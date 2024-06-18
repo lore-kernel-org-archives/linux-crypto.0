@@ -1,120 +1,114 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B45B15747F;
-	Tue, 18 Jun 2024 19:27:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A3EF16DC20
+	for <linux-crypto@vger.kernel.org>; Tue, 18 Jun 2024 20:25:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718738876; cv=none; b=uPbC8FADph8QOFhsvOkW/+EztTsXV2OWitC7q6yAHMeTXHvi3oxCRS+oiqEVRFmNeJZgM3SJBSplGMFYgxsZIc7JoFdeo/xiJZ96zqbisabdGut1FVpU0zO7vb+NqFALQObtrH0a7NqyLWpRHd2Hv4BCw0Fu8SExBtUyxDjXy1s=
+	t=1718742337; cv=none; b=otsm1flmKSC4LqNlRxEXwEoEeuWR7mvY2XeyuHQXEs1iKH1LSZ9rPmH198gGHeEuDvhtUPogicUXQnDfQdpeGq6H01dVxPDceTPLz9RaKuvrNZJoWS0fpvWSrGDjjc3L/+M9bShfL5rDWHp9Y8re4uqG2Z6ZsSsrbe+vAaKMLu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718738876; c=relaxed/simple;
-	bh=heR/isSr78VcW/VYrPWTjRfQ7W1E6j/MQUID0htM5m0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KUi9KVbwbXrMat+aob2NozU2IpBZS2wB1XSWUoQ9puHSkgTI6c2YfuPJRVpJzO1vElhnlBerIY+dDIr7QyU+x2kj6rgFLp7DlaIPFPvbn8nOhwGxNkh0IKFg2g2yex8Q8g1pOcmJVn8Ck524zEEtoUAlIFFzNWAgPvrxxZUKpsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=KY6RjJcv; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1718742337; c=relaxed/simple;
+	bh=YRwOsnVFLe6p/kcwQwqv47N4rgTeTPM2k+Ln+QF8Fh0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uJhkJ3e+elxUyTfYs+e9Kbrss5OGsVc7F12aCGfHL5iDJsx6FlOsBz/+QlU6N9WBAoR4PronZEeiXzLiTlUAfBzzaEy+cwRVriHwx/Mrzlcn7lQMsUrnlqEbM6vxVS+vOvVMIKsOKBuhdtbFt/eTeo+nxjlkMK+Ik15BHJ87yRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=qXXXbIE+; arc=none smtp.client-ip=209.85.128.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="KY6RjJcv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC5F3C3277B;
-	Tue, 18 Jun 2024 19:27:54 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="KY6RjJcv"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1718738873;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=w+M43ijHJAES43FqmOh139eqeLQGGZwedR3F/gwSFa4=;
-	b=KY6RjJcvm/x40m75gOjTtS5zZeqJn6Hk6z5rySRNMI1VIx5Dc65xsL/Ek3fQwB70rHmUra
-	mdhDiYsVZr2fEVMCyZ248m8uSfIio4SolEXXEchZDvepYgd4DmrhwyTsyKYp0Zw/BAfWRW
-	GrTqF8l+K33DEyV9p1Lhegiix3TzTqg=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id fbae344a (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Tue, 18 Jun 2024 19:27:52 +0000 (UTC)
-Date: Tue, 18 Jun 2024 21:27:50 +0200
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: Andy Lutomirski <luto@amacapital.net>
-Cc: linux-kernel@vger.kernel.org, patches@lists.linux.dev,
-	tglx@linutronix.de, linux-crypto@vger.kernel.org,
-	linux-api@vger.kernel.org, x86@kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-	Carlos O'Donell <carlos@redhat.com>,
-	Florian Weimer <fweimer@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
-	Jann Horn <jannh@google.com>,
-	Christian Brauner <brauner@kernel.org>,
-	David Hildenbrand <dhildenb@redhat.com>
-Subject: Re: [PATCH v17 4/5] random: introduce generic vDSO getrandom()
- implementation
-Message-ID: <ZnHftrP3H410gScf@zx2c4.com>
-References: <20240614190646.2081057-1-Jason@zx2c4.com>
- <20240614190646.2081057-5-Jason@zx2c4.com>
- <CALCETrVQtQO87U3SEgQyHfkNKsrcS8PjeZrsy2MPAU7gQY70XA@mail.gmail.com>
- <ZnDQ-HQH8NlmCcIr@zx2c4.com>
- <CALCETrWzXQMXjvL+nGq-+aLVUeiABJ46DACtLnrLXxmwh9s_dg@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qXXXbIE+"
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-6312f1f83d9so44265327b3.2
+        for <linux-crypto@vger.kernel.org>; Tue, 18 Jun 2024 13:25:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1718742334; x=1719347134; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=w90+p3jzlFRMUniSo2b8ogKD0Fur+lnhSGZA3lnaqUs=;
+        b=qXXXbIE+NKRMPRbDJwPrtNn5CmdceaKOHH5JlhyyOQlJKlNuQGoJ4mGPoe1VMNZKcU
+         6Vi/ekRKMExenrWocUrnrXnSc1vWoRQq+AAGVybfWkfN+pgH9l4jOGPuMuI6eXeaZRzb
+         XQCZlrvX+VpNACZDxILsOiOjELsyZmmSmp87DiK6KxbnhTB7MRWlwTSaRTK+JHhwcQTt
+         Ol7AB/Xrv1uib6sDl+LwoD3L3c0WNrFyzy3X2dT8AOj8sooho/3dgT+K64j8SAut96NO
+         ad4LNaHr8toHP98dw/9jGzMUpAUcrOeURfOz1pUGagpMPEU67nC+zZjib9XRUxi8ehTW
+         WTOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718742334; x=1719347134;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=w90+p3jzlFRMUniSo2b8ogKD0Fur+lnhSGZA3lnaqUs=;
+        b=vwO0rvIyP4mz2cSmcSRJIIKLXwj+3bCUisx56DqDwoHKLsKh6UjSSY2gZQYriG0HTk
+         vAmnbJT39ULGf1UxHKpHThebXZMsgo/ZewfhM6xq/uh9bFqjkaJH3rlNK5qBm1LuTbT7
+         LzcfuDWeyody8tacsRDBa7KloX/hn+p5baoMkvhIlraR4ZKacMTMdd7zm76bquVzsSjc
+         NU7f04+k5c4UaqwCQou4aN3t/MHxpNtMZST0S3qNtZ9qS9kVEexzxtK/c37S3BspyGMD
+         cqT+qLhupNbDEN27apyjkpy56OhjN3+s+bUgHmSNFtIh4DCZJrS1vqwHsioOx52H2XJk
+         yajQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVv5n96yY3XCt/2zgJW1xXqg4Q0/+VdqtGLBvxG/LWbPfgzAupjNAJl0oGMKYLD54V6L+iCmQciaR1ZxnjpjmNMWV9yG2kpxPBcfCoo
+X-Gm-Message-State: AOJu0Yw2USbrivAPvk2H3sYakJf9e5M+TtZYRLUFQj4fWIw9BuobRC+B
+	y7QnL4bwbZr8SUFhxFgc5SSXPqIPFHvq9pUH+JBMuH6EXaAehA1drygF+VTN3XgupnMV6yh3c4x
+	56sUBga/t7hXJkPNENx9ZNpdbB34EZUpmb6H5teHUZdm60OUfY/E=
+X-Google-Smtp-Source: AGHT+IGpLhokgo384YPPtzeum2gZbC5i+iA9FZlR28A17rfQt8gwax2e5rYT0RauGBa3Y+2aEIDe9j1FBX0e6anXkkM=
+X-Received: by 2002:a81:7e0d:0:b0:62f:37c9:77bc with SMTP id
+ 00721157ae682-63a8ac68875mr9831877b3.0.1718742334043; Tue, 18 Jun 2024
+ 13:25:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CALCETrWzXQMXjvL+nGq-+aLVUeiABJ46DACtLnrLXxmwh9s_dg@mail.gmail.com>
+References: <20240618003743.2975-1-semen.protsenko@linaro.org>
+ <20240618003743.2975-7-semen.protsenko@linaro.org> <94d50353-15ba-4769-bd98-57f4430f5fc2@kernel.org>
+In-Reply-To: <94d50353-15ba-4769-bd98-57f4430f5fc2@kernel.org>
+From: Sam Protsenko <semen.protsenko@linaro.org>
+Date: Tue, 18 Jun 2024 15:25:23 -0500
+Message-ID: <CAPLW+4mHA4GHHX8TQa-CvMkYBU8me=q=cxKXLWwypGxpOtMpCQ@mail.gmail.com>
+Subject: Re: [PATCH 6/7] hwrng: exynos: Enable Exynos850 support
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: =?UTF-8?Q?=C5=81ukasz_Stelmach?= <l.stelmach@samsung.com>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	Alim Akhtar <alim.akhtar@samsung.com>, linux-samsung-soc@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 18, 2024 at 10:55:17AM -0700, Andy Lutomirski wrote:
-> On Mon, Jun 17, 2024 at 5:12 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+On Tue, Jun 18, 2024 at 1:39=E2=80=AFAM Krzysztof Kozlowski <krzk@kernel.or=
+g> wrote:
+>
+> On 18/06/2024 02:37, Sam Protsenko wrote:
+> > Add Exynos850 compatible and its driver data. It's only possible to
+> > access TRNG block via SMC calls in Exynos850, so specify that fact usin=
+g
+> > QUIRK_SMC in the driver data.
 > >
-> > Hi Andy,
+> > Signed-off-by: Sam Protsenko <semen.protsenko@linaro.org>
+> > ---
+> >  drivers/char/hw_random/exynos-trng.c | 3 +++
+> >  1 file changed, 3 insertions(+)
 > >
-> > On Mon, Jun 17, 2024 at 05:06:22PM -0700, Andy Lutomirski wrote:
-> > > On Fri, Jun 14, 2024 at 12:08 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> > > >
-> > > > Provide a generic C vDSO getrandom() implementation, which operates on
-> > > > an opaque state returned by vgetrandom_alloc() and produces random bytes
-> > > > the same way as getrandom(). This has a the API signature:
-> > > >
-> > > >   ssize_t vgetrandom(void *buffer, size_t len, unsigned int flags, void *opaque_state);
-> > >
-> > > Last time around, I mentioned some potential issues with this function
-> > > signature, and I didn't see any answer.  My specific objection was to
-> > > the fact that the caller passes in a pointer but not a length, and
-> > > this potentially makes reasoning about memory safety awkward,
-> > > especially if anything like CRIU is involved.
-> >
-> > Oh, I understood this backwards last time - I thought you were
-> > criticizing the size_t len argument, which didn't make any sense.
-> >
-> > Re-reading now, what you're suggesting is that I add an additional
-> > argument called `size_t opaque_len`, and then the implementation does
-> > something like:
-> >
-> >     if (opaque_len != sizeof(struct vgetrandom_state))
-> >         goto fallback_syscall;
-> >
-> > With the reasoning that falling back to syscall is better than returning
-> > -EINVAL, because that could happen in a natural way due to CRIU. In
-> > contrast, your objection to opaque_state not being aligned falling back
-> > to the syscall was that it should never happen ever, so -EFAULT is more
-> > fitting.
-> >
-> > Is that correct?
-> 
-> My alternative suggestion, which is far less well formed, would be to
-> make the opaque argument be somehow not pointer-like and be more of an
-> opaque handle.  So it would be uintptr_t instead of void *, and the
-> user API would be built around the user getting a list of handles
-> instead of a block of memory.
-> 
-> The benefit would be a tiny bit less overhead (potentially), but the
-> API would need substantially more rework.  I'm not convinced that this
-> would be worthwhile.
+> > diff --git a/drivers/char/hw_random/exynos-trng.c b/drivers/char/hw_ran=
+dom/exynos-trng.c
+> > index 98b7a8ebb909..3368a08df9ce 100644
+> > --- a/drivers/char/hw_random/exynos-trng.c
+> > +++ b/drivers/char/hw_random/exynos-trng.c
+> > @@ -333,6 +333,9 @@ static DEFINE_SIMPLE_DEV_PM_OPS(exynos_trng_pm_ops,=
+ exynos_trng_suspend,
+> >  static const struct of_device_id exynos_trng_dt_match[] =3D {
+> >       {
+> >               .compatible =3D "samsung,exynos5250-trng",
+> > +     }, {
+> > +             .compatible =3D "samsung,exynos850-trng",
+> > +             .data =3D (void *)QUIRK_SMC,
+>
+> Probably this (and in previous patch) should be called flags, not
+> quirks. Quirks are for work-arounds.
+>
 
-I'd thought about this too -- a Windows-style handle system -- but
-it seemed complicated and just not worth it, so the simplicity here
-seems more appealing. I'm happy to take your suggestion of an opaque_len
-argument (and it's already implemented in my "vdso" branch), and
-leaving it at that.
+Thanks for the quick review! Will submit v2 soon with all the comments
+addressed.
 
-Jason
+
+> Best regards,
+> Krzysztof
+>
