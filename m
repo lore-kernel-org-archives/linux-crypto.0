@@ -1,187 +1,205 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D40913F42E
-	for <linux-crypto@vger.kernel.org>; Tue, 18 Jun 2024 07:13:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3DE06D1B9;
+	Tue, 18 Jun 2024 07:39:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718694821; cv=none; b=M9MjPv2JGZ3F5sOC0EmqcUpw1iw+QAEML0hTjR+BvBhFpFNdQHgRejawhRCWmC/z44oT76TycqMjS6BYDeGJNbngGiWLL2KCcVLgl3cDQyckqolG4rzpB6+NEkzwMG6Y45NZbMcTiECn6bAH1eF0JDS9iXdp/oN23kQjrc6nGdo=
+	t=1718696386; cv=none; b=qgVifls1M5LWBJYq3Z19GyhTZ7EgXobIDsAPyDn4wl3EHE7Jbo97WKZg+VzYG5I1R0spuvtJHNbHp+oq+/0wKcEOUJmg/5HAd6wIPnZrsGiOdL8bi1/6HENL1qv52gBlLqEri+qQVv6BvCckhi5Hd0EOkBd1A0l33MsrKB2cAr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718694821; c=relaxed/simple;
-	bh=9ya6iEKqGg8De/4s6Ze4xDIb+xQaAQNCIrZCtIWF/7s=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=IqySCKVJErfXzFtC2CWBNKml3AXAqYxZM1Nc0pCI3uIeo4LXMPl4jRO0hs99Z7vbRwclPHKv4EVWyXc6mulZ/jXNeY6StO4Y/Y7QcL/GSJvgxroV++biSduhX9zTgpmB9+0/2h4cPwca66DR12Rxj+ctVwUHPaSrDm6SaKA1M5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ldU06kSN; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1718696386; c=relaxed/simple;
+	bh=OjKlfNpd7OTHedF4ooTljpuB/fy48tL79BH5283OL2c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X8xPx5yGW8WLSXkSFJ2uMGzNu2cJZ/y0z+eMcgkhAEjr+E9IfzBWkesv6jeN6EfyGbZofyuUxeLqtZ4XMc87RnTf6yKVUWvpwBRRDsR63NwR54VyYkxlcs/ZkMcXRlPq9pJrlRGDccfqrIwPNSm5fYPLnZ6pB4oX55U68/hy9l4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LAulVbrO; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ldU06kSN"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4217926991fso46082375e9.3
-        for <linux-crypto@vger.kernel.org>; Tue, 18 Jun 2024 00:13:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1718694817; x=1719299617; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:references:cc:to:subject:reply-to:from:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1wiBjLcn5WbWlRuyHrxpnQqW9c9nIklW7PRJKCt1+mI=;
-        b=ldU06kSNw0FLOx0n2BJJ3b9TFaxXyCr755UCfA+09pmW4BWiyu/y/rYdPzSZedPGLI
-         BLFc87rF+wBB97XUgdajI0/miFtn6wpU/PJqCu6l3rWw4x+99WbIivv9jDB6VAVzp8oI
-         4H/qVj4imD6x0OuP63l8aMWF7kCKsrjfvwXsZc6oUuCGh0Srn7NMB5YCIvSJH0G5EPwe
-         UjcNqynrSM4qCl9wmrHU6KPs2A1zIvC7HGy5z0iNuuS4NBtT9DR7rOj6p6t/rOr6UBkE
-         YTTN9xOTKWsoGJURhYdOfxllvu0DHjKds8nyWnZg2YoN9VOWAOd/R6qrdBfAQ9P0f/CA
-         8IWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718694817; x=1719299617;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:references:cc:to:subject:reply-to:from:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=1wiBjLcn5WbWlRuyHrxpnQqW9c9nIklW7PRJKCt1+mI=;
-        b=kt3pg5Hdcu7Z2vckWzmDY/NRsoJJvjnnHeJy7FYm78sad9/HmiPr3JqnBbFYZPc7Yq
-         JQxTcjejx4x1FAC/WF3awinTooCZu4WnCRCkiYYmmSlyDUFr3sokINqOnc23UoifwQCg
-         XC545Shj36a5sbZZhnd4FfYK/RuMXcMKnvzXbfT4JKb+2tjCnwNwU3kK0Ex/lV7MbD+4
-         be2WF+Jw4z+VzG5DqklotcxDNFYExsqau6UVEHJdQt1Er1Ied60of4pma7H6anBlx8J+
-         KWdM4DW7ogkz/L7PVu1L3N510XtYDhKOLMyYeU0RGCo7nBS5H0WCw9pkFGKoUcp0Wyfb
-         pPaw==
-X-Forwarded-Encrypted: i=1; AJvYcCWYKEj66+vLuHWBwrwcrvyVCEG7fhBz71SclNVaXbCgxi5Uyy4Uxc4tB5r5SAVV2akafBGJOKgtcGaW5wUtDWOlWNEXPBHG3yUCSYXH
-X-Gm-Message-State: AOJu0Yw5WDe1SjE9DgJFYCJP6NJgPKl7pXdHuHPk+giihYnNbkPAPd+e
-	6FAtZ9IP7HIM8TKLrMZ00ID5qGWZDoA2WyKT3BLEWls0DVwH/zZ0xyOEEIqvYoE=
-X-Google-Smtp-Source: AGHT+IHS9iZxX2xl/jBNg4f+neP7mB0SCIizLgvgWkWOKv8wSW3XcXSQF6qHt2nKb5aYk3tH9re1MA==
-X-Received: by 2002:a05:600c:154d:b0:421:8028:a507 with SMTP id 5b1f17b1804b1-4230482b872mr76976565e9.18.1718694816781;
-        Tue, 18 Jun 2024 00:13:36 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:982:cbb0:7f31:be49:5b98:50cd? ([2a01:e0a:982:cbb0:7f31:be49:5b98:50cd])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-422a1e68d04sm196876345e9.36.2024.06.18.00.13.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Jun 2024 00:13:36 -0700 (PDT)
-Message-ID: <ad7f22f5-21e4-4411-88f3-7daa448d2c83@linaro.org>
-Date: Tue, 18 Jun 2024 09:13:34 +0200
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LAulVbrO"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718696383; x=1750232383;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=OjKlfNpd7OTHedF4ooTljpuB/fy48tL79BH5283OL2c=;
+  b=LAulVbrOjdfYS2fk4hIsGQOY2QNFumUYSL5QsQ0tCDO3MPCxOVoTOBFU
+   T+63+X02Jf0TOjcbfu7zSADriPpxty3209Nz9JzUOhpkKze6ye4uWYtta
+   GlxjknogH9gM4h2VrLxON4MJRfQ66vOZuTYYWWM1g3UgqknIMX8yq4aIl
+   BE8953DY2/0kLJLZp5fNJB3maGO8jOeC/Zm0792tQn4pIzBQurQS7vd4J
+   vx27f1lOJN2tSPmnBMLAxQO/Mg7zwAIZJxJUmLJCvGHCBGgdwGSVFGbIP
+   6WjmGijsGXbMZ2zg67ihShJQun4HjP4o7xYPNNBn4lLUdZndLRFnw/fBQ
+   Q==;
+X-CSE-ConnectionGUID: qJCOoPSJRWydcAM/clWPmg==
+X-CSE-MsgGUID: TkrBEcBDTRKzsX1vH3rQ5A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11106"; a="33026728"
+X-IronPort-AV: E=Sophos;i="6.08,247,1712646000"; 
+   d="scan'208";a="33026728"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jun 2024 00:39:42 -0700
+X-CSE-ConnectionGUID: ZH26BE4mRAesZDWo1QDSVg==
+X-CSE-MsgGUID: dOhvDB2lRZezr651awkCQQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,247,1712646000"; 
+   d="scan'208";a="45998161"
+Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
+  by fmviesa004.fm.intel.com with ESMTP; 18 Jun 2024 00:39:38 -0700
+Received: from kbuild by 68891e0c336b with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sJTRI-0005JJ-1Z;
+	Tue, 18 Jun 2024 07:39:36 +0000
+Date: Tue, 18 Jun 2024 15:39:21 +0800
+From: kernel test robot <lkp@intel.com>
+To: Andre Przywara <andre.przywara@arm.com>,
+	Corentin Labbe <clabbe.montjoie@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>
+Cc: oe-kbuild-all@lists.linux.dev, linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH 2/4] crypto: sun8i-ce - wrap accesses to descriptor
+ address fields
+Message-ID: <202406181436.RZPPffYb-lkp@intel.com>
+References: <20240616220719.26641-3-andre.przywara@arm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: neil.armstrong@linaro.org
-Reply-To: neil.armstrong@linaro.org
-Subject: Re: [PATCH v5 04/15] soc: qcom: ice: add hwkm support in ice
-To: Gaurav Kashyap <quic_gaurkash@quicinc.com>,
- linux-arm-msm@vger.kernel.org, linux-scsi@vger.kernel.org,
- andersson@kernel.org, ebiggers@google.com, srinivas.kandagatla@linaro.org,
- krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, robh+dt@kernel.org
-Cc: linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org,
- kernel@quicinc.com, linux-crypto@vger.kernel.org,
- devicetree@vger.kernel.org, quic_omprsing@quicinc.com,
- quic_nguyenb@quicinc.com, bartosz.golaszewski@linaro.org,
- konrad.dybcio@linaro.org, ulf.hansson@linaro.org, jejb@linux.ibm.com,
- martin.petersen@oracle.com, mani@kernel.org, davem@davemloft.net,
- herbert@gondor.apana.org.au, psodagud@quicinc.com, quic_apurupa@quicinc.com,
- sonalg@quicinc.com
-References: <20240617005825.1443206-1-quic_gaurkash@quicinc.com>
- <20240617005825.1443206-5-quic_gaurkash@quicinc.com>
-Content-Language: en-US, fr
-Autocrypt: addr=neil.armstrong@linaro.org; keydata=
- xsBNBE1ZBs8BCAD78xVLsXPwV/2qQx2FaO/7mhWL0Qodw8UcQJnkrWmgTFRobtTWxuRx8WWP
- GTjuhvbleoQ5Cxjr+v+1ARGCH46MxFP5DwauzPekwJUD5QKZlaw/bURTLmS2id5wWi3lqVH4
- BVF2WzvGyyeV1o4RTCYDnZ9VLLylJ9bneEaIs/7cjCEbipGGFlfIML3sfqnIvMAxIMZrvcl9
- qPV2k+KQ7q+aXavU5W+yLNn7QtXUB530Zlk/d2ETgzQ5FLYYnUDAaRl+8JUTjc0CNOTpCeik
- 80TZcE6f8M76Xa6yU8VcNko94Ck7iB4vj70q76P/J7kt98hklrr85/3NU3oti3nrIHmHABEB
- AAHNKk5laWwgQXJtc3Ryb25nIDxuZWlsLmFybXN0cm9uZ0BsaW5hcm8ub3JnPsLAkQQTAQoA
- OwIbIwULCQgHAwUVCgkICwUWAgMBAAIeAQIXgBYhBInsPQWERiF0UPIoSBaat7Gkz/iuBQJk
- Q5wSAhkBAAoJEBaat7Gkz/iuyhMIANiD94qDtUTJRfEW6GwXmtKWwl/mvqQtaTtZID2dos04
- YqBbshiJbejgVJjy+HODcNUIKBB3PSLaln4ltdsV73SBcwUNdzebfKspAQunCM22Mn6FBIxQ
- GizsMLcP/0FX4en9NaKGfK6ZdKK6kN1GR9YffMJd2P08EO8mHowmSRe/ExAODhAs9W7XXExw
- UNCY4pVJyRPpEhv373vvff60bHxc1k/FF9WaPscMt7hlkbFLUs85kHtQAmr8pV5Hy9ezsSRa
- GzJmiVclkPc2BY592IGBXRDQ38urXeM4nfhhvqA50b/nAEXc6FzqgXqDkEIwR66/Gbp0t3+r
- yQzpKRyQif3OwE0ETVkGzwEIALyKDN/OGURaHBVzwjgYq+ZtifvekdrSNl8TIDH8g1xicBYp
- QTbPn6bbSZbdvfeQPNCcD4/EhXZuhQXMcoJsQQQnO4vwVULmPGgtGf8PVc7dxKOeta+qUh6+
- SRh3vIcAUFHDT3f/Zdspz+e2E0hPV2hiSvICLk11qO6cyJE13zeNFoeY3ggrKY+IzbFomIZY
- 4yG6xI99NIPEVE9lNBXBKIlewIyVlkOaYvJWSV+p5gdJXOvScNN1epm5YHmf9aE2ZjnqZGoM
- Mtsyw18YoX9BqMFInxqYQQ3j/HpVgTSvmo5ea5qQDDUaCsaTf8UeDcwYOtgI8iL4oHcsGtUX
- oUk33HEAEQEAAcLAXwQYAQIACQUCTVkGzwIbDAAKCRAWmrexpM/4rrXiB/sGbkQ6itMrAIfn
- M7IbRuiSZS1unlySUVYu3SD6YBYnNi3G5EpbwfBNuT3H8//rVvtOFK4OD8cRYkxXRQmTvqa3
- 3eDIHu/zr1HMKErm+2SD6PO9umRef8V82o2oaCLvf4WeIssFjwB0b6a12opuRP7yo3E3gTCS
- KmbUuLv1CtxKQF+fUV1cVaTPMyT25Od+RC1K+iOR0F54oUJvJeq7fUzbn/KdlhA8XPGzwGRy
- 4zcsPWvwnXgfe5tk680fEKZVwOZKIEuJC3v+/yZpQzDvGYJvbyix0lHnrCzq43WefRHI5XTT
- QbM0WUIBIcGmq38+OgUsMYu4NzLu7uZFAcmp6h8g
-Organization: Linaro
-In-Reply-To: <20240617005825.1443206-5-quic_gaurkash@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240616220719.26641-3-andre.przywara@arm.com>
 
-On 17/06/2024 02:50, Gaurav Kashyap wrote:
-> Qualcomm's ICE (Inline Crypto Engine) contains a proprietary
-> key management hardware called Hardware Key Manager (HWKM).
-> This patch integrates HWKM support in ICE when it is
-> available. HWKM primarily provides hardware wrapped key support
-> where the ICE (storage) keys are not available in software and
-> protected in hardware.
-> 
-> When HWKM software support is not fully available (from Trustzone),
-> there can be a scenario where the ICE hardware supports HWKM, but
-> it cannot be used for wrapped keys. In this case, standard keys have
-> to be used without using HWKM. Hence, providing a toggle controlled
-> by a devicetree entry to use HWKM or not.
-> 
-> Tested-by: Neil Armstrong <neil.armstrong@linaro.org>
-> Signed-off-by: Gaurav Kashyap <quic_gaurkash@quicinc.com>
-> ---
->   drivers/soc/qcom/ice.c | 153 +++++++++++++++++++++++++++++++++++++++--
->   include/soc/qcom/ice.h |   1 +
->   2 files changed, 150 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/soc/qcom/ice.c b/drivers/soc/qcom/ice.c
-> index 6f941d32fffb..d5e74cf2946b 100644
-> --- a/drivers/soc/qcom/ice.c
-> +++ b/drivers/soc/qcom/ice.c
-> @@ -26,6 +26,40 @@
+Hi Andre,
 
-<snip>
+kernel test robot noticed the following build warnings:
 
-> +
->   static struct qcom_ice *qcom_ice_create(struct device *dev,
->   					void __iomem *base)
->   {
-> @@ -239,6 +382,8 @@ static struct qcom_ice *qcom_ice_create(struct device *dev,
->   		engine->core_clk = devm_clk_get_enabled(dev, NULL);
->   	if (IS_ERR(engine->core_clk))
->   		return ERR_CAST(engine->core_clk);
-> +	engine->use_hwkm = of_property_read_bool(dev->of_node,
-> +						 "qcom,ice-use-hwkm");
+[auto build test WARNING on sunxi/sunxi/for-next]
+[also build test WARNING on herbert-cryptodev-2.6/master herbert-crypto-2.6/master linus/master v6.10-rc4 next-20240617]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Please drop this property and instead add an scm function calling:
+url:    https://github.com/intel-lab-lkp/linux/commits/Andre-Przywara/dt-bindings-crypto-sun8i-ce-Add-compatible-for-H616/20240617-061144
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/sunxi/linux.git sunxi/for-next
+patch link:    https://lore.kernel.org/r/20240616220719.26641-3-andre.przywara%40arm.com
+patch subject: [PATCH 2/4] crypto: sun8i-ce - wrap accesses to descriptor address fields
+config: loongarch-randconfig-r111-20240618 (https://download.01.org/0day-ci/archive/20240618/202406181436.RZPPffYb-lkp@intel.com/config)
+compiler: loongarch64-linux-gcc (GCC) 13.2.0
+reproduce: (https://download.01.org/0day-ci/archive/20240618/202406181436.RZPPffYb-lkp@intel.com/reproduce)
 
-__qcom_scm_is_call_available(QCOM_SCM_SVC_ES, QCOM_SCM_ES_DERIVE_SW_SECRET)
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202406181436.RZPPffYb-lkp@intel.com/
 
-like
+sparse warnings: (new ones prefixed by >>)
+>> drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c:175:34: sparse: sparse: incorrect type in argument 1 (different base types) @@     expected unsigned int [usertype] value @@     got restricted __le32 @@
+   drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c:175:34: sparse:     expected unsigned int [usertype] value
+   drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c:175:34: sparse:     got restricted __le32
 
-bool qcom_scm_derive_sw_secret_available(void)
-{
-	if (!__qcom_scm_is_call_available(__scm->dev, QCOM_SCM_SVC_ES,
-					  QCOM_SCM_ES_DERIVE_SW_SECRET))
-		return false;
+vim +175 drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
 
-	return true;
-}
+   167	
+   168		mutex_lock(&ce->mlock);
+   169	
+   170		v = readl(ce->base + CE_ICR);
+   171		v |= 1 << flow;
+   172		writel(v, ce->base + CE_ICR);
+   173	
+   174		reinit_completion(&ce->chanlist[flow].complete);
+ > 175		writel(sun8i_ce_desc_addr(ce, ce->chanlist[flow].t_phy),
+   176		       ce->base + CE_TDQ);
+   177	
+   178		ce->chanlist[flow].status = 0;
+   179		/* Be sure all data is written before enabling the task */
+   180		wmb();
+   181	
+   182		/* Only H6 needs to write a part of t_common_ctl along with "1", but since it is ignored
+   183		 * on older SoCs, we have no reason to complicate things.
+   184		 */
+   185		v = 1 | ((le32_to_cpu(ce->chanlist[flow].tl->t_common_ctl) & 0x7F) << 8);
+   186		writel(v, ce->base + CE_TLR);
+   187		mutex_unlock(&ce->mlock);
+   188	
+   189		wait_for_completion_interruptible_timeout(&ce->chanlist[flow].complete,
+   190				msecs_to_jiffies(ce->chanlist[flow].timeout));
+   191	
+   192		if (ce->chanlist[flow].status == 0) {
+   193			dev_err(ce->dev, "DMA timeout for %s (tm=%d) on flow %d\n", name,
+   194				ce->chanlist[flow].timeout, flow);
+   195			err = -EFAULT;
+   196		}
+   197		/* No need to lock for this read, the channel is locked so
+   198		 * nothing could modify the error value for this channel
+   199		 */
+   200		v = readl(ce->base + CE_ESR);
+   201		switch (ce->variant->esr) {
+   202		case ESR_H3:
+   203			/* Sadly, the error bit is not per flow */
+   204			if (v) {
+   205				dev_err(ce->dev, "CE ERROR: %x for flow %x\n", v, flow);
+   206				err = -EFAULT;
+   207				print_hex_dump(KERN_INFO, "TASK: ", DUMP_PREFIX_NONE, 16, 4,
+   208					       cet, sizeof(struct ce_task), false);
+   209			}
+   210			if (v & CE_ERR_ALGO_NOTSUP)
+   211				dev_err(ce->dev, "CE ERROR: algorithm not supported\n");
+   212			if (v & CE_ERR_DATALEN)
+   213				dev_err(ce->dev, "CE ERROR: data length error\n");
+   214			if (v & CE_ERR_KEYSRAM)
+   215				dev_err(ce->dev, "CE ERROR: keysram access error for AES\n");
+   216			break;
+   217		case ESR_A64:
+   218		case ESR_D1:
+   219		case ESR_H5:
+   220		case ESR_R40:
+   221			v >>= (flow * 4);
+   222			v &= 0xF;
+   223			if (v) {
+   224				dev_err(ce->dev, "CE ERROR: %x for flow %x\n", v, flow);
+   225				err = -EFAULT;
+   226				print_hex_dump(KERN_INFO, "TASK: ", DUMP_PREFIX_NONE, 16, 4,
+   227					       cet, sizeof(struct ce_task), false);
+   228			}
+   229			if (v & CE_ERR_ALGO_NOTSUP)
+   230				dev_err(ce->dev, "CE ERROR: algorithm not supported\n");
+   231			if (v & CE_ERR_DATALEN)
+   232				dev_err(ce->dev, "CE ERROR: data length error\n");
+   233			if (v & CE_ERR_KEYSRAM)
+   234				dev_err(ce->dev, "CE ERROR: keysram access error for AES\n");
+   235			break;
+   236		case ESR_H6:
+   237			v >>= (flow * 8);
+   238			v &= 0xFF;
+   239			if (v) {
+   240				dev_err(ce->dev, "CE ERROR: %x for flow %x\n", v, flow);
+   241				err = -EFAULT;
+   242				print_hex_dump(KERN_INFO, "TASK: ", DUMP_PREFIX_NONE, 16, 4,
+   243					       cet, sizeof(struct ce_task), false);
+   244			}
+   245			if (v & CE_ERR_ALGO_NOTSUP)
+   246				dev_err(ce->dev, "CE ERROR: algorithm not supported\n");
+   247			if (v & CE_ERR_DATALEN)
+   248				dev_err(ce->dev, "CE ERROR: data length error\n");
+   249			if (v & CE_ERR_KEYSRAM)
+   250				dev_err(ce->dev, "CE ERROR: keysram access error for AES\n");
+   251			if (v & CE_ERR_ADDR_INVALID)
+   252				dev_err(ce->dev, "CE ERROR: address invalid\n");
+   253			if (v & CE_ERR_KEYLADDER)
+   254				dev_err(ce->dev, "CE ERROR: key ladder configuration error\n");
+   255			break;
+   256		}
+   257	
+   258		return err;
+   259	}
+   260	
 
-You may perhaps only call qcom_scm_derive_sw_secret_available() for some
-ICE versions.
-
-Neil
-
->   
->   	if (!qcom_ice_check_supported(engine))
->   		return ERR_PTR(-EOPNOTSUPP);
-> diff --git a/include/soc/qcom/ice.h b/include/soc/qcom/ice.h
-> index 9dd835dba2a7..1f52e82e3e1c 100644
-> --- a/include/soc/qcom/ice.h
-> +++ b/include/soc/qcom/ice.h
-> @@ -34,5 +34,6 @@ int qcom_ice_program_key(struct qcom_ice *ice,
->   			 const struct blk_crypto_key *bkey,
->   			 u8 data_unit_size, int slot);
->   int qcom_ice_evict_key(struct qcom_ice *ice, int slot);
-> +bool qcom_ice_hwkm_supported(struct qcom_ice *ice);
->   struct qcom_ice *of_qcom_ice_get(struct device *dev);
->   #endif /* __QCOM_ICE_H__ */
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
