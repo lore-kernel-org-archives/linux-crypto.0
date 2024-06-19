@@ -1,127 +1,262 @@
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 094C584DF8
-	for <linux-crypto@vger.kernel.org>; Wed, 19 Jun 2024 11:37:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.85.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE7DD1CAA2;
+	Wed, 19 Jun 2024 15:45:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718797047; cv=none; b=RacNpqQsXtj0SypLeJYwx/nVke0DPb/76CKOgPE3xOn2Dk3t6r2YIo3gk0kq4pxZjA4vcVJL8z7M1/jWitimmvGhkvmNg9djL4ecFdpZ4tkvdtOJwNG9Tf3vmipgWfqoiZ8nngAjmohgN62ilZHFz82x6f2rxKUEDEuwMqsq0oo=
+	t=1718811918; cv=none; b=B1UJMw2LH5ri9NSWmKividqvNO45jvz3CFk/KCiuQbGCbSFGZq0OEiBl0c1ObLCOFKIFj97CAm5q1D2UcoxOfuLD2TTB88ob1noT9wnM1cCGeseWaItqodnxzHWjy61DWK4Rn6EOQLMYvx9G/f+2Ru3jJnKNx78gwIYEohUqXC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718797047; c=relaxed/simple;
-	bh=BSHkKLrECWLAlbeSl4v1U37C/da+oM2lEsa5kkc5HAU=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 MIME-Version:Content-Type; b=noFZ9A34nKhKvbCoFsi0j4ax2N4n/6KOL78ZoWxtVkbPyBWXUeB/yafhFonIAUwWKSccAXxLcC0uWRiYQnz3TqES+vNzHUVJmaJ3V83lLdMI0Ejs2/1VBkQcEmkVjswshDVZzxXX8Q+oI8Tq6E3JsGIbkq9nqk/+NQKGgITcpb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.85.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-194-CS909xtoNvSfQqELdIGVDA-1; Wed, 19 Jun 2024 12:37:22 +0100
-X-MC-Unique: CS909xtoNvSfQqELdIGVDA-1
-Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
- (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 19 Jun
- 2024 12:36:46 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Wed, 19 Jun 2024 12:36:46 +0100
-From: David Laight <David.Laight@ACULAB.COM>
-To: "'Jason A. Donenfeld'" <Jason@zx2c4.com>, Andy Lutomirski
-	<luto@amacapital.net>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"patches@lists.linux.dev" <patches@lists.linux.dev>, "tglx@linutronix.de"
-	<tglx@linutronix.de>, "linux-crypto@vger.kernel.org"
-	<linux-crypto@vger.kernel.org>, "linux-api@vger.kernel.org"
-	<linux-api@vger.kernel.org>, "x86@kernel.org" <x86@kernel.org>, "Greg
- Kroah-Hartman" <gregkh@linuxfoundation.org>, Adhemerval Zanella Netto
-	<adhemerval.zanella@linaro.org>, Carlos O'Donell <carlos@redhat.com>,
-	"Florian Weimer" <fweimer@redhat.com>, Arnd Bergmann <arnd@arndb.de>, Jann
- Horn <jannh@google.com>, Christian Brauner <brauner@kernel.org>, David
- Hildenbrand <dhildenb@redhat.com>
-Subject: RE: [PATCH v17 4/5] random: introduce generic vDSO getrandom()
- implementation
-Thread-Topic: [PATCH v17 4/5] random: introduce generic vDSO getrandom()
- implementation
-Thread-Index: AQHawbWRB8EYMZoZREup+2i1zqOfJbHO9S3w
-Date: Wed, 19 Jun 2024 11:36:46 +0000
-Message-ID: <e860c5fdea5b4d26b1d95d32e2662a9d@AcuMS.aculab.com>
-References: <20240614190646.2081057-1-Jason@zx2c4.com>
- <20240614190646.2081057-5-Jason@zx2c4.com>
- <CALCETrVQtQO87U3SEgQyHfkNKsrcS8PjeZrsy2MPAU7gQY70XA@mail.gmail.com>
- <ZnDQ-HQH8NlmCcIr@zx2c4.com>
- <CALCETrWzXQMXjvL+nGq-+aLVUeiABJ46DACtLnrLXxmwh9s_dg@mail.gmail.com>
- <ZnHftrP3H410gScf@zx2c4.com>
-In-Reply-To: <ZnHftrP3H410gScf@zx2c4.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
+	s=arc-20240116; t=1718811918; c=relaxed/simple;
+	bh=fjs/HSbDS4tp/jn9C/h6sSXqZP5qij2ZouJdM0o1maU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=poKzomoGKW8EVLkW+8oCyo3YKiBwFyvbpbCQ8BJ5HdjYWjX/FxUY4k0H4tOAGfXNhhjcFv7GBbLOIXfxbURsrQXZOjr54tj5UD8h5VTlIrbb39FKqeKesPPO2trgbSawaeSU1lcS+EcOqpAO0+W8+nHI6h1A6N/iXyQZfLQqw3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=A9IiR2oQ; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="A9IiR2oQ"
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45JEpMFC016255;
+	Wed, 19 Jun 2024 15:44:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	message-id:subject:from:to:cc:date:in-reply-to:references
+	:content-type:content-transfer-encoding:mime-version; s=pp1; bh=
+	xKFYqoB155OgWsXMwJh8/xlXL+QoRB8FAIYdLU5RO84=; b=A9IiR2oQpsG6m7iC
+	U+bvYJzwB8FTnrPmIonwnERFvsPReTKHLnnADGzsf+5Cuaxc18/yIy7iaIridZew
+	ScQU8hq631G7H9j7Tr6w8LZbZF12MfbDVRucYfE5/WMMaq+TA3iU9jHvWVYU9uDF
+	7gphVOPkEs6ltXsnLqUoLwbuXnOGpMjc1Lzkbxzw9RkG5tgwo0YgdKuIXyOTuWfC
+	Y1gdtCKE8pqSgJK7GAUMYFIhIbIzmB7sYt/ki1spMnn59XazJNB+BFk8YIiOGf4l
+	zwfxm3htdoR7SgCMO5Z+V+lKLu4MtuKkfZRqSoYwPED9UHNbWyPMiRU5mPUyMUf8
+	uE4qUg==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yv14ug74j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 19 Jun 2024 15:44:37 +0000 (GMT)
+Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 45JFiatM003589;
+	Wed, 19 Jun 2024 15:44:36 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yv14ug74e-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 19 Jun 2024 15:44:36 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45JEK1v7011052;
+	Wed, 19 Jun 2024 15:22:52 GMT
+Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3yspsndms1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 19 Jun 2024 15:22:52 +0000
+Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
+	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45JFMnYS61931950
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 19 Jun 2024 15:22:51 GMT
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3B65358063;
+	Wed, 19 Jun 2024 15:22:49 +0000 (GMT)
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1C55458052;
+	Wed, 19 Jun 2024 15:22:48 +0000 (GMT)
+Received: from li-5cd3c5cc-21f9-11b2-a85c-a4381f30c2f3.ibm.com (unknown [9.61.172.36])
+	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 19 Jun 2024 15:22:48 +0000 (GMT)
+Message-ID: <ce7232469844231f768c2f5b4cacc4d48c2f1db3.camel@linux.ibm.com>
+Subject: Re: [RFC PATCH v2 0/8] Clavis LSM
+From: Mimi Zohar <zohar@linux.ibm.com>
+To: Eric Snowberg <eric.snowberg@oracle.com>,
+        linux-security-module@vger.kernel.org
+Cc: dhowells@redhat.com, dwmw2@infradead.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net, ardb@kernel.org, jarkko@kernel.org,
+        paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
+        roberto.sassu@huawei.com, dmitry.kasatkin@gmail.com, mic@digikod.net,
+        casey@schaufler-ca.com, stefanb@linux.ibm.com, ebiggers@kernel.org,
+        rdunlap@infradead.org, linux-kernel@vger.kernel.org,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-efi@vger.kernel.org, linux-integrity@vger.kernel.org
+Date: Wed, 19 Jun 2024 11:22:47 -0400
+In-Reply-To: <20240531003945.44594-1-eric.snowberg@oracle.com>
+References: <20240531003945.44594-1-eric.snowberg@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-25.el8_9) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: kk3i3-PWXGW8orAzEZTBq5y_ZAUx_dRY
+X-Proofpoint-ORIG-GUID: w13BX0wkvUBrSH9H9FNy9Th8PuoH-n5q
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-19_02,2024-06-19_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ bulkscore=0 phishscore=0 impostorscore=0 mlxlogscore=999 suspectscore=0
+ lowpriorityscore=0 malwarescore=0 mlxscore=0 clxscore=1011 adultscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2405170001 definitions=main-2406190115
 
-RnJvbTogSmFzb24gQS4gRG9uZW5mZWxkDQo+IFNlbnQ6IDE4IEp1bmUgMjAyNCAyMDoyOA0KPiBP
-biBUdWUsIEp1biAxOCwgMjAyNCBhdCAxMDo1NToxN0FNIC0wNzAwLCBBbmR5IEx1dG9taXJza2kg
-d3JvdGU6DQo+ID4gT24gTW9uLCBKdW4gMTcsIDIwMjQgYXQgNToxMuKAr1BNIEphc29uIEEuIERv
-bmVuZmVsZCA8SmFzb25AengyYzQuY29tPiB3cm90ZToNCj4gPiA+DQo+ID4gPiBIaSBBbmR5LA0K
-PiA+ID4NCj4gPiA+IE9uIE1vbiwgSnVuIDE3LCAyMDI0IGF0IDA1OjA2OjIyUE0gLTA3MDAsIEFu
-ZHkgTHV0b21pcnNraSB3cm90ZToNCj4gPiA+ID4gT24gRnJpLCBKdW4gMTQsIDIwMjQgYXQgMTI6
-MDjigK9QTSBKYXNvbiBBLiBEb25lbmZlbGQgPEphc29uQHp4MmM0LmNvbT4gd3JvdGU6DQo+ID4g
-PiA+ID4NCj4gPiA+ID4gPiBQcm92aWRlIGEgZ2VuZXJpYyBDIHZEU08gZ2V0cmFuZG9tKCkgaW1w
-bGVtZW50YXRpb24sIHdoaWNoIG9wZXJhdGVzIG9uDQo+ID4gPiA+ID4gYW4gb3BhcXVlIHN0YXRl
-IHJldHVybmVkIGJ5IHZnZXRyYW5kb21fYWxsb2MoKSBhbmQgcHJvZHVjZXMgcmFuZG9tIGJ5dGVz
-DQo+ID4gPiA+ID4gdGhlIHNhbWUgd2F5IGFzIGdldHJhbmRvbSgpLiBUaGlzIGhhcyBhIHRoZSBB
-UEkgc2lnbmF0dXJlOg0KPiA+ID4gPiA+DQo+ID4gPiA+ID4gICBzc2l6ZV90IHZnZXRyYW5kb20o
-dm9pZCAqYnVmZmVyLCBzaXplX3QgbGVuLCB1bnNpZ25lZCBpbnQgZmxhZ3MsIHZvaWQgKm9wYXF1
-ZV9zdGF0ZSk7DQo+ID4gPiA+DQo+ID4gPiA+IExhc3QgdGltZSBhcm91bmQsIEkgbWVudGlvbmVk
-IHNvbWUgcG90ZW50aWFsIGlzc3VlcyB3aXRoIHRoaXMgZnVuY3Rpb24NCj4gPiA+ID4gc2lnbmF0
-dXJlLCBhbmQgSSBkaWRuJ3Qgc2VlIGFueSBhbnN3ZXIuICBNeSBzcGVjaWZpYyBvYmplY3Rpb24g
-d2FzIHRvDQo+ID4gPiA+IHRoZSBmYWN0IHRoYXQgdGhlIGNhbGxlciBwYXNzZXMgaW4gYSBwb2lu
-dGVyIGJ1dCBub3QgYSBsZW5ndGgsIGFuZA0KPiA+ID4gPiB0aGlzIHBvdGVudGlhbGx5IG1ha2Vz
-IHJlYXNvbmluZyBhYm91dCBtZW1vcnkgc2FmZXR5IGF3a3dhcmQsDQo+ID4gPiA+IGVzcGVjaWFs
-bHkgaWYgYW55dGhpbmcgbGlrZSBDUklVIGlzIGludm9sdmVkLg0KPiA+ID4NCj4gPiA+IE9oLCBJ
-IHVuZGVyc3Rvb2QgdGhpcyBiYWNrd2FyZHMgbGFzdCB0aW1lIC0gSSB0aG91Z2h0IHlvdSB3ZXJl
-DQo+ID4gPiBjcml0aWNpemluZyB0aGUgc2l6ZV90IGxlbiBhcmd1bWVudCwgd2hpY2ggZGlkbid0
-IG1ha2UgYW55IHNlbnNlLg0KPiA+ID4NCj4gPiA+IFJlLXJlYWRpbmcgbm93LCB3aGF0IHlvdSdy
-ZSBzdWdnZXN0aW5nIGlzIHRoYXQgSSBhZGQgYW4gYWRkaXRpb25hbA0KPiA+ID4gYXJndW1lbnQg
-Y2FsbGVkIGBzaXplX3Qgb3BhcXVlX2xlbmAsIGFuZCB0aGVuIHRoZSBpbXBsZW1lbnRhdGlvbiBk
-b2VzDQo+ID4gPiBzb21ldGhpbmcgbGlrZToNCj4gPiA+DQo+ID4gPiAgICAgaWYgKG9wYXF1ZV9s
-ZW4gIT0gc2l6ZW9mKHN0cnVjdCB2Z2V0cmFuZG9tX3N0YXRlKSkNCj4gPiA+ICAgICAgICAgZ290
-byBmYWxsYmFja19zeXNjYWxsOw0KPiA+ID4NCj4gPiA+IFdpdGggdGhlIHJlYXNvbmluZyB0aGF0
-IGZhbGxpbmcgYmFjayB0byBzeXNjYWxsIGlzIGJldHRlciB0aGFuIHJldHVybmluZw0KPiA+ID4g
-LUVJTlZBTCwgYmVjYXVzZSB0aGF0IGNvdWxkIGhhcHBlbiBpbiBhIG5hdHVyYWwgd2F5IGR1ZSB0
-byBDUklVLiBJbg0KPiA+ID4gY29udHJhc3QsIHlvdXIgb2JqZWN0aW9uIHRvIG9wYXF1ZV9zdGF0
-ZSBub3QgYmVpbmcgYWxpZ25lZCBmYWxsaW5nIGJhY2sNCj4gPiA+IHRvIHRoZSBzeXNjYWxsIHdh
-cyB0aGF0IGl0IHNob3VsZCBuZXZlciBoYXBwZW4gZXZlciwgc28gLUVGQVVMVCBpcyBtb3JlDQo+
-ID4gPiBmaXR0aW5nLg0KPiA+ID4NCj4gPiA+IElzIHRoYXQgY29ycmVjdD8NCj4gPg0KPiA+IE15
-IGFsdGVybmF0aXZlIHN1Z2dlc3Rpb24sIHdoaWNoIGlzIGZhciBsZXNzIHdlbGwgZm9ybWVkLCB3
-b3VsZCBiZSB0bw0KPiA+IG1ha2UgdGhlIG9wYXF1ZSBhcmd1bWVudCBiZSBzb21laG93IG5vdCBw
-b2ludGVyLWxpa2UgYW5kIGJlIG1vcmUgb2YgYW4NCj4gPiBvcGFxdWUgaGFuZGxlLiAgU28gaXQg
-d291bGQgYmUgdWludHB0cl90IGluc3RlYWQgb2Ygdm9pZCAqLCBhbmQgdGhlDQo+ID4gdXNlciBB
-UEkgd291bGQgYmUgYnVpbHQgYXJvdW5kIHRoZSB1c2VyIGdldHRpbmcgYSBsaXN0IG9mIGhhbmRs
-ZXMNCj4gPiBpbnN0ZWFkIG9mIGEgYmxvY2sgb2YgbWVtb3J5Lg0KPiA+DQo+ID4gVGhlIGJlbmVm
-aXQgd291bGQgYmUgYSB0aW55IGJpdCBsZXNzIG92ZXJoZWFkIChwb3RlbnRpYWxseSksIGJ1dCB0
-aGUNCj4gPiBBUEkgd291bGQgbmVlZCBzdWJzdGFudGlhbGx5IG1vcmUgcmV3b3JrLiAgSSdtIG5v
-dCBjb252aW5jZWQgdGhhdCB0aGlzDQo+ID4gd291bGQgYmUgd29ydGh3aGlsZS4NCj4gDQo+IEkn
-ZCB0aG91Z2h0IGFib3V0IHRoaXMgdG9vIC0tIGEgV2luZG93cy1zdHlsZSBoYW5kbGUgc3lzdGVt
-IC0tIGJ1dA0KPiBpdCBzZWVtZWQgY29tcGxpY2F0ZWQgYW5kIGp1c3Qgbm90IHdvcnRoIGl0LCBz
-byB0aGUgc2ltcGxpY2l0eSBoZXJlDQo+IHNlZW1zIG1vcmUgYXBwZWFsaW5nLiBJJ20gaGFwcHkg
-dG8gdGFrZSB5b3VyIHN1Z2dlc3Rpb24gb2YgYW4gb3BhcXVlX2xlbg0KPiBhcmd1bWVudCAoYW5k
-IGl0J3MgYWxyZWFkeSBpbXBsZW1lbnRlZCBpbiBteSAidmRzbyIgYnJhbmNoKSwgYW5kDQo+IGxl
-YXZpbmcgaXQgYXQgdGhhdC4NCg0KVGhleSBkb24ndCB3b3JrIGVpdGhlci4uLg0KDQpQcm9iYWJs
-eSBiZXN0IGlzIHRvIG1ha2UgaXQgJ3N0cnVjdCB2Z2V0cmFuZG9tX3N0YXRlIConIGJ1dCBuZXZl
-cg0KYWN0dWFsbHkgZGVmaW5lIHRoYXQgc3RydWN0dXJlIGluIGFueSB1c2VyIGhlYWRlci4NClRo
-ZW4gYXQgbGVhc3QgdGhlIGFwcGxpY2F0aW9uIGdldHMgc29tZSB0eXBlIGNoZWNraW5nIGZyb20g
-dGhlIGNvbXBpbGVyDQp0aGF0IHRoZSBjb3JyZWN0IHBvaW50ZXIgaXMgYmVpbmcgcGFzc2VkLg0K
-DQpEZXBlbmRpbmcgb24gd2hlcmUvaG93IHRoZSBkYXRhIGlzIGFsbG9jYXRlZCB5b3UgbWF5IHRo
-ZW4gbm90IG5lZWQNCmEgbGVuZ3RoPyANCg0KCURhdmlkDQoNCi0NClJlZ2lzdGVyZWQgQWRkcmVz
-cyBMYWtlc2lkZSwgQnJhbWxleSBSb2FkLCBNb3VudCBGYXJtLCBNaWx0b24gS2V5bmVzLCBNSzEg
-MVBULCBVSw0KUmVnaXN0cmF0aW9uIE5vOiAxMzk3Mzg2IChXYWxlcykNCg==
+Hi Eric,
+
+On Thu, 2024-05-30 at 18:39 -0600, Eric Snowberg wrote:
+> Introduce a new LSM called Clavis (Latin word meaning key).  The motivation
+> behind this LSM is to provide access control for system keys.  Before spending
+> more time on this LSM, I am sending this as an RFC to start a discussion to see
+> if the current direction taken has a possibility of being accepted in the
+> future.
+> 
+> Today the kernel has the following system keyrings: .builtin_trusted_keyring,
+> .secondary_trusted_keyring, and the .machine.  It also has the .platform
+> keyring which has limited capabilities; it can only be used to verify a kernel
+> for kexec.
+
+Please start the cover letter with the problem description/motivation, not the
+solution.
+
+From https://docs.kernel.org/process/submitting-patches.html: 
+
+"Describe your problem. Whether your patch is a one-line bug fix or 5000 lines
+of a new feature, there must be an underlying problem that motivated you to do
+this work. Convince the reviewer that there is a problem worth fixing and that
+it makes sense for them to read past the first paragraph."
+
+For example,
+
+Additional keys not built into the kernel could originally be loaded onto the
+.secondary_trusted_keyring *only* if they were signed by a key built into the
+kernel or by a key already on the .secondary_trusted_keyring.  The concern for
+using the wrong key for signature verification was minimal.  With the ability of
+loading Machine Owner Keys(MOK) keys onto the .machine keyring, which is linked
+to the .secondary_trusted_keys keyring, key usage is a real concern.
+
+To limit key usage ...
+
+> 
+> Today the kernel also tracks key usage for verification done with any of these
+> keys. Current verification usage includes: VERIFYING_MODULE_SIGNATURE,
+> VERIFYING_FIRMWARE_SIGNATURE, VERIFYING_KEXEC_PE_SIGNATURE,
+> VERIFYING_KEY_SIGNATURE, VERIFYING_KEY_SELF_SIGNATURE, and
+> VERIFYING_UNSPECIFIED_SIGNATURE. After these usage types were originally
+> introduced, most additions have typically used the
+> VERIFYING_UNSPECIFIED_SIGNATURE.
+> 
+> At the moment, besides the usage enforcement for .platform keys, any key
+> contained within the system keyrings can be used for any verification
+> purpose.  For example, a key that was originally created to sign kernel
+> modules could be used for BPF verification.
+> 
+> This new LSM adds the ability to do access control for all system keys. When
+> enabled, only the .builtin_trusted_keys are available for loading kernel
+> modules and doing a kexec.  Until an ACL entry is added for a specific key, no
+> other system key may be used for any other purpose.
+
+Keys stored on the .builtin_trusted_keys keyring seem to always be permitted,
+independent of a Clavis rule, which is fine, but the above paragraph needs to be
+re-worded.
+
+> 
+> Enabling the LSM is done during initial boot by passing in a single asymmetric
+> key id within a new "clavis=" boot param. The asymmetric key id must match one
+> already contained within any of the system keyrings.  If a match is found, a
+> link is created into the new .clavis keyring.  This key shall be used as the
+> root of trust for any keyring ACL updates afterwards.
+> 
+> On UEFI systems the "clavis" boot param is mirrored into a new UEFI variable
+> within the EFI stub code. This variable will persist until the next power on
+> reset.  This same type of functionality is done within shim. Since this
+> variable is created before ExitBootServices (EBS) it will not have the NVRAM
+> bit set, signifying it was created during the Boot Services phase. This is
+> being used so the "clavis" boot param can not be changed via kexec, thereby
+> preventing a pivot of the root of trust.
+
+Move this paragraph (and patch) to later.  Defining a new UEFI variable makes it
+more difficult to test.  Consider defering introducing the new UEFI variable
+patch to the end.
+
+> 
+> As mentioned earlier, this LSM introduces a new .clavis keyring.  Following
+> boot, no new asymmetric keys can be added to this keyring and only the key
+> designated via the initial boot param may be used. This LSM can not be started
+> at any other point in time.  The .clavis keyring also holds the access control
+> list for system keys. A new key type called clavis_key_acl is being introduced.
+> This contains the usage followed by the asymmetric key id. To be added to the
+> clavis keyring, the clavis_key_acl must be S/MIME signed by the sole asymmetric
+> key contained within it. New ACL additions to the .clavis keyring may be added
+> at any time.
+
+Ok. To summarize, the Clavis policy rules are loaded at runtime onto the .clavis
+keyring.  The Clavis rules must be signed by the key specified on the "clavis="
+boot command line.  The only key on the .clavis keyring is the one specified on
+the boot command line.
+
+As far as I'm aware, this would be the first time policy rules are stored in a
+keyring.
+
+> 
+> Currently this LSM does not require new changes or modifications to any user
+> space tools.  It also does not have a securityfs interface.  Everything is
+> done using the existing keyctl tool through the new .clavis keyring. The
+> S/MIME signing can be done with a simple OpenSSL command. If additions or
+> updates need to be added in the future, new ACL key types could be created.
+> With this approach, maintainability should not be an issue in the future
+> if missing items are identified.
+> 
+> Clavis must be configured at build time with CONFIG_SECURITY_CLAVIS=y. The list
+> of security modules enabled by default is set with CONFIG_LSM.  The kernel
+> configuration must contain CONFIG_LSM=clavis,[...] with [...] as the list of
+> other security modules for the running system.
+> 
+> For setup and usage instructions, the final patch includes an admin-guide.
+> 
+> Future enhancements to this LSM could include:
+> 
+> 1. Subsystems that currently use system keys with
+>    VERIFYING_UNSPECIFIED_SIGNATURE could be updated with their specific
+>    usage type.  For example, a usage type for IMA, BPF, etc could be
+>    added.
+
+Being able to at least limit the key used to verify the IMA policy signature
+would be nice to have earlier, rather than later.
+
+> 
+> 2. Currently, each clavis_key_acl must be individually signed.  Add the ability
+>    to sign multiple clavis_key_acl entries within the same file.
+> 
+> 3. Currently, this LSM does not place key usage restrictions on the builtin
+>    keys for kexec and kernel module verification. This was done to prevent a
+>    regression that could  prevent the kernel from booting.  This could be
+>    changed if there was a way at compile time to pre-populate the .clavis
+>    keyring. This would allow the ephemeral key used to sign the kernel
+>    modules to be included within the .clavis keyring, allowing the kernel
+>    to boot.
+
+I don't see a problem with trusting the builtin keys.  They should be trusted. 
+
+> 
+> 4. UEFI Secure Boot Advanced Targeting (SBAT) support. Since
+>    the boot param is mirrored into UEFI before EBS is called,
+>    this LSM could be enhanced to not only enforce key usage,
+>    but also SBAT levels across kexec.
+> 
+> 5. Having the ability to allow platform keys to be on par with
+>    all other system keys when using this LSM. This would be useful
+>    for a user that controls their entire UEFI SB DB key chain and
+>    doesn't want to use MOK keys.
+
+Additional comments:
+
+This patch set is dependent on CONFIG_{MODULE, KEXEC}_SIG being enabled:
+
+- with CONFIG_MODULE_SIG_FORCE and CONFIG_KEXEC_SIG_FORCE configured.
+- wit sig_enforce specified on the boot command line.
+- with either Lockdown or CONFIG_IMA_ARCH_POLICY enforcing kexec/module
+signature verification.
+
+Without CONFIG_{MODULE, KEXEC}_SIG enabled and with CONFIG_IMA_ARCH_POLICY
+enabled or similar rules, IMA would verify the kexec kernel image and kernel
+modules without Clavis enforcement.
+
+Mimi
 
