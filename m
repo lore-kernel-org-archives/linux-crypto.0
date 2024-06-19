@@ -1,125 +1,115 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E663F155C8E;
-	Wed, 19 Jun 2024 17:32:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3D7115252C
+	for <linux-crypto@vger.kernel.org>; Wed, 19 Jun 2024 18:18:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718818322; cv=none; b=GdD9qB62hZza1Nd96XltoLrelKatrIEVmvIl8AfGaEGS6AK14FznrMR+cCnB5Cb3Inoo0lhvVY+3eWkN7VyBxwCaQsN9/MzZck4IFHwPxsUUcAS6f06SLnCEXVm1R15uNwiNDQdSuB4IRhEbYfKf8TXsxbOWwny6/+UVc8EYdXg=
+	t=1718821085; cv=none; b=F70L+SyH95T1y7zct3KFOAp/O8O67nSUthqY2kPBhqdydEG+iarJLMUh3Kui5OC2yFqT6uwPLVJdp0c7X5XaLwXQBpCymRIiCtG0iPQsxvOSH+eGlFUM5Vp1Z3+N2dm30ub+gziXhcogMVpZ2S4kQGPSxmSET4XTN0wQNoQp4/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718818322; c=relaxed/simple;
-	bh=Bk8pDU+SPg5xF1wbzUJW8YF5QkNMCQk0wDQv5SKdeSo=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=kLRj7/AVvqnHi3hN9W3+HJGr204l5XUkQTSWInKxJglFzQnZOqcH94IOxKW87ukL5xEC0HhHVt3CtaknHmu2BdMBfeYHhleETPOYwDcVIXE+uxh1cYb1akrQzSXSCP+CLE36CF35AM56ZTeL4ElDtqFx3g4ssctKKb+qhQxkKXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Se7Za0se; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1718821085; c=relaxed/simple;
+	bh=BMsEnaJeqRgypiQRsvcEy+etmijnHQyGI+cG12HwEz8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=dxcdl4t25QAqk4OE2WjLsF9lFU904Zs/vO9DhRLlrnmpanLgRKZ2Lf/vesDxQzA4kBeK2x2qRn+X5xZwvvA+s2lW2JFz7cTQcd66e8JF9Q+KxV6OC4VFyzVldiaaiBQMUwdbRWbyOwUNt6La4XI8X5S+AYz5Ixh75CycCW22+fg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=FYlQOxon; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Se7Za0se"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FE82C2BBFC;
-	Wed, 19 Jun 2024 17:32:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718818321;
-	bh=Bk8pDU+SPg5xF1wbzUJW8YF5QkNMCQk0wDQv5SKdeSo=;
-	h=Date:From:To:Cc:Subject:From;
-	b=Se7Za0segNU66V+823W3EJnFXofqChSRcSnLsR/AgAb6p4vYOhC+VMTVfY7TlIfRG
-	 aJydnAvXCtRMAJzQG7rTyGY4TreNQszmg6i3At0w/TH9Ld8FmhUE9M8NUjfn+PD6Fb
-	 ynZUBbnIw0Pmw+BogfQNDX19+3NTfCXShYu0FrV10FeLk8nxnblUjKjdVmRi/6tKfw
-	 JTU5/Nvq9lS0e6Cz7lRypYNzsEjd85FqtM0Rjyu4aHU0hVgQ+afMhNEcOuP72bQUoY
-	 PUSOeEIF2eaaH1XNnn6M2dq457+/f7zWfE8DolizUG8rxinvygznA8TgQmotAi86mW
-	 bGnFusMSNGsCQ==
-Date: Wed, 19 Jun 2024 19:31:57 +0200
-From: Helge Deller <deller@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>, linux-parisc@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: xor - fix template benchmarking
-Message-ID: <ZnMWDdKJHfYQLDzS@p100>
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="FYlQOxon"
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45JAuixe024363;
+	Wed, 19 Jun 2024 18:17:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	5eYe8VUZI/Gg2v+i4M3/B0rLim5Cf4VZmsZkZAO5Yjo=; b=FYlQOxonXmoNnsbs
+	l9aHqNZjiVSBYvQnEyTpnwbovxuNYVHpVW3LvTIYd5/hDZFKVlQuAKlff5/9usJH
+	eyHplB+rISGD8LvftNYJKU5hmVjyr8HXlGR0+ceql+ANMT+esweg9a3LVumh7eOT
+	bvouPyCwWwVZ5IP3ynInG7U4zIvgI7ZX0s7I8Vq5qx2jkYQUQ996d0QA3ychVtS6
+	e00y/knr39IlJIylKJ2gf5ZHccf1hQzNkSUgKEyxjrQoxCzGm0wDdHkKugd9HRbz
+	wJt9iiuXcnW4pbwajx4fOnF/hfebGifXXdUvhuMp81S9jb5cS+5PHeoqYfP6irDC
+	7irj+g==
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3yux1510vg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 19 Jun 2024 18:17:41 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA03.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 45JIHeca011538
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 19 Jun 2024 18:17:40 GMT
+Received: from [10.81.24.74] (10.49.16.6) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 19 Jun
+ 2024 11:17:39 -0700
+Message-ID: <704905a5-fcbb-4263-b6f2-c85d65ceef00@quicinc.com>
+Date: Wed, 19 Jun 2024 11:17:39 -0700
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/7] Add SPAcc Skcipher support
+To: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>,
+        <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>
+CC: <Ruud.Derwig@synopsys.com>, <manjunath.hadli@vayavyalabs.com>,
+        <bhoomikak@vayavyalabs.com>, shwetar <shwetar@vayavyalabs.com>
+References: <20240618042750.485720-1-pavitrakumarm@vayavyalabs.com>
+ <20240618042750.485720-2-pavitrakumarm@vayavyalabs.com>
+Content-Language: en-US
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+In-Reply-To: <20240618042750.485720-2-pavitrakumarm@vayavyalabs.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nalasex01a.na.qualcomm.com (10.47.209.196) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: awnik2yH0r1Nf-heyajxz9Z9RajCm6UB
+X-Proofpoint-ORIG-GUID: awnik2yH0r1Nf-heyajxz9Z9RajCm6UB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-19_02,2024-06-19_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ lowpriorityscore=0 suspectscore=0 malwarescore=0 spamscore=0 clxscore=1011
+ mlxlogscore=761 mlxscore=0 phishscore=0 impostorscore=0 bulkscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2405170001 definitions=main-2406190138
 
-Commit c055e3eae0f1 ("crypto: xor - use ktime for template benchmarking")
-switched from using jiffies to ktime-based performance benchmarking.
+On 6/17/24 21:27, Pavitrakumar M wrote:
+> Signed-off-by: shwetar <shwetar@vayavyalabs.com>
+> Signed-off-by: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
+> Acked-by: Ruud Derwig <Ruud.Derwig@synopsys.com>
+> ---
+>   drivers/crypto/dwc-spacc/spacc_core.c      | 1241 ++++++++++++++++++++
+>   drivers/crypto/dwc-spacc/spacc_core.h      |  826 +++++++++++++
+>   drivers/crypto/dwc-spacc/spacc_device.c    |  339 ++++++
+>   drivers/crypto/dwc-spacc/spacc_device.h    |  236 ++++
+>   drivers/crypto/dwc-spacc/spacc_hal.c       |  367 ++++++
+>   drivers/crypto/dwc-spacc/spacc_hal.h       |  113 ++
+>   drivers/crypto/dwc-spacc/spacc_interrupt.c |  316 +++++
+>   drivers/crypto/dwc-spacc/spacc_manager.c   |  650 ++++++++++
+>   drivers/crypto/dwc-spacc/spacc_skcipher.c  |  715 +++++++++++
+>   9 files changed, 4803 insertions(+)
+>   create mode 100644 drivers/crypto/dwc-spacc/spacc_core.c
+>   create mode 100644 drivers/crypto/dwc-spacc/spacc_core.h
+>   create mode 100644 drivers/crypto/dwc-spacc/spacc_device.c
+>   create mode 100644 drivers/crypto/dwc-spacc/spacc_device.h
+>   create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.c
+>   create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.h
+>   create mode 100644 drivers/crypto/dwc-spacc/spacc_interrupt.c
+>   create mode 100644 drivers/crypto/dwc-spacc/spacc_manager.c
+>   create mode 100644 drivers/crypto/dwc-spacc/spacc_skcipher.c
+> 
+...
 
-This works nicely on machines which have a fine-grained ktime()
-clocksource as e.g. x86 machoines with TSC.
-But other machines, e.g. my 4-way HP PARISC server, don't have such
-fine-grained clocksources, which is why it seems that 800 xor loops
-take zero seconds, which then calculates in the logs as:
+> +module_platform_driver(spacc_driver);
+> +
+> +MODULE_LICENSE("GPL");
+> +MODULE_AUTHOR("Synopsys, Inc.");
 
- xor: measuring software checksum speed
-    8regs           : -1018167296 MB/sec
-    8regs_prefetch  : -1018167296 MB/sec
-    32regs          : -1018167296 MB/sec
-    32regs_prefetch : -1018167296 MB/sec
+Missing MODULE_DESCRIPTION()
+This will cause a warning with make W=1
 
-Fix this with some small modifications to the existing code to improve
-the algorithm to always produce correct results without introducing
-major delays for architectures with a fine-grained ktime()
-clocksource:
-a) Delay start of the timing until ktime() just advanced. On machines
-with a fast ktime() this should be just one additional ktime() call.
-b) Count the number of loops. Run at minimum 800 loops and finish
-earliest when the ktime() counter has progressed.
 
-With that the throughput can now be calculated more accurately under all
-conditions.
-
-Fixes: c055e3eae0f1 ("crypto: xor - use ktime for template benchmarking")
-Signed-off-by: Helge Deller <deller@gmx.de>
-
-diff --git a/crypto/xor.c b/crypto/xor.c
-index 8e72e5d5db0d..29b4c0fd89d7 100644
---- a/crypto/xor.c
-+++ b/crypto/xor.c
-@@ -83,33 +83,29 @@ static void __init
- do_xor_speed(struct xor_block_template *tmpl, void *b1, void *b2)
- {
- 	int speed;
--	int i, j;
--	ktime_t min, start, diff;
-+	unsigned long reps;
-+	ktime_t min, start, t0;
- 
- 	tmpl->next = template_list;
- 	template_list = tmpl;
- 
- 	preempt_disable();
- 
--	min = (ktime_t)S64_MAX;
--	for (i = 0; i < 3; i++) {
--		start = ktime_get();
--		for (j = 0; j < REPS; j++) {
--			mb(); /* prevent loop optimization */
--			tmpl->do_2(BENCH_SIZE, b1, b2);
--			mb();
--		}
--		diff = ktime_sub(ktime_get(), start);
--		if (diff < min)
--			min = diff;
--	}
-+	t0 = ktime_get();
-+	/* delay start until time has advanced */
-+	do { start = ktime_get(); } while (start == t0);
-+	reps = 0;
-+	do {
-+		mb(); /* prevent loop optimization */
-+		tmpl->do_2(BENCH_SIZE, b1, b2);
-+		mb();
-+	} while (reps++ < REPS || (t0 = ktime_get()) == start);
-+	min = ktime_sub(t0, start);
- 
- 	preempt_enable();
- 
- 	// bytes/ns == GB/s, multiply by 1000 to get MB/s [not MiB/s]
--	if (!min)
--		min = 1;
--	speed = (1000 * REPS * BENCH_SIZE) / (unsigned int)ktime_to_ns(min);
-+	speed = (1000 * reps * BENCH_SIZE) / (unsigned int)ktime_to_ns(min);
- 	tmpl->speed = speed;
- 
- 	pr_info("   %-16s: %5d MB/sec\n", tmpl->name, speed);
