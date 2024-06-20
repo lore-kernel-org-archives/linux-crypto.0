@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D0A0446A5;
-	Thu, 20 Jun 2024 07:27:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3051647F7A;
+	Thu, 20 Jun 2024 07:29:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718868449; cv=none; b=jF8QiOclbO+fa2AOHICRRvCAe36G9n9su6eMKaMILxSroUI/tIJ3HRm8LOR9pAXbOXKT2ZLymz+EEG5FNq62XZTWhOWxPIC6Vujs1zecUIV4N1EVAVBOWFl7cPRvsOZGAzEVrfp8ztLGIlXEZkTVAI+8HjIFuOQ8ligYnpsUmYc=
+	t=1718868548; cv=none; b=GwzNQt1ubrTea1rv3a9ySlRX9NtZm74bGzFN5kiTQHWWo5/nktM6uZBBcAxF8wJX3XJN2n2frvXuz5SKuzt3nV7s0tqfLVSRvsvgYo0ayGR+3/0U8psgVe1tsN55FsMuqf+EMMbCMVYyv485fNs561mQl2PQAlwNj4VsB3X1wDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718868449; c=relaxed/simple;
-	bh=cnfxORgUb2XRzaUYhyY7pO04rpW+058lKSthDjn+Z90=;
+	s=arc-20240116; t=1718868548; c=relaxed/simple;
+	bh=6Kza/hMjE9mD2QVBTejC6hAoZQe05MWT0U56Rjvaf/k=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cf3kZ9JyUB4h4aQy7twe+McIHGvL9Gy6MJGqgp83rnEwyzbh7yvymm7MT3+FnSM3YmQTRRFHx90AxwWlbb4mxkKa8zU/KPHzVESHjdrEodMUQ0aESKWS9lgipkO10xYlaOAySjdH2KGuSG9T/CiFrBcLpxgtkUk/y760dpuJvjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cVgTOahZ; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=N7jsL6eQ1qlbwmIY5kcYNGeg1bUtNgmvd54CVNMztboc6d/tCPm6mEfKv7H9+gxrrr/vaPDrDgdWLJU4NThKMvzbvoUaN5A8BxuFzNeHdax9MP43ypO03w17EPxwXSYyIoxM8rgIACmPrQazemBtXuZJWdm08j69Ft6h2X7McRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aM7eDUBJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cVgTOahZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BA3DC2BD10;
-	Thu, 20 Jun 2024 07:27:22 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aM7eDUBJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD3AAC2BD10;
+	Thu, 20 Jun 2024 07:29:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718868448;
-	bh=cnfxORgUb2XRzaUYhyY7pO04rpW+058lKSthDjn+Z90=;
+	s=k20201202; t=1718868547;
+	bh=6Kza/hMjE9mD2QVBTejC6hAoZQe05MWT0U56Rjvaf/k=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=cVgTOahZ7q8pfb9SLRgrQ3drJhGKn0rOK7azdkbjd/FdlyRfwj39PI2NMfFxdSJAm
-	 iu3Lif8D9pIkpJQ4paeP5Y7ZM4+/1msNjNQ0AQfuEIye6mPOdJmRA+Gz9zVCoL3Uqx
-	 EDQ+VYI7l9TYjHhzdxoZvW7Z+TP/Gl1tAL07eUvBaOGksljF2wvdIteUyNqPYHK/Ku
-	 jgOFqQCr1SO31bfhJIqGEIsUqmWDqeXtdVfu71ak1Rbf3NFkRV/HzBGBboBKKyVZo4
-	 3b6kaEYnsjOIeAqgGs4oO/cYrHSdt9aoOv+b5p6p9ulgVspRZ1/UUIIEJJesnaurtC
-	 mjt7zwGMqTefA==
-Message-ID: <710469e2-d7be-46d0-9851-773458bd789b@kernel.org>
-Date: Thu, 20 Jun 2024 09:27:20 +0200
+	b=aM7eDUBJ1FeDR8Lfr3x0y39eYrgLZLSrjG192LvrVih1sjp5HeTTylTZ/+2Xih0jm
+	 yJCHrXFTZUqM094S8N2A1Nc8GtPfKDNRM+Eo4u3M4TOtBbHf0tLGZadoOQQKf/sXlA
+	 9c7DexIIQmtai7uzJmPnfJ4Y5S6wjLUdcVoyzF1mX2LsLLcEH9N3i+SlvQJ2SJYurY
+	 YHrlt0HtewZh8puvEYdJ3D6uIXpAebdK1a7HvNWpS4po7zgAFKqRWOmzesFV+L0+j/
+	 FnbYn+JNtt5WlvMMzndMZkK9ggF7ZibEdNK9l9TrI5oC5F28YrXtNGVr5M6r0X8KYJ
+	 YF3VJZa7OZs1Q==
+Message-ID: <63e4f095-6558-4cb1-a189-60d1d3cc6ec3@kernel.org>
+Date: Thu, 20 Jun 2024 09:29:00 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,8 +35,8 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/7] dt-bindings: rng: Add Exynos850 support to
- exynos-trng
+Subject: Re: [PATCH v2 3/7] hwrng: exynos: Use devm_clk_get_enabled() to get
+ the clock
 To: Sam Protsenko <semen.protsenko@linaro.org>,
  =?UTF-8?Q?=C5=81ukasz_Stelmach?= <l.stelmach@samsung.com>,
  Krzysztof Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>,
@@ -47,7 +47,7 @@ Cc: Anand Moon <linux.amoon@gmail.com>, Olivia Mackall <olivia@selenic.com>,
  linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 References: <20240618204523.9563-1-semen.protsenko@linaro.org>
- <20240618204523.9563-2-semen.protsenko@linaro.org>
+ <20240618204523.9563-4-semen.protsenko@linaro.org>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -93,23 +93,18 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20240618204523.9563-2-semen.protsenko@linaro.org>
+In-Reply-To: <20240618204523.9563-4-semen.protsenko@linaro.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 18/06/2024 22:45, Sam Protsenko wrote:
-> The TRNG block in Exynos850 is pretty much the same as in Exynos5250,
-> but there are two clocks that has to be controlled to make it work:
->   1. Functional (operating) clock: called ACLK in Exynos850, the same as
->      "secss" clock in Exynos5250
->   2. Interface (bus) clock: called PCLK in Exynos850. It has to be
->      enabled in order to access TRNG registers
-> 
-> Document Exynos850 compatible and the related clock changes.
+> Use devm_clk_get_enabled() helper instead of calling devm_clk_get() and
+> then clk_prepare_enable(). It simplifies the error handling and makes
+> the code more compact. Also use dev_err_probe() to handle possible
+> -EPROBE_DEFER errors if the clock is not available yet.
 > 
 > Signed-off-by: Sam Protsenko <semen.protsenko@linaro.org>
 > ---
-
 
 Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
