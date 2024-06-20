@@ -1,176 +1,196 @@
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+Received: from APC01-SG2-obe.outbound.protection.outlook.com (mail-sgaapc01olkn2092.outbound.protection.outlook.com [40.92.53.92])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CD9740858;
-	Thu, 20 Jun 2024 08:47:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718873276; cv=none; b=s/B652ecpI8VndZsqb3KCPifVNXCXCGdbjmpbBN1XBLA9mR402FeS4zftmGX0jH3H710Yj8WMUA2txxPNN+065mWmoY+UJpXZKctnKD9uoXkAm5RNsPi8kcJmSIzb3G73bPvz046Q0o7B6ebX6tuII40HhXrd86Gd9kKZYMv0To=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718873276; c=relaxed/simple;
-	bh=TBVTI/0PYjZSNwLs8zOMBanM4w1UfbWtOpjIx22X/S8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:Message-ID:MIME-Version:
-	 Content-Type:References; b=VQbRjLSm4Qb1roC7yuLhd5ASR39aynhOz/pRXMI0spw8N+Pv1Z76WeQOZcpUdkPLrdik/UciEfKPXSfSPxGCmmzsrhjNGak8Bc0lgAfYz3+G62lhCKhEmLYPKWhRs8hZHDBH3/sNyxad5aWO7R1YbVngb0ph9S6/tj45HwP6uEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=CnCwWcPG; arc=none smtp.client-ip=210.118.77.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C595C40858;
+	Thu, 20 Jun 2024 08:51:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.53.92
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718873488; cv=fail; b=tuEzLjbOw7MPUchcNvvsUhO24DnL2wZD3YujzEJrt2IFqmJb9tdRREs/TqJFSrAoF5FZrfVCih0J3kmKSzo7bVVycH7IkTBFVZAjXWyVUq1+YKeILJAAuhQjf2haPBrg08qvLLAbjBm3K1XmHtaNQlPbz7cyow3m7DmqVCWEzcE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718873488; c=relaxed/simple;
+	bh=NwoOQgsH7togAnKtvrNaYGEAboE/sTcbm1JjLHHSx9I=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=TLG4GNmq9Zd+XCwkQ+lnsfp47OXbB6Q0CnpTz8jrdSzr/p75iOb112tEuwJE3dVRR+ly1KTFz/ANc0NqKM5S+V8HyF/IhSlEdtiJejfpABe2QSucxo37+b4Zbfc6BRHbplOYm8uPbttvmiNEqux6aaBG8+bAzJCE279b5AyrK+c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=HmBlszHA; arc=fail smtp.client-ip=40.92.53.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="CnCwWcPG"
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20240620084750euoutp022a61bdb452905d0d93967b59e85b60ff~aqiHwNbLt1458414584euoutp02w;
-	Thu, 20 Jun 2024 08:47:50 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20240620084750euoutp022a61bdb452905d0d93967b59e85b60ff~aqiHwNbLt1458414584euoutp02w
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1718873270;
-	bh=2xH7UaeSHxwlKbfKFdgiBYrxzRVkCcqlRlIhfGGkv3E=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=CnCwWcPGEQLlrmu5GiGFmqg0ZxD5CVc+j6jPG5uuRr9gCAk7ZPCub9S5bgAmQfeoS
-	 glnYI8j0c2Va+5WGibE3KKBIp7FN49iE7HuZaLtE3SR3AYhmtU7UPUuVXg9iBr3H4Y
-	 BexdtWc8Ke8ws3TU2C6pXr/R9dncumT+S7Dkx+F0=
-Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-	20240620084750eucas1p1e7fb1bcad2283f58e3f6041152a56a46~aqiHegUUU0512305123eucas1p1O;
-	Thu, 20 Jun 2024 08:47:50 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-	eusmges1new.samsung.com (EUCPMTA) with SMTP id CE.08.09624.6BCE3766; Thu, 20
-	Jun 2024 09:47:50 +0100 (BST)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-	20240620084749eucas1p18f46cc9aa0983afb75e1677b399d12f8~aqiG47y3k0326503265eucas1p1Z;
-	Thu, 20 Jun 2024 08:47:49 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-	eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20240620084749eusmtrp10b61c85089f15485d410823a8fd41c31~aqiG4BP6H2065920659eusmtrp1C;
-	Thu, 20 Jun 2024 08:47:49 +0000 (GMT)
-X-AuditID: cbfec7f2-c11ff70000002598-16-6673ecb6e85e
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-	eusmgms2.samsung.com (EUCPMTA) with SMTP id 41.33.09010.5BCE3766; Thu, 20
-	Jun 2024 09:47:49 +0100 (BST)
-Received: from localhost (unknown [106.120.51.111]) by eusmtip1.samsung.com
-	(KnoxPortal) with ESMTPA id
-	20240620084749eusmtip121f8870fba034cffe60389c2be011cc0~aqiGnuu2i3165231652eusmtip1W;
-	Thu, 20 Jun 2024 08:47:49 +0000 (GMT)
-From: Lukasz Stelmach <l.stelmach@samsung.com>
-To: Sam Protsenko <semen.protsenko@linaro.org>
-Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>,  Rob Herring
-	<robh@kernel.org>,  Conor Dooley <conor+dt@kernel.org>,  Anand Moon
-	<linux.amoon@gmail.com>,  Olivia Mackall <olivia@selenic.com>,  Herbert Xu
-	<herbert@gondor.apana.org.au>,  Alim Akhtar <alim.akhtar@samsung.com>,
-	linux-samsung-soc@vger.kernel.org,  linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org,  linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 6/7] hwrng: exynos: Enable Exynos850 support
-Date: Thu, 20 Jun 2024 10:47:44 +0200
-In-Reply-To: <20240618204523.9563-7-semen.protsenko@linaro.org> (Sam
-	Protsenko's message of "Tue, 18 Jun 2024 15:45:22 -0500")
-Message-ID: <oypijdjzikt2z3.fsf%l.stelmach@samsung.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="HmBlszHA"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DwphcPS6dx5vzeZHja0d3NstX7n8TxhM68uy3+B/2j1Dqv5ZfS+cfwxR2Mup5lVncfP03FxVEybgAFnrMu7OZwmZUbe5h9rLZRk5DMXvszwFAsgDugJS4YuDs8a5TfjV9TKFcpoqld0vMSlb6M8VWAFfZwmdkZjY+HjLiYMmWFq7bvg6mnVGglF+VcqE01RSmZBeErrPGbTZPaguA5N7HfRq743QLA8GYyHT4SY/5I+f8xKz9OyXPmA+pSNwYrpvCBqySPZnduJG83Ei6oF9IZNyp+pHoNDUINkP8z0ElV73zPTfps4CbMjmtbJdkJ2wmIWs4vtkRGjeZQ6UJgITjw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6g20A5St77nSp9t/MZZBqtDNODNwsja+usQdT0yAEg0=;
+ b=XDxFMLDU8RNRNPnU+5nrhBMjj/6IUu4/Bj0xW0vI7KsjZzrHq8CvBsD1d74X6g6EeQk4AN02HmN+CwW90GLT/kunMt5PMtFRJdYtMdJez6mgMgowiOiJXg0I9111mVay8IRO5/e9rSEFxXlBcW+bhy/z8SgGU+60GA8E7CVEvZt3P5ikcwWVmqjXHNYzodP8icHusYDut3e9Yj+12418zsdL5VbbjSXcNRv+W0/uCfwNfXhDIGEwYuKN77iRh7H9wiXnvjPKGP6NDwc1lv/nJSYaDsdEBWWBKEVqFu1vrQdb98fBbuaPvaSlBj4i8eXYEPocSlzlqKjxIU8WRP1hNA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6g20A5St77nSp9t/MZZBqtDNODNwsja+usQdT0yAEg0=;
+ b=HmBlszHAAgRxNcfI8KBBMpAdlUAYe1VWm9Iuh01wg5G/d+rwp56XO8oVJqtOebeYzfR72RYAw7/kJ8RO4xSismH8c2TXp7sYSbu1WRejZn42lM7OYomwEdneD9mU3KK7ne9sG/XA/+0BHjWPCqwwdQXjCnqVOFCTyXfEJrFqDWHRDRzcSsSK1DqOQqI8/rHSicwAHYilTa2ugRtk37JYspw3I8Zdbak6GmVO3n9sSAguYeWd2bIaiSXEAQG35Mx41vxp5+yuqkq8rc58u+B6tvFAyQ35nnPWKaakdKDJwtiwc2N+GJ5Jvxcjz4KnLfTFFwPV/pqrSLRqxu/ijwA1tA==
+Received: from SEZPR01MB4527.apcprd01.prod.exchangelabs.com
+ (2603:1096:101:76::5) by JH0PR01MB5516.apcprd01.prod.exchangelabs.com
+ (2603:1096:990:13::6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.21; Thu, 20 Jun
+ 2024 08:51:21 +0000
+Received: from SEZPR01MB4527.apcprd01.prod.exchangelabs.com
+ ([fe80::653b:3492:9140:d2bf]) by SEZPR01MB4527.apcprd01.prod.exchangelabs.com
+ ([fe80::653b:3492:9140:d2bf%2]) with mapi id 15.20.7677.030; Thu, 20 Jun 2024
+ 08:51:21 +0000
+From: Jiwei Sun <sunjw10@outlook.com>
+To: giovanni.cabiddu@intel.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	damian.muszynski@intel.com,
+	tero.kristo@linux.intel.com,
+	siming.wan@intel.com,
+	adam.guerin@intel.com,
+	ciunas.bennett@intel.com
+Cc: qat-linux@intel.com,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	sunjw10@lenovo.com,
+	sunjw10@outlook.com,
+	ahuang12@lenovo.com
+Subject: [PATCH] crypto: qat - initialize user_input.lock for rate_limiting
+Date: Thu, 20 Jun 2024 16:51:10 +0800
+Message-ID:
+ <SEZPR01MB45275F2F7A32D2DE4D6E2C9BA8C82@SEZPR01MB4527.apcprd01.prod.exchangelabs.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN: [HPwfxdzSystxuZy61dO/Uakq5MgonkVs]
+X-ClientProxiedBy: SG3P274CA0003.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:be::15)
+ To SEZPR01MB4527.apcprd01.prod.exchangelabs.com (2603:1096:101:76::5)
+X-Microsoft-Original-Message-ID: <20240620085110.11288-1-sunjw10@outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-="; micalg="pgp-sha256";
-	protocol="application/pgp-signature"
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrMKsWRmVeSWpSXmKPExsWy7djPc7rb3hSnGRx/yWnxYN42Nos1e88x
-	Wcw/co7VovuVjMXLWffYLDY9vsZqcf/eTyaLy7vmsFnMOL+PyWLdxlvsFvfP9DBa/N+zg93i
-	ed8+Jgdej52z7rJ7bDug6rFpVSebx51re9g8Ni+p9+jbsorRo+/lBkaPz5vkAjiiuGxSUnMy
-	y1KL9O0SuDK+7N7GXvCfr2LTnnVMDYyfeboYOTkkBEwkuo7sZu9i5OIQEljBKLF753RGCOcL
-	o0RP7x02COczo8TSM83sMC0ftr+DqlrOKHF+3TdWCOcFo8SDG5OYuxg5ONgE9CTWro0AaRAB
-	MtfNfAXWzCywj1li099AEFtYwFmiec1jsDiLgKrE1+MNYHdwCjQwSnz6fAMswStgLnFh00pW
-	EFtUwFLi+NZ2Noi4oMTJmU9YIIbmSsw8/wbsIgmB7ZwSNyZdYoU41UXi14LdUGcLS7w6vgXK
-	lpE4PbmHBaKhnVGi6cpCVghnAqPE544mJogqa4k7536xQdiOEh+/HGIHeU1CgE/ixltBiM18
-	EpO2TWeGCPNKdLQJQVSrSKzr38MCYUtJ9L5awQhhe0icW/EEGtqTGCXONfezT2BUmIXkoVlI
-	HpoFNJZZQFNi/S59iLC2xLKFr5khbFuJdevesyxgZF3FKJ5aWpybnlpsmJdarlecmFtcmpeu
-	l5yfu4kRmPZO/zv+aQfj3Fcf9Q4xMnEwHmJUAWp+tGH1BUYplrz8vFQlEd7nXUVpQrwpiZVV
-	qUX58UWlOanFhxilOViUxHlVU+RThQTSE0tSs1NTC1KLYLJMHJxSDUyCti31/z0Xb/F02MZx
-	8NWZaV/7tCN38U9ymrLlylPeJQEufzdkylrqzHTkerjh1X27NYpXznmxbPLY+ebBAnOvqw7b
-	K4rXpTCfYVy0mCva+P/Vm4du5j4431a3PcDWf8uS694pe5155gQE2v9wd7sc77rDfoK/tP8i
-	2xuvZ9x/66at91F54d7a/CBrnT91eyY93FD/eYWz9spkxz1Ox9wmNqTNFTZmz3z6Zf2zV+GX
-	Chd0NrUE5DVn8F1/erm7ks/5xtT20y8t5lZIOWZuD3zoOMs5Ma7neXzCbs+8TeqZJbF6Rk9P
-	J7UWcG9Uvp7inLaa/+re0i1vRKTnhVxZnHn0svOZNpUzRl9nH93tpnVbiaU4I9FQi7moOBEA
-	xZ5FWfYDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrJIsWRmVeSWpSXmKPExsVy+t/xu7pb3xSnGfTtkLZ4MG8bm8WaveeY
-	LOYfOcdq0f1KxuLlrHtsFpseX2O1uH/vJ5PF5V1z2CxmnN/HZLFu4y12i/tnehgt/u/ZwW7x
-	vG8fkwOvx85Zd9k9th1Q9di0qpPN4861PWwem5fUe/RtWcXo0fdyA6PH501yARxRejZF+aUl
-	qQoZ+cUltkrRhhZGeoaWFnpGJpZ6hsbmsVZGpkr6djYpqTmZZalF+nYJehlfdm9jL/jPV7Fp
-	zzqmBsbPPF2MnBwSAiYSH7a/Y+xi5OIQEljKKPH56Qq2LkYOoISUxMq56RA1whJ/rnWxQdQ8
-	Y5R4OOMHWA2bgJ7E2rURIDUiQOa6ma/YQWqYBQ4yS1x63MMEkhAWcJZoXvOYHcQWErCTaLt0
-	gxnEZhFQlfh6vAGsgVOggVHi0+cbYEW8AuYSFzatZAWxRQUsJY5vbWeDiAtKnJz5hAXEZhbI
-	lvi6+jnzBEaBWUhSs5CkZgHdxyygKbF+lz5EWFti2cLXzBC2rcS6de9ZFjCyrmIUSS0tzk3P
-	LTbSK07MLS7NS9dLzs/dxAiM123Hfm7Zwbjy1Ue9Q4xMHIyHGFWAOh9tWH2BUYolLz8vVUmE
-	93lXUZoQb0piZVVqUX58UWlOavEhRlOg3yYyS4km5wMTSV5JvKGZgamhiZmlgamlmbGSOK9n
-	QUeikEB6YklqdmpqQWoRTB8TB6dUA9PSUxVKDxvvzPmmkVvOtzTGJuKhDe95vs/p6xmOfPmp
-	uT/m0LWOfPXdYiZvD7YU3Er/bWzl6+oUceZRI/OpPdyHrZd0qcfI25Q8OZtRcN0vXXdHWEfd
-	d2bfM2tbUqavS52kZHxlZ9mVyLmsi/Pa5t22rZ3izzC9O3HmrwWLc7IS2C++q7B9Yj/t14oq
-	k12Pbb6p19p9/TwzWzj3ilW5in3soVc/t8Rc+5W/LXXqsev3eIL+yijm7nIU+DHlxL/O/zra
-	lz69Otd851fS3hy53LItyRNeNc/Nm5nLWLfwzDx34f95BaJhq3+t2sK/4luNa3FXqa7ShpkJ
-	MpqOF9/rPtirt2BFgc/F1BevlZdwyP5UYinOSDTUYi4qTgQA8UnVOmwDAAA=
-X-CMS-MailID: 20240620084749eucas1p18f46cc9aa0983afb75e1677b399d12f8
-X-Msg-Generator: CA
-X-RootMTR: 20240620084749eucas1p18f46cc9aa0983afb75e1677b399d12f8
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20240620084749eucas1p18f46cc9aa0983afb75e1677b399d12f8
-References: <20240618204523.9563-7-semen.protsenko@linaro.org>
-	<CGME20240620084749eucas1p18f46cc9aa0983afb75e1677b399d12f8@eucas1p1.samsung.com>
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SEZPR01MB4527:EE_|JH0PR01MB5516:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4c97552a-75f3-4da9-efc0-08dc91062816
+X-Microsoft-Antispam:
+	BCL:0;ARA:14566002|461199025|3412199022|440099025|3420499029|1710799023;
+X-Microsoft-Antispam-Message-Info:
+	a0Nd5ppn57/wRgRjv5dPJuCzZw9qYfI8fr7FOHsDWHWB6lRuISePqf6PgA3MpNILNBRu0ceMbmcawm+bGwNGhhnD93OiiPhFUcwQQj9z8v3uFfIomShwbMdWefIBRyI9/R/gejd0dvfdOcCNLzZZUJmEVtwJxqGHfpB6coGxq+t/vPPVFpycpUf0a76Ib96uxiqlIsZ3+VYMOA1K2y55eEL+n+1AMGooBGYQq4didSDIut6ml6UeGNt7rR5yQS0GTN9NW+AiKDnN+kssQgveooA5JptrHYPLX+bGUOta0U0BsS33jSzdtlao1exxOTXfqo2hCngk/iQC10RwvsEAGdnVK0Wf6wvaNnKrqu/FxFt/bBVeRbzr328ZI8RpED5Szh0R0xKI5SSJgIyuPau4gdY9kihHUUfBZ6bDjAdwb5490Lvnv9rHKbJjRJUtwYl5JSKgjUC3P1AZx8mUbap2NuJySQJJSIiXarbJuWu+aADiSQiKencn9k9mbyehhhLx6m9xkKNVl3ukpX+ep5cWG5PYc21e4KLsxRPLiBMDaBl0eVo3JDsxPASzhxFJvKOE12u1cQ4MeZL3zXVtlQ4nrCe4LGgw21SEjwzdwHWAZ/hJWJxsLI6vHbovWUTMp34w
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?L2ZKEi9/gVAbaYF13092gS08D28w7CIFT/qqKc0Dk496D4D1KidsmT9j8TQu?=
+ =?us-ascii?Q?rZ30SMELVN6+V5Do5H22Cf/UqmkBBiv4OjqmkQzoMr16Z60UxQlvIQDodyfG?=
+ =?us-ascii?Q?SfHFepSW6i4J70Spd3/I62LPeIlk6yXP+4YxtJYluPizOC/L2QmYoL6c6RDo?=
+ =?us-ascii?Q?IRSStFlIiL3fTdPMYanqGCiFhsLGC2Llq1Ky+Gny0niJT8cofmFf3EMIpuXt?=
+ =?us-ascii?Q?o1QNY7SneLcTasocofzvgfdxCuxk/JtijdQlUNY4n7KWv+97oQ0T25dmt+/E?=
+ =?us-ascii?Q?v4IVm302ibSnqtkYGZxJ0/IxP0cVw1lsCGIr68J3vsfqIU3m42emYuHy083E?=
+ =?us-ascii?Q?6YajJSh0fMNruJxRUBxFWNmYL/lU2eodxE7S2nHxxzE49FhVSYxm3A6LNWYq?=
+ =?us-ascii?Q?jGy65iO8KQZchCxJWgQkA1DgQHGsC69vrz0EyqdF0hoALlwoJcdLk6ZqDj91?=
+ =?us-ascii?Q?eMvO03SRd6+i5yXg1gv5U2b4TRFma8ZeypguiCe1JnMJ8of4Z635juh1gu0c?=
+ =?us-ascii?Q?JzFEy6yxLgLIoXDuSTKdM0twgWjSVe4Cgq+/wnLBN+jtEdTVgsFdzIHxs0up?=
+ =?us-ascii?Q?ljCnMINsf1OkcYCU3TQpokdUJlRpAySbmdGk8OiXy7n9WjVahZBpdZlkE2Z7?=
+ =?us-ascii?Q?BEsddIvZiUOz5NSmfFBM9xur0vxoHF8FtSAOdQKY6xbfCGBvf/qCKflWnlUq?=
+ =?us-ascii?Q?OWtYI5620EBnc8XuMaK85uI7wktFxIzje4p36u0qcHCS2JAk5IhvXxvHPugc?=
+ =?us-ascii?Q?dgsBYeMnGJleo2TQDlN5rpYtl4Il3sArx56qKLvpZB7ccY4XUxiLr/l9X2ls?=
+ =?us-ascii?Q?IfxUgmxkw7AFhOfunWM0vWDnIWy/OPUpQdNsNpKHTe75hF7mSk3yDzgdrF19?=
+ =?us-ascii?Q?1OozYepbuzYLmT5idMd6fujGGUpOmZYxQYfc7wn9gYUAsYJCbPVJLwpLPvJe?=
+ =?us-ascii?Q?wdRli2lMbpQ7XbyOFGmUUNSq3aEo2WAta58jp2t40gtw1EUrrrVp5QeoI8UN?=
+ =?us-ascii?Q?vgbq+92xMQdMfglOK/wKI3QlTfW1xWPXxmusKXPhxDqrhqw8J+qcJm8m7PFM?=
+ =?us-ascii?Q?tnzzvHhZZbeRn68sA5u0mFuQexU7U3/m4DjTAnrDj1MxthJC7AK3indrQBQV?=
+ =?us-ascii?Q?grsT76NF2d4Sme79Vz+a9T6YpuvfJmqet1CG4LbZmCqwh6SurNX3aLja/J5T?=
+ =?us-ascii?Q?YH2PFMhQXvvfeH0osawwXDmZocufSRyMcZAfnu51tAoOdu9efaUgBp/c9nc?=
+ =?us-ascii?Q?=3D?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4c97552a-75f3-4da9-efc0-08dc91062816
+X-MS-Exchange-CrossTenant-AuthSource: SEZPR01MB4527.apcprd01.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2024 08:51:21.0719
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: JH0PR01MB5516
 
---=-=-=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+From: Jiwei Sun <sunjw10@lenovo.com>
 
-It was <2024-06-18 wto 15:45>, when Sam Protsenko wrote:
-> Add Exynos850 compatible and its driver data. It's only possible to
-> access TRNG block via SMC calls in Exynos850, so specify that fact using
-> EXYNOS_SMC flag in the driver data.
->
-> Signed-off-by: Sam Protsenko <semen.protsenko@linaro.org>
-> ---
-> Changes in v2:
->   - Changed QUIRK_SMC to EXYNOS_SMC to reflect the name change in the
->     previous patch
->
->  drivers/char/hw_random/exynos-trng.c | 3 +++
->  1 file changed, 3 insertions(+)
->
+If the following configurations are set,
+CONFIG_DEBUG_RWSEMS=y
+CONFIG_DEBUG_LOCK_ALLOC=y
+CONFIG_RWSEM_SPIN_ON_OWNER=y
 
-Acked-by: =C5=81ukasz Stelmach <l.stelmach@samsung.com>
+And run the following command,
+[root@localhost sys]# cat /sys/devices/pci0000:6b/0000:6b:00.0/qat_rl/pir
+The following warning log appears,
 
-> diff --git a/drivers/char/hw_random/exynos-trng.c b/drivers/char/hw_rando=
-m/exynos-trng.c
-> index 497d6018c6ba..841598037cce 100644
-> --- a/drivers/char/hw_random/exynos-trng.c
-> +++ b/drivers/char/hw_random/exynos-trng.c
-> @@ -313,6 +313,9 @@ static DEFINE_SIMPLE_DEV_PM_OPS(exynos_trng_pm_ops, e=
-xynos_trng_suspend,
->  static const struct of_device_id exynos_trng_dt_match[] =3D {
->  	{
->  		.compatible =3D "samsung,exynos5250-trng",
-> +	}, {
-> +		.compatible =3D "samsung,exynos850-trng",
-> +		.data =3D (void *)EXYNOS_SMC,
->  	},
->  	{ },
->  };
+------------[ cut here ]------------
+DEBUG_RWSEMS_WARN_ON(sem->magic != sem): count = 0x0, magic = 0x0, owner = 0x1, curr 0xff11000119288040, list not empty
+WARNING: CPU: 131 PID: 1254984 at kernel/locking/rwsem.c:1280 down_read+0x439/0x7f0
+CPU: 131 PID: 1254984 Comm: cat Kdump: loaded Tainted: G        W          6.10.0-rc4+ #86 b2ae60c8ceabed15f4fd2dba03c1c5a5f7f4040c
+Hardware name: Lenovo ThinkServer SR660 V3/SR660 V3, BIOS T8E166X-2.54 05/30/2024
+RIP: 0010:down_read+0x439/0x7f0
+Code: 44 24 10 80 3c 02 00 0f 85 05 03 00 00 48 8b 13 41 54 48 c7 c6 a0 3e 0e b4 48 c7 c7 e0 3e 0e b4 4c 8b 4c 24 08 e8 77 d5 40 fd <0f> 0b 59 e9 bc fc ff ff 0f 1f 44 00 00 e9 e2 fd ff ff 4c 8d 7b 08
+RSP: 0018:ffa0000035f67a78 EFLAGS: 00010286
+RAX: 0000000000000000 RBX: ff1100012b03a658 RCX: 0000000000000000
+RDX: 0000000080000002 RSI: 0000000000000008 RDI: 0000000000000001
+RBP: 1ff4000006becf53 R08: fff3fc0006becf17 R09: fff3fc0006becf17
+R10: fff3fc0006becf16 R11: ffa0000035f678b7 R12: ffffffffb40e3e60
+R13: ffffffffb627d1f4 R14: ff1100012b03a6d0 R15: ff1100012b03a6c8
+FS:  00007fa9ff9a6740(0000) GS:ff1100081e600000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fa9ff984000 CR3: 00000002118ae006 CR4: 0000000000771ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe07f0 DR7: 0000000000000400
+PKRU: 55555554
+Call Trace:
+ <TASK>
+ pir_show+0x5d/0xe0 [intel_qat 9e297e249ab040329cf58b657b06f418fd5c5855]
+ dev_attr_show+0x3f/0xc0
+ sysfs_kf_seq_show+0x1ce/0x400
+ seq_read_iter+0x3fa/0x10b0
+ vfs_read+0x6f5/0xb20
+ ksys_read+0xe9/0x1d0
+ do_syscall_64+0x8a/0x170
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
+RIP: 0033:0x7fa9ff6fd9b2
+Code: c0 e9 b2 fe ff ff 50 48 8d 3d ea 1d 0c 00 e8 c5 fd 01 00 0f 1f 44 00 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 0f 05 <48> 3d 00 f0 ff ff 77 56 c3 0f 1f 44 00 00 48 83 ec 28 48 89 54 24
+RSP: 002b:00007ffc0616b968 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
+RAX: ffffffffffffffda RBX: 0000000000020000 RCX: 00007fa9ff6fd9b2
+RDX: 0000000000020000 RSI: 00007fa9ff985000 RDI: 0000000000000003
+RBP: 00007fa9ff985000 R08: 00007fa9ff984010 R09: 0000000000000000
+R10: 0000000000000022 R11: 0000000000000246 R12: 0000000000022000
+R13: 0000000000000003 R14: 0000000000020000 R15: 0000000000020000
+ </TASK>
+irq event stamp: 0
+hardirqs last  enabled at (0): [<0000000000000000>] 0x0
+hardirqs last disabled at (0): [<ffffffffb102c126>] copy_process+0x21e6/0x6e70
+softirqs last  enabled at (0): [<ffffffffb102c176>] copy_process+0x2236/0x6e70
+softirqs last disabled at (0): [<0000000000000000>] 0x0
+---[ end trace 0000000000000000 ]---
 
-=2D-=20
-=C5=81ukasz Stelmach
-Samsung R&D Institute Poland
-Samsung Electronics
+The rate_limiting->user_input.lock rwsem lock is not initialized before
+use. Let's initialize it.
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
+Signed-off-by: Jiwei Sun <sunjw10@lenovo.com>
+Reviewed-by: Adrian Huang <ahuang12@lenovo.com>
+---
+ drivers/crypto/intel/qat/qat_common/adf_rl.c | 1 +
+ 1 file changed, 1 insertion(+)
 
------BEGIN PGP SIGNATURE-----
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_rl.c b/drivers/crypto/intel/qat/qat_common/adf_rl.c
+index 346ef8bee99d..e782c23fc1bf 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_rl.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_rl.c
+@@ -1106,6 +1106,7 @@ int adf_rl_init(struct adf_accel_dev *accel_dev)
+ 	mutex_init(&rl->rl_lock);
+ 	rl->device_data = &accel_dev->hw_device->rl_data;
+ 	rl->accel_dev = accel_dev;
++	init_rwsem(&rl->user_input.lock);
+ 	accel_dev->rate_limiting = rl;
+ 
+ err_ret:
+-- 
+2.27.0
 
-iQEzBAEBCAAdFiEEXpuyqjq9kGEVr9UQsK4enJilgBAFAmZz7LAACgkQsK4enJil
-gBA4ZQf9H/yTan9r7idWXpguT1GA+QwtJfaZDQynWcWKu6JdXndL54/0k5A5WQsC
-KAItmS8Wzp5CDEUY2uTO/o3O7vSuuAMWC8yY1Gz6OyA9A6RZ1wYlSdYSyPO7eu2Q
-+lAaSn+hx6EgEWeAmsN8e67FhbRu7qvY/+EaYbobCGDfoBTVw4d1eX1ZmAEVY9+W
-qqvMyOlFq8KVxA6I+kYdkm9/Yj6AsxcZMSfZMLf/GfFwgkySTwnxxTz7nFpihYUc
-fEHU8L8IqEaU6EFxkg6tmkx2y0nYnBSkEuQ5/0LYndCqIH8ts+cBBExNNrpVNRz3
-peJy+ClnFMVwNxSK64LK9iBItsDq/w==
-=DvxN
------END PGP SIGNATURE-----
---=-=-=--
