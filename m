@@ -1,116 +1,115 @@
-Received: from mail-yw1-f171.google.com (mail-yw1-f171.google.com [209.85.128.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.zeus03.de (zeus03.de [194.117.254.33])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 868E647772
-	for <linux-crypto@vger.kernel.org>; Thu, 20 Jun 2024 09:40:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDF081A8C08
+	for <linux-crypto@vger.kernel.org>; Thu, 20 Jun 2024 10:21:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.117.254.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718876414; cv=none; b=NAoWHtNES2//LsejCC3989nPZWzZ0ueJg/1QmarA4GVJ6bzfk4r7HW9oR/lA1jetup8XJ0Oq1BK4mjZJCGVedb0whJeBX6mrJiIQO9lEDB5KFaKEEXtF9CVAOgIP1Cu4X2gZJeJZ4rv2TqVqW+5uUhY0o6WP2yGD/BOHJcLcddw=
+	t=1718878875; cv=none; b=aTV+PpF8UyFH1J+6YxZrAYbILZVOaOptMbXE4IGja2N6BdC4Zffs0vjcEGHe/xQ9CN3G+yJXLym7Sh4v3ULmit1d3TqI3s6AB1yu29CGX3XSpDBOxo4KyDfXHocwK6NkQORpD+QKBqQYYIK0Q3/+A6WlE896RDbJb0KUXld4aOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718876414; c=relaxed/simple;
-	bh=81wRV5d6xLLaTy+w9cdcb8V1rfPwieNaDBg9qMdYkF4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ixMyRQO2yGNMAoF/mU2Dr6dxV6XiYtjPdjwWdIEvl9hly9NorMGSKcf/QnzYtJj/atIXhuP8/WbeFbY6T6+ZDCeO8SXNUT7XOV1uJPlGEX6DnHNDehB0bXIw9G5E1DwiTll2ZFkdPsE2Blca+mQGMDRHB5HC/TjKMDcE2qdJJqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=AhEMlcA7; arc=none smtp.client-ip=209.85.128.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
+	s=arc-20240116; t=1718878875; c=relaxed/simple;
+	bh=VySAUnc5zyycJcWSlkBDQsdcG2gx5xBxSB4r0CBXKsc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i43Nf/QwWkUsYQU0rKf/Cc2E/yKTcdi53XTnGae4nYr+XONHPRmHULuFqcgl3svMn+3k7a9EmIHNylV133IQ40meNnB2GABUiR6ZDXeu9scMMqPzbrEuJCVXx3N0C+RFWDJWknHhji8vmRbfys/j9Hg5SSf3GRGgt/h3ah1EAC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com; spf=pass smtp.mailfrom=sang-engineering.com; dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b=GTZJLFBT; arc=none smtp.client-ip=194.117.254.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sang-engineering.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sang-engineering.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="AhEMlcA7"
-Received: by mail-yw1-f171.google.com with SMTP id 00721157ae682-62cddff7f20so6058817b3.3
-        for <linux-crypto@vger.kernel.org>; Thu, 20 Jun 2024 02:40:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vayavyalabs.com; s=google; t=1718876411; x=1719481211; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o9yvuvGzPb9yvNbyHdNFTjY4T9XesC6/RY/Iro+MqrA=;
-        b=AhEMlcA7RSDOrqOtnMDjawj0j1a5q+2y/KY/H4Jap58lnfdeUIVjyFWMSD5e+IKkW1
-         ZdVN6+Fjy+Q4RngsXidd1CIiQJ0rJKw02wcuUFavOYrv+//JdqVwlKy9albaEiyzWgMR
-         iOo5aA08h5s5gyhgTFr1lD3zTrw7Rx1nr7u5I=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718876411; x=1719481211;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=o9yvuvGzPb9yvNbyHdNFTjY4T9XesC6/RY/Iro+MqrA=;
-        b=DqwjCJFIS75d2QceHmz4VJBIxd5MvUgB+161LIdpl081uZoA6lTXdFiBb+F0pyPyX4
-         Cjpffj4NnJeHv59+rm3zoqc9hB5y7f3bVwyLqmtx6eHAvuLUMur7qYaQAWivCoTWRl/M
-         fZWo+YCfqKG4tYLjqK4BKI3tg2HzXqQAzKAVOWVvFF+r8y7wfrAGEZyd2RoJNc8Vv1fe
-         vkQe0WGnLHCI/rhdALdn1EeVowKUcEdUFe7vLGhQY02MxKRFH0n69/L7ePYFtmSjPCE/
-         E3YO5DLshFClbEQdTDRIIw9IjWdnpc3HWV0sSf0ARzSNFbirZnc6yJ4bQe7myq2ov5IH
-         hxsQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUcUF6hHa9R9S/DgmorqmBWD1d97EgCaP3sTjyQAxCg8tlY2svb+ksWge/5c1j9lOIoe21BBneT7qX9JWotseRsJ6L1FKB0Xlc/NjMG
-X-Gm-Message-State: AOJu0YxFVSFEQFEWzSlVkvrVAK/C6hLFflBnkaV+UIRGCDvHAZ88lSb8
-	Ch4OUISQmxPzIquNvQ8dzQVpg0+sN2c3Oq370tz/j1N6PmmTOHURvEthvTKWY+pGQ5nsxCAJsxN
-	tu9vQ/2Ih0XRBCIX0wQlYwIxcMqkB1MYoac+gEQ==
-X-Google-Smtp-Source: AGHT+IFg5vx0iXsjT2/b4vzVj4MC0xeG5mj4wB+TYWsSr75j0JHsIf3pYKquOUI5pDqlsIdFdfg9H7gay8KVCkI5gQI=
-X-Received: by 2002:a05:690c:806:b0:632:6914:9b0a with SMTP id
- 00721157ae682-63a903a4156mr50335257b3.44.1718876411404; Thu, 20 Jun 2024
- 02:40:11 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=sang-engineering.com header.i=@sang-engineering.com header.b="GTZJLFBT"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	sang-engineering.com; h=date:from:to:cc:subject:message-id
+	:references:mime-version:content-type:in-reply-to; s=k1; bh=6QvP
+	0748bCUTqO0uAOaBSr5w4kgzYGCPnOBesJKCbVI=; b=GTZJLFBTtLk78TI/p/eD
+	ectdwK0IgGoe6CvaiIkqJVKbTWCCaebezaECDEUs+dEI3RUOXRX+pd6qxfFTmUq6
+	ZOgMT0V4llgzBaMJrUDVWPAP8bNp1waN1c255iJ5+r1dShbe7VPKsL4d85q5x5zT
+	BZHVD5qSZaZ3HvleYoyQlmgDHS+FaLL65pj9qfBjWLqyT1uauKWknokJlFqnV225
+	NPHp9ysKRs9yKXBsY2ZR6e0/h5la5MtjZZxfgFesxT+NOGwF4mQ025FqMuPRXHCf
+	TP7ck/HjXk0ROhcfJVumhbEQDx8nOn+tuFHv04DM+3wBVBI/455N2eOZFUYVtP9S
+	QQ==
+Received: (qmail 976563 invoked from network); 20 Jun 2024 12:21:10 +0200
+Received: by mail.zeus03.de with ESMTPSA (TLS_AES_256_GCM_SHA384 encrypted, authenticated); 20 Jun 2024 12:21:10 +0200
+X-UD-Smtp-Session: l3s3148p1@iAh8rE8bMrogAwDPXzjQABqqX1QYyOSW
+Date: Thu, 20 Jun 2024 12:21:10 +0200
+From: Wolfram Sang <wsa+renesas@sang-engineering.com>
+To: Xu Yilun <yilun.xu@linux.intel.com>
+Cc: linux-crypto@vger.kernel.org, Moritz Fischer <mdf@kernel.org>, 
+	Wu Hao <hao.wu@intel.com>, Xu Yilun <yilun.xu@intel.com>, Tom Rix <trix@redhat.com>, 
+	linux-fpga@vger.kernel.org
+Subject: Re: [PATCH 1/2] fpga: socfpga: use 'time_left' variable with
+ wait_for_completion_interruptible_timeout()
+Message-ID: <g5xw3icobdq2cuubqzmfvkph5jd3ag7shbxkntnotposuxviis@ewfw2cyc4g7k>
+Mail-Followup-To: Wolfram Sang <wsa+renesas@sang-engineering.com>, 
+	Xu Yilun <yilun.xu@linux.intel.com>, linux-crypto@vger.kernel.org, Moritz Fischer <mdf@kernel.org>, 
+	Wu Hao <hao.wu@intel.com>, Xu Yilun <yilun.xu@intel.com>, Tom Rix <trix@redhat.com>, 
+	linux-fpga@vger.kernel.org
+References: <20240502210038.11480-1-wsa+renesas@sang-engineering.com>
+ <20240502210038.11480-2-wsa+renesas@sang-engineering.com>
+ <ZmgGiuu/5Eqxb0uR@yilunxu-OptiPlex-7050>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240618042750.485720-1-pavitrakumarm@vayavyalabs.com>
- <20240618042750.485720-2-pavitrakumarm@vayavyalabs.com> <704905a5-fcbb-4263-b6f2-c85d65ceef00@quicinc.com>
-In-Reply-To: <704905a5-fcbb-4263-b6f2-c85d65ceef00@quicinc.com>
-From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-Date: Thu, 20 Jun 2024 15:10:00 +0530
-Message-ID: <CALxtO0=uTP6vUHG92fqFUGZ2ygGJr+eRv3cVXeWGYxZcLdgpnQ@mail.gmail.com>
-Subject: Re: [PATCH v4 1/7] Add SPAcc Skcipher support
-To: Jeff Johnson <quic_jjohnson@quicinc.com>
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org, 
-	Ruud.Derwig@synopsys.com, manjunath.hadli@vayavyalabs.com, 
-	bhoomikak@vayavyalabs.com, shwetar <shwetar@vayavyalabs.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="tb3ejhpz355vq5oq"
+Content-Disposition: inline
+In-Reply-To: <ZmgGiuu/5Eqxb0uR@yilunxu-OptiPlex-7050>
+
+
+--tb3ejhpz355vq5oq
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-Thanks Jeff,
-   Acked, I will add it to v5.
+Hi Yilun,
 
-Warm Regards,
-PK
+> Sorry for late reply.
+
+No worries, thank you for the review.
+
+> First of all, please limit your subject/shortlog/summary within 70
+> chars.
+
+I'll try but it will be hard when it contains such a long function name.
+
+> > There is a confusing pattern in the kernel to use a variable named 'tim=
+eout' to
+>=20
+> Please make the changelog line wrapped at less than 75 chars.
+
+Good point. My scripts reformat generated paragraphs now accordingly.
+
+> > +	int ret =3D 0;
+> > +	long time_left;
+>=20
+> Please use reverse xmas tree when it is easy to follow.
+
+Will fix.
+
+All the best,
+
+   Wolfram
 
 
-On Wed, Jun 19, 2024 at 11:48=E2=80=AFPM Jeff Johnson <quic_jjohnson@quicin=
-c.com> wrote:
->
-> On 6/17/24 21:27, Pavitrakumar M wrote:
-> > Signed-off-by: shwetar <shwetar@vayavyalabs.com>
-> > Signed-off-by: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
-> > Acked-by: Ruud Derwig <Ruud.Derwig@synopsys.com>
-> > ---
-> >   drivers/crypto/dwc-spacc/spacc_core.c      | 1241 +++++++++++++++++++=
-+
-> >   drivers/crypto/dwc-spacc/spacc_core.h      |  826 +++++++++++++
-> >   drivers/crypto/dwc-spacc/spacc_device.c    |  339 ++++++
-> >   drivers/crypto/dwc-spacc/spacc_device.h    |  236 ++++
-> >   drivers/crypto/dwc-spacc/spacc_hal.c       |  367 ++++++
-> >   drivers/crypto/dwc-spacc/spacc_hal.h       |  113 ++
-> >   drivers/crypto/dwc-spacc/spacc_interrupt.c |  316 +++++
-> >   drivers/crypto/dwc-spacc/spacc_manager.c   |  650 ++++++++++
-> >   drivers/crypto/dwc-spacc/spacc_skcipher.c  |  715 +++++++++++
-> >   9 files changed, 4803 insertions(+)
-> >   create mode 100644 drivers/crypto/dwc-spacc/spacc_core.c
-> >   create mode 100644 drivers/crypto/dwc-spacc/spacc_core.h
-> >   create mode 100644 drivers/crypto/dwc-spacc/spacc_device.c
-> >   create mode 100644 drivers/crypto/dwc-spacc/spacc_device.h
-> >   create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.c
-> >   create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.h
-> >   create mode 100644 drivers/crypto/dwc-spacc/spacc_interrupt.c
-> >   create mode 100644 drivers/crypto/dwc-spacc/spacc_manager.c
-> >   create mode 100644 drivers/crypto/dwc-spacc/spacc_skcipher.c
-> >
-> ...
->
-> > +module_platform_driver(spacc_driver);
-> > +
-> > +MODULE_LICENSE("GPL");
-> > +MODULE_AUTHOR("Synopsys, Inc.");
->
-> Missing MODULE_DESCRIPTION()
-> This will cause a warning with make W=3D1
->
->
+--tb3ejhpz355vq5oq
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEEOZGx6rniZ1Gk92RdFA3kzBSgKbYFAmZ0ApIACgkQFA3kzBSg
+KbYWBA//eSJ+HBgKDygwObdBJzw3riwudWm2kfTqZbQBg0v9ZvT75hrAf2jgODY0
+2viatD/wLDc9MQrSF23+gK7XG/PrqOMTmy146d4oW6iTF4D+WVr2h+dF1eJRhOHS
+PPV9THjycPreR/leGqlSc/f/npETprYEyPv/AwEQYziL3wPW7KHXASSjGGTmKKqc
+lzTzYmkmVbsPcDNwV47OlUY7ClQSS2oxHpxC0MbU2tyLngM/56/nBd+BSaLkCqQz
+wUlYMmIeDTZzXGH+iDUsPvjrpcQ8pzdzFIhfj5psATkoEeJKdpaqw4fCktNL5mmY
+k3yT7gqIXdcE5YfKLrwhcfEzh+XAFIbj3rprfT72zCIh9FWTHkMFh7tDJSXL0tH9
+ggdXtva6t5crumoOGkzbkKlMl/SAxAB9ZpfwMFqeoIYOcTCbeJ+psKQsI8tzV9dU
+LlUVsNphLAzN0KvyUpojoK+AM5Sf9E0NH72fTcNJovKjSPsBzULDhwOclx7idXqq
+EA9dtjoJMMPHiPKEhJSJaN3p+v2Qbi0ObXKCNv2n4F1hmiRtyj9GgCAECZWPdhKZ
+Ciuo/aIe7cT5iWJYWzP8yiG9YVfhEfwv+CvC2CnUmo7UbQ8rAOxXx9yocwCMcK+L
+UPNvV2Fv2+4TrJwr+uRJ4KonbWmMQvcFUB2JAhZj9l8ybCyefA4=
+=pYHh
+-----END PGP SIGNATURE-----
+
+--tb3ejhpz355vq5oq--
