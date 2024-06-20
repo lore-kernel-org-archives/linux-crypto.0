@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5179A51016;
-	Thu, 20 Jun 2024 07:29:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEEBC4EB2B;
+	Thu, 20 Jun 2024 07:31:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718868587; cv=none; b=CjM0lpnntAOtb9//kJ4BiICy8hae00rKxWEgRJfN/xOilD4V1YXnE1+wi5vyEtYH/KKN7zcMIITij/V/L5wjQbO4Fjch/nvAvRHj3mhAHNW0uzs/z1gSb8dnzNjYy1b1gD1YBSY9oF/E5PyogP6SKhrogypCez6clP1qkKCMlK4=
+	t=1718868696; cv=none; b=BQNwPW00mrzDdkZfsKiEp7y0H1ZX+mLJNcAuMSqF6UMdY1C4PdCOBa3jZ+yIzIXdhVusVdyEbefpoHizvW7pgUdnE+ZMvgi1YtWwQXMziHah9NSXDcdWW1iZ221paEaVQhQp9zC5/0vkEJ6kgO9/JFHwE+mXSVANNV5IjCfPhE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718868587; c=relaxed/simple;
-	bh=/0Pu/qY+/qWUJjZ6cuA3xu5HXb/g2AgHzz2MOiE2n4k=;
+	s=arc-20240116; t=1718868696; c=relaxed/simple;
+	bh=tA4wrg78690AuFETPh2m9h8RjT3OKY3Y2+fbfrA3Vo0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bWgqPrvPELd3uxIfGGrvRxJ7rz+l+n6RchDxRV2idCfB9uvOoXZeapENOixIZEyg+3dHyV8qual427h+0Qsqc+eJBuSS50XFRW99ymSCURxc7BagS2ZFfs+c6EQ8VuwslGg7KWveSa38rJGSfl+sjczPzZj/WQgk6JUqlP1YaCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xl+N7rT0; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=UHhVIyrFCl8Qel4y9j3fDMpSJBY3fLYepVrDeyr18+s44X7AanLfLGMtHZw/1rGSWxSQ8gbJ8xh/HMcmsYnCFfI2mIVbE4/dWyaXLwoob+tu8ACdS0tprC9sPhmD9g5plaGIRlrKmdWFt+frg3LWTaTMTLpSwoKumCl1ufUStLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ao+9KxTU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xl+N7rT0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A3F2C2BD10;
-	Thu, 20 Jun 2024 07:29:40 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ao+9KxTU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BB8FC32781;
+	Thu, 20 Jun 2024 07:31:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718868585;
-	bh=/0Pu/qY+/qWUJjZ6cuA3xu5HXb/g2AgHzz2MOiE2n4k=;
+	s=k20201202; t=1718868694;
+	bh=tA4wrg78690AuFETPh2m9h8RjT3OKY3Y2+fbfrA3Vo0=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Xl+N7rT0nScFC5i7zVVjLy0tBT8VPIrz8JcILz62jtm+O1daLv4w1gFk3ld6Pdlo4
-	 eFhy2jm+GCtERlp90dNS6P9m7fYdLpsKpkU6uCTF+PdXUz/Eh6IM6B21TmGR9TectH
-	 /rM773eG8oapb38bJYnVLLCi3OSIOtDk26h9G3U9SVmw0nI67rgNqZWqarCDRVrdHK
-	 gBap/sjOe/gqMe8c5xShFzBkHRIrcJTKsT7LNAfHbQmZEkaAFRVzUu2aJ34z3gtNTg
-	 LRue0Os0lKawREKGz18Vz2Gxa1acIvFcS05V3idbmd74GrKOB/wVDwquTqB1bFe+Zm
-	 bhy9rzmf7kVEg==
-Message-ID: <dd9433a8-7992-487b-9b33-10ca66ba9c51@kernel.org>
-Date: Thu, 20 Jun 2024 09:29:38 +0200
+	b=ao+9KxTUEzgEVKOMZhjDusmxyjkWDUmBs6cyTqSRU68radPHDx6sWHWO6FSRLdnqg
+	 tVygMxzRnQx3OluBjzVFS6NVWwq4XTGC1llGWmE+GJ9PXr5eGU8qREkVrrNKtrUl10
+	 QDPVZ+CH+ZmSqLCD+L/5wbH4RxXt1Bxh4D5p738tVUVjwd/exjoBpcNGgYkhEZTzlo
+	 BTNgt4Do60WkhlFmYs1B/+upu1asYcNVlgGLlknBvNxtmyZvmupWHqGDN5N2wB/qWd
+	 FrpFZTtx+4FXH0CvFYYjbFlX+giP8OWWjdGvlo0O1hMfzT+8/OHh+sQTGZvfDJK9IZ
+	 pXUdb4I578cNA==
+Message-ID: <6e4e78f7-9d94-4c4e-9098-02522dee29a2@kernel.org>
+Date: Thu, 20 Jun 2024 09:31:27 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,7 +35,7 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 6/7] hwrng: exynos: Enable Exynos850 support
+Subject: Re: [PATCH v2 7/7] arm64: dts: exynos850: Enable TRNG
 To: Sam Protsenko <semen.protsenko@linaro.org>,
  =?UTF-8?Q?=C5=81ukasz_Stelmach?= <l.stelmach@samsung.com>,
  Krzysztof Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>,
@@ -46,7 +46,7 @@ Cc: Anand Moon <linux.amoon@gmail.com>, Olivia Mackall <olivia@selenic.com>,
  linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
  linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 References: <20240618204523.9563-1-semen.protsenko@linaro.org>
- <20240618204523.9563-7-semen.protsenko@linaro.org>
+ <20240618204523.9563-8-semen.protsenko@linaro.org>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -92,19 +92,22 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20240618204523.9563-7-semen.protsenko@linaro.org>
+In-Reply-To: <20240618204523.9563-8-semen.protsenko@linaro.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 18/06/2024 22:45, Sam Protsenko wrote:
-> Add Exynos850 compatible and its driver data. It's only possible to
-> access TRNG block via SMC calls in Exynos850, so specify that fact using
-> EXYNOS_SMC flag in the driver data.
+> Add True Random Number Generator (TRNG) node to Exynos850 SoC dtsi.
 > 
 > Signed-off-by: Sam Protsenko <semen.protsenko@linaro.org>
 > ---
+> Changes in v2:
+>   - (no changes)
+> 
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+That's a patch for Samsung soc. I'll take it once binding is accepted.
+If you send any new version of the patchset, please do not include DTS,
+so the crypto maintainer could apply entire set easier.
 
 Best regards,
 Krzysztof
