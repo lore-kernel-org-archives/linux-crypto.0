@@ -1,172 +1,196 @@
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBCAC179203
-	for <linux-crypto@vger.kernel.org>; Fri, 21 Jun 2024 19:40:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F1A116D4CD;
+	Fri, 21 Jun 2024 20:14:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718998823; cv=none; b=j5kdkCre+QNrieGv3RuCdcSPJz8oaqUZI6o/NC2VINug4HYjG5C944BMF9mQU7yU+AGdPgYG2KicdlGZJOiDKZY7K2KJaIGAY7i2XWJs7LJB9v7RV2dxu+x5ctLm6zDM8a3MoUpc7U4ZBcy5YrkV0jqnHjr1DtkVzPLtljxbv4M=
+	t=1719000884; cv=none; b=XK+rBIuJLSYlscFDxrxMHUFqgsPBf2alF6apn2FvQ1HqmpJ9wM24ANa01h+uPq5F8uur8Wnt8Gps5t95g8ClHNjfnFC03ZamL/28kuErNZ9pLYPMf3bVyGSwHuANwRsyPY48YdDHMwTYZQVAwT2M/DUPANmti704duVqaclV3m4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718998823; c=relaxed/simple;
-	bh=6ZPeCGjV8WBzKchfn6bhJls+sDUkHecdyn5jbswwMA0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FG+CQNfjFAXgBzf5TPpbRvnlBVt7Sn2+duczmZ7Hs/TyjUIKyZNPmmnbZCXiPuR/YsfwVWC4vG5DCdi81nvhxHJb7cL0lBnei5c4FNoF+CakD8IS6khG43NxEJL9IhM9afCDFqpagSP53fTTKd//QjDWeNHOgVCLE9kLNPtgl/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=NdrVElxF; arc=none smtp.client-ip=209.85.128.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1719000884; c=relaxed/simple;
+	bh=vHNxcU9s9MR4LOyWyYM6sc5OyVItOebWsy9TgzJ3F2U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IURa71P1h6TYbXaZR1zrffRItSblMDrLCdawgK+gkfBmK1hp71ENGLqZlOWdsGX8fpnVhfMR+uE7qWV5k91SiotJn0cDDvps/h5UH7R3d0JP3VogMUk3kVxqUSU9ky/mMcjt/YPpwEECiDKY6Nytx4z56ZnfNtgL3FcSineiKQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T9O5yaMM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NdrVElxF"
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-6325b04c275so24293907b3.3
-        for <linux-crypto@vger.kernel.org>; Fri, 21 Jun 2024 12:40:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1718998820; x=1719603620; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CbwyiyWva+x9FYZsLEbwDcBJqBAnnNSOVrVdnz/JzOg=;
-        b=NdrVElxFQdKgDZffEK30KtUnF8EkQcdiH4pR6F9xg+kf3PV/XMU0BTo70omSG9QFe6
-         K0AwFsYmwmsM5ikZNeUbvWF8fJCmZ3DXo/INLp7J1mNHxxSA3Y+nFOAPQ7FK6NSgDZwu
-         THNaVoWMHG2DZYsT4EnDGXv15FGp9stvRPcRS6lzFjWdmqQnMafbxeL/HRUn2d06rtul
-         TBWf2cad3lgIIcKFa0F/Q0Hrr/93ehezxTucLnWM1ywy4GkrZK2V8K9mO92z0XYgTwt6
-         bgnLUfhpqmyLpKIp9mUZdbQmSiCMtrVpMb9E86M5cpRk3x3J4wsovqQqHv4pP/rxlis7
-         T/LA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718998820; x=1719603620;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CbwyiyWva+x9FYZsLEbwDcBJqBAnnNSOVrVdnz/JzOg=;
-        b=lA386KeO6ZOKhl8/E9Ngxfxu/enMAHW2z/K61iWxS2VDiUCG0SdlEDUFhs8a1zvqJV
-         BSB7vd8TH3jIKk6x+OHNTP8LYUl32BpdJ+jS3SXw+gogZW2II+9L4S9idCMo8f8VMaPG
-         6HWCZrdV9DMxPuIJIFhau9o039JoTH+Xp6mgnK/a+V+vJWqBDfnwbrl9twNpgFmgap0T
-         H7f9IRMuOV5B/fCC3w/KAOjQaSicc7aTNriesX3uOCThcQk56RNc3h+9QWKaGwIloo9E
-         KqfOhZiiiMy3HfMX+M17i/7jlyrbbE+zl0cJ9Ah6iV/0B0vXXHmCJ1AK/oKCcUUhVBf5
-         +Jkg==
-X-Forwarded-Encrypted: i=1; AJvYcCUfNVyfxS20NICKBHotPAT2d43cVN/UxpQkD8VQ9CEhFc1TTVY62RyWqYA012fcJ5n8XIQHq3UJjpuXSsYNi5JSS6d66hT4XCaMgf7D
-X-Gm-Message-State: AOJu0YzfXExIyykVV3HTwpc09xE5RyCvptSS7tekd7y1KBWXH9L0e8Sn
-	0935VdSZqB9jRkzXPV1UDFhD0i0G3lxktO8gDboVXUkZd6B3p/yC9pPaoJDa1rE6r7O+7D0qghU
-	5Ktcpl3qXz/yFY8z0YTuFB8d8rjMRTA3Z7pcgwA==
-X-Google-Smtp-Source: AGHT+IEmV0m+/TjcKpWT6y40NzpmbgGYoiiKNqdKPlOSZ6tUU44/DxfiY84Ds0g2/sBfdjZbnUd1cxbqC/UhcIk3SWg=
-X-Received: by 2002:a81:f805:0:b0:62f:cb31:1be with SMTP id
- 00721157ae682-63a8d543d67mr96963607b3.8.1718998819708; Fri, 21 Jun 2024
- 12:40:19 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T9O5yaMM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D20DC2BBFC;
+	Fri, 21 Jun 2024 20:14:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719000883;
+	bh=vHNxcU9s9MR4LOyWyYM6sc5OyVItOebWsy9TgzJ3F2U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=T9O5yaMMi65WQBjGVtTi7z0837mF1Gm9iTUq9ReB718yxqMgk0cF1wK4zefwfRrJD
+	 Jv9TGV0av+2VOzqdlXXoY4X7Y4zEoS7ggbw7xcfBTpiGv/VvHLNy1If3o8z2fD5S/k
+	 GrPLrJTVTOZ7bLMyYSSUF0Jer/6EvjIBTz5GI0DtTjQtL73k/ITRYhpzvzlYW3+0kz
+	 HTQOjI2jr+qQkN76/4T+pd44WqNMTYQS0QTx80ftof5673kw0M1OoOPWrtGKk0OOvF
+	 YpOyGc6uvC1qyNxeyFeWaLX47t4fSp5lQTHdY9m9jNx5fzZ9LtDbmxvdMqTE3vFNBo
+	 JWXxSkBF11hVg==
+Date: Fri, 21 Jun 2024 20:14:41 +0000
+From: Eric Biggers <ebiggers@kernel.org>
+To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Cc: "Gaurav Kashyap (QUIC)" <quic_gaurkash@quicinc.com>,
+	"linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
+	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+	"andersson@kernel.org" <andersson@kernel.org>,
+	"neil.armstrong@linaro.org" <neil.armstrong@linaro.org>,
+	"srinivas.kandagatla" <srinivas.kandagatla@linaro.org>,
+	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>,
+	"robh+dt@kernel.org" <robh+dt@kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+	kernel <kernel@quicinc.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"Om Prakash Singh (QUIC)" <quic_omprsing@quicinc.com>,
+	"Bao D. Nguyen (QUIC)" <quic_nguyenb@quicinc.com>,
+	"bartosz.golaszewski" <bartosz.golaszewski@linaro.org>,
+	"konrad.dybcio@linaro.org" <konrad.dybcio@linaro.org>,
+	"ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
+	"jejb@linux.ibm.com" <jejb@linux.ibm.com>,
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+	"mani@kernel.org" <mani@kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	Prasad Sodagudi <psodagud@quicinc.com>,
+	Sonal Gupta <sonalg@quicinc.com>
+Subject: Re: [PATCH v5 04/15] soc: qcom: ice: add hwkm support in ice
+Message-ID: <20240621201441.GA3850750@google.com>
+References: <3a15df00a2714b40aba4ebc43011a7b6@quicinc.com>
+ <CAA8EJpoZ0RR035QwzMLguJZvdYb-C6aqudp1BgHgn_DH2ffsoQ@mail.gmail.com>
+ <20240621044747.GC4362@sol.localdomain>
+ <CAA8EJppXsbpFCeGJOMGKOQddy0fF4uW3rt4RUuDTQq6mPunBkg@mail.gmail.com>
+ <20240621153939.GA2081@sol.localdomain>
+ <CAA8EJpqV4CW9kKLVUZgfo+hkSv+tn0t+k0McmHEyXNJUpsZF1w@mail.gmail.com>
+ <20240621163127.GC2081@sol.localdomain>
+ <CAA8EJpqytynwQrCAqqBsmx2XYgV5tsNeV4hpYzT6snqu+r8Wdg@mail.gmail.com>
+ <20240621183645.GE2081@sol.localdomain>
+ <CAA8EJprydVC6Sp8g9b1TOyxN8Awc33=MxKY8=Upi_zag=kDBHA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CGME20240621190049eucas1p28ba502d86e2f9380315c06add645517c@eucas1p2.samsung.com>
- <20240620231339.1574-6-semen.protsenko@linaro.org> <oypijdplsaruia.fsf%l.stelmach@samsung.com>
-In-Reply-To: <oypijdplsaruia.fsf%l.stelmach@samsung.com>
-From: Sam Protsenko <semen.protsenko@linaro.org>
-Date: Fri, 21 Jun 2024 14:40:08 -0500
-Message-ID: <CAPLW+4njmKxXSMqNazX6t6LS=fHNh6Pi8_icF1=aPw27G0J3PQ@mail.gmail.com>
-Subject: Re: [PATCH v3 5/6] hwrng: exynos: Add SMC based TRNG operation
-To: Lukasz Stelmach <l.stelmach@samsung.com>
-Cc: Krzysztof Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>, 
-	Conor Dooley <conor+dt@kernel.org>, Anand Moon <linux.amoon@gmail.com>, 
-	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Alim Akhtar <alim.akhtar@samsung.com>, linux-samsung-soc@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Marek Szyprowski <m.szyprowski@samsung.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAA8EJprydVC6Sp8g9b1TOyxN8Awc33=MxKY8=Upi_zag=kDBHA@mail.gmail.com>
 
-On Fri, Jun 21, 2024 at 2:00=E2=80=AFPM Lukasz Stelmach <l.stelmach@samsung=
-.com> wrote:
->
-> It was <2024-06-20 czw 18:13>, when Sam Protsenko wrote:
-> > On some Exynos chips like Exynos850 the access to Security Sub System
-> > (SSS) registers is protected with TrustZone, and therefore only possibl=
-e
-> > from EL3 monitor software. The Linux kernel is running in EL1, so the
-> > only way for the driver to obtain TRNG data is via SMC calls to EL3
-> > monitor. Implement such SMC operation and use it when EXYNOS_SMC flag i=
-s
-> > set in the corresponding chip driver data.
+On Fri, Jun 21, 2024 at 10:24:07PM +0300, Dmitry Baryshkov wrote:
 > >
-> > Signed-off-by: Sam Protsenko <semen.protsenko@linaro.org>
-> > Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> > ---
-> > Changes in v3:
-> >   - Added appropriate error messages for the case when init SMC command=
- fails
+> > (fscrypt used to use the keyring service a bit more: it looked up a key whenever
+> > a file was opened, and it supported evicting per-file keys by revoking the
+> > corresponding keyring key.  But this turned out to be totally broken.  E.g., it
+> > didn't provide the correct semantics for filesystem encryption where the key
+> > should either be present or absent filesystem-wide.)
 > >
-> > Changes in v2:
-> >   - Used the "reversed Christmas tree" style in the variable declaratio=
-n
-> >     block in exynos_trng_do_read_smc()
-> >   - Renamed .quirks to .flags in the driver structure
-> >   - Added Krzysztof's R-b tag
+> > We do need the ability to create HW-wrapped keys in long-term wrapped form,
+> > either via "generate" or "import", return those long-term wrapped keys to
+> > userspace so that they can be stored on-disk, and convert them into
+> > ephemerally-wrapped form so they can be used.  It probably would be possible to
+> > support all of this through the keyrings service, but it would need a couple new
+> > key types:
 > >
-> >  drivers/char/hw_random/exynos-trng.c | 140 +++++++++++++++++++++++++--
-> >  1 file changed, 130 insertions(+), 10 deletions(-)
+> > - One key type that can be instantiated with a raw key (or NULL to request
+> >   generation of a key) and that automagically creates a long-term wrapped key
+> >   and supports userspace reading it back.  This would be vaguely similar to
+> >   "trusted", but without any support for using the key directly.
 > >
-> > diff --git a/drivers/char/hw_random/exynos-trng.c b/drivers/char/hw_ran=
-dom/exynos-trng.c
-> > index 6ef2ee6c9804..9fa30583cc86 100644
-> > --- a/drivers/char/hw_random/exynos-trng.c
-> > +++ b/drivers/char/hw_random/exynos-trng.c
->
-> [...]
->
->
-> > @@ -103,6 +163,24 @@ static int exynos_trng_init(struct hwrng *rng)
-> >       return 0;
-> >  }
-> >
-> > +static int exynos_trng_init_smc(struct hwrng *rng)
-> > +{
-> > +     struct exynos_trng_dev *trng =3D (struct exynos_trng_dev *)rng->p=
-riv;
-> > +     struct arm_smccc_res res;
-> > +     int ret =3D 0;
-> > +
-> > +     arm_smccc_smc(SMC_CMD_RANDOM, HWRNG_INIT, 0, 0, 0, 0, 0, 0, &res)=
-;
-> > +     if (res.a0 !=3D HWRNG_RET_OK) {
-> > +             dev_err(trng->dev, "SMC command for TRNG init failed (%d)=
-\n",
-> > +                     (int)res.a0);
-> > +             ret =3D -EIO;
-> > +     }
-> > +     if ((int)res.a0 =3D=3D -1)
-> > +             dev_info(trng->dev, "Make sure LDFW is loaded by your BL\=
-n");
->
-> This is good, thank you for adding it. It can be even better though, if
-> you don't skimp on message length (-; I mean, I know what BL is, I can
-> fingure what LDFW is because you have explained to me and I can see the
-> source code, but somewone who sees it for the first time will be only
-> slightly less surprised than with v2 error message only. Come on, you
-> can make this message twice as long and it will still fit in 80 character=
-s (-;
->
+> > - One key type that can be instantiated using a long-term wrapped key which gets
+> >   automagically converted to an ephemerally-wrapped key.  This would be what is
+> >   passed to other kernel subsystems.  Functions specific to this key type would
+> >   need to be provided for users to use.
+> 
+> I think having one key type should be enough. The userspace loads /
+> generates&reads / wraps and reads back the 'exported' version wrapped
+> using the platform-specific key. In kernel the key is unsealed and
+> represented as binary key to be loaded to the hardware + a cookie for
+> the ephemeral key and device that have been used to wrap it. When
+> userspace asks the device to program the key, the cookie is verified
+> to match the device / ephemeral key and then the binary is programmed
+> to the hardware. Maybe it's enough to use the struct device as a
+> cookie.
 
-Guess my OCD got in the way and I just didn't want to break the line
-:) But yeah, LDFW =3D Loadable Firmware, and BL =3D bootloader. There is
-an "ldfw" partition on eMMC, and I noticed Samsung usually uses LDFW
-term, so I figured it was not a big deal to throw that abbreviation at
-the user. But I totally agree on BL part, it might be confusing. I
-don't have any strong opinion on this one. If you are going to apply
-v3, can I kindly ask you to change that message the way you want it to
-be?
+The long-term wrapped key has to be wiped from memory as soon as it's no longer
+needed.  So it's hard to see how overloading a key type in this way can work, as
+the kernel can't know if userspace intends to read back the long-term wrapped
+key or not.
 
-> Don't change it if v3 is the last. If not, please, make it more verbose.
->
-> > +
-> > +     return ret;
-> > +}
-> > +
->
->
-> [...]
->
->
-> Kind regards,
-> --
-> =C5=81ukasz Stelmach
-> Samsung R&D Institute Poland
-> Samsung Electronics
+> 
+> > I think it would be possible, but it feels like a bit of a shoehorned API.  The
+> > ioctls are a more straightforward solution.
+> 
+> Are we going to have another set of IOCTLs for loading the encrypted
+> keys? keys sealed by TPM?
+
+Those features aren't compatible with hardware-wrapped inline encryption keys,
+so they're not really relevant here.  BLKCRYPTOIMPORTKEY could support importing
+a keyring service key as an alternative to a raw key, of course.  But this would
+just work similarly to fscrypt and dm-crypt where they just extract the payload,
+and the keyring service key plays no further role.
+
+> > > > Support for it will be added at some point, which will likely indeed take the
+> > > > form of an ioctl to set a key on a block device.  But that would be the case
+> > > > even without HW-wrapped keys.  And *requiring* the key to be given in a keyring
+> > > > (instead of just in a byte array passed to the ioctl) isn't very helpful, as it
+> > > > just makes the API harder to use.  We've learned this from the fscrypt API
+> > > > already where we actually had to move away from the keyrings service in order to
+> > > > fix all the issues caused by it (see FS_IOC_ADD_ENCRYPTION_KEY).
+> > > >
+> > > > > >
+> > > > > > > Second part is the actual block interface. Gaurav wrote about
+> > > > > > > targeting fscrypt, but there should be no actual difference between
+> > > > > > > crypto targets. FDE or having a single partition encrypted should
+> > > > > > > probably work in the same way. Convert the key into blk_crypto_key
+> > > > > > > (including the cookie for the ephemeral key), program the key into the
+> > > > > > > slot, use the slot to en/decrypt hardware blocks.
+> > > > > > >
+> > > > > > > My main point is that the decision on the key type should be coming
+> > > > > > > from the user.
+> > > > > >
+> > > > > > That's exactly how it works.  There is a block interface for specifying an
+> > > > > > inline encryption key along with each bio.  The submitter of the bio can specify
+> > > > > > either a standard key or a HW-wrapped key.
+> > > > >
+> > > > > Not in this patchset. The ICE driver decides whether it can support
+> > > > > HW-wrapped keys or not and then fails to support other type of keys.
+> > > > >
+> > > >
+> > > > Sure, that's just a matter of hardware capabilities though, right?  The block
+> > > > layer provides a way for drivers to declare which inline encryption capabilities
+> > > > they support.  They can declare they support standard keys, HW-wrapped keys,
+> > > > both, or neither.  If Qualcomm SoCs can't support both types of keys at the same
+> > > > time, that's unfortunate, but I'm not sure what your poitnt is.  The user (e.g.
+> > > > fscrypt) still has control over whether they use the functionality that the
+> > > > hardware provides.
+> > >
+> > > It's a matter of policy. Harware / firmware doesn't support using both
+> > > kinds of keys concurrently, if I understood Gaurav's explanations
+> > > correctly. But the user should be able to make a judgement and use
+> > > non-hw-wrapped keys if it fits their requirements. The driver should
+> > > not make this kind of judgement. Note, this is not an issue of your
+> > > original patchset, but it's a driver flaw in this patchset.
+> >
+> > If the driver has to make a decision about which type of keys to support (due to
+> > the hardware and firmware supporting both but not at the same time), I think
+> > this will need to be done via a module parameter, e.g.
+> > qcom_ice.hw_wrapped_keys=1 to support HW-wrapped keys instead of standard keys.
+> 
+> No, the user can not set modparams on  e.g. Android device. In my
+> opinion it should be first-come-first-serve. If the user wants
+> hw-wrapped keys (and the platform is fine with that), then further
+> attempts to use raw keys should fail. If the user loads a raw key,
+> further attempts to set hw-wrapped key should fail (maybe until the
+> last raw key has been evicted from the hw, if such thing is actually
+> supported).
+
+That's not going to work.  Upper layers need to know what the crypto
+capabilities are before they decide to use them.  We can't randomly revoke
+capabilities based on who happened to get there first, as a user might have
+already checked the capabilities.  Yes, the module parameter is a litle
+annoying, but it seems to be necessary here.  It is not a problem for Android
+because the type of encryption an Android device uses is set by the build
+anyway, which makes it no easier to change than module parameters.
+
+- Eric
