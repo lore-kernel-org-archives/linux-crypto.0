@@ -1,62 +1,86 @@
-Received: from norbury.hmeau.com (helcar.hmeau.com [216.24.177.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FE07155741;
-	Fri, 21 Jun 2024 12:35:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.24.177.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E66452232B;
+	Fri, 21 Jun 2024 14:37:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718973325; cv=none; b=cDOvKEGZu7qY0uNLmG8eNtK0KjCknNVSygiJMtCVHuFY0lKRyeo3GvtW6bl88HmGHJ+WmtYbUJiD56Nh13LZkmCZ9J7nkZBrqvFasxgkjhATJWCrPhQPPgDKXo2eHODBf6anOxGKWKT5hL5v3tg/BbhnbZZ9JDXslU1AFIZS88E=
+	t=1718980660; cv=none; b=DSTlVvp/rm5YY0SwP/QYl8jNORq0zpEsfEWXSHowqr+4nshjuRFbdeaUwfzzh3l1RaQHfzVkKhDsLmU8jT/dFljI8x9l+AWALUokCnrs8y7o8EcmOngsWv68kFP6LviGq3zjd6Jq5SQocQgn5h336+6tx9RB8Ij9MiwUwqC9WCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718973325; c=relaxed/simple;
-	bh=DAbfkbzQszqjx9XcJQhPa3kDd4qDzqPlO1ZHE4zgObM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Tv/vPp8YgL7NEvW6Vv/dOaMwLxMOWnv77it5rclxwzxVULmp8Ki20XQ5M6KZwFv7KcL/P88mD7FGNUt5J1S8I6/tXlTI3JV1HvFpwqlVSEn4VBAmzMkDUPXpu/2U7N1l4IAs72zmLdTRe1qtEMnWxz3qGDYG6EP4AOeXOzpHMcQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=216.24.177.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-	by norbury.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1sKdTs-002eps-2d;
-	Fri, 21 Jun 2024 22:35:05 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 21 Jun 2024 22:35:05 +1000
-Date: Fri, 21 Jun 2024 22:35:05 +1000
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Jeff Johnson <quic_jjohnson@quicinc.com>
-Cc: "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] crypto: lib - add missing MODULE_DESCRIPTION() macros
-Message-ID: <ZnVzeapei4WxSUbQ@gondor.apana.org.au>
-References: <20240615-md-arm-lib-crypto-v1-1-27b67bf8573c@quicinc.com>
+	s=arc-20240116; t=1718980660; c=relaxed/simple;
+	bh=ejMsu1bb2eGEnL9goJV3n78NDDkQX2G7CVwsyRVBo4k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=S/1ZWw34ikFPVWcOn622OP0GlDYkBPTwWqGZ4WPxua5TL1vipzKigdmiywH1lhlfn3ft58uMvH/jiTru5Rws87JOhPlJ5VL2fElyUp4bQAe2Cw9fyoS7enD+uSv8lPD4fNTy00jJJ0YuaWqoFxYSXSfrpQzVa3LPvuYM/aJDjIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=csie.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2eaae2a6dc1so39147531fa.0;
+        Fri, 21 Jun 2024 07:37:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718980655; x=1719585455;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :reply-to:in-reply-to:references:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ejMsu1bb2eGEnL9goJV3n78NDDkQX2G7CVwsyRVBo4k=;
+        b=YcP5bI3JIUFvs1uMsm2OeIPbe5v58sE89KIVThALwsg406yybosC7XV8FnZ2ehpjj6
+         SSmG5lc8nVtGEkSRrrVS8MUxoAcyvcxqFMwoIBBbhasPs0p7rwouqNcZhgY1ooTQyWPw
+         +D/FwDm+tQ+Ok+uyxRSG5kfRzyeMViWZfMyWD5Hsxp2UoFae56FLMdj5MxCbkbPaSyGu
+         WHSjrB8nB6B4SlvyZXU8f2FHeuFkaq1Ie1jVi/bLmwwahSOnzA0cdtrhhEzPlVOEPBuG
+         sUc4paDvU+CzksGF+sDmkkCk6MOKEi6LZ34jTplUEZ9vlh9CG/58/SmRgrOQkS3qJr9S
+         AI7w==
+X-Forwarded-Encrypted: i=1; AJvYcCUYK4Wal5D8afxYXIgtUz4RowyKHordBM4OmX8dViIDuuIa0vTGtcze1RKl7Lng79pgtJ/6nch5UWTmNJIV4wECuOZ7mTTdxtM1P6gLK8HB02M4AuNsYDRiH1ZN5GE4/deE7dhlqxb4tA==
+X-Gm-Message-State: AOJu0Yw9z+rOkArq2ds0iMRrGbn7htWco0Mp+3YSRL8NykvqXDhpwwTI
+	Vc7Z4ajSZT6tF/bkUHEKbcclok3WBRR0BRI/P7JjQMx88bBwKx3kauh+UP4V
+X-Google-Smtp-Source: AGHT+IF1rX81EhoxmN2x+YZygjI6p408k58V0LS3KQFvZd7c9Vkoaz3dyBbzx5pjq7pQklTHNKlujg==
+X-Received: by 2002:a2e:8955:0:b0:2ec:5200:a93d with SMTP id 38308e7fff4ca-2ec5200aa16mr7547091fa.23.1718980654620;
+        Fri, 21 Jun 2024 07:37:34 -0700 (PDT)
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com. [209.85.208.169])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2ec511dac51sm912611fa.74.2024.06.21.07.37.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Jun 2024 07:37:34 -0700 (PDT)
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2eaea28868dso27763031fa.3;
+        Fri, 21 Jun 2024 07:37:34 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCXbg7MSeLwQwC0u4kfF9m/OlzhNXhvnR3GTFwxo8TeF6WtRwZ1dV0o0FyXYei3KO//7XGh7HFG0c+AkVe7XaSDU9S5oQGjGLVItinW12/YOHpdzeadqP/w0mb/x/YoziX0RjzJ9Ia/sYA==
+X-Received: by 2002:a05:651c:1a0b:b0:2ec:4093:ec7 with SMTP id
+ 38308e7fff4ca-2ec40931047mr73651401fa.30.1718980654160; Fri, 21 Jun 2024
+ 07:37:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240615-md-arm-lib-crypto-v1-1-27b67bf8573c@quicinc.com>
+References: <20240616220719.26641-1-andre.przywara@arm.com> <20240616220719.26641-2-andre.przywara@arm.com>
+In-Reply-To: <20240616220719.26641-2-andre.przywara@arm.com>
+Reply-To: wens@csie.org
+From: Chen-Yu Tsai <wens@csie.org>
+Date: Fri, 21 Jun 2024 22:37:21 +0800
+X-Gmail-Original-Message-ID: <CAGb2v66t88ER-D71hrJ6pqybjHiYrHE8gnHHxpX11sa5H_F7bA@mail.gmail.com>
+Message-ID: <CAGb2v66t88ER-D71hrJ6pqybjHiYrHE8gnHHxpX11sa5H_F7bA@mail.gmail.com>
+Subject: Re: [PATCH 1/4] dt-bindings: crypto: sun8i-ce: Add compatible for H616
+To: Andre Przywara <andre.przywara@arm.com>
+Cc: Corentin Labbe <clabbe.montjoie@gmail.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S . Miller" <davem@davemloft.net>, Jernej Skrabec <jernej.skrabec@gmail.com>, 
+	Samuel Holland <samuel@sholland.org>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, linux-crypto@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev, 
+	devicetree@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jun 15, 2024 at 11:14:57PM -0700, Jeff Johnson wrote:
-> With ARCH=arm, make allmodconfig && make W=1 C=1 reports:
-> WARNING: modpost: missing MODULE_DESCRIPTION() in lib/crypto/libsha256.o
-> 
-> Add the missing invocation of the MODULE_DESCRIPTION() macro to all
-> files which have a MODULE_LICENSE().
-> 
-> This includes sha1.c and utils.c which, although they did not produce
-> a warning with the arm allmodconfig configuration, may cause this
-> warning with other configurations.
-> 
-> Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
-> ---
->  lib/crypto/sha1.c   | 1 +
->  lib/crypto/sha256.c | 1 +
->  lib/crypto/utils.c  | 1 +
->  3 files changed, 3 insertions(+)
+On Mon, Jun 17, 2024 at 6:08=E2=80=AFAM Andre Przywara <andre.przywara@arm.=
+com> wrote:
+>
+> The Allwinner H616 has a crypto engine very similar to the one in the
+> H6, although all addresses in the DMA descriptors are shifted by 2 bits,
+> to accommodate for the larger physical address space. That makes it
+> incompatible to the H6 variant, and thus requires a new compatible
+> string. Clock wise it relies on the internal oscillator for the TRNG,
+> so needs all four possible clocks specified.
+>
+> Add the compatible string to the list of recognised names, and add the
+> H616 to list of devices requiring all four clocks.
+>
+> Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Acked-by: Chen-Yu Tsai <wens@csie.org>
