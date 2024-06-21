@@ -1,163 +1,169 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05BDA128372;
-	Fri, 21 Jun 2024 04:47:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18B1316C6A8
+	for <linux-crypto@vger.kernel.org>; Fri, 21 Jun 2024 08:21:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718945270; cv=none; b=VQJ3Qrus+UNFB3l+lbIsJAYx1yxKbBDJQ/zseNRlqRwj2JQXrcilegIrL1WzFmdEKcIYFWiJo+Ce8k4CLXltmc11io1kmHDir/caA50sxoPoJKAicH3mcAldpWKBPraYH3cd31YxUsPf8cqeQmEb+SP6q6H8WI8N1jilPNl6W3w=
+	t=1718958076; cv=none; b=NhhACvS2cqGaiiJQtPg7I14Dl+RougoZr13NLD12KZNuW2cJoukkiNRQn5ByyTdRe1BaVOpu64Ycix1X3I8Xk+uQQwqV1kDd5dZVA8Lsn8DOb9Wl5C8/UsZZt/hHhSHjnJmPXWF8bGZnDwJSEblXtZNVDwNfvX/DK/g3wHZstHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718945270; c=relaxed/simple;
-	bh=fBV8KBfToKEsuEOUDdzCW7cT2SZZxlOGyAx8BY0dG94=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mHda+qYea5fOTbSCjAFC8II8EblfSIm1wbDfvJBBmDlKPAvnJFefD3Q7qj0Fd18AV5wkhOt0XjHi008i9hOmGcNm2Ftj8EKix7TlIZwQUU/A32xKMKtSxayE5Bah/SAB+vYVZANU2435YWtNm4rh+LwBY05UBGNunAH0Y6OkzEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kMgP2HpL; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1718958076; c=relaxed/simple;
+	bh=AZMW9Nu2DPjLgFXSzhp5Sme8UNShKiAJQRD+JkJrGpg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=bpK2syjDkM2PaEh6BZm9WE6Ou0yq4GAvWFYKfhKTCq7lyiTltml4vnOd3l7ghrBWXG81oTM7YDa13VLRFjmJiEuA1xvPo7ANORXqenMeU22BQ57nZ5EDdOo3zCRmpT9MSscjsxVWtwSrAZUoN3yaiHhz5OYc9gBVEiPLdKtQf48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=Tw/nZ+Iy; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kMgP2HpL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8CC0C2BBFC;
-	Fri, 21 Jun 2024 04:47:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718945269;
-	bh=fBV8KBfToKEsuEOUDdzCW7cT2SZZxlOGyAx8BY0dG94=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kMgP2HpLFATidjc+wCCnYT1CTxFqfv9ETC8+2kS969Ah+hTp2JhbcPDQi8es+EDgR
-	 BXG+SvdWKbmzb8bXMTh/+6ALzlQGlizcC8chCOo9xlvCej8xyn8HZHqdWFWWaDfyS5
-	 r04wyb9/cbiA8wiVQP36GyQ4gj2crKdG8sI2ePH8ttDSh0e+m8nUkwcvkjhz1SDZK0
-	 zPzXPNzCv9Rs3+X37Jn2CXTTfwEVSi6Tbag8boW/3E2j4dwlErlmbhiyO9oFU23ilZ
-	 80+XA6YQAES+dcDHRz7zu70KZmnyBnBCLODTf5lWSEQUODP/sx//h8qhps25A8BcPO
-	 7okQUfyN4NzhA==
-Date: Thu, 20 Jun 2024 21:47:47 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Cc: "Gaurav Kashyap (QUIC)" <quic_gaurkash@quicinc.com>,
-	"linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"andersson@kernel.org" <andersson@kernel.org>,
-	"neil.armstrong@linaro.org" <neil.armstrong@linaro.org>,
-	"srinivas.kandagatla" <srinivas.kandagatla@linaro.org>,
-	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"robh+dt@kernel.org" <robh+dt@kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-	kernel <kernel@quicinc.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"Om Prakash Singh (QUIC)" <quic_omprsing@quicinc.com>,
-	"Bao D. Nguyen (QUIC)" <quic_nguyenb@quicinc.com>,
-	"bartosz.golaszewski" <bartosz.golaszewski@linaro.org>,
-	"konrad.dybcio@linaro.org" <konrad.dybcio@linaro.org>,
-	"ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
-	"jejb@linux.ibm.com" <jejb@linux.ibm.com>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-	"mani@kernel.org" <mani@kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	Prasad Sodagudi <psodagud@quicinc.com>,
-	Sonal Gupta <sonalg@quicinc.com>
-Subject: Re: [PATCH v5 04/15] soc: qcom: ice: add hwkm support in ice
-Message-ID: <20240621044747.GC4362@sol.localdomain>
-References: <20240617005825.1443206-1-quic_gaurkash@quicinc.com>
- <20240617005825.1443206-5-quic_gaurkash@quicinc.com>
- <3eehkn3cdhhjfqtzpahxhjxtu5uqwhntpgu22k3hknctrop3g5@f7dhwvdvhr3k>
- <96e2ce4b154a4f918be0bc2a45011e6d@quicinc.com>
- <CAA8EJppGpv7N_JQQNJZrbngBBdEKZfuqutR9MPnS1R_WqYNTQw@mail.gmail.com>
- <3a15df00a2714b40aba4ebc43011a7b6@quicinc.com>
- <CAA8EJpoZ0RR035QwzMLguJZvdYb-C6aqudp1BgHgn_DH2ffsoQ@mail.gmail.com>
+	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="Tw/nZ+Iy"
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1f9b52ef481so15877575ad.1
+        for <linux-crypto@vger.kernel.org>; Fri, 21 Jun 2024 01:21:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=vayavyalabs.com; s=google; t=1718958074; x=1719562874; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hc944UNN7f50PN3TB8+9mucd9oay64prolyLQ6dOTms=;
+        b=Tw/nZ+Iy6SOcKePx9V/Mqb2BgQ9cXZvOuRdjpiF/qC2ffxt2Bq3USslvFIqEMmYFno
+         HVnB7w+Gb8dZ476m9RdvtaYzY6Wa021DbX+o7qDwjU3od92/p40ezNc3A8nEvl9Slbb8
+         C7NaHA6j5UIslxadgW4b8Q7MRIIxiAYLGUes8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718958074; x=1719562874;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hc944UNN7f50PN3TB8+9mucd9oay64prolyLQ6dOTms=;
+        b=nVfIJV2MR4ec57RPTADRC1ODsuUCWzELmU3vBGVS/Kv3jLz7SDJG4YM3XjP+hI/uoW
+         us8Act5SWf6GOE3P2sA4A5/Geq0KVLOt6dFxIPyKqinvtszS37Q9OvXl829CTVpe+BgL
+         H1Xuw141nw1NQhk0p9JTqFQjgXiH5srtPHULNrpeuwD/G0l00QKgsdklOxIyzKs3VUQz
+         WnK5wEc/BH9LUfMRE5R0zl2DWZTp2PXruUzz6B4DnTssWyXQsbWfiEPVguToVtYovJTy
+         V0Ca71lgIn5gI/9//D/E7ONtotnjeSMR/Kv+WwRGdhn7XX0MxqKD86A0nrX6t9uEWwPT
+         LzlQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXj8rKGcKXGWHtxNe7l43XPJzHp0nzJH2eIfo3YBLhkAoqM2GiRurVcD2v2bvOXxjRCHiVJdwnkN6JNK5oRcwAhi5RwIjH7/nsFxyr0
+X-Gm-Message-State: AOJu0YzqAAWhSb/283vVCd0QrJJZoeSSVYvwr3tsweXpqAPBFy7QKF3V
+	DCrcusai1j1v9rMPDZSXgDLWVEA6Gw2jFYjjVacA7I3KCfnCHisEPDLNQ6S2UaI=
+X-Google-Smtp-Source: AGHT+IHUJU8CYeyGQtVmNv/mwqMlQh+ABaUBR7JpvjiHvXHAcjoQKfUZgd09zRcxcqjp5uZTQqyIdg==
+X-Received: by 2002:a17:902:d2d1:b0:1f9:f217:83d with SMTP id d9443c01a7336-1f9f2170c01mr7159075ad.2.1718958074298;
+        Fri, 21 Jun 2024 01:21:14 -0700 (PDT)
+Received: from localhost.localdomain ([103.108.57.9])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f9eb3c5c97sm8673555ad.125.2024.06.21.01.21.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Jun 2024 01:21:13 -0700 (PDT)
+From: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
+To: herbert@gondor.apana.org.au,
+	linux-crypto@vger.kernel.org
+Cc: Ruud.Derwig@synopsys.com,
+	manjunath.hadli@vayavyalabs.com,
+	bhoomikak@vayavyalabs.com,
+	Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
+Subject: [PATCH v5 0/7] Add SPAcc Crypto Driver Support
+Date: Fri, 21 Jun 2024 13:50:46 +0530
+Message-Id: <20240621082053.638952-1-pavitrakumarm@vayavyalabs.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAA8EJpoZ0RR035QwzMLguJZvdYb-C6aqudp1BgHgn_DH2ffsoQ@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jun 20, 2024 at 02:57:40PM +0300, Dmitry Baryshkov wrote:
-> > > >
-> > > > > Is it possible to use both kind of keys when working on standard mode?
-> > > > > If not, it should be the user who selects what type of keys to be used.
-> > > > > Enforcing this via DT is not a way to go.
-> > > > >
-> > > >
-> > > > Unfortunately, that support is not there yet. When you say user, do
-> > > > you mean to have it as a filesystem mount option?
-> > >
-> > > During cryptsetup time. When running e.g. cryptsetup I, as a user, would like
-> > > to be able to use either a hardware-wrapped key or a standard key.
-> > >
-> >
-> > What we are looking for with these patches is for per-file/folder encryption using fscrypt policies.
-> > Cryptsetup to my understanding supports only full-disk , and does not support FBE (File-Based)
-> 
-> I must admit, I mostly used dm-crypt beforehand, so I had to look at
-> fscrypt now. Some of my previous comments might not be fully
-> applicable.
-> 
-> > Hence the idea here is that we mount an unencrypted device (with the inlinecrypt option that indicates inline encryption is supported)
-> > And specify policies (links to keys) for different folders.
-> >
-> > > > The way the UFS/EMMC crypto layer is designed currently is that, this
-> > > > information is needed when the modules are loaded.
-> > > >
-> > > > https://lore.kernel.org/all/20231104211259.17448-2-ebiggers@kernel.org
-> > > > /#Z31drivers:ufs:core:ufshcd-crypto.c
-> > >
-> > > I see that the driver lists capabilities here. E.g. that it supports HW-wrapped
-> > > keys. But the line doesn't specify that standard keys are not supported.
-> > >
-> >
-> > Those are capabilities that are read from the storage controller. However, wrapped keys
-> > Are not a standard in the ICE JEDEC specification, and in most cases, is a value add coming
-> > from the SoC.
-> >
-> > QCOM SOC and firmware currently does not support both kinds of keys in the HWKM mode.
-> > That is something we are internally working on, but not available yet.
-> 
-> I'd say this is a significant obstacle, at least from my point of
-> view. I understand that the default might be to use hw-wrapped keys,
-> but it should be possible for the user to select non-HW keys if the
-> ability to recover the data is considered to be important. Note, I'm
-> really pointing to the user here, not to the system integrator. So
-> using DT property or specifying kernel arguments to switch between
-> these modes is not really an option.
-> 
-> But I'd really love to hear some feedback from linux-security and/or
-> linux-fscrypt here.
-> 
-> In my humble opinion the user should be able to specify that the key
-> is wrapped using the hardware KMK. Then if the hardware has already
-> started using the other kind of keys, it should be able to respond
-> with -EINVAL / whatever else. Then the user can evict previously
-> programmed key and program a desired one.
-> 
-> > > Also, I'd have expected that hw-wrapped keys are handled using trusted
-> > > keys mechanism (see security/keys/trusted-keys/). Could you please point
-> > > out why that's not the case?
-> > >
-> >
-> > I will evaluate this.
-> > But my initial response is that we currently cannot communicate to our TPM directly from HLOS, but
-> > goes through QTEE, and I don't think our qtee currently interfaces with the open source tee
-> > driver. The interface is through QCOM SCM driver.
-> 
-> Note, this is just an API interface, see how it is implemented for the
-> CAAM hardware.
-> 
+Add the driver for SPAcc(Security Protocol Accelerator), which is a
+crypto acceleration IP from Synopsys. The SPAcc supports many cipher,
+hash, aead algorithms and various modes.The driver currently supports
+below,
 
-The problem is that this patchset was sent out without the patches that add the
-block and filesystem-level framework for hardware-wrapped inline encryption
-keys, which it depends on.  So it's lacking context.  The proposed framework can
-be found at
-https://lore.kernel.org/linux-block/20231104211259.17448-1-ebiggers@kernel.org/T/#u
+aead:
+- ccm(sm4)
+- ccm(aes)
+- gcm(sm4)
+- gcm(aes)
+- rfc7539(chacha20,poly1305)
 
-As for why "trusted keys" aren't used, they just aren't helpful here.  "Trusted
-keys" are based around a model where the kernel can request that keys be sealed
-and unsealed using a trust source, and the kernel gets access to the raw
-unsealed keys.  Hardware-wrapped inline encryption keys use a different model
-where the kernel never gets access to the raw keys.  They also have the concept
-of ephemeral wrapping which does not exist in "trusted keys".  And they need to
-be properly integrated with the inline encryption framework in the block layer.
+cipher:
+- cbc(sm4)
+- ecb(sm4)
+- ctr(sm4)
+- xts(sm4)
+- cts(cbc(sm4))
+- cbc(aes)
+- ecb(aes)
+- xts(aes)
+- cts(cbc(aes))
+- ctr(aes)
+- chacha20
+- ecb(des)
+- cbc(des)
+- ecb(des3_ede)
+- cbc(des3_ede)
 
-- Eric
+hash:
+- cmac(aes)
+- xcbc(aes)
+- cmac(sm4)
+- xcbc(sm4) 
+- hmac(md5)
+- md5
+- hmac(sha1)
+- sha1
+- sha224
+- sha256
+- sha384
+- sha512
+- hmac(sha224)
+- hmac(sha256)
+- hmac(sha384)
+- hmac(sha512)
+- sha3-224
+- sha3-256
+- sha3-384
+- sha3-512
+- hmac(sm3)
+- sm3
+- michael_mic
+
+Pavitrakumar M (7):
+  Add SPAcc Skcipher support
+  Enable SPAcc AUTODETECT
+  Add SPAcc ahash support
+  Add SPAcc aead support
+  Add SPAcc Kconfig and Makefile
+  Add SPAcc dts overlay
+  Enable Driver compilation in crypto Kconfig and Makefile
+
+ arch/arm64/boot/dts/xilinx/Makefile           |    3 +
+ .../arm64/boot/dts/xilinx/snps-dwc-spacc.dtso |   35 +
+ drivers/crypto/Kconfig                        |    1 +
+ drivers/crypto/Makefile                       |    1 +
+ drivers/crypto/dwc-spacc/Kconfig              |   95 +
+ drivers/crypto/dwc-spacc/Makefile             |   16 +
+ drivers/crypto/dwc-spacc/spacc_aead.c         | 1273 ++++++++
+ drivers/crypto/dwc-spacc/spacc_ahash.c        |  862 ++++++
+ drivers/crypto/dwc-spacc/spacc_core.c         | 2623 +++++++++++++++++
+ drivers/crypto/dwc-spacc/spacc_core.h         |  826 ++++++
+ drivers/crypto/dwc-spacc/spacc_device.c       |  340 +++
+ drivers/crypto/dwc-spacc/spacc_device.h       |  234 ++
+ drivers/crypto/dwc-spacc/spacc_hal.c          |  367 +++
+ drivers/crypto/dwc-spacc/spacc_hal.h          |  114 +
+ drivers/crypto/dwc-spacc/spacc_interrupt.c    |  316 ++
+ drivers/crypto/dwc-spacc/spacc_manager.c      |  650 ++++
+ drivers/crypto/dwc-spacc/spacc_skcipher.c     |  715 +++++
+ 17 files changed, 8471 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/xilinx/snps-dwc-spacc.dtso
+ create mode 100644 drivers/crypto/dwc-spacc/Kconfig
+ create mode 100644 drivers/crypto/dwc-spacc/Makefile
+ create mode 100755 drivers/crypto/dwc-spacc/spacc_aead.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_ahash.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_core.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_core.h
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_device.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_device.h
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.h
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_interrupt.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_manager.c
+ create mode 100644 drivers/crypto/dwc-spacc/spacc_skcipher.c
+
+
+base-commit: 1dcf865d3bf5bff45e93cb2410911b3428dacb78
+-- 
+2.25.1
+
