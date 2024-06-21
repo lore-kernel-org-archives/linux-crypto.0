@@ -1,251 +1,160 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C861208C4;
-	Fri, 21 Jun 2024 16:31:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E5A52BD05;
+	Fri, 21 Jun 2024 17:00:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718987490; cv=none; b=oDNS1UOUh45KisFUQVK7CI4VFlEtpsbC+tH18nvVMD1+kwQWj2y03evTtG9rVNY0qE65PJaKyRBSN0OGL1G3ycIaDQVY7Kmy4QAPLVhgDAmMm9NwsLRMQYU/oeI5HrOVAHFCygEPNrHIiZfluajpIwZqVe8xLxvvcQLGomcdBmg=
+	t=1718989216; cv=none; b=OUxaMpOvWpZy5DzU1axKxEs91gdTRlpZw083eFsf8IoNUe+HOr2moudJW9IyVvuY8Ib+dKM7IkBwbQzOHEAATOynuw5TE8J522sSpqfAeTQ7QSShftYI+ouhEWf6WsW3WJiEAGX5p6PpcvNhjw3LQlrnTznEA+zsSuT9cuV11D8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718987490; c=relaxed/simple;
-	bh=nPphPUeEU2Y1VOGdc8liNZZNuQZI5X8YMgWw9y27L5Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K3eKPIMLLeazwQ69/Iwx1/euQJYLEz17xgKK/j3f67Cd703qmqPMfY37WT6b9oBmjmw2F3RFcC1e77URv0xGvqGiby/5Z+T2m8GztHbmg95SvetQ+7e+NFkZ8v59H7jFqpBdhnc26idHeDZpAJPlpEEYaGupkuWKg3LM7bSc9wg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P5CMEdUK; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1718989216; c=relaxed/simple;
+	bh=T5agsG03jsn5iNLlN/Q/8k0qiwUTJkBZqtzS0aWxZ64=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qFfOJEVT37ozw8pKAseX7SHt7c7WH3DpEHwnHFLYY2TeJAJIPH8iJspb7amqoBW/sw72UtsuSD/hb1j49fDQ7eMSYHwnbbztWyztcSs+mddXFsoKnSrd91HxsVjnKesfuq8Al7QLujpWT4Pmwt8d0FuTSJbFrTkumuw9LLc7nzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ojqrPTO5; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P5CMEdUK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DBA0C2BBFC;
-	Fri, 21 Jun 2024 16:31:29 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ojqrPTO5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 653DBC2BBFC;
+	Fri, 21 Jun 2024 17:00:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718987489;
-	bh=nPphPUeEU2Y1VOGdc8liNZZNuQZI5X8YMgWw9y27L5Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=P5CMEdUK+9O+VtZhP50Xja+3J1Ax0+1spF2JIzICS3tzGelE6VxNXyzlgEDnoOqC+
-	 vLSIZo3FSGD1UZfzBm/53edB+bhFy1cQ3qkMDIQQowLlOMuZ3Y1EdL8BLW3EQPb+s3
-	 H24KGWVbzLElqdtDDoAfylcQd/MsFmJX4v9Q5iC7u74eZoP7eD6r6y2/V6CzAfSrXY
-	 vfjH8TNHeK4QO68xkkjckspLpj0onmxa0DYIKEhauFVgPmfQZyxbB5dTdMbXLbV38z
-	 P9QeI2FS8MNa5wuxelTMuBWPNT/wX2vQO07tqNFP6b8YqxEsPlq0zY/DGLaA1mCz15
-	 lOj5veLn3CoVw==
-Date: Fri, 21 Jun 2024 09:31:27 -0700
+	s=k20201202; t=1718989215;
+	bh=T5agsG03jsn5iNLlN/Q/8k0qiwUTJkBZqtzS0aWxZ64=;
+	h=From:To:Cc:Subject:Date:From;
+	b=ojqrPTO5aTeKGpQCSMvF+zQ7FwXzf9ik9wd7WRt6ReT02MtlwSRsY7+900ySKryUf
+	 dAdusLYaBuAyVE1nLHzVzn44YGXrRj5is0xXoHmUaBYoCBME/uJO+QVB74dZZjc2qk
+	 tqiFh/sL3WTHXKl131e3AzIVmkR5c0AH50ObTUtyrWd6WhW3jlNmdfdSI11G9rRdzp
+	 AVQ3qTefuTgEq+qJ9KwUjM0CcAzNepeyx4BRYRftNtvA/k/ZcrVyy8W1bhNkprgX4z
+	 tgiostLDLm7s9EN80zODUNApObbKoLkasOAX2knaXamwq2PwtJySm1aT3fXbjnTgJo
+	 FbKRwk2ZijGrg==
 From: Eric Biggers <ebiggers@kernel.org>
-To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Cc: "Gaurav Kashyap (QUIC)" <quic_gaurkash@quicinc.com>,
-	"linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
-	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-	"andersson@kernel.org" <andersson@kernel.org>,
-	"neil.armstrong@linaro.org" <neil.armstrong@linaro.org>,
-	"srinivas.kandagatla" <srinivas.kandagatla@linaro.org>,
-	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"robh+dt@kernel.org" <robh+dt@kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-	kernel <kernel@quicinc.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"Om Prakash Singh (QUIC)" <quic_omprsing@quicinc.com>,
-	"Bao D. Nguyen (QUIC)" <quic_nguyenb@quicinc.com>,
-	"bartosz.golaszewski" <bartosz.golaszewski@linaro.org>,
-	"konrad.dybcio@linaro.org" <konrad.dybcio@linaro.org>,
-	"ulf.hansson@linaro.org" <ulf.hansson@linaro.org>,
-	"jejb@linux.ibm.com" <jejb@linux.ibm.com>,
-	"martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-	"mani@kernel.org" <mani@kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	Prasad Sodagudi <psodagud@quicinc.com>,
-	Sonal Gupta <sonalg@quicinc.com>
-Subject: Re: [PATCH v5 04/15] soc: qcom: ice: add hwkm support in ice
-Message-ID: <20240621163127.GC2081@sol.localdomain>
-References: <20240617005825.1443206-5-quic_gaurkash@quicinc.com>
- <3eehkn3cdhhjfqtzpahxhjxtu5uqwhntpgu22k3hknctrop3g5@f7dhwvdvhr3k>
- <96e2ce4b154a4f918be0bc2a45011e6d@quicinc.com>
- <CAA8EJppGpv7N_JQQNJZrbngBBdEKZfuqutR9MPnS1R_WqYNTQw@mail.gmail.com>
- <3a15df00a2714b40aba4ebc43011a7b6@quicinc.com>
- <CAA8EJpoZ0RR035QwzMLguJZvdYb-C6aqudp1BgHgn_DH2ffsoQ@mail.gmail.com>
- <20240621044747.GC4362@sol.localdomain>
- <CAA8EJppXsbpFCeGJOMGKOQddy0fF4uW3rt4RUuDTQq6mPunBkg@mail.gmail.com>
- <20240621153939.GA2081@sol.localdomain>
- <CAA8EJpqV4CW9kKLVUZgfo+hkSv+tn0t+k0McmHEyXNJUpsZF1w@mail.gmail.com>
+To: linux-crypto@vger.kernel.org,
+	fsverity@lists.linux.dev,
+	dm-devel@lists.linux.dev
+Cc: x86@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Alasdair Kergon <agk@redhat.com>,
+	Mike Snitzer <snitzer@kernel.org>,
+	Mikulas Patocka <mpatocka@redhat.com>
+Subject: [PATCH v6 00/15] Optimize dm-verity and fsverity using multibuffer hashing
+Date: Fri, 21 Jun 2024 09:59:07 -0700
+Message-ID: <20240621165922.77672-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAA8EJpqV4CW9kKLVUZgfo+hkSv+tn0t+k0McmHEyXNJUpsZF1w@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jun 21, 2024 at 07:06:25PM +0300, Dmitry Baryshkov wrote:
-> On Fri, 21 Jun 2024 at 18:39, Eric Biggers <ebiggers@kernel.org> wrote:
-> >
-> > On Fri, Jun 21, 2024 at 06:16:37PM +0300, Dmitry Baryshkov wrote:
-> > > On Fri, 21 Jun 2024 at 07:47, Eric Biggers <ebiggers@kernel.org> wrote:
-> > > >
-> > > > On Thu, Jun 20, 2024 at 02:57:40PM +0300, Dmitry Baryshkov wrote:
-> > > > > > > >
-> > > > > > > > > Is it possible to use both kind of keys when working on standard mode?
-> > > > > > > > > If not, it should be the user who selects what type of keys to be used.
-> > > > > > > > > Enforcing this via DT is not a way to go.
-> > > > > > > > >
-> > > > > > > >
-> > > > > > > > Unfortunately, that support is not there yet. When you say user, do
-> > > > > > > > you mean to have it as a filesystem mount option?
-> > > > > > >
-> > > > > > > During cryptsetup time. When running e.g. cryptsetup I, as a user, would like
-> > > > > > > to be able to use either a hardware-wrapped key or a standard key.
-> > > > > > >
-> > > > > >
-> > > > > > What we are looking for with these patches is for per-file/folder encryption using fscrypt policies.
-> > > > > > Cryptsetup to my understanding supports only full-disk , and does not support FBE (File-Based)
-> > > > >
-> > > > > I must admit, I mostly used dm-crypt beforehand, so I had to look at
-> > > > > fscrypt now. Some of my previous comments might not be fully
-> > > > > applicable.
-> > > > >
-> > > > > > Hence the idea here is that we mount an unencrypted device (with the inlinecrypt option that indicates inline encryption is supported)
-> > > > > > And specify policies (links to keys) for different folders.
-> > > > > >
-> > > > > > > > The way the UFS/EMMC crypto layer is designed currently is that, this
-> > > > > > > > information is needed when the modules are loaded.
-> > > > > > > >
-> > > > > > > > https://lore.kernel.org/all/20231104211259.17448-2-ebiggers@kernel.org
-> > > > > > > > /#Z31drivers:ufs:core:ufshcd-crypto.c
-> > > > > > >
-> > > > > > > I see that the driver lists capabilities here. E.g. that it supports HW-wrapped
-> > > > > > > keys. But the line doesn't specify that standard keys are not supported.
-> > > > > > >
-> > > > > >
-> > > > > > Those are capabilities that are read from the storage controller. However, wrapped keys
-> > > > > > Are not a standard in the ICE JEDEC specification, and in most cases, is a value add coming
-> > > > > > from the SoC.
-> > > > > >
-> > > > > > QCOM SOC and firmware currently does not support both kinds of keys in the HWKM mode.
-> > > > > > That is something we are internally working on, but not available yet.
-> > > > >
-> > > > > I'd say this is a significant obstacle, at least from my point of
-> > > > > view. I understand that the default might be to use hw-wrapped keys,
-> > > > > but it should be possible for the user to select non-HW keys if the
-> > > > > ability to recover the data is considered to be important. Note, I'm
-> > > > > really pointing to the user here, not to the system integrator. So
-> > > > > using DT property or specifying kernel arguments to switch between
-> > > > > these modes is not really an option.
-> > > > >
-> > > > > But I'd really love to hear some feedback from linux-security and/or
-> > > > > linux-fscrypt here.
-> > > > >
-> > > > > In my humble opinion the user should be able to specify that the key
-> > > > > is wrapped using the hardware KMK. Then if the hardware has already
-> > > > > started using the other kind of keys, it should be able to respond
-> > > > > with -EINVAL / whatever else. Then the user can evict previously
-> > > > > programmed key and program a desired one.
-> > > > >
-> > > > > > > Also, I'd have expected that hw-wrapped keys are handled using trusted
-> > > > > > > keys mechanism (see security/keys/trusted-keys/). Could you please point
-> > > > > > > out why that's not the case?
-> > > > > > >
-> > > > > >
-> > > > > > I will evaluate this.
-> > > > > > But my initial response is that we currently cannot communicate to our TPM directly from HLOS, but
-> > > > > > goes through QTEE, and I don't think our qtee currently interfaces with the open source tee
-> > > > > > driver. The interface is through QCOM SCM driver.
-> > > > >
-> > > > > Note, this is just an API interface, see how it is implemented for the
-> > > > > CAAM hardware.
-> > > > >
-> > > >
-> > > > The problem is that this patchset was sent out without the patches that add the
-> > > > block and filesystem-level framework for hardware-wrapped inline encryption
-> > > > keys, which it depends on.  So it's lacking context.  The proposed framework can
-> > > > be found at
-> > > > https://lore.kernel.org/linux-block/20231104211259.17448-1-ebiggers@kernel.org/T/#u
-> > >
-> > > Thank you. I have quickly skimmed through the patches, but I didn't
-> > > review them thoroughly. Maybe the patchset already implements the
-> > > interfaces that I'm thinking about. In such a case please excuse me. I
-> > > will give it a more thorough look later today.
-> > >
-> > > > As for why "trusted keys" aren't used, they just aren't helpful here.  "Trusted
-> > > > keys" are based around a model where the kernel can request that keys be sealed
-> > > > and unsealed using a trust source, and the kernel gets access to the raw
-> > > > unsealed keys.  Hardware-wrapped inline encryption keys use a different model
-> > > > where the kernel never gets access to the raw keys.  They also have the concept
-> > > > of ephemeral wrapping which does not exist in "trusted keys".  And they need to
-> > > > be properly integrated with the inline encryption framework in the block layer.
-> > >
-> > > Then what exactly does qcom_scm_derive_sw_secret() do? Does it rewrap
-> > > the key under some other key?
-> >
-> > It derives a secret for functionality such as filenames encryption that can't
-> > use inline encryption.
-> >
-> > > I had the feeling that there are two separate pieces of functionality
-> > > being stuffed into a single patchset and into a single solution.
-> > >
-> > > First one is handling the keys. I keep on thinking that there should
-> > > be a separate software interface to unseal the key and rewrap it under
-> > > an ephemeral key.
-> >
-> > There is.  That's what the BLKCRYPTOPREPAREKEY ioctl is for.
-> >
-> > > Some hardware might permit importing raw keys.
-> >
-> > That's what BLKCRYPTOIMPORTKEY is for.
-> >
-> > > Other hardware might insist on generating the keys on-chip so that raw keys
-> > > can never be used.
-> >
-> > And that's what BLKCRYPTOGENERATEKEY is for.
-> 
-> Again, this might be answered somewhere, but why can't we use keyctl
-> for handling the keys and then use a single IOCTL to point the block
-> device to the key in the keyring?
+On many modern CPUs, it is possible to compute the SHA-256 hash of two
+equal-length messages in about the same time as a single message, if all
+the instructions are interleaved.  This is because each SHA-256 (and
+also most other cryptographic hash functions) is inherently serialized
+and therefore can't always take advantage of the CPU's full throughput.
 
-All the same functionality would need to be supported, and I think that
-shoehorning it into the keyrings service instead of just adding new ioctls would
-be more difficult.  The keyrings service was not designed for this use case.
-We've already had a lot of problems trying to take advantage of the keyrings
-service in fscrypt previously.  The keyrings service is something that sounds
-useful but really isn't all that useful.
+An earlier attempt to support multibuffer hashing in Linux was based
+around the ahash API.  That approach had some major issues, as does the
+alternative ahash-based approach proposed by Herbert (see my response at
+https://lore.kernel.org/linux-crypto/20240610164258.GA3269@sol.localdomain/).
+This patchset instead takes a much simpler approach of just adding a
+synchronous API for hashing equal-length messages.
 
-By "a single IOCTL to point the block device to the key in the keyring", you
-seem to be referring to configuring full block device encryption with a single
-key.  That's not something that's supported by the upstream kernel yet, and it's
-not related to this patchset; currently only fscrypt supports inline encryption.
-Support for it will be added at some point, which will likely indeed take the
-form of an ioctl to set a key on a block device.  But that would be the case
-even without HW-wrapped keys.  And *requiring* the key to be given in a keyring
-(instead of just in a byte array passed to the ioctl) isn't very helpful, as it
-just makes the API harder to use.  We've learned this from the fscrypt API
-already where we actually had to move away from the keyrings service in order to
-fix all the issues caused by it (see FS_IOC_ADD_ENCRYPTION_KEY).
+This works well for dm-verity and fsverity, which use Merkle trees and
+therefore hash large numbers of equal-length messages.
 
-> >
-> > > Second part is the actual block interface. Gaurav wrote about
-> > > targeting fscrypt, but there should be no actual difference between
-> > > crypto targets. FDE or having a single partition encrypted should
-> > > probably work in the same way. Convert the key into blk_crypto_key
-> > > (including the cookie for the ephemeral key), program the key into the
-> > > slot, use the slot to en/decrypt hardware blocks.
-> > >
-> > > My main point is that the decision on the key type should be coming
-> > > from the user.
-> >
-> > That's exactly how it works.  There is a block interface for specifying an
-> > inline encryption key along with each bio.  The submitter of the bio can specify
-> > either a standard key or a HW-wrapped key.
-> 
-> Not in this patchset. The ICE driver decides whether it can support
-> HW-wrapped keys or not and then fails to support other type of keys.
-> 
+This patchset is organized as follows:
 
-Sure, that's just a matter of hardware capabilities though, right?  The block
-layer provides a way for drivers to declare which inline encryption capabilities
-they support.  They can declare they support standard keys, HW-wrapped keys,
-both, or neither.  If Qualcomm SoCs can't support both types of keys at the same
-time, that's unfortunate, but I'm not sure what your point is.  The user (e.g.
-fscrypt) still has control over whether they use the functionality that the
-hardware provides.
+- Patch 1-3 add crypto_shash_finup_mb() and tests for it.
+- Patch 4-5 implement finup_mb on x86_64 and arm64, using an
+  interleaving factor of 2.
+- Patch 6 adds multibuffer hashing support to fsverity.
+- Patches 7-14 are cleanups and optimizations to dm-verity that prepare
+  the way for adding multibuffer hashing support.  These don't depend on
+  any of the previous patches.
+- Patch 15 adds multibuffer hashing support to dm-verity.
 
-- Eric
+On CPUs that support multiple concurrent SHA-256's (all arm64 CPUs I
+tested, and AMD Zen CPUs), raw SHA-256 hashing throughput increases by
+70-98%, and the throughput of cold-cache reads from dm-verity and
+fsverity increases by very roughly 35%.
+
+Changed in v6:
+  - All patches: added Reviewed-by and Acked-by tags
+  - "crypto: testmgr - add tests for finup_mb": Whitespace fix
+  - "crypto: testmgr - generate power-of-2 lengths more often":
+    Fixed undefined behavior
+  - "fsverity: improve performance by using multibuffer hashing":
+    Simplified a comment
+  - "dm-verity: reduce scope of real and wanted digests":
+    Fixed mention of nonexistent function in commit message
+  - "dm-verity: improve performance by using multibuffer hashing":
+    Two small optimizations, and simplified a comment
+
+Changed in v5:
+  - Reworked the dm-verity patches again.  Split the preparation work
+    into separate patches, fixed two bugs, and added some new cleanups.
+  - Other small cleanups
+
+Changed in v4:
+  - Reorganized the fsverity and dm-verity code to have a unified code
+    path for single-block vs. multi-block processing.  For data blocks
+    they now use only crypto_shash_finup_mb().
+
+Changed in v3:
+  - Change API from finup2x to finup_mb.  It now takes arrays of data
+    buffer and output buffers, avoiding hardcoding 2x in the API.
+
+Changed in v2:
+  - Rebase onto cryptodev/master
+  - Add more comments to assembly
+  - Reorganize some of the assembly slightly
+  - Fix the claimed throughput improvement on arm64
+  - Fix incorrect kunmap order in fs/verity/verify.c
+  - Adjust testmgr generation logic slightly
+  - Explicitly check for INT_MAX before casting unsigned int to int
+  - Mention SHA3 based parallel hashes
+  - Mention AVX512-based approach
+
+Eric Biggers (15):
+  crypto: shash - add support for finup_mb
+  crypto: testmgr - generate power-of-2 lengths more often
+  crypto: testmgr - add tests for finup_mb
+  crypto: x86/sha256-ni - add support for finup_mb
+  crypto: arm64/sha256-ce - add support for finup_mb
+  fsverity: improve performance by using multibuffer hashing
+  dm-verity: move hash algorithm setup into its own function
+  dm-verity: move data hash mismatch handling into its own function
+  dm-verity: make real_digest and want_digest fixed-length
+  dm-verity: provide dma_alignment limit in io_hints
+  dm-verity: always "map" the data blocks
+  dm-verity: make verity_hash() take dm_verity_io instead of
+    ahash_request
+  dm-verity: hash blocks with shash import+finup when possible
+  dm-verity: reduce scope of real and wanted digests
+  dm-verity: improve performance by using multibuffer hashing
+
+ arch/arm64/crypto/sha2-ce-core.S    | 281 +++++++++++++-
+ arch/arm64/crypto/sha2-ce-glue.c    |  40 ++
+ arch/x86/crypto/sha256_ni_asm.S     | 368 ++++++++++++++++++
+ arch/x86/crypto/sha256_ssse3_glue.c |  39 ++
+ crypto/shash.c                      |  58 +++
+ crypto/testmgr.c                    |  89 ++++-
+ drivers/md/dm-verity-fec.c          |  49 +--
+ drivers/md/dm-verity-fec.h          |   9 +-
+ drivers/md/dm-verity-target.c       | 581 ++++++++++++++++------------
+ drivers/md/dm-verity.h              |  65 ++--
+ fs/verity/fsverity_private.h        |   7 +
+ fs/verity/hash_algs.c               |   8 +-
+ fs/verity/verify.c                  | 169 ++++++--
+ include/crypto/hash.h               |  52 ++-
+ 14 files changed, 1436 insertions(+), 379 deletions(-)
+
+
+base-commit: ff33c2e6af99afcac3024a5c3ec8730d1e6b8ac7
+-- 
+2.45.2
+
