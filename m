@@ -1,107 +1,160 @@
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [95.215.58.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB75D16D4D7
-	for <linux-crypto@vger.kernel.org>; Fri, 21 Jun 2024 08:21:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1895F16D4C9
+	for <linux-crypto@vger.kernel.org>; Fri, 21 Jun 2024 09:12:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718958111; cv=none; b=rCsIg7flvbi/3zvMEBgKZKQd0vG6GpijxAUbjr3/XhcNcTY65ZEwtSbvPR9dQCUmfE9dn+lUmQPwN1uabdOm8/exehZZx+d2c5hhnPJ60VfMiM/rF1TaprPwapRQnrfMzDyt41PiFbvrLo5DXUwvCxMvjWTRu2WGk1vOcIC7kuw=
+	t=1718961177; cv=none; b=SqZGx5gTMZBuqtNTXYRs3zDPsZ9Is0u5lH9Pa7QCk80RC/QL/w9kO343TZVh9gOS8V/VNeotk4He+2wmXNMZqDpC9c22fcUomWMJDC3B9QoL8xYCWcPnjh/cv+Ox3cpjNL5sGfC+lUkOqDd6EgpmlIn7e+tkLvx1KtTldPLH0Vg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718958111; c=relaxed/simple;
-	bh=03Or/FiYd0/nl0Pewsikw0aSkjgcfqdZV+GhUY8nJPg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=DDuLkaqoKWUlH2Eod2MWFFxoBwg5f5WdnRA/ewttbeGwE/8CiyqneGlD/3za2DizyIRILOMTIVYGJN6iClT6vqOFzM8BV6ZhPGykh3r8wHefVd4fOXDJ9yFPQV9BwG1ehf98RMml3g6Tqag6INYR31qWj/iC1R0RE44PCP/121o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=BdpH41qT; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
+	s=arc-20240116; t=1718961177; c=relaxed/simple;
+	bh=X1yqTZpc+YxmN3y1eggCSxrmsj4Vb2Fhxpq7DnAN7cQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=I5ZC0cn2Ow223Q6SXoLM1LJEr8C77b6vW05XsywNfX0ze9BLdLgsbXR3pPjfLUb4C3+n+LoP5WTk4t3DxRqCpw9vPfBGGX+6fJjjoqLPTFCDvFClxvaJs+bJT1rdmbHNEFZhyL7ZURnYUU71gZJbES90uzhJdQlcjwHvEhQwmNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cknow.org; spf=pass smtp.mailfrom=cknow.org; dkim=pass (2048-bit key) header.d=cknow.org header.i=@cknow.org header.b=cAUoZfSn; arc=none smtp.client-ip=95.215.58.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cknow.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cknow.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="BdpH41qT"
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1f9d9b57b90so9662725ad.0
-        for <linux-crypto@vger.kernel.org>; Fri, 21 Jun 2024 01:21:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vayavyalabs.com; s=google; t=1718958109; x=1719562909; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Z6rOVwxl67M1ho00LCXthXQkqBxCB3HpfniWe3LKqEs=;
-        b=BdpH41qTRP9DhLnkEfpL5bRmQQR0X6i56c2X1fXFwv44JcMbO5EPgXfLRwGNI2c2AV
-         0gRGqAChzILeGqF2Z8sHttu16V4+m8ZvsHoVedsKOGg+/CWr761fTZ3N52doVYt/fqsK
-         tuLYaXai0lv+qizqI7zTQuaaDFi+BLPaJHedo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718958109; x=1719562909;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Z6rOVwxl67M1ho00LCXthXQkqBxCB3HpfniWe3LKqEs=;
-        b=TYr//lCSoE1KsOoJvF1AVg77MkvTTxb91xuGlnLtFkHSWf8JmYhQlYEs5bgfReBXd0
-         /i/ID7BlmZ8Ki2R1GLYIcaKGS/idsES5Zddhd2o9OxDunSGpDXx615G5Ls9tHhRv7dk5
-         VjXQ9pdfuhc6HiIvSMPoxO5B0zUI5ijehrjl9iSq3NXsRLFv9JOCY0n2EZbDTqVy1dJ/
-         8VhROBo+QNaVJOBuOGUe7f7+EUVF0JJezxxFD56Oqxu78xPNJxhFiYGrN/vOWE1mkJPy
-         Gn4INeNtF0lb6L/sCOl/ChyxGwXyRbCcNSE6cbHgszqzthbKHErsl9GA6bGj86VTfDpY
-         DtzQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWJOyhp+3nnRc72CWsnSdZWRuInpZqREvv2pc21NqT0+KQkbuCgycqpLgBX0guMJAsv589r0ezH2G+/Usy7n/IL4J1BUiwD+NRbZmx1
-X-Gm-Message-State: AOJu0Yzv0vdDbX6vpzbizVOKoqkUwzmkJl6X7/LBOTB2tz/2LFhhpiGZ
-	VS/UZmf4TBbNNTAh1ks7nikqslLxOyOhG5D2MdGRk5JeuMelY2lAwXfRMnPd/28=
-X-Google-Smtp-Source: AGHT+IGGSbcSun11nk1hO10EuFOhJrFXGwbkrIs9Aw/XmDG5Vli6+OP4u6IE3TrZycBNv2exrIUa1g==
-X-Received: by 2002:a17:903:2349:b0:1f8:69ed:cfd5 with SMTP id d9443c01a7336-1f9aa3b09ebmr92252975ad.10.1718958109268;
-        Fri, 21 Jun 2024 01:21:49 -0700 (PDT)
-Received: from localhost.localdomain ([103.108.57.9])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f9eb3c5c97sm8673555ad.125.2024.06.21.01.21.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Jun 2024 01:21:48 -0700 (PDT)
-From: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
-To: herbert@gondor.apana.org.au,
-	linux-crypto@vger.kernel.org
-Cc: Ruud.Derwig@synopsys.com,
-	manjunath.hadli@vayavyalabs.com,
-	bhoomikak@vayavyalabs.com,
-	Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
-Subject: [PATCH v5 7/7] Enable Driver compilation in crypto Kconfig and Makefile
-Date: Fri, 21 Jun 2024 13:50:53 +0530
-Message-Id: <20240621082053.638952-8-pavitrakumarm@vayavyalabs.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240621082053.638952-1-pavitrakumarm@vayavyalabs.com>
-References: <20240621082053.638952-1-pavitrakumarm@vayavyalabs.com>
+	dkim=pass (2048-bit key) header.d=cknow.org header.i=@cknow.org header.b="cAUoZfSn"
+X-Envelope-To: daniel@makrotopia.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cknow.org; s=key1;
+	t=1718961171;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HoU+w5hbf95oI+65NF7m7axx7dLHxuPKJDtqnUpn1Y4=;
+	b=cAUoZfSnDjSevbeJKZhULk5jqgXfbwffQyhxmKz2AGwKmw8Owmhnbge9dU3PvjSRj8z3Vr
+	KCiWaEjz7D1mRt2SgPcTjqKWZrqRwg/5O4OxdZVmk5Wjb0zssWviaTs4YUemA/XHxNVrL8
+	NULITiv0p/F8S/YV0Qtn4vTu7FnfpM//2+3pz9E+XojIDEj5DwIqKZjVMiwqS9ZtjY31Fp
+	au0iPLd6lJ1htHHbHQGc88M7x27ugivW9tRNS/sFXjqGsa7qeflmVX/jtzoDROqar2raio
+	AOfPJ4gPbIcCeJU3ogTjag7Zh2+friJmFGBaoJS9T1P7N0+Sg8UTTRw0+MpofA==
+X-Envelope-To: aurelien@aurel32.net
+X-Envelope-To: olivia@selenic.com
+X-Envelope-To: herbert@gondor.apana.org.au
+X-Envelope-To: robh@kernel.org
+X-Envelope-To: krzk+dt@kernel.org
+X-Envelope-To: conor+dt@kernel.org
+X-Envelope-To: heiko@sntech.de
+X-Envelope-To: p.zabel@pengutronix.de
+X-Envelope-To: ukleinek@debian.org
+X-Envelope-To: sebastian.reichel@collabora.com
+X-Envelope-To: linux.amoon@gmail.com
+X-Envelope-To: dsimic@manjaro.org
+X-Envelope-To: s.hauer@pengutronix.de
+X-Envelope-To: martin@kaiser.cx
+X-Envelope-To: ardb@kernel.org
+X-Envelope-To: linux-crypto@vger.kernel.org
+X-Envelope-To: devicetree@vger.kernel.org
+X-Envelope-To: linux-arm-kernel@lists.infradead.org
+X-Envelope-To: linux-rockchip@lists.infradead.org
+X-Envelope-To: linux-kernel@vger.kernel.org
+X-Envelope-To: daniel@makrotopia.org
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Diederik de Haas <didi.debian@cknow.org>
+To: Daniel Golle <daniel@makrotopia.org>,
+ Aurelien Jarno <aurelien@aurel32.net>, Olivia Mackall <olivia@selenic.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
+ Heikomemcpy_fromio Stuebner <heiko@sntech.de>,
+ Philipp Zabel <p.zabel@pengutronix.de>,
+ Uwe =?ISO-8859-1?Q?Kleine=2DK=F6nig?= <ukleinek@debian.org>,
+ Sebastian Reichel <sebastian.reichel@collabora.com>,
+ Anand Moon <linux.amoon@gmail.com>, Dragan Simic <dsimic@manjaro.org>,
+ Sascha Hauer <s.hauer@pengutronix.de>, Martin Kaiser <martin@kaiser.cx>,
+ Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org
+Cc: Daniel Golle <daniel@makrotopia.org>
+Subject: Re: [PATCH v3 1/3] dt-bindings: RNG: Add Rockchip RNG bindings
+Date: Fri, 21 Jun 2024 11:12:35 +0200
+Message-ID: <68762122.lzCB0yxN2V@bagend>
+Organization: Connecting Knowledge
+In-Reply-To:
+ <10f621d0711c80137afd93f62a03b1b10009715c.1718921174.git.daniel@makrotopia.org>
+References:
+ <cover.1718921174.git.daniel@makrotopia.org>
+ <10f621d0711c80137afd93f62a03b1b10009715c.1718921174.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="nextPart3910405.qtKquTYnKW";
+ micalg="pgp-sha256"; protocol="application/pgp-signature"
+X-Migadu-Flow: FLOW_OUT
 
-Signed-off-by: Bhoomika K <bhoomikak@vayavyalabs.com>
-Signed-off-by: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
-Acked-by: Ruud Derwig <Ruud.Derwig@synopsys.com>
----
- drivers/crypto/Kconfig  | 1 +
- drivers/crypto/Makefile | 1 +
- 2 files changed, 2 insertions(+)
+--nextPart3910405.qtKquTYnKW
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"; protected-headers="v1"
+From: Diederik de Haas <didi.debian@cknow.org>
+Cc: Daniel Golle <daniel@makrotopia.org>
+Date: Fri, 21 Jun 2024 11:12:35 +0200
+Message-ID: <68762122.lzCB0yxN2V@bagend>
+Organization: Connecting Knowledge
+MIME-Version: 1.0
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 94f23c6fc93b..009cbd0e1993 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -696,6 +696,7 @@ config CRYPTO_DEV_BCM_SPU
- 	  ahash, and aead algorithms with the kernel cryptographic API.
- 
- source "drivers/crypto/stm32/Kconfig"
-+source "drivers/crypto/dwc-spacc/Kconfig"
- 
- config CRYPTO_DEV_SAFEXCEL
- 	tristate "Inside Secure's SafeXcel cryptographic engine driver"
-diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
-index ad4ccef67d12..a937e8f5849b 100644
---- a/drivers/crypto/Makefile
-+++ b/drivers/crypto/Makefile
-@@ -48,6 +48,7 @@ obj-$(CONFIG_CRYPTO_DEV_BCM_SPU) += bcm/
- obj-$(CONFIG_CRYPTO_DEV_SAFEXCEL) += inside-secure/
- obj-$(CONFIG_CRYPTO_DEV_ARTPEC6) += axis/
- obj-y += xilinx/
-+obj-y += dwc-spacc/
- obj-y += hisilicon/
- obj-$(CONFIG_CRYPTO_DEV_AMLOGIC_GXL) += amlogic/
- obj-y += intel/
--- 
-2.25.1
+Hi,
+
+https://lore.kernel.org/all/89b16ec5-f9a5-f836-f51a-8325448e4775@linaro.org/ 
+also mentions some remarks about the subject, so if I interpreted those 
+remarks correctly, it should be:
+
+dt-bindings: rng: rockchip: Add rk3568 TRNG
+
+On Friday, 21 June 2024 03:25:01 CEST Daniel Golle wrote:
+> From: Aurelien Jarno <aurelien@aurel32.net>
+> 
+> Add the RNG bindings for the RK3568 SoC from Rockchip
+> 
+> Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> ---
+>  .../bindings/rng/rockchip,rk3568-rng.yaml     | 60 +++++++++++++++++++
+>  MAINTAINERS                                   |  6 ++
+>  2 files changed, 66 insertions(+)
+>  create mode 100644
+> Documentation/devicetree/bindings/rng/rockchip,rk3568-rng.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/rng/rockchip,rk3568-rng.yaml
+> b/Documentation/devicetree/bindings/rng/rockchip,rk3568-rng.yaml new file
+> mode 100644
+> index 000000000000..d45f03683fbe
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/rng/rockchip,rk3568-rng.yaml
+> @@ -0,0 +1,61 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/rng/rockchip,rk3568-rng.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Rockchip TRNG
+> +
+> +description: True Random Number Generator on Rokchip RK3568 SoC
+
+I *think* that the TRNG for rk3588 is different, so shouldn't the title be:
+
+Rockchip TRNG for rk356x SoCs
+
+Cheers,
+  Diederik
+
+PS: Heiko's name is without `memcpy_fromio` ;-P
+--nextPart3910405.qtKquTYnKW
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+Content-Transfer-Encoding: 7Bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQT1sUPBYsyGmi4usy/XblvOeH7bbgUCZnVEAwAKCRDXblvOeH7b
+bvYLAQD5phdvtSaGx5MmYC50JLDUbw5C48bFzb/suRy7BfZaNgD/TyjMUTJNnFPk
+fy6xGLowx9j4pjU1c+McDZwWhadqpAM=
+=qx6y
+-----END PGP SIGNATURE-----
+
+--nextPart3910405.qtKquTYnKW--
+
+
 
