@@ -1,468 +1,293 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com [209.85.219.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B113A175554;
-	Fri, 21 Jun 2024 17:00:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1C93168484
+	for <linux-crypto@vger.kernel.org>; Fri, 21 Jun 2024 17:50:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718989223; cv=none; b=eX+TvmVaXcwk9FdwYJDjtHDi0pdAJlFU9z+4FQcduz/yqFDFGQGgTNX3RwBjh5f6k7L2K90dZtH6Lq5K4upmRsKzme4W8e9yvDr4flyo/GgmwGAT+dMI+tRFvRoUGeocdN1vT36lTcI5cIQYREWCVGUFOHauIMSkn/66BSRIiPk=
+	t=1718992210; cv=none; b=tAOBjiTaKSKl55ekzUsiA8nHz0qr56yLHrrmqcfbQVkNXL0iAf7BMhQDR60RE9TLjZK2+EP1dLKMkEFyQXZr3CiMWlz8LZkKYRW5ZRpkR6AGqVNCFDE6zeQ8fFVW2fmfXj5C7t4WSSCdEtmuK5h/OlX17v/53QFt9jTRHms94G8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718989223; c=relaxed/simple;
-	bh=fNLe52TPOxjgLpo59slUZdXGoIEJCK+i4EGVq9NPfPk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TXMHtMAiXYY46qt0XTFF3PJy1IgSawpQyknRZQvjN3SpPmIfKGP+Cg239+380GwTtiEBN3UBFawv1Y8vOkguvW7SJMyL53jjnCJQynIEh8cWA/BKSntgAY2fLGrvrtj1T+oQ7oz6xZsjwhCKoBhe5736QOyB0CJpjdbiqkAojtI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i2d5eAYN; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1718992210; c=relaxed/simple;
+	bh=IPf9+fbqGUDmVSOQu/X/7C1F1f5gxqDHVFmJFmx7PBo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VsVrUX/ywqhkxWA6bBO2Kxe989HbJPqF93j6baSS92pyeNO4nsQrnv2N+Y40vN/AjFLbzb4Trvnfd3CSw5N1+iCY0k7lVMdBnt247J7yHDGS018TfxlMREuuxxeZ3CneB0HKcyQdTlOkirpFp3Ii9UBehXaJVFgKcD1vXgqTEWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=gcTz6lim; arc=none smtp.client-ip=209.85.219.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i2d5eAYN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CBA2C4AF08;
-	Fri, 21 Jun 2024 17:00:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718989223;
-	bh=fNLe52TPOxjgLpo59slUZdXGoIEJCK+i4EGVq9NPfPk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=i2d5eAYNbel8tNFaas0Y2Zbntn3EsMrJFceSmw8a+H/FjQZo8soMdzNBqFL7ITnsI
-	 QtbzcJMq9G2hFe4d/DBjWDvypthFeyDQAxWdpjlTLCwer35MFy7vFk0aoXrs/gNMlr
-	 sxKVV7PoILNJV5kx3ZRphMuLayzZptgF2ZLvRj8Su3Ch8d239rUyR19NFMYxbhmloS
-	 l0Jw8LWf6aXBAqSPowrlGo/m8sMdVk3MksDfgAdYdEbZulKCN7WGq+wOLfJqokArVe
-	 HE/V59d+lXfN/cNr9cfvriHVeiIspLlkBbBdadbBcaMA0uuE4fiVVE3LRFzBxnRs2R
-	 tdfh+UGfARpDw==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-	fsverity@lists.linux.dev,
-	dm-devel@lists.linux.dev
-Cc: x86@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Alasdair Kergon <agk@redhat.com>,
-	Mike Snitzer <snitzer@kernel.org>,
-	Mikulas Patocka <mpatocka@redhat.com>
-Subject: [PATCH v6 15/15] dm-verity: improve performance by using multibuffer hashing
-Date: Fri, 21 Jun 2024 09:59:22 -0700
-Message-ID: <20240621165922.77672-16-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240621165922.77672-1-ebiggers@kernel.org>
-References: <20240621165922.77672-1-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gcTz6lim"
+Received: by mail-yb1-f170.google.com with SMTP id 3f1490d57ef6-dff36345041so2322420276.3
+        for <linux-crypto@vger.kernel.org>; Fri, 21 Jun 2024 10:50:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1718992208; x=1719597008; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=htDP1OG5xDHkVSgxL7act3JE2EwPbPaL4PqefhbQ1KE=;
+        b=gcTz6limN1lNk9l2pmc/7myxvx8Xtvfe9DACeOJPf8zvRAA4HDQ13PbOGfg3uDDFHB
+         HItpfnJAfV0IYiQkAj1dV3zxSX4tXOPiwPbE3WtqMTSl5tIKUJwzUsuivdeEiFr/9fo5
+         L4Lk7GXR6gjZuNFIaRbNHCpWr+4yw93pIXt02v/j6DSMu48J4qoSbOZJwXgN7H3ZzNMX
+         QcIpTtn2uY+R+o7Oxoc8irLIkBf8rCMVqKfDRW4EnpjfvirpXHm5xZ1N5kFANb5sruQV
+         NvNAQxg6av2d4/rgVZv4H4dYVEr+UoufgGrsBteZDB9+0ytUoQPQu5sOyjT1EWiDX6r8
+         zcoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718992208; x=1719597008;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=htDP1OG5xDHkVSgxL7act3JE2EwPbPaL4PqefhbQ1KE=;
+        b=nfoUdrlkSFXvH3OhLa0z21b1lwVbUbeT5njwaq0QUNUV9Bmen1UwD48F1LU3tGHGI9
+         3pJJKPHECnhIoLTTRZ/EVbBCRDALeWvxsuwYhhCYYJkuMXlg7ZS+BFoPF2PzGFSNlYqj
+         ws8dyAybzSkYb+kXAgIBgVqA7nur6iL/2BlaRb0hHPF373I1dOVHFR8WPMsVxNobhgRx
+         KikM0vurl7gizpmI4PS2gA9R1PFMWho8f+kg2F3PIc7hvti4ydt0dV1bYXI2Sz85H1TZ
+         k/atMvoSEUiea6KGvL2mf4f5UiVUBGke+4/5vn8T51RLf8J05ADjslAYKlMxVRVFE1yU
+         wd7w==
+X-Forwarded-Encrypted: i=1; AJvYcCU6bNHCnOPwgEyGJJv36KZZeXweJc8xhaFAuOLqji6/safz5TykcsORXaXGdNGOjALeR3J002PAl6Al2rXs1Nj65gfJ6maBHxgIQ9TF
+X-Gm-Message-State: AOJu0Ywy6UACq4wl/qWCDU9LbV9Z31bzzTTfTOLHFbf7oKza1zhKRK6Q
+	8VEZ6DZLCJbgZ84yfLIIZcRKHB6KpJYQbGDezDa7naHL6CzXN0B8c4xo/iUzB7l5QL1YDaHQDb1
+	WH2h/MfZK0pOJ7QPhkxx93AgSncghTdbLq0tuew==
+X-Google-Smtp-Source: AGHT+IHqlvmRkxYABkG7qiYB3TKNgv1qPu0jG5c4eKaGw4Kw40QlUhGgeVH2vPtXYTkPD9ZVsxpdIq7vGdDAsYrGOR0=
+X-Received: by 2002:a25:6644:0:b0:e02:bc67:829e with SMTP id
+ 3f1490d57ef6-e02be230f48mr8974923276.65.1718992207767; Fri, 21 Jun 2024
+ 10:50:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240617005825.1443206-5-quic_gaurkash@quicinc.com>
+ <3eehkn3cdhhjfqtzpahxhjxtu5uqwhntpgu22k3hknctrop3g5@f7dhwvdvhr3k>
+ <96e2ce4b154a4f918be0bc2a45011e6d@quicinc.com> <CAA8EJppGpv7N_JQQNJZrbngBBdEKZfuqutR9MPnS1R_WqYNTQw@mail.gmail.com>
+ <3a15df00a2714b40aba4ebc43011a7b6@quicinc.com> <CAA8EJpoZ0RR035QwzMLguJZvdYb-C6aqudp1BgHgn_DH2ffsoQ@mail.gmail.com>
+ <20240621044747.GC4362@sol.localdomain> <CAA8EJppXsbpFCeGJOMGKOQddy0fF4uW3rt4RUuDTQq6mPunBkg@mail.gmail.com>
+ <20240621153939.GA2081@sol.localdomain> <CAA8EJpqV4CW9kKLVUZgfo+hkSv+tn0t+k0McmHEyXNJUpsZF1w@mail.gmail.com>
+ <20240621163127.GC2081@sol.localdomain>
+In-Reply-To: <20240621163127.GC2081@sol.localdomain>
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Date: Fri, 21 Jun 2024 20:49:56 +0300
+Message-ID: <CAA8EJpqytynwQrCAqqBsmx2XYgV5tsNeV4hpYzT6snqu+r8Wdg@mail.gmail.com>
+Subject: Re: [PATCH v5 04/15] soc: qcom: ice: add hwkm support in ice
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: "Gaurav Kashyap (QUIC)" <quic_gaurkash@quicinc.com>, 
+	"linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>, 
+	"linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, "andersson@kernel.org" <andersson@kernel.org>, 
+	"neil.armstrong@linaro.org" <neil.armstrong@linaro.org>, 
+	"srinivas.kandagatla" <srinivas.kandagatla@linaro.org>, 
+	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>, 
+	"conor+dt@kernel.org" <conor+dt@kernel.org>, "robh+dt@kernel.org" <robh+dt@kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>, kernel <kernel@quicinc.com>, 
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, 
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, 
+	"Om Prakash Singh (QUIC)" <quic_omprsing@quicinc.com>, 
+	"Bao D. Nguyen (QUIC)" <quic_nguyenb@quicinc.com>, 
+	"bartosz.golaszewski" <bartosz.golaszewski@linaro.org>, 
+	"konrad.dybcio@linaro.org" <konrad.dybcio@linaro.org>, 
+	"ulf.hansson@linaro.org" <ulf.hansson@linaro.org>, "jejb@linux.ibm.com" <jejb@linux.ibm.com>, 
+	"martin.petersen@oracle.com" <martin.petersen@oracle.com>, "mani@kernel.org" <mani@kernel.org>, 
+	"davem@davemloft.net" <davem@davemloft.net>, 
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>, Prasad Sodagudi <psodagud@quicinc.com>, 
+	Sonal Gupta <sonalg@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Eric Biggers <ebiggers@google.com>
+On Fri, 21 Jun 2024 at 19:31, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> On Fri, Jun 21, 2024 at 07:06:25PM +0300, Dmitry Baryshkov wrote:
+> > On Fri, 21 Jun 2024 at 18:39, Eric Biggers <ebiggers@kernel.org> wrote:
+> > >
+> > > On Fri, Jun 21, 2024 at 06:16:37PM +0300, Dmitry Baryshkov wrote:
+> > > > On Fri, 21 Jun 2024 at 07:47, Eric Biggers <ebiggers@kernel.org> wrote:
+> > > > >
+> > > > > On Thu, Jun 20, 2024 at 02:57:40PM +0300, Dmitry Baryshkov wrote:
+> > > > > > > > >
+> > > > > > > > > > Is it possible to use both kind of keys when working on standard mode?
+> > > > > > > > > > If not, it should be the user who selects what type of keys to be used.
+> > > > > > > > > > Enforcing this via DT is not a way to go.
+> > > > > > > > > >
+> > > > > > > > >
+> > > > > > > > > Unfortunately, that support is not there yet. When you say user, do
+> > > > > > > > > you mean to have it as a filesystem mount option?
+> > > > > > > >
+> > > > > > > > During cryptsetup time. When running e.g. cryptsetup I, as a user, would like
+> > > > > > > > to be able to use either a hardware-wrapped key or a standard key.
+> > > > > > > >
+> > > > > > >
+> > > > > > > What we are looking for with these patches is for per-file/folder encryption using fscrypt policies.
+> > > > > > > Cryptsetup to my understanding supports only full-disk , and does not support FBE (File-Based)
+> > > > > >
+> > > > > > I must admit, I mostly used dm-crypt beforehand, so I had to look at
+> > > > > > fscrypt now. Some of my previous comments might not be fully
+> > > > > > applicable.
+> > > > > >
+> > > > > > > Hence the idea here is that we mount an unencrypted device (with the inlinecrypt option that indicates inline encryption is supported)
+> > > > > > > And specify policies (links to keys) for different folders.
+> > > > > > >
+> > > > > > > > > The way the UFS/EMMC crypto layer is designed currently is that, this
+> > > > > > > > > information is needed when the modules are loaded.
+> > > > > > > > >
+> > > > > > > > > https://lore.kernel.org/all/20231104211259.17448-2-ebiggers@kernel.org
+> > > > > > > > > /#Z31drivers:ufs:core:ufshcd-crypto.c
+> > > > > > > >
+> > > > > > > > I see that the driver lists capabilities here. E.g. that it supports HW-wrapped
+> > > > > > > > keys. But the line doesn't specify that standard keys are not supported.
+> > > > > > > >
+> > > > > > >
+> > > > > > > Those are capabilities that are read from the storage controller. However, wrapped keys
+> > > > > > > Are not a standard in the ICE JEDEC specification, and in most cases, is a value add coming
+> > > > > > > from the SoC.
+> > > > > > >
+> > > > > > > QCOM SOC and firmware currently does not support both kinds of keys in the HWKM mode.
+> > > > > > > That is something we are internally working on, but not available yet.
+> > > > > >
+> > > > > > I'd say this is a significant obstacle, at least from my point of
+> > > > > > view. I understand that the default might be to use hw-wrapped keys,
+> > > > > > but it should be possible for the user to select non-HW keys if the
+> > > > > > ability to recover the data is considered to be important. Note, I'm
+> > > > > > really pointing to the user here, not to the system integrator. So
+> > > > > > using DT property or specifying kernel arguments to switch between
+> > > > > > these modes is not really an option.
+> > > > > >
+> > > > > > But I'd really love to hear some feedback from linux-security and/or
+> > > > > > linux-fscrypt here.
+> > > > > >
+> > > > > > In my humble opinion the user should be able to specify that the key
+> > > > > > is wrapped using the hardware KMK. Then if the hardware has already
+> > > > > > started using the other kind of keys, it should be able to respond
+> > > > > > with -EINVAL / whatever else. Then the user can evict previously
+> > > > > > programmed key and program a desired one.
+> > > > > >
+> > > > > > > > Also, I'd have expected that hw-wrapped keys are handled using trusted
+> > > > > > > > keys mechanism (see security/keys/trusted-keys/). Could you please point
+> > > > > > > > out why that's not the case?
+> > > > > > > >
+> > > > > > >
+> > > > > > > I will evaluate this.
+> > > > > > > But my initial response is that we currently cannot communicate to our TPM directly from HLOS, but
+> > > > > > > goes through QTEE, and I don't think our qtee currently interfaces with the open source tee
+> > > > > > > driver. The interface is through QCOM SCM driver.
+> > > > > >
+> > > > > > Note, this is just an API interface, see how it is implemented for the
+> > > > > > CAAM hardware.
+> > > > > >
+> > > > >
+> > > > > The problem is that this patchset was sent out without the patches that add the
+> > > > > block and filesystem-level framework for hardware-wrapped inline encryption
+> > > > > keys, which it depends on.  So it's lacking context.  The proposed framework can
+> > > > > be found at
+> > > > > https://lore.kernel.org/linux-block/20231104211259.17448-1-ebiggers@kernel.org/T/#u
+> > > >
+> > > > Thank you. I have quickly skimmed through the patches, but I didn't
+> > > > review them thoroughly. Maybe the patchset already implements the
+> > > > interfaces that I'm thinking about. In such a case please excuse me. I
+> > > > will give it a more thorough look later today.
+> > > >
+> > > > > As for why "trusted keys" aren't used, they just aren't helpful here.  "Trusted
+> > > > > keys" are based around a model where the kernel can request that keys be sealed
+> > > > > and unsealed using a trust source, and the kernel gets access to the raw
+> > > > > unsealed keys.  Hardware-wrapped inline encryption keys use a different model
+> > > > > where the kernel never gets access to the raw keys.  They also have the concept
+> > > > > of ephemeral wrapping which does not exist in "trusted keys".  And they need to
+> > > > > be properly integrated with the inline encryption framework in the block layer.
+> > > >
+> > > > Then what exactly does qcom_scm_derive_sw_secret() do? Does it rewrap
+> > > > the key under some other key?
+> > >
+> > > It derives a secret for functionality such as filenames encryption that can't
+> > > use inline encryption.
+> > >
+> > > > I had the feeling that there are two separate pieces of functionality
+> > > > being stuffed into a single patchset and into a single solution.
+> > > >
+> > > > First one is handling the keys. I keep on thinking that there should
+> > > > be a separate software interface to unseal the key and rewrap it under
+> > > > an ephemeral key.
+> > >
+> > > There is.  That's what the BLKCRYPTOPREPAREKEY ioctl is for.
+> > >
+> > > > Some hardware might permit importing raw keys.
+> > >
+> > > That's what BLKCRYPTOIMPORTKEY is for.
+> > >
+> > > > Other hardware might insist on generating the keys on-chip so that raw keys
+> > > > can never be used.
+> > >
+> > > And that's what BLKCRYPTOGENERATEKEY is for.
+> >
+> > Again, this might be answered somewhere, but why can't we use keyctl
+> > for handling the keys and then use a single IOCTL to point the block
+> > device to the key in the keyring?
+>
+> All the same functionality would need to be supported, and I think that
+> shoehorning it into the keyrings service instead of just adding new ioctls would
+> be more difficult.  The keyrings service was not designed for this use case.
+> We've already had a lot of problems trying to take advantage of the keyrings
+> service in fscrypt previously.  The keyrings service is something that sounds
+> useful but really isn't all that useful.
 
-When supported by the hash algorithm, use crypto_shash_finup_mb() to
-interleave the hashing of pairs of data blocks.  On some CPUs this
-nearly doubles hashing performance.  The increase in overall throughput
-of cold-cache dm-verity reads that I'm seeing on arm64 and x86_64 is
-roughly 35% (though this metric is hard to measure as it jumps around a
-lot).
+I would be really interested in reading or listening to any kind of
+summary or parts of the issues.
+I'm slightly pushy towards keyctl / keyrings, because it already
+provides support for different kinds of key wrapping and key
+management. Encrypted keys, trusted keys - those are all kinds of key
+management, which either will be missing or will have to be
+reimplemented for block layers.
 
-For now this is only done on data blocks, not Merkle tree blocks.  We
-could use finup_mb on Merkle tree blocks too, but that is less important
-as there aren't as many Merkle tree blocks as data blocks, and that
-would require some additional code restructuring.
+I know that keyrings are clumsy and not that logical, but then their
+API needs to be improved. Just ignoring the existing mechanisms sounds
+like a bad idea.
 
-Reviewed-by: Sami Tolvanen <samitolvanen@google.com>
-Acked-by: Ard Biesheuvel <ardb@kernel.org>
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- drivers/md/dm-verity-target.c | 166 ++++++++++++++++++++++++++--------
- drivers/md/dm-verity.h        |  33 ++++---
- 2 files changed, 147 insertions(+), 52 deletions(-)
+>
+> By "a single IOCTL to point the block device to the key in the keyring", you
+> seem to be referring to configuring full block device encryption with a single
+> key.  That's not something that's supported by the upstream kernel yet, and it's
+> not related to this patchset; currently only fscrypt supports inline encryption.
 
-diff --git a/drivers/md/dm-verity-target.c b/drivers/md/dm-verity-target.c
-index 1f23354256d3..ff91bfa40302 100644
---- a/drivers/md/dm-verity-target.c
-+++ b/drivers/md/dm-verity-target.c
-@@ -181,22 +181,28 @@ static int verity_ahash_final(struct dm_verity *v, struct ahash_request *req,
- 	r = crypto_wait_req(crypto_ahash_final(req), wait);
- out:
- 	return r;
- }
- 
-+static int verity_ahash(struct dm_verity *v, struct dm_verity_io *io,
-+			const u8 *data, size_t len, u8 *digest, bool may_sleep)
-+{
-+	struct ahash_request *req = verity_io_hash_req(v, io);
-+	struct crypto_wait wait;
-+
-+	return verity_ahash_init(v, req, &wait, may_sleep) ?:
-+	       verity_ahash_update(v, req, data, len, &wait) ?:
-+	       verity_ahash_final(v, req, digest, &wait);
-+}
-+
- int verity_hash(struct dm_verity *v, struct dm_verity_io *io,
- 		const u8 *data, size_t len, u8 *digest, bool may_sleep)
- {
- 	int r;
- 
- 	if (static_branch_unlikely(&ahash_enabled) && !v->shash_tfm) {
--		struct ahash_request *req = verity_io_hash_req(v, io);
--		struct crypto_wait wait;
--
--		r = verity_ahash_init(v, req, &wait, may_sleep) ?:
--		    verity_ahash_update(v, req, data, len, &wait) ?:
--		    verity_ahash_final(v, req, digest, &wait);
-+		r = verity_ahash(v, io, data, len, digest, may_sleep);
- 	} else {
- 		struct shash_desc *desc = verity_io_hash_req(v, io);
- 
- 		desc->tfm = v->shash_tfm;
- 		r = crypto_shash_import(desc, v->initial_hashstate) ?:
-@@ -205,10 +211,38 @@ int verity_hash(struct dm_verity *v, struct dm_verity_io *io,
- 	if (unlikely(r))
- 		DMERR("Error hashing block: %d", r);
- 	return r;
- }
- 
-+static int verity_hash_mb(struct dm_verity *v, struct dm_verity_io *io,
-+			  const u8 *data[], size_t len, u8 *digests[],
-+			  int num_blocks)
-+{
-+	int r = 0;
-+
-+	if (static_branch_unlikely(&ahash_enabled) && !v->shash_tfm) {
-+		int i;
-+
-+		/* Note: in practice num_blocks is always 1 in this case. */
-+		for (i = 0; i < num_blocks; i++) {
-+			r = verity_ahash(v, io, data[i], len, digests[i],
-+					 !io->in_bh);
-+			if (r)
-+				break;
-+		}
-+	} else {
-+		struct shash_desc *desc = verity_io_hash_req(v, io);
-+
-+		desc->tfm = v->shash_tfm;
-+		r = crypto_shash_import(desc, v->initial_hashstate) ?:
-+		    crypto_shash_finup_mb(desc, data, len, digests, num_blocks);
-+	}
-+	if (unlikely(r))
-+		DMERR("Error hashing blocks: %d", r);
-+	return r;
-+}
-+
- static void verity_hash_at_level(struct dm_verity *v, sector_t block, int level,
- 				 sector_t *hash_block, unsigned int *offset)
- {
- 	sector_t position = verity_position_at_level(v, block, level);
- 	unsigned int idx;
-@@ -454,13 +488,16 @@ static noinline int verity_recheck(struct dm_verity *v, struct dm_verity_io *io,
- }
- 
- static int verity_handle_data_hash_mismatch(struct dm_verity *v,
- 					    struct dm_verity_io *io,
- 					    struct bio *bio,
--					    const u8 *want_digest,
--					    sector_t blkno, u8 *data)
-+					    struct pending_block *block)
- {
-+	const u8 *want_digest = block->want_digest;
-+	sector_t blkno = block->blkno;
-+	u8 *data = block->data;
-+
- 	if (static_branch_unlikely(&use_bh_wq_enabled) && io->in_bh) {
- 		/*
- 		 * Error handling code (FEC included) cannot be run in the
- 		 * BH workqueue, so fallback to a standard workqueue.
- 		 */
-@@ -484,10 +521,57 @@ static int verity_handle_data_hash_mismatch(struct dm_verity *v,
- 		return -EIO;
- 	}
- 	return 0;
- }
- 
-+static void verity_clear_pending_blocks(struct dm_verity_io *io)
-+{
-+	int i;
-+
-+	for (i = io->num_pending - 1; i >= 0; i--) {
-+		kunmap_local(io->pending_blocks[i].data);
-+		io->pending_blocks[i].data = NULL;
-+	}
-+	io->num_pending = 0;
-+}
-+
-+static int verity_verify_pending_blocks(struct dm_verity *v,
-+					struct dm_verity_io *io,
-+					struct bio *bio)
-+{
-+	const u8 *data[DM_VERITY_MAX_PENDING_DATA_BLOCKS];
-+	u8 *real_digests[DM_VERITY_MAX_PENDING_DATA_BLOCKS];
-+	int i;
-+	int r;
-+
-+	for (i = 0; i < io->num_pending; i++) {
-+		data[i] = io->pending_blocks[i].data;
-+		real_digests[i] = io->pending_blocks[i].real_digest;
-+	}
-+
-+	r = verity_hash_mb(v, io, data, 1 << v->data_dev_block_bits,
-+			   real_digests, io->num_pending);
-+	if (unlikely(r))
-+		return r;
-+
-+	for (i = 0; i < io->num_pending; i++) {
-+		struct pending_block *block = &io->pending_blocks[i];
-+
-+		if (likely(memcmp(block->real_digest, block->want_digest,
-+				  v->digest_size) == 0)) {
-+			if (v->validated_blocks)
-+				set_bit(block->blkno, v->validated_blocks);
-+		} else {
-+			r = verity_handle_data_hash_mismatch(v, io, bio, block);
-+			if (unlikely(r))
-+				return r;
-+		}
-+	}
-+	verity_clear_pending_blocks(io);
-+	return 0;
-+}
-+
- /*
-  * Verify one "dm_verity_io" structure.
-  */
- static int verity_verify_io(struct dm_verity_io *io)
- {
-@@ -495,10 +579,13 @@ static int verity_verify_io(struct dm_verity_io *io)
- 	const unsigned int block_size = 1 << v->data_dev_block_bits;
- 	struct bvec_iter iter_copy;
- 	struct bvec_iter *iter;
- 	struct bio *bio = dm_bio_from_per_bio_data(io, v->ti->per_io_data_size);
- 	unsigned int b;
-+	int r;
-+
-+	io->num_pending = 0;
- 
- 	if (static_branch_unlikely(&use_bh_wq_enabled) && io->in_bh) {
- 		/*
- 		 * Copy the iterator in case we need to restart
- 		 * verification in a work-queue.
-@@ -508,36 +595,38 @@ static int verity_verify_io(struct dm_verity_io *io)
- 	} else
- 		iter = &io->iter;
- 
- 	for (b = 0; b < io->n_blocks;
- 	     b++, bio_advance_iter(bio, iter, block_size)) {
--		int r;
--		sector_t cur_block = io->block + b;
-+		sector_t blkno = io->block + b;
-+		struct pending_block *block;
- 		bool is_zero;
- 		struct bio_vec bv;
- 		void *data;
- 
- 		if (v->validated_blocks && bio->bi_status == BLK_STS_OK &&
--		    likely(test_bit(cur_block, v->validated_blocks)))
-+		    likely(test_bit(blkno, v->validated_blocks)))
- 			continue;
- 
--		r = verity_hash_for_block(v, io, cur_block,
--					  verity_io_want_digest(v, io),
-+		block = &io->pending_blocks[io->num_pending];
-+
-+		r = verity_hash_for_block(v, io, blkno, block->want_digest,
- 					  &is_zero);
- 		if (unlikely(r < 0))
--			return r;
-+			goto error;
- 
- 		bv = bio_iter_iovec(bio, *iter);
- 		if (unlikely(bv.bv_len < block_size)) {
- 			/*
- 			 * Data block spans pages.  This should not happen,
- 			 * since dm-verity sets dma_alignment to the data block
- 			 * size minus 1, and dm-verity also doesn't allow the
- 			 * data block size to be greater than PAGE_SIZE.
- 			 */
- 			DMERR_LIMIT("unaligned io (data block spans pages)");
--			return -EIO;
-+			r = -EIO;
-+			goto error;
- 		}
- 
- 		data = bvec_kmap_local(&bv);
- 
- 		if (is_zero) {
-@@ -547,34 +636,30 @@ static int verity_verify_io(struct dm_verity_io *io)
- 			 */
- 			memset(data, 0, block_size);
- 			kunmap_local(data);
- 			continue;
- 		}
--
--		r = verity_hash(v, io, data, block_size,
--				verity_io_real_digest(v, io), !io->in_bh);
--		if (unlikely(r < 0)) {
--			kunmap_local(data);
--			return r;
-+		block->data = data;
-+		block->blkno = blkno;
-+		if (++io->num_pending == v->mb_max_msgs) {
-+			r = verity_verify_pending_blocks(v, io, bio);
-+			if (unlikely(r))
-+				goto error;
- 		}
-+	}
- 
--		if (likely(memcmp(verity_io_real_digest(v, io),
--				  verity_io_want_digest(v, io), v->digest_size) == 0)) {
--			if (v->validated_blocks)
--				set_bit(cur_block, v->validated_blocks);
--			kunmap_local(data);
--			continue;
--		}
--		r = verity_handle_data_hash_mismatch(v, io, bio,
--						     verity_io_want_digest(v, io),
--						     cur_block, data);
--		kunmap_local(data);
-+	if (io->num_pending) {
-+		r = verity_verify_pending_blocks(v, io, bio);
- 		if (unlikely(r))
--			return r;
-+			goto error;
- 	}
- 
- 	return 0;
-+
-+error:
-+	verity_clear_pending_blocks(io);
-+	return r;
- }
- 
- /*
-  * Skip verity work in response to I/O error when system is shutting down.
-  */
-@@ -1155,14 +1240,15 @@ static int verity_setup_hash_alg(struct dm_verity *v, const char *alg_name)
- 
- 	/*
- 	 * Allocate the hash transformation object that this dm-verity instance
- 	 * will use.  The vast majority of dm-verity users use CPU-based
- 	 * hashing, so when possible use the shash API to minimize the crypto
--	 * API overhead.  If the ahash API resolves to a different driver
--	 * (likely an off-CPU hardware offload), use ahash instead.  Also use
--	 * ahash if the obsolete dm-verity format with the appended salt is
--	 * being used, so that quirk only needs to be handled in one place.
-+	 * API overhead, especially when multibuffer hashing is used.  If the
-+	 * ahash API resolves to a different driver (likely an off-CPU hardware
-+	 * offload), use ahash instead.  Also use ahash if the obsolete
-+	 * dm-verity format with the appended salt is being used, so that quirk
-+	 * only needs to be handled in one place.
- 	 */
- 	ahash = crypto_alloc_ahash(alg_name, 0,
- 				   v->use_bh_wq ? CRYPTO_ALG_ASYNC : 0);
- 	if (IS_ERR(ahash)) {
- 		ti->error = "Cannot initialize hash function";
-@@ -1186,17 +1272,21 @@ static int verity_setup_hash_alg(struct dm_verity *v, const char *alg_name)
- 		ahash = NULL;
- 		v->shash_tfm = shash;
- 		v->digest_size = crypto_shash_digestsize(shash);
- 		v->hash_reqsize = sizeof(struct shash_desc) +
- 				  crypto_shash_descsize(shash);
--		DMINFO("%s using shash \"%s\"", alg_name, driver_name);
-+		v->mb_max_msgs = min(crypto_shash_mb_max_msgs(shash),
-+				     DM_VERITY_MAX_PENDING_DATA_BLOCKS);
-+		DMINFO("%s using shash \"%s\"%s", alg_name, driver_name,
-+		       v->mb_max_msgs > 1 ? " (multibuffer)" : "");
- 	} else {
- 		v->ahash_tfm = ahash;
- 		static_branch_inc(&ahash_enabled);
- 		v->digest_size = crypto_ahash_digestsize(ahash);
- 		v->hash_reqsize = sizeof(struct ahash_request) +
- 				  crypto_ahash_reqsize(ahash);
-+		v->mb_max_msgs = 1;
- 		DMINFO("%s using ahash \"%s\"", alg_name, driver_name);
- 	}
- 	if ((1 << v->hash_dev_block_bits) < v->digest_size * 2) {
- 		ti->error = "Digest size too big";
- 		return -EINVAL;
-diff --git a/drivers/md/dm-verity.h b/drivers/md/dm-verity.h
-index 3951e5a4a156..85f4f40f3645 100644
---- a/drivers/md/dm-verity.h
-+++ b/drivers/md/dm-verity.h
-@@ -55,10 +55,11 @@ struct dm_verity {
- 	unsigned char hash_per_block_bits;	/* log2(hashes in hash block) */
- 	unsigned char levels;	/* the number of tree levels */
- 	unsigned char version;
- 	bool hash_failed:1;	/* set if hash of any block failed */
- 	bool use_bh_wq:1;	/* try to verify in BH wq before normal work-queue */
-+	unsigned char mb_max_msgs; /* max multibuffer hashing interleaving factor */
- 	unsigned int digest_size;	/* digest size for the current hash algorithm */
- 	unsigned int hash_reqsize; /* the size of temporary space for crypto */
- 	enum verity_mode mode;	/* mode for handling verification errors */
- 	unsigned int corrupted_errs;/* Number of errors for corrupted blocks */
- 
-@@ -74,10 +75,19 @@ struct dm_verity {
- 
- 	struct dm_io_client *io;
- 	mempool_t recheck_pool;
- };
- 
-+#define DM_VERITY_MAX_PENDING_DATA_BLOCKS	HASH_MAX_MB_MSGS
-+
-+struct pending_block {
-+	void *data;
-+	sector_t blkno;
-+	u8 want_digest[HASH_MAX_DIGESTSIZE];
-+	u8 real_digest[HASH_MAX_DIGESTSIZE];
-+};
-+
- struct dm_verity_io {
- 	struct dm_verity *v;
- 
- 	/* original value of bio->bi_end_io */
- 	bio_end_io_t *orig_bi_end_io;
-@@ -90,12 +100,19 @@ struct dm_verity_io {
- 
- 	struct work_struct work;
- 	struct work_struct bh_work;
- 
- 	u8 tmp_digest[HASH_MAX_DIGESTSIZE];
--	u8 real_digest[HASH_MAX_DIGESTSIZE];
--	u8 want_digest[HASH_MAX_DIGESTSIZE];
-+
-+	/*
-+	 * This is the queue of data blocks that are pending verification.  We
-+	 * allow multiple blocks to be queued up in order to support multibuffer
-+	 * hashing, i.e. interleaving the hashing of multiple messages.  On many
-+	 * CPUs this improves performance significantly.
-+	 */
-+	int num_pending;
-+	struct pending_block pending_blocks[DM_VERITY_MAX_PENDING_DATA_BLOCKS];
- 
- 	/*
- 	 * This struct is followed by a variable-sized hash request of size
- 	 * v->hash_reqsize, either a struct ahash_request or a struct shash_desc
- 	 * (depending on whether ahash_tfm or shash_tfm is being used).  To
-@@ -107,22 +124,10 @@ static inline void *verity_io_hash_req(struct dm_verity *v,
- 				       struct dm_verity_io *io)
- {
- 	return io + 1;
- }
- 
--static inline u8 *verity_io_real_digest(struct dm_verity *v,
--					struct dm_verity_io *io)
--{
--	return io->real_digest;
--}
--
--static inline u8 *verity_io_want_digest(struct dm_verity *v,
--					struct dm_verity_io *io)
--{
--	return io->want_digest;
--}
--
- extern int verity_hash(struct dm_verity *v, struct dm_verity_io *io,
- 		       const u8 *data, size_t len, u8 *digest, bool may_sleep);
- 
- extern int verity_hash_for_block(struct dm_verity *v, struct dm_verity_io *io,
- 				 sector_t block, u8 *digest, bool *is_zero);
--- 
-2.45.2
+I see that dm has at least some provisioning and hooks for
+CONFIG_BLK_INLINE_ENCRYPTION. Thus I thought that it's possible to use
+inline encryption through DM.
 
+> Support for it will be added at some point, which will likely indeed take the
+> form of an ioctl to set a key on a block device.  But that would be the case
+> even without HW-wrapped keys.  And *requiring* the key to be given in a keyring
+> (instead of just in a byte array passed to the ioctl) isn't very helpful, as it
+> just makes the API harder to use.  We've learned this from the fscrypt API
+> already where we actually had to move away from the keyrings service in order to
+> fix all the issues caused by it (see FS_IOC_ADD_ENCRYPTION_KEY).
+>
+> > >
+> > > > Second part is the actual block interface. Gaurav wrote about
+> > > > targeting fscrypt, but there should be no actual difference between
+> > > > crypto targets. FDE or having a single partition encrypted should
+> > > > probably work in the same way. Convert the key into blk_crypto_key
+> > > > (including the cookie for the ephemeral key), program the key into the
+> > > > slot, use the slot to en/decrypt hardware blocks.
+> > > >
+> > > > My main point is that the decision on the key type should be coming
+> > > > from the user.
+> > >
+> > > That's exactly how it works.  There is a block interface for specifying an
+> > > inline encryption key along with each bio.  The submitter of the bio can specify
+> > > either a standard key or a HW-wrapped key.
+> >
+> > Not in this patchset. The ICE driver decides whether it can support
+> > HW-wrapped keys or not and then fails to support other type of keys.
+> >
+>
+> Sure, that's just a matter of hardware capabilities though, right?  The block
+> layer provides a way for drivers to declare which inline encryption capabilities
+> they support.  They can declare they support standard keys, HW-wrapped keys,
+> both, or neither.  If Qualcomm SoCs can't support both types of keys at the same
+> time, that's unfortunate, but I'm not sure what your poitnt is.  The user (e.g.
+> fscrypt) still has control over whether they use the functionality that the
+> hardware provides.
+
+It's a matter of policy. Harware / firmware doesn't support using both
+kinds of keys concurrently, if I understood Gaurav's explanations
+correctly. But the user should be able to make a judgement and use
+non-hw-wrapped keys if it fits their requirements. The driver should
+not make this kind of judgement. Note, this is not an issue of your
+original patchset, but it's a driver flaw in this patchset.
+
+--
+With best wishes
+Dmitry
