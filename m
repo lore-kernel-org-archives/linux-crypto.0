@@ -1,34 +1,33 @@
 Received: from norbury.hmeau.com (helcar.hmeau.com [216.24.177.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE19F1534E8;
-	Fri, 21 Jun 2024 12:29:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D75D219F9;
+	Fri, 21 Jun 2024 12:31:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.24.177.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718972950; cv=none; b=COriNnPFObk0389uD/WxhQB0ObMrZNh5FyAKDhDHkGSKwvTX4tJEpT/1pucWa7u4BpjCjp8+vI1e4Pxd6lw7gpEsYbuNHNPt/ZBKixaQnlk84VxG69++FZUVeeXRtWWbYBFn22OR5SLgf2sUuurFet1m1IBwPcJDHcAt7tJJWtM=
+	t=1718973115; cv=none; b=mPRqyTsw4bj8PNuHvAcA+cv36fuOIX+Q3T8HiMx1MK3GYRcAlPeCcMxGEY27t0HSUkBDEN+gtpdx//g3Pnabb2ruQv5ay3JX0l67CveaZd8YnPr4FL7aVkZEVsBNGlYKdaqJzKIT95XKkIp1IVPK1scHGk/W97JlQh5r4DbcnFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718972950; c=relaxed/simple;
-	bh=XzQqElddduEUupZUPqXe2PBUtkb4x+yCw+Lda9yPS/A=;
+	s=arc-20240116; t=1718973115; c=relaxed/simple;
+	bh=KkFIaG+IN8bP3wjGhaqksjllG2yOiRAZ5wfBC8geIpc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sactUeRHXwf7vMvL/gfEOxeamcgR9oJhHItPFvnFTbk8HK1DpDgfCfaicus97RMcQobnuShe02SfqHT+HM/8wWfq+ofp5II+nZh9QTXzrH4XVi9g21xBQ2w9ffNCos5JoNztxMa/hm0zy2Gggfpe4JV/NqrOjvamt6EbNXDo0l4=
+	 Content-Type:Content-Disposition:In-Reply-To; b=YOWQVUpblubgGHSS0eLYT64KMzsw9wBbYcrXijw6Ro9ZaJPMdixehP0Tp4W6MzPis6EWCezAfjWhMUGAfpoQyAAPsM3KTDKqrOK7JVQYy3QWJc/7x5w9+mz6l1tdX2lXFEn/tJnPb0KarIzDt+6Jbc1gk8jl2alCoNAd4Imi7VA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=216.24.177.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
 	by norbury.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1sKdNU-002egk-1h;
-	Fri, 21 Jun 2024 22:28:29 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 21 Jun 2024 22:28:29 +1000
-Date: Fri, 21 Jun 2024 22:28:29 +1000
+	id 1sKdQV-002ejS-2E;
+	Fri, 21 Jun 2024 22:31:36 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 21 Jun 2024 22:31:36 +1000
+Date: Fri, 21 Jun 2024 22:31:36 +1000
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Xin Zeng <xin.zeng@intel.com>
-Cc: alex.williamson@redhat.com, jgg@nvidia.com, yishaih@nvidia.com,
-	shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
-	arnd@arndb.de, linux-crypto@vger.kernel.org, kvm@vger.kernel.org,
-	qat-linux@intel.com
-Subject: Re: [PATCH] crypto: qat - fix linking errors when PCI_IOV is disabled
-Message-ID: <ZnVx7RaLAP66L3MV@gondor.apana.org.au>
-References: <20240610143756.2031626-1-xin.zeng@intel.com>
+To: Ard Biesheuvel <ardb+git@google.com>
+Cc: linux-crypto@vger.kernel.org, linux-hardening@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>, Kees Cook <keescook@chromium.org>,
+	Linus Walleij <linus.walleij@linaro.org>
+Subject: Re: [PATCH] crypto: arm/crc32 - add kCFI annotations to asm routines
+Message-ID: <ZnVyqPEBmHXkMgi9@gondor.apana.org.au>
+References: <20240610152638.2755370-2-ardb+git@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -37,36 +36,21 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240610143756.2031626-1-xin.zeng@intel.com>
+In-Reply-To: <20240610152638.2755370-2-ardb+git@google.com>
 
-On Mon, Jun 10, 2024 at 10:37:56PM +0800, Xin Zeng wrote:
-> When CONFIG_PCI_IOV=n, the build of the QAT vfio pci variant driver
-> fails reporting the following linking errors:
+On Mon, Jun 10, 2024 at 05:26:39PM +0200, Ard Biesheuvel wrote:
+> From: Ard Biesheuvel <ardb@kernel.org>
 > 
->     ERROR: modpost: "qat_vfmig_open" [drivers/vfio/pci/qat/qat_vfio_pci.ko] undefined!
->     ERROR: modpost: "qat_vfmig_resume" [drivers/vfio/pci/qat/qat_vfio_pci.ko] undefined!
->     ERROR: modpost: "qat_vfmig_save_state" [drivers/vfio/pci/qat/qat_vfio_pci.ko] undefined!
->     ERROR: modpost: "qat_vfmig_suspend" [drivers/vfio/pci/qat/qat_vfio_pci.ko] undefined!
->     ERROR: modpost: "qat_vfmig_load_state" [drivers/vfio/pci/qat/qat_vfio_pci.ko] undefined!
->     ERROR: modpost: "qat_vfmig_reset" [drivers/vfio/pci/qat/qat_vfio_pci.ko] undefined!
->     ERROR: modpost: "qat_vfmig_save_setup" [drivers/vfio/pci/qat/qat_vfio_pci.ko] undefined!
->     ERROR: modpost: "qat_vfmig_destroy" [drivers/vfio/pci/qat/qat_vfio_pci.ko] undefined!
->     ERROR: modpost: "qat_vfmig_close" [drivers/vfio/pci/qat/qat_vfio_pci.ko] undefined!
->     ERROR: modpost: "qat_vfmig_cleanup" [drivers/vfio/pci/qat/qat_vfio_pci.ko] undefined!
->     WARNING: modpost: suppressed 1 unresolved symbol warnings because there were too many)
+> The crc32/crc32c implementations using the scalar CRC32 instructions are
+> accessed via indirect calls, and so they must be annotated with type ids
+> in order to execute correctly when kCFI is enabled.
 > 
-> Make live migration helpers provided by QAT PF driver always available
-> even if CONFIG_PCI_IOV is not selected. This does not cause any side
-> effect.
-> 
-> Reported-by: Arnd Bergmann <arnd@arndb.de>
-> Closes: https://lore.kernel.org/lkml/20240607153406.60355e6c.alex.williamson@redhat.com/T/
-> Fixes: bb208810b1ab ("vfio/qat: Add vfio_pci driver for Intel QAT SR-IOV VF devices")
-> Signed-off-by: Xin Zeng <xin.zeng@intel.com>
-> Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> Cc: Kees Cook <keescook@chromium.org>
+> Cc: Linus Walleij <linus.walleij@linaro.org>
+> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 > ---
->  drivers/crypto/intel/qat/qat_common/Makefile | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+>  arch/arm/crypto/crc32-ce-core.S | 17 +++++++++--------
+>  1 file changed, 9 insertions(+), 8 deletions(-)
 
 Patch applied.  Thanks.
 -- 
