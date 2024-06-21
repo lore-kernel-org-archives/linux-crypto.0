@@ -1,54 +1,54 @@
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 641B816D31B
-	for <linux-crypto@vger.kernel.org>; Fri, 21 Jun 2024 08:21:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB75D16D4D7
+	for <linux-crypto@vger.kernel.org>; Fri, 21 Jun 2024 08:21:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718958106; cv=none; b=VpgpkaIOuZPwVhG141hGYE5zbMX0OZ4GRRCihYOcdMy23W/VFivTfZ3lZHp7v5AjbIXPNE3V6fqDddx9WLhtpfFKFl7epI8+34/gYjVytpFRuSRahRX52ZXLLfFZDHIRIw58qkO/sHkC8gGz+M41nzLe+aA4vhRtGLOpCI1LjHw=
+	t=1718958111; cv=none; b=rCsIg7flvbi/3zvMEBgKZKQd0vG6GpijxAUbjr3/XhcNcTY65ZEwtSbvPR9dQCUmfE9dn+lUmQPwN1uabdOm8/exehZZx+d2c5hhnPJ60VfMiM/rF1TaprPwapRQnrfMzDyt41PiFbvrLo5DXUwvCxMvjWTRu2WGk1vOcIC7kuw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718958106; c=relaxed/simple;
-	bh=WirT4bT4tmCljyDRZtwHJgsdAfDt/AizWIeiRZuMgLM=;
+	s=arc-20240116; t=1718958111; c=relaxed/simple;
+	bh=03Or/FiYd0/nl0Pewsikw0aSkjgcfqdZV+GhUY8nJPg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qQpyfiWCxsanSXF8rxsX36WoF+N9p+elf8Gbvf6dA5dSAzZ6hcJOeJUdmGGTQdoA3ka1QBJ+6FdFiat6PJSZTy3sAPmSr3MNCSoH/9YK0tVyMTYADBOsfJdDKyegOJRzZX2NdF1J0/12sd6U0n2XmH5AiKRv7L/YuKzmWRuxlJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=B9c6xS3L; arc=none smtp.client-ip=209.85.214.182
+	 MIME-Version; b=DDuLkaqoKWUlH2Eod2MWFFxoBwg5f5WdnRA/ewttbeGwE/8CiyqneGlD/3za2DizyIRILOMTIVYGJN6iClT6vqOFzM8BV6ZhPGykh3r8wHefVd4fOXDJ9yFPQV9BwG1ehf98RMml3g6Tqag6INYR31qWj/iC1R0RE44PCP/121o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=BdpH41qT; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="B9c6xS3L"
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1f44b45d6abso14316645ad.0
-        for <linux-crypto@vger.kernel.org>; Fri, 21 Jun 2024 01:21:45 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="BdpH41qT"
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1f9d9b57b90so9662725ad.0
+        for <linux-crypto@vger.kernel.org>; Fri, 21 Jun 2024 01:21:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vayavyalabs.com; s=google; t=1718958105; x=1719562905; darn=vger.kernel.org;
+        d=vayavyalabs.com; s=google; t=1718958109; x=1719562909; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=D5cfWMtWXGsB/SuVB2xqL3O8y2vBNkEblP3Chb8x//I=;
-        b=B9c6xS3LRM/+Z1lkS0cHnrvmDGx+k8aRE8hFbLsizQVOUgsbLZ6dHP9dXNr2KwpdZv
-         XDizi5FAefDEhlc6M7+wInyqgYOEl1Z/mj8GNXnSDikGBK3ahm1y0m30gAuqjVgkxqHq
-         spE3nmg2cRZqJELXqfmowz4wBt2bovVlnDEU4=
+        bh=Z6rOVwxl67M1ho00LCXthXQkqBxCB3HpfniWe3LKqEs=;
+        b=BdpH41qTRP9DhLnkEfpL5bRmQQR0X6i56c2X1fXFwv44JcMbO5EPgXfLRwGNI2c2AV
+         0gRGqAChzILeGqF2Z8sHttu16V4+m8ZvsHoVedsKOGg+/CWr761fTZ3N52doVYt/fqsK
+         tuLYaXai0lv+qizqI7zTQuaaDFi+BLPaJHedo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718958105; x=1719562905;
+        d=1e100.net; s=20230601; t=1718958109; x=1719562909;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=D5cfWMtWXGsB/SuVB2xqL3O8y2vBNkEblP3Chb8x//I=;
-        b=W15IQFFSg5v4PTlAv7e2GHUQJlu8l8OyFRMRQvn7WtgUlaPVj+fUdGaY/lsk/74g7L
-         2TRuT1nDoB3guEu5kXNAvqHpaw7w47NrSmryAVQonImE1jw8SUeczxNherLvSABJ8y4x
-         129HHPizE2Zcimgr+sPa0TJW29l3e6j0U5z4/PCQadoCfWK2OdYXUh1s6Nk5ujWOYTdr
-         4uLAl7SMXvSpKD0Kc3XUD5iCAjS0xJwJIZRf8g8PmKNMDQt5omxMUueNcpeIMPIdD1Fv
-         /mzVw37yPTc20f6mDAp0JzisEHFPqRbOMrb2PY9h14spC9UGlvteKanCQMptsVaEI9L0
-         SFqw==
-X-Forwarded-Encrypted: i=1; AJvYcCVJ/1PRgJaCf5ZnZORIKMJP3PpGlDQmSO1q1GK3mMZQ2ye/jyCMbK4aA6A8nC14VEKxFaojek+Jo299MzSduWeeRL9XWhLEoQscECvO
-X-Gm-Message-State: AOJu0YzHcUv7WyWJ7wXCahNoZUchlaYFwkSp8J+hfjZMNLUpWkZwdHqc
-	Fb64s391dib1J4jce+ehFxEPOXRWkyfVNLRT/arPYLZjsex/10ODHlJbZWdPdvI=
-X-Google-Smtp-Source: AGHT+IE2hoqwLql/AIJN9EKd9XIfA/phaoNOVzmlMO6gYdTPE3mN45SobLEA2iqd+cUvYOzV5rzR3Q==
-X-Received: by 2002:a17:902:6548:b0:1f9:cea7:1e78 with SMTP id d9443c01a7336-1f9cea71f5cmr29442855ad.50.1718958104137;
-        Fri, 21 Jun 2024 01:21:44 -0700 (PDT)
+        bh=Z6rOVwxl67M1ho00LCXthXQkqBxCB3HpfniWe3LKqEs=;
+        b=TYr//lCSoE1KsOoJvF1AVg77MkvTTxb91xuGlnLtFkHSWf8JmYhQlYEs5bgfReBXd0
+         /i/ID7BlmZ8Ki2R1GLYIcaKGS/idsES5Zddhd2o9OxDunSGpDXx615G5Ls9tHhRv7dk5
+         VjXQ9pdfuhc6HiIvSMPoxO5B0zUI5ijehrjl9iSq3NXsRLFv9JOCY0n2EZbDTqVy1dJ/
+         8VhROBo+QNaVJOBuOGUe7f7+EUVF0JJezxxFD56Oqxu78xPNJxhFiYGrN/vOWE1mkJPy
+         Gn4INeNtF0lb6L/sCOl/ChyxGwXyRbCcNSE6cbHgszqzthbKHErsl9GA6bGj86VTfDpY
+         DtzQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWJOyhp+3nnRc72CWsnSdZWRuInpZqREvv2pc21NqT0+KQkbuCgycqpLgBX0guMJAsv589r0ezH2G+/Usy7n/IL4J1BUiwD+NRbZmx1
+X-Gm-Message-State: AOJu0Yzv0vdDbX6vpzbizVOKoqkUwzmkJl6X7/LBOTB2tz/2LFhhpiGZ
+	VS/UZmf4TBbNNTAh1ks7nikqslLxOyOhG5D2MdGRk5JeuMelY2lAwXfRMnPd/28=
+X-Google-Smtp-Source: AGHT+IGGSbcSun11nk1hO10EuFOhJrFXGwbkrIs9Aw/XmDG5Vli6+OP4u6IE3TrZycBNv2exrIUa1g==
+X-Received: by 2002:a17:903:2349:b0:1f8:69ed:cfd5 with SMTP id d9443c01a7336-1f9aa3b09ebmr92252975ad.10.1718958109268;
+        Fri, 21 Jun 2024 01:21:49 -0700 (PDT)
 Received: from localhost.localdomain ([103.108.57.9])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f9eb3c5c97sm8673555ad.125.2024.06.21.01.21.41
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f9eb3c5c97sm8673555ad.125.2024.06.21.01.21.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Jun 2024 01:21:43 -0700 (PDT)
+        Fri, 21 Jun 2024 01:21:48 -0700 (PDT)
 From: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
 To: herbert@gondor.apana.org.au,
 	linux-crypto@vger.kernel.org
@@ -56,9 +56,9 @@ Cc: Ruud.Derwig@synopsys.com,
 	manjunath.hadli@vayavyalabs.com,
 	bhoomikak@vayavyalabs.com,
 	Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
-Subject: [PATCH v5 6/7] Add SPAcc dts overlay
-Date: Fri, 21 Jun 2024 13:50:52 +0530
-Message-Id: <20240621082053.638952-7-pavitrakumarm@vayavyalabs.com>
+Subject: [PATCH v5 7/7] Enable Driver compilation in crypto Kconfig and Makefile
+Date: Fri, 21 Jun 2024 13:50:53 +0530
+Message-Id: <20240621082053.638952-8-pavitrakumarm@vayavyalabs.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240621082053.638952-1-pavitrakumarm@vayavyalabs.com>
 References: <20240621082053.638952-1-pavitrakumarm@vayavyalabs.com>
@@ -70,74 +70,38 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Signed-off-by: Manjunath Hadli <manjunath.hadli@vayavyalabs.com>
+Signed-off-by: Bhoomika K <bhoomikak@vayavyalabs.com>
 Signed-off-by: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
 Acked-by: Ruud Derwig <Ruud.Derwig@synopsys.com>
 ---
- arch/arm64/boot/dts/xilinx/Makefile           |  3 ++
- .../arm64/boot/dts/xilinx/snps-dwc-spacc.dtso | 35 +++++++++++++++++++
- 2 files changed, 38 insertions(+)
- create mode 100644 arch/arm64/boot/dts/xilinx/snps-dwc-spacc.dtso
+ drivers/crypto/Kconfig  | 1 +
+ drivers/crypto/Makefile | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/arch/arm64/boot/dts/xilinx/Makefile b/arch/arm64/boot/dts/xilinx/Makefile
-index 1068b0fa8e98..1e98ca994283 100644
---- a/arch/arm64/boot/dts/xilinx/Makefile
-+++ b/arch/arm64/boot/dts/xilinx/Makefile
-@@ -20,6 +20,7 @@ dtb-$(CONFIG_ARCH_ZYNQMP) += zynqmp-zcu1275-revA.dtb
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index 94f23c6fc93b..009cbd0e1993 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -696,6 +696,7 @@ config CRYPTO_DEV_BCM_SPU
+ 	  ahash, and aead algorithms with the kernel cryptographic API.
  
- dtb-$(CONFIG_ARCH_ZYNQMP) += zynqmp-sm-k26-revA.dtb
- dtb-$(CONFIG_ARCH_ZYNQMP) += zynqmp-smk-k26-revA.dtb
-+dtb-$(CONFIG_ARCH_ZYNQMP) += zynqmp-smk-k26-revA.dtb
+ source "drivers/crypto/stm32/Kconfig"
++source "drivers/crypto/dwc-spacc/Kconfig"
  
- zynqmp-sm-k26-revA-sck-kv-g-revA-dtbs := zynqmp-sm-k26-revA.dtb zynqmp-sck-kv-g-revA.dtbo
- dtb-$(CONFIG_ARCH_ZYNQMP) += zynqmp-sm-k26-revA-sck-kv-g-revA.dtb
-@@ -29,3 +30,5 @@ zynqmp-smk-k26-revA-sck-kv-g-revA-dtbs := zynqmp-smk-k26-revA.dtb zynqmp-sck-kv-
- dtb-$(CONFIG_ARCH_ZYNQMP) += zynqmp-smk-k26-revA-sck-kv-g-revA.dtb
- zynqmp-smk-k26-revA-sck-kv-g-revB-dtbs := zynqmp-smk-k26-revA.dtb zynqmp-sck-kv-g-revB.dtbo
- dtb-$(CONFIG_ARCH_ZYNQMP) += zynqmp-smk-k26-revA-sck-kv-g-revB.dtb
-+zynqmp-zcu104-revC-snps-dwc-spacc-dtbs := zynqmp-zcu104-revC.dtb snps-dwc-spacc.dtbo
-+dtb-$(CONFIG_ARCH_ZYNQMP) += zynqmp-zcu104-revC-snps-dwc-spacc.dtb
-diff --git a/arch/arm64/boot/dts/xilinx/snps-dwc-spacc.dtso b/arch/arm64/boot/dts/xilinx/snps-dwc-spacc.dtso
-new file mode 100644
-index 000000000000..603ad92f4c49
---- /dev/null
-+++ b/arch/arm64/boot/dts/xilinx/snps-dwc-spacc.dtso
-@@ -0,0 +1,35 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * dts file for Synopsys DWC SPAcc
-+ *
-+ * (C) Copyright 2024 Synopsys
-+ *
-+ * Ruud Derwig <Ruud.Derwig@synopsys.com>
-+ */
-+
-+/dts-v1/;
-+/plugin/;
-+
-+/ {
-+	#address-cells = <2>;
-+	#size-cells = <2>;
-+
-+	fragment@0 {
-+		target = <&amba>;
-+
-+		overlay1: __overlay__ {
-+			#address-cells = <2>;
-+			#size-cells = <2>;
-+
-+			dwc_spacc: spacc@400000000 {
-+				compatible = "snps-dwc-spacc";
-+				reg = /bits/ 64 <0x400000000 0x3FFFF>;
-+				interrupts = <0 89 4>;
-+				interrupt-parent = <&gic>;
-+				clock-names = "ref_clk";
-+				spacc_priority = <0>;
-+				spacc_index = <0>;
-+			};
-+		};
-+	};
-+};
+ config CRYPTO_DEV_SAFEXCEL
+ 	tristate "Inside Secure's SafeXcel cryptographic engine driver"
+diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
+index ad4ccef67d12..a937e8f5849b 100644
+--- a/drivers/crypto/Makefile
++++ b/drivers/crypto/Makefile
+@@ -48,6 +48,7 @@ obj-$(CONFIG_CRYPTO_DEV_BCM_SPU) += bcm/
+ obj-$(CONFIG_CRYPTO_DEV_SAFEXCEL) += inside-secure/
+ obj-$(CONFIG_CRYPTO_DEV_ARTPEC6) += axis/
+ obj-y += xilinx/
++obj-y += dwc-spacc/
+ obj-y += hisilicon/
+ obj-$(CONFIG_CRYPTO_DEV_AMLOGIC_GXL) += amlogic/
+ obj-y += intel/
 -- 
 2.25.1
 
