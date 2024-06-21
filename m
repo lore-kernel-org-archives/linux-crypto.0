@@ -1,119 +1,122 @@
-Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D10C1514DE
-	for <linux-crypto@vger.kernel.org>; Thu, 20 Jun 2024 23:13:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F091052F9B;
+	Fri, 21 Jun 2024 01:25:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718925227; cv=none; b=FI9I74bKVcJ8O1zLI9/byHUrsP4cXfZkXJ7vkl7ZPkc5vveKnxah/XfdDZegz4K8bfCWEbg3zlE9lz1L50Qp6nSYQ3AV51N9Faj7hki2A6SrcFMbqBz6To1tAvsQvX7oOW6sXJy7paO0hvg0ro5OoQwAe7B2FOZwJn9UEnKtEYc=
+	t=1718933103; cv=none; b=rwN6PnFGU0M+D36BIwPJxj3fst+Eg3UsAO6U+PZmAFK37V4/0U/+MgxHShW9JDg2EVHlcWFEabq9lE7r4iodQdJCDjCBW6y+kEsurYFY3JJryE6Krv7k0/W/CgQ4Fmn4qjky8aleZ5rv9qYYQ43I5vaAFfNpoU3u68GS3o+EnGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718925227; c=relaxed/simple;
-	bh=OnEU/sDI6L4n4GuKABhOjlofl7NLYJUjjb44iomKIdw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BVEwHZeM4sJxaRzOks3cATpmPYhBlCAIaiP+58gZJuOS+fN0RncHXsBpoQeMQkReY0dIlzGqqK1tL5lRot2mBWA47ICXB560Jc/NV0GFqc7L5s+2ipsyxYajkL0qG/0TSGYe7NoyhCeQt3YWqQV64KRM4Di8pGJOk5K3aOgzMt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=KbGzKlsu; arc=none smtp.client-ip=209.85.167.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KbGzKlsu"
-Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-3d2472450d6so753902b6e.3
-        for <linux-crypto@vger.kernel.org>; Thu, 20 Jun 2024 16:13:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1718925224; x=1719530024; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Zz8ynrGU4z42Aj9sdj4ptAZtRt0FzTqPDvedxGwGE2Y=;
-        b=KbGzKlsuFU1MfOfM+Ae5/YotqltjV0hy5HkjLHV/b5SHJ6gHDkITlmrmHo0NkylSKw
-         5uJWeA0epi6Ym+UhRcXiV/fEgsTTJnrwrJz/3/pEMBPKK9C9Ir1YVHoaP7lDO/OSG8i1
-         /1w98jnfKtR4buUC2EU9haxz2CGUKjqBT1JQa17PpWNZ7AnAttujMQpukXYOC6Rbxuz+
-         bi2EbPqojfU1LJ2613JCd/DkZOZ/A3aw6faqLgE54g6gdW6E4LOe1lZo9kJwupOau6Hd
-         gH5C2VCe3Kt9wdoG7M90nMBr1EHIKQ5DEm/7Xe6Fb1ZYk+ZCmhTt2vLzqpx3J2q47veK
-         P1YA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718925224; x=1719530024;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Zz8ynrGU4z42Aj9sdj4ptAZtRt0FzTqPDvedxGwGE2Y=;
-        b=DwrIG3pbiYggkXQeYK61awzYDbLITG4ElR+b1nNv1rKR+vRoEnjW3Vn2hn2N7q5XaO
-         wYW5cZP5W5etWv5tz85/AQKotUyA6eN8p37I3wM5eBAGd2GCGcpUuSq+Fk7Z+RxPDFPA
-         v7bMlwRC5mEtHqN9ousnBeJilddR5AN8liJd0UaB80u/ziM8rC+CD9brX7NCFh14d9Nf
-         mWSWiLZRTiEJcLhPIQjuBQs99WUQg1/i6G9NNJh5ATnvztuoQpsKAFjobg8YOdMLOCZc
-         sChDfqH5LK7Lyh/03S7L/kdxGFbVEGVxQS1LHTvwvv6xb0UkA+ho0QKwRgUD1gaW9xRx
-         +m2g==
-X-Forwarded-Encrypted: i=1; AJvYcCXwsnRO5wJpD11jYJg2KzM0Q2NEfr3iuKnbrXhjzJUjaL8q6YKe9ovHaUHIUVDpRlW3Qtf3D0JP4qCplj5S//ytmTqljEm0FM8CtwT/
-X-Gm-Message-State: AOJu0YwSY9QsIlCnyAn+M4CtFoVIIhhl5LldQpAulIhnzzxxF28//Shr
-	3KjHZR8mfQOOQ+GVyIsYvAaqvbTaTua9AHD53Xds5wDp5H0I4Z/eDVvREc/UqzE=
-X-Google-Smtp-Source: AGHT+IGMxuLpMKjIuYdJYrob79SDg2RZvql0ouDIgVaa+eFVMNZbWP3rPhPLCBOfG/l5X2eomxjBsA==
-X-Received: by 2002:a05:6808:300f:b0:3d2:2b8e:a7e2 with SMTP id 5614622812f47-3d51baf503fmr6570385b6e.48.1718925224517;
-        Thu, 20 Jun 2024 16:13:44 -0700 (PDT)
-Received: from localhost ([136.62.192.75])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-3d5344de45bsm86185b6e.3.2024.06.20.16.13.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Jun 2024 16:13:44 -0700 (PDT)
-From: Sam Protsenko <semen.protsenko@linaro.org>
-To: =?UTF-8?q?=C5=81ukasz=20Stelmach?= <l.stelmach@samsung.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>
-Cc: Anand Moon <linux.amoon@gmail.com>,
+	s=arc-20240116; t=1718933103; c=relaxed/simple;
+	bh=d84lgjVEEm0ZT03aEeBtLSkrbkS5gEWl6DEC1ywpEvU=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=KVv68wCsNxhlaIX+DpthQsh+YXMwpecpzBa9+Ftx7JV5i/zxfPIzjtnNaoA6UM/g4Rii8bWdoaM8Oe5FHteYa1VzWZy5vSjq5+Mn2VVJF5S4lxH1sFGZJ8zuiuiZ7V4DCdEK2pQ65SLGdqoIUS6HihNIH7JMHKWm/BLEx1UBl5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.97.1)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1sKT0r-000000004db-0C1t;
+	Fri, 21 Jun 2024 01:24:25 +0000
+Date: Fri, 21 Jun 2024 02:24:17 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Daniel Golle <daniel@makrotopia.org>,
+	Aurelien Jarno <aurelien@aurel32.net>,
 	Olivia Mackall <olivia@selenic.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Alim Akhtar <alim.akhtar@samsung.com>,
-	linux-samsung-soc@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiko Stuebner <heiko@sntech.de>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <ukleinek@debian.org>,
+	Sebastian Reichel <sebastian.reichel@collabora.com>,
+	Anand Moon <linux.amoon@gmail.com>,
+	Dragan Simic <dsimic@manjaro.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Martin Kaiser <martin@kaiser.cx>, Ard Biesheuvel <ardb@kernel.org>,
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 6/6] hwrng: exynos: Enable Exynos850 support
-Date: Thu, 20 Jun 2024 18:13:39 -0500
-Message-Id: <20240620231339.1574-7-semen.protsenko@linaro.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240620231339.1574-1-semen.protsenko@linaro.org>
-References: <20240620231339.1574-1-semen.protsenko@linaro.org>
+	linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v3 0/3] hwrng: add hwrng support for Rockchip RK3568
+Message-ID: <cover.1718921174.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Add Exynos850 compatible and its driver data. It's only possible to
-access TRNG block via SMC calls in Exynos850, so specify that fact using
-EXYNOS_SMC flag in the driver data.
+Rockchip SoCs used to have a random number generator as part of their
+crypto device, and support for it has to be added to the corresponding
+driver.
 
-Signed-off-by: Sam Protsenko <semen.protsenko@linaro.org>
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Acked-by: Łukasz Stelmach <l.stelmach@samsung.com>
----
-Changes in v3:
-  - Added R-b tag from Krzysztof
-  - Added A-b tag from Łukasz
+However newer Rockchip SoCs like the RK3568 have an independent True
+Random Number Generator device. This patchset adds a driver for it and
+enable it in the device tree.
 
-Changes in v2:
-  - Changed QUIRK_SMC to EXYNOS_SMC to reflect the name change in the
-    previous patch
+v2 of this patchset has been submitted by Aurelien Jarno in November
+2022. A follow-up submission addressing the comments received for v2
+never happened.
 
- drivers/char/hw_random/exynos-trng.c | 3 +++
- 1 file changed, 3 insertions(+)
+As I believe that using the TRNG is generally desireable as it reduces
+the time needed to boot significantly as userspace no longer waits due
+blocking read of /dev/random while still lacking entropy I have picked
+up Aurelien's previous work and completed it.
 
-diff --git a/drivers/char/hw_random/exynos-trng.c b/drivers/char/hw_random/exynos-trng.c
-index 9fa30583cc86..9f039fddaee3 100644
---- a/drivers/char/hw_random/exynos-trng.c
-+++ b/drivers/char/hw_random/exynos-trng.c
-@@ -320,6 +320,9 @@ static DEFINE_SIMPLE_DEV_PM_OPS(exynos_trng_pm_ops, exynos_trng_suspend,
- static const struct of_device_id exynos_trng_dt_match[] = {
- 	{
- 		.compatible = "samsung,exynos5250-trng",
-+	}, {
-+		.compatible = "samsung,exynos850-trng",
-+		.data = (void *)EXYNOS_SMC,
- 	},
- 	{ },
- };
+Link to v2: https://patchwork.kernel.org/project/linux-arm-kernel/cover/20221128184718.1963353-1-aurelien@aurel32.net/
+
+v2 -> v3:
+ * Patch 1: address comments of Krzysztof Kozlowski, add MAINTAINERS
+   - improved description
+   - meaningful clock-names
+   - add entry in MAINTAINERS files
+
+ * Patch 2: numerous code-style improvements
+   - drop misleading rk_rng_write_ctl(), simplify I/O writes
+   - drop unused TRNG_RNG_DOUT_[1-7] macros
+   - handle error handling for pm_runtime_get_sync()
+   - use memcpy_fromio() instead of open coding for-loop
+   - some minor white-spaces fixes
+
+ * Patch 3:
+   - use clock-names as defined in dt-bindings
+
+v1 -> v2:
+ * Patch 1: fix issues reported by Rob Herring and Krzysztof Kozlowski:
+   - Rename rockchip-rng.yaml into rockchip,rk3568-rng.yaml
+   - Fix binding title and description
+   - Fix compatible property
+   - Rename clocks and add the corresponding descriptions
+   - Drop reset-names
+   - Add a bus definition with #address-cells and #size-cells to the
+     example.
+
+ * Patch 2: fix issue reported by kernel test robot <lkp@intel.com>
+   - Do not read the random registers as big endian, looking at the
+     RK3568 TRM this is actually not needed. This fixes a sparse
+     warning.
+
+ * Patch 3: unchanged
+
+Aurelien Jarno (3):
+  dt-bindings: RNG: Add Rockchip RNG bindings
+  hwrng: add Rockchip SoC hwrng driver
+  arm64: dts: rockchip: add DT entry for RNG to RK356x
+
+ .../bindings/rng/rockchip,rk3568-rng.yaml     |  60 +++++
+ MAINTAINERS                                   |   7 +
+ arch/arm64/boot/dts/rockchip/rk356x.dtsi      |   9 +
+ drivers/char/hw_random/Kconfig                |  14 ++
+ drivers/char/hw_random/Makefile               |   1 +
+ drivers/char/hw_random/rockchip-rng.c         | 229 ++++++++++++++++++
+ 6 files changed, 320 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/rng/rockchip,rk3568-rng.yaml
+ create mode 100644 drivers/char/hw_random/rockchip-rng.c
+
 -- 
-2.39.2
-
+2.45.2
