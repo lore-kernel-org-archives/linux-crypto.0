@@ -1,33 +1,33 @@
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4F9478C8D
-	for <linux-crypto@vger.kernel.org>; Fri, 21 Jun 2024 09:33:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF82216E885;
+	Fri, 21 Jun 2024 09:36:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718962388; cv=none; b=Rr0UO5O4KWkL8d85ZIvrKRZbbze5CHO6s7FLvl60l6beqPmxc4KuoawV3w7tect2FCUDRACI9sPphH+8PB+YFLDYeJDfJV0he16pdUItXQ1UpF1e+aUF7rcEi3wG9BRqJIg1sdsKsBL3xPGXeh7mS1t6wtweeAvVPD870c7V7nA=
+	t=1718962612; cv=none; b=a19w2cbfDa+xu4AursrYpsWm3ijQtjDyjunCcFQUS2y4UWWfNrlJvvfVgMbi7bo+g8cvcHAd9PlKbU4vDE7i1aGOYKvuE7oE2DKPeuPyDkVFHw6Be3HerxZfFTFioeUd31dkGwOdFiWr/Su25TxKn4aUPcKExsMQR+NN8LIfbr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718962388; c=relaxed/simple;
-	bh=E9cYpE4iW5KxYJc5t6VcgPWDNJ7zI+gXmn7e5IvxHj0=;
+	s=arc-20240116; t=1718962612; c=relaxed/simple;
+	bh=ylbZICfxbniUhJiXjboEvGYMsTr7jOnhrJ7HtvySKxY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VzEy7E+6QYnFYdD/2b1s7UMa8sMOVAKMhyXppzbQFgMnuKAyDX6FtMzdvvRBmJuc8t8Ir82mgqtlq5gdKOgUh2qQckPFrdr12LJEez5AVEFJ5xIorTlUWcccCXTeKxGXNBs5EvIkDPhA1u/yYlbpny+6+u+mojkVpaxyZDdhjV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cknow.org; spf=pass smtp.mailfrom=cknow.org; dkim=pass (2048-bit key) header.d=cknow.org header.i=@cknow.org header.b=VhKjjRrK; arc=none smtp.client-ip=95.215.58.186
+	 MIME-Version:Content-Type; b=FtPeS7depQo2oVXDlK+y6L/ccqMlRk3h2rqNREio6ugQl0MxjmSzQTfm4ueoxiTB89JehWJsMaJqkS+k3WhACfBMEizcC7EBXW49CJmrGs/zU34KVAW1cqNQzQ41hBKLuiqhZFFGpebgJQOvHJAuapaQTZB6lZ8jrqSOr151Qhk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cknow.org; spf=pass smtp.mailfrom=cknow.org; dkim=pass (2048-bit key) header.d=cknow.org header.i=@cknow.org header.b=UTGblEpV; arc=none smtp.client-ip=95.215.58.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cknow.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cknow.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cknow.org header.i=@cknow.org header.b="VhKjjRrK"
+	dkim=pass (2048-bit key) header.d=cknow.org header.i=@cknow.org header.b="UTGblEpV"
 X-Envelope-To: daniel@makrotopia.org
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cknow.org; s=key1;
-	t=1718962383;
+	t=1718962608;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=OwyKB6XsVezaf31h9Csn0ERhorbwkY4Vv9b4XERmN7w=;
-	b=VhKjjRrKfeDUSL0Fh1j6EQQMHRry83jtwLDLaOIMKjyfXh+pgxkMifNrIfDOzzo/9fKAeG
-	YqM6f6xi2NT3CLK9VU2VB+OdaltyUI8XQMzp8Jwwg9/7EvnT4NibVV/vbgcMg7q0U5IWvK
-	gXSqgEaG2qhQdtlXnmc8nY6Z/PR0qndd/4FgYvCXRrD+kyy5vQdIwUuA1FZY6tJJtmbye7
-	s9U7nEVgH5XPimBn0pOKOoMvoz9sG/6OtXVbMRtkCyGZoTpVcRhT+z/PYCdfr289tkWpc8
-	yW8W7BBCRbLQ8010+5JASTc8cpMAi4asNiI7BFq2uVLIENtdAEeZG54c0U5iGg==
+	bh=7tocwp9lNfOnGFlQhgrKD+Lp7CcVz+tHpAKPZsWSJzg=;
+	b=UTGblEpVdd3T+psQYU9COc2q3jV5L5PhuGGv2162hEoex83pduUNObt1D5UEm/fv7Jj39H
+	cgAwnVpYY54HNcEc7qlPAM6jZ6Ullzwc6AQ4ltqbeeyOJYvuRSLFWsdXtPknfR8ZPQdtkq
+	6g44YJSyOaDW8mAL+EdmTlOwzzog1LMdMLho/hYfSqHpwPj/I66Bxc6x/s0gnmNPdis+Y1
+	VYBwo4Kpkw+msHIBUTxd9Dygl1SIgx1QZWIyWytFO73/7YptRo//l8XkyrvdPjZ1Yv1mP7
+	KjrYoFl4Y1h8FJveU68MBYGwtSJ3GBQozEwb+NlcqOFR8Yrr8GsRJ8ItLGoWNg==
 X-Envelope-To: aurelien@aurel32.net
 X-Envelope-To: olivia@selenic.com
 X-Envelope-To: herbert@gondor.apana.org.au
@@ -64,98 +64,79 @@ To: Daniel Golle <daniel@makrotopia.org>,
  devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
  linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org
 Cc: Daniel Golle <daniel@makrotopia.org>
-Subject: Re: [PATCH v3 2/3] hwrng: add Rockchip SoC hwrng driver
-Date: Fri, 21 Jun 2024 11:32:47 +0200
-Message-ID: <2947104.hVmBtEWnvU@bagend>
+Subject:
+ Re: [PATCH v3 3/3] arm64: dts: rockchip: add DT entry for RNG to RK356x
+Date: Fri, 21 Jun 2024 11:36:45 +0200
+Message-ID: <5870442.3KgWVfgXFx@bagend>
 Organization: Connecting Knowledge
 In-Reply-To:
- <57a7fb13451f066ddc8d1d9339d8f6c1e1946bf1.1718921174.git.daniel@makrotopia.org>
+ <bd08c142ce6b32cd98014c875c7ccf3657c63f23.1718921174.git.daniel@makrotopia.org>
 References:
  <cover.1718921174.git.daniel@makrotopia.org>
- <57a7fb13451f066ddc8d1d9339d8f6c1e1946bf1.1718921174.git.daniel@makrotopia.org>
+ <bd08c142ce6b32cd98014c875c7ccf3657c63f23.1718921174.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart1935094.npV3YSaYj1";
+Content-Type: multipart/signed; boundary="nextPart2326598.u92GhurISB";
  micalg="pgp-sha256"; protocol="application/pgp-signature"
 X-Migadu-Flow: FLOW_OUT
 
---nextPart1935094.npV3YSaYj1
+--nextPart2326598.u92GhurISB
 Content-Transfer-Encoding: 7Bit
 Content-Type: text/plain; charset="us-ascii"; protected-headers="v1"
 From: Diederik de Haas <didi.debian@cknow.org>
 Cc: Daniel Golle <daniel@makrotopia.org>
-Subject: Re: [PATCH v3 2/3] hwrng: add Rockchip SoC hwrng driver
-Date: Fri, 21 Jun 2024 11:32:47 +0200
-Message-ID: <2947104.hVmBtEWnvU@bagend>
+Date: Fri, 21 Jun 2024 11:36:45 +0200
+Message-ID: <5870442.3KgWVfgXFx@bagend>
 Organization: Connecting Knowledge
 MIME-Version: 1.0
 
-Hi,
+On Friday, 21 June 2024 03:25:30 CEST Daniel Golle wrote:
+> diff --git a/arch/arm64/boot/dts/rockchip/rk356x.dtsi
+> b/arch/arm64/boot/dts/rockchip/rk356x.dtsi index d8543b5557ee..57c8103500ea
+> 100644
+> --- a/arch/arm64/boot/dts/rockchip/rk356x.dtsi
+> +++ b/arch/arm64/boot/dts/rockchip/rk356x.dtsi
+> @@ -1855,6 +1855,15 @@ usb2phy1_otg: otg-port {
+>                 };
+>         };
+> 
+> +       rng: rng@fe388000 {
+> +               compatible = "rockchip,rk3568-rng";
+> +               reg = <0x0 0xfe388000 0x0 0x4000>;
+> +               clocks = <&cru CLK_TRNG_NS>, <&cru HCLK_TRNG_NS>;
+> +               clock-names = "core", "ahb";
+> +               resets = <&cru SRST_TRNG_NS>;
+> +               reset-names = "reset";
+> +       };
+> +
+>         pinctrl: pinctrl {
+>                 compatible = "rockchip,rk3568-pinctrl";
+>                 rockchip,grf = <&grf>;
+> --
 
-On Friday, 21 June 2024 03:25:18 CEST Daniel Golle wrote:
-> diff --git a/drivers/char/hw_random/rockchip-rng.c
-> b/drivers/char/hw_random/rockchip-rng.c new file mode 100644
-> index 000000000000..6070abb73847
-> --- /dev/null
-> +++ b/drivers/char/hw_random/rockchip-rng.c
-> @@ -0,0 +1,229 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * rockchip-rng.c True Random Number Generator driver for Rockchip SoCs
-> + *
-> + * Copyright (c) 2018, Fuzhou Rockchip Electronics Co., Ltd.
-> + * Copyright (c) 2022, Aurelien Jarno
-> + * Authors:
-> + *  Lin Jinhan <troy.lin@rock-chips.com>
-> + *  Aurelien Jarno <aurelien@aurel32.net>
-> + */
-> +#include <linux/clk.h>
-> +#include <linux/hw_random.h>
-> +#include <linux/io.h>
-> +#include <linux/iopoll.h>
-> +#include <linux/kernel.h>
-> +#include <linux/module.h>
-> +#include <linux/of_platform.h>
-> +#include <linux/pm_runtime.h>
-> +#include <linux/reset.h>
-> +#include <linux/slab.h>
-
-I've been using a modified version of Aurelien's patch myself and I added the 
-following to my commit description:
-
-```
-hwrng: rockchip: Explicitly include correct DT includes
-
-Similar to commit 
-045a44d4c9b3 ("regulator: Explicitly include correct DT includes")
-replace ``of_platform.h`` include with ``of.h`` and ``platform_device.h``.
-
-Link: https://git.kernel.org/linus/045a44d4c9b32578aacf0811063e5bb741c7c32c
-```
-
-BUT I don't (really) know what I'm doing, so could you verify whether there is 
-some merit to it?
+I had placed the node between ``sdhci: mmc@fe310000`` and
+``i2s0_8ch: i2s@fe400000`` which I think is the proper order.
 
 Cheers,
   Diederik
---nextPart1935094.npV3YSaYj1
+--nextPart2326598.u92GhurISB
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: This is a digitally signed message part.
 Content-Transfer-Encoding: 7Bit
 
 -----BEGIN PGP SIGNATURE-----
 
-iHUEABYIAB0WIQT1sUPBYsyGmi4usy/XblvOeH7bbgUCZnVIvwAKCRDXblvOeH7b
-bqE7AQDF37/CXTAUyN3awVxvukKshJxjy4bD/LzGPF6vKKjeMwD+OQtj9mn9qg9S
-9VINqYzabKxos3rXWoGeIEgjc7TYkwM=
-=DxWI
+iHUEABYIAB0WIQT1sUPBYsyGmi4usy/XblvOeH7bbgUCZnVJrQAKCRDXblvOeH7b
+biBSAQCMa4hNIGCHuiNhbaI8GKE6K+tGfAz4PV8PCWjZL2SX8gEAp/afD39PReUl
+9q2MBI5TXF+g0+JU6oBWjxcSlvzXcAw=
+=IJaH
 -----END PGP SIGNATURE-----
 
---nextPart1935094.npV3YSaYj1--
+--nextPart2326598.u92GhurISB--
 
 
 
