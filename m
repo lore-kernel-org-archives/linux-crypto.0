@@ -1,126 +1,137 @@
-Received: from mail.manjaro.org (mail.manjaro.org [116.203.91.91])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from fhigh8-smtp.messagingengine.com (fhigh8-smtp.messagingengine.com [103.168.172.159])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7733D381AA;
-	Sat, 22 Jun 2024 20:45:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.91.91
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29612495CC;
+	Sat, 22 Jun 2024 23:37:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719089131; cv=none; b=If1Hem8KRMOUGVYTdwLWlwfoYW/g13dDGWybJqgbWiJ8+Wm3Ia23+6VnJuyjxkZiE7uYBvj3kp3cofdzE7RVy10s7NDoigWlRgZMcM9+A1E9X6vihUF+iHwdBOnmSa5He79v1Ph4phhrKG2JDtCBcIudyetGHijjnQslG7H8uvY=
+	t=1719099480; cv=none; b=icf52upkDj1T+++SdvwJT3XEQEqsSCSULGR4AnC2FMvZwxApZO0sK8eahXGKWmL6vMBCGaT4vzvmjl7oib+/W6wqXtxgQmkg4RIdUCVplIioc2SLP0u39oQCwSkIxykJDkIiSCoquKwQndUiqvHO9+aRGlNPZmfQj7DIMGsVc2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719089131; c=relaxed/simple;
-	bh=f361aP1H2fhPiV6ZzXRV4IlCRWpJ16KLdJmM2TAa/xg=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=dd/t6FTfYVmH1v6G9lijH4Bny100XCKXR4u7kdb+FRqfMGBLY6gMcBBGT3ASVZt4OlXAGl4JgWR1aVyWxVa7G+XlIRm8AtpwUHBRCxf/z26mNQhUdOFBcck0GzRLbbLonBm9mNJ7tjt0d8VvvzXmuIUdXXuESGmD0sWYSILpwNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org; spf=pass smtp.mailfrom=manjaro.org; dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b=yut8vwcx; arc=none smtp.client-ip=116.203.91.91
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manjaro.org
+	s=arc-20240116; t=1719099480; c=relaxed/simple;
+	bh=1OqJpHQ366I2P8KyTSVSP//3azJ6U2em0Ustkmco2kM=;
+	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
+	 Subject:Content-Type; b=tmWId7yGT0WbPXgL6nu9aLFbq6G63XkHKZ/uZnX4Y7DD8EWG0h528Kj/pFXRryG0xEv3/9B0srTbcTNkC101E0Jo/0CX9eV4PlXL8QZVsb5WnlAr6wg1xdvUb97L31/CBOSjBhxnTKuHUj2PwBg2jaMrksfkSlxWzNvgHLBOVCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=testtoast.com; spf=pass smtp.mailfrom=testtoast.com; dkim=pass (2048-bit key) header.d=testtoast.com header.i=@testtoast.com header.b=otkW9YU/; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=cXy9C5mS; arc=none smtp.client-ip=103.168.172.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=testtoast.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=testtoast.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b="yut8vwcx"
+	dkim=pass (2048-bit key) header.d=testtoast.com header.i=@testtoast.com header.b="otkW9YU/";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="cXy9C5mS"
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailfhigh.nyi.internal (Postfix) with ESMTP id 4628611400A7;
+	Sat, 22 Jun 2024 19:37:57 -0400 (EDT)
+Received: from imap47 ([10.202.2.97])
+  by compute5.internal (MEProxy); Sat, 22 Jun 2024 19:37:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=testtoast.com;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm2; t=1719099477; x=
+	1719185877; bh=k5o5mQ9UnR2y4q+VUneHpWeUtJa3ONEuJTFdu0HoL3E=; b=o
+	tkW9YU/psI5nX8jr+RGHteDFvodoKVI+PDfz27ncz0Bbo0YPpyslLyurd+6iwU+Y
+	kWipgnKuunHFJWl5InwT4onoixjC1UOftpSO6q7tFN9eLHJ8vW4pnenPtUsGAO28
+	7VpgNSaY/1hGOf59BujrlUsnMV320o1tNFfmQXLz8nQIHjyAMFXMOomecSHICgD0
+	E4j0TQ5GtlUcILyqVbxzF2h1OK0FIgQJNxcASo8uKWQDIF9ObywEcNeYWm8mgq3v
+	4c0J4OAzKqILku4NANA93YzhJ0JshTSiJssxRqrqaJhRMWktdvYHh+G3rm/SXnkA
+	xVLfWEfaNP137xIyyN7gg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm2; t=1719099477; x=1719185877; bh=k5o5mQ9UnR2y4q+VUneHpWeUtJa3
+	ONEuJTFdu0HoL3E=; b=cXy9C5mSIlcy+/WsSqsjUFscEuhbyoG0/xgy8gfoj+UA
+	IEvzqgpCBs7QJwSdMBcZwyFB8lOswvPELdGsoXiuNdhFKHQNqKViMT1SlqfIFcmB
+	L19R6m7uMJvDAwsum6I6J+T647PsrPznmN3FMeQZLK/fgJVneH0fhEH0NQCb/NKO
+	AkAh9Dlp/w+hfl/LAsMfZw9bwP7bFadVI/JaOZVNfz0BMMXE++f/GVz8QjUBtujz
+	3uBZEuOo9lj9h/RA/R0hUy7mUtNd3sifPSC+vxZHlp/Rd9XQ/j67QVkdKPM1X6/K
+	GtQz3nAiX5/UNysIrGN2eKbzx6A65aRn2LDEGIrT0w==
+X-ME-Sender: <xms:U2B3Zm0HFak589UUx0r-pwY3rbPqk4P4Q_0lYiJwk4MoSc1UnYq_pw>
+    <xme:U2B3ZpEzEok5CLfgarFrxR3IkJfdmslaXNYoZNp2p5uHlugfLMYPLBYyRYcJBSg8g
+    yP3-IggAoMU7bqalA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrfeefjedgvdefucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftfih
+    rghnucghrghlkhhlihhnfdcuoehrhigrnhesthgvshhtthhorghsthdrtghomheqnecugg
+    ftrfgrthhtvghrnhephedvveeigedujeeufeegffehhfffveduhfeijefgtdffteelgfet
+    ueevieduieejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrh
+    homheprhihrghnsehtvghsthhtohgrshhtrdgtohhm
+X-ME-Proxy: <xmx:U2B3Zu6SIPZU4BR9rsKn0dJ5YH_t-xrioU2mJv8ZL2pO28gFV3ccZw>
+    <xmx:U2B3Zn3PKyx1wazstsIM8EPbAZ7oS-twMQOD4JNbW-cnADYmGc-bYg>
+    <xmx:U2B3ZpFqkRRHtvMdxzBVAOlDLEVwk_w7ZXYaOhLrAsLgb9cSKGXQ8w>
+    <xmx:U2B3Zg9CO-QQlBzHqToOrj2FhmiQ2oXyWO2zDZSC-0oczJZKOeGGdw>
+    <xmx:VWB3ZhGXkAw64lWpUHEcBl9gVArdxhMQMparEvMiZINDpo0SF_jEwkGC>
+Feedback-ID: idc0145fc:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id 6AD38A60078; Sat, 22 Jun 2024 19:37:55 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.11.0-alpha0-522-ga39cca1d5-fm-20240610.002-ga39cca1d
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manjaro.org; s=2021;
-	t=1719089125;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZAx6xJEcAp2BzU+6jCZ3gQ0T/OrV48S/ARN8pl1rVcw=;
-	b=yut8vwcxjmeGy4YmsZGRxYcx0knvQfa1RRPq0L8Y2dElH+KmWFRYK+BC8x9fQp5Dji4FRj
-	Rg+/zD5pw1CSr7whGYO4CIuiY/52drtn8tpCZwZVJUYYRFaLggpDMs+NiiNq8EDXW5kHQQ
-	6+dEGFaVR8d95EdSohBI2qhlglNr0eeO/m5uas95//jDed91uFLFXxdgWASR2nxcdilWFt
-	/EYmo1mcWO2M4wF+a/9ubAUq3MudExsN+bhjEgYXuFwbw4o0/OfTLSZ4pzaxC4/ueysE4X
-	IONlh7c2olGV0pHdtZA0ZkrmwGQ7ZkuI1JQcUfmCmXu2W1ofoDs+m7umToCZ+g==
-Date: Sat, 22 Jun 2024 22:45:22 +0200
-From: Dragan Simic <dsimic@manjaro.org>
-To: =?UTF-8?Q?Heiko_St=C3=BCbner?= <heiko@sntech.de>
-Cc: =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <ukleinek@kernel.org>, Krzysztof
- Kozlowski <krzk@kernel.org>, Daniel Golle <daniel@makrotopia.org>, Aurelien
- Jarno <aurelien@aurel32.net>, Olivia Mackall <olivia@selenic.com>, Herbert
- Xu <herbert@gondor.apana.org.au>, Rob Herring <robh@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Philipp
- Zabel <p.zabel@pengutronix.de>, Sebastian Reichel
- <sebastian.reichel@collabora.com>, Anand Moon <linux.amoon@gmail.com>,
- Sascha Hauer <s.hauer@pengutronix.de>, Martin Kaiser <martin@kaiser.cx>, Ard
- Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 2/3] hwrng: add Rockchip SoC hwrng driver
-In-Reply-To: <3660160.WbyNdk4fJJ@diego>
-References: <cover.1718921174.git.daniel@makrotopia.org>
- <ead26406-dd3b-491c-b6ab-11002a2db11a@kernel.org>
- <07fba45d99e9eabf9bcca71b86651074@manjaro.org> <3660160.WbyNdk4fJJ@diego>
-Message-ID: <b0164e0d05d9e445a844ffdfca7a82d5@manjaro.org>
-X-Sender: dsimic@manjaro.org
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Authentication-Results: ORIGINATING;
-	auth=pass smtp.auth=dsimic@manjaro.org smtp.mailfrom=dsimic@manjaro.org
+Message-Id: <2d88450a-9b4e-46f3-9ec5-136feb4e680c@app.fastmail.com>
+In-Reply-To: <20240616220719.26641-1-andre.przywara@arm.com>
+References: <20240616220719.26641-1-andre.przywara@arm.com>
+Date: Sun, 23 Jun 2024 11:37:35 +1200
+From: "Ryan Walklin" <ryan@testtoast.com>
+To: "Andre Przywara" <andre.przywara@arm.com>,
+ "Corentin Labbe" <clabbe.montjoie@gmail.com>,
+ "Herbert Xu" <herbert@gondor.apana.org.au>,
+ "David S . Miller" <davem@davemloft.net>, "Chen-Yu Tsai" <wens@csie.org>,
+ "Jernej Skrabec" <jernej.skrabec@gmail.com>,
+ "Samuel Holland" <samuel@sholland.org>, "Rob Herring" <robh@kernel.org>,
+ "Krzysztof Kozlowski" <krzk+dt@kernel.org>,
+ "Conor Dooley" <conor+dt@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-sunxi@lists.linux.dev, devicetree@vger.kernel.org
+Subject: Re: [PATCH 0/4] crypto: sun8i-ce: add Allwinner H616 support
+Content-Type: text/plain
 
-Hello Heiko,
+On Mon, 17 Jun 2024, at 10:07 AM, Andre Przywara wrote:
 
-On 2024-06-22 22:26, Heiko Stübner wrote:
-> Am Samstag, 22. Juni 2024, 12:29:33 CEST schrieb Dragan Simic:
->> On 2024-06-22 00:16, Uwe Kleine-König wrote:
->> > On 6/21/24 20:13, Dragan Simic wrote:
->> >> On 2024-06-21 11:57, Krzysztof Kozlowski wrote:
->> >>> On 21/06/2024 03:25, Daniel Golle wrote:
->> >>>> From: Aurelien Jarno <aurelien@aurel32.net>
->> >>
->> >> [snip]
->> >>
->> >>>> +    pm_runtime_set_autosuspend_delay(dev,
->> >>>> RK_RNG_AUTOSUSPEND_DELAY);
->> >>>> +    pm_runtime_use_autosuspend(dev);
->> >>>> +    pm_runtime_enable(dev);
->> >>>> +
->> >>>> +    ret = devm_hwrng_register(dev, &rk_rng->rng);
->> >>>> +    if (ret)
->> >>>> +        return dev_err_probe(&pdev->dev, ret, "Failed to register
->> >>>> Rockchip hwrng\n");
->> >>>> +
->> >>>> +    dev_info(&pdev->dev, "Registered Rockchip hwrng\n");
->> >>>
->> >>> Drop, driver should be silent on success.
->> >>
->> >> I respectfully disagree.  Many drivers print a single line upon
->> >> successful probing, which I find very useful.  In this particular
->> >> case, it's even more useful, because some people may be concerned
->> >> about the use of hardware TRNGs, so we should actually make sure
->> >> to announce it.
->> >
->> > I agree to Krzysztof here. From the POV of a driver author, your own
->> > driver is very important and while you write it, it really interests
->> > *you* if the driver is successfully probed. However from a system
->> > perspective these are annoying: There are easily >50 devices[1] on a
->> > system, if all of these print a message in probe, you have little
->> > chance
->> > to see the relevant messages. Even if every driver author thinks their
->> > work is a special snow flake that is worth announcing, in practice
->> > users
->> > only care about your driver if there is a problem. Additionally each
->> > message takes time and so delays the boot process. Additionally each
->> > message takes place in the printk ring buffer and so edges out earlier
->> > messages that might be more important.
->> 
->> Well, I don't find those messages annoying, for the drivers I've had
->> nothing to do with.  Also, in my experience, 99.9% of users don't care
->> about the kernel messages at all, be it everything hunky-dory, or be
->> it something really wrong somewhere.
->> 
->> > So +1 for dropping the dev_info() or at least using dev_debug() for it.
-> 
-> Just for 2ct ... I'm also in the don't print too much camp ;-) .
-> When parsing kernel logs to see where things fail, messages just
-> telling me about sucesses make things more difficult.
-> 
-> So really this message should be dropped or at least as Uwe suggests
-> made a dev_dbg.
+Thanks Andre!
 
-As a note, "dmesg --level=err,warn", for example, is rather useful
-when it comes to filtering the kernel messages to see only those that
-are signs of a trouble.
+> Corentin's cryptotest passed for me, though I haven't checked how fast
+> it is and if it really brings an advantage performance-wise, but maybe
+> people find it useful to offload that from the CPU cores.
+
+Running the rngtest gives the following output:
+
+localhost:~# rngtest -c 10000 < /dev/random
+rngtest 6.16
+Copyright (c) 2004 by Henrique de Moraes Holschuh
+This is free software; see the source for copying conditions.  There is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+rngtest: starting FIPS tests...
+rngtest: bits received from input: 200000032
+rngtest: FIPS 140-2 successes: 9991
+rngtest: FIPS 140-2 failures: 9
+rngtest: FIPS 140-2(2001-10-10) Monobit: 0
+rngtest: FIPS 140-2(2001-10-10) Poker: 2
+rngtest: FIPS 140-2(2001-10-10) Runs: 2
+rngtest: FIPS 140-2(2001-10-10) Long run: 5
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=144.496; avg=808.068; max=866.977)Mibits/s
+rngtest: FIPS tests speed: (min=17.199; avg=60.937; max=62.949)Mibits/s
+rngtest: Program run time: 3369060 microseconds
+
+So looks like a nice performance boost. 
+
+> One immediate advantage is the availability of the TRNG device, which
+> helps to feed the kernel's entropy pool much faster - typically before
+> we reach userland. Without the driver this sometimes takes minutes, and
+> delays workloads that rely on the entropy pool.
+
+CRNG bringup now also very fast:
+
+[    1.114790] sun8i-ce 1904000.crypto: CryptoEngine Die ID 0
+[    1.116253] random: crng init done
+
+Tested-by: Ryan Walklin <ryan@testtoast.com>
+
+Regards,
+
+Ryan
