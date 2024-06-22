@@ -1,125 +1,108 @@
-Received: from mail.manjaro.org (mail.manjaro.org [116.203.91.91])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from hall.aurel32.net (hall.aurel32.net [195.154.113.88])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A633D79DF;
-	Sat, 22 Jun 2024 10:29:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.91.91
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1B6E14B09C;
+	Sat, 22 Jun 2024 10:43:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.154.113.88
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719052187; cv=none; b=Felq0bPcH6oM0QVM4jLMOcbbNzIOGN+KWw7dT+Gcn1+8MZ4NLCx2UrHmB/wGHz4F/d8dI7SsfzbBpvegN/fhM/15zuUp4hdQfwdHH+pBIgBi/o3OsOnE5D+i0i+u+6/MrqyEZ1V8IlC/deZB4kUbU1bYOxpN2Y+mXduPHCy3F4o=
+	t=1719053013; cv=none; b=rLHsTEClA9l5leN4pSkcx/K8KELhqTWGse99RZhNtgZ2V55364Vhcx3qLscImfz0LtgbOHgAO+XtD934zwfzGJA5oFDeC/8YGZexx6tTzypJM+5g29L9CHg+uQFOS5SlaFAD47e5EJEUKp4DSx3e7nTidX10ZEtocMEZ83e8720=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719052187; c=relaxed/simple;
-	bh=EbhJrZl4vfVX69Ed6tMYXe+MvUXi6WxJaYR8+kCdLp0=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=Y3XnFGVnNvBAYCGnp625iYphtM6hVVwzacY6++q/XQyy7VjWcuJOQRJmctNtttWeLL29M2cL12RdcWtSy2U7PUj/iBuHz5zwLjKxePMEIGwvE9v/Zbyli7h/Dld5DuRDBmvRs8sEkvLwRopwss25NVdO5K/qi4MRYsH3tnIjGKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org; spf=pass smtp.mailfrom=manjaro.org; dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b=nLBuVgLd; arc=none smtp.client-ip=116.203.91.91
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manjaro.org
+	s=arc-20240116; t=1719053013; c=relaxed/simple;
+	bh=LVfYR8/jFkVpAgI5c9DnudXm1sPcC5/oQYIYNdp8Jys=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mfrpAsHEHqTRB6X2IOHRVfQniHPxGcZi5b78H8RujVF4MC3xSNwrNBt6oed/IvZZUVqW61Zz5KHF5i8licOe1LfjmNmN82l98oQOaX7VOhbhrVOstYr8frNfSSfBFX0o6DUPAQmNTdA9swFnfUmn/qR4PApCX5VgKg8JLpwRI3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=aurel32.net; spf=pass smtp.mailfrom=aurel32.net; dkim=pass (2048-bit key) header.d=aurel32.net header.i=@aurel32.net header.b=bTv1y0xU; arc=none smtp.client-ip=195.154.113.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=aurel32.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aurel32.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b="nLBuVgLd"
+	dkim=pass (2048-bit key) header.d=aurel32.net header.i=@aurel32.net header.b="bTv1y0xU"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=aurel32.net
+	; s=202004.hall; h=In-Reply-To:Content-Type:MIME-Version:References:
+	Message-ID:Subject:Cc:To:From:Date:Content-Transfer-Encoding:From:Reply-To:
+	Subject:Content-ID:Content-Description:X-Debbugs-Cc;
+	bh=L7GES3nlJ/mbxpjgjMloPbQ6xU28njSFXetD3IW/C9k=; b=bTv1y0xUMPOFAGcp8NXNG5sAri
+	9Wuf4Hr94UiZ7MZR0BqUJALKC7GisIpFxsW4LjUzSTu1FQa6X6/y1SDljDg3i+o2SYsmilCnpGMmt
+	CbkRrHufQlZoVG/xB9JElfWnkZp8zN4O9JUqJfB+BjT42Xt+9oCe/VUU5TuPkmepcyVGseWADjq2b
+	cj2nad8/d1eEV2nuXGQo+5U/ebwR2rLenZBgHimL1u9n/wlKqDQcyCZZCZY+GI+SnPDQFkaePavUf
+	KzQEhPT/Mso/7rXN/RH21FOxsdKDOYvAKYTGT2lc97Jjyt56u0C1qbY7b2LoeI6bbTsFUMb5cK9mp
+	KNunQfcw==;
+Received: from [2a01:e34:ec5d:a741:1ee1:92ff:feb4:5ec0] (helo=ohm.rr44.fr)
+	by hall.aurel32.net with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <aurelien@aurel32.net>)
+	id 1sKxVY-003oby-0i;
+	Sat, 22 Jun 2024 11:58:08 +0200
+Date: Sat, 22 Jun 2024 11:58:06 +0200
+From: Aurelien Jarno <aurelien@aurel32.net>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiko Stuebner <heiko@sntech.de>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <ukleinek@debian.org>,
+	Sebastian Reichel <sebastian.reichel@collabora.com>,
+	Anand Moon <linux.amoon@gmail.com>,
+	Dragan Simic <dsimic@manjaro.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Martin Kaiser <martin@kaiser.cx>, Ard Biesheuvel <ardb@kernel.org>,
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 0/3] hwrng: add hwrng support for Rockchip RK3568
+Message-ID: <ZnagLpqZS4UjDR6T@aurel32.net>
+Mail-Followup-To: Daniel Golle <daniel@makrotopia.org>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiko Stuebner <heiko@sntech.de>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <ukleinek@debian.org>,
+	Sebastian Reichel <sebastian.reichel@collabora.com>,
+	Anand Moon <linux.amoon@gmail.com>,
+	Dragan Simic <dsimic@manjaro.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Martin Kaiser <martin@kaiser.cx>, Ard Biesheuvel <ardb@kernel.org>,
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <cover.1718921174.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manjaro.org; s=2021;
-	t=1719052181;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gAs4OzU1Oz3fZkEyE0fXcGDcqifaH35w5B5v23oDbGw=;
-	b=nLBuVgLdi1Ma3AsC4BcduWrQtZljtVvLRLy8P++PL4vrCvYI8UjuY1RWa1GQEQUYAss95u
-	ZhOlYTGJL8HfYiXljF3nuWBQhZXfcw60f48BGapi1QZ1eZnQVwQ7Z7NG5tBGYdPdNEEMDi
-	vf45ho21uqRa1x6iiIU5HK0qfJKGsT+YzEjZUhSLXR7eeufJ6saJjzserH6ceUmcMOmi6R
-	heTdohQ4ujLYbMNd9ySFlM9XgOJgb9j8eaZow2P5XcKZ4XbABY2Qku9+KTFWgnBxsZn8bM
-	tlmA2OK7w48oxzYmXFfp1fzheQXxkSryBkQwf3IG2ms7svnYumxZQIfTJZMqdg==
-Date: Sat, 22 Jun 2024 12:29:33 +0200
-From: Dragan Simic <dsimic@manjaro.org>
-To: =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <ukleinek@kernel.org>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>, Daniel Golle
- <daniel@makrotopia.org>, Aurelien Jarno <aurelien@aurel32.net>, Olivia
- Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, Rob
- Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor
- Dooley <conor+dt@kernel.org>, Heiko Stuebner <heiko@sntech.de>, Philipp
- Zabel <p.zabel@pengutronix.de>, Sebastian Reichel
- <sebastian.reichel@collabora.com>, Anand Moon <linux.amoon@gmail.com>,
- Sascha Hauer <s.hauer@pengutronix.de>, Martin Kaiser <martin@kaiser.cx>, Ard
- Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 2/3] hwrng: add Rockchip SoC hwrng driver
-In-Reply-To: <ead26406-dd3b-491c-b6ab-11002a2db11a@kernel.org>
-References: <cover.1718921174.git.daniel@makrotopia.org>
- <57a7fb13451f066ddc8d1d9339d8f6c1e1946bf1.1718921174.git.daniel@makrotopia.org>
- <f8e6b1b9-f8ff-42df-b1ef-bcc439c2e913@kernel.org>
- <173ce1663186ab8282356748abcac3f4@manjaro.org>
- <ead26406-dd3b-491c-b6ab-11002a2db11a@kernel.org>
-Message-ID: <07fba45d99e9eabf9bcca71b86651074@manjaro.org>
-X-Sender: dsimic@manjaro.org
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Authentication-Results: ORIGINATING;
-	auth=pass smtp.auth=dsimic@manjaro.org smtp.mailfrom=dsimic@manjaro.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1718921174.git.daniel@makrotopia.org>
+User-Agent: Mutt/2.2.12 (2023-09-09)
 
-Hello Uwe,
+Hi Daniel,
 
-On 2024-06-22 00:16, Uwe Kleine-König wrote:
-> On 6/21/24 20:13, Dragan Simic wrote:
->> On 2024-06-21 11:57, Krzysztof Kozlowski wrote:
->>> On 21/06/2024 03:25, Daniel Golle wrote:
->>>> From: Aurelien Jarno <aurelien@aurel32.net>
->> 
->> [snip]
->> 
->>>> +    pm_runtime_set_autosuspend_delay(dev, 
->>>> RK_RNG_AUTOSUSPEND_DELAY);
->>>> +    pm_runtime_use_autosuspend(dev);
->>>> +    pm_runtime_enable(dev);
->>>> +
->>>> +    ret = devm_hwrng_register(dev, &rk_rng->rng);
->>>> +    if (ret)
->>>> +        return dev_err_probe(&pdev->dev, ret, "Failed to register 
->>>> Rockchip hwrng\n");
->>>> +
->>>> +    dev_info(&pdev->dev, "Registered Rockchip hwrng\n");
->>> 
->>> Drop, driver should be silent on success.
->> 
->> I respectfully disagree.  Many drivers print a single line upon
->> successful probing, which I find very useful.  In this particular
->> case, it's even more useful, because some people may be concerned
->> about the use of hardware TRNGs, so we should actually make sure
->> to announce it.
+On 2024-06-21 02:24, Daniel Golle wrote:
+> Rockchip SoCs used to have a random number generator as part of their
+> crypto device, and support for it has to be added to the corresponding
+> driver.
 > 
-> I agree to Krzysztof here. From the POV of a driver author, your own
-> driver is very important and while you write it, it really interests
-> *you* if the driver is successfully probed. However from a system
-> perspective these are annoying: There are easily >50 devices[1] on a
-> system, if all of these print a message in probe, you have little 
-> chance
-> to see the relevant messages. Even if every driver author thinks their
-> work is a special snow flake that is worth announcing, in practice 
-> users
-> only care about your driver if there is a problem. Additionally each
-> message takes time and so delays the boot process. Additionally each
-> message takes place in the printk ring buffer and so edges out earlier
-> messages that might be more important.
+> However newer Rockchip SoCs like the RK3568 have an independent True
+> Random Number Generator device. This patchset adds a driver for it and
+> enable it in the device tree.
+> 
+> v2 of this patchset has been submitted by Aurelien Jarno in November
+> 2022. A follow-up submission addressing the comments received for v2
+> never happened.
 
-Well, I don't find those messages annoying, for the drivers I've had
-nothing to do with.  Also, in my experience, 99.9% of users don't care
-about the kernel messages at all, be it everything hunky-dory, or be
-it something really wrong somewhere.
+I didn't have the time or energy to continue working on this. Thanks for
+continuing the work, I'll give it a try at some point.
 
-> So +1 for dropping the dev_info() or at least using dev_debug() for it.
-> 
-> Best regards
-> Uwe
-> 
-> [1] On my laptop if have:
-> 
-> 	$ find /sys/devices -name driver | wc -l
-> 	87
-> 
->     On a Raspberrypi it yields 66.
+Regards
+Aurelien
+
+-- 
+Aurelien Jarno                          GPG: 4096R/1DDD8C9B
+aurelien@aurel32.net                     http://aurel32.net
