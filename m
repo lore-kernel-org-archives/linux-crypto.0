@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84AB3C133;
-	Sun, 23 Jun 2024 07:00:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C48FC133;
+	Sun, 23 Jun 2024 07:03:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719126035; cv=none; b=lMb9w8FES1Vo9TuY1rPuvK0kv/5MGVaAn+alD2VzOs24az49tau7VUsnjKx7LM6OC+vozUa80qpF8gr7gNwvZFSnQK5Mlb2JaIToU+ZwyhR3McCq7ebF/nzPhw2NCxINxS5AXwSNlxTn7U3BKPwtWydDp+GrVrP2BlwWPJP18yg=
+	t=1719126204; cv=none; b=DD/FsaPm32pnqiogj2HdAr32QeH7OdnH3sgv5ZVXnPbcQkjnjlQg4fDFXaqm6g6jIz4kqH1aZUeR+oe4LUSa0V8l6bGb8e9Adv9PtX+qHJlC1ThGsr6e10AGVzipLWJhEUjhk91J+eCmGRpCI3fPNXYDBI0rpqDYTBM06y1hZBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719126035; c=relaxed/simple;
-	bh=Zh3rGWiju+eKajioJDo3k+SKSAZQHHVkEqE+gI1cN5s=;
+	s=arc-20240116; t=1719126204; c=relaxed/simple;
+	bh=31tCZ1WF5nzqWiKtcHmHj56vy33PnluvT8cin4fs0Do=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=srFFWu6iZHrme44UlWblmMmR/7EZhUUmzpSyWjgq9DkNa7f21IDQ7R3TrAhlfL6ZQ3vZK7d1+QoRwK2S5YcA8odcf0oCSqeJ5GTshyzIXNqGh431AjIkm7ofCQB3rPNLMztrvViqHYh3NmJxzg71om2HQR6t3r9WAHparcWpicU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ky8X+fej; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=cIkiNvjn5LN4A7JxcxvgsmPY2itl1O4Cd19BDnS88ZwtHZocZ0mgg0STmbLV3wcLBhU5bQv+hdmJAvQRk1jARQvNHvmHVbNaMgBlPByEoDoNqdKy4bmwqz6mW7+skyObIrP6AkyxhgCNb1jq9JbM9tceQqp6BihsupdLLw2Qkn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=navFBi/Q; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ky8X+fej"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95121C2BD10;
-	Sun, 23 Jun 2024 07:00:29 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="navFBi/Q"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6276C2BD10;
+	Sun, 23 Jun 2024 07:03:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719126035;
-	bh=Zh3rGWiju+eKajioJDo3k+SKSAZQHHVkEqE+gI1cN5s=;
+	s=k20201202; t=1719126204;
+	bh=31tCZ1WF5nzqWiKtcHmHj56vy33PnluvT8cin4fs0Do=;
 	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=ky8X+fejbTaHSKNaiFtCirYzTTO0/A3J4zLzqLtVHEH3mJeKJWXCyEf9hoJXghGJE
-	 MMAH95us0fr56u3X6PERvMUQEZhwJLxE2f9e09WzrqFHT0JwWSNTwcsFGqdBaPWGFp
-	 a6IQdLo4qmYVcQVCyNREMIj95AZaneU+3vho6oRlqaghYIewxoO2m9+lNsLzgNGh/V
-	 u/HdmXGGSLnygS6ZMF1sH+hU+PoFApf0SiaQcTaFRMurw/YOeyZwoK4zm1t7BE1CDh
-	 EH5/zf+TdpTZ9YtFojDOXBOtwEnpi4l6EXhW/2POReT+LPNoE2JiEcaqwasolg7tCE
-	 Zo/nkpjpr2k+g==
-Message-ID: <612bd49c-c44a-41f2-89e9-c96e62e52a0a@kernel.org>
-Date: Sun, 23 Jun 2024 09:00:27 +0200
+	b=navFBi/QEk26NC3CZElXX+5BDPtENV3rKEjmv0zyApQRER2fwpCmKEvGsy04pgApp
+	 H/o/nXH6xCj/sAekB8hSZwCCdnOoTQJD2lIQgWcLh6nLdyAlQ2bt5/Arga6FhqKiBT
+	 c8tDhH6s7eXa0C2gIl/S1JTf/APNuKFdWFUiMbtNKnJnHNc1mViewJGx11cEKlenh3
+	 Geete8Ned8PittIvTFJXAp9sTS+1aeiNCL+Wb0NMI6lZB6h2RCymovVTfxzFZgGg0h
+	 Ko9djV3VGavCrqzDeYJU0bDt175757Y+TE8v3bgo56Ri0Yph6Cu9LW3PjESUjYqYEQ
+	 +as76DDHReOwQ==
+Message-ID: <a31bc0f2-4f82-4e15-95b8-c17dc46e7bf5@kernel.org>
+Date: Sun, 23 Jun 2024 09:03:15 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,7 +35,7 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 2/3] hwrng: add Rockchip SoC hwrng driver
+Subject: Re: [PATCH v4 1/3] dt-bindings: rng: Add Rockchip RNG bindings
 To: Daniel Golle <daniel@makrotopia.org>,
  Aurelien Jarno <aurelien@aurel32.net>, Olivia Mackall <olivia@selenic.com>,
  Herbert Xu <herbert@gondor.apana.org.au>, Rob Herring <robh@kernel.org>,
@@ -50,7 +50,7 @@ To: Daniel Golle <daniel@makrotopia.org>,
  linux-arm-kernel@lists.infradead.org, linux-rockchip@lists.infradead.org,
  linux-kernel@vger.kernel.org
 References: <cover.1719106472.git.daniel@makrotopia.org>
- <240db6e0ab07e8e2a86da99b0fc085eabaf9f0cc.1719106472.git.daniel@makrotopia.org>
+ <b28ccedac0a51f8a437f7ceb5175e3b70696c8c2.1719106472.git.daniel@makrotopia.org>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -96,44 +96,22 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <240db6e0ab07e8e2a86da99b0fc085eabaf9f0cc.1719106472.git.daniel@makrotopia.org>
+In-Reply-To: <b28ccedac0a51f8a437f7ceb5175e3b70696c8c2.1719106472.git.daniel@makrotopia.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 23/06/2024 05:33, Daniel Golle wrote:
-> +
-> +	rk_rng->rng.name = dev_driver_string(dev);
-> +#ifndef CONFIG_PM
-> +	rk_rng->rng.init = rk_rng_init;
-> +	rk_rng->rng.cleanup = rk_rng_cleanup;
-> +#endif
-> +	rk_rng->rng.read = rk_rng_read;
-> +	rk_rng->rng.priv = (unsigned long) dev;
-> +	rk_rng->rng.quality = 900;
+On 23/06/2024 05:32, Daniel Golle wrote:
+> From: Aurelien Jarno <aurelien@aurel32.net>
+> 
+> Add the True Random Number Generator on the Rockchip RK3568 SoC.
+> 
+> Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 
-I doubt in this value. Usually SoC vendors do not provide datasheet with
-any reliable and verifiable (so one which could be proven by 3rd party)
-information. Can you provide a source? (and vendor downstream tree does
-not really count)
+My comments from v2, which I reminded at v3, were not addressed.
 
-> +
-> +	pm_runtime_set_autosuspend_delay(dev, RK_RNG_AUTOSUSPEND_DELAY);
-> +	pm_runtime_use_autosuspend(dev);
-> +	devm_pm_runtime_enable(dev);
-> +
-> +	ret = devm_hwrng_register(dev, &rk_rng->rng);
-> +	if (ret)
-> +		return dev_err_probe(&pdev->dev, ret, "Failed to register Rockchip hwrng\n");
-> +
-> +	dev_dbg(&pdev->dev, "Registered Rockchip hwrng\n");
-
-Drop, it is not useful at all. Srsly, we had already long enough talk,
-which wasted time of three people. Why do you insist on wasting more?
-
-There is no single benefit of such debug statement. sysfs already
-provides you this information. Simple entry/exit  is provided by
-tracing. You duplicate existing interfaces without any benefit, because
-this prints nothing more.
+Respond to each of them and acknowledge that you are going to implement
+the change.
 
 Best regards,
 Krzysztof
