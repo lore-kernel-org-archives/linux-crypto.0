@@ -1,103 +1,167 @@
-Received: from mail.manjaro.org (mail.manjaro.org [116.203.91.91])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8192113AA39;
-	Sun, 23 Jun 2024 11:47:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.91.91
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2637A145FE5;
+	Sun, 23 Jun 2024 13:09:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719143282; cv=none; b=t6g/e2SpM81ScRyI6t3GDs5JcTPDYHwsA3dBLMmLvshSOLUrjGUY/JNx4sjC+WxNUBmYsc6ihFg89DDtbZpxnH1G3tdxSiaYNaN/YRETwEL2YR91RD3oVumXrm9Zm6WSJuMK8b7LFdx/DucWeCTXSs701rB5iBGh9VZVcmMq3zw=
+	t=1719148151; cv=none; b=cnrm0Tfo5ssV7BQ6SVgbLJy9vHi3cagWMtP0HSoMI5wyMXYititWh+cABoct1nsi7GKElQcQsuENgJLbngb5Z0IztBcquB03zDdlfJRAQaQmpsK1dqnLSvQMmGrec9dgajeRspmiDc/EKpZmBR7dMgAQe3wsSxiByDgJ/CE8hT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719143282; c=relaxed/simple;
-	bh=w+CDf5w2t977KxI8pwc/QoX7UorZ1kCyn3RckVK/bto=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=aINH7IBJFpy0awZ0JhVu17l4w5bNHwz5rYQ8/PKBrb5zHEeikL1Zvm+RTki/bfwO/dLUrYOI1KzcLStpxgafX21sGpnatUy2T7xm7UJdJ4zx9x73jtiRq5wTSXtjDAioauhflj0gLe1k/4O5TYeXrkg9tMRT2qh1I/yn3jQdf6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org; spf=pass smtp.mailfrom=manjaro.org; dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b=hty961XI; arc=none smtp.client-ip=116.203.91.91
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manjaro.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b="hty961XI"
+	s=arc-20240116; t=1719148151; c=relaxed/simple;
+	bh=Glj3PVhq07s9ybEWPOZIinwXH1m+JqkijiqUrCCJCbw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EOooGQuuBsJ9suhd8JFdl+OFD/d7DkLTi1fCD/nBXclOSabAY9h21AZZPMzI720NSjiqIE+fmHKIzu73KHIevMk6iUIXa6QT6wVOQ8QoU7lzuUSIc/R2Mptg1p0hkebzgNlPP8G3ZMAvI4/ehHaDDok/FRTpJE3Zqr+nB3s3Kok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.97.1)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1sLMxY-0000000081f-4C5p;
+	Sun, 23 Jun 2024 13:08:45 +0000
+Date: Sun, 23 Jun 2024 14:08:35 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Aurelien Jarno <aurelien@aurel32.net>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiko Stuebner <heiko@sntech.de>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <ukleinek@debian.org>,
+	Sebastian Reichel <sebastian.reichel@collabora.com>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Dragan Simic <dsimic@manjaro.org>, Martin Kaiser <martin@kaiser.cx>,
+	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 1/3] dt-bindings: rng: Add Rockchip RNG bindings
+Message-ID: <ZngeUxK6r0qqBj28@makrotopia.org>
+References: <cover.1719106472.git.daniel@makrotopia.org>
+ <b28ccedac0a51f8a437f7ceb5175e3b70696c8c2.1719106472.git.daniel@makrotopia.org>
+ <a31bc0f2-4f82-4e15-95b8-c17dc46e7bf5@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manjaro.org; s=2021;
-	t=1719143275;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yZOaYUoA97Ep2akKiluJXo61048Ck0byvoUwJNmlD6g=;
-	b=hty961XIXoBvEtYoWvvtAB6zK7d8snxmtmqhs4AqVp2gw3TC30vm8HF6cI0u2mXj4TJxJO
-	qvNAGUeGfecMkrperYCtVjAVDDwcqMhiH6CopcAefHqTn1Ff+YFz9DqP9sn5QsD7VpQocR
-	jMfRLNJOsjghVOPvfwH9WbBKW3dtgRDzKK4NV9Da/CjszS2c7TGGy+HtIS3mr7UgP00Br9
-	e3qGF+JjNR4FZ/7YpUswgtKRk8nyCJTPQQh78PtjYEnPLd9MjC1eDGPzJ4k+u8JTFyqMWP
-	0LBYR/vgWbO9fqNnOBYLeAjgmBR4wKXEhmG0TV1JwG7wnwURsrgLvxqBbsiGQg==
-Date: Sun, 23 Jun 2024 13:47:47 +0200
-From: Dragan Simic <dsimic@manjaro.org>
-To: =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <ukleinek@debian.org>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>, Daniel Golle
- <daniel@makrotopia.org>, Aurelien Jarno <aurelien@aurel32.net>, Olivia
- Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, Rob
- Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor
- Dooley <conor+dt@kernel.org>, Heiko Stuebner <heiko@sntech.de>, Philipp
- Zabel <p.zabel@pengutronix.de>, Sebastian Reichel
- <sebastian.reichel@collabora.com>, Sascha Hauer <s.hauer@pengutronix.de>,
- Martin Kaiser <martin@kaiser.cx>, Ard Biesheuvel <ardb@kernel.org>,
- linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-rockchip@lists.infradead.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 2/3] hwrng: add Rockchip SoC hwrng driver
-In-Reply-To: <395f8ebe-1392-4d8f-b91f-c9a8f5f48afe@debian.org>
-References: <cover.1719106472.git.daniel@makrotopia.org>
- <240db6e0ab07e8e2a86da99b0fc085eabaf9f0cc.1719106472.git.daniel@makrotopia.org>
- <612bd49c-c44a-41f2-89e9-c96e62e52a0a@kernel.org>
- <395f8ebe-1392-4d8f-b91f-c9a8f5f48afe@debian.org>
-Message-ID: <051d76a29de62b943b221cf0c7662ef1@manjaro.org>
-X-Sender: dsimic@manjaro.org
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Authentication-Results: ORIGINATING;
-	auth=pass smtp.auth=dsimic@manjaro.org smtp.mailfrom=dsimic@manjaro.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a31bc0f2-4f82-4e15-95b8-c17dc46e7bf5@kernel.org>
 
-Hello Uwe,
+Hi Krzysztof,
 
-On 2024-06-23 11:46, Uwe Kleine-König wrote:
-> On 6/23/24 09:00, Krzysztof Kozlowski wrote:
->> On 23/06/2024 05:33, Daniel Golle wrote:
->>> +
->>> +	pm_runtime_set_autosuspend_delay(dev, RK_RNG_AUTOSUSPEND_DELAY);
->>> +	pm_runtime_use_autosuspend(dev);
->>> +	devm_pm_runtime_enable(dev);
->>> +
->>> +	ret = devm_hwrng_register(dev, &rk_rng->rng);
->>> +	if (ret)
->>> +		return dev_err_probe(&pdev->dev, ret, "Failed to register Rockchip 
->>> hwrng\n");
->>> +
->>> +	dev_dbg(&pdev->dev, "Registered Rockchip hwrng\n");
->> 
->> Drop, it is not useful at all. Srsly, we had already long enough talk,
->> [...]
+thank you for your patiente and repeated review of this series.
+
+On Sun, Jun 23, 2024 at 09:03:15AM +0200, Krzysztof Kozlowski wrote:
+> On 23/06/2024 05:32, Daniel Golle wrote:
+> > From: Aurelien Jarno <aurelien@aurel32.net>
+> > 
+> > Add the True Random Number Generator on the Rockchip RK3568 SoC.
+> > 
+> > Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
+> > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 > 
-> And in this long talk using dev_dbg() was one of the suggestions for a
-> compromise. For me this is ok.
+> My comments from v2, which I reminded at v3, were not addressed.
 > 
->> There is no single benefit of such debug statement. sysfs already
->> provides you this information. Simple entry/exit  is provided by
->> tracing. You duplicate existing interfaces without any benefit, 
->> because
->> this prints nothing more.
+> Respond to each of them and acknowledge that you are going to implement
+> the change.
+
+Your comments to v1which I'm aware of are:
+https://patchwork.kernel.org/comment/25087874/
+
+> > +++ b/Documentation/devicetree/bindings/rng/rockchip-rng.yaml
+> Filename matching compatible, so "rockchip,rk3568-rng.yaml"
+
+I've changed the filename.
+
+> > +title: Rockchip TRNG bindings
+
+> Drop "bindings"
+
+I've changed the title accordingly (now: "Rockchip TRNG" in v4).
+
+> > +description:
+> > +  This driver interface with the True Random Number Generator present in some
 > 
-> There might be a (small) value if you want to know when during boot
-> the device becomes available. So having a dev_dbg() that can be
-> enabled dynamically (assuming DYNAMIC_DEBUG=y) and isn't in the way
-> otherwise might be justified. IMHO a dev_dbg is lightweight enough
-> that *I* won't continue the discussion.
+> Drop "This driver interface" and make it a proper sentence. Bindings are
+> not about drivers.
 
-For anyone interested, below is an example that shows the usability
-of knowing when a device becomes available:
+This has been addressed by Aurelien and further improved by me in v3.
 
-https://gitlab.manjaro.org/manjaro-arm/packages/core/linux/-/issues/21
+> > +  clocks:
+> > +    minItems: 2
+
+> Drop minItems.
+
+Aurelien did that in v2.
+
+> > +  clock-names:
+> > +    items:
+> > +      - const: clk
+> > +      - const: hclk
+> 
+> You need to explain what are these in clocks. Also you need better
+> names. A clock name "clk" is useless.
+
+Clocks now have meaningful names and descriptions.
+
+> > +  reset-names:
+> > +    items:
+> > +      - const: reset
+> 
+> Drop reset-names entirely, not useful.
+
+Aurelien did so in v2.
+
+Your comments to v2 which I'm aware of are:
+https://patchwork.kernel.org/comment/25111597/
+
+> > Add the RNG bindings for the RK3568 SoC from Rockchip
+
+> Use subject prefixes matching the subsystem (git log --oneline -- ...),
+> so it is rng, not RNG. Also, you are not adding all-Rockhip RNG but a
+> specific device.
+> 
+> Subject: drop second, redundant "bindings".
+
+I've changed 'RNG' into 'rng' in the subject and spelled it out in the
+commit message.
+
+> > +description: True Random Number Generator for some Rockchip SoCs
+> 
+> s/for some Rockchip SoCs/on Rokchip RK3568 SoC/
+
+I've adopted your suggestion in v3 and then fixed the typo in v4.
+
+> 
+> > +  clock-names:
+> > +    items:
+> > +      - const: trng_clk
+> > +      - const: trng_hclk
+
+> These are too vague names. Everything is a clk in clock-names, so no
+> need usually to add it as name suffix. Give them some descriptive names,
+> e.g. core and ahb.
+
+If changed the names to the suggested 'core' and 'ahb'.
+
+Before sending another round of patches, just to make sure we are on
+the same page, please confirm that what remains is
+Subject: dt-bindings: rng: Add Rockchip RNG bindings
+which not only should be 'rng' in small letters but also name the exact
+chip, eg.:
+Subject: dt-bindings: rng: add TRNG on the Rockchip RK3568 SoC
+
+If there are any other comments you made which I'm not aware of, please
+point me to them.
+
+
+Cheers
+
+
+Daniel
