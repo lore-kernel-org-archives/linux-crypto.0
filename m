@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AFD91A2C1C;
-	Mon, 24 Jun 2024 23:23:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E06671A255B;
+	Mon, 24 Jun 2024 23:23:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719271384; cv=none; b=A5L194EiY0hpGSR+Hv9XDyi7/oAViINGqGveHKh0Emd8leXdnCh6zHKqEFZrjSFE6sWpnwkWnv3GmCGUvyRsH43VhdQBEsvSVJjFQmZwz108tgIYJHzA6WmbnptWYenfYNngZtLqQ5Aky/g8vmIaa2SgKrgWfYAGyC7tt0pvLbE=
+	t=1719271386; cv=none; b=ZBQ7UH5+Pb4iaw33GOYlbijxcaBckzSZWpFaUGm5HFEER6Sn3vrXnlIfEL8ORzlup6nrQJRb4l6kFuugQC9jOkqwB0k8EbehcjjmFScPslRg9fLa0y2c2Ji2a6ZMYxd5sXrqKrEpr7xr65fdlhtQTPF8rN0Cyct1arDhpzaK9Ho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719271384; c=relaxed/simple;
-	bh=2dYzk+Vphu9QcyP6sHBUGi650SCMFm21mzEIEJP+Rz8=;
+	s=arc-20240116; t=1719271386; c=relaxed/simple;
+	bh=KvmbdydXpOos6pQj7PzGDoZI5wEE4oJZr9Q2b/564JQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=c1GbqAWOluyprFPoxbOn48Rh7NtILK6vtirpTI1fl/2whw9/fBiFQwsIMHIzR2nbsGyf5IT/jjldeOI5s+HqvgoDm3NClqmBU8levCbXOPY5uP4Ja5VOLMY+XpRM1ZBIT6fZhRiZYIa4+fuCjxK1YaoJnoMaApb7iK5sbr243Z8=
+	 MIME-Version; b=gupMK45ntUXGFSlWju8WgkU4yFGSRZP7dUB0EDKh15XFj8bWHdtRat3K7pn2foZ1ou12FmdvScHN8ks/SNl0z732xE4dttG/2JYXoNGsQJ1qsjX9fHywqhmAWg5tONPxLBCVRCVcHNQoN3zv7qHky2ziTYA9NaO6hgIZYaYtPvk=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 25D66339;
-	Mon, 24 Jun 2024 16:23:27 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 687B7DA7;
+	Mon, 24 Jun 2024 16:23:29 -0700 (PDT)
 Received: from localhost.localdomain (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 44D803F766;
-	Mon, 24 Jun 2024 16:23:00 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8797A3F766;
+	Mon, 24 Jun 2024 16:23:02 -0700 (PDT)
 From: Andre Przywara <andre.przywara@arm.com>
 To: Corentin Labbe <clabbe.montjoie@gmail.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
@@ -34,9 +34,9 @@ Cc: Ryan Walklin <ryan@testtoast.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-sunxi@lists.linux.dev,
 	devicetree@vger.kernel.org
-Subject: [PATCH v2 3/4] crypto: sun8i-ce - add Allwinner H616 support
-Date: Tue, 25 Jun 2024 00:21:09 +0100
-Message-Id: <20240624232110.9817-4-andre.przywara@arm.com>
+Subject: [PATCH v2 4/4] arm64: dts: allwinner: h616: add crypto engine node
+Date: Tue, 25 Jun 2024 00:21:10 +0100
+Message-Id: <20240624232110.9817-5-andre.przywara@arm.com>
 X-Mailer: git-send-email 2.39.4
 In-Reply-To: <20240624232110.9817-1-andre.przywara@arm.com>
 References: <20240624232110.9817-1-andre.przywara@arm.com>
@@ -48,66 +48,38 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The crypto engine in the Allwinner H616 is very similar to the H6, but
-needs the base address for the task descriptor and the addresses within
-it to be expressed in words, not in bytes.
-
-Add a new variant struct entry for the H616, and set the new flag to
-mark the use of 34 bit addresses. Also the internal 32K oscillator is
-required for TRNG operation, so specify all four clocks.
+The Allwinner H616 SoC contains a crypto engine very similar to the H6
+version, but with all base addresses in the DMA descriptors shifted by
+two bits. This requires a new compatible string.
+Also the H616 CE relies on the internal osciallator for the TRNG
+operation, so we need to reference this clock.
 
 Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-Reviewed-by: Chen-Yu Tsai <wens@csie.org>
-Tested-by: Ryan Walklin <ryan@testtoast.com>
-Tested-by: Philippe Simons <simons.philippe@gmail.com>
 ---
- .../crypto/allwinner/sun8i-ce/sun8i-ce-core.c | 26 +++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-index 6d45c1e559f7d..e55e58e164db3 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-@@ -92,6 +92,30 @@ static const struct ce_variant ce_h6_variant = {
- 	.trng = CE_ALG_TRNG_V2,
- };
+diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
+index 921d5f61d8d6a..187663d45ed72 100644
+--- a/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
++++ b/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
+@@ -113,6 +113,16 @@ soc {
+ 		#size-cells = <1>;
+ 		ranges = <0x0 0x0 0x0 0x40000000>;
  
-+static const struct ce_variant ce_h616_variant = {
-+	.alg_cipher = { CE_ALG_AES, CE_ALG_DES, CE_ALG_3DES,
-+	},
-+	.alg_hash = { CE_ALG_MD5, CE_ALG_SHA1, CE_ALG_SHA224, CE_ALG_SHA256,
-+		CE_ALG_SHA384, CE_ALG_SHA512
-+	},
-+	.op_mode = { CE_OP_ECB, CE_OP_CBC
-+	},
-+	.cipher_t_dlen_in_bytes = true,
-+	.hash_t_dlen_in_bits = true,
-+	.prng_t_dlen_in_bytes = true,
-+	.trng_t_dlen_in_bytes = true,
-+	.needs_word_addresses = true,
-+	.ce_clks = {
-+		{ "bus", 0, 200000000 },
-+		{ "mod", 300000000, 0 },
-+		{ "ram", 0, 400000000 },
-+		{ "trng", 0, 0 },
-+		},
-+	.esr = ESR_H6,
-+	.prng = CE_ALG_PRNG_V2,
-+	.trng = CE_ALG_TRNG_V2,
-+};
++		crypto: crypto@1904000 {
++			compatible = "allwinner,sun50i-h616-crypto";
++			reg = <0x01904000 0x1000>;
++			interrupts = <GIC_SPI 91 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&ccu CLK_BUS_CE>, <&ccu CLK_CE>,
++				 <&ccu CLK_MBUS_CE>, <&rtc CLK_IOSC>;
++			clock-names = "bus", "mod", "ram", "trng";
++			resets = <&ccu RST_BUS_CE>;
++		};
 +
- static const struct ce_variant ce_a64_variant = {
- 	.alg_cipher = { CE_ALG_AES, CE_ALG_DES, CE_ALG_3DES,
- 	},
-@@ -1097,6 +1121,8 @@ static const struct of_device_id sun8i_ce_crypto_of_match_table[] = {
- 	  .data = &ce_h5_variant },
- 	{ .compatible = "allwinner,sun50i-h6-crypto",
- 	  .data = &ce_h6_variant },
-+	{ .compatible = "allwinner,sun50i-h616-crypto",
-+	  .data = &ce_h616_variant },
- 	{}
- };
- MODULE_DEVICE_TABLE(of, sun8i_ce_crypto_of_match_table);
+ 		syscon: syscon@3000000 {
+ 			compatible = "allwinner,sun50i-h616-system-control";
+ 			reg = <0x03000000 0x1000>;
 -- 
 2.39.4
 
