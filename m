@@ -1,56 +1,57 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92395154C18
-	for <linux-crypto@vger.kernel.org>; Tue, 25 Jun 2024 14:39:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E44416C6AE
+	for <linux-crypto@vger.kernel.org>; Tue, 25 Jun 2024 14:41:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719326345; cv=none; b=Clal5leqId1qTkcoysxCGzozUUVCEllQIA1gWyHhn62fohCAl6gC5MtgGCAKVylvYA7dEqqqjaWexQiVXjva0uhMRYIzoA9wIZUEnxmPTyWDhwYBgrYLv6nMLau4ZpZUD/T/DUovVmnyF71z1de1T8NvMUSrQpgsxnZG4Fv+I5A=
+	t=1719326518; cv=none; b=YuzWv7y8+4A8Um3dGt0SxWVHiypX4FLZ71Hat0kP/Fu1qbOhhoSEuOSgp9xcWF2leDfFWrJChYiYzBY82/SxVoCja/QUr6NYPRZmK0leu64/FoTJqUaXYHy1aTI5Titrnncmb0rl0+keW1SW8hqBNStJB8HAlLchh2TngEt445g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719326345; c=relaxed/simple;
-	bh=ejEto1qvfKbvtF0c33giZ5oov2DqFV0klyKmleu1wTA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=glwAKBwkatdvjqZMBNx4Y6zjYFoy8E1d65Ss5Yvu18zr9uNtkZd/G0NKk5PiTluSssduIIxKFkVkhrpGZbNNENbtpspEtZw8qHj3F+RxMILYBf5K6WwOJTCKWpNdWYPcojBNBY9uCxr0Or1JUOvVUfGPGgS5Zz4Y8z+O/TsHyPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fZoWuTs5; arc=none smtp.client-ip=192.198.163.12
+	s=arc-20240116; t=1719326518; c=relaxed/simple;
+	bh=wGmnE2+rdmXlGx8/2odHwGZ+Ls8tK5BwMLXdI2hXtNc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AKEHrKWCfMDY2fXzCasJ99oMzdxVUxPCGJed27CG5oR9c9Puvmb9OsohY3xS6efAS7HnohG9ktMYRp7yDiihqPL5Gs3/qriuW/pHCT5GKhR14ONxYO63icTTKcAw+fTxFx+msYr83WbsEZt9io99SDe+beYVLqmvJtbTpzUESbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iy7snxQm; arc=none smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fZoWuTs5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iy7snxQm"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719326344; x=1750862344;
+  t=1719326517; x=1750862517;
   h=from:to:cc:subject:date:message-id:mime-version:
    content-transfer-encoding;
-  bh=ejEto1qvfKbvtF0c33giZ5oov2DqFV0klyKmleu1wTA=;
-  b=fZoWuTs58Getkhtg6Pm1gn3r4mCoTTKUp6tnAhDpqYJrAWwBLN4n5fBy
-   KRWjanau/4WJXSZQn4b/UjZQ685jtFLfy5oFAifAlFG2FyvjcJm1Olwcy
-   7G59qZipIvAdva26TyekMOq9ejbbbp5qpjcAZmgFp4kj9mSEphhCM/zUf
-   9r/o2arfHwDh4eQ+TIdbFzpkYNmo79wq+oRMigS1RUEfGvWuWgtOeacKw
-   alo/ofR2mX1e5EVhg1pmBwsOxCB02FxIS7nn2t0M3EeqidCE58NMtcTR6
-   rOVsC0ThUPayY+HamencpX9EQAqgoYZEZD5Q70evqd9TKFNK+dQd4RCFu
-   A==;
-X-CSE-ConnectionGUID: CnFkIYmoTXe3ku18Eg1DrA==
-X-CSE-MsgGUID: GFwyyfFPQFCacIn9nllrdw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11114"; a="20230657"
+  bh=wGmnE2+rdmXlGx8/2odHwGZ+Ls8tK5BwMLXdI2hXtNc=;
+  b=iy7snxQmAgANHkAuLKo+QXCPA63Cz/jZLD8PNE7ipW5pTS5z79+gHuFc
+   uRCqIYnudA7xs2LiS3+YnoTHXxFB2eg2U8YRGA6vxFMTup0REo3evnShT
+   DylzNMP3oWPpmxt+pJHY3mHQLn5q7ZgON7NG8lXkrUsq2VtoRyDWfucIs
+   qOMhHM+6WJBdjCk1pqqsgIInsW+pfpb+fNL+Xe9f02JY5McT62Fu9fN5C
+   FDhXP8vop4q9AozsPkYv9y4kMopnEeZEZPIvtUrjxqeMMcAB6GtlMQxoY
+   wtPHMc7PWHKj5LPJzdJw9CLRDycCQpb7V/u2vpjhg3c8D5fwzYDYtqDPh
+   g==;
+X-CSE-ConnectionGUID: U2GEHmuRQ0yXziXzifccig==
+X-CSE-MsgGUID: RaLsPDMBSj6pw32zxhZDvQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11114"; a="16226024"
 X-IronPort-AV: E=Sophos;i="6.08,264,1712646000"; 
-   d="scan'208";a="20230657"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2024 07:39:02 -0700
-X-CSE-ConnectionGUID: 5i8VSgkPSvy6WOMhInA3Hw==
-X-CSE-MsgGUID: ZRdlcL5XTbiWULJBIxdRoA==
+   d="scan'208";a="16226024"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2024 07:41:43 -0700
+X-CSE-ConnectionGUID: iZ8vD7hSTJSfUqwg1Syk2A==
+X-CSE-MsgGUID: EH1HCIKYQwi3aHRoHQA0IQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.08,264,1712646000"; 
-   d="scan'208";a="48065991"
+   d="scan'208";a="43540629"
 Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.216])
-  by fmviesa003.fm.intel.com with ESMTP; 25 Jun 2024 07:38:59 -0700
+  by fmviesa007.fm.intel.com with ESMTP; 25 Jun 2024 07:41:42 -0700
 From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 To: herbert@gondor.apana.org.au
 Cc: linux-crypto@vger.kernel.org,
 	qat-linux@intel.com,
-	Nivas Varadharajan Mugunthakumar <nivasx.varadharajan.mugunthakumar@intel.com>,
+	Hareshx Sankar Raj <hareshx.sankar.raj@intel.com>,
+	Damian Muszynski <damian.muszynski@intel.com>,
 	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH] crypto: qat - extend scope of lock in adf_cfg_add_key_value_param()
-Date: Tue, 25 Jun 2024 15:38:50 +0100
-Message-ID: <20240625143857.5778-1-giovanni.cabiddu@intel.com>
+Subject: [PATCH] crypto: qat - fix unintentional re-enabling of error interrupts
+Date: Tue, 25 Jun 2024 15:41:19 +0100
+Message-ID: <20240625144139.6003-1-giovanni.cabiddu@intel.com>
 X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -61,46 +62,59 @@ MIME-Version: 1.0
 Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
 Content-Transfer-Encoding: 8bit
 
-From: Nivas Varadharajan Mugunthakumar <nivasx.varadharajan.mugunthakumar@intel.com>
+From: Hareshx Sankar Raj <hareshx.sankar.raj@intel.com>
 
-The function adf_cfg_add_key_value_param() attempts to access and modify
-the key value store of the driver without locking.
+The logic that detects pending VF2PF interrupts unintentionally clears
+the section of the error mask register(s) not related to VF2PF.
+This might cause interrupts unrelated to VF2PF, reported through
+errsou3 and errsou5, to be reported again after the execution
+of the function disable_pending_vf2pf_interrupts() in dh895xcc
+and GEN2 devices.
 
-Extend the scope of cfg->lock to avoid a potential race condition.
+Fix by updating only section of errmsk3 and errmsk5 related to VF2PF.
 
-Fixes: 92bf269fbfe9 ("crypto: qat - change behaviour of adf_cfg_add_key_value_param()")
-Signed-off-by: Nivas Varadharajan Mugunthakumar <nivasx.varadharajan.mugunthakumar@intel.com>
+Signed-off-by: Hareshx Sankar Raj <hareshx.sankar.raj@intel.com>
+Reviewed-by: Damian Muszynski <damian.muszynski@intel.com>
 Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
- drivers/crypto/intel/qat/qat_common/adf_cfg.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ drivers/crypto/intel/qat/qat_common/adf_gen2_pfvf.c       | 4 +++-
+ .../crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c  | 8 ++++++--
+ 2 files changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_cfg.c b/drivers/crypto/intel/qat/qat_common/adf_cfg.c
-index 8836f015c39c..2cf102ad4ca8 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_cfg.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_cfg.c
-@@ -290,17 +290,19 @@ int adf_cfg_add_key_value_param(struct adf_accel_dev *accel_dev,
- 	 * 3. if the key exists with the same value, then return without doing
- 	 *    anything (the newly created key_val is freed).
- 	 */
-+	down_write(&cfg->lock);
- 	if (!adf_cfg_key_val_get(accel_dev, section_name, key, temp_val)) {
- 		if (strncmp(temp_val, key_val->val, sizeof(temp_val))) {
- 			adf_cfg_keyval_remove(key, section);
- 		} else {
- 			kfree(key_val);
--			return 0;
-+			goto out;
- 		}
- 	}
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen2_pfvf.c b/drivers/crypto/intel/qat/qat_common/adf_gen2_pfvf.c
+index 70ef11963938..43af81fcab86 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_gen2_pfvf.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_gen2_pfvf.c
+@@ -100,7 +100,9 @@ static u32 adf_gen2_disable_pending_vf2pf_interrupts(void __iomem *pmisc_addr)
+ 	errmsk3 |= ADF_GEN2_ERR_MSK_VF2PF(ADF_GEN2_VF_MSK);
+ 	ADF_CSR_WR(pmisc_addr, ADF_GEN2_ERRMSK3, errmsk3);
  
--	down_write(&cfg->lock);
- 	adf_cfg_keyval_add(key_val, section);
+-	errmsk3 &= ADF_GEN2_ERR_MSK_VF2PF(sources | disabled);
++	/* Update only section of errmsk3 related to VF2PF */
++	errmsk3 &= ~ADF_GEN2_ERR_MSK_VF2PF(ADF_GEN2_VF_MSK);
++	errmsk3 |= ADF_GEN2_ERR_MSK_VF2PF(sources | disabled);
+ 	ADF_CSR_WR(pmisc_addr, ADF_GEN2_ERRMSK3, errmsk3);
+ 
+ 	/* Return the sources of the (new) interrupt(s) */
+diff --git a/drivers/crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c b/drivers/crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c
+index 6e24d57e6b98..c0661ff5e929 100644
+--- a/drivers/crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c
++++ b/drivers/crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c
+@@ -193,8 +193,12 @@ static u32 disable_pending_vf2pf_interrupts(void __iomem *pmisc_addr)
+ 	ADF_CSR_WR(pmisc_addr, ADF_GEN2_ERRMSK3, errmsk3);
+ 	ADF_CSR_WR(pmisc_addr, ADF_GEN2_ERRMSK5, errmsk5);
+ 
+-	errmsk3 &= ADF_DH895XCC_ERR_MSK_VF2PF_L(sources | disabled);
+-	errmsk5 &= ADF_DH895XCC_ERR_MSK_VF2PF_U(sources | disabled);
++	/* Update only section of errmsk3 and errmsk5 related to VF2PF */
++	errmsk3 &= ~ADF_DH895XCC_ERR_MSK_VF2PF_L(ADF_DH895XCC_VF_MSK);
++	errmsk5 &= ~ADF_DH895XCC_ERR_MSK_VF2PF_U(ADF_DH895XCC_VF_MSK);
 +
-+out:
- 	up_write(&cfg->lock);
- 	return 0;
- }
++	errmsk3 |= ADF_DH895XCC_ERR_MSK_VF2PF_L(sources | disabled);
++	errmsk5 |= ADF_DH895XCC_ERR_MSK_VF2PF_U(sources | disabled);
+ 	ADF_CSR_WR(pmisc_addr, ADF_GEN2_ERRMSK3, errmsk3);
+ 	ADF_CSR_WR(pmisc_addr, ADF_GEN2_ERRMSK5, errmsk5);
+ 
 -- 
 2.44.0
 
