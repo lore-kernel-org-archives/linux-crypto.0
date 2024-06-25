@@ -1,56 +1,56 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DD001BC57
-	for <linux-crypto@vger.kernel.org>; Tue, 25 Jun 2024 14:37:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92395154C18
+	for <linux-crypto@vger.kernel.org>; Tue, 25 Jun 2024 14:39:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719326224; cv=none; b=cgRjjOwxZDXyteEqjvfEamKaxlEKT2sHkdEib1z5d2Os+NqRqnZY4KETV6q4GggLRDttM+tHfqFTxUH7y08plALDtya/zTYjyXk67lG+tSH00Mj5KhCApR7vJAlEiIAMnfbaoaq4F31J/1QkLQHUSHJkNdU2GUho1yuV6OoPZoY=
+	t=1719326345; cv=none; b=Clal5leqId1qTkcoysxCGzozUUVCEllQIA1gWyHhn62fohCAl6gC5MtgGCAKVylvYA7dEqqqjaWexQiVXjva0uhMRYIzoA9wIZUEnxmPTyWDhwYBgrYLv6nMLau4ZpZUD/T/DUovVmnyF71z1de1T8NvMUSrQpgsxnZG4Fv+I5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719326224; c=relaxed/simple;
-	bh=JABPh5kbiWufGNmHKqZxbo988NZNSUexAQHsXt+D1PA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=olLl7QFw5BvKXg8845/lj/1shSvZaGp8qHC0w2bmLc2GyV0GBbsGSld22x4/h8XPykfuSPMcEeSJZXv+savjC0bgL6DvDj1t+6C5sc2E3zwGyestL+vhLXiviobfw9piCGZj/rcGqbWt3Lx/LnM4HsVXJMqslALrmakqEnPPyo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=m7WzfKBX; arc=none smtp.client-ip=192.198.163.10
+	s=arc-20240116; t=1719326345; c=relaxed/simple;
+	bh=ejEto1qvfKbvtF0c33giZ5oov2DqFV0klyKmleu1wTA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=glwAKBwkatdvjqZMBNx4Y6zjYFoy8E1d65Ss5Yvu18zr9uNtkZd/G0NKk5PiTluSssduIIxKFkVkhrpGZbNNENbtpspEtZw8qHj3F+RxMILYBf5K6WwOJTCKWpNdWYPcojBNBY9uCxr0Or1JUOvVUfGPGgS5Zz4Y8z+O/TsHyPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fZoWuTs5; arc=none smtp.client-ip=192.198.163.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="m7WzfKBX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fZoWuTs5"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719326222; x=1750862222;
+  t=1719326344; x=1750862344;
   h=from:to:cc:subject:date:message-id:mime-version:
    content-transfer-encoding;
-  bh=JABPh5kbiWufGNmHKqZxbo988NZNSUexAQHsXt+D1PA=;
-  b=m7WzfKBXmzT5xXDh4zt9icVqRRkQXRCrb79D+/gPrEyTZ9J6oeUAvwDQ
-   3r4ox8lLj2heI7ax0cdn8WZoF5UQjbCIJEMpvfsWrvrzODj36xdH/RcFy
-   JEwgSPTtQXqA0hyzVr3B7dUnXBguUpezvQunuykultxu/KylQHCdsrzkQ
-   O49IhKxY4ga76gVVoq0ipJEb2Ecc1vMqvd618GjUkfx3f01/Kb9Vftulv
-   dS61FY4AbFUELBhw5ISM9GYsQV0JJSZd5kBQEb5GF/uIZn9ELTtAUsm6L
-   9ukH0Pq/2p8Cc1THi0EEiRk7/0zUd0GyqIeXREtHX3IzG6gZdXNEV91E2
+  bh=ejEto1qvfKbvtF0c33giZ5oov2DqFV0klyKmleu1wTA=;
+  b=fZoWuTs58Getkhtg6Pm1gn3r4mCoTTKUp6tnAhDpqYJrAWwBLN4n5fBy
+   KRWjanau/4WJXSZQn4b/UjZQ685jtFLfy5oFAifAlFG2FyvjcJm1Olwcy
+   7G59qZipIvAdva26TyekMOq9ejbbbp5qpjcAZmgFp4kj9mSEphhCM/zUf
+   9r/o2arfHwDh4eQ+TIdbFzpkYNmo79wq+oRMigS1RUEfGvWuWgtOeacKw
+   alo/ofR2mX1e5EVhg1pmBwsOxCB02FxIS7nn2t0M3EeqidCE58NMtcTR6
+   rOVsC0ThUPayY+HamencpX9EQAqgoYZEZD5Q70evqd9TKFNK+dQd4RCFu
    A==;
-X-CSE-ConnectionGUID: LlRthfnyRXOA5yZ8+lZvZQ==
-X-CSE-MsgGUID: z4nFh/TKRF+5D8WnwlyNcw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11114"; a="27755784"
+X-CSE-ConnectionGUID: CnFkIYmoTXe3ku18Eg1DrA==
+X-CSE-MsgGUID: GFwyyfFPQFCacIn9nllrdw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11114"; a="20230657"
 X-IronPort-AV: E=Sophos;i="6.08,264,1712646000"; 
-   d="scan'208";a="27755784"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2024 07:37:02 -0700
-X-CSE-ConnectionGUID: jLJpuN8bRRik3o6sHYi1pQ==
-X-CSE-MsgGUID: Cw7RF2tXSb6copCPVVUOJQ==
+   d="scan'208";a="20230657"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2024 07:39:02 -0700
+X-CSE-ConnectionGUID: 5i8VSgkPSvy6WOMhInA3Hw==
+X-CSE-MsgGUID: ZRdlcL5XTbiWULJBIxdRoA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.08,264,1712646000"; 
-   d="scan'208";a="43539878"
+   d="scan'208";a="48065991"
 Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.216])
-  by fmviesa007.fm.intel.com with ESMTP; 25 Jun 2024 07:37:00 -0700
+  by fmviesa003.fm.intel.com with ESMTP; 25 Jun 2024 07:38:59 -0700
 From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 To: herbert@gondor.apana.org.au
 Cc: linux-crypto@vger.kernel.org,
 	qat-linux@intel.com,
-	Damian Muszynski <damian.muszynski@intel.com>,
+	Nivas Varadharajan Mugunthakumar <nivasx.varadharajan.mugunthakumar@intel.com>,
 	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH] Documentation: qat: fix auto_reset attribute details
-Date: Tue, 25 Jun 2024 15:36:44 +0100
-Message-ID: <20240625143657.3381-1-giovanni.cabiddu@intel.com>
+Subject: [PATCH] crypto: qat - extend scope of lock in adf_cfg_add_key_value_param()
+Date: Tue, 25 Jun 2024 15:38:50 +0100
+Message-ID: <20240625143857.5778-1-giovanni.cabiddu@intel.com>
 X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -61,33 +61,46 @@ MIME-Version: 1.0
 Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
 Content-Transfer-Encoding: 8bit
 
-From: Damian Muszynski <damian.muszynski@intel.com>
+From: Nivas Varadharajan Mugunthakumar <nivasx.varadharajan.mugunthakumar@intel.com>
 
-The auto_reset attribute was introduced in kernel 6.9. Fix version and
-date in documentation.
+The function adf_cfg_add_key_value_param() attempts to access and modify
+the key value store of the driver without locking.
 
-Fixes: f5419a4239af ("crypto: qat - add auto reset on error")
-Signed-off-by: Damian Muszynski <damian.muszynski@intel.com>
+Extend the scope of cfg->lock to avoid a potential race condition.
+
+Fixes: 92bf269fbfe9 ("crypto: qat - change behaviour of adf_cfg_add_key_value_param()")
+Signed-off-by: Nivas Varadharajan Mugunthakumar <nivasx.varadharajan.mugunthakumar@intel.com>
 Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
- Documentation/ABI/testing/sysfs-driver-qat | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/crypto/intel/qat/qat_common/adf_cfg.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/ABI/testing/sysfs-driver-qat b/Documentation/ABI/testing/sysfs-driver-qat
-index 96020fb051c3..f290e77cd590 100644
---- a/Documentation/ABI/testing/sysfs-driver-qat
-+++ b/Documentation/ABI/testing/sysfs-driver-qat
-@@ -143,8 +143,8 @@ Description:
- 		This attribute is only available for qat_4xxx devices.
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_cfg.c b/drivers/crypto/intel/qat/qat_common/adf_cfg.c
+index 8836f015c39c..2cf102ad4ca8 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_cfg.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_cfg.c
+@@ -290,17 +290,19 @@ int adf_cfg_add_key_value_param(struct adf_accel_dev *accel_dev,
+ 	 * 3. if the key exists with the same value, then return without doing
+ 	 *    anything (the newly created key_val is freed).
+ 	 */
++	down_write(&cfg->lock);
+ 	if (!adf_cfg_key_val_get(accel_dev, section_name, key, temp_val)) {
+ 		if (strncmp(temp_val, key_val->val, sizeof(temp_val))) {
+ 			adf_cfg_keyval_remove(key, section);
+ 		} else {
+ 			kfree(key_val);
+-			return 0;
++			goto out;
+ 		}
+ 	}
  
- What:		/sys/bus/pci/devices/<BDF>/qat/auto_reset
--Date:		March 2024
--KernelVersion:	6.8
-+Date:		May 2024
-+KernelVersion:	6.9
- Contact:	qat-linux@intel.com
- Description:	(RW) Reports the current state of the autoreset feature
- 		for a QAT device
+-	down_write(&cfg->lock);
+ 	adf_cfg_keyval_add(key_val, section);
++
++out:
+ 	up_write(&cfg->lock);
+ 	return 0;
+ }
 -- 
 2.44.0
 
