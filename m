@@ -1,120 +1,80 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail11.truemail.it (mail11.truemail.it [217.194.8.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E44416C6AE
-	for <linux-crypto@vger.kernel.org>; Tue, 25 Jun 2024 14:41:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4339117D8BE;
+	Tue, 25 Jun 2024 19:57:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.194.8.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719326518; cv=none; b=YuzWv7y8+4A8Um3dGt0SxWVHiypX4FLZ71Hat0kP/Fu1qbOhhoSEuOSgp9xcWF2leDfFWrJChYiYzBY82/SxVoCja/QUr6NYPRZmK0leu64/FoTJqUaXYHy1aTI5Titrnncmb0rl0+keW1SW8hqBNStJB8HAlLchh2TngEt445g=
+	t=1719345479; cv=none; b=J/BLgAbjZSaWnHpIpy85qSzgaElTo7ulwT7Tbt47Ogmfe+BPyWbNLexpq31kwR/RgBqBXkJYYZkNGuWavI/xnNcov/9GszvdlAYVG/1uOaMObD3eNwn4wTnY4zimW7HfEk8KlFvbPH/8E9aXzgxxxqY7EJcYf+WU1oHPJMWqci8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719326518; c=relaxed/simple;
-	bh=wGmnE2+rdmXlGx8/2odHwGZ+Ls8tK5BwMLXdI2hXtNc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AKEHrKWCfMDY2fXzCasJ99oMzdxVUxPCGJed27CG5oR9c9Puvmb9OsohY3xS6efAS7HnohG9ktMYRp7yDiihqPL5Gs3/qriuW/pHCT5GKhR14ONxYO63icTTKcAw+fTxFx+msYr83WbsEZt9io99SDe+beYVLqmvJtbTpzUESbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iy7snxQm; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1719345479; c=relaxed/simple;
+	bh=5WXuGLJgM+QtAIwqwDjoNKPak65DDHF2eYjfAS6luTg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=trdKc/wcx9WuQiHNyRmllnAKxlkTkWI5k6KzeQ8KpJe2ezDjfA9Hul+8PY+m42NcwtpNxxqxVqiMRfuOKSHzDN/9OiQJ8D8lTka9csum5gimfu8gDFF6fdB37yTwehOfJYZ5iTs63e6m4l1VuIB68sPo8f5CjPygvCU5JO/8xJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it; spf=pass smtp.mailfrom=dolcini.it; dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b=n3Wtluo9; arc=none smtp.client-ip=217.194.8.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dolcini.it
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iy7snxQm"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719326517; x=1750862517;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=wGmnE2+rdmXlGx8/2odHwGZ+Ls8tK5BwMLXdI2hXtNc=;
-  b=iy7snxQmAgANHkAuLKo+QXCPA63Cz/jZLD8PNE7ipW5pTS5z79+gHuFc
-   uRCqIYnudA7xs2LiS3+YnoTHXxFB2eg2U8YRGA6vxFMTup0REo3evnShT
-   DylzNMP3oWPpmxt+pJHY3mHQLn5q7ZgON7NG8lXkrUsq2VtoRyDWfucIs
-   qOMhHM+6WJBdjCk1pqqsgIInsW+pfpb+fNL+Xe9f02JY5McT62Fu9fN5C
-   FDhXP8vop4q9AozsPkYv9y4kMopnEeZEZPIvtUrjxqeMMcAB6GtlMQxoY
-   wtPHMc7PWHKj5LPJzdJw9CLRDycCQpb7V/u2vpjhg3c8D5fwzYDYtqDPh
-   g==;
-X-CSE-ConnectionGUID: U2GEHmuRQ0yXziXzifccig==
-X-CSE-MsgGUID: RaLsPDMBSj6pw32zxhZDvQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11114"; a="16226024"
-X-IronPort-AV: E=Sophos;i="6.08,264,1712646000"; 
-   d="scan'208";a="16226024"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2024 07:41:43 -0700
-X-CSE-ConnectionGUID: iZ8vD7hSTJSfUqwg1Syk2A==
-X-CSE-MsgGUID: EH1HCIKYQwi3aHRoHQA0IQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,264,1712646000"; 
-   d="scan'208";a="43540629"
-Received: from silpixa00400314.ir.intel.com (HELO silpixa00400314.ger.corp.intel.com) ([10.237.222.216])
-  by fmviesa007.fm.intel.com with ESMTP; 25 Jun 2024 07:41:42 -0700
-From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To: herbert@gondor.apana.org.au
-Cc: linux-crypto@vger.kernel.org,
-	qat-linux@intel.com,
-	Hareshx Sankar Raj <hareshx.sankar.raj@intel.com>,
-	Damian Muszynski <damian.muszynski@intel.com>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [PATCH] crypto: qat - fix unintentional re-enabling of error interrupts
-Date: Tue, 25 Jun 2024 15:41:19 +0100
-Message-ID: <20240625144139.6003-1-giovanni.cabiddu@intel.com>
-X-Mailer: git-send-email 2.44.0
+	dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b="n3Wtluo9"
+Received: from francesco-nb.pivistrello.it (93-49-2-63.ip317.fastwebnet.it [93.49.2.63])
+	by mail11.truemail.it (Postfix) with ESMTPA id A053B1FACA;
+	Tue, 25 Jun 2024 21:57:52 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dolcini.it;
+	s=default; t=1719345472;
+	bh=mTXmTyJB6Z16tkKRKJPTeo4y+EeQ33t7StEL4G7pefM=; h=From:To:Subject;
+	b=n3Wtluo9CY/ZpmDsBaRaLJGIdRIlFtqyG8HeR+smMxSV4SlPj0P+LjDIYhrwdLzWw
+	 6fazspF2nXAI2Zv15SnmQqnoleC3a3yhzDeh86uF9FVfW3OJjCSSuexlvGVMR7hx3t
+	 GtCy9CfuTHTd4B8eIA0j/NMHk0GNe3bCzpx+sCfeoSIuGFI7+qA4wa6CQoabuE+JZn
+	 DZiDXBcLRGvr411TY4HVOVejjRPmCzXOe/HvGgXG8h7f2B+Lvr1bob8C9+DLbD4Zio
+	 p+f+kJjbBoqDv8sGNtE3/s8SSKnZp06CmXXdavn/fWb3bJVkD1iWCR3oDGUcRjACoq
+	 C8RASSzdAC6Ww==
+From: Francesco Dolcini <francesco@dolcini.it>
+To: Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Francesco Dolcini <francesco.dolcini@toradex.com>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v1] hwrng: Kconfig - Do not enable by default CN10K driver
+Date: Tue, 25 Jun 2024 21:57:46 +0200
+Message-Id: <20240625195746.48905-1-francesco@dolcini.it>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
 Content-Transfer-Encoding: 8bit
 
-From: Hareshx Sankar Raj <hareshx.sankar.raj@intel.com>
+From: Francesco Dolcini <francesco.dolcini@toradex.com>
 
-The logic that detects pending VF2PF interrupts unintentionally clears
-the section of the error mask register(s) not related to VF2PF.
-This might cause interrupts unrelated to VF2PF, reported through
-errsou3 and errsou5, to be reported again after the execution
-of the function disable_pending_vf2pf_interrupts() in dh895xcc
-and GEN2 devices.
+Do not enable by default the CN10K HW random generator driver.
 
-Fix by updating only section of errmsk3 and errmsk5 related to VF2PF.
+CN10K Random Number Generator is available only on some specific
+Marvell SoCs, however the driver is in practice enabled by default on
+all arm64 configs.
 
-Signed-off-by: Hareshx Sankar Raj <hareshx.sankar.raj@intel.com>
-Reviewed-by: Damian Muszynski <damian.muszynski@intel.com>
-Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Signed-off-by: Francesco Dolcini <francesco.dolcini@toradex.com>
 ---
- drivers/crypto/intel/qat/qat_common/adf_gen2_pfvf.c       | 4 +++-
- .../crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c  | 8 ++++++--
- 2 files changed, 9 insertions(+), 3 deletions(-)
+as an alternative I could propose
 
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen2_pfvf.c b/drivers/crypto/intel/qat/qat_common/adf_gen2_pfvf.c
-index 70ef11963938..43af81fcab86 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_gen2_pfvf.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_gen2_pfvf.c
-@@ -100,7 +100,9 @@ static u32 adf_gen2_disable_pending_vf2pf_interrupts(void __iomem *pmisc_addr)
- 	errmsk3 |= ADF_GEN2_ERR_MSK_VF2PF(ADF_GEN2_VF_MSK);
- 	ADF_CSR_WR(pmisc_addr, ADF_GEN2_ERRMSK3, errmsk3);
- 
--	errmsk3 &= ADF_GEN2_ERR_MSK_VF2PF(sources | disabled);
-+	/* Update only section of errmsk3 related to VF2PF */
-+	errmsk3 &= ~ADF_GEN2_ERR_MSK_VF2PF(ADF_GEN2_VF_MSK);
-+	errmsk3 |= ADF_GEN2_ERR_MSK_VF2PF(sources | disabled);
- 	ADF_CSR_WR(pmisc_addr, ADF_GEN2_ERRMSK3, errmsk3);
- 
- 	/* Return the sources of the (new) interrupt(s) */
-diff --git a/drivers/crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c b/drivers/crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c
-index 6e24d57e6b98..c0661ff5e929 100644
---- a/drivers/crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c
-+++ b/drivers/crypto/intel/qat/qat_dh895xcc/adf_dh895xcc_hw_data.c
-@@ -193,8 +193,12 @@ static u32 disable_pending_vf2pf_interrupts(void __iomem *pmisc_addr)
- 	ADF_CSR_WR(pmisc_addr, ADF_GEN2_ERRMSK3, errmsk3);
- 	ADF_CSR_WR(pmisc_addr, ADF_GEN2_ERRMSK5, errmsk5);
- 
--	errmsk3 &= ADF_DH895XCC_ERR_MSK_VF2PF_L(sources | disabled);
--	errmsk5 &= ADF_DH895XCC_ERR_MSK_VF2PF_U(sources | disabled);
-+	/* Update only section of errmsk3 and errmsk5 related to VF2PF */
-+	errmsk3 &= ~ADF_DH895XCC_ERR_MSK_VF2PF_L(ADF_DH895XCC_VF_MSK);
-+	errmsk5 &= ~ADF_DH895XCC_ERR_MSK_VF2PF_U(ADF_DH895XCC_VF_MSK);
-+
-+	errmsk3 |= ADF_DH895XCC_ERR_MSK_VF2PF_L(sources | disabled);
-+	errmsk5 |= ADF_DH895XCC_ERR_MSK_VF2PF_U(sources | disabled);
- 	ADF_CSR_WR(pmisc_addr, ADF_GEN2_ERRMSK3, errmsk3);
- 	ADF_CSR_WR(pmisc_addr, ADF_GEN2_ERRMSK5, errmsk5);
- 
+default HW_RANDOM if ARCH_THUNDER=y
+
+---
+ drivers/char/hw_random/Kconfig | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+index 442c40efb200..01e2e1ef82cf 100644
+--- a/drivers/char/hw_random/Kconfig
++++ b/drivers/char/hw_random/Kconfig
+@@ -555,7 +555,6 @@ config HW_RANDOM_ARM_SMCCC_TRNG
+ config HW_RANDOM_CN10K
+        tristate "Marvell CN10K Random Number Generator support"
+        depends on HW_RANDOM && PCI && (ARM64 || (64BIT && COMPILE_TEST))
+-       default HW_RANDOM
+        help
+ 	 This driver provides support for the True Random Number
+ 	 generator available in Marvell CN10K SoCs.
 -- 
-2.44.0
+2.39.2
 
