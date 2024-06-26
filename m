@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9866B29414;
-	Wed, 26 Jun 2024 07:30:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CE2C29414;
+	Wed, 26 Jun 2024 07:31:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719387052; cv=none; b=oORtMUyPTwmAjAA3HqaZAuNI3VSbtTwuDX+m4p2YDOyZZHJej7eJKdf7XtgkUxTYi+TYmdbsVezFRX0CfbioT62fXkeiLFO5gp0hAkrMLaL2f0nM+eqM+jg+ebRn5QTJxbFMgfgNDQUM76eXgn2zNeb+qlHs5N6eK2xop6ebA1A=
+	t=1719387100; cv=none; b=LPgxlxDKKZEDPvWvSedbTqBRblr4IXk5eXRrS0im+2B4qYrDEgOgfAYQUk8OfhN9V8nPyeEvqKCj5Todny5QbHEDu7fcO3M04YtkNf9zqRKsAaPwjjXDeL+WODY19gB8jVkqTI+IBtQJASgpJXOGdK2+obDp8Lm+s6rXR1Hqk0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719387052; c=relaxed/simple;
-	bh=zOVMpDTFFB1iUIaRHdgZB/DQUUlyw1zqiK79M86MG3c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MZ3eANdJh2bU7eB2o+Zv6NfjMdo2lG6V5iAzO+5hbCrRMwiJVRFU2nomG5+j3jzRFe6nyaMFdSSmkfZKbACFLyESt8wREFQvVc5xpuHyeoQRz7kNMgJwK/5zmY5URNcE4NQoUciC74mtKNA7eySSL4qtOcifFk4Ra87Rj5w9jTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nKkfUCB+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1719387100; c=relaxed/simple;
+	bh=QZBFe/JCMye3gzv7JM3x9d0jAKUSjXZunjWg+/IonaA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=GCW8A2+JHQEGpEJX8MF6+j7O+KMHecoM0FvVebYWqsINUclFvBV+lFndUg9tti1USD3Gp1hUpy7XdsZ2iJWGFolE7PZRWQGZ0P9ioRYRpaYZ6J8R4rkGprBjUxCt/WWxEJnqX5gVwfSdv31CmpU5obyN1rEwtPzLm74UG18R8nY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ReiwIUAq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nKkfUCB+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93957C2BD10;
-	Wed, 26 Jun 2024 07:30:46 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ReiwIUAq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CD18C2BD10;
+	Wed, 26 Jun 2024 07:31:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719387052;
-	bh=zOVMpDTFFB1iUIaRHdgZB/DQUUlyw1zqiK79M86MG3c=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=nKkfUCB+lmo2sYtEUkKIgRw5h3aVUIBLHAOV/LHuzU9nlNwAOETQtroF13gfeHwmP
-	 wxmHbDAOzTBPPO3SMYnwUbMnNgvZ9Yew0uWVW5RWs4H61MKCs1is5pMxvweiBCvKSE
-	 hyqCSzWmGQZmN64vnxmVN16syltOXJ7i7HKjTQrnooCCvPA/nr4Mk6dGmCDUEz5v4F
-	 MWRJ0boKr07jDQ2iWOd+NenoiDlhOFgEH744qflgFwWEbKu4fXOsiEKF4qi9VfJ3Pf
-	 SSHAOR0eEDWLdAq8DzZltzLi6hkdIKJo8uB3k/KJZSXLCRXA0pET24E7K1nsf8vx3c
-	 YUdKeM2Rnek6Q==
-Message-ID: <ce81dc9d-bc13-45e2-828e-6570b506ed25@kernel.org>
-Date: Wed, 26 Jun 2024 09:30:44 +0200
+	s=k20201202; t=1719387100;
+	bh=QZBFe/JCMye3gzv7JM3x9d0jAKUSjXZunjWg+/IonaA=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=ReiwIUAqDz3OZUo3CrTijdYiM4iQWGF2xdK0PmQk53bZ5dL8doZENYwgNJ1UjE81K
+	 hTDuLWUU19Cz1kVs085qhswxRc3oUTReEjNpzIW0e1p5+ZR4PffoLXvas9Yl4y092k
+	 s3QjyWJPWUI6F0xx7/RwuJfFYvPFE6LYJRAJMGbBGWfeyFEGxticMuSq5r8zDzP8uf
+	 La2ShGINA7StZktt4KzAd4ff7vFGNiHJBOantWni8Dw2IonvNxQ53ZQ3T5LkTlj5+O
+	 pP3WP+7BxkxkSzf/4YcFV/+odTk4463rjJWUVmuqCMqs6bLp1EeOXRb0yDsEdeHpww
+	 fqEueZxpdPhHg==
+Message-ID: <6bd1bedb-7360-4021-a79d-ba8751d9f02c@kernel.org>
+Date: Wed, 26 Jun 2024 09:31:30 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,24 +35,21 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 1/3] dt-bindings: rng: Add Rockchip RNG bindings
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Aurelien Jarno <aurelien@aurel32.net>, Olivia Mackall
- <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Heiko Stuebner <heiko@sntech.de>,
+Subject: Re: [PATCH v5 1/3] dt-bindings: rng: Add Rockchip RK3568 TRNG
+To: Daniel Golle <daniel@makrotopia.org>,
+ Aurelien Jarno <aurelien@aurel32.net>, Olivia Mackall <olivia@selenic.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Heiko Stuebner <heiko@sntech.de>,
  Philipp Zabel <p.zabel@pengutronix.de>,
  =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <ukleinek@debian.org>,
- Sebastian Reichel <sebastian.reichel@collabora.com>,
- Sascha Hauer <s.hauer@pengutronix.de>, Dragan Simic <dsimic@manjaro.org>,
- Martin Kaiser <martin@kaiser.cx>, Ard Biesheuvel <ardb@kernel.org>,
- linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-rockchip@lists.infradead.org,
- linux-kernel@vger.kernel.org
-References: <cover.1719106472.git.daniel@makrotopia.org>
- <b28ccedac0a51f8a437f7ceb5175e3b70696c8c2.1719106472.git.daniel@makrotopia.org>
- <a31bc0f2-4f82-4e15-95b8-c17dc46e7bf5@kernel.org>
- <ZngeUxK6r0qqBj28@makrotopia.org>
+ Dragan Simic <dsimic@manjaro.org>, Sascha Hauer <s.hauer@pengutronix.de>,
+ Martin Kaiser <martin@kaiser.cx>, Tony Luck <tony.luck@intel.com>,
+ Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <cover.1719365405.git.daniel@makrotopia.org>
+ <edcbe260f9ebe71c901cf3788ccf572cb15b9728.1719365406.git.daniel@makrotopia.org>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -98,96 +95,19 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <ZngeUxK6r0qqBj28@makrotopia.org>
+In-Reply-To: <edcbe260f9ebe71c901cf3788ccf572cb15b9728.1719365406.git.daniel@makrotopia.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 23/06/2024 15:08, Daniel Golle wrote:
-> Hi Krzysztof,
+On 26/06/2024 03:36, Daniel Golle wrote:
+> From: Aurelien Jarno <aurelien@aurel32.net>
 > 
-> thank you for your patiente and repeated review of this series.
+> Add the True Random Number Generator on the Rockchip RK3568 SoC.
 > 
-> On Sun, Jun 23, 2024 at 09:03:15AM +0200, Krzysztof Kozlowski wrote:
->> On 23/06/2024 05:32, Daniel Golle wrote:
->>> From: Aurelien Jarno <aurelien@aurel32.net>
->>>
->>> Add the True Random Number Generator on the Rockchip RK3568 SoC.
->>>
->>> Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
->>> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
->>
->> My comments from v2, which I reminded at v3, were not addressed.
->>
->> Respond to each of them and acknowledge that you are going to implement
->> the change.
-> 
-> Your comments to v1which I'm aware of are:
-> https://patchwork.kernel.org/comment/25087874/
+> Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 
-We talk about comments from v2, not v1.
-
-> 
->>> +++ b/Documentation/devicetree/bindings/rng/rockchip-rng.yaml
->> Filename matching compatible, so "rockchip,rk3568-rng.yaml"
-> 
-> I've changed the filename.
-> 
->>> +title: Rockchip TRNG bindings
-> 
->> Drop "bindings"
-> 
-> I've changed the title accordingly (now: "Rockchip TRNG" in v4).
-> 
->>> +description:
->>> +  This driver interface with the True Random Number Generator present in some
->>
->> Drop "This driver interface" and make it a proper sentence. Bindings are
->> not about drivers.
-> 
-> This has been addressed by Aurelien and further improved by me in v3.
-> 
->>> +  clocks:
->>> +    minItems: 2
-> 
->> Drop minItems.
-> 
-> Aurelien did that in v2.
-> 
->>> +  clock-names:
->>> +    items:
->>> +      - const: clk
->>> +      - const: hclk
->>
->> You need to explain what are these in clocks. Also you need better
->> names. A clock name "clk" is useless.
-> 
-> Clocks now have meaningful names and descriptions.
-> 
->>> +  reset-names:
->>> +    items:
->>> +      - const: reset
->>
->> Drop reset-names entirely, not useful.
-> 
-> Aurelien did so in v2.
-> 
-> Your comments to v2 which I'm aware of are:
-> https://patchwork.kernel.org/comment/25111597/
-> 
->>> Add the RNG bindings for the RK3568 SoC from Rockchip
-> 
->> Use subject prefixes matching the subsystem (git log --oneline -- ...),
->> so it is rng, not RNG. Also, you are not adding all-Rockhip RNG but a
->> specific device.
->>
->> Subject: drop second, redundant "bindings".
-> 
-> I've changed 'RNG' into 'rng' in the subject and spelled it out in the
-> commit message.
-
-And where did you drop the redundant bindings? You just quoted the
-sentence and ignored it.
-
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
 Best regards,
 Krzysztof
