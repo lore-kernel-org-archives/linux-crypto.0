@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CE2C29414;
-	Wed, 26 Jun 2024 07:31:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92EC81FBB;
+	Wed, 26 Jun 2024 07:31:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719387100; cv=none; b=LPgxlxDKKZEDPvWvSedbTqBRblr4IXk5eXRrS0im+2B4qYrDEgOgfAYQUk8OfhN9V8nPyeEvqKCj5Todny5QbHEDu7fcO3M04YtkNf9zqRKsAaPwjjXDeL+WODY19gB8jVkqTI+IBtQJASgpJXOGdK2+obDp8Lm+s6rXR1Hqk0A=
+	t=1719387117; cv=none; b=sPVnUR5lZ6A7yXvui98+MKkztyXhHUEI9hOQqpOdBbwTWfqRFleIFZiBAqIbpuUrJGcLi6INh4ihBfOBSuXameSAvi6kE/gGz5ChmvwOwu0cgtbBwTHXTiVMrDlP/E8ZxXtid5J5sFuo+yJ0+JI/lZomLZe7+8ESU1T3QNehfho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719387100; c=relaxed/simple;
-	bh=QZBFe/JCMye3gzv7JM3x9d0jAKUSjXZunjWg+/IonaA=;
+	s=arc-20240116; t=1719387117; c=relaxed/simple;
+	bh=+L5YngHDp8qosRb3biMyCjOYaHN+17UPtFt+slcAkP4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=GCW8A2+JHQEGpEJX8MF6+j7O+KMHecoM0FvVebYWqsINUclFvBV+lFndUg9tti1USD3Gp1hUpy7XdsZ2iJWGFolE7PZRWQGZ0P9ioRYRpaYZ6J8R4rkGprBjUxCt/WWxEJnqX5gVwfSdv31CmpU5obyN1rEwtPzLm74UG18R8nY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ReiwIUAq; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=FqcE4BJ6P/zLgit1xfEJya+dSJ5SfnJjfNS8TQjuGKW0emQwiqxhWwRWpq4RpL+a/yCnuZaD9YinvBBcTJbvULYgry4q8S/ibguNhTF4kPKVMnMWNsPEyByt+DNmf+BguigXKd0GEtuNzxYKCQzGm5/3MbThMvrUdQ56OZMotMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i1hN/Khb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ReiwIUAq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CD18C2BD10;
-	Wed, 26 Jun 2024 07:31:33 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i1hN/Khb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75021C2BD10;
+	Wed, 26 Jun 2024 07:31:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719387100;
-	bh=QZBFe/JCMye3gzv7JM3x9d0jAKUSjXZunjWg+/IonaA=;
+	s=k20201202; t=1719387117;
+	bh=+L5YngHDp8qosRb3biMyCjOYaHN+17UPtFt+slcAkP4=;
 	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=ReiwIUAqDz3OZUo3CrTijdYiM4iQWGF2xdK0PmQk53bZ5dL8doZENYwgNJ1UjE81K
-	 hTDuLWUU19Cz1kVs085qhswxRc3oUTReEjNpzIW0e1p5+ZR4PffoLXvas9Yl4y092k
-	 s3QjyWJPWUI6F0xx7/RwuJfFYvPFE6LYJRAJMGbBGWfeyFEGxticMuSq5r8zDzP8uf
-	 La2ShGINA7StZktt4KzAd4ff7vFGNiHJBOantWni8Dw2IonvNxQ53ZQ3T5LkTlj5+O
-	 pP3WP+7BxkxkSzf/4YcFV/+odTk4463rjJWUVmuqCMqs6bLp1EeOXRb0yDsEdeHpww
-	 fqEueZxpdPhHg==
-Message-ID: <6bd1bedb-7360-4021-a79d-ba8751d9f02c@kernel.org>
-Date: Wed, 26 Jun 2024 09:31:30 +0200
+	b=i1hN/Khbyx1aHGNAAvofLcrU2vC0nz/L89nu/jftUZxI9swkSxGkECeGRtzZA5+Rr
+	 Fzpm/qpDPMICqkpuPs2xftgSlQmCBHC2LRZovcBPCgvv37Ej0bYP19RuiLUknP/x51
+	 R51dFkM5Wags3oqT/NskIETjS8tgCmfnkg3R7qNVcHfkrEHVvwNAyGsrZGn0dCTyRH
+	 UkIfmkLU1W8LbV/mjiwEkI6uM+tgS+J8uXv+dMd3GRavs8wJU1LE0M2Hln7IXHa8P0
+	 +vS1IXRx/Nlol/gubu9R3soyzz1x0bWnINOHWwkdmTTGcyo+z3SOhe/GA49wnfe7Kx
+	 wCGPMFEGZoKsA==
+Message-ID: <20901d00-0a7b-432f-a6f1-3efc9b5c8a53@kernel.org>
+Date: Wed, 26 Jun 2024 09:31:48 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,7 +35,7 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 1/3] dt-bindings: rng: Add Rockchip RK3568 TRNG
+Subject: Re: [PATCH v5 2/3] hwrng: add hwrng driver for Rockchip RK3568 SoC
 To: Daniel Golle <daniel@makrotopia.org>,
  Aurelien Jarno <aurelien@aurel32.net>, Olivia Mackall <olivia@selenic.com>,
  Herbert Xu <herbert@gondor.apana.org.au>, Rob Herring <robh@kernel.org>,
@@ -49,7 +49,7 @@ To: Daniel Golle <daniel@makrotopia.org>,
  devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
  linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org
 References: <cover.1719365405.git.daniel@makrotopia.org>
- <edcbe260f9ebe71c901cf3788ccf572cb15b9728.1719365406.git.daniel@makrotopia.org>
+ <15b001360cffc0832e7e2748ad900b1336e0fa32.1719365406.git.daniel@makrotopia.org>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -95,19 +95,31 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <edcbe260f9ebe71c901cf3788ccf572cb15b9728.1719365406.git.daniel@makrotopia.org>
+In-Reply-To: <15b001360cffc0832e7e2748ad900b1336e0fa32.1719365406.git.daniel@makrotopia.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 26/06/2024 03:36, Daniel Golle wrote:
+On 26/06/2024 03:37, Daniel Golle wrote:
 > From: Aurelien Jarno <aurelien@aurel32.net>
 > 
-> Add the True Random Number Generator on the Rockchip RK3568 SoC.
+> Rockchip SoCs used to have a random number generator as part of their
+> crypto device, and support for it has to be added to the corresponding
+> driver. However newer Rockchip SoCs like the RK3568 have an independent
+> True Random Number Generator device. This patch adds a driver for it,
+> greatly inspired from the downstream driver.
+> 
+> The TRNG device does not seem to have a signal conditionner and the FIPS
+> 140-2 test returns a lot of failures. They can be reduced by increasing
+> RK_RNG_SAMPLE_CNT, in a tradeoff between quality and speed. This value
+> has been adjusted to get ~90% of successes and the quality value has
+> been set accordingly.
 > 
 > Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
+> [daniel@makrotpia.org: code style fixes]
 > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
 Best regards,
 Krzysztof
