@@ -1,96 +1,86 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpbgau2.qq.com (smtpbgau2.qq.com [54.206.34.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB5A5FBB1;
-	Fri, 28 Jun 2024 07:39:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04B1C43AC0;
+	Fri, 28 Jun 2024 08:43:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.206.34.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719560359; cv=none; b=otn5AAmoX+PSglleEep7xWdCe4mIB1lDzAhNjXFgVAXHu1D88IBhfemBG1AvCWsn1RwRhXcQnTjSYcJ48v5zZIJlb3vS9fnwQCHTX8enr2KHTzJK+jYQLzBt7c00X9hpmck2zt/Jl+FROlMObYuTKzqpw/Q8Relty8hZyJX0t9I=
+	t=1719564193; cv=none; b=jH+HsuMAgEpxKhQKoR9x5Pd3eGWWkE0G/rA4BUjI5ev8JdB+LF9rqno0BvZAcHZeNc1AEZodM7gun04tuugCwNapEytiPR74twUhTlibVAjoVOxMeSLWdTtbU7btHtY8Hyxnfj4bDG0oULNv+p+f8M0wpLGPUNTeA1h+jFdYJUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719560359; c=relaxed/simple;
-	bh=1AZuypACBJ1EVl+EHSFcbj8lkbWG2c9CwFzXru13aDs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k/kEnHwGGLLnsBIbOaRiGqfSk7fqEddXznUabBerAjkZKxAMjxXxzDXCWKYi2lpQVhP8wTI6yYvAwsGJMwm+RJLDZ2mv2626NQ0vrdzhH7VWt/XcXkfCmpPfd04OGrl0V7pk9WQHv/KRT3Oo2TzClNEtUTAVA6OLcLiW9iovJ/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RgmH5uCl; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RgmH5uCl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 789FEC116B1;
-	Fri, 28 Jun 2024 07:39:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719560359;
-	bh=1AZuypACBJ1EVl+EHSFcbj8lkbWG2c9CwFzXru13aDs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RgmH5uClfa6lPYENsvQSkGudX3DSBGvDv2yWm1rN/s3Nv6gBV6RAd5xY3AfmD0A0s
-	 XHW8XhNwd1ZxnZLkVS6ItiSuH96efKaxQHM91MF4eveJMKt2R9igca9Xf6pfgulCS6
-	 f4tK1tFbgFQIl1V9zEoap/K/oYT/hr8vZwRlTXZBLJRoQ/u8AOmmcRncjhswmjYiP9
-	 f54EwGygdxIYiXHSGhBvBTc+MPEIkIhnl4l6fsmKrIGBFu6TWqjc6MPnZTP/VgdZ5n
-	 bYwb8J1t2p5BAsLe+D+0d9ZDNE5/azNOIm/zIf3FP6iuUu0MXI0gC1CS9f5hsDH9hY
-	 gBcTAlSJIaYMg==
-Date: Fri, 28 Jun 2024 13:09:15 +0530
-From: Vinod Koul <vkoul@kernel.org>
-To: JiaJie Ho <jiajie.ho@starfivetech.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eugeniy Paltsev <Eugeniy.Paltsev@synopsys.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>
-Subject: Re: [PATCH v5 1/3] dmaengine: dw-axi-dmac: Support hardware quirks
-Message-ID: <Zn5oo3rZCnxgc5Ns@matsya>
-References: <20240530031112.4952-1-jiajie.ho@starfivetech.com>
- <20240530031112.4952-2-jiajie.ho@starfivetech.com>
- <ZmiOemWQrG-3EdIB@matsya>
- <NT0PR01MB11826C9F142FCD1A1199A11B8AC02@NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn>
+	s=arc-20240116; t=1719564193; c=relaxed/simple;
+	bh=VPCR6B+q/ze+0k8/a5//nsllEdjBibCOi2hB+YOPY7M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YliSfFXdC60gYXBb4QZQcU8gKMJZzBcPg4maYizAyi532XNae7QSRG7uY/PCbBzX77b4Exp8kmeWrynPB4PqZdsEYlnw++QUuDDOSkpY0Vl+wLhM0y5ogzKug6HtSQ5pyK5nhAQEBi4bdslSiT7wdZowI8I7xlzSQNuSnZsGf2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; arc=none smtp.client-ip=54.206.34.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+X-QQ-mid: bizesmtpsz9t1719564106tkrjopl
+X-QQ-Originating-IP: f/kOEM2Glu4JL+oCsb/LBSQoNQjNX+nOQd0jJxI2XXc=
+Received: from localhost.localdomain ( [113.57.152.160])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Fri, 28 Jun 2024 16:41:44 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 2146255387032920080
+From: WangYuli <wangyuli@uniontech.com>
+To: herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	tsbogend@alpha.franken.de
+Cc: linux-crypto@vger.kernel.org,
+	linux-mips@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	WangYuli <wangyuli@uniontech.com>,
+	Guan Wentao <guanwentao@uniontech.com>
+Subject: [PATCH] MIPS: crypto: Clean up useless assignment operations
+Date: Fri, 28 Jun 2024 16:41:17 +0800
+Message-ID: <1D248893502B75F5+20240628084117.84264-1-wangyuli@uniontech.com>
+X-Mailer: git-send-email 2.43.4
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <NT0PR01MB11826C9F142FCD1A1199A11B8AC02@NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn>
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpsz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
+When entering the "len & sizeof(u32)" branch, len must be less than 8.
+So after one operation, len must be less than 4.
+At this time, "len -= sizeof(u32)" is not necessary for 64-bit CPUs.
 
-Hi JiaJie
+A similar issue has been solved at Loongarch.
 
-On 12-06-24, 10:13, JiaJie Ho wrote:
-> > On 30-05-24, 11:11, Jia Jie Ho wrote:
-> > 
-> > > +
-> > > +struct dw_axi_peripheral_config {
-> > > +#define DWAXIDMAC_STARFIVE_SM_ALGO	BIT(0)
-> > 
-> > what does this quirk mean?
-> > 
-> > > +	u32 quirks;
-> > 
-> > Can you explain why you need this to be exposed. I would prefer we use
-> > existing interfaces and not define a new one...
-> > 
-> 
-> Hi Vinod,
-> Thanks for reviewing this.
-> This is a dedicated dma controller for the crypto engine.
-> I am adding this quirk to:
-> 1. Select the src and dest AXI master for transfers between mem and dev. 
->     Driver currently only uses AXI0 for both.
+Link: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?h=v6.10-rc5&id=fea1c949f6ca5059e12de00d0483645debc5b206
+Signed-off-by: Guan Wentao <guanwentao@uniontech.com>
+Signed-off-by: WangYuli <wangyuli@uniontech.com>
+---
+ arch/mips/crypto/crc32-mips.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-why cant this information be passed thru DT, that is typically done by
-most controllers?
-
-> 2. Workaround a hardware limitation on the crypto engine to
->      transfer data > 256B by incrementing the peripheral FIFO offset.
-
-Dont set the transfer data > 256B, you should ideally use maxburst for
-configuring the FIFO...
-
-> 
-> What is the recommended way to handle such cases besides using 
-> peripheral_config in dma_slave_config?
-
-First use dma_slave_config() fields, if they are not appropriate, lets
-discuss why before we add custom methods or use peripheral_config
-
+diff --git a/arch/mips/crypto/crc32-mips.c b/arch/mips/crypto/crc32-mips.c
+index ec6d58008f8e..505d2d897849 100644
+--- a/arch/mips/crypto/crc32-mips.c
++++ b/arch/mips/crypto/crc32-mips.c
+@@ -94,7 +94,9 @@ static u32 crc32_mips_le_hw(u32 crc_, const u8 *p, unsigned int len)
+ 
+ 		CRC32(crc, value, w);
+ 		p += sizeof(u32);
++#ifndef CONFIG_64BIT
+ 		len -= sizeof(u32);
++#endif
+ 	}
+ 
+ 	if (len & sizeof(u16)) {
+@@ -134,7 +136,9 @@ static u32 crc32c_mips_le_hw(u32 crc_, const u8 *p, unsigned int len)
+ 
+ 		CRC32C(crc, value, w);
+ 		p += sizeof(u32);
++#ifndef CONFIG_64BIT
+ 		len -= sizeof(u32);
++#endif
+ 	}
+ 
+ 	if (len & sizeof(u16)) {
 -- 
-~Vinod
+2.43.4
+
