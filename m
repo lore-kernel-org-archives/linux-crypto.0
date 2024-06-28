@@ -1,113 +1,81 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B4BC15278D;
-	Fri, 28 Jun 2024 09:40:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from norbury.hmeau.com (helcar.hmeau.com [216.24.177.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15A1F154444;
+	Fri, 28 Jun 2024 10:12:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.24.177.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719567610; cv=none; b=nFuD/hIekIj7WCUETrJv0FqfQLLD/HVLLsm7QR30/nOYZctB6cEbrDGP91gUc5ak5eFx4U9ekOepvZw34j1w/eIfvzEU9QRBf/7pOkDWpNhjBY3N26wkFcmd2RsqtZzeoa34/dsysJBsf3AWa9TbS0jrIhzqHb4l8KeT8FeWn8s=
+	t=1719569575; cv=none; b=YrhU3RFToRbn6sFDpfrp6IukI0D28IXCOXXA2imWUfd3jXK6f4KGluRxUSFO/aP3rr79K98RqohbD5c7ZFWhxqD+k9fHPkLvJSTCVwKEmli2Jyfi+aT80wAjNrjcAL24/sPDOySgsRVaKv0WDf3/gLJ3+ImfNmV0tlnC1hX31+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719567610; c=relaxed/simple;
-	bh=vwWYuw8MReSjhj/uWrhsSw093dCcYZAc3JIqgm9h7vs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ja8EpLB/lGeejANlqcCHlNmnR7MCCE2qmNhWYg5zqCVd8xSlhlvIAF51SwG2r3f7HNs44V27+0Rrb+OuN/2+wGsjfqpw7CGhCd+xV6NnP/mWeMnAxRf5oce65w9FfXvTi8vdS7/PIMiTvL5N4JjBtXjorSRXbl+v2wKpVyM4l2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D8EEB106F;
-	Fri, 28 Jun 2024 02:30:38 -0700 (PDT)
-Received: from donnerap.manchester.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F0FEF3F6A8;
-	Fri, 28 Jun 2024 02:30:11 -0700 (PDT)
-Date: Fri, 28 Jun 2024 10:30:07 +0100
-From: Andre Przywara <andre.przywara@arm.com>
-To: Chen-Yu Tsai <wens@csie.org>
-Cc: Corentin Labbe <clabbe.montjoie@gmail.com>, Herbert Xu
- <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>,
- Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel Holland
- <samuel@sholland.org>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
- <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Ryan Walklin
- <ryan@testtoast.com>, Philippe Simons <simons.philippe@gmail.com>,
- linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-sunxi@lists.linux.dev, devicetree@vger.kernel.org
-Subject: Re: [PATCH v2 4/4] arm64: dts: allwinner: h616: add crypto engine
- node
-Message-ID: <20240628103007.6ea3685c@donnerap.manchester.arm.com>
-In-Reply-To: <CAGb2v67qo7qgf2uzBAUf9-C9NHrHG47mLc579NRkTO7qLDtV7Q@mail.gmail.com>
-References: <20240624232110.9817-1-andre.przywara@arm.com>
-	<20240624232110.9817-5-andre.przywara@arm.com>
-	<CAGb2v67qo7qgf2uzBAUf9-C9NHrHG47mLc579NRkTO7qLDtV7Q@mail.gmail.com>
-Organization: ARM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+	s=arc-20240116; t=1719569575; c=relaxed/simple;
+	bh=pzwr6heChKxBnt2X3WfkhfOjAnEHnig9DA7aY1PlUp4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hTKAjQ/DDBTNUFaOKQScy0WVsgL/bixWHB/9WHtCDSleWH0UN+TMKRXHioIpdeJhKvQgFD7h2snBh0xdZ2XRKF33xjASxwQkEastbmZheDy1+M592Gd/ShnFN5je3KiPkcpw2fFU1gFBf9sZ7PJoYNCWd8WxL7ZgLEzOgoLfioM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=216.24.177.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+	by norbury.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1sN8ag-004LRC-0i;
+	Fri, 28 Jun 2024 20:12:27 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 28 Jun 2024 20:12:26 +1000
+Date: Fri, 28 Jun 2024 20:12:26 +1000
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: WangYuli <wangyuli@uniontech.com>
+Cc: davem@davemloft.net, tsbogend@alpha.franken.de,
+	linux-crypto@vger.kernel.org, linux-mips@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Guan Wentao <guanwentao@uniontech.com>
+Subject: Re: [PATCH] MIPS: crypto: Clean up useless assignment operations
+Message-ID: <Zn6MiqGOD6p6YEul@gondor.apana.org.au>
+References: <1D248893502B75F5+20240628084117.84264-1-wangyuli@uniontech.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1D248893502B75F5+20240628084117.84264-1-wangyuli@uniontech.com>
 
-On Fri, 28 Jun 2024 01:54:00 +0800
-Chen-Yu Tsai <wens@csie.org> wrote:
+On Fri, Jun 28, 2024 at 04:41:17PM +0800, WangYuli wrote:
+> When entering the "len & sizeof(u32)" branch, len must be less than 8.
+> So after one operation, len must be less than 4.
+> At this time, "len -= sizeof(u32)" is not necessary for 64-bit CPUs.
+> 
+> A similar issue has been solved at Loongarch.
+> 
+> Link: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?h=v6.10-rc5&id=fea1c949f6ca5059e12de00d0483645debc5b206
+> Signed-off-by: Guan Wentao <guanwentao@uniontech.com>
+> Signed-off-by: WangYuli <wangyuli@uniontech.com>
+> ---
+>  arch/mips/crypto/crc32-mips.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/arch/mips/crypto/crc32-mips.c b/arch/mips/crypto/crc32-mips.c
+> index ec6d58008f8e..505d2d897849 100644
+> --- a/arch/mips/crypto/crc32-mips.c
+> +++ b/arch/mips/crypto/crc32-mips.c
+> @@ -94,7 +94,9 @@ static u32 crc32_mips_le_hw(u32 crc_, const u8 *p, unsigned int len)
+>  
+>  		CRC32(crc, value, w);
+>  		p += sizeof(u32);
+> +#ifndef CONFIG_64BIT
+>  		len -= sizeof(u32);
+> +#endif
 
-Hi Chen-Yu,
+First of all, did you verify that this actually makes a difference?
+Please post the actual assembly output with and without this patch.
 
-> On Tue, Jun 25, 2024 at 7:23=E2=80=AFAM Andre Przywara <andre.przywara@ar=
-m.com> wrote:
-> >
-> > The Allwinner H616 SoC contains a crypto engine very similar to the H6
-> > version, but with all base addresses in the DMA descriptors shifted by
-> > two bits. This requires a new compatible string.
-> > Also the H616 CE relies on the internal osciallator for the TRNG
-> > operation, so we need to reference this clock.
-> >
-> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
-> > ---
-> >  arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi | 10 ++++++++++
-> >  1 file changed, 10 insertions(+)
-> >
-> > diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi b/arch/arm6=
-4/boot/dts/allwinner/sun50i-h616.dtsi
-> > index 921d5f61d8d6a..187663d45ed72 100644
-> > --- a/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
-> > +++ b/arch/arm64/boot/dts/allwinner/sun50i-h616.dtsi
-> > @@ -113,6 +113,16 @@ soc {
-> >                 #size-cells =3D <1>;
-> >                 ranges =3D <0x0 0x0 0x0 0x40000000>;
-> >
-> > +               crypto: crypto@1904000 {
-> > +                       compatible =3D "allwinner,sun50i-h616-crypto";
-> > +                       reg =3D <0x01904000 0x1000>; =20
->=20
-> The address range only goes up to 0x019047ff. The other half is the
-> secure crypto engine. The other bits look correct.
+If it does make a difference, you should avoid doing ifdefs as they
+are more likely to cause build failures.  Instead do something like
 
-You are right, the manual restricts CE_NS to 0x019047ff, and we certainly
-use much less registers than that anyway. So good catch!
-
-> I can fix this up when applying, assuming the driver parts get merged
-> in the next few days.
-
-Many thanks, I'd be very grateful if you could fix this up!
+		if (!IS_ENABLED(CONFIG_64BIT))
+			len -= sizeof(u32);
 
 Cheers,
-Andre
-
->=20
-> Chenyu
->=20
-> > +                       interrupts =3D <GIC_SPI 91 IRQ_TYPE_LEVEL_HIGH>;
-> > +                       clocks =3D <&ccu CLK_BUS_CE>, <&ccu CLK_CE>,
-> > +                                <&ccu CLK_MBUS_CE>, <&rtc CLK_IOSC>;
-> > +                       clock-names =3D "bus", "mod", "ram", "trng";
-> > +                       resets =3D <&ccu RST_BUS_CE>;
-> > +               };
-> > +
-> >                 syscon: syscon@3000000 {
-> >                         compatible =3D "allwinner,sun50i-h616-system-co=
-ntrol";
-> >                         reg =3D <0x03000000 0x1000>;
-> > --
-> > 2.39.4
-> > =20
-
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
