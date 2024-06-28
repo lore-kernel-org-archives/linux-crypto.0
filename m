@@ -1,72 +1,61 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from norbury.hmeau.com (helcar.hmeau.com [216.24.177.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C9828EA;
-	Fri, 28 Jun 2024 01:01:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6139828EA;
+	Fri, 28 Jun 2024 01:04:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.24.177.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719536514; cv=none; b=fAJGHjF/A5yUr9zlZTClban9MIdNQO0UJfSnGQHkPW4deFx1huRfDbEfBA+a+3rnxtJWQ1dsyttouXqqufvlJMccMhpQU7HOgjLSHj2js1KsAIBnT1W65gQ6z98C3JxXLI5uzyDeXYTu+5cS9Niy8R7fqL2I2pz9sRhNXGRJ0i8=
+	t=1719536658; cv=none; b=dsr/5LEYk2Cjrf+yrY7pBD8k/ZAtH5cyd2tqeRzMFovE5Pk2Fb2QSuVvvlSHpJD+0JmfsC4qIa4AhO9SvWCKFawqSt5Bq7DThi2yDgh8a2Tfab78+ZGII/pSD2dp5pO5x0+FPduuLfg53cq/rgoq3Fj4lS1Eq+ZLk2MX3NXdDbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719536514; c=relaxed/simple;
-	bh=pV2h0LEZ2VCWHX8+jQOV1ozSQfsgpmRWnzRtqC7oEVw=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=jCmsMjr2N/X64HnhuJaJtE5HS7h/ukJk8yg1EeKUe6pas/6zsadDndhjV0B4fVM9L9g0Pl0gcwNKz0MpaxGnn0g6Tu2qaWA9l7jw3lXX6V9upEXaAnSbrdO6rHhmU2HIxxs1gLMRe5qD8U2JXrOBCkO1Cn5oYLq5f0iWSCJ0Ktk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f+n1rFkM; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f+n1rFkM"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E23E7C32786;
-	Fri, 28 Jun 2024 01:01:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719536513;
-	bh=pV2h0LEZ2VCWHX8+jQOV1ozSQfsgpmRWnzRtqC7oEVw=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=f+n1rFkM1mo2jqiSaASnPAlLiQ0EvEI+ArdJHAlFIlxfjFGYTEKyKDJTOn7pda4GG
-	 CMb0+aonmgKifEmQcb6cM8yFqsXFXTGrZ9CRUTtbff/s+df6fBWf2fBTqmMWoaHOTh
-	 +4fPv6rxeqAq3FNNc0EtKksA4dvdXq4DtFpEdxL9lMZCVaPKRdJp7CJuu8auMLj165
-	 auM1b/TzYk05BBSAH8qx7f772FfyOWG40Vh7hmoQEo4dBngSFIPN+SQ7FZO2PiqxVs
-	 YlfSe+SdXnOsiv09hkdZQzKmHJ68yhfiTrEvrXUbK+7WebDfkbx6KeLwOIv85s7uT7
-	 zROzABJtrIK+A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D72EBC43335;
-	Fri, 28 Jun 2024 01:01:53 +0000 (UTC)
-Subject: Re: [GIT PULL] Crypto Fixes for 6.10
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <Zn4Gc+jxtfLZ+cD1@gondor.apana.org.au>
-References: <Y/MDmL02XYfSz8XX@gondor.apana.org.au>
- <ZEYLC6QsKnqlEQzW@gondor.apana.org.au>
- <ZJ0RSuWLwzikFr9r@gondor.apana.org.au>
- <ZOxnTFhchkTvKpZV@gondor.apana.org.au>
- <ZUNIBcBJ0VeZRmT9@gondor.apana.org.au>
- <ZZ3F/Pp1pxkdqfiD@gondor.apana.org.au>
- <ZbstBewmaIfrFocE@gondor.apana.org.au>
- <ZgFIP3x1w294DIxQ@gondor.apana.org.au>
- <ZkrC8u1NmwpldTOH@gondor.apana.org.au>
- <ZlascqIex2rE2nO_@gondor.apana.org.au> <Zn4Gc+jxtfLZ+cD1@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <Zn4Gc+jxtfLZ+cD1@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.10-p4
-X-PR-Tracked-Commit-Id: a5d8922ab2aec39336ebc78d7cefe3b84647b058
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 5bbd9b249880dba032bffa002dd9cd12cd5af09c
-Message-Id: <171953651387.31542.2046745370772004601.pr-tracker-bot@kernel.org>
-Date: Fri, 28 Jun 2024 01:01:53 +0000
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+	s=arc-20240116; t=1719536658; c=relaxed/simple;
+	bh=f7Cv0c1sT79r4wmQl923NLIjPFbM8FMzILmtJ+gVcks=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SDNaX2GSnyoTHUB455A0jAM5eVUJutYa7vKGNkuNzWaPdN0+IdHDuu1jP/FZb3LYLDrlyBNkvF+eMYlRFMA2bABvLaehvC8AVeIMMHAA/9NjsLhC2t2EkUlOQApIYUpsHlCE7pHATenrCE22j41zSA6U2o+QanDcdSR+g2QyViA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=216.24.177.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+	by norbury.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1sN01u-004FjC-1o;
+	Fri, 28 Jun 2024 11:03:59 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 28 Jun 2024 11:03:58 +1000
+Date: Fri, 28 Jun 2024 11:03:58 +1000
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Helge Deller <deller@kernel.org>
+Cc: linux-crypto@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	linux-parisc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: xor - fix template benchmarking
+Message-ID: <Zn4L/pyXgyukCt8+@gondor.apana.org.au>
+References: <ZnMWDdKJHfYQLDzS@p100>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZnMWDdKJHfYQLDzS@p100>
 
-The pull request you sent on Fri, 28 Jun 2024 10:40:19 +1000:
+On Wed, Jun 19, 2024 at 07:31:57PM +0200, Helge Deller wrote:
+> Commit c055e3eae0f1 ("crypto: xor - use ktime for template benchmarking")
+> switched from using jiffies to ktime-based performance benchmarking.
+> 
+> This works nicely on machines which have a fine-grained ktime()
+> clocksource as e.g. x86 machoines with TSC.
+> But other machines, e.g. my 4-way HP PARISC server, don't have such
+> fine-grained clocksources, which is why it seems that 800 xor loops
+> take zero seconds, which then calculates in the logs as:
+> 
+>  xor: measuring software checksum speed
+>     8regs           : -1018167296 MB/sec
+>     8regs_prefetch  : -1018167296 MB/sec
+>     32regs          : -1018167296 MB/sec
+>     32regs_prefetch : -1018167296 MB/sec
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.10-p4
-
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/5bbd9b249880dba032bffa002dd9cd12cd5af09c
-
-Thank you!
-
+Ard, could you please take a look at this patch when you get a
+chance? Thanks!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
