@@ -1,32 +1,46 @@
-Received: from norbury.hmeau.com (helcar.hmeau.com [216.24.177.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4F6811CA9
-	for <linux-crypto@vger.kernel.org>; Fri, 28 Jun 2024 01:53:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.24.177.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB5A5FBB1;
+	Fri, 28 Jun 2024 07:39:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719539585; cv=none; b=Vw/pH47q7kQjNcypWKpGU8mjpGHs6s3Xmr9UwtMiNzO7otVR4LjgsYpCNC7WWnn3e0PJ+HSTnyamkyrrujI2Xg1gClN3X8a4JSGTzXVwQlXEyWMNnChxjqaC6boQ2eT+eAoi9JQrG69loj3JfvvMtHaS6bDrfXVqwIwBEHIF6k4=
+	t=1719560359; cv=none; b=otn5AAmoX+PSglleEep7xWdCe4mIB1lDzAhNjXFgVAXHu1D88IBhfemBG1AvCWsn1RwRhXcQnTjSYcJ48v5zZIJlb3vS9fnwQCHTX8enr2KHTzJK+jYQLzBt7c00X9hpmck2zt/Jl+FROlMObYuTKzqpw/Q8Relty8hZyJX0t9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719539585; c=relaxed/simple;
-	bh=20HcdlCqKaQF5MnUQB1WC0YJIUrETNsQwDltKyj4Hzo=;
+	s=arc-20240116; t=1719560359; c=relaxed/simple;
+	bh=1AZuypACBJ1EVl+EHSFcbj8lkbWG2c9CwFzXru13aDs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LMyo3SMnWPI0nuJh2+YeBSlt5ur8OITm79VeOXipI9HLVvI9MxdwY0FVRLhcFOh0MQ1RCeJ6OHo5cpClxOtiNcF/z7TkxTPTBe5R774rIpNMr0DnK4iADxeB/ozqq/EpnMHvUX9N3XwN4va71vVwMUNWy0sMYyubF5vI9RbTgjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=216.24.177.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-	by norbury.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1sN0n7-004GGT-1w;
-	Fri, 28 Jun 2024 11:52:46 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 28 Jun 2024 11:52:46 +1000
-Date: Fri, 28 Jun 2024 11:52:46 +1000
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Harald Freudenberger <freude@linux.ibm.com>
-Cc: linux-crypto@vger.kernel.org, dengler@linux.ibm.com, Jason@zx2c4.com
-Subject: Re: [PATCH v2] hwrng: core - Fix wrong quality calculation at hw rng
- registration
-Message-ID: <Zn4XboIRp5V5RRuz@gondor.apana.org.au>
-References: <20240621150224.53886-1-freude@linux.ibm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=k/kEnHwGGLLnsBIbOaRiGqfSk7fqEddXznUabBerAjkZKxAMjxXxzDXCWKYi2lpQVhP8wTI6yYvAwsGJMwm+RJLDZ2mv2626NQ0vrdzhH7VWt/XcXkfCmpPfd04OGrl0V7pk9WQHv/KRT3Oo2TzClNEtUTAVA6OLcLiW9iovJ/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RgmH5uCl; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RgmH5uCl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 789FEC116B1;
+	Fri, 28 Jun 2024 07:39:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719560359;
+	bh=1AZuypACBJ1EVl+EHSFcbj8lkbWG2c9CwFzXru13aDs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RgmH5uClfa6lPYENsvQSkGudX3DSBGvDv2yWm1rN/s3Nv6gBV6RAd5xY3AfmD0A0s
+	 XHW8XhNwd1ZxnZLkVS6ItiSuH96efKaxQHM91MF4eveJMKt2R9igca9Xf6pfgulCS6
+	 f4tK1tFbgFQIl1V9zEoap/K/oYT/hr8vZwRlTXZBLJRoQ/u8AOmmcRncjhswmjYiP9
+	 f54EwGygdxIYiXHSGhBvBTc+MPEIkIhnl4l6fsmKrIGBFu6TWqjc6MPnZTP/VgdZ5n
+	 bYwb8J1t2p5BAsLe+D+0d9ZDNE5/azNOIm/zIf3FP6iuUu0MXI0gC1CS9f5hsDH9hY
+	 gBcTAlSJIaYMg==
+Date: Fri, 28 Jun 2024 13:09:15 +0530
+From: Vinod Koul <vkoul@kernel.org>
+To: JiaJie Ho <jiajie.ho@starfivetech.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eugeniy Paltsev <Eugeniy.Paltsev@synopsys.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>
+Subject: Re: [PATCH v5 1/3] dmaengine: dw-axi-dmac: Support hardware quirks
+Message-ID: <Zn5oo3rZCnxgc5Ns@matsya>
+References: <20240530031112.4952-1-jiajie.ho@starfivetech.com>
+ <20240530031112.4952-2-jiajie.ho@starfivetech.com>
+ <ZmiOemWQrG-3EdIB@matsya>
+ <NT0PR01MB11826C9F142FCD1A1199A11B8AC02@NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,43 +49,48 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240621150224.53886-1-freude@linux.ibm.com>
+In-Reply-To: <NT0PR01MB11826C9F142FCD1A1199A11B8AC02@NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn>
 
-On Fri, Jun 21, 2024 at 05:02:24PM +0200, Harald Freudenberger wrote:
-> When there are rng sources registering at the hwrng core via
-> hwrng_register() a struct hwrng is delivered. There is a quality
-> field in there which is used to decide which of the registered
-> hw rng sources will be used by the hwrng core.
-> 
-> With commit 16bdbae39428 ("hwrng: core - treat default_quality as
-> a maximum and default to 1024") there came in a new default of
-> 1024 in case this field is empty and all the known hw rng sources
-> at that time had been reworked to not fill this field and thus
-> use the default of 1024.
-> 
-> The code choosing the 'better' hw rng source during registration
-> of a new hw rng source has never been adapted to this and thus
-> used 0 if the hw rng implementation does not fill the quality field.
-> So when two rng sources register, one with 0 (meaning 1024) and
-> the other one with 999, the 999 hw rng will be chosen.
-> 
-> As the later invoked function hwrng_init() anyway adjusts the
-> quality field of the hw rng source, this adjustment is now done
-> during registration of this new hw rng source.
-> 
-> Tested on s390 with two hardware rng sources: crypto cards and
-> trng true random generator device driver.
-> 
-> Fixes: 16bdbae39428 ("hwrng: core - treat default_quality as a maximum and default to 1024")
-> Reported-by: Christian Rund <Christian.Rund@de.ibm.com>
-> Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
-> Signed-off-by: Harald Freudenberger <freude@linux.ibm.com>
-> ---
->  drivers/char/hw_random/core.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
 
-Patch applied.  Thanks.
+Hi JiaJie
+
+On 12-06-24, 10:13, JiaJie Ho wrote:
+> > On 30-05-24, 11:11, Jia Jie Ho wrote:
+> > 
+> > > +
+> > > +struct dw_axi_peripheral_config {
+> > > +#define DWAXIDMAC_STARFIVE_SM_ALGO	BIT(0)
+> > 
+> > what does this quirk mean?
+> > 
+> > > +	u32 quirks;
+> > 
+> > Can you explain why you need this to be exposed. I would prefer we use
+> > existing interfaces and not define a new one...
+> > 
+> 
+> Hi Vinod,
+> Thanks for reviewing this.
+> This is a dedicated dma controller for the crypto engine.
+> I am adding this quirk to:
+> 1. Select the src and dest AXI master for transfers between mem and dev. 
+>     Driver currently only uses AXI0 for both.
+
+why cant this information be passed thru DT, that is typically done by
+most controllers?
+
+> 2. Workaround a hardware limitation on the crypto engine to
+>      transfer data > 256B by incrementing the peripheral FIFO offset.
+
+Dont set the transfer data > 256B, you should ideally use maxburst for
+configuring the FIFO...
+
+> 
+> What is the recommended way to handle such cases besides using 
+> peripheral_config in dma_slave_config?
+
+First use dma_slave_config() fields, if they are not appropriate, lets
+discuss why before we add custom methods or use peripheral_config
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+~Vinod
