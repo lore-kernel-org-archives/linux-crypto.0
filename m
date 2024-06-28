@@ -1,81 +1,95 @@
-Received: from norbury.hmeau.com (helcar.hmeau.com [216.24.177.18])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15A1F154444;
-	Fri, 28 Jun 2024 10:12:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.24.177.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEA2815D5A1;
+	Fri, 28 Jun 2024 13:56:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719569575; cv=none; b=YrhU3RFToRbn6sFDpfrp6IukI0D28IXCOXXA2imWUfd3jXK6f4KGluRxUSFO/aP3rr79K98RqohbD5c7ZFWhxqD+k9fHPkLvJSTCVwKEmli2Jyfi+aT80wAjNrjcAL24/sPDOySgsRVaKv0WDf3/gLJ3+ImfNmV0tlnC1hX31+Q=
+	t=1719582975; cv=none; b=eZVv4+mSkJcCTww037w2l4T2s3MHfGeMHaXnGYnYegGjKMmnsfdR14WfUUdySukNWI9dagiHBT+34WeZg68uxScgbS/Vb4e7Hvs2iMpzm9hsVgCR5eujGADUpvVrD4tbfkdwZrvqcSJC/q9DzO+6J43qcG2UZg86bcatgK/XU9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719569575; c=relaxed/simple;
-	bh=pzwr6heChKxBnt2X3WfkhfOjAnEHnig9DA7aY1PlUp4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hTKAjQ/DDBTNUFaOKQScy0WVsgL/bixWHB/9WHtCDSleWH0UN+TMKRXHioIpdeJhKvQgFD7h2snBh0xdZ2XRKF33xjASxwQkEastbmZheDy1+M592Gd/ShnFN5je3KiPkcpw2fFU1gFBf9sZ7PJoYNCWd8WxL7ZgLEzOgoLfioM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=216.24.177.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-	by norbury.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1sN8ag-004LRC-0i;
-	Fri, 28 Jun 2024 20:12:27 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 28 Jun 2024 20:12:26 +1000
-Date: Fri, 28 Jun 2024 20:12:26 +1000
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: WangYuli <wangyuli@uniontech.com>
-Cc: davem@davemloft.net, tsbogend@alpha.franken.de,
-	linux-crypto@vger.kernel.org, linux-mips@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Guan Wentao <guanwentao@uniontech.com>
-Subject: Re: [PATCH] MIPS: crypto: Clean up useless assignment operations
-Message-ID: <Zn6MiqGOD6p6YEul@gondor.apana.org.au>
-References: <1D248893502B75F5+20240628084117.84264-1-wangyuli@uniontech.com>
+	s=arc-20240116; t=1719582975; c=relaxed/simple;
+	bh=YwsaHrOzPvhBj063sIEundMu75Zcsby1a7cfcxtbVCA=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=EDWzE9norvg01WgMdz/ZSKDDian5Sk8z3hmj0Ti7nthmFPaTNYbaaBGH+qxmUwVsgdZ2hXlebwLvrxOQQXX5h4/kmubHFAJKUF8K4A5bNZuqwE5lFsntzbcZkbM75cH2I9WUFYwTa6lXNcOb4Q4n5zJqm40JcSpEBN+Q8OQ5SJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=1TQgy6sC; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=9hT6haFB; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="1TQgy6sC";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="9hT6haFB"
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1719582972;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0I16KSpDuZeoDhB1Yd2cM6pzj9GT5uR+PgHOxVDH1co=;
+	b=1TQgy6sCUUCHUJ22HcBZ3+yTp0qQsDGGFWy88Zp21iDRkETrhKlK9HI8oYG6r23qQ6VyAj
+	90M6THlVoGSq5I5ENtegYYlOSRcLMyd/SQgPJRKQQmhr+TaPPL9cUolXxmUblrhyRD4LCF
+	FbCBfpZbY8i20NNmVc91gWvPg+kHBZHfzrOmeGmItmC3qxt1MlLrPaaQ4sLaGTSPqRlxZR
+	uRJGkRPCSQBQ52hPf9gP7xR7DL5qw9O9rInkRH3xhGCc0HbyI0NvSlP0R/vfnLAawI3jmU
+	Z5A4JVOSUwqvC1PTked86oGXHSJZNiSBVJ6f0fVJTDh/7W8bvzDvL45hCZXTqw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1719582972;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0I16KSpDuZeoDhB1Yd2cM6pzj9GT5uR+PgHOxVDH1co=;
+	b=9hT6haFBPNQuDLiNL3jknk1S40faMnJp6rLW6MBxSaEb0GjnoSfuKHQCSjCTzzFUPCpJEE
+	cUoJzhIWfczTftAA==
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>, Aleksa Sarai <cyphar@cyphar.com>
+Cc: linux-kernel@vger.kernel.org, patches@lists.linux.dev,
+ linux-crypto@vger.kernel.org, linux-api@vger.kernel.org, x86@kernel.org,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Adhemerval Zanella Netto
+ <adhemerval.zanella@linaro.org>, Carlos O'Donell <carlos@redhat.com>,
+ Florian Weimer <fweimer@redhat.com>, Arnd Bergmann <arnd@arndb.de>, Jann
+ Horn <jannh@google.com>, Christian Brauner <brauner@kernel.org>, David
+ Hildenbrand <dhildenb@redhat.com>
+Subject: Re: [PATCH v18 2/5] random: add vgetrandom_alloc() syscall
+In-Reply-To: <ZnQeCRjgNXEAQjEo@zx2c4.com>
+References: <20240620005339.1273434-1-Jason@zx2c4.com>
+ <20240620005339.1273434-3-Jason@zx2c4.com>
+ <20240620.020423-puny.wheat.mobile.arm-1wWnJHwWYyAl@cyphar.com>
+ <ZnQeCRjgNXEAQjEo@zx2c4.com>
+Date: Fri, 28 Jun 2024 15:56:12 +0200
+Message-ID: <87v81txjb7.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1D248893502B75F5+20240628084117.84264-1-wangyuli@uniontech.com>
+Content-Type: text/plain
 
-On Fri, Jun 28, 2024 at 04:41:17PM +0800, WangYuli wrote:
-> When entering the "len & sizeof(u32)" branch, len must be less than 8.
-> So after one operation, len must be less than 4.
-> At this time, "len -= sizeof(u32)" is not necessary for 64-bit CPUs.
-> 
-> A similar issue has been solved at Loongarch.
-> 
-> Link: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?h=v6.10-rc5&id=fea1c949f6ca5059e12de00d0483645debc5b206
-> Signed-off-by: Guan Wentao <guanwentao@uniontech.com>
-> Signed-off-by: WangYuli <wangyuli@uniontech.com>
-> ---
->  arch/mips/crypto/crc32-mips.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/arch/mips/crypto/crc32-mips.c b/arch/mips/crypto/crc32-mips.c
-> index ec6d58008f8e..505d2d897849 100644
-> --- a/arch/mips/crypto/crc32-mips.c
-> +++ b/arch/mips/crypto/crc32-mips.c
-> @@ -94,7 +94,9 @@ static u32 crc32_mips_le_hw(u32 crc_, const u8 *p, unsigned int len)
->  
->  		CRC32(crc, value, w);
->  		p += sizeof(u32);
-> +#ifndef CONFIG_64BIT
->  		len -= sizeof(u32);
-> +#endif
+Jason!
 
-First of all, did you verify that this actually makes a difference?
-Please post the actual assembly output with and without this patch.
+On Thu, Jun 20 2024 at 14:18, Jason A. Donenfeld wrote:
+> On Wed, Jun 19, 2024 at 07:13:26PM -0700, Aleksa Sarai wrote:
+>> Then again, I guess since libc is planned to be the primary user,
+>> creating a new syscall in a decade if necessary is probably not that big
+>> of an issue.
+>
+> I'm not sure going the whole big struct thing is really necessary, and
+> for an additional reason: this is only meant to be used with the vDSO
+> function, which is also coupled with the kernel. It doesn't return
+> information that's made to be used (or allowed to be used) anywhere
+> else. So both the vdso code and the syscall code are part of the same
+> basic thing that will evolve together. So I'm not convinced extensible
+> struct really makes sense for this, as neat as it is.
+>
+> If there's wide consensus that it's desirable, in contrast to what I'm
+> saying, I'm not vehemently opposed to it and could do it, but it just
+> seems like massive overkill and not at all necessary. Things are
+> intentionally as simple and straightforward as can be.
 
-If it does make a difference, you should avoid doing ifdefs as they
-are more likely to cause build failures.  Instead do something like
+Right, but the problem is that this is a syscall, so people are free to
+explore it even without the vdso part. Now when you want to change it
+later then you are caught in the no-regression trap.
 
-		if (!IS_ENABLED(CONFIG_64BIT))
-			len -= sizeof(u32);
+So making it extensible with backwards compability in place (add the
+unused flag field and check for 0) will allow you to expand without
+breaking users.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thanks,
+
+        tglx
