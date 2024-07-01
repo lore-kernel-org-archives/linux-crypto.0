@@ -1,77 +1,90 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C61973BBED;
-	Mon,  1 Jul 2024 11:38:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3624314A601;
+	Mon,  1 Jul 2024 11:53:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719833910; cv=none; b=S84zX7nKMdnDVHaV7fYODCsuI9YVz7j4W3WSAto8d7D/2M9MNar2ylbKLhoYEiQ2efHgWMKMufJB9uYZbrUiP7Re8CT+pk8zOcPeq6ifsZTkMl/SC+FbWJtwPXCRmnLI1NzNcNUR4VM155MMkE+JOP+0Ijl5C2TD49dHKZm/aAY=
+	t=1719834791; cv=none; b=XY+6BQ3gjoimuvhZA9fPJ/enOS9u0EUmNcP8Ou5G3qSfmJ+JCWG2zh3tt9FBDdkBG12H48irmCdYg+FhyylQjb9uunoFijT498DcQJri3qJm48s+JzB2mNmZ/RoJQIiduskv490dTMlFSjc3qM0xAgPL71B0Fs/6Cv+XlfunKwA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719833910; c=relaxed/simple;
-	bh=bHOqgyma+zpO2MbWNympnDKo29K7Cl31NJv3Wl7N7Ls=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HB0CSqWgAejf4Hgj3P1l/ulbWnfD215nr+BNQKNUDPM1QBV6q/i5bv+UPMAI+3LCGx3z7MtjcOfzjz7uaSdlzBwpnAzAbO/grEdKMZp8F+wk/p3T+DGw6J0ysdZso/1tk1f5uJ6XA0aUkK6UJaELY9F9C2BPJXmQfLvxeRfhv6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d9MVcZ5A; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1719834791; c=relaxed/simple;
+	bh=vKDM44VET0ISDBwcNtPUEEiERcMPn9O7mLC4TjHOZ80=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N4l5G4dGfYOTZ9u1dmQmgeeIV5GSjx90yBqrVDGGbt+aw1WU3YeWu3ChpOHNEGgxYA+lKxJIczVRSZ0lkYoabVMzNTRO+mfVmg1z8pnsOPjYFcIUv4eLaYOCkGxwvbDwsxqvNivF3lR5muc4YgMhkmSHT3unI6fvCDKCA8A3+oE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=O6qhCzL1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d9MVcZ5A"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD215C116B1;
-	Mon,  1 Jul 2024 11:38:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719833910;
-	bh=bHOqgyma+zpO2MbWNympnDKo29K7Cl31NJv3Wl7N7Ls=;
-	h=Date:From:To:List-Id:Cc:Subject:In-Reply-To:References:From;
-	b=d9MVcZ5AeL+425pje4XMZ6l6YpWd1CNiLok9QRR+ekiNWmELFXkzbZMcs/q/9zn7p
-	 /F0EgE81q02J8q9PIVONMS58R+QfbDfrHbhQd8bYGvyS58OPVT1EIo10mD0SZafIF3
-	 pGi7riOC8oX3DrD593mh6cIz9XoFc07qtScKf5g8sKvuIhmXuJocD0MFlF5AhCtDFm
-	 TX3QYaG4jLgxTyRusplRJKKC95ZnYz24bmr8fSjJgolit68VApDzS4i4N6SlwDNM8M
-	 vwaZE4hyeYChyhxLXXuyrA4cNwdROXAc/lGUnqxMCC0f6k4rgBAnqHk6firwxeYBUx
-	 Zj4FJmaqFTTBg==
-Date: Mon, 1 Jul 2024 13:38:21 +0200
-From: Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Gregory CLEMENT <gregory.clement@bootlin.com>, soc@kernel.org,
- arm@kernel.org, Andy Shevchenko <andy@kernel.org>, Hans de Goede
- <hdegoede@redhat.com>, Ilpo =?UTF-8?B?SsOkcnZpbmVu?=
- <ilpo.jarvinen@linux.intel.com>, Alessandro Zummo <a.zummo@towertech.it>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>, Bartosz Golaszewski
- <brgl@bgdev.pl>, Christophe JAILLET <christophe.jaillet@wanadoo.fr>, Dan
- Carpenter <dan.carpenter@linaro.org>, devicetree@vger.kernel.org, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, Guenter Roeck
- <linux@roeck-us.net>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Linus Walleij
- <linus.walleij@linaro.org>, linux-crypto@vger.kernel.org,
- linux-gpio@vger.kernel.org, linux-rtc@vger.kernel.org,
- linux-watchdog@vger.kernel.org, Olivia Mackall <olivia@selenic.com>, Rob
- Herring <robh+dt@kernel.org>, Wim Van Sebroeck <wim@linux-watchdog.org>,
- Andrew Lunn <andrew@lunn.ch>, Conor Dooley <conor+dt@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>, Sebastian
- Hesselbarth <sebastian.hesselbarth@gmail.com>, Uwe =?UTF-8?B?S2xlaW5lLUs=?=
- =?UTF-8?B?w7ZuaWc=?= <uwe@kleine-koenig.org>
-Subject: Re: [PATCH v12 0/8] Turris Omnia MCU driver
-Message-ID: <20240701133821.059576fd@dellmb>
-In-Reply-To: <nznz6bdxcin3srtf2le34gxbyrmhwquym3xdowoognqaswrjgg@ujvaoaydzj6f>
-References: <20240617152606.26191-1-kabel@kernel.org>
-	<nznz6bdxcin3srtf2le34gxbyrmhwquym3xdowoognqaswrjgg@ujvaoaydzj6f>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="O6qhCzL1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B531C2BD10;
+	Mon,  1 Jul 2024 11:53:09 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="O6qhCzL1"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1719834787;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BdJk45yqWfAF6GzrWiLUT4OERI93TgE+sNwH9kDnoUI=;
+	b=O6qhCzL1UqaP9OmQMiGvaqfgQIkuqdGJxVyuwGFZxSyXxf70lZBi6WuLHkNATF4f9u2r5o
+	Vl8I/mObuqeWf/v/9TdNNLvaJGZlf1ikZftxdYT4T4BbsDh2XDXng0jV1Y7NDIAsmOd3aq
+	R1SKNw65Tsg+asToLqMmCu4u4yP9Tyg=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 67037b82 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Mon, 1 Jul 2024 11:53:07 +0000 (UTC)
+Date: Mon, 1 Jul 2024 13:53:04 +0200
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: Aleksa Sarai <cyphar@cyphar.com>, linux-kernel@vger.kernel.org,
+	patches@lists.linux.dev, linux-crypto@vger.kernel.org,
+	linux-api@vger.kernel.org, x86@kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+	Carlos O'Donell <carlos@redhat.com>,
+	Florian Weimer <fweimer@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
+	Jann Horn <jannh@google.com>,
+	Christian Brauner <brauner@kernel.org>,
+	David Hildenbrand <dhildenb@redhat.com>
+Subject: Re: [PATCH v18 2/5] random: add vgetrandom_alloc() syscall
+Message-ID: <ZoKYoBp_bSRP_fqn@zx2c4.com>
+References: <20240620005339.1273434-1-Jason@zx2c4.com>
+ <20240620005339.1273434-3-Jason@zx2c4.com>
+ <20240620.020423-puny.wheat.mobile.arm-1wWnJHwWYyAl@cyphar.com>
+ <ZnQeCRjgNXEAQjEo@zx2c4.com>
+ <87v81txjb7.ffs@tglx>
+ <Zn7D_YBC2SXTa_jX@zx2c4.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Zn7D_YBC2SXTa_jX@zx2c4.com>
 
-On Mon, 1 Jul 2024 10:41:15 +0200
-Marek Beh=C3=BAn <kabel@kernel.org> wrote:
+On Fri, Jun 28, 2024 at 04:09:01PM +0200, Jason A. Donenfeld wrote:
+> fine. Also I used u32 there for the two smaller arguments, but maybe
+> that's silly and we should go straight to u64?
 
-> Hi Arnd,
->=20
-> will you be merging this series?
+Judging by `struct clone_args`, it looks like I've got to use
+__aligned_u64 for every argument:
 
-Just to clear up, I wanted to ask whether you will be merging or
-someone else should take stuff to drivers/platform.
+    struct clone_args {
+        __aligned_u64 flags;
+        __aligned_u64 pidfd;
+        __aligned_u64 child_tid;
+        __aligned_u64 parent_tid;
+        __aligned_u64 exit_signal;
+        __aligned_u64 stack;
+        __aligned_u64 stack_size;
+        __aligned_u64 tls;
+        __aligned_u64 set_tid;
+        __aligned_u64 set_tid_size;
+        __aligned_u64 cgroup;
+    };
+    #define CLONE_ARGS_SIZE_VER0 64 /* sizeof first published struct */
+    #define CLONE_ARGS_SIZE_VER1 80 /* sizeof second published struct */
+    #define CLONE_ARGS_SIZE_VER2 88 /* sizeof third published struct */
+    
+So okay, I'll do that, and will have an ARGS_SIZE_VER0 macro too.
 
-Anyway, I sent v13 with one more cosmetic change, requested by Bart.
-
-Marek
+Jason
