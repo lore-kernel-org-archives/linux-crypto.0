@@ -1,101 +1,71 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60A2C14AD36;
-	Mon,  1 Jul 2024 14:00:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D02C137E;
+	Mon,  1 Jul 2024 14:45:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719842413; cv=none; b=es6h+zxrS5h5DHHhOs+FjyKQE/EcYknP0ItbFy/8ke9lTsv/O+ZqZ2p4DV2uzNwMOV2Bi2lnL3YB12u7sJ0x6L39bRo6TsPZSpTlBCh6/yZffJ8f2DCTlM/CJeDHziSdyIgMn2wU1FNFwyNu+KeeMaRcXz4v8Ovp68C4OVK71CQ=
+	t=1719845132; cv=none; b=GcVbReF9q7swVJ+CXOFtlh29TTcpAh9q/+uhFT1DD3zn2y9Tx8WsGaXlA83M4RhC4ZSRdzIrv3yiFq61+nedZLzeI4yQbofb5Ay/jH7wBu9ozvBQH6leAMJBCXeTrmGLFalCSiKwC8mFOWj3kt+Y1T6psQmdCk91qt7dc3+9tQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719842413; c=relaxed/simple;
-	bh=qTEQjVk0tKxOKX1m6lN2tYIgvkZrJ7LGYmq75GF9S9o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YYSoSUDJnUo1KPheDHnfvLVUqt70vwbXVjdy7ZvSMKuH3Yqjy+RPxnYuxCru0mD0JajiGYZbA8PO1+FRmYaJ/DGTcVNCrRXuxG8Mf8joxHu7aeRnVJQEQKahF3yljC86nWM36/RhWRhxIW6c4VSGqF4BaWlp9gVAoybjxahLB3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=fSv+muiq; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1719845132; c=relaxed/simple;
+	bh=nVoWhZ54bVbfutTma+csFUuBOmOpNcmPuKkxTkG+LWU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ljmEK/8ehYA/cEuoTx4UH+NizZN9XYlRP+gzRptl9vbVxhkXKvg9FHi8hBiazdF9ULx8wmmbamYzS1d1hadLJEFk9w1kCITki6iUT5iV+/k1QjwwA3WcNOgOvkCxkDGq7RE8M2rJhgLCX34tL7ut2AP4+2P0sYPKLQxrixBQ5nU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e0XF8UQl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="fSv+muiq"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81907C4AF0D;
-	Mon,  1 Jul 2024 14:00:12 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="fSv+muiq"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1719842409;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZItOz8mD+QC05vJ9N7C1vvN7W60Qy3m66+OR2/u/3EU=;
-	b=fSv+muiqQJqN3a6x1gkiA6fJvKljNCDkfK5dya7Gt0NNaqUE+9a8Cpz4uC/55j3ttKFp05
-	F9bza5WFJuchyRT2tGaJawPbMLflS945YXKSgg1mNBjffwxBtpQbmfkOWQS5M5nEc92GS2
-	8UhqVk0+Pr2JE1sJdxCDLurUYZrOt3Q=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 9e4c9795 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Mon, 1 Jul 2024 14:00:08 +0000 (UTC)
-Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-5c2284616f7so2019931eaf.1;
-        Mon, 01 Jul 2024 07:00:08 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVSLkXkdWsAhjSs7bOLtbGAXoyj17HxNERaZXBTAfMPg2Vfp3iE/6M4GrOc3NQjIJR0M/uIyC9y5rLiLuWvaDU9T+HOCnf/W0yq19h6KxjSUbwyjZEjy1Nqisplx3VnXXJWSyhzku7QAprPBfA+PGrRkyHnKy4lKjutcqYl61PtQtUlVl6c
-X-Gm-Message-State: AOJu0YzoUBUOHXB/gS6KHqS5mluPL0OxQ6BsW1jJrcmJFUl6p/Wyf+cp
-	wQCTVA3hEQJRWo9U2zlheyTS/WaDtzSNFPfBRfBSJ+FpJnK7r7/phlcio6qYPMeE2ix/4hTaPMs
-	w9RSXIsaLWFMtVJms8Zi8nkNuYuU=
-X-Google-Smtp-Source: AGHT+IE1jxyGiueUEPSswOQsUIiXDbT8crZPdJRtiuqOnv85BhhtzLC+FOcAwhNrOHuWJUxUmx2IxcgL+w6Ca0JK8c0=
-X-Received: by 2002:a05:6870:4153:b0:25d:5f08:6b0b with SMTP id
- 586e51a60fabf-25db3414cfcmr5460274fac.18.1719842406764; Mon, 01 Jul 2024
- 07:00:06 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e0XF8UQl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72A19C116B1;
+	Mon,  1 Jul 2024 14:45:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719845131;
+	bh=nVoWhZ54bVbfutTma+csFUuBOmOpNcmPuKkxTkG+LWU=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=e0XF8UQlw8JDBtI9/0JHTQGCUtwDaV+CTfSs1JFNJkgINOrxziqEY7v6M9vzSOWdw
+	 tBcK7TS4BmHUQjP7u7HGYSWBTlW4g+1q+A1LJ6buAXL9XBjM8hItMPupgKH/1JmL9n
+	 GsNVwqy/086U9l7N/b+du3wGSUEvOo+bYudWzu0kBUmST/vrhL4xZ6Pt9p1Lh3iJsE
+	 M3fUKo7hhNuWE8IQUE1KTTJGXAV66ga0VeyFAls5Iq8VxsW4ferQqBE9HPBfjWbEw2
+	 tHY/Qjvj0ezlIDk2DcQlqNfAg8N0Ou/DgHPx8WlZuliJN5sM1XMuRupNIO7Bv/e/5k
+	 pgdUFMSzePL+Q==
+Message-ID: <85c8e8095d22db8923c10a180d9e91c61ae64c54.camel@kernel.org>
+Subject: Re: Warning at crypto/testmgr.c:5900, while booting to OS
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: Venkat Rao Bagalkote <venkat88@linux.vnet.ibm.com>,
+ stefanb@linux.ibm.com,  herbert@gondor.apana.org.au
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Mon, 01 Jul 2024 14:45:28 +0000
+In-Reply-To: <25d1a371-a4be-41d9-a3ad-f97bd9348dbc@linux.vnet.ibm.com>
+References: <25d1a371-a4be-41d9-a3ad-f97bd9348dbc@linux.vnet.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.2 (3.52.2-1.fc40) 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240620005339.1273434-1-Jason@zx2c4.com> <20240620005339.1273434-3-Jason@zx2c4.com>
- <20240620.020423-puny.wheat.mobile.arm-1wWnJHwWYyAl@cyphar.com>
- <ZnQeCRjgNXEAQjEo@zx2c4.com> <87v81txjb7.ffs@tglx> <Zn7D_YBC2SXTa_jX@zx2c4.com>
- <ZoKYoBp_bSRP_fqn@zx2c4.com>
-In-Reply-To: <ZoKYoBp_bSRP_fqn@zx2c4.com>
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Mon, 1 Jul 2024 15:59:55 +0200
-X-Gmail-Original-Message-ID: <CAHmME9p-VTJnwCJK7qko_k4X=L_WqiCk9vrif=GbpJE3ZPP1PA@mail.gmail.com>
-Message-ID: <CAHmME9p-VTJnwCJK7qko_k4X=L_WqiCk9vrif=GbpJE3ZPP1PA@mail.gmail.com>
-Subject: Re: [PATCH v18 2/5] random: add vgetrandom_alloc() syscall
-To: Thomas Gleixner <tglx@linutronix.de>
-Cc: Aleksa Sarai <cyphar@cyphar.com>, linux-kernel@vger.kernel.org, 
-	patches@lists.linux.dev, linux-crypto@vger.kernel.org, 
-	linux-api@vger.kernel.org, x86@kernel.org, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>, "Carlos O'Donell" <carlos@redhat.com>, 
-	Florian Weimer <fweimer@redhat.com>, Arnd Bergmann <arnd@arndb.de>, Jann Horn <jannh@google.com>, 
-	Christian Brauner <brauner@kernel.org>, David Hildenbrand <dhildenb@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 1, 2024 at 1:53=E2=80=AFPM Jason A. Donenfeld <Jason@zx2c4.com>=
- wrote:
->
-> On Fri, Jun 28, 2024 at 04:09:01PM +0200, Jason A. Donenfeld wrote:
-> > fine. Also I used u32 there for the two smaller arguments, but maybe
-> > that's silly and we should go straight to u64?
->
-> Judging by `struct clone_args`, it looks like I've got to use
-> __aligned_u64 for every argument:
->
->     struct clone_args {
->         __aligned_u64 flags;
->         __aligned_u64 pidfd;
->         __aligned_u64 child_tid;
->         __aligned_u64 parent_tid;
->         __aligned_u64 exit_signal;
->         __aligned_u64 stack;
->         __aligned_u64 stack_size;
->         __aligned_u64 tls;
->         __aligned_u64 set_tid;
->         __aligned_u64 set_tid_size;
->         __aligned_u64 cgroup;
->     };
->     #define CLONE_ARGS_SIZE_VER0 64 /* sizeof first published struct */
->     #define CLONE_ARGS_SIZE_VER1 80 /* sizeof second published struct */
->     #define CLONE_ARGS_SIZE_VER2 88 /* sizeof third published struct */
->
-> So okay, I'll do that, and will have an ARGS_SIZE_VER0 macro too.
+On Wed, 2024-06-12 at 12:16 +0530, Venkat Rao Bagalkote wrote:
+> This issue is being caused by the patch: 2fd2a82ccbfc106aec314db6c4bda5e2=
+4fd32a22.
+>=20
+> After reverting the above patch, issue is not seen.
 
-This is now covered by v19 of this patchset:
-https://lore.kernel.org/lkml/20240701135801.3698-1-Jason@zx2c4.com/
+$ git show 2fd2a82ccbfc106aec314db6c4bda5e24fd32a22 # [1]
+fatal: bad object 2fd2a82ccbfc106aec314db6c4bda5e24fd32a22
+
+Unless I made a mistake, for me it really looks like that the commit is
+non-existent.
+
+> Regards,
+> Venkat.
+
+[1]
+commit 22a40d14b572deb80c0648557f4bd502d7e83826 (tag: v6.10-rc6, mainline/m=
+aster)
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sun Jun 30 14:40:44 2024 -0700
+
+    Linux 6.10-rc6
+
+BR, Jarkko
