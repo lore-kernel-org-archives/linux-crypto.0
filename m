@@ -1,130 +1,107 @@
-Received: from mail-oa1-f53.google.com (mail-oa1-f53.google.com [209.85.160.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4794E79DF
-	for <linux-crypto@vger.kernel.org>; Tue,  2 Jul 2024 05:34:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06B9D4CB23;
+	Tue,  2 Jul 2024 07:42:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719898490; cv=none; b=Oz/DSiRy6znkJtvI/II+GIsDQbtcnPcpo/33V21yj41G5taxnV9sNHp68PsfXP96manIkZjT8v6URZ3WE86xzyiFp/gW1AhJbV6FC9P3j4/xdchMy3yx057qCpFHs+hZGIppHFHgrSevI38/5uTdGzBHu9SiUU0t4Av9H2tD5lk=
+	t=1719906176; cv=none; b=V7YH7+VRLODwSvZI1MV0RI/rxMnODh+MHue0SsPKfzFhYo/GwGRpoxaBGooy5djsB63npcrsrmgeENQVYsV5m9lRLCoYnoMCa1Dn7y6weGLbavQZ/mIYmtMmyHw6Un26Efs2jF4TWl5y4gpU7gjqAR7pcKB1OI4FCceVXBnibwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719898490; c=relaxed/simple;
-	bh=FjtVOHtZTmMqztivu3c1awxhvlnUREuGjkoEgVHP1aw=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=R3QrsiQZ/NcaqwTbaWvBbn7Yy97W/IXi8DKxQ+rTjNSCvB0LMUc47IOEUxPApnMGztnW1uFeKNr2nNit6xvFOyXfauseeN1Lj53+/fG/Ysb03Pu/l40F76kaa4H+AsKL80wtFgKKXkxYj80VVeN93gxxfr2pdv/zYA5lmRE60Mc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bade.nz; spf=pass smtp.mailfrom=leithalweapon.geek.nz; dkim=pass (2048-bit key) header.d=bade.nz header.i=@bade.nz header.b=MoDIET7e; arc=none smtp.client-ip=209.85.160.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bade.nz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leithalweapon.geek.nz
+	s=arc-20240116; t=1719906176; c=relaxed/simple;
+	bh=b9oO32qfFgklf7sETD8/dcIhc/Mu840qILzRUiMTpP4=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=SRVdjxAvNkRauoJP4T7ggZiLCyzJ1I7ArehIkiYDZF2JytK6u6QVs7sq15Od0/xAxs/FnnoLm/0X4cWcofnHuWtxdFOM+vYcdJbWBN4f27gDQMgbIz+6w6jI3EwnWlcLshxm/QG/5ovD1MQAHGFLv01HSbYlkUTgaUmdPDF/zMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=OshYRO+R; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bade.nz header.i=@bade.nz header.b="MoDIET7e"
-Received: by mail-oa1-f53.google.com with SMTP id 586e51a60fabf-25c9786835eso2240897fac.3
-        for <linux-crypto@vger.kernel.org>; Mon, 01 Jul 2024 22:34:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bade.nz; s=google; t=1719898486; x=1720503286; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=k9AFZnKOW/OV6MX+SwcsEAZ4wLQxlx3trIXu3lIbf/g=;
-        b=MoDIET7euHU3CJjqzPZmah6R5X/8ODKz0NUgYKsYkxyn3EvRvTzwgrYTcZPbl1BUJj
-         teGuUz0TV8fN7H9PQO0q2gcv+R9shGrPLkFbjb2zEf9Ljv9HI98ycUbUFCG1yn11Owv1
-         DPDQqg+vgpTxILOY2tKiiUey0AjH+qS3uOhFCYQ9pb8fqLAXbWh6AJjcKfUNZq6FxIIe
-         PVPue/58nbSvyUm6XZer9RPYyxjpOjFKq7EDEa9V+bDmoRVrP7tJ0jeGV/8DTtAAEXE+
-         3qRGEqjJjxM5GUvRrLRtdtT9OY+JpsoD6Swax4QD9Zfw7DzvqHV2qAD9CiwNAYaKvvqZ
-         xUEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719898486; x=1720503286;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=k9AFZnKOW/OV6MX+SwcsEAZ4wLQxlx3trIXu3lIbf/g=;
-        b=A7z0HEQMYkFcskSH0ELagmLx1tCPIy+hYjEha2BWI2WpcXFrhTFCYBNKg6qPN1Wp3t
-         K+crPTGsL0dAb4HqLLq9VOdm3HytUk4SFrFUBhulPeVXbbrMApBpz+BUQCMIhBOnFLJG
-         vwEjpY0MDd/cMOWQfGdwXBwj+ICq8N7IZauoa2beNCGDmul7NrTMwKzWHMFx/RANLh6Z
-         2XxF5WnsXASpnSE34giyceHoP2cLGMvSUajOCdgAvHnhdsVjq119hYVP7qRsn8Q9gMRU
-         DpuCh4fS8Ygle3T8Qvt3Po5SLN0S8QIz4gGOmKq6Z+tALs73uUjnoEakFmMWTUp3TQEE
-         Kstg==
-X-Gm-Message-State: AOJu0YxCff66p1JX6QhVFpkkrLP54uyQFqvmsllOyIEvdeJVfnLCKj1t
-	BCqoAklJQjzfBNH+g9VQf7b6QA8skQvITOwImqJJwfKkbSjn0hxQz+ab36FwiMa2bjlHUvgZ2eH
-	jZIG8kezV8fWr73Fzlqf3RLHBTGV2Um77/ptUXcwGDt/ttaDDmBQH
-X-Google-Smtp-Source: AGHT+IGwmszSMGvkr08n3X/1OA+McVqsuTBXL5fJP3TwrrQ1RIEyspXl4H4r6TlV6E4NoKTdD8pvCypu529lgIOLxnA=
-X-Received: by 2002:a05:6870:2407:b0:254:bd24:de85 with SMTP id
- 586e51a60fabf-25db340de8amr6736728fac.16.1719898486503; Mon, 01 Jul 2024
- 22:34:46 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="OshYRO+R"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9194C116B1;
+	Tue,  2 Jul 2024 07:42:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+	s=korg; t=1719906175;
+	bh=b9oO32qfFgklf7sETD8/dcIhc/Mu840qILzRUiMTpP4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=OshYRO+RqtW//uVs0njfZO7RS9kJp7HLUpkuV1+ecHPNjZ4TMDFd+ugEBS0Pi7c1j
+	 4NzTC/LyznWWg2EQLbG1xW5vZ28wBuRKvTHc7rpWhFih0+wqUumCbAP7TXxdJ0vmlT
+	 +XaG2OR5kNm6vFn4gpH1YXOJO7gEKW7cQ4RcGDmU=
+Date: Tue, 2 Jul 2024 00:42:54 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: linux-kernel@vger.kernel.org, patches@lists.linux.dev,
+ tglx@linutronix.de, linux-crypto@vger.kernel.org,
+ linux-api@vger.kernel.org, x86@kernel.org, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, Adhemerval Zanella Netto
+ <adhemerval.zanella@linaro.org>, Carlos O'Donell <carlos@redhat.com>,
+ Florian Weimer <fweimer@redhat.com>, Arnd Bergmann <arnd@arndb.de>, Jann
+ Horn <jannh@google.com>, Christian Brauner <brauner@kernel.org>, David
+ Hildenbrand <dhildenb@redhat.com>, linux-mm@kvack.org
+Subject: Re: [PATCH v19 1/5] mm: add VM_DROPPABLE for designating always
+ lazily freeable mappings
+Message-Id: <20240702004254.3ab2db4a98cb7fdd245407cb@linux-foundation.org>
+In-Reply-To: <20240701135801.3698-2-Jason@zx2c4.com>
+References: <20240701135801.3698-1-Jason@zx2c4.com>
+	<20240701135801.3698-2-Jason@zx2c4.com>
+X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: Leith Bade <leith@bade.nz>
-Date: Tue, 2 Jul 2024 15:34:35 +1000
-Message-ID: <CAPDEroXky+PJ29VcR6vsrdQ6uk43DekCvmiZGUqxxYHrYXrYoA@mail.gmail.com>
-Subject: Failed self-tests with crypto-safexcel on MediaTek MT7986 SoC
-To: linux-crypto@vger.kernel.org
-Cc: atenart@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi,
+On Mon,  1 Jul 2024 15:57:55 +0200 "Jason A. Donenfeld" <Jason@zx2c4.com> wrote:
 
-I am using a Banana Pi BPI-R3 router board, which has a MediaTek
-MT7986 SoC, with Linux  and I have noticed a large number of error
-messages and stack traces in my kernel boot log related to the
-crypto-safexcel module. The errors all related to a large number of
-failed self-tests for both hashing and encryption, thus I believe this
-device is not working correctly at all.
+> The vDSO getrandom() implementation works with a buffer allocated with a
+> new system call that has certain requirements:
+> 
+> - It shouldn't be written to core dumps.
+>   * Easy: VM_DONTDUMP.
+> - It should be zeroed on fork.
+>   * Easy: VM_WIPEONFORK.
+> 
+> - It shouldn't be written to swap.
+>   * Uh-oh: mlock is rlimited.
+>   * Uh-oh: mlock isn't inherited by forks.
+> 
+> It turns out that the vDSO getrandom() function has three really nice
+> characteristics that we can exploit to solve this problem:
+> 
+> 1) Due to being wiped during fork(), the vDSO code is already robust to
+>    having the contents of the pages it reads zeroed out midway through
+>    the function's execution.
+> 
+> 2) In the absolute worst case of whatever contingency we're coding for,
+>    we have the option to fallback to the getrandom() syscall, and
+>    everything is fine.
+> 
+> 3) The buffers the function uses are only ever useful for a maximum of
+>    60 seconds -- a sort of cache, rather than a long term allocation.
+> 
+> These characteristics mean that we can introduce VM_DROPPABLE, which
+> has the following semantics:
+> 
+> a) It never is written out to swap.
+> b) Under memory pressure, mm can just drop the pages (so that they're
+>    zero when read back again).
+> c) It is inherited by fork.
+> d) It doesn't count against the mlock budget, since nothing is locked.
+> 
+> This is fairly simple to implement, with the one snag that we have to
+> use 64-bit VM_* flags, but this shouldn't be a problem, since the only
+> consumers will probably be 64-bit anyway.
+> 
+> This way, allocations used by vDSO getrandom() can use:
+> 
+>     VM_DROPPABLE | VM_DONTDUMP | VM_WIPEONFORK | VM_NORESERVE
+> 
+> And there will be no problem with using memory when not in use, not
+> wiping on fork(), coredumps, or writing out to swap.
 
-I have been using the current Debian unstable distribution with a
-variety of kernel builds. I have seen the errors with both Debian and
-"vanilla" builds of v6.8.12, v6.9.7 and v6.10.0-rc6.
+The patch is impressively comment-free.  It is a little harsh to make
+readers go poking around in the git history to figure out what
+VM_DROPPABLE is, and why it exists.
 
-To reproduce, simply boot Linux on the BPI-R3 using the compiled DTS
-file  arch/arm64/boot/dts/mediatek/mt7986a-bananapi-bpi-r3.dts with
-the crypto-safexcel module enabled via the CONFIG_CRYPTO_DEV_SAFEXCEL
-option.
+Seems hard to test that this mode is working correctly.  Can you think
+of a way for userspace to check this?  And if so, add it to selftests?
 
-Any help fixing these errors would be appreciated.
-
-The relevant boot log messages:
-
-crypto-safexcel 10320000.crypto:
-EIP97:230(0,1,4,4)-HIA:270(0,5,5),PE:150/433(alg:7fcdfc00)/0/0/0
-
-alg: ahash: safexcel-sha384 test failed (wrong result) on test vector
-1, cfg="init+update+final aligned buffer"
-alg: self-tests for sha384 using safexcel-sha384 failed (rc=-22)
-
-alg: ahash: safexcel-sha512 test failed (wrong result) on test vector
-1, cfg="init+update+final aligned buffer"
-alg: self-tests for sha512 using safexcel-sha512 failed (rc=-22)
-
-alg: ahash: safexcel-hmac-sha384 setkey failed on test vector 0;
-expected_error=0, actual_error=-80, flags=0x1
-alg: self-tests for hmac(sha384) using safexcel-hmac-sha384 failed (rc=-80)
-
-alg: ahash: safexcel-hmac-sha512 setkey failed on test vector 0;
-expected_error=0, actual_error=-80, flags=0x1
-alg: self-tests for hmac(sha512) using safexcel-hmac-sha512 failed (rc=-80)
-
-alg: aead: safexcel-authenc-hmac-sha512-cbc-aes encryption test failed
-(wrong result) on test vector 0, cfg="in-place (one sglist)"
-alg: self-tests for authenc(hmac(sha512),cbc(aes)) using
-safexcel-authenc-hmac-sha512-cbc-aes failed (rc=-22)
-
-alg: aead: safexcel-authenc-hmac-sha512-cbc-des3_ede encryption test
-failed (wrong result) on test vector 0, cfg="in-place (one sglist)"
-alg: self-tests for authenc(hmac(sha512),cbc(des3_ede)) using
-safexcel-authenc-hmac-sha512-cbc-des3_ede failed (rc=-22
-
-alg: aead: safexcel-authenc-hmac-sha384-cbc-des3_ede encryption test
-failed (wrong result) on test vector 0, cfg="in-place (one sglist)"
-alg: self-tests for authenc(hmac(sha384),cbc(des3_ede)) using
-safexcel-authenc-hmac-sha384-cbc-des3_ede failed (rc=-22)
-
-alg: aead: safexcel-authenc-hmac-sha512-cbc-des encryption test failed
-(wrong result) on test vector 0, cfg="in-place (one sglist)"
-alg: self-tests for authenc(hmac(sha512),cbc(des)) using
-safexcel-authenc-hmac-sha512-cbc-des failed (rc=-22)
-
-alg: aead: safexcel-authenc-hmac-sha384-cbc-des encryption test failed
-(wrong result) on test vector 0, cfg="in-place (one sglist)"
-alg: self-tests for authenc(hmac(sha384),cbc(des)) using
-safexcel-authenc-hmac-sha384-cbc-des failed (rc=-22)
-
-Thanks,
-Leith Bade
