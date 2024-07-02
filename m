@@ -1,56 +1,61 @@
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 219F91CB313;
-	Tue,  2 Jul 2024 18:56:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE0121CE084;
+	Tue,  2 Jul 2024 18:56:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719946612; cv=none; b=XIBbAfnNdjgbmtrYSU1adDWmaujmPMvisL6zpROAkNrkK6rzJP6m4abW5JULkSNVdKcn6xobrmxvYC5IvBEr6ujJt8PnOV+BEDu7F3XaYDaXnfxHYh6lcRXlxtvs5uJbeymCuqVGM/jAUu5+/dyEth663megaAroHtuxKkszXLc=
+	t=1719946615; cv=none; b=MNrQXa9ZLQTEP05eIt5cZsxVt1nogF/FEW5pBbTzmafXxL2pPFxJG89ktHmHxyz37F6pX4EqSrnFEI45YS+OcgxmoaxgjYRRKGey9oNrh8x0kdZdWzC7dibVPIzvVefvXIHF+6ryLiWhxUtcT9b6IyGYrYN395Gq+YSaAQTbTIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719946612; c=relaxed/simple;
-	bh=oZCuWrk77Oh6MOcRNODRuXQLaDoO86CGQtEiADu7gFY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eMZ9m0sqcjAJ6nNiy+DaUUATtZY1Tl0RYoepOBdNEpPBC5a/jqkEcFf1NeC+gVQUaJx0oShFxSG8OSTUWvcrwVVJJMleQO7W7AVdOR8oKmYTbdkKAaAohpn+xU0g4gFkUB+C8izpGs8DFo3sjULmcf2ATRpCijmV91KrGoor5MI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.47
+	s=arc-20240116; t=1719946615; c=relaxed/simple;
+	bh=Tq6BeA1w1NTkooeocTh0TfPApScW5WuthP1LYm80wmY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=bTA0+xRq3Ju6f3hquJWB0f0fgjLtGHWEz7enJO3NtVGEnaKFYmVN5eglO+Dtyovkd9hBtitRydM8fyYW54E6BsBFGV2rJwS/q7lz6BjatiHAvJV/tnDy4LzvMTZWGXwi8xSH95J9r0y8KDXuF9hGTcZHTht/wvAWsyNYEhP2N3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a732cb4ea31so610612566b.0;
-        Tue, 02 Jul 2024 11:56:50 -0700 (PDT)
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-57cb9a370ddso2610050a12.1;
+        Tue, 02 Jul 2024 11:56:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719946609; x=1720551409;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DTTcbpXMOFADYW0lRHSPwqJdZc7vf70BCGyE+fxxMmA=;
-        b=MkcFnSG9/wkJxaZg5Vnt5i4blqcNl6qML9L81VMQ2od4mGrpNYjGPc/GbjEMxh/Bif
-         BFm7Tzp6wnsA/NT35W5Zz5z/dgfqFY9duc9Sv5j3xFXoDp93pqWVUM61Sdac7cANe0EQ
-         T5csQgDktn1Yiqz0+xmuOPLyHkTd6+wYZyKON9dFhBG5rZzHKA54ec0PGCNMf+gjMWaD
-         M51mJrmI5943oskiqz9gVChAje7KvZaUVvymbQ8OeewHue1JO3kDtnH+lCzwPGueq2oL
-         9LOqcwFmNrqB5umJ6ecR4UJ4spHiQHVmnyTPDe7xD1tx5Glv4+M5wQnS/Ev1gWLPW0m2
-         SFEA==
-X-Forwarded-Encrypted: i=1; AJvYcCX+XsCvoymkN9uPCLwjANFUKTJb5ex8VBq+ZCxOxsZnE20uoaVYFeyH5gk68zf7ttmTp4ZKw3k5WsyKT8yRbI2WbOh6zXFOV2G6ZUG2MS8TMXZJ7K/Iik3/W4UxUF1OCsJc4PtMjWJlItocihSEl1/z6bGNbYtH1bdWBq2+XCpAO+Au
-X-Gm-Message-State: AOJu0YzhBDXxG3wk7mawZOHXJpeCjRHNCIr5tZZqqT8jkFGP6+4y3Mn0
-	LWN3c/02antmVqBiy03TaCfWl4p9J11/pTjuG7VjMDxr/j719EXW
-X-Google-Smtp-Source: AGHT+IGdP6OiJHfi7JEGv9W7ei+6MpmPcS2a8RBrZUry8A/33/AybdkBk5mhiEmuBAcjdpUEwGdfdQ==
-X-Received: by 2002:a17:907:c1f:b0:a73:9037:fdf5 with SMTP id a640c23a62f3a-a751386d999mr908347766b.6.1719946609215;
-        Tue, 02 Jul 2024 11:56:49 -0700 (PDT)
-Received: from localhost (fwdproxy-lla-114.fbsv.net. [2a03:2880:30ff:72::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a72ab0900f1sm441886766b.168.2024.07.02.11.56.48
+        d=1e100.net; s=20230601; t=1719946612; x=1720551412;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ip/QRkyatcVO8eC7phQqenDI9TdZRtsHzlRKFfbcrzA=;
+        b=VCc3e12YJ2ecE6N+f6bbsltlMLHshtocB7lD/rf7Ms5H9NFBfYwKOK8UVKIxj9ib2a
+         V4uklJPmqaadzMdtbbj+yneyovZoCj4z9HQ7IUZOfWLhRwiPZobzXHZ+H1yGawPdLfCi
+         9Or5mSKct4EhjTlf2NOo7W7jPQdkKJHkcbbiABN9BPeuXTAF0db0tA7pxfd5uypG0mEE
+         VJTSfdNNOmHn/AAuSYqS4fcIWLGrfhHHd+JwLwhq+jQyNpz3KAhcbkn2TqZyWrHGxzZ9
+         N3m+A5Ipszy5ycN8uiYemgb54/gk51t/vgjA75MnfWEJb+1LryrNGH+i3dDMcVJKM5XW
+         YyTw==
+X-Forwarded-Encrypted: i=1; AJvYcCWZZlTpcDGCBivAwwoN07LPRZ2l5rIr9Gy2TFg9Y8uX2MfBSftG5502y03W2ZWF9GRdvE22GHQVZ4Jv2y9vWQHmrbI8a8kT3Ne2Mqe9+1Hcn0kZ4gwSy39r9eg3cSVisJZuGVw6GJB4cj9lwTLYTPIJCSM5BBSoY8+VGvZ/3BCHJG9H
+X-Gm-Message-State: AOJu0Yx1d3wWLt1CBrxmgp4hLdDepEW/ih8yc/77B0A3xiJiHUji84GR
+	bSXZmoc42og9dS4D43RJ+k3RO41j1pPa8YZQb02htTBvXNmU7rLc
+X-Google-Smtp-Source: AGHT+IFVGEuTqBHQWwZ3xfvjSxpJO86F1S10Bdm6VwIjobxlgC6PqqFmKGSZQEEo+L2eUFVJp179mA==
+X-Received: by 2002:a17:907:60d0:b0:a77:9bf3:f2f0 with SMTP id a640c23a62f3a-a779bf3f42cmr56778766b.65.1719946612128;
+        Tue, 02 Jul 2024 11:56:52 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-112.fbsv.net. [2a03:2880:30ff:70::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a72ab08cfc1sm442036166b.163.2024.07.02.11.56.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jul 2024 11:56:48 -0700 (PDT)
+        Tue, 02 Jul 2024 11:56:51 -0700 (PDT)
 From: Breno Leitao <leitao@debian.org>
 To: kuba@kernel.org,
 	horia.geanta@nxp.com,
 	pankaj.gupta@nxp.com,
 	gaurav.jain@nxp.com,
-	linux-crypto@vger.kernel.org
+	linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
 Cc: horms@kernel.org,
 	netdev@vger.kernel.org,
-	herbert@gondor.apana.org.au,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3 0/3] crypto: caam: Unembed net_dev
-Date: Tue,  2 Jul 2024 11:55:50 -0700
-Message-ID: <20240702185557.3699991-1-leitao@debian.org>
+	linux-kernel@vger.kernel.org,
+	kernel test robot <lkp@intel.com>
+Subject: [PATCH net-next v3 1/4] crypto: caam: Avoid unused imx8m_machine_match variable
+Date: Tue,  2 Jul 2024 11:55:51 -0700
+Message-ID: <20240702185557.3699991-2-leitao@debian.org>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240702185557.3699991-1-leitao@debian.org>
+References: <20240702185557.3699991-1-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -59,36 +64,47 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This will un-embed the net_device struct from inside other struct, so we
-can add flexible array into net_device.
+If caam module is built without OF support, the compiler returns the
+following warning:
 
-This also enable COMPILE test for FSL_CAAM, as any config option that
-depends on ARCH_LAYERSCAPE.
+	drivers/crypto/caam/ctrl.c:83:34: warning: 'imx8m_machine_match' defined but not used [-Wunused-const-variable=]
 
-Changelog:
-v3:
-	* Fix free_netdev() deference per-cpu (Simon)
-	* Hide imx8m_machine_match under CONFIG_OF (Jakub)
-v2:
-        * added a cover letter (Jakub)
-        * dropped the patch that makes FSL_DPAA dependent of
-          COMPILE_TEST, since it exposes other problems.
-v1:
-        * https://lore.kernel.org/all/20240624162128.1665620-1-leitao@debian.org/
+imx8m_machine_match is only referenced by of_match_node(), which is set
+to NULL if CONFIG_OF is not set, as of commit 5762c20593b6b ("dt: Add
+empty of_match_node() macro"):
 
-Breno Leitao (4):
-  crypto: caam: Avoid unused variable
-  crypto: caam: Make CRYPTO_DEV_FSL_CAAM dependent of COMPILE_TEST
-  crypto: caam: Unembed net_dev structure from qi
-  crypto: caam: Unembed net_dev structure in dpaa2
+	#define of_match_node(_matches, _node)  NULL
 
- drivers/crypto/caam/Kconfig       |  2 +-
- drivers/crypto/caam/caamalg_qi2.c | 28 +++++++++++++++++---
- drivers/crypto/caam/caamalg_qi2.h |  2 +-
- drivers/crypto/caam/ctrl.c        |  2 ++
- drivers/crypto/caam/qi.c          | 43 +++++++++++++++++++++++++------
- 5 files changed, 64 insertions(+), 13 deletions(-)
+Do not create imx8m_machine_match if CONFIG_OF is not set.
 
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202407011309.cpTuOGdg-lkp@intel.com/
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+ drivers/crypto/caam/ctrl.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index bd418dea586d..d4b39184dbdb 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -80,6 +80,7 @@ static void build_deinstantiation_desc(u32 *desc, int handle)
+ 	append_jump(desc, JUMP_CLASS_CLASS1 | JUMP_TYPE_HALT);
+ }
+ 
++#ifdef CONFIG_OF
+ static const struct of_device_id imx8m_machine_match[] = {
+ 	{ .compatible = "fsl,imx8mm", },
+ 	{ .compatible = "fsl,imx8mn", },
+@@ -88,6 +89,7 @@ static const struct of_device_id imx8m_machine_match[] = {
+ 	{ .compatible = "fsl,imx8ulp", },
+ 	{ }
+ };
++#endif
+ 
+ /*
+  * run_descriptor_deco0 - runs a descriptor on DECO0, under direct control of
 -- 
 2.43.0
 
