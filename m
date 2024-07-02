@@ -1,43 +1,43 @@
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64EF81CF3CB;
-	Tue,  2 Jul 2024 18:56:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 256901CF3F9;
+	Tue,  2 Jul 2024 18:56:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719946619; cv=none; b=FGoRJ38nliNrZSe89vEb4IWnCmTyWUdCpN1GAuQuToXkCb2XDucOGve9tde7yNxX/uTnsgEBdz9XCbKN8e5BrQva9w2Sz9bA2281R6uOCbS5H4sdYS93kWrbXH/8Rm6YkgAGLYaGnEm3ujfSZoorWyEBih2fGZyn7vQR23lvWXs=
+	t=1719946620; cv=none; b=NsrztHudx780pSlFlKpqcGKEb7vX7OquenxjkbQURUWZUkGeeN/iVByi8yVkg3ixmbkT9V8jrEor56nWifsEQu1eRUz+nFYTCUSnst/u6WzBFR0ayHLJ/US4kqxo/SeJ/VmkkjAKFIdsujD2FsLTE6QazDZs38JAl0fUtF1I3PA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719946619; c=relaxed/simple;
-	bh=LewReLZ488nceXVfROCKjjRqr6mgLCSW0OHeBB/hHSQ=;
+	s=arc-20240116; t=1719946620; c=relaxed/simple;
+	bh=JNl2l3vdXcnwyiGAaHW2mChV80yaVjG0lqiKdNOQ6eM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ak7VBnMX5UjX6Y4mBVuJu4IBuOvVV9FGgHB/CXHsTWMqIwuhqBjNHlCA1Sm5d/aDipo+G33bUqcbtcbhEkbHJnBz7/m3tOZK06juxbQv+rH9fztsan17n2co/KdnupTlDittqzfAx/JMGDXI7NSs/ucmVIymlDR+SLZBqFaBnsc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.54
+	 MIME-Version; b=GQmwP+NLMgi1hYcYt3PNQDcB/gG6kcOSVZh6wW+07xdTRtG96JjJ8z9oCZX9CNveCgTY1MawfVp6K1+0mwBmiIpA71VWC99BRpZgxRg3WE2cbUh0f72yMc2KlOdGjkAzdOuaX06NAI/+8hAzed0TtxSSxM6UHNqamfwRrlGslbg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a72b3e1c14cso535885766b.1;
-        Tue, 02 Jul 2024 11:56:57 -0700 (PDT)
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a75131ce948so418996066b.2;
+        Tue, 02 Jul 2024 11:56:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719946616; x=1720551416;
+        d=1e100.net; s=20230601; t=1719946617; x=1720551417;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=SKoF4CiVeQZjUAsog/IhvfGsb/vWl4mbiyS3/rCHROE=;
-        b=pNzq6ZiTucQdv6VeIN1q//xxZ6EgnrcyB4ndMerzAVAyKwFFOrKmm1L4CGSKczO4it
-         zQFozwqHJ+P3xGYpW91DP7jYXFIbaHrpP+PSgy7pbr+QzPC8pUrHanzhUmoT3bfk0QrJ
-         Cw3m6iXNrYmtQapyNTdibAxvyGoz5syN5P0UJ1YuS7KfBpkD7Ksjj/9urRYHq2bG3z2A
-         BiL3FHQPpCluYjDxO6Dtiyz4MTRDIKkM24uSPzo9F42k8ONHAmkVqL4bKe/pMXDOjeTY
-         TzpxsV83IZQNBo/0r7kJU31GBbETsBGXuDgIQ32p9mIhukD0d+RuIfcQ3/+9WoUkXsom
-         1UPg==
-X-Forwarded-Encrypted: i=1; AJvYcCVsrjDN2f3kaR4TjdLC+ORj7DNFXdSiy9epl8yxv/HSSnPDlXVcuKWq5hqB4ixPQ0A2/KEJSYhhJxua8vDxHQPIa+CGzLxrxc0dwdaFMugPzHfPosaHXrgn7agzMD40bxrnjf7iwXUo7fST1ZQarlxuZCVfTxgCPo27wSdVbTUB8aEy
-X-Gm-Message-State: AOJu0YwnWAxpd7bC/shvTgnJA9H69bIJ9Eefp/YhVXN7VpPhzrIoNefx
-	Z2ChKRRElOHkRARgCSQ9OK/UT8hPgPHlndjgOQaZLbqIhd/qJcS/WE6U1w==
-X-Google-Smtp-Source: AGHT+IEze65jQf7HnZOgqdtG7PyeTgOhJEZRPpZUDwi9ebQf0brT8FCeqOlR9bZHX0qzLiTYp3P1Yw==
-X-Received: by 2002:a17:907:9488:b0:a6f:7c8:4fd6 with SMTP id a640c23a62f3a-a75141fb4f8mr873741166b.0.1719946615676;
-        Tue, 02 Jul 2024 11:56:55 -0700 (PDT)
-Received: from localhost (fwdproxy-lla-001.fbsv.net. [2a03:2880:30ff:1::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a72aaf6336csm443042166b.70.2024.07.02.11.56.55
+        bh=oSy9xn6zf0uOofSAGvu9prtSY8Ipz+Uu9GyDLC9cna0=;
+        b=tR+4OdhakwwDdUHxw8/qXVuyjzP84H6JIIJS550oHF5c4O8sWAgGW1iGZLDN5/6TcN
+         LsRQoj7e5Iu1aU0DiEKdulmTbhMyFmxDx7EvXOfc1cV6D/UVq/qfsKEX46EO2cUO1Opm
+         E9FkonQcZ8IGRMO7i4Bv4WGYG+4aDSaFFVY8j8eAIo9FtsDqISYuPF1dFhXHf5jbZJJX
+         RQP+L7u63XMcnYW4lq4N9vA8HZKBjPMV42LbaWDLZZ5xtI/Nw1b/bDTKIGcZhXAoUnxE
+         yNZ8gz9DrQNzak70fLVC7xfRtNbSkzz2IK1BJBAWb9Y4RPDUrMmIA9Fdav3waAkYwbyB
+         2b7A==
+X-Forwarded-Encrypted: i=1; AJvYcCVuLTs1tjXmdGqojknwpfpUWSpgx6Hvoj78A7Yf9DOWWad2ZueOQ9td7WK/YkEMedf5NRPjTry+0IPjkza64/154e3uYsa/SFjs+09JDD+b1iTa1dOT87ImRfESRJeiPXlLMwBQMIcmSCyFTSYP6H5Omu6IAGPLlfNEa93MNrIOvrJo
+X-Gm-Message-State: AOJu0YyOU8NUlKwWoanYnCvxvQPWz/3hcylhwjRfV6oF/E3k/QY2/RVG
+	y6w13nfpIVQso+pWV3Ba720e0jS0JSz0oosKUUV8M4tZlI+4o09N
+X-Google-Smtp-Source: AGHT+IEXvPn8naD3LbFJ25auYC36fl2hcqanVnNALKBRNbctpka4Tp29E80aHtwxaClGB+NJLiSMzQ==
+X-Received: by 2002:a17:906:3450:b0:a72:8100:c3e with SMTP id a640c23a62f3a-a75144a2848mr512170666b.48.1719946617501;
+        Tue, 02 Jul 2024 11:56:57 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-116.fbsv.net. [2a03:2880:30ff:74::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a72aaf63360sm444217666b.64.2024.07.02.11.56.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jul 2024 11:56:55 -0700 (PDT)
+        Tue, 02 Jul 2024 11:56:57 -0700 (PDT)
 From: Breno Leitao <leitao@debian.org>
 To: kuba@kernel.org,
 	horia.geanta@nxp.com,
@@ -49,9 +49,9 @@ To: kuba@kernel.org,
 Cc: horms@kernel.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3 3/4] crypto: caam: Unembed net_dev structure from qi
-Date: Tue,  2 Jul 2024 11:55:53 -0700
-Message-ID: <20240702185557.3699991-4-leitao@debian.org>
+Subject: [PATCH net-next v3 4/4] crypto: caam: Unembed net_dev structure in dpaa2
+Date: Tue,  2 Jul 2024 11:55:54 -0700
+Message-ID: <20240702185557.3699991-5-leitao@debian.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240702185557.3699991-1-leitao@debian.org>
 References: <20240702185557.3699991-1-leitao@debian.org>
@@ -67,137 +67,104 @@ Embedding net_device into structures prohibits the usage of flexible
 arrays in the net_device structure. For more details, see the discussion
 at [1].
 
-Un-embed the net_devices from struct caam_qi_pcpu_priv by converting them
-into pointers, and allocating them dynamically. Use the leverage
-alloc_netdev_dummy() to allocate the net_device object at
-caam_qi_init().
+Un-embed the net_devices from struct dpaa2_caam_priv_per_cpu by
+converting them into pointers, and allocating them dynamically. Use the
+leverage alloc_netdev_dummy() to allocate the net_device object at
+dpaa2_dpseci_setup().
 
-The free of the device occurs at caam_qi_shutdown().
+The free of the device occurs at dpaa2_dpseci_disable().
 
 Link: https://lore.kernel.org/all/20240229225910.79e224cf@kernel.org/ [1]
 Signed-off-by: Breno Leitao <leitao@debian.org>
 ---
- drivers/crypto/caam/qi.c | 43 ++++++++++++++++++++++++++++++++--------
- 1 file changed, 35 insertions(+), 8 deletions(-)
+ drivers/crypto/caam/caamalg_qi2.c | 28 +++++++++++++++++++++++++---
+ drivers/crypto/caam/caamalg_qi2.h |  2 +-
+ 2 files changed, 26 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/caam/qi.c b/drivers/crypto/caam/qi.c
-index 46a083849a8e..ba8fb5d8a7b2 100644
---- a/drivers/crypto/caam/qi.c
-+++ b/drivers/crypto/caam/qi.c
-@@ -57,7 +57,7 @@ struct caam_napi {
-  */
- struct caam_qi_pcpu_priv {
- 	struct caam_napi caam_napi;
--	struct net_device net_dev;
-+	struct net_device *net_dev;
- 	struct qman_fq *rsp_fq;
- } ____cacheline_aligned;
- 
-@@ -144,7 +144,7 @@ static void caam_fq_ern_cb(struct qman_portal *qm, struct qman_fq *fq,
- {
- 	const struct qm_fd *fd;
- 	struct caam_drv_req *drv_req;
--	struct device *qidev = &(raw_cpu_ptr(&pcpu_qipriv)->net_dev.dev);
-+	struct device *qidev = &(raw_cpu_ptr(&pcpu_qipriv)->net_dev->dev);
- 	struct caam_drv_private *priv = dev_get_drvdata(qidev);
- 
- 	fd = &msg->ern.fd;
-@@ -530,6 +530,7 @@ static void caam_qi_shutdown(void *data)
- 
- 		if (kill_fq(qidev, per_cpu(pcpu_qipriv.rsp_fq, i)))
- 			dev_err(qidev, "Rsp FQ kill failed, cpu: %d\n", i);
-+		free_netdev(per_cpu(pcpu_qipriv.net_dev, i));
- 	}
- 
- 	qman_delete_cgr_safe(&priv->cgr);
-@@ -573,7 +574,7 @@ static enum qman_cb_dqrr_result caam_rsp_fq_dqrr_cb(struct qman_portal *p,
- 	struct caam_napi *caam_napi = raw_cpu_ptr(&pcpu_qipriv.caam_napi);
- 	struct caam_drv_req *drv_req;
- 	const struct qm_fd *fd;
--	struct device *qidev = &(raw_cpu_ptr(&pcpu_qipriv)->net_dev.dev);
-+	struct device *qidev = &(raw_cpu_ptr(&pcpu_qipriv)->net_dev->dev);
- 	struct caam_drv_private *priv = dev_get_drvdata(qidev);
- 	u32 status;
- 
-@@ -718,12 +719,24 @@ static void free_rsp_fqs(void)
- 		kfree(per_cpu(pcpu_qipriv.rsp_fq, i));
+diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
+index a4f6884416a0..207dc422785a 100644
+--- a/drivers/crypto/caam/caamalg_qi2.c
++++ b/drivers/crypto/caam/caamalg_qi2.c
+@@ -4990,11 +4990,23 @@ static int dpaa2_dpseci_congestion_setup(struct dpaa2_caam_priv *priv,
+ 	return err;
  }
  
-+static void free_caam_qi_pcpu_netdev(const cpumask_t *cpus)
++static void free_dpaa2_pcpu_netdev(struct dpaa2_caam_priv *priv, const cpumask_t *cpus)
 +{
-+	struct caam_qi_pcpu_priv *priv;
++	struct dpaa2_caam_priv_per_cpu *ppriv;
 +	int i;
 +
 +	for_each_cpu(i, cpus) {
-+		priv = per_cpu_ptr(&pcpu_qipriv, i);
-+		free_netdev(priv->net_dev);
++		ppriv = per_cpu_ptr(priv->ppriv, i);
++		free_netdev(ppriv->net_dev);
 +	}
 +}
 +
- int caam_qi_init(struct platform_device *caam_pdev)
+ static int __cold dpaa2_dpseci_setup(struct fsl_mc_device *ls_dev)
  {
- 	int err, i;
- 	struct device *ctrldev = &caam_pdev->dev, *qidev;
- 	struct caam_drv_private *ctrlpriv;
- 	const cpumask_t *cpus = qman_affine_cpus();
+ 	struct device *dev = &ls_dev->dev;
+ 	struct dpaa2_caam_priv *priv;
+ 	struct dpaa2_caam_priv_per_cpu *ppriv;
 +	cpumask_t clean_mask;
+ 	int err, cpu;
+ 	u8 i;
  
- 	ctrlpriv = dev_get_drvdata(ctrldev);
- 	qidev = ctrldev;
-@@ -743,6 +756,8 @@ int caam_qi_init(struct platform_device *caam_pdev)
- 		return err;
+@@ -5073,6 +5085,7 @@ static int __cold dpaa2_dpseci_setup(struct fsl_mc_device *ls_dev)
+ 		}
  	}
  
 +	cpumask_clear(&clean_mask);
-+
- 	/*
- 	 * Enable the NAPI contexts on each of the core which has an affine
- 	 * portal.
-@@ -751,10 +766,16 @@ int caam_qi_init(struct platform_device *caam_pdev)
- 		struct caam_qi_pcpu_priv *priv = per_cpu_ptr(&pcpu_qipriv, i);
- 		struct caam_napi *caam_napi = &priv->caam_napi;
- 		struct napi_struct *irqtask = &caam_napi->irqtask;
--		struct net_device *net_dev = &priv->net_dev;
-+		struct net_device *net_dev;
+ 	i = 0;
+ 	for_each_online_cpu(cpu) {
+ 		u8 j;
+@@ -5096,15 +5109,23 @@ static int __cold dpaa2_dpseci_setup(struct fsl_mc_device *ls_dev)
+ 			priv->rx_queue_attr[j].fqid,
+ 			priv->tx_queue_attr[j].fqid);
  
-+		net_dev = alloc_netdev_dummy(0);
-+		if (!net_dev) {
+-		ppriv->net_dev.dev = *dev;
+-		INIT_LIST_HEAD(&ppriv->net_dev.napi_list);
+-		netif_napi_add_tx_weight(&ppriv->net_dev, &ppriv->napi,
++		ppriv->net_dev = alloc_netdev_dummy(0);
++		if (!ppriv->net_dev) {
 +			err = -ENOMEM;
-+			goto fail;
++			goto err_alloc_netdev;
 +		}
-+		cpumask_set_cpu(i, &clean_mask);
-+		priv->net_dev = net_dev;
- 		net_dev->dev = *qidev;
--		INIT_LIST_HEAD(&net_dev->napi_list);
- 
- 		netif_napi_add_tx_weight(net_dev, irqtask, caam_qi_poll,
- 					 CAAM_NAPI_WEIGHT);
-@@ -766,16 +787,22 @@ int caam_qi_init(struct platform_device *caam_pdev)
- 				     dma_get_cache_alignment(), 0, NULL);
- 	if (!qi_cache) {
- 		dev_err(qidev, "Can't allocate CAAM cache\n");
--		free_rsp_fqs();
--		return -ENOMEM;
-+		err = -ENOMEM;
-+		goto fail2;
++		cpumask_set_cpu(cpu, &clean_mask);
++		ppriv->net_dev->dev = *dev;
++
++		netif_napi_add_tx_weight(ppriv->net_dev, &ppriv->napi,
+ 					 dpaa2_dpseci_poll,
+ 					 DPAA2_CAAM_NAPI_WEIGHT);
  	}
  
- 	caam_debugfs_qi_init(ctrlpriv);
- 
- 	err = devm_add_action_or_reset(qidev, caam_qi_shutdown, ctrlpriv);
- 	if (err)
--		return err;
-+		goto fail2;
- 
- 	dev_info(qidev, "Linux CAAM Queue I/F driver initialised\n");
  	return 0;
-+
-+fail2:
-+	free_rsp_fqs();
-+fail:
-+	free_caam_qi_pcpu_netdev(&clean_mask);
-+	return err;
- }
+ 
++err_alloc_netdev:
++	free_dpaa2_pcpu_netdev(priv, &clean_mask);
+ err_get_rx_queue:
+ 	dpaa2_dpseci_congestion_free(priv);
+ err_get_vers:
+@@ -5153,6 +5174,7 @@ static int __cold dpaa2_dpseci_disable(struct dpaa2_caam_priv *priv)
+ 		ppriv = per_cpu_ptr(priv->ppriv, i);
+ 		napi_disable(&ppriv->napi);
+ 		netif_napi_del(&ppriv->napi);
++		free_netdev(ppriv->net_dev);
+ 	}
+ 
+ 	return 0;
+diff --git a/drivers/crypto/caam/caamalg_qi2.h b/drivers/crypto/caam/caamalg_qi2.h
+index abb502bb675c..61d1219a202f 100644
+--- a/drivers/crypto/caam/caamalg_qi2.h
++++ b/drivers/crypto/caam/caamalg_qi2.h
+@@ -81,7 +81,7 @@ struct dpaa2_caam_priv {
+  */
+ struct dpaa2_caam_priv_per_cpu {
+ 	struct napi_struct napi;
+-	struct net_device net_dev;
++	struct net_device *net_dev;
+ 	int req_fqid;
+ 	int rsp_fqid;
+ 	int prio;
 -- 
 2.43.0
 
