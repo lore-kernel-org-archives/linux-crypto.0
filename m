@@ -1,59 +1,130 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f53.google.com (mail-oa1-f53.google.com [209.85.160.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D20417108D;
-	Mon,  1 Jul 2024 20:55:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4794E79DF
+	for <linux-crypto@vger.kernel.org>; Tue,  2 Jul 2024 05:34:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719867323; cv=none; b=FX+QZIr5qE5t4THNpExalUkWk4veDTc3rjmGiU2npUSBKM1CwhhitFRb1xbu9heMJjzy02dh6kI8d75tUY6/KLVGLQYiUfSzfW1fgTkk2O1u5ml7vxgjwUN0nwauqEX7EFn4Ona6s40oTsbXbsa9u9Px1mV/2ZLMipMJczrbdqs=
+	t=1719898490; cv=none; b=Oz/DSiRy6znkJtvI/II+GIsDQbtcnPcpo/33V21yj41G5taxnV9sNHp68PsfXP96manIkZjT8v6URZ3WE86xzyiFp/gW1AhJbV6FC9P3j4/xdchMy3yx057qCpFHs+hZGIppHFHgrSevI38/5uTdGzBHu9SiUU0t4Av9H2tD5lk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719867323; c=relaxed/simple;
-	bh=ccCNvlPvitLrFUNbB59+klivWsSH/qMEMhKBAz5irNg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rpY4CPyo9Z9BFn92lrurHeL8PedSU+G0NNi2v3syRNvhhSyMegttUSGWTDcuZrO8wapQ6VSW6d3t1XSo/SahO+kNamgfxXBfk/nacht9qFuHY9Zgu0qTuBjChcGtKuvNsHadbgZdeQkFJEDby9rX0b6jfoTHXp/4ichlWpLGDIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ean99Tba; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1719898490; c=relaxed/simple;
+	bh=FjtVOHtZTmMqztivu3c1awxhvlnUREuGjkoEgVHP1aw=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=R3QrsiQZ/NcaqwTbaWvBbn7Yy97W/IXi8DKxQ+rTjNSCvB0LMUc47IOEUxPApnMGztnW1uFeKNr2nNit6xvFOyXfauseeN1Lj53+/fG/Ysb03Pu/l40F76kaa4H+AsKL80wtFgKKXkxYj80VVeN93gxxfr2pdv/zYA5lmRE60Mc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bade.nz; spf=pass smtp.mailfrom=leithalweapon.geek.nz; dkim=pass (2048-bit key) header.d=bade.nz header.i=@bade.nz header.b=MoDIET7e; arc=none smtp.client-ip=209.85.160.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bade.nz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leithalweapon.geek.nz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ean99Tba"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E729C116B1;
-	Mon,  1 Jul 2024 20:55:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719867322;
-	bh=ccCNvlPvitLrFUNbB59+klivWsSH/qMEMhKBAz5irNg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ean99TbavhafoA5g+v6yuVoPFhvlW9VhLqHyqdAdTRQYuvr2mavkjCBm++ClDA2+I
-	 RSH+STG1M76y3L519+gNN1oR0SN6VXvAWoTyxGTig4TJsXAKr5Ux+GLdiXwxs4cMfd
-	 t4nPfATGlNRFYY3F1Qd8/UCeftSW6ltuOURZxU4pXQawDVzYfiBS3seyk9Muyx/cBT
-	 v26nCspBpM/5Au6xX4xXkH1hLCVB+eJ9/vlYA6kC9pJOFadwdIN0qF7qFkANm2dAoq
-	 ESjfV6vZl6xc0w3KbiNEPDD89/pql4UbjPUizB0qn0pX0qrVjKZWph1QEUc62Eb1Yv
-	 6K88XHw9uamwg==
-Date: Mon, 1 Jul 2024 13:55:21 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: kernel test robot <lkp@intel.com>, Breno Leitao <leitao@debian.org>
-Cc: horia.geanta@nxp.com, pankaj.gupta@nxp.com, gaurav.jain@nxp.com,
- linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, oe-kbuild-all@lists.linux.dev,
- netdev@vger.kernel.org, horms@kernel.org, linux-kernel@vger.kernel.org,
- Nicolas Ferre <nicolas.ferre@microchip.com>
-Subject: Re: [PATCH net-next v2 1/3] crypto: caam: Make CRYPTO_DEV_FSL_CAAM
- dependent of COMPILE_TEST
-Message-ID: <20240701135521.3ba809bb@kernel.org>
-In-Reply-To: <202407011309.cpTuOGdg-lkp@intel.com>
-References: <20240628161450.2541367-2-leitao@debian.org>
-	<202407011309.cpTuOGdg-lkp@intel.com>
+	dkim=pass (2048-bit key) header.d=bade.nz header.i=@bade.nz header.b="MoDIET7e"
+Received: by mail-oa1-f53.google.com with SMTP id 586e51a60fabf-25c9786835eso2240897fac.3
+        for <linux-crypto@vger.kernel.org>; Mon, 01 Jul 2024 22:34:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bade.nz; s=google; t=1719898486; x=1720503286; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=k9AFZnKOW/OV6MX+SwcsEAZ4wLQxlx3trIXu3lIbf/g=;
+        b=MoDIET7euHU3CJjqzPZmah6R5X/8ODKz0NUgYKsYkxyn3EvRvTzwgrYTcZPbl1BUJj
+         teGuUz0TV8fN7H9PQO0q2gcv+R9shGrPLkFbjb2zEf9Ljv9HI98ycUbUFCG1yn11Owv1
+         DPDQqg+vgpTxILOY2tKiiUey0AjH+qS3uOhFCYQ9pb8fqLAXbWh6AJjcKfUNZq6FxIIe
+         PVPue/58nbSvyUm6XZer9RPYyxjpOjFKq7EDEa9V+bDmoRVrP7tJ0jeGV/8DTtAAEXE+
+         3qRGEqjJjxM5GUvRrLRtdtT9OY+JpsoD6Swax4QD9Zfw7DzvqHV2qAD9CiwNAYaKvvqZ
+         xUEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719898486; x=1720503286;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=k9AFZnKOW/OV6MX+SwcsEAZ4wLQxlx3trIXu3lIbf/g=;
+        b=A7z0HEQMYkFcskSH0ELagmLx1tCPIy+hYjEha2BWI2WpcXFrhTFCYBNKg6qPN1Wp3t
+         K+crPTGsL0dAb4HqLLq9VOdm3HytUk4SFrFUBhulPeVXbbrMApBpz+BUQCMIhBOnFLJG
+         vwEjpY0MDd/cMOWQfGdwXBwj+ICq8N7IZauoa2beNCGDmul7NrTMwKzWHMFx/RANLh6Z
+         2XxF5WnsXASpnSE34giyceHoP2cLGMvSUajOCdgAvHnhdsVjq119hYVP7qRsn8Q9gMRU
+         DpuCh4fS8Ygle3T8Qvt3Po5SLN0S8QIz4gGOmKq6Z+tALs73uUjnoEakFmMWTUp3TQEE
+         Kstg==
+X-Gm-Message-State: AOJu0YxCff66p1JX6QhVFpkkrLP54uyQFqvmsllOyIEvdeJVfnLCKj1t
+	BCqoAklJQjzfBNH+g9VQf7b6QA8skQvITOwImqJJwfKkbSjn0hxQz+ab36FwiMa2bjlHUvgZ2eH
+	jZIG8kezV8fWr73Fzlqf3RLHBTGV2Um77/ptUXcwGDt/ttaDDmBQH
+X-Google-Smtp-Source: AGHT+IGwmszSMGvkr08n3X/1OA+McVqsuTBXL5fJP3TwrrQ1RIEyspXl4H4r6TlV6E4NoKTdD8pvCypu529lgIOLxnA=
+X-Received: by 2002:a05:6870:2407:b0:254:bd24:de85 with SMTP id
+ 586e51a60fabf-25db340de8amr6736728fac.16.1719898486503; Mon, 01 Jul 2024
+ 22:34:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+From: Leith Bade <leith@bade.nz>
+Date: Tue, 2 Jul 2024 15:34:35 +1000
+Message-ID: <CAPDEroXky+PJ29VcR6vsrdQ6uk43DekCvmiZGUqxxYHrYXrYoA@mail.gmail.com>
+Subject: Failed self-tests with crypto-safexcel on MediaTek MT7986 SoC
+To: linux-crypto@vger.kernel.org
+Cc: atenart@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 1 Jul 2024 13:48:21 +0800 kernel test robot wrote:
-> >> drivers/crypto/caam/ctrl.c:83:34: warning: 'imx8m_machine_match' defined but not used [-Wunused-const-variable=]  
->       83 | static const struct of_device_id imx8m_machine_match[] = {
->          |                            
+Hi,
 
-Reading 5762c20593b6b95 it seems like hiding the references in
-intentional. You gotta wrap this array in an ifdef for non-OF 
-builds it seems.
+I am using a Banana Pi BPI-R3 router board, which has a MediaTek
+MT7986 SoC, with Linux  and I have noticed a large number of error
+messages and stack traces in my kernel boot log related to the
+crypto-safexcel module. The errors all related to a large number of
+failed self-tests for both hashing and encryption, thus I believe this
+device is not working correctly at all.
+
+I have been using the current Debian unstable distribution with a
+variety of kernel builds. I have seen the errors with both Debian and
+"vanilla" builds of v6.8.12, v6.9.7 and v6.10.0-rc6.
+
+To reproduce, simply boot Linux on the BPI-R3 using the compiled DTS
+file  arch/arm64/boot/dts/mediatek/mt7986a-bananapi-bpi-r3.dts with
+the crypto-safexcel module enabled via the CONFIG_CRYPTO_DEV_SAFEXCEL
+option.
+
+Any help fixing these errors would be appreciated.
+
+The relevant boot log messages:
+
+crypto-safexcel 10320000.crypto:
+EIP97:230(0,1,4,4)-HIA:270(0,5,5),PE:150/433(alg:7fcdfc00)/0/0/0
+
+alg: ahash: safexcel-sha384 test failed (wrong result) on test vector
+1, cfg="init+update+final aligned buffer"
+alg: self-tests for sha384 using safexcel-sha384 failed (rc=-22)
+
+alg: ahash: safexcel-sha512 test failed (wrong result) on test vector
+1, cfg="init+update+final aligned buffer"
+alg: self-tests for sha512 using safexcel-sha512 failed (rc=-22)
+
+alg: ahash: safexcel-hmac-sha384 setkey failed on test vector 0;
+expected_error=0, actual_error=-80, flags=0x1
+alg: self-tests for hmac(sha384) using safexcel-hmac-sha384 failed (rc=-80)
+
+alg: ahash: safexcel-hmac-sha512 setkey failed on test vector 0;
+expected_error=0, actual_error=-80, flags=0x1
+alg: self-tests for hmac(sha512) using safexcel-hmac-sha512 failed (rc=-80)
+
+alg: aead: safexcel-authenc-hmac-sha512-cbc-aes encryption test failed
+(wrong result) on test vector 0, cfg="in-place (one sglist)"
+alg: self-tests for authenc(hmac(sha512),cbc(aes)) using
+safexcel-authenc-hmac-sha512-cbc-aes failed (rc=-22)
+
+alg: aead: safexcel-authenc-hmac-sha512-cbc-des3_ede encryption test
+failed (wrong result) on test vector 0, cfg="in-place (one sglist)"
+alg: self-tests for authenc(hmac(sha512),cbc(des3_ede)) using
+safexcel-authenc-hmac-sha512-cbc-des3_ede failed (rc=-22
+
+alg: aead: safexcel-authenc-hmac-sha384-cbc-des3_ede encryption test
+failed (wrong result) on test vector 0, cfg="in-place (one sglist)"
+alg: self-tests for authenc(hmac(sha384),cbc(des3_ede)) using
+safexcel-authenc-hmac-sha384-cbc-des3_ede failed (rc=-22)
+
+alg: aead: safexcel-authenc-hmac-sha512-cbc-des encryption test failed
+(wrong result) on test vector 0, cfg="in-place (one sglist)"
+alg: self-tests for authenc(hmac(sha512),cbc(des)) using
+safexcel-authenc-hmac-sha512-cbc-des failed (rc=-22)
+
+alg: aead: safexcel-authenc-hmac-sha384-cbc-des encryption test failed
+(wrong result) on test vector 0, cfg="in-place (one sglist)"
+alg: self-tests for authenc(hmac(sha384),cbc(des)) using
+safexcel-authenc-hmac-sha384-cbc-des failed (rc=-22)
+
+Thanks,
+Leith Bade
