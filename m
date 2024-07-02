@@ -1,107 +1,83 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06B9D4CB23;
-	Tue,  2 Jul 2024 07:42:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB48B1BB685;
+	Tue,  2 Jul 2024 15:08:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719906176; cv=none; b=V7YH7+VRLODwSvZI1MV0RI/rxMnODh+MHue0SsPKfzFhYo/GwGRpoxaBGooy5djsB63npcrsrmgeENQVYsV5m9lRLCoYnoMCa1Dn7y6weGLbavQZ/mIYmtMmyHw6Un26Efs2jF4TWl5y4gpU7gjqAR7pcKB1OI4FCceVXBnibwE=
+	t=1719932923; cv=none; b=e7c/sSb1au5Hb/OOX41JXYmeNjU/YlFZ+D22yku45x6z7oUuhM3d8OwuhhfGvRB9u2h+vkFkYbSKXbU2OzZXfwXHjvRLM0vK1GBrvldsI1HyEAH/Kdwu4fwYCHziksAUDt4nv3/GodsQhdGIFhGbLTtuwkko9Ujf/Qmwa+Ha7OE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719906176; c=relaxed/simple;
-	bh=b9oO32qfFgklf7sETD8/dcIhc/Mu840qILzRUiMTpP4=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=SRVdjxAvNkRauoJP4T7ggZiLCyzJ1I7ArehIkiYDZF2JytK6u6QVs7sq15Od0/xAxs/FnnoLm/0X4cWcofnHuWtxdFOM+vYcdJbWBN4f27gDQMgbIz+6w6jI3EwnWlcLshxm/QG/5ovD1MQAHGFLv01HSbYlkUTgaUmdPDF/zMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=OshYRO+R; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1719932923; c=relaxed/simple;
+	bh=r+3+y5Bqpte3FWzeov5eAIYc0Xj4txwX8QQ/c1nIrT4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MkVy5cevC2TSe/gvZZtWZPpTINwajMcFpGCvUuXBAeFwF00guAgUdGvzUkliLcswPkYxLy4LClah6zjoxhmYdwyEiaNWRKXN5j+XhXy8ZnXufXI6XLz0+Ae8+UVTbXhZzPcSNpGU9y4f8CsRLbNMfjtDjqqmw1MNSmspsDvIFVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=JD42hutR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="OshYRO+R"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9194C116B1;
-	Tue,  2 Jul 2024 07:42:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-	s=korg; t=1719906175;
-	bh=b9oO32qfFgklf7sETD8/dcIhc/Mu840qILzRUiMTpP4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OshYRO+RqtW//uVs0njfZO7RS9kJp7HLUpkuV1+ecHPNjZ4TMDFd+ugEBS0Pi7c1j
-	 4NzTC/LyznWWg2EQLbG1xW5vZ28wBuRKvTHc7rpWhFih0+wqUumCbAP7TXxdJ0vmlT
-	 +XaG2OR5kNm6vFn4gpH1YXOJO7gEKW7cQ4RcGDmU=
-Date: Tue, 2 Jul 2024 00:42:54 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="JD42hutR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19C49C116B1;
+	Tue,  2 Jul 2024 15:08:41 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="JD42hutR"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1719932919;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vn+Q8NW4bbMGozhTyvScvIPS122WxS7dCXcrNrQNePA=;
+	b=JD42hutR8R9eR9bl8Mk9GlUUg7WChrnYNR0XMRMyM5jMhIXnhl7DWdPNmEvbXrCX9i+vDC
+	PmuqcG+oBdx+PogQ+NgfsDLGKhSbnkXlG43fhSEoEglUgS/0rRzPwrMoOzTTQp19JTTK1b
+	gFb9GX3U+wwhcbEKl/8tXeob2erGp1c=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 6661eee5 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Tue, 2 Jul 2024 15:08:37 +0000 (UTC)
+Date: Tue, 2 Jul 2024 17:08:34 +0200
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Andrew Morton <akpm@linux-foundation.org>
 Cc: linux-kernel@vger.kernel.org, patches@lists.linux.dev,
- tglx@linutronix.de, linux-crypto@vger.kernel.org,
- linux-api@vger.kernel.org, x86@kernel.org, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, Adhemerval Zanella Netto
- <adhemerval.zanella@linaro.org>, Carlos O'Donell <carlos@redhat.com>,
- Florian Weimer <fweimer@redhat.com>, Arnd Bergmann <arnd@arndb.de>, Jann
- Horn <jannh@google.com>, Christian Brauner <brauner@kernel.org>, David
- Hildenbrand <dhildenb@redhat.com>, linux-mm@kvack.org
+	tglx@linutronix.de, linux-crypto@vger.kernel.org,
+	linux-api@vger.kernel.org, x86@kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+	Carlos O'Donell <carlos@redhat.com>,
+	Florian Weimer <fweimer@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
+	Jann Horn <jannh@google.com>,
+	Christian Brauner <brauner@kernel.org>,
+	David Hildenbrand <dhildenb@redhat.com>, linux-mm@kvack.org
 Subject: Re: [PATCH v19 1/5] mm: add VM_DROPPABLE for designating always
  lazily freeable mappings
-Message-Id: <20240702004254.3ab2db4a98cb7fdd245407cb@linux-foundation.org>
-In-Reply-To: <20240701135801.3698-2-Jason@zx2c4.com>
+Message-ID: <ZoQX8uxqww6Zkq2C@zx2c4.com>
 References: <20240701135801.3698-1-Jason@zx2c4.com>
-	<20240701135801.3698-2-Jason@zx2c4.com>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+ <20240701135801.3698-2-Jason@zx2c4.com>
+ <20240702004254.3ab2db4a98cb7fdd245407cb@linux-foundation.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240702004254.3ab2db4a98cb7fdd245407cb@linux-foundation.org>
 
-On Mon,  1 Jul 2024 15:57:55 +0200 "Jason A. Donenfeld" <Jason@zx2c4.com> wrote:
+Hey Andrew,
 
-> The vDSO getrandom() implementation works with a buffer allocated with a
-> new system call that has certain requirements:
-> 
-> - It shouldn't be written to core dumps.
->   * Easy: VM_DONTDUMP.
-> - It should be zeroed on fork.
->   * Easy: VM_WIPEONFORK.
-> 
-> - It shouldn't be written to swap.
->   * Uh-oh: mlock is rlimited.
->   * Uh-oh: mlock isn't inherited by forks.
-> 
-> It turns out that the vDSO getrandom() function has three really nice
-> characteristics that we can exploit to solve this problem:
-> 
-> 1) Due to being wiped during fork(), the vDSO code is already robust to
->    having the contents of the pages it reads zeroed out midway through
->    the function's execution.
-> 
-> 2) In the absolute worst case of whatever contingency we're coding for,
->    we have the option to fallback to the getrandom() syscall, and
->    everything is fine.
-> 
-> 3) The buffers the function uses are only ever useful for a maximum of
->    60 seconds -- a sort of cache, rather than a long term allocation.
-> 
-> These characteristics mean that we can introduce VM_DROPPABLE, which
-> has the following semantics:
-> 
-> a) It never is written out to swap.
-> b) Under memory pressure, mm can just drop the pages (so that they're
->    zero when read back again).
-> c) It is inherited by fork.
-> d) It doesn't count against the mlock budget, since nothing is locked.
-> 
-> This is fairly simple to implement, with the one snag that we have to
-> use 64-bit VM_* flags, but this shouldn't be a problem, since the only
-> consumers will probably be 64-bit anyway.
-> 
-> This way, allocations used by vDSO getrandom() can use:
-> 
->     VM_DROPPABLE | VM_DONTDUMP | VM_WIPEONFORK | VM_NORESERVE
-> 
-> And there will be no problem with using memory when not in use, not
-> wiping on fork(), coredumps, or writing out to swap.
+On Tue, Jul 02, 2024 at 12:42:54AM -0700, Andrew Morton wrote:
+> The patch is impressively comment-free.  It is a little harsh to make
+> readers go poking around in the git history to figure out what
+> VM_DROPPABLE is, and why it exists.
 
-The patch is impressively comment-free.  It is a little harsh to make
-readers go poking around in the git history to figure out what
-VM_DROPPABLE is, and why it exists.
+Sure, I'll add some comments to the conditionals added to make it more
+clear.
 
-Seems hard to test that this mode is working correctly.  Can you think
-of a way for userspace to check this?  And if so, add it to selftests?
+> Seems hard to test that this mode is working correctly.  Can you think
+> of a way for userspace to check this?  And if so, add it to selftests?
 
+I've got a pretty straight forward test I've been using during my own
+testing that I can add to the vgetrandom_alloc() selftest (which exposes
+these code paths). It works fairly reliably. Basically, one process
+keeps checking to see if the memory has been dropped, while the other
+consumes memory a page at a time. Pretty soon (depending on how much ram
+you have), the memory gets dropped, and this is detected, and the test
+completes with a pass. I'll have this in v+1 of this series.
+
+Jason
