@@ -1,108 +1,117 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD95F178367;
-	Wed,  3 Jul 2024 19:04:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F7F3185E4F
+	for <linux-crypto@vger.kernel.org>; Wed,  3 Jul 2024 19:05:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720033486; cv=none; b=APRS/9AOikMnTF5L8p/DZ9RBPu7C0MlFeHQMFCjlg2X9YNKINBKIkI07NqBR0pb1T36Zgdis4gcwBfgTXSdOvTxkRj7cElHi8F9//VJxQeW0bFxOnPbF0c/HsuK1jlcMHFm6JF7nNdynux/B0alq/+RQ18EvEmH1a1nUiq3cZGc=
+	t=1720033511; cv=none; b=s+6Gy7Sd5nDdJnHp/5wP0x+6GH4WZ6OE2PxgAhRf0CjQjH5r+yxNt2gZzgZLRgHzYAEGjd+sY7BlWQcn8VtOWyKIm4+naKsr7AH6Jiu0k79CHvmDsHWXUPyZdLzABzywxDXzwfIPdARHTrk8z3f+1XzwlJp0On5vIAgBdmUfDyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720033486; c=relaxed/simple;
-	bh=Oc81FuqP3fYxQZO2NIeym9OJaFkN9S77RiMCzQDI9Yw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ffb85zmI+BWAU1guRNGkk2q5vSQZYUF8ALtl0ea7HcJgLJc7Fsx28/HUEhhEssybwx4N5iVEte+Ncllb0nZQaOhA9Gtpbtc64ElxCtJOXAoCWxBkSwawRy6PuAi4JXiimRNv6FEsg3+lgH/BP/DMk6XO8J7UECnLG1b+6XEoS/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=jkxC1dbc; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1720033511; c=relaxed/simple;
+	bh=2Vz6hJ0h/TklevmbNfooUTLTupNNk8r/DeolGS3CKWg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Vzd3na/YuOpCManSHCCaEM15HiaexQAkWQocn66JDm2ecDbTBKRxilDHTcqgTP5NPZtThSCwDquXKdhpyiKSqB9VHZF9qpPfG/SWb1kBY4xLY+emkWQjDqkCo0YW1RjeTb+AAB4zQIclQJtTUb2q0uasnVpbkee3Fy8HRDktuZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ODE1v+ey; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="jkxC1dbc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A08C8C4AF07;
-	Wed,  3 Jul 2024 19:04:45 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="jkxC1dbc"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1720033483;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Oc81FuqP3fYxQZO2NIeym9OJaFkN9S77RiMCzQDI9Yw=;
-	b=jkxC1dbceZx7Be7QJL7a7Ic39wHGYwkBltLiS8mY+H1iZtPBT9TDTthP2QeMMSw9n3UhZu
-	ayr2cBoMf01X1+Uudntkvb8Bup8CzkZYMoIzQHr1tw3p2t5H7pSU3x8O9e5e+2pdsfOywC
-	GRP6njc2YYiqHQ8+J+a6V9ddjs5ivcY=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id e9f2ad1b (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Wed, 3 Jul 2024 19:04:43 +0000 (UTC)
-Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-5c46c8b0defso999751eaf.1;
-        Wed, 03 Jul 2024 12:04:42 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCWNs+ymo17PqtjizDZU9F25M6bnOOGhzawprrVJBN5LHej/HgBOK25UHMKebg6bnMNlQTR/oR3JPye9lyAP6MQGIAXfz3upVqlZQhAd4Ap2ByQ6gAvy0UIZdhgQOwe5lh6Jg24kkjeS
-X-Gm-Message-State: AOJu0YztoHExiL6NdjrEF51aEEiL6GnYFbjV4CtBBpzCo+5vE2RYyKre
-	GN8uVJ2clpTnj5EEQX9x9ioaFeQc5cRM0CFK2nRU1ZrmeYjphPy5oLCYiwIcbo/Frj0FCkLdaPs
-	p6ZzEHrOarpFJmKhnme91EMZ3q5k=
-X-Google-Smtp-Source: AGHT+IF/1JsRrNHrx673Yy+3KzYSc//OID5zS/adculNKhtga+UJFUlkNMK+w1t4qZ56KmzV+zu/1jP+s2nmIVvVD0s=
-X-Received: by 2002:a05:6870:6590:b0:25e:1976:37c0 with SMTP id
- 586e51a60fabf-25e19763d7fmr1558743fac.6.1720033481764; Wed, 03 Jul 2024
- 12:04:41 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ODE1v+ey"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2523C2BD10;
+	Wed,  3 Jul 2024 19:05:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720033510;
+	bh=2Vz6hJ0h/TklevmbNfooUTLTupNNk8r/DeolGS3CKWg=;
+	h=From:To:Cc:Subject:Date:From;
+	b=ODE1v+ey7nJvOvCjIivqGz1zkiGI0vIW11lqLynWKg5NOIBLM26jZ3yzRXMSIO6Lz
+	 OX2BFWifslAUEKZMZCVKo/2XikhvDwPnZwvz+YESaV0ZcQtxDLHlVEAV8keAlU+rdC
+	 vxsTq5CBy2jgd65hLl9LEUSVexLIEtyfyz/Rzvx+/RscHGW+njBsZzQFbjznpQUVXx
+	 K4hdLP7ml2+0xDRC/1Lz+RBWUdV9+OtK1id/VF1XfK85KYAWytUtSBInaydKl/FVWn
+	 fcvi1g6NFDtyP1Ep/sF2kbRCnQzcxQ3NYqLddEY5U/+o+s2WB7ioYY2OjNaottXpDO
+	 ULYlF+HIDVqbw==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: Sami Tolvanen <samitolvanen@google.com>,
+	Ard Biesheuvel <ardb@kernel.org>
+Subject: [PATCH] crypto: testmgr - generate power-of-2 lengths more often
+Date: Wed,  3 Jul 2024 12:04:31 -0700
+Message-ID: <20240703190431.6513-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240703183115.1075219-1-Jason@zx2c4.com> <20240703183115.1075219-4-Jason@zx2c4.com>
- <fa6eb1f8-b681-4c3f-bf5f-4ca19da78b17@app.fastmail.com>
-In-Reply-To: <fa6eb1f8-b681-4c3f-bf5f-4ca19da78b17@app.fastmail.com>
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Wed, 3 Jul 2024 21:04:30 +0200
-X-Gmail-Original-Message-ID: <CAHmME9ouVcCt6C6XdvvKACbCBLV1DaAuv_NP8=fXFN1UMeUu_Q@mail.gmail.com>
-Message-ID: <CAHmME9ouVcCt6C6XdvvKACbCBLV1DaAuv_NP8=fXFN1UMeUu_Q@mail.gmail.com>
-Subject: Re: [PATCH v20 3/5] arch: allocate vgetrandom_alloc() syscall number
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: linux-kernel@vger.kernel.org, patches@lists.linux.dev, 
-	Thomas Gleixner <tglx@linutronix.de>, linux-crypto@vger.kernel.org, 
-	linux-api@vger.kernel.org, x86@kernel.org, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>, "Carlos O'Donell" <carlos@redhat.com>, 
-	Florian Weimer <fweimer@redhat.com>, Jann Horn <jannh@google.com>, 
-	Christian Brauner <brauner@kernel.org>, David Hildenbrand <dhildenb@redhat.com>, 
-	Geert Uytterhoeven <geert@linux-m68k.org>, =?UTF-8?Q?Christian_G=C3=B6ttsche?= <cgzones@googlemail.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Stephen Rothwell <sfr@canb.auug.org.au>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Arnd,
+From: Eric Biggers <ebiggers@google.com>
 
-On Wed, Jul 3, 2024 at 8:59=E2=80=AFPM Arnd Bergmann <arnd@arndb.de> wrote:
->
-> On Wed, Jul 3, 2024, at 20:31, Jason A. Donenfeld wrote:
-> > Add vgetrandom_alloc() as syscall 463 (or 573 on alpha) by adding it to
-> > all of the various syscall.tbl and unistd.h files.
-> >
-> > Acked-by: Geert Uytterhoeven <geert@linux-m68k.org>
-> > Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
->
-> I checked that the system calls are all hooked up correctly
-> across all architectures:
->
-> Acked-by: Arnd Bergmann <arnd@arndb.de>
+Implementations of hash functions often have special cases when lengths
+are a multiple of the hash function's internal block size (e.g. 64 for
+SHA-256, 128 for SHA-512).  Currently, when the fuzz testing code
+generates lengths, it doesn't prefer any length mod 64 over any other.
+This limits the coverage of these special cases.
 
-Thanks.
+Therefore, this patch updates the fuzz testing code to generate
+power-of-2 lengths and divide messages exactly in half a bit more often.
 
-> Unfortunately we now have three syscalls scheduled for
-> the number 463, the other ones being uretprobe (only
-> for arc, arm64, csky, hexagon, loongarch, nios2, openrisc,
-> riscv and x86 for some reason) and setxattrat (on
-> all architectures).
->
-> It would be nice if you could all coordinate on this to
-> pick unique numbers.
+Reviewed-by: Sami Tolvanen <samitolvanen@google.com>
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
 
-Stephen and I were just talking about this when looking at the linux-next m=
-erge.
+This is the same as
+https://lore.kernel.org/linux-crypto/20240621165922.77672-3-ebiggers@kernel.org/,
+just resent as a standalone patch.
 
-Dibs on 463! Just kidding.
+ crypto/testmgr.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
 
-There's going to be merge conflicts anyway, due to the __NR_syscalls
-counter changing. So I figured this is something Linus typically just
-handles based on what order he merges things in. But I actually don't
-know. What's the best way to handle this?
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index a780b615f8c6..f02cb075bd68 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -914,18 +914,24 @@ static unsigned int generate_random_length(struct rnd_state *rng,
+ {
+ 	unsigned int len = prandom_u32_below(rng, max_len + 1);
+ 
+ 	switch (prandom_u32_below(rng, 4)) {
+ 	case 0:
+-		return len % 64;
++		len %= 64;
++		break;
+ 	case 1:
+-		return len % 256;
++		len %= 256;
++		break;
+ 	case 2:
+-		return len % 1024;
++		len %= 1024;
++		break;
+ 	default:
+-		return len;
++		break;
+ 	}
++	if (len && prandom_u32_below(rng, 4) == 0)
++		len = rounddown_pow_of_two(len);
++	return len;
+ }
+ 
+ /* Flip a random bit in the given nonempty data buffer */
+ static void flip_random_bit(struct rnd_state *rng, u8 *buf, size_t size)
+ {
+@@ -1017,10 +1023,12 @@ static char *generate_random_sgl_divisions(struct rnd_state *rng,
+ 		unsigned int this_len;
+ 		const char *flushtype_str;
+ 
+ 		if (div == &divs[max_divs - 1] || prandom_bool(rng))
+ 			this_len = remaining;
++		else if (prandom_u32_below(rng, 4) == 0)
++			this_len = (remaining + 1) / 2;
+ 		else
+ 			this_len = prandom_u32_inclusive(rng, 1, remaining);
+ 		div->proportion_of_total = this_len;
+ 
+ 		if (prandom_u32_below(rng, 4) == 0)
 
-Jason
+base-commit: 95c0f5c3b8bb7acdc5c4f04bc6a7d3f40d319e9e
+-- 
+2.45.2
+
