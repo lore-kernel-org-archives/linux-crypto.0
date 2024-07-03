@@ -1,93 +1,61 @@
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D77A717166A
-	for <linux-crypto@vger.kernel.org>; Wed,  3 Jul 2024 10:33:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 042CE17B50A;
+	Wed,  3 Jul 2024 11:26:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720002797; cv=none; b=qSH46gxywPD5vvq079ysRi3QXCfIa716C7vCFKOQia1ikTlYbU7Qu8Cc2i+gxnJCf1dWmRCOBhOzrr8v/4KIg49mrHar6FX29VBwhHIApKfQMlPYBQWEmp0i6F/akjCRV8QNO3Vk2v5lZgBvadP4MkbGEEQ8rEGsc6PH95iIHJU=
+	t=1720006004; cv=none; b=oePtXoB0rXsyhHNda8n6ClJq5iNykn2NblHfPCCRbd1c3BwMGufwcZHJdLe1f1bUQDYs8jBiYT8kQGxMqs3scjDyknjsEZFeqRT89r78sRjobVNKmkCXvRjvl3vguIqs+5acBho4HIeD+IF4CEOvR2JYBW/TueCdwoWnANpQMHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720002797; c=relaxed/simple;
-	bh=4H5haDE7k64EWfuCw7wYQ8GiPFESg0dfVMdT8ZwOa9Y=;
+	s=arc-20240116; t=1720006004; c=relaxed/simple;
+	bh=NAwTmEHqJI/g5QC50U8AQivwoiPQ/FxFK+E4TqhVNPA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kXR10wZrA1enZGjDxmvy3u3jHKGCtTYL6L8TBwmkhyKXx/B74Efe4g1iv8qTeQ02mub6LwrpUAqR32BXoa1BiOgrtgLhMU9lsM+nn5shb/RKnDfVHxnsEKwSkOI3Yg6Ey+nYNPntRYZuT20G/e3QHqHPIrOt1p+vastyPIQ5WXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=tTSCYIFC; arc=none smtp.client-ip=209.85.208.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tTSCYIFC"
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2ebe40673e8so63402581fa.3
-        for <linux-crypto@vger.kernel.org>; Wed, 03 Jul 2024 03:33:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1720002793; x=1720607593; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TrB2TnPNBgt+WbBBIM4+5QWbIuhtFAqbg6qcHUZxaco=;
-        b=tTSCYIFCM9x8KJGViFEBb8Yb5gQu4qmjLgpYZIcAL+qddS7kr1YwE08ziXob92ubaN
-         jxwD7gNYXoEj3AeZROLmWOwijpOpfqfBXc2P+7Dht3CxYPwt5vhIgE43AFlyaK07WbxK
-         TRFYQ9/ANP7dDnvh5t9BZ8XTSbhu29pRLUA1RiRPZ/iCaFwjuCpzi4/1zo+lFAlUc2K3
-         plULoOR7vKDyLMKkjdHppqmbIhlsuapIo/NEcwnCqu+RY+Bo5OoBm/6++/W4tCQbVgfv
-         Q6iUhl4RNXmOAskcjO2HChzJOSHudruVGwoOSq7Fu0Ib6liCFbyS3zkuviBR0ja5g3iz
-         n4XQ==
+	 Content-Type:Content-Disposition:In-Reply-To; b=Fqi2sqIq0HBAj9Zp0Cf1etfHQc73EC/GVg4za4SwiYy9hh4cNJ0PxUzzqxOsbAdqz6nU52Gau/3CvupsiP2u5Ennh+vCUaYMgIXb4VpHTpPsP7ywWVne8tjQ0iUfEhFbBTeE87dg2L3CYtZ1hvbIN7+4S+pZBNysvcfFVmJxqjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-52e7693c369so7174202e87.3;
+        Wed, 03 Jul 2024 04:26:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720002793; x=1720607593;
+        d=1e100.net; s=20230601; t=1720006001; x=1720610801;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=TrB2TnPNBgt+WbBBIM4+5QWbIuhtFAqbg6qcHUZxaco=;
-        b=u85qP4dCJDRQAvKEoRch7Pr7afcdg+NsTuG/3mF55U08zUchsEQIttjaZ1izD1z9bG
-         fBmvh4X7bR5VSftnOoVh3LHCOh33eYSfvAeXhvWhns1Uqi3HP7BwYSqis3r9e35EpCD1
-         kh4g6NDyM6hCLMC9rab3Zk93O6xnWdrmxt39h2pi3aKhPEV2E8/Iz7sV7SOqI+cACew7
-         +to4dqxzu4Pc+T+t0N/Olv6/t126D2buRzM7Re6bIGr9Z6/g4GkNFgWD0QdrDabj7OAU
-         2sI3kOvWJ58lphN/To8okRIYdg38d1GdP4XB0mO/SdhRcozr6DrLP9ipHjP+WIS1u8jR
-         Bdlg==
-X-Forwarded-Encrypted: i=1; AJvYcCUjmlNChDUswz7/TY3mZ3Z64Fh+KURNWlVDpX0NVHfUTu3Pafeiur0COn8qFek+R4YEWSkDpV3UlnXlvEpyRQde1aA/pFFnrNexMCxp
-X-Gm-Message-State: AOJu0YzuM/Os4LEQFZG4qTk/o8+KJF1jcHaSbvH2yr4n0TQ2K4dGafA/
-	eAHbvaGzt/eb6imoZefSqUS2aMEoDneWrOnH6EEAE2R9uL5YjXzhIij5JgfaSJE=
-X-Google-Smtp-Source: AGHT+IEgLYgf/SDysaV48RHAuwJ+VgK2M5e2XinMD5byEgw07GiQwTlTQD6QPmY0VgdHWS5AezImMg==
-X-Received: by 2002:a05:651c:49b:b0:2eb:d9a3:2071 with SMTP id 38308e7fff4ca-2ee5e6c9cd8mr61398201fa.50.1720002792033;
-        Wed, 03 Jul 2024 03:33:12 -0700 (PDT)
-Received: from eriador.lumag.spb.ru (dzdbxzyyyyyyyyyyybrhy-3.rev.dnainternet.fi. [2001:14ba:a0c3:3a00::b8c])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2ee51696991sm18684511fa.136.2024.07.03.03.33.11
+        bh=i6Pb8eWYjG/lUAtf/dpDbWcNlsXUZ5c2rnoW11IR3JM=;
+        b=wbctDzPIt4JNpmEypYhvsTnMZt5SNSG50iLYdX24tr1Vs+tE55AqzDS60igJ8NGmD/
+         doCILuyAzXov32Y+Xctfhs/Cq8V8TXSKym4snvL395Dp/AxO3XtD6BRRtTpI5idr01UI
+         e+gGx9hil4iS3Jv9ZhMSAYoMqEfpM4uSfEv52HeQnNZTgaqcO2Fo8NSw7e6VadkDdxll
+         zXtl6YP25Pa3AJgzLuH83zlZ1EC3zt/e2MI6JbjAFyWB8O9VJq3ErcsH/tObJXypFYPi
+         Jwfgf3b8gAibnoXdzHWRYpQfWthoprLmk0Dz39m8bxIph34EMk3XjGtVbnAd92p4e6XU
+         wBlg==
+X-Forwarded-Encrypted: i=1; AJvYcCVVdXboL1NZjCcg//+LAlixOHSTC+j25xKlTsdKHYMKKkLnCXzoey8CeYCR6DC1J9A8/nU7/4BSQa6BTQ4uEL3+pMtJtnXZC7Ml7crDFBUSGG15F6a43LxiW9/mxsWa+hTbPbFeq8dCYlPR8DUz+FH1Fy9Z4ES/D9MknwGyohWClkBk
+X-Gm-Message-State: AOJu0Yy74Wj8SkFIbaKQKmG7FQ+qU+Wc8NzGZHIJhT8CKhRCaV8yVNsh
+	qe/a7qHODPTayBCpui0+feWoNX0Bc//AF//E0CE3/BuOJ29ceY2t2LGNAg==
+X-Google-Smtp-Source: AGHT+IEbAQ8nFW0BsPbyiOwXt/vQdxbqW/1IV4VaU6x/l7d9vtN8XdicV2zAwUK37aIl/GyFuMd2lA==
+X-Received: by 2002:a05:6512:3b91:b0:52e:7f87:4e66 with SMTP id 2adb3069b0e04-52e826ee70amr8624122e87.49.1720006000901;
+        Wed, 03 Jul 2024 04:26:40 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-005.fbsv.net. [2a03:2880:30ff:5::face:b00c])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-58612c8368esm6843735a12.19.2024.07.03.04.26.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Jul 2024 03:33:11 -0700 (PDT)
-Date: Wed, 3 Jul 2024 13:33:09 +0300
-From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-To: Tengfei Fan <quic_tengfan@quicinc.com>
-Cc: andersson@kernel.org, konrad.dybcio@linaro.org, robh@kernel.org, 
-	krzk+dt@kernel.org, conor+dt@kernel.org, djakov@kernel.org, mturquette@baylibre.com, 
-	sboyd@kernel.org, jassisinghbrar@gmail.com, herbert@gondor.apana.org.au, 
-	davem@davemloft.net, manivannan.sadhasivam@linaro.org, will@kernel.org, 
-	joro@8bytes.org, conor@kernel.org, tglx@linutronix.de, amitk@kernel.org, 
-	thara.gopinath@gmail.com, linus.walleij@linaro.org, wim@linux-watchdog.org, 
-	linux@roeck-us.net, rafael@kernel.org, viresh.kumar@linaro.org, vkoul@kernel.org, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com, 
-	robimarko@gmail.com, quic_gurus@quicinc.com, bartosz.golaszewski@linaro.org, 
-	kishon@kernel.org, quic_wcheng@quicinc.com, alim.akhtar@samsung.com, 
-	avri.altman@wdc.com, bvanassche@acm.org, agross@kernel.org, 
-	gregkh@linuxfoundation.org, quic_tdas@quicinc.com, robin.murphy@arm.com, 
-	daniel.lezcano@linaro.org, rui.zhang@intel.com, lukasz.luba@arm.com, 
-	quic_rjendra@quicinc.com, ulf.hansson@linaro.org, quic_sibis@quicinc.com, 
-	otto.pflueger@abscue.de, quic_rohiagar@quicinc.com, luca@z3ntu.xyz, 
-	neil.armstrong@linaro.org, abel.vesa@linaro.org, bhupesh.sharma@linaro.org, 
-	alexandre.torgue@foss.st.com, peppe.cavallaro@st.com, joabreu@synopsys.com, 
-	netdev@vger.kernel.org, lpieralisi@kernel.org, kw@linux.com, bhelgaas@google.com, 
-	ahalaney@redhat.com, krzysztof.kozlowski@linaro.org, u.kleine-koenig@pengutronix.de, 
-	quic_cang@quicinc.com, danila@jiaxyga.com, quic_nitirawa@quicinc.com, 
-	mantas@8devices.com, athierry@redhat.com, quic_kbajaj@quicinc.com, 
-	quic_bjorande@quicinc.com, quic_msarkar@quicinc.com, quic_devipriy@quicinc.com, 
-	quic_tsoni@quicinc.com, quic_rgottimu@quicinc.com, quic_shashim@quicinc.com, 
-	quic_kaushalk@quicinc.com, quic_tingweiz@quicinc.com, quic_aiquny@quicinc.com, 
-	srinivas.kandagatla@linaro.org, linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org, linux-clk@vger.kernel.org, 
-	linux-phy@lists.infradead.org, linux-crypto@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	linux-usb@vger.kernel.org, linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev, 
-	linux-riscv@lists.infradead.org, linux-gpio@vger.kernel.org, linux-watchdog@vger.kernel.org, 
-	linux-pci@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, kernel@quicinc.com
-Subject: Re: [PATCH 00/47] arm64: qcom: dts: add QCS9100 support
-Message-ID: <43nktnqp6mthafojiph7ouzfchmudtht634gtxwg7gmutb5l7y@a5j27mpl7d23>
-References: <20240703025850.2172008-1-quic_tengfan@quicinc.com>
- <20240703035735.2182165-1-quic_tengfan@quicinc.com>
+        Wed, 03 Jul 2024 04:26:40 -0700 (PDT)
+Date: Wed, 3 Jul 2024 04:26:38 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Gaurav Jain <gaurav.jain@nxp.com>
+Cc: "kuba@kernel.org" <kuba@kernel.org>,
+	Horia Geanta <horia.geanta@nxp.com>,
+	Pankaj Gupta <pankaj.gupta@nxp.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	"horms@kernel.org" <horms@kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [EXT] [PATCH net-next v3 4/4] crypto: caam: Unembed net_dev
+ structure in dpaa2
+Message-ID: <ZoU1bh79jugMaRty@gmail.com>
+References: <20240702185557.3699991-1-leitao@debian.org>
+ <20240702185557.3699991-5-leitao@debian.org>
+ <AM0PR04MB600485850F153B6792CA8C0DE7DD2@AM0PR04MB6004.eurprd04.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -96,24 +64,27 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240703035735.2182165-1-quic_tengfan@quicinc.com>
+In-Reply-To: <AM0PR04MB600485850F153B6792CA8C0DE7DD2@AM0PR04MB6004.eurprd04.prod.outlook.com>
 
-On Wed, Jul 03, 2024 at 11:56:48AM GMT, Tengfei Fan wrote:
-> Introduce support for the QCS9100 SoC device tree (DTSI) and the
-> QCS9100 RIDE board DTS. The QCS9100 is a variant of the SA8775p.
-> While the QCS9100 platform is still in the early design stage, the
-> QCS9100 RIDE board is identical to the SA8775p RIDE board, except it
-> mounts the QCS9100 SoC instead of the SA8775p SoC.
+Hello Gaurav,
 
-Your patch series includes a second copy of your patches, wich have
-different Message-IDs:
+On Wed, Jul 03, 2024 at 05:45:23AM +0000, Gaurav Jain wrote:
 
-20240703035735.2182165-1-quic_tengfan@quicinc.com vs
-20240703025850.2172008-1-quic_tengfan@quicinc.com
+> > @@ -5096,15 +5109,23 @@ static int __cold dpaa2_dpseci_setup(struct
+> > fsl_mc_device *ls_dev)
+> >                         priv->rx_queue_attr[j].fqid,
+> >                         priv->tx_queue_attr[j].fqid);
+> >
+> > -               ppriv->net_dev.dev = *dev;
+> > -               INIT_LIST_HEAD(&ppriv->net_dev.napi_list);
 
-Please consider switching to the b4 tool or just
-checking what is being sent.
+> napi_list is not needed anymore? There is no mention in commit.
 
--- 
-With best wishes
-Dmitry
+Good question. This allocation is now done in the alloc_netdev_dummy()
+path. This is the code path:
+
+alloc_netdev_dummy()->alloc_netdev()->alloc_netdev_mqs() which calls:
+
+	INIT_LIST_HEAD(&dev->napi_list);
+
+So, napi_list is initialized when the net_device interface is allocated.
