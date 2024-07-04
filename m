@@ -1,65 +1,82 @@
-Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 105BD1B11FB
-	for <linux-crypto@vger.kernel.org>; Thu,  4 Jul 2024 15:25:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 459E11B29CD;
+	Thu,  4 Jul 2024 16:04:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720106710; cv=none; b=TbDYPP+2WoJQJj/dlR9kNwWYF+KZ3mRQZwW5s1Axy39kWWupBUlRghLPtlUaQgqNnblpHDZehlJMGHdQ2nu+GaKqqZ0wUB7g9sFnwQanoRTbGpA7PvWSQ2jlwnjtDn0PZMIFGQgDIx6OEG4QHR529G+IgCVwrx2wJgewppYDxzA=
+	t=1720109064; cv=none; b=dtotdWw6xNKVeLbu9nkBsgl+d+Ed+1vwQeHAagnj/e11FE65YnwU6qlhWO9BGGh57KKu/4TV+ENUh768lDIG/SqPxv9e66cSOD/382TzdLqDlrU56elUvJWfSxf3PVKVoS21PCxC75KusaT0wmia6/RCBJfaLdayoKyefWf4LC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720106710; c=relaxed/simple;
-	bh=L0fqthKwQoJ3/n3wTuxc8RAAQ0COsdCjZ1mWGK2Mepw=;
-	h=Message-ID:Date:From:To:Cc:Subject:MIME-Version:Content-Type:
-	 Content-Disposition; b=mAijtUp3v3VVJoDbVupbkJi53YurHShWi7HJu326BCPCQUqz6malqEt1rKlfAmBZvRwyKJWwo7vTP0b0+hq959refQ18nkul1giS4fNUZk95Myu3nlxQwpVuZZDxj9U/D/s0sOgCpWrVRy+QofUqCsBihLuJDP7m48XzqNcLfng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=nQaXHkA8; arc=none smtp.client-ip=209.85.161.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1720109064; c=relaxed/simple;
+	bh=1+toRJY35/129MSR44qFWaryqVoiascuVBFB3NmaZ/M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Tvy2tcntNmsqvvyfx7GRr4698K+UJKCPlS582UAIpLc0LbyuwfhuvStqlafx/vfeO2vBDPvFSJpXbYjJKO0E8g7YPCjOsPQRamI2/vrn/+eLnpWPL2KDaxbDaOIOwKwvCJwFuYZm/Oj01MidtxcDaio519FI6guNC5V/3e7Swkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=uctUXtst; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nQaXHkA8"
-Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-5b9a35a0901so278662eaf.0
-        for <linux-crypto@vger.kernel.org>; Thu, 04 Jul 2024 08:25:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1720106708; x=1720711508; darn=vger.kernel.org;
-        h=content-disposition:mime-version:subject:cc:to:from:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7sFNJOnSmqtqKvPXuuEH/9m0mTzrSrkSfu1bDrkU8IU=;
-        b=nQaXHkA8W9mW8J8bVh4lksG8sNjdzmiE0L2KEJo99bUiZZKzomIc/HX7qTbqhalHn7
-         pPZfstVNyW8ku2/qeOKT3QmrcHsN66waiAU0uLUFyx+518GLENllFuka0H/NfFhNmZEc
-         4JJQQfr5FowIEftD4L2O4QCImkjNR2bi6sir9jtUZ79Cr+wCpJQuLCP4pbCVMEmKFxkF
-         BmoO1gUDIrHJlcRbYsYShprA+OjuWmQnjGgJqVOpLGpgwo2IisSOvEFz0cY+UITsIFHH
-         jjzvo7ouyPBezol5S4XEVWKNh6jpFwlMxuordhp6ld+guvBIJJlQDbUgIoMkyN3Zd05S
-         0OPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720106708; x=1720711508;
-        h=content-disposition:mime-version:subject:cc:to:from:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7sFNJOnSmqtqKvPXuuEH/9m0mTzrSrkSfu1bDrkU8IU=;
-        b=J3ENqh+kULe1gyLdDIaSbeInGe3QkIKog79JfQ1x/S5wej0rXZrM3J1/tjrUdrEE2D
-         coqjnR7Na5QXWiG9lsTQMf0DdEQtlvwNgeroU7lGuvVAKPWblchx5qsNItDSp5qYpYtc
-         7PX5+1XMsUNG2bR45lJPpWnb5TIq7zFNd6QLdKt80VUEedblN2ALBiaQJIUd9zEV1jVi
-         wrbkxmVQ32zWmq22u1PvVPZuCZPp88LQn7zVcvjt+4V0678cZCRVNrgLBfPkYksuftMx
-         eBV3G/2NLw6nM1fHWpf0fBtXLNOqBq8R2ciUm2W/Kez2bZRqYIKoBHOs9amXF41g6wVU
-         ccXw==
-X-Forwarded-Encrypted: i=1; AJvYcCWTyduZlDc9mImTjDLvyqeIBmC7fT8VCrrivrZb4rHsjVgOJ3r4f/jzt7ifiyiVEEgxVklVwbZb3ysGDrFNQRWDkDoM/mgU9U7IYasp
-X-Gm-Message-State: AOJu0YwHzLmavfdgSzKCGjaQrMcggdF6fEZn92W/gvKassMliew0OdMY
-	mtAqbhYZT5CKwloDzcQgZDe0rDdfQB2J0vjRCj8csAnnv+Mf4Y5eZl46e/O4JcU=
-X-Google-Smtp-Source: AGHT+IFsO54HvV2syeU4YZ26SXAOrzkSz/Z2cJBBPKHT1L0d/gQhuA22lcmvQepFViKBwkpZQsYdug==
-X-Received: by 2002:a4a:4b43:0:b0:5c2:1bdc:669c with SMTP id 006d021491bc7-5c646f7105dmr2315521eaf.6.1720106708143;
-        Thu, 04 Jul 2024 08:25:08 -0700 (PDT)
-Received: from localhost ([2603:8080:b800:f700:96a0:e6e9:112e:f4c])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-5c44bba4eddsm1148760eaf.32.2024.07.04.08.25.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jul 2024 08:25:07 -0700 (PDT)
-Message-ID: <6686bed3.4a0a0220.6aa45.6c34@mx.google.com>
-X-Google-Original-Message-ID: <@stanley.mountain>
-Date: Thu, 4 Jul 2024 10:25:05 -0500
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Mimi Zohar <zohar@linux.ibm.com>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH] crypto: lib/mpi: delete unnecessary condition
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="uctUXtst"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=NUvYT0Apw8SqjInlbdvt2ov0pZsd3AGE3tETszdRDzg=; b=uctUXtstqOdYStp1RAdEevee8A
+	og2m1rbeRGyNCyWKUOMtyM5AqIVxQFyxOPDwVFm9FnkbszNQ36vazTBa9yXYKCDMQBhsJURhhsCMA
+	j1mTGX2YuuLQQvVFM9F5PJp4GaLgK5ASkZXssZl/rnBc5yDOus60fNPX7zh7xaHLB3Ec=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sPOvS-001pKc-Qp; Thu, 04 Jul 2024 18:03:14 +0200
+Date: Thu, 4 Jul 2024 18:03:14 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Tengfei Fan <quic_tengfan@quicinc.com>
+Cc: Andrew Halaney <ahalaney@redhat.com>, andersson@kernel.org,
+	konrad.dybcio@linaro.org, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, djakov@kernel.org, mturquette@baylibre.com,
+	sboyd@kernel.org, jassisinghbrar@gmail.com,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	manivannan.sadhasivam@linaro.org, will@kernel.org, joro@8bytes.org,
+	conor@kernel.org, tglx@linutronix.de, amitk@kernel.org,
+	thara.gopinath@gmail.com, linus.walleij@linaro.org,
+	wim@linux-watchdog.org, linux@roeck-us.net, rafael@kernel.org,
+	viresh.kumar@linaro.org, vkoul@kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
+	robimarko@gmail.com, bartosz.golaszewski@linaro.org,
+	kishon@kernel.org, quic_wcheng@quicinc.com, alim.akhtar@samsung.com,
+	avri.altman@wdc.com, bvanassche@acm.org, agross@kernel.org,
+	gregkh@linuxfoundation.org, quic_tdas@quicinc.com,
+	robin.murphy@arm.com, daniel.lezcano@linaro.org,
+	rui.zhang@intel.com, lukasz.luba@arm.com, quic_rjendra@quicinc.com,
+	ulf.hansson@linaro.org, quic_sibis@quicinc.com,
+	otto.pflueger@abscue.de, luca@z3ntu.xyz, neil.armstrong@linaro.org,
+	abel.vesa@linaro.org, bhupesh.sharma@linaro.org,
+	alexandre.torgue@foss.st.com, peppe.cavallaro@st.com,
+	joabreu@synopsys.com, netdev@vger.kernel.org, lpieralisi@kernel.org,
+	kw@linux.com, bhelgaas@google.com, krzysztof.kozlowski@linaro.org,
+	u.kleine-koenig@pengutronix.de, dmitry.baryshkov@linaro.org,
+	quic_cang@quicinc.com, danila@jiaxyga.com,
+	quic_nitirawa@quicinc.com, mantas@8devices.com, athierry@redhat.com,
+	quic_kbajaj@quicinc.com, quic_bjorande@quicinc.com,
+	quic_msarkar@quicinc.com, quic_devipriy@quicinc.com,
+	quic_tsoni@quicinc.com, quic_rgottimu@quicinc.com,
+	quic_shashim@quicinc.com, quic_kaushalk@quicinc.com,
+	quic_tingweiz@quicinc.com, quic_aiquny@quicinc.com,
+	srinivas.kandagatla@linaro.org, linux-arm-msm@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-pm@vger.kernel.org, linux-clk@vger.kernel.org,
+	linux-phy@lists.infradead.org, linux-crypto@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev,
+	linux-gpio@vger.kernel.org, linux-watchdog@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	kernel@quicinc.com
+Subject: Re: [PATCH 29/47] dt-bindings: net: qcom,ethqos: add description for
+ qcs9100
+Message-ID: <add1bdda-2321-4c47-91ef-299f99385bc8@lunn.ch>
+References: <20240703025850.2172008-1-quic_tengfan@quicinc.com>
+ <20240703025850.2172008-30-quic_tengfan@quicinc.com>
+ <u5ekupjqvgoehkl76pv7ljyqqzbnnyh6ci2dilfxfkcdvdy3dp@ehdujhkul7ow>
+ <f4162b7f-d957-4dd6-90a0-f65c1cbc213a@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -68,37 +85,29 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
+In-Reply-To: <f4162b7f-d957-4dd6-90a0-f65c1cbc213a@quicinc.com>
 
-We checked that "nlimbs" is non-zero in the outside if statement so delete
-the duplicate check here.
+On Thu, Jul 04, 2024 at 09:13:59AM +0800, Tengfei Fan wrote:
+> 
+> 
+> On 7/3/2024 11:09 PM, Andrew Halaney wrote:
+> > On Wed, Jul 03, 2024 at 10:58:32AM GMT, Tengfei Fan wrote:
+> > > Add the compatible for the MAC controller on qcs9100 platforms. This MAC
+> > > works with a single interrupt so add minItems to the interrupts property.
+> > > The fourth clock's name is different here so change it. Enable relevant
+> > > PHY properties. Add the relevant compatibles to the binding document for
+> > > snps,dwmac as well.
+> > 
+> > This description doesn't match what was done in this patch, its what
+> > Bart did when he made changes to add the sa8775 changes. Please consider
+> > using a blurb indicating that this is the same SoC as sa8775p, just with
+> > different firmware strategies or something along those lines?
+> 
+> I will update this commit message as you suggested.
 
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
- lib/crypto/mpi/mpi-bit.c | 10 ++++------
- 1 file changed, 4 insertions(+), 6 deletions(-)
+Hi Andrew, Tengfei
 
-diff --git a/lib/crypto/mpi/mpi-bit.c b/lib/crypto/mpi/mpi-bit.c
-index 070ba784c9f1..e08fc202ea5c 100644
---- a/lib/crypto/mpi/mpi-bit.c
-+++ b/lib/crypto/mpi/mpi-bit.c
-@@ -212,12 +212,10 @@ void mpi_rshift(MPI x, MPI a, unsigned int n)
- 			return;
- 		}
- 
--		if (nlimbs) {
--			for (i = 0; i < x->nlimbs - nlimbs; i++)
--				x->d[i] = x->d[i+nlimbs];
--			x->d[i] = 0;
--			x->nlimbs -= nlimbs;
--		}
-+		for (i = 0; i < x->nlimbs - nlimbs; i++)
-+			x->d[i] = x->d[i+nlimbs];
-+		x->d[i] = 0;
-+		x->nlimbs -= nlimbs;
- 
- 		if (x->nlimbs && nbits)
- 			mpihelp_rshift(x->d, x->d, x->nlimbs, nbits);
--- 
-2.43.0
+Please trim emails when replying to just the needed context.
 
+Thanks
+	Andrew
