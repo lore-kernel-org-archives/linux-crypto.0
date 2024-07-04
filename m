@@ -1,82 +1,57 @@
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 459E11B29CD;
-	Thu,  4 Jul 2024 16:04:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADE7314B966;
+	Thu,  4 Jul 2024 16:15:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720109064; cv=none; b=dtotdWw6xNKVeLbu9nkBsgl+d+Ed+1vwQeHAagnj/e11FE65YnwU6qlhWO9BGGh57KKu/4TV+ENUh768lDIG/SqPxv9e66cSOD/382TzdLqDlrU56elUvJWfSxf3PVKVoS21PCxC75KusaT0wmia6/RCBJfaLdayoKyefWf4LC8=
+	t=1720109737; cv=none; b=IrC4YDI8WKQKS/TfCQZ1pySESgFJOnhwXRx7XqTP99GEjRCpAjQLHuF3mLxd87MrqTU9tpFqmGqu2RYz02CDmm0gGl++QtYV2L/E3cIrikmmtZlWpSRmgzWsnRRfJRBEaZx7bEOu2QYyMwXsvY8PYhRjFLaec/ICrd1ToeNC8CI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720109064; c=relaxed/simple;
-	bh=1+toRJY35/129MSR44qFWaryqVoiascuVBFB3NmaZ/M=;
+	s=arc-20240116; t=1720109737; c=relaxed/simple;
+	bh=c4q5Jgv8TLP8NcmfeDKwvvOhlsN3MP6PRX2BR1kN7zs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Tvy2tcntNmsqvvyfx7GRr4698K+UJKCPlS582UAIpLc0LbyuwfhuvStqlafx/vfeO2vBDPvFSJpXbYjJKO0E8g7YPCjOsPQRamI2/vrn/+eLnpWPL2KDaxbDaOIOwKwvCJwFuYZm/Oj01MidtxcDaio519FI6guNC5V/3e7Swkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=uctUXtst; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="uctUXtst"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=NUvYT0Apw8SqjInlbdvt2ov0pZsd3AGE3tETszdRDzg=; b=uctUXtstqOdYStp1RAdEevee8A
-	og2m1rbeRGyNCyWKUOMtyM5AqIVxQFyxOPDwVFm9FnkbszNQ36vazTBa9yXYKCDMQBhsJURhhsCMA
-	j1mTGX2YuuLQQvVFM9F5PJp4GaLgK5ASkZXssZl/rnBc5yDOus60fNPX7zh7xaHLB3Ec=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sPOvS-001pKc-Qp; Thu, 04 Jul 2024 18:03:14 +0200
-Date: Thu, 4 Jul 2024 18:03:14 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Tengfei Fan <quic_tengfan@quicinc.com>
-Cc: Andrew Halaney <ahalaney@redhat.com>, andersson@kernel.org,
-	konrad.dybcio@linaro.org, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, djakov@kernel.org, mturquette@baylibre.com,
-	sboyd@kernel.org, jassisinghbrar@gmail.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	manivannan.sadhasivam@linaro.org, will@kernel.org, joro@8bytes.org,
-	conor@kernel.org, tglx@linutronix.de, amitk@kernel.org,
-	thara.gopinath@gmail.com, linus.walleij@linaro.org,
-	wim@linux-watchdog.org, linux@roeck-us.net, rafael@kernel.org,
-	viresh.kumar@linaro.org, vkoul@kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com,
-	robimarko@gmail.com, bartosz.golaszewski@linaro.org,
-	kishon@kernel.org, quic_wcheng@quicinc.com, alim.akhtar@samsung.com,
-	avri.altman@wdc.com, bvanassche@acm.org, agross@kernel.org,
-	gregkh@linuxfoundation.org, quic_tdas@quicinc.com,
-	robin.murphy@arm.com, daniel.lezcano@linaro.org,
-	rui.zhang@intel.com, lukasz.luba@arm.com, quic_rjendra@quicinc.com,
-	ulf.hansson@linaro.org, quic_sibis@quicinc.com,
-	otto.pflueger@abscue.de, luca@z3ntu.xyz, neil.armstrong@linaro.org,
-	abel.vesa@linaro.org, bhupesh.sharma@linaro.org,
-	alexandre.torgue@foss.st.com, peppe.cavallaro@st.com,
-	joabreu@synopsys.com, netdev@vger.kernel.org, lpieralisi@kernel.org,
-	kw@linux.com, bhelgaas@google.com, krzysztof.kozlowski@linaro.org,
-	u.kleine-koenig@pengutronix.de, dmitry.baryshkov@linaro.org,
-	quic_cang@quicinc.com, danila@jiaxyga.com,
-	quic_nitirawa@quicinc.com, mantas@8devices.com, athierry@redhat.com,
-	quic_kbajaj@quicinc.com, quic_bjorande@quicinc.com,
-	quic_msarkar@quicinc.com, quic_devipriy@quicinc.com,
-	quic_tsoni@quicinc.com, quic_rgottimu@quicinc.com,
-	quic_shashim@quicinc.com, quic_kaushalk@quicinc.com,
-	quic_tingweiz@quicinc.com, quic_aiquny@quicinc.com,
-	srinivas.kandagatla@linaro.org, linux-arm-msm@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-pm@vger.kernel.org, linux-clk@vger.kernel.org,
-	linux-phy@lists.infradead.org, linux-crypto@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, iommu@lists.linux.dev,
-	linux-gpio@vger.kernel.org, linux-watchdog@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	kernel@quicinc.com
-Subject: Re: [PATCH 29/47] dt-bindings: net: qcom,ethqos: add description for
- qcs9100
-Message-ID: <add1bdda-2321-4c47-91ef-299f99385bc8@lunn.ch>
-References: <20240703025850.2172008-1-quic_tengfan@quicinc.com>
- <20240703025850.2172008-30-quic_tengfan@quicinc.com>
- <u5ekupjqvgoehkl76pv7ljyqqzbnnyh6ci2dilfxfkcdvdy3dp@ehdujhkul7ow>
- <f4162b7f-d957-4dd6-90a0-f65c1cbc213a@quicinc.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=almrmO68uqmfhJ7HCRCCECB4cIJdc7DyG5fJc1lKF+bZ44bonxDaKDqhiIT9vvQ4IyTpaZV/TJgAUfcDg+wGVvj+ln8l3OapO2vwQRPVcUQCfakdd8M35kr7D5ox9lNja+GQWsBH5mTQcypc22hucniKWnekfLQiqIiDtCofxJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a729d9d7086so339034566b.0;
+        Thu, 04 Jul 2024 09:15:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720109734; x=1720714534;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ifhtzXGs+i5f3VXWSwrfmv9kw+0cgBz6vNCd3/K8wJo=;
+        b=tBGLiDg0Vc7GjjEuDfBNalLiZ4KqDEfa2ac34pRec+hfcDl2bPjVPgW6BtM1U35sq3
+         3zcQChrW0GGKiTSDBD8TtKyXSU2aQGl0Ez7SO3XTLs1/aKXAo52AKKRAZ37MPcpHcFd3
+         bnQnUK9dJ+AXjeNiBbiW02U7mMhs1PnNGkCir2c8qbrLdg7cdVGr82UVyaozNrZpV2lp
+         bOoXjdzBQsqvX1zMJYnHcCjCy6M7rRv7XjRkeWAK7nK/yRNJz4U13S7Em4//OXCsmClq
+         nQpDobAlQPVB9gqR4XBohmeP51fTqZL4vz+RSlDA4jisBG2wggXXBWUOXAcZmECG4aSn
+         3dew==
+X-Forwarded-Encrypted: i=1; AJvYcCXmr3QGRH9DgZXdYDNfkgf5vRF9aKZjbvTXOZEGTkbzJaN/5++Zjdftodf8O3Gy4YyqNm/xlQIev0vpTnNyI20ukfew77nagyPysLSORG0LRSTZ7o1k5J2HvU53jCzEq2a52LS8/ZY9nJixvMjum+hO1IZq2mBtmqgVx4KzHEqVIJ3C
+X-Gm-Message-State: AOJu0YwRj1LAsKzamxqHx8I3/GC/ZMeN1E4X8rfkzVG5vLl2uGhiBOiu
+	Qla8N8CXEmREMRJYFqp1keZEc+2msz/caScbsKuCqlGEat1neGwq
+X-Google-Smtp-Source: AGHT+IHyIp9PHYjXo9rsa26hJ5TZ1+lz779fiuQgo4pA6qV9Q55a9y4V+mdgajPl/5voXT1eb1gdAw==
+X-Received: by 2002:a17:906:f882:b0:a62:e450:b147 with SMTP id a640c23a62f3a-a77bdc1f137mr150099566b.29.1720109732671;
+        Thu, 04 Jul 2024 09:15:32 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-004.fbsv.net. [2a03:2880:30ff:4::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a72ab0652d8sm612815566b.98.2024.07.04.09.15.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Jul 2024 09:15:32 -0700 (PDT)
+Date: Thu, 4 Jul 2024 09:15:29 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: horia.geanta@nxp.com, pankaj.gupta@nxp.com, gaurav.jain@nxp.com,
+	linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>, horms@kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 3/4] crypto: caam: Unembed net_dev structure
+ from qi
+Message-ID: <ZobKod5Fhf1kvLp1@gmail.com>
+References: <20240702185557.3699991-1-leitao@debian.org>
+ <20240702185557.3699991-4-leitao@debian.org>
+ <20240703194533.5a00ea5d@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -85,29 +60,61 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f4162b7f-d957-4dd6-90a0-f65c1cbc213a@quicinc.com>
+In-Reply-To: <20240703194533.5a00ea5d@kernel.org>
 
-On Thu, Jul 04, 2024 at 09:13:59AM +0800, Tengfei Fan wrote:
+Hello Jakub,
+
+On Wed, Jul 03, 2024 at 07:45:33PM -0700, Jakub Kicinski wrote:
+> On Tue,  2 Jul 2024 11:55:53 -0700 Breno Leitao wrote:
+
+> > @@ -751,10 +766,16 @@ int caam_qi_init(struct platform_device *caam_pdev)
+> >  		struct caam_qi_pcpu_priv *priv = per_cpu_ptr(&pcpu_qipriv, i);
+> >  		struct caam_napi *caam_napi = &priv->caam_napi;
+> >  		struct napi_struct *irqtask = &caam_napi->irqtask;
+> > -		struct net_device *net_dev = &priv->net_dev;
+> > +		struct net_device *net_dev;
+> >  
+> > +		net_dev = alloc_netdev_dummy(0);
+> > +		if (!net_dev) {
+> > +			err = -ENOMEM;
+> > +			goto fail;
 > 
-> 
-> On 7/3/2024 11:09 PM, Andrew Halaney wrote:
-> > On Wed, Jul 03, 2024 at 10:58:32AM GMT, Tengfei Fan wrote:
-> > > Add the compatible for the MAC controller on qcs9100 platforms. This MAC
-> > > works with a single interrupt so add minItems to the interrupts property.
-> > > The fourth clock's name is different here so change it. Enable relevant
-> > > PHY properties. Add the relevant compatibles to the binding document for
-> > > snps,dwmac as well.
-> > 
-> > This description doesn't match what was done in this patch, its what
-> > Bart did when he made changes to add the sa8775 changes. Please consider
-> > using a blurb indicating that this is the same SoC as sa8775p, just with
-> > different firmware strategies or something along those lines?
-> 
-> I will update this commit message as you suggested.
+> free_netdev() doesn't take NULL, free_caam_qi_pcpu_netdev()
+> will feed it one if we fail here
 
-Hi Andrew, Tengfei
+Sorry, I am not sure I followed you. Let me ask a clarifying questions:
 
-Please trim emails when replying to just the needed context.
+Do you think that free_netdev() will take NULL ?
 
-Thanks
-	Andrew
+If that is the case, that *shouldn't* happen, since I have a cpumask
+that tracks the percpu netdev that got allocated, and only free those
+percpu-net_device that was properly allocated.
+
+Let me simplify the code to make it easy to understand what I had in
+mind:
+
+	int caam_qi_init(struct platform_device *caam_pdev) {
+		cpumask_clear(&clean_mask);
+
+		net_dev = alloc_netdev_dummy(0);
+		if (!net_dev)
+			goto fail;
+
+		cpumask_set_cpu(i, &clean_mask);
+
+	fail:
+		free_caam_qi_pcpu_netdev(&clean_mask);
+	}
+
+	static void free_caam_qi_pcpu_netdev(const cpumask_t *cpus) {
+		for_each_cpu(i, cpus) {
+			priv = per_cpu_ptr(&pcpu_qipriv, i);
+			free_netdev(priv->net_dev);
+		}
+	}
+
+So, if alloc_netdev_dummy() fails, then the cpu current cpu will not be
+set in `clean_mask`, thus, free_caam_qi_pcpu_netdev() will not free it
+later.
+
+Anyway, let me know if I am missing something.
