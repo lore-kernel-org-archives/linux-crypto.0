@@ -1,128 +1,92 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D64A3232;
-	Thu,  4 Jul 2024 02:45:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B019C1A0730;
+	Thu,  4 Jul 2024 10:13:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720061135; cv=none; b=hCWdkjVwwkWS/p03UE8MMXVvyslw/G0jFERz5EiLvWKqAog52ynOpoqca5HORziyVp5pYxAXLs7O64eyveR5IYAjTKcBZHDIUPda+MbpQmbrRQExOcjFz3fEpWjM2ynqxING1QH3VBlcMNxHrNNIf56Sl8PQs9zu+hahyDy0Yc4=
+	t=1720088005; cv=none; b=TD+UUtZIoGlZoT16RG13rmI17WWY+Tl/VBmeIIl+rZ3Vk630RNXVHnLaFP1ql0ERvQVkihHN1CfRaTKzwt7DrYclkDiZpFc/Dvp79cyIq1s4wNtcb6OjA5eQMuWaCwLyx+Gcv4VM88vjoLfi3xrweL3O1dYs5XtkCwfScQD6+5o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720061135; c=relaxed/simple;
-	bh=pFP9IxCw7IYe6OVYz0+ush3KMUC3J8iarT/TRPZp4Pk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iTetWmBALGpA3I47EA3r4p+mfVDHQbxzcvTxZEES7EnmjMv4LDi1UB+DmT/BgO0m1/faA1MLdk6j5KvDFG4YuWOyW1YOOvpIjza/VZgk3mjRRH9Q1fxq5F1NYEdsLbuW2Wy6odNzaU4ruCYuvDEMMwLYOpNOi4dBpYWcCHxtzFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=npZazG+W; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1720088005; c=relaxed/simple;
+	bh=ri7ZVe86JKjzpqC5bIJZsfQCruCljNSMit5y3s9O10Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZxrB4e+rMvB1UGf5wosN1Hh80FLQ6hq8zwZ7MCwD7zv+KCrjfqI6vU3j0dL8r1EpmQPNWJEJciDt/UDT+aAGWkasKUC0xCBqz+BWSD2xtmXYfBXzkyIHJ70Ag6sRJgXvDwWNyn2yDaLRToFZvFBPAOXgPdOdb92JJpE5aruxaxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=uFhAScAX; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="npZazG+W"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C329C2BD10;
-	Thu,  4 Jul 2024 02:45:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720061134;
-	bh=pFP9IxCw7IYe6OVYz0+ush3KMUC3J8iarT/TRPZp4Pk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=npZazG+WyFRwPSNDIE22wrtS5mBL5a/vZ/U6MkDA7J9RZuqhXhOrrore8Z55msytf
-	 qnMQAUKQQshhqxvPSoUCdgtkmZwedZikV8HLIAj6PgeC1fGJnkLUru8QxRah51EqOd
-	 GBtcAZzH4k2S1eSYWvJOEzAsVGKRi/10Qwa4pnJzbgnFSCxMAucxnhUUIdURt/dhQZ
-	 dGheeB5aP/6fbdYJt8e7nYaMkrXmxl8/UOcA1fPQGxCVEVjJSGPfVMdFDfVxvsU857
-	 bIT7FI8x0LmGAKsFyZH8Ew/bVy/eXdcsGE6z7b/IExCrh+B+m5/Z8+EGNriWmnk0/E
-	 Nd1DVSCeVI4YQ==
-Date: Wed, 3 Jul 2024 19:45:33 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: horia.geanta@nxp.com, pankaj.gupta@nxp.com, gaurav.jain@nxp.com,
- linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, horms@kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 3/4] crypto: caam: Unembed net_dev structure
- from qi
-Message-ID: <20240703194533.5a00ea5d@kernel.org>
-In-Reply-To: <20240702185557.3699991-4-leitao@debian.org>
-References: <20240702185557.3699991-1-leitao@debian.org>
-	<20240702185557.3699991-4-leitao@debian.org>
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="uFhAScAX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0DD0C3277B;
+	Thu,  4 Jul 2024 10:13:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1720088005;
+	bh=ri7ZVe86JKjzpqC5bIJZsfQCruCljNSMit5y3s9O10Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uFhAScAXFiwChxa8HylNZvkMtjjuThUbvzB34mYnKlzx+5MU5uBA4sRmI3pBCUeD0
+	 FZbgnynyDvA/kEjLszVgvuVyfo1birpuzzKcO11QVrLAtH9IoUdsGpSSnGFHstEGkg
+	 hSwSk0SAvhFTd3U8yYSpgPZdR9YZFWlAKe12wHg0=
+Date: Thu, 4 Jul 2024 12:13:22 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Lukas Wunner <lukas@wunner.de>
+Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Bjorn Helgaas <helgaas@kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Woodhouse <dwmw2@infradead.org>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	linux-pci@vger.kernel.org, linux-cxl@vger.kernel.org,
+	linux-coco@lists.linux.dev, keyrings@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linuxarm@huawei.com,
+	David Box <david.e.box@intel.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	"Li, Ming" <ming4.li@intel.com>,
+	Ilpo Jarvinen <ilpo.jarvinen@linux.intel.com>,
+	Alistair Francis <alistair.francis@wdc.com>,
+	Wilfred Mallawa <wilfred.mallawa@wdc.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Alexey Kardashevskiy <aik@amd.com>,
+	Dhaval Giani <dhaval.giani@amd.com>,
+	Gobikrishna Dhanuskodi <gdhanuskodi@nvidia.com>,
+	Jason Gunthorpe <jgg@nvidia.com>, Peter Gonda <pgonda@google.com>,
+	Jerome Glisse <jglisse@google.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Alexander Graf <graf@amazon.com>, Samuel Ortiz <sameo@rivosinc.com>,
+	Alan Stern <stern@rowland.harvard.edu>
+Subject: Re: [PATCH v2 13/18] sysfs: Allow bin_attributes to be added to
+ groups
+Message-ID: <2024070413-yeast-exposable-6d2d@gregkh>
+References: <cover.1719771133.git.lukas@wunner.de>
+ <16490618cbde91b5aac04873c39c8fb7666ff686.1719771133.git.lukas@wunner.de>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <16490618cbde91b5aac04873c39c8fb7666ff686.1719771133.git.lukas@wunner.de>
 
-On Tue,  2 Jul 2024 11:55:53 -0700 Breno Leitao wrote:
-> +static void free_caam_qi_pcpu_netdev(const cpumask_t *cpus)
-> +{
-> +	struct caam_qi_pcpu_priv *priv;
-> +	int i;
-> +
-> +	for_each_cpu(i, cpus) {
-> +		priv = per_cpu_ptr(&pcpu_qipriv, i);
-> +		free_netdev(priv->net_dev);
-> +	}
-> +}
-> +
->  int caam_qi_init(struct platform_device *caam_pdev)
->  {
->  	int err, i;
->  	struct device *ctrldev = &caam_pdev->dev, *qidev;
->  	struct caam_drv_private *ctrlpriv;
->  	const cpumask_t *cpus = qman_affine_cpus();
-> +	cpumask_t clean_mask;
->  
->  	ctrlpriv = dev_get_drvdata(ctrldev);
->  	qidev = ctrldev;
-> @@ -743,6 +756,8 @@ int caam_qi_init(struct platform_device *caam_pdev)
->  		return err;
->  	}
->  
-> +	cpumask_clear(&clean_mask);
-> +
->  	/*
->  	 * Enable the NAPI contexts on each of the core which has an affine
->  	 * portal.
-> @@ -751,10 +766,16 @@ int caam_qi_init(struct platform_device *caam_pdev)
->  		struct caam_qi_pcpu_priv *priv = per_cpu_ptr(&pcpu_qipriv, i);
->  		struct caam_napi *caam_napi = &priv->caam_napi;
->  		struct napi_struct *irqtask = &caam_napi->irqtask;
-> -		struct net_device *net_dev = &priv->net_dev;
-> +		struct net_device *net_dev;
->  
-> +		net_dev = alloc_netdev_dummy(0);
-> +		if (!net_dev) {
-> +			err = -ENOMEM;
-> +			goto fail;
+On Sun, Jun 30, 2024 at 09:48:00PM +0200, Lukas Wunner wrote:
+> Commit dfa87c824a9a ("sysfs: allow attributes to be added to groups")
+> introduced dynamic addition of sysfs attributes to groups.
+> 
+> Allow the same for bin_attributes, in support of a subsequent commit
+> which adds various bin_attributes every time a PCI device is
+> authenticated.
+> 
+> Addition of bin_attributes to groups differs from regular attributes in
+> that different kernfs_ops are selected by sysfs_add_bin_file_mode_ns()
+> vis-à-vis sysfs_add_file_mode_ns().
+> 
+> So call either of those two functions from sysfs_add_file_to_group()
+> based on an additional boolean parameter and add two wrapper functions,
+> one for bin_attributes and another for regular attributes.
+> 
+> Removal of bin_attributes from groups does not require a differentiation
+> for bin_attributes and can use the same code path as regular attributes.
+> 
+> Signed-off-by: Lukas Wunner <lukas@wunner.de>
+> Cc: Alan Stern <stern@rowland.harvard.edu>
 
-free_netdev() doesn't take NULL, free_caam_qi_pcpu_netdev()
-will feed it one if we fail here
-
-> +		}
-> +		cpumask_set_cpu(i, &clean_mask);
-> +		priv->net_dev = net_dev;
->  		net_dev->dev = *qidev;
-> -		INIT_LIST_HEAD(&net_dev->napi_list);
->  
->  		netif_napi_add_tx_weight(net_dev, irqtask, caam_qi_poll,
->  					 CAAM_NAPI_WEIGHT);
-> @@ -766,16 +787,22 @@ int caam_qi_init(struct platform_device *caam_pdev)
->  				     dma_get_cache_alignment(), 0, NULL);
->  	if (!qi_cache) {
->  		dev_err(qidev, "Can't allocate CAAM cache\n");
-> -		free_rsp_fqs();
-> -		return -ENOMEM;
-> +		err = -ENOMEM;
-> +		goto fail2;
->  	}
->  
->  	caam_debugfs_qi_init(ctrlpriv);
->  
->  	err = devm_add_action_or_reset(qidev, caam_qi_shutdown, ctrlpriv);
->  	if (err)
-> -		return err;
-> +		goto fail2;
->  
->  	dev_info(qidev, "Linux CAAM Queue I/F driver initialised\n");
->  	return 0;
-> +
-> +fail2:
-> +	free_rsp_fqs();
-> +fail:
-> +	free_caam_qi_pcpu_netdev(&clean_mask);
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
