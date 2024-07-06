@@ -1,57 +1,98 @@
-Received: from norbury.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F4836125
-	for <linux-crypto@vger.kernel.org>; Sat,  6 Jul 2024 01:01:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3DA5132109;
+	Sat,  6 Jul 2024 14:42:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720227679; cv=none; b=S7iGnp5U3I2yLwZbFyALXkbjdJ1qBWQC6Ij/CcChMQ2/N2h/buw75/UrEEf0Bw6cZE6KL/ihQOxt2k2upKrPlDp/VliaVUub2TFdeIgYmkkEpLL+JlEWWcnX937Ru/nTJ66ngxOObEbLy7Uq7C1HpC4dzwvZea3xgd8+I7et8Vo=
+	t=1720276939; cv=none; b=i3xW8FubZun9i2eQgyEUJbd6LFAo/UqAE+cHL/0rIIcT9QnotKuaGJeBuSRg5cDjrw55DnfYbKhFd7VJy7om2e7fP5SRaVzR+AaOCBVqwe+JKrWmqjU2fLyHase2ZeScsGq50+gVtHw6Nz6AETBgQBItE/U3lII2pMRntk5RoO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720227679; c=relaxed/simple;
-	bh=0IFX0zJGYqa3/+xkQgLge9uf6Yo5BCoUTXQPLert7Bc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o95nOXwov47LeK66xmP+AEDmawX+tlS8RIczXUXbBQdjO82FPVm7szm+JPVYRPDALqSg2m8w24l5YprPE0Z2qoibJrikkSDeExjgrcYKOqOSmnpPD5umxOutkYktX7DT+1rn1nihoJVG+5Fsa/iaJ5CGhunG4FBWktk47GZmTnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-	by norbury.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1sPtcG-006h1k-0a;
-	Sat, 06 Jul 2024 10:49:29 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Sat, 06 Jul 2024 10:49:15 +1000
-Date: Sat, 6 Jul 2024 10:49:15 +1000
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
-	Damian Muszynski <damian.muszynski@intel.com>
-Subject: Re: [PATCH] Documentation: qat: fix auto_reset attribute details
-Message-ID: <ZoiUi1HGwrLAAT+M@gondor.apana.org.au>
-References: <20240625143657.3381-1-giovanni.cabiddu@intel.com>
+	s=arc-20240116; t=1720276939; c=relaxed/simple;
+	bh=kmaLasBc28PecSN5WaVJ/A5fIQaXdnrZjil/fqE4rA0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MhzAUumw2K2rG5+sg6LHeNCb7FaJBknM5HfAskODdJj7GM9p3k5BSDmuBjs6f28ycposT9dk/gOidtsr/02Zz/7bhtBwyCncpIoBm1vaeWdq9UWn8nHzAA3/anI3EWvJDYGb60mV1xT563PJg39s2ZROCsC2L1QgFyo3jWPOId0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EVDy32S3; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EVDy32S3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84D5DC2BD10;
+	Sat,  6 Jul 2024 14:42:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720276939;
+	bh=kmaLasBc28PecSN5WaVJ/A5fIQaXdnrZjil/fqE4rA0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=EVDy32S3vTBtxBzdJU1z+QSG3MJdyXZ/crOKEqBtNmRq0I2ih5eUroyvp61nWl4fp
+	 mxVsmcuxZpykXWHXDNVhFzOpKYSr9PRQ60iAf7up+3da7MZMMYUVM1A3+xQXFgwdMX
+	 Flu4mlWZ23iJAqBKQYStS4ixsVazAqh8bwK9E3v/jalCzDkd/4jkawObZwaSHnMsdw
+	 JsTLl8xqik9TEanwqBkWNhV5qqAu2lZgUwyhT32V6rwh91EEPmA6XcygwMH9n/B6P9
+	 jV7KzuPrADsmWtypWiv6lr6fJnbI/yhKcoHY0P9VX5nHAmCvxSTmEZooWfPDtuVtcs
+	 C++kuOgGkfPHA==
+From: Masahiro Yamada <masahiroy@kernel.org>
+To: Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH] hwrng: core - remove (un)register_miscdev()
+Date: Sat,  6 Jul 2024 23:41:24 +0900
+Message-ID: <20240706144205.2301865-1-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240625143657.3381-1-giovanni.cabiddu@intel.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jun 25, 2024 at 03:36:44PM +0100, Giovanni Cabiddu wrote:
-> From: Damian Muszynski <damian.muszynski@intel.com>
-> 
-> The auto_reset attribute was introduced in kernel 6.9. Fix version and
-> date in documentation.
-> 
-> Fixes: f5419a4239af ("crypto: qat - add auto reset on error")
-> Signed-off-by: Damian Muszynski <damian.muszynski@intel.com>
-> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> ---
->  Documentation/ABI/testing/sysfs-driver-qat | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+These functions are redundant after commit 0daa7a0afd0f ("hwrng: Avoid
+manual device_create_file() calls").
 
-Patch applied.  Thanks.
+Let's call misc_(de)register() directly.
+
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
+
+ drivers/char/hw_random/core.c | 14 ++------------
+ 1 file changed, 2 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+index 4084df65c9fa..29a663db6909 100644
+--- a/drivers/char/hw_random/core.c
++++ b/drivers/char/hw_random/core.c
+@@ -470,16 +470,6 @@ static struct attribute *rng_dev_attrs[] = {
+ 
+ ATTRIBUTE_GROUPS(rng_dev);
+ 
+-static void __exit unregister_miscdev(void)
+-{
+-	misc_deregister(&rng_miscdev);
+-}
+-
+-static int __init register_miscdev(void)
+-{
+-	return misc_register(&rng_miscdev);
+-}
+-
+ static int hwrng_fillfn(void *unused)
+ {
+ 	size_t entropy, entropy_credit = 0; /* in 1/1024 of a bit */
+@@ -668,7 +658,7 @@ static int __init hwrng_modinit(void)
+ 		return -ENOMEM;
+ 	}
+ 
+-	ret = register_miscdev();
++	ret = misc_register(&rng_miscdev);
+ 	if (ret) {
+ 		kfree(rng_fillbuf);
+ 		kfree(rng_buffer);
+@@ -685,7 +675,7 @@ static void __exit hwrng_modexit(void)
+ 	kfree(rng_fillbuf);
+ 	mutex_unlock(&rng_mutex);
+ 
+-	unregister_miscdev();
++	misc_deregister(&rng_miscdev);
+ }
+ 
+ fs_initcall(hwrng_modinit); /* depends on misc_register() */
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.43.0
+
