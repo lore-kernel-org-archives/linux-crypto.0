@@ -1,159 +1,204 @@
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87DBA487AE
-	for <linux-crypto@vger.kernel.org>; Sun,  7 Jul 2024 19:23:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC56F6AB6
+	for <linux-crypto@vger.kernel.org>; Sun,  7 Jul 2024 21:01:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720380185; cv=none; b=rnq4R2fm6w5dMVjiZJ024CGvGXa9kOKHQeoOSY5CPy9Z9vNGMzPM11+Uad/ICHxfu1Pp3qszaS+OKFQIVYC1D+4sBvIAq1i6BgI24qPxAibizUdCSjyjAe2dc37eKaZ6rT3GBY94xOtxZ/jlGP02RpJH5WBaBouXYBL/DwK0dP4=
+	t=1720386070; cv=none; b=WULZrSNnrQxz+EEeOkqgxM7DHDxKFUoAa8loVoHyrn1NOaYzrUwAKTzojit5lboetFKmwCQb/s903b86wyrMmEMFNHFZoB7HRFiMrGCWOjkjRvBg+aqAHjOfEjmaVtnmnAnx8vAFCmhq5jPW8EYfFBliaZqNfPM2r8KIMBGGcUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720380185; c=relaxed/simple;
-	bh=EpPs/PieXAoJ9C1Niu2SR/rTGpSjbWX77CzmDxsNsCs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=J4SIhdJdioECrWfu242Dy2eWWCYSBMA0qWakHktM3tUpdhpd8D62tq2mLKYlLym0UScSZxh62gJyhIERSS+ecB4tlea3ITIdUYfjLpXK1mzVEn5dxJJaI0xRrk0sibOvh7jsaTYq40OH2ZrlXQbJgfWppqg6OGkPMzFCbxi7u4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=O0gZTKHW; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+	s=arc-20240116; t=1720386070; c=relaxed/simple;
+	bh=Okw5O240u4q+Y/Mg4iX+wPYuhJB7XxrkO8YTRVN2Dqc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=E/qQsa79kcVytckFU0F6DdSPwWQJGtdh0Qc79aq1uF6uq9svQVqPI8CMDGy/dCZLcC1AZ+bPbSVye2hneBnXxtvZQStsN8FC2gWapge806QQV1iyC7TvE16Fsol6ZSG6CrGxJJQiqu9jVHY+9mt9I0mz9TEAIbpkP4iON0g443U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fJeIr0W+; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="O0gZTKHW"
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a77c7d3e8bcso278345866b.1
-        for <linux-crypto@vger.kernel.org>; Sun, 07 Jul 2024 12:23:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1720380182; x=1720984982; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=r0kqfSkBdmswPIG4hqXsZ+rgeH3ZVa2Soxi8UY2qccM=;
-        b=O0gZTKHWqwDskabka0/dAI4tfr6cJLX8haT1skAujsKfM4W3QilrlqCBwDr44hKW17
-         xtgglYIPxVAdWCI+RJsP1vrns2bj0cUvkT40pn5gDU0uFGfxLoUP7WHAqAdYUPNViAiy
-         xvwJZ9+fbwptTWg8g8RSgavWJZrIA0TgP17Cg=
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fJeIr0W+"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1720386067;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=LvIWlwl8DHJhFq3or4kDUP1tA5vzdIeDCGHCo8MeNUs=;
+	b=fJeIr0W+nePpFmMtf101pVH6BdqjUP2OB8NT2U9QfKl6M3RjC5XZje6ACZIQPeP8yZxUeu
+	cImYl8oZPo5m1P22QJo/+vR+wRMd8OCBAUu/iCkJpvtv/s8iu17/+Q7N2rtfN2TWQSpU5a
+	UIbH0x2ZBedApADQ6rUAVstoAMOIaY4=
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-209-UwMXokmTNNedg9xJg6cddQ-1; Sun, 07 Jul 2024 17:01:06 -0400
+X-MC-Unique: UwMXokmTNNedg9xJg6cddQ-1
+Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2ee87d500caso34929281fa.3
+        for <linux-crypto@vger.kernel.org>; Sun, 07 Jul 2024 14:01:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720380182; x=1720984982;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=r0kqfSkBdmswPIG4hqXsZ+rgeH3ZVa2Soxi8UY2qccM=;
-        b=gO4VQk0ZOigOpsPSMMh/9lb/jrkhn4iLAuigTRLp1SjBHTHDr6HgIrFmUuBhXPOjMQ
-         dCobaFCjGc+iFL7MHCfuMBxnapxICWVUkoa6DfUFbJpAlUmOxDsW6K8jzDVZSZI8XsE/
-         Wz3FX/Tk4WWKtqTuN0hzGG+KDpY+a23e1gtBGMnh9RiNeDNA88Qtwl3ktR8PtPSw9yBk
-         ZNabLYDT20LaACE+kmB16FtOyojcINMVKqZbOrNOopg3tS7kexBbdd3Q9UPdM1IiUFV6
-         Gm6j0BJqTU808caULHyRj153DIeAw3psHZTCaxleYSYHx4/V2S/RMyCr4AApBC8/N5Jt
-         6IvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWdXKxBZBD9e+0u5Z6WfpfRZVaHAWvX2c01zKZr596IO4fMH2zyI61N/7wCeVsupZ4fOTPplX/AmW5H+1TR6S+7EGF5Hz9VbLzqLhb6
-X-Gm-Message-State: AOJu0YyDNKRK3ZuWIHf4+kUB4jw9VWGyfsxMxxepa53BUrPevxfqkrWj
-	GPE+ZcplF+Y0nwd/J7Ny+W6+sdvUqJuDP6IMV8A3pOQlxE0Rf78PLjCfoOYWcMfgUZ/MC6qG6XZ
-	1UVnSQg==
-X-Google-Smtp-Source: AGHT+IHNFL+HvWa5NXZwbQetz6Fad6xW+mz4NQ2QcXratMzoz/it6kanjo03J4WgsBOyi73FYPpbXg==
-X-Received: by 2002:a17:906:6a81:b0:a77:e55a:9e77 with SMTP id a640c23a62f3a-a77e55aa129mr243255766b.7.1720380181890;
-        Sun, 07 Jul 2024 12:23:01 -0700 (PDT)
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com. [209.85.208.51])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a77df1015e2sm178398066b.51.2024.07.07.12.23.01
-        for <linux-crypto@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1720386065; x=1720990865;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=LvIWlwl8DHJhFq3or4kDUP1tA5vzdIeDCGHCo8MeNUs=;
+        b=VnFwEPVJWVDCxmND1PCH5AYzIoxklM6M3EChHTqmh5deC6uwHp1fIo/DQHZa6njqNV
+         OX0Lg81D+R27CLaeA4uBQnQC7jK9VmV4+TMYl8cNNVbnlc7Zk4pXSfHZA/DmFoD46hyW
+         DvBwxOG+BmXmvAbkVrakZT9f+IVWLTgEs60iPmNNqZiPzHYzAoJOTFfHM7ozo3tdT5bH
+         5VixDiBre5KsqzLWbyYg1RN6qHqrhfw2vElZUQAN5kYdSancHqtv6WbGMi+zT8YHELzK
+         mCP3Um3nGUY3vlinG8l9Z22DalFewAwXH5M7RNeYt4uw2LgH6luHXvm8rcwtyJXPlygy
+         UZDw==
+X-Forwarded-Encrypted: i=1; AJvYcCVmpmrtGMJ485xslMEIVFsme2R0Krw3WQ9xEvOSJKGfPn3HjavzcSmH44kRM6EPWaKypG0VWYUfsq3xgOYfAzvOKqvn4n5m3ce76pdE
+X-Gm-Message-State: AOJu0Yy+Fqv5LcDaSjDu8QP4Xa4qXNixKca5p6/LJxNRycUvEn7SeNSV
+	WkNyMLMr0G0BpHzhHDNNrso7iaWm03HS42NY6QMbDSxPP7y8j0eCmtvQaAppTXJpy6N10ho7FVk
+	qi6mwlJVoVpv7x8yZ+73T62QJqkHvuvYJFyeSRMWHMRLk07WzzfqqOTGcN5h4Ns870CaYYw==
+X-Received: by 2002:a05:651c:19a2:b0:2ec:4086:ea6d with SMTP id 38308e7fff4ca-2ee8ed5f61emr80641141fa.4.1720386064865;
+        Sun, 07 Jul 2024 14:01:04 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH8qeOvMCk8PQe6Rpatbp9qDgVonuvCIsKIw8dx2fcqG8CtClRo7qd9MPYVscr1v+qTwWOOJw==
+X-Received: by 2002:a05:651c:19a2:b0:2ec:4086:ea6d with SMTP id 38308e7fff4ca-2ee8ed5f61emr80640981fa.4.1720386064276;
+        Sun, 07 Jul 2024 14:01:04 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c72f:c00:10f0:d1a8:c206:17ac? (p200300cbc72f0c0010f0d1a8c20617ac.dip0.t-ipconnect.de. [2003:cb:c72f:c00:10f0:d1a8:c206:17ac])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4266ac156easm9425895e9.38.2024.07.07.14.01.03
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 07 Jul 2024 12:23:01 -0700 (PDT)
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-57ccd1111aeso4092727a12.0
-        for <linux-crypto@vger.kernel.org>; Sun, 07 Jul 2024 12:23:01 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCX3Yu3efF7l2ZUhXD9Q+VL5vAP/Zc0MGfceyxUFA4TmdEtu5j1pMXH1XSLJtJf67vI7GyzufO5FYwpNIJex6FShNpmBuT5h1VhZ7QGY
-X-Received: by 2002:a17:906:7708:b0:a75:3c31:4f58 with SMTP id
- a640c23a62f3a-a77ba46fa2bmr620405066b.32.1720380181227; Sun, 07 Jul 2024
- 12:23:01 -0700 (PDT)
+        Sun, 07 Jul 2024 14:01:03 -0700 (PDT)
+Message-ID: <6705c6c8-8b6a-4d03-ae0f-aa83442ec0ab@redhat.com>
+Date: Sun, 7 Jul 2024 23:01:02 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240707002658.1917440-1-Jason@zx2c4.com> <20240707002658.1917440-2-Jason@zx2c4.com>
- <1583c837-a4d5-4a8a-9c1d-2c64548cd199@redhat.com> <CAHk-=wjs-9DVeoc430BDOv+dkpDkdVvkEsSJxNVZ+sO51H1dJA@mail.gmail.com>
- <e2f104ac-b6d9-4583-b999-8f975c60d469@redhat.com>
-In-Reply-To: <e2f104ac-b6d9-4583-b999-8f975c60d469@redhat.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Sun, 7 Jul 2024 12:22:44 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wibRRHVH5D4XvX1maQDCT-o4JLkANXHMoZoWdn=tN0TLA@mail.gmail.com>
-Message-ID: <CAHk-=wibRRHVH5D4XvX1maQDCT-o4JLkANXHMoZoWdn=tN0TLA@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v21 1/4] mm: add VM_DROPPABLE for designating always
  lazily freeable mappings
-To: David Hildenbrand <david@redhat.com>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, linux-kernel@vger.kernel.org, patches@lists.linux.dev, 
-	tglx@linutronix.de, linux-crypto@vger.kernel.org, linux-api@vger.kernel.org, 
-	x86@kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>, "Carlos O'Donell" <carlos@redhat.com>, 
-	Florian Weimer <fweimer@redhat.com>, Arnd Bergmann <arnd@arndb.de>, Jann Horn <jannh@google.com>, 
-	Christian Brauner <brauner@kernel.org>, David Hildenbrand <dhildenb@redhat.com>, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, linux-kernel@vger.kernel.org,
+ patches@lists.linux.dev, tglx@linutronix.de, linux-crypto@vger.kernel.org,
+ linux-api@vger.kernel.org, x86@kernel.org,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+ Carlos O'Donell <carlos@redhat.com>, Florian Weimer <fweimer@redhat.com>,
+ Arnd Bergmann <arnd@arndb.de>, Jann Horn <jannh@google.com>,
+ Christian Brauner <brauner@kernel.org>,
+ David Hildenbrand <dhildenb@redhat.com>, linux-mm@kvack.org
+References: <20240707002658.1917440-1-Jason@zx2c4.com>
+ <20240707002658.1917440-2-Jason@zx2c4.com>
+ <1583c837-a4d5-4a8a-9c1d-2c64548cd199@redhat.com>
+ <CAHk-=wjs-9DVeoc430BDOv+dkpDkdVvkEsSJxNVZ+sO51H1dJA@mail.gmail.com>
+ <e2f104ac-b6d9-4583-b999-8f975c60d469@redhat.com>
+ <CAHk-=wibRRHVH5D4XvX1maQDCT-o4JLkANXHMoZoWdn=tN0TLA@mail.gmail.com>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <CAHk-=wibRRHVH5D4XvX1maQDCT-o4JLkANXHMoZoWdn=tN0TLA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sun, 7 Jul 2024 at 11:52, David Hildenbrand <david@redhat.com> wrote:
->
-> I recall that introducing things like MAP_SHARED_VALIDATE received a lot
-> of pushback in the past. But that was before my MM days, and I only had
-> people tell me stories about it.
+On 07.07.24 21:22, Linus Torvalds wrote:
+> On Sun, 7 Jul 2024 at 11:52, David Hildenbrand <david@redhat.com> wrote:
+>>
+>> I recall that introducing things like MAP_SHARED_VALIDATE received a lot
+>> of pushback in the past. But that was before my MM days, and I only had
+>> people tell me stories about it.
+> 
+> I think MAP_SHARED_VALIDATE was mostly about worrying about the API impact.
+> 
+> And I think it worked out so well that this is probably the first time
+> it has been brought up ever since ;)
+> 
+> That said, the *reason* for MAP_SHARED_VALIDATE is actually very
+> valid: we have historically just ignored any random flags in the
+> mmap() interfaces, and with shared mappings, that can be dangerous.
+> 
+> IOW, the real issue wasn't MAP_SHARED_VALIDATE itself, but introducing
+> *other* flags that affected maps that old kernels would ignore, and
+> then the worry was "now old kernels and new kernels work very
+> differently for this binary".
+> 
+> That's technically obviously true of any MAP_DROPPABLE thing too - old
+> kernels would happily just ignore it. I suspect that's more of a
+> feature than a mis-feature, but..
+> 
+>> My understanding so far was that we should have madvise() ways to toggle
+>> stuff and add mmap bits if not avoidable; at least that's what I learned
+>> from the community.
+> 
+> It doesn't sound like a bad model in general. I'm not entirely sure it
+> makes sense for something like "droppable", since that is a fairly
+> fundamental behavioral thing. Does it make sense to make something
+> undroppable when it can drop pages concurrently with that operation?
+> 
+> I mean, you can't switch MAP_SHARED around either.
+> 
+> The other bits already _do_ have madvise() things, and Jason added a
+> way to just do it all in one go.
 
-I think MAP_SHARED_VALIDATE was mostly about worrying about the API impact.
+I just recalled that with MAP_HUGETLB, bits [26:31] encode a hugetlb
+size (see include/uapi/asm-generic/hugetlb_encode.h). hugetlb, the gift
+that keeps on giving.
 
-And I think it worked out so well that this is probably the first time
-it has been brought up ever since ;)
+We're using:
 
-That said, the *reason* for MAP_SHARED_VALIDATE is actually very
-valid: we have historically just ignored any random flags in the
-mmap() interfaces, and with shared mappings, that can be dangerous.
++#define MAP_WIPEONFORK		0x08000000	/* Zero memory in child forks. */
++#define MAP_DONTDUMP		0x10000000	/* Do not write to coredumps. */
++#define MAP_DROPPABLE		0x20000000	/* Zero memory under memory pressure. */
 
-IOW, the real issue wasn't MAP_SHARED_VALIDATE itself, but introducing
-*other* flags that affected maps that old kernels would ignore, and
-then the worry was "now old kernels and new kernels work very
-differently for this binary".
+Which should be bit 27-29.
 
-That's technically obviously true of any MAP_DROPPABLE thing too - old
-kernels would happily just ignore it. I suspect that's more of a
-feature than a mis-feature, but..
+So using these flags with MAP_HUGETLB will result in surprises.
 
-> My understanding so far was that we should have madvise() ways to toggle
-> stuff and add mmap bits if not avoidable; at least that's what I learned
-> from the community.
+At least MAP_DROPPABLE doesn't quite make sense with hugetlb, but at least
+the other ones do have semantics with hugetlb?
 
-It doesn't sound like a bad model in general. I'm not entirely sure it
-makes sense for something like "droppable", since that is a fairly
-fundamental behavioral thing. Does it make sense to make something
-undroppable when it can drop pages concurrently with that operation?
+It's late Sunday here in Germany, so I might just have messed something up.
 
-I mean, you can't switch MAP_SHARED around either.
+Just raising that there might be a "bit" conflict.
 
-The other bits already _do_ have madvise() things, and Jason added a
-way to just do it all in one go.
+-- 
+Cheers,
 
-> Good to hear that this is changing. (or it's just been an urban myth)
+David / dhildenb
 
-I don't know if that's an urban myth.  Some people are a *lot* more
-risk-averse than I personally am. I want things to make sense, but I
-also consider "this is fixable if it causes issues" to be a valid
-argument.
-
-So for example, who knows *what* garbage people pass off to mmap() as
-an argument. That worry was why MAP_SHARED_VALIDATE happened.
-
-But at the same time, does it make sense to complicate things because
-of some theoretical worry? Giving random bits to mmap() sounds
-unlikely to be a real issue to me, but maybe I'm being naive.
-
-I do generally think that user mode programs can pretty much be
-expected to do random things, but how do you even *create* a mmap
-MAP_xyz flags field that has random high bits set?
-
-> > We also have PROT_GROSDOWN and PROT_GROWSUP , which is basically a
-> > "match MAP_GROWSxyz and change the mprotect() limits appropriately"
->
-> It's the first time I hear about these two mprotect() options, thanks
-> for mentioning that :)
-
-Don't thank me.
-
-They actually do make sense in a "what if I want to mprotect() the
-stack, but I don't know what the stack range is since it's dynamic"
-kind of sense, so I certainly don't hate them.
-
-So they are not bad bits, but at the same time they are examples of
-how there is a fuzzy line between MAP_xyz and PROT_xyz.
-
-And sometimes the line is literally just "mprotect() only gets one of
-them, but we want to pass in the other one, so we duplicate them as a
-very very special case".
-
-                     Linus
