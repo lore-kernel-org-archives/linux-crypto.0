@@ -1,38 +1,61 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bmailout1.hostsharing.net (bmailout1.hostsharing.net [83.223.95.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18B581419B5;
-	Mon,  8 Jul 2024 12:24:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A510824A3;
+	Mon,  8 Jul 2024 12:54:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720441497; cv=none; b=GoL9SnMtqoMAp+eNmpOactgqP7A88GbqkXMpjRWKGZCauyemMwCklLolgUIQD0NetC16JYKmjw2UbjIzvdQB9DwXnzcdyOTDzgtJPVui0gaSjJWnDoGXT1C3pdJPJ+K6ffmOfnB6cV8qOdKP8IKToK5AoHHZjjwh8o8YNLhFwO4=
+	t=1720443250; cv=none; b=shzc//4TCz/ShNV6u7dDYnnfZQi0eTfdhyU2vHPO1jjKE6osdUkmG8MMV6pF8nkVbfNW+oUFbOGFputVHdE+lB1fdd28aVmzTi1W6rxFhHyxbGSgtUV4EmPgV8hqFucK8D8JappY5ykH+C3E4qpci/XcRoYa6qIMD0n2298yox8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720441497; c=relaxed/simple;
-	bh=hAjK1CSgalbDgXlil2C5+pUhvGQFCTOlGlL6Abg5m5c=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=mEYb1T/H/ChrPzAskFPrhByVMXVLOgETh0MuyXpLaQbUqpGoPDvcTdJwClZOcqn04tOV9ToT68ycphs4fKx0rWjFCr/EgBFYStMdfW0HpEH2cbS7fy7uvSr64UOeR9dHBbgGXnj0htbJdsxuNY4Cj9oDepkh4LON+E8t50Xa+uM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IqblDYz0; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IqblDYz0"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 156C6C4AF0A;
-	Mon,  8 Jul 2024 12:24:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720441496;
-	bh=hAjK1CSgalbDgXlil2C5+pUhvGQFCTOlGlL6Abg5m5c=;
-	h=Date:From:To:Subject:From;
-	b=IqblDYz0wjoX6XXXaYKaFiMx+pGX9c8cP9UZqRpWykL6Kved7cDMUk7dxwCuYqkI0
-	 /Z33YJpDR/8MPPXLOqWoF7qFzKeMaW/iAtiyGhYAq/l1X8VDwm2NM+Zl0rkgqatfU9
-	 Z+KbMOTepkzG9Maj7ncIklKjVhgBYjfnZZ1n7H06abKk3AHKCOWZ13b38A8xO6JsYB
-	 TlVut0V1TluIB673+EvoLQSRABAsJ8Y3E2PJFuvIx8tlTyNMKdmfF9M+yh1dMmMvMB
-	 WAZR0Q/Ekhz216spDqmQR/HDad9SQbnrkmX+MqEF/Kyhth/zQd9oxSku6gPzyc8DN9
-	 TqmI/cfIpwc5g==
-Date: Mon, 8 Jul 2024 14:24:52 +0200
-From: Helge Deller <deller@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-parisc@vger.kernel.org
-Subject: [PATCH v2] crypto: xor - fix template benchmarking
-Message-ID: <ZovalOTfarFv1SZa@p100>
+	s=arc-20240116; t=1720443250; c=relaxed/simple;
+	bh=RMVniVhF/wGXXn+M2jkcQzFQemX/je9WFzpBwZlKox4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=U+BjmM2SSnPhmlmLfBHwEias06XK8wYKCGJJF/2Mht3gmXnQR1YwIRnwpWvSSMihrq25fcujlw7Iley1NUGKvU9qPrE/xoKiDj9rhgdPXKcYTlFMQ0l+IMCERF/I2wqK7MIMGqj4fbP+SX6UXq4EaVVP6NF2R2nJo24o+0/o+k0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.95.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
+Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by bmailout1.hostsharing.net (Postfix) with ESMTPS id 89319300000BD;
+	Mon,  8 Jul 2024 14:54:03 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id 713143512D; Mon,  8 Jul 2024 14:54:03 +0200 (CEST)
+Date: Mon, 8 Jul 2024 14:54:03 +0200
+From: Lukas Wunner <lukas@wunner.de>
+To: Alexey Kardashevskiy <aik@amd.com>
+Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Bjorn Helgaas <helgaas@kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Woodhouse <dwmw2@infradead.org>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	linux-pci@vger.kernel.org, linux-cxl@vger.kernel.org,
+	linux-coco@lists.linux.dev, keyrings@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linuxarm@huawei.com,
+	David Box <david.e.box@intel.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	"Li, Ming" <ming4.li@intel.com>,
+	Ilpo Jarvinen <ilpo.jarvinen@linux.intel.com>,
+	Alistair Francis <alistair.francis@wdc.com>,
+	Wilfred Mallawa <wilfred.mallawa@wdc.com>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Dhaval Giani <dhaval.giani@amd.com>,
+	Gobikrishna Dhanuskodi <gdhanuskodi@nvidia.com>,
+	Jason Gunthorpe <jgg@nvidia.com>, Peter Gonda <pgonda@google.com>,
+	Jerome Glisse <jglisse@google.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Alexander Graf <graf@amazon.com>, Samuel Ortiz <sameo@rivosinc.com>,
+	Eric Biggers <ebiggers@google.com>,
+	Stefan Berger <stefanb@linux.ibm.com>
+Subject: Re: [PATCH v2 07/18] spdm: Introduce library to authenticate devices
+Message-ID: <Zovha33CS76PwAMF@wunner.de>
+References: <cover.1719771133.git.lukas@wunner.de>
+ <bbbea6e1b7d27463243a0fcb871ad2953312fe3a.1719771133.git.lukas@wunner.de>
+ <26715537-5dc4-46c1-bdcd-c760696dd418@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -41,91 +64,57 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <26715537-5dc4-46c1-bdcd-c760696dd418@amd.com>
 
-Commit c055e3eae0f1 ("crypto: xor - use ktime for template benchmarking")
-switched from using jiffies to ktime-based performance benchmarking.
+On Mon, Jul 08, 2024 at 07:57:02PM +1000, Alexey Kardashevskiy wrote:
+> > +	rc = spdm_exchange(spdm_state, req, req_sz, rsp, rsp_sz);
+> 
+> rsp_sz is 36 bytes here. And spdm_exchange() cannot return more than 36
+> because this is how pci_doe() works...
+> 
+> > +	if (rc < 0)
+> > +		return rc;
+> > +
+> > +	length = rc;
+> > +	if (length < sizeof(*rsp) ||
+> > +	    length < sizeof(*rsp) + rsp->param1 * sizeof(*req_alg_struct)) {
+> > +		dev_err(spdm_state->dev, "Truncated algorithms response\n");
+> 
+> ... but here you expect more than 36 as realistically rsp->param1 > 0.
+> How was this tested and what do I miss here?
 
-This works nicely on machines which have a fine-grained ktime()
-clocksource as e.g. x86 machines with TSC.
-But other machines, e.g. my 4-way HP PARISC server, don't have such
-fine-grained clocksources, which is why it seems that 800 xor loops
-take zero seconds, which then shows up in the logs as:
+I assume you tested this patch set against a libspdm responder
+and got a "Truncated algorithms response" error.
 
- xor: measuring software checksum speed
-    8regs           : -1018167296 MB/sec
-    8regs_prefetch  : -1018167296 MB/sec
-    32regs          : -1018167296 MB/sec
-    32regs_prefetch : -1018167296 MB/sec
+The short answer is, it's a bug in libspdm and the issue should
+go away once you update libspdm to version 3.1.0 or newer.
 
-Fix this with some small modifications to the existing code to improve
-the algorithm to always produce correct results without introducing
-major delays for architectures with a fine-grained ktime()
-clocksource:
-a) Delay start of the timing until ktime() just advanced. On machines
-with a fast ktime() this should be just one additional ktime() call.
-b) Count the number of loops. Run at minimum 800 loops and finish
-earliest when the ktime() counter has progressed.
+If you need to stay at an older version, consider cherry-picking
+libspdm commits 941f0ae0d24e ("libspdm_rsp_algorithms: fixup spec
+conformance") and 065fb17b74c7 ("responder: negotiate algorithms
+conformance").
 
-With that the throughput can now be calculated more accurately under all
-conditions.
+The bug was found and fixed by Wilfred Mallawa when testing the
+in-kernel SPDM implementation against libspdm:
 
-Fixes: c055e3eae0f1 ("crypto: xor - use ktime for template benchmarking")
-Signed-off-by: Helge Deller <deller@gmx.de>
-Tested-by: John David Anglin <dave.anglin@bell.net>
+https://github.com/l1k/linux/issues/3
+https://github.com/DMTF/libspdm/pull/2341
+https://github.com/DMTF/libspdm/issues/2344
+https://github.com/DMTF/libspdm/pull/2353
 
-v2:
-- clean up coding style (noticed & suggested by Herbert Xu)
-- rephrased & fixed typo in commit message
+Problem is, most SPDM-enabled products right now are based on
+libspdm (the DMTF reference implementation) and thus are bug-by-bug
+compatible.  However such a software monoculture is dangerous and
+having a from-scratch kernel implementation has already proven useful
+to identify issues like this which otherwise wouldn't have been noticed.
 
-diff --git a/crypto/xor.c b/crypto/xor.c
-index 8e72e5d5db0d..56aa3169e871 100644
---- a/crypto/xor.c
-+++ b/crypto/xor.c
-@@ -83,33 +83,30 @@ static void __init
- do_xor_speed(struct xor_block_template *tmpl, void *b1, void *b2)
- {
- 	int speed;
--	int i, j;
--	ktime_t min, start, diff;
-+	unsigned long reps;
-+	ktime_t min, start, t0;
- 
- 	tmpl->next = template_list;
- 	template_list = tmpl;
- 
- 	preempt_disable();
- 
--	min = (ktime_t)S64_MAX;
--	for (i = 0; i < 3; i++) {
--		start = ktime_get();
--		for (j = 0; j < REPS; j++) {
--			mb(); /* prevent loop optimization */
--			tmpl->do_2(BENCH_SIZE, b1, b2);
--			mb();
--		}
--		diff = ktime_sub(ktime_get(), start);
--		if (diff < min)
--			min = diff;
--	}
-+	reps = 0;
-+	t0 = ktime_get();
-+	/* delay start until time has advanced */
-+	while ((start = ktime_get()) == t0)
-+		cpu_relax();
-+	do {
-+		mb(); /* prevent loop optimization */
-+		tmpl->do_2(BENCH_SIZE, b1, b2);
-+		mb();
-+	} while (reps++ < REPS || (t0 = ktime_get()) == start);
-+	min = ktime_sub(t0, start);
- 
- 	preempt_enable();
- 
- 	// bytes/ns == GB/s, multiply by 1000 to get MB/s [not MiB/s]
--	if (!min)
--		min = 1;
--	speed = (1000 * REPS * BENCH_SIZE) / (unsigned int)ktime_to_ns(min);
-+	speed = (1000 * reps * BENCH_SIZE) / (unsigned int)ktime_to_ns(min);
- 	tmpl->speed = speed;
- 
- 	pr_info("   %-16s: %5d MB/sec\n", tmpl->name, speed);
+The in-kernel SPDM implementation currently doesn't send any
+ReqAlgStructs and per the spec, the responder isn't supposed to
+send any RespAlgStructs which the requester didn't ask for.
+Yet libspdm always sent a hardcoded array of RespAlgStructs.
+
+So the *reference* implementation wasn't conforming to the spec. :(
+
+Thanks,
+
+Lukas
