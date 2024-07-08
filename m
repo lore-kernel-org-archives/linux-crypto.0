@@ -1,66 +1,66 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A00C208B0
-	for <linux-crypto@vger.kernel.org>; Mon,  8 Jul 2024 20:06:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 042B9225AF
+	for <linux-crypto@vger.kernel.org>; Mon,  8 Jul 2024 20:06:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720469165; cv=none; b=E4UdZ8IGuXlbVjQr7yJPQyPManGQoyBHQ2IPNe7cEWLyLQ3gqZMWB+nTZMvWrzzVFfcHxHb3hb8612ekHszIrX1JvVzplZnCD5fbmX6W5CG9wyTXQNU26HYZBpasbcaG78Qy6JhK9qiqfvMemcbKPUH0bJhF2R2F2GQPQpFn5HA=
+	t=1720469211; cv=none; b=Dgm1kY08e8ngFL988iKerMCSvDlo2vjRzuJMymvSHYrZEWg0/Mk2aIcY/kSY7c/timvCb/5V8HwRjiTLDK7KatM9Z+y1vVK4vIs9yPW2r6vrYg7a5NUgYMrY+Nezle9wPfixiP6erd3KfB9YpoJ9mOkfAeAZnZMugFJh6HoHUkw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720469165; c=relaxed/simple;
-	bh=aRagdgTlsE3MWGFlwzI6ef72f+KQMUPg1M2pXIo5ZqY=;
+	s=arc-20240116; t=1720469211; c=relaxed/simple;
+	bh=lopMJKNUkM5mdilFcbxOlowjhB72XNJu1hZbshGnERQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HbrSTM8DIZ6KMNztTDH3YpRDJ7OSRfcDN7tgF+K08JPeL6r7gk72UyxrrlID79BpDU7Us3AsDMLj6VEvsA/9uGYh9sHDmXsCb9DM3k6MGa49lzfQt3I++BkV1CV3pXAW/XZPPs6iuBVIJCLFaINn0RvLMWZgiGBWJ5q3sHzizAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bE7c3Ouw; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=bfBbV8w91io2TM2P/Olbvn6DDq4BO47/t+N/J5RJEJMFoOMAsJtQZtLuaox5t+kaFRnUt0aQ73VfiThjb9iMmD9kOT0hL2BhmHytAyGzH+Xp7kI21MTM0XkiWA/I+KUcAyCzNHcEk5NgOqmRqb3cJKr2v0gWcjFXCfnE6xXpLG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KLwPScXE; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bE7c3Ouw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KLwPScXE"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1720469162;
+	s=mimecast20190719; t=1720469209;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=j2lTC/uV+6KmvXYNZup4rA4eKjMMz1SsHbPB0aVLD3U=;
-	b=bE7c3OuwjhP+5SSY4w9lA9AF/MWu9vn+gZ60p3zN3xjHUikoo9oOgbcpmDq+6Bd/fgQ4Rt
-	uxDSer4WVMpeLL8QR6Kn5f50+b08L6Aq7wee1QBkR9uK5OAzt45glSPa60jd0XPf0Jp1YY
-	AAKTAGbSETbxkdF4klet6mLzXCuF5zA=
-Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
- [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=ufhtylmYb0l9ME9pQ71j54Ozfhc8pZ6jpAyIxmjbQ/M=;
+	b=KLwPScXEUMmF0H/xCn1qH5R3zeq97OsUYCnTiCHl9tGZZdQgRv2/rzQ9CQqNzvsYFFSerr
+	5Ezu9p1uENGRqO50ykSq+B3sZmr4mRVlG+k/VprAbD/l1LuLTrQKz8TmAkyL2zqdtm2U8k
+	Jseo8uWFTWdJABQKKwSXzhxKeoHcL58=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-79-m5whSJCzMemBhuM1E6b88Q-1; Mon, 08 Jul 2024 16:06:01 -0400
-X-MC-Unique: m5whSJCzMemBhuM1E6b88Q-1
-Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2ee92048377so43282401fa.2
-        for <linux-crypto@vger.kernel.org>; Mon, 08 Jul 2024 13:06:00 -0700 (PDT)
+ us-mta-217-KQmow9GQMXKLYBGN2_XmtA-1; Mon, 08 Jul 2024 16:06:47 -0400
+X-MC-Unique: KQmow9GQMXKLYBGN2_XmtA-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-42668796626so10756765e9.0
+        for <linux-crypto@vger.kernel.org>; Mon, 08 Jul 2024 13:06:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720469159; x=1721073959;
+        d=1e100.net; s=20230601; t=1720469205; x=1721074005;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=j2lTC/uV+6KmvXYNZup4rA4eKjMMz1SsHbPB0aVLD3U=;
-        b=JmG1gtnZBkzUJBJ545CeOYVLSN5ujOJcL9D5cmqtkGIPti3wcZ7VH6uGNp210F01E3
-         Hud6ULUQjpdayXLZl7hAfhWNWLuGu1D+Z0M4KJo4hI55JYJGDNKV5vfHes5sfePN1djK
-         uzk+yg0zkZaAAcTAIKtImSLRf/N7kteQzmQotGdpspZzGjDn5epzaEZn4uzaYyXmH0Pv
-         ltnFc9CLagrfhzceqD3/W7MXTOJ6Eeftg1WE14iUZYaYm6Y5sBaTCZEYl7jmdGBLhM/x
-         Pw1c236aTj1W4frt7uYPg6VTyP5jCnC58/2zLeRBr09pM6eYA3uGq/LonzOju6X6ElAQ
-         2Nuw==
-X-Forwarded-Encrypted: i=1; AJvYcCVen2FzWlG+B4aHaJAJHN2SBUXqmTuouYN8UobG6XHaZ5++DnMJ6z2NJY0+MP2NHGejz1utQMByEQzuAektds3Mjl5h7M1l5Tnqiccn
-X-Gm-Message-State: AOJu0YzUiRaOCLwJsrTgb4llY3pDepFY7zgjRQFou94UD+fZwhj3WTnq
-	JubEvfUvMVoFaE8CNKifXI4xtMIS9nkNA0OFu48lt8PbJCtb01VgR/Ma6wF7jryCTf2yQKc7jTU
-	alRQNEz7GWgDZRz2nGtRUp08op38MEuwyAWZlmyDEAiW6+U8OFcyuHaKkCCJ6OQ==
-X-Received: by 2002:a19:ac4b:0:b0:52c:84a2:d848 with SMTP id 2adb3069b0e04-52eb99d5f90mr212443e87.65.1720469159543;
-        Mon, 08 Jul 2024 13:05:59 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEOutunBjtATYlYPcPc2RtJuaPBHwhpp2F+6BNL1SdYd55rueYzXjB88TMPhrVMThULXxhZ7w==
-X-Received: by 2002:a19:ac4b:0:b0:52c:84a2:d848 with SMTP id 2adb3069b0e04-52eb99d5f90mr212419e87.65.1720469159140;
-        Mon, 08 Jul 2024 13:05:59 -0700 (PDT)
+        bh=ufhtylmYb0l9ME9pQ71j54Ozfhc8pZ6jpAyIxmjbQ/M=;
+        b=e38uiHBDAG8bhNxi8cR6SA7AitWnr/cg4CgGh5MfYOPvEVQxocJLXcYps5xuG4RtIO
+         niM9vG+DqnTOIvKLo1ftWwWrdNJsrR+Fmf2qwps65FcpaAzwlEzZF8BNti7hqSDVRWO0
+         U8C4F4rjskZfqTJFjyr+99bpxIPD0MXa2BdDlzWSmt/NPZPx5SZlb2u11pO9cBOoU4mu
+         i7sqimQTjPLxcL4ykIK9FIz7DdTzAa3ZEObvY+yNRjsqsejda4ay6YkfEh8i0IuXPlj0
+         ysiV9PBTjH0Tzfgf/L1b7fv5mzCu101N7ZMOFoTFrV0vq8jhGeWMw/Ag6b8xJ5xP91n4
+         HVsg==
+X-Forwarded-Encrypted: i=1; AJvYcCU9VF6TZZmobGHbpZhKTJ9KFV6uoNUlu+Dn/nEczqVEbmpNbQNkJHUBAiiCspzb3xaN8miOcf4xCoAEUj7tZmHqkr/YO26rVD/hlaZV
+X-Gm-Message-State: AOJu0YzgzUQzDCNyc1hGq80HXK/b6YpfguHxcb+8A4V2ZInab7G/ZxJl
+	VT4WLKK/yVnIxdiF5AnlAFOc/Q9FduULP059L17eowTXiG75Q7obF+qquaVxBIXFki5CXNIzDGo
+	ktIcGhuAX+bEct74mcXu3ksNKpqlycLrJm9DTg0rCpMyxv3YrepfeEx1iOEnGjw==
+X-Received: by 2002:a05:600c:896:b0:426:64a2:5375 with SMTP id 5b1f17b1804b1-426707cbf60mr4187785e9.1.1720469205664;
+        Mon, 08 Jul 2024 13:06:45 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFY3cy8KO7R2bm9GD3OsyrOijDD4r+Wzecwv9hQQdddOHxtAoBS7yAbuwECbpXjcjqzix6Adw==
+X-Received: by 2002:a05:600c:896:b0:426:64a2:5375 with SMTP id 5b1f17b1804b1-426707cbf60mr4187585e9.1.1720469205258;
+        Mon, 08 Jul 2024 13:06:45 -0700 (PDT)
 Received: from ?IPV6:2003:cb:c744:2200:bad7:95bd:e25e:a9e? (p200300cbc7442200bad795bde25e0a9e.dip0.t-ipconnect.de. [2003:cb:c744:2200:bad7:95bd:e25e:a9e])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4266f6f5a27sm10282465e9.23.2024.07.08.13.05.57
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4266f6f5f25sm10628625e9.26.2024.07.08.13.06.43
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Jul 2024 13:05:58 -0700 (PDT)
-Message-ID: <3492ea69-54cd-4ba3-b328-2e76542ccc32@redhat.com>
-Date: Mon, 8 Jul 2024 22:05:57 +0200
+        Mon, 08 Jul 2024 13:06:44 -0700 (PDT)
+Message-ID: <75cf01cd-8a45-4a79-b06c-cdf2d68cdd53@redhat.com>
+Date: Mon, 8 Jul 2024 22:06:43 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -89,8 +89,7 @@ References: <20240707002658.1917440-1-Jason@zx2c4.com>
  <6705c6c8-8b6a-4d03-ae0f-aa83442ec0ab@redhat.com>
  <CAHk-=wi=XvCZ9r897LjEb4ZarLzLtKN1p+Fyig+F2fmQDF8GSA@mail.gmail.com>
  <7439da2e-4a60-4643-9804-17e99ce6e312@redhat.com>
- <8bf64731-9e5c-4c8c-b46b-5b18ae3110a1@redhat.com>
- <ZovwO8KJ5Cv5fa26@zx2c4.com>
+ <Zovv4lzM38EHtnms@zx2c4.com>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -138,26 +137,48 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <ZovwO8KJ5Cv5fa26@zx2c4.com>
+In-Reply-To: <Zovv4lzM38EHtnms@zx2c4.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 08.07.24 15:57, Jason A. Donenfeld wrote:
-> On Mon, Jul 08, 2024 at 10:23:10AM +0200, David Hildenbrand wrote:
->>> As a side note, I'll raise that I am not a particular fan of the
->>> "droppable" terminology, at least with the "read 0s" approach.
->>>
->>>    From a user perspective, the memory might suddenly lose its state and
->>> read as 0s just like volatile memory when it loses power. "dropping
->>> pages" sounds more like an implementation detail.
->>
->> Long story short: it's the hypervisor that could be effectively
->> dropping/zeroing out that memory, not the guest VM. "NONVOLATILE" might
->> be clearer than "DROPPABLE".
+On 08.07.24 15:55, Jason A. Donenfeld wrote:
+> Hi David,
 > 
-> Surely you mean "VOLATILE", not "NONVOLATILE", right?
+> On Mon, Jul 08, 2024 at 10:11:24AM +0200, David Hildenbrand wrote:
+>> The semantics are much more intuitive. No need for separate mmap flags.
+> 
+> Agreed.
+>   
+>> Likely we'll have to adjust mlock() as well. Also, I think we should
+>> just bail out with hugetlb as well.
+> 
+> Ack.
+> 
+>> Further, maybe we want to disallow madvise() clearing these flags here,
+>> just to be consistent.
+> 
+> Good thinking.
+> 
+>> As a side note, I'll raise that I am not a particular fan of the
+>> "droppable" terminology, at least with the "read 0s" approach.
+>>
+>>   From a user perspective, the memory might suddenly lose its state and
+>> read as 0s just like volatile memory when it loses power. "dropping
+>> pages" sounds more like an implementation detail.
+>>
+>> Something like MAP_VOLATILE might be more intuitive (similar to the
+>> proposed MADV_VOLATILE).
+>>
+>> But naming is hard, just mentioning to share my thought :)
+> 
+> Naming is hard, but *renaming* is annoying. I like droppable simply
+> because that's what I've been calling it in my head. MAP_VOLATILE is
+> fine with me though, and seems reasonable enough. So I'll name it that,
+> and then please don't change your mind about it later so I won't have to
+> rename everything again. :)
 
-Yes, typo :)
+:) Nah. But wait with any remaining until more than one person thinks 
+it's a good idea.
 
 -- 
 Cheers,
