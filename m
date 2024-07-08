@@ -1,66 +1,66 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECC2D47F7A
-	for <linux-crypto@vger.kernel.org>; Mon,  8 Jul 2024 08:11:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CCC444C93
+	for <linux-crypto@vger.kernel.org>; Mon,  8 Jul 2024 08:23:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720426293; cv=none; b=acCZZT2EdXbXIB7VHPorobqQRozcoSsovle85GEqRQUXl90BhqqIpC997umH3ntr9DA3NR4Tv0W/cdZFzSAyOuOa+VUu9xUCzjRDuQHdyhvyy4CB5oWW3tcWV7t8RxlJzORtWxGDZ8gDlu/Tfuv5Lbe7teENeY8fTfI01GSHvqY=
+	t=1720427002; cv=none; b=jxo8/7b5WQuC/OAUm6Jj/r01YRdj84VgUBSHEljcZlN837wNiSi11VfuxGvb17Y9tWdG3aA6mfE+hI1mZLmwzflFH9xr+hQXo1oStjzM0+VL0iJvVuJeR9orDoCDFpZ+Sg5ngoZ5OskuSDZkiRchWHBUFIUp7njDj/9Kasynxx0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720426293; c=relaxed/simple;
-	bh=2oLuXobac5roJSa3IO5/5qzJKdTUjyDWzEQLC8i5HaQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NcgiVVCzMGm7vuM3p/E//4mMeRA827OUj9tQuSQGYw5cvijwr7oAHBBbrWxWPz3YXaKtDQiCATuJif2CiOnhVWOzi+4DPUft91wA95umEzDTlgujwr9WzXA9m0MKy8kybgYsIic52kTRbxOu6yAPy59XXeuDGm7/ohtJ/Nd/3tc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SVqBD5Xi; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1720427002; c=relaxed/simple;
+	bh=u9mN5ZVUNKs/SnqYF+TXngxMJE/RrZZ3YGgiYU4pUlc=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=Jf63QaXN/EGu0Ww84fhqrfm4qPY8w+wIJ7bVzHeDu97nrstB0XpWanBQma5cowbdvIP/UoinLlyHjIZkbv/9Flnuee5Vq/FGy0wFQpvEVMJkm0UySCibp5/T1/t9sN9bWVAWl0VSIVmvinMSl/9oR26CLM5q9a9ieQSgkOTL4S4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OdwUleTs; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SVqBD5Xi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OdwUleTs"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1720426291;
+	s=mimecast20190719; t=1720426999;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=Gp+JU/F91iJfi0msXelpd8IVzKHprY8FUr3nyaI8s/Y=;
-	b=SVqBD5XijwqfN7jw4RPCA+ceVw4XlxcOlEB8867+X/I7REOQEIOjJg7Y6XXezvq2FrqvA3
-	CfQPw9Xtx+4NSASUXo8KcpdszNdSSeS3jeY4A6YHCkHrjoY7NikD29/gKaoioRS9epHJB8
-	9d1lQJLAi0ntuOK7ZJEMp+7QH+hHMyY=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=MFZguN8EVoK7OymJmQKuCA2IoYCB5NF4rjLMBNd7sSM=;
+	b=OdwUleTsMN+lgcnYznmcQ6M5fIDSVyaD38AcDcapcaBcdUBmrobNaBEiJqMY3MvY+3WjJf
+	QicZO0NX3C/8xFocazAtjLhuJrR3Hryfgi8GQ2O3rYuXDTpI10kmIIMb6EX9QulWy6NSC5
+	qHZLR2y7fDL6gBa1uXS2mRLgv3AWGlQ=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-80-Xk82zjmQOvyyV8yxwoa7MA-1; Mon, 08 Jul 2024 04:11:28 -0400
-X-MC-Unique: Xk82zjmQOvyyV8yxwoa7MA-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a6f571c3eefso167436666b.2
-        for <linux-crypto@vger.kernel.org>; Mon, 08 Jul 2024 01:11:28 -0700 (PDT)
+ us-mta-492-Sc8Fr-N4PFaA0C3wtA3VKQ-1; Mon, 08 Jul 2024 04:23:15 -0400
+X-MC-Unique: Sc8Fr-N4PFaA0C3wtA3VKQ-1
+Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-57851ae6090so3262396a12.3
+        for <linux-crypto@vger.kernel.org>; Mon, 08 Jul 2024 01:23:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720426287; x=1721031087;
+        d=1e100.net; s=20230601; t=1720426994; x=1721031794;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
+         :content-language:references:cc:to:from:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=Gp+JU/F91iJfi0msXelpd8IVzKHprY8FUr3nyaI8s/Y=;
-        b=K+cQM9jMQOJu6FAZbtkV7GuUzHWsleihP6r5YWotG18Ow/aKZcUiRltrCUL4+qnZqx
-         MMGTgo0/GnVkf7CYiwy5Y2ZfrofoNhpkrIoq6T2xLI7qsgyHsFX0A7N+UETftI9ryUH8
-         RExakHzMsZoBZ/8v7rw6/MTrcWCCU+jvPRWvGPk+2T9rK3jBFajOYq2l8RsQkVwW/2Zx
-         luaW/qPu8xokaGpHkXGx7b/Q4d2P7sLSiq6FZg/6NyBRSAM3ZR6wyha6SAwBF/vHjVSu
-         2Cj0CRyh6Iehg0YU4PuC7VC5zASanKmcEbeG4T8+DG/uNkc9/7kszef6AyWIOsCtr5uf
-         oitg==
-X-Forwarded-Encrypted: i=1; AJvYcCURUtj9wcXj+yQ67JawEKEvcaqS7AKYg1jyYcR2mFwy3bnw9RQsXg4NV98iEoZHWVTk8uIFLvqYSRJn2HJPeX8W0nWsqRWSPeoJSo6I
-X-Gm-Message-State: AOJu0YzFeDHyvvw2Nl+0OY4OyVYMOgwtiUVeh9c4aBCifiEip06OVsQx
-	sL7/YtFYGkf2UNIAZ84g8mYrzbhuhxANLqWMtL/a+brUeAurjbW5A1P73jlJpR/PKFI3ygzeqmD
-	bBsxU19RaWKgnGN1Qcauj6+m1kNo0yXd+EuRAyM8eHA/YNSc1djjef4QvMjDRvg==
-X-Received: by 2002:a05:6402:311c:b0:58c:adad:cbb with SMTP id 4fb4d7f45d1cf-58e5cc0b694mr5634050a12.38.1720426287093;
-        Mon, 08 Jul 2024 01:11:27 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IERhu1ncMdDmYLIvyQzpQhR84SA4zIqAfzm6r9bAw/Jyk06nNBrd+LkPTmKZbo4Xr0uenl3oQ==
-X-Received: by 2002:a05:6402:311c:b0:58c:adad:cbb with SMTP id 4fb4d7f45d1cf-58e5cc0b694mr5634038a12.38.1720426286701;
-        Mon, 08 Jul 2024 01:11:26 -0700 (PDT)
+        bh=MFZguN8EVoK7OymJmQKuCA2IoYCB5NF4rjLMBNd7sSM=;
+        b=GPq6/17YM7jBi6XYO2VrZGtWxP7mrQ05aK4DO5f7V0AJ/bzgspMR92dPECcnfNoEu5
+         bSNNG08hqiBPLv33xMrDQ+krHS+LbkpN9MMa8rUhIIYZqEww7yStpHOEh7/lMt27Fzdc
+         ZiYThpImHiMn/eROeyYUsgpy4ftzRLZQGXNCARhl4FAv0UWZpzrQe0yC3xGfMan7D9ft
+         sHeU/dUK0AvBmr5n0W7Uby0B9l8mkMR+m9kGYEd8kALQTmyMvn2UWIAeF+Q/Hu2IFcHn
+         tL2oK9XwtyPxW2NusHvBN/clq5m2D8LNdBXnpVeVXMHRalrcs2KVX40reBbwwLlRHKaE
+         qAow==
+X-Forwarded-Encrypted: i=1; AJvYcCXiPzdlWDyWdTSyZZTmYWzmnVWUTh33jaxfZLTTRZcIH/z2p5JVN2/85lMZY16llb7IGVQkcaSFBU4XR3QPg0h5Wz5ogufXDDv36XIK
+X-Gm-Message-State: AOJu0YzASLyLZcRCWvuj88KW3f7q7qYyoD+vsEVLMGwHde7nVfD1BQby
+	1wiz6KvfP1nm09b3K2VxaOtyn5sqneJBwmXIBw8TsqI2hM1MaETTugHBptTlDwvq0b7H9LZatG+
+	AMXkAlzuFuw7OnlnCkMKYD6pgxgpxlS4mUAz1cItIcMLirtyZkiezGUQZtvfAuw==
+X-Received: by 2002:a05:6402:1ed4:b0:57d:466a:246 with SMTP id 4fb4d7f45d1cf-58e5a8e8d16mr7877318a12.8.1720426994411;
+        Mon, 08 Jul 2024 01:23:14 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEI7JB2DQx/fSTi7SMHizXA4YiB8BrliEg6vtno1cAdZYwZNeZhUcg0gPX1yenfeB1h1VEyFg==
+X-Received: by 2002:a05:6402:1ed4:b0:57d:466a:246 with SMTP id 4fb4d7f45d1cf-58e5a8e8d16mr7877294a12.8.1720426993994;
+        Mon, 08 Jul 2024 01:23:13 -0700 (PDT)
 Received: from [100.81.188.195] ([178.24.249.36])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-593c7f2845fsm411567a12.95.2024.07.08.01.11.25
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-58fe866155esm3527497a12.20.2024.07.08.01.23.11
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Jul 2024 01:11:26 -0700 (PDT)
-Message-ID: <7439da2e-4a60-4643-9804-17e99ce6e312@redhat.com>
-Date: Mon, 8 Jul 2024 10:11:24 +0200
+        Mon, 08 Jul 2024 01:23:13 -0700 (PDT)
+Message-ID: <8bf64731-9e5c-4c8c-b46b-5b18ae3110a1@redhat.com>
+Date: Mon, 8 Jul 2024 10:23:10 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -70,6 +70,7 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v21 1/4] mm: add VM_DROPPABLE for designating always
  lazily freeable mappings
+From: David Hildenbrand <david@redhat.com>
 To: Linus Torvalds <torvalds@linux-foundation.org>
 Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, linux-kernel@vger.kernel.org,
  patches@lists.linux.dev, tglx@linutronix.de, linux-crypto@vger.kernel.org,
@@ -88,7 +89,7 @@ References: <20240707002658.1917440-1-Jason@zx2c4.com>
  <CAHk-=wibRRHVH5D4XvX1maQDCT-o4JLkANXHMoZoWdn=tN0TLA@mail.gmail.com>
  <6705c6c8-8b6a-4d03-ae0f-aa83442ec0ab@redhat.com>
  <CAHk-=wi=XvCZ9r897LjEb4ZarLzLtKN1p+Fyig+F2fmQDF8GSA@mail.gmail.com>
-From: David Hildenbrand <david@redhat.com>
+ <7439da2e-4a60-4643-9804-17e99ce6e312@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
  xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -135,123 +136,33 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <CAHk-=wi=XvCZ9r897LjEb4ZarLzLtKN1p+Fyig+F2fmQDF8GSA@mail.gmail.com>
+In-Reply-To: <7439da2e-4a60-4643-9804-17e99ce6e312@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 08.07.24 02:08, Linus Torvalds wrote:
-> On Sun, 7 Jul 2024 at 14:01, David Hildenbrand <david@redhat.com> wrote:
->>
->> At least MAP_DROPPABLE doesn't quite make sense with hugetlb, but at least
->> the other ones do have semantics with hugetlb?
+> As a side note, I'll raise that I am not a particular fan of the
+> "droppable" terminology, at least with the "read 0s" approach.
 > 
-> Hmm.
-> 
-> How about we just say that VM_DROPPABLE really is something separate
-> from MAP_PRIVATE or MAP_SHARED..
+>   From a user perspective, the memory might suddenly lose its state and
+> read as 0s just like volatile memory when it loses power. "dropping
+> pages" sounds more like an implementation detail.
 
-So it would essentially currently imply MAP_ANON|MAP_PRIVATE, without 
-COW (not shared with a child process).
+Just to raise why I consider "dropping" an implementation detail: in 
+combination with a previous idea I had of exposing "nonvolatile" memory 
+to VMs, the following might be interesting:
 
-Then, we should ignore any fd+offset that is passed (or bail out); I 
-assume that's what your proposal below does automatically without diving 
-into the code.
+A hypervisor could expose special "nonvolatile memory" as separate guest 
+physical memory region to a VM.
 
-> 
-> And then we make the rule be that VM_DROPPABLE is never dumped and
-> always dropped on fork, just to make things simpler.
+We could use that special memory to back these MAP_XXX regions in our 
+guest, in addition to trying to make use of them in the guest kernel, 
+for example for something similar to cleancache.
 
-The semantics are much more intuitive. No need for separate mmap flags.
+Long story short: it's the hypervisor that could be effectively 
+dropping/zeroing out that memory, not the guest VM. "NONVOLATILE" might 
+be clearer than "DROPPABLE".
 
-> 
-> It not only avoids a flag, but it actually makes sense: the pages
-> aren't stable for dumping anyway, and not copying them on fork() not
-> only avoids some overhead, but makes it much more reliable and
-> testable.
-> 
-> IOW, how about taking this approach:
-> 
->     --- a/include/uapi/linux/mman.h
->     +++ b/include/uapi/linux/mman.h
->     @@ -17,5 +17,6 @@
->      #define MAP_SHARED  0x01            /* Share changes */
->      #define MAP_PRIVATE 0x02            /* Changes are private */
->      #define MAP_SHARED_VALIDATE 0x03    /* share + validate extension flags */
->     +#define MAP_DROPPABLE       0x08    /* 4 is not in MAP_TYPE on parisc? */
-> 
->      /*
-> 
-> with do_mmap() doing:
-> 
->     --- a/mm/mmap.c
->     +++ b/mm/mmap.c
->     @@ -1369,6 +1369,23 @@ unsigned long do_mmap(struct file *file,
->                          pgoff = 0;
->                          vm_flags |= VM_SHARED | VM_MAYSHARE;
->                          break;
->     +            case MAP_DROPPABLE:
->     +                    /*
->     +                     * A locked or stack area makes no sense to
->     +                     * be droppable.
->     +                     *
->     +                     * Also, since droppable pages can just go
->     +                     * away at any time, it makes no sense to
->     +                     * copy them on fork or dump them.
->     +                     */
->     +                    if (flags & MAP_LOCKED)
->     +                            return -EINVAL;
-
-Likely we'll have to adjust mlock() as well. Also, I think we should 
-just bail out with hugetlb as well.
-
->     +                    if (vm_flags & (VM_GROWSDOWN|VM_GROWSUP))
->     +                            return -EINVAL;
->     +
->     +                    vm_flags |= VM_DROPPABLE;
->     +                    vm_flags |= VM_WIPEONFORK | VM_DONTDUMP;
-
-Further, maybe we want to disallow madvise() clearing these flags here, 
-just to be consistent.
-
->     +                    fallthrough;
->                  case MAP_PRIVATE:
->                          /*
->                           * Set pgoff according to addr for anon_vma.
-> 
-> which looks rather simple.
-> 
-> The only oddity is that parisc thing - every other archiecture has the
-> MAP_TYPE bits being 0xf, but parisc uses 0x2b (also four bits, but
-> instead of the low four bits it's 00101011 - strange).
-
-I assume, changing that would have the risk of breaking stupid user 
-space, right? (that sets a bit without any semantics)
-
-> 
-> So using 8 as a MAP_TYPE bit for MAP_DROPPABLE works everywhere, and
-> if we eventually want to do a "signaling" MAP_DROPPABLE we could use
-> 9.
-
-Sounds good enough.
-
-> 
-> This has the added advantage that if somebody does this on an old
-> kernel,. they *will* get an error. Because unlike the 'flag' bits in
-> general, the MAP_TYPE bit space has always been tested.
-> 
-> Hmm?
-
-As a side note, I'll raise that I am not a particular fan of the 
-"droppable" terminology, at least with the "read 0s" approach.
-
- From a user perspective, the memory might suddenly lose its state and 
-read as 0s just like volatile memory when it loses power. "dropping 
-pages" sounds more like an implementation detail.
-
-Something like MAP_VOLATILE might be more intuitive (similar to the 
-proposed MADV_VOLATILE).
-
-But naming is hard, just mentioning to share my thought :)
+But again, naming is hard ... :)
 
 -- 
 Cheers,
