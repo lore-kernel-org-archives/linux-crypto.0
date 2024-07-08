@@ -1,48 +1,66 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11B31364A9;
-	Mon,  8 Jul 2024 07:48:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECC2D47F7A
+	for <linux-crypto@vger.kernel.org>; Mon,  8 Jul 2024 08:11:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720424892; cv=none; b=YVRB8NuHnILEWvRjvE8Nif3g9Niv1yXRwKDe9vtQo1Vl9MbwIJXl3DL51Vs/YwUgkcqwZkCZ4l0fjJHcnU5fc0kch0zBgEg2WKvKEzr+yItdTUVAmZKAbxEAZ9ZmeoseqhKoDgrNgOJ+zATi+bl/5xnDVT6k/kPhUdZR+l7mhbU=
+	t=1720426293; cv=none; b=acCZZT2EdXbXIB7VHPorobqQRozcoSsovle85GEqRQUXl90BhqqIpC997umH3ntr9DA3NR4Tv0W/cdZFzSAyOuOa+VUu9xUCzjRDuQHdyhvyy4CB5oWW3tcWV7t8RxlJzORtWxGDZ8gDlu/Tfuv5Lbe7teENeY8fTfI01GSHvqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720424892; c=relaxed/simple;
-	bh=rVBEw98YsMl1OrcDCG36qiCr3u6VVUckw8754YjmETM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=u7D3Uvaw8xPwSwcfMQ12Rtc8R58HfXdbIxBlCbplny90CRq4/hYrfZT9w3vlSIdLvErZuE5iSM1YwQHmrNkSuv2yUK00QpOMMI9eQZmhhZOFjCQvm7kcSSruj7ieeefwUhl8zoVQy4TtZahWJL5SWw8HkvRrux2P0HqK+446Sfw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=C8H2jH4K; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1720426293; c=relaxed/simple;
+	bh=2oLuXobac5roJSa3IO5/5qzJKdTUjyDWzEQLC8i5HaQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NcgiVVCzMGm7vuM3p/E//4mMeRA827OUj9tQuSQGYw5cvijwr7oAHBBbrWxWPz3YXaKtDQiCATuJif2CiOnhVWOzi+4DPUft91wA95umEzDTlgujwr9WzXA9m0MKy8kybgYsIic52kTRbxOu6yAPy59XXeuDGm7/ohtJ/Nd/3tc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SVqBD5Xi; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="C8H2jH4K"
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4680W7K6001325;
-	Mon, 8 Jul 2024 07:47:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	i/uQYDKEprLvHhEtr15EIS+2LOUqtGYnciWz60brKUQ=; b=C8H2jH4Knqhy89w5
-	tqFeDHt6hlPjff5e1i7KCwZo3309m1ap0ZNrD071Jn3uzlSG4v8v8ewYLJdEZfSN
-	GJKKa99eekiaKcrdXjGyHuw/urdVYF1HTEn5VOepVeCoQJY/20W67edgOXEOm2ad
-	o5Di4F6Eyu3IiRTyHrfCbn8k5PNjzMrHSWG/ukDEc0gLDpLuz9CWXEhHlXKmeBCm
-	EqOtmEZH6+iDvMofCTH0bsR4YLVKoA1+nUHfxZYMdaxWJIGgulKB/vrGdGTndQXJ
-	gKxKzCsX8TvAJoMIGoy/02L8yfqMVZqhYfIx4jgQGbJdkR0BY62oStU0Jr5fgmdl
-	O3+5ow==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 406we8txv0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 08 Jul 2024 07:47:33 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA03.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 4687lV2H006833
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 8 Jul 2024 07:47:31 GMT
-Received: from [10.239.132.204] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 8 Jul 2024
- 00:47:09 -0700
-Message-ID: <1b32168b-7d1c-4b18-b4f3-a4979232b515@quicinc.com>
-Date: Mon, 8 Jul 2024 15:47:06 +0800
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SVqBD5Xi"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1720426291;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=Gp+JU/F91iJfi0msXelpd8IVzKHprY8FUr3nyaI8s/Y=;
+	b=SVqBD5XijwqfN7jw4RPCA+ceVw4XlxcOlEB8867+X/I7REOQEIOjJg7Y6XXezvq2FrqvA3
+	CfQPw9Xtx+4NSASUXo8KcpdszNdSSeS3jeY4A6YHCkHrjoY7NikD29/gKaoioRS9epHJB8
+	9d1lQJLAi0ntuOK7ZJEMp+7QH+hHMyY=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-80-Xk82zjmQOvyyV8yxwoa7MA-1; Mon, 08 Jul 2024 04:11:28 -0400
+X-MC-Unique: Xk82zjmQOvyyV8yxwoa7MA-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a6f571c3eefso167436666b.2
+        for <linux-crypto@vger.kernel.org>; Mon, 08 Jul 2024 01:11:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720426287; x=1721031087;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Gp+JU/F91iJfi0msXelpd8IVzKHprY8FUr3nyaI8s/Y=;
+        b=K+cQM9jMQOJu6FAZbtkV7GuUzHWsleihP6r5YWotG18Ow/aKZcUiRltrCUL4+qnZqx
+         MMGTgo0/GnVkf7CYiwy5Y2ZfrofoNhpkrIoq6T2xLI7qsgyHsFX0A7N+UETftI9ryUH8
+         RExakHzMsZoBZ/8v7rw6/MTrcWCCU+jvPRWvGPk+2T9rK3jBFajOYq2l8RsQkVwW/2Zx
+         luaW/qPu8xokaGpHkXGx7b/Q4d2P7sLSiq6FZg/6NyBRSAM3ZR6wyha6SAwBF/vHjVSu
+         2Cj0CRyh6Iehg0YU4PuC7VC5zASanKmcEbeG4T8+DG/uNkc9/7kszef6AyWIOsCtr5uf
+         oitg==
+X-Forwarded-Encrypted: i=1; AJvYcCURUtj9wcXj+yQ67JawEKEvcaqS7AKYg1jyYcR2mFwy3bnw9RQsXg4NV98iEoZHWVTk8uIFLvqYSRJn2HJPeX8W0nWsqRWSPeoJSo6I
+X-Gm-Message-State: AOJu0YzFeDHyvvw2Nl+0OY4OyVYMOgwtiUVeh9c4aBCifiEip06OVsQx
+	sL7/YtFYGkf2UNIAZ84g8mYrzbhuhxANLqWMtL/a+brUeAurjbW5A1P73jlJpR/PKFI3ygzeqmD
+	bBsxU19RaWKgnGN1Qcauj6+m1kNo0yXd+EuRAyM8eHA/YNSc1djjef4QvMjDRvg==
+X-Received: by 2002:a05:6402:311c:b0:58c:adad:cbb with SMTP id 4fb4d7f45d1cf-58e5cc0b694mr5634050a12.38.1720426287093;
+        Mon, 08 Jul 2024 01:11:27 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IERhu1ncMdDmYLIvyQzpQhR84SA4zIqAfzm6r9bAw/Jyk06nNBrd+LkPTmKZbo4Xr0uenl3oQ==
+X-Received: by 2002:a05:6402:311c:b0:58c:adad:cbb with SMTP id 4fb4d7f45d1cf-58e5cc0b694mr5634038a12.38.1720426286701;
+        Mon, 08 Jul 2024 01:11:26 -0700 (PDT)
+Received: from [100.81.188.195] ([178.24.249.36])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-593c7f2845fsm411567a12.95.2024.07.08.01.11.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Jul 2024 01:11:26 -0700 (PDT)
+Message-ID: <7439da2e-4a60-4643-9804-17e99ce6e312@redhat.com>
+Date: Mon, 8 Jul 2024 10:11:24 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -50,109 +68,193 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/47] arm64: qcom: dts: add QCS9100 support
-To: Conor Dooley <conor.dooley@microchip.com>,
-        Krzysztof Kozlowski
-	<krzk@kernel.org>
-CC: <andersson@kernel.org>, <konrad.dybcio@linaro.org>, <robh@kernel.org>,
-        <krzk+dt@kernel.org>, <conor+dt@kernel.org>, <djakov@kernel.org>,
-        <mturquette@baylibre.com>, <sboyd@kernel.org>,
-        <jassisinghbrar@gmail.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>, <manivannan.sadhasivam@linaro.org>,
-        <will@kernel.org>, <joro@8bytes.org>, <conor@kernel.org>,
-        <tglx@linutronix.de>, <amitk@kernel.org>, <thara.gopinath@gmail.com>,
-        <linus.walleij@linaro.org>, <wim@linux-watchdog.org>,
-        <linux@roeck-us.net>, <rafael@kernel.org>, <viresh.kumar@linaro.org>,
-        <vkoul@kernel.org>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <mcoquelin.stm32@gmail.com>,
-        <robimarko@gmail.com>, <quic_gurus@quicinc.com>,
-        <bartosz.golaszewski@linaro.org>, <kishon@kernel.org>,
-        <quic_wcheng@quicinc.com>, <alim.akhtar@samsung.com>,
-        <avri.altman@wdc.com>, <bvanassche@acm.org>, <agross@kernel.org>,
-        <gregkh@linuxfoundation.org>, <quic_tdas@quicinc.com>,
-        <robin.murphy@arm.com>, <daniel.lezcano@linaro.org>,
-        <rui.zhang@intel.com>, <lukasz.luba@arm.com>,
-        <quic_rjendra@quicinc.com>, <ulf.hansson@linaro.org>,
-        <quic_sibis@quicinc.com>, <otto.pflueger@abscue.de>,
-        <quic_rohiagar@quicinc.com>, <luca@z3ntu.xyz>,
-        <neil.armstrong@linaro.org>, <abel.vesa@linaro.org>,
-        <bhupesh.sharma@linaro.org>, <alexandre.torgue@foss.st.com>,
-        <peppe.cavallaro@st.com>, <joabreu@synopsys.com>,
-        <netdev@vger.kernel.org>, <lpieralisi@kernel.org>, <kw@linux.com>,
-        <bhelgaas@google.com>, <ahalaney@redhat.com>,
-        <krzysztof.kozlowski@linaro.org>, <u.kleine-koenig@pengutronix.de>,
-        <dmitry.baryshkov@linaro.org>, <quic_cang@quicinc.com>,
-        <danila@jiaxyga.com>, <quic_nitirawa@quicinc.com>,
-        <mantas@8devices.com>, <athierry@redhat.com>,
-        <quic_kbajaj@quicinc.com>, <quic_bjorande@quicinc.com>,
-        <quic_msarkar@quicinc.com>, <quic_devipriy@quicinc.com>,
-        <quic_tsoni@quicinc.com>, <quic_rgottimu@quicinc.com>,
-        <quic_shashim@quicinc.com>, <quic_kaushalk@quicinc.com>,
-        <quic_tingweiz@quicinc.com>, <quic_aiquny@quicinc.com>,
-        <srinivas.kandagatla@linaro.org>, <linux-arm-msm@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-pm@vger.kernel.org>, <linux-clk@vger.kernel.org>,
-        <linux-phy@lists.infradead.org>, <linux-crypto@vger.kernel.org>,
-        <linux-scsi@vger.kernel.org>, <linux-usb@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <iommu@lists.linux.dev>,
-        <linux-riscv@lists.infradead.org>, <linux-gpio@vger.kernel.org>,
-        <linux-watchdog@vger.kernel.org>, <linux-pci@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>, <kernel@quicinc.com>
-References: <20240703025850.2172008-1-quic_tengfan@quicinc.com>
- <20240703035735.2182165-1-quic_tengfan@quicinc.com>
- <7417fd8c-e852-45ee-bac9-d92921036e2f@kernel.org>
- <20240703-manager-armless-b13b18c79192@wendy>
-From: Tengfei Fan <quic_tengfan@quicinc.com>
-In-Reply-To: <20240703-manager-armless-b13b18c79192@wendy>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Subject: Re: [PATCH v21 1/4] mm: add VM_DROPPABLE for designating always
+ lazily freeable mappings
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, linux-kernel@vger.kernel.org,
+ patches@lists.linux.dev, tglx@linutronix.de, linux-crypto@vger.kernel.org,
+ linux-api@vger.kernel.org, x86@kernel.org,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+ Carlos O'Donell <carlos@redhat.com>, Florian Weimer <fweimer@redhat.com>,
+ Arnd Bergmann <arnd@arndb.de>, Jann Horn <jannh@google.com>,
+ Christian Brauner <brauner@kernel.org>,
+ David Hildenbrand <dhildenb@redhat.com>, linux-mm@kvack.org
+References: <20240707002658.1917440-1-Jason@zx2c4.com>
+ <20240707002658.1917440-2-Jason@zx2c4.com>
+ <1583c837-a4d5-4a8a-9c1d-2c64548cd199@redhat.com>
+ <CAHk-=wjs-9DVeoc430BDOv+dkpDkdVvkEsSJxNVZ+sO51H1dJA@mail.gmail.com>
+ <e2f104ac-b6d9-4583-b999-8f975c60d469@redhat.com>
+ <CAHk-=wibRRHVH5D4XvX1maQDCT-o4JLkANXHMoZoWdn=tN0TLA@mail.gmail.com>
+ <6705c6c8-8b6a-4d03-ae0f-aa83442ec0ab@redhat.com>
+ <CAHk-=wi=XvCZ9r897LjEb4ZarLzLtKN1p+Fyig+F2fmQDF8GSA@mail.gmail.com>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <CAHk-=wi=XvCZ9r897LjEb4ZarLzLtKN1p+Fyig+F2fmQDF8GSA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: WJaCcFF2njxbbZhKA7uiH0ECQvUaDd6U
-X-Proofpoint-GUID: WJaCcFF2njxbbZhKA7uiH0ECQvUaDd6U
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-08_02,2024-07-05_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 impostorscore=0
- bulkscore=0 spamscore=0 suspectscore=0 lowpriorityscore=0 phishscore=0
- priorityscore=1501 mlxlogscore=999 malwarescore=0 mlxscore=0 clxscore=1011
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2406140001
- definitions=main-2407080059
 
-
-
-On 7/3/2024 2:28 PM, Conor Dooley wrote:
-> On Wed, Jul 03, 2024 at 06:45:00AM +0200, Krzysztof Kozlowski wrote:
->> On 03/07/2024 05:56, Tengfei Fan wrote:
->>> Introduce support for the QCS9100 SoC device tree (DTSI) and the
->>> QCS9100 RIDE board DTS. The QCS9100 is a variant of the SA8775p.
->>> While the QCS9100 platform is still in the early design stage, the
->>> QCS9100 RIDE board is identical to the SA8775p RIDE board, except it
->>> mounts the QCS9100 SoC instead of the SA8775p SoC.
+On 08.07.24 02:08, Linus Torvalds wrote:
+> On Sun, 7 Jul 2024 at 14:01, David Hildenbrand <david@redhat.com> wrote:
 >>
->> The same huge patchset, to huge number of recipients was sent twice.
->> First, sorry, this is way too big. Second, it has way too many
->> recipients, but this is partially a result of first point. Only
->> partially because you put here dozen of totally unrelated emails. Sorry,
->> that does not make even sense. See form letter at the end how this
->> works. Third, sending it to everyone twice is a way to annoy them off
->> twice... Fourth,
->>
->> Please split your work and do not cc dozen of unrelated folks.
+>> At least MAP_DROPPABLE doesn't quite make sense with hugetlb, but at least
+>> the other ones do have semantics with hugetlb?
 > 
-> One of the extra recipients is cos that of that patch I sent adding the
-> cache bindings to the cache entry, forgetting that that would CC the
-> riscv list on all cache bindings. I modified that patch to drop the riscv
-> list from the entry.
+> Hmm.
 > 
-> Cheers,
-> Conor.
+> How about we just say that VM_DROPPABLE really is something separate
+> from MAP_PRIVATE or MAP_SHARED..
 
+So it would essentially currently imply MAP_ANON|MAP_PRIVATE, without 
+COW (not shared with a child process).
 
-Thank you, Conor!
+Then, we should ignore any fd+offset that is passed (or bail out); I 
+assume that's what your proposal below does automatically without diving 
+into the code.
+
+> 
+> And then we make the rule be that VM_DROPPABLE is never dumped and
+> always dropped on fork, just to make things simpler.
+
+The semantics are much more intuitive. No need for separate mmap flags.
+
+> 
+> It not only avoids a flag, but it actually makes sense: the pages
+> aren't stable for dumping anyway, and not copying them on fork() not
+> only avoids some overhead, but makes it much more reliable and
+> testable.
+> 
+> IOW, how about taking this approach:
+> 
+>     --- a/include/uapi/linux/mman.h
+>     +++ b/include/uapi/linux/mman.h
+>     @@ -17,5 +17,6 @@
+>      #define MAP_SHARED  0x01            /* Share changes */
+>      #define MAP_PRIVATE 0x02            /* Changes are private */
+>      #define MAP_SHARED_VALIDATE 0x03    /* share + validate extension flags */
+>     +#define MAP_DROPPABLE       0x08    /* 4 is not in MAP_TYPE on parisc? */
+> 
+>      /*
+> 
+> with do_mmap() doing:
+> 
+>     --- a/mm/mmap.c
+>     +++ b/mm/mmap.c
+>     @@ -1369,6 +1369,23 @@ unsigned long do_mmap(struct file *file,
+>                          pgoff = 0;
+>                          vm_flags |= VM_SHARED | VM_MAYSHARE;
+>                          break;
+>     +            case MAP_DROPPABLE:
+>     +                    /*
+>     +                     * A locked or stack area makes no sense to
+>     +                     * be droppable.
+>     +                     *
+>     +                     * Also, since droppable pages can just go
+>     +                     * away at any time, it makes no sense to
+>     +                     * copy them on fork or dump them.
+>     +                     */
+>     +                    if (flags & MAP_LOCKED)
+>     +                            return -EINVAL;
+
+Likely we'll have to adjust mlock() as well. Also, I think we should 
+just bail out with hugetlb as well.
+
+>     +                    if (vm_flags & (VM_GROWSDOWN|VM_GROWSUP))
+>     +                            return -EINVAL;
+>     +
+>     +                    vm_flags |= VM_DROPPABLE;
+>     +                    vm_flags |= VM_WIPEONFORK | VM_DONTDUMP;
+
+Further, maybe we want to disallow madvise() clearing these flags here, 
+just to be consistent.
+
+>     +                    fallthrough;
+>                  case MAP_PRIVATE:
+>                          /*
+>                           * Set pgoff according to addr for anon_vma.
+> 
+> which looks rather simple.
+> 
+> The only oddity is that parisc thing - every other archiecture has the
+> MAP_TYPE bits being 0xf, but parisc uses 0x2b (also four bits, but
+> instead of the low four bits it's 00101011 - strange).
+
+I assume, changing that would have the risk of breaking stupid user 
+space, right? (that sets a bit without any semantics)
+
+> 
+> So using 8 as a MAP_TYPE bit for MAP_DROPPABLE works everywhere, and
+> if we eventually want to do a "signaling" MAP_DROPPABLE we could use
+> 9.
+
+Sounds good enough.
+
+> 
+> This has the added advantage that if somebody does this on an old
+> kernel,. they *will* get an error. Because unlike the 'flag' bits in
+> general, the MAP_TYPE bit space has always been tested.
+> 
+> Hmm?
+
+As a side note, I'll raise that I am not a particular fan of the 
+"droppable" terminology, at least with the "read 0s" approach.
+
+ From a user perspective, the memory might suddenly lose its state and 
+read as 0s just like volatile memory when it loses power. "dropping 
+pages" sounds more like an implementation detail.
+
+Something like MAP_VOLATILE might be more intuitive (similar to the 
+proposed MADV_VOLATILE).
+
+But naming is hard, just mentioning to share my thought :)
 
 -- 
-Thx and BRs,
-Tengfei Fan
+Cheers,
+
+David / dhildenb
+
