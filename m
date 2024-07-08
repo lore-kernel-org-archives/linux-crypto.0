@@ -1,117 +1,82 @@
-Received: from bmailout3.hostsharing.net (bmailout3.hostsharing.net [176.9.242.62])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84CC47E56B;
-	Mon,  8 Jul 2024 13:35:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.9.242.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D89E713A3FF;
+	Mon,  8 Jul 2024 13:51:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720445750; cv=none; b=HrnWaFkTVAzwdy9/K2YcJZkkvgFzUrV0al77r93WFa3j2dyTq7qTdBxVDZand2NShRrNOB4q+h7Y3Ot/xwbWpC1oivC0cspGYtwh4Ppci3gxbsVeYDRqmW4iIkmna51A7a4L90Q4RqlYNkSg+flpMpRgLjSPoyJBjzw2PPoZ42Q=
+	t=1720446686; cv=none; b=jG4O44GrUUS1Ikh0T2QVDv+caRwUueWWV+lCw3IB3ivwOUOXx47b6W7SvtWS60T5d6TKMxbzEVwqNsZuvHHcWzeZp4PyEvdGqwVWO3y4gcgsYVyFZ4aLkb2JcIIXhkovpKb4F0X+NxaeuM9L7l3flpcIr9LdCX69HmjmbZWDhYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720445750; c=relaxed/simple;
-	bh=wgD9a4DNK3P6VEZab1/0rPVhR9Z/fDFUP3wzihfV+GE=;
+	s=arc-20240116; t=1720446686; c=relaxed/simple;
+	bh=G87kDnZnqvGSMs4uyhWZ60F6IU9JHQtUsJOPR1HoP5Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DNi7HA2B7uV2Z6A59Qy0yGCL5u8Pkzx3dyvUi/SqCTDQM3G26qqPoQDCyPCBafpz0qIvfQx38Y0BCNUbukSNOTTKk3qSgmXvJC45ju7TFDvUTPkN10MTneC/cV85R+UPWVh4r1pmE6K8MC91OFUXIso/4S3Z9ggkLOq9B+zOEwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=176.9.242.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout3.hostsharing.net (Postfix) with ESMTPS id F044A100D9438;
-	Mon,  8 Jul 2024 15:35:39 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id BF9321F5CA; Mon,  8 Jul 2024 15:35:39 +0200 (CEST)
-Date: Mon, 8 Jul 2024 15:35:39 +0200
-From: Lukas Wunner <lukas@wunner.de>
-To: Alexey Kardashevskiy <aik@amd.com>
-Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Bjorn Helgaas <helgaas@kernel.org>,
-	David Howells <dhowells@redhat.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Woodhouse <dwmw2@infradead.org>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	linux-pci@vger.kernel.org, linux-cxl@vger.kernel.org,
-	linux-coco@lists.linux.dev, keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linuxarm@huawei.com,
-	David Box <david.e.box@intel.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	"Li, Ming" <ming4.li@intel.com>,
-	Ilpo Jarvinen <ilpo.jarvinen@linux.intel.com>,
-	Alistair Francis <alistair.francis@wdc.com>,
-	Wilfred Mallawa <wilfred.mallawa@wdc.com>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Dhaval Giani <dhaval.giani@amd.com>,
-	Gobikrishna Dhanuskodi <gdhanuskodi@nvidia.com>,
-	Jason Gunthorpe <jgg@nvidia.com>, Peter Gonda <pgonda@google.com>,
-	Jerome Glisse <jglisse@google.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Alexander Graf <graf@amazon.com>, Samuel Ortiz <sameo@rivosinc.com>,
-	Eric Biggers <ebiggers@google.com>,
-	Stefan Berger <stefanb@linux.ibm.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Alan Stern <stern@rowland.harvard.edu>
-Subject: Re: [PATCH v2 00/18] PCI device authentication
-Message-ID: <ZovrK7GsDpOMp3Bz@wunner.de>
-References: <cover.1719771133.git.lukas@wunner.de>
- <2140c4e4-6df0-47c7-8301-c6eb70ada27d@amd.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=bQUf8Q8Jikni7d9Cd5X0vyA/QEyszSbAXYksJVf8+hbuNZpaTMWwURpkdNPR5+TY62L1j9JbD/RTKZ4ZPAZwUSnskUiVDpsrSF3KQ/oUn+JMX+YO37AxP6wkjw+o/kq3hMb8zS4LTUpxjQA3BzTHnwBpb6oEmoxdn4+FYHcDQ4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=Ltc/kfe5; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Ltc/kfe5"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D134FC116B1;
+	Mon,  8 Jul 2024 13:51:23 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Ltc/kfe5"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1720446682;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=wmWJs2g1W7bIdx4gchsYMHASAqH5Nl1Wal5e/OBuZ4E=;
+	b=Ltc/kfe55weFCdOPd0v5+eIU/rru8g1L280RLc2zXVS6Gdi2G5cohudgE4+0timl4c4NpZ
+	Sk6U7XWXuosGL3CAcmi9GVlppDikr4+SBsuWnFkL8ljOP1yXMGhK/dY+nnIxyUlybiKT1s
+	sJy1/yE9zue6HOFfwY78jZt9CLz7nyE=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 173f7d39 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Mon, 8 Jul 2024 13:51:20 +0000 (UTC)
+Date: Mon, 8 Jul 2024 15:50:57 +0200
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org,
+	patches@lists.linux.dev, tglx@linutronix.de,
+	linux-crypto@vger.kernel.org, linux-api@vger.kernel.org,
+	x86@kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+	Carlos O'Donell <carlos@redhat.com>,
+	Florian Weimer <fweimer@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
+	Jann Horn <jannh@google.com>,
+	Christian Brauner <brauner@kernel.org>,
+	David Hildenbrand <dhildenb@redhat.com>, linux-mm@kvack.org
+Subject: Re: [PATCH v21 1/4] mm: add VM_DROPPABLE for designating always
+ lazily freeable mappings
+Message-ID: <Zovuwesu_RaSixe6@zx2c4.com>
+References: <20240707002658.1917440-1-Jason@zx2c4.com>
+ <20240707002658.1917440-2-Jason@zx2c4.com>
+ <1583c837-a4d5-4a8a-9c1d-2c64548cd199@redhat.com>
+ <CAHk-=wjs-9DVeoc430BDOv+dkpDkdVvkEsSJxNVZ+sO51H1dJA@mail.gmail.com>
+ <e2f104ac-b6d9-4583-b999-8f975c60d469@redhat.com>
+ <CAHk-=wibRRHVH5D4XvX1maQDCT-o4JLkANXHMoZoWdn=tN0TLA@mail.gmail.com>
+ <6705c6c8-8b6a-4d03-ae0f-aa83442ec0ab@redhat.com>
+ <CAHk-=wi=XvCZ9r897LjEb4ZarLzLtKN1p+Fyig+F2fmQDF8GSA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <2140c4e4-6df0-47c7-8301-c6eb70ada27d@amd.com>
+In-Reply-To: <CAHk-=wi=XvCZ9r897LjEb4ZarLzLtKN1p+Fyig+F2fmQDF8GSA@mail.gmail.com>
 
-On Mon, Jul 08, 2024 at 07:47:51PM +1000, Alexey Kardashevskiy wrote:
-> On 1/7/24 05:35, Lukas Wunner wrote:
-> > PCI device authentication v2
-> > 
-> > Authenticate PCI devices with CMA-SPDM (PCIe r6.2 sec 6.31) and
-> > expose the result in sysfs.
-> 
-> What is it based on?
+Hi Linus,
 
-This series is based on v6.10-rc1.
+On Sun, Jul 07, 2024 at 05:08:29PM -0700, Linus Torvalds wrote:
+>    +                    vm_flags |= VM_DROPPABLE;
+>    +                    vm_flags |= VM_WIPEONFORK | VM_DONTDUMP;
+> which looks rather simple.
 
-I also successfully cherry-picked the patches onto v6.10-rc6 and
-linux-next 20240628 (no merge conflicts and no issues reported by 0-day).
+That is nice, though I would add that if we're implying things that are
+sensible to imply, it really also needs to add VM_NORESERVE too.
+DROPPABLE doesn't make sense semantically without it.
 
-Older kernels than v6.10-rc1 won't work because they're missing
-ecdsa-nist-p521 support as well as a few preparatory sysfs patches
-of mine that went into v6.10-rc1.
+Anyway, rather than adding PROT_xyz for v+1, I'll try adding this
+MAP_DROPPABLE (or a different name for David) with the implications as
+you've suggested.
 
-
-> I am using https://github.com/l1k/linux.git branch cma_v2 for now but wonder
-> if that's the right one.
-
-Yes that's fine.
-
-There's now also a kernel.org repository with a testing branch:
-
-https://git.kernel.org/pub/scm/linux/kernel/git/devsec/spdm.git/
-
-Future maintenance of the SPDM library is intended to be happening
-in that repo.  I assumed that Bjorn may not be keen on having to
-deal with SPDM patches forever, so creating a dedicated repo seemed
-to make sense.
-
-Most patches in this series with a "PCI/CMA: " subject actually
-only change very few lines in the PCI core.  The bulk of the changes
-is in the SPDM library instead.  I used that subject merely to
-highlight that at least an ack from Bjorn is required.  The only
-patches containing PCI core changes to speak of are patches 8, 9, 10.
-
-The devsec group (short for Device Security Alphabet Soup) currently
-only contains the spdm.git repo.  Going forward, further repos may be
-added below the devsec umbrella, such as tsm.git to deal with a
-vendor-neutral interface between kernel and Trusted Security Module.
-
-Thanks,
-
-Lukas
+Jason
