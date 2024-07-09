@@ -1,247 +1,84 @@
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2057.outbound.protection.outlook.com [40.107.92.57])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A999410FA;
-	Tue,  9 Jul 2024 00:45:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.57
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720485945; cv=fail; b=mZm4jxpFYn1xJPcIiEYxD6qYPKhyhMwXSftw+TixzHtOJtk6c3AWKT+khTB4cEvpv3xZfFWr63L/IUqDx0Wtl9V7NkztrzaEcQS16bE0BQ21izTdgGA7t75tw5OC1Cyccv+CQDqkb4dQtBzXEVrWV/2/XpH1HGWeBeQUncqut8s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720485945; c=relaxed/simple;
-	bh=rGFr0jN3Ie3bvyaORMNdQ0xbRTSgux4SNRR2pP4kHKc=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=rz5/5frlkAqaBXE1dfHtb8Hic9TwMSgdTEHeaZIbJZcYgBPG1Ey8bQQtSLQ+CqeErlBEFTPM7r5d5NpeML/WZHMtJYVyGqNjK/ff42Xny+cKrTTL+8PU1qiDZg8ZKIw+4IK+GJ/bNq6TXgcOx6BSaZJnjanFmJQ7TgorfJCMWHY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=UteIjJb+; arc=fail smtp.client-ip=40.107.92.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C5612C1AC;
+	Tue,  9 Jul 2024 02:18:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1720491487; cv=none; b=cDxhICgKPMuA9KRMPiTSww0LbukDvG3C84TyvbE/p5HINmJKAhLsbRyI3S1XlB6whAvg1pXbGFaC9HoZZIjsC3eSHAnmdy6Q2yDH1rkuhzwhejEW+/dWFDqs8wZt/lp4VQkxgwbfdKKtzJLI97njoeWrZ81wifZhlNCHNFWkD0w=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1720491487; c=relaxed/simple;
+	bh=sQpw2n0NaOOsrwQoFWy5PaDNmaERqzAgtz/ScLWKs7A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MEHSbOTSVMf7RvPF7+jeSqHGweQtgNSREh12ZLsUHxKjkEN1bZSQGsixzZXRZVH/vFRE5ohsshAEgAQgQ/sf3OE0+IpaC84LVvAG7srVTTKRmtbUJdiikld0inqZC/lYarxnbiUFka6xkStMTu0FpT5yb+HUb80AANQCDUwvR9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=KN/jvw/U; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="UteIjJb+"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=B1WQ2z7m90w22TI2ebD8PU6ev5B1ibXbPyJBZ8yTmjiaf3nDsoMDIUxHkE5RJHMQsH5iJ5V0Nn82auxXl1aZJE8ZAkOJGgWGiwJi1KCxkEJkOs2W5Rx105+z7dU1ugYcX2I28S5F2Sl8lwwOYjtU0PCTo9cmCwlce4bcCTud1yWI+cwTZwaN28QV9k5yhM7LW48mTBeFNLAimp5E7lhlbq97SIRqkDcJ97zd+YNrNgyQ1NWW+nsZFAIti39BNFapCp8/bsAFQrG5y0yNkVyoKtGNOpiZ1ecF+2iWcuap2Dj6NDlJ8b9rr4+HoXXHUUry/7Hu4jesz+OxFf4OA5vuXQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hUTfeJBv2PsoDPUeHTGIRl0vzv6SecbVWj6TOPuNzrc=;
- b=lWYl05ho7GSmBfP9ko1BR03JvoERcpdbN/AcbCr8WLWPrDUtwqxnC8JjtsPRtIZaERoZiZkMBNvsTQ3r8lEQTFY123GQBo8cGTcK9Kc/+sGPjglTlydR0BkMfa2nPS1plRrkBOCnR1ARbve59EPWUfrUevzwBpYa7GMNJG5Kru9++m9keKl3fcxMWkjr49StfV9Ilg3PrtcBvEKqQN4F1W14H00+pDsKTqMvl8j+URT7bdNOCKkzBs/RW+eZ04iPP9e8i3GGrlg34LI0+bM4imEayFfeEVhtVJEFEcqjz3Uc97Gs/oWwuIUy0lKirz7jVZYsCgohyrG4did9GiF2VA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hUTfeJBv2PsoDPUeHTGIRl0vzv6SecbVWj6TOPuNzrc=;
- b=UteIjJb+nodnJIRIJDUvHf2//toi7Tv05XOKyKtcH406PCr1M72xA2XiK+fSxKU9mJRFyLLPRI7edWTkxyRuJhbd+6K6y2mr6FpF2EkeOeyrLd1AHY6floOc1a+ECX1JmZPLzRrJNC9/g6ZnMVT147+zLXL/rPHttLX9FI0GQxU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from LV3PR12MB9213.namprd12.prod.outlook.com (2603:10b6:408:1a6::20)
- by DS7PR12MB8420.namprd12.prod.outlook.com (2603:10b6:8:e9::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7741.36; Tue, 9 Jul
- 2024 00:45:40 +0000
-Received: from LV3PR12MB9213.namprd12.prod.outlook.com
- ([fe80::dcd3:4b39:8a3a:869a]) by LV3PR12MB9213.namprd12.prod.outlook.com
- ([fe80::dcd3:4b39:8a3a:869a%4]) with mapi id 15.20.7741.033; Tue, 9 Jul 2024
- 00:45:40 +0000
-Message-ID: <ad7b3e48-2e61-476f-8fea-28424f46d306@amd.com>
-Date: Tue, 9 Jul 2024 10:45:27 +1000
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH v2 07/18] spdm: Introduce library to authenticate devices
-Content-Language: en-US
-To: Lukas Wunner <lukas@wunner.de>
-Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- Bjorn Helgaas <helgaas@kernel.org>, David Howells <dhowells@redhat.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>,
- David Woodhouse <dwmw2@infradead.org>,
- James Bottomley <James.Bottomley@hansenpartnership.com>,
- linux-pci@vger.kernel.org, linux-cxl@vger.kernel.org,
- linux-coco@lists.linux.dev, keyrings@vger.kernel.org,
- linux-crypto@vger.kernel.org, linuxarm@huawei.com,
- David Box <david.e.box@intel.com>, Dan Williams <dan.j.williams@intel.com>,
- "Li, Ming" <ming4.li@intel.com>,
- Ilpo Jarvinen <ilpo.jarvinen@linux.intel.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- Wilfred Mallawa <wilfred.mallawa@wdc.com>,
- Damien Le Moal <dlemoal@kernel.org>, Dhaval Giani <dhaval.giani@amd.com>,
- Gobikrishna Dhanuskodi <gdhanuskodi@nvidia.com>,
- Jason Gunthorpe <jgg@nvidia.com>, Peter Gonda <pgonda@google.com>,
- Jerome Glisse <jglisse@google.com>, Sean Christopherson <seanjc@google.com>,
- Alexander Graf <graf@amazon.com>, Samuel Ortiz <sameo@rivosinc.com>,
- Eric Biggers <ebiggers@google.com>, Stefan Berger <stefanb@linux.ibm.com>
-References: <cover.1719771133.git.lukas@wunner.de>
- <bbbea6e1b7d27463243a0fcb871ad2953312fe3a.1719771133.git.lukas@wunner.de>
- <26715537-5dc4-46c1-bdcd-c760696dd418@amd.com> <Zovha33CS76PwAMF@wunner.de>
-From: Alexey Kardashevskiy <aik@amd.com>
-In-Reply-To: <Zovha33CS76PwAMF@wunner.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SY5P282CA0108.AUSP282.PROD.OUTLOOK.COM
- (2603:10c6:10:20b::14) To LV3PR12MB9213.namprd12.prod.outlook.com
- (2603:10b6:408:1a6::20)
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="KN/jvw/U"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C6D6C116B1;
+	Tue,  9 Jul 2024 02:18:05 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="KN/jvw/U"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1720491483;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SG/nhRJ5sb1lI6oh+MAWi0fczWmHK6PqjjxjYpcpOV4=;
+	b=KN/jvw/Uc89zg8Kt77Xfog7E285Xcl2tdf9W0YRz3BOiCS3+imXctZmnwPAmIUpCSBfK6e
+	n6mdgXUPFPORrbaOWCG/Hcm8MvCU+4PyDTyIZ80b4goZ00TRfM4l+fBEvYkg6/BiYID8rE
+	ad8gUp/6uXjU8SeH0RZVPZgBm3p2y6o=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 2946a661 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Tue, 9 Jul 2024 02:18:03 +0000 (UTC)
+Date: Tue, 9 Jul 2024 04:17:56 +0200
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+	linux-kernel@vger.kernel.org, patches@lists.linux.dev,
+	tglx@linutronix.de, linux-crypto@vger.kernel.org,
+	linux-api@vger.kernel.org, x86@kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+	Carlos O'Donell <carlos@redhat.com>,
+	Florian Weimer <fweimer@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
+	Jann Horn <jannh@google.com>,
+	Christian Brauner <brauner@kernel.org>,
+	David Hildenbrand <dhildenb@redhat.com>, linux-mm@kvack.org
+Subject: Re: [PATCH v21 1/4] mm: add VM_DROPPABLE for designating always
+ lazily freeable mappings
+Message-ID: <Zoyd1DYuD7cmJbgx@zx2c4.com>
+References: <1583c837-a4d5-4a8a-9c1d-2c64548cd199@redhat.com>
+ <CAHk-=wjs-9DVeoc430BDOv+dkpDkdVvkEsSJxNVZ+sO51H1dJA@mail.gmail.com>
+ <e2f104ac-b6d9-4583-b999-8f975c60d469@redhat.com>
+ <CAHk-=wibRRHVH5D4XvX1maQDCT-o4JLkANXHMoZoWdn=tN0TLA@mail.gmail.com>
+ <6705c6c8-8b6a-4d03-ae0f-aa83442ec0ab@redhat.com>
+ <CAHk-=wi=XvCZ9r897LjEb4ZarLzLtKN1p+Fyig+F2fmQDF8GSA@mail.gmail.com>
+ <7439da2e-4a60-4643-9804-17e99ce6e312@redhat.com>
+ <Zovv4lzM38EHtnms@zx2c4.com>
+ <Zov6SZZCKrqmigua@zx2c4.com>
+ <75d6c45d-deea-464d-b0fd-b36e5d73b898@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV3PR12MB9213:EE_|DS7PR12MB8420:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7ea6bc1a-6da3-4e26-d3c3-08dc9fb074ba
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|366016|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?ZGNLRHZMUW16RndqVm9xdWk1YVZSdHk5c2ppT2hrb28zUWN6Q3dwOFlleEpp?=
- =?utf-8?B?VGdHSGNNODYzZzJHSzhocFlwWSsrTXZhc2I1S2pHUk12cWozZG02ZDVTTk1q?=
- =?utf-8?B?T3pNOFc5S1NVRmw3VG1jaXZoN3owSU9vb1Bzc2dFeFhwdzNOVHlBTURpdHE1?=
- =?utf-8?B?Q0lIMzVxRzJCSTl3Umtib0JMZEhUNFBRM2QwRjBnTXpLcVpSVkNlalk0NFFT?=
- =?utf-8?B?eEN1c0szdUkvL3g2MWUxQ2FhejJhZUd2M3MrSVVONjdCL0tjTWx5dDVWOE0v?=
- =?utf-8?B?VTNRODVnK3JQRE5LUlFGckQvc1o0YVZCcW9EWEtEZ1pROE9SK1J6aDFLWE5n?=
- =?utf-8?B?dVRnc21ta3lzWTE4dFhrZXFnK1EyNjV3MkxEU1BrODAxY0lIN055S3pkNTEz?=
- =?utf-8?B?ejc3bWZRWllreldkcGN1NTRWcWxBT210cTNtZEdXVk1QeThrVUJ0QlV3ZjRF?=
- =?utf-8?B?aTFDZ1J1cW1TVE5BakI2NDFRT0YvNnJtelplYkNZbDNmT09RQ05KeUdYR25B?=
- =?utf-8?B?eUtpWXFCTmtGRk1OVm8wc0JGNllOV0MvQUtVU2x6TE1Gd09xRkFVRVVGSXNm?=
- =?utf-8?B?Mkh4TlZFa05CalFxaHN3VWtscFpnbklidGZ6RWhmODVYa2QyczFYRkNQdmxM?=
- =?utf-8?B?V3JoalkzcFVVUngvUzYzNk1IcUgwQnpkQTRrRHhjcFZsMkFWcUZVQXBPSFNO?=
- =?utf-8?B?RWZTYUdIeU9GcGx6a1MrNmc0YmJLMTU4OG9TbU9EOEhzeXN6T0hGMmJBVFNx?=
- =?utf-8?B?dTBVa2RNNFBqV1VVNDBIN091cURreENWTWFVajZEb2xPQ29YbGFCcStFbGR1?=
- =?utf-8?B?ZEtzcjUxQ2YyeHZJZ3hKK0ZBaEVnWmQxUUptSGYwaXNZWldZMmhJbEhUT0lK?=
- =?utf-8?B?TStLR1Q5aUJnNVFheXVSM0crT0dXbTRSY3lvL3NSeEFNUmhqQ2lKZTR1MzJM?=
- =?utf-8?B?N0s1Vy9hNFBydG92Q3RSOU5DU2NwR3hNNUxndlRaVWpENWEvTUhySWNneEhp?=
- =?utf-8?B?M2c2d21oaDZuMXZ5OEJuMmZQUFRCQVh0V0QrcENsSlVmT2IxQkdOVU5mVC83?=
- =?utf-8?B?OXV5WEhiSFlWZTEzOFl3d1NrWG5VMTF4bVdKUlBvZmNQS3plYkFHbmowT3Nr?=
- =?utf-8?B?MFcxdkVlNzc4cGFlNm5FaFlyWVV0MmlhclpMZkhYWDJzNnY0K3crQThqOCs1?=
- =?utf-8?B?RjNLcXVXanp5dzRidytQaEJkRzVSd3JlbXJYRVZVcUVqTnRxSllvSW12dzlX?=
- =?utf-8?B?eCtQbkJFU2w5WXcwRU00a0FXcFdCWkw1VUV2SWs1cWZSUTd4RzZNR3plMlpt?=
- =?utf-8?B?VXliSHNPYkp2WkhITU5WRTEzazRzY1JZL3cvMmEvSHJFOEtkbzh2YXU0eDFT?=
- =?utf-8?B?MmQ0cWJRTHhyeTh4Tm01NWp4YTkrQmdWengyS0ZVZTVhMURrUEJuQkVZZ0xC?=
- =?utf-8?B?VU5IZSsvdWVjN2hhWHhuV3pINGFEOU5JeXM2OTcvUDBmeHhLZEFXdE1LdTZs?=
- =?utf-8?B?NGZmeW9neDdYQVRYQU56MzBwRU9Kc3ozUkxKaGxqYm9qb1hQR2Rza2R1clRC?=
- =?utf-8?B?dmgxc2g4UVQ0UzlXSFBVWkhDMGRzUjJCL1NUaWN4ODJuaEJhY05qVGJtZG9p?=
- =?utf-8?B?VkRMWkkwU21tM2RrM2JTQ0EyeUNGWlNpNU9HWUxLc1RKQjVvYmg4Y2dSS2NZ?=
- =?utf-8?B?ZWw0QUp1RDZqbWIxNGhrWDh1VHRqSmVlYndvYVJHUjF5THZzdlFmWkUrUDFi?=
- =?utf-8?Q?AeEvQf6qrFnLQgchj04uE5tJL+l6/yYC9yKBOTx?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR12MB9213.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(366016)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?a2xqUDFiZk5GZHdXbVdIMERuVGpNc1JUWXFKVkZ2RFVNK0JNbDlLUmY4U0Z1?=
- =?utf-8?B?NnhQamh3eTRwNWc3ZmJZT0VtR3d4T3NwdEk1bVVOUmx0RmFoaldWRXVnRmVS?=
- =?utf-8?B?S0RZSU1ldVladWxhK0hzKzNEUEtTZ2M1MGp2Q0ZQK0pja3JQbnd6UEJvVU1q?=
- =?utf-8?B?c25wMk5peEt5OExMR080bzhSZEQ5SzdrV2gyaE9VY2JvdjVMUTVTUVVwR3Ir?=
- =?utf-8?B?bGtnVGE0V2VCamc3eXM1dUVWVFU3aEQwYThjejNpWmxiMG1KaWhLc1hwQjg0?=
- =?utf-8?B?dGNqUFkwT2ttYUlVSmhrdnl5RUF6S1RFeVhkK3JnMjFOQ3l0SEF2YnBrSUZq?=
- =?utf-8?B?L2d2cWREbEF6ZTRnYy9CTmZqczUrQVY3ZUVnNldUczhlWFZ6ZXVVU3NoRWhZ?=
- =?utf-8?B?V21UWEZjMWtTdERlQkJBQUVmcFhBR2VSODRKcDEyZ0lkVXZPRVgwWHFvRXM4?=
- =?utf-8?B?d0lUSXhsU1RJQkM5VEI0Y0ZGZWl4anlxc2F4MlcyTkNHSlZEM1FiQmRZdmlT?=
- =?utf-8?B?dm1laXpJN2NWa3IvZkhtNXdHZHNPTmw1czYrTmlIYUMwcXlpSFJQTGZZb3dZ?=
- =?utf-8?B?RkRQdm1pMkdnMzc3cCtLVm93cThZNDZFa0FUZHFxUG9JTHhlTWxRMExHaEt5?=
- =?utf-8?B?Ty91dmh3STI4WGIzeHZRcDFNbWtSMEtsM1hCWWZCQzA0OUMwaEdqS1Y5Tmla?=
- =?utf-8?B?YWJKZ0ZXUWVHSWtGWVI2L0VyZXowV3NLNjBIMzYzdElSQ3E2a1Q5R2hoNGxp?=
- =?utf-8?B?OTdDSnVaend2ZkYxK0RSRzBjeFc3L1RBL3FHb3orMjVUd0tlYWxvNmtRME9p?=
- =?utf-8?B?YjFKb3c3TVpOZGNyd0kvWGdVYzJKYjd4bTJmZHhNVGp6cDlzbC9SZWp5RDFm?=
- =?utf-8?B?SHZKZWNMT3lyZkhEYjF3aVV5ZTFTMTZvUzk3ZXcvKzNTR0JYbi9JeUgra0hC?=
- =?utf-8?B?TmoxY2NNbjJBV0tHS2dnckZlNk9pOXdnSmJsZWhSa1JtbVA3TEYxS3BncjBL?=
- =?utf-8?B?TWRDSkZKT0h0RGg3dDZBSlg0b2lITHcrMGRNZUtsVDZnMmJkOWxTb2xxZUxk?=
- =?utf-8?B?ckRydjA2NUN2TGlKalp6UzFCNG56ckdrSDk3YVRYdDdkeG9vVHROWkpHZHVs?=
- =?utf-8?B?a2FyMGNNK0FjNVo0bXFCQmJWV1B3TDlZeldpb2FzYTUwbERSZ1piUnBZVXd0?=
- =?utf-8?B?ZnhvYytKdzZRaUdJemo1RThDKzlTeE9WQVVzN094OFhuNHVGaGlGcHJ3aDhN?=
- =?utf-8?B?a3BFbmlFY0M4bDVBdUhDODc0WFVydFNobXZzbU5SNlVSRDBUNjRYZVdxanU5?=
- =?utf-8?B?VTlBN1dYNUZsZHlJM2lvdTdJRU8xdXVVQmdPdTBTR0NvQUxhSGR1MEtRaElz?=
- =?utf-8?B?aWFHZThnSk5jcWZ0NzRDMW53VkdFYkJ1Q3ZqM200R2dwTXRtZUFVTGg5b2M4?=
- =?utf-8?B?RjJRUG9UYUFGV0VOVXdWVHhsVTI3cmxzOVVGWE13b2NkRjlhZ2NQWFVzZmU3?=
- =?utf-8?B?VTAyc2hOY1pNN3h0Z1JTbG9RdTA1U0VObTdmOVNZdXY4cEFXUyt2ZnhoaVBm?=
- =?utf-8?B?SmVFRHIyRVBmQ09NUTB3dTlIUVBqdGh1OVlXMFNhei9mN1UybndqZWl1cjhi?=
- =?utf-8?B?cmJMeHdEVlJQdENYY1Zycko5dlArUHBVR0ZWNUc4eUZ4RkcyTWxWZXFWdGdZ?=
- =?utf-8?B?WWwrQUkzRVIyd1lYRWNsbVBNUVpRSjJPa2J0Rlc2UWwyN0VtVUc3U0RXUm9P?=
- =?utf-8?B?cUs4TGducmV1Um5lL2JEeXF1d2VYOFV6QzBLNUx0VkVFcllKR0x0ZzRtUDNZ?=
- =?utf-8?B?UzMrZGpnaUJFR3pua2JhNkNZemZBOEVSLzlreVdPa0lTVE94R0xkcXkzSFF1?=
- =?utf-8?B?OElqcGhJbm5CenNhRlpYemhNRmYzYm5hc1kwaGR4K3Noa1kzUWxVQ3NadnF6?=
- =?utf-8?B?Z0pyQWd3WGRQYlFUTXUzeWVMRmp1QTZiVC9QbnhJZWhYL2dJeEI0ZVFWa1RL?=
- =?utf-8?B?N0hVRmowNElkdW5DZjd6TTFBbDBZNGZUV1p1dWVKcy9GdFFYeVFFZ0JlZWRI?=
- =?utf-8?B?MW81QUFFRVEvR2hXeHhZd1J1MDJvV1kwbXc3UklrUGorSkFuMzFqbmNoM2JP?=
- =?utf-8?Q?s3JO7VTv56xyN5hxCziOIqHL8?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7ea6bc1a-6da3-4e26-d3c3-08dc9fb074ba
-X-MS-Exchange-CrossTenant-AuthSource: LV3PR12MB9213.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jul 2024 00:45:40.4318
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: OQdoAJXpF0A+Qq0uZcSshjvhBtLQieNq/6YlFcrxU2dkLgsfiQgUs/vWTmAJbCf1sL7S8HAmtyj504dxwBFQug==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB8420
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <75d6c45d-deea-464d-b0fd-b36e5d73b898@redhat.com>
 
+Hi David,
 
-
-On 8/7/24 22:54, Lukas Wunner wrote:
-> On Mon, Jul 08, 2024 at 07:57:02PM +1000, Alexey Kardashevskiy wrote:
->>> +	rc = spdm_exchange(spdm_state, req, req_sz, rsp, rsp_sz);
->>
->> rsp_sz is 36 bytes here. And spdm_exchange() cannot return more than 36
->> because this is how pci_doe() works...
->>
->>> +	if (rc < 0)
->>> +		return rc;
->>> +
->>> +	length = rc;
->>> +	if (length < sizeof(*rsp) ||
->>> +	    length < sizeof(*rsp) + rsp->param1 * sizeof(*req_alg_struct)) {
->>> +		dev_err(spdm_state->dev, "Truncated algorithms response\n");
->>
->> ... but here you expect more than 36 as realistically rsp->param1 > 0.
->> How was this tested and what do I miss here?
+On Mon, Jul 08, 2024 at 10:21:09PM +0200, David Hildenbrand wrote:
+> BTW, I was just trying to understand how MADV_FREE + MAP_DROPPABLE would 
+> behave without any swap space around.
 > 
-> I assume you tested this patch set against a libspdm responder
-> and got a "Truncated algorithms response" error.
+> Did you experiment with that?
 
-It is against a device with libspdm in its firmware, likely to be older 
-than 3.1.0.
+You mean on a system without any swap configured? That's actually my
+primary test environment for this. It behaves as expected: when ram
+fills up and the scanner is trying to reclaim what it can,
+folio_test_swapbacked(folio) is false, and the memory gets freed. After,
+reads fault in a zero page. So it's working as expected.
 
-> The short answer is, it's a bug in libspdm and the issue should
-> go away once you update libspdm to version 3.1.0 or newer.
-
-Easier to hack lib/spdm/req-authenticate.c just to see how far I can get 
-with my device, now it is "Malformed certificate at slot 0 offset 0". It 
-is just a bit inconvenient that CMA is not a module and requires the 
-system reboot after every change.
-
-> If you need to stay at an older version, consider cherry-picking
-> libspdm commits 941f0ae0d24e ("libspdm_rsp_algorithms: fixup spec
-> conformance") and 065fb17b74c7 ("responder: negotiate algorithms
-> conformance").
-> 
-> The bug was found and fixed by Wilfred Mallawa when testing the
-> in-kernel SPDM implementation against libspdm:
-> 
-> https://github.com/l1k/linux/issues/3
-> https://github.com/DMTF/libspdm/pull/2341
-> https://github.com/DMTF/libspdm/issues/2344
-> https://github.com/DMTF/libspdm/pull/2353
-> 
-> Problem is, most SPDM-enabled products right now are based on
-> libspdm (the DMTF reference implementation) and thus are bug-by-bug
-> compatible.  However such a software monoculture is dangerous and
-> having a from-scratch kernel implementation has already proven useful
-> to identify issues like this which otherwise wouldn't have been noticed.
-
-True and a bit hilarious :)
-
-> The in-kernel SPDM implementation currently doesn't send any
-> ReqAlgStructs and per the spec, the responder isn't supposed to
-> send any RespAlgStructs which the requester didn't ask for.
-> Yet libspdm always sent a hardcoded array of RespAlgStructs.
-
-Uff, I see. So it should probably be "Malformed algorithms response" 
-(where param1 is actually checked) than "Truncated algorithms response", 
-a minor detail though. Thanks for the explanation.
-
-> So the *reference* implementation wasn't conforming to the spec. :(
-> 
-> Thanks,
-> 
-> Lukas
-
--- 
-Alexey
-
+Jason
