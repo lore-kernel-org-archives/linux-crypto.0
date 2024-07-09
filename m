@@ -1,193 +1,308 @@
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2088.outbound.protection.outlook.com [40.107.20.88])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20EDE12D210;
-	Tue,  9 Jul 2024 10:44:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.20.88
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720521859; cv=fail; b=QKYIXfd8oRwOF8U7rxRjpy5Az9uwsUS/PwZgczTclNM5kMJlTz9voYQJy4mMM/CQPjsZO50KjM2FGz7WLEVtrcRTB26H/M5iHyPKmR3FnQTwcqISd9QzoWP91RaFeEkktA9OhCJhi6CWlLLXOoBlm7Jr2Xlv1CxJ6H1SB48EIc4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720521859; c=relaxed/simple;
-	bh=BTGSdDcc5/vV3uBn7BceCKmRru4V/23VMMEGwIh5kUw=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=AIS4EChTvO5+QhwT4/YBa7FaQ6LHC56VWBA/47TdZ6Les5V0q0ZUaHH2wku3+2NZ0+aYERHXr5d9r92ksOa4o0tm2X5jEtvBeEc5AyMYAjP/4NJc7hIURT8fXgEwGrWyCWtBbztGN1LALIO00h5BTkcgEplceIqkr8m6xWVb5mU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=cxUnBl5P; arc=fail smtp.client-ip=40.107.20.88
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9A92158D83;
+	Tue,  9 Jul 2024 13:05:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1720530342; cv=none; b=PUqQ1XtLIRz2witLdxAqq4BmAfptHH7tZnSSivpFyw7xnsgXvWdpx2ZVen4o7jllK4pmN5ZnV4hk5Xquig2FS9tkDZslGYlazg+jkRQNXRcBqitd3kZx9lP5upYbrF2dlfEL4E2RQYb3wuABVn7NQKTnkGWKQuPHEQMd9A8VNqk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1720530342; c=relaxed/simple;
+	bh=ARrsQLAg/ASkIVBcIlLW0uP1cAwwTUaOptxcyYVIGzk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GJzpTh+pzeBdMWATTnJXyBE/wdXQ+ltiihHGlGQKJfRFO0uQ5ei2cp0iDxPLhy2kC697MFSrt0UIa+dwGWYjve8Ecy99ggdcDeWAwoNtlDcn7Y2DIxkRyokj9o4leKGyZddnry6dIeYf9RWO+9NEgMAY//96+YoMjigrjBIwQx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=mTflRnaH; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="cxUnBl5P"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dpFiHqVwpGfrrijFe+J35CAPaT7ph+OcCQDw4SsDhw+V0F/qEism+nT6p4eNUUv9+meK6alUKc8gOha2PJ97W6TDJ6J3eiSInz0gQVqgwJ70v1/XnurQmBpChITx4hdlUroOSoTbnh5v5dIresixp1WYcsXN6Ze4ZBmDC+2yRo3aa8bS5uJLEHQ5SloV8DcGXYUv3K8VnGy7l/UUsHVbK2jKqI9Rwtv+91Xq7JspjEcJ36y57bRd5Nvlhxie2BfkidF7HqDnzYo8afPcpNmb3KCnAjwl7L9Spz2bNWxqR0Ni7Zx5ELFrUXPyTxah9ay/o9SIscgvg1Osfw11l/fyzQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BTGSdDcc5/vV3uBn7BceCKmRru4V/23VMMEGwIh5kUw=;
- b=iSMGpg6MuUQdU6m1yqwqKuHJC2gDb8SRhBu92RolU121gemEsstRe6gLAByntTrwQOoXREkPjcLPpQihGcHAbVQejtZE2lSGPzcURo5D+lzj/IIIcbaMsDfR8V+mm6NP+6fM1HTLKKtXrtn9fQ/fF8XZVGTvNwfUY/FDz5nRnqzZ37kYWmkRgLSk1/nsL611OYuCf85Aras3M24ab+7Cuqse3fCY4RJdrULzCmNjqqvsD6WKsVf0LcZ8Fum0w0VuxrugRcmO2AXFZMm8oAi4D2bLFod2X4pINfNh2eBKuBNzwP6bu1QKrzsE/adgwWsJS4N8SRSovhweQ1WXW4Lb5w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BTGSdDcc5/vV3uBn7BceCKmRru4V/23VMMEGwIh5kUw=;
- b=cxUnBl5PpQbklh/30BS2LhqLegMaxQ9TXC2YbYaDuCwkn/4iHp8BLBoRWkvOs7L2ucUWxXziH6dJuhK9+a1R3RMfm9KosgVgL1Qg85OvhtHR4UOGVVjcgdsxQzSzSB63342gugZ35CP5f7KuGgjF3iEVF5J2YbPxhiI49Y5CpOk=
-Received: from PA4PR04MB9709.eurprd04.prod.outlook.com (2603:10a6:102:26b::10)
- by AM0PR04MB6929.eurprd04.prod.outlook.com (2603:10a6:208:181::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7741.35; Tue, 9 Jul
- 2024 10:44:14 +0000
-Received: from PA4PR04MB9709.eurprd04.prod.outlook.com
- ([fe80::1009:ebb:d7ae:4628]) by PA4PR04MB9709.eurprd04.prod.outlook.com
- ([fe80::1009:ebb:d7ae:4628%2]) with mapi id 15.20.7741.033; Tue, 9 Jul 2024
- 10:44:14 +0000
-From: Horia Geanta <horia.geanta@nxp.com>
-To: Breno Leitao <leitao@debian.org>
-CC: "kuba@kernel.org" <kuba@kernel.org>, Pankaj Gupta <pankaj.gupta@nxp.com>,
-	Gaurav Jain <gaurav.jain@nxp.com>, "linux-crypto@vger.kernel.org"
-	<linux-crypto@vger.kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>, "horms@kernel.org"
-	<horms@kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, kernel test
- robot <lkp@intel.com>
-Subject: Re: [PATCH net-next v3 1/4] crypto: caam: Avoid unused
- imx8m_machine_match variable
-Thread-Topic: [PATCH net-next v3 1/4] crypto: caam: Avoid unused
- imx8m_machine_match variable
-Thread-Index: AQHazsO65NR3H4r1AU+O2bj4SR9fDbHstqmAgAGFr4A=
-Date: Tue, 9 Jul 2024 10:44:13 +0000
-Message-ID: <a3740986-cfc5-4d92-ae2d-0ce5a06ac009@nxp.com>
-References: <20240702185557.3699991-1-leitao@debian.org>
- <20240702185557.3699991-2-leitao@debian.org>
- <ffcb4e2a-22f2-4ce2-a2cd-ad05763c91f4@nxp.com> <ZovNme6LSqxdYpS4@gmail.com>
-In-Reply-To: <ZovNme6LSqxdYpS4@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Mozilla Thunderbird
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PA4PR04MB9709:EE_|AM0PR04MB6929:EE_
-x-ms-office365-filtering-correlation-id: 13301cd6-46fa-44a8-afed-08dca0041317
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?MDlJMmVwYnU4Qm5pNGlwNVArL3NFOWJJWXFQTTdzQVRHbXlwL2liU3RIT3o4?=
- =?utf-8?B?aG5xVysvZ2ZjaC9iL0pEc2NGNlpiWWJNR3lSWEJWMVlkNS9Gc2UzOFRwZWFs?=
- =?utf-8?B?TFhidG56ZXUzemg1blJ6aW96cGhSMElZbkhHang5QUd1c2dLQXMvWTR3NTlx?=
- =?utf-8?B?ZXQ1TmNyZVczc2dlYXlkOGp6Wjc1YzdIRmtZVGp5YkVhZURXTFR5SkZQSitK?=
- =?utf-8?B?UjBBZU8rRzlVTllKV0s2TGZ2Wm80TitzaDhGU3dJYzR1VzloVjR5Y3JmV3dr?=
- =?utf-8?B?QVlOMEJRVCtxQXBNWVNGZXpPd2loeFRYZzlVNyt5RG4xVVB5ZWFiRUdGUEVM?=
- =?utf-8?B?ZHZLazcwMGlYaWNNKzlrMGNWdmxteEttcExYWlkzWmpnY0w2RzNkN0oybHNP?=
- =?utf-8?B?ZlpFWUNtL3I0eUdVMExvNVFvNzZBc3U5c3I3VkpkVWwxM3doYnBzM1RMUitm?=
- =?utf-8?B?OWVsU2g5OVRuYm1LUmt4bUQxMW5WOHdKRFR3SFRaeHVlTzluYzNod1JXTksv?=
- =?utf-8?B?aXNvREJOVXhEVFNkMEhBTytoVFEyM0JGRlNLa3VhUGdqdkFTdmtLdjZqSWxv?=
- =?utf-8?B?M2hjU2V2dDRMaGt6dW5NRjEyVldDODVvT1MvM0dlSjliV3k0K0pCTFoyYlE5?=
- =?utf-8?B?NVhHYW9XNktaYU41NTNpWE9SYWRqanFJeGlGdXhrNkxLcUJKdm1yQWVQcGF1?=
- =?utf-8?B?RUsveHFpbTRSM29ieFpiQis0ZmJ4VWxGTzZVaC80c2U2Q3N0SzJrTWlBRVlj?=
- =?utf-8?B?VVBuMUlSS2x3OTROSTBwQ2I5Nks1SUpUT0ZBVytPN285UjJ4WDloSlRZQWpi?=
- =?utf-8?B?ejFvSjdaVllFcVhIQzNDYVZxSnNoOEQ0NFBXV040K2FSb2tDSWhDcFZJUnJG?=
- =?utf-8?B?OUIvUmsvT3NDOW0xQVJCRVR3RzdocGszT3k3cEd3dEtjWUs0UjZyZi93SmdF?=
- =?utf-8?B?WDZRYmdWWFZid2llTHNrUTVWbW55OU5tVGtoR3RpcHB0eE9pQmZQa3VTdXpa?=
- =?utf-8?B?K0xXc1ExTVQ5dExRR0c2WFp3eWZSUERMMXM3Ky82UjZ3YlhlVkdKTS8zbGhi?=
- =?utf-8?B?ZC9uWm9aY2xibXBKWWNuVGZuMysydTN0dG9aYXhZdUxwQWpHYWx6Q054V0pT?=
- =?utf-8?B?QmROS1JtclkzWE1ENnoxRTRVbnhNQTdSMWFXS1NXcjN2cDJ2UXpnK1hPNEh5?=
- =?utf-8?B?cmhnMWFCaWpRWHNCMFN6YzVKSmltZFdmT2ZGM20wOHJDNUtuYU1mNCtnY1ll?=
- =?utf-8?B?VTlvTWhnMzVMSk5admxSNnFURldDb3pyVXNoUktIY0JjanJtR0p6U2dWNTEx?=
- =?utf-8?B?UXcxL1JLZWR1UmxEeTI0emdmcy9Kb3ZPQUs4Rm1GQm8xYWRmbldpaTV4MjdH?=
- =?utf-8?B?cTUwRUlCT2xFa0htK2Jqa29MRUFIaXVwSEpzY0YvWGJHYWFBSmRwcGFFVXQ3?=
- =?utf-8?B?NklxWjRsb1V3WjI2WjhZbzJxY2ZJY2JhYy9TYS9sd0hTTjVjU0VTVmMyK1Bh?=
- =?utf-8?B?KzVjTGk4UmNLYzdEaU1jMnZjU0JhMDR4N2dyRCtXbTdhdnRNSXpkRFVUb0ho?=
- =?utf-8?B?S2ZCU2VxcFRQVk1EdEhieDh0c25kbnBhaEMyNGgrUHBCWjFNRkJCNDM4NjBz?=
- =?utf-8?B?a1drbCtQUnlqYzNLS2RCdXRUWGU2Q0ZXYzh6L0xkaGUzMWhzWFNMZ0crOXB0?=
- =?utf-8?B?NGpUYVpYMVVGUGxRdGU2R01ZWDJQV1lzSndJZDM0Z1l1WmtUQkJjMjErYytB?=
- =?utf-8?B?aVp1U2NZV3laNTJZeWF1QjVNcGVFUnpFN3hZZjNpeS9nZmY2SERRaE4zczlD?=
- =?utf-8?Q?rWhwdP3LuaXEkRHSa4EJDUEnpGzF+ax3snaBA=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA4PR04MB9709.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?RFpHRzhCbFlBNkdwWWZ0WGRMVlMyUmU1WkF2WDE3bStjK1FGdmlUWTNJL09k?=
- =?utf-8?B?NnFDaW9XcmIvZkpHdkJid25SZ2FZQUJjcUVVZ1Q5cFl6Njk5TDVNYjMwaVlO?=
- =?utf-8?B?a0tRdHh6TVIzNFp6Q1FUdzFIazZPTzlqK1phckdCYkFtYzZOYWhYUGVqUFRV?=
- =?utf-8?B?enIzeTA3TlVvUHI3eVZkTjVSVnJ1WTVjZlQyeHBod3p6TjdCYS9USUdXZGVy?=
- =?utf-8?B?WDh5ZDZyMUhsMExoMXdpMzhDSk40TDVUUGZscy83emhESElyZDQvQnArT3I5?=
- =?utf-8?B?dG9pRzd6WlFiUGV4SDF5NVI3K0htRjAyV3Irdy8xRFozTElXMHVPZWVhNjJS?=
- =?utf-8?B?eFZrdVdWcTROR2dQcDh4UXZUTWl5SzI1OW5WZCtEK0N6NklsUmR5cTZ2S0dF?=
- =?utf-8?B?K2RBLzdYTXd4NjB0NTdlRWgyQWo2M3p1SzVHa0NjNERtSzBKRlkvRmNhZUFI?=
- =?utf-8?B?K0VJOTFjZXNGbGh4SHBHdWZSamIzbjVVZVVkMUJ2K1RCNjdHS2tOOGZobnR2?=
- =?utf-8?B?d1oyVXZmR2YwMTlxT0VSYk9pK2FzcVpJelZYV1ZGRzlSb2c4M2NnUGQ0eGdJ?=
- =?utf-8?B?WDlDcWZDK2dST05SUU44U3RCV1BWVHVFbmVIRzg5U3pJSC9XSFZwZnZ1WkFw?=
- =?utf-8?B?bjBrWmw2cW9PTldjOEQ0YUgyZlBLbEhPKytSTXpyUGxtZFBtNDY1SWVxSmRo?=
- =?utf-8?B?ZHlaNVZIZTY3cGlRQjIzcU5Zb1cvTkVvUkZtZ25GUzA1S2ZOK2FweDNZdkVj?=
- =?utf-8?B?M1ZYUHAvdW8vZXdDQUs1S1k5dFNMdktFYUkySWxuZjh1SUdzNlh0a0J4cU9L?=
- =?utf-8?B?WmhaSFN2c3dXdTFxNXI0d1RCSElTV3kybTRCRUJJRGNaZnZTbE13L0lHaHVq?=
- =?utf-8?B?QTZrT2U2WnRQVkhkK0hSc0UvMnZKRUVza24rSllCSW01Ni9XNm44aUUzckNW?=
- =?utf-8?B?WXlhaFJaMHdFUzlJU29ROUZRSXNtdXhpTEZiZTdYNVdHSi9XSU01c0tVY2x2?=
- =?utf-8?B?N3Q0Uk9PRlZLcWJIYnh2MkRRbVYxK1g5MFV2UW5TUCs3RSs3MEorL3F6Q0Rx?=
- =?utf-8?B?aUFPNDRIWk9GbWNobCs1aGo1enBxR0M1dzg5TXhyM2JHSHRCUStoV3F6dlpN?=
- =?utf-8?B?bFN4OUk4ZFBsRmFXVVBmOHZxcDVlUVJqekdrOWw2eDNoYUNDVDI2ZlFGQ2t2?=
- =?utf-8?B?ZjhhU1NOdUhXR2l2Q2F2ZVIrZGVMT1MydVJkTWQwQ2VOU0xkNlgzNkFFQ1E2?=
- =?utf-8?B?d01ueUxiUXhSM2NZeFhoZ2s3b1dhbFBXVGtCcExVZUxtc09XdkNXYWVEeFJ0?=
- =?utf-8?B?QkYvOXZPNHQzTjk0RE5HZEZ6K09nRWZXL29LY21Bdi8rd3lIMEI5eGdmS1Q2?=
- =?utf-8?B?cWJiQlJkeUNnZjJMMGhYcUsxTU5GblVhcWVNd0U2N2l4OUhxQlJsaEZ5QTM1?=
- =?utf-8?B?R05qanY3cmlpTFA5eDVGM2Njbm1nQ1N4YnFzYUVVOXdwV09ESWpDUHJvOFZG?=
- =?utf-8?B?VGFYb0tycW9jUnR5Z1RtaEVMWmZEeHBDK0RWV3Q0Y1NnQTJLeGxGbG5EYVo5?=
- =?utf-8?B?Rjk5RFRPcFZySzBDTzlwVU5TWmtpeXFxQWZGanJjekdCeHBER1p4OWMwcktj?=
- =?utf-8?B?b3B5dDZrOWRrVFo5Mm8rb1BFUENBSGc2TXN2RWxSdTZPSUlrTlFzMzBjN1BR?=
- =?utf-8?B?QVU0ZExQcDRTcVZMN0pFeVZvdjUyQ0xwUW02OXlGZDVaTHVYclpITkhsVTJC?=
- =?utf-8?B?ZG9pbEZ2cndSRWE1TnMveDFEWStKUEtTVHFCbmVhZk1VY1dKamdzWTVHMjZJ?=
- =?utf-8?B?c3Rsa3QyaGYyZFZLMmV1SG44aGkyRmlXYlNOUkVJSk96UXhzeWdaOGhrQ0Fj?=
- =?utf-8?B?Yy84Nm9KVjJYSmw5ZGtzS1YxVGdUVm5BbFV2UmRJTStSbUE5UlFVejU5U2dS?=
- =?utf-8?B?bkx2SnNqZGxnelcvQ3JRNjV1cWRmbG4waStTYmNqQzVQUUUrcHFObnlpUjVE?=
- =?utf-8?B?WXkwN0krcWRzM0FYNXNzeFpQV1NQWWVMajNOeTBhRGtrdnQwM0l4Vy81KzE4?=
- =?utf-8?B?c2F5UC9ZcDBSTWduYlpHRkIxcFNTRFZ5MFFLVEhaa0VGTXROdWNXWmxGMjFM?=
- =?utf-8?B?dmNUbDhXS0E5ZWV0aFVPcndzZ2N0dUU2em0wNkxjNTZRa21nQnJnTzdBUHA3?=
- =?utf-8?B?MlE9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <B165C3B6E3430844B84355F56896BE45@eurprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="mTflRnaH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B9FDC32786;
+	Tue,  9 Jul 2024 13:05:39 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="mTflRnaH"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1720530333;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=CvATs55KyorkIpNaw1Hrw39huAw0P4fvSkg+BxM7rl8=;
+	b=mTflRnaH520Mv1kFExF/lnB+uQg8mFx51PQQOYldIAWg2EHcNgmxAv20woo376R1ABpIlr
+	tzflCtMkl9uBqhErKrPRvEF0Gw1o6y9ZIvVH3aavRzsnhkmHI+6WHuP822KxWxU6a2dchG
+	7YKv4NyWRtIklE/ooQ2HS965d5T9ijQ=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 49ebf4af (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Tue, 9 Jul 2024 13:05:30 +0000 (UTC)
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: linux-kernel@vger.kernel.org,
+	patches@lists.linux.dev,
+	tglx@linutronix.de
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+	linux-crypto@vger.kernel.org,
+	linux-api@vger.kernel.org,
+	x86@kernel.org,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+	Carlos O'Donell <carlos@redhat.com>,
+	Florian Weimer <fweimer@redhat.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Jann Horn <jannh@google.com>,
+	Christian Brauner <brauner@kernel.org>,
+	David Hildenbrand <dhildenb@redhat.com>
+Subject: [PATCH v22 0/4] implement getrandom() in vDSO
+Date: Tue,  9 Jul 2024 15:05:08 +0200
+Message-ID: <20240709130513.98102-1-Jason@zx2c4.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PA4PR04MB9709.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 13301cd6-46fa-44a8-afed-08dca0041317
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Jul 2024 10:44:13.9895
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: SVbb6lNY9RjlN+oDaWGFhbj+FsADYDyByBHdXqRWCDqQOkikWL1J/XQTVnqDv96jDcnY7mntDBWohMKxPoWYHw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR04MB6929
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-T24gNy84LzIwMjQgMjoyOSBQTSwgQnJlbm8gTGVpdGFvIHdyb3RlOg0KPiBIZWxsbyBIb3JpYSwN
-Cj4gDQo+IE9uIEZyaSwgSnVsIDA1LCAyMDI0IGF0IDEwOjExOjQwQU0gKzAwMDAsIEhvcmlhIEdl
-YW50YSB3cm90ZToNCj4+IE9uIDcvMi8yMDI0IDk6NTYgUE0sIEJyZW5vIExlaXRhbyB3cm90ZToN
-Cj4gDQo+Pj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvY3J5cHRvL2NhYW0vY3RybC5jIGIvZHJpdmVy
-cy9jcnlwdG8vY2FhbS9jdHJsLmMNCj4+PiBpbmRleCBiZDQxOGRlYTU4NmQuLmQ0YjM5MTg0ZGJk
-YiAxMDA2NDQNCj4+PiAtLS0gYS9kcml2ZXJzL2NyeXB0by9jYWFtL2N0cmwuYw0KPj4+ICsrKyBi
-L2RyaXZlcnMvY3J5cHRvL2NhYW0vY3RybC5jDQo+Pj4gQEAgLTgwLDYgKzgwLDcgQEAgc3RhdGlj
-IHZvaWQgYnVpbGRfZGVpbnN0YW50aWF0aW9uX2Rlc2ModTMyICpkZXNjLCBpbnQgaGFuZGxlKQ0K
-Pj4+ICAJYXBwZW5kX2p1bXAoZGVzYywgSlVNUF9DTEFTU19DTEFTUzEgfCBKVU1QX1RZUEVfSEFM
-VCk7DQo+Pj4gIH0NCj4+PiAgDQo+Pj4gKyNpZmRlZiBDT05GSUdfT0YNCj4+PiAgc3RhdGljIGNv
-bnN0IHN0cnVjdCBvZl9kZXZpY2VfaWQgaW14OG1fbWFjaGluZV9tYXRjaFtdID0gew0KPj4+ICAJ
-eyAuY29tcGF0aWJsZSA9ICJmc2wsaW14OG1tIiwgfSwNCj4+PiAgCXsgLmNvbXBhdGlibGUgPSAi
-ZnNsLGlteDhtbiIsIH0sDQo+Pj4gQEAgLTg4LDYgKzg5LDcgQEAgc3RhdGljIGNvbnN0IHN0cnVj
-dCBvZl9kZXZpY2VfaWQgaW14OG1fbWFjaGluZV9tYXRjaFtdID0gew0KPj4+ICAJeyAuY29tcGF0
-aWJsZSA9ICJmc2wsaW14OHVscCIsIH0sDQo+Pj4gIAl7IH0NCj4+PiAgfTsNCj4+PiArI2VuZGlm
-DQo+IA0KPj4gU2hvdWxkbid0IHVzaW5nIF9fbWF5YmVfdW51c2VkIGluc3RlYWQgb2YgdGhlIGlm
-ZGVmZmVyeSBiZSBwcmVmZXJyZWQNCj4+IGluIHRoaXMgY2FzZT8NCj4gDQo+IFRoYXQgaXMgYW4g
-b3B0aW9uIGFzIHdlbGwuIE5vdCBzdXJlIGlmIGl0IG1ha2VzIGFueSBkaWZmZXJlbmNlLCB0aG8u
-DQo+IA0KSW4gZ2VuZXJhbCwgSSBwcmVmZXIgYXZvaWRpbmcgcHJlcHJvY2Vzc29yIGNvbmRpdGlv
-bmFscy4NClRoaXMgc2VlbXMgdG8gYmUgc3VnZ2VzdGVkIGFsc28gaGVyZToNCmh0dHBzOi8vd3d3
-Lmtlcm5lbC5vcmcvZG9jL2h0bWwvbGF0ZXN0L3Byb2Nlc3MvY29kaW5nLXN0eWxlLmh0bWwjY29u
-ZGl0aW9uYWwtY29tcGlsYXRpb24NCg0KPiBJZiB5b3UgcHJlZmVyIF9fbWF5YmVfdW51c2VkLCBJ
-IGFtIG1vcmUgdGhhbiBoYXBweSB0byBzZW5kIGEgZm9sbG93LXVwDQo+IHBhdGNoIHRvIGNvbnZl
-cnQgdGhlICNpZmRlZiB0byBfX21heWJlX3VudXNlZC4gVXAgdG8geW91Lg0KPiANCk5haCwgcGxl
-YXNlIGRvbid0IGJvdGhlci4NCg0KVGhhbmtzLA0KSG9yaWENCg0K
+The plan for this series is to take it through my random.git tree for 6.11.
+It's cooking in linux-next now.
+
+Changes v21->v22:
+- Only add MAP_DROPPABLE, not the other MAP_*s, but make it imply the other
+  relevant flags.
+- Ensure that mlock() and madvise() can't undo MAP_DROPPABLE implications.
+- Since MAP_DROPPABLE is generally useful, remove conditional Kconfig
+  scafolding around it.
+- Follow mm/ standards on comment style.
+- Base atop latest selftest PR, to avoid merge conflicts in 6.11.
+- Update glibc patches.
+
+Changes v20->v21:
+- After extensive conversation with Linus, we're nixing the entire
+  vgetrandom_alloc() syscall, in favor of just exposing the functionality
+  needed through mmap() and having the kernel communicate to the caller what
+  arguments/sizes it should pass to mmap(). This simplifies the series
+  considerably. It also means that the first commit adds some new MAP_*
+  constants for mmap().
+- Separate vDSO selftests out into separate commit.
+
+--------------
+
+Useful links:
+
+- This series:
+  - https://git.kernel.org/pub/scm/linux/kernel/git/crng/random.git/log/
+
+- Glibc patches by Adhemerval and me against glibc-2.39:
+  - https://git.zx2c4.com/glibc/log/?h=vdso
+
+- In case you're actually interested in the v≤14 design where faults were
+  non-fatal and instructions were skipped (which I think is more coherent, even
+  if the implementation is controversial), this lives in my branch here:
+  - https://git.kernel.org/pub/scm/linux/kernel/git/crng/random.git/log/?h=jd/vdso-skip-insn
+  Note that I'm *not* actually proposing this for upstream at this time. But it
+  may be of conversational interest.
+
+-------------
+
+Two statements:
+
+  1) Userspace wants faster cryptographically secure random numbers of
+     arbitrary size, big or small.
+
+  2) Userspace is currently unable to safely roll its own RNG with the
+     same security profile as getrandom().
+
+Statement (1) has been debated for years, with arguments ranging from
+"we need faster cryptographically secure card shuffling!" to "the only
+things that actually need good randomness are keys, which are few and
+far between" to "actually, TLS CBC nonces are frequent" and so on. I
+don't intend to wade into that debate substantially, except to note that
+recently glibc added arc4random(), whose goal is to return a
+cryptographically secure uint32_t, and there are real user reports of it
+being too slow. So here we are.
+
+Statement (2) is more interesting. The kernel is the nexus of all
+entropic inputs that influence the RNG. It is in the best position, and
+probably the only position, to decide anything at all about the current
+state of the RNG and of its entropy. One of the things it uniquely knows
+about is when reseeding is necessary.
+
+For example, when a virtual machine is forked, restored, or duplicated,
+it's imparative that the RNG doesn't generate the same outputs. For this
+reason, there's a small protocol between hypervisors and the kernel that
+indicates this has happened, alongside some ID, which the RNG uses to
+immediately reseed, so as not to return the same numbers. Were userspace
+to expand a getrandom() seed from time T1 for the next hour, and at some
+point T2 < hour, the virtual machine forked, userspace would continue to
+provide the same numbers to two (or more) different virtual machines,
+resulting in potential cryptographic catastrophe. Something similar
+happens on resuming from hibernation (or even suspend), with various
+compromise scenarios there in mind.
+
+There's a more general reason why userspace rolling its own RNG from a
+getrandom() seed is fraught. There's a lot of attention paid to this
+particular Linuxism we have of the RNG being initialized and thus
+non-blocking or uninitialized and thus blocking until it is initialized.
+These are our Two Big States that many hold to be the holy
+differentiating factor between safe and not safe, between
+cryptographically secure and garbage. The fact is, however, that the
+distinction between these two states is a hand-wavy wishy-washy inexact
+approximation. Outside of a few exceptional cases (e.g. a HW RNG is
+available), we actually don't really ever know with any rigor at all
+when the RNG is safe and ready (nor when it's compromised). We do the
+best we can to "estimate" it, but entropy estimation is fundamentally
+impossible in the general case. So really, we're just doing guess work,
+and hoping it's good and conservative enough. Let's then assume that
+there's always some potential error involved in this differentiator.
+
+In fact, under the surface, the RNG is engineered around a different
+principle, and that is trying to *use* new entropic inputs regularly and
+at the right specific moments in time. For example, close to boot time,
+the RNG reseeds itself more often than later. At certain events, like VM
+fork, the RNG reseeds itself immediately. The various heuristics for
+when the RNG will use new entropy and how often is really a core aspect
+of what the RNG has some potential to do decently enough (and something
+that will probably continue to improve in the future from random.c's
+present set of algorithms). So in your mind, put away the metal
+attachment to the Two Big States, which represent an approximation with
+a potential margin of error. Instead keep in mind that the RNG's primary
+operating heuristic is how often and exactly when it's going to reseed.
+
+So, if userspace takes a seed from getrandom() at point T1, and uses it
+for the next hour (or N megabytes or some other meaningless metric),
+during that time, potential errors in the Two Big States approximation
+are amplified. During that time potential reseeds are being lost,
+forgotten, not reflected in the output stream. That's not good.
+
+The simplest statement you could make is that userspace RNGs that expand
+a getrandom() seed at some point T1 are nearly always *worse*, in some
+way, than just calling getrandom() every time a random number is
+desired.
+
+For those reasons, after some discussion on libc-alpha, glibc's
+arc4random() now just calls getrandom() on each invocation. That's
+trivially safe, and gives us latitude to then make the safe thing faster
+without becoming unsafe at our leasure. Card shuffling isn't
+particularly fast, however.
+
+How do we rectify this? By putting a safe implementation of getrandom()
+in the vDSO, which has access to whatever information a
+particular iteration of random.c is using to make its decisions. I use
+that careful language of "particular iteration of random.c", because the
+set of things that a vDSO getrandom() implementation might need for making
+decisions as good as the kernel's will likely change over time. This
+isn't just a matter of exporting certain *data* to userspace. We're not
+going to commit to a "data API" where the various heuristics used are
+exposed, locking in how the kernel works for decades to come, and then
+leave it to various userspaces to roll something on top and shoot
+themselves in the foot and have all sorts of complexity disasters.
+Rather, vDSO getrandom() is supposed to be the *same exact algorithm*
+that runs in the kernel, except it's been hoisted into userspace as
+much as possible. And so vDSO getrandom() and kernel getrandom() will
+always mirror each other hermetically.
+
+API-wise, the vDSO gains this function:
+
+  ssize_t vgetrandom(void *buffer, size_t len, unsigned int flags,
+                     void *opaque_state, size_t opaque_len);
+
+The return value and the first 3 arguments are the same as ordinary
+getrandom(), while the penultimate argument is a pointer to some state
+allocated with the right flags passed to mmap(2), explained below. Were all
+five arguments passed to the getrandom syscall, nothing different would happen,
+and the functions would have the exact same behavior.
+
+If vgetrandom(NULL, 0, 0, &params, ~0UL) is called, then params gets populated
+with information about what flags and prot fields to pass to mmap(2), as well
+as how big each state should be, so that the caller can slice up returned
+memory from mmap(2) into chunks for passing to vgetrandom().
+
+Libc is expected to allocate a chunk of these on first use, and then
+dole them out to threads as they're created, allocating more when
+needed.
+
+The interesting meat of the implementation is in lib/vdso/getrandom.c,
+as generic C code, and it aims to mainly follow random.c's buffered fast
+key erasure logic. Before the RNG is initialized, it falls back to the
+syscall. Right now it uses a simple generation counter to make its decisions
+on reseeding (though this could be made more extensive over time).
+
+The actual place that has the most work to do is in all of the other
+files. Most of the vDSO shared page infrastructure is centered around
+gettimeofday, and so the main structs are all in arrays for different
+timestamp types, and attached to time namespaces, and so forth. I've
+done the best I could to add onto this in an unintrusive way.
+
+In my test results, performance is pretty stellar (around 15x for uint32_t
+generation), and it seems to be working. There's an extended example in the
+last commit of this series, showing how the syscall and the vDSO function
+are meant to be used together.
+
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-api@vger.kernel.org
+Cc: x86@kernel.org
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>
+Cc: Carlos O'Donell <carlos@redhat.com>
+Cc: Florian Weimer <fweimer@redhat.com>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Jann Horn <jannh@google.com>
+Cc: Christian Brauner <brauner@kernel.org>
+Cc: David Hildenbrand <dhildenb@redhat.com>
+
+Jason A. Donenfeld (4):
+  mm: add MAP_DROPPABLE for designating always lazily freeable mappings
+  random: introduce generic vDSO getrandom() implementation
+  x86: vdso: Wire up getrandom() vDSO implementation
+  selftests/vDSO: add tests for vgetrandom
+
+ MAINTAINERS                                   |   4 +
+ arch/x86/Kconfig                              |   1 +
+ arch/x86/entry/vdso/Makefile                  |   3 +-
+ arch/x86/entry/vdso/vdso.lds.S                |   2 +
+ arch/x86/entry/vdso/vgetrandom-chacha.S       | 178 +++++++++++
+ arch/x86/entry/vdso/vgetrandom.c              |  17 ++
+ arch/x86/include/asm/vdso/getrandom.h         |  55 ++++
+ arch/x86/include/asm/vdso/vsyscall.h          |   2 +
+ arch/x86/include/asm/vvar.h                   |  16 +
+ drivers/char/random.c                         |  18 +-
+ fs/proc/task_mmu.c                            |   1 +
+ include/linux/mm.h                            |   7 +
+ include/trace/events/mmflags.h                |   7 +
+ include/uapi/linux/mman.h                     |   1 +
+ include/uapi/linux/random.h                   |  15 +
+ include/vdso/datapage.h                       |  11 +
+ include/vdso/getrandom.h                      |  46 +++
+ lib/vdso/Kconfig                              |   5 +
+ lib/vdso/getrandom.c                          | 251 +++++++++++++++
+ mm/madvise.c                                  |   5 +-
+ mm/mlock.c                                    |   2 +-
+ mm/mmap.c                                     |  30 ++
+ mm/rmap.c                                     |  22 +-
+ tools/include/asm/rwonce.h                    |   0
+ tools/include/uapi/linux/mman.h               |   1 +
+ tools/testing/selftests/mm/.gitignore         |   1 +
+ tools/testing/selftests/mm/Makefile           |   1 +
+ tools/testing/selftests/mm/droppable.c        |  53 ++++
+ tools/testing/selftests/vDSO/.gitignore       |   2 +
+ tools/testing/selftests/vDSO/Makefile         |  18 ++
+ .../testing/selftests/vDSO/vdso_test_chacha.c |  43 +++
+ .../selftests/vDSO/vdso_test_getrandom.c      | 288 ++++++++++++++++++
+ 32 files changed, 1099 insertions(+), 7 deletions(-)
+ create mode 100644 arch/x86/entry/vdso/vgetrandom-chacha.S
+ create mode 100644 arch/x86/entry/vdso/vgetrandom.c
+ create mode 100644 arch/x86/include/asm/vdso/getrandom.h
+ create mode 100644 include/vdso/getrandom.h
+ create mode 100644 lib/vdso/getrandom.c
+ create mode 100644 tools/include/asm/rwonce.h
+ create mode 100644 tools/testing/selftests/mm/droppable.c
+ create mode 100644 tools/testing/selftests/vDSO/vdso_test_chacha.c
+ create mode 100644 tools/testing/selftests/vDSO/vdso_test_getrandom.c
+
+
+base-commit: 22a40d14b572deb80c0648557f4bd502d7e83826
+prerequisite-patch-id: 9a45c4b77033012b2c2cbbec24fd8b2a7a5daf84
+prerequisite-patch-id: 8b773921433de1e8b9fd5a8f3d6107258c133c2a
+prerequisite-patch-id: afd1b07bd24fe3c93d1fef782ba9064e95d1534c
+prerequisite-patch-id: a5cbcafe6072a173a8f20eac5cc7e545be50ae20
+prerequisite-patch-id: 59640753e9c60e5d23ede9a20ed5c933a47b3f97
+-- 
+2.45.2
+
