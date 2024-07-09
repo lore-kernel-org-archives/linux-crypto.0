@@ -1,48 +1,47 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A830382;
-	Tue,  9 Jul 2024 13:09:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2615015749F;
+	Tue,  9 Jul 2024 13:35:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720530573; cv=none; b=USWDiM/qyeKSfvAGk6yWWsyc1vsOVnnkzOksBfEe3vcBuvYteJvIXjBQwPJOOE+AJMJSW0GzqgFYdWpsG3WKqmTC/Ga79zMQhjVYmEboolNC1yZUMxlT+gnk2WObf4yKvDamToPzf9LJz8P+2nxM+2u8HKCzxNlD3Dez5vGwmqE=
+	t=1720532126; cv=none; b=IjARprZifN/92K1J6HzdmBmm2ATK74LelhDFSZkQ6cFeEsyWADdUpZB9JXOxsZCyqp6DZxht+tP1xAyUEud4i9uyYDarBQShd/rlJ3+iOhJe10x6DQ2iRSMVpcDuAYtbwCZ7v1vD/BioyHPdwtXCEuOS1bS3+Jp6Qg3Yq46GJjQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720530573; c=relaxed/simple;
-	bh=3Z7C/k1/OCInJr3E0eRERpLS8eMXVKBjkm5IMZj13QE=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=OKZ1PKM80vjizj96KYqeo44bfZcuUg+NiQFTOiODkQdXRkv1rK+SDHY5keRdYNNGR30+DM9xml2viXdo9eOQYiXjv2esyWZpoeXKd9ckwHgL8nkb2YqBd34kbj/Gl0dhRdxaO2VxsvKnk5YM3NrEF6UAK6UaKJ0tZshrP2YYh6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=U1zkWpKf; arc=none smtp.client-ip=205.220.168.131
+	s=arc-20240116; t=1720532126; c=relaxed/simple;
+	bh=DU3VRQnrYNqDNAW1kRz+FjafMjZRpBs2Xr3aTHym4Rw=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=uP5ydGjWAj6lXqR+pSzlafOTP/hexgUGtEbu01noNs5xPmKEneVPytj2Tn7+wquH3Wk1FS4mraWDCD2nYrAwQfCdoQSnvWjdPBlS2PeUJX8VFuCGzjHTrSzOobX0InjeN2+Wj5Cnj/zkufGhHxTEZMlh69xWwxfVIRSJbgg81k8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=FqOumSBJ; arc=none smtp.client-ip=205.220.180.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="U1zkWpKf"
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4698HAkd026705;
-	Tue, 9 Jul 2024 13:08:25 GMT
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="FqOumSBJ"
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 469AF32V003367;
+	Tue, 9 Jul 2024 13:34:16 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
 	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=MJluPvsOPAnlDo8aYbkYhi
-	dD7T6wP/LREsgsBkHtyeE=; b=U1zkWpKfm0efOWrsto6/6UPVitYWhVJNJSw3J4
-	+5gZrLK+shQXAnECUoIcUu25uIHWDYkKhIref9LwImzD7fXex0Iu/yao1YjxJT6W
-	IJrQf4FkuQ9SRO98SsvFIyPs4WUXOgcw0AlB2/sViLxw1rd8JdaRX3Wo9UVhiwQv
-	3eRb6uVRFwfyx9gBywt2CiJ2N8EKsN8R3uIZt1qzC1rD2ZAoB7Z++Q3YVeBi72Ul
-	AIzNM9eVHnbOAqAV3J1PUUgwkGiR8MBLjIy6dbAVoQD7Hlznr+XhXsf1pFYqG2dh
-	8mqLbtvGFKea2skjsF3X3d3QvoZGf5bINKjY34Wi5skbcGaw==
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4091jdgrd3-1
+	:mime-version:subject:to; s=qcppdkim1; bh=rJHuFR7kdC5Bjk0We68ws0
+	8urMZfuY363j5+cZKIEJc=; b=FqOumSBJUMv7GICTS7iSidR1uNIsCJj0i25PZz
+	DgZE2qiGDwvuQjvCWuun/3v8bSLTeCkXp34kJXMJNe2Yt3hGgbFKNxLW5TpqNIPg
+	8wglncJ/T+Ly4SaBc1J+oNU4mnX/VWUJ7BTAAp1wQM7c0w1ou/CjjOE8Kr+p06kS
+	JIPoekePTdEYCsbIjrow2RSWo3e4FgVqbz8FoMrL+Mkd3a7sztLVUbvs3tFhhZHk
+	azbhXyOaMT5Mkfx/TOH6dZqsQjUY1lPT23ZbSdU4qpGdu3SZbcyWhZ/sFCEfTM+x
+	Fy9joXulxgsnhEIEEl0rVwqyhIIilZ6hzh3oSKUCxcCCo21Q==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 406wjn6t2h-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Jul 2024 13:08:25 +0000 (GMT)
+	Tue, 09 Jul 2024 13:34:16 +0000 (GMT)
 Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA04.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 469D8OBF015271
+	by NALASPPMTA01.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 469DYFd1015308
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 9 Jul 2024 13:08:24 GMT
+	Tue, 9 Jul 2024 13:34:15 GMT
 Received: from tengfan-gv.ap.qualcomm.com (10.80.80.8) by
  nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Tue, 9 Jul 2024 06:08:18 -0700
+ 15.2.1544.9; Tue, 9 Jul 2024 06:34:10 -0700
 From: Tengfei Fan <quic_tengfan@quicinc.com>
-Date: Tue, 9 Jul 2024 21:08:07 +0800
-Subject: [PATCH v2] dt-bindings: crypto: ice: Document QCS9100 inline
- crypto engine
+Date: Tue, 9 Jul 2024 21:34:00 +0800
+Subject: [PATCH v2] dt-bindings: crypto: qcom,prng: document QCS9100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -51,56 +50,51 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-ID: <20240709-documnet_qcs9100_crypto_engine_compatible-v2-1-59bd16b1a99c@quicinc.com>
-X-B4-Tracking: v=1; b=H4sIADY2jWYC/zXNQQ6DIBCF4as0rIsZaanaVe/RGKI46iQVFNDUG
- O9eNOnyf4v3bcyjI/TsedmYw4U8WRNDXC9M95XpkFMTmwkQd8ig4I3V82AwqEn7IgVQ2q1jsAp
- NRwaVtsNYBao/yFE2KBr5qHVVsPg3Omzpe1rvMnZPPli3nvSSHutfuYGQuYREpJkAyHnKp5m0C
- tFoK/M6goxOosXKfd9/iuQmC8UAAAA=
+Message-ID: <20240709-document_qcs9100_trng_compatible-v2-1-3a924ee68511@quicinc.com>
+X-B4-Tracking: v=1; b=H4sIAEc8jWYC/zXNQQqDMBCF4atI1o2MMVbtqvcoIhpHHaiJJlFax
+ Ls3Cl1+b/H+nTm0hI49op1Z3MiR0QHiFjE1NnpATl0wEyAk5FDyzqh1Qu3rRbkyAai91UOtzDQ
+ 3nto38hblvUtB5rKQLNzMFnv6XIlXFTyS88Z+r+KWnOv/PAWRFRnEIskFQMETvqykao966Bv9P
+ EFaxaHFquM4fkURvSG8AAAA
 To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller"
 	<davem@davemloft.net>,
         Rob Herring <robh@kernel.org>,
         Krzysztof Kozlowski
 	<krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bjorn Andersson
-	<andersson@kernel.org>
-CC: <linux-arm-msm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel@quicinc.com>, Tengfei Fan <quic_tengfan@quicinc.com>,
-        Maria Yu
-	<quic_aiquny@quicinc.com>
+        Conor Dooley <conor+dt@kernel.org>, Vinod Koul
+	<vkoul@kernel.org>
+CC: <kernel@quicinc.com>, <linux-arm-msm@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Tengfei Fan <quic_tengfan@quicinc.com>
 X-Mailer: b4 0.15-dev-a66ce
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1720530498; l=2633;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1720532049; l=2396;
  i=quic_tengfan@quicinc.com; s=20240709; h=from:subject:message-id;
- bh=3Z7C/k1/OCInJr3E0eRERpLS8eMXVKBjkm5IMZj13QE=;
- b=tdxgb2nzo0CUI6WZQMGePXlr8dQXrZTL9IQKfE6mANIC5ixZs8mSFm3bbMwLFD5sWBgGOcfi2
- bM7et+6Iv3ZCK38LfFgvGp0emK522kNY13SELvPgLKSkAybI9osY1CU
+ bh=DU3VRQnrYNqDNAW1kRz+FjafMjZRpBs2Xr3aTHym4Rw=;
+ b=eoYm9hAAGEpoD5+EdVl0NLpFh5UQ/n9pGZscfw4+/7b8zEkDKOrIFM3LZHAULQ8+yfd6SM1an
+ sqzO0T/RdBCBLVvQVXgBLWoJfLkG8dzo8UmhfzTJXWX05Vd+aMIYvxS
 X-Developer-Key: i=quic_tengfan@quicinc.com; a=ed25519;
  pk=4VjoTogHXJhZUM9XlxbCAcZ4zmrLeuep4dfOeKqQD0c=
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
  nalasex01a.na.qualcomm.com (10.47.209.196)
 X-QCInternal: smtphost
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: 3h1GkmC6XB48gAEHaAc5xCyz7CmJ_vdi
-X-Proofpoint-ORIG-GUID: 3h1GkmC6XB48gAEHaAc5xCyz7CmJ_vdi
+X-Proofpoint-ORIG-GUID: 8ZF87UzU--WJ7Fkvlj1LdnXKuL7cHp0o
+X-Proofpoint-GUID: 8ZF87UzU--WJ7Fkvlj1LdnXKuL7cHp0o
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-09_02,2024-07-09_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
- lowpriorityscore=0 adultscore=0 spamscore=0 malwarescore=0 mlxlogscore=946
- mlxscore=0 priorityscore=1501 phishscore=0 clxscore=1015 impostorscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2406140001
- definitions=main-2407090083
+ definitions=2024-07-09_03,2024-07-09_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=946 clxscore=1015
+ mlxscore=0 adultscore=0 lowpriorityscore=0 suspectscore=0
+ priorityscore=1501 phishscore=0 malwarescore=0 bulkscore=0 impostorscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2406140001 definitions=main-2407090087
 
-Document the compatible used for the inline crypto engine found on
-QCS9100.
-
+Document QCS9100 compatible for the True Random Number Generator.
 QCS9100 is drived from SA8775p. Currently, both the QCS9100 and SA8775p
 platform use non-SCMI resource. In the future, the SA8775p platform will
 move to use SCMI resources and it will have new sa8775p-related device
-tree. Consequently, introduce "qcom,qcs9100-inline-crypto-engine" to
-describe non-SCMI based crypto engine.
+tree. Consequently, introduce "qcom,qcs9100-trng" to describe non-SCMI
+based TRNG.
 
 Signed-off-by: Tengfei Fan <quic_tengfan@quicinc.com>
 ---
@@ -117,40 +111,37 @@ bindings and device driver patches are reviewed.
 
 The final dtsi will like:
 https://lore.kernel.org/linux-arm-msm/20240703025850.2172008-3-quic_tengfan@quicinc.com/
- 
+
 The detailed cover letter reference:
 https://lore.kernel.org/linux-arm-msm/20240703025850.2172008-1-quic_tengfan@quicinc.com/
-
-Co-developed-by: Maria Yu <quic_aiquny@quicinc.com>
-Signed-off-by: Maria Yu <quic_aiquny@quicinc.com>
 ---
 Changes in v2:
-   - Split huge patch series into different patch series according to
-     subsytems
-   - Update patch commit message
+  - Split huge patch series into different patch series according to
+    subsytems
+  - Update patch commit message
 
 prevous disscussion here:
-[1] v1: https://lore.kernel.org/linux-arm-msm/1b32168b-7d1c-4b18-b4f3-a4979232b515@quicinc.com
+[1] v1: https://lore.kernel.org/linux-arm-msm/20240703025850.2172008-1-quic_tengfan@quicinc.com/
 ---
- Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml | 1 +
+ Documentation/devicetree/bindings/crypto/qcom,prng.yaml | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
-index 0304f074cf08..ad0944e05025 100644
---- a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
-+++ b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
-@@ -13,6 +13,7 @@ properties:
-   compatible:
-     items:
-       - enum:
-+          - qcom,qcs9100-inline-crypto-engine
-           - qcom,sa8775p-inline-crypto-engine
-           - qcom,sc7180-inline-crypto-engine
-           - qcom,sc7280-inline-crypto-engine
+diff --git a/Documentation/devicetree/bindings/crypto/qcom,prng.yaml b/Documentation/devicetree/bindings/crypto/qcom,prng.yaml
+index 89c88004b41b..e97226eb7a50 100644
+--- a/Documentation/devicetree/bindings/crypto/qcom,prng.yaml
++++ b/Documentation/devicetree/bindings/crypto/qcom,prng.yaml
+@@ -17,6 +17,7 @@ properties:
+           - qcom,prng-ee  # 8996 and later using EE
+       - items:
+           - enum:
++              - qcom,qcs9100-trng
+               - qcom,sa8775p-trng
+               - qcom,sc7280-trng
+               - qcom,sm8450-trng
 
 ---
 base-commit: 0b58e108042b0ed28a71cd7edf5175999955b233
-change-id: 20240709-documnet_qcs9100_crypto_engine_compatible-e5de2d56bca9
+change-id: 20240709-document_qcs9100_trng_compatible-be46d3047484
 
 Best regards,
 -- 
