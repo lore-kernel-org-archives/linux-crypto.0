@@ -1,63 +1,48 @@
-Received: from bmailout3.hostsharing.net (bmailout3.hostsharing.net [176.9.242.62])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4842153814;
-	Tue,  9 Jul 2024 08:49:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.9.242.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F235715358A
+	for <linux-crypto@vger.kernel.org>; Tue,  9 Jul 2024 08:55:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720514981; cv=none; b=JUA9DRf2rreRveVIFyR/zQsfQBJBmsAGmPFyT+t5lMYSXlXB7w3S2Jqw03+pNJrqiM+IhoPI4bf14ZJ+uDgLwEz7Sv7L8YBiXjZWbkUkg12eWgQiYp3thjBds6wjzLnY7xJif3wwuuIPOOgjGkC9IdYcTgxlAqyOutmmVGDUjhU=
+	t=1720515307; cv=none; b=aluTJjLNGUJv92nWAydyjOOZH7MJxoglFRnXaVEy/+5bbJzwN62iowTSszSQmHrk4zzi8vrUXnZG+DocGGbNZej23z04Gr0Mk/UHJwINosysRxBvFuZ/oUZVn8qoDVGY1etDHSsj6SzpcYfqtSPSaTe2tBAX5vjYK5ZyeDzZzkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720514981; c=relaxed/simple;
-	bh=1LGGttV5i62yDKUecr8vz54XeY4DPh2JWDsYY1rJrOY=;
+	s=arc-20240116; t=1720515307; c=relaxed/simple;
+	bh=2FYVMtmDzIZUKIJ+dabrFKImBJRSm71ljP7ZDyoecE0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UZNNbMf5Cg+qVVNZxuneJn4qX8WZbc6h/BTW1pA7KtrxLc2oHHnUFRGU+eXxyw81OwZzXSKaxbKqzjDlcUgy3LZqPGcJ5ExRmFY/mF1GX69hhaqSJ3P6OYxVG0R5aQQTunBCaTXt/ndv1zyeS7ADPF1O/L8LenNey3UWA4O3ivg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=176.9.242.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout3.hostsharing.net (Postfix) with ESMTPS id AF9F21025A944;
-	Tue,  9 Jul 2024 10:49:36 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id 7265B2D31A; Tue,  9 Jul 2024 10:49:36 +0200 (CEST)
-Date: Tue, 9 Jul 2024 10:49:36 +0200
-From: Lukas Wunner <lukas@wunner.de>
-To: Alexey Kardashevskiy <aik@amd.com>
-Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Bjorn Helgaas <helgaas@kernel.org>,
-	David Howells <dhowells@redhat.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Woodhouse <dwmw2@infradead.org>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	linux-pci@vger.kernel.org, linux-cxl@vger.kernel.org,
-	linux-coco@lists.linux.dev, keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linuxarm@huawei.com,
-	David Box <david.e.box@intel.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	"Li, Ming" <ming4.li@intel.com>,
-	Ilpo Jarvinen <ilpo.jarvinen@linux.intel.com>,
-	Alistair Francis <alistair.francis@wdc.com>,
-	Wilfred Mallawa <wilfred.mallawa@wdc.com>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Dhaval Giani <dhaval.giani@amd.com>,
-	Gobikrishna Dhanuskodi <gdhanuskodi@nvidia.com>,
-	Jason Gunthorpe <jgg@nvidia.com>, Peter Gonda <pgonda@google.com>,
-	Jerome Glisse <jglisse@google.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Alexander Graf <graf@amazon.com>, Samuel Ortiz <sameo@rivosinc.com>,
-	Eric Biggers <ebiggers@google.com>,
-	Stefan Berger <stefanb@linux.ibm.com>
-Subject: Re: [PATCH v2 07/18] spdm: Introduce library to authenticate devices
-Message-ID: <Zoz5oHx8HxYLTftQ@wunner.de>
-References: <cover.1719771133.git.lukas@wunner.de>
- <bbbea6e1b7d27463243a0fcb871ad2953312fe3a.1719771133.git.lukas@wunner.de>
- <26715537-5dc4-46c1-bdcd-c760696dd418@amd.com>
- <Zovha33CS76PwAMF@wunner.de>
- <ad7b3e48-2e61-476f-8fea-28424f46d306@amd.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=LiMtfe9SDy2xrKzfdI8aYFx5octx2DWRFiDsdUG1eWTxvLTkL72f00O9XaKtRUqf+1kAMPjzgfhqON68bYwTIDPbtyEVm/w3chilvOrozCmWf8pT+YeQybsOii1UUEW40EkWw7jRU+UmQihfr23oHxnBOsBP6Y+krArZNV1BXeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mfe@pengutronix.de>)
+	id 1sR6cj-0001sa-Fu; Tue, 09 Jul 2024 10:54:57 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mfe@pengutronix.de>)
+	id 1sR6cg-008F2O-FK; Tue, 09 Jul 2024 10:54:54 +0200
+Received: from mfe by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <mfe@pengutronix.de>)
+	id 1sR6cg-006TZB-1F;
+	Tue, 09 Jul 2024 10:54:54 +0200
+Date: Tue, 9 Jul 2024 10:54:54 +0200
+From: Marco Felsch <m.felsch@pengutronix.de>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Horia Geanta <horia.geanta@nxp.com>,
+	Pankaj Gupta <pankaj.gupta@nxp.com>,
+	Gaurav Jain <gaurav.jain@nxp.com>,
+	"kernel@pengutronix.de" <kernel@pengutronix.de>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] crypto: caam - enable hash api only on ARM platforms per
+ default
+Message-ID: <20240709085454.you3b3ueb3xbtrv6@pengutronix.de>
+References: <20240626155724.4045056-1-m.felsch@pengutronix.de>
+ <258feb43-382d-4ea0-9164-357924350dec@nxp.com>
+ <ZofSbH2Fu/xLnzif@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -66,55 +51,36 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ad7b3e48-2e61-476f-8fea-28424f46d306@amd.com>
+In-Reply-To: <ZofSbH2Fu/xLnzif@gondor.apana.org.au>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mfe@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 
-On Tue, Jul 09, 2024 at 10:45:27AM +1000, Alexey Kardashevskiy wrote:
-> On 8/7/24 22:54, Lukas Wunner wrote:
-> > The short answer is, it's a bug in libspdm and the issue should
-> > go away once you update libspdm to version 3.1.0 or newer.
+On 24-07-05, Herbert Xu wrote:
+> On Fri, Jul 05, 2024 at 09:39:19AM +0000, Horia Geanta wrote:
+> >
+> > I disagree with compiling out the hash support.
+
+We don't compile it out, we just don't set the default=y since on ARMv8
+it's not required.
+
+> > If needed, algorithm priority could be changed - even at runtime,
+> > using NETLINK_CRYPTO messages (needs CONFIG_CRYPTO_USER=y/m).
 > 
-> Easier to hack lib/spdm/req-authenticate.c just to see how far I can get
-> with my device, now it is "Malformed certificate at slot 0 offset 0".
+> We should change the default priority.
 
-In that case all (up to 8) certificate chains should have been retrieved
-and are available for examination in the certificates/ directory in sysfs
-(below the PCI device's directory).
+We had an patch exactly doing this but depending on the SoC the default
+prio may valid since the CAAM is used on ARMv7 and ARMv8 NXP SoCs. To
+not cause any regression we went this way.
 
-You can use ordinary openssl tooling to examine the certificates and
-see what's wrong with them, see the ABI documentation in patch [12/18]
-for examples:
+Regards,
+  Marco
 
-https://lore.kernel.org/all/e42905e3e5f1d5be39355e833fefc349acb0b03c.1719771133.git.lukas@wunner.de/
-
-The "Malformed certificate at slot 0 offset 0" message means that the
-first certificate in the chain in slot 0 does not comply with
-requirements set forth in the SPDM spec.  (E.g. Basic Constraints CA
-value shall be false for leaf cert, true for intermediate and root certs
-per SPDM 1.3.0 table 42.)
-
-The expectation is that vendors will test their devices and fix issues
-like this, so that end users never see those messages.
-
-The error message is emitted by spdm_validate_cert_chain().
-The implementation calls that to identify a certificate chain which is
-considered valid by the kernel.  The first one found is used for
-challenge-response authentication.  If none is found valid, the kernel
-will try to perform challenge-response authentication with the first
-*provisioned* slot, regardless of its validity.  That is done to
-expose a signature in sysfs about which user space can make up its
-own mind, see patch [17/18]:
-
-https://lore.kernel.org/all/dff8bcb091a3123e1c7c685f8149595e39bbdb8f.1719771133.git.lukas@wunner.de/
-
-So despite the error message you should see a signature with full SPDM
-transcript and other ancillary data in the signatures/ directory in sysfs.
-
-Not sure yet whether that feature (exposing a signature despite
-cert chains' invalidity from the kernel POV) makes sense.
-We can also discuss adding ABI which allows user space to force
-challenge-response with a specific slot, or to declare a specific
-slot valid.
-
-Thanks,
-
-Lukas
+> 
+> Thanks,
+> -- 
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> 
