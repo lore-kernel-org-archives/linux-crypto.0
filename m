@@ -1,66 +1,65 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DEDD482C8
-	for <linux-crypto@vger.kernel.org>; Wed, 10 Jul 2024 03:53:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA6373D96D
+	for <linux-crypto@vger.kernel.org>; Wed, 10 Jul 2024 04:05:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720583601; cv=none; b=XP3t+H0LRA250IIz7CycGxzOGK2WL2k4DCPY+ExpD4exmCguFHx911T0qo2hQvGmFmNQvsSkJwtOHSbuvLT+3pXLvTybZ8MsOfbDya9BJmcBXv9Jt1vmkaVpqcGOBQekdDCmd/8yyJ8zcS7pgiyW7x6TWoOazjNUIQ4V0XaFafs=
+	t=1720584347; cv=none; b=tyHJXj4mA394eJyS/dlEJPUBCnBCyIAQFuc5Wlbd/3sGSESuZKOYz5vmYvVW78YgrfsYdksls4cYCLmw3Gr7XgssxPVIG2lUgTA73JD8E73HJnRaQ5kvv8OFx45tz6BumHvYRzmMAEPX+bRaPjfzAqQQvRxW8Pccds9Ss2N16CI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720583601; c=relaxed/simple;
-	bh=G128oUr+qCIRBR7nowEROTw1zOSfR0auy4jqH2JVQkI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SajiYzQcAeqkmoobTMd0peEvSM5DP6SHQ0LHQYppkvnmTqdN/LfZ5JwnU9vwULmmpKWqzXGZJLuTWFnKEoX2ZU8CNf42eb58hXRGmqHOuEP2H3pOcRfTokrlneKlIPV28I8MaoLBaudZqSxlzKsJ161IqSaDeauPQO50v2B3UcM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K+2TPm4A; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1720584347; c=relaxed/simple;
+	bh=N1DLSASEZAN3kKjigTdMNNTl81NLknNxhrYdWutM44Q=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=M2Ysa53zSyVeaJMO8YVAaCMoXt2poFPpejZ/R6l/56KvVS16keNA/YhxVYpAgCPqxMiHVpTOE6tKNRVBhVy6oXbgjRfmiIBQnjDh6LoaWI4wv3eejhQN4pVSGTmkuH/HM+oMVoZwdDSzDdzpmRNR+TTcxE3RThwluMgR41DwjVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ry+vSNOy; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K+2TPm4A"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ry+vSNOy"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1720583598;
+	s=mimecast20190719; t=1720584344;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=8rIGnL/7yS1yko4wAcwcwoYD4aALcV2EdKmJ89sPeeo=;
-	b=K+2TPm4AuNBtNSIzjyHbxOI4I5QQMSv9tdIe+mMvUKkjp17r6VQLD/Ti9TxJRAkqX3z3rY
-	rR+8AsidDzg9k1Rge6OJEnAIkWKqTf5zG7DMtu19PFz9RXZgYsxL4C2kSx/4u+pkq3wsIv
-	18af0B64vu2mkUlqA6IJj5BojgDc9rU=
-Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
- [209.85.210.198]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=DmsPM2YP83ayw/MNMYnl2BCj1FnEks7yViZlukNd1Wc=;
+	b=Ry+vSNOy7goEAF650F8rZmji6wHxOx5wGVMygRU+tIu4tjh7d0v+5SmRFKxDC/gZYd9mK3
+	Fv74BvB+sx6xdPajc4/a+3xh9m4CQLASV8yIm7jP70zDbcEzN+IPsMsPQf/8WOrOuC9s/5
+	4waWaNEAdJJo5k3V2Jz76aEN9YQEBoc=
+Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com
+ [209.85.167.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-444-wVPTwQZqP1OtmhmySZBQmA-1; Tue, 09 Jul 2024 23:53:17 -0400
-X-MC-Unique: wVPTwQZqP1OtmhmySZBQmA-1
-Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-70afee11d7bso5316082b3a.3
-        for <linux-crypto@vger.kernel.org>; Tue, 09 Jul 2024 20:53:16 -0700 (PDT)
+ us-mta-637-kvQR_Mu_PdyKSGTR0oPgiw-1; Wed, 10 Jul 2024 00:05:40 -0400
+X-MC-Unique: kvQR_Mu_PdyKSGTR0oPgiw-1
+Received: by mail-oi1-f197.google.com with SMTP id 5614622812f47-3d9da24ef75so496218b6e.0
+        for <linux-crypto@vger.kernel.org>; Tue, 09 Jul 2024 21:05:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720583596; x=1721188396;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8rIGnL/7yS1yko4wAcwcwoYD4aALcV2EdKmJ89sPeeo=;
-        b=UHgDIB92o3Sa/sCS/5zfhdBQxniCFdrEU0h47ri0yPV9EeIW/pMohZPjxVxCcBB8qt
-         3Vktq7a4jB7TNx+QffhLbBNe6nYQ0xrmzndQFSNBB2L7/UT7xELhpzN4s5jm1TYxVZDy
-         ka7hIVerUfj7Yoz7oevsnYKqrrGqhSrzoV7RADyLimgLN+XEp0AffIwIJlBAsjPJq5hW
-         1ZvkJ+iKwnYo0MyVbf4oMAzU7ZlVuuetSnqb1PXqgfGD4eurh0XfEzviOZAsbVncbb+L
-         xM+cl1ERTnqxxcXQtXkqP4AkreONqUjyMEvsz9894BeBx7L/KcFvMRF/MpqOBzl4dn3Y
-         B/ng==
-X-Forwarded-Encrypted: i=1; AJvYcCXZmgLMeOqpyy2ZC8RusnJJrSUwZTVS4lxlqucnqbZsl5BZFw55pu3O1GOGoEtKK6dvVaLFgZXrscYrLUJpLiCgUdPZ7RxI34kcuILY
-X-Gm-Message-State: AOJu0YzHI4FCqFuL2fP/VEBWW4XnEqppLGb0tcDxU+yWrXEvPy+x0N3t
-	0LCYWpdpS9qbJQQXOOvEXQIcuXoISM0tL+zCXrBGDd7qRdSmxxhZWGd1vx6UNhyQ+HKgReoPlCb
-	FeJoOTIxXTpWIkg5DMhKmsqFzpfTGI2PZO23X/XYAhysB773QVNJv/cKZNNJhIg==
-X-Received: by 2002:a05:6a00:1748:b0:705:b81b:6ee2 with SMTP id d2e1a72fcca58-70b4356a698mr5890538b3a.19.1720583595921;
-        Tue, 09 Jul 2024 20:53:15 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGn3njPMJJBJ5F0Zt8iJ6gKpKa4GsBSnEFY4YFOmgLnTJeV0xDzKBATDsOFxABmhNHKJN8Ipw==
-X-Received: by 2002:a05:6a00:1748:b0:705:b81b:6ee2 with SMTP id d2e1a72fcca58-70b4356a698mr5890525b3a.19.1720583595531;
-        Tue, 09 Jul 2024 20:53:15 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1720584339; x=1721189139;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:references:cc:to:from:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=DmsPM2YP83ayw/MNMYnl2BCj1FnEks7yViZlukNd1Wc=;
+        b=b4j8mJv+PTm68cvBO2MfHDiw8jNxmoTdcI57wmUFJBFCD8LgkKqZtS55szGDK6uXsG
+         imndhIsy6iDqZ8pp36Z+bh5CHB0UkkjZPrDFS27h44rnZXui5QW8PDwMQ8s+t2FVpBYv
+         4MVWFSxgtXc8bQeopCUZizkv+7K1AiuLsXUqFAziduprBitsk7dYyJswPKTT3T2XqAex
+         T08oMzc+Lvu94fjyMjdIWK0NOI/4FjZuBBsqrDXJYAQZDSvWlBKyGHkMeK3oB2TsSrV1
+         CCEiwwSh3fJOzpMEr0qLyHzKDFddAsueNNtvm9VTb1Fr/8V7KNqVght3jaHR+G78Ebsy
+         XVDA==
+X-Gm-Message-State: AOJu0Yy8aPI5XapaP6E6Utvi+evYncnmbfVoz6YXovZ78NvDTYdgMYtm
+	oSVRWrfcmiYu9O2OtDYVSr8Nn9+AJlp7CA/LLA7yhbd2vaWy7LSPprb9toLx/5JaWTjw4MUNsWn
+	kTirb3RMzuRh/qOXM5hWW+RRBfRTfC9/w232cFvCe4dw6L/ZSzeEjBf3WERLDQw==
+X-Received: by 2002:a05:6808:14c5:b0:3d6:32be:a8a5 with SMTP id 5614622812f47-3d93bee56ddmr5526554b6e.4.1720584339214;
+        Tue, 09 Jul 2024 21:05:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEgdLnkHjsM7KRqdvsvUHsf1OJloSf5RcHmhVmwnIt7ECNqQrB5n6pEpzefYp+WqCn1g6D/tg==
+X-Received: by 2002:a05:6808:14c5:b0:3d6:32be:a8a5 with SMTP id 5614622812f47-3d93bee56ddmr5526539b6e.4.1720584338879;
+        Tue, 09 Jul 2024 21:05:38 -0700 (PDT)
 Received: from [172.20.2.228] ([4.28.11.157])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70b43898af8sm2649036b3a.42.2024.07.09.20.53.12
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70b4396740asm2662984b3a.105.2024.07.09.21.05.35
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Jul 2024 20:53:15 -0700 (PDT)
-Message-ID: <6e978965-5bfd-483d-9504-f362fdf19ec5@redhat.com>
-Date: Wed, 10 Jul 2024 05:53:12 +0200
+        Tue, 09 Jul 2024 21:05:36 -0700 (PDT)
+Message-ID: <9b400450-46bc-41c7-9e89-825993851101@redhat.com>
+Date: Wed, 10 Jul 2024 06:05:34 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -68,30 +67,23 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v21 1/4] mm: add VM_DROPPABLE for designating always
+Subject: Re: [PATCH v22 1/4] mm: add MAP_DROPPABLE for designating always
  lazily freeable mappings
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
- linux-kernel@vger.kernel.org, patches@lists.linux.dev, tglx@linutronix.de,
- linux-crypto@vger.kernel.org, linux-api@vger.kernel.org, x86@kernel.org,
+From: David Hildenbrand <david@redhat.com>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>, linux-kernel@vger.kernel.org,
+ patches@lists.linux.dev, tglx@linutronix.de
+Cc: linux-crypto@vger.kernel.org, linux-api@vger.kernel.org, x86@kernel.org,
+ Linus Torvalds <torvalds@linux-foundation.org>,
  Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
  Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
  Carlos O'Donell <carlos@redhat.com>, Florian Weimer <fweimer@redhat.com>,
  Arnd Bergmann <arnd@arndb.de>, Jann Horn <jannh@google.com>,
  Christian Brauner <brauner@kernel.org>,
  David Hildenbrand <dhildenb@redhat.com>, linux-mm@kvack.org
-References: <e2f104ac-b6d9-4583-b999-8f975c60d469@redhat.com>
- <CAHk-=wibRRHVH5D4XvX1maQDCT-o4JLkANXHMoZoWdn=tN0TLA@mail.gmail.com>
- <6705c6c8-8b6a-4d03-ae0f-aa83442ec0ab@redhat.com>
- <CAHk-=wi=XvCZ9r897LjEb4ZarLzLtKN1p+Fyig+F2fmQDF8GSA@mail.gmail.com>
- <7439da2e-4a60-4643-9804-17e99ce6e312@redhat.com>
- <Zovv4lzM38EHtnms@zx2c4.com> <Zov6SZZCKrqmigua@zx2c4.com>
- <75d6c45d-deea-464d-b0fd-b36e5d73b898@redhat.com>
- <Zoyd1DYuD7cmJbgx@zx2c4.com>
- <b71d8619-1182-43b6-940b-d68f672aa379@redhat.com>
- <Zo4BPjTIitoYSBMP@zx2c4.com>
+References: <20240709130513.98102-1-Jason@zx2c4.com>
+ <20240709130513.98102-2-Jason@zx2c4.com>
+ <378f23cb-362e-413a-b221-09a5352e79f2@redhat.com>
 Content-Language: en-US
-From: David Hildenbrand <david@redhat.com>
 Autocrypt: addr=david@redhat.com; keydata=
  xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
  dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
@@ -137,36 +129,84 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <Zo4BPjTIitoYSBMP@zx2c4.com>
+In-Reply-To: <378f23cb-362e-413a-b221-09a5352e79f2@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 10.07.24 05:34, Jason A. Donenfeld wrote:
-> On Wed, Jul 10, 2024 at 05:05:06AM +0200, David Hildenbrand wrote:
->> On 09.07.24 04:17, Jason A. Donenfeld wrote:
->>> Hi David,
->>>
->>> On Mon, Jul 08, 2024 at 10:21:09PM +0200, David Hildenbrand wrote:
->>>> BTW, I was just trying to understand how MADV_FREE + MAP_DROPPABLE would
->>>> behave without any swap space around.
->>>>
->>>> Did you experiment with that?
->>>
->>> You mean on a system without any swap configured? That's actually my
->>> primary test environment for this. It behaves as expected: when ram
->>> fills up and the scanner is trying to reclaim what it can,
->>> folio_test_swapbacked(folio) is false, and the memory gets freed. After,
->>> reads fault in a zero page. So it's working as expected.
+On 10.07.24 05:27, David Hildenbrand wrote:
+> On 09.07.24 15:05, Jason A. Donenfeld wrote:
+>> The vDSO getrandom() implementation works with a buffer allocated with a
+>> new system call that has certain requirements:
 >>
->> Okay, just to be clear: no swap/zram/zswap. The reclaim code regarding
->> not scanning anonymous memory without swap was a bit confusing.
+>> - It shouldn't be written to core dumps.
+>>     * Easy: VM_DONTDUMP.
+>> - It should be zeroed on fork.
+>>     * Easy: VM_WIPEONFORK.
+>>
+>> - It shouldn't be written to swap.
+>>     * Uh-oh: mlock is rlimited.
+>>     * Uh-oh: mlock isn't inherited by forks.
+>>
+>> It turns out that the vDSO getrandom() function has three really nice
+>> characteristics that we can exploit to solve this problem:
+>>
+>> 1) Due to being wiped during fork(), the vDSO code is already robust to
+>>      having the contents of the pages it reads zeroed out midway through
+>>      the function's execution.
+>>
+>> 2) In the absolute worst case of whatever contingency we're coding for,
+>>      we have the option to fallback to the getrandom() syscall, and
+>>      everything is fine.
+>>
+>> 3) The buffers the function uses are only ever useful for a maximum of
+>>      60 seconds -- a sort of cache, rather than a long term allocation.
+>>
+>> These characteristics mean that we can introduce VM_DROPPABLE, which
+>> has the following semantics:
+>>
+>> a) It never is written out to swap.
+>> b) Under memory pressure, mm can just drop the pages (so that they're
+>>      zero when read back again).
+>> c) It is inherited by fork.
+>> d) It doesn't count against the mlock budget, since nothing is locked.
+>>
+>> This is fairly simple to implement, with the one snag that we have to
+>> use 64-bit VM_* flags, but this shouldn't be a problem, since the only
+>> consumers will probably be 64-bit anyway.
+>>
+>> This way, allocations used by vDSO getrandom() can use:
+>>
+>>       VM_DROPPABLE | VM_DONTDUMP | VM_WIPEONFORK | VM_NORESERVE
+>>
+>> And there will be no problem with using memory when not in use, not
+>> wiping on fork(), coredumps, or writing out to swap.
+>>
+>> In order to let vDSO getrandom() use this, expose these via mmap(2) as
+>> MAP_DROPPABLE.
+>>
+>> Finally, the provided self test ensures that this is working as desired.
 > 
-> Right, no swap, as boring a system as can be. I've experimented with
-> that behavior on my swap-less 64GB thinkpad, as well as on little
-> special purpose VMs, where I hacked the VM_DROPPABLE test code into the
-> wireguard test suite.
+> Acked-by: David Hildenbrand <david@redhat.com>
+> 
+> 
+> I'll try to think of some corner cases we might be missing.
 
-Great, thanks!
+BTW, do we have to handle the folio_set_swapbacked() in sort_folio() as well?
+
+
+	/* dirty lazyfree */
+	if (type == LRU_GEN_FILE && folio_test_anon(folio) && folio_test_dirty(folio)) {
+		success = lru_gen_del_folio(lruvec, folio, true);
+		VM_WARN_ON_ONCE_FOLIO(!success, folio);
+		folio_set_swapbacked(folio);
+		lruvec_add_folio_tail(lruvec, folio);
+		return true;
+	}
+
+Maybe more difficult because we don't have a VMA here ... hmm
+
+IIUC, we have to make sure that no folio_set_swapbacked() would ever get
+performed on these folios, correct?
 
 -- 
 Cheers,
