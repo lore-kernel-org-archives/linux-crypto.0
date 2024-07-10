@@ -1,138 +1,180 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CDCA19004B;
-	Wed, 10 Jul 2024 10:23:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED6DC18FC98
+	for <linux-crypto@vger.kernel.org>; Wed, 10 Jul 2024 10:54:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720607009; cv=none; b=Cl0xwnbFYZuwJ3yRgxsOepowerGq9FbMVZlgntgfH6NTxpsDi2Ps2tRBJCRDqrcj5DzVdj1V0uKpq/WLTNEoFEG/6ov0ns2VKeZEGYRnUHKoh4gLwNJf+NCRcAGXSi89u4uz5TjBh+IX22ma1i7unDlFYw7sW/DX04TT6Lzc8fQ=
+	t=1720608874; cv=none; b=ZzYOYXx7EFEHYtE3aCm9dBxgATpUmv/3sxl6Ozollr0xUVld+UgN6XbAAzb3UzRE8b72oSz+Dkm85kCdlKknbzkNbPjDJfZb84wQ8L2RkLq+ZcRQnfInAReAfCgXI0Y4k1vvcUtWeYWNWnjlcvS2VHrwS8BeaVIqo8qP96CWpjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720607009; c=relaxed/simple;
-	bh=fcaO4h/+u+w3+nshc5FwqYeFFC6p7+zsydZ+zqXYiQM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=MOo1mnniCx8vOinEmZowr4/QuKhEd7826hoyk0U/sY4/ijFIkzZmAnIEeqZ62TRPvcCVGvAKd0+xMK16utmHrBKHOU/OK3xo2DH92A9d/0Ofm756NLejzEpRaQkNFxm5ooE4Y5ZmePbmQynLg5UNzQYF0wTpKMF2GZT6BCDqErw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=BBm1m4xK; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1720608874; c=relaxed/simple;
+	bh=g/Z8swP+y6kHNA6kDxmKESjyxjf4EdQpf0o45pfJAV4=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=IWtQEJIpK0AIUGN8NAbgXk6YyDlwCqtfkwV6B2sYeaPYYxaqg0/j5b5l4T6g0OqSZztzt2SxVsRSq+GHjJZT4ycia0iSDTm44n8jj69I+aepfHvMcP+3ZDzsMfzX32NqVdK7LZPr2zF5/DBu7nFrexUm3xCX9Se985f1blaHcYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VAz7Sl8Z; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="BBm1m4xK"
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46A9q512031417;
-	Wed, 10 Jul 2024 10:23:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	kG/I+Sehug8xvjfpoA+Y8R4NHvaPUsN6xVsDLdaFOlE=; b=BBm1m4xKwyACpGJa
-	C4uyaKFCPTyXh13ayT08GesJoBU2PNSWuVj/UwK5NSP5S470yPUEdBX7JM8Cx3/i
-	ts89LZOJOYcHlCNkG60Uc/Akbon0LoGhcbCokhQcL0abJFXZv4rPMgFt5jfuzIO3
-	FtpAlHcKQqC3VDuHpRiuOpwXXgflv6bOkDYnjYd5W51IhimUsRb4SfnSvn+4XWf4
-	k0A1Rf0n3QEcjzcVVuXTN0CnSPDDlC7x5AOTBf5vD8cA7NPRfzNO6bPG4eWdPMnu
-	t2KQEXpHp7zEwwLHiVCZ8/6COLbJAkEinUPmrqxhSiEdMS88vQF+PLpd/hJw692X
-	93xqAw==
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 406wmms5yw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 10 Jul 2024 10:23:21 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA04.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 46AANJDf024645
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 10 Jul 2024 10:23:19 GMT
-Received: from [10.239.132.204] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 10 Jul
- 2024 03:23:13 -0700
-Message-ID: <21a5ab8b-ed33-41d5-a478-1f38ce8226c1@quicinc.com>
-Date: Wed, 10 Jul 2024 18:23:10 +0800
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VAz7Sl8Z"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1720608871;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UACuPcdZcKado8V67RiC59MQG9qi61DDAS+Lk0oK73w=;
+	b=VAz7Sl8Z9E7Z40s3/DRfec7dlSBWtgiG/xJ2FpYaCLLgSiRWeI+11PJPa07zi7sEfLcLPS
+	Zr/g5l8UGarYxHwAX9IGVGtDtbFlMmOZfeVJvv5dws0wnK+L8TJ1unCW696aC1nHjoGr5T
+	+S+CGXJXR2AiH+k5+tdnnoR7yxoENYk=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-529-Gq0UvDTAN92kdivSKIrqWQ-1; Wed,
+ 10 Jul 2024 06:54:28 -0400
+X-MC-Unique: Gq0UvDTAN92kdivSKIrqWQ-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4881A19560AA;
+	Wed, 10 Jul 2024 10:54:26 +0000 (UTC)
+Received: from file1-rdu.file-001.prod.rdu2.dc.redhat.com (unknown [10.11.5.21])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3EBD619560AE;
+	Wed, 10 Jul 2024 10:54:25 +0000 (UTC)
+Received: by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix, from userid 12668)
+	id 51E5930C1C1C; Wed, 10 Jul 2024 10:54:24 +0000 (UTC)
+Received: from localhost (localhost [127.0.0.1])
+	by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix) with ESMTP id 4E47F3FA91;
+	Wed, 10 Jul 2024 12:54:24 +0200 (CEST)
+Date: Wed, 10 Jul 2024 12:54:24 +0200 (CEST)
+From: Mikulas Patocka <mpatocka@redhat.com>
+To: Eric Biggers <ebiggers@kernel.org>
+cc: linux-crypto@vger.kernel.org, fsverity@lists.linux.dev, 
+    dm-devel@lists.linux.dev, x86@kernel.org, 
+    linux-arm-kernel@lists.infradead.org, Ard Biesheuvel <ardb@kernel.org>, 
+    Sami Tolvanen <samitolvanen@google.com>, 
+    Bart Van Assche <bvanassche@acm.org>, 
+    Herbert Xu <herbert@gondor.apana.org.au>, 
+    Mike Snitzer <snitzer@kernel.org>, Jonathan Brassow <jbrassow@redhat.com>
+Subject: Re: [PATCH v5 00/15] Optimize dm-verity and fsverity using multibuffer
+ hashing
+In-Reply-To: <20240611034822.36603-1-ebiggers@kernel.org>
+Message-ID: <7097bafd-e146-99a5-7f86-369e8e2b080@redhat.com>
+References: <20240611034822.36603-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] dt-bindings: crypto: ice: Document QCS9100 inline
- crypto engine
-To: Krzysztof Kozlowski <krzk@kernel.org>,
-        Herbert Xu
-	<herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Rob
- Herring" <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        "Conor
- Dooley" <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>
-CC: <linux-arm-msm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel@quicinc.com>, Maria Yu <quic_aiquny@quicinc.com>
-References: <20240709-documnet_qcs9100_crypto_engine_compatible-v2-1-59bd16b1a99c@quicinc.com>
- <46239515-badb-4ad7-8280-91074eae47bf@kernel.org>
-From: Tengfei Fan <quic_tengfan@quicinc.com>
-In-Reply-To: <46239515-badb-4ad7-8280-91074eae47bf@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: 4farxQXVREIav9xRq9zWYeXE8cTWMxOh
-X-Proofpoint-ORIG-GUID: 4farxQXVREIav9xRq9zWYeXE8cTWMxOh
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-10_06,2024-07-09_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- priorityscore=1501 lowpriorityscore=0 spamscore=0 bulkscore=0 adultscore=0
- impostorscore=0 suspectscore=0 malwarescore=0 mlxscore=0 mlxlogscore=999
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2406140001 definitions=main-2407100071
+Content-Type: text/plain; charset=US-ASCII
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+
+Hi
+
+I'd like to ask what's the status of this patchset.
+
+Will Herbert accept it? What's the planned kernel version where it will 
+appear?
+
+Mikulas
 
 
+On Mon, 10 Jun 2024, Eric Biggers wrote:
 
-On 7/10/2024 6:16 PM, Krzysztof Kozlowski wrote:
-> On 09/07/2024 15:08, Tengfei Fan wrote:
->> Document the compatible used for the inline crypto engine found on
->> QCS9100.
->>
->> QCS9100 is drived from SA8775p. Currently, both the QCS9100 and SA8775p
->> platform use non-SCMI resource. In the future, the SA8775p platform will
->> move to use SCMI resources and it will have new sa8775p-related device
->> tree. Consequently, introduce "qcom,qcs9100-inline-crypto-engine" to
->> describe non-SCMI based crypto engine.
->>
->> Signed-off-by: Tengfei Fan <quic_tengfan@quicinc.com>
->> ---
->> Introduce support for the QCS9100 SoC device tree (DTSI) and the
->> QCS9100 RIDE board DTS. The QCS9100 is a variant of the SA8775p.
->> While the QCS9100 platform is still in the early design stage, the
->> QCS9100 RIDE board is identical to the SA8775p RIDE board, except it
->> mounts the QCS9100 SoC instead of the SA8775p SoC.
->>
->> The QCS9100 SoC DTSI is directly renamed from the SA8775p SoC DTSI, and
->> all the compatible strings will be updated from "SA8775p" to "QCS9100".
->> The QCS9100 device tree patches will be pushed after all the device tree
->> bindings and device driver patches are reviewed.
->>
->> The final dtsi will like:
->> https://lore.kernel.org/linux-arm-msm/20240703025850.2172008-3-quic_tengfan@quicinc.com/
->>   
->> The detailed cover letter reference:
->> https://lore.kernel.org/linux-arm-msm/20240703025850.2172008-1-quic_tengfan@quicinc.com/
->>
->> Co-developed-by: Maria Yu <quic_aiquny@quicinc.com>
->> Signed-off-by: Maria Yu <quic_aiquny@quicinc.com>
+> On many modern CPUs, it is possible to compute the SHA-256 hash of two
+> equal-length messages in about the same time as a single message, if all
+> the instructions are interleaved.  This is because each SHA-256 (and
+> also most other cryptographic hash functions) is inherently serialized
+> and therefore can't always take advantage of the CPU's full throughput.
 > 
-> This looks messy - wrongly placed, not in correct DCO order. Some tools
-> will just ignore it, some might produce wrong result.
+> An earlier attempt to support multibuffer hashing in Linux was based
+> around the ahash API.  That approach had some major issues, as does the
+> alternative ahash-based approach proposed by Herbert (see my response at
+> https://lore.kernel.org/linux-crypto/20240610164258.GA3269@sol.localdomain/).
+> This patchset instead takes a much simpler approach of just adding a
+> synchronous API for hashing equal-length messages.
 > 
-> Best regards,
-> Krzysztof
+> This works well for dm-verity and fsverity, which use Merkle trees and
+> therefore hash large numbers of equal-length messages.
+> 
+> This patchset is organized as follows:
+> 
+> - Patch 1-3 add crypto_shash_finup_mb() and tests for it.
+> - Patch 4-5 implement finup_mb on x86_64 and arm64, using an
+>   interleaving factor of 2.
+> - Patch 6 adds multibuffer hashing support to fsverity.
+> - Patches 7-14 are cleanups and optimizations to dm-verity that prepare
+>   the way for adding multibuffer hashing support.  These don't depend on
+>   any of the previous patches.
+> - Patch 15 adds multibuffer hashing support to dm-verity.
+> 
+> On CPUs that support multiple concurrent SHA-256's (all arm64 CPUs I
+> tested, and AMD Zen CPUs), raw SHA-256 hashing throughput increases by
+> 70-98%, and the throughput of cold-cache reads from dm-verity and
+> fsverity increases by very roughly 35%.
+> 
+> Changed in v5:
+>   - Reworked the dm-verity patches again.  Split the preparation work
+>     into separate patches, fixed two bugs, and added some new cleanups.
+>   - Other small cleanups
+> 
+> Changed in v4:
+>   - Reorganized the fsverity and dm-verity code to have a unified code
+>     path for single-block vs. multi-block processing.  For data blocks
+>     they now use only crypto_shash_finup_mb().
+> 
+> Changed in v3:
+>   - Change API from finup2x to finup_mb.  It now takes arrays of data
+>     buffer and output buffers, avoiding hardcoding 2x in the API.
+> 
+> Changed in v2:
+>   - Rebase onto cryptodev/master
+>   - Add more comments to assembly
+>   - Reorganize some of the assembly slightly
+>   - Fix the claimed throughput improvement on arm64
+>   - Fix incorrect kunmap order in fs/verity/verify.c
+>   - Adjust testmgr generation logic slightly
+>   - Explicitly check for INT_MAX before casting unsigned int to int
+>   - Mention SHA3 based parallel hashes
+>   - Mention AVX512-based approach
+> 
+> Eric Biggers (15):
+>   crypto: shash - add support for finup_mb
+>   crypto: testmgr - generate power-of-2 lengths more often
+>   crypto: testmgr - add tests for finup_mb
+>   crypto: x86/sha256-ni - add support for finup_mb
+>   crypto: arm64/sha256-ce - add support for finup_mb
+>   fsverity: improve performance by using multibuffer hashing
+>   dm-verity: move hash algorithm setup into its own function
+>   dm-verity: move data hash mismatch handling into its own function
+>   dm-verity: make real_digest and want_digest fixed-length
+>   dm-verity: provide dma_alignment limit in io_hints
+>   dm-verity: always "map" the data blocks
+>   dm-verity: make verity_hash() take dm_verity_io instead of ahash_request
+>   dm-verity: hash blocks with shash import+finup when possible
+>   dm-verity: reduce scope of real and wanted digests
+>   dm-verity: improve performance by using multibuffer hashing
+> 
+>  arch/arm64/crypto/sha2-ce-core.S    | 281 +++++++++++++-
+>  arch/arm64/crypto/sha2-ce-glue.c    |  40 ++
+>  arch/x86/crypto/sha256_ni_asm.S     | 368 ++++++++++++++++++
+>  arch/x86/crypto/sha256_ssse3_glue.c |  39 ++
+>  crypto/shash.c                      |  58 +++
+>  crypto/testmgr.c                    |  90 ++++-
+>  drivers/md/dm-verity-fec.c          |  49 +--
+>  drivers/md/dm-verity-fec.h          |   9 +-
+>  drivers/md/dm-verity-target.c       | 582 ++++++++++++++++------------
+>  drivers/md/dm-verity.h              |  66 ++--
+>  fs/verity/fsverity_private.h        |   7 +
+>  fs/verity/hash_algs.c               |   8 +-
+>  fs/verity/verify.c                  | 170 ++++++--
+>  include/crypto/hash.h               |  52 ++-
+>  14 files changed, 1440 insertions(+), 379 deletions(-)
+> 
+> 
+> base-commit: 6d4e1993a30539f556da2ebd36f1936c583eb812
+> -- 
+> 2.45.1
+> 
 > 
 
-Thanks Krzysztof!
-
-I will fix the messy information in all the QCS9100 related patch series 
-in the next.
-
--- 
-Thx and BRs,
-Tengfei Fan
