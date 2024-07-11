@@ -1,66 +1,66 @@
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2718F16A930
-	for <linux-crypto@vger.kernel.org>; Thu, 11 Jul 2024 17:24:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1C8B16DEA9
+	for <linux-crypto@vger.kernel.org>; Thu, 11 Jul 2024 17:27:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720718681; cv=none; b=O7ZQKdDuzDx30e5xlxdK5LuP/7lI/6PgRk/b0r+5GRTp/lS+n2EkQypiv6ezoVjogmBobZKWsHEeI2+5yaW6zma74LnRRAtQHxl8UlUFh2NyUlDb1NMr+HwxThOTiQMGPNWiMxDRsqjXp77k65xSWHap99ncaKw071KWjj+DPks=
+	t=1720718855; cv=none; b=MPyeT0qJ5LjGtS50BNB5KeEE0Qa3j+Hb0Tzs0HF3UTMBECy4NtmbDVlnqYeWZCbPOKTBSbMMZW4sDm4zfAbabj7a8kpJiAIkWSZwsRWIsUko8kgklht8T7MDm6AA1EYtQwCvsl0J+cpSnhhpfcroRXBzH7C1pCKtJ/A0TkcOIa4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720718681; c=relaxed/simple;
-	bh=aK5fGxfzkfaF8CjDF+AftR41H/5Cb8VT2TGnJRgpefE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XPdGP7/M0RABMQWE73fQVKV3VZrf5vR+dD/TweyHuzM+L8438FzShFyNAQ+0iT4banxWsotd0wUR/EQmMNARNBgP+YD1NyaIrZVnCq3LqqyhN2LlvupS1bLOjwVurv9XNVzH1C/Nfiun2zf3wpp7cGhfidC2DQl297dQnSiz91o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Dv9KCko5; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1720718855; c=relaxed/simple;
+	bh=D5kYreCrB5xrumNP3OKohnR608Naw8wi1bCJDarZPNI=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=W0GvJbOvq0WbY4LRIWsoJYH1LkLImruPyEu5Na/uH7Rg5no8hTborJxlABI4daVQOu+O8OHUBaTurW6t5pT0w8TXMDSZWTrYbcAyzBsDfgi4YT3VLmn4Am564V3RCmhZBMfb4ijPZmTeEB57wk43PKY0pF1HxayI8z84fTu0hgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Qcsi2N7J; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dv9KCko5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qcsi2N7J"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1720718679;
+	s=mimecast20190719; t=1720718852;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=LHcQAftkTM3ozuP6bogHJjs0mv0L9m4CNnKaf7CG7SA=;
-	b=Dv9KCko52MUMX4fb493XcB62h9Tv5W1z0NapiTZLgrKejKX8i8EAr2qSHFauTUye+Ptu9f
-	O4X+gOK1LZJaUaCA7/JFE+JvBKrYDEZwvNMxdR1y78fPHJBhq8yHb5JP5/6Pw2ZSMZHIQ1
-	621z3vSOlWIuBxqg49NSspWkF1R9rfw=
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
- [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=zJAVuyl9T4GQQYKbPn1wdX80P5wSTLbI1xM8EjpmCQk=;
+	b=Qcsi2N7JlUo7UYQPU5j65Ph93lNiZyFR+LewUZAvAgVJggXeL+qwRu0t+KtseLmr1ju+/K
+	WjUTJ2iMiO1Ce1YvDjWnnFfsSQ7EXpZ97RL4ioFND/PyE3vN/chu13DDm4Z7YcdhVw7T2X
+	izoCmVQPdoqa9zJl1CzmjlHxkEb/VEo=
+Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
+ [209.85.210.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-41-GesWJ5JQP4yv1MYWx3vR4w-1; Thu, 11 Jul 2024 13:24:36 -0400
-X-MC-Unique: GesWJ5JQP4yv1MYWx3vR4w-1
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-767c010fe18so1139353a12.2
-        for <linux-crypto@vger.kernel.org>; Thu, 11 Jul 2024 10:24:36 -0700 (PDT)
+ us-mta-673-_s-IIkUUNhGApojjhHBGSg-1; Thu, 11 Jul 2024 13:27:31 -0400
+X-MC-Unique: _s-IIkUUNhGApojjhHBGSg-1
+Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-70af58f79d1so1065935b3a.0
+        for <linux-crypto@vger.kernel.org>; Thu, 11 Jul 2024 10:27:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720718675; x=1721323475;
+        d=1e100.net; s=20230601; t=1720718850; x=1721323650;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
+         :content-language:references:cc:to:from:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=LHcQAftkTM3ozuP6bogHJjs0mv0L9m4CNnKaf7CG7SA=;
-        b=gVThrwIfj8aVbifyAEvmmO7UzYeqVrZaHwjybYFyrqkBkjNrVFhR8dvMnLN08S+Kuj
-         Zk+4kuAQ5HC4fvpzKEiPXZn27xbBEZQ2Mtl/LK7A4MT+JeTxNIvWumknoSE7qTKos0Z5
-         jRMLQGSVSzLw2kpizxoO4DL+ce/Vsnh82Nt8AnWpAHNyx7IoZrqDxdinAka8lwkIx7F1
-         F8wb1mrcFtQ9c5rNAP6NtkRqycMNSFekJAh4OC1nP9ksZa/lDD75KxjTJkWVVLV/Y7xx
-         1vUCBv11UTN03iSD/lPmPPnxz1rTetzc0qvH1myPN9Vnj5l4mRAUv+l4GjWQDtaylKNC
-         IVJg==
-X-Forwarded-Encrypted: i=1; AJvYcCVPc+UXu29beKxK7gAscM9POvYTgzNs574KyBuCdQGDRGkYltwJ1OtZZlbOPmYqhPPIgrXFXHdujYjCp7meM0USxvMz7oZme7PRECCu
-X-Gm-Message-State: AOJu0Ywi1UvmtLvCdt9aI4WWd+1NhwvZIh4Z6BETCk/S6IqMvqYFwAzA
-	SC4EOdv+BH3KNzoT5PPLuZ64YMIBIwTvMmqpQcxAxpvcpvvZuf8kWtfL9AIaAXm1sAkL1helD3T
-	b/3qsob+BINGk+WvT34itFzCsMVvHmlEEuoyxC45DT/ohWyTBLctGpuf6ls1uhQ==
-X-Received: by 2002:a05:6a20:4303:b0:1c0:bf35:ef4c with SMTP id adf61e73a8af0-1c29821493emr10965277637.11.1720718675285;
-        Thu, 11 Jul 2024 10:24:35 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH4gq5Y/9m136LJj8IjW2RDY4xHAx+IMxnZfYhFOWR09eQ5+olsjCd/jwDFzgTYIuyLaMXLfg==
-X-Received: by 2002:a05:6a20:4303:b0:1c0:bf35:ef4c with SMTP id adf61e73a8af0-1c29821493emr10965253637.11.1720718674833;
-        Thu, 11 Jul 2024 10:24:34 -0700 (PDT)
-Received: from [10.35.209.243] ([208.115.86.68])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fbb6ac5431sm53033315ad.229.2024.07.11.10.24.33
+        bh=zJAVuyl9T4GQQYKbPn1wdX80P5wSTLbI1xM8EjpmCQk=;
+        b=PFPMWsSXuBsqPJKbDcegiMsKlRMgZEYdzUWuHLONrNaZjbT8LyAebrls40YBTWtRL8
+         tJumrujM69MArr8IGidNLBj1ZnnfolgCd1hvlE0svRzPZRQPU6bNKxJtVDaFTpM3f8V2
+         W9LlFruAGF4tPaAC9Y0WbT8GP/Y9H3Vq/M4uZPqRdNUOUce75uiICXH1E7lyVpl8o2pA
+         5b4LhJD3OlZxRhy2skUL3Nxd5ou23lONcdqPEpTgPhe36p6WcW0Ro5WdgwMJM+ElP4bp
+         SFaj6FuzFYYfsvBeGbecDuZQLiY0Mzacesk9nObcUWyO/UjhlsAASnlL38kwwMPbrT2j
+         t9sw==
+X-Forwarded-Encrypted: i=1; AJvYcCW5iHSoh22rBK7gEb9YuA+nkYD6B3h5VEgPqaEH4sr9DYVMFIzC2m75qmYok1MJ9F5xh+t9r8XxJix3g7fEgan+KziZLltYOwpyYNdr
+X-Gm-Message-State: AOJu0YxNLuFI46ApOaAGnPoyAitBNNgIoxdM/PWUZpvvcqJCFhWpGIsw
+	z0hen/WJnpphpB3QZ8iaj8s6+5hSo4uEOY2u6UhTBUkGeM+CAECMV+KShpz8fcDXK6VK3d+lezI
+	ZfJoTouOaVsKeSr+5Wofyv/uLgvECrfBxxybRDkkr139dNZIDAGo4kN4YxzccEQ==
+X-Received: by 2002:a05:6a21:3393:b0:1c2:8e77:a813 with SMTP id adf61e73a8af0-1c298205f0dmr11027127637.1.1720718850308;
+        Thu, 11 Jul 2024 10:27:30 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHh44QMcq2txXbEeWFpr+RS5mfBXkcTVLyvOo+9zU+WfqfEcW+CPvdJNskQniJUZNJcHLgJ4A==
+X-Received: by 2002:a05:6a21:3393:b0:1c2:8e77:a813 with SMTP id adf61e73a8af0-1c298205f0dmr11027098637.1.1720718849890;
+        Thu, 11 Jul 2024 10:27:29 -0700 (PDT)
+Received: from [10.35.209.243] ([208.115.86.77])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fbb6ab75ffsm53099335ad.175.2024.07.11.10.27.28
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Jul 2024 10:24:34 -0700 (PDT)
-Message-ID: <98798483-dfcd-451e-94bb-57d830bf68d8@redhat.com>
-Date: Thu, 11 Jul 2024 19:24:33 +0200
+        Thu, 11 Jul 2024 10:27:29 -0700 (PDT)
+Message-ID: <54b6de32-f127-4928-9f4a-acb8653e5c81@redhat.com>
+Date: Thu, 11 Jul 2024 19:27:27 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -70,6 +70,7 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v22 1/4] mm: add MAP_DROPPABLE for designating always
  lazily freeable mappings
+From: David Hildenbrand <david@redhat.com>
 To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
  Linus Torvalds <torvalds@linux-foundation.org>
 Cc: linux-kernel@vger.kernel.org, patches@lists.linux.dev,
@@ -88,7 +89,7 @@ References: <20240709130513.98102-1-Jason@zx2c4.com>
  <bf51a483-8725-4222-937f-3d6c66876d34@redhat.com>
  <CAHk-=wh=vzhiDSNaLJdmjkhLqevB8+rhE49pqh0uBwhsV=1ccQ@mail.gmail.com>
  <ZpAR0CgLc28gEkV3@zx2c4.com> <ZpATx21F_01SBRnO@zx2c4.com>
-From: David Hildenbrand <david@redhat.com>
+ <98798483-dfcd-451e-94bb-57d830bf68d8@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
  xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -135,51 +136,59 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <ZpATx21F_01SBRnO@zx2c4.com>
+In-Reply-To: <98798483-dfcd-451e-94bb-57d830bf68d8@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 11.07.24 19:17, Jason A. Donenfeld wrote:
-> On Thu, Jul 11, 2024 at 07:09:36PM +0200, Jason A. Donenfeld wrote:
->> So, hmm... The swapbacked thing really seemed so simple... I wonder if
->> there's a way of recovering that.
+On 11.07.24 19:24, David Hildenbrand wrote:
+> On 11.07.24 19:17, Jason A. Donenfeld wrote:
+>> On Thu, Jul 11, 2024 at 07:09:36PM +0200, Jason A. Donenfeld wrote:
+>>> So, hmm... The swapbacked thing really seemed so simple... I wonder if
+>>> there's a way of recovering that.
+>>
+>> Not wanting to introduce a new bitflag, I went looking and noticed this:
+>>
+>> /*
+>>    * Private page markings that may be used by the filesystem that owns the page
+>>    * for its own purposes.
+>>    * - PG_private and PG_private_2 cause release_folio() and co to be invoked
+>>    */
+>> PAGEFLAG(Private, private, PF_ANY)
+>> PAGEFLAG(Private2, private_2, PF_ANY) TESTSCFLAG(Private2, private_2, PF_ANY)
+>> PAGEFLAG(OwnerPriv1, owner_priv_1, PF_ANY)
+>>           TESTCLEARFLAG(OwnerPriv1, owner_priv_1, PF_ANY)
+>>
+>> The below +4/-1 diff is pretty hacky and might be illegal in the state
+>> of California, but I think it does work. The idea is that if that bit is
+>> normally only used for filesystems, then in the anonymous case, it's
+>> free to be used for this.
+>>
+>> Any opinions about this, or a suggestion on how to do that in a less
+>> ugly way?
+>>
+>> Jason
+>>
+>>
+>> diff --git a/mm/rmap.c b/mm/rmap.c
+>> index 1f9b5a9cb121..090554277e4a 100644
+>> --- a/mm/rmap.c
+>> +++ b/mm/rmap.c
+>> @@ -1403,6 +1403,8 @@ void folio_add_new_anon_rmap(struct folio *folio, struct vm_area_struct *vma,
+>>    	 */
+>>    	if (!(vma->vm_flags & VM_DROPPABLE))
+>>    		__folio_set_swapbacked(folio);
+>> +	else
+>> +		folio_set_owner_priv_1(folio);
 > 
-> Not wanting to introduce a new bitflag, I went looking and noticed this:
 > 
-> /*
->   * Private page markings that may be used by the filesystem that owns the page
->   * for its own purposes.
->   * - PG_private and PG_private_2 cause release_folio() and co to be invoked
->   */
-> PAGEFLAG(Private, private, PF_ANY)
-> PAGEFLAG(Private2, private_2, PF_ANY) TESTSCFLAG(Private2, private_2, PF_ANY)
-> PAGEFLAG(OwnerPriv1, owner_priv_1, PF_ANY)
->          TESTCLEARFLAG(OwnerPriv1, owner_priv_1, PF_ANY)
-> 
-> The below +4/-1 diff is pretty hacky and might be illegal in the state
-> of California, but I think it does work. The idea is that if that bit is
-> normally only used for filesystems, then in the anonymous case, it's
-> free to be used for this.
-> 
-> Any opinions about this, or a suggestion on how to do that in a less
-> ugly way?
-> 
-> Jason
-> 
-> 
-> diff --git a/mm/rmap.c b/mm/rmap.c
-> index 1f9b5a9cb121..090554277e4a 100644
-> --- a/mm/rmap.c
-> +++ b/mm/rmap.c
-> @@ -1403,6 +1403,8 @@ void folio_add_new_anon_rmap(struct folio *folio, struct vm_area_struct *vma,
->   	 */
->   	if (!(vma->vm_flags & VM_DROPPABLE))
->   		__folio_set_swapbacked(folio);
-> +	else
-> +		folio_set_owner_priv_1(folio);
+> PG_owner_priv_1 maps to PG_swapcache? :)
 
+Maybe the combination !swapbacked && swapcache could be used to indicate 
+such folios. (we will never set swapbacked)
 
-PG_owner_priv_1 maps to PG_swapcache? :)
+But likely we have to be a bit careful here. We don't want 
+folio_test_swapcache() to return for folios that ... are not in the 
+swapcache.
 
 -- 
 Cheers,
