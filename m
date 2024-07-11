@@ -1,155 +1,292 @@
-Received: from bmailout1.hostsharing.net (bmailout1.hostsharing.net [83.223.95.100])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 626B316B743;
-	Thu, 11 Jul 2024 15:00:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D48FE16D4E7;
+	Thu, 11 Jul 2024 17:09:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720710037; cv=none; b=dzQJvLy+IEuYf+ut96ILlapwvC06+MhuUJ3CYx5WuFYtUB6ICymq1+9TE/sSS9qx7uwafdixm5LQQ4C4RabIdrqhIb3Vg3CNhfimUj6G7wQaOpRqIwcxrcy8f21v0HDYI9MYf1hMG4RUCA84bH/lbw7Ee7sd4VL4zdjVm4O7BmY=
+	t=1720717784; cv=none; b=alD53J28DAQLoo4nLMS4MeCwP7MmkqnsJU4/cXk+hYl7ZrGsR3mrGtrpDnD/IzaVmYtzjoNCUPQS2C/RvE57IKtl3oSA7NZOR0+A34d7Weqd+VYvxGoXK7aozq8vV4qwqM4zVcwnT20aZ2mXKqQSBe8gyHUPWFXAHpVO9TJ+mrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720710037; c=relaxed/simple;
-	bh=LudTEYRfZlnvYQXONEYRd3VAVe+JaXveGK9Bk1Rqur4=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=G1EMuzTidY7VdMQEWnTPbjbB7bo/Cd5ATKYih75/vFRYicYK9Dpkl8Qt0+1tFAVOZTtetUOeajubvt6WvLeqGAMfqk7VlKR13aWzz+Y27ZHu0FxYNiLGZOoo5FJ2hUfeOJflOrUbnMSp4xANHfDnUZzjmLG66toGpSHDJNBRvTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.95.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout1.hostsharing.net (Postfix) with ESMTPS id 1FB3830002534;
-	Thu, 11 Jul 2024 17:00:26 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id 0F242EEAB0; Thu, 11 Jul 2024 17:00:26 +0200 (CEST)
-Date: Thu, 11 Jul 2024 17:00:26 +0200
-From: Lukas Wunner <lukas@wunner.de>
-To: Dan Williams <dan.j.williams@intel.com>
-Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Bjorn Helgaas <helgaas@kernel.org>,
-	David Howells <dhowells@redhat.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Woodhouse <dwmw2@infradead.org>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	linux-pci@vger.kernel.org, linux-cxl@vger.kernel.org,
-	linux-coco@lists.linux.dev, keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linuxarm@huawei.com,
-	David Box <david.e.box@intel.com>, "Li, Ming" <ming4.li@intel.com>,
-	Ilpo Jarvinen <ilpo.jarvinen@linux.intel.com>,
-	Alistair Francis <alistair.francis@wdc.com>,
-	Wilfred Mallawa <wilfred.mallawa@wdc.com>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Alexey Kardashevskiy <aik@amd.com>,
-	Dhaval Giani <dhaval.giani@amd.com>,
-	Gobikrishna Dhanuskodi <gdhanuskodi@nvidia.com>,
-	Jason Gunthorpe <jgg@nvidia.com>, Peter Gonda <pgonda@google.com>,
-	Jerome Glisse <jglisse@google.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Alexander Graf <graf@amazon.com>, Samuel Ortiz <sameo@rivosinc.com>
-Subject: Re: [PATCH v2 08/18] PCI/CMA: Authenticate devices on enumeration
-Message-ID: <Zo_zivacyWmBuQcM@wunner.de>
+	s=arc-20240116; t=1720717784; c=relaxed/simple;
+	bh=VJps8YRyXPgmkQL/Oc0nWeCbG5EJcOqKrcAnZRcok64=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UyBAz/WlAamYdEoVpRgzlPEEAhmO+DK5yPuhrPPZWfXuQuo+l8JpzmuXwO8odDgjEblTaX9DQBm2RymkP7vVDePo+ZdLMxKgXfCEFM1+Hr8EwX8vfbNLTrt702zWhTzPy8C9UwD4ZT/FnpZ8KyyRwuy8wGG4mzbwblE+umoMrEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=X/X7+0TS; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="X/X7+0TS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB2E2C116B1;
+	Thu, 11 Jul 2024 17:09:41 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="X/X7+0TS"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1720717780;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=b5Zk8ILabTM/NFQk7obBb2+60sqv1qoyRRStBSjez0M=;
+	b=X/X7+0TSXxHpmN9PMnqrKgXgKx72kEhINEQYzolMUKcDfR1Vzh5V+MOSwdpOdnflOrEggY
+	zwuFsiGiSZePB7MRot1uPuwaJvzoEreWrxF6ZujhbuOrACxJggMXynn87lCnleNNjeWH5z
+	uh/2WYxRcos75n4JpPgbhTxfBYbgRw4=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 229a906f (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Thu, 11 Jul 2024 17:09:39 +0000 (UTC)
+Date: Thu, 11 Jul 2024 19:09:36 +0200
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: David Hildenbrand <david@redhat.com>, linux-kernel@vger.kernel.org,
+	patches@lists.linux.dev, tglx@linutronix.de,
+	linux-crypto@vger.kernel.org, linux-api@vger.kernel.org,
+	x86@kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+	Carlos O'Donell <carlos@redhat.com>,
+	Florian Weimer <fweimer@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
+	Jann Horn <jannh@google.com>,
+	Christian Brauner <brauner@kernel.org>,
+	David Hildenbrand <dhildenb@redhat.com>, linux-mm@kvack.org
+Subject: Re: [PATCH v22 1/4] mm: add MAP_DROPPABLE for designating always
+ lazily freeable mappings
+Message-ID: <ZpAR0CgLc28gEkV3@zx2c4.com>
+References: <20240709130513.98102-1-Jason@zx2c4.com>
+ <20240709130513.98102-2-Jason@zx2c4.com>
+ <378f23cb-362e-413a-b221-09a5352e79f2@redhat.com>
+ <9b400450-46bc-41c7-9e89-825993851101@redhat.com>
+ <Zo8q7ePlOearG481@zx2c4.com>
+ <Zo9gXAlF-82_EYX1@zx2c4.com>
+ <bf51a483-8725-4222-937f-3d6c66876d34@redhat.com>
+ <CAHk-=wh=vzhiDSNaLJdmjkhLqevB8+rhE49pqh0uBwhsV=1ccQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <668f17d4553_6de2294ba@dwillia2-mobl3.amr.corp.intel.com.notmuch>
- <668dc8525d9e7_102cc294f8@dwillia2-xfh.jf.intel.com.notmuch>
+In-Reply-To: <CAHk-=wh=vzhiDSNaLJdmjkhLqevB8+rhE49pqh0uBwhsV=1ccQ@mail.gmail.com>
 
-On Tue, Jul 09, 2024 at 04:31:30PM -0700, Dan Williams wrote:
-> Non-authenticated operation is the status quo. CMA is a building block
-> to other security features.
+Hi Linus, David,
 
-That's not quite correct:  Products exist which support CMA but neither
-IDE nor TDISP.  CMA is not just a building block for IDE or TDISP,
-but is useful on its own merits.
+On Wed, Jul 10, 2024 at 10:07:03PM -0700, Linus Torvalds wrote:
+> The other approach might be to just let all the dirty handling happen
+> - make droppable pages have a "page->mapping" (and not be anonymous),
+> and have the mapping->a_ops->writepage() just always return success
+> immediately.
 
-> Nothing currently cares about CMA being
-> established before a driver loads and it is not clear that now is the
-> time to for the kernel to paint itself into a corner to make that
-> guarantee.
+When I was working on this patchset this year with the syscall, this is
+similar somewhat to the initial approach I was taking with setting up a
+special mapping. It turned into kind of a mess and I couldn't get it
+working. There's a lot of functionality built around anonymous pages
+that would need to be duplicated (I think?). I'll revisit it if need be,
+but let's see if I can make avoiding the dirty bit propagation work.
 
-The PCI core initializes all of the device's capabilities upon enumeration.
-CMA is no different than any of the other capabilities.
-
-Chromebooks and many Linux distributions prevent driver binding to
-Thunderbolt-attached devices unless they're authorized by the user.
-I fully expect that vendors will want to additionally take advantage
-of authentication.  I don't want to wait for Windows or macOS to go
-ahead and add automatic authentication, then follow in their footsteps.
-I want Linux to lead the way here, so yes, absolutely, that's the corner
-I want the kernel to paint itself in, no less.
-
-> I think you are conflating automatic authentication and built-in
-> functionality. There are counter examples of security features like
-> encrypted root filesystems built on top of module drivers.
-
-Encrypted root filesystems are mounted after all initcall levels have run
-and user space has been launched.  At that point it's possible to invoke
-request_module().  But request_module() cannot be invoked from a
-subsys_initcall(), which is when device capabilities are enumerated.
-
-TSM can be a module because it's geared towards the passthrough use case
-and passthrough only happens when user space is up and running.
-
-> What I am trying to avoid is CMA setting unnecessary expectations that
-> can not be duplicated by TSM like "all authentication capable PCI
-> devices will be authenticated prior to driver attach".
-
-I don't want to artificially cripple CMA in order to achieve only a
-lowest common denominator with TSM.  Both, native CMA and TSM-driven
-authentication have their respective use cases and (dis)advantages.
-Should we try to strive for commonalities in the ABI?  Of course!
-But not at the expense of reducing functionality.
-
-> I agree that CMA should be in kernel, it's not clear that authentication
-> needs to be automatic, and certainly not in a way that a driver can not
-> opt-out of.
-
-If there is a need to opt out, that feature can be retrofitted easily.
-But systems need to be "secure by default":
-https://en.wikipedia.org/wiki/Secure_by_default
-
-> What if a use case cares about resume time latency?
-
-Resume is parallelized (see dpm_noirq_resume_devices()), so the latency
-is bounded by the time to authenticate a single device.
-
-Unfortunately boot-time enumeration of the PCI bus is not parallelized
-for historic reasons, we may indeed have to look into that.
-
-> What if a driver
-> knows that authentication is only needed later in the resume flow?
-
-If authentication is not possible in the ->resume_noirq phase because
-the driver needs to perform some initialization steps, it can just call
-on the PCI core to reauthenticate the device after those steps.
-
-The declaration of pci_cma_reauthenticate() can be moved from
-drivers/pci/pci.h to include/linux/pci.h once that need arrives.
-
-> At a minimum I think pci_cma_reauthenticate() should do something like:
+> It's mainly the pte_dirty games in mm/vmscan.c that does it
+> (walk_pte_range), but also the tear-down in mm/memory.c
+> (zap_present_folio_ptes). Possibly others that I didn't think of.
 > 
-> /* not previously authenticated skip authentication */
-> if (!spdm_state->authenticated)
-> 	return;
+> Both do have access to the vma, although in the case of
+> walk_pte_range() we don't actually pass it down because we haven't
+> needed it).
+
+Actually, it's there hanging out in args->vma, and the function makes
+use of that member already. So not so bad.
+
 > 
-> ...so that spdm capable devices can opt-out of automatic reauthentication.
+> There's also page_vma_mkclean_one(), try_to_unmap_one() and
+> try_to_migrate_one().  And possibly many others I haven't even thought
+> about.
+> 
+> So quite a few places that do that "transfer dirty bit from pte to folio".
 
-Unfortunately that doesn't work:
+Alright, an hour later of fiddling, and it doesn't actually work (yet?)
+-- the selftest fails. A diff follows below.
 
-A device may have been reset due to a firmware update which adds
-CMA support.  Or the keyring of trusted root certificates may have
-been missing the certificate for authenticating the device, but the
-certificate has since been added.  Or the device came back from reset
-with a different certificate chain.  Or it was hot-replaced with a
-CMA-capable one...
+So, hmm... The swapbacked thing really seemed so simple... I wonder if
+there's a way of recovering that.
 
-Thanks,
+Jason
 
-Lukas
+
+diff --git a/mm/gup.c b/mm/gup.c
+index ca0f5cedce9b..38745cc4fa06 100644
+--- a/mm/gup.c
++++ b/mm/gup.c
+@@ -990,7 +990,8 @@ static struct page *follow_page_pte(struct vm_area_struct *vma,
+ 	}
+ 	if (flags & FOLL_TOUCH) {
+ 		if ((flags & FOLL_WRITE) &&
+-		    !pte_dirty(pte) && !PageDirty(page))
++		    !pte_dirty(pte) && !PageDirty(page) &&
++		    !(vma->vm_flags & VM_DROPPABLE))
+ 			set_page_dirty(page);
+ 		/*
+ 		 * pte_mkyoung() would be more correct here, but atomic care
+diff --git a/mm/ksm.c b/mm/ksm.c
+index 34c4820e0d3d..2401fc4203ba 100644
+--- a/mm/ksm.c
++++ b/mm/ksm.c
+@@ -1339,7 +1339,7 @@ static int write_protect_page(struct vm_area_struct *vma, struct folio *folio,
+ 			goto out_unlock;
+ 		}
+
+-		if (pte_dirty(entry))
++		if (pte_dirty(entry) && !(vma->vm_flags & VM_DROPPABLE))
+ 			folio_mark_dirty(folio);
+ 		entry = pte_mkclean(entry);
+
+@@ -1518,7 +1518,7 @@ static int try_to_merge_one_page(struct vm_area_struct *vma,
+ 			 * Page reclaim just frees a clean page with no dirty
+ 			 * ptes: make sure that the ksm page would be swapped.
+ 			 */
+-			if (!PageDirty(page))
++			if (!PageDirty(page) && !(vma->vm_flags & VM_DROPPABLE))
+ 				SetPageDirty(page);
+ 			err = 0;
+ 		} else if (pages_identical(page, kpage))
+diff --git a/mm/memory.c b/mm/memory.c
+index d10e616d7389..6a02d16309be 100644
+--- a/mm/memory.c
++++ b/mm/memory.c
+@@ -1479,7 +1479,7 @@ static __always_inline void zap_present_folio_ptes(struct mmu_gather *tlb,
+
+ 	if (!folio_test_anon(folio)) {
+ 		ptent = get_and_clear_full_ptes(mm, addr, pte, nr, tlb->fullmm);
+-		if (pte_dirty(ptent)) {
++		if (pte_dirty(ptent) && !(vma->vm_flags & VM_DROPPABLE)) {
+ 			folio_mark_dirty(folio);
+ 			if (tlb_delay_rmap(tlb)) {
+ 				delay_rmap = true;
+@@ -6140,7 +6140,8 @@ static int __access_remote_vm(struct mm_struct *mm, unsigned long addr,
+ 			if (write) {
+ 				copy_to_user_page(vma, page, addr,
+ 						  maddr + offset, buf, bytes);
+-				set_page_dirty_lock(page);
++				if (!(vma->vm_flags & VM_DROPPABLE))
++					set_page_dirty_lock(page);
+ 			} else {
+ 				copy_from_user_page(vma, page, addr,
+ 						    buf, maddr + offset, bytes);
+diff --git a/mm/migrate_device.c b/mm/migrate_device.c
+index aecc71972a87..72d3f8eaae6e 100644
+--- a/mm/migrate_device.c
++++ b/mm/migrate_device.c
+@@ -216,7 +216,7 @@ static int migrate_vma_collect_pmd(pmd_t *pmdp,
+ 			migrate->cpages++;
+
+ 			/* Set the dirty flag on the folio now the pte is gone. */
+-			if (pte_dirty(pte))
++			if (pte_dirty(pte) && !(vma->vm_flags & VM_DROPPABLE))
+ 				folio_mark_dirty(folio);
+
+ 			/* Setup special migration page table entry */
+diff --git a/mm/rmap.c b/mm/rmap.c
+index 1f9b5a9cb121..1688d06bb617 100644
+--- a/mm/rmap.c
++++ b/mm/rmap.c
+@@ -1397,12 +1397,7 @@ void folio_add_new_anon_rmap(struct folio *folio, struct vm_area_struct *vma,
+ 	VM_WARN_ON_FOLIO(folio_test_hugetlb(folio), folio);
+ 	VM_BUG_ON_VMA(address < vma->vm_start ||
+ 			address + (nr << PAGE_SHIFT) > vma->vm_end, vma);
+-	/*
+-	 * VM_DROPPABLE mappings don't swap; instead they're just dropped when
+-	 * under memory pressure.
+-	 */
+-	if (!(vma->vm_flags & VM_DROPPABLE))
+-		__folio_set_swapbacked(folio);
++	__folio_set_swapbacked(folio);
+ 	__folio_set_anon(folio, vma, address, true);
+
+ 	if (likely(!folio_test_large(folio))) {
+@@ -1777,7 +1772,7 @@ static bool try_to_unmap_one(struct folio *folio, struct vm_area_struct *vma,
+ 		pte_install_uffd_wp_if_needed(vma, address, pvmw.pte, pteval);
+
+ 		/* Set the dirty flag on the folio now the pte is gone. */
+-		if (pte_dirty(pteval))
++		if (pte_dirty(pteval) && !(vma->vm_flags & VM_DROPPABLE))
+ 			folio_mark_dirty(folio);
+
+ 		/* Update high watermark before we lower rss */
+@@ -1822,7 +1817,7 @@ static bool try_to_unmap_one(struct folio *folio, struct vm_area_struct *vma,
+ 			}
+
+ 			/* MADV_FREE page check */
+-			if (!folio_test_swapbacked(folio)) {
++			if (!folio_test_swapbacked(folio) || (vma->vm_flags & VM_DROPPABLE)) {
+ 				int ref_count, map_count;
+
+ 				/*
+@@ -1846,13 +1841,7 @@ static bool try_to_unmap_one(struct folio *folio, struct vm_area_struct *vma,
+ 				 * plus the rmap(s) (dropped by discard:).
+ 				 */
+ 				if (ref_count == 1 + map_count &&
+-				    (!folio_test_dirty(folio) ||
+-				     /*
+-				      * Unlike MADV_FREE mappings, VM_DROPPABLE
+-				      * ones can be dropped even if they've
+-				      * been dirtied.
+-				      */
+-				     (vma->vm_flags & VM_DROPPABLE))) {
++				    !folio_test_dirty(folio)) {
+ 					dec_mm_counter(mm, MM_ANONPAGES);
+ 					goto discard;
+ 				}
+@@ -1862,12 +1851,7 @@ static bool try_to_unmap_one(struct folio *folio, struct vm_area_struct *vma,
+ 				 * discarded. Remap the page to page table.
+ 				 */
+ 				set_pte_at(mm, address, pvmw.pte, pteval);
+-				/*
+-				 * Unlike MADV_FREE mappings, VM_DROPPABLE ones
+-				 * never get swap backed on failure to drop.
+-				 */
+-				if (!(vma->vm_flags & VM_DROPPABLE))
+-					folio_set_swapbacked(folio);
++				folio_set_swapbacked(folio);
+ 				ret = false;
+ 				page_vma_mapped_walk_done(&pvmw);
+ 				break;
+@@ -2151,7 +2135,7 @@ static bool try_to_migrate_one(struct folio *folio, struct vm_area_struct *vma,
+ 		}
+
+ 		/* Set the dirty flag on the folio now the pte is gone. */
+-		if (pte_dirty(pteval))
++		if (pte_dirty(pteval) && !(vma->vm_flags & VM_DROPPABLE))
+ 			folio_mark_dirty(folio);
+
+ 		/* Update high watermark before we lower rss */
+@@ -2397,7 +2381,7 @@ static bool page_make_device_exclusive_one(struct folio *folio,
+ 		pteval = ptep_clear_flush(vma, address, pvmw.pte);
+
+ 		/* Set the dirty flag on the folio now the pte is gone. */
+-		if (pte_dirty(pteval))
++		if (pte_dirty(pteval) && !(vma->vm_flags & VM_DROPPABLE))
+ 			folio_mark_dirty(folio);
+
+ 		/*
+diff --git a/mm/vmscan.c b/mm/vmscan.c
+index 2e34de9cd0d4..cf5b26bd067a 100644
+--- a/mm/vmscan.c
++++ b/mm/vmscan.c
+@@ -3396,6 +3396,7 @@ static bool walk_pte_range(pmd_t *pmd, unsigned long start, unsigned long end,
+ 		walk->mm_stats[MM_LEAF_YOUNG]++;
+
+ 		if (pte_dirty(ptent) && !folio_test_dirty(folio) &&
++		    !(args->vma->vm_flags & VM_DROPPABLE) &&
+ 		    !(folio_test_anon(folio) && folio_test_swapbacked(folio) &&
+ 		      !folio_test_swapcache(folio)))
+ 			folio_mark_dirty(folio);
+@@ -3476,6 +3477,7 @@ static void walk_pmd_range_locked(pud_t *pud, unsigned long addr, struct vm_area
+ 		walk->mm_stats[MM_LEAF_YOUNG]++;
+
+ 		if (pmd_dirty(pmd[i]) && !folio_test_dirty(folio) &&
++		    !(vma->vm_flags && VM_DROPPABLE) &&
+ 		    !(folio_test_anon(folio) && folio_test_swapbacked(folio) &&
+ 		      !folio_test_swapcache(folio)))
+ 			folio_mark_dirty(folio);
+@@ -4076,6 +4078,7 @@ void lru_gen_look_around(struct page_vma_mapped_walk *pvmw)
+ 		young++;
+
+ 		if (pte_dirty(ptent) && !folio_test_dirty(folio) &&
++		    !(vma->vm_flags & VM_DROPPABLE) &&
+ 		    !(folio_test_anon(folio) && folio_test_swapbacked(folio) &&
+ 		      !folio_test_swapcache(folio)))
+ 			folio_mark_dirty(folio);
+
