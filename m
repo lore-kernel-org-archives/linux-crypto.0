@@ -1,100 +1,204 @@
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB0C616B75D
-	for <linux-crypto@vger.kernel.org>; Thu, 11 Jul 2024 19:17:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71B9016E88D
+	for <linux-crypto@vger.kernel.org>; Thu, 11 Jul 2024 19:18:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720725481; cv=none; b=dgLTkKl4J+f+5O6CbJDzysknE5yXTGFgbJ0nnXnr+w7oq01e7zlel8kLbEPQQtq8PVorROqM3pU/OL1ML43Xk/3TZ6a5HQxF3cr/ErikGWCwxhEMhMBZ3QT2e4F062xCNw2sJK2EMKfxZOfCS5XMCy7/H/4E6JC4W8P+TXQEWU0=
+	t=1720725491; cv=none; b=tlIwkZ3dGcrJOoHc18aBVyaZg2wZJpTLR6BCPLb+x1cTAGHupeXT4wjJ7w/ehdvf4QcZ1T5wmQFwgTlERq2191F+KKHnbgB+Hxroi0v8PYo8RxR+w2CQCz35hvkllIlEFchNk6vDqY6qq0sptG4/VIoum0+lyV0sRCboRWiV8gk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720725481; c=relaxed/simple;
-	bh=jml2mH5xPX6WLHw6QUqvLqc4gm8iBoTV1e8ILzGXDOY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dUXpRouup+ZL6+oFJzeycikEvd9VaPRFVAdWajunNQbCS5w0Oq8VUsEcxYxayMFf512/I/N6F3UPzIvKUY1f9PvWrO4HRQ6HqjDmL83nUTTMFeu2MOOKb0LAr6riq7bQ4pAYpLCpNwGuQUJAtRedTIQwR+6oj4vdaDGNPA1NLtk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=UZ6bQRut; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+	s=arc-20240116; t=1720725491; c=relaxed/simple;
+	bh=LD5F8waAmDcJ+gfEOAlGZEOJ5gl2yhVpWvogsEeiWJQ=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=LPP7ebIPMsM5b5COsbXOZ725G0F28I7EXuIQkvzMRRZJv+Dw+Y0AT+uYorRJlNbI92HkQ3+YtQDlGlHrOGZdZd/6OULlLSCYG9jrfm7PJ0CZwvqAUstIgHv4b0upMUbKJM1w9ZQeo/R1WL9bl1BFVsMT2rnpO8iqlG08rFLb80c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DkPNt9fO; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="UZ6bQRut"
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-595856e2332so1601233a12.1
-        for <linux-crypto@vger.kernel.org>; Thu, 11 Jul 2024 12:17:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1720725478; x=1721330278; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=PfkbCy6IC8MM2ShGGRIr/7yv5osfVo7ephGJ4Ll7hD8=;
-        b=UZ6bQRutE9y1fXyZCAPMmbq4wfcZUdp2IvI6GM1DTlyFoHshJpBxryXnvC2Y4Puo7j
-         LWFDJZuK6DVZpGZ4evDHFhakV229Fi9CATz6Gr9chaRLCZNHVyHC0h7oaLoFqqwzDGjx
-         tsVc2WIYdbkGsJdxDZxC8T9c5ZoBRDvZQOQA8=
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DkPNt9fO"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1720725488;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=BsFK6AFfUoEsMQwEYVBX+EezO+YNFPKdzylcEdBJ5wQ=;
+	b=DkPNt9fOECB/YWo9FXplbKl0FvMZ2NLwBsv1rzzqCGdPT09YZNuXJxWsheD+6jJTqX9b73
+	Heaym1wT0q1ezddjlP3IlDOE0bA/igMvE+Fx/2C1hn6jPNYaCTH5GTE6Acs2EocIy1nGNb
+	B6wNNKqaNvuJX6A2mXyXoyL8Pkb0z5o=
+Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
+ [209.85.215.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-208-jwm4Wo3oOh2gldHE9HD3XA-1; Thu, 11 Jul 2024 15:18:07 -0400
+X-MC-Unique: jwm4Wo3oOh2gldHE9HD3XA-1
+Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-767c010fe18so1231923a12.2
+        for <linux-crypto@vger.kernel.org>; Thu, 11 Jul 2024 12:18:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720725478; x=1721330278;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PfkbCy6IC8MM2ShGGRIr/7yv5osfVo7ephGJ4Ll7hD8=;
-        b=GONwWg+lUQJ/ZmOyfBAdEUZKBJ7pcfOKT1niZwYNWnscnJTMSbOlCZOElF7OJ8SlBx
-         yBmNIiEX2IzK+o5RznelwTNp09Mgao7pP1F8NYtZS3xHoPFqJowCvDIMNW/FVlnnwDII
-         h/CYDIXq9rFqwUA8NHzbuvpLfAJkOSzPRz921XJ+t2c4Xu3LJUmWAxTU2qZfa2M/5Fqh
-         Ra3O88qp+ISd0ymMqJQY3IEkKpbwL4zvCRvpUN2F5bLjexqphVHxBko2yvMFoWIVTHI9
-         BY/+DhvTgsMfhC8jh7Vkt1lSjvhGZQ7YkpFzphPFsDVkcsUCgwwsuLJgmfFcTzwg9Jtc
-         tsfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWIhJBfWT1419sQLZO9dizR7Z2a2quBluha9o8AFeuwEbLdKqrhQOm0nGpaUt4sOaMG50JEfTz4NH51xfeWXNXDWWIgFEtZJZOy6Cuw
-X-Gm-Message-State: AOJu0Ywe2jRYrFRYjRT+g/oJZ1mD5FXa17iQVo3xnoIn9f+YGr8HqduM
-	miDFuwPUn6C784mNazVMM4Cd4Paq/QKP9W3nlt4U+h/x+PXHUiA2wy8ZkoBEHqmp+G/pqE8KL1m
-	YEy4Cbg==
-X-Google-Smtp-Source: AGHT+IGkkmFLyCPGy4VCmdwQqJynPks/rWpUSkPCu9W9CAKRWj+zizSs0eiKFJ4gjQAMg0NKzjfYzg==
-X-Received: by 2002:aa7:d44b:0:b0:58c:f5bd:eb60 with SMTP id 4fb4d7f45d1cf-594bc7c821cmr5251077a12.33.1720725477956;
-        Thu, 11 Jul 2024 12:17:57 -0700 (PDT)
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com. [209.85.208.45])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-594bda308efsm3713405a12.81.2024.07.11.12.17.57
-        for <linux-crypto@vger.kernel.org>
+        d=1e100.net; s=20230601; t=1720725486; x=1721330286;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:references:cc:to:from:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=BsFK6AFfUoEsMQwEYVBX+EezO+YNFPKdzylcEdBJ5wQ=;
+        b=IQMlFQHiYtyf+amtDOa8nMpCILhPo6tPOKlSKQRgqMq+9wCE90d4Po/BNdd97mIWdg
+         tPBujz9szmd7kK78cCVY19XkTc5aLNcC2iTej/lcRcVp9YsJ8XMHKwYsXmuWlxYx2UjI
+         WeRwrem9nn7SPKq/v1BjPEqt+EB2o8xrl1CUebD9n7tjU1sERLIbqm6fhQcSgNvKomEL
+         R+bZ62qUwMJKABRSNuAJg4gAKB2AZM+RoywLIzEW1dGa09ImtzVrUf6yxLYYmY+NkrIw
+         dgRUIgPazBtAtuD1q2AlkCusorW9MGFuLhAj2xzxXNTq+UbiDkiPUdiXxOzNCCDFfY1V
+         FAeg==
+X-Forwarded-Encrypted: i=1; AJvYcCXkU59w1UTlh1o3oAAgyuelRmtdN5mopQfb1WKs6p3dKeV9As50YOVLz+mHtxAVBLZPJtmxBDII6xkmuo6/wLGjDlxbezArNS309jYY
+X-Gm-Message-State: AOJu0Yx+rs1DcmCGkQhyRW5Vr6IUCkAWX2k/nsNx/nsbU1w/OZM33U+f
+	ecbQRB+8sT5t95Ctkcz3SRxtBBihdIJLm5OC1SBAzWRxqlm8igZKK2JGr4qHVqKGa3pbc1EwF8I
+	7LOczcL2A9m5PfW9AC8P8CYTS3qPEEvjVzK2zVt+ZHRrlLrkkOEt2LV0pgxhtOQ==
+X-Received: by 2002:a05:6a20:db0c:b0:1c0:f1a8:d9da with SMTP id adf61e73a8af0-1c29822d487mr8813953637.21.1720725486036;
+        Thu, 11 Jul 2024 12:18:06 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGD/IxMxt6B0he3UDBu2rDg+SCwJWefFoWRmvGoNS9xSPNAQ/jnj1cb5nQDtVXdO8li+MEN0Q==
+X-Received: by 2002:a05:6a20:db0c:b0:1c0:f1a8:d9da with SMTP id adf61e73a8af0-1c29822d487mr8813922637.21.1720725485558;
+        Thu, 11 Jul 2024 12:18:05 -0700 (PDT)
+Received: from [10.35.209.243] ([208.115.86.75])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70b438eb4eesm6213417b3a.93.2024.07.11.12.18.04
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Jul 2024 12:17:57 -0700 (PDT)
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-595856e2332so1601208a12.1
-        for <linux-crypto@vger.kernel.org>; Thu, 11 Jul 2024 12:17:57 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCXGlayf76F4h210n61xdk66WiaceAwLlikzN0DZJnpaZSsDNcYhGTMsviXSr86KXaWZQYpO+HyMRfMQyUXozc0oTvMHZVoHdhfptmtl
-X-Received: by 2002:a05:6402:2707:b0:57d:10c:6c40 with SMTP id
- 4fb4d7f45d1cf-594ba98e3c7mr6937905a12.7.1720725476855; Thu, 11 Jul 2024
- 12:17:56 -0700 (PDT)
+        Thu, 11 Jul 2024 12:18:05 -0700 (PDT)
+Message-ID: <1c8632b4-06a5-49da-be0c-6fc7ac2b3257@redhat.com>
+Date: Thu, 11 Jul 2024 21:18:03 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240709130513.98102-1-Jason@zx2c4.com> <20240709130513.98102-2-Jason@zx2c4.com>
- <378f23cb-362e-413a-b221-09a5352e79f2@redhat.com> <9b400450-46bc-41c7-9e89-825993851101@redhat.com>
- <Zo8q7ePlOearG481@zx2c4.com> <Zo9gXAlF-82_EYX1@zx2c4.com> <bf51a483-8725-4222-937f-3d6c66876d34@redhat.com>
- <CAHk-=wh=vzhiDSNaLJdmjkhLqevB8+rhE49pqh0uBwhsV=1ccQ@mail.gmail.com>
- <ZpAR0CgLc28gEkV3@zx2c4.com> <CAHk-=whGE_w46zVk=7S0zOcWv4Dp3EYtuJtzU92ab3pSnnmpHw@mail.gmail.com>
- <37da7835-0d76-463e-b074-455e405b138b@redhat.com>
-In-Reply-To: <37da7835-0d76-463e-b074-455e405b138b@redhat.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Thu, 11 Jul 2024 12:17:40 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wjVc6cpSCJwAqrhPvwBbcQEOL2TEnCELfadhA=n1GN4Ww@mail.gmail.com>
-Message-ID: <CAHk-=wjVc6cpSCJwAqrhPvwBbcQEOL2TEnCELfadhA=n1GN4Ww@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v22 1/4] mm: add MAP_DROPPABLE for designating always
  lazily freeable mappings
-To: David Hildenbrand <david@redhat.com>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, linux-kernel@vger.kernel.org, patches@lists.linux.dev, 
-	tglx@linutronix.de, linux-crypto@vger.kernel.org, linux-api@vger.kernel.org, 
-	x86@kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>, "Carlos O'Donell" <carlos@redhat.com>, 
-	Florian Weimer <fweimer@redhat.com>, Arnd Bergmann <arnd@arndb.de>, Jann Horn <jannh@google.com>, 
-	Christian Brauner <brauner@kernel.org>, David Hildenbrand <dhildenb@redhat.com>, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
+From: David Hildenbrand <david@redhat.com>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>,
+ linux-kernel@vger.kernel.org, patches@lists.linux.dev, tglx@linutronix.de,
+ linux-crypto@vger.kernel.org, linux-api@vger.kernel.org, x86@kernel.org,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
+ Carlos O'Donell <carlos@redhat.com>, Florian Weimer <fweimer@redhat.com>,
+ Arnd Bergmann <arnd@arndb.de>, Jann Horn <jannh@google.com>,
+ Christian Brauner <brauner@kernel.org>,
+ David Hildenbrand <dhildenb@redhat.com>, linux-mm@kvack.org,
+ Yu Zhao <yuzhao@google.com>
+References: <bf51a483-8725-4222-937f-3d6c66876d34@redhat.com>
+ <CAHk-=wh=vzhiDSNaLJdmjkhLqevB8+rhE49pqh0uBwhsV=1ccQ@mail.gmail.com>
+ <ZpAR0CgLc28gEkV3@zx2c4.com> <ZpATx21F_01SBRnO@zx2c4.com>
+ <98798483-dfcd-451e-94bb-57d830bf68d8@redhat.com>
+ <54b6de32-f127-4928-9f4a-acb8653e5c81@redhat.com>
+ <ZpAcWvij59AzUD9u@zx2c4.com> <ZpAc118_U7p3u2gZ@zx2c4.com>
+ <ZpAfigBHfHdVeyNO@zx2c4.com>
+ <8586b19c-2e14-4164-888f-8c3b86f3f963@redhat.com>
+ <ZpAqbh3TnB9hIRRh@zx2c4.com>
+ <443146f4-9db8-4a19-91f1-b6822fad8ce8@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <443146f4-9db8-4a19-91f1-b6822fad8ce8@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, 11 Jul 2024 at 12:08, David Hildenbrand <david@redhat.com> wrote:
->
-> We also have these folio_mark_dirty() calls, for example in
-> unpin_user_pages_dirty_lock(). Hm ... so preventing the folio from
-> getting dirtied is likely shaky.
+On 11.07.24 20:56, David Hildenbrand wrote:
+> On 11.07.24 20:54, Jason A. Donenfeld wrote:
+>> On Thu, Jul 11, 2024 at 08:24:07PM +0200, David Hildenbrand wrote:
+>>>> And PG_large_rmappable seems to only be used for hugetlb branches.
+>>>
+>>> It should be set for THP/large folios.
+>>
+>> And it's tested too, apparently.
+>>
+>> Okay, well, how disappointing is this below? Because I'm running out of
+>> tricks for flag reuse.
+>>
+>> diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
+>> index b9e914e1face..c1ea49a7f198 100644
+>> --- a/include/linux/page-flags.h
+>> +++ b/include/linux/page-flags.h
+>> @@ -110,6 +110,7 @@ enum pageflags {
+>>    	PG_workingset,
+>>    	PG_error,
+>>    	PG_owner_priv_1,	/* Owner use. If pagecache, fs may use*/
+>> +	PG_owner_priv_2,
+> 
+> Oh no, no new page flags please :)
+> 
+> Maybe just follow what Linux suggested: pass vma to pte_dirty() and
+> always return false for these special VMAs.
 
-I do wonder if we should just disallow page pinning for these pages
-entirely. When the page can get replaced by zeroes at any time,
-pinning it doesn't make much sense.
+... or look into removing that one case that gives us headake.
 
-Except we do have that whole "fast" case that intentionally doesn't
-take locks and doesn't have a vma. Darn.
+No idea what would happen if we do the following:
 
-             Linus
+CCing Yu Zhao.
+
+diff --git a/mm/vmscan.c b/mm/vmscan.c
+index 0761f91b407f..d1dfbd4fd38d 100644
+--- a/mm/vmscan.c
++++ b/mm/vmscan.c
+@@ -4280,14 +4280,9 @@ static bool sort_folio(struct lruvec *lruvec, struct folio *folio, struct scan_c
+                 return true;
+         }
+  
+-       /* dirty lazyfree */
+-       if (type == LRU_GEN_FILE && folio_test_anon(folio) && folio_test_dirty(folio)) {
+-               success = lru_gen_del_folio(lruvec, folio, true);
+-               VM_WARN_ON_ONCE_FOLIO(!success, folio);
+-               folio_set_swapbacked(folio);
+-               lruvec_add_folio_tail(lruvec, folio);
+-               return true;
+-       }
++       /* lazyfree: we may not be allowed to set swapbacked: MAP_DROPPABLE */
++       if (type == LRU_GEN_FILE && folio_test_anon(folio) && folio_test_dirty(folio))
++               return false;
+  
+
+
+-- 
+Cheers,
+
+David / dhildenb
+
