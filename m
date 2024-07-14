@@ -1,58 +1,46 @@
-Received: from bmailout1.hostsharing.net (bmailout1.hostsharing.net [83.223.95.100])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AAEC1F5FF;
-	Sun, 14 Jul 2024 08:42:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7926DB656;
+	Sun, 14 Jul 2024 15:16:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720946573; cv=none; b=UCsEr+H/WDftCkqFrxAzFJMlDBk59VuLH4WIKVW8Edi8rgOZmT0yBwYQvxuNo+w0ARTeAJf17O4SCaJ8fDgyKZA3ZngXy0ORFbvmzKVoctlkHBUI1wCZbXIYdXvWqm3zN2KRCPSs2dp64BOnlOqEuY892PObknFZbrWyU+cgq7k=
+	t=1720970175; cv=none; b=a2GCUCBsadhqwM223ASVJRGqrxJzjMpnuWHE1m7hReUELbDhDwf0JH9fOrKYcFyHV+LNuAmAQd2CR/bcYPmgHy7ltnRCG4u2c2upH9glNgvneIKXwQpR1lrLTx8wiWT5w/SOYZaCK4Ss0isejVQKlZo3QZv3FmS0msb4w4TnZvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720946573; c=relaxed/simple;
-	bh=r8QUsPT+q8BDUuCNRac8TuMNIQlNaaK5BIOllXFbCPs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aEyIMRB58JGFPFZYGt+6h6HesfMkFX6PHXEF1xb1kLTHuS1elnuqFF7TUg6ryLIDlYhCTM+eSi/uZHh7VMTb3QMI+BXaDgO0rVk5DdPcuKWcq/hdIoUc3XEDrO6DrRFAU/2bgoC5/9paPURVileH70OGetQ9qX08BiHZnadelYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.95.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout1.hostsharing.net (Postfix) with ESMTPS id A8EF730000099;
-	Sun, 14 Jul 2024 10:42:41 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id 8F60811DB61; Sun, 14 Jul 2024 10:42:41 +0200 (CEST)
-Date: Sun, 14 Jul 2024 10:42:41 +0200
-From: Lukas Wunner <lukas@wunner.de>
-To: Dan Williams <dan.j.williams@intel.com>
-Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Bjorn Helgaas <helgaas@kernel.org>,
-	David Howells <dhowells@redhat.com>,
+	s=arc-20240116; t=1720970175; c=relaxed/simple;
+	bh=0SnQO3Pl2RWQqB/GpIqpR/7XZ6JVsfZ09z4DOLnGvzo=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=QWJmbNtcdClut2/mO8fxS4VJkRM7Cmoc5aRZS/vOsizGIoJJCAAJQO697F8Eg0SGEgd4Mr7sEDsWfvT7RZdRglpMeGbJaAoFwZlKesuBEKhYElnKjuyjGUos1wC7UUKUV/V+8Q+xJ4liIXnjhLnoeYgXVHtz0xx4UQgF/X1E2XA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.97.1)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1sT0ww-0000000038q-1sEg;
+	Sun, 14 Jul 2024 15:15:42 +0000
+Date: Sun, 14 Jul 2024 16:15:35 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Chen-Yu Tsai <wens@kernel.org>, Aurelien Jarno <aurelien@aurel32.net>,
+	Olivia Mackall <olivia@selenic.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Woodhouse <dwmw2@infradead.org>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	linux-pci@vger.kernel.org, linux-cxl@vger.kernel.org,
-	linux-coco@lists.linux.dev, keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linuxarm@huawei.com,
-	David Box <david.e.box@intel.com>, "Li, Ming" <ming4.li@intel.com>,
-	Ilpo Jarvinen <ilpo.jarvinen@linux.intel.com>,
-	Alistair Francis <alistair.francis@wdc.com>,
-	Wilfred Mallawa <wilfred.mallawa@wdc.com>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Alexey Kardashevskiy <aik@amd.com>,
-	Dhaval Giani <dhaval.giani@amd.com>,
-	Gobikrishna Dhanuskodi <gdhanuskodi@nvidia.com>,
-	Jason Gunthorpe <jgg@nvidia.com>, Peter Gonda <pgonda@google.com>,
-	Jerome Glisse <jglisse@google.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Alexander Graf <graf@amazon.com>, Samuel Ortiz <sameo@rivosinc.com>,
-	Kees Cook <kees@kernel.org>, Jann Horn <jannh@google.com>
-Subject: Re: [PATCH v2 08/18] PCI/CMA: Authenticate devices on enumeration
-Message-ID: <ZpOPgcXU6eNqEB7M@wunner.de>
-References: <Zo_zivacyWmBuQcM@wunner.de>
- <66901b646bd44_1a7742941d@dwillia2-xfh.jf.intel.com.notmuch>
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiko Stuebner <heiko@sntech.de>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Dragan Simic <dsimic@manjaro.org>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <ukleinek@debian.org>,
+	Sebastian Reichel <sebastian.reichel@collabora.com>,
+	Cristian Ciocaltea <cristian.ciocaltea@collabora.com>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Martin Kaiser <martin@kaiser.cx>, Ard Biesheuvel <ardb@kernel.org>,
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v7 0/3] hwrng: add hwrng support for Rockchip RK3568
+Message-ID: <cover.1720969799.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -61,93 +49,110 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <66901b646bd44_1a7742941d@dwillia2-xfh.jf.intel.com.notmuch>
 
-[cc += Kees Cook, Jann Horn; start of thread:
-https://lore.kernel.org/all/6d4361f13a942efc4b4d33d22e56b564c4362328.1719771133.git.lukas@wunner.de/
-]
+Rockchip SoCs used to have a random number generator as part of their
+crypto device.
 
-On Thu, Jul 11, 2024 at 10:50:28AM -0700, Dan Williams wrote:
-> Lukas Wunner wrote:
-> > Resume is parallelized (see dpm_noirq_resume_devices()), so the latency
-> > is bounded by the time to authenticate a single device.
-> 
-> As far as I understand that can still be on the order of seconds, and
-> pathological cases that could be longer. [...]
-> How bad is that latency problem in practice?
+However newer Rockchip SoCs like the RK3568 have an independent True
+Random Number Generator device. This patchset adds a driver for it and
+enables it in the device tree.
 
-I'm seeing 150 msec to authenticate a PCI device if the signature can't be
-verified (e.g. due to missing trusted root certificate) and 400 msec if
-the signature *is* verified.  This varies depending on beefiness of CPU,
-algorithm selection, key length and number of provisioned slots.
+Tested on FriendlyARM NanoPi R5C.
 
-But I've never seen this take "on the order of seconds", I assume that's
-a misunderstanding.
+v6 -> v7:
+ * Patch 1: unchanged
 
-vmlinux size grows by 12.752 bytes with CONFIG_PCI_CMA=y on x86_64.
-The feature is disabled by default.
+ * Patch 2: bring back rk_rng_write_ctl()
+   - bring back rk_rng_write_ctl() with improved comment to describe
+     the hardware.
+
+ * Patch 3: unchaned
+
+v5 -> v6:
+ * Patch 1: unchanged
+
+ * Patch 2: get rid of #ifdef
+   - use if (IS_ENABLED(...)) { ... }instead of #ifdef inside functions
+   - use __maybe_unused for functions previously enclosed by #ifdef'ery
+
+ * Patch 3: unchanged
+
+v4 -> v5:
+ * Patch 1: always use RK3568 name
+   - use full RK3568 name in patch description
+   - add RK3568 to title in binding
+
+ * Patch 2: full name and cosmetics
+   - also always mention RK3568 as there may be other RNG in other
+     (future) Rockchip SoCs
+   - remove debug output on successful probe
+   - use MODULE_AUTHOR several times instead of single comma-separated
+
+ * Patch 3: unchanged
+
+v3 -> v4:
+ * Patch 1: minor corrections
+   - fix Rokchip -> Rockchip typo
+   - change commit title as requested
+
+ * Patch 2: improved error handling and resource management
+   - Always use writel() instead of writel_relaxed()
+   - Use pm_runtime_resume_and_get
+   - Correctly return error code in rk_rng_read()
+   - Make use of devm_reset_control_array_get_exclusive
+   - Use devm_pm_runtime_enable and there by get rid of rk_rng_remove()
+
+ * Patch 3:
+   - Move node to conform with ordering by address
+
+v2 -> v3: patch adopted by Daniel Golle
+ * Patch 1: address comments of Krzysztof Kozlowski, add MAINTAINERS
+   - improved description
+   - meaningful clock-names
+   - add entry in MAINTAINERS files
+
+ * Patch 2: numerous code-style improvements
+   - drop misleading rk_rng_write_ctl(), simplify I/O writes
+   - drop unused TRNG_RNG_DOUT_[1-7] macros
+   - handle error handling for pm_runtime_get_sync()
+   - use memcpy_fromio() instead of open coding for-loop
+   - some minor white-spaces fixes
+
+ * Patch 3:
+   - use clock-names as defined in dt-bindings
+
+v1 -> v2:
+ * Patch 1: fix issues reported by Rob Herring and Krzysztof Kozlowski:
+   - Rename rockchip-rng.yaml into rockchip,rk3568-rng.yaml
+   - Fix binding title and description
+   - Fix compatible property
+   - Rename clocks and add the corresponding descriptions
+   - Drop reset-names
+   - Add a bus definition with #address-cells and #size-cells to the
+     example.
+
+ * Patch 2: fix issue reported by kernel test robot <lkp@intel.com>
+   - Do not read the random registers as big endian, looking at the
+     RK3568 TRM this is actually not needed. This fixes a sparse
+     warning.
+
+ * Patch 3: unchanged
 
 
-> All of these are mitigated by pushing authentication management to
-> drivers.
+Aurelien Jarno (3):
+  dt-bindings: rng: Add Rockchip RK3568 TRNG
+  hwrng: add hwrng driver for Rockchip RK3568 SoC
+  arm64: dts: rockchip: add DT entry for RNG to RK356x
 
-Device authentication can't be pushed to drivers.  It must be done
-*before* driver binding:
+ .../bindings/rng/rockchip,rk3568-rng.yaml     |  61 +++++
+ MAINTAINERS                                   |   7 +
+ arch/arm64/boot/dts/rockchip/rk356x.dtsi      |   9 +
+ drivers/char/hw_random/Kconfig                |  14 ++
+ drivers/char/hw_random/Makefile               |   1 +
+ drivers/char/hw_random/rockchip-rng.c         | 227 ++++++++++++++++++
+ 6 files changed, 319 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/rng/rockchip,rk3568-rng.yaml
+ create mode 100644 drivers/char/hw_random/rockchip-rng.c
 
-Drivers are bound based on identity information in config space
-(such as Vendor ID or Device ID).  A malicious device could spoof
-identity information in config space to force binding to a specific
-(CMA-unaware) driver.
-
-The certificate contains the signed Vendor ID and Device ID of the
-device.  By validating the certificate and the signature presented
-by the device, its identity can be ascertained by the PCI core
-before a driver (the right one) starts accessing it.
-
-
-> I see no justification for the hard coded aggressive default policy
-
-I think that just preventing driver binding if a device fails
-authentication may not be good enough.  If a device is truly
-malicious, perhaps we should firewall it off.  I'm worried about
-a device laterally attacking other devices through P2PDMA or
-sending malformed TLPs upstream to the root complex. 
-
-In patch [11/18], I'm suggesting:
-
-   "Traffic from devices which failed authentication could also be
-    filtered through ACS I/O Request Blocking Enable (PCIe r6.2 sec
-    7.7.11.3) or through Link Disable (PCIe r6.2 sec 7.5.3.7)."
-
-To firewall off malicious devices, authentication should happen early on.
-The system shouldn't be exposed to those devices any longer than necessary.
-That's one reason why this patch set performs mandatory authentication
-already on enumeration:  So that we're able to catch malicious devices
-as early as possible.
-
-Patch [08/18] inserts pci_cma_init() at the end of pci_init_capabilities()
-because CMA depends on DOE.  We may want to move DOE and CMA init
-further up in the function to authenticate the device even before
-enumerating any of its other capabilities.
-
-It's probably too early to decide which actions to take if a device fails
-authentication, whether to offer a variety of actions (only prevent driver
-binding) or just stick to the harshest one (firewall off the device),
-when to perform those actions and which knobs to offer to users for
-controlling policy and overriding actions.  We may need more real-world
-experience before we can make those decisions and we may need to ask
-security folks such as Kees Cook and Jann Horn for their perspective.
-
-This patch set merely exposes to user space whether a device passed
-authentication or not.  For that alone, it would indeed be sufficient
-to authenticate asynchronously -- or delay authentication until the
-sysfs attribute is accessed.
-
-But I wanted to keep the option open to firewall off devices early on.
-And placing pci_cma_init() in pci_init_capabilities() felt natural
-because it's where all the other device capabilities are enumerated
-and initialized.
-
-Thanks,
-
-Lukas
+-- 
+2.45.2
