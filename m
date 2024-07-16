@@ -1,264 +1,168 @@
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36D41168490
-	for <linux-crypto@vger.kernel.org>; Tue, 16 Jul 2024 08:29:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8296B19AA42
+	for <linux-crypto@vger.kernel.org>; Tue, 16 Jul 2024 12:34:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721118562; cv=none; b=VZX8E5ZQGxygvyMi28xdaqt9a5E/Z0dB8EiExOdk0iQ6h9Mr0c/PI9zY6YwK9dGFGfI0ITdS8IpwLY9aEFBOhor/66bo6GrCanNX3jVA24wve4usWopphIYMoVjPMCP60Goax4xtvyihakYeIBaoTLKhhbPV3Or1XPUy8Fh2skw=
+	t=1721133299; cv=none; b=fTDyQ8Go/pKYxzwLAIEyL5UuLOXE5rAxKcU6TwL2dJrxP4IiUrZfhGcKMscTjvSC48Qm4pA1BkyK1UXnPYxXLrKNUYQk7U+B5D584SPx3ffrGbO41WajgELOjy1hvw2RIC4RvATwlB/JyilrhYBf3amwcVMruXLa1m0Kow2oUgc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721118562; c=relaxed/simple;
-	bh=/S5lYmoee1MWJyBWbLOZ1ZRpzZ4SRDr028DVj5Zg124=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=VAj4otA0Ys/3w5EvsEKH+BG0gnKH6c6cFE1VPZUUWlm056beNk+tWWN+ZuYR+0j6oKoXkmyR/cfZpbJccYk2n+YdmcFC664NTu6g431MgRd6sbu4mU6LtcbnslId6zu5dILH2Z6iLJSx42UgAj5drW8Gu2mNQDiiiWzCRGqXEoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-382e66d79a4so64954935ab.3
-        for <linux-crypto@vger.kernel.org>; Tue, 16 Jul 2024 01:29:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721118557; x=1721723357;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3JYi/cYQmPnb1wJRCNZnSWIHuQaKPptej5dRCpbB/yk=;
-        b=LUumyVnmn/LQGQ1+6dcodlNn0/bsAvTgMorS+wgPNWc1vwvcxqzCmlmexIDIJ1vaJY
-         24Cq/lDM6ntMND3aRZ+s0zKAKMgyJsJCZvPnVfmeLDQzH3eT/7iyierrb7Rtz5bETwOO
-         Sr9KbJ+jfcfeqgYNiS0NUwwm5YUJTGF6vqamlGddSfIOZ5u/nsh5EPYE0WaPKv0CGxAP
-         PmqjiZt9Pj3pgkIJ1iVErXqdsJudc+ElVfzVAikPEThHSKKuc7nBFe10c1fs3tmbhbbt
-         ScfiMfmeOC4hw4yXpNxo5cLT2mil3XzmNTU0YHNMxaFd+Cpj/l5BscCTePwxDPA2Bz4I
-         YNvg==
-X-Forwarded-Encrypted: i=1; AJvYcCWs3mZCAsJDq2mzA007JnHZ6MHMM5ydoW+h8GKQw94NtAJZyY/5Rz+JyRFHMcM7hth1EuNb6O9UyMKPtD5o5wZJP7ceU7d7T6+FhSgu
-X-Gm-Message-State: AOJu0Yygfr+Z1+G9evln5rpn9+YCyO624+ie1+s5x+aJTlPkdthXdzfH
-	3ND4aZ27/om/11Pk9zETLWwy09GWTUCN8vOewe7sFmV+pcPDl3fxyK2IUqK8yxkrNKoU7FgQ+os
-	y2OXJ052spIXWOzEgW8gqDuT6VCGPOcpgKbCouzpBTM/TaVgew6UwKW0=
-X-Google-Smtp-Source: AGHT+IHpdW3MuXUOYL5V88czliNf5/kvj2dLLMasq9YjrKTXqUYf9Ummsl+h8fF/hi3Gzep5k3IHdNC9OVw+dYk2tqkY+RMW3jwT
+	s=arc-20240116; t=1721133299; c=relaxed/simple;
+	bh=V/F4UTvvEy3NCSvKyNNAWr4zGMGneWAsO6rPvWKaGvs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=shipyQyy2WQraJfi1mPVPCpvLyfAW5eNv/hT/wxFlV7YVFVEq9O/m4gQuHzE3wRO3Lo1WKhXVe5GE7CdSNzCztJIcIjJTlGj9TDyyCJrjDMVwfg3B/oOJYnJ+5Tya0XjDVMQasvI1nnEVZCl69fgm5tjXvY9UUAqRnWzodTsf84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cknow.org; spf=pass smtp.mailfrom=cknow.org; dkim=pass (2048-bit key) header.d=cknow.org header.i=@cknow.org header.b=PGWN6knR; arc=none smtp.client-ip=91.218.175.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cknow.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cknow.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=cknow.org header.i=@cknow.org header.b="PGWN6knR"
+X-Envelope-To: wens@kernel.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cknow.org; s=key1;
+	t=1721133292;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TUFna8KX4ihrtDkjdAKNgLT+tJDIS3c9nXtfNbeflQI=;
+	b=PGWN6knRfOiyzyBmePMrs5eNI9XnN46/sa44jaUfrDReHR8E3BZIou5l4AikCZxA07uLKi
+	AODkX8ezbh6Pb09qom3tdW5X9394/BSWmdfmtcopPuSqwhP9nYVY6HoB/LRv0brek/TFd4
+	EyM8HD2LwKk1TOuAzvVY4TzEWfDV8cBlm6UBWAmehEwuAv+NCOk0HOeL6ptO6uMjRxy6OK
+	vHFPHadXuHJM+hoOHerbWBFM+nvU8F9D6Pil5tETn67vCBGlckMI9khfEm3OMxRErGF2Ar
+	bfB/A2dndy2llg0q9w2k80vW1CZeI53j3FFYERh4kEjMSJtNMjtwtV9DFi0ZZA==
+X-Envelope-To: aurelien@aurel32.net
+X-Envelope-To: herbert@gondor.apana.org.au
+X-Envelope-To: heiko@sntech.de
+X-Envelope-To: linux-rockchip@lists.infradead.org
+X-Envelope-To: daniel@makrotopia.org
+X-Envelope-To: olivia@selenic.com
+X-Envelope-To: robh@kernel.org
+X-Envelope-To: krzk+dt@kernel.org
+X-Envelope-To: conor+dt@kernel.org
+X-Envelope-To: p.zabel@pengutronix.de
+X-Envelope-To: dsimic@manjaro.org
+X-Envelope-To: ukleinek@debian.org
+X-Envelope-To: sebastian.reichel@collabora.com
+X-Envelope-To: cristian.ciocaltea@collabora.com
+X-Envelope-To: s.hauer@pengutronix.de
+X-Envelope-To: martin@kaiser.cx
+X-Envelope-To: ardb@kernel.org
+X-Envelope-To: linux-crypto@vger.kernel.org
+X-Envelope-To: devicetree@vger.kernel.org
+X-Envelope-To: linux-arm-kernel@lists.infradead.org
+X-Envelope-To: linux-kernel@vger.kernel.org
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Diederik de Haas <didi.debian@cknow.org>
+To: Chen-Yu Tsai <wens@kernel.org>, Aurelien Jarno <aurelien@aurel32.net>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Heiko Stuebner <heiko@sntech.de>,
+ linux-rockchip@lists.infradead.org, Daniel Golle <daniel@makrotopia.org>
+Cc: Olivia Mackall <olivia@selenic.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
+ Philipp Zabel <p.zabel@pengutronix.de>, Dragan Simic <dsimic@manjaro.org>,
+ Uwe =?ISO-8859-1?Q?Kleine=2DK=F6nig?= <ukleinek@debian.org>,
+ Sebastian Reichel <sebastian.reichel@collabora.com>,
+ Cristian Ciocaltea <cristian.ciocaltea@collabora.com>,
+ Sascha Hauer <s.hauer@pengutronix.de>, Martin Kaiser <martin@kaiser.cx>,
+ Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v7 0/3] hwrng: add hwrng support for Rockchip RK3568
+Date: Tue, 16 Jul 2024 14:34:40 +0200
+Message-ID: <6425788.NZdkxuyfQg@bagend>
+Organization: Connecting Knowledge
+In-Reply-To: <cover.1720969799.git.daniel@makrotopia.org>
+References: <cover.1720969799.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:194e:b0:384:ff22:e5f9 with SMTP id
- e9e14a558f8ab-393d3172aa7mr1336495ab.3.1721118557189; Tue, 16 Jul 2024
- 01:29:17 -0700 (PDT)
-Date: Tue, 16 Jul 2024 01:29:17 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000037cdb0061d5924b3@google.com>
-Subject: [syzbot] [crypto?] KASAN: slab-use-after-free Read in handle_mm_fault
-From: syzbot <syzbot+4c882a4a0697c4a25364@syzkaller.appspotmail.com>
-To: akpm@linux-foundation.org, davem@davemloft.net, 
-	herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="nextPart5537839.MQpQnaDgsY";
+ micalg="pgp-sha256"; protocol="application/pgp-signature"
+X-Migadu-Flow: FLOW_OUT
 
-Hello,
+--nextPart5537839.MQpQnaDgsY
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"; protected-headers="v1"
+From: Diederik de Haas <didi.debian@cknow.org>
+Date: Tue, 16 Jul 2024 14:34:40 +0200
+Message-ID: <6425788.NZdkxuyfQg@bagend>
+Organization: Connecting Knowledge
+In-Reply-To: <cover.1720969799.git.daniel@makrotopia.org>
+References: <cover.1720969799.git.daniel@makrotopia.org>
+MIME-Version: 1.0
 
-syzbot found the following issue on:
+On Sunday, 14 July 2024 17:15:35 CEST Daniel Golle wrote:
+> Rockchip SoCs used to have a random number generator as part of their
+> crypto device.
+> 
+> However newer Rockchip SoCs like the RK3568 have an independent True
+> Random Number Generator device. This patchset adds a driver for it and
+> enables it in the device tree.
+> 
+> Tested on FriendlyARM NanoPi R5C.
+> 
+> ...
+> 
+> Aurelien Jarno (3):
+>   dt-bindings: rng: Add Rockchip RK3568 TRNG
+>   hwrng: add hwrng driver for Rockchip RK3568 SoC
+>   arm64: dts: rockchip: add DT entry for RNG to RK356x
+> 
+>  .../bindings/rng/rockchip,rk3568-rng.yaml     |  61 +++++
+>  MAINTAINERS                                   |   7 +
+>  arch/arm64/boot/dts/rockchip/rk356x.dtsi      |   9 +
+>  drivers/char/hw_random/Kconfig                |  14 ++
+>  drivers/char/hw_random/Makefile               |   1 +
+>  drivers/char/hw_random/rockchip-rng.c         | 227 ++++++++++++++++++
+>  6 files changed, 319 insertions(+)
+>  create mode 100644
+> Documentation/devicetree/bindings/rng/rockchip,rk3568-rng.yaml create mode
+> 100644 drivers/char/hw_random/rockchip-rng.c
 
-HEAD commit:    3fe121b62282 Add linux-next specific files for 20240712
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1097ebed980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=98dd8c4bab5cdce
-dashboard link: https://syzkaller.appspot.com/bug?extid=4c882a4a0697c4a25364
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11d611a5980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13ce3259980000
+I just did the following test on my Quartz64 Model A running kernel 6.10
++ a number of patches, including this one:
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/8c6fbf69718d/disk-3fe121b6.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/39fc7e43dfc1/vmlinux-3fe121b6.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/0a78e70e4b4e/bzImage-3fe121b6.xz
-mounted in repro: https://storage.googleapis.com/syzbot-assets/66cfe5a679f2/mount_0.gz
+===============================================================
+root@quartz64a:~# dd if=/dev/hwrng bs=100000 count=1 > /dev/null
+1+0 records in
+1+0 records out
+100000 bytes (100 kB, 98 KiB) copied, 5.64507 s, 17.7 kB/s
+root@quartz64a:~# cat /dev/hwrng | rngtest -c 1000
+rngtest 5
+Copyright (c) 2004 by Henrique de Moraes Holschuh
+This is free software; see the source for copying conditions. 
+There is NO warranty; not even for MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+4c882a4a0697c4a25364@syzkaller.appspotmail.com
+rngtest: starting FIPS tests...
+rngtest: bits received from input: 20000032
+rngtest: FIPS 140-2 successes: 362
+rngtest: FIPS 140-2 failures: 638
+rngtest: FIPS 140-2(2001-10-10) Monobit: 634
+rngtest: FIPS 140-2(2001-10-10) Poker: 106
+rngtest: FIPS 140-2(2001-10-10) Runs: 43
+rngtest: FIPS 140-2(2001-10-10) Long run: 0
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=2.638; avg=139.351; max=9765625.000)Kibits/s
+rngtest: FIPS tests speed: (min=21.169; avg=36.158; max=68.610)Mibits/s
+rngtest: Program run time: 148109761 microseconds
+===============================================================
 
-==================================================================
-BUG: KASAN: slab-use-after-free in handle_mm_fault+0x14f0/0x19a0 mm/memory.c:5842
-Read of size 8 at addr ffff88802c4719d0 by task syz-executor125/5235
+That's almost twice as many failures as successes ...
+--nextPart5537839.MQpQnaDgsY
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+Content-Transfer-Encoding: 7Bit
 
-CPU: 1 UID: 0 PID: 5235 Comm: syz-executor125 Not tainted 6.10.0-rc7-next-20240712-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:377 [inline]
- print_report+0x169/0x550 mm/kasan/report.c:488
- kasan_report+0x143/0x180 mm/kasan/report.c:601
- handle_mm_fault+0x14f0/0x19a0 mm/memory.c:5842
- faultin_page mm/gup.c:1194 [inline]
- __get_user_pages+0x6ec/0x16a0 mm/gup.c:1493
- populate_vma_page_range+0x264/0x330 mm/gup.c:1932
- __mm_populate+0x27a/0x460 mm/gup.c:2035
- mm_populate include/linux/mm.h:3429 [inline]
- vm_mmap_pgoff+0x2c3/0x3d0 mm/util.c:593
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f093ce17fe9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 1d 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f093cd9e158 EFLAGS: 00000246 ORIG_RAX: 0000000000000009
-RAX: ffffffffffffffda RBX: 00007f093ce9f4b8 RCX: 00007f093ce17fe9
-RDX: 0000000000000002 RSI: 0000000000b36000 RDI: 0000000020000000
-RBP: 00007f093ce9f4b0 R08: 00000000ffffffff R09: 0000000000000000
-R10: 0000000000008031 R11: 0000000000000246 R12: 00007f093ce9f4bc
-R13: 000000000000006e R14: 00007ffe8008cc30 R15: 00007ffe8008cd18
- </TASK>
+-----BEGIN PGP SIGNATURE-----
 
-Allocated by task 5235:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
- unpoison_slab_object mm/kasan/common.c:312 [inline]
- __kasan_slab_alloc+0x66/0x80 mm/kasan/common.c:338
- kasan_slab_alloc include/linux/kasan.h:201 [inline]
- slab_post_alloc_hook mm/slub.c:3988 [inline]
- slab_alloc_node mm/slub.c:4037 [inline]
- kmem_cache_alloc_noprof+0x135/0x2a0 mm/slub.c:4044
- vm_area_alloc+0x24/0x1d0 kernel/fork.c:472
- mmap_region+0xc3d/0x2090 mm/mmap.c:2944
- do_mmap+0x8f9/0x1010 mm/mmap.c:1468
- vm_mmap_pgoff+0x1dd/0x3d0 mm/util.c:588
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+iHUEABYIAB0WIQT1sUPBYsyGmi4usy/XblvOeH7bbgUCZpZo4AAKCRDXblvOeH7b
+boR5AQCgqaoiNWyzbxb+45ldj8zkL/JfpahT6y+T00sZkniBUQEAq8WpWtRZKF2U
+KCvP/JqsEptPp3b08vRkAwxriNImTgc=
+=mIG+
+-----END PGP SIGNATURE-----
 
-Freed by task 5237:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
- kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:579
- poison_slab_object+0xe0/0x150 mm/kasan/common.c:240
- __kasan_slab_free+0x37/0x60 mm/kasan/common.c:256
- kasan_slab_free include/linux/kasan.h:184 [inline]
- slab_free_hook mm/slub.c:2252 [inline]
- slab_free mm/slub.c:4473 [inline]
- kmem_cache_free+0x145/0x350 mm/slub.c:4548
- rcu_do_batch kernel/rcu/tree.c:2569 [inline]
- rcu_core+0xafd/0x1830 kernel/rcu/tree.c:2843
- handle_softirqs+0x2c4/0x970 kernel/softirq.c:554
- __do_softirq kernel/softirq.c:588 [inline]
- invoke_softirq kernel/softirq.c:428 [inline]
- __irq_exit_rcu+0xf4/0x1c0 kernel/softirq.c:637
- irq_exit_rcu+0x9/0x30 kernel/softirq.c:649
- instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
- sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1043
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-
-Last potentially related work creation:
- kasan_save_stack+0x3f/0x60 mm/kasan/common.c:47
- __kasan_record_aux_stack+0xac/0xc0 mm/kasan/generic.c:541
- __call_rcu_common kernel/rcu/tree.c:3106 [inline]
- call_rcu+0x167/0xa70 kernel/rcu/tree.c:3210
- remove_vma mm/mmap.c:189 [inline]
- remove_mt mm/mmap.c:2415 [inline]
- do_vmi_align_munmap+0x155c/0x18c0 mm/mmap.c:2758
- do_vmi_munmap+0x261/0x2f0 mm/mmap.c:2830
- mmap_region+0x72f/0x2090 mm/mmap.c:2881
- do_mmap+0x8f9/0x1010 mm/mmap.c:1468
- vm_mmap_pgoff+0x1dd/0x3d0 mm/util.c:588
- ksys_mmap_pgoff+0x544/0x720 mm/mmap.c:1514
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-The buggy address belongs to the object at ffff88802c4719b0
- which belongs to the cache vm_area_struct of size 184
-The buggy address is located 32 bytes inside of
- freed 184-byte region [ffff88802c4719b0, ffff88802c471a68)
-
-The buggy address belongs to the physical page:
-page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x2c471
-memcg:ffff888024312e01
-flags: 0xfff00000000000(node=0|zone=1|lastcpupid=0x7ff)
-page_type: 0xfdffffff(slab)
-raw: 00fff00000000000 ffff888015eefb40 ffffea000091a480 0000000000000008
-raw: 0000000000000000 0000000080100010 00000001fdffffff ffff888024312e01
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 0, migratetype Unmovable, gfp_mask 0x52cc0(GFP_KERNEL|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP), pid 4769, tgid 4769 (S41dhcpcd), ts 42147845478, free_ts 42112307396
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x1f3/0x230 mm/page_alloc.c:1493
- prep_new_page mm/page_alloc.c:1501 [inline]
- get_page_from_freelist+0x2ccb/0x2d80 mm/page_alloc.c:3474
- __alloc_pages_noprof+0x256/0x6c0 mm/page_alloc.c:4732
- __alloc_pages_node_noprof include/linux/gfp.h:269 [inline]
- alloc_pages_node_noprof include/linux/gfp.h:296 [inline]
- alloc_slab_page+0x5f/0x120 mm/slub.c:2321
- allocate_slab+0x5a/0x2f0 mm/slub.c:2484
- new_slab mm/slub.c:2537 [inline]
- ___slab_alloc+0xcd1/0x14b0 mm/slub.c:3723
- __slab_alloc+0x58/0xa0 mm/slub.c:3813
- __slab_alloc_node mm/slub.c:3866 [inline]
- slab_alloc_node mm/slub.c:4025 [inline]
- kmem_cache_alloc_noprof+0x1c1/0x2a0 mm/slub.c:4044
- vm_area_dup+0x27/0x290 kernel/fork.c:487
- dup_mmap kernel/fork.c:696 [inline]
- dup_mm kernel/fork.c:1674 [inline]
- copy_mm+0xc7b/0x1f30 kernel/fork.c:1723
- copy_process+0x186b/0x3d90 kernel/fork.c:2376
- kernel_clone+0x226/0x8f0 kernel/fork.c:2788
- __do_sys_clone kernel/fork.c:2931 [inline]
- __se_sys_clone kernel/fork.c:2915 [inline]
- __x64_sys_clone+0x258/0x2a0 kernel/fork.c:2915
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-page last free pid 4768 tgid 4768 stack trace:
- reset_page_owner include/linux/page_owner.h:25 [inline]
- free_pages_prepare mm/page_alloc.c:1094 [inline]
- free_unref_folios+0x103a/0x1b00 mm/page_alloc.c:2692
- folios_put_refs+0x76e/0x860 mm/swap.c:1039
- free_pages_and_swap_cache+0x5c8/0x690 mm/swap_state.c:335
- __tlb_batch_free_encoded_pages mm/mmu_gather.c:136 [inline]
- tlb_batch_pages_flush mm/mmu_gather.c:149 [inline]
- tlb_flush_mmu_free mm/mmu_gather.c:366 [inline]
- tlb_flush_mmu+0x3a3/0x680 mm/mmu_gather.c:373
- tlb_finish_mmu+0xd4/0x200 mm/mmu_gather.c:465
- exit_mmap+0x44f/0xc80 mm/mmap.c:3425
- __mmput+0x115/0x390 kernel/fork.c:1347
- exit_mm+0x220/0x310 kernel/exit.c:571
- do_exit+0x9b2/0x27f0 kernel/exit.c:869
- do_group_exit+0x207/0x2c0 kernel/exit.c:1031
- __do_sys_exit_group kernel/exit.c:1042 [inline]
- __se_sys_exit_group kernel/exit.c:1040 [inline]
- __x64_sys_exit_group+0x3f/0x40 kernel/exit.c:1040
- x64_sys_call+0x26c3/0x26d0 arch/x86/include/generated/asm/syscalls_64.h:232
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Memory state around the buggy address:
- ffff88802c471880: fc fc fc fc fc fc fc 00 00 00 00 00 00 00 00 00
- ffff88802c471900: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 fc fc
->ffff88802c471980: fc fc fc fc fc fc fa fb fb fb fb fb fb fb fb fb
-                                                 ^
- ffff88802c471a00: fb fb fb fb fb fb fb fb fb fb fb fb fb fc fc fc
- ffff88802c471a80: fc fc fc fc fc 00 00 00 00 00 00 00 00 00 00 00
-==================================================================
+--nextPart5537839.MQpQnaDgsY--
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
