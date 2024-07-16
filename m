@@ -1,202 +1,178 @@
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2047.outbound.protection.outlook.com [40.107.220.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93C90182;
-	Tue, 16 Jul 2024 00:11:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721088709; cv=fail; b=UNhXoyAeEpPSTMsLv1MEvZIFFVGwhaI8qKUJmcRaKOcAgpexGaysxTM6B71gQoUxYho1X4N4LFhGCPRbQkQtu9CRs3Zqs1ZoV7Hqvkwwha46DNstw5qRMURzwyHD2k5m2rnrS+PeTiuEeaYkqh5MDzfP5tVKCDJ7EiCObUGp93E=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721088709; c=relaxed/simple;
-	bh=G1lOhMU6Uksd7wGQzLZ3qEAPC3bHQjBynhuPb0f78MU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=kNY/3b7nMiQ924f4rOpkwXuMfJmP/a+i1BP/3NzmYBOnu0/yhkDKdddNUjnLFhTegDwqqntENCd5hTUX2DB6vnXMX7LR3tlckLjnn9IdL2m95eXw4TS7NQya6+LAlIiELqGJ7jnDQTvuiSDS7W8aDRWbFtDKkGZxiKRt/lMoicU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=MyHZbMez; arc=fail smtp.client-ip=40.107.220.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="MyHZbMez"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=B0xLZXmMxbq8UFyNoiNOS9+oqwBQh1oSnfRfi4tLLSwzA2bZDNti0NNJNpUI53i+18QuWzo11WS2NGqPbj6AYcFiqwGcI5+AsR8572qR5Rf44yAB+kULhA8TUNmkX+p+uwAGCV69XoKZUFMoUKbVjzzlQPcQr3GbmdyyNmX10QFdent27n4oswcarVn+F9zwypjsw12Ywhrf4iWo+OalFDOeWm2xgRtuiSaXWs3JtwrJbPclJveOOtxdnJWiAZwTHMKXLfEi4I5fKYd1J4O5JIZeNLUapqTjyXKDeuHja1o/Nyg4Xcxz9v6Ip0HEWjB9W2987PY6gxBMpH9umKAu4A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zU9Cuiirfhd/GO8jEYecyxVicQ5/GPlJxDpjW2SVFbs=;
- b=cONZgQ71WW7K9AU/q5mUEWzeVS9xY6THe3VNSegTcEkIBkYyaaS4eecNH+mX24o5MRCmocZJhRQXFjToPeK5Wfj7tISH2Q1OcJeAM/fXX8uLcMRUzI+5WRfut9JusKxVgqByV+yLKyX6HYQI/cP8kG3Or3vehxMcTGbcHCfIO3AaQFO1WFRvPkN1/rP4GT6rQAhASOqgHX29ikOJdp+FEeY6h8LnJ8h0QcFUuEzprUJOE04CTy7kNrdEIBFaTqTGIssksatKb3Ot9RV0PIFv20VeZ97vovlwXP0UqpFAXhbhsDjG+KJzbTN0yz+YdOsZUcpJdXmbCc0M1r8skgOjHg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zU9Cuiirfhd/GO8jEYecyxVicQ5/GPlJxDpjW2SVFbs=;
- b=MyHZbMezgxrgqv/NNrY6LE3Wq4Frr8ijcAux+l6dFVrsqx9EwoQHXkfyHb2PhsR9+66OVpNQtoQCQOgZ/oFZZZCzMUd0WdhmflG43Sy48ZqtgZ0E/uko2R4gxOBTYjNPQOGXqPuLxMnaNKFyEPswuxZA+Us7SJxDyOfaSRh+q7FCFrziE9tqydu5EMjJvj3qFvDTigHi8Xk6AcGwy3opbObun/H5hD5r+bfG4bsffPoDcvKXETpwcxeRUQNn3Mq6yjN3kBXe6HcoWlH2MSbVXsyjGUOsabBM1W/GuhI/kTT7bT+6f505qIiF5xUI4a8QBG9Bn45ViiaNDf04g6Dkbw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DM6PR12MB3849.namprd12.prod.outlook.com (2603:10b6:5:1c7::26)
- by SA1PR12MB8095.namprd12.prod.outlook.com (2603:10b6:806:33f::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.28; Tue, 16 Jul
- 2024 00:11:43 +0000
-Received: from DM6PR12MB3849.namprd12.prod.outlook.com
- ([fe80::c296:774b:a5fc:965e]) by DM6PR12MB3849.namprd12.prod.outlook.com
- ([fe80::c296:774b:a5fc:965e%4]) with mapi id 15.20.7762.027; Tue, 16 Jul 2024
- 00:11:43 +0000
-Date: Mon, 15 Jul 2024 21:11:42 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: Dan Williams <dan.j.williams@intel.com>, Kees Cook <kees@kernel.org>,
-	Lukas Wunner <lukas@wunner.de>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Bjorn Helgaas <helgaas@kernel.org>,
-	David Howells <dhowells@redhat.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Woodhouse <dwmw2@infradead.org>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	linux-pci@vger.kernel.org, linux-cxl@vger.kernel.org,
-	linux-coco@lists.linux.dev, keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linuxarm@huawei.com,
-	David Box <david.e.box@intel.com>, "Li, Ming" <ming4.li@intel.com>,
-	Ilpo Jarvinen <ilpo.jarvinen@linux.intel.com>,
-	Alistair Francis <alistair.francis@wdc.com>,
-	Wilfred Mallawa <wilfred.mallawa@wdc.com>,
-	Alexey Kardashevskiy <aik@amd.com>,
-	Dhaval Giani <dhaval.giani@amd.com>,
-	Gobikrishna Dhanuskodi <gdhanuskodi@nvidia.com>,
-	Peter Gonda <pgonda@google.com>, Jerome Glisse <jglisse@google.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Alexander Graf <graf@amazon.com>, Samuel Ortiz <sameo@rivosinc.com>,
-	Jann Horn <jannh@google.com>
-Subject: Re: [PATCH v2 08/18] PCI/CMA: Authenticate devices on enumeration
-Message-ID: <20240716001142.GB1482543@nvidia.com>
-References: <ZpOPgcXU6eNqEB7M@wunner.de>
- <202407151005.15C1D4C5E8@keescook>
- <20240715181252.GU1482543@nvidia.com>
- <66958850db394_8f74d2942b@dwillia2-xfh.jf.intel.com.notmuch>
- <20240715220206.GV1482543@nvidia.com>
- <57791455-5c70-4ede-97d9-d5784eef7abe@kernel.org>
- <20240715230333.GX1482543@nvidia.com>
- <f228526a-984f-4754-8ade-3f998a8b436a@kernel.org>
- <20240715234259.GZ1482543@nvidia.com>
- <5f7fca8b-ab74-4fba-8df8-152ad6f94227@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5f7fca8b-ab74-4fba-8df8-152ad6f94227@kernel.org>
-X-ClientProxiedBy: BL1PR13CA0180.namprd13.prod.outlook.com
- (2603:10b6:208:2bd::35) To DM6PR12MB3849.namprd12.prod.outlook.com
- (2603:10b6:5:1c7::26)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03A254A32
+	for <linux-crypto@vger.kernel.org>; Tue, 16 Jul 2024 01:23:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721093002; cv=none; b=QNIS1zIUso+/jnLWVZYvPRx1LeOyrhneQyQeaCrzXYxxmzrZEEOUGSt0weC+kBUFI6eASUqfeO9OmnQGuBYf0/hkuBqYnJomqA52tl96PA5Q4Nagwpy/JNH8KKvL+20Y9Rkv4bgxJ/RI8OFEZV8qIlHGL2GM9+5wCe25nqlzbdE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721093002; c=relaxed/simple;
+	bh=bq0vAZeiH25E5s3ISrbTktGHbbPiDY51qBzXDk3EKO8=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=G1f13pIRzbngs/DllP7O6Jk73RD8JrCHSA8viBCaxL/Kw2nXyw3iwfhRd7K19H02YbQtBXMkSzac7/kurcaMoZBgomUofOA7mQIzEQgzAsAaRYxcT0JVfHiCRm9mlrCZu21h5OHysmyHBqnJH5NNG6tYJ2E2kViI5Gft1IG5kew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-804888d4610so485104339f.1
+        for <linux-crypto@vger.kernel.org>; Mon, 15 Jul 2024 18:23:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721093000; x=1721697800;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Dn2dD9SXzWCfYkGnDiRvv9qn92tH6gbZqZyhArKDrx0=;
+        b=IMYzNXSnuSYObSH+iwjiMXVHt5chguLR3qRSvqobYO4FZljHpK4Xg+nDGeaawUkZex
+         VazWbsYjReH8DcbSTvEtwMDkaruTUWm3MPcxCSXT5UsgT6fAbTbNw+rsG/gkflhGwBYl
+         mm8t3CbunbkVsPcGqcf7GLNiXg2rSpOxcrrDYNCtrxCKjFxgCCWIy0pnCqh691GIccSi
+         C0VCjaMXW1Ouxv5xshxbdl513VHFwjaiLyVl2mWogd3UYQKp++uounKXGfDaZedEBpRz
+         aP1VFOx7Qv69V03n6WuteaYu7xfEu74pE+01njo4u6xQhm1s2S7eBGoJ0YgVaKMnBeTV
+         Ekcw==
+X-Forwarded-Encrypted: i=1; AJvYcCW2UgrQ+9shJCtLn5xSvuaDPDWWjSZmY+FnW8GZL3G3Krd+UfntFAtrWNrxAJmi+tOMOcPMtUqa3LfZ3JGQQMW4c9d3haQ2mBeMeMQW
+X-Gm-Message-State: AOJu0YzJXPRGiOs9v/kKtD1fZtd8ne5VHLlJxf0vniTjgtAsmaj/uE8Q
+	rmtVvGDA0tFj1KYgBdZgaMa3HtB1xpUFW1F8ljeaGDw+o978yh5qSZJlv5IBI0nEoJJ+9GCBNJK
+	yryiYEU/ANgJwtRutFAbV281Fs1lrllAwyS+hLxiHtfTP1W8bapXAC5g=
+X-Google-Smtp-Source: AGHT+IEAmwQbANedBlsmL7xbuvuTXsAXFpos5LDFMFVT5CnnwlpHe7iyuc4Hb7jSMdAmqxVmzYQGx9DgXlGq3HpjM0MbubAQZn1j
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3849:EE_|SA1PR12MB8095:EE_
-X-MS-Office365-Filtering-Correlation-Id: 44eb1ab6-81ce-4aa1-fe2a-08dca52bdfa4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Boj8ry6f7qK8sq7BawJO7cm7lDtJjL4evUHSotyy+9MTSTCseF12NzTOSiH3?=
- =?us-ascii?Q?5gDAwutZS2Jo7B32buvakd1rUC+o+rfFbUQZSWMAp31inZjCAq5Llppgfm8A?=
- =?us-ascii?Q?SGlL+6pwG+mPKmUKuG6A005o0llCqy6A1ol+Bz/y5/9XCfAfSwSX67wVAVqn?=
- =?us-ascii?Q?MIpOKW7kT6QToDJwTnUuTTRmHxrBw4dzwQIVDUZPbw+a/+qBcYu6TqXJ9Dfs?=
- =?us-ascii?Q?9iZLHdqHyceNL2K/ROBV7xW32WXHCoYe8z4GffwvFkEqqjFVNtOpGJ+ghdub?=
- =?us-ascii?Q?Mpc8XAL0Lhh/EL823aVoFeG1+RIRD2j6cM3oy5m/qtRPCE1tCg5MzMxbyRAu?=
- =?us-ascii?Q?6VKUtCWJ1+P6ssPLeNXttQZ2fv6spLfT7sySoQqmOtgo19vYfNbo1mdO0AZ2?=
- =?us-ascii?Q?XpBqoegpLqyVHJKkL1fKWNFLfFQpa3mUy5a0uOkWssgCiQ8b0qEhvH6wGTjs?=
- =?us-ascii?Q?qu7XioB5WhW1KtZ1BKDJVNpR7lDDEd6+5FoQ6Tcp+vr/Ib9qqdPnfpesHy/y?=
- =?us-ascii?Q?ZYcCzZX/ZJ0IcWIalAFI7Tvz6MhhmNM5XKE5umjcazlpDe9FpZnTVi5s8g8l?=
- =?us-ascii?Q?Vp3X4J84BWe18RRJYiZ1O7WQ+3psEryzLX6IVqHZ7ku2pgN24MkkLJ11OPw4?=
- =?us-ascii?Q?oUASRbfMAV4rldhpwVc4YqvNP8KIRVC29eVuFD5rBKRw4YXlXjJrWnxZw3ZS?=
- =?us-ascii?Q?iKQ41ZWs5s4UXIsVk8GoB70s+kbcjcBI3CPR00R/SX0PQv2F96VHvF9ZU1Jm?=
- =?us-ascii?Q?HEdWNp3g7kQ/DSjqALNnkZjQvvrm6HFyfVBKS59xfXMsCnJZeNlR0tkK98Ag?=
- =?us-ascii?Q?FI7XGM/atfpKmfwIywAXjM/IwnH8GOPMdoCghjVqKgpZ41N+sYZOk0I/8GnO?=
- =?us-ascii?Q?uetdMyfNpICi4YXVwH79S3Ayk1T7YlHJdpxNI2EwTv26JHeRZAG/38YY/OTQ?=
- =?us-ascii?Q?5G2+lRJhgTKoP4zPZv9IGWOxZFCzvnmsH+7LTTCUoVD7+zqoLrjkgAGc1Aox?=
- =?us-ascii?Q?/9YLy+A7t0Nri1k1+OkBFnTMYoY2RFCWZw+ZHk5gWbKM0sXc+Yu3Xh2Rt2LC?=
- =?us-ascii?Q?bZv8KKx5pghSl+jMbJDo2h7BSFUB3u20XdIxHilUSpkTo0T0sUJa6CdpoIe4?=
- =?us-ascii?Q?zPIxlVwINb2s3fCU51MgjBeIFAC3ucpUzXVfeIVwM6nrSaXCoO3rsJbFbzwA?=
- =?us-ascii?Q?W3D4tbbxk0cBmjxLTfch78iOOtriPYSGOWqs+p/Ue/+7ltPYKjI/HwSCu+gr?=
- =?us-ascii?Q?oj9FBzPAoh/dKlx0ALpohr7nZm1dWWLRur8k9SMeHkziFE9/b7cMe06HHrJa?=
- =?us-ascii?Q?cpkLgsclZP4etyqMir8sjKlV23T0r4F816TkQ+ancG87gg=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3849.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?L0XNqqOEt11w9NHw9XjEeR8pzY9Y0WGH6O3KVrMt8k1YDbOQcr5/dV+UhY9T?=
- =?us-ascii?Q?lPPz6390aHeDnz1FKBcYUVUCkvntK0xPJqwdq0y83GjgO9Z2Fbvc4RwvRM8L?=
- =?us-ascii?Q?aByp9aaEjPhzlEDBDE22251mgPWm59L4EeO3iTJ5qRLJ7m+52tuOF7XOxRp6?=
- =?us-ascii?Q?ySlV9HaOXFdk3LeOC/94q2HHLWruPb1SK7P1dwFWwiemvwHpJ+D/CqRovc0v?=
- =?us-ascii?Q?eUH+EUWt0cC7WFsdEYFWWM8/MSv3Bpi65Zh5bJt2qv7cUyqMCnXBxz/LyB7+?=
- =?us-ascii?Q?vA1ZTfpzuRGCSyA3y0ebEAFMaUOPTIf5n6U0ZNngPy1Fl5pHZgPq6qpQqg/U?=
- =?us-ascii?Q?NXC0a6izMWPh1Q87jLWi72nb2zyb1/UPB6QwlX+TJZwSKzN4Gca93yRwghPD?=
- =?us-ascii?Q?eixfvFcF6+rdpjqUk0eMI08i0pB5yxKysY8opzKTrQ4ZAzyc0srjMl5en/Cy?=
- =?us-ascii?Q?9fQytvZ0uCbZct4x5wgQsweqo63qD/bNG5DpAjFHdjte7j57bsiYP7jjKNu7?=
- =?us-ascii?Q?a8FiNiZeajqzZm6js1Dfxwt93EUrJdZ0P/is8lGYboLwkFl9OcQqTdSyRYlW?=
- =?us-ascii?Q?eX5xkp851Ug2IPIbl5sCWbFjAthBNduwIkvNRMunRmy8Ef8Df9FVpqPN4vjt?=
- =?us-ascii?Q?eCsQiTpOH3ype8j5zo5iXtKbOtxjgjeik44WnoDQRVFOnhI3oBeQLUZ7AM5o?=
- =?us-ascii?Q?f8w6DIXJEfpYsolW9SnNLzySx4o7qoGXLToE1Z6nNl/FIkkp7ewakDNgArxi?=
- =?us-ascii?Q?IpfRSOYBF45uTbQhcefq8hRY/3vio0pKzdAbWFC+1+T6kUXb2Lyx3fhpkhBc?=
- =?us-ascii?Q?2mdce/a6RdX4Uh3e4BkgpXY7Ke/GR5jfkGJwvguMAtQF9LvbHIeSEwKH6n9T?=
- =?us-ascii?Q?gQMyDakozhk+LIpDX4XMucC3tWFM3cteCzgx1la5bLg1t+yTl1BRu+xA3cdH?=
- =?us-ascii?Q?qUWS4Uh2jYP4jlveg7hTLK27ZuXvQyheW63a5rg36+TyjSBQqCKrpMRaSlSH?=
- =?us-ascii?Q?hknoKkWegD+v0IRgoaM82qhePEncxSELNt7rnAZt4S0KilGsmcpcGwFMBvYc?=
- =?us-ascii?Q?xEaZQcDnaiJRGU3KKZdXib1Fgqc4YPMx+CdqSvRSH5O/d7syLdgUeKP8gsOy?=
- =?us-ascii?Q?Rl3JAVtvTPj+iV7EWYNqciINvOnSFxCvndPmYvtGGReecRarBbJ8FT6bRDCp?=
- =?us-ascii?Q?9CXffhnnfJB78cTZhsWGnV70KLS6gspxbB4thSF0n85dzGxyAPOgV85iZ8y8?=
- =?us-ascii?Q?K8VxbAkAc5VjuGvXL6JDDkZRZ40qwjAm7/B3zOegc++ATllGu+ydDCPQm/Ct?=
- =?us-ascii?Q?/Hu7sDFSfaaEiaXOuqY/yXxB2Dl/8WdR50zMkeN6NTcVzi2eLy0e0TuMZJd1?=
- =?us-ascii?Q?xxi24gsCmGhWqMqtE/zAy/7aUPWvFjXOb4V3qPhOaMX7VtOwlZ/rU0Cj3zqv?=
- =?us-ascii?Q?Soo9lgh1Xk/7qyvXbQ4w5dxVkd1j3J1r3qr2k9+bPf3VOjGnTTiejzCym43H?=
- =?us-ascii?Q?OVoZ3PuvN1y0gOma8WXWFIRWUgXE310Mfyl4J0iLerUHLYaKRT9GHKmQozcB?=
- =?us-ascii?Q?ZvByb0vUKVx0EUQ4Lm/EoVyq7V0a9iQkOu5Vn7/i?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 44eb1ab6-81ce-4aa1-fe2a-08dca52bdfa4
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3849.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jul 2024 00:11:43.5191
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: amMUxWr1KSBvLXteU1fRanfzs+qhBqNeaQlmEs3VGA1b+41qO9cRL0g92RsaBKQD
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8095
+X-Received: by 2002:a05:6638:1382:b0:4b9:ad94:2074 with SMTP id
+ 8926c6da1cb9f-4c2070710dfmr12619173.3.1721093000071; Mon, 15 Jul 2024
+ 18:23:20 -0700 (PDT)
+Date: Mon, 15 Jul 2024 18:23:20 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000e51951061d533014@google.com>
+Subject: [syzbot] [crypto?] [bcachefs?] BUG: unable to handle kernel paging
+ request in crypto_shash_update
+From: syzbot <syzbot+e46f29a4b409be681ad9@syzkaller.appspotmail.com>
+To: davem@davemloft.net, herbert@gondor.apana.org.au, 
+	kent.overstreet@linux.dev, linux-bcachefs@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Jul 16, 2024 at 08:57:14AM +0900, Damien Le Moal wrote:
+Hello,
 
-> Initially, we can certainly treat them like that. But eventually, we
-> may need something more as CC VMs access to storage has to be
-> trusted too and so will require both HBA and the device to be
-> trusted. For the TDISP handling, I am however not sure how that
-> should looks like (is it the HBA or the storage device secrets that
-> are used, both ?). As I said, I have not spent any time yet thinking
-> about that use case.
+syzbot found the following issue on:
 
-My guess for CC VM's is you do both.
+HEAD commit:    c912bf709078 Merge remote-tracking branches 'origin/arm64-..
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
+console output: https://syzkaller.appspot.com/x/log.txt?x=10696b35980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=79a49b0b9ffd6585
+dashboard link: https://syzkaller.appspot.com/bug?extid=e46f29a4b409be681ad9
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: arm64
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=117911a5980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16f0554e980000
 
-From a big picture a CC TVM is going to want encrypted storage,
-otherwise it doesn't really make any sense.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/fea69a9d153c/disk-c912bf70.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/be06762a72ef/vmlinux-c912bf70.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/6c8e58b4215d/Image-c912bf70.gz.xz
+mounted in repro: https://storage.googleapis.com/syzbot-assets/cb5b89772c6e/mount_0.gz
 
-If the TVM does the encryption with the CPU then we don't really need to
-attest the storage or PCI at all, bounce the encrypted data into
-untrusted memory and then CPU copy it while crypting it. This
-minimizes the amount of stuff you have to trust.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+e46f29a4b409be681ad9@syzkaller.appspotmail.com
 
-If the TVM would like to have the storage device do the encryption
-with something like OPAL then:
- - Attest and trust the PCI function, this lets you load the HBA driver
- - Attest and trust the "media"
- - Use the media attestation to load an encrypted copy of the media
-   key from the secure keyserver into the drive
+ __invoke_syscall arch/arm64/kernel/syscall.c:34 [inline]
+ invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:48
+ el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:131
+ do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:150
+ el0_svc+0x54/0x168 arch/arm64/kernel/entry-common.c:712
+ el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:730
+ el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
+Unable to handle kernel paging request at virtual address dfff800000000004
+KASAN: null-ptr-deref in range [0x0000000000000020-0x0000000000000027]
+Mem abort info:
+  ESR = 0x0000000096000005
+  EC = 0x25: DABT (current EL), IL = 32 bits
+  SET = 0, FnV = 0
+  EA = 0, S1PTW = 0
+  FSC = 0x05: level 1 translation fault
+Data abort info:
+  ISV = 0, ISS = 0x00000005, ISS2 = 0x00000000
+  CM = 0, WnR = 0, TnD = 0, TagAccess = 0
+  GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+[dfff800000000004] address between user and kernel address ranges
+Internal error: Oops: 0000000096000005 [#1] PREEMPT SMP
+Modules linked in:
+CPU: 1 PID: 6452 Comm: syz-executor232 Not tainted 6.10.0-rc7-syzkaller-gc912bf709078 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
+pstate: 80400005 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+pc : crypto_shash_alg include/crypto/hash.h:733 [inline]
+pc : crypto_shash_update+0x50/0xa8 crypto/shash.c:52
+lr : crypto_shash_update+0x30/0xa8 crypto/shash.c:51
+sp : ffff80009ff56620
+x29: ffff80009ff56620 x28: fff1000040000000 x27: ffff80009ff56800
+x26: ffff0000e1c404d0 x25: dfff800000000000 x24: ffff80009ff56800
+x23: dfff800000000000 x22: 0000000000000020 x21: ffff80009ff56800
+x20: ffff0000c6009000 x19: 0000000000001000 x18: 0000000000000008
+x17: 0000000000000000 x16: ffff800082f8f174 x15: 0000000000000001
+x14: 1ffff00011e7a636 x13: 0000000000000000 x12: 0000000000000000
+x11: ffff700011e7a637 x10: 0000000000ff0100 x9 : 0000000000000000
+x8 : 0000000000000004 x7 : 0000000000000001 x6 : 0000000000000001
+x5 : 00000000ffffffff x4 : 0000000000000cc0 x3 : 0000000000000040
+x2 : 0000000000001000 x1 : ffff0000c6009000 x0 : ffff80009ff56800
+Call trace:
+ crypto_shash_alg include/crypto/hash.h:733 [inline]
+ crypto_shash_update+0x50/0xa8 crypto/shash.c:52
+ __bch2_checksum_bio+0xbf4/0x10d8 fs/bcachefs/checksum.c:300
+ bch2_checksum_bio+0xc0/0x10c fs/bcachefs/checksum.c:319
+ bch2_write_extent fs/bcachefs/io_write.c:1044 [inline]
+ __bch2_write+0x1d20/0x47f4 fs/bcachefs/io_write.c:1461
+ bch2_write+0x8bc/0x153c fs/bcachefs/io_write.c:1634
+ closure_queue include/linux/closure.h:269 [inline]
+ closure_call include/linux/closure.h:425 [inline]
+ bch2_dio_write_loop fs/bcachefs/fs-io-direct.c:531 [inline]
+ bch2_direct_write+0x1670/0x2988 fs/bcachefs/fs-io-direct.c:654
+ bch2_write_iter+0x1a8/0x2d24 fs/bcachefs/fs-io-buffered.c:1135
+ new_sync_write fs/read_write.c:497 [inline]
+ vfs_write+0x8f8/0xc38 fs/read_write.c:590
+ ksys_write+0x15c/0x26c fs/read_write.c:643
+ __do_sys_write fs/read_write.c:655 [inline]
+ __se_sys_write fs/read_write.c:652 [inline]
+ __arm64_sys_write+0x7c/0x90 fs/read_write.c:652
+ __invoke_syscall arch/arm64/kernel/syscall.c:34 [inline]
+ invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:48
+ el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:131
+ do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:150
+ el0_svc+0x54/0x168 arch/arm64/kernel/entry-common.c:712
+ el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:730
+ el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
+Code: 9778c38d f94002a8 91008116 d343fec8 (38776908) 
+---[ end trace 0000000000000000 ]---
+----------------
+Code disassembly (best guess):
+   0:	9778c38d 	bl	0xfffffffffde30e34
+   4:	f94002a8 	ldr	x8, [x21]
+   8:	91008116 	add	x22, x8, #0x20
+   c:	d343fec8 	lsr	x8, x22, #3
+* 10:	38776908 	ldrb	w8, [x8, x23] <-- trapping instruction
 
-The split view of "media" and PCI function seems appropriate. The
-keyserver should only release keys to media that has the correct
-attested ID, while a controller may have many different media attached
-to it.
 
-Attesting the controller is probably not enough to release the keys?
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Jason
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
