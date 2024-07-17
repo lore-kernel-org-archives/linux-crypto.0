@@ -1,125 +1,103 @@
-Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [95.215.58.175])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34B591F171
-	for <linux-crypto@vger.kernel.org>; Tue, 16 Jul 2024 17:19:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08A58442F;
+	Wed, 17 Jul 2024 02:25:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721150390; cv=none; b=JhiyTNxRF5tXc4poUhTxPAktxPQEcX1KF71oKzBk3cyk1SQ7tZ40dmYFNaj4IcjraPisZIlkuJKtdWrRxjfkeuE98/qIlcL9U7zYYGsVjDUzac/wdYeKwsUGS0y/BfsmMqmFJWlOnPj7J8DYMRndmpmccpnkV5nRwIpxldrwl3E=
+	t=1721183115; cv=none; b=uGvdrUuAV0yfcmoGRlz7iNfhqPV6MsKSLDiRO0M5HKI8j5BB5nfy7jStYViKsmpl7sW97rgyUenx4Rv9tbM/JoVAPU8alXl/o3SHgaTrR04v/3CfLd8k6/Rj9D8DK+OZRRXou1Ns8xkm11QDLFsR5qEJntE7lCgWDelmuy96AiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721150390; c=relaxed/simple;
-	bh=LQtVgMXT1kLs9xuSAb2Dnp0S9QMFr2sEd0jibq58t+M=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hodr6A9M5+j0dqi7nq1wC0OHf4LrzAOqc+DULzuDJnOATX3r85T6Jo13b0bKvm9MzgZmya6amGRK+csQR62jH0h4ny6krdicXmzUKq+ogzCBq/3stEsouQ/BtuEGBkaGslZ6jJ2P1ATvdbsj5bqf2h66Txp5rlqDjibLEHdTSi8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cknow.org; spf=pass smtp.mailfrom=cknow.org; dkim=pass (2048-bit key) header.d=cknow.org header.i=@cknow.org header.b=qc8zIPW0; arc=none smtp.client-ip=95.215.58.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cknow.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cknow.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cknow.org header.i=@cknow.org header.b="qc8zIPW0"
-X-Envelope-To: wens@kernel.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cknow.org; s=key1;
-	t=1721150385;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LQtVgMXT1kLs9xuSAb2Dnp0S9QMFr2sEd0jibq58t+M=;
-	b=qc8zIPW0HWu090g9RF35uDSfiwvOgImM2IhEQPwe4ttIfKmuVhVARSUh+CW3NoFQWb2A+t
-	N7ZhQYxRoUK3P54ZsqKHUcKBRvUDzJyA9kf7GNsk/vrif1Bt6SJ+jJSPXC89ufy8mcxvRv
-	lAsOS4t3za0sjHnk2be5j1wXrPrpP4+UhjJjcQNN9hACBFfRzj2roqKHxC7S8m745JJSCl
-	QTmDpIcOpWBvVC/ljM7CogwHo/wi5a9l1Up23ke9vE05Bo/BzSgyIs7CbORxL2ZxEIDgbC
-	kyo2QL09uMIfaEz4x2Gp9LrtI2XzzX5pZcAQdCeIeOcKCcYlON0+qSZzCE/1HQ==
-X-Envelope-To: daniel@makrotopia.org
-X-Envelope-To: linux-rockchip@lists.infradead.org
-X-Envelope-To: linux-rockchip@lists.infradead.org
-X-Envelope-To: linux-arm-kernel@lists.infradead.org
-X-Envelope-To: robh@kernel.org
-X-Envelope-To: conor+dt@kernel.org
-X-Envelope-To: linux-kernel@vger.kernel.org
-X-Envelope-To: herbert@gondor.apana.org.au
-X-Envelope-To: martin@kaiser.cx
-X-Envelope-To: s.hauer@pengutronix.de
-X-Envelope-To: sebastian.reichel@collabora.com
-X-Envelope-To: ardb@kernel.org
-X-Envelope-To: ukleinek@debian.org
-X-Envelope-To: devicetree@vger.kernel.org
-X-Envelope-To: linux-crypto@vger.kernel.org
-X-Envelope-To: p.zabel@pengutronix.de
-X-Envelope-To: olivia@selenic.com
-X-Envelope-To: krzk+dt@kernel.org
-X-Envelope-To: dsimic@manjaro.org
-X-Envelope-To: aurelien@aurel32.net
-X-Envelope-To: heiko@sntech.de
-X-Envelope-To: didi.debian@cknow.org
-X-Envelope-To: linux.amoon@gmail.com
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Diederik de Haas <didi.debian@cknow.org>
-To: Chen-Yu Tsai <wens@kernel.org>, Daniel Golle <daniel@makrotopia.org>
-Cc: linux-rockchip@lists.infradead.org, linux-rockchip@lists.infradead.org,
- linux-arm-kernel@lists.infradead.org, Rob Herring <robh@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, linux-kernel@vger.kernel.org,
- Herbert Xu <herbert@gondor.apana.org.au>, Martin Kaiser <martin@kaiser.cx>,
- Sascha Hauer <s.hauer@pengutronix.de>,
- Sebastian Reichel <sebastian.reichel@collabora.com>,
- Ard Biesheuvel <ardb@kernel.org>,
- Uwe =?ISO-8859-1?Q?Kleine=2DK=F6nig?= <ukleinek@debian.org>,
- devicetree@vger.kernel.org, linux-crypto@vger.kernel.org,
- Philipp Zabel <p.zabel@pengutronix.de>, Olivia Mackall <olivia@selenic.com>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Dragan Simic <dsimic@manjaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>, Heiko Stuebner <heiko@sntech.de>,
- Diederik de Haas <didi.debian@cknow.org>, Anand Moon <linux.amoon@gmail.com>
+	s=arc-20240116; t=1721183115; c=relaxed/simple;
+	bh=hTsCtKMMwpYJJaYHd+VYy/lZb1GbRWgDEPKlTd/+vwc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XVFxNCA3YiQlIEsxzBb1TXGJgrFUwPblqfJMQatR7KBHs8Yg1sqUeWW2crLjd5YJhm1pCyi+jw7JVxL8ye3HlboFUZXtRQdTAkqi432XoVMBF6oj/Ovf/XA4fO4xg5ARq2ejQXU5sJzD7lDwmWUwvMOlz7++RoSf5if8Zg7MAxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.97.1)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1sTuLk-000000006Cr-1FJG;
+	Wed, 17 Jul 2024 02:25:00 +0000
+Date: Wed, 17 Jul 2024 03:24:55 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Diederik de Haas <didi.debian@cknow.org>
+Cc: Chen-Yu Tsai <wens@kernel.org>, linux-rockchip@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org, Rob Herring <robh@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, linux-kernel@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Martin Kaiser <martin@kaiser.cx>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Sebastian Reichel <sebastian.reichel@collabora.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <ukleinek@debian.org>,
+	devicetree@vger.kernel.org, linux-crypto@vger.kernel.org,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Olivia Mackall <olivia@selenic.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Dragan Simic <dsimic@manjaro.org>,
+	Aurelien Jarno <aurelien@aurel32.net>,
+	Heiko Stuebner <heiko@sntech.de>,
+	Anand Moon <linux.amoon@gmail.com>
 Subject: Re: [PATCH v7 0/3] hwrng: add hwrng support for Rockchip RK3568
-Date: Tue, 16 Jul 2024 19:19:35 +0200
-Message-ID: <3220752.Q7WYUMVHaa@bagend>
-Organization: Connecting Knowledge
-In-Reply-To: <3190961.CRkYR5qTbq@bagend>
-References:
- <cover.1720969799.git.daniel@makrotopia.org>
+Message-ID: <ZpcrdwZBNFu-YlZt@makrotopia.org>
+References: <cover.1720969799.git.daniel@makrotopia.org>
  <CAGb2v67zxs03xScN8OfWXR1gf8tddJciXrjw3FQZcL7pR3ocxA@mail.gmail.com>
  <3190961.CRkYR5qTbq@bagend>
+ <3220752.Q7WYUMVHaa@bagend>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart4668013.QbK88pdo3q";
- micalg="pgp-sha256"; protocol="application/pgp-signature"
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <3220752.Q7WYUMVHaa@bagend>
 
---nextPart4668013.QbK88pdo3q
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"; protected-headers="v1"
-From: Diederik de Haas <didi.debian@cknow.org>
-Date: Tue, 16 Jul 2024 19:19:35 +0200
-Message-ID: <3220752.Q7WYUMVHaa@bagend>
-Organization: Connecting Knowledge
-In-Reply-To: <3190961.CRkYR5qTbq@bagend>
-MIME-Version: 1.0
+On Tue, Jul 16, 2024 at 07:19:35PM +0200, Diederik de Haas wrote:
+> On Tuesday, 16 July 2024 18:53:43 CEST Diederik de Haas wrote:
+> > rngtest: FIPS 140-2(2001-10-10) Long run: 0
+>=20
+> I don't know if it means something, but I noticed that I have
+> ``Long run: 0`` with all my poor results,
+> while Chen-Yu had ``Long run: 1``.
+>=20
+> Different SoC (RK3399), but Anand had ``Long run: 0`` too on their
+> very poor result (100% failure):
+> https://lore.kernel.org/linux-rockchip/CANAwSgTTzZOwBaR9zjJ5VMpxm5BydtW6r=
+B2S7jg+dnoX8hAoWg@mail.gmail.com/
 
-On Tuesday, 16 July 2024 18:53:43 CEST Diederik de Haas wrote:
-> rngtest: FIPS 140-2(2001-10-10) Long run: 0
+The conclusions I draw from that rather ugly situation are:
+ - The hwrng should not be enabled by default, but it should by done
+   for each board on which it is known to work well.
+ - RK_RNG_SAMPLE_CNT as well as the assumed rng quality should be
+   defined in DT for each board:
+   * introduce new 'rochchip,rng-sample-count' property
+   * read 'quality' property already used for timeriomem_rng
 
-I don't know if it means something, but I noticed that I have
-``Long run: 0`` with all my poor results,
-while Chen-Yu had ``Long run: 1``.
+I will prepare a follow-up patch taking those conclusions into account.
 
-Different SoC (RK3399), but Anand had ``Long run: 0`` too on their
-very poor result (100% failure):
-https://lore.kernel.org/linux-rockchip/CANAwSgTTzZOwBaR9zjJ5VMpxm5BydtW6rB2S7jg+dnoX8hAoWg@mail.gmail.com/
---nextPart4668013.QbK88pdo3q
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
+Just for completeness, here my test result on the NanoPi R5C:
+root@OpenWrt:~# cat /dev/hwrng | rngtest -c 1000
+rngtest 6.15
+Copyright (c) 2004 by Henrique de Moraes Holschuh
+This is free software; see the source for copying conditions.  There is NO =
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQT1sUPBYsyGmi4usy/XblvOeH7bbgUCZparpwAKCRDXblvOeH7b
-bghfAP0STaXg+UlSKsk1L6VzJ9BHzyphyFMlfj7FGoFob7nyLgEAh1Yebqje+avX
-NIUvaQhX4nxlMMHIY/hZdtpdZIfbigs=
-=VxyF
------END PGP SIGNATURE-----
-
---nextPart4668013.QbK88pdo3q--
-
-
-
+rngtest: starting FIPS tests...
+rngtest: bits received from input: 20000032
+rngtest: FIPS 140-2 successes: 875
+rngtest: FIPS 140-2 failures: 125
+rngtest: FIPS 140-2(2001-10-10) Monobit: 123
+rngtest: FIPS 140-2(2001-10-10) Poker: 5
+rngtest: FIPS 140-2(2001-10-10) Runs: 4
+rngtest: FIPS 140-2(2001-10-10) Long run: 0
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=3D85.171; avg=3D141.102; max=3D4882812.5=
+00)Kibits/s
+rngtest: FIPS tests speed: (min=3D17.809; avg=3D19.494; max=3D60.169)Mibits=
+/s
+rngtest: Program run time: 139628605 microseconds
