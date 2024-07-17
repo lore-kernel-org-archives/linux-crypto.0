@@ -1,67 +1,67 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 888B913CFBC
-	for <linux-crypto@vger.kernel.org>; Wed, 17 Jul 2024 11:46:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8777413CFBC
+	for <linux-crypto@vger.kernel.org>; Wed, 17 Jul 2024 11:47:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721216819; cv=fail; b=GayLbdbn/ysiXG3LzQNdeCOnv77dYXOlSnDc0JkNTvXBGonvQPp7cnB38a0GdxO3lY+SWYjK59hLj1mq01Biqo4uXPFXShu57v5Sz1s2twK7/87dnKSW/8XmDGM41fXP7tr0Xq+C2GXJ7Qcvq0fAmihpEr9gTDSxtdtFpU7UpBk=
+	t=1721216823; cv=fail; b=S4r8hNPzOmY06fCo8ffCOLTJdP//WMaeorEiCtKXiED2aBr6//kg8HT8x7fKanodZALzs6l2FYVMaRMNomLVOr7wGNZA2AGXWGEUG9ie5Z2SThsBC6RjWamTCWkPOGMed4bf11NkZrZbWjsDk/w5FTCqVSF63byQGYoahVTvd0Y=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721216819; c=relaxed/simple;
-	bh=1jqSK8/+2JIBb2/ir8Kc9ZeOEzChsqjrYVaYJDHj3GA=;
+	s=arc-20240116; t=1721216823; c=relaxed/simple;
+	bh=6sh2uEiv7Hd6FuF8MPeayrblto0+bZRTK4f3dIwrkhI=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=b/ijZgmPSVih89YRDMrassfJ19fWaoXiLxC2hXRAW81ucvE4JoS3+BYyq6u8PYgmTfbcfRl/PKQZ7wHa/OOraIyLK004xehS4p/gbEMIe82lI+nsiF5VjxN5/h37iK5NdfBHyaZ5zJ2xxe1lJ8pR31+HPAx0Yxfh6Z+WfPf+L0g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FYcfvl1P; arc=fail smtp.client-ip=192.198.163.12
+	 Content-Type:MIME-Version; b=Vzwsl5vUCaXaraqfz6elFe3zQ+pg2vUKISVBJusmc1ufsfO9RzCvWVP8iPZMRm3zQ1NcF/FOmiysz0hudUcXkDPsObypg+DUAFGb/jGNg6pj+fXPnQzGegMsInRD2KiwbkvwI7rLHupamHc+dg6wKfF5exYQZhMaLX0JYA43j7w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ly0uLilZ; arc=fail smtp.client-ip=192.198.163.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FYcfvl1P"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ly0uLilZ"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1721216818; x=1752752818;
+  t=1721216822; x=1752752822;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:content-transfer-encoding:mime-version;
-  bh=1jqSK8/+2JIBb2/ir8Kc9ZeOEzChsqjrYVaYJDHj3GA=;
-  b=FYcfvl1Ps62Ut0ADtktdHkikzt6ZQ9VWsJzKWzlXWBWALN1of5A4blTO
-   JToIRkrHkrOJWirm1IIYanhtcdpZQoon/qWiM1PFy03EE6NbMpjpPRCHA
-   IaywoRtjag3nYLLzPF9daIoXXs1CWUQT92gpIJfXnSEYcsXo2ArG+mC9f
-   XLSZSS05fdwexS05oQIJtIjL3GRQYJMdyEQp6/zQGDCCWxbulKrOaYojT
-   3Dl3Z6gyzH8UnyWxLyGGnNTFoqIb5q9ctWlfjbdlANv4LMwnur4LDJJsj
-   zfxw7YZ1DkE7dRY2DsePtNCTCWMFNcoYlhdcUkEwRFsCmHNTbWsp2ulBE
-   w==;
-X-CSE-ConnectionGUID: IS4edo8NSMeJbGgSzFdRBg==
-X-CSE-MsgGUID: DqdV58K/TfGfCHUhB7qzyQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11135"; a="22572919"
+  bh=6sh2uEiv7Hd6FuF8MPeayrblto0+bZRTK4f3dIwrkhI=;
+  b=ly0uLilZF/q18A3Hxz8jSLyrQUWzBbPebb1QqSaWqG5yaHZMpMVet4j8
+   kHNFvZRD62/e+97AT/in6564SWHTwcL45gqwhJ7BnlQXnborBDFvChWZN
+   GiftCr4FbCg3qglFW8o6uR3hK/7p5ddk/GWizeE+7oI2dJaanp3AJ+g4s
+   nijEe5OWbWxFGdq1xa8ANEUxnMa/TF9xBmlDT5sGJ++hh/41kCmc92ud+
+   kS7kaPbucdOG9kxMYevvZaIIl6LACUhozgT36kLLIQmxhmE5uocnVWcI/
+   fn0dF124Ge+LisVyr8VjXCBMJPfIbNtuIln72efw7EbRFQP6G2IBUZC0V
+   g==;
+X-CSE-ConnectionGUID: 85MhiPETTtOwxxrB0vUQ9g==
+X-CSE-MsgGUID: QvGhR5F3T5Ow2sCPGwFY+g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11135"; a="21617739"
 X-IronPort-AV: E=Sophos;i="6.09,214,1716274800"; 
-   d="scan'208";a="22572919"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2024 04:46:58 -0700
-X-CSE-ConnectionGUID: KA95izjvQ8a3I0c+p5TuxA==
-X-CSE-MsgGUID: 4Hc05/hJSgqbrUgk++IzZQ==
+   d="scan'208";a="21617739"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2024 04:47:01 -0700
+X-CSE-ConnectionGUID: QpYATMZQRBKUXUwdeTZqmA==
+X-CSE-MsgGUID: 3RfE1XgTTmW+O5TOr/DKMA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.09,214,1716274800"; 
-   d="scan'208";a="55207404"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orviesa005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 17 Jul 2024 04:46:58 -0700
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+   d="scan'208";a="81406958"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmviesa001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 17 Jul 2024 04:47:01 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 17 Jul 2024 04:46:56 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ 15.1.2507.39; Wed, 17 Jul 2024 04:47:00 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Wed, 17 Jul 2024 04:46:56 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.175)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ 15.1.2507.39 via Frontend Transport; Wed, 17 Jul 2024 04:47:00 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.168)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 17 Jul 2024 04:46:56 -0700
+ 15.1.2507.39; Wed, 17 Jul 2024 04:47:00 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ujoltb28h5jBNdKQWe9bC2lul+JqXSkLCcZey0o5ofLG8mFHt07K3nQC+Z8jQrNg8kaVeOSm6E5fsT/0CmP7a6vXGGhxzMhZozNxm7p98m1J5ikN8YBioU49G5fmnuACx6JQ9eAjAc4jPqCITvmXCL47F7zSB5arMPJu9piZAh8qo+GVL3yQ8bxVBjTRouTEGfQ3dcQdLN/TQ9kfTp+AyM+k+mLLvK0UNcn/icri10Jv8RQe3VxwKKX3JFEM7qcWNAEU/WWh4t3iuk1dslMJMziH4DhAQEr+O6rpr/e3nKfJ4xSCN9PsRtNacqcW+aQbaZPEa5L1NNLwzuT9bbYhhQ==
+ b=m4AmYqUZHNCwLSl4SlOZkCsq+up7NXG8WbIt1Q6+tB58xROjC8cbtmusuQx0OxsiUAzby6+nfLCRafJ5EhqP3X4OpeH0TWAL35OTkeH3ce/AsvFd2wmbwwnzHiXafumkvaPLpkGrQtmPpjkSwey7rx38GiZ6K2fROQUGajAgKyEbAgWGxB3hJ+B9DhonRsmiRsRXl1v31QhvY1GifX2sEurWAanVQqIhGzWCPVkYPXPcxwJlMEt1REFKv0vra/Dy0fQIjHw6b62CVexdKmDJrlaOjn+uLt0eB6tDjXu7xKPOFs7Hjhu/UeqghyN+gxO3hN7lWTOBJGWp0Gu54CGLIQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=m2lw8x1P01pWKmRbH4dFHiCEwzy1fXOVtXWADSmHNho=;
- b=V0qiIwlerwwbU812q7ZhA2Kz5K9EgBt0ObMvH2DRPeo9U4nslPt6Wv/0WnLpOLlNDi0n76FJ36qfka0NNOH4mjn3tfVQWqZs/FXbgJS4Tqcv9/ExTT3o5NKnNXCnnvGohGG3it/DGkmow8hzgE667WLxioJdNDFUnaFhGbiMY6Zp1Zj+irlr7nCQeJv65jZ7FAR636PxsCMC2r7HR4l/jJpU9hrRt5AVqdV4Vx4zetrKERUoYv2Vxi8J7zUa278x+jm9A6bfnW0vVdku79zr/+NcJSW0HDdNLTOHeD5/IGOEHh0eVFYn6EutGD3lcQrSH3gQfbUaqupESAxZis2ZwA==
+ bh=lHOGUz8HY2zAgr7fONQ5Re3zDb4pevl9lZJCtvdEH0c=;
+ b=Y9HvAON3y7JXPstHt6dhKZ+yZnUlWfUQ618CBV4gil4QnE70WYJUQi+gf6k867peoDGe49gYVebmKBJMUnDlbrN4FFb2vC1j4hAgM9LTtJqMpycrjgGykNhkrki80/62AMXbn8N9HngqpdHHV4nN1Q2VhWnjkxZ8KJft+74g0ePqTOIrrV8QmIPKYXpxnaHFb3XNVl8NE55caDJQtmrn0DE4Pwxwej9xawUM6uk+zoke1ZVlnFTRIxhYRIvoV0oVuHXqfZYpI2c+DA6vFMFc/gDbVCqQrMCgCRQMaWWO1sIWpnoWYgamT0ODB1AbEJOA3SZ3hISC/BLVnx1pdM0A7Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
@@ -71,19 +71,19 @@ Received: from PH0PR11MB5830.namprd11.prod.outlook.com (2603:10b6:510:129::20)
  by CH3PR11MB7794.namprd11.prod.outlook.com (2603:10b6:610:125::13) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.29; Wed, 17 Jul
- 2024 11:46:53 +0000
+ 2024 11:46:58 +0000
 Received: from PH0PR11MB5830.namprd11.prod.outlook.com
  ([fe80::c80d:3b17:3f40:10d6]) by PH0PR11MB5830.namprd11.prod.outlook.com
  ([fe80::c80d:3b17:3f40:10d6%3]) with mapi id 15.20.7762.027; Wed, 17 Jul 2024
- 11:46:53 +0000
+ 11:46:58 +0000
 From: Michal Witwicki <michal.witwicki@intel.com>
 To: <herbert@gondor.apana.org.au>
 CC: <linux-crypto@vger.kernel.org>, <qat-linux@intel.com>, Michal Witwicki
 	<michal.witwicki@intel.com>, Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
 	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH 3/5] crypto: qat - fix recovery flow for VFs
-Date: Wed, 17 Jul 2024 07:44:58 -0400
-Message-ID: <20240717114544.364892-4-michal.witwicki@intel.com>
+Subject: [PATCH 4/5] crypto: qat - ensure correct order in VF restarting handler
+Date: Wed, 17 Jul 2024 07:44:59 -0400
+Message-ID: <20240717114544.364892-5-michal.witwicki@intel.com>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240717114544.364892-1-michal.witwicki@intel.com>
 References: <20240717114544.364892-1-michal.witwicki@intel.com>
@@ -101,149 +101,118 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: PH0PR11MB5830:EE_|CH3PR11MB7794:EE_
-X-MS-Office365-Filtering-Correlation-Id: a83cd593-9482-4bef-4f71-08dca6562742
+X-MS-Office365-Filtering-Correlation-Id: 50013319-7c2b-4e7a-33d6-08dca65629d7
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?cmtcOw4xa9cCFSxaDGAKmuwTqEaN9KeLerkYJ41CTxJvj/cubaUsIoSIDizj?=
- =?us-ascii?Q?HGI+T4d2I3sICLxByccU2dBv5XiXijuvY3yrVIbm0iooVUxS6N9Ymkz4qTa0?=
- =?us-ascii?Q?V3oRRzZzG8VvlZj5woLoWfnX80vZy2mtkF+p5qx/1sE5xMCiO3CgRQGxC7gd?=
- =?us-ascii?Q?3DbjdKKgFW5Tmd6E5IRwYtdl/Any/cIIPGTL8pjMoTriXyK7Dz7+I2Ot0mW9?=
- =?us-ascii?Q?x4fIvBd/hypH4j4qOjeuMCcp0twXBCzdrFZK/Bkk9Vqm3mDmn2/y0WlK1SkB?=
- =?us-ascii?Q?ZvB9xJZ/fSq5bNfU2Babh3b7VWIibqy47eK3JtNWchOgIsINn1/4H6OALk/w?=
- =?us-ascii?Q?GJAuSXT9Ty444jsDVrSogcFi0PlqohB+1EfBYqG/Nt9Ry9WfQOcaBZ20clLs?=
- =?us-ascii?Q?kklqPp29ipZQR32tudGAIKQ5P4Q25YmuiGMBhDxjJaDnrjzXQCXEWQiaSc/r?=
- =?us-ascii?Q?kquoCN7JNRfFDiZdEwB3DO7Vw7AvoeuEWyfzfyZHJ9pbuvrKwo1JS0T9TjBN?=
- =?us-ascii?Q?bV0dcnBn5adx5+i+J3CJ4EhWkrFJi2QDfGAXYcNIUxDmcJ5wUfTVY8RFemCQ?=
- =?us-ascii?Q?8uzX6UcQalLvtAxiMSgu4eLNs5vfoaV9v/8cleAKtj2fbJkiBEtBpbU2Q6Gp?=
- =?us-ascii?Q?LpQq9zdgHUt8YMq5C60W0vQq13IE3fQqSTQvFz2/sD04tVTE8p9dbsPOIX15?=
- =?us-ascii?Q?LDygUHpAJD9i92zTb8Ru2Bv3HqIXpgoH30I/LnT/ifluw0Sz2uKyIqz1wV5j?=
- =?us-ascii?Q?tcqABsAu/5WLTlBGY1TrMRbUDYEwmF+sxIjoZRF5pEcIV+u9wd0hFg3+9SSc?=
- =?us-ascii?Q?E7nR7Cn+AotxykMAUNJf/PWuJhDm62gkEJbfiBB0RTX9MpwVyZ3EnxYq/5hX?=
- =?us-ascii?Q?lAudpOwroi+zrmHuE7WMpAKhghv6LMmvO12Om+Fnl3nz1TLWbC1u7vYQvpS2?=
- =?us-ascii?Q?Trg3PmPMnfibDmDe8QiKk7MWvwIFwbYNUetoNsW9mh2O9oJ5uE7CXXWBEIwh?=
- =?us-ascii?Q?hrlbOFq7kYnDXK2T5AAaqeBhvJ7kxjlWJHbFPwEVP6kOneWGeihyB7enjZ84?=
- =?us-ascii?Q?nqPwW8uM+77k8siZKwYQ2Jdo7JvIywyzGU44Kp7kit1uA109Q7s4vlh7dA71?=
- =?us-ascii?Q?8L+f1xbcxmcVhw9STv+zvzf3tWM4XOY1YkAwfUX6fRzDUb2JsYBV3RFPnVMp?=
- =?us-ascii?Q?6HD864nNjzdbfYaEQgsB/+zBevLRAFSMH62WXpr3cOJyMuYQgsp5lWaZrxJn?=
- =?us-ascii?Q?CwDuIJBbTSpEoBgXpviHF4fpHErVUJpo5RyBRTBBJLllcA79Z8pEdAILx2zF?=
- =?us-ascii?Q?y9ogE4t7TXbh3jzZMdk3PdXllaO42ymJtLMWqNlSoZWmnQ=3D=3D?=
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?wHE0CrDWI5t2tYPUoL+bQ4mYi9g6w4Km64KBJifmfK+sKzRkApgmJiFxgJ3q?=
+ =?us-ascii?Q?OrTMlY9tKnwgQMedipV6ZJE1CNVMzTwAuNyMVxc1HRQ1zd/L0vSCnImgEUeM?=
+ =?us-ascii?Q?ZlfPK/p7BH7VTZSwK7mVL/vmNqnyAVXt0L8AF0QGq0D80uwJ3XWtDL8ML4h3?=
+ =?us-ascii?Q?nRK8BNMAz8Og0b++WUfwZXXSDjaNLI0pvByo5w7uRbpC2607Oh0PtMjfxqlt?=
+ =?us-ascii?Q?sK7KmbdBD58B5wfJwk3xok9E4iY73hMfzPb1N8fclqzufxH3M/uItCFvDJw6?=
+ =?us-ascii?Q?VOzDuaTs/McKFF7yhDDZF4ra6zlWBPVHNbNgpKfOaZOg7yMRGi0mn7DybsQ9?=
+ =?us-ascii?Q?JFyMXf+Xv50BAn5gPkoiAv23vUCTeMZ4Hp7V7VjfSnxGun6OQP/zP572Alal?=
+ =?us-ascii?Q?VT1ZxTvDD99ILVhgzrTgL/pLwFLWiONhfyBY9FIqp9BOmM6QakzPaqyPA0Zj?=
+ =?us-ascii?Q?85HgSzzKYwT+MWg2szahHvFh2dZX7BcqR2csCqje1O5PmHv0RqixOQL+b/zz?=
+ =?us-ascii?Q?jj1W2RprQa1bYcxiMdK/X4bsPiw66fO7QFqDDtFTKHZPWMcLzs732qNpimpD?=
+ =?us-ascii?Q?KlktyuSsiZP3Xq5WamXxKycB7oEvI/ZnlANfSUT+o5zhVnIvzBRJTaonm3qL?=
+ =?us-ascii?Q?2l/QXjkvP2HCoh/8mszsuslT6MIPHXLLA87L2DNThgXI/SfSju7UgGW79Si2?=
+ =?us-ascii?Q?M4MZwpSLQzU5JMDV+gJe1vXN3VMsGTBNblIJlpRLNJdL85et2511dNQUEJxS?=
+ =?us-ascii?Q?SUe4AC4UW26b1nFuPSFYTWt8k+2nyJiISEWpoqRPxAWxYxdHDDpS6Vzf9G9Y?=
+ =?us-ascii?Q?Wgr5V3leTbWERG1dSwPS0P2Xpjjh+Jol7pQMcgmxePcNn/KgwLR639bf241o?=
+ =?us-ascii?Q?kJ5c2nCv8wtALVWKQkPIyipIMPcpaY4dKaGQxA+gWHTYcXijOae+1EaJ0zG5?=
+ =?us-ascii?Q?rMrPH/2RjUlrqOtI9Am7uCQRs+w4pohha5aMl8gTe8+ahnQg20XlSpe68C4K?=
+ =?us-ascii?Q?WO+OVXPHpZxukk5ynaBrjxm3vNKu+iLgumICKRVyIYvaqGCAcij9oXUotYZR?=
+ =?us-ascii?Q?1rOgzembbpF1Dttfzo0+zmfjVGl/QvqLfr6QFc0VuRvR/mjtJFbX8HTYp1Tq?=
+ =?us-ascii?Q?t+Uvv/wJfSPjYLreG+IvYjGepK/SnPHZvtPKjYD/41AlvemJJomiczqKzWEr?=
+ =?us-ascii?Q?542NpJMf4d/4hItQoS9YrUYu0I2WSoEtguNVB1fjpBC933W7SLv5XGz0L5mQ?=
+ =?us-ascii?Q?Siq8rM88LT2kONxD6MvNlJFAL7Z+ORd8LNpvMghr/WbFiZ04KiwX8Wav/cmp?=
+ =?us-ascii?Q?ku4K+kFUYmt52SRv6sWo8YOZgFqCaAfbFvPvRx5+VxnpJg=3D=3D?=
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5830.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?+c/H0xMGjZ2XVXHuxWDn4X1r0hApUwPkawNAqVX4BnWA7AhZsL5/RSVXzunx?=
- =?us-ascii?Q?lHALt21IWw86QnUcVbEjHuTqRQE1ynkCziYPM/91qPWYlAEyIBABl9JrZbfD?=
- =?us-ascii?Q?YGIcRkMRRc8ZQSCrpeDgGsSQqIB6m4VsTTIXUXqLmjpHtojNxhT9hNUy+BGO?=
- =?us-ascii?Q?twiDW3pTV4Np3ddFczsqg5C9i+1j4kD0MOGe2NKwR4DKjzxCGU29Y339pCoW?=
- =?us-ascii?Q?T2OqKn00pu6vGNtfu5xXMbLtWgAB3Q1s9zbf/ImMlgNM90GARVfRynbTGfgw?=
- =?us-ascii?Q?a/LixdC6ZuGc/fOilmKfj+LE450ZwzvzhxRzjj1cBOOnv7U4N+U7NehTmh1v?=
- =?us-ascii?Q?ot3uvSxXoR72E1L9bD6Gq/O/vhUAbIJXKkVTaBG6fMiX28Gt8AtQ8Ztk8nUI?=
- =?us-ascii?Q?w8LxG/202+Ze8c9pKhurpcFpEkezUj7Z5YIW2MVKYvqeNLZZJr3vzOTru/vT?=
- =?us-ascii?Q?lnZSueN7Jnus0rTFF53N6ODUYZa/RF9TkT+wQ0chT7ZpdAVAV5Nx63apXZJg?=
- =?us-ascii?Q?wutQCqdGbmHmiLAZKnnra4VIIuF4gYkF1h9lk+S/qHbDEZwzWwWXfbRp4YZZ?=
- =?us-ascii?Q?bHdvzWxhcoXvtl4YZVN85mNbcRk0kcvvF9EE5+hnNmP+c6u5TrqepTfnqwVc?=
- =?us-ascii?Q?tcw1v048Yi5RDoAJ8xse5A6s0e/BdWkoPPB7HCJ88H+uE+XrhrhSvMaNhXGS?=
- =?us-ascii?Q?kd3OpOn15Ej4KzLcXy9nvkCyHIk6GlG49Wlu4GgGCIQI8xRa/04xku3zmXvs?=
- =?us-ascii?Q?vtJKC4RDmRlK/mg7hkOtAtZgtPND1V739R/BL0CYr47Jf1YDAhtor/ZIQkrh?=
- =?us-ascii?Q?i+VF5ec3Qvabr+nd9LV1Dl7V7/WV5MPjebwU8p5px3BrZuP+O65YHHEOucYg?=
- =?us-ascii?Q?Tjm8aAiprgmL6ZRGkR6DsZYZG61u/pSzQAWqKRnRVpZaW1NlJlrEW65Xwid6?=
- =?us-ascii?Q?GncJII2NHHHAIJUAkuhBzTFIQncNfh4YCSJa9INUzsTzxxWjB2gCsmbEvOpF?=
- =?us-ascii?Q?BMkTv6aaod4RML+2fq+MW3/MgmS7k74o01gyCmpf6Xig31mSiuRvECqgP4ze?=
- =?us-ascii?Q?aoqozPDvI5AGxkn1vIJJE2kq+9W9j/jgio7sYpa6kht5BLtaljyroVzz+6mT?=
- =?us-ascii?Q?R3lwJaeWLqZtN0nMCux8TwuurxTPjKnSBwLO3S/OegGQbd3ftgvPzCGx3vnn?=
- =?us-ascii?Q?fkKVbanaB8nIeEHzjVoW0bOovXRLDdPIkuv4WaUKJRByU63GM8tr6UKUNUaf?=
- =?us-ascii?Q?FGwmWFH2PTwKtEe3lkziQTI23G6Dqr7Oys4ot+aHrNNp4cbJ76aykg0jM5Xi?=
- =?us-ascii?Q?l4y7D/pUIo3T4aRamnnfDsbFkVoEAaepqG8wB0LHm28bNYpFBA2zusQdgD4y?=
- =?us-ascii?Q?s4Ap0ter+0EHM1l4ulxL7qYh2i+yxl4TGshGxR1Pq+cvN0Z4Fnyt7eCkaNev?=
- =?us-ascii?Q?AKrhGwQipWjAyzrKqAJ73yMezx8liId9ykepAiTk/VBMMarnXY206Rbkp3na?=
- =?us-ascii?Q?Zy9gUF0TyW2pEVHFAmmmWvCrpwD+ivFw1+nKXJnKmZSOaLWfsBCDuAA/dEbK?=
- =?us-ascii?Q?srCATNacGI2oTdxClimQRgW5rWvyV2Feb4RlAZ703F0jkWuoIBPG5FyJgUv/?=
- =?us-ascii?Q?8g=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: a83cd593-9482-4bef-4f71-08dca6562742
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?RrJJgoJ/yNnPkZBPx2BxIM3I2Hoq5JwTvpL/o2TXhFNCmcBgYp2DdlCM/vfx?=
+ =?us-ascii?Q?EcOscPGJ7BDppBENrcLh9ZZm1CycNIy18GpMbOt2+FQ7XkBKD3ArWiDDOpvt?=
+ =?us-ascii?Q?xU0/e0zTwrThAWH9IxmeEAn5dH3FiBNl+I1KVEDINOSh0+6Q3VWKCozHRav8?=
+ =?us-ascii?Q?Jw25EA1oqcLEK45l4B3pguF2clGkosgvJgHQHJbqLRO/5+eepyckcag5puan?=
+ =?us-ascii?Q?VVX3xikLhGt6Wqyl1ClknhCGTZkjoESBai6PWm8ZAuoAF/ASULCryZdLCWe3?=
+ =?us-ascii?Q?HkkrzamWJHN+PeOZymij+V1qSH4oGwXe8wZ1E29htHsK5oKDuPKbuPCk6DZe?=
+ =?us-ascii?Q?qRkvSQdnBksKDAxBtoB5hKJt2eQbee0pyAILd5neD1jgx4Nm3dkPOrB1ujfZ?=
+ =?us-ascii?Q?Fe2i1zVYNavupDYeVCFCNUH34uOYFhDu8svRhUAyF+ghCtv7TV6XKe/kaRPG?=
+ =?us-ascii?Q?Z4rj3BB6ZeFiZTHYvERdUaEpbFwdRI5zT4yU0AnupYsPX7h9xLCunOqYlqfa?=
+ =?us-ascii?Q?zNosG9YTpgqep/crYgWB0hkK4bDx3qqu6GqG06vhNSozfzIQcgaJZv1ok1OX?=
+ =?us-ascii?Q?PhtU2Mp3f5/v6muI53RgsW8mnIZf1p0PeFuoyTQ1ymUx28mNuna645axfcqe?=
+ =?us-ascii?Q?KPD6i2fcq9aMSnjUObDTUFI66zmVCcT1R2qYMSD5nGLM9rJVzCq7teY3ggX1?=
+ =?us-ascii?Q?enubSNbIPlERDMOw9+RlnstvO5JblUo7HH6Dm1RN7yvBq1zFhzMyVwJOdHSC?=
+ =?us-ascii?Q?nEZk+dILv5cszN0DUs9xA89CW8S9quY99Xex55qQ9QsYI30G98s7FrUy1fVP?=
+ =?us-ascii?Q?6X9aF42TfV2wsecZKAp3OTB9QM5A05wzj5Y5VNDqk0eaqhtuVhLHICvlls0X?=
+ =?us-ascii?Q?nWZAWtmOLE3+bB5KpLmfX5lhTYG4LbwV0cL4nXo13SANiSyMBEKlc0Dx+B8l?=
+ =?us-ascii?Q?Qhm4iIuuGAmcPQdbzA1aJaPqcLmaJGvY7ytEp8FEXPj/SXAuwQvRu17ND6aa?=
+ =?us-ascii?Q?tpVtNpEiVbjfxJo0O2Ya+/YsJe7N4xrCYKJtmq06iziCEIboMFj3+ZKjnEGn?=
+ =?us-ascii?Q?KhlvjV0jgdlSSffKutEmtPBAR7llPJIUedS2JKDeopWsvMPoPI9tOSrw/fQ/?=
+ =?us-ascii?Q?U+/5nLEm2/x4nhwXp+mkOw7uLHwvxiOVqbRye0AmrcIxi5PelT/mXaHv9pJ7?=
+ =?us-ascii?Q?VaMfqUKQsz+kzYB87KVVE9BhFqGo6MHMyjGAp9rUI6U6dXvmdUV6EeW1EN9x?=
+ =?us-ascii?Q?KY9/zXwO2BJPdiKK/fJ4r5ZMAspYh7W6Zuk2CNv12rPYMvr4TP76liO9/o3e?=
+ =?us-ascii?Q?WWFMTN3XeKHt00etyH6f/XpnT0E6k9wwfP1BuH7Zc3PBJj+cxJ1EgQ/iKZ5K?=
+ =?us-ascii?Q?2XYEX/FZ5mu89ppocAX4TQHfmFGR8UTaH9WUB9wu5iuJwVb+8sM+LCJ4y4ml?=
+ =?us-ascii?Q?M0oDBzYh/zimc8YJedgmiaBvOy9je2scM4tT4mKugsVYNJ2m+8K+JqUnOPlZ?=
+ =?us-ascii?Q?qZMySbr8C/NJjRDTvf65N6N/lAujepHOxRcEjoCrvVl8UvojGG9zzkLHhQ+k?=
+ =?us-ascii?Q?PpoM+zFi69RUbI8XQ3HxuRMlUNCO1DOucDfq0EgIidotycj6psw6SkpjDaA4?=
+ =?us-ascii?Q?3Q=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 50013319-7c2b-4e7a-33d6-08dca65629d7
 X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5830.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jul 2024 11:46:53.7181
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jul 2024 11:46:58.0303
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7lm/xwBA5B9n51cNHf4haZeJHv1cKoiBWpLEGgFnquTcbVkSWChhGeL9s80g1jr7p8OO0Hect9gguJV2T0wGULNDo58FhAB4fTl6nuUcw84=
+X-MS-Exchange-CrossTenant-UserPrincipalName: /3K8JieZmM4eEjbO/MU+3ldlSw7060M3p3xKNHRpPddDYMhLedT/5p3Q2vwdVni32OXtjeuliWdBMcEjpOOrD3zo/waQvvs26M0G2MKuqG4=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7794
 X-OriginatorOrg: intel.com
 
-When the PFVF protocol was updated to support version 5, i.e.
-ADF_PFVF_COMPAT_FALLBACK, the compatibility version for the VF was
-updated without supporting the message RESTARTING_COMPLETE required for
-such version.
+In the process of sending the ADF_PF2VF_MSGTYPE_RESTARTING message to
+Virtual Functions (VFs), the Physical Function (PF) should set the
+`vf->restarting` flag to true before dispatching the message.
+This change is necessary to prevent a race condition where the handling
+of the ADF_VF2PF_MSGTYPE_RESTARTING_COMPLETE message (which sets the
+`vf->restarting` flag to false) runs immediately after the message is sent,
+but before the flag is set to true.
 
-Add support for the ADF_VF2PF_MSGTYPE_RESTARTING_COMPLETE message in the
-VF drivers. This message is sent by the VF driver to the PF to notify
-the completion of the shutdown flow.
+Set the `vf->restarting` to true before sending the message
+ADF_PF2VF_MSGTYPE_RESTARTING, if supported by the version of the
+protocol and if the VF is started.
 
 Fixes: ec26f8e6c784 ("crypto: qat - update PFVF protocol for recovery")
 Signed-off-by: Michal Witwicki <michal.witwicki@intel.com>
 Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 ---
- .../crypto/intel/qat/qat_common/adf_pfvf_vf_msg.c  | 14 ++++++++++++++
- .../crypto/intel/qat/qat_common/adf_pfvf_vf_msg.h  |  1 +
- drivers/crypto/intel/qat/qat_common/adf_vf_isr.c   |  2 ++
- 3 files changed, 17 insertions(+)
+ drivers/crypto/intel/qat/qat_common/adf_pfvf_pf_msg.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_pfvf_vf_msg.c b/drivers/crypto/intel/qat/qat_common/adf_pfvf_vf_msg.c
-index 1141258db4b6..10c91e56d6be 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_pfvf_vf_msg.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_pfvf_vf_msg.c
-@@ -48,6 +48,20 @@ void adf_vf2pf_notify_shutdown(struct adf_accel_dev *accel_dev)
- }
- EXPORT_SYMBOL_GPL(adf_vf2pf_notify_shutdown);
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_pfvf_pf_msg.c b/drivers/crypto/intel/qat/qat_common/adf_pfvf_pf_msg.c
+index 0e31f4b41844..0cee3b23dee9 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_pfvf_pf_msg.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_pfvf_pf_msg.c
+@@ -18,14 +18,17 @@ void adf_pf2vf_notify_restarting(struct adf_accel_dev *accel_dev)
  
-+void adf_vf2pf_notify_restart_complete(struct adf_accel_dev *accel_dev)
-+{
-+	struct pfvf_message msg = { .type = ADF_VF2PF_MSGTYPE_RESTARTING_COMPLETE };
+ 	dev_dbg(&GET_DEV(accel_dev), "pf2vf notify restarting\n");
+ 	for (i = 0, vf = accel_dev->pf.vf_info; i < num_vfs; i++, vf++) {
+-		vf->restarting = false;
++		if (vf->init && vf->vf_compat_ver >= ADF_PFVF_COMPAT_FALLBACK)
++			vf->restarting = true;
++		else
++			vf->restarting = false;
 +
-+	/* Check compatibility version */
-+	if (accel_dev->vf.pf_compat_ver < ADF_PFVF_COMPAT_FALLBACK)
-+		return;
+ 		if (!vf->init)
+ 			continue;
 +
-+	if (adf_send_vf2pf_msg(accel_dev, msg))
-+		dev_err(&GET_DEV(accel_dev),
-+			"Failed to send Restarting complete event to PF\n");
-+}
-+EXPORT_SYMBOL_GPL(adf_vf2pf_notify_restart_complete);
-+
- int adf_vf2pf_request_version(struct adf_accel_dev *accel_dev)
- {
- 	u8 pf_version;
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_pfvf_vf_msg.h b/drivers/crypto/intel/qat/qat_common/adf_pfvf_vf_msg.h
-index 71bc0e3f1d93..d79340ab3134 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_pfvf_vf_msg.h
-+++ b/drivers/crypto/intel/qat/qat_common/adf_pfvf_vf_msg.h
-@@ -6,6 +6,7 @@
- #if defined(CONFIG_PCI_IOV)
- int adf_vf2pf_notify_init(struct adf_accel_dev *accel_dev);
- void adf_vf2pf_notify_shutdown(struct adf_accel_dev *accel_dev);
-+void adf_vf2pf_notify_restart_complete(struct adf_accel_dev *accel_dev);
- int adf_vf2pf_request_version(struct adf_accel_dev *accel_dev);
- int adf_vf2pf_get_capabilities(struct adf_accel_dev *accel_dev);
- int adf_vf2pf_get_ring_to_svc(struct adf_accel_dev *accel_dev);
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_vf_isr.c b/drivers/crypto/intel/qat/qat_common/adf_vf_isr.c
-index 783ee8c0fc14..a4636ec9f9ca 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_vf_isr.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_vf_isr.c
-@@ -13,6 +13,7 @@
- #include "adf_cfg.h"
- #include "adf_cfg_strings.h"
- #include "adf_cfg_common.h"
-+#include "adf_pfvf_vf_msg.h"
- #include "adf_transport_access_macros.h"
- #include "adf_transport_internal.h"
- 
-@@ -75,6 +76,7 @@ static void adf_dev_stop_async(struct work_struct *work)
- 
- 	/* Re-enable PF2VF interrupts */
- 	adf_enable_pf2vf_interrupts(accel_dev);
-+	adf_vf2pf_notify_restart_complete(accel_dev);
- 	kfree(stop_data);
+ 		if (adf_send_pf2vf_msg(accel_dev, i, msg))
+ 			dev_err(&GET_DEV(accel_dev),
+ 				"Failed to send restarting msg to VF%d\n", i);
+-		else if (vf->vf_compat_ver >= ADF_PFVF_COMPAT_FALLBACK)
+-			vf->restarting = true;
+ 	}
  }
  
 -- 
