@@ -1,39 +1,59 @@
-Received: from mail-4325.protonmail.ch (mail-4325.protonmail.ch [185.70.43.25])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D5B858AA5
-	for <linux-crypto@vger.kernel.org>; Sat, 20 Jul 2024 08:01:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1210B804;
+	Sun, 21 Jul 2024 00:26:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721462465; cv=none; b=evjT1Ukym2/Zq6KQ8PFgqFb9tTpG2UrmT69q2GXNPA70YhId5TWtwj1MyXsZUr9bI/giEC4V8HCy5UPi/8SsF0dHQ5cWL433vKdYqYKzspmgNhrOUbd0DqKZbdVXZB54GKDzyunACLJ3F5CbXgOEY4Y0rVEwPLKPRFN/BiWEvcA=
+	t=1721521609; cv=none; b=XwNA0RYOCniCqDRIrAYi+VjGF8FNkVJdT4jb3Bp5CLnZ9QXJwN7kD3U6RqB9QY4t/iYK3mjx5qFk7x6QxJMCwq4mMsXrKr40HYjHvhzDgTYRE5gd4el1mAMidbCQ9o928AZMOIAH0Y0bEkW6xvzvAq3+l11d7vmqpgGX8Q2oZtw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721462465; c=relaxed/simple;
-	bh=DPHT+BfOa0vagYpe7nlw5q4gExak7dRfzS6eOSek5Us=;
-	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=WKJoCCtX09WmCAoBQEJtdl+185slPQQ0wv6HQgGDKSknVEasRYweY1QDo/84Y1Gsbt4mFYnGnqK0Q6ncLagI8H/3MvDou0bW8ZazoLWvALhW3uNsXACltXNww28sBd+HACx/yVvY7bH99yvKNPdWiLnR5qBXihZIm3pKnOEzI8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=NQ4Ebzg0; arc=none smtp.client-ip=185.70.43.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
+	s=arc-20240116; t=1721521609; c=relaxed/simple;
+	bh=JMGaMaPZ3ZO2BcfKDOjO1lFotjB4r9bLN2jZkshxsj8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BMcS8YOKWjIePhssaXNsp1DetmXSssjH6mUNh6v8EMZ70cUlenh2uMCsMVRdPn+DMwj1+VGZhcgeGB38iIgwo73bzifjUTTeVygn6JQNy0Si7ufI31Qpuw3HdE2I17Nh0yo4tNIR2UdRf8+XGlAksh3J2FixknSjGxfJ26xT6Pw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=Ofoz6UP3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="NQ4Ebzg0"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-	s=protonmail3; t=1721462447; x=1721721647;
-	bh=zAyD8N1jd8wn9zgkPHwTpcBdJue2QBdmN1NS7myffk0=;
-	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
-	b=NQ4Ebzg0R9kxkThvFmF8ezo+gubrz6NW+abasAj2v6ZOwaLu1tOeDTPN78aLE7gIx
-	 81pymRfZfPTLaKdDggi5HnvjDrgGMFrUsyoBGsHhmvxv9FJU9g+okvkCEQltivjBy2
-	 i9R1Vc04b+mhoBsGs7RrqMABABhHbctRObc8vigRCAUnXeZXlPeqUmCsBU3V+8T85o
-	 zNmztIjRhs5BTgVFW+viG/5nDdgpn+dPFjz6eWt86zekdz/CRekKDIaS/rgONgt4DP
-	 fXKREGipglBJVrLX1+hVhCjIPDc6vI1/23v7s+KX/DgPlt7BlZCCYvP+9tyj5XsR6k
-	 Ww8ziE1O0xNqw==
-Date: Sat, 20 Jul 2024 08:00:43 +0000
-To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-From: Jari Ruusu <jariruusu@protonmail.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Announce loop-AES-v3.8d file/swap crypto package
-Message-ID: <zIEccC4mfA_ETwu4qTNHosdNy5ng6aeo8PmR_29jPqGEg18eo55fkS9OodYvXyY9sY5wgF991xwnGSHSpi_YE4e6g888l6mpV-Pb91KXUoA=@protonmail.com>
-Feedback-ID: 22639318:user:proton
-X-Pm-Message-ID: 972074221727eb9ced1fa452b6135c841dcf9287
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Ofoz6UP3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D312C2BD10;
+	Sun, 21 Jul 2024 00:26:46 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Ofoz6UP3"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1721521604;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=94FH1yeLhYBAH1oy+kJ20vtAV9HFB221cCBm9BA0Y7A=;
+	b=Ofoz6UP3L2rYYQH6xpyv5+l3QzmBz2DqzvtyQRdg0I5jCeLGXesg2U3vIwij0bYuMW6qCI
+	ZNiNA2P7D9i/D9QhhHqK/3V0pVmuRhMTdrpi71gIrXXXCdKnm0K38ac5w05FbuGtgiS481
+	HiX89vVGR/i+0MON2fj7Dx418V6Dwgo=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 6afbfb1c (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Sun, 21 Jul 2024 00:26:44 +0000 (UTC)
+Date: Sun, 21 Jul 2024 02:26:40 +0200
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Chen-Yu Tsai <wens@kernel.org>, Aurelien Jarno <aurelien@aurel32.net>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiko Stuebner <heiko@sntech.de>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Dragan Simic <dsimic@manjaro.org>,
+	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <ukleinek@debian.org>,
+	Sebastian Reichel <sebastian.reichel@collabora.com>,
+	Cristian Ciocaltea <cristian.ciocaltea@collabora.com>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Martin Kaiser <martin@kaiser.cx>, Ard Biesheuvel <ardb@kernel.org>,
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v7 2/3] hwrng: add hwrng driver for Rockchip RK3568 SoC
+Message-ID: <ZpxVwFdIZxLw3R_l@zx2c4.com>
+References: <cover.1720969799.git.daniel@makrotopia.org>
+ <f606403145588d28dda14a55ba3afef85720a4dc.1720969799.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -41,19 +61,12 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+In-Reply-To: <f606403145588d28dda14a55ba3afef85720a4dc.1720969799.git.daniel@makrotopia.org>
 
-loop-AES changes since previous release:
-- Worked around kernel interface changes on 6.10 kernels.
+On Sun, Jul 14, 2024 at 04:16:17PM +0100, Daniel Golle wrote:
+> +	rk_rng->rng.quality = 900;
 
-bzip2 compressed tarball is here:
+This is out of 1024, not 1000.
 
-    https://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.8d.tar.bz2
-    md5sum 47ec963e18ed1ac8e8b471d3c15e3b7a
-
-    https://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.8d.tar.bz2.sign
-
---
-Jari Ruusu=C2=A0 4096R/8132F189 12D6 4C3A DCDA 0AA4 27BD=C2=A0 ACDF F073 3C=
-80 8132 F189
-
+https://elixir.bootlin.com/linux/v6.10/source/include/linux/hw_random.h#L35
