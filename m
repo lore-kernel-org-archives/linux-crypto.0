@@ -1,297 +1,334 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D24816F0D6;
-	Mon, 22 Jul 2024 17:57:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A127518637
+	for <linux-crypto@vger.kernel.org>; Mon, 22 Jul 2024 19:04:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721671041; cv=none; b=iJVXhp3x7K6aWpvkKeGoqCbf8yuLWeLlHzD00HHKFeKanVoebSVR0fNsVoZf5TeP3t+ZnKO+DhkXSFnV1rP6oLcI5G7ZVycuO4+g4igtTncO4m4WsJ0zFD3IXD/JxSaTGWcJs11OSFu+nDHj8a/QOgOEtc4B85uuOXZkFRub8jg=
+	t=1721675049; cv=none; b=iP8inpfAvnptX8jnyR0VzkG5Qo39WsJzFaqiDB/PcM6lFf3jq7Pdri1C3q8aPbUFw7Lf2n9faSv4Sr4wYCtrwKlRsrYgFxT7BqJr0n7qmuEQoHEC5mcpuWrIWo1nJeyAyAVkuJ/4KBFPL5jNHhTCMuDXNVOKcOjKkcCjzteb7UE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721671041; c=relaxed/simple;
-	bh=gLe2umgqwhHYuD0lOMCuwPcdgZ3WgUSWvxweYSYrAeA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ju/Xqe2IS5VHtQCiCjefncCa5oKCsruRrFTUVn78IWy0tqQaPdK3i822130We0epiFeWWosgYDs7Tnp1V85qc4XiC2Krw08QFk5lcdnpWw6CyHG+WxJ89/pgehgGLGg848kM8qobpvOIhfATDq2XH+6KkK0cgRDd0VsehBqZOKc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=evn7FQ2R; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1721675049; c=relaxed/simple;
+	bh=8sLTIyS8TZWjmlWYCZZ1+fuTzwlxAzROzLQ+A6GLbMY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ru3QLNOXq03ZU3ILPy7rIx2AnfCIoHk9t7ndoHhIr0KyfFxy0CTqh3E1UEQhKlISUub7S48CvxfMig+S0EqUhWqOq8p1QRbBzGJVSzzM4kLMMLG9KHQsbYYAWSln/NrWIvzR786LxDBE3aaXY4PIBHVtJlqhYaz4G0o9tb1f4IE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cknow.org; spf=pass smtp.mailfrom=cknow.org; dkim=pass (2048-bit key) header.d=cknow.org header.i=@cknow.org header.b=aBI+0EK3; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cknow.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cknow.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="evn7FQ2R"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96ADBC4AF15;
-	Mon, 22 Jul 2024 17:57:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721671040;
-	bh=gLe2umgqwhHYuD0lOMCuwPcdgZ3WgUSWvxweYSYrAeA=;
-	h=References:In-Reply-To:Reply-To:From:Date:Subject:To:Cc:From;
-	b=evn7FQ2R94h8tEX5h6K1R7y5QTqbDdU3a06nixSfTicpUr4SDZqjVUUtVmqtamDa6
-	 kTcxYo0NqtAR6TPsg6t4jzThRScj67a6K8QyRBCyCDPcRv5Xv1k0+DM8afXQc9+sB8
-	 NdyTwLxDQEjr/6dcIaQ33cPWcOGWvBzWdhzr1pAYpAN8QEoWce9JzWzut5NVN0qXXf
-	 XA+FWLxzXEmj3cnJO22WF+fI3wDyYk7QfdwW8hfp8THjF3h2YXg89S/zzxg/xiLtIy
-	 VH8C7Aqnn8JSkrYG/Qr0TTCQzdRal4U8cWKUEXtH4fCD5SP65daf43qglB4c6kUK1R
-	 1IIWDeb/w1Zng==
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2ef2fccca2cso15422891fa.1;
-        Mon, 22 Jul 2024 10:57:20 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCWQZJNIukkn9vAsFRQ+lU0QbvFwDW0z63yocS8nV+9pzGTs014KicvgXEau22EBr35jVobB0ZWwq8WAM236w4i0UTi3v5g6LBX/XxVyp3+4xwauYnqYQA50BYwuAmNzW8WKGmcn2FQssdwjfEQy989POVwoI4trYwyXHI97mZhQ8mp9jvPLzw==
-X-Gm-Message-State: AOJu0YxMgzME9lEJ3Y8rFQNqjRfvm7MtMcWIR0UsjlDdwMET2QgriOT/
-	js+fJ51ZA0F0emMHkNr8f1CE+aEZmkyWkYHK0xcXimsvsJwHluKQGlOPOUngZvAmLiVXAGggnkt
-	VTn6DW/wftYkh9A2Lb79s+QMh54M=
-X-Google-Smtp-Source: AGHT+IEG03JkqirBP9XkQG4NM1JUJU5kVRXR7Lg2r8kdI7m+ph+YlmCwtxJCdn/y0qIZNAsmNDBdM3/fapg0DIQIWd4=
-X-Received: by 2002:a2e:a54b:0:b0:2ef:2f4b:deeb with SMTP id
- 38308e7fff4ca-2ef2f4c1181mr32945621fa.23.1721671038811; Mon, 22 Jul 2024
- 10:57:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=cknow.org header.i=@cknow.org header.b="aBI+0EK3"
+X-Envelope-To: wens@kernel.org
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cknow.org; s=key1;
+	t=1721675044;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vCehHTNE0yJwghwUTXXSJntL5vplfQCDdSOUf961ASQ=;
+	b=aBI+0EK3wjLxJSZThjUWcQviQSjA/o39gjU7+8eXu4hFQE5Inwz0rQjd5C1uSkpT/+AIhk
+	SFgp7iseg3AzPFgPvvH9JiEy/lCdZ+nn1j4b3m5MasY+QZ8enEk/DarMP9w/KdeQqfX0L2
+	Icn5we5tV7++NxWd1JF+12mAaGgt1PMlVmOJfBSinCr0nGml260axTI+4n5Mt6ZC/q9ee6
+	LhT9ukw60icBwfjSEeM6sDll6GbuhWPFuzaG5mPZdf1IKo8G2l6vglSrcSUVBaClTMULWB
+	ZCJQsBm4vGwePZaujkbUHoex0pWxPXrYnqOuxY6qdUXBabGkND7vsqP3Bh33+g==
+X-Envelope-To: daniel@makrotopia.org
+X-Envelope-To: linux-rockchip@lists.infradead.org
+X-Envelope-To: linux-arm-kernel@lists.infradead.org
+X-Envelope-To: robh@kernel.org
+X-Envelope-To: conor+dt@kernel.org
+X-Envelope-To: linux-kernel@vger.kernel.org
+X-Envelope-To: herbert@gondor.apana.org.au
+X-Envelope-To: martin@kaiser.cx
+X-Envelope-To: s.hauer@pengutronix.de
+X-Envelope-To: sebastian.reichel@collabora.com
+X-Envelope-To: ardb@kernel.org
+X-Envelope-To: ukleinek@debian.org
+X-Envelope-To: devicetree@vger.kernel.org
+X-Envelope-To: linux-crypto@vger.kernel.org
+X-Envelope-To: p.zabel@pengutronix.de
+X-Envelope-To: olivia@selenic.com
+X-Envelope-To: krzk+dt@kernel.org
+X-Envelope-To: dsimic@manjaro.org
+X-Envelope-To: aurelien@aurel32.net
+X-Envelope-To: heiko@sntech.de
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Diederik de Haas <didi.debian@cknow.org>
+To: Chen-Yu Tsai <wens@kernel.org>
+Cc: Daniel Golle <daniel@makrotopia.org>, linux-rockchip@lists.infradead.org,
+ linux-arm-kernel@lists.infradead.org, Rob Herring <robh@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, linux-kernel@vger.kernel.org,
+ Herbert Xu <herbert@gondor.apana.org.au>, Martin Kaiser <martin@kaiser.cx>,
+ Sascha Hauer <s.hauer@pengutronix.de>,
+ Sebastian Reichel <sebastian.reichel@collabora.com>,
+ Ard Biesheuvel <ardb@kernel.org>,
+ Uwe =?ISO-8859-1?Q?Kleine=2DK=F6nig?= <ukleinek@debian.org>,
+ devicetree@vger.kernel.org, linux-crypto@vger.kernel.org,
+ Philipp Zabel <p.zabel@pengutronix.de>, Olivia Mackall <olivia@selenic.com>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Dragan Simic <dsimic@manjaro.org>,
+ Aurelien Jarno <aurelien@aurel32.net>, Heiko Stuebner <heiko@sntech.de>
+Subject: Re: [PATCH v7 0/3] hwrng: add hwrng support for Rockchip RK3568
+Date: Mon, 22 Jul 2024 21:03:52 +0200
+Message-ID: <4406786.zLnsZ2vfAB@bagend>
+Organization: Connecting Knowledge
+In-Reply-To:
+ <CAGb2v64Dx7XaJOu0HHzFxYYY2ddUZao5Tar8-s1R_miVZqWcXA@mail.gmail.com>
+References:
+ <cover.1720969799.git.daniel@makrotopia.org> <3190961.CRkYR5qTbq@bagend>
+ <CAGb2v64Dx7XaJOu0HHzFxYYY2ddUZao5Tar8-s1R_miVZqWcXA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1720969799.git.daniel@makrotopia.org> <6779787.ZJYUc1KeCW@bagend>
- <CAGb2v67zxs03xScN8OfWXR1gf8tddJciXrjw3FQZcL7pR3ocxA@mail.gmail.com> <3190961.CRkYR5qTbq@bagend>
-In-Reply-To: <3190961.CRkYR5qTbq@bagend>
-Reply-To: wens@kernel.org
-From: Chen-Yu Tsai <wens@kernel.org>
-Date: Tue, 23 Jul 2024 01:57:05 +0800
-X-Gmail-Original-Message-ID: <CAGb2v64Dx7XaJOu0HHzFxYYY2ddUZao5Tar8-s1R_miVZqWcXA@mail.gmail.com>
-Message-ID: <CAGb2v64Dx7XaJOu0HHzFxYYY2ddUZao5Tar8-s1R_miVZqWcXA@mail.gmail.com>
-Subject: Re: [PATCH v7 0/3] hwrng: add hwrng support for Rockchip RK3568
-To: Diederik de Haas <didi.debian@cknow.org>
-Cc: Daniel Golle <daniel@makrotopia.org>, linux-rockchip@lists.infradead.org, 
-	linux-arm-kernel@lists.infradead.org, Rob Herring <robh@kernel.org>, 
-	Conor Dooley <conor+dt@kernel.org>, linux-kernel@vger.kernel.org, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Martin Kaiser <martin@kaiser.cx>, 
-	Sascha Hauer <s.hauer@pengutronix.de>, 
-	Sebastian Reichel <sebastian.reichel@collabora.com>, Ard Biesheuvel <ardb@kernel.org>, 
-	=?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <ukleinek@debian.org>, 
-	devicetree@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	Philipp Zabel <p.zabel@pengutronix.de>, Olivia Mackall <olivia@selenic.com>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Dragan Simic <dsimic@manjaro.org>, 
-	Aurelien Jarno <aurelien@aurel32.net>, Heiko Stuebner <heiko@sntech.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; boundary="nextPart2509603.0URhkfn4ud";
+ micalg="pgp-sha256"; protocol="application/pgp-signature"
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Jul 17, 2024 at 12:54=E2=80=AFAM Diederik de Haas <didi.debian@ckno=
-w.org> wrote:
->
-> On Tuesday, 16 July 2024 17:18:48 CEST Chen-Yu Tsai wrote:
-> > On Jul 16, 2024 at 10:13=E2=80=AFPM Diederik de Haas <didi.debian@cknow=
-.org> wrote:
-> > > On Tuesday, 16 July 2024 15:59:40 CEST Diederik de Haas wrote:
-> > > > For shits and giggles, I tried it on my PineTab2 too (also rk3566):
-> > > >
+--nextPart2509603.0URhkfn4ud
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="UTF-8"; protected-headers="v1"
+From: Diederik de Haas <didi.debian@cknow.org>
+To: Chen-Yu Tsai <wens@kernel.org>
+Date: Mon, 22 Jul 2024 21:03:52 +0200
+Message-ID: <4406786.zLnsZ2vfAB@bagend>
+Organization: Connecting Knowledge
+MIME-Version: 1.0
+
+On Monday, 22 July 2024 19:57:05 CEST Chen-Yu Tsai wrote:
+> On Wed, Jul 17, 2024 at 12:54=E2=80=AFAM Diederik de Haas <didi.debian@ck=
+now.org>=20
+wrote:
+> > On Tuesday, 16 July 2024 17:18:48 CEST Chen-Yu Tsai wrote:
+> > > On Jul 16, 2024 at 10:13=E2=80=AFPM Diederik de Haas <didi.debian@ckn=
+ow.org>=20
+wrote:
+> > > > On Tuesday, 16 July 2024 15:59:40 CEST Diederik de Haas wrote:
+> > > > > For shits and giggles, I tried it on my PineTab2 too (also rk3566=
+):
+> > > > >=20
+> > > > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > > > > root@pinetab2:~# uname -a
+> > > > > Linux pinetab2 6.10+unreleased-arm64 #1 SMP Debian 6.10-1~cknow
+> > > > > (2024-04-24) aarch64 GNU/Linux
+> > > > >=20
+> > > > > root@pinetab2:~# dd if=3D/dev/hwrng bs=3D100000 count=3D1 > /dev/=
+null
+> > > > > 1+0 records in
+> > > > > 1+0 records out
+> > > > > 100000 bytes (100 kB, 98 KiB) copied, 5,69533 s, 17,6 kB/s
+> > > > >=20
+> > > > > root@plebian-pinetab2:~# cat /dev/hwrng | rngtest -c 1000
+> > > > > rngtest 5
+> > > > > ...
+> > > > > rngtest: starting FIPS tests...
+> > > > > rngtest: bits received from input: 20000032
+> > > > > rngtest: FIPS 140-2 successes: 730
+> > > > > rngtest: FIPS 140-2 failures: 270
+> > > > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > > > >=20
+> > > > > That's looking quite a lot better ... and I have no idea why.
+> > > > >=20
+> > > > > The Q64-A is used as headless server and the PineTab2 is not,
+> > > > > but I connected to both over SSH and they were freshly booted
+> > > > > into, thus I haven't actually/normally used the PT2 since boot.
+> > > >=20
+> > > > I did freshly install rng-tools5 package before running the test, so
+> > > > I rebooted again to make sure that wasn't a factor:
+> > > >=20
 > > > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > > root@pinetab2:~# uname -a
-> > > > Linux pinetab2 6.10+unreleased-arm64 #1 SMP Debian 6.10-1~cknow
-> > > > (2024-04-24) aarch64 GNU/Linux
-> > > >
-> > > > root@pinetab2:~# dd if=3D/dev/hwrng bs=3D100000 count=3D1 > /dev/nu=
-ll
-> > > > 1+0 records in
-> > > > 1+0 records out
-> > > > 100000 bytes (100 kB, 98 KiB) copied, 5,69533 s, 17,6 kB/s
-> > > >
-> > > > root@plebian-pinetab2:~# cat /dev/hwrng | rngtest -c 1000
+> > > > root@pinetab2:~# cat /dev/hwrng | rngtest -c 1000
 > > > > rngtest 5
-> > > > Copyright (c) 2004 by Henrique de Moraes Holschuh
-> > > > This is free software; see the source for copying conditions.
-> > > > There is NO warranty; not even for MERCHANTABILITY or
-> > > > FITNESS FOR A PARTICULAR PURPOSE.
-> > > >
+> > > > ...
 > > > > rngtest: starting FIPS tests...
 > > > > rngtest: bits received from input: 20000032
-> > > > rngtest: FIPS 140-2 successes: 730
-> > > > rngtest: FIPS 140-2 failures: 270
-> > > > rngtest: FIPS 140-2(2001-10-10) Monobit: 266
-> > > > rngtest: FIPS 140-2(2001-10-10) Poker: 23
-> > > > rngtest: FIPS 140-2(2001-10-10) Runs: 9
-> > > > rngtest: FIPS 140-2(2001-10-10) Long run: 0
-> > > > rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-> > > > rngtest: input channel speed: (min=3D2.615; avg=3D137.889;
-> > > > max=3D9765625.000)Kibits/s rngtest: FIPS tests speed: (min=3D24.643=
-;
-> > > > avg=3D34.518; max=3D68.364)Mibits/s rngtest: Program run time: 1496=
-74336
-> > > > microseconds
+> > > > rngtest: FIPS 140-2 successes: 704
+> > > > rngtest: FIPS 140-2 failures: 296
 > > > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > >
-> > > > That's looking quite a lot better ... and I have no idea why.
-> > > >
-> > > > The Q64-A is used as headless server and the PineTab2 is not,
-> > > > but I connected to both over SSH and they were freshly booted
-> > > > into, thus I haven't actually/normally used the PT2 since boot.
-> > >
-> > > I did freshly install rng-tools5 package before running the test, so
-> > > I rebooted again to make sure that wasn't a factor:
-> > >
-> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > root@pinetab2:~# cat /dev/hwrng | rngtest -c 1000
+> > > >=20
+> > > > So that 704/296 vs 730/270 in the previous run on the PT2.
+> > > >=20
+> > > On my Rock 3A:
+> > >=20
+> > > wens@rock-3a:~$ sudo cat /dev/hwrng | rngtest -c 1000
 > > > rngtest 5
 > > > ...
-> > >
 > > > rngtest: starting FIPS tests...
 > > > rngtest: bits received from input: 20000032
-> > > rngtest: FIPS 140-2 successes: 704
-> > > rngtest: FIPS 140-2 failures: 296
-> > > rngtest: FIPS 140-2(2001-10-10) Monobit: 293
-> > > rngtest: FIPS 140-2(2001-10-10) Poker: 32
-> > > rngtest: FIPS 140-2(2001-10-10) Runs: 10
-> > > rngtest: FIPS 140-2(2001-10-10) Long run: 0
-> > > rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-> > > rngtest: input channel speed: (min=3D2.612; avg=3D137.833;
-> > > max=3D9765625.000)Kibits/s rngtest: FIPS tests speed: (min=3D24.391;
-> > > avg=3D34.416; max=3D68.364)Mibits/s rngtest: Program run time: 149736=
-205
-> > > microseconds
-> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > >
-> > > So that 704/296 vs 730/270 in the previous run on the PT2.
-> > >
-> > > In case it helps:
-> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > root@quartz64a:~# grep . /sys/devices/virtual/misc/hw_random/rng_*
-> > > /sys/devices/virtual/misc/hw_random/rng_available:rockchip-rng
-> > > /sys/devices/virtual/misc/hw_random/rng_current:rockchip-rng
-> > > /sys/devices/virtual/misc/hw_random/rng_quality:900
-> > > /sys/devices/virtual/misc/hw_random/rng_selected:0
-> > >
-> > > root@pinetab2:~# grep . /sys/devices/virtual/misc/hw_random/rng_*
-> > > /sys/devices/virtual/misc/hw_random/rng_available:rockchip-rng
-> > > /sys/devices/virtual/misc/hw_random/rng_current:rockchip-rng
-> > > /sys/devices/virtual/misc/hw_random/rng_quality:900
-> > > /sys/devices/virtual/misc/hw_random/rng_selected:0
-> > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >
-> > On my Rock 3A:
-> >
-> > wens@rock-3a:~$ sudo cat /dev/hwrng | rngtest -c 1000
+> > > rngtest: FIPS 140-2 successes: 992
+> > > rngtest: FIPS 140-2 failures: 8
+> > >=20
+> > > wens@rock-3a:~$ uname -a
+> > > Linux rock-3a 6.10.0-rc7-next-20240712-12899-g7df602fe7c8b #9 SMP Mon
+> > > Jul 15 00:39:32 CST 2024 aarch64 GNU/Linux
+> >=20
+> > I wondered if ``dd if=3D/dev/hwrng bs=3D100000 count=3D1 > /dev/null`` =
+before
+> > the actual test run made a difference.
+> > Tried it on my Quartz64 Model A: no
+> >=20
+> > Then I tried it on my Quartz64 Model B:
+> >=20
+> > root@quartz64b:~# cat /dev/hwrng | rngtest -c 1000
 > > rngtest 5
-> > Copyright (c) 2004 by Henrique de Moraes Holschuh
-> > This is free software; see the source for copying conditions.  There
-> > is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A
-> > PARTICULAR PURPOSE.
-> >
+> > ...
 > > rngtest: starting FIPS tests...
 > > rngtest: bits received from input: 20000032
-> > rngtest: FIPS 140-2 successes: 992
-> > rngtest: FIPS 140-2 failures: 8
-> > rngtest: FIPS 140-2(2001-10-10) Monobit: 7
-> > rngtest: FIPS 140-2(2001-10-10) Poker: 0
-> > rngtest: FIPS 140-2(2001-10-10) Runs: 0
-> > rngtest: FIPS 140-2(2001-10-10) Long run: 1
-> > rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-> > rngtest: input channel speed: (min=3D2.658; avg=3D140.067;
-> > max=3D9765625.000)Kibits/s rngtest: FIPS tests speed: (min=3D26.751;
-> > avg=3D34.901; max=3D65.320)Mibits/s rngtest: Program run time: 14736759=
-4
-> > microseconds
-> >
-> > wens@rock-3a:~$ uname -a
-> > Linux rock-3a 6.10.0-rc7-next-20240712-12899-g7df602fe7c8b #9 SMP Mon
-> > Jul 15 00:39:32 CST 2024 aarch64 GNU/Linux
->
-> I wondered if ``dd if=3D/dev/hwrng bs=3D100000 count=3D1 > /dev/null`` be=
-fore
-> the actual test run made a difference.
-> Tried it on my Quartz64 Model A: no
->
-> Then I tried it on my Quartz64 Model B:
->
-> root@quartz64b:~# cat /dev/hwrng | rngtest -c 1000
+> > rngtest: FIPS 140-2 successes: 120
+> > rngtest: FIPS 140-2 failures: 880
+> >=20
+> > root@quartz64b:~# dd if=3D/dev/hwrng bs=3D100000 count=3D1 > /dev/null
+> > 1+0 records in
+> > 1+0 records out
+> > 100000 bytes (100 kB, 98 KiB) copied, 5.71466 s, 17.5 kB/s
+> >=20
+> > root@quartz64b:~# cat /dev/hwrng | rngtest -c 1000
+> > rngtest 5
+> > ...
+> > rngtest: starting FIPS tests...
+> > rngtest: bits received from input: 20000032
+> > rngtest: FIPS 140-2 successes: 104
+> > rngtest: FIPS 140-2 failures: 896
+> >=20
+> > root@quartz64b:~# uname -a
+> > Linux quartz64b 6.10+unreleased-arm64 #1 SMP Debian 6.10-1~cknow
+> > (2024-04-24) aarch64 GNU/Linux>=20
+> > :-O
+>=20
+> I pulled out my Quartz64 model B, and the results seem better than yours.
+>=20
+> root@quartz64:~# sudo dd if=3D/dev/hwrng bs=3D256 | rngtest -c 1000
 > rngtest 5
 > ...
 > rngtest: starting FIPS tests...
 > rngtest: bits received from input: 20000032
-> rngtest: FIPS 140-2 successes: 120
-> rngtest: FIPS 140-2 failures: 880
-> rngtest: FIPS 140-2(2001-10-10) Monobit: 879
-> rngtest: FIPS 140-2(2001-10-10) Poker: 332
-> rngtest: FIPS 140-2(2001-10-10) Runs: 91
-> rngtest: FIPS 140-2(2001-10-10) Long run: 0
-> rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-> rngtest: input channel speed: (min=3D2.615; avg=3D138.117; max=3D9765625.=
-000)Kibits/s
-> rngtest: FIPS tests speed: (min=3D20.777; avg=3D34.535; max=3D68.857)Mibi=
-ts/s
-> rngtest: Program run time: 149461754 microseconds
->
-> root@quartz64b:~# dd if=3D/dev/hwrng bs=3D100000 count=3D1 > /dev/null
-> 1+0 records in
-> 1+0 records out
-> 100000 bytes (100 kB, 98 KiB) copied, 5.71466 s, 17.5 kB/s
->
-> root@quartz64b:~# cat /dev/hwrng | rngtest -c 1000
+> rngtest: FIPS 140-2 successes: 859
+> rngtest: FIPS 140-2 failures: 141
+> root@quartz64:~# sudo dd if=3D/dev/hwrng bs=3D256 | rngtest -c 1000
 > rngtest 5
 > ...
 > rngtest: starting FIPS tests...
 > rngtest: bits received from input: 20000032
-> rngtest: FIPS 140-2 successes: 104
-> rngtest: FIPS 140-2 failures: 896
-> rngtest: FIPS 140-2(2001-10-10) Monobit: 892
-> rngtest: FIPS 140-2(2001-10-10) Poker: 335
-> rngtest: FIPS 140-2(2001-10-10) Runs: 79
-> rngtest: FIPS 140-2(2001-10-10) Long run: 0
-> rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-> rngtest: input channel speed: (min=3D2.613; avg=3D138.098; max=3D9765625.=
-000)Kibits/s
-> rngtest: FIPS tests speed: (min=3D20.465; avg=3D34.587; max=3D69.107)Mibi=
-ts/s
-> rngtest: Program run time: 149475187 microseconds
->
-> root@quartz64b:~# uname -a
-> Linux quartz64b 6.10+unreleased-arm64 #1 SMP Debian 6.10-1~cknow (2024-04=
--24) aarch64 GNU/Linux
->
-> :-O
+> rngtest: FIPS 140-2 successes: 843
+> rngtest: FIPS 140-2 failures: 157
 
-I pulled out my Quartz64 model B, and the results seem better than yours.
+I noticed you used ``dd`` instead of ``cat``, so I tried again ...
 
-root@quartz64:~# sudo dd if=3D/dev/hwrng bs=3D256 | rngtest -c 1000
+Quartz64-A:
+root@quartz64a:~# dd if=3D/dev/hwrng bs=3D256 | rngtest -c 1000
 rngtest 5
-Copyright (c) 2004 by Henrique de Moraes Holschuh
-This is free software; see the source for copying conditions.  There
-is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE.
+=2E..
+rngtest: starting FIPS tests...                                            =
+                  =20
+rngtest: bits received from input: 20000032                                =
+                  =20
+rngtest: FIPS 140-2 successes: 411                                         =
+                  =20
+rngtest: FIPS 140-2 failures: 589
 
-rngtest: starting FIPS tests...
+root@quartz64a:~# dd if=3D/dev/hwrng bs=3D256 | rngtest -c 1000
+=2E..
+rngtest: starting FIPS tests...          =20
 rngtest: bits received from input: 20000032
-rngtest: FIPS 140-2 successes: 859
-rngtest: FIPS 140-2 failures: 141
-rngtest: FIPS 140-2(2001-10-10) Monobit: 137
-rngtest: FIPS 140-2(2001-10-10) Poker: 10
-rngtest: FIPS 140-2(2001-10-10) Runs: 5
-rngtest: FIPS 140-2(2001-10-10) Long run: 0
-rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=3D134.990; avg=3D143.460; max=3D157.836)=
-Kibits/s
-rngtest: FIPS tests speed: (min=3D34.742; avg=3D40.675; max=3D41.285)Mibits=
-/s
-rngtest: Program run time: 136667679 microseconds
-root@quartz64:~# sudo dd if=3D/dev/hwrng bs=3D256 | rngtest -c 1000
-rngtest 5
-Copyright (c) 2004 by Henrique de Moraes Holschuh
-This is free software; see the source for copying conditions.  There
-is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE.
+rngtest: FIPS 140-2 successes: 391        =20
+rngtest: FIPS 140-2 failures: 609
 
-rngtest: starting FIPS tests...
-rngtest: bits received from input: 20000032
-rngtest: FIPS 140-2 successes: 843
-rngtest: FIPS 140-2 failures: 157
-rngtest: FIPS 140-2(2001-10-10) Monobit: 155
-rngtest: FIPS 140-2(2001-10-10) Poker: 13
-rngtest: FIPS 140-2(2001-10-10) Runs: 7
-rngtest: FIPS 140-2(2001-10-10) Long run: 0
-rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=3D134.977; avg=3D143.669; max=3D157.906)=
-Kibits/s
-rngtest: FIPS tests speed: (min=3D37.036; avg=3D40.666; max=3D41.285)Mibits=
-/s
-rngtest: Program run time: 136459178 microseconds
+root@quartz64a:~# dd if=3D/dev/hwrng bs=3D100000 count=3D1 > /dev/null
+1+0 records in                            =20
+1+0 records out                  =20
+100000 bytes (100 kB, 98 KiB) copied, 5.66202 s, 17.7 kB/s
+
+root@quartz64a:~# dd if=3D/dev/hwrng bs=3D256 | rngtest -c 1000
+=2E..
+rngtest: FIPS 140-2 successes: 386                                         =
+                  =20
+rngtest: FIPS 140-2 failures: 614
+
+root@quartz64a:~# dd if=3D/dev/hwrng bs=3D256 | rngtest -c 1000
+=2E..
+rngtest: FIPS 140-2 successes: 356
+rngtest: FIPS 140-2 failures: 644
+
+Quartz64-B:
+root@quartz64b:~# dd if=3D/dev/hwrng bs=3D256 | rngtest -c 1000
+=2E..
+rngtest: FIPS 140-2 successes: 118
+rngtest: FIPS 140-2 failures: 882
+
+root@quartz64b:~# dd if=3D/dev/hwrng bs=3D256 | rngtest -c 1000
+=2E..
+rngtest: FIPS 140-2 successes: 133
+rngtest: FIPS 140-2 failures: 867
+
+root@quartz64b:~# dd if=3D/dev/hwrng bs=3D100000 count=3D1 > /dev/null
+
+root@quartz64b:~# dd if=3D/dev/hwrng bs=3D256 | rngtest -c 1000
+=2E..
+rngtest: FIPS 140-2 successes: 97
+rngtest: FIPS 140-2 failures: 903
+
+root@quartz64b:~# dd if=3D/dev/hwrng bs=3D256 | rngtest -c 1000
+=2E..
+rngtest: FIPS 140-2 successes: 130
+rngtest: FIPS 140-2 failures: 870
+
+And lastly on PineTab2:
+root@pinetab2:~# dd if=3D/dev/hwrng bs=3D256 | rngtest -c 1000
+=2E..
+rngtest: FIPS 140-2 successes: 705
+rngtest: FIPS 140-2 failures: 295
+
+root@pinetab2:~# dd if=3D/dev/hwrng bs=3D256 | rngtest -c 1000
+=2E..
+rngtest: FIPS 140-2 successes: 678
+rngtest: FIPS 140-2 failures: 322
+
+root@pinetab2:~# dd if=3D/dev/hwrng bs=3D100000 count=3D1 > /dev/null
+
+root@pinetab2:~# dd if=3D/dev/hwrng bs=3D256 | rngtest -c 1000
+=2E..
+rngtest: FIPS 140-2 successes: 681
+rngtest: FIPS 140-2 failures: 319
+
+root@pinetab2:~# dd if=3D/dev/hwrng bs=3D256 | rngtest -c 1000
+=2E..
+rngtest: FIPS 140-2 successes: 669
+rngtest: FIPS 140-2 failures: 331
+
+
+So my Q64-B tests are consistently MUCH worse then your Q64-B tests ...
+This seems BAD to me, now that we even have completely different results pe=
+r=20
+device of the EXACT same model?!? Hardware revision may be different (I hav=
+e a=20
+v1.4), but it seems rather pointless to go into that direction.
+
+It then also seems rather pointless to try it with different parameters if =
+the=20
+results on the same SBC model can vary this much.
+
+Thanks for your tests,
+  Diederik
+
+--nextPart2509603.0URhkfn4ud
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+Content-Transfer-Encoding: 7Bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQT1sUPBYsyGmi4usy/XblvOeH7bbgUCZp6tGAAKCRDXblvOeH7b
+bnIPAP9eRr0EgWFfuf4HAEy2gbcjRS0YYCyCeha4MjfASco9EQD/XQXNEecekolM
+xPv/OQmXAzX1hHLrt8gX4KRIaxkJ8wc=
+=5Ged
+-----END PGP SIGNATURE-----
+
+--nextPart2509603.0URhkfn4ud--
+
+
+
