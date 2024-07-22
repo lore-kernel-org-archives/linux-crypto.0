@@ -1,71 +1,149 @@
-Received: from bmailout1.hostsharing.net (bmailout1.hostsharing.net [83.223.95.100])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 122AB8F5E;
-	Mon, 22 Jul 2024 14:05:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90A68166308
+	for <linux-crypto@vger.kernel.org>; Mon, 22 Jul 2024 14:22:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721657123; cv=none; b=oLH6IcEVQNQvEcOyxVfY88ltfdFnAWThfEkvZKxWX5P21Kc8tLUScs7UI+9QQf3VPP+7IKCvOx9//KctRQ7mKykQFJHcvrUk+gULPnnmcArgMxYo/vgZkh7UZzOfej7fZMw0AV1Z2XI5bHA9Qq64TBVktraZtRoPP74yln8hAik=
+	t=1721658121; cv=none; b=AmUiBQqT+zC0q8a8SU+5012cgI8MZZRfDVR7xK70nX7vJaaWusjHKtaAcmYzr5u+cACXG3JOv/rOnDaUH2CeW8VOS6YCQ2OEXZl2slsudpOBQClqEP22msVrGopwZ7IuylDvEX6oXyUHq8q8boMQR1l4pOHM3+YbLbDfv6HLSBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721657123; c=relaxed/simple;
-	bh=PNiMLggC12F9PS2N2fc8x2/l4DaQ93BCfhgTNm84lys=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=trpvMI9baHbF62jrAsOXLuoeE/8Pe341oXHZDuTUkJI1iHbBNzJD4yF6qP8pyssW5v5Qbdum2YcMy1eDtAxRQMjs4yTgx1iBAMXB04Ef5F+AZTsjLlzs5/gWIg//TOy0SAedJX0/qd87pNY3ZlZDCgVEEpj7joFax8jCFxKdX9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.95.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout1.hostsharing.net (Postfix) with ESMTPS id 3143D3000A0C0;
-	Mon, 22 Jul 2024 16:05:12 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id 1B76C27609A; Mon, 22 Jul 2024 16:05:12 +0200 (CEST)
-Date: Mon, 22 Jul 2024 16:05:12 +0200
-From: Lukas Wunner <lukas@wunner.de>
-To: Ralf Baechle <ralf@linux-mips.org>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>
-Cc: linux-mips@vger.kernel.org, Stefan Berger <stefanb@linux.ibm.com>,
-	linux-crypto@vger.kernel.org
-Subject: Mips handling of signed integer overflows
-Message-ID: <Zp5nGEBD41jBnw6B@wunner.de>
+	s=arc-20240116; t=1721658121; c=relaxed/simple;
+	bh=sO48rBfePwJJwOuzkWv9CUXSJWa4aJoG3UxyflX83Ss=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ujknw0gNwdPd14EhlcJK9TPaBWBlKuyVvscGa7r1MRwvkIf1mkjnKKJwW9uFvMjzLUs7Z36ctZpLJgRCkjEcXpezxjGcgwEV0ooy0BtHpyACzfumBV23Lbb4LdboXnJDaqQpre+ocKjJFMycxAvcipmElcINy0lGZ3wyGtHXGNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tWMyjQHb; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tWMyjQHb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85A47C116B1;
+	Mon, 22 Jul 2024 14:21:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721658121;
+	bh=sO48rBfePwJJwOuzkWv9CUXSJWa4aJoG3UxyflX83Ss=;
+	h=From:To:Cc:Subject:Date:From;
+	b=tWMyjQHbegfVwskT3GBJxlDZclJfEJjSZBivYlo8bqDxSeilqd6YDNt2uhKs6uiL5
+	 6AKnYrh5VLi+5uiL0GwaXuraj8iMiaQDqox8197nt2zWa7TtQR+c6iziT3Hv4ypGtT
+	 83ywrel3YtZXmMmT8soAKy1wZSCDu/8Jj+CdGP2ExesPyMhW7kHEIO4L4cYHEoj+Gc
+	 OsNAkq4XH/+jJY4sh80yYh9ZQpiodhcPAaUBGvzER0tGEq379dRUA/xRN6FTAuDasx
+	 /XwVwEFS/brY4WX5sgR4aBsESyGE/59vMAIFrXW7MJ2HtZfYoVd0tSfqhML59sRD76
+	 yPg/oLm7TaqMA==
+From: Hannes Reinecke <hare@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Keith Busch <kbusch@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Eric Biggers <ebiggers@kernel.org>,
+	linux-crypto@vger.kernel.org,
+	linux-nvme@lists.infradead.org,
+	Hannes Reinecke <hare@suse.de>
+Subject: [PATCHv8 0/9] nvme: implement secure concatenation
+Date: Mon, 22 Jul 2024 16:21:13 +0200
+Message-Id: <20240722142122.128258-1-hare@kernel.org>
+X-Mailer: git-send-email 2.35.3
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-Dear Mips maintainers,
+From: Hannes Reinecke <hare@suse.de>
 
-back in 2006, commit 36ccf1c0e391 ("[MIPS] Make integer overflow
-exceptions in kernel mode fatal.") forced the kernel to panic on
-integer overflows.
+Hi all,
 
-But three years later in 2009, commit 68df3755e383 ("Add '-fwrapv'
-to gcc CFLAGS") ensured that integer overflows are not undefined
-behavior and instead force wraparound.
+here's my attempt to implement secure concatenation for NVMe-of TCP
+as outlined in TP8018.
+The original (v5) patchset had been split in two, and this is the
+second part based on top of the patchset 'nvme: fixes for secure
+concatenation' sent earlier to the mailinglist.
 
-I assume this means that the compiler uses non-trapping instructions
-for addition/subtraction on Mips.  Consequently, calling die_if_kernel()
-from do_ov() in arch/mips/kernel/traps.c should no longer be necessary
-as it can never happen.
+Secure concatenation means that a TLS PSK is generated from the key
+material negotiated by the DH-HMAC-CHAP protocol, and the TLS PSK
+is then used for a subsequent TLS connection.
+The difference between the original definition of secure concatenation
+and the method outlined in TP8018 is that with TP8018 the connection
+is reset after DH-HMAC-CHAP negotiation, and a new connection is setup
+with the generated TLS PSK.
 
-Can you confirm or deny this?
+To implement that Sagi came up with the idea to directly reset the
+admin queue once the DH-CHAP negotiation has completed; that way
+it will be transparent to the upper layers and we don't have to
+worry about exposing queues which should not be used.
 
-I came across this because ecdsa_get_signature_rs() in crypto/ecdsa.c
-performs a subtraction which may lead to a signed integer overflow:
+As usual, comments and reviews are welcome.
 
-https://lore.kernel.org/all/Zp5b7ZQaXfGbkCVC@wunner.de/
+Patchset can be found at
+git.kernel.org:/pub/scm/linux/kernel/git/hare/nvme.git
+branch secure-concat.v8
 
-If gcc ignores -fno-strict-overflow on Mips and raises an exception,
-the kernel would panic in ecdsa_get_signature_rs() for a sufficiently
-large ASN.1-encoded integer.
+Changes to v7:
+- Add patch to display nvme target TLS status in debugfs
+- Include reviews from Sagi
 
-Thanks,
+Changes to v6:
+- Rebase to nvme-6.11
 
-Lukas
+Changes to v5:
+- Include reviews from Sagi
+- Split patchset in two parts
+
+Changes to v4:
+- Rework reset admin queue functionality based on an idea
+  from Sagi (thanks!)
+- kbuild robot fixes
+- Fixup dhchap negotiation with non-empty C2 value
+
+Changes to v3:
+- Include reviews from Sagi
+- Do not start I/O queues after DH-HMAC-CHAP negotiation
+- Use bool to indicate TLS has been enabled on a queue
+- Add 'tls_keyring' sysfs attribute
+- Add 'tls_configured_key' sysfs attribute
+
+Changes to v2:
+- Fixup reset after dhchap negotiation
+- Disable namespace scanning on I/O queues after
+  dhchap negotiation
+      - Reworked TLS key handling (again)
+
+Changes to the original submission:
+- Sanitize TLS key handling
+- Fixup modconfig compilation
+
+Hannes Reinecke (9):
+  crypto,fs: Separate out hkdf_extract() and hkdf_expand()
+  nvme: add nvme_auth_generate_psk()
+  nvme: add nvme_auth_generate_digest()
+  nvme: add nvme_auth_derive_tls_psk()
+  nvme-keyring: add nvme_tls_psk_refresh()
+  nvme-tcp: request secure channel concatenation
+  nvme-fabrics: reset admin connection for secure concatenation
+  nvmet-tcp: support secure channel concatenation
+  nvmet: add tls_concat and tls_key debugfs entries
+
+ crypto/Makefile                        |   1 +
+ crypto/hkdf.c                          | 112 +++++++++
+ drivers/nvme/common/auth.c             | 303 +++++++++++++++++++++++++
+ drivers/nvme/common/keyring.c          |  50 ++++
+ drivers/nvme/host/auth.c               | 108 ++++++++-
+ drivers/nvme/host/fabrics.c            |  34 ++-
+ drivers/nvme/host/fabrics.h            |   3 +
+ drivers/nvme/host/nvme.h               |   2 +
+ drivers/nvme/host/sysfs.c              |   4 +-
+ drivers/nvme/host/tcp.c                |  56 ++++-
+ drivers/nvme/target/auth.c             |  72 +++++-
+ drivers/nvme/target/debugfs.c          |  27 +++
+ drivers/nvme/target/fabrics-cmd-auth.c |  49 +++-
+ drivers/nvme/target/fabrics-cmd.c      |  33 ++-
+ drivers/nvme/target/nvmet.h            |  38 +++-
+ drivers/nvme/target/tcp.c              |  23 +-
+ fs/crypto/hkdf.c                       |  68 +-----
+ include/crypto/hkdf.h                  |  18 ++
+ include/linux/nvme-auth.h              |   7 +
+ include/linux/nvme-keyring.h           |   7 +
+ include/linux/nvme.h                   |   7 +
+ 21 files changed, 926 insertions(+), 96 deletions(-)
+ create mode 100644 crypto/hkdf.c
+ create mode 100644 include/crypto/hkdf.h
+
+-- 
+2.35.3
+
