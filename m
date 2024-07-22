@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D9F6BE5E
-	for <linux-crypto@vger.kernel.org>; Mon, 22 Jul 2024 14:22:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E09AB166308
+	for <linux-crypto@vger.kernel.org>; Mon, 22 Jul 2024 14:22:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721658123; cv=none; b=i1PczmisXw1vJsCUJgA3S9UMXBfN+OmK0SEcrU+jmMEdTM9PvmM9fgFskpKzBTmxPiYuWRRc/OXus+zOdGXXYCG6cJjnIrmyBKwjNfYBlUk+jbAkKWSYPjVf05NtkcxAe2Ezpnev1jbNuhVqpkl2L9eX1S1qleJs8tEAsNtgDvw=
+	t=1721658126; cv=none; b=c1PuP8pV/6pLAXejKb6v/CFgpjmwejz64WWiyZgvHHD+T9JxX/veLRfwMaRSu0xx2xyQw8yG+hFTpc89l3cN+wGDo76sBV0twPrHaKf169K+175GQ16iW5IalsjoXC+JN6ND6oBvvYvVfk744JcRIWaAPRQjk8PFfXOdJ3+mL8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721658123; c=relaxed/simple;
-	bh=r5ZDBk4HmRPtpcmmR1xIehiRjqgNNPB10LyJvpl6WDE=;
+	s=arc-20240116; t=1721658126; c=relaxed/simple;
+	bh=doKYCexsrnFUuf8hvAHdQvOsB3mMlcJ5tJxV61/Z6mI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=G3dEJurShb7bl+FnLX2mXmC5G9MFqvPdDBA78uVtHoEYYS7MQWJQfA3uuX+rvrU5YWSi6xAICTkuFxEt0AroloScoeZ9ztKwmEJSlF0d9ouolDmNoQ+HY8vudQRxS6FBqjT/ZGiXnbjSRId9zNY8RzS1JEYkMI7vW+458nWmrak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OR4hk/Ve; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=ioFqiupE3xNfk1b3tYBOTN3Z1eeEHo2L37pMptiskkQyByS1pW3+TaT+F+1XOI70T4H4vzcd3jlJaj9Z5Vrsz3MBbD8843dOx8GdGelUX5Jh9FcWqqdzgsYKkOCq2iCPcPjL0doW2x917m5Z2eKTjl03+xv7dNWj0BgU4G0Ko/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tfheRBZ1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OR4hk/Ve"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 981B2C4AF0E;
-	Mon, 22 Jul 2024 14:22:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tfheRBZ1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A508BC4AF0B;
+	Mon, 22 Jul 2024 14:22:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721658123;
-	bh=r5ZDBk4HmRPtpcmmR1xIehiRjqgNNPB10LyJvpl6WDE=;
+	s=k20201202; t=1721658125;
+	bh=doKYCexsrnFUuf8hvAHdQvOsB3mMlcJ5tJxV61/Z6mI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OR4hk/VeSoklnIfsmf8qTnC6m2GoLCsILEIJ9SqPzoBiLiFXqz6XkRf+FDREqt25D
-	 MJnOuSoiP1A8XYBH6CUNHakAUFpFrIOW4D+iF/xZl6JrdjvnbK7JTRpUi/94JnyWC1
-	 OvkmkDJQgiYOiz8KDmr46IUcHuyJADooS9g96bEsuWNd39imELqlT4qwIAhTYliASb
-	 SgByFPD1vFe13GKVusSwNTA6wEM6fo1K5lQYqeX3R354TUThazMTOF+dDhtNAG704H
-	 jR5olO6Lx+rOukQV3JCsGwnch3iRDtEkX6L6XKzbe3tvDvAxl5b0wiNfp0i8WjNT5A
-	 FEfpWnwWJj6Qg==
+	b=tfheRBZ1aRc8mBT4qBkgwfayLW6KPepvgXDk7reCL9bcTi0Os6eEFXa65T2CHnLfT
+	 TFJj1MFmp507nf2PCsJae3ZVLn54cYF1YIUy9WMg5V2rCfqfdhm2its4QlF8Q9VZS9
+	 j8ya5uM3Fexnr2i8rzlegpXUZrdqfZ3wtYt0wYe+LCTZ8X8Z4DYRMGmS6f4exODOyb
+	 +Dg3gFFD0YoWi0K4yqp69VnLc4w2e9puSM/gWdfKIf/p46kGZQ//fGJcGtkwW/sOfr
+	 /fXa8ivVSW4+It6OsHJHE0/eOLjF8WUjJJeLQOjF7myuYFyvyOwtquwIM0OXKL71Kv
+	 pEU+HJbqAzsMA==
 From: Hannes Reinecke <hare@kernel.org>
 To: Christoph Hellwig <hch@lst.de>
 Cc: Keith Busch <kbusch@kernel.org>,
@@ -34,9 +34,9 @@ Cc: Keith Busch <kbusch@kernel.org>,
 	linux-crypto@vger.kernel.org,
 	linux-nvme@lists.infradead.org,
 	Hannes Reinecke <hare@kernel.org>
-Subject: [PATCH 1/9] crypto,fs: Separate out hkdf_extract() and hkdf_expand()
-Date: Mon, 22 Jul 2024 16:21:14 +0200
-Message-Id: <20240722142122.128258-2-hare@kernel.org>
+Subject: [PATCH 2/9] nvme: add nvme_auth_generate_psk()
+Date: Mon, 22 Jul 2024 16:21:15 +0200
+Message-Id: <20240722142122.128258-3-hare@kernel.org>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20240722142122.128258-1-hare@kernel.org>
 References: <20240722142122.128258-1-hare@kernel.org>
@@ -48,278 +48,133 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Separate out the HKDF functions into a separate file to make them
-available to other callers.
+Add a function to generate a NVMe PSK from the shared credentials
+negotiated by DH-HMAC-CHAP.
 
 Signed-off-by: Hannes Reinecke <hare@kernel.org>
-Cc: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
 ---
- crypto/Makefile       |   1 +
- crypto/hkdf.c         | 112 ++++++++++++++++++++++++++++++++++++++++++
- fs/crypto/hkdf.c      |  68 ++++---------------------
- include/crypto/hkdf.h |  18 +++++++
- 4 files changed, 140 insertions(+), 59 deletions(-)
- create mode 100644 crypto/hkdf.c
- create mode 100644 include/crypto/hkdf.h
+ drivers/nvme/common/auth.c | 87 ++++++++++++++++++++++++++++++++++++++
+ include/linux/nvme-auth.h  |  3 ++
+ 2 files changed, 90 insertions(+)
 
-diff --git a/crypto/Makefile b/crypto/Makefile
-index edbbaa3ffef5..b77fc360f0ff 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -29,6 +29,7 @@ obj-$(CONFIG_CRYPTO_ECHAINIV) += echainiv.o
- 
- crypto_hash-y += ahash.o
- crypto_hash-y += shash.o
-+crypto_hash-y += hkdf.o
- obj-$(CONFIG_CRYPTO_HASH2) += crypto_hash.o
- 
- obj-$(CONFIG_CRYPTO_AKCIPHER2) += akcipher.o
-diff --git a/crypto/hkdf.c b/crypto/hkdf.c
-new file mode 100644
-index 000000000000..22e343851c0b
---- /dev/null
-+++ b/crypto/hkdf.c
-@@ -0,0 +1,112 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Implementation of HKDF ("HMAC-based Extract-and-Expand Key Derivation
-+ * Function"), aka RFC 5869.  See also the original paper (Krawczyk 2010):
-+ * "Cryptographic Extraction and Key Derivation: The HKDF Scheme".
-+ *
-+ * This is used to derive keys from the fscrypt master keys.
-+ *
-+ * Copyright 2019 Google LLC
-+ */
-+
-+#include <crypto/hash.h>
-+#include <crypto/sha2.h>
-+#include <crypto/hkdf.h>
-+
-+/*
-+ * HKDF consists of two steps:
-+ *
-+ * 1. HKDF-Extract: extract a pseudorandom key of length HKDF_HASHLEN bytes from
-+ *    the input keying material and optional salt.
-+ * 2. HKDF-Expand: expand the pseudorandom key into output keying material of
-+ *    any length, parameterized by an application-specific info string.
-+ *
-+ */
-+
-+/* HKDF-Extract (RFC 5869 section 2.2), unsalted */
-+int hkdf_extract(struct crypto_shash *hmac_tfm, const u8 *ikm,
-+		 unsigned int ikmlen, u8 *prk)
-+{
-+	unsigned int prklen = crypto_shash_digestsize(hmac_tfm);
-+	u8 *default_salt;
-+	int err;
-+
-+	default_salt = kzalloc(prklen, GFP_KERNEL);
-+	if (!default_salt)
-+		return -ENOMEM;
-+	err = crypto_shash_setkey(hmac_tfm, default_salt, prklen);
-+	if (!err)
-+		err = crypto_shash_tfm_digest(hmac_tfm, ikm, ikmlen, prk);
-+
-+	kfree(default_salt);
-+	return err;
-+}
-+EXPORT_SYMBOL_GPL(hkdf_extract);
-+
-+/*
-+ * HKDF-Expand (RFC 5869 section 2.3).
-+ * This expands the pseudorandom key, which was already keyed into @hmac_tfm,
-+ * into @okmlen bytes of output keying material parameterized by the
-+ * application-specific @info of length @infolen bytes.
-+ * This is thread-safe and may be called by multiple threads in parallel.
-+ */
-+int hkdf_expand(struct crypto_shash *hmac_tfm,
-+		const u8 *info, unsigned int infolen,
-+		u8 *okm, unsigned int okmlen)
-+{
-+	SHASH_DESC_ON_STACK(desc, hmac_tfm);
-+	unsigned int i, hashlen = crypto_shash_digestsize(hmac_tfm);
-+	int err;
-+	const u8 *prev = NULL;
-+	u8 counter = 1;
-+	u8 *tmp;
-+
-+	if (WARN_ON(okmlen > 255 * hashlen))
-+		return -EINVAL;
-+
-+	tmp = kzalloc(hashlen, GFP_KERNEL);
-+	if (!tmp)
-+		return -ENOMEM;
-+
-+	desc->tfm = hmac_tfm;
-+
-+	for (i = 0; i < okmlen; i += hashlen) {
-+
-+		err = crypto_shash_init(desc);
-+		if (err)
-+			goto out;
-+
-+		if (prev) {
-+			err = crypto_shash_update(desc, prev, hashlen);
-+			if (err)
-+				goto out;
-+		}
-+
-+		err = crypto_shash_update(desc, info, infolen);
-+		if (err)
-+			goto out;
-+
-+		BUILD_BUG_ON(sizeof(counter) != 1);
-+		if (okmlen - i < hashlen) {
-+			err = crypto_shash_finup(desc, &counter, 1, tmp);
-+			if (err)
-+				goto out;
-+			memcpy(&okm[i], tmp, okmlen - i);
-+			memzero_explicit(tmp, sizeof(tmp));
-+		} else {
-+			err = crypto_shash_finup(desc, &counter, 1, &okm[i]);
-+			if (err)
-+				goto out;
-+		}
-+		counter++;
-+		prev = &okm[i];
-+	}
-+	err = 0;
-+out:
-+	if (unlikely(err))
-+		memzero_explicit(okm, okmlen); /* so caller doesn't need to */
-+	shash_desc_zero(desc);
-+	kfree(tmp);
-+	return err;
-+}
-+EXPORT_SYMBOL_GPL(hkdf_expand);
-diff --git a/fs/crypto/hkdf.c b/fs/crypto/hkdf.c
-index 5a384dad2c72..9c2f9aca9412 100644
---- a/fs/crypto/hkdf.c
-+++ b/fs/crypto/hkdf.c
+diff --git a/drivers/nvme/common/auth.c b/drivers/nvme/common/auth.c
+index a3455f1d67fa..f6d21960b140 100644
+--- a/drivers/nvme/common/auth.c
++++ b/drivers/nvme/common/auth.c
 @@ -11,6 +11,7 @@
- 
+ #include <asm/unaligned.h>
  #include <crypto/hash.h>
- #include <crypto/sha2.h>
+ #include <crypto/dh.h>
 +#include <crypto/hkdf.h>
+ #include <linux/nvme.h>
+ #include <linux/nvme-auth.h>
  
- #include "fscrypt_private.h"
- 
-@@ -44,20 +45,6 @@
-  * there's no way to persist a random salt per master key from kernel mode.
-  */
- 
--/* HKDF-Extract (RFC 5869 section 2.2), unsalted */
--static int hkdf_extract(struct crypto_shash *hmac_tfm, const u8 *ikm,
--			unsigned int ikmlen, u8 prk[HKDF_HASHLEN])
--{
--	static const u8 default_salt[HKDF_HASHLEN];
--	int err;
--
--	err = crypto_shash_setkey(hmac_tfm, default_salt, HKDF_HASHLEN);
--	if (err)
--		return err;
--
--	return crypto_shash_tfm_digest(hmac_tfm, ikm, ikmlen, prk);
--}
--
- /*
-  * Compute HKDF-Extract using the given master key as the input keying material,
-  * and prepare an HMAC transform object keyed by the resulting pseudorandom key.
-@@ -118,61 +105,24 @@ int fscrypt_hkdf_expand(const struct fscrypt_hkdf *hkdf, u8 context,
- 			u8 *okm, unsigned int okmlen)
- {
- 	SHASH_DESC_ON_STACK(desc, hkdf->hmac_tfm);
--	u8 prefix[9];
--	unsigned int i;
-+	u8 *prefix;
- 	int err;
--	const u8 *prev = NULL;
--	u8 counter = 1;
--	u8 tmp[HKDF_HASHLEN];
- 
- 	if (WARN_ON_ONCE(okmlen > 255 * HKDF_HASHLEN))
- 		return -EINVAL;
- 
-+	prefix = kzalloc(okmlen + 9, GFP_KERNEL);
-+	if (!prefix)
-+		return -ENOMEM;
- 	desc->tfm = hkdf->hmac_tfm;
- 
- 	memcpy(prefix, "fscrypt\0", 8);
- 	prefix[8] = context;
-+	memcpy(prefix + 9, info, infolen);
- 
--	for (i = 0; i < okmlen; i += HKDF_HASHLEN) {
--
--		err = crypto_shash_init(desc);
--		if (err)
--			goto out;
--
--		if (prev) {
--			err = crypto_shash_update(desc, prev, HKDF_HASHLEN);
--			if (err)
--				goto out;
--		}
--
--		err = crypto_shash_update(desc, prefix, sizeof(prefix));
--		if (err)
--			goto out;
--
--		err = crypto_shash_update(desc, info, infolen);
--		if (err)
--			goto out;
--
--		BUILD_BUG_ON(sizeof(counter) != 1);
--		if (okmlen - i < HKDF_HASHLEN) {
--			err = crypto_shash_finup(desc, &counter, 1, tmp);
--			if (err)
--				goto out;
--			memcpy(&okm[i], tmp, okmlen - i);
--			memzero_explicit(tmp, sizeof(tmp));
--		} else {
--			err = crypto_shash_finup(desc, &counter, 1, &okm[i]);
--			if (err)
--				goto out;
--		}
--		counter++;
--		prev = &okm[i];
--	}
--	err = 0;
--out:
--	if (unlikely(err))
--		memzero_explicit(okm, okmlen); /* so caller doesn't need to */
--	shash_desc_zero(desc);
-+	err = hkdf_expand(hkdf->hmac_tfm, prefix, infolen + 8,
-+			  okm, okmlen);
-+	kfree(prefix);
- 	return err;
+@@ -471,5 +472,91 @@ int nvme_auth_generate_key(u8 *secret, struct nvme_dhchap_key **ret_key)
  }
+ EXPORT_SYMBOL_GPL(nvme_auth_generate_key);
  
-diff --git a/include/crypto/hkdf.h b/include/crypto/hkdf.h
-new file mode 100644
-index 000000000000..bf06c080d7ed
---- /dev/null
-+++ b/include/crypto/hkdf.h
-@@ -0,0 +1,18 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
 +/*
-+ * HKDF: HMAC-based Key Derivation Function (HKDF), RFC 5869
++ * nvme_auth_generate_psk - Generate a PSK for TLS
 + *
-+ * Extracted from fs/crypto/hkdf.c, which has
-+ * Copyright 2019 Google LLC
++ * Generate a PSK for TLS as specified in NVMe base specification, section 8.13.5.9:
++ *    Generated PSK for TLS
++ *
++ * The generated PSK for TLS shall be computed applying the HMAC function using the
++ * hash function H( ) selected by the HashID parameter in the DH-HMAC-CHAP_Challenge
++ * message with the session key KS as key to the concatenation of the two challenges
++ * C1 and C2 (i.e., generated PSK = HMAC(KS, C1 || C2)).
 + */
++int nvme_auth_generate_psk(u8 hmac_id, u8 *skey, size_t skey_len,
++		u8 *c1, u8 *c2, size_t hash_len, u8 **ret_psk,size_t *ret_len)
++{
++	struct crypto_shash *tfm;
++	struct shash_desc *shash;
++	u8 *psk;
++	const char *hmac_name;
++	int ret, psk_len;
 +
-+#ifndef _CRYPTO_HKDF_H
-+#define _CRYPTO_HKDF_H
++	if (!c1 || !c2) {
++		pr_warn("%s: invalid parameter\n", __func__);
++		return -EINVAL;
++	}
 +
-+int hkdf_extract(struct crypto_shash *hmac_tfm, const u8 *ikm,
-+		 unsigned int ikmlen, u8 *prk);
-+int hkdf_expand(struct crypto_shash *hmac_tfm,
-+		const u8 *info, unsigned int infolen,
-+		u8 *okm, unsigned int okmlen);
++	hmac_name = nvme_auth_hmac_name(hmac_id);
++	if (!hmac_name) {
++		pr_warn("%s: invalid hash algoritm %d\n",
++			__func__, hmac_id);
++		return -EINVAL;
++	}
 +
-+#endif
++	tfm = crypto_alloc_shash(hmac_name, 0, 0);
++	if (IS_ERR(tfm))
++		return PTR_ERR(tfm);
++
++	psk_len = crypto_shash_digestsize(tfm);
++	psk = kzalloc(psk_len, GFP_KERNEL);
++	if (!psk) {
++		ret = -ENOMEM;
++		goto out_free_tfm;
++	}
++
++	shash = kmalloc(sizeof(struct shash_desc) +
++			crypto_shash_descsize(tfm),
++			GFP_KERNEL);
++	if (!shash) {
++		ret = -ENOMEM;
++		goto out_free_psk;
++	}
++
++	shash->tfm = tfm;
++	ret = crypto_shash_setkey(tfm, skey, skey_len);
++	if (ret)
++		goto out_free_shash;
++
++	ret = crypto_shash_init(shash);
++	if (ret)
++		goto out_free_shash;
++
++	ret = crypto_shash_update(shash, c1, hash_len);
++	if (ret)
++		goto out_free_shash;
++
++	ret = crypto_shash_update(shash, c2, hash_len);
++	if (ret)
++		goto out_free_shash;
++
++	ret = crypto_shash_final(shash, psk);
++	if (!ret) {
++		*ret_psk = psk;
++		*ret_len = psk_len;
++	}
++
++out_free_shash:
++	kfree_sensitive(shash);
++out_free_psk:
++	if (ret)
++		kfree_sensitive(psk);
++out_free_tfm:
++	crypto_free_shash(tfm);
++
++	return ret;
++}
++EXPORT_SYMBOL_GPL(nvme_auth_generate_psk);
++
+ MODULE_DESCRIPTION("NVMe Authentication framework");
+ MODULE_LICENSE("GPL v2");
+diff --git a/include/linux/nvme-auth.h b/include/linux/nvme-auth.h
+index c1d0bc5d9624..b13884b04dfd 100644
+--- a/include/linux/nvme-auth.h
++++ b/include/linux/nvme-auth.h
+@@ -40,5 +40,8 @@ int nvme_auth_gen_pubkey(struct crypto_kpp *dh_tfm,
+ int nvme_auth_gen_shared_secret(struct crypto_kpp *dh_tfm,
+ 				u8 *ctrl_key, size_t ctrl_key_len,
+ 				u8 *sess_key, size_t sess_key_len);
++int nvme_auth_generate_psk(u8 hmac_id, u8 *skey, size_t skey_len,
++			   u8 *c1, u8 *c2, size_t hash_len,
++			   u8 **ret_psk, size_t *ret_len);
+ 
+ #endif /* _NVME_AUTH_H */
 -- 
 2.35.3
 
