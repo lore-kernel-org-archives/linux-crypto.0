@@ -1,81 +1,80 @@
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F05A81E4BE
-	for <linux-crypto@vger.kernel.org>; Tue, 23 Jul 2024 06:24:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFF5813C838
+	for <linux-crypto@vger.kernel.org>; Tue, 23 Jul 2024 06:26:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721715853; cv=none; b=rHAxCf47jdqsW6dEmjZKI8oFw0QVgxrT882BYJqnAraTHLIqcltUAcx2rJ0LfT3LeCCHbo5fZd7FusxHKkYtHfs7xNLVtI0cKab44xc0DybwfPHveWeAWl2kiHvqn9eUfJeyVr4iB3ntSDS/rZCmXWhGL9Ud+aSBmquLj2Y6ddw=
+	t=1721715979; cv=none; b=MW6zibnGkQnrZMWDdl0X768XhBIIpwH2v4OfMik5RdpQm8SoaQZlMkOQ65p3y/KKhl39m9lcLNYmdETpUb+0qwl6fkiGW0mbAaZ+cMQOCF9jw9Qb1LIcdYKZwnUpBddFQGD07/nQFQDjpzNk+NDksRTNaS2bIcwA+XcVrNl+DkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721715853; c=relaxed/simple;
-	bh=h85wNqE+j08NdTb7FARCbK1zPRBZBPxImCLWBzf4Gfw=;
+	s=arc-20240116; t=1721715979; c=relaxed/simple;
+	bh=vJfyGkkJ6paFRI1owsV8tkJ4WHqP9mCQHgd1DR0nWQM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bhxl2mFlUiTWzWLA3y/YGqTHQsE/gJaTEZoPINnDNIsr+NUes/GW8VCfg6FNjdJEto4rEiQ6R9PYG3EXbkpJf/zY6Bmt1LhlZmjbYu1fj2l3lVeCzPrs0TyuWyorSlXAxd6ODIk5Ip9k3AlGWbdgaMssGIpH+SG+dhMvI2zgejA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=trJNUFkS; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=lgg15eu2; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=trJNUFkS; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=lgg15eu2; arc=none smtp.client-ip=195.135.223.131
+	 In-Reply-To:Content-Type; b=cJgozfkQw+ZSckStS3ircrpZK9Cr36M1d1mIJME5nIbeyTFLU4JKZOwuuFRFj3VeaaDAbx2BTyitEPbUdzWKA+Ul+6T3QI56U0ixyEGtoMLTH+NCErUo7QrqsxTZDieZDhJZBaOLvRztnOtbpk/0TJwSezDOdAbzxdqWKpaMOaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=jKZYmX/h; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ONlrhsmX; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=s94xDyjQ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=JAgPTDof; arc=none smtp.client-ip=195.135.223.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="trJNUFkS";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="lgg15eu2";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="trJNUFkS";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="lgg15eu2"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="jKZYmX/h";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ONlrhsmX";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="s94xDyjQ";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="JAgPTDof"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id F2F021F387;
-	Tue, 23 Jul 2024 06:24:09 +0000 (UTC)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id E50541FBA2;
+	Tue, 23 Jul 2024 06:26:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1721715850; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1721715976; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=OEITy78FO3t1YAeFiajyfi1Xs3jFEWuZv1WjhZ+fRqM=;
-	b=trJNUFkSTaIrBRM+mVB0xq26WbigzX7MINh1+f2X+/iCcuC7Qg7yaN3EOt7A2S+YfBCAHj
-	bAE2y19VknyWuMMTv3qI0m1M65WcAAMF5C+Q7x+9HkhZA3EPAR97tuTuRM8PieUjbSqZiS
-	BH+jJ8MFjh30XwQJvbk9FLP6yaTx3AM=
+	bh=sVaMf9c+l8gM9tbWJVbYHvoX5kYpyszS0eYVw3y7AhA=;
+	b=jKZYmX/htBO1DYvPe0mFjDMOQJ89BnLi+V9i43DyMI8u4L/hdXHXVwhLKyyK0JqUnAGEuE
+	D0n7OVVC6kPQ0P7qXQUcA3nBNHCd4ITWJnKftorPteGYgH+OhAquxBiF0dgR2H0lrafWQN
+	i+r1XDOLN9UzUqLOw+y/lzMnUpOkhb4=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1721715850;
+	s=susede2_ed25519; t=1721715976;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=OEITy78FO3t1YAeFiajyfi1Xs3jFEWuZv1WjhZ+fRqM=;
-	b=lgg15eu2LB6oIU0jjfJsEazUNp/Xrgcgg9lmp5+VCsbyaizzoTN71e5InAhVmpSeI42U5p
-	3KMOHs6DFrJ9SbBw==
+	bh=sVaMf9c+l8gM9tbWJVbYHvoX5kYpyszS0eYVw3y7AhA=;
+	b=ONlrhsmXd5ATkdjqoNbd0sxywSdSsIX8K0An/VoD8w1fvrRhgdagZNuu7X6fU0fqFyQ0ic
+	ZGHCTDVsOwsEvHCg==
 Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=trJNUFkS;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=lgg15eu2
+	none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1721715850; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	t=1721715975; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=OEITy78FO3t1YAeFiajyfi1Xs3jFEWuZv1WjhZ+fRqM=;
-	b=trJNUFkSTaIrBRM+mVB0xq26WbigzX7MINh1+f2X+/iCcuC7Qg7yaN3EOt7A2S+YfBCAHj
-	bAE2y19VknyWuMMTv3qI0m1M65WcAAMF5C+Q7x+9HkhZA3EPAR97tuTuRM8PieUjbSqZiS
-	BH+jJ8MFjh30XwQJvbk9FLP6yaTx3AM=
+	bh=sVaMf9c+l8gM9tbWJVbYHvoX5kYpyszS0eYVw3y7AhA=;
+	b=s94xDyjQGUEBMRpl+guIzC/nThd7sZX7nb8MBstFatd3o9lHgNTnrvP4UGsr65IZLAtsgy
+	+UTT64+nnMWpc4338CYdnHAkBSaNg7MyoFKhkOmjzwqlniEL2TgrnAK1ucCj31g27f0e9M
+	68vDSYHHfNle2ctBdHndjM7WFOKmycY=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1721715850;
+	s=susede2_ed25519; t=1721715975;
 	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
 	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=OEITy78FO3t1YAeFiajyfi1Xs3jFEWuZv1WjhZ+fRqM=;
-	b=lgg15eu2LB6oIU0jjfJsEazUNp/Xrgcgg9lmp5+VCsbyaizzoTN71e5InAhVmpSeI42U5p
-	3KMOHs6DFrJ9SbBw==
+	bh=sVaMf9c+l8gM9tbWJVbYHvoX5kYpyszS0eYVw3y7AhA=;
+	b=JAgPTDofH9pvrRIZS+NPbS9h7ieW4q0LNvkb2zXNgqbMMU6QmzX9T+skxrmIUYFQMlf/AS
+	Z3wAyDlIF3ppE1Cw==
 Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 973D213888;
-	Tue, 23 Jul 2024 06:24:09 +0000 (UTC)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 8D99813888;
+	Tue, 23 Jul 2024 06:26:15 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
 	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id gAC3IolMn2b7QgAAD6G6ig
-	(envelope-from <hare@suse.de>); Tue, 23 Jul 2024 06:24:09 +0000
-Message-ID: <08bd78ee-d772-44a3-a89a-c9c0bb27e487@suse.de>
-Date: Tue, 23 Jul 2024 08:24:09 +0200
+	id kQrLHgdNn2a2QwAAD6G6ig
+	(envelope-from <hare@suse.de>); Tue, 23 Jul 2024 06:26:15 +0000
+Message-ID: <d0101bf1-5f71-4fe4-b391-e6d761c8a9e3@suse.de>
+Date: Tue, 23 Jul 2024 08:26:15 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -83,235 +82,126 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/9] crypto,fs: Separate out hkdf_extract() and
- hkdf_expand()
+Subject: Re: [PATCH 4/9] nvme: add nvme_auth_derive_tls_psk()
 Content-Language: en-US
 To: Eric Biggers <ebiggers@kernel.org>, Hannes Reinecke <hare@kernel.org>
 Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
  Sagi Grimberg <sagi@grimberg.me>, linux-crypto@vger.kernel.org,
  linux-nvme@lists.infradead.org
 References: <20240722142122.128258-1-hare@kernel.org>
- <20240722142122.128258-2-hare@kernel.org>
- <20240723013602.GA2319848@google.com>
+ <20240722142122.128258-5-hare@kernel.org>
+ <20240723014715.GB2319848@google.com>
 From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20240723013602.GA2319848@google.com>
+In-Reply-To: <20240723014715.GB2319848@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Score: -1.30
-X-Spam-Flag: NO
-X-Spamd-Result: default: False [-1.30 / 50.00];
+X-Spam-Score: -4.09
+X-Spamd-Result: default: False [-4.09 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
 	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
 	MIME_GOOD(-0.10)[text/plain];
 	XM_UA_NO_VERSION(0.01)[];
-	MX_GOOD(-0.01)[];
-	DWL_DNSWL_BLOCKED(0.00)[suse.de:dkim];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_SOME(0.00)[];
 	RCPT_COUNT_SEVEN(0.00)[7];
-	MIME_TRACE(0.00)[0:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
 	ARC_NA(0.00)[];
 	MID_RHS_MATCH_FROM(0.00)[];
+	MIME_TRACE(0.00)[0:+];
 	RCVD_TLS_ALL(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
 	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
+	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
 	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Rspamd-Action: no action
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,imap1.dmz-prg2.suse.org:helo]
 X-Spam-Level: 
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Queue-Id: F2F021F387
+X-Spam-Flag: NO
 
-On 7/23/24 03:36, Eric Biggers wrote:
-> On Mon, Jul 22, 2024 at 04:21:14PM +0200, Hannes Reinecke wrote:
->> diff --git a/crypto/Makefile b/crypto/Makefile
->> index edbbaa3ffef5..b77fc360f0ff 100644
->> --- a/crypto/Makefile
->> +++ b/crypto/Makefile
->> @@ -29,6 +29,7 @@ obj-$(CONFIG_CRYPTO_ECHAINIV) += echainiv.o
->>   
->>   crypto_hash-y += ahash.o
->>   crypto_hash-y += shash.o
->> +crypto_hash-y += hkdf.o
->>   obj-$(CONFIG_CRYPTO_HASH2) += crypto_hash.o
-> 
-> This should go under a kconfig option CONFIG_CRYPTO_HKDF that is selected by the
-> users that need it.  That way the code will be built only when needed.
-> 
-Okay.
-
-> Including a self-test would also be desirable.
-> 
-First time for me, but ok.
-
->> diff --git a/crypto/hkdf.c b/crypto/hkdf.c
->> new file mode 100644
->> index 000000000000..22e343851c0b
->> --- /dev/null
->> +++ b/crypto/hkdf.c
->> @@ -0,0 +1,112 @@
->> +// SPDX-License-Identifier: GPL-2.0
+On 7/23/24 03:47, Eric Biggers wrote:
+> On Mon, Jul 22, 2024 at 04:21:17PM +0200, Hannes Reinecke wrote:
 >> +/*
->> + * Implementation of HKDF ("HMAC-based Extract-and-Expand Key Derivation
->> + * Function"), aka RFC 5869.  See also the original paper (Krawczyk 2010):
->> + * "Cryptographic Extraction and Key Derivation: The HKDF Scheme".
+>> + * Derive a TLS PSK as specified in TP8018 Section 3.6.1.3:
+>> + *   TLS PSK and PSK identity Derivation
 >> + *
->> + * This is used to derive keys from the fscrypt master keys.
-> 
-> This is no longer in fs/crypto/, so the part about fscrypt should be removed.
-> 
-Will be removing this line.
-
->> +/*
->> + * HKDF consists of two steps:
->> + *
->> + * 1. HKDF-Extract: extract a pseudorandom key of length HKDF_HASHLEN bytes from
->> + *    the input keying material and optional salt.
-> 
-> It doesn't make sense to refer to HKDF_HASHLEN here since it is specific to
-> fs/crypto/.
-> 
-Ok.
-
->> +/* HKDF-Extract (RFC 5869 section 2.2), unsalted */
->> +int hkdf_extract(struct crypto_shash *hmac_tfm, const u8 *ikm,
->> +		 unsigned int ikmlen, u8 *prk)
-> 
-> Needs kerneldoc now that this is a library interface.
-> 
-Indeed, will be updating the comment.
-
+>> + * The TLS PSK shall be derived as follows from an input PSK
+>> + * (i.e., either a retained PSK or a generated PSK) and a PSK
+>> + * identity using the HKDF-Extract and HKDF-Expand-Label operations
+>> + * (refer to RFC 5869 and RFC 8446) where the hash function is the
+>> + * one specified by the hash specifier of the PSK identity:
+>> + * 1. PRK = HKDF-Extract(0, Input PSK); and
+>> + * 2. TLS PSK = HKDF-Expand-Label(PRK, "nvme-tls-psk", PskIdentityContext, L),
+>> + * where PskIdentityContext is the hash identifier indicated in
+>> + * the PSK identity concatenated to a space character and to the
+>> + * Base64 PSK digest (i.e., "<hash> <PSK digest>") and L is the
+>> + * output size in bytes of the hash function (i.e., 32 for SHA-256
+>> + * and 48 for SHA-384).
+>> + */
+>> +int nvme_auth_derive_tls_psk(int hmac_id, u8 *psk, size_t psk_len,
+>> +		u8 *psk_digest, u8 **ret_psk)
 >> +{
->> +	unsigned int prklen = crypto_shash_digestsize(hmac_tfm);
->> +	u8 *default_salt;
->> +	int err;
+>> +	struct crypto_shash *hmac_tfm;
+>> +	const char *hmac_name;
+>> +	const char *psk_prefix = "tls13 nvme-tls-psk";
+>> +	size_t info_len, prk_len;
+>> +	char *info;
+>> +	unsigned char *prk, *tls_key;
+>> +	int ret;
 >> +
->> +	default_salt = kzalloc(prklen, GFP_KERNEL);
->> +	if (!default_salt)
->> +		return -ENOMEM;
-> 
-> Now that this is a library interface, it should take the salt as a parameter,
-> and the users who want the default salt should explicitly specify that.  If we
-> only provide support for unsalted use, that might inadventently discourage the
-> use of a salt in future code.  As the function is named hkdf_extract(), people
-> might also overlook that it's unsalted and doesn't actually match the RFC's
-> definition of HKDF-Extract.
-> 
-> The use of kzalloc here is also inefficient, as the maximum length of a digest
-> is known (HKDF_HASHLEN in fs/crypto/ case, HASH_MAX_DIGESTSIZE in general).
-> 
-I was trying to keep the changes to the actual code to a minimum, so I 
-didn't modify the calling sequence of the original code.
-But sure, passing in the 'salt' as a parameter is sensible.
-
->> +	err = crypto_shash_setkey(hmac_tfm, default_salt, prklen);
->> +	if (!err)
->> +		err = crypto_shash_tfm_digest(hmac_tfm, ikm, ikmlen, prk);
+>> +	hmac_name = nvme_auth_hmac_name(hmac_id);
+>> +	if (!hmac_name) {
+>> +		pr_warn("%s: invalid hash algoritm %d\n",
+>> +			__func__, hmac_id);
+>> +		return -EINVAL;
+>> +	}
+>> +	if (hmac_id == NVME_AUTH_HASH_SHA512) {
+>> +		pr_warn("%s: unsupported hash algorithm %s\n",
+>> +			__func__, hmac_name);
+>> +		return -EINVAL;
+>> +	}
 >> +
->> +	kfree(default_salt);
->> +	return err;
->> +}
->> +EXPORT_SYMBOL_GPL(hkdf_extract);
+>> +	hmac_tfm = crypto_alloc_shash(hmac_name, 0, 0);
+>> +	if (IS_ERR(hmac_tfm))
+>> +		return PTR_ERR(hmac_tfm);
 >> +
->> +/*
->> + * HKDF-Expand (RFC 5869 section 2.3).
->> + * This expands the pseudorandom key, which was already keyed into @hmac_tfm,
->> + * into @okmlen bytes of output keying material parameterized by the
->> + * application-specific @info of length @infolen bytes.
->> + * This is thread-safe and may be called by multiple threads in parallel.
->> + */
->> +int hkdf_expand(struct crypto_shash *hmac_tfm,
->> +		const u8 *info, unsigned int infolen,
->> +		u8 *okm, unsigned int okmlen)
+>> +	prk_len = crypto_shash_digestsize(hmac_tfm);
+>> +	prk = kzalloc(prk_len, GFP_KERNEL);
+>> +	if (!prk) {
+>> +		ret = -ENOMEM;
+>> +		goto out_free_shash;
+>> +	}
+>> +
+>> +	ret = hkdf_extract(hmac_tfm, psk, psk_len, prk);
+>> +	if (ret)
+>> +		goto out_free_prk;
+>> +
+>> +	ret = crypto_shash_setkey(hmac_tfm, prk, prk_len);
+>> +	if (ret)
+>> +		goto out_free_prk;
+>> +
+>> +	info_len = strlen(psk_digest) + strlen(psk_prefix) + 1;
+>> +	info = kzalloc(info_len, GFP_KERNEL);
+>> +	if (!info)
+>> +		goto out_free_prk;
+>> +
+>> +	memcpy(info, psk_prefix, strlen(psk_prefix));
+>> +	memcpy(info + strlen(psk_prefix), psk_digest, strlen(psk_digest));
 > 
-> Needs kerneldoc now that this is a library interface.
+> The code doesn't match the description given in the function comment (which
+> looks like it was quoted from a specification).
 > 
-Ok.
-
->> diff --git a/fs/crypto/hkdf.c b/fs/crypto/hkdf.c
->> index 5a384dad2c72..9c2f9aca9412 100644
->> --- a/fs/crypto/hkdf.c
->> +++ b/fs/crypto/hkdf.c
->> // SPDX-License-Identifier: GPL-2.0
->> /*
->> * Implementation of HKDF ("HMAC-based Extract-and-Expand Key Derivation
->> * Function"), aka RFC 5869.  See also the original paper (Krawczyk 2010):
->> * "Cryptographic Extraction and Key Derivation: The HKDF Scheme".
->> *
->> * This is used to derive keys from the fscrypt master keys.
->> *
->> * Copyright 2019 Google LLC
->> */
+> The code does HKDF-Expand with info="tls13 nvme-tls-psk<PSK digest>".
 > 
-> The above file comment should be adjusted now that this file doesn't contain the
-> actual HKDF implementation.
+> The description does HKDF-Expand-Label with Label="nvme-tls-psk",
+> Context="<hash identifier> <PSK digest>", Length=digest_size.
 > 
-Ok.
-
->> @@ -118,61 +105,24 @@ int fscrypt_hkdf_expand(const struct fscrypt_hkdf *hkdf, u8 context,
->>   			u8 *okm, unsigned int okmlen)
->>   {
->>   	SHASH_DESC_ON_STACK(desc, hkdf->hmac_tfm);
->> -	u8 prefix[9];
->> -	unsigned int i;
->> +	u8 *prefix;
->>   	int err;
->> -	const u8 *prev = NULL;
->> -	u8 counter = 1;
->> -	u8 tmp[HKDF_HASHLEN];
->>   
->>   	if (WARN_ON_ONCE(okmlen > 255 * HKDF_HASHLEN))
->>   		return -EINVAL;
->>   
->> +	prefix = kzalloc(okmlen + 9, GFP_KERNEL);
->> +	if (!prefix)
->> +		return -ENOMEM;
->>   	desc->tfm = hkdf->hmac_tfm;
->>   
->>   	memcpy(prefix, "fscrypt\0", 8);
->>   	prefix[8] = context;
->> +	memcpy(prefix + 9, info, infolen);
+> Not only does the code not actually use <hash identifier>, but it doesn't follow
+> the definition of HKDF-Expand-Label from RFC8446
+> (https://datatracker.ietf.org/doc/html/rfc8446#section-7.1) in that it's missing
+> all the length fields.  So the info string used by the actual code ends up being
+> quite different from the one specified.
 > 
-> This makes the variable called 'prefix' no longer be the prefix, but rather the
-> full info string.  A better name for it would be 'full_info'.
-> 
-> Also, it's being allocated with the wrong length.  It should be 9 + infolen.
-> 
-Will fix it up.
-
->> +	err = hkdf_expand(hkdf->hmac_tfm, prefix, infolen + 8,
->> +			  okm, okmlen);
->> +	kfree(prefix);
-> 
-> kfree_sensitive()
-> 
->> diff --git a/include/crypto/hkdf.h b/include/crypto/hkdf.h
->> new file mode 100644
->> index 000000000000..bf06c080d7ed
->> --- /dev/null
->> +++ b/include/crypto/hkdf.h
->> @@ -0,0 +1,18 @@
->> +/* SPDX-License-Identifier: GPL-2.0-or-later */
->> +/*
->> + * HKDF: HMAC-based Key Derivation Function (HKDF), RFC 5869
->> + *
->> + * Extracted from fs/crypto/hkdf.c, which has
->> + * Copyright 2019 Google LLC
->> + */
-> 
-> If this is keeping the copyright of fs/crypto/hkdf.c, the license needs to stay
-> the same (GPL-2.0, not GPL-2.0-or-later).
-> 
-Will be modifying it.
-
-Thanks a lot for your review!
+Aw. Guess you are right. Will be fixing it up.
 
 Cheers,
 
