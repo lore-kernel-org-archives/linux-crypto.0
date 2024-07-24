@@ -1,281 +1,105 @@
-Received: from mail.manjaro.org (mail.manjaro.org [116.203.91.91])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f53.google.com (mail-oo1-f53.google.com [209.85.161.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5B68481A3;
-	Wed, 24 Jul 2024 06:07:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.91.91
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17C5615CD49
+	for <linux-crypto@vger.kernel.org>; Wed, 24 Jul 2024 16:09:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721801283; cv=none; b=lLoRD9OBlba++aiEBVB4voYU2g4lxfxuAhDgzjuJL6ApY0vqYRADO+IiomEKi9S0VWq7r2Ji0eTqO1hOD4Z42OEeIdlijsCghdlx65pC9+xEpgtnBbI8EQGYrYxI46r6H/+/+lHUQHO9kjNFUaeA84YSEG90UkJeeJIECA8HBEU=
+	t=1721837388; cv=none; b=dn7JGen5XHz/aZRq5iwzJQXZZH2GfcOenPUiN44zHgnLGWbJRetp+WDQ/RTNJJ94ssaeZoBo6FgF3FtC7mhgRpokikzkogBU+ye+QePQPJczRhd2wMLF5+v99qqRbZMg0K6bx0WNSNeXdffoz+Kj0WuMy6GHRx7zMmTthAbm0is=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721801283; c=relaxed/simple;
-	bh=jInSfdolrSb6rZZTNpR8KYUxyhXwMQW98qG0aYlhT7k=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=plRYqaDL29hjmmyURAyrXthW95p96OfW+Q1STcrA+ln/LI7N1wVjG+cfcqpU/v3H0reF55kNzrrTrUXo3Bs2LJOdJKn7v3JhlMTvrwn7TBQKX9BWO2S0LmN4JUb386E5nlKP8PDn6cuKQ5tF+qDvsXQTBm+65DVxISlZLwFEvBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org; spf=pass smtp.mailfrom=manjaro.org; dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b=Jv+PLl69; arc=none smtp.client-ip=116.203.91.91
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manjaro.org
+	s=arc-20240116; t=1721837388; c=relaxed/simple;
+	bh=irBx30ZH81Fx6HQI9IkJBrgeBdvBm9pERG4FSMQxMC8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=KT8reT+ycekxBEAx4TGdh19j9vjaX2iMt21/IyyiJzzmgwbgcgMqMlal0kN8U272xqs6MlYq6jWBkoi9xi15RMr000PErfhmWlni8UYi/nIp/Xykt58Rj5qDr2llbiAZ0HHBKAM4jJUPc8vxVaKYd7AUI0ptDgdvUIwre7QCgmE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=wP40oO2d; arc=none smtp.client-ip=209.85.161.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b="Jv+PLl69"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wP40oO2d"
+Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-5cebf0b37fcso11912eaf.1
+        for <linux-crypto@vger.kernel.org>; Wed, 24 Jul 2024 09:09:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1721837386; x=1722442186; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=h1PBLgIHK487Z50PNrv9ADUF0TlVhgZyaxmIow0sPp4=;
+        b=wP40oO2dBS+rjR249dRQfWx3BLWseJVbRKHlmZDoZNNgA3PmgBDWGL0KPs5p3GMdIJ
+         0JxTlp7O1RdTlyVqDaBaG4hlpVlmZPCvrFYDZCWBaF9kVlS/Y11y6dyRBmxWooIY/T3S
+         uLDfNqMA6VME/yyhPNod3SGKn3jSGNU6VwtLNYHAy2Ipgtei6pnbqRl5aO9JFKmCjbzE
+         oS4/Jom9JqXor9QpwyBG2EcMpNSNU5SoYSqrIu7/+Dot9NRLwZ/Z/NXIDdf3uFD89sjV
+         FDr5wFd9oDQ36mp8fadEnPVMmc4ZwJme8Gh7rDTMPvmfHssN7XsysRq92PJa+Qm4D2Od
+         suXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721837386; x=1722442186;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=h1PBLgIHK487Z50PNrv9ADUF0TlVhgZyaxmIow0sPp4=;
+        b=JtvHCgg3gHsEU0lHa7BdiTibAcXDpAXQ6tSH427yaeBhdWDfNKOwhojPz8nLjv2WUG
+         ahFV4kYoVb/fmu670lbCANx5Myo4vbqcvzY+6sH3BF0DaZ9v7I4f4Ela9t4xW0ojxS2G
+         M6lU94FbCp1XdTgt0eWbgh4OY90mjraU/55ZQjaRmeH6r/Gf9IXMekL8xpgJ5CYF4IG+
+         8p4HQgFFGpkAGf5cLSY+6YuCwLNWwosLrfPtqbuCVziBhAcplWsMbjX6jXruuDuQ20Qv
+         pYK52Xpon1aqOI+mnCNRc1bHjMVYWRX0AfxdWwgCuPjfbpkHIVImmhmuax7gy4r2Nx78
+         TBYw==
+X-Forwarded-Encrypted: i=1; AJvYcCVobZyDMckxIdF6fScZyLWaLIKt1xfcOzAPlXztDjCgpnjxkwHUVNliEnc0ZhM2B5uh15Xa3SH1Godu+/9mpVPtArhCLct3vz4IHEes
+X-Gm-Message-State: AOJu0Yy4MdBZIL85OTaYIzMqChA0wCqkUse7hQrpHd6EHD7JWf6puXP8
+	WfbfNFJF1ssaXnvZBxDoOoK/wCjrWVEfwlcYleP4YjAwKI5PPpTd9pJH8EnDKRw=
+X-Google-Smtp-Source: AGHT+IHFom7KvpfbYKrPK/1mGnzI+CArrRK1rhoQT2jftUr92K4IlDd8GEMZkPh8yOdOvyQOSkETJg==
+X-Received: by 2002:a05:6820:200e:b0:5ba:f20c:3629 with SMTP id 006d021491bc7-5d5add05fd4mr387041eaf.4.1721837386161;
+        Wed, 24 Jul 2024 09:09:46 -0700 (PDT)
+Received: from localhost ([2603:8080:b800:f700:23ae:46cb:84b6:1002])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-5d59f07e534sm364151eaf.43.2024.07.24.09.09.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jul 2024 09:09:45 -0700 (PDT)
+Date: Wed, 24 Jul 2024 11:09:43 -0500
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Tom Zanussi <tom.zanussi@linux.intel.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: [PATCH] crypto: iaa - Fix potential use after free bug
+Message-ID: <e049271f-41f2-4d04-ac69-80186f2eecd9@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manjaro.org; s=2021;
-	t=1721801277;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XyjInt3tUidOyksxXpHHpDTL3zQ9fivow6y7hPi+Pno=;
-	b=Jv+PLl69onj6PsmLDv9OGGgcsJIk6CcGUDtFNWwsNxrClYC0BX/MWOSwjKLN03FhPovzcy
-	yVoxU/Vn7jROb7vesIgxuN+llQ6MX0Jwf3dXSWsn7vtKWjynEqa32D05UMD7IzDv1IpAEz
-	QSg93FKdkm7Xo66nuxpChrdZXBYH/d3j8c4WU+/Xeib38kannBWEbVTKWLxHOZkiS8etT6
-	Mm37bq289hYMKCgObh8hMcy0lrdVMW7IANkJBOoVyKZF/Mad9vKtCrOFBLDTk6T+C0e/TJ
-	hiHlDHfS2xSH2+DzHl25RP0UQpGkrRwbnoyNbIKuH8NV/dNnlGSSu6OCHdZjeQ==
-Date: Wed, 24 Jul 2024 08:07:51 +0200
-From: Dragan Simic <dsimic@manjaro.org>
-To: Diederik de Haas <didi.debian@cknow.org>
-Cc: Chen-Yu Tsai <wens@kernel.org>, Daniel Golle <daniel@makrotopia.org>,
- linux-rockchip@lists.infradead.org, linux-arm-kernel@lists.infradead.org,
- Rob Herring <robh@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
- linux-kernel@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
- Martin Kaiser <martin@kaiser.cx>, Sascha Hauer <s.hauer@pengutronix.de>,
- Sebastian Reichel <sebastian.reichel@collabora.com>, Ard Biesheuvel
- <ardb@kernel.org>, =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <ukleinek@debian.org>,
- devicetree@vger.kernel.org, linux-crypto@vger.kernel.org, Philipp Zabel
- <p.zabel@pengutronix.de>, Olivia Mackall <olivia@selenic.com>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Aurelien Jarno <aurelien@aurel32.net>, Heiko
- Stuebner <heiko@sntech.de>
-Subject: Re: [PATCH v7 0/3] hwrng: add hwrng support for Rockchip RK3568
-In-Reply-To: <4406786.zLnsZ2vfAB@bagend>
-References: <cover.1720969799.git.daniel@makrotopia.org>
- <3190961.CRkYR5qTbq@bagend>
- <CAGb2v64Dx7XaJOu0HHzFxYYY2ddUZao5Tar8-s1R_miVZqWcXA@mail.gmail.com>
- <4406786.zLnsZ2vfAB@bagend>
-Message-ID: <faa0baebabd3c31adf1afa7efbbdf608@manjaro.org>
-X-Sender: dsimic@manjaro.org
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Authentication-Results: ORIGINATING;
-	auth=pass smtp.auth=dsimic@manjaro.org smtp.mailfrom=dsimic@manjaro.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
 
-Hello Diederik and Chen-Yu,
+The free_device_compression_mode(iaa_device, device_mode) function frees
+"device_mode" but it iss passed to iaa_compression_modes[i]->free() a few
+lines later resulting in a use after free.
 
-On 2024-07-22 21:03, Diederik de Haas wrote:
-> On Monday, 22 July 2024 19:57:05 CEST Chen-Yu Tsai wrote:
->> On Wed, Jul 17, 2024 at 12:54 AM Diederik de Haas 
->> <didi.debian@cknow.org>
-> wrote:
->> > On Tuesday, 16 July 2024 17:18:48 CEST Chen-Yu Tsai wrote:
->> > > On Jul 16, 2024 at 10:13 PM Diederik de Haas <didi.debian@cknow.org>
-> wrote:
->> > > > On Tuesday, 16 July 2024 15:59:40 CEST Diederik de Haas wrote:
->> > > > > For shits and giggles, I tried it on my PineTab2 too (also rk3566):
->> > > > >
->> > > > > ===========================================================
->> > > > > root@pinetab2:~# uname -a
->> > > > > Linux pinetab2 6.10+unreleased-arm64 #1 SMP Debian 6.10-1~cknow
->> > > > > (2024-04-24) aarch64 GNU/Linux
->> > > > >
->> > > > > root@pinetab2:~# dd if=/dev/hwrng bs=100000 count=1 > /dev/null
->> > > > > 1+0 records in
->> > > > > 1+0 records out
->> > > > > 100000 bytes (100 kB, 98 KiB) copied, 5,69533 s, 17,6 kB/s
->> > > > >
->> > > > > root@plebian-pinetab2:~# cat /dev/hwrng | rngtest -c 1000
->> > > > > rngtest 5
->> > > > > ...
->> > > > > rngtest: starting FIPS tests...
->> > > > > rngtest: bits received from input: 20000032
->> > > > > rngtest: FIPS 140-2 successes: 730
->> > > > > rngtest: FIPS 140-2 failures: 270
->> > > > > ===========================================================
->> > > > >
->> > > > > That's looking quite a lot better ... and I have no idea why.
->> > > > >
->> > > > > The Q64-A is used as headless server and the PineTab2 is not,
->> > > > > but I connected to both over SSH and they were freshly booted
->> > > > > into, thus I haven't actually/normally used the PT2 since boot.
->> > > >
->> > > > I did freshly install rng-tools5 package before running the test, so
->> > > > I rebooted again to make sure that wasn't a factor:
->> > > >
->> > > > ===========================================================
->> > > > root@pinetab2:~# cat /dev/hwrng | rngtest -c 1000
->> > > > rngtest 5
->> > > > ...
->> > > > rngtest: starting FIPS tests...
->> > > > rngtest: bits received from input: 20000032
->> > > > rngtest: FIPS 140-2 successes: 704
->> > > > rngtest: FIPS 140-2 failures: 296
->> > > > ===========================================================
->> > > >
->> > > > So that 704/296 vs 730/270 in the previous run on the PT2.
->> > > >
->> > > On my Rock 3A:
->> > >
->> > > wens@rock-3a:~$ sudo cat /dev/hwrng | rngtest -c 1000
->> > > rngtest 5
->> > > ...
->> > > rngtest: starting FIPS tests...
->> > > rngtest: bits received from input: 20000032
->> > > rngtest: FIPS 140-2 successes: 992
->> > > rngtest: FIPS 140-2 failures: 8
->> > >
->> > > wens@rock-3a:~$ uname -a
->> > > Linux rock-3a 6.10.0-rc7-next-20240712-12899-g7df602fe7c8b #9 SMP Mon
->> > > Jul 15 00:39:32 CST 2024 aarch64 GNU/Linux
->> >
->> > I wondered if ``dd if=/dev/hwrng bs=100000 count=1 > /dev/null`` before
->> > the actual test run made a difference.
->> > Tried it on my Quartz64 Model A: no
->> >
->> > Then I tried it on my Quartz64 Model B:
->> >
->> > root@quartz64b:~# cat /dev/hwrng | rngtest -c 1000
->> > rngtest 5
->> > ...
->> > rngtest: starting FIPS tests...
->> > rngtest: bits received from input: 20000032
->> > rngtest: FIPS 140-2 successes: 120
->> > rngtest: FIPS 140-2 failures: 880
->> >
->> > root@quartz64b:~# dd if=/dev/hwrng bs=100000 count=1 > /dev/null
->> > 1+0 records in
->> > 1+0 records out
->> > 100000 bytes (100 kB, 98 KiB) copied, 5.71466 s, 17.5 kB/s
->> >
->> > root@quartz64b:~# cat /dev/hwrng | rngtest -c 1000
->> > rngtest 5
->> > ...
->> > rngtest: starting FIPS tests...
->> > rngtest: bits received from input: 20000032
->> > rngtest: FIPS 140-2 successes: 104
->> > rngtest: FIPS 140-2 failures: 896
->> >
->> > root@quartz64b:~# uname -a
->> > Linux quartz64b 6.10+unreleased-arm64 #1 SMP Debian 6.10-1~cknow
->> > (2024-04-24) aarch64 GNU/Linux>
->> > :-O
->> 
->> I pulled out my Quartz64 model B, and the results seem better than 
->> yours.
->> 
->> root@quartz64:~# sudo dd if=/dev/hwrng bs=256 | rngtest -c 1000
->> rngtest 5
->> ...
->> rngtest: starting FIPS tests...
->> rngtest: bits received from input: 20000032
->> rngtest: FIPS 140-2 successes: 859
->> rngtest: FIPS 140-2 failures: 141
->> root@quartz64:~# sudo dd if=/dev/hwrng bs=256 | rngtest -c 1000
->> rngtest 5
->> ...
->> rngtest: starting FIPS tests...
->> rngtest: bits received from input: 20000032
->> rngtest: FIPS 140-2 successes: 843
->> rngtest: FIPS 140-2 failures: 157
-> 
-> I noticed you used ``dd`` instead of ``cat``, so I tried again ...
-> 
-> Quartz64-A:
-> root@quartz64a:~# dd if=/dev/hwrng bs=256 | rngtest -c 1000
-> rngtest 5
-> ...
-> rngtest: starting FIPS tests...
-> 
-> rngtest: bits received from input: 20000032
-> 
-> rngtest: FIPS 140-2 successes: 411
-> 
-> rngtest: FIPS 140-2 failures: 589
-> 
-> root@quartz64a:~# dd if=/dev/hwrng bs=256 | rngtest -c 1000
-> ...
-> rngtest: starting FIPS tests...
-> rngtest: bits received from input: 20000032
-> rngtest: FIPS 140-2 successes: 391
-> rngtest: FIPS 140-2 failures: 609
-> 
-> root@quartz64a:~# dd if=/dev/hwrng bs=100000 count=1 > /dev/null
-> 1+0 records in
-> 1+0 records out
-> 100000 bytes (100 kB, 98 KiB) copied, 5.66202 s, 17.7 kB/s
-> 
-> root@quartz64a:~# dd if=/dev/hwrng bs=256 | rngtest -c 1000
-> ...
-> rngtest: FIPS 140-2 successes: 386
-> 
-> rngtest: FIPS 140-2 failures: 614
-> 
-> root@quartz64a:~# dd if=/dev/hwrng bs=256 | rngtest -c 1000
-> ...
-> rngtest: FIPS 140-2 successes: 356
-> rngtest: FIPS 140-2 failures: 644
-> 
-> Quartz64-B:
-> root@quartz64b:~# dd if=/dev/hwrng bs=256 | rngtest -c 1000
-> ...
-> rngtest: FIPS 140-2 successes: 118
-> rngtest: FIPS 140-2 failures: 882
-> 
-> root@quartz64b:~# dd if=/dev/hwrng bs=256 | rngtest -c 1000
-> ...
-> rngtest: FIPS 140-2 successes: 133
-> rngtest: FIPS 140-2 failures: 867
-> 
-> root@quartz64b:~# dd if=/dev/hwrng bs=100000 count=1 > /dev/null
-> 
-> root@quartz64b:~# dd if=/dev/hwrng bs=256 | rngtest -c 1000
-> ...
-> rngtest: FIPS 140-2 successes: 97
-> rngtest: FIPS 140-2 failures: 903
-> 
-> root@quartz64b:~# dd if=/dev/hwrng bs=256 | rngtest -c 1000
-> ...
-> rngtest: FIPS 140-2 successes: 130
-> rngtest: FIPS 140-2 failures: 870
-> 
-> And lastly on PineTab2:
-> root@pinetab2:~# dd if=/dev/hwrng bs=256 | rngtest -c 1000
-> ...
-> rngtest: FIPS 140-2 successes: 705
-> rngtest: FIPS 140-2 failures: 295
-> 
-> root@pinetab2:~# dd if=/dev/hwrng bs=256 | rngtest -c 1000
-> ...
-> rngtest: FIPS 140-2 successes: 678
-> rngtest: FIPS 140-2 failures: 322
-> 
-> root@pinetab2:~# dd if=/dev/hwrng bs=100000 count=1 > /dev/null
-> 
-> root@pinetab2:~# dd if=/dev/hwrng bs=256 | rngtest -c 1000
-> ...
-> rngtest: FIPS 140-2 successes: 681
-> rngtest: FIPS 140-2 failures: 319
-> 
-> root@pinetab2:~# dd if=/dev/hwrng bs=256 | rngtest -c 1000
-> ...
-> rngtest: FIPS 140-2 successes: 669
-> rngtest: FIPS 140-2 failures: 331
-> 
-> 
-> So my Q64-B tests are consistently MUCH worse then your Q64-B tests ...
-> This seems BAD to me, now that we even have completely different 
-> results per
-> device of the EXACT same model?!? Hardware revision may be different (I 
-> have a
-> v1.4), but it seems rather pointless to go into that direction.
-> 
-> It then also seems rather pointless to try it with different parameters 
-> if the
-> results on the same SBC model can vary this much.
+The good news is that, so far as I can tell, nothing implements the
+->free() function and the use after free happens in dead code.  But, with
+this fix, when something does implement it, we'll be ready.  :)
 
-Thanks a lot for the testing.  Though, such wildly different test 
-results
-can, regrettably, lead to only one conclusion:  the HWRNG found in 
-RK3566
-is unusable. :/
+Fixes: b190447e0fa3 ("crypto: iaa - Add compression mode management along with fixed mode")
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+---
+ drivers/crypto/intel/iaa/iaa_crypto_main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/intel/iaa/iaa_crypto_main.c
+index e810d286ee8c..237f87000070 100644
+--- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
++++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
+@@ -495,10 +495,10 @@ static void remove_device_compression_modes(struct iaa_device *iaa_device)
+ 		if (!device_mode)
+ 			continue;
+ 
+-		free_device_compression_mode(iaa_device, device_mode);
+-		iaa_device->compression_modes[i] = NULL;
+ 		if (iaa_compression_modes[i]->free)
+ 			iaa_compression_modes[i]->free(device_mode);
++		free_device_compression_mode(iaa_device, device_mode);
++		iaa_device->compression_modes[i] = NULL;
+ 	}
+ }
+ 
+-- 
+2.43.0
+
