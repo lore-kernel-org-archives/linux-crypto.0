@@ -1,105 +1,184 @@
-Received: from mail-oo1-f53.google.com (mail-oo1-f53.google.com [209.85.161.53])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17C5615CD49
-	for <linux-crypto@vger.kernel.org>; Wed, 24 Jul 2024 16:09:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA0A12B64
+	for <linux-crypto@vger.kernel.org>; Thu, 25 Jul 2024 11:50:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721837388; cv=none; b=dn7JGen5XHz/aZRq5iwzJQXZZH2GfcOenPUiN44zHgnLGWbJRetp+WDQ/RTNJJ94ssaeZoBo6FgF3FtC7mhgRpokikzkogBU+ye+QePQPJczRhd2wMLF5+v99qqRbZMg0K6bx0WNSNeXdffoz+Kj0WuMy6GHRx7zMmTthAbm0is=
+	t=1721908223; cv=none; b=N4a+O9ztg6d58ckdS08mA1sX6cfO4V+iw7zz9JXC3YjILoOi+wyG+8e2/qQRx8WfCbAHkWN9ahRjFvVjOwcLEffq8Le4GJ/gxnyaPo32X8/j14RlkT2Xd+62OTKOapTtS8GKNHmRAxytqtdpBlZzWDoc4CsMDEjXtc2yc/Q5Mcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721837388; c=relaxed/simple;
-	bh=irBx30ZH81Fx6HQI9IkJBrgeBdvBm9pERG4FSMQxMC8=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=KT8reT+ycekxBEAx4TGdh19j9vjaX2iMt21/IyyiJzzmgwbgcgMqMlal0kN8U272xqs6MlYq6jWBkoi9xi15RMr000PErfhmWlni8UYi/nIp/Xykt58Rj5qDr2llbiAZ0HHBKAM4jJUPc8vxVaKYd7AUI0ptDgdvUIwre7QCgmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=wP40oO2d; arc=none smtp.client-ip=209.85.161.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1721908223; c=relaxed/simple;
+	bh=Zwj8ZqUz5r6BEw7+r0w64+jnacyh1B1y3oPgRksVsH4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=spLEe/bfkiMgtJFMLIEaXTdw7+cdyNnSHQnvnOeDqsEMlDwrOwUjAN2hKLxuqrB/LW5GNiqEXjFXXVB4km5b/FGDochiybJoBBnZZtc6JSuigVy8qVQaWfkX5RiD0VP2kRwocUkACyZ+AK69wgPaJr8pSfmKKvaItnUZSIHQ12Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Pu3k8FNQ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=o1oCANS1; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Pu3k8FNQ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=o1oCANS1; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wP40oO2d"
-Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-5cebf0b37fcso11912eaf.1
-        for <linux-crypto@vger.kernel.org>; Wed, 24 Jul 2024 09:09:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1721837386; x=1722442186; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=h1PBLgIHK487Z50PNrv9ADUF0TlVhgZyaxmIow0sPp4=;
-        b=wP40oO2dBS+rjR249dRQfWx3BLWseJVbRKHlmZDoZNNgA3PmgBDWGL0KPs5p3GMdIJ
-         0JxTlp7O1RdTlyVqDaBaG4hlpVlmZPCvrFYDZCWBaF9kVlS/Y11y6dyRBmxWooIY/T3S
-         uLDfNqMA6VME/yyhPNod3SGKn3jSGNU6VwtLNYHAy2Ipgtei6pnbqRl5aO9JFKmCjbzE
-         oS4/Jom9JqXor9QpwyBG2EcMpNSNU5SoYSqrIu7/+Dot9NRLwZ/Z/NXIDdf3uFD89sjV
-         FDr5wFd9oDQ36mp8fadEnPVMmc4ZwJme8Gh7rDTMPvmfHssN7XsysRq92PJa+Qm4D2Od
-         suXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721837386; x=1722442186;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=h1PBLgIHK487Z50PNrv9ADUF0TlVhgZyaxmIow0sPp4=;
-        b=JtvHCgg3gHsEU0lHa7BdiTibAcXDpAXQ6tSH427yaeBhdWDfNKOwhojPz8nLjv2WUG
-         ahFV4kYoVb/fmu670lbCANx5Myo4vbqcvzY+6sH3BF0DaZ9v7I4f4Ela9t4xW0ojxS2G
-         M6lU94FbCp1XdTgt0eWbgh4OY90mjraU/55ZQjaRmeH6r/Gf9IXMekL8xpgJ5CYF4IG+
-         8p4HQgFFGpkAGf5cLSY+6YuCwLNWwosLrfPtqbuCVziBhAcplWsMbjX6jXruuDuQ20Qv
-         pYK52Xpon1aqOI+mnCNRc1bHjMVYWRX0AfxdWwgCuPjfbpkHIVImmhmuax7gy4r2Nx78
-         TBYw==
-X-Forwarded-Encrypted: i=1; AJvYcCVobZyDMckxIdF6fScZyLWaLIKt1xfcOzAPlXztDjCgpnjxkwHUVNliEnc0ZhM2B5uh15Xa3SH1Godu+/9mpVPtArhCLct3vz4IHEes
-X-Gm-Message-State: AOJu0Yy4MdBZIL85OTaYIzMqChA0wCqkUse7hQrpHd6EHD7JWf6puXP8
-	WfbfNFJF1ssaXnvZBxDoOoK/wCjrWVEfwlcYleP4YjAwKI5PPpTd9pJH8EnDKRw=
-X-Google-Smtp-Source: AGHT+IHFom7KvpfbYKrPK/1mGnzI+CArrRK1rhoQT2jftUr92K4IlDd8GEMZkPh8yOdOvyQOSkETJg==
-X-Received: by 2002:a05:6820:200e:b0:5ba:f20c:3629 with SMTP id 006d021491bc7-5d5add05fd4mr387041eaf.4.1721837386161;
-        Wed, 24 Jul 2024 09:09:46 -0700 (PDT)
-Received: from localhost ([2603:8080:b800:f700:23ae:46cb:84b6:1002])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-5d59f07e534sm364151eaf.43.2024.07.24.09.09.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jul 2024 09:09:45 -0700 (PDT)
-Date: Wed, 24 Jul 2024 11:09:43 -0500
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Tom Zanussi <tom.zanussi@linux.intel.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: [PATCH] crypto: iaa - Fix potential use after free bug
-Message-ID: <e049271f-41f2-4d04-ac69-80186f2eecd9@stanley.mountain>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Pu3k8FNQ";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="o1oCANS1";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Pu3k8FNQ";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="o1oCANS1"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id BAB5D21A6B;
+	Thu, 25 Jul 2024 11:50:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1721908219; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=voRwSZrJEOFd/xnLyYK20i8daq81INo4ohUTHXeg5sY=;
+	b=Pu3k8FNQZFVNXe5OkpeZJlD0VACtwUSNZ4v+Xj/qXzI/UdI2tkOLiLZ6BwFzTFA7hmIRPg
+	NcNR9JYet1EXQRMJ/HN+UOKO4T062oDKqvVJB1qfJDcAtTAlsfl3Rou7F2NgflWAXtzVXO
+	sgpMv49QPXWt+0jsX8q3F3Mw8fuEgno=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1721908219;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=voRwSZrJEOFd/xnLyYK20i8daq81INo4ohUTHXeg5sY=;
+	b=o1oCANS1jpCB1Vfbv9VQyy2V+M2V3+/5CZWexSwQg2iNvyaTJv2/5778EDoQp0z5IhXh3z
+	p+lVSxpHlLEwMZAw==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=Pu3k8FNQ;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=o1oCANS1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1721908219; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=voRwSZrJEOFd/xnLyYK20i8daq81INo4ohUTHXeg5sY=;
+	b=Pu3k8FNQZFVNXe5OkpeZJlD0VACtwUSNZ4v+Xj/qXzI/UdI2tkOLiLZ6BwFzTFA7hmIRPg
+	NcNR9JYet1EXQRMJ/HN+UOKO4T062oDKqvVJB1qfJDcAtTAlsfl3Rou7F2NgflWAXtzVXO
+	sgpMv49QPXWt+0jsX8q3F3Mw8fuEgno=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1721908219;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=voRwSZrJEOFd/xnLyYK20i8daq81INo4ohUTHXeg5sY=;
+	b=o1oCANS1jpCB1Vfbv9VQyy2V+M2V3+/5CZWexSwQg2iNvyaTJv2/5778EDoQp0z5IhXh3z
+	p+lVSxpHlLEwMZAw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 805251368A;
+	Thu, 25 Jul 2024 11:50:19 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id j457Hvs7omYCYwAAD6G6ig
+	(envelope-from <hare@suse.de>); Thu, 25 Jul 2024 11:50:19 +0000
+Message-ID: <f69aee16-8238-48cc-986a-6d9dc7f6d933@suse.de>
+Date: Thu, 25 Jul 2024 13:50:19 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 8/9] nvmet-tcp: support secure channel concatenation
+To: Eric Biggers <ebiggers@kernel.org>, Hannes Reinecke <hare@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
+ Sagi Grimberg <sagi@grimberg.me>, linux-crypto@vger.kernel.org,
+ linux-nvme@lists.infradead.org
+References: <20240722142122.128258-1-hare@kernel.org>
+ <20240722142122.128258-9-hare@kernel.org>
+ <20240723014854.GC2319848@google.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20240723014854.GC2319848@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	XM_UA_NO_VERSION(0.01)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:email,suse.de:dkim];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Rspamd-Action: no action
+X-Spam-Flag: NO
+X-Spam-Score: -4.30
+X-Rspamd-Queue-Id: BAB5D21A6B
 
-The free_device_compression_mode(iaa_device, device_mode) function frees
-"device_mode" but it iss passed to iaa_compression_modes[i]->free() a few
-lines later resulting in a use after free.
+On 7/23/24 03:48, Eric Biggers wrote:
+> On Mon, Jul 22, 2024 at 04:21:21PM +0200, Hannes Reinecke wrote:
+>> +	ret = nvme_auth_generate_digest(sq->ctrl->shash_id, psk, psk_len,
+>> +					sq->ctrl->subsysnqn,
+>> +					sq->ctrl->hostnqn, &digest);
+>> +	if (ret) {
+>> +		pr_warn("%s: ctrl %d qid %d failed to generate digest, error %d\n",
+>> +			__func__, sq->ctrl->cntlid, sq->qid, ret);
+>> +		goto out_free_psk;
+>> +	}
+>> +	ret = nvme_auth_derive_tls_psk(sq->ctrl->shash_id, psk, psk_len,
+>> +				       digest, &tls_psk);
+>> +	if (ret) {
+>> +		pr_warn("%s: ctrl %d qid %d failed to derive TLS PSK, error %d\n",
+>> +			__func__, sq->ctrl->cntlid, sq->qid, ret);
+>> +		goto out_free_digest;
+>> +	}
+> 
+> This reuses 'psk' as both an HMAC key and as input keying material for HKDF.
+> It's *probably* still secure, but this violates cryptographic best practices in
+> that it reuses a key for multiple purposes.  Is this a defect in the spec?
+> 
+This is using a digest calculated from the actual PSK key material, 
+true. You are right that with that we probably impact cryptographic
+reliability, but that that is what the spec mandates.
 
-The good news is that, so far as I can tell, nothing implements the
-->free() function and the use after free happens in dead code.  But, with
-this fix, when something does implement it, we'll be ready.  :)
+Actual reason for this modification was the need to identify the TLS 
+PSKs for each connection, _and_ support key refresh.
 
-Fixes: b190447e0fa3 ("crypto: iaa - Add compression mode management along with fixed mode")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
- drivers/crypto/intel/iaa/iaa_crypto_main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+We identify TLS PSKs by the combination of '<hash> <hostnqn> 
+<subsysnqn>', where '<hostnqn>' is the identification of the
+initiator (source), and '<subsynqn>' the identification of the
+target. But as we regenerate the PSK for each reset we are having
+a hard time identifying the newly generated PSK by the original
+'<hash> <hostnqn> <subsysnqn>' tuple only.
+We cannot delete the original TLS PSK directly as it might be used
+by other connections, so there will be a time where both PSKs
+are valid and have to be stored in the keyring.
 
-diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-index e810d286ee8c..237f87000070 100644
---- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
-+++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-@@ -495,10 +495,10 @@ static void remove_device_compression_modes(struct iaa_device *iaa_device)
- 		if (!device_mode)
- 			continue;
- 
--		free_device_compression_mode(iaa_device, device_mode);
--		iaa_device->compression_modes[i] = NULL;
- 		if (iaa_compression_modes[i]->free)
- 			iaa_compression_modes[i]->free(device_mode);
-+		free_device_compression_mode(iaa_device, device_mode);
-+		iaa_device->compression_modes[i] = NULL;
- 	}
- }
- 
+And keeping a global 'revision' counter is horrible, the alternative
+of having a per-connection instance counter is similarly unpleasant.
+
+Not ideal, true, so if you have better ideas I'd like to hear them.
+
+But thanks for your consideration. I'll be bringing them up.
+
+Cheers,
+
+Hannes
 -- 
-2.43.0
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
