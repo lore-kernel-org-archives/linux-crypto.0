@@ -1,210 +1,147 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B49E825624
-	for <linux-crypto@vger.kernel.org>; Fri, 26 Jul 2024 06:17:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7169D57333;
+	Sun, 28 Jul 2024 16:06:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721974635; cv=none; b=KcMYxx49PDnRxsGoQqxX+Jo+0Gpal1JYhWgFBesAvNwd22UdZyrC0ThJBIc4pppdGQsEkqsEGQQSqWROou8H+K1/VWvfEWwiI9Mzhe3eguCbkathLcDw6cJXfjK8z8cjzC/Sdxi/LsOFTXZo3IM9tvt1kAdWqdZqOR0lkPWH11Q=
+	t=1722182792; cv=none; b=pzzA6aaU1yxbEQTm6n/3eGoKCVaL5X457/x/qhRcLxfrRICLmAIPudnNaASdWulhQT+6BpwF9KHyI+DmMwXX3uF6cLgw7gvh1T/sLFwc8hFzJxEUR/OtDbg4nZjxY42bMxdqZo+bh8pPDEfyYXRn39e3tqdxSDHwOcsWiQUDiYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721974635; c=relaxed/simple;
-	bh=SYFcrnXqsc3IxHU7qgtTxd2gSBgWXh97W7HF+rJ/kPg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hAkCgXdZNXLOZbTXtkxL8kzhWX6BbrwLtG5QXiAK1Oa/EUFJecYbe8No+0EVyi7Q5EVA0cOgUpjhWC5SlKR5nseawQXz42sDgxR2XrO2nIJCSJrt4f/Nm8vJTYIZh6VTzY1iOy5joD2+jNCWEhZoi+/0zhNLBkhmW9/+a5eQTR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=rxuuFMU8; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=xUD16lYr; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=wvNrJMST; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=dYoxhtBi; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1722182792; c=relaxed/simple;
+	bh=gIToTiYNeW1cGs4mXVB1QJiyt+wWM33pHI3ZXBBaBfo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=dQp06gBC+J8yDR8Fsmw9QaitMIDGmt1BlmEzIm1RyuNHX3MbeUyAtCCphT2MPaPbZiEg6AYnz5uegrdX1Rl4XvMOMefMMle3Gweiwu40IfIMe2j2QOz4eBW7if/8nj7KFRGd3r0HOaD3h9+vxBppxZY3vmrPXeQTnRATm8/H8VQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LsD/vWlJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="rxuuFMU8";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="xUD16lYr";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="wvNrJMST";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="dYoxhtBi"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id BF913219F4;
-	Fri, 26 Jul 2024 06:17:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1721974631; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=R4AoZW+ieoAyhFjTTvcJye669tIRCsLBnaaV2INMGss=;
-	b=rxuuFMU8No+SKBr9PH4x8MDfkRh1VTUg3GyJ71YqPuC1bmw6hmCNogk17nbHb9ujQTIuOz
-	TQ06LiQ5mJoKDU764IbVi0pzcfqJZHqk9SSVeuC+sa4FhBYrP9Cz/Qk0iIMN0id9ucgTzH
-	zWkRFRAxT4fCXvg+hjQxXhBN7jaIasg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1721974631;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=R4AoZW+ieoAyhFjTTvcJye669tIRCsLBnaaV2INMGss=;
-	b=xUD16lYrw7XYxNtJHATOO1QOOT8AqQy4QT08z19XD/H10+pA6lGH2lRSHem/HxScdAgo+K
-	YEBOvzA2nWEpNVDw==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=wvNrJMST;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=dYoxhtBi
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1721974630; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=R4AoZW+ieoAyhFjTTvcJye669tIRCsLBnaaV2INMGss=;
-	b=wvNrJMSTrSuRpmQMUDdIW0vGoEHJbBuZ9Zk9Pf39NnucZ55HhRYmqJ+YpcbnKH98HAZaH4
-	bQN79va6dbFHg99qBW7OYIuAs6PaIFNbvBr3Amw43Wq7x2cJVpYpC1uUw7NLow1z663nJq
-	jKnb3KapZTv0YuTPuU8F/6/0EVf63kY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1721974630;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=R4AoZW+ieoAyhFjTTvcJye669tIRCsLBnaaV2INMGss=;
-	b=dYoxhtBiy3o1HmVI7eYHi69ZTXnQFbH/pJZEEG3572LD1Slv2nxGY7eFh58O01bWmswYF7
-	0C5n2MEXusTXEJAA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 69235138A7;
-	Fri, 26 Jul 2024 06:17:10 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id Y/NgF2Y/o2anDQAAD6G6ig
-	(envelope-from <hare@suse.de>); Fri, 26 Jul 2024 06:17:10 +0000
-Message-ID: <334a583f-0cd1-41bd-9361-766a486c115a@suse.de>
-Date: Fri, 26 Jul 2024 08:17:09 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LsD/vWlJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE30DC4AF0A;
+	Sun, 28 Jul 2024 16:06:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722182792;
+	bh=gIToTiYNeW1cGs4mXVB1QJiyt+wWM33pHI3ZXBBaBfo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=LsD/vWlJzAiaXvpIBZn0Zslwt5yyowBupstPzDMNINcpHt0BD4adSKKgkkIW4nL+p
+	 99Tm07mW/Vz4r9xHuygPzDxYQd2DbRZv2RloijduHo2DpaZ9T+5BCFDOFb4rwkneJK
+	 NSQlpU4bY7xXCU2CnWATisBDIkr5p+9+iiL8yTCp1HZL7jESb6rolqZdQdsBQBjRQw
+	 CChW0owem/E7kuRkA+0Ku1/XBatmltjUNPqvYtTWofXPCqH/88rePaHy8Cl5qeux6q
+	 HsXGD+hcS3cIZy5u/UPGnAk4OHwDqwbXkUAfA+a9e6VHO21Nfz0rmr3oQgcadDAtMh
+	 RRlS6x9sSeTFw==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Jiwei Sun <sunjw10@lenovo.com>,
+	Adrian Huang <ahuang12@lenovo.com>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Sasha Levin <sashal@kernel.org>,
+	davem@davemloft.net,
+	damian.muszynski@intel.com,
+	tero.kristo@linux.intel.com,
+	xin.zeng@intel.com,
+	siming.wan@intel.com,
+	ciunas.bennett@intel.com,
+	adam.guerin@intel.com,
+	qat-linux@intel.com,
+	linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.10 17/23] crypto: qat - initialize user_input.lock for rate_limiting
+Date: Sun, 28 Jul 2024 12:04:58 -0400
+Message-ID: <20240728160538.2051879-17-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240728160538.2051879-1-sashal@kernel.org>
+References: <20240728160538.2051879-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 8/9] nvmet-tcp: support secure channel concatenation
-Content-Language: en-US
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Hannes Reinecke <hare@kernel.org>, Christoph Hellwig <hch@lst.de>,
- Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
- linux-crypto@vger.kernel.org, linux-nvme@lists.infradead.org
-References: <20240722142122.128258-1-hare@kernel.org>
- <20240722142122.128258-9-hare@kernel.org>
- <20240723014854.GC2319848@google.com>
- <f69aee16-8238-48cc-986a-6d9dc7f6d933@suse.de>
- <20240725172118.GA2020@sol.localdomain>
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20240725172118.GA2020@sol.localdomain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.10.2
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Rspamd-Queue-Id: BF913219F4
-X-Spam-Score: -6.30
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Spamd-Result: default: False [-6.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	DWL_DNSWL_MED(-2.00)[suse.de:dkim];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	MIME_GOOD(-0.10)[text/plain];
-	XM_UA_NO_VERSION(0.01)[];
-	MX_GOOD(-0.01)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_TLS_ALL(0.00)[];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:dkim];
-	DKIM_TRACE(0.00)[suse.de:+]
 
-On 7/25/24 19:21, Eric Biggers wrote:
-> On Thu, Jul 25, 2024 at 01:50:19PM +0200, Hannes Reinecke wrote:
->> On 7/23/24 03:48, Eric Biggers wrote:
->>> On Mon, Jul 22, 2024 at 04:21:21PM +0200, Hannes Reinecke wrote:
->>>> +	ret = nvme_auth_generate_digest(sq->ctrl->shash_id, psk, psk_len,
->>>> +					sq->ctrl->subsysnqn,
->>>> +					sq->ctrl->hostnqn, &digest);
->>>> +	if (ret) {
->>>> +		pr_warn("%s: ctrl %d qid %d failed to generate digest, error %d\n",
->>>> +			__func__, sq->ctrl->cntlid, sq->qid, ret);
->>>> +		goto out_free_psk;
->>>> +	}
->>>> +	ret = nvme_auth_derive_tls_psk(sq->ctrl->shash_id, psk, psk_len,
->>>> +				       digest, &tls_psk);
->>>> +	if (ret) {
->>>> +		pr_warn("%s: ctrl %d qid %d failed to derive TLS PSK, error %d\n",
->>>> +			__func__, sq->ctrl->cntlid, sq->qid, ret);
->>>> +		goto out_free_digest;
->>>> +	}
->>>
->>> This reuses 'psk' as both an HMAC key and as input keying material for HKDF.
->>> It's *probably* still secure, but this violates cryptographic best practices in
->>> that it reuses a key for multiple purposes.  Is this a defect in the spec?
->>>
->> This is using a digest calculated from the actual PSK key material, true.
->> You are right that with that we probably impact cryptographic
->> reliability, but that that is what the spec mandates.
-> 
-> How set in stone is this specification?  Is it finalized and has it been
-> implemented by anyone else?  Your code didn't correctly implement the spec
-> anyway, so at least you must not have done any interoperability testing.
-> 
-Well ... thing is, this _is_ the first implementation. Anyone else does 
-interop testing against us.
-The spec is pretty much set in stone here; sure we can update the spec, 
-but that takes time. I can ask the primary author if he's willing to
-engage in a conversation about the cryptographic implications if you are 
-up to it.
+From: Jiwei Sun <sunjw10@lenovo.com>
 
->>
->> Actual reason for this modification was the need to identify the TLS PSKs
->> for each connection, _and_ support key refresh.
->>
->> We identify TLS PSKs by the combination of '<hash> <hostnqn> <subsysnqn>',
->> where '<hostnqn>' is the identification of the
->> initiator (source), and '<subsynqn>' the identification of the
->> target. But as we regenerate the PSK for each reset we are having
->> a hard time identifying the newly generated PSK by the original
->> '<hash> <hostnqn> <subsysnqn>' tuple only.
->> We cannot delete the original TLS PSK directly as it might be used
->> by other connections, so there will be a time where both PSKs
->> are valid and have to be stored in the keyring.
->>
->> And keeping a global 'revision' counter is horrible, the alternative
->> of having a per-connection instance counter is similarly unpleasant.
->>
->> Not ideal, true, so if you have better ideas I'd like to hear them.
->>
->> But thanks for your consideration. I'll be bringing them up.
->>
-> 
-> You are already using HKDF, so you could just use that, similar to how fscrypt
-> uses HKDF to derive both its key identifiers and its actual subkeys.  HKDF can
-> be used to derive both public and non-public values; there's no need to use a
-> separate algorithm such as plain HMAC just because you need a public value.
-> 
-I will check. But at this time I fear we have to stick with this 
-implementation because that's what the spec mandates.
+[ Upstream commit ccacbbc3176277bbfc324f85fa827d1a2656bedf ]
 
-But thanks for the review, very much appreciated.
+If the following configurations are set,
+CONFIG_DEBUG_RWSEMS=y
+CONFIG_DEBUG_LOCK_ALLOC=y
+CONFIG_RWSEM_SPIN_ON_OWNER=y
 
-Cheers,
+And run the following command,
+[root@localhost sys]# cat /sys/devices/pci0000:6b/0000:6b:00.0/qat_rl/pir
+The following warning log appears,
 
-Hannes
+------------[ cut here ]------------
+DEBUG_RWSEMS_WARN_ON(sem->magic != sem): count = 0x0, magic = 0x0, owner = 0x1, curr 0xff11000119288040, list not empty
+WARNING: CPU: 131 PID: 1254984 at kernel/locking/rwsem.c:1280 down_read+0x439/0x7f0
+CPU: 131 PID: 1254984 Comm: cat Kdump: loaded Tainted: G        W          6.10.0-rc4+ #86 b2ae60c8ceabed15f4fd2dba03c1c5a5f7f4040c
+Hardware name: Lenovo ThinkServer SR660 V3/SR660 V3, BIOS T8E166X-2.54 05/30/2024
+RIP: 0010:down_read+0x439/0x7f0
+Code: 44 24 10 80 3c 02 00 0f 85 05 03 00 00 48 8b 13 41 54 48 c7 c6 a0 3e 0e b4 48 c7 c7 e0 3e 0e b4 4c 8b 4c 24 08 e8 77 d5 40 fd <0f> 0b 59 e9 bc fc ff ff 0f 1f 44 00 00 e9 e2 fd ff ff 4c 8d 7b 08
+RSP: 0018:ffa0000035f67a78 EFLAGS: 00010286
+RAX: 0000000000000000 RBX: ff1100012b03a658 RCX: 0000000000000000
+RDX: 0000000080000002 RSI: 0000000000000008 RDI: 0000000000000001
+RBP: 1ff4000006becf53 R08: fff3fc0006becf17 R09: fff3fc0006becf17
+R10: fff3fc0006becf16 R11: ffa0000035f678b7 R12: ffffffffb40e3e60
+R13: ffffffffb627d1f4 R14: ff1100012b03a6d0 R15: ff1100012b03a6c8
+FS:  00007fa9ff9a6740(0000) GS:ff1100081e600000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fa9ff984000 CR3: 00000002118ae006 CR4: 0000000000771ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe07f0 DR7: 0000000000000400
+PKRU: 55555554
+Call Trace:
+ <TASK>
+ pir_show+0x5d/0xe0 [intel_qat 9e297e249ab040329cf58b657b06f418fd5c5855]
+ dev_attr_show+0x3f/0xc0
+ sysfs_kf_seq_show+0x1ce/0x400
+ seq_read_iter+0x3fa/0x10b0
+ vfs_read+0x6f5/0xb20
+ ksys_read+0xe9/0x1d0
+ do_syscall_64+0x8a/0x170
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
+RIP: 0033:0x7fa9ff6fd9b2
+Code: c0 e9 b2 fe ff ff 50 48 8d 3d ea 1d 0c 00 e8 c5 fd 01 00 0f 1f 44 00 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 0f 05 <48> 3d 00 f0 ff ff 77 56 c3 0f 1f 44 00 00 48 83 ec 28 48 89 54 24
+RSP: 002b:00007ffc0616b968 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
+RAX: ffffffffffffffda RBX: 0000000000020000 RCX: 00007fa9ff6fd9b2
+RDX: 0000000000020000 RSI: 00007fa9ff985000 RDI: 0000000000000003
+RBP: 00007fa9ff985000 R08: 00007fa9ff984010 R09: 0000000000000000
+R10: 0000000000000022 R11: 0000000000000246 R12: 0000000000022000
+R13: 0000000000000003 R14: 0000000000020000 R15: 0000000000020000
+ </TASK>
+irq event stamp: 0
+hardirqs last  enabled at (0): [<0000000000000000>] 0x0
+hardirqs last disabled at (0): [<ffffffffb102c126>] copy_process+0x21e6/0x6e70
+softirqs last  enabled at (0): [<ffffffffb102c176>] copy_process+0x2236/0x6e70
+softirqs last disabled at (0): [<0000000000000000>] 0x0
+---[ end trace 0000000000000000 ]---
+
+The rate_limiting->user_input.lock rwsem lock is not initialized before
+use. Let's initialize it.
+
+Signed-off-by: Jiwei Sun <sunjw10@lenovo.com>
+Reviewed-by: Adrian Huang <ahuang12@lenovo.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/crypto/intel/qat/qat_common/adf_rl.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_rl.c b/drivers/crypto/intel/qat/qat_common/adf_rl.c
+index 346ef8bee99d9..e782c23fc1bfc 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_rl.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_rl.c
+@@ -1106,6 +1106,7 @@ int adf_rl_init(struct adf_accel_dev *accel_dev)
+ 	mutex_init(&rl->rl_lock);
+ 	rl->device_data = &accel_dev->hw_device->rl_data;
+ 	rl->accel_dev = accel_dev;
++	init_rwsem(&rl->user_input.lock);
+ 	accel_dev->rate_limiting = rl;
+ 
+ err_ret:
 -- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+2.43.0
 
