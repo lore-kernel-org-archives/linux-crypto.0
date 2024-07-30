@@ -1,51 +1,35 @@
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303EE288BD;
-	Mon, 29 Jul 2024 23:19:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0155CCA6F
+	for <linux-crypto@vger.kernel.org>; Tue, 30 Jul 2024 02:56:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722295150; cv=none; b=QXZCxD/2qW7ATs+qcmPXpZxs9qWXxVvgwSZYCojanGCq81MeRDHUagWK+TnwXGm2UGoptXwUMJJLX6Lg8MX97DU3LOvWHQ7iq/AtFy/rQ+oiKZddtKlQQdtecW0LjH8AD5ScAFMRm9wdhK3X73wPMG/8flYh4CglYe62hF2YAXM=
+	t=1722308208; cv=none; b=fwZ2iwVAbQuc5oVqsYJ1/qPFejhDzRA0jDgN0jlq71Zmv3sG0OjJXu9owtgwXq6KZdZum6JMHruWwDiIZov/b7Bc3rqvZ05NC2dwdm3Lf7lgxYbmq1iAHFY5r8PXgJZg6EN2WmRHNPjcGU6ZX0jBSzjO//qj9haPZ3QkzpYQsgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722295150; c=relaxed/simple;
-	bh=C9Q/uxyrf74fdHhdxm1fLdf6cHFhS/lUKhNgg1ajdhY=;
+	s=arc-20240116; t=1722308208; c=relaxed/simple;
+	bh=Z+dpfELzHk4KdWS/EpByLNZKJEEfRT5q1v6V1XpbIhs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CRAGkjqcQFSGOOpjZYLhDbK8UZLI/lSmAE1Z/NNghFpaVSxWLQzj2+WaAaXyyE3FMKyvB10aBz8DTZpJ1hf7lGkXa4QfBUQlKqQLmupmgd2iLM4PnqSi6BGJY+DFs0/eEzbGXNKUatzPHVQFfMYc7lN/EqVwX9PXBtjh4Mz0yeY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1sYZdZ-000000006Q5-0COe;
-	Mon, 29 Jul 2024 23:18:41 +0000
-Date: Tue, 30 Jul 2024 00:18:37 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Dragan Simic <dsimic@manjaro.org>
-Cc: Diederik de Haas <didi.debian@cknow.org>,
-	Chen-Yu Tsai <wens@kernel.org>, linux-rockchip@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org, Rob Herring <robh@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, linux-kernel@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Martin Kaiser <martin@kaiser.cx>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Sebastian Reichel <sebastian.reichel@collabora.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <ukleinek@debian.org>,
-	devicetree@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Olivia Mackall <olivia@selenic.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Aurelien Jarno <aurelien@aurel32.net>,
-	Heiko Stuebner <heiko@sntech.de>
-Subject: Re: [PATCH v7 0/3] hwrng: add hwrng support for Rockchip RK3568
-Message-ID: <ZqgjTQMgWZO2FjaC@makrotopia.org>
-References: <cover.1720969799.git.daniel@makrotopia.org>
- <3190961.CRkYR5qTbq@bagend>
- <CAGb2v64Dx7XaJOu0HHzFxYYY2ddUZao5Tar8-s1R_miVZqWcXA@mail.gmail.com>
- <4406786.zLnsZ2vfAB@bagend>
- <faa0baebabd3c31adf1afa7efbbdf608@manjaro.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=JoF+s3/bUlo39eg1uDAkDcg4smD/L4DElZMG1JRWmfThFMpk0Vf3qVGfBtzHQgzREX/QaEcM1nSjEiHPedPB134qWYU7oEPjizJm90sqQdlqD3d1GR9sM1hXgE5cBAuaoXOVkJ+DfwUjYheb4BFMSpqqPYsOBMv8YMRVIjeabko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1sYcu2-0014Sd-1N;
+	Tue, 30 Jul 2024 10:56:40 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 30 Jul 2024 10:56:39 +0800
+Date: Tue, 30 Jul 2024 10:56:39 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Horia Geanta <horia.geanta@nxp.com>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Pankaj Gupta <pankaj.gupta@nxp.com>,
+	Gaurav Jain <gaurav.jain@nxp.com>
+Subject: Re: [PATCH] crypto: caam/qi2 - use cpumask_var_t in
+ dpaa2_dpseci_setup
+Message-ID: <ZqhWZ6yrP4n6awn-@gondor.apana.org.au>
+References: <Zqdd5VASjaXaac9Z@gondor.apana.org.au>
+ <39d32499-d41d-4cbd-be3e-25f92ebd8df9@nxp.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -54,18 +38,40 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <faa0baebabd3c31adf1afa7efbbdf608@manjaro.org>
+In-Reply-To: <39d32499-d41d-4cbd-be3e-25f92ebd8df9@nxp.com>
 
-On Wed, Jul 24, 2024 at 08:07:51AM +0200, Dragan Simic wrote:
-> Thanks a lot for the testing.  Though, such wildly different test results
-> can, regrettably, lead to only one conclusion:  the HWRNG found in RK3566
-> is unusable. :/
+On Mon, Jul 29, 2024 at 02:50:00PM +0000, Horia Geanta wrote:
+>
+> 1. This patch does not apply cleanly on crypto tree
+> 
+> Patch depends on the patch set
+> https://lore.kernel.org/linux-crypto/20240702185557.3699991-1-leitao@debian.org/
+> which was merged via net-next.
+> 
+> I assume the dependency will be fixed with the crypto tree moving to v6.11-rc1.
 
-The results on RK3568 look much better and the series right now also
-only enabled the RNG on RK3568 systems. However, we have only seen few
-boards with RK3568 up to now, and I only got a couple of NanoPi R5C
-here to test, all with good hwrng results.
+Yes this is meant to be based on rc1.
 
-Do you think it would be agreeable to only enable the HWRNG for RK3568
-as suggested in this series? Or are we expecting quality to also vary
-as much as it (sadly) does for RK3566?
+> 2. I was not able to reproduce the issue
+> 
+> I tried on arm64 and i386 (with COMPILE_TEST=y) defconfigs.
+
+I'm building on x86-64 with NR_CPUS set to 8192.
+
+> I could reproduce the issue on arm64 only when modifying
+> CONFIG_FRAME_WARN=2048 -> 1024.
+> 
+> Still, I would like to know your configuration, since there is a similar case
+> in caam_qi_init() (drivers/crypto/caam/qi.c) which might need attention too.
+
+Oops you're right.  Somehow this file didn't get rebuilt so I
+missed the warning.  It does indeed give the same warning when
+I force it to be rebuilt.
+
+I'll send an updated patch.
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
