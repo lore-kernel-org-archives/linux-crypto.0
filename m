@@ -1,170 +1,182 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9746D1A073C;
-	Tue, 30 Jul 2024 13:55:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E097B18B464;
+	Tue, 30 Jul 2024 16:08:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722347750; cv=none; b=iYvLPo3cxl8zQbiIJi35znJvkxi0NQ+6IidzimIxY8XhRbEwG73U14MygJa5kH7xphMEgUNOMKXZNwW2ybr1Cqxq73EiQaLAZ/4RuwH+LmEmmFja7SuKka+oZC2ioGvMY0IAig4uEvaPCQ7g9oMWWmdeco0dtjCZdJIM7iP26+g=
+	t=1722355707; cv=none; b=mJn7yAT9sA0Xa49m/Enp7B+78BjLoH6xrSowvcDDxHuPLluvPeTZ34aRWeQh0w7YEW4pY7nGp7gMcsCYt8IKbto133Jc4deyKczLKFaOd/ihdGGFKYOwr7mcXR9bIHPEDuxiYKDNGD6MM7UD8sSQaGe3vmNutV3ALDZ29yNSK2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722347750; c=relaxed/simple;
-	bh=L6iSsb9dY9GgMD5jkzqxUmACpzdxzll1k7gjdK8xQlY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PomrfSyhFXg5xg1xagTfYggGM8sDAJGqsaHtReK/Feknk2arL+lBmwDDTZuR0KCxqWNyuGak1LCBlJYrBeYw6ONl9WU8NsVahHl/LINe3FaRjqjfarPD9H0oT9MVVQdXbc1NaWyDKAHFYpqaAfeVFz4a9a5676mFb9KglcHTQU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ptY+5TtD; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ptY+5TtD"
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46UCeMQm006055;
-	Tue, 30 Jul 2024 13:50:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=1
-	MINSpHEnZhXgKlj8DRgvIXKxyO0lCmVKVXSnz+kzws=; b=ptY+5TtDW3+qL5Zex
-	kr6EotLXHNSK/re7PzW+IavqHT4mQbvyzsytVBe2x6g03lFCwJznWRiQVviTjfas
-	tK6+gaiZAB20PY2ClQNiCsmZkjcc71d/+IxrhGx2dM08ABvu7yg+pHFGK6egsKyK
-	JGitZrLe9+Ka5EgsjKD2cNx46rLTU8SqpaTidtszfq8Qf+N1i2G9WCZkx9FsBVkj
-	j/HcPm1mlpHd60lJ2f/i0WC1J/3uKGIo+EvTS9ElqbVoJWODLQjOXnB+1iSUZfvk
-	d2cHQ5JK9VB++kXx1Q3gQO6ti3wR2ND1bwlBBVDIT179go8fc7wDbZtHa/urNXTn
-	c9oIw==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40pnnn216e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 30 Jul 2024 13:50:22 +0000 (GMT)
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 46UDoM67004966;
-	Tue, 30 Jul 2024 13:50:22 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40pnnn2169-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 30 Jul 2024 13:50:22 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 46UAoGOs029094;
-	Tue, 30 Jul 2024 13:50:20 GMT
-Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 40nbm0n2dk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 30 Jul 2024 13:50:20 +0000
-Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
-	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 46UDoI7Q21824148
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 30 Jul 2024 13:50:20 GMT
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 538FC5805E;
-	Tue, 30 Jul 2024 13:50:18 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D287B58050;
-	Tue, 30 Jul 2024 13:50:16 +0000 (GMT)
-Received: from [9.47.158.152] (unknown [9.47.158.152])
-	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 30 Jul 2024 13:50:16 +0000 (GMT)
-Message-ID: <cee0d829-8f44-41d8-9f49-c215aa582f77@linux.ibm.com>
-Date: Tue, 30 Jul 2024 09:50:16 -0400
+	s=arc-20240116; t=1722355707; c=relaxed/simple;
+	bh=LebSPG0FLq3FIUloAQtPYXALNDCpTPoH4E1GJ/xLx10=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=UdAhcWtWgeT3X5xTjw4LT2Z8BI/G3LM+0QznQ2L+N6fw30uhprQ4f189fiI6N4LhujiJ2Ymg2lc/3M+Zo/fRFPJxq9ZRt1zrQEC2Rk5zGGAahCG/4P21Ei5Gt0eziLknHIwL94VnDDw6cUX9UN2ATrC8Ti4lQuSTmQRdQKirrZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1sYpOS-000000002LS-1H0P;
+	Tue, 30 Jul 2024 16:08:08 +0000
+Date: Tue, 30 Jul 2024 17:08:04 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Daniel Golle <daniel@makrotopia.org>,
+	Aurelien Jarno <aurelien@aurel32.net>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiko Stuebner <heiko@sntech.de>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Dragan Simic <dsimic@manjaro.org>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <ukleinek@debian.org>,
+	Cristian Ciocaltea <cristian.ciocaltea@collabora.com>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Francesco Dolcini <francesco.dolcini@toradex.com>,
+	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v9 0/3] hwrng: add hwrng support for Rockchip RK3568
+Message-ID: <cover.1722355365.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/5] crypto: ecdsa - Avoid signed integer overflow on
- signature decoding
-To: Lukas Wunner <lukas@wunner.de>, Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc: David Howells <dhowells@redhat.com>, Vitaly Chikunov <vt@altlinux.org>,
-        Tadeusz Struk <tstruk@gigaio.com>,
-        Andrew Zaborowski <andrew.zaborowski@intel.com>,
-        Saulo Alessandre <saulo.alessandre@tse.jus.br>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        linux-crypto@vger.kernel.org, keyrings@vger.kernel.org
-References: <cover.1722260176.git.lukas@wunner.de>
- <919ce5664ab3883f1bc15aadfc6b6a2d9b30ecbd.1722260176.git.lukas@wunner.de>
-Content-Language: en-US
-From: Stefan Berger <stefanb@linux.ibm.com>
-In-Reply-To: <919ce5664ab3883f1bc15aadfc6b6a2d9b30ecbd.1722260176.git.lukas@wunner.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 1G8tptm3wS6y4dH5QQdRxQjqp2nrs6d4
-X-Proofpoint-GUID: QYiX9AUMFuTF4MECsXXARzDh14VfZ-5z
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-30_11,2024-07-30_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- phishscore=0 lowpriorityscore=0 bulkscore=0 clxscore=1011 adultscore=0
- malwarescore=0 impostorscore=0 mlxlogscore=999 suspectscore=0 spamscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2407110000 definitions=main-2407300091
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+Rockchip SoCs used to have a random number generator as part of their
+crypto device.
+
+However newer Rockchip SoCs like the RK3568 have an independent True
+Random Number Generator device. This patchset adds a driver for it and
+enables it in the device tree for RK3568.
+
+It turns out the HW RNG returns very low quality on RK3566, so while
+it is theoretically also present on that SoC, only enable it on RK3568
+for now on which the quality expectations are met.
+
+Tested on FriendlyARM NanoPi R5C.
+
+v8 -> v9:
+ * Patch 1: revert to v7
+
+ * Patch 2: revert to v7, use 922 as quality
+
+ * Patch 3: drop new properties, but enable only in rk3568.dtsi
+
+v7 -> v8:
+ * Patch 1: document new properties
+   - introduce 'rockchip,sample-count'
+   - require to specify 'quality' (0~1024)
+
+ * Patch 2:
+   - read sample-count and quality from DT
+
+ * Patch 3:
+   - disable hwrng in rk356x.dtsi, enable only in rk3568.dtsi
+   - set sample-count 1000 and quality 900 (87.9%) as before
+
+v6 -> v7:
+ * Patch 1: unchanged
+
+ * Patch 2: bring back rk_rng_write_ctl()
+   - bring back rk_rng_write_ctl() with improved comment to describe
+     the hardware.
+
+ * Patch 3: unchaned
+
+v5 -> v6:
+ * Patch 1: unchanged
+
+ * Patch 2: get rid of #ifdef
+   - use if (IS_ENABLED(...)) { ... }instead of #ifdef inside functions
+   - use __maybe_unused for functions previously enclosed by #ifdef'ery
+
+ * Patch 3: unchanged
+
+v4 -> v5:
+ * Patch 1: always use RK3568 name
+   - use full RK3568 name in patch description
+   - add RK3568 to title in binding
+
+ * Patch 2: full name and cosmetics
+   - also always mention RK3568 as there may be other RNG in other
+     (future) Rockchip SoCs
+   - remove debug output on successful probe
+   - use MODULE_AUTHOR several times instead of single comma-separated
+
+ * Patch 3: unchanged
+
+v3 -> v4:
+ * Patch 1: minor corrections
+   - fix Rokchip -> Rockchip typo
+   - change commit title as requested
+
+ * Patch 2: improved error handling and resource management
+   - Always use writel() instead of writel_relaxed()
+   - Use pm_runtime_resume_and_get
+   - Correctly return error code in rk_rng_read()
+   - Make use of devm_reset_control_array_get_exclusive
+   - Use devm_pm_runtime_enable and there by get rid of rk_rng_remove()
+
+ * Patch 3:
+   - Move node to conform with ordering by address
+
+v2 -> v3: patch adopted by Daniel Golle
+ * Patch 1: address comments of Krzysztof Kozlowski, add MAINTAINERS
+   - improved description
+   - meaningful clock-names
+   - add entry in MAINTAINERS files
+
+ * Patch 2: numerous code-style improvements
+   - drop misleading rk_rng_write_ctl(), simplify I/O writes
+   - drop unused TRNG_RNG_DOUT_[1-7] macros
+   - handle error handling for pm_runtime_get_sync()
+   - use memcpy_fromio() instead of open coding for-loop
+   - some minor white-spaces fixes
+
+ * Patch 3:
+   - use clock-names as defined in dt-bindings
+
+v1 -> v2:
+ * Patch 1: fix issues reported by Rob Herring and Krzysztof Kozlowski:
+   - Rename rockchip-rng.yaml into rockchip,rk3568-rng.yaml
+   - Fix binding title and description
+   - Fix compatible property
+   - Rename clocks and add the corresponding descriptions
+   - Drop reset-names
+   - Add a bus definition with #address-cells and #size-cells to the
+     example.
+
+ * Patch 2: fix issue reported by kernel test robot <lkp@intel.com>
+   - Do not read the random registers as big endian, looking at the
+     RK3568 TRM this is actually not needed. This fixes a sparse
+     warning.
+
+ * Patch 3: unchanged
 
 
+Aurelien Jarno (3):
+  dt-bindings: rng: Add Rockchip RK3568 TRNG
+  hwrng: add hwrng driver for Rockchip RK3568 SoC
+  arm64: dts: rockchip: add DT entry for RNG to RK356x
 
-On 7/29/24 9:49 AM, Lukas Wunner wrote:
-> When extracting a signature component r or s from an ASN.1-encoded
-> integer, ecdsa_get_signature_rs() subtracts the expected length
-> "bufsize" from the ASN.1 length "vlen" (both of unsigned type size_t)
-> and stores the result in "diff" (of signed type ssize_t).
-> 
-> This results in a signed integer overflow if vlen > SSIZE_MAX + bufsize.
-> 
-> The kernel is compiled with -fno-strict-overflow, which implies -fwrapv,
-> meaning signed integer overflow is not undefined behavior.  And the
-> function does check for overflow:
-> 
->         if (-diff >= bufsize)
->                 return -EINVAL;
-> 
-> So the code is fine in principle but not very obvious.  In the future it
-> might trigger a false-positive with CONFIG_UBSAN_SIGNED_WRAP=y.
-> 
-> Avoid by comparing the two unsigned variables directly and erroring out
-> if "vlen" is too large.
-> 
-> Signed-off-by: Lukas Wunner <lukas@wunner.de>
+ .../bindings/rng/rockchip,rk3568-rng.yaml     |  61 +++++
+ MAINTAINERS                                   |   7 +
+ arch/arm64/boot/dts/rockchip/rk3568.dtsi      |   4 +
+ arch/arm64/boot/dts/rockchip/rk356x.dtsi      |  10 +
+ drivers/char/hw_random/Kconfig                |  14 ++
+ drivers/char/hw_random/Makefile               |   1 +
+ drivers/char/hw_random/rockchip-rng.c         | 227 ++++++++++++++++++
+ 7 files changed, 324 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/rng/rockchip,rk3568-rng.yaml
+ create mode 100644 drivers/char/hw_random/rockchip-rng.c
 
-> ---
->   crypto/ecdsa.c | 17 ++++-------------
->   1 file changed, 4 insertions(+), 13 deletions(-)
-> 
-> diff --git a/crypto/ecdsa.c b/crypto/ecdsa.c
-> index f63731fb7535..03f608132242 100644
-> --- a/crypto/ecdsa.c
-> +++ b/crypto/ecdsa.c
-> @@ -35,29 +35,20 @@ static int ecdsa_get_signature_rs(u64 *dest, size_t hdrlen, unsigned char tag,
->   				  const void *value, size_t vlen, unsigned int ndigits)
->   {
->   	size_t bufsize = ndigits * sizeof(u64);
-> -	ssize_t diff = vlen - bufsize;
->   	const char *d = value;
->   
-> -	if (!value || !vlen)
-> +	if (!value || !vlen || vlen > bufsize + 1)
->   		return -EINVAL; >
-> -	/* diff = 0: 'value' has exacly the right size
-> -	 * diff > 0: 'value' has too many bytes; one leading zero is allowed that
-> -	 *           makes the value a positive integer; error on more
-> -	 * diff < 0: 'value' is missing leading zeros
-> -	 */
-> -	if (diff > 0) {
-> +	if (vlen > bufsize) {
-
-At this point vlen could be 1 larger then bufsize in the worst case and 
-there must be a leading 0.
-
->   		/* skip over leading zeros that make 'value' a positive int */
->   		if (*d == 0) {
->   			vlen -= 1;
-> -			diff--;
->   			d++;
-> -		 > -		if (diff)
-> +		} else { >   			return -EINVAL;
-> +		}
->   	}
-> -	if (-diff >= bufsize)
-> -		return -EINVAL;
->   
->   	ecc_digits_from_bytes(d, vlen, dest, ndigits);
->   
-
-Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
+-- 
+2.45.2
