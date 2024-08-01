@@ -1,104 +1,92 @@
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F3211A6193;
-	Tue, 30 Jul 2024 16:11:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E509A16F0DF;
+	Thu,  1 Aug 2024 14:42:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722355919; cv=none; b=oVBsimJsjBKqBOaQKa1lnyGBulwGlTSx95B8a3iSFSEbj5n+anGwESH/UYRd+I/DrvN/U42XTPvcOhhPwYuGzT1pHe53JtQe7z5WBUvLLxTNXYsqjA5ijRpKVQXEriLr6AGhYwt6Q2g7NpqlY06T2PGqki40dP4210oRgKzBUG8=
+	t=1722523363; cv=none; b=dj+HFlat9m/Krm4MBzUgXHBhVJYUBGkfGafoayTP8paAPYpWVE2DUvQZUNRNbUcZG6hMLhwqZJLcDxgs9O0rTY9zDspT7kJzdPmxVJEgwxh0r/3vRCnjgX2G/i4WKRbk+rpWj44seppASxA5h3Suw3LreyiQyJkztIJLOybOlnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722355919; c=relaxed/simple;
-	bh=ZTRcB21gnrJRzjR9fYwahHH5hEJkFRw0l4npIRKjIqE=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mdeQNIB60OpK1lGhESIo+C81if/pQSb7AfiA5L/XxFB9jd9OGkpI/fBSVfuZF2LnPkx6JUVcz3EwbEoZ4UAfwW+E74/arbinPq+KZgjLfOrnkEZg0ujTEtfywXzxwyiYV4D8R1m9Gn1jpYXtVZRBmCoLOrUQ2A5MZ8ExackVIP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1sYpRz-000000002Mu-3HTJ;
-	Tue, 30 Jul 2024 16:11:47 +0000
-Date: Tue, 30 Jul 2024 17:11:44 +0100
-From: Daniel Golle <daniel@makrotopia.org>
-To: Daniel Golle <daniel@makrotopia.org>,
-	Aurelien Jarno <aurelien@aurel32.net>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Dragan Simic <dsimic@manjaro.org>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <ukleinek@debian.org>,
-	Cristian Ciocaltea <cristian.ciocaltea@collabora.com>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Francesco Dolcini <francesco.dolcini@toradex.com>,
-	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v9 3/3] arm64: dts: rockchip: add DT entry for RNG to RK356x
-Message-ID: <d2beb15377dc8b580ca5557b1a4a6f50b74055aa.1722355365.git.daniel@makrotopia.org>
-References: <cover.1722355365.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1722523363; c=relaxed/simple;
+	bh=dwBxhYSYWHgMN7E4yUs7uCNO33v+/pbSqSfbfuRYkME=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tWoOW0/qxlmc+VN40+YHQmxmENFMZH6ZvjC2TIFrOAr/BCpwNrgq801aJlTvuuKD0/b+2P2Dg37H4M9cEDAelKeG082Hr8Eh3FTOwR1hTJkwM/Y7a+TblhlPRBxRfj6dJm+I+R6wstqXCPpSdZpUjEMRx0gPtF050qZGdhOEtn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4WZWpB4jflz6K5vC;
+	Thu,  1 Aug 2024 22:40:02 +0800 (CST)
+Received: from lhrpeml500005.china.huawei.com (unknown [7.191.163.240])
+	by mail.maildlp.com (Postfix) with ESMTPS id 57C281404FC;
+	Thu,  1 Aug 2024 22:42:38 +0800 (CST)
+Received: from localhost (10.203.177.66) by lhrpeml500005.china.huawei.com
+ (7.191.163.240) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Thu, 1 Aug
+ 2024 15:42:37 +0100
+Date: Thu, 1 Aug 2024 15:42:37 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Lukas Wunner <lukas@wunner.de>
+CC: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
+	<davem@davemloft.net>, Stefan Berger <stefanb@linux.ibm.com>, David Howells
+	<dhowells@redhat.com>, Vitaly Chikunov <vt@altlinux.org>, Tadeusz Struk
+	<tstruk@gigaio.com>, Andrew Zaborowski <andrew.zaborowski@intel.com>, "Saulo
+ Alessandre" <saulo.alessandre@tse.jus.br>, <linux-crypto@vger.kernel.org>,
+	<keyrings@vger.kernel.org>
+Subject: Re: [PATCH 1/5] ASN.1: Add missing include <linux/types.h>
+Message-ID: <20240801154237.00002925@Huawei.com>
+In-Reply-To: <a98ae07646e243fe0d9c1a25fcb3feb3e5987960.1722260176.git.lukas@wunner.de>
+References: <cover.1722260176.git.lukas@wunner.de>
+	<a98ae07646e243fe0d9c1a25fcb3feb3e5987960.1722260176.git.lukas@wunner.de>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1722355365.git.daniel@makrotopia.org>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500006.china.huawei.com (7.191.161.198) To
+ lhrpeml500005.china.huawei.com (7.191.163.240)
 
-From: Aurelien Jarno <aurelien@aurel32.net>
+On Mon, 29 Jul 2024 15:47:00 +0200
+Lukas Wunner <lukas@wunner.de> wrote:
 
-Include the just added Rockchip RNG driver for RK356x SoCs and
-enable it on RK3568.
+> If <linux/asn1_decoder.h> is the first header included from a .c file
+> (due to headers being sorted alphabetically), the compiler complains:
+> 
+> include/linux/asn1_decoder.h:18:29: error: unknown type name 'size_t'
+> 
+> Fix it.
+> 
+> Signed-off-by: Lukas Wunner <lukas@wunner.de>
 
-Signed-off-by: Aurelien Jarno <aurelien@aurel32.net>
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
- arch/arm64/boot/dts/rockchip/rk3568.dtsi |  4 ++++
- arch/arm64/boot/dts/rockchip/rk356x.dtsi | 10 ++++++++++
- 2 files changed, 14 insertions(+)
+FWIW
+Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 
-diff --git a/arch/arm64/boot/dts/rockchip/rk3568.dtsi b/arch/arm64/boot/dts/rockchip/rk3568.dtsi
-index f1be76a54ceb0..2a6ca20e607fd 100644
---- a/arch/arm64/boot/dts/rockchip/rk3568.dtsi
-+++ b/arch/arm64/boot/dts/rockchip/rk3568.dtsi
-@@ -257,6 +257,10 @@ power-domain@RK3568_PD_PIPE {
- 	};
- };
- 
-+&rng {
-+	status = "okay";
-+};
-+
- &usb_host0_xhci {
- 	phys = <&usb2phy0_otg>, <&combphy0 PHY_TYPE_USB3>;
- 	phy-names = "usb2-phy", "usb3-phy";
-diff --git a/arch/arm64/boot/dts/rockchip/rk356x.dtsi b/arch/arm64/boot/dts/rockchip/rk356x.dtsi
-index 4690be841a1cd..d160a23fd4959 100644
---- a/arch/arm64/boot/dts/rockchip/rk356x.dtsi
-+++ b/arch/arm64/boot/dts/rockchip/rk356x.dtsi
-@@ -1113,6 +1113,16 @@ sdhci: mmc@fe310000 {
- 		status = "disabled";
- 	};
- 
-+	rng: rng@fe388000 {
-+		compatible = "rockchip,rk3568-rng";
-+		reg = <0x0 0xfe388000 0x0 0x4000>;
-+		clocks = <&cru CLK_TRNG_NS>, <&cru HCLK_TRNG_NS>;
-+		clock-names = "core", "ahb";
-+		resets = <&cru SRST_TRNG_NS>;
-+		reset-names = "reset";
-+		status = "disabled";
-+	};
-+
- 	i2s0_8ch: i2s@fe400000 {
- 		compatible = "rockchip,rk3568-i2s-tdm";
- 		reg = <0x0 0xfe400000 0x0 0x1000>;
--- 
-2.45.2
+I see asn1_encoder.h already has this include so this
+is nice and consistent.
+
+However that header includes bug.h which should probably be
+pushed down into the relevant c files.  Not relevant for this
+series though so one for another day (or never :)
+
+> ---
+>  include/linux/asn1_decoder.h | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/include/linux/asn1_decoder.h b/include/linux/asn1_decoder.h
+> index 83f9c6e1e5e9..b41bce82a191 100644
+> --- a/include/linux/asn1_decoder.h
+> +++ b/include/linux/asn1_decoder.h
+> @@ -9,6 +9,7 @@
+>  #define _LINUX_ASN1_DECODER_H
+>  
+>  #include <linux/asn1.h>
+> +#include <linux/types.h>
+>  
+>  struct asn1_decoder;
+>  
+
