@@ -1,147 +1,93 @@
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAD651B32D9;
-	Thu,  1 Aug 2024 17:56:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A3F41B32D9
+	for <linux-crypto@vger.kernel.org>; Thu,  1 Aug 2024 17:57:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722534970; cv=none; b=PP/dBVC5TE5EBqO5PbLsis0tCE6oU/RRcdZxOivbmvJIDNnHloBYd5Lki1mme458t/USKC4UD1TBVAqcuHON6mqUeIMR2TpNLKLA3ee9J4v59wXU8l62vKDLk60onXsRkWuukohpJjpO3H7GWjjJBDviyoumR0mZYwxdJbTrFyY=
+	t=1722535075; cv=none; b=uMTitxaD3SBtaHYB2Trp7+zEqL37QmFZNXjD4adp1p/qcCnkpIn2OLakuUHIAxt/64haTDVfy8tN6PtDnx8+5+aS7+h7lPzZFV3iNrKoLAtAoeRitSet/S96w+X3FSspDbMgxqFlepBLCAQzIFU70LcefSVApBae5IH4JK/JmSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722534970; c=relaxed/simple;
-	bh=tvue2mYTfwnEUwml27Tmo8Nu3VBPB0p3/0YXnVpNxyk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pbOCHfKbmalgwSO5o0nXhtxgB2Sltx0s5ify0vRiSCbKvMUwR5ed7LTQHhCXOY8L6su+D0NfIeyVFcVxR+1hjH4T6X/O7ZPcQ2ZVFYlJLBlW1esTxtmaSr3BHGuksuciO4RlQvyM0fdtdgtMU5QEACS0IOhaLoTgHdaVTaoJH+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iBtGfO0Q; arc=none smtp.client-ip=209.85.208.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1722535075; c=relaxed/simple;
+	bh=RRnVrODlIXwb4KTZdh1i8JoY9YJHVgr4QPTd7lqZ8sc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=XrtoLeW+JtT37HRPnRze25NAGE2rjDflxV0Er4UdGiWk7rVTiksj+kZ7tjA4vcjA28T3Q9lGUC+xkWlDG4NJCUkPsLlp6LuLfSU83WyrgCzNm5YpnuCSHTkAK8ACDd8UJAdJgKhyKtUnZD4gavDWSJdCVXsc+1YduMJF/0Wn/1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1gTXcblx; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iBtGfO0Q"
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2eeb1051360so80958481fa.0;
-        Thu, 01 Aug 2024 10:56:08 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1gTXcblx"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2cb63abe6f7so8782881a91.0
+        for <linux-crypto@vger.kernel.org>; Thu, 01 Aug 2024 10:57:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722534967; x=1723139767; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QrRMVRpNUsdGLYtVeQ+Si89ML1jZN7HWMBFx7Phtrik=;
-        b=iBtGfO0QRwOpmsaC71aEx+g3UZaZURyveGgrKo26D7DvUmwLxiaUKjTBaPYtpjwCYp
-         0ce8BzDnRWEza4HZuIdx1TxoFbYZadqhdbwvDRJSX+AIeeUn+u9ytWpkBxuBDoFKqu14
-         T0KaLy35w/gM2zezXQr770TxRSM/PBDTZgMSFudhxG2PNfesTfitqvJyrxdf0K4DNvFf
-         AMeXV2faiurvARavfnbhjCxI9Kg4mJhIIruAot5rnFcO8U2hwih5vC1ECz/MJVdSmodE
-         BPLgcXz30I3IRzGuPflqD8iJMayDfV4dnj0m3EGqUow5jJB0Gnezy5GEyxH5T36qhvXc
-         nUPA==
+        d=google.com; s=20230601; t=1722535073; x=1723139873; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YZsjMORWNMLw4A5ZHbitxpDYHrl9my8e/hfGilOpgU0=;
+        b=1gTXcblxCkia0kBomrawj1uNO4++9SAjhMjPZ2MuZ8GZuSBaQ93kNnJraAVl2Sw+mO
+         kHXERg66AoBKsUYykay5a5tnFOjvW1Ljdnxuxl8BjuIcHumul+uy2YMDZu60vJr6H06E
+         d5544MKImHtVM401dgS1KqaPOObb/Ya2ma9/DDTrse2dkX0s1+mCwxODr1A8CdsnNp2Y
+         YGeUNz5RpXqygfIwAZheyhepX1NWYP5Yp+l933VJylJiMoVcMZYvjM0woRqTMbM60NyT
+         W0fxYTuP8L1JSJbbF4HhbadTzedDKV+HLyEQeBhL8SOGBxn4Hh+rKaZ7zDceEb3oJK4z
+         HdPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722534967; x=1723139767;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QrRMVRpNUsdGLYtVeQ+Si89ML1jZN7HWMBFx7Phtrik=;
-        b=n22IhfOjnefYd4yZhcaAIWYHTSW5l1Alm+BuuYJIPonsVhFkDHm2C0sHJ/WOY94bXd
-         J5wD6PL7t29UTstpTkKAJ35zp8itrdbu4Gfhz6pQeyjr+LNKTsnbl/Lh0dLvBKHG1GV8
-         BoVWXnRbvbKqUAGZlv7zylO0wuBN1RkAkzhmYEqbeqphtFF4OGwjQgprOpUvYWNftjm2
-         hRGwwl5MycXXIMvzErkueb3trViSMK4l0NKLkM+TOHJnVfHcEPgF2E5TS055uKX3tZhi
-         JJqHLK0VYoT3TndpO2YZDzxpnojbarjc5aIquEegYFGWlfrJ+jXXorYaKGQHTHPvYze7
-         vSgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUMCKFZXYkDoQEoOunqeyqcQHe/0vQhd0TzRc9kVykTZxo8MOnYVznbEvrdD7E/mjJfINHWOmFvWTlBiMI=@vger.kernel.org, AJvYcCVJmWSc+dfhsqFxJgTR0Lspid2vXZdjhlBmdcukgUabb+/wwLQ2T7YXcB/k87vKofs9AnSHtvUwC0J/LWrT@vger.kernel.org, AJvYcCVRdDc4EMbm1Uu87v90YBUiApcqZcRMFRSJszHifm0MO/4WhmKwRN6LND9FnX9Grz+j+HRHqnuVmNtU@vger.kernel.org, AJvYcCVbeAXO9isKRLpKj7QPDdZK8Se/uADih+WGETPvdOUsQsTV4vd0I1/tTF4+qL0G0J/5a6x262UhxpjSM1VY@vger.kernel.org, AJvYcCWg/Q7aPWYwIpSvDVkapi6/0znq7FQP2RugZXNx6NsbUvgw6aUUaKaAZ132SCBsbn3JWJvAVNFNyCdo/tCtZ8g=@vger.kernel.org, AJvYcCX3744FySOLPtS8Xg8pMAK9OFepHlrGxk9w/T2KmW5Y61ZBeMu5XugMs/S1nVnItJiKtU3Om6SNBXy9@vger.kernel.org, AJvYcCXti2eaeI22vUGo8vvAZzgnKpSXE/Wwe+g3z74BA4/6sEGJqFaiFWxcib7FO1OZ6F1Wde41EMBHcwCtQHg=@vger.kernel.org, AJvYcCXz0KbFgY1SgM9H2ppBcPVQqWS4yQnQ1ElaXbeACBpdukgAL48+zB03CjxzhHFzsChAS0D1CigwTc/K@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOczApyo9oy2bUzvSBfRYUcUP48IQkcjAK/Vdrcl4o+iLm6hiZ
-	ih7Ednczjj4QGhWLa1Ipiv9b/Ff0W0NFG5EilpLJMjrP6h+/mLhj
-X-Google-Smtp-Source: AGHT+IHvjEgp8SzrbRoSN/aHtB0pDailmN+501lqd79ClZo8CZfX2mxC+K4sF5JPxDjOtcs/TSF3BQ==
-X-Received: by 2002:a2e:9689:0:b0:2ef:2d3a:e70a with SMTP id 38308e7fff4ca-2f15aa93150mr8058061fa.18.1722534966525;
-        Thu, 01 Aug 2024 10:56:06 -0700 (PDT)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2f15c431639sm153591fa.92.2024.08.01.10.56.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Aug 2024 10:56:06 -0700 (PDT)
-Date: Thu, 1 Aug 2024 20:56:02 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Philipp Stanner <pstanner@redhat.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, Damien Le Moal <dlemoal@kernel.org>, 
-	Niklas Cassel <cassel@kernel.org>, Giovanni Cabiddu <giovanni.cabiddu@intel.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Boris Brezillon <bbrezillon@kernel.org>, Arnaud Ebalard <arno@natisbad.org>, 
-	Srujana Challa <schalla@marvell.com>, Alexander Shishkin <alexander.shishkin@linux.intel.com>, 
-	Miri Korenblit <miriam.rachel.korenblit@intel.com>, Kalle Valo <kvalo@kernel.org>, Jon Mason <jdmason@kudzu.us>, 
-	Dave Jiang <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Kevin Cernekee <cernekee@gmail.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jirislaby@kernel.org>, 
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Mark Brown <broonie@kernel.org>, 
-	David Lechner <dlechner@baylibre.com>, 
-	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, 
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Jie Wang <jie.wang@intel.com>, 
-	Adam Guerin <adam.guerin@intel.com>, Shashank Gupta <shashank.gupta@intel.com>, 
-	Damian Muszynski <damian.muszynski@intel.com>, Nithin Dabilpuram <ndabilpuram@marvell.com>, 
-	Bharat Bhushan <bbhushan2@marvell.com>, Johannes Berg <johannes.berg@intel.com>, 
-	Gregory Greenman <gregory.greenman@intel.com>, Emmanuel Grumbach <emmanuel.grumbach@intel.com>, 
-	Yedidya Benshimol <yedidya.ben.shimol@intel.com>, Breno Leitao <leitao@debian.org>, 
-	Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>, John Ogness <john.ogness@linutronix.de>, 
-	Thomas Gleixner <tglx@linutronix.de>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-ide@vger.kernel.org, qat-linux@intel.com, linux-crypto@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, ntb@lists.linux.dev, linux-pci@vger.kernel.org, 
-	linux-serial@vger.kernel.org, linux-sound@vger.kernel.org
-Subject: Re: [PATCH 07/10] ntb: idt: Replace deprecated PCI functions
-Message-ID: <gxl6trxfwcjsjbte5pg3334iqxofh2kau4fsfovdptibnng3jl@332tt4vrpo3o>
-References: <20240801174608.50592-1-pstanner@redhat.com>
- <20240801174608.50592-8-pstanner@redhat.com>
+        d=1e100.net; s=20230601; t=1722535073; x=1723139873;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YZsjMORWNMLw4A5ZHbitxpDYHrl9my8e/hfGilOpgU0=;
+        b=NpmjJSRyc6BL1D+Mkhu99r2kqUD1MP/uu9auhihyHuiUJBbpOCI45vm9KCnSneYY+B
+         5TwGNfv9TctyDk5AKjME4cqq26dVuoW8z/QGJAWYOAjPBDSDz4KVZ6IhiYapihxQQekE
+         Op8FmXXJDj/MiNLr0BkcoSmn3YHCM+u1rGBTIHBPwBf1iW19OafPe6AqXU3VzSzAWGP2
+         /ZK6fZd6gBUi2Dii3icEVOdvCoSTHK57rMzQRVL/j8p+7SFHpxUvmLB1t2//bjj7YoCZ
+         xfGgjq3ILmz2yw4jgsPtlcOknpG6GbYZPRlUYY4kGeF3DvOFogHv1b+pk1S/A8ssElxN
+         l6Tw==
+X-Forwarded-Encrypted: i=1; AJvYcCV8QVWhI6INv4JQPSRVC/rWFXWIaeotQjSM/Uzhzzyh28igrppE5mxpBsx0CU2BABbsB9z4E44wRH7dns+aWUYMqlmyPhkY9I9hKYdM
+X-Gm-Message-State: AOJu0YzX2l5bKjE7sJeozDnCRTpw7vQG/MXIYd1z5J9Pm6uP6rkcfAJn
+	+seDaxPVviyQTKpXU3dK3m1g3QfmUHTygD5r0fJE5jG3zpIUv0ZGtf23a+ATRYh88n/KKPvwQiS
+	OqA==
+X-Google-Smtp-Source: AGHT+IFR+iUgu+QKJU7dkP2vun0rHsyzYS+V01y7jiTTuZQWqm44psgY1ZYc8q2GM5amzUuj4CJmeyx9mEs=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90b:314a:b0:2cf:6730:9342 with SMTP id
+ 98e67ed59e1d1-2cff93d3415mr54282a91.1.1722535072537; Thu, 01 Aug 2024
+ 10:57:52 -0700 (PDT)
+Date: Thu, 1 Aug 2024 10:57:51 -0700
+In-Reply-To: <20240801173955.1975034-1-ackerleytng@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240801174608.50592-8-pstanner@redhat.com>
+Mime-Version: 1.0
+References: <20240501085210.2213060-3-michael.roth@amd.com> <20240801173955.1975034-1-ackerleytng@google.com>
+Message-ID: <ZqvMnz8203fJYr5L@google.com>
+Subject: Re: [PATCH] Fixes: f32fb32820b1 ("KVM: x86: Add hook for determining
+ max NPT mapping level")
+From: Sean Christopherson <seanjc@google.com>
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: michael.roth@amd.com, ak@linux.intel.com, alpergun@google.com, 
+	ardb@kernel.org, ashish.kalra@amd.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, dovmurik@linux.ibm.com, hpa@zytor.com, 
+	jarkko@kernel.org, jmattson@google.com, vannapurve@google.com, 
+	erdemaktas@google.com, jroedel@suse.de, kirill@shutemov.name, 
+	kvm@vger.kernel.org, liam.merwick@oracle.com, linux-coco@lists.linux.dev, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, luto@kernel.org, mingo@redhat.com, 
+	nikunj.dadhania@amd.com, pankaj.gupta@amd.com, pbonzini@redhat.com, 
+	peterz@infradead.org, pgonda@google.com, rientjes@google.com, 
+	sathyanarayanan.kuppuswamy@linux.intel.com, slp@redhat.com, 
+	srinivas.pandruvada@linux.intel.com, tglx@linutronix.de, 
+	thomas.lendacky@amd.com, tobin@ibm.com, tony.luck@intel.com, vbabka@suse.cz, 
+	vkuznets@redhat.com, x86@kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-Hi Philipp
-
-On Thu, Aug 01, 2024 at 07:46:05PM +0200, Philipp Stanner wrote:
-> pcim_iomap_table() and pcim_iomap_regions_request_all() have been
-> deprecated by the PCI subsystem in commit e354bb84a4c1 ("PCI: Deprecate
-> pcim_iomap_table(), pcim_iomap_regions_request_all()").
+On Thu, Aug 01, 2024, Ackerley Tng wrote:
+> The `if (req_max_level)` test was meant ignore req_max_level if
+> PG_LEVEL_NONE was returned. Hence, this function should return
+> max_level instead of the ignored req_max_level.
 > 
-> Replace these functions with their successors, pcim_iomap() and
-> pcim_request_all_regions()
-> 
-> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
 
-Looking good to me. Thanks.
+Fixes: ?
 
-Acked-by: Serge Semin <fancer.lancer@gmail.com>
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> Change-Id: I403898aacc379ed98ba5caa41c9f1c52f277adc2
 
--Serge(y)
-
-> ---
->  drivers/ntb/hw/idt/ntb_hw_idt.c | 13 +++++++++----
->  1 file changed, 9 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/ntb/hw/idt/ntb_hw_idt.c b/drivers/ntb/hw/idt/ntb_hw_idt.c
-> index 48dfb1a69a77..f1b57d51a814 100644
-> --- a/drivers/ntb/hw/idt/ntb_hw_idt.c
-> +++ b/drivers/ntb/hw/idt/ntb_hw_idt.c
-> @@ -2671,15 +2671,20 @@ static int idt_init_pci(struct idt_ntb_dev *ndev)
->  	 */
->  	pci_set_master(pdev);
->  
-> -	/* Request all BARs resources and map BAR0 only */
-> -	ret = pcim_iomap_regions_request_all(pdev, 1, NTB_NAME);
-> +	/* Request all BARs resources */
-> +	ret = pcim_request_all_regions(pdev, NTB_NAME);
->  	if (ret != 0) {
->  		dev_err(&pdev->dev, "Failed to request resources\n");
->  		goto err_clear_master;
->  	}
->  
-> -	/* Retrieve virtual address of BAR0 - PCI configuration space */
-> -	ndev->cfgspc = pcim_iomap_table(pdev)[0];
-> +	/* ioremap BAR0 - PCI configuration space */
-> +	ndev->cfgspc = pcim_iomap(pdev, 0, 0);
-> +	if (!ndev->cfgspc) {
-> +		dev_err(&pdev->dev, "Failed to ioremap BAR 0\n");
-> +		ret = -ENOMEM;
-> +		goto err_clear_master;
-> +	}
->  
->  	/* Put the IDT driver data pointer to the PCI-device private pointer */
->  	pci_set_drvdata(pdev, ndev);
-> -- 
-> 2.45.2
-> 
+Bad gerrit, bad!
