@@ -1,72 +1,81 @@
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6745F1E2890
-	for <linux-crypto@vger.kernel.org>; Fri,  2 Aug 2024 11:55:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1AB41E2889;
+	Fri,  2 Aug 2024 12:47:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722599754; cv=none; b=ZMgr0OlPstXKnaO/+7L4FfV3+B9Iqe0Pm3dek+A8JwsQrz8PV6fj2ap1VsSzeZdjFwM9OJyKCc99vKYsKxU3zZuOKjAnr59O746AdyQobtuvMESYzooK5rRwhaVpXL2sf8gYs08oMbW3/CqyRosWtg/pRXBDpVfvaY4KPtKjaFk=
+	t=1722602836; cv=none; b=SOHOwHm9S5S089qkIt9R0hjoa5pke+GMRHiz+XZt9IxcC4ddoDKy7NRGCqSmTnARtq7578Tt671uAiDclqbykL8P3M0AlGhhal61KOSTPIACnDoZuloAZ58fK7PhX1errVAp9vZCd1pllR3X19NfuDbTUbWZPKde/UG4BnoiU+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722599754; c=relaxed/simple;
-	bh=O6ACiJB0pijeHG+vBDhP6+9/St9ZXMLPw/9iES6OVy4=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GYfVEwwYewdwte7vCDRaRQbJb4QIuYGfYN/5SBrPcu1nZ5Jsos8//lf8Nkj5DHtsDHAxBGGKBEalsatPE6EVy3i9YAsbMDNYjeI6Q13P6fu15T1VUEyZBaTVnFhliKuALfT0tDPZVBB+vewjTZDcgKbLWiJrlgaOCdmKRHSYS20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4Wb41C49J1zQnZV;
-	Fri,  2 Aug 2024 19:51:27 +0800 (CST)
-Received: from kwepemm600014.china.huawei.com (unknown [7.193.23.54])
-	by mail.maildlp.com (Postfix) with ESMTPS id CA1AE180101;
-	Fri,  2 Aug 2024 19:55:48 +0800 (CST)
-Received: from huawei.com (10.67.174.78) by kwepemm600014.china.huawei.com
- (7.193.23.54) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 2 Aug
- 2024 19:55:48 +0800
-From: Yi Yang <yiyang13@huawei.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-	<mcoquelin.stm32@gmail.com>, <alexandre.torgue@foss.st.com>
-CC: <lujialin4@huawei.com>, <linux-crypto@vger.kernel.org>
-Subject: [PATCH -next] crypto: testmgr - don't generate WARN for -EAGAIN
-Date: Fri, 2 Aug 2024 11:49:47 +0000
-Message-ID: <20240802114947.3984577-1-yiyang13@huawei.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1722602836; c=relaxed/simple;
+	bh=QwtvSHP8orsfWRhmoOyhHXEUD00kRv35Tia6kl9g/64=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Mcn3EuvgNUg20LhlK9UN5YTwrkBjyUqPuo+hDm7yqrIU5vxRaZQiiPnJLA/c85xSz4bkqzW6gmQw1S1vZxqcphMJ6YKA9n1lGCMCB1TJj6IrJjdtS4xMm+QWMuw9NuellaUw+OvId0n+d/6j+A4QSAS3k0ti96Q4VL9dKa+zgfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1sZrXr-001zj2-0Q;
+	Fri, 02 Aug 2024 20:46:53 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 02 Aug 2024 20:46:52 +0800
+Date: Fri, 2 Aug 2024 20:46:52 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Roman Smirnov <r.smirnov@omp.ru>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Mimi Zohar <zohar@linux.ibm.com>,
+	Sergey Shtylyov <s.shtylyov@omp.ru>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
+Subject: Re: [PATCH] crypto: mpi: add NULL checks to mpi_normalize().
+Message-ID: <ZqzVPGCbwAS8ChEa@gondor.apana.org.au>
+References: <20240716082825.65219-1-r.smirnov@omp.ru>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemm600014.china.huawei.com (7.193.23.54)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240716082825.65219-1-r.smirnov@omp.ru>
 
-Since commit 8f4f68e788c3 ("crypto: pcrypt - Fix hungtask for PADATA_RESET"),
-The encryption and decryption using padata be failed when the CPU goes
-online and offline.
-We should try to re-encrypt or re-decrypt when -EAGAIN happens rather than
-generate WARN. The unnecessary panic will occur when panic_on_warn set 1.
+On Tue, Jul 16, 2024 at 11:28:25AM +0300, Roman Smirnov wrote:
+> If a->d is NULL, the NULL pointer will be dereferenced. It
+> is necessary to prevent this case. There is at least one call
+> stack that can lead to it:
+> 
+>     mpi_ec_curve_point()
+>       ec_pow2()
+>         ec_mulm()
+>           ec_mod()
+>             mpi_mod()
+>               mpi_fdiv_r()
+>                 mpi_tdiv_r()
+>                   mpi_tdiv_qr()
+>                     mpi_resize()
+>                       kcalloc()
+> 
+> mpi_resize can return -ENOMEM, but this case is not handled in any way.
+> 
+> Next, dereferencing takes place:
+> 
+>     mpi_ec_curve_point()
+>       mpi_cmp()
+>         do_mpi_cmp()
+>           mpi_normalize()
+> 
+> Found by Linux Verification Center (linuxtesting.org) with Svace.
+> 
+> Signed-off-by: Roman Smirnov <r.smirnov@omp.ru>
+> ---
+>  lib/crypto/mpi/mpi-bit.c | 3 +++
+>  1 file changed, 3 insertions(+)
 
-Fixes: 8f4f68e788c3 ("crypto: pcrypt - Fix hungtask for PADATA_RESET")
-Signed-off-by: Yi Yang <yiyang13@huawei.com>
----
- crypto/testmgr.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I've just posted a patch to remove mpi_ec_curve_point and mpi_tdiv_qr.
+Are there any other code paths with the same problem?
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index f02cb075bd68..15e0f5e4ba6f 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -5905,7 +5905,7 @@ int alg_test(const char *driver, const char *alg, u32 type, u32 mask)
- 		}
- 		pr_warn("alg: self-tests for %s using %s failed (rc=%d)",
- 			alg, driver, rc);
--		WARN(rc != -ENOENT,
-+		WARN(rc != -ENOENT && rc != -EAGAIN,
- 		     "alg: self-tests for %s using %s failed (rc=%d)",
- 		     alg, driver, rc);
- 	} else {
+Thanks,
 -- 
-2.25.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
