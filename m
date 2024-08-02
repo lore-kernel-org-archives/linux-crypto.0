@@ -1,143 +1,208 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 551EA1BE86E
-	for <linux-crypto@vger.kernel.org>; Fri,  2 Aug 2024 07:39:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85FE61EB4B6;
+	Fri,  2 Aug 2024 08:01:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722584359; cv=none; b=eZL3G0L3e2/zu1o4XesyYzazfZvGGYZTPVtzOVTDhCE2JuURnh5+EtuujBnGLSFoB9lmASMI1vdxBjS9YWo3IWvDZXZf0SpvA6pf3v4C3Q2FW3+xtS7GK/YqxEDxq0lZE8x17JBnli+ZWI90vqHja5bZnA0x+/WHCmx8UyAIKCA=
+	t=1722585688; cv=none; b=qZ26qQ2vdPystPMXSfynNlLMK1EGF4MdSQ1ptkak65prsW0Qb8Bj7kCwyRb3bZUkVCPjrIANvMOKYHja9XyvuSxqdNzLneKaQGDXQZ9dl5DHSZO6hAnf0z0RpFKL+0XJyf5m9sbvxORqva0zldNCimF/MD8pbsqa+jm/UfONi6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722584359; c=relaxed/simple;
-	bh=XyoAsjYXR6vlNnAFOtS7SDp80nop+IcyYDiUz8xV5lU=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=VPAaSiBzpz0xKTKjdNkOVrrmQ4TexXtLgjnkGZD/t/iRi4T82l64BCEKigqcAHCzOoDyxs1qZ+RjhGScoul4fvx9/de0XfBh5K1GsUD8BEMDH3PIeVFg4KvKcWTTxNCurTH1HQan1Bn4SE8FbAhsd8cDtmU2YskEYYWFSEkEPGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BedV4qwT; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1722585688; c=relaxed/simple;
+	bh=+RPF19zxpzjlvYCTbY+grIfPZrP90fYFntEOY8xsHMs=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hSZr+tyc8gjXpT50cNqMsM6N2FxDJvJ/pETJnO/+1CTNK2yqEDKuk9LmrpUuSruvdumlKp3kLO95nYWDjN0C7fI3rTkux255h9h1PUW6ku8KT8UneW1TZxgSdMP9hmKG76d61xdQwwW93d0WYV9GlhH0R13VgMlKEiBaxMHvpdg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=gV+dy6Hb; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=OBpPn8MH; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=gV+dy6Hb; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=OBpPn8MH; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BedV4qwT"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722584357;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="gV+dy6Hb";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="OBpPn8MH";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="gV+dy6Hb";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="OBpPn8MH"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id AF21F2193C;
+	Fri,  2 Aug 2024 08:01:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1722585684; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=XyoAsjYXR6vlNnAFOtS7SDp80nop+IcyYDiUz8xV5lU=;
-	b=BedV4qwT1Ebraxcmp08denCVQ5m+jWUwcyROQZ5hVOA8aTv8UJrD9tqIzUg++bIls79sHt
-	IkwT+hh8NDWmrBz9G+C8YGEyxWwzDCQWTkcrc1rOXlF6juFnyqjmNVOgqKZVKE0cNUSgI7
-	/OyrLT/VYCWdqTrwc2w4bu7fPUJbLxI=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-478-qDiSS0pNNfC9DsXwxRZLsQ-1; Fri, 02 Aug 2024 03:39:15 -0400
-X-MC-Unique: qDiSS0pNNfC9DsXwxRZLsQ-1
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-5a0e93ebc78so1137038a12.3
-        for <linux-crypto@vger.kernel.org>; Fri, 02 Aug 2024 00:39:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722584354; x=1723189154;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XyoAsjYXR6vlNnAFOtS7SDp80nop+IcyYDiUz8xV5lU=;
-        b=dQYCbV1V3MMFJO+9R0IaBkBcY0z5w7/0FtGrqSx30lR9js8RzfyVgXh5TO8hCBbGQi
-         vhd9vnaPr+L8MolYBhmUpXyMBIWLcGOVWlXSxY4DRN8nAGwfNHhVSMP69/B73i7nu6Dw
-         j0+O9euru+x5N+AziGG4O0aa/f1Nq2ce9vnW8E1pBxsIBWkmTXXo7PPqmNuOVRSUYzpb
-         36QgJKFcysf4aPfuisllgi9Kwt6OaZ0T4PPeJBcWTBTrCWG+JBHvY5X82XysowTZmKYC
-         dEtsacm6cUsmqP46sXcMylP68VnUMwS+cWbuLbO+/NcHU4tC+miNXJTZakFsug1UWXNn
-         Cong==
-X-Forwarded-Encrypted: i=1; AJvYcCXq2/FV39VyyoXHEZzueQZjVgCLSboY1OXS3VJZAFme81a07CtX8bW7PP5HQ+GjrdODF/DlOcWYyl9FEif4x40AakdaQ/xvLEMdfzPx
-X-Gm-Message-State: AOJu0YwVOjDRLTQMjSU7R1uwY6sPxu4+IUsbMYjrJx1KInsNw8eLm2L6
-	e8PwxmJMqXyLkuYe7an8Sx5fkr/CftCSve1fuHYVSQRFDkIsk8UxjEx1WIMPDvlw9lCkHGMOmIT
-	GN3APBu9VF5bW8HEh5pQE+tI9QkWYTuUGXjS4nxuQ5DLWztL5VKLoleOox6RGwg==
-X-Received: by 2002:a17:907:d8e:b0:a7a:a4be:2f8f with SMTP id a640c23a62f3a-a7dc4b2ed0fmr130667666b.0.1722584354311;
-        Fri, 02 Aug 2024 00:39:14 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEFONH/seRIPn55nxoXB3Ih6iDe58gzFUv6VfG3nc8IISoWvXI/jL74Kj1p+wvKOnC3k+pqpQ==
-X-Received: by 2002:a17:907:d8e:b0:a7a:a4be:2f8f with SMTP id a640c23a62f3a-a7dc4b2ed0fmr130665366b.0.1722584353684;
-        Fri, 02 Aug 2024 00:39:13 -0700 (PDT)
-Received: from eisenberg.fritz.box ([2001:16b8:3d6c:8e00:43f3:8884:76fa:d218])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7dc9e80eb6sm66892066b.174.2024.08.02.00.39.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Aug 2024 00:39:13 -0700 (PDT)
-Message-ID: <6eb427a501499273b39439dd6514fef399c3b55f.camel@redhat.com>
-Subject: Re: [PATCH 08/10] serial: rp2: Remove deprecated PCI functions
-From: Philipp Stanner <pstanner@redhat.com>
-To: Jiri Slaby <jirislaby@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
- Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>,
- Giovanni Cabiddu <giovanni.cabiddu@intel.com>, Herbert Xu
- <herbert@gondor.apana.org.au>,  "David S. Miller" <davem@davemloft.net>,
- Boris Brezillon <bbrezillon@kernel.org>, Arnaud Ebalard
- <arno@natisbad.org>,  Srujana Challa <schalla@marvell.com>, Alexander
- Shishkin <alexander.shishkin@linux.intel.com>, Miri Korenblit
- <miriam.rachel.korenblit@intel.com>, Kalle Valo <kvalo@kernel.org>, Serge
- Semin <fancer.lancer@gmail.com>, Jon Mason <jdmason@kudzu.us>, Dave Jiang
- <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>, Bjorn Helgaas
- <bhelgaas@google.com>, Kevin Cernekee <cernekee@gmail.com>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, Jaroslav Kysela
- <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Mark Brown
- <broonie@kernel.org>, David Lechner <dlechner@baylibre.com>, Uwe
- =?ISO-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>, Jonathan
- Cameron <Jonathan.Cameron@huawei.com>,  Andy Shevchenko
- <andriy.shevchenko@linux.intel.com>, Jie Wang <jie.wang@intel.com>, Adam
- Guerin <adam.guerin@intel.com>, Shashank Gupta <shashank.gupta@intel.com>,
- Damian Muszynski <damian.muszynski@intel.com>, Nithin Dabilpuram
- <ndabilpuram@marvell.com>, Bharat Bhushan <bbhushan2@marvell.com>, Johannes
- Berg <johannes.berg@intel.com>, Gregory Greenman
- <gregory.greenman@intel.com>, Emmanuel Grumbach
- <emmanuel.grumbach@intel.com>, Yedidya Benshimol
- <yedidya.ben.shimol@intel.com>, Breno Leitao <leitao@debian.org>, Ilpo
- =?ISO-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>, John Ogness
- <john.ogness@linutronix.de>, Thomas Gleixner <tglx@linutronix.de>
-Cc: linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-ide@vger.kernel.org, qat-linux@intel.com,
- linux-crypto@vger.kernel.org,  linux-wireless@vger.kernel.org,
- ntb@lists.linux.dev, linux-pci@vger.kernel.org, 
- linux-serial@vger.kernel.org, linux-sound@vger.kernel.org
-Date: Fri, 02 Aug 2024 09:39:11 +0200
-In-Reply-To: <8d2e03ac-2a08-4a25-9929-dad375afb738@kernel.org>
+	bh=4BS7F6/VnwHnr5d6vmx7l+U580Ch90URY4uXrae65JM=;
+	b=gV+dy6HbW8R3P7OG9uh6RP1bjX0DVZqjFjhTbWkrR9S7VP8Web/ce6ZKRSbjfDx72JBVOi
+	O+1JsszkXDGvbjaVYtwmNaGEGnMe453X7lcUhXPk+FnD3wZY6wl/dUwH++bAS4lBwq+p4y
+	H0/A+sRM7ZNvSD5SVj4y83dWMpROtws=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1722585684;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4BS7F6/VnwHnr5d6vmx7l+U580Ch90URY4uXrae65JM=;
+	b=OBpPn8MHCWvKZ7UJR8thx66+D8gmFu9DOUBW6ku1tH5yANcLOexdH1xlHzpMr2HdCc7xco
+	vOrWI2InCG9uByCg==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=gV+dy6Hb;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=OBpPn8MH
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1722585684; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4BS7F6/VnwHnr5d6vmx7l+U580Ch90URY4uXrae65JM=;
+	b=gV+dy6HbW8R3P7OG9uh6RP1bjX0DVZqjFjhTbWkrR9S7VP8Web/ce6ZKRSbjfDx72JBVOi
+	O+1JsszkXDGvbjaVYtwmNaGEGnMe453X7lcUhXPk+FnD3wZY6wl/dUwH++bAS4lBwq+p4y
+	H0/A+sRM7ZNvSD5SVj4y83dWMpROtws=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1722585684;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4BS7F6/VnwHnr5d6vmx7l+U580Ch90URY4uXrae65JM=;
+	b=OBpPn8MHCWvKZ7UJR8thx66+D8gmFu9DOUBW6ku1tH5yANcLOexdH1xlHzpMr2HdCc7xco
+	vOrWI2InCG9uByCg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 7C3351388E;
+	Fri,  2 Aug 2024 08:01:23 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id Wo4KHVOSrGazDwAAD6G6ig
+	(envelope-from <tiwai@suse.de>); Fri, 02 Aug 2024 08:01:23 +0000
+Date: Fri, 02 Aug 2024 10:02:00 +0200
+Message-ID: <87ed77ic93.wl-tiwai@suse.de>
+From: Takashi Iwai <tiwai@suse.de>
+To: Philipp Stanner <pstanner@redhat.com>
+Cc: Jonathan Corbet <corbet@lwn.net>,	Damien Le Moal <dlemoal@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>,	Giovanni Cabiddu
+ <giovanni.cabiddu@intel.com>,	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,	Boris Brezillon
+ <bbrezillon@kernel.org>,	Arnaud Ebalard <arno@natisbad.org>,	Srujana Challa
+ <schalla@marvell.com>,	Alexander Shishkin
+ <alexander.shishkin@linux.intel.com>,	Miri Korenblit
+ <miriam.rachel.korenblit@intel.com>,	Kalle Valo <kvalo@kernel.org>,	Serge
+ Semin <fancer.lancer@gmail.com>,	Jon Mason <jdmason@kudzu.us>,	Dave Jiang
+ <dave.jiang@intel.com>,	Allen Hubbe <allenbh@gmail.com>,	Bjorn Helgaas
+ <bhelgaas@google.com>,	Kevin Cernekee <cernekee@gmail.com>,	Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>,	Jiri Slaby
+ <jirislaby@kernel.org>,	Jaroslav Kysela <perex@perex.cz>,	Takashi Iwai
+ <tiwai@suse.com>,	Mark Brown <broonie@kernel.org>,	David Lechner
+ <dlechner@baylibre.com>,	Uwe =?ISO-8859-1?Q?Kleine-K=F6nig?=
+ <u.kleine-koenig@pengutronix.de>,	Jonathan Cameron
+ <Jonathan.Cameron@huawei.com>,	Andy Shevchenko
+ <andriy.shevchenko@linux.intel.com>,	Jie Wang <jie.wang@intel.com>,	Adam
+ Guerin <adam.guerin@intel.com>,	Shashank Gupta <shashank.gupta@intel.com>,
+	Damian Muszynski <damian.muszynski@intel.com>,	Nithin Dabilpuram
+ <ndabilpuram@marvell.com>,	Bharat Bhushan <bbhushan2@marvell.com>,	Johannes
+ Berg <johannes.berg@intel.com>,	Gregory Greenman
+ <gregory.greenman@intel.com>,	Emmanuel Grumbach
+ <emmanuel.grumbach@intel.com>,	Yedidya Benshimol
+ <yedidya.ben.shimol@intel.com>,	Breno Leitao <leitao@debian.org>,	Ilpo
+ =?ISO-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,	John Ogness
+ <john.ogness@linutronix.de>,	Thomas Gleixner <tglx@linutronix.de>,
+	linux-doc@vger.kernel.org,	linux-kernel@vger.kernel.org,
+	linux-ide@vger.kernel.org,	qat-linux@intel.com,
+	linux-crypto@vger.kernel.org,	linux-wireless@vger.kernel.org,
+	ntb@lists.linux.dev,	linux-pci@vger.kernel.org,
+	linux-serial@vger.kernel.org,	linux-sound@vger.kernel.org
+Subject: Re: [PATCH 09/10] ALSA: korg1212: Replace deprecated PCI functions
+In-Reply-To: <20240801174608.50592-10-pstanner@redhat.com>
 References: <20240801174608.50592-1-pstanner@redhat.com>
-	 <20240801174608.50592-9-pstanner@redhat.com>
-	 <8d2e03ac-2a08-4a25-9929-dad375afb738@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.3 (3.52.3-1.fc40) 
+	<20240801174608.50592-10-pstanner@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) Emacs/27.2 Mule/6.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Rspamd-Queue-Id: AF21F2193C
+X-Spam-Score: -1.81
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spamd-Result: default: False [-1.81 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_CC(0.00)[lwn.net,kernel.org,intel.com,gondor.apana.org.au,davemloft.net,natisbad.org,marvell.com,linux.intel.com,gmail.com,kudzu.us,google.com,linuxfoundation.org,perex.cz,suse.com,baylibre.com,pengutronix.de,huawei.com,debian.org,linutronix.de,vger.kernel.org,lists.linux.dev];
+	ARC_NA(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_TRACE(0.00)[suse.de:+];
+	R_RATELIMIT(0.00)[to_ip_from(RLp4wjbahqp9imfp3xd18ktmsn)];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	TO_MATCH_ENVRCPT_SOME(0.00)[];
+	DWL_DNSWL_BLOCKED(0.00)[suse.de:dkim];
+	RCPT_COUNT_GT_50(0.00)[52];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:dkim]
 
-On Fri, 2024-08-02 at 07:18 +0200, Jiri Slaby wrote:
-> On 01. 08. 24, 19:46, Philipp Stanner wrote:
-> > pcim_iomap_table() and pcim_iomap_regions_request_all() have been
-> > deprecated by the PCI subsystem in commit e354bb84a4c1 ("PCI:
-> > Deprecate
-> > pcim_iomap_table(), pcim_iomap_regions_request_all()").
-> >=20
-> > Replace these functions with their successors, pcim_iomap() and
-> > pcim_request_all_regions()
->=20
-> Reviewed-by: Jiri Slaby <jirislaby@kernel.org>
+On Thu, 01 Aug 2024 19:46:07 +0200,
+Philipp Stanner wrote:
+> 
+> pcim_iomap_table() and pcim_iomap_regions_request_all() have been
+> deprecated by the PCI subsystem in commit e354bb84a4c1 ("PCI: Deprecate
+> pcim_iomap_table(), pcim_iomap_regions_request_all()").
+> 
+> Replace these functions with their successors, pcim_iomap() and
+> pcim_request_all_regions()
+> 
+> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
 
-Thank you for the review.
+Reviewed-by: Takashi Iwai <tiwai@suse.de>
 
-I have to provide a v2 for a small bug in one of the other patches.
-While I'm at it, I would rename the title of this patch =E2=84=968 here so =
-that
-it's "Replace" instead of "Remove", making it consistent with the other
-ones.
+And feel free to take my ack to v2 if the further change will be only
+about the description, too :)
 
-I'd assume that keeping your RB then would be alright. Please tell me
-if not.
 
-Cheers,
-P.
+thanks,
 
->=20
-> > Signed-off-by: Philipp Stanner <pstanner@redhat.com>
-> > ---
-> > =C2=A0 drivers/tty/serial/rp2.c | 12 +++++++-----
-> > =C2=A0 1 file changed, 7 insertions(+), 5 deletions(-)
->=20
-> thanks,
+Takashi
 
+
+> ---
+>  sound/pci/korg1212/korg1212.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/sound/pci/korg1212/korg1212.c b/sound/pci/korg1212/korg1212.c
+> index 5c2cac201a28..b5428ac34d3b 100644
+> --- a/sound/pci/korg1212/korg1212.c
+> +++ b/sound/pci/korg1212/korg1212.c
+> @@ -2106,7 +2106,7 @@ static int snd_korg1212_create(struct snd_card *card, struct pci_dev *pci)
+>          for (i=0; i<kAudioChannels; i++)
+>                  korg1212->volumePhase[i] = 0;
+>  
+> -	err = pcim_iomap_regions_request_all(pci, 1 << 0, "korg1212");
+> +	err = pcim_request_all_regions(pci, "korg1212");
+>  	if (err < 0)
+>  		return err;
+>  
+> @@ -2128,7 +2128,9 @@ static int snd_korg1212_create(struct snd_card *card, struct pci_dev *pci)
+>  		   korg1212->iomem2, iomem2_size,
+>  		   stateName[korg1212->cardState]);
+>  
+> -	korg1212->iobase = pcim_iomap_table(pci)[0];
+> +	korg1212->iobase = pcim_iomap(pci, 0, 0);
+> +	if (!korg1212->iobase)
+> +		return -ENOMEM;
+>  
+>  	err = devm_request_irq(&pci->dev, pci->irq, snd_korg1212_interrupt,
+>                            IRQF_SHARED,
+> -- 
+> 2.45.2
+> 
