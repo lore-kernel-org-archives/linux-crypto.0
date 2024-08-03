@@ -1,64 +1,61 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 173AB4687;
-	Sat,  3 Aug 2024 00:40:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25FD42AEEA
+	for <linux-crypto@vger.kernel.org>; Sat,  3 Aug 2024 06:49:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722645609; cv=none; b=VLNHcWF9972ZXKmBWMSJO+z9es6OJj/1FJ3EntnWLZak+MUxAGkFGv4Kz5uU+zkktHcBEbEvxjcWZtW94Xva1+2lCOUp9/h0thDBncpPsYDshOWzNQrOLQtpBM6VAMrxB+IUcV2G/nSj8yqm5cVUUp2jLkEOeUvlbUwaDz7DgsA=
+	t=1722667769; cv=none; b=WLMZWdwOK5Xy2riue1elmF1bt4aK2mEQ4nrkpVFmvWZCAu/GGC3dqeRHfZ5Kt8CDwqpDErP3+S87DdvZGl/rwQ9ZvNOO+BChGFv7fpRcs9550/zb6LAUMISfX2g/04KihupIY3E4I1crgnP6BWsk3dvkX8DDFlZqRYnnixRGlwo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722645609; c=relaxed/simple;
-	bh=PzMk2p3zdOZIqJkFUDWKpvnPX7N32f5w6EXQpIrRcJc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bwb42F/0wivAKrJCtGCwAjaBF19r6X+pKY0xq4R714xOMPbC8eAuPi+PSPdybenX76fkY/ewjJhoOC2RPb9CfPemR497kwi9hBQADBK7znznkH6bQCACibQImP3ZdleApBUwmTtZ6LOwuWlcf7rxNdlBzD0zf/seRDGrTEJWNGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1sa2fq-00276O-1O;
-	Sat, 03 Aug 2024 08:39:52 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 03 Aug 2024 08:39:51 +0800
-Date: Sat, 3 Aug 2024 08:39:51 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: herbertx/cryptodev <reply+AAIFISMST74UQEQBJUWW7J6EXDLZNEVBMPHARJBRSY@reply.github.com>
-Cc: herbertx/cryptodev <cryptodev@noreply.github.com>,
-	Author <author@noreply.github.com>, Jia He <justin.he@arm.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	linux-crypto@vger.kernel.org, Will Deacon <will@kernel.org>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Andy Polyakov <appro@cryptogams.org>
-Subject: Re: [herbertx/cryptodev] crypto: arm64/poly1305 - move data to
- rodata section (47d9625)
-Message-ID: <Zq18V66ufraB_1-T@gondor.apana.org.au>
-References: <herbertx/cryptodev/commit/47d96252099a7184b4bad852fcfa3c233c1d2f71@github.com>
- <herbertx/cryptodev/commit/47d96252099a7184b4bad852fcfa3c233c1d2f71/144978326@github.com>
+	s=arc-20240116; t=1722667769; c=relaxed/simple;
+	bh=BMD1pZTIyr7VWgKf9KkB8BNt/ZVXQ7HXuKiqvLQghaE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GLAk+rrsMSB4GS3Bx52aDziKGxBiCsYER2h43bz6+YcKwg+hEFXK91prhoTiV9q57tkKRVeJq0ctTV/H/39oqkv1yTv/srPFcmTQcwZiwlLwfghagrcZFL2J2OgDMm/kVWuYDu1YP8QnjTOe0w8fkxw3gu6bPBSLW4pBpSjkiA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4WbYGB1YlVzcd3p;
+	Sat,  3 Aug 2024 14:49:22 +0800 (CST)
+Received: from kwepemd200011.china.huawei.com (unknown [7.221.188.251])
+	by mail.maildlp.com (Postfix) with ESMTPS id D70EA1800A4;
+	Sat,  3 Aug 2024 14:49:24 +0800 (CST)
+Received: from cgs.huawei.com (10.244.148.83) by
+ kwepemd200011.china.huawei.com (7.221.188.251) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.34; Sat, 3 Aug 2024 14:49:24 +0800
+From: Gaosheng Cui <cuigaosheng1@huawei.com>
+To: <olivia@selenic.com>, <herbert@gondor.apana.org.au>,
+	<florian.fainelli@broadcom.com>, <bcm-kernel-feedback-list@broadcom.com>,
+	<rjui@broadcom.com>, <sbranden@broadcom.com>, <hadar.gat@arm.com>,
+	<cuigaosheng1@huawei.com>, <alex@shruggie.ro>, <aboutphysycs@gmail.com>,
+	<wahrenst@gmx.net>, <robh@kernel.org>
+CC: <linux-crypto@vger.kernel.org>, <linux-rpi-kernel@lists.infradead.org>,
+	<linux-arm-kernel@lists.infradead.org>
+Subject: [PATCH -next 0/2] Add missing clk_disable_unprepare
+Date: Sat, 3 Aug 2024 14:49:21 +0800
+Message-ID: <20240803064923.337696-1-cuigaosheng1@huawei.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <herbertx/cryptodev/commit/47d96252099a7184b4bad852fcfa3c233c1d2f71/144978326@github.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemd200011.china.huawei.com (7.221.188.251)
 
-On Fri, Aug 02, 2024 at 08:09:10AM -0700, Andy Polyakov wrote:
-> Formally speaking this is error prone, because there is no guarantee that linker will be able to resolve it as argument to `adr` instruction above. I mean since the address is resolved with `adr` instruction alone, there is a limit on how far the label can be from the instruction in question. On a practical level, if/since it's compiled as part of a kernel module, it won't be a problem, because the module won't be large enough to break the limit, but it **is** a problem in general case.
-> 
-> But why would objtool attempt to disassemble it? Does it actually attempt to disassemble unreferenced spaces between functions? Note that the .Lzeros label doesn't make it into .o file, so there won't be anything in the symbol table to discover as potential entry point...
-> 
-> -- 
-> Reply to this email directly or view it on GitHub:
-> https://github.com/herbertx/cryptodev/commit/47d96252099a7184b4bad852fcfa3c233c1d2f71#r144978326
-> You are receiving this because you authored the thread.
-> 
-> Message ID: <herbertx/cryptodev/commit/47d96252099a7184b4bad852fcfa3c233c1d2f71/144978326@github.com>
+Add missing clk_disable_unprepare, thanks!
 
-Adding the original Cc list.
+Gaosheng Cui (2):
+  hwrng: bcm2835 - Add missing clk_disable_unprepare in bcm2835_rng_init
+  hwrng: cctrng - Add missing clk_disable_unprepare in cctrng_resume
+
+ drivers/char/hw_random/bcm2835-rng.c | 4 +++-
+ drivers/char/hw_random/cctrng.c      | 1 +
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.25.1
+
