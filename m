@@ -1,119 +1,181 @@
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D764C631
-	for <linux-crypto@vger.kernel.org>; Mon,  5 Aug 2024 05:23:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76F8F149C62
+	for <linux-crypto@vger.kernel.org>; Mon,  5 Aug 2024 08:02:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722835385; cv=none; b=Id/wXKAYvsfTPe/doakQZiUv52jpXhHF5rfaPE+GuWoxkUuSyLEM5eP6b76HIUwhQNwkU7k0z8reXU4QfdDAOzQcowMM4nXKmLpXALf6J8cXaYh5HFCdnDF80ihEjK4X+kJRQb8R95KhcRgtfCDsEanuN7gRT5FxQ1LvuWHWozE=
+	t=1722844929; cv=none; b=ChD8ySHeysVR8Pg+qzY8KI88fBWQRhJYf5uSqiCteHkzjYWcxHkfXqUIZWskQfy0KaT9P3rLOcaHV4J9mzLdh7qPWlBBikLf6/3jIFSHlz+2p5UUWZ5PkNXBzdNo2hsfcQ++HcEfWdUlrKF8EU2dbuoKqWI9FAGC7MOhx4DFpt0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722835385; c=relaxed/simple;
-	bh=9toEjo193JFbOMCWCwzU1N59OdbCAjE+rsJfi30mHT0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=r+MDPXjOqbq3+vAzpvvPTFtB/4H4/hEYiKcZhGN0L5Wj3OxQek00gkWX1H0GXxKJwWO92Az1RQUwgRZVCl836DQ7aC3hgNmXonqScPKlaVHVx9S1VIloDLmjCZqnKUCQeHWm5/Qzmyq3fzR+VBxJx+rdplZV3gsJXAjUTwwiNFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=iyfdfE0h; arc=none smtp.client-ip=209.85.219.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
+	s=arc-20240116; t=1722844929; c=relaxed/simple;
+	bh=3SzrIAjNMfo/xyaY6qD0WMNLA83hhVRZkGTby43i1Yw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=i0NhYp0dOasSeDiKcsIfY1bb2oLJy8y4RaU4HZknKUkpj7V1HHhU5KnlJ+fsbIo4yCn4PMY8COlU0pTyyE8/VsQ6aezbdCVLM0/LZjEArmImJ+j7E8d22ukwQmc9eHOlwqPJ06qrKUFRuGLKbNcvxkUqqVk/rsFk9wDIxJpMHH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H+OZgpti; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="iyfdfE0h"
-Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-dfef5980a69so9133498276.3
-        for <linux-crypto@vger.kernel.org>; Sun, 04 Aug 2024 22:23:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vayavyalabs.com; s=google; t=1722835383; x=1723440183; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KwH9KdTM9xhlL2i/Q24CvpyqTjnKXLFgl8v2KpQU8Bw=;
-        b=iyfdfE0hnT2zQl02tiNngxfa4ZO2e919pbDWQ18jHqWm6IOFe7RAj0RwVnhlHml30U
-         Y+cVArMFA9WxuCZ2bIN/B31HBb9Eg+jcFDfuKNguZ1j1H/qjoMxOHc6DA+JiGfK77nXh
-         vFzxlcFoMEH7iVRm9LtUdR3X4djA6GQYxpsBw=
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H+OZgpti"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722844926;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=FOOMdJZrThW/VVTNtW/8cjfUGb38v95FiRlM9skachc=;
+	b=H+OZgptio28nPEyhAu9+AAqD3kBcxWDc+wrnZb4eujOKTlYwagy3IG12zgtdFcPm2sgnQF
+	OCAVX6JeuluI69vmtm9oDaOcvUcJkwvlrwZErbZcTqV9c8V6MQVoq+de0WHHytSQbuNLpn
+	evRP1OP+wXFQ4pNijBfYE8+Vyc2NnB4=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-57-8YkkXOWiNPO-yDCStErEyg-1; Mon, 05 Aug 2024 04:02:04 -0400
+X-MC-Unique: 8YkkXOWiNPO-yDCStErEyg-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a7aa22266aaso95457266b.1
+        for <linux-crypto@vger.kernel.org>; Mon, 05 Aug 2024 01:02:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722835383; x=1723440183;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KwH9KdTM9xhlL2i/Q24CvpyqTjnKXLFgl8v2KpQU8Bw=;
-        b=iuKakyspkwzOBcBMp+nBRmWZO/xbtSwv1rKG75y87bxaupF+jev9gHJTrTo3GkoV/J
-         Ntb6taajwfcm9E9hQrDX4+4gvv/tJ8T0YqDZxRkTswpU3rd6PAhGf9QPnd0ZeHiYNgs6
-         wWLbpBg0mxDw7+/qT9CebNgXnXvZRn564CdzoJWuxMrpx8npGW9FKCea+uiD6N7hxKsb
-         H2j6BeRxJdeP32se0WPUukMPzZwoudJPQ7Au741TuWXd0Vb+SbykVeaGEWHUv/AoaGxB
-         /1fI5UP2QM8pu9U74hcLNVfR2Q2qL5XlQb5L1SQHY6XwgBt2mA3MAWQdXT0S25ltLfjO
-         CqWg==
-X-Gm-Message-State: AOJu0Yxf1vVtKOeiLz7HNe4REuokod2X5pahf6vNauRCQGhZk1YMtJQn
-	90qMCd5t9K0QHChzyGcfB9Ttsjq0fGKpVdpxNYbHuW9UX4eQHZU6GTOkS5umThSsfbnHXSbIDJb
-	G1fT+/TJBEjMSHsiYyrgb64e3diTFUO+/bogU+Q==
-X-Google-Smtp-Source: AGHT+IFY+zqRFCz5bQpWauHGmrbkuU9vo47k6EQzMwj8tPmpu3NNomYZ/ia1ANpQF940hzdoMd5KvcynTf9Sl0o66bQ=
-X-Received: by 2002:a25:9342:0:b0:e08:6f3d:3a41 with SMTP id
- 3f1490d57ef6-e0bde21a820mr11909069276.8.1722835382702; Sun, 04 Aug 2024
- 22:23:02 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1722844923; x=1723449723;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FOOMdJZrThW/VVTNtW/8cjfUGb38v95FiRlM9skachc=;
+        b=qT8gWQy7k7xPu+ug58CK3stWJcx5XVdk9Hp1zhDr174hodAULlMPYykxohkN5fWv1/
+         HRRN+hihKUxfagwBnwVnvwQxlNJl1+IWAcqNcwVa9vM4tBF/ulrU1WHfjAfQWrvGJ83F
+         snQYYjD8nqagp54nR5+S21H6xNZxS1tsgKIbwf61AvEBMN2fPVmCjX9PSd115H2BwL/4
+         GATQc33iqtPmGrUEd9sR/XF1SjR1zE3iEG4rXfTq3NHG80u5eH0q5cJioZkrak4wT1F9
+         QZG8MB0725p3Rna9lZQXWfNfTmFBufbpyHsH+BhHL7Jj1a7x4s+OmLHuEKuA49aKTlfO
+         0hIw==
+X-Forwarded-Encrypted: i=1; AJvYcCXvRNTXGkGOHjeySkjHKbOGFatXqTQXRzhbvU3WaLV6HuxXV5DPH5Vif/C9ZLfVCYJ4PmYwqzvSWpAkfp8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzjDIfic2rVlppKKTZBg24aHdbnAsWTWVzTZVMxHeXAUc38a29R
+	umCSmSg4lGRLCnKIFXaAN0mf0fnQlYzS2z0vqyxrlimN4RCNstQDpFZYxkTUzQISDtepWXJmACK
+	QGelbg6Fvj+CyWWvLd976sf0Xw4SaccXn/PUrG0ykc8j5QaKeIXWQysq7eM+/vw==
+X-Received: by 2002:a17:906:6a0f:b0:a7a:aa35:409c with SMTP id a640c23a62f3a-a7dc512cdc8mr479716466b.9.1722844923329;
+        Mon, 05 Aug 2024 01:02:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHTS/SS1ApAhdkVa3Kv54fKJw0UKK+zRKzrvkYAaC1yWAeQnQdQA8voDIcJKUGPudzDl20u8A==
+X-Received: by 2002:a17:906:6a0f:b0:a7a:aa35:409c with SMTP id a640c23a62f3a-a7dc512cdc8mr479712266b.9.1722844922775;
+        Mon, 05 Aug 2024 01:02:02 -0700 (PDT)
+Received: from eisenberg.fritz.box (200116b82df07e000a5f4891a3b0b190.dip.versatel-1u1.de. [2001:16b8:2df0:7e00:a5f:4891:a3b0:b190])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7de8d0868bsm277958966b.143.2024.08.05.01.02.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Aug 2024 01:02:02 -0700 (PDT)
+From: Philipp Stanner <pstanner@redhat.com>
+To: Jonathan Corbet <corbet@lwn.net>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Boris Brezillon <bbrezillon@kernel.org>,
+	Arnaud Ebalard <arno@natisbad.org>,
+	Srujana Challa <schalla@marvell.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+	Kalle Valo <kvalo@kernel.org>,
+	Serge Semin <fancer.lancer@gmail.com>,
+	Jon Mason <jdmason@kudzu.us>,
+	Dave Jiang <dave.jiang@intel.com>,
+	Allen Hubbe <allenbh@gmail.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Kevin Cernekee <cernekee@gmail.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	Jaroslav Kysela <perex@perex.cz>,
+	Takashi Iwai <tiwai@suse.com>,
+	Mark Brown <broonie@kernel.org>,
+	David Lechner <dlechner@baylibre.com>,
+	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Philipp Stanner <pstanner@redhat.com>,
+	Jie Wang <jie.wang@intel.com>,
+	Adam Guerin <adam.guerin@intel.com>,
+	Shashank Gupta <shashank.gupta@intel.com>,
+	Damian Muszynski <damian.muszynski@intel.com>,
+	Nithin Dabilpuram <ndabilpuram@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Gregory Greenman <gregory.greenman@intel.com>,
+	Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
+	Yedidya Benshimol <yedidya.ben.shimol@intel.com>,
+	Breno Leitao <leitao@debian.org>,
+	=?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	John Ogness <john.ogness@linutronix.de>,
+	Thomas Gleixner <tglx@linutronix.de>
+Cc: linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-ide@vger.kernel.org,
+	qat-linux@intel.com,
+	linux-crypto@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	ntb@lists.linux.dev,
+	linux-pci@vger.kernel.org,
+	linux-serial@vger.kernel.org,
+	linux-sound@vger.kernel.org
+Subject: [PATCH v2 00/10] Remove pcim_iomap_regions_request_all()
+Date: Mon,  5 Aug 2024 10:01:27 +0200
+Message-ID: <20240805080150.9739-2-pstanner@redhat.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240705171255.2618994-1-pavitrakumarm@vayavyalabs.com>
- <20240705171255.2618994-4-pavitrakumarm@vayavyalabs.com> <ZpG+m8mnbsikdM+D@gondor.apana.org.au>
-In-Reply-To: <ZpG+m8mnbsikdM+D@gondor.apana.org.au>
-From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-Date: Mon, 5 Aug 2024 10:52:51 +0530
-Message-ID: <CALxtO0nn94NoB6yGxouogFFdWe3UyMiOALL7t-MPsmTtTHBebw@mail.gmail.com>
-Subject: Re: [PATCH v6 3/6] Add SPAcc ahash support
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org, Ruud.Derwig@synopsys.com, 
-	manjunath.hadli@vayavyalabs.com, bhoomikak@vayavyalabs.com, 
-	Shweta Raikar <shwetar@vayavyalabs.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Herbert,
-   I have pushed the V7 patch with the fix. Do let me know if that
-suffices for the software fallback.
-   Requesting a review of the same.
-
-Warm regards,
-PK
+Changes in v2:
+  - Fix a bug in patch №4 ("crypto: marvell ...") where an error code
+    was not set before printing it. (Me)
+  - Apply Damien's Reviewed- / Acked-by to patches 1, 2 and 10. (Damien)
+  - Apply Serge's Acked-by to patch №7. (Serge)
+  - Apply Jiri's Reviewed-by to patch №8. (Jiri)
+  - Apply Takashi Iwai's Reviewed-by to patch №9. (Takashi)
 
 
-On Sat, Jul 13, 2024 at 5:09=E2=80=AFAM Herbert Xu <herbert@gondor.apana.or=
-g.au> wrote:
->
-> On Fri, Jul 05, 2024 at 10:42:52PM +0530, Pavitrakumar M wrote:
-> >
-> > +static int spacc_hash_cra_init(struct crypto_tfm *tfm)
-> > +{
-> > +     const struct spacc_alg *salg =3D spacc_tfm_ahash(tfm);
-> > +     struct spacc_crypto_ctx *tctx =3D crypto_tfm_ctx(tfm);
-> > +     struct spacc_priv *priv =3D NULL;
-> > +
-> > +     tctx->handle    =3D -1;
-> > +     tctx->ctx_valid =3D false;
-> > +     tctx->dev       =3D get_device(salg->dev[0]);
-> > +
-> > +     if (salg->mode->sw_fb) {
-> > +             tctx->fb.hash =3D crypto_alloc_ahash(salg->calg->cra_name=
-, 0,
-> > +                                                CRYPTO_ALG_NEED_FALLBA=
-CK);
-> > +
-> > +             if (IS_ERR(tctx->fb.hash)) {
-> > +                     if (tctx->handle >=3D 0)
-> > +                             spacc_close(&priv->spacc, tctx->handle);
-> > +                     put_device(tctx->dev);
-> > +                     return PTR_ERR(tctx->fb.hash);
-> > +             }
-> > +
-> > +             crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
-> > +                                      sizeof(struct spacc_crypto_reqct=
-x) +
-> > +                                      crypto_ahash_reqsize(tctx->fb.ha=
-sh));
->
-> I thought you added set_statesize based on the fallback state
-> size, but it appears to be missing?
->
-> Thanks,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Hi all,
+
+the PCI subsystem is currently working on cleaning up its devres API. To
+do so, a few functions will be replaced with better alternatives.
+
+This series removes pcim_iomap_regions_request_all(), which has been
+deprecated already, and accordingly replaces the calls to
+pcim_iomap_table() (which were only necessary because of
+pcim_iomap_regions_request_all() in the first place) with calls to
+pcim_iomap().
+
+Would be great if you can take a look whether this behaves as you
+intended for your respective component.
+
+Cheers,
+Philipp
+
+Philipp Stanner (10):
+  PCI: Make pcim_request_all_regions() a public function
+  ata: ahci: Replace deprecated PCI functions
+  crypto: qat - replace deprecated PCI functions
+  crypto: marvell - replace deprecated PCI functions
+  intel_th: pci: Replace deprecated PCI functions
+  wifi: iwlwifi: replace deprecated PCI functions
+  ntb: idt: Replace deprecated PCI functions
+  serial: rp2: Replace deprecated PCI functions
+  ALSA: korg1212: Replace deprecated PCI functions
+  PCI: Remove pcim_iomap_regions_request_all()
+
+ .../driver-api/driver-model/devres.rst        |  1 -
+ drivers/ata/acard-ahci.c                      |  6 +-
+ drivers/ata/ahci.c                            |  6 +-
+ drivers/crypto/intel/qat/qat_420xx/adf_drv.c  | 11 +++-
+ drivers/crypto/intel/qat/qat_4xxx/adf_drv.c   | 11 +++-
+ .../marvell/octeontx2/otx2_cptpf_main.c       | 14 +++--
+ .../marvell/octeontx2/otx2_cptvf_main.c       | 13 ++--
+ drivers/hwtracing/intel_th/pci.c              |  9 ++-
+ .../net/wireless/intel/iwlwifi/pcie/trans.c   | 16 ++---
+ drivers/ntb/hw/idt/ntb_hw_idt.c               | 13 ++--
+ drivers/pci/devres.c                          | 59 +------------------
+ drivers/tty/serial/rp2.c                      | 12 ++--
+ include/linux/pci.h                           |  3 +-
+ sound/pci/korg1212/korg1212.c                 |  6 +-
+ 14 files changed, 76 insertions(+), 104 deletions(-)
+
+-- 
+2.45.2
+
