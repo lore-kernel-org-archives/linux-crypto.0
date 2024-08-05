@@ -1,125 +1,104 @@
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1840F1D540;
-	Mon,  5 Aug 2024 18:47:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.130.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5791414A09C
+	for <linux-crypto@vger.kernel.org>; Mon,  5 Aug 2024 20:32:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722883655; cv=none; b=ioT8g/vqX88sj0F3VtdJj9YWA713Ix3jkauIaWf1OS62MCqZs6dWYuT5IFl4d8rKDji9CJPKWV524YH+oz9VLtplXg5wbAUtpiA/lb4YzA03GQqWfybsTAMoexkJe0OusF5HJ6YNOHJZFsGq+JECVWAgB3WFQ2kOi2+4N7WydJI=
+	t=1722889961; cv=none; b=tIzsf9Yq8LuP3Q1Ne3UZJzddYQkb+l7NvE90/hMM8Dp8jsvM9AgVYG99GHCFhmvCmDEMx1qA8Fpitk9rPOL/XBVFK4Rdz3zxqXm2cdvFc/cs0nSnxyhCRUHnMFLe4Wvx2S2b4KmAk0v+uj7QlK678CcLY+Z7yghbhXpAPuX2gdc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722883655; c=relaxed/simple;
-	bh=RB5ABq4ub7SeudjawYwgkqLmnuH/wm0HeSQlI0Pti0o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Q5YigqCxpm1UBJRtosXx2yHYludvlPya1+IKNFjYvsrWpZXjMDMkO453DYB/jyOQN5QQqojuDT5pvo/5mLfxFeCaXbIz5VqoH7n5uurKoRTwbgfmqAVrs3lLe/Jj7QX9BM0vq7HNux316Cn147YD2E18YYvoN3V8MNjzH8f8uUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info; spf=pass smtp.mailfrom=leemhuis.info; dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b=yR+2mv4D; arc=none smtp.client-ip=80.237.130.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=leemhuis.info
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=leemhuis.info
+	s=arc-20240116; t=1722889961; c=relaxed/simple;
+	bh=QUw3QeI7OYZ1AwcqILIHnl5Wyq/fgKZKE4y6WwkXezA=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=pMx7PoPX9l4bGrQ2XiuaamtzbN7QLcq6HyZBZYKm6s0ryZYM80XzZ0r31DQjzbhUIvZqO3VqsomHNNQ6gOE6UnNpMsfofRsx6pjKP7kyNW0fgfdUD0S2q1XO2/OtliMyv3phDuojGu/VK+uts0EbUa+VUZvwhqCjiOUs9fp0cBw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com; spf=none smtp.mailfrom=toblux.com; dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b=Rc27k3lf; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=toblux.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=leemhuis.info header.i=@leemhuis.info header.b="yR+2mv4D"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=leemhuis.info; s=he214686; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:In-Reply-To:
-	References; bh=pCPe3QNW7Gfv8d+9jcf1cpKcadC66WQXFO95ychUD+Y=; t=1722883653;
-	x=1723315653; b=yR+2mv4DZBV+IsdFZ72IsCebDbikWluBbzbnKaU7jHS5W/X9i2a9UXjs0MY6u
-	Xlkf5U/TNAx3fJHFB4wJSLGpm9mHUzNW2yNsJZ9Wcjfu8U9H7zwVwZtVVtRCW9r9bAVz1ponxKAJX
-	QCNREF62OgVGtkR67zd9x49nzD55Hs2mzJlhfjdFWo9uCOtmruTEzlYEXHWyOkNk0jVws3T4Gf5vT
-	8jggAruTmNswuEJwdULcIy7p87c0IrB1eNu0dYcRSclt7eFQh4Y4Hv8K0DMpjkHbZVzYxeEsckk/q
-	HT1qqu5dOOVgrNH6X6yADu2t5rjZxsRXzMTkHRi2BjH64+yk/g==;
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1sb2jw-0002t2-Nz; Mon, 05 Aug 2024 20:47:28 +0200
-Message-ID: <4bba778c-79b6-49a6-9839-5f492cc4251b@leemhuis.info>
-Date: Mon, 5 Aug 2024 20:47:28 +0200
+	dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b="Rc27k3lf"
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-42803bbf842so99939395e9.1
+        for <linux-crypto@vger.kernel.org>; Mon, 05 Aug 2024 13:32:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=toblux-com.20230601.gappssmtp.com; s=20230601; t=1722889959; x=1723494759; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Vn6Rnyxr4niEdIXil13oe5CZlyeVE53UOlfup/AAfYs=;
+        b=Rc27k3lfr9eyi8SjbJcNRO/iwiEzwWl6zn+iCj+T+Hb+FzLSEHmN9WKSLekogpBZqA
+         eC8/Wmp3mZI9WbXv69yFrnpm96YRm6pLvpQcCmozdXrPqAX9lXvRCGbVpXNy7NJG0N6E
+         AqSSg/csyjDw0j/Rmn83oJe6Jdj5BMFeu2ESSebyh1uViAPCj/3CBn8DTaPYOE8UBTD7
+         E9MMIGyFcBoWf/YCAIwSx7GQNbAZCseKFZC6ZDdCXaIoZnumAeZh5d4CeTd7OZl0izjf
+         UfEUnuVs+iD7AqsDPE525KNQP6q8OZ8VVCuD895vYnWNimvm4G5DQQy0YB16D/Q9WW9i
+         BcuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722889959; x=1723494759;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Vn6Rnyxr4niEdIXil13oe5CZlyeVE53UOlfup/AAfYs=;
+        b=s7ldBZP96g3ND0E3NRCxuWCuDsu1uq0KY8bUeJ+nOumdbBLc4kcIGsDKbJUT89vv4N
+         PrQANd6xot0Y25RzgX4HzLKI2JWwO7VsTQO2N0ZkivIKcvGDc8E2FcayU8js/hfihgEX
+         EhRH2xn6Aeq9PcR7mSebONIzJ9wH1/dXSr7xgbwxEKA1r+YoANCe65zwjWXnZrMyDgQ0
+         dxJkjo+GrZ8zUrEMlWybe+Ng8DigA+iylAwBCiHaXpU33vSgg1bfzcu/nhaGd3kqdHDa
+         AzEJsn0ouF+vZrsH8mIz2+NqMSi44zU9OZ08SL+F0jT3aG24mmWCCiK43/SF8iyindWg
+         u2tA==
+X-Forwarded-Encrypted: i=1; AJvYcCVSPOJj2BMLbC9VIaZCNPin7eRE9nBGs9uvZiw5vSNWP2pNzogGvR7y+cOvHj3SLjr+ZSTxUYV3ZGBN37numqrouDN7Jy+m92sEMJrq
+X-Gm-Message-State: AOJu0YzoOnqJARo+4RvpttRAgf+7ltoouVjLEaVm7M9VP0pl/ZEDkgyX
+	5BIv0vZhgGOAuq8iuN/pIgkY+lOtPkQbULnX8z02lMZJ5odsUYR4DYNNHD/aPwDYd3W9E3IqfgY
+	L
+X-Google-Smtp-Source: AGHT+IFEVQJwp3vZXhCpDGiKBNDcqVcaDTiD72/DHGQk9xC8MVyvZWQq5QLSREYXMf2KASU8Tj4CmQ==
+X-Received: by 2002:a05:600c:4588:b0:428:15b0:c8dd with SMTP id 5b1f17b1804b1-428e6b2f14emr118747665e9.20.1722889958397;
+        Mon, 05 Aug 2024 13:32:38 -0700 (PDT)
+Received: from smtpclient.apple ([2001:a61:10b5:fc01:ad5e:c962:d96f:7752])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4282b89aa7bsm216173985e9.5.2024.08.05.13.32.37
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 05 Aug 2024 13:32:38 -0700 (PDT)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [herbert-cryptodev-2.6:master 2/9]
- arch/arm64/crypto/poly1305-core.S:415:(.text+0x3d4): relocation truncated to
- fit: R_AARCH64_ADR_PREL_LO21 against `.rodata'
-To: Jia He <justin.he@arm.com>
-Cc: oe-kbuild-all@lists.linux.dev, linux-crypto@vger.kernel.org,
- Herbert Xu <herbert@gondor.apana.org.au>, kernel test robot <lkp@intel.com>
-References: <202408040817.OWKXtCv6-lkp@intel.com>
-From: Thorsten Leemhuis <linux@leemhuis.info>
-Content-Language: en-US, de-DE
-Autocrypt: addr=linux@leemhuis.info; keydata=
- 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 n7RI
-In-Reply-To: <202408040817.OWKXtCv6-lkp@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;linux@leemhuis.info;1722883653;7fa585eb;
-X-HE-SMSGID: 1sb2jw-0002t2-Nz
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.600.62\))
+Subject: Re: [PATCH] crypto: chacha20poly1305 - Annotate struct chachapoly_ctx
+ with __counted_by()
+From: Thorsten Blum <thorsten.blum@toblux.com>
+In-Reply-To: <20240805175932.GB1564@sol.localdomain>
+Date: Mon, 5 Aug 2024 22:32:26 +0200
+Cc: herbert@gondor.apana.org.au,
+ davem@davemloft.net,
+ kees@kernel.org,
+ gustavoars@kernel.org,
+ linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ linux-hardening@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <DA00621C-305F-4126-8D04-9F6D86E959D1@toblux.com>
+References: <20240805175237.63098-2-thorsten.blum@toblux.com>
+ <20240805175932.GB1564@sol.localdomain>
+To: Eric Biggers <ebiggers@kernel.org>
+X-Mailer: Apple Mail (2.3774.600.62)
 
-On 04.08.24 02:20, kernel test robot wrote:
-> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-> head:   e0d3b845a1b10b7b5abdad7ecc69d45b2aab3209
-> commit: 47d96252099a7184b4bad852fcfa3c233c1d2f71 [2/9] crypto: arm64/poly1305 - move data to rodata section
-> config: arm64-randconfig-002-20240804 (https://download.01.org/0day-ci/archive/20240804/202408040817.OWKXtCv6-lkp@intel.com/config)
-> compiler: aarch64-linux-gcc (GCC) 14.1.0
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240804/202408040817.OWKXtCv6-lkp@intel.com/reproduce)
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202408040817.OWKXtCv6-lkp@intel.com/
-> 
-> All errors (new ones prefixed by >>):
-> 
->    arch/arm64/crypto/poly1305-core.o: in function `poly1305_blocks_neon':
->>> arch/arm64/crypto/poly1305-core.S:415:(.text+0x3d4): relocation truncated to fit: R_AARCH64_ADR_PREL_LO21 against `.rodata'
+On 5. Aug 2024, at 19:59, Eric Biggers <ebiggers@kernel.org> wrote:
+> On Mon, Aug 05, 2024 at 07:52:38PM +0200, Thorsten Blum wrote:
+>> struct poly_req {
+>> @@ -611,8 +611,8 @@ static int chachapoly_create(struct =
+crypto_template *tmpl, struct rtattr **tb,
+>>       poly->base.cra_priority) / 2;
+>> inst->alg.base.cra_blocksize =3D 1;
+>> inst->alg.base.cra_alignmask =3D chacha->base.cra_alignmask;
+>> - inst->alg.base.cra_ctxsize =3D sizeof(struct chachapoly_ctx) +
+>> -     ctx->saltlen;
+>> + inst->alg.base.cra_ctxsize =3D struct_size_t(struct chachapoly_ctx, =
+salt,
+>> +   ctx->saltlen);
+>=20
+> What was wrong with the more straightforward code it had before?
 
-Ran into the same problem today with my kernel vanilla next builds for
-Fedora. Build log:
+There's nothing wrong with it, but I find using the helper macro
+struct_size_t() more straightforward. It's just a refactoring; happy to
+take it out if there's a preference for the open coded version.
 
-https://download.copr.fedorainfracloud.org/results/@kernel-vanilla/next/fedora-40-aarch64/07852205-next-next-all/builder-live.log.gz
-
-Happens with Fedora 39 and Fedora rawhide as well.
-
-Ciao, Thorsten
+Thanks,
+Thorsten=
