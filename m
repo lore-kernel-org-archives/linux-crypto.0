@@ -1,143 +1,119 @@
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A90F441746
-	for <linux-crypto@vger.kernel.org>; Mon,  5 Aug 2024 15:45:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E11316BE3A
+	for <linux-crypto@vger.kernel.org>; Mon,  5 Aug 2024 17:38:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722872739; cv=none; b=F1qYSoE9Re9wHxZTUcBqCiT4XAEOJucyiE+qQ8qQdbnI+mzDCls9M/FzVoiRq2mMbGFPoTvpMQwq1a0hR8ty3znVg3nFe6FwC0yxx9tEi0F13BNOGBeQPT2egVdspfie84cxu+Fn3IWXOM84I7hle8SpTdYlOuAF0yBzILUmLYk=
+	t=1722879509; cv=none; b=HmEejah9DcFu3eKdpPD+7v1ACl2pvWHqIgE2pEF/N42qSWLeMzmPy3ClXn83IzOnvHml0DMCbWyXd1FYNyELhirKwnBlbp8QCPVP8SDSs33uJVQDPCuqiQ2+cxh8xTZYj2+ghXeYFZVUEPL79z8tjb83wp/G/fER72WW7f4iiQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722872739; c=relaxed/simple;
-	bh=vEB+f0GhXn2Y1GL8VFX5EXsjwXKCJGMgjh2WoM2OcHE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hTyrVAU2Wk9vF6aT3xZMFjeZk3ZMJTnzjVD5LnGOYJhVXnCni7TGlnjxZEeu6Ox2ZUei0MoZRvWUunTI3hCTQ+jzJ99gTcQ8Vnw6NO6XhQEuLl+pl/SRufSw4yymR3rsBga9mf3o5eTcNoY1a9UpIsEGK9o0WQrWnEITnJiQ0KM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cryptogams.org; spf=pass smtp.mailfrom=cryptogams.org; dkim=pass (2048-bit key) header.d=cryptogams.org header.i=@cryptogams.org header.b=f2hew9p2; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cryptogams.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cryptogams.org
+	s=arc-20240116; t=1722879509; c=relaxed/simple;
+	bh=/8St2FPKhNt7onTcny3gjlqotiTPh1Jf/cUdeZLD2rk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UQV8a+6VGQHf7v8wuFGLhn4LrMVVWVCb0hiy3vH08xKK9BV+bS6qcLMqQa/Z1Uf19aTI5dDHAjI1ozW9ldW9n8Uqy2DT043VEhm6kRpC1qdqDOHjDhwNNAeav7JYGDgDtZY8D270fdVtPP6t4fpZ/heBvTQZzXkuLeMvD5r54ds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ny5nwYwx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cryptogams.org header.i=@cryptogams.org header.b="f2hew9p2"
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-52f04c29588so17022499e87.3
-        for <linux-crypto@vger.kernel.org>; Mon, 05 Aug 2024 08:45:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cryptogams.org; s=gmail; t=1722872736; x=1723477536; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lgwj/PCY5l3ttsTnYpQqhQu4YQpCRA34f5cZ+qu+J4w=;
-        b=f2hew9p2JEDUafLlH3+Q6AgCnQLjyrnO7Sg8PGlJXHt1sV1iRYm3eqaCpYsK3uu8rW
-         qrZZYJTfxQOQkaux74SB8hRw2cerKUdWqxsdv/bRYrFvBfArC/fJQKJi3dkJY6nwQXrz
-         761N1Nd3xIyxH33cE0FmgBi/EmNgiPzbveI9CTN1XCi/+nNKzlDvbdBjDuI5HFr9HxJO
-         h+rAM41zd743O/e4kTEZjCOLBb2OcEc0BBnlv2NTPe/37IOTjAuBaGc0xobBd7GciPdz
-         20eJRNo18VFmLqsyib/FLzqDIbDhYEaUEg0eHzSrtX/X7osM1PkSCsBYLjfKHMJF5hU0
-         54MA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722872736; x=1723477536;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lgwj/PCY5l3ttsTnYpQqhQu4YQpCRA34f5cZ+qu+J4w=;
-        b=gLmdDPpLj/NN2p2ohXAX5ZM7uuIU4Nv5FlEnrB7DysvmEVTAt2jKm/LyLq2uwFz6Ak
-         XdwDyTyi4dgeabysnfVAdgQZjR8BW76aCHdGM8e301Ct51em8UuvIunDToID7FQVCO9f
-         sVf9BwMSu+C5y3tQW75G8mDpvN3lI27GuIbms2p52SWKQkyO4bxaJcEH2023nT7BFwbk
-         ILwoDzGfSG0tlxJ27HeexH3Coq3h2a2J3/DijcCV1zAkJA08N8HSfBf68V2Hxvj6zHwf
-         FIhFo83iFd/r7Rz7QYKZyF+xK+N1U7cXNjJHKKIJ7yFI+gIE4ouNFr0AlCrEUy4deT4r
-         KOlg==
-X-Forwarded-Encrypted: i=1; AJvYcCVNFyjpPf9XCKTZSC5laRk3bANCLMiJRx8CY2YeVcDDvtA5p0Q6VsirYmkREoYFo0HzYyNnC8Os9Mc1SUTSQeXv2kewY7TKzLLag+Mz
-X-Gm-Message-State: AOJu0YyzT0B7T8X40mm+n0yhoH/v/UThfQ+qwBUmqfJa3LID7WjtuEr8
-	Z10eraHVdFij3d882MPtMUWPvEf/Y9YTiW4AzsFq4tWqkd3jcKhV5QRuB2yVBsQ=
-X-Google-Smtp-Source: AGHT+IFhHFjmWGoDB9H51c2IPL5yCBn7vA265Ma7mTCoX6o1wOoZj6MQCb7OTojuBIUL5S9rjQKI9w==
-X-Received: by 2002:a05:6512:3b8c:b0:52d:b150:b9b3 with SMTP id 2adb3069b0e04-530bb3b6fb7mr7704753e87.32.1722872735336;
-        Mon, 05 Aug 2024 08:45:35 -0700 (PDT)
-Received: from [10.0.1.129] (c-a9fa205c.012-252-67626723.bbcust.telenor.se. [92.32.250.169])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-530bba353c2sm1195003e87.212.2024.08.05.08.45.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Aug 2024 08:45:35 -0700 (PDT)
-Message-ID: <7a288592-4793-4743-b8ef-c76de1dcca5b@cryptogams.org>
-Date: Mon, 5 Aug 2024 17:45:33 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ny5nwYwx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DEFDC4AF0B;
+	Mon,  5 Aug 2024 17:38:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722879508;
+	bh=/8St2FPKhNt7onTcny3gjlqotiTPh1Jf/cUdeZLD2rk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ny5nwYwx3dc2jGv2wRk/I1LjokyKBZArUSCQ5QBrsXiZPLRRW84q6a8if15V/BOHQ
+	 uK1zmAOnJLHRhq8LFd0OA+LygOQWmIgFo/Ee16CmNM9S63T+XgnwygEsp0oyAQ3vwH
+	 lANJM6bF5b9aE7/GZIPMzQT5Qg4xI8HITejU8Zcr4DBPO1EJ8Y/We4xw32t2eC2itn
+	 NMTRc78lWz+ahA+L5h3G24V4HQawBhXq1o7EJW3E71iNaOEnczG4awyAgYMXsYTXFJ
+	 o9gzPX9AIUNQbEuAc+vlDmeQGq/lagr4xgxGFLvAdbfpl72S/h6qJonaq5DTs9427l
+	 nro8BSGe1p1Gw==
+Date: Mon, 5 Aug 2024 10:38:26 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: linux-crypto@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH] crypto: x86/aes-gcm: Disable FPU around
+ skcipher_walk_done().
+Message-ID: <20240805173826.GA1564@sol.localdomain>
+References: <20240802102333.itejxOsJ@linutronix.de>
+ <20240802162832.GA1809@sol.localdomain>
+ <20240805084121.XVnJxnOk@linutronix.de>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [herbertx/cryptodev] crypto: arm64/poly1305 - move data to rodata
- section (47d9625)
-To: Justin He <Justin.He@arm.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- herbertx/cryptodev
- <reply+AAIFISMST74UQEQBJUWW7J6EXDLZNEVBMPHARJBRSY@reply.github.com>
-Cc: herbertx/cryptodev <cryptodev@noreply.github.com>,
- Author <author@noreply.github.com>, "David S. Miller" <davem@davemloft.net>,
- Catalin Marinas <Catalin.Marinas@arm.com>,
- "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
- Will Deacon <will@kernel.org>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Ard Biesheuvel <ardb@kernel.org>
-References: <herbertx/cryptodev/commit/47d96252099a7184b4bad852fcfa3c233c1d2f71@github.com>
- <herbertx/cryptodev/commit/47d96252099a7184b4bad852fcfa3c233c1d2f71/144978326@github.com>
- <Zq18V66ufraB_1-T@gondor.apana.org.au>
- <GV2PR08MB92062BC06FFCFD28B8707592F7BE2@GV2PR08MB9206.eurprd08.prod.outlook.com>
-Content-Language: en-US
-From: Andy Polyakov <appro@cryptogams.org>
-In-Reply-To: <GV2PR08MB92062BC06FFCFD28B8707592F7BE2@GV2PR08MB9206.eurprd08.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240805084121.XVnJxnOk@linutronix.de>
 
-Hi,
+On Mon, Aug 05, 2024 at 10:41:21AM +0200, Sebastian Andrzej Siewior wrote:
+> On 2024-08-02 09:28:32 [-0700], Eric Biggers wrote:
+> > Hi Sebastian,
+> Hi Eric,
+> 
+> > > diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+> > > index cd37de5ec4046..be92e4c3f9c7f 100644
+> > > --- a/arch/x86/crypto/aesni-intel_glue.c
+> > > +++ b/arch/x86/crypto/aesni-intel_glue.c
+> > > @@ -1403,7 +1403,9 @@ gcm_crypt(struct aead_request *req, int flags)
+> > >  			aes_gcm_update(key, le_ctr, ghash_acc,
+> > >  				       walk.src.virt.addr, walk.dst.virt.addr,
+> > >  				       nbytes, flags);
+> > > +			kernel_fpu_end();
+> > >  			err = skcipher_walk_done(&walk, 0);
+> > > +			kernel_fpu_begin();
+> > >  			/*
+> > >  			 * The low word of the counter isn't used by the
+> > >  			 * finalize, so there's no need to increment it here.
+> > 
+> > Can you make this conditional on CONFIG_PREEMPT_RT so that it doesn't hurt
+> > performance for everyone else?
+> 
+> Every other instance in this file had a kernel_fpu_end/ begin() before
+> skcipher_walk_done() so I though was just missed by chance.
 
->> -----Original Message-----
->> From: Herbert Xu <herbert@gondor.apana.org.au>
->> Sent: Saturday, August 3, 2024 8:40 AM
->> To: herbertx/cryptodev
->> <reply+AAIFISMST74UQEQBJUWW7J6EXDLZNEVBMPHARJBRSY@reply.github.c
->> om>
->> Cc: herbertx/cryptodev <cryptodev@noreply.github.com>; Author
->> <author@noreply.github.com>; Justin He <Justin.He@arm.com>; David S. Miller
->> <davem@davemloft.net>; Catalin Marinas <Catalin.Marinas@arm.com>;
->> linux-crypto@vger.kernel.org; Will Deacon <will@kernel.org>;
->> linux-arm-kernel@lists.infradead.org; linux-kernel@vger.kernel.org; Ard
->> Biesheuvel <ardb@kernel.org>; Andy Polyakov <appro@cryptogams.org>
->> Subject: Re: [herbertx/cryptodev] crypto: arm64/poly1305 - move data to
->> rodata section (47d9625)
->>
->> On Fri, Aug 02, 2024 at 08:09:10AM -0700, Andy Polyakov wrote:
->>> Formally speaking this is error prone, because there is no guarantee that linker
->> will be able to resolve it as argument to `adr` instruction above. I mean since the
->> address is resolved with `adr` instruction alone, there is a limit on how far the
->> label can be from the instruction in question. On a practical level, if/since it's
->> compiled as part of a kernel module, it won't be a problem, because the module
->> won't be large enough to break the limit, but it **is** a problem in general case.
-> Thanks,
-> Can this problem be resolved by changing "adr" to "adrp"?
+No, it was intentional.  See the comment above the first kernel_fpu_begin() in
+gcm_crypt():
 
-Not by adrp alone, it has to be complemented with addition. I mean addrp 
-gives you the label's page address and you need to add the offset within 
-the page.
+	/*
+	 * Since the AES-GCM assembly code requires that at least three assembly
+	 * functions be called to process any message (this is needed to support
+	 * incremental updates cleanly), to reduce overhead we try to do all
+	 * three calls in the same kernel FPU section if possible.  We close the
+	 * section and start a new one if there are multiple data segments or if
+	 * rescheduling is needed while processing the associated data.
+	 */
+	kernel_fpu_begin();
 
->>> But why would objtool attempt to disassemble it? Does it actually attempt to
->> disassemble unreferenced spaces between functions? Note that the .Lzeros label
->> doesn't make it into .o file, so there won't be anything in the symbol table to
->> discover as potential entry point..
-> There is a similar patch (1253cab8a352) for x86. I guess that objtool/stacktool can be improved in this regard.
+> > Note that kfree() lacks a might_sleep(), and its kerneldoc does not say that it
+> > can sleep.  Have you checked for other instances of this same problem?  It seems
+> > it would be quite common kernel-wide.  
+> 
+> kfree() can't have a might_sleep() because it does not qualify for this
+> since you can use it in softirq context for instance with an acquired
+> spinlockt_t on !RT which would trigger it.
+> On PREEMPT_RT interrupts are threaded, softirq is preemptible,
+> spintlock_t is a sleeping lock so all these things where a kfree()
+> would have been invoked in preempt-disable context on !PREEMPT_RT is
+> actually preemptible on PREEMPT_RT.
+> This is of course not true in cases where preemption is explicitly
+> disabled like in this case.
 
-objtool is weird and arguably inconsistent. It does look at the symbol 
-table(*), and detects the return instructions(**), yet insists on 
-disassemble-ability of the whole .text segment... Oh well...
+WARN_ON(!preemptible()) then?
 
-Cheers.
+If I add that to kfree(), it triggers from lots of other places.  Are those
+problems on PREEMPT_RT too?
 
-(*) For example it refuses to generated ORC metadata for the following 
-snippet
+What I am trying to get at is what debugging options do I need to detect issues
+like this.  Is there really no option other than actually running a PREEMPT_RT
+kernel?
 
-.text
-foo: ret
+I had tested this code with lots of debug options pre-merge and nothing came up.
 
-It insists on foo being complemented with '.type foo,@function' as well 
-as meaningful .size.
+If there was something in CONFIG_SLUB_DEBUG, for example, I would have seen
+that, and you would never have had to deal with this issue at all as it would
+never have been introduced.
 
-(**) Since it does mark the region[s] past 'ret' as type:(und)
-
-
-
+- Eric
