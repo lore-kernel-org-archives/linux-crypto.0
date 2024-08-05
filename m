@@ -1,86 +1,119 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DF7DEC7
-	for <linux-crypto@vger.kernel.org>; Sun,  4 Aug 2024 00:21:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D764C631
+	for <linux-crypto@vger.kernel.org>; Mon,  5 Aug 2024 05:23:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722730901; cv=none; b=QWf/5j+Hx5tVv6pcq/gseSSEFE3X8bU4JGCzbzm9+nfuqbwajuorV/UmHj1O5yTC4FjqZu/fG9Sin0CK8b70c88re0ZE0yL0+fbhorkQ1DVd4OnCiYoNKFDFbU33bGUdUlk8pGUv5N65lT1M+H8lCLnmiN8MN2gUidbgT5w0cY8=
+	t=1722835385; cv=none; b=Id/wXKAYvsfTPe/doakQZiUv52jpXhHF5rfaPE+GuWoxkUuSyLEM5eP6b76HIUwhQNwkU7k0z8reXU4QfdDAOzQcowMM4nXKmLpXALf6J8cXaYh5HFCdnDF80ihEjK4X+kJRQb8R95KhcRgtfCDsEanuN7gRT5FxQ1LvuWHWozE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722730901; c=relaxed/simple;
-	bh=6fwdjn2Sdr9CngYFRhAVfoaS6hFUQxV5ElQ3usVTWds=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=FvPWPDwow6X95k1uTHmtWgoXgwqR1Ov6lTmLCnhHBETdSBsm9ZLJ4oL1dn09vJxGgCvfbc0gUF/SaIdpk9YkH/+vX/LZ7gQJw3z1ROq2dUnqRM6cjrT1wvIAREg+ZdmyWD8ohWuYZv2FJTZGrviY4HHpdigJWxScF8G3s3Lu+h4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NSp2zJaY; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1722835385; c=relaxed/simple;
+	bh=9toEjo193JFbOMCWCwzU1N59OdbCAjE+rsJfi30mHT0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=r+MDPXjOqbq3+vAzpvvPTFtB/4H4/hEYiKcZhGN0L5Wj3OxQek00gkWX1H0GXxKJwWO92Az1RQUwgRZVCl836DQ7aC3hgNmXonqScPKlaVHVx9S1VIloDLmjCZqnKUCQeHWm5/Qzmyq3fzR+VBxJx+rdplZV3gsJXAjUTwwiNFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=iyfdfE0h; arc=none smtp.client-ip=209.85.219.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NSp2zJaY"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1722730900; x=1754266900;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=6fwdjn2Sdr9CngYFRhAVfoaS6hFUQxV5ElQ3usVTWds=;
-  b=NSp2zJaYGkD88dSI8Ksbz91595OW6t0dmfU8SAGpnwHXbW44ER0+byc+
-   aFNe+otC/nANRTYc2BaYFT2p1OFxbXo/CcPFZizGcbwqw3wK1wWFUjPjI
-   0IA7fETP1Ge/PHlx9Gzj2zBeFba/m85FxokPjlPnCZxQN4fmf3Vt2TUy+
-   kZN3F+vjc6uq0g9Y9xJvwNJZP8Xy/kbXSNFBIiW+JdktmsaTrLZL+UrpM
-   nrwiQ0fWZeUc4y/NgeTFiUNBqtHZ8mMulwZPXMj27RNTI+Hy0/FW4895G
-   PJkxOYBbRnLtgB1+h7VcJ9/gFQHNnfieYvv43E1Nu/OxE6BEYJKkxq2lp
-   w==;
-X-CSE-ConnectionGUID: 8LW13vAVQcq7vmi1lhJRjA==
-X-CSE-MsgGUID: HG3xVjR1TZ21abP53pzZ7Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11153"; a="43242578"
-X-IronPort-AV: E=Sophos;i="6.09,261,1716274800"; 
-   d="scan'208";a="43242578"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Aug 2024 17:21:39 -0700
-X-CSE-ConnectionGUID: 16t7gnjDQZWIb9U8blcFEQ==
-X-CSE-MsgGUID: 0JC6fkHlQrqfRZgLcePUUg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,261,1716274800"; 
-   d="scan'208";a="55665630"
-Received: from unknown (HELO b6bf6c95bbab) ([10.239.97.151])
-  by orviesa010.jf.intel.com with ESMTP; 03 Aug 2024 17:21:37 -0700
-Received: from kbuild by b6bf6c95bbab with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1saP0A-00012A-2n;
-	Sun, 04 Aug 2024 00:21:34 +0000
-Date: Sun, 4 Aug 2024 08:20:34 +0800
-From: kernel test robot <lkp@intel.com>
-To: Jia He <justin.he@arm.com>
-Cc: oe-kbuild-all@lists.linux.dev, linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [herbert-cryptodev-2.6:master 2/9]
- arch/arm64/crypto/poly1305-core.S:415:(.text+0x3d4): relocation truncated to
- fit: R_AARCH64_ADR_PREL_LO21 against `.rodata'
-Message-ID: <202408040817.OWKXtCv6-lkp@intel.com>
+	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="iyfdfE0h"
+Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-dfef5980a69so9133498276.3
+        for <linux-crypto@vger.kernel.org>; Sun, 04 Aug 2024 22:23:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=vayavyalabs.com; s=google; t=1722835383; x=1723440183; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KwH9KdTM9xhlL2i/Q24CvpyqTjnKXLFgl8v2KpQU8Bw=;
+        b=iyfdfE0hnT2zQl02tiNngxfa4ZO2e919pbDWQ18jHqWm6IOFe7RAj0RwVnhlHml30U
+         Y+cVArMFA9WxuCZ2bIN/B31HBb9Eg+jcFDfuKNguZ1j1H/qjoMxOHc6DA+JiGfK77nXh
+         vFzxlcFoMEH7iVRm9LtUdR3X4djA6GQYxpsBw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722835383; x=1723440183;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KwH9KdTM9xhlL2i/Q24CvpyqTjnKXLFgl8v2KpQU8Bw=;
+        b=iuKakyspkwzOBcBMp+nBRmWZO/xbtSwv1rKG75y87bxaupF+jev9gHJTrTo3GkoV/J
+         Ntb6taajwfcm9E9hQrDX4+4gvv/tJ8T0YqDZxRkTswpU3rd6PAhGf9QPnd0ZeHiYNgs6
+         wWLbpBg0mxDw7+/qT9CebNgXnXvZRn564CdzoJWuxMrpx8npGW9FKCea+uiD6N7hxKsb
+         H2j6BeRxJdeP32se0WPUukMPzZwoudJPQ7Au741TuWXd0Vb+SbykVeaGEWHUv/AoaGxB
+         /1fI5UP2QM8pu9U74hcLNVfR2Q2qL5XlQb5L1SQHY6XwgBt2mA3MAWQdXT0S25ltLfjO
+         CqWg==
+X-Gm-Message-State: AOJu0Yxf1vVtKOeiLz7HNe4REuokod2X5pahf6vNauRCQGhZk1YMtJQn
+	90qMCd5t9K0QHChzyGcfB9Ttsjq0fGKpVdpxNYbHuW9UX4eQHZU6GTOkS5umThSsfbnHXSbIDJb
+	G1fT+/TJBEjMSHsiYyrgb64e3diTFUO+/bogU+Q==
+X-Google-Smtp-Source: AGHT+IFY+zqRFCz5bQpWauHGmrbkuU9vo47k6EQzMwj8tPmpu3NNomYZ/ia1ANpQF940hzdoMd5KvcynTf9Sl0o66bQ=
+X-Received: by 2002:a25:9342:0:b0:e08:6f3d:3a41 with SMTP id
+ 3f1490d57ef6-e0bde21a820mr11909069276.8.1722835382702; Sun, 04 Aug 2024
+ 22:23:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20240705171255.2618994-1-pavitrakumarm@vayavyalabs.com>
+ <20240705171255.2618994-4-pavitrakumarm@vayavyalabs.com> <ZpG+m8mnbsikdM+D@gondor.apana.org.au>
+In-Reply-To: <ZpG+m8mnbsikdM+D@gondor.apana.org.au>
+From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+Date: Mon, 5 Aug 2024 10:52:51 +0530
+Message-ID: <CALxtO0nn94NoB6yGxouogFFdWe3UyMiOALL7t-MPsmTtTHBebw@mail.gmail.com>
+Subject: Re: [PATCH v6 3/6] Add SPAcc ahash support
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, Ruud.Derwig@synopsys.com, 
+	manjunath.hadli@vayavyalabs.com, bhoomikak@vayavyalabs.com, 
+	Shweta Raikar <shwetar@vayavyalabs.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-head:   e0d3b845a1b10b7b5abdad7ecc69d45b2aab3209
-commit: 47d96252099a7184b4bad852fcfa3c233c1d2f71 [2/9] crypto: arm64/poly1305 - move data to rodata section
-config: arm64-randconfig-002-20240804 (https://download.01.org/0day-ci/archive/20240804/202408040817.OWKXtCv6-lkp@intel.com/config)
-compiler: aarch64-linux-gcc (GCC) 14.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240804/202408040817.OWKXtCv6-lkp@intel.com/reproduce)
+Hi Herbert,
+   I have pushed the V7 patch with the fix. Do let me know if that
+suffices for the software fallback.
+   Requesting a review of the same.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202408040817.OWKXtCv6-lkp@intel.com/
+Warm regards,
+PK
 
-All errors (new ones prefixed by >>):
 
-   arch/arm64/crypto/poly1305-core.o: in function `poly1305_blocks_neon':
->> arch/arm64/crypto/poly1305-core.S:415:(.text+0x3d4): relocation truncated to fit: R_AARCH64_ADR_PREL_LO21 against `.rodata'
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+On Sat, Jul 13, 2024 at 5:09=E2=80=AFAM Herbert Xu <herbert@gondor.apana.or=
+g.au> wrote:
+>
+> On Fri, Jul 05, 2024 at 10:42:52PM +0530, Pavitrakumar M wrote:
+> >
+> > +static int spacc_hash_cra_init(struct crypto_tfm *tfm)
+> > +{
+> > +     const struct spacc_alg *salg =3D spacc_tfm_ahash(tfm);
+> > +     struct spacc_crypto_ctx *tctx =3D crypto_tfm_ctx(tfm);
+> > +     struct spacc_priv *priv =3D NULL;
+> > +
+> > +     tctx->handle    =3D -1;
+> > +     tctx->ctx_valid =3D false;
+> > +     tctx->dev       =3D get_device(salg->dev[0]);
+> > +
+> > +     if (salg->mode->sw_fb) {
+> > +             tctx->fb.hash =3D crypto_alloc_ahash(salg->calg->cra_name=
+, 0,
+> > +                                                CRYPTO_ALG_NEED_FALLBA=
+CK);
+> > +
+> > +             if (IS_ERR(tctx->fb.hash)) {
+> > +                     if (tctx->handle >=3D 0)
+> > +                             spacc_close(&priv->spacc, tctx->handle);
+> > +                     put_device(tctx->dev);
+> > +                     return PTR_ERR(tctx->fb.hash);
+> > +             }
+> > +
+> > +             crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
+> > +                                      sizeof(struct spacc_crypto_reqct=
+x) +
+> > +                                      crypto_ahash_reqsize(tctx->fb.ha=
+sh));
+>
+> I thought you added set_statesize based on the fallback state
+> size, but it appears to be missing?
+>
+> Thanks,
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
