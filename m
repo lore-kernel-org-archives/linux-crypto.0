@@ -1,119 +1,111 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E11316BE3A
-	for <linux-crypto@vger.kernel.org>; Mon,  5 Aug 2024 17:38:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF47415ECEF
+	for <linux-crypto@vger.kernel.org>; Mon,  5 Aug 2024 17:53:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722879509; cv=none; b=HmEejah9DcFu3eKdpPD+7v1ACl2pvWHqIgE2pEF/N42qSWLeMzmPy3ClXn83IzOnvHml0DMCbWyXd1FYNyELhirKwnBlbp8QCPVP8SDSs33uJVQDPCuqiQ2+cxh8xTZYj2+ghXeYFZVUEPL79z8tjb83wp/G/fER72WW7f4iiQc=
+	t=1722880393; cv=none; b=bw9S14SxrjpIB75ZMc9qZizTKWxfx2/iGtrSmsAOdDejnjVWxV0IIIz4pIr1R7QwyBVPC4l60Fs4oRiehZ5kTBnZu79gCBbP8AHBl0wTD7a/9CfcIO2T5exz9neFyWdtmvc7PkFTlyEt7GUGr+sfBxHhFqmjpkIam0z1GWixdZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722879509; c=relaxed/simple;
-	bh=/8St2FPKhNt7onTcny3gjlqotiTPh1Jf/cUdeZLD2rk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UQV8a+6VGQHf7v8wuFGLhn4LrMVVWVCb0hiy3vH08xKK9BV+bS6qcLMqQa/Z1Uf19aTI5dDHAjI1ozW9ldW9n8Uqy2DT043VEhm6kRpC1qdqDOHjDhwNNAeav7JYGDgDtZY8D270fdVtPP6t4fpZ/heBvTQZzXkuLeMvD5r54ds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ny5nwYwx; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1722880393; c=relaxed/simple;
+	bh=37JxbYtgj0UGmkJjr7UoHvqcTRSFFhKr2Vl6ibBWKk4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mxAx/xk+LALr0zmTzqS/dToPJ1BJ3qHiaJLpzY/7GpMVa+j9pJ3GJ1ZIc+xDKKnZhyi8JulkpWbsBwTNO78Wocwl2s/ovbbhMumMf54pjaWpEFwpV5sMNQFNJt8Mi4Io0ZGAH74UjP5XWc8Gr3bXqkoQD1y+PxxiwD6Hgkh0zHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com; spf=none smtp.mailfrom=toblux.com; dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b=f8pKmzbN; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toblux.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=toblux.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ny5nwYwx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DEFDC4AF0B;
-	Mon,  5 Aug 2024 17:38:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722879508;
-	bh=/8St2FPKhNt7onTcny3gjlqotiTPh1Jf/cUdeZLD2rk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ny5nwYwx3dc2jGv2wRk/I1LjokyKBZArUSCQ5QBrsXiZPLRRW84q6a8if15V/BOHQ
-	 uK1zmAOnJLHRhq8LFd0OA+LygOQWmIgFo/Ee16CmNM9S63T+XgnwygEsp0oyAQ3vwH
-	 lANJM6bF5b9aE7/GZIPMzQT5Qg4xI8HITejU8Zcr4DBPO1EJ8Y/We4xw32t2eC2itn
-	 NMTRc78lWz+ahA+L5h3G24V4HQawBhXq1o7EJW3E71iNaOEnczG4awyAgYMXsYTXFJ
-	 o9gzPX9AIUNQbEuAc+vlDmeQGq/lagr4xgxGFLvAdbfpl72S/h6qJonaq5DTs9427l
-	 nro8BSGe1p1Gw==
-Date: Mon, 5 Aug 2024 10:38:26 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: linux-crypto@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH] crypto: x86/aes-gcm: Disable FPU around
- skcipher_walk_done().
-Message-ID: <20240805173826.GA1564@sol.localdomain>
-References: <20240802102333.itejxOsJ@linutronix.de>
- <20240802162832.GA1809@sol.localdomain>
- <20240805084121.XVnJxnOk@linutronix.de>
+	dkim=pass (2048-bit key) header.d=toblux-com.20230601.gappssmtp.com header.i=@toblux-com.20230601.gappssmtp.com header.b="f8pKmzbN"
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3683329f787so6102156f8f.1
+        for <linux-crypto@vger.kernel.org>; Mon, 05 Aug 2024 10:53:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=toblux-com.20230601.gappssmtp.com; s=20230601; t=1722880389; x=1723485189; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+vqwe0/CvqutnT3l9d7/bTn3dqeHNjAfCcV9ZLukVbM=;
+        b=f8pKmzbN0/ZM/QxuwCBdH+N06OQKotZqtz8yH41AO62ttbRG371WCfw8SQPPlOPT3q
+         USIyL6ZRuPWeO4y4T3RBB8nu/6fcWTJTNK4xlUa4wRCFyIHj/NmXScXQ1QGQuGX3O++x
+         zgIazL2/Ej4+AO1p3QVNXVcLKhpAqaSF9ojHA5Q/Gnh5XCARExOS989fbpe85Z4HMyzX
+         OO913yMCiRfBcOG/+S6Q5lfgmyBt1D0yDfabqPoM7wkE18C/d65G0p116I1aj9DMK4St
+         cRswLk4C5hmawy6SIjNGWqbrde8Ex03wWJqr8mTrcBGlLJFyp7MawCnmtEgehtEgvj7m
+         phjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722880389; x=1723485189;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+vqwe0/CvqutnT3l9d7/bTn3dqeHNjAfCcV9ZLukVbM=;
+        b=B8ys6QnhOZBWHY5J6ditXjcNmoZElH+UO2VdckUmRO6avy0CrqXf2e+yaNMXse/XvM
+         4hx3LvMHL2oktFYdUtIy5hAUEEArx8iXBtRGEC3MeVOi25S2S0AuRKvpjoB4xmXPUgig
+         P/+Ivy4m1eCqpp419hf25JKkXilG/ANvhP2ro3iZ/INcoSJFHvOfWMGXY/QzIZ7vKgW0
+         FLBSCDSr/DeGTx67qknGM0KpdLlNfKChe/o8hqu1KQEURLj+zcZ6Zxc+1DwBhHEXCdEw
+         tiA7PMKp8+/aOtageGbu6yJP2Wa/sdiMJ1jpyJWb7vMUHzZjvBgpoFGmRPbwEjypij6z
+         PnKA==
+X-Gm-Message-State: AOJu0YwXAysYeH/saQ94n/Y3pV3IVW8HzD4CjDkLTFmh0jl6/pmPte0e
+	LnUiZkforM5mi38Oiw7dSWNoX2Pnt5F0xSwhiSYzbzGqlr4zIMyNbqpGG7RT8x0/fkefZ5M9dpP
+	j
+X-Google-Smtp-Source: AGHT+IFsapBhb8f6mICFhltKqRUHmpBomLHqM0Xug77XUaSdZlzbbtSgJltdKCGcKWuJfAdIFBDA9g==
+X-Received: by 2002:a5d:6083:0:b0:367:340e:d6e6 with SMTP id ffacd0b85a97d-36bbc1bcadfmr7746862f8f.41.1722880388924;
+        Mon, 05 Aug 2024 10:53:08 -0700 (PDT)
+Received: from fedora.fritz.box (aftr-82-135-80-26.dynamic.mnet-online.de. [82.135.80.26])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36bbd06dfbfsm10593716f8f.99.2024.08.05.10.53.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Aug 2024 10:53:08 -0700 (PDT)
+From: Thorsten Blum <thorsten.blum@toblux.com>
+To: herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	kees@kernel.org,
+	gustavoars@kernel.org
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org,
+	Thorsten Blum <thorsten.blum@toblux.com>
+Subject: [PATCH] crypto: chacha20poly1305 - Annotate struct chachapoly_ctx with __counted_by()
+Date: Mon,  5 Aug 2024 19:52:38 +0200
+Message-ID: <20240805175237.63098-2-thorsten.blum@toblux.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240805084121.XVnJxnOk@linutronix.de>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Aug 05, 2024 at 10:41:21AM +0200, Sebastian Andrzej Siewior wrote:
-> On 2024-08-02 09:28:32 [-0700], Eric Biggers wrote:
-> > Hi Sebastian,
-> Hi Eric,
-> 
-> > > diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-> > > index cd37de5ec4046..be92e4c3f9c7f 100644
-> > > --- a/arch/x86/crypto/aesni-intel_glue.c
-> > > +++ b/arch/x86/crypto/aesni-intel_glue.c
-> > > @@ -1403,7 +1403,9 @@ gcm_crypt(struct aead_request *req, int flags)
-> > >  			aes_gcm_update(key, le_ctr, ghash_acc,
-> > >  				       walk.src.virt.addr, walk.dst.virt.addr,
-> > >  				       nbytes, flags);
-> > > +			kernel_fpu_end();
-> > >  			err = skcipher_walk_done(&walk, 0);
-> > > +			kernel_fpu_begin();
-> > >  			/*
-> > >  			 * The low word of the counter isn't used by the
-> > >  			 * finalize, so there's no need to increment it here.
-> > 
-> > Can you make this conditional on CONFIG_PREEMPT_RT so that it doesn't hurt
-> > performance for everyone else?
-> 
-> Every other instance in this file had a kernel_fpu_end/ begin() before
-> skcipher_walk_done() so I though was just missed by chance.
+Add the __counted_by compiler attribute to the flexible array member
+salt to improve access bounds-checking via CONFIG_UBSAN_BOUNDS and
+CONFIG_FORTIFY_SOURCE.
 
-No, it was intentional.  See the comment above the first kernel_fpu_begin() in
-gcm_crypt():
+Use struct_size_t() instead of manually calculating the struct's size.
 
-	/*
-	 * Since the AES-GCM assembly code requires that at least three assembly
-	 * functions be called to process any message (this is needed to support
-	 * incremental updates cleanly), to reduce overhead we try to do all
-	 * three calls in the same kernel FPU section if possible.  We close the
-	 * section and start a new one if there are multiple data segments or if
-	 * rescheduling is needed while processing the associated data.
-	 */
-	kernel_fpu_begin();
+Signed-off-by: Thorsten Blum <thorsten.blum@toblux.com>
+---
+ crypto/chacha20poly1305.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-> > Note that kfree() lacks a might_sleep(), and its kerneldoc does not say that it
-> > can sleep.  Have you checked for other instances of this same problem?  It seems
-> > it would be quite common kernel-wide.  
-> 
-> kfree() can't have a might_sleep() because it does not qualify for this
-> since you can use it in softirq context for instance with an acquired
-> spinlockt_t on !RT which would trigger it.
-> On PREEMPT_RT interrupts are threaded, softirq is preemptible,
-> spintlock_t is a sleeping lock so all these things where a kfree()
-> would have been invoked in preempt-disable context on !PREEMPT_RT is
-> actually preemptible on PREEMPT_RT.
-> This is of course not true in cases where preemption is explicitly
-> disabled like in this case.
+diff --git a/crypto/chacha20poly1305.c b/crypto/chacha20poly1305.c
+index 9e4651330852..b37f59a8280a 100644
+--- a/crypto/chacha20poly1305.c
++++ b/crypto/chacha20poly1305.c
+@@ -27,7 +27,7 @@ struct chachapoly_ctx {
+ 	struct crypto_ahash *poly;
+ 	/* key bytes we use for the ChaCha20 IV */
+ 	unsigned int saltlen;
+-	u8 salt[];
++	u8 salt[] __counted_by(saltlen);
+ };
+ 
+ struct poly_req {
+@@ -611,8 +611,8 @@ static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
+ 				       poly->base.cra_priority) / 2;
+ 	inst->alg.base.cra_blocksize = 1;
+ 	inst->alg.base.cra_alignmask = chacha->base.cra_alignmask;
+-	inst->alg.base.cra_ctxsize = sizeof(struct chachapoly_ctx) +
+-				     ctx->saltlen;
++	inst->alg.base.cra_ctxsize = struct_size_t(struct chachapoly_ctx, salt,
++						   ctx->saltlen);
+ 	inst->alg.ivsize = ivsize;
+ 	inst->alg.chunksize = chacha->chunksize;
+ 	inst->alg.maxauthsize = POLY1305_DIGEST_SIZE;
+-- 
+2.45.2
 
-WARN_ON(!preemptible()) then?
-
-If I add that to kfree(), it triggers from lots of other places.  Are those
-problems on PREEMPT_RT too?
-
-What I am trying to get at is what debugging options do I need to detect issues
-like this.  Is there really no option other than actually running a PREEMPT_RT
-kernel?
-
-I had tested this code with lots of debug options pre-merge and nothing came up.
-
-If there was something in CONFIG_SLUB_DEBUG, for example, I would have seen
-that, and you would never have had to deal with this issue at all as it would
-never have been introduced.
-
-- Eric
