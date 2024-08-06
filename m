@@ -1,133 +1,104 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from bmailout2.hostsharing.net (bmailout2.hostsharing.net [83.223.78.240])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E401A3C092
-	for <linux-crypto@vger.kernel.org>; Tue,  6 Aug 2024 07:46:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B764213C81C;
+	Tue,  6 Aug 2024 08:33:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.78.240
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722930379; cv=none; b=glt+6fFRSt/HiJ9iVnukID8ov6Gj8VbMgt9BNODttlyiPiB25p3VxTAIDJwMpFC+0Tg90HejJrSdUq315yB5FfPI7BvVRox6Qy3fxxgHODD7hvleSAX+xhB7gPUk4plfmql3MJ/Efa/cYxZrBBNxEs9rfjopto5VA+uBqDeOHos=
+	t=1722933186; cv=none; b=f2rUdIgktcQuyD9GvD1tyYyEKVpDi4luBJSm1xni4oD3Z62tV8d+Kq+lNt3nsOxrir7Apqa8HrTKrQJn4l6dyfgrTCDpDyGuXFkprcwpM3EBA5DksjikVKNq+Qb/lhMR5m98W5O2OqyGRgMy/Y+OMSLwZlNhp0tvuyPfGYGoOAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722930379; c=relaxed/simple;
-	bh=udHVDbouYGd8j7LPqztahda046aGvPYoLEGPAoTnkg4=;
+	s=arc-20240116; t=1722933186; c=relaxed/simple;
+	bh=Et4UrDWBSq2Ig4dCwK/PUkVMKoqWc0/cBul9G49mKe4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ICBPidwnu2Ianlqd05wdKrfre3R5hUr/rSsTC/LHMw73DOQx4F1z1ETmgntipSOKQjvEG6PaQjljBqkvJkPCO29J+oxsOnad+CXMh7XmU4Xxv+ioOywFmIL92byGe+297AIiT4aFU3NnLA/vywNdkQ9EhpBjgVtUSlaILmm7rYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=1tImh0bw; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=6hM40m1S; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="1tImh0bw";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="6hM40m1S"
-Date: Tue, 6 Aug 2024 09:46:14 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1722930376;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dZ3OIIWNWe9/6pNuk2Q02KdvDfWdsfM3xdOX118Zc3Y=;
-	b=1tImh0bwcscsu0CUmpna5TtuCh5M8Bm4/9Oz6bcW03xhAOrWoZk51GY6nS10vIUnrJAs95
-	0yKRZRI+k+q/z93ISXqwbAZBlarTY7ZAWCOgUdStLmqPqpOpJ4H0aeipNbt2DEB9G6p7xI
-	wMnwlmmehhhIsMDCJ3oe7wBRyOBerRdFLBjLJ8n5oQ7JhANmSvFX+dyy3CHaxqWmwztIBK
-	8Y4pQSUN5yBwp+naIzf/2D8Qci3G3ADSzxaVzybV1nIvjUMbHBgz1zVsrINLVtiPV56X4d
-	bJiqxyge6NCAN5OD/a6eaFCY3gNXJKfXG7+5A/28SJ/pKB6QeRy09JW3mGhTFw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1722930376;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dZ3OIIWNWe9/6pNuk2Q02KdvDfWdsfM3xdOX118Zc3Y=;
-	b=6hM40m1SWSm8Ay8BGuQFRvYBDgJBpRQ/N2wGtnzY7lP9KQoQZRzGNCU1nfDfyRsknX9qZC
-	sDd9nRH+QXBgeYBA==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH] crypto: x86/aes-gcm: Disable FPU around
- skcipher_walk_done().
-Message-ID: <20240806074614.2c9Y52Lt@linutronix.de>
-References: <20240802102333.itejxOsJ@linutronix.de>
- <20240802162832.GA1809@sol.localdomain>
- <20240805084121.XVnJxnOk@linutronix.de>
- <20240805173826.GA1564@sol.localdomain>
+	 Content-Type:Content-Disposition:In-Reply-To; b=btV+iTm+2pqgwerLh97tPefbc0uriYO/ndXv8EGG1syf+M5KcvWKPNvELFKgnhwIA6AhMuXbL/pAhfOzGNWsDwZiaJBZit/TgJbxQBCMhRx4UUQYSN+cRGXodD1i3IOKDp7obm9kALqnOGcH1SslvITuKu63+KQtxAarbvjaTEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.78.240
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
+Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by bmailout2.hostsharing.net (Postfix) with ESMTPS id 14EA62800B489;
+	Tue,  6 Aug 2024 10:32:55 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id 0E03F3F4DC; Tue,  6 Aug 2024 10:32:55 +0200 (CEST)
+Date: Tue, 6 Aug 2024 10:32:55 +0200
+From: Lukas Wunner <lukas@wunner.de>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Stefan Berger <stefanb@linux.ibm.com>,
+	David Howells <dhowells@redhat.com>,
+	Vitaly Chikunov <vt@altlinux.org>,
+	Tadeusz Struk <tstruk@gigaio.com>,
+	Andrew Zaborowski <andrew.zaborowski@intel.com>,
+	Saulo Alessandre <saulo.alessandre@tse.jus.br>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	linux-crypto@vger.kernel.org, keyrings@vger.kernel.org
+Subject: Re: [PATCH 2/5] crypto: akcipher - Drop usage of sglists for verify
+ op
+Message-ID: <ZrHft0G-1BTmhF0V@wunner.de>
+References: <cover.1722260176.git.lukas@wunner.de>
+ <eb13c292f60a61b0af14f0c5afd23719b3cb0bd7.1722260176.git.lukas@wunner.de>
+ <ZrG6w9wsb-iiLZIF@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20240805173826.GA1564@sol.localdomain>
+In-Reply-To: <ZrG6w9wsb-iiLZIF@gondor.apana.org.au>
 
-On 2024-08-05 10:38:26 [-0700], Eric Biggers wrote:
-> No, it was intentional.  See the comment above the first kernel_fpu_begin=
-() in
-> gcm_crypt():
->=20
-> 	/*
-> 	 * Since the AES-GCM assembly code requires that at least three assembly
-> 	 * functions be called to process any message (this is needed to support
-> 	 * incremental updates cleanly), to reduce overhead we try to do all
-> 	 * three calls in the same kernel FPU section if possible.  We close the
-> 	 * section and start a new one if there are multiple data segments or if
-> 	 * rescheduling is needed while processing the associated data.
-> 	 */
-> 	kernel_fpu_begin();
+On Tue, Aug 06, 2024 at 01:55:15PM +0800, Herbert Xu wrote:
+> On Mon, Jul 29, 2024 at 03:48:00PM +0200, Lukas Wunner wrote:
+> > Commit 6cb8815f41a9 ("crypto: sig - Add interface for sign/verify")
+> > introduced an API which accepts kernel buffers instead of sglists for
+> > signature generation and verification.
+> > 
+> > Commit 63ba4d67594a ("KEYS: asymmetric: Use new crypto interface without
+> > scatterlists") converted the sole user in the tree to the new API.
+> > 
+> > Although the API externally accepts kernel buffers, internally it still
+> > converts them to sglists, which results in overhead for asymmetric
+> > algorithms because they need to copy the sglists back into kernel
+> > buffers.
+> > 
+> > Take the next step and switch signature verification over to using
+> > kernel buffers internally, thereby avoiding the sglists overhead.
+> > 
+> > Because all ->verify implementations are synchronous, forego invocation
+> > of crypto_akcipher_sync_{prep,post}() and call crypto_akcipher_verify()
+> > directly from crypto_sig_verify().
+> 
+> The link between sig and akcipher is meant to be temporary.  The
+> plan is to create a new low-level API for sig and then migrate
+> the signature code over to that from akcipher.
+> 
+> Yes we do want to get rid of the unnecessary SG list ops but is
+> it possible to side-step this for your work? If not perhaps you
+> could help by creating the low-level API for sig? :)
 
-Okay.
+I'm looking through the code right now to understand what would be
+necessary to get there.
 
-> > > Note that kfree() lacks a might_sleep(), and its kerneldoc does not s=
-ay that it
-> > > can sleep.  Have you checked for other instances of this same problem=
-?  It seems
-> > > it would be quite common kernel-wide. =20
-> >=20
-> > kfree() can't have a might_sleep() because it does not qualify for this
-> > since you can use it in softirq context for instance with an acquired
-> > spinlockt_t on !RT which would trigger it.
-> > On PREEMPT_RT interrupts are threaded, softirq is preemptible,
-> > spintlock_t is a sleeping lock so all these things where a kfree()
-> > would have been invoked in preempt-disable context on !PREEMPT_RT is
-> > actually preemptible on PREEMPT_RT.
-> > This is of course not true in cases where preemption is explicitly
-> > disabled like in this case.
->=20
-> WARN_ON(!preemptible()) then?
->=20
-> If I add that to kfree(), it triggers from lots of other places.  Are tho=
-se
-> problems on PREEMPT_RT too?
+One issue I see is an algorithm name collision in rsa-pkcs1pad.c:
+I think I'd have to register two instances in pkcs1pad_create(),
+an akcipher_instance and a sig_instance.
 
-Nope, shouldn't. On PREEMPT_RT you can only invoke kfree() or kmalloc()
-=66rom preemptible context. This is not a problem since interrupts are
-threaded, softirqs are preemptbile,=E2=80=A6
+And inst->alg.base.cra_name would be the same in both cases,
+i.e. "pkcs1pad(%s)".  Now what?  :(
 
-> What I am trying to get at is what debugging options do I need to detect =
-issues
-> like this.  Is there really no option other than actually running a PREEM=
-PT_RT
-> kernel?
+The last couple of days I've been contemplating amending
+struct akcipher_alg with additional callbacks to get the
+max_sig_size and max_data_size.  For RSA it's the same as
+the keysize (which is available through the existing ->max_size
+callback), but for ECDSA it's different depending on the
+template.  Adding those new callbacks to a new struct sig_alg
+would be cleaner of course than shoehorning them into struct
+akcipher_alg.
 
-There is PROVE_RAW_LOCK_NESTING but this only catches something like
-raw_spinlock_t -> spinlock_t or using a spinlock_t in an interrupt
-handler that won't be threaded. It won't find anything where you disable
-interrupts or preemption on purpose.
+Thanks,
 
-> I had tested this code with lots of debug options pre-merge and nothing c=
-ame up.
->=20
-> If there was something in CONFIG_SLUB_DEBUG, for example, I would have se=
-en
-> that, and you would never have had to deal with this issue at all as it w=
-ould
-> never have been introduced.
-
-Don't worry. I didn't think for a second that there was lack of testing
-on your side.
-
-> - Eric
-
-Sebastian
+Lukas
