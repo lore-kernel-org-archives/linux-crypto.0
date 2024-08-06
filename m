@@ -1,68 +1,94 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5522015D1;
-	Tue,  6 Aug 2024 05:49:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C600615D1;
+	Tue,  6 Aug 2024 05:55:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722923344; cv=none; b=MjULp7Ia/hvYf0RZUNv4wyv8F8X/PSxYzEdl9xHMa33O32fLbw1bht9ix+zr29e/c2rsz2W2YiLlD71RhCyWM5Y9KjISQ9epbhJiZBtHNp03H1n9ETSxu28FmwimIotD7tXatHfV50RUcYD+I6x81nEH5DpunybHfxLh6RZKwcM=
+	t=1722923710; cv=none; b=GKnIJ7fLimfEnukPmiCUtRL1Tl5xszeI1B1CFPmgTQqc9dot+r0C5N2IlQif9bCgCWexE5aO4j1O9/hKjkfR2Ejbb3Q+35iWYEiu2EhmkjtxDViQ1NcfZrZ4iWVySlvMcSD+EHqCmgpDXejfCpgJiUjXCtXUaUqE8BXeNc9fQFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722923344; c=relaxed/simple;
-	bh=r52wgsyMWXkd0w0zl1y/LGO+H0/Csu398YV7QeLpysc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QmCrvI9csDdV2F9a9/7fG2zDONUBU/KbvQXk3HdNMyqOU5iytPm+0ak2pxDEydcOn4HNH8oiAq2QXu7G7088bpCrt2Lgt7R4QmTsWSowLSf3aV7QjtFaJcSBn9v9ztWy2C0T2/25XEkxBkt2gHnaQ7QVIM03EbziPsXY1iNl/yY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1sbCva-002iAN-07;
-	Tue, 06 Aug 2024 13:48:56 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 06 Aug 2024 13:48:55 +0800
-Date: Tue, 6 Aug 2024 13:48:55 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Justin He <Justin.He@arm.com>
-Cc: Thorsten Leemhuis <linux@leemhuis.info>,
-	"oe-kbuild-all@lists.linux.dev" <oe-kbuild-all@lists.linux.dev>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	kernel test robot <lkp@intel.com>, nd <nd@arm.com>
-Subject: Re: [herbert-cryptodev-2.6:master 2/9]
- arch/arm64/crypto/poly1305-core.S:415:(.text+0x3d4): relocation truncated to
- fit: R_AARCH64_ADR_PREL_LO21 against `.rodata'
-Message-ID: <ZrG5RwH-HVweqiaE@gondor.apana.org.au>
-References: <202408040817.OWKXtCv6-lkp@intel.com>
- <4bba778c-79b6-49a6-9839-5f492cc4251b@leemhuis.info>
- <GV2PR08MB9206F98238936874A3A82D9AF7BF2@GV2PR08MB9206.eurprd08.prod.outlook.com>
+	s=arc-20240116; t=1722923710; c=relaxed/simple;
+	bh=r/OxstG860TQKkSCJl419UwMF4PiKYNabXTfHM39AZI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ll8ZWHdz9hFWP04if4vdeyRNv0/52lt1IICvnhM91Q3WAvhZuAwb0uJDmWkDHB/VOZXsdiKxro9Io8FkVo7HbZ8nEymJ223svdrpqVGcj6j2kcPWltEE9PSo35GWZPITLiV0MPx0ZcBk6iWi48SMdeRq1vfFGjfKFBHsq2PjW0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9B5BA106F;
+	Mon,  5 Aug 2024 22:55:26 -0700 (PDT)
+Received: from entos-yitian-01.shanghai.arm.com (entos-yitian-01.shanghai.arm.com [10.169.218.121])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 6BC433F5A1;
+	Mon,  5 Aug 2024 22:54:57 -0700 (PDT)
+From: Jia He <justin.he@arm.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Andy Polyakov <appro@cryptogams.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Jia He <justin.he@arm.com>
+Subject: [PATCH v2] crypto: arm64/poly1305 - move data to rodata section
+Date: Tue,  6 Aug 2024 05:54:44 +0000
+Message-Id: <20240806055444.528932-1-justin.he@arm.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <GV2PR08MB9206F98238936874A3A82D9AF7BF2@GV2PR08MB9206.eurprd08.prod.outlook.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Aug 06, 2024 at 12:46:33AM +0000, Justin He wrote:
-> Hi Thorsten,
-> 
-> > -----Original Message-----
-> > From: Thorsten Leemhuis <linux@leemhuis.info>
-> >
-> > Ran into the same problem today with my kernel vanilla next builds for Fedora.
-> > Build log:
-> > 
-> > https://download.copr.fedorainfracloud.org/results/@kernel-vanilla/next/fedor
-> > a-40-aarch64/07852205-next-next-all/builder-live.log.gz
-> > 
-> > Happens with Fedora 39 and Fedora rawhide as well.
-> Thanks, I've reproduce this issue with the kconfig provided by kernel test robot.
-> Tend to think it can be resolved by replacing "adr" with "adrp"
+When objtool gains support for ARM in the future, it may encounter issues
+disassembling the following data in the .text section:
+> .Lzeros:
+> .long   0,0,0,0,0,0,0,0
+> .asciz  "Poly1305 for ARMv8, CRYPTOGAMS by \@dot-asm"
+> .align  2
 
-I've reverted this patch for the time being.
+Move it to .rodata which is a more appropriate section for read-only data.
 
-Thanks,
+There is a limit on how far the label can be from the instruction, hence
+use "adrp" and low 12bits offset of the label to avoid the compilation
+error.
+
+Signed-off-by: Jia He <justin.he@arm.com>
+---
+v2:
+  - use adrp+offset to avoid compilation error(kernel test bot and Andy)
+v1: https://lkml.org/lkml/2024/8/2/616
+
+ arch/arm64/crypto/poly1305-armv8.pl | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/crypto/poly1305-armv8.pl b/arch/arm64/crypto/poly1305-armv8.pl
+index cbc980fb02e3..22c9069c0650 100644
+--- a/arch/arm64/crypto/poly1305-armv8.pl
++++ b/arch/arm64/crypto/poly1305-armv8.pl
+@@ -473,7 +473,8 @@ poly1305_blocks_neon:
+ 	subs	$len,$len,#64
+ 	ldp	x9,x13,[$inp,#48]
+ 	add	$in2,$inp,#96
+-	adr	$zeros,.Lzeros
++	adrp	$zeros,.Lzeros
++	add	$zeros,$zeros,#:lo12:.Lzeros
+ 
+ 	lsl	$padbit,$padbit,#24
+ 	add	x15,$ctx,#48
+@@ -885,10 +886,13 @@ poly1305_blocks_neon:
+ 	ret
+ .size	poly1305_blocks_neon,.-poly1305_blocks_neon
+ 
++.pushsection .rodata
+ .align	5
+ .Lzeros:
+ .long	0,0,0,0,0,0,0,0
+ .asciz	"Poly1305 for ARMv8, CRYPTOGAMS by \@dot-asm"
++.popsection
++
+ .align	2
+ #if !defined(__KERNEL__) && !defined(_WIN64)
+ .comm	OPENSSL_armcap_P,4,4
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.34.1
+
