@@ -1,91 +1,79 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A53721BD006;
-	Tue,  6 Aug 2024 08:58:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EE9F1BDA84
+	for <linux-crypto@vger.kernel.org>; Tue,  6 Aug 2024 09:58:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722934726; cv=none; b=h746gjd0fqT/Cx1RdaZqNNFbpodH9jynoLmzOKoCqu5b9tGd1eWptFEfcvxj5tKd5R1YAPV1RmfrY1dwu7tSJSzB8JaOd+w1lwWekMxNMaH8Jg5ALHIF9jco9IEFxkr9y7u7jY7bDTk0VMqe3o8D7pUTkUGHWjJ5qT7zg/FrGpQ=
+	t=1722938287; cv=none; b=eX9lM93u6jkKuNE/7dSaL/J71OOMrhtlY+cd8PeM/2l6npPA0J1HWAYv4w638TL/+WPVZZg/v2Yk9ndfZBYXj+kqDQvHaV66IrWyfIoLQ3ULAisBus6P84Piwn164TplZXdQdKd6EaunI/aZGMDwVFM7zjh0EgahrGUGy3CWzEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722934726; c=relaxed/simple;
-	bh=A3jT79yax7B4x+CCo8lOx9zIktZJhYbb2Jpf2FLQKSY=;
+	s=arc-20240116; t=1722938287; c=relaxed/simple;
+	bh=2HUJZpCAfyNRH8E5Z4HOcNnclfEAlaaKGbM4A2IlwrA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JGNTfm+KXVDlgNOfUXKIjIXaU6RpSHc6XPxCG5KfbQvuXhMp73phh49cOzywobNfyXJToMV2Xu3tpuH9sl+NnuBuOzC9aXTgp5+kgjyR3ZIf+ZqfzifbuXd3uhpSGN2FYC6/Ce8gq5zb+FoukjlJ5evvsPG/cjI+igeWne3xm2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1sbFso-002k7B-07;
-	Tue, 06 Aug 2024 16:58:16 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 06 Aug 2024 16:58:15 +0800
-Date: Tue, 6 Aug 2024 16:58:15 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Lukas Wunner <lukas@wunner.de>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Stefan Berger <stefanb@linux.ibm.com>,
-	David Howells <dhowells@redhat.com>,
-	Vitaly Chikunov <vt@altlinux.org>,
-	Tadeusz Struk <tstruk@gigaio.com>,
-	Andrew Zaborowski <andrew.zaborowski@intel.com>,
-	Saulo Alessandre <saulo.alessandre@tse.jus.br>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	linux-crypto@vger.kernel.org, keyrings@vger.kernel.org
-Subject: Re: [PATCH 2/5] crypto: akcipher - Drop usage of sglists for verify
- op
-Message-ID: <ZrHlpz4qnre0zWJO@gondor.apana.org.au>
-References: <cover.1722260176.git.lukas@wunner.de>
- <eb13c292f60a61b0af14f0c5afd23719b3cb0bd7.1722260176.git.lukas@wunner.de>
- <ZrG6w9wsb-iiLZIF@gondor.apana.org.au>
- <ZrHft0G-1BTmhF0V@wunner.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=psuaqLXN+tUBFZHpQnBqzzsaq4ZbzsincTwcUJUS6zw5P6hpKhIohmV1x1nJ5Hi4YJ9jARyk5SyG8EG9TTmkFE+Z3hAz7uvVId86Xq1mxMbt9kwXgo+o5HI/lbjs+P0oVlw0NbhFl9YTP9b0qOauN9hn4DBuAyawUwdHpNGgdMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=0rN046l3; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=J2cTOtxe; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="0rN046l3";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="J2cTOtxe"
+Date: Tue, 6 Aug 2024 11:57:56 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1722938277;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=s4d/A+2BKO2+LeDBYII8yJrMay3NludajAQqBaYb+DA=;
+	b=0rN046l3Gjk1M1qAL9quNEke79rSgIsjCzjwOWv1uMbr+h9cMwaubA0luoTI2J3LF58+bC
+	7rvO51Gazfe9JCoYANUpq9Mmp9VnGVP11PUlWPZOgfTpdKReFXa6RRUpqbMrfJDHTq8GqM
+	2yyYvW88Wx/SpY7loq+/PNN8UezE3ccqlVvjqqZHVmIzgl0LVm6w4Ga527N3iS3W2YsDAC
+	Pvo89HHEp3ncKV/336IkJTIWpSy2B4IOm7W1ABzPukU+Fw+qL5vXDfZkg/fFKDsoB/Qyc0
+	BhPMtf9+4ir9sN7e7Uy5Jt4P2/BCbdTtIhFWLDFD7XFXOO7bV38C+x9SOFZj+g==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1722938277;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=s4d/A+2BKO2+LeDBYII8yJrMay3NludajAQqBaYb+DA=;
+	b=J2cTOtxeljWFMaYrtif71uHjXjFExeIwz8UTSBcQo7XJM7Up1jLNpYyqTQ1s+vcsn75dei
+	6r1SjD8bvNO859AA==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+	Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH] crypto: x86/aes-gcm - fix PREEMPT_RT issue in gcm_crypt()
+Message-ID: <20240806095756.uLukAZs_@linutronix.de>
+References: <20240805182713.161198-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ZrHft0G-1BTmhF0V@wunner.de>
+In-Reply-To: <20240805182713.161198-1-ebiggers@kernel.org>
 
-On Tue, Aug 06, 2024 at 10:32:55AM +0200, Lukas Wunner wrote:
->
-> I'm looking through the code right now to understand what would be
-> necessary to get there.
+On 2024-08-05 11:27:13 [-0700], Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> On PREEMPT_RT, kfree() takes sleeping locks and must not be called with
+> preemption disabled.  Therefore, on PREEMPT_RT skcipher_walk_done() must
+> not be called from within a kernel_fpu_{begin,end}() pair, even when
+> it's the last call which is guaranteed to not allocate memory.
+> 
+> Therefore, move the last skcipher_walk_done() in gcm_crypt() to the end
+> of the function so that it goes after the kernel_fpu_end().  To make
+> this work cleanly, rework the data processing loop to handle only
+> non-last data segments.
+> 
+> Fixes: b06affb1cb58 ("crypto: x86/aes-gcm - add VAES and AVX512 / AVX10 optimized AES-GCM")
+> Reported-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> Closes: https://lore.kernel.org/linux-crypto/20240802102333.itejxOsJ@linutronix.de
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-Great :)
+Tested-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 
-> One issue I see is an algorithm name collision in rsa-pkcs1pad.c:
-> I think I'd have to register two instances in pkcs1pad_create(),
-> an akcipher_instance and a sig_instance.
+Thank you Eric.
 
-Since there is precisely one user -- crypto/asymmetric, we could
-simply rename the sig version of pkcs1pad to something else without
-causing too much churn.  Perhaps leave the akcipher pkcs1pad as is
-and create a new template for sig called pkcs1sig.
-
-So you could do it in a little series without breaking bisection:
-
-1) Add sig type and then create the pkcs1sig template;
-2) Switch to pkcs1sig when signing in crypto/asymmetric;
-3) Remove now-unused signing code from pkcs1pad.
-
-> The last couple of days I've been contemplating amending
-> struct akcipher_alg with additional callbacks to get the
-> max_sig_size and max_data_size.  For RSA it's the same as
-> the keysize (which is available through the existing ->max_size
-> callback), but for ECDSA it's different depending on the
-> template.  Adding those new callbacks to a new struct sig_alg
-> would be cleaner of course than shoehorning them into struct
-> akcipher_alg.
-
-Yes having a separate alg for sig is definitely where we want to
-be since there is very little that the two types actually share.
-
-The only place where they currently intersect is pkcs1pad :)
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Sebastian
