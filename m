@@ -1,41 +1,35 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADFC01BB6AB;
-	Tue,  6 Aug 2024 05:55:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE4C25EE8D
+	for <linux-crypto@vger.kernel.org>; Tue,  6 Aug 2024 06:00:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722923760; cv=none; b=NzWlE4yJWrzS5Wnk3U06O/1tW71kx+6K7Q8sUGo6EpLHF2IOllPudSkvTpVoV2Nbk4PZM7hMQdCtxHpSrxJwIO5DhT4DkvuNU4AuO+zL4EEb0X/fqnNEun/9S8brAyHRZhxUCUQkRAR+0kdux8TTMSUM4TmHYzvHBZmxLZXQw2E=
+	t=1722924009; cv=none; b=NuZnkAZ/CVfUXzvfXFwK5SdfyKXL/fjXL2mSJ6zGCbMGOepoSThn8Nooju/mvTPAnn49EFcYDpyUtl+P7Lxlbd+F5ZFBCni/zBvIzORaB7w9kE3VZH5BQ0fNn+GeD1JBXdtS7IMXuPRKkOEcLoDNVFY2k1SeEMNVGJrndTI2y1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722923760; c=relaxed/simple;
-	bh=bF/kPymzVwsm4G5FVZrNwYBVzG3zHnDbcM7SULwMHPo=;
+	s=arc-20240116; t=1722924009; c=relaxed/simple;
+	bh=cfsVJjX2B6AFeZVgoCJaJN3CFB3WnIBuenP3EBQYClg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SOM1pP/ez9Nb4fWsMvNJe6nOdYjUrsH+m413l66czGhiIa4oWiwlWu+H8p/VADyPBWSbtADz6AxW0JfDbfNPI6ZenhnXhDFRrbLUdAeEgizpXlmWawR9O2ItqgU6eXuLRYyGrnOLuXIEL6ZCErc+13wc3ZCKkqSRYfuw61+VMEo=
+	 Content-Type:Content-Disposition:In-Reply-To; b=NhBeXJ1fvJ2nLo4vNqg355muqlPav866yX2LIgt18hsDp42Jz3oKJonp8MAf3JhyY/Q1KAv9yKikXyfCLmcSK0m6A9e9f2XWJrjL71IIypBAzztBaEhM4HhukLVigb/CCljS7YBeXd8lE/+HUhSmpkbTC064rYXK7Vcl44faP4s=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1sbD1i-002iCv-2y;
-	Tue, 06 Aug 2024 13:55:17 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 06 Aug 2024 13:55:15 +0800
-Date: Tue, 6 Aug 2024 13:55:15 +0800
+	id 1sbD60-002iEW-2H;
+	Tue, 06 Aug 2024 13:59:42 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 06 Aug 2024 13:59:41 +0800
+Date: Tue, 6 Aug 2024 13:59:41 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Lukas Wunner <lukas@wunner.de>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Stefan Berger <stefanb@linux.ibm.com>,
-	David Howells <dhowells@redhat.com>,
-	Vitaly Chikunov <vt@altlinux.org>,
-	Tadeusz Struk <tstruk@gigaio.com>,
-	Andrew Zaborowski <andrew.zaborowski@intel.com>,
-	Saulo Alessandre <saulo.alessandre@tse.jus.br>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	linux-crypto@vger.kernel.org, keyrings@vger.kernel.org
-Subject: Re: [PATCH 2/5] crypto: akcipher - Drop usage of sglists for verify
- op
-Message-ID: <ZrG6w9wsb-iiLZIF@gondor.apana.org.au>
-References: <cover.1722260176.git.lukas@wunner.de>
- <eb13c292f60a61b0af14f0c5afd23719b3cb0bd7.1722260176.git.lukas@wunner.de>
+To: Yi Yang <yiyang13@huawei.com>
+Cc: davem@davemloft.net, mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com, lujialin4@huawei.com,
+	linux-crypto@vger.kernel.org,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Daniel Jordan <daniel.m.jordan@oracle.com>
+Subject: Re: [PATCH -next] crypto: testmgr - don't generate WARN for -EAGAIN
+Message-ID: <ZrG7zWxeXQn-Mkhn@gondor.apana.org.au>
+References: <20240802114947.3984577-1-yiyang13@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -44,46 +38,26 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <eb13c292f60a61b0af14f0c5afd23719b3cb0bd7.1722260176.git.lukas@wunner.de>
+In-Reply-To: <20240802114947.3984577-1-yiyang13@huawei.com>
 
-On Mon, Jul 29, 2024 at 03:48:00PM +0200, Lukas Wunner wrote:
-> Commit 6cb8815f41a9 ("crypto: sig - Add interface for sign/verify")
-> introduced an API which accepts kernel buffers instead of sglists for
-> signature generation and verification.
+On Fri, Aug 02, 2024 at 11:49:47AM +0000, Yi Yang wrote:
+> Since commit 8f4f68e788c3 ("crypto: pcrypt - Fix hungtask for PADATA_RESET"),
+> The encryption and decryption using padata be failed when the CPU goes
+> online and offline.
+> We should try to re-encrypt or re-decrypt when -EAGAIN happens rather than
+> generate WARN. The unnecessary panic will occur when panic_on_warn set 1.
 > 
-> Commit 63ba4d67594a ("KEYS: asymmetric: Use new crypto interface without
-> scatterlists") converted the sole user in the tree to the new API.
-> 
-> Although the API externally accepts kernel buffers, internally it still
-> converts them to sglists, which results in overhead for asymmetric
-> algorithms because they need to copy the sglists back into kernel
-> buffers.
-> 
-> Take the next step and switch signature verification over to using
-> kernel buffers internally, thereby avoiding the sglists overhead.
-> 
-> Because all ->verify implementations are synchronous, forego invocation
-> of crypto_akcipher_sync_{prep,post}() and call crypto_akcipher_verify()
-> directly from crypto_sig_verify().
-> 
-> Signed-off-by: Lukas Wunner <lukas@wunner.de>
+> Fixes: 8f4f68e788c3 ("crypto: pcrypt - Fix hungtask for PADATA_RESET")
+> Signed-off-by: Yi Yang <yiyang13@huawei.com>
 > ---
->  crypto/akcipher.c         | 11 +++-----
->  crypto/ecdsa.c            | 27 +++++---------------
->  crypto/ecrdsa.c           | 28 +++++++--------------
->  crypto/rsa-pkcs1pad.c     | 27 ++++++++------------
->  crypto/sig.c              | 24 +++++++++---------
->  crypto/testmgr.c          | 12 ++++-----
->  include/crypto/akcipher.h | 53 +++++++++++++++++++++------------------
->  7 files changed, 76 insertions(+), 106 deletions(-)
+>  crypto/testmgr.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-The link between sig and akcipher is meant to be temporary.  The
-plan is to create a new low-level API for sig and then migrate
-the signature code over to that from akcipher.
+We should not expect Crypto API users to retry requests in this
+manner.
 
-Yes we do want to get rid of the unnecessary SG list ops but is
-it possible to side-step this for your work? If not perhaps you
-could help by creating the low-level API for sig? :)
+If this is a reliability issue, perhaps padata should be performing
+the retry? Steffen?
 
 Thanks,
 -- 
