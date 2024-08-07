@@ -1,151 +1,90 @@
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [81.169.146.165])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 444A11E674E
-	for <linux-crypto@vger.kernel.org>; Wed,  7 Aug 2024 13:45:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=81.169.146.165
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723038314; cv=pass; b=lAI++j91whbHHchoU+7BoX0eostr8SbY+D7LzQDKIS/Y1R/8+0UshM+TALJY7rinjC2OFwYTJb+dQ95Nq1ja4RyACq9ERAeDodHQkSaKrSU4bcpoWd1qQmQ0FfeKPZivxqI3z1Zeo1agtgEsLjUYn/hwm9nUr0bN4q1O81Tr2Ic=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723038314; c=relaxed/simple;
-	bh=Fqkx7LyQoYNOGb/lr2QbqdmtNQCUXPRRcA8awGu7qao=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PO9eTlfG2D/Jl/lapWABul7ZQlUGa9pK77dhNczxPegeVh9DieA0YOt6uPW7J8s+1GsmO6EQhCl/eZVWCXedzjH4tB+6jnZwiDnc/F3aFHmIfzp2aI44Sve/5XKjZUrZT0DKJFpHswQHaxc92ZcB/M1x9aYBUNcHNUNLehb4QBU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chronox.de; spf=none smtp.mailfrom=chronox.de; dkim=pass (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b=NQKWG6ho; dkim=permerror (0-bit key) header.d=chronox.de header.i=@chronox.de header.b=92rE7mvs; arc=pass smtp.client-ip=81.169.146.165
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chronox.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=chronox.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="NQKWG6ho";
-	dkim=permerror (0-bit key) header.d=chronox.de header.i=@chronox.de header.b="92rE7mvs"
-ARC-Seal: i=1; a=rsa-sha256; t=1723036866; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=qKcxbLAYBewu0qm1NaEtxJariHKm97h9H5zbywUymDhsGfuTYXAZLvdPMEhxVWUHeu
-    UFGSD7Q5E9HChbQftLgum85F4n1a+pIy/m/TYmar98SHpLLlLQwlJ50aw6YbN6mYPJam
-    JKfl8MA7o5wg5p0Hl3BsIt1tjfjIo2t6nblj4iGKkX1Zir2bZoinoWY24SC5eZMkBo0P
-    mCLSz7clAkQXFR8RqLGyz20Hs54gdjqTzaRC5Wbe25kLFZZA5KFcCVx3xrOmfeEvyBpY
-    tYUhOMQcxRG0+S7B5zhFJH1VQ1Jx4PP9Ys5hOcmYLxXMNFVERmlrO06AmxfbxUo1HR4e
-    I9Dw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1723036866;
-    s=strato-dkim-0002; d=strato.com;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=qDHrlG1ILlUXk2DSlmGS0FXDVscbKmDpvUZGl7pCqIg=;
-    b=UeN5AY0uYp9j9O90oMPpSXmLzbSJoJ9KF7mMOYDWNUgBPaddJdTfeWpzYcrWd2wab/
-    YS/0BZ+j/0gVgtYZjXAZ34FsOFyvB/P/OgY8COjwIPNV0lAw8ai9HSsj3qC+P8hBtSHm
-    yl8aHzZ5e6gGCS75qwcIG+vs8XOYBXtVtwOVYSo071nkdquAtvTrsJYCIWxYf+cxBsAM
-    S6NfhNmLk67sVO0o50yQ7wVuiOi6ocNIMNVBJTfiwdPqyGhRPOU52PXKYVL3fZLUtDLg
-    d41NlTaNdgHGHAHukSQSbDvMrcdz3xo5YlXL4jKCcvBI4CWttdgj9yRsfZxxmSLiPFDM
-    jx6w==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1723036866;
-    s=strato-dkim-0002; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=qDHrlG1ILlUXk2DSlmGS0FXDVscbKmDpvUZGl7pCqIg=;
-    b=NQKWG6ho3IeODcOFFdz1n8FjcJjB7XLjsgGycC2Tb0e0BJn6bAW4SC7UgOsxNeLwss
-    eZT0w+9anFm9rmcVFrKS1JDp1Di33YQUqf2H3uta3yWhoox8vi/NfAakvonATOkKy1nU
-    P1OinnJq/QNxeonehh3FncNJPsOdBTgs4dz78QbmL/AFqnZ7A8WSWv6A3UAaTnYfow3N
-    vSuwd93sWspmKyYMBgIsHV820C+Xr9JFU29sXsZ+u0wNOT9FvhbMWkUHTPHx/8lmbOu3
-    IyQ9jiR1DrCapqdAM4Eg/UbuXjBBGkhXHW5X+JfSSHg3XgWUyNs/+6WDOd7CT1/uo6gy
-    KGUA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1723036866;
-    s=strato-dkim-0003; d=chronox.de;
-    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
-    From:Subject:Sender;
-    bh=qDHrlG1ILlUXk2DSlmGS0FXDVscbKmDpvUZGl7pCqIg=;
-    b=92rE7mvsbla9x75xVXzj/AqY6xUexvqEIpJHS4IEHIz++fBOS5I8YoqwTeYG/jjDSe
-    36KE0bailPUqsZJDzLCg==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzHHXDYJfSY+Zs="
-Received: from tauon.atsec.com
-    by smtp.strato.de (RZmta 51.1.0 DYNA|AUTH)
-    with ESMTPSA id f5d0fe077DL5zCp
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Wed, 7 Aug 2024 15:21:05 +0200 (CEST)
-From: Stephan Mueller <smueller@chronox.de>
-To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
- Jeff Barnes <jeffbarnes@microsoft.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
- Vladis Dronov <vdronov@redhat.com>,
- "marcelo.cerri@canonical.com" <marcelo.cerri@canonical.com>,
- Tyler Hicks <Tyler.Hicks@microsoft.com>,
- Shyam Saini <shyamsaini@microsoft.com>
-Subject:
- Re: Intermittent EHEALTH Failure in FIPS Mode - jitterentropy
- jent_entropy_init() in Kernel 6.6.14
-Date: Wed, 07 Aug 2024 15:21:04 +0200
-Message-ID: <2143341.7H5Lhh2ooS@tauon.atsec.com>
-In-Reply-To:
- <DM4PR21MB360932816FA7B848D7D8F7B0C7B82@DM4PR21MB3609.namprd21.prod.outlook.com>
-References:
- <DM4PR21MB360932816FA7B848D7D8F7B0C7B82@DM4PR21MB3609.namprd21.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93ADC2209B;
+	Wed,  7 Aug 2024 14:20:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723040458; cv=none; b=YCxvJw4ShgMoW+qrQJoIPgKuiEaWguu63qarv+8nQEodnPSK1ho22hpoQJ4xDE6mo3USvXz8MyFJUjUSoqx3Of706df/vOpVPLx3ZOilfmbkQxJig75QrTFmCNgW+7aBgSqquvHLcWS7Ze6JVBm+90ssnP9pEp7RIKm2248KX24=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723040458; c=relaxed/simple;
+	bh=iLtQqJ3VQexC+/HUBMgr0HMLjLF/JY1huZ/Dt7YfC+w=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=jFe+49eb9naMrshufVJHYXZsXK1BYDyi2M4+KAF7afKRjJcEd82zaayw/RNlETKcpMVD4VJ/rgV2U6wKYEYmWFSJN5ytzQsST7gaayHEl2Ln3s+2bZfDwqZ4R+FtWTzL236CzIhj8MQ551T3Aa4eYMtqDPHa817uwhrWtb1kxzI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from msexch01.omp.ru (10.188.4.12) by msexch01.omp.ru (10.188.4.12)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 7 Aug
+ 2024 17:20:36 +0300
+Received: from msexch01.omp.ru ([fe80::485b:1c4a:fb7f:c753]) by
+ msexch01.omp.ru ([fe80::485b:1c4a:fb7f:c753%5]) with mapi id 15.02.1258.012;
+ Wed, 7 Aug 2024 17:20:36 +0300
+From: Roman Smirnov <r.smirnov@omp.ru>
+To: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
+CC: "lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>, Sergey Shtylyov
+	<s.shtylyov@omp.ru>, "zohar@linux.ibm.com" <zohar@linux.ibm.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] crypto: mpi: add NULL checks to mpi_normalize().
+Thread-Topic: [PATCH] crypto: mpi: add NULL checks to mpi_normalize().
+Thread-Index: AQHa11o1TSphTpofNUacgE4EgGeVc7IT0xkAgAf12AA=
+Date: Wed, 7 Aug 2024 14:20:36 +0000
+Message-ID: <4ea0ced79912e810e2655bf21896937bd8f8d24e.camel@omp.ru>
+References: <20240716082825.65219-1-r.smirnov@omp.ru>
+	 <ZqzVPGCbwAS8ChEa@gondor.apana.org.au>
+In-Reply-To: <ZqzVPGCbwAS8ChEa@gondor.apana.org.au>
+Accept-Language: ru-RU, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-kse-serverinfo: msexch01.omp.ru, 9
+x-kse-antivirus-interceptor-info: scan successful
+x-kse-antivirus-info: Clean, bases: 8/7/2024 11:55:00 AM
+x-kse-attachment-filter-triggered-rules: Clean
+x-kse-attachment-filter-triggered-filters: Clean
+x-kse-bulkmessagesfiltering-scan-result: InTheLimit
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <DE7E717FFC66844FAE74F161E036AA70@omp.ru>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="utf-8"
 
-Am Mittwoch, 7. August 2024, 14:50:32 MESZ schrieb Jeff Barnes:
-
-Hi Jeff,
-
-> Hello,
-> 
-> We are currently migrating to kernel 6.6.14 and encountering intermittent
-> EHEALTH errors that cause a kernel panic in initrd (FIPS mode). The error
-> occurs in the following section of the code:
-> 
-> crypto/jitterentropy.c
-> 722                 /* Validate health test result */
-> 723                 if (jent_health_failure(&ec))
-> 724                         return JENT_EHEALTH;
-> 
-> This is called from jent_mod_init():
-> 
-> 337         ret = jent_entropy_init(desc);
-> 338         shash_desc_zero(desc);
-> 339         crypto_free_shash(tfm);
-> 340         if (ret) {
-> 341                 /* Handle permanent health test error */
-> 342                 if (fips_enabled)
-> 343                         panic("jitterentropy: Initialization failed with
-> host not compliant with requirements: %d\n", ret);
-> 
-> We are experiencing up to a 90% failure rate.
-> 
-> In my troubleshooting efforts, I followed the call to jent_condition_data()
-> and attempted to increase the SHA3_HASH_LOOP to give the CPU more work,
-> hoping to collect more entropy:
-
-The proper way to handle it is the following: set 
-CONFIG_CRYPTO_JITTERENTROPY_OSR to a higer value as it is - like 3 (the 
-default is 1). The higher you set it the slower the collection will get as 
-more samples are collected.
-> 
-> 356
-> -#define SHA3_HASH_LOOP (1<<3)
-> +#define SHA3_HASH_LOOP (1<<4)
-> 
-> This adjustment reduced the failure rate to 40-50%, but the issue persists.
-> It is intermittent. It is also intermittent without the change. Sometimes I
-> get a 90% failure rate on 10 reboots, sometimes 0%.
-> 
-> Given the difficulty in reproducing the kernel panic consistently, is there
-> a more effective workaround or solution for this problem?
-> 
-> Your assistance is greatly appreciated.
-> 
-> Best regards,
-> Jeff Barnes
-
-
-Ciao
-Stephan
-
-
+T24gRnJpLCAyMDI0LTA4LTAyIGF0IDIwOjQ2ICswODAwLCBIZXJiZXJ0IFh1IHdyb3RlOg0KPiBP
+biBUdWUsIEp1bCAxNiwgMjAyNCBhdCAxMToyODoyNUFNICswMzAwLCBSb21hbiBTbWlybm92IHdy
+b3RlOg0KPiA+IElmIGEtPmQgaXMgTlVMTCwgdGhlIE5VTEwgcG9pbnRlciB3aWxsIGJlIGRlcmVm
+ZXJlbmNlZC4gSXQNCj4gPiBpcyBuZWNlc3NhcnkgdG8gcHJldmVudCB0aGlzIGNhc2UuIFRoZXJl
+IGlzIGF0IGxlYXN0IG9uZSBjYWxsDQo+ID4gc3RhY2sgdGhhdCBjYW4gbGVhZCB0byBpdDoNCj4g
+PiANCj4gPiDCoMKgwqAgbXBpX2VjX2N1cnZlX3BvaW50KCkNCj4gPiDCoMKgwqDCoMKgIGVjX3Bv
+dzIoKQ0KPiA+IMKgwqDCoMKgwqDCoMKgIGVjX211bG0oKQ0KPiA+IMKgwqDCoMKgwqDCoMKgwqDC
+oCBlY19tb2QoKQ0KPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgbXBpX21vZCgpDQo+ID4gwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgbXBpX2ZkaXZfcigpDQo+ID4gwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgIG1waV90ZGl2X3IoKQ0KPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqAgbXBpX3RkaXZfcXIoKQ0KPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgIG1waV9yZXNpemUoKQ0KPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoCBrY2FsbG9jKCkNCj4gPiANCj4gPiBtcGlfcmVzaXplIGNhbiByZXR1
+cm4gLUVOT01FTSwgYnV0IHRoaXMgY2FzZSBpcyBub3QgaGFuZGxlZCBpbiBhbnkgd2F5Lg0KPiA+
+IA0KPiA+IE5leHQsIGRlcmVmZXJlbmNpbmcgdGFrZXMgcGxhY2U6DQo+ID4gDQo+ID4gwqDCoMKg
+IG1waV9lY19jdXJ2ZV9wb2ludCgpDQo+ID4gwqDCoMKgwqDCoCBtcGlfY21wKCkNCj4gPiDCoMKg
+wqDCoMKgwqDCoCBkb19tcGlfY21wKCkNCj4gPiDCoMKgwqDCoMKgwqDCoMKgwqAgbXBpX25vcm1h
+bGl6ZSgpDQo+ID4gDQo+ID4gRm91bmQgYnkgTGludXggVmVyaWZpY2F0aW9uIENlbnRlciAobGlu
+dXh0ZXN0aW5nLm9yZykgd2l0aCBTdmFjZS4NCj4gPiANCj4gPiBTaWduZWQtb2ZmLWJ5OiBSb21h
+biBTbWlybm92IDxyLnNtaXJub3ZAb21wLnJ1Pg0KPiA+IC0tLQ0KPiA+IMKgbGliL2NyeXB0by9t
+cGkvbXBpLWJpdC5jIHwgMyArKysNCj4gPiDCoDEgZmlsZSBjaGFuZ2VkLCAzIGluc2VydGlvbnMo
+KykNCj4gDQo+IEkndmUganVzdCBwb3N0ZWQgYSBwYXRjaCB0byByZW1vdmUgbXBpX2VjX2N1cnZl
+X3BvaW50IGFuZCBtcGlfdGRpdl9xci4NCj4gQXJlIHRoZXJlIGFueSBvdGhlciBjb2RlIHBhdGhz
+IHdpdGggdGhlIHNhbWUgcHJvYmxlbT8NCg0KU3ZhY2UgZm91bmQgYSBzaW1pbGFyIGNhc2UgYnV0
+IGl0IGlzIG5vIGxvbmdlciByZWxldmFudDoNCg0KTlVMTCBjb25zdGFudDoNCiAgICBtcGlfZWNf
+bXVsX3BvaW50KCkNCiAgICAgIGVjX211bG0oejMsIHBvaW50LT56LCB6MiwgY3R4KQ0KICAgICAg
+ICBlY19tb2QoKQ0KICAgICAgICAgIG1waV9tb2QoKQ0KICAgICAgICAgICAgbXBpX2ZkaXZfcigp
+DQogICAgICAgICAgICAgIG1waV90ZGl2X3IoKQ0KICAgICAgICAgICAgICAgIG1waV90ZGl2X3Fy
+KCkNCiAgICAgICAgICAgICAgICAgIG1waV9yZXNpemUoKQ0KICAgICAgICAgICAgICAgICAgICBr
+Y2FsbG9jKCkNCg0KRGVyZWZlcmVuY2U6DQogICAgbXBpX2VjX211bF9wb2ludCgpDQogICAgICBl
+Y19pbnZtKHozLCB6MywgY3R4KQ0KICAgICAgICBtcGlfaW52bSgpDQogICAgICAgICAgbXBpX2Nt
+cF91aSgpDQogICAgICAgICAgICBtcGlfbm9ybWFsaXplKCkNCj4gDQo+IFRoYW5rcywNCg0K
