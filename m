@@ -1,68 +1,99 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 437204A1E
-	for <linux-crypto@vger.kernel.org>; Thu,  8 Aug 2024 06:20:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54BD5D528
+	for <linux-crypto@vger.kernel.org>; Thu,  8 Aug 2024 10:10:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723098050; cv=none; b=WRgdUAIk5ixLy0bmVogoTABLwqTrwTfuiC1ZMp49j3KdRflK/q4PWw3tGelJ/6m+14Yg4U7Z0qwMNatP/F+HDomLv1CCSjRhJYTq3/FRskr+r5VJM5ClO4LwB+wtfxfkxV4l0l3490bci9+Xl7D+rxS7rtgF5fsNBL/SIu8LkPU=
+	t=1723111813; cv=none; b=DVd/QKIRhje4NyeR2jqgaRq7fR4rd74y7HOHGduRD+ITz3Na3ZsNw/3UaOcgidhPK2NgXZRqKvhges746Q8HLOxb/zNdagKS4YOpvn+ewJR2vwlBClnWnJcbt1ECYTWefjFJR+gtjAbucndCElsQaJppUDKjs6HqXZVboe1XN7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723098050; c=relaxed/simple;
-	bh=lz+vgTfPCTOuvQihu+Bd6BQqI9KyCUskc5QQpJk/OKQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D9qsNq0R/XraQpcFVtZkf76i0LMwhPUiPdPj2IIESWnYtU0x+HPyvsaojy5YNwsAKXuWTJ/yM6E5V40V054Ag8LdxM+dbqxczCCkJ/sIFoMoNEq6hd8mkxWSgdBylJVhK8dLVH9ZCXvdL5mJvOLlh4kDXRb/+iC72Vx4Eq4TO4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1sbwNS-003Ekd-1x;
-	Thu, 08 Aug 2024 14:20:44 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 08 Aug 2024 14:20:43 +0800
-Date: Thu, 8 Aug 2024 14:20:43 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Stephan Mueller <smueller@chronox.de>
-Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	Jeff Barnes <jeffbarnes@microsoft.com>,
-	Vladis Dronov <vdronov@redhat.com>,
-	"marcelo.cerri@canonical.com" <marcelo.cerri@canonical.com>,
-	Tyler Hicks <Tyler.Hicks@microsoft.com>,
-	Shyam Saini <shyamsaini@microsoft.com>
-Subject: Re: Intermittent EHEALTH Failure in FIPS Mode - jitterentropy
- jent_entropy_init() in Kernel 6.6.14
-Message-ID: <ZrRju-vVlIT_AMED@gondor.apana.org.au>
-References: <DM4PR21MB360932816FA7B848D7D8F7B0C7B82@DM4PR21MB3609.namprd21.prod.outlook.com>
- <2533289.B1Duu4BR7M@tauon.atsec.com>
- <ZrRhR-IRZPrQ5DSe@gondor.apana.org.au>
- <2416186.INgNo8UaUA@tauon.atsec.com>
+	s=arc-20240116; t=1723111813; c=relaxed/simple;
+	bh=QVojfJ44sfu/dRfUh96GVSYizxfRBC4zAvMJUR53i8c=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=caP9o5JoqzoE/PIOjhUmLHVGkJ8r7Cr6a9qKX52Z9TbOaGzjarInt8iLjPEJFS95rrFriYQNP3rmP1JLs3Y/AYvK4Ed5cX0aR+F6m49BCjvf1OAqUBMMjYzdVmJcBOUodAHprD+N7IwsyfR7cu0j/RRurP64VCKRBD+ng3nCPaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=rtrDXDAb; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="rtrDXDAb"
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id CAEAB2082B;
+	Thu,  8 Aug 2024 12:10:00 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id LzpuQrJY8a_i; Thu,  8 Aug 2024 12:09:58 +0200 (CEST)
+Received: from cas-essen-02.secunet.de (rl2.secunet.de [10.53.40.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by a.mx.secunet.com (Postfix) with ESMTPS id 44B4D20539;
+	Thu,  8 Aug 2024 12:09:58 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 44B4D20539
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1723111798;
+	bh=mNDEiPCs35/IVJlcOBlMRCwQX+1Qqr37SCLhBLpaWMQ=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=rtrDXDAby1Lkov4CJSQDLCL300eVEzt3PZ8aPg7d78fnx/9XIbPpS9+lSLIo/oqrJ
+	 r9NW5YdlnSxniFs76epodmTDN0OnWGko1wVwg+GJm8CL30pT1BRPH4POD+jRDpwqop
+	 0w/HcoHo4/G9Z3Nw6JWi17KZlfASyNMjckB2NzJj91OKeYW8G4I/6eqV8Q3JSL9eC+
+	 pDQPmuvKAELcTFdem7q47/ttNhyD9BeJwXB4Dh3/TDTdtttD2rImdaxcB3KI4xvPJM
+	 JLpMt6/0hTUmfRmJz7sFySG3nag+5vc5fSaCc9LeXnDqszkRhz/ZaK+47FOYRBEy35
+	 LyDAd8TVNsVMA==
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Thu, 8 Aug 2024 12:09:58 +0200
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 8 Aug
+ 2024 12:09:57 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id 6672E3180549; Thu,  8 Aug 2024 12:09:57 +0200 (CEST)
+Date: Thu, 8 Aug 2024 12:09:57 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+CC: Yi Yang <yiyang13@huawei.com>, <davem@davemloft.net>,
+	<mcoquelin.stm32@gmail.com>, <alexandre.torgue@foss.st.com>,
+	<lujialin4@huawei.com>, <linux-crypto@vger.kernel.org>, Daniel Jordan
+	<daniel.m.jordan@oracle.com>
+Subject: Re: [PATCH -next] crypto: testmgr - don't generate WARN for -EAGAIN
+Message-ID: <ZrSZdQxeKaXVmi9E@gauss3.secunet.de>
+References: <20240802114947.3984577-1-yiyang13@huawei.com>
+ <ZrG7zWxeXQn-Mkhn@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <2416186.INgNo8UaUA@tauon.atsec.com>
+In-Reply-To: <ZrG7zWxeXQn-Mkhn@gondor.apana.org.au>
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-On Thu, Aug 08, 2024 at 08:13:56AM +0200, Stephan Mueller wrote:
->
-> However, the heart of the problem is the following: This failure mode is 
-> probabilistic in nature. A number of folks trying to push rules that the 
-> failure does not need to be handled with a panic.
+On Tue, Aug 06, 2024 at 01:59:41PM +0800, Herbert Xu wrote:
+> On Fri, Aug 02, 2024 at 11:49:47AM +0000, Yi Yang wrote:
+> > Since commit 8f4f68e788c3 ("crypto: pcrypt - Fix hungtask for PADATA_RESET"),
+> > The encryption and decryption using padata be failed when the CPU goes
+> > online and offline.
+> > We should try to re-encrypt or re-decrypt when -EAGAIN happens rather than
+> > generate WARN. The unnecessary panic will occur when panic_on_warn set 1.
+> > 
+> > Fixes: 8f4f68e788c3 ("crypto: pcrypt - Fix hungtask for PADATA_RESET")
+> > Signed-off-by: Yi Yang <yiyang13@huawei.com>
+> > ---
+> >  crypto/testmgr.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> A changed OSR only changes the probability, but that probability is always 
-> strictly higher than zero.
+> We should not expect Crypto API users to retry requests in this
+> manner.
+> 
+> If this is a reliability issue, perhaps padata should be performing
+> the retry? Steffen?
 
-That's fine.  There are many places in the kernel that will fail
-with a probably that is non-zero.  It is considered to be acceptable
-as long as the value is negligible (e.g., equal or less than the
-probablility of cosmic rays hitting DRAM).
-
-But if it happens reproducibly it clearly is not acceptable.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+If padata_do_parallel returns an error, it means it can't take the
+parallelization request. That is either because the instance gets
+replaced or it goes down. There is currently no infrastructure
+to queue requests on error, in particular not if it goes down.
