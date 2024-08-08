@@ -1,61 +1,61 @@
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63E5A13DDD9
-	for <linux-crypto@vger.kernel.org>; Thu,  8 Aug 2024 18:35:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 942E33398E
+	for <linux-crypto@vger.kernel.org>; Thu,  8 Aug 2024 19:54:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723142146; cv=none; b=hSOJjFQMSvEbqgvplUgDhdnRstGatvYo9eAtv9KaE3290NRTztgtPrP+Z6U8sxDJJBgHKpRMd1KjadiFseuH7q0oRTuQUhKmaAAEbjw9cpy/cK4P6p6+z9j+CYebgnwnkACjQHNtwFEVhT7Cju0q5GrV4B9UslBmcRmaV0hLbYM=
+	t=1723146872; cv=none; b=dom454nRF4RXC5juhn31IcEH2O7hGoVrVypyJCzyCsx8qgOPhWvLMzb04KsO8zFFO/HC5MLkVJDwmxlq6qipmsXyy18VGbhvzAAVMMB6GH29hnbyFcyBw0g8bn+5KoH9CHf9HD0AbB2zR6SY6lwn1sNFWftqoNd93/7IGvWHCi0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723142146; c=relaxed/simple;
-	bh=02kwCYOxv+z8OLO7RIT/t+VnaG6BWgvfG2Dcw80OmZI=;
+	s=arc-20240116; t=1723146872; c=relaxed/simple;
+	bh=8ck9stzaxoY/zwqEhcvEsG+wxaQzwrnkAvI4YYr+6ao=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=m5xOCkWBECRAIn4CDpiJI/1Qx6GuPzkIV1REbLjIWRkFiGrZnRw0B2o9Osamfgs4SCww/fPzNjBA2Su8xXEgXsI+TKrSKY0ZsOigdnZ12R5Ti9nMfHWx/2BjT/B1B9E9mDZHximScjh+mif3nI3t26UoGU7h0QNBmFvx8XsHqWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=QXDyT0tQ; arc=none smtp.client-ip=209.85.167.48
+	 To:Cc:Content-Type; b=H/DguPTDA2gcYaWe8gH3IJYCPQzK9f/kuj6VZ0mZrBWRB4OJwHQrS+DMSYmMae6yBz+2z/K73IM61swZxCIrik2uXIGJ9emVFvpKWZPkZT0io8o/lPC6Pv+4u7QoCghet/rooFLy4QYdElI3oi7q2RYYiDjt/zlRD6CaWJzhVZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=PTrQZtZx; arc=none smtp.client-ip=209.85.218.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="QXDyT0tQ"
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-52ed741fe46so1415516e87.0
-        for <linux-crypto@vger.kernel.org>; Thu, 08 Aug 2024 11:35:44 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="PTrQZtZx"
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a7a975fb47eso159241366b.3
+        for <linux-crypto@vger.kernel.org>; Thu, 08 Aug 2024 12:54:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1723142142; x=1723746942; darn=vger.kernel.org;
+        d=linux-foundation.org; s=google; t=1723146869; x=1723751669; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=+fJFJEPSzrBhC9abcg5k3SeAn9QnXTSYxtGiuAtcArM=;
-        b=QXDyT0tQF/gADTMyKhBBMuD/UVBHidiE2GQDDUjutb6q0zIoiqItJega/J1O88VG8j
-         rAeBiKDIMotW+iULhkUTkcdmk5b7sMwtvcrbSRFjG+bEuMDdeOAJnDz2Mar3OGJQZNUx
-         O9MVh334ukKY1Hab2fB7nwAH8b7yprwhbe+p8=
+        bh=7SwZ2LyzeAh2LP/WBHvw0dGjR3AssNzuYIz0wycbR0A=;
+        b=PTrQZtZxK2K6N0k/7uD+s0DmRcVu13lAnQpoRNziHK8hINL+oaAfpE/urgDTQeHq6y
+         bffubApbEhnvYO/hFT9zJFZLKfFyx+2WBv0uR6DyUpcvnXCIt1XlHHV2c0TPeALWQzJO
+         SaPvRb/IH5SC/xff9vmdxxAsKw3MsuzyV31gY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723142142; x=1723746942;
+        d=1e100.net; s=20230601; t=1723146869; x=1723751669;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=+fJFJEPSzrBhC9abcg5k3SeAn9QnXTSYxtGiuAtcArM=;
-        b=Z/RtZptxE8Mp9+gm98+ESmXGo8Ce1qn58l+bWPGC34TlutVvAakFAccjaOko4vWFmn
-         N8/U0kf5GIkkAELmXuGJlSNUe5qpkbLzmc2uuovnCBEWq88tJrPG3liRxPe14iXb3zgL
-         zjVLl2KlxqAaXoijPjto/TmPab+kygtdXy5M9+nif5dgVjyfp/Y8/UEGCqfCmWcfaxFd
-         PgILfRiodBOsSexD21szlmhgrq9+qxoESfY5f5ATW6BFWRt6RxyplAFzKak4PysU4X7q
-         VgY08btmHiOLA2XAx1YAJZHsohlWwSZKwss8s79cpJEPVNTNXhrmnhi9X+DVbLx9Dwh/
-         azhw==
-X-Forwarded-Encrypted: i=1; AJvYcCUVPkkH9NPizJWbNBIM03mfUC8IEH7KpKY5pi8Oba22QsfKmqGDBCZVQePU9LPAV8VrnnDOnhx3LHfu7UjusKCXvyNicroO0cN86u9Y
-X-Gm-Message-State: AOJu0YzrcfdlL1egJkL6t4gbR42c3ud8rKviuLwNcn1IOWtIPdpBvBtY
-	wGm1ljXl0DvwZqVKqk9DnXUW0raZ/ShnhQu4xPRk1uSe5m4xRZX8qQNAP1+zyLhpYgFFCnaIFFn
-	bKoBu4A==
-X-Google-Smtp-Source: AGHT+IGDKelN0fuXBSpQZUDcYLuCVi6ZThnHsjaypuQxAaGj0+EPYNC4PLr+G/cWhFyilzGoHRk89A==
-X-Received: by 2002:a05:6512:350e:b0:530:ea7b:2944 with SMTP id 2adb3069b0e04-530ea7b2afamr285223e87.33.1723142141338;
-        Thu, 08 Aug 2024 11:35:41 -0700 (PDT)
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com. [209.85.167.47])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-530de478d78sm723367e87.255.2024.08.08.11.35.40
+        bh=7SwZ2LyzeAh2LP/WBHvw0dGjR3AssNzuYIz0wycbR0A=;
+        b=Lz3s5KEnIa+xpH3hThHmZxmV7u2J8frT1d7xq7aVNTJlm6TIh57nFUnrvKtUBvElFz
+         GWT9tjlDZCYtqyzYfo2IxNf+3ubukV/MILydDYifu6KPWWGWvM2CRsSkbz03LMgvzY4u
+         ew0F1Z6B1uNdQkxRCNfWrtA50LpM5WhY4qcf+tLQLamitme1TrK9RiY97+AijStvhHRw
+         KjCUfvjUp4ige8ue0FruV0Dd6okdNEa4ezyAw0uCjvdPcaHbNSgiXWuz9mAP17yM2eyc
+         9a7O/3iILNa0KTmwltViYO+pHAyDg52jxAihJcDEcceHP7x6qggG1ZtDblssryf6f357
+         WjHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX+Myg/z74Am8RGF/KgHpv97q/AZMzIu56BTCTgwEeXHBbn5jzn53GCkFosqB4Z7B01YSHzZhKiUwwl5zE6Bj/aMUuLQLlbAo868piP
+X-Gm-Message-State: AOJu0Yw4Lt7qCy/wva7HXsMZ3mHVVVeTj0mWciGG9FszFzT1pW7q3evQ
+	7rOi/bgq7P2TWIRm/YNTuSu9t3tR/YY1yv9paI9vssU0UTp99W+QDAzFIk8G3j35flwpPolnh1q
+	Q/y5waQ==
+X-Google-Smtp-Source: AGHT+IFz7QpNRQoWJo6BmS0QPEjYjpBcmjeNfE/9tNvmSzlDYynxPFcfzLd7nviIa7s/9F8w0pL1rQ==
+X-Received: by 2002:a17:907:1b27:b0:a7a:c256:3cc with SMTP id a640c23a62f3a-a8090f03df5mr193442866b.67.1723146868599;
+        Thu, 08 Aug 2024 12:54:28 -0700 (PDT)
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com. [209.85.218.52])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7dc9e841a7sm778903566b.179.2024.08.08.12.54.27
         for <linux-crypto@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 Aug 2024 11:35:40 -0700 (PDT)
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-530e22878cfso1182632e87.2
-        for <linux-crypto@vger.kernel.org>; Thu, 08 Aug 2024 11:35:40 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCX/cl30pzZEn9/tEMC264ptk3i3RW//FSKs2LrL9trclE/ZwIDRUpQhZXO1S+DTHUrvw98MPHQfI/yljHOnbqDkfm0CHBL+2T0rCeBP
-X-Received: by 2002:a05:6512:2808:b0:52e:9b92:49ad with SMTP id
- 2adb3069b0e04-530e578b384mr2034089e87.0.1723142139967; Thu, 08 Aug 2024
- 11:35:39 -0700 (PDT)
+        Thu, 08 Aug 2024 12:54:27 -0700 (PDT)
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a7a975fb47eso159238066b.3
+        for <linux-crypto@vger.kernel.org>; Thu, 08 Aug 2024 12:54:27 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCXtQsw0813HioO/4o4EIFfzUsgEWXoMXoNy/voeW+rK9EBq72KTQ7B+MmoMvZyevLrQoDJwOxmR9r2cvB6yCu/6T6hLWmjII91+H6mb
+X-Received: by 2002:a17:907:1b09:b0:a7a:c083:8579 with SMTP id
+ a640c23a62f3a-a8090ec605cmr234215466b.62.1723146867065; Thu, 08 Aug 2024
+ 12:54:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -66,9 +66,9 @@ References: <ZrFHLqvFqhzykuYw@shell.armlinux.org.uk> <ZrH8Wf2Fgb_qS8N4@gondor.ap
  <ZrRjDHKHUheXkYTH@gondor.apana.org.au> <CAHk-=wjLFeE_kT5YHfHsX9+Mn10d2p+PQ0S-wK0M3kTFe37o_Q@mail.gmail.com>
 In-Reply-To: <CAHk-=wjLFeE_kT5YHfHsX9+Mn10d2p+PQ0S-wK0M3kTFe37o_Q@mail.gmail.com>
 From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Thu, 8 Aug 2024 11:35:23 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wiKbastNQ1xZOpOkwzjz7Bhb-vPa5OyLeMEsTeQcKpxew@mail.gmail.com>
-Message-ID: <CAHk-=wiKbastNQ1xZOpOkwzjz7Bhb-vPa5OyLeMEsTeQcKpxew@mail.gmail.com>
+Date: Thu, 8 Aug 2024 12:54:10 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wgzTrrpY3Z2881FAtz=oLYzAPhbVxd8hdiPopsF-pWG=w@mail.gmail.com>
+Message-ID: <CAHk-=wgzTrrpY3Z2881FAtz=oLYzAPhbVxd8hdiPopsF-pWG=w@mail.gmail.com>
 Subject: Re: [BUG] More issues with arm/aes-neonbs
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>, 
@@ -82,21 +82,54 @@ On Thu, 8 Aug 2024 at 10:14, Linus Torvalds
 > done something incredibly stupid and maybe there's some silly and
 > fatal bug in what _appears_ trivially correct).
 
-It's like I have a sixth sense.
+Ok, I fixed the stupid timeout check condition, and I actually ended
+up testing this on my system by making the timeout be just 10ms
+instead of ten seconds.
 
-The wait_for_completion_timeout() test was entirely wrong. It returns
-the time remaining if it timed out, not an error like some of the
-other ones.
+With that, I get a nice
 
-So t needs to be
+    module 'hid-logitech-dj.ko' taking a long time to load
 
-                if (wait_for_completion_timeout(&idem.complete, 10*HZ))
-                        return idem.ret;
+message about the "problem", so at least the warning seems to work.
 
-instead.
+I've committed that (with the timeout for the warning set back to
+10s), not because it *fixes* anything, but because the warning itself
+is hopefully useful to avoid having to debug issues like this in the
+future, and because it also re-organizes the code so that any possible
+"break dependency on recursion detection" thing would be easier to
+deal with.
 
-Of course, it's only going to cause issues if it actually times out,
-so that patch "works" in normal situations where module loading takes
-less than 10s. But still - it was completely buggered.
+That said, the *proper* fix really is to make sure that a module
+doesn't recursively try to load itself.
 
-               Linus
+Because the thing that happened to make it work before the "wait until
+the previous module has completely finished loading" was that we
+*used* to do "wait until the both module has _almost_ completely
+finished loading, then return an error if there was another copy of
+it".
+
+And it turns out that the "return an error if there's a concurrent
+load" is fundmanetally racy if the concurrent loaders are actually
+concurrent (not a serial recursion).
+
+The race is typically *small*, but when I made it bigger in commit
+9828ed3f695a, it actually ended up triggering in real life for modules
+that had dependencies and returning an error before the module had
+finished would then cause cascading errors. So the race does exist in
+real life.
+
+In the case of the actual recursive invocation, that race isn't an
+issue - it's all serial - and returning an error before fully
+initializing the first module is actually what you want (since it
+won't _become_ fully initialized if you wait for it).
+
+But basically the old recursion avoidance was not really reliable in
+other situations, which is why we don't want to re-introduce the
+"error out early" behavior.
+
+I don't know the crypto registration API enough to even guess at what
+the fix to break the recursion is.
+
+Herbert?
+
+              Linus
