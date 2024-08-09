@@ -1,103 +1,98 @@
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 880E818C918
-	for <linux-crypto@vger.kernel.org>; Fri,  9 Aug 2024 07:51:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79D32197A68
+	for <linux-crypto@vger.kernel.org>; Fri,  9 Aug 2024 16:25:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723189869; cv=none; b=a6cVcNChUnXo+FgK6tE4qMOjUKdEgZ2v5CsjHWW/6ZnTWY80MW3OqFC223p/UJ8M4hmJXVi+mszLtcJo56mQpoysHkGRXq35v2jG0y3t/G5e9FH1sRbmaUynW3F+y/KuCiIpgAD27g0U8cLu5oOd8HMStBMqJrrVbfXls9eq2Vs=
+	t=1723220725; cv=none; b=HY2XKgQeSuN5UQZDdU8sljqXLZ2XE0vkDIREAL278wBdYBOwOd/QKZtQoXgSs1BKQeZBx7oiq+DMGHf/xu2fIYn08CrxOcItN1jCggvrU8Y19HJ4Yj/JIozZKlXvnLmsMdeFuDc12uYRclKy973+GgIK01uE6LpcZe/dtFBNQFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723189869; c=relaxed/simple;
-	bh=hoiU4a1oQrUBAui5PkzZFqg7eOEu2MlqArA2OshzXPU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rZPRxo4c0EtnHP5tPFm8vSv+AyZezk9BYKOGSUT8JhDuNwITpLbz+6VO3RRBxvSKAL6MgKwnfyNEBNF+3yqB1FxQCzAjxFtc4hmMvJDHfHRS+LGFJEPmSMAHCVH7eNE3tjiQ7If7pPH7h2Ux8RfFq9/878D11bpDyeUN0NxubT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=XA70Eo0u; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+	s=arc-20240116; t=1723220725; c=relaxed/simple;
+	bh=dAgBl/nMjLQRKRBv+fRVFhMHS+spvufXB+yQ9KVvtA0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rxgO7I5i3jVDbpeisQWDgORHBKObzVBd3h8SkNNsA+Elk+zUAh0jgwhumLN4mLrr9YEk7GRyTUcLqYHijEiJkCe1h3f0lCxHW0wxopJRRxPYelyrnSyZm6VxkiHIXgE2ZohPEmWRjNu5QorgeZ1e7OFcHnYJFHUafzGIIkvfohc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=Jc+3sjaY; arc=none smtp.client-ip=209.85.167.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="XA70Eo0u"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Wsd9ykEhgVw9TK6u4wF5mxFFMCdLdtUgV8Gkl74zv4Q=; b=XA70Eo0ulDL+L6bFhGAvq2UAzV
-	zqmCn3ZNidxJm3DyeqM7tjqoTCYtr6fppMegUzSkbPZpeigHt5eZW8fDfuAVV3FVMLmFP7axiTBCr
-	CSZn5zfHL7fuwfWKUrlsiMEiW08vplz6OmrpjNN74xaEEeAFrhvuIpHB8aDLtKRSepe+DuWkpsvH9
-	lGa01+kKfpLZwTstw4WM5mq4W6Fe1gYM5K25Po+WC9XqLnXR9CbzkgGQL/8XVcB8uNJ1fF6ZRE+XP
-	TN2156RfL6R8QfN259z3VsezdJmjRINOelZPqQeZaxLrcjjTRosd2/nGn6ZV3MImeGpn0PqbEw0/5
-	PVhJRgow==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:52812)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1scKOg-00034d-1d;
-	Fri, 09 Aug 2024 08:50:50 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1scKOi-0005yX-5J; Fri, 09 Aug 2024 08:50:52 +0100
-Date: Fri, 9 Aug 2024 08:50:52 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org
-Subject: Re: [BUG] More issues with arm/aes-neonbs
-Message-ID: <ZrXKXIQ6loxE7msT@shell.armlinux.org.uk>
-References: <ZrFHLqvFqhzykuYw@shell.armlinux.org.uk>
- <ZrH8Wf2Fgb_qS8N4@gondor.apana.org.au>
- <ZrRjDHKHUheXkYTH@gondor.apana.org.au>
- <CAHk-=wjLFeE_kT5YHfHsX9+Mn10d2p+PQ0S-wK0M3kTFe37o_Q@mail.gmail.com>
- <CAHk-=wgzTrrpY3Z2881FAtz=oLYzAPhbVxd8hdiPopsF-pWG=w@mail.gmail.com>
- <ZrWdx5cL1vKrMBbs@gondor.apana.org.au>
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="Jc+3sjaY"
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-52f01b8738dso2129303e87.1
+        for <linux-crypto@vger.kernel.org>; Fri, 09 Aug 2024 09:25:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1723220721; x=1723825521; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=zqjdcCpHkFdcL2nl1TO3CYdbwI3m4N75MEmN+JaQxiM=;
+        b=Jc+3sjaYR6Lj9G5rIy8O1UlYIlbSQrmiT3wxPijDkM3hu7bQ6iKU7VJd3MnTnkxOLI
+         lBScr9iQAgoYj6I7GWxN1hb+09Px0AicO+Xrfd9Fows2gDDVNalswdTY/6DnI+i6wZ7V
+         dVjcM2UTgRBLUGYYEA/s6RTl5Cc0pg9EUucWg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723220721; x=1723825521;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zqjdcCpHkFdcL2nl1TO3CYdbwI3m4N75MEmN+JaQxiM=;
+        b=K6rrKvbZA7I8BhBfPkbD/wTts54rFo1tEw9y1J3n4tMtNWPDucxGHaT6kSU7wf2dD1
+         jVNgZ+m2yDBm6SIdv8jlYV+iejpN85RDjRuBEOSB5ULVMa3sPn9q+JNBtpY7d3vyZm0v
+         aUowg1Un4mzVlhE84G+zCon0/TZwF5R5Xv2f4ted8MtBS32UX3H8UjFH8UwBqAUhRLUV
+         RVXT5CYpFqRMpVQLWukrDhdDQtC1onppI9GTdTEr8FIxZ3Ev61Fqsny1CPxknYila2+O
+         MjWM/5DqdfFMUjUjbWodP3X19o5qzgOcio9Ew01DQYm/chuxVX+jL/npkuO0F7/Kni8K
+         344Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVIV3IK/WjdwPC7ifJn+jT3Ud3Quy0FYJTVYzf9fnFIjmwQd0IB/1JluPDCFRVKwFfj5OXNbVfdbrKNUwW5weaijlXM/U/ARNdQ0xUY
+X-Gm-Message-State: AOJu0YwKWBRxMEKI8QucqTq2RmF8KjCUNcKS7G9crOTlj6fIBRR/feO/
+	8ryLey/KiWcrzgI2krxZULKZNYrDnh9rYqmTGpdip8Z3M9nrueNW5yEO1Hl3MaHiojpdo79xGzh
+	kFtL+bg==
+X-Google-Smtp-Source: AGHT+IGE225ypMmG9Xicx9dmmcfWta8meVc4OTMX/DYsHcPpbDnPjx0qNxyJminvoRhDH7GK77MkvA==
+X-Received: by 2002:a05:6512:3049:b0:52c:825e:3b1c with SMTP id 2adb3069b0e04-530ee983123mr1594627e87.26.1723220721174;
+        Fri, 09 Aug 2024 09:25:21 -0700 (PDT)
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com. [209.85.218.44])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bbb2d35351sm1633613a12.60.2024.08.09.09.25.19
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 09 Aug 2024 09:25:20 -0700 (PDT)
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a6265d3ba8fso197528566b.0
+        for <linux-crypto@vger.kernel.org>; Fri, 09 Aug 2024 09:25:19 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCV75eI6i4daGqaj+DgqVI5D5hsK/DDeXfmwJ9k7nO11wP80RoTWEijf9ScPNiwBEfDIK5bpmlRr5T7BGIrrSfLmk0DvX3OJULq/geta
+X-Received: by 2002:a17:907:9710:b0:a6f:33d6:2d45 with SMTP id
+ a640c23a62f3a-a80aa67b05bmr147176166b.60.1723220719559; Fri, 09 Aug 2024
+ 09:25:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZrWdx5cL1vKrMBbs@gondor.apana.org.au>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <ZrFHLqvFqhzykuYw@shell.armlinux.org.uk> <ZrH8Wf2Fgb_qS8N4@gondor.apana.org.au>
+ <ZrRjDHKHUheXkYTH@gondor.apana.org.au> <CAHk-=wjLFeE_kT5YHfHsX9+Mn10d2p+PQ0S-wK0M3kTFe37o_Q@mail.gmail.com>
+ <CAHk-=wgzTrrpY3Z2881FAtz=oLYzAPhbVxd8hdiPopsF-pWG=w@mail.gmail.com>
+ <ZrWdx5cL1vKrMBbs@gondor.apana.org.au> <CAHk-=wguRaBM_urKAgvxG5-dD9RT=07+zZznRZjwTDSOp9=eGw@mail.gmail.com>
+In-Reply-To: <CAHk-=wguRaBM_urKAgvxG5-dD9RT=07+zZznRZjwTDSOp9=eGw@mail.gmail.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Fri, 9 Aug 2024 09:25:02 -0700
+X-Gmail-Original-Message-ID: <CAHk-=whhz5gqh4nto8kh5r25_W=r339w0WWJEzH8AoUR52y+gw@mail.gmail.com>
+Message-ID: <CAHk-=whhz5gqh4nto8kh5r25_W=r339w0WWJEzH8AoUR52y+gw@mail.gmail.com>
+Subject: Re: [BUG] More issues with arm/aes-neonbs
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>, =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>, 
+	Ard Biesheuvel <ardb@kernel.org>, "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Aug 09, 2024 at 12:40:39PM +0800, Herbert Xu wrote:
-> On Thu, Aug 08, 2024 at 12:54:10PM -0700, Linus Torvalds wrote:
-> >
-> > I don't know the crypto registration API enough to even guess at what
-> > the fix to break the recursion is.
-> > 
-> > Herbert?
-> 
-> Yes my plan is to fix this in the Crypto API and not do any recursive
-> loads as we used to do.
-> 
-> The immediate cause of the recursive load is the self-test system
-> (if it is not disabled through Kconfig).  The algorithm registration
-> does not return until after the self-test has successfully executed.
-> For the algorithm in question, that involves loading a fallback
-> algorithm which is what triggered the recursive module load.
-> 
-> We had an issue when algorithms were built into the kernel, where
-> due to the random of registration calls, a self-test may invoke
-> an algorithm which is built into the kernel but not yet registered.
-> There it was resolved by postponing all self-tests until all
-> algorithms had been registered (or when an algorithm was first used,
-> which would trigger the self-test for that algorithm there and then).
-> 
-> I will extend this to modules and let the registration return
-> as soon as the new algorithm can be looked up.  The self-test
-> can then complete asynchronously.
-> 
-> Russell, is it OK with you if we only resolve this in the mainline
-> kernel or do you want a solution that can be backported as well?
+On Thu, 8 Aug 2024 at 22:19, Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
+>
+> End result: I now have a new plan - I'll make the
+> wait_for_completion(&idem.complete) be interruptible and return -EINTR
+> (and I'll have to clean up the wait-queues etc).
 
-That's fine - I've blacklisted the arm-aes-bs module in modprobe.conf
-on the affected machines. Thanks!
+.. and that seems to have been pretty straightforward, and creating a
+test-module that just recursively does a "request_module()" of itself
+shows that it all seems to work.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+I've committed it and marked it as
+
+  Fixes: 9b9879fc0327 ("modules: catch concurrent module loads, treat
+them as idempotent")
+
+but it shouldn't actually matter for any non-buggy module situation.
+
+             Linus
