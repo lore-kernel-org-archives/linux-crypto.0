@@ -1,36 +1,33 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A79EF14A4D6
-	for <linux-crypto@vger.kernel.org>; Sat, 10 Aug 2024 06:25:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B27F4409
+	for <linux-crypto@vger.kernel.org>; Sat, 10 Aug 2024 06:25:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723271102; cv=none; b=TQ9pNwgMsXmuHzeTntsSEHeEdymhgmZiwg9tK/0HORtDYzR6phFfEd3VpIeI9qqQNOFxyNwQm2KRXmcGlmQd3QjRJajbho2fHu50P3+5T4H7FL3boXeVtYF61psE2Zo7z7mkzBAbZA5kKbHUpAx2lTB9cWVBAPkYbfDAH6rG4mg=
+	t=1723271135; cv=none; b=t4M74Jrc41skAHzpCW2XxfG6Cq1PPSjljDbt2U0PcQytZ42eQs+C0398FEnRO3KwvY1PhcXVsaHQRrWJsYoZsyMULBg3qlyf0a7IuSCG8vVG7E249jmAopskCKXSZZRfZx10xQwW4ZjppPjUHBEkO4ayfKr8owdMN8vQifVSzWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723271102; c=relaxed/simple;
-	bh=soMgFvGIAT4yetF6iiQPdwr0nBni+q1EJk37z2FFPhE=;
+	s=arc-20240116; t=1723271135; c=relaxed/simple;
+	bh=PwmieYPqlbqLH2s9iYCDezUramuuC7MKpbaR1UwFKx4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aEv9nH3Fi8J5PncZpWqebzrlBv7LHdAjIdZeYiyFK+wCYrAnnK3E+/zWiaYTG4CkLNyI+a2QvZlPZA0JtNN+zIurS0CvcWKGAYH6fif1aG3BugvJchi7xI0t7PiJmGvTMNp2FvijpN3Lf/VeV9XyZv54pCqTy43pgueLuMQuyyI=
+	 Content-Type:Content-Disposition:In-Reply-To; b=CCLY8uSvtSFDpBzxl3/qnwb4XkoCCBBvQLjAXV4iZSZbxW//FrEh98jbnExDWZz77jf0a20j7JDswOoobfikarIqH1aHrKuJikLzynYmmqfBgRkApNmbDt/XQbKBl6B7Swk2AafBqSvuwk6N7QDh2DK+6e/rszEY77QVoPYlSzo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1scfOH-003irK-0R;
-	Sat, 10 Aug 2024 14:24:35 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 10 Aug 2024 14:24:34 +0800
-Date: Sat, 10 Aug 2024 14:24:34 +0800
+	id 1scfPB-003is2-1Z;
+	Sat, 10 Aug 2024 14:25:31 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 10 Aug 2024 14:25:30 +0800
+Date: Sat, 10 Aug 2024 14:25:30 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Gaosheng Cui <cuigaosheng1@huawei.com>
-Cc: olivia@selenic.com, florian.fainelli@broadcom.com,
-	bcm-kernel-feedback-list@broadcom.com, rjui@broadcom.com,
-	sbranden@broadcom.com, hadar.gat@arm.com, alex@shruggie.ro,
-	aboutphysycs@gmail.com, wahrenst@gmx.net, robh@kernel.org,
-	linux-crypto@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH -next 0/2] Add missing clk_disable_unprepare
-Message-ID: <ZrcHoqtXWQ1s3aYl@gondor.apana.org.au>
-References: <20240803064923.337696-1-cuigaosheng1@huawei.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH] crypto: x86/aes-gcm - fix PREEMPT_RT issue in gcm_crypt()
+Message-ID: <ZrcH2vEzP2EGytEp@gondor.apana.org.au>
+References: <20240805182713.161198-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -39,23 +36,30 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240803064923.337696-1-cuigaosheng1@huawei.com>
+In-Reply-To: <20240805182713.161198-1-ebiggers@kernel.org>
 
-On Sat, Aug 03, 2024 at 02:49:21PM +0800, Gaosheng Cui wrote:
-> Add missing clk_disable_unprepare, thanks!
+On Mon, Aug 05, 2024 at 11:27:13AM -0700, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
 > 
-> Gaosheng Cui (2):
->   hwrng: bcm2835 - Add missing clk_disable_unprepare in bcm2835_rng_init
->   hwrng: cctrng - Add missing clk_disable_unprepare in cctrng_resume
+> On PREEMPT_RT, kfree() takes sleeping locks and must not be called with
+> preemption disabled.  Therefore, on PREEMPT_RT skcipher_walk_done() must
+> not be called from within a kernel_fpu_{begin,end}() pair, even when
+> it's the last call which is guaranteed to not allocate memory.
 > 
->  drivers/char/hw_random/bcm2835-rng.c | 4 +++-
->  drivers/char/hw_random/cctrng.c      | 1 +
->  2 files changed, 4 insertions(+), 1 deletion(-)
+> Therefore, move the last skcipher_walk_done() in gcm_crypt() to the end
+> of the function so that it goes after the kernel_fpu_end().  To make
+> this work cleanly, rework the data processing loop to handle only
+> non-last data segments.
 > 
-> -- 
-> 2.25.1
+> Fixes: b06affb1cb58 ("crypto: x86/aes-gcm - add VAES and AVX512 / AVX10 optimized AES-GCM")
+> Reported-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> Closes: https://lore.kernel.org/linux-crypto/20240802102333.itejxOsJ@linutronix.de
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>  arch/x86/crypto/aesni-intel_glue.c | 59 ++++++++++++++----------------
+>  1 file changed, 28 insertions(+), 31 deletions(-)
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
