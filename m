@@ -1,66 +1,69 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E42604409;
-	Sat, 10 Aug 2024 04:05:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 105A84409
+	for <linux-crypto@vger.kernel.org>; Sat, 10 Aug 2024 06:20:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723262732; cv=none; b=JH/d8/tjZd8zjvElbbXIJ8TU9h0EcO/1ZpGbAY+0XZOxefvv1HQXtr7yVIdNts0GfH6oPSGUAeswfnXEKJrGflVMd7EhBZpRJ6C1Kmokp8sCnLSMoMrjoHhwFz9Sr+qZ8+H9Q9XsuF4o42iqawfeZyRQIF4x0DyTfL0BFVhFH3U=
+	t=1723270861; cv=none; b=fPsWt+YimwCEJLZBepdfgzPNUW4PBSfNGNb0Ok97jdCrTqbRGRFppZ4AZicN1Qgvhr5FbOWThJub0dyG7HoVGBR/pLAAEbR5J9Ywi4knzbqilVy0juc1nqfzZ1EhyMRaiwIZuabvIcV0xnspZZk9knmCc9hTU9ALSUwOY6GWY/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723262732; c=relaxed/simple;
-	bh=n1qTkf0PwQ59B//afhTL/1aAU9z2u2nd+TAWev/OX4M=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=SStE4wbz2Tt1a7/D5zipePBV9KrSEuy5v48u3Yr6NpnumwBMKUoQc+D3w52zZRma5aw+DYV3CY5YYNFacUkNRFIqhk/PtHBhKKAZpWyUzxiMX/NH10ntatM1ZaLem7V/sTk4JeBFrs62iyM6qPJMRaS7y3QeRMiKFD/CjsErSAQ=
+	s=arc-20240116; t=1723270861; c=relaxed/simple;
+	bh=x+3GHAL1s1rBGYNdAAe80kuC5EvqQnQt8dgXYN2M8gs=;
+	h=Date:Message-Id:From:Subject:To; b=EJPuAH3B2GIR078v7lm/8CWIEAnSnrvbuCBr3Kr8s+NG6SmS+Ay88PGvpMx8Flv/mPCL4FK6hkAb7kxnrMgALO95SyGDPF1malr37GfzE8QUuSgkzmZP4yNqJiBo0kVovdVKn/sejiLg+k2l4h2dVMc7VbhHNLg+t3COqIUwVvk=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1scdDS-003hgG-10;
-	Sat, 10 Aug 2024 12:05:16 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 10 Aug 2024 12:05:15 +0800
-Date: Sat, 10 Aug 2024 12:05:15 +0800
+	id 1scfKh-003ip6-2s;
+	Sat, 10 Aug 2024 14:20:54 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 10 Aug 2024 14:20:52 +0800
+Date: Sat, 10 Aug 2024 14:20:52 +0800
+Message-Id: <cover.1723270405.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Waiman Long <longman@redhat.com>
-Cc: steffen.klassert@secunet.com, daniel.m.jordan@oracle.com,
-	akpm@linux-foundation.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, longman@redhat.com
-Subject: Re: [PATCH] padata: Fix possible divide-by-0 panic in
- padata_mt_helper()
-Message-ID: <Zrbm--AxRXgfHUek@gondor.apana.org.au>
+Subject: [v2 PATCH 0/4] crypto: lib/mpi - Add error checks
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240806174647.1050398-1-longman@redhat.com>
-X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
 
-Waiman Long <longman@redhat.com> wrote:
->
-> diff --git a/kernel/padata.c b/kernel/padata.c
-> index 53f4bc912712..0fa6c2895460 100644
-> --- a/kernel/padata.c
-> +++ b/kernel/padata.c
-> @@ -517,6 +517,13 @@ void __init padata_do_multithreaded(struct padata_mt_job *job)
->        ps.chunk_size = max(ps.chunk_size, job->min_chunk);
->        ps.chunk_size = roundup(ps.chunk_size, job->align);
-> 
-> +       /*
-> +        * chunk_size can be 0 if the caller sets min_chunk to 0. So force it
-> +        * to at least 1 to prevent divide-by-0 panic in padata_mt_helper().`
-> +        */
-> +       if (!ps.chunk_size)
-> +               ps.chunk_size = 1U;
+This patch series reverts MPI library extensions which are buggy
+as they carried assumptions from user-space that memory allocations
+always succeed.  They were used by SM2 which itself has now been
+removed.
 
-Perhaps change the first ps.chunk_size assignment to use DIV_ROUND_UP
-instead?
+Ironically most of these library functions were previously in the
+kernel in a non-buggy form but were removed because they were unused.
 
-Thanks,
+About half of the extensions remain because they have found uses
+beyond SM2.  For those error checks have been added.
+
+Herbert Xu (4):
+  Revert "lib/mpi: Extend the MPI library"
+  crypto: lib/mpi - Add error checks to extension
+  crypto: dh - Check mpi_rshift errors
+  crypto: rsa - Check MPI allocation errors
+
+ crypto/dh.c                   |   4 +-
+ crypto/rsa.c                  |  19 +-
+ include/linux/mpi.h           |  87 ++-------
+ lib/crypto/mpi/Makefile       |   1 -
+ lib/crypto/mpi/mpi-add.c      |  89 +++------
+ lib/crypto/mpi/mpi-bit.c      | 168 ++---------------
+ lib/crypto/mpi/mpi-cmp.c      |  46 +----
+ lib/crypto/mpi/mpi-div.c      |  82 ++++-----
+ lib/crypto/mpi/mpi-internal.h |  21 +--
+ lib/crypto/mpi/mpi-inv.c      | 143 ---------------
+ lib/crypto/mpi/mpi-mod.c      | 148 +--------------
+ lib/crypto/mpi/mpi-mul.c      |  29 ++-
+ lib/crypto/mpi/mpicoder.c     | 336 ----------------------------------
+ lib/crypto/mpi/mpih-mul.c     |  25 ---
+ lib/crypto/mpi/mpiutil.c      | 184 +------------------
+ 15 files changed, 151 insertions(+), 1231 deletions(-)
+ delete mode 100644 lib/crypto/mpi/mpi-inv.c
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.39.2
+
