@@ -1,125 +1,162 @@
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC85524B28;
-	Sun, 11 Aug 2024 06:28:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37C231487D1
+	for <linux-crypto@vger.kernel.org>; Sun, 11 Aug 2024 13:30:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723357714; cv=none; b=H+9Pn7KBaLLFTi7ZqNZ5B+2gpa+pD3COhmUg2LpVVduLcjw9p02ipOejH+3vHRX25q5EqCZMDhpfbGlq3UMRfIg39zEOSofbrj//OWUq7oT6Gim72tbzjw0e53QOr/OJ5SoQMkdpXRWX1aBYD82BjUUCr0p41wT4c8UHlzh/ZWs=
+	t=1723383021; cv=none; b=P/eIpywsV1bliIu1ZNjJ2xI/2o4t3S5kb12wyJyzAZ05oZuCSkPiTm1/JRpCWsQ6p6HzK0AI3I+kDmtQVTlnXyYw1b6dpr77vfa61BFz7fk4BNs3UJ/eYwTfEgjuAomWswogZNweLoMJ6jxG+02w1Hd1x2a7ohGtHxLKLFQtMFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723357714; c=relaxed/simple;
-	bh=9ZkdAe9Ke7PD237/+CHPox+nY7Q64p614CBHQGtg8e8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=kMlMecUeF1ba+C4TW/s2z3A/6LdSOaCmjSSAbFDtBR1hpdWsP2OgzVkj/VTNSpo3dgSZzCJAyNl9Rz1uUYD0fDO+bbyvKBGGfUo5IGnJ7N6FtyKsaqmT2JB4jo/r9938/zkpiKrF0brilnvKUHklIU1K5NnO1zmpoL9TbSGYm4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nEXepUcq; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1723383021; c=relaxed/simple;
+	bh=WI32aLDXzMX73NHJX889i+Bmg8NKd4/36nuecSsCIeY=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=BY7keXkshMtjLSIk4uKpLTzm6lAZh7N2j7Bi/zOO1qzP7ljejSHb8jqxUPW+pOVpQMapckbGEyjJJGHqZi5QHwwvQue+TWaqvCuHCvZyvl1HMeV3EKbRA6ZZV/8tPSVUUFIJxYC0p5OLXn9UU96CKGetlgPL5EoTIIIlnuP83PE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Sjlef+3V; arc=none smtp.client-ip=209.85.167.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nEXepUcq"
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1fc53171e56so2004505ad.3;
-        Sat, 10 Aug 2024 23:28:32 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Sjlef+3V"
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-52f01ec08d6so4827805e87.2
+        for <linux-crypto@vger.kernel.org>; Sun, 11 Aug 2024 06:30:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723357712; x=1723962512; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=InerpERUTShRbv/VugKq7TcCuS6dPEaJJKrcgohqHKg=;
-        b=nEXepUcqk5LaSnjm2ueiGfOalvuD3/LvULwdrOOiy2ZfZWDiRJZE1DOD91P8uOxsUl
-         zc33jULMnVjHvn8K/BsJ7j4d1UcqDr7Y+w0c/Pdmfwu0hLMADt1GeHkDRUtF8QrT6ADQ
-         +RkOqMGR5Xarrzynt/LVtfzTCaHEGwcNJRqx6Fj0ZIf1MpiGgEjuco2mVHs9TX4nwoEx
-         qKb9NXNLvA/GP1+ziHhi3us5jeG3CmP5IS+ocFGTvtEtE9B4jielUQHoreWiE0qqDNQJ
-         4Et84qO/QytZ7l6PCvmvQkYCP28l7+jngB1xlpkVEZFZm1Rhn28NJoJaB6UJ4+fqE+I+
-         Or6A==
+        d=linaro.org; s=google; t=1723383017; x=1723987817; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ophunq+irD/RQYGfTe1EmvYis9lTBIa/JcdniZkh3wo=;
+        b=Sjlef+3Vg8J0R/PUs8fU/Gs4ALOySOWUwxI/yNmUnKNbrwSMCGGR2Haafq3tgkcmRQ
+         ivxtTe72ERHJRqD/ny1Ok96+uJR970LAAYniH26FTtSq2mLlMEG/eHfQcvDzfAzhOw42
+         mCufgdkN/tqldJs609wkNpovgMXxXSp9jfS+CuEq3lvGBdK+g4wZPgMEFI40agxdO64A
+         MJ2/EPMaokcUaYBm5/1PW060rIV0Lf6f2m97i/pddZ/ju6l7MBlFldreQkflQh5njVnU
+         EO3VdS8BxxZB/y2hZS2b4VvaOHrNPAYz1BjxGsPiuBKRvoa8GSP4eS6kcwutbJ/AED2V
+         nRMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723357712; x=1723962512;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=InerpERUTShRbv/VugKq7TcCuS6dPEaJJKrcgohqHKg=;
-        b=QbL2EANdFu3n8+K+87lcyZUa8/riuVRkGk7XnrosPfU3rZcpz0Opf/R9eUdJwxbc9c
-         1A+fdYAyloqM5LCbfNgYKaRj9pY5vetzpdXyDaUhjfvjzZlZa7pumNWadAyW1tE4WGAh
-         m9I9x+6jQtnCqZQ8vgMJfj0kHQzhtQrDMtuKTVKw+H6+X/jDrSYbOij+y7fnLF3Ue2Sa
-         HKzxuF9ltVF9bI81C0ZZUI4mYZ4lM8e4Ph36beHyrF+Lkk9J9bYi9hZMEfyy+pjnmwKV
-         XfqmfHmCAkuWjEbhcDTQ8jbV+YgLxYQYbOdoocPae+T7fogkQDEiK9cj0cKSChOHfVd8
-         0bGA==
-X-Forwarded-Encrypted: i=1; AJvYcCUfbOtA++ZzxtK2Z7CKfoHHQ1C3FVfyysI8ulV5EC4WXD3fzGqgz3OuV45c6AtiAFk3CsGvuSWgqx9p2FZbZX6QdeRwjGtQe1BpYjffyZHR+4dRNvw8HdFVP1YDdxXNNirzCsXfBh6UgvTj
-X-Gm-Message-State: AOJu0YwUFMtGNHeo3y0P+oy9OF305jAD9tONOJAWqo3AN3VmctOMewKm
-	L5hz/N8o3VgHzuSLvWRI0gZTPxUpH2Q8jnWwGxIHTs7M2cxdtvc5
-X-Google-Smtp-Source: AGHT+IHvdBL2rMWB7oeGir6Skh1qb4tcnrTXVhWVceA1z4a31aZa3M19yfoqi70+O1nIpgeE9RH4oQ==
-X-Received: by 2002:a17:902:d50e:b0:1f7:2576:7f88 with SMTP id d9443c01a7336-200ae5733f2mr47672915ad.6.1723357711881;
-        Sat, 10 Aug 2024 23:28:31 -0700 (PDT)
-Received: from visitorckw-System-Product-Name.. ([140.113.216.168])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-200bb9038fesm18836795ad.114.2024.08.10.23.28.29
+        d=1e100.net; s=20230601; t=1723383017; x=1723987817;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ophunq+irD/RQYGfTe1EmvYis9lTBIa/JcdniZkh3wo=;
+        b=b7rUGHwp2ua5+Bqs1miyKSl8qJG/j85AY62kXFjpvUm0vardWJoUMllZ3Imk0+teZ3
+         sf8OyqE1nqqjaLPTXHzZXVl/wdyNKn6HgJbmT1if035cvhndXSwFjntKDoK10D0idMOp
+         xacJ5+15AV4ItjMrIEp/Wd86DI9b1v2FFEvsnKHBLo5nc1whMmCtk03R/vgH0Yv82Isf
+         BJq8JhJstYb0QYd+MfoOQZLjhzqDSOZExAH3QJ8t2ejVxkUQjrvRQdkeB0+sHTqADRRz
+         rveMeWJW1WmYjtc8vIoZ7iRsIrGY2KU6ycbO6JIGza4gQqHKPd9flhnPxu3KlC0r1P9H
+         3yyA==
+X-Forwarded-Encrypted: i=1; AJvYcCU0i/HuIama6wPvId49boBXkfwvKngx5A7Q4uyCFgpZt4wdRNEtjhfDa3PQvT3dgxH3cykLzvmUkmt7qaZIOYTJHcQKDI4dFcrFHE1z
+X-Gm-Message-State: AOJu0YyN9jZAiveffkp09O83crmWSV/fhS/U/oo8htwUs4t4nMlspNhF
+	Bd3cd6SrdMsbnKvUKXGTFtn8XPovpiLtPCQrtyel76SzjOcrbKVgU/9QNUTrqqc=
+X-Google-Smtp-Source: AGHT+IH3NE04N2VqidGut2ih4Aovg/6zbgyk+VvQdaiI3UDBTeO6TYI7TA1F0AtaoaJGPhUsVrHPRg==
+X-Received: by 2002:a05:6512:b96:b0:52c:d84b:eee6 with SMTP id 2adb3069b0e04-530eea25013mr5295040e87.38.1723383016894;
+        Sun, 11 Aug 2024 06:30:16 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a80bb212e32sm146603566b.166.2024.08.11.06.30.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 10 Aug 2024 23:28:31 -0700 (PDT)
-From: Kuan-Wei Chiu <visitorckw@gmail.com>
-To: bbrezillon@kernel.org,
-	arno@natisbad.org,
-	schalla@marvell.com
-Cc: herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	jserv@ccns.ncku.edu.tw,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Kuan-Wei Chiu <visitorckw@gmail.com>
-Subject: [PATCH 2/2] crypto: octeontx2 - Remove custom swap functions in favor of built-in sort swap
-Date: Sun, 11 Aug 2024 14:28:17 +0800
-Message-Id: <20240811062817.210527-3-visitorckw@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240811062817.210527-1-visitorckw@gmail.com>
-References: <20240811062817.210527-1-visitorckw@gmail.com>
+        Sun, 11 Aug 2024 06:30:16 -0700 (PDT)
+Date: Sun, 11 Aug 2024 16:30:10 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: oe-kbuild@lists.linux.dev, Herbert Xu <herbert@gondor.apana.org.au>,
+	Linus Torvalds <torvalds@linux-foundation.org>
+Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev,
+	LKML <linux-kernel@vger.kernel.org>,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 2/3] crypto: api - Do not wait for tests during
+ registration
+Message-ID: <34069b9d-3731-4d0c-b317-bcbc61df7e9d@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZrbTfOViUr3S4V7X@gondor.apana.org.au>
 
-The custom swap functions used in octeontx2 driver do not perform any
-special operations and can be replaced with the built-in swap function
-of sort. This change not only reduces code size but also improves
-efficiency, especially in scenarios where CONFIG_RETPOLINE is enabled,
-as it makes indirect function calls more expensive.
+Hi Herbert,
 
-By using the built-in swap, we avoid these costly indirect function
-calls, leading to better performance.
+kernel test robot noticed the following build warnings:
 
-Signed-off-by: Kuan-Wei Chiu <visitorckw@gmail.com>
----
-Note: Build test only.
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
- drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c | 10 +---------
- 1 file changed, 1 insertion(+), 9 deletions(-)
+url:    https://github.com/intel-lab-lkp/linux/commits/Herbert-Xu/crypto-api-Do-not-wait-for-tests-during-registration/20240810-160343
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+patch link:    https://lore.kernel.org/r/ZrbTfOViUr3S4V7X%40gondor.apana.org.au
+patch subject: [PATCH 2/3] crypto: api - Do not wait for tests during registration
+config: x86_64-randconfig-161-20240811 (https://download.01.org/0day-ci/archive/20240811/202408110413.vKk2q3qN-lkp@intel.com/config)
+compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
 
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c b/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
-index 1604fc58dc13..ff7cc8c13e73 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
-@@ -1702,14 +1702,6 @@ static int compare_func(const void *lptr, const void *rptr)
- 	return 0;
- }
- 
--static void swap_func(void *lptr, void *rptr, int size)
--{
--	struct cpt_device_desc *ldesc = lptr;
--	struct cpt_device_desc *rdesc = rptr;
--
--	swap(*ldesc, *rdesc);
--}
--
- int otx2_cpt_crypto_init(struct pci_dev *pdev, struct module *mod,
- 			 int num_queues, int num_devices)
- {
-@@ -1739,7 +1731,7 @@ int otx2_cpt_crypto_init(struct pci_dev *pdev, struct module *mod,
- 		is_crypto_registered = true;
- 	}
- 	sort(se_devices.desc, count, sizeof(struct cpt_device_desc),
--	     compare_func, swap_func);
-+	     compare_func, NULL);
- 
- unlock:
- 	mutex_unlock(&mutex);
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+| Closes: https://lore.kernel.org/r/202408110413.vKk2q3qN-lkp@intel.com/
+
+smatch warnings:
+crypto/algapi.c:396 crypto_alg_tested() error: uninitialized symbol 'test'.
+
+vim +/test +396 crypto/algapi.c
+
+73d3864a4823ab Herbert Xu     2008-08-03  350  void crypto_alg_tested(const char *name, int err)
+73d3864a4823ab Herbert Xu     2008-08-03  351  {
+73d3864a4823ab Herbert Xu     2008-08-03  352  	struct crypto_larval *test;
+73d3864a4823ab Herbert Xu     2008-08-03  353  	struct crypto_alg *alg;
+73d3864a4823ab Herbert Xu     2008-08-03  354  	struct crypto_alg *q;
+73d3864a4823ab Herbert Xu     2008-08-03  355  	LIST_HEAD(list);
+73d3864a4823ab Herbert Xu     2008-08-03  356  
+73d3864a4823ab Herbert Xu     2008-08-03  357  	down_write(&crypto_alg_sem);
+73d3864a4823ab Herbert Xu     2008-08-03  358  	list_for_each_entry(q, &crypto_alg_list, cra_list) {
+b8e15992b420d0 Herbert Xu     2009-01-28  359  		if (crypto_is_moribund(q) || !crypto_is_larval(q))
+73d3864a4823ab Herbert Xu     2008-08-03  360  			continue;
+
+Is it possible for everything to be moribund or larval?
+
+73d3864a4823ab Herbert Xu     2008-08-03  361  
+73d3864a4823ab Herbert Xu     2008-08-03  362  		test = (struct crypto_larval *)q;
+73d3864a4823ab Herbert Xu     2008-08-03  363  
+73d3864a4823ab Herbert Xu     2008-08-03  364  		if (!strcmp(q->cra_driver_name, name))
+73d3864a4823ab Herbert Xu     2008-08-03  365  			goto found;
+73d3864a4823ab Herbert Xu     2008-08-03  366  	}
+73d3864a4823ab Herbert Xu     2008-08-03  367  
+c72358571aaadf Karim Eshapa   2017-05-13  368  	pr_err("alg: Unexpected test result for %s: %d\n", name, err);
+73d3864a4823ab Herbert Xu     2008-08-03  369  	goto unlock;
+
+This calling crypto_alg_put() on the last item in the list seems wrong either
+way.
+
+73d3864a4823ab Herbert Xu     2008-08-03  370  
+73d3864a4823ab Herbert Xu     2008-08-03  371  found:
+b8e15992b420d0 Herbert Xu     2009-01-28  372  	q->cra_flags |= CRYPTO_ALG_DEAD;
+73d3864a4823ab Herbert Xu     2008-08-03  373  	alg = test->adult;
+d6097b8d5d55f2 Nicolai Stange 2022-02-21  374  
+d6097b8d5d55f2 Nicolai Stange 2022-02-21  375  	if (list_empty(&alg->cra_list))
+73d3864a4823ab Herbert Xu     2008-08-03  376  		goto complete;
+73d3864a4823ab Herbert Xu     2008-08-03  377  
+d6097b8d5d55f2 Nicolai Stange 2022-02-21  378  	if (err == -ECANCELED)
+d6097b8d5d55f2 Nicolai Stange 2022-02-21  379  		alg->cra_flags |= CRYPTO_ALG_FIPS_INTERNAL;
+d6097b8d5d55f2 Nicolai Stange 2022-02-21  380  	else if (err)
+73d3864a4823ab Herbert Xu     2008-08-03  381  		goto complete;
+d6097b8d5d55f2 Nicolai Stange 2022-02-21  382  	else
+d6097b8d5d55f2 Nicolai Stange 2022-02-21  383  		alg->cra_flags &= ~CRYPTO_ALG_FIPS_INTERNAL;
+73d3864a4823ab Herbert Xu     2008-08-03  384  
+73d3864a4823ab Herbert Xu     2008-08-03  385  	alg->cra_flags |= CRYPTO_ALG_TESTED;
+73d3864a4823ab Herbert Xu     2008-08-03  386  
+103961609b0935 Herbert Xu     2024-08-10  387  	crypto_alg_finish_registration(alg, &list);
+cce9e06d100df1 Herbert Xu     2006-08-21  388  
+73d3864a4823ab Herbert Xu     2008-08-03  389  complete:
+862e4618d9321e Herbert Xu     2024-08-10  390  	list_del_init(&test->alg.cra_list);
+73d3864a4823ab Herbert Xu     2008-08-03  391  	complete_all(&test->completion);
+2825982d9d66eb Herbert Xu     2006-08-06  392  
+73d3864a4823ab Herbert Xu     2008-08-03  393  unlock:
+73d3864a4823ab Herbert Xu     2008-08-03  394  	up_write(&crypto_alg_sem);
+2825982d9d66eb Herbert Xu     2006-08-06  395  
+862e4618d9321e Herbert Xu     2024-08-10 @396  	crypto_alg_put(&test->alg);
+                                                                ^^^^
+
+73d3864a4823ab Herbert Xu     2008-08-03  397  	crypto_remove_final(&list);
+cce9e06d100df1 Herbert Xu     2006-08-21  398  }
+
 -- 
-2.34.1
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
