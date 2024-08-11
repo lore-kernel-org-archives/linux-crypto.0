@@ -1,122 +1,96 @@
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7245517FE;
-	Sun, 11 Aug 2024 05:44:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 110401BC41;
+	Sun, 11 Aug 2024 06:28:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723355069; cv=none; b=Xi0XrAUN1kuGDrWMl38/nqLbLHHYS/dGg0YkZgJz3Fgqsa9GWTb5/HalzUErWU4ePe4UdGw9kjGE4ZPKszZK4dvRPVBrYec1zVWqagsjYsFv+f+m3kpjCoQy0tV4GS/4CM7b91K1CqWjlLFJtVMft5P06CJ/WRmh41IrLYr95ZM=
+	t=1723357707; cv=none; b=OIIitLTXHg16tCPUVYToh+D4uPot32Hhw2qY29rw/Ysr/xfrAMEITVtTYWw2s1fYfSVjcYKDeo9EUvdfc2u3jNHZ0gfCctwfRKdlxU2hne1rTOWttwqsQhbzUs9pvaT3lramML1Nq6Vwzcz7zfsGvjkGfL9lZ/hsJHvpz1TEDQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723355069; c=relaxed/simple;
-	bh=JGO6cAaAYQrAkledt5zG6oxNXE2zt4v72GCHvYMjDLU=;
-	h=From:To:CC:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=LYjCrD7tQjvEQpWtU51pZzt1ya5suxn92gu3iOFgyeBN8Kq2qqKaZ9I450kqTEGedBbJ/taJ9IWE/WbAHTdYC7VVm3gM8acpvEQH3UOsSiyO8mx9f1vULE7ryuQNjQq3hK+95EQxBoTHhNme744KXWgZHhXmW0EN5EUC0YCisgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=yh15/wgP; arc=none smtp.client-ip=198.47.19.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+	s=arc-20240116; t=1723357707; c=relaxed/simple;
+	bh=ITlBrNk/nnNYFawhBXPmlXS015YrTn0oyia8RryqSnc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=bCVFFsxTUvysPJQYWNymL+8SFGzqgpKP2oW4DGUwdDbxf7H27E9oP2OWo/Lxgd2GbwAuu/2BXzj10kA04JuOOVC4k9ofSHqL0QtVH222z4POzqrfwfA4PcMqm4ldUO20F2SSwnTuWFHhFOyt9SrjVbSTMlJ/MY9B325O2qbCIyY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kIuG11Qv; arc=none smtp.client-ip=209.85.215.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="yh15/wgP"
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 47B5i89T002019;
-	Sun, 11 Aug 2024 00:44:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1723355048;
-	bh=/+PUL3LEMAgL23QbsIlJGx5S8eUd+Dakmov9dS9NNFc=;
-	h=From:To:CC:Subject:In-Reply-To:References:Date;
-	b=yh15/wgPUSS4AxHoEdrV+kxOA+KRqVQt/pW6oP2OmcBnvs53YcK973pvYI7tBYTi1
-	 4REZcWq/6GOp/5DYAXraQ0TzzwWjGhiMS468mpStM0cRya901dPbeRkIBeHywdWkIs
-	 f4YodD6svGmd/ajgBkvwxNoSpGKbRVDJQl5RTJ8M=
-Received: from DFLE109.ent.ti.com (dfle109.ent.ti.com [10.64.6.30])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 47B5i87i016786
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Sun, 11 Aug 2024 00:44:08 -0500
-Received: from DFLE107.ent.ti.com (10.64.6.28) by DFLE109.ent.ti.com
- (10.64.6.30) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Sun, 11
- Aug 2024 00:44:08 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE107.ent.ti.com
- (10.64.6.28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Sun, 11 Aug 2024 00:44:08 -0500
-Received: from localhost (kamlesh.dhcp.ti.com [172.24.227.123])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 47B5i76L120127;
-	Sun, 11 Aug 2024 00:44:08 -0500
-From: Kamlesh Gurudasani <kamlesh@ti.com>
-To: Waiman Long <longman@redhat.com>,
-        Steffen Klassert
-	<steffen.klassert@secunet.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Andrew Morton <akpm@linux-foundation.org>
-CC: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] padata: Fix possible divide-by-0 panic in
- padata_mt_helper()
-In-Reply-To: <70e28278-d9cf-4158-b296-cabe7786e4a7@redhat.com>
-References: <20240806174647.1050398-1-longman@redhat.com>
- <87jzgonug5.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
- <70e28278-d9cf-4158-b296-cabe7786e4a7@redhat.com>
-Date: Sun, 11 Aug 2024 11:14:06 +0530
-Message-ID: <87h6brobq1.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kIuG11Qv"
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-7c2595f5c35so547421a12.1;
+        Sat, 10 Aug 2024 23:28:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723357705; x=1723962505; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/DMcAaFP8TtynypPN0f9sbeN3Vgz8QTUBmxZp6aEgJE=;
+        b=kIuG11Qvd/MZYLN53ZOm7EXjeSgDaUpsduJQuikIxmfvHFx+L9jDAs96J5c97yLqku
+         UokrfIK1wrxXqZRGdf+uW0VyhB1ZpPcbGl86U+T6oa/1pOrRAMVfltjDjPdyGVPtwJ+t
+         +COrvFOjETNx4MNKJ6uML2cbcIiA1HFLZx7WLFUXzCxKnKAQhffgs9I3oDFZjwMsL18i
+         LNm+be9VpsGvBTVpNEtqhtoilBCywAigtVKvsqtR9YuNefOMoTI/jNtp+rgApVeEYI8J
+         4VA60zVeWSqADG0Ihj30L7OLAKFULrAbQOEZv0242UekEAEv9EocZ0vYCYTbr5XOUc8u
+         jDAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723357705; x=1723962505;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/DMcAaFP8TtynypPN0f9sbeN3Vgz8QTUBmxZp6aEgJE=;
+        b=ewwTP9BFcvzDaztEwb0xafF3KIKPTezSVbhI77PCyAaa5VNiQfxKBpTF84+WsJeTmi
+         XwYBuSfNONHNpvhigYDQrYz1Z6Nh1MX0Hrf2rLBVmhi+lkgNgxgFsOUlVzuf6fWGv4lS
+         Ao0HiWLu2JT/1kFKiLaQNLs/eFpLfWlhaV2bqjURykGDDq2ynGYEezSwIQ4kEDEvWGhA
+         hlL4Gy8hzendXcyxiTEfcDDx6VAbqMPgT6ynFtR/X6gePBiNwGyNnrwTMLXOvkINa4o1
+         lvagmdBhacueOohEiR6fIcGHVYH2EPpR0rXtaH5eOrFLm4mshXFYBpqIxdcXxcHRsSKy
+         j1Ww==
+X-Forwarded-Encrypted: i=1; AJvYcCUJYsiYXaJQMjnFz/JtzQowQeD/4Qi1Nn2Jt6j9f/ujWtjMa6x+OiIQBJD9CAl+NaFDJricUDZ/XfAktTTQ@vger.kernel.org, AJvYcCV5elIC2+QJHOvckVYCwbIOdKRxoFHK0KcsIgf72dqCfQaoUN5n7kVBTPx2J95qF9kGyMe3hABAgznTZ/k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyiC1RDpv96scMPekqjfk+4J72uoip0e12bWpTb7F3909eWeOnt
+	ykt63ILpl8USuOLTAzmilaBaOTjfDUxFrCBZ9k2aA5oxBcLQa2/H
+X-Google-Smtp-Source: AGHT+IER3XajM5bBFvxQnnjDkNDUhSDbah17k73U0KUx8IyAlBH0JwbLi+zdu0VJ+kWqdFtqTyDWCQ==
+X-Received: by 2002:a17:902:ec8a:b0:1f7:2046:a8ae with SMTP id d9443c01a7336-200ae25aa5amr47643885ad.0.1723357705138;
+        Sat, 10 Aug 2024 23:28:25 -0700 (PDT)
+Received: from visitorckw-System-Product-Name.. ([140.113.216.168])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-200bb9038fesm18836795ad.114.2024.08.10.23.28.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 10 Aug 2024 23:28:24 -0700 (PDT)
+From: Kuan-Wei Chiu <visitorckw@gmail.com>
+To: bbrezillon@kernel.org,
+	arno@natisbad.org,
+	schalla@marvell.com
+Cc: herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	jserv@ccns.ncku.edu.tw,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Kuan-Wei Chiu <visitorckw@gmail.com>
+Subject: [PATCH 0/2] crypto: marvell - Remove custom swap function in favor of built-in sort swap
+Date: Sun, 11 Aug 2024 14:28:15 +0800
+Message-Id: <20240811062817.210527-1-visitorckw@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Transfer-Encoding: 8bit
 
-Waiman Long <longman@redhat.com> writes:
+The custom swap function used in octeontx/octeontx2 driver do not
+perform any special operations and can be replaced with the built-in
+swap function of sort. This change not only reduces code size but also
+improves efficiency, especially in scenarios where CONFIG_RETPOLINE is
+enabled, as it makes indirect function calls more expensive.
 
-> On 8/10/24 13:44, Kamlesh Gurudasani wrote:
->> Waiman Long <longman@redhat.com> writes:
->>
-...
->>> diff --git a/kernel/padata.c b/kernel/padata.c
->>> index 53f4bc912712..0fa6c2895460 100644
->>> --- a/kernel/padata.c
->>> +++ b/kernel/padata.c
->>> @@ -517,6 +517,13 @@ void __init padata_do_multithreaded(struct padata_mt_job *job)
->>>   	ps.chunk_size = max(ps.chunk_size, job->min_chunk);
->>>   	ps.chunk_size = roundup(ps.chunk_size, job->align);
->>>   
->>> +	/*
->>> +	 * chunk_size can be 0 if the caller sets min_chunk to 0. So force it
->>> +	 * to at least 1 to prevent divide-by-0 panic in padata_mt_helper().`
->>> +	 */
->> Thanks for the patch and detailed comment.
->>> +	if (!ps.chunk_size)
->>> +		ps.chunk_size = 1U;
->>> +
->> could it be
->>          ps.chunk_size = max(ps.chunk_size, 1U);
->>          
->> or can be merged with earlier max()
->>    	ps.chunk_size = max(ps.chunk_size, max(job->min_chunk, 1U));
->>    	ps.chunk_size = roundup(ps.chunk_size, job->align);
->>
->> sits well with how entire file is written and compiler is optimizing
->> them to same level.
->
-> I had actually thought about doing that as an alternative. I used the 
-> current patch to avoid putting too many max() calls there. I can go this 
-> route if you guys prefer this.
-Just curious, what is your reason for avoiding too many max() calls? Both
-        if (!ps.chunk_size)
-        	ps.chunk_size = 1U;
-and
-        ps.chunk_size = max(ps.chunk_size, 1U);
+By using the built-in swap, we avoid these costly indirect function
+calls, leading to better performance.
 
-are having same number of instructions [1]. 
+Kuan-Wei Chiu (2):
+  crypto: octeontx - Remove custom swap function in favor of built-in
+    sort swap
+  crypto: octeontx2 - Remove custom swap functions in favor of built-in
+    sort swap
 
-[1] https://godbolt.org/z/ajrK59c67
+ drivers/crypto/marvell/octeontx/otx_cptvf_algs.c   | 12 ++----------
+ drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c | 10 +---------
+ 2 files changed, 3 insertions(+), 19 deletions(-)
 
-We can avoid nested max(), though following would make it easier to understand. 
+-- 
+2.34.1
 
-   ps.chunk_size = max(ps.chunk_size, 1U);
-
-Cheers,
-Kamlesh
-
->
-> Cheers,
-> Longman
