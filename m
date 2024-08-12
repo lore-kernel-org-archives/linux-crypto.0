@@ -1,146 +1,128 @@
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [81.169.146.165])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C857A3C0B;
-	Mon, 12 Aug 2024 00:42:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723423362; cv=none; b=asLRN9lOkeSIhS7093PKtYEFSfVk1zS5uVnNR0yAbQQOaHj43KMPX9Niq2s3PnJSHd/kKOolFUcFFxE3Yve58Qj6BeMiQBFJ7eLljVlKjFayTfWNL6b7jhGlowky6ULxXMgqfLXSP6VcYvz+M5hCWaT6XEWmqb+CxXtcIjm1gUg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723423362; c=relaxed/simple;
-	bh=uSBKCVsGn7X4JvvuBZ/PkqJxqwMm0MixGyeT4UxHTsA=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=RT+pc5AoGylzwhdgSZhh6qamDIOCugMfI5FdLAd5Z72xGh/Fz60gEMhfLhFIYi9rBFvGcoZcXT9Jt4PN1gjfv8evo1QlJUq9LVRc7K+MICcbHDS/yVzTU5A2No+seUQ2E0vd88ngFFvyDNRilNt5iGC7Gx3KePq+FnMkreBCWYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=YysNNPhV; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8E208F47
+	for <linux-crypto@vger.kernel.org>; Mon, 12 Aug 2024 06:28:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=81.169.146.165
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723444137; cv=pass; b=nj8YQcGiQ4SeCzsIPbeuuklRZO8+csq3UIbVLKn9giNpeKQ/ASC1I6m/4hTiblBSZ/JigluQRcq56CFA8QT5SjSaKBBLT4yj2mgqV6wtlFreB08cOOzZ12Ap4ovUCdqUGh+HOwJAVdHpvLOfJRNQRLeU0nifnwgNCjv42r9cJSQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723444137; c=relaxed/simple;
+	bh=d6RyXn1n9L/oPVAZa2LHfVjYrPAhV211CPtko/UD8Hw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pFmrGOMDMxsGbQTI4l60hY2TKotVdLXnz6j/rP4z4quvqRdUdXgAcgYIvuKUIO9ndiBanGRe7bz+6lEwnnRZ17q7YLUwkToQ45m6AsL+1iYBra8ygKjwQfeXIcOyjonMHT4UF5IayNWqn2eaEy/cgNVGCVbkvlE1IbGGT3CSN9A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chronox.de; spf=none smtp.mailfrom=chronox.de; dkim=pass (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b=iagJlMTE; dkim=permerror (0-bit key) header.d=chronox.de header.i=@chronox.de header.b=4pmzwrZJ; arc=pass smtp.client-ip=81.169.146.165
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chronox.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=chronox.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="YysNNPhV"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1723423356;
-	bh=o9Yl88GRdYa0Tf8CKT8WYG+PaxWDkRwNzOvj36oLkdI=;
-	h=Date:From:To:Cc:Subject:From;
-	b=YysNNPhVEnpC+gePl8N+oZCgNFkz3QC8+iDp4EUUti+ZsM/TjxNdowowjUvte3r/y
-	 5EpFYIZusSeiJ1Ap115/Nvyuot3Nl29O0gr94CXjeOEd8/DMUE0UbDAVCMMIhQv6Yj
-	 GKG9/nxWB/wBxTgHouGWvNtqTwryUq6anoiafgaEFjNjYV4B5kaE/NfgeMF5CehIGi
-	 gmc+70fl7TfWeTTTX0XIbSJzSA5HFLybL21XYAnlB8FiGk1H6smM3HrGy8qBta12Mu
-	 GR55V6upAnTwUmNoIuSoWsUgim21FQoLi52TqsD3QyZTmoskfEChQHCU7E0SfAVi6z
-	 HW8EbGi6+HC5g==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Whwhq70JWz4x2g;
-	Mon, 12 Aug 2024 10:42:35 +1000 (AEST)
-Date: Mon, 12 Aug 2024 10:42:35 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Herbert Xu <herbert@gondor.apana.org.au>, Linus Torvalds
- <torvalds@linux-foundation.org>
-Cc: Bhoomika K <bhoomikak@vayavyalabs.com>, Pavitrakumar M
- <pavitrakumarm@vayavyalabs.com>, Linux Crypto List
- <linux-crypto@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: build failure after merge of the crypto tree
-Message-ID: <20240812104235.6eefb365@canb.auug.org.au>
+	dkim=pass (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="iagJlMTE";
+	dkim=permerror (0-bit key) header.d=chronox.de header.i=@chronox.de header.b="4pmzwrZJ"
+ARC-Seal: i=1; a=rsa-sha256; t=1723443943; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=pdzZa2LyB7z+YNdfqbSmZahYWgrih+w1tep7e+MWqWnwD84TMJXAU+rv8slH5/P3qh
+    oi+NVM8ZGiF+AkAOvDSskJrFLc15yLLBd2oZq8N8KEWCkJVWS30ChDUigBNQ5J0eBZh/
+    BSW6oHKdsU8Ee1u2Q7aGJoWHYo83XGnft7klJAczp+ZYiXWl0VAY3UnjYIoNaXH8c1us
+    N4zmR7SMnVQYvIeBEHi8OeDOnQBnk9nffVlgh2AOhi/woswap0m7oVRj7Krrd81D03Nk
+    oHf/Bz8dib5NyPpWmLnDYetxQMPJcwmJha7LQl1ZAy++dcwErFeY8qRPqhfflrUxZi10
+    wSWg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1723443943;
+    s=strato-dkim-0002; d=strato.com;
+    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=P3Y0xA88hIhckfa9IvHCax/lx0AwW8oQxka6ZYfWl+4=;
+    b=o+dtyhNSdZCxQPXvR83cXxDewyljVnonB5H+p2grWQV5sOu0AvIRnTd4pkXoTX0UPe
+    Ks6eogyCK9wi/nLqzMbZCiiQQifWk2Kcn+4UGPiZirqhS1eMsMc0b7YM4F9zkOH8iNXG
+    cn5MDzNxhAJWqIvFQt7TCcSlEDXhxikSahGmlMR6RfvKOlFUQjrdw5xTuxRwpq9MW+Ny
+    G99rzng1B1SsCZL6e/KdMs7vT7hdMKMJ9l4nvg3zVB9ayk7L9pDXgybga+Z5VX7oMM6r
+    CkWTwC/AeS6seYqoQNF53ckwKK8TGmYO7H8VMmc0/jzxOLAeLaeUOCdQkHOi1v6CAchH
+    qZtg==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1723443943;
+    s=strato-dkim-0002; d=chronox.de;
+    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=P3Y0xA88hIhckfa9IvHCax/lx0AwW8oQxka6ZYfWl+4=;
+    b=iagJlMTEleIisyi/q7rui+Bg3snt5G6K/+vkx6hjz/6z9LnoEOsRNvOnJ8LTWM02tx
+    IWxgMWjAvyU8LmnWBg/3o2k+75vydZUJIO2zqGnKGwjnFtog34Zo38RmK2GTIkQmz4TI
+    cJqhSZl9c2HK8nko7Aard06/RCXY+xuaRVT4k6SzG6s+Mof5CATftvqLr3/TYnxux01z
+    0L0NWgSRLGpMT8+eDPwRmuhpIw75KsTKPKYQuQ/QhOObYEVFTj9sLmN933hFqNA6cL2f
+    /lMMBoDnanjuiDBS/wPlYkvscsuypm/Tgq3gW0H8vaXw77CbeCmibHpZPGW/dmy/c5b/
+    F3Fw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1723443943;
+    s=strato-dkim-0003; d=chronox.de;
+    h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Cc:Date:
+    From:Subject:Sender;
+    bh=P3Y0xA88hIhckfa9IvHCax/lx0AwW8oQxka6ZYfWl+4=;
+    b=4pmzwrZJxcFIK999YlXRtwBwDDoquC2TFGuqkaSpS3Oq4e9c1eQlFamLjiIJuApxCs
+    utTR9NAgOUj/NGdALiDw==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzHHXDYI/SfDjXa"
+Received: from tauon.atsec.com
+    by smtp.strato.de (RZmta 51.1.0 DYNA|AUTH)
+    with ESMTPSA id f5d0fe07C6PgC0U
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Mon, 12 Aug 2024 08:25:42 +0200 (CEST)
+From: Stephan Mueller <smueller@chronox.de>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+ Jeff Barnes <jeffbarnes@microsoft.com>, Vladis Dronov <vdronov@redhat.com>,
+ "marcelo.cerri@canonical.com" <marcelo.cerri@canonical.com>,
+ Tyler Hicks <Tyler.Hicks@microsoft.com>,
+ Shyam Saini <shyamsaini@microsoft.com>
+Subject: [PATCH] crypto: JENT - set default OSR to 3
+Date: Mon, 12 Aug 2024 08:25:42 +0200
+Message-ID: <2185508.xKdoZgZVDs@tauon.atsec.com>
+In-Reply-To: <ZrRUzaPVqoDAcRLk@gondor.apana.org.au>
+References:
+ <DM4PR21MB360932816FA7B848D7D8F7B0C7B82@DM4PR21MB3609.namprd21.prod.outlook.com>
+ <2143341.7H5Lhh2ooS@tauon.atsec.com> <ZrRUzaPVqoDAcRLk@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/CAn7uTIb=+uwYmIQa8YeFrK";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"
 
---Sig_/CAn7uTIb=+uwYmIQa8YeFrK
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+The user space Jitter RNG library uses the oversampling rate of 3 which
+implies that each time stamp is credited with 1/3 bit of entropy. To
+obtain 256 bits of entropy, 768 time stamps need to be sampled. The
+increase in OSR is applied based on a report where the Jitter RNG is
+used on a system exhibiting a challenging environment to collect
+entropy.
 
-Hi all,
+This OSR default value is now applied to the Linux kernel version of
+the Jitter RNG as well.
 
-After merging the crypto tree, today's linux-next build (x86_64
-allmodconfig) failed like this:
+The increase in the OSR from 1 to 3 also implies that the Jitter RNG is
+now slower by default.
 
-drivers/crypto/dwc-spacc/spacc_manager.c:5: error: "MIN" redefined [-Werror]
-    5 | #define MIN(x, y) (((x) < (y)) ? (x) : (y))
-      |=20
-In file included from include/linux/kernel.h:28,
-                 from include/linux/interrupt.h:6,
-                 from drivers/crypto/dwc-spacc/spacc_core.h:7,
-                 from drivers/crypto/dwc-spacc/spacc_manager.c:3:
-include/linux/minmax.h:329: note: this is the location of the previous defi=
-nition
-  329 | #define MIN(a,b) __cmp(min,a,b)
-      |=20
-cc1: all warnings being treated as errors
-
-Caused by commit
-
-  c8981d9230d8 ("crypto: spacc - Add SPAcc Skcipher support")
-
-interacting with commit
-
-  1a251f52cfdc ("minmax: make generic MIN() and MAX() macros available ever=
-ywhere")
-
-from Linus' tree (in v6.11-rc2).
-
-I applied the following merge fix patch.  I added the include of
-minmax.h just in case it was not included implicitly for some other
-build config.
-
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Date: Mon, 12 Aug 2024 10:36:30 +1000
-Subject: [PATCH] fixup for "crypto: spacc - Add SPAcc Skcipher support"
-
-interacting with commit
-
-  1a251f52cfdc ("minmax: make generic MIN() and MAX() macros available ever=
-ywhere")
-
-from Linus' tree.
-
-Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
+Reported-by: Jeff Barnes <jeffbarnes@microsoft.com>
+Signed-off-by: Stephan Mueller <smueller@chronox.com>
 ---
- drivers/crypto/dwc-spacc/spacc_manager.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ crypto/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/dwc-spacc/spacc_manager.c b/drivers/crypto/dwc-=
-spacc/spacc_manager.c
-index 3b26b27a998f..67c4360334e2 100644
---- a/drivers/crypto/dwc-spacc/spacc_manager.c
-+++ b/drivers/crypto/dwc-spacc/spacc_manager.c
-@@ -1,9 +1,8 @@
- // SPDX-License-Identifier: GPL-2.0
-=20
-+#include <linux/minmax.h>
- #include "spacc_core.h"
-=20
--#define MIN(x, y) (((x) < (y)) ? (x) : (y))
--
- /* prevent reading past the end of the buffer */
- static void read_from_buf(unsigned char *dst, unsigned char *src,
- 			  int off, int n, int max)
---=20
-2.43.0
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 72e2decb8c6a..a779cab668c2 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1305,7 +1305,7 @@ config CRYPTO_JITTERENTROPY_MEMORY_BLOCKSIZE
+ config CRYPTO_JITTERENTROPY_OSR
+ 	int "CPU Jitter RNG Oversampling Rate"
+ 	range 1 15
+-	default 1
++	default 3
+ 	help
+ 	  The Jitter RNG allows the specification of an oversampling rate (OSR).
+ 	  The Jitter RNG operation requires a fixed amount of timing
+-- 
+2.46.0
 
---=20
-Cheers,
-Stephen Rothwell
 
---Sig_/CAn7uTIb=+uwYmIQa8YeFrK
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
 
------BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAma5WnsACgkQAVBC80lX
-0GzB1wf/c//maN1MbBz4zLjJ82Cn94IF8ZQKMXSUNNJuAn/FEvm0Fujg3StoYWJv
-bx3tphyZmHne1wMI070gUn41hDwo5yCaMLF5tkQeglhHxdSGkAlV3gUC38GDa8lg
-qeJkWRWqpIAUZABfsN6auAusVAPikeIdR/wDK+qZpCUWJU/OvE1zIj6L4H4VjsCu
-eor1mW+fNB6Sgd7idPHLbgU8gP5j4TRQUDQdPGYFLa6gfqbNO1oGXx+N/Te7ehs7
-sp7ZnmD4sYA1HJqksk4RVg8TptDEqqq3rx50su+iOb+cce4pv0loAJo3jdOiuZch
-hwkiJ2qcWJGtDy6BbbLxk+cvv6d9+A==
-=9nOS
------END PGP SIGNATURE-----
-
---Sig_/CAn7uTIb=+uwYmIQa8YeFrK--
