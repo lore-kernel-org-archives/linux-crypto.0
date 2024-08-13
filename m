@@ -1,127 +1,89 @@
-Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C4183AC01;
-	Tue, 13 Aug 2024 07:50:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B63003B192
+	for <linux-crypto@vger.kernel.org>; Tue, 13 Aug 2024 08:12:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723535431; cv=none; b=sE9IIxoT7sv8QWF0HAUhtljjaq7Uney3mpnG+bU9otSrmAJxDYr8tf3gO8iy6FFHVJ3Q14wzoKWFHxgfGUdakpaEZZBkEN9lwUJFsbwlZinYYydpsdMmVNmi7wC+Ag1cl5k3xLwHEKfrXlrJ2fvQ/2iRY9sc2O26pbPiNEvl+e8=
+	t=1723536746; cv=none; b=Bx2+U4plLQyo96zSztaEIJYfWqAIsWs4U2nWsoKKsYufEU2V4UkHAovV9SNoGrdL5dhjEqW/iwHoVvocpqCSCbFVZ95yMaku2ixc1yUdZBCROW/Zgny6Ff25AqjZ6iov6UDfwATTqlL+X/elWmQ6W0o4pEsI68MnfbsNC9vlggY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723535431; c=relaxed/simple;
-	bh=3YlNtsaDCcsAcHaVTN0CfYd2K6RSzN6+m+xD9anLX84=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ODS1TNhBkvGM0rtxHiWAT71sY97b6Qgo3lXq/hmzOMuKU323dRfxr0OPglMgRoB/+X1kA5Kk2TWtAiXQRRYx9O2aeBbw5NjrLCPMi1mj/PwuTPZp8A7IAFRplKM+xeGfZSvHfn6nrAEV7akj22oCbfqife1nFcJMUPQP2apKV6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from icess-ProLiant-DL380-Gen10.. (unknown [183.174.60.14])
-	by APP-05 (Coremail) with SMTP id zQCowACnUEAtELtme1XmBQ--.59441S2;
-	Tue, 13 Aug 2024 15:50:08 +0800 (CST)
-From: Ma Ke <make24@iscas.ac.cn>
-To: herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	t-kristo@ti.com,
-	j-keerthy@ti.com
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Ma Ke <make24@iscas.ac.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH] crypto: sa2ul - fix memory leak in sa_cra_init_aead()
-Date: Tue, 13 Aug 2024 15:49:58 +0800
-Message-Id: <20240813074958.3988528-1-make24@iscas.ac.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1723536746; c=relaxed/simple;
+	bh=wba/CeR2mJ6am9vgmaghUpPeqoiHwg5jfmRDoygAiPo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Fzzi3Az1QWrm9TnBhujpT8/b2U4kukyvBjsSmKRDIOy1jEcv55tNVi560jUE4bswo+ukzL1isAutjxWt2S1ONYOjYaJfhrVNxdCuELHretjJJBJmfmY4OPTKg6m6RU7lX4XgHNjmMbPVARuWydOUR17Ylj7X/G7cia1C7NW23y0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1sdmVB-004Hg7-2e;
+	Tue, 13 Aug 2024 16:12:19 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 13 Aug 2024 16:12:18 +0800
+Date: Tue, 13 Aug 2024 16:12:18 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Harald Freudenberger <freude@linux.ibm.com>
+Cc: linux-crypto@vger.kernel.org, Holger Dengler <dengler@linux.ibm.com>
+Subject: Re: RFC: s390/crypto: Add hardware acceleration for HMAC modes
+Message-ID: <ZrsVYl3NYdRbUMNm@gondor.apana.org.au>
+References: <20240807160629.2486-1-dengler@linux.ibm.com>
+ <20240807160629.2486-3-dengler@linux.ibm.com>
+ <8511b5079e158b79232f7be9d03fbba5@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQCowACnUEAtELtme1XmBQ--.59441S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7tw18KFykGF1xtF45Jw43Jrb_yoW8uw4fpF
-	s5uFWjyry5JFn3GFWftws5Gr15X3yS93yagayxGwn3ZrnF9r1v9FW7CFy0vF17GF1kGr17
-	XFZrJr45Zr1UG3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvE14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
-	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
-	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
-	648v4I1lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7
-	v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF
-	1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIx
-	AIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI
-	42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWI
-	evJa73UjIFyTuYvjfUY3kuUUUUU
-X-CM-SenderInfo: ppdnvj2u6l2u1dvotugofq/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8511b5079e158b79232f7be9d03fbba5@linux.ibm.com>
 
-Currently the resource allocated by crypto_alloc_shash() is not freed in
-case crypto_alloc_aead() fails, resulting in memory leak.
+On Tue, Aug 13, 2024 at 09:37:24AM +0200, Harald Freudenberger wrote:
+>
+> +static int hash(const u8 *in, unsigned int inlen,
+> +		u8 *digest, unsigned int digestsize)
+> +{
+> +	struct crypto_shash *htfm;
+> +	const char *alg_name;
+> +	int ret;
+> +
+> +	switch (digestsize) {
+> +	case SHA224_DIGEST_SIZE:
+> +		alg_name = "sha224";
+> +		break;
+> +	case SHA256_DIGEST_SIZE:
+> +		alg_name = "sha256";
+> +		break;
+> +	case SHA384_DIGEST_SIZE:
+> +		alg_name = "sha384";
+> +		break;
+> +	case SHA512_DIGEST_SIZE:
+> +		alg_name = "sha512";
+> +		break;
+> +	default:
+> +		return -EINVAL;
+> +	}
+> +
+> +	htfm = crypto_alloc_shash(alg_name, 0, CRYPTO_ALG_NEED_FALLBACK);
+> +	if (IS_ERR(htfm))
+> +		return PTR_ERR(htfm);
+> +
+> +	ret = crypto_shash_tfm_digest(htfm, in, inlen, digest);
+> +	if (ret)
+> +		pr_err("shash digest error: %d\n", ret);
+> +
+> +	crypto_free_shash(htfm);
+> +	return ret;
+> +}
 
-Add crypto_free_shash() to fix it.
+The setkey function can be called in softirq context.  Therefore
+calling crypto_alloc_* from it is not allowed.  You could either
+move the allocation to init_tfm and carry it throughout the life
+of the tfm, or perhaps you could call the s390 underlying sha hash
+function directly?
 
-Found by code review.
-
-Cc: stable@vger.kernel.org
-Fixes: d2c8ac187fc9 ("crypto: sa2ul - Add AEAD algorithm support")
-Signed-off-by: Ma Ke <make24@iscas.ac.cn>
----
- drivers/crypto/sa2ul.c | 20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/crypto/sa2ul.c b/drivers/crypto/sa2ul.c
-index 461eca40e878..b5af621f7f17 100644
---- a/drivers/crypto/sa2ul.c
-+++ b/drivers/crypto/sa2ul.c
-@@ -1740,7 +1740,8 @@ static int sa_cra_init_aead(struct crypto_aead *tfm, const char *hash,
- 	ctx->shash = crypto_alloc_shash(hash, 0, CRYPTO_ALG_NEED_FALLBACK);
- 	if (IS_ERR(ctx->shash)) {
- 		dev_err(sa_k3_dev, "base driver %s couldn't be loaded\n", hash);
--		return PTR_ERR(ctx->shash);
-+		ret = PTR_ERR(ctx->shash);
-+		goto err_free_shash;
- 	}
- 
- 	ctx->fallback.aead = crypto_alloc_aead(fallback, 0,
-@@ -1749,7 +1750,8 @@ static int sa_cra_init_aead(struct crypto_aead *tfm, const char *hash,
- 	if (IS_ERR(ctx->fallback.aead)) {
- 		dev_err(sa_k3_dev, "fallback driver %s couldn't be loaded\n",
- 			fallback);
--		return PTR_ERR(ctx->fallback.aead);
-+		ret = PTR_ERR(ctx->fallback.aead);
-+		goto err_free_shash;
- 	}
- 
- 	crypto_aead_set_reqsize(tfm, sizeof(struct aead_request) +
-@@ -1757,19 +1759,23 @@ static int sa_cra_init_aead(struct crypto_aead *tfm, const char *hash,
- 
- 	ret = sa_init_ctx_info(&ctx->enc, data);
- 	if (ret)
--		return ret;
-+		goto err_free_shash;
- 
- 	ret = sa_init_ctx_info(&ctx->dec, data);
--	if (ret) {
--		sa_free_ctx_info(&ctx->enc, data);
--		return ret;
--	}
-+	if (ret)
-+		goto err_free_ctx_info;
- 
- 	dev_dbg(sa_k3_dev, "%s(0x%p) sc-ids(0x%x(0x%pad), 0x%x(0x%pad))\n",
- 		__func__, tfm, ctx->enc.sc_id, &ctx->enc.sc_phys,
- 		ctx->dec.sc_id, &ctx->dec.sc_phys);
- 
- 	return ret;
-+
-+err_free_ctx_info:
-+	sa_free_ctx_info(&ctx->enc, data);
-+err_free_shash:
-+	crypto_free_shash(ctx->shash);
-+	return ret;
- }
- 
- static int sa_cra_init_aead_sha1(struct crypto_aead *tfm)
+Cheers,
 -- 
-2.25.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
