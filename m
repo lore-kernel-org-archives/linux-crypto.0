@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C6512233A
-	for <linux-crypto@vger.kernel.org>; Tue, 13 Aug 2024 11:15:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F4C2233A
+	for <linux-crypto@vger.kernel.org>; Tue, 13 Aug 2024 11:15:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723547737; cv=none; b=YNDThI7YyNj+Ffcf3jQfJFvYcvhr+1Zv66hRlsEBcIo7LiLSA5U1/UIBDxoEmGSY1UwNoc+gFMazKRr1QuALOMr0qgWOwnBqyLfwFVpTK5UUTxPk2PV/hE7KoDztIvD14py95JNIc9FxmVSmfB7X0pXCpRCQPGQD0y+r/snh8XU=
+	t=1723547738; cv=none; b=Zr8ao/oGtdUV7nqryPS9kftqbkF1K+YdFsbVjW7IiJ5q4IMuWX4rOyqwhiqLBI0kIzSSFt+2C5K9Vb9FvKc7t2Nl7Xoe35NGezzjUG7Kf6RCOoppsozE0PRORcn0kEGGm5BQ5rjLfArDIqcnhruKwOPpjO6lrclOxLuVdAvvHyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723547737; c=relaxed/simple;
-	bh=ruExrBFJbkteI8AexloKYOBxLwCIA/w7aZ9Dzbua6K8=;
+	s=arc-20240116; t=1723547738; c=relaxed/simple;
+	bh=ZwMsd8NTC5/Sf7wF60QxCdkV/D5R6GsFF4w1vQNhams=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=C9ngPpnim1VLwGlyKG9aMG6vR8ZWmM0LQPbJckmjIUXfr2Nw7n6/P/SFMHBCp8TS5wRl4b/7pwo/S6eixLUpJU4RF9zxqzlUAo/OlSY5iKBI34J6v8bNtOc+RlzbSGE5p8eeJkLsr4BvhFBOKJmZAcl1KOAWaWYbjl2BG0lnP18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KfJ1oOj+; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=ZDxdZ8en3Aoqgd18RVmPBLyyGXSeTdGueYO4dqCFbWxGYtM+OnIpn0BC3siBY/btKVxtKMGD0yjtjhp0wNcyedzeqMgFImQnK0NWyCVh3cUqzOvhk5heOr8txtHarEyu7ICNmHtNv4k3Yw/zlQ8OnQgrU4No1n/EsVm5IdsnXSI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aqWo7O3R; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KfJ1oOj+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00B78C4AF09;
-	Tue, 13 Aug 2024 11:15:34 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aqWo7O3R"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F886C4AF11;
+	Tue, 13 Aug 2024 11:15:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723547736;
-	bh=ruExrBFJbkteI8AexloKYOBxLwCIA/w7aZ9Dzbua6K8=;
+	s=k20201202; t=1723547738;
+	bh=ZwMsd8NTC5/Sf7wF60QxCdkV/D5R6GsFF4w1vQNhams=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=KfJ1oOj+Opu9K3Lgk1mtYWTgOacJI3JYviygIabiKxjHGPAiDSRBF29z/rMWkogQE
-	 r+Pv4pfwhus/zDkd8bPx4mPwI6ztrbRw4Cwhs6qYxMTP6bGnRikt45yPvOo2iBGizh
-	 Mjt8sfjIa19ZMzOkCLYVHm2f4cfgaDB+euECoAuYVTwPpu3hvI8Tvwul0497yQr7X9
-	 frEZKxiAPKxny1S7gqqcD3X496Y24D16Nch/6pt269Q4HhVvo6yatf2WzuOkiMj+ZA
-	 SkPqyT7qUR7z2st1OBTtuhJugP9hMeYKHYSsSUG809tApyazZ1/w//rZJZP+rrrOng
-	 nkdWQ2DAfUe4g==
+	b=aqWo7O3RitIbK6NbQN5WgomLLM2GV62HmPuQDdZCfv7lp+WcatXKcZb/IMros4avA
+	 VAsJksGS1d9Pz3WmvQxp4/scCju42ZiQQhR8xCZfkiLw0cKQ4HZY6F5+CgPiU6QimU
+	 ZQyPn75emyHatmA+Bo955+9B8JrT01lcKWRygIOH9ef6C6TZRe0v9S8bQGYtj0yJUC
+	 09pMWGYd8Qj03GnGPzuCSbtSBIHGcg2/FJLwUYsho9ljJ61HqY4Ci7g+4LEtDXXVs5
+	 T9fvBhFw12tarjWJN5GHR4MgHXebUPO6oOTiU/8bf/PJaOWjmADXYm09Uty18TgrKn
+	 pGH4Nr92X/kKw==
 From: Hannes Reinecke <hare@kernel.org>
 To: Christoph Hellwig <hch@lst.de>
 Cc: Keith Busch <kbusch@kernel.org>,
@@ -34,9 +34,9 @@ Cc: Keith Busch <kbusch@kernel.org>,
 	Eric Biggers <ebiggers@kernel.org>,
 	linux-crypto@vger.kernel.org,
 	Hannes Reinecke <hare@kernel.org>
-Subject: [PATCH 3/9] nvme: add nvme_auth_generate_digest()
-Date: Tue, 13 Aug 2024 13:15:06 +0200
-Message-Id: <20240813111512.135634-4-hare@kernel.org>
+Subject: [PATCH 4/9] nvme: add nvme_auth_derive_tls_psk()
+Date: Tue, 13 Aug 2024 13:15:07 +0200
+Message-Id: <20240813111512.135634-5-hare@kernel.org>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20240813111512.135634-1-hare@kernel.org>
 References: <20240813111512.135634-1-hare@kernel.org>
@@ -48,65 +48,80 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a function to calculate the PSK digest as specified in TP8018.
+Add a function to derive the TLS PSK as specified TP8018.
 
 Signed-off-by: Hannes Reinecke <hare@kernel.org>
 Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
 ---
- drivers/nvme/common/auth.c | 137 +++++++++++++++++++++++++++++++++++++
- include/linux/nvme-auth.h  |   2 +
- 2 files changed, 139 insertions(+)
+ drivers/nvme/common/Kconfig |   1 +
+ drivers/nvme/common/auth.c  | 109 ++++++++++++++++++++++++++++++++++++
+ include/linux/nvme-auth.h   |   2 +
+ 3 files changed, 112 insertions(+)
 
+diff --git a/drivers/nvme/common/Kconfig b/drivers/nvme/common/Kconfig
+index 244432e0b73d..da963e4f3f1f 100644
+--- a/drivers/nvme/common/Kconfig
++++ b/drivers/nvme/common/Kconfig
+@@ -12,3 +12,4 @@ config NVME_AUTH
+ 	select CRYPTO_SHA512
+ 	select CRYPTO_DH
+ 	select CRYPTO_DH_RFC7919_GROUPS
++	select CRYPTO_HKDF
 diff --git a/drivers/nvme/common/auth.c b/drivers/nvme/common/auth.c
-index 8448bd195ff1..d04d966fd19c 100644
+index d04d966fd19c..b0ee24f90683 100644
 --- a/drivers/nvme/common/auth.c
 +++ b/drivers/nvme/common/auth.c
-@@ -569,5 +569,142 @@ int nvme_auth_generate_psk(u8 hmac_id, u8 *skey, size_t skey_len,
+@@ -15,6 +15,8 @@
+ #include <linux/nvme.h>
+ #include <linux/nvme-auth.h>
+ 
++#define HKDF_MAX_HASHLEN 64
++
+ static u32 nvme_dhchap_seqnum;
+ static DEFINE_MUTEX(nvme_dhchap_mutex);
+ 
+@@ -706,5 +708,112 @@ int nvme_auth_generate_digest(u8 hmac_id, u8 *psk, size_t psk_len,
  }
- EXPORT_SYMBOL_GPL(nvme_auth_generate_psk);
+ EXPORT_SYMBOL_GPL(nvme_auth_generate_digest);
  
 +/**
-+ * nvme_auth_generate_digest - Generate TLS PSK digest
++ * nvme_auth_derive_tls_psk - Derive TLS PSK
 + * @hmac_id: Hash function identifier
-+ * @psk: Generated input PSK
-+ * @psk_len: Lenght of @psk
-+ * @subsysnqn: NQN of the subsystem
-+ * @hostnqn: NQN of the host
-+ * @ret_digest: Pointer to the returned digest
++ * @psk: generated input PSK
++ * @psk_len: size of @psk
++ * @psk_digest: TLS PSK digest
++ * @ret_psk: Pointer to the resulting TLS PSK
 + *
-+ * Generate a TLS PSK digest as specified in TP8018 Section 3.6.1.3:
++ * Derive a TLS PSK as specified in TP8018 Section 3.6.1.3:
 + *   TLS PSK and PSK identity Derivation
 + *
-+ * The PSK digest shall be computed by encoding in Base64 (refer to RFC 4648)
-+ * the result of the application of the HMAC function using the hash function
-+ * specified in item 4 above (ie the hash function of the cipher suite associated
-+ * with the PSK identity) with the PSK as HMAC key to the concatenation of:
-+ * - the NQN of the host (i.e., NQNh) not including the null terminator;
-+ * - a space character;
-+ * - the NQN of the NVM subsystem (i.e., NQNc) not including the null terminator;
-+ * - a space character; and
-+ * - the seventeen ASCII characters "NVMe-over-Fabrics"
-+ * (i.e., <PSK digest> = Base64(HMAC(PSK, NQNh || " " || NQNc || " " || "NVMe-over-Fabrics"))).
-+ * The length of the PSK digest depends on the hash function used to compute
-+ * it as follows:
-+ * - If the SHA-256 hash function is used, the resulting PSK digest is 44 characters long; or
-+ * - If the SHA-384 hash function is used, the resulting PSK digest is 64 characters long.
++ * The TLS PSK shall be derived as follows from an input PSK
++ * (i.e., either a retained PSK or a generated PSK) and a PSK
++ * identity using the HKDF-Extract and HKDF-Expand-Label operations
++ * (refer to RFC 5869 and RFC 8446) where the hash function is the
++ * one specified by the hash specifier of the PSK identity:
++ * 1. PRK = HKDF-Extract(0, Input PSK); and
++ * 2. TLS PSK = HKDF-Expand-Label(PRK, "nvme-tls-psk", PskIdentityContext, L),
++ * where PskIdentityContext is the hash identifier indicated in
++ * the PSK identity concatenated to a space character and to the
++ * Base64 PSK digest (i.e., "<hash> <PSK digest>") and L is the
++ * output size in bytes of the hash function (i.e., 32 for SHA-256
++ * and 48 for SHA-384).
 + *
-+ * Returns 0 on success with a valid digest pointer in @ret_digest, or a negative
-+ * error number on failure.
++ * Returns 0 on success with a valid psk pointer in @ret_psk or a negative
++ * error number otherwise.
 + */
-+int nvme_auth_generate_digest(u8 hmac_id, u8 *psk, size_t psk_len,
-+		char *subsysnqn, char *hostnqn, u8 **ret_digest)
++int nvme_auth_derive_tls_psk(int hmac_id, u8 *psk, size_t psk_len,
++		u8 *psk_digest, u8 **ret_psk)
 +{
-+	struct crypto_shash *tfm;
-+	struct shash_desc *shash;
-+	u8 *digest, *hmac;
++	struct crypto_shash *hmac_tfm;
 +	const char *hmac_name;
-+	size_t digest_len, hmac_len;
++	const char *psk_prefix = "tls13 nvme-tls-psk";
++	static const char default_salt[HKDF_MAX_HASHLEN];
++	size_t info_len, prk_len;
++	char *info;
++	unsigned char *prk, *tls_key;
 +	int ret;
-+
-+	if (WARN_ON(!subsysnqn || !hostnqn))
-+		return -EINVAL;
 +
 +	hmac_name = nvme_auth_hmac_name(hmac_id);
 +	if (!hmac_name) {
@@ -114,106 +129,80 @@ index 8448bd195ff1..d04d966fd19c 100644
 +			__func__, hmac_id);
 +		return -EINVAL;
 +	}
-+
-+	switch (nvme_auth_hmac_hash_len(hmac_id)) {
-+	case 32:
-+		hmac_len = 44;
-+		break;
-+	case 48:
-+		hmac_len = 64;
-+		break;
-+	default:
-+		pr_warn("%s: invalid hash algorithm '%s'\n",
++	if (hmac_id == NVME_AUTH_HASH_SHA512) {
++		pr_warn("%s: unsupported hash algorithm %s\n",
 +			__func__, hmac_name);
 +		return -EINVAL;
 +	}
 +
-+	hmac = kzalloc(hmac_len + 1, GFP_KERNEL);
-+	if (!hmac)
-+		return -ENOMEM;
++	hmac_tfm = crypto_alloc_shash(hmac_name, 0, 0);
++	if (IS_ERR(hmac_tfm))
++		return PTR_ERR(hmac_tfm);
 +
-+	tfm = crypto_alloc_shash(hmac_name, 0, 0);
-+	if (IS_ERR(tfm)) {
-+		ret = PTR_ERR(tfm);
-+		goto out_free_hmac;
-+	}
-+
-+	digest_len = crypto_shash_digestsize(tfm);
-+	digest = kzalloc(digest_len, GFP_KERNEL);
-+	if (!digest) {
++	prk_len = crypto_shash_digestsize(hmac_tfm);
++	prk = kzalloc(prk_len, GFP_KERNEL);
++	if (!prk) {
 +		ret = -ENOMEM;
-+		goto out_free_tfm;
++		goto out_free_shash;
 +	}
 +
-+	shash = kmalloc(sizeof(struct shash_desc) +
-+			crypto_shash_descsize(tfm),
-+			GFP_KERNEL);
-+	if (!shash) {
++	if (WARN_ON(prk_len > HKDF_MAX_HASHLEN)) {
++		ret = -EINVAL;
++		goto out_free_prk;
++	}
++	ret = hkdf_extract(hmac_tfm, psk, psk_len,
++			   default_salt, prk_len, prk);
++	if (ret)
++		goto out_free_prk;
++
++	ret = crypto_shash_setkey(hmac_tfm, prk, prk_len);
++	if (ret)
++		goto out_free_prk;
++
++	info_len = strlen(psk_digest) + strlen(psk_prefix) + 5;
++	info = kzalloc(info_len, GFP_KERNEL);
++	if (!info)
++		goto out_free_prk;
++
++	put_unaligned_be16(psk_len, info);
++	memcpy(info + 2, psk_prefix, strlen(psk_prefix));
++	sprintf(info + 2 + strlen(psk_prefix), "%02d %s", hmac_id, psk_digest);
++
++	tls_key = kzalloc(psk_len, GFP_KERNEL);
++	if (!tls_key) {
 +		ret = -ENOMEM;
-+		goto out_free_digest;
++		goto out_free_info;
 +	}
++	ret = hkdf_expand(hmac_tfm, info, strlen(info), tls_key, psk_len);
++	if (ret) {
++		kfree(tls_key);
++		goto out_free_info;
++	}
++	*ret_psk = tls_key;
 +
-+	shash->tfm = tfm;
-+	ret = crypto_shash_setkey(tfm, psk, psk_len);
-+	if (ret)
-+		goto out_free_shash;
-+
-+	ret = crypto_shash_init(shash);
-+	if (ret)
-+		goto out_free_shash;
-+
-+	ret = crypto_shash_update(shash, hostnqn, strlen(hostnqn));
-+	if (ret)
-+		goto out_free_shash;
-+
-+	ret = crypto_shash_update(shash, " ", 1);
-+	if (ret)
-+		goto out_free_shash;
-+
-+	ret = crypto_shash_update(shash, subsysnqn, strlen(subsysnqn));
-+	if (ret)
-+		goto out_free_shash;
-+
-+	ret = crypto_shash_update(shash, " NVMe-over-Fabrics", 18);
-+	if (ret)
-+		goto out_free_shash;
-+
-+	ret = crypto_shash_final(shash, digest);
-+	if (ret)
-+		goto out_free_shash;
-+
-+	ret = base64_encode(digest, digest_len, hmac);
-+	if (ret < hmac_len)
-+		ret = -ENOKEY;
-+	*ret_digest = hmac;
-+	ret = 0;
-+
++out_free_info:
++	kfree(info);
++out_free_prk:
++	kfree(prk);
 +out_free_shash:
-+	kfree_sensitive(shash);
-+out_free_digest:
-+	kfree_sensitive(digest);
-+out_free_tfm:
-+	crypto_free_shash(tfm);
-+out_free_hmac:
-+	if (ret)
-+		kfree_sensitive(hmac);
++	crypto_free_shash(hmac_tfm);
 +
 +	return ret;
 +}
-+EXPORT_SYMBOL_GPL(nvme_auth_generate_digest);
++EXPORT_SYMBOL_GPL(nvme_auth_derive_tls_psk);
 +
  MODULE_DESCRIPTION("NVMe Authentication framework");
  MODULE_LICENSE("GPL v2");
 diff --git a/include/linux/nvme-auth.h b/include/linux/nvme-auth.h
-index b13884b04dfd..998f06bf10fd 100644
+index 998f06bf10fd..60e069a6757f 100644
 --- a/include/linux/nvme-auth.h
 +++ b/include/linux/nvme-auth.h
-@@ -43,5 +43,7 @@ int nvme_auth_gen_shared_secret(struct crypto_kpp *dh_tfm,
- int nvme_auth_generate_psk(u8 hmac_id, u8 *skey, size_t skey_len,
- 			   u8 *c1, u8 *c2, size_t hash_len,
+@@ -45,5 +45,7 @@ int nvme_auth_generate_psk(u8 hmac_id, u8 *skey, size_t skey_len,
  			   u8 **ret_psk, size_t *ret_len);
-+int nvme_auth_generate_digest(u8 hmac_id, u8 *psk, size_t psk_len,
-+		char *subsysnqn, char *hostnqn, u8 **ret_digest);
+ int nvme_auth_generate_digest(u8 hmac_id, u8 *psk, size_t psk_len,
+ 		char *subsysnqn, char *hostnqn, u8 **ret_digest);
++int nvme_auth_derive_tls_psk(int hmac_id, u8 *psk, size_t psk_len,
++		u8 *psk_digest, u8 **ret_psk);
  
  #endif /* _NVME_AUTH_H */
 -- 
