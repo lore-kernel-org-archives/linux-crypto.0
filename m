@@ -1,66 +1,67 @@
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39E591C9EB0
-	for <linux-crypto@vger.kernel.org>; Wed, 14 Aug 2024 21:12:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6775E13C684
+	for <linux-crypto@vger.kernel.org>; Wed, 14 Aug 2024 21:20:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723669933; cv=none; b=ohxxqCxPdmSY9gQup+XfwWkPe4tucDIRSeCj/+2cMQ5vDvsAhMPpLdE+OuY35ApkBQQfJyN2blNDkk5M1EjL2NjzFzL25b+SnV5fhPuF/3OXKqSC/7cLnX5S9dfAF1hhNyx5o/lY9E8BVaDeCpvYMtGZXXePANbEwnLA32JTNew=
+	t=1723670447; cv=none; b=TAOV2UQ8FpRQFqvKlVbAcINDuAqhNFBuuBhgCBrzEutUAU/0Dknw8sIV0e7E6MFTAOd+3ZOrVj8qZyDPCNtJZLElLm39QU0gF8G0HNlaB46Ad4WgKDVu3tGpBvcirqvwIzSU8SIv6m7aGEFzahCfXqAfrAKCqL82PVh7PSuFsis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723669933; c=relaxed/simple;
-	bh=NrYy3KCJ93XBrlv0fDajDdUpZNCCuP92065pd5XQ7L0=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=hieV3wezdMLAVZnfdRN32ELfVndReVDvABPd1LRlZkgs71Q4QlQdKx/6Qdt4TU1ceU2RTSwzYViB5S85DFChOemsXHAHC126ZlNZFuXEJEKZwbZYKhgUPqCjEVvrduTBbfqZKnRXfqTvXBSPp0lXVC4Y8K95hiyzGiwXb8Ln+K8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=TGiOsIRo; arc=none smtp.client-ip=209.85.221.52
+	s=arc-20240116; t=1723670447; c=relaxed/simple;
+	bh=BXpWJ7G60z8moZHykofBPZq77vdUi15m9nFEAwLkLYc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RMYy+v9x8lB+TqEW8N8h8gyuajpKp0uyqOJxx+r9uYiYYgdz98r1YLf5nBKSEKipyYuqI/tlv7jIET/GXmucoV/yFY/uCIHHYfFOeUsa8rpNfkPlNuI+YlibUwCFOKEc5CIfL1H3310sdrEEWwg+xrzgEkkGG5M9h2RqEse2mpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=LXJkDOrg; arc=none smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TGiOsIRo"
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-368440b073bso160755f8f.0
-        for <linux-crypto@vger.kernel.org>; Wed, 14 Aug 2024 14:12:09 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LXJkDOrg"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-428243f928fso2094165e9.0
+        for <linux-crypto@vger.kernel.org>; Wed, 14 Aug 2024 14:20:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1723669928; x=1724274728; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DvinTXy1Pu55Z1s2JUlMWc8o/CYhTf2Gu4R5avb3VKA=;
-        b=TGiOsIRooyHcS0msmiFeN891Da1wTkpXIWki0edp2EJhLLJ5MfAF2+UaqSC7QZqsjq
-         P4pG3F4eXgjKsYFGFNc8arEneEmNwa2Sk9X+2G9pkyhO84FPDWYW3MI0ykjj/ZzReNqx
-         Porr53d+ZJxTxO6HUganSeTyl0D5o0hutV1elxJW5L0KjR7JZQOrAS/7x0bp7WuCID4r
-         I+XxvjEgk+0K8kqORFkKnCfB7H85kEglUhfwVAH8zA9b88YTdK7JCd18LbfJoYpnF5o0
-         Rz7QnFMOX7h4UlWrQ0LjfDy3GZPaGINO3ymfbvcoO4eI/YHsPdKQ8trmkfCJUiMauFiF
-         leWQ==
+        d=linaro.org; s=google; t=1723670444; x=1724275244; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9oAYmnH6MofwvfK7sgRQ6mxCg378Vn0pCt20dkMthag=;
+        b=LXJkDOrgO6ZQlF5TwYc8UAiRfQ8vZOzKHK6lNbsPFPhXEQCv7Zvr24szwgv8nZ5Wmc
+         dxswBL8Bw4AOC+ghjzJMKMTtaDyYHnpgQ4vx2FZRk7dKwNEQMs9e/KoVust8F8JMMBhF
+         IIm5n65EJRoUWb1otRsnVM7gy25yVnVDe6ZUa8gGTM0Ka1LLqJKyTIVDyyxM9qXFRRqO
+         9SVGgx9QgOQL1dXRhI00wF9ETbn4FdP+6hSBAH81DW/FgyKxqfnP10pv7X+mGVLAhUIQ
+         C4B5Ki6cy6llvm9JO1XMSgHj4EANk1fuqBSxUcROnU/Qkp0tTtAybfk+tu6Pi9D9zhr+
+         SVRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723669928; x=1724274728;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DvinTXy1Pu55Z1s2JUlMWc8o/CYhTf2Gu4R5avb3VKA=;
-        b=YhoWmiwJsmsBAAfoORc3pPNBFPYDHq3b91gFrlwj5uQPJ1jiGEVLmrubqwW1ixjasg
-         UL8D6AqwXn4fm5Xjtm9GScOW2PVtzLdny+QQigFbgJAvBr2S6XyAih2alHY9LYdoyLAM
-         k7tXYJL7zGzk0mpslGTkp7Nf8goD68XM6LEv/HGHr3UWrcg1h31YcJpe6sg8Mc3nvdzd
-         yzm9syyQdHuk/vvh9DEA2EFmhUFnC4VjLCRi8EFD0G3Kir/N1hVGpqcVJZQDAM9fuTrh
-         V+JBGQQeaXMKXoYbkUCNo4+eRAMtqfQEF2jco+ae/cjsTE83igQHhShfsOb8Yx3o2Lvo
-         wzKA==
-X-Forwarded-Encrypted: i=1; AJvYcCW1xbvMPo2rtEuw8HQ7o9lXHUQXkCWvUxN7KtUzTmc7iQF3JWX7GsnjzX+LLcm0hH7Z3fWhJVmiCVAsjLLSSYkvjpcBP63ADKi0VwRC
-X-Gm-Message-State: AOJu0Yzu5pvTO6AA8jn2fURkpQaO28UQQMDxmZR1QT2b9do+cRDU3105
-	phfGznzQgYhyV157MWqS2fio+zV6Lpc35ZN74N0AtOpF7KjCY0E5MAVNCD2AFa8=
-X-Google-Smtp-Source: AGHT+IH6g79uU3REsY1aYPRVUa3GzDJE31zY/2sWg+HmnohPnve8H/2pByk8jsfDM46XuWz95tP5uQ==
-X-Received: by 2002:adf:e609:0:b0:36b:ea3c:5c00 with SMTP id ffacd0b85a97d-37186bea9a7mr629717f8f.9.1723669928337;
-        Wed, 14 Aug 2024 14:12:08 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1723670444; x=1724275244;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9oAYmnH6MofwvfK7sgRQ6mxCg378Vn0pCt20dkMthag=;
+        b=LBlv9SlRmruF6kaoGO9iGvEnPQ7VM5mOKjhupJ698vgQNtDLucUqaDQsNeEITrlMQi
+         ssGAUHT50rUBXTBsEN8a3/DL5LGAOL6bYtDD/FGVZie4K/vI2VNkYmqWSRDZRDNrMdGX
+         QwWWeCU4EzR3dtUfE5Hg+Rbo9UOnb5BhnUkgO5as+nXprWXRm2Zm5usubtJwpdCl50+Y
+         qnrxF+hISOZnSarMMt1hNuH3a/MZd7HSsh0+nB/j0zO3xJj+CUIpSL7aIxuDWGalALAe
+         UFCIxUoiGXHbQZdNotWhL0AAAgVhh9exp52sxhfwZQ/YjiNkZiJP6bJfZ/IQjbQ+MU+I
+         g53g==
+X-Forwarded-Encrypted: i=1; AJvYcCV1ti12NPa0TkCtXi/AI+b/pbQvcx66KQmbGpw3x0NmqiGsQlZt9W3UbA9cUJY2xSZEwQlg0fonGv8NgthNedLZ4tvjvs0QJlU8vUoW
+X-Gm-Message-State: AOJu0YwFz6jo3N7MDcpaFUA5dvHHTuywf4m8PXfPH/BjBmnBePzI960c
+	B9wA29y8q0XZ0bdeUpPaAr4DobJCInFsXF/3UdjDPfSb4N2R/igdnLqkEzaedgU=
+X-Google-Smtp-Source: AGHT+IFeFdsWCWSXFxKzZH3YN0A/8/j4lcY3BId4eyq51PWhMqA3R4eNW2JxWCo7iUvVwKlvj2scBg==
+X-Received: by 2002:a05:600c:5488:b0:428:e30:fa8d with SMTP id 5b1f17b1804b1-429dd22f43emr33659265e9.6.1723670443523;
+        Wed, 14 Aug 2024 14:20:43 -0700 (PDT)
 Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429e7e1c5f2sm1477435e9.40.2024.08.14.14.12.07
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429ded3596esm30497385e9.22.2024.08.14.14.20.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Aug 2024 14:12:08 -0700 (PDT)
-Date: Thu, 15 Aug 2024 00:12:03 +0300
+        Wed, 14 Aug 2024 14:20:43 -0700 (PDT)
+Date: Thu, 15 Aug 2024 00:20:39 +0300
 From: Dan Carpenter <dan.carpenter@linaro.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Ruud Derwig <Ruud.Derwig@synopsys.com>,
-	Bhoomika K <bhoomikak@vayavyalabs.com>,
+Cc: Bhoomika K <bhoomikak@vayavyalabs.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Pavitrakumar M <pavitrakumarm@vayavyalabs.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 3/3] crypto: spacc - Add a new line in spacc_open()
-Message-ID: <6e603578-2250-4ace-aa43-818b8f23e2e9@stanley.mountain>
+	Ruud Derwig <Ruud.Derwig@synopsys.com>
+Subject: Re: [PATCH 0/3] crypto: spacc - Fix Smatch issues
+Message-ID: <35f19bb9-8035-4301-924b-45d6a20512bd@stanley.mountain>
+References: <b47b6e7a-dd63-4005-9339-edb705f6f983@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -69,29 +70,11 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c12622ca-923e-4aa5-993b-36cee7442ed2@stanley.mountain>
+In-Reply-To: <b47b6e7a-dd63-4005-9339-edb705f6f983@stanley.mountain>
 
-Put the break statement should be on its own line.
+Sorry the threading was messed up.  I'm writing script to add cover letters but
+it had a bug.  Hopefully that was the last bug.
 
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
----
- drivers/crypto/dwc-spacc/spacc_core.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/dwc-spacc/spacc_core.c b/drivers/crypto/dwc-spacc/spacc_core.c
-index b7630f559973..b9e0d3227f81 100644
---- a/drivers/crypto/dwc-spacc/spacc_core.c
-+++ b/drivers/crypto/dwc-spacc/spacc_core.c
-@@ -1904,7 +1904,8 @@ int spacc_open(struct spacc_device *spacc, int enc, int hash, int ctxid,
- 		ctrl |= SPACC_CTRL_SET(SPACC_CTRL_HASH_ALG,
- 				H_SHAKE256);
- 		ctrl |= SPACC_CTRL_SET(SPACC_CTRL_HASH_MODE,
--				HM_SHAKE_KMAC); break;
-+				HM_SHAKE_KMAC);
-+		break;
- 	case CRYPTO_MODE_MAC_KMACXOF128:
- 		ctrl |= SPACC_CTRL_SET(SPACC_CTRL_HASH_ALG,
- 				H_SHAKE128);
--- 
-2.43.0
+regards,
+dan carpenter
 
