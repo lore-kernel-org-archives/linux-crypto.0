@@ -1,80 +1,61 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E0C27345B
-	for <linux-crypto@vger.kernel.org>; Wed, 14 Aug 2024 06:11:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 243E680C09
+	for <linux-crypto@vger.kernel.org>; Wed, 14 Aug 2024 06:14:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723615916; cv=none; b=Z4JupntupbVN7brrgduwYqS4PxV5aqqlGS5nC9gS12L8+oJxPfjEzb2r3l1LGAubmweFvoellojazUT458ZlybAzIv2vp8T8iecwF6AQNERPm56x8jHJgjCigvksumIi4T/tPnGly33NFI2y3zqbnQnmDbf7zmsMSHbjbeJQ+9Y=
+	t=1723616103; cv=none; b=q41k51PcTyW990DJ/wa7ne8UmgdW0430JdN8SQ+YfT99SSC5KpJ/UYY1P/+va4MzvoNYBRaO0qxDTVkKOjgxReZNHSo42ObueYqI9CPv3o8rPNI5zqIoz0uVyTaXPe7+0XUIr4nMfE8XZHmdLvzBdzg8ghznU/1SVw+Q0sL8/KY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723615916; c=relaxed/simple;
-	bh=/9U85E/aZUh9CkNRJCjxX8PKA2Ej8RfdhaDSfFGtIUE=;
+	s=arc-20240116; t=1723616103; c=relaxed/simple;
+	bh=o8VshW/qHMVax0T8KrHSJiaFvotvebrmKSHz14Kdu9Q=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qEdZ/qBEwkGM3p4tkOd0V9vE1GJ9YQYtuH9Q20j684wupZBbxHHY/dGpKOfE6Iax4rl+wrQPUgPYEx9b4WRLf+UgYouyM/md0ZSYFByIqzsd7QScdSDZPeYSsNsXIjNT0v82QQJ4UCmKrh88jtvK2I+NCLlFyFMbck8//hIe6eI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ECCCbUtc; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=LwJd/qgr; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ECCCbUtc; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=LwJd/qgr; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	 In-Reply-To:Content-Type; b=fcvzI5CgCFHApy5wyV/7qTD71UKkFwVAwQf3uOfncqiNazdGPnGFtJiS3fzve5oijRvDhrb91khoTYlcYlw9DPBdGnHCyjbI0GwP55U92047T3+aSnhTNGPKJXdiVbCF+FJ0NQ1IZ2btxAWSvc0IR7fQt7hu9T/R8QEPuPwqbb4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=TSaDnIFR; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ECCCbUtc";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="LwJd/qgr";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ECCCbUtc";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="LwJd/qgr"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 7BDB52259D;
-	Wed, 14 Aug 2024 06:11:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1723615912; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=L77LMhB1RZ1z2/fegLqCgeWr+Rz3ex9q8mOsIhpqmG8=;
-	b=ECCCbUtcm9ZBXNwVzNvPRf0HSZK9qkBsRx2FBaFCFKMueIF1Xj3Tp0VmHyDTuWCesx14su
-	/P2G1qb950I2Grw0r2I2HujfmKXeq8WPDk8U/7VWvLI++LGCKh8h2c1v0SrKZRtTPR1I/8
-	f6kgTlgxA2QZge5KOgfjNGuqNzYpVtE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1723615912;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=L77LMhB1RZ1z2/fegLqCgeWr+Rz3ex9q8mOsIhpqmG8=;
-	b=LwJd/qgrb1dMOe4OuNWucNEb0Kw4DszKBUI4DOXVv+gg6DVe2+vn3l4RSrTU28nWmcqMHz
-	00oj9JiLOL3tqPCA==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1723615912; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=L77LMhB1RZ1z2/fegLqCgeWr+Rz3ex9q8mOsIhpqmG8=;
-	b=ECCCbUtcm9ZBXNwVzNvPRf0HSZK9qkBsRx2FBaFCFKMueIF1Xj3Tp0VmHyDTuWCesx14su
-	/P2G1qb950I2Grw0r2I2HujfmKXeq8WPDk8U/7VWvLI++LGCKh8h2c1v0SrKZRtTPR1I/8
-	f6kgTlgxA2QZge5KOgfjNGuqNzYpVtE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1723615912;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=L77LMhB1RZ1z2/fegLqCgeWr+Rz3ex9q8mOsIhpqmG8=;
-	b=LwJd/qgrb1dMOe4OuNWucNEb0Kw4DszKBUI4DOXVv+gg6DVe2+vn3l4RSrTU28nWmcqMHz
-	00oj9JiLOL3tqPCA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 345861348F;
-	Wed, 14 Aug 2024 06:11:52 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 8jDzCqhKvGbFGQAAD6G6ig
-	(envelope-from <hare@suse.de>); Wed, 14 Aug 2024 06:11:52 +0000
-Message-ID: <5051f4e7-cce4-436f-b4c8-cf121330e4c2@suse.de>
-Date: Wed, 14 Aug 2024 08:11:51 +0200
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="TSaDnIFR"
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a7aabb71bb2so649691666b.2
+        for <linux-crypto@vger.kernel.org>; Tue, 13 Aug 2024 23:14:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1723616097; x=1724220897; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=FZil0/SackO01yqLZXR+2a2UWsCCpCTO6qDp2xWbFuk=;
+        b=TSaDnIFRKKhsqLPjOrHei3iZtwS/MZTCxiokEK2FnpcsAfGo6MTyy1qxxdWc2Uocpn
+         B8MJt6WE8edB/tgUXvaB5MVQVsptXriDVRQwxsrHlnQ082sRJM24l2ReLjuejU/OgcIP
+         9X4K8x+tfGT833IYCgZjyTNuGQenRZYQZYUKVV5MWLvnkQw6iB41IDJLvaq/ZLimQdZo
+         S843pU6n5C+H2/cDDrCqOct7KHvyPWgwXxJlMn1VK0RrRyoHa063jtrxFolvyZk+yz4X
+         w+f+/8MbxjWkH3rrDwNuIeVxOhuizsWKCwxvOECfCVgXw6D8MXudo/z0zr+18i/BrZsr
+         3U3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723616097; x=1724220897;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FZil0/SackO01yqLZXR+2a2UWsCCpCTO6qDp2xWbFuk=;
+        b=w9xIL4D2ULOD6IkaahClNvuDGGAX1uZhR/EgQtZmRCwd8u7pJuZRHLUMCDZshfV+O8
+         KpDjxF2zZ/D/7dxljI1t6xw3wDZUplfNr/L7mTa7JqT2ccTP4R7DPeT02iFdLL779sLs
+         ufk5GHuCicJD3SzRX4hqVw3sHmnNPP1nJQP9jTfR6RRAsz+KF2N8/Pwtn/YafnYFHtqb
+         0hiYuRpCpadtFRca+I99r6D2AeexTLLmR4aIxEQoF7zz9I7mYhpwmsbsqPWIH431I50b
+         bRXBWOoBAoEnE4h0fygg52y1lj7m/BQyizJ8PCW52sr31CGqZVyjHUq43I7qam6+K9ms
+         LqZg==
+X-Forwarded-Encrypted: i=1; AJvYcCXsg1MmpKbasPSrqClpVFLnkZ765kQS6hMDCCdP3UMMmk0nvgAdip/TQy/aks1Tjpc+eRclCbWtC8X2XaCOMreA9IipECkcwdVDj4id
+X-Gm-Message-State: AOJu0YxbRzEu8t4AUM9Y/7mk7WUt7DZLH8P9WSI0N5y6QWJAOYQpZWCh
+	969cY80bS4JeVTRvgLVCxxIJVCHjLQ1QRiUY6/Z4KlXVL1nrHO4yFajGEI1ChNKEHJgVpKmcPtc
+	=
+X-Google-Smtp-Source: AGHT+IEyiaPYtVku3SMV2wUF47BKRW4I8CezTfvS5akSHpsseasFMRoJbGdiK3WHTsvFhslKwpzhNg==
+X-Received: by 2002:a17:907:7e9c:b0:a7a:aa35:409a with SMTP id a640c23a62f3a-a83670701eamr98104766b.68.1723616097191;
+        Tue, 13 Aug 2024 23:14:57 -0700 (PDT)
+Received: from [10.156.60.236] (ip-037-024-206-209.um08.pools.vodafone-ip.de. [37.24.206.209])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a80f414e37dsm133209266b.173.2024.08.13.23.14.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 13 Aug 2024 23:14:56 -0700 (PDT)
+Message-ID: <7ee049f1-17fb-41eb-b52c-60cc4cdf9a40@suse.com>
+Date: Wed, 14 Aug 2024 08:14:55 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -82,133 +63,66 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 6/9] nvme-tcp: request secure channel concatenation
+Subject: Re: [PATCH] crypto: x86/sha256: Add parentheses around macros' single
+ arguments
+To: Fangrui Song <maskray@google.com>
+Cc: linux-kernel@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+ Thomas Gleixner <tglx@linutronix.de>, linux-crypto@vger.kernel.org,
+ x86@kernel.org
+References: <20240814044802.1743286-1-maskray@google.com>
 Content-Language: en-US
-To: Sagi Grimberg <sagi@grimberg.me>, Hannes Reinecke <hare@kernel.org>,
- Christoph Hellwig <hch@lst.de>
-Cc: Keith Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org,
- Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
-References: <20240813111512.135634-1-hare@kernel.org>
- <20240813111512.135634-7-hare@kernel.org>
- <4b64fa0f-cfda-465c-8be6-60b4cf60f558@grimberg.me>
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <4b64fa0f-cfda-465c-8be6-60b4cf60f558@grimberg.me>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Score: -4.29
-X-Spamd-Result: default: False [-4.29 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.998];
-	MIME_GOOD(-0.10)[text/plain];
-	XM_UA_NO_VERSION(0.01)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email]
-X-Spam-Flag: NO
-X-Spam-Level: 
+From: Jan Beulich <jbeulich@suse.com>
+Autocrypt: addr=jbeulich@suse.com; keydata=
+ xsDiBFk3nEQRBADAEaSw6zC/EJkiwGPXbWtPxl2xCdSoeepS07jW8UgcHNurfHvUzogEq5xk
+ hu507c3BarVjyWCJOylMNR98Yd8VqD9UfmX0Hb8/BrA+Hl6/DB/eqGptrf4BSRwcZQM32aZK
+ 7Pj2XbGWIUrZrd70x1eAP9QE3P79Y2oLrsCgbZJfEwCgvz9JjGmQqQkRiTVzlZVCJYcyGGsD
+ /0tbFCzD2h20ahe8rC1gbb3K3qk+LpBtvjBu1RY9drYk0NymiGbJWZgab6t1jM7sk2vuf0Py
+ O9Hf9XBmK0uE9IgMaiCpc32XV9oASz6UJebwkX+zF2jG5I1BfnO9g7KlotcA/v5ClMjgo6Gl
+ MDY4HxoSRu3i1cqqSDtVlt+AOVBJBACrZcnHAUSuCXBPy0jOlBhxPqRWv6ND4c9PH1xjQ3NP
+ nxJuMBS8rnNg22uyfAgmBKNLpLgAGVRMZGaGoJObGf72s6TeIqKJo/LtggAS9qAUiuKVnygo
+ 3wjfkS9A3DRO+SpU7JqWdsveeIQyeyEJ/8PTowmSQLakF+3fote9ybzd880fSmFuIEJldWxp
+ Y2ggPGpiZXVsaWNoQHN1c2UuY29tPsJgBBMRAgAgBQJZN5xEAhsDBgsJCAcDAgQVAggDBBYC
+ AwECHgECF4AACgkQoDSui/t3IH4J+wCfQ5jHdEjCRHj23O/5ttg9r9OIruwAn3103WUITZee
+ e7Sbg12UgcQ5lv7SzsFNBFk3nEQQCACCuTjCjFOUdi5Nm244F+78kLghRcin/awv+IrTcIWF
+ hUpSs1Y91iQQ7KItirz5uwCPlwejSJDQJLIS+QtJHaXDXeV6NI0Uef1hP20+y8qydDiVkv6l
+ IreXjTb7DvksRgJNvCkWtYnlS3mYvQ9NzS9PhyALWbXnH6sIJd2O9lKS1Mrfq+y0IXCP10eS
+ FFGg+Av3IQeFatkJAyju0PPthyTqxSI4lZYuJVPknzgaeuJv/2NccrPvmeDg6Coe7ZIeQ8Yj
+ t0ARxu2xytAkkLCel1Lz1WLmwLstV30g80nkgZf/wr+/BXJW/oIvRlonUkxv+IbBM3dX2OV8
+ AmRv1ySWPTP7AAMFB/9PQK/VtlNUJvg8GXj9ootzrteGfVZVVT4XBJkfwBcpC/XcPzldjv+3
+ HYudvpdNK3lLujXeA5fLOH+Z/G9WBc5pFVSMocI71I8bT8lIAzreg0WvkWg5V2WZsUMlnDL9
+ mpwIGFhlbM3gfDMs7MPMu8YQRFVdUvtSpaAs8OFfGQ0ia3LGZcjA6Ik2+xcqscEJzNH+qh8V
+ m5jjp28yZgaqTaRbg3M/+MTbMpicpZuqF4rnB0AQD12/3BNWDR6bmh+EkYSMcEIpQmBM51qM
+ EKYTQGybRCjpnKHGOxG0rfFY1085mBDZCH5Kx0cl0HVJuQKC+dV2ZY5AqjcKwAxpE75MLFkr
+ wkkEGBECAAkFAlk3nEQCGwwACgkQoDSui/t3IH7nnwCfcJWUDUFKdCsBH/E5d+0ZnMQi+G0A
+ nAuWpQkjM1ASeQwSHEeAWPgskBQL
+In-Reply-To: <20240814044802.1743286-1-maskray@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 8/13/24 21:45, Sagi Grimberg wrote:
+On 14.08.2024 06:48, Fangrui Song wrote:
+> The macros FOUR_ROUNDS_AND_SCHED and DO_4ROUNDS rely on an
+> unexpected/undocumented behavior of the GNU assembler, which might
+> change in the future
+> (https://sourceware.org/bugzilla/show_bug.cgi?id=32073).
 > 
-> On 13/08/2024 14:15, Hannes Reinecke wrote:
->> Add a fabrics option 'concat' to request secure channel concatenation.
->> When secure channel concatenation is enabled a 'generated PSK' is 
->> inserted
->> into the keyring such that it's available after reset.
->>
->> Signed-off-by: Hannes Reinecke <hare@kernel.org>
->> ---
->>   drivers/nvme/host/auth.c    | 108 +++++++++++++++++++++++++++++++++++-
->>   drivers/nvme/host/fabrics.c |  34 +++++++++++-
->>   drivers/nvme/host/fabrics.h |   3 +
->>   drivers/nvme/host/nvme.h    |   2 +
->>   drivers/nvme/host/sysfs.c   |   4 +-
->>   drivers/nvme/host/tcp.c     |  47 ++++++++++++++--
->>   include/linux/nvme.h        |   7 +++
->>   7 files changed, 191 insertions(+), 14 deletions(-)
->>
->> diff --git a/drivers/nvme/host/auth.c b/drivers/nvme/host/auth.c
->> index 371e14f0a203..d2fdaefd236f 100644
->> --- a/drivers/nvme/host/auth.c
->> +++ b/drivers/nvme/host/auth.c
-[ .. ]
->> @@ -833,6 +921,14 @@ static void nvme_queue_auth_work(struct 
->> work_struct *work)
->>       }
->>       if (!ret) {
->>           chap->error = 0;
->> +        /* Secure concatenation can only be enabled on the admin 
->> queue */
->> +        if (!chap->qid && ctrl->opts->concat &&
->> +            (ret = nvme_auth_secure_concat(ctrl, chap))) {
->> +            dev_warn(ctrl->device,
->> +                 "%s: qid %d failed to enable secure concatenation\n",
->> +                 __func__, chap->qid);
->> +            chap->error = ret;
->> +        }
+>     M (1) (2) // 1 arg !? Future: 2 args
+>     M 1 + 2   // 1 arg !? Future: 3 args
 > 
-> Lets break up the if condition:
+>     M 1 2     // 2 args
 > 
->      if (!chap->qid && ctrl->opts->concat) {
->          ret = nvme_auth_secure_concat(ctrl, chap);
->          if (!ret)
->              return;
->          dev_warn(ctrl->device,
->              "%s: qid %d failed to enable secure concatenation\n",
->               __func__, chap->qid);
->          chap->error = ret;
->      }
+> Add parentheses around the single arguments to support future GNU
+> assembler and LLVM integrated assembler (when the IsOperator hack from
+> the following link is dropped).
 > 
-> 
-> 
-Okay.
+> Link: https://github.com/llvm/llvm-project/commit/055006475e22014b28a070db1bff41ca15f322f0
+> Signed-off-by: Fangrui Song <maskray@google.com>
 
->>           return;
-> 
-> No need for the return statement.
-> 
-[ .. ]
->> diff --git a/include/linux/nvme.h b/include/linux/nvme.h
->> index 7b2ae2e43544..8072edf3c842 100644
->> --- a/include/linux/nvme.h
->> +++ b/include/linux/nvme.h
->> @@ -1678,6 +1678,13 @@ enum {
->>       NVME_AUTH_DHGROUP_INVALID    = 0xff,
->>   };
->> +enum {
->> +    NVME_AUTH_SECP_NOSC        = 0x00,
->> +    NVME_AUTH_SECP_SC        = 0x01,
->> +    NVME_AUTH_SECP_NEWTLSPSK    = 0x02,
->> +    NVME_AUTH_SECP_REPLACETLSPSK    = 0x03,
->> +};
->> +
->>   union nvmf_auth_protocol {
->>       struct nvmf_auth_dhchap_protocol_descriptor dhchap;
->>   };
-> 
-> Wandering if splitting core/fabrics from tcp would be viable here...
+Reviewed-by: Jan Beulich <jbeulich@suse.com>
 
-Well, authentication is a base functionality, not a tcp one.
-Even though it's pretty much TCP-centric.
-So I'd rather keep in in nvme.h for now.
+Thank you for taking care of one of the many instances! That said,
+upstream (binutils) plans now appear to be to continue to support
+usages like the ones here, no matter that I'm not really happy about
+that. Hence I'm uncertain whether that Clang hack you refer to can
+actually be dropped any time soon.
 
-Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
-
+Jan
