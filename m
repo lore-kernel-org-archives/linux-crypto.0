@@ -1,77 +1,141 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20A5924B4A;
-	Wed, 14 Aug 2024 08:31:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78E15142E70
+	for <linux-crypto@vger.kernel.org>; Wed, 14 Aug 2024 08:58:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723624293; cv=none; b=p1cBJXu6px/k9YJP3AEMWwMDqQI1M0ys8waSULsvEudvfCbMswTmPpJ/0q16TpUAqNj/2P2UvtpW5gSYB97YeCH8aCEPJ1fWg73edw2ZdDgnJ42kA0WyASeVWsiM/Xa2CKEEJ+/IkwriaileUdsB8c9yJRe/70jxDgUjiorWbFw=
+	t=1723625887; cv=none; b=MuD5J+ATbt22v2CG9s+P/IzNi/hefvON+argetNpuwhWPXRvZzoRHEqtj8WgBT/JaYLPpasgY6A0/PRdVFKVRIBcT8bKR1IlhHLESEcyF8kSRSw72kLuViUJ/4e1CmchDGkXVEc4XG4ov6Kbm7yxmh/X9lXjP8mrKAZh42ssvmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723624293; c=relaxed/simple;
-	bh=nLPuAIh8rjbIDAj5WhCdf3+G9eV6BNGUL1w9hDjvP2M=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CLaOqYJ2o+Vci0yBYOiB05qc9Cl2iN8Zs53QrBNuKRBIza9Sd4nZfOjSav0Qj3gBjU1d7CxywbmReMocEzDkiskg0z84ukJhYOqRuuOtG5oE7fJtrU5f56/r26nipRY+Bh7DvMXccJ/K7BCHWt9ePG7z859zHg3dMUnsYsNec5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u1b2Vkoo; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1723625887; c=relaxed/simple;
+	bh=nKfIWh5tTXBWbHuSF6DmM/umryirIIkMzXbySRjO3bQ=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=rnVm+zrtjL8rTIEM2agmGGAolZHXLDRkmKuj/qrD9NTDPqBlSeuqTpUsEMTxIMs2IQ5CivS7bLBImlqsAryCNcb5xQ/n0tLFiY7yv5nfJSbai5mqdpNJbPsnNBsAQnhwJcUKkVjtDOR/UU9kj0AMeEHGhJIKJkXHI3EWZ0dmq24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=YdUj2Me5; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u1b2Vkoo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 258E2C32786;
-	Wed, 14 Aug 2024 08:31:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723624292;
-	bh=nLPuAIh8rjbIDAj5WhCdf3+G9eV6BNGUL1w9hDjvP2M=;
-	h=From:To:Cc:Subject:Date:From;
-	b=u1b2VkooLHPDO+iwlj4CphrkBKK2gREfiWlKyi15SWpn7HP3n0JaOScz1OrdS+sM5
-	 cuJ/DAcGRtviaDsGwsPqDhankoMlCgdk355EXO0/13kgKBmVydffFBV4M/60xJp502
-	 Y9bj9nLZDhjoRTqqYUTuAYXfbbrVi02EgRYLz3et16awiVZsm9IifQOX5+RvXb1a9k
-	 LdzJweeIeFLhbOxzMjo9uWCijZljOU+ycaVR9Njmbjc6nWqUI2IYx/wwdJR/qUOcq2
-	 aXjNBfBvgwra1ruNkPfa1M36PIxbBvY9G0BqOJINv2qqa5EYessPVF4O/WME/MtrlM
-	 8kqGJxdc+JE2A==
-From: Amit Shah <amit@kernel.org>
-To: seanjc@google.com,
-	pbonzini@redhat.com,
-	x86@kernel.org,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Cc: amit.shah@amd.com,
-	bp@alien8.de,
-	ashish.kalra@amd.com,
-	thomas.lendacky@amd.com,
-	maz@kernel.org
-Subject: [PATCH] KVM: SEV: uapi: fix typo in SEV_RET_INVALID_CONFIG
-Date: Wed, 14 Aug 2024 10:31:13 +0200
-Message-ID: <20240814083113.21622-1-amit@kernel.org>
-X-Mailer: git-send-email 2.46.0
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="YdUj2Me5"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47E8ctfh007540;
+	Wed, 14 Aug 2024 08:53:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	mime-version:date:from:to:cc:subject:reply-to:in-reply-to
+	:references:message-id:content-type:content-transfer-encoding;
+	 s=pp1; bh=oNE7YUbR9F5FZRA6oSai4Ae9eOaSBu5JA+0MCethd7E=; b=YdUj2
+	Me52zQlWagrosWAmeD+eTCiGWSOTEmZ4EZV8CsFlXT2SKANep/Rbsj5gcRBSHgO0
+	gUnhR1la8MFAsg9zBJcIMJYkD+hnDoqbkqDa3cIPSHvO6dkziynterfYYwslurPO
+	gvRVoVf+P+lWN3AfAU30YDsQk1OAz5rBM27/fsHJ1DfygiGN3GULwsrhabdJgChr
+	LBauJfujwn0JoIbQ+sCPgPOhgwtM6bkV1Fh/mzJ/q526uOXUznwwVsKI6ni6ZIiC
+	4fA7zbRDcnq1yum+sas2ddey9kwtnT2AU+9m6tdbkVKqhvjQKIuM9WYzCJXydDtP
+	wkxBF34yslN6lM9Vw==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 410s8g81sh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 14 Aug 2024 08:53:00 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 47E6DZiQ015888;
+	Wed, 14 Aug 2024 08:52:58 GMT
+Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 40xm1mreaq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 14 Aug 2024 08:52:58 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 47E8qtnj59900238
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 14 Aug 2024 08:52:58 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D94A45805B;
+	Wed, 14 Aug 2024 08:52:55 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8473C58058;
+	Wed, 14 Aug 2024 08:52:55 +0000 (GMT)
+Received: from ltc.linux.ibm.com (unknown [9.5.196.140])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 14 Aug 2024 08:52:55 +0000 (GMT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Date: Wed, 14 Aug 2024 10:52:55 +0200
+From: Harald Freudenberger <freude@linux.ibm.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, Holger Dengler <dengler@linux.ibm.com>
+Subject: Re: RFC: s390/crypto: Add hardware acceleration for HMAC modes
+Reply-To: freude@linux.ibm.com
+Mail-Reply-To: freude@linux.ibm.com
+In-Reply-To: <ZrsVYl3NYdRbUMNm@gondor.apana.org.au>
+References: <20240807160629.2486-1-dengler@linux.ibm.com>
+ <20240807160629.2486-3-dengler@linux.ibm.com>
+ <8511b5079e158b79232f7be9d03fbba5@linux.ibm.com>
+ <ZrsVYl3NYdRbUMNm@gondor.apana.org.au>
+Message-ID: <e3ee41957dea7c296aece5daa56a692b@linux.ibm.com>
+X-Sender: freude@linux.ibm.com
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: RJG8R_XA5dDdpiOsPQ727fde1px_OOI3
+X-Proofpoint-ORIG-GUID: RJG8R_XA5dDdpiOsPQ727fde1px_OOI3
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-14_05,2024-08-13_02,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ suspectscore=0 lowpriorityscore=0 bulkscore=0 priorityscore=1501
+ mlxscore=0 adultscore=0 phishscore=0 spamscore=0 malwarescore=0
+ clxscore=1015 mlxlogscore=999 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2407110000 definitions=main-2408140059
 
-From: Amit Shah <amit.shah@amd.com>
+On 2024-08-13 10:12, Herbert Xu wrote:
+> On Tue, Aug 13, 2024 at 09:37:24AM +0200, Harald Freudenberger wrote:
+>> 
+>> +static int hash(const u8 *in, unsigned int inlen,
+>> +		u8 *digest, unsigned int digestsize)
+>> +{
+>> +	struct crypto_shash *htfm;
+>> +	const char *alg_name;
+>> +	int ret;
+>> +
+>> +	switch (digestsize) {
+>> +	case SHA224_DIGEST_SIZE:
+>> +		alg_name = "sha224";
+>> +		break;
+>> +	case SHA256_DIGEST_SIZE:
+>> +		alg_name = "sha256";
+>> +		break;
+>> +	case SHA384_DIGEST_SIZE:
+>> +		alg_name = "sha384";
+>> +		break;
+>> +	case SHA512_DIGEST_SIZE:
+>> +		alg_name = "sha512";
+>> +		break;
+>> +	default:
+>> +		return -EINVAL;
+>> +	}
+>> +
+>> +	htfm = crypto_alloc_shash(alg_name, 0, CRYPTO_ALG_NEED_FALLBACK);
+>> +	if (IS_ERR(htfm))
+>> +		return PTR_ERR(htfm);
+>> +
+>> +	ret = crypto_shash_tfm_digest(htfm, in, inlen, digest);
+>> +	if (ret)
+>> +		pr_err("shash digest error: %d\n", ret);
+>> +
+>> +	crypto_free_shash(htfm);
+>> +	return ret;
+>> +}
+> 
+> The setkey function can be called in softirq context.  Therefore
+> calling crypto_alloc_* from it is not allowed.  You could either
+> move the allocation to init_tfm and carry it throughout the life
+> of the tfm, or perhaps you could call the s390 underlying sha hash
+> function directly?
+> 
+> Cheers,
 
-"INVALID" is misspelt in "SEV_RET_INAVLID_CONFIG". Since this is part of
-the UAPI, keep the current definition and add a new one with the fix.
+Ok, good catch. I'll discuss this with Holger when he is back from 
+vacation.
 
-Fix-suggested-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Amit Shah <amit.shah@amd.com>
----
- include/uapi/linux/psp-sev.h | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/include/uapi/linux/psp-sev.h b/include/uapi/linux/psp-sev.h
-index 2289b7c76c59..832c15d9155b 100644
---- a/include/uapi/linux/psp-sev.h
-+++ b/include/uapi/linux/psp-sev.h
-@@ -51,6 +51,7 @@ typedef enum {
- 	SEV_RET_INVALID_PLATFORM_STATE,
- 	SEV_RET_INVALID_GUEST_STATE,
- 	SEV_RET_INAVLID_CONFIG,
-+	SEV_RET_INVALID_CONFIG = SEV_RET_INAVLID_CONFIG,
- 	SEV_RET_INVALID_LEN,
- 	SEV_RET_ALREADY_OWNED,
- 	SEV_RET_INVALID_CERTIFICATE,
--- 
-2.46.0
-
+Thanks for your work.
