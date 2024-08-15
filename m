@@ -1,149 +1,105 @@
-Received: from xry111.site (xry111.site [89.208.246.23])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CD771714AE
-	for <linux-crypto@vger.kernel.org>; Thu, 15 Aug 2024 13:36:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.208.246.23
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DAF619DF9C
+	for <linux-crypto@vger.kernel.org>; Thu, 15 Aug 2024 13:56:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723728990; cv=none; b=aWhMPSoZ2l6mgMyHL/IfTZGvSrygG1JgWAJ6v6yF8P7oTEzRjD1iOHofkC7rdfluvDm/z7PJmqlt2mpXGavbIfIHRmbYfPBg72r+wZWfmw5vdGg5q4ALDiuHqfVYPl4WyakFX1NkOYNg4+6RWwBj1hNMyMD8fFmbz4/lEB3tSCk=
+	t=1723730204; cv=none; b=foiwe5Z+mM7ZDa/uMwvt6fW9wnp8a07INFpGK62tKvKfm1q5i8a8aIFUFihVDm2ZxzTRuQGqG8hI4F0nsr6CUhTtZH8FMUFXQ+euQI2c2ndgt0I28ZAWb/YZkNejcS9PnwiaTwNUIt+utiksSPvn3LzIlGJW4A2dMXgvwT8PYc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723728990; c=relaxed/simple;
-	bh=R4b+BevwFhONDEGuu7nofcOB8xkn9DayS2NTXvOdpRg=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=cvLe9Sov1NIqVJcVn8/Pok2xpRI7m+J2+2aTa98oR5Pr2l8gI6Xc8wyCA5LQ/DphRkFTiaijikFe7vL7wqmLvrygCwhInAdhXRMNeAMQF7HOFNeJ++PozZp7bRNpdr1D0vFDLTiLehcvj5DExd4+bJwuzX8/jNEQdCMsGW764MA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site; spf=pass smtp.mailfrom=xry111.site; dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b=QDQMgCoi; arc=none smtp.client-ip=89.208.246.23
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xry111.site
+	s=arc-20240116; t=1723730204; c=relaxed/simple;
+	bh=vqxWsJzciRMbILiYK+Kat3pn1oc69qfxQfFSLs7kul0=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:Cc:To; b=hUUXTXKuEeH5rpJ5cftShXJ1pp7X1vjPSmQqgoZf77689dKLFLqrwBAWo5LO/7tQZpLnjT29PEqmhpLg7i7BsPvI9J4strNuvMSex1hI7rvjgvWlLl1eGn4vujFyrYd/xYTdfjqraUG8nMnyABJkqcDuNwMDMWeGGMt7di2IM1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cknow.org; spf=pass smtp.mailfrom=cknow.org; dkim=pass (2048-bit key) header.d=cknow.org header.i=@cknow.org header.b=zK9QEZX9; arc=none smtp.client-ip=91.218.175.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cknow.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cknow.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b="QDQMgCoi"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xry111.site;
-	s=default; t=1723728988;
-	bh=R4b+BevwFhONDEGuu7nofcOB8xkn9DayS2NTXvOdpRg=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=QDQMgCoiRE1eOSF5MYro1rB4lCa2Tt/SpR1PI5puWUKrSJpKP1CcwbGNZtL59vwVF
-	 89hOE0piS2D1HhoeH9Xj6bi1MZRSIorKArtXpSceBrzt7UNHMT9ULf/xDGP3Ga6dc0
-	 ZJoEkwgAMVpIQY+p8t+BdVq/slu/nan7VrlaScCA=
-Received: from [IPv6:240e:456:1030:181:abd4:6e7f:e826:ac0f] (unknown [IPv6:240e:456:1030:181:abd4:6e7f:e826:ac0f])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-384) server-digest SHA384)
-	(Client did not present a certificate)
-	(Authenticated sender: xry111@xry111.site)
-	by xry111.site (Postfix) with ESMTPSA id 6D76D66F26;
-	Thu, 15 Aug 2024 09:36:23 -0400 (EDT)
-Message-ID: <31494f15332037052d1ecf17fa1de874538b9333.camel@xry111.site>
-Subject: Re: [PATCH 0/2] LoongArch: Implement getrandom() in vDSO
-From: Xi Ruoyao <xry111@xry111.site>
-To: "Jason A . Donenfeld" <Jason@zx2c4.com>, Huacai Chen
- <chenhuacai@kernel.org>,  WANG Xuerui <kernel@xen0n.name>
-Cc: linux-crypto@vger.kernel.org, loongarch@lists.linux.dev, Jinyang He
- <hejinyang@loongson.cn>, Tiezhu Yang <yangtiezhu@loongson.cn>, Arnd
- Bergmann <arnd@arndb.de>
-Date: Thu, 15 Aug 2024 21:36:18 +0800
-In-Reply-To: <20240815131759.33302-1-xry111@xry111.site>
-References: <20240815131759.33302-1-xry111@xry111.site>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.3 
+	dkim=pass (2048-bit key) header.d=cknow.org header.i=@cknow.org header.b="zK9QEZX9"
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cknow.org; s=key1;
+	t=1723730199;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=jRUdXH2Gl6rw+xJJhhgxHtdMQ1UkSxCrnpLh3C7+fX8=;
+	b=zK9QEZX90pzd4bqhseXo1FpO5UsNhnweJu6H4bUBMb3SvWcgZJgc7B7WTF6JeKqmjdsP6Q
+	xnGx0iZJ7QMZ38iRpdc/mBBLPj90ZUkC4hjXIiJq9kgZkzMSbqyhdu5WZIRpseLNsdOK66
+	7W5/vQK+TaNVjrYMmzjYWX5MXAurfMHqTBavN7aix+J3v36N7wkYnXIPJY6f+oVsNqOoCY
+	en5TUjlYYjohLiSZ9XFJWan8SxCDzmhfY7y6cu+h0aYNHbq9gSdtEfvwQLFCdNg7q/53Hf
+	jaOhsd2iJfLhEaChZISjXP4+g8KdMz8Uya0cG+1qBY+06u8P75xM8j4o3Hwyrw==
+Content-Type: multipart/signed;
+ boundary=62032c8257d9ec58f3454a49951ee88f6705259ff7df0bbe783d64edb2fc;
+ micalg=pgp-sha256; protocol="application/pgp-signature"
+Date: Thu, 15 Aug 2024 15:56:26 +0200
+Message-Id: <D3GJCRNY4KDK.3SPJB5WP8Z7DK@cknow.org>
+Subject: [BUG] Non working HWRNG on AMD Ryzen 5 5500GT
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Diederik de Haas" <didi.debian@cknow.org>
+Cc: "Herbert Xu" <herbert@gondor.apana.org.au>, "David S. Miller"
+ <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, "Diederik de Haas" <didi.debian@cknow.org>
+To: "Tom Lendacky" <thomas.lendacky@amd.com>, "John Allen"
+ <john.allen@amd.com>
+X-Migadu-Flow: FLOW_OUT
 
-This series is not properly sent.  See v2 instead:
-https://lore.kernel.org/all/20240815133357.35829-1-xry111@xry111.site/
+--62032c8257d9ec58f3454a49951ee88f6705259ff7df0bbe783d64edb2fc
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
 
-On Thu, 2024-08-15 at 21:17 +0800, Xi Ruoyao wrote:
-> For the rationale to implement getrandom() in vDSO see [1].
->=20
-> The vDSO getrandom() needs a stack-less ChaCha20 implementation, so we
-> need to add architecture-specific code and wire it up with the generic
-> code.
->=20
-> Without LSX it's not easy to implement ChaCha20 without stack.=C2=A0 So t=
-he
-> current implementation just falls back to a getrandom() syscall if LSX
-> is unavailable.=C2=A0 In the 1st patch the existing alternative runtime
-> patching mechanism is expanded to cover vDSO in the first patch, so we
-> don't need to invoke cpucfg for each vDSO getrandom() call.
->=20
-> Then in the 2nd patch stack-less ChaCha20 is implemented with LSX.=C2=A0 =
-The
-> code is basically a direct translate from the x86 SSE2 implementation.
-> One annoying thing here is the compiler generates a memset() call for a
-> "large" struct initialization in a cold path and there seems no way to
-> prevent it.=C2=A0 So a naive memset implementation is copied from the ker=
-nel
-> code into vDSO.
->=20
-> The implementation is tested with the kernel selftests added by the last
-> patch in [1].=C2=A0 I had to make some adjustments to make it work on
-> LoongArch (see [2], I've not submitted the changes as at now because I'm
-> unsure about the KHDR_INCLUDES addition).=C2=A0 The vdso_test_getrandom
-> bench-single result:
->=20
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vdso: 25000000 times in 0.631345201 =
-seconds
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 libc: 25000000 times in 6.953121083 =
-seconds
-> =C2=A0=C2=A0=C2=A0 syscall: 25000000 times in 6.992112386 seconds
->=20
-> The vdso_test_getrandom bench-multi result:
->=20
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vdso: 25000000 x 256 times in 29.558=
-284986 seconds
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 libc: 25000000 x 256 times in 356.63=
-3930139 seconds
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 syscall: 25000000 x 256 times in 334=
-.885555338 seconds
->=20
-> [1]:https://lore.kernel.org/all/20240712014009.281406-1-Jason@zx2c4.com/
-> [2]:https://github.com/xry111/linux/commits/xry111/la-vdso/
->=20
-> Cc: linux-crypto@vger.kernel.org
-> Cc: loongarch@lists.linux.dev
-> Cc: Jason A. Donenfeld <Jason@zx2c4.com>
-> Cc: Huacai Chen <chenhuacai@kernel.org>
-> Cc: WANG Xuerui <kernel@xen0n.name>
-> Cc: Jinyang He <hejinyang@loongson.cn>
-> Cc: Tiezhu Yang <yangtiezhu@loongson.cn>
-> Cc: Arnd Bergmann <arnd@arndb.de>
->=20
-> Xi Ruoyao (2):
-> =C2=A0 LoongArch: Perform alternative runtime patching on vDSO
-> =C2=A0 LoongArch: vDSO: Wire up getrandom() vDSO implementation
->=20
-> =C2=A0arch/loongarch/Kconfig=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 |=C2=A0=C2=A0 1 +
-> =C2=A0arch/loongarch/include/asm/vdso/getrandom.h |=C2=A0 47 ++++++
-> =C2=A0arch/loongarch/include/asm/vdso/vdso.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 |=C2=A0=C2=A0 8 +
-> =C2=A0arch/loongarch/kernel/asm-offsets.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 |=C2=A0 10 ++
-> =C2=A0arch/loongarch/kernel/vdso.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 14 +-
-> =C2=A0arch/loongarch/vdso/Makefile=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 2 +
-> =C2=A0arch/loongarch/vdso/memset.S=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 24 +++
-> =C2=A0arch/loongarch/vdso/vdso.lds.S=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 7 +
-> =C2=A0arch/loongarch/vdso/vgetrandom-alt.S=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 |=C2=A0 19 +++
-> =C2=A0arch/loongarch/vdso/vgetrandom-chacha.S=C2=A0=C2=A0=C2=A0=C2=A0 | 1=
-62 ++++++++++++++++++++
-> =C2=A0arch/loongarch/vdso/vgetrandom.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 16 ++
-> =C2=A011 files changed, 309 insertions(+), 1 deletion(-)
-> =C2=A0create mode 100644 arch/loongarch/include/asm/vdso/getrandom.h
-> =C2=A0create mode 100644 arch/loongarch/vdso/memset.S
-> =C2=A0create mode 100644 arch/loongarch/vdso/vgetrandom-alt.S
-> =C2=A0create mode 100644 arch/loongarch/vdso/vgetrandom-chacha.S
-> =C2=A0create mode 100644 arch/loongarch/vdso/vgetrandom.c
->=20
+Hi,
 
---=20
-Xi Ruoyao <xry111@xry111.site>
-School of Aerospace Science and Technology, Xidian University
+I recently bought an Asus ROG STRIX B550-F GAMING MB with an
+AMD Ryzen 5 5500GT CPU (and installed the latest BIOS: 3607).
+I'm running Debian Testing/Sid on it with kernel 6.9 and now 6.10
+and it seems to work great.
+I've been doing some (unrelated) tests with `rngtest` from the
+`rng-tools5` package and wondered how it would fare on my AMD CPU.
+
+And I found out it doesn't work at all!
+But on another system I have (Asus ROG CROSSHAIR VII HERO MB +
+AMD Ryzen 1800X CPU) it works absolutely fine.
+
+# dmesg | grep ccp
+[    5.399853] ccp 0000:07:00.2: ccp: unable to access the device: you might
+be running a broken BIOS.
+[    5.401031] ccp 0000:07:00.2: tee enabled
+[    5.401113] ccp 0000:07:00.2: psp enabled
+
+Found an article [1] which could be relevant and downloaded and ran the
+accompanying test program (written by Jason Donenfeld):
+# ./amd-rdrand-bug
+Your RDRAND() does not have the AMD bug.
+# ./test-rdrand
+RDRAND() = 0x47c993c0
+RDRAND() = 0xec7c697d
+... (more seemingly random numbers)
+RDRAND() = 0xba858101
+
+I tried it with the latest microcode dd 2024-07-10, but that didn't make
+a difference.
+
+So I'd like to know if this may actually be a bug on the kernel side.
+
+Happy to provide additional information or run tests or try patches.
+
+Cheers,
+  Diederik
+
+[1] https://arstechnica.com/gadgets/2019/10/how-a-months-old-amd-microcode-bug-destroyed-my-weekend/
+
+--62032c8257d9ec58f3454a49951ee88f6705259ff7df0bbe783d64edb2fc
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQT1sUPBYsyGmi4usy/XblvOeH7bbgUCZr4JDgAKCRDXblvOeH7b
+blWgAP0dg1azuw0JBqEIdwQkI/hE8oZw3WkNKYwBckEcCQEY0gEAkr8b4LpvK/jw
+J3Rp0WKaYWWd7IXn8Y+R86U+1kkYYgU=
+=1wh9
+-----END PGP SIGNATURE-----
+
+--62032c8257d9ec58f3454a49951ee88f6705259ff7df0bbe783d64edb2fc--
