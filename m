@@ -1,66 +1,67 @@
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CA571AC8A2
-	for <linux-crypto@vger.kernel.org>; Thu, 15 Aug 2024 11:20:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0F801AC88A
+	for <linux-crypto@vger.kernel.org>; Thu, 15 Aug 2024 11:20:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723720805; cv=none; b=pKoVg1DjzrYCdzDt7qn+80Mc1GpNu0DAEyvBOj7PZsbbmBwiawZ+rf5a4ANX7c96J3MfmlyZQSxVlluz9PUhYcLCPBv7l0Eoc6gRpozRA0Ic7opX9+af5bFEh2TRtc90clBMe0OtRjmqJclj7szLIv2pKWoY1fQnUATwZlIs3fY=
+	t=1723720812; cv=none; b=R7eg4+NUv+nv92eCmlqwF2VACkEw1/szzgDoPqUSI3BGqnQDgnnhng9I0DyIzrvGDPMR9lcjix5PI/PM2JFW1j3TmoH96tCWBPp2i4Ldoc4I7mjfRy5BOphBRcQE2/mcLpoccLheAwz7b4cPNsT0GTU/XHzPlMnkCsnrTSRm3L4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723720805; c=relaxed/simple;
-	bh=yURztonZrBwHUHibkawREdePNMweVxOWwY8OJ0QSyB0=;
+	s=arc-20240116; t=1723720812; c=relaxed/simple;
+	bh=+rx9vl+x75FoWyGwCUxTtmzERdKUHmIGH1zDEF/INZk=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=r6LxBUriOlCmdhdANvzIvJdhC6XtZMQjyUqZvT6DJu+IOq6/THhYN1Vcdn7Sb6Spw2Gsj6muWxhziMsqAWgnSUnQZvutr/fT+Miqrhd7oyJjEx8NtrHSxKS88UkYHdJ9LwVmt7vXQJ6hGiWDgM2aPhTARBmlvHW9V7OoaNfvMDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=NQKrB/tj; arc=none smtp.client-ip=209.85.128.43
+	 Content-Disposition:In-Reply-To; b=Ng9uR3SbsYAHWgblU6uy6heXo0APk4vm3CcBQYRReCE5SsUfOFcV+/AV6kB40za+EYjfuvCIN7M1Jwm17nbuHNuk9MzlXLMtsauXt6Uy/spyueP55YWKvuTWUijYEBdYDuHgf/WJnF2Fo52XItCTkwgr061OO15CI2IExPmljcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=unxTl0kP; arc=none smtp.client-ip=209.85.167.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NQKrB/tj"
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4280c55e488so4070015e9.0
-        for <linux-crypto@vger.kernel.org>; Thu, 15 Aug 2024 04:20:02 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="unxTl0kP"
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-530e2548dfdso856455e87.1
+        for <linux-crypto@vger.kernel.org>; Thu, 15 Aug 2024 04:20:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1723720801; x=1724325601; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nI4171woC8AbIwEQ7yZoKX44iROE7Q6gQWAZSkQrquE=;
-        b=NQKrB/tj/k375VSGk79fmL9o7iqpTCgt1iPBQjzQmRdPJxdwqiI8sisfdLcez3fBmt
-         1Yf1xUuaREFHR5CG5KZiJYA3ozkQkOOamKlSBIpO6ip1kMqCv6tkfeL9941j4jfWmYlJ
-         eaam3qtZdLWsIACtVula3bGHggy4YerhlFQC5/2hL/C9qCa9XNb+YvAzJTWwO00V+cEr
-         EDChFrKKSiBojYMFIgLtXKf9dRd0sMEi7k8cn6zSSytgJKFEgI8ZKtbEerIXcjX3p8ob
-         7HIJJd0LsVXwIUL95Zp2AC7N3TlFGAx4GspXKBAVXMHovOeXWZIuNiKy4KGCYDWVDrnA
-         EAKw==
+        d=linaro.org; s=google; t=1723720809; x=1724325609; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=a5FdodYMUJlHJKuSCp9GX1nhpR2hEhWwQY2UySRkoYk=;
+        b=unxTl0kPMZ5GO/YY+N7XNx37vViuN3aXuD7pDT5xXlKwp8vNVNVMLeoVwrFcQ/Rc1U
+         HUh5ffJaVK9h8HsSuIkA3a91DOHROS+ZMotKXu4sfoukR9M6t8ay27aGlzslm29bjuvR
+         MkfTNungMFwf1CvnBNGAMdtsyh9O1DziH5kYInM1rZ10f5KO+2m+EBAJ1I5Cni1cDBE2
+         +w3O5ZsfHHaS5DXY2riSIQEZVDpqf/M/9FIS/AtVAFgQ5NVcNFfo+/iewkLTmszO1tzP
+         VEzfHO8yfLe4Lc5am08XU8hCq3rJXCCutTfe96Q9ZWEXX0kawsrTQQIzG7lqzYUjiPQg
+         hk6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723720801; x=1724325601;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nI4171woC8AbIwEQ7yZoKX44iROE7Q6gQWAZSkQrquE=;
-        b=BHnlYLozqzvRM7WsSsKr72IAnYRhj5ZtG3mVLnZ1Qr4EIAfsDd40LGQ8RWGYY0nACu
-         IKBm3fEXiccsyk6Vr8QVeiCg/R8mvbNsSLin5unZCAumhOCLeBmqRtn+y7WM5MzF9CvC
-         WNCLNLg22VvxnoLBIVA0q3nyFB3UqZHgkwNwduklFzSIQ6mmPUz0ZJqNs2KKhuzAfbYm
-         UJ3x15gpjW5Dvzdt6HJvetafhL29oIlYcBo/qr1/qnXm7pqT6A6zAeRneudyjypbm7p9
-         3DDPvr8khlqB0CXVdLuDIwX8YJ0CMuzUoJWAiX/Gy7t4j0J/O02lufI47wWCllUWRvU8
-         vZvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWwfuxd4hl9ierlI+5g1muhuAnXFpi25W98Kn5osLPsUc0hOFN8y6hEsVY8OO7DHQma+mpjXeQlibAWKm63HqAIPmBXXAoHAajgOPPd
-X-Gm-Message-State: AOJu0YyM6h3rZyl7Nc99yH9caDyRLxH6Y4vhzixJgXCH5l6tyfDe/8te
-	PHHuLKwzSlM6PH7eoaJJ09dLuNdGYugfOr5+SwShpcBukb8VO4IGSEnxJjhO3aw=
-X-Google-Smtp-Source: AGHT+IHd9j20vHOXcP9rlnZ9ILGmbI3Pz/RRtKxnfVhu+foJuiDVUD5jJfu6OyZ/hkQoLTos92SGtA==
-X-Received: by 2002:a05:600c:500c:b0:426:6981:1bd with SMTP id 5b1f17b1804b1-429e233b139mr20497645e9.5.1723720801296;
-        Thu, 15 Aug 2024 04:20:01 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1723720809; x=1724325609;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=a5FdodYMUJlHJKuSCp9GX1nhpR2hEhWwQY2UySRkoYk=;
+        b=aFBNLSif5x+jiIo8i/SKWZTIo3m19jmHm6ZJI5iBqbOwvPT4cEcnikkuazeem9V+LM
+         GozfpSSWK+Tq5/eVK15KY+bjeZUIT3CsnpMuu1xSl/LHIruPO1t3+1I8Bx3X5IQFBDJ9
+         n75RPfeZKgaqEfU85MAw4LsgcNz2itIF+knzt/wylbN0/RiWNwwD0rYi58FBTN3S+M1c
+         S76SktD+lSHTJ/V7bRP+9kGxhbdQcYaxryg4YlrlvFP9cd34N9zi7RDBxqaUpdckzPen
+         QysWe6+wzz5iJDFG6dkqsVvfx8o9OjYx7kGR3TGEtiJOXyTfTX1OfvSECFWZssjj1vSM
+         nX5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU7WrqL7seu/yvIBzeYFTUISmvBud0OSOpJYMX9F0biahtvXUUVIU1aTQL8dws7vt4ziMhvB51umrs/xvo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzV/O9ijQFoOu4arBLVOXvl0adivdWZ0NAG4WXcOEbhtHCh7iVk
+	oFgX07XRuke8igUII+l0gWtEv7J8eA6oL1TbeVOGa57vJS1A+vLSm5tz5N60Wqw=
+X-Google-Smtp-Source: AGHT+IGDSlIrMpFgn/V8ura8ZIKZtXcMX3El1z5OwXZ8AzCb2FT/8bSO+SRiLiqDp5oxPLs65pOZLg==
+X-Received: by 2002:a05:6512:b97:b0:52e:9fe0:bee4 with SMTP id 2adb3069b0e04-532eda59e63mr3297113e87.9.1723720808603;
+        Thu, 15 Aug 2024 04:20:08 -0700 (PDT)
 Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429e7bfd90bsm16608105e9.9.2024.08.15.04.20.00
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429e7987681sm17067555e9.0.2024.08.15.04.20.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Aug 2024 04:20:00 -0700 (PDT)
-Date: Thu, 15 Aug 2024 14:19:56 +0300
+        Thu, 15 Aug 2024 04:20:08 -0700 (PDT)
+Date: Thu, 15 Aug 2024 14:20:04 +0300
 From: Dan Carpenter <dan.carpenter@linaro.org>
 To: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
-Cc: Bhoomika K <bhoomikak@vayavyalabs.com>,
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	shwetar <shwetar@vayavyalabs.com>,
 	Ruud Derwig <Ruud.Derwig@synopsys.com>,
-	shwetar <shwetar@vayavyalabs.com>
-Subject: [PATCH 0/3] crypto: spacc - More Smatch fixes
-Message-ID: <df1ed763-0916-41e9-bdcf-a1a51c8ad88a@stanley.mountain>
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 1/3] crypto: spacc - Fix uninitialized variable in
+ spacc_aead_process()
+Message-ID: <74ca2a96-978d-4d22-a787-04ceaa08aff6@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -69,19 +70,44 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <0c352e73-714a-476e-8e71-eef750f22902@stanley.mountain>
 
-A few more Smatch one liner patches.
+Smatch complains that:
 
-Dan Carpenter (3):
-  crypto: spacc - Fix uninitialized variable in spacc_aead_process()
-  crypto: spacc - Fix NULL vs IS_ERR() check in spacc_aead_fallback()
-  crypto: spacc - Check for allocation failure in
-    spacc_skcipher_fallback()
+    drivers/crypto/dwc-spacc/spacc_aead.c:1031 spacc_aead_process()
+    error: uninitialized symbol 'ptaadsize'.
 
- drivers/crypto/dwc-spacc/spacc_aead.c     | 8 +++-----
- drivers/crypto/dwc-spacc/spacc_skcipher.c | 2 ++
- 2 files changed, 5 insertions(+), 5 deletions(-)
+This could happen if, for example, tctx->mode was CRYPTO_MODE_NULL and
+req->cryptlen was less than icvremove.
 
+Fixes: 06af76b46c78 ("crypto: spacc - Add SPAcc aead support")
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+---
+ drivers/crypto/dwc-spacc/spacc_aead.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/drivers/crypto/dwc-spacc/spacc_aead.c b/drivers/crypto/dwc-spacc/spacc_aead.c
+index 3468ff605957..50ef9053fc4d 100755
+--- a/drivers/crypto/dwc-spacc/spacc_aead.c
++++ b/drivers/crypto/dwc-spacc/spacc_aead.c
+@@ -823,7 +823,7 @@ static int spacc_aead_process(struct aead_request *req, u64 seq, int encrypt)
+ 	u32 dstoff;
+ 	int icvremove;
+ 	int ivaadsize;
+-	int ptaadsize;
++	int ptaadsize = 0;
+ 	int iv_to_context;
+ 	int spacc_proc_len;
+ 	u32 spacc_icv_offset = 0;
+@@ -974,8 +974,6 @@ static int spacc_aead_process(struct aead_request *req, u64 seq, int encrypt)
+ 	    tctx->mode == CRYPTO_MODE_NULL) {
+ 		if (req->cryptlen >= icvremove)
+ 			ptaadsize = req->cryptlen - icvremove;
+-	} else {
+-		ptaadsize = 0;
+ 	}
+ 
+ 	/* Calculate and set the below, important parameters
 -- 
 2.43.0
 
