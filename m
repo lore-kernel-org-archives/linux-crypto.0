@@ -1,47 +1,47 @@
 Received: from xry111.site (xry111.site [89.208.246.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E493A15D5D9
-	for <linux-crypto@vger.kernel.org>; Thu, 15 Aug 2024 13:18:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3967A19F462
+	for <linux-crypto@vger.kernel.org>; Thu, 15 Aug 2024 13:34:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.208.246.23
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723727925; cv=none; b=DKkdlXpnrxsRhqS0AsFa4WqHUbOnfkehalB54oR0XyPKY/64lOMnuAVHmjNSz7aJax0LoB6qgaJ4SVjKmu5xttRaAs217x8Ga3ogJX5y9U0iPId9NyHoSwrgHrCEqGVewGtiGdzL3ixc6glYsYX5KmwDCaMB6O2p0ksKesN2X28=
+	t=1723728870; cv=none; b=H2whdeDSO2AtAte+IUyiG6uUEw3q7vdAq/StTV8C8q8dUhjKOFs/aZY++tn9Nu+peyjYLX7KI7OG5yikExRSeAHIlWYx1WpvJVRkSSdat0vTEf/0gZHaie7DBNlVG+o/pP7O0i61C/fNDyotq8p6/Nx2vU0qan25Wnqj2JBIWNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723727925; c=relaxed/simple;
-	bh=4hzUrzKMfzOotKIdtZ/WcRr8hPE8sUsUUimVai+Neao=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VD141GtIHrUmoJhb9pCFrMrVFq4afl3BjYAQjjIC15NkGezojupLy6y8JDb40B/jh+ikbyY2XBTKt+daJlhzTmVXtzHeRfz7NdfdZoVUYUn0IjdeLkVHDoS+uC9lpZuR8Mk+XbayncVtxkugRaPVFHbpOn626pY7EZPTTqP2+M8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site; spf=pass smtp.mailfrom=xry111.site; dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b=BoU3hHlu; arc=none smtp.client-ip=89.208.246.23
+	s=arc-20240116; t=1723728870; c=relaxed/simple;
+	bh=fslrdu5Nszz2Nz8vrseap7EPSGoE/xWnEzrMHHbzYWc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dxqcB60k7nnqeB6qVJ+TVcTOftOB0sWpe5B6Pg1Hy+izsaVxqNUBy9nUDkqaQSXk77qdpyqmqZ3DUjaCI06osuGQc1LxKg1Vt38/7SPkeGLPW6Kli4Ewgjqb0niElShQfdmEW4+we1Q+t04KaFqfR32BiPlcuw65gm203iXEsSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site; spf=pass smtp.mailfrom=xry111.site; dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b=SmNbvxZw; arc=none smtp.client-ip=89.208.246.23
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xry111.site
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b="BoU3hHlu"
+	dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b="SmNbvxZw"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xry111.site;
-	s=default; t=1723727922;
-	bh=4hzUrzKMfzOotKIdtZ/WcRr8hPE8sUsUUimVai+Neao=;
+	s=default; t=1723728866;
+	bh=fslrdu5Nszz2Nz8vrseap7EPSGoE/xWnEzrMHHbzYWc=;
 	h=From:To:Cc:Subject:Date:From;
-	b=BoU3hHluVt0EeMMkZd7TORKax3TxUo7uOcm14ZjGiO6Vhuzf1uLc9s1Sxxv2zkOQP
-	 7cNeKSSJ15UgmaxQY3auoAuCHFI4qJL+JmqovaJTS1cadqq2lIoKnXAfa2iBOL9PvD
-	 ak3+eG2oGJ20IRyotUDJlsIjzbMQugHWabZXjxts=
+	b=SmNbvxZwB5DBE5kbcxTUwkb57ElQ0mKS8tNETSfpdJBL2pd0EBAFCW34DIdV8WGvP
+	 +LV0Do93mroIYO76h/HZZJVLx7OrtyQBZdNCw9XC9s1EjPfahkX7Ux1WU6EW+4v5y4
+	 6rdI6nF8K3Eo5OuBqbma+IVbUJqnPeHUXfqr6spg=
 Received: from stargazer.. (unknown [IPv6:240e:456:1030:181:abd4:6e7f:e826:ac0f])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (P-384) server-digest SHA384)
 	(Client did not present a certificate)
 	(Authenticated sender: xry111@xry111.site)
-	by xry111.site (Postfix) with ESMTPSA id BFC6E66F26;
-	Thu, 15 Aug 2024 09:18:34 -0400 (EDT)
+	by xry111.site (Postfix) with ESMTPSA id 8465566F26;
+	Thu, 15 Aug 2024 09:34:20 -0400 (EDT)
 From: Xi Ruoyao <xry111@xry111.site>
 To: "Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Huacai Chen <chenhuacai@kernel.org>,
 	WANG Xuerui <kernel@xen0n.name>
-Cc: Xi Ruoyao <xry111@xry111.site>,
-	linux-crypto@vger.kernel.org,
+Cc: linux-crypto@vger.kernel.org,
 	loongarch@lists.linux.dev,
 	Jinyang He <hejinyang@loongson.cn>,
 	Tiezhu Yang <yangtiezhu@loongson.cn>,
-	Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH 0/2] LoongArch: Implement getrandom() in vDSO
-Date: Thu, 15 Aug 2024 21:17:57 +0800
-Message-ID: <20240815131759.33302-1-xry111@xry111.site>
+	Arnd Bergmann <arnd@arndb.de>,
+	Xi Ruoyao <xry111@xry111.site>
+Subject: [PATCH v2 0/2] LoongArch: Implement getrandom() in vDSO
+Date: Thu, 15 Aug 2024 21:33:55 +0800
+Message-ID: <20240815133357.35829-1-xry111@xry111.site>
 X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -89,14 +89,10 @@ The vdso_test_getrandom bench-multi result:
 [1]:https://lore.kernel.org/all/20240712014009.281406-1-Jason@zx2c4.com/
 [2]:https://github.com/xry111/linux/commits/xry111/la-vdso/
 
-Cc: linux-crypto@vger.kernel.org
-Cc: loongarch@lists.linux.dev
-Cc: Jason A. Donenfeld <Jason@zx2c4.com>
-Cc: Huacai Chen <chenhuacai@kernel.org>
-Cc: WANG Xuerui <kernel@xen0n.name>
-Cc: Jinyang He <hejinyang@loongson.cn>
-Cc: Tiezhu Yang <yangtiezhu@loongson.cn>
-Cc: Arnd Bergmann <arnd@arndb.de>
+v1->v2: Remove Cc: lists in the cover letter and just type them in git
+send-email command.  I assumed the Cc: lists in the cover letter would be
+"propagated" to the patches by git send-email but I was wrong, so v1 was
+never properly delivered to the lists.
 
 Xi Ruoyao (2):
   LoongArch: Perform alternative runtime patching on vDSO
