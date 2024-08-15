@@ -1,53 +1,53 @@
 Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E3001C9EBB;
-	Thu, 15 Aug 2024 08:57:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E3991C9EC6;
+	Thu, 15 Aug 2024 08:57:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723712278; cv=none; b=HIXMNUgdamoKT/2WDZwJh2Vdw4/eH7C2rD29Awosu9GQkaHlsS0LtWXZL0X1wQlbnQ+HBL+jeuxCCeyuGqVQavK7+MzedD4W9LiVTG4PjI7Le4UV82yRwOkrzJd/Zee5PwVpNo9dLZikCJvWREVbX63uYtrVF1X2aaZ1wK93trw=
+	t=1723712279; cv=none; b=ddyxB5VdLkUBIOnP+8vu5weYhNGpGf6A21IWeQ0yhtsqhEmMEU1e/5MmeUdfSiU1IxzhLzp+E0E1UcREpxGtlM6SQl2pqgMppiK/BYFcvndj7XLEYsjF1qoizDpApaFv08qkmsHE/Y+MECcqd/XE4VBi2tgCzV3urCCKnDuEHAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723712278; c=relaxed/simple;
-	bh=2yRMZCl2RljoEQN5hXEYOaWxKeYD2cbufrF78j4PKDY=;
+	s=arc-20240116; t=1723712279; c=relaxed/simple;
+	bh=7l6wGQ98HpBbyXQeXaA1zEMxmFdw15AbADVhA9ODIsI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=rD0A9dZNaGWIK6VAwvEFCea1iEnysCa3UeorCjD+M0aDmGTgR2VP3WP5GQDt9G9g0ntcIFlI3cMwvjDQ3ThIsCNJPPt6s/oO601wBRl9F7Z1+F4cw4BDFIT+tvDZV9JIEAh6o6iNaQeliefHMwJseOxiJbuMB51b1uoQ9jDxiEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=K03kZdjQ; arc=none smtp.client-ip=205.220.180.131
+	 MIME-Version; b=NGOXjZF8SqTqCyZJVWSD/4E8GWfO5939idU95HrutPiQWnu6l9sNtSIIxi5RQFasEBU++aqTR3c/H/H/5WH1Fjlfj1uG9d5JpoZz5iHmldo9RtUmQGfW0ZCyCzvwktDi1HJmwRhSmjqWwiI+5EsZQBnK4mLkOjd7OLQPrNLwI34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=A4xYLb0B; arc=none smtp.client-ip=205.220.180.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="K03kZdjQ"
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47F7H4HA027983;
-	Thu, 15 Aug 2024 08:57:34 GMT
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="A4xYLb0B"
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47EN9r1t027657;
+	Thu, 15 Aug 2024 08:57:33 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
 	cc:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=qcppdkim1; bh=l5/Sou69fVu
-	Oc8aikx7562hWjh4VsmqAChQUaywmypk=; b=K03kZdjQYLx8R70THUb9M8Wkc1Y
-	UVgTBdsQ9BDbya3KdIOr8H1YglOkvJJLTIaR3i48jGR/Rwk2LpXv1xCd6BR8/f9h
-	fZhmqJ2cwEShMODZdRM8jEJ37899iWK7RmeT6fSgyg2Ndk8c2uSsPDFvHi4irzZO
-	3FcKseA9CmF1DwWas8AfKgqB3UKO98thbia/TVIioVSju2m9RbmHT9M/TGEORugN
-	MoJO1/XCncKBMl84DN9SJupffJVOwsvSCszfJp068nyVz4jbPf0R7jId6mQ1n6CS
-	x05iUpTObOGn7Wa7PSjz+STIpWrtITb/wPCEvEeJPfX8hgaBkTXhDqlYsMg==
+	:mime-version:references:subject:to; s=qcppdkim1; bh=m7Xggm7ZIW4
+	WehkFh4oxlkRKXpkz8aAItTBbl9RctsA=; b=A4xYLb0BOKKQ84FcGw6wikF53nO
+	tGe5pzJrP6uQM2cWWRgosonBTd/q154ziowEeq5JB7LYJUSaTWKmsT9Cr54l/OzS
+	S67/RWQeMcfwkwqyZlyAdKvayd3kcAURoUOS8OIZMOjWMC1n4zdwCwR0bpaN+5jI
+	h7oZrM6t+doQCGgoZNxGW8AENCqKQM/vlTxXJM8LCMaHcYWoAfA6tOHpl6TCnYXv
+	nYDZ5kja85rWZvy7Edvf/DuxFINqDKHVIog+pi+mVhEZlp4F3Fe+E9/flJdAVy/J
+	2H3Nv9uVy0wSVVXS2B4Ropuq0uuRyCgtd6SwVMAvahdW751rOPY5aoDZHQw==
 Received: from apblrppmta02.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com [103.229.18.19])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 411d5688pe-1
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 40x3etdq3v-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 15 Aug 2024 08:57:34 +0000 (GMT)
+	Thu, 15 Aug 2024 08:57:32 +0000 (GMT)
 Received: from pps.filterd (APBLRPPMTA02.qualcomm.com [127.0.0.1])
-	by APBLRPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 47F8tDTj027535;
-	Thu, 15 Aug 2024 08:57:30 GMT
+	by APBLRPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 47F8u85x028275;
+	Thu, 15 Aug 2024 08:57:29 GMT
 Received: from pps.reinject (localhost [127.0.0.1])
-	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTPS id 40xkmhennr-1
+	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTPS id 40xkmhenmp-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 15 Aug 2024 08:57:30 +0000
+	Thu, 15 Aug 2024 08:57:29 +0000
 Received: from APBLRPPMTA02.qualcomm.com (APBLRPPMTA02.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 47F8vUBw029711;
-	Thu, 15 Aug 2024 08:57:30 GMT
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 47F8vSVu029647;
+	Thu, 15 Aug 2024 08:57:28 GMT
 Received: from hu-devc-blr-u22-a.qualcomm.com (hu-mdalam-blr.qualcomm.com [10.131.36.157])
-	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTPS id 47F8vTvw029694
+	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTPS id 47F8vSEm029640
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 15 Aug 2024 08:57:30 +0000
+	Thu, 15 Aug 2024 08:57:28 +0000
 Received: by hu-devc-blr-u22-a.qualcomm.com (Postfix, from userid 466583)
-	id A5857417F0; Thu, 15 Aug 2024 14:27:27 +0530 (+0530)
+	id 8F6CB411DA; Thu, 15 Aug 2024 14:27:27 +0530 (+0530)
 From: Md Sadre Alam <quic_mdalam@quicinc.com>
 To: vkoul@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
         andersson@kernel.org, konradybcio@kernel.org, thara.gopinath@gmail.com,
@@ -58,9 +58,9 @@ To: vkoul@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
         linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
 Cc: quic_srichara@quicinc.com, quic_varada@quicinc.com,
         quic_mdalam@quicinc.com, quic_utiwari@quicinc.com
-Subject: [PATCH v2 07/16] crypto: qce - Convert register r/w for sha via BAM/DMA
-Date: Thu, 15 Aug 2024 14:27:16 +0530
-Message-Id: <20240815085725.2740390-8-quic_mdalam@quicinc.com>
+Subject: [PATCH v2 01/16] dt-bindings: dma: qcom,bam: Add bam pipe lock
+Date: Thu, 15 Aug 2024 14:27:10 +0530
+Message-Id: <20240815085725.2740390-2-quic_mdalam@quicinc.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240815085725.2740390-1-quic_mdalam@quicinc.com>
 References: <20240815085725.2740390-1-quic_mdalam@quicinc.com>
@@ -75,95 +75,64 @@ X-QCInternal: smtphost
 X-QCInternal: smtphost
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: ii5zmbULCk8_n2aWUZ3JCupe2zD-y7nC
-X-Proofpoint-ORIG-GUID: ii5zmbULCk8_n2aWUZ3JCupe2zD-y7nC
+X-Proofpoint-GUID: dPzDTXje2zgTCvSf6rea3MW84dL_nyi4
+X-Proofpoint-ORIG-GUID: dPzDTXje2zgTCvSf6rea3MW84dL_nyi4
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
  definitions=2024-08-15_01,2024-08-13_02,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- malwarescore=0 impostorscore=0 mlxscore=0 lowpriorityscore=0 spamscore=0
- suspectscore=0 bulkscore=0 clxscore=1015 phishscore=0 priorityscore=1501
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2407110000 definitions=main-2408150064
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
+ suspectscore=0 impostorscore=0 phishscore=0 clxscore=1015 mlxlogscore=999
+ lowpriorityscore=0 priorityscore=1501 spamscore=0 adultscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2407110000
+ definitions=main-2408150064
 
-Convert register read/write for sha via BAM/DMA.
-with this change all the crypto register configuration
-will be done via BAM/DMA. This change will prepare command
-descriptor for all register and write it once.
+BAM having pipe locking mechanism. The Lock and Un-Lock bit
+should be set on CMD descriptor only. Upon encountering a
+descriptor with Lock bit set, the BAM will lock all other
+pipes not related to the current pipe group, and keep
+handling the current pipe only until it sees the Un-Lock
+set.
 
 Signed-off-by: Md Sadre Alam <quic_mdalam@quicinc.com>
 ---
 
 Change in [v2]
 
-* No change
+* Added initial support for dt-binding
 
 Change in [v1]
 
-* Added initial support for register read/write via bam 
-  for SHA
+* This patch was not included in [v1]
 
- drivers/crypto/qce/common.c | 26 +++++++++++++++++---------
- 1 file changed, 17 insertions(+), 9 deletions(-)
+ Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/drivers/crypto/qce/common.c b/drivers/crypto/qce/common.c
-index d1da6b1938f3..d485762a3fdc 100644
---- a/drivers/crypto/qce/common.c
-+++ b/drivers/crypto/qce/common.c
-@@ -157,17 +157,19 @@ static int qce_setup_regs_ahash(struct crypto_async_request *async_req)
- 	__be32 mackey[QCE_SHA_HMAC_KEY_SIZE / sizeof(__be32)] = {0};
- 	u32 auth_cfg = 0, config;
- 	unsigned int iv_words;
-+	int ret;
+diff --git a/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml b/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml
+index 3ad0d9b1fbc5..91cc2942aa62 100644
+--- a/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml
++++ b/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml
+@@ -77,6 +77,12 @@ properties:
+       Indicates that the bam is powered up by a remote processor but must be
+       initialized by the local processor.
  
- 	/* if not the last, the size has to be on the block boundary */
- 	if (!rctx->last_blk && req->nbytes % blocksize)
- 		return -EINVAL;
- 
-+	qce_clear_bam_transaction(qce);
- 	qce_setup_config(qce);
- 
- 	if (IS_CMAC(rctx->flags)) {
--		qce_write(qce, REG_AUTH_SEG_CFG, 0);
--		qce_write(qce, REG_ENCR_SEG_CFG, 0);
--		qce_write(qce, REG_ENCR_SEG_SIZE, 0);
-+		qce_write_reg_dma(qce, REG_AUTH_SEG_CFG, 0, 1);
-+		qce_write_reg_dma(qce, REG_ENCR_SEG_CFG, 0, 1);
-+		qce_write_reg_dma(qce, REG_ENCR_SEG_SIZE, 0, 1);
- 		qce_clear_array(qce, REG_AUTH_IV0, 16);
- 		qce_clear_array(qce, REG_AUTH_KEY0, 16);
- 		qce_clear_array(qce, REG_AUTH_BYTECNT0, 4);
-@@ -213,18 +215,24 @@ static int qce_setup_regs_ahash(struct crypto_async_request *async_req)
- 		auth_cfg &= ~BIT(AUTH_FIRST_SHIFT);
- 
- go_proc:
--	qce_write(qce, REG_AUTH_SEG_CFG, auth_cfg);
--	qce_write(qce, REG_AUTH_SEG_SIZE, req->nbytes);
--	qce_write(qce, REG_AUTH_SEG_START, 0);
--	qce_write(qce, REG_ENCR_SEG_CFG, 0);
--	qce_write(qce, REG_SEG_SIZE, req->nbytes);
-+	qce_write_reg_dma(qce, REG_AUTH_SEG_CFG, auth_cfg, 1);
-+	qce_write_reg_dma(qce, REG_AUTH_SEG_SIZE, req->nbytes, 1);
-+	qce_write_reg_dma(qce, REG_AUTH_SEG_START, 0, 1);
-+	qce_write_reg_dma(qce, REG_ENCR_SEG_CFG, 0, 1);
-+	qce_write_reg_dma(qce, REG_SEG_SIZE, req->nbytes, 1);
- 
- 	/* get little endianness */
- 	config = qce_config_reg(qce, 1);
--	qce_write(qce, REG_CONFIG, config);
-+	qce_write_reg_dma(qce, REG_CONFIG, config, 1);
- 
- 	qce_crypto_go(qce, true);
- 
-+	ret = qce_submit_cmd_desc(qce, 0);
-+	if (ret) {
-+		dev_err(qce->dev, "Error in sha cmd descriptor\n");
-+		return ret;
-+	}
++  qcom,bam_pipe_lock:
++    type: boolean
++    description:
++      Indicates that the bam pipe needs locking or not based on client driver
++      sending the LOCK or UNLOK bit set on command descriptor.
 +
- 	return 0;
- }
- #endif
+   reg:
+     maxItems: 1
+ 
+@@ -92,6 +98,8 @@ anyOf:
+       - qcom,powered-remotely
+   - required:
+       - qcom,controlled-remotely
++  - required:
++      - qcom,bam_pipe_lock
+   - required:
+       - clocks
+       - clock-names
 -- 
 2.34.1
 
