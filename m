@@ -1,152 +1,107 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mail02.rohde-schwarz.com (mail02.rohde-schwarz.com [80.246.32.97])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FEF21684AC;
-	Thu, 15 Aug 2024 09:02:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFB417DA69;
+	Thu, 15 Aug 2024 09:38:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.246.32.97
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723712566; cv=none; b=rGBBfQEWyjdQt2WlHBvW2OEY/dICfejAKl0aW3hik9Gw/0++LMaFwNeLaaq64U5ye0/dWcyjsv9Y5OLH2kAsF04GEljBlClswAuBXewZbEwie4dEmgQl3Y1XKzh8fJi1oBI1UeBDW3KmKWsRj/Z6spAo4QlIMbzlgG2wV2uC4sU=
+	t=1723714732; cv=none; b=S7AM1J5ySEXmOPodfK/7KQqUwCAd5rgl8XK7p3tUaM+GXcc3yskZ+X6oJGEvnQGnLSZqYSL4STugQ3NzXmVV5oa/zQwjgV1x4Bvs2URbkGg+swx/stHlY1byKYU8ei8AOdHlItQXXkVnUdovxvRjwJ/mxDejFTaeMyjdNihsXV8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723712566; c=relaxed/simple;
-	bh=YjSqiA7/QVLf25LwcJfb9dB8HqlVkkV9IyQB9ZLnEGc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LM6vUmwBsqKTb8PF/NfTcQBbfaedc6lzBIOSggYtNE7XwyTVZoKcQcPTqzyqt4MAbLeLaUi5IkmPbogUPVIMLaMCAxcJaXFypxQu/LNDV8hGpuvna1nQoClSEV/vvJzJfQuY25uBA7hwXcMeQgW9Gy2IDDzPs34YuB2tAtepum8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=YeCrQwzQ; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="YeCrQwzQ"
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47ENHGbN001557;
-	Thu, 15 Aug 2024 08:57:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=qcppdkim1; bh=IjbkWi5kX00E+MSOryd9RKDwP/mZ52uqdmY
-	550VUK4s=; b=YeCrQwzQuBbkaTD01WChDrtFoM166clfvjukRBaWAAso/CKRLOo
-	vY9RgDYwup/bWd6/w+axGdpdvhjyJAaa2Qc0OqAXsxeUPOKi7H9NDo0+YM2R8rcH
-	4Jm1EzdCv+bWGWRbq+dlvaIevCZh7peOkyqp5FI+H20LLs+rtHc1KjwMwxYo+q7n
-	VVuEsQuqcxIzqzVPiT2zYljp2d75w6ulsXTBdHr0NutXQ7r23hmbUjEXr1pQZyrD
-	BEiXwotc7Gr/ARK6yPNzjTFd52uZYvNHcO/QNUhUt73O3lO6IUeUuLMnY3hPV0tQ
-	QgyT0K6QZ4/zxekImldpfLcGbLg8Tp3DlLg==
-Received: from apblrppmta02.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com [103.229.18.19])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 410437xysa-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 15 Aug 2024 08:57:32 +0000 (GMT)
-Received: from pps.filterd (APBLRPPMTA02.qualcomm.com [127.0.0.1])
-	by APBLRPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTP id 47F8sTNQ025255;
-	Thu, 15 Aug 2024 08:57:29 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTPS id 40xkmhenmq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 15 Aug 2024 08:57:29 +0000
-Received: from APBLRPPMTA02.qualcomm.com (APBLRPPMTA02.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 47F8vSMr029648;
-	Thu, 15 Aug 2024 08:57:28 GMT
-Received: from hu-devc-blr-u22-a.qualcomm.com (hu-mdalam-blr.qualcomm.com [10.131.36.157])
-	by APBLRPPMTA02.qualcomm.com (PPS) with ESMTPS id 47F8vSUK029642
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 15 Aug 2024 08:57:28 +0000
-Received: by hu-devc-blr-u22-a.qualcomm.com (Postfix, from userid 466583)
-	id 8BB644117A; Thu, 15 Aug 2024 14:27:27 +0530 (+0530)
-From: Md Sadre Alam <quic_mdalam@quicinc.com>
-To: vkoul@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
-        andersson@kernel.org, konradybcio@kernel.org, thara.gopinath@gmail.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        gustavoars@kernel.org, u.kleine-koenig@pengutronix.de, kees@kernel.org,
-        agross@kernel.org, linux-arm-msm@vger.kernel.org,
-        dmaengine@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Cc: quic_srichara@quicinc.com, quic_varada@quicinc.com,
-        quic_mdalam@quicinc.com, quic_utiwari@quicinc.com
-Subject: [PATCH v2 00/16] Add cmd descriptor support
-Date: Thu, 15 Aug 2024 14:27:09 +0530
-Message-Id: <20240815085725.2740390-1-quic_mdalam@quicinc.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1723714732; c=relaxed/simple;
+	bh=exZPANPQYNHESUMA8nzYYPjJNdOMyxngR0lhlAm2x44=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=nzGSl8SPhlGqPs3WxyIM6FkX54g9WemvKRduxJY8rYY81dID9cTO4aD4nu2qd73mLdg1/As7RF4VnBYPf+uLUsjKGcVbSZUyw3iBU0UfCsSDLdiTh0NhbgCrtc20Wg0zDZcPmRTMctqKL7IgpplKg90u0hOBEll55VK4dPCxwrs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rohde-schwarz.com; spf=pass smtp.mailfrom=rohde-schwarz.com; arc=none smtp.client-ip=80.246.32.97
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rohde-schwarz.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rohde-schwarz.com
+Received: from amu316.rsint.net (10.0.19.27) by mail02.rohde-schwarz.com
+ (172.21.64.152) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.34; Thu, 15 Aug
+ 2024 11:38:40 +0200
+Received: from GMU452.rsint.net ([10.0.225.105])
+          by amu316.rsint.net (Totemo SMTP Server) with SMTP ID 562;
+          Thu, 15 Aug 2024 11:38:40 +0200 (CEST)
+Received: from GMU504.rsint.net (10.0.225.36) by GMU452.rsint.net
+ (10.0.225.105) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.34; Thu, 15 Aug
+ 2024 11:38:40 +0200
+Received: from GMU503.rsint.net (10.0.225.35) by GMU504.rsint.net
+ (10.0.225.36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.34; Thu, 15 Aug
+ 2024 11:38:36 +0200
+Received: from GMU503.rsint.net ([fe80::957e:76:e488:c60d]) by
+ GMU503.rsint.net ([fe80::957e:76:e488:c60d%4]) with mapi id 15.02.1258.034;
+ Thu, 15 Aug 2024 11:38:36 +0200
+From: VanGiang Nguyen <vangiang.nguyen@rohde-schwarz.com>
+To: "steffen.klassert@secunet.com" <steffen.klassert@secunet.com>,
+	"daniel.m.jordan@oracle.com" <daniel.m.jordan@oracle.com>
+CC: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: [PATCH v2] padata: use integer wrap around to prevent deadlock on
+ seq_nr overflow
+Thread-Index: AQHa7vbmBiWPqu6VjE+ESlTCdwzyZg==
+Date: Thu, 15 Aug 2024 09:38:36 +0000
+Message-ID: <370458fcfbbd452381ad0f8787293455@rohde-schwarz.com>
+References: <a16995232eda4d39812f4bd94d9fb846@rohde-schwarz.com>
+In-Reply-To: <a16995232eda4d39812f4bd94d9fb846@rohde-schwarz.com>
+Accept-Language: de-DE, en-US
+Content-Language: de-DE
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: df4jEv_9SsajWUuB6skBt_37TqV9FpTa
-X-Proofpoint-GUID: df4jEv_9SsajWUuB6skBt_37TqV9FpTa
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-15_01,2024-08-13_02,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 clxscore=1015
- mlxlogscore=850 malwarescore=0 lowpriorityscore=0 phishscore=0 spamscore=0
- bulkscore=0 suspectscore=0 adultscore=0 mlxscore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2407110000
- definitions=main-2408150064
+X-IQAV: YES
+thread-topic: [PATCH v2] padata: use integer wrap around to prevent deadlock on seq_nr overflow /ur/
+X-rus_sensitivity: 10
+msip_labels: MSIP_Label_9764cdcd-3664-4d05-9615-7cbf65a4f0a8_Enabled=true; MSIP_Label_9764cdcd-3664-4d05-9615-7cbf65a4f0a8_SetDate=2024-08-15T11:38:40Z; MSIP_Label_9764cdcd-3664-4d05-9615-7cbf65a4f0a8_Method=Privileged; MSIP_Label_9764cdcd-3664-4d05-9615-7cbf65a4f0a8_Name=UNRESTRICTED; MSIP_Label_9764cdcd-3664-4d05-9615-7cbf65a4f0a8_SiteId=74bddbd9-705c-456e-aabd-99beb719a2b2; MSIP_Label_9764cdcd-3664-4d05-9615-7cbf65a4f0a8_ActionId=8b69e117-7756-4ef8-b52e-ebe0297deaf4; MSIP_Label_9764cdcd-3664-4d05-9615-7cbf65a4f0a8_ContentBits=1
+X-GBS-PROC: dRCQSVjCk7Qx8mr9czr5fRjIHEA8CC2Wd/bFf6fJm7z9iHxUTaznMFWagZkg0fa7T4nn3F8HW+l+s4ohwJoZyUo4VtkbAmOKpGv0/+ElS0FNfJ1Dtx8w8uBSCLp8KGwQ
+X-GBS-PROCJOB: buzKt0rMdTzr5vYVJ1GuM5uACJ2qtSjCglomb5PQhjZYlFR4NpLLPciCAWpdd5BO
 
-This series of patches will add command descriptor
-support to read/write crypto engine register via
-BAM/DMA
+When submitting more than 2^32 padata objects to padata_do_serial, the
+current sorting implementation incorrectly sorts padata objects with
+overflowed seq_nr, causing them to be placed before existing objects in
+the reorder list. This leads to a deadlock in the serialization process
+as padata_find_next cannot match padata->seq_nr and pd->processed
+because the padata instance with overflowed seq_nr will be selected
+next.
 
-We need this support because if there is multiple EE's
-(Execution Environment) accessing the same CE then there
-will be race condition. To avoid this race condition
-BAM HW hsving LOC/UNLOCK feature on BAM pipes and this
-LOCK/UNLOCK will be set via command descriptor only.
+To fix this, we use an unsigned integer wrap around to correctly sort
+padata objects in scenarios with integer overflow.
 
-Since each EE's having their dedicated BAM pipe, BAM allows
-Locking and Unlocking on BAM pipe. So if one EE's requesting
-for CE5 access then that EE's first has to LOCK the BAM pipe
-while setting LOCK bit on command descriptor and then access
-it. After finishing the request EE's has to UNLOCK the BAM pipe
-so in this way we race condition will not happen.
+Fixes: bfde23ce200e ("padata: unbind parallel jobs from specific CPUs")
 
-tested with "tcrypt.ko" and "kcapi" tool.
+Co-developed-by: Christian Gafert <christian.gafert@rohde-schwarz.com>
+Signed-off-by: Christian Gafert <christian.gafert@rohde-schwarz.com>
+Co-developed-by: Max Ferger <max.ferger@rohde-schwarz.com>
+Signed-off-by: Max Ferger <max.ferger@rohde-schwarz.com>
+Signed-off-by: Van Giang Nguyen <vangiang.nguyen@rohde-schwarz.com>
+Acked-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+---
+v2: include Fixes tag and Daniel's Acked-by tag
+v1: https://lore.kernel.org/a16995232eda4d39812f4bd94d9fb846@rohde-schwarz.=
+com
+ kernel/padata.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Need help to test these all the patches on msm platform
-
-v2:
- * Addressed all the comments from v1
- * Added the dt-binding
- * Added locking/unlocking mechanism in bam driver
-
-v1:
- * https://lore.kernel.org/lkml/20231214114239.2635325-1-quic_mdalam@quicinc.com/
- * Initial set of patches for cmd descriptor support
-
-Md Sadre Alam (16):
-  dt-bindings: dma: qcom,bam: Add bam pipe lock
-  dmaengine: qcom: bam_dma: add bam_pipe_lock dt property
-  dmaengine: qcom: bam_dma: add LOCK & UNLOCK flag support
-  crypto: qce - Add support for crypto address read
-  crypto: qce - Add bam dma support for crypto register r/w
-  crypto: qce - Convert register r/w for skcipher via BAM/DMA
-  crypto: qce - Convert register r/w for sha via BAM/DMA
-  crypto: qce - Convert register r/w for aead via BAM/DMA
-  crypto: qce - Add LOCK and UNLOCK flag support
-  crypto: qce - Add support for lock aquire,lock release api.
-  crypto: qce - Add support for lock/unlock in skcipher
-  crypto: qce - Add support for lock/unlock in sha
-  crypto: qce - Add support for lock/unlock in aead
-  arm64: dts: qcom: ipq9574: enable bam pipe locking/unlocking
-  arm64: dts: qcom: ipq8074: enable bam pipe locking/unlocking
-  arm64: dts: qcom: ipq6018: enable bam pipe locking/unlocking
-
- .../devicetree/bindings/dma/qcom,bam-dma.yaml |   8 +
- arch/arm64/boot/dts/qcom/ipq6018.dtsi         |   1 +
- arch/arm64/boot/dts/qcom/ipq8074.dtsi         |   1 +
- arch/arm64/boot/dts/qcom/ipq9574.dtsi         |   1 +
- drivers/crypto/qce/aead.c                     |   4 +
- drivers/crypto/qce/common.c                   | 142 +++++++----
- drivers/crypto/qce/core.c                     |  13 +-
- drivers/crypto/qce/core.h                     |  12 +
- drivers/crypto/qce/dma.c                      | 232 ++++++++++++++++++
- drivers/crypto/qce/dma.h                      |  26 +-
- drivers/crypto/qce/sha.c                      |   4 +
- drivers/crypto/qce/skcipher.c                 |   4 +
- drivers/dma/qcom/bam_dma.c                    |  14 +-
- include/linux/dmaengine.h                     |   6 +
- 14 files changed, 424 insertions(+), 44 deletions(-)
-
--- 
+diff --git a/kernel/padata.c b/kernel/padata.c
+index 53f4bc912712..222bccd0c96b 100644
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -404,7 +404,8 @@ void padata_do_serial(struct padata_priv *padata)
+ =09/* Sort in ascending order of sequence number. */
+ =09list_for_each_prev(pos, &reorder->list) {
+ =09=09cur =3D list_entry(pos, struct padata_priv, list);
+-=09=09if (cur->seq_nr < padata->seq_nr)
++=09=09/* Compare by difference to consider integer wrap around */
++=09=09if ((signed int)(cur->seq_nr - padata->seq_nr) < 0)
+ =09=09=09break;
+ =09}
+ =09list_add(&padata->list, pos);
+--=20
 2.34.1
-
