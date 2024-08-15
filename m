@@ -1,98 +1,200 @@
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2049.outbound.protection.outlook.com [40.107.236.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D78AB7DA72
-	for <linux-crypto@vger.kernel.org>; Thu, 15 Aug 2024 11:20:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723720828; cv=none; b=MFsiT/2H5dmlfY6f+wO+KECh3B+fXw1Veff+8pX7BbG0yoDZxHRc5yBHg6xYG49aTuGJNWLZwIkKFoFWGFG0nIxLg9xD095WBsF599O/+syZmWcNaQ2qB9Pwh7SSJ+M08Vo0cCKvaHEYyu/ncsBbc2I5tl0geRaRt6BdidEFrgk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723720828; c=relaxed/simple;
-	bh=HxwqfPal+HPnTS7U68L/EgIg3QGgE3PaIdmgWW1fsUI=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=fNrFxTCDUCOFST45tfBKYGB1uQJ4QZDdqlwoouyomN1xElQcoIE1e457QSFPcPBA9RWfuOcVxtYjr7+jGe/T/kyUfSKE1fKJBfJ4MboLy18STfjZHtPJNzlZYfJoiQogysilaU1JlcMDvHNKNesf6Bg7CXW567Q000BH/my92pc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=hFsYbilS; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11A2E2770B;
+	Thu, 15 Aug 2024 12:25:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723724716; cv=fail; b=ncxNXB6o2dhKIsKKkdwlc+8AwmAoqfBQbgZqSqK3lNtSdgj/ncaX1HEho4dawR6DPFMHitVqvB62o9YMkpYT8p8SYVRGuLqJP+PBCLU6EIfz6sbH2NDP3tYK4QE6omi9ZqY5zWo9dJcVXvhswdSR3qi2z2u3Q5tbJa4wtNdEGn0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723724716; c=relaxed/simple;
+	bh=PsePS7dpY+2WEGBE0YYNH8SPNwij5yx8y1qkJ6au874=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hQ+EGSFj/e+FQvS5LQgiqV1yQfvv4q4YDN+kmbLCYYLh2zbgoXfUJPp35VU/TGWpsnLS3J1f8wwtmmTyGxpxqNxLOg8XwG9fWO0tAoXLsiJHIt1UEz8hY4lhwCAObQ+1H2xaRIeJu9xh1kU4+KmomaP8t71FSpQhhALWE1EUbbY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ekowyMzk; arc=fail smtp.client-ip=40.107.236.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hFsYbilS"
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3717de33d58so457924f8f.1
-        for <linux-crypto@vger.kernel.org>; Thu, 15 Aug 2024 04:20:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1723720825; x=1724325625; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3oz0pMrv8IB6uL3g45VQLGPvoAVDEFZ62Di96CP+YN8=;
-        b=hFsYbilSkn2+G8hqXmr5f+XljEDJuPAUaBUpv1KfN/Px+BgYc7MTg6fnw6ElAyfAMu
-         mBZaTAfKtjXJ2FAujNegPtRvS8xo7uT8YFgFIUmtb/A+rFvURX1nP4+IVKz9tuLO06FD
-         MHfE5npycI5q4Pf7sf4nFJCZ2pZtY+xKSmkLN5oxq3Il5685zI4WAVBcfCYuqcRi6Fbs
-         FNISH7SF+oexHCqcIu7I/ZWyhigfM286VssbkOCu3XdteJyhsGJOP99T14K2KZ2QS+d9
-         oXS5XcHnISt4qELYF2Cb6tJvXtbaNLifAbCCsoB2+5B6l68+g/QvCsWPfgOmdRQwbKMa
-         rEJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723720825; x=1724325625;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3oz0pMrv8IB6uL3g45VQLGPvoAVDEFZ62Di96CP+YN8=;
-        b=ElVTi76+fEAhrVmpkn30kTV19D39Mof/WULDmDJDtE7pDX/2h3qIb2wjddiOs3N19+
-         6IfelC4DNUTsGln4dyN1XdyoF5FTevWnwmL3284PotuY3ewbJB3gGvVRB6+9S7Bt+faR
-         qx3J7YpN6SP6sUzShcYNO75IKy6umbzRnLmZRimircTY7TAsEC2j6//vjYKEv7BWpBzb
-         DgVDLDOOhKKzNl/zyl06cy3vDuDWC9xHkHTKg6ntUNDQfLpS6uZcxjmZqrQng9KrGzGL
-         r+N+4oaTsj/ileMzTZJHUbk9uxMjqZlD4JEGkwqvsvNobzKsgvOyXP059ZTXZrzVtGCd
-         ZJKA==
-X-Forwarded-Encrypted: i=1; AJvYcCWief1cJ3NAdKEOp6iDK2VGEqQpA1xslO46M31fVuxi2aMO+RkIP1PpFGMrOL+KVai2ots8ir1pr2H7uzFexb9NzTsweVNMeBBltNyo
-X-Gm-Message-State: AOJu0Yx2Wz6Gnm8JL9Od7mj8duPn2UKj7EreqtE7JIGiy9KcK4Hfs4ss
-	Qh72ycfscHNoLzpjL2VkwEzeDaJ9DPr+RcFskuhE3eGX9dpdF2zTBFULKIc7Xos=
-X-Google-Smtp-Source: AGHT+IEtSZncKJsrNhscDuBg2ooT2R3yBeExJ8WkgH59BQVHeShDTmQBJQR5acthD/BW5B0kKMMQEw==
-X-Received: by 2002:a5d:5f45:0:b0:367:35d7:bf11 with SMTP id ffacd0b85a97d-371777968d8mr4691884f8f.25.1723720825209;
-        Thu, 15 Aug 2024 04:20:25 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37189897029sm1246243f8f.74.2024.08.15.04.20.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Aug 2024 04:20:24 -0700 (PDT)
-Date: Thu, 15 Aug 2024 14:20:20 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Bhoomika K <bhoomikak@vayavyalabs.com>,
-	Ruud Derwig <Ruud.Derwig@synopsys.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 3/3] crypto: spacc - Check for allocation failure in
- spacc_skcipher_fallback()
-Message-ID: <2d0fd293-31a0-4116-a3ed-5e259864e561@stanley.mountain>
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ekowyMzk"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=SqKACufOo14tWxxHYD47mgwXbeZTD01ntSxflgOhW4pH2dxCZvCs5z7pXXrtSziroum53xGRAiiQTRdcIauZkZFjt07ZrVVsnisMj9FpmXtgJsk7YCjQH2m9ATxoDCm0I/p2bR1Y2CC6drworvnAavKWR2f89SSpsNOsweMYzA6yxf+0Lp1PxAVKVolfVXbAPLMMoYLCKWZkdTOylIZ9unnXCaoE8IMUlJOipI4BrP/mRSQqpsqpaO+AxoGW5tJ/pqIoSp/20twdu3tY9LH3D8T2maSoXtUaGgR31FTWs5T2FN9kpjEKP/EPtLmvyBf2oubEKlqUSpZ35IM5TSl+/g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZktDFB3FIrzfEljB4wpfp6PE8alaIPeW71EYv/KPEQo=;
+ b=SRFLIz1wbnEh9hviWPT2Ipuor+F0Rx/c0oMwB+N5fPuhGxQIisbQaUJ+ztzk/7Vyy/0y/H7465jHr/6MsHl9PLJXz5iFEbQ4Mctji7dXOLpEq3Zqw7tM7fONtbNAp+VQuhy6dV155HStHsJoByR+aElCYqshmqbVfpUYsGYmFWyUbXGUHkjCb+esx/MTG6yfvBcQ/DnPrwSioBTQFigOIfGGmkylTgCde/q+2xfeJEpbBT5yDdfdDX14zoWiaOeJIpsKwHY/m6FUnKKljfGUe4k4CS+uIklgJogsWcVVLr3ds2j/H54SmiPzG/gymfUlD6jlD27tlxgXtv3aBuMamA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZktDFB3FIrzfEljB4wpfp6PE8alaIPeW71EYv/KPEQo=;
+ b=ekowyMzkcWkKL++8CMOr813nvIMTRDAZbKFEnPINglN7uJU/ZncM0mPP0bDzEpUxfqRuyflOrZBdsnNaZeHFgVgDDHDY+Nxc0lSff7FlKQhNDAW4P2+Pm0hh36LbrutxUkTZLObpI+frFS8qFDww+pqP/GOLDj69SoqFpjW9T4w=
+Received: from MN2PR16CA0048.namprd16.prod.outlook.com (2603:10b6:208:234::17)
+ by SA1PR12MB8965.namprd12.prod.outlook.com (2603:10b6:806:38d::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.20; Thu, 15 Aug
+ 2024 12:25:09 +0000
+Received: from BL6PEPF00020E64.namprd04.prod.outlook.com
+ (2603:10b6:208:234:cafe::9f) by MN2PR16CA0048.outlook.office365.com
+ (2603:10b6:208:234::17) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.23 via Frontend
+ Transport; Thu, 15 Aug 2024 12:25:08 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BL6PEPF00020E64.mail.protection.outlook.com (10.167.249.25) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7849.8 via Frontend Transport; Thu, 15 Aug 2024 12:25:08 +0000
+Received: from ethanolx16dchost.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 15 Aug
+ 2024 07:25:08 -0500
+From: Pavan Kumar Paluri <papaluri@amd.com>
+To: <linux-crypto@vger.kernel.org>
+CC: <linux-kernel@vger.kernel.org>, Tom Lendacky <thomas.lendacky@amd.com>,
+	Ashish Kalra <ashish.kalra@amd.com>, John Allen <john.allen@amd.com>,
+	"Herbert Xu" <herbert@gondor.apana.org.au>, "David S . Miller"
+	<davem@davemloft.net>, Pavan Kumar Paluri <papaluri@amd.com>,
+	<stable@vger.kernel.org>
+Subject: [PATCH] crypto: ccp: Properly unregister /dev/sev on sev PLATFORM_STATUS failure
+Date: Thu, 15 Aug 2024 07:25:00 -0500
+Message-ID: <20240815122500.71946-1-papaluri@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0c352e73-714a-476e-8e71-eef750f22902@stanley.mountain>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL6PEPF00020E64:EE_|SA1PR12MB8965:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7785835f-1690-48a7-f487-08dcbd254d64
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|82310400026|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?2/axsrFmw80QiMmOkDtjLagohfzQCZqN/ln09NnLd5OOAjttrlnaA9+3IvIT?=
+ =?us-ascii?Q?uqhO1PvHthZfCmJWT8hS3XeKxdEyTjKfL8FE1r/ZvJrP6LtbyVGBdBj/a/On?=
+ =?us-ascii?Q?/0IERx7Q5UinB3zPmMIhIDkhh+ETL1YVEbrvRPGIGPhdhEYBFW7qYArr3va8?=
+ =?us-ascii?Q?3JEzbKUqPXzxY1mNd1rQzONiuoN5c1wnpfQqe7e9OEYQH+z4LMvHVkgGYpyp?=
+ =?us-ascii?Q?1PNjmYw/5D7g0CvpmNrdbTO0uskPatuB7l9APkAwNbdr5F4Ua6LIlt8cYXSI?=
+ =?us-ascii?Q?EEmqh1pyh5Gj8u4EYqKLDvyhBG2Ad+tEdhFgFalLDin7t0OGRqq4jn4FEn58?=
+ =?us-ascii?Q?ypMbQAJsgi9iP5jY/KKT8BZxyVMsQw+R2/KutoZKqx9/VBStz3UxacR9tu6a?=
+ =?us-ascii?Q?kfbQaKob1DNau/k6HybiU6F2dQ42uVzaPH38gpLwJ5cvbp3afUOxQDmRwifq?=
+ =?us-ascii?Q?Gbut6Txlaq8nKxmI13qwC946YjRvoTXr/ERMO7jg+A8HOaWUDcLFTH2FAEkH?=
+ =?us-ascii?Q?JPpdDp6XLHeibitM6Q0NQzu5RJJ5EaXBURbI8Irccp5wwWNxG9ug0maqamSX?=
+ =?us-ascii?Q?4CvTtmwnZ+MWqgr+5k7fes9Ck/278RHQoH7TY22ts5s1Vs9XlQn7u1zFli2u?=
+ =?us-ascii?Q?ZPQabV+YsbuCeTPa6XG2TgOZOSK6SC04bzWfpd0eGCc1X/dJpgFoo+Bwzh1C?=
+ =?us-ascii?Q?5koeeHY6fTx2VxjcMKSESXvEgL1Vmj4rF4KkPv+YDH1XdA9uTdM3QnJbKlSE?=
+ =?us-ascii?Q?X/5uSLA7AOq7BxjFdMdFyJMd7HyXJvwOo5YpVf1z9dUgxb860LouNAcsIdd1?=
+ =?us-ascii?Q?HVHx4q5dLhZ7v9Cbou6zP2k11l2iijQNGN4kuhkgXJP6r7LeInAZRZhtLe0V?=
+ =?us-ascii?Q?uIsTmEXVP4soMupWWZltjWIvegzwyI7hPef9gVrl9o1xdNx4H43q+90RI6pf?=
+ =?us-ascii?Q?9POawV8nqOa+sb7JxJLr/wWNNWcgPlf2A7wn65BMHL025aO4lSrsGEnEGodt?=
+ =?us-ascii?Q?0wWB6ConNZvLwvkuFzJosSMEfdh+2Jsd7AF1a/7jHwJX+jrhQjmZGSGaVjTP?=
+ =?us-ascii?Q?5dagURnlL850Zkb9FxCO9aBl2qetzzhc+qQR+Gn5ZzXfzcNYaOdK93Ax1/WY?=
+ =?us-ascii?Q?fdZ/YuEAmO6X1R//t+5ax8ELHHPFiEFyAhvhDFCyfdiKGDDYd4MzwYYBgeIE?=
+ =?us-ascii?Q?qiEhUdhSQRFaxdPcY2a+vOV2JZygqyToWwn5fd8LnLGFX+Aeczlb0AA4pT5L?=
+ =?us-ascii?Q?W3OXHPkw1VYs56Vp+3AMTS05SnWyublfDmZa86VnGFPLArx0+E7XjkSWlcYe?=
+ =?us-ascii?Q?I5oyjtTBo16uc+uz8nQ6uX/QUGM/rN2+tcdpU5drPVtalDI2RWyXRLNFqwCu?=
+ =?us-ascii?Q?cQAt+DJsWXU3CbFmK3eztEbzjZn3P7nEDZxGh08RW9Oj/W7kKF6HKe3ffQ9C?=
+ =?us-ascii?Q?UyVuWtfoK76bugsktLPnNSFD6lmZ79Cq?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Aug 2024 12:25:08.8888
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7785835f-1690-48a7-f487-08dcbd254d64
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL6PEPF00020E64.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8965
 
-Check for crypto_alloc_skcipher() failure.
+In case of sev PLATFORM_STATUS failure, sev_get_api_version() fails
+resulting in sev_data field of psp_master nulled out. This later becomes
+a problem when unloading the ccp module because the device has not been
+unregistered (via misc_deregister()) before clearing the sev_data field
+of psp_master. As a result, on reloading the ccp module, a duplicate
+device issue is encountered as can be seen from the dmesg log below.
 
-Fixes: c8981d9230d8 ("crypto: spacc - Add SPAcc Skcipher support")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+on reloading ccp module via modprobe ccp
+
+Call Trace:
+  <TASK>
+  dump_stack_lvl+0xd7/0xf0
+  dump_stack+0x10/0x20
+  sysfs_warn_dup+0x5c/0x70
+  sysfs_create_dir_ns+0xbc/0xd
+  kobject_add_internal+0xb1/0x2f0
+  kobject_add+0x7a/0xe0
+  ? srso_alias_return_thunk+0x5/0xfbef5
+  ? get_device_parent+0xd4/0x1e0
+  ? __pfx_klist_children_get+0x10/0x10
+  device_add+0x121/0x870
+  ? srso_alias_return_thunk+0x5/0xfbef5
+  device_create_groups_vargs+0xdc/0x100
+  device_create_with_groups+0x3f/0x60
+  misc_register+0x13b/0x1c0
+  sev_dev_init+0x1d4/0x290 [ccp]
+  psp_dev_init+0x136/0x300 [ccp]
+  sp_init+0x6f/0x80 [ccp]
+  sp_pci_probe+0x2a6/0x310 [ccp]
+  ? srso_alias_return_thunk+0x5/0xfbef5
+  local_pci_probe+0x4b/0xb0
+  work_for_cpu_fn+0x1a/0x30
+  process_one_work+0x203/0x600
+  worker_thread+0x19e/0x350
+  ? __pfx_worker_thread+0x10/0x10
+  kthread+0xeb/0x120
+  ? __pfx_kthread+0x10/0x10
+  ret_from_fork+0x3c/0x60
+  ? __pfx_kthread+0x10/0x10
+  ret_from_fork_asm+0x1a/0x30
+  </TASK>
+  kobject: kobject_add_internal failed for sev with -EEXIST, don't try to register things with the same name in the same directory.
+  ccp 0000:22:00.1: sev initialization failed
+  ccp 0000:22:00.1: psp initialization failed
+  ccp 0000:a2:00.1: no command queues available
+  ccp 0000:a2:00.1: psp enabled
+
+Address this issue by unregistering the /dev/sev before clearing out
+sev_data in case of PLATFORM_STATUS failure.
+
+Fixes: 200664d5237f ("crypto: ccp: Add Secure Encrypted Virtualization (SEV) command support")
+Cc: stable@vger.kernel.org
+Signed-off-by: Pavan Kumar Paluri <papaluri@amd.com>
 ---
- drivers/crypto/dwc-spacc/spacc_skcipher.c | 2 ++
+ drivers/crypto/ccp/sev-dev.c | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/drivers/crypto/dwc-spacc/spacc_skcipher.c b/drivers/crypto/dwc-spacc/spacc_skcipher.c
-index 488c03ff6c36..8c698b75dd92 100644
---- a/drivers/crypto/dwc-spacc/spacc_skcipher.c
-+++ b/drivers/crypto/dwc-spacc/spacc_skcipher.c
-@@ -67,6 +67,8 @@ static int spacc_skcipher_fallback(unsigned char *name,
- 	tctx->fb.cipher = crypto_alloc_skcipher(name,
- 						CRYPTO_ALG_TYPE_SKCIPHER,
- 						CRYPTO_ALG_NEED_FALLBACK);
-+	if (IS_ERR(tctx->fb.cipher))
-+		return PTR_ERR(tctx->fb.cipher);
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index 9810edbb272d..5f63d2018649 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -2410,6 +2410,8 @@ void sev_pci_init(void)
+ 	return;
  
- 	crypto_skcipher_set_reqsize(reqtfm,
- 				    sizeof(struct spacc_crypto_reqctx) +
+ err:
++	sev_dev_destroy(psp_master);
++
+ 	psp_master->sev_data = NULL;
+ }
+ 
+
+base-commit: b8c7cbc324dc17b9e42379b42603613580bec2d8
 -- 
-2.43.0
+2.34.1
 
