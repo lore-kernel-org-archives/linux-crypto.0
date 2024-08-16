@@ -1,169 +1,119 @@
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from xry111.site (xry111.site [89.208.246.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7F6E17BEB7
-	for <linux-crypto@vger.kernel.org>; Fri, 16 Aug 2024 11:01:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D428917BEB5
+	for <linux-crypto@vger.kernel.org>; Fri, 16 Aug 2024 11:07:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.208.246.23
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723806081; cv=none; b=omRlroH85TOzPKW0m3bUGjXB1aWNdykayU+Cp41h5zhf8uHvGFAgC5J/5yCiRn8/iDS2GbAmEmo6A65uZE7OldHNl8S79E297oFiymasdwlhP46qTLK/bCqo1Dz8F7QlQnMgPN0RnXVZWQB2IHfWw/4OpNyuaUrJa1QgNoosXMY=
+	t=1723806464; cv=none; b=YKeCmLW1NDKk3aWsFr7hs7JqSdayh8PTO0ZwTruLE3ePm20aVvgRCLsFB/yAJTXBF/8RvYB+RVuGoUkDqOwCF6kwoYeyJ+hgAk0AmreF2F8TroENZIRG9XOX6dWUK/dNQ97yTZZv1ewxSIrSo0Dfq3LuISN83amZHI/51xj71L8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723806081; c=relaxed/simple;
-	bh=jOVkyCZRwxwfPGY4eymxAuwM3qMtwzLVgjzO31sjmjI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ukKhO1k8KoEpaMFikH+y6MT3STPB1ILwgPyA4ITB3XlZ4/U8sSdtgRomRa4wqMG97Qxpn70C3lBIw7GV7bMSr3C4pD9hvy+l5gLpwFAxCropo/koNEYFlGEY9kyZMStArwPg+OpEGnwGmpxffoGU0T/REyY3XMubmN/9wi1OvgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com; spf=pass smtp.mailfrom=cloud.com; dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b=G1pjVnaO; arc=none smtp.client-ip=209.85.167.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=citrix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloud.com
+	s=arc-20240116; t=1723806464; c=relaxed/simple;
+	bh=Ist7kymIdrBgHBhzaycHtnyoW3xAaoZVWRQN5c2CX74=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Fsg+UGNSBW2vysloN8vn+hnltWRALe/MGxkFSQL3tyR2287wJfaUpKEJ8JU2BXXY+xJtnxBkqrwhWnlJWWP5yZlPf0dO/glqE/vBx9t2SRCXK+5TnHZcW7gKzsYU+Q/HdZtHv/URrcunOU1elU89F0ix0+xxvoQvux8V5dd7syg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site; spf=pass smtp.mailfrom=xry111.site; dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b=Ajym5f+P; arc=none smtp.client-ip=89.208.246.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xry111.site
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="G1pjVnaO"
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-52efbb55d24so3417609e87.1
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Aug 2024 04:01:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=citrix.com; s=google; t=1723806078; x=1724410878; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=4qsz+7mQYKMGsKT5Lq9NXZ6sjzsnZVAWwIJdiaA3GZU=;
-        b=G1pjVnaO1TgbyjtkCz9qqyrWZSXyR7ZOm941OMfE7aKU+U28+4pM3i4wi7GoLOoxga
-         MWr9aA4A62yroM1UkSaxnWs6VY8CoVvkTXH+sRtPYcmuRykSwTCf+4l7qJ82DVQIcLzu
-         Jsdy5PurQQtk/R5eTWQKl6Oyj0fCA75pFEQg4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723806078; x=1724410878;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4qsz+7mQYKMGsKT5Lq9NXZ6sjzsnZVAWwIJdiaA3GZU=;
-        b=l0Ibs8keB0vhxBvV9c0Gr700ArZGefby7W7NvRku+AwS7ccen0AU36mHZSb1WCc9Vd
-         2YdZYUjxAkPDnMHpCI8JXYdQYN+tGvi9xTArA8XNc0L68IQrbNZRrcFEaSKuLlbwnHYF
-         aMylZk2ED3/iJ3afIp5EKRLlsvug/RZgfHyULEG34W48HbSRGX6y25648vOAIDQxBaI/
-         Dj//nXm1FMR95Lep3rJwfaEe3bGFAx+RtT9qCLef4Wit9Ge884286nZSCL7Xvgb9KP+E
-         CioHnASouoMMVh3TbON407OPrm+gWx92ERS/bJFSDaHT1d/yq8i9h9aCbuRhKczJVBX/
-         l69Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVjI5L/x2rbbN0/ck+4twWvEHqTSot5kUy94ysQ6jf8i630gcZaclCUidCeZptZg+vOFcsNLl9fAm4Gb+GnAJQAKAtb8ZgeRD2DQaSz
-X-Gm-Message-State: AOJu0YzmfaHzYNOt8h/hWi1l4LAHoX0BN/dxxZRvhM+4sLEz/2wHDXFV
-	imuY6Am1nJ3JvZuP2//zvyj83LOHCskKA2wpywZPUkFREqUxqxZCmcp9HeUgmpE=
-X-Google-Smtp-Source: AGHT+IE4AZiVE7kjprocqnllW5JlMr4sYvdQRlM74n9w7KXPCquuL65elKkFvCQuUxcO79Gv2cLBjw==
-X-Received: by 2002:a05:6512:3d28:b0:52c:8342:6699 with SMTP id 2adb3069b0e04-5331c6e4088mr2153159e87.55.1723806077291;
-        Fri, 16 Aug 2024 04:01:17 -0700 (PDT)
-Received: from [192.168.1.10] (host-92-26-98-202.as13285.net. [92.26.98.202])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a83838c6ae6sm238812066b.35.2024.08.16.04.01.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Aug 2024 04:01:16 -0700 (PDT)
-Message-ID: <550d15cd-5c48-4c20-92c2-f09a7e30adc9@citrix.com>
-Date: Fri, 16 Aug 2024 12:01:15 +0100
+	dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b="Ajym5f+P"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xry111.site;
+	s=default; t=1723806455;
+	bh=Ist7kymIdrBgHBhzaycHtnyoW3xAaoZVWRQN5c2CX74=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Ajym5f+PAXP5cuYUitQsvO2qTV+f6ASVUqJpfVZxAWzSMt96fy+n9H53cnYVwjgWy
+	 pbFyksORbd/pb+kAV2mIBQWZzh6CtKiDSUgAPd83JPTG4iCiufcAl/A5uDkWq9erlp
+	 1Z/7Y/pn6TVIwi8tG8xLHiamErtsZjMrsWUP9UgQ=
+Received: from stargazer.. (unknown [IPv6:240e:457:1000:1603:4ab7:c07d:7ab1:44b2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-384) server-digest SHA384)
+	(Client did not present a certificate)
+	(Authenticated sender: xry111@xry111.site)
+	by xry111.site (Postfix) with ESMTPSA id E085C66F26;
+	Fri, 16 Aug 2024 07:07:28 -0400 (EDT)
+From: Xi Ruoyao <xry111@xry111.site>
+To: "Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	WANG Xuerui <kernel@xen0n.name>
+Cc: Xi Ruoyao <xry111@xry111.site>,
+	linux-crypto@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	Jinyang He <hejinyang@loongson.cn>,
+	Tiezhu Yang <yangtiezhu@loongson.cn>,
+	Arnd Bergmann <arnd@arndb.de>
+Subject: 
+Date: Fri, 16 Aug 2024 19:07:13 +0800
+Message-ID: <20240816110717.10249-1-xry111@xry111.site>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 06/19] x86: Add early SHA-1 support for Secure Launch
- early measurements
-To: Thomas Gleixner <tglx@linutronix.de>,
- "Daniel P. Smith" <dpsmith@apertussolutions.com>,
- "Eric W. Biederman" <ebiederm@xmission.com>,
- Eric Biggers <ebiggers@kernel.org>
-Cc: Ross Philipson <ross.philipson@oracle.com>, linux-kernel@vger.kernel.org,
- x86@kernel.org, linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
- linux-efi@vger.kernel.org, iommu@lists.linux-foundation.org,
- mingo@redhat.com, bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com,
- ardb@kernel.org, mjg59@srcf.ucam.org, James.Bottomley@hansenpartnership.com,
- peterhuewe@gmx.de, jarkko@kernel.org, jgg@ziepe.ca, luto@amacapital.net,
- nivedita@alum.mit.edu, herbert@gondor.apana.org.au, davem@davemloft.net,
- corbet@lwn.net, dwmw2@infradead.org, baolu.lu@linux.intel.com,
- kanth.ghatraju@oracle.com, trenchboot-devel@googlegroups.com
-References: <20240531010331.134441-1-ross.philipson@oracle.com>
- <20240531010331.134441-7-ross.philipson@oracle.com>
- <20240531021656.GA1502@sol.localdomain>
- <874jaegk8i.fsf@email.froward.int.ebiederm.org>
- <5b1ce8d3-516d-4dfd-a976-38e5cee1ef4e@apertussolutions.com>
- <87ttflli09.ffs@tglx>
-Content-Language: en-GB
-From: Andrew Cooper <andrew.cooper3@citrix.com>
-Autocrypt: addr=andrew.cooper3@citrix.com; keydata=
- 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
- 6+ahAA==
-In-Reply-To: <87ttflli09.ffs@tglx>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 15/08/2024 8:10 pm, Thomas Gleixner wrote:
-> On Thu, Aug 15 2024 at 13:38, Daniel P. Smith wrote:
->> On 5/31/24 09:54, Eric W. Biederman wrote:
->>> Eric Biggers <ebiggers@kernel.org> writes:
->>>> That paragraph is also phrased as a hypothetical, "Even if we'd prefer to use
->>>> SHA-256-only".  That implies that you do not, in fact, prefer SHA-256 only.  Is
->>>> that the case?  Sure, maybe there are situations where you *have* to use SHA-1,
->>>> but why would you not at least *prefer* SHA-256?
->>> Yes.  Please prefer to use SHA-256.
->>>
->>> Have you considered implementing I think it is SHA1-DC (as git has) that
->>> is compatible with SHA1 but blocks the known class of attacks where
->>> sha1 is actively broken at this point?
->> We are using the kernel's implementation, addressing what the kernel 
->> provides is beyond our efforts. Perhaps someone who is interested in 
->> improving the kernel's SHA1 could submit a patch implementing/replacing 
->> it with SHA1-DC, as I am sure the maintainers would welcome the help.
-> Well, someone who is interested to get his "secure" code merged should
-> have a vested interested to have a non-broken SHA1 implementation if
-> there is a sensible requirement to use SHA1 in that new "secure" code,
-> no?
+Subject: [PATCH v3 0/2] LoongArch: Implement getrandom() in vDSO
 
-No.
+For the rationale to implement getrandom() in vDSO see [1].
 
-The use of SHA-1 is necessary even on modern systems to avoid a
-vulnerability.
+The vDSO getrandom() needs a stack-less ChaCha20 implementation, so we
+need to add architecture-specific code and wire it up with the generic
+code.  Both generic LoongArch implementation and Loongson SIMD eXtension
+based implementation are added.  To dispatch them at runtime without
+invoking cpucfg on each call, the alternative runtime patching mechanism
+is extended to cover the vDSO.
 
-It is the platform, not Linux, which decides which TPM PCR banks are active.
+The implementation is tested with the kernel selftests added by the last
+patch in [1].  I had to make some adjustments to make it work on
+LoongArch (see [2], I've not submitted the changes as at now because I'm
+unsure about the KHDR_INCLUDES addition).  The vdso_test_getrandom
+bench-single result:
 
-Linux *must* have an algorithm for every active bank (which is the
-platform's choice), even if the single thing it intends to do is cap the
-bank and use better ones.
+       vdso: 25000000 times in 0.647855257 seconds (generic)
+       vdso: 25000000 times in 0.601068605 seconds (LSX)
+       libc: 25000000 times in 6.948168864 seconds
+    syscall: 25000000 times in 6.990265548 seconds
 
-Capping a bank requires updating the TPM Log without corrupting it,
-which requires a hash calculation of the correct type for the bank.
+The vdso_test_getrandom bench-multi result:
 
-~Andrew
+       vdso: 25000000 x 256 times in 35.322187834 seconds (generic)
+       vdso: 25000000 x 256 times in 29.183885426 seconds (LSX)
+       libc: 25000000 x 256 times in 356.628428409 seconds
+       syscall: 25000000 x 256 times in 334.764602866 seconds
+
+[1]:https://lore.kernel.org/all/20240712014009.281406-1-Jason@zx2c4.com/
+[2]:https://github.com/xry111/linux/commits/xry111/la-vdso-v3/
+
+[v2]->v3:
+- Add a generic LoongArch implementation for which LSX isn't needed.
+
+v1->v2:
+- Properly send the series to the list.
+
+[v2]:https://lore.kernel.org/all/20240815133357.35829-1-xry111@xry111.site/
+
+Xi Ruoyao (3):
+  LoongArch: vDSO: Wire up getrandom() vDSO implementation
+  LoongArch: Perform alternative runtime patching on vDSO
+  LoongArch: vDSO: Add LSX implementation of vDSO getrandom()
+
+ arch/loongarch/Kconfig                      |   1 +
+ arch/loongarch/include/asm/vdso/getrandom.h |  47 ++++
+ arch/loongarch/include/asm/vdso/vdso.h      |   8 +
+ arch/loongarch/kernel/asm-offsets.c         |  10 +
+ arch/loongarch/kernel/vdso.c                |  14 +-
+ arch/loongarch/vdso/Makefile                |   6 +
+ arch/loongarch/vdso/memset.S                |  24 ++
+ arch/loongarch/vdso/vdso.lds.S              |   7 +
+ arch/loongarch/vdso/vgetrandom-chacha-lsx.S | 162 +++++++++++++
+ arch/loongarch/vdso/vgetrandom-chacha.S     | 252 ++++++++++++++++++++
+ arch/loongarch/vdso/vgetrandom.c            |  19 ++
+ 11 files changed, 549 insertions(+), 1 deletion(-)
+ create mode 100644 arch/loongarch/include/asm/vdso/getrandom.h
+ create mode 100644 arch/loongarch/vdso/memset.S
+ create mode 100644 arch/loongarch/vdso/vgetrandom-chacha-lsx.S
+ create mode 100644 arch/loongarch/vdso/vgetrandom-chacha.S
+ create mode 100644 arch/loongarch/vdso/vgetrandom.c
+
+-- 
+2.46.0
+
