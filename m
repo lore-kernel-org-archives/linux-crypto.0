@@ -1,31 +1,37 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3821256E
-	for <linux-crypto@vger.kernel.org>; Sat, 17 Aug 2024 04:36:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD67C2F23;
+	Sat, 17 Aug 2024 06:56:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723869387; cv=none; b=Kf67CqAt2E7Li+V5Dr2Q8dAPzoaWSH2Ih179OAgt7Nu9B0rtzXyRgU8+eZufpVhxI2fBiGt7mU0gsRTADCH6p7b+EFEmyfBxPiVMxhJOekwl3FNBpANRea7NcPouCwp0FmJkkabyxYGoTQaI17HnhF9qUVA3qDSsy4L8MjClpjU=
+	t=1723877822; cv=none; b=ogTHW1y8eJc55ay6jlk1VpALBv7SMeDr/8XZzDDA5deMsyMKKf/9Yb0Sv90BEjFRjEhXNpRHuA74QGzv/H1JHRkJENHVdrbBRC58QiPnfDGkxvCBktLrE9tFnldKEEKERUa05kJXCz2dq3waNThXNTJjO7CCzx22786C9PND6Vc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723869387; c=relaxed/simple;
-	bh=Sf52ltfl8rFfq4Uq/kPf5mX/k+aRW74O5KwFuZIBpB0=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=Vdy5OGVKIXsaNWLpdHZjUvf+lUMhvQ+c7nx91A2bw7nWQ6I7gUulqMzgwdGZfww31RLnrCCNbbtQkz4hM498AMDFLzSGhcWXMJxck+G6Lfh9dIpAVz2bpH8ZnMWkBrRoodtjxN2N9IU/No0wEgA4ZPpYHmBPg1vQ/t+HIL6h1pQ=
+	s=arc-20240116; t=1723877822; c=relaxed/simple;
+	bh=zUv1rBUZmu5Yn4+YINkeQuhuuWyCBBfTecIy32HYAYc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X47wTeMmt8mZB+AkzE61M7jI+ZQREDqLOEqQ7dvdjLLP2pxKP3AJtYe/ishJp+WTQOJfRY7EusgLNaAgeoCdkBd+06ZMcld8+maLry4GtvIVTJ0bX+BJS8aGxYvq6t03g6TLdAusYLpWKYFj53fzIW/Gu1LaD52JZMmTN1/P5cw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1sfB2M-005HKn-1W;
-	Sat, 17 Aug 2024 12:36:20 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 17 Aug 2024 12:36:19 +0800
-Date: Sat, 17 Aug 2024 12:36:19 +0800
+	id 1sfDEM-005IF8-2C;
+	Sat, 17 Aug 2024 14:56:52 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 17 Aug 2024 14:56:51 +0800
+Date: Sat, 17 Aug 2024 14:56:51 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Cc: Boris Brezillon <bbrezillon@kernel.org>,
-	Srujana Challa <schalla@marvell.com>
-Subject: [PATCH] crypto: octeontx2 - Fix authenc setkey
-Message-ID: <ZsAow_WIkbvdBvSX@gondor.apana.org.au>
+To: kernel test robot <oliver.sang@intel.com>
+Cc: oe-lkp@lists.linux.dev, lkp@intel.com, linux-crypto@vger.kernel.org,
+	ltp@lists.linux.it, Linus Torvalds <torvalds@linux-foundation.org>,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>
+Subject: [v3 PATCH 1/3] crypto: api - Remove instance larval fulfilment
+Message-ID: <ZsBJs_C6GdO_qgV7@gondor.apana.org.au>
+References: <ZrbTUk6DyktnO7qk@gondor.apana.org.au>
+ <202408161634.598311fd-oliver.sang@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -34,386 +40,194 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <202408161634.598311fd-oliver.sang@intel.com>
 
-Use the generic crypto_authenc_extractkeys helper instead of custom
-parsing code that is slightly broken.  Also fix a number of memory
-leaks by moving memory allocation from setkey to init_tfm (setkey
-can be called multiple times over the life of a tfm).
+On Fri, Aug 16, 2024 at 04:45:59PM +0800, kernel test robot wrote:
+> 
+> kernel test robot noticed "ltp.af_alg03.fail" on:
 
-Finally accept all hash key lengths by running the digest over
-extra-long keys.
+Thanks for the report.  Indeed the first patch is buggy as the
+larval isn't marked as dead upon completion which when paired with
+the new re-lookup triggers a dead-lock.  Fix this by adding a DEAD
+marking prior to calling complete_all.
+
+---8<---
+In order to allow testing to complete asynchronously after the
+registration process, instance larvals need to complete prior
+to having a test result.  Support this by redoing the lookup for
+instance larvals after completion.   This should locate the pending
+test larval and then repeat the wait on that (if it is still pending).
+
+As the lookup is now repeated there is no longer any need to compute
+the fulfilment status and all that code can be removed.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
+ crypto/algapi.c  | 48 +++---------------------------------------------
+ crypto/algboss.c |  1 +
+ crypto/api.c     | 23 +++++++++++++++++++----
+ 3 files changed, 23 insertions(+), 49 deletions(-)
 
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c b/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
-index 1604fc58dc13..5aa56f20f888 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
-@@ -11,7 +11,6 @@
- #include <crypto/xts.h>
- #include <crypto/gcm.h>
- #include <crypto/scatterwalk.h>
--#include <linux/rtnetlink.h>
- #include <linux/sort.h>
- #include <linux/module.h>
- #include "otx2_cptvf.h"
-@@ -55,6 +54,8 @@ static struct cpt_device_table se_devices = {
- 	.count = ATOMIC_INIT(0)
- };
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index 122cd910c4e1..d2ccc1289f92 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -235,7 +235,6 @@ void crypto_remove_spawns(struct crypto_alg *alg, struct list_head *list,
+ EXPORT_SYMBOL_GPL(crypto_remove_spawns);
  
-+static struct otx2_cpt_sdesc *alloc_sdesc(struct crypto_shash *alg);
-+
- static inline int get_se_device(struct pci_dev **pdev, int *cpu_num)
+ static void crypto_alg_finish_registration(struct crypto_alg *alg,
+-					   bool fulfill_requests,
+ 					   struct list_head *algs_to_put)
  {
- 	int count;
-@@ -598,40 +599,56 @@ static int cpt_aead_init(struct crypto_aead *atfm, u8 cipher_type, u8 mac_type)
- 	ctx->cipher_type = cipher_type;
- 	ctx->mac_type = mac_type;
+ 	struct crypto_alg *q;
+@@ -247,30 +246,8 @@ static void crypto_alg_finish_registration(struct crypto_alg *alg,
+ 		if (crypto_is_moribund(q))
+ 			continue;
  
-+	switch (ctx->mac_type) {
-+	case OTX2_CPT_SHA1:
-+		ctx->hashalg = crypto_alloc_shash("sha1", 0, 0);
-+		break;
-+
-+	case OTX2_CPT_SHA256:
-+		ctx->hashalg = crypto_alloc_shash("sha256", 0, 0);
-+		break;
-+
-+	case OTX2_CPT_SHA384:
-+		ctx->hashalg = crypto_alloc_shash("sha384", 0, 0);
-+		break;
-+
-+	case OTX2_CPT_SHA512:
-+		ctx->hashalg = crypto_alloc_shash("sha512", 0, 0);
-+		break;
-+	}
-+
-+	if (IS_ERR(ctx->hashalg))
-+		return PTR_ERR(ctx->hashalg);
-+
-+	if (ctx->hashalg) {
-+		ctx->sdesc = alloc_sdesc(ctx->hashalg);
-+		if (!ctx->sdesc) {
-+			crypto_free_shash(ctx->hashalg);
-+			return -ENOMEM;
-+		}
-+	}
-+
- 	/*
- 	 * When selected cipher is NULL we use HMAC opcode instead of
- 	 * FLEXICRYPTO opcode therefore we don't need to use HASH algorithms
- 	 * for calculating ipad and opad
- 	 */
--	if (ctx->cipher_type != OTX2_CPT_CIPHER_NULL) {
--		switch (ctx->mac_type) {
--		case OTX2_CPT_SHA1:
--			ctx->hashalg = crypto_alloc_shash("sha1", 0,
--							  CRYPTO_ALG_ASYNC);
--			if (IS_ERR(ctx->hashalg))
--				return PTR_ERR(ctx->hashalg);
--			break;
-+	if (ctx->cipher_type != OTX2_CPT_CIPHER_NULL && ctx->hashalg) {
-+		int ss = crypto_shash_statesize(ctx->hashalg);
- 
--		case OTX2_CPT_SHA256:
--			ctx->hashalg = crypto_alloc_shash("sha256", 0,
--							  CRYPTO_ALG_ASYNC);
--			if (IS_ERR(ctx->hashalg))
--				return PTR_ERR(ctx->hashalg);
--			break;
-+		ctx->ipad = kzalloc(ss, GFP_KERNEL);
-+		if (!ctx->ipad) {
-+			kfree(ctx->sdesc);
-+			crypto_free_shash(ctx->hashalg);
-+			return -ENOMEM;
-+		}
- 
--		case OTX2_CPT_SHA384:
--			ctx->hashalg = crypto_alloc_shash("sha384", 0,
--							  CRYPTO_ALG_ASYNC);
--			if (IS_ERR(ctx->hashalg))
--				return PTR_ERR(ctx->hashalg);
--			break;
+-		if (crypto_is_larval(q)) {
+-			struct crypto_larval *larval = (void *)q;
 -
--		case OTX2_CPT_SHA512:
--			ctx->hashalg = crypto_alloc_shash("sha512", 0,
--							  CRYPTO_ALG_ASYNC);
--			if (IS_ERR(ctx->hashalg))
--				return PTR_ERR(ctx->hashalg);
--			break;
-+		ctx->opad = kzalloc(ss, GFP_KERNEL);
-+		if (!ctx->opad) {
-+			kfree(ctx->ipad);
-+			kfree(ctx->sdesc);
-+			crypto_free_shash(ctx->hashalg);
-+			return -ENOMEM;
- 		}
- 	}
- 	switch (ctx->cipher_type) {
-@@ -713,8 +730,7 @@ static void otx2_cpt_aead_exit(struct crypto_aead *tfm)
- 
- 	kfree(ctx->ipad);
- 	kfree(ctx->opad);
--	if (ctx->hashalg)
--		crypto_free_shash(ctx->hashalg);
-+	crypto_free_shash(ctx->hashalg);
- 	kfree(ctx->sdesc);
- 
- 	if (ctx->fbk_cipher) {
-@@ -788,7 +804,7 @@ static inline void swap_data64(void *buf, u32 len)
- 		cpu_to_be64s(src);
- }
- 
--static int copy_pad(u8 mac_type, u8 *out_pad, u8 *in_pad)
-+static int swap_pad(u8 mac_type, u8 *pad)
- {
- 	struct sha512_state *sha512;
- 	struct sha256_state *sha256;
-@@ -796,22 +812,19 @@ static int copy_pad(u8 mac_type, u8 *out_pad, u8 *in_pad)
- 
- 	switch (mac_type) {
- 	case OTX2_CPT_SHA1:
--		sha1 = (struct sha1_state *) in_pad;
-+		sha1 = (struct sha1_state *)pad;
- 		swap_data32(sha1->state, SHA1_DIGEST_SIZE);
--		memcpy(out_pad, &sha1->state, SHA1_DIGEST_SIZE);
- 		break;
- 
- 	case OTX2_CPT_SHA256:
--		sha256 = (struct sha256_state *) in_pad;
-+		sha256 = (struct sha256_state *)pad;
- 		swap_data32(sha256->state, SHA256_DIGEST_SIZE);
--		memcpy(out_pad, &sha256->state, SHA256_DIGEST_SIZE);
- 		break;
- 
- 	case OTX2_CPT_SHA384:
- 	case OTX2_CPT_SHA512:
--		sha512 = (struct sha512_state *) in_pad;
-+		sha512 = (struct sha512_state *)pad;
- 		swap_data64(sha512->state, SHA512_DIGEST_SIZE);
--		memcpy(out_pad, &sha512->state, SHA512_DIGEST_SIZE);
- 		break;
- 
- 	default:
-@@ -821,55 +834,54 @@ static int copy_pad(u8 mac_type, u8 *out_pad, u8 *in_pad)
- 	return 0;
- }
- 
--static int aead_hmac_init(struct crypto_aead *cipher)
-+static int aead_hmac_init(struct crypto_aead *cipher,
-+			  struct crypto_authenc_keys *keys)
- {
- 	struct otx2_cpt_aead_ctx *ctx = crypto_aead_ctx_dma(cipher);
--	int state_size = crypto_shash_statesize(ctx->hashalg);
- 	int ds = crypto_shash_digestsize(ctx->hashalg);
- 	int bs = crypto_shash_blocksize(ctx->hashalg);
--	int authkeylen = ctx->auth_key_len;
-+	int authkeylen = keys->authkeylen;
- 	u8 *ipad = NULL, *opad = NULL;
--	int ret = 0, icount = 0;
+-			/*
+-			 * Check to see if either our generic name or
+-			 * specific name can satisfy the name requested
+-			 * by the larval entry q.
+-			 */
+-			if (strcmp(alg->cra_name, q->cra_name) &&
+-			    strcmp(alg->cra_driver_name, q->cra_name))
+-				continue;
 -
--	ctx->sdesc = alloc_sdesc(ctx->hashalg);
--	if (!ctx->sdesc)
--		return -ENOMEM;
+-			if (larval->adult)
+-				continue;
+-			if ((q->cra_flags ^ alg->cra_flags) & larval->mask)
+-				continue;
 -
--	ctx->ipad = kzalloc(bs, GFP_KERNEL);
--	if (!ctx->ipad) {
--		ret = -ENOMEM;
--		goto calc_fail;
--	}
+-			if (fulfill_requests && crypto_mod_get(alg))
+-				larval->adult = alg;
+-			else
+-				larval->adult = ERR_PTR(-EAGAIN);
 -
--	ctx->opad = kzalloc(bs, GFP_KERNEL);
--	if (!ctx->opad) {
--		ret = -ENOMEM;
--		goto calc_fail;
--	}
--
--	ipad = kzalloc(state_size, GFP_KERNEL);
--	if (!ipad) {
--		ret = -ENOMEM;
--		goto calc_fail;
--	}
--
--	opad = kzalloc(state_size, GFP_KERNEL);
--	if (!opad) {
--		ret = -ENOMEM;
--		goto calc_fail;
--	}
-+	int icount = 0;
-+	int ret;
++		if (crypto_is_larval(q))
+ 			continue;
+-		}
  
- 	if (authkeylen > bs) {
--		ret = crypto_shash_digest(&ctx->sdesc->shash, ctx->key,
--					  authkeylen, ipad);
-+		ret = crypto_shash_digest(&ctx->sdesc->shash, keys->authkey,
-+					  authkeylen, ctx->key);
- 		if (ret)
- 			goto calc_fail;
- 
- 		authkeylen = ds;
--	} else {
--		memcpy(ipad, ctx->key, authkeylen);
-+	} else
-+		memcpy(ctx->key, keys->authkey, authkeylen);
-+
-+	ctx->enc_key_len = keys->enckeylen;
-+	ctx->auth_key_len = authkeylen;
-+
-+	if (ctx->cipher_type == OTX2_CPT_CIPHER_NULL)
-+		return keys->enckeylen ? -EINVAL : 0;
-+
-+	switch (keys->enckeylen) {
-+	case AES_KEYSIZE_128:
-+		ctx->key_type = OTX2_CPT_AES_128_BIT;
-+		break;
-+	case AES_KEYSIZE_192:
-+		ctx->key_type = OTX2_CPT_AES_192_BIT;
-+		break;
-+	case AES_KEYSIZE_256:
-+		ctx->key_type = OTX2_CPT_AES_256_BIT;
-+		break;
-+	default:
-+		/* Invalid key length */
-+		return -EINVAL;
+ 		if (strcmp(alg->cra_name, q->cra_name))
+ 			continue;
+@@ -359,7 +336,7 @@ __crypto_register_alg(struct crypto_alg *alg, struct list_head *algs_to_put)
+ 		list_add(&larval->alg.cra_list, &crypto_alg_list);
+ 	} else {
+ 		alg->cra_flags |= CRYPTO_ALG_TESTED;
+-		crypto_alg_finish_registration(alg, true, algs_to_put);
++		crypto_alg_finish_registration(alg, algs_to_put);
  	}
  
-+	memcpy(ctx->key + authkeylen, keys->enckey, keys->enckeylen);
-+
-+	ipad = ctx->ipad;
-+	opad = ctx->opad;
-+
-+	memcpy(ipad, ctx->key, authkeylen);
- 	memset(ipad + authkeylen, 0, bs - authkeylen);
- 	memcpy(opad, ipad, bs);
+ out:
+@@ -376,7 +353,6 @@ void crypto_alg_tested(const char *name, int err)
+ 	struct crypto_alg *alg;
+ 	struct crypto_alg *q;
+ 	LIST_HEAD(list);
+-	bool best;
  
-@@ -887,7 +899,7 @@ static int aead_hmac_init(struct crypto_aead *cipher)
- 	crypto_shash_init(&ctx->sdesc->shash);
- 	crypto_shash_update(&ctx->sdesc->shash, ipad, bs);
- 	crypto_shash_export(&ctx->sdesc->shash, ipad);
--	ret = copy_pad(ctx->mac_type, ctx->ipad, ipad);
-+	ret = swap_pad(ctx->mac_type, ipad);
- 	if (ret)
- 		goto calc_fail;
+ 	down_write(&crypto_alg_sem);
+ 	list_for_each_entry(q, &crypto_alg_list, cra_list) {
+@@ -408,25 +384,7 @@ void crypto_alg_tested(const char *name, int err)
  
-@@ -895,25 +907,9 @@ static int aead_hmac_init(struct crypto_aead *cipher)
- 	crypto_shash_init(&ctx->sdesc->shash);
- 	crypto_shash_update(&ctx->sdesc->shash, opad, bs);
- 	crypto_shash_export(&ctx->sdesc->shash, opad);
--	ret = copy_pad(ctx->mac_type, ctx->opad, opad);
--	if (ret)
--		goto calc_fail;
--
--	kfree(ipad);
--	kfree(opad);
--
--	return 0;
-+	ret = swap_pad(ctx->mac_type, opad);
+ 	alg->cra_flags |= CRYPTO_ALG_TESTED;
  
- calc_fail:
--	kfree(ctx->ipad);
--	ctx->ipad = NULL;
--	kfree(ctx->opad);
--	ctx->opad = NULL;
--	kfree(ipad);
--	kfree(opad);
--	kfree(ctx->sdesc);
--	ctx->sdesc = NULL;
+-	/*
+-	 * If a higher-priority implementation of the same algorithm is
+-	 * currently being tested, then don't fulfill request larvals.
+-	 */
+-	best = true;
+-	list_for_each_entry(q, &crypto_alg_list, cra_list) {
+-		if (crypto_is_moribund(q) || !crypto_is_larval(q))
+-			continue;
 -
- 	return ret;
- }
- 
-@@ -921,87 +917,17 @@ static int otx2_cpt_aead_cbc_aes_sha_setkey(struct crypto_aead *cipher,
- 					    const unsigned char *key,
- 					    unsigned int keylen)
- {
--	struct otx2_cpt_aead_ctx *ctx = crypto_aead_ctx_dma(cipher);
--	struct crypto_authenc_key_param *param;
--	int enckeylen = 0, authkeylen = 0;
--	struct rtattr *rta = (void *)key;
-+	struct crypto_authenc_keys authenc_keys;
- 
--	if (!RTA_OK(rta, keylen))
--		return -EINVAL;
+-		if (strcmp(alg->cra_name, q->cra_name))
+-			continue;
 -
--	if (rta->rta_type != CRYPTO_AUTHENC_KEYA_PARAM)
--		return -EINVAL;
--
--	if (RTA_PAYLOAD(rta) < sizeof(*param))
--		return -EINVAL;
--
--	param = RTA_DATA(rta);
--	enckeylen = be32_to_cpu(param->enckeylen);
--	key += RTA_ALIGN(rta->rta_len);
--	keylen -= RTA_ALIGN(rta->rta_len);
--	if (keylen < enckeylen)
--		return -EINVAL;
--
--	if (keylen > OTX2_CPT_MAX_KEY_SIZE)
--		return -EINVAL;
--
--	authkeylen = keylen - enckeylen;
--	memcpy(ctx->key, key, keylen);
--
--	switch (enckeylen) {
--	case AES_KEYSIZE_128:
--		ctx->key_type = OTX2_CPT_AES_128_BIT;
--		break;
--	case AES_KEYSIZE_192:
--		ctx->key_type = OTX2_CPT_AES_192_BIT;
--		break;
--	case AES_KEYSIZE_256:
--		ctx->key_type = OTX2_CPT_AES_256_BIT;
--		break;
--	default:
--		/* Invalid key length */
--		return -EINVAL;
+-		if (q->cra_priority > alg->cra_priority) {
+-			best = false;
+-			break;
+-		}
 -	}
 -
--	ctx->enc_key_len = enckeylen;
--	ctx->auth_key_len = authkeylen;
--
--	return aead_hmac_init(cipher);
-+	return crypto_authenc_extractkeys(&authenc_keys, key, keylen) ?:
-+	       aead_hmac_init(cipher, &authenc_keys);
- }
+-	crypto_alg_finish_registration(alg, best, &list);
++	crypto_alg_finish_registration(alg, &list);
  
- static int otx2_cpt_aead_ecb_null_sha_setkey(struct crypto_aead *cipher,
- 					     const unsigned char *key,
- 					     unsigned int keylen)
+ complete:
+ 	complete_all(&test->completion);
+diff --git a/crypto/algboss.c b/crypto/algboss.c
+index 1aa5f306998a..d05a5aad2176 100644
+--- a/crypto/algboss.c
++++ b/crypto/algboss.c
+@@ -64,6 +64,7 @@ static int cryptomgr_probe(void *data)
+ 	crypto_tmpl_put(tmpl);
+ 
+ out:
++	param->larval->alg.cra_flags |= CRYPTO_ALG_DEAD;
+ 	complete_all(&param->larval->completion);
+ 	crypto_alg_put(&param->larval->alg);
+ 	kfree(param);
+diff --git a/crypto/api.c b/crypto/api.c
+index 22556907b3bc..ffb81aa32725 100644
+--- a/crypto/api.c
++++ b/crypto/api.c
+@@ -37,6 +37,8 @@ DEFINE_STATIC_KEY_FALSE(__crypto_boot_test_finished);
+ #endif
+ 
+ static struct crypto_alg *crypto_larval_wait(struct crypto_alg *alg);
++static struct crypto_alg *crypto_alg_lookup(const char *name, u32 type,
++					    u32 mask);
+ 
+ struct crypto_alg *crypto_mod_get(struct crypto_alg *alg)
  {
--	struct otx2_cpt_aead_ctx *ctx = crypto_aead_ctx_dma(cipher);
--	struct crypto_authenc_key_param *param;
--	struct rtattr *rta = (void *)key;
--	int enckeylen = 0;
--
--	if (!RTA_OK(rta, keylen))
--		return -EINVAL;
--
--	if (rta->rta_type != CRYPTO_AUTHENC_KEYA_PARAM)
--		return -EINVAL;
--
--	if (RTA_PAYLOAD(rta) < sizeof(*param))
--		return -EINVAL;
--
--	param = RTA_DATA(rta);
--	enckeylen = be32_to_cpu(param->enckeylen);
--	key += RTA_ALIGN(rta->rta_len);
--	keylen -= RTA_ALIGN(rta->rta_len);
--	if (enckeylen != 0)
--		return -EINVAL;
--
--	if (keylen > OTX2_CPT_MAX_KEY_SIZE)
--		return -EINVAL;
--
--	memcpy(ctx->key, key, keylen);
--	ctx->enc_key_len = enckeylen;
--	ctx->auth_key_len = keylen;
--
--	return 0;
-+	return otx2_cpt_aead_cbc_aes_sha_setkey(cipher, key, keylen);
+@@ -201,9 +203,12 @@ static void crypto_start_test(struct crypto_larval *larval)
+ 
+ static struct crypto_alg *crypto_larval_wait(struct crypto_alg *alg)
+ {
+-	struct crypto_larval *larval = (void *)alg;
++	struct crypto_larval *larval;
+ 	long time_left;
+ 
++again:
++	larval = container_of(alg, struct crypto_larval, alg);
++
+ 	if (!crypto_boot_test_finished())
+ 		crypto_start_test(larval);
+ 
+@@ -215,9 +220,16 @@ static struct crypto_alg *crypto_larval_wait(struct crypto_alg *alg)
+ 		alg = ERR_PTR(-EINTR);
+ 	else if (!time_left)
+ 		alg = ERR_PTR(-ETIMEDOUT);
+-	else if (!alg)
+-		alg = ERR_PTR(-ENOENT);
+-	else if (IS_ERR(alg))
++	else if (!alg) {
++		u32 type;
++		u32 mask;
++
++		alg = &larval->alg;
++		type = alg->cra_flags & ~(CRYPTO_ALG_LARVAL | CRYPTO_ALG_DEAD);
++		mask = larval->mask;
++		alg = crypto_alg_lookup(alg->cra_name, type, mask) ?:
++		      ERR_PTR(-ENOENT);
++	} else if (IS_ERR(alg))
+ 		;
+ 	else if (crypto_is_test_larval(larval) &&
+ 		 !(alg->cra_flags & CRYPTO_ALG_TESTED))
+@@ -228,6 +240,9 @@ static struct crypto_alg *crypto_larval_wait(struct crypto_alg *alg)
+ 		alg = ERR_PTR(-EAGAIN);
+ 	crypto_mod_put(&larval->alg);
+ 
++	if (!IS_ERR(alg) && crypto_is_larval(alg))
++		goto again;
++
+ 	return alg;
  }
  
- static int otx2_cpt_aead_gcm_aes_setkey(struct crypto_aead *cipher,
+-- 
+2.39.2
+
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
