@@ -1,32 +1,33 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D000F54774
-	for <linux-crypto@vger.kernel.org>; Sat, 17 Aug 2024 03:56:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E3774F606
+	for <linux-crypto@vger.kernel.org>; Sat, 17 Aug 2024 04:13:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723867008; cv=none; b=l6vnYUSgKxW/j9GPLANDMLxVijau0xqXdwPb3hNYh58XWWqgZKHdJjIJlVNYtXTWr5gsNJjzcQ5oQihhFUZDlnuwsR98i5p9jawZ/YD3eN/qlN+EZhWZvnB0swYiEFg2jrQCIuyoSqeuCbn+A7TEJZVNNphDykVTCsFY3gFSGAQ=
+	t=1723868011; cv=none; b=AYt0TjTVVFdYecLQumW2iouw+8AKHCI+h7BBMoaDQ22lq0khzyXBMDV1CsWPmpY1XzGDc3GkI9JQAQcFhteTB3/5Hjdgy8TdKhp9l65k1Ar+YLH/bjGaaep4lw+zRrNueiWpAgCf3O8Hfv1fzrVTprTXLGY/wX6n/5nJjcPqTpE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723867008; c=relaxed/simple;
-	bh=nvshWDz6sy+T6KNK6Ha/4qgolPZKDrl8Rcm90v1xM+k=;
+	s=arc-20240116; t=1723868011; c=relaxed/simple;
+	bh=dlzhDhQRefhm4Mq+bWXJZY4e7BiTYiXUtmawYBMk8M8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X+0SyeDsHGTOgTUNofBEskUFlfKsXltupo6DiwJ90MTKeMGcXMcY5dDzOsUquG9gKyjWUmEIoJ71Lww+evtAbnZAbYomZRItxXcIAgNdRKSlB0Fz+14mm1pDzRgaI4SghwTyTcWBXHa2qYKbfn4g5VPq6XiD4IHpFCmj5bsB3aU=
+	 Content-Type:Content-Disposition:In-Reply-To; b=Cf42h6h3E1IZXpYrW0keaOSPJ5BSoi5iey5LGtpl6Q7s+d3hLSJRdME5DBqGFOkDCGaJOiaV5S0k87wkuc9HN8Va8BN2Wp1Dqv+DI/GFqpP7UKzr2HA+FXieN0x9pnYvqFYVN5W4AmQmEgR/8RwIFpvleG1YBd1DwMlEjcjWJYE=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1sfAPs-005H2Z-2D;
-	Sat, 17 Aug 2024 11:56:34 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 17 Aug 2024 11:56:33 +0800
-Date: Sat, 17 Aug 2024 11:56:33 +0800
+	id 1sfAgA-005HBG-2O;
+	Sat, 17 Aug 2024 12:13:24 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 17 Aug 2024 12:13:23 +0800
+Date: Sat, 17 Aug 2024 12:13:23 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Cc: Boris Brezillon <bbrezillon@kernel.org>,
 	Srujana Challa <schalla@marvell.com>
-Subject: [v2 PATCH] crypto: octeontx - Fix authenc setkey
-Message-ID: <ZsAfcYN1wIeJJl2H@gondor.apana.org.au>
+Subject: [v3 PATCH] crypto: octeontx - Fix authenc setkey
+Message-ID: <ZsAjY3vAjxIUY-rl@gondor.apana.org.au>
 References: <Zr3ftZC585VPi8O7@gondor.apana.org.au>
+ <ZsAfcYN1wIeJJl2H@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,10 +36,10 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Zr3ftZC585VPi8O7@gondor.apana.org.au>
+In-Reply-To: <ZsAfcYN1wIeJJl2H@gondor.apana.org.au>
 
-v2 fixes a NULL-pointer dereference when ss is initialised because
-there is no hash algorithm.
+v3 fixes the incorrect auth key length when it is greater than block
+size.
 
 ---8<---
 Use the generic crypto_authenc_extractkeys helper instead of custom
@@ -52,7 +53,7 @@ extra-long keys.
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
 diff --git a/drivers/crypto/marvell/octeontx/otx_cptvf_algs.c b/drivers/crypto/marvell/octeontx/otx_cptvf_algs.c
-index 3c5d577d8f0d..a8b2840551f7 100644
+index 3c5d577d8f0d..0a1b85ad0057 100644
 --- a/drivers/crypto/marvell/octeontx/otx_cptvf_algs.c
 +++ b/drivers/crypto/marvell/octeontx/otx_cptvf_algs.c
 @@ -17,7 +17,6 @@
@@ -72,29 +73,25 @@ index 3c5d577d8f0d..a8b2840551f7 100644
  static inline int get_se_device(struct pci_dev **pdev, int *cpu_num)
  {
  	int count, ret = 0;
-@@ -509,44 +510,65 @@ static int cpt_aead_init(struct crypto_aead *tfm, u8 cipher_type, u8 mac_type)
+@@ -509,44 +510,61 @@ static int cpt_aead_init(struct crypto_aead *tfm, u8 cipher_type, u8 mac_type)
  	ctx->cipher_type = cipher_type;
  	ctx->mac_type = mac_type;
  
 +	switch (ctx->mac_type) {
 +	case OTX_CPT_SHA1:
-+		ctx->hashalg = crypto_alloc_shash("sha1", 0,
-+						  CRYPTO_ALG_ASYNC);
++		ctx->hashalg = crypto_alloc_shash("sha1", 0, 0);
 +		break;
 +
 +	case OTX_CPT_SHA256:
-+		ctx->hashalg = crypto_alloc_shash("sha256", 0,
-+						  CRYPTO_ALG_ASYNC);
++		ctx->hashalg = crypto_alloc_shash("sha256", 0, 0);
 +		break;
 +
 +	case OTX_CPT_SHA384:
-+		ctx->hashalg = crypto_alloc_shash("sha384", 0,
-+						  CRYPTO_ALG_ASYNC);
++		ctx->hashalg = crypto_alloc_shash("sha384", 0, 0);
 +		break;
 +
 +	case OTX_CPT_SHA512:
-+		ctx->hashalg = crypto_alloc_shash("sha512", 0,
-+						  CRYPTO_ALG_ASYNC);
++		ctx->hashalg = crypto_alloc_shash("sha512", 0, 0);
 +		break;
 +	}
 +
@@ -165,7 +162,7 @@ index 3c5d577d8f0d..a8b2840551f7 100644
  
  	return 0;
  }
-@@ -602,8 +624,7 @@ static void otx_cpt_aead_exit(struct crypto_aead *tfm)
+@@ -602,8 +620,7 @@ static void otx_cpt_aead_exit(struct crypto_aead *tfm)
  
  	kfree(ctx->ipad);
  	kfree(ctx->opad);
@@ -175,7 +172,7 @@ index 3c5d577d8f0d..a8b2840551f7 100644
  	kfree(ctx->sdesc);
  }
  
-@@ -699,7 +720,7 @@ static inline void swap_data64(void *buf, u32 len)
+@@ -699,7 +716,7 @@ static inline void swap_data64(void *buf, u32 len)
  		*dst = cpu_to_be64p(src);
  }
  
@@ -184,7 +181,7 @@ index 3c5d577d8f0d..a8b2840551f7 100644
  {
  	struct sha512_state *sha512;
  	struct sha256_state *sha256;
-@@ -707,22 +728,19 @@ static int copy_pad(u8 mac_type, u8 *out_pad, u8 *in_pad)
+@@ -707,22 +724,19 @@ static int copy_pad(u8 mac_type, u8 *out_pad, u8 *in_pad)
  
  	switch (mac_type) {
  	case OTX_CPT_SHA1:
@@ -210,7 +207,7 @@ index 3c5d577d8f0d..a8b2840551f7 100644
  		break;
  
  	default:
-@@ -732,55 +750,52 @@ static int copy_pad(u8 mac_type, u8 *out_pad, u8 *in_pad)
+@@ -732,55 +746,53 @@ static int copy_pad(u8 mac_type, u8 *out_pad, u8 *in_pad)
  	return 0;
  }
  
@@ -220,7 +217,7 @@ index 3c5d577d8f0d..a8b2840551f7 100644
  {
  	struct otx_cpt_aead_ctx *ctx = crypto_aead_ctx_dma(cipher);
 -	int state_size = crypto_shash_statesize(ctx->hashalg);
--	int ds = crypto_shash_digestsize(ctx->hashalg);
+ 	int ds = crypto_shash_digestsize(ctx->hashalg);
  	int bs = crypto_shash_blocksize(ctx->hashalg);
 -	int authkeylen = ctx->auth_key_len;
 +	int authkeylen = keys->authkeylen;
@@ -264,14 +261,14 @@ index 3c5d577d8f0d..a8b2840551f7 100644
 +					  authkeylen, ctx->key);
  		if (ret)
 -			goto calc_fail;
+-
 +			return ret;
-+		authkeylen = bs;
-+	} else
-+		memcpy(ctx->key, keys->authkey, authkeylen);
- 
--		authkeylen = ds;
+ 		authkeylen = ds;
 -	} else {
 -		memcpy(ipad, ctx->key, authkeylen);
++	} else
++		memcpy(ctx->key, keys->authkey, authkeylen);
++
 +	ctx->enc_key_len = keys->enckeylen;
 +	ctx->auth_key_len = authkeylen;
 +
@@ -302,7 +299,7 @@ index 3c5d577d8f0d..a8b2840551f7 100644
  	memset(ipad + authkeylen, 0, bs - authkeylen);
  	memcpy(opad, ipad, bs);
  
-@@ -798,7 +813,7 @@ static int aead_hmac_init(struct crypto_aead *cipher)
+@@ -798,7 +810,7 @@ static int aead_hmac_init(struct crypto_aead *cipher)
  	crypto_shash_init(&ctx->sdesc->shash);
  	crypto_shash_update(&ctx->sdesc->shash, ipad, bs);
  	crypto_shash_export(&ctx->sdesc->shash, ipad);
@@ -311,7 +308,7 @@ index 3c5d577d8f0d..a8b2840551f7 100644
  	if (ret)
  		goto calc_fail;
  
-@@ -806,25 +821,9 @@ static int aead_hmac_init(struct crypto_aead *cipher)
+@@ -806,25 +818,9 @@ static int aead_hmac_init(struct crypto_aead *cipher)
  	crypto_shash_init(&ctx->sdesc->shash);
  	crypto_shash_update(&ctx->sdesc->shash, opad, bs);
  	crypto_shash_export(&ctx->sdesc->shash, opad);
@@ -338,7 +335,7 @@ index 3c5d577d8f0d..a8b2840551f7 100644
  	return ret;
  }
  
-@@ -832,57 +831,15 @@ static int otx_cpt_aead_cbc_aes_sha_setkey(struct crypto_aead *cipher,
+@@ -832,57 +828,15 @@ static int otx_cpt_aead_cbc_aes_sha_setkey(struct crypto_aead *cipher,
  					   const unsigned char *key,
  					   unsigned int keylen)
  {
@@ -401,7 +398,7 @@ index 3c5d577d8f0d..a8b2840551f7 100644
  badkey:
  	return status;
  }
-@@ -891,36 +848,7 @@ static int otx_cpt_aead_ecb_null_sha_setkey(struct crypto_aead *cipher,
+@@ -891,36 +845,7 @@ static int otx_cpt_aead_ecb_null_sha_setkey(struct crypto_aead *cipher,
  					    const unsigned char *key,
  					    unsigned int keylen)
  {
