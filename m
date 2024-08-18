@@ -1,179 +1,212 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout11.his.huawei.com (frasgout11.his.huawei.com [14.137.139.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE789145B10;
-	Sat, 17 Aug 2024 09:11:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 416B581AD2;
+	Sun, 18 Aug 2024 16:59:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=14.137.139.23
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723885866; cv=none; b=ij6+ZMLkuJXo1fw5aZi2HnIcKRZKng9MwxQUaCrDVwCeLnIesAs08jkuU3rKPm1UpzuzuYuO6Ag8RMEtpeJDiYv4rxX07+LGoED7feOQ1ZIe3Nwpc8Zl/EJy8iGA1PyOQ3558Vb2VGXbzr4beJqCCy5pQ+AZrOFNgxWyF0qmvl8=
+	t=1724000386; cv=none; b=AeCafPTSJvV7klRcOG+pdzfCBsLcu+KSnwJqYwSTRA8A6iYU97E9lOhwfuZQOj0OQAT6/jIPpu/hLTvEesxnsC6pg8MwAacRx1qwm3arvAlLy1iucHVwpHhGonjYu96k1YdGysr8hkMjKqfw23RhdpbDuIuPx8L489fn0KJT5G8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723885866; c=relaxed/simple;
-	bh=URvB4JCVzwXoQzNY8U7d4UZOKGZ9b6mGU5yBRP2B/iw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=clZdykJrKBfVoB+SiBzP7JL0NJzZ9N8ze+sh4iO+RTscl9yCRhYNIwCSq0Qlz2XwZ8g2YSXMM1Yz/yoXlkfcIrr9K/0TV+KkbvtpyARjL8n8mRNeefvr/FONdjlcqerKBgtUklwIa+GVhltzr808BAMLfhNnPlumRHmCuMycy1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o3cCfnO+; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o3cCfnO+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF7ADC116B1;
-	Sat, 17 Aug 2024 09:10:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723885866;
-	bh=URvB4JCVzwXoQzNY8U7d4UZOKGZ9b6mGU5yBRP2B/iw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=o3cCfnO+qplvhZJPrkyXFi9rca7iF/+ZIA6Kw4qSDDCWbHNDqXGpNp8BqNklRihdH
-	 YHD1PR3SiKc9BurSEAvQw9R7HhgmzoOaR4Qdv1tF/Rz1qDKG6Yz0BGKBTAPhxByMQi
-	 8ZIT4BE7DfHAA8z/t5znVnG2Sk+rr0eCCJO+tQG47nCzKpeEO0zoQ9bua9eYRyhXuG
-	 VGnAO5Z5g2b9Bhg2hjw+gvkE6Yk1tDC06vl7NSxELh2edJWqly+Z+CUOdiH0XXJyWG
-	 FsVpyPF7ftPHxr4yl8nf6xSreqo+6iJZHOp1JwZfCYu7ishTYGOSeU8Oct0gJU2lQq
-	 0UkEs3ZcsAvGw==
-Message-ID: <72cef34a-acb0-4278-984c-dadd53817b5d@kernel.org>
-Date: Sat, 17 Aug 2024 11:10:57 +0200
+	s=arc-20240116; t=1724000386; c=relaxed/simple;
+	bh=hsTauafTm2FR41Tdc9ImN807VXws3wFETzem63wTHrw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=j38h+vNkTK/C5KEULp8pS9HZLwh5gZHy8RiKNLsnouH1bvPis3VPnVhkM+fdbCx83Qxzz59BYn4dE3pUS7QwYw3G2fuT5/XSNTp3pMYrNfG2kuqmG4AGlR/Zj2N5gMnKtgOZHWR5Vst11n6UNdZfGlSZVDyhMLXcsvuTV4Cky4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=14.137.139.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.18.186.51])
+	by frasgout11.his.huawei.com (SkyGuard) with ESMTP id 4Wn1gQ1BQFz9v7Hm;
+	Mon, 19 Aug 2024 00:40:34 +0800 (CST)
+Received: from mail02.huawei.com (unknown [7.182.16.47])
+	by mail.maildlp.com (Postfix) with ESMTP id 578ED1401F1;
+	Mon, 19 Aug 2024 00:59:34 +0800 (CST)
+Received: from huaweicloud.com (unknown [10.204.63.22])
+	by APP1 (Coremail) with SMTP id LxC2BwAXm4VpKMJm+zZxAQ--.21009S2;
+	Sun, 18 Aug 2024 17:59:33 +0100 (CET)
+From: Roberto Sassu <roberto.sassu@huaweicloud.com>
+To: dhowells@redhat.com,
+	dwmw2@infradead.org,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net
+Cc: linux-kernel@vger.kernel.org,
+	keyrings@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	zohar@linux.ibm.com,
+	linux-integrity@vger.kernel.org,
+	Roberto Sassu <roberto.sassu@huawei.com>
+Subject: [PATCH v2 00/14] KEYS: Add support for PGP keys and signatures
+Date: Sun, 18 Aug 2024 18:57:42 +0200
+Message-Id: <20240818165756.629203-1-roberto.sassu@huaweicloud.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 04/16] crypto: qce - Add support for crypto address
- read
-To: Md Sadre Alam <quic_mdalam@quicinc.com>, vkoul@kernel.org,
- robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- andersson@kernel.org, konradybcio@kernel.org, thara.gopinath@gmail.com,
- herbert@gondor.apana.org.au, davem@davemloft.net, gustavoars@kernel.org,
- u.kleine-koenig@pengutronix.de, kees@kernel.org, agross@kernel.org,
- linux-arm-msm@vger.kernel.org, dmaengine@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org
-Cc: quic_srichara@quicinc.com, quic_varada@quicinc.com,
- quic_utiwari@quicinc.com
-References: <20240815085725.2740390-1-quic_mdalam@quicinc.com>
- <20240815085725.2740390-5-quic_mdalam@quicinc.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20240815085725.2740390-5-quic_mdalam@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:LxC2BwAXm4VpKMJm+zZxAQ--.21009S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxKrW7ArW5Zw4fGFW7uFWDtwb_yoWxuF1xpF
+	4Fkr90yFyDJrn2kayfJw17uw4rAFs5Aw43Gwnaqw15A3sIqF10ya92kF13uF9xGr18XrWF
+	qrWYqw1UCw1Yy3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvFb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxV
+	AFwI0_Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAa
+	w2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxV
+	Aqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q
+	6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6x
+	kF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AK
+	xVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvj
+	xUF1v3UUUUU
+X-CM-SenderInfo: purev21wro2thvvxqx5xdzvxpfor3voofrz/1tbiAgATBGbBWPgB5wABs1
 
-On 15/08/2024 10:57, Md Sadre Alam wrote:
-> Get crypto base address from DT. This will use for
-> command descriptor support for crypto register r/w
-> via BAM/DMA
+From: Roberto Sassu <roberto.sassu@huawei.com>
 
-All your commit messages are oddly wrapped. This does not make reading
-it easy...
+Support for PGP keys and signatures was proposed by David long time ago,
+before the decision of using PKCS#7 for kernel modules signatures
+verification was made. After that, there has been not enough interest to
+support PGP too.
 
-> 
-> Signed-off-by: Md Sadre Alam <quic_mdalam@quicinc.com>
-> ---
-> Change in [v2]
-> 
-> * Addressed all comments from v1
-> 
-> Change in [v1]
-> 
-> * Added support to read crypto base address from dt
-> 
->  drivers/crypto/qce/core.c | 13 ++++++++++++-
->  drivers/crypto/qce/core.h |  1 +
->  2 files changed, 13 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
-> index 28b5fd823827..9b23a948078a 100644
-> --- a/drivers/crypto/qce/core.c
-> +++ b/drivers/crypto/qce/core.c
-> @@ -192,6 +192,7 @@ static int qce_crypto_probe(struct platform_device *pdev)
->  {
->  	struct device *dev = &pdev->dev;
->  	struct qce_device *qce;
-> +	struct resource *res;
->  	int ret;
->  
->  	qce = devm_kzalloc(dev, sizeof(*qce), GFP_KERNEL);
-> @@ -201,10 +202,16 @@ static int qce_crypto_probe(struct platform_device *pdev)
->  	qce->dev = dev;
->  	platform_set_drvdata(pdev, qce);
->  
-> -	qce->base = devm_platform_ioremap_resource(pdev, 0);
-> +	qce->base = devm_platform_get_and_ioremap_resource(pdev, 0, &res);
->  	if (IS_ERR(qce->base))
->  		return PTR_ERR(qce->base);
->  
-> +	qce->base_dma = dma_map_resource(dev, res->start,
-> +					 resource_size(res),
-> +					 DMA_BIDIRECTIONAL, 0);
-> +	if (dma_mapping_error(dev, qce->base_dma))
-> +		return -ENXIO;
-> +
->  	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(32));
->  	if (ret < 0)
->  		return ret;
+Lately, when discussing a proposal of introducing fsverity signatures in
+Fedora [1], developers expressed their preference on not having a separate
+key for signing, which would complicate the management of the distribution.
+They would be more in favor of using the same PGP key, currently used for
+signing RPM headers, also for file-based signatures (not only fsverity, but
+also IMA ones).
 
-And how do you handle error paths?
+Another envisioned use case would be to add the ability to appraise RPM
+headers with their existing PGP signature, so that they can be used as an
+authenticated source of reference values for appraising remaining
+files [2].
 
+To make these use cases possible, introduce support for PGP keys and
+signatures in the kernel, and load provided PGP keys in the built-in
+keyring, so that PGP signatures of RPM headers, fsverity digests, and IMA
+digests can be verified from this trust anchor.
 
-> @@ -280,6 +287,7 @@ static int qce_crypto_probe(struct platform_device *pdev)
->  static void qce_crypto_remove(struct platform_device *pdev)
->  {
->  	struct qce_device *qce = platform_get_drvdata(pdev);
-> +	struct resource *res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
->  
->  	tasklet_kill(&qce->done_tasklet);
->  	qce_unregister_algs(qce);
-> @@ -287,6 +295,9 @@ static void qce_crypto_remove(struct platform_device *pdev)
->  	clk_disable_unprepare(qce->bus);
->  	clk_disable_unprepare(qce->iface);
->  	clk_disable_unprepare(qce->core);
-> +
-> +	dma_unmap_resource(&pdev->dev, qce->base_dma, resource_size(res),
-> +			   DMA_BIDIRECTIONAL, 0);
+In addition to the original version of the patch set, also introduce
+support for signature verification of PGP keys, so that those keys can be
+added to keyrings with a signature-based restriction (e.g. .ima). PGP keys
+are searched with partial IDs, provided with signature subtype 16 (Issuer).
+Search with full IDs could be supported with
+draft-ietf-openpgp-rfc4880bis-10, by retrieving the information from
+signature subtype 33 (Issuer Fingerprint). Due to the possibility of ID
+collisions, the key_or_keyring restriction is not supported.
 
-If you add code to the remove callback, not adding it to error paths is
-suspicious by itself...
+The patch set includes two preliminary patches: patch 1 introduces
+mpi_key_length(), to get the number of bits and bytes of an MPI; patch 2
+introduces rsa_parse_priv_key_raw() and rsa_parse_pub_key_raw(), to parse
+an RSA key in RAW format if the ASN.1 parser returns an error.
 
-Best regards,
-Krzysztof
+Patches 3-5 introduce the library necessary to parse PGP keys and
+signatures, whose support is added with patches 6-10. Patch 11 introduces
+verify_pgp_signature() to be used by kernel subsystems (e.g. fsverity and
+IMA). Patch 12 is for testing of PGP signatures. Finally, patches 13-14
+allow loading a set of PGP keys from a supplied blob at boot time.
+
+Changelog
+
+v1 [4]:
+- Remove quiet_cmd_extract_certs (redundant, likely leftover from
+  conflict resolution)
+- Load PGP keys embedded in the kernel image within load_module_cert()
+  and load_system_certificate_list(), instead of using a separate initcall
+- Style bug fixes found by checkpatch.pl
+- Add <crypto/pgp.h> include in crypto/asymmetric_keys/pgp_preload.c, to
+  remove no previous prototype warning
+- Correctly check returned tfm in pgp_generate_fingerprint()
+- Fix printing message in pgp_generate_fingerprint()
+- Don't create a public key if the key blob does not contain a PGP key
+  packet
+- Remove unused pgp_pubkey_hash array
+- Set KEY_EFLAG_DIGITALSIG key flag if the key has the capability
+- Allow PGP_SIG_GENERAL_CERT_OF_UID_PUBKEY signature type (for key sigs)
+- Add is_key_sig parameter to pgp_sig_get_sig() to ensure the key
+  signature type is PGP_SIG_GENERAL_CERT_OF_UID_PUBKEY or
+  PGP_SIG_POSTITIVE_CERT_OF_UID_PUBKEY
+
+v0 [3]:
+- style fixes
+- move include/linux/pgp.h and pgplib.h to crypto/asymmetric_keys
+- introduce verify_pgp_signature()
+- replace KEY_ALLOC_TRUSTED flag with KEY_ALLOC_BUILT_IN
+- don't fetch PGP subkeys
+- drop support for DSA
+- store number of MPIs in pgp_key_algo_p_num_mpi array
+- replace dynamic memory allocations with static ones in
+  pgp_generate_fingerprint()
+- store only keys with capability of verifying signatures
+- remember selection of PGP signature packet and don't repeat parsing
+- move search of the PGP key to verify the signature from the beginning
+  to the end of the verification process (to be similar with PKCS#7)
+- don't retry key search in the session keyring from the signature
+  verification code, let the caller pass the desired keyring
+- for the PGP signature test key type, retry the key search in the session
+  keyring
+- retry key search in restrict_link_by_signature() with a partial ID
+  (provided in the PGP signature)
+
+[1] https://fedoraproject.org/wiki/Changes/FsVerityRPM
+[2] https://lore.kernel.org/linux-integrity/20240415142436.2545003-1-roberto.sassu@huaweicloud.com/
+[3] https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-modsign.git/log/?h=pgp-parser
+[4] https://lore.kernel.org/linux-integrity/20220111180318.591029-1-roberto.sassu@huawei.com/
+
+David Howells (8):
+  PGPLIB: PGP definitions (RFC 4880)
+  PGPLIB: Basic packet parser
+  PGPLIB: Signature parser
+  KEYS: PGP data parser
+  KEYS: Provide PGP key description autogeneration
+  KEYS: PGP-based public key signature verification
+  PGP: Provide a key type for testing PGP signatures
+  KEYS: Provide a function to load keys from a PGP keyring blob
+
+Roberto Sassu (6):
+  mpi: Introduce mpi_key_length()
+  rsa: add parser of raw format
+  KEYS: Retry asym key search with partial ID in
+    restrict_link_by_signature()
+  KEYS: Calculate key digest and get signature of the key
+  verification: introduce verify_pgp_signature()
+  KEYS: Introduce load_pgp_public_keyring()
+
+ MAINTAINERS                             |   1 +
+ certs/Kconfig                           |  11 +
+ certs/Makefile                          |   7 +
+ certs/system_certificates.S             |  18 +
+ certs/system_keyring.c                  |  93 ++++
+ crypto/asymmetric_keys/Kconfig          |  38 ++
+ crypto/asymmetric_keys/Makefile         |  13 +
+ crypto/asymmetric_keys/pgp.h            | 206 ++++++++
+ crypto/asymmetric_keys/pgp_library.c    | 620 ++++++++++++++++++++++++
+ crypto/asymmetric_keys/pgp_parser.h     |  18 +
+ crypto/asymmetric_keys/pgp_preload.c    | 111 +++++
+ crypto/asymmetric_keys/pgp_public_key.c | 492 +++++++++++++++++++
+ crypto/asymmetric_keys/pgp_signature.c  | 505 +++++++++++++++++++
+ crypto/asymmetric_keys/pgp_test_key.c   | 129 +++++
+ crypto/asymmetric_keys/pgplib.h         |  74 +++
+ crypto/asymmetric_keys/restrict.c       |  10 +-
+ crypto/rsa.c                            |  14 +-
+ crypto/rsa_helper.c                     |  69 +++
+ include/crypto/internal/rsa.h           |   6 +
+ include/crypto/pgp.h                    |  36 ++
+ include/linux/mpi.h                     |   2 +
+ include/linux/verification.h            |  23 +
+ lib/crypto/mpi/mpicoder.c               |  33 +-
+ 23 files changed, 2516 insertions(+), 13 deletions(-)
+ create mode 100644 crypto/asymmetric_keys/pgp.h
+ create mode 100644 crypto/asymmetric_keys/pgp_library.c
+ create mode 100644 crypto/asymmetric_keys/pgp_parser.h
+ create mode 100644 crypto/asymmetric_keys/pgp_preload.c
+ create mode 100644 crypto/asymmetric_keys/pgp_public_key.c
+ create mode 100644 crypto/asymmetric_keys/pgp_signature.c
+ create mode 100644 crypto/asymmetric_keys/pgp_test_key.c
+ create mode 100644 crypto/asymmetric_keys/pgplib.h
+ create mode 100644 include/crypto/pgp.h
+
+-- 
+2.34.1
 
