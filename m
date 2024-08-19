@@ -1,225 +1,187 @@
-Received: from frasgout13.his.huawei.com (frasgout13.his.huawei.com [14.137.139.46])
+Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C2A032C8B;
-	Mon, 19 Aug 2024 16:31:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=14.137.139.46
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724085069; cv=none; b=rLiqnos3vnFwg94i2/uae2uTep2Yd4uiQJZd+1NIww2j4nxbWwVaNmnNfrtUPp7aVZjzdgPMoIU1ZIqfMh8b43YyZ8PvNfFsEoaVRaSV7MplIluWf3EV0qv35QxqKNWGQWfDzRrf0VYsijv06M6fw2n6U8zpMHV8pwqI3EaBg0g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724085069; c=relaxed/simple;
-	bh=KayCsSrw/wPS7vuoxUC8St036JAJ2fqsYzR9mza+wY0=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=uSX2QED7kp7KxgZ1Dz0LKiVEYOYZBMaZoUc3QTYi662xumeAwJPJlvi4AIBqwOwwr5DeSKz97RTkJIahoNpbs/eJ17JNd1djKxUXEHO7Dtg4jFZvkT0InGsZEMzu/Usi79t9B3WIV2u1h89KLQdnIvaMZGVycWWzVl86m4aRvHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=14.137.139.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.18.186.51])
-	by frasgout13.his.huawei.com (SkyGuard) with ESMTP id 4Wnd035HvWz9v7NP;
-	Tue, 20 Aug 2024 00:12:03 +0800 (CST)
-Received: from mail02.huawei.com (unknown [7.182.16.27])
-	by mail.maildlp.com (Postfix) with ESMTP id E131314065B;
-	Tue, 20 Aug 2024 00:30:53 +0800 (CST)
-Received: from [127.0.0.1] (unknown [10.204.63.22])
-	by APP2 (Coremail) with SMTP id GxC2BwD3E8Exc8NmeuqEAQ--.28899S2;
-	Mon, 19 Aug 2024 17:30:52 +0100 (CET)
-Message-ID: <d0070fb3b46aa9d8f02ee9d0558cd6107af74a73.camel@huaweicloud.com>
-Subject: Re: [PATCH v2 00/14] KEYS: Add support for PGP keys and signatures
-From: Roberto Sassu <roberto.sassu@huaweicloud.com>
-To: dhowells@redhat.com, dwmw2@infradead.org, herbert@gondor.apana.org.au, 
-	davem@davemloft.net
-Cc: linux-kernel@vger.kernel.org, keyrings@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, zohar@linux.ibm.com, 
-	linux-integrity@vger.kernel.org, Roberto Sassu <roberto.sassu@huawei.com>
-Date: Mon, 19 Aug 2024 18:30:38 +0200
-In-Reply-To: <20240818165756.629203-1-roberto.sassu@huaweicloud.com>
-References: <20240818165756.629203-1-roberto.sassu@huaweicloud.com>
-Content-Type: text/plain; charset="UTF-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96E49188CA3
+	for <linux-crypto@vger.kernel.org>; Mon, 19 Aug 2024 17:45:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=216.71.154.45
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724089502; cv=fail; b=Q7KRnWnLv6spVLlbaGxt8cRsd5ak7MZyjCIhkjkFfd9gHbeRZmiy0dM1Ni1B13mynlhJf9ykvyvEMv55sQQZ9uO2VKMQzNpYiPsB4aO3jMoEchy7RNuRHUzyhRhs9D8lU/OBRKo5uZVxhc2XvMirFDPipGJ3PnvyGKFnHa0pwE8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724089502; c=relaxed/simple;
+	bh=DPlEf2zh7Z3U5Ra2dj0qCYgVtOL5kmdLZs2edE3ulCc=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=ahV/X3aREn/2ujMotuTjLcs9ydkHJL3/8Hz7huj2fawEsuVumbBWVZqOLCFGyyrUom6eC05egIHMHcuCVW27jN+krUy+OjDYNhJn5j7FWxdAN8TAMHxwi87LZSkwOtn3yLXaeLMw81VDyIEZQwtYlUW+m95dTPzPo73lx1MRkPc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com; spf=pass smtp.mailfrom=wdc.com; dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b=F2xQ5BBN; dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b=lnjsQeLE; arc=fail smtp.client-ip=216.71.154.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wdc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wdc.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="F2xQ5BBN";
+	dkim=pass (1024-bit key) header.d=sharedspace.onmicrosoft.com header.i=@sharedspace.onmicrosoft.com header.b="lnjsQeLE"
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1724089500; x=1755625500;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=DPlEf2zh7Z3U5Ra2dj0qCYgVtOL5kmdLZs2edE3ulCc=;
+  b=F2xQ5BBNWq1eCnP3+6F5uvZsBC53zRp5dNfW8NdqYiOonnQGZ4u7g5ak
+   xb6/CTVIWfG0u5+r4mw3RbbueIF6GlCUlV5icQqRYdtZajpCua/atAw5V
+   kEbP6TiWk//EMebzlCfBFOW/QzqJipTb4PfkEp6gXRjuDDSfyLaMhX3R6
+   kS1FRdNw0WlcuEH0aaJ5UhexULqektFHzXOY7xc/tiKpYLMxe3UIzmitA
+   2MlrU82Ux9xCqhoUadJgOLFoMADl+y3NyG43PAWb6NluY1tD4S6cq25ga
+   9ALj2cO9q21Ug2EZ502vdUOzyES1qPuWyuRrAD1GGM/ZtiUaHOjRWFe2j
+   A==;
+X-CSE-ConnectionGUID: gCKZ1pjqTRqv038DOT6XCQ==
+X-CSE-MsgGUID: JiVDDPvaRg+2LgtYhE6e6A==
+X-IronPort-AV: E=Sophos;i="6.10,159,1719849600"; 
+   d="scan'208";a="24667038"
+Received: from mail-eastusazlp17010001.outbound.protection.outlook.com (HELO BL2PR02CU003.outbound.protection.outlook.com) ([40.93.11.1])
+  by ob1.hgst.iphmx.com with ESMTP; 20 Aug 2024 01:44:58 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=vKYhahE8e1dXu0ds4sSdELkXhw7Zzs94jC3q5tUrTYJtag34k0YI14JFeYYCoseHbRMH6MCcC8+4rdJaci7iS3/nBiUKypfvM3QtLcENYmMlOFqjCFYrSLakVh413Te65b09ZzNjykqaHyi1Glj4h2FojAPZcsVgiIv3kt2kj1ep3pK3B56zsteSCXOTAbI5qmunlfPCwcNFsowE2pTkVGqvd5in60nzbWxa99cZtfVUN3q3XchyfH3l0ko4ocGIjXjxzq9c0dlWlOZVfMMDMBnPC8QXp2yUcJzMiPGgIcdMxXzleH2u4uQ/d58ozonR4BV7FfIB8hrq57zb2sxxkg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=DPlEf2zh7Z3U5Ra2dj0qCYgVtOL5kmdLZs2edE3ulCc=;
+ b=Z25zX6VKZb+C0MbFnYp5QSnPMPF+5N9CEJ1FW2tR9lk1mxGuxD9PlhLgWpGgn9lfgoWI48cQyaxR24uF8eHaZS+KMarElMRWYji+/BKGGRwzrmKfozzhfR+wdFqMYS5GDxLWkm60Hjv/A/o+l5pRhaqs0shH4n7j1coTxQqMCl/Pmh9R+2qCL5OAMhatxgL8vNeBf+ygAW5vjwC4tNcpQiJPJ9TncPjM5ZMHbOt/wQtHy5C4ZBe53ODc6fwLbFA+Eu/lalk0lvbgtRlQSjlBDOe0x113mOQmvr9ejIfXK+rcV5WmFLJ4wcOj/apgIgmGiSVgkHrYHj73GYCDb/Wa7w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=DPlEf2zh7Z3U5Ra2dj0qCYgVtOL5kmdLZs2edE3ulCc=;
+ b=lnjsQeLED9nUcypgyfMEaxqhllbKvOzhbf/AD2ZkHSAFhfQbnkpskbypLqVpufkS8XWwAiCpTASdIAQw2cmloBScjmfgkPA3z+c+wUaJ6xs36nMSNvJNyJn5DNy4jPaYzcK/DY9GP05bp1IyV+aiEliyFCOzCTdNNDeHVAv+5xE=
+Received: from BY5PR04MB6849.namprd04.prod.outlook.com (2603:10b6:a03:228::17)
+ by BY1PR04MB9610.namprd04.prod.outlook.com (2603:10b6:a03:5b8::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.21; Mon, 19 Aug
+ 2024 17:44:55 +0000
+Received: from BY5PR04MB6849.namprd04.prod.outlook.com
+ ([fe80::b2a6:2bbf:ed0a:7320]) by BY5PR04MB6849.namprd04.prod.outlook.com
+ ([fe80::b2a6:2bbf:ed0a:7320%7]) with mapi id 15.20.7875.019; Mon, 19 Aug 2024
+ 17:44:55 +0000
+From: Kamaljit Singh <Kamaljit.Singh1@wdc.com>
+To: Hannes Reinecke <hare@suse.de>, hch <hch@lst.de>
+CC: Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+	"linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>, Eric
+ Biggers <ebiggers@kernel.org>, "linux-crypto@vger.kernel.org"
+	<linux-crypto@vger.kernel.org>
+Subject: Re: [PATCHv9 0/9] nvme: implement secure concatenation
+Thread-Topic: [PATCHv9 0/9] nvme: implement secure concatenation
+Thread-Index: AQHa7XJkx9IUgccPBEuakH4yu6nDrrIqOHeTgAPytoCAALgRYg==
+Date: Mon, 19 Aug 2024 17:44:55 +0000
+Message-ID:
+ <BY5PR04MB68498D30DA2C154B069D3897BC8C2@BY5PR04MB6849.namprd04.prod.outlook.com>
+References: <20240813111512.135634-1-hare@kernel.org>
+ <BY5PR04MB6849C928A957A4C549A94020BC812@BY5PR04MB6849.namprd04.prod.outlook.com>
+ <5f0eee28-289f-4a84-a292-eda119783ed4@suse.de>
+In-Reply-To: <5f0eee28-289f-4a84-a292-eda119783ed4@suse.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BY5PR04MB6849:EE_|BY1PR04MB9610:EE_
+x-ms-office365-filtering-correlation-id: 570fdd84-1c5d-4041-2fa1-08dcc076a31a
+x-ld-processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|38070700018;
+x-microsoft-antispam-message-info:
+ =?iso-8859-1?Q?foNRXeiYr9b5xILaH7iCthLXjsT4rF4S+Zx2cxadDzI8Y1zcb6RMYy8j5k?=
+ =?iso-8859-1?Q?TGqus1Ucwi3O0uLlGe5n/h0sMGFkrVZVHuQR5VhD6QqnL86R8KR3WBWo74?=
+ =?iso-8859-1?Q?YqbvCqmyjwA6nvCnnJkgCAqlwSy6i1nejkyQC3h/KAhBgB3hBOH22/kMj6?=
+ =?iso-8859-1?Q?qj8rJrVKlQFOBs+hG3PeuDVVd2+45ZX5a4O2Ipjd9I5wV2unOcFMGcC/gp?=
+ =?iso-8859-1?Q?BmDTkBSauKC+zf2Jkx6OxtcW1ctJST6Z10DzBUFBe991eF2B+O6sCGgVw7?=
+ =?iso-8859-1?Q?G6SqpX+3HPm5WbDFoQKyPRRvPEgidRq1j8yzs1FFZ6MT13c7TYRVy42PJ+?=
+ =?iso-8859-1?Q?QaZPNi61DxabOyJnkSZfkuFLiLtEg1RQEYw+oUZUgU5JxgUE8gvJlkqc38?=
+ =?iso-8859-1?Q?Hojj19GY5J1eWCy1LJYb1LVEkzbZclY+WRSJVW94YlXaA+RVDgU/3nLgpo?=
+ =?iso-8859-1?Q?/nZj5jmqeedDJ6/LJDq0Yn+r4eeHaF0jP/gRrBvHSCrfU86DsUTkmJYXXJ?=
+ =?iso-8859-1?Q?C7hP4I+KqTfGbUqrd/Zyaahtg0MixPDDsaHFP/IhC+80yIt64l97gnS5sy?=
+ =?iso-8859-1?Q?UqsOINN5JHNvQCaubJ02Hx0Nu+RL+BPgZhXrr4ibay1MDLSaKNAysZUgNw?=
+ =?iso-8859-1?Q?mzSKCDqdJlvhXHg8Bjb0CE5zlHiisjc7+fdJwhy7/OjenT1NVrgSci1JuL?=
+ =?iso-8859-1?Q?nRhnXMhrLfpzMk9iqa/EJgC2+bQKFD+QMKgyAWusCVjWXpHibvMUJI1759?=
+ =?iso-8859-1?Q?xQMv71YY6ghHMBZ9UFzmye0AVr5ZBEQPDyDjK30RG98oAAfyfqLUZrW+Qn?=
+ =?iso-8859-1?Q?joc0fQkm235mjLIUfEn9ysCT8+CxDXDOQ6KfolaMqtGR/oOkHP70GJ3GxQ?=
+ =?iso-8859-1?Q?ENhaOhtTs1+j5+D+BrlzjZpJYkXHIH2Lq2zTMlOiRSMjVgQmd62bCRcbOy?=
+ =?iso-8859-1?Q?7eFM26ygjKzbxI1Q+uMokuIIYpPHySGH77JNPVe4hH7+DHvzlqmfSq1je0?=
+ =?iso-8859-1?Q?Mg2SzQRmEQuZRsLw5pMzSkVwY8ykvmdqgCFOidwxLGvteUPv2FPBiMk/Wd?=
+ =?iso-8859-1?Q?FyDIxayAuU5NzoroUdCbMuzVwnoyPySR4zERMqJpTtsYA12mWdlllVdp24?=
+ =?iso-8859-1?Q?sUFlf0d5gwG5JwSmDQAnlwNc9IjcPrSKnOCKFqF7Ch/pRICQFdwSnoi83R?=
+ =?iso-8859-1?Q?a5hmAhYncTD4bdfolcvkRicDbis8MzFM4N4j32C47nviN16b7wYXCaC7+u?=
+ =?iso-8859-1?Q?LjiaMjmipYaBYEgRDiM91cFsDoL8Alech8w5OSjD7rzZVdohxVg9kGdxis?=
+ =?iso-8859-1?Q?lu3tiZq5oaFjL4NZoU50o5+2vRUusg5ZG0zFRDD6Wr0FCO7BUMwg5EtNKt?=
+ =?iso-8859-1?Q?H44o5WJIrkrMClb4h/FC9W/56ZFkbc3vrb6+W7gKPrdDmWqyXw3+UqjXqn?=
+ =?iso-8859-1?Q?zR8jhoOZ9Nby9P6G3jsoSUSAwQ2Y3tZ1C6reGA=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR04MB6849.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?cKq9+YW7+fUakOXoulGdJJfsVi5vApwQZ2RG1D1YwM8/KyqmgmE13y4MoH?=
+ =?iso-8859-1?Q?tdMNsZSghxKYRXiyD9QEI4E9Rf/kw9lGleFsAn5iBwkqxb99iRq7idufRn?=
+ =?iso-8859-1?Q?APSdPO3hi3t37XVx48LYBCFbuNLav54cQZmXOHCB9eJChd5IKU19zJlMZC?=
+ =?iso-8859-1?Q?wL3WlQuV5m/0DBfhlYvSqhVxDK0Uh/Y+vFyCz5+Sp7zml3bNDPJ0jMyo35?=
+ =?iso-8859-1?Q?KkxoeWrguk7r7O4q+mg/3v6FLL18prNmYpkSL3nmWhaKg+ZACuEDMqltYI?=
+ =?iso-8859-1?Q?ICgd/XctFg9Od9JUabF2GIgsGhJmaBupHViFvo8IBF/JzcCT8NOvHxuKxG?=
+ =?iso-8859-1?Q?EJaoInvmikw+JU92F1e5/cZ/I/myfkMbbMOuiC7UbopV7o9FpSwzZprZ/L?=
+ =?iso-8859-1?Q?R2X2c2B5h6L2hIzCHCCGFLAXFkWWiztc72VN32nqPVXiANoNgToXTlXDG5?=
+ =?iso-8859-1?Q?hlbHqVCLRc25DGLjqP6keabMYDebIMlC/30Yxoei5SfdL50vshRrFV+YRL?=
+ =?iso-8859-1?Q?0mikCK0OhVV9KiKqpHwEyGzRjDNDuBXtN9gRkU20jN+HeDPH7WytDaGYRs?=
+ =?iso-8859-1?Q?ezpjjp4uuhslkFJDwmRij+gYwF4bjNZ0snju3w5tjiSUM5eY8eTIVmX/jR?=
+ =?iso-8859-1?Q?aXgm90L5N9ZH9FvmsKeYS6OnStRPqKNF7eHHeZd4goPX5CmTphXw63d05U?=
+ =?iso-8859-1?Q?xYRcilRuU2/+Ix+7QHk9vj0l8vMW7+ZLg0TZE+ubyhxhnKjs3oQq4kElp+?=
+ =?iso-8859-1?Q?uJY3oOXsX6k/f1IFvCMqiJFN6JTzaQPZ3ow/kRzCW45Nb7HDrnPMDI0DO3?=
+ =?iso-8859-1?Q?bhMKsUBN/grVuXKc/ajTL2sg+ZE03GZNlF07HirVVoRnj/o7J500OixIq7?=
+ =?iso-8859-1?Q?4NO4L070G6NiDjCaOuJ/DJ8S3M1nThiavmrs0rPK/y4SLFsj7gMrklllTX?=
+ =?iso-8859-1?Q?z2asNgZ9wrCYsRBl9MBBbk+wbVuBHpVVZxcADH0oBrYjEd3RRNokLV7vnH?=
+ =?iso-8859-1?Q?cnVFCOPHdInuckzDBnju3Is4hv/gJRVd1h4U8HHypopBmSm5gn0Kvf+kqK?=
+ =?iso-8859-1?Q?6Zj1OSUB6ZnUNdxyPZfdQWIxoWdFuoy4d2Rj2AEm5pGFcvLPqLzJq71PYX?=
+ =?iso-8859-1?Q?nmtSCn2nZ98sFUKs1KVLAjbCwCGO9Fh9y/SXj3Hj3PS/wGg47folII/UDn?=
+ =?iso-8859-1?Q?P87VE6IafCIWwrgFcxXphf2qu9qwmSPnrRiBLVsSdGjN9DRci7vo16VLzE?=
+ =?iso-8859-1?Q?nKKySgGaPHZhrQob06VNhBVeA5Rmz+Z9lX6ic8hC+UcRkjhwvak5MJ7wwY?=
+ =?iso-8859-1?Q?CXuW0+JHkKDBH79mkqVuxthCkce5gV0heRZMTyEVDt+L6UV/ZJcnFapC5q?=
+ =?iso-8859-1?Q?/LnI7DNZnkHcVWvPYHwwcybR8UGzQkSqbQzIA9PcA7Dds6jb/BI29bvC+y?=
+ =?iso-8859-1?Q?p9ZDpAVT6VZyGlP7ioKwwQegLwh3JFgPitxoc20hPGONmbza2osUh1sZgZ?=
+ =?iso-8859-1?Q?N02bCSXuM/sPs9F+I+YPD5DOMyc6Z5NUHib5BrGLuUEpXkILslu9qrv3UW?=
+ =?iso-8859-1?Q?YQweRXOqDSCmZx4JEpekxGhSGW1DLesxnZH+8kDFgP5ZkYIDyK17b243Rz?=
+ =?iso-8859-1?Q?KIItHksZC9/lJv0yXHhO2Rn9yOl5tx9Jpy?=
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-CM-TRANSID:GxC2BwD3E8Exc8NmeuqEAQ--.28899S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxtw4xtF43GF47CF4xXFW8Zwb_yoW3Jr4fpF
-	4rKr98JF98Gr92kFWfJw1xu3y5Ars5Aw43Gwnagw15A3sIqF1vya92kF43uF9xGr18Xr4F
-	qrZYqr1UCw1Yy3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxV
-	AFwI0_Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AF
-	wI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
-	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-	0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
-	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUF1
-	v3UUUUU
-X-CM-SenderInfo: purev21wro2thvvxqx5xdzvxpfor3voofrz/1tbiAgAABGbCqngH4gAAsV
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	83xfIMskFeLeiGTc+rBcrWjtrvUnGoBjwdWszYb4Bnh3O4k1UqFtrG2oWUcn1L+jxZR+p9cl7wbUEX/DMygKJRinImUoe3aRpiojGNBbqsNREEB0KfFWAPWkgo4wQ8b2eIrRpHxUKADNR40YMpkjOPFx0stVO6W+XA3CAbnwmzLbS+xB2EwTvY1SSO2PxOnlTs+XYhqlFuw6krDxW2v+ahB6lAzMLBZFRkEebhd76kjyLpvNkMhg6r2Fii0Nny32DmEUmIbYRty83WJxGJeYcqv0z2ktAplrHeurfr+QXjzK14SwnL9ozA4mWh4JBnQjiPIXJYO4SLNQXdqlzdwtD5uZJzd4iPr6REsIQZjNA212CF/kb234U5647b4FxKOWSwb9i1nvaboR1WxjjZWLsfUh1Vlix1tgB+D5gy1pbPYZjgysJuLtywjWU08G2Fk1qn0GRjvtZkuXgdt4VYgT/5MH5QDasnGWLq+cKV4XymNgP+Q4UBQl1zxrWmkwe977Wnilmg/NNuftPXtj7vQuitmWJPUOT/GWgEMQrfMFA8QoJaZuYtNlbyRF/6f792UgbI6XC5Fw9yo7oIL+bdp23986CE2T/g5oASTAxrvfG3zrcyUPMMTr96vdatwMO41v
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BY5PR04MB6849.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 570fdd84-1c5d-4041-2fa1-08dcc076a31a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Aug 2024 17:44:55.4401
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: TP9knKxi1R0cd46kLsqJJOn1J8SIt7g4llPVr1xxIFQHGPgvyB4qLUihgb0c38JMnEN9IJ1tA9JcTjPJLGOY7g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY1PR04MB9610
 
-On Sun, 2024-08-18 at 18:57 +0200, Roberto Sassu wrote:
-> From: Roberto Sassu <roberto.sassu@huawei.com>
->=20
-> Support for PGP keys and signatures was proposed by David long time ago,
-> before the decision of using PKCS#7 for kernel modules signatures
-> verification was made. After that, there has been not enough interest to
-> support PGP too.
->=20
-> Lately, when discussing a proposal of introducing fsverity signatures in
-> Fedora [1], developers expressed their preference on not having a separat=
-e
-> key for signing, which would complicate the management of the distributio=
-n.
-> They would be more in favor of using the same PGP key, currently used for
-> signing RPM headers, also for file-based signatures (not only fsverity, b=
-ut
-> also IMA ones).
-
-Update: since Fedora 39, IMA file signatures are supported on an
-independent key infrastructure.
-
-Roberto
-
-> Another envisioned use case would be to add the ability to appraise RPM
-> headers with their existing PGP signature, so that they can be used as an
-> authenticated source of reference values for appraising remaining
-> files [2].
->=20
-> To make these use cases possible, introduce support for PGP keys and
-> signatures in the kernel, and load provided PGP keys in the built-in
-> keyring, so that PGP signatures of RPM headers, fsverity digests, and IMA
-> digests can be verified from this trust anchor.
->=20
-> In addition to the original version of the patch set, also introduce
-> support for signature verification of PGP keys, so that those keys can be
-> added to keyrings with a signature-based restriction (e.g. .ima). PGP key=
-s
-> are searched with partial IDs, provided with signature subtype 16 (Issuer=
-).
-> Search with full IDs could be supported with
-> draft-ietf-openpgp-rfc4880bis-10, by retrieving the information from
-> signature subtype 33 (Issuer Fingerprint). Due to the possibility of ID
-> collisions, the key_or_keyring restriction is not supported.
->=20
-> The patch set includes two preliminary patches: patch 1 introduces
-> mpi_key_length(), to get the number of bits and bytes of an MPI; patch 2
-> introduces rsa_parse_priv_key_raw() and rsa_parse_pub_key_raw(), to parse
-> an RSA key in RAW format if the ASN.1 parser returns an error.
->=20
-> Patches 3-5 introduce the library necessary to parse PGP keys and
-> signatures, whose support is added with patches 6-10. Patch 11 introduces
-> verify_pgp_signature() to be used by kernel subsystems (e.g. fsverity and
-> IMA). Patch 12 is for testing of PGP signatures. Finally, patches 13-14
-> allow loading a set of PGP keys from a supplied blob at boot time.
->=20
-> Changelog
->=20
-> v1 [4]:
-> - Remove quiet_cmd_extract_certs (redundant, likely leftover from
->   conflict resolution)
-> - Load PGP keys embedded in the kernel image within load_module_cert()
->   and load_system_certificate_list(), instead of using a separate initcal=
-l
-> - Style bug fixes found by checkpatch.pl
-> - Add <crypto/pgp.h> include in crypto/asymmetric_keys/pgp_preload.c, to
->   remove no previous prototype warning
-> - Correctly check returned tfm in pgp_generate_fingerprint()
-> - Fix printing message in pgp_generate_fingerprint()
-> - Don't create a public key if the key blob does not contain a PGP key
->   packet
-> - Remove unused pgp_pubkey_hash array
-> - Set KEY_EFLAG_DIGITALSIG key flag if the key has the capability
-> - Allow PGP_SIG_GENERAL_CERT_OF_UID_PUBKEY signature type (for key sigs)
-> - Add is_key_sig parameter to pgp_sig_get_sig() to ensure the key
->   signature type is PGP_SIG_GENERAL_CERT_OF_UID_PUBKEY or
->   PGP_SIG_POSTITIVE_CERT_OF_UID_PUBKEY
->=20
-> v0 [3]:
-> - style fixes
-> - move include/linux/pgp.h and pgplib.h to crypto/asymmetric_keys
-> - introduce verify_pgp_signature()
-> - replace KEY_ALLOC_TRUSTED flag with KEY_ALLOC_BUILT_IN
-> - don't fetch PGP subkeys
-> - drop support for DSA
-> - store number of MPIs in pgp_key_algo_p_num_mpi array
-> - replace dynamic memory allocations with static ones in
->   pgp_generate_fingerprint()
-> - store only keys with capability of verifying signatures
-> - remember selection of PGP signature packet and don't repeat parsing
-> - move search of the PGP key to verify the signature from the beginning
->   to the end of the verification process (to be similar with PKCS#7)
-> - don't retry key search in the session keyring from the signature
->   verification code, let the caller pass the desired keyring
-> - for the PGP signature test key type, retry the key search in the sessio=
-n
->   keyring
-> - retry key search in restrict_link_by_signature() with a partial ID
->   (provided in the PGP signature)
->=20
-> [1] https://fedoraproject.org/wiki/Changes/FsVerityRPM
-> [2] https://lore.kernel.org/linux-integrity/20240415142436.2545003-1-robe=
-rto.sassu@huaweicloud.com/
-> [3] https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-modsig=
-n.git/log/?h=3Dpgp-parser
-> [4] https://lore.kernel.org/linux-integrity/20220111180318.591029-1-rober=
-to.sassu@huawei.com/
->=20
-> David Howells (8):
->   PGPLIB: PGP definitions (RFC 4880)
->   PGPLIB: Basic packet parser
->   PGPLIB: Signature parser
->   KEYS: PGP data parser
->   KEYS: Provide PGP key description autogeneration
->   KEYS: PGP-based public key signature verification
->   PGP: Provide a key type for testing PGP signatures
->   KEYS: Provide a function to load keys from a PGP keyring blob
->=20
-> Roberto Sassu (6):
->   mpi: Introduce mpi_key_length()
->   rsa: add parser of raw format
->   KEYS: Retry asym key search with partial ID in
->     restrict_link_by_signature()
->   KEYS: Calculate key digest and get signature of the key
->   verification: introduce verify_pgp_signature()
->   KEYS: Introduce load_pgp_public_keyring()
->=20
->  MAINTAINERS                             |   1 +
->  certs/Kconfig                           |  11 +
->  certs/Makefile                          |   7 +
->  certs/system_certificates.S             |  18 +
->  certs/system_keyring.c                  |  93 ++++
->  crypto/asymmetric_keys/Kconfig          |  38 ++
->  crypto/asymmetric_keys/Makefile         |  13 +
->  crypto/asymmetric_keys/pgp.h            | 206 ++++++++
->  crypto/asymmetric_keys/pgp_library.c    | 620 ++++++++++++++++++++++++
->  crypto/asymmetric_keys/pgp_parser.h     |  18 +
->  crypto/asymmetric_keys/pgp_preload.c    | 111 +++++
->  crypto/asymmetric_keys/pgp_public_key.c | 492 +++++++++++++++++++
->  crypto/asymmetric_keys/pgp_signature.c  | 505 +++++++++++++++++++
->  crypto/asymmetric_keys/pgp_test_key.c   | 129 +++++
->  crypto/asymmetric_keys/pgplib.h         |  74 +++
->  crypto/asymmetric_keys/restrict.c       |  10 +-
->  crypto/rsa.c                            |  14 +-
->  crypto/rsa_helper.c                     |  69 +++
->  include/crypto/internal/rsa.h           |   6 +
->  include/crypto/pgp.h                    |  36 ++
->  include/linux/mpi.h                     |   2 +
->  include/linux/verification.h            |  23 +
->  lib/crypto/mpi/mpicoder.c               |  33 +-
->  23 files changed, 2516 insertions(+), 13 deletions(-)
->  create mode 100644 crypto/asymmetric_keys/pgp.h
->  create mode 100644 crypto/asymmetric_keys/pgp_library.c
->  create mode 100644 crypto/asymmetric_keys/pgp_parser.h
->  create mode 100644 crypto/asymmetric_keys/pgp_preload.c
->  create mode 100644 crypto/asymmetric_keys/pgp_public_key.c
->  create mode 100644 crypto/asymmetric_keys/pgp_signature.c
->  create mode 100644 crypto/asymmetric_keys/pgp_test_key.c
->  create mode 100644 crypto/asymmetric_keys/pgplib.h
->  create mode 100644 include/crypto/pgp.h
->=20
-
+>> Hi Hannes,=0A=
+>>=0A=
+>>> Patchset can be found at=0A=
+>>> git.kernel.org:/pub/scm/linux/kernel/git/hare/nvme.git=0A=
+>>> branch secure-concat.v9=0A=
+>> I don't see the .v9 branch under that repo. Did you mean secure-concat.v=
+8 branch?=0A=
+>>=0A=
+>Sorry. Pushed now.=0A=
+=0A=
+Thanks Hannes! I can access the v9 branch now.=0A=
+=0A=
+Kamaljit=
