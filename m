@@ -1,141 +1,128 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CD92154454
-	for <linux-crypto@vger.kernel.org>; Mon, 19 Aug 2024 06:43:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC33815B140;
+	Mon, 19 Aug 2024 08:49:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724049786; cv=none; b=Vim5E2E5qCiJL9MTZK/WbCmXf97hHlat6JXUow7eQqSrA8J6Lf/lxXZJf9ICn2lcwtHMXrUviqY7NHEIEhyrLJbz3QpC8NMATXJRQumPfHJTsepIjtIurbagt3kACMwhvT9zEqoTZGPFyDhND40obv/vyFLKam/urHkWvwa0nCA=
+	t=1724057348; cv=none; b=dVcq5D0atkw8YcLdt7n6WHzqJJFKIGAPODQV82dTiT2ovrmA7uWl6LTXduC7tYZAPoy4fVtUGY5kAK7/9FbgzTnXxjIp2ZLOMW2D1OnkeUV8r2S4aGngKpT+SXuTBFDqfJNRvwU5Ryx4f/KGB20hxXFpy0LUCpgd5ZO9TbLiS94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724049786; c=relaxed/simple;
-	bh=swujPn2bqZqF7Qn/5MKewxMvGXNaqaNVvdeyQXLr8AI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qhJcb+wDF9CgDKT+Sp+DPJUSXTPJFhnY14mcG15/E/iGaaxIUI/kuj9KT1fCO7oo7nCB+WKBzM+UYpdaaC6MKlpaFAG+e5PvfBXWM8rK5+nkLnGWNuaHPd4/joQIvOlniiFucuOsAhYbfuKPHLALyXT2yC3O3rLtzfFQDZnwKPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=BeTvQqQs; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=O9XYnEGQ; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=BeTvQqQs; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=O9XYnEGQ; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="BeTvQqQs";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="O9XYnEGQ";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="BeTvQqQs";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="O9XYnEGQ"
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 6FA8C1FE4D;
-	Mon, 19 Aug 2024 06:43:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1724049782; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kYJ7IrM/sJw93LV44EVrCcZd+5zxpLgMtNaiTu5IIlg=;
-	b=BeTvQqQsoFVO1lzo+FNj2LCbjorAPSVzb3khiI+I0VbEVIgs+MsI0w6tmIeCqW6tHidIUz
-	Tf9oAA8w61rwq27oNJpGhbs2WP6hYhpZYSqOkRtbSo6ZjLGjflsyLfiCcNCces9c2f6OEi
-	iT6Q/t83uT2fTWVmNOKrMZlXZMfYfqc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1724049782;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kYJ7IrM/sJw93LV44EVrCcZd+5zxpLgMtNaiTu5IIlg=;
-	b=O9XYnEGQcTDEEd52DEM1CXmfo+C0O9K6use9jm6FQgdVIr6YKIrNw+OzgxskywyHYUIYFx
-	J4IpGcWoSnaRdYBg==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1724049782; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kYJ7IrM/sJw93LV44EVrCcZd+5zxpLgMtNaiTu5IIlg=;
-	b=BeTvQqQsoFVO1lzo+FNj2LCbjorAPSVzb3khiI+I0VbEVIgs+MsI0w6tmIeCqW6tHidIUz
-	Tf9oAA8w61rwq27oNJpGhbs2WP6hYhpZYSqOkRtbSo6ZjLGjflsyLfiCcNCces9c2f6OEi
-	iT6Q/t83uT2fTWVmNOKrMZlXZMfYfqc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1724049782;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kYJ7IrM/sJw93LV44EVrCcZd+5zxpLgMtNaiTu5IIlg=;
-	b=O9XYnEGQcTDEEd52DEM1CXmfo+C0O9K6use9jm6FQgdVIr6YKIrNw+OzgxskywyHYUIYFx
-	J4IpGcWoSnaRdYBg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 1A9D6137C3;
-	Mon, 19 Aug 2024 06:43:02 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id yL18BHbpwma0cgAAD6G6ig
-	(envelope-from <hare@suse.de>); Mon, 19 Aug 2024 06:43:02 +0000
-Message-ID: <5f0eee28-289f-4a84-a292-eda119783ed4@suse.de>
-Date: Mon, 19 Aug 2024 08:43:01 +0200
+	s=arc-20240116; t=1724057348; c=relaxed/simple;
+	bh=3YlNtsaDCcsAcHaVTN0CfYd2K6RSzN6+m+xD9anLX84=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iPdLJ3tZNB39xsrMexvSUXqbZ406g9WCrJ+vCjEQh91aATw2t7Wl8lpAQC4FQP8EgYwUv81Q/D9RkJSScUzIkqpqupylMtxqsZFN5fRS3f0fGuK690Gh9jWfnl0+ux/Q6W2GOZ3FcbD4xcmT819PVDrxJj4Xi8Q0/kD7pCs4HCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from icess-ProLiant-DL380-Gen10.. (unknown [183.174.60.14])
+	by APP-03 (Coremail) with SMTP id rQCowACnhRjsBsNmhUISCA--.42807S2;
+	Mon, 19 Aug 2024 16:48:51 +0800 (CST)
+From: Ma Ke <make24@iscas.ac.cn>
+To: herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	j-keerthy@ti.com,
+	t-kristo@ti.com,
+	akpm@linux-foundation.org
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ma Ke <make24@iscas.ac.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH RESEND] crypto: sa2ul - fix memory leak in sa_cra_init_aead()
+Date: Mon, 19 Aug 2024 16:48:43 +0800
+Message-Id: <20240819084843.1012289-1-make24@iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv9 0/9] nvme: implement secure concatenation
-Content-Language: en-US
-To: Kamaljit Singh <Kamaljit.Singh1@wdc.com>,
- Hannes Reinecke <hare@kernel.org>, hch <hch@lst.de>
-Cc: Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- Eric Biggers <ebiggers@kernel.org>,
- "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-References: <20240813111512.135634-1-hare@kernel.org>
- <BY5PR04MB6849C928A957A4C549A94020BC812@BY5PR04MB6849.namprd04.prod.outlook.com>
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <BY5PR04MB6849C928A957A4C549A94020BC812@BY5PR04MB6849.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Spamd-Result: default: False [-4.30 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.999];
-	MIME_GOOD(-0.10)[text/plain];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	TO_DN_EQ_ADDR_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:mid]
-X-Spam-Score: -4.30
+X-CM-TRANSID:rQCowACnhRjsBsNmhUISCA--.42807S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7tw18KFykGF1xtF45Jw43Jrb_yoW8uw4fpF
+	s5uFWjyry5JFn3GFWftws5Gr15X3yS93yagayxGwn3ZrnF9r1v9FW7CFy0vF17GF1kGr17
+	XFZrJr45Zr1UG3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
+	6r4UJwA2z4x0Y4vEx4A2jsIE14v26F4UJVW0owA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
+	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
+	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
+	648v4I1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7
+	v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF
+	1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIx
+	AIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI
+	42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxh
+	VjvjDU0xZFpf9x0JUQvtAUUUUU=
+X-CM-SenderInfo: ppdnvj2u6l2u1dvotugofq/
 
-On 8/16/24 20:32, Kamaljit Singh wrote:
-> Hi Hannes,
-> 
->> Patchset can be found at
->> git.kernel.org:/pub/scm/linux/kernel/git/hare/nvme.git
->> branch secure-concat.v9
-> I don't see the .v9 branch under that repo. Did you mean secure-concat.v8 branch?
-> 
-Sorry. Pushed now.
+Currently the resource allocated by crypto_alloc_shash() is not freed in
+case crypto_alloc_aead() fails, resulting in memory leak.
 
-Cheers,
+Add crypto_free_shash() to fix it.
 
-Hannes
+Found by code review.
+
+Cc: stable@vger.kernel.org
+Fixes: d2c8ac187fc9 ("crypto: sa2ul - Add AEAD algorithm support")
+Signed-off-by: Ma Ke <make24@iscas.ac.cn>
+---
+ drivers/crypto/sa2ul.c | 20 +++++++++++++-------
+ 1 file changed, 13 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/crypto/sa2ul.c b/drivers/crypto/sa2ul.c
+index 461eca40e878..b5af621f7f17 100644
+--- a/drivers/crypto/sa2ul.c
++++ b/drivers/crypto/sa2ul.c
+@@ -1740,7 +1740,8 @@ static int sa_cra_init_aead(struct crypto_aead *tfm, const char *hash,
+ 	ctx->shash = crypto_alloc_shash(hash, 0, CRYPTO_ALG_NEED_FALLBACK);
+ 	if (IS_ERR(ctx->shash)) {
+ 		dev_err(sa_k3_dev, "base driver %s couldn't be loaded\n", hash);
+-		return PTR_ERR(ctx->shash);
++		ret = PTR_ERR(ctx->shash);
++		goto err_free_shash;
+ 	}
+ 
+ 	ctx->fallback.aead = crypto_alloc_aead(fallback, 0,
+@@ -1749,7 +1750,8 @@ static int sa_cra_init_aead(struct crypto_aead *tfm, const char *hash,
+ 	if (IS_ERR(ctx->fallback.aead)) {
+ 		dev_err(sa_k3_dev, "fallback driver %s couldn't be loaded\n",
+ 			fallback);
+-		return PTR_ERR(ctx->fallback.aead);
++		ret = PTR_ERR(ctx->fallback.aead);
++		goto err_free_shash;
+ 	}
+ 
+ 	crypto_aead_set_reqsize(tfm, sizeof(struct aead_request) +
+@@ -1757,19 +1759,23 @@ static int sa_cra_init_aead(struct crypto_aead *tfm, const char *hash,
+ 
+ 	ret = sa_init_ctx_info(&ctx->enc, data);
+ 	if (ret)
+-		return ret;
++		goto err_free_shash;
+ 
+ 	ret = sa_init_ctx_info(&ctx->dec, data);
+-	if (ret) {
+-		sa_free_ctx_info(&ctx->enc, data);
+-		return ret;
+-	}
++	if (ret)
++		goto err_free_ctx_info;
+ 
+ 	dev_dbg(sa_k3_dev, "%s(0x%p) sc-ids(0x%x(0x%pad), 0x%x(0x%pad))\n",
+ 		__func__, tfm, ctx->enc.sc_id, &ctx->enc.sc_phys,
+ 		ctx->dec.sc_id, &ctx->dec.sc_phys);
+ 
+ 	return ret;
++
++err_free_ctx_info:
++	sa_free_ctx_info(&ctx->enc, data);
++err_free_shash:
++	crypto_free_shash(ctx->shash);
++	return ret;
+ }
+ 
+ static int sa_cra_init_aead_sha1(struct crypto_aead *tfm)
 -- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+2.25.1
 
