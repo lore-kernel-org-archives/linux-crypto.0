@@ -1,128 +1,73 @@
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC33815B140;
-	Mon, 19 Aug 2024 08:49:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6091815B111;
+	Mon, 19 Aug 2024 12:21:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724057348; cv=none; b=dVcq5D0atkw8YcLdt7n6WHzqJJFKIGAPODQV82dTiT2ovrmA7uWl6LTXduC7tYZAPoy4fVtUGY5kAK7/9FbgzTnXxjIp2ZLOMW2D1OnkeUV8r2S4aGngKpT+SXuTBFDqfJNRvwU5Ryx4f/KGB20hxXFpy0LUCpgd5ZO9TbLiS94=
+	t=1724070088; cv=none; b=ToKjm98tVuQwXh60lFWUxsT5XR7ZfuG996Lk2SpkwoQ8cHkd2faSt0Ob0jLwDHcqnI2niGbvvch4LsAK6nOE3JAdvStIM0reCIUyKfHppSY6lRl4x22++U4M+Rj4Ne1AHTrNoSEs/JR8IzLM0fx7PL5EplnhKEHNCGWZutLhYUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724057348; c=relaxed/simple;
-	bh=3YlNtsaDCcsAcHaVTN0CfYd2K6RSzN6+m+xD9anLX84=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iPdLJ3tZNB39xsrMexvSUXqbZ406g9WCrJ+vCjEQh91aATw2t7Wl8lpAQC4FQP8EgYwUv81Q/D9RkJSScUzIkqpqupylMtxqsZFN5fRS3f0fGuK690Gh9jWfnl0+ux/Q6W2GOZ3FcbD4xcmT819PVDrxJj4Xi8Q0/kD7pCs4HCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from icess-ProLiant-DL380-Gen10.. (unknown [183.174.60.14])
-	by APP-03 (Coremail) with SMTP id rQCowACnhRjsBsNmhUISCA--.42807S2;
-	Mon, 19 Aug 2024 16:48:51 +0800 (CST)
-From: Ma Ke <make24@iscas.ac.cn>
-To: herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	j-keerthy@ti.com,
-	t-kristo@ti.com,
-	akpm@linux-foundation.org
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Ma Ke <make24@iscas.ac.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH RESEND] crypto: sa2ul - fix memory leak in sa_cra_init_aead()
-Date: Mon, 19 Aug 2024 16:48:43 +0800
-Message-Id: <20240819084843.1012289-1-make24@iscas.ac.cn>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1724070088; c=relaxed/simple;
+	bh=CwDadtLSK4MHhxA4C0bap9jx6VN/xQZEC5yBdNE2uOs=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
+	 In-Reply-To:Content-Type; b=VPyGBxGqtNvrsgKsEisYx9YKIS0aBneFusAJaHcayDhCtAOamUe85AC21eHC7iblnNbikP5H9sTDep2/OuXLDEPNGO/cwaXEY3PdSDBR5pIvZuMuXfCRz6CHLhPt7svrRCRs+7jnTO7QYPeci0n8ELuloO4C9/06zS/x6a867M0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4WnWsV1JngzyR3K;
+	Mon, 19 Aug 2024 20:21:02 +0800 (CST)
+Received: from dggpemm500020.china.huawei.com (unknown [7.185.36.49])
+	by mail.maildlp.com (Postfix) with ESMTPS id AD211180064;
+	Mon, 19 Aug 2024 20:21:22 +0800 (CST)
+Received: from [10.67.108.52] (10.67.108.52) by dggpemm500020.china.huawei.com
+ (7.185.36.49) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Mon, 19 Aug
+ 2024 20:21:22 +0800
+Message-ID: <63efd8d1-e294-42f0-8b0f-ec0ceb793772@huawei.com>
+Date: Mon, 19 Aug 2024 20:21:22 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:rQCowACnhRjsBsNmhUISCA--.42807S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7tw18KFykGF1xtF45Jw43Jrb_yoW8uw4fpF
-	s5uFWjyry5JFn3GFWftws5Gr15X3yS93yagayxGwn3ZrnF9r1v9FW7CFy0vF17GF1kGr17
-	XFZrJr45Zr1UG3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvK14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwA2z4x0Y4vEx4A2jsIE14v26F4UJVW0owA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1lnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
-	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
-	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
-	648v4I1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7
-	v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF
-	1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIx
-	AIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI
-	42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxh
-	VjvjDU0xZFpf9x0JUQvtAUUUUU=
-X-CM-SenderInfo: ppdnvj2u6l2u1dvotugofq/
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH -next] crypto: keembay - fix module autoloading
+Content-Language: en-US
+From: "liaochen (A)" <liaochen4@huawei.com>
+To: <linux-crypto@vger.kernel.org>
+CC: <linux-kernel@vger.kernel.org>, <declan.murphy@intel.com>,
+	<herbert@gondor.apana.org.au>, <davem@davemloft.net>
+References: <20240814024406.3875287-1-liaochen4@huawei.com>
+In-Reply-To: <20240814024406.3875287-1-liaochen4@huawei.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpemm500020.china.huawei.com (7.185.36.49)
 
-Currently the resource allocated by crypto_alloc_shash() is not freed in
-case crypto_alloc_aead() fails, resulting in memory leak.
+On 2024/8/14 10:44, Liao Chen wrote:
+> Add MODULE_DEVICE_TABLE(), so modules could be properly autoloaded
+> based on the alias from of_device_id table.
+> 
+> Signed-off-by: Liao Chen <liaochen4@huawei.com>
+> ---
+>   drivers/crypto/intel/keembay/keembay-ocs-hcu-core.c | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/crypto/intel/keembay/keembay-ocs-hcu-core.c b/drivers/crypto/intel/keembay/keembay-ocs-hcu-core.c
+> index c2dfca73fe4e..e54c79890d44 100644
+> --- a/drivers/crypto/intel/keembay/keembay-ocs-hcu-core.c
+> +++ b/drivers/crypto/intel/keembay/keembay-ocs-hcu-core.c
+> @@ -1150,6 +1150,7 @@ static const struct of_device_id kmb_ocs_hcu_of_match[] = {
+>   	},
+>   	{}
+>   };
+> +MODULE_DEVICE_TABLE(of, kmb_ocs_hcu_of_match);
+>   
+>   static void kmb_ocs_hcu_remove(struct platform_device *pdev)
+>   {
+Gentle ping
 
-Add crypto_free_shash() to fix it.
-
-Found by code review.
-
-Cc: stable@vger.kernel.org
-Fixes: d2c8ac187fc9 ("crypto: sa2ul - Add AEAD algorithm support")
-Signed-off-by: Ma Ke <make24@iscas.ac.cn>
----
- drivers/crypto/sa2ul.c | 20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/crypto/sa2ul.c b/drivers/crypto/sa2ul.c
-index 461eca40e878..b5af621f7f17 100644
---- a/drivers/crypto/sa2ul.c
-+++ b/drivers/crypto/sa2ul.c
-@@ -1740,7 +1740,8 @@ static int sa_cra_init_aead(struct crypto_aead *tfm, const char *hash,
- 	ctx->shash = crypto_alloc_shash(hash, 0, CRYPTO_ALG_NEED_FALLBACK);
- 	if (IS_ERR(ctx->shash)) {
- 		dev_err(sa_k3_dev, "base driver %s couldn't be loaded\n", hash);
--		return PTR_ERR(ctx->shash);
-+		ret = PTR_ERR(ctx->shash);
-+		goto err_free_shash;
- 	}
- 
- 	ctx->fallback.aead = crypto_alloc_aead(fallback, 0,
-@@ -1749,7 +1750,8 @@ static int sa_cra_init_aead(struct crypto_aead *tfm, const char *hash,
- 	if (IS_ERR(ctx->fallback.aead)) {
- 		dev_err(sa_k3_dev, "fallback driver %s couldn't be loaded\n",
- 			fallback);
--		return PTR_ERR(ctx->fallback.aead);
-+		ret = PTR_ERR(ctx->fallback.aead);
-+		goto err_free_shash;
- 	}
- 
- 	crypto_aead_set_reqsize(tfm, sizeof(struct aead_request) +
-@@ -1757,19 +1759,23 @@ static int sa_cra_init_aead(struct crypto_aead *tfm, const char *hash,
- 
- 	ret = sa_init_ctx_info(&ctx->enc, data);
- 	if (ret)
--		return ret;
-+		goto err_free_shash;
- 
- 	ret = sa_init_ctx_info(&ctx->dec, data);
--	if (ret) {
--		sa_free_ctx_info(&ctx->enc, data);
--		return ret;
--	}
-+	if (ret)
-+		goto err_free_ctx_info;
- 
- 	dev_dbg(sa_k3_dev, "%s(0x%p) sc-ids(0x%x(0x%pad), 0x%x(0x%pad))\n",
- 		__func__, tfm, ctx->enc.sc_id, &ctx->enc.sc_phys,
- 		ctx->dec.sc_id, &ctx->dec.sc_phys);
- 
- 	return ret;
-+
-+err_free_ctx_info:
-+	sa_free_ctx_info(&ctx->enc, data);
-+err_free_shash:
-+	crypto_free_shash(ctx->shash);
-+	return ret;
- }
- 
- static int sa_cra_init_aead_sha1(struct crypto_aead *tfm)
--- 
-2.25.1
-
+Thanks,
+Chen
