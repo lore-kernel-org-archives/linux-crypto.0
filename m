@@ -1,136 +1,73 @@
-Received: from frasgout13.his.huawei.com (frasgout13.his.huawei.com [14.137.139.46])
+Received: from xry111.site (xry111.site [89.208.246.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9820A3A8F0;
-	Mon, 19 Aug 2024 15:15:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=14.137.139.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 140BB3B1A4
+	for <linux-crypto@vger.kernel.org>; Mon, 19 Aug 2024 15:22:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.208.246.23
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724080523; cv=none; b=aihjZ33uuS4+kF6tNpvWKaQCROtprHvgGIluneGqyPwPYBpMBCbqzIzNFAnZPdAVtWRqr7hsxqvGDKveue4O4CK305AL0Botk9r5iGwuOA9P4TpmR2SRo1CNuPk1GJZSOMzmIAkRSD1EonnAc39HzSnyaLkLrx72eOizwoyANFU=
+	t=1724080967; cv=none; b=ed0cVZagb25R3CEjjQP/yX5U9u7k3BvVIjcPCUEvmQiMa6KdOW7CVNor4LTdZEJ0r9SCp84SIF7iAzzoe39w8qWVU8uCJVPr81H9KmRX7y/CE5BNxkHQbkSUqN5wOU/5mLQKh8cJ9LfV3F8YPO4vMm/LRKC3/0tFJSs5ZGsjW4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724080523; c=relaxed/simple;
-	bh=eBgQOaG5792MypyuAUQklFLUNmtxOLNrLOLKzEly7xo=;
+	s=arc-20240116; t=1724080967; c=relaxed/simple;
+	bh=u9SQN/jwBMd33HW5yJVkXJWT61e1P0urff/Krc79cmY=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=TO5LtSG7dXwL2wQMpzJq+/j0qHfrdpN4xVkFKhfxcpc8EIepsoitJF4XcLpxQEakJfrnF1/GQqCykvsTvJkhS0EAonxvUN1SbfwW/FnL6eZnIVhKCmPaO1ng2xGwonxPZ96BDDZYv56ZEcTPt6lF+SXjJUX8Cke5mPraBojhFWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=14.137.139.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.18.186.29])
-	by frasgout13.his.huawei.com (SkyGuard) with ESMTP id 4WnbJf1VL5z9v7Hj;
-	Mon, 19 Aug 2024 22:56:18 +0800 (CST)
-Received: from mail02.huawei.com (unknown [7.182.16.47])
-	by mail.maildlp.com (Postfix) with ESMTP id 9050814101D;
-	Mon, 19 Aug 2024 23:15:12 +0800 (CST)
-Received: from [127.0.0.1] (unknown [10.204.63.22])
-	by APP1 (Coremail) with SMTP id LxC2BwAHi4V4YcNm5o6AAQ--.28507S2;
-	Mon, 19 Aug 2024 16:15:12 +0100 (CET)
-Message-ID: <f142b1c4e662d4701a2ab67fa5fc839ab7109e5e.camel@huaweicloud.com>
-Subject: Re: [PATCH v2 00/14] KEYS: Add support for PGP keys and signatures
-From: Roberto Sassu <roberto.sassu@huaweicloud.com>
-To: Jonathan McDowell <noodles@earth.li>
-Cc: dhowells@redhat.com, dwmw2@infradead.org, herbert@gondor.apana.org.au, 
- davem@davemloft.net, linux-kernel@vger.kernel.org,
- keyrings@vger.kernel.org,  linux-crypto@vger.kernel.org,
- zohar@linux.ibm.com,  linux-integrity@vger.kernel.org, Roberto Sassu
- <roberto.sassu@huawei.com>
-Date: Mon, 19 Aug 2024 17:15:02 +0200
-In-Reply-To: <ZsNf1VdfkHqD8R4Q@earth.li>
-References: <20240818165756.629203-1-roberto.sassu@huaweicloud.com>
-	 <ZsNf1VdfkHqD8R4Q@earth.li>
+	 Content-Type:MIME-Version; b=iRZOjebW1j/bD/qzEWpeJRVs8jtME1WQLLSyrp2msJK02NeTNkYRmFV6WJixh8EmfTCo7HNjcqZFvTKwZ88FK6P+9sR6G/FQx3mMoQAJONiw9u8d5sMG9qvrUEiQCb14zAlU/IHGpzVrrQozvoR0HGnbSW9hx/X/y/G9ig00FSE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site; spf=pass smtp.mailfrom=xry111.site; dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b=ifRwA9JB; arc=none smtp.client-ip=89.208.246.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xry111.site
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b="ifRwA9JB"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xry111.site;
+	s=default; t=1724080958;
+	bh=u9SQN/jwBMd33HW5yJVkXJWT61e1P0urff/Krc79cmY=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=ifRwA9JBcHwtJHWOH2NTwisHnWC1HNR/3Tly7MsbT3c6ekP9yIYZhElCYrISxz69U
+	 dDpMmnYk2lTT48KyVZ5AgS7EbhftWhEynyBjgPCt6b9WJqeDLZMiJJv8l/1Lu2PY9f
+	 19HpOLYR6QRCQu3B94fM0wrAP4uNr+1lhz/MsyqQ=
+Received: from [192.168.124.6] (unknown [113.200.174.126])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-384) server-digest SHA384)
+	(Client did not present a certificate)
+	(Authenticated sender: xry111@xry111.site)
+	by xry111.site (Postfix) with ESMTPSA id 008FD66F26;
+	Mon, 19 Aug 2024 11:22:33 -0400 (EDT)
+Message-ID: <d10c0e620ae26e0c53e50aaae6efc87719b034f0.camel@xry111.site>
+Subject: Re:
+From: Xi Ruoyao <xry111@xry111.site>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>, Huacai Chen
+ <chenhuacai@kernel.org>
+Cc: WANG Xuerui <kernel@xen0n.name>, linux-crypto@vger.kernel.org, 
+	loongarch@lists.linux.dev, Jinyang He <hejinyang@loongson.cn>, Tiezhu Yang
+	 <yangtiezhu@loongson.cn>, Arnd Bergmann <arnd@arndb.de>
+Date: Mon, 19 Aug 2024 23:22:29 +0800
+In-Reply-To: <ZsNCPKo9XZG52Yph@zx2c4.com>
+References: <20240816110717.10249-1-xry111@xry111.site>
+	 <CAAhV-H5a42p6AAda=ncqCdmpHyc_tpXHjDVHq_F1pPZumfGeLw@mail.gmail.com>
+	 <ZsNCPKo9XZG52Yph@zx2c4.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2 
+User-Agent: Evolution 3.52.3 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-CM-TRANSID:LxC2BwAHi4V4YcNm5o6AAQ--.28507S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxArWrXFy3WrWxKw1DZryUtrb_yoW5GF48pa
-	yFkFn8Jr98JFnxCanxZw4UZrWYyrZ3J3W5Grnxt34Fyr1YqFnIvF18KF4ru39xWr4fAw4v
-	qrW5tw13u398AaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxV
-	AFwI0_Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AF
-	wI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
-	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
-	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUOB
-	MKDUUUU
-X-CM-SenderInfo: purev21wro2thvvxqx5xdzvxpfor3voofrz/1tbiAQAABGbCqfEHWgAAsk
 
-On Mon, 2024-08-19 at 16:08 +0100, Jonathan McDowell wrote:
-> On Sun, Aug 18, 2024 at 06:57:42PM +0200, Roberto Sassu wrote:
-> > From: Roberto Sassu <roberto.sassu@huawei.com>
-> >=20
-> > Support for PGP keys and signatures was proposed by David long time ago=
-,
-> > before the decision of using PKCS#7 for kernel modules signatures
-> > verification was made. After that, there has been not enough interest t=
-o
-> > support PGP too.
+On Mon, 2024-08-19 at 13:01 +0000, Jason A. Donenfeld wrote:
+> > I don't see significant improvements about LSX here, so I prefer to
+> > just use the generic version to avoid complexity (I remember Linus
+> > said the whole of __vdso_getrandom is not very useful).
 >=20
-> You might want to update the RFC/bis references to RFC9580, which was
-> published last month and updates things.
+> I'm inclined to feel the same way, at least for now. Let's just go with
+> one implementation -- the generic one -- and then we can see if
+> optimization really makes sense later. I suspect the large speedup we're
+> already getting from being in the vDSO is already sufficient for
+> purposes.
 
-Yes, makes sense (but probably isn't too much hassle to support more
-things for our purposes?)
+Ok I'll drop the 2nd and 3rd patches in the next version.  But I'm
+puzzled why the LSX implementation isn't much faster, maybe I made some
+mistake in it?
 
-> Also, I see support for v2 + v3 keys, and this doesn't seem like a good
-> idea. There are cryptographic issues with fingerprints etc there and I
-> can't think of a good reason you'd want the kernel to support them. The
-> same could probably be said of DSA key support too.
-
-Uhm, if I remember correctly I encountered some old PGP keys used to
-verify RPM packages (need to check). DSA keys are not supported, since
-the algorithm is not in the kernel.
-
-Thanks
-
-Roberto
-
-> > Lately, when discussing a proposal of introducing fsverity signatures i=
-n
-> > Fedora [1], developers expressed their preference on not having a separ=
-ate
-> > key for signing, which would complicate the management of the distribut=
-ion.
-> > They would be more in favor of using the same PGP key, currently used f=
-or
-> > signing RPM headers, also for file-based signatures (not only fsverity,=
- but
-> > also IMA ones).
-> >=20
-> > Another envisioned use case would be to add the ability to appraise RPM
-> > headers with their existing PGP signature, so that they can be used as =
-an
-> > authenticated source of reference values for appraising remaining
-> > files [2].
-> >=20
-> > To make these use cases possible, introduce support for PGP keys and
-> > signatures in the kernel, and load provided PGP keys in the built-in
-> > keyring, so that PGP signatures of RPM headers, fsverity digests, and I=
-MA
-> > digests can be verified from this trust anchor.
-> >=20
-> > In addition to the original version of the patch set, also introduce
-> > support for signature verification of PGP keys, so that those keys can =
-be
-> > added to keyrings with a signature-based restriction (e.g. .ima). PGP k=
-eys
-> > are searched with partial IDs, provided with signature subtype 16 (Issu=
-er).
-> > Search with full IDs could be supported with
-> > draft-ietf-openpgp-rfc4880bis-10, by retrieving the information from
-> > signature subtype 33 (Issuer Fingerprint). Due to the possibility of ID
-> > collisions, the key_or_keyring restriction is not supported.
->=20
->=20
-> J.
->=20
-
+--=20
+Xi Ruoyao <xry111@xry111.site>
+School of Aerospace Science and Technology, Xidian University
