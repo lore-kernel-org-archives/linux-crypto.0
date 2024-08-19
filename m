@@ -1,50 +1,49 @@
 Received: from xry111.site (xry111.site [89.208.246.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1164E5339E
-	for <linux-crypto@vger.kernel.org>; Mon, 19 Aug 2024 15:36:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C67012B176
+	for <linux-crypto@vger.kernel.org>; Mon, 19 Aug 2024 15:54:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.208.246.23
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724081813; cv=none; b=Cvt/g8CW+KsR4jiITSmbeYY1sxlU59TZS0+ldVX14PAl4cTnw5YyKzui3kDnl/kcJ4YteO/V7Ca/3G7r1xyxj5TC3oQuFDQJV+++6yy9zQh6gD7LBYKWMUOq+tIKTQkP9in59ra+tsRfwdxT3JA6H0hZN/PDbFykXvShrvIIeC0=
+	t=1724082881; cv=none; b=EUqjjVK58nyIaslqS9xg8XDErh/NEDr5CV/6Nsmd9e+iCB7Ra052YOkdy/VOvgpcsGPD3swxK6WyfeNpkuaptjKCOZUZMZVaUvm5ut1dEqpkwA6G/4PoCDPzX+aokaGAqKoWKLdbMtbe2UrjG3PaHEuR8sEXFMwKMDZRB410jgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724081813; c=relaxed/simple;
-	bh=DrLCCgk5Pv+NRzVbmw63X/YE4Xq3igbrfTU6q8wpwDg=;
+	s=arc-20240116; t=1724082881; c=relaxed/simple;
+	bh=oSmLQncAkEs2Zw8wryDIMacsQInU88bocr9yYTzc/Io=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=BjJPuuPXP5BdnBIO//gt3sf7FtI4REjiKVQG3nRzwACuUalekbCjm66dg15WaY7+1pSiSZROwmhRrYnJw5fsjzNLt6zGlnw1PFp3/EUac3kJRvVOl2HlluJLPWdhmAcFekH0A2qtdz0BB/5go5AGXoOkK8O9Q1LezwyTgUUTnEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site; spf=pass smtp.mailfrom=xry111.site; dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b=MX45U6eM; arc=none smtp.client-ip=89.208.246.23
+	 Content-Type:MIME-Version; b=HNjkIN5R1TtOLmwY4hf70Du52o51vOIcXI4giBC6W/+nfCFH9w7h1O9tb8slQmGtK+1eUi9m1rxilSdigXza5dCXh/bc+sMco+SC8KS+aKEFH5poac+d9uk4bj+JsMxhSA/IKRv3hD88Kivawpb124Jm2etTPaAuOJAQ9Ie041w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site; spf=pass smtp.mailfrom=xry111.site; dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b=AXE3x4ro; arc=none smtp.client-ip=89.208.246.23
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xry111.site
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b="MX45U6eM"
+	dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b="AXE3x4ro"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xry111.site;
-	s=default; t=1724081810;
-	bh=DrLCCgk5Pv+NRzVbmw63X/YE4Xq3igbrfTU6q8wpwDg=;
+	s=default; t=1724082879;
+	bh=oSmLQncAkEs2Zw8wryDIMacsQInU88bocr9yYTzc/Io=;
 	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=MX45U6eMpJUfzBf+2BpSv9bxRoA4065icZjnOSw8f+21AXSY7HX0wo8NJ7wYJMwdu
-	 mm1vnNMTdFIlDqiCTNWDFkd8s3cmBK8n/+b+RO6jrKZ+m4fF0Dpi0Zt4dgeEFRW3Ja
-	 0iL+Ug4drpb37PDsYjuHyx7K0vnPibgRSki72H2Y=
+	b=AXE3x4roBYWZ/cv7KGH25qAWtFH638p4aVwrPRXFo8eNimZUS5kwvjq839xj7whVF
+	 +VKHdBlK959bpZJOGet2jtsRPWgcub9Lbm+reXmVsNoILpN6Ak/X88ZnaIg7Uro3SN
+	 DbgTqjsA99/ufV2mOqHBM3zX3fBnVZ7h810XS6vs=
 Received: from [192.168.124.6] (unknown [113.200.174.126])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature ECDSA (P-384) server-digest SHA384)
 	(Client did not present a certificate)
 	(Authenticated sender: xry111@xry111.site)
-	by xry111.site (Postfix) with ESMTPSA id 092D066F26;
-	Mon, 19 Aug 2024 11:36:48 -0400 (EDT)
-Message-ID: <9d6850dd52989ad72238903187377cbaa59f7e62.camel@xry111.site>
-Subject: Re: [PATCH v3 1/3] LoongArch: vDSO: Wire up getrandom() vDSO
- implementation
+	by xry111.site (Postfix) with ESMTPSA id 4AB426656F;
+	Mon, 19 Aug 2024 11:54:37 -0400 (EDT)
+Message-ID: <46567f45f41512e8e43a37a5caaf08b6be810f3d.camel@xry111.site>
+Subject: Re:
 From: Xi Ruoyao <xry111@xry111.site>
 To: "Jason A. Donenfeld" <Jason@zx2c4.com>, Huacai Chen
  <chenhuacai@kernel.org>
 Cc: WANG Xuerui <kernel@xen0n.name>, linux-crypto@vger.kernel.org, 
 	loongarch@lists.linux.dev, Jinyang He <hejinyang@loongson.cn>, Tiezhu Yang
 	 <yangtiezhu@loongson.cn>, Arnd Bergmann <arnd@arndb.de>
-Date: Mon, 19 Aug 2024 23:36:46 +0800
-In-Reply-To: <ZsNClVFzfi3djXDz@zx2c4.com>
+Date: Mon, 19 Aug 2024 23:54:29 +0800
+In-Reply-To: <d10c0e620ae26e0c53e50aaae6efc87719b034f0.camel@xry111.site>
 References: <20240816110717.10249-1-xry111@xry111.site>
-	 <20240816110717.10249-2-xry111@xry111.site>
-	 <CAAhV-H7TKg98QXtrv9UmzZd9O=pxERvzCsz83Y+m+kf0zbeCkA@mail.gmail.com>
-	 <ZsNClVFzfi3djXDz@zx2c4.com>
+	 <CAAhV-H5a42p6AAda=ncqCdmpHyc_tpXHjDVHq_F1pPZumfGeLw@mail.gmail.com>
+	 <ZsNCPKo9XZG52Yph@zx2c4.com>
+	 <d10c0e620ae26e0c53e50aaae6efc87719b034f0.camel@xry111.site>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 User-Agent: Evolution 3.52.3 
@@ -55,29 +54,33 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-On Mon, 2024-08-19 at 13:03 +0000, Jason A. Donenfeld wrote:
-> > > The compiler (GCC 14.2) calls memset() for initializing a "large" str=
-uct
-> > > in a cold path of the generic vDSO getrandom() code.=C2=A0 There seem=
-s no way
-> > > to prevent it from calling memset(), and it's a cold path so the
-> > > performance does not matter, so just provide a naive memset()
-> > > implementation for vDSO.
-> > Why x86 doesn't need to provide a naive memset()?
+On Mon, 2024-08-19 at 23:22 +0800, Xi Ruoyao wrote:
+> On Mon, 2024-08-19 at 13:01 +0000, Jason A. Donenfeld wrote:
+> > > I don't see significant improvements about LSX here, so I prefer to
+> > > just use the generic version to avoid complexity (I remember Linus
+> > > said the whole of __vdso_getrandom is not very useful).
+> >=20
+> > I'm inclined to feel the same way, at least for now. Let's just go with
+> > one implementation -- the generic one -- and then we can see if
+> > optimization really makes sense later. I suspect the large speedup we'r=
+e
+> > already getting from being in the vDSO is already sufficient for
+> > purposes.
+>=20
+> Ok I'll drop the 2nd and 3rd patches in the next version.=C2=A0 But I'm
+> puzzled why the LSX implementation isn't much faster, maybe I made some
+> mistake in it?
 
-I'm not sure.  Maybe it's because x86_64 has SSE2 enabled so by default
-the maximum buffer length to inline memset is larger.
+After some thinking this seems making sense: the LoongArch desktop
+processors have 4 ALUs able to perform the scalar add/rot/xor
+operations, and the throughput is already maximized for ChaCha20 due to
+the data dependency.  The advantage of LSX seems just to avoid reloading
+key from the memory (because the register file is large enough to hold a
+copy of it).
 
-> It looks like others are running into this when porting to ppc and
-> arm64, so I'll probably refactor the code to avoid needing it in the
-> first place. I'll chime in here when that's done.
-
-Yes, I've seen the PPC guys hacking the code to avoid memset.
-
-BTW I've also seen "vDSO getrandom isn't supported on 32-bit platforms"
-in the PPC discussion.  Is there any plan to support it in the future?=20
-If not I'll only select VDSO_GETRANDOM if CONFIG_64BIT, and then the
-assembly code can be slightly simplified.
+Perhaps LSX will be much better on those embedded processors with 2 ALUs
+and 1 SIMD unit (if they don't downclock with heavy SIMD load), but I
+don't have one for testing.
 
 --=20
 Xi Ruoyao <xry111@xry111.site>
