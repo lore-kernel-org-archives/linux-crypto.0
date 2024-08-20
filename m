@@ -1,40 +1,40 @@
 Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94ABE1917E3;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94B131917F4;
 	Tue, 20 Aug 2024 15:02:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.18.73.165
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724166149; cv=none; b=KHSr+uhXNiC1yP/a5KBig5EOncWDypeZORJmg5fZmW7UrtTUROZoeUiAg//b6+WcoO5tXetbiFsamx1vLgtji4OtU8tN6b85r63z7qinqCWPzhnsgLpbuUoYHAWblARXMt0HSCmfnQAvy/7y1i+ZLM+SnRcki9KuX8LS3WPeMDw=
+	t=1724166149; cv=none; b=WjyAlM+TJFZDQPVC/o1DE9acdzY0nPGyPTeEYR0TCqXGhkAesE5rYagYvXd4hDtvg6fD5F01jGseMAznVRwx4gg1RMW7YmJ5fC7RnQSiOHptDFLqmFjpUnrkX8EcqrAePhUrteDqlEETJkROxrFL7F6kM5uLRClEekmRqrcO0/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1724166149; c=relaxed/simple;
-	bh=K7UieHG9RsHgDBpcjxeQWQsIDLszF4my3Mke2V00m8I=;
+	bh=eKiX+/Kz2JJwdjMCuGv51OdF9N3/l/bTum2+ZwPcTTQ=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FaJ8Y1P2DoGtA6KM4i0dx+lAxai2RIcYUBy3LUDP21f+NkM+5b3tbVC3MqmChNZyNUPb21ZaoW5s/qCuvMJp6lC+a/6j0vJL/HfDdX91xKIA6yNgrj/D/K9AD4620pl2N5q8vMLJ+NpqaW33sdhCiOFN4p3BxbGLaPcCmzNbE/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=s2b.tech; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=e2iDmCaN; arc=none smtp.client-ip=37.18.73.165
+	 MIME-Version:Content-Type; b=q0q+UH/CCJ4rQj1dd5akN7F38Rho0aR5cMB+7A9GeCBD55GxapoX2U3GmyzkFL+I1GF/04+tuI/iofByDBAngx2ebtgArky7JY5mjEsklgTj2oc98z6LNE9hJuEfv7TWRtRVs9X0S2+KRy09QVd9Ectn46lgXoCtpHD4BDdPb20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=s2b.tech; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=LfIR78KB; arc=none smtp.client-ip=37.18.73.165
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=s2b.tech
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="e2iDmCaN"
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="LfIR78KB"
 Received: from p-infra-ksmg-sc-msk01.sberdevices.ru (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id C32E6100033;
-	Tue, 20 Aug 2024 17:56:52 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru C32E6100033
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 381FC100039;
+	Tue, 20 Aug 2024 17:56:59 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 381FC100039
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1724165812;
-	bh=T4w8YmD8VWdxpwAM+qh0428tx6ubcLSqso0bV80y5tA=;
+	s=mail; t=1724165819;
+	bh=kbk01LZx5Gx3XlSl8eks76phYzgWifOc69jIi3h8WLs=;
 	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=e2iDmCaNuBKQAEadEGFqqBheTwFck/FV3k0s41TUxRgHOwXD8t3DwMwujVjBOh6iW
-	 BfEYz0j0ACvH8HOH9UvMuZf6YC+LgOMuONqaT7ExyhW6N5AhYQ+ElAp6Md25LijUNh
-	 K+2f8/RA99NIoU+aqER83v01z82tqOo0tKdvCpViAMkSUqoIUFpe/T+HhIO1YyO2XK
-	 DVVl+NuTNkoHdTrBHgWDX0/m8NZg+R9lIlJW+M50548XpTwL7nqX3+cc5we/UeFDqo
-	 hamnDsi07SkFH7Iy8m8R6xhErpZV60KqN8vKkCHutRHC0GcMzSGBhqVc3NfoJt5JXC
-	 mxkQJCwjWQvUA==
+	b=LfIR78KBD4fvz9mcMmiVlJVt8JeokAzWDWcfTUJmEy7yt2o/JYqldhEOvqCLGpUFl
+	 t0wDLvswAOtEGX2pM0x0H/9Nl5JsEhsVvvXU7qq4EIETXttVdhvtv4D/cGLfI99Da+
+	 Qrdo6Ws+hmiqzHypA/RKwxCVdQdH9+ecMrWJ/YtKCOhwv5tAhpOLkTOlM86IIDuDa4
+	 sUHAjU9Bam0P9BxbuCeNP0JKRVGy5bhht27Igng6Mc5R+mTfTEvY4cWpZQ7u/BqvBQ
+	 ehaFd+8KUeE8Of6B8ruMSkcBls+waqBsE1T8EljLu6R1XO2XpvOSrbqA8z0bb1GJnL
+	 EN3v209Dk9c5A==
 Received: from smtp.sberdevices.ru (p-i-exch-sc-m02.sberdevices.ru [172.16.192.103])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
 	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Tue, 20 Aug 2024 17:56:52 +0300 (MSK)
+	Tue, 20 Aug 2024 17:56:59 +0300 (MSK)
 From: Alexey Romanov <avromanov@salutedevices.com>
 To: <neil.armstrong@linaro.org>, <clabbe@baylibre.com>,
 	<herbert@gondor.apana.org.au>, <davem@davemloft.net>, <robh+dt@kernel.org>,
@@ -45,9 +45,9 @@ CC: <linux-crypto@vger.kernel.org>, <linux-amlogic@lists.infradead.org>,
 	<linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
 	<linux-arm-kernel@lists.infradead.org>, <kernel@salutedevices.com>, Alexey
  Romanov <avromanov@salutedevices.com>
-Subject: [PATCH v9 01/23] drivers: crypto: meson: don't hardcode IRQ count
-Date: Tue, 20 Aug 2024 17:56:01 +0300
-Message-ID: <20240820145623.3500864-2-avromanov@salutedevices.com>
+Subject: [PATCH v9 05/23] drivers: crypto: meson: move get_engine_number()
+Date: Tue, 20 Aug 2024 17:56:05 +0300
+Message-ID: <20240820145623.3500864-6-avromanov@salutedevices.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240820145623.3500864-1-avromanov@salutedevices.com>
 References: <20240820145623.3500864-1-avromanov@salutedevices.com>
@@ -78,183 +78,79 @@ X-KSMG-LinksScanning: Clean
 X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/08/20 03:45:00 #26365304
 X-KSMG-AntiVirus-Status: Clean, skipped
 
-IRQ count is no longer hardcoded, and make it part of
-struct meson_flow. We need this for extend driver support for
-other Amlogic SoC's.
+Move get_engine_number() function from cipher.c to core.c
 
 Signed-off-by: Alexey Romanov <avromanov@salutedevices.com>
+Reviewed-by: Neil Armstrong <neil.armstrong@linaro.org>
 ---
- drivers/crypto/amlogic/amlogic-gxl-cipher.c |  2 +-
- drivers/crypto/amlogic/amlogic-gxl-core.c   | 47 ++++++++++++---------
- drivers/crypto/amlogic/amlogic-gxl.h        |  8 ++--
- 3 files changed, 31 insertions(+), 26 deletions(-)
+ drivers/crypto/amlogic/amlogic-gxl-cipher.c | 9 ++-------
+ drivers/crypto/amlogic/amlogic-gxl-core.c   | 5 +++++
+ drivers/crypto/amlogic/amlogic-gxl.h        | 2 ++
+ 3 files changed, 9 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/crypto/amlogic/amlogic-gxl-cipher.c b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
-index 29048da6f50a..b19032f92415 100644
+index 1fe916b0a138..18e9e2d39b1f 100644
 --- a/drivers/crypto/amlogic/amlogic-gxl-cipher.c
 +++ b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
-@@ -19,7 +19,7 @@
+@@ -17,11 +17,6 @@
+ #include <crypto/internal/skcipher.h>
+ #include "amlogic-gxl.h"
  
- static int get_engine_number(struct meson_dev *mc)
- {
--	return atomic_inc_return(&mc->flow) % MAXFLOW;
-+	return atomic_inc_return(&mc->flow) % mc->flow_cnt;
- }
- 
+-static int get_engine_number(struct meson_dev *mc)
+-{
+-	return atomic_inc_return(&mc->flow) % mc->flow_cnt;
+-}
+-
  static bool meson_cipher_need_fallback(struct skcipher_request *areq)
+ {
+ 	struct scatterlist *src_sg = areq->src;
+@@ -282,7 +277,7 @@ int meson_skdecrypt(struct skcipher_request *areq)
+ 	rctx->op_dir = MESON_DECRYPT;
+ 	if (meson_cipher_need_fallback(areq))
+ 		return meson_cipher_do_fallback(areq);
+-	e = get_engine_number(op->mc);
++	e = meson_get_engine_number(op->mc);
+ 	engine = op->mc->chanlist[e].engine;
+ 	rctx->flow = e;
+ 
+@@ -300,7 +295,7 @@ int meson_skencrypt(struct skcipher_request *areq)
+ 	rctx->op_dir = MESON_ENCRYPT;
+ 	if (meson_cipher_need_fallback(areq))
+ 		return meson_cipher_do_fallback(areq);
+-	e = get_engine_number(op->mc);
++	e = meson_get_engine_number(op->mc);
+ 	engine = op->mc->chanlist[e].engine;
+ 	rctx->flow = e;
+ 
 diff --git a/drivers/crypto/amlogic/amlogic-gxl-core.c b/drivers/crypto/amlogic/amlogic-gxl-core.c
-index f54ab0d0b1e8..35ec64df5b3a 100644
+index 0698ac5e2a6a..52317f111c6c 100644
 --- a/drivers/crypto/amlogic/amlogic-gxl-core.c
 +++ b/drivers/crypto/amlogic/amlogic-gxl-core.c
-@@ -28,8 +28,8 @@ static irqreturn_t meson_irq_handler(int irq, void *data)
- 	int flow;
- 	u32 p;
+@@ -22,6 +22,11 @@
  
--	for (flow = 0; flow < MAXFLOW; flow++) {
--		if (mc->irqs[flow] == irq) {
-+	for (flow = 0; flow < mc->flow_cnt; flow++) {
-+		if (mc->chanlist[flow].irq == irq) {
- 			p = readl(mc->base + ((0x04 + flow) << 2));
- 			if (p) {
- 				writel_relaxed(0xF, mc->base + ((0x4 + flow) << 2));
-@@ -110,7 +110,7 @@ static int meson_debugfs_show(struct seq_file *seq, void *v)
- 	struct meson_dev *mc __maybe_unused = seq->private;
- 	int i;
+ #include "amlogic-gxl.h"
  
--	for (i = 0; i < MAXFLOW; i++)
-+	for (i = 0; i < mc->flow_cnt; i++)
- 		seq_printf(seq, "Channel %d: nreq %lu\n", i,
- #ifdef CONFIG_CRYPTO_DEV_AMLOGIC_GXL_DEBUG
- 			   mc->chanlist[i].stat_req);
-@@ -153,14 +153,32 @@ static void meson_free_chanlist(struct meson_dev *mc, int i)
-  */
- static int meson_allocate_chanlist(struct meson_dev *mc)
++int meson_get_engine_number(struct meson_dev *mc)
++{
++	return atomic_inc_return(&mc->flow) % mc->flow_cnt;
++}
++
+ void meson_dma_start(struct meson_dev *mc, int flow)
  {
-+	struct platform_device *pdev = to_platform_device(mc->dev);
- 	int i, err;
- 
--	mc->chanlist = devm_kcalloc(mc->dev, MAXFLOW,
-+	mc->flow_cnt = platform_irq_count(pdev);
-+	if (mc->flow_cnt <= 0) {
-+		dev_err(mc->dev, "No IRQs defined\n");
-+		return -ENODEV;
-+	}
-+
-+	mc->chanlist = devm_kcalloc(mc->dev, mc->flow_cnt,
- 				    sizeof(struct meson_flow), GFP_KERNEL);
- 	if (!mc->chanlist)
- 		return -ENOMEM;
- 
--	for (i = 0; i < MAXFLOW; i++) {
-+	for (i = 0; i < mc->flow_cnt; i++) {
-+		mc->chanlist[i].irq = platform_get_irq(pdev, i);
-+		if (mc->chanlist[i].irq < 0)
-+			return mc->chanlist[i].irq;
-+
-+		err = devm_request_irq(mc->dev, mc->chanlist[i].irq,
-+				       meson_irq_handler, 0, "aml-crypto", mc);
-+		if (err < 0) {
-+			dev_err(mc->dev, "Cannot request IRQ for flow %d\n", i);
-+			return err;
-+		}
-+
- 		init_completion(&mc->chanlist[i].complete);
- 
- 		mc->chanlist[i].engine = crypto_engine_alloc_init(mc->dev, true);
-@@ -230,7 +248,7 @@ static void meson_unregister_algs(struct meson_dev *mc)
- static int meson_crypto_probe(struct platform_device *pdev)
- {
- 	struct meson_dev *mc;
--	int err, i;
-+	int err;
- 
- 	mc = devm_kzalloc(&pdev->dev, sizeof(*mc), GFP_KERNEL);
- 	if (!mc)
-@@ -252,19 +270,6 @@ static int meson_crypto_probe(struct platform_device *pdev)
- 		return err;
- 	}
- 
--	for (i = 0; i < MAXFLOW; i++) {
--		mc->irqs[i] = platform_get_irq(pdev, i);
--		if (mc->irqs[i] < 0)
--			return mc->irqs[i];
--
--		err = devm_request_irq(&pdev->dev, mc->irqs[i], meson_irq_handler, 0,
--				       "gxl-crypto", mc);
--		if (err < 0) {
--			dev_err(mc->dev, "Cannot request IRQ for flow %d\n", i);
--			return err;
--		}
--	}
--
- 	err = clk_prepare_enable(mc->busclk);
- 	if (err != 0) {
- 		dev_err(&pdev->dev, "Cannot prepare_enable busclk\n");
-@@ -294,7 +299,7 @@ static int meson_crypto_probe(struct platform_device *pdev)
- error_alg:
- 	meson_unregister_algs(mc);
- error_flow:
--	meson_free_chanlist(mc, MAXFLOW - 1);
-+	meson_free_chanlist(mc, mc->flow_cnt - 1);
- 	clk_disable_unprepare(mc->busclk);
- 	return err;
- }
-@@ -309,7 +314,7 @@ static void meson_crypto_remove(struct platform_device *pdev)
- 
- 	meson_unregister_algs(mc);
- 
--	meson_free_chanlist(mc, MAXFLOW - 1);
-+	meson_free_chanlist(mc, mc->flow_cnt - 1);
- 
- 	clk_disable_unprepare(mc->busclk);
- }
+ 	u32 offset = (mc->pdata->descs_reg + flow) << 2;
 diff --git a/drivers/crypto/amlogic/amlogic-gxl.h b/drivers/crypto/amlogic/amlogic-gxl.h
-index 1013a666c932..79177cfa8b88 100644
+index 8670f7ebcdda..dc54bd533a2d 100644
 --- a/drivers/crypto/amlogic/amlogic-gxl.h
 +++ b/drivers/crypto/amlogic/amlogic-gxl.h
-@@ -22,8 +22,6 @@
- #define MESON_OPMODE_ECB 0
- #define MESON_OPMODE_CBC 1
- 
--#define MAXFLOW 2
--
- #define MAXDESC 64
- 
- #define DESC_LAST BIT(18)
-@@ -62,6 +60,7 @@ struct meson_desc {
-  * @keylen:	keylen for this flow operation
-  * @complete:	completion for the current task on this flow
-  * @status:	set to 1 by interrupt if task is done
-+ * @irq:	IRQ number for amlogic-crypto
-  * @t_phy:	Physical address of task
-  * @tl:		pointer to the current ce_task for this flow
-  * @stat_req:	number of request done by this flow
-@@ -70,6 +69,7 @@ struct meson_flow {
- 	struct crypto_engine *engine;
- 	struct completion complete;
- 	int status;
-+	int irq;
- 	unsigned int keylen;
- 	dma_addr_t t_phy;
- 	struct meson_desc *tl;
-@@ -85,7 +85,7 @@ struct meson_flow {
-  * @dev:	the platform device
-  * @chanlist:	array of all flow
-  * @flow:	flow to use in next request
-- * @irqs:	IRQ numbers for amlogic-crypto
-+ * @flow_cnt:	flow count for amlogic-crypto
-  * @dbgfs_dir:	Debugfs dentry for statistic directory
-  * @dbgfs_stats: Debugfs dentry for statistic counters
-  */
-@@ -95,7 +95,7 @@ struct meson_dev {
- 	struct device *dev;
- 	struct meson_flow *chanlist;
- 	atomic_t flow;
--	int irqs[MAXFLOW];
-+	int flow_cnt;
- #ifdef CONFIG_CRYPTO_DEV_AMLOGIC_GXL_DEBUG
- 	struct dentry *dbgfs_dir;
+@@ -161,6 +161,8 @@ struct meson_alg_template {
  #endif
+ };
+ 
++int meson_get_engine_number(struct meson_dev *mc);
++
+ void meson_dma_start(struct meson_dev *mc, int flow);
+ 
+ int meson_enqueue(struct crypto_async_request *areq, u32 type);
 -- 
 2.34.1
 
