@@ -1,117 +1,81 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A61021862
-	for <linux-crypto@vger.kernel.org>; Tue, 20 Aug 2024 00:07:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18393DDA1
+	for <linux-crypto@vger.kernel.org>; Tue, 20 Aug 2024 00:52:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724112476; cv=none; b=SrzfOG0kXUODOCCdZLp2OqrHHJlFiRLIynm2QGOANGTnHaxoeao6Hy4BdSKACvJdZy699rIZ6ZzSOaxqT+QurWyKldlhnqEaE63Y2oucHw17bWxlr/DRJ04Zr2bAf5rb3j8OfNDTSWaljovZsWrHGd85/uFgfOPD6V4b5eRnZOU=
+	t=1724115138; cv=none; b=qJv59h551p9sG/Veyp/au6zhkV/Km0oilsFskXeAd3H0xPC914cb73PtmE2X33mnlaUPMASzQ9kFFcTYqGoSjcVmteSPCG75ag4fkcwfNcTsijwLioZb2U90GImxWhTr9lc9K9/4KMhqEJtwMMhJP0JEdf7dJwLLnMmKuxa/bMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724112476; c=relaxed/simple;
-	bh=kAggRSDu583wxxJ9jzUF7klJtT8ZvbPXIdmEoblBV/U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=B9Mnt9jZ8iVJ7CDxggc412dPsYrDli/9QWc0NcMhy0ktRhrhZKijMOtyF77c0gsst7Eo36QoxrVBG0980FbsYInANNwo+WrRv3H6pKtRU4AdGGKw9OisUukQ8SPySMqlA6jNYUXG7waIBatvw/MQzkfvgY25dnb5f3wT/oDn5Ns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Avfr3PSb; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Avfr3PSb"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724112473;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UpEXdW1E+Fg0C4DaKnGXHprFckkZuEg6MAwJNzIzuEs=;
-	b=Avfr3PSb5KSUkZQ0yHPjuVFRc+RtSalhFbtKqcH6fG9fym5e7moB70i2icnfq3HbGM42wx
-	7zJa1SQgSVnoo3FGfBp13rGII7SWjspuJ/c+LJWhUJTR4VihU0Xu3SPp5Hi2JS/1kbfVPh
-	StP9dNgpLzy7N9ZgYskRv3ppyqipbWs=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-392-OcQH1AmoNvCjTLEIB2pnIA-1; Mon,
- 19 Aug 2024 20:07:50 -0400
-X-MC-Unique: OcQH1AmoNvCjTLEIB2pnIA-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9FD161955D45;
-	Tue, 20 Aug 2024 00:07:48 +0000 (UTC)
-Received: from [10.2.16.112] (unknown [10.2.16.112])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D39FF19560A3;
-	Tue, 20 Aug 2024 00:07:46 +0000 (UTC)
-Message-ID: <0d8c956b-9397-4268-830b-2abe19ec3066@redhat.com>
-Date: Mon, 19 Aug 2024 20:07:45 -0400
+	s=arc-20240116; t=1724115138; c=relaxed/simple;
+	bh=2ioYGP+M8IHViOUOeVxEe4+PE+2PfXR1I4ooDHkhex0=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=TXB8DrEr4DdBWIhVYIhNo8zwsnrUnlt82s3uZ2/KFaPbWkBELItfJI+EvCkJtG86sFC5pMa0cAz3uPYucNdSonTX9cQFCcbgTeFe3rGP2bUquJurfOV6MckIY9TXVtNzegr3VzyViflrypn7Ots9gLVrwjn7oFAam+ZNmxMvvUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [111.9.175.10])
+	by gateway (Coremail) with SMTP id _____8AxSZpC6MNmDrUZAA--.19315S3;
+	Tue, 20 Aug 2024 08:50:10 +0800 (CST)
+Received: from [10.136.12.26] (unknown [111.9.175.10])
+	by front1 (Coremail) with SMTP id qMiowMDxnWdA6MNm0wMbAA--.25858S3;
+	Tue, 20 Aug 2024 08:50:09 +0800 (CST)
+Subject: Re: [PATCH v3 1/3] LoongArch: vDSO: Wire up getrandom() vDSO
+ implementation
+To: Xi Ruoyao <xry111@xry111.site>, "Jason A. Donenfeld" <Jason@zx2c4.com>,
+ Huacai Chen <chenhuacai@kernel.org>
+Cc: WANG Xuerui <kernel@xen0n.name>, linux-crypto@vger.kernel.org,
+ loongarch@lists.linux.dev, Tiezhu Yang <yangtiezhu@loongson.cn>,
+ Arnd Bergmann <arnd@arndb.de>
+References: <20240816110717.10249-1-xry111@xry111.site>
+ <20240816110717.10249-2-xry111@xry111.site>
+ <CAAhV-H7TKg98QXtrv9UmzZd9O=pxERvzCsz83Y+m+kf0zbeCkA@mail.gmail.com>
+ <ZsNClVFzfi3djXDz@zx2c4.com>
+ <9d6850dd52989ad72238903187377cbaa59f7e62.camel@xry111.site>
+From: Jinyang He <hejinyang@loongson.cn>
+Message-ID: <a29807b5-d0ce-f04e-a7d1-024d29f398be@loongson.cn>
+Date: Tue, 20 Aug 2024 08:50:07 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] padata: Fix possible divide-by-0 panic in
- padata_mt_helper()
-To: Daniel Jordan <daniel.m.jordan@oracle.com>,
- Herbert Xu <herbert@gondor.apana.org.au>
-Cc: steffen.klassert@secunet.com, akpm@linux-foundation.org,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <Zrbm--AxRXgfHUek@gondor.apana.org.au>
- <e752f094-adb4-4448-8bc8-e2460330eaec@redhat.com>
- <ZrgXtLI1R5zJ9GFG@gondor.apana.org.au>
- <91d29649-ca88-4f6c-bf1d-19e49c9555df@redhat.com>
- <ZrgsU-1PdxvUVMOW@gondor.apana.org.au>
- <88c188dc-3664-45db-b54a-11feca59d7d2@redhat.com>
- <Zrgy1TDikPSkzaYP@gondor.apana.org.au>
- <c5cc5ea9-1135-4ac6-a38f-652ed07dae17@redhat.com>
- <ZsBNZXfVZbtZnb2Y@gondor.apana.org.au>
- <dgtppozpgkm2gtv7nnvranbkjudr7bwuvfe7hjbznipozcxyzd@3qcag7izn4fj>
+In-Reply-To: <9d6850dd52989ad72238903187377cbaa59f7e62.camel@xry111.site>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-From: Waiman Long <longman@redhat.com>
-In-Reply-To: <dgtppozpgkm2gtv7nnvranbkjudr7bwuvfe7hjbznipozcxyzd@3qcag7izn4fj>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+X-CM-TRANSID:qMiowMDxnWdA6MNm0wMbAA--.25858S3
+X-CM-SenderInfo: pkhmx0p1dqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj9xXoW7XFWfCryktF4fAr1rGrWfJFc_yoWxZwb_ur
+	1kuF48CanI9r4DJFWvk3WrA3sFq392qw13AF1vvr13X343J3y5CFWq9rWF9w48XF18XFsF
+	9Fs0q3Z3ury2gosvyTuYvTs0mTUanT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUj1kv1TuYvT
+	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
+	cSsGvfJTRUUUbx8YFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
+	vaj40_Wr0E3s1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
+	w2x7M28EF7xvwVC0I7IYx2IY67AKxVWUJVWUCwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
+	WUJVW8JwA2z4x0Y4vEx4A2jsIE14v26r1j6r4UM28EF7xvwVC2z280aVCY1x0267AKxVWU
+	JVW8JwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYIkI8VC2zVCFFI0UMc02F4
+	0EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAFwI0_
+	Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4CEbI
+	xvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AK
+	xVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrx
+	kI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v2
+	6r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8Jw
+	CI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07j1WlkUUUUU
+	=
 
-On 8/19/24 18:29, Daniel Jordan wrote:
-> On Sat, Aug 17, 2024 at 03:12:37PM GMT, Herbert Xu wrote:
->> On Mon, Aug 12, 2024 at 10:04:07AM -0400, Waiman Long wrote:
->>> Anyway, using DIV_ROUND_UP() is a slight change in behavior as chunk_size
->>> will be increased by 1 in most cases. I am a bit hesitant to make this
->>> change without looking into more detail about the rationale behind the
->>> current code.
->> I don't think it matters much.  Just look at the two lines after
->> the division, they're both rounding the value up.  So clearly this
->> is expected to handle the case where work gets bunched up into the
->> first N CPUs, potentially leaving some CPUs unused.
-> Yeah, the caller is supposed to use min_chunk as a hint for what a
-> reasonable amount of work is per thread and so avoid wasteful amounts of
-> threads.
->
->> But Daniel wrote the code so he can have the last say of whether
->> we should round up after the division or after the other two ops.
-> I think either way works fine with the three existing users and how they
-> choose job->min_chunk and job->size.
->
-> The DIV_ROUND_UP approach reads a bit nicer to me, but I can imagine
-> oddball cases where rounding up is undesirable (say, near-zero values
-> for size, min_chunk, and align; padata_work_alloc_mt returns many fewer
-> works than requested; and a single unit of work is very expensive) so
-> that rounding up makes a bigger difference.  So, the way it now is seems
-> ok.
->
->
-> By the way, this bug must've happened coming from
-> hugetlb_pages_alloc_boot(), right, Waiman?  Because the other padata
-> users have hardcoded min_chunk.  I guess it was a case of
->
->      h->max_huge_pages < num_node_state(N_MEMORY) * 2
->
-Yes, I guess the hugetlbfs caller is the cause of this div-by-0 problem. 
-This is likely a bug that needs to be fixed. The current patch does 
-guarantee that padata won't crash like that even with rogue caller.
+On 2024-08-19 23:36, Xi Ruoyao wrote:
 
-Cheers,
-Longman
-
+> On Mon, 2024-08-19 at 13:03 +0000, Jason A. Donenfeld wrote:
+>>>> The compiler (GCC 14.2) calls memset() for initializing a "large" struct
+>>>> in a cold path of the generic vDSO getrandom() code.  There seems no way
+>>>> to prevent it from calling memset(), and it's a cold path so the
+>>>> performance does not matter, so just provide a naive memset()
+>>>> implementation for vDSO.
+>>> Why x86 doesn't need to provide a naive memset()?
+> I'm not sure.  Maybe it's because x86_64 has SSE2 enabled so by default
+> the maximum buffer length to inline memset is larger.
+>
+I suspect the loongarch gcc has issue with -fno-builtin(-memset).
 
