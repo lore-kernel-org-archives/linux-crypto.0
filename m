@@ -1,115 +1,161 @@
-Received: from frasgout11.his.huawei.com (frasgout11.his.huawei.com [14.137.139.23])
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D521189F3F;
-	Tue, 20 Aug 2024 14:14:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=14.137.139.23
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A78AA18E37F;
+	Tue, 20 Aug 2024 14:57:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.89.224.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724163297; cv=none; b=CsAxTd5cb5/VNOKvbQ7bNn2etYYkL6m5szWbFnMMhDEr3PaVlt7QI6LT7CcaYulA6xW88i/F53utLqyRsSDQON9HNfmOxjaVwm75ty3Le+3bpid4j7EQUr4zwIwRIN+6W4QETJPXdfDwm/szvGEI/vO0sx6JxU0b1EcOMmG0z3I=
+	t=1724165824; cv=none; b=WhhGrjS6LD1Ygad5WwNr5aYOyYc99RLgu2rNHxEChRJN2lu8xwjCZBgkdnOZIGzZsBz1d8GfnNHttNwPQ2t1xmvFqkkqTVNU8vJOLVRTVt5+2lvt8snlEXlSMUvYF9WK/GFJEP5qsIS3RDZwEL69J1wBCZUnPvg5uEbjB/d+Q0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724163297; c=relaxed/simple;
-	bh=Li4il9DPZcDFmQDsu6gkCNX3IrynfYcKNpVKGyGtauc=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ccAX9qUQojXkJ/6K08isZv8sOLBokw93NjZM5i3NRw2wA1dW2avOtYcodCNRujrBLYReW4bS4Dk3LuOfDi76wkNd613bpE99MMyGBqVkSJztU2ClaGzqmB7HqVm/iZd85cz0uFblW4eCCPlmKM+0OZVITcKG23WIH/m1atvNkT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=14.137.139.23
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.18.186.51])
-	by frasgout11.his.huawei.com (SkyGuard) with ESMTP id 4Wp9wG09J9z9v7Hk;
-	Tue, 20 Aug 2024 21:55:42 +0800 (CST)
-Received: from mail02.huawei.com (unknown [7.182.16.27])
-	by mail.maildlp.com (Postfix) with ESMTP id D434A140B1C;
-	Tue, 20 Aug 2024 22:14:36 +0800 (CST)
-Received: from [127.0.0.1] (unknown [10.204.63.22])
-	by APP2 (Coremail) with SMTP id GxC2BwDntsPEpMRmxQiUAQ--.4381S2;
-	Tue, 20 Aug 2024 15:14:36 +0100 (CET)
-Message-ID: <e0a67e424dc4cd9f36252c453f046f1f6e51d363.camel@huaweicloud.com>
-Subject: Re: [PATCH v2 00/14] KEYS: Add support for PGP keys and signatures
-From: Roberto Sassu <roberto.sassu@huaweicloud.com>
-To: Jonathan McDowell <noodles@earth.li>
-Cc: dhowells@redhat.com, dwmw2@infradead.org, herbert@gondor.apana.org.au, 
- davem@davemloft.net, linux-kernel@vger.kernel.org,
- keyrings@vger.kernel.org,  linux-crypto@vger.kernel.org,
- zohar@linux.ibm.com,  linux-integrity@vger.kernel.org, Roberto Sassu
- <roberto.sassu@huawei.com>
-Date: Tue, 20 Aug 2024 16:14:24 +0200
-In-Reply-To: <ZsSkTs4TFfx2pK8r@earth.li>
-References: <20240818165756.629203-1-roberto.sassu@huaweicloud.com>
-	 <ZsNf1VdfkHqD8R4Q@earth.li>
-	 <f142b1c4e662d4701a2ab67fa5fc839ab7109e5e.camel@huaweicloud.com>
-	 <ZsSkTs4TFfx2pK8r@earth.li>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	s=arc-20240116; t=1724165824; c=relaxed/simple;
+	bh=g7v5y5TqQIYlFtzFUceKyepZT8VSU3QRJHcH6erE3nk=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RJ5q66ZKCml+lu9s4EzxNzjlvVoGx7nbYAmwaJfdR/v0emStTQKYAUTXxXG+d3lTS2dn9igdQBapNmDFrQ9vEdXTUmSNLKTwaf6g4WfXK6jOz2LQBqaV3z2cUphYHr3WcNDmjpIeM3DR4RR/hQDwmM5RoWx8cQI3jUzlPJuSSKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=s2b.tech; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=ow+nHu+D; arc=none smtp.client-ip=45.89.224.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=s2b.tech
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="ow+nHu+D"
+Received: from p-infra-ksmg-sc-msk02.sberdevices.ru (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 348E9120018;
+	Tue, 20 Aug 2024 17:56:58 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 348E9120018
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1724165818;
+	bh=NhKK43BFs9WSPEu12TubmDHMMoMRfMTyJ3HOlIxykU8=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+	b=ow+nHu+DVN42crFdNytTIFGna6LePkOrFw9NwjbtkB850iCVjNQJFfB8kthaLQQB3
+	 4K2MyHJG+NQ1aQ94S3vhsbqf+uZmaDYtFboJoAiRSYEsqLOzfIePdFvVd74cZBsDQE
+	 l6zSDMPB7kvJrMXvHGAkfcYEPXbrpF38WBtpmKpuVbG4ijj6TSVIK0JGPW4972TUKg
+	 hbd1rAL05ToER3Fx6XX2uV4u+r5wnb+vSWk0fuNESPdlcM8HlTEw8IkcO9jzFI7blQ
+	 jEt19bUC6cqnUz0IgGBKc/E0ZLKigY2TWIGdmR0Z3xEvBsvIFmLaVOZs+9YrLoEUJF
+	 GWEMr9Lwa8edQ==
+Received: from smtp.sberdevices.ru (p-i-exch-sc-m02.sberdevices.ru [172.16.192.103])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Tue, 20 Aug 2024 17:56:57 +0300 (MSK)
+From: Alexey Romanov <avromanov@salutedevices.com>
+To: <neil.armstrong@linaro.org>, <clabbe@baylibre.com>,
+	<herbert@gondor.apana.org.au>, <davem@davemloft.net>, <robh+dt@kernel.org>,
+	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+	<khilman@baylibre.com>, <jbrunet@baylibre.com>,
+	<martin.blumenstingl@googlemail.com>, <vadim.fedorenko@linux.dev>
+CC: <linux-crypto@vger.kernel.org>, <linux-amlogic@lists.infradead.org>,
+	<linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <kernel@salutedevices.com>, Alexey
+ Romanov <avromanov@salutedevices.com>
+Subject: [PATCH v9 04/23] drivers: crypto: meson: add MMIO helpers
+Date: Tue, 20 Aug 2024 17:56:04 +0300
+Message-ID: <20240820145623.3500864-5-avromanov@salutedevices.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240820145623.3500864-1-avromanov@salutedevices.com>
+References: <20240820145623.3500864-1-avromanov@salutedevices.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-CM-TRANSID:GxC2BwDntsPEpMRmxQiUAQ--.4381S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7ZF1kJFWfWr1DWr17AFyUtrb_yoW8AFWkpa
-	yrWF13tFZ5tw1SkFnay3WUGrWjy39rJF15JwnxJrykAFn0qFy09F1xKF45u3s8Grn3Cw1j
-	vrW3Ja13W3s8AaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxV
-	AFwI0_Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AF
-	wI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
-	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
-	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUF1
-	v3UUUUU
-X-CM-SenderInfo: purev21wro2thvvxqx5xdzvxpfor3voofrz/1tbiAgABBGbD+-gF-gABsb
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: p-i-exch-a-m1.sberdevices.ru (172.24.196.116) To
+ p-i-exch-sc-m02.sberdevices.ru (172.16.192.103)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 187181 [Aug 20 2024]
+X-KSMG-AntiSpam-Version: 6.1.0.4
+X-KSMG-AntiSpam-Envelope-From: avromanov@s2b.tech
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 27 0.3.27 71302da218a62dcd84ac43314e19b5cc6b38e0b6, {Tracking_smtp_not_equal_from}, {Tracking_from_domain_doesnt_match_to}, s2b.tech:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;smtp.sberdevices.ru:7.1.1,5.0.1;127.0.0.199:7.1.2;salutedevices.com:7.1.1, {Tracking_smtp_domain_mismatch}, {Tracking_smtp_domain_2level_mismatch}, FromAlignment: n
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/08/20 03:45:00 #26365304
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-On Tue, 2024-08-20 at 15:12 +0100, Jonathan McDowell wrote:
-> On Mon, Aug 19, 2024 at 05:15:02PM +0200, Roberto Sassu wrote:
-> > On Mon, 2024-08-19 at 16:08 +0100, Jonathan McDowell wrote:
-> > > On Sun, Aug 18, 2024 at 06:57:42PM +0200, Roberto Sassu wrote:
-> > > > From: Roberto Sassu <roberto.sassu@huawei.com>
-> > > >=20
-> > > > Support for PGP keys and signatures was proposed by David long time=
- ago,
-> > > > before the decision of using PKCS#7 for kernel modules signatures
-> > > > verification was made. After that, there has been not enough intere=
-st to
-> > > > support PGP too.
-> > >=20
-> > > You might want to update the RFC/bis references to RFC9580, which was
-> > > published last month and updates things.
-> >=20
-> > Yes, makes sense (but probably isn't too much hassle to support more
-> > things for our purposes?)
->=20
-> I'm mostly suggesting that the comments/docs point to the latest
-> standard rather than the draft version, not changing to support the new
-> v6 keys.
->=20
-> > > Also, I see support for v2 + v3 keys, and this doesn't seem like a go=
-od
-> > > idea. There are cryptographic issues with fingerprints etc there and =
-I
-> > > can't think of a good reason you'd want the kernel to support them. T=
-he
-> > > same could probably be said of DSA key support too.
-> >=20
-> > Uhm, if I remember correctly I encountered some old PGP keys used to
-> > verify RPM packages (need to check). DSA keys are not supported, since
-> > the algorithm is not in the kernel.
->=20
-> I would question the benefit gained from using obsolete key/signature
-> types for verification (I was involved in the process of Debian dropping
-> them back in *2010* which was later than it should have been). Dropping
-> the code for that path means a smaller attack surface/maintenance
-> overhead for something that isn't giving a benefit.
+Add MMIO access helpers: meson_dma_start() and meson_dma_ready().
 
-Ok, I agree to both!
+Signed-off-by: Alexey Romanov <avromanov@salutedevices.com>
+Reviewed-by: Neil Armstrong <neil.armstrong@linaro.org>
+---
+ drivers/crypto/amlogic/amlogic-gxl-cipher.c |  2 +-
+ drivers/crypto/amlogic/amlogic-gxl-core.c   | 24 ++++++++++++++++-----
+ drivers/crypto/amlogic/amlogic-gxl.h        |  2 ++
+ 3 files changed, 22 insertions(+), 6 deletions(-)
 
-Thanks
-
-Roberto
+diff --git a/drivers/crypto/amlogic/amlogic-gxl-cipher.c b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
+index 7eff3ae7356f..1fe916b0a138 100644
+--- a/drivers/crypto/amlogic/amlogic-gxl-cipher.c
++++ b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
+@@ -225,7 +225,7 @@ static int meson_cipher(struct skcipher_request *areq)
+ 
+ 	reinit_completion(&mc->chanlist[flow].complete);
+ 	mc->chanlist[flow].status = 0;
+-	writel(mc->chanlist[flow].t_phy | 2, mc->base + ((mc->pdata->descs_reg + flow) << 2));
++	meson_dma_start(mc, flow);
+ 	wait_for_completion_interruptible_timeout(&mc->chanlist[flow].complete,
+ 						  msecs_to_jiffies(500));
+ 	if (mc->chanlist[flow].status == 0) {
+diff --git a/drivers/crypto/amlogic/amlogic-gxl-core.c b/drivers/crypto/amlogic/amlogic-gxl-core.c
+index 9d92115043c3..0698ac5e2a6a 100644
+--- a/drivers/crypto/amlogic/amlogic-gxl-core.c
++++ b/drivers/crypto/amlogic/amlogic-gxl-core.c
+@@ -22,18 +22,32 @@
+ 
+ #include "amlogic-gxl.h"
+ 
++void meson_dma_start(struct meson_dev *mc, int flow)
++{
++	u32 offset = (mc->pdata->descs_reg + flow) << 2;
++
++	writel(mc->chanlist[flow].t_phy | 2, mc->base + offset);
++}
++
++static bool meson_dma_ready(struct meson_dev *mc, int flow)
++{
++	u32 offset = (mc->pdata->status_reg + flow) << 2;
++	u32 data = readl(mc->base + offset);
++
++	if (data)
++		writel_relaxed(0xF, mc->base + offset);
++
++	return data;
++}
++
+ static irqreturn_t meson_irq_handler(int irq, void *data)
+ {
+ 	struct meson_dev *mc = (struct meson_dev *)data;
+ 	int flow;
+-	u32 p;
+ 
+ 	for (flow = 0; flow < mc->flow_cnt; flow++) {
+ 		if (mc->chanlist[flow].irq == irq) {
+-			p = readl(mc->base + ((mc->pdata->status_reg + flow) << 2));
+-			if (p) {
+-				writel_relaxed(0xF, mc->base +
+-					      ((mc->pdata->status_reg + flow) << 2));
++			if (meson_dma_ready(mc, flow)) {
+ 				mc->chanlist[flow].status = 1;
+ 				complete(&mc->chanlist[flow].complete);
+ 				return IRQ_HANDLED;
+diff --git a/drivers/crypto/amlogic/amlogic-gxl.h b/drivers/crypto/amlogic/amlogic-gxl.h
+index 9ad75da214ff..8670f7ebcdda 100644
+--- a/drivers/crypto/amlogic/amlogic-gxl.h
++++ b/drivers/crypto/amlogic/amlogic-gxl.h
+@@ -161,6 +161,8 @@ struct meson_alg_template {
+ #endif
+ };
+ 
++void meson_dma_start(struct meson_dev *mc, int flow);
++
+ int meson_enqueue(struct crypto_async_request *areq, u32 type);
+ 
+ int meson_aes_setkey(struct crypto_skcipher *tfm, const u8 *key,
+-- 
+2.34.1
 
