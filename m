@@ -1,37 +1,42 @@
-Received: from albert.telenet-ops.be (albert.telenet-ops.be [195.130.137.90])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from gauss.telenet-ops.be (gauss.telenet-ops.be [195.130.132.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 131C818B498
-	for <linux-crypto@vger.kernel.org>; Tue, 20 Aug 2024 09:25:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.130.137.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A566018A94A
+	for <linux-crypto@vger.kernel.org>; Tue, 20 Aug 2024 09:29:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.130.132.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724145904; cv=none; b=qNv2ootWhFd3xXAa8FuSXZvDKHXFd3vqSMoubtvVF7gyBV01L0P3LDwvXSVLfVocUCzU3o6pCZfVGzlbktCRWnHF/GDO5fqDXlx+kAlRXA/VoK1eMM3woLopRua21vbpcikB3SZQZCESqNpKHGwO1DRnV1G7NKhFyMFmQDC+GB8=
+	t=1724146154; cv=none; b=ue/veM/Bzgt8WiMie1n1rJh5aPmNS6MmNfo32COYTGQZY3rInetgev+qOb7fjPE2CI79BD2bjRlIzRDmMLxc9NpL3npVuHEI5gF1GqwWN8o2QlkPt2zIR68lQUlDRtAGUiYpVkqLDtiRLBusDpt6VlX8FEzim4uj02zf+4OiKu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724145904; c=relaxed/simple;
-	bh=3FiOCf8fm0kY9F5zQd4hyuzaEe7QA8k0TgU05oRkPe8=;
+	s=arc-20240116; t=1724146154; c=relaxed/simple;
+	bh=1p3JZfIy57+yQxzEAuW3lsEC0DcOCf65qWJ1CHrK5V4=;
 	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=rSwkDBwNvDHmn0baO9ErTpdFTbgzDm6x/N35Iu9C1YDM/VcTE/Kg5R4eItDlQcTHbpwGev9RTFiE/TOcASU8oJ7VEfnZssgRP+uoylG2oSqJ/xVIOrNBujnmYumwBSbKgXcQh0BF2B0okRNAxjD0Z1OfsuTIxrr4Jv8BYeoXOYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; arc=none smtp.client-ip=195.130.137.90
+	 MIME-Version:Content-Type; b=XLgSPzCxB4Y3HoA1BGrtq1V+mR8g8SAwHqhM7AaGC45O69hLn7X9fXtlnwEK6c/YhMS4VdcKf10+/AIh2T3CBpI8KooFg+uybELh2d9FSpX4AYbRnMRAb0sfWmT17cFlyo+j5Dvzc5HyIOg+2ZHJcRhrbXBxWVn+UCNgW34HtdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; arc=none smtp.client-ip=195.130.132.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
+Received: from michel.telenet-ops.be (michel.telenet-ops.be [IPv6:2a02:1800:110:4::f00:18])
+	by gauss.telenet-ops.be (Postfix) with ESMTPS id 4Wp40d3jHfz4xKqw
+	for <linux-crypto@vger.kernel.org>; Tue, 20 Aug 2024 11:29:05 +0200 (CEST)
 Received: from ramsan.of.borg ([IPv6:2a02:1810:ac12:ed80:a2e4:464c:5828:2da3])
-	by albert.telenet-ops.be with bizsmtp
-	id 29Qt2D00E2WQTnu069QtqJ; Tue, 20 Aug 2024 11:24:54 +0200
+	by michel.telenet-ops.be with bizsmtp
+	id 29Ux2D0092WQTnu069Uxui; Tue, 20 Aug 2024 11:28:58 +0200
 Received: from geert (helo=localhost)
 	by ramsan.of.borg with local-esmtp (Exim 4.95)
 	(envelope-from <geert@linux-m68k.org>)
-	id 1sgL6j-000Mcf-AO;
-	Tue, 20 Aug 2024 11:24:53 +0200
-Date: Tue, 20 Aug 2024 11:24:53 +0200 (CEST)
+	id 1sgLAf-000Md9-4T;
+	Tue, 20 Aug 2024 11:28:57 +0200
+Date: Tue, 20 Aug 2024 11:28:57 +0200 (CEST)
 From: Geert Uytterhoeven <geert@linux-m68k.org>
 To: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
 cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org, 
     Ruud.Derwig@synopsys.com, manjunath.hadli@vayavyalabs.com, 
-    bhoomikak@vayavyalabs.com, devicetree@vger.kernel.org
-Subject: Re: [PATCH v4 6/7] Add SPAcc dts overlay
-In-Reply-To: <20240618042750.485720-7-pavitrakumarm@vayavyalabs.com>
-Message-ID: <d430d47b-b8c6-69f8-3f2c-eeed78b583dc@linux-m68k.org>
-References: <20240618042750.485720-1-pavitrakumarm@vayavyalabs.com> <20240618042750.485720-7-pavitrakumarm@vayavyalabs.com>
+    bhoomikak@vayavyalabs.com, Rob Herring <robh@kernel.org>, 
+    Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+    Conor Dooley <conor+dt@kernel.org>, devicetree@vger.kernel.org
+Subject: Re: [PATCH v4 0/7] Add SPAcc Crypto Driver Support
+In-Reply-To: <20240618042750.485720-1-pavitrakumarm@vayavyalabs.com>
+Message-ID: <2c9014b3-efd-101d-6fe5-4d436059c9@linux-m68k.org>
+References: <20240618042750.485720-1-pavitrakumarm@vayavyalabs.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -45,60 +50,28 @@ Content-Type: text/plain; charset=US-ASCII; format=flowed
 CC devicetree
 
 On Tue, 18 Jun 2024, Pavitrakumar M wrote:
-> Signed-off-by: Manjunath Hadli <manjunath.hadli@vayavyalabs.com>
-> Signed-off-by: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
-> Acked-by: Ruud Derwig <Ruud.Derwig@synopsys.com>
+> Add the driver for SPAcc(Security Protocol Accelerator), which is a
+> crypto acceleration IP from Synopsys. The SPAcc supports many cipher,
+> hash, aead algorithms and various modes.The driver currently supports
+> below,
 
-Thanks for your patch!
+[...]
 
-Please provide a patch description.
-The one-line summary is also not very informative and lacks a suitable prefix.
+> Pavitrakumar M (7):
+>  Add SPAcc Skcipher support
+>  Enable SPAcc AUTODETECT
+>  Add SPAcc ahash support
+>  Add SPAcc aead support
+>  Add SPAcc Kconfig and Makefile
+>  Add SPAcc dts overlay
+>  Enable Driver compilation in crypto Kconfig and Makefile
 
-> --- /dev/null
-> +++ b/arch/arm64/boot/dts/xilinx/snps-dwc-spacc.dtso
-> @@ -0,0 +1,35 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * dts file for Synopsys DWC SPAcc
-> + *
-> + * (C) Copyright 2024 Synopsys
-> + *
-> + * Ruud Derwig <Ruud.Derwig@synopsys.com>
-> + */
-> +
-> +/dts-v1/;
-> +/plugin/;
-> +
-> +/ {
-> +	#address-cells = <2>;
-> +	#size-cells = <2>;
-> +
-> +	fragment@0 {
-> +		target = <&amba>;
-> +
-> +		overlay1: __overlay__ {
+Thanks for your series, of which all but the dts patches have been
+applied to the crypto tree (commits fc61c658c94cb740 ("crypto: spacc -
+Enable Driver compilation in crypto Kconfig and Makefile") and before).
 
-Please use sugar syntax.  See e.g. commit db2f3762d609318e ("of:
-convert unittest overlay devicetree source to sugar syntax").
-
-> +			#address-cells = <2>;
-> +			#size-cells = <2>;
-> +
-> +			dwc_spacc: spacc@400000000 {
-> +				compatible = "snps-dwc-spacc";
-
-Where can we find the DT bindings?
-
-> +				reg = /bits/ 64 <0x400000000 0x3FFFF>;
-> +				interrupts = <0 89 4>;
-> +				interrupt-parent = <&gic>;
-> +				clock-names = "ref_clk";
-> +				spacc_priority = <0>;
-> +				spacc_index = <0>;
-> +			};
-> +		};
-> +	};
-> +};
+This driver uses device tree, but lacks DT bindings, which are a
+requirement for new DT drivers.  So please provide DT bindings.
 
 Gr{oetje,eeting}s,
 
