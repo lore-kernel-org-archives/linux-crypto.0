@@ -1,111 +1,64 @@
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57CB416EB76;
-	Wed, 21 Aug 2024 21:11:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7B75176FAC;
+	Wed, 21 Aug 2024 22:41:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724274672; cv=none; b=QqQbSNsoKKzf76hIisRzYmdbRn6g2ser6yjPoq63GxOlFV3slSFmZ4PrDxCkQsTAzbBh2wXC+9uHjS0zrbdG+4W/hQ4nVJj++yoKFJps2l1/rpZ0UVZwprLPWwZpz+7fawxm+Ztm7TYuqXxAr42KL8bGDCYEiRlKfeuJxqZAqYo=
+	t=1724280097; cv=none; b=Avg5EI3WTmrvzjPLvn4dC1rqPsaBiwLCbh0iuF914ygk4Eef5NClw+1UbwHh+S47D3RvD+dh327k/fE68q7oikp/Ey1rgl+aMOtqBPRqW2C982fjC3jguCR91mtjFf94pwC8toP0mH4A8Zvl6kn0J4yt3yCB/dQdsZjJ0ivqCaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724274672; c=relaxed/simple;
-	bh=mN41pj977FmWYbSRwVaWkMoGypbYHhGNkyDUK/aF7ww=;
-	h=From:To:CC:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=INsuPPf3I3AcECtBk34+J+7GnjYTLpaAtMfV8sbb/JLqQN4x8eqZ9awwf5aae1Fc+fpsyxwzITgyaKh+wMhZ2puwuAeb+AN6dvJ9BiGdPVsRPwxBVk1Zi8fOHcAxJiBu9Bmsn0uRIXWq9jvFCBrM5uhud4yLeVbWzqyk1xm78So=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=P/mdg3IP; arc=none smtp.client-ip=198.47.23.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+	s=arc-20240116; t=1724280097; c=relaxed/simple;
+	bh=MU5eX2ZknS+WS6wreHZexZd69rODrhjryDKYvVR0OQ0=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=LZ8M/0CD4iat6Yur580jdiBOFMwh6atxQhgTcomMSQb7N4KUnF4xD5Nla76we3+H2ksT/UjzyLmeW1DHFZoBTfaBogCaBiW9//asF9i84TbNMu0rWPIUBhqH4NxHFavCS0AiwPpRDEzXzfxxJYs46tFbXAj9YggLvmop/3fHT5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=URb/BoIa; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="P/mdg3IP"
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 47LLAxC2042110;
-	Wed, 21 Aug 2024 16:10:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1724274659;
-	bh=e+Pe5qHbfIoXGrIPUqhyvZ1/ONTkySDiDp/bXEauUI8=;
-	h=From:To:CC:Subject:In-Reply-To:References:Date;
-	b=P/mdg3IPZbeTLD2Mcbat27nti+8lIg7qCR6xXJH7viPS1BMTvUv7FijzkXRTj9Ye2
-	 Q4pCmS8FHwUC3+BvoShSMM6FW64FnNfsUAlCcALFVzPdbOjs8cH3+xuy2k7BBExdH2
-	 jgdiYSnhQ18IQ3CN8wW5pR7UzZjdA4l3h78RfY+s=
-Received: from DLEE109.ent.ti.com (dlee109.ent.ti.com [157.170.170.41])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 47LLAxpN114191
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 21 Aug 2024 16:10:59 -0500
-Received: from DLEE108.ent.ti.com (157.170.170.38) by DLEE109.ent.ti.com
- (157.170.170.41) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 21
- Aug 2024 16:10:58 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE108.ent.ti.com
- (157.170.170.38) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Wed, 21 Aug 2024 16:10:58 -0500
-Received: from localhost (kamlesh.dhcp.ti.com [172.24.227.123])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 47LLAwjl057124;
-	Wed, 21 Aug 2024 16:10:58 -0500
-From: Kamlesh Gurudasani <kamlesh@ti.com>
-To: Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Herbert Xu
-	<herbert@gondor.apana.org.au>
-CC: Waiman Long <longman@redhat.com>, <steffen.klassert@secunet.com>,
-        <akpm@linux-foundation.org>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] padata: Fix possible divide-by-0 panic in
- padata_mt_helper()
-In-Reply-To: <87bk1mnvn9.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
-References: <e752f094-adb4-4448-8bc8-e2460330eaec@redhat.com>
- <ZrgXtLI1R5zJ9GFG@gondor.apana.org.au>
- <91d29649-ca88-4f6c-bf1d-19e49c9555df@redhat.com>
- <ZrgsU-1PdxvUVMOW@gondor.apana.org.au>
- <88c188dc-3664-45db-b54a-11feca59d7d2@redhat.com>
- <Zrgy1TDikPSkzaYP@gondor.apana.org.au>
- <c5cc5ea9-1135-4ac6-a38f-652ed07dae17@redhat.com>
- <ZsBNZXfVZbtZnb2Y@gondor.apana.org.au>
- <dgtppozpgkm2gtv7nnvranbkjudr7bwuvfe7hjbznipozcxyzd@3qcag7izn4fj>
- <ZsQWV_j5zMuYWqvH@gondor.apana.org.au>
- <3kexyvcrc5pxp4cqlgt7tvdbo3hbt225w76kczjdlzwitpeuto@addhycc4evbe>
- <87bk1mnvn9.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
-Date: Thu, 22 Aug 2024 02:40:57 +0530
-Message-ID: <878qwpoa3i.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="URb/BoIa"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8E2EC32781;
+	Wed, 21 Aug 2024 22:41:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+	s=korg; t=1724280097;
+	bh=MU5eX2ZknS+WS6wreHZexZd69rODrhjryDKYvVR0OQ0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=URb/BoIaWRMpk4YpCvjH6goKjrz9oJD+taUF/8zSjzkMVEFIZ1k5RQGe1qLUb6YHN
+	 aT/7rFWa2sA/xXFFV/da/lvlFiAkJpDg4AWM2qtRRn/P55/TRXKDhsLWS552xqXNni
+	 Tbj5xzqnL8rBXmt2qykcvLRbL1f/upaZl8A9z5hM=
+Date: Wed, 21 Aug 2024 15:41:36 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+To: Kamlesh Gurudasani <kamlesh@ti.com>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>, Daniel Jordan
+ <daniel.m.jordan@oracle.com>, Waiman Long <longman@redhat.com>, Herbert Xu
+ <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] padata: Honor the caller's alignment in case of
+ chunk_size 0
+Message-Id: <20240821154136.a09fa0e80903aa9ae17d43bd@linux-foundation.org>
+In-Reply-To: <20240822-max-v1-1-cb4bc5b1c101@ti.com>
+References: <20240822-max-v1-1-cb4bc5b1c101@ti.com>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Kamlesh Gurudasani <kamlesh@ti.com> writes:
+On Thu, 22 Aug 2024 02:32:52 +0530 Kamlesh Gurudasani <kamlesh@ti.com> wrote:
 
-> Daniel Jordan <daniel.m.jordan@oracle.com> writes:
->
->> On Tue, Aug 20, 2024 at 12:06:47PM GMT, Herbert Xu wrote:
->>> On Mon, Aug 19, 2024 at 06:29:52PM -0400, Daniel Jordan wrote:
->>> >
->>> > The DIV_ROUND_UP approach reads a bit nicer to me, but I can imagine
->>> > oddball cases where rounding up is undesirable (say, near-zero values
->>> > for size, min_chunk, and align; padata_work_alloc_mt returns many fewer
->>> > works than requested; and a single unit of work is very expensive) so
->>> > that rounding up makes a bigger difference.  So, the way it now is seems
->>> > ok.
->>> 
->>> In that case let's do the max ahead of the align check:
->>> 
->>> 	ps.chunk_size = max(ps.chunk_size, 1ul);
->>> 	ps.chunk_size = roundup(ps.chunk_size, job->align);
->>> 
->>> If we do it after then it may come out unaligned (e.g., job->align = 8
->>> and ps.chunk_size = 1).
->>
->> Sure, I think Kamlesh was the first to suggest max, so maybe Kamlesh
->> would like to make the change.  I'll send a patch otherwise.
-> Thanks for consideration, Daniel. I'll send a patch.
-Sent.
+> In the case where we are forcing the ps.chunk_size to be at least 1,
+> we are ignoring the caller's alignment.
+> 
+> Move the forcing of ps.chunk_size to be at least 1 before rounding it
+> up to caller's alignment, so that caller's alignment is honored.
+> 
+> While at it, use max() to force the ps.chunk_size to be at least 1 to
+> improve readability.
 
-Just curious about one thing on line 495,
+Please (as always) describe the userspace-visible runtime effects of
+this change.  This helps others to determine which kernel(s) should be
+patched.  And it helps others decide whether this fix might address an
+issue which they are encountering.
 
-nworks = max(job->size / max(job->min_chunk, job->align), 1ul);
 
-what happens if both min_chunk and align are 0.
-
-cheers,
-Kamlesh
