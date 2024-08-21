@@ -1,140 +1,112 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from akranes.kaiser.cx (akranes.kaiser.cx [152.53.16.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41F6F1537D1;
-	Wed, 21 Aug 2024 05:16:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0450185B67;
+	Wed, 21 Aug 2024 06:59:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=152.53.16.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724217407; cv=none; b=JGNwoFLE8DQjGSr8ulfArUv/VbuolUZ796WvhXbn3H/is1h4AkWEEhK8A2lXsJT4qekGYDLh4LTR0mSek9va+UWJpCr8Fo2j1in77dz7KZq7vpRjKyL7zcHUCBPbcfAdGBnsPTHLL2n6bUvqxH5gSgF8rf2HJNjGIdkPfMYMwUM=
+	t=1724223596; cv=none; b=TIXcexpN8h58o5EWzkkZrvL/2ba9Am+wr+3VsTOHGbPhOjXA/WZicRYnh9tlHErt7VN7aN3xXBPylcHitSzvTYIGvH/vwDD1TgftRK4wlzh+gr8bAr97vVHxRDleOGBMtBYsWw1EkBBaEUKfFPTptO9MaosleCvRHT639KqwgKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724217407; c=relaxed/simple;
-	bh=ZZXp028kuznJ40MHUeSJt4Qcm9NAbrJnKp1wijan5lw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=cRMid9wv7qiyODG9enoEPb9aQwMf0N/LmdFDNODQeD8ckpRNOOq5BFucZerBoC8S3gNCYi8nABUSSXY1xOrxGqKBcBudQjXkZR4jH985HdiHPYagqUDqOm/lknbn0x539BjHPcw0qXfCCjN0Ss/+9XYCMHX/kTNETYZZmCKiNww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=pmU9hxl5; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="pmU9hxl5"
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47L5AQT6022670;
-	Wed, 21 Aug 2024 05:16:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	1mpMc7tEgd9LCX6iqpPcU8hX1X+O3hBWQ6RVnA+nEWs=; b=pmU9hxl5TNCPmcZH
-	Kn6SLir45a5KfH9MgsdaLZ9Riy3H4tmvq36bV8eWnIwdkSlGvBjFakLT1crmXYfs
-	LKhvZRUmKIQSVbPeQoUknqY8fJlQuxhf7DEMwvGPtPLMmlZ6sOR5ppUtKiYiQfV0
-	3uOdLAyyrynCz3oy+iGL5SI+vSYnPE4fw0rUQBDPixQbCruc8UVnpObLmNlMAvgW
-	rzxfbsoDsju76kXp+gxxNYE3uJWPPAE7kQxAwgrrPFnsgg9LFA1HuXASkNGba3Mc
-	9qShuDfqP88ICXlROhjIQBTWwrqz750JB7dafsyw6sv3UpJi81CnJfSZ8Yb7vUT/
-	q777/A==
-Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 414pdmb1bc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 21 Aug 2024 05:16:35 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 47L5GYBf026977
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 21 Aug 2024 05:16:34 GMT
-Received: from [10.151.37.94] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 20 Aug
- 2024 22:16:27 -0700
-Message-ID: <ef8b3a3d-5791-f5c5-4362-7e2f87d726d0@quicinc.com>
-Date: Wed, 21 Aug 2024 10:46:24 +0530
+	s=arc-20240116; t=1724223596; c=relaxed/simple;
+	bh=8cjkmKFsxDX/YLWmGFYfoAyPJVWnGwygJdAeY5YFv3Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sGNqBLUC6E6sZl3eFs5Xe5YUVsHuKPZyoURFpsew2tEnThMEGBeEeR3oOQUcVTnr7sZT0TtDqfEicLgfVLt0FYllyLpdYa4eStW3pXBMbzVBZ57mKIuHIpkRRTNX9XiBFe5aGqsRhiR3L/HUbjXoTSvqxlE0PxKuwEs9m1Ooqn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kaiser.cx; spf=pass smtp.mailfrom=kaiser.cx; arc=none smtp.client-ip=152.53.16.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kaiser.cx
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kaiser.cx
+Received: from martin by akranes.kaiser.cx with local (Exim 4.96)
+	(envelope-from <martin@akranes.kaiser.cx>)
+	id 1sgf2s-001zDD-1p;
+	Wed, 21 Aug 2024 08:42:14 +0200
+Date: Wed, 21 Aug 2024 08:42:14 +0200
+From: Martin Kaiser <martin@kaiser.cx>
+To: Huan Yang <link@vivo.com>
+Cc: Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	opensource.kernel@vivo.com
+Subject: Re: [PATCH] char: mxc-rnga: Use devm_clk_get_enabled() helpers
+Message-ID: <ZsWMRn1gPNnrdaRy@akranes.kaiser.cx>
+References: <20240820094715.104998-1-link@vivo.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH v2 14/16] arm64: dts: qcom: ipq9574: enable bam pipe
- locking/unlocking
-Content-Language: en-US
-To: Bjorn Andersson <andersson@kernel.org>
-CC: <vkoul@kernel.org>, <robh@kernel.org>, <krzk+dt@kernel.org>,
-        <conor+dt@kernel.org>, <konradybcio@kernel.org>,
-        <thara.gopinath@gmail.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>, <gustavoars@kernel.org>,
-        <u.kleine-koenig@pengutronix.de>, <kees@kernel.org>,
-        <agross@kernel.org>, <linux-arm-msm@vger.kernel.org>,
-        <dmaengine@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <quic_srichara@quicinc.com>, <quic_varada@quicinc.com>,
-        <quic_utiwari@quicinc.com>
-References: <20240815085725.2740390-1-quic_mdalam@quicinc.com>
- <20240815085725.2740390-15-quic_mdalam@quicinc.com>
- <lr53irikxjjoiks2utckyt5bsflxm52r2nlospkv3id6qwkfih@pycrjkeibx4g>
-From: Md Sadre Alam <quic_mdalam@quicinc.com>
-In-Reply-To: <lr53irikxjjoiks2utckyt5bsflxm52r2nlospkv3id6qwkfih@pycrjkeibx4g>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: KN-cptjYjujvWk4URMmF6hvTYq_beEY-
-X-Proofpoint-ORIG-GUID: KN-cptjYjujvWk4URMmF6hvTYq_beEY-
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-21_05,2024-08-19_03,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 spamscore=0
- suspectscore=0 malwarescore=0 phishscore=0 priorityscore=1501 mlxscore=0
- impostorscore=0 bulkscore=0 lowpriorityscore=0 adultscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2407110000
- definitions=main-2408210036
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240820094715.104998-1-link@vivo.com>
+Sender: "Martin Kaiser,,," <martin@akranes.kaiser.cx>
 
+Thus wrote Huan Yang (link@vivo.com):
 
+> The devm_clk_get_enabled() helpers:
+>     - call devm_clk_get()
+>     - call clk_prepare_enable() and register what is needed in order to
+>      call clk_disable_unprepare() when needed, as a managed resource.
 
-On 8/16/2024 10:10 PM, Bjorn Andersson wrote:
-> On Thu, Aug 15, 2024 at 02:27:23PM GMT, Md Sadre Alam wrote:
->> enable bam pipe locking/unlocking for ipq9507 SoC.
-> 
-> Note that the commit messages for the other non-dts commits will not
-> show up in the git history for this file. So, please follow
-> https://docs.kernel.org/process/submitting-patches.html#describe-your-changes
-> and give some indication of "problem description", to give future
-> readers an idea why this is here.
-   Ok
-> 
->>
->> Signed-off-by: Md Sadre Alam <quic_mdalam@quicinc.com>
->> ---
->>
->> Change in [v2]
->>
->> * enabled locking/unlocking support for ipq9574
->>
->> Change in [v1]
->>
->> * This patch was not included in [v1]
->>
->>   arch/arm64/boot/dts/qcom/ipq9574.dtsi | 1 +
->>   1 file changed, 1 insertion(+)
->>
->> diff --git a/arch/arm64/boot/dts/qcom/ipq9574.dtsi b/arch/arm64/boot/dts/qcom/ipq9574.dtsi
->> index 48dfafea46a7..dacaec62ec39 100644
->> --- a/arch/arm64/boot/dts/qcom/ipq9574.dtsi
->> +++ b/arch/arm64/boot/dts/qcom/ipq9574.dtsi
->> @@ -262,6 +262,7 @@ cryptobam: dma-controller@704000 {
->>   			#dma-cells = <1>;
->>   			qcom,ee = <1>;
->>   			qcom,controlled-remotely;
->> +			qcom,bam_pipe_lock;
-> 
-> Per the question before about what does this actually lock. Is this a
-> property of the BAM controller, or the crypto channel?
-   This is the property of BAM controller.
-> 
-> Regards,
-> Bjorn
-> 
->>   		};
->>   
->>   		crypto: crypto@73a000 {
->> -- 
->> 2.34.1
->>
+> This simplifies the code and avoids the calls to clk_disable_unprepare().
+
+> Signed-off-by: Huan Yang <link@vivo.com>
+> ---
+>  drivers/char/hw_random/mxc-rnga.c | 16 +++-------------
+>  1 file changed, 3 insertions(+), 13 deletions(-)
+
+> diff --git a/drivers/char/hw_random/mxc-rnga.c b/drivers/char/hw_random/mxc-rnga.c
+> index 94ee18a1120a..f01eb95bee31 100644
+> --- a/drivers/char/hw_random/mxc-rnga.c
+> +++ b/drivers/char/hw_random/mxc-rnga.c
+> @@ -147,33 +147,25 @@ static int mxc_rnga_probe(struct platform_device *pdev)
+>  	mxc_rng->rng.data_present = mxc_rnga_data_present;
+>  	mxc_rng->rng.data_read = mxc_rnga_data_read;
+
+> -	mxc_rng->clk = devm_clk_get(&pdev->dev, NULL);
+> +	mxc_rng->clk = devm_clk_get_enabled(&pdev->dev, NULL);
+>  	if (IS_ERR(mxc_rng->clk)) {
+>  		dev_err(&pdev->dev, "Could not get rng_clk!\n");
+>  		return PTR_ERR(mxc_rng->clk);
+>  	}
+
+> -	err = clk_prepare_enable(mxc_rng->clk);
+> -	if (err)
+> -		return err;
+> -
+>  	mxc_rng->mem = devm_platform_ioremap_resource(pdev, 0);
+>  	if (IS_ERR(mxc_rng->mem)) {
+>  		err = PTR_ERR(mxc_rng->mem);
+> -		goto err_ioremap;
+> +		return err;
+>  	}
+
+>  	err = hwrng_register(&mxc_rng->rng);
+>  	if (err) {
+>  		dev_err(&pdev->dev, "MXC RNGA registering failed (%d)\n", err);
+> -		goto err_ioremap;
+> +		return err;
+>  	}
+
+>  	return 0;
+> -
+> -err_ioremap:
+> -	clk_disable_unprepare(mxc_rng->clk);
+> -	return err;
+>  }
+
+>  static void mxc_rnga_remove(struct platform_device *pdev)
+> @@ -181,8 +173,6 @@ static void mxc_rnga_remove(struct platform_device *pdev)
+>  	struct mxc_rng *mxc_rng = platform_get_drvdata(pdev);
+
+>  	hwrng_unregister(&mxc_rng->rng);
+> -
+> -	clk_disable_unprepare(mxc_rng->clk);
+>  }
+
+>  static const struct of_device_id mxc_rnga_of_match[] = {
+> -- 
+> 2.45.2
+
+looks good to me
+
+Reviewed-by: Martin Kaiser <martin@kaiser.cx>
