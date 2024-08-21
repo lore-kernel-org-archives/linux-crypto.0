@@ -1,262 +1,224 @@
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37C571BFDE8;
-	Wed, 21 Aug 2024 10:02:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.89.224.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13E9F5D8F0;
+	Wed, 21 Aug 2024 16:32:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724234579; cv=none; b=Nt7jRciYXr2Zm0RB9qFQOetyAR9G/Hwe3zjIeuCol4xutxcqSxsiVI3V8T32aVPnJNzaVm6Qj498UytSpfObFCGWaNmB/zllzhboUT9rk+2dPG8reivsYestbIBANNbyBf7E+TnT15vWWszwD65Ch7Mvd26F5aDGR3WKFGbIKZc=
+	t=1724257936; cv=none; b=mluTmibCt3G8BlsKpgUBPRMzgk4d/J30V2eIwpGrHT+M2WBWS0CnhVS3yH60iFHM0SPdsPGn/77GVo/xYga9NcCqsrKLvXghQ2erIIDvKnoBoONTniwd+DM0F/c8o7JJKTJkEvh+nBQ4+8JNxAFhZjT07od9tDkAvqFYALVbzm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724234579; c=relaxed/simple;
-	bh=LBx8b6fa46n9coj8rSupKMXrF5Jk2Vtbna8Hp+EkQqk=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=rZ7RwoOPdfDq++c36xZaTfmad51WH+TkoMeqKR6GoWSja5J5x+yb3mGJjxS7NKHPcreuwVaTNGNAdhN9Y6cuuU687QRvIHrcc0szKQ7eKXzGou/aF9SucDVmDr1eF/NJvDuisodebh6M+pf95K8EegK4087WC5DJ73oX+f82AKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=s2b.tech; spf=pass smtp.mailfrom=s2b.tech; dkim=fail (0-bit key) header.d=s2b.tech header.i=@s2b.tech header.b=yiEsMJp6 reason="key not found in DNS"; arc=none smtp.client-ip=45.89.224.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=s2b.tech
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=s2b.tech
+	s=arc-20240116; t=1724257936; c=relaxed/simple;
+	bh=ydiATV2XuDjT4P4uEWGX77NmnCuMdVJf/U8IfiMU7MQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=A+zZbejwSyIpDdyvjw7g9C9Ahfq5rynO1jjm6DKVLgT6c7sWBgeCTBtLhiObofLGQVpukMA7ztjjVxCyirORrAfMMC3Iuh7G9UuTvCfSQOeq4ml7m8HdNiZ0FlI/Hi35Tt/8dvZ/uiUGnsz6rlsWfFPAsDju47MolaoQuxszcL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=SM6nODZP; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=s2b.tech header.i=@s2b.tech header.b="yiEsMJp6"
-Received: from p-infra-ksmg-sc-msk02.sberdevices.ru (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 6CF4D120009;
-	Wed, 21 Aug 2024 13:02:51 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 6CF4D120009
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=s2b.tech;
-	s=s2b.tech; t=1724234571;
-	bh=COXiy57lY8dzSPNXsiiYnAyzRBL65uPiWZ3K75EEL8s=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version:From;
-	b=yiEsMJp6lq7tdEgPiHFXk1xdLN78EScAQP4xLlgVULgr/MBYJfTYTe3A7YkaYowy7
-	 ZgyOILRBQuL9HqtYh45ofGS+c5wpup2Kpcllz2toUlI3/67ESMvz4VmWdNV+xLrDEY
-	 BVp+9vWBR0gI/kNZ/zW4BAiKTp4eEZ/nzyJggz8qXj63OuxHdWxqYIiM2KiNi190Sp
-	 G0m8ZhLEhIvaI2chNCyuLlYHXn+H6gD5u+n5cJlEnco1ZIBfHW5GIOhTnbIvcbPz2c
-	 CLHIT3xW1EGujP7yytLg+B4txR5PqjzbAu8qlZ7Gt6V9kEgfh9E2Uetsj4ltrprvnX
-	 /rQXZaNI+iFGA==
-Received: from smtp.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Wed, 21 Aug 2024 13:02:51 +0300 (MSK)
-From: Alexey Romanov <avromanov@s2b.tech>
-To: "neil.armstrong@linaro.org" <neil.armstrong@linaro.org>
-CC: "clabbe@baylibre.com" <clabbe@baylibre.com>, "herbert@gondor.apana.org.au"
-	<herbert@gondor.apana.org.au>, "davem@davemloft.net" <davem@davemloft.net>,
-	"robh+dt@kernel.org" <robh+dt@kernel.org>,
-	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>, "khilman@baylibre.com"
-	<khilman@baylibre.com>, "jbrunet@baylibre.com" <jbrunet@baylibre.com>,
-	"martin.blumenstingl@googlemail.com" <martin.blumenstingl@googlemail.com>,
-	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-amlogic@lists.infradead.org" <linux-amlogic@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, kernel <kernel@sberdevices.ru>
-Subject: Re: [PATCH v9 00/23] Support more Amlogic SoC families in crypto
- driver
-Thread-Topic: [PATCH v9 00/23] Support more Amlogic SoC families in crypto
- driver
-Thread-Index: AQHa8xEu8HBRFAfkMUCcNq+0g+oZurIwEEOAgAE52YA=
-Date: Wed, 21 Aug 2024 10:02:50 +0000
-Message-ID: <20240821100245.q5uptswxmx4rk35n@cab-wsm-0029881>
-References: <20240820145623.3500864-1-avromanov@salutedevices.com>
- <6e535895-6a06-42f8-abf3-e3b7472c97e0@linaro.org>
-In-Reply-To: <6e535895-6a06-42f8-abf3-e3b7472c97e0@linaro.org>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <7FC1B060E590BD478A7D229A9792E8A3@sberdevices.ru>
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="SM6nODZP"
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47LCIJ13022390;
+	Wed, 21 Aug 2024 16:32:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	C3Kgh+kP9eI1LhPm7yyGDpHjNiyatM6aYOhcljr30h8=; b=SM6nODZP7/zcbk6j
+	yFZ/+jzMikfhtjXrW1NmTNE27frmV9KJS50iyCo62pCHfH0LA9IVrcEZxsGZOs+N
+	b/Q7pc58YVPya+1yEsXbafQOvuGnmXnFqy0eb1Zex4MeWRGXWgTbE0fAh/RKrdK4
+	+ZMMtc5yx5gAeCaG4TBgfC3qWg8PfZCPzzuMVGyaYTvPRD3Hs3snbyhqb0+8kazO
+	STEO26TpCkPYGXAfsue4o7fJ0gAOZdjuHDIArWDdv7dntsrl1dOPgI+RKLhlf1h9
+	v2CVPca8w6EI5cXvspRX8nkODev+mAzkb3L5Oa5xRwDEDhLPON9GK4IiA1td7XSw
+	70Nk4Q==
+Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 414pdmdda1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 21 Aug 2024 16:32:02 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 47LGW1a9025563
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 21 Aug 2024 16:32:01 GMT
+Received: from [10.216.59.247] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 21 Aug
+ 2024 09:31:54 -0700
+Message-ID: <24909c0b-ad83-e33b-e11f-22d0fb2ec979@quicinc.com>
+Date: Wed, 21 Aug 2024 22:01:51 +0530
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 187202 [Aug 21 2024]
-X-KSMG-AntiSpam-Version: 6.1.0.4
-X-KSMG-AntiSpam-Envelope-From: avromanov@s2b.tech
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 27 0.3.27 71302da218a62dcd84ac43314e19b5cc6b38e0b6, {Tracking_uf_ne_domains}, {Track_E25351}, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;lore.kernel.org:7.1.1;smtp.sberdevices.ru:7.1.1,5.0.1;gist.github.com:7.1.1;127.0.0.199:7.1.2;s2b.tech:7.1.1, FromAlignment: s
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean, bases: 2024/08/21 05:09:00
-X-KSMG-LinksScanning: Clean, bases: 2024/08/21 05:09:00
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/08/21 06:50:00 #26388227
-X-KSMG-AntiVirus-Status: Clean, skipped
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.9.1
+Subject: Re: [PATCH v2 03/16] dmaengine: qcom: bam_dma: add LOCK & UNLOCK flag
+ support
+Content-Language: en-US
+To: Bjorn Andersson <andersson@kernel.org>
+CC: <vkoul@kernel.org>, <robh@kernel.org>, <krzk+dt@kernel.org>,
+        <conor+dt@kernel.org>, <konradybcio@kernel.org>,
+        <thara.gopinath@gmail.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>, <gustavoars@kernel.org>,
+        <u.kleine-koenig@pengutronix.de>, <kees@kernel.org>,
+        <agross@kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <dmaengine@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <quic_srichara@quicinc.com>, <quic_varada@quicinc.com>,
+        <quic_utiwari@quicinc.com>
+References: <20240815085725.2740390-1-quic_mdalam@quicinc.com>
+ <20240815085725.2740390-4-quic_mdalam@quicinc.com>
+ <knhqbj2pyluwrvr2f4h6zgpfosa6o2qgnhtl4qltadpuyfexgu@kk5knurc4v7h>
+From: Md Sadre Alam <quic_mdalam@quicinc.com>
+In-Reply-To: <knhqbj2pyluwrvr2f4h6zgpfosa6o2qgnhtl4qltadpuyfexgu@kk5knurc4v7h>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: tW-EWFCvrONGIKhLXnMMyZtjIn5U73n4
+X-Proofpoint-ORIG-GUID: tW-EWFCvrONGIKhLXnMMyZtjIn5U73n4
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-21_11,2024-08-19_03,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=859 spamscore=0
+ suspectscore=0 malwarescore=0 phishscore=0 priorityscore=1501 mlxscore=0
+ impostorscore=0 bulkscore=0 lowpriorityscore=0 adultscore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2407110000
+ definitions=main-2408210121
 
-Hi Neil,
 
-On Tue, Aug 20, 2024 at 05:19:27PM +0200, neil.armstrong@linaro.org wrote:
-> Hi,
->=20
-> On 20/08/2024 16:56, Alexey Romanov wrote:
-> > Hello!
-> >=20
-> > This patchset expand the funcionality of the Amlogic
-> > crypto driver by adding support for more SoC families:
-> > AXG, G12A, G12B, SM1, A1, S4.
-> >=20
-> > Also specify and enable crypto node in device tree
-> > for reference Amlogic devices.
-> >=20
-> > Tested on GXL, AXG, G12A/B, SM1, A1 and S4 devices via
-> > custom tests [1] and tcrypt module.
->=20
-> On which tree did you base yourself ? It fails to apply patch 20 on next-=
-20240820 and 6.11-rc4
 
-Sorry, my tree is out of date (6.10.1).=20
-
-I can rebase it to linux-next and resend patchset.
-
->=20
-> Neil
->=20
-> >=20
-> > ---
-> >=20
-> > Changes V1 -> V2 [2]:
-> >=20
-> > - Rebased over linux-next.
-> > - Adjusted device tree bindings description.
-> > - A1 and S4 dts use their own compatible, which is a G12 fallback.
-> >=20
-> > Changes V2 -> V3 [3]:
-> >=20
-> > - Fix errors in dt-bindings and device tree.
-> > - Add new field in platform data, which determines
-> > whether clock controller should be used for crypto IP.
-> > - Place back MODULE_DEVICE_TABLE.
-> > - Correct commit messages.
-> >=20
-> > Changes V3 -> V4 [4]:
-> >=20
-> > - Update dt-bindings as per Krzysztof Kozlowski comments.
-> > - Fix bisection: get rid of compiler errors in some patches.
-> >=20
-> > Changes V4 -> V5 [5]:
-> >=20
-> > - Tested on GXL board:
-> >    1. Fix panic detected by Corentin Labbe [6].
-> >    2. Disable hasher backend for GXL: in its current realization
-> >       is doesn't work. And there are no examples or docs in the
-> >       vendor SDK.
-> > - Fix AES-CTR realization: legacy boards (gxl, g12, axg) requires
-> >    inversion of the keyiv at keys setup stage.
-> > - A1 now uses its own compatible string.
-> > - S4 uses A1 compatible as fallback.
-> > - Code fixes based on comments Neil Atrmstrong and Rob Herring.
-> > - Style fixes (set correct indentations)
-> >=20
-> > Changes V5 -> V6 [7]:
-> >=20
-> > - Fix DMA sync warning reported by Corentin Labbe [8].
-> > - Remove CLK input from driver. Remove clk definition
-> >    and second interrput line from crypto node inside GXL dtsi.
-> >=20
-> > Changes V6 -> V7 [9]:
-> >=20
-> > - Fix dt-schema: power domain now required only for A1.
-> > - Use crypto_skcipher_ctx_dma() helper for cipher instead of
-> >    ____cacheline_aligned.
-> > - Add import/export functions for hasher.
-> > - Fix commit message for patch 17, acorrding to discussion [10].
-> >=20
-> > Changes V7 -> V8 [11]:
-> >=20
-> > - Test patchset with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS: fix some bugs
-> >    in hasher logic.
-> > - Use crypto crypto_ahash_ctx_dma in hasher code.
-> > - Correct clock definition: clk81 is required for all SoC's.
-> > - Add fixed-clock (clk81) definition for A1/S4.
-> > - Add information (in commit messages) why different compatibles are us=
-ed.
-> >=20
-> > Changes V8 -> V9 [12]:
-> >=20
-> > - Remove required field clk-names from dt-schema according to Rob Herri=
-ng
-> > recommendation [13].
-> > - Fix commit order: all dt-bindings schema commits now located earlier
-> > than any changes in device tree.
-> > - Fix typos and add more clarifications in dt-schema patches.
-> >=20
-> > Links:
-> >    - [1] https://gist.github.com/mRrvz/3fb8943a7487ab7b943ec140706995e7
-> >    - [2] https://lore.kernel.org/all/20240110201216.18016-1-avromanov@s=
-alutedevices.com/
-> >    - [3] https://lore.kernel.org/all/20240123165831.970023-1-avromanov@=
-salutedevices.com/
-> >    - [4] https://lore.kernel.org/all/20240205155521.1795552-1-avromanov=
-@salutedevices.com/
-> >    - [5] https://lore.kernel.org/all/20240212135108.549755-1-avromanov@=
-salutedevices.com/
-> >    - [6] https://lore.kernel.org/all/ZcsYaPIUrBSg8iXu@Red/
-> >    - [7] https://lore.kernel.org/all/20240301132936.621238-1-avromanov@=
-salutedevices.com/
-> >    - [8] https://lore.kernel.org/all/Zf1BAlYtiwPOG-Os@Red/
-> >    - [9] https://lore.kernel.org/all/20240326153219.2915080-1-avromanov=
-@salutedevices.com/
-> >    - [10] https://lore.kernel.org/all/20240329-dotted-illusive-9f059380=
-5a05@wendy/
-> >    - [11] https://lore.kernel.org/all/20240411133832.2896463-1-avromano=
-v@salutedevices.com/
-> >    - [12] https://lore.kernel.org/all/20240607141242.2616580-1-avromano=
-v@salutedevices.com/
-> >    - [13] https://lore.kernel.org/all/20240610222827.GA3166929-robh@ker=
-nel.org/
-> >=20
-> > Alexey Romanov (23):
-> >    drivers: crypto: meson: don't hardcode IRQ count
-> >    drviers: crypto: meson: add platform data
-> >    drivers: crypto: meson: remove clock input
-> >    drivers: crypto: meson: add MMIO helpers
-> >    drivers: crypto: meson: move get_engine_number()
-> >    drivers: crypto: meson: drop status field from meson_flow
-> >    drivers: crypto: meson: move algs definition and cipher API to
-> >      cipher.c
-> >    drivers: crypto: meson: cleanup defines
-> >    drivers: crypto: meson: process more than MAXDESCS descriptors
-> >    drivers: crypto: meson: avoid kzalloc in engine thread
-> >    drivers: crypto: meson: introduce hasher
-> >    drivers: crypto: meson: add support for AES-CTR
-> >    drivers: crypto: meson: use fallback for 192-bit keys
-> >    drivers: crypto: meson: add support for G12-series
-> >    drivers: crypto: meson: add support for AXG-series
-> >    drivers: crypto: meson: add support for A1-series
-> >    dt-bindings: crypto: meson: correct clk and remove second interrupt
-> >      line
-> >    dt-bindings: crypto: meson: support new SoC's
-> >    arch: arm64: dts: meson: gxl: correct crypto node definition
-> >    arch: arm64: dts: meson: a1: add crypto node
-> >    arch: arm64: dts: meson: s4: add crypto node
-> >    arch: arm64: dts: meson: g12: add crypto node
-> >    arch: arm64: dts: meson: axg: add crypto node
-> >=20
-> >   .../bindings/crypto/amlogic,gxl-crypto.yaml   |  32 +-
-> >   arch/arm64/boot/dts/amlogic/meson-a1.dtsi     |  14 +
-> >   arch/arm64/boot/dts/amlogic/meson-axg.dtsi    |   7 +
-> >   .../boot/dts/amlogic/meson-g12-common.dtsi    |   7 +
-> >   arch/arm64/boot/dts/amlogic/meson-gxl.dtsi    |   6 +-
-> >   arch/arm64/boot/dts/amlogic/meson-s4.dtsi     |  13 +
-> >   drivers/crypto/amlogic/Makefile               |   2 +-
-> >   drivers/crypto/amlogic/amlogic-gxl-cipher.c   | 632 ++++++++++++-----=
--
-> >   drivers/crypto/amlogic/amlogic-gxl-core.c     | 292 ++++----
-> >   drivers/crypto/amlogic/amlogic-gxl-hasher.c   | 507 ++++++++++++++
-> >   drivers/crypto/amlogic/amlogic-gxl.h          | 118 +++-
-> >   11 files changed, 1269 insertions(+), 361 deletions(-)
-> >   create mode 100644 drivers/crypto/amlogic/amlogic-gxl-hasher.c
-> >=20
->=20
-
---=20
-Thank you,
-Alexey=
+On 8/16/2024 9:52 PM, Bjorn Andersson wrote:
+> On Thu, Aug 15, 2024 at 02:27:12PM GMT, Md Sadre Alam wrote:
+>> Add lock and unlock flag support on command descriptor.
+>> Once lock set in requester pipe, then the bam controller
+>> will lock all others pipe and process the request only
+>> from requester pipe. Unlocking only can be performed from
+>> the same pipe.
+>>
+> 
+> Is the lock per channel, or for the whole BAM instance?
+   This lock is for whole BAM instance. Once LOCK bit will
+   set on initiator CMD descriptor BAM will lock all pipes
+   which belongs to other EE's and Pipes not in the current
+   group.
+> 
+>> If DMA_PREP_LOCK flag passed in command descriptor then requester
+>> of this transaction wanted to lock the BAM controller for this
+>> transaction so BAM driver should set LOCK bit for the HW descriptor.
+> 
+> You use the expression "this transaction" here, but if I understand the
+> calling code the lock is going to be held over multiple DMA operations
+> and even across asynchronous operations in the crypto driver.
+   Yes its correct.
+> 
+> DMA_PREP_LOCK indicates that this is the beginning of a transaction,
+> consisting of multiple operations that needs to happen while other EEs
+> are being locked out, and DMA_PREP_UNLOCK marks the end of the
+> transaction.
+   Yes its correct.
+> 
+> That said, I'm not entirely fond of the fact that these flags are not
+> just used on first and last operation in one sequence, but spread out.
+   Yes its correct.
+> 
+> Locking is hard, when you spread the responsibility of locking and
+> unlocking across different entities it's made harder...
+   The locking/unlocking always synchronous because unlocking happening
+   in the dma callback.
+> 
+>>
+>> If DMA_PREP_UNLOCK flag passed in command descriptor then requester
+>> of this transaction wanted to unlock the BAM controller.so BAM driver
+>> should set UNLOCK bit for the HW descriptor.
+>>
+>> Signed-off-by: Md Sadre Alam <quic_mdalam@quicinc.com>
+>> ---
+>>
+>> Change in [v2]
+>>
+>> * Added LOCK and UNLOCK flag in bam driver
+>>
+>> Change in [v1]
+>>
+>> * This patch was not included in [v1]
+> 
+> v1 can be found here:
+> https://lore.kernel.org/all/20231214114239.2635325-7-quic_mdalam@quicinc.com/
+> 
+> And it was also posted once before that:
+> https://lore.kernel.org/all/1608215842-15381-1-git-send-email-mdalam@codeaurora.org/
+> 
+> In particular during the latter (i.e. first post) we had a rather long
+> discussion about this feature, so that's certainly worth linking to.
+> 
+> Looks like this series provides some answers to the questions we had
+> back then.
+   Will add the link in next post
+> 
+> Regards,
+> Bjorn
+> 
+>>
+>>   drivers/dma/qcom/bam_dma.c | 10 +++++++++-
+>>   include/linux/dmaengine.h  |  6 ++++++
+>>   2 files changed, 15 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/dma/qcom/bam_dma.c b/drivers/dma/qcom/bam_dma.c
+>> index 1ac7e250bdaa..ab3b5319aa68 100644
+>> --- a/drivers/dma/qcom/bam_dma.c
+>> +++ b/drivers/dma/qcom/bam_dma.c
+>> @@ -58,6 +58,8 @@ struct bam_desc_hw {
+>>   #define DESC_FLAG_EOB BIT(13)
+>>   #define DESC_FLAG_NWD BIT(12)
+>>   #define DESC_FLAG_CMD BIT(11)
+>> +#define DESC_FLAG_LOCK BIT(10)
+>> +#define DESC_FLAG_UNLOCK BIT(9)
+>>   
+>>   struct bam_async_desc {
+>>   	struct virt_dma_desc vd;
+>> @@ -692,9 +694,15 @@ static struct dma_async_tx_descriptor *bam_prep_slave_sg(struct dma_chan *chan,
+>>   		unsigned int curr_offset = 0;
+>>   
+>>   		do {
+>> -			if (flags & DMA_PREP_CMD)
+>> +			if (flags & DMA_PREP_CMD) {
+>>   				desc->flags |= cpu_to_le16(DESC_FLAG_CMD);
+>>   
+>> +				if (bdev->bam_pipe_lock && flags & DMA_PREP_LOCK)
+>> +					desc->flags |= cpu_to_le16(DESC_FLAG_LOCK);
+>> +				else if (bdev->bam_pipe_lock && flags & DMA_PREP_UNLOCK)
+>> +					desc->flags |= cpu_to_le16(DESC_FLAG_UNLOCK);
+>> +			}
+>> +
+>>   			desc->addr = cpu_to_le32(sg_dma_address(sg) +
+>>   						 curr_offset);
+>>   
+>> diff --git a/include/linux/dmaengine.h b/include/linux/dmaengine.h
+>> index b137fdb56093..70f23068bfdc 100644
+>> --- a/include/linux/dmaengine.h
+>> +++ b/include/linux/dmaengine.h
+>> @@ -200,6 +200,10 @@ struct dma_vec {
+>>    *  transaction is marked with DMA_PREP_REPEAT will cause the new transaction
+>>    *  to never be processed and stay in the issued queue forever. The flag is
+>>    *  ignored if the previous transaction is not a repeated transaction.
+>> + *  @DMA_PREP_LOCK: tell the driver that there is a lock bit set on command
+>> + *  descriptor.
+>> + *  @DMA_PREP_UNLOCK: tell the driver that there is a un-lock bit set on command
+>> + *  descriptor.
+>>    */
+>>   enum dma_ctrl_flags {
+>>   	DMA_PREP_INTERRUPT = (1 << 0),
+>> @@ -212,6 +216,8 @@ enum dma_ctrl_flags {
+>>   	DMA_PREP_CMD = (1 << 7),
+>>   	DMA_PREP_REPEAT = (1 << 8),
+>>   	DMA_PREP_LOAD_EOT = (1 << 9),
+>> +	DMA_PREP_LOCK = (1 << 10),
+>> +	DMA_PREP_UNLOCK = (1 << 11),
+>>   };
+>>   
+>>   /**
+>> -- 
+>> 2.34.1
+>>
