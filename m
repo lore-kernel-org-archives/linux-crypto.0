@@ -1,166 +1,218 @@
-Received: from sender3-of-o57.zoho.com (sender3-of-o57.zoho.com [136.143.184.57])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B86DFEC5;
-	Thu, 22 Aug 2024 18:31:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.184.57
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FFBEAD4C;
+	Fri, 23 Aug 2024 00:45:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724351476; cv=pass; b=DjtlAO4jxEDjb5OCzhDa6aC9dqZcDzuWs2vbKD5M2zonlfxDgH7CBSrZ2B2ZfvzaZoai1+MVtCYKp3IGF3FGzlQZ/mxdx3eF5IpARPPC+7sKMSp3nYGByWTQqVC6cNJ5Yt2GqgY0gV5WH7F1Ex3LcFXcWBO50sokM5ViOFEfpfE=
+	t=1724373928; cv=fail; b=gbGidf+sfD81i/sc2D9rZ00Sr/qvqtXDjG9VtK+ayOnXBV3JaJKvytIga8iHeHolsCrAGBNqnnyD9Hfk+w3Hh4jO9GIIjDrJDgsTxWbEzPNBskVY+TE1SLel5jloOjY98oKlY1Hdkm7r+W6EAgR6mO0ETZ3/dO9nCSvNAbuOiU4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724351476; c=relaxed/simple;
-	bh=agHBdZkQ8BulJoORPycTlSOnOyfy9kfTwiKBhxMAjag=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VkQwmhFYO7roLIV4f+GbFbuS4asXoazYfaCyLI0+rIiytKmygp1j8G6FNMayAE5LNaFeZA5YwleJvGdIt7b2409PvLPC7VzX/bJzh62zUo6KxPuxgfQwg6SqljzeEinSvV5q2cbyKEbJH1WzL5ydL4b0TY9iZpQd1giLUDHxsHw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=apertussolutions.com; spf=pass smtp.mailfrom=apertussolutions.com; dkim=pass (1024-bit key) header.d=apertussolutions.com header.i=dpsmith@apertussolutions.com header.b=LWndbxnZ; arc=pass smtp.client-ip=136.143.184.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=apertussolutions.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=apertussolutions.com
+	s=arc-20240116; t=1724373928; c=relaxed/simple;
+	bh=3yhN5zFu1t1icueuTbXzC0yxCl0MiYZ7XqkdmtmEurU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=lPspKooIsJhTIfjk0OrxaJwJOUZ4eZTTUqNrqJvLnvM4XnkXliYCGaLhIplnzMQA+Glux/eSWqWxao2wlnzey5HcNreUanZfz5F1RYxwx1KlVNmLVSvBXK6Y85zBRhHYNJofsaHGPjpHA0KGzbqPmcB16BoZioin0oYQVEgXZzc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=LYDzSUaK; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=nkb0SHBU; arc=fail smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=apertussolutions.com header.i=dpsmith@apertussolutions.com header.b="LWndbxnZ"
-ARC-Seal: i=1; a=rsa-sha256; t=1724351396; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=ensxJanajnfNH4lrohozTfRp/kJ8ndAR/I5SeOCvPtvZpwA/RS3UKS9IzW5MnGlu3KwD9JZgR/559mn/GKEg7+II30GBHjPG+RHQQXv6qYJ8VO6d6q5godbIQcqq8y5Wsi0Giv6acyQMSSuozV5LPKeS57s5x4o9g8w+sokW13c=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1724351396; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=MyQlkXBuBh5D5+ORO/Ajt6ntHefewg/FMRXibyLJvKQ=; 
-	b=fPGGbQa6PDJETfzD86dOnyy2nf1dhiCXht9Z7kAfpQDeTDuKfPlCsPgzwzvQy4C7qDUHI6mVeTa8+DiKlK4twHkkFW7Rmr4iNCsDZl/Ko9tv8Bi0jkphPJpIC2WLsxxLAEHGJm+ZQJ0UDZdtX2DQt0UJL9HnfiEXQoDXnto9fHQ=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=apertussolutions.com;
-	spf=pass  smtp.mailfrom=dpsmith@apertussolutions.com;
-	dmarc=pass header.from=<dpsmith@apertussolutions.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1724351396;
-	s=zoho; d=apertussolutions.com; i=dpsmith@apertussolutions.com;
-	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=MyQlkXBuBh5D5+ORO/Ajt6ntHefewg/FMRXibyLJvKQ=;
-	b=LWndbxnZqsXgRW0zxX0skSHrs/RICB+4zvHapAfsJIHhBjt1SzpRUZ8bMV2l5ynf
-	xRPob/zjMHRjYX8ykLglY1hM59kdZCqo6e2s59dYvXpsTBX6lSomKRhRHWTKfRE2XAz
-	FMGosfle+46Swp76HbPabYQUH+ZMH+FO0Ir/i62I=
-Received: by mx.zohomail.com with SMTPS id 1724351393878947.9797156192928;
-	Thu, 22 Aug 2024 11:29:53 -0700 (PDT)
-Message-ID: <281c3bb3-13f6-47a2-9a9a-134e397bf686@apertussolutions.com>
-Date: Thu, 22 Aug 2024 14:29:48 -0400
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="LYDzSUaK";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="nkb0SHBU"
+Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47N0C1o4023348;
+	Fri, 23 Aug 2024 00:45:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=
+	date:from:to:cc:subject:message-id:references:content-type
+	:in-reply-to:mime-version; s=corp-2023-11-20; bh=pOEn7vVb5MCF19w
+	8/Tk4N6pXVzHqk6qFgwclROh6V/Y=; b=LYDzSUaKOVwCXJsDf5uz9D10G10hg1h
+	lnubpswlhUTuVHAGaHlep43o3pw7EqH9TAgcA07riBs0c1UmR2r8BxH0t2ySbwKZ
+	W8aMn7GTxrmR0DouJOFrvnSiF0cNHUTpzS2rgiwjDvSfmNEZ7iHtMQn74nijiD2D
+	Dz/zdUeNeeOEJwlPONRuF9FslShDncn6T4Z22OmFAmoOObl9SXnVEjwy21S6cttM
+	kNSaj340gE2xKiztAenLOEFwYLcwGN4WtQRNRCzpX0k+DiZCmQ7AoaT7+Fku7nFr
+	QioNdB5eiomNyOW0fesgRAMDkV2PRN9mFMx/DWBEX+VT6IOoXrEky1Q==
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 412m3dukdn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 23 Aug 2024 00:45:17 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 47N0Y8hM011957;
+	Fri, 23 Aug 2024 00:45:16 GMT
+Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2173.outbound.protection.outlook.com [104.47.59.173])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 416g0e8715-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 23 Aug 2024 00:45:15 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=lbsh06+1Y3w+Im/AnCGUMxAEgFCU+/skeQiR+6gqbZr/91LPOH9868Sb2RJ2rD67gAoFg9+4/2ivlRkjKT4gslLM9ZiUEJuFZvjC9Zz5cgm3/sJYCY3s2LQYwmQx5OBRkqs6mGizcT6iQlWU8rtDaM7Q3U3FMNfGgJo7I2iqwG/8oHFi4+bplsS3PpzAuOzUokaCJYQyH34whmBSeZTM/dx4x0a4CQ+UTlyEBePp+PfXaltvTPWNS+oDstqy9Fwk+jQR2uuWee1wHgDAvY6402KVIdgqYMTa4WHwv1TH2JdnETqkk5qMzc7/hicTxejydua5hgE1vIFBQuwHgNlgVQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=pOEn7vVb5MCF19w8/Tk4N6pXVzHqk6qFgwclROh6V/Y=;
+ b=QlT/mXFTP83vtKIWKTSdG3lk6IWxBdWSQGAuLL+MMtJYzeKQUkJ+z7O1yFg7HwzYR4eQnTu8LcnkoIeXd4xJUdAeJPtIDlmy3/9VFg9/STMRQ1jY4WPzDk/Z0O77nSn4SRcwBN8hZ+U7yKhT7AZK3d7NbYxbeR4vZpV1SkbdXJ/Wo8wL6O3/O5hPYoPDjN/d1xIFcJHaFszCTLZO2lUSf7KFohwE6HJA1hJHDVYkqpXArrPJVqagcIvTAzUiNC6oAFurhJAEQB56Cw7zrcZz0xzyyRE8gyj2CNAioHxAOmMFxAthshsc+t5UAgXQ/fYgBJTgbfgt2KnSbnDHW8SoTg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pOEn7vVb5MCF19w8/Tk4N6pXVzHqk6qFgwclROh6V/Y=;
+ b=nkb0SHBUx9bJjGrDnnJC7GyysWTVCZA9swYXSqmbf0yLvLRN+vZPEx3ehdahLdZPg/ifUW9AXGQi4iMKWH669sD3r1zso2q3mkrjTLRfKHN2BoCgIc2lQZ7enqANR9/dXi7YTfJvmgEFaQ3hrkS10wRbld5nM9zEEFQWCpRLTx0=
+Received: from CY8PR10MB7265.namprd10.prod.outlook.com (2603:10b6:930:79::6)
+ by DS7PR10MB5949.namprd10.prod.outlook.com (2603:10b6:8:86::9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7897.19; Fri, 23 Aug 2024 00:45:13 +0000
+Received: from CY8PR10MB7265.namprd10.prod.outlook.com
+ ([fe80::d299:36f1:493b:33fc]) by CY8PR10MB7265.namprd10.prod.outlook.com
+ ([fe80::d299:36f1:493b:33fc%4]) with mapi id 15.20.7897.014; Fri, 23 Aug 2024
+ 00:45:13 +0000
+Date: Thu, 22 Aug 2024 20:45:10 -0400
+From: Daniel Jordan <daniel.m.jordan@oracle.com>
+To: Kamlesh Gurudasani <kamlesh@ti.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, Waiman Long <longman@redhat.com>,
+        steffen.klassert@secunet.com, akpm@linux-foundation.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] padata: Fix possible divide-by-0 panic in
+ padata_mt_helper()
+Message-ID: <2ue3ogwfxwmnhncikcuwuyon6fpr7nvsbe53zvamfla7phppd3@ydwm4rvb3h4a>
+References: <ZrgsU-1PdxvUVMOW@gondor.apana.org.au>
+ <88c188dc-3664-45db-b54a-11feca59d7d2@redhat.com>
+ <Zrgy1TDikPSkzaYP@gondor.apana.org.au>
+ <c5cc5ea9-1135-4ac6-a38f-652ed07dae17@redhat.com>
+ <ZsBNZXfVZbtZnb2Y@gondor.apana.org.au>
+ <dgtppozpgkm2gtv7nnvranbkjudr7bwuvfe7hjbznipozcxyzd@3qcag7izn4fj>
+ <ZsQWV_j5zMuYWqvH@gondor.apana.org.au>
+ <3kexyvcrc5pxp4cqlgt7tvdbo3hbt225w76kczjdlzwitpeuto@addhycc4evbe>
+ <87bk1mnvn9.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
+ <878qwpoa3i.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <878qwpoa3i.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
+X-ClientProxiedBy: MN2PR12CA0029.namprd12.prod.outlook.com
+ (2603:10b6:208:a8::42) To CY8PR10MB7265.namprd10.prod.outlook.com
+ (2603:10b6:930:79::6)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 06/19] x86: Add early SHA-1 support for Secure Launch
- early measurements
-To: Thomas Gleixner <tglx@linutronix.de>,
- "Eric W. Biederman" <ebiederm@xmission.com>,
- Eric Biggers <ebiggers@kernel.org>
-Cc: Ross Philipson <ross.philipson@oracle.com>, linux-kernel@vger.kernel.org,
- x86@kernel.org, linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
- linux-efi@vger.kernel.org, iommu@lists.linux-foundation.org,
- mingo@redhat.com, bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com,
- ardb@kernel.org, mjg59@srcf.ucam.org, James.Bottomley@hansenpartnership.com,
- peterhuewe@gmx.de, jarkko@kernel.org, jgg@ziepe.ca, luto@amacapital.net,
- nivedita@alum.mit.edu, herbert@gondor.apana.org.au, davem@davemloft.net,
- corbet@lwn.net, dwmw2@infradead.org, baolu.lu@linux.intel.com,
- kanth.ghatraju@oracle.com, andrew.cooper3@citrix.com,
- trenchboot-devel@googlegroups.com
-References: <20240531010331.134441-1-ross.philipson@oracle.com>
- <20240531010331.134441-7-ross.philipson@oracle.com>
- <20240531021656.GA1502@sol.localdomain>
- <874jaegk8i.fsf@email.froward.int.ebiederm.org>
- <5b1ce8d3-516d-4dfd-a976-38e5cee1ef4e@apertussolutions.com>
- <87ttflli09.ffs@tglx>
-Content-Language: en-US
-From: "Daniel P. Smith" <dpsmith@apertussolutions.com>
-In-Reply-To: <87ttflli09.ffs@tglx>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ZohoMailClient: External
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY8PR10MB7265:EE_|DS7PR10MB5949:EE_
+X-MS-Office365-Filtering-Correlation-Id: f6d6de66-a25a-4f64-31b6-08dcc30cd927
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?lQ5kevsRAH4jPzXk98IxjcRk+n1c2p22gfFvmw64dFjItOIBm2xG6PQNxcBd?=
+ =?us-ascii?Q?HXkjml+VqtzEMK7Ftja31QY/plKmSBIoTxkerJR2hp3z9aKrNxKgXHihvjM/?=
+ =?us-ascii?Q?Cknyhp8VzcQGvXAj1Yomp7TLE/yD0DWpPLj+d2i5asBfVhV4UIWFGO2CUC9G?=
+ =?us-ascii?Q?begaYvnxIrpVUGRbHBMTk40FOAdT2tBPyRwnCeRoVrT3cOHWWJ7jA5nWk3Mb?=
+ =?us-ascii?Q?RuGaKbIp5rrS1fPu8jJ0nfWFDS14jTj1QvwQ1ucTIOPLfRc3xOF6xL6WQ8GR?=
+ =?us-ascii?Q?PoWMCOIj+OhsWxIY58Wyy3E76WXdi4Q1uhZeLPFWpGzWjScyTcdvWAbswBus?=
+ =?us-ascii?Q?9lGChpwM/Xb4b30M0SDYquUNhADOXa9QDMCNo9EcvSY4rP4XMYQ0NDq5qfNQ?=
+ =?us-ascii?Q?x25m9gzlP0OjOI1KAZBdt2roAbOPc20OtJAOQzcNbYcpTqu7sr0rjhLyrvSt?=
+ =?us-ascii?Q?fiahBMcB5ApV3rJ+uAeUmi/riSt4bCtJXE3EwF39pgJFZ2ir1cRo6PckiBWr?=
+ =?us-ascii?Q?ManhzP7zpGdiKwPBqAiVK1EjgWNkHZspeeLV0ArpXSkprvNTIWtTfIJfT7wi?=
+ =?us-ascii?Q?Fglb6jYkhFAa9HV6OQv27UPZPqbxpeBSAVvondDpPX3YJtvdnBwcbK9rMHm7?=
+ =?us-ascii?Q?VO/SQ1oOGTC5bTeFJ/ly6DMFDXyF1qhZ0reBvh2x0HdvgJRpZF4U8FCgPLtY?=
+ =?us-ascii?Q?voc/RpAGEpIUb9z26wscQD9ZBvxRdfwsume1XQl+br+yXahk9d1xNhMT38yR?=
+ =?us-ascii?Q?f1d7Ck4qBbJwrSpTh7hwWzhcKlRQ63SKRg/T87bkCwtQFY6t4B+QMwdHxCaf?=
+ =?us-ascii?Q?XFcidPo2CZ/O5wFjlXgMJ/Yv1k3MCliV9UYdmkEGH2qEC6lVlxyUHtqQSZs/?=
+ =?us-ascii?Q?GLzUz4Sut4ua0823ZnJc/NJWJ74erOebFBEoAIcYt63cwz1C9l+EaQiWEjFN?=
+ =?us-ascii?Q?Ii9CdqKzFep0mQ63rQTKeFiVC4T6gizb81HUDVv0LupFzUAzwfe57lqWCcH3?=
+ =?us-ascii?Q?f/hxTkKR/OQ8zl68QMXuvjZ89oyK9slBX/oNv6+M9HcOGKRSMyU1kKg3wrb4?=
+ =?us-ascii?Q?+XMZ+u2KeyyFsln6kOf8mvm8Bmesqbj8CQT6U15iOjHA7N6FYQamkwvPq/YP?=
+ =?us-ascii?Q?m/11Qy1qnEuMFkoRCRuz0cP/nvyyLqFxK9NxU9tG0WXvzKZHas4nHEQgiB9A?=
+ =?us-ascii?Q?eEduJvQLySMdUcO6jY5mjY55Cqc2e/GeVDKztyxj9z93ukir5CzIEsQ6v11c?=
+ =?us-ascii?Q?oL4NfsUl4zF8nxPsjY69pJ6hJUvZc/WgPOrNhG5qdXhEQj2duV3XR3Ugc8xp?=
+ =?us-ascii?Q?+jKf6PgRnOhHo5CL2JCKldmXq6RF6nLzi2GkfhKQ+KPBQw=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR10MB7265.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?aOAB5rGhkreGkftwQUoDo75J/hiRZ5Lf9qJAS+EdkycDMb2I3vM/MKLbANof?=
+ =?us-ascii?Q?VqVlzvxCxlfUOjEt5kJFdHEJ6cZSdxUyV1lGUXw4xagmMpCTELQmVjIKCiUR?=
+ =?us-ascii?Q?KQJGuYXCxbYFAOSWoHprZ1Z0/6YJPDaabZRwzfG2rxaYa86Y7V6U/P/mRRMC?=
+ =?us-ascii?Q?8oIC01DXCUbpquYgyWn3hh7A7b8EagsTIapm1WFaXz1PI7aopZHZwqiKXfEi?=
+ =?us-ascii?Q?WIrgoaMRHMl8vm5R1+Qxnu9YPDJDONwpetIM7cfW2JU8o99G2sphooE3EofB?=
+ =?us-ascii?Q?al4ERTuxD3/cB/yqtWhE39Semefk5Ork28vkRlSLScCvFvH2FOcjzywFUlKj?=
+ =?us-ascii?Q?Em6nRKV3Ibv3wcr3l1A/Au9hr2ZfaRJzQzzm5XD8dSZwVxeDl4oMYAULzw2P?=
+ =?us-ascii?Q?Z9VhnGs+Fl9+0ugRM2fn2Ban/UIp95+A0cu0+3AB9kq93UCs/c2QtBFUoBB/?=
+ =?us-ascii?Q?Qa2wXeJfnPUXh7aACAjCp4LwAatceX2TNywardxpwvHPP8a9yKgjeefvScac?=
+ =?us-ascii?Q?GjINo7w1qeEZTo71Vjcrpc54AmVU9SCpdOoYixDJYE5mSodJLzvHJNO3KMWs?=
+ =?us-ascii?Q?1lp6UNsvSccfKNVZl6vVAp2AmQDzCKsqsbvTxNFgUSQuQHYAce77N8+QSX5t?=
+ =?us-ascii?Q?x0x5S0y++PK0UZgAe1n/oVPDFJeTJeDv840BcFJcAoJ9zWqZrzgcpWoQUwzI?=
+ =?us-ascii?Q?HXGri2hcu+I4BiSawF03pCFx/PjfzToCXNWOmZv28JG0jPMpT0MwCQ2SheLy?=
+ =?us-ascii?Q?01vT0NSzTKrH/eP2/EsQVwS1/eZGxwQaJZ/iuXW5GMzLZUGEf5fdLEbMudKy?=
+ =?us-ascii?Q?REEpxdwc7qJfyS8OlYeNjqA4HEkZhqZTeCyXamtLzefNZ9m9O75zOA/w0cj/?=
+ =?us-ascii?Q?zin0D9NYEmLdQdJqza3PfWVeHbMQjFwgejxJETchN5z3cAbtF0kdUdAGCuFQ?=
+ =?us-ascii?Q?CKRT4kdZXuLd3/EStTMHBDU8S0FHFy9fAqaSSF8LaZPwdUlbr46QsJ6SreFw?=
+ =?us-ascii?Q?c268QPrPfGnWMfvhMGWpcjS5ukHsOBsZgnsc2FV9qkMh98VL+WD+2C3wbsEz?=
+ =?us-ascii?Q?EEazwCcMRRtvryf7tnladF6895CIUhPw+QnlNbswkHHc9aRqbMJaNxobwPAQ?=
+ =?us-ascii?Q?7ekQpAVe7sFKrYKn3w2tds76IM90KwaynXvyyr5wE2nHs4bSPfM04Zpjr/NA?=
+ =?us-ascii?Q?63xuUsUggO7UP8iZ0WwGDy7xpFHJFTU48Bk1wqLlNdOFPekSbZ90n6xQKovQ?=
+ =?us-ascii?Q?405F4JZHrWoElZDFMZjw2KVZyjSPXtSafFuX99xpfSak6R99mLWinLkzdpQi?=
+ =?us-ascii?Q?4tpX4SzA5ZAyE0DuehnzYIR+mx1pn1JepZ5VDjdI6JlqR4oUgmDk4q+bjvxt?=
+ =?us-ascii?Q?K4gOszIPiTF4ne8g7GRQ3LfYbv9jMRhEIFTvYlC9ZzSVhWHLHKVlv6R9OyN2?=
+ =?us-ascii?Q?RqVutjicgtbeqyyI0+/3oByFJjq/bnSr/5Z3X9GASU+CsLoHsfE048IY0V2g?=
+ =?us-ascii?Q?kckyIG20TQpA7+4Uzlt5F3O+IWpxyF4sratStlPqD12oBtWBE+i7bRzeYb9Z?=
+ =?us-ascii?Q?6fd9Gryh9sw8YLc/U0lSg+5LpCY9BmA9g4Ox1sgRQyVromsLBhPntrd+MINI?=
+ =?us-ascii?Q?/g=3D=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	3D8FbhllAjAe0XgyCkMOXFqxqBfaKcYAiYWhfpESpUtI2y3M9r0bcXI2jGE7DylClOVaJn4awMAjMrqm4vFK8WrFY8mZWaLm79HpxueTW7pJPVONxBTy9Sy7ZcOnjipMlSVg5YkA9QgV5f2PmiPQCkwwlGOJ3CiICsw/kPEGd+nlJelUdrsLSuGGmc7tLDrny+D8HrI/P46i8p5fVnQMOsN3Jfl1mLDeu27JbtQPPd91By0YJ1g5GMJfSJxBUDGB/Vhr6X5WF4WDQCvAnSeU8r8uz+P6ZPZEBI8aHuVW3FHPXBCAEkLJiJShppO3yIrkooTFdIJOtUF6S6ecxtds1olrK9QFOYLXFMXxl5Q+650U+HhP90inEUoDEDuZ+7JnCn4wFL0Aqsxwx1hv/hIhLOngCo1Q3ho5SzaTBOIXOtvWls8y+3Nocx4JNi6vbVc6y9vwq5Kff2cAqvErmOyaTX2C4CYWDK8Re7I25yZ1ph93AQWgI3JjiRVmqbLuumrqqgmORmwztIYxWkajvKIn+wTMTeN/By4a2SfHt5SE8tdceV/LfXBqmnQpHFLybY6zhZPr8mDaMU60tb8VhxVLZWcGUqECWSAEMRHbgagoEBM=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f6d6de66-a25a-4f64-31b6-08dcc30cd927
+X-MS-Exchange-CrossTenant-AuthSource: CY8PR10MB7265.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Aug 2024 00:45:13.3195
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: jYVj3H6ZUBkj9G8zK2/SrdgjcL9RIgX2v5WuriuESF0nfG9eDKgR+lvZfm4x/bfCf4rLOPDZA/Qs82DN7f2OE8lK98ZJ4NMs1LjTzXnxM0k=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR10MB5949
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-22_17,2024-08-22_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 bulkscore=0 adultscore=0
+ malwarescore=0 suspectscore=0 mlxscore=0 mlxlogscore=999 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2407110000
+ definitions=main-2408230003
+X-Proofpoint-ORIG-GUID: dn3dOAlXGoVC-qcpbu78kbYsVEh_6cuA
+X-Proofpoint-GUID: dn3dOAlXGoVC-qcpbu78kbYsVEh_6cuA
 
-On 8/15/24 15:10, Thomas Gleixner wrote:
-> On Thu, Aug 15 2024 at 13:38, Daniel P. Smith wrote:
->> On 5/31/24 09:54, Eric W. Biederman wrote:
->>> Eric Biggers <ebiggers@kernel.org> writes:
->>>> That paragraph is also phrased as a hypothetical, "Even if we'd prefer to use
->>>> SHA-256-only".  That implies that you do not, in fact, prefer SHA-256 only.  Is
->>>> that the case?  Sure, maybe there are situations where you *have* to use SHA-1,
->>>> but why would you not at least *prefer* SHA-256?
->>>
->>> Yes.  Please prefer to use SHA-256.
->>>
->>> Have you considered implementing I think it is SHA1-DC (as git has) that
->>> is compatible with SHA1 but blocks the known class of attacks where
->>> sha1 is actively broken at this point?
->>
->> We are using the kernel's implementation, addressing what the kernel
->> provides is beyond our efforts. Perhaps someone who is interested in
->> improving the kernel's SHA1 could submit a patch implementing/replacing
->> it with SHA1-DC, as I am sure the maintainers would welcome the help.
+On Thu, Aug 22, 2024 at 02:40:57AM GMT, Kamlesh Gurudasani wrote:
+> Kamlesh Gurudasani <kamlesh@ti.com> writes:
 > 
-> Well, someone who is interested to get his "secure" code merged should
-> have a vested interested to have a non-broken SHA1 implementation if
-> there is a sensible requirement to use SHA1 in that new "secure" code,
-> no?
+> > Daniel Jordan <daniel.m.jordan@oracle.com> writes:
+> >
+> >> On Tue, Aug 20, 2024 at 12:06:47PM GMT, Herbert Xu wrote:
+> >>> On Mon, Aug 19, 2024 at 06:29:52PM -0400, Daniel Jordan wrote:
+> >>> >
+> >>> > The DIV_ROUND_UP approach reads a bit nicer to me, but I can imagine
+> >>> > oddball cases where rounding up is undesirable (say, near-zero values
+> >>> > for size, min_chunk, and align; padata_work_alloc_mt returns many fewer
+> >>> > works than requested; and a single unit of work is very expensive) so
+> >>> > that rounding up makes a bigger difference.  So, the way it now is seems
+> >>> > ok.
+> >>> 
+> >>> In that case let's do the max ahead of the align check:
+> >>> 
+> >>> 	ps.chunk_size = max(ps.chunk_size, 1ul);
+> >>> 	ps.chunk_size = roundup(ps.chunk_size, job->align);
+> >>> 
+> >>> If we do it after then it may come out unaligned (e.g., job->align = 8
+> >>> and ps.chunk_size = 1).
+> >>
+> >> Sure, I think Kamlesh was the first to suggest max, so maybe Kamlesh
+> >> would like to make the change.  I'll send a patch otherwise.
+> > Thanks for consideration, Daniel. I'll send a patch.
+> Sent.
 > 
-> Just for the record. The related maintainers can rightfully decide to
-> reject known broken "secure" code on a purely technical argument.
+> Just curious about one thing on line 495,
 > 
-> Thanks,
+> nworks = max(job->size / max(job->min_chunk, job->align), 1ul);
 > 
->          tglx
-> 
+> what happens if both min_chunk and align are 0.
 
-There is one simple question, does allowing the Secure Launch code to 
-record SHA1 measurements make the system insecure, and the answer is 
-absolutely not.
-
-The role of the Secure Launch code base in the context of the larger 
-launch process is to function as observer. Within this role, its only 
-responsibility is continuing the trust chain(s) that were started by the 
-CPU/Hardware. It does so by measuring the components and configuration 
-it is responsible for loading and applying, i.e. in TCG parlance, it is 
-continuing the construction of the transitive trust for the system. In 
-this aspect, the only degradation of security that can affect the 
-kernel's role is whether all the necessary entities are safely measured 
-and not what algorithms are used.
-
-If the system integrator, whether that be the OEM, your employer, the 
-distro maintainer, the system administrator, or the end user, configures 
-the DL preamble to only use SHA1 or used older hardware that has a 
-TPM1.2, then they are accepting the risk it creates in their solution. 
-In fact, a greater threat to the security of the launch is the 
-misconfiguration of the IOMMU, which risks the kernel's ability to 
-safely make measurements, as compared to the use of SHA1. Yet it was 
-insisted in past reviews that we allow the user to specify an incorrect 
-IOMMU policy.
-
-In the end, the "security" of an RTM solution is how and what 
-measurements are used to assess the health of a system. Thus bringing it 
-back to the opening question, if SHA1 measurements are made but not 
-used, i.e. the attestation enforcement only uses SHA2, then it has zero 
-impact on the security of the system.
-
-Another fact to consider is that the current Intel's TXT MLE 
-specification dictates SHA1 as a valid configuration. Secure Launch's 
-use of SHA1 is therefore to comply with Intel's specification for TXT. 
-And like the IOMMU situation, having the option available allows the 
-user to determine how they ultimately want to integrate Secure Launch 
-into their integrity management. And because Secure Launch will only 
-attempt SHA1 if it was in the TXT configuration, when either Intel 
-removes SHA1 from the MLE specification or firmware manufactures begin 
-disabling the SHA1 banks, this will obviously mean that Secure Launch 
-will not produce SHA1 measurements.
-
-On a side note, with my remote attestation hat on, the SHA1 measurements 
-can in fact be extremely useful. If an attestation was made containing 
-both SHA1 and SHA2 chains, and the SHA1 of an event was correct but the 
-SHA2 was not, either a natural collision happened or someone maliciously 
-caused a collision. The former has an extremely low probability, while 
-the latter is highly probable.
-
-Thus, with this information alone, it is possible to make the reasonable 
-determination the device is compromised. Whereas if both hashes are 
-mismatched, without any additional information it is equally probable of 
-either misconfiguration or compromise. And to state the obvious, with 
-only SHA2, further information is needed to distinguish between 
-misconfiguration and compromise.
-
-V/r,
-Daniel P. Smith
+That's a fair point.  It's another of those things that's not supposed
+to happen, but it's worth making padata robust to it.
