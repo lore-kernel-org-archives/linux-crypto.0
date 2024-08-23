@@ -1,207 +1,193 @@
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD8978BEF
-	for <linux-crypto@vger.kernel.org>; Fri, 23 Aug 2024 06:49:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5FE4149C43;
+	Fri, 23 Aug 2024 09:08:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724395776; cv=none; b=kCSeNdZhD3CRE2FyR/G/qSQQexmQWVoa1eE2iAZcrGmIqYQOsFypH1FGDlcomOwOYWPL/T1RwqtP1GONZzlo5E/kazDC7yQz7ks2t1KJrjGLPp4l/a33cFGW1g193Kz+clh4DBHq4u0f+fPeb0rrNZ1hKWqsENlCYAZLUeArsV0=
+	t=1724404089; cv=none; b=mUHeiY3RWHEvXR7ysmO7zY7qmkiPKs+VV5wzFiCx9rEYHrHfsv13WOjMESGzOmlU2cNUouOfgYwpK6bdxHglvxl2/ieCTrLdxkbbRxRaVEPbN82Ynseo9sdYeBmn7VK5rjRkmL0wLojCC/az4Sj5OdNfSvhq4BZpa3XunpL2A/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724395776; c=relaxed/simple;
-	bh=9r7QjXJU+C65NYSaWLGbHkGD+S+NexOdaZyZM3lk07A=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=bSDRTGK1U6t9Yg+nXFKlaTNaux/uEHvs2sgiHxV8X/aXlt4mbi6yT9U5RtPTc8UzQAcZc5KLdifFg/qHUWuLmQ6fqxWbIDggLfcTI6QpNAwNLDHj77uoSjChcoBuyFXZEeFd1BCLgMPmCnYqZu1inxVkjRNqm7gKYSSraH2BgGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4WqrK11dx4z2CnGZ;
-	Fri, 23 Aug 2024 14:49:25 +0800 (CST)
-Received: from dggpeml500022.china.huawei.com (unknown [7.185.36.66])
-	by mail.maildlp.com (Postfix) with ESMTPS id E0D6114013B;
-	Fri, 23 Aug 2024 14:49:29 +0800 (CST)
-Received: from huawei.com (10.90.53.73) by dggpeml500022.china.huawei.com
- (7.185.36.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 23 Aug
- 2024 14:49:29 +0800
-From: Hongbo Li <lihongbo22@huawei.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC: <lihongbo22@huawei.com>, <linux-crypto@vger.kernel.org>
-Subject: [PATCH -next] crypto: Remove unused parameter from macro ROLDQ
-Date: Fri, 23 Aug 2024 14:57:07 +0800
-Message-ID: <20240823065707.3327267-1-lihongbo22@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1724404089; c=relaxed/simple;
+	bh=Ve2sqD6iFM1UKf+rloPpgtAo7gWk9UfkFY95e3//i/s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RJ+RgM9SpbDkDEGKdbvIiG4qlHC+9+nXzWnP00e5mxr8o+QPPg08hg7qW/7RT6Y0yoeyQ9h+gHTqHgETjDWHyc4KpLfTkkfFFaW/t+uV89fHe4LtS4es88Lb0s07AT+1S1+QEOFmQfU5v5NvlTiFZsyjN34BJU8F+G/2J4as9XI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lMDsO8Xk; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lMDsO8Xk"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53A5FC4AF0B;
+	Fri, 23 Aug 2024 09:08:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724404088;
+	bh=Ve2sqD6iFM1UKf+rloPpgtAo7gWk9UfkFY95e3//i/s=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=lMDsO8Xkg+vjG2uP+6H2ZjIIT3JzFHH1ZwI1nqWbcVlzEOIsVzDIk88LYoxB0z2xa
+	 UgZZizGqAlJfQ3b5mNUN3+sw5oU04G9i/Dj4Nygsz9/P7O6sW1B0H9VDJCOrWIUoqX
+	 x9zix5JZ1n59sCQr/gsMEFrXCCwmPulHb9y98TsG4sgv4LZMHmF3mJlMG8MUxwlu0u
+	 job095Z+DEmA5ZV2ZZEs+wHQ57yUUKsCoQzmZ3dEHzb1ArxKsH/hQeaCHEcgsXtHzq
+	 ndXd3kv/xo+uX8jPtsp5+hPllBmgjfHDgzQdNvMU+HnX9O2OWJOxGmbn7YA1eVrSZh
+	 b4os0KwMC/EUA==
+Message-ID: <bf49738a-6979-41f2-a8d3-e36ac634102f@kernel.org>
+Date: Fri, 23 Aug 2024 11:07:59 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpeml500022.china.huawei.com (7.185.36.66)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 01/16] dt-bindings: dma: qcom,bam: Add bam pipe lock
+To: Md Sadre Alam <quic_mdalam@quicinc.com>, vkoul@kernel.org,
+ robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ andersson@kernel.org, konradybcio@kernel.org, thara.gopinath@gmail.com,
+ herbert@gondor.apana.org.au, davem@davemloft.net, gustavoars@kernel.org,
+ u.kleine-koenig@pengutronix.de, kees@kernel.org, agross@kernel.org,
+ linux-arm-msm@vger.kernel.org, dmaengine@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-crypto@vger.kernel.org
+Cc: quic_srichara@quicinc.com, quic_varada@quicinc.com,
+ quic_utiwari@quicinc.com
+References: <20240815085725.2740390-1-quic_mdalam@quicinc.com>
+ <20240815085725.2740390-2-quic_mdalam@quicinc.com>
+ <0a2b884b-bd28-428e-be12-8fef4fdfd278@kernel.org>
+ <c8b7c2f0-9de1-1787-2f1b-2aa0102f347c@quicinc.com>
+ <c2292ef2-e93e-4ca3-bcd3-542bd27526ad@kernel.org>
+ <6365b444-f552-4b13-c73b-00ba04ec1e62@quicinc.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <6365b444-f552-4b13-c73b-00ba04ec1e62@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The parameter w1 is not used in macro ROLDQ, so we can
-remove it to simplify the code.
+On 22/08/2024 13:45, Md Sadre Alam wrote:
+> 
+> 
+> On 8/22/2024 11:57 AM, Krzysztof Kozlowski wrote:
+>> On 21/08/2024 18:34, Md Sadre Alam wrote:
+>>>
+>>>
+>>> On 8/17/2024 2:38 PM, Krzysztof Kozlowski wrote:
+>>>> On 15/08/2024 10:57, Md Sadre Alam wrote:
+>>>>> BAM having pipe locking mechanism. The Lock and Un-Lock bit
+>>>>> should be set on CMD descriptor only. Upon encountering a
+>>>>> descriptor with Lock bit set, the BAM will lock all other
+>>>>> pipes not related to the current pipe group, and keep
+>>>>> handling the current pipe only until it sees the Un-Lock
+>>>>> set.
+>>>>
+>>>> Please wrap commit message according to Linux coding style / submission
+>>>> process (neither too early nor over the limit):
+>>>> https://elixir.bootlin.com/linux/v6.4-rc1/source/Documentation/process/submitting-patches.rst#L597
+>>>     Ok , will update in next patch.
+>>>>
+>>>>>
+>>>>> Signed-off-by: Md Sadre Alam <quic_mdalam@quicinc.com>
+>>>>> ---
+>>>>>
+>>>>> Change in [v2]
+>>>>>
+>>>>> * Added initial support for dt-binding
+>>>>>
+>>>>> Change in [v1]
+>>>>>
+>>>>> * This patch was not included in [v1]
+>>>>>
+>>>>>    Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml | 8 ++++++++
+>>>>>    1 file changed, 8 insertions(+)
+>>>>>
+>>>>> diff --git a/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml b/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml
+>>>>> index 3ad0d9b1fbc5..91cc2942aa62 100644
+>>>>> --- a/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml
+>>>>> +++ b/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml
+>>>>> @@ -77,6 +77,12 @@ properties:
+>>>>>          Indicates that the bam is powered up by a remote processor but must be
+>>>>>          initialized by the local processor.
+>>>>>    
+>>>>> +  qcom,bam_pipe_lock:
+>>>>
+>>>> Please follow DTS coding style.
+>>>     Ok
+>>>>
+>>>>> +    type: boolean
+>>>>> +    description:
+>>>>> +      Indicates that the bam pipe needs locking or not based on client driver
+>>>>> +      sending the LOCK or UNLOK bit set on command descriptor.
+>>>>
+>>>> You described the desired Linux feature or behavior, not the actual
+>>>> hardware. The bindings are about the latter, so instead you need to
+>>>> rephrase the property and its description to match actual hardware
+>>>> capabilities/features/configuration etc.
+>>>     Ok, will update in next patch.
+>>>>
+>>>>> +
+>>>>>      reg:
+>>>>>        maxItems: 1
+>>>>>    
+>>>>> @@ -92,6 +98,8 @@ anyOf:
+>>>>>          - qcom,powered-remotely
+>>>>>      - required:
+>>>>>          - qcom,controlled-remotely
+>>>>> +  - required:
+>>>>> +      - qcom,bam_pipe_lock
+>>>>
+>>>> Why is it here? What do you want to achieve?
+>>>     This property added to achieve locking/unlocking
+>>>     of BAM pipe groups for mutual exclusion of resources
+>>>     that can be used across multiple EE's
+>>
+>> This explains me nothing. I am questioning the anyOf block. Why this is
+>> the fourth method of controlling BAM? Anyway, if it is, then explain
+>> this in commit msg.
+>    This is the BAM property for locking/unlocking the BAM pipes.That's
+>    why I kept in anyOf block.
 
-Signed-off-by: Hongbo Li <lihongbo22@huawei.com>
----
- crypto/camellia_generic.c | 42 +++++++++++++++++++--------------------
- 1 file changed, 21 insertions(+), 21 deletions(-)
+You keep repeating the same. It's like poking me with the same comment
+till I agree. I am done with this.
 
-diff --git a/crypto/camellia_generic.c b/crypto/camellia_generic.c
-index c04670cf51ac..0c552868ebdd 100644
---- a/crypto/camellia_generic.c
-+++ b/crypto/camellia_generic.c
-@@ -316,7 +316,7 @@ static const u32 camellia_sp4404[256] = {
- /*
-  *  macros
-  */
--#define ROLDQ(ll, lr, rl, rr, w0, w1, bits) ({		\
-+#define ROLDQ(ll, lr, rl, rr, w0, bits) ({		\
- 	w0 = ll;					\
- 	ll = (ll << bits) + (lr >> (32 - bits));	\
- 	lr = (lr << bits) + (rl >> (32 - bits));	\
-@@ -555,35 +555,35 @@ static void camellia_setup128(const unsigned char *key, u32 *subkey)
- 	/* kw2 */
- 	subL[1] = krl; subR[1] = krr;
- 	/* rotation left shift 15bit */
--	ROLDQ(kll, klr, krl, krr, w0, w1, 15);
-+	ROLDQ(kll, klr, krl, krr, w0, 15);
- 	/* k3 */
- 	subL[4] = kll; subR[4] = klr;
- 	/* k4 */
- 	subL[5] = krl; subR[5] = krr;
- 	/* rotation left shift 15+30bit */
--	ROLDQ(kll, klr, krl, krr, w0, w1, 30);
-+	ROLDQ(kll, klr, krl, krr, w0, 30);
- 	/* k7 */
- 	subL[10] = kll; subR[10] = klr;
- 	/* k8 */
- 	subL[11] = krl; subR[11] = krr;
- 	/* rotation left shift 15+30+15bit */
--	ROLDQ(kll, klr, krl, krr, w0, w1, 15);
-+	ROLDQ(kll, klr, krl, krr, w0, 15);
- 	/* k10 */
- 	subL[13] = krl; subR[13] = krr;
- 	/* rotation left shift 15+30+15+17 bit */
--	ROLDQ(kll, klr, krl, krr, w0, w1, 17);
-+	ROLDQ(kll, klr, krl, krr, w0, 17);
- 	/* kl3 */
- 	subL[16] = kll; subR[16] = klr;
- 	/* kl4 */
- 	subL[17] = krl; subR[17] = krr;
- 	/* rotation left shift 15+30+15+17+17 bit */
--	ROLDQ(kll, klr, krl, krr, w0, w1, 17);
-+	ROLDQ(kll, klr, krl, krr, w0, 17);
- 	/* k13 */
- 	subL[18] = kll; subR[18] = klr;
- 	/* k14 */
- 	subL[19] = krl; subR[19] = krr;
- 	/* rotation left shift 15+30+15+17+17+17 bit */
--	ROLDQ(kll, klr, krl, krr, w0, w1, 17);
-+	ROLDQ(kll, klr, krl, krr, w0, 17);
- 	/* k17 */
- 	subL[22] = kll; subR[22] = klr;
- 	/* k18 */
-@@ -613,18 +613,18 @@ static void camellia_setup128(const unsigned char *key, u32 *subkey)
- 	/* k1, k2 */
- 	subL[2] = kll; subR[2] = klr;
- 	subL[3] = krl; subR[3] = krr;
--	ROLDQ(kll, klr, krl, krr, w0, w1, 15);
-+	ROLDQ(kll, klr, krl, krr, w0, 15);
- 	/* k5,k6 */
- 	subL[6] = kll; subR[6] = klr;
- 	subL[7] = krl; subR[7] = krr;
--	ROLDQ(kll, klr, krl, krr, w0, w1, 15);
-+	ROLDQ(kll, klr, krl, krr, w0, 15);
- 	/* kl1, kl2 */
- 	subL[8] = kll; subR[8] = klr;
- 	subL[9] = krl; subR[9] = krr;
--	ROLDQ(kll, klr, krl, krr, w0, w1, 15);
-+	ROLDQ(kll, klr, krl, krr, w0, 15);
- 	/* k9 */
- 	subL[12] = kll; subR[12] = klr;
--	ROLDQ(kll, klr, krl, krr, w0, w1, 15);
-+	ROLDQ(kll, klr, krl, krr, w0, 15);
- 	/* k11, k12 */
- 	subL[14] = kll; subR[14] = klr;
- 	subL[15] = krl; subR[15] = krr;
-@@ -632,7 +632,7 @@ static void camellia_setup128(const unsigned char *key, u32 *subkey)
- 	/* k15, k16 */
- 	subL[20] = kll; subR[20] = klr;
- 	subL[21] = krl; subR[21] = krr;
--	ROLDQ(kll, klr, krl, krr, w0, w1, 17);
-+	ROLDQ(kll, klr, krl, krr, w0, 17);
- 	/* kw3, kw4 */
- 	subL[24] = kll; subR[24] = klr;
- 	subL[25] = krl; subR[25] = krr;
-@@ -671,12 +671,12 @@ static void camellia_setup256(const unsigned char *key, u32 *subkey)
- 	subL[12] = kll; subR[12] = klr;
- 	/* k10 */
- 	subL[13] = krl; subR[13] = krr;
--	ROLDQ(kll, klr, krl, krr, w0, w1, 15);
-+	ROLDQ(kll, klr, krl, krr, w0, 15);
- 	/* kl3 */
- 	subL[16] = kll; subR[16] = klr;
- 	/* kl4 */
- 	subL[17] = krl; subR[17] = krr;
--	ROLDQ(kll, klr, krl, krr, w0, w1, 17);
-+	ROLDQ(kll, klr, krl, krr, w0, 17);
- 	/* k17 */
- 	subL[22] = kll; subR[22] = klr;
- 	/* k18 */
-@@ -688,17 +688,17 @@ static void camellia_setup256(const unsigned char *key, u32 *subkey)
- 	subL[31] = krl; subR[31] = krr;
- 
- 	/* generate KR dependent subkeys */
--	ROLDQ(krll, krlr, krrl, krrr, w0, w1, 15);
-+	ROLDQ(krll, krlr, krrl, krrr, w0, 15);
- 	/* k3 */
- 	subL[4] = krll; subR[4] = krlr;
- 	/* k4 */
- 	subL[5] = krrl; subR[5] = krrr;
--	ROLDQ(krll, krlr, krrl, krrr, w0, w1, 15);
-+	ROLDQ(krll, krlr, krrl, krrr, w0, 15);
- 	/* kl1 */
- 	subL[8] = krll; subR[8] = krlr;
- 	/* kl2 */
- 	subL[9] = krrl; subR[9] = krrr;
--	ROLDQ(krll, krlr, krrl, krrr, w0, w1, 30);
-+	ROLDQ(krll, krlr, krrl, krrr, w0, 30);
- 	/* k13 */
- 	subL[18] = krll; subR[18] = krlr;
- 	/* k14 */
-@@ -743,12 +743,12 @@ static void camellia_setup256(const unsigned char *key, u32 *subkey)
- 	krll ^= w0; krlr ^= w1;
- 
- 	/* generate KA dependent subkeys */
--	ROLDQ(kll, klr, krl, krr, w0, w1, 15);
-+	ROLDQ(kll, klr, krl, krr, w0, 15);
- 	/* k5 */
- 	subL[6] = kll; subR[6] = klr;
- 	/* k6 */
- 	subL[7] = krl; subR[7] = krr;
--	ROLDQ(kll, klr, krl, krr, w0, w1, 30);
-+	ROLDQ(kll, klr, krl, krr, w0, 30);
- 	/* k11 */
- 	subL[14] = kll; subR[14] = klr;
- 	/* k12 */
-@@ -770,12 +770,12 @@ static void camellia_setup256(const unsigned char *key, u32 *subkey)
- 	subL[2] = krll; subR[2] = krlr;
- 	/* k2 */
- 	subL[3] = krrl; subR[3] = krrr;
--	ROLDQ(krll, krlr, krrl, krrr, w0, w1, 30);
-+	ROLDQ(krll, krlr, krrl, krrr, w0, 30);
- 	/* k7 */
- 	subL[10] = krll; subR[10] = krlr;
- 	/* k8 */
- 	subL[11] = krrl; subR[11] = krrr;
--	ROLDQ(krll, krlr, krrl, krrr, w0, w1, 30);
-+	ROLDQ(krll, krlr, krrl, krrr, w0, 30);
- 	/* k15 */
- 	subL[20] = krll; subR[20] = krlr;
- 	/* k16 */
--- 
-2.34.1
+NAK. Provide proper rationale.
+
+Best regards,
+Krzysztof
 
