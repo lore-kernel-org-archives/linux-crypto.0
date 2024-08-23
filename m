@@ -1,193 +1,265 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from HK2PR02CU002.outbound.protection.outlook.com (mail-eastasiaazon11010050.outbound.protection.outlook.com [52.101.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5FE4149C43;
-	Fri, 23 Aug 2024 09:08:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724404089; cv=none; b=mUHeiY3RWHEvXR7ysmO7zY7qmkiPKs+VV5wzFiCx9rEYHrHfsv13WOjMESGzOmlU2cNUouOfgYwpK6bdxHglvxl2/ieCTrLdxkbbRxRaVEPbN82Ynseo9sdYeBmn7VK5rjRkmL0wLojCC/az4Sj5OdNfSvhq4BZpa3XunpL2A/w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724404089; c=relaxed/simple;
-	bh=Ve2sqD6iFM1UKf+rloPpgtAo7gWk9UfkFY95e3//i/s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RJ+RgM9SpbDkDEGKdbvIiG4qlHC+9+nXzWnP00e5mxr8o+QPPg08hg7qW/7RT6Y0yoeyQ9h+gHTqHgETjDWHyc4KpLfTkkfFFaW/t+uV89fHe4LtS4es88Lb0s07AT+1S1+QEOFmQfU5v5NvlTiFZsyjN34BJU8F+G/2J4as9XI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lMDsO8Xk; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6CCA20DF4
+	for <linux-crypto@vger.kernel.org>; Fri, 23 Aug 2024 09:31:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.128.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724405490; cv=fail; b=lBVas7fcjwuf/0x+SbiBEAJLOQo+MUYVb8r+prJvqRZaH6dcswsv3cq9WWTWl63O9rQGY5Cw/lyXXiYab0Ha4opVzj/N+Qdz+dNMwrQh7TI5BnROZ/1GpdamQoZ2zbTQbn96hWCcCV6WYeaQNDDYQpynCT5oAHYEEfEkMrg7S0I=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724405490; c=relaxed/simple;
+	bh=vMVgDyfnsGDNwFJQYC6/vkj4TrQYDAQyEJ8qX32n1hA=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=EyfL6NJICCxvKP4rVsb6D4XblB9/3WQBQyjIeaLUreZ6WcJryKPD2ZYkjzCdgW5qwh6Jzyitx+PCR/Utm2qw/rdylEZIxSuUf+/HUyk5GkBZ3KVJ3qfNzhsZmyQPsKC4wh+GFC4APklHDPX36SjX9J2GjeRUIk+etFTrRXiaZfg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com; spf=pass smtp.mailfrom=vivo.com; dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b=mH7m6WEN; arc=fail smtp.client-ip=52.101.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivo.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lMDsO8Xk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53A5FC4AF0B;
-	Fri, 23 Aug 2024 09:08:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724404088;
-	bh=Ve2sqD6iFM1UKf+rloPpgtAo7gWk9UfkFY95e3//i/s=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=lMDsO8Xkg+vjG2uP+6H2ZjIIT3JzFHH1ZwI1nqWbcVlzEOIsVzDIk88LYoxB0z2xa
-	 UgZZizGqAlJfQ3b5mNUN3+sw5oU04G9i/Dj4Nygsz9/P7O6sW1B0H9VDJCOrWIUoqX
-	 x9zix5JZ1n59sCQr/gsMEFrXCCwmPulHb9y98TsG4sgv4LZMHmF3mJlMG8MUxwlu0u
-	 job095Z+DEmA5ZV2ZZEs+wHQ57yUUKsCoQzmZ3dEHzb1ArxKsH/hQeaCHEcgsXtHzq
-	 ndXd3kv/xo+uX8jPtsp5+hPllBmgjfHDgzQdNvMU+HnX9O2OWJOxGmbn7YA1eVrSZh
-	 b4os0KwMC/EUA==
-Message-ID: <bf49738a-6979-41f2-a8d3-e36ac634102f@kernel.org>
-Date: Fri, 23 Aug 2024 11:07:59 +0200
+	dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b="mH7m6WEN"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=kBOKb9IwShNaij0KykzWkQFN27d/CScTiP0qKJfGyTZf/QIhCZcnzITEPLVwopuSc/yrF4rzZ0wmUqsI0eELLcGuApGBELUdTpdxH1zvY6uON9gZncwegWoSCJzH8DjBQrSZV9ufoMmecUzVJjx29W24yebLXgMxn7VGnLgvWj+HOIt+RFyfJcpi5UmKQHuHSU1BsZ0PT1Tr5ZVigBVAHL7M8JU0I7pp4OPDzdG/7D0QJGsXUce0eu0sJeV9L0HTD8yY3+VN+oE/ny3QppylIWcdoLynS9uUc3OgIGAwwJ1ZOiREwvwZhBywihtISfu0Q7sHyD32Hd6dghGH3OgZJw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=z1PkD//2I0dSgC9mpWBmnyqEBXBh5wEztLwUBnq7ahU=;
+ b=gxzuUNmxFK6mlMIVPNzfva0ViXFJGBW/iSnb69d36azE8Mdy6Jr6xaJ7Cc8Qh0VswrSxfljCuIe2mBf/QdXhdFKvJmGsOigkG4oiRntKTcBJLubTNKbbMTxQ8rEpAH7J2hkpREcpRiOwS9jUHXEu5faEh5ovMvVGjt8noMzWggEncwPJdd9ksUQqC+gRaduyZ2FunsBzlMUkF/fbCdAV4s+kNnT53INKtgzoYdeZVZ5+P/rJz/XoRGdie6q9u35RddYzgdn10TcgwYQb1C/8/7wWfPU3IGMircNFBawwh92FxSHp64c7QcvfBYSfT0cDpgrStzih4BlzB+lEaKWIkQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
+ dkim=pass header.d=vivo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=z1PkD//2I0dSgC9mpWBmnyqEBXBh5wEztLwUBnq7ahU=;
+ b=mH7m6WENrD6HeUuTH4c2WrO2C7fRLgcosHOwuH8hZBBq/dvfJTvYKYoUogvft/7BjMt2a/IE66cIPIXeUtXt7bS9hgjji6Hj71aleg1MDox46tjsXa4Nj+7MrNf4kJgeLHyPt3jiNe4xxvPOFopXQmZ4AgXrIvkWZuRcSZf/f5AdJ/RXIaLNcK4t2QopKHAwxKvresQvJTRTJ4Xhq3rEQIpYOmvUISKaBuhtkY7IibR1w2BJPuHbFHSmozxukbE8XLI64h1djqnxJfNXToteBfRVlCVEGpq2MK2VXvdfYC1JlHFPfx+g/M7xPYgqoG5O9kxYGuTcTwc5GZINZFMp9Q==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=vivo.com;
+Received: from TYZPR06MB7096.apcprd06.prod.outlook.com (2603:1096:405:b5::13)
+ by TYZPR06MB6639.apcprd06.prod.outlook.com (2603:1096:400:45b::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.21; Fri, 23 Aug
+ 2024 09:31:25 +0000
+Received: from TYZPR06MB7096.apcprd06.prod.outlook.com
+ ([fe80::6c3a:9f76:c4a5:c2b]) by TYZPR06MB7096.apcprd06.prod.outlook.com
+ ([fe80::6c3a:9f76:c4a5:c2b%5]) with mapi id 15.20.7897.014; Fri, 23 Aug 2024
+ 09:31:25 +0000
+From: Chunhai Guo <guochunhai@vivo.com>
+To: herbert@gondor.apana.org.au,
+	davem@davemloft.net
+Cc: nicolas.ferre@microchip.com,
+	alexandre.belloni@bootlin.com,
+	claudiu.beznea@tuxon.dev,
+	linux-crypto@vger.kernel.org,
+	Chunhai Guo <guochunhai@vivo.com>
+Subject: [PATCH] crypto: atmel-{aes,sha} - use devm_clk_get_prepared() helpers
+Date: Fri, 23 Aug 2024 03:42:49 -0600
+Message-Id: <20240823094249.2172979-1-guochunhai@vivo.com>
+X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SI1PR02CA0055.apcprd02.prod.outlook.com
+ (2603:1096:4:1f5::16) To TYZPR06MB7096.apcprd06.prod.outlook.com
+ (2603:1096:405:b5::13)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 01/16] dt-bindings: dma: qcom,bam: Add bam pipe lock
-To: Md Sadre Alam <quic_mdalam@quicinc.com>, vkoul@kernel.org,
- robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
- andersson@kernel.org, konradybcio@kernel.org, thara.gopinath@gmail.com,
- herbert@gondor.apana.org.au, davem@davemloft.net, gustavoars@kernel.org,
- u.kleine-koenig@pengutronix.de, kees@kernel.org, agross@kernel.org,
- linux-arm-msm@vger.kernel.org, dmaengine@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org
-Cc: quic_srichara@quicinc.com, quic_varada@quicinc.com,
- quic_utiwari@quicinc.com
-References: <20240815085725.2740390-1-quic_mdalam@quicinc.com>
- <20240815085725.2740390-2-quic_mdalam@quicinc.com>
- <0a2b884b-bd28-428e-be12-8fef4fdfd278@kernel.org>
- <c8b7c2f0-9de1-1787-2f1b-2aa0102f347c@quicinc.com>
- <c2292ef2-e93e-4ca3-bcd3-542bd27526ad@kernel.org>
- <6365b444-f552-4b13-c73b-00ba04ec1e62@quicinc.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <6365b444-f552-4b13-c73b-00ba04ec1e62@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: TYZPR06MB7096:EE_|TYZPR06MB6639:EE_
+X-MS-Office365-Filtering-Correlation-Id: a467c8e9-ae8d-4cae-4dcc-08dcc3565bd2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|52116014|376014|1800799024|366016|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?b8ZWWImKrX/ZHMWA3elxN9lHAYOQYf79zSfDrWY5HFGqTgdvxSwBW2PpoW9k?=
+ =?us-ascii?Q?r4qS+4eSymDzzAmh1bFMB2XuONFp4EdCsGo4s3It0fCDowGLbs8CWe3mBzcf?=
+ =?us-ascii?Q?f9ptBbKJt6lmUSc2OBhODpMhDoVoJlCr7/otda6rbPGV1uNBhB8jT04yny+9?=
+ =?us-ascii?Q?FJbt2cqVZkAs3VhaMD5TVDL88hHXTDqHgD17uY6cRn60VJ/etb1GECE65IU2?=
+ =?us-ascii?Q?h8pNNqcPMtQ1IMHxB4I+bJJwsPTMCT8rr+zlmY4dTjQY9P5yr4HvrKcqdtfy?=
+ =?us-ascii?Q?IVgxV6f/gpLnU1EL6vHCO7MpxJt27fox88D4ttRJlp/dWa5COYyrWGpSQsiK?=
+ =?us-ascii?Q?dCUxseIq4FJJbdYbjGb/H/MXHHbfUk6tI5rpqMgqant8h0WESjywD7bf+u2p?=
+ =?us-ascii?Q?gl9+jNxiW/p7a/sNZCg0XeseL0rbM3Wna6jPCTkpfrS6tX5IJ3kcihVI+xFa?=
+ =?us-ascii?Q?LP1IzAXOTXzNlb5oyVa8kgJEvL3c9LLlvlmWj097bq4oFnDErcGSWaDPNquJ?=
+ =?us-ascii?Q?RDExdsAyxMxppj2Z1dKWeO4kYLJjjcR8nJkrBKsh+OLvDnNkccRlfGh+YkEs?=
+ =?us-ascii?Q?5868xS9lMZB4xlHut8lmCPjww6yCNM7j4YVNEAS6DDqbeWiUn+znvYzXFFny?=
+ =?us-ascii?Q?GCcODXUPMPhY5zPedDlXW+7CTvmTbpJ5SFK7yCaawXKep8HslLsHh/i+0LmB?=
+ =?us-ascii?Q?kbEwQDItJZauE5Gi3vYsR3f/wN5byjoY0pc8HlPz9nELfQvQHc82/r+KGXYd?=
+ =?us-ascii?Q?IEw0wIokwYXntIOq0cpMJW5V71hA6xqC+n4Uc84NXK8UkghfSgE3jxoKZWTW?=
+ =?us-ascii?Q?in+JKnm9MMrbJdUuE5P0TwP8fRG9iLk/DmKW5Ww1EaNJp/Dwk6oQKXO43BbS?=
+ =?us-ascii?Q?99Ggl/mdinIoW2EXMSwjPwNasOcmMCkKdkh8NNQJ+JFUc5+xlSaAPIBsuqVc?=
+ =?us-ascii?Q?zs8jex4Y1dzWshkE8RXxczR/bi8cewgHHiBC0/ZcwEolZMsBO0nENGkHrgfS?=
+ =?us-ascii?Q?wgwTe0eBuQ4uiDniWfrNuRZt+46EaEmw1yY4Ek1Em9vFfj53fBMvhdJ8EysD?=
+ =?us-ascii?Q?0WKdmqfBJLa6cl9AnTJQCZMmMSGioVAcdpRZPP5b4Hb/SdWAZbxMxCxmfHlk?=
+ =?us-ascii?Q?5iQ4fq8t9oBbQmqxcrobotm5gThJyG0MLqIGi0hRP7FOs+PZNimG9cg61poc?=
+ =?us-ascii?Q?KB6Zby7D8pm3Unb+TN6WgxsMB13XvskpHUEJTO8il6ZC4xMeqBJ4hCWJRvZP?=
+ =?us-ascii?Q?ynMzbs/ZNa8Y1XU0joJ0+iLKaTyxo9vICSkvaVKXT8J+cTSKYpHhNgks7Tk/?=
+ =?us-ascii?Q?MNxGyqOZemOvCZqn9avnXv02V04QcQk1BtreIaxSVp9Ih/LUBIjJXeMdzx0q?=
+ =?us-ascii?Q?MvpKho64Igdw2eUhwy+ZUzoYl5XhSJWfERXZoGWF0khrYmxeOw=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TYZPR06MB7096.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(376014)(1800799024)(366016)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?WiRA8pZDji/GceXW6ep9PMqOsiX5ZkMgYmFH+JYm6KSJ0gOM9dqFtvgFpEI5?=
+ =?us-ascii?Q?AXQcoC3kTvY1a2fRPb7Kw/f9BgBIU2Vr4N98JQq59JNkfgQEx8y/E8laqm34?=
+ =?us-ascii?Q?nYV0TGnwjA0twRtQz4cqPX6ce45cVS5WDBNhLUgvTp+yAO4mYEH7qh/coPce?=
+ =?us-ascii?Q?fccy391f1e5NnFCv9O+va52NY4tdv2A8MM8bBeTEaBBP+iOXu6CvDGVRwn/I?=
+ =?us-ascii?Q?7lOAr6f41DWF9Jsf8EdMlLe0lFjNDpYT9hxHnFRb/qsHw6KlWkncSlMB8CY1?=
+ =?us-ascii?Q?5fs0buyqHVnwGhjsifvnM3pIThRxhVpjVNcMhnTWxYF4GhB7xws2L07mSX6v?=
+ =?us-ascii?Q?FxKbvWFF7AUkrP6MaIYW3WGSB/iSYEDX9yzR4JPjYm7jkFmw/WfYQocR3AzN?=
+ =?us-ascii?Q?eaSykhamhtw6FCTxE6q2ocN4aRTCYWZ5oSbLqS1seBN0IL2N1HQHWfYJMgJS?=
+ =?us-ascii?Q?aD6bNvltNBrF8ZmcZOVFsY18KTeUPdGFEgl0tOHhqZxKGYavVKE2bUycwwNC?=
+ =?us-ascii?Q?s5c2X23GM03OrNY+fNKqzBLvXlkKsw+sdy+kXeV9ikjbnaegYccCBnlsNplc?=
+ =?us-ascii?Q?5Rq/cbpoCoQTgOsMk4Ip2R4Cvr3WiiKn4Ivqz7fgVSXyXCUgUxZ6FPlXaZnq?=
+ =?us-ascii?Q?gRKDri7jFMtHyTBMoa0fKJx1OdX3i1fO3hz3k6fVAZw22LsL9JO2suBx4qPS?=
+ =?us-ascii?Q?GGcVzNIBLGMcoLguyAeAJ7r3pVlNh0sWwliylXq0830WjuIPIYYTREWoWQI7?=
+ =?us-ascii?Q?pQGBjqKDUS6clnuua6oFg2zuHCii4eDMC8jt18H6ykgrOi7ajna4uf3iqWFH?=
+ =?us-ascii?Q?PkflDZJ0hDdLfx9fwrdWoki3TZ4K61BbwJraCpOod1vyON16b08NESKGTSCh?=
+ =?us-ascii?Q?rKCCvXVqmdcdjsL8R4UG3xJ0kARLAaBRSzii8Ow22YJCWA5lbcehsnbD41QR?=
+ =?us-ascii?Q?JktWNsjVPt3Oxls33ulRnavzwChIlp7ABsyMdBcIshDoN/UOfQ39sp01eIf+?=
+ =?us-ascii?Q?oUyYGCZvMrp53mXpRh0+9oZYkyaSGpfKZR2XymCKx3QYxa/RWmjjBz6bkHm/?=
+ =?us-ascii?Q?SbDQlJLTYnj6QsymwGne4LYqjNfekY2bG20Nhv1wa/6v5Wyn+3YpL9qjWOWh?=
+ =?us-ascii?Q?l7DuKDzWBAAkCIgKnPTbkGcYXaf8nigKQlK7G5pU4z7s5JTwI6KVQL+VNXhL?=
+ =?us-ascii?Q?4l6wwPBmiSzzJnd0D8rd1cCwX1LP4gVIdi96OKTirWBzXVW+5RcLOkTlo8YE?=
+ =?us-ascii?Q?L6OzJoggRuD2h67klWroYW5R3nD5W+fgLXyFOCeTPD3Eh+PUGCVtbBMRJ5ur?=
+ =?us-ascii?Q?iouWxILIOeb81NKv8epRObux1NZBWz4yFxARcmzG5c2TuG3Qx01lgu5+ZFSc?=
+ =?us-ascii?Q?bgJqidmtz05RFCVIQnS2nHa35XWMqx3EJ0wQ7TBaNzqQQDzcA4NoCtapFNi5?=
+ =?us-ascii?Q?4o/lhMW0d593yjTGvuSMzAwzLbXXQ9TW6x1M+R0RqvZ7czxjG2NGr3FcIilK?=
+ =?us-ascii?Q?I82chTHgKJ+3ZE51+8784cISht0wWanUEE4j/TX5NNJ1tdeI5ClP4beQGrfY?=
+ =?us-ascii?Q?1mknP2omMeowor6zMqHib5/WCFm6Q0Q84BlYuhzg?=
+X-OriginatorOrg: vivo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a467c8e9-ae8d-4cae-4dcc-08dcc3565bd2
+X-MS-Exchange-CrossTenant-AuthSource: TYZPR06MB7096.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Aug 2024 09:31:25.6057
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0dWPbfY92QB7uv+j6aDeoW8dR+h+I2FnV9s1KEhVCtO5Tym+ZcoVlEywaEdqxfN9aBt1xk01B3U/+ft/y1yFyQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYZPR06MB6639
 
-On 22/08/2024 13:45, Md Sadre Alam wrote:
-> 
-> 
-> On 8/22/2024 11:57 AM, Krzysztof Kozlowski wrote:
->> On 21/08/2024 18:34, Md Sadre Alam wrote:
->>>
->>>
->>> On 8/17/2024 2:38 PM, Krzysztof Kozlowski wrote:
->>>> On 15/08/2024 10:57, Md Sadre Alam wrote:
->>>>> BAM having pipe locking mechanism. The Lock and Un-Lock bit
->>>>> should be set on CMD descriptor only. Upon encountering a
->>>>> descriptor with Lock bit set, the BAM will lock all other
->>>>> pipes not related to the current pipe group, and keep
->>>>> handling the current pipe only until it sees the Un-Lock
->>>>> set.
->>>>
->>>> Please wrap commit message according to Linux coding style / submission
->>>> process (neither too early nor over the limit):
->>>> https://elixir.bootlin.com/linux/v6.4-rc1/source/Documentation/process/submitting-patches.rst#L597
->>>     Ok , will update in next patch.
->>>>
->>>>>
->>>>> Signed-off-by: Md Sadre Alam <quic_mdalam@quicinc.com>
->>>>> ---
->>>>>
->>>>> Change in [v2]
->>>>>
->>>>> * Added initial support for dt-binding
->>>>>
->>>>> Change in [v1]
->>>>>
->>>>> * This patch was not included in [v1]
->>>>>
->>>>>    Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml | 8 ++++++++
->>>>>    1 file changed, 8 insertions(+)
->>>>>
->>>>> diff --git a/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml b/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml
->>>>> index 3ad0d9b1fbc5..91cc2942aa62 100644
->>>>> --- a/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml
->>>>> +++ b/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml
->>>>> @@ -77,6 +77,12 @@ properties:
->>>>>          Indicates that the bam is powered up by a remote processor but must be
->>>>>          initialized by the local processor.
->>>>>    
->>>>> +  qcom,bam_pipe_lock:
->>>>
->>>> Please follow DTS coding style.
->>>     Ok
->>>>
->>>>> +    type: boolean
->>>>> +    description:
->>>>> +      Indicates that the bam pipe needs locking or not based on client driver
->>>>> +      sending the LOCK or UNLOK bit set on command descriptor.
->>>>
->>>> You described the desired Linux feature or behavior, not the actual
->>>> hardware. The bindings are about the latter, so instead you need to
->>>> rephrase the property and its description to match actual hardware
->>>> capabilities/features/configuration etc.
->>>     Ok, will update in next patch.
->>>>
->>>>> +
->>>>>      reg:
->>>>>        maxItems: 1
->>>>>    
->>>>> @@ -92,6 +98,8 @@ anyOf:
->>>>>          - qcom,powered-remotely
->>>>>      - required:
->>>>>          - qcom,controlled-remotely
->>>>> +  - required:
->>>>> +      - qcom,bam_pipe_lock
->>>>
->>>> Why is it here? What do you want to achieve?
->>>     This property added to achieve locking/unlocking
->>>     of BAM pipe groups for mutual exclusion of resources
->>>     that can be used across multiple EE's
->>
->> This explains me nothing. I am questioning the anyOf block. Why this is
->> the fourth method of controlling BAM? Anyway, if it is, then explain
->> this in commit msg.
->    This is the BAM property for locking/unlocking the BAM pipes.That's
->    why I kept in anyOf block.
+Simplify the code by replacing devm_clk_get() and clk_prepare() with
+devm_clk_get_prepared(), which also avoids the call to clk_unprepare().
 
-You keep repeating the same. It's like poking me with the same comment
-till I agree. I am done with this.
+Signed-off-by: Chunhai Guo <guochunhai@vivo.com>
+---
+ drivers/crypto/atmel-aes.c | 16 ++++------------
+ drivers/crypto/atmel-sha.c | 14 +++-----------
+ 2 files changed, 7 insertions(+), 23 deletions(-)
 
-NAK. Provide proper rationale.
-
-Best regards,
-Krzysztof
+diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
+index 8bd64fc37e75..0dd90785db9a 100644
+--- a/drivers/crypto/atmel-aes.c
++++ b/drivers/crypto/atmel-aes.c
+@@ -2376,33 +2376,29 @@ static int atmel_aes_probe(struct platform_device *pdev)
+ 	}
+ 
+ 	/* Initializing the clock */
+-	aes_dd->iclk = devm_clk_get(&pdev->dev, "aes_clk");
++	aes_dd->iclk = devm_clk_get_prepared(&pdev->dev, "aes_clk");
+ 	if (IS_ERR(aes_dd->iclk)) {
+ 		dev_err(dev, "clock initialization failed.\n");
+ 		err = PTR_ERR(aes_dd->iclk);
+ 		goto err_tasklet_kill;
+ 	}
+ 
+-	err = clk_prepare(aes_dd->iclk);
+-	if (err)
+-		goto err_tasklet_kill;
+-
+ 	err = atmel_aes_hw_version_init(aes_dd);
+ 	if (err)
+-		goto err_iclk_unprepare;
++		goto err_tasklet_kill;
+ 
+ 	atmel_aes_get_cap(aes_dd);
+ 
+ #if IS_ENABLED(CONFIG_CRYPTO_DEV_ATMEL_AUTHENC)
+ 	if (aes_dd->caps.has_authenc && !atmel_sha_authenc_is_ready()) {
+ 		err = -EPROBE_DEFER;
+-		goto err_iclk_unprepare;
++		goto err_tasklet_kill;
+ 	}
+ #endif
+ 
+ 	err = atmel_aes_buff_init(aes_dd);
+ 	if (err)
+-		goto err_iclk_unprepare;
++		goto err_tasklet_kill;
+ 
+ 	err = atmel_aes_dma_init(aes_dd);
+ 	if (err)
+@@ -2429,8 +2425,6 @@ static int atmel_aes_probe(struct platform_device *pdev)
+ 	atmel_aes_dma_cleanup(aes_dd);
+ err_buff_cleanup:
+ 	atmel_aes_buff_cleanup(aes_dd);
+-err_iclk_unprepare:
+-	clk_unprepare(aes_dd->iclk);
+ err_tasklet_kill:
+ 	tasklet_kill(&aes_dd->done_task);
+ 	tasklet_kill(&aes_dd->queue_task);
+@@ -2455,8 +2449,6 @@ static void atmel_aes_remove(struct platform_device *pdev)
+ 
+ 	atmel_aes_dma_cleanup(aes_dd);
+ 	atmel_aes_buff_cleanup(aes_dd);
+-
+-	clk_unprepare(aes_dd->iclk);
+ }
+ 
+ static struct platform_driver atmel_aes_driver = {
+diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
+index f4cd6158a4f7..8cc57df25778 100644
+--- a/drivers/crypto/atmel-sha.c
++++ b/drivers/crypto/atmel-sha.c
+@@ -2623,27 +2623,23 @@ static int atmel_sha_probe(struct platform_device *pdev)
+ 	}
+ 
+ 	/* Initializing the clock */
+-	sha_dd->iclk = devm_clk_get(&pdev->dev, "sha_clk");
++	sha_dd->iclk = devm_clk_get_prepared(&pdev->dev, "sha_clk");
+ 	if (IS_ERR(sha_dd->iclk)) {
+ 		dev_err(dev, "clock initialization failed.\n");
+ 		err = PTR_ERR(sha_dd->iclk);
+ 		goto err_tasklet_kill;
+ 	}
+ 
+-	err = clk_prepare(sha_dd->iclk);
+-	if (err)
+-		goto err_tasklet_kill;
+-
+ 	err = atmel_sha_hw_version_init(sha_dd);
+ 	if (err)
+-		goto err_iclk_unprepare;
++		goto err_tasklet_kill;
+ 
+ 	atmel_sha_get_cap(sha_dd);
+ 
+ 	if (sha_dd->caps.has_dma) {
+ 		err = atmel_sha_dma_init(sha_dd);
+ 		if (err)
+-			goto err_iclk_unprepare;
++			goto err_tasklet_kill;
+ 
+ 		dev_info(dev, "using %s for DMA transfers\n",
+ 				dma_chan_name(sha_dd->dma_lch_in.chan));
+@@ -2669,8 +2665,6 @@ static int atmel_sha_probe(struct platform_device *pdev)
+ 	spin_unlock(&atmel_sha.lock);
+ 	if (sha_dd->caps.has_dma)
+ 		atmel_sha_dma_cleanup(sha_dd);
+-err_iclk_unprepare:
+-	clk_unprepare(sha_dd->iclk);
+ err_tasklet_kill:
+ 	tasklet_kill(&sha_dd->queue_task);
+ 	tasklet_kill(&sha_dd->done_task);
+@@ -2693,8 +2687,6 @@ static void atmel_sha_remove(struct platform_device *pdev)
+ 
+ 	if (sha_dd->caps.has_dma)
+ 		atmel_sha_dma_cleanup(sha_dd);
+-
+-	clk_unprepare(sha_dd->iclk);
+ }
+ 
+ static struct platform_driver atmel_sha_driver = {
+-- 
+2.25.1
 
