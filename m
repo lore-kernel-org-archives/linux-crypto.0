@@ -1,153 +1,66 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80DE1153824;
-	Sat, 24 Aug 2024 07:10:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEB7F111AD;
+	Sat, 24 Aug 2024 13:42:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724483430; cv=none; b=Ip+AYvCRjoKPLnokCZqra8yzmtujNQRWQiO55QMPienO+NKSIxZB8r6lTS9lveG1stayn5qY29QQo0JUGaIMEoIB57d64co7V5GU4tRItA3AGkrd9lqRejd4hrqF5n98vhQXXH5Qp6EAcZCAhICuVzdCEXfL7cXU3EW0c9j4FHY=
+	t=1724506957; cv=none; b=gL0Xu9c27vRgCMxmiA//DpCtSc9KCUrEwjuhquzt8KDgrZkBB+qsscQv9PTxeVrV2dUziDi1zsp2cQ3TUwVuwvDkdYKZAJLxIQSdfkUpAe0dHoe77Vmghuj8xTB9T7eUn4jMo71nBFnaEGAh8FDEDcbz34iaAT8hnKXYY0S4H1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724483430; c=relaxed/simple;
-	bh=UMSSgFtE9sSYCRl7FqDQxvs8kkccAFFNVpy/6zc6pq0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=qvLUYjaeKGHZbynOgSrVo47QD1DxOAQffaZGd/1GeYEpf+tg/1ryWwrnFWbEBWMZeJ33SBzK75SclsHx/oXD7baOOrVk+yOXqF2IztqcN+8/lcVS9xoRsFMdcB6T86rFynKKkQULzEF8kCVWeOFWLkSLugYlvn4nGGrasR0yrXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=IYxl7xYi; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="IYxl7xYi"
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47O5S3sA023727;
-	Sat, 24 Aug 2024 07:05:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	ak1bjo5v/J0lhnYtiB4yxlYX1xBnGK1uJl/2njt9Dn4=; b=IYxl7xYiJCXgkflT
-	R2d2uDaG/EIKr4hQCBiCsdb8pOxHz81A7ktgxSvY3jeotypDcpgPvs0wRgJh8KPj
-	leC13oK/4iC1zeovvBwfmFut1yI01apa1qVqaS3uvMRrgigosUFhPLshc4nsqFRm
-	2shBJory1gY5/PA1EKyFT0WuuCEtPDkma9suMKFM2j1bUOs0qVnghTnDCH7d+tmj
-	srPA/rezRTRGlrbDQQC+TgYPg47OtRFFEz5EoJT260+jHAgGgBIw8q394vS7QGbq
-	xu9P7BccrFM0TPncSSpi89sxWXMgiIqxJ7uN4eRUD4q+f4x/Xmgag5mJuufPqUUM
-	dnAaWw==
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 417980r36h-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 24 Aug 2024 07:05:14 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 47O75Dfp025819
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 24 Aug 2024 07:05:13 GMT
-Received: from [10.216.42.154] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Sat, 24 Aug
- 2024 00:05:06 -0700
-Message-ID: <51653ef6-07f3-5419-e85b-b3e26958173f@quicinc.com>
-Date: Sat, 24 Aug 2024 12:34:53 +0530
+	s=arc-20240116; t=1724506957; c=relaxed/simple;
+	bh=bw9ORmxsQ6caup9Mnh9BhSq+xVQNAWDa7nOcdY/pe3s=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=V+VZg6ddiDtMEUGMQCgKuxZA8S7y0eSHraBuOuVRRkSOACZLjooNxo7hqITu76bI3jdfFy/rzPL3zO/jAWNuoLkBHWR1qN0w7GNYEXTHFF2I7mC2zhrvNu63ZuwfwGVgXsX1mImXf6pwzIjGOQaknA96SFUrQ+iVYEJOmq97Sy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1shqtQ-0071uy-0i;
+	Sat, 24 Aug 2024 21:42:10 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 24 Aug 2024 21:42:09 +0800
+Date: Sat, 24 Aug 2024 21:42:09 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: VanGiang Nguyen <vangiang.nguyen@rohde-schwarz.com>
+Cc: steffen.klassert@secunet.com, daniel.m.jordan@oracle.com,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] padata: use integer wrap around to prevent deadlock on
+ seq_nr overflow
+Message-ID: <ZsnjMWrFP0IYJmaa@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.9.1
-Subject: Re: [PATCH v2 01/16] dt-bindings: dma: qcom,bam: Add bam pipe lock
-To: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-CC: <vkoul@kernel.org>, <robh@kernel.org>, <krzk+dt@kernel.org>,
-        <conor+dt@kernel.org>, <andersson@kernel.org>,
-        <konradybcio@kernel.org>, <thara.gopinath@gmail.com>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <gustavoars@kernel.org>, <u.kleine-koenig@pengutronix.de>,
-        <kees@kernel.org>, <agross@kernel.org>,
-        <linux-arm-msm@vger.kernel.org>, <dmaengine@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>, <quic_srichara@quicinc.com>,
-        <quic_varada@quicinc.com>, <quic_utiwari@quicinc.com>
-References: <20240815085725.2740390-1-quic_mdalam@quicinc.com>
- <20240815085725.2740390-2-quic_mdalam@quicinc.com>
- <20240823153958.vk4naz34vgkqzhrb@thinkpad>
-Content-Language: en-US
-From: Md Sadre Alam <quic_mdalam@quicinc.com>
-In-Reply-To: <20240823153958.vk4naz34vgkqzhrb@thinkpad>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: fgyA9iH7KNSk9YsPjZ7AZdROO68WMbCg
-X-Proofpoint-ORIG-GUID: fgyA9iH7KNSk9YsPjZ7AZdROO68WMbCg
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-24_05,2024-08-23_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
- adultscore=0 mlxlogscore=999 spamscore=0 lowpriorityscore=0 clxscore=1015
- malwarescore=0 phishscore=0 priorityscore=1501 mlxscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2407110000
- definitions=main-2408240039
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a16995232eda4d39812f4bd94d9fb846@rohde-schwarz.com>
+X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
 
+VanGiang Nguyen <vangiang.nguyen@rohde-schwarz.com> wrote:
+> When submitting more than 2^32 padata objects to padata_do_serial, the
+> current sorting implementation incorrectly sorts padata objects with
+> overflowed seq_nr, causing them to be placed before existing objects in
+> the reorder list. This leads to a deadlock in the serialization process
+> as padata_find_next cannot match padata->seq_nr and pd->processed
+> because the padata instance with overflowed seq_nr will be selected
+> next.
+> 
+> To fix this, we use an unsigned integer wrap around to correctly sort
+> padata objects in scenarios with integer overflow.
+> 
+> Co-developed-by: Christian Gafert <christian.gafert@rohde-schwarz.com>
+> Signed-off-by: Christian Gafert <christian.gafert@rohde-schwarz.com>
+> Co-developed-by: Max Ferger <max.ferger@rohde-schwarz.com>
+> Signed-off-by: Max Ferger <max.ferger@rohde-schwarz.com>
+> Signed-off-by: Van Giang Nguyen <vangiang.nguyen@rohde-schwarz.com>
+> ---
+> kernel/padata.c | 3 ++-
+> 1 file changed, 2 insertions(+), 1 deletion(-)
 
-
-On 8/23/2024 9:09 PM, Manivannan Sadhasivam wrote:
-> On Thu, Aug 15, 2024 at 02:27:10PM +0530, Md Sadre Alam wrote:
->> BAM having pipe locking mechanism. The Lock and Un-Lock bit
->> should be set on CMD descriptor only. Upon encountering a
->> descriptor with Lock bit set, the BAM will lock all other
->> pipes not related to the current pipe group, and keep
->> handling the current pipe only until it sees the Un-Lock
->> set.
->>
->> Signed-off-by: Md Sadre Alam <quic_mdalam@quicinc.com>
->> ---
->>
->> Change in [v2]
->>
->> * Added initial support for dt-binding
->>
->> Change in [v1]
->>
->> * This patch was not included in [v1]
->>
->>   Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml | 8 ++++++++
->>   1 file changed, 8 insertions(+)
->>
->> diff --git a/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml b/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml
->> index 3ad0d9b1fbc5..91cc2942aa62 100644
->> --- a/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml
->> +++ b/Documentation/devicetree/bindings/dma/qcom,bam-dma.yaml
->> @@ -77,6 +77,12 @@ properties:
->>         Indicates that the bam is powered up by a remote processor but must be
->>         initialized by the local processor.
->>   
->> +  qcom,bam_pipe_lock:
->> +    type: boolean
->> +    description:
->> +      Indicates that the bam pipe needs locking or not based on client driver
->> +      sending the LOCK or UNLOK bit set on command descriptor.
->> +
-> 
-> This looks like a pure driver implementation and doesn't belong to the DT at
-> all. Why can't you add a logic in the driver to use the lock based on some
-> detection mechanism?
-   Sure , will use BAM_SW_VERSION register for detection mechanism, since this
-   support only for bam version above 1.4.0.
-> 
-> - Mani
-> 
->>     reg:
->>       maxItems: 1
->>   
->> @@ -92,6 +98,8 @@ anyOf:
->>         - qcom,powered-remotely
->>     - required:
->>         - qcom,controlled-remotely
->> +  - required:
->> +      - qcom,bam_pipe_lock
->>     - required:
->>         - clocks
->>         - clock-names
->> -- 
->> 2.34.1
->>
->>
-> 
+Patch applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
