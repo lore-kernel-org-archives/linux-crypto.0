@@ -1,99 +1,140 @@
-Received: from smtp.ouvaton.coop (smtp.ouvaton.coop [194.36.166.20])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 354AA1D69E;
-	Sun, 25 Aug 2024 14:56:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.36.166.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43BA9154C11
+	for <linux-crypto@vger.kernel.org>; Sun, 25 Aug 2024 15:58:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724597818; cv=none; b=mCK65pZQDxdm64OYFaiSdUZRA92L38b1XYBtoQMI0q03i8TiJsqorVnbDmiZ9dGBfer7R/Npno99w+WI2RsqhC40iYMJBwbzTjj3LRt2/TSRFBPZdeH3RMZTuG7oOl/Yz6FhmCa8mIxIGcF8VVO8QNN3KfpNjjiv7nQGaga/1b0=
+	t=1724601482; cv=none; b=NE4c8JQxklIRAYMXjnIbYfrrWZ8xFVUNFsu5520sncPlL0k67mXnguKJ9XjGIFmzTiCnpLGLBAH0mXF5n9Vab+RcmOFLRcjNR8KjE09wfj8bvCkoi+eQufULRTIaSOV81O6YIXvuhDCtOyttSq1SIVybq54sEogJ3T3Cv6g9nUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724597818; c=relaxed/simple;
-	bh=pje8LvzpwZxpfyPmKKZhrdQ4pVRqF60UwIBYRCsY1Gg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=H7i3foMqu0xmS+DoGjwggKub2hYKZHSBbmRGRa9atNJoy/SpcgL1usHYJRdzCg0va1K6QL75ZqyXKftATtmv/Rl1egrqWJZ7XvDw7HpK5uJE/ITUBqAgxJrfxesNLw6JN4cKJFAY0NzieeE1oAuq7XGQm6WFFR3SIeZ/b16YMV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=droneaud.fr; spf=pass smtp.mailfrom=droneaud.fr; arc=none smtp.client-ip=194.36.166.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=droneaud.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=droneaud.fr
-Received: from ouvaton.coop (82-65-99-74.subs.proxad.net [82.65.99.74])
+	s=arc-20240116; t=1724601482; c=relaxed/simple;
+	bh=ezffQNU1szIz3pvp4vj5BZ5nLJ9pWUp7VuSOTePVzl4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hI0U7hb8KpeRgFWKpPH3ctFM2oJSVF+YdWbI5f2TM9apFiE297tlHicT3rmZTvALtDSc+ZK4lrUSVw6dqoRQauy+ouCQtMRJKUP87Apx8zISVgnQezWH5l1EM/6TGEEoruTQjFRnRfTKWBodXuZz4ZR2FPwbKQxBCBR0mE/oPTo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Fqz7b1SS; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fqz7b1SS"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1724601479;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HW4V02rxhL7jFxeX8s68XMzeocslCRd9TScmMxpXdJY=;
+	b=Fqz7b1SSDmhka9XEYaqm8iIxaK6zFncAyS+Hjat+RPiGIWjtz8OWe63Q/c4NpmZQu1aEYt
+	KgG7jPrwrbzffkf3gvYhBw+plgzxYMe27nuAL9tFbGvJyIsFFIEJ/PIjjnseHRGrVxmz5c
+	g2Cibu+EikRfB1NTWDDaUnr3EmMxBYc=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-634-k8lLBNtuND2MULniVMKF7g-1; Sun,
+ 25 Aug 2024 11:57:55 -0400
+X-MC-Unique: k8lLBNtuND2MULniVMKF7g-1
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by ouvalternc.octopuce.fr (Postfix) with ESMTPSA id A47952F5EC;
-	Sun, 25 Aug 2024 16:48:12 +0200 (CEST)
-From: Yann Droneaud <yann@droneaud.fr>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: Yann Droneaud <yann@droneaud.fr>,
-	linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-api@vger.kernel.org,
-	Theodore Ts'o  <tytso@mit.edu>,
-	Andy Lutomirski <luto@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Vincenzo Frascino <vincenzo.frascino@arm.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>,
-	Carlos O'Donell <carlos@redhat.com>,
-	Florian Weimer <fweimer@redhat.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Jann Horn <jannh@google.com>,
-	Christian Brauner <brauner@kernel.org>,
-	David Hildenbrand <dhildenb@redhat.com>
-Subject: [PATCH] random: vDSO getrandom() must reject invalid flag
-Date: Sun, 25 Aug 2024 16:47:50 +0200
-Message-ID: <20240825144758.325298-1-yann@droneaud.fr>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20240712014009.281406-3-Jason@zx2c4.com>
-References: <20240712014009.281406-3-Jason@zx2c4.com>
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 507781956080;
+	Sun, 25 Aug 2024 15:57:53 +0000 (UTC)
+Received: from [10.2.16.7] (unknown [10.2.16.7])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 456791955E8C;
+	Sun, 25 Aug 2024 15:57:51 +0000 (UTC)
+Message-ID: <609c9a82-38c9-4643-b62f-16fbd34b20e0@redhat.com>
+Date: Sun, 25 Aug 2024 11:57:50 -0400
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [EXTERNAL] Re: [PATCH] padata: Honor the caller's alignment in
+ case of chunk_size 0
+To: Kamlesh Gurudasani <kamlesh@ti.com>,
+ Steffen Klassert <steffen.klassert@secunet.com>,
+ Daniel Jordan <daniel.m.jordan@oracle.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240822-max-v1-1-cb4bc5b1c101@ti.com>
+ <21df0502-3f16-4afc-9f3c-7825ded578c4@redhat.com>
+ <87y14kn8ev.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
+Content-Language: en-US
+From: Waiman Long <longman@redhat.com>
+In-Reply-To: <87y14kn8ev.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-Like getrandom() syscall, vDSO getrandom() must not let
-unknown flags unnoticed [1].
+On 8/25/24 07:34, Kamlesh Gurudasani wrote:
+> Waiman Long <longman@redhat.com> writes:
+>
+>> This message was sent from outside of Texas Instruments.
+>> Do not click links or open attachments unless you recognize the source of this email and know the content is safe.
+>> Report Suspicious
+>>   
+>> On 8/21/24 17:02, Kamlesh Gurudasani wrote:
+>>> In the case where we are forcing the ps.chunk_size to be at least 1,
+>>> we are ignoring the caller's alignment.
+>>>
+>>> Move the forcing of ps.chunk_size to be at least 1 before rounding it
+>>> up to caller's alignment, so that caller's alignment is honored.
+>>>
+>>> While at it, use max() to force the ps.chunk_size to be at least 1 to
+>>> improve readability.
+>>>
+>>> Fixes: 6d45e1c948a8 ("padata: Fix possible divide-by-0 panic in padata_mt_helper()")
+>>> Signed-off-by: Kamlesh Gurudasani <kamlesh@ti.com>
+>>> ---
+>>>    kernel/padata.c | 12 ++++--------
+>>>    1 file changed, 4 insertions(+), 8 deletions(-)
+>>>
+>>> diff --git a/kernel/padata.c b/kernel/padata.c
+>>> index 0fa6c2895460..d8a51eff1581 100644
+>>> --- a/kernel/padata.c
+>>> +++ b/kernel/padata.c
+>>> @@ -509,21 +509,17 @@ void __init padata_do_multithreaded(struct padata_mt_job *job)
+>>>    
+>>>    	/*
+>>>    	 * Chunk size is the amount of work a helper does per call to the
+>>> -	 * thread function.  Load balance large jobs between threads by
+>>> +	 * thread function. Load balance large jobs between threads by
+>>>    	 * increasing the number of chunks, guarantee at least the minimum
+>>>    	 * chunk size from the caller, and honor the caller's alignment.
+>>> +	 * Ensure chunk_size is at least 1 to prevent divide-by-0
+>>> +	 * panic in padata_mt_helper().
+>>>    	 */
+>>>    	ps.chunk_size = job->size / (ps.nworks * load_balance_factor);
+>>>    	ps.chunk_size = max(ps.chunk_size, job->min_chunk);
+>>> +	ps.chunk_size = max(ps.chunk_size, 1ul);
+>>>    	ps.chunk_size = roundup(ps.chunk_size, job->align);
+>>>    
+>>> -	/*
+>>> -	 * chunk_size can be 0 if the caller sets min_chunk to 0. So force it
+>>> -	 * to at least 1 to prevent divide-by-0 panic in padata_mt_helper().`
+>>> -	 */
+>>> -	if (!ps.chunk_size)
+>>> -		ps.chunk_size = 1U;
+>>> -
+>>>    	list_for_each_entry(pw, &works, pw_list)
+>>>    		if (job->numa_aware) {
+>>>    			int old_node = atomic_read(&last_used_nid);
+>>>
+>>> ---
+>>> base-commit: b311c1b497e51a628aa89e7cb954481e5f9dced2
+>>> change-id: 20240822-max-93c17adc6457
+>> LGTM, my only nit is the use of "1ul" which is less common and harder to
+>> read than "1UL" as the former one may be misread as a "lul" variable.
+>>
+>> Acked-by:  Waiman Long <longman@redhat.com>
+> Thanks for the Acked-by, Waiman. I understand your point, though Daniel seems
+> to be okay with this, so will keep it as is this time.
 
-It could be possible to return -EINVAL from vDSO, but
-in the likely case a new flag is added to getrandom()
-syscall in the future, it would be nicer to get the
-behavior from the syscall, instead of an error until
-the vDSO is extended to support the new flag.
+This is just a suggestion in case you need to update your patch. I am 
+fine with keeping it as is if no further update is needed.
 
-[1] Designing the API: Planning for Extension
-    https://docs.kernel.org/process/adding-syscalls.html#designing-the-api-planning-for-extension
-
-Signed-off-by: Yann Droneaud <yann@droneaud.fr>
----
- lib/vdso/getrandom.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-Hi Jason,
-
-Please indulge me as I'm a bit late to add some junk to the conversation[2].
-
-[2] Re: [RFC PATCH 0/4] random: a simple vDSO mechanism for reseeding userspace CSPRNGs
-    https://lore.kernel.org/all/CAHmME9oXB8=jUz98tv6k1xS+ELaRmgartoT6go_1axhH1L-HJg@mail.gmail.com/
-
-Bye.
-
-diff --git a/lib/vdso/getrandom.c b/lib/vdso/getrandom.c
-index b230f0b10832..be9db42c8309 100644
---- a/lib/vdso/getrandom.c
-+++ b/lib/vdso/getrandom.c
-@@ -89,6 +89,10 @@ __cvdso_getrandom_data(const struct vdso_rng_data *rng_info, void *buffer, size_
- 	if (unlikely(opaque_len != sizeof(*state)))
- 		goto fallback_syscall;
- 
-+	/* Unexpected flags are to be handled by the kernel */
-+	if (unlikely(flags & ~(GRND_NONBLOCK | GRND_RANDOM | GRND_INSECURE)))
-+		goto fallback_syscall;
-+
- 	/*
- 	 * If the kernel's RNG is not yet ready, then it's not possible to provide random bytes from
- 	 * userspace, because A) the various @flags require this to block, or not, depending on
--- 
-2.46.0
+Cheers,
+Longman
 
