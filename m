@@ -1,161 +1,74 @@
-Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2BC8129A74;
-	Mon, 26 Aug 2024 07:36:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACAD013FD84;
+	Mon, 26 Aug 2024 08:54:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724657770; cv=none; b=Lxe+fTvKnMbN3B5EeWWeiKEqw729miqGb0EOX/cFPTphEmq+f5GuA4qPTSa4JASKlwqBEB6aMKjGaeVkUf0BvF7UtbfolV40LJ5DIMupUp6bFSbZ7RAYAASqYc5HFdAGmwnUytas/fiD0rUdpNyh7rf7DzLkFUYHCqNopmcrmMg=
+	t=1724662466; cv=none; b=VHeiEQ/YjCNHri2e/zljacQrlXrXzZgsi91HberUlugVCQ5AqHbEsvv/bqElRZ8WBR1YwDGwoeo9QMGFXCpVEV68T5USJEsHaaFt0ZaqH2uJb9Z/yY6cqhwrOEBq0qlmNEGJaTKb/svkXeI2Y9PBKI3ivkwe7MDRIzVJ6M13YMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724657770; c=relaxed/simple;
-	bh=gvY8AH4a88MP1lz2m4OgJjyz6KDbapZwsTzDMYuixg4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=q9e6f2b3jHBoAH8BpIvMHkHVknrXEDoBEKzh4pEzKhMVQSYALa6l3BR6Z/8N+97rFlIZ1Ye/kM6XUsvrACGrVjcKvfo+fxvW8prd31fqSImTI7l8yosWlSJtmbgqvBn6aMpcOxWj/HEMovetPnfs4nPx0vdXulDiDBBwwqJlCik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=UssJl6wd; arc=none smtp.client-ip=54.207.22.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+	s=arc-20240116; t=1724662466; c=relaxed/simple;
+	bh=rR9SM/nBlqlqKsdKY9O/8t2YAXbtoNLDK4wyVeQBQ74=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WGLE/87PDv/tiMjb+HIcvp+vP+JUYMRQhIBrBWCoE77O27iDpUvscLE4XgTaxNCYyt6EYGzw+CKWGbdnkOSLfi4y2jb8dq4nULH+YKDaZJ016z1D5TY8PnGO4WoBf6Wj0HD5L3ElccDBn4RRpIyAIVJMwTRRHPEwZGkrHf82NV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=jGFPOdTQ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="UssJl6wd"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1724657731;
-	bh=BHo9Isz2T8wnA4FQQqg3YttItu9Af8Lpgwwo2oZ48CY=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=UssJl6wdqsO8BmTIvBZeUKUjMZvAScE+J1fpkkKhc3KcYBXE1CLidqQaYCrrXC6dJ
-	 PxuIkgljjw98g6O3oIZH08/UNoDEf73Tt0zFkcinUs9ps/1izE8eogjm7jxtTTHMHc
-	 jA81Dhwu6qBchNh7DA0oIizcMSBHyj4+SewSbpjw=
-X-QQ-mid: bizesmtpsz1t1724657724t649sll
-X-QQ-Originating-IP: uwki6QKLS7//uyngcBsEu/Z1SrjmGyWbJZ5KjC6R5NM=
-Received: from localhost.localdomain ( [113.57.152.160])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 26 Aug 2024 15:35:22 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 16075421044122579621
-From: WangYuli <wangyuli@uniontech.com>
-To: herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	tsbogend@alpha.franken.de
-Cc: linux-crypto@vger.kernel.org,
-	linux-mips@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	WangYuli <wangyuli@uniontech.com>,
-	"Maciej W . Rozycki" <macro@orcam.me.uk>,
-	Guan Wentao <guanwentao@uniontech.com>
-Subject: [PATCH v2] MIPS: crypto: Clean up useless assignment operations
-Date: Mon, 26 Aug 2024 15:35:18 +0800
-Message-ID: <E77DE576D872065A+20240826073518.812454-1-wangyuli@uniontech.com>
-X-Mailer: git-send-email 2.43.4
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="jGFPOdTQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67C4AC4E696;
+	Mon, 26 Aug 2024 08:54:25 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="jGFPOdTQ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1724662464;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AF81dAGwjtoyy9T08zoVHtx/QpSDpioe8XEVyMBlDxI=;
+	b=jGFPOdTQ2tKl1v/SItPmVwABTErg9P4ahKTWxhM0XGcy4WilGBSWg5cAP59fRtVjqNpCn2
+	2i20abVs1gPQNp4B3Bu0dPCCTC+UBg7sI+zL1CchuLcBxlVEG24LniL4piECyrEmjVI9Sl
+	w9M+CbiYG5OpW0jSs2eeL0jDzR5CL5M=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 4ea437a1 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Mon, 26 Aug 2024 08:54:23 +0000 (UTC)
+Date: Mon, 26 Aug 2024 10:54:18 +0200
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Xi Ruoyao <xry111@xry111.site>
+Cc: Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>,
+	linux-crypto@vger.kernel.org, loongarch@lists.linux.dev,
+	Jinyang He <hejinyang@loongson.cn>,
+	Tiezhu Yang <yangtiezhu@loongson.cn>, Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH v2 0/2] LoongArch: Implement getrandom() in vDSO
+Message-ID: <ZsxCuvkJLDrS1qX1@zx2c4.com>
+References: <20240815133357.35829-1-xry111@xry111.site>
+ <Zr4K77uPi3CMfE-S@zx2c4.com>
+ <b39ba1dea300c905f377af4cf3702ce4226cabc7.camel@xry111.site>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtpsz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <b39ba1dea300c905f377af4cf3702ce4226cabc7.camel@xry111.site>
 
-When entering the "len & sizeof(u32)" branch, len must be less than 8.
-So after one operation, len must be less than 4.
-At this time, "len -= sizeof(u32)" is not necessary for 64-bit CPUs.
+On Mon, Aug 26, 2024 at 02:32:05PM +0800, Xi Ruoyao wrote:
+> On Thu, 2024-08-15 at 14:04 +0000, Jason A. Donenfeld wrote:
+> > Thanks for posting this! That's very nice to see.
+> > 
+> > I'm currently traveling without my laptop (actually in Yunnan, China!),
+> > so I'll be able to take a look at this for real starting the 26th, as
+> > right now I'm just on my cellphone using lore+mutt.
+> 
+> Hi Jason,
+> 
+> When you start the reviewing I guess you can check out the powerpc
+> implementation first and add me into the Cc of your reply.  There seems
+> something useful to me in the powerpc implementation (avoiding memset,
+> adding __arch_get_k_vdso_data so I wouldn't need the inline asm trick
+> for the _vdso_rng_data symbol, and the selftest support).
 
-After that, replace `while' loops with equivalent `for' to make the
-code structure a little bit better by the way.
+Indeed, I just committed a bit of those fixups to the random.git tree,
+if you want to base your work on that for the time being:
 
-Suggested-by: Maciej W. Rozycki <macro@orcam.me.uk>
-Link: https://lore.kernel.org/all/alpine.DEB.2.21.2406281713040.43454@angie.orcam.me.uk/
-Signed-off-by: Guan Wentao <guanwentao@uniontech.com>
-Signed-off-by: WangYuli <wangyuli@uniontech.com>
----
- arch/mips/crypto/crc32-mips.c | 27 +++++++--------------------
- 1 file changed, 7 insertions(+), 20 deletions(-)
-
-diff --git a/arch/mips/crypto/crc32-mips.c b/arch/mips/crypto/crc32-mips.c
-index ec6d58008f8e..3a80b7576ec3 100644
---- a/arch/mips/crypto/crc32-mips.c
-+++ b/arch/mips/crypto/crc32-mips.c
-@@ -77,36 +77,29 @@ static u32 crc32_mips_le_hw(u32 crc_, const u8 *p, unsigned int len)
- {
- 	u32 crc = crc_;
- 
--#ifdef CONFIG_64BIT
--	while (len >= sizeof(u64)) {
-+#if IS_ENABLED(CONFIG_64BIT)
-+	for (; len >= sizeof(u64); p += sizeof(u64), len -= sizeof(u64)) {
- 		u64 value = get_unaligned_le64(p);
--
- 		CRC32(crc, value, d);
--		p += sizeof(u64);
--		len -= sizeof(u64);
- 	}
- 
- 	if (len & sizeof(u32)) {
- #else /* !CONFIG_64BIT */
--	while (len >= sizeof(u32)) {
-+	for (; len >= sizeof(u32); len -= sizeof(u32)) {
- #endif
- 		u32 value = get_unaligned_le32(p);
--
- 		CRC32(crc, value, w);
- 		p += sizeof(u32);
--		len -= sizeof(u32);
- 	}
- 
- 	if (len & sizeof(u16)) {
- 		u16 value = get_unaligned_le16(p);
--
- 		CRC32(crc, value, h);
- 		p += sizeof(u16);
- 	}
- 
- 	if (len & sizeof(u8)) {
- 		u8 value = *p++;
--
- 		CRC32(crc, value, b);
- 	}
- 
-@@ -117,38 +110,32 @@ static u32 crc32c_mips_le_hw(u32 crc_, const u8 *p, unsigned int len)
- {
- 	u32 crc = crc_;
- 
--#ifdef CONFIG_64BIT
--	while (len >= sizeof(u64)) {
-+#if IS_ENABLED(CONFIG_64BIT)
-+	for (; len >= sizeof(u64); p += sizeof(u64), len -= sizeof(u64)) {
- 		u64 value = get_unaligned_le64(p);
--
- 		CRC32C(crc, value, d);
--		p += sizeof(u64);
--		len -= sizeof(u64);
- 	}
- 
- 	if (len & sizeof(u32)) {
- #else /* !CONFIG_64BIT */
--	while (len >= sizeof(u32)) {
-+	for (; len >= sizeof(u32); len -= sizeof(u32)) {
- #endif
- 		u32 value = get_unaligned_le32(p);
--
- 		CRC32C(crc, value, w);
- 		p += sizeof(u32);
--		len -= sizeof(u32);
- 	}
- 
- 	if (len & sizeof(u16)) {
- 		u16 value = get_unaligned_le16(p);
--
- 		CRC32C(crc, value, h);
- 		p += sizeof(u16);
- 	}
- 
- 	if (len & sizeof(u8)) {
- 		u8 value = *p++;
--
- 		CRC32C(crc, value, b);
- 	}
-+
- 	return crc;
- }
- 
--- 
-2.43.4
-
+   https://git.kernel.org/pub/scm/linux/kernel/git/crng/random.git/log/
