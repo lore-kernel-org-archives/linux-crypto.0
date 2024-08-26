@@ -1,49 +1,49 @@
-Received: from smtp-relay-canonical-0.canonical.com (smtp-relay-canonical-0.canonical.com [185.125.188.120])
+Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8419130ADA
-	for <linux-crypto@vger.kernel.org>; Mon, 26 Aug 2024 07:15:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2BC8129A74;
+	Mon, 26 Aug 2024 07:36:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724656507; cv=none; b=ThWfZy5xQQTnvZxuzkdB9qhXB2vEqarOSIh6jdizNib9niP9zhiZkSCo7v/KNzEJoW4dQ1UHbJvz98QovesmlRGM35HOQOVM/T21HJxu5kjnXk5XHwZamYXdwvSyqSRTKWxgu5S/NJ0tzaRYtHzjks5Fn6hs612R3HVnlE4zM9o=
+	t=1724657770; cv=none; b=Lxe+fTvKnMbN3B5EeWWeiKEqw729miqGb0EOX/cFPTphEmq+f5GuA4qPTSa4JASKlwqBEB6aMKjGaeVkUf0BvF7UtbfolV40LJ5DIMupUp6bFSbZ7RAYAASqYc5HFdAGmwnUytas/fiD0rUdpNyh7rf7DzLkFUYHCqNopmcrmMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724656507; c=relaxed/simple;
-	bh=qDAxbfStrZE1C7xsT/1dyQQQA12Bx8WVEzo2heqH498=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=F5GaHcBafPgS781XOC6quAJ/feqLSJabxKcAszMemRvCDzkzOmhCWI5uZKRRJGiwEr13dGgEkP+4X1QGy90DiStlq4VmLcSZPct3hj7hOTqKUKiuVodbWoigbX6zIT38mRF7ZY+gpPL9Af2e377WIrzgIbnhk0bh6+rZSe5A34o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=Z2el6X1/; arc=none smtp.client-ip=185.125.188.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+	s=arc-20240116; t=1724657770; c=relaxed/simple;
+	bh=gvY8AH4a88MP1lz2m4OgJjyz6KDbapZwsTzDMYuixg4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=q9e6f2b3jHBoAH8BpIvMHkHVknrXEDoBEKzh4pEzKhMVQSYALa6l3BR6Z/8N+97rFlIZ1Ye/kM6XUsvrACGrVjcKvfo+fxvW8prd31fqSImTI7l8yosWlSJtmbgqvBn6aMpcOxWj/HEMovetPnfs4nPx0vdXulDiDBBwwqJlCik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=UssJl6wd; arc=none smtp.client-ip=54.207.22.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="Z2el6X1/"
-Received: from laptop.lan (unknown [125.33.218.254])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-canonical-0.canonical.com (Postfix) with ESMTPSA id 47BB040958;
-	Mon, 26 Aug 2024 07:04:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1724655870;
-	bh=gAlDnV00OTi8pOFAQvJJe9at6x6rDLA71GGMr4eI9rs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
-	b=Z2el6X1/fY1wc1fFsRSyoIlp9qBErm9kXKZcrvzLG1pKHpREBYrra2to49U9iOGCm
-	 DoXWADbBeiI7bnjF8kYJHT2alR9G1hl2aGpyiFCaUDr7ajeAKie80HqWpmg0jRm+zM
-	 xKALjg+angNL+TtQSJ4FniiQV1fj6OEOy+12j2Zjgg3/q4fn1QEHAoZEn9R9YXFjeE
-	 k3gy0nef3E21WHgyvq2d6DYSYM99NE4PEjW369wsO72rb71dq8q7x3nBqpBxZday8v
-	 UWpqgYNF0OHAepgvPkc26dcNl9TOQmmhTx/y9jdsh6nBYlVbUiSvRYQ2HE5TvnDcin
-	 ju4H2czWLnD/A==
-From: Guoqing Jiang <guoqing.jiang@canonical.com>
-To: sean.wang@mediatek.com,
-	olivia@selenic.com,
-	herbert@gondor.apana.org.au,
-	matthias.bgg@gmail.com,
-	angelogioacchino.delregno@collabora.com
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="UssJl6wd"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1724657731;
+	bh=BHo9Isz2T8wnA4FQQqg3YttItu9Af8Lpgwwo2oZ48CY=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=UssJl6wdqsO8BmTIvBZeUKUjMZvAScE+J1fpkkKhc3KcYBXE1CLidqQaYCrrXC6dJ
+	 PxuIkgljjw98g6O3oIZH08/UNoDEf73Tt0zFkcinUs9ps/1izE8eogjm7jxtTTHMHc
+	 jA81Dhwu6qBchNh7DA0oIizcMSBHyj4+SewSbpjw=
+X-QQ-mid: bizesmtpsz1t1724657724t649sll
+X-QQ-Originating-IP: uwki6QKLS7//uyngcBsEu/Z1SrjmGyWbJZ5KjC6R5NM=
+Received: from localhost.localdomain ( [113.57.152.160])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Mon, 26 Aug 2024 15:35:22 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 16075421044122579621
+From: WangYuli <wangyuli@uniontech.com>
+To: herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	tsbogend@alpha.franken.de
 Cc: linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH] hwrng: mtk - Use devm_pm_runtime_enable
-Date: Mon, 26 Aug 2024 15:04:15 +0800
-Message-Id: <20240826070415.12425-1-guoqing.jiang@canonical.com>
-X-Mailer: git-send-email 2.34.1
+	linux-mips@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	WangYuli <wangyuli@uniontech.com>,
+	"Maciej W . Rozycki" <macro@orcam.me.uk>,
+	Guan Wentao <guanwentao@uniontech.com>
+Subject: [PATCH v2] MIPS: crypto: Clean up useless assignment operations
+Date: Mon, 26 Aug 2024 15:35:18 +0800
+Message-ID: <E77DE576D872065A+20240826073518.812454-1-wangyuli@uniontech.com>
+X-Mailer: git-send-email 2.43.4
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -51,33 +51,111 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpsz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
-Replace pm_runtime_enable with the devres-enabled version which
-can trigger pm_runtime_disable.
+When entering the "len & sizeof(u32)" branch, len must be less than 8.
+So after one operation, len must be less than 4.
+At this time, "len -= sizeof(u32)" is not necessary for 64-bit CPUs.
 
-Otherwise, the below appears during reload driver.
+After that, replace `while' loops with equivalent `for' to make the
+code structure a little bit better by the way.
 
-mtk_rng 1020f000.rng: Unbalanced pm_runtime_enable!
-
-Suggested-by: Chen-Yu Tsai <wenst@chromium.org>
-Signed-off-by: Guoqing Jiang <guoqing.jiang@canonical.com>
+Suggested-by: Maciej W. Rozycki <macro@orcam.me.uk>
+Link: https://lore.kernel.org/all/alpine.DEB.2.21.2406281713040.43454@angie.orcam.me.uk/
+Signed-off-by: Guan Wentao <guanwentao@uniontech.com>
+Signed-off-by: WangYuli <wangyuli@uniontech.com>
 ---
- drivers/char/hw_random/mtk-rng.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/mips/crypto/crc32-mips.c | 27 +++++++--------------------
+ 1 file changed, 7 insertions(+), 20 deletions(-)
 
-diff --git a/drivers/char/hw_random/mtk-rng.c b/drivers/char/hw_random/mtk-rng.c
-index aa993753ab12..1e3048f2bb38 100644
---- a/drivers/char/hw_random/mtk-rng.c
-+++ b/drivers/char/hw_random/mtk-rng.c
-@@ -142,7 +142,7 @@ static int mtk_rng_probe(struct platform_device *pdev)
- 	dev_set_drvdata(&pdev->dev, priv);
- 	pm_runtime_set_autosuspend_delay(&pdev->dev, RNG_AUTOSUSPEND_TIMEOUT);
- 	pm_runtime_use_autosuspend(&pdev->dev);
--	pm_runtime_enable(&pdev->dev);
-+	devm_pm_runtime_enable(&pdev->dev);
+diff --git a/arch/mips/crypto/crc32-mips.c b/arch/mips/crypto/crc32-mips.c
+index ec6d58008f8e..3a80b7576ec3 100644
+--- a/arch/mips/crypto/crc32-mips.c
++++ b/arch/mips/crypto/crc32-mips.c
+@@ -77,36 +77,29 @@ static u32 crc32_mips_le_hw(u32 crc_, const u8 *p, unsigned int len)
+ {
+ 	u32 crc = crc_;
  
- 	dev_info(&pdev->dev, "registered RNG driver\n");
+-#ifdef CONFIG_64BIT
+-	while (len >= sizeof(u64)) {
++#if IS_ENABLED(CONFIG_64BIT)
++	for (; len >= sizeof(u64); p += sizeof(u64), len -= sizeof(u64)) {
+ 		u64 value = get_unaligned_le64(p);
+-
+ 		CRC32(crc, value, d);
+-		p += sizeof(u64);
+-		len -= sizeof(u64);
+ 	}
+ 
+ 	if (len & sizeof(u32)) {
+ #else /* !CONFIG_64BIT */
+-	while (len >= sizeof(u32)) {
++	for (; len >= sizeof(u32); len -= sizeof(u32)) {
+ #endif
+ 		u32 value = get_unaligned_le32(p);
+-
+ 		CRC32(crc, value, w);
+ 		p += sizeof(u32);
+-		len -= sizeof(u32);
+ 	}
+ 
+ 	if (len & sizeof(u16)) {
+ 		u16 value = get_unaligned_le16(p);
+-
+ 		CRC32(crc, value, h);
+ 		p += sizeof(u16);
+ 	}
+ 
+ 	if (len & sizeof(u8)) {
+ 		u8 value = *p++;
+-
+ 		CRC32(crc, value, b);
+ 	}
+ 
+@@ -117,38 +110,32 @@ static u32 crc32c_mips_le_hw(u32 crc_, const u8 *p, unsigned int len)
+ {
+ 	u32 crc = crc_;
+ 
+-#ifdef CONFIG_64BIT
+-	while (len >= sizeof(u64)) {
++#if IS_ENABLED(CONFIG_64BIT)
++	for (; len >= sizeof(u64); p += sizeof(u64), len -= sizeof(u64)) {
+ 		u64 value = get_unaligned_le64(p);
+-
+ 		CRC32C(crc, value, d);
+-		p += sizeof(u64);
+-		len -= sizeof(u64);
+ 	}
+ 
+ 	if (len & sizeof(u32)) {
+ #else /* !CONFIG_64BIT */
+-	while (len >= sizeof(u32)) {
++	for (; len >= sizeof(u32); len -= sizeof(u32)) {
+ #endif
+ 		u32 value = get_unaligned_le32(p);
+-
+ 		CRC32C(crc, value, w);
+ 		p += sizeof(u32);
+-		len -= sizeof(u32);
+ 	}
+ 
+ 	if (len & sizeof(u16)) {
+ 		u16 value = get_unaligned_le16(p);
+-
+ 		CRC32C(crc, value, h);
+ 		p += sizeof(u16);
+ 	}
+ 
+ 	if (len & sizeof(u8)) {
+ 		u8 value = *p++;
+-
+ 		CRC32C(crc, value, b);
+ 	}
++
+ 	return crc;
+ }
  
 -- 
-2.34.1
+2.43.4
 
