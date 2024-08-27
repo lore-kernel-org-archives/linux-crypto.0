@@ -1,85 +1,107 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB556146590;
-	Tue, 27 Aug 2024 18:48:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 851ED1C4623
+	for <linux-crypto@vger.kernel.org>; Tue, 27 Aug 2024 18:50:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724784521; cv=none; b=h3qpFzUoFU7MrzLqKoT1qAGmcYjGaXOME8Pmeyahf/QtoN/OZhpsc1G3J2HfcwO2mcnRX2ZARnuXN36Fv56zEBKBQ+lefpto6UYzt+7YeznIMY++MukTl5geu2wVTI17l97rYON0727Tuzxyt0LQWFzgZSXzxVI+EPeyV0l5eQ0=
+	t=1724784630; cv=none; b=XmoHN1TPBCcdXceizHaLQXvJByh9Jrq2qtURURAZhPISqJNFC7b/LFcuR8bBA09sQ+SATSSCSmsYn2zUODk7d4MPyvf41+ACIG9Je1GrvAqRuSlKA3pL7tmnu+5v8AdsesGQiNSKiQm+qrqp3JZOj6r5MKSGho381VYx+xv0igs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724784521; c=relaxed/simple;
-	bh=TOskMyqvmJnMMdMK9trHR8rWGt1L+cQe4Dtdla0PK+0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UNV3ZgJIuhWI7cd0FLWy8YlQw+H96t0bJjAsOwkqEK6E0mMx7seYWBPInzd6gEWzGcyXSxNx+xZtjGJ2lqVBtbYMo2ZzNvu8nyyv+CT2zG/ROIhSWF5JnfEsMoqeb9snp+XSvroCUIpccs8LDFSemhNdqWZpBAt4Htvd5TSvCQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=murPJKnr; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1724784630; c=relaxed/simple;
+	bh=lO6oBz8F+JLDitPwAQRjYCldOeflcpaDAiJnMhqg67Q=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=XxLiKODIMOppldgh8RWGlXEubybUR1JRqJ/WhvZdqpOHorILXevPHo8BeZlIlyh7ELVGAy3Yu2USE+swghccL6soCve/hs0j+oz9+hB2spSnVkiLGnEID0KB8pgaE32+GnTOVXHBkPWusi3GQlLbRhX8rSXo/hq0bJPQoA8EOq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hl71/cGl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="murPJKnr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55A4DC4FF4D;
-	Tue, 27 Aug 2024 18:48:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hl71/cGl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 031F8C55DF5
+	for <linux-crypto@vger.kernel.org>; Tue, 27 Aug 2024 18:50:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724784521;
-	bh=TOskMyqvmJnMMdMK9trHR8rWGt1L+cQe4Dtdla0PK+0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=murPJKnrocvWfXX7rWlYLG3ledHoOxLgwG/e1Qwf9cs/KuUhuSnLz6a4PwpOAICuO
-	 7I+yhTbPeHZEp0GMdcgKfU0849z1wX6+w4+F9r3xzYA8tUC5mvlm6uoY/lydfbwgcL
-	 YbZIPndcqpP30be39cIFQKzkQXAUHFLV4iZilqIUEFJk/d1I4ZpM9MeRfk61F3L/UW
-	 qi4FAvEF0mCdQd+kCGVRsp45+khRStTBMoO2AwnBPxsNa1wzB6aRfW1uEKXueg92JN
-	 9KlbU+LvI6rKoGjx+2KIIvtsiGAkGuLnPpWBzAzReks4ZfNBEaaseoATd97fcjlw86
-	 yeTIdEUTFmOhw==
-Date: Tue, 27 Aug 2024 11:48:39 -0700
+	s=k20201202; t=1724784630;
+	bh=lO6oBz8F+JLDitPwAQRjYCldOeflcpaDAiJnMhqg67Q=;
+	h=From:To:Subject:Date:From;
+	b=hl71/cGlUdNqrVgu9CtaXBkXKLc7HUktERY/l9vAh+WH1w2K3PcyiUGPzfm7WluWx
+	 fjS5ko2vm402qs39z/+ZvN6lAMtitrLxr14icxucndLk96zfqWsedA3gcbVjmh/b9V
+	 j8c5Wa8j0caKuXUP+LwhnlP0XB9cta5AAxUfIa1ExVGH9unsnPtpfS6wrflN5gZng4
+	 31XyQVg841DeSo0aU3d2C3FDqvj+kDarlmFMumI/mtBJHGZtLXwnLws2dR627E1901
+	 VR2UYcBrKrgs2I8JasbrJNYPWBhnBx7IfWy6M8XmBOotN92FIo2gnHVyhvlSGz4qrj
+	 ViNnwvcSKprtw==
 From: Eric Biggers <ebiggers@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: kernel test robot <oliver.sang@intel.com>, oe-lkp@lists.linux.dev,
-	lkp@intel.com, linux-crypto@vger.kernel.org, ltp@lists.linux.it,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	"Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>
-Subject: Re: [v3 PATCH 3/3] crypto: simd - Do not call crypto_alloc_tfm
- during registration
-Message-ID: <20240827184839.GD2049@sol.localdomain>
-References: <ZrbTUk6DyktnO7qk@gondor.apana.org.au>
- <202408161634.598311fd-oliver.sang@intel.com>
- <ZsBJs_C6GdO_qgV7@gondor.apana.org.au>
- <ZsBJ5H4JExArHGVw@gondor.apana.org.au>
- <ZsBKG0la0m69Dyq3@gondor.apana.org.au>
+To: linux-crypto@vger.kernel.org
+Subject: [PATCH] crypto: x86/aesni - update docs for aesni-intel module
+Date: Tue, 27 Aug 2024 11:50:01 -0700
+Message-ID: <20240827185001.71699-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZsBKG0la0m69Dyq3@gondor.apana.org.au>
+Content-Transfer-Encoding: 8bit
 
-On Sat, Aug 17, 2024 at 02:58:35PM +0800, Herbert Xu wrote:
-> Algorithm registration is usually carried out during module init,
-> where as little work as possible should be carried out.  The SIMD
-> code violated this rule by allocating a tfm, this then triggers a
-> full test of the algorithm which may dead-lock in certain cases.
-> 
-> SIMD is only allocating the tfm to get at the alg object, which is
-> in fact already available as it is what we are registering.  Use
-> that directly and remove the crypto_alloc_tfm call.
-> 
-> Also remove some obsolete and unused SIMD API.
-> 
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> ---
->  arch/arm/crypto/aes-ce-glue.c     |  2 +-
->  arch/arm/crypto/aes-neonbs-glue.c |  2 +-
->  crypto/simd.c                     | 76 ++++++-------------------------
->  include/crypto/internal/simd.h    | 12 +----
->  4 files changed, 19 insertions(+), 73 deletions(-)
-> 
+From: Eric Biggers <ebiggers@google.com>
 
-I'm getting a test failure with this series applied:
+Update the kconfig help and module description to reflect that VAES
+instructions are now used in some cases.  Also fix XTR => XCTR.
 
-[    0.383128] alg: aead: failed to allocate transform for gcm_base(ctr(aes-generic),ghash-generic): -2
-[    0.383500] alg: self-tests for gcm(aes) using gcm_base(ctr(aes-generic),ghash-generic) failed (rc=-2)
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ arch/x86/crypto/Kconfig            | 8 ++++++--
+ arch/x86/crypto/aesni-intel_glue.c | 2 +-
+ 2 files changed, 7 insertions(+), 3 deletions(-)
 
-This is on x86_64 with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y.
+diff --git a/arch/x86/crypto/Kconfig b/arch/x86/crypto/Kconfig
+index 24875e6295f2d..7b1bebed879df 100644
+--- a/arch/x86/crypto/Kconfig
++++ b/arch/x86/crypto/Kconfig
+@@ -12,25 +12,29 @@ config CRYPTO_CURVE25519_X86
+ 
+ 	  Architecture: x86_64 using:
+ 	  - ADX (large integer arithmetic)
+ 
+ config CRYPTO_AES_NI_INTEL
+-	tristate "Ciphers: AES, modes: ECB, CBC, CTS, CTR, XTR, XTS, GCM (AES-NI)"
++	tristate "Ciphers: AES, modes: ECB, CBC, CTS, CTR, XCTR, XTS, GCM (AES-NI/VAES)"
+ 	depends on X86
+ 	select CRYPTO_AEAD
+ 	select CRYPTO_LIB_AES
+ 	select CRYPTO_LIB_GF128MUL
+ 	select CRYPTO_ALGAPI
+ 	select CRYPTO_SKCIPHER
+ 	select CRYPTO_SIMD
+ 	help
+ 	  Block cipher: AES cipher algorithms
+ 	  AEAD cipher: AES with GCM
+-	  Length-preserving ciphers: AES with ECB, CBC, CTS, CTR, XTR, XTS
++	  Length-preserving ciphers: AES with ECB, CBC, CTS, CTR, XCTR, XTS
+ 
+ 	  Architecture: x86 (32-bit and 64-bit) using:
+ 	  - AES-NI (AES new instructions)
++	  - VAES (Vector AES)
++
++	  Some algorithm implementations are supported only in 64-bit builds,
++	  and some have additional prerequisites such as AVX2 or AVX512.
+ 
+ config CRYPTO_BLOWFISH_X86_64
+ 	tristate "Ciphers: Blowfish, modes: ECB, CBC"
+ 	depends on X86 && 64BIT
+ 	select CRYPTO_SKCIPHER
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index d63ba9eaba3e4..b0dd835554997 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -1748,8 +1748,8 @@ static void __exit aesni_exit(void)
+ }
+ 
+ late_initcall(aesni_init);
+ module_exit(aesni_exit);
+ 
+-MODULE_DESCRIPTION("Rijndael (AES) Cipher Algorithm, Intel AES-NI instructions optimized");
++MODULE_DESCRIPTION("AES cipher and modes, optimized with AES-NI or VAES instructions");
+ MODULE_LICENSE("GPL");
+ MODULE_ALIAS_CRYPTO("aes");
 
-- Eric
+base-commit: 3c44d31cb34ce4eb8311a2e73634d57702948230
+-- 
+2.46.0
+
