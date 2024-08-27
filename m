@@ -1,49 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDE3C1EEE0;
-	Tue, 27 Aug 2024 08:53:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AB3819ADB0;
+	Tue, 27 Aug 2024 09:45:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724748833; cv=none; b=F0Pjn1J4lTomXyYIYyc+XYJik9/BwGyMtS9C3Ew/M3xGFlJ4o0ujoBT9fEB1D4iF92IJyYpApy+7tinfaLER5ArMnf69mFWAosZ/VpInJH/U5rXGY8R7Owej8La8aDgGXUoYIGJRWMQ8rWmpRjdFcAvkctITGgmk5XBJMcGODD8=
+	t=1724751940; cv=none; b=RX13CTw/wK2pyx1qijh1BmQm1RA/Ig6+jgo2fBsRNwNQMhw5MxIs2uwLeMbnt0Prv22DrD9oH5h6FuDXjYRiC3v/sxdXFihRNtfAtfxkUo11qKkIx5gA8cB5PttWkMlNVrnZmLDSNfr4sQfwsFoFi02b1Y4pM7OdKBhuElCXp68=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724748833; c=relaxed/simple;
-	bh=uJh1BECLYykryv2qkUmuuEWHi81HJAVxT6K2ErkpGBo=;
+	s=arc-20240116; t=1724751940; c=relaxed/simple;
+	bh=eVclaBJ2YxjTVTaOSTbmAnw0uz4jKUu4DqgThpqOVSs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u/umhVVogkXmL4DohR93571eBQydtSr5hdBWur6wQzrY1J2tj7Ud2SoSXPTca23Bx7F6wrgEVixKpxJCcCCPPKl9coR/OsmERdojzKu/8ZGdNr0NyOGywViuRQEXPdxsNUPBPKGXleFY2fFpS1fTt4fc4sfYS+pzPa0a5r2MwqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=D1/WZsrs; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=k6wpw9DOIz37+RpSG6rqPop3m77nFE1Y+JA8c5nhbwsjs4Tgu3dQYCObOn8rxZ1gBROZ4vKeHyb11inMoX/s185EdGqDdk18Y2Jdvp4rqgpsl5I3KpVDxNlaZh/MkxaN87vhJ4Ny92smZuNGFq5cs/gUBnPoBlvBSETCrSK/zJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=caeQWXgN; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="D1/WZsrs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2810FC8B7A1;
-	Tue, 27 Aug 2024 08:53:51 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="caeQWXgN"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC586C8B7A0;
+	Tue, 27 Aug 2024 09:45:38 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="D1/WZsrs"
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="caeQWXgN"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1724748829;
+	t=1724751937;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=hhZkFRC4BoRf7DDoYQ5LMerp2DKl7zuwL0hrKx7OfYM=;
-	b=D1/WZsrsVBICInECxaAzM5ZzLnpcUbffHSeTWi1jkL1GMpaIbPFop5qpynTi5PTWOs31yJ
-	r4mn5bQmbf/biAOcwdYkekFC9FzuPx8Hk3lNftQPPRwYnYoE7iNviSJlmUQCVdXagvnCrc
-	r/hXqQrO7oZDFWP5u9smem6JjbbRGfs=
+	bh=eVclaBJ2YxjTVTaOSTbmAnw0uz4jKUu4DqgThpqOVSs=;
+	b=caeQWXgNoSnvlrNwSSAl9nDQtEgPn3bBXDq8o5gn1N4Vsm04CP8AWk2HGYIQzMNDv5qcdq
+	EdthTkWpCfF5SjJTVU1SohO2gJE28IVfBv7rJjCEhqtEDSixWUFLmpZdv62Lok4ZcAlLnX
+	+/MRHP4ZxCjpJoFfIlmnoInaSx6WorU=
 Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 318679ca (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Tue, 27 Aug 2024 08:53:49 +0000 (UTC)
-Date: Tue, 27 Aug 2024 10:53:44 +0200
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id aa222d56 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Tue, 27 Aug 2024 09:45:36 +0000 (UTC)
+Date: Tue, 27 Aug 2024 11:45:31 +0200
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: Adhemerval Zanella <adhemerval.zanella@linaro.org>,
-	Theodore Ts'o <tytso@mit.edu>, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-arch@vger.kernel.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
-	Eric Biggers <ebiggers@kernel.org>
-Subject: Re: [PATCH] aarch64: vdso: Wire up getrandom() vDSO implementation
-Message-ID: <Zs2UGH6xjJmis5XD@zx2c4.com>
-References: <20240826181059.111536-1-adhemerval.zanella@linaro.org>
- <397f9865-c4ad-44be-91ab-9764fe3aeb89@csgroup.eu>
+To: Xi Ruoyao <xry111@xry111.site>
+Cc: Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>,
+	linux-crypto@vger.kernel.org, loongarch@lists.linux.dev,
+	Jinyang He <hejinyang@loongson.cn>,
+	Tiezhu Yang <yangtiezhu@loongson.cn>, Arnd Bergmann <arnd@arndb.de>
+Subject: Re:
+Message-ID: <Zs2gO0NQwOuK8Bmu@zx2c4.com>
+References: <20240816110717.10249-1-xry111@xry111.site>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,63 +48,12 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <397f9865-c4ad-44be-91ab-9764fe3aeb89@csgroup.eu>
+In-Reply-To: <20240816110717.10249-1-xry111@xry111.site>
 
-On Tue, Aug 27, 2024 at 10:46:21AM +0200, Christophe Leroy wrote:
-> > +/**
-> > + * __arch_chacha20_blocks_nostack - Generate ChaCha20 stream without using the stack.
-> > + * @dst_bytes:	Destination buffer to hold @nblocks * 64 bytes of output.
-> > + * @key:	32-byte input key.
-> > + * @counter:	8-byte counter, read on input and updated on return.
-> > + * @nblocks:	Number of blocks to generate.
-> > + *
-> > + * Generates a given positive number of blocks of ChaCha20 output with nonce=0, and does not write
-> > + * to any stack or memory outside of the parameters passed to it, in order to mitigate stack data
-> > + * leaking into forked child processes.
-> > + */
-> > +extern void __arch_chacha20_blocks_nostack(u8 *dst_bytes, const u32 *key, u32 *counter, size_t nblocks);
-> 
-> For Jason: We all redefine this prototype, should we have it in a 
-> central place, or do you expect some architecture to provide some static 
-> inline for it ?
+Hey,
 
-Given the doc comment and such, that would be nice. But I didn't see a
-straight forward way of doing that when I tried before. If you want to
-try and send another fixup commit, that'd be welcomed.
-
-> > +#define __VDSO_RND_DATA_OFFSET  480
-> > +
-> 
-> How is this offset calculated or defined ? What happens if the other 
-> structures grow ? Could you use some sizeof(something) instead of 
-> something from asm-offsets if you also need it in ASM ?
-
-FYI, there's a similar static calculation like this in the x86 code:
-
-+#if !defined(_SINGLE_DATA)
-+#define _SINGLE_DATA
-+DECLARE_VVAR_SINGLE(640, struct vdso_rng_data, _vdso_rng_data)
-+#endif
-
-> >   uname_M := $(shell uname -m 2>/dev/null || echo not)
-> > -ARCH ?= $(shell echo $(uname_M) | sed -e s/i.86/x86/ -e s/x86_64/x86/)
-> > +ARCH ?= $(shell echo $(uname_M) | sed -e s/i.86/x86/ -e s/x86_64/x86/ -e s/aarch64.*/arm64/)
-> 
-> >   SODIUM := $(shell pkg-config --libs libsodium 2>/dev/null)
-> >   
-> >   TEST_GEN_PROGS := vdso_test_gettimeofday
-> > @@ -11,7 +11,7 @@ ifeq ($(ARCH),$(filter $(ARCH),x86 x86_64))
-> >   TEST_GEN_PROGS += vdso_standalone_test_x86
-> >   endif
-> >   TEST_GEN_PROGS += vdso_test_correctness
-> > -ifeq ($(uname_M),x86_64)
-> > +ifeq ($(uname_M), $(filter x86_64 aarch64, $(uname_M)))
-> 
-> Does that work for you when you cross-compile ? For powerpc when I cross 
-> compile I still get the x86_64 from uname_M here, which is unexpected.
-
-That sounds like a legitimate bug you're pointing out, but not one with
-Adhemerval's code, right? Rather, it's something to be fixed inside of
-these self tests as a whole?
+Per https://lore.kernel.org/all/Zs2c_9Z6sFMNJs1O@zx2c4.com/ , you may
+want to rebase on random.git and send a v4 series. Hopefully now it's
+just a single patch.
 
 Jason
