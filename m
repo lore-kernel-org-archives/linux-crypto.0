@@ -1,346 +1,252 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2078.outbound.protection.outlook.com [40.107.20.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E45D1C57A0
-	for <linux-crypto@vger.kernel.org>; Tue, 27 Aug 2024 14:07:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724767648; cv=none; b=JM1VsO84XCrev1o48SrWmTrvh1EmESGTmML3nhuE8hlN3KS/AQOj6wZMnrh791UHnTbveeaa96mU4UpKDjv3mdvKWQ9AAI6H9rK2vyI0sSEi4YQzY8TfC/tRW6MHdFBegat6tOzpu3i70JqcHy6IhILj2mH/Szmec5KuIAXDowE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724767648; c=relaxed/simple;
-	bh=K9lgvZpWgHyZfOmspvVq64PEIHpt0SbtQcTFhjLn10A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=EIRGFGArZER7RFDFS2KycVwYEUCDteGTV5atynp2XkzwTa1+a2c+YWGcrGTZwEqyHwKYuHvRhxE4oaLf/M3ctxwpSqeOfwnnoB5/w2ugG2RmeahKumAERfAexr6JVvbKjfK2l+BmtHXw3DGCHcmxDHVlnC3/gXy5VVnHIlPaxcI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=PIuMkapE; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AA6F1E49E;
+	Tue, 27 Aug 2024 14:08:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.20.78
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724767684; cv=fail; b=uOdhLFdsOBvcU6TUXCXzU+TRe5IRFHrskmjM9vrnYFXbKI6jQUo9qEyEUzRbI7N5uMjQH2K8RXsCbgx5YWhBjaxVUcA4TQJvouo+hUa9Q6+LXHXYgkK2AFnd/gGjrOULojs/OYcdnohvXkulhUObRtgkXqlQKj5Jxj1eMuDjkJw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724767684; c=relaxed/simple;
+	bh=oxXiopKonJ3RBQCBNMFEkYGF4aEPGNGqsx4fJt//4SA=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=nkm4NS5tfmdUZ0J8ATSdpnOnscKEWPu7oS7GWEirDPixUeAwpkBa+3bO00ngFShu6jsn9q0isO7jOfki2n/GtRIK6t1a4NR/OoKdOfVIZ+xiyH/LwQ+jcJ95sY4X8VfCHpeciMzrmDIMWJGewp80Gvk8te96PzJ87G9xmQWRTJI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cs-soprasteria.com; spf=pass smtp.mailfrom=cs-soprasteria.com; dkim=pass (2048-bit key) header.d=cs-soprasteria.com header.i=@cs-soprasteria.com header.b=zpUGHyA4; arc=fail smtp.client-ip=40.107.20.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cs-soprasteria.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs-soprasteria.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PIuMkapE"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-201e64607a5so39550605ad.2
-        for <linux-crypto@vger.kernel.org>; Tue, 27 Aug 2024 07:07:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1724767646; x=1725372446; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=TDm5a7OlR/7U6ykT+0Jq6tWrOVlgFNdpji+7rba+NPs=;
-        b=PIuMkapEejcJIhueS/NlQHQ2P072C/TClFILc6N7hRJyplVhp6lSCobkLAG8Ezcouq
-         tmnpUJRsnnG6IA1ftTwoEYWEkwUQOLZpaKb5uoxVle8NWrMUo7b18g6+CVXPTAwl2Qyh
-         fgTTSKYPZNx+R6sUovGm2ssBGMXQWyrIrJBI0lmYNDocmQRYuaPtu/HrzmwIGHWlVMI9
-         Kx92jZXPLzUaDAQcgMFe7aMAwmljy/oRT9Rkz2Vb7uaLby6L48szlLHdfbDZqoIFlWgV
-         T+feOUlY2LFRPNYKG++seMuvNQiqVv+gFTWYokrra2G5dtqzp80Pam5tZz/h8ikO8wgr
-         vXcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724767646; x=1725372446;
-        h=content-transfer-encoding:in-reply-to:organization:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TDm5a7OlR/7U6ykT+0Jq6tWrOVlgFNdpji+7rba+NPs=;
-        b=dhDTrh6s/2ibKNarTkHCMQdm7hYDymNl/DoZrKZ0FdYxCmHAk03cTG1Wovv2EvJi9M
-         FVCiGHGYz7GUC0df6XAAhre52Tf7XYz2h+6d6+rjUG6suztE6gKhMaGzh2M1QbtGGnC+
-         Fwani5rg4iArh/ny9UC8dtRzJX6WOBlh4Ym3isUbpRRX4vNbSlz77RMRI4yfZH41OMWb
-         FMGa0XYZkzuoWKSK6FJvlUI+RB74NpuIm5nEVpxwYPnFDMzN+7efNNfZWdroewG3ykf0
-         +urhSvB9mAQVwcPmjv0Et5puxCxKl7o6+Fw7txbkG62lckDYbH4maXZ8pGCPIkIXbzbp
-         Graw==
-X-Forwarded-Encrypted: i=1; AJvYcCWfcrmMHz1WpMN6M4aitJIguBG2X8koupiY9QNXj1Yp71Wo1GZY9ayVYuJ2HwtCdqAr99C75JV9GZyagE4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8Y1Um7g4qLS50/0W7558wxC53YbHyfnsRgPEE5oCaX/IeMryc
-	igmgMtZ2S1gV3jp/q3csZ+jN+8hNeHsDawT7AIvmiwCjUy0u25ip/adl9DvXOis=
-X-Google-Smtp-Source: AGHT+IHQDbCLVIzMT09kixbJK36L4yX7rLhWugQTIJdytpmko0/ySpR5JCewS6qB8AN3IQ8VQY5dCQ==
-X-Received: by 2002:a17:902:ce92:b0:202:359:9f66 with SMTP id d9443c01a7336-2039e4fbbc8mr197529735ad.54.1724767645460;
-        Tue, 27 Aug 2024 07:07:25 -0700 (PDT)
-Received: from ?IPV6:2804:1b3:a7c3:4c2c:7d73:fa05:8bad:32cb? ([2804:1b3:a7c3:4c2c:7d73:fa05:8bad:32cb])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20385fd0e91sm84062115ad.309.2024.08.27.07.07.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Aug 2024 07:07:24 -0700 (PDT)
-Message-ID: <f4400864-7bd2-4dc1-975b-52023ee597e5@linaro.org>
-Date: Tue, 27 Aug 2024 11:07:20 -0300
+	dkim=pass (2048-bit key) header.d=cs-soprasteria.com header.i=@cs-soprasteria.com header.b="zpUGHyA4"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=LrJwJXuoeT9OtVUB9qlj9yYcLj6VCK0bJGUrHStL22Vd9DRnm2XewCxWQazXltVp+/6H85df1bRu4Fe3YFOiomM6Jvrnr8sSWZNKaUJaKapkTen9qtoBQoj73UV3bEvDHNmRIn/7hR7+fQb5FQ9DBikz46/sbtA812DNqHCuQurHS9IruiYhJj8atHEkfiH3QAuGvmowfSmfwjUzyZtTYp/6IEadYWKHcpx/HDnmAjauT79ndeAVi2+kIWixjTS7yKBlPs8QyIeeu1TvkuZdzfPcYh+gBPen4bdOZPzVz5BNJSzxiuEi/J0WGX/asEF28Oqs0qZdCQPBugx+fsUmvA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=oxXiopKonJ3RBQCBNMFEkYGF4aEPGNGqsx4fJt//4SA=;
+ b=n4Bn5GWVCtik74cbrOIbqtOa5cwt68uHoXkQ0jBoqGom46T9F119StHsv/vGcFPEf1AxBRF3lZe4/wltpGvv236SqxP2oaFN+4o9PDtnLhk4zm3iW4jRxmQ0tdVQYWaIO7uJspspD7vc3fBfn5UlMnOB9Y2oFn0OfXLfnimPBCrNtBrx7YXKS6WMMn/PT/l+6Gv48E82/pvGoOJG4etT8DNbU1hBIg6o6yMfCYz5y02Ranft6vZuEkufcsRtWjKuOkmoDUsEpdsGCfg77aNNxBJVkJAmukPmWPGmt2/a4zkGZuqbec4gpP7OoX2LCNecHGJr/mvNT8z1EMF++GCy9w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=cs-soprasteria.com; dmarc=pass action=none
+ header.from=cs-soprasteria.com; dkim=pass header.d=cs-soprasteria.com;
+ arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cs-soprasteria.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=oxXiopKonJ3RBQCBNMFEkYGF4aEPGNGqsx4fJt//4SA=;
+ b=zpUGHyA44DonY7SE4DQmiE20voqLot9Lfr52oVAint1/k4ILSlCllZwPH5ifhizTQD+YP3WkEizbSQXeV1laZE1wZmLu58XuGgBxpK48R9bmDXjp1Pl+dfRJSxPYzu6wxB5F73LzWhYvgDoWz+D7ZwSl0CsF4SoRQwJaCWD+w8aYEqnGuT5Z5+RH+YQeW8oSwK9hZjC1O/iKBGj5EOlCD/Iy5ziCxi+rZd80zYq5dgaNTdSqNhBBzbQOXwN2fAv4FefTpDOOkUevF2qoaJR40sLSEOvEEwmIcYJAwKKUJCe+c33AcAd/KMhzDqYxVhebyCAPSqzl9TLVckSdSdxp+w==
+Received: from AM0PR07MB4962.eurprd07.prod.outlook.com (2603:10a6:208:f3::19)
+ by AS8PR07MB7733.eurprd07.prod.outlook.com (2603:10a6:20b:350::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7897.25; Tue, 27 Aug
+ 2024 14:07:59 +0000
+Received: from AM0PR07MB4962.eurprd07.prod.outlook.com
+ ([fe80::6724:2919:9cbb:2bb2]) by AM0PR07MB4962.eurprd07.prod.outlook.com
+ ([fe80::6724:2919:9cbb:2bb2%4]) with mapi id 15.20.7897.021; Tue, 27 Aug 2024
+ 14:07:59 +0000
+From: LEROY Christophe <christophe.leroy2@cs-soprasteria.com>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>, Xi Ruoyao <xry111@xry111.site>
+CC: Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>, Jinyang He
+	<hejinyang@loongson.cn>, Tiezhu Yang <yangtiezhu@loongson.cn>, Arnd Bergmann
+	<arnd@arndb.de>, LEROY Christophe <christophe.leroy2@cs-soprasteria.com>,
+	"tglx@linutronix.de" <tglx@linutronix.de>, "linux-kselftest@vger.kernel.org"
+	<linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH v4 3/4] selftests/vDSO: Use KHDR_INCLUDES to locate UAPI
+ headers for vdso_test_getrandom
+Thread-Topic: [PATCH v4 3/4] selftests/vDSO: Use KHDR_INCLUDES to locate UAPI
+ headers for vdso_test_getrandom
+Thread-Index: AQHa+IlDZBvC5l2urUWOj88BNmT4CbI7I/cA
+Date: Tue, 27 Aug 2024 14:07:59 +0000
+Message-ID: <019268d4-c177-49e7-aab3-b8fa431905ca@cs-soprasteria.com>
+References: <20240827132018.88854-1-xry111@xry111.site>
+ <20240827132018.88854-4-xry111@xry111.site> <Zs3blfx1inX_FQLR@zx2c4.com>
+In-Reply-To: <Zs3blfx1inX_FQLR@zx2c4.com>
+Accept-Language: fr-FR, en-US
+Content-Language: fr-FR
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=cs-soprasteria.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: AM0PR07MB4962:EE_|AS8PR07MB7733:EE_
+x-ms-office365-filtering-correlation-id: a0d31dbd-7b3b-45fb-e971-08dcc6a1a839
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|1800799024|7416014|376014|38070700018;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?dnBGQ3YxejVRb3hqc1VJTlVFVlZtMURPWWxPU2J6dk1lKzdySHdDN2UzWHZq?=
+ =?utf-8?B?Vy9CbllTMkhleFd1dkNud1pyOE1QNDhTc1RpQ1BHMGUzQlFCVlpxbVVXaU1S?=
+ =?utf-8?B?dDFvaW5qMi80L0w5VXlUR1NLRWc5a1RnWUZjN1FqVnYrWG10N1NrKzJFaEZD?=
+ =?utf-8?B?anZCMEtKdWhVcXcwYk9QU05nblVEL3Y3STFUc00rTklGVlh3cGVOV1BpQ1hs?=
+ =?utf-8?B?d29tM1BBdU5FMG5OMEgwOHRJMmV4aExWTWJmMWhReGdTNVVMNDRhclVqRGx4?=
+ =?utf-8?B?T3VKd1RQOC8wNkY1UlVoY1BKWWt5b3VsOVpZTGxTOEo3S0ZZcm5YWDQ2eW0w?=
+ =?utf-8?B?c014RWtDVndWcExNc3JiOWhMVTNpN1JVRTl1ZWZxL3pPZWk0VVppdGNwdWNB?=
+ =?utf-8?B?MTRUdzA5VnNNdkdVaDQzZlhkMDJEKzV4UkJiTVRuaXNzTUs5RHA4bEtzc0hU?=
+ =?utf-8?B?bEsvYzZhak1kOUNlTEFNTVdqalFJd2xGYkVtcHFFdVliemlNQ0J2VGlERFJm?=
+ =?utf-8?B?anRRcFZoS1N5L3FxVmp3UWtCazNIcW9CenhrczR0cXl0VzJETXlwMEx3T0ZE?=
+ =?utf-8?B?UWpTVGlpaDNPcEhZcHJiWVc1eUoyTEZ1Qm54MkFBdG9pREJneS9NYXZ3aXhH?=
+ =?utf-8?B?K3lZY3MrNXFTRFdhWmlzanRpcWQxOHJnbFpmYk45c1pXTDhpMURZZHVEZGVT?=
+ =?utf-8?B?QktLRkg4dTZ4NlpOZ3cwZkc3UkhGcGx0MWRvd0c0TkE5YS8yNjIxZzlCa2pT?=
+ =?utf-8?B?ZFVmTWNIenJha2JXNDZrL0FFZ0xER0dLNUxXNkU4Z2w3cnNHQVg0elczY0ls?=
+ =?utf-8?B?VTQzMURIdWYzZUgraDMyYWhva1A0ZzNWY2g1b3RjbVY0RUp0QjBHczZRVWF2?=
+ =?utf-8?B?UUNhZDM5N2R5a2xJRlFnejl4akVtbTFGbDN1b2p2bmZvemNtcTV3aUpRZ2Nz?=
+ =?utf-8?B?TlluZENqNGNyMWJlMmwrM3liSExsWHFWQnNVYzhxTTZJSVJZdzVhai8yYm5W?=
+ =?utf-8?B?QW8vY3BBcytDUlBFMkpneXkwQ0JXM2dKMzZzWERMWDRlVUhkOEY2TTRSdHA1?=
+ =?utf-8?B?Z1NCQm1xK2daVVNZdlhKdWhtWUE3YS9Pb0M2UjlsOHo3T0hEc1NEMW1xRVB3?=
+ =?utf-8?B?Qk9KRlVBRmhOVEFRSXJoaHFOeHFGMUZLdUFuZWUxVEM3cjRIMk9xOGJYWmhO?=
+ =?utf-8?B?NmgwZnp4WklwY2xWdGh2Q1FUeldaMVhxV3lpN01iSVlBQmR4UzQ4V3JWWkQr?=
+ =?utf-8?B?OXVwNlFvWjdZK2RuTFFSdTFNMGUrc0c0cGtZMEZ3c1h4NjBVcU9GMUVjdXM3?=
+ =?utf-8?B?THpQVXF5dExUWWRINmlPSFo1UElVLzU1QVp4Sjd0eGcvWlNpM1FtaEtWSXNi?=
+ =?utf-8?B?Q01DR1dyeUMyaEYvL3lQUU1RYUdyd0xoSlRwY0Z1QzVtR3FtdU1WNk5KWEJC?=
+ =?utf-8?B?RkFyQXpWdW1SNzBtNkQ1My8xZGVoWklGWjhheVVsbUk4Umpwb0g1TGVKM2R1?=
+ =?utf-8?B?cU43ZXljL1g2ZVhWN2ttbXlKTFhlWkk3aFJzb1JVMWo4QXJPU094MXFtV0c0?=
+ =?utf-8?B?M29MWkpidzR1NitwR3ZYVWlPRUo4RHhvT3BiQmVxLzRqQnEyU0g1VktZWjdL?=
+ =?utf-8?B?ZEZBN3dQNGtaa0V1bzJ3dGNmUWN3R2R6aUcyODdrNWRjWld0UlV3Qzd5bkxB?=
+ =?utf-8?B?Smo4VUdpaW9CTVQ3RllZM1pRMjlVakNZRUVLdlgvamhUd2hFNmV6NnYwRkdN?=
+ =?utf-8?B?T3JpbzZtSnRDTUkrdlVyS1ZlRXBFaXJJZzloWTVWajRlRjN5bUhkQTNyUFBI?=
+ =?utf-8?B?M084RHlJWG1CcGkxd0kxc1UwY1lTVFNsR3pqZ1hEWEt4SHEzWWNBL3hKZHdE?=
+ =?utf-8?B?cjB5aEdpM0NBd3YyeHpkMEVjbjFuLzZVd2dXV3dPcEMrenc9PQ==?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR07MB4962.eurprd07.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?czBKakNPbGNQRHYyYk0vTmZLNVE0Qm03VTlZK3NMS2sxVENXOThzRjdUcWpN?=
+ =?utf-8?B?QXdJTjVwZDZKN0hldENmVnlGQ3JKQlRLVWdRcDlRUmpIM2tJbU4xM1lYWlVn?=
+ =?utf-8?B?V1dUTHAxdnZNQ0VnZSsyVlZWaXV5OE1nYVV4YkdyY1FPMDB5dWdPS0QwUUNX?=
+ =?utf-8?B?UjRuVlNxZ0RBd1FCbXVmUEFFU3JHRDBxQjJEVy9MQlNEMmkvRCtvai9MWVVG?=
+ =?utf-8?B?UDdKbU9SNWhJSlM4ODN5VzJtalEyRk1oOHJWOUZGQ25ZTktrZm11SkxRaW1Q?=
+ =?utf-8?B?TUhwd1JIdVErR0haK2Jwa0xxMHc2Ujh4NTZPWnlvODRpVGtXRU9wd0RtVzVs?=
+ =?utf-8?B?Z05GV0x0Mm12ZmdwL0hNaDlRaEk2OE5iaWJSanVIS1VtWjZDQ2hLZmZzUVNI?=
+ =?utf-8?B?ZUlUdnNzWEcvUDJRQmsvaVBLRmlLbytLZE44b1NtV0ZrQWVlRzVEdGFLNEJR?=
+ =?utf-8?B?SjRvcWdGOWZRMUJpOGVHV3JUR0JmRXl6OUQ4YkdXeVZKSXo2Kzg3YW5lQnVr?=
+ =?utf-8?B?TEY5cEVoU2pNMFBhbEFiSWtyS3pSV1dYOWVnYnQxRGlNNWZVQ3NTZ3o3TGx3?=
+ =?utf-8?B?US8za3c1UVo0bWZKc25CdnlTUVNFczdIZkx0dng4WVlNOGF3eEIzZ2ZtSE1p?=
+ =?utf-8?B?UDRmbi9LL1c5TERNdkZHVXhta1BtdFc1dE5OQ1dXVE5EVmJJN0hLN1FiVEx0?=
+ =?utf-8?B?UFlkMXc1SXdPNm9BZmhnNjZUV2ZXWm4rWUdmcmxpaHZxR0t5dHZQWVA4NWE1?=
+ =?utf-8?B?ZjNFWXg0Y013MEl4ZVRrY2VKc0VJbmMvYmtmZ3hlVTZRMnhIcmtwazhhcVVZ?=
+ =?utf-8?B?aTE2U1F6bzhwNlM2NTJ3amNPbEJ4NHBJdlR5dHJtTVpGTGpwL1pvVWF4N0Zw?=
+ =?utf-8?B?K05aZ3F1d1ErS3VvcGxMVW5EU1FocFB0a3l1MkZmOE5QT0FBdWpwRWhVbjF5?=
+ =?utf-8?B?Z051bXIwSEREZUJNMnRPWGlSMXZUSkZKR0FPclV4clQ2eWZXeGJ2emRMZGhW?=
+ =?utf-8?B?ZVd3MnJHYlVHRFFnck1KMHBmNUxpTjNGSllSaTJMMEh1ZEJoM0Z5VVZFYmR0?=
+ =?utf-8?B?OXpOaHFjYVgyVFRXWUpSejd2UC9OVkpsNXdCUDhOQU9nVDFIUUJWNkxGYWRD?=
+ =?utf-8?B?NXlRS0hrVXIySmg3MTRHaG9xS1N6WUowdFY2MHZxMVRuNVVSbFhSVkFTM2E5?=
+ =?utf-8?B?ejBweHNsR0FJeEx6TVM1dTEybWxJNWxWd0M5eGlYVWY4SkpqWEI2WkE1cTFw?=
+ =?utf-8?B?NVJ2Zkp3c2VYdmZpVVlzbmxwSU9vanJWVy90UWtPTUFyZmNUV2JISXpEVXVy?=
+ =?utf-8?B?ZVFBQmt4TVpMNGVuQkVJcVRkSWViL2ZkN3ZOQjl0WXhSMEN0NS8yL0oxMUsz?=
+ =?utf-8?B?dWhldFRwaWZsZ0MwVnhLMVEwN2xGMUFrRFI2ZjZVQkNQbk1DNFRoY3ZpL2tF?=
+ =?utf-8?B?cHpFK3pTVUI1NWRtOTI5WXRMVzY3b0lJQThGVFo5WW4rZTdCZEpLK0RVY1gr?=
+ =?utf-8?B?ZXRKY0crM2taS1NNY2kySzc3MWtna0xpV3BvWkRmWTVSR1g5WkpJaDlJZWI4?=
+ =?utf-8?B?bktPVzBKZ05IbW1PMTRkZUpTVGtoWGI2SWRmVVZrbGFBUE9WTG5ZWE9LODVU?=
+ =?utf-8?B?Ynh0MDgvVTFVKzVLaUdiaTlFUlFESEpINGxzYkViUEo3dnBlL21LU0RDYkNM?=
+ =?utf-8?B?Rnl6MjdHNWNDbnB6VytWOVFrSmVXSW9iWEpFY1AreDdNZzNMTkFOSUNFL3JU?=
+ =?utf-8?B?K3NzUEpsM0h1MGhyR3habUxFUURQdSswd2hkY3pocUZ4TUZVQ2ZYWkphWHlD?=
+ =?utf-8?B?MGxtZE81Q2hCMy9tekgrL3JHQitidWs1T0E5aTNna2FJY2s3ZHJqRHh3NjV6?=
+ =?utf-8?B?U0NpMVlSY1REZzFqT2pBd1dLREZDTzBFWkpORElaQ04yWUdoUXlmRElBaCtB?=
+ =?utf-8?B?dCtTRDMzOWhvK0tINTd4ajYvSU16VmJocjJBenpVWjlpbGZuK0d3bmhBOVJp?=
+ =?utf-8?B?SnVWVTNWWGJjdHBhUVBsbUVQNU5xT2JJbkRYcG1RNEg4ckdueWc3NVNzRkZB?=
+ =?utf-8?B?dFovZUZEQTVvMHl0VWtoZmQzeXVWTkYycjczdmg0aXBFTXNkd2c0UG9WVnlO?=
+ =?utf-8?B?NW9PckgrWmIzNHlEOG1UNWxTcEJ1YnJERWk5K1NLM252NXcvclJ2d1JET216?=
+ =?utf-8?B?V1A3Y29iK0t3UUljc1hvSlNnMHpTOURCK0tqcnAyc3c2ZC9lKzlkWFJqNWly?=
+ =?utf-8?Q?hRZjX2xICIwU1UXoWmvbXSGZwT9RXnVdEpDYr7MSLY=3D?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <6EFA7EB37D360A49BEE5950530638F4D@eurprd07.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] aarch64: vdso: Wire up getrandom() vDSO implementation
-To: Christophe Leroy <christophe.leroy@csgroup.eu>,
- "Jason A . Donenfeld" <Jason@zx2c4.com>, Theodore Ts'o <tytso@mit.edu>,
- linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Thomas Gleixner <tglx@linutronix.de>, Eric Biggers <ebiggers@kernel.org>
-References: <20240826181059.111536-1-adhemerval.zanella@linaro.org>
- <397f9865-c4ad-44be-91ab-9764fe3aeb89@csgroup.eu>
-Content-Language: en-US
-From: Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>
-Organization: Linaro
-In-Reply-To: <397f9865-c4ad-44be-91ab-9764fe3aeb89@csgroup.eu>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: cs-soprasteria.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR07MB4962.eurprd07.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a0d31dbd-7b3b-45fb-e971-08dcc6a1a839
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Aug 2024 14:07:59.3991
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 8b87af7d-8647-4dc7-8df4-5f69a2011bb5
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: kd0GeytTLUa0XBi2zZNSSJu2Fo02gpH9XwvxvUTQY1qyPTb3zU61p/0zKSxMWqgE9h/NbAfUVi66Q16SAxTSgG4UiEuXTcV90e0BAx563aJnx1D+79qIRlYs58ms9h33
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR07MB7733
+X-MS-Exchange-CrossPremises-AuthAs: Internal
+X-MS-Exchange-CrossPremises-AuthMechanism: 04
+X-MS-Exchange-CrossPremises-AuthSource: AM0PR07MB4962.eurprd07.prod.outlook.com
+X-MS-Exchange-CrossPremises-TransportTrafficType: Email
+X-MS-Exchange-CrossPremises-SCL: 1
+X-MS-Exchange-CrossPremises-messagesource: StoreDriver
+X-MS-Exchange-CrossPremises-BCC:
+X-MS-Exchange-CrossPremises-originalclientipaddress: 2a01:e0a:511:aad0:9f10:86ad:5cd0:9703
+X-MS-Exchange-CrossPremises-transporttraffictype: Email
+X-MS-Exchange-CrossPremises-antispam-scancontext: DIR:Originating;SFV:NSPM;SKIP:0;
+X-MS-Exchange-CrossPremises-processed-by-journaling: Journal Agent
+X-OrganizationHeadersPreserved: AS8PR07MB7733.eurprd07.prod.outlook.com
 
-
-
-On 27/08/24 05:46, Christophe Leroy wrote:
-> 
-> 
-> Le 26/08/2024 à 20:10, Adhemerval Zanella a écrit :
->> Hook up the generic vDSO implementation to the aarch64 vDSO data page.
->> The _vdso_rng_data required data is placed within the _vdso_data vvar
->> page, by using a offset larger than the vdso_data
->> (__VDSO_RND_DATA_OFFSET).
->>
->> The vDSO function requires a ChaCha20 implementation that does not
->> write to the stack, and that can do an entire ChaCha20 permutation.
->> The one provided is based on the current chacha-neon-core.S and uses NEON
->> on the permute operation.
->>
->> Signed-off-by: Adhemerval Zanella <adhemerval.zanella@linaro.org>
->> ---
->>   arch/arm64/Kconfig                         |   1 +
->>   arch/arm64/include/asm/vdso/getrandom.h    |  50 +++++++
->>   arch/arm64/include/asm/vdso/vsyscall.h     |   9 ++
->>   arch/arm64/kernel/vdso/Makefile            |   7 +-
->>   arch/arm64/kernel/vdso/vdso.lds.S          |   4 +
->>   arch/arm64/kernel/vdso/vgetrandom-chacha.S | 153 +++++++++++++++++++++
->>   arch/arm64/kernel/vdso/vgetrandom.c        |  13 ++
->>   tools/testing/selftests/vDSO/Makefile      |   4 +-
->>   8 files changed, 238 insertions(+), 3 deletions(-)
->>   create mode 100644 arch/arm64/include/asm/vdso/getrandom.h
->>   create mode 100644 arch/arm64/kernel/vdso/vgetrandom-chacha.S
->>   create mode 100644 arch/arm64/kernel/vdso/vgetrandom.c
-> 
-> Were you able to use selftests ? I think you are missing the symbolic link to vdso directory (assuming you are using latest master branch from https://git.kernel.org/pub/scm/linux/kernel/git/crng/random.git)
-
-It is missing indeed, last time I use a old brach that has a different Makefile
-machinery and it I could it built more easily.
-
-> 
->>
->> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
->> index b3fc891f1544..e3f4c5bf0661 100644
->> --- a/arch/arm64/Kconfig
->> +++ b/arch/arm64/Kconfig
->> @@ -237,6 +237,7 @@ config ARM64
->>       select HAVE_KPROBES
->>       select HAVE_KRETPROBES
->>       select HAVE_GENERIC_VDSO
->> +    select VDSO_GETRANDOM
-> 
-> You don't keep things in alphabetical here order on ARM64 ?
-
-It seems to most part, but the file does have some outliers (HAVE_SOFTIRQ_ON_OWN_STACK
-for instance).   I moved to the end of the list.
-
-> 
->>       select HOTPLUG_CORE_SYNC_DEAD if HOTPLUG_CPU
->>       select IRQ_DOMAIN
->>       select IRQ_FORCED_THREADING
->> diff --git a/arch/arm64/include/asm/vdso/getrandom.h b/arch/arm64/include/asm/vdso/getrandom.h
->> new file mode 100644
->> index 000000000000..6e2b136813ca
->> --- /dev/null
->> +++ b/arch/arm64/include/asm/vdso/getrandom.h
->> @@ -0,0 +1,50 @@
->> +/* SPDX-License-Identifier: GPL-2.0 */
->> +
->> +#ifndef __ASM_VDSO_GETRANDOM_H
->> +#define __ASM_VDSO_GETRANDOM_H
->> +
->> +#ifndef __ASSEMBLY__
->> +
->> +#include <asm/unistd.h>
->> +#include <vdso/datapage.h>
->> +
->> +/**
->> + * getrandom_syscall - Invoke the getrandom() syscall.
->> + * @buffer:    Destination buffer to fill with random bytes.
->> + * @len:    Size of @buffer in bytes.
->> + * @flags:    Zero or more GRND_* flags.
->> + * Returns:    The number of random bytes written to @buffer, or a negative value indicating an error.
->> + */
->> +static __always_inline ssize_t getrandom_syscall(void *buffer, size_t len, unsigned int flags)
->> +{
->> +    register long int x8 asm ("x8") = __NR_getrandom;
->> +    register long int x0 asm ("x0") = (long int) buffer;
->> +    register long int x1 asm ("x1") = (long int) len;
->> +    register long int x2 asm ("x2") = (long int) flags;
->> +
->> +    asm ("svc 0" : "=r"(x0) : "r"(x8), "0"(x0), "r"(x1), "r"(x2));
->> +
->> +    return x0;
->> +}
->> +
->> +static __always_inline const struct vdso_rng_data *__arch_get_vdso_rng_data(void)
->> +{
->> +    return &_vdso_rng_data;
->> +}
->> +
->> +/**
->> + * __arch_chacha20_blocks_nostack - Generate ChaCha20 stream without using the stack.
->> + * @dst_bytes:    Destination buffer to hold @nblocks * 64 bytes of output.
->> + * @key:    32-byte input key.
->> + * @counter:    8-byte counter, read on input and updated on return.
->> + * @nblocks:    Number of blocks to generate.
->> + *
->> + * Generates a given positive number of blocks of ChaCha20 output with nonce=0, and does not write
->> + * to any stack or memory outside of the parameters passed to it, in order to mitigate stack data
->> + * leaking into forked child processes.
->> + */
->> +extern void __arch_chacha20_blocks_nostack(u8 *dst_bytes, const u32 *key, u32 *counter, size_t nblocks);
-> 
-> For Jason: We all redefine this prototype, should we have it in a central place, or do you expect some architecture to provide some static inline for it ?
-> 
->> +
->> +#endif /* !__ASSEMBLY__ */
->> +
->> +#endif /* __ASM_VDSO_GETRANDOM_H */
->> diff --git a/arch/arm64/include/asm/vdso/vsyscall.h b/arch/arm64/include/asm/vdso/vsyscall.h
->> index f94b1457c117..7ddb2bc3b57b 100644
->> --- a/arch/arm64/include/asm/vdso/vsyscall.h
->> +++ b/arch/arm64/include/asm/vdso/vsyscall.h
->> @@ -2,6 +2,8 @@
->>   #ifndef __ASM_VDSO_VSYSCALL_H
->>   #define __ASM_VDSO_VSYSCALL_H
->>   +#define __VDSO_RND_DATA_OFFSET  480
->> +
-> 
-> How is this offset calculated or defined ? What happens if the other structures grow ? Could you use some sizeof(something) instead of something from asm-offsets if you also need it in ASM ?
-
-That is something I talked to Jason some time ago, since a similar strategy
-to use a 'magic' offset is used on x86_64.  Ideally I think the vdso_rnd_data
-should be moved to  a common static structure along with _vdso_data, so the
-there is no need to come up with magic offset like this.  It seems that the
-powerpc does follow this pattern, but other ports no.
-
-However, since each architecture does some specific machinery with the vdso
-datapages; it would require some more extensive refactoring on multiple
-architectures to get this right.
-
-> 
->>   #ifndef __ASSEMBLY__
->>     #include <linux/timekeeper_internal.h>
->> @@ -21,6 +23,13 @@ struct vdso_data *__arm64_get_k_vdso_data(void)
->>   }
->>   #define __arch_get_k_vdso_data __arm64_get_k_vdso_data
->>   +static __always_inline
->> +struct vdso_rng_data *__arm64_get_k_vdso_rnd_data(void)
->> +{
->> +    return (void *)__arm64_get_k_vdso_data() + __VDSO_RND_DATA_OFFSET;
->> +}
->> +#define __arch_get_k_vdso_rng_data __arm64_get_k_vdso_rnd_data
->> +
->>   static __always_inline
->>   void __arm64_update_vsyscall(struct vdso_data *vdata, struct timekeeper *tk)
->>   {
->> diff --git a/arch/arm64/kernel/vdso/Makefile b/arch/arm64/kernel/vdso/Makefile
->> index d11da6461278..37dad3bb953a 100644
->> --- a/arch/arm64/kernel/vdso/Makefile
->> +++ b/arch/arm64/kernel/vdso/Makefile
->> @@ -9,7 +9,7 @@
->>   # Include the generic Makefile to check the built vdso.
->>   include $(srctree)/lib/vdso/Makefile
->>   -obj-vdso := vgettimeofday.o note.o sigreturn.o
->> +obj-vdso := vgettimeofday.o note.o sigreturn.o vgetrandom.o vgetrandom-chacha.o
->>     # Build rules
->>   targets := $(obj-vdso) vdso.so vdso.so.dbg
->> @@ -40,8 +40,13 @@ CFLAGS_REMOVE_vgettimeofday.o = $(CC_FLAGS_FTRACE) -Os $(CC_FLAGS_SCS) \
->>                   $(RANDSTRUCT_CFLAGS) $(GCC_PLUGINS_CFLAGS) \
->>                   $(CC_FLAGS_LTO) $(CC_FLAGS_CFI) \
->>                   -Wmissing-prototypes -Wmissing-declarations
->> +CFLAGS_REMOVE_vgetrandom.o = $(CC_FLAGS_FTRACE) -Os $(CC_FLAGS_SCS) \
->> +                 $(RANDSTRUCT_CFLAGS) $(GCC_PLUGINS_CFLAGS) \
->> +                 $(CC_FLAGS_LTO) $(CC_FLAGS_CFI) \
->> +                 -Wmissing-prototypes -Wmissing-declarations
->>     CFLAGS_vgettimeofday.o = -O2 -mcmodel=tiny -fasynchronous-unwind-tables
->> +CFLAGS_vgetrandom.o = -O2 -mcmodel=tiny -fasynchronous-unwind-tables
->>     ifneq ($(c-gettimeofday-y),)
->>     CFLAGS_vgettimeofday.o += -include $(c-gettimeofday-y)
->> diff --git a/arch/arm64/kernel/vdso/vdso.lds.S b/arch/arm64/kernel/vdso/vdso.lds.S
->> index 45354f2ddf70..f8dbcece20e2 100644
->> --- a/arch/arm64/kernel/vdso/vdso.lds.S
->> +++ b/arch/arm64/kernel/vdso/vdso.lds.S
->> @@ -12,6 +12,8 @@
->>   #include <asm/page.h>
->>   #include <asm/vdso.h>
->>   #include <asm-generic/vmlinux.lds.h>
->> +#include <vdso/datapage.h>
->> +#include <asm/vdso/vsyscall.h>
->>     OUTPUT_FORMAT("elf64-littleaarch64", "elf64-bigaarch64", "elf64-littleaarch64")
->>   OUTPUT_ARCH(aarch64)
->> @@ -19,6 +21,7 @@ OUTPUT_ARCH(aarch64)
->>   SECTIONS
->>   {
->>       PROVIDE(_vdso_data = . - __VVAR_PAGES * PAGE_SIZE);
->> +    PROVIDE(_vdso_rng_data = _vdso_data + __VDSO_RND_DATA_OFFSET);
->>   #ifdef CONFIG_TIME_NS
->>       PROVIDE(_timens_data = _vdso_data + PAGE_SIZE);
->>   #endif
->> @@ -102,6 +105,7 @@ VERSION
->>           __kernel_gettimeofday;
->>           __kernel_clock_gettime;
->>           __kernel_clock_getres;
->> +        __kernel_getrandom;
->>       local: *;
->>       };
->>   }
->> diff --git a/arch/arm64/kernel/vdso/vgetrandom-chacha.S b/arch/arm64/kernel/vdso/vgetrandom-chacha.S
-> 
-> [skipped ASM as I have not spoken ARM asm since I was at school in the 90's]
-> 
->> diff --git a/arch/arm64/kernel/vdso/vgetrandom.c b/arch/arm64/kernel/vdso/vgetrandom.c
->> new file mode 100644
->> index 000000000000..b6d6f4db3a98
->> --- /dev/null
->> +++ b/arch/arm64/kernel/vdso/vgetrandom.c
->> @@ -0,0 +1,13 @@
->> +// SPDX-License-Identifier: GPL-2.0-only
->> +
->> +#include <linux/types.h>
->> +#include <linux/mm.h>
->> +
->> +#include "../../../../lib/vdso/getrandom.c"
-> 
-> For gettimeofday ARM64 uses c-gettimeofday-y in the Makefile instead.
-> 
-> You should do the same with c-getrandom-y
-
-Ack.
-
-> 
->> +
->> +ssize_t __kernel_getrandom(void *buffer, size_t len, unsigned int flags, void *opaque_state, size_t opaque_len);
->> +
->> +ssize_t __kernel_getrandom(void *buffer, size_t len, unsigned int flags, void *opaque_state, size_t opaque_len)
->> +{
->> +    return __cvdso_getrandom(buffer, len, flags, opaque_state, opaque_len);
->> +}
->> diff --git a/tools/testing/selftests/vDSO/Makefile b/tools/testing/selftests/vDSO/Makefile
->> index 10ffdda3f2fa..f07ea679a4cc 100644
->> --- a/tools/testing/selftests/vDSO/Makefile
->> +++ b/tools/testing/selftests/vDSO/Makefile
->> @@ -1,6 +1,6 @@
->>   # SPDX-License-Identifier: GPL-2.0
->>   uname_M := $(shell uname -m 2>/dev/null || echo not)
->> -ARCH ?= $(shell echo $(uname_M) | sed -e s/i.86/x86/ -e s/x86_64/x86/)
->> +ARCH ?= $(shell echo $(uname_M) | sed -e s/i.86/x86/ -e s/x86_64/x86/ -e s/aarch64.*/arm64/)
-> 
->>   SODIUM := $(shell pkg-config --libs libsodium 2>/dev/null)
->>     TEST_GEN_PROGS := vdso_test_gettimeofday
->> @@ -11,7 +11,7 @@ ifeq ($(ARCH),$(filter $(ARCH),x86 x86_64))
->>   TEST_GEN_PROGS += vdso_standalone_test_x86
->>   endif
->>   TEST_GEN_PROGS += vdso_test_correctness
->> -ifeq ($(uname_M),x86_64)
->> +ifeq ($(uname_M), $(filter x86_64 aarch64, $(uname_M)))
-> 
-> Does that work for you when you cross-compile ? For powerpc when I cross compile I still get the x86_64 from uname_M here, which is unexpected.
-
-Right, I haven't test cross-compilation on the selftests so I
-am not sure.  I will check it.
-
-> 
->>   TEST_GEN_PROGS += vdso_test_getrandom
->>   ifneq ($(SODIUM),)
->>   TEST_GEN_PROGS += vdso_test_chacha
-> 
-> Christophe
+DQoNCkxlIDI3LzA4LzIwMjQgw6AgMTU6NTgsIEphc29uIEEuIERvbmVuZmVsZCBhIMOpY3JpdMKg
+Og0KPiBPbiBUdWUsIEF1ZyAyNywgMjAyNCBhdCAwOToyMDoxNlBNICswODAwLCBYaSBSdW95YW8g
+d3JvdGU6DQo+PiBCdWlsZGluZyB0ZXN0X3Zkc29fZ2V0cmFuZG9tIGN1cnJlbnRseSBsZWFkcyB0
+byBmb2xsb3dpbmcgaXNzdWU6DQo+Pg0KPj4gICAgICBJbiBmaWxlIGluY2x1ZGVkIGZyb20gL2hv
+bWUveHJ5MTExL2dpdC1yZXBvcy9saW51eC90b29scy9pbmNsdWRlL2xpbnV4L2NvbXBpbGVyX3R5
+cGVzLmg6MzYsDQo+PiAgICAgICAgICAgICAgICAgICAgICAgZnJvbSAvaG9tZS94cnkxMTEvZ2l0
+LXJlcG9zL2xpbnV4L2luY2x1ZGUvdWFwaS9saW51eC9zdGRkZWYuaDo1LA0KPj4gICAgICAgICAg
+ICAgICAgICAgICAgIGZyb20gL2hvbWUveHJ5MTExL2dpdC1yZXBvcy9saW51eC9pbmNsdWRlL3Vh
+cGkvbGludXgvcG9zaXhfdHlwZXMuaDo1LA0KPj4gICAgICAgICAgICAgICAgICAgICAgIGZyb20g
+L3Vzci9pbmNsdWRlL2FzbS9zaWdjb250ZXh0Lmg6MTIsDQo+PiAgICAgICAgICAgICAgICAgICAg
+ICAgZnJvbSAvdXNyL2luY2x1ZGUvYml0cy9zaWdjb250ZXh0Lmg6MzAsDQo+PiAgICAgICAgICAg
+ICAgICAgICAgICAgZnJvbSAvdXNyL2luY2x1ZGUvc2lnbmFsLmg6MzAxLA0KPj4gICAgICAgICAg
+ICAgICAgICAgICAgIGZyb20gdmRzb190ZXN0X2dldHJhbmRvbS5jOjE0Og0KPj4gICAgICAvaG9t
+ZS94cnkxMTEvZ2l0LXJlcG9zL2xpbnV4L3Rvb2xzL2luY2x1ZGUvbGludXgvY29tcGlsZXItZ2Nj
+Lmg6MzoyOiBlcnJvcjogI2Vycm9yICJQbGVhc2UgZG9uJ3QgaW5jbHVkZSA8bGludXgvY29tcGls
+ZXItZ2NjLmg+IGRpcmVjdGx5LCBpbmNsdWRlIDxsaW51eC9jb21waWxlci5oPiBpbnN0ZWFkLiIN
+Cj4+ICAgICAgICAgIDMgfCAjZXJyb3IgIlBsZWFzZSBkb24ndCBpbmNsdWRlIDxsaW51eC9jb21w
+aWxlci1nY2MuaD4gZGlyZWN0bHksIGluY2x1ZGUgPGxpbnV4L2NvbXBpbGVyLmg+IGluc3RlYWQu
+Ig0KPj4gICAgICAgICAgICB8ICBefn5+fg0KPj4NCj4+IEl0J3MgYmVjYXVzZSB0aGUgY29tcGls
+ZXJfdHlwZXMuaCBpbmNsdXNpb24gaW4NCj4+IGluY2x1ZGUvdWFwaS9saW51eC9zdGRkZWYuaCBp
+cyBleHBlY3RlZCB0byBiZSByZW1vdmVkIGJ5IHRoZQ0KPj4gaGVhZGVyX2luc3RhbGwuc2ggc2Ny
+aXB0LCBhcyBjb21waWxlcl90eXBlcy5oIHNob3VsZG4ndCBiZSB1c2VkIGZyb20gdGhlDQo+PiB1
+c2VyIHNwYWNlLg0KPiAgIA0KPiBIbW0uIElmIEkgcnVuIHRoaXMgb24gbXkgY3VycmVudCA2LjEw
+LWJhc2VkIHN5c3RlbSwgSSBnZXQ6DQo+IA0KPiAkIG1ha2UNCj4gICAgQ0MgICAgICAgdmRzb19z
+dGFuZGFsb25lX3Rlc3RfeDg2DQo+ICAgIENDICAgICAgIHZkc29fdGVzdF9nZXRyYW5kb20NCj4g
+dmRzb190ZXN0X2dldHJhbmRvbS5jOjQzOjQxOiBlcnJvcjogZmllbGQg4oCYcGFyYW1z4oCZIGhh
+cyBpbmNvbXBsZXRlIHR5cGUNCj4gICAgIDQzIHwgICAgICAgICBzdHJ1Y3QgdmdldHJhbmRvbV9v
+cGFxdWVfcGFyYW1zIHBhcmFtczsNCj4gICAgICAgIHwgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgIF5+fn5+fg0KPiANCj4gQmVjYXVzZSBLSERSX0lOQ0xVREVTIGlzIC91
+c3IvaW5jbHVkZSBpbnN0ZWFkLg0KPiANCj4gQ2hyaXN0b3BoZSwgYW55IHN1Z2dlc3Rpb25zIG9u
+IHRoaXMgb25lPyBBbmQgYW55IGlkZWEgd2h5IGxvb25nYXJjaCBpcw0KPiBoaXR0aW5nIGl0LCBi
+dXQgbm90IHg4NiBvciBwcGM/DQo+IA0KDQoNCkNhbiB5b3UgJ21ha2UgY2xlYW4nIHRoZW4gcHJv
+dmlkZSB0aGUgb3V0cHV0IG9mICdtYWtlIFY9MScgPw0KDQpPbiBwb3dlcnBjIEkgZ2V0Og0KDQok
+IG1ha2UgIEFSQ0g9cG93ZXJwYyBDUk9TU19DT01QSUxFPXBwYy1saW51eC0gDQpTT0RJVU09Ii1J
+L3RtcC9zb2RpdW0vdXNyL2xvY2FsL2luY2x1ZGUvIC1ML3RtcC9zb2RpdW0vdXNyL2xvY2FsL2xp
+Yi8gDQotbHNvZGl1bSIgVj0xDQpwcGMtbGludXgtZ2NjIC1zdGQ9Z251OTkgLURfR05VX1NPVVJD
+RT0gICAgdmRzb190ZXN0X2dldHRpbWVvZmRheS5jIA0KcGFyc2VfdmRzby5jICAtbyANCi9ob21l
+L2NobGVyb3kvbGludXgtcG93ZXJwYy90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy92RFNPL3Zkc29f
+dGVzdF9nZXR0aW1lb2ZkYXkNCnBwYy1saW51eC1nY2MgLXN0ZD1nbnU5OSAtRF9HTlVfU09VUkNF
+PSAgICB2ZHNvX3Rlc3RfZ2V0Y3B1LmMgDQpwYXJzZV92ZHNvLmMgIC1vIA0KL2hvbWUvY2hsZXJv
+eS9saW51eC1wb3dlcnBjL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3RzL3ZEU08vdmRzb190ZXN0X2dl
+dGNwdQ0KcHBjLWxpbnV4LWdjYyAtc3RkPWdudTk5IC1EX0dOVV9TT1VSQ0U9ICAgIHZkc29fdGVz
+dF9hYmkuYyBwYXJzZV92ZHNvLmMgDQotbyAvaG9tZS9jaGxlcm95L2xpbnV4LXBvd2VycGMvdG9v
+bHMvdGVzdGluZy9zZWxmdGVzdHMvdkRTTy92ZHNvX3Rlc3RfYWJpDQpwcGMtbGludXgtZ2NjIC1z
+dGQ9Z251OTkgLURfR05VX1NPVVJDRT0gICAgdmRzb190ZXN0X2Nsb2NrX2dldHJlcy5jICAtbyAN
+Ci9ob21lL2NobGVyb3kvbGludXgtcG93ZXJwYy90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy92RFNP
+L3Zkc29fdGVzdF9jbG9ja19nZXRyZXMNCnBwYy1saW51eC1nY2MgLXN0ZD1nbnU5OSAtRF9HTlVf
+U09VUkNFPSAgLWxkbCAgdmRzb190ZXN0X2NvcnJlY3RuZXNzLmMgDQotbyANCi9ob21lL2NobGVy
+b3kvbGludXgtcG93ZXJwYy90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy92RFNPL3Zkc29fdGVzdF9j
+b3JyZWN0bmVzcw0KcHBjLWxpbnV4LWdjYyAtc3RkPWdudTk5IC1EX0dOVV9TT1VSQ0U9IC1pc3lz
+dGVtIA0KL2hvbWUvY2hsZXJveS9saW51eC1wb3dlcnBjL3Rvb2xzL3Rlc3Rpbmcvc2VsZnRlc3Rz
+Ly4uLy4uLy4uL3Rvb2xzL2luY2x1ZGUgDQotaXN5c3RlbSANCi9ob21lL2NobGVyb3kvbGludXgt
+cG93ZXJwYy90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy8uLi8uLi8uLi9pbmNsdWRlL3VhcGkgDQog
+ICAgdmRzb190ZXN0X2dldHJhbmRvbS5jIHBhcnNlX3Zkc28uYyAgLW8gDQovaG9tZS9jaGxlcm95
+L2xpbnV4LXBvd2VycGMvdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMvdkRTTy92ZHNvX3Rlc3RfZ2V0
+cmFuZG9tDQpwcGMtbGludXgtZ2NjIC1zdGQ9Z251OTkgLURfR05VX1NPVVJDRT0gLWlkaXJhZnRl
+ciANCi9ob21lL2NobGVyb3kvbGludXgtcG93ZXJwYy90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy8u
+Li8uLi8uLi90b29scy9pbmNsdWRlIA0KLWlkaXJhZnRlciANCi9ob21lL2NobGVyb3kvbGludXgt
+cG93ZXJwYy90b29scy90ZXN0aW5nL3NlbGZ0ZXN0cy8uLi8uLi8uLi9hcmNoL3Bvd2VycGMvaW5j
+bHVkZSANCi1pZGlyYWZ0ZXIgDQovaG9tZS9jaGxlcm95L2xpbnV4LXBvd2VycGMvdG9vbHMvdGVz
+dGluZy9zZWxmdGVzdHMvLi4vLi4vLi4vaW5jbHVkZSANCi1EX19BU1NFTUJMWV9fIC1EQlVMSURf
+VkRTTyAtRENPTkZJR19GVU5DVElPTl9BTElHTk1FTlQ9MCANCi1XYSwtLW5vZXhlY3N0YWNrIC1J
+L3RtcC9zb2RpdW0vdXNyL2xvY2FsL2luY2x1ZGUvIA0KLUwvdG1wL3NvZGl1bS91c3IvbG9jYWwv
+bGliLyAtbHNvZGl1bSAgICB2ZHNvX3Rlc3RfY2hhY2hhLmMgDQovaG9tZS9jaGxlcm95L2xpbnV4
+LXBvd2VycGMvdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMvLi4vLi4vLi4vdG9vbHMvYXJjaC9wb3dl
+cnBjL3Zkc28vdmdldHJhbmRvbS1jaGFjaGEuUyANCiAgLW8gDQovaG9tZS9jaGxlcm95L2xpbnV4
+LXBvd2VycGMvdG9vbHMvdGVzdGluZy9zZWxmdGVzdHMvdkRTTy92ZHNvX3Rlc3RfY2hhY2hhDQok
+DQoNClRoYW5rcw0KQ2hyaXN0b3BoZQ0K
