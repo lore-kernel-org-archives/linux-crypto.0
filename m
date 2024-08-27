@@ -1,54 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C136D64A;
-	Tue, 27 Aug 2024 18:14:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB556146590;
+	Tue, 27 Aug 2024 18:48:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724782469; cv=none; b=QeNUD1inJ9Q33iwUkMW9DtpD6ClhiCwUJ9gvuilOejns4jukWrTcerzu9lDkfP7xG9VLXM7+U/bVynVgHCWQppZUlUuPe7MX1q2vxu3+yGnt/WQiZveKqhd3d7GOQEfBNjUFsf6A7pdnN+hA53NXDv+6DznIl2I4NP9mzMLSzxI=
+	t=1724784521; cv=none; b=h3qpFzUoFU7MrzLqKoT1qAGmcYjGaXOME8Pmeyahf/QtoN/OZhpsc1G3J2HfcwO2mcnRX2ZARnuXN36Fv56zEBKBQ+lefpto6UYzt+7YeznIMY++MukTl5geu2wVTI17l97rYON0727Tuzxyt0LQWFzgZSXzxVI+EPeyV0l5eQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724782469; c=relaxed/simple;
-	bh=m0KhuixhE94LpmqoQsm4UAltH48GcF8i8IXdiG38ZPk=;
+	s=arc-20240116; t=1724784521; c=relaxed/simple;
+	bh=TOskMyqvmJnMMdMK9trHR8rWGt1L+cQe4Dtdla0PK+0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t4dRea0Q8M9HFDmc+xTpywqohdnbEW2O3XLj9X1bgrEQ1kk4L78aWE9NjMA80fHqmD811dFGq3VZMbZF8hlMzHXmc5A2p+gJNP3zISzkZlPqYWSpf9iIrrOzooiP7+2zZe501FWrtdja8eDUJWKyrnF/Z1e9lEc8+zB98Jjb8WU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NO9wZXRK; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=UNV3ZgJIuhWI7cd0FLWy8YlQw+H96t0bJjAsOwkqEK6E0mMx7seYWBPInzd6gEWzGcyXSxNx+xZtjGJ2lqVBtbYMo2ZzNvu8nyyv+CT2zG/ROIhSWF5JnfEsMoqeb9snp+XSvroCUIpccs8LDFSemhNdqWZpBAt4Htvd5TSvCQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=murPJKnr; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NO9wZXRK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58B41C55DE1;
-	Tue, 27 Aug 2024 18:14:28 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="murPJKnr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55A4DC4FF4D;
+	Tue, 27 Aug 2024 18:48:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724782469;
-	bh=m0KhuixhE94LpmqoQsm4UAltH48GcF8i8IXdiG38ZPk=;
+	s=k20201202; t=1724784521;
+	bh=TOskMyqvmJnMMdMK9trHR8rWGt1L+cQe4Dtdla0PK+0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NO9wZXRK+c5+9o1RgEUXTMlPsLUkraQbJNjNWgnaiIsMVAj7HTDpigo1IKFqPjQSC
-	 72aYl4ts3jLiWhPoHr5B+0XONuilwh2rVswBam14Vp2U84t+uzxlVMX80qsuYTUwMd
-	 B03rCcpX2T0+wlO1mryM4OumGNDr3k3Oj8NO3Dc94a7lzqt6Vqdane7FRLa1U8xvd6
-	 QIqoXi5N9u8S8mhS9/gA5VAQP+xy8shOYuVsU9PJsQmze3QJq57qFJCtarRBhpyAya
-	 VTsHjCBQprW7P/+6l5j3vMcsypMc9D0XOKJ+pnsn9wnsg3+pJxbeIeF38mRpoBFf7O
-	 XwDFH+Dkzul/A==
-Date: Tue, 27 Aug 2024 11:14:26 -0700
+	b=murPJKnrocvWfXX7rWlYLG3ledHoOxLgwG/e1Qwf9cs/KuUhuSnLz6a4PwpOAICuO
+	 7I+yhTbPeHZEp0GMdcgKfU0849z1wX6+w4+F9r3xzYA8tUC5mvlm6uoY/lydfbwgcL
+	 YbZIPndcqpP30be39cIFQKzkQXAUHFLV4iZilqIUEFJk/d1I4ZpM9MeRfk61F3L/UW
+	 qi4FAvEF0mCdQd+kCGVRsp45+khRStTBMoO2AwnBPxsNa1wzB6aRfW1uEKXueg92JN
+	 9KlbU+LvI6rKoGjx+2KIIvtsiGAkGuLnPpWBzAzReks4ZfNBEaaseoATd97fcjlw86
+	 yeTIdEUTFmOhw==
+Date: Tue, 27 Aug 2024 11:48:39 -0700
 From: Eric Biggers <ebiggers@kernel.org>
-To: Ross Philipson <ross.philipson@oracle.com>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org,
-	linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
-	linux-efi@vger.kernel.org, iommu@lists.linux-foundation.org,
-	dpsmith@apertussolutions.com, tglx@linutronix.de, mingo@redhat.com,
-	bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com,
-	ardb@kernel.org, mjg59@srcf.ucam.org,
-	James.Bottomley@hansenpartnership.com, peterhuewe@gmx.de,
-	jarkko@kernel.org, jgg@ziepe.ca, luto@amacapital.net,
-	nivedita@alum.mit.edu, herbert@gondor.apana.org.au,
-	davem@davemloft.net, corbet@lwn.net, ebiederm@xmission.com,
-	dwmw2@infradead.org, baolu.lu@linux.intel.com,
-	kanth.ghatraju@oracle.com, andrew.cooper3@citrix.com,
-	trenchboot-devel@googlegroups.com
-Subject: Re: [PATCH v9 06/19] x86: Add early SHA-1 support for Secure Launch
- early measurements
-Message-ID: <20240827181426.GC2049@sol.localdomain>
-References: <20240531010331.134441-1-ross.philipson@oracle.com>
- <20240531010331.134441-7-ross.philipson@oracle.com>
- <20240531021656.GA1502@sol.localdomain>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: kernel test robot <oliver.sang@intel.com>, oe-lkp@lists.linux.dev,
+	lkp@intel.com, linux-crypto@vger.kernel.org, ltp@lists.linux.it,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>
+Subject: Re: [v3 PATCH 3/3] crypto: simd - Do not call crypto_alloc_tfm
+ during registration
+Message-ID: <20240827184839.GD2049@sol.localdomain>
+References: <ZrbTUk6DyktnO7qk@gondor.apana.org.au>
+ <202408161634.598311fd-oliver.sang@intel.com>
+ <ZsBJs_C6GdO_qgV7@gondor.apana.org.au>
+ <ZsBJ5H4JExArHGVw@gondor.apana.org.au>
+ <ZsBKG0la0m69Dyq3@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -57,36 +52,34 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240531021656.GA1502@sol.localdomain>
+In-Reply-To: <ZsBKG0la0m69Dyq3@gondor.apana.org.au>
 
-On Thu, May 30, 2024 at 07:16:56PM -0700, Eric Biggers wrote:
-> On Thu, May 30, 2024 at 06:03:18PM -0700, Ross Philipson wrote:
-> > From: "Daniel P. Smith" <dpsmith@apertussolutions.com>
-> > 
-> > For better or worse, Secure Launch needs SHA-1 and SHA-256. The
-> > choice of hashes used lie with the platform firmware, not with
-> > software, and is often outside of the users control.
-> > 
-> > Even if we'd prefer to use SHA-256-only, if firmware elected to start us
-> > with the SHA-1 and SHA-256 backs active, we still need SHA-1 to parse
-> > the TPM event log thus far, and deliberately cap the SHA-1 PCRs in order
-> > to safely use SHA-256 for everything else.
-> > 
-> > The SHA-1 code here has its origins in the code from the main kernel:
-> > 
-> > commit c4d5b9ffa31f ("crypto: sha1 - implement base layer for SHA-1")
-> > 
-> > A modified version of this code was introduced to the lib/crypto/sha1.c
-> > to bring it in line with the SHA-256 code and allow it to be pulled into the
-> > setup kernel in the same manner as SHA-256 is.
-> > 
-> > Signed-off-by: Daniel P. Smith <dpsmith@apertussolutions.com>
-> > Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
+On Sat, Aug 17, 2024 at 02:58:35PM +0800, Herbert Xu wrote:
+> Algorithm registration is usually carried out during module init,
+> where as little work as possible should be carried out.  The SIMD
+> code violated this rule by allocating a tfm, this then triggers a
+> full test of the algorithm which may dead-lock in certain cases.
 > 
-> Thanks.  This explanation doesn't seem to have made it into the actual code or
-> documentation.  Can you please get it into a more permanent location?
+> SIMD is only allocating the tfm to get at the alg object, which is
+> in fact already available as it is what we are registering.  Use
+> that directly and remove the crypto_alloc_tfm call.
+> 
+> Also remove some obsolete and unused SIMD API.
+> 
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> ---
+>  arch/arm/crypto/aes-ce-glue.c     |  2 +-
+>  arch/arm/crypto/aes-neonbs-glue.c |  2 +-
+>  crypto/simd.c                     | 76 ++++++-------------------------
+>  include/crypto/internal/simd.h    | 12 +----
+>  4 files changed, 19 insertions(+), 73 deletions(-)
+> 
 
-I see that a new version of the patchset was sent out but this suggestion was
-not taken.  Are you planning to address it?
+I'm getting a test failure with this series applied:
+
+[    0.383128] alg: aead: failed to allocate transform for gcm_base(ctr(aes-generic),ghash-generic): -2
+[    0.383500] alg: self-tests for gcm(aes) using gcm_base(ctr(aes-generic),ghash-generic) failed (rc=-2)
+
+This is on x86_64 with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y.
 
 - Eric
