@@ -1,118 +1,160 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from xry111.site (xry111.site [89.208.246.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8DAB1DFF5;
-	Tue, 27 Aug 2024 14:15:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EA201A0AF4
+	for <linux-crypto@vger.kernel.org>; Tue, 27 Aug 2024 14:27:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.208.246.23
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724768145; cv=none; b=Wpi4MZFxnKvoza5zSxefFzXPznZoulflxeLsoADr0vE+VDhyHjodiJzbDbFnU6VPX+1nS8ABPluq/5mK0qKwcmwfIYObXc0MVhtmtNWsB6Yd4+MG0zsxE4ctDXZIx0B5Y17RflSqzANvjnegCJltLwpIyHYvlNEbEcG9zi5uSNA=
+	t=1724768822; cv=none; b=QSvs+W0IuxKt+YkPZk8jAgnkEQjicrCLx1P160ECQCCXTJMRKTrSSuFwSLQq0j0PBQgB74cK/NfiToBWBRvXnZyssqK1nXFCnOhVhlXKUOwEb3SpbIGvGkfZwvWmJ1XMnR00jiEKhILZJpI4na36iCfmlsKGDcFXT6Mh/ZrmCuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724768145; c=relaxed/simple;
-	bh=AR8PJ+UiqD2KHGBWAy5OqFsKQ0kKsJPhPMa3BPwHMys=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eyoIKfl06pxKUYuw5y92zCzUPmOzDT99FEAbmhFj2nMm5scp3XoTy9575qBNdmI+X5gGy8d4/4z8s6zPsrWY2Ke0aKdelRYCapud5eBr20cgqL04cDk1XAQISVkb3ZkW5gGA2kXC2cKxaqk1q78/cyycmglD3t4ddTYk6Cu9U6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=n1DK9Q6C; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1724768822; c=relaxed/simple;
+	bh=+q2+LZWCWXtLQCcNQ3ibvgIQp4F3rZIVxQwsHCBGARY=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=EUWQ4lGfbNf/xX4iXXSHbl66H8AVTKTcRvamQ4Sp9KCSr12onEDoH/BiMpS5cozff/vIMn/Lj9Gd6HrMB7HwnK5f5LWJQS1qKUZTkzaHdQwINGw5fNTZniZ+R0BOeRTW+a6kgnRAFjTl/GEfBUmYnacRVrhVvfmKffJ5s1Ln0bs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site; spf=pass smtp.mailfrom=xry111.site; dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b=M4qZwCN1; arc=none smtp.client-ip=89.208.246.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xry111.site
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="n1DK9Q6C"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C702C581AB;
-	Tue, 27 Aug 2024 14:15:43 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="n1DK9Q6C"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1724768141;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WJtKwQReDIyAbQzKAN5WLKqtgiU7ReZHpA8bCOUtZqM=;
-	b=n1DK9Q6C45QX0Z4PdSNk6+sAjncf8DQBukQzt2iCkS6aG+AeJLDjEacXLNumsznmMSV/H5
-	BNWYtro2G6sYMoARDrMtPqehth131s95Wexs0j6FtXZOznfhp5MCFBUH0ABYIuelqran9y
-	J9U36q4btY5005ovzCCltuimSeNJAck=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id a575f1cc (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Tue, 27 Aug 2024 14:15:40 +0000 (UTC)
-Date: Tue, 27 Aug 2024 16:15:34 +0200
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: LEROY Christophe <christophe.leroy2@cs-soprasteria.com>
-Cc: Xi Ruoyao <xry111@xry111.site>, Huacai Chen <chenhuacai@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"loongarch@lists.linux.dev" <loongarch@lists.linux.dev>,
-	Jinyang He <hejinyang@loongson.cn>,
-	Tiezhu Yang <yangtiezhu@loongson.cn>, Arnd Bergmann <arnd@arndb.de>,
-	"tglx@linutronix.de" <tglx@linutronix.de>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
-Subject: Re: [PATCH v4 3/4] selftests/vDSO: Use KHDR_INCLUDES to locate UAPI
- headers for vdso_test_getrandom
-Message-ID: <Zs3fhiSlXg2aCGa8@zx2c4.com>
+	dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b="M4qZwCN1"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xry111.site;
+	s=default; t=1724768818;
+	bh=+q2+LZWCWXtLQCcNQ3ibvgIQp4F3rZIVxQwsHCBGARY=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=M4qZwCN1nUoS8g8eiWSSfchqgF0ZC2KS+LtJVgtOwBaAAm7bYKOZuT+BAuR3sze90
+	 Cx7H6PXSEu1mB4jRiy7pANWpxT2k9BYrul+nzQq4k2tUeOuF+BkmzBpzjXxQU4iSAQ
+	 c1dE0AzP3dOupf+pU3bWFV6YVQOSj27Auw427z4w=
+Received: from [127.0.0.1] (unknown [IPv6:2001:470:683e::1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-384) server-digest SHA384)
+	(Client did not present a certificate)
+	(Authenticated sender: xry111@xry111.site)
+	by xry111.site (Postfix) with ESMTPSA id 9D3F766F26;
+	Tue, 27 Aug 2024 10:26:55 -0400 (EDT)
+Message-ID: <f404ae352a8cba3e035c9d5a10b553fb4497bb02.camel@xry111.site>
+Subject: Re: [PATCH v4 1/4] LoongArch: vDSO: Wire up getrandom() vDSO
+ implementation
+From: Xi Ruoyao <xry111@xry111.site>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>, 
+ linux-crypto@vger.kernel.org, loongarch@lists.linux.dev, Jinyang He
+ <hejinyang@loongson.cn>, Tiezhu Yang <yangtiezhu@loongson.cn>, Arnd
+ Bergmann <arnd@arndb.de>
+Date: Tue, 27 Aug 2024 22:26:53 +0800
+In-Reply-To: <Zs3ZWm-218Cb_ir0@zx2c4.com>
 References: <20240827132018.88854-1-xry111@xry111.site>
- <20240827132018.88854-4-xry111@xry111.site>
- <Zs3blfx1inX_FQLR@zx2c4.com>
- <019268d4-c177-49e7-aab3-b8fa431905ca@cs-soprasteria.com>
+	 <20240827132018.88854-2-xry111@xry111.site> <Zs3ZWm-218Cb_ir0@zx2c4.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.3 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <019268d4-c177-49e7-aab3-b8fa431905ca@cs-soprasteria.com>
 
-On Tue, Aug 27, 2024 at 02:07:59PM +0000, LEROY Christophe wrote:
-> Le 27/08/2024 à 15:58, Jason A. Donenfeld a écrit :
-> > On Tue, Aug 27, 2024 at 09:20:16PM +0800, Xi Ruoyao wrote:
-> >> Building test_vdso_getrandom currently leads to following issue:
-> >>
-> >>      In file included from /home/xry111/git-repos/linux/tools/include/linux/compiler_types.h:36,
-> >>                       from /home/xry111/git-repos/linux/include/uapi/linux/stddef.h:5,
-> >>                       from /home/xry111/git-repos/linux/include/uapi/linux/posix_types.h:5,
-> >>                       from /usr/include/asm/sigcontext.h:12,
-> >>                       from /usr/include/bits/sigcontext.h:30,
-> >>                       from /usr/include/signal.h:301,
-> >>                       from vdso_test_getrandom.c:14:
-> >>      /home/xry111/git-repos/linux/tools/include/linux/compiler-gcc.h:3:2: error: #error "Please don't include <linux/compiler-gcc.h> directly, include <linux/compiler.h> instead."
-> >>          3 | #error "Please don't include <linux/compiler-gcc.h> directly, include <linux/compiler.h> instead."
-> >>            |  ^~~~~
-> >>
-> >> It's because the compiler_types.h inclusion in
-> >> include/uapi/linux/stddef.h is expected to be removed by the
-> >> header_install.sh script, as compiler_types.h shouldn't be used from the
-> >> user space.
-> >   
-> > Hmm. If I run this on my current 6.10-based system, I get:
-> > 
-> > $ make
-> >    CC       vdso_standalone_test_x86
-> >    CC       vdso_test_getrandom
-> > vdso_test_getrandom.c:43:41: error: field ‘params’ has incomplete type
-> >     43 |         struct vgetrandom_opaque_params params;
-> >        |                                         ^~~~~~
-> > 
-> > Because KHDR_INCLUDES is /usr/include instead.
-> > 
-> > Christophe, any suggestions on this one? And any idea why loongarch is
-> > hitting it, but not x86 or ppc?
-> > 
-> 
-> 
-> Can you 'make clean' then provide the output of 'make V=1' ?
- 
-With*out* this patch, the output is:
+On Tue, 2024-08-27 at 15:49 +0200, Jason A. Donenfeld wrote:
+> On Tue, Aug 27, 2024 at 09:20:14PM +0800, Xi Ruoyao wrote:
+> > +	register long ret asm("a0");
+> > +	register long int nr asm("a7") =3D __NR_getrandom;
+>=20
+> The first line is `long` and the second line is `long int` here. Just
+> call them both `long` like usual?
 
-gcc -std=gnu99 -D_GNU_SOURCE= -isystem /home/zx2c4/Projects/random-linux/tools/testing/selftests/../../../tools/include -isystem /home/zx2c4/Projects/random-linux/tools/testing/selftests/../../../include/uapi    vdso_test_getrandom.c parse_vdso.c  -o /home/zx2c4/Projects/random-linux/tools/testing/selftests/vDSO/vdso_test_getrandom
+I'll change it.
+>=20
+> > =C2=A0struct loongarch_vdso_data {
+> > =C2=A0	struct vdso_pcpu_data pdata[NR_CPUS];
+> > +#ifdef CONFIG_VDSO_GETRANDOM
+> > +	struct vdso_rng_data rng_data;
+> > +#endif
+>=20
+> If VSO_GETRANDOM is selected unconditionally for the arch, why the
+> ifdef
+> here?
+>=20
+> > +obj-vdso-$(CONFIG_VDSO_GETRANDOM) +=3D vgetrandom.o vgetrandom-
+> > chacha.o
+>=20
+> Likewise, same question here.
 
-*With* this patch, the output is:
+I'll remove the ifdef and just add them into obj-vdso-y.
 
-gcc -std=gnu99 -D_GNU_SOURCE= -isystem /home/zx2c4/Projects/random-linux/tools/testing/selftests/../../../tools/include -isystem /home/zx2c4/Projects/random-linux/tools/testing/selftests/../../../usr/include    vdso_test_getrandom.c parse_vdso.c  -o /home/zx2c4/Projects/random-linux/tools/testing/selftests/vDSO/vdso_test_getrandom
-vdso_test_getrandom.c:43:41: error: field ‘params’ has incomplete type
-   43 |         struct vgetrandom_opaque_params params;
-      |                                         ^~~~~~
+> > +	/* copy[3] =3D "expa" */
+> > +	li.w		copy3, 0x6b206574
+>=20
+> Might want to mention why you're doing this.
+>=20
+> =C2=A0=C2=A0=C2=A0 /* copy[3] =3D "expa", because it was clobbered by the=
+ i index. */
 
-$ ls /home/zx2c4/Projects/random-linux/tools/testing/selftests/../../../usr/include
-headers_check.pl  Makefile
+I'll add it.
 
-Since I don't build in there, this directory is empty.
+> Or something like that.
+>=20
+> But on the topic of those constants,
+>=20
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 li.w=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 copy0, 0x61707865
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 li.w=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 copy1, 0x3320646e
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 li.w=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 copy2, 0x79622d32
+>=20
+> What if you avoid doing this,
+>=20
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ld.w=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cnt_lo, counter, 0
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ld.w=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cnt_hi, counter, 4
+> > +
+> > +.Lblock:
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* state[0,1,2,3] =3D "expand 32-=
+byte k" */
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 move=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 state0, copy0
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 move=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 state1, copy1
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 move=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 state2, copy2
+>=20
+> Use li.w here with the integer literals,
 
-Jason
+li.w is expanded to two instructions (lu12i.w + addi.w) by the
+assembler.
+
+> > +	/* copy[3] =3D "expa" */
+> > +	li.w		copy3, 0x6b206574
+>=20
+> Skip this,
+>=20
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 add.w=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 state0, state0, copy0
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 add.w=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 state1, state1, copy1
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 add.w=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 state2, state2, copy2
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 add.w=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 state3, state3, copy3
+>=20
+> And then use addi.w here with the integer literals instead?
+
+LoongArch addi.w can only handle 12-bit signed immediate values (such a
+limitation is very common in RISC machines).  On my processor I can
+avoid using a register to materialize the constant with addu16i.d +
+addu12i.w + addi.w.  But there would be 3 instructions, and addu12i.w is
+a part of the Loongson Binary Translation extension which is not
+available on some processors.  Also LBT isn't intended for general use,
+so most LBT instructions have a lower throughput than the basic
+instructions.
+
+> I don't know anything about loongarch, so just guessing.
+
+> BTW, can you confirm that this passes the test in test_vdso_chacha?
+
+Yes, it has passed the test.
+
+--=20
+Xi Ruoyao <xry111@xry111.site>
+School of Aerospace Science and Technology, Xidian University
