@@ -1,167 +1,90 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from xry111.site (xry111.site [89.208.246.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 099F61A00EE;
-	Tue, 27 Aug 2024 13:34:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C66B8F54
+	for <linux-crypto@vger.kernel.org>; Tue, 27 Aug 2024 13:36:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.208.246.23
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724765671; cv=none; b=gks1tWhzz/2aD27bUnCXJPrrDmjq+1XkysCFoAXNO9sFgU+lK78Pbq2kRALGH3oZJG9Wmg5pWkGq9MxXbkdGUQkHnduWKOoVS65m1n+pDSceBQGT/zNYBt9tQ6+Nw/sEOMVVyjcmfJVBZpcN28MmhZWk05uZIAQDQBcHu9CEZok=
+	t=1724765771; cv=none; b=Gv7fiDMiwKs/qdnrZT7x7xx+bfKRA9TXxf1Xhm0BEERpH6oawTAonmTkNGfUvt0B0jGvN+iNijlPZfbwMQQuouteVngxPLQeutQlZea8TJrFIgTrkTjMhyAL+bxKC22znzHJSg3r4m33Tirdc2J7KbWkHvGv6xkSiuaVtVdruLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724765671; c=relaxed/simple;
-	bh=G5clD8Optkw0MoCKh+T6nncwLBMLnao15yzQVBD2UyU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WUgxRKsKAp9+VMo2CEOtfZ4ijuBQU4DOdVsUkFniRaPuBGowaQH+67UcM8ZGExZ2pl6eqrzcs17eA2NuaIuU4fFalhuxb2KpQ572vJ7LZkqMeT2jYDsWS/OE/g+n50H5sdmLRoTb60LjNCnqWCil4Mpqb9Xn5TdvSZJwfLTGa/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=Q+geZFdb; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1724765771; c=relaxed/simple;
+	bh=GTGzIZR0CANt6o8R1vL/vi7QxvJ9y+bEkhIVB/SLra4=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=AjpIGDpj36laPQMnr5hl/ztksjJ+esGD24f2NA0pGcuWw5sMMcuFoE7VPR8RPvlzxQB4rJfWUl+DI1AeadB6HtdCm0aUCKFYb9i7qfCZa7Fvzd8n/J6zOmGMTj1ZgbyuXzzjNzO9Y70kYC2sNw0HhUJ2bBKo8wtmh2cH3swe5ic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site; spf=pass smtp.mailfrom=xry111.site; dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b=DzsS9Czo; arc=none smtp.client-ip=89.208.246.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xry111.site
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Q+geZFdb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD927C61043;
-	Tue, 27 Aug 2024 13:34:29 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Q+geZFdb"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1724765667;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JXX7f47ZGvyfYVfZTOAIbEyIBS+BUEfdrN8TErecN44=;
-	b=Q+geZFdbPMu7rSZ4x8XhBI4emfB05hMJcMdYsIGhwHySfBuHbhdQr8L55m3dY5D3kJEzXd
-	1YJpYekLGGYWUybW4PeWnwrvH6WzgSzJPBtTG0hH7DR9g0l0QYuXiB6uOxnjOHQtPG3Wgd
-	CpSHTbxThM8qNcQH4G5T7vaDXFDcjMs=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 764f8b54 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Tue, 27 Aug 2024 13:34:26 +0000 (UTC)
-Date: Tue, 27 Aug 2024 15:34:20 +0200
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>
-Cc: Theodore Ts'o <tytso@mit.edu>, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-arch@vger.kernel.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>
-Subject: Re: [PATCH] aarch64: vdso: Wire up getrandom() vDSO implementation
-Message-ID: <Zs3V3FYwz57tyGgp@zx2c4.com>
-References: <20240826181059.111536-1-adhemerval.zanella@linaro.org>
- <ZszlGPqfrULzi3KG@zx2c4.com>
- <fd3cd385-131a-43b2-8ce9-05547a4f2d1d@linaro.org>
+	dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b="DzsS9Czo"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xry111.site;
+	s=default; t=1724765769;
+	bh=GTGzIZR0CANt6o8R1vL/vi7QxvJ9y+bEkhIVB/SLra4=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=DzsS9CzoZnakCQtjSGCa2HYfsd1W2255M9yAipzTXdwm+2kVlvLCzbnjMLKZ/ojTW
+	 f5PAa80QEpI8NhGgoU57Jc6lxt9qBHJ0qeGNR7Y4DdpLO1MEm5zEoYripQVZXNBMsc
+	 PM2pPYfHyu9XjhdDaGSfOFb+d+QANrZ1ei43xOrQ=
+Received: from [127.0.0.1] (unknown [IPv6:2001:470:683e::1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-384) server-digest SHA384)
+	(Client did not present a certificate)
+	(Authenticated sender: xry111@xry111.site)
+	by xry111.site (Postfix) with ESMTPSA id 7D5D366F26;
+	Tue, 27 Aug 2024 09:36:05 -0400 (EDT)
+Message-ID: <2faae6a144eaaa12a06bdb07438a07217659ff3b.camel@xry111.site>
+Subject: Re: [PATCH v4 1/4] LoongArch: vDSO: Wire up getrandom() vDSO
+ implementation
+From: Xi Ruoyao <xry111@xry111.site>
+To: "Jason A . Donenfeld" <Jason@zx2c4.com>, Huacai Chen
+ <chenhuacai@kernel.org>,  WANG Xuerui <kernel@xen0n.name>
+Cc: linux-crypto@vger.kernel.org, loongarch@lists.linux.dev, Jinyang He
+ <hejinyang@loongson.cn>, Tiezhu Yang <yangtiezhu@loongson.cn>, Arnd
+ Bergmann <arnd@arndb.de>
+Date: Tue, 27 Aug 2024 21:36:03 +0800
+In-Reply-To: <20240827132018.88854-2-xry111@xry111.site>
+References: <20240827132018.88854-1-xry111@xry111.site>
+	 <20240827132018.88854-2-xry111@xry111.site>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.3 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <fd3cd385-131a-43b2-8ce9-05547a4f2d1d@linaro.org>
 
-On Tue, Aug 27, 2024 at 10:17:18AM -0300, Adhemerval Zanella Netto wrote:
-> 
-> 
-> On 26/08/24 17:27, Jason A. Donenfeld wrote:
-> > Hi Adhemerval,
-> > 
-> > Thanks for posting this! Exciting to have it here.
-> > 
-> > Just some small nits for now:
-> > 
-> > On Mon, Aug 26, 2024 at 06:10:40PM +0000, Adhemerval Zanella wrote:
-> >> +static __always_inline ssize_t getrandom_syscall(void *buffer, size_t len, unsigned int flags)
-> >> +{
-> >> +	register long int x8 asm ("x8") = __NR_getrandom;
-> >> +	register long int x0 asm ("x0") = (long int) buffer;
-> >> +	register long int x1 asm ("x1") = (long int) len;
-> >> +	register long int x2 asm ("x2") = (long int) flags;
-> > 
-> > Usually it's written just as `long` or `unsigned long`, and likewise
-> > with the cast. Also, no space after the cast.
-> 
-> Ack.
-> 
-> > 
-> >> +#define __VDSO_RND_DATA_OFFSET  480
-> > 
-> > This is the size of the data currently there?
-> 
-> Yes, I used the same strategy x86 did.
-> 
-> > 
-> >>  #include <asm/page.h>
-> >>  #include <asm/vdso.h>
-> >>  #include <asm-generic/vmlinux.lds.h>
-> >> +#include <vdso/datapage.h>
-> >> +#include <asm/vdso/vsyscall.h>
-> > 
-> > Possible to keep the asm/ together?
-> 
-> Ack.
-> 
-> > 
-> >> + * ARM64 ChaCha20 implementation meant for vDSO.  Produces a given positive
-> >> + * number of blocks of output with nonnce 0, taking an input key and 8-bytes
-> > 
-> > nonnce -> nonce
-> 
-> Ack.
-> 
-> > 
-> >> -ARCH ?= $(shell echo $(uname_M) | sed -e s/i.86/x86/ -e s/x86_64/x86/)
-> >> +ARCH ?= $(shell echo $(uname_M) | sed -e s/i.86/x86/ -e s/x86_64/x86/ -e s/aarch64.*/arm64/)
-> >>  SODIUM := $(shell pkg-config --libs libsodium 2>/dev/null)
-> >>  
-> >>  TEST_GEN_PROGS := vdso_test_gettimeofday
-> >> @@ -11,7 +11,7 @@ ifeq ($(ARCH),$(filter $(ARCH),x86 x86_64))
-> >>  TEST_GEN_PROGS += vdso_standalone_test_x86
-> >>  endif
-> >>  TEST_GEN_PROGS += vdso_test_correctness
-> >> -ifeq ($(uname_M),x86_64)
-> >> +ifeq ($(uname_M), $(filter x86_64 aarch64, $(uname_M)))
-> >>  TEST_GEN_PROGS += vdso_test_getrandom
-> >>  ifneq ($(SODIUM),)
-> >>  TEST_GEN_PROGS += vdso_test_chacha
-> > 
-> > You'll need to add the symlink to get the chacha selftest running:
-> > 
-> >   $ ln -s ../../../arch/arm64/kernel/vdso tools/arch/arm64/vdso
-> >   $ git add tools/arch/arm64/vdso
-> > 
-> > Also, can you confirm that the chacha selftest runs and works?
-> 
-> Yes, last time I has to built it manually since the Makefile machinery seem 
-> to be broken even on x86_64.  In a Ubuntu vm I have:
-> 
-> tools/testing/selftests/vDSO$ make
->   CC       vdso_test_gettimeofday
->   CC       vdso_test_getcpu
->   CC       vdso_test_abi
->   CC       vdso_test_clock_getres
->   CC       vdso_standalone_test_x86
->   CC       vdso_test_correctness
->   CC       vdso_test_getrandom
->   CC       vdso_test_chacha
-> In file included from /home/azanella/Projects/linux/linux-git/include/linux/limits.h:7,
->                  from /usr/include/x86_64-linux-gnu/bits/local_lim.h:38,
->                  from /usr/include/x86_64-linux-gnu/bits/posix1_lim.h:161,
->                  from /usr/include/limits.h:195,
->                  from /usr/lib/gcc/x86_64-linux-gnu/13/include/limits.h:205,
->                  from /usr/lib/gcc/x86_64-linux-gnu/13/include/syslimits.h:7,
->                  from /usr/lib/gcc/x86_64-linux-gnu/13/include/limits.h:34,
->                  from /usr/include/sodium/export.h:7,
->                  from /usr/include/sodium/crypto_stream_chacha20.h:14,
->                  from vdso_test_chacha.c:6:
-> /usr/include/x86_64-linux-gnu/bits/xopen_lim.h:99:6: error: missing binary operator before token "("
->    99 | # if INT_MAX == 32767
->       |      ^~~~~~~
-> /usr/include/x86_64-linux-gnu/bits/xopen_lim.h:102:7: error: missing binary operator before token "("
->   102 | #  if INT_MAX == 2147483647
->       |       ^~~~~~~
-> /usr/include/x86_64-linux-gnu/bits/xopen_lim.h:126:6: error: missing binary operator before token "("
->   126 | # if LONG_MAX == 2147483647
->       |      ^~~~~~~~
-> make: *** [../lib.mk:222: /home/azanella/Projects/linux/linux-git/tools/testing/selftests/vDSO/vdso_test_chacha] Error 1
+On Tue, 2024-08-27 at 21:20 +0800, Xi Ruoyao wrote:
+> diff --git a/arch/loongarch/kernel/asm-offsets.c b/arch/loongarch/kernel/=
+asm-offsets.c
 
-You get that even with the latest random.git? I thought Christophe's
-patch fixed that, but maybe not and I should just remove the dependency
-on the sodium header instead.
+This change is unneeded now but I forgot to remove it.  Will remove it
+in v5 but for now just waiting for other review comments.
 
-Jason
+> index bee9f7a3108f..86f6d8a6dc23 100644
+> --- a/arch/loongarch/kernel/asm-offsets.c
+> +++ b/arch/loongarch/kernel/asm-offsets.c
+> @@ -14,6 +14,7 @@
+> =C2=A0#include <asm/ptrace.h>
+> =C2=A0#include <asm/processor.h>
+> =C2=A0#include <asm/ftrace.h>
+> +#include <asm/vdso/vdso.h>
+> =C2=A0
+> =C2=A0static void __used output_ptreg_defines(void)
+> =C2=A0{
+> @@ -321,3 +322,12 @@ static void __used output_kvm_defines(void)
+> =C2=A0	OFFSET(KVM_GPGD, kvm, arch.pgd);
+> =C2=A0	BLANK();
+> =C2=A0}
+> +
+> +#ifdef CONFIG_VDSO_GETRANDOM
+> +static void __used output_vdso_rng_defines(void)
+> +{
+> +	COMMENT("LoongArch VDSO getrandom offsets.");
+> +	OFFSET(VDSO_RNG_DATA, loongarch_vdso_data, rng_data);
+> +	BLANK();
+> +}
+> +#endif
+
+--=20
+Xi Ruoyao <xry111@xry111.site>
+School of Aerospace Science and Technology, Xidian University
