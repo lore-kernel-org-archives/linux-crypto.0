@@ -1,35 +1,35 @@
 Received: from xry111.site (xry111.site [89.208.246.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 797CB1BFDED
-	for <linux-crypto@vger.kernel.org>; Tue, 27 Aug 2024 13:20:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF6FC1BD514
+	for <linux-crypto@vger.kernel.org>; Tue, 27 Aug 2024 13:20:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.208.246.23
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724764840; cv=none; b=nWoc4fXODOJWu0/Crqhp3ciLuBlzSd9Ato/ShCbjvKBlQs5KCrxk7F+l1JmyeYYKWTOL/nG+s6pFV+X6SpNfd4MDrY6pcw3WSgSKSRNFXXYrSg9h+lk1xrcJmrGta9vouHygCfm/kFPy82nVdd8jWsyJdtZw4AF0nYwAZKkpGzc=
+	t=1724764844; cv=none; b=riEGcoFmjfH6rw/ufGhONS9FFt9NdoFtJ6OTmMrxsNmldtawQTY1wsH/a3VyOIY0XjACiFB39qffw5wtIyL91he190nxa7G1hHlt003kxgT30fuhEr335W5LvcJCb5h/uemUihDoYiX6oUb9W9DH3Z0VlwoUQxxLMSD6mZJ6Mdk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724764840; c=relaxed/simple;
-	bh=fXN8UG0rJUoY1dO0Gpv0JbKri/vi7HB4lr/7tQrm/vs=;
+	s=arc-20240116; t=1724764844; c=relaxed/simple;
+	bh=vSiHdjycb9BkOejRCco5hOWhYBDjhhf9CWN2DYr+Qls=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uA0sjk5qNQGWKNcqehjfhAwTpLDUA2uFJcNpc+nAVJmKqCEKpce3FUFWHarAMqOuPOAWYbsncXiwaNyANd345Wu33iVQ8SHIHVDpOKaloxQf8RLcJEqZixVo3sZolshFtlsK1eAViP5kamKN//7ACJVyUbnt5YZtqtI3mCu3oL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site; spf=pass smtp.mailfrom=xry111.site; dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b=VFfZY4GO; arc=none smtp.client-ip=89.208.246.23
+	 MIME-Version; b=Yn12V4H597mbGXMZgGXk5LmpO9BXfcIq+Q/fPtGmlQfHesTtn0qOCkm77GdpBz0/3D4izPlNFM3Hc5VBn8pI5YAt/HEUBRYfZwqeI5HkhKrZURf+x1vqkgmPm/WKvC1CWxdszLs79eitIIpFUDrgEDDIXn9GbWHyWZ1jcEh6FD0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site; spf=pass smtp.mailfrom=xry111.site; dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b=I1iEhgk3; arc=none smtp.client-ip=89.208.246.23
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xry111.site
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b="VFfZY4GO"
+	dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b="I1iEhgk3"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xry111.site;
-	s=default; t=1724764839;
-	bh=fXN8UG0rJUoY1dO0Gpv0JbKri/vi7HB4lr/7tQrm/vs=;
+	s=default; t=1724764842;
+	bh=vSiHdjycb9BkOejRCco5hOWhYBDjhhf9CWN2DYr+Qls=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=VFfZY4GODMcSgswzEY/UCQZ892DeugZAaaXsrkmaAgIZchxDgp/pBm1HncUpJP6+h
-	 Uu1c4Wd4f5Oy7fcWHX7vCyf82N9d+4Of3RjYTwXbv6+vBr11xwd0oHwpCL1ZB1Vv+N
-	 AtcDrh+GKbSh+rUZE8Y33GqBFe6SZB2KWztEztdA=
+	b=I1iEhgk3TQ6bYZzWRRGWiVWwJhRxoBFFEoaB1Wt9+K8MK7Zp/BjFn2s31vZp6kk/V
+	 t26lSgWME9+v5i99Ilp7rSk4rnlXwLpQ+WkGqa/VYnO/ic9SeeGc/7cCeFZApA5poW
+	 OhOqdLhdUuFUBcQAUlGCTwdKsKXFpfvYi9nTyjak=
 Received: from stargazer.. (unknown [113.200.174.85])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature ECDSA (P-384) server-digest SHA384)
 	(Client did not present a certificate)
 	(Authenticated sender: xry111@xry111.site)
-	by xry111.site (Postfix) with ESMTPSA id 125DE66F29;
-	Tue, 27 Aug 2024 09:20:35 -0400 (EDT)
+	by xry111.site (Postfix) with ESMTPSA id 66C8866F2A;
+	Tue, 27 Aug 2024 09:20:39 -0400 (EDT)
 From: Xi Ruoyao <xry111@xry111.site>
 To: "Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Huacai Chen <chenhuacai@kernel.org>,
@@ -40,9 +40,9 @@ Cc: Xi Ruoyao <xry111@xry111.site>,
 	Jinyang He <hejinyang@loongson.cn>,
 	Tiezhu Yang <yangtiezhu@loongson.cn>,
 	Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH v4 3/4] selftests/vDSO: Use KHDR_INCLUDES to locate UAPI headers for vdso_test_getrandom
-Date: Tue, 27 Aug 2024 21:20:16 +0800
-Message-ID: <20240827132018.88854-4-xry111@xry111.site>
+Subject: [PATCH v4 4/4] selftests/vDSO: Enable vdso getrandom tests for LoongArch
+Date: Tue, 27 Aug 2024 21:20:17 +0800
+Message-ID: <20240827132018.88854-5-xry111@xry111.site>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20240827132018.88854-1-xry111@xry111.site>
 References: <20240827132018.88854-1-xry111@xry111.site>
@@ -54,42 +54,45 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Building test_vdso_getrandom currently leads to following issue:
-
-    In file included from /home/xry111/git-repos/linux/tools/include/linux/compiler_types.h:36,
-                     from /home/xry111/git-repos/linux/include/uapi/linux/stddef.h:5,
-                     from /home/xry111/git-repos/linux/include/uapi/linux/posix_types.h:5,
-                     from /usr/include/asm/sigcontext.h:12,
-                     from /usr/include/bits/sigcontext.h:30,
-                     from /usr/include/signal.h:301,
-                     from vdso_test_getrandom.c:14:
-    /home/xry111/git-repos/linux/tools/include/linux/compiler-gcc.h:3:2: error: #error "Please don't include <linux/compiler-gcc.h> directly, include <linux/compiler.h> instead."
-        3 | #error "Please don't include <linux/compiler-gcc.h> directly, include <linux/compiler.h> instead."
-          |  ^~~~~
-
-It's because the compiler_types.h inclusion in
-include/uapi/linux/stddef.h is expected to be removed by the
-header_install.sh script, as compiler_types.h shouldn't be used from the
-user space.
+Create the symlink to the LoongArch vdso directory, and correct set ARCH
+for LoongArch.
 
 Signed-off-by: Xi Ruoyao <xry111@xry111.site>
 ---
- tools/testing/selftests/vDSO/Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/arch/loongarch/vdso             | 1 +
+ tools/testing/selftests/vDSO/Makefile | 4 ++--
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+ create mode 120000 tools/arch/loongarch/vdso
 
+diff --git a/tools/arch/loongarch/vdso b/tools/arch/loongarch/vdso
+new file mode 120000
+index 000000000000..ebda43a82db7
+--- /dev/null
++++ b/tools/arch/loongarch/vdso
+@@ -0,0 +1 @@
++../../../arch/loongarch/vdso
+\ No newline at end of file
 diff --git a/tools/testing/selftests/vDSO/Makefile b/tools/testing/selftests/vDSO/Makefile
-index 180854eb9fec..e346890d4c91 100644
+index e346890d4c91..2ad98afce111 100644
 --- a/tools/testing/selftests/vDSO/Makefile
 +++ b/tools/testing/selftests/vDSO/Makefile
-@@ -38,7 +38,7 @@ $(OUTPUT)/vdso_test_correctness: LDFLAGS += -ldl
+@@ -1,6 +1,6 @@
+ # SPDX-License-Identifier: GPL-2.0
+ uname_M := $(shell uname -m 2>/dev/null || echo not)
+-ARCH ?= $(shell echo $(uname_M) | sed -e s/i.86/x86/ -e s/x86_64/x86/)
++ARCH ?= $(shell echo $(uname_M) | sed -e s/i.86/x86/ -e s/x86_64/x86/ -e /loongarch/s/[0-9]//g)
+ SODIUM := $(shell pkg-config --libs --cflags libsodium 2>/dev/null)
  
- $(OUTPUT)/vdso_test_getrandom: parse_vdso.c
- $(OUTPUT)/vdso_test_getrandom: CFLAGS += -isystem $(top_srcdir)/tools/include \
--                                         -isystem $(top_srcdir)/include/uapi
-+                                         $(KHDR_INCLUDES)
- 
- $(OUTPUT)/vdso_test_chacha: $(top_srcdir)/tools/arch/$(ARCH)/vdso/vgetrandom-chacha.S
- $(OUTPUT)/vdso_test_chacha: CFLAGS += -idirafter $(top_srcdir)/tools/include \
+ TEST_GEN_PROGS := vdso_test_gettimeofday
+@@ -11,7 +11,7 @@ ifeq ($(ARCH),$(filter $(ARCH),x86 x86_64))
+ TEST_GEN_PROGS += vdso_standalone_test_x86
+ endif
+ TEST_GEN_PROGS += vdso_test_correctness
+-ifeq ($(uname_M),x86_64)
++ifeq ($(uname_M),$(filter $(uname_M),x86_64 loongarch64))
+ TEST_GEN_PROGS += vdso_test_getrandom
+ ifneq ($(SODIUM),)
+ TEST_GEN_PROGS += vdso_test_chacha
 -- 
 2.46.0
 
