@@ -1,99 +1,102 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from xry111.site (xry111.site [89.208.246.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FDD91BC9FC;
-	Tue, 27 Aug 2024 15:16:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61CB91D1F4E;
+	Tue, 27 Aug 2024 15:28:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.208.246.23
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724771795; cv=none; b=mvpoaZPxx1qkcpXbV4nXf4Xeg3t858fDklJuDTV2EXPve7C/TjfftYSMuvaId+2Q618ACKi0p/B9Y6VjjuUbEX/Pue/rOPhkEzkany3f2YKUvUd2ohYolGyy8TTaYd8oTZy0nKdnOW3BG2wK7T7A8yu77zUKuk19UQfm09kZGWg=
+	t=1724772538; cv=none; b=UmrQPLwWfS54Sw/9vOZauGgPYe0Kc6qRbwvFvCQsEy0ZkUpD1zcr8aDVnpfwR7GiDXklj1pCEqZqKLaBkG3nX61KSmiUHxzYH6ePBg9NKklCC9Ul9V5D5CU2XGvJAED4LNOKjxOKpK2pZHCNaI9nTqUSFwjP/SEG4uF6xrkLtqU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724771795; c=relaxed/simple;
-	bh=4CERzyJPApKe9b8waHvyPgcYFDtkKGL2bOp9eM0x8OE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PQ7l4TxrYiwEIqNjXBRvlPHrpNFv2FAcJFZ3xCBiFb2TPN+MDASY0BN++wqg5573iIgJ9UdwiXfh12fv/MEnwOmGF9iEMGr+ad8UTOpjxanERxYzoPaKBazPwTk/h9t/D9Gb1yOquY6zyZWNCdLnwrRRoFWmJc6USCi2ZU5mkOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=mpljrPsr; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1724772538; c=relaxed/simple;
+	bh=8omP4rl5BYw+84ZxOQg77pGbA8nGQhV/5is63uik8LM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=OB/9pGUrCNNL9uJ+87PaYATPaahWlDE6pctTuVsFqMydxOscZVORgNX78CmJJckn2gTqEVaptvQJ3zBFj3QST4gTbwAXcDcs616Gj3nM/yHyKVJxotzOV2MGPZ2U7U+o1wp84jmkrzE06UL7g/4o9xh/Ts54KRxj94KMCt03gxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site; spf=pass smtp.mailfrom=xry111.site; dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b=bA3g4SBO; arc=none smtp.client-ip=89.208.246.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xry111.site
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="mpljrPsr"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AB70C4DE10;
-	Tue, 27 Aug 2024 15:16:34 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="mpljrPsr"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1724771791;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oMqVM/w+phqj82xsm2b1jf2JRlYeXm3YIM84EG1EwNA=;
-	b=mpljrPsrXw6rZuijJSW5LPwgN9NOJDOnsPITJxvPEONsjfuVdhgLT7xLmpNkYXhNO/307k
-	x9dcn/2jy7xEx75301wmZcJH3MVsjPU/81+A8EUilB/sHTURp7TEGWQgcmh3Ax7K9f6Bi4
-	jfLfF134AgkjgATwcO9dQ9ohh4YpVnU=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 42417ec2 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Tue, 27 Aug 2024 15:16:31 +0000 (UTC)
-Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-270420e231aso3718488fac.2;
-        Tue, 27 Aug 2024 08:16:30 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCWNfnc7mofgYt6mF7eUWrwi3cIMmnO1cXcmbDVvZRtvEnvk5mWfKtiveA8kYD1cgULzGrmgmxeU6lc01RFx@vger.kernel.org, AJvYcCWdGfz5V0+I0vafPxj7DdD+zF7F08gNpkmRzTq9y102ykGmrn0Kp992rKmRHqZ+NXXiIKZNWN9oAjeo08L3@vger.kernel.org, AJvYcCX0fWNoP1ubnyM5oWLz0kVxB662U8VnjBFK8ZALHy2l7u9U6d64fQv+0ZI6iib82Y+oksixl8+hRKVv@vger.kernel.org
-X-Gm-Message-State: AOJu0YxeIVPQlr2zVRwmISJ9tXy0w2oBIXne7eFjHcVHjJ5Y41iM5px8
-	BSInnwwwI2s1jC0OpFCSpOKRBhPKiROJq55iPpiDRUYdAitdVH8HkZ9yR1sIlEdPxJ5pPN6XBVs
-	2KmptKSNdrQqJLKJAu7Yd34m4A8M=
-X-Google-Smtp-Source: AGHT+IF/nLZQ5Ljyy7TUacWXpsdnydDu+GGulnItz3FJFKRIJogkvULfxf6RkPyzDRIY4rgZi7DYLIWg7RRZ8G7H2Yc=
-X-Received: by 2002:a05:6870:3920:b0:25e:de4:9621 with SMTP id
- 586e51a60fabf-27759da2e37mr3635566fac.24.1724771790136; Tue, 27 Aug 2024
- 08:16:30 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b="bA3g4SBO"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xry111.site;
+	s=default; t=1724772535;
+	bh=8omP4rl5BYw+84ZxOQg77pGbA8nGQhV/5is63uik8LM=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=bA3g4SBOD1ZNZn3yIrQvz65f9taQx/3xq3FMxT41TJeFdKZ84QzcexS8AZ8E9sJwR
+	 kgB38JBPMSzjfQ97WTjKFURHv+rNBt67Tphn7CZnpKr3ZIWBzZ1Ne4Rps4/Mnbklhk
+	 X1R8kRylvziKd2kV1KGhqbRqXrarQik41qgvu+hs=
+Received: from [127.0.0.1] (unknown [IPv6:2001:470:683e::1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-384) server-digest SHA384)
+	(Client did not present a certificate)
+	(Authenticated sender: xry111@xry111.site)
+	by xry111.site (Postfix) with ESMTPSA id C4C8166F26;
+	Tue, 27 Aug 2024 11:28:51 -0400 (EDT)
+Message-ID: <d1707f9c173f80588c2917f6289c1394802d6229.camel@xry111.site>
+Subject: Re: [PATCH v4 3/4] selftests/vDSO: Use KHDR_INCLUDES to locate UAPI
+ headers for vdso_test_getrandom
+From: Xi Ruoyao <xry111@xry111.site>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: Christophe Leroy <christophe.leroy@csgroup.eu>, Huacai Chen
+ <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>, 
+ "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+ "loongarch@lists.linux.dev" <loongarch@lists.linux.dev>, Jinyang He
+ <hejinyang@loongson.cn>, Tiezhu Yang <yangtiezhu@loongson.cn>, Arnd
+ Bergmann <arnd@arndb.de>, "tglx@linutronix.de" <tglx@linutronix.de>,
+ "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
+Date: Tue, 27 Aug 2024 23:28:48 +0800
+In-Reply-To: <Zs3sVv43djP3W2yc@zx2c4.com>
+References: <20240827132018.88854-1-xry111@xry111.site>
+	 <20240827132018.88854-4-xry111@xry111.site> <Zs3blfx1inX_FQLR@zx2c4.com>
+	 <019268d4-c177-49e7-aab3-b8fa431905ca@cs-soprasteria.com>
+	 <Zs3fhiSlXg2aCGa8@zx2c4.com>
+	 <e9a2257f1447ce11e1f22e9a3c64d4b18aa428e1.camel@xry111.site>
+	 <0730ca3a-e158-44ea-bb9e-1a7716b45360@csgroup.eu>
+	 <Zs3qEMQOv5MAipox@zx2c4.com>
+	 <0b540679ec8cfccec75aeb3463810924f6ff71e6.camel@xry111.site>
+	 <Zs3sVv43djP3W2yc@zx2c4.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.3 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240826181059.111536-1-adhemerval.zanella@linaro.org>
- <397f9865-c4ad-44be-91ab-9764fe3aeb89@csgroup.eu> <Zs2UGH6xjJmis5XD@zx2c4.com>
-In-Reply-To: <Zs2UGH6xjJmis5XD@zx2c4.com>
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Tue, 27 Aug 2024 17:16:16 +0200
-X-Gmail-Original-Message-ID: <CAHmME9o35OwD574x2TyAfp=iRfWD95pvi561+Q=2aAWRORofKg@mail.gmail.com>
-Message-ID: <CAHmME9o35OwD574x2TyAfp=iRfWD95pvi561+Q=2aAWRORofKg@mail.gmail.com>
-Subject: Re: [PATCH] aarch64: vdso: Wire up getrandom() vDSO implementation
-To: Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: Adhemerval Zanella <adhemerval.zanella@linaro.org>, "Theodore Ts'o" <tytso@mit.edu>, 
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Thomas Gleixner <tglx@linutronix.de>, Eric Biggers <ebiggers@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Aug 27, 2024 at 11:02=E2=80=AFAM Jason A. Donenfeld <Jason@zx2c4.co=
-m> wrote:
->
-> On Tue, Aug 27, 2024 at 10:46:21AM +0200, Christophe Leroy wrote:
-> > > +/**
-> > > + * __arch_chacha20_blocks_nostack - Generate ChaCha20 stream without=
- using the stack.
-> > > + * @dst_bytes:     Destination buffer to hold @nblocks * 64 bytes of=
- output.
-> > > + * @key:   32-byte input key.
-> > > + * @counter:       8-byte counter, read on input and updated on retu=
-rn.
-> > > + * @nblocks:       Number of blocks to generate.
-> > > + *
-> > > + * Generates a given positive number of blocks of ChaCha20 output wi=
-th nonce=3D0, and does not write
-> > > + * to any stack or memory outside of the parameters passed to it, in=
- order to mitigate stack data
-> > > + * leaking into forked child processes.
-> > > + */
-> > > +extern void __arch_chacha20_blocks_nostack(u8 *dst_bytes, const u32 =
-*key, u32 *counter, size_t nblocks);
-> >
-> > For Jason: We all redefine this prototype, should we have it in a
-> > central place, or do you expect some architecture to provide some stati=
-c
-> > inline for it ?
->
-> Given the doc comment and such, that would be nice. But I didn't see a
-> straight forward way of doing that when I tried before. If you want to
-> try and send another fixup commit, that'd be welcomed.
+On Tue, 2024-08-27 at 17:10 +0200, Jason A. Donenfeld wrote:
+> On Tue, Aug 27, 2024 at 11:05:14PM +0800, Xi Ruoyao wrote:
+> > On Tue, 2024-08-27 at 17:00 +0200, Jason A. Donenfeld wrote:
+> > > The effect of this patch is to replace include/uapi with usr/include,=
+ so
+> > > it will break for you too.
+> > >=20
+> > > What I'm wondering is why yours and mine work like that, while Ruoyao=
+'s
+> > > breaks. He makes a good argument as to why this patch is the "right
+> > > way", even if it breaks our workflow...
+> >=20
+> > Because arch/loongarch/include/uapi/asm/sigcontext.h includes
+> > <linux/posix_types.h>, but the files for x86 and ppc do not.
+> >=20
+> > I cannot see how this inclusion is useful anyway, so maybe I can just
+> > remove the inclusion and paper over the real issue for now?
+>=20
+> The kselftest people might disagree with papering it over and may prefer
+> your patch, but your solution does sound better to me...
 
-I'll give it a shot.
+Oops the papering over does not really work because the compiler picks
+up the sigcontext.h already installed to /usr/include/asm/sigcontext.h.
+So, if we want to use the "updated" version of sigcontext.h, we still
+have to add KHDR_INCLUDES to pick up
+kernel-tree/usr/include/asm/sigcontext.h instead.
+
+Or, I can add $(KHDR_INCLUDES) but also keep
+-isystem $(top_srcdir)/include/uapi, so "make -C tools/testing/selftests
+TARGETS=3DvDSO" will still (happens to) work on x86 and ppc (without
+headers in kernel-tree/usr).
+
+If you agree I'll use this approach in v5.
+
+--=20
+Xi Ruoyao <xry111@xry111.site>
+School of Aerospace Science and Technology, Xidian University
