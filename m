@@ -1,144 +1,99 @@
-Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BA741BC9E3;
-	Tue, 27 Aug 2024 15:12:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FDD91BC9FC;
+	Tue, 27 Aug 2024 15:16:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724771545; cv=none; b=aLe0An4oAh9joHquYAHOMf39SAfSfkAqGkdeGAUvgqO33cdT9C4nMhj94O8nK07LOwILpWGxfXWUDa4ZQW5Ayrqhp+6QPEUSeE9DdGaQOcasiAHDYZaiKdwIe6AaL7nz9KMThVjW4NcGKnYg7H7jOglzni1dDlnEhXOLhfPz0YA=
+	t=1724771795; cv=none; b=mvpoaZPxx1qkcpXbV4nXf4Xeg3t858fDklJuDTV2EXPve7C/TjfftYSMuvaId+2Q618ACKi0p/B9Y6VjjuUbEX/Pue/rOPhkEzkany3f2YKUvUd2ohYolGyy8TTaYd8oTZy0nKdnOW3BG2wK7T7A8yu77zUKuk19UQfm09kZGWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724771545; c=relaxed/simple;
-	bh=YS1WS6AMQC0AIGR4KIux8obLAvmAK9y0e/V4joi0yis=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=d7oVidnlWHOWyuJsREzQRSfjCg6rb7NuRhhJIvfPA/kA83k7nLVI8HgRLOoFFwgabMqxVQRkpongzqsoWVCtK5sY+z+PZLhCGCavBsZNvsfIowyoIl1YNTBpduuwgt+wfrF/gSxpVubRo3db9/Io6hXSazCrnKK8HuKeFrVR+cs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
-Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4WtWHT4Q90z9sPd;
-	Tue, 27 Aug 2024 17:12:21 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id sLT0wIHpPuNS; Tue, 27 Aug 2024 17:12:21 +0200 (CEST)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4WtWHT3WwTz9rvV;
-	Tue, 27 Aug 2024 17:12:21 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 692058B78B;
-	Tue, 27 Aug 2024 17:12:21 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id J_l_rLP-Y5G0; Tue, 27 Aug 2024 17:12:21 +0200 (CEST)
-Received: from [192.168.233.149] (unknown [192.168.233.149])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id CF8898B77C;
-	Tue, 27 Aug 2024 17:12:20 +0200 (CEST)
-Message-ID: <538e9c85-8050-427d-a513-3194bae67115@csgroup.eu>
-Date: Tue, 27 Aug 2024 17:12:20 +0200
+	s=arc-20240116; t=1724771795; c=relaxed/simple;
+	bh=4CERzyJPApKe9b8waHvyPgcYFDtkKGL2bOp9eM0x8OE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PQ7l4TxrYiwEIqNjXBRvlPHrpNFv2FAcJFZ3xCBiFb2TPN+MDASY0BN++wqg5573iIgJ9UdwiXfh12fv/MEnwOmGF9iEMGr+ad8UTOpjxanERxYzoPaKBazPwTk/h9t/D9Gb1yOquY6zyZWNCdLnwrRRoFWmJc6USCi2ZU5mkOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=mpljrPsr; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="mpljrPsr"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AB70C4DE10;
+	Tue, 27 Aug 2024 15:16:34 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="mpljrPsr"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1724771791;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oMqVM/w+phqj82xsm2b1jf2JRlYeXm3YIM84EG1EwNA=;
+	b=mpljrPsrXw6rZuijJSW5LPwgN9NOJDOnsPITJxvPEONsjfuVdhgLT7xLmpNkYXhNO/307k
+	x9dcn/2jy7xEx75301wmZcJH3MVsjPU/81+A8EUilB/sHTURp7TEGWQgcmh3Ax7K9f6Bi4
+	jfLfF134AgkjgATwcO9dQ9ohh4YpVnU=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 42417ec2 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Tue, 27 Aug 2024 15:16:31 +0000 (UTC)
+Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-270420e231aso3718488fac.2;
+        Tue, 27 Aug 2024 08:16:30 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCWNfnc7mofgYt6mF7eUWrwi3cIMmnO1cXcmbDVvZRtvEnvk5mWfKtiveA8kYD1cgULzGrmgmxeU6lc01RFx@vger.kernel.org, AJvYcCWdGfz5V0+I0vafPxj7DdD+zF7F08gNpkmRzTq9y102ykGmrn0Kp992rKmRHqZ+NXXiIKZNWN9oAjeo08L3@vger.kernel.org, AJvYcCX0fWNoP1ubnyM5oWLz0kVxB662U8VnjBFK8ZALHy2l7u9U6d64fQv+0ZI6iib82Y+oksixl8+hRKVv@vger.kernel.org
+X-Gm-Message-State: AOJu0YxeIVPQlr2zVRwmISJ9tXy0w2oBIXne7eFjHcVHjJ5Y41iM5px8
+	BSInnwwwI2s1jC0OpFCSpOKRBhPKiROJq55iPpiDRUYdAitdVH8HkZ9yR1sIlEdPxJ5pPN6XBVs
+	2KmptKSNdrQqJLKJAu7Yd34m4A8M=
+X-Google-Smtp-Source: AGHT+IF/nLZQ5Ljyy7TUacWXpsdnydDu+GGulnItz3FJFKRIJogkvULfxf6RkPyzDRIY4rgZi7DYLIWg7RRZ8G7H2Yc=
+X-Received: by 2002:a05:6870:3920:b0:25e:de4:9621 with SMTP id
+ 586e51a60fabf-27759da2e37mr3635566fac.24.1724771790136; Tue, 27 Aug 2024
+ 08:16:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 3/4] selftests/vDSO: Use KHDR_INCLUDES to locate UAPI
- headers for vdso_test_getrandom
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: Xi Ruoyao <xry111@xry111.site>, Huacai Chen <chenhuacai@kernel.org>,
- WANG Xuerui <kernel@xen0n.name>,
- "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
- "loongarch@lists.linux.dev" <loongarch@lists.linux.dev>,
- Jinyang He <hejinyang@loongson.cn>, Tiezhu Yang <yangtiezhu@loongson.cn>,
- Arnd Bergmann <arnd@arndb.de>, "tglx@linutronix.de" <tglx@linutronix.de>,
- "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>
-References: <20240827132018.88854-1-xry111@xry111.site>
- <20240827132018.88854-4-xry111@xry111.site> <Zs3blfx1inX_FQLR@zx2c4.com>
- <019268d4-c177-49e7-aab3-b8fa431905ca@cs-soprasteria.com>
- <Zs3fhiSlXg2aCGa8@zx2c4.com>
- <e9a2257f1447ce11e1f22e9a3c64d4b18aa428e1.camel@xry111.site>
- <0730ca3a-e158-44ea-bb9e-1a7716b45360@csgroup.eu>
- <Zs3qEMQOv5MAipox@zx2c4.com>
-Content-Language: fr-FR
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-In-Reply-To: <Zs3qEMQOv5MAipox@zx2c4.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20240826181059.111536-1-adhemerval.zanella@linaro.org>
+ <397f9865-c4ad-44be-91ab-9764fe3aeb89@csgroup.eu> <Zs2UGH6xjJmis5XD@zx2c4.com>
+In-Reply-To: <Zs2UGH6xjJmis5XD@zx2c4.com>
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date: Tue, 27 Aug 2024 17:16:16 +0200
+X-Gmail-Original-Message-ID: <CAHmME9o35OwD574x2TyAfp=iRfWD95pvi561+Q=2aAWRORofKg@mail.gmail.com>
+Message-ID: <CAHmME9o35OwD574x2TyAfp=iRfWD95pvi561+Q=2aAWRORofKg@mail.gmail.com>
+Subject: Re: [PATCH] aarch64: vdso: Wire up getrandom() vDSO implementation
+To: Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc: Adhemerval Zanella <adhemerval.zanella@linaro.org>, "Theodore Ts'o" <tytso@mit.edu>, 
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
+	Thomas Gleixner <tglx@linutronix.de>, Eric Biggers <ebiggers@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Aug 27, 2024 at 11:02=E2=80=AFAM Jason A. Donenfeld <Jason@zx2c4.co=
+m> wrote:
+>
+> On Tue, Aug 27, 2024 at 10:46:21AM +0200, Christophe Leroy wrote:
+> > > +/**
+> > > + * __arch_chacha20_blocks_nostack - Generate ChaCha20 stream without=
+ using the stack.
+> > > + * @dst_bytes:     Destination buffer to hold @nblocks * 64 bytes of=
+ output.
+> > > + * @key:   32-byte input key.
+> > > + * @counter:       8-byte counter, read on input and updated on retu=
+rn.
+> > > + * @nblocks:       Number of blocks to generate.
+> > > + *
+> > > + * Generates a given positive number of blocks of ChaCha20 output wi=
+th nonce=3D0, and does not write
+> > > + * to any stack or memory outside of the parameters passed to it, in=
+ order to mitigate stack data
+> > > + * leaking into forked child processes.
+> > > + */
+> > > +extern void __arch_chacha20_blocks_nostack(u8 *dst_bytes, const u32 =
+*key, u32 *counter, size_t nblocks);
+> >
+> > For Jason: We all redefine this prototype, should we have it in a
+> > central place, or do you expect some architecture to provide some stati=
+c
+> > inline for it ?
+>
+> Given the doc comment and such, that would be nice. But I didn't see a
+> straight forward way of doing that when I tried before. If you want to
+> try and send another fixup commit, that'd be welcomed.
 
-
-Le 27/08/2024 à 17:00, Jason A. Donenfeld a écrit :
-> On Tue, Aug 27, 2024 at 04:50:59PM +0200, Christophe Leroy wrote:
->>
->>
->> Le 27/08/2024 à 16:41, Xi Ruoyao a écrit :
->>> On Tue, 2024-08-27 at 16:15 +0200, Jason A. Donenfeld wrote:
->>>
->>> /* snip */
->>>
->>>> gcc -std=gnu99 -D_GNU_SOURCE= -isystem /home/zx2c4/Projects/random-linux/tools/testing/selftests/../../../tools/include -isystem /home/zx2c4/Projects/random-linux/tools/testing/selftests/../../../usr/include    vdso_test_getrandom.c parse_vdso.c  -o /home/zx2c4/Projects/random-linux/tools/testing/selftests/vDSO/vdso_test_getrandom
->>>> vdso_test_getrandom.c:43:41: error: field ‘params’ has incomplete type
->>>>      43 |         struct vgetrandom_opaque_params params;
->>>>         |                                         ^~~~~~
->>>>
->>>> $ ls /home/zx2c4/Projects/random-linux/tools/testing/selftests/../../../usr/include
->>>> headers_check.pl  Makefile
->>>>
->>>> Since I don't build in there, this directory is empty.
->>>
->>> In the toplevel Makefile:
->>>
->>> kselftest-%: headers FORCE
->>>       $(Q)$(MAKE) -C $(srctree)/tools/testing/selftests $*
->>>
->>> So running "make kselftest-all" to build the self tests should have
->>> already caused make to build the "headers" target, which puts the
->>> headers into usr/include.
->>>
->>> I don't think it's supported to build self tests w/o invoking the
->>> toplevel Makefile: many other self tests use KHDR_INCLUDES as well, so
->>> generally building with something like "make -C tools/testing/selftests"
->>> just won't work.
->>>
->>
->> My usr/include/ is also empty (only Makefile and headers_check.pl) and
->> building directly in tools/testing/selftests/vDSO works for me.
->>
->> The command is:
->>
->> ppc-linux-gcc -std=gnu99 -D_GNU_SOURCE= -isystem
->> /home/chleroy/linux-powerpc/tools/testing/selftests/../../../tools/include
->> -isystem
->> /home/chleroy/linux-powerpc/tools/testing/selftests/../../../include/uapi
->>      vdso_test_getrandom.c parse_vdso.c  -o
->> /home/chleroy/linux-powerpc/tools/testing/selftests/vDSO/vdso_test_getrandom
->>
->> I believe I get the needed headers through : -isystem
->> /home/chleroy/linux-powerpc/tools/testing/selftests/../../../include/uapi
-> 
-> The effect of this patch is to replace include/uapi with usr/include, so
-> it will break for you too.
-> 
-> What I'm wondering is why yours and mine work like that, while Ruoyao's
-> breaks. He makes a good argument as to why this patch is the "right
-> way", even if it breaks our workflow...
-
-Ah yes he is probably right.
-
-Then I'll have to first do:
-
-make CROSS_COMPILE=powerpc64-linux- ARCH=powerpc headers
-
-Then everything should be fine.
-
-Christophe
-
-> 
->>
->> Christophe
->>
->> PS: By the way, did you see the -DBULID_VDSO for the chacha test ? Don't
->> know the impact though ....
-> 
-> Yes and https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fall%2F20240827145454.3317093-1-Jason%40zx2c4.com%2F&data=05%7C02%7Cchristophe.leroy%40csgroup.eu%7C627846cc0a0e429e45c508dcc6a90690%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C638603676502990226%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C0%7C%7C%7C&sdata=H7PPFv8QGHsb9xh3J%2FzyeFrpvDu2uSKqx4ZwrPNwC2s%3D&reserved=0
+I'll give it a shot.
