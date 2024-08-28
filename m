@@ -1,105 +1,122 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C000161914;
-	Wed, 28 Aug 2024 23:13:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 243B21AC8AC;
+	Wed, 28 Aug 2024 23:45:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724886832; cv=none; b=HiiMJTWdFAmtaYL3wIt4QuN563m+6ZFD45TNdHe3xFe3Hz+Da+cjTH2cqCRwTOW+jnlzJv+USSD+InRkbhyyITPToH6D+/hh4bQuXb3DtG28zMkQrd5GRBsozag4BiyTcQdGzKY98t9ypT0rY0mO22XsDn5W7sOdYjEf6k61n0I=
+	t=1724888701; cv=none; b=h/Cu18/sUDAtJ+ezGRD8mKVGIYkcUhJPtakC4S7RJvtksIfUdR31gV5fYM22ESed5iC1KIcS7I44lpf9B+ZJKyTZWaqvsBq16YUCADB8DuDZ1p0xuNGCMEIJ/DQNF6bRMOZ79UZshCt+YLAmhvLxuFPclNusp6XsA6Orx0eZ9yA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724886832; c=relaxed/simple;
-	bh=QISJ42Va0eYxqFWZBmZo3tT+XOt9YziD/pQSoZRbBg0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gurYLTzf0WrdidDXhR8LkD/MvzAH7mXyfA7ajNbQbfyiGf++QZJyjB8132t9c+SJymq930WtwmsheeEtaH+lrtxptwzGTfNB5U+3o+zdqH9CC/O/VjJUaubHvyQH4NJqvXe1xevIlJMvnjBnM86OdqfP3MmEVdOqB2b3gJ2dd+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Igkl3X+Y; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1724888701; c=relaxed/simple;
+	bh=/0/eXeks8zvDtAEd52bJboyHEaDy5nAxxgH+5MqENPQ=;
+	h=Date:Content-Type:MIME-Version:From:To:Cc:In-Reply-To:References:
+	 Message-Id:Subject; b=I6Q9LSzCuwRcXUZ7utlLT1sTkaFibIflr2yApEadTE5LCQIyrwxtNEjqcE/NhbJRVesnnG0NlhQWvGvfgCQvITEByKkau1Jh1JB8UFpa6mgH7YHsiVgzgs8Z1/UTgn3FUp/ChrdjwAPW/DbU/KXDh1rsV5U8v5bZh6Mc2hjjG4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RZ334jj0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Igkl3X+Y"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E93BC4CEC0;
-	Wed, 28 Aug 2024 23:13:51 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RZ334jj0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60A51C4CEC0;
+	Wed, 28 Aug 2024 23:45:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724886832;
-	bh=QISJ42Va0eYxqFWZBmZo3tT+XOt9YziD/pQSoZRbBg0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Igkl3X+YtPWt9lCblaUZzraFSdFxa54F4n2l+ehwjXqByzx1N8EEiLXby+Z8CfzZ8
-	 7kzVqzb8dj1SXhUoZnGtY8B83J9xdiCwbXKuUdpBcevOBu7zDAdlF4il1Q5fte9o71
-	 nmxNhsqDLPd36IPd35D5ImzYQ31N8WkReq8dF8zlJnD6n22lEPcHNNR/bxWxOYjj1Z
-	 aFUyNy3WDAmPeW76D+8frUPREHFpIB07PDD9tNSXHzZMg6/+XpabrzvlGz742UtqW1
-	 lM7HQIRrpnau/LYc6CLvEiTOSvR5JXx5Y5SdAfIwROoUCfXVwWxwhqEPETSQsl/I1G
-	 qxqrLyHNPkFGA==
-Date: Wed, 28 Aug 2024 23:13:50 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: ross.philipson@oracle.com
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org,
-	linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
-	linux-efi@vger.kernel.org, iommu@lists.linux-foundation.org,
-	dpsmith@apertussolutions.com, tglx@linutronix.de, mingo@redhat.com,
-	bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com,
-	ardb@kernel.org, mjg59@srcf.ucam.org,
-	James.Bottomley@hansenpartnership.com, peterhuewe@gmx.de,
-	jarkko@kernel.org, jgg@ziepe.ca, luto@amacapital.net,
-	nivedita@alum.mit.edu, herbert@gondor.apana.org.au,
-	davem@davemloft.net, corbet@lwn.net, ebiederm@xmission.com,
-	dwmw2@infradead.org, baolu.lu@linux.intel.com,
-	kanth.ghatraju@oracle.com, andrew.cooper3@citrix.com,
-	trenchboot-devel@googlegroups.com
-Subject: Re: [PATCH v9 06/19] x86: Add early SHA-1 support for Secure Launch
- early measurements
-Message-ID: <20240828231350.GA558903@google.com>
-References: <20240531010331.134441-1-ross.philipson@oracle.com>
- <20240531010331.134441-7-ross.philipson@oracle.com>
- <20240531021656.GA1502@sol.localdomain>
- <20240827181426.GC2049@sol.localdomain>
- <601646a2-46ac-47a0-a8b7-1d45a09172ab@oracle.com>
+	s=k20201202; t=1724888700;
+	bh=/0/eXeks8zvDtAEd52bJboyHEaDy5nAxxgH+5MqENPQ=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=RZ334jj0iL9xi6y3u69zqCvpOBinulYmgcN49DFNBoTygYH8PdsRPtlbscBnh+s0L
+	 YBbX0X705zKTkdIcPDMNduOzNLOtTifKNobePf7O8LQ0UF7RRlHfOwYwfbo9ziYfp4
+	 RfSi+OMo22hXaZvsAee3Gs9e+KDiJI7NTLvg/QjUGhHqq73aeeXWpiTjZSNvM4I48u
+	 XMPAIRr2sPA0tRQOosCuFlrHXrECAwz65Pd6+2RMY8FAcqJS7zow0xp+ooP0/ssqan
+	 RkJBVAiqpgZN+h1XlIUb2PYPNpFOtUy3kvnAVc4khzL/RDwjDFTmFMSBtNc/TQLJu0
+	 f+0lGK/ZPyVAw==
+Date: Wed, 28 Aug 2024 18:44:59 -0500
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <601646a2-46ac-47a0-a8b7-1d45a09172ab@oracle.com>
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Nikunj Kela <quic_nkela@quicinc.com>
+Cc: konradybcio@kernel.org, herbert@gondor.apana.org.au, 
+ cristian.marussi@arm.com, rui.zhang@intel.com, robimarko@gmail.com, 
+ andi.shyti@kernel.org, amitk@kernel.org, wim@linux-watchdog.org, 
+ iommu@lists.linux.dev, thara.gopinath@gmail.com, jassisinghbrar@gmail.com, 
+ linux-serial@vger.kernel.org, arm-scmi@vger.kernel.org, vkoul@kernel.org, 
+ linux-watchdog@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ sudeep.holla@arm.com, broonie@kernel.org, joro@8bytes.org, 
+ linux@roeck-us.net, viresh.kumar@linaro.org, krzk+dt@kernel.org, 
+ linux-arm-msm@vger.kernel.org, linux-spi@vger.kernel.org, 
+ conor+dt@kernel.org, lee@kernel.org, davem@davemloft.net, 
+ linux-i2c@vger.kernel.org, quic_gurus@quicinc.com, quic_rjendra@quicinc.com, 
+ linus.walleij@linaro.org, agross@kernel.org, bartosz.golaszewski@linaro.org, 
+ rafael@kernel.org, robin.murphy@arm.com, quic_psodagud@quicinc.com, 
+ linux-gpio@vger.kernel.org, andersson@kernel.org, will@kernel.org, 
+ linux-pm@vger.kernel.org, Praveen Talari <quic_ptalari@quicinc.com>, 
+ quic_tsoni@quicinc.com, tglx@linutronix.de, linux-crypto@vger.kernel.org, 
+ kernel@quicinc.com, lukasz.luba@arm.com, quic_shazhuss@quicinc.com
+In-Reply-To: <20240828203721.2751904-17-quic_nkela@quicinc.com>
+References: <20240828203721.2751904-1-quic_nkela@quicinc.com>
+ <20240828203721.2751904-17-quic_nkela@quicinc.com>
+Message-Id: <172488869750.1836577.14830231532115665875.robh@kernel.org>
+Subject: Re: [PATCH 16/22] dt-bindings: qcom: geni-se: document support for
+ SA8255P
 
-On Wed, Aug 28, 2024 at 01:14:45PM -0700, ross.philipson@oracle.com wrote:
-> On 8/27/24 11:14 AM, 'Eric Biggers' via trenchboot-devel wrote:
-> > On Thu, May 30, 2024 at 07:16:56PM -0700, Eric Biggers wrote:
-> > > On Thu, May 30, 2024 at 06:03:18PM -0700, Ross Philipson wrote:
-> > > > From: "Daniel P. Smith" <dpsmith@apertussolutions.com>
-> > > > 
-> > > > For better or worse, Secure Launch needs SHA-1 and SHA-256. The
-> > > > choice of hashes used lie with the platform firmware, not with
-> > > > software, and is often outside of the users control.
-> > > > 
-> > > > Even if we'd prefer to use SHA-256-only, if firmware elected to start us
-> > > > with the SHA-1 and SHA-256 backs active, we still need SHA-1 to parse
-> > > > the TPM event log thus far, and deliberately cap the SHA-1 PCRs in order
-> > > > to safely use SHA-256 for everything else.
-> > > > 
-> > > > The SHA-1 code here has its origins in the code from the main kernel:
-> > > > 
-> > > > commit c4d5b9ffa31f ("crypto: sha1 - implement base layer for SHA-1")
-> > > > 
-> > > > A modified version of this code was introduced to the lib/crypto/sha1.c
-> > > > to bring it in line with the SHA-256 code and allow it to be pulled into the
-> > > > setup kernel in the same manner as SHA-256 is.
-> > > > 
-> > > > Signed-off-by: Daniel P. Smith <dpsmith@apertussolutions.com>
-> > > > Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
-> > > 
-> > > Thanks.  This explanation doesn't seem to have made it into the actual code or
-> > > documentation.  Can you please get it into a more permanent location?
-> > 
-> > I see that a new version of the patchset was sent out but this suggestion was
-> > not taken.  Are you planning to address it?
+
+On Wed, 28 Aug 2024 13:37:15 -0700, Nikunj Kela wrote:
+> Add "qcom,sa8255p-geni-se-qup" compatible for representing QUP on
+> SA8255p.
 > 
-> Sorry we sort of overlooked that part of the request. We will take the
-> latest commit message, clean it up a little and put it in
-> boot/compressed/sha1.c file as a comment. I believe that is what you would
-> like us to do.
+> Clocks are being managed by the firmware VM and not required on
+> SA8255p Linux VM hence removing it from required list.
+> 
+> CC: Praveen Talari <quic_ptalari@quicinc.com>
+> Signed-off-by: Nikunj Kela <quic_nkela@quicinc.com>
+> ---
+>  .../bindings/soc/qcom/qcom,geni-se.yaml       | 47 +++++++++++++++++--
+>  1 file changed, 43 insertions(+), 4 deletions(-)
 > 
 
-Do users of this feature need to make a decision about SHA-1?  If so there needs
-to be guidance in Documentation/.  A comment in a .c file is not user facing.
+My bot found errors running 'make dt_binding_check' on your patch:
 
-- Eric
+yamllint warnings/errors:
+
+dtschema/dtc warnings/errors:
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/soc/qcom/qcom,geni-se.example.dtb: geniqup@9c0000: i2c@984000:compatible:0: 'qcom,sa8255p-geni-i2c' is not one of ['qcom,geni-i2c', 'qcom,geni-i2c-master-hub']
+	from schema $id: http://devicetree.org/schemas/soc/qcom/qcom,geni-se.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/soc/qcom/qcom,geni-se.example.dtb: geniqup@9c0000: i2c@984000: 'clocks' is a required property
+	from schema $id: http://devicetree.org/schemas/soc/qcom/qcom,geni-se.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/soc/qcom/qcom,geni-se.example.dtb: geniqup@9c0000: i2c@984000: 'clock-names' is a required property
+	from schema $id: http://devicetree.org/schemas/soc/qcom/qcom,geni-se.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/soc/qcom/qcom,geni-se.example.dtb: geniqup@9c0000: i2c@984000: Unevaluated properties are not allowed ('compatible' was unexpected)
+	from schema $id: http://devicetree.org/schemas/soc/qcom/qcom,geni-se.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/soc/qcom/qcom,geni-se.example.dtb: geniqup@9c0000: serial@990000:compatible:0: 'qcom,sa8255p-geni-uart' is not one of ['qcom,geni-uart', 'qcom,geni-debug-uart']
+	from schema $id: http://devicetree.org/schemas/soc/qcom/qcom,geni-se.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/soc/qcom/qcom,geni-se.example.dtb: geniqup@9c0000: serial@990000:power-domains: [[4294967295, 4], [4294967295, 4]] is too long
+	from schema $id: http://devicetree.org/schemas/soc/qcom/qcom,geni-se.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/soc/qcom/qcom,geni-se.example.dtb: geniqup@9c0000: serial@990000: 'clocks' is a required property
+	from schema $id: http://devicetree.org/schemas/soc/qcom/qcom,geni-se.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/soc/qcom/qcom,geni-se.example.dtb: geniqup@9c0000: serial@990000: 'clock-names' is a required property
+	from schema $id: http://devicetree.org/schemas/soc/qcom/qcom,geni-se.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/soc/qcom/qcom,geni-se.example.dtb: geniqup@9c0000: serial@990000: Unevaluated properties are not allowed ('compatible', 'power-domain-names', 'power-domains' were unexpected)
+	from schema $id: http://devicetree.org/schemas/soc/qcom/qcom,geni-se.yaml#
+Documentation/devicetree/bindings/soc/qcom/qcom,geni-se.example.dtb: /example-1/soc/geniqup@9c0000/i2c@984000: failed to match any schema with compatible: ['qcom,sa8255p-geni-i2c']
+Documentation/devicetree/bindings/soc/qcom/qcom,geni-se.example.dtb: /example-1/soc/geniqup@9c0000/serial@990000: failed to match any schema with compatible: ['qcom,sa8255p-geni-uart']
+
+doc reference errors (make refcheckdocs):
+
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20240828203721.2751904-17-quic_nkela@quicinc.com
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
+
