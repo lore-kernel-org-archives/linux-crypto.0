@@ -1,46 +1,46 @@
 Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 853CE1AC8B2;
-	Wed, 28 Aug 2024 20:38:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E80D1AD3F6;
+	Wed, 28 Aug 2024 20:38:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724877508; cv=none; b=XwpsfFd1tqzIxm7ucfuKRyUJT/yMfO/kkO5MH185uVMxTco1U0jreJTZfWcMoZrMrLCMImTkfDucz2/U4RuxTEPEnn8hHQ6veznlA4T5dTBCNi+W23KTKl0pp5sPmHCMLbMNDAGVx1XpQX2YNwaps1qXc1c9MM/ceHjMgl0ilkM=
+	t=1724877509; cv=none; b=ENr7flsWfdiaXl+BLgMSt92me+NbovyoEy77CPHbovW3890IMTgveDzNcUTaSTmFLFHUhy6g25hlHsY9F9ZOm5MUSgYK7WVilkc8Eo75I+H8EcIRE38iLlnRL3/kg2OgtebXmQTEho9xv6wng4FSIPS8stNn6iQmy2HSIOoKgGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724877508; c=relaxed/simple;
-	bh=M+daQL7gE+R6zSzCmv7cAXBZrTWgqOUJB+CVt8jeJA4=;
+	s=arc-20240116; t=1724877509; c=relaxed/simple;
+	bh=XNcUcB1ixbejfM9h8lBM4RKslPFX+NWF9zZaCLj1A8k=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sVXR+NketjTvUsRFCaqsGX3rZGHYlx2i7JV2CUtiGWSvou9/3c5oVhSR6jbtpmLKRBcmcikFx/95YkzWG03bJITM/rJBqxuwAh0FQfoe5oiGU6LqfnWD1MZkosZSL/VTRfsajt2KR+qEkShVpFSBjlYkBD2Ljj2+O46KL2iGMfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=nLXSZuFU; arc=none smtp.client-ip=205.220.180.131
+	 MIME-Version:Content-Type; b=WM9VNke46i+coIqMEyujfeFPUODsyV0GDCm3p87Bjk+/Xj3HqNu/A6BrmGolMR2SkBpN8FFUvj1CZUEXybjhy/WCco7NQC8ecL+rw8dKPPmSCK37iHxtn4X6Ux67IzAwNPCvZWbrJSZSftJ6yo7YErJFFjsOShKElSEciXpTrZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=ARoW2HNK; arc=none smtp.client-ip=205.220.180.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="nLXSZuFU"
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47SJMLTl026218;
-	Wed, 28 Aug 2024 20:38:05 GMT
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="ARoW2HNK"
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47SJMQMP024268;
+	Wed, 28 Aug 2024 20:38:08 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	7viP3XZ2rO2LIKhJIh/HLaIIw+hpC7836tUaEq4n8Zc=; b=nLXSZuFU5AQPBwo5
-	Q5oNFXD6m7xtxabOZCPLXhU/piiIlSKcGqhXjDCgmlSTA1iNqWsCgxIVyhIdAQE/
-	AT/pMfyISq1iY9sag50QVQxO3b8RrUM/FSLao8VSJ0BZVL1ocA614WXTN1jjJSHM
-	WgMlESsZCvm78YbcW1uuu0QK3UXKEBGreze7DlDp35kPVlgVNYI3hUGTSqjXq+Yz
-	iThDN0WnSjmtVTZ5xuLkDX5mw6zxhfLkRWJi1Hwdwsmm1blLE+2Fz1daaPsD1pbf
-	Z0r6EdsW9iOn1FBmkalbjSqtV7OuQ/jkvWrZwYFq6eAdf3XckeFWT7VXoWCIUEW4
-	sNAV7g==
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 41a612gx85-1
+	itSRfBevvSCvMgMm7DbDm0v4eWADSRFNjVgieE+phXY=; b=ARoW2HNKZcWc0PHY
+	+1hV7k5T4K1FiPcNvcJlafpKYF3SEbab3xZiwkNa1F+kHTFEYHUJa7wp/pbNRfHn
+	gm7sf4i1dUdCO+kTNBe2S7VI3c/YxcaqVCPU0LaqpTehm8uCWChbBSM2B+yxs0Ba
+	RgmR5O5ztM+YcdPB5RQOf+z9D07di8maMqtcSgkzqcVEnRqrhMRVhKzw3n/Iq4fd
+	CdqmneL/qxz8JqMP/PMtYTp8z4bnY0lC+m93lk+pmMsH3OxVPahHbVkBygflsC5X
+	n1rRtH+75Kr0Xtw1Cnsv/1Sf5I5ub/91Uj6y+u3y2YgPUeznFfCadhxJJxN4flO+
+	nAcbGw==
+Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 419puuk279-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 28 Aug 2024 20:38:04 +0000 (GMT)
+	Wed, 28 Aug 2024 20:38:07 +0000 (GMT)
 Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 47SKc3Pe015487
+	by NASANPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 47SKc6wE004630
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 28 Aug 2024 20:38:03 GMT
+	Wed, 28 Aug 2024 20:38:06 GMT
 Received: from hu-nkela-lv.qualcomm.com (10.49.16.6) by
  nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Wed, 28 Aug 2024 13:37:59 -0700
+ 15.2.1544.9; Wed, 28 Aug 2024 13:38:02 -0700
 From: Nikunj Kela <quic_nkela@quicinc.com>
 To: <andersson@kernel.org>, <konradybcio@kernel.org>, <robh@kernel.org>,
         <krzk+dt@kernel.org>, <conor+dt@kernel.org>, <rafael@kernel.org>,
@@ -64,9 +64,9 @@ CC: <robin.murphy@arm.com>, <cristian.marussi@arm.com>, <rui.zhang@intel.com>,
         <linux-watchdog@vger.kernel.org>, <kernel@quicinc.com>,
         <quic_psodagud@quicinc.com>, <quic_tsoni@quicinc.com>,
         <quic_shazhuss@quicinc.com>, Nikunj Kela <quic_nkela@quicinc.com>
-Subject: [PATCH 06/22] dt-bindings: watchdog: qcom-wdt: document support on SA8255p
-Date: Wed, 28 Aug 2024 13:37:05 -0700
-Message-ID: <20240828203721.2751904-7-quic_nkela@quicinc.com>
+Subject: [PATCH 09/22] dt-bindings: soc: qcom: aoss-qmp: document support for SA8255p
+Date: Wed, 28 Aug 2024 13:37:08 -0700
+Message-ID: <20240828203721.2751904-10-quic_nkela@quicinc.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240828203721.2751904-1-quic_nkela@quicinc.com>
 References: <20240828203721.2751904-1-quic_nkela@quicinc.com>
@@ -82,36 +82,36 @@ X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
  nasanex01b.na.qualcomm.com (10.46.141.250)
 X-QCInternal: smtphost
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: Yq_02RE4HEwsRN-C-HSz0LT2hrE8lAjA
-X-Proofpoint-ORIG-GUID: Yq_02RE4HEwsRN-C-HSz0LT2hrE8lAjA
+X-Proofpoint-ORIG-GUID: tL1smLsJN2AMO9bZsrmIi916U-3doqAx
+X-Proofpoint-GUID: tL1smLsJN2AMO9bZsrmIi916U-3doqAx
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
  definitions=2024-08-28_08,2024-08-28_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 malwarescore=0
- phishscore=0 spamscore=0 mlxlogscore=999 adultscore=0 impostorscore=0
- mlxscore=0 suspectscore=0 bulkscore=0 lowpriorityscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 clxscore=1015 impostorscore=0 phishscore=0 adultscore=0
+ bulkscore=0 suspectscore=0 lowpriorityscore=0 spamscore=0 mlxlogscore=999
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.19.0-2407110000 definitions=main-2408280149
 
-Add a compatible for the SA8255p platform's KPSS watchdog.
+Add compatible for AOSS QMP representing support on SA8255p.
 
 Signed-off-by: Nikunj Kela <quic_nkela@quicinc.com>
 ---
- Documentation/devicetree/bindings/watchdog/qcom-wdt.yaml | 1 +
+ Documentation/devicetree/bindings/soc/qcom/qcom,aoss-qmp.yaml | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/Documentation/devicetree/bindings/watchdog/qcom-wdt.yaml b/Documentation/devicetree/bindings/watchdog/qcom-wdt.yaml
-index 47587971fb0b..932393f8c649 100644
---- a/Documentation/devicetree/bindings/watchdog/qcom-wdt.yaml
-+++ b/Documentation/devicetree/bindings/watchdog/qcom-wdt.yaml
+diff --git a/Documentation/devicetree/bindings/soc/qcom/qcom,aoss-qmp.yaml b/Documentation/devicetree/bindings/soc/qcom/qcom,aoss-qmp.yaml
+index 7afdb60edb22..bd873e7e4ae5 100644
+--- a/Documentation/devicetree/bindings/soc/qcom/qcom,aoss-qmp.yaml
++++ b/Documentation/devicetree/bindings/soc/qcom/qcom,aoss-qmp.yaml
 @@ -26,6 +26,7 @@ properties:
-               - qcom,apss-wdt-msm8994
-               - qcom,apss-wdt-qcm2290
-               - qcom,apss-wdt-qcs404
-+              - qcom,apss-wdt-sa8255p
-               - qcom,apss-wdt-sa8775p
-               - qcom,apss-wdt-sc7180
-               - qcom,apss-wdt-sc7280
+     items:
+       - enum:
+           - qcom,qdu1000-aoss-qmp
++          - qcom,sa8255p-aoss-qmp
+           - qcom,sa8775p-aoss-qmp
+           - qcom,sc7180-aoss-qmp
+           - qcom,sc7280-aoss-qmp
 -- 
 2.34.1
 
