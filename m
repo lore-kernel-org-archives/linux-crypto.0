@@ -1,101 +1,82 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 653FD149C53;
-	Wed, 28 Aug 2024 17:45:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C512A14EC47;
+	Wed, 28 Aug 2024 18:40:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724867122; cv=none; b=T0Ay2w/407uyDHrPzR6LMYViDrYGy4mzL+JLmCYy4O17vmVxqsx+xVTtTlwfGXbgl8yJxVGCfo7IJnbdKV1kiaV2nfJme9l60FVKri+9KYezztCKzVb0C1Gk3fzPSGfzT9Di9XDAxFRAdlBeTfnWZNBODXpEoPn/zf48V5oFbqo=
+	t=1724870427; cv=none; b=Ov3lNg7W1hWN+kPTDAsYuzTbnsnefr6SSmbCGGaIfdB7b4H4pY9i26BpCno9ktz5uon+S/o4D7kvy0vBJVv68DTPwnaM80s973tEXOmLrdGYVGmgocK3oNi3ag10rIZu83g1bMtcc08AU2NFh6qhfV/1ndiatPQRow9xHD3Yvlo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724867122; c=relaxed/simple;
-	bh=G9QT0vPfao0O0lwDuOgePtuOTxFGY2xhec23X8b5r3c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OtuR6NiXYjDXDOg2iqkr7ff0CzhoDC1Mz56I1TLsLf6WYGBKwg+/gsygO1PvETMnsq8FB+wahd8hBjagKOM8J7cU+ZzJFg4TYkqg6JG5COHYRR6/N/1PNXm78GyhUA7GoXZ98zIMTpmm5rEGBkM8UoAWGANNnr6Nt1Bsx2WiqTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mM/+yUPj; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1724870427; c=relaxed/simple;
+	bh=0p4/r8/yzBwUZ+dwptQpesjoe0ome9DpiK7SlPrQpNU=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=lMmGf8RprfuTR/RCBLQFf81TQnR94/hA8fX83xPimqDj6LYwB5fqYPTqdCn+rrG5ZIfbF8ARmfnqQcK7KtLUyLzhGJfETRWdld+m6dk8N7EP1kXvLe7yzFAJpEhTNM48sIeSYRIH0HHgzpG+Y59MlhMtxIn6BqwOAIPAPEzqp3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NQ6TKFLR; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mM/+yUPj"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5AF1C4CECC;
-	Wed, 28 Aug 2024 17:45:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724867121;
-	bh=G9QT0vPfao0O0lwDuOgePtuOTxFGY2xhec23X8b5r3c=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=mM/+yUPj34upe6fwknvPELrONW32fk0ywkcuF5Yc/nxTosp3RT0wKHcL76S16MvtH
-	 j3IwMhKQu8qVRZjCIpkuB8SK3TEhEAXyfj3dZnJe0tbaqiVP/FsHKEJN2Hsipy4I7h
-	 gkJkuLzG0ohDSSP2DeWa0OGl6udyOeDqIku7S/4rHBTeHBRUQENCLcv0vzIOxz+iVS
-	 Rgi4GZ+PyNaUSYK2dwtpxpzLKWWwYKn6WAFbuODH77EFEz0Dn0x8CYEvCLCwLKxuuo
-	 Ob4RXaQvd7vCsvhYa15myiMQWN3o4BkdOKa9VMf2VyByT3CJHTwhNPT0zImH4j/Mi0
-	 jSwH8HGVeoQsg==
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-53346132348so8419245e87.2;
-        Wed, 28 Aug 2024 10:45:21 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVsBvV3zuQt3OefTkidwvoxXPbdz/Rj0+DDAzPGEANS3Lai51YeI1LJmk02HdwHdO5J4Ia4jwo+W3KQ@vger.kernel.org, AJvYcCWpxf5+HfSQbjZc1gVInoLqHmk8zuNIOqr+7ZxHSZAgCho1sdh1wfhsm7PKQODOuVtiHVVG/QmpYbVSVw4=@vger.kernel.org, AJvYcCXa9qKkwthTAmjqayMzosoNOGuzTHo/KQuBZUkoamgVJGMuIaAeYP+oNDzcKAbHTBfP1ultP9U/YJ7ax76BrL4S@vger.kernel.org, AJvYcCXaODFRkmSGHN6XX/7wWJaulI+6OjL2yjZyOX6pM1ARjuHXYFL6+QqER0xdxMwWnFjnFjKu0G+MRF5E32+S@vger.kernel.org, AJvYcCXc9D3ZurPw91QlDdvF5gz9lQOZM1IJuA9lVT8eWhtZjAK5RtRxRrKhcV9WY1qmcApMsL1dtWHHx1aB@vger.kernel.org
-X-Gm-Message-State: AOJu0YxmAzcrKhqbS9ua6h8PnrYv2K9Y2UyuKJIcY9iAZ1YIJwfsWFPN
-	QxVE05K8OlerwzCKT1rT3GZ2iJU9MOr7W8G7oGSQFSm+ZVI79L7kFJrv0WkJB0CyfGGN8i1BfmI
-	u07z8mXlxh667neyALjcmlFw97fE=
-X-Google-Smtp-Source: AGHT+IGaVTdJ/LHztg5boQQvEQD2uV+Xdg8ZsjilzNuNZwL1c7aotEe1qcRRan6SrgWsXGUOuRs+QonsXS8FUfmscYw=
-X-Received: by 2002:a05:6512:b98:b0:530:bbe7:4db3 with SMTP id
- 2adb3069b0e04-5353e5b81e8mr28078e87.39.1724867120119; Wed, 28 Aug 2024
- 10:45:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NQ6TKFLR"
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-7143ae1b48fso4133870b3a.1;
+        Wed, 28 Aug 2024 11:40:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1724870425; x=1725475225; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=b/ZaVDyTwhjqU8Ji5DgGVdd9z0y2XgewwBZz8Absvl0=;
+        b=NQ6TKFLRJBOzYzuUS7BGadPb0j+aAoApM3lNQd3pxU++UBFUp83g0OHC/cTcfTazbi
+         akbC9RS+v8he7oL5i9gPlSLPlELRQ5K8LN0x3tZ9i/uXb2q6p7+JG+48eyefrZxglbTo
+         sQtb1S/bUZzm8hcRORRLqGdj3yO1fxoVHtH2AhlQL5tHKxJZsUPKaZD50OFKPXU/XJoP
+         psSs7Rr/EgFzzBcU/XML5SAWJlXY+dmu4MaYD36LzyYx1ZWOD0W0UuzmitQAaSrdFL++
+         LZwkOmCfMefG5OrLDfd7vooPNfPvc41eQEAnxnC3sM+MWl5SLKy/cvm0vrrQT+wa/f/n
+         9sCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724870425; x=1725475225;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=b/ZaVDyTwhjqU8Ji5DgGVdd9z0y2XgewwBZz8Absvl0=;
+        b=AECq0Os6SLfA8Gz5mlaNHNiHUmd39ObJdom3VhrPs2RAIo+FtjHhVA9h7NZZ17wnmS
+         Urn715f5/3licCD8cyg1opS+bUC2h2L/R/Ls6hHY8HH5QxMMg1K6BkCPO3UqSTMqoA9p
+         5xdNXwVLo5MEeNeryeqadL2FdbHaOIjDsWQb9E/Tn4xEDOFdJE7gnuBbJ7ulela5btY0
+         byzb8qh7p14UFCOI2Y2TsQ4lV+6+ZG1w+Fs4HkfWqKGVHWYFvIMj36Dpql2nqJeDGsb7
+         R+m17pY/UarC5YP6pUGAhz0FFm66UgEwH57hz7KdltKTDDL2x3ixCzM25biEgTxY2A1j
+         27hQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX0a2QnMzUcXefcCP9N5Az1eaKI3Qdrh2uQis0wqK2Acp6rAi1gQ0GS13fY+xMCCO6MyGWL30ARVNHHpNau@vger.kernel.org
+X-Gm-Message-State: AOJu0YypqQiH9wz2S1ug0VIgYH91Z1Exl/m+M3HDMKCji9rhVnVnJ9c3
+	zwN1YQrBGrm/tITDkmC6AVEtgAPOtdd0DtiXEquqT49c9114MONR6NDlAw==
+X-Google-Smtp-Source: AGHT+IGu35YjbA8PyUlak5f93Cdpg9/Uyf7jVYgpD0Fu2M1v1Vyy6AnB4F7MGWjP290I59R2dCleng==
+X-Received: by 2002:a05:6a20:2d14:b0:1c4:c879:b770 with SMTP id adf61e73a8af0-1cce101502dmr250972637.23.1724870424667;
+        Wed, 28 Aug 2024 11:40:24 -0700 (PDT)
+Received: from eaf ([2800:40:39:2b6:f705:4703:24a7:564])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7143433046csm10469664b3a.191.2024.08.28.11.40.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Aug 2024 11:40:24 -0700 (PDT)
+Date: Wed, 28 Aug 2024 15:40:19 -0300
+From: Ernesto =?utf-8?Q?A=2E_Fern=C3=A1ndez?= <ernesto.mnd.fernandez@gmail.com>
+To: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-arm-msm@vger.kernel.org
+Cc: Om Prakash Singh <quic_omprsing@quicinc.com>
+Subject: qcom-rng is broken for acpi
+Message-ID: <20240828184019.GA21181@eaf>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240214221847.2066632-1-ross.philipson@oracle.com>
- <20240214221847.2066632-2-ross.philipson@oracle.com> <CAMj1kXH3Gvr3vDRLDdXuc0s7ZAQYE6+D7tmCRBjJWwWt2fn4-w@mail.gmail.com>
- <9d01a6d2-4dd9-4331-8fc9-b01c07cfdbb5@apertussolutions.com>
-In-Reply-To: <9d01a6d2-4dd9-4331-8fc9-b01c07cfdbb5@apertussolutions.com>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Wed, 28 Aug 2024 19:45:09 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXHn6xeAskWiDLvvA4oG3j9_tqx+iMYJXMqmgvyX4pMzgg@mail.gmail.com>
-Message-ID: <CAMj1kXHn6xeAskWiDLvvA4oG3j9_tqx+iMYJXMqmgvyX4pMzgg@mail.gmail.com>
-Subject: Re: [PATCH v8 01/15] x86/boot: Place kernel_info at a fixed offset
-To: "Daniel P. Smith" <dpsmith@apertussolutions.com>, Stuart Yoder <stuart.yoder@arm.com>
-Cc: Ross Philipson <ross.philipson@oracle.com>, linux-kernel@vger.kernel.org, x86@kernel.org, 
-	linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, kexec@lists.infradead.org, 
-	linux-efi@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
-	hpa@zytor.com, dave.hansen@linux.intel.com, mjg59@srcf.ucam.org, 
-	James.Bottomley@hansenpartnership.com, peterhuewe@gmx.de, jarkko@kernel.org, 
-	jgg@ziepe.ca, luto@amacapital.net, nivedita@alum.mit.edu, 
-	herbert@gondor.apana.org.au, davem@davemloft.net, kanth.ghatraju@oracle.com, 
-	trenchboot-devel@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-(cc Stuart)
+Hi, I have a bug to report.
 
-On Thu, 21 Mar 2024 at 15:46, Daniel P. Smith
-<dpsmith@apertussolutions.com> wrote:
->
-> Hi Ard!
->
-> On 2/15/24 02:56, Ard Biesheuvel wrote:
-> > On Wed, 14 Feb 2024 at 23:31, Ross Philipson <ross.philipson@oracle.com> wrote:
-> >>
-> >> From: Arvind Sankar <nivedita@alum.mit.edu>
-> >>
-> >> There are use cases for storing the offset of a symbol in kernel_info.
-> >> For example, the trenchboot series [0] needs to store the offset of the
-> >> Measured Launch Environment header in kernel_info.
-> >>
-> >
-> > Why? Is this information consumed by the bootloader?
->
-> Yes, the bootloader needs a standardized means to find the offset of the
-> MLE header, which communicates a set of meta-data needed by the DCE in
-> order to set up for and start the loaded kernel. Arm will also need to
-> provide a similar metadata structure and alternative entry point (or a
-> complete rewrite of the existing entry point), as the current Arm entry
-> point is in direct conflict with Arm DRTM specification.
->
+I'm getting a null pointer dereference inside qcom_rng_probe() when this
+driver gets loaded. The problem comes from here:
 
-Digging up an old thread here: could you elaborate on this? What do
-you mean by 'Arm entry point' and how does it conflict directly with
-the Arm DRTM specification? The Linux/arm64 port predates that spec by
-about 10 years, so I would expect the latter to take the former into
-account. If that failed to happen, we should fix the spec while we
-still can.
+  rng->of_data = (struct qcom_rng_of_data *)of_device_get_match_data(&pdev->dev);
 
-Thanks,
-Ard.
+because of_device_get_match_data() will just return null for acpi. It seems
+that acpi was left behind by the changes in commit f29cd5bb64c2 ("crypto:
+qcom-rng - Add hw_random interface support").
+
+Thanks in advance, let me know if you need anything else.
+Ernesto
