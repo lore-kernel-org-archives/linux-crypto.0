@@ -1,118 +1,105 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C69791AED32;
-	Wed, 28 Aug 2024 20:43:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C000161914;
+	Wed, 28 Aug 2024 23:13:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724877837; cv=none; b=U9ijoLxwhlgjftlCYpNqp/Lx5n57wIdQaB46yRx1MI86NPhuHrM7LGB16IuxAghQxiowkVWnlGcmjaaDT1NX6QTtVVG4PAVH2GUNAylPzmGbaLZoYCTJp1FCojevsZ7jKDc2QU5gAU3YDf3P93M4pStK+zm2qRE0eMO7Q8tI7+c=
+	t=1724886832; cv=none; b=HiiMJTWdFAmtaYL3wIt4QuN563m+6ZFD45TNdHe3xFe3Hz+Da+cjTH2cqCRwTOW+jnlzJv+USSD+InRkbhyyITPToH6D+/hh4bQuXb3DtG28zMkQrd5GRBsozag4BiyTcQdGzKY98t9ypT0rY0mO22XsDn5W7sOdYjEf6k61n0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724877837; c=relaxed/simple;
-	bh=GXZl48K7EFCGmXer8x9KQlUaWBdXi14B53BJFi/4PUA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Js2K9bmfsOjkfA1AgqwD98EPYcbxq/3peocxpe1KI3uaRcoC5zOpW04OdGXdICW195swlpYbGTnXrLYh5s1Oruc1s2B0EWQ2bLyiFroLw6q8UFPSHdkCtsw4jQ+enKedlFy9EtVIGHFFbvOLgsQ0PZjpF9fQePmuSfa9JLGJRY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=GelYMMoz; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1724886832; c=relaxed/simple;
+	bh=QISJ42Va0eYxqFWZBmZo3tT+XOt9YziD/pQSoZRbBg0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gurYLTzf0WrdidDXhR8LkD/MvzAH7mXyfA7ajNbQbfyiGf++QZJyjB8132t9c+SJymq930WtwmsheeEtaH+lrtxptwzGTfNB5U+3o+zdqH9CC/O/VjJUaubHvyQH4NJqvXe1xevIlJMvnjBnM86OdqfP3MmEVdOqB2b3gJ2dd+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Igkl3X+Y; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="GelYMMoz"
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47SJM2Nt013233;
-	Wed, 28 Aug 2024 20:38:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	ioQIr6ZQHoLqjIx+IpUUkpTUjoh7kLQrRYAd6jKuzLM=; b=GelYMMozWnvEBA57
-	/VJT5lVVYoy45/A063bMehSKs9ZOHHcl0/npvPknsoblq0NeoHIxYTqVE431eJCh
-	WotxVNzIzENwTkYCwv7/iHT1wu5jSQHtkD/+bXoXQcWOmP1CMcK6QncNPJP8FbB5
-	wm6tesaWqGDvaXjL69OQ47CEpfgZU8BFLWEWVSsswNsyUjSScZpZkoS6peXeXmP8
-	zMbn2NpbXUh9MLSV2PHOq/od8gTim1TKcKoNX8vF682rHEma4lceTd34hrTqNZ5t
-	t+MxXXQ1M3PrAlIWoDflkfWIFmePmLJ2x3e7xEPbnHkfsjrG/GYqItZqxb8Em57r
-	5L4TFQ==
-Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 419pv130bq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 28 Aug 2024 20:38:12 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 47SKcBOI025894
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 28 Aug 2024 20:38:11 GMT
-Received: from hu-nkela-lv.qualcomm.com (10.49.16.6) by
- nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Wed, 28 Aug 2024 13:38:08 -0700
-From: Nikunj Kela <quic_nkela@quicinc.com>
-To: <andersson@kernel.org>, <konradybcio@kernel.org>, <robh@kernel.org>,
-        <krzk+dt@kernel.org>, <conor+dt@kernel.org>, <rafael@kernel.org>,
-        <viresh.kumar@linaro.org>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>, <sudeep.holla@arm.com>, <andi.shyti@kernel.org>,
-        <tglx@linutronix.de>, <will@kernel.org>, <joro@8bytes.org>,
-        <jassisinghbrar@gmail.com>, <lee@kernel.org>,
-        <linus.walleij@linaro.org>, <amitk@kernel.org>,
-        <thara.gopinath@gmail.com>, <broonie@kernel.org>,
-        <wim@linux-watchdog.org>, <linux@roeck-us.net>
-CC: <robin.murphy@arm.com>, <cristian.marussi@arm.com>, <rui.zhang@intel.com>,
-        <lukasz.luba@arm.com>, <vkoul@kernel.org>, <quic_gurus@quicinc.com>,
-        <agross@kernel.org>, <bartosz.golaszewski@linaro.org>,
-        <quic_rjendra@quicinc.com>, <robimarko@gmail.com>,
-        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-pm@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>, <arm-scmi@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-i2c@vger.kernel.org>,
-        <iommu@lists.linux.dev>, <linux-gpio@vger.kernel.org>,
-        <linux-serial@vger.kernel.org>, <linux-spi@vger.kernel.org>,
-        <linux-watchdog@vger.kernel.org>, <kernel@quicinc.com>,
-        <quic_psodagud@quicinc.com>, <quic_tsoni@quicinc.com>,
-        <quic_shazhuss@quicinc.com>, Nikunj Kela <quic_nkela@quicinc.com>
-Subject: [PATCH 15/22] dt-bindings: mfd: qcom,tcsr: document support for SA8255p
-Date: Wed, 28 Aug 2024 13:37:14 -0700
-Message-ID: <20240828203721.2751904-16-quic_nkela@quicinc.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240828203721.2751904-1-quic_nkela@quicinc.com>
-References: <20240828203721.2751904-1-quic_nkela@quicinc.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Igkl3X+Y"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E93BC4CEC0;
+	Wed, 28 Aug 2024 23:13:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724886832;
+	bh=QISJ42Va0eYxqFWZBmZo3tT+XOt9YziD/pQSoZRbBg0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Igkl3X+YtPWt9lCblaUZzraFSdFxa54F4n2l+ehwjXqByzx1N8EEiLXby+Z8CfzZ8
+	 7kzVqzb8dj1SXhUoZnGtY8B83J9xdiCwbXKuUdpBcevOBu7zDAdlF4il1Q5fte9o71
+	 nmxNhsqDLPd36IPd35D5ImzYQ31N8WkReq8dF8zlJnD6n22lEPcHNNR/bxWxOYjj1Z
+	 aFUyNy3WDAmPeW76D+8frUPREHFpIB07PDD9tNSXHzZMg6/+XpabrzvlGz742UtqW1
+	 lM7HQIRrpnau/LYc6CLvEiTOSvR5JXx5Y5SdAfIwROoUCfXVwWxwhqEPETSQsl/I1G
+	 qxqrLyHNPkFGA==
+Date: Wed, 28 Aug 2024 23:13:50 +0000
+From: Eric Biggers <ebiggers@kernel.org>
+To: ross.philipson@oracle.com
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org,
+	linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
+	linux-efi@vger.kernel.org, iommu@lists.linux-foundation.org,
+	dpsmith@apertussolutions.com, tglx@linutronix.de, mingo@redhat.com,
+	bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com,
+	ardb@kernel.org, mjg59@srcf.ucam.org,
+	James.Bottomley@hansenpartnership.com, peterhuewe@gmx.de,
+	jarkko@kernel.org, jgg@ziepe.ca, luto@amacapital.net,
+	nivedita@alum.mit.edu, herbert@gondor.apana.org.au,
+	davem@davemloft.net, corbet@lwn.net, ebiederm@xmission.com,
+	dwmw2@infradead.org, baolu.lu@linux.intel.com,
+	kanth.ghatraju@oracle.com, andrew.cooper3@citrix.com,
+	trenchboot-devel@googlegroups.com
+Subject: Re: [PATCH v9 06/19] x86: Add early SHA-1 support for Secure Launch
+ early measurements
+Message-ID: <20240828231350.GA558903@google.com>
+References: <20240531010331.134441-1-ross.philipson@oracle.com>
+ <20240531010331.134441-7-ross.philipson@oracle.com>
+ <20240531021656.GA1502@sol.localdomain>
+ <20240827181426.GC2049@sol.localdomain>
+ <601646a2-46ac-47a0-a8b7-1d45a09172ab@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: ALa-1UPZ8rkXC1hubn1E8ZhyGkcgaK7E
-X-Proofpoint-ORIG-GUID: ALa-1UPZ8rkXC1hubn1E8ZhyGkcgaK7E
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-28_08,2024-08-28_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- suspectscore=0 clxscore=1015 lowpriorityscore=0 mlxscore=0 bulkscore=0
- mlxlogscore=999 impostorscore=0 malwarescore=0 spamscore=0 phishscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2407110000 definitions=main-2408280149
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <601646a2-46ac-47a0-a8b7-1d45a09172ab@oracle.com>
 
-Add compatible for tcsr representing support on SA8255p SoC.
+On Wed, Aug 28, 2024 at 01:14:45PM -0700, ross.philipson@oracle.com wrote:
+> On 8/27/24 11:14 AM, 'Eric Biggers' via trenchboot-devel wrote:
+> > On Thu, May 30, 2024 at 07:16:56PM -0700, Eric Biggers wrote:
+> > > On Thu, May 30, 2024 at 06:03:18PM -0700, Ross Philipson wrote:
+> > > > From: "Daniel P. Smith" <dpsmith@apertussolutions.com>
+> > > > 
+> > > > For better or worse, Secure Launch needs SHA-1 and SHA-256. The
+> > > > choice of hashes used lie with the platform firmware, not with
+> > > > software, and is often outside of the users control.
+> > > > 
+> > > > Even if we'd prefer to use SHA-256-only, if firmware elected to start us
+> > > > with the SHA-1 and SHA-256 backs active, we still need SHA-1 to parse
+> > > > the TPM event log thus far, and deliberately cap the SHA-1 PCRs in order
+> > > > to safely use SHA-256 for everything else.
+> > > > 
+> > > > The SHA-1 code here has its origins in the code from the main kernel:
+> > > > 
+> > > > commit c4d5b9ffa31f ("crypto: sha1 - implement base layer for SHA-1")
+> > > > 
+> > > > A modified version of this code was introduced to the lib/crypto/sha1.c
+> > > > to bring it in line with the SHA-256 code and allow it to be pulled into the
+> > > > setup kernel in the same manner as SHA-256 is.
+> > > > 
+> > > > Signed-off-by: Daniel P. Smith <dpsmith@apertussolutions.com>
+> > > > Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
+> > > 
+> > > Thanks.  This explanation doesn't seem to have made it into the actual code or
+> > > documentation.  Can you please get it into a more permanent location?
+> > 
+> > I see that a new version of the patchset was sent out but this suggestion was
+> > not taken.  Are you planning to address it?
+> 
+> Sorry we sort of overlooked that part of the request. We will take the
+> latest commit message, clean it up a little and put it in
+> boot/compressed/sha1.c file as a comment. I believe that is what you would
+> like us to do.
+> 
 
-Signed-off-by: Shazad Hussain <quic_shazhuss@quicinc.com>
-Signed-off-by: Nikunj Kela <quic_nkela@quicinc.com>
----
- Documentation/devicetree/bindings/mfd/qcom,tcsr.yaml | 1 +
- 1 file changed, 1 insertion(+)
+Do users of this feature need to make a decision about SHA-1?  If so there needs
+to be guidance in Documentation/.  A comment in a .c file is not user facing.
 
-diff --git a/Documentation/devicetree/bindings/mfd/qcom,tcsr.yaml b/Documentation/devicetree/bindings/mfd/qcom,tcsr.yaml
-index c6bd14ec5aa0..88f804bd7581 100644
---- a/Documentation/devicetree/bindings/mfd/qcom,tcsr.yaml
-+++ b/Documentation/devicetree/bindings/mfd/qcom,tcsr.yaml
-@@ -21,6 +21,7 @@ properties:
-           - qcom,msm8998-tcsr
-           - qcom,qcm2290-tcsr
-           - qcom,qcs404-tcsr
-+          - qcom,sa8255p-tcsr
-           - qcom,sc7180-tcsr
-           - qcom,sc7280-tcsr
-           - qcom,sc8280xp-tcsr
--- 
-2.34.1
-
+- Eric
