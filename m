@@ -1,212 +1,140 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A08F14A00;
-	Thu, 29 Aug 2024 03:06:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EBCD38DDB
+	for <linux-crypto@vger.kernel.org>; Thu, 29 Aug 2024 03:17:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724900798; cv=none; b=sf5/RbMbEAq4afphrje0DjV1xL6neJ/edCrtfUhHDumiXLmb2ubfNY0ugH9hGcDfwq22Ng/BJJCE56y8Zo03rKOpsG5/paCTe/09/dSgtTiJldJ1KW1o68gv4LEcYH4FkUrB7Voy+YmNJfDT52RWe4EAJc7AeZiASvUMnCQmS10=
+	t=1724901440; cv=none; b=D+NlmBng2yFIg98UIM28N8/u5LRHZR++VZueeG0wGSGK9pXf+mUJoVbV3NYjPw5NKg+ErHzvQGzVespiG1+ZyY3Zy4sx5QkmkUcWVIRw+V+ntwIH0cHJEAAvSCBpZ/32/4Me5PjW+gDJTbzWCgW6COqeF8/oes4iV+uALGWC4fw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724900798; c=relaxed/simple;
-	bh=V51tZLE6chfQqVtSs/q+YZUu4GgCPe8BR7V7YnYADVc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UfYoLo7M3EX4TCGG9zmwA5UqtlNBm7C1bzYsPls3yJbvha7nkzFkN87Zr0IhxK0slDpwGwpRnFblr523h1+ZLwjAlbMvm2OGR+05TRQ6DG6P9XGx5+WrSb+x+8I1mNpX4PxAn2qlOY1xA4h18ud1g6lym2AfIV6bs5Iv27B5DT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R/Q1ulfC; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1724901440; c=relaxed/simple;
+	bh=2aTnaXW705uxQNx7oNYfenyF4g7+kMVW1ZmdnZoGpwc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=txiaX2bgMMnOunEvW3fK7uYl5JDcGZqcROSANiwLqdZ1jtdlxtye6WgvDU5coI2kQQzf38OV6gUQJvoRKOFqa63z4ov4aqJ3xaP60/hdUbvLR8prYPCWFC9K15Hy9/Spd7XfOxUR1G1kgAMUcTz/1CffqIrnwTTw3IgsQmI14Vc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amacapital.net; spf=pass smtp.mailfrom=amacapital.net; dkim=pass (2048-bit key) header.d=amacapital-net.20230601.gappssmtp.com header.i=@amacapital-net.20230601.gappssmtp.com header.b=V5Dy5ekw; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amacapital.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amacapital.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R/Q1ulfC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D383FC4CEC0;
-	Thu, 29 Aug 2024 03:06:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1724900798;
-	bh=V51tZLE6chfQqVtSs/q+YZUu4GgCPe8BR7V7YnYADVc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=R/Q1ulfCYH77cN7NSaau2Bh8FRTX9GiM6zpuXJyHVhlz36ylE4JGkY1vvHM/M8doH
-	 2xhGyM+JrkWwJxIg0ESf8zBZ8zwjzU4JqYrqXaM89W4snq7vvI4FnX3sahVYUJ5X7D
-	 e3dPFTPrLl1twrv+GJFSOFvVZX3hoWeDapI6iVZloGDmiGI1oYynZ8QCy+CueTORbE
-	 LA0S0zMHBwft8ZBLUq+OvBceA+WUjL9a1f1W/K8yppefR78l44xrGk6oqxDPvixm9i
-	 hwf1iMIpc0sOOyxK5jGSGUOUsu59YAIs2oqIf1VCxVSnfazxZ6fO3/CZkgNt0Ywj+h
-	 ZmKW3k90V8dHQ==
-Date: Wed, 28 Aug 2024 22:06:36 -0500
-From: Rob Herring <robh@kernel.org>
-To: Nikunj Kela <quic_nkela@quicinc.com>
-Cc: andersson@kernel.org, konradybcio@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, rafael@kernel.org, viresh.kumar@linaro.org,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	sudeep.holla@arm.com, andi.shyti@kernel.org, tglx@linutronix.de,
-	will@kernel.org, joro@8bytes.org, jassisinghbrar@gmail.com,
-	lee@kernel.org, linus.walleij@linaro.org, amitk@kernel.org,
-	thara.gopinath@gmail.com, broonie@kernel.org,
-	wim@linux-watchdog.org, linux@roeck-us.net, robin.murphy@arm.com,
-	cristian.marussi@arm.com, rui.zhang@intel.com, lukasz.luba@arm.com,
-	vkoul@kernel.org, quic_gurus@quicinc.com, agross@kernel.org,
-	bartosz.golaszewski@linaro.org, quic_rjendra@quicinc.com,
-	robimarko@gmail.com, linux-arm-msm@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-pm@vger.kernel.org, linux-crypto@vger.kernel.org,
-	arm-scmi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-i2c@vger.kernel.org, iommu@lists.linux.dev,
-	linux-gpio@vger.kernel.org, linux-serial@vger.kernel.org,
-	linux-spi@vger.kernel.org, linux-watchdog@vger.kernel.org,
-	kernel@quicinc.com, quic_psodagud@quicinc.com,
-	quic_tsoni@quicinc.com, quic_shazhuss@quicinc.com,
-	Praveen Talari <quic_ptalari@quicinc.com>
-Subject: Re: [PATCH 18/22] dt-bindings: spi: document support for SA8255p
-Message-ID: <20240829030636.GA2208587-robh@kernel.org>
-References: <20240828203721.2751904-1-quic_nkela@quicinc.com>
- <20240828203721.2751904-19-quic_nkela@quicinc.com>
+	dkim=pass (2048-bit key) header.d=amacapital-net.20230601.gappssmtp.com header.i=@amacapital-net.20230601.gappssmtp.com header.b="V5Dy5ekw"
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5a10835487fso170599a12.1
+        for <linux-crypto@vger.kernel.org>; Wed, 28 Aug 2024 20:17:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=amacapital-net.20230601.gappssmtp.com; s=20230601; t=1724901437; x=1725506237; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KNmzosmlE3keF9ZOCKanmUq6J3PfB9qYT5nEB2uhPjQ=;
+        b=V5Dy5ekwSz4wlE7HIog3NxMEqjOmIkwJJvBJI80QQjk5dv0AllEip3f/d0NrqLAaHv
+         cA63UJtIQlP40O7dftABI7mbjgbdLfBu4FWt3Bq3lVfREK4HLx8wT4BFMVtfZ0QOxswt
+         vY9CPSS+wSbJZ3nokNkaANEVjcmjKENxLvnmMiqEQVSthWf7v4f+SW3bcUTISkOZOzxu
+         prvnwSKg9iKmYoB5JutyocnBiMZxiqpra6t4HKKLymEO3K7YsLRFLOIZryJlHZ09fmLj
+         Of9O27H6Nx0n2PjerFUsF5Q2McYvlwTLu4QNmEazbBquYEzt5eMQ+nPCfbV+qOMKUThK
+         3eFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724901437; x=1725506237;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KNmzosmlE3keF9ZOCKanmUq6J3PfB9qYT5nEB2uhPjQ=;
+        b=swPlNZ7WSrNDANtR6g/NZKuJgfMBAvrNfwWnhyAfif84IcISluHrH9o+a7HeOmUeBq
+         /8RlnIkKxdah7JbynxL9l/QcFJMe88wN/b4illcd9Wv1pN1n4uj8GoNmkKguPHc+gxBQ
+         FjbjCTN28mxLZ46pR2MjepMuFqCIqCq5pfG5fiF+sYV7lQsDpCT4HIUxPSAOlvpr7aDj
+         3QgMJ7yh8UZDlyvudhhxFQgLkKsk7HJDiRo0IkCk6701iodI5DnoATRqrLP87P4EcU6s
+         SkSgRPKdsQJb4cxdDivw+P6V5o5r/XbHpunLtPjRHB7kOAxveibBsu3mi7d6k0QlrB98
+         QB2g==
+X-Forwarded-Encrypted: i=1; AJvYcCUbQZohQzBOCgOS2pulbJlsXnAR8Hmmz3FCQR/liMqMYTid2kTQ3ezc2p5ptW4Kczm1lBnMxeiTT+DQ7Wo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4Yqe2wc5b2SgcSOXo9GjoZBtNctHZF3L/fR5LkTWcjwFiZyMq
+	l11tqhi/Kac5+h+lNbB8AHU4rtXbC1D+L4pgv37Ec9Q+URlNlphnxltJ/DrT7sydMPFenWeTe2E
+	PKd9oCAuHeBLT84ZKPb5bFid53KNpuBKaFSzg
+X-Google-Smtp-Source: AGHT+IFEtovpRJEIjkfJeoX6oyzRzBMJpdpEM5rys6Mzg7Lm/FHfWD6uqtRHPHJtPhzPqMuGNpCp0pksl5KfgHXNdDI=
+X-Received: by 2002:a05:6402:518e:b0:5bf:c8:78a with SMTP id
+ 4fb4d7f45d1cf-5c21ed5316amr952709a12.17.1724901436704; Wed, 28 Aug 2024
+ 20:17:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240828203721.2751904-19-quic_nkela@quicinc.com>
+References: <20240531010331.134441-1-ross.philipson@oracle.com>
+ <20240531010331.134441-7-ross.philipson@oracle.com> <20240531021656.GA1502@sol.localdomain>
+ <874jaegk8i.fsf@email.froward.int.ebiederm.org> <5b1ce8d3-516d-4dfd-a976-38e5cee1ef4e@apertussolutions.com>
+ <87ttflli09.ffs@tglx>
+In-Reply-To: <87ttflli09.ffs@tglx>
+From: Andy Lutomirski <luto@amacapital.net>
+Date: Wed, 28 Aug 2024 20:17:05 -0700
+Message-ID: <CALCETrXQ7rChWLDqTG0+KY7rsfajSPguMnHO1G4VJi_mgwN9Zw@mail.gmail.com>
+Subject: Re: [PATCH v9 06/19] x86: Add early SHA-1 support for Secure Launch
+ early measurements
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: "Daniel P. Smith" <dpsmith@apertussolutions.com>, 
+	"Eric W. Biederman" <ebiederm@xmission.com>, Eric Biggers <ebiggers@kernel.org>, 
+	Ross Philipson <ross.philipson@oracle.com>, linux-kernel@vger.kernel.org, x86@kernel.org, 
+	linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, kexec@lists.infradead.org, 
+	linux-efi@vger.kernel.org, iommu@lists.linux-foundation.org, mingo@redhat.com, 
+	bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com, ardb@kernel.org, 
+	mjg59@srcf.ucam.org, James.Bottomley@hansenpartnership.com, peterhuewe@gmx.de, 
+	jarkko@kernel.org, jgg@ziepe.ca, nivedita@alum.mit.edu, 
+	herbert@gondor.apana.org.au, davem@davemloft.net, corbet@lwn.net, 
+	dwmw2@infradead.org, baolu.lu@linux.intel.com, kanth.ghatraju@oracle.com, 
+	andrew.cooper3@citrix.com, trenchboot-devel@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 28, 2024 at 01:37:17PM -0700, Nikunj Kela wrote:
-> Add compatible representing spi support on SA8255p.
-> 
-> Clocks and interconnects are being configured in firmware VM
-> on SA8255p platform, therefore making them optional.
-> 
-> CC: Praveen Talari <quic_ptalari@quicinc.com>
-> Signed-off-by: Nikunj Kela <quic_nkela@quicinc.com>
-> ---
->  .../bindings/spi/qcom,spi-geni-qcom.yaml      | 64 +++++++++++++++----
->  1 file changed, 53 insertions(+), 11 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/spi/qcom,spi-geni-qcom.yaml b/Documentation/devicetree/bindings/spi/qcom,spi-geni-qcom.yaml
-> index 2e20ca313ec1..74ea7c4f2451 100644
-> --- a/Documentation/devicetree/bindings/spi/qcom,spi-geni-qcom.yaml
-> +++ b/Documentation/devicetree/bindings/spi/qcom,spi-geni-qcom.yaml
-> @@ -25,10 +25,41 @@ description:
->  
->  allOf:
->    - $ref: /schemas/spi/spi-controller.yaml#
-> +  - if:
-> +      properties:
-> +        compatible:
-> +          contains:
-> +            const: qcom,sa8255p-geni-spi
-> +    then:
-> +      required:
-> +        - power-domains
-> +        - power-domain-names
+On Thu, Aug 15, 2024 at 12:10=E2=80=AFPM Thomas Gleixner <tglx@linutronix.d=
+e> wrote:
+>
+> On Thu, Aug 15 2024 at 13:38, Daniel P. Smith wrote:
+> > On 5/31/24 09:54, Eric W. Biederman wrote:
+> >> Eric Biggers <ebiggers@kernel.org> writes:
+> >>> That paragraph is also phrased as a hypothetical, "Even if we'd prefe=
+r to use
+> >>> SHA-256-only".  That implies that you do not, in fact, prefer SHA-256=
+ only.  Is
+> >>> that the case?  Sure, maybe there are situations where you *have* to =
+use SHA-1,
+> >>> but why would you not at least *prefer* SHA-256?
+> >>
+> >> Yes.  Please prefer to use SHA-256.
+> >>
+> >> Have you considered implementing I think it is SHA1-DC (as git has) th=
+at
+> >> is compatible with SHA1 but blocks the known class of attacks where
+> >> sha1 is actively broken at this point?
+> >
+> > We are using the kernel's implementation, addressing what the kernel
+> > provides is beyond our efforts. Perhaps someone who is interested in
+> > improving the kernel's SHA1 could submit a patch implementing/replacing
+> > it with SHA1-DC, as I am sure the maintainers would welcome the help.
+>
+> Well, someone who is interested to get his "secure" code merged should
+> have a vested interested to have a non-broken SHA1 implementation if
+> there is a sensible requirement to use SHA1 in that new "secure" code,
+> no?
+>
+> Just for the record. The related maintainers can rightfully decide to
+> reject known broken "secure" code on a purely technical argument.
+>
 
-blank line
+Wait, hold on a second.
 
-> +      properties:
-> +        power-domains:
-> +          minItems: 2
-> +          maxItems: 2
+SHA1-DC isn't SHA1.  It's a different hash function that is mostly
+compatible with SHA1, is different on some inputs, and is maybe more
+secure.  But the _whole point_ of using SHA1 in the TPM code (well,
+this really should be the whole point for new applications) is to
+correctly cap the SHA1 PCRs so we can correctly _turn them off_ in the
+best way without breaking compatibility with everything that might
+read the event log.  I think that anyone suggesting using SHA1-DC for
+this purpose should give some actual analysis as to why they think
+it's an improvement, let alone even valid.
 
-Drop maxItems as 2 is already the max (with my change below).
+Ross et al, can you confirm that your code actually, at least by
+default and with a monstrous warning to anyone who tries to change the
+default, caps SHA1 PCRs if SHA256 is available?  And then can we maybe
+all stop hassling the people trying to develop this series about the
+fact that they're doing their best with the obnoxious system that the
+TPM designers gave them?
 
-Add blank line here.
-
-> +    else:
-> +      required:
-> +        - clocks
-> +        - clock-names
-
-blank line
-
-> +      properties:
-> +        power-domains:
-> +          maxItems: 1
-
-blank line
-
-> +        interconnects:
-> +          minItems: 2
-> +          maxItems: 3
-
-blank line
-
-> +        interconnect-names:
-> +          minItems: 2
-> +          items:
-> +            - const: qup-core
-> +            - const: qup-config
-> +            - const: qup-memory
->  
->  properties:
->    compatible:
-> -    const: qcom,geni-spi
-> +    enum:
-> +      - qcom,geni-spi
-> +      - qcom,sa8255p-geni-spi
->  
->    clocks:
->      maxItems: 1
-> @@ -45,15 +76,10 @@ properties:
->        - const: rx
->  
->    interconnects:
-> -    minItems: 2
-> -    maxItems: 3
-> +    description: phandles of interconnect bw provider
->  
->    interconnect-names:
-> -    minItems: 2
-> -    items:
-> -      - const: qup-core
-> -      - const: qup-config
-> -      - const: qup-memory
-> +    description: names of interconnects
-
-No, keep all properties defined at the top-level and then add 
-constraints in if/then schemas.
-
->  
->    interrupts:
->      maxItems: 1
-> @@ -61,15 +87,18 @@ properties:
->    operating-points-v2: true
->  
->    power-domains:
-> -    maxItems: 1
-> +    $ref: "/schemas/power/power-domain.yaml#/properties/power-domains"
-
-Do you see an example of this anywhere else? No. You need:
-
-minItems: 1
-maxItems: 2
-
-> +
-> +  power-domain-names:
-> +    items:
-> +      - const: power
-> +      - const: perf
->  
->    reg:
->      maxItems: 1
->  
->  required:
->    - compatible
-> -  - clocks
-> -  - clock-names
->    - interrupts
->    - reg
->  
-> @@ -116,3 +145,16 @@ examples:
->          #address-cells = <1>;
->          #size-cells = <0>;
->      };
-> +
-> +  - |
-> +    #include <dt-bindings/interrupt-controller/arm-gic.h>
-> +
-> +    spi@888000 {
-> +        compatible = "qcom,sa8255p-geni-spi";
-> +        reg = <0x888000 0x4000>;
-> +        interrupts = <GIC_SPI 584 IRQ_TYPE_LEVEL_HIGH>;
-> +        #address-cells = <1>;
-> +        #size-cells = <0>;
-> +        power-domains = <&scmi10_pd 16>, <&scmi10_dvfs 16>;
-> +        power-domain-names = "power", "perf";
-> +    };
-> -- 
-> 2.34.1
-> 
+Thanks,
+Andy
