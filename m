@@ -1,98 +1,212 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60BAA4C9A
-	for <linux-crypto@vger.kernel.org>; Thu, 29 Aug 2024 01:33:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A08F14A00;
+	Thu, 29 Aug 2024 03:06:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724895190; cv=none; b=P6h8Zb/0UCWWMF5GEzzyJy5G/Z1cq20/eJdnWilII+llOds0ZpVebRNqID7rJNp8xxfr9dO9/Pyfq9dxXB4IEe83cGnV3BIEf2SWPYrzE+W0MaxsAp/0uMzlaVtMb0+G22+QFNhsecqL2TRjYTLiDLfVWCVB8cVTsRS9ui1SJCI=
+	t=1724900798; cv=none; b=sf5/RbMbEAq4afphrje0DjV1xL6neJ/edCrtfUhHDumiXLmb2ubfNY0ugH9hGcDfwq22Ng/BJJCE56y8Zo03rKOpsG5/paCTe/09/dSgtTiJldJ1KW1o68gv4LEcYH4FkUrB7Voy+YmNJfDT52RWe4EAJc7AeZiASvUMnCQmS10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724895190; c=relaxed/simple;
-	bh=vcV/EtgfSEZkTi7fPPscq2YKKTTxngZO+ZAgKKqLiA4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FFk/j9DkbOHrgaAWhWo8dTnN0Nf9xkvU0Qi/G7vff+XtZ1X0v/GRtYPr6qc5PaKsaJsBQtVVX3nuJNhz30NCjFIK4IV9P8oWSmVwZ/PN4pNLb4K3gmjt/COZNHH9u0TKRhMV4t1lA/BRiYIK/LPQkTqAnFL8GRlbbnxDbme2YHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K8KxruKn; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1724900798; c=relaxed/simple;
+	bh=V51tZLE6chfQqVtSs/q+YZUu4GgCPe8BR7V7YnYADVc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UfYoLo7M3EX4TCGG9zmwA5UqtlNBm7C1bzYsPls3yJbvha7nkzFkN87Zr0IhxK0slDpwGwpRnFblr523h1+ZLwjAlbMvm2OGR+05TRQ6DG6P9XGx5+WrSb+x+8I1mNpX4PxAn2qlOY1xA4h18ud1g6lym2AfIV6bs5Iv27B5DT0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R/Q1ulfC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K8KxruKn"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724895187;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=guVZQ+4Ujpsmei6SykN5ABhiPcX8ndAIleDb2wTj8Os=;
-	b=K8KxruKnLwVEcwXdVwXM++lroroIRjkxQmm+l3pTlZDkKz5c+gSOAmr6HA0Jmm2vzOyiwI
-	z16zOxkI3wlb4lUQfZOvaoXEHlFn6YKIlYgnGfCOIXAzLiODcpocFICWK/GLdy20lgB84u
-	JKXq4sRaVlGMwJ6faljKtN1s2QM5YZ8=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-552-2ZjJw_bRO9CxvFUOzTEFew-1; Wed, 28 Aug 2024 21:33:05 -0400
-X-MC-Unique: 2ZjJw_bRO9CxvFUOzTEFew-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a867bc4f3c4so25851866b.0
-        for <linux-crypto@vger.kernel.org>; Wed, 28 Aug 2024 18:33:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724895184; x=1725499984;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=guVZQ+4Ujpsmei6SykN5ABhiPcX8ndAIleDb2wTj8Os=;
-        b=BGiWC+WiYgirvmiZpcFEeHGnoXRpuynsGUidOllGhjYak2vQzWMmZhHsdYpwwq+UO/
-         RVLng82vVeeUtS8vceARBCXttXpQgNULDWL0eNY02JJgffkzgmRnZBcPr4xJyyakVIig
-         sSt/ieHQcW7BqyELgaZgQ9He366FovXyeiVTAArZcwryyQ2BicQhc7A+HWVWNgK1wkWY
-         vUKee0HkjOH1RgzP55FvNyjsftDe5mgimKcEAixL8J4+diS/bcrETQ0Cl7Ck2saFCneo
-         35CuTN8MIN79J0fexowY3eKevht2Y1h0gSvSPHdw5GSOalxQ0pOXBf6IXCx8/KJHEeA1
-         v1KA==
-X-Forwarded-Encrypted: i=1; AJvYcCWzDvf7dZMtdMMlte1iJViWVMBnMJIumunxm94GdYG5Da6H63tFxekQoeJ+5PUQEhvVfLeLvf2awKvWc88=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7MA5qDVCnu8bS6kJO1NL62Oa6ITgjkNCJe2HJ7Em/26Guq/Hw
-	3M9n1yqO8qnxKe/ArSEDwmNiN+7C5bMhNqu2ZJnjirEGOEjQrql6lof3tGmMOr96s1gDDQrT7I9
-	+XN8FDAD96s0erujegaZGoJ6SPOFHH9KgYlV6yyHiIYfkrgTlFz/pQdmuoaC+KbEaaacWsasQDZ
-	y0r8k8gpp1y32f5J+4NBebSbDRC8VvtBzsXpLe
-X-Received: by 2002:a17:907:2d88:b0:a86:9e85:2619 with SMTP id a640c23a62f3a-a89827a3c54mr90996466b.25.1724895184576;
-        Wed, 28 Aug 2024 18:33:04 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFVuaa8PpTIB/qvdANkSSPCnKMBiHO0nIuN3ZJLxTk/dFv47bs73X+AN3Ug+YDJbxCeUQQYDVI5CGCDy1eBC10=
-X-Received: by 2002:a17:907:2d88:b0:a86:9e85:2619 with SMTP id
- a640c23a62f3a-a89827a3c54mr90994666b.25.1724895184141; Wed, 28 Aug 2024
- 18:33:04 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R/Q1ulfC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D383FC4CEC0;
+	Thu, 29 Aug 2024 03:06:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724900798;
+	bh=V51tZLE6chfQqVtSs/q+YZUu4GgCPe8BR7V7YnYADVc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=R/Q1ulfCYH77cN7NSaau2Bh8FRTX9GiM6zpuXJyHVhlz36ylE4JGkY1vvHM/M8doH
+	 2xhGyM+JrkWwJxIg0ESf8zBZ8zwjzU4JqYrqXaM89W4snq7vvI4FnX3sahVYUJ5X7D
+	 e3dPFTPrLl1twrv+GJFSOFvVZX3hoWeDapI6iVZloGDmiGI1oYynZ8QCy+CueTORbE
+	 LA0S0zMHBwft8ZBLUq+OvBceA+WUjL9a1f1W/K8yppefR78l44xrGk6oqxDPvixm9i
+	 hwf1iMIpc0sOOyxK5jGSGUOUsu59YAIs2oqIf1VCxVSnfazxZ6fO3/CZkgNt0Ywj+h
+	 ZmKW3k90V8dHQ==
+Date: Wed, 28 Aug 2024 22:06:36 -0500
+From: Rob Herring <robh@kernel.org>
+To: Nikunj Kela <quic_nkela@quicinc.com>
+Cc: andersson@kernel.org, konradybcio@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, rafael@kernel.org, viresh.kumar@linaro.org,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	sudeep.holla@arm.com, andi.shyti@kernel.org, tglx@linutronix.de,
+	will@kernel.org, joro@8bytes.org, jassisinghbrar@gmail.com,
+	lee@kernel.org, linus.walleij@linaro.org, amitk@kernel.org,
+	thara.gopinath@gmail.com, broonie@kernel.org,
+	wim@linux-watchdog.org, linux@roeck-us.net, robin.murphy@arm.com,
+	cristian.marussi@arm.com, rui.zhang@intel.com, lukasz.luba@arm.com,
+	vkoul@kernel.org, quic_gurus@quicinc.com, agross@kernel.org,
+	bartosz.golaszewski@linaro.org, quic_rjendra@quicinc.com,
+	robimarko@gmail.com, linux-arm-msm@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-pm@vger.kernel.org, linux-crypto@vger.kernel.org,
+	arm-scmi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-i2c@vger.kernel.org, iommu@lists.linux.dev,
+	linux-gpio@vger.kernel.org, linux-serial@vger.kernel.org,
+	linux-spi@vger.kernel.org, linux-watchdog@vger.kernel.org,
+	kernel@quicinc.com, quic_psodagud@quicinc.com,
+	quic_tsoni@quicinc.com, quic_shazhuss@quicinc.com,
+	Praveen Talari <quic_ptalari@quicinc.com>
+Subject: Re: [PATCH 18/22] dt-bindings: spi: document support for SA8255p
+Message-ID: <20240829030636.GA2208587-robh@kernel.org>
+References: <20240828203721.2751904-1-quic_nkela@quicinc.com>
+ <20240828203721.2751904-19-quic_nkela@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240829012005.382715-1-bmasney@redhat.com>
-In-Reply-To: <20240829012005.382715-1-bmasney@redhat.com>
-From: Brian Masney <bmasney@redhat.com>
-Date: Wed, 28 Aug 2024 21:32:53 -0400
-Message-ID: <CABx5tqKrsVYQ1yHw3Lkt8sT957xLv-jKwpa7VxUSJ9QRXRGbiA@mail.gmail.com>
-Subject: Re: [PATCH 0/2] crypto: qcom-rng: fix support for ACPI-based systems
-To: herbert@gondor.apana.org.au
-Cc: davem@davemloft.net, quic_omprsing@quicinc.com, neil.armstrong@linaro.org, 
-	quic_bjorande@quicinc.com, linux-arm-msm@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	=?UTF-8?Q?Ernesto_A=2E_Fern=C3=A1ndez?= <ernesto.mnd.fernandez@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240828203721.2751904-19-quic_nkela@quicinc.com>
 
-On Wed, Aug 28, 2024 at 9:21=E2=80=AFPM Brian Masney <bmasney@redhat.com> w=
-rote:
->
-> The qcom-rng driver supports both ACPI and device tree based systems.
-> ACPI support was broken when the hw_random interface support was added.
-> This small series gets that working again.
->
-> This fix was boot tested on a Qualcomm Amberwing server.
->
-> Brian Masney (2):
->   crypto: qcom-rng: rename *_of_data to *_match_data
->   crypto: qcom-rng: fix support for ACPI-based systems
->
->  drivers/crypto/qcom-rng.c | 50 +++++++++++++++++++++------------------
->  1 file changed, 27 insertions(+), 23 deletions(-)
+On Wed, Aug 28, 2024 at 01:37:17PM -0700, Nikunj Kela wrote:
+> Add compatible representing spi support on SA8255p.
+> 
+> Clocks and interconnects are being configured in firmware VM
+> on SA8255p platform, therefore making them optional.
+> 
+> CC: Praveen Talari <quic_ptalari@quicinc.com>
+> Signed-off-by: Nikunj Kela <quic_nkela@quicinc.com>
+> ---
+>  .../bindings/spi/qcom,spi-geni-qcom.yaml      | 64 +++++++++++++++----
+>  1 file changed, 53 insertions(+), 11 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/spi/qcom,spi-geni-qcom.yaml b/Documentation/devicetree/bindings/spi/qcom,spi-geni-qcom.yaml
+> index 2e20ca313ec1..74ea7c4f2451 100644
+> --- a/Documentation/devicetree/bindings/spi/qcom,spi-geni-qcom.yaml
+> +++ b/Documentation/devicetree/bindings/spi/qcom,spi-geni-qcom.yaml
+> @@ -25,10 +25,41 @@ description:
+>  
+>  allOf:
+>    - $ref: /schemas/spi/spi-controller.yaml#
+> +  - if:
+> +      properties:
+> +        compatible:
+> +          contains:
+> +            const: qcom,sa8255p-geni-spi
+> +    then:
+> +      required:
+> +        - power-domains
+> +        - power-domain-names
 
-Ohh I forgot to add this tag to the series:
+blank line
 
-Reported-by: Ernesto A. Fern=C3=A1ndez <ernesto.mnd.fernandez@gmail.com>
+> +      properties:
+> +        power-domains:
+> +          minItems: 2
+> +          maxItems: 2
 
+Drop maxItems as 2 is already the max (with my change below).
+
+Add blank line here.
+
+> +    else:
+> +      required:
+> +        - clocks
+> +        - clock-names
+
+blank line
+
+> +      properties:
+> +        power-domains:
+> +          maxItems: 1
+
+blank line
+
+> +        interconnects:
+> +          minItems: 2
+> +          maxItems: 3
+
+blank line
+
+> +        interconnect-names:
+> +          minItems: 2
+> +          items:
+> +            - const: qup-core
+> +            - const: qup-config
+> +            - const: qup-memory
+>  
+>  properties:
+>    compatible:
+> -    const: qcom,geni-spi
+> +    enum:
+> +      - qcom,geni-spi
+> +      - qcom,sa8255p-geni-spi
+>  
+>    clocks:
+>      maxItems: 1
+> @@ -45,15 +76,10 @@ properties:
+>        - const: rx
+>  
+>    interconnects:
+> -    minItems: 2
+> -    maxItems: 3
+> +    description: phandles of interconnect bw provider
+>  
+>    interconnect-names:
+> -    minItems: 2
+> -    items:
+> -      - const: qup-core
+> -      - const: qup-config
+> -      - const: qup-memory
+> +    description: names of interconnects
+
+No, keep all properties defined at the top-level and then add 
+constraints in if/then schemas.
+
+>  
+>    interrupts:
+>      maxItems: 1
+> @@ -61,15 +87,18 @@ properties:
+>    operating-points-v2: true
+>  
+>    power-domains:
+> -    maxItems: 1
+> +    $ref: "/schemas/power/power-domain.yaml#/properties/power-domains"
+
+Do you see an example of this anywhere else? No. You need:
+
+minItems: 1
+maxItems: 2
+
+> +
+> +  power-domain-names:
+> +    items:
+> +      - const: power
+> +      - const: perf
+>  
+>    reg:
+>      maxItems: 1
+>  
+>  required:
+>    - compatible
+> -  - clocks
+> -  - clock-names
+>    - interrupts
+>    - reg
+>  
+> @@ -116,3 +145,16 @@ examples:
+>          #address-cells = <1>;
+>          #size-cells = <0>;
+>      };
+> +
+> +  - |
+> +    #include <dt-bindings/interrupt-controller/arm-gic.h>
+> +
+> +    spi@888000 {
+> +        compatible = "qcom,sa8255p-geni-spi";
+> +        reg = <0x888000 0x4000>;
+> +        interrupts = <GIC_SPI 584 IRQ_TYPE_LEVEL_HIGH>;
+> +        #address-cells = <1>;
+> +        #size-cells = <0>;
+> +        power-domains = <&scmi10_pd 16>, <&scmi10_dvfs 16>;
+> +        power-domain-names = "power", "perf";
+> +    };
+> -- 
+> 2.34.1
+> 
