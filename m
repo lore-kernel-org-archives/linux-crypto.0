@@ -1,189 +1,126 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AE331922F1;
-	Thu, 29 Aug 2024 14:44:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D276A194C88;
+	Thu, 29 Aug 2024 15:00:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724942693; cv=none; b=JDbSzFlgTijPdDOGe1UxIWF1OR9sT9y3JB5czrG2WzWUC9MUfjwwCHuudiPH2477y8JR4EMgnc0EkCJQttprk33J2D25afwY99yE4XUi1DJUsNt8CpbpiWllrvKEh6dxuZqLKa9NtEQW2TYI/L3A/7BSBtk6OvrLENDO1012++o=
+	t=1724943660; cv=none; b=SL1Pfoo0IHmLbg0Jz5lnq8dYsEAE0MvR5haHdupI2ykYvg3FDcQl2LDTdSzo3ix/4UkLQsPt5F4RU8uqfDYXmqjoTUjOS6hLpjkTs5gq3LsIgu5oWtFCULjVrK/ZGQjaRFAkHzBP2+JaW0UJgF991+ofDgLy+OkHRUonV34FZVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724942693; c=relaxed/simple;
-	bh=YN5yNp4XlCp7LjXWlGz86hgJZ5nYnEokwYCmKdqb6xg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=U3lFyY+Zsu2vLey4ftzxtNvakBMxn1msdzw992/P39hqRfQZIaCrNfwePcdsFUvyfh5FDQumKfE8v50/7/OPVZSVy3McKnC62SoAuLhIMUwUsFE3qDjCBpz0IhMmEW0HyZ3LPrIWuP1e4s1a+qCNV5XsBiW/UKFyTCfuG5Z6Eyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=YZV3tiEW; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1724943660; c=relaxed/simple;
+	bh=O+d/0lMVaIYVMB/riqqZ+H+RRARHH5fN/vZI7PK+/nw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=bMNTOR30Ev4R0D+6yZXc9Kjr+8D9Cx6cLFuS1HWiq+pfa0Swv43boSKQg2tAzVmzHa6JN20JRSmWaBc/1tN86N/NsZ2OV/+JkjFihDap7pIVJfemRvJZcy7E8csKoSjX4gKj124xhKzihdtIuJowpe93CmFJYHceJGSZ1XpfwBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=J4cOHHuN; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="YZV3tiEW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0815C4CEC5;
-	Thu, 29 Aug 2024 14:44:52 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="YZV3tiEW"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1724942689;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=em0njsUAXOJS7+NmJUjK8AWGxPR3Ii25X9Y4rjxzDJ0=;
-	b=YZV3tiEWAIpKuCaXEnaRkSHi7Nxo9a1wLJOQ1Sf1uWJuDXxy/ayHfz7pH5dKHsVKc3mNF5
-	EDfP6pXBgESyO5I0jrKrZ4i5Dz1MVjTZ3xnqtnI7jkhtjDBZVGLT9N68cx2e8yqqzMa2zD
-	HqXsFwoCBiEip/IToj7i9dsjcuDmcKg=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id bda16223 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Thu, 29 Aug 2024 14:44:49 +0000 (UTC)
-Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-7093ba310b0so326869a34.2;
-        Thu, 29 Aug 2024 07:44:49 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUcU4A+nwnXbsD6ts+nxHV91SC9CnY4fs1RWd5DoGt2sbIQEf19DZDX8cr00zzFCGDntFZwWFyEUTd0TwE=@vger.kernel.org, AJvYcCXPNCVqmxAGbM1wsnT2XE9MW8VubQQBznOO7yVOJpIbAD+CW3/QVQ0o+rRO/t5wj+xEsH8aAZ89SPQJqzTc@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6onYsN91SQiIuCu4LjIfTOonuPBXOxnSrylBHza26ZWVi/0zY
-	jRzEYwYsRz6zN8UxKy7kzFT7CzAqMoLrgpfkzlfXX4yyO1jsQHNScE65zkpNsupuHKLMXoObceb
-	a9UReycuVvfjKD0qmEhuONjhnRPo=
-X-Google-Smtp-Source: AGHT+IFJFrP+7ciDdf49r1WxVQMZ4slbYd8niK13QH/LcjAK9dSq+dZxL8xUkF3KdsiF8Kxxnl37aJ2kSqeju0SYw6I=
-X-Received: by 2002:a05:6830:628b:b0:709:621b:f336 with SMTP id
- 46e09a7af769-70f5c3922cbmr3323136a34.16.1724942688205; Thu, 29 Aug 2024
- 07:44:48 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="J4cOHHuN"
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47T8cT5f010662;
+	Thu, 29 Aug 2024 14:55:50 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	qci3cwf+mW9KbSy7TQgd0WaPW96WIwi1KoQEYhtS2Pg=; b=J4cOHHuN9G0HjIWw
+	/25+ak2LuBuAXp7eGZFNHpxPl4yiyt4dzF4/+JUKvfdGtA+Llcb8s4yxBbzWM/qx
+	SDse382kxkCffOGDv4/s90dEPT0QfLufEfqvCiYmN2dS1erBe1xZKIFs/xCQTgKW
+	eUNr/ayP1xNcIIFUQPA1OKbttqGzD5ZUyGnLhUfIcV8j9EUjwdR+O/WggxiMdIaO
+	vn4PSEfEetkhvnwVZpPaljah10iK0iDxhDZ/fx+mHaREAivl9Ws9FMCtTQowBTmf
+	6QSBDl8Tnw9mG0YdKGgp95evG4PmaNnSawAlXBb7iAW0aoWXh53eS8KzLdpzPHhu
+	x3NmJw==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 419pv0np5p-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 29 Aug 2024 14:55:50 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 47TEtnF4031331
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 29 Aug 2024 14:55:49 GMT
+Received: from [10.226.59.182] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 29 Aug
+ 2024 07:55:48 -0700
+Message-ID: <f6075361-1766-35a5-c7ac-cc3eb416a4e1@quicinc.com>
+Date: Thu, 29 Aug 2024 08:55:47 -0600
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240829125656.19017-1-xry111@xry111.site> <ZtB3RczHN00XDO52@zx2c4.com>
- <ZtB5pqfp0Lg6lzz6@zx2c4.com> <a3373ad5f92a4120bd0c8e0c751eb7617e035cf6.camel@xry111.site>
-In-Reply-To: <a3373ad5f92a4120bd0c8e0c751eb7617e035cf6.camel@xry111.site>
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Thu, 29 Aug 2024 16:44:36 +0200
-X-Gmail-Original-Message-ID: <CAHmME9p+-0S-a3kjsv75irmLdGpW6rUWBVm87E4-Z9hpWyA7YA@mail.gmail.com>
-Message-ID: <CAHmME9p+-0S-a3kjsv75irmLdGpW6rUWBVm87E4-Z9hpWyA7YA@mail.gmail.com>
-Subject: Re: [PATCH v5] LoongArch: vDSO: Wire up getrandom() vDSO implementation
-To: Xi Ruoyao <xry111@xry111.site>
-Cc: Tiezhu Yang <yangtiezhu@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
-	WANG Xuerui <kernel@xen0n.name>, linux-crypto@vger.kernel.org, loongarch@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, Jinyang He <hejinyang@loongson.cn>, 
-	Arnd Bergmann <arnd@arndb.de>, Thomas Gleixner <tglx@linutronix.de>, 
-	Christophe Leroy <christophe.leroy@csgroup.eu>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.0
+Subject: Re: qcom-rng is broken for acpi
+Content-Language: en-US
+To: Brian Masney <bmasney@redhat.com>,
+        =?UTF-8?Q?Ernesto_A=2e_Fern=c3=a1ndez?=
+	<ernesto.mnd.fernandez@gmail.com>
+CC: Trilok Soni <quic_tsoni@quicinc.com>, <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        <linux-arm-msm@vger.kernel.org>,
+        Om Prakash Singh
+	<quic_omprsing@quicinc.com>
+References: <20240828184019.GA21181@eaf>
+ <a8914563-d158-4141-b022-340081062440@quicinc.com>
+ <20240828201313.GA26138@eaf>
+ <CABx5tq+ZFpTDdjV7R5HSEFyNoR5VUYDHm89JEHvKb-9TW6Oejw@mail.gmail.com>
+From: Jeffrey Hugo <quic_jhugo@quicinc.com>
+In-Reply-To: <CABx5tq+ZFpTDdjV7R5HSEFyNoR5VUYDHm89JEHvKb-9TW6Oejw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: nPn6qFdRs7NaGeLsQxwaLHdeZRIfhkaK
+X-Proofpoint-ORIG-GUID: nPn6qFdRs7NaGeLsQxwaLHdeZRIfhkaK
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-29_03,2024-08-29_02,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ mlxlogscore=826 bulkscore=0 impostorscore=0 phishscore=0 clxscore=1011
+ mlxscore=0 spamscore=0 suspectscore=0 malwarescore=0 adultscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2408290104
 
-On Thu, Aug 29, 2024 at 4:06=E2=80=AFPM Xi Ruoyao <xry111@xry111.site> wrot=
-e:
->
-> On Thu, 2024-08-29 at 15:37 +0200, Jason A. Donenfeld wrote:
-> > On Thu, Aug 29, 2024 at 03:27:33PM +0200, Jason A. Donenfeld wrote:
-> > > One small question just occurred to me:
-> > >
-> > > > +static __always_inline const struct vdso_rng_data *__arch_get_vdso=
-_rng_data(
-> > > > + void)
-> > > > +{
-> > > > + return (const struct vdso_rng_data *)(
-> > > > +         get_vdso_data() +
-> > > > +         VVAR_LOONGARCH_PAGES_START * PAGE_SIZE +
-> > > > +         offsetof(struct loongarch_vdso_data, rng_data));
-> > > > +}
-> > >
-> > > Did you test this in a TIMENS? On x86, I had to deal with the page
-> > > offsets switching around depending on whether there was a TIMENS. I
-> > > tested this in my test harness with some basic code like:
-> > >
-> > >        if (argc =3D=3D 1) {
-> > >                if (unshare(CLONE_NEWTIME))
-> > >                        panic("unshare(CLONE_NEWTIME)");
-> > >                if (!fork()) {
-> > >                        if (execl(argv[0], argv[0], "now-in-timens"))
-> > >                                panic("execl");
-> > >                }
-> > >                wait(NULL);
-> > >                poweroff();
-> > >        }
-> > >
-> > > Because unlike other namespaces, the time one only becomes active aft=
-er
-> > > fork/exec.
-> > >
-> > > But maybe loongarch is more organized and you don't need any special
-> > > handling in __arch_get_vdso...data() functions like I needed on x86.
-> > > Just thought I should check.
-> >
-> > Normal results:
-> >
-> >    vdso: 25000000 times in 0.287330836 seconds
-> >    libc: 25000000 times in 4.480710835 seconds
-> > syscall: 25000000 times in 4.411098048 seconds
-> >
-> > After applying
-> >
-> > diff --git a/arch/x86/include/asm/vdso/getrandom.h b/arch/x86/include/a=
-sm/vdso/getrandom.h
-> > index ff5334ad32a0..5cb1b318ebe3 100644
-> > --- a/arch/x86/include/asm/vdso/getrandom.h
-> > +++ b/arch/x86/include/asm/vdso/getrandom.h
-> > @@ -32,8 +32,6 @@ static __always_inline ssize_t getrandom_syscall(void=
- *buffer, size_t len, unsig
-> >
-> >  static __always_inline const struct vdso_rng_data *__arch_get_vdso_rng=
-_data(void)
-> >  {
-> > -     if (IS_ENABLED(CONFIG_TIME_NS) && __vdso_data->clock_mode =3D=3D =
-VDSO_CLOCKMODE_TIMENS)
-> > -             return (void *)&__vdso_rng_data + ((void *)&__timens_vdso=
-_data - (void *)&__vdso_data);
-> >       return &__vdso_rng_data;
-> >  }
-> >
-> > the results are:
-> >
-> >    vdso: 25000000 times in 4.403789593 seconds
-> >    libc: 25000000 times in 4.466771093 seconds
-> > syscall: 25000000 times in 4.428145416 seconds
-> >
-> > The difference is that when it finds the shared data in the wrong place=
-,
-> > it thinks the RNG is uninitialized, so it always falls back to the
-> > syscall, hence all three times being the same.
-> >
-> > If you're unsure how timens handling works on loongarch, try this test
-> > yourself and see what you get.
->
-> $ unshare -r -T --boottime $((365*24*3600))
-> # uptime
->  21:54:36 up 365 days,  5:38,  0 user,  load average: 0.05, 0.08, 2.82
-> # /home/xry111/git-repos/linux/tools/testing/selftests/vDSO/vdso_test_get=
-random bench-single
->    vdso: 25000000 times in 0.499528591 seconds
->    libc: 25000000 times in 6.968980040 seconds
-> syscall: 25000000 times in 6.987357071 seconds
->
-> So it seems normal in a time ns.
->
-> And from a comment in arch/loongarch/include/asm/vdso/vdso.h:
->
-> /*
->  * The layout of vvar:
->  *
->  *                      high
->  * +---------------------+--------------------------+
->  * | loongarch vdso data | LOONGARCH_VDSO_DATA_SIZE |
->  * +---------------------+--------------------------+
->  * |  time-ns vdso data  |        PAGE_SIZE         |
->  * +---------------------+--------------------------+
->  * |  generic vdso data  |        PAGE_SIZE         |
->  * +---------------------+--------------------------+
->  *                      low
->  */
->
-> And VVAR_LOONGARCH_PAGES_START is 2:
->
-> enum vvar_pages {
->     VVAR_GENERIC_PAGE_OFFSET,
->     VVAR_TIMENS_PAGE_OFFSET,
->     VVAR_LOONGARCH_PAGES_START,
->     VVAR_LOONGARCH_PAGES_END =3D VVAR_LOONGARCH_PAGES_START +
-> LOONGARCH_VDSO_DATA_PAGES - 1,
->     VVAR_NR_PAGES,
-> };
->
-> So get_vdso_data() + VVAR_LOONGARCH_PAGES_START * PAGE_SIZE should have
-> already "jumped over" the time-ns vdso data.
+On 8/28/2024 7:25 PM, Brian Masney wrote:
+> On Wed, Aug 28, 2024 at 4:13 PM Ernesto A. Fernández
+> <ernesto.mnd.fernandez@gmail.com> wrote:
+>> On Wed, Aug 28, 2024 at 12:03:57PM -0700, Trilok Soni wrote:
+>>> On 8/28/2024 11:40 AM, Ernesto A. Fernández wrote:
+>>>> Hi, I have a bug to report.
+>>>>
+>>>> I'm getting a null pointer dereference inside qcom_rng_probe() when this
+>>>> driver gets loaded. The problem comes from here:
+>>>>
+>>>>    rng->of_data = (struct qcom_rng_of_data *)of_device_get_match_data(&pdev->dev);
+>>>>
+>>>> because of_device_get_match_data() will just return null for acpi. It seems
+>>>> that acpi was left behind by the changes in commit f29cd5bb64c2 ("crypto:
+>>>> qcom-rng - Add hw_random interface support").
+>>>
+>>> Which Qualcomm platform you are testing w/ the ACPI? Most of our platforms
+>>> uses the devicetree.
+>>
+>> Amberwing.
+> 
+> We have a few Amberwing servers in the lab at Red Hat. I verified that
+> qcom-rng was crashing on boot with an upstream kernel, and it's now
+> fixed with this:
+> 
+> https://lore.kernel.org/linux-arm-msm/20240829012005.382715-1-bmasney@redhat.com/T/#t
+> 
+> Brian
+> 
+> 
 
-Oh good. Thanks for checking. So it sounds like there's just Huacai's
-set of comments and we're good.
+Interesting, I haven't seen this in my testing.  I'll go swing back and 
+try to figure out why.
+
+For future reference, I'm still supporting Amberwing/QDF2400. 
+Addressing emails to me is a good way to get my attention.
+
+-Jeff
