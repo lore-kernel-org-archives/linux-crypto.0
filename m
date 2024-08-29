@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADAE1193077;
-	Thu, 29 Aug 2024 13:05:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C16F61AE059;
+	Thu, 29 Aug 2024 13:13:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724936750; cv=none; b=Re09j/5Ppz4fx3dm/L5E2A/tBtfhr/OFB6w0uQOKZPkkRugM8w2ycJL+cndE3aLlYFGtraZiCVL5RxZ29mdwo6wDugLP06JKDz4p1R2qk6jDTR4SrQbH8yN+LwiiRz53xk2bJRZ1c3syj++5CczCbyT0EFgvsZI6L+iYaMW9VfE=
+	t=1724937192; cv=none; b=AwWLgXZ/HPohWdDzJGRCZlXs43f4GNdMVWJg2mROfwN6SPW9Vrmd6Gfgf7E/C9msRYe/JXltnn2gVM201ztXWbGJawBzYCedJgwYZxhZHADffIJYpqwQy49TPTmVbKlcdEns6UpUw1hyhyjQOPXVeGs8xa2G6md4hq6VjocPZhs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724936750; c=relaxed/simple;
-	bh=AbSBCcQESNZ01X9cJly73vYG37Uf90FCB8dLFUAoilw=;
+	s=arc-20240116; t=1724937192; c=relaxed/simple;
+	bh=P0SU4Uq/KibzgxuLiStzRDjp877kavMW2p4snspj9Vw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IZQuBJYCiAzSOb2UETXs8SUXAj3GSMN4im5LMP04eMmt6lCsavm5TIOrHANyVxpcXU+bKzFINxSVl7nNny4KxlOh5ajErdiBNhYqhekg0dlLB7utr9D7qJlGw8b8J7xx7h8+wRqT++tZhwXuAolC/b6PuvhdDityNKruvjloHv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=CeaSpp3z; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=PVvr0G2nU5RxU2wZ/TUYRdRtYRyV7q8YgZun87Jn801rqkNJjG8g1WM9Vy0bFfLmxGyjRSNEqRVl2oPYHgJUe69mh2AuXqsxD3sIxvupmLoXGrwrXF7LhiUCfMsV9Z36AqV68X6oa3zVktnVHQU6s46/+rC0F8XEdakPtWl8CYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=MPJEa5F6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="CeaSpp3z"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AB79C4CEC1;
-	Thu, 29 Aug 2024 13:05:49 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="MPJEa5F6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E040C4AF0C;
+	Thu, 29 Aug 2024 13:13:10 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="CeaSpp3z"
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="MPJEa5F6"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1724936746;
+	t=1724937189;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=GEBN9RGX4gVYaxQyDKMgArd+XSmyXIBDljl8TMdKAs4=;
-	b=CeaSpp3zI+KSDTIA5bVaLT5Gxodjx0BrDG6ls+4m79dHAiARP+ER7wjewC2JhkrWs7Fp4N
-	XgK/2uypukdW2N4pnfl+RL742y7XQzoKdsoJaJJMamZtFQO3Oj7LfAS/JB75AI6TExoET/
-	RUjPQZc/BmcDlJmtnVrnQTYPluYQ48I=
+	bh=3dmuou++vOol9G+qKlRss7jg5q3v8/cQtkGWgqWGNeA=;
+	b=MPJEa5F64/6flfvGqNPKHMpR9EnBhnaMmP0DTVjgOmpmNa85ZGuzqOnFpB4R1JtL4LuW8n
+	CUYbPFuoKYkS5zqXls6RHVz3mTIOx8c/JoSziQfzMO8YQyOcNgovMOc/tH5f6FVGkmLTkx
+	bThCqqm8re3HL0zSBKOESus3WXjRvR4=
 Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 7d924092 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Thu, 29 Aug 2024 13:05:44 +0000 (UTC)
-Date: Thu, 29 Aug 2024 15:05:37 +0200
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id d4cdc9e7 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Thu, 29 Aug 2024 13:13:08 +0000 (UTC)
+Date: Thu, 29 Aug 2024 15:13:06 +0200
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: Xi Ruoyao <xry111@xry111.site>
+To: Xi Ruoyao <xry111@xry111.site>, Huacai Chen <chenhuacai@kernel.org>
 Cc: Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>,
 	linux-crypto@vger.kernel.org, loongarch@lists.linux.dev,
 	linux-kernel@vger.kernel.org, Jinyang He <hejinyang@loongson.cn>,
@@ -41,9 +41,8 @@ Cc: Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>,
 	Christophe Leroy <christophe.leroy@csgroup.eu>
 Subject: Re: [PATCH v5] LoongArch: vDSO: Wire up getrandom() vDSO
  implementation
-Message-ID: <ZtByIdPicun5PqDO@zx2c4.com>
+Message-ID: <ZtBz4l--dxkNt7yG@zx2c4.com>
 References: <20240829125656.19017-1-xry111@xry111.site>
- <5fc8fc031c338f438fcd4aa5eaeb26b60d869405.camel@xry111.site>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,31 +51,50 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <5fc8fc031c338f438fcd4aa5eaeb26b60d869405.camel@xry111.site>
+In-Reply-To: <20240829125656.19017-1-xry111@xry111.site>
 
-On Thu, Aug 29, 2024 at 09:01:05PM +0800, Xi Ruoyao wrote:
-> On Thu, 2024-08-29 at 20:56 +0800, Xi Ruoyao wrote:
-> > diff --git a/arch/loongarch/kernel/asm-offsets.c b/arch/loongarch/kernel/asm-offsets.c
+Hi Huacai & Ruoyao,
+
+On Thu, Aug 29, 2024 at 08:56:55PM +0800, Xi Ruoyao wrote:
+> Hook up the generic vDSO implementation to the LoongArch vDSO data page
+> by providing the required __arch_chacha20_blocks_nostack,
+> __arch_get_k_vdso_rng_data, and getrandom_syscall implementations.
 > 
-> Oops stupid I.  Please remove this hunk applying the patch.
+> Also enable the vDSO getrandom tests for LoongArch: create the symlink
+> to the arch/loongarch/vdso directory, and correctly set the ARCH
+> variable for LoongArch.
 > 
-> I'll remove this in v6 if needed.
-
-While we're on the topic of herps and derps,
-
 > Signed-off-by: Xi Ruoyao <xry111@xry111.site>
 > ---
+>
+> Passed vdso_test_getrandom and vdso_test_chacha tests.  Benchmark
+> results:
 > 
-> Cc: linux-crypto@vger.kernel.org
-> Cc: loongarch@lists.linux.dev
-> Cc: linux-kernel@vger.kernel.org
-> Cc: Jinyang He <hejinyang@loongson.cn>
-> Cc: Tiezhu Yang <yangtiezhu@loongson.cn>
-> Cc: Arnd Bergmann <arnd@arndb.de>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Christophe Leroy <christophe.leroy@csgroup.eu>
+> vdso_test_getrandom bench-single:
+> 
+>        vdso: 25000000 times in 0.499490289 seconds
+>        libc: 25000000 times in 6.963829873 seconds
+>     syscall: 25000000 times in 6.983413486 seconds
+> 
+> vdso_test_getrandom bench-multi:
+>        vdso: 25000000 x 256 times in 28.703710823 seconds
+>        libc: 25000000 x 256 times in 356.835801784 seconds
+>        syscall: 25000000 x 256 times in 338.525837197 seconds
+ 
+Thanks for including the test results. I've also verified the
+vdso_test_chacha and can confirm that passes:
 
-Typically all of the Cc tags go before your Signed-off-by and enter the
-git history of the commit. "Here's who received this letter" sort of
-documentation. (But not a big deal and something I can fix up upon
-commit, of course.)
+zx2c4@thinkpad ~/Projects/random-linux/tools/testing/selftests/vDSO $  /home/zx2c4/Downloads/Chrome/cross-tools/bin/loongarch64-unknown-linux-gnu-gcc -std=gnu99 -D_GNU_SOURCE= -idirafter /home/zx2c4/Projects/random-linux/tools/testing/selftests/../../../tools/include -idirafter /home/zx2c4/Projects/random-linux/tools/testing/selftests/../../../arch/loongarch/include -idirafter /home/zx2c4/Projects/random-linux/tools/testing/selftests/../../../include -D__ASSEMBLY__ -Wa,--noexecstack    vdso_test_chacha.c /home/zx2c4/Projects/random-linux/tools/testing/selftests/../../../tools/arch/loongarch/vdso/vgetrandom-chacha.S  -o /home/zx2c4/Projects/random-linux/tools/testing/selftests/vDSO/vdso_test_chacha -static
+zx2c4@thinkpad ~/Projects/random-linux/tools/testing/selftests/vDSO $ qemu-loongarch64 /home/zx2c4/Projects/random-linux/tools/testing/selftests/vDSO/vdso_test_chacha
+TAP version 13
+1..1
+ok 1 chacha: PASS
+
+So, with the asm-offsets.c snippet removed as you instructed, this is
+fine for me. I'll happily queue this up for 6.12, but I'd like Huacai's
+Acked-by first.
+
+Huacai, does this look okay to you?
+
+Thanks,
+Jason
