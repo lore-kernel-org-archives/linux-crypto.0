@@ -1,585 +1,594 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B5B51B6540;
-	Thu, 29 Aug 2024 19:12:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD6711B81C4
+	for <linux-crypto@vger.kernel.org>; Thu, 29 Aug 2024 20:17:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724958752; cv=none; b=XwTaPVcqEy9skf7/rEw1CFNRtz7Nyyr+jDNXlRvJxS1gWVLrZ63gea0VEGcK/hhmm4YshllRW6myEEa2o9q7A+uZXwTJwpVNDyMxSQL9jPv45nZLbpZTM7oU99Gv7tOzyR6clVyS239dhpiA95YeEgTnCOSAh1K4GPZZacTIvgY=
+	t=1724962655; cv=none; b=DmmbizeE5xC1w8i/ics4Mb4ME2iI52J5eoEfcbSJWBu9EoMIMHr5GGbr89XSqeyGX7MaRfIJ6iYHFq0TWY41N7p0eYyxquE8OZOnjIgSqV/JYA8MId+SIDck+kBpLaIT/0TTNmCektTz9+bEBjwC8i12LStYTUZw8BjsHCuSbVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724958752; c=relaxed/simple;
-	bh=IccCRubsZkcY5u3qNEH7PHyogwGX+dXPNc8wVEM5Uj0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=IlLtOW19GE2cic94oRBopDM6Cj7jo0T6VlM/0aGOtZ7HZEO+COHxw13XZhAcSmZ57499h4CtzRdkyqYpPClolcDXbtvKnyTcCmTLbhmv0rNe1NGgUiFk7G137m/UMeh9fsM0VvDv0rCCzs3Cs7UZLwIZa7gY8DFbywsdd6UkYjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=hfyPmOCI; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1724962655; c=relaxed/simple;
+	bh=bmhug5e31gczYnSrrQ/ZrUmZfDtHNN+92ZTU+nY1Euw=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=mTRQPyio/LCZ0UpjvvibY8wNKTnOEFvIqvASkG2Zvul7EcuNY8r51mkTzrui9o2/GaXQkEj27Q1L0edi50ntBEt0aOG+FldB0RUsfYJB3s9LWmiJw7QBSs8U06RQG7vKJT6IzTiE0fvQRyBArJ2YM3YaILODEpeOynifbmYg54A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=FZIqLTQY; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="hfyPmOCI"
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47TGK93O024486;
-	Thu, 29 Aug 2024 19:06:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	XDi8cWM8np1l+qyak2upQZYRIHORj4j79K4H6ISldk8=; b=hfyPmOCIbJzySDql
-	OmdQD12Zz2sJREaZberhLneflE/hOKYVZZofyBK6QxUqr+18/e7B2woskKUH04yX
-	P9M6Vu7XCzs0Sw1UkxkCGUDZsLS2J/ybso0t3LyLX392wvtW70b21D/3qIl5LXMA
-	moO9LAh5TzBMpGjBBvPoAERhy5GgXTVGwzuYgryZAtMF714InpSKXglhAg/IpGDL
-	onNsTohtbQclmqE+Ke7mTlocsMoR/YNkSWUnZwb0lG3imy41+HiXq8RBvXvyElo7
-	Sz/h8Nr/0cTtOzqvqIu0+E1ab50ffotira891aDv2XBw5h9QpcpLs73DzIoO7eBM
-	PC1l5w==
-Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 419puvedfy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 29 Aug 2024 19:06:52 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 47TJ6ppS019360
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 29 Aug 2024 19:06:51 GMT
-Received: from [10.110.28.107] (10.80.80.8) by nasanex01b.na.qualcomm.com
- (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 29 Aug
- 2024 12:06:47 -0700
-Message-ID: <57eee144-cdc4-48e7-838b-103cda6ec1dd@quicinc.com>
-Date: Thu, 29 Aug 2024 12:06:46 -0700
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FZIqLTQY"
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4280bca3960so9380505e9.3
+        for <linux-crypto@vger.kernel.org>; Thu, 29 Aug 2024 13:17:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1724962651; x=1725567451; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=b76Wbr7PFqXYp0RH7MReormvqHDR4gkLWHSdXWuSZbs=;
+        b=FZIqLTQY7Z/rP8pGKqGzRXIQjhJqhnbx2FFkbg7CKBoXD8IQyu1YswsNIHYm+poPrJ
+         qofWIqvIGjzIWj7axt3jelaakoZ8j285X+UA1c9MM5SNtRgOWyx4zjslEVNYd6DbbXtN
+         QQUdLakxsY0eNsJ6WZoWjHbJXnjuZYUlGv0uTOr16KnclzvlwOXdORkjDZAbN22+0nsO
+         bURKgYmlppYqimw1NZYvhJf58gq3UrFz24cv7QiIHabe1qkzHByrgW59X143cjE8uGDL
+         ob27zijObY3lPNv/CYRh0p6opE5EfTeeEsiW8EbMQZKo4I9GkjnUw17yUpfWCQyfxY+j
+         4oVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1724962651; x=1725567451;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=b76Wbr7PFqXYp0RH7MReormvqHDR4gkLWHSdXWuSZbs=;
+        b=N7u7xNm5wuW+SQr5A3AHw2OAGiTZNg3mhDQCfWULt8dWFS9wtYuKbuVPfFP3HnxzDn
+         eGPwOeGltDiNDdgAEOJnW0uK/bdg0AIwKrMpf3GyTHLoOu8nBGrFG3lSx5ocCqG82cyI
+         AgUBWVx54DqF8OnnNaj+g2buvAB3cfHRfLqMA2v17Q045dMx5sUbjnxxQ+zn3MHMMenR
+         IfpI1f+37xWG65w0s0QvFi0JUIM/32zXb96NP4tWGgsvtrxkcBM/HtlrFh4M0WLgyD22
+         CrFK2ZiVyckve/6uynU2ANo1IzNMQT9BdLLNpYMVv64szDBhbR69GCwbIGyPquoi6YW4
+         FzOA==
+X-Forwarded-Encrypted: i=1; AJvYcCU4HqSlGimsv90Mx1EoAKDGIT2oB1++vRYPDIErn1OJC3j9olb8HPeQS0+uTVhuYdiWYA84tpFIe8EMgjY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxoAfqL99b5jltCghje13J9NfVh1qqinsP9OiV6uxbWMfOdUR/+
+	y6DgaiW2CQ9xXSOyOVyMs1EXFFffzQQhKYAtNJiPOtn7ZRQo1XU769FZf2vy2jc=
+X-Google-Smtp-Source: AGHT+IGs6CVUbEG3Pn+UUbtTNtWRUcvb5/ocLwuYt472TmOUUmU/PQ3QeMve8wCMJL5Ptm5n5wA3sA==
+X-Received: by 2002:a05:600c:3ca1:b0:428:23c8:1e54 with SMTP id 5b1f17b1804b1-42bb025c135mr36378015e9.18.1724962650816;
+        Thu, 29 Aug 2024 13:17:30 -0700 (PDT)
+Received: from ubuntu-vm.. (51-148-40-55.dsl.zen.co.uk. [51.148.40.55])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3749ee76c84sm2230588f8f.45.2024.08.29.13.17.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Aug 2024 13:17:30 -0700 (PDT)
+From: Adhemerval Zanella <adhemerval.zanella@linaro.org>
+To: "Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Theodore Ts'o <tytso@mit.edu>,
+	linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-arch@vger.kernel.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>
+Subject: [PATCH v2] aarch64: vdso: Wire up getrandom() vDSO implementation
+Date: Thu, 29 Aug 2024 20:17:14 +0000
+Message-ID: <20240829201728.2825-1-adhemerval.zanella@linaro.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 22/22] arm64: dts: qcom: Add reduced functional DT for
- SA8255p Ride platform
-Content-Language: en-US
-To: Krzysztof Kozlowski <krzk@kernel.org>, <andersson@kernel.org>,
-        <konradybcio@kernel.org>, <robh@kernel.org>, <krzk+dt@kernel.org>,
-        <conor+dt@kernel.org>, <rafael@kernel.org>, <viresh.kumar@linaro.org>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <sudeep.holla@arm.com>, <andi.shyti@kernel.org>, <tglx@linutronix.de>,
-        <will@kernel.org>, <joro@8bytes.org>, <jassisinghbrar@gmail.com>,
-        <lee@kernel.org>, <linus.walleij@linaro.org>, <amitk@kernel.org>,
-        <thara.gopinath@gmail.com>, <broonie@kernel.org>,
-        <wim@linux-watchdog.org>, <linux@roeck-us.net>
-CC: <robin.murphy@arm.com>, <cristian.marussi@arm.com>, <rui.zhang@intel.com>,
-        <lukasz.luba@arm.com>, <vkoul@kernel.org>, <quic_gurus@quicinc.com>,
-        <agross@kernel.org>, <bartosz.golaszewski@linaro.org>,
-        <quic_rjendra@quicinc.com>, <robimarko@gmail.com>,
-        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-pm@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>, <arm-scmi@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-i2c@vger.kernel.org>,
-        <iommu@lists.linux.dev>, <linux-gpio@vger.kernel.org>,
-        <linux-serial@vger.kernel.org>, <linux-spi@vger.kernel.org>,
-        <linux-watchdog@vger.kernel.org>, <kernel@quicinc.com>,
-        <quic_psodagud@quicinc.com>, <quic_tsoni@quicinc.com>,
-        <quic_shazhuss@quicinc.com>
-References: <20240828203721.2751904-1-quic_nkela@quicinc.com>
- <20240828203721.2751904-23-quic_nkela@quicinc.com>
- <746be896-8798-44b0-aa86-e77cf34655e1@kernel.org>
-From: Nikunj Kela <quic_nkela@quicinc.com>
-In-Reply-To: <746be896-8798-44b0-aa86-e77cf34655e1@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: 1DMGIf9YfzGAwuDSquaVObGA-TL4ZKmm
-X-Proofpoint-GUID: 1DMGIf9YfzGAwuDSquaVObGA-TL4ZKmm
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-29_06,2024-08-29_02,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- mlxlogscore=999 priorityscore=1501 bulkscore=0 impostorscore=0
- adultscore=0 malwarescore=0 phishscore=0 lowpriorityscore=0 mlxscore=0
- spamscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2407110000 definitions=main-2408290136
+Content-Transfer-Encoding: 8bit
 
+Hook up the generic vDSO implementation to the aarch64 vDSO data page.
+The _vdso_rng_data required data is placed within the _vdso_data vvar
+page, by using a offset larger than the vdso_data.
 
-On 8/29/2024 12:49 AM, Krzysztof Kozlowski wrote:
-> On 28/08/2024 22:37, Nikunj Kela wrote:
->> SA8255p Ride platform is an automotive virtual platform. This platform
->> abstracts resources such as clocks, regulators etc. in the firmware VM.
->> The device drivers request resources operations over SCMI using power,
->> performance, reset and sensor protocols.
->>
->> Multiple virtual SCMI instances are being employed for greater parallelism.
->> These instances are tied to devices such that devices can have dedicated
->> SCMI channel. Firmware VM (runs SCMI platform stack) is SMP enabled and
->> can process requests from agents in parallel. Qualcomm smc transport is
->> used for communication between SCMI agent and platform.
->>
->> Let's add the reduced functional support for SA8255p Ride board.
->> Subsequently, the support for PCIe, USB, UFS, Ethernet will be added.
->>
->> Co-developed-by: Shazad Hussain <quic_shazhuss@quicinc.com>
->> Signed-off-by: Shazad Hussain <quic_shazhuss@quicinc.com>
->> Signed-off-by: Nikunj Kela <quic_nkela@quicinc.com>
->> ---
->>  arch/arm64/boot/dts/qcom/Makefile           |    1 +
->>  arch/arm64/boot/dts/qcom/sa8255p-pmics.dtsi |   80 +
->>  arch/arm64/boot/dts/qcom/sa8255p-ride.dts   |  149 ++
->>  arch/arm64/boot/dts/qcom/sa8255p-scmi.dtsi  | 2312 ++++++++++++++++++
->>  arch/arm64/boot/dts/qcom/sa8255p.dtsi       | 2405 +++++++++++++++++++
->>  5 files changed, 4947 insertions(+)
->>  create mode 100644 arch/arm64/boot/dts/qcom/sa8255p-pmics.dtsi
->>  create mode 100644 arch/arm64/boot/dts/qcom/sa8255p-ride.dts
->>  create mode 100644 arch/arm64/boot/dts/qcom/sa8255p-scmi.dtsi
->>  create mode 100644 arch/arm64/boot/dts/qcom/sa8255p.dtsi
->>
-> ...
->
->> diff --git a/arch/arm64/boot/dts/qcom/sa8255p-ride.dts b/arch/arm64/boot/dts/qcom/sa8255p-ride.dts
->> new file mode 100644
->> index 000000000000..1dc03051ad92
->> --- /dev/null
->> +++ b/arch/arm64/boot/dts/qcom/sa8255p-ride.dts
->> @@ -0,0 +1,149 @@
->> +// SPDX-License-Identifier: BSD-3-Clause
->> +/*
->> + * Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
->> + */
->> +
->> +/dts-v1/;
->> +
->> +#include <dt-bindings/gpio/gpio.h>
->> +
->> +#include "sa8255p.dtsi"
->> +#include "sa8255p-pmics.dtsi"
->> +#include "sa8255p-scmi.dtsi"
->> +
->> +/ {
->> +	model = "Qualcomm Technologies, Inc. SA8255P Ride";
->> +	compatible = "qcom,sa8255p-ride", "qcom,sa8255p";
->> +
->> +	aliases {
->> +		i2c11 = &i2c11;
->> +		i2c18 = &i2c18;
->> +		serial0 = &uart10;
->> +		serial1 = &uart4;
->> +		spi16 = &spi16;
->> +		scmichannels = &scmichannels;
-> Nothing parses this.
->
-We are using this alias in bootloader to speed up the parsing. Since we
-are using 64 SCMI instances and SCMI smc transport driver for
-Qualcomm(drivers/firmware/arm_scmi/transports/smc.c) expects
-cap-id(created by hypervisor at boot time), our bootloader gets those
-cap-id for each channel and populate them. This alias is an optimization
-to save boottime as in automotive, boot KPIs are critical.
+The vDSO function requires a ChaCha20 implementation that does not
+write to the stack, and that can do an entire ChaCha20 permutation.
+The one provided is based on the current chacha-neon-core.S and uses NEON
+on the permute operation. The fallback for chips that do not support
+NEON issues the syscall.
 
+This also passes the vdso_test_chacha test along with
+vdso_test_getrandom. The vdso_test_getrandom bench-single result on
+Neoverse-N1 shows:
 
->
->> +
->> +#include <dt-bindings/interrupt-controller/arm-gic.h>
->> +
->> +&firmware {
->> +	scmi0: scmi0 {
-> scmi-0
->
-ACK!
->> +		compatible = "qcom,scmi-smc";
->> +		arm,smc-id = <0xc6008012>;
->> +		shmem = <&shmem0>;
->> +
->> +		interrupts = <GIC_SPI 963 IRQ_TYPE_EDGE_RISING>;
->> +		interrupt-names = "a2p";
->> +
->> +		max-rx-timeout-ms = <3000>;
->> +
->> +		status = "disabled";
-> status is the last property (from properties)
->
-ACK!
-> ...
->
->> +
->> +&soc {
->> +	scmichannels: sram@d0000000 {
->> +		#address-cells = <1>;
->> +		#size-cells = <1>;
->> +		compatible = "mmio-sram";
->> +		reg = <0x0 0xd0000000 0x0 0x40000>;
->> +		ranges = <0x0 0x0 0x0 0xffffffff>;
->> +
->> +		shmem0: scmi-sram@d0000000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0000000 0x1000>;
->> +		};
->> +
->> +		shmem1: scmi-sram@d0001000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0001000 0x1000>;
->> +		};
->> +
->> +		shmem2: scmi-sram@d0002000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0002000 0x1000>;
->> +		};
->> +
->> +		shmem3: scmi-sram@d0003000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0003000 0x1000>;
->> +		};
->> +
->> +		shmem4: scmi-sram@d0004000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0004000 0x1000>;
->> +		};
->> +
->> +		shmem5: scmi-sram@d0005000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0005000 0x1000>;
->> +		};
->> +
->> +		shmem6: scmi-sram@d0006000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0006000 0x1000>;
->> +		};
->> +
->> +		shmem7: scmi-sram@d0007000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0007000 0x1000>;
->> +		};
->> +
->> +		shmem8: scmi-sram@d0008000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0008000 0x1000>;
->> +		};
->> +
->> +		shmem9: scmi-sram@d0009000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0009000 0x1000>;
->> +		};
->> +
->> +		shmem10: scmi-sram@d000a000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd000a000 0x1000>;
->> +		};
->> +
->> +		shmem11: scmi-sram@d000b000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd000b000 0x1000>;
->> +		};
->> +
->> +		shmem12: scmi-sram@d000c000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd000c000 0x1000>;
->> +		};
->> +
->> +		shmem13: scmi-sram@d000d000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd000d000 0x1000>;
->> +		};
->> +
->> +		shmem14: scmi-sram@d000e000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd000e000 0x1000>;
->> +		};
->> +
->> +		shmem15: scmi-sram@d000f000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd000f000 0x1000>;
->> +		};
->> +
->> +		shmem16: scmi-sram@d0010000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0010000 0x1000>;
->> +		};
->> +
->> +		shmem17: scmi-sram@d0011000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0011000 0x1000>;
->> +		};
->> +
->> +		shmem18: scmi-sram@d0012000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0012000 0x1000>;
->> +		};
->> +
->> +		shmem19: scmi-sram@d0013000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0013000 0x1000>;
->> +		};
->> +
->> +		shmem20: scmi-sram@d0014000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0014000 0x1000>;
->> +		};
->> +
->> +		shmem21: scmi-sram@d0015000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0015000 0x1000>;
->> +		};
->> +
->> +		shmem22: scmi-sram@d0016000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0016000 0x1000>;
->> +		};
->> +
->> +		shmem23: scmi-sram@d0017000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0017000 0x1000>;
->> +		};
->> +
->> +		shmem24: scmi-sram@d0018000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0018000 0x1000>;
->> +		};
->> +
->> +		shmem25: scmi-sram@d0019000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0019000 0x1000>;
->> +		};
->> +
->> +		shmem26: scmi-sram@d001a000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd001a000 0x1000>;
->> +		};
->> +
->> +		shmem27: scmi-sram@d001b000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd001b000 0x1000>;
->> +		};
->> +
->> +		shmem28: scmi-sram@d001c000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd001c000 0x1000>;
->> +		};
->> +
->> +		shmem29: scmi-sram@d001d000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd001d000 0x1000>;
->> +		};
->> +
->> +		shmem30: scmi-sram@d001e000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd001e000 0x1000>;
->> +		};
->> +
->> +		shmem31: scmi-sram@d001f000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd001f000 0x1000>;
->> +		};
->> +
->> +		shmem32: scmi-sram@d0020000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0020000 0x1000>;
->> +		};
->> +
->> +		shmem33: scmi-sram@d0021000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0021000 0x1000>;
->> +		};
->> +
->> +		shmem34: scmi-sram@d0022000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0022000 0x1000>;
->> +		};
->> +
->> +		shmem35: scmi-sram@d0023000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0023000 0x1000>;
->> +		};
->> +
->> +		shmem36: scmi-sram@d0024000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0024000 0x1000>;
->> +		};
->> +
->> +		shmem37: scmi-sram@d0025000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0025000 0x1000>;
->> +		};
->> +
->> +		shmem38: scmi-sram@d0026000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0026000 0x1000>;
->> +		};
->> +
->> +		shmem39: scmi-sram@d0027000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0027000 0x1000>;
->> +		};
->> +
->> +		shmem40: scmi-sram@d0028000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0028000 0x1000>;
->> +		};
->> +
->> +		shmem41: scmi-sram@d0029000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0029000 0x1000>;
->> +		};
->> +
->> +		shmem42: scmi-sram@d002a000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd002a000 0x1000>;
->> +		};
->> +
->> +		shmem43: scmi-sram@d002b000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd002b000 0x1000>;
->> +		};
->> +
->> +		shmem44: scmi-sram@d002c000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd002c000 0x1000>;
->> +		};
->> +
->> +		shmem45: scmi-sram@d002d000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd002d000 0x1000>;
->> +		};
->> +
->> +		shmem46: scmi-sram@d002e000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd002e000 0x1000>;
->> +		};
->> +
->> +		shmem47: scmi-sram@d002f000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd002f000 0x1000>;
->> +		};
->> +
->> +		shmem48: scmi-sram@d0030000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0030000 0x1000>;
->> +		};
->> +
->> +		shmem49: scmi-sram@d0031000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0031000 0x1000>;
->> +		};
->> +
->> +		shmem50: scmi-sram@d0032000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0032000 0x1000>;
->> +		};
->> +
->> +		shmem51: scmi-sram@d0033000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0033000 0x1000>;
->> +		};
->> +
->> +		shmem52: scmi-sram@d0034000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0034000 0x1000>;
->> +		};
->> +
->> +		shmem53: scmi-sram@d0035000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0035000 0x1000>;
->> +		};
->> +
->> +		shmem54: scmi-sram@d0036000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0036000 0x1000>;
->> +		};
->> +
->> +		shmem55: scmi-sram@d0037000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0037000 0x1000>;
->> +		};
->> +
->> +		shmem56: scmi-sram@d0038000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0038000 0x1000>;
->> +		};
->> +
->> +		shmem57: scmi-sram@d0039000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd0039000 0x1000>;
->> +		};
->> +
->> +		shmem58: scmi-sram@d003a000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd003a000 0x1000>;
->> +		};
->> +
->> +		shmem59: scmi-sram@d003b000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd003b000 0x1000>;
->> +		};
->> +
->> +		shmem60: scmi-sram@d003c000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd003c000 0x1000>;
->> +		};
->> +
->> +		shmem61: scmi-sram@d003d000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd003d000 0x1000>;
->> +		};
->> +
->> +		shmem62: scmi-sram@d003e000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd003e000 0x1000>;
->> +		};
->> +
->> +		shmem63: scmi-sram@d003f000 {
->> +			compatible = "arm,scmi-shmem";
->> +			reg = <0xd003f000 0x1000>;
->> +		};
->> +	};
->> +};
->> diff --git a/arch/arm64/boot/dts/qcom/sa8255p.dtsi b/arch/arm64/boot/dts/qcom/sa8255p.dtsi
->> new file mode 100644
->> index 000000000000..c354f76ffa5e
->> --- /dev/null
->> +++ b/arch/arm64/boot/dts/qcom/sa8255p.dtsi
->> @@ -0,0 +1,2405 @@
->> +// SPDX-License-Identifier: BSD-3-Clause
->> +/*
->> + * Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
->> + */
->> +
->> +#include <dt-bindings/interrupt-controller/arm-gic.h>
->> +#include <dt-bindings/mailbox/qcom-ipcc.h>
->> +
->> +/ {
->> +	interrupt-parent = <&intc>;
->> +
->> +	#address-cells = <2>;
->> +	#size-cells = <2>;
->> +
->> +	clocks {
->> +		xo_board_clk: xo-board-clk {
->> +			compatible = "fixed-clock";
->> +			#clock-cells = <0>;
->> +		};
->> +
->> +		sleep_clk: sleep-clk {
->> +			compatible = "fixed-clock";
->> +			#clock-cells = <0>;
->> +		};
->> +
->> +		gpll0_board_clk: gpll0-board-clk {
->> +			compatible = "fixed-clock";
->> +			#clock-cells = <0>;
->> +		};
->> +
->> +		bi_tcxo_div2: bi-tcxo-div2-clk {
->> +			compatible = "fixed-factor-clock";
->> +			clocks = <&xo_board_clk>;
->> +			clock-mult = <1>;
->> +			clock-div = <2>;
->> +			#clock-cells = <0>;
->> +		};
->> +	};
->> +
->> +	cpus {
->> +		#address-cells = <2>;
->> +		#size-cells = <0>;
->> +
->> +		CPU0: cpu@0 {
-> Lowercase label.
-ACK!
->
-> ...
->
-> Best regards,
-> Krzysztof
->
+   vdso: 25000000 times in 0.746506464 seconds
+   libc: 25000000 times in 8.849179444 seconds
+syscall: 25000000 times in 8.818726425 seconds
+
+Changes from v1:
+- Fixed style issues and typos.
+- Added fallback for systems without NEON support.
+- Avoid use of non-volatile vector registers in neon chacha20.
+- Use c-getrandom-y for vgetrandom.c.
+- Fixed TIMENS vdso_rnd_data access.
+
+Signed-off-by: Adhemerval Zanella <adhemerval.zanella@linaro.org>
+---
+ arch/arm64/Kconfig                         |   1 +
+ arch/arm64/include/asm/vdso.h              |   6 +
+ arch/arm64/include/asm/vdso/getrandom.h    |  49 ++++++
+ arch/arm64/include/asm/vdso/vsyscall.h     |  10 ++
+ arch/arm64/kernel/vdso.c                   |   6 -
+ arch/arm64/kernel/vdso/Makefile            |  11 +-
+ arch/arm64/kernel/vdso/vdso                |   1 +
+ arch/arm64/kernel/vdso/vdso.lds.S          |   4 +
+ arch/arm64/kernel/vdso/vgetrandom-chacha.S | 168 +++++++++++++++++++++
+ arch/arm64/kernel/vdso/vgetrandom.c        |  15 ++
+ lib/vdso/getrandom.c                       |   1 +
+ tools/arch/arm64/vdso                      |   1 +
+ tools/include/linux/compiler.h             |   4 +
+ tools/testing/selftests/vDSO/Makefile      |   5 +-
+ 14 files changed, 273 insertions(+), 9 deletions(-)
+ create mode 100644 arch/arm64/include/asm/vdso/getrandom.h
+ create mode 120000 arch/arm64/kernel/vdso/vdso
+ create mode 100644 arch/arm64/kernel/vdso/vgetrandom-chacha.S
+ create mode 100644 arch/arm64/kernel/vdso/vgetrandom.c
+ create mode 120000 tools/arch/arm64/vdso
+
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index a2f8ff354ca6..7f7424d1b3b8 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -262,6 +262,7 @@ config ARM64
+ 	select TRACE_IRQFLAGS_NMI_SUPPORT
+ 	select HAVE_SOFTIRQ_ON_OWN_STACK
+ 	select USER_STACKTRACE_SUPPORT
++	select VDSO_GETRANDOM
+ 	help
+ 	  ARM 64-bit (AArch64) Linux support.
+ 
+diff --git a/arch/arm64/include/asm/vdso.h b/arch/arm64/include/asm/vdso.h
+index 4305995c8f82..18407b757c95 100644
+--- a/arch/arm64/include/asm/vdso.h
++++ b/arch/arm64/include/asm/vdso.h
+@@ -16,6 +16,12 @@
+ 
+ #ifndef __ASSEMBLY__
+ 
++enum vvar_pages {
++	VVAR_DATA_PAGE_OFFSET,
++	VVAR_TIMENS_PAGE_OFFSET,
++	VVAR_NR_PAGES,
++};
++
+ #include <generated/vdso-offsets.h>
+ 
+ #define VDSO_SYMBOL(base, name)						   \
+diff --git a/arch/arm64/include/asm/vdso/getrandom.h b/arch/arm64/include/asm/vdso/getrandom.h
+new file mode 100644
+index 000000000000..fca66ba49d4c
+--- /dev/null
++++ b/arch/arm64/include/asm/vdso/getrandom.h
+@@ -0,0 +1,49 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++
++#ifndef __ASM_VDSO_GETRANDOM_H
++#define __ASM_VDSO_GETRANDOM_H
++
++#ifndef __ASSEMBLY__
++
++#include <asm/vdso.h>
++#include <asm/unistd.h>
++#include <vdso/datapage.h>
++
++/**
++ * getrandom_syscall - Invoke the getrandom() syscall.
++ * @buffer:	Destination buffer to fill with random bytes.
++ * @len:	Size of @buffer in bytes.
++ * @flags:	Zero or more GRND_* flags.
++ * Returns:	The number of random bytes written to @buffer, or a negative value indicating an error.
++ */
++static __always_inline ssize_t getrandom_syscall(void *_buffer, size_t _len, unsigned int _flags)
++{
++	register void *buffer asm ("x0") = _buffer;
++	register size_t len asm ("x1") = _len;
++	register unsigned int flags asm ("x2") = _flags;
++	register long ret asm ("x0");
++	register long nr asm ("x8") = __NR_getrandom;
++
++	asm volatile(
++	"       svc #0\n"
++	: "=r" (ret)
++	: "r" (buffer), "r" (len), "r" (flags), "r" (nr)
++	: "memory");
++
++	return ret;
++}
++
++static __always_inline const struct vdso_rng_data *__arch_get_vdso_rng_data(void)
++{
++	/*
++	 * If a task belongs to a time namespace then a namespace the real
++	 * VVAR page is mapped with the VVAR_TIMENS_PAGE_OFFSET.
++	 */
++	if (IS_ENABLED(CONFIG_TIME_NS) && _vdso_data->clock_mode == VDSO_CLOCKMODE_TIMENS)
++		return (void*)&_vdso_rng_data + VVAR_TIMENS_PAGE_OFFSET * PAGE_SIZE;
++	return &_vdso_rng_data;
++}
++
++#endif /* !__ASSEMBLY__ */
++
++#endif /* __ASM_VDSO_GETRANDOM_H */
+diff --git a/arch/arm64/include/asm/vdso/vsyscall.h b/arch/arm64/include/asm/vdso/vsyscall.h
+index f94b1457c117..2a87f0e1b144 100644
+--- a/arch/arm64/include/asm/vdso/vsyscall.h
++++ b/arch/arm64/include/asm/vdso/vsyscall.h
+@@ -2,8 +2,11 @@
+ #ifndef __ASM_VDSO_VSYSCALL_H
+ #define __ASM_VDSO_VSYSCALL_H
+ 
++#define __VDSO_RND_DATA_OFFSET  480
++
+ #ifndef __ASSEMBLY__
+ 
++#include <asm/vdso.h>
+ #include <linux/timekeeper_internal.h>
+ #include <vdso/datapage.h>
+ 
+@@ -21,6 +24,13 @@ struct vdso_data *__arm64_get_k_vdso_data(void)
+ }
+ #define __arch_get_k_vdso_data __arm64_get_k_vdso_data
+ 
++static __always_inline
++struct vdso_rng_data *__arm64_get_k_vdso_rnd_data(void)
++{
++	return (void*)vdso_data + __VDSO_RND_DATA_OFFSET;
++}
++#define __arch_get_k_vdso_rng_data __arm64_get_k_vdso_rnd_data
++
+ static __always_inline
+ void __arm64_update_vsyscall(struct vdso_data *vdata, struct timekeeper *tk)
+ {
+diff --git a/arch/arm64/kernel/vdso.c b/arch/arm64/kernel/vdso.c
+index 89b6e7840002..706c9c3a7a50 100644
+--- a/arch/arm64/kernel/vdso.c
++++ b/arch/arm64/kernel/vdso.c
+@@ -34,12 +34,6 @@ enum vdso_abi {
+ 	VDSO_ABI_AA32,
+ };
+ 
+-enum vvar_pages {
+-	VVAR_DATA_PAGE_OFFSET,
+-	VVAR_TIMENS_PAGE_OFFSET,
+-	VVAR_NR_PAGES,
+-};
+-
+ struct vdso_abi_info {
+ 	const char *name;
+ 	const char *vdso_code_start;
+diff --git a/arch/arm64/kernel/vdso/Makefile b/arch/arm64/kernel/vdso/Makefile
+index d11da6461278..50246a38d6bd 100644
+--- a/arch/arm64/kernel/vdso/Makefile
++++ b/arch/arm64/kernel/vdso/Makefile
+@@ -9,7 +9,7 @@
+ # Include the generic Makefile to check the built vdso.
+ include $(srctree)/lib/vdso/Makefile
+ 
+-obj-vdso := vgettimeofday.o note.o sigreturn.o
++obj-vdso := vgettimeofday.o note.o sigreturn.o vgetrandom.o vgetrandom-chacha.o
+ 
+ # Build rules
+ targets := $(obj-vdso) vdso.so vdso.so.dbg
+@@ -40,13 +40,22 @@ CFLAGS_REMOVE_vgettimeofday.o = $(CC_FLAGS_FTRACE) -Os $(CC_FLAGS_SCS) \
+ 				$(RANDSTRUCT_CFLAGS) $(GCC_PLUGINS_CFLAGS) \
+ 				$(CC_FLAGS_LTO) $(CC_FLAGS_CFI) \
+ 				-Wmissing-prototypes -Wmissing-declarations
++CFLAGS_REMOVE_vgetrandom.o = $(CC_FLAGS_FTRACE) -Os $(CC_FLAGS_SCS) \
++			     $(RANDSTRUCT_CFLAGS) $(GCC_PLUGINS_CFLAGS) \
++			     $(CC_FLAGS_LTO) $(CC_FLAGS_CFI) \
++			     -Wmissing-prototypes -Wmissing-declarations
+ 
+ CFLAGS_vgettimeofday.o = -O2 -mcmodel=tiny -fasynchronous-unwind-tables
++CFLAGS_vgetrandom.o = -O2 -mcmodel=tiny -fasynchronous-unwind-tables
+ 
+ ifneq ($(c-gettimeofday-y),)
+   CFLAGS_vgettimeofday.o += -include $(c-gettimeofday-y)
+ endif
+ 
++ifneq ($(c-getrandom-y),)
++  CFLAGS_vgetrandom.o += -include $(c-getrandom-y)
++endif
++
+ targets += vdso.lds
+ CPPFLAGS_vdso.lds += -P -C -U$(ARCH)
+ 
+diff --git a/arch/arm64/kernel/vdso/vdso b/arch/arm64/kernel/vdso/vdso
+new file mode 120000
+index 000000000000..233c7a26f6e5
+--- /dev/null
++++ b/arch/arm64/kernel/vdso/vdso
+@@ -0,0 +1 @@
++../../../arch/arm64/kernel/vdso
+\ No newline at end of file
+diff --git a/arch/arm64/kernel/vdso/vdso.lds.S b/arch/arm64/kernel/vdso/vdso.lds.S
+index 45354f2ddf70..f204a9ddc833 100644
+--- a/arch/arm64/kernel/vdso/vdso.lds.S
++++ b/arch/arm64/kernel/vdso/vdso.lds.S
+@@ -11,7 +11,9 @@
+ #include <linux/const.h>
+ #include <asm/page.h>
+ #include <asm/vdso.h>
++#include <asm/vdso/vsyscall.h>
+ #include <asm-generic/vmlinux.lds.h>
++#include <vdso/datapage.h>
+ 
+ OUTPUT_FORMAT("elf64-littleaarch64", "elf64-bigaarch64", "elf64-littleaarch64")
+ OUTPUT_ARCH(aarch64)
+@@ -19,6 +21,7 @@ OUTPUT_ARCH(aarch64)
+ SECTIONS
+ {
+ 	PROVIDE(_vdso_data = . - __VVAR_PAGES * PAGE_SIZE);
++	PROVIDE(_vdso_rng_data = _vdso_data + __VDSO_RND_DATA_OFFSET);
+ #ifdef CONFIG_TIME_NS
+ 	PROVIDE(_timens_data = _vdso_data + PAGE_SIZE);
+ #endif
+@@ -102,6 +105,7 @@ VERSION
+ 		__kernel_gettimeofday;
+ 		__kernel_clock_gettime;
+ 		__kernel_clock_getres;
++		__kernel_getrandom;
+ 	local: *;
+ 	};
+ }
+diff --git a/arch/arm64/kernel/vdso/vgetrandom-chacha.S b/arch/arm64/kernel/vdso/vgetrandom-chacha.S
+new file mode 100644
+index 000000000000..9ebf12a09c65
+--- /dev/null
++++ b/arch/arm64/kernel/vdso/vgetrandom-chacha.S
+@@ -0,0 +1,168 @@
++// SPDX-License-Identifier: GPL-2.0
++
++#include <linux/linkage.h>
++#include <asm/cache.h>
++#include <asm/assembler.h>
++
++	.text
++
++#define state0		v0
++#define state1		v1
++#define state2		v2
++#define state3		v3
++#define copy0		v4
++#define copy1		v5
++#define copy2		v6
++#define copy3		v7
++#define copy3_d		d7
++#define one_d		d16
++#define one_q		q16
++#define tmp		v17
++#define rot8		v18
++
++/*
++ * ARM64 ChaCha20 implementation meant for vDSO.  Produces a given positive
++ * number of blocks of output with nonce 0, taking an input key and 8-bytes
++ * counter.  Importantly does not spill to the stack.
++ *
++ * void __arch_chacha20_blocks_nostack(uint8_t *dst_bytes,
++ *				       const uint8_t *key,
++ * 				       uint32_t *counter,
++ *				       size_t nblocks)
++ *
++ * 	x0: output bytes
++ *	x1: 32-byte key input
++ *	x2: 8-byte counter input/output
++ *	x3: number of 64-byte block to write to output
++ */
++SYM_FUNC_START(__arch_chacha20_blocks_nostack)
++
++	/* copy0 = "expand 32-byte k" */
++	adr_l		x8, CTES
++	ld1		{copy0.4s}, [x8]
++	/* copy1,copy2 = key */
++	ld1		{ copy1.4s, copy2.4s }, [x1]
++	/* copy3 = counter || zero nonce  */
++	ldr		copy3_d, [x2]
++
++	adr_l		x8, ONE
++	ldr		one_q, [x8]
++
++	adr_l		x10, ROT8
++	ld1		{rot8.4s}, [x10]
++.Lblock:
++	/* copy state to auxiliary vectors for the final add after the permute.  */
++	mov		state0.16b, copy0.16b
++	mov		state1.16b, copy1.16b
++	mov		state2.16b, copy2.16b
++	mov		state3.16b, copy3.16b
++
++	mov		w4, 20
++.Lpermute:
++	/*
++	 * Permute one 64-byte block where the state matrix is stored in the four NEON
++	 * registers state0-state3.  It performs matrix operations on four words in parallel,
++	 * but requires shuffling to rearrange the words after each round.
++	 */
++
++.Ldoubleround:
++	/* state0 += state1, state3 = rotl32(state3 ^ state0, 16) */
++	add		state0.4s, state0.4s, state1.4s
++	eor		state3.16b, state3.16b, state0.16b
++	rev32		state3.8h, state3.8h
++
++	/* state2 += state3, state1 = rotl32(state1 ^ state2, 12) */
++	add		state2.4s, state2.4s, state3.4s
++	eor		tmp.16b, state1.16b, state2.16b
++	shl		state1.4s, tmp.4s, #12
++	sri		state1.4s, tmp.4s, #20
++
++	/* state0 += state1, state3 = rotl32(state3 ^ state0, 8) */
++	add		state0.4s, state0.4s, state1.4s
++	eor		state3.16b, state3.16b, state0.16b
++	tbl		state3.16b, {state3.16b}, rot8.16b
++
++	/* state2 += state3, state1 = rotl32(state1 ^ state2, 7) */
++	add		state2.4s, state2.4s, state3.4s
++	eor		tmp.16b, state1.16b, state2.16b
++	shl		state1.4s, tmp.4s, #7
++	sri		state1.4s, tmp.4s, #25
++
++	/* state1[0,1,2,3] = state1[1,2,3,0] */
++	ext		state1.16b, state1.16b, state1.16b, #4
++	/* state2[0,1,2,3] = state2[2,3,0,1] */
++	ext		state2.16b, state2.16b, state2.16b, #8
++	/* state3[0,1,2,3] = state3[1,2,3,0] */
++	ext		state3.16b, state3.16b, state3.16b, #12
++
++	/* state0 += state1, state3 = rotl32(state3 ^ state0, 16) */
++	add		state0.4s, state0.4s, state1.4s
++	eor		state3.16b, state3.16b, state0.16b
++	rev32		state3.8h, state3.8h
++
++	/* state2 += state3, state1 = rotl32(state1 ^ state2, 12) */
++	add		state2.4s, state2.4s, state3.4s
++	eor		tmp.16b, state1.16b, state2.16b
++	shl		state1.4s, tmp.4s, #12
++	sri		state1.4s, tmp.4s, #20
++
++	/* state0 += state1, state3 = rotl32(state3 ^ state0, 8) */
++	add		state0.4s, state0.4s, state1.4s
++	eor		state3.16b, state3.16b, state0.16b
++	tbl		state3.16b, {state3.16b}, rot8.16b
++
++	/* state2 += state3, state1 = rotl32(state1 ^ state2, 7) */
++	add		state2.4s, state2.4s, state3.4s
++	eor		tmp.16b, state1.16b, state2.16b
++	shl		state1.4s, tmp.4s, #7
++	sri		state1.4s, tmp.4s, #25
++
++	/* state1[0,1,2,3] = state1[3,0,1,2] */
++	ext		state1.16b, state1.16b, state1.16b, #12
++	/* state2[0,1,2,3] = state2[2,3,0,1] */
++	ext		state2.16b, state2.16b, state2.16b, #8
++	/* state3[0,1,2,3] = state3[1,2,3,0] */
++	ext		state3.16b, state3.16b, state3.16b, #4
++
++	subs		w4, w4, #2
++	b.ne		.Ldoubleround
++
++	/* output0 = state0 + state0 */
++	add		state0.4s, state0.4s, copy0.4s
++	/* output1 = state1 + state1 */
++	add		state1.4s, state1.4s, copy1.4s
++	/* output2 = state2 + state2 */
++	add		state2.4s, state2.4s, copy2.4s
++	/* output2 = state3 + state3 */
++	add		state3.4s, state3.4s, copy3.4s
++	st1		{ state0.4s - state3.4s }, [x0]
++
++	/* ++copy3.counter */
++	add		copy3_d, copy3_d, one_d
++
++	/* output += 64, --nblocks */
++	add		x0, x0, 64
++	subs		x3, x3, #1
++	b.ne		.Lblock
++
++	/* counter = copy3.counter */
++	str		copy3_d, [x2]
++
++	/* Zero out the potentially sensitive regs, in case nothing uses these again. */
++	eor		state0.16b, state0.16b, state0.16b
++	eor		state1.16b, state1.16b, state1.16b
++	eor		state2.16b, state2.16b, state2.16b
++	eor		state3.16b, state3.16b, state3.16b
++	eor		copy1.16b, copy1.16b, copy1.16b
++	eor		copy2.16b, copy2.16b, copy2.16b
++	ret
++SYM_FUNC_END(__arch_chacha20_blocks_nostack)
++
++        .section        ".rodata", "a", %progbits
++        .align          L1_CACHE_SHIFT
++
++CTES:	.word		1634760805, 857760878, 	2036477234, 1797285236
++ONE:    .xword		1, 0
++ROT8:	.word		0x02010003, 0x06050407, 0x0a09080b, 0x0e0d0c0f
++
++emit_aarch64_feature_1_and
+diff --git a/arch/arm64/kernel/vdso/vgetrandom.c b/arch/arm64/kernel/vdso/vgetrandom.c
+new file mode 100644
+index 000000000000..0833d25f3121
+--- /dev/null
++++ b/arch/arm64/kernel/vdso/vgetrandom.c
+@@ -0,0 +1,15 @@
++// SPDX-License-Identifier: GPL-2.0
++
++typeof(__cvdso_getrandom) __kernel_getrandom;
++
++ssize_t __kernel_getrandom(void *buffer, size_t len, unsigned int flags, void *opaque_state, size_t opaque_len)
++{
++	asm goto (
++	ALTERNATIVE("b %[fallback]", "nop", RM64_HAS_FPSIMD) : : : : fallback);
++	return __cvdso_getrandom(buffer, len, flags, opaque_state, opaque_len);
++
++fallback:
++	if (unlikely(opaque_len == ~0UL && !buffer && !len && !flags))
++		return -ENOSYS;
++	return getrandom_syscall(buffer, len, flags);
++}
+diff --git a/lib/vdso/getrandom.c b/lib/vdso/getrandom.c
+index 938ca539aaa6..7c9711248d9b 100644
+--- a/lib/vdso/getrandom.c
++++ b/lib/vdso/getrandom.c
+@@ -5,6 +5,7 @@
+ 
+ #include <linux/array_size.h>
+ #include <linux/minmax.h>
++#include <linux/mm.h>
+ #include <vdso/datapage.h>
+ #include <vdso/getrandom.h>
+ #include <vdso/unaligned.h>
+diff --git a/tools/arch/arm64/vdso b/tools/arch/arm64/vdso
+new file mode 120000
+index 000000000000..233c7a26f6e5
+--- /dev/null
++++ b/tools/arch/arm64/vdso
+@@ -0,0 +1 @@
++../../../arch/arm64/kernel/vdso
+\ No newline at end of file
+diff --git a/tools/include/linux/compiler.h b/tools/include/linux/compiler.h
+index 6f7f22ac9da5..4366da278033 100644
+--- a/tools/include/linux/compiler.h
++++ b/tools/include/linux/compiler.h
+@@ -2,6 +2,8 @@
+ #ifndef _TOOLS_LINUX_COMPILER_H_
+ #define _TOOLS_LINUX_COMPILER_H_
+ 
++#ifndef __ASSEMBLY__
++
+ #include <linux/compiler_types.h>
+ 
+ #ifndef __compiletime_error
+@@ -224,4 +226,6 @@ static __always_inline void __write_once_size(volatile void *p, void *res, int s
+ 	__asm__ ("" : "=r" (var) : "0" (var))
+ #endif
+ 
++#endif /* __ASSEMBLY__ */
++
+ #endif /* _TOOLS_LINUX_COMPILER_H */
+diff --git a/tools/testing/selftests/vDSO/Makefile b/tools/testing/selftests/vDSO/Makefile
+index e21e78aae24d..29b4ac928e0b 100644
+--- a/tools/testing/selftests/vDSO/Makefile
++++ b/tools/testing/selftests/vDSO/Makefile
+@@ -1,6 +1,6 @@
+ # SPDX-License-Identifier: GPL-2.0
+ uname_M := $(shell uname -m 2>/dev/null || echo not)
+-ARCH ?= $(shell echo $(uname_M) | sed -e s/i.86/x86/ -e s/x86_64/x86/)
++ARCH ?= $(shell echo $(uname_M) | sed -e s/i.86/x86/ -e s/x86_64/x86/ -e s/aarch64.*/arm64/)
+ 
+ TEST_GEN_PROGS := vdso_test_gettimeofday
+ TEST_GEN_PROGS += vdso_test_getcpu
+@@ -10,7 +10,7 @@ ifeq ($(ARCH),$(filter $(ARCH),x86 x86_64))
+ TEST_GEN_PROGS += vdso_standalone_test_x86
+ endif
+ TEST_GEN_PROGS += vdso_test_correctness
+-ifeq ($(uname_M),x86_64)
++ifeq ($(uname_M), $(filter x86_64 aarch64, $(uname_M)))
+ TEST_GEN_PROGS += vdso_test_getrandom
+ TEST_GEN_PROGS += vdso_test_chacha
+ endif
+@@ -41,5 +41,6 @@ $(OUTPUT)/vdso_test_getrandom: CFLAGS += -isystem $(top_srcdir)/tools/include \
+ $(OUTPUT)/vdso_test_chacha: $(top_srcdir)/tools/arch/$(ARCH)/vdso/vgetrandom-chacha.S
+ $(OUTPUT)/vdso_test_chacha: CFLAGS += -idirafter $(top_srcdir)/tools/include \
+                                       -idirafter $(top_srcdir)/arch/$(ARCH)/include \
++                                      -idirafter $(top_srcdir)/arch/$(ARCH)/include/generated \
+                                       -idirafter $(top_srcdir)/include \
+                                       -D__ASSEMBLY__ -Wa,--noexecstack
+-- 
+2.43.0
+
