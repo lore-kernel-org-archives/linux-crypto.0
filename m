@@ -1,63 +1,63 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2B318E20
-	for <linux-crypto@vger.kernel.org>; Thu, 29 Aug 2024 01:21:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B795717C67
+	for <linux-crypto@vger.kernel.org>; Thu, 29 Aug 2024 01:21:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724894495; cv=none; b=fZD/l7ydBnvrNxfHrKKhftnQlIh+QR7e8hmi5d3n2krcuT1AheWckjWvDB7D/2uZrJ/DP6VDwBqlPLUMYY5BAqWv1C05A5JTb+GEdiFo1MvTkCMa+O5teeMWHrH4JZFM2NuTjK0DbNFctNwsKkozatblZ49XWAg5dkGFjD6aNdA=
+	t=1724894497; cv=none; b=Nvogx7bGez/lg3qcir7zE4vem4e0qB+p7Yd8bCGByIx+h8BITUayEhyR/0Cd8zFmXP30GtMvf4eAcJz3vpHS96ijuP8j/SYyPaf458Tv1mPsCvpH5uTQfLQiQ1R4cl5HkVedNyBnL3LeyvPFLHDJ6WyY0tOA+z/EAmqN9jjGjMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724894495; c=relaxed/simple;
-	bh=pVIsjIwUVSuD9f5vpgG6Je4vWyRG4TASquy5YfmS7vk=;
+	s=arc-20240116; t=1724894497; c=relaxed/simple;
+	bh=5cZ/tjRZEvLlBlcMgDypjgg3mVu/wSmTlQDFzZ8a8WY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-type; b=R52eRCm7id5nkjAHHoHYYHv5SlTOb6o7QeZu/ijbbckLOZwNO+ivDauPJ/CLTUCRfcZKCdxJ/8NouhMLENjnY6LyLBAUhOAfGyb5OfFmy5HJfAjn44H0S4ivq1frFSEyp9Q/vIl2yEbVMGWjZbfEeTDUR/4nR/wtg9fv7kiwPTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U1XAPBih; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version:Content-type; b=cL7YVKkbPLI+U8rZ8TBd3CAU280zuuxcv9utiV7oNrVXtqFI8imh6m7NqJ8PNd7PNjOHQJF6pdU1CUkioTgHLJUOCPmXGmFpQx6bv8lammgj4EmZpubbT8ojn56nvW9j+NN/fkZwxWZbDGtQ6s9TOqHae6JS9A+DUWF2JDtzI2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GPO0QDUw; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U1XAPBih"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GPO0QDUw"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1724894493;
+	s=mimecast20190719; t=1724894494;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=uPFXZeRskPV1LBySPC5AK+d7TuSi/RtTN6Kvr+xrijg=;
-	b=U1XAPBihyi/jcsMsoqK2rPQxl5aOi/g6tsj6uKDmvdmzeHl+XymVEmR4IcA5jDwWZmGnnG
-	EYtuFRjAfyJ5+iBBpwMOzW+OeZ8pi+G0pR6qD2Qv7HMUh57KRTDP6vdzBA5NXaN1axfqS5
-	6wqm1mYJ7Fn2JzjRNUdR/Y72M/sdqZM=
+	bh=1NZAUVynLNTnl3J66RD+E9gv/iCwUnMmJ5YyN4QH4Ew=;
+	b=GPO0QDUw1RX4Yvbufz6sMQEuRvbrm8VgI66Ak6NxYQkqzkhyxwqQetXUeZnvW+QaCY1hn3
+	CloobR+XwYJCSsxQ0GO8HpWHoToRA1gg6RaARyaQEM6Gfto9qSGIT2eUgWETSBTkzcQ0PL
+	7zMz+I0BMPWYMbncER4g3nujfCKqdPU=
 Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
  [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-318-LG2L7SdaM5Gq_mb8hS18XA-1; Wed, 28 Aug 2024 21:21:31 -0400
-X-MC-Unique: LG2L7SdaM5Gq_mb8hS18XA-1
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6bf7ad66ab7so26187676d6.1
-        for <linux-crypto@vger.kernel.org>; Wed, 28 Aug 2024 18:21:31 -0700 (PDT)
+ us-mta-111-v6CxWPGfPwCLkI9Dh0JTNg-1; Wed, 28 Aug 2024 21:21:33 -0400
+X-MC-Unique: v6CxWPGfPwCLkI9Dh0JTNg-1
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6bf8d9867a3so1862966d6.1
+        for <linux-crypto@vger.kernel.org>; Wed, 28 Aug 2024 18:21:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724894490; x=1725499290;
+        d=1e100.net; s=20230601; t=1724894493; x=1725499293;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=uPFXZeRskPV1LBySPC5AK+d7TuSi/RtTN6Kvr+xrijg=;
-        b=kr7YoE8zrOwQezWIojW8Ieu/JYWX7LLdWrn4a2MU/vx66WC0qC4JXZmhuaObd5acS+
-         V8wLyuSwAZma4lU3Ry8PhIMgyD8nOEKsHhJvJI+XK4IodCfjyYoAIpguw+hVp+iCnMmD
-         Cjo0q5CJd+WVIeApOaOT81zsuD7knqT2nOIFwPLAMYX5GNeB+ADKf/Q0hr4S0bCeG5Pv
-         eXxh+KVp7GPA/M/qLLMWsw95i9Rq38aQFDczyEVhcyyCQ/0+jHMS9qkXj9zvJE9wPuPl
-         wHbUimKEZg9qClWkLieyvpMPxgKHEvhkV8bIWqgA0rz0nO/RO5Ss3EWUCqBHF6Auucps
-         kEBA==
-X-Forwarded-Encrypted: i=1; AJvYcCUy3v9CbX427EJO6kMfLcWESzPdwegrHo+ObOOXxJqHlNoSXZtaNnZjpiXb33jOQenram7xvxZPNuAxWAQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwjIzxWXX1dgFMJj2LMRcoUE8JP7+Lb5QbpTwUot33U0QBM0hzE
-	4u3mAvI/FxnkcgKG4zAjwUepRoUThN3nf5SS5Ty8q8Q17X85B17TH61IjbogNvuWsXCjWk6OcKp
-	0IDYt1JFQBB4FbxtUqlrLELhXIUk7H8ZM80oGXXK6014Ns8aMfcJWDtnGsTAwBA==
-X-Received: by 2002:a05:6214:1946:b0:6bf:7efc:1117 with SMTP id 6a1803df08f44-6c33f33d66emr20160226d6.9.1724894490325;
-        Wed, 28 Aug 2024 18:21:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG+83JODhwFjiVeEZ7C0/0RpEBcm05e8lIief195xyZB9E5UbynGRmQWhUDqK+J30xjphpQgg==
-X-Received: by 2002:a05:6214:1946:b0:6bf:7efc:1117 with SMTP id 6a1803df08f44-6c33f33d66emr20160006d6.9.1724894490020;
-        Wed, 28 Aug 2024 18:21:30 -0700 (PDT)
+        bh=1NZAUVynLNTnl3J66RD+E9gv/iCwUnMmJ5YyN4QH4Ew=;
+        b=L6olqYQ1739jHRc5Imw2G8AmM22wg+6ghBzLp3SRZ4V5sZOf51yXBGyQGjRmSupGN9
+         cbFVLpIj6+ux5ML06CXm00B5U5heERVrFfMVzQDvhi8FEYgnE4WTck7M1YQEMwqAEzYn
+         +nGCnEtmMaRe/PEnwuXAjg0wXOP8B8foWts2Zd4aNFL6EPqYde0SBNDqhLtQ81FqzXD2
+         gOu3djzK+2AGNuaUSN0k+Ta6TjqPS/f0qLV41Oex5beYQ/Bb3A/5IH2fLvksX5rhz8jt
+         xQQfijv3yfGJmeg5+iXVqkM46PVl5l5oap7NbQ2PKBsnOdEAh+RDj82MNmK57hLOPyD7
+         2zsg==
+X-Forwarded-Encrypted: i=1; AJvYcCWFhrFyUIjfpa4/0DOHlb5vPgorICXC4Ml17SZVu/OlHS+SrwZT7BjZF0fHTBRPrT0XefVDQlFiu+2S5gM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzNUVvxHbDFUzQJpnI9zXxSwCS48fl4OOwF9QOxYq8mxJ0C5HbR
+	ZCZ2mbWb0m6B7SmVGfrE70ekyd6DLxXYg9i9ZAfAE6D5d7KxbOEOpBGoCXPTbNGTZDvHKk4t9lU
+	2NR1Rbhy9fBgWD8T+NbhqQLKi7aNgCwzhGS6hQ3HQ3LD5g1r0dL2/WUO1w2sGGA==
+X-Received: by 2002:a05:6214:451b:b0:6bd:778b:6594 with SMTP id 6a1803df08f44-6c33e6962a0mr14117416d6.54.1724894492856;
+        Wed, 28 Aug 2024 18:21:32 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFicbErcyZiL6ygZRYadzj1SdSXTCvwnpByTUjprwT++cXLx+ACzuYsCKWZ7aVgr6os4cyMlg==
+X-Received: by 2002:a05:6214:451b:b0:6bd:778b:6594 with SMTP id 6a1803df08f44-6c33e6962a0mr14117266d6.54.1724894492488;
+        Wed, 28 Aug 2024 18:21:32 -0700 (PDT)
 Received: from x1.redhat.com (c-98-219-206-88.hsd1.pa.comcast.net. [98.219.206.88])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c340c96825sm1013236d6.75.2024.08.28.18.21.27
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c340c96825sm1013236d6.75.2024.08.28.18.21.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Aug 2024 18:21:28 -0700 (PDT)
+        Wed, 28 Aug 2024 18:21:30 -0700 (PDT)
 From: Brian Masney <bmasney@redhat.com>
 To: herbert@gondor.apana.org.au
 Cc: davem@davemloft.net,
@@ -67,9 +67,9 @@ Cc: davem@davemloft.net,
 	linux-arm-msm@vger.kernel.org,
 	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/2] crypto: qcom-rng: rename *_of_data to *_match_data
-Date: Wed, 28 Aug 2024 21:20:04 -0400
-Message-ID: <20240829012005.382715-2-bmasney@redhat.com>
+Subject: [PATCH 2/2] crypto: qcom-rng: fix support for ACPI-based systems
+Date: Wed, 28 Aug 2024 21:20:05 -0400
+Message-ID: <20240829012005.382715-3-bmasney@redhat.com>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20240829012005.382715-1-bmasney@redhat.com>
 References: <20240829012005.382715-1-bmasney@redhat.com>
@@ -83,97 +83,78 @@ Content-type: text/plain
 Content-Transfer-Encoding: 8bit
 
 The qcom-rng driver supports both ACPI and device tree based systems.
-Let's rename all instances of *_of_data to *_match_data in preparation
-for fixing the ACPI support that was broken with commit
-f29cd5bb64c2 ("crypto: qcom-rng - Add hw_random interface support").
+ACPI support was broken when the hw_random interface support was added.
+Let's go ahead and fix this by checking has_acpi_companion().
 
+This fix was boot tested on a Qualcomm Amberwing server.
+
+Fixes: f29cd5bb64c2 ("crypto: qcom-rng - Add hw_random interface support")
 Signed-off-by: Brian Masney <bmasney@redhat.com>
 ---
- drivers/crypto/qcom-rng.c | 22 +++++++++++-----------
- 1 file changed, 11 insertions(+), 11 deletions(-)
+ drivers/crypto/qcom-rng.c | 36 ++++++++++++++++++++----------------
+ 1 file changed, 20 insertions(+), 16 deletions(-)
 
 diff --git a/drivers/crypto/qcom-rng.c b/drivers/crypto/qcom-rng.c
-index c670d7d0c11e..4ed545001b77 100644
+index 4ed545001b77..470062cb258c 100644
 --- a/drivers/crypto/qcom-rng.c
 +++ b/drivers/crypto/qcom-rng.c
-@@ -36,14 +36,14 @@ struct qcom_rng {
- 	void __iomem *base;
- 	struct clk *clk;
- 	struct hwrng hwrng;
--	struct qcom_rng_of_data *of_data;
-+	struct qcom_rng_match_data *match_data;
+@@ -176,6 +176,21 @@ static struct rng_alg qcom_rng_alg = {
+ 	}
  };
  
- struct qcom_rng_ctx {
++static struct qcom_rng_match_data qcom_prng_match_data = {
++	.skip_init = false,
++	.hwrng_support = false,
++};
++
++static struct qcom_rng_match_data qcom_prng_ee_match_data = {
++	.skip_init = true,
++	.hwrng_support = false,
++};
++
++static struct qcom_rng_match_data qcom_trng_match_data = {
++	.skip_init = true,
++	.hwrng_support = true,
++};
++
+ static int qcom_rng_probe(struct platform_device *pdev)
+ {
  	struct qcom_rng *rng;
- };
- 
--struct qcom_rng_of_data {
-+struct qcom_rng_match_data {
- 	bool skip_init;
- 	bool hwrng_support;
- };
-@@ -155,7 +155,7 @@ static int qcom_rng_init(struct crypto_tfm *tfm)
- 
- 	ctx->rng = qcom_rng_dev;
- 
--	if (!ctx->rng->of_data->skip_init)
-+	if (!ctx->rng->match_data->skip_init)
- 		return qcom_rng_enable(ctx->rng);
- 
- 	return 0;
-@@ -196,7 +196,7 @@ static int qcom_rng_probe(struct platform_device *pdev)
+@@ -196,7 +211,11 @@ static int qcom_rng_probe(struct platform_device *pdev)
  	if (IS_ERR(rng->clk))
  		return PTR_ERR(rng->clk);
  
--	rng->of_data = (struct qcom_rng_of_data *)of_device_get_match_data(&pdev->dev);
-+	rng->match_data = (struct qcom_rng_match_data *)of_device_get_match_data(&pdev->dev);
+-	rng->match_data = (struct qcom_rng_match_data *)of_device_get_match_data(&pdev->dev);
++	if (has_acpi_companion(&pdev->dev))
++		rng->match_data = &qcom_prng_match_data;
++	else
++		rng->match_data =
++			(struct qcom_rng_match_data *)of_device_get_match_data(&pdev->dev);
  
  	qcom_rng_dev = rng;
  	ret = crypto_register_rng(&qcom_rng_alg);
-@@ -206,7 +206,7 @@ static int qcom_rng_probe(struct platform_device *pdev)
- 		return ret;
- 	}
- 
--	if (rng->of_data->hwrng_support) {
-+	if (rng->match_data->hwrng_support) {
- 		rng->hwrng.name = "qcom_hwrng";
- 		rng->hwrng.read = qcom_hwrng_read;
- 		rng->hwrng.quality = QCOM_TRNG_QUALITY;
-@@ -231,17 +231,17 @@ static void qcom_rng_remove(struct platform_device *pdev)
+@@ -231,21 +250,6 @@ static void qcom_rng_remove(struct platform_device *pdev)
  	qcom_rng_dev = NULL;
  }
  
--static struct qcom_rng_of_data qcom_prng_of_data = {
-+static struct qcom_rng_match_data qcom_prng_match_data = {
- 	.skip_init = false,
- 	.hwrng_support = false,
- };
- 
--static struct qcom_rng_of_data qcom_prng_ee_of_data = {
-+static struct qcom_rng_match_data qcom_prng_ee_match_data = {
- 	.skip_init = true,
- 	.hwrng_support = false,
- };
- 
--static struct qcom_rng_of_data qcom_trng_of_data = {
-+static struct qcom_rng_match_data qcom_trng_match_data = {
- 	.skip_init = true,
- 	.hwrng_support = true,
- };
-@@ -253,9 +253,9 @@ static const struct acpi_device_id __maybe_unused qcom_rng_acpi_match[] = {
- MODULE_DEVICE_TABLE(acpi, qcom_rng_acpi_match);
- 
- static const struct of_device_id __maybe_unused qcom_rng_of_match[] = {
--	{ .compatible = "qcom,prng", .data = &qcom_prng_of_data },
--	{ .compatible = "qcom,prng-ee", .data = &qcom_prng_ee_of_data },
--	{ .compatible = "qcom,trng", .data = &qcom_trng_of_data },
-+	{ .compatible = "qcom,prng", .data = &qcom_prng_match_data },
-+	{ .compatible = "qcom,prng-ee", .data = &qcom_prng_ee_match_data },
-+	{ .compatible = "qcom,trng", .data = &qcom_trng_match_data },
+-static struct qcom_rng_match_data qcom_prng_match_data = {
+-	.skip_init = false,
+-	.hwrng_support = false,
+-};
+-
+-static struct qcom_rng_match_data qcom_prng_ee_match_data = {
+-	.skip_init = true,
+-	.hwrng_support = false,
+-};
+-
+-static struct qcom_rng_match_data qcom_trng_match_data = {
+-	.skip_init = true,
+-	.hwrng_support = true,
+-};
+-
+ static const struct acpi_device_id __maybe_unused qcom_rng_acpi_match[] = {
+ 	{ .id = "QCOM8160", .driver_data = 1 },
  	{}
- };
- MODULE_DEVICE_TABLE(of, qcom_rng_of_match);
 -- 
 2.46.0
 
