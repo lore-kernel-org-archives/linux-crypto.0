@@ -1,68 +1,73 @@
-Received: from cavan.codon.org.uk (cavan.codon.org.uk [176.126.240.207])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1099200CB;
-	Thu, 29 Aug 2024 03:34:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.126.240.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49D781547D5;
+	Thu, 29 Aug 2024 06:26:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724902479; cv=none; b=IPIiJt5q8CP4xkKUUhQilQClBFDXSvkZ5IfrwVyplrSa2NGhH2zotVdReW7glQCOxqCfvnxcYaOohuAcdJWoIpCKLGnzgJKI9PwTkoAK32C8XeJ+AzQsMF3mCtHUuqRiEXO39TkpYgLQZcm1zawBZxMUW9K+xTIiDp/QLj+gcrk=
+	t=1724912793; cv=none; b=JfRcTEqbmp5ZX8jRFnKXSqXL/t6tYljPWilCgIGSIrbE6KWdtYOV5qOkBZLfwAj93fdVkvSZ/srJANuOSgnlXqzaaHs9NGdqg6m7o/qBQvV/jvJx+i2a/mhpAA3+teAyZeqfX2RcBCe2yQyX3dg/P6A9WDLXWAJJIZNa0XepAlw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724902479; c=relaxed/simple;
-	bh=qHdRA0U04mt92W2CO9LLoiFZR6iRhXsbHyIqb5u5k2w=;
+	s=arc-20240116; t=1724912793; c=relaxed/simple;
+	bh=X4b6JtUdMPQPMlJuLtBV2fk2oDdhcuWi2ciJPzgEQoQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Xz7bO5/MxuWbMeYjw/UMvlayDSnLWKkOF8xDWFA4IE8cR68v539ePbox/uv6X1hqDruPAxi9mMPiaubkj93eCjwGxVXtOq7/cq1hdf56DowOrQwP0zyj52VDoAwAZgcxmV7rSXnBnfztOLvCWUqhZAlj/nahQOrElChE48CAh6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=srcf.ucam.org; spf=pass smtp.mailfrom=codon.org.uk; arc=none smtp.client-ip=176.126.240.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=srcf.ucam.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codon.org.uk
-Received: by cavan.codon.org.uk (Postfix, from userid 1000)
-	id 1FEBF407E6; Thu, 29 Aug 2024 04:25:26 +0100 (BST)
-Date: Thu, 29 Aug 2024 04:25:26 +0100
-From: Matthew Garrett <mjg59@srcf.ucam.org>
-To: Andy Lutomirski <luto@amacapital.net>
-Cc: Thomas Gleixner <tglx@linutronix.de>,
-	"Daniel P. Smith" <dpsmith@apertussolutions.com>,
-	"Eric W. Biederman" <ebiederm@xmission.com>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Ross Philipson <ross.philipson@oracle.com>,
-	linux-kernel@vger.kernel.org, x86@kernel.org,
-	linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
-	linux-efi@vger.kernel.org, iommu@lists.linux-foundation.org,
-	mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-	dave.hansen@linux.intel.com, ardb@kernel.org,
-	James.Bottomley@hansenpartnership.com, peterhuewe@gmx.de,
-	jarkko@kernel.org, jgg@ziepe.ca, nivedita@alum.mit.edu,
-	herbert@gondor.apana.org.au, davem@davemloft.net, corbet@lwn.net,
-	dwmw2@infradead.org, baolu.lu@linux.intel.com,
-	kanth.ghatraju@oracle.com, andrew.cooper3@citrix.com,
-	trenchboot-devel@googlegroups.com
-Subject: Re: [PATCH v9 06/19] x86: Add early SHA-1 support for Secure Launch
- early measurements
-Message-ID: <Zs/qJsKu3StL3Wzt@srcf.ucam.org>
-References: <20240531010331.134441-1-ross.philipson@oracle.com>
- <20240531010331.134441-7-ross.philipson@oracle.com>
- <20240531021656.GA1502@sol.localdomain>
- <874jaegk8i.fsf@email.froward.int.ebiederm.org>
- <5b1ce8d3-516d-4dfd-a976-38e5cee1ef4e@apertussolutions.com>
- <87ttflli09.ffs@tglx>
- <CALCETrXQ7rChWLDqTG0+KY7rsfajSPguMnHO1G4VJi_mgwN9Zw@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=lFazORoBNWic18n0BjRbX3WsaoANasJujJcREGqE8Te1T9ypRHvm6cSeh52y5gF1mCeiNLPmHkp2YjPm5qgGHiOzfDGDok/vLkyFGNDaUrA7Puu+/rsM773Kcsk8Lh+1zGh5Cm/fMb3+Lk1VNHdDDhf55xB6tShiC/nrhVFXzFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aKxNSZcQ; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aKxNSZcQ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C979C4CEC1;
+	Thu, 29 Aug 2024 06:26:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1724912792;
+	bh=X4b6JtUdMPQPMlJuLtBV2fk2oDdhcuWi2ciJPzgEQoQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=aKxNSZcQtz4XSTWsLnqiPA98RPB5kQFA2Hv5lN4xJaOuvFqNTxIQ2jJFxb3VYaxoi
+	 GCN3KXW/d+E4uwicF3CuXFClgQAZfUM1zl49oMKnNZN12b93HK6MZrSv/LLLj78qE0
+	 ma+XslCKbnrgCdobzb2t9hGoLKa8KCi+CQiUF9ZaFFBeC0xgZDjxat/WGQAQ3llZdX
+	 EAiJkgwHLrIkDdheXjQKHqiRtL8ooZjnvoIRRg8UeHBjoAbxGQngtfwQQP1ZoEfqhS
+	 DLFXO/uqV98hlS1GAj7FD4h0qJ5k6f+pLmV7/cBoFLbiz5VtSdjhvAQWycA0Qi3Z0p
+	 Jb2AyHgmw60yA==
+Date: Thu, 29 Aug 2024 08:26:29 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Nikunj Kela <quic_nkela@quicinc.com>
+Cc: andersson@kernel.org, konradybcio@kernel.org, robh@kernel.org, 
+	krzk+dt@kernel.org, conor+dt@kernel.org, rafael@kernel.org, viresh.kumar@linaro.org, 
+	herbert@gondor.apana.org.au, davem@davemloft.net, sudeep.holla@arm.com, andi.shyti@kernel.org, 
+	tglx@linutronix.de, will@kernel.org, joro@8bytes.org, jassisinghbrar@gmail.com, 
+	lee@kernel.org, linus.walleij@linaro.org, amitk@kernel.org, 
+	thara.gopinath@gmail.com, broonie@kernel.org, wim@linux-watchdog.org, linux@roeck-us.net, 
+	robin.murphy@arm.com, cristian.marussi@arm.com, rui.zhang@intel.com, 
+	lukasz.luba@arm.com, vkoul@kernel.org, quic_gurus@quicinc.com, agross@kernel.org, 
+	bartosz.golaszewski@linaro.org, quic_rjendra@quicinc.com, robimarko@gmail.com, 
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-pm@vger.kernel.org, linux-crypto@vger.kernel.org, arm-scmi@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-i2c@vger.kernel.org, iommu@lists.linux.dev, 
+	linux-gpio@vger.kernel.org, linux-serial@vger.kernel.org, linux-spi@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, kernel@quicinc.com, quic_psodagud@quicinc.com, 
+	quic_tsoni@quicinc.com, quic_shazhuss@quicinc.com
+Subject: Re: [PATCH 01/22] dt-bindings: arm: qcom: add the SoC ID for SA8255P
+Message-ID: <vmz2tefrlti7y5boe3bx322skdndmpdqnr4tketl3ws6sibhgq@rnamodrsf5im>
+References: <20240828203721.2751904-1-quic_nkela@quicinc.com>
+ <20240828203721.2751904-2-quic_nkela@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CALCETrXQ7rChWLDqTG0+KY7rsfajSPguMnHO1G4VJi_mgwN9Zw@mail.gmail.com>
+In-Reply-To: <20240828203721.2751904-2-quic_nkela@quicinc.com>
 
-On Wed, Aug 28, 2024 at 08:17:05PM -0700, Andy Lutomirski wrote:
+On Wed, Aug 28, 2024 at 01:37:00PM -0700, Nikunj Kela wrote:
+> Add the SoC ID entry for SA8255P.
+> 
+> Signed-off-by: Nikunj Kela <quic_nkela@quicinc.com>
+> ---
+>  include/dt-bindings/arm/qcom,ids.h | 1 +
+>  1 file changed, 1 insertion(+)
 
-> Ross et al, can you confirm that your code actually, at least by
-> default and with a monstrous warning to anyone who tries to change the
-> default, caps SHA1 PCRs if SHA256 is available?  And then can we maybe
-> all stop hassling the people trying to develop this series about the
-> fact that they're doing their best with the obnoxious system that the
-> TPM designers gave them?
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-Presumably this would be dependent upon non-SHA1 banks being enabled?
+Best regards,
+Krzysztof
+
