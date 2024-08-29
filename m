@@ -1,203 +1,123 @@
-Received: from xry111.site (xry111.site [89.208.246.23])
+Received: from sender4-of-o51.zoho.com (sender4-of-o51.zoho.com [136.143.188.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A33EE1ABEAF;
-	Thu, 29 Aug 2024 14:06:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.208.246.23
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724940419; cv=none; b=TyaYu35Q+xv96Kp9e1BdAUTV1AAqSWvWsqmcII8gTICqV1g/1CuGh4YphPM+KsmfEGD1l6teOPdFoxIJnf89SbH7V7s/9pXq6OhJpikaNQq4kqu88ZwrAT5TuqBtehuyhOBkoQwdoDOiQPTIOiBQw0ChcEYZburvurKJk02yTqU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724940419; c=relaxed/simple;
-	bh=0S0yRpTpB8yDAp2PnEOxUn8pAAxSOhZjZhcRIfE3S74=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=PCzvty5W4r64kQDq+oyGygFLWgO9zkQQQVRjCflmhqoZ6gy41nUP3witi9Wi9RIylmxIIRkZTBCZ+ym7sVzMd7sdc4eZeX+q2F2fxbnvtoHZRLQVv4eUiA9xSp2t86H5eFJRU8Psv7uiLo31tK2BDovj/uBN53fpWY+Pndyy8OI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site; spf=pass smtp.mailfrom=xry111.site; dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b=RP02U9sZ; arc=none smtp.client-ip=89.208.246.23
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xry111.site
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9034E1A3BDD;
+	Thu, 29 Aug 2024 14:12:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724940747; cv=pass; b=MbqgQEZK5Xk+2D+sOpjtK2h+HFdl+0bfkj37W1K1Uds1NxXSt78iZyNW93HJ2rFrgcJzjKZMxgYrhyvsJpTZ87TKTGpadfQfoTBwhTaexdPGBv5T7SB1uCKGR37iXhBTzW/4zZHknpr67Vv3YwgMiqf/Ah8ym8wJMIiAo15+A/o=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724940747; c=relaxed/simple;
+	bh=7hB/1UOJaiqQ99Joa1DObT9nogjXVp6w2U15f4FVo3Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Lxb0veOerT8BEIzmJq9Tk7r/EASVTsWNexoWFtVdf0MxZOZfnpPtwQ+VtE1GHfeH/V3xMNoD2tNr8GuK6Y7VWRCRCJgqDLDOKK6CpYcj5wwtUJWS9N4ED2EpPwtwequwRmLlVNfxbsu3UpsA0DFVu51hnzxJ/y8gQzsIfBRX+jA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=apertussolutions.com; spf=pass smtp.mailfrom=apertussolutions.com; dkim=pass (1024-bit key) header.d=apertussolutions.com header.i=dpsmith@apertussolutions.com header.b=fRJYXpXL; arc=pass smtp.client-ip=136.143.188.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=apertussolutions.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=apertussolutions.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b="RP02U9sZ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xry111.site;
-	s=default; t=1724940414;
-	bh=0S0yRpTpB8yDAp2PnEOxUn8pAAxSOhZjZhcRIfE3S74=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=RP02U9sZkbOfdFPO8mfb67sv7a7pUPB1RkXe0tOFUw1oK+k3Pdd7QhkvEk+EuzCcm
-	 s/x0TZLUUesMrgjSZMkxhFutpEP8H8mIiqTlrxBI1cS0lc791ysBI+l/hts/fl+RmN
-	 2mqCBWCuIS1pcPcdWPZMRWCPMk0F7w5598CqkERM=
-Received: from [192.168.124.6] (unknown [113.200.174.10])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-384) server-digest SHA384)
-	(Client did not present a certificate)
-	(Authenticated sender: xry111@xry111.site)
-	by xry111.site (Postfix) with ESMTPSA id 7AD2966F26;
-	Thu, 29 Aug 2024 10:06:51 -0400 (EDT)
-Message-ID: <a3373ad5f92a4120bd0c8e0c751eb7617e035cf6.camel@xry111.site>
-Subject: Re: [PATCH v5] LoongArch: vDSO: Wire up getrandom() vDSO
- implementation
-From: Xi Ruoyao <xry111@xry111.site>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>, Tiezhu Yang
- <yangtiezhu@loongson.cn>
-Cc: Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>, 
- linux-crypto@vger.kernel.org, loongarch@lists.linux.dev, 
- linux-kernel@vger.kernel.org, Jinyang He <hejinyang@loongson.cn>, Arnd
- Bergmann <arnd@arndb.de>, Thomas Gleixner <tglx@linutronix.de>, Christophe
- Leroy <christophe.leroy@csgroup.eu>
-Date: Thu, 29 Aug 2024 22:06:47 +0800
-In-Reply-To: <ZtB5pqfp0Lg6lzz6@zx2c4.com>
-References: <20240829125656.19017-1-xry111@xry111.site>
-	 <ZtB3RczHN00XDO52@zx2c4.com> <ZtB5pqfp0Lg6lzz6@zx2c4.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.3 
+	dkim=pass (1024-bit key) header.d=apertussolutions.com header.i=dpsmith@apertussolutions.com header.b="fRJYXpXL"
+ARC-Seal: i=1; a=rsa-sha256; t=1724940676; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=E7EusWO6er6F2xI1Zxfssj17795cFIrBU9nS7H5PyLGs+6UWBCNXAkfV+JQpsvkn4X6QnDjZg59GcAbdwpZwp541+ugqTaxP6T/nv6M351s7VISQpTXJZegJ/QpLmHKW8PhIgd5ObyYNwREe1/OqSZxAHGA/WYAAlVOJLcXTMDk=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1724940676; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=HgDBKtReaNoT627XPwozc8cV/1MN4aAoTtHPOciy3pM=; 
+	b=F8+Ieta99m9Sb6grjg5r5Hse1Vt8cQANARXzRz4E2JRoFdXjGYznYWVRmMvi/k0t3GJxjfgkNXCi7mbnz93mta8ovG1WRwOCa2szi73evgpHYzIgytv1sd3soamVZ71SpJYmuyZoaySGKcb25OExw2BJMSP43syvz3OmqKbf23o=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=apertussolutions.com;
+	spf=pass  smtp.mailfrom=dpsmith@apertussolutions.com;
+	dmarc=pass header.from=<dpsmith@apertussolutions.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1724940676;
+	s=zoho; d=apertussolutions.com; i=dpsmith@apertussolutions.com;
+	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=HgDBKtReaNoT627XPwozc8cV/1MN4aAoTtHPOciy3pM=;
+	b=fRJYXpXL9J45pXy0RROxungza/op8PLpbcAgBCB2imI/b3vHv4nw02sEX8neAivz
+	PPiCX2FneFCwIi7K74vsx1xZ2NcmUIkgDl+v3rZoRF1EkHBouBvTymaYqasGUoGZL83
+	itV4OEfBmfm1uvXSAhidcGZMH/LIAtY/V/1UW3+4=
+Received: by mx.zohomail.com with SMTPS id 1724940674239491.862092879441;
+	Thu, 29 Aug 2024 07:11:14 -0700 (PDT)
+Message-ID: <e3194ad1-e976-40a6-a8f3-98081b0b07ea@apertussolutions.com>
+Date: Thu, 29 Aug 2024 10:11:11 -0400
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 01/15] x86/boot: Place kernel_info at a fixed offset
+To: Ard Biesheuvel <ardb@kernel.org>, Stuart Yoder <stuart.yoder@arm.com>
+Cc: Ross Philipson <ross.philipson@oracle.com>, linux-kernel@vger.kernel.org,
+ x86@kernel.org, linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
+ linux-efi@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+ bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com,
+ mjg59@srcf.ucam.org, James.Bottomley@hansenpartnership.com,
+ peterhuewe@gmx.de, jarkko@kernel.org, jgg@ziepe.ca, luto@amacapital.net,
+ nivedita@alum.mit.edu, herbert@gondor.apana.org.au, davem@davemloft.net,
+ kanth.ghatraju@oracle.com, trenchboot-devel@googlegroups.com
+References: <20240214221847.2066632-1-ross.philipson@oracle.com>
+ <20240214221847.2066632-2-ross.philipson@oracle.com>
+ <CAMj1kXH3Gvr3vDRLDdXuc0s7ZAQYE6+D7tmCRBjJWwWt2fn4-w@mail.gmail.com>
+ <9d01a6d2-4dd9-4331-8fc9-b01c07cfdbb5@apertussolutions.com>
+ <CAMj1kXHn6xeAskWiDLvvA4oG3j9_tqx+iMYJXMqmgvyX4pMzgg@mail.gmail.com>
+Content-Language: en-US
+From: "Daniel P. Smith" <dpsmith@apertussolutions.com>
+In-Reply-To: <CAMj1kXHn6xeAskWiDLvvA4oG3j9_tqx+iMYJXMqmgvyX4pMzgg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ZohoMailClient: External
 
-On Thu, 2024-08-29 at 15:37 +0200, Jason A. Donenfeld wrote:
-> On Thu, Aug 29, 2024 at 03:27:33PM +0200, Jason A. Donenfeld wrote:
-> > One small question just occurred to me:
-> >=20
-> > > +static __always_inline const struct vdso_rng_data *__arch_get_vdso_r=
-ng_data(
-> > > +	void)
-> > > +{
-> > > +	return (const struct vdso_rng_data *)(
-> > > +		get_vdso_data() +
-> > > +		VVAR_LOONGARCH_PAGES_START * PAGE_SIZE +
-> > > +		offsetof(struct loongarch_vdso_data, rng_data));
-> > > +}
-> >=20
-> > Did you test this in a TIMENS? On x86, I had to deal with the page
-> > offsets switching around depending on whether there was a TIMENS. I
-> > tested this in my test harness with some basic code like:
-> >=20
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (argc =3D=3D 1) {
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 if (unshare(CLONE_NEWTIME))
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 panic("unsh=
-are(CLONE_NEWTIME)");
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 if (!fork()) {
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (execl(a=
-rgv[0], argv[0], "now-in-timens"))
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 panic("execl");
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 }
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 wait(NULL);
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 poweroff();
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
-> >=20
-> > Because unlike other namespaces, the time one only becomes active after
-> > fork/exec.
-> >=20
-> > But maybe loongarch is more organized and you don't need any special
-> > handling in __arch_get_vdso...data() functions like I needed on x86.
-> > Just thought I should check.
->=20
-> Normal results:
->=20
-> =C2=A0=C2=A0 vdso: 25000000 times in 0.287330836 seconds
-> =C2=A0=C2=A0 libc: 25000000 times in 4.480710835 seconds
-> syscall: 25000000 times in 4.411098048 seconds
->=20
-> After applying
->=20
-> diff --git a/arch/x86/include/asm/vdso/getrandom.h b/arch/x86/include/asm=
-/vdso/getrandom.h
-> index ff5334ad32a0..5cb1b318ebe3 100644
-> --- a/arch/x86/include/asm/vdso/getrandom.h
-> +++ b/arch/x86/include/asm/vdso/getrandom.h
-> @@ -32,8 +32,6 @@ static __always_inline ssize_t getrandom_syscall(void *=
-buffer, size_t len, unsig
->=20
-> =C2=A0static __always_inline const struct vdso_rng_data *__arch_get_vdso_=
-rng_data(void)
-> =C2=A0{
-> -	if (IS_ENABLED(CONFIG_TIME_NS) && __vdso_data->clock_mode =3D=3D VDSO_C=
-LOCKMODE_TIMENS)
-> -		return (void *)&__vdso_rng_data + ((void *)&__timens_vdso_data - (void=
- *)&__vdso_data);
-> =C2=A0	return &__vdso_rng_data;
-> =C2=A0}
->=20
-> the results are:
->=20
-> =C2=A0=C2=A0 vdso: 25000000 times in 4.403789593 seconds
-> =C2=A0=C2=A0 libc: 25000000 times in 4.466771093 seconds
-> syscall: 25000000 times in 4.428145416 seconds
->=20
-> The difference is that when it finds the shared data in the wrong place,
-> it thinks the RNG is uninitialized, so it always falls back to the
-> syscall, hence all three times being the same.
->=20
-> If you're unsure how timens handling works on loongarch, try this test
-> yourself and see what you get.
+On 8/28/24 13:45, Ard Biesheuvel wrote:
+> (cc Stuart)
+> 
+> On Thu, 21 Mar 2024 at 15:46, Daniel P. Smith
+> <dpsmith@apertussolutions.com> wrote:
+>>
+>> Hi Ard!
+>>
+>> On 2/15/24 02:56, Ard Biesheuvel wrote:
+>>> On Wed, 14 Feb 2024 at 23:31, Ross Philipson <ross.philipson@oracle.com> wrote:
+>>>>
+>>>> From: Arvind Sankar <nivedita@alum.mit.edu>
+>>>>
+>>>> There are use cases for storing the offset of a symbol in kernel_info.
+>>>> For example, the trenchboot series [0] needs to store the offset of the
+>>>> Measured Launch Environment header in kernel_info.
+>>>>
+>>>
+>>> Why? Is this information consumed by the bootloader?
+>>
+>> Yes, the bootloader needs a standardized means to find the offset of the
+>> MLE header, which communicates a set of meta-data needed by the DCE in
+>> order to set up for and start the loaded kernel. Arm will also need to
+>> provide a similar metadata structure and alternative entry point (or a
+>> complete rewrite of the existing entry point), as the current Arm entry
+>> point is in direct conflict with Arm DRTM specification.
+>>
+> 
+> Digging up an old thread here: could you elaborate on this? What do
+> you mean by 'Arm entry point' and how does it conflict directly with
+> the Arm DRTM specification? The Linux/arm64 port predates that spec by
+> about 10 years, so I would expect the latter to take the former into
+> account. If that failed to happen, we should fix the spec while we
+> still can.
 
-$ unshare -r -T --boottime $((365*24*3600))
-# uptime
- 21:54:36 up 365 days,  5:38,  0 user,  load average: 0.05, 0.08, 2.82
-# /home/xry111/git-repos/linux/tools/testing/selftests/vDSO/vdso_test_getra=
-ndom bench-single
-   vdso: 25000000 times in 0.499528591 seconds
-   libc: 25000000 times in 6.968980040 seconds
-syscall: 25000000 times in 6.987357071 seconds
+Yes, we have been working with Stuart regarding the specification and 
+crafting a compliant implementation approach. It is still very early 
+days, we are attempting to draft a plan around the specification with no 
+physical implementation to validate against. After some discussion, the 
+concern that a separate entry point may be needed has faded and in fact 
+it likely will not be needed. As always, the devil is in the details, 
+and until we have a hardware that has implemented the specification, and 
+we attempt to light it up, we won't know what will be needed for the 
+implementation.
 
-So it seems normal in a time ns.
+In short, at this point it was determined no update to the DRTM spec is 
+needed. As hardware becomes available, and we do battle with it, Stuart 
+will be kept up to date. We will work with him to ensure any changes are 
+captured that will help reduce chances that vendors and developers do 
+not misinterpret the spec.
 
-And from a comment in arch/loongarch/include/asm/vdso/vdso.h:
-
-/*
- * The layout of vvar:
- *
- *                      high
- * +---------------------+--------------------------+
- * | loongarch vdso data | LOONGARCH_VDSO_DATA_SIZE |
- * +---------------------+--------------------------+
- * |  time-ns vdso data  |        PAGE_SIZE         |
- * +---------------------+--------------------------+
- * |  generic vdso data  |        PAGE_SIZE         |
- * +---------------------+--------------------------+
- *                      low
- */
-
-And VVAR_LOONGARCH_PAGES_START is 2:
-
-enum vvar_pages {
-    VVAR_GENERIC_PAGE_OFFSET,
-    VVAR_TIMENS_PAGE_OFFSET,
-    VVAR_LOONGARCH_PAGES_START,
-    VVAR_LOONGARCH_PAGES_END =3D VVAR_LOONGARCH_PAGES_START +
-LOONGARCH_VDSO_DATA_PAGES - 1,
-    VVAR_NR_PAGES,
-};
-
-So get_vdso_data() + VVAR_LOONGARCH_PAGES_START * PAGE_SIZE should have
-already "jumped over" the time-ns vdso data.
-
-OTOH it seems we are wasting a page if !CONFIG_TIME_NS.	Maybe:
-
-enum vvar_pages {
-    VVAR_GENERIC_PAGE_OFFSET,
-#ifdef CONFIG_TIME_NS
-    VVAR_TIMENS_PAGE_OFFSET,
-#endif
-    VVAR_LOONGARCH_PAGES_START,
-    VVAR_LOONGARCH_PAGES_END =3D VVAR_LOONGARCH_PAGES_START +
-LOONGARCH_VDSO_DATA_PAGES - 1,
-    VVAR_NR_PAGES,
-};
-
-Tiezhu: how do you think?
-
-
---=20
-Xi Ruoyao <xry111@xry111.site>
-School of Aerospace Science and Technology, Xidian University
+V/r,
+Daniel P. Smith
