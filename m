@@ -1,43 +1,48 @@
-Received: from sender4-of-o51.zoho.com (sender4-of-o51.zoho.com [136.143.188.51])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9034E1A3BDD;
-	Thu, 29 Aug 2024 14:12:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724940747; cv=pass; b=MbqgQEZK5Xk+2D+sOpjtK2h+HFdl+0bfkj37W1K1Uds1NxXSt78iZyNW93HJ2rFrgcJzjKZMxgYrhyvsJpTZ87TKTGpadfQfoTBwhTaexdPGBv5T7SB1uCKGR37iXhBTzW/4zZHknpr67Vv3YwgMiqf/Ah8ym8wJMIiAo15+A/o=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724940747; c=relaxed/simple;
-	bh=7hB/1UOJaiqQ99Joa1DObT9nogjXVp6w2U15f4FVo3Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Lxb0veOerT8BEIzmJq9Tk7r/EASVTsWNexoWFtVdf0MxZOZfnpPtwQ+VtE1GHfeH/V3xMNoD2tNr8GuK6Y7VWRCRCJgqDLDOKK6CpYcj5wwtUJWS9N4ED2EpPwtwequwRmLlVNfxbsu3UpsA0DFVu51hnzxJ/y8gQzsIfBRX+jA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=apertussolutions.com; spf=pass smtp.mailfrom=apertussolutions.com; dkim=pass (1024-bit key) header.d=apertussolutions.com header.i=dpsmith@apertussolutions.com header.b=fRJYXpXL; arc=pass smtp.client-ip=136.143.188.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=apertussolutions.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=apertussolutions.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2881C1AD9E7;
+	Thu, 29 Aug 2024 14:18:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1724941090; cv=none; b=XyVaDL6xw8Woi7ghH4f7XZJHY2hIsYXNEIEOASSiSiPt8MzY0hQ6GxBCbq9Ny3oEBpKA4LXTbjqOkUPhHhtXdeIkp5nluT9ZWN4Hmu+iQvee46lgjIyG1BTaBwCzoQQcuIG2hI/JRh8VzZvPap6AzjMgMApOCmwvfObCbUvy7k8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1724941090; c=relaxed/simple;
+	bh=t+RKO9TNWxY4HrBdBWb9BA8+VLsmoITn4UlYlIT7srY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=MfLaDi/bGUE9OU7itVdbrTB9FKBXWRxcufyA4egl4FAxlIPelyvs94Kt4jMlULYWcwUOMAt1MI4svsXSusU0JOkXlVGGTo7KKnypE+ytVGOyHq0GYlTGM8p5tZq4RD8H/jvGupoU35IW2qa/ioce9r14HcGWVvRNhXvF57sw9VU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=DKZih9YA; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=apertussolutions.com header.i=dpsmith@apertussolutions.com header.b="fRJYXpXL"
-ARC-Seal: i=1; a=rsa-sha256; t=1724940676; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=E7EusWO6er6F2xI1Zxfssj17795cFIrBU9nS7H5PyLGs+6UWBCNXAkfV+JQpsvkn4X6QnDjZg59GcAbdwpZwp541+ugqTaxP6T/nv6M351s7VISQpTXJZegJ/QpLmHKW8PhIgd5ObyYNwREe1/OqSZxAHGA/WYAAlVOJLcXTMDk=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1724940676; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=HgDBKtReaNoT627XPwozc8cV/1MN4aAoTtHPOciy3pM=; 
-	b=F8+Ieta99m9Sb6grjg5r5Hse1Vt8cQANARXzRz4E2JRoFdXjGYznYWVRmMvi/k0t3GJxjfgkNXCi7mbnz93mta8ovG1WRwOCa2szi73evgpHYzIgytv1sd3soamVZ71SpJYmuyZoaySGKcb25OExw2BJMSP43syvz3OmqKbf23o=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=apertussolutions.com;
-	spf=pass  smtp.mailfrom=dpsmith@apertussolutions.com;
-	dmarc=pass header.from=<dpsmith@apertussolutions.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1724940676;
-	s=zoho; d=apertussolutions.com; i=dpsmith@apertussolutions.com;
-	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=HgDBKtReaNoT627XPwozc8cV/1MN4aAoTtHPOciy3pM=;
-	b=fRJYXpXL9J45pXy0RROxungza/op8PLpbcAgBCB2imI/b3vHv4nw02sEX8neAivz
-	PPiCX2FneFCwIi7K74vsx1xZ2NcmUIkgDl+v3rZoRF1EkHBouBvTymaYqasGUoGZL83
-	itV4OEfBmfm1uvXSAhidcGZMH/LIAtY/V/1UW3+4=
-Received: by mx.zohomail.com with SMTPS id 1724940674239491.862092879441;
-	Thu, 29 Aug 2024 07:11:14 -0700 (PDT)
-Message-ID: <e3194ad1-e976-40a6-a8f3-98081b0b07ea@apertussolutions.com>
-Date: Thu, 29 Aug 2024 10:11:11 -0400
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="DKZih9YA"
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47T8qot9013831;
+	Thu, 29 Aug 2024 14:17:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	t+RKO9TNWxY4HrBdBWb9BA8+VLsmoITn4UlYlIT7srY=; b=DKZih9YAEWADMmXQ
+	sdVY89ixeiTr1iAWqukECdtYmZU3kK9mfKqDrNlx/2MVx07VTIMwYLUdAekmAwsY
+	idKsx1qQdliqNzMmL9RdIXevrNeCfsoOIu/ELTc56mEmrWjf8bp7ZM12e/GI96Ej
+	DaSElKuQYHRAdPzjCAJIT0bHx6RK176n9KnCyta/tsltRB8wTbcScppbSRTcVubo
+	j99yRUOew5+8MtfigQ8/CLlhRpcCeCY/3hx7u7J9A04mimYzRX4/Qhb9YlYA2RQK
+	n/OXRIp5JXMJRqhqv0LSHxthi6XoKGt/pFOZp7J5QLRmghU7c6sH5h4ksvCOZnOx
+	pIT7gw==
+Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 419pv15ejs-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 29 Aug 2024 14:17:26 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 47TEHPsx001357
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 29 Aug 2024 14:17:25 GMT
+Received: from [10.110.28.107] (10.80.80.8) by nasanex01b.na.qualcomm.com
+ (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 29 Aug
+ 2024 07:17:21 -0700
+Message-ID: <d15927f9-bd00-4e32-9c25-535c69fe56f6@quicinc.com>
+Date: Thu, 29 Aug 2024 07:17:20 -0700
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -45,79 +50,76 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v8 01/15] x86/boot: Place kernel_info at a fixed offset
-To: Ard Biesheuvel <ardb@kernel.org>, Stuart Yoder <stuart.yoder@arm.com>
-Cc: Ross Philipson <ross.philipson@oracle.com>, linux-kernel@vger.kernel.org,
- x86@kernel.org, linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
- linux-efi@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
- bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com,
- mjg59@srcf.ucam.org, James.Bottomley@hansenpartnership.com,
- peterhuewe@gmx.de, jarkko@kernel.org, jgg@ziepe.ca, luto@amacapital.net,
- nivedita@alum.mit.edu, herbert@gondor.apana.org.au, davem@davemloft.net,
- kanth.ghatraju@oracle.com, trenchboot-devel@googlegroups.com
-References: <20240214221847.2066632-1-ross.philipson@oracle.com>
- <20240214221847.2066632-2-ross.philipson@oracle.com>
- <CAMj1kXH3Gvr3vDRLDdXuc0s7ZAQYE6+D7tmCRBjJWwWt2fn4-w@mail.gmail.com>
- <9d01a6d2-4dd9-4331-8fc9-b01c07cfdbb5@apertussolutions.com>
- <CAMj1kXHn6xeAskWiDLvvA4oG3j9_tqx+iMYJXMqmgvyX4pMzgg@mail.gmail.com>
+Subject: Re: [PATCH 11/22] pinctrl: qcom: sa8775p: Add support for SA8255p SoC
+To: Krzysztof Kozlowski <krzk@kernel.org>
+CC: <andersson@kernel.org>, <konradybcio@kernel.org>, <robh@kernel.org>,
+        <krzk+dt@kernel.org>, <conor+dt@kernel.org>, <rafael@kernel.org>,
+        <viresh.kumar@linaro.org>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>, <sudeep.holla@arm.com>, <andi.shyti@kernel.org>,
+        <tglx@linutronix.de>, <will@kernel.org>, <joro@8bytes.org>,
+        <jassisinghbrar@gmail.com>, <lee@kernel.org>,
+        <linus.walleij@linaro.org>, <amitk@kernel.org>,
+        <thara.gopinath@gmail.com>, <broonie@kernel.org>,
+        <wim@linux-watchdog.org>, <linux@roeck-us.net>, <robin.murphy@arm.com>,
+        <cristian.marussi@arm.com>, <rui.zhang@intel.com>,
+        <lukasz.luba@arm.com>, <vkoul@kernel.org>, <quic_gurus@quicinc.com>,
+        <agross@kernel.org>, <bartosz.golaszewski@linaro.org>,
+        <quic_rjendra@quicinc.com>, <robimarko@gmail.com>,
+        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-pm@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <arm-scmi@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-i2c@vger.kernel.org>,
+        <iommu@lists.linux.dev>, <linux-gpio@vger.kernel.org>,
+        <linux-serial@vger.kernel.org>, <linux-spi@vger.kernel.org>,
+        <linux-watchdog@vger.kernel.org>, <kernel@quicinc.com>,
+        <quic_psodagud@quicinc.com>, <quic_tsoni@quicinc.com>,
+        <quic_shazhuss@quicinc.com>
+References: <20240828203721.2751904-1-quic_nkela@quicinc.com>
+ <20240828203721.2751904-12-quic_nkela@quicinc.com>
+ <erlzqkxrogk24ugfahfsxrramay6tfhljnxrcfcuhe24pla7k3@lytnz3kmszyj>
 Content-Language: en-US
-From: "Daniel P. Smith" <dpsmith@apertussolutions.com>
-In-Reply-To: <CAMj1kXHn6xeAskWiDLvvA4oG3j9_tqx+iMYJXMqmgvyX4pMzgg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Nikunj Kela <quic_nkela@quicinc.com>
+In-Reply-To: <erlzqkxrogk24ugfahfsxrramay6tfhljnxrcfcuhe24pla7k3@lytnz3kmszyj>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-X-ZohoMailClient: External
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 5ZcCT-ksT85jhXv9aplZcsONon_gYS75
+X-Proofpoint-ORIG-GUID: 5ZcCT-ksT85jhXv9aplZcsONon_gYS75
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-29_03,2024-08-29_02,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ suspectscore=0 clxscore=1011 lowpriorityscore=0 mlxscore=0 bulkscore=0
+ mlxlogscore=999 impostorscore=0 malwarescore=0 spamscore=0 phishscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2408290098
 
-On 8/28/24 13:45, Ard Biesheuvel wrote:
-> (cc Stuart)
-> 
-> On Thu, 21 Mar 2024 at 15:46, Daniel P. Smith
-> <dpsmith@apertussolutions.com> wrote:
->>
->> Hi Ard!
->>
->> On 2/15/24 02:56, Ard Biesheuvel wrote:
->>> On Wed, 14 Feb 2024 at 23:31, Ross Philipson <ross.philipson@oracle.com> wrote:
->>>>
->>>> From: Arvind Sankar <nivedita@alum.mit.edu>
->>>>
->>>> There are use cases for storing the offset of a symbol in kernel_info.
->>>> For example, the trenchboot series [0] needs to store the offset of the
->>>> Measured Launch Environment header in kernel_info.
->>>>
->>>
->>> Why? Is this information consumed by the bootloader?
->>
->> Yes, the bootloader needs a standardized means to find the offset of the
->> MLE header, which communicates a set of meta-data needed by the DCE in
->> order to set up for and start the loaded kernel. Arm will also need to
->> provide a similar metadata structure and alternative entry point (or a
->> complete rewrite of the existing entry point), as the current Arm entry
->> point is in direct conflict with Arm DRTM specification.
->>
-> 
-> Digging up an old thread here: could you elaborate on this? What do
-> you mean by 'Arm entry point' and how does it conflict directly with
-> the Arm DRTM specification? The Linux/arm64 port predates that spec by
-> about 10 years, so I would expect the latter to take the former into
-> account. If that failed to happen, we should fix the spec while we
-> still can.
 
-Yes, we have been working with Stuart regarding the specification and 
-crafting a compliant implementation approach. It is still very early 
-days, we are attempting to draft a plan around the specification with no 
-physical implementation to validate against. After some discussion, the 
-concern that a separate entry point may be needed has faded and in fact 
-it likely will not be needed. As always, the devil is in the details, 
-and until we have a hardware that has implemented the specification, and 
-we attempt to light it up, we won't know what will be needed for the 
-implementation.
+On 8/29/2024 12:29 AM, Krzysztof Kozlowski wrote:
+> On Wed, Aug 28, 2024 at 01:37:10PM -0700, Nikunj Kela wrote:
+>> SA8255p platform uses the same TLMM block as used in SA8775p,
+>> though the pins are split between Firmware VM and Linux VM.
+>> let's add SA8255p specific compatible.
+> The change suggests devices are fully compatible, but above description
+> does not.
+>
+> This looks conflicting.
+>
+> Best regards,
+> Krzysztof
 
-In short, at this point it was determined no update to the DRTM spec is 
-needed. As hardware becomes available, and we do battle with it, Stuart 
-will be kept up to date. We will work with him to ensure any changes are 
-captured that will help reduce chances that vendors and developers do 
-not misinterpret the spec.
+Hi Krzysztof,
 
-V/r,
-Daniel P. Smith
+Thanks for reviewing patches. TLMM HW block is exactly same as used in
+SA8775p however ownership of pins can be split between firmware VM and
+Linux VM. It is upto devices to decide what pins they want to use in
+what VM. I will extend the subject with same description as used in DT
+binding.
+
+Regards,
+
+-Nikunj
+
