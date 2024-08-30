@@ -1,44 +1,33 @@
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA66E175D27;
-	Fri, 30 Aug 2024 09:39:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51AE91531CD;
+	Fri, 30 Aug 2024 09:51:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725010792; cv=none; b=ANH2EpT5w15S474PMrN72CSD3tg8ud20cj0zjyzcnUqFc1gxh1y/coivFKqYEtjOBpmXQMTs2QabhefOOSu3uMHJPGECJxe0wIYTLfqRWQw/MY6wig9dq7qEh9X8Bd2aAtfozXDhksf2IEGjNStpRc7yyAu8MdibdO185hUOU+M=
+	t=1725011500; cv=none; b=kqgj/fmkmyCMtMA7fvjxPFD9NwpF42GYq0692v6/VicGceMPphlzJfXkSNDkgBOlnCJ/wmXk1FfNfrwMGCWO/9NqSDQWxg5EswDNaEy9fUHphF/l9uXXK1evBOgB+5duMr1HyOWYZmFa6StplkwKzDh8Tto+B0XPNGxk++1USR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725010792; c=relaxed/simple;
-	bh=o0yYZ0uZJuZZrRbQjwzbrRKCA3xl6coF8rB7q0b1M+g=;
-	h=Content-Type:Message-ID:Date:MIME-Version:To:Cc:References:
-	 Subject:From:In-Reply-To; b=rPseU6QOSeERu0TJAzff8l2ZXABAzU54581dQZx0/dN6qoSA3Swfdcy1CP/yp29OeheYVq9WbCXN15iMDK6WsLjG6mVgFLEPWTR06UxIAVQ4sv4PEQXfDw6wU0H2OBr9taJBoJIYo/FT6n25aqghul0Ry5V/LH6f9AFw8y491n4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: c41a8acc66b311efa216b1d71e6e1362-20240830
-X-QC-Scan-Result: 0
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.38,REQID:a37ee11d-aacd-4c51-9184-840419c2f200,IP:20,
-	URL:0,TC:0,Content:6,EDM:0,RT:0,SF:-5,FILE:5,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:26
-X-CID-INFO: VERSION:1.1.38,REQID:a37ee11d-aacd-4c51-9184-840419c2f200,IP:20,UR
-	L:0,TC:0,Content:6,EDM:0,RT:0,SF:-5,FILE:5,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:26
-X-CID-META: VersionHash:82c5f88,CLOUDID:0e8cc27e3b5adbe4bb1b4b57d23951a4,BulkI
-	D:2408301739375WJW0VBU,BulkQuantity:0,Recheck:0,SF:66|23|17|19|43|74|102,T
-	C:nil,Content:4|-5,EDM:-3,IP:-2,URL:0,File:2,RT:nil,Bulk:nil,QS:0,BEC:nil,
-	COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD
-X-UUID: c41a8acc66b311efa216b1d71e6e1362-20240830
-X-User: zhaomengmeng@kylinos.cn
-Received: from [192.168.109.86] [(123.53.36.118)] by mailgw.kylinos.cn
-	(envelope-from <zhaomengmeng@kylinos.cn>)
-	(Generic MTA with TLSv1.3 TLS_AES_128_GCM_SHA256 128/128)
-	with ESMTP id 1864003786; Fri, 30 Aug 2024 17:39:34 +0800
-Content-Type: multipart/mixed; boundary="------------WzrG2UVkCJipirGvg7B7lk4H"
-Message-ID: <f388d965-84f4-44ac-b95d-26b2ecc4b1d9@kylinos.cn>
-Date: Fri, 30 Aug 2024 17:39:10 +0800
+	s=arc-20240116; t=1725011500; c=relaxed/simple;
+	bh=NDukMRi0OurMDQvb5Qn4QuwFUZUeJJQIQoFalgKICzI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=h1pm6g9KKFmLKPAK422LO1MB6gKcsUfBgnzNfoWgcj0zJnSsIbqgb+/QZcEYkgjRTfEU8biR2OxwxU4DZxlw8k4ElzKDekExeCQ06SmGHC8EiuhO4e1UtKfTbiffVbBEOchyEKIS9pTnURVyq8zpCZBElR4caWqWfrAQuKH1djM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jICfdczX; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jICfdczX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 981B9C4CEC2;
+	Fri, 30 Aug 2024 09:51:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725011499;
+	bh=NDukMRi0OurMDQvb5Qn4QuwFUZUeJJQIQoFalgKICzI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=jICfdczXbXRdkEcM9Xcn4s8UALWsaTcW+IxWBMT057MQ09wJVZduiDaJVbGZoks9I
+	 S5Iw6ni1FK8QoyFwfn2TarwefKowsrASoq1u2Gz5Dmf4AVVtMfF3u/1QYP7mMiWDyG
+	 FvSNza0qF9lYEVEsk9Um162KDVu2Zzue5dp1rqws5KLWyj1w+d63Bbg88CGdSnJr8T
+	 r2pmxgVPrAOxoSSzJOsodyUEp4psJVqEW2PPPTRiYwuPRjhu9uqqvU63u81uN7NIzD
+	 8ViVemtWP21Zqmcw0IkAmjyF+GeGqXNasiXqm6oQFCr+yPTvXUmTNuaZKvy3exh10e
+	 WPLYsJFx+M3lQ==
+Message-ID: <095f5048-5c39-438d-b5a9-7519199a8e9f@kernel.org>
+Date: Fri, 30 Aug 2024 11:51:20 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -46,133 +35,167 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-To: syzbot+02341e0daa42a15ce130@syzkaller.appspotmail.com
-Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
- syzkaller-bugs@googlegroups.com
-References: <000000000000320db40620d976af@google.com>
-Subject: Re: [syzbot] [crypto?] KMSAN: uninit-value in lzo1x_1_do_compress (3)
-From: Zhao Mengmeng <zhaomengmeng@kylinos.cn>
-In-Reply-To: <000000000000320db40620d976af@google.com>
-
-This is a multi-part message in MIME format.
---------------WzrG2UVkCJipirGvg7B7lk4H
+Subject: Re: [PATCH 22/22] arm64: dts: qcom: Add reduced functional DT for
+ SA8255p Ride platform
+To: Nikunj Kela <quic_nkela@quicinc.com>, andersson@kernel.org,
+ konradybcio@kernel.org, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, rafael@kernel.org, viresh.kumar@linaro.org,
+ herbert@gondor.apana.org.au, davem@davemloft.net, sudeep.holla@arm.com,
+ andi.shyti@kernel.org, tglx@linutronix.de, will@kernel.org, joro@8bytes.org,
+ jassisinghbrar@gmail.com, lee@kernel.org, linus.walleij@linaro.org,
+ amitk@kernel.org, thara.gopinath@gmail.com, broonie@kernel.org,
+ wim@linux-watchdog.org, linux@roeck-us.net
+Cc: robin.murphy@arm.com, cristian.marussi@arm.com, rui.zhang@intel.com,
+ lukasz.luba@arm.com, vkoul@kernel.org, quic_gurus@quicinc.com,
+ agross@kernel.org, bartosz.golaszewski@linaro.org, quic_rjendra@quicinc.com,
+ robimarko@gmail.com, linux-arm-msm@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-pm@vger.kernel.org, linux-crypto@vger.kernel.org,
+ arm-scmi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-i2c@vger.kernel.org, iommu@lists.linux.dev,
+ linux-gpio@vger.kernel.org, linux-serial@vger.kernel.org,
+ linux-spi@vger.kernel.org, linux-watchdog@vger.kernel.org,
+ kernel@quicinc.com, quic_psodagud@quicinc.com, quic_tsoni@quicinc.com,
+ quic_shazhuss@quicinc.com
+References: <20240828203721.2751904-1-quic_nkela@quicinc.com>
+ <20240828203721.2751904-23-quic_nkela@quicinc.com>
+ <746be896-8798-44b0-aa86-e77cf34655e1@kernel.org>
+ <57eee144-cdc4-48e7-838b-103cda6ec1dd@quicinc.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <57eee144-cdc4-48e7-838b-103cda6ec1dd@quicinc.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-#syz test
---------------WzrG2UVkCJipirGvg7B7lk4H
-Content-Type: text/x-patch; charset=UTF-8;
- name="0001-jfs-Fix-uninit-value-access-of-new_ea-in-ea_buffer.patch"
-Content-Disposition: attachment;
- filename*0="0001-jfs-Fix-uninit-value-access-of-new_ea-in-ea_buffer.patc";
- filename*1="h"
-Content-Transfer-Encoding: base64
+On 29/08/2024 21:06, Nikunj Kela wrote:
+> 
+> On 8/29/2024 12:49 AM, Krzysztof Kozlowski wrote:
+>> On 28/08/2024 22:37, Nikunj Kela wrote:
+>>> SA8255p Ride platform is an automotive virtual platform. This platform
+>>> abstracts resources such as clocks, regulators etc. in the firmware VM.
+>>> The device drivers request resources operations over SCMI using power,
+>>> performance, reset and sensor protocols.
+>>>
+>>> Multiple virtual SCMI instances are being employed for greater parallelism.
+>>> These instances are tied to devices such that devices can have dedicated
+>>> SCMI channel. Firmware VM (runs SCMI platform stack) is SMP enabled and
+>>> can process requests from agents in parallel. Qualcomm smc transport is
+>>> used for communication between SCMI agent and platform.
+>>>
+>>> Let's add the reduced functional support for SA8255p Ride board.
+>>> Subsequently, the support for PCIe, USB, UFS, Ethernet will be added.
+>>>
+>>> Co-developed-by: Shazad Hussain <quic_shazhuss@quicinc.com>
+>>> Signed-off-by: Shazad Hussain <quic_shazhuss@quicinc.com>
+>>> Signed-off-by: Nikunj Kela <quic_nkela@quicinc.com>
+>>> ---
+>>>  arch/arm64/boot/dts/qcom/Makefile           |    1 +
+>>>  arch/arm64/boot/dts/qcom/sa8255p-pmics.dtsi |   80 +
+>>>  arch/arm64/boot/dts/qcom/sa8255p-ride.dts   |  149 ++
+>>>  arch/arm64/boot/dts/qcom/sa8255p-scmi.dtsi  | 2312 ++++++++++++++++++
+>>>  arch/arm64/boot/dts/qcom/sa8255p.dtsi       | 2405 +++++++++++++++++++
+>>>  5 files changed, 4947 insertions(+)
+>>>  create mode 100644 arch/arm64/boot/dts/qcom/sa8255p-pmics.dtsi
+>>>  create mode 100644 arch/arm64/boot/dts/qcom/sa8255p-ride.dts
+>>>  create mode 100644 arch/arm64/boot/dts/qcom/sa8255p-scmi.dtsi
+>>>  create mode 100644 arch/arm64/boot/dts/qcom/sa8255p.dtsi
+>>>
+>> ...
+>>
+>>> diff --git a/arch/arm64/boot/dts/qcom/sa8255p-ride.dts b/arch/arm64/boot/dts/qcom/sa8255p-ride.dts
+>>> new file mode 100644
+>>> index 000000000000..1dc03051ad92
+>>> --- /dev/null
+>>> +++ b/arch/arm64/boot/dts/qcom/sa8255p-ride.dts
+>>> @@ -0,0 +1,149 @@
+>>> +// SPDX-License-Identifier: BSD-3-Clause
+>>> +/*
+>>> + * Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
+>>> + */
+>>> +
+>>> +/dts-v1/;
+>>> +
+>>> +#include <dt-bindings/gpio/gpio.h>
+>>> +
+>>> +#include "sa8255p.dtsi"
+>>> +#include "sa8255p-pmics.dtsi"
+>>> +#include "sa8255p-scmi.dtsi"
+>>> +
+>>> +/ {
+>>> +	model = "Qualcomm Technologies, Inc. SA8255P Ride";
+>>> +	compatible = "qcom,sa8255p-ride", "qcom,sa8255p";
+>>> +
+>>> +	aliases {
+>>> +		i2c11 = &i2c11;
+>>> +		i2c18 = &i2c18;
+>>> +		serial0 = &uart10;
+>>> +		serial1 = &uart4;
+>>> +		spi16 = &spi16;
+>>> +		scmichannels = &scmichannels;
+>> Nothing parses this.
+>>
+> We are using this alias in bootloader to speed up the parsing. Since we
 
-RnJvbSA0NTI1NDU4NTM4ZmY1ZTVhNDMxNWZjODVhYzQ5NWFkY2I2MmU3NzI0IE1vbiBTZXAg
-MTcgMDA6MDA6MDAgMjAwMQpGcm9tOiBaaGFvIE1lbmdtZW5nIDx6aGFvbWVuZ21lbmdAa3ls
-aW5vcy5jbj4KRGF0ZTogRnJpLCAzMCBBdWcgMjAyNCAxNzoxNjozOSArMDgwMApTdWJqZWN0
-OiBbUEFUQ0hdIGpmczogRml4IHVuaW5pdC12YWx1ZSBhY2Nlc3Mgb2YgbmV3X2VhIGluIGVh
-X2J1ZmZlcgoKc3l6Ym90IHJlcG9ydHMgdGhhdCBsem8xeF8xX2RvX2NvbXByZXNzIGlzIHVz
-aW5nIHVuaW5pdC12YWx1ZToKCj09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09CkJVRzogS01TQU46IHVuaW5pdC12YWx1ZSBpbiBsem8xeF8x
-X2RvX2NvbXByZXNzKzB4MTlmOS8weDI1MTAgbGliL2x6by9sem8xeF9jb21wcmVzcy5jOjE3
-OAogbHpvMXhfMV9kb19jb21wcmVzcysweDE5ZjkvMHgyNTEwIGxpYi9sem8vbHpvMXhfY29t
-cHJlc3MuYzoxNzgKIGx6b2dlbmVyaWMxeF8xX2NvbXByZXNzKzB4MjZhLzB4MTFiMCBsaWIv
-bHpvL2x6bzF4X2NvbXByZXNzLmM6MzMzCiBsem8xeF8xX2NvbXByZXNzKzB4NDcvMHg4MCBs
-aWIvbHpvL2x6bzF4X2NvbXByZXNzLmM6MzgzCiBfX2x6b19jb21wcmVzcyBjcnlwdG8vbHpv
-LmM6NTggW2lubGluZV0KIGx6b19zY29tcHJlc3MrMHg5OC8weDE4MCBjcnlwdG8vbHpvLmM6
-NzkKIHNjb21wX2Fjb21wX2NvbXBfZGVjb21wKzB4N2M2LzB4YjkwCiBzY29tcF9hY29tcF9j
-b21wcmVzcysweDMyLzB4NDAgY3J5cHRvL3Njb21wcmVzcy5jOjE4NwogY3J5cHRvX2Fjb21w
-X2NvbXByZXNzIGluY2x1ZGUvY3J5cHRvL2Fjb21wcmVzcy5oOjI1MSBbaW5saW5lXQogenN3
-YXBfY29tcHJlc3MrMHgzNjgvMHhhZDAgbW0venN3YXAuYzo5MjcKIHpzd2FwX3N0b3JlKzB4
-MWFmMy8weDJkZDAgbW0venN3YXAuYzoxNDU5CiBzd2FwX3dyaXRlcGFnZSsweDExZi8weDQ3
-MCBtbS9wYWdlX2lvLmM6MTk4CiBzaG1lbV93cml0ZXBhZ2UrMHgxYTc1LzB4MWY3MCBtbS9z
-aG1lbS5jOjE1MzYKIHBhZ2VvdXQgbW0vdm1zY2FuLmM6NjgwIFtpbmxpbmVdCiBzaHJpbmtf
-Zm9saW9fbGlzdCsweDU3N2YvMHg3Y2IwIG1tL3Ztc2Nhbi5jOjEzNjAKIGV2aWN0X2ZvbGlv
-cysweDliY2UvMHhiYzgwIG1tL3Ztc2Nhbi5jOjQ1ODAKIHRyeV90b19zaHJpbmtfbHJ1dmVj
-KzB4MTNhMy8weDE3NTAgbW0vdm1zY2FuLmM6NDc3NQogc2hyaW5rX29uZSsweDY0Ni8weGQy
-MCBtbS92bXNjYW4uYzo0ODEzCiBzaHJpbmtfbWFueSBtbS92bXNjYW4uYzo0ODc2IFtpbmxp
-bmVdCiBscnVfZ2VuX3Nocmlua19ub2RlIG1tL3Ztc2Nhbi5jOjQ5NTQgW2lubGluZV0KIHNo
-cmlua19ub2RlKzB4NDUxYS8weDUwZjAgbW0vdm1zY2FuLmM6NTkzNAoga3N3YXBkX3Nocmlu
-a19ub2RlIG1tL3Ztc2Nhbi5jOjY3NjIgW2lubGluZV0KIGJhbGFuY2VfcGdkYXQgbW0vdm1z
-Y2FuLmM6Njk1NCBbaW5saW5lXQoga3N3YXBkKzB4MjU3ZS8weDQyOTAgbW0vdm1zY2FuLmM6
-NzIyMwoga3RocmVhZCsweDNkZC8weDU0MCBrZXJuZWwva3RocmVhZC5jOjM4OQogcmV0X2Zy
-b21fZm9yaysweDZkLzB4OTAgYXJjaC94ODYva2VybmVsL3Byb2Nlc3MuYzoxNDcKIHJldF9m
-cm9tX2ZvcmtfYXNtKzB4MWEvMHgzMCBhcmNoL3g4Ni9lbnRyeS9lbnRyeV82NC5TOjI0NAoK
-VW5pbml0IHdhcyBzdG9yZWQgdG8gbWVtb3J5IGF0OgogbWVtY3B5X2Zyb21faXRlciBsaWIv
-aW92X2l0ZXIuYzo3MyBbaW5saW5lXQogaXRlcmF0ZV9idmVjIGluY2x1ZGUvbGludXgvaW92
-X2l0ZXIuaDoxMjIgW2lubGluZV0KIGl0ZXJhdGVfYW5kX2FkdmFuY2UyIGluY2x1ZGUvbGlu
-dXgvaW92X2l0ZXIuaDoyNDkgW2lubGluZV0KIGl0ZXJhdGVfYW5kX2FkdmFuY2UgaW5jbHVk
-ZS9saW51eC9pb3ZfaXRlci5oOjI3MSBbaW5saW5lXQogX19jb3B5X2Zyb21faXRlciBsaWIv
-aW92X2l0ZXIuYzoyNDkgW2lubGluZV0KIGNvcHlfcGFnZV9mcm9tX2l0ZXJfYXRvbWljKzB4
-MTJiYi8weDJhZTAgbGliL2lvdl9pdGVyLmM6NDgxCiBjb3B5X2ZvbGlvX2Zyb21faXRlcl9h
-dG9taWMgaW5jbHVkZS9saW51eC91aW8uaDoxODYgW2lubGluZV0KIGdlbmVyaWNfcGVyZm9y
-bV93cml0ZSsweDg5Ni8weDEyZTAgbW0vZmlsZW1hcC5jOjQwMzIKIHNobWVtX2ZpbGVfd3Jp
-dGVfaXRlcisweDJiZC8weDJmMCBtbS9zaG1lbS5jOjMwNzQKIGRvX2l0ZXJfcmVhZHZfd3Jp
-dGV2KzB4OGExLzB4YTQwCiB2ZnNfaXRlcl93cml0ZSsweDQ1OS8weGQ1MCBmcy9yZWFkX3dy
-aXRlLmM6ODk1CiBsb193cml0ZV9idmVjIGRyaXZlcnMvYmxvY2svbG9vcC5jOjI0MyBbaW5s
-aW5lXQogbG9fd3JpdGVfc2ltcGxlIGRyaXZlcnMvYmxvY2svbG9vcC5jOjI2NCBbaW5saW5l
-XQogZG9fcmVxX2ZpbGViYWNrZWQgZHJpdmVycy9ibG9jay9sb29wLmM6NTExIFtpbmxpbmVd
-CiBsb29wX2hhbmRsZV9jbWQgZHJpdmVycy9ibG9jay9sb29wLmM6MTkxMCBbaW5saW5lXQog
-bG9vcF9wcm9jZXNzX3dvcmsrMHgxNWVjLzB4Mzc1MCBkcml2ZXJzL2Jsb2NrL2xvb3AuYzox
-OTQ1CiBsb29wX3Jvb3RjZ193b3JrZm4rMHgyYi8weDQwIGRyaXZlcnMvYmxvY2svbG9vcC5j
-OjE5NzYKIHByb2Nlc3Nfb25lX3dvcmsga2VybmVsL3dvcmtxdWV1ZS5jOjMyMzEgW2lubGlu
-ZV0KIHByb2Nlc3Nfc2NoZWR1bGVkX3dvcmtzKzB4YWUwLzB4MWM0MCBrZXJuZWwvd29ya3F1
-ZXVlLmM6MzMxMgogd29ya2VyX3RocmVhZCsweGVhNy8weDE0ZDAga2VybmVsL3dvcmtxdWV1
-ZS5jOjMzODkKIGt0aHJlYWQrMHgzZGQvMHg1NDAga2VybmVsL2t0aHJlYWQuYzozODkKIHJl
-dF9mcm9tX2ZvcmsrMHg2ZC8weDkwIGFyY2gveDg2L2tlcm5lbC9wcm9jZXNzLmM6MTQ3CiBy
-ZXRfZnJvbV9mb3JrX2FzbSsweDFhLzB4MzAgYXJjaC94ODYvZW50cnkvZW50cnlfNjQuUzoy
-NDQKClVuaW5pdCB3YXMgc3RvcmVkIHRvIG1lbW9yeSBhdDoKIGNvcHlfdG9fZGlub2RlKzB4
-ODgxLzB4YjMwIGZzL2pmcy9qZnNfaW1hcC5jOjMxNTgKIGRpV3JpdGUrMHgxYmY1LzB4MWYw
-MCBmcy9qZnMvamZzX2ltYXAuYzo3OTAKIHR4Q29tbWl0KzB4ZGI4LzB4OGNkMCBmcy9qZnMv
-amZzX3R4bm1nci5jOjEyNTUKIF9famZzX3hhdHRyX3NldCsweDFiNy8weDFmMCBmcy9qZnMv
-eGF0dHIuYzo5MzYKIGpmc194YXR0cl9zZXQrMHg3OS8weDkwIGZzL2pmcy94YXR0ci5jOjk1
-OAogX192ZnNfc2V0eGF0dHIrMHg4NDQvMHg4YjAgZnMveGF0dHIuYzoyMDAKIF9fdmZzX3Nl
-dHhhdHRyX25vcGVybSsweDIyZi8weGIwMCBmcy94YXR0ci5jOjIzNAogX192ZnNfc2V0eGF0
-dHJfbG9ja2VkKzB4NDQxLzB4NDgwIGZzL3hhdHRyLmM6Mjk1CiB2ZnNfc2V0eGF0dHIrMHgy
-OTQvMHg2NTAgZnMveGF0dHIuYzozMjEKIGRvX3NldHhhdHRyIGZzL3hhdHRyLmM6NjI5IFtp
-bmxpbmVdCiBfX2RvX3N5c19mc2V0eGF0dHIgZnMveGF0dHIuYzo3MTAgW2lubGluZV0KIF9f
-c2Vfc3lzX2ZzZXR4YXR0cisweDdmMC8weDk4MCBmcy94YXR0ci5jOjY4NgogX194NjRfc3lz
-X2ZzZXR4YXR0cisweGU0LzB4MTUwIGZzL3hhdHRyLmM6Njg2CiB4NjRfc3lzX2NhbGwrMHgx
-OWMzLzB4M2JhMCBhcmNoL3g4Ni9pbmNsdWRlL2dlbmVyYXRlZC9hc20vc3lzY2FsbHNfNjQu
-aDoxOTEKIGRvX3N5c2NhbGxfeDY0IGFyY2gveDg2L2VudHJ5L2NvbW1vbi5jOjUyIFtpbmxp
-bmVdCiBkb19zeXNjYWxsXzY0KzB4Y2QvMHgxZTAgYXJjaC94ODYvZW50cnkvY29tbW9uLmM6
-ODMKIGVudHJ5X1NZU0NBTExfNjRfYWZ0ZXJfaHdmcmFtZSsweDc3LzB4N2YKClVuaW5pdCB3
-YXMgc3RvcmVkIHRvIG1lbW9yeSBhdDoKIGVhX3B1dCBmcy9qZnMveGF0dHIuYzo2MzkgW2lu
-bGluZV0KIF9famZzX3NldHhhdHRyKzB4MTg1Zi8weDFhZTAgZnMvamZzL3hhdHRyLmM6Nzg1
-CiBfX2pmc194YXR0cl9zZXQrMHhlNi8weDFmMCBmcy9qZnMveGF0dHIuYzo5MzQKIGpmc194
-YXR0cl9zZXQrMHg3OS8weDkwIGZzL2pmcy94YXR0ci5jOjk1OAogX192ZnNfc2V0eGF0dHIr
-MHg4NDQvMHg4YjAgZnMveGF0dHIuYzoyMDAKIF9fdmZzX3NldHhhdHRyX25vcGVybSsweDIy
-Zi8weGIwMCBmcy94YXR0ci5jOjIzNAogX192ZnNfc2V0eGF0dHJfbG9ja2VkKzB4NDQxLzB4
-NDgwIGZzL3hhdHRyLmM6Mjk1CiB2ZnNfc2V0eGF0dHIrMHgyOTQvMHg2NTAgZnMveGF0dHIu
-YzozMjEKIGRvX3NldHhhdHRyIGZzL3hhdHRyLmM6NjI5IFtpbmxpbmVdCiBfX2RvX3N5c19m
-c2V0eGF0dHIgZnMveGF0dHIuYzo3MTAgW2lubGluZV0KIF9fc2Vfc3lzX2ZzZXR4YXR0cisw
-eDdmMC8weDk4MCBmcy94YXR0ci5jOjY4NgogX194NjRfc3lzX2ZzZXR4YXR0cisweGU0LzB4
-MTUwIGZzL3hhdHRyLmM6Njg2CiB4NjRfc3lzX2NhbGwrMHgxOWMzLzB4M2JhMCBhcmNoL3g4
-Ni9pbmNsdWRlL2dlbmVyYXRlZC9hc20vc3lzY2FsbHNfNjQuaDoxOTEKIGRvX3N5c2NhbGxf
-eDY0IGFyY2gveDg2L2VudHJ5L2NvbW1vbi5jOjUyIFtpbmxpbmVdCiBkb19zeXNjYWxsXzY0
-KzB4Y2QvMHgxZTAgYXJjaC94ODYvZW50cnkvY29tbW9uLmM6ODMKIGVudHJ5X1NZU0NBTExf
-NjRfYWZ0ZXJfaHdmcmFtZSsweDc3LzB4N2YKCkxvY2FsIHZhcmlhYmxlIGVhX2J1ZiBjcmVh
-dGVkIGF0OgogX19qZnNfc2V0eGF0dHIrMHg1ZC8weDFhZTAgZnMvamZzL3hhdHRyLmM6NjYy
-CiBfX2pmc194YXR0cl9zZXQrMHhlNi8weDFmMCBmcy9qZnMveGF0dHIuYzo5MzQKCkNQVTog
-MCBVSUQ6IDAgUElEOiA4MSBDb21tOiBrc3dhcGQwIFRhaW50ZWQ6IEcgICAgICAgIFcgICAg
-ICAgICAgNi4xMS4wLXJjNS1zeXprYWxsZXIgIzAKVGFpbnRlZDogW1ddPVdBUk4KSGFyZHdh
-cmUgbmFtZTogR29vZ2xlIEdvb2dsZSBDb21wdXRlIEVuZ2luZS9Hb29nbGUgQ29tcHV0ZSBF
-bmdpbmUsIEJJT1MgR29vZ2xlIDA4LzA2LzIwMjQKPT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KClRoZSByZWFzb24gaXMgZWFfYnVmLT5u
-ZXdfZWEgaXMgbm90IGluaXRpYWxpemVkIHByb3Blcmx5LgoKRml4IHRoaXMgYnkgdXNpbmcg
-bWVtc2V0IHRvIGVtcHR5IGl0cyBjb250ZW50IGF0IHRoZSBiZWdpbmluZwppbiBlYV9nZXQo
-KS4KU2lnbmVkLW9mZi1ieTogWmhhbyBNZW5nbWVuZyA8emhhb21lbmdtZW5nQGt5bGlub3Mu
-Y24+Ci0tLQogZnMvamZzL3hhdHRyLmMgfCAyICsrCiAxIGZpbGUgY2hhbmdlZCwgMiBpbnNl
-cnRpb25zKCspCgpkaWZmIC0tZ2l0IGEvZnMvamZzL3hhdHRyLmMgYi9mcy9qZnMveGF0dHIu
-YwppbmRleCAyOTk5ZWQ1ZDgzZjUuLjBmYjA1ZTMxNGVkZiAxMDA2NDQKLS0tIGEvZnMvamZz
-L3hhdHRyLmMKKysrIGIvZnMvamZzL3hhdHRyLmMKQEAgLTQzNCw2ICs0MzQsOCBAQCBzdGF0
-aWMgaW50IGVhX2dldChzdHJ1Y3QgaW5vZGUgKmlub2RlLCBzdHJ1Y3QgZWFfYnVmZmVyICpl
-YV9idWYsIGludCBtaW5fc2l6ZSkKIAlpbnQgcmM7CiAJaW50IHF1b3RhX2FsbG9jYXRpb24g
-PSAwOwogCisJbWVtc2V0KCZlYV9idWYtPm5ld19lYSwgMCwgc2l6ZW9mKGVhX2J1Zi0+bmV3
-X2VhKSk7CisKIAkvKiBXaGVuIGZzY2suamZzIGNsZWFycyBhIGJhZCBlYSwgaXQgZG9lc24n
-dCBjbGVhciB0aGUgc2l6ZSAqLwogCWlmIChqaS0+ZWEuZmxhZyA9PSAwKQogCQllYV9zaXpl
-ID0gMDsKLS0gCjIuNDMuMAoK
+Then please provide link to the bindings in this open-source upstream
+bootloader.
 
---------------WzrG2UVkCJipirGvg7B7lk4H--
+Otherwise it is a clear no-go for me. We don't add properties because
+some downstream wants them. Imagine what would happen if we opened that
+can of worms...
+
+> are using 64 SCMI instances and SCMI smc transport driver for
+> Qualcomm(drivers/firmware/arm_scmi/transports/smc.c) expects
+> cap-id(created by hypervisor at boot time), our bootloader gets those
+> cap-id for each channel and populate them. This alias is an optimization
+> to save boottime as in automotive, boot KPIs are critical.
+
+I will refrain about commenting on KPIs...
+
+
+
+Best regards,
+Krzysztof
+
