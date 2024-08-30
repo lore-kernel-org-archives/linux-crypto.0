@@ -1,346 +1,261 @@
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4E07192D6A
-	for <linux-crypto@vger.kernel.org>; Fri, 30 Aug 2024 17:38:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04FF814E2E9;
+	Fri, 30 Aug 2024 17:51:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725039490; cv=none; b=Sy0nEK+BFgPD7HDWyOg40jNpTTQCGW3YoOkd/bWjpd72YngAoPgFw58M6RjLoxoBQficfiGrCIWewSc7u+1RlgaNnxpHnUF/p0PrPEorLpMfJCdMxzHr6Cmd4a6AYWl9oF24DwGFh4pfwthzBRNCxnlhykWi2uZXrBQsX2Ekeh4=
+	t=1725040317; cv=none; b=MG6KmruHkZfiCwhxfW2tZVl7ldzE3ebpXiMVVj8UhkrQ6umnNZsoEH/x9G2XJTBGciehsDS/apfsfMgsWCs4y4WlpCyhcWFXrq7I46ztTERyrmrRjsHdRLRFntUpP5enK4mjZVgnXTsN8RHHaX8lYJ/RJGULzsx09TS/XhRlMh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725039490; c=relaxed/simple;
-	bh=DIRvJN75BI6ZcDMoN56RkJd770BrPZnL26TYARaCmLo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IsATFRR9idSODISP422JKh/ruqtmLPikPL274HeiJydS6eSmNlZizZ9Jy76GRwIaYQquvVf//8o41ndj2JcIWSDQJ28prVGcAfjmSyc1M/5b3BfwbPrirzFVvy8Ub8szURHKWkrZFAeyAwWhW21xez5ECUB8d2k2sLuuaFbqHL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ro4/v4Cu; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1725040317; c=relaxed/simple;
+	bh=uWhMmjJ50H1qYWLeYvBQd6Nv7WH9zgHdxdtD0x/kJv8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GbdOMHFlWjFPbzDxnnR33T+su+XS18wjor7mZmdgvUSUyYb/uxRc6ytj0NYD5QCNhVmlHMWayjrbxacvjkE+Qsitg+n/Lk/fypBiY3ik9Qgs3p1MyCfF7c96SuL+SNNHXcTk8NSNBwTvghCaxJDfXIfMGaLuUwGOUlUH5DCJZng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lRgzNm8+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ro4/v4Cu"
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-202089e57d8so14572535ad.0
-        for <linux-crypto@vger.kernel.org>; Fri, 30 Aug 2024 10:38:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1725039488; x=1725644288; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=94im9BOaQRR7bOCoTzpbzzJQE0FEOF3V36nzvAWIihA=;
-        b=ro4/v4Cu2j2uoZMDWqGQW4e+Wksy09259D7UYPqzv3s0LrTyKf1B2Zhl1aB8Quij85
-         rGSzWF7pfS+wMRC29CGr8iHosB1OSyTD6N2V12KIZhhxi8LcSv4QUHODeNckMYUU6LaX
-         AZM4R/vXiqJKjfZ+SoN3P4NTAwzRaZzzMDziJ2gfzurXgwCyj9JpXE2eb3eMh1RhmJ5H
-         DXmbWqOuMJa/wkqcCtb6s0pY8S/tiwhdXkwG2Ine66JLBaqlBaD5EckW2Y8dmZ0Fld48
-         2PMug7MKJKHyiU1xoKf1bh2C3sh3PIiwDcGynbMo6C8tKEckxBJnbxLb/Kh+OldOKzI1
-         8rlw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725039488; x=1725644288;
-        h=content-transfer-encoding:in-reply-to:organization:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=94im9BOaQRR7bOCoTzpbzzJQE0FEOF3V36nzvAWIihA=;
-        b=ZlNESyU9xbXSzGUMO5uHXQ/mT6ykK9KT2pADBEDYsMfGlP4T83U7PgmD6Fn41Ur3if
-         O4t0dkGU2+CwhylaTIV7ljJaWy9A2IIjUrtFNiLdukolznkgZHh4uTZwJE0iQoNaIIfi
-         RlE8J1/HGh20kCONWSA0MXbw5UXNGqNMrRRIJPcVSKF7WeLPj1X0FDSBQe/xo8tlmUxn
-         rI3CV/nBO0YNocNd3NSiIkQeD2kDSniwevPQp1W5tIIoUnqsQoUeVQsN9OQYWr9gLPuG
-         l1fHagTQcrpaHKBAPTE2TkG+W5dYN3gU7HAgGRB4SmuDOG+CMckxoTXxR3SqaOm+V8tC
-         dq5g==
-X-Forwarded-Encrypted: i=1; AJvYcCV9x+G+VnxFvXVIVSGisn85aKxvjuxLHfnBRh8a3DVvDciQfJwLEEz4LmNS0z4xKUbV2nS5X+/uX8qL0II=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwXP64DwkWfRoS9AB/nH2TGu9p7ZhbsBZi2lAKHNE5NfL/9l483
-	lgvoC6bOkK86h252XNEoSGdAL2xraOTmwXyQCF/v5C02CbI7nerLgHpnHhpLEf8=
-X-Google-Smtp-Source: AGHT+IG7OtLe0iFlbzoAtEYseXf/s/gcdc6CrXeB4sUmiwH1tdSbqIL80AQ35CS2r2ZSAVwszoA3ew==
-X-Received: by 2002:a17:902:e5c2:b0:203:a03c:a4ae with SMTP id d9443c01a7336-205287d5e1amr56017255ad.24.1725039487814;
-        Fri, 30 Aug 2024 10:38:07 -0700 (PDT)
-Received: from ?IPV6:2804:1b3:a7c3:4c2c:97d:de0:fa17:dbc6? ([2804:1b3:a7c3:4c2c:97d:de0:fa17:dbc6])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-205152b3122sm29552965ad.9.2024.08.30.10.38.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 30 Aug 2024 10:38:07 -0700 (PDT)
-Message-ID: <723120f6-c2e5-4277-bcd7-daf95984877e@linaro.org>
-Date: Fri, 30 Aug 2024 14:38:03 -0300
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lRgzNm8+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F24AC4CEC2;
+	Fri, 30 Aug 2024 17:51:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725040316;
+	bh=uWhMmjJ50H1qYWLeYvBQd6Nv7WH9zgHdxdtD0x/kJv8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lRgzNm8+2G8pziDOMsiYugWgkPs3lXCnFeOZogB2bmerJAFS9ATZvAU8Z0LncZdq8
+	 +Y9jqkfu43WNnJ9SzKGrlfsatf6adScShb6fEHaLPjljMxUEc6jXfMYMv/eQcJE2sw
+	 zBAtitYvz+WV/aUZjNrXJZ3+IJ7xVsGEg9gY6QGfWBSvVslPRuTNq9is9BkxQtccTC
+	 Y/evok2+IS081uo4qn941Gc87BEoBnsvLznvdeY8eyaVh6qx5kuG5jkzPG3qyV1gMS
+	 frgFuWmkUbGn6t6HK68/vUqeV3fBNdtl6Ku79+5H4S0L7w77k4C/Y/CBpSkwjtcbUQ
+	 Y0PvzhYWctVPQ==
+Date: Fri, 30 Aug 2024 10:51:54 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: kernel test robot <oliver.sang@intel.com>, oe-lkp@lists.linux.dev,
+	lkp@intel.com, linux-crypto@vger.kernel.org, ltp@lists.linux.it,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>
+Subject: Re: [v3 PATCH 3/3] crypto: simd - Do not call crypto_alloc_tfm
+ during registration
+Message-ID: <20240830175154.GA48019@sol.localdomain>
+References: <ZrbTUk6DyktnO7qk@gondor.apana.org.au>
+ <202408161634.598311fd-oliver.sang@intel.com>
+ <ZsBJs_C6GdO_qgV7@gondor.apana.org.au>
+ <ZsBJ5H4JExArHGVw@gondor.apana.org.au>
+ <ZsBKG0la0m69Dyq3@gondor.apana.org.au>
+ <20240827184839.GD2049@sol.localdomain>
+ <Zs6SiBOdasO9Thd1@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] aarch64: vdso: Wire up getrandom() vDSO implementation
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: "Jason A . Donenfeld" <Jason@zx2c4.com>, Theodore Ts'o <tytso@mit.edu>,
- linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Thomas Gleixner <tglx@linutronix.de>, Eric Biggers <ebiggers@kernel.org>,
- Christophe Leroy <christophe.leroy@csgroup.eu>
-References: <20240829201728.2825-1-adhemerval.zanella@linaro.org>
- <CAMj1kXEnYW7ft3e-bSqWRLhickUeOkaWwtVVSxi49jski6T2iQ@mail.gmail.com>
-Content-Language: en-US
-From: Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>
-Organization: Linaro
-In-Reply-To: <CAMj1kXEnYW7ft3e-bSqWRLhickUeOkaWwtVVSxi49jski6T2iQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zs6SiBOdasO9Thd1@gondor.apana.org.au>
 
+On Wed, Aug 28, 2024 at 10:59:20AM +0800, Herbert Xu wrote:
+> On Tue, Aug 27, 2024 at 11:48:39AM -0700, Eric Biggers wrote:
+> > On Sat, Aug 17, 2024 at 02:58:35PM +0800, Herbert Xu wrote:
+> > > Algorithm registration is usually carried out during module init,
+> > > where as little work as possible should be carried out.  The SIMD
+> > > code violated this rule by allocating a tfm, this then triggers a
+> > > full test of the algorithm which may dead-lock in certain cases.
+> > > 
+> > > SIMD is only allocating the tfm to get at the alg object, which is
+> > > in fact already available as it is what we are registering.  Use
+> > > that directly and remove the crypto_alloc_tfm call.
+> > > 
+> > > Also remove some obsolete and unused SIMD API.
+> > > 
+> > > Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> > > ---
+> > >  arch/arm/crypto/aes-ce-glue.c     |  2 +-
+> > >  arch/arm/crypto/aes-neonbs-glue.c |  2 +-
+> > >  crypto/simd.c                     | 76 ++++++-------------------------
+> > >  include/crypto/internal/simd.h    | 12 +----
+> > >  4 files changed, 19 insertions(+), 73 deletions(-)
+> > > 
+> > 
+> > I'm getting a test failure with this series applied:
+> > 
+> > [    0.383128] alg: aead: failed to allocate transform for gcm_base(ctr(aes-generic),ghash-generic): -2
+> > [    0.383500] alg: self-tests for gcm(aes) using gcm_base(ctr(aes-generic),ghash-generic) failed (rc=-2)
+> > 
+> > This is on x86_64 with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y.
+> 
+> Could you please send me your config file?
+> 
+> Thanks,
 
+Given below in defconfig form, use 'make olddefconfig' to apply.  The failures
+are nondeterministic and sometimes there are different ones, for example:
 
-On 30/08/24 11:11, Ard Biesheuvel wrote:
-> On Thu, 29 Aug 2024 at 22:17, Adhemerval Zanella
-> <adhemerval.zanella@linaro.org> wrote:
->>
->> Hook up the generic vDSO implementation to the aarch64 vDSO data page.
->> The _vdso_rng_data required data is placed within the _vdso_data vvar
->> page, by using a offset larger than the vdso_data.
->>
->> The vDSO function requires a ChaCha20 implementation that does not
->> write to the stack, and that can do an entire ChaCha20 permutation.
->> The one provided is based on the current chacha-neon-core.S and uses NEON
->> on the permute operation. The fallback for chips that do not support
->> NEON issues the syscall.
->>
->> This also passes the vdso_test_chacha test along with
->> vdso_test_getrandom. The vdso_test_getrandom bench-single result on
->> Neoverse-N1 shows:
->>
->>    vdso: 25000000 times in 0.746506464 seconds
->>    libc: 25000000 times in 8.849179444 seconds
->> syscall: 25000000 times in 8.818726425 seconds
->>
->> Changes from v1:
->> - Fixed style issues and typos.
->> - Added fallback for systems without NEON support.
->> - Avoid use of non-volatile vector registers in neon chacha20.
->> - Use c-getrandom-y for vgetrandom.c.
->> - Fixed TIMENS vdso_rnd_data access.
->>
->> Signed-off-by: Adhemerval Zanella <adhemerval.zanella@linaro.org>
->> ---
-> ...
->> diff --git a/arch/arm64/kernel/vdso/vgetrandom-chacha.S b/arch/arm64/kernel/vdso/vgetrandom-chacha.S
->> new file mode 100644
->> index 000000000000..9ebf12a09c65
->> --- /dev/null
->> +++ b/arch/arm64/kernel/vdso/vgetrandom-chacha.S
->> @@ -0,0 +1,168 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +
->> +#include <linux/linkage.h>
->> +#include <asm/cache.h>
->> +#include <asm/assembler.h>
->> +
->> +       .text
->> +
->> +#define state0         v0
->> +#define state1         v1
->> +#define state2         v2
->> +#define state3         v3
->> +#define copy0          v4
->> +#define copy1          v5
->> +#define copy2          v6
->> +#define copy3          v7
->> +#define copy3_d                d7
->> +#define one_d          d16
->> +#define one_q          q16
->> +#define tmp            v17
->> +#define rot8           v18
->> +
-> 
-> Please make a note somewhere around here that you are deliberately
-> avoiding d8-d15 because they are callee-save in user space.
+[    0.358017] alg: skcipher: failed to allocate transform for cbc(twofish-generic): -2
+[    0.358365] alg: self-tests for cbc(twofish) using cbc(twofish-generic) failed (rc=-2)
+[    0.358535] alg: skcipher: failed to allocate transform for cbc(camellia-generic): -2
+[    0.358918] alg: self-tests for cbc(camellia) using cbc(camellia-generic) failed (rc=-2)
+[    0.371533] alg: skcipher: failed to allocate transform for xts(ecb(aes-generic)): -2
+[    0.371922] alg: self-tests for xts(aes) using xts(ecb(aes-generic)) failed (rc=-2)
 
-Ack.
+Modules are not enabled, maybe that matters (I haven't checked yet).
 
-> 
->> +/*
->> + * ARM64 ChaCha20 implementation meant for vDSO.  Produces a given positive
->> + * number of blocks of output with nonce 0, taking an input key and 8-bytes
->> + * counter.  Importantly does not spill to the stack.
->> + *
->> + * void __arch_chacha20_blocks_nostack(uint8_t *dst_bytes,
->> + *                                    const uint8_t *key,
->> + *                                    uint32_t *counter,
->> + *                                    size_t nblocks)
->> + *
->> + *     x0: output bytes
->> + *     x1: 32-byte key input
->> + *     x2: 8-byte counter input/output
->> + *     x3: number of 64-byte block to write to output
->> + */
->> +SYM_FUNC_START(__arch_chacha20_blocks_nostack)
->> +
->> +       /* copy0 = "expand 32-byte k" */
->> +       adr_l           x8, CTES
->> +       ld1             {copy0.4s}, [x8]
->> +       /* copy1,copy2 = key */
->> +       ld1             { copy1.4s, copy2.4s }, [x1]
->> +       /* copy3 = counter || zero nonce  */
->> +       ldr             copy3_d, [x2]
->> +
->> +       adr_l           x8, ONE
->> +       ldr             one_q, [x8]
->> +
->> +       adr_l           x10, ROT8
->> +       ld1             {rot8.4s}, [x10]
-> 
-> These immediate loads are forcing the vDSO to have a .rodata section,
-> which is best avoided, given that this is mapped into every user space
-> program.
-> 
-> Either use the existing mov_q macro and then move the values into SIMD
-> registers, or compose the required vectors in a different way.
-
-Ack, mov_q seems suffice here.
-
-> 
-> E.g., with one_v == v16,
-> 
-> movi one_v.2s, #1
-> uzp1 one_v.4s, one_v.4s, one_v.4s
-> 
-> puts the correct value in one_d, uses 1 instruction and 16 bytes of
-> rodata less, and avoids a memory access.
-
-Ack.
-
-> 
-> The ROT8 + tbl can be replaced by shl/sri (see below)
-> 
->> +.Lblock:
->> +       /* copy state to auxiliary vectors for the final add after the permute.  */
->> +       mov             state0.16b, copy0.16b
->> +       mov             state1.16b, copy1.16b
->> +       mov             state2.16b, copy2.16b
->> +       mov             state3.16b, copy3.16b
->> +
->> +       mov             w4, 20
->> +.Lpermute:
->> +       /*
->> +        * Permute one 64-byte block where the state matrix is stored in the four NEON
->> +        * registers state0-state3.  It performs matrix operations on four words in parallel,
->> +        * but requires shuffling to rearrange the words after each round.
->> +        */
->> +
->> +.Ldoubleround:
->> +       /* state0 += state1, state3 = rotl32(state3 ^ state0, 16) */
->> +       add             state0.4s, state0.4s, state1.4s
->> +       eor             state3.16b, state3.16b, state0.16b
->> +       rev32           state3.8h, state3.8h
->> +
->> +       /* state2 += state3, state1 = rotl32(state1 ^ state2, 12) */
->> +       add             state2.4s, state2.4s, state3.4s
->> +       eor             tmp.16b, state1.16b, state2.16b
->> +       shl             state1.4s, tmp.4s, #12
->> +       sri             state1.4s, tmp.4s, #20
->> +
->> +       /* state0 += state1, state3 = rotl32(state3 ^ state0, 8) */
->> +       add             state0.4s, state0.4s, state1.4s
->> +       eor             state3.16b, state3.16b, state0.16b
->> +       tbl             state3.16b, {state3.16b}, rot8.16b
->> +
-> 
-> This can be changed to the below, removing the need for the ROT8 vector
-> 
-> eor   tmp.16b, state3.16b, state0.16b
-> shl   state3.4s, tmp.4s, #8
-> sri   state3.4s, tmp.4s, #24
-> 
-
-Ack.
-
->> +       /* state2 += state3, state1 = rotl32(state1 ^ state2, 7) */
->> +       add             state2.4s, state2.4s, state3.4s
->> +       eor             tmp.16b, state1.16b, state2.16b
->> +       shl             state1.4s, tmp.4s, #7
->> +       sri             state1.4s, tmp.4s, #25
->> +
->> +       /* state1[0,1,2,3] = state1[1,2,3,0] */
->> +       ext             state1.16b, state1.16b, state1.16b, #4
->> +       /* state2[0,1,2,3] = state2[2,3,0,1] */
->> +       ext             state2.16b, state2.16b, state2.16b, #8
->> +       /* state3[0,1,2,3] = state3[1,2,3,0] */
->> +       ext             state3.16b, state3.16b, state3.16b, #12
->> +
->> +       /* state0 += state1, state3 = rotl32(state3 ^ state0, 16) */
->> +       add             state0.4s, state0.4s, state1.4s
->> +       eor             state3.16b, state3.16b, state0.16b
->> +       rev32           state3.8h, state3.8h
->> +
->> +       /* state2 += state3, state1 = rotl32(state1 ^ state2, 12) */
->> +       add             state2.4s, state2.4s, state3.4s
->> +       eor             tmp.16b, state1.16b, state2.16b
->> +       shl             state1.4s, tmp.4s, #12
->> +       sri             state1.4s, tmp.4s, #20
->> +
->> +       /* state0 += state1, state3 = rotl32(state3 ^ state0, 8) */
->> +       add             state0.4s, state0.4s, state1.4s
->> +       eor             state3.16b, state3.16b, state0.16b
->> +       tbl             state3.16b, {state3.16b}, rot8.16b
->> +
->> +       /* state2 += state3, state1 = rotl32(state1 ^ state2, 7) */
->> +       add             state2.4s, state2.4s, state3.4s
->> +       eor             tmp.16b, state1.16b, state2.16b
->> +       shl             state1.4s, tmp.4s, #7
->> +       sri             state1.4s, tmp.4s, #25
->> +
->> +       /* state1[0,1,2,3] = state1[3,0,1,2] */
->> +       ext             state1.16b, state1.16b, state1.16b, #12
->> +       /* state2[0,1,2,3] = state2[2,3,0,1] */
->> +       ext             state2.16b, state2.16b, state2.16b, #8
->> +       /* state3[0,1,2,3] = state3[1,2,3,0] */
->> +       ext             state3.16b, state3.16b, state3.16b, #4
->> +
->> +       subs            w4, w4, #2
->> +       b.ne            .Ldoubleround
->> +
->> +       /* output0 = state0 + state0 */
->> +       add             state0.4s, state0.4s, copy0.4s
->> +       /* output1 = state1 + state1 */
->> +       add             state1.4s, state1.4s, copy1.4s
->> +       /* output2 = state2 + state2 */
->> +       add             state2.4s, state2.4s, copy2.4s
->> +       /* output2 = state3 + state3 */
->> +       add             state3.4s, state3.4s, copy3.4s
->> +       st1             { state0.4s - state3.4s }, [x0]
->> +
->> +       /* ++copy3.counter */
->> +       add             copy3_d, copy3_d, one_d
->> +
-> 
-> This 'add' clears the upper half of the SIMD register, which is where
-> the zero nonce lives. So this happens to be correct, but it is not
-> very intuitive, so perhaps a comment would be in order here.
-
-Ack, will do.
-
-> 
->> +       /* output += 64, --nblocks */
->> +       add             x0, x0, 64
->> +       subs            x3, x3, #1
->> +       b.ne            .Lblock
->> +
->> +       /* counter = copy3.counter */
->> +       str             copy3_d, [x2]
->> +
->> +       /* Zero out the potentially sensitive regs, in case nothing uses these again. */
->> +       eor             state0.16b, state0.16b, state0.16b
->> +       eor             state1.16b, state1.16b, state1.16b
->> +       eor             state2.16b, state2.16b, state2.16b
->> +       eor             state3.16b, state3.16b, state3.16b
->> +       eor             copy1.16b, copy1.16b, copy1.16b
->> +       eor             copy2.16b, copy2.16b, copy2.16b
-> 
-> This is not x86 - no need to use XOR to clear registers, you can just
-> use 'movi reg.16b, #0' here.
-
-Ack.
-
-> 
->> +       ret
->> +SYM_FUNC_END(__arch_chacha20_blocks_nostack)
->> +
->> +        .section        ".rodata", "a", %progbits
->> +        .align          L1_CACHE_SHIFT
->> +
->> +CTES:  .word           1634760805, 857760878,  2036477234, 1797285236
->> +ONE:    .xword         1, 0
->> +ROT8:  .word           0x02010003, 0x06050407, 0x0a09080b, 0x0e0d0c0f
->> +
->> +emit_aarch64_feature_1_and
-> ...
+CONFIG_SYSVIPC=y
+CONFIG_POSIX_MQUEUE=y
+CONFIG_NO_HZ=y
+CONFIG_HIGH_RES_TIMERS=y
+CONFIG_IKCONFIG=y
+CONFIG_IKCONFIG_PROC=y
+CONFIG_CGROUPS=y
+CONFIG_USER_NS=y
+CONFIG_BLK_DEV_INITRD=y
+CONFIG_SMP=y
+CONFIG_X86_X2APIC=y
+CONFIG_HYPERVISOR_GUEST=y
+CONFIG_PARAVIRT=y
+CONFIG_MCORE2=y
+CONFIG_NR_CPUS=48
+CONFIG_NUMA=y
+CONFIG_HZ_300=y
+# CONFIG_RANDOMIZE_BASE is not set
+CONFIG_IA32_EMULATION=y
+CONFIG_JUMP_LABEL=y
+CONFIG_NET=y
+CONFIG_PACKET=y
+CONFIG_PACKET_DIAG=y
+CONFIG_UNIX=y
+CONFIG_UNIX_DIAG=y
+CONFIG_INET=y
+CONFIG_PCI=y
+CONFIG_PCI_MSI=y
+CONFIG_DEVTMPFS=y
+CONFIG_BLK_DEV_LOOP=y
+CONFIG_VIRTIO_BLK=y
+CONFIG_NETDEVICES=y
+CONFIG_VIRTIO_NET=y
+CONFIG_SERIAL_8250=y
+CONFIG_SERIAL_8250_CONSOLE=y
+CONFIG_SERIAL_8250_NR_UARTS=32
+CONFIG_SERIAL_8250_RUNTIME_UARTS=32
+CONFIG_HW_RANDOM_VIRTIO=y
+CONFIG_VIRT_DRIVERS=y
+CONFIG_VIRTIO_PCI=y
+CONFIG_VIRTIO_MMIO=y
+CONFIG_EXT4_FS=y
+CONFIG_EXT4_FS_POSIX_ACL=y
+CONFIG_EXT4_FS_SECURITY=y
+CONFIG_AUTOFS_FS=y
+CONFIG_TMPFS=y
+CONFIG_TMPFS_POSIX_ACL=y
+CONFIG_CRYPTO_USER=y
+# CONFIG_CRYPTO_MANAGER_DISABLE_TESTS is not set
+CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y
+CONFIG_CRYPTO_PCRYPT=y
+CONFIG_CRYPTO_DH_RFC7919_GROUPS=y
+CONFIG_CRYPTO_ECDH=y
+CONFIG_CRYPTO_ECDSA=y
+CONFIG_CRYPTO_ECRDSA=y
+CONFIG_CRYPTO_CURVE25519=y
+CONFIG_CRYPTO_AES_TI=y
+CONFIG_CRYPTO_ANUBIS=y
+CONFIG_CRYPTO_BLOWFISH=y
+CONFIG_CRYPTO_CAMELLIA=y
+CONFIG_CRYPTO_DES=y
+CONFIG_CRYPTO_FCRYPT=y
+CONFIG_CRYPTO_KHAZAD=y
+CONFIG_CRYPTO_SEED=y
+CONFIG_CRYPTO_TEA=y
+CONFIG_CRYPTO_TWOFISH=y
+CONFIG_CRYPTO_ADIANTUM=y
+CONFIG_CRYPTO_ARC4=y
+CONFIG_CRYPTO_HCTR2=y
+CONFIG_CRYPTO_KEYWRAP=y
+CONFIG_CRYPTO_LRW=y
+CONFIG_CRYPTO_PCBC=y
+CONFIG_CRYPTO_AEGIS128=y
+CONFIG_CRYPTO_SEQIV=y
+CONFIG_CRYPTO_ECHAINIV=y
+CONFIG_CRYPTO_ESSIV=y
+CONFIG_CRYPTO_BLAKE2B=y
+CONFIG_CRYPTO_MD4=y
+CONFIG_CRYPTO_RMD160=y
+CONFIG_CRYPTO_SM3_GENERIC=y
+CONFIG_CRYPTO_VMAC=y
+CONFIG_CRYPTO_WP512=y
+CONFIG_CRYPTO_XXHASH=y
+CONFIG_CRYPTO_CRC32=y
+CONFIG_CRYPTO_DEFLATE=y
+CONFIG_CRYPTO_LZO=y
+CONFIG_CRYPTO_842=y
+CONFIG_CRYPTO_LZ4=y
+CONFIG_CRYPTO_LZ4HC=y
+CONFIG_CRYPTO_ZSTD=y
+CONFIG_CRYPTO_ANSI_CPRNG=y
+CONFIG_CRYPTO_DRBG_HASH=y
+CONFIG_CRYPTO_DRBG_CTR=y
+CONFIG_CRYPTO_USER_API_HASH=y
+CONFIG_CRYPTO_USER_API_SKCIPHER=y
+CONFIG_CRYPTO_USER_API_RNG=y
+CONFIG_CRYPTO_USER_API_RNG_CAVP=y
+CONFIG_CRYPTO_USER_API_AEAD=y
+CONFIG_CRYPTO_CURVE25519_X86=y
+CONFIG_CRYPTO_AES_NI_INTEL=y
+CONFIG_CRYPTO_BLOWFISH_X86_64=y
+CONFIG_CRYPTO_CAMELLIA_AESNI_AVX2_X86_64=y
+CONFIG_CRYPTO_CAST5_AVX_X86_64=y
+CONFIG_CRYPTO_CAST6_AVX_X86_64=y
+CONFIG_CRYPTO_DES3_EDE_X86_64=y
+CONFIG_CRYPTO_SERPENT_SSE2_X86_64=y
+CONFIG_CRYPTO_SERPENT_AVX2_X86_64=y
+CONFIG_CRYPTO_SM4_AESNI_AVX2_X86_64=y
+CONFIG_CRYPTO_TWOFISH_AVX_X86_64=y
+CONFIG_CRYPTO_ARIA_GFNI_AVX512_X86_64=y
+CONFIG_CRYPTO_CHACHA20_X86_64=y
+CONFIG_CRYPTO_AEGIS128_AESNI_SSE2=y
+CONFIG_CRYPTO_NHPOLY1305_SSE2=y
+CONFIG_CRYPTO_NHPOLY1305_AVX2=y
+CONFIG_CRYPTO_BLAKE2S_X86=y
+CONFIG_CRYPTO_POLYVAL_CLMUL_NI=y
+CONFIG_CRYPTO_POLY1305_X86_64=y
+CONFIG_CRYPTO_SHA1_SSSE3=y
+CONFIG_CRYPTO_SHA256_SSSE3=y
+CONFIG_CRYPTO_SHA512_SSSE3=y
+CONFIG_CRYPTO_SM3_AVX_X86_64=y
+CONFIG_CRYPTO_GHASH_CLMUL_NI_INTEL=y
+CONFIG_CRYPTO_CRC32C_INTEL=y
+CONFIG_CRYPTO_CRC32_PCLMUL=y
+CONFIG_CRYPTO_CRCT10DIF_PCLMUL=y
+CONFIG_CRYPTO_DEV_PADLOCK=y
+CONFIG_CRYPTO_DEV_PADLOCK_AES=y
+CONFIG_CRYPTO_DEV_PADLOCK_SHA=y
+CONFIG_CRYPTO_DEV_CCP=y
+CONFIG_CRYPTO_DEV_NITROX_CNN55XX=y
+CONFIG_CRYPTO_DEV_QAT_DH895xCC=y
+CONFIG_CRYPTO_DEV_QAT_C3XXX=y
+CONFIG_CRYPTO_DEV_QAT_C62X=y
+CONFIG_CRYPTO_DEV_QAT_4XXX=y
+CONFIG_CRYPTO_DEV_QAT_DH895xCCVF=y
+CONFIG_CRYPTO_DEV_QAT_C3XXXVF=y
+CONFIG_CRYPTO_DEV_QAT_C62XVF=y
+CONFIG_CRYPTO_DEV_VIRTIO=y
+CONFIG_CRYPTO_DEV_SAFEXCEL=y
+CONFIG_CRYPTO_DEV_AMLOGIC_GXL=y
+CONFIG_CRYPTO_DEV_AMLOGIC_GXL_DEBUG=y
+CONFIG_CRYPTO_LIB_CURVE25519=y
+CONFIG_CRYPTO_LIB_CHACHA20POLY1305=y
+CONFIG_CRC_CCITT=y
+CONFIG_CRC_T10DIF=y
+CONFIG_CRC64_ROCKSOFT=y
+CONFIG_CRC_ITU_T=y
+CONFIG_CRC32_SELFTEST=y
+CONFIG_CRC32_SLICEBY4=y
+CONFIG_CRC4=y
+CONFIG_CRC7=y
+CONFIG_LIBCRC32C=y
+CONFIG_PRINTK_TIME=y
+CONFIG_DEBUG_KERNEL=y
+CONFIG_DEBUG_FS=y
+CONFIG_PANIC_TIMEOUT=5
+CONFIG_UNWINDER_FRAME_POINTER=y
