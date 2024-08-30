@@ -1,96 +1,165 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C854188A39;
-	Fri, 30 Aug 2024 09:53:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3303713C3D5;
+	Fri, 30 Aug 2024 09:59:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725011620; cv=none; b=f4b/C2eUiLcR8lU67ubhkfHWSJyd8x1i5xRvErN0NlNPSLGGoHcdzD66rdYgMiXyQ2U2ovr80QuLrtymHzpfOw3ZfBgxd53MXuLZxXFCGTGDFwx7eR4xGEGr9kQ+nOslERykowAG2uO7l+MdPiCzI7+Jo3kTjTOiEWva9YZFJKU=
+	t=1725011944; cv=none; b=Sk+pODQQWgmGcEkPGNuwf6H2toSWYtDFU007acTJx5H9rZNbgQtXxvAaHcEy+0O6uxaY62rkjcBtpZja6VBa5I/0XDXgtoUPl+4JZAQGI9n1vVwWWDTsJJtT2brwuOzhOi5li5U6AAUdueEZT60/zj7yeuk+9csyVUkufmKxIMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725011620; c=relaxed/simple;
-	bh=yFNoWirOsLFaQ2/ZHS0wZXqnaEF6GYGpZvhGR3HGpx8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NznzSFwaP97gfZypucazgV7pMwqGFU9lkrLKUp4CWTR6UauWBwdMWINoKjT6ztL4bMi+OgKeYhh65ye+jgS2aMj6GZQLHUQGBvAJcBt8hdYlv1TsuJoqP1mfQ2Fg4wu3MqhzWJVA02w3CuibOsqqfkMtGKemUcsz5YnrAqUw8Ik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1sjyBK-008Tou-0I;
-	Fri, 30 Aug 2024 17:53:24 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 30 Aug 2024 17:53:23 +0800
-Date: Fri, 30 Aug 2024 17:53:23 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Ma Ke <make24@iscas.ac.cn>
-Cc: davem@davemloft.net, j-keerthy@ti.com, t-kristo@ti.com,
-	akpm@linux-foundation.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH RESEND] crypto: sa2ul - fix memory leak in
- sa_cra_init_aead()
-Message-ID: <ZtGWkxsMHGihPh81@gondor.apana.org.au>
-References: <20240819084843.1012289-1-make24@iscas.ac.cn>
+	s=arc-20240116; t=1725011944; c=relaxed/simple;
+	bh=Xz3mDx21E4z9kKk8sJRWgbNnSRev+LlOgd7/CHZsUyw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GW3T1euEndA7OQgQlcfw/GgCuEbAz4bw+li+BZbYZVKZQBZnLQ+1SvkR7rNbK+GCY+BAJn3GdquExeB2s7fXTYE3CFbdSnMqC4+pwrX90ynJw9WACap+y0CIb92CeBo/p5c+qaiX40k9pKGFOUD4RqQjDR/7smmvZorl+ve5q+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tzt2dnQy; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tzt2dnQy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3BC4C4CEC2;
+	Fri, 30 Aug 2024 09:58:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725011943;
+	bh=Xz3mDx21E4z9kKk8sJRWgbNnSRev+LlOgd7/CHZsUyw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Tzt2dnQyr/MecVXaYBLbiTTYVMo8Zle/mFym6vwsQUSCF5qsHklhlf+BjdAGlttON
+	 Bj3FbtZe/v5C+3lxbvCnJTLo8M9RBGAJhhZ4EscfzpE/pbRvu8AmuevVse5P2FUzX+
+	 cGyAAoCMEHxO1DIalRsjcDkG/fg9zulo+PGkYgvPoISPA1NfGqss+83D7+JVj12UG8
+	 qgZHyn4l4svQ2m184V1MrEml0jQAU87AdIeYJnGbOOJ8Ze4GRBfQ3ScsNTm+oM7a7L
+	 8K1hSo8rjzye3qQr6RLLDVhXY84haWX7IIvzFxCesm0HMSQhwyUKqiNummKOCiy+0M
+	 mAhzY+yM2YkLQ==
+Message-ID: <1941ebf9-8bcf-49f5-bf69-cb2c66435b9b@kernel.org>
+Date: Fri, 30 Aug 2024 11:58:44 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240819084843.1012289-1-make24@iscas.ac.cn>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 16/22] dt-bindings: qcom: geni-se: document support for
+ SA8255P
+To: Nikunj Kela <quic_nkela@quicinc.com>
+Cc: andersson@kernel.org, konradybcio@kernel.org, robh@kernel.org,
+ krzk+dt@kernel.org, conor+dt@kernel.org, rafael@kernel.org,
+ viresh.kumar@linaro.org, herbert@gondor.apana.org.au, davem@davemloft.net,
+ sudeep.holla@arm.com, andi.shyti@kernel.org, tglx@linutronix.de,
+ will@kernel.org, joro@8bytes.org, jassisinghbrar@gmail.com, lee@kernel.org,
+ linus.walleij@linaro.org, amitk@kernel.org, thara.gopinath@gmail.com,
+ broonie@kernel.org, wim@linux-watchdog.org, linux@roeck-us.net,
+ robin.murphy@arm.com, cristian.marussi@arm.com, rui.zhang@intel.com,
+ lukasz.luba@arm.com, vkoul@kernel.org, quic_gurus@quicinc.com,
+ agross@kernel.org, bartosz.golaszewski@linaro.org, quic_rjendra@quicinc.com,
+ robimarko@gmail.com, linux-arm-msm@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-pm@vger.kernel.org, linux-crypto@vger.kernel.org,
+ arm-scmi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-i2c@vger.kernel.org, iommu@lists.linux.dev,
+ linux-gpio@vger.kernel.org, linux-serial@vger.kernel.org,
+ linux-spi@vger.kernel.org, linux-watchdog@vger.kernel.org,
+ kernel@quicinc.com, quic_psodagud@quicinc.com, quic_tsoni@quicinc.com,
+ quic_shazhuss@quicinc.com, Praveen Talari <quic_ptalari@quicinc.com>
+References: <20240828203721.2751904-1-quic_nkela@quicinc.com>
+ <20240828203721.2751904-17-quic_nkela@quicinc.com>
+ <zzznoxebkrksnpzmk55cff3wz5lhb7dd3qzcvtzkjjv2usmvbr@ebmlirkmahoj>
+ <5ce821d8-ebf6-484c-9f0b-e78c227d799c@quicinc.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <5ce821d8-ebf6-484c-9f0b-e78c227d799c@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Aug 19, 2024 at 04:48:43PM +0800, Ma Ke wrote:
-> Currently the resource allocated by crypto_alloc_shash() is not freed in
-> case crypto_alloc_aead() fails, resulting in memory leak.
+On 29/08/2024 16:23, Nikunj Kela wrote:
 > 
-> Add crypto_free_shash() to fix it.
+> On 8/29/2024 12:42 AM, Krzysztof Kozlowski wrote:
+>> On Wed, Aug 28, 2024 at 01:37:15PM -0700, Nikunj Kela wrote:
+>>> Add "qcom,sa8255p-geni-se-qup" compatible for representing QUP on
+>>> SA8255p.
+>>>
+>>> Clocks are being managed by the firmware VM and not required on
+>>> SA8255p Linux VM hence removing it from required list.
+>>>
+>>> CC: Praveen Talari <quic_ptalari@quicinc.com>
+>>> Signed-off-by: Nikunj Kela <quic_nkela@quicinc.com>
+>>> ---
+>>>  .../bindings/soc/qcom/qcom,geni-se.yaml       | 47 +++++++++++++++++--
+>>>  1 file changed, 43 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/Documentation/devicetree/bindings/soc/qcom/qcom,geni-se.yaml b/Documentation/devicetree/bindings/soc/qcom/qcom,geni-se.yaml
+>>> index 7b031ef09669..40e3a3e045da 100644
+>>> --- a/Documentation/devicetree/bindings/soc/qcom/qcom,geni-se.yaml
+>>> +++ b/Documentation/devicetree/bindings/soc/qcom/qcom,geni-se.yaml
+>>> @@ -22,17 +22,16 @@ properties:
+>>>      enum:
+>>>        - qcom,geni-se-qup
+>>>        - qcom,geni-se-i2c-master-hub
+>>> +      - qcom,sa8255p-geni-se-qup
+>> Same problems. If you decide to use generic compatibles, it means it
+>> covers all devices. Otherwise it does not make any sense.
 > 
-> Found by code review.
+> Hi Krzysztof,
 > 
-> Cc: stable@vger.kernel.org
-> Fixes: d2c8ac187fc9 ("crypto: sa2ul - Add AEAD algorithm support")
-> Signed-off-by: Ma Ke <make24@iscas.ac.cn>
-> ---
->  drivers/crypto/sa2ul.c | 20 +++++++++++++-------
->  1 file changed, 13 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/crypto/sa2ul.c b/drivers/crypto/sa2ul.c
-> index 461eca40e878..b5af621f7f17 100644
-> --- a/drivers/crypto/sa2ul.c
-> +++ b/drivers/crypto/sa2ul.c
-> @@ -1740,7 +1740,8 @@ static int sa_cra_init_aead(struct crypto_aead *tfm, const char *hash,
->  	ctx->shash = crypto_alloc_shash(hash, 0, CRYPTO_ALG_NEED_FALLBACK);
->  	if (IS_ERR(ctx->shash)) {
->  		dev_err(sa_k3_dev, "base driver %s couldn't be loaded\n", hash);
-> -		return PTR_ERR(ctx->shash);
-> +		ret = PTR_ERR(ctx->shash);
-> +		goto err_free_shash;
->  	}
+> SA8255p platform is not compatible with generic ones. At the time
+> generic compatibles were added, no one thought of such platform will
 
-This hunk is unnecessary and confusing.  Please keep the existing
-code.
+That's kind of obvious and expected yet these were added...
 
-> @@ -1749,7 +1750,8 @@ static int sa_cra_init_aead(struct crypto_aead *tfm, const char *hash,
->  	if (IS_ERR(ctx->fallback.aead)) {
->  		dev_err(sa_k3_dev, "fallback driver %s couldn't be loaded\n",
->  			fallback);
-> -		return PTR_ERR(ctx->fallback.aead);
-> +		ret = PTR_ERR(ctx->fallback.aead);
-> +		goto err_free_shash;
->  	}
->  
->  	crypto_aead_set_reqsize(tfm, sizeof(struct aead_request) +
-> @@ -1757,19 +1759,23 @@ static int sa_cra_init_aead(struct crypto_aead *tfm, const char *hash,
->  
->  	ret = sa_init_ctx_info(&ctx->enc, data);
->  	if (ret)
-> -		return ret;
-> +		goto err_free_shash;
+> appear in future. Please advise what should we do in this case?
 
-Shouldn't this free the fallback AEAD?
+I don't know. We keep telling - do not use generic compatibles, because
+you will have something like this, but people use generic compatibles -
+so what can I say? I told you so?
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Can we get agreement that using generic compatibles is a wrong idea? Or
+sort of promise - we won't use them? Or policy? I don't know, we can
+move on assuming this was a mistake 8 years ago, approaches evolve,
+reviews change, but I am just afraid I will be repeating the same to
+several future contributions and every time come with long arguments
+exhausting my energy - don't add generic compatibles.
+
+If devices are not compatible, I suggest different bindings.
+
+Best regards,
+Krzysztof
+
