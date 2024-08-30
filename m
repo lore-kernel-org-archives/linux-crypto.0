@@ -1,176 +1,346 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D79F1B5813;
-	Fri, 30 Aug 2024 16:18:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4E07192D6A
+	for <linux-crypto@vger.kernel.org>; Fri, 30 Aug 2024 17:38:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725034702; cv=none; b=cHBjj+juGjeyZh9VQj31e+0AzZXttko7XfdX3y2OhAN1NLd8tV0+P1GqRCjdskz5rnmt3emNpK9ZQBWOYgagbdQUqZmZ+oZgIo6V9jHWCdI8O2xKd8WZcrDepmQ8WnxAm+sI5Q7nhINNu2ORzdp7qcK/zrdReCusM74SIFrTgpU=
+	t=1725039490; cv=none; b=Sy0nEK+BFgPD7HDWyOg40jNpTTQCGW3YoOkd/bWjpd72YngAoPgFw58M6RjLoxoBQficfiGrCIWewSc7u+1RlgaNnxpHnUF/p0PrPEorLpMfJCdMxzHr6Cmd4a6AYWl9oF24DwGFh4pfwthzBRNCxnlhykWi2uZXrBQsX2Ekeh4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725034702; c=relaxed/simple;
-	bh=DO78Muknig9uLuHIr6AaX8YDe6MmUYrrNJiE1yiyh+w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HN+DJ+Z8RdlNzDyJkxWt/ywdg659HfFQc1sH2+yIAMDr7zE5NtKSvccQHO08HGH50XZVssgJj6Et/3se4QfNoTRlM5l+r4sIQO8Xfz6oouwjXmfrtSbHmPsjiiFsby/QehzAFU3YZuSNbWbwt/mbPVUDKClpugLWSfgj/QJtCVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=O1H9mzd+; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1725039490; c=relaxed/simple;
+	bh=DIRvJN75BI6ZcDMoN56RkJd770BrPZnL26TYARaCmLo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IsATFRR9idSODISP422JKh/ruqtmLPikPL274HeiJydS6eSmNlZizZ9Jy76GRwIaYQquvVf//8o41ndj2JcIWSDQJ28prVGcAfjmSyc1M/5b3BfwbPrirzFVvy8Ub8szURHKWkrZFAeyAwWhW21xez5ECUB8d2k2sLuuaFbqHL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ro4/v4Cu; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O1H9mzd+"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725034701; x=1756570701;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=DO78Muknig9uLuHIr6AaX8YDe6MmUYrrNJiE1yiyh+w=;
-  b=O1H9mzd+Hwlz5gwZ46xdCxwaQMD8UsGj+oBU7oIWyoRManAJJUd/6Keo
-   /d9KUE6kB91ilWpMPU/Dm6f4QrMT5wifQq5T4MvQTl1z8yD/0sZhsGBBW
-   8eAHeKGV9g700DR6C7T3EEGzwT05mNBjqih5BvppueaQZiyR0O41EMoz6
-   Jvvtpi+2yjxOLFqUk7BJqs3OMDZEUAD+kVPrR91OJusSE6AapOU2IetnI
-   9fBX6al5QxfKx0s3ZmFwWcgiCDSxocgHdKa2gxyneBy2VJbXE3l0kHcAM
-   zcqao9iS0G7rO1qQimNqgUv+KnSQ6pmvfi5kQIsfd9LMDqmbQje87fk7l
-   Q==;
-X-CSE-ConnectionGUID: OTQTYBxUTmKeOqslJPAZDg==
-X-CSE-MsgGUID: E/uTCHznQyedAbwnyAN9pw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11180"; a="23201123"
-X-IronPort-AV: E=Sophos;i="6.10,189,1719903600"; 
-   d="scan'208";a="23201123"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2024 09:18:20 -0700
-X-CSE-ConnectionGUID: ZmpClZ4hQiSdhPeamVJM7Q==
-X-CSE-MsgGUID: nUiw9z3xSnu9BstrvjHnZw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,189,1719903600"; 
-   d="scan'208";a="64134769"
-Received: from lkp-server01.sh.intel.com (HELO 9c6b1c7d3b50) ([10.239.97.150])
-  by fmviesa010.fm.intel.com with ESMTP; 30 Aug 2024 09:18:17 -0700
-Received: from kbuild by 9c6b1c7d3b50 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sk4KF-0001dS-0L;
-	Fri, 30 Aug 2024 16:18:15 +0000
-Date: Sat, 31 Aug 2024 00:18:11 +0800
-From: kernel test robot <lkp@intel.com>
-To: Adhemerval Zanella <adhemerval.zanella@linaro.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Theodore Ts'o <tytso@mit.edu>, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-arch@vger.kernel.org,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev
-Subject: Re: [PATCH v2] aarch64: vdso: Wire up getrandom() vDSO implementation
-Message-ID: <202408310030.S5ZNwLWz-lkp@intel.com>
-References: <20240829201728.2825-1-adhemerval.zanella@linaro.org>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ro4/v4Cu"
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-202089e57d8so14572535ad.0
+        for <linux-crypto@vger.kernel.org>; Fri, 30 Aug 2024 10:38:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1725039488; x=1725644288; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=94im9BOaQRR7bOCoTzpbzzJQE0FEOF3V36nzvAWIihA=;
+        b=ro4/v4Cu2j2uoZMDWqGQW4e+Wksy09259D7UYPqzv3s0LrTyKf1B2Zhl1aB8Quij85
+         rGSzWF7pfS+wMRC29CGr8iHosB1OSyTD6N2V12KIZhhxi8LcSv4QUHODeNckMYUU6LaX
+         AZM4R/vXiqJKjfZ+SoN3P4NTAwzRaZzzMDziJ2gfzurXgwCyj9JpXE2eb3eMh1RhmJ5H
+         DXmbWqOuMJa/wkqcCtb6s0pY8S/tiwhdXkwG2Ine66JLBaqlBaD5EckW2Y8dmZ0Fld48
+         2PMug7MKJKHyiU1xoKf1bh2C3sh3PIiwDcGynbMo6C8tKEckxBJnbxLb/Kh+OldOKzI1
+         8rlw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725039488; x=1725644288;
+        h=content-transfer-encoding:in-reply-to:organization:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=94im9BOaQRR7bOCoTzpbzzJQE0FEOF3V36nzvAWIihA=;
+        b=ZlNESyU9xbXSzGUMO5uHXQ/mT6ykK9KT2pADBEDYsMfGlP4T83U7PgmD6Fn41Ur3if
+         O4t0dkGU2+CwhylaTIV7ljJaWy9A2IIjUrtFNiLdukolznkgZHh4uTZwJE0iQoNaIIfi
+         RlE8J1/HGh20kCONWSA0MXbw5UXNGqNMrRRIJPcVSKF7WeLPj1X0FDSBQe/xo8tlmUxn
+         rI3CV/nBO0YNocNd3NSiIkQeD2kDSniwevPQp1W5tIIoUnqsQoUeVQsN9OQYWr9gLPuG
+         l1fHagTQcrpaHKBAPTE2TkG+W5dYN3gU7HAgGRB4SmuDOG+CMckxoTXxR3SqaOm+V8tC
+         dq5g==
+X-Forwarded-Encrypted: i=1; AJvYcCV9x+G+VnxFvXVIVSGisn85aKxvjuxLHfnBRh8a3DVvDciQfJwLEEz4LmNS0z4xKUbV2nS5X+/uX8qL0II=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXP64DwkWfRoS9AB/nH2TGu9p7ZhbsBZi2lAKHNE5NfL/9l483
+	lgvoC6bOkK86h252XNEoSGdAL2xraOTmwXyQCF/v5C02CbI7nerLgHpnHhpLEf8=
+X-Google-Smtp-Source: AGHT+IG7OtLe0iFlbzoAtEYseXf/s/gcdc6CrXeB4sUmiwH1tdSbqIL80AQ35CS2r2ZSAVwszoA3ew==
+X-Received: by 2002:a17:902:e5c2:b0:203:a03c:a4ae with SMTP id d9443c01a7336-205287d5e1amr56017255ad.24.1725039487814;
+        Fri, 30 Aug 2024 10:38:07 -0700 (PDT)
+Received: from ?IPV6:2804:1b3:a7c3:4c2c:97d:de0:fa17:dbc6? ([2804:1b3:a7c3:4c2c:97d:de0:fa17:dbc6])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-205152b3122sm29552965ad.9.2024.08.30.10.38.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 30 Aug 2024 10:38:07 -0700 (PDT)
+Message-ID: <723120f6-c2e5-4277-bcd7-daf95984877e@linaro.org>
+Date: Fri, 30 Aug 2024 14:38:03 -0300
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240829201728.2825-1-adhemerval.zanella@linaro.org>
-
-Hi Adhemerval,
-
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on crng-random/master]
-[also build test ERROR on next-20240830]
-[cannot apply to arm64/for-next/core shuah-kselftest/next shuah-kselftest/fixes linus/master v6.11-rc5]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Adhemerval-Zanella/aarch64-vdso-Wire-up-getrandom-vDSO-implementation/20240830-041912
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/crng/random.git master
-patch link:    https://lore.kernel.org/r/20240829201728.2825-1-adhemerval.zanella%40linaro.org
-patch subject: [PATCH v2] aarch64: vdso: Wire up getrandom() vDSO implementation
-config: arm64-allyesconfig (https://download.01.org/0day-ci/archive/20240831/202408310030.S5ZNwLWz-lkp@intel.com/config)
-compiler: clang version 20.0.0git (https://github.com/llvm/llvm-project 46fe36a4295f05d5d3731762e31fc4e6e99863e9)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240831/202408310030.S5ZNwLWz-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202408310030.S5ZNwLWz-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from arch/arm64/kernel/asm-offsets.c:10:
-   In file included from include/linux/arm_sdei.h:8:
-   In file included from include/acpi/ghes.h:5:
-   In file included from include/acpi/apei.h:9:
-   In file included from include/linux/acpi.h:39:
-   In file included from include/acpi/acpi_io.h:7:
-   In file included from arch/arm64/include/asm/acpi.h:14:
-   In file included from include/linux/memblock.h:12:
-   In file included from include/linux/mm.h:2228:
-   include/linux/vmstat.h:503:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     503 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     504 |                            item];
-         |                            ~~~~
-   include/linux/vmstat.h:510:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     510 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     511 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/vmstat.h:517:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     517 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
-   include/linux/vmstat.h:523:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     523 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     524 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   4 warnings generated.
-   In file included from <built-in>:4:
-   In file included from lib/vdso/getrandom.c:8:
-   In file included from include/linux/mm.h:2228:
-   include/linux/vmstat.h:503:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     503 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     504 |                            item];
-         |                            ~~~~
-   include/linux/vmstat.h:510:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     510 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     511 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/vmstat.h:517:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     517 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
-   include/linux/vmstat.h:523:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     523 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     524 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   In file included from <built-in>:4:
-   In file included from lib/vdso/getrandom.c:12:
-   In file included from arch/arm64/include/asm/vdso/getrandom.h:8:
->> arch/arm64/include/asm/vdso.h:25:10: fatal error: 'generated/vdso-offsets.h' file not found
-      25 | #include <generated/vdso-offsets.h>
-         |          ^~~~~~~~~~~~~~~~~~~~~~~~~~
-   4 warnings and 1 error generated.
-   make[3]: *** [scripts/Makefile.build:244: arch/arm64/kernel/vdso/vgetrandom.o] Error 1
-   make[3]: Target 'include/generated/vdso-offsets.h' not remade because of errors.
-   make[3]: Target 'arch/arm64/kernel/vdso/vdso.so' not remade because of errors.
-   make[2]: *** [arch/arm64/Makefile:217: vdso_prepare] Error 2
-   make[2]: Target 'prepare' not remade because of errors.
-   make[1]: *** [Makefile:224: __sub-make] Error 2
-   make[1]: Target 'prepare' not remade because of errors.
-   make: *** [Makefile:224: __sub-make] Error 2
-   make: Target 'prepare' not remade because of errors.
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] aarch64: vdso: Wire up getrandom() vDSO implementation
+To: Ard Biesheuvel <ardb@kernel.org>
+Cc: "Jason A . Donenfeld" <Jason@zx2c4.com>, Theodore Ts'o <tytso@mit.edu>,
+ linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Eric Biggers <ebiggers@kernel.org>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>
+References: <20240829201728.2825-1-adhemerval.zanella@linaro.org>
+ <CAMj1kXEnYW7ft3e-bSqWRLhickUeOkaWwtVVSxi49jski6T2iQ@mail.gmail.com>
+Content-Language: en-US
+From: Adhemerval Zanella Netto <adhemerval.zanella@linaro.org>
+Organization: Linaro
+In-Reply-To: <CAMj1kXEnYW7ft3e-bSqWRLhickUeOkaWwtVVSxi49jski6T2iQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
 
-vim +25 arch/arm64/include/asm/vdso.h
 
-0a7927d2b89e55 Adhemerval Zanella 2024-08-29  24  
-9031fefde6f2ac Will Deacon        2012-03-05 @25  #include <generated/vdso-offsets.h>
-9031fefde6f2ac Will Deacon        2012-03-05  26  
+On 30/08/24 11:11, Ard Biesheuvel wrote:
+> On Thu, 29 Aug 2024 at 22:17, Adhemerval Zanella
+> <adhemerval.zanella@linaro.org> wrote:
+>>
+>> Hook up the generic vDSO implementation to the aarch64 vDSO data page.
+>> The _vdso_rng_data required data is placed within the _vdso_data vvar
+>> page, by using a offset larger than the vdso_data.
+>>
+>> The vDSO function requires a ChaCha20 implementation that does not
+>> write to the stack, and that can do an entire ChaCha20 permutation.
+>> The one provided is based on the current chacha-neon-core.S and uses NEON
+>> on the permute operation. The fallback for chips that do not support
+>> NEON issues the syscall.
+>>
+>> This also passes the vdso_test_chacha test along with
+>> vdso_test_getrandom. The vdso_test_getrandom bench-single result on
+>> Neoverse-N1 shows:
+>>
+>>    vdso: 25000000 times in 0.746506464 seconds
+>>    libc: 25000000 times in 8.849179444 seconds
+>> syscall: 25000000 times in 8.818726425 seconds
+>>
+>> Changes from v1:
+>> - Fixed style issues and typos.
+>> - Added fallback for systems without NEON support.
+>> - Avoid use of non-volatile vector registers in neon chacha20.
+>> - Use c-getrandom-y for vgetrandom.c.
+>> - Fixed TIMENS vdso_rnd_data access.
+>>
+>> Signed-off-by: Adhemerval Zanella <adhemerval.zanella@linaro.org>
+>> ---
+> ...
+>> diff --git a/arch/arm64/kernel/vdso/vgetrandom-chacha.S b/arch/arm64/kernel/vdso/vgetrandom-chacha.S
+>> new file mode 100644
+>> index 000000000000..9ebf12a09c65
+>> --- /dev/null
+>> +++ b/arch/arm64/kernel/vdso/vgetrandom-chacha.S
+>> @@ -0,0 +1,168 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +
+>> +#include <linux/linkage.h>
+>> +#include <asm/cache.h>
+>> +#include <asm/assembler.h>
+>> +
+>> +       .text
+>> +
+>> +#define state0         v0
+>> +#define state1         v1
+>> +#define state2         v2
+>> +#define state3         v3
+>> +#define copy0          v4
+>> +#define copy1          v5
+>> +#define copy2          v6
+>> +#define copy3          v7
+>> +#define copy3_d                d7
+>> +#define one_d          d16
+>> +#define one_q          q16
+>> +#define tmp            v17
+>> +#define rot8           v18
+>> +
+> 
+> Please make a note somewhere around here that you are deliberately
+> avoiding d8-d15 because they are callee-save in user space.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Ack.
+
+> 
+>> +/*
+>> + * ARM64 ChaCha20 implementation meant for vDSO.  Produces a given positive
+>> + * number of blocks of output with nonce 0, taking an input key and 8-bytes
+>> + * counter.  Importantly does not spill to the stack.
+>> + *
+>> + * void __arch_chacha20_blocks_nostack(uint8_t *dst_bytes,
+>> + *                                    const uint8_t *key,
+>> + *                                    uint32_t *counter,
+>> + *                                    size_t nblocks)
+>> + *
+>> + *     x0: output bytes
+>> + *     x1: 32-byte key input
+>> + *     x2: 8-byte counter input/output
+>> + *     x3: number of 64-byte block to write to output
+>> + */
+>> +SYM_FUNC_START(__arch_chacha20_blocks_nostack)
+>> +
+>> +       /* copy0 = "expand 32-byte k" */
+>> +       adr_l           x8, CTES
+>> +       ld1             {copy0.4s}, [x8]
+>> +       /* copy1,copy2 = key */
+>> +       ld1             { copy1.4s, copy2.4s }, [x1]
+>> +       /* copy3 = counter || zero nonce  */
+>> +       ldr             copy3_d, [x2]
+>> +
+>> +       adr_l           x8, ONE
+>> +       ldr             one_q, [x8]
+>> +
+>> +       adr_l           x10, ROT8
+>> +       ld1             {rot8.4s}, [x10]
+> 
+> These immediate loads are forcing the vDSO to have a .rodata section,
+> which is best avoided, given that this is mapped into every user space
+> program.
+> 
+> Either use the existing mov_q macro and then move the values into SIMD
+> registers, or compose the required vectors in a different way.
+
+Ack, mov_q seems suffice here.
+
+> 
+> E.g., with one_v == v16,
+> 
+> movi one_v.2s, #1
+> uzp1 one_v.4s, one_v.4s, one_v.4s
+> 
+> puts the correct value in one_d, uses 1 instruction and 16 bytes of
+> rodata less, and avoids a memory access.
+
+Ack.
+
+> 
+> The ROT8 + tbl can be replaced by shl/sri (see below)
+> 
+>> +.Lblock:
+>> +       /* copy state to auxiliary vectors for the final add after the permute.  */
+>> +       mov             state0.16b, copy0.16b
+>> +       mov             state1.16b, copy1.16b
+>> +       mov             state2.16b, copy2.16b
+>> +       mov             state3.16b, copy3.16b
+>> +
+>> +       mov             w4, 20
+>> +.Lpermute:
+>> +       /*
+>> +        * Permute one 64-byte block where the state matrix is stored in the four NEON
+>> +        * registers state0-state3.  It performs matrix operations on four words in parallel,
+>> +        * but requires shuffling to rearrange the words after each round.
+>> +        */
+>> +
+>> +.Ldoubleround:
+>> +       /* state0 += state1, state3 = rotl32(state3 ^ state0, 16) */
+>> +       add             state0.4s, state0.4s, state1.4s
+>> +       eor             state3.16b, state3.16b, state0.16b
+>> +       rev32           state3.8h, state3.8h
+>> +
+>> +       /* state2 += state3, state1 = rotl32(state1 ^ state2, 12) */
+>> +       add             state2.4s, state2.4s, state3.4s
+>> +       eor             tmp.16b, state1.16b, state2.16b
+>> +       shl             state1.4s, tmp.4s, #12
+>> +       sri             state1.4s, tmp.4s, #20
+>> +
+>> +       /* state0 += state1, state3 = rotl32(state3 ^ state0, 8) */
+>> +       add             state0.4s, state0.4s, state1.4s
+>> +       eor             state3.16b, state3.16b, state0.16b
+>> +       tbl             state3.16b, {state3.16b}, rot8.16b
+>> +
+> 
+> This can be changed to the below, removing the need for the ROT8 vector
+> 
+> eor   tmp.16b, state3.16b, state0.16b
+> shl   state3.4s, tmp.4s, #8
+> sri   state3.4s, tmp.4s, #24
+> 
+
+Ack.
+
+>> +       /* state2 += state3, state1 = rotl32(state1 ^ state2, 7) */
+>> +       add             state2.4s, state2.4s, state3.4s
+>> +       eor             tmp.16b, state1.16b, state2.16b
+>> +       shl             state1.4s, tmp.4s, #7
+>> +       sri             state1.4s, tmp.4s, #25
+>> +
+>> +       /* state1[0,1,2,3] = state1[1,2,3,0] */
+>> +       ext             state1.16b, state1.16b, state1.16b, #4
+>> +       /* state2[0,1,2,3] = state2[2,3,0,1] */
+>> +       ext             state2.16b, state2.16b, state2.16b, #8
+>> +       /* state3[0,1,2,3] = state3[1,2,3,0] */
+>> +       ext             state3.16b, state3.16b, state3.16b, #12
+>> +
+>> +       /* state0 += state1, state3 = rotl32(state3 ^ state0, 16) */
+>> +       add             state0.4s, state0.4s, state1.4s
+>> +       eor             state3.16b, state3.16b, state0.16b
+>> +       rev32           state3.8h, state3.8h
+>> +
+>> +       /* state2 += state3, state1 = rotl32(state1 ^ state2, 12) */
+>> +       add             state2.4s, state2.4s, state3.4s
+>> +       eor             tmp.16b, state1.16b, state2.16b
+>> +       shl             state1.4s, tmp.4s, #12
+>> +       sri             state1.4s, tmp.4s, #20
+>> +
+>> +       /* state0 += state1, state3 = rotl32(state3 ^ state0, 8) */
+>> +       add             state0.4s, state0.4s, state1.4s
+>> +       eor             state3.16b, state3.16b, state0.16b
+>> +       tbl             state3.16b, {state3.16b}, rot8.16b
+>> +
+>> +       /* state2 += state3, state1 = rotl32(state1 ^ state2, 7) */
+>> +       add             state2.4s, state2.4s, state3.4s
+>> +       eor             tmp.16b, state1.16b, state2.16b
+>> +       shl             state1.4s, tmp.4s, #7
+>> +       sri             state1.4s, tmp.4s, #25
+>> +
+>> +       /* state1[0,1,2,3] = state1[3,0,1,2] */
+>> +       ext             state1.16b, state1.16b, state1.16b, #12
+>> +       /* state2[0,1,2,3] = state2[2,3,0,1] */
+>> +       ext             state2.16b, state2.16b, state2.16b, #8
+>> +       /* state3[0,1,2,3] = state3[1,2,3,0] */
+>> +       ext             state3.16b, state3.16b, state3.16b, #4
+>> +
+>> +       subs            w4, w4, #2
+>> +       b.ne            .Ldoubleround
+>> +
+>> +       /* output0 = state0 + state0 */
+>> +       add             state0.4s, state0.4s, copy0.4s
+>> +       /* output1 = state1 + state1 */
+>> +       add             state1.4s, state1.4s, copy1.4s
+>> +       /* output2 = state2 + state2 */
+>> +       add             state2.4s, state2.4s, copy2.4s
+>> +       /* output2 = state3 + state3 */
+>> +       add             state3.4s, state3.4s, copy3.4s
+>> +       st1             { state0.4s - state3.4s }, [x0]
+>> +
+>> +       /* ++copy3.counter */
+>> +       add             copy3_d, copy3_d, one_d
+>> +
+> 
+> This 'add' clears the upper half of the SIMD register, which is where
+> the zero nonce lives. So this happens to be correct, but it is not
+> very intuitive, so perhaps a comment would be in order here.
+
+Ack, will do.
+
+> 
+>> +       /* output += 64, --nblocks */
+>> +       add             x0, x0, 64
+>> +       subs            x3, x3, #1
+>> +       b.ne            .Lblock
+>> +
+>> +       /* counter = copy3.counter */
+>> +       str             copy3_d, [x2]
+>> +
+>> +       /* Zero out the potentially sensitive regs, in case nothing uses these again. */
+>> +       eor             state0.16b, state0.16b, state0.16b
+>> +       eor             state1.16b, state1.16b, state1.16b
+>> +       eor             state2.16b, state2.16b, state2.16b
+>> +       eor             state3.16b, state3.16b, state3.16b
+>> +       eor             copy1.16b, copy1.16b, copy1.16b
+>> +       eor             copy2.16b, copy2.16b, copy2.16b
+> 
+> This is not x86 - no need to use XOR to clear registers, you can just
+> use 'movi reg.16b, #0' here.
+
+Ack.
+
+> 
+>> +       ret
+>> +SYM_FUNC_END(__arch_chacha20_blocks_nostack)
+>> +
+>> +        .section        ".rodata", "a", %progbits
+>> +        .align          L1_CACHE_SHIFT
+>> +
+>> +CTES:  .word           1634760805, 857760878,  2036477234, 1797285236
+>> +ONE:    .xword         1, 0
+>> +ROT8:  .word           0x02010003, 0x06050407, 0x0a09080b, 0x0e0d0c0f
+>> +
+>> +emit_aarch64_feature_1_and
+> ...
