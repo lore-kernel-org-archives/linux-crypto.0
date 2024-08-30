@@ -1,82 +1,74 @@
-Received: from bmailout1.hostsharing.net (bmailout1.hostsharing.net [83.223.95.100])
+Received: from xry111.site (xry111.site [89.208.246.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAFBA14D71D;
-	Fri, 30 Aug 2024 06:30:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19E8516DC3C;
+	Fri, 30 Aug 2024 09:05:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.208.246.23
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724999416; cv=none; b=OjhDRE3ubDIFKEqINxuPvXIqcC3zcR3vEBSLczTmFQr0kMKn0VC9+IiHOAyyF7nHgRlXLtWe5O+3++AoXW7atID0Yi7/9P0TyFqJGWpWJBz+4v809J6UpFpdHwWXObhRYwW35zvtii82UywRi58387wBj5BPYaXay/dgDZBffHE=
+	t=1725008748; cv=none; b=ZTJPTXcbvYTC+ScGNIjt56Owzlddx1TJYV6rjLsYvbekhLh7RByn9D3I5b7iUA+7iudSIJYXelsa8XxVkz4qsME8hApUO+d6pDKPtjH2u2mMY+1gN6jzDew+5OeXE2ItSZY/Br4hefja+eUMsO1okeim98Yxk2HYMK4SY/wPlLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724999416; c=relaxed/simple;
-	bh=lPbDnoIYYT+OPMoFM9FRA/Gip0DGARusSAmuTjihBlc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TMU0zcvYI4uARG//aaL1R0IyI96Ul3a3PlBKq2TLBjLpBLIw4pPeojST6zfcf8a8kQ8kfnKqyxQgu0Ys9iuKm5NwySXyIxAB80RFutLvZjab1ZrDy2KYT2CJ7zqd/RsmpNngDlbqC2HuKGh1AAFTFvsz8lXoO6T/uAKM2FZth6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.95.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
+	s=arc-20240116; t=1725008748; c=relaxed/simple;
+	bh=MZL+XJIDKl6SSsfW0G6HQHuhX/O1VwGvEPQqKk0XYMA=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=XNJUmGlcIU/HYuxZdtRGGgKv2lMTbQ1IGs2GNPcOYg5AAZO8KpfqEw4caF/WE2JYDZfH0w90MwQaGEzNx0Ud90wwUJHsYdFwrumWQSsaJ8ciuWYfoomH+rqlC0P1CzbiltUeb1qBBjFxs5M6wi9PhikigVvSq9eb8Ht3ta/Zpws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site; spf=pass smtp.mailfrom=xry111.site; dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b=a8yZZSFV; arc=none smtp.client-ip=89.208.246.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xry111.site
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b="a8yZZSFV"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xry111.site;
+	s=default; t=1725008744;
+	bh=MZL+XJIDKl6SSsfW0G6HQHuhX/O1VwGvEPQqKk0XYMA=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=a8yZZSFV7JAtUobiaR8ZzbdBhBUtMTMBAdz52DgS9f0V01BRpgMWBYSuv9pb4rVHK
+	 DsyIOWhDHDtYYyiBfxDpdj5PFTGtD1G5OcQUycc+LheHGT1c5ex213xi/LnXPagu0F
+	 RgcNQlXMZYM6kEnGwx2XAdFwIW86phKFxt6w+9UY=
+Received: from [192.168.124.6] (unknown [113.200.174.7])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout1.hostsharing.net (Postfix) with ESMTPS id 9989B3000C785;
-	Fri, 30 Aug 2024 08:30:03 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id 92D6D357A40; Fri, 30 Aug 2024 08:30:03 +0200 (CEST)
-Date: Fri, 30 Aug 2024 08:30:03 +0200
-From: Lukas Wunner <lukas@wunner.de>
-To: Gonglei <arei.gonglei@huawei.com>
-Cc: linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Baolin Wang <baolin.wang@linaro.org>, longpeng2@huawei.com,
-	wu.wubin@huawei.com
-Subject: Re: [PATCH] virtio-crypto: support crypto engine framework
-Message-ID: <ZtFm60YSk9BsAjYV@wunner.de>
-References: <1482821347-47664-1-git-send-email-arei.gonglei@huawei.com>
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-384) server-digest SHA384)
+	(Client did not present a certificate)
+	(Authenticated sender: xry111@xry111.site)
+	by xry111.site (Postfix) with ESMTPSA id 0A1BE66F26;
+	Fri, 30 Aug 2024 05:05:41 -0400 (EDT)
+Message-ID: <57d648ed2143df2f5951f8e972cc4c3b2d40c46a.camel@xry111.site>
+Subject: Re: [PATCH v5] LoongArch: vDSO: Wire up getrandom() vDSO
+ implementation
+From: Xi Ruoyao <xry111@xry111.site>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: Tiezhu Yang <yangtiezhu@loongson.cn>, Huacai Chen
+ <chenhuacai@kernel.org>,  WANG Xuerui <kernel@xen0n.name>,
+ linux-crypto@vger.kernel.org, loongarch@lists.linux.dev, 
+ linux-kernel@vger.kernel.org, Jinyang He <hejinyang@loongson.cn>, Arnd
+ Bergmann <arnd@arndb.de>, Thomas Gleixner <tglx@linutronix.de>, Christophe
+ Leroy <christophe.leroy@csgroup.eu>
+Date: Fri, 30 Aug 2024 17:05:38 +0800
+In-Reply-To: <CAHmME9p+-0S-a3kjsv75irmLdGpW6rUWBVm87E4-Z9hpWyA7YA@mail.gmail.com>
+References: <20240829125656.19017-1-xry111@xry111.site>
+	 <ZtB3RczHN00XDO52@zx2c4.com> <ZtB5pqfp0Lg6lzz6@zx2c4.com>
+	 <a3373ad5f92a4120bd0c8e0c751eb7617e035cf6.camel@xry111.site>
+	 <CAHmME9p+-0S-a3kjsv75irmLdGpW6rUWBVm87E4-Z9hpWyA7YA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.3 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1482821347-47664-1-git-send-email-arei.gonglei@huawei.com>
 
-On Tue, Dec 27, 2016 at 02:49:07PM +0800, Gonglei wrote:
-> crypto engine was introduced since 'commit 735d37b5424b ("crypto: engine
-> - Introduce the block request crypto engine framework")' which uses work
-> queue to realize the asynchronous processing for ablk_cipher and ahash.
-> 
-> For virtio-crypto device, I register an engine for each
-> data virtqueue so that we can use the capability of
-> multiple data queues in future.
+On Thu, 2024-08-29 at 16:44 +0200, Jason A. Donenfeld wrote:
+> > So get_vdso_data() + VVAR_LOONGARCH_PAGES_START * PAGE_SIZE should have
+> > already "jumped over" the time-ns vdso data.
+>=20
+> Oh good. Thanks for checking. So it sounds like there's just Huacai's
+> set of comments and we're good.
 
-The above got applied as d79b5d0bbf2e.
+Both Huacai and I (we've discussed a little off the list) think it seems
+more natural to separate the implementation and the self test into two
+patches.  Do you think it's acceptable?  If not we can live with one
+consolidated patch though.
 
-What's the benefit of this change?
-
-virtio has its own queue for requests.  Adding a crypto_engine puts
-a queue in front of that.  So now there's a queue feeding a queue.
-That seems to be a roundabout way of doing things, so I'm wondering
-why this change was made?  It seems to introduce complexity and
-overhead with no apparent benefit.
-
-The reason I'm asking is that I'm splitting sign/verify out of
-virtio_crypto_akcipher_algs.c:
-
-https://lore.kernel.org/all/ZscuLueUKl9rcCGr@wunner.de/
-
-Nowadays sign/verify is no longer asynchronous.  However the
-crypto_engine indirection forces me to introduce a sig_request
-struct which stores the input/output parameters for a sign/verify
-operation, so that the crypto_engine can consume it asynchronously.
-
-I'm tempted to instead remove crypto_engine support from
-virtio_crypto_core.c to ease migration to synchronous sign/verify.
-
-Thanks,
-
-Lukas
+--=20
+Xi Ruoyao <xry111@xry111.site>
+School of Aerospace Science and Technology, Xidian University
