@@ -1,48 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A90C161FCE;
-	Fri, 30 Aug 2024 15:05:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5FE71A4B6C;
+	Fri, 30 Aug 2024 15:19:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725030331; cv=none; b=p/X7I3frMQJRNH3vmhv8iigl7hkTVXwfKY7i5JoPItpqPbpYnFv5Aawcwnrhs4QXNqpAKAAHocBeCZM2Ctv1CETHvR0+GBSnLtzMRuy4xIFuYGn7i9HVJBWB7PqOHobgQK83mw6xkf5LgiBmVFfChMgdeqAUsMEw+tMAmjukRvs=
+	t=1725031148; cv=none; b=bMgVjhZRai1PWySpMjD9DWCDmz6yk5IP0x8WnJ4c3qQWIbTyxQ5/kvguJ0n5t4ryPhkJAGNYxltW+h6cOXf9FdJYr0QakFHKBJjQV/DIf7msnjHmXEYzSATjJhq+IkZ7Eigjj8gA1EEFWGWSU8W5WVsUH5yL/RuFql6ExPrmEt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725030331; c=relaxed/simple;
-	bh=uG3bEWNdwBYes9gIw5O/LaJAm5QrHlsCibzYkXHfO78=;
+	s=arc-20240116; t=1725031148; c=relaxed/simple;
+	bh=UxT0zvqEy8sU3/AbTHrjGMCPAwmSCWG5KRJHyiSxNTY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t0DWqJD9kbKKlKZeIZqEfAakh+PM5MvY5VAPpR14I1vYwYhmPjCKgrQ2kd0gjN3joz/Ae87CL9zWymAoCxGBK3t3Mz6imaEG/AhLinM2/56aFbvllzlJYW0HY8joNyrYAqO1pgcknV26szsr82SZCv5mD/vEaNOJSbUF2ZiXTnY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FV13FeQY; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=ICNmYIB4vdbusrzLT2KwyojtjOw/KXgPcEbyOZ4eBkB9idddVMB4hcNE9P4Rz66sVtoyIa+NxV5lrsOG0FUT9TrYKEzamcvLsTP43dvnvcb/bz3+xMDL6VEas6n5PE0Cn1enarFTQ+Js9nZ3sTnXtcXFavjr0UAQg/MjgsQRvzk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CneQS+/4; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FV13FeQY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85CB4C4CEC7;
-	Fri, 30 Aug 2024 15:05:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CneQS+/4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0298C4CEC2;
+	Fri, 30 Aug 2024 15:19:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725030330;
-	bh=uG3bEWNdwBYes9gIw5O/LaJAm5QrHlsCibzYkXHfO78=;
+	s=k20201202; t=1725031147;
+	bh=UxT0zvqEy8sU3/AbTHrjGMCPAwmSCWG5KRJHyiSxNTY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FV13FeQYg/h++SDDm+EjNpaOU2HB9KsqpppdeLaUunA9e/k6Rty96aJeqoSs0uzIh
-	 +m0jplwJN/8u26ETZdSWtCPz9LntggWnVM76kbdj8hhlBnWZ8djZEJ3wJRM4AQj6tl
-	 HHkprGYQ6Is+feW9Ne7oibcf4UD0wSGQqLARDhOTMmdt/0D1Ky0zIOR3/MiY/wLTka
-	 jWLSYigE1X1aCP0rxTls3fBymMBAdOzKGYV8pDkS+ncE6b6IlVSgfpBYEh/DjIQWQm
-	 2Mtf7a8/W/Yh61fxQrB42tLQPckjiC8W0YP2YD1Hf5aFm+0ZWTTclOEZW/DDx5pwsf
-	 7r1sgAUKda5PQ==
-Date: Fri, 30 Aug 2024 16:05:24 +0100
+	b=CneQS+/47YZSiFmolQlOfv6vNSbuq5lZVLqJIDFsARxtQxuVAwblCl1XAl0My1rnk
+	 P2G+kWT6kYsVrbP9HWrcIbREN9xJZ0dUNanx2EEipvQbH7QsWaxlfRBjIUPpq7+C11
+	 ATREe9JbH795uuLmFjK8qp45c/K3y71sz0+dXuEwrSL+9Aggn5a2K7HmEZvbN9y7RU
+	 TZ9P8JNcfZ7nTuW5Z63n0Wi21BdmKqG+SoEYPAyRNyQ+BlLFqfhFM2u/NjGXGRk/I+
+	 fyH78sNKR/D7Y08mT3krNm+KUiFqRhr+UzJ3bqJnveJFAfQEECse64cWJOEjlsCLdJ
+	 /UVlZZ9BBpVVw==
+Date: Fri, 30 Aug 2024 16:19:00 +0100
 From: Mark Brown <broonie@kernel.org>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: Will Deacon <will@kernel.org>,
-	Adhemerval Zanella <adhemerval.zanella@linaro.org>,
-	Theodore Ts'o <tytso@mit.edu>, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-arch@vger.kernel.org,
+To: Adhemerval Zanella <adhemerval.zanella@linaro.org>
+Cc: "Jason A . Donenfeld" <Jason@zx2c4.com>, Theodore Ts'o <tytso@mit.edu>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org,
 	Catalin Marinas <catalin.marinas@arm.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
+	Will Deacon <will@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
 	Eric Biggers <ebiggers@kernel.org>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>, ardb@kernel.org
+	Christophe Leroy <christophe.leroy@csgroup.eu>
 Subject: Re: [PATCH v2] aarch64: vdso: Wire up getrandom() vDSO implementation
-Message-ID: <d0642c77-34be-4082-be92-1c32c912b9ce@sirena.org.uk>
+Message-ID: <9dd8fee0-008f-42f5-b1e1-d4de3270ccdd@sirena.org.uk>
 References: <20240829201728.2825-1-adhemerval.zanella@linaro.org>
- <20240830114645.GA8219@willie-the-truck>
- <ZtG1V9me28OvU0Qu@zx2c4.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -50,43 +46,49 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="3z+LVmFu7Fj3GG9k"
+	protocol="application/pgp-signature"; boundary="EEUPVV0CH0Fg3oZJ"
 Content-Disposition: inline
-In-Reply-To: <ZtG1V9me28OvU0Qu@zx2c4.com>
+In-Reply-To: <20240829201728.2825-1-adhemerval.zanella@linaro.org>
 X-Cookie: VMS is like a nightmare about RXS-11M.
 
 
---3z+LVmFu7Fj3GG9k
+--EEUPVV0CH0Fg3oZJ
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-On Fri, Aug 30, 2024 at 02:04:39PM +0200, Jason A. Donenfeld wrote:
-> > > +SYM_FUNC_START(__arch_chacha20_blocks_nostack)
+On Thu, Aug 29, 2024 at 08:17:14PM +0000, Adhemerval Zanella wrote:
+> Hook up the generic vDSO implementation to the aarch64 vDSO data page.
+> The _vdso_rng_data required data is placed within the _vdso_data vvar
+> page, by using a offset larger than the vdso_data.
 
-> > Is there any way we can reuse the existing code in
-> > crypto/chacha-neon-core.S for this? It looks to my untrained eye like
-> > this is an arbitrarily different implementation to what we already have.
+This exposes some preexisting compiler warnings in the getrandom test
+when built with clang:
 
-> Nope, it is indeed different, and not arbitrarily so. This patch is
-> mirroring exactly what we did on x86.
+vdso_test_getrandom.c:145:40: warning: omitting the parameter name in a function definition is a C23 extension [-Wc23-extensions]
+  145 | static void *test_vdso_getrandom(void *)
+      |                                        ^
+vdso_test_getrandom.c:155:40: warning: omitting the parameter name in a function definition is a C23 extension [-Wc23-extensions]
+  155 | static void *test_libc_getrandom(void *)
+      |                                        ^
+vdso_test_getrandom.c:165:43: warning: omitting the parameter name in a function definition is a C23 extension [-Wc23-extensions]
+  165 | static void *test_syscall_getrandom(void *)
+      |                                           ^
 
-It's probably worth some comments or something explaining what's going
-on with that (the commit log for the x86 patch mentions that it's that
-the vDSO needs a version that doesn't write to the stack).
+which it'd be good to get fixed before merging.
 
---3z+LVmFu7Fj3GG9k
+--EEUPVV0CH0Fg3oZJ
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmbR37MACgkQJNaLcl1U
-h9Dqfwf+KbUULVPh36yGrixMdaEv3rTW8UGCRY02kKejrOexslmWfOeKks5uOjaK
-+8tOBYrEBNr88ghsWNmLhpftBmI7T2M0VdK84ZP7nuddiZNPONOsLux/g7Q/X6OD
-23uWI+2YwcCRkj/Y+wJeFKn/kCQeKlz+bxNGD09waay/2cfX6+pHbm0UityoMILN
-yEWo/7xfZx1mU+gwks4tzjPI1goxnd6/EDqS7Ha+PEyowShlP2e6Gxbd6wY6dgZH
-p1fbGoz/1GUHZM5PYcAvvmIbgYlEFQVFjORrkkQ12Vf0myHdQd5e0QHGngPKsidh
-CTOfZOlYvow2lwhUUhwYj9TyxmO2hw==
-=3l0l
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmbR4uQACgkQJNaLcl1U
+h9CxrwgAhl7rM/yuoIqLoJv1Q/KWB9FRLr9ypByZbn34tfS34OkNFesGrcwcUhXJ
++hlzFh3ru3NHwfkx772CXSLtK0sJN+a/zBVj/sfighNXJmr62rVS60Z9hvm+tn2M
+AXwwowGgw67Pb9hTIqGiOoLzxXA3IZEQjckLB7EDQuYTAxcvcKL/R/4iPV/QRWeJ
+ELpgjfIT4YDtxUUs1fgM7HFhpnIW+0n7rWmMoFashs74ckgkJhhjDt7DrFMet8kb
+doT1xjOY8z6daxqmahpjjbFVBxKvvsXIvJMsqgSsHSdNoz8k7znSZLVa/Tb8Smhd
+HE/CCrVpWCJqfc43mWFsfqQvUfLEJQ==
+=qnZn
 -----END PGP SIGNATURE-----
 
---3z+LVmFu7Fj3GG9k--
+--EEUPVV0CH0Fg3oZJ--
