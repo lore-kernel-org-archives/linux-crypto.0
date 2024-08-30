@@ -1,93 +1,106 @@
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE2D718C348;
-	Fri, 30 Aug 2024 10:17:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B11D18E355;
+	Fri, 30 Aug 2024 10:28:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725013046; cv=none; b=TNe0n9FUFHFEKwmd21oeNCULOSGEPZQhLBkhwJscVoNEdh9iAJHwaS/XODenk5HywgpF/Xf6+PrYfgmDY8rsyFtlKFCvGD1NYs1G9b8GDf+AK3Ot90IBqWyeTV0HeGOoPox2Fc9/cq8RiI2IfXtLXTDBG2uQfeBYvKuRosQ9qZ8=
+	t=1725013711; cv=none; b=D2vQ6vrS9wmkTc5yKWIXXFl241GvsU10nMtSqCdh6VU84SLeXeYJu6n5pMSciiEzrKffKexjZ6EpBdqqaz/kmRuBe/lMGHCjGBRh4u6TGVH+ZXYzQBU6rceWli9H9AFy8YjyyXnhnB5brX5QXmsIFkeS+deD91KEro0JqLLbpPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725013046; c=relaxed/simple;
-	bh=hUbjT7qj0ylI5uwOskrsSChPh/FbefLjixfh3uDGogk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rrqfjjY7IpCH7xvJjOC6oi66nG9rPNuigS0UrGKebik8QYVkigLx3Q1AX8q1EbXbBULKKScnJsDlX2a1ImQBh9ez+xxHC6x7MHOP3IEqSvI9mxA2KVvARTXqSbd292yJS6rRgPdcaLZftsoiZyrPMwDFZyw5/CoTkmeIyw0Chq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4WwDbS1Gyqz1j7q0;
-	Fri, 30 Aug 2024 18:17:08 +0800 (CST)
-Received: from kwepemd200024.china.huawei.com (unknown [7.221.188.85])
-	by mail.maildlp.com (Postfix) with ESMTPS id D4E221400D7;
-	Fri, 30 Aug 2024 18:17:21 +0800 (CST)
-Received: from localhost.huawei.com (10.90.30.45) by
- kwepemd200024.china.huawei.com (7.221.188.85) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 30 Aug 2024 18:17:21 +0800
-From: Chenghai Huang <huangchenghai2@huawei.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<fanghao11@huawei.com>, <liulongfang@huawei.com>, <shenyang39@huawei.com>,
-	<songzhiqi1@huawei.com>, <qianweili@huawei.com>, <linwenkai6@hisilicon.com>,
-	<taoqi10@huawei.com>, <wangzhou1@hisilicon.com>, <huangchenghai2@huawei.com>
-Subject: [PATCH 3/3] crypto: hisilicon/trng - modifying the order of header files
-Date: Fri, 30 Aug 2024 18:17:18 +0800
-Message-ID: <20240830101718.3193159-4-huangchenghai2@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20240830101718.3193159-1-huangchenghai2@huawei.com>
-References: <20240830101718.3193159-1-huangchenghai2@huawei.com>
+	s=arc-20240116; t=1725013711; c=relaxed/simple;
+	bh=zIr6ofHRy4wHFT1oom3DmckyPg52yr84jBW6Dqoz3Go=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LNR6K2lplVii/R8R9kRm+o94ksdkgZhElhaQQd5n4QavXBtP3kWGzSrB4zCxRjwfA/qBld97DmO+WIQfiXIb3adwybtij+l3DgaE8NgX6H+cgXjLKRhH47QfMhDWvc5KSY+jJptNSVdHItFn3zCZ8+uPlV8bglYTrKIr4V5uAfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1sjyj9-008Ufb-1u;
+	Fri, 30 Aug 2024 18:28:21 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 30 Aug 2024 18:28:20 +0800
+Date: Fri, 30 Aug 2024 18:28:20 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Pavan Kumar Paluri <papaluri@amd.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Ashish Kalra <ashish.kalra@amd.com>,
+	John Allen <john.allen@amd.com>,
+	"David S . Miller" <davem@davemloft.net>, stable@vger.kernel.org
+Subject: Re: [PATCH] crypto: ccp: Properly unregister /dev/sev on sev
+ PLATFORM_STATUS failure
+Message-ID: <ZtGexA2G-kOTQZ4i@gondor.apana.org.au>
+References: <20240815122500.71946-1-papaluri@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemd200024.china.huawei.com (7.221.188.85)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240815122500.71946-1-papaluri@amd.com>
 
-Header files is included Order-ref: standard library headers,
-OS library headers, and project-specific headers. This patch
-modifies the order of header files according to suggestions.
+On Thu, Aug 15, 2024 at 07:25:00AM -0500, Pavan Kumar Paluri wrote:
+> In case of sev PLATFORM_STATUS failure, sev_get_api_version() fails
+> resulting in sev_data field of psp_master nulled out. This later becomes
+> a problem when unloading the ccp module because the device has not been
+> unregistered (via misc_deregister()) before clearing the sev_data field
+> of psp_master. As a result, on reloading the ccp module, a duplicate
+> device issue is encountered as can be seen from the dmesg log below.
+> 
+> on reloading ccp module via modprobe ccp
+> 
+> Call Trace:
+>   <TASK>
+>   dump_stack_lvl+0xd7/0xf0
+>   dump_stack+0x10/0x20
+>   sysfs_warn_dup+0x5c/0x70
+>   sysfs_create_dir_ns+0xbc/0xd
+>   kobject_add_internal+0xb1/0x2f0
+>   kobject_add+0x7a/0xe0
+>   ? srso_alias_return_thunk+0x5/0xfbef5
+>   ? get_device_parent+0xd4/0x1e0
+>   ? __pfx_klist_children_get+0x10/0x10
+>   device_add+0x121/0x870
+>   ? srso_alias_return_thunk+0x5/0xfbef5
+>   device_create_groups_vargs+0xdc/0x100
+>   device_create_with_groups+0x3f/0x60
+>   misc_register+0x13b/0x1c0
+>   sev_dev_init+0x1d4/0x290 [ccp]
+>   psp_dev_init+0x136/0x300 [ccp]
+>   sp_init+0x6f/0x80 [ccp]
+>   sp_pci_probe+0x2a6/0x310 [ccp]
+>   ? srso_alias_return_thunk+0x5/0xfbef5
+>   local_pci_probe+0x4b/0xb0
+>   work_for_cpu_fn+0x1a/0x30
+>   process_one_work+0x203/0x600
+>   worker_thread+0x19e/0x350
+>   ? __pfx_worker_thread+0x10/0x10
+>   kthread+0xeb/0x120
+>   ? __pfx_kthread+0x10/0x10
+>   ret_from_fork+0x3c/0x60
+>   ? __pfx_kthread+0x10/0x10
+>   ret_from_fork_asm+0x1a/0x30
+>   </TASK>
+>   kobject: kobject_add_internal failed for sev with -EEXIST, don't try to register things with the same name in the same directory.
+>   ccp 0000:22:00.1: sev initialization failed
+>   ccp 0000:22:00.1: psp initialization failed
+>   ccp 0000:a2:00.1: no command queues available
+>   ccp 0000:a2:00.1: psp enabled
+> 
+> Address this issue by unregistering the /dev/sev before clearing out
+> sev_data in case of PLATFORM_STATUS failure.
+> 
+> Fixes: 200664d5237f ("crypto: ccp: Add Secure Encrypted Virtualization (SEV) command support")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Pavan Kumar Paluri <papaluri@amd.com>
+> ---
+>  drivers/crypto/ccp/sev-dev.c | 2 ++
+>  1 file changed, 2 insertions(+)
 
-In addition, use %u to print unsigned int variables to prevent
-overflow.
-
-Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
----
- drivers/crypto/hisilicon/trng/trng.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/crypto/hisilicon/trng/trng.c b/drivers/crypto/hisilicon/trng/trng.c
-index 451b167bcc73..66c551ecdee8 100644
---- a/drivers/crypto/hisilicon/trng/trng.c
-+++ b/drivers/crypto/hisilicon/trng/trng.c
-@@ -1,6 +1,7 @@
- // SPDX-License-Identifier: GPL-2.0
- /* Copyright (c) 2019 HiSilicon Limited. */
- 
-+#include <crypto/internal/rng.h>
- #include <linux/acpi.h>
- #include <linux/crypto.h>
- #include <linux/err.h>
-@@ -13,7 +14,6 @@
- #include <linux/mutex.h>
- #include <linux/platform_device.h>
- #include <linux/random.h>
--#include <crypto/internal/rng.h>
- 
- #define HISI_TRNG_REG		0x00F0
- #define HISI_TRNG_BYTES		4
-@@ -121,7 +121,7 @@ static int hisi_trng_generate(struct crypto_rng *tfm, const u8 *src,
- 	u32 i;
- 
- 	if (dlen > SW_DRBG_BLOCKS_NUM * SW_DRBG_BYTES || dlen == 0) {
--		pr_err("dlen(%d) exceeds limit(%d)!\n", dlen,
-+		pr_err("dlen(%u) exceeds limit(%d)!\n", dlen,
- 			SW_DRBG_BLOCKS_NUM * SW_DRBG_BYTES);
- 		return -EINVAL;
- 	}
+Patch applied.  Thanks.
 -- 
-2.33.0
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
