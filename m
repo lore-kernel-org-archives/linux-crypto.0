@@ -1,70 +1,127 @@
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50DF418EB1
-	for <linux-crypto@vger.kernel.org>; Sat, 31 Aug 2024 01:55:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4BB418C31;
+	Sat, 31 Aug 2024 01:57:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725069308; cv=none; b=NuDart7g9o9Go+rTkawgdMHr6Skc8PoZZYMstu3Xw4RUguC0I50VHjlxmOLA47+h/+j6ZjcFqnQ0hkqUIitFBczVN7181quWVY9Lh2bVs6hNGX8J5wcGlRUogSx/k6wgREier3SNxw+xJ4sOCET1MqbRlIajD/ibg+cKkk5WWBI=
+	t=1725069469; cv=none; b=fHiZ4g2uPKChy8/uEZEaa7IAGJT8LUaXp4yWL8+i8Oxxnw7pyICSyZG3talCIuL/Y9K0cGooCWCjo7fSJ1JfGROAIIvE8jed3TM5tMNYC1zlkHJlhzzLpAFSmrDetY3eLvLxvEKLzTD3JKFZo/tfKcMzkbMOkdf0uZVw8m6vIlI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725069308; c=relaxed/simple;
-	bh=/49X5HIHx087L2R2KETHVO8tqiYMe4EHx3xXIfbEJN8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=D6JJBPg68MFaaeFr3TfZyt3jrr9WKc55nm0d7SAJfXSlS4+Q5SJ9ykGZT965Xs6G15v+wA4wwyTqjMZOCt+G3M1Fo2IASomJ2KBQ8Gs5/eY4vH/HoOUjaQwDR1e5Rpzg6O0i1JUZfr3ZbyGiQiqt2vNYM6lYpAeDDdTnKfbCJh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4WwdPM2NYmz1S9W0;
-	Sat, 31 Aug 2024 09:54:47 +0800 (CST)
-Received: from dggpeml500022.china.huawei.com (unknown [7.185.36.66])
-	by mail.maildlp.com (Postfix) with ESMTPS id 9F205140109;
-	Sat, 31 Aug 2024 09:55:02 +0800 (CST)
-Received: from [10.67.111.104] (10.67.111.104) by
- dggpeml500022.china.huawei.com (7.185.36.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Sat, 31 Aug 2024 09:55:02 +0800
-Message-ID: <41e37215-2e03-4ac2-9420-8b3370e60a06@huawei.com>
-Date: Sat, 31 Aug 2024 09:55:01 +0800
+	s=arc-20240116; t=1725069469; c=relaxed/simple;
+	bh=Or8HdMw0jQmW5OAewy5sc08VXT/MO4lE6accWkZyWGQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=miuV4hZaVMs1YPdYI6Nqrm6lSlwGnrDJ9o572MdYMdU41MaKl+Rw6bSNW7P5crGqW7LbbNN4h9k+4yk09czv/2oNtEjtZrwZLr0Oeu8/eRPO7PAVql7ke76pShuXyPHn/XMowrNw5mymuU4wpxdUn5mG5/cR5ZcK45Rawz53vZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dCmY11w4; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dCmY11w4"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1725069468; x=1756605468;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Or8HdMw0jQmW5OAewy5sc08VXT/MO4lE6accWkZyWGQ=;
+  b=dCmY11w4PxILmTF8qrTk4ywUI4fBq2dCuUisat4v1lJkM7gr1aBVM4rU
+   MzhqOHjCEfj0KLEbSjnOO4H0elJQq6oF3IPAhbvvkPPhZtYY7HE8n/qzs
+   Om3wRaH9JWYSMXF96E5s0rz7riK31T2P8ZTY1ij/xFi4ZmCPvxu/QQlgm
+   o25zlg65f72SQZ15R1gwkRB7RBmWgn1QaCvhiH2bZb8yYtJiuOt0u8vVs
+   AcRCfJSwBsNdACExdUetotByv1Da08MfwFwE35WfPGzhrEq7VD0zQ40bq
+   bA1OcqbSiRQNnFuLAwCDoKQArfIswUZvBkSAGfAbFp8A2ySCpKsd6ZE36
+   A==;
+X-CSE-ConnectionGUID: JNPXZGnOQnOMyK8IlO2s4g==
+X-CSE-MsgGUID: K5LMsmimT0ClpomNkaByww==
+X-IronPort-AV: E=McAfee;i="6700,10204,11180"; a="34297814"
+X-IronPort-AV: E=Sophos;i="6.10,190,1719903600"; 
+   d="scan'208";a="34297814"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Aug 2024 18:57:47 -0700
+X-CSE-ConnectionGUID: Pcv5OCCbTwi8LpYKrNzcoA==
+X-CSE-MsgGUID: AbF7xuwuTPG6xNW2MXEm0g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,190,1719903600"; 
+   d="scan'208";a="94795001"
+Received: from lkp-server01.sh.intel.com (HELO 9c6b1c7d3b50) ([10.239.97.150])
+  by orviesa002.jf.intel.com with ESMTP; 30 Aug 2024 18:57:44 -0700
+Received: from kbuild by 9c6b1c7d3b50 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1skDMz-0002HK-2v;
+	Sat, 31 Aug 2024 01:57:41 +0000
+Date: Sat, 31 Aug 2024 09:56:52 +0800
+From: kernel test robot <lkp@intel.com>
+To: Adhemerval Zanella <adhemerval.zanella@linaro.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Theodore Ts'o <tytso@mit.edu>, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-arch@vger.kernel.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc: oe-kbuild-all@lists.linux.dev
+Subject: Re: [PATCH v2] aarch64: vdso: Wire up getrandom() vDSO implementation
+Message-ID: <202408310834.qh5oO1N6-lkp@intel.com>
+References: <20240829201728.2825-1-adhemerval.zanella@linaro.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH -next] crypto: Remove unused parameter from macro ROLDQ
-Content-Language: en-US
-To: Herbert Xu <herbert@gondor.apana.org.au>
-CC: <davem@davemloft.net>, <linux-crypto@vger.kernel.org>
-References: <20240823065707.3327267-1-lihongbo22@huawei.com>
- <ZtGbKYhHXQWBQbbM@gondor.apana.org.au>
-From: Hongbo Li <lihongbo22@huawei.com>
-In-Reply-To: <ZtGbKYhHXQWBQbbM@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpeml500022.china.huawei.com (7.185.36.66)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240829201728.2825-1-adhemerval.zanella@linaro.org>
+
+Hi Adhemerval,
+
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on crng-random/master]
+[also build test ERROR on next-20240830]
+[cannot apply to arm64/for-next/core shuah-kselftest/next shuah-kselftest/fixes linus/master v6.11-rc5]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Adhemerval-Zanella/aarch64-vdso-Wire-up-getrandom-vDSO-implementation/20240830-041912
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/crng/random.git master
+patch link:    https://lore.kernel.org/r/20240829201728.2825-1-adhemerval.zanella%40linaro.org
+patch subject: [PATCH v2] aarch64: vdso: Wire up getrandom() vDSO implementation
+config: arm64-defconfig (https://download.01.org/0day-ci/archive/20240831/202408310834.qh5oO1N6-lkp@intel.com/config)
+compiler: aarch64-linux-gcc (GCC) 13.3.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240831/202408310834.qh5oO1N6-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408310834.qh5oO1N6-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from arch/arm64/include/asm/vdso/getrandom.h:8,
+                    from lib/vdso/getrandom.c:12,
+                    from <command-line>:
+>> arch/arm64/include/asm/vdso.h:25:10: fatal error: generated/vdso-offsets.h: No such file or directory
+      25 | #include <generated/vdso-offsets.h>
+         |          ^~~~~~~~~~~~~~~~~~~~~~~~~~
+   compilation terminated.
+   make[3]: *** [scripts/Makefile.build:244: arch/arm64/kernel/vdso/vgetrandom.o] Error 1
+   make[3]: Target 'include/generated/vdso-offsets.h' not remade because of errors.
+   make[3]: Target 'arch/arm64/kernel/vdso/vdso.so' not remade because of errors.
+   make[2]: *** [arch/arm64/Makefile:217: vdso_prepare] Error 2
+   make[2]: Target 'prepare' not remade because of errors.
+   make[1]: *** [Makefile:224: __sub-make] Error 2
+   make[1]: Target 'prepare' not remade because of errors.
+   make: *** [Makefile:224: __sub-make] Error 2
+   make: Target 'prepare' not remade because of errors.
 
 
+vim +25 arch/arm64/include/asm/vdso.h
 
-On 2024/8/30 18:12, Herbert Xu wrote:
-> On Fri, Aug 23, 2024 at 02:57:07PM +0800, Hongbo Li wrote:
->> The parameter w1 is not used in macro ROLDQ, so we can
->> remove it to simplify the code.
->>
->> Signed-off-by: Hongbo Li <lihongbo22@huawei.com>
->> ---
->>   crypto/camellia_generic.c | 42 +++++++++++++++++++--------------------
->>   1 file changed, 21 insertions(+), 21 deletions(-)
-> 
-> I don't think the churn caused by this change is worth it.
-> 
-Although it seems a bit risky, the new code does not have to consider 
-passing in unnecessary arguments when using the ROLDQ macro. Of course, 
-I'm not sure if there will be other new places using it.
+0a7927d2b89e55 Adhemerval Zanella 2024-08-29  24  
+9031fefde6f2ac Will Deacon        2012-03-05 @25  #include <generated/vdso-offsets.h>
+9031fefde6f2ac Will Deacon        2012-03-05  26  
 
-Thanks,
-Hongbo
-
-> Cheers,
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
