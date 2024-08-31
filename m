@@ -1,25 +1,25 @@
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFED5170A24;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D55A716A940;
 	Sat, 31 Aug 2024 09:50:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725097817; cv=none; b=bCtG01eNHT2Ry4eP8bvs6Kcoggu2NAHijSBNvJziYpfjQaiDnCSNPkTchuwfKl3SybR8GY9UsnruInX8i3ntKOa0S6il/T0ZLk6vtWuviuLyJ/2u39K2hVZoe86paYsA9mTh4jtL5KFkJQjSmczWnDYnV7Z3uijWW20GDm1YYhg=
+	t=1725097818; cv=none; b=dfdzUehabJ5ckF5oIsSHSsu2Agk8FANM0BP59BwNwOzolm0o7B7Fv+0m/O4NkKXKxEbfa/BrsVLlT+TP+hWm2I0F04SoU40BIYEZg/FIChsCIbW0Jxyt49gwDp/YAkF34K06Ef2OlUAuqS3ufqH+vfdzwvTFg2eJK8evDpeaJoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725097817; c=relaxed/simple;
-	bh=hUbjT7qj0ylI5uwOskrsSChPh/FbefLjixfh3uDGogk=;
+	s=arc-20240116; t=1725097818; c=relaxed/simple;
+	bh=NWhtZ/Bj5G8xe/nOcPTyigY9psQjLUTolLVJnHofZXc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qSLJjvYzraqRv9WCx75dCKO1n9IlJ54crRwn70cj3fqA7XFnsvoq0uOXkTBijCBmYYaiO8VWHz7Tru6sCANmSnfarCCCyWqO6Z1EdSecBKTq1m4vh9l8IdgQIaTDxUTuhZPXym5eOSkPtQGVIuXPCJ26n6UqtOFSetN8lqeYqnI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+	 MIME-Version:Content-Type; b=Nr6EO1Th4zz4qDDQxukruk3l+YhPlvNe231t7KJECMSBxUdILwbGRX+fMY1MQ7HsgasJ6bEnM9yweH9RSiobuHge/Bh8JW9VkJqHtdbE949iHces57f6VzdvmqOsKBY1AKGIDTK2Qw/4cMkBh2lGcLk2AjQ/rI3nvNwNoMQRWbU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Wwqww0qmDzyQxg;
-	Sat, 31 Aug 2024 17:49:20 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Wwqvs3G8KzpVCx;
+	Sat, 31 Aug 2024 17:48:25 +0800 (CST)
 Received: from kwepemd200024.china.huawei.com (unknown [7.221.188.85])
-	by mail.maildlp.com (Postfix) with ESMTPS id 728A1140137;
-	Sat, 31 Aug 2024 17:50:12 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id EF10B1400DC;
+	Sat, 31 Aug 2024 17:50:11 +0800 (CST)
 Received: from localhost.huawei.com (10.90.30.45) by
  kwepemd200024.china.huawei.com (7.221.188.85) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
@@ -30,9 +30,9 @@ CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
 	<fanghao11@huawei.com>, <liulongfang@huawei.com>, <shenyang39@huawei.com>,
 	<songzhiqi1@huawei.com>, <qianweili@huawei.com>, <linwenkai6@hisilicon.com>,
 	<taoqi10@huawei.com>, <wangzhou1@hisilicon.com>, <huangchenghai2@huawei.com>
-Subject: [PATCH v2 3/3] crypto: hisilicon/trng - modifying the order of header files
-Date: Sat, 31 Aug 2024 17:50:09 +0800
-Message-ID: <20240831095009.446780-4-huangchenghai2@huawei.com>
+Subject: [PATCH v2 2/3] crypto: hisilicon - add a lock for the qp send operation
+Date: Sat, 31 Aug 2024 17:50:08 +0800
+Message-ID: <20240831095009.446780-3-huangchenghai2@huawei.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20240831095009.446780-1-huangchenghai2@huawei.com>
 References: <20240831095009.446780-1-huangchenghai2@huawei.com>
@@ -47,47 +47,58 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
  kwepemd200024.china.huawei.com (7.221.188.85)
 
-Header files is included Order-ref: standard library headers,
-OS library headers, and project-specific headers. This patch
-modifies the order of header files according to suggestions.
+Apply for a lock before the qp send operation to ensure no
+resource race in multi-concurrency situations.
 
-In addition, use %u to print unsigned int variables to prevent
-overflow.
+This modification has almost no impact on performance.
 
 Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
 ---
- drivers/crypto/hisilicon/trng/trng.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/trng/trng.c b/drivers/crypto/hisilicon/trng/trng.c
-index 451b167bcc73..66c551ecdee8 100644
---- a/drivers/crypto/hisilicon/trng/trng.c
-+++ b/drivers/crypto/hisilicon/trng/trng.c
-@@ -1,6 +1,7 @@
- // SPDX-License-Identifier: GPL-2.0
- /* Copyright (c) 2019 HiSilicon Limited. */
+v2:
+- Rebased on top of the merged spin_lock type.
+
+---
+ drivers/crypto/hisilicon/hpre/hpre_crypto.c | 2 ++
+ drivers/crypto/hisilicon/zip/zip_crypto.c   | 3 +++
+ 2 files changed, 5 insertions(+)
+
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+index 764532a6ca82..c167dbd6c7d6 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+@@ -575,7 +575,9 @@ static int hpre_send(struct hpre_ctx *ctx, struct hpre_sqe *msg)
  
-+#include <crypto/internal/rng.h>
- #include <linux/acpi.h>
- #include <linux/crypto.h>
- #include <linux/err.h>
-@@ -13,7 +14,6 @@
- #include <linux/mutex.h>
- #include <linux/platform_device.h>
- #include <linux/random.h>
--#include <crypto/internal/rng.h>
+ 	do {
+ 		atomic64_inc(&dfx[HPRE_SEND_CNT].value);
++		spin_lock_bh(&ctx->req_lock);
+ 		ret = hisi_qp_send(ctx->qp, msg);
++		spin_unlock_bh(&ctx->req_lock);
+ 		if (ret != -EBUSY)
+ 			break;
+ 		atomic64_inc(&dfx[HPRE_SEND_BUSY_CNT].value);
+diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
+index 92d3bd0dfe1b..7327f8f29b01 100644
+--- a/drivers/crypto/hisilicon/zip/zip_crypto.c
++++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
+@@ -213,6 +213,7 @@ static int hisi_zip_do_work(struct hisi_zip_qp_ctx *qp_ctx,
+ {
+ 	struct hisi_acc_sgl_pool *pool = qp_ctx->sgl_pool;
+ 	struct hisi_zip_dfx *dfx = &qp_ctx->zip_dev->dfx;
++	struct hisi_zip_req_q *req_q = &qp_ctx->req_q;
+ 	struct acomp_req *a_req = req->req;
+ 	struct hisi_qp *qp = qp_ctx->qp;
+ 	struct device *dev = &qp->qm->pdev->dev;
+@@ -244,7 +245,9 @@ static int hisi_zip_do_work(struct hisi_zip_qp_ctx *qp_ctx,
  
- #define HISI_TRNG_REG		0x00F0
- #define HISI_TRNG_BYTES		4
-@@ -121,7 +121,7 @@ static int hisi_trng_generate(struct crypto_rng *tfm, const u8 *src,
- 	u32 i;
- 
- 	if (dlen > SW_DRBG_BLOCKS_NUM * SW_DRBG_BYTES || dlen == 0) {
--		pr_err("dlen(%d) exceeds limit(%d)!\n", dlen,
-+		pr_err("dlen(%u) exceeds limit(%d)!\n", dlen,
- 			SW_DRBG_BLOCKS_NUM * SW_DRBG_BYTES);
- 		return -EINVAL;
- 	}
+ 	/* send command to start a task */
+ 	atomic64_inc(&dfx->send_cnt);
++	spin_lock_bh(&req_q->req_lock);
+ 	ret = hisi_qp_send(qp, &zip_sqe);
++	spin_unlock_bh(&req_q->req_lock);
+ 	if (unlikely(ret < 0)) {
+ 		atomic64_inc(&dfx->send_busy_cnt);
+ 		ret = -EAGAIN;
 -- 
 2.33.0
 
