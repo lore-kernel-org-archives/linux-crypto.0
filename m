@@ -1,39 +1,41 @@
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from xry111.site (xry111.site [89.208.246.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 905EE17C7C1;
-	Sat, 31 Aug 2024 11:52:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5377D2F28;
+	Sun,  1 Sep 2024 06:13:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.208.246.23
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725105143; cv=none; b=D4/b7M1oT7CcvtH504ZBQM6nLimu//ZjJxAds1HvTY9KxJDM0JTuhcUsuMfTORVqVCuKWNFnQZtYGHS007Y0HT2Xzfva9opWfAF1zh7wTHgNfKy29/s0Pu2fpxwpiihJHg00Ca1zxz1bp+T233zAIx2HI/jdMcmxSS4NhrK6S9E=
+	t=1725171227; cv=none; b=uYwQCvecv2TutXF+e4U4bpH/xdMnLzh8rWK9+svXYhmW5R/UNuixCnMXMUPr03r93FkO3F4Uwwl0bimiuxq0nRO/hTzPJdPZMdfmdItI4BkiUfq1DQyhinIgyinJQ3yyNPbXoOByIzUuLriM5f5JDofDarhwkz8KZqYBsT0klYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725105143; c=relaxed/simple;
-	bh=O2FB3Q74UJTbxFVdwTJnIyMlNKqkAWY7pe+sL6bH2Aw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Wciap9o6XA584B2IPirWcut3v6whIBKH6bIrt12ZTmwCTzRRkKjtLQj6JXn2fhYSsCUW7EMovubyxU4LpraJro2MB92AxhypTgCSKaJPY8u7E7ff4IW4kGFpz7OOYjPlffIPknlfwBQX+/IAybsPZf4HguCb7oJbUVEmFHwzpMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Wwtck4KhPzpV3Y;
-	Sat, 31 Aug 2024 19:50:30 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (unknown [7.193.23.164])
-	by mail.maildlp.com (Postfix) with ESMTPS id 3ED2B18006C;
-	Sat, 31 Aug 2024 19:52:17 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.56) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Sat, 31 Aug 2024 19:52:16 +0800
-From: Weili Qian <qianweili@huawei.com>
-To: <herbert@gondor.apana.org.au>
-CC: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<liulongfang@huawei.com>, <shenyang39@huawei.com>
-Subject: [PATCH 3/3] crypto: hisilicon/qm - inject error before stopping queue
-Date: Sat, 31 Aug 2024 19:48:31 +0800
-Message-ID: <20240831114831.21987-4-qianweili@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20240831114831.21987-1-qianweili@huawei.com>
-References: <20240831114831.21987-1-qianweili@huawei.com>
+	s=arc-20240116; t=1725171227; c=relaxed/simple;
+	bh=CzldQ8R74KRGEZMr+wtIlJ54mQi4+DTTVEIXhU8MinY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XF/otv3GAsTreob8cPbrB3ARnzD+TnhtWrQu7KAbJh461B8Mof4bD7+29ROnudtoRQMVhLqyfmg0huK5YV8KVDkqIIOlZB068VHzOr2eMdm2ydKrbcstJo6PEgEDNInFysmvdFOxSwVh2LC+tzEuNEKTj0DGu4gu2/b10xuLGcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site; spf=pass smtp.mailfrom=xry111.site; arc=none smtp.client-ip=89.208.246.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xry111.site
+Received: from stargazer.. (unknown [IPv6:240e:358:11b0:f100:dc73:854d:832e:2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (secp384r1) server-digest SHA384)
+	(Client did not present a certificate)
+	(Authenticated sender: xry111@xry111.site)
+	by xry111.site (Postfix) with ESMTPSA id 819CA1A3FE1;
+	Sun,  1 Sep 2024 02:13:39 -0400 (EDT)
+From: Xi Ruoyao <xry111@xry111.site>
+To: "Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	WANG Xuerui <kernel@xen0n.name>
+Cc: Xi Ruoyao <xry111@xry111.site>,
+	linux-crypto@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Jinyang He <hejinyang@loongson.cn>,
+	Tiezhu Yang <yangtiezhu@loongson.cn>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH v6 0/3] LoongArch: Implement getrandom() in vDSO
+Date: Sun,  1 Sep 2024 14:13:09 +0800
+Message-ID: <20240901061315.15693-1-xry111@xry111.site>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -41,104 +43,110 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemm600009.china.huawei.com (7.193.23.164)
 
-The master ooo cannot be completely closed when the
-accelerator core reports memory error. Therefore, the driver
-needs to inject the qm error to close the master ooo. Currently,
-the qm error is injected after stopping queue, memory may be
-released immediately after stopping queue, causing the device to
-access the released memory. Therefore, error is injected to close master
-ooo before stopping queue to ensure that the device does not access
-the released memory.
+Implement stack-less ChaCha20 and wire it with the generic vDSO
+getrandom code.  It passes vdso_test_chacha test, and the
+vdso_test_getrandom results:
 
-Fixes: 6c6dd5802c2d ("crypto: hisilicon/qm - add controller reset interface")
-Signed-off-by: Weili Qian <qianweili@huawei.com>
----
- drivers/crypto/hisilicon/qm.c | 47 ++++++++++++++++++-----------------
- 1 file changed, 24 insertions(+), 23 deletions(-)
+bench-single:
 
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index b2b5f15abdf7..07983af9e3e2 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -4015,6 +4015,28 @@ static int qm_set_vf_mse(struct hisi_qm *qm, bool set)
- 	return -ETIMEDOUT;
- }
- 
-+static void qm_dev_ecc_mbit_handle(struct hisi_qm *qm)
-+{
-+	u32 nfe_enb = 0;
-+
-+	/* Kunpeng930 hardware automatically close master ooo when NFE occurs */
-+	if (qm->ver >= QM_HW_V3)
-+		return;
-+
-+	if (!qm->err_status.is_dev_ecc_mbit &&
-+	    qm->err_status.is_qm_ecc_mbit &&
-+	    qm->err_ini->close_axi_master_ooo) {
-+		qm->err_ini->close_axi_master_ooo(qm);
-+	} else if (qm->err_status.is_dev_ecc_mbit &&
-+		   !qm->err_status.is_qm_ecc_mbit &&
-+		   !qm->err_ini->close_axi_master_ooo) {
-+		nfe_enb = readl(qm->io_base + QM_RAS_NFE_ENABLE);
-+		writel(nfe_enb & QM_RAS_NFE_MBIT_DISABLE,
-+		       qm->io_base + QM_RAS_NFE_ENABLE);
-+		writel(QM_ECC_MBIT, qm->io_base + QM_ABNORMAL_INT_SET);
-+	}
-+}
-+
- static int qm_vf_reset_prepare(struct hisi_qm *qm,
- 			       enum qm_stop_reason stop_reason)
- {
-@@ -4079,6 +4101,8 @@ static int qm_controller_reset_prepare(struct hisi_qm *qm)
- 		return ret;
- 	}
- 
-+	qm_dev_ecc_mbit_handle(qm);
-+
- 	/* PF obtains the information of VF by querying the register. */
- 	qm_cmd_uninit(qm);
- 
-@@ -4125,28 +4149,6 @@ static int qm_master_ooo_check(struct hisi_qm *qm)
- 	return ret;
- }
- 
--static void qm_dev_ecc_mbit_handle(struct hisi_qm *qm)
--{
--	u32 nfe_enb = 0;
--
--	/* Kunpeng930 hardware automatically close master ooo when NFE occurs */
--	if (qm->ver >= QM_HW_V3)
--		return;
--
--	if (!qm->err_status.is_dev_ecc_mbit &&
--	    qm->err_status.is_qm_ecc_mbit &&
--	    qm->err_ini->close_axi_master_ooo) {
--		qm->err_ini->close_axi_master_ooo(qm);
--	} else if (qm->err_status.is_dev_ecc_mbit &&
--		   !qm->err_status.is_qm_ecc_mbit &&
--		   !qm->err_ini->close_axi_master_ooo) {
--		nfe_enb = readl(qm->io_base + QM_RAS_NFE_ENABLE);
--		writel(nfe_enb & QM_RAS_NFE_MBIT_DISABLE,
--		       qm->io_base + QM_RAS_NFE_ENABLE);
--		writel(QM_ECC_MBIT, qm->io_base + QM_ABNORMAL_INT_SET);
--	}
--}
--
- static int qm_soft_reset_prepare(struct hisi_qm *qm)
- {
- 	struct pci_dev *pdev = qm->pdev;
-@@ -4171,7 +4173,6 @@ static int qm_soft_reset_prepare(struct hisi_qm *qm)
- 		return ret;
- 	}
- 
--	qm_dev_ecc_mbit_handle(qm);
- 	ret = qm_master_ooo_check(qm);
- 	if (ret)
- 		return ret;
+   vdso: 25000000 times in 0.527882568 seconds
+   libc: 25000000 times in 6.963153452 seconds
+syscall: 25000000 times in 6.980286094 seconds
+
+bench-multi:
+
+   vdso: 25000000 x 256 times in 29.405172862 seconds
+   libc: 25000000 x 256 times in 355.692605551 seconds
+   syscall: 25000000 x 256 times in 338.481559154 seconds
+
+bench-single in an unshared time namespace:
+
+   vdso: 25000000 times in 0.528282411 seconds
+   libc: 25000000 times in 6.966410240 seconds
+syscall: 25000000 times in 6.976614579 seconds
+
+Cc: linux-crypto@vger.kernel.org
+Cc: loongarch@lists.linux.dev
+Cc: linux-kernel@vger.kernel.org
+Cc: Jinyang He <hejinyang@loongson.cn>
+Cc: Tiezhu Yang <yangtiezhu@loongson.cn>
+Cc:	Thomas Gleixner <tglx@linutronix.de>
+Cc: Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc: Arnd Bergmann <arnd@arndb.de>
+
+[v5]->v6:
+- Rebase onto crng/random.git.
+- Separate selftest patch from the implementation patch again (both I
+  and Huacai perfer this way).
+- Add a patch to provide a __vdso_getrandom prototype shared by all
+  ports, similar to the __vdso_gettimeofday prototype added by Arnd in
+  commit 42874e4eb35b ("arch: vdso: consolidate gettime prototypes").
+- Stop breaking lines at 80 characters for C code.
+- In vdso.lds.S and Makefile, keep sigreturn the last in the lists.
+
+[v4]->v5:
+- Rebase onto crng/random.git:
+  - Remove two selftest patches.
+  - Remove __arch_chacha20_blocks_nostack forward declaration.
+- Squash the remaining selftest patch into the vDSO getrandom
+  implementation patch.
+- Remove ifdef CONFIG_VDSO_GETRANDOM and $(CONFIG_VDSO_GETRANDOM) as
+  they are always true in arch/loongarch.
+- Remove asm-offsets.c change which has been already unneeded in v4.
+- Add comment about rematerializing the constant in the assembly code.
+- Add prototype for __vdso_getrandom to silence a -Wmissing-prototype
+  warning.
+
+[v3]->v4:
+- Remove LSX implementation, which isn't much faster than the generic
+  implementaion.
+- Rebase onto crng/random.git:
+  - Define __arch_get_k_vdso_rng_data instead of using inline asm to
+    provide the _vdso_rng_data symbol in a magic way.
+  - Remove memset.S.
+  - Use c-getrandom-y to easily include the generic C code.
+  - The benchmark results seem better than v3, maybe related to the TLS
+    refactoring in random.git.
+- Add patches for selftests.
+
+[v2]->v3:
+- Add a generic LoongArch implementation for which LSX isn't needed.
+
+v1->v2:
+- Properly send the series to the list.
+
+[v5]:https://lore.kernel.org/all/20240829125656.19017-1-xry111@xry111.site/
+[v4]:https://lore.kernel.org/all/20240827132018.88854-1-xry111@xry111.site/
+[v3]:https://lore.kernel.org/all/20240816110717.10249-1-xry111@xry111.site/
+[v2]:https://lore.kernel.org/all/20240815133357.35829-1-xry111@xry111.site/
+
+Xi Ruoyao (3):
+  arch: vDSO: Add a __vdso_getrandom prototype for all architectures
+  LoongArch: vDSO: Wire up getrandom() vDSO implementation
+  selftests/vDSO: Enable vdso getrandom tests for LoongArch
+
+ arch/loongarch/Kconfig                      |   1 +
+ arch/loongarch/include/asm/vdso/getrandom.h |  38 +++
+ arch/loongarch/include/asm/vdso/vdso.h      |   6 +
+ arch/loongarch/include/asm/vdso/vsyscall.h  |   8 +
+ arch/loongarch/kernel/vdso.c                |   1 +
+ arch/loongarch/vdso/Makefile                |   7 +-
+ arch/loongarch/vdso/vdso.lds.S              |   1 +
+ arch/loongarch/vdso/vgetrandom-chacha.S     | 242 ++++++++++++++++++++
+ arch/loongarch/vdso/vgetrandom.c            |  10 +
+ arch/x86/entry/vdso/vgetrandom.c            |   2 -
+ include/vdso/getrandom.h                    |   5 +
+ tools/arch/loongarch/vdso                   |   1 +
+ tools/testing/selftests/vDSO/Makefile       |   4 +-
+ 13 files changed, 321 insertions(+), 5 deletions(-)
+ create mode 100644 arch/loongarch/include/asm/vdso/getrandom.h
+ create mode 100644 arch/loongarch/vdso/vgetrandom-chacha.S
+ create mode 100644 arch/loongarch/vdso/vgetrandom.c
+ create mode 120000 tools/arch/loongarch/vdso
+
+
+base-commit: 0dfed8092247b5e179f52d27b93533bce3eaf5ba
 -- 
-2.33.0
+2.46.0
 
