@@ -1,15 +1,16 @@
 Received: from xry111.site (xry111.site [89.208.246.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5377D2F28;
-	Sun,  1 Sep 2024 06:13:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E40C0524B4;
+	Sun,  1 Sep 2024 06:13:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.208.246.23
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725171227; cv=none; b=uYwQCvecv2TutXF+e4U4bpH/xdMnLzh8rWK9+svXYhmW5R/UNuixCnMXMUPr03r93FkO3F4Uwwl0bimiuxq0nRO/hTzPJdPZMdfmdItI4BkiUfq1DQyhinIgyinJQ3yyNPbXoOByIzUuLriM5f5JDofDarhwkz8KZqYBsT0klYM=
+	t=1725171238; cv=none; b=TB6QIsQpBwmQMkOYn8vrZLIBWHMXThw3OVag4DU4kWLsAxlFMsiUX0HuDZXmlDrrD2PllqvZLX5oOC+eNpSZ1Nzif+0xn0Y5YqIGlpI81dRq/4gVW2l8EN3tigI+wwmHxLK0jDGSYfjMsumwfONyHl3QOy5aAplyOpWWasrKJPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725171227; c=relaxed/simple;
-	bh=CzldQ8R74KRGEZMr+wtIlJ54mQi4+DTTVEIXhU8MinY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XF/otv3GAsTreob8cPbrB3ARnzD+TnhtWrQu7KAbJh461B8Mof4bD7+29ROnudtoRQMVhLqyfmg0huK5YV8KVDkqIIOlZB068VHzOr2eMdm2ydKrbcstJo6PEgEDNInFysmvdFOxSwVh2LC+tzEuNEKTj0DGu4gu2/b10xuLGcM=
+	s=arc-20240116; t=1725171238; c=relaxed/simple;
+	bh=dwxKp4a2baTzLJelYswz7WwU5A4oJrOlV7SPaBtCC3A=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=l+eo1KqGaQcTbAZY+6uaDpsweUsxbweiNmoF2B8thZK6IeNRvent8ZyNtr8WV4TrTUGJYzkmn6bpxIeglpWC7mrFVVh5qp/CzRZr0UTMTx4o/zvbTvBUq0YFhOz21JBKHiqVmrwgnCup6fB6nOiNVjO3dbt8tc26VUsEHq4T1ac=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site; spf=pass smtp.mailfrom=xry111.site; arc=none smtp.client-ip=89.208.246.23
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xry111.site
@@ -18,8 +19,8 @@ Received: from stargazer.. (unknown [IPv6:240e:358:11b0:f100:dc73:854d:832e:2])
 	 key-exchange X25519 server-signature ECDSA (secp384r1) server-digest SHA384)
 	(Client did not present a certificate)
 	(Authenticated sender: xry111@xry111.site)
-	by xry111.site (Postfix) with ESMTPSA id 819CA1A3FE1;
-	Sun,  1 Sep 2024 02:13:39 -0400 (EDT)
+	by xry111.site (Postfix) with ESMTPSA id 3FAB31A3FE1;
+	Sun,  1 Sep 2024 02:13:50 -0400 (EDT)
 From: Xi Ruoyao <xry111@xry111.site>
 To: "Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Huacai Chen <chenhuacai@kernel.org>,
@@ -32,10 +33,12 @@ Cc: Xi Ruoyao <xry111@xry111.site>,
 	Tiezhu Yang <yangtiezhu@loongson.cn>,
 	Christophe Leroy <christophe.leroy@csgroup.eu>,
 	Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH v6 0/3] LoongArch: Implement getrandom() in vDSO
-Date: Sun,  1 Sep 2024 14:13:09 +0800
-Message-ID: <20240901061315.15693-1-xry111@xry111.site>
+Subject: [PATCH v6 1/3] arch: vDSO: Add a __vdso_getrandom prototype for all architectures
+Date: Sun,  1 Sep 2024 14:13:10 +0800
+Message-ID: <20240901061315.15693-2-xry111@xry111.site>
 X-Mailer: git-send-email 2.46.0
+In-Reply-To: <20240901061315.15693-1-xry111@xry111.site>
+References: <20240901061315.15693-1-xry111@xry111.site>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -44,109 +47,46 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Implement stack-less ChaCha20 and wire it with the generic vDSO
-getrandom code.  It passes vdso_test_chacha test, and the
-vdso_test_getrandom results:
+Without a prototype, we'll have to add a prototype for each architecture
+implementing vDSO getrandom.  As most architectures will likely have the
+vDSO getrandom implemented in a near future, and we'd like to keep the
+declarations compatible everywhere (to ease the Glibc work), we should
+really just have one copy of the prototype.
 
-bench-single:
+Suggested-by: Huacai Chen <chenhuacai@kernel.org>
+Signed-off-by: Xi Ruoyao <xry111@xry111.site>
+---
+ arch/x86/entry/vdso/vgetrandom.c | 2 --
+ include/vdso/getrandom.h         | 5 +++++
+ 2 files changed, 5 insertions(+), 2 deletions(-)
 
-   vdso: 25000000 times in 0.527882568 seconds
-   libc: 25000000 times in 6.963153452 seconds
-syscall: 25000000 times in 6.980286094 seconds
-
-bench-multi:
-
-   vdso: 25000000 x 256 times in 29.405172862 seconds
-   libc: 25000000 x 256 times in 355.692605551 seconds
-   syscall: 25000000 x 256 times in 338.481559154 seconds
-
-bench-single in an unshared time namespace:
-
-   vdso: 25000000 times in 0.528282411 seconds
-   libc: 25000000 times in 6.966410240 seconds
-syscall: 25000000 times in 6.976614579 seconds
-
-Cc: linux-crypto@vger.kernel.org
-Cc: loongarch@lists.linux.dev
-Cc: linux-kernel@vger.kernel.org
-Cc: Jinyang He <hejinyang@loongson.cn>
-Cc: Tiezhu Yang <yangtiezhu@loongson.cn>
-Cc:	Thomas Gleixner <tglx@linutronix.de>
-Cc: Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: Arnd Bergmann <arnd@arndb.de>
-
-[v5]->v6:
-- Rebase onto crng/random.git.
-- Separate selftest patch from the implementation patch again (both I
-  and Huacai perfer this way).
-- Add a patch to provide a __vdso_getrandom prototype shared by all
-  ports, similar to the __vdso_gettimeofday prototype added by Arnd in
-  commit 42874e4eb35b ("arch: vdso: consolidate gettime prototypes").
-- Stop breaking lines at 80 characters for C code.
-- In vdso.lds.S and Makefile, keep sigreturn the last in the lists.
-
-[v4]->v5:
-- Rebase onto crng/random.git:
-  - Remove two selftest patches.
-  - Remove __arch_chacha20_blocks_nostack forward declaration.
-- Squash the remaining selftest patch into the vDSO getrandom
-  implementation patch.
-- Remove ifdef CONFIG_VDSO_GETRANDOM and $(CONFIG_VDSO_GETRANDOM) as
-  they are always true in arch/loongarch.
-- Remove asm-offsets.c change which has been already unneeded in v4.
-- Add comment about rematerializing the constant in the assembly code.
-- Add prototype for __vdso_getrandom to silence a -Wmissing-prototype
-  warning.
-
-[v3]->v4:
-- Remove LSX implementation, which isn't much faster than the generic
-  implementaion.
-- Rebase onto crng/random.git:
-  - Define __arch_get_k_vdso_rng_data instead of using inline asm to
-    provide the _vdso_rng_data symbol in a magic way.
-  - Remove memset.S.
-  - Use c-getrandom-y to easily include the generic C code.
-  - The benchmark results seem better than v3, maybe related to the TLS
-    refactoring in random.git.
-- Add patches for selftests.
-
-[v2]->v3:
-- Add a generic LoongArch implementation for which LSX isn't needed.
-
-v1->v2:
-- Properly send the series to the list.
-
-[v5]:https://lore.kernel.org/all/20240829125656.19017-1-xry111@xry111.site/
-[v4]:https://lore.kernel.org/all/20240827132018.88854-1-xry111@xry111.site/
-[v3]:https://lore.kernel.org/all/20240816110717.10249-1-xry111@xry111.site/
-[v2]:https://lore.kernel.org/all/20240815133357.35829-1-xry111@xry111.site/
-
-Xi Ruoyao (3):
-  arch: vDSO: Add a __vdso_getrandom prototype for all architectures
-  LoongArch: vDSO: Wire up getrandom() vDSO implementation
-  selftests/vDSO: Enable vdso getrandom tests for LoongArch
-
- arch/loongarch/Kconfig                      |   1 +
- arch/loongarch/include/asm/vdso/getrandom.h |  38 +++
- arch/loongarch/include/asm/vdso/vdso.h      |   6 +
- arch/loongarch/include/asm/vdso/vsyscall.h  |   8 +
- arch/loongarch/kernel/vdso.c                |   1 +
- arch/loongarch/vdso/Makefile                |   7 +-
- arch/loongarch/vdso/vdso.lds.S              |   1 +
- arch/loongarch/vdso/vgetrandom-chacha.S     | 242 ++++++++++++++++++++
- arch/loongarch/vdso/vgetrandom.c            |  10 +
- arch/x86/entry/vdso/vgetrandom.c            |   2 -
- include/vdso/getrandom.h                    |   5 +
- tools/arch/loongarch/vdso                   |   1 +
- tools/testing/selftests/vDSO/Makefile       |   4 +-
- 13 files changed, 321 insertions(+), 5 deletions(-)
- create mode 100644 arch/loongarch/include/asm/vdso/getrandom.h
- create mode 100644 arch/loongarch/vdso/vgetrandom-chacha.S
- create mode 100644 arch/loongarch/vdso/vgetrandom.c
- create mode 120000 tools/arch/loongarch/vdso
-
-
-base-commit: 0dfed8092247b5e179f52d27b93533bce3eaf5ba
+diff --git a/arch/x86/entry/vdso/vgetrandom.c b/arch/x86/entry/vdso/vgetrandom.c
+index 52d3c7faae2e..430862b8977c 100644
+--- a/arch/x86/entry/vdso/vgetrandom.c
++++ b/arch/x86/entry/vdso/vgetrandom.c
+@@ -6,8 +6,6 @@
+ 
+ #include "../../../../lib/vdso/getrandom.c"
+ 
+-ssize_t __vdso_getrandom(void *buffer, size_t len, unsigned int flags, void *opaque_state, size_t opaque_len);
+-
+ ssize_t __vdso_getrandom(void *buffer, size_t len, unsigned int flags, void *opaque_state, size_t opaque_len)
+ {
+ 	return __cvdso_getrandom(buffer, len, flags, opaque_state, opaque_len);
+diff --git a/include/vdso/getrandom.h b/include/vdso/getrandom.h
+index 4cf02e678f5e..08b47b002bf7 100644
+--- a/include/vdso/getrandom.h
++++ b/include/vdso/getrandom.h
+@@ -56,4 +56,9 @@ struct vgetrandom_state {
+  */
+ extern void __arch_chacha20_blocks_nostack(u8 *dst_bytes, const u32 *key, u32 *counter, size_t nblocks);
+ 
++/**
++ * __vdso_getrandom: Prototype of vDSO getrandom.
++ */
++extern ssize_t __vdso_getrandom(void *buffer, size_t len, unsigned int flags, void *opaque_state, size_t opaque_len);
++
+ #endif /* _VDSO_GETRANDOM_H */
 -- 
 2.46.0
 
