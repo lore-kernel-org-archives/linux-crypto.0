@@ -1,97 +1,116 @@
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B7323FC7;
-	Sun,  1 Sep 2024 16:07:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4D4844393;
+	Sun,  1 Sep 2024 18:06:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725206842; cv=none; b=AOluyzduLmutnvpVCmJaWJYp1J2kqgD0gVWorOxvpFQTgCjh2/He0rc0EFCKPpI8uPBD4s/g5gTziTpzjGNjP4X6EFRigl/6d4kDDnp9pd7LTC15VWqXh4zV8FC3NhtgM4sVLZ6/glFP9rHGrZBmnUuHqq67uYsBsHl6JgtgmSE=
+	t=1725214015; cv=none; b=Pul/pV2SuubqxsPRbjPmOwyHNa6oFaVaRCfV9Z7ALEBS3nomuyzDUjtjtuP1xP6O0jgsZyZ5fHtsg6aF8yGUKwDg4ECEp7iEXcJpXp56ujaXbbzNY0SWHfsDiBNzgCw/SVFaJ/SoWZT/s/8wduJ+I9h2yhsAyQrFg31MjxA0IUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725206842; c=relaxed/simple;
-	bh=PEKbhOoFlVX8YUiyHbi3XuPmBlu0tFvrDsTCjxY9z5Y=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=uVd31nETouv/YR6DXfJ468Ns+gSs+NCEyKQbjCprVJA5oifd0M5cfdDg65b7M1Ag3WtAyU/GOyJAdsAx3GV9prdsfTT0VzrRfH7LCmdol/jWISYrlGc5g+LkZFT5djiFCNEo2rirKoh6iIH3T4xFWct/4UHE8/sPN9Fud9v6n5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nUIznfC5; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nUIznfC5"
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5c210e23573so3457476a12.0;
-        Sun, 01 Sep 2024 09:07:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725206839; x=1725811639; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=FwcSjCcT+sTlDDTDScDweyeWxNPTfQSTrbXIW/fa5kg=;
-        b=nUIznfC5aPY2AtpkzCrlDF11qvyHiaDgIlGUYDTL/UQy0j+qy8xQCBR3lX6CdbBL2y
-         mNjS2Icw4X97pvRitNp+U83/m2V8SzVc33z9gk5irjuNtxvnZHgHQ9MUoLX7jW2J2aKD
-         n5NlHYTSEMMxEMmC75YdPPqY3ERu96XEz8msmFRRHufYaOlkuqugNlXBzK/urxNJlKyd
-         C0jNLA99jSTAJuOsIbfXSMluh22DRkuYFxs62o9VNOkp7sUgKrBWCB+Qj/m0SYLlJW7v
-         QaeiGhTmdFD9zXn/Z4L6SwUikNHYjIK+gRgPXWX3XCa2nbGKd8YPUEgvXLUu7g3hbO2H
-         3O3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725206839; x=1725811639;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FwcSjCcT+sTlDDTDScDweyeWxNPTfQSTrbXIW/fa5kg=;
-        b=WfEElaIGWC+ErzfNQZq5PspctNDQeCAUM8mh+6ygL+4LD4FMdVFQ0087qwlKEVjLTT
-         HMtQLiFP/pNRGvRMw1+AvGNmhCmA1qVYjELD+mtfbyxLJ1gXiHjYbsBTxYTLzWAPKFUV
-         G2mW7LyHGtNap4OGvGYgQIY6GSoWlXihRAR1FFwfDX9xZDh9NpLxBeRc6Tsi9//tAxXw
-         eiemOdOACCiBugEmN4LcgqeFwxpUMDahg0/8Ora+dU12I15uZ8K7Lf37XFyWoJXURTF4
-         s3ftSNfz9GVspA/7gabfgRm4/2R94861vE2W2IOMXNawrpKICdrIshK6l7r8A438EbT5
-         W5Vw==
-X-Forwarded-Encrypted: i=1; AJvYcCW4lQKU1yrV7/sJjuCX4zUZPnAYcMbZ0Ey7JJcypZ7Wz5TjBcCZVSI5IFgWIyxe/Yrh5nD9P8BX2eqApYCB@vger.kernel.org, AJvYcCXrfeus/zjAPO4pAXo+EDkzvfRfqd1Tif855ldIHgs/i3pubarwEVQN3+k/8MozyQ75s9YhC/uJEUrZTV0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yykdl4foMslCOqjG8KcnOZF6Kdufsx6LKsxL24avF2D0cxjomFK
-	i2EFvqtEyhnxEnlf6BUPZf8RX9XvvuZN1kN3z6gQUQSuc2kqUoKg
-X-Google-Smtp-Source: AGHT+IFJmyE3MebeV1DKi0VBZLcVuRBMldbRsVQTZl0XHigxIbVf0OPvW3Ju+JMfaQBINVQn/8iC9g==
-X-Received: by 2002:a05:6402:35cd:b0:5c2:524b:7711 with SMTP id 4fb4d7f45d1cf-5c2524b7c2cmr1211903a12.33.1725206838630;
-        Sun, 01 Sep 2024 09:07:18 -0700 (PDT)
-Received: from localhost (craw-09-b2-v4wan-169726-cust2117.vm24.cable.virginm.net. [92.238.24.70])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c251cf4384sm1010584a12.88.2024.09.01.09.07.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 01 Sep 2024 09:07:18 -0700 (PDT)
-From: Colin Ian King <colin.i.king@gmail.com>
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	qat-linux@intel.com,
-	linux-crypto@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH][next] crypto: qat - Remove trailing space after \n newline
-Date: Sun,  1 Sep 2024 17:07:17 +0100
-Message-Id: <20240901160717.143334-1-colin.i.king@gmail.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1725214015; c=relaxed/simple;
+	bh=BPLrJN3UMpNuXgRmPmDcj2geSPj996SWXjtw9iHJaKU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JwTmjyFSMI4VtJKkXXGYLESXyVOlHRAoJRsoP69bPQBGzCpN5FdT7dI5h673rKgo7OZkIPNC/5WPo4CbPvr4IYvwATgMiN1mX9i9YVZ2jApqnYJ1fCd4DxH/0DHjPTmWuupCPR7Yo2iggA6vMjBFLaDxi3cQ5VulASWkruOLflM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
+Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
+	by localhost (Postfix) with ESMTP id 4WxfwX1D6zz9sSN;
+	Sun,  1 Sep 2024 20:06:52 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase2.c-s.fr ([172.26.127.65])
+	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id hNS5A6He75iU; Sun,  1 Sep 2024 20:06:52 +0200 (CEST)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+	by pegase2.c-s.fr (Postfix) with ESMTP id 4WxfwX0N6Nz9sSK;
+	Sun,  1 Sep 2024 20:06:52 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id EE2908B767;
+	Sun,  1 Sep 2024 20:06:51 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+	with ESMTP id tZRK63f112yO; Sun,  1 Sep 2024 20:06:51 +0200 (CEST)
+Received: from [192.168.234.154] (unknown [192.168.234.154])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 7A6918B763;
+	Sun,  1 Sep 2024 20:06:51 +0200 (CEST)
+Message-ID: <88982e01-9d69-4ac6-a423-ecfe700abc1b@csgroup.eu>
+Date: Sun, 1 Sep 2024 20:06:51 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 1/3] arch: vDSO: Add a __vdso_getrandom prototype for
+ all architectures
+To: Xi Ruoyao <xry111@xry111.site>, "Jason A . Donenfeld" <Jason@zx2c4.com>,
+ Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>
+Cc: linux-crypto@vger.kernel.org, loongarch@lists.linux.dev,
+ linux-kernel@vger.kernel.org, Jinyang He <hejinyang@loongson.cn>,
+ Tiezhu Yang <yangtiezhu@loongson.cn>, Arnd Bergmann <arnd@arndb.de>
+References: <20240901061315.15693-1-xry111@xry111.site>
+ <20240901061315.15693-2-xry111@xry111.site>
+Content-Language: fr-FR
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+In-Reply-To: <20240901061315.15693-2-xry111@xry111.site>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-There is a extraneous space after a newline in a pr_err message.
-Remove it.
 
-Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
----
- drivers/crypto/intel/qat/qat_common/qat_uclo.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/intel/qat/qat_common/qat_uclo.c b/drivers/crypto/intel/qat/qat_common/qat_uclo.c
-index ad2c64af7427..7ea40b4f6e5b 100644
---- a/drivers/crypto/intel/qat/qat_common/qat_uclo.c
-+++ b/drivers/crypto/intel/qat/qat_common/qat_uclo.c
-@@ -58,7 +58,7 @@ static int qat_uclo_free_ae_data(struct icp_qat_uclo_aedata *ae_data)
- 	unsigned int i;
- 
- 	if (!ae_data) {
--		pr_err("QAT: bad argument, ae_data is NULL\n ");
-+		pr_err("QAT: bad argument, ae_data is NULL\n");
- 		return -EINVAL;
- 	}
- 
--- 
-2.39.2
+Le 01/09/2024 à 08:13, Xi Ruoyao a écrit :
+> Without a prototype, we'll have to add a prototype for each architecture
+> implementing vDSO getrandom.  As most architectures will likely have the
+> vDSO getrandom implemented in a near future, and we'd like to keep the
+> declarations compatible everywhere (to ease the Glibc work), we should
+> really just have one copy of the prototype.
 
+It is a good idea but it have to handle all architectures, not only half 
+of them. If you look into vdso_config.h in selftests, you can see that 
+there are two names:
+
+__kernel_getrandom is used on arm64, powerpc, s390,
+
+__vdso_getrandom is used on arm, mips, sparc, x86, riscv, loongarch
+
+Christophe
+
+
+
+> 
+> Suggested-by: Huacai Chen <chenhuacai@kernel.org>
+> Signed-off-by: Xi Ruoyao <xry111@xry111.site>
+> ---
+>   arch/x86/entry/vdso/vgetrandom.c | 2 --
+>   include/vdso/getrandom.h         | 5 +++++
+>   2 files changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/entry/vdso/vgetrandom.c b/arch/x86/entry/vdso/vgetrandom.c
+> index 52d3c7faae2e..430862b8977c 100644
+> --- a/arch/x86/entry/vdso/vgetrandom.c
+> +++ b/arch/x86/entry/vdso/vgetrandom.c
+> @@ -6,8 +6,6 @@
+>   
+>   #include "../../../../lib/vdso/getrandom.c"
+>   
+> -ssize_t __vdso_getrandom(void *buffer, size_t len, unsigned int flags, void *opaque_state, size_t opaque_len);
+> -
+>   ssize_t __vdso_getrandom(void *buffer, size_t len, unsigned int flags, void *opaque_state, size_t opaque_len)
+>   {
+>   	return __cvdso_getrandom(buffer, len, flags, opaque_state, opaque_len);
+> diff --git a/include/vdso/getrandom.h b/include/vdso/getrandom.h
+> index 4cf02e678f5e..08b47b002bf7 100644
+> --- a/include/vdso/getrandom.h
+> +++ b/include/vdso/getrandom.h
+> @@ -56,4 +56,9 @@ struct vgetrandom_state {
+>    */
+>   extern void __arch_chacha20_blocks_nostack(u8 *dst_bytes, const u32 *key, u32 *counter, size_t nblocks);
+>   
+> +/**
+> + * __vdso_getrandom: Prototype of vDSO getrandom.
+> + */
+> +extern ssize_t __vdso_getrandom(void *buffer, size_t len, unsigned int flags, void *opaque_state, size_t opaque_len);
+> +
+>   #endif /* _VDSO_GETRANDOM_H */
