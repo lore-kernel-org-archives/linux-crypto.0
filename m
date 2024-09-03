@@ -1,54 +1,57 @@
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28B5E1B9859
-	for <linux-crypto@vger.kernel.org>; Tue,  3 Sep 2024 12:09:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 253A91C986B
+	for <linux-crypto@vger.kernel.org>; Tue,  3 Sep 2024 12:09:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725365396; cv=none; b=sYjcZLtMIx9H+69tXZApOuv1rCBgCv/k8Bm2gl3ty4rUBIyMQqgjQJeJhAR2JzKtuk+SmYU27qMFMlm2sejq1csyjdklYtmTWc8UDerXuP0Oaw3C6uPPI8fRZBY3Khd/AIWbFtPWZaUgFohlMRHfKVuOfBPzUqWaVlAF1coH3gM=
+	t=1725365399; cv=none; b=mc9vHP9HCiSzsLKo4nimqi8yhcHhO5wy+HNGzOuzpMrf6nYF72JQlyVo3HZuksSAlEjRQd9rpR9S/SxVF2V4FMty19gY03RyP4T6FmUUg5kBgw3Bj9q+oIo6qXKoc3+MJTALx3RT5JOJEWG/Q3Df/aeL0ICy7YaSN1BN+JPnbs4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725365396; c=relaxed/simple;
-	bh=N1qqn7vYKBlbeXYmAR1aaSBjOkAuuoIsPmVXjG1IKa0=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=YPNt7XOGAr4vJxTnX+cAu7MMWm+1qgKwAveEqvkyzDSe1we1SiK9JxSzpMp2joAHu+tRGxvKO5VpoCV4zTAxGQP93p6rsMaHdE+eLHPKAbu0O3r5jrIltMhMx5iuX43YLFML0RHNT1XjjVe7YmjS3HNDfombMpo4nb7L4yef37I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=S9fJCH2U; arc=none smtp.client-ip=209.85.128.52
+	s=arc-20240116; t=1725365399; c=relaxed/simple;
+	bh=44yzxRSTqwlOROlkCwEXzmTbMUBKaeO1+N1E/oREDTU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=mfYttEYZ+D4D/huNfTp4LYJwRzky4eywoQOiPcutCePioLRbBtr2SYdCu8TQpeE+BRKXIK82RnimcnT3QQAUrIezhPaVIzqQVVTdqDwgmCqcua7p2+0aFiQw5Vl101vp21rqOYwGbtvia2VZ/xcYXMVCkptajEzbKxSVpTwBHwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=A6f+8c2B; arc=none smtp.client-ip=209.85.128.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="S9fJCH2U"
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4280ca0791bso45340265e9.1
-        for <linux-crypto@vger.kernel.org>; Tue, 03 Sep 2024 05:09:54 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="A6f+8c2B"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-42c7a49152aso32654455e9.2
+        for <linux-crypto@vger.kernel.org>; Tue, 03 Sep 2024 05:09:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1725365393; x=1725970193; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=JLYlLLGKbB0TvMjhCmijODtjVYZ8RqD6X4SH5pHru3k=;
-        b=S9fJCH2UgJkF2l+UauktRfkH4nq6TM7EIxAYnstUodWneXJ/guUWV3jxiexAaIpX4P
-         cOq8nLDzfXxC24xhhrjvz8eoi7ZCHnuoeIc9i5DH2nwzRDOdkBbkMElRrv5Dx5N8rVH0
-         daBP0biULvTTipG6uBkctB9INyCkes3hes1btVssSexWAWLn9xBLIUnBQYOpgVKLNU3I
-         RmQVAeQuXl+Z1Ew8SF0UsboblwrwBQioUMVgi3C8lf1Xu3gc0XDkEQeX3+dzbKYdjQjt
-         tB2SGlEpDmfrbfc0mEyAoZ40Cj+dHGrp4/SxzdaspfziCz5RqhBjWQmsWgv+wodJCxeR
-         faOA==
+        d=linaro.org; s=google; t=1725365396; x=1725970196; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/DUDom//tRZnCzR0TPrW7dnmFkZZ6kQdXEFrODb12u4=;
+        b=A6f+8c2BdG8o+Y7O5uRJFBHkFlH0wNBzQPPcmb2rLp1n6O2+pj2PIans7wSwV3ZtJz
+         cF2m//6pNZJxbUx/iwdJetrS0IXrbo610bm8ip8ChOsoji50g6laURTZ5n3qutnn7KY4
+         Bo8tFVLSIXVCGoFAPYbZieLD+iOW3LfI6U/73nNEGgBEp4p5l0z6eQ+m8XYvWfL0ve+L
+         cvnoyAcuylsbtoERPhCH0VHyJ+h6TvrIZaw+zzFkES36/2LisAtEq8yXRqJ63be8Ci5l
+         IUfQ8EX+YjpPoDvAAVJvi4fxMFGWtGT8qmvDgohmXuxBHwNM6QQZSj2QNtTuGr0zi1q4
+         npsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725365393; x=1725970193;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JLYlLLGKbB0TvMjhCmijODtjVYZ8RqD6X4SH5pHru3k=;
-        b=miKELIxwRyBW/BJGD+NAMmsnZDhrZF9B+T4RJApuHf8h/ySHJ66pbWh7LtjIdg/zwi
-         eJXQkd99b4cXwfg/Gy5/zvDW/LRN/UIXRsUOTX0f9eH6zvocmcqQr/D+k2QXBI/lEmE/
-         z9ywgeHgicEoQr0p1BXV1liWNnivXRve4vFA3cfqp890xyZb1RoF+GFRrmJ3YfLcOhjL
-         ZDkqBgfPoNkrTeUJkK9Wzx/M1sQRTQegikihZRxcSjSru00fwABkb2do9dSQWbL7baLe
-         M0LdPBS0t6SIEGHLfKDdfvFhANLIJzjrtUeabYzxpAYSAIAfQymlCGAFCcLdyieH090Z
-         WNeg==
-X-Forwarded-Encrypted: i=1; AJvYcCUR4W09WDuM+OUeznuzyldxCvsWQDyb0kc4BNj7CFrnwCB1ySFo/FeRxVElEeDP/LVfOyhUxkI4NLmvYK8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7j3oUDzmgjSSLzqujYq81GYYgFqhchmeUkfnBdRe2iw4wnxHm
-	EJ5vP2LPdQhEK/nBcfkS5GFQwiET2F3PjvyrJ/xeCC33bJQjR1cFZyPPgpwFAyo=
-X-Google-Smtp-Source: AGHT+IEyoZ4C1GIHdc4etZJ5y8/7i4ZOxLROM5omYazPOI3P6CpupmD7KGheFpP2J3CHj/uHt2FC5g==
-X-Received: by 2002:a5d:440b:0:b0:374:c847:852 with SMTP id ffacd0b85a97d-376dd71aa2bmr403119f8f.29.1725365393138;
-        Tue, 03 Sep 2024 05:09:53 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1725365396; x=1725970196;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/DUDom//tRZnCzR0TPrW7dnmFkZZ6kQdXEFrODb12u4=;
+        b=LQjEKRHljRV20VtFaf/cpaRnnpB7AE8eilSwwn+qPUDpLDXuEK48otlRhu18RZ4t70
+         R52s1SfWMAk0+MKphhoBP01Tgly5NvLq7p1UlwE3duO5NuPNvg2ADBILCUrE8CKTmOXC
+         DjvqoqQJSvU16cTFA/xQkiaNDUkOA5aH/nFKQu9EjXET4+bRXGpWUN0NDTVH1fM70HAP
+         s22hlx3u6Xdpa3Gr5jfXTm3EANfk5r7ypClWKFxsp8LIaBpD8M/GkICvKEm6DwGCvVhq
+         47Cf7qtoGz/6sjG7rctLM8+usdaYi4Y9uaX4EXzhxYAhdCKVekNErqRaI3qTLioHF/QH
+         NIgg==
+X-Forwarded-Encrypted: i=1; AJvYcCVul41ie3YD4N36IHJju81iXCHgm4ZHviqTBXbC38wz4rJyyXHV963ONYmytgj8JvvhPAxPC0TcuBaxOec=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx8G68G7lfooDx0Luze+OhKt1eJCYtEuvIz7rTyT7hkAagZzQ7i
+	bgwdfeHRvEJwm+uBBOhADVVT+BOfWbXH8sctvZLaO71pzJkgLwZeW32MyNSAv7Y=
+X-Google-Smtp-Source: AGHT+IFcoK0ATItLWWMNoYyO3QSsujmu7MhadnpNmBdao6RwrBFoO5Fsa1nhUpv/GrvTkZFRm38cOA==
+X-Received: by 2002:a05:600c:3c9f:b0:426:5b44:2be7 with SMTP id 5b1f17b1804b1-42bb01b5f50mr137762745e9.10.1725365396400;
+        Tue, 03 Sep 2024 05:09:56 -0700 (PDT)
 Received: from ubuntu-vm.. (51-148-40-55.dsl.zen.co.uk. [51.148.40.55])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3749ee4a55fsm14069238f8f.10.2024.09.03.05.09.51
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3749ee4a55fsm14069238f8f.10.2024.09.03.05.09.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Sep 2024 05:09:51 -0700 (PDT)
+        Tue, 03 Sep 2024 05:09:55 -0700 (PDT)
 From: Adhemerval Zanella <adhemerval.zanella@linaro.org>
 To: "Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Theodore Ts'o <tytso@mit.edu>,
@@ -61,10 +64,13 @@ To: "Jason A . Donenfeld" <Jason@zx2c4.com>,
 	Thomas Gleixner <tglx@linutronix.de>,
 	Eric Biggers <ebiggers@kernel.org>,
 	Christophe Leroy <christophe.leroy@csgroup.eu>
-Subject: [PATCH v5 0/2] arm64: Implement getrandom() in vDSO
-Date: Tue,  3 Sep 2024 12:09:15 +0000
-Message-ID: <20240903120948.13743-1-adhemerval.zanella@linaro.org>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Subject: [PATCH v5 1/2] arm64: alternative: make alternative_has_cap_likely() VDSO compatible
+Date: Tue,  3 Sep 2024 12:09:16 +0000
+Message-ID: <20240903120948.13743-2-adhemerval.zanella@linaro.org>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240903120948.13743-1-adhemerval.zanella@linaro.org>
+References: <20240903120948.13743-1-adhemerval.zanella@linaro.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -73,57 +79,50 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Implement stack-less ChaCha20 and wire it with the generic vDSO
-getrandom code.  The first patch is Mark's fix to the alternatives
-system in the vDSO, while the the second is the actual vDSO work.
+From: Mark Rutland <mark.rutland@arm.com>
 
-Changes from v4:
-- Improve BE handling.
+Currently alternative_has_cap_unlikely() can be used in VDSO code, but
+alternative_has_cap_likely() cannot as it references alt_cb_patch_nops,
+which is not available when linking the VDSO. This is unfortunate as it
+would be useful to have alternative_has_cap_likely() available in VDSO
+code.
 
-Changes from v3:
-- Use alternative_has_cap_likely instead of ALTERNATIVE.
-- Header/include and comment fixups.
+The use of alt_cb_patch_nops was added in commit:
 
-Changes from v2:
-- Refactor Makefile to use same flags for vgettimeofday and
-  vgetrandom.
-- Removed rodata usage and fixed BE on vgetrandom-chacha.S.
+  d926079f17bf8aa4 ("arm64: alternatives: add shared NOP callback")
 
-Changes from v1:
-- Fixed style issues and typos.
-- Added fallback for systems without NEON support.
-- Avoid use of non-volatile vector registers in neon chacha20.
-- Use c-getrandom-y for vgetrandom.c.
-- Fixed TIMENS vdso_rnd_data access.
+... as removing duplicate NOPs within the kernel Image saved areasonable
+amount of space.
 
-Adhemerval Zanella (1):
-  arm64: vdso: wire up getrandom() vDSO implementation
+Given the VDSO code will have nowhere near as many alternative branches
+as the main kernel image, this isn't much of a concern, and a few extra
+nops isn't a massive problem.
 
-Mark Rutland (1):
-  arm64: alternative: make alternative_has_cap_likely() VDSO compatible
+Change alternative_has_cap_likely() to only use alt_cb_patch_nops for
+the main kernel image, and allow duplicate NOPs in VDSO code.
 
- arch/arm64/Kconfig                          |   1 +
- arch/arm64/include/asm/alternative-macros.h |   4 +
- arch/arm64/include/asm/mman.h               |   6 +-
- arch/arm64/include/asm/vdso.h               |   6 +
- arch/arm64/include/asm/vdso/getrandom.h     |  50 ++++++
- arch/arm64/include/asm/vdso/vsyscall.h      |  10 ++
- arch/arm64/kernel/vdso.c                    |   6 -
- arch/arm64/kernel/vdso/Makefile             |  25 ++-
- arch/arm64/kernel/vdso/vdso                 |   1 +
- arch/arm64/kernel/vdso/vdso.lds.S           |   4 +
- arch/arm64/kernel/vdso/vgetrandom-chacha.S  | 172 ++++++++++++++++++++
- arch/arm64/kernel/vdso/vgetrandom.c         |  15 ++
- tools/arch/arm64/vdso                       |   1 +
- tools/include/linux/compiler.h              |   4 +
- tools/testing/selftests/vDSO/Makefile       |   3 +-
- 15 files changed, 292 insertions(+), 16 deletions(-)
- create mode 100644 arch/arm64/include/asm/vdso/getrandom.h
- create mode 120000 arch/arm64/kernel/vdso/vdso
- create mode 100644 arch/arm64/kernel/vdso/vgetrandom-chacha.S
- create mode 100644 arch/arm64/kernel/vdso/vgetrandom.c
- create mode 120000 tools/arch/arm64/vdso
+Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+Signed-off-by: Adhemerval Zanella <adhemerval.zanella@linaro.org>
+---
+ arch/arm64/include/asm/alternative-macros.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
+diff --git a/arch/arm64/include/asm/alternative-macros.h b/arch/arm64/include/asm/alternative-macros.h
+index d328f549b1a6..c8c77f9e36d6 100644
+--- a/arch/arm64/include/asm/alternative-macros.h
++++ b/arch/arm64/include/asm/alternative-macros.h
+@@ -230,7 +230,11 @@ alternative_has_cap_likely(const unsigned long cpucap)
+ 		return false;
+ 
+ 	asm goto(
++#ifdef BUILD_VDSO
++	ALTERNATIVE("b	%l[l_no]", "nop", %[cpucap])
++#else
+ 	ALTERNATIVE_CB("b	%l[l_no]", %[cpucap], alt_cb_patch_nops)
++#endif
+ 	:
+ 	: [cpucap] "i" (cpucap)
+ 	:
 -- 
 2.43.0
 
