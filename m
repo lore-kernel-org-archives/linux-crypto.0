@@ -1,64 +1,64 @@
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF131CA6B3;
-	Tue,  3 Sep 2024 12:55:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EFA71CA682;
+	Tue,  3 Sep 2024 13:48:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725368151; cv=none; b=tb/uaWG+O+3GwtSqTd4OfECksynz7AQkxQZaX70WaSgESrNeimD4iaIeBPYOvHcsr9SkNd2aeZ46RluejAlzcIqQ5oaHoyCB9u0FbLwoOqrhupjx+ohsjZFm5y299Xot2eQhe7mkaB8wtD0h7wsAeWZiWi2lqD/o/qQLMkoGxmg=
+	t=1725371320; cv=none; b=abQKkYivDDmCuk/Bzdy32rFpbpHNgNMRCWUWjO+aiTLkGJjULTKifOT3O8LZuafnQmDQfM3enRWd4oHsKCwZh9rlehrsm8VqWaZrsJIJjiAm2j3BAqZOZb3taOo1F9C+TLZq5Xkqdsi0R/1OetgiN/X/4qyXoIxTEPCn1nA0zmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725368151; c=relaxed/simple;
-	bh=FR4eP3hFCVHV4yot3NIpLRkrKDFwbr7wCO+ZPZ9IT6E=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BMu9lxjYJaTw5wwVWE/OA1srMqq/dx1LZdTu6Dn350gaCiQltpQviCRLJcQqYO7vbvELqEMxh6B6u2LOaGGlextlHAVH+B+P76rysfDBf7giSEqERY8A/knBraDqbYZ7WyLthJcuGBDxPVxEBS/NO364d95UveAayhDwWHH/rS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XNEO6m8K; arc=none smtp.client-ip=209.85.210.175
+	s=arc-20240116; t=1725371320; c=relaxed/simple;
+	bh=GfAJ31uVBCQfDcYwWC28kWiRyOOUCGErkUC149AKq8s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FPD2d0YpoIE8LeOzR+SC/hjP4b2rRuAp48TW8u/DY6xC6MRCL/BM32oRqKXR0L9cBovvaD/vUDo3TeFAQ8GzNCtNljbVJ+vDc42K3ecp146wHKiLO4eOmHzmxN6sHfeAT8OpmlQKt+HWhAw7dvPT0weGpQxeDTcdI6FgqpSmEEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CJI2EsjF; arc=none smtp.client-ip=209.85.216.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XNEO6m8K"
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-714187df604so3641952b3a.1;
-        Tue, 03 Sep 2024 05:55:49 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CJI2EsjF"
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2d8f06c2459so1144663a91.0;
+        Tue, 03 Sep 2024 06:48:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725368149; x=1725972949; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1725371318; x=1725976118; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+IsWpqVgt+KJ6WzMhEvW26KeomE/4ZiUXtss83zz0RY=;
-        b=XNEO6m8KMIHM+cMEE6mUA/QBQqxIZzCk0osRjcW2cNOiWhziseXCsN67I54bloa545
-         j/Ml3ez3xhOBpe0BB9MPzlYrsPg5QPRRZ6kTkRW9xL6gg582MwzZwwFHcIsJFg5HYubl
-         BANEb4PWmuh0NwwMQaVF/yv8tKpztCR3wqKsHIDLdFRdtYfICT1frlVe/4hXYD2d6idE
-         ozCfIrmVrnR9A/2NexCB+W7BbqsIg5JYfwmjvVze/61mhFJ7Ebb2Gs71cRBd+96A7jYp
-         yQmr00ZOCv7OEkEg36Iu6wJhr6PUpBrcGlON0oDey6lGWEkLlAypRtRSaa6GH3hTLeIQ
-         Y9og==
+        bh=8CkO4LO0iIgeVPWEypCVZBj97mLMZOxv6D2spYKCPoc=;
+        b=CJI2EsjF00XHhky1Nc0ng1TGJeb3UY3ZN8Pe7nAHinIc+Sh6DQQiY3w7vP6GjVFhmQ
+         coWb6wVSiEwNBtKQjuKNPQ+PUbxOc4qQDC/d7tYjn9zP1i/0cPHV0+HiGM1HBlobwmTF
+         lvsAdPqh+IYR7p/JjorwpkrFBOxrUPh+DCtdQL2jM3dFi/bfmvUINoVc0MOxV/Jxd8Mz
+         D3bXP1Bd/5ICvFgIBscj7te/2Paky/rncZjIFwAvGANPHLWXYL4QEglpl3iAXtkQpziO
+         uWJprGQOJD4yfbsZ3XJBXu/xYCibIDAZzzZZJ7ynEI7ZtB7P0Owp3Pnzv0sp3R7fQDMS
+         Jhdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725368149; x=1725972949;
+        d=1e100.net; s=20230601; t=1725371318; x=1725976118;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=+IsWpqVgt+KJ6WzMhEvW26KeomE/4ZiUXtss83zz0RY=;
-        b=BCkjwi9Ms3HHapDO6XAJfYiT8kCUoojgv+Gj+qXpoQ/+VH/E75yysxTu1xUWgmJnpo
-         MmmQCf+AbrKpI/DS3wOvBphXoJvNZfADn6XHOLwfXj4STi43qgl+z3RXwT102Qd5aXtO
-         zjmgx0XcB3w0qhVfwM8LThF0MN1kP8G9ipt+CSrqmqz8r9MNNGIJnkc5k5JuELkhJsrY
-         aXZYQsTSBxQESbUslfFjmnTnXk58qCjGhlyOOXp41igQCmHAnfYAc3XTQMZmmdMn1ZOF
-         xku6RtyWKc7+ewLeSqAsKcqbwWTCW78TJmQ70Rvu2FA1aovE7I7c9yVCKeTEJdSjmWfk
-         5MmA==
-X-Forwarded-Encrypted: i=1; AJvYcCVfM1G94KUR6qq8sZiiArXYNxmmjB4WsjuFu7GBGaXgoYqB5/fwR6AsHELY6ZhbK+2+kw2Sudw7DleUw8Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzaINPs3HuwLBvJhEIL0J9Zwoq+s+AE/yf8f6u9kRTCmhq8YlxQ
-	rPP7LdQ1pphMS4pvxH46C2eGnY+J5kLXBiTiNFhpE5DAQEpgTLOnlNiTj0X4lkU=
-X-Google-Smtp-Source: AGHT+IHUkTkxp4HLChhYmhajoCXVva33bPyWUMJt+1RyfTslmygXSbqtzhhnUBYWX5olbvVaOTb2wg==
-X-Received: by 2002:a05:6a20:2594:b0:1c4:8694:6be8 with SMTP id adf61e73a8af0-1cce15f7ea3mr26840193637.3.1725368148746;
-        Tue, 03 Sep 2024 05:55:48 -0700 (PDT)
+        bh=8CkO4LO0iIgeVPWEypCVZBj97mLMZOxv6D2spYKCPoc=;
+        b=FaNoV6MzJcx3fAWuochx+h0CRhQVj4XIDBbZB2aTj0205tkipgixaH7ygqR1SipGKI
+         D7wOEe5KbOB37gDs79R7JDWGElfq1EBCucEyjOToydl3vqSY1j+rG4XcuW5jA2X0PcNa
+         WEHt2/cJxPb3s9Bil4kIQEY17WumdbEGNAwdOYRBMrAwXh0C48opPLCvBJp9vHJjgE91
+         RAqSvITcWYAeTZpVVz+9KxkUs7Sya2qsVAbDnIwbXOgTXQJQpyFSQCS0Tpj5yglMhItn
+         Vc6cnplJx7EwW+LhpDVaBGZBrapRh618+YJ3nziLrijhbCHs2FagIYQkUQywRykdkK4N
+         uJHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUO5R3Z4RBUvNJMsul5G6twDGXupb9nqQNIcIr78++eBYyQN23+3AsjQObPTOAhKlIzrjwONvKdGfBeAEk=@vger.kernel.org, AJvYcCUzRu4bgCcYBrxIq6NDSNmcXYF0sBlK+7voanXl2f+Qs5PtKXooAYYwHuWmAOGt1JVFcGmOO4ud6vFOA/X5@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXWFPg6jSeiokHf97lAl1RlHYKGLtUYZUZxFHxhd4XwIMgBnPS
+	46BDpkgYm6EteSdCv5vSfyUgtmoaLx5h/G/AP9T0uphRdWv6f/6y
+X-Google-Smtp-Source: AGHT+IE0ozs3PMwhIotGD8U/MicGghL1ZPAo0jdAAA28tajLjyvmIAl4xRILEG65te3lGOTE67Knsw==
+X-Received: by 2002:a17:90b:350d:b0:2d3:c9bb:9cd7 with SMTP id 98e67ed59e1d1-2da55a77e52mr3115600a91.36.1725371317968;
+        Tue, 03 Sep 2024 06:48:37 -0700 (PDT)
 Received: from fedora.. ([106.219.162.224])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-715e569f4bcsm8438250b3a.115.2024.09.03.05.55.46
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2d8d0985062sm4863045a91.12.2024.09.03.06.48.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Sep 2024 05:55:48 -0700 (PDT)
+        Tue, 03 Sep 2024 06:48:37 -0700 (PDT)
 From: Riyan Dhiman <riyandhiman14@gmail.com>
-To: herbert@gondor.apana.org.au,
-	davem@davemloft.net
-Cc: linux-crypto@vger.kernel.org,
+To: dhowells@redhat.com
+Cc: keyrings@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Riyan Dhiman <riyandhiman14@gmail.com>
-Subject: [PATCH] crypto: aegis128: Fix indentation issue in crypto_aegis128_process_crypt()
-Date: Tue,  3 Sep 2024 18:25:39 +0530
-Message-ID: <20240903125539.12679-1-riyandhiman14@gmail.com>
+Subject: [PATCH] KEYS: asymmetric: Calculate size from pointer
+Date: Tue,  3 Sep 2024 19:18:31 +0530
+Message-ID: <20240903134831.15448-1-riyandhiman14@gmail.com>
 X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -68,37 +68,31 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The code in crypto_aegis128_process_crypt() had an indentation
-issue where spaces were used instead of tabs. This commit
-corrects the indentation to use tabs, adhering to the
-Linux kernel coding style guidelines.
+Calculate the size from pointer instead of
+struct to adhere to linux kernel coding style.
 
-Issue reported by checkpatch:
-- ERROR: code indent should use tabs where possible
+Issue reported by checkpatch.
 
-No functional changes are intended.
+This commit has no functional changes.
 
 Signed-off-by: Riyan Dhiman <riyandhiman14@gmail.com>
 ---
- crypto/aegis128-core.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ crypto/asymmetric_keys/asymmetric_type.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/crypto/aegis128-core.c b/crypto/aegis128-core.c
-index c4f1bfa1d04f..4fdb53435827 100644
---- a/crypto/aegis128-core.c
-+++ b/crypto/aegis128-core.c
-@@ -323,8 +323,9 @@ static __always_inline
- int crypto_aegis128_process_crypt(struct aegis_state *state,
- 				  struct skcipher_walk *walk,
- 				  void (*crypt)(struct aegis_state *state,
--					        u8 *dst, const u8 *src,
--					        unsigned int size))
-+						u8 *dst,
-+						const u8 *src,
-+						unsigned int size))
+diff --git a/crypto/asymmetric_keys/asymmetric_type.c b/crypto/asymmetric_keys/asymmetric_type.c
+index a5da8ccd353e..59b5c6f3ebb4 100644
+--- a/crypto/asymmetric_keys/asymmetric_type.c
++++ b/crypto/asymmetric_keys/asymmetric_type.c
+@@ -151,7 +151,7 @@ struct asymmetric_key_id *asymmetric_key_generate_id(const void *val_1,
  {
- 	int err = 0;
+ 	struct asymmetric_key_id *kid;
  
+-	kid = kmalloc(sizeof(struct asymmetric_key_id) + len_1 + len_2,
++	kid = kmalloc(sizeof(*kid) + len_1 + len_2,
+ 		      GFP_KERNEL);
+ 	if (!kid)
+ 		return ERR_PTR(-ENOMEM);
 -- 
 2.46.0
 
