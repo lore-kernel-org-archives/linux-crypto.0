@@ -1,155 +1,154 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76C741AACA;
-	Tue,  3 Sep 2024 15:34:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF9AD18BC22
+	for <linux-crypto@vger.kernel.org>; Tue,  3 Sep 2024 17:25:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725377694; cv=none; b=cia2+ErG+TxgLJ4KaPkun1N6Yh9OFR04cqDyKUB6Wb44eW31e+GXxKRaLBk6IuiVFI3NJiPu/YWPHkq+o6brHTG4dEFWrTrYVh+FCeQo2dZqcTVgfxBHEfmJ5IVY64aIJlr+ps0Jx7j5D2I0Jkckqsaat1HqLQT4yjEykDGM38o=
+	t=1725384311; cv=none; b=cjGKKiWGJUYLrkvJRTfN3VqPRX0WJHgjFiLaV7RARJuw7J3aGzUY62ke/+n6QpDDKvjs/NTBZzNmW1wB2iXx9xtef34SVxGNTkM07j6PDLKOn4Vq5zwwrWj9dXMqtDI+TzPsd6IjTVtcQ3+/7ZRWIQ7JtoI/ib0/NV5dGStgGB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725377694; c=relaxed/simple;
-	bh=g6ObcrgDOboADgb9kxpvqEpUpqwiJLyBdTwwo5QBF3w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=t5xNanDfzptdr+FT6tSvl8qMSI91y1LisrvdoB50VrjsnG3gQRt8H2GXxXM70m251qx4mwlomygzmgECedwSyD7jgxssdZnZDz9HZR5Jl5NDrzYCs5T0Jt3Bx6AZG+ci1CcSvuear27coNXCIAHv8M9eVN4XSSe7Xupl1AUihM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lwCJbWvl; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1725384311; c=relaxed/simple;
+	bh=0GQ60j9Kpm6aDkp69Hid+eWu32D7f4A17UAOLn1+/VU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jSfwjcE7doKfM5tjFjLhbP+t4b6k6gC4YFFKhrww++we1tSmo5SoiGQl/nAPpMmXy9laDCcjTvXxPBW6D+0nrM3YeKZaTwccZKW26+t4lPkrfEpqTZk+BatKoBNELpGeTY+QJX87+50/J0w7t392YwV/qczueKYSnGFV6a4eacQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=boGfBQne; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lwCJbWvl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0ED45C4CEC4;
-	Tue,  3 Sep 2024 15:34:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="boGfBQne"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5361DC4CEC4;
+	Tue,  3 Sep 2024 17:25:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725377694;
-	bh=g6ObcrgDOboADgb9kxpvqEpUpqwiJLyBdTwwo5QBF3w=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=lwCJbWvlDhTrMoiODgJrGz4VH5T1ut2MZIAiJShiRwGLg2wCHJ3m4zQQQ6gND5PiB
-	 4/Uw1jWtHtWecvL+0nAE2Hah+5FEu+5A2n203Xd/s5JVvkn+ANobATSuCFjKf/nZMG
-	 xrrrdfhPHCned2wjT1yeGRZzzbVk7AjnLdbm35wK/fhBfqoYSo+6r/J4UfBVxxExnk
-	 fdj7cdu9QegUxWGZsAJWo91zXIpYkBtP6G1+Rf/jdugGhjjcvgE9qTVjV3qX+sQknt
-	 P8H0L9UPyT1AAwMXxcHMnzXxs3PG0Z4SWPFq5L7LPCszBq2zAQUzvq1o8xaFXn9dSR
-	 mlZbFJ9P2SOnw==
-Message-ID: <19902a34-e02d-4ffc-a2f7-64ccdf06ded6@kernel.org>
-Date: Tue, 3 Sep 2024 17:34:31 +0200
+	s=k20201202; t=1725384310;
+	bh=0GQ60j9Kpm6aDkp69Hid+eWu32D7f4A17UAOLn1+/VU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=boGfBQnegjIhyx5Rv4zOG2nFqQUEcaf3N7sGnQObNGCZdcEppewEGrKeSP76AhOwA
+	 NDkBgXM2bYAXkcqW8TKZ4QnjxuUjh17OzA94qgHLJZlVrP5mtyGBAADjRArZWb8fZP
+	 1CT9QCcFCQ1mO00kLRMzWY97WwekFN0kAwGAc86nhJGTgSFBk+tn+ggiDgFf+GIEkr
+	 jmGPwOjJ0Ajf6Fmnym83s2lojnPNwgUzUQm/WrX2gJ59GzYKWdLw1wUdEdZm6oLx73
+	 GJnliTSTvKZgnw2PkDwxyh+rO8tfNhfQhBOd3qmp6Yds7uh+mw4bUCrbCQ6aP14FnG
+	 lt88Ktlo5ReGg==
+Date: Tue, 3 Sep 2024 12:25:09 -0500
+From: Rob Herring <robh@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>,
+	linux-crypto@vger.kernel.org, Ruud.Derwig@synopsys.com,
+	manjunath.hadli@vayavyalabs.com, bhoomikak@vayavyalabs.com
+Subject: Re: [PATCH v7 0/6] Add SPAcc Crypto Driver Support
+Message-ID: <20240903172509.GA1754429-robh@kernel.org>
+References: <20240729041350.380633-1-pavitrakumarm@vayavyalabs.com>
+ <ZrcHGxcYnsejQ7H_@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 11/22] pinctrl: qcom: sa8775p: Add support for SA8255p SoC
-To: Nikunj Kela <quic_nkela@quicinc.com>
-Cc: andersson@kernel.org, konradybcio@kernel.org, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org, rafael@kernel.org,
- viresh.kumar@linaro.org, herbert@gondor.apana.org.au, davem@davemloft.net,
- sudeep.holla@arm.com, andi.shyti@kernel.org, tglx@linutronix.de,
- will@kernel.org, joro@8bytes.org, jassisinghbrar@gmail.com, lee@kernel.org,
- linus.walleij@linaro.org, amitk@kernel.org, thara.gopinath@gmail.com,
- broonie@kernel.org, wim@linux-watchdog.org, linux@roeck-us.net,
- robin.murphy@arm.com, cristian.marussi@arm.com, rui.zhang@intel.com,
- lukasz.luba@arm.com, vkoul@kernel.org, quic_gurus@quicinc.com,
- agross@kernel.org, bartosz.golaszewski@linaro.org, quic_rjendra@quicinc.com,
- robimarko@gmail.com, linux-arm-msm@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-pm@vger.kernel.org, linux-crypto@vger.kernel.org,
- arm-scmi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-i2c@vger.kernel.org, iommu@lists.linux.dev,
- linux-gpio@vger.kernel.org, linux-serial@vger.kernel.org,
- linux-spi@vger.kernel.org, linux-watchdog@vger.kernel.org,
- kernel@quicinc.com, quic_psodagud@quicinc.com, quic_tsoni@quicinc.com,
- quic_shazhuss@quicinc.com
-References: <20240828203721.2751904-1-quic_nkela@quicinc.com>
- <20240828203721.2751904-12-quic_nkela@quicinc.com>
- <erlzqkxrogk24ugfahfsxrramay6tfhljnxrcfcuhe24pla7k3@lytnz3kmszyj>
- <d15927f9-bd00-4e32-9c25-535c69fe56f6@quicinc.com>
- <f227c799-cf9a-481a-b359-21828d6e8bca@kernel.org>
- <b855f1a9-35c2-4c53-9485-0989b3eb5a6b@quicinc.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
- cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
- JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
- gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
- J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
- NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
- BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
- vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
- Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
- TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
- S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
- FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJgPO8PBQkUX63hAAoJEBuTQ307
- QWKbBn8P+QFxwl7pDsAKR1InemMAmuykCHl+XgC0LDqrsWhAH5TYeTVXGSyDsuZjHvj+FRP+
- gZaEIYSw2Yf0e91U9HXo3RYhEwSmxUQ4Fjhc9qAwGKVPQf6YuQ5yy6pzI8brcKmHHOGrB3tP
- /MODPt81M1zpograAC2WTDzkICfHKj8LpXp45PylD99J9q0Y+gb04CG5/wXs+1hJy/dz0tYy
- iua4nCuSRbxnSHKBS5vvjosWWjWQXsRKd+zzXp6kfRHHpzJkhRwF6ArXi4XnQ+REnoTfM5Fk
- VmVmSQ3yFKKePEzoIriT1b2sXO0g5QXOAvFqB65LZjXG9jGJoVG6ZJrUV1MVK8vamKoVbUEe
- 0NlLl/tX96HLowHHoKhxEsbFzGzKiFLh7hyboTpy2whdonkDxpnv/H8wE9M3VW/fPgnL2nPe
- xaBLqyHxy9hA9JrZvxg3IQ61x7rtBWBUQPmEaK0azW+l3ysiNpBhISkZrsW3ZUdknWu87nh6
- eTB7mR7xBcVxnomxWwJI4B0wuMwCPdgbV6YDUKCuSgRMUEiVry10xd9KLypR9Vfyn1AhROrq
- AubRPVeJBf9zR5UW1trJNfwVt3XmbHX50HCcHdEdCKiT9O+FiEcahIaWh9lihvO0ci0TtVGZ
- MCEtaCE80Q3Ma9RdHYB3uVF930jwquplFLNF+IBCn5JRzsFNBFVDXDQBEADNkrQYSREUL4D3
- Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
- MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
- OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
- GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
- 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
- YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
- 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
- BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
- JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
- 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
- YpsFAmA872oFCRRflLYACgkQG5NDfTtBYpvScw/9GrqBrVLuJoJ52qBBKUBDo4E+5fU1bjt0
- Gv0nh/hNJuecuRY6aemU6HOPNc2t8QHMSvwbSF+Vp9ZkOvrM36yUOufctoqON+wXrliEY0J4
- ksR89ZILRRAold9Mh0YDqEJc1HmuxYLJ7lnbLYH1oui8bLbMBM8S2Uo9RKqV2GROLi44enVt
- vdrDvo+CxKj2K+d4cleCNiz5qbTxPUW/cgkwG0lJc4I4sso7l4XMDKn95c7JtNsuzqKvhEVS
- oic5by3fbUnuI0cemeizF4QdtX2uQxrP7RwHFBd+YUia7zCcz0//rv6FZmAxWZGy5arNl6Vm
- lQqNo7/Poh8WWfRS+xegBxc6hBXahpyUKphAKYkah+m+I0QToCfnGKnPqyYIMDEHCS/RfqA5
- t8F+O56+oyLBAeWX7XcmyM6TGeVfb+OZVMJnZzK0s2VYAuI0Rl87FBFYgULdgqKV7R7WHzwD
- uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
- 7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
- 5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <b855f1a9-35c2-4c53-9485-0989b3eb5a6b@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZrcHGxcYnsejQ7H_@gondor.apana.org.au>
 
-On 03/09/2024 17:24, Nikunj Kela wrote:
+On Sat, Aug 10, 2024 at 02:22:19PM +0800, Herbert Xu wrote:
+> On Mon, Jul 29, 2024 at 09:43:44AM +0530, Pavitrakumar M wrote:
+> > Add the driver for SPAcc(Security Protocol Accelerator), which is a
+> > crypto acceleration IP from Synopsys. The SPAcc supports many cipher,
+> > hash, aead algorithms and various modes.The driver currently supports
+> > below,
+> > 
+> > aead:
+> > - ccm(sm4)
+> > - ccm(aes)
+> > - gcm(sm4)
+> > - gcm(aes)
+> > - rfc7539(chacha20,poly1305)
+> > 
+> > cipher:
+> > - cbc(sm4)
+> > - ecb(sm4)
+> > - ctr(sm4)
+> > - xts(sm4)
+> > - cts(cbc(sm4))
+> > - cbc(aes)
+> > - ecb(aes)
+> > - xts(aes)
+> > - cts(cbc(aes))
+> > - ctr(aes)
+> > - chacha20
+> > - ecb(des)
+> > - cbc(des)
+> > - ecb(des3_ede)
+> > - cbc(des3_ede)
+> > 
+> > hash:
+> > - cmac(aes)
+> > - xcbc(aes)
+> > - cmac(sm4)
+> > - xcbc(sm4) 
+> > - hmac(md5)
+> > - md5
+> > - hmac(sha1)
+> > - sha1
+> > - sha224
+> > - sha256
+> > - sha384
+> > - sha512
+> > - hmac(sha224)
+> > - hmac(sha256)
+> > - hmac(sha384)
+> > - hmac(sha512)
+> > - sha3-224
+> > - sha3-256
+> > - sha3-384
+> > - sha3-512
+> > - hmac(sm3)
+> > - sm3
+> > - michael_mic
+> > 
+> > Pavitrakumar M (6):
+> >   Add SPAcc Skcipher support
+> >   Enable SPAcc AUTODETECT
+> >   Add SPAcc ahash support
+> >   Add SPAcc aead support
+> >   Add SPAcc Kconfig and Makefile
+> >   Enable Driver compilation in crypto Kconfig and Makefile
+> > 
+> >  drivers/crypto/Kconfig                     |    1 +
+> >  drivers/crypto/Makefile                    |    1 +
+> >  drivers/crypto/dwc-spacc/Kconfig           |   95 +
+> >  drivers/crypto/dwc-spacc/Makefile          |   16 +
+> >  drivers/crypto/dwc-spacc/spacc_aead.c      | 1260 ++++++++++
+> >  drivers/crypto/dwc-spacc/spacc_ahash.c     |  914 +++++++
+> >  drivers/crypto/dwc-spacc/spacc_core.c      | 2512 ++++++++++++++++++++
+> >  drivers/crypto/dwc-spacc/spacc_core.h      |  826 +++++++
+> >  drivers/crypto/dwc-spacc/spacc_device.c    |  340 +++
+> >  drivers/crypto/dwc-spacc/spacc_device.h    |  231 ++
+> >  drivers/crypto/dwc-spacc/spacc_hal.c       |  367 +++
+> >  drivers/crypto/dwc-spacc/spacc_hal.h       |  114 +
+> >  drivers/crypto/dwc-spacc/spacc_interrupt.c |  316 +++
+> >  drivers/crypto/dwc-spacc/spacc_manager.c   |  650 +++++
+> >  drivers/crypto/dwc-spacc/spacc_skcipher.c  |  712 ++++++
+> >  15 files changed, 8355 insertions(+)
+> >  create mode 100644 drivers/crypto/dwc-spacc/Kconfig
+> >  create mode 100644 drivers/crypto/dwc-spacc/Makefile
+> >  create mode 100755 drivers/crypto/dwc-spacc/spacc_aead.c
+> >  create mode 100644 drivers/crypto/dwc-spacc/spacc_ahash.c
+> >  create mode 100644 drivers/crypto/dwc-spacc/spacc_core.c
+> >  create mode 100644 drivers/crypto/dwc-spacc/spacc_core.h
+> >  create mode 100644 drivers/crypto/dwc-spacc/spacc_device.c
+> >  create mode 100644 drivers/crypto/dwc-spacc/spacc_device.h
+> >  create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.c
+> >  create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.h
+> >  create mode 100644 drivers/crypto/dwc-spacc/spacc_interrupt.c
+> >  create mode 100644 drivers/crypto/dwc-spacc/spacc_manager.c
+> >  create mode 100644 drivers/crypto/dwc-spacc/spacc_skcipher.c
+> > 
+> > 
+> > base-commit: 95c0f5c3b8bb7acdc5c4f04bc6a7d3f40d319e9e
+> > -- 
+> > 2.25.1
 > 
-> On 8/30/2024 2:52 AM, Krzysztof Kozlowski wrote:
->> On 29/08/2024 16:17, Nikunj Kela wrote:
->>> On 8/29/2024 12:29 AM, Krzysztof Kozlowski wrote:
->>>> On Wed, Aug 28, 2024 at 01:37:10PM -0700, Nikunj Kela wrote:
->>>>> SA8255p platform uses the same TLMM block as used in SA8775p,
->>>>> though the pins are split between Firmware VM and Linux VM.
->>>>> let's add SA8255p specific compatible.
->>>> The change suggests devices are fully compatible, but above description
->>>> does not.
->>>>
->>>> This looks conflicting.
->>>>
->>>> Best regards,
->>>> Krzysztof
->>> Hi Krzysztof,
->>>
->>> Thanks for reviewing patches. TLMM HW block is exactly same as used in
->>> SA8775p however ownership of pins can be split between firmware VM and
->>> Linux VM. It is upto devices to decide what pins they want to use in
->>> what VM. I will extend the subject with same description as used in DT
->>> binding.
->> So there is no difference? Then devices should be made compatible with
->> fallback.
->>
->> Best regards,
->> Krzysztof
-> 
-> Yes, I get your point now. I will discuss internally. I am leaning
-> towards using sa8775p-tlmm compatible in SA8255p TLMM node so there is
-> no need for adding new compatible. Will drop the two pincontrol related
-> patches from the series in next version if agreed internally.
-> 
+> All applied.  Thanks.
 
-You need compatible followed by fallback (and therefore drop driver
-change). That's how compatibility is expressed.
+Please drop it. Amongst other problems I pointed out in patch, there's 
+no binding for this nor will one be accepted as-is. The author has had 2 
+weeks to address it.
 
-
-Best regards,
-Krzysztof
-
+Rob
