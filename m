@@ -1,80 +1,129 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64BDF1A0BC6;
-	Tue,  3 Sep 2024 09:54:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28B5E1B9859
+	for <linux-crypto@vger.kernel.org>; Tue,  3 Sep 2024 12:09:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725357251; cv=none; b=m+aWutV3MASBckfc7CeoABvPx+0VK/50jQrYqUIf5J5kCpCWL3tHTUrMEP46RvMnbYfvT3l4eZo1TNOa9PU8Y66tPTDZF/d0rGk8x6y2cf4I6ZXikRuJ0QWXuwAxJV6hwvHnp8mutnHyNzUfhPZ1DuKhPO3yT6h8rh0thxadXLE=
+	t=1725365396; cv=none; b=sYjcZLtMIx9H+69tXZApOuv1rCBgCv/k8Bm2gl3ty4rUBIyMQqgjQJeJhAR2JzKtuk+SmYU27qMFMlm2sejq1csyjdklYtmTWc8UDerXuP0Oaw3C6uPPI8fRZBY3Khd/AIWbFtPWZaUgFohlMRHfKVuOfBPzUqWaVlAF1coH3gM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725357251; c=relaxed/simple;
-	bh=gSZx9Ftz4YqeMezQVs7CELNKANVCRLqxaXuLpm8FapM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X/gG3hoGHGsQ3gprn2TJ3mAlNDMWmEzpvuQNuxACHUx9jeJJr1rTiYTpUYK5UqfuXjYi6btkz10laxuOx5vuCKR/BRj19rDxKBoRAUC+oFaWvN8BaM3jbGnFjaXJHetKDrXq0s7fqA8iwjUzW2p6mKGDDKVLksxAMcx21/NomPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=O524RKUM; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1725365396; c=relaxed/simple;
+	bh=N1qqn7vYKBlbeXYmAR1aaSBjOkAuuoIsPmVXjG1IKa0=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=YPNt7XOGAr4vJxTnX+cAu7MMWm+1qgKwAveEqvkyzDSe1we1SiK9JxSzpMp2joAHu+tRGxvKO5VpoCV4zTAxGQP93p6rsMaHdE+eLHPKAbu0O3r5jrIltMhMx5iuX43YLFML0RHNT1XjjVe7YmjS3HNDfombMpo4nb7L4yef37I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=S9fJCH2U; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="O524RKUM"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=ZiW7w/YZN8asOcWg8W2o5ZcuBXFyy+c0kNFOkdG5QPU=; b=O524RKUM3cduINesK7N1JErSJc
-	aKLWjtUAvfa1stw1uzlQ+fOb2YVWX5qbPJyH/LMlnKJvfQQflIClgBGpGoSCP4VqgwGyp4gvwR/Er
-	wjYKET80usDsnKvybZ7Sg5gt4G8KiX877M8WbiQ+MVObRmQm65xEb3EUTVMFVm0x+fAWkB9fcWVQs
-	sniRD1yG22YXv8B1FWMRLtvDqscrDBG5J4ww7KQTjhuiefqA6Oau8845wUme9LPe//OmDoyPX4HFN
-	LOtVNNgpc8X02qWFUn33hbZB9krmwfoZ/9kRLpFZdU1rVUf7JeA42PJG7smOd+cHCgpLsxLqkoGIR
-	FRfB5MSA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1slQEc-009JHS-22;
-	Tue, 03 Sep 2024 17:54:03 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 03 Sep 2024 17:54:02 +0800
-Date: Tue, 3 Sep 2024 17:54:02 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: kernel test robot <oliver.sang@intel.com>
-Cc: oe-lkp@lists.linux.dev, lkp@intel.com, linux-crypto@vger.kernel.org,
-	ltp@lists.linux.it
-Subject: Re: [PATCH] crypto: algboss - Pass instance creation error up
-Message-ID: <ZtbcumjZQAaF_5hS@gondor.apana.org.au>
-References: <ZtQgoIhvZUvpI8K4@gondor.apana.org.au>
- <202409031626.c7cf85de-oliver.sang@intel.com>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="S9fJCH2U"
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4280ca0791bso45340265e9.1
+        for <linux-crypto@vger.kernel.org>; Tue, 03 Sep 2024 05:09:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1725365393; x=1725970193; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=JLYlLLGKbB0TvMjhCmijODtjVYZ8RqD6X4SH5pHru3k=;
+        b=S9fJCH2UgJkF2l+UauktRfkH4nq6TM7EIxAYnstUodWneXJ/guUWV3jxiexAaIpX4P
+         cOq8nLDzfXxC24xhhrjvz8eoi7ZCHnuoeIc9i5DH2nwzRDOdkBbkMElRrv5Dx5N8rVH0
+         daBP0biULvTTipG6uBkctB9INyCkes3hes1btVssSexWAWLn9xBLIUnBQYOpgVKLNU3I
+         RmQVAeQuXl+Z1Ew8SF0UsboblwrwBQioUMVgi3C8lf1Xu3gc0XDkEQeX3+dzbKYdjQjt
+         tB2SGlEpDmfrbfc0mEyAoZ40Cj+dHGrp4/SxzdaspfziCz5RqhBjWQmsWgv+wodJCxeR
+         faOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725365393; x=1725970193;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JLYlLLGKbB0TvMjhCmijODtjVYZ8RqD6X4SH5pHru3k=;
+        b=miKELIxwRyBW/BJGD+NAMmsnZDhrZF9B+T4RJApuHf8h/ySHJ66pbWh7LtjIdg/zwi
+         eJXQkd99b4cXwfg/Gy5/zvDW/LRN/UIXRsUOTX0f9eH6zvocmcqQr/D+k2QXBI/lEmE/
+         z9ywgeHgicEoQr0p1BXV1liWNnivXRve4vFA3cfqp890xyZb1RoF+GFRrmJ3YfLcOhjL
+         ZDkqBgfPoNkrTeUJkK9Wzx/M1sQRTQegikihZRxcSjSru00fwABkb2do9dSQWbL7baLe
+         M0LdPBS0t6SIEGHLfKDdfvFhANLIJzjrtUeabYzxpAYSAIAfQymlCGAFCcLdyieH090Z
+         WNeg==
+X-Forwarded-Encrypted: i=1; AJvYcCUR4W09WDuM+OUeznuzyldxCvsWQDyb0kc4BNj7CFrnwCB1ySFo/FeRxVElEeDP/LVfOyhUxkI4NLmvYK8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx7j3oUDzmgjSSLzqujYq81GYYgFqhchmeUkfnBdRe2iw4wnxHm
+	EJ5vP2LPdQhEK/nBcfkS5GFQwiET2F3PjvyrJ/xeCC33bJQjR1cFZyPPgpwFAyo=
+X-Google-Smtp-Source: AGHT+IEyoZ4C1GIHdc4etZJ5y8/7i4ZOxLROM5omYazPOI3P6CpupmD7KGheFpP2J3CHj/uHt2FC5g==
+X-Received: by 2002:a5d:440b:0:b0:374:c847:852 with SMTP id ffacd0b85a97d-376dd71aa2bmr403119f8f.29.1725365393138;
+        Tue, 03 Sep 2024 05:09:53 -0700 (PDT)
+Received: from ubuntu-vm.. (51-148-40-55.dsl.zen.co.uk. [51.148.40.55])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3749ee4a55fsm14069238f8f.10.2024.09.03.05.09.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Sep 2024 05:09:51 -0700 (PDT)
+From: Adhemerval Zanella <adhemerval.zanella@linaro.org>
+To: "Jason A . Donenfeld" <Jason@zx2c4.com>,
+	Theodore Ts'o <tytso@mit.edu>,
+	linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-arch@vger.kernel.org,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>
+Subject: [PATCH v5 0/2] arm64: Implement getrandom() in vDSO
+Date: Tue,  3 Sep 2024 12:09:15 +0000
+Message-ID: <20240903120948.13743-1-adhemerval.zanella@linaro.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202409031626.c7cf85de-oliver.sang@intel.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Sep 03, 2024 at 04:40:33PM +0800, kernel test robot wrote:
->
-> Running tests.......
-> <<<test_start>>>
-> tag=cve-2017-17806 stime=1725329707
-> cmdline="af_alg01"
-> contacts=""
-> analysis=exit
-> <<<test_output>>>
-> tst_test.c:1809: TINFO: LTP version: 20240524-209-g9a6f3896f
-> tst_test.c:1813: TINFO: Tested kernel: 6.11.0-rc1-00074-g577bf9f41d61 #1 SMP PREEMPT_DYNAMIC Tue Sep  3 00:19:02 CST 2024 x86_64
-> tst_test.c:1652: TINFO: Timeout per run is 0h 00m 30s
-> af_alg01.c:36: TFAIL: instantiated nested hmac algorithm ('hmac(hmac(md5))')!
-> tst_af_alg.c:46: TBROK: unexpected error binding AF_ALG socket to hash algorithm 'hmac(hmac(md5))': EINVAL (22)
+Implement stack-less ChaCha20 and wire it with the generic vDSO
+getrandom code.  The first patch is Mark's fix to the alternatives
+system in the vDSO, while the the second is the actual vDSO work.
 
-This is actually expected.  Previously the construction error
-was discarded so user-space always ended up with ENOENT.  Now
-the actual error is returned to user-space.
+Changes from v4:
+- Improve BE handling.
 
-I recommend that this ltp test be modified accordingly.
+Changes from v3:
+- Use alternative_has_cap_likely instead of ALTERNATIVE.
+- Header/include and comment fixups.
 
-Thanks,
+Changes from v2:
+- Refactor Makefile to use same flags for vgettimeofday and
+  vgetrandom.
+- Removed rodata usage and fixed BE on vgetrandom-chacha.S.
+
+Changes from v1:
+- Fixed style issues and typos.
+- Added fallback for systems without NEON support.
+- Avoid use of non-volatile vector registers in neon chacha20.
+- Use c-getrandom-y for vgetrandom.c.
+- Fixed TIMENS vdso_rnd_data access.
+
+Adhemerval Zanella (1):
+  arm64: vdso: wire up getrandom() vDSO implementation
+
+Mark Rutland (1):
+  arm64: alternative: make alternative_has_cap_likely() VDSO compatible
+
+ arch/arm64/Kconfig                          |   1 +
+ arch/arm64/include/asm/alternative-macros.h |   4 +
+ arch/arm64/include/asm/mman.h               |   6 +-
+ arch/arm64/include/asm/vdso.h               |   6 +
+ arch/arm64/include/asm/vdso/getrandom.h     |  50 ++++++
+ arch/arm64/include/asm/vdso/vsyscall.h      |  10 ++
+ arch/arm64/kernel/vdso.c                    |   6 -
+ arch/arm64/kernel/vdso/Makefile             |  25 ++-
+ arch/arm64/kernel/vdso/vdso                 |   1 +
+ arch/arm64/kernel/vdso/vdso.lds.S           |   4 +
+ arch/arm64/kernel/vdso/vgetrandom-chacha.S  | 172 ++++++++++++++++++++
+ arch/arm64/kernel/vdso/vgetrandom.c         |  15 ++
+ tools/arch/arm64/vdso                       |   1 +
+ tools/include/linux/compiler.h              |   4 +
+ tools/testing/selftests/vDSO/Makefile       |   3 +-
+ 15 files changed, 292 insertions(+), 16 deletions(-)
+ create mode 100644 arch/arm64/include/asm/vdso/getrandom.h
+ create mode 120000 arch/arm64/kernel/vdso/vdso
+ create mode 100644 arch/arm64/kernel/vdso/vgetrandom-chacha.S
+ create mode 100644 arch/arm64/kernel/vdso/vgetrandom.c
+ create mode 120000 tools/arch/arm64/vdso
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.43.0
+
