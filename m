@@ -1,46 +1,46 @@
 Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD3731D54E4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD3D01DB930;
 	Tue,  3 Sep 2024 22:03:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725401025; cv=none; b=jjHCTYUTcFjOLyxeZ4a4aqL1oe4ZCQtt6geEjKO5JM0/kTBMT4cxnnWTvCDfpJtV7E/dChDLyQzI4uZFifqcoAqMytsFMTkUNxmFn9KX/E0VNDucrDYYiHP0APw2GWuB+Taf3hh6HCcet4sX4M4Hbm++PsHVJc7qsfW6u0g3l/0=
+	t=1725401025; cv=none; b=p445ktukWgLKlZSQqadZ4gm0HWHdWGbTHS1L8NsLEDF+LLZJAURS2wZiB/4fuiJ/Q6iIMVcFr2+6jKqMblQskLfAQRw7VvrhKk547IDuSu+R4pbh6N30fnZ9f03ZH1E1gR+SGwubuZpP7lp19q/ho6Uz/5zpJaRyEOHvATAeqf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1725401025; c=relaxed/simple;
-	bh=lQbhBqzJrpbQeuZr5KFK5lqvmeYMeJD/wl3OmKcWbbQ=;
+	bh=RT43NvnYI8KokyHtIcUoYMFsPFcr8ZBvTOQSPuQ+8Vw=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WfvpYs8IdIk/MoOwx0HH0Y9xGW7WzFPQEvfG63ltyek6srtNqL7evfr1X7o9YFRFaFoOLc7ROMKbZPisrnnGMF7Y2Do31KLYqFJ8cJuUnylqiy7w6f2hhfaWKLGMmg8apXxSJrlvo7Pxz4afxZiNzzYHi9X88Qj/Ib8ifJRHkQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Gv4FAFu3; arc=none smtp.client-ip=205.220.168.131
+	 MIME-Version:Content-Type; b=UdbufrIxsVKMaE1k04WYbk3CBxFyisCk8EHMV8gkhXqd8Jb3Jfcrio6xYCzkwHCpXEkeGeWUUXCKTDfKSX+NUjedGcPPCZz+9h5W7HHGVGWJQqKf1b04Nlvb4/pNVJy0M5ADupSx467neAfhEjH77ku2OLFr6bn8WYGRF4qDQ0U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=UCSW2v5A; arc=none smtp.client-ip=205.220.168.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Gv4FAFu3"
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 483BQfk3007698;
-	Tue, 3 Sep 2024 22:03:02 GMT
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="UCSW2v5A"
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 483Bvw58022362;
+	Tue, 3 Sep 2024 22:03:12 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	4TQ/vxlC7PBywN8i6bt9nEHId2Z42EXHeP4UJLJ94FY=; b=Gv4FAFu3IaapTSJM
-	uHiCQVrLg1Ah2KpkCxqMAEm8u/KtTyQMub/nhHBHNR84RTxfwrXJ0YjZ0YPSoDrT
-	0V+Lo5TGmjHKyoRTPs/piW3xSGhZ/cRRgBhJzI2UvtgrfP9KSbv4mVcSVJo47Okz
-	WOVincomLCcIJgeY1L0DiG7fmIUq6UY/WcZSi3zOh9YDprHY1a24hiBdaDYg/5m5
-	bmBgelwZJAM9EKFrc7mI8iKpS3vu6Iemr8ucUmLMma8jVpDfC3TBX7V5Vs4GZSiw
-	M/8tnRzwkB7ZODqT9MlRscnEesgS4wKfgAJSRVIKy1Iyy/veNwbdDx4Ov1byIFgJ
-	P2ThAA==
-Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 41buxf8nx7-1
+	7tfB68W+5+9Gbp/8HchPcn6kiOZl88SONsHykq2stjY=; b=UCSW2v5A9QumgjqI
+	yEBE2DHT/icbCzdcN6wWC2DJJwBPLwBIZ9t1kIBnlyd7wps3W+gvnPEYWh5KuG43
+	ezAcHFmA8QJtgpScovA4de0OjRDmNl8wvCEjrsl2u+vmlie8OneZDZpaZoqYrYHo
+	TRlcoYvgORpK7sJfztqGvu9TcN4IhYPo4qBg59I2zPWfPdPtxGdp9CrUVYbbaPNk
+	x9+0Soj8hPE5H4c6PrKR+8aiSkqpJ9mypy6b9x3+F9LDw+VnvGTYSDcj1eNLa9RT
+	D9XXCrRdVvjt33LtcVJPMPNJz54plUHVMuVXuGuIKtWTIif2tdFx0Th/H1Kg9Rrc
+	zSYnCQ==
+Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 41brvf11uf-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 03 Sep 2024 22:03:01 +0000 (GMT)
+	Tue, 03 Sep 2024 22:03:12 +0000 (GMT)
 Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 483M30Wq020050
+	by NASANPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 483M3BRk002648
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 3 Sep 2024 22:03:00 GMT
+	Tue, 3 Sep 2024 22:03:11 GMT
 Received: from hu-nkela-lv.qualcomm.com (10.49.16.6) by
  nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Tue, 3 Sep 2024 15:02:57 -0700
+ 15.2.1544.9; Tue, 3 Sep 2024 15:03:07 -0700
 From: Nikunj Kela <quic_nkela@quicinc.com>
 To: <quic_nkela@quicinc.com>
 CC: <andersson@kernel.org>, <konradybcio@kernel.org>, <robh@kernel.org>,
@@ -60,12 +60,10 @@ CC: <andersson@kernel.org>, <konradybcio@kernel.org>, <robh@kernel.org>,
         <iommu@lists.linux.dev>, <linux-gpio@vger.kernel.org>,
         <linux-serial@vger.kernel.org>, <linux-spi@vger.kernel.org>,
         <linux-watchdog@vger.kernel.org>, <kernel@quicinc.com>,
-        <quic_psodagud@quicinc.com>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski@linaro.org>
-Subject: [PATCH v2 02/21] soc: qcom: socinfo: add support for SA8255P
-Date: Tue, 3 Sep 2024 15:02:21 -0700
-Message-ID: <20240903220240.2594102-3-quic_nkela@quicinc.com>
+        <quic_psodagud@quicinc.com>, Praveen Talari <quic_ptalari@quicinc.com>
+Subject: [PATCH v2 15/21] dt-bindings: i2c: document support for SA8255p
+Date: Tue, 3 Sep 2024 15:02:34 -0700
+Message-ID: <20240903220240.2594102-16-quic_nkela@quicinc.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240903220240.2594102-1-quic_nkela@quicinc.com>
 References: <20240828203721.2751904-1-quic_nkela@quicinc.com>
@@ -82,37 +80,99 @@ X-ClientProxiedBy: nalasex01a.na.qualcomm.com (10.47.209.196) To
  nasanex01b.na.qualcomm.com (10.46.141.250)
 X-QCInternal: smtphost
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: BP9UprQmGZGLqz7ZFZ7OVTIETLi4fHSL
-X-Proofpoint-ORIG-GUID: BP9UprQmGZGLqz7ZFZ7OVTIETLi4fHSL
+X-Proofpoint-GUID: m_UpNyaGFDGid86XxW4CFTS0a0puWrif
+X-Proofpoint-ORIG-GUID: m_UpNyaGFDGid86XxW4CFTS0a0puWrif
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
  definitions=2024-09-03_10,2024-09-03_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 malwarescore=0
- adultscore=0 clxscore=1015 mlxlogscore=999 lowpriorityscore=0 phishscore=0
- bulkscore=0 mlxscore=0 impostorscore=0 priorityscore=1501 suspectscore=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
+ adultscore=0 mlxlogscore=999 priorityscore=1501 malwarescore=0 spamscore=0
+ mlxscore=0 clxscore=1015 lowpriorityscore=0 suspectscore=0 phishscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2407110000
  definitions=main-2409030177
 
-Add SocInfo support for SA8255P.
+Add compatible representing i2c support on SA8255p.
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Clocks and interconnects are being configured in Firmware VM
+on SA8255p, therefore making them optional.
+
+CC: Praveen Talari <quic_ptalari@quicinc.com>
 Signed-off-by: Nikunj Kela <quic_nkela@quicinc.com>
 ---
- drivers/soc/qcom/socinfo.c | 1 +
- 1 file changed, 1 insertion(+)
+ .../bindings/i2c/qcom,i2c-geni-qcom.yaml      | 33 +++++++++++++++++--
+ 1 file changed, 31 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/soc/qcom/socinfo.c b/drivers/soc/qcom/socinfo.c
-index 24c3971f2ef1..5c3bd59eaa69 100644
---- a/drivers/soc/qcom/socinfo.c
-+++ b/drivers/soc/qcom/socinfo.c
-@@ -424,6 +424,7 @@ static const struct soc_id soc_id[] = {
- 	{ qcom_board_id(QRB2210) },
- 	{ qcom_board_id(SM8475) },
- 	{ qcom_board_id(SM8475P) },
-+	{ qcom_board_id(SA8255P) },
- 	{ qcom_board_id(SA8775P) },
- 	{ qcom_board_id(QRU1000) },
- 	{ qcom_board_id(SM8475_2) },
+diff --git a/Documentation/devicetree/bindings/i2c/qcom,i2c-geni-qcom.yaml b/Documentation/devicetree/bindings/i2c/qcom,i2c-geni-qcom.yaml
+index 9f66a3bb1f80..b477fae734b6 100644
+--- a/Documentation/devicetree/bindings/i2c/qcom,i2c-geni-qcom.yaml
++++ b/Documentation/devicetree/bindings/i2c/qcom,i2c-geni-qcom.yaml
+@@ -15,6 +15,7 @@ properties:
+     enum:
+       - qcom,geni-i2c
+       - qcom,geni-i2c-master-hub
++      - qcom,sa8255p-geni-i2c
+ 
+   clocks:
+     minItems: 1
+@@ -69,8 +70,6 @@ properties:
+ required:
+   - compatible
+   - interrupts
+-  - clocks
+-  - clock-names
+   - reg
+ 
+ allOf:
+@@ -81,6 +80,10 @@ allOf:
+           contains:
+             const: qcom,geni-i2c-master-hub
+     then:
++      required:
++        - clocks
++        - clock-names
++
+       properties:
+         clocks:
+           minItems: 2
+@@ -100,7 +103,21 @@ allOf:
+           items:
+             - const: qup-core
+             - const: qup-config
++
++  - if:
++      properties:
++        compatible:
++          contains:
++            const: qcom,sa8255p-geni-i2c
++    then:
++      required:
++        - power-domains
++
+     else:
++      required:
++        - clocks
++        - clock-names
++
+       properties:
+         clocks:
+           maxItems: 1
+@@ -143,4 +160,16 @@ examples:
+         power-domains = <&rpmhpd SC7180_CX>;
+         required-opps = <&rpmhpd_opp_low_svs>;
+     };
++
++  - |
++    #include <dt-bindings/interrupt-controller/arm-gic.h>
++
++    i2c@a90000 {
++        compatible = "qcom,sa8255p-geni-i2c";
++        reg = <0xa90000 0x4000>;
++        interrupts = <GIC_SPI 357 IRQ_TYPE_LEVEL_HIGH>;
++        #address-cells = <1>;
++        #size-cells = <0>;
++        power-domains = <&scmi9_pd 11>;
++    };
+ ...
 -- 
 2.34.1
 
