@@ -1,94 +1,80 @@
-Received: from mod.modforum.org (mod.modforum.org [192.254.136.77])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 992EA1C767C
-	for <linux-crypto@vger.kernel.org>; Tue,  3 Sep 2024 09:15:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.254.136.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64BDF1A0BC6;
+	Tue,  3 Sep 2024 09:54:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725354960; cv=none; b=jM0PBjN/wtmV1bSzfEkMd8btp2sWbDBU4SBA9bo98N8lnIm4yWY31W1XQ0c7C3A8akDGQple2bc9cLlwHmnsiKKskBfdSql9gJzEb/2V0We8OxvMjphP3BiNF7TJ8Q8hiKi5eE8JmcIVxD8+ul2czjG0CssB6XNgW/J7PN+mUns=
+	t=1725357251; cv=none; b=m+aWutV3MASBckfc7CeoABvPx+0VK/50jQrYqUIf5J5kCpCWL3tHTUrMEP46RvMnbYfvT3l4eZo1TNOa9PU8Y66tPTDZF/d0rGk8x6y2cf4I6ZXikRuJ0QWXuwAxJV6hwvHnp8mutnHyNzUfhPZ1DuKhPO3yT6h8rh0thxadXLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725354960; c=relaxed/simple;
-	bh=G4BItOc8k/hB4suOfWWwTOg/U0FTlHwyCNnKCLPge2w=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=EpkuBszWA+yEYSZ7GHlpv/1IC3vK6XkOJowsZPGFVnCW8KcX48qXqg+k7lzTAZ5lCGfe/KhcbZ0IZX1unjFr9xyRum945sE/B2dmskHZPa3diNHXXOvm9AzPEXWB+4ehJTY0ITjkl5UwZ96X48y4IZaU3eyHHKr9zz76Wl69mKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=basantfashion.com; spf=pass smtp.mailfrom=basantfashion.com; dkim=pass (2048-bit key) header.d=basantfashion.com header.i=@basantfashion.com header.b=Q+IPslnp; arc=none smtp.client-ip=192.254.136.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=basantfashion.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=basantfashion.com
+	s=arc-20240116; t=1725357251; c=relaxed/simple;
+	bh=gSZx9Ftz4YqeMezQVs7CELNKANVCRLqxaXuLpm8FapM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X/gG3hoGHGsQ3gprn2TJ3mAlNDMWmEzpvuQNuxACHUx9jeJJr1rTiYTpUYK5UqfuXjYi6btkz10laxuOx5vuCKR/BRj19rDxKBoRAUC+oFaWvN8BaM3jbGnFjaXJHetKDrXq0s7fqA8iwjUzW2p6mKGDDKVLksxAMcx21/NomPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=O524RKUM; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=basantfashion.com header.i=@basantfashion.com header.b="Q+IPslnp"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=basantfashion.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Message-ID:Date:Subject:To:From:Reply-To:Sender:Cc:Content-ID:
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="O524RKUM"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=G4BItOc8k/hB4suOfWWwTOg/U0FTlHwyCNnKCLPge2w=; b=Q+IPslnpgEaUewbQgY3UmUWvSM
-	Fqbqios8ZzbKy/yn3Dwa9XUPZ5UIDB0TagKM8H5NvDA1QTcggJKxEUnvPLlCRel+GRe+AuRBCidVj
-	KMt7539wRLGe9IKlAVaDOnchwpnVSIV3hsQKLXq/ik4g4HDR2fuug9kThEBY/Bv4KQvuuwFIC1pfb
-	b7UQu4QMLpCtLj0taNCUe2Ts7jUlfA0adz0w3Hxtf4FMmjTlxDUmAFAer4P5beZXb2UGkdIa/G/9F
-	pP4LF/W0ivh2peulVM0Bb5eATZaqdmsy8cUYZWZnlQcv82q2/z/0hlI31BpR82cck7eMcxKqIJclx
-	L5BhDiaw==;
-Received: from [162.244.210.121] (port=62958)
-	by mod.modforum.org with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.93)
-	(envelope-from <kuljeet@basantfashion.com>)
-	id 1slPcs-00088g-Rx
-	for linux-crypto@vger.kernel.org; Tue, 03 Sep 2024 04:15:02 -0500
-Reply-To: procurement@mercuira.com
-From: MERCURIA  <kuljeet@basantfashion.com>
-To: linux-crypto@vger.kernel.org
-Subject: Request for Quote and Meeting Availability
-Date: 3 Sep 2024 02:15:57 -0700
-Message-ID: <20240903021557.B50BCEC2058DB47F@basantfashion.com>
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=ZiW7w/YZN8asOcWg8W2o5ZcuBXFyy+c0kNFOkdG5QPU=; b=O524RKUM3cduINesK7N1JErSJc
+	aKLWjtUAvfa1stw1uzlQ+fOb2YVWX5qbPJyH/LMlnKJvfQQflIClgBGpGoSCP4VqgwGyp4gvwR/Er
+	wjYKET80usDsnKvybZ7Sg5gt4G8KiX877M8WbiQ+MVObRmQm65xEb3EUTVMFVm0x+fAWkB9fcWVQs
+	sniRD1yG22YXv8B1FWMRLtvDqscrDBG5J4ww7KQTjhuiefqA6Oau8845wUme9LPe//OmDoyPX4HFN
+	LOtVNNgpc8X02qWFUn33hbZB9krmwfoZ/9kRLpFZdU1rVUf7JeA42PJG7smOd+cHCgpLsxLqkoGIR
+	FRfB5MSA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1slQEc-009JHS-22;
+	Tue, 03 Sep 2024 17:54:03 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 03 Sep 2024 17:54:02 +0800
+Date: Tue, 3 Sep 2024 17:54:02 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: kernel test robot <oliver.sang@intel.com>
+Cc: oe-lkp@lists.linux.dev, lkp@intel.com, linux-crypto@vger.kernel.org,
+	ltp@lists.linux.it
+Subject: Re: [PATCH] crypto: algboss - Pass instance creation error up
+Message-ID: <ZtbcumjZQAaF_5hS@gondor.apana.org.au>
+References: <ZtQgoIhvZUvpI8K4@gondor.apana.org.au>
+ <202409031626.c7cf85de-oliver.sang@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - mod.modforum.org
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - basantfashion.com
-X-Get-Message-Sender-Via: mod.modforum.org: authenticated_id: kuljeet@basantfashion.com
-X-Authenticated-Sender: mod.modforum.org: kuljeet@basantfashion.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202409031626.c7cf85de-oliver.sang@intel.com>
 
-Greetings,
+On Tue, Sep 03, 2024 at 04:40:33PM +0800, kernel test robot wrote:
+>
+> Running tests.......
+> <<<test_start>>>
+> tag=cve-2017-17806 stime=1725329707
+> cmdline="af_alg01"
+> contacts=""
+> analysis=exit
+> <<<test_output>>>
+> tst_test.c:1809: TINFO: LTP version: 20240524-209-g9a6f3896f
+> tst_test.c:1813: TINFO: Tested kernel: 6.11.0-rc1-00074-g577bf9f41d61 #1 SMP PREEMPT_DYNAMIC Tue Sep  3 00:19:02 CST 2024 x86_64
+> tst_test.c:1652: TINFO: Timeout per run is 0h 00m 30s
+> af_alg01.c:36: TFAIL: instantiated nested hmac algorithm ('hmac(hmac(md5))')!
+> tst_af_alg.c:46: TBROK: unexpected error binding AF_ALG socket to hash algorithm 'hmac(hmac(md5))': EINVAL (22)
 
-I hope you are doing great.
+This is actually expected.  Previously the construction error
+was discarded so user-space always ended up with ENOENT.  Now
+the actual error is returned to user-space.
 
-We have reviewed your products on your website, and several items=20
-have caught our interest. We would like to request a quote the=20
-following
+I recommend that this ltp test be modified accordingly.
 
-Can you ship to the United States?
-
-What are your best prices?
-
-What support do you provide?
-
-We are also interested in your services for this project.
-
-Could you let us know your availability for a virtual meeting on=20
-Zoom to discuss this project further?
-
-Please advise us on these matters so that we can prepare a=20
-meeting notice for our company executives to effectively engage=20
-with you.
-
-Thank you for your attention to this inquiry. We look forward to=20
-your prompt response.
-
-Best regards,
-
-Nina Petrova
-Procurement Manager
-Email: procurement@mercuira.com
-12 Marina View, Asia Square Tower 2, #26-01, Singapore, 018961
-Phone: +65 641 1080
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
