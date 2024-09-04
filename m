@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ACA615532A;
-	Wed,  4 Sep 2024 07:49:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BBD5155757
+	for <linux-crypto@vger.kernel.org>; Wed,  4 Sep 2024 07:53:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725436183; cv=none; b=c0f3UurMyL+9l++Vze+QgOEJ1M9/5Ph3Uw1NWCYEAQ64HqQG7YSgjhWSz2DsJaJrATycGPZDgtrrlW+RmcfbhQ5IMrl1BUyk62e4jLd4Ln3wOgwaXtKZFA8Rth6XV8D8+/1oh8ppvoNXGCbkLb4gkqwh70LNnIq1GvoFbaJdyF0=
+	t=1725436426; cv=none; b=EumLE1JWXdQRIm2MlDgeZofOigsc4WsFK07Fb+oNoTlBkY1tjvGza78sB1lWjuoXtlcQ3ewoNV/HsFeG1QV40KPnTs+Mv8gq/bXLfgrYZd7wwGgCVb9NWJerX/2aJcP7ml0jZvW0BPAaw+V5kGaQfPgXigdl/T5YHzCZylw+nB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725436183; c=relaxed/simple;
-	bh=3KugoatgsYhguaXY9JsawEdZW1G1l+SmST9SZyYaxrw=;
+	s=arc-20240116; t=1725436426; c=relaxed/simple;
+	bh=kfxdb3xNHzbllyURtOcqUEA96vfF8Z97njwYR7Og2rM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Swawy8rpKw5ESzeFmlimW8LaeoFXDdpIFTqWqGhVL7Rn8fTpV79fmkh45dnqzdzEBmm03dQumq7m0szdlH0NT3ntB/dN03ymU2UM/5YbhEKPBTZSiS5HVMonxLtbVpBsmPgY/MYgzch86gC5lmEjI8n1vtrDIA2V5+uC6Rw7vZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZPKZQbbh; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=uQIouFPLeM9tkKZziUXfrqH5kt6bBCMySLPl2hUC+Cwxn12pCNG601WyecVTWLNwCijDwp26YQX8fnpSKwu8OC9MdgbsSJRqPWJkcN926nG113FcXgJG0zRZgzjr+m7BxuKbOzYC+S2TI8F08KhMeJvKKruOaDUFl8YPSAMcKQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G5iDDWCz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZPKZQbbh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCE27C4CEC5;
-	Wed,  4 Sep 2024 07:49:29 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G5iDDWCz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B7CFC4CEC9;
+	Wed,  4 Sep 2024 07:53:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725436182;
-	bh=3KugoatgsYhguaXY9JsawEdZW1G1l+SmST9SZyYaxrw=;
+	s=k20201202; t=1725436425;
+	bh=kfxdb3xNHzbllyURtOcqUEA96vfF8Z97njwYR7Og2rM=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ZPKZQbbhPeGSfZbxSLXdbhT/YmRLMfwqCxrKxVGtJbd1JjOIun8qERUNPS1fa7VKr
-	 32x0W3FDadBWzW8zZblKH3mFpUh0Fd0KvOkucIgnzdLsZxVFnL0FwYpj2KFAYiWX9W
-	 mvlBdNpKPa8uV0sdPDaJrbrnsrcg8nJSwQHDX90hRUHynizZUnou5tkegRwaMvxDjC
-	 2FPQZlzUH2mQZPCmRcGf/gZuLmlXrldeBAyn/vcmjGV12s6UdBWfFVQ0S/eiwRJT4c
-	 zEzxYQqBQdjNuENhOfwcluJmdgu+2W8x30fMHq4GZNPrVZ8dKjhZMCSODqFlFbZI3j
-	 hzWP9eI2oIL8A==
-Message-ID: <7fc1e4c3-ca09-4a0a-b072-0c4f1d21e44f@kernel.org>
-Date: Wed, 4 Sep 2024 09:49:27 +0200
+	b=G5iDDWCzS1+xlTskBjr6SKpZ8dVmcBdYh1SHPJ8T9YUYEL9vBfSPQqBtARHnrZNCX
+	 AibE5HKICG2zHP9YYjo9B3P0UNynhZ3TL0Y1RoaHFMF+dkIlMPRxrhkpnoCE0xIrSX
+	 WwrrPKQmtr37y+8DM1dYQcItRpEiD+kfMbhmSrTKpGO4WKRxT67XDDF5bb4mZVFwbV
+	 TCJb9xCxqTv6GrYcgWoLP5hQ+wKlJ86z0bWxwEtwJN9Q38UyesK0MI1NzzDvvlclp2
+	 EDo3/sO8xqjp30szIqmGAw0HTgO69RLSgqd0RZFlRZTwYKe0W8dWXC8L9pk2/dyNts
+	 AoUHzq6VdiMqA==
+Message-ID: <0ea7694b-bda2-47d9-9778-9e68cef3d5d5@kernel.org>
+Date: Wed, 4 Sep 2024 09:53:39 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,28 +35,14 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 15/21] dt-bindings: i2c: document support for SA8255p
-To: Nikunj Kela <quic_nkela@quicinc.com>
-Cc: andersson@kernel.org, konradybcio@kernel.org, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org, rafael@kernel.org,
- viresh.kumar@linaro.org, herbert@gondor.apana.org.au, davem@davemloft.net,
- sudeep.holla@arm.com, andi.shyti@kernel.org, tglx@linutronix.de,
- will@kernel.org, robin.murphy@arm.com, joro@8bytes.org,
- jassisinghbrar@gmail.com, lee@kernel.org, linus.walleij@linaro.org,
- amitk@kernel.org, thara.gopinath@gmail.com, broonie@kernel.org,
- cristian.marussi@arm.com, rui.zhang@intel.com, lukasz.luba@arm.com,
- wim@linux-watchdog.org, linux@roeck-us.net, linux-arm-msm@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-pm@vger.kernel.org, linux-crypto@vger.kernel.org,
- arm-scmi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-i2c@vger.kernel.org, iommu@lists.linux.dev,
- linux-gpio@vger.kernel.org, linux-serial@vger.kernel.org,
- linux-spi@vger.kernel.org, linux-watchdog@vger.kernel.org,
- kernel@quicinc.com, quic_psodagud@quicinc.com,
- Praveen Talari <quic_ptalari@quicinc.com>
-References: <20240828203721.2751904-1-quic_nkela@quicinc.com>
- <20240903220240.2594102-1-quic_nkela@quicinc.com>
- <20240903220240.2594102-16-quic_nkela@quicinc.com>
+Subject: Re: [PATCH 1/2] Device tree registration and property names changes
+To: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+Cc: herbert@gondor.apana.org.au, robh@kernel.org,
+ linux-crypto@vger.kernel.org, Ruud.Derwig@synopsys.com,
+ manjunath.hadli@vayavyalabs.com, bhoomikak@vayavyalabs.com
+References: <20240904031123.34144-1-pavitrakumarm@vayavyalabs.com>
+ <4b2d796e-222e-4591-b141-eb82811a674d@kernel.org>
+ <CALxtO0mREXjvGWYpL5PQUXAJ+v8yT9rHSOn69mfe7EMNz_LnmA@mail.gmail.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -102,25 +88,22 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20240903220240.2594102-16-quic_nkela@quicinc.com>
+In-Reply-To: <CALxtO0mREXjvGWYpL5PQUXAJ+v8yT9rHSOn69mfe7EMNz_LnmA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 04/09/2024 00:02, Nikunj Kela wrote:
-> Add compatible representing i2c support on SA8255p.
-> 
-> Clocks and interconnects are being configured in Firmware VM
-> on SA8255p, therefore making them optional.
-> 
-> CC: Praveen Talari <quic_ptalari@quicinc.com>
-> Signed-off-by: Nikunj Kela <quic_nkela@quicinc.com>
-> ---
->  .../bindings/i2c/qcom,i2c-geni-qcom.yaml      | 33 +++++++++++++++++--
->  1 file changed, 31 insertions(+), 2 deletions(-)
-> 
+On 04/09/2024 09:41, Pavitrakumar Managutte wrote:
+> Hi Krzysztof,
+>    Today's patch was an incremental fix on the SPAcc driver.
+>    Please ignore this as I am pushing the complete driver patchset with the
+> DT bindings for review.
+>    SPAcc driver was reverted today since it was missing the DT bindings.
+>    I have addressed all your concerns in the SPAcc driver patchset which I
+> will be pushing today.
 
-Just to clarify to I2C maintainers:
-This is incomplete. Missing driver changes.
+So we wasted time reviewing this?  I don't understand. Send finished
+work or some finished stages, not something which you immediately
+retract the moment people review it.
 
 Best regards,
 Krzysztof
