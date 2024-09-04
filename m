@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E338513BC11
-	for <linux-crypto@vger.kernel.org>; Wed,  4 Sep 2024 06:08:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B4E482C7E
+	for <linux-crypto@vger.kernel.org>; Wed,  4 Sep 2024 06:09:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725430100; cv=none; b=QeXc09DI+UE6GlwYrmHWj0kqTCmFNB4eSxnIObcwbgsbwGbIHBr7X0fHRsEwA7AvP3eIHDe4HFU2op30/yB6cT5FvA1mkeN1/KmVzq8xJ8J4H3Ul3bxR0/tf13+Awoaf33bU9tSu6nVANt7RyUnPGB2XWkoNZyx2rCYKggixx/U=
+	t=1725430171; cv=none; b=YCcgu2pQVSFfYkL2ATL7BJcb9jbFYc7VgU2DKlapF/KWXpGN3IDdK+uqqjKjAW94R37uJoS3YOsKh3haxOok1uuyTZxy6glI7YO5Xe/kg+vMGfOziQ5T89e6S+wpy6cSocLF1F1wNhMMMgjti6BJYQpTdvJZrsfkrwF1OzROZ1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725430100; c=relaxed/simple;
-	bh=5R+dj0u5ecG3gY5zJ+JEieXpPNPxN3caimK0qdixohg=;
+	s=arc-20240116; t=1725430171; c=relaxed/simple;
+	bh=uaMj4LSVBYFyFfTvdkA8cZz8W+d28sCmWJ7S+8vv820=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DONH8trv/WkFkyRcDWPYOfxSv8d+lBjjq5JMFtlb3DidUQXQejC0OQYn7dx14HZ593f9PjgWMoHANiGLNpk2hOc+htZ1wKN/HzaAa0xZGyUcS7FPWGT+LN0pp7B6LrUdzUH3QXesNVpFUyPJQdbHUlccyPiKTcDAAPJnzCg5euc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eLUQBreV; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=PybN1DK+XICVqOzyzlvGzuSdpNh2Fa5Fn/4KVhX6+cxg/J5BvlhmJybGRJSxS2FmA8mzCvNUYOUZFeBKoqG1MhRY4hWlTVTkP1guqGofYDTllzbtAbt7ReeVKw5g90oo0GW6EfA/rE08RnJTv8PgfgLBdSPGNl6UXQX0/w6GXjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RPpfOy7C; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eLUQBreV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73A2AC4CEC2;
-	Wed,  4 Sep 2024 06:08:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RPpfOy7C"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1138C4CEC2;
+	Wed,  4 Sep 2024 06:09:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725430099;
-	bh=5R+dj0u5ecG3gY5zJ+JEieXpPNPxN3caimK0qdixohg=;
+	s=k20201202; t=1725430171;
+	bh=uaMj4LSVBYFyFfTvdkA8cZz8W+d28sCmWJ7S+8vv820=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=eLUQBreVTvnH1KtstBzedpIWanK1Onehs6487qeT11H9QaMHzvVhudXzGEX8DySDQ
-	 umFf5lXO3bzQrnXczpitctamblGzbV9yQgVpYTi6X+7sJHP1pHQzUOxmBNhciJM04q
-	 hqV7IeFOLCYsf8TZli3xdyXr8QYJ3uyegC+Z4TzzgGOyfMCjlimnBDfPSBbnnHAwSp
-	 WXpg3kJnHxA+6PBnekfnddzha8erPmXlW4nLx8oI+MqwbmY+esXj27mzmdxfN/31Vf
-	 IPuVyYRw/mVhV+zv317SuHP3/a2agHEssz1yRDCI86IkzMPQKYBxBbzeJp67Iz5PFs
-	 pj7d60/cPvVNA==
-Message-ID: <b97fb256-12ca-4258-ac63-87c350395fac@kernel.org>
-Date: Wed, 4 Sep 2024 08:08:14 +0200
+	b=RPpfOy7Cy5xUAsu76xSP0M6YAu3nWbQAFvpXFo5jWru2SHzje4z+4roNCRSrr3pif
+	 te37H/13HR8A0jMh4k15vypRWa+0dXvQGwebxxchmnYRTECEjhw0sa5ejeSVpW7shD
+	 n5rEDpvkQevcJA89IyLNtehagmhIAJGRy9qEazOsEeCyzu0ffC5t/mA5A/zqfplVgY
+	 VzCsxGVayuYJ/NQzcDnOitOFdOJrMrV5bBz6wMhc8CnVbe1v3zO3mkPo0mD45dyuZc
+	 p/SazgJhHXKEjO3yYY5uB0fcJjECmMa75YsxyEEqsWz5XipsyxSICdIUTOzRoCALlY
+	 uN24PHCtNxydQ==
+Message-ID: <4b2d796e-222e-4591-b141-eb82811a674d@kernel.org>
+Date: Wed, 4 Sep 2024 08:09:25 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,13 +35,12 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] SPAcc DT bindings
+Subject: Re: [PATCH 1/2] Device tree registration and property names changes
 To: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>,
  herbert@gondor.apana.org.au, robh@kernel.org, linux-crypto@vger.kernel.org
 Cc: Ruud.Derwig@synopsys.com, manjunath.hadli@vayavyalabs.com,
  bhoomikak@vayavyalabs.com
 References: <20240904031123.34144-1-pavitrakumarm@vayavyalabs.com>
- <20240904031123.34144-2-pavitrakumarm@vayavyalabs.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -87,104 +86,264 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20240904031123.34144-2-pavitrakumarm@vayavyalabs.com>
+In-Reply-To: <20240904031123.34144-1-pavitrakumarm@vayavyalabs.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 04/09/2024 05:11, Pavitrakumar M wrote:
+> This patch fixes Device tree registrations, DT property names and counter width
+> checks.
+
+Please do not use "This commit/patch/change", but imperative mood. See
+longer explanation here:
+https://elixir.bootlin.com/linux/v5.17.1/source/Documentation/process/submitting-patches.rst#L95
+
+Please wrap commit message according to Linux coding style / submission
+process (neither too early nor over the limit):
+https://elixir.bootlin.com/linux/v6.4-rc1/source/Documentation/process/submitting-patches.rst#L597
+
+
+> 
 > Signed-off-by: Bhoomika K <bhoomikak@vayavyalabs.com>
 > Signed-off-by: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
 > Acked-by: Ruud Derwig <Ruud.Derwig@synopsys.com>
-
-Please run scripts/checkpatch.pl and fix reported warnings. Then please
-run `scripts/checkpatch.pl --strict` and (probably) fix more warnings.
-Some warnings can be ignored, especially from --strict run, but the code
-here looks like it needs a fix. Feel free to get in touch if the warning
-is not clear.
-
-Please use subject prefixes matching the subsystem. You can get them for
-example with `git log --oneline -- DIRECTORY_OR_FILE` on the directory
-your patch is touching. For bindings, the preferred subjects are
-explained here:
-https://www.kernel.org/doc/html/latest/devicetree/bindings/submitting-patches.html#i-for-patch-submitters
-
-<form letter>
-Please use scripts/get_maintainers.pl to get a list of necessary people
-and lists to CC. It might happen, that command when run on an older
-kernel, gives you outdated entries. Therefore please be sure you base
-your patches on recent Linux kernel.
-
-Tools like b4 or scripts/get_maintainer.pl provide you proper list of
-people, so fix your workflow. Tools might also fail if you work on some
-ancient tree (don't, instead use mainline) or work on fork of kernel
-(don't, instead use mainline). Just use b4 and everything should be
-fine, although remember about `b4 prep --auto-to-cc` if you added new
-patches to the patchset.
-
-You missed at least devicetree list (maybe more), so this won't be
-tested by automated tooling. Performing review on untested code might be
-a waste of time.
-
-Please kindly resend and include all necessary To/Cc entries.
-</form letter>
-
-
 > ---
->  .../bindings/crypto/snps,dwc-spacc.yaml       | 43 +++++++++++++++++++
->  1 file changed, 43 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/crypto/snps,dwc-spacc.yaml
+>  drivers/crypto/dwc-spacc/Kconfig          |  2 +-
+>  drivers/crypto/dwc-spacc/spacc_core.c     |  4 +-
+>  drivers/crypto/dwc-spacc/spacc_device.c   | 64 ++++++++---------------
+>  drivers/crypto/dwc-spacc/spacc_device.h   |  3 +-
+>  drivers/crypto/dwc-spacc/spacc_skcipher.c | 29 +++++-----
+>  5 files changed, 40 insertions(+), 62 deletions(-)
 > 
-> diff --git a/Documentation/devicetree/bindings/crypto/snps,dwc-spacc.yaml b/Documentation/devicetree/bindings/crypto/snps,dwc-spacc.yaml
-> new file mode 100644
-> index 000000000000..4432defbe268
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/crypto/snps,dwc-spacc.yaml
-> @@ -0,0 +1,43 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/crypto/snps,dwc-spacc.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Synopsys Security Protocol Accelerator(SPAcc) Hardware Crypto Engine
-> +
-> +maintainers:
-> +  - Ruud Derwig <Ruud.Derwig@synopsys.com>
-> +
-> +description:
-> +  DWC Synopsys Security Protocol Accelerator(SPAcc) Hardware Crypto Engine is
-> +  a crypto IP, designed by Synopsis, that can accelerate cryptographic
-> +  operations.
-> +
-> +properties:
-> +  compatible:
-> +    const: snps,dwc-spacc
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  interrupts:
-> +    maxItems: 1
-> +
-> +  mac-mode:
-> +    maxItems: 1
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +  - interrupts
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  - |
-> +    spacc: spacc@400000000 {
-> +            compatible = "snps,dwc-spacc";
-> +            reg = <0x0000000400000000 0x0003FFFF>;
-> +            interrupts = <0 89 4>;
+> diff --git a/drivers/crypto/dwc-spacc/Kconfig b/drivers/crypto/dwc-spacc/Kconfig
+> index 9eb41a295f9d..bc44c2a61fe7 100644
+> --- a/drivers/crypto/dwc-spacc/Kconfig
+> +++ b/drivers/crypto/dwc-spacc/Kconfig
+> @@ -3,7 +3,7 @@
+>  config CRYPTO_DEV_SPACC
+>  	tristate "Support for dw_spacc Security protocol accelerators"
+>  	depends on HAS_DMA
+> -	default m
+> +	default n
 
-Fix indentation (see writing schema) and use proper defines. I am not
-reviewing rest.
+How is it related?
+
+>  
+>  	help
+>  	  This enables support for the HASH/CRYP/AEAD hw accelerator which can be found
+> diff --git a/drivers/crypto/dwc-spacc/spacc_core.c b/drivers/crypto/dwc-spacc/spacc_core.c
+> index 1da7cdd93e78..d48e4b9a56af 100644
+> --- a/drivers/crypto/dwc-spacc/spacc_core.c
+> +++ b/drivers/crypto/dwc-spacc/spacc_core.c
+> @@ -1,9 +1,11 @@
+>  // SPDX-License-Identifier: GPL-2.0
+>  
+> -#include <linux/of_device.h>
+> +#include <crypto/skcipher.h>
+> +#include <linux/of.h>
+>  #include <linux/vmalloc.h>
+>  #include <linux/platform_device.h>
+>  #include <linux/interrupt.h>
+> +#include <linux/dma-mapping.h>
+>  #include "spacc_hal.h"
+>  #include "spacc_core.h"
+>  
+> diff --git a/drivers/crypto/dwc-spacc/spacc_device.c b/drivers/crypto/dwc-spacc/spacc_device.c
+> index 964ccdf294e3..332703daffef 100644
+> --- a/drivers/crypto/dwc-spacc/spacc_device.c
+> +++ b/drivers/crypto/dwc-spacc/spacc_device.c
+> @@ -25,9 +25,14 @@ void spacc_stat_process(struct spacc_device *spacc)
+>  	tasklet_schedule(&priv->pop_jobs);
+>  }
+>  
+> +static const struct of_device_id snps_spacc_id[] = {
+> +	{.compatible = "snps,dwc-spacc" },
+> +	{ /*sentinel */        }
+> +};
+> +
+> +MODULE_DEVICE_TABLE(of, snps_spacc_id);
+>  
+> -int spacc_probe(struct platform_device *pdev,
+> -		const struct of_device_id snps_spacc_id[])
+> +int spacc_probe(struct platform_device *pdev)
+>  {
+>  	int spacc_idx = -1;
+>  	struct resource *mem;
+> @@ -37,29 +42,14 @@ int spacc_probe(struct platform_device *pdev,
+>  	int spacc_priority = -1;
+>  	struct spacc_priv *priv;
+>  	int x = 0, err, oldmode, irq_num;
+> -	const struct of_device_id *match, *id;
+>  	u64 oldtimer = 100000, timer = 100000;
+>  
+> -	if (pdev->dev.of_node) {
+> -		id = of_match_node(snps_spacc_id, pdev->dev.of_node);
+> -		if (!id) {
+> -			dev_err(&pdev->dev, "DT node did not match\n");
+> -			return -EINVAL;
+> -		}
+> -	}
+> -
+>  	/* Initialize DDT DMA pools based on this device's resources */
+>  	if (pdu_mem_init(&pdev->dev)) {
+>  		dev_err(&pdev->dev, "Could not initialize DMA pools\n");
+>  		return -ENOMEM;
+>  	}
+>  
+> -	match = of_match_device(of_match_ptr(snps_spacc_id), &pdev->dev);
+> -	if (!match) {
+> -		dev_err(&pdev->dev, "SPAcc dtb missing");
+> -		return -ENODEV;
+> -	}
+> -
+>  	mem = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+>  	if (!mem) {
+>  		dev_err(&pdev->dev, "no memory resource for spacc\n");
+> @@ -74,52 +64,52 @@ int spacc_probe(struct platform_device *pdev,
+>  	}
+>  
+>  	/* Read spacc priority and index and save inside priv.spacc.config */
+> -	if (of_property_read_u32(pdev->dev.of_node, "spacc_priority",
+> +	if (of_property_read_u32(pdev->dev.of_node, "spacc-priority",
+>  				 &spacc_priority)) {
+> -		dev_err(&pdev->dev, "No vspacc priority specified\n");
+> +		dev_err(&pdev->dev, "No virtual spacc priority specified\n");
+>  		err = -EINVAL;
+>  		goto free_ddt_mem_pool;
+>  	}
+>  
+>  	if (spacc_priority < 0 && spacc_priority > VSPACC_PRIORITY_MAX) {
+> -		dev_err(&pdev->dev, "Invalid vspacc priority\n");
+> +		dev_err(&pdev->dev, "Invalid virtual spacc priority\n");
+>  		err = -EINVAL;
+>  		goto free_ddt_mem_pool;
+>  	}
+>  	priv->spacc.config.priority = spacc_priority;
+>  
+> -	if (of_property_read_u32(pdev->dev.of_node, "spacc_index",
+> +	if (of_property_read_u32(pdev->dev.of_node, "spacc-index",
+>  				 &spacc_idx)) {
+> -		dev_err(&pdev->dev, "No vspacc index specified\n");
+> +		dev_err(&pdev->dev, "No virtual spacc index specified\n");
+>  		err = -EINVAL;
+>  		goto free_ddt_mem_pool;
+>  	}
+>  	priv->spacc.config.idx = spacc_idx;
+>  
+> -	if (of_property_read_u32(pdev->dev.of_node, "spacc_endian",
+> +	if (of_property_read_u32(pdev->dev.of_node, "spacc-endian",
+>  				 &spacc_endian)) {
+> -		dev_dbg(&pdev->dev, "No spacc_endian specified\n");
+> +		dev_dbg(&pdev->dev, "No spacc endian specified\n");
+>  		dev_dbg(&pdev->dev, "Default spacc Endianness (0==little)\n");
+>  		spacc_endian = 0;
+>  	}
+>  	priv->spacc.config.spacc_endian = spacc_endian;
+>  
+> -	if (of_property_read_u64(pdev->dev.of_node, "oldtimer",
+> +	if (of_property_read_u64(pdev->dev.of_node, "spacc-oldtimer",
+>  				 &oldtimer)) {
+> -		dev_dbg(&pdev->dev, "No oldtimer specified\n");
+> +		dev_dbg(&pdev->dev, "No spacc oldtimer specified\n");
+>  		dev_dbg(&pdev->dev, "Default oldtimer (100000)\n");
+>  		oldtimer = 100000;
+>  	}
+>  	priv->spacc.config.oldtimer = oldtimer;
+>  
+> -	if (of_property_read_u64(pdev->dev.of_node, "timer", &timer)) {
+> -		dev_dbg(&pdev->dev, "No timer specified\n");
+> +	if (of_property_read_u64(pdev->dev.of_node, "spacc-timer", &timer)) {
+> +		dev_dbg(&pdev->dev, "No spacc timer specified\n");
+>  		dev_dbg(&pdev->dev, "Default timer (100000)\n");
+>  		timer = 100000;
+>  	}
+>  	priv->spacc.config.timer = timer;
+>  
+> -	baseaddr = devm_ioremap_resource(&pdev->dev, mem);
+> +	baseaddr = devm_platform_get_and_ioremap_resource(pdev, 0, &mem);
+>  	if (IS_ERR(baseaddr)) {
+>  		dev_err(&pdev->dev, "unable to map iomem\n");
+>  		err = PTR_ERR(baseaddr);
+> @@ -127,12 +117,6 @@ int spacc_probe(struct platform_device *pdev,
+>  	}
+>  
+>  	pdu_get_version(baseaddr, &info);
+> -	if (pdev->dev.platform_data) {
+> -		struct pdu_info *parent_info = pdev->dev.platform_data;
+> -
+> -		memcpy(&info.pdu_config, &parent_info->pdu_config,
+> -		       sizeof(info.pdu_config));
+> -	}
+>  
+>  	dev_dbg(&pdev->dev, "EPN %04X : virt [%d]\n",
+>  				info.spacc_version.project,
+> @@ -273,18 +257,12 @@ static void spacc_unregister_algs(void)
+>  #endif
+>  }
+>  
+> -static const struct of_device_id snps_spacc_id[] = {
+> -	{.compatible = "snps-dwc-spacc" },
+> -	{ /*sentinel */        }
+> -};
+> -
+> -MODULE_DEVICE_TABLE(of, snps_spacc_id);
+>  
+>  static int spacc_crypto_probe(struct platform_device *pdev)
+>  {
+>  	int rc;
+>  
+> -	rc = spacc_probe(pdev, snps_spacc_id);
+> +	rc = spacc_probe(pdev);
+>  	if (rc < 0)
+>  		goto err;
+>  
+> @@ -326,7 +304,7 @@ static struct platform_driver spacc_driver = {
+>  	.remove = spacc_crypto_remove,
+>  	.driver = {
+>  		.name  = "spacc",
+> -		.of_match_table = of_match_ptr(snps_spacc_id),
+> +		.of_match_table = snps_spacc_id,
+>  		.owner = THIS_MODULE,
+>  	},
+>  };
+> diff --git a/drivers/crypto/dwc-spacc/spacc_device.h b/drivers/crypto/dwc-spacc/spacc_device.h
+> index be7fde25046b..e6a34dc20eba 100644
+> --- a/drivers/crypto/dwc-spacc/spacc_device.h
+> +++ b/drivers/crypto/dwc-spacc/spacc_device.h
+> @@ -224,8 +224,7 @@ int spacc_unregister_aead_algs(void);
+>  int probe_ciphers(struct platform_device *spacc_pdev);
+>  int spacc_unregister_cipher_algs(void);
+>  
+> -int spacc_probe(struct platform_device *pdev,
+> -		const struct of_device_id snps_spacc_id[]);
+> +int spacc_probe(struct platform_device *pdev);
+>  
+>  irqreturn_t spacc_irq_handler(int irq, void *dev);
+>  #endif
+> diff --git a/drivers/crypto/dwc-spacc/spacc_skcipher.c b/drivers/crypto/dwc-spacc/spacc_skcipher.c
+> index 1ef7c665188f..8410ad9d9910 100644
+> --- a/drivers/crypto/dwc-spacc/spacc_skcipher.c
+> +++ b/drivers/crypto/dwc-spacc/spacc_skcipher.c
+> @@ -401,41 +401,40 @@ static int spacc_cipher_process(struct skcipher_request *req, int enc_dec)
+>  			return ret;
+>  		}
+>  	}
+> -
+>  	if (salg->mode->id == CRYPTO_MODE_AES_CTR ||
+>  	    salg->mode->id == CRYPTO_MODE_SM4_CTR) {
+>  		/* copy the IV to local buffer */
+>  		for (i = 0; i < 16; i++)
+>  			ivc1[i] = req->iv[i];
+>  
+> -		/* 64-bit counter width */
+> -		if (readl(device_h->regmap + SPACC_REG_VERSION_EXT_3) & (0x3)) {
+> +		/* 32-bit counter width */
+> +		if (readl(device_h->regmap + SPACC_REG_VERSION_EXT_3) & (0x2)) {
+
+Your patch is absolute mess.
+
+You must organize your changes logically. Please read carefully
+submitting patches document.
 
 Best regards,
 Krzysztof
