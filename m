@@ -1,169 +1,103 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F102126BE8
-	for <linux-crypto@vger.kernel.org>; Tue,  3 Sep 2024 22:59:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59D6A3211;
+	Wed,  4 Sep 2024 01:50:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725404388; cv=none; b=ZiuaZqaZrP0vMZBWhsX41eSVO7xat7GhvOGjeicFKWgJTHLAaiN5Hjb0ooU4f/wG9GNNWPmX/Ua9lo7WdPwK6+cNizCHHMOjIAmGn25p5YPcgApduhln0r+qQjQ5kXyX4A6dwO9Q813e3lQG6bEUkDnBpbOOB6UUx4IGKgkQhiY=
+	t=1725414608; cv=none; b=P/ngmW3zT49Xqd2PnAeBwkh+ve5BVICmDE1NTYJJdge74KefuwVaHAus5pnukVrZSS2SSLiCWPVFgajGbLhQmUgfgv7Maiu2IiHL7mIEzJCKeaKEm22D8AYgHVw20feYYaYE8TzUddHTEotVZfuAFLz1TJFNODzCZo2g5GsHyL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725404388; c=relaxed/simple;
-	bh=PB3beGuUpyRMJ/S2D64l5J/LWOM+pC/Y60AvXgaPxEk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SnHdBboGvB5v4mybQkBMGfRvYZj1zreJF7P848Bg1JYYzAfUX1U3pmF7Lrw64Cx+Y0Jp7wPHSTQiDtRV9MC/fe+ZjhEmlkVvERtKOIR9rLm7/rnRcu5HIpq7P7cyIEQZ47WLzVQ7LrYpcc+kHFpANufXOeYJPYq/IotQ0meSVoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=ilv+nujL; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1725414608; c=relaxed/simple;
+	bh=4AQxlfwksI8M0lXuPBfgDWfUUeO7Xwm6/Q69FGEDaqE=;
+	h=Date:Content-Type:MIME-Version:From:To:Cc:In-Reply-To:References:
+	 Message-Id:Subject; b=Bf07VAvSoWJ+nAeiW8MfCQS4ADKdpvknOTWLeIM8dFcLjGGXZAONCiXaRg7qZNZ2BiKBX2f3e3TFVIpfhMebThfTvG/O8+fTMhxTGCR3iI+i/Qg1FonPxKcOSLwCsAI0s53+Zpasrty0f5gmxRpP7ePt9KgKuoto+FQ0/NAIxqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jsadccl/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="ilv+nujL"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=9y1aTG66Q4OPDA5vNHTHkzERjvSvgcpYPBgD5CFAHxE=; b=ilv+nujLHInxFo6vhQXnVHx/0s
-	SLE9cQII5QGrFttYcd9yWGTa5z1CZcRfgZjj/GUFphTOwkPy7LHPL7a0JcDwWLczc8MQ6MVTxwRj8
-	iV2sWVwL4usBHE52gBjeBfjP07g+Jh7cJjU6E219OMwGa6aYW4+P34lkt3PdZM/TH9IvvKuKVW41k
-	fbzk0204PYmoleU1TmD4SIHcb2VTXsk3S5n12TW2otTam/jRoes5D3BV+fQg6CvOkrRKgAQWFDpn0
-	JI+9SR6neTiZxKna/oznT3nE6LOsyV9mjGZsdZM7c7nlDNw8aLQCmARbEAsP1Iz8bmG6vaVA3OVZc
-	jMjI5Azg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1slcUu-009U1i-0K;
-	Wed, 04 Sep 2024 06:59:41 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 04 Sep 2024 06:59:40 +0800
-Date: Wed, 4 Sep 2024 06:59:40 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Rob Herring <robh@kernel.org>
-Cc: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>,
-	linux-crypto@vger.kernel.org, Ruud.Derwig@synopsys.com,
-	manjunath.hadli@vayavyalabs.com, bhoomikak@vayavyalabs.com
-Subject: Re: [PATCH v7 0/6] Add SPAcc Crypto Driver Support
-Message-ID: <ZteU3EvBxSCTeiBY@gondor.apana.org.au>
-References: <20240729041350.380633-1-pavitrakumarm@vayavyalabs.com>
- <ZrcHGxcYnsejQ7H_@gondor.apana.org.au>
- <20240903172509.GA1754429-robh@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jsadccl/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 853F8C4CEC4;
+	Wed,  4 Sep 2024 01:50:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725414607;
+	bh=4AQxlfwksI8M0lXuPBfgDWfUUeO7Xwm6/Q69FGEDaqE=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=jsadccl/9E+PbXaq+qBmbPd7/PjPSWuCGCCzZgXrCdzxotTCt+t4Jh4/bmoJd9CVw
+	 H8TFVkWCnT6PO3N5msofWRplIEzvDa/Eg5k4rOBS65A+0zhdG8IyexgNbEl8PJPjw+
+	 IPqvsG8xcWU4KoDxTm0aKsnESTEtPBfW/2JJhC2yZ7oNtXlbcdYda/gKsGnl9kjiks
+	 zYIezEibBc9qTHTav6i6r2l9PCUv9D8lgvmxWdNEEHSR/qOB+sf1qlb4hUUhVYAkeY
+	 sRh9O478wwJmKVRY2p7fE4R/AvzwSGarhGRI5N4ZYyVZuwxFz3ZGhNiy/K7VPANfL9
+	 HopuyFoAQZ++g==
+Date: Tue, 03 Sep 2024 20:50:06 -0500
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240903172509.GA1754429-robh@kernel.org>
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Nikunj Kela <quic_nkela@quicinc.com>
+Cc: devicetree@vger.kernel.org, cristian.marussi@arm.com, 
+ rui.zhang@intel.com, linux-spi@vger.kernel.org, lee@kernel.org, 
+ krzk+dt@kernel.org, will@kernel.org, linux-arm-msm@vger.kernel.org, 
+ linus.walleij@linaro.org, joro@8bytes.org, linux-kernel@vger.kernel.org, 
+ robin.murphy@arm.com, quic_psodagud@quicinc.com, conor+dt@kernel.org, 
+ kernel@quicinc.com, sudeep.holla@arm.com, linux-serial@vger.kernel.org, 
+ linux-i2c@vger.kernel.org, herbert@gondor.apana.org.au, 
+ konradybcio@kernel.org, jassisinghbrar@gmail.com, 
+ linux-gpio@vger.kernel.org, linux-pm@vger.kernel.org, andersson@kernel.org, 
+ lukasz.luba@arm.com, iommu@lists.linux.dev, linux-watchdog@vger.kernel.org, 
+ broonie@kernel.org, rafael@kernel.org, davem@davemloft.net, 
+ arm-scmi@vger.kernel.org, thara.gopinath@gmail.com, viresh.kumar@linaro.org, 
+ linux@roeck-us.net, amitk@kernel.org, wim@linux-watchdog.org, 
+ andi.shyti@kernel.org, linux-arm-kernel@lists.infradead.org, 
+ tglx@linutronix.de, linux-crypto@vger.kernel.org
+In-Reply-To: <20240903220240.2594102-14-quic_nkela@quicinc.com>
+References: <20240828203721.2751904-1-quic_nkela@quicinc.com>
+ <20240903220240.2594102-1-quic_nkela@quicinc.com>
+ <20240903220240.2594102-14-quic_nkela@quicinc.com>
+Message-Id: <172541460656.3237041.12121704663662726692.robh@kernel.org>
+Subject: Re: [PATCH v2 13/21] dt-bindings: pinctrl: Add SA8255p TLMM
 
-On Tue, Sep 03, 2024 at 12:25:09PM -0500, Rob Herring wrote:
-> On Sat, Aug 10, 2024 at 02:22:19PM +0800, Herbert Xu wrote:
-> > On Mon, Jul 29, 2024 at 09:43:44AM +0530, Pavitrakumar M wrote:
-> > > Add the driver for SPAcc(Security Protocol Accelerator), which is a
-> > > crypto acceleration IP from Synopsys. The SPAcc supports many cipher,
-> > > hash, aead algorithms and various modes.The driver currently supports
-> > > below,
-> > > 
-> > > aead:
-> > > - ccm(sm4)
-> > > - ccm(aes)
-> > > - gcm(sm4)
-> > > - gcm(aes)
-> > > - rfc7539(chacha20,poly1305)
-> > > 
-> > > cipher:
-> > > - cbc(sm4)
-> > > - ecb(sm4)
-> > > - ctr(sm4)
-> > > - xts(sm4)
-> > > - cts(cbc(sm4))
-> > > - cbc(aes)
-> > > - ecb(aes)
-> > > - xts(aes)
-> > > - cts(cbc(aes))
-> > > - ctr(aes)
-> > > - chacha20
-> > > - ecb(des)
-> > > - cbc(des)
-> > > - ecb(des3_ede)
-> > > - cbc(des3_ede)
-> > > 
-> > > hash:
-> > > - cmac(aes)
-> > > - xcbc(aes)
-> > > - cmac(sm4)
-> > > - xcbc(sm4) 
-> > > - hmac(md5)
-> > > - md5
-> > > - hmac(sha1)
-> > > - sha1
-> > > - sha224
-> > > - sha256
-> > > - sha384
-> > > - sha512
-> > > - hmac(sha224)
-> > > - hmac(sha256)
-> > > - hmac(sha384)
-> > > - hmac(sha512)
-> > > - sha3-224
-> > > - sha3-256
-> > > - sha3-384
-> > > - sha3-512
-> > > - hmac(sm3)
-> > > - sm3
-> > > - michael_mic
-> > > 
-> > > Pavitrakumar M (6):
-> > >   Add SPAcc Skcipher support
-> > >   Enable SPAcc AUTODETECT
-> > >   Add SPAcc ahash support
-> > >   Add SPAcc aead support
-> > >   Add SPAcc Kconfig and Makefile
-> > >   Enable Driver compilation in crypto Kconfig and Makefile
-> > > 
-> > >  drivers/crypto/Kconfig                     |    1 +
-> > >  drivers/crypto/Makefile                    |    1 +
-> > >  drivers/crypto/dwc-spacc/Kconfig           |   95 +
-> > >  drivers/crypto/dwc-spacc/Makefile          |   16 +
-> > >  drivers/crypto/dwc-spacc/spacc_aead.c      | 1260 ++++++++++
-> > >  drivers/crypto/dwc-spacc/spacc_ahash.c     |  914 +++++++
-> > >  drivers/crypto/dwc-spacc/spacc_core.c      | 2512 ++++++++++++++++++++
-> > >  drivers/crypto/dwc-spacc/spacc_core.h      |  826 +++++++
-> > >  drivers/crypto/dwc-spacc/spacc_device.c    |  340 +++
-> > >  drivers/crypto/dwc-spacc/spacc_device.h    |  231 ++
-> > >  drivers/crypto/dwc-spacc/spacc_hal.c       |  367 +++
-> > >  drivers/crypto/dwc-spacc/spacc_hal.h       |  114 +
-> > >  drivers/crypto/dwc-spacc/spacc_interrupt.c |  316 +++
-> > >  drivers/crypto/dwc-spacc/spacc_manager.c   |  650 +++++
-> > >  drivers/crypto/dwc-spacc/spacc_skcipher.c  |  712 ++++++
-> > >  15 files changed, 8355 insertions(+)
-> > >  create mode 100644 drivers/crypto/dwc-spacc/Kconfig
-> > >  create mode 100644 drivers/crypto/dwc-spacc/Makefile
-> > >  create mode 100755 drivers/crypto/dwc-spacc/spacc_aead.c
-> > >  create mode 100644 drivers/crypto/dwc-spacc/spacc_ahash.c
-> > >  create mode 100644 drivers/crypto/dwc-spacc/spacc_core.c
-> > >  create mode 100644 drivers/crypto/dwc-spacc/spacc_core.h
-> > >  create mode 100644 drivers/crypto/dwc-spacc/spacc_device.c
-> > >  create mode 100644 drivers/crypto/dwc-spacc/spacc_device.h
-> > >  create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.c
-> > >  create mode 100644 drivers/crypto/dwc-spacc/spacc_hal.h
-> > >  create mode 100644 drivers/crypto/dwc-spacc/spacc_interrupt.c
-> > >  create mode 100644 drivers/crypto/dwc-spacc/spacc_manager.c
-> > >  create mode 100644 drivers/crypto/dwc-spacc/spacc_skcipher.c
-> > > 
-> > > 
-> > > base-commit: 95c0f5c3b8bb7acdc5c4f04bc6a7d3f40d319e9e
-> > > -- 
-> > > 2.25.1
-> > 
-> > All applied.  Thanks.
+
+On Tue, 03 Sep 2024 15:02:32 -0700, Nikunj Kela wrote:
+> Add compatible for TLMM block representing support on SA8255p.
 > 
-> Please drop it. Amongst other problems I pointed out in patch, there's 
-> no binding for this nor will one be accepted as-is. The author has had 2 
-> weeks to address it.
+> SA8255p uses the same TLMM block as SA8775p however the ownership
+> of pins are split between Firmware VM and Linux VM on SA8255p. For
+> example, pins used by UART are owned and configured by Firmware VM
+> while pins used by ethernet are owned and configured by Linux VM.
+> Therefore, adding a sa8255p specific compatible to mark the difference.
+> 
+> Signed-off-by: Nikunj Kela <quic_nkela@quicinc.com>
+> ---
+>  .../devicetree/bindings/pinctrl/qcom,sa8775p-tlmm.yaml    | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
+> 
 
-OK I will revert this.
+My bot found errors running 'make dt_binding_check' on your patch:
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+yamllint warnings/errors:
+./Documentation/devicetree/bindings/pinctrl/qcom,sa8775p-tlmm.yaml:22:9: [warning] wrong indentation: expected 10 but found 8 (indentation)
+./Documentation/devicetree/bindings/pinctrl/qcom,sa8775p-tlmm.yaml:23:11: [warning] wrong indentation: expected 12 but found 10 (indentation)
+./Documentation/devicetree/bindings/pinctrl/qcom,sa8775p-tlmm.yaml:26:9: [warning] wrong indentation: expected 10 but found 8 (indentation)
+
+dtschema/dtc warnings/errors:
+
+doc reference errors (make refcheckdocs):
+
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20240903220240.2594102-14-quic_nkela@quicinc.com
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
+
