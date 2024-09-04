@@ -1,100 +1,150 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFD0E1D54DC;
-	Wed,  4 Sep 2024 12:28:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1CEE18A95E;
+	Wed,  4 Sep 2024 12:33:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725452925; cv=none; b=FrnhWQtG9FnF5z9Phdk/vFCpxfWHNu3k4+LS4Amn4ASvSd8+n5JTFFPO9A7k/nlnNj6K+y1/7Q2hIO6WZpPTueCrS+MzBX2gqiRRJs0oOMvrg18+UisX5NMj1IZkvUEU/wb23Wi1xKyWXFGke/UtMz3qPbg3yNELULyb9Jt8zfY=
+	t=1725453199; cv=none; b=TS48a+muqFZ7vxqs3fwm9QB68vPWuoSwt3+Jh1jRA2Uazv/t4eFV36/JwqujJSHkDFKFnVn3kLtA4GQxLx0bYbkSHZ9ZZPhwpwq1K2+RjlTbalHpxr5I36pGndlABVrASHMJexqa61WlBtT3LY2qLtefDfL98vLPn90t6LdCJ6Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725452925; c=relaxed/simple;
-	bh=Ep0kQQGTEblS4lA+NUsumwO9DQchEqYKJfJ3QPM3POU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lzdj+e+rFZLX1AByJc15eLHhNvNmR/E0D+SMDXT8+P4dx/P73fR3rOaxrELB7k0D/YKBxpZdTqFs1Tv84eT0akw3JkL2RqXyeHPNIfeoCYg1wFU7wkw2TmoEd1p1gKb1lh0DmQX98GK5tN9U7XagkL8l1Y641QAlXH7RvudA+R8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EC9R7Wtt; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1725453199; c=relaxed/simple;
+	bh=xa87nakc6XNq/4Neh8s4LIJHVttsOMH5ng2n83Z6g0A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=gGtxpx1DzKCNCubXZrlw0urWl2YjuBQ7TkEdGYlCojPRzgjR7yz9tCgeyLW506uz6cjSVFBnSf/4YkeAxTCirJc3l3cW9oFBfMzEc5zWI4z+TSQ+5uhCDfABXPDPKkIFC9xhucwl0L0mP/K5Y3aEfPRstSKKIjX50IIfCsDY14A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=b9SuzB/J; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EC9R7Wtt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 511A9C4CEC9;
-	Wed,  4 Sep 2024 12:28:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725452925;
-	bh=Ep0kQQGTEblS4lA+NUsumwO9DQchEqYKJfJ3QPM3POU=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=EC9R7Wtt1yS5ulfHjVxCKNQ6wvgpc0P9mF6DtcY2d0OyMnKcXpOzYIa2bCbPEi0FO
-	 Le5o8zlxONFkx7WmEcwXMqjxycbzYaajEyV3cR9WDGdkq4wnbmcrOcI2dJU62OwxDv
-	 AL8X4/TbUT+NZ1PkKAg5MqgVIWMjhWWr+cDSgjDyoWwoTzyOQK7owJXrnqOcNsLtjd
-	 zHCPE7AL4NNim/7DZGn13tJ+Jlzlaf9TEQHutDKOyZSeGolv170m5Em8sjb7Db8i13
-	 MHgOiDyNJeFFyGQtDSjdqZ67U8jcyvUbBDyQkZ/AUFUaTrhukCQl0ySoFR7q+5V3nk
-	 fPZvQvzmySgpA==
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-53345dcd377so9000866e87.2;
-        Wed, 04 Sep 2024 05:28:45 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCWv+Dc1mjI8UmS9+VptJxB0egX3ZugFC/aTW1l55zk/Lzbgp9qOW1eHPf5NNYTMQUBJjw7DR0Q37hpq@vger.kernel.org, AJvYcCX1FHE+FA3q3XJOj3L57UOqbBW38fEGVnSieE9sElzEhLj+dQxDlevh+jOUZAl55+IyERcLsgE6V6XmhVl2@vger.kernel.org, AJvYcCXFopQVkIwkYvLRK1++YYG281khfwQkht8+V68VbtkeBRVTC7N4jMB/PINa24kJRbSh+zkvaeHIg8rmXrSj@vger.kernel.org
-X-Gm-Message-State: AOJu0YwuyZWpvPWhyf4q5O5jCpdq1QsglFUvLY0DZs35p0ukE+8RY2UV
-	5PnhSs23jX6fe7hkUNRbCH2ZgqHbPJksmMuqUnX7eOYt1SouG17vOJ6hYEb+n8xIXVmPEddOi9z
-	3XFzbUiQixWPXmXql1wc65nEQMP8=
-X-Google-Smtp-Source: AGHT+IFnIZx/SDFkvhuT1T8cvL7l5Y8tgtZ8/IfSHFcmv8ZDbJZ0DiswjW2Y4RbkNu3ugqn0z+9QaL83QGABMTQXJI8=
-X-Received: by 2002:a05:6512:3c99:b0:52e:9f17:841a with SMTP id
- 2adb3069b0e04-53546af3048mr13795648e87.6.1725452923531; Wed, 04 Sep 2024
- 05:28:43 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="b9SuzB/J"
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4844XuRU010442;
+	Wed, 4 Sep 2024 12:27:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	ACIP4yKZfQ7RqY1CWgZI/P153QRx9YXMYeXV5DGtfXo=; b=b9SuzB/J5IzF1PS8
+	FOfFvufwok8TKEtvQ2ooAAcJ6/F94hfMq6l34zrocUdnk3SLZs3UgKN2B5/fGoUt
+	Sqz2yTybzXT8IArJtFCjgXbBTauWhgON4YNO1T4b5N+g4s5/FhY0ARgS0SlmCk3Q
+	OSiFIBj+8UI2DLOkfhYTVGKRepN+6y5nP9tgQm0NFFqrwNhQPDmfIJlKOQnMwrHV
+	WHpjRdJJdq4wOcgHRCmiTHuh5d8h20kXFSlVv8p/AmmI126/id5RmuKE28Qw4H3H
+	ocIRT72wy14B4JrkD2De6KH9WHBXvPtJVfB3pGxpcbTkmMuKzUJ2oWXJNXKsY+rm
+	5dxJvQ==
+Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 41egmrh556-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 04 Sep 2024 12:27:31 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 484CRUH4014575
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 4 Sep 2024 12:27:30 GMT
+Received: from [10.110.120.207] (10.80.80.8) by nasanex01b.na.qualcomm.com
+ (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 4 Sep 2024
+ 05:27:26 -0700
+Message-ID: <1b831fc1-9360-4038-91b2-b2c0cea513ed@quicinc.com>
+Date: Wed, 4 Sep 2024 05:27:25 -0700
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240903120948.13743-1-adhemerval.zanella@linaro.org> <20240904120504.GB13550@willie-the-truck>
-In-Reply-To: <20240904120504.GB13550@willie-the-truck>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Wed, 4 Sep 2024 14:28:32 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXHsfmaydb+RCxA1rJPs9K8o4y8LSMTO8sMH-pmAwrZ6PA@mail.gmail.com>
-Message-ID: <CAMj1kXHsfmaydb+RCxA1rJPs9K8o4y8LSMTO8sMH-pmAwrZ6PA@mail.gmail.com>
-Subject: Re: [PATCH v5 0/2] arm64: Implement getrandom() in vDSO
-To: Will Deacon <will@kernel.org>
-Cc: Adhemerval Zanella <adhemerval.zanella@linaro.org>, "Jason A . Donenfeld" <Jason@zx2c4.com>, 
-	"Theodore Ts'o" <tytso@mit.edu>, linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, 
-	Catalin Marinas <catalin.marinas@arm.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	Eric Biggers <ebiggers@kernel.org>, Christophe Leroy <christophe.leroy@csgroup.eu>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 14/21] dt-bindings: cpufreq: qcom-hw: document support
+ for SA8255p
+To: Krzysztof Kozlowski <krzk@kernel.org>
+CC: <andersson@kernel.org>, <konradybcio@kernel.org>, <robh@kernel.org>,
+        <krzk+dt@kernel.org>, <conor+dt@kernel.org>, <rafael@kernel.org>,
+        <viresh.kumar@linaro.org>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>, <sudeep.holla@arm.com>, <andi.shyti@kernel.org>,
+        <tglx@linutronix.de>, <will@kernel.org>, <robin.murphy@arm.com>,
+        <joro@8bytes.org>, <jassisinghbrar@gmail.com>, <lee@kernel.org>,
+        <linus.walleij@linaro.org>, <amitk@kernel.org>,
+        <thara.gopinath@gmail.com>, <broonie@kernel.org>,
+        <cristian.marussi@arm.com>, <rui.zhang@intel.com>,
+        <lukasz.luba@arm.com>, <wim@linux-watchdog.org>, <linux@roeck-us.net>,
+        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-pm@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <arm-scmi@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-i2c@vger.kernel.org>,
+        <iommu@lists.linux.dev>, <linux-gpio@vger.kernel.org>,
+        <linux-serial@vger.kernel.org>, <linux-spi@vger.kernel.org>,
+        <linux-watchdog@vger.kernel.org>, <kernel@quicinc.com>,
+        <quic_psodagud@quicinc.com>
+References: <20240828203721.2751904-1-quic_nkela@quicinc.com>
+ <20240903220240.2594102-1-quic_nkela@quicinc.com>
+ <20240903220240.2594102-15-quic_nkela@quicinc.com>
+ <odg5ssqu2soaqp6m4rambj7qhqiyp7othkvu4v6fu6xtuhbdho@vccya6qcwgoz>
+Content-Language: en-US
+From: Nikunj Kela <quic_nkela@quicinc.com>
+In-Reply-To: <odg5ssqu2soaqp6m4rambj7qhqiyp7othkvu4v6fu6xtuhbdho@vccya6qcwgoz>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: NbquHstL0bz40AbnilrRCvaiD2k-JG5t
+X-Proofpoint-ORIG-GUID: NbquHstL0bz40AbnilrRCvaiD2k-JG5t
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-04_10,2024-09-04_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
+ suspectscore=0 lowpriorityscore=0 mlxlogscore=999 priorityscore=1501
+ spamscore=0 malwarescore=0 adultscore=0 bulkscore=0 impostorscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2409040094
 
-On Wed, 4 Sept 2024 at 14:05, Will Deacon <will@kernel.org> wrote:
+
+On 9/3/2024 11:26 PM, Krzysztof Kozlowski wrote:
+> On Tue, Sep 03, 2024 at 03:02:33PM -0700, Nikunj Kela wrote:
+>> Add compatible for the cpufreq engine representing support on SA8255p.
+>>
+>> Signed-off-by: Nikunj Kela <quic_nkela@quicinc.com>
+>> ---
+>>  .../bindings/cpufreq/cpufreq-qcom-hw.yaml        | 16 ++++++++++++++++
+>>  1 file changed, 16 insertions(+)
+>>
+>> diff --git a/Documentation/devicetree/bindings/cpufreq/cpufreq-qcom-hw.yaml b/Documentation/devicetree/bindings/cpufreq/cpufreq-qcom-hw.yaml
+>> index 1e9797f96410..84865e553c8b 100644
+>> --- a/Documentation/devicetree/bindings/cpufreq/cpufreq-qcom-hw.yaml
+>> +++ b/Documentation/devicetree/bindings/cpufreq/cpufreq-qcom-hw.yaml
+>> @@ -34,6 +34,7 @@ properties:
+>>          items:
+>>            - enum:
+>>                - qcom,qdu1000-cpufreq-epss
+>> +              - qcom,sa8255p-cpufreq-epss
+>>                - qcom,sa8775p-cpufreq-epss
+>>                - qcom,sc7280-cpufreq-epss
+>>                - qcom,sc8280xp-cpufreq-epss
+>> @@ -206,6 +207,21 @@ allOf:
+>>          interrupt-names:
+>>            minItems: 2
+>>  
+>> +  - if:
+>> +      properties:
+>> +        compatible:
+>> +          contains:
+>> +            enum:
+>> +              - qcom,sa8255p-cpufreq-epss
+>> +    then:
+>> +      properties:
+>> +        reg:
+>> +          minItems: 2
+>> +          maxItems: 2
+>> +
+>> +        reg-names:
+>> +          minItems: 2
+>> +          maxItems: 2
+> What about interrupts? You need to constrain each of such lists.
 >
-> +Ard as he had helpful comments on the previous version.
->
+> Best regards,
+> Krzysztof
 
-Thanks for the cc
+Interrupts are not required, I still need to put constraints for
+interrupts? BTW, there is no if block for SA8775p binding in this file.
 
-> On Tue, Sep 03, 2024 at 12:09:15PM +0000, Adhemerval Zanella wrote:
-> > Implement stack-less ChaCha20 and wire it with the generic vDSO
-> > getrandom code.  The first patch is Mark's fix to the alternatives
-> > system in the vDSO, while the the second is the actual vDSO work.
-> >
-> > Changes from v4:
-> > - Improve BE handling.
-> >
-> > Changes from v3:
-> > - Use alternative_has_cap_likely instead of ALTERNATIVE.
-> > - Header/include and comment fixups.
-> >
-> > Changes from v2:
-> > - Refactor Makefile to use same flags for vgettimeofday and
-> >   vgetrandom.
-> > - Removed rodata usage and fixed BE on vgetrandom-chacha.S.
-> >
-> > Changes from v1:
-> > - Fixed style issues and typos.
-> > - Added fallback for systems without NEON support.
-> > - Avoid use of non-volatile vector registers in neon chacha20.
-> > - Use c-getrandom-y for vgetrandom.c.
-> > - Fixed TIMENS vdso_rnd_data access.
-> >
-> > Adhemerval Zanella (1):
-> >   arm64: vdso: wire up getrandom() vDSO implementation
-> >
-> > Mark Rutland (1):
-> >   arm64: alternative: make alternative_has_cap_likely() VDSO compatible
-> >
+Thanks,
 
-This looks ok to me now
+-Nikunj
 
-Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
