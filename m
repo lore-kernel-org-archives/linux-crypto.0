@@ -1,96 +1,139 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35DB231A89;
-	Thu,  5 Sep 2024 02:39:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EE322AE96;
+	Thu,  5 Sep 2024 08:05:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725503959; cv=none; b=iuMSTOpAsz8ySAyGohtCUCPHvF8hAHEyUuM2BySLCLdXP1xOYhBPfUfv6mbSH9BxpLSPAsXBqnqmakSWzPhIjLN19yvOZ6mIXSGjPToSU7PViT7WQ7TpnI2ycIzn8qdVD20U/NHcDgtUOIloEKVTpO8SmtZqyGdqPr4nqiKQkE0=
+	t=1725523509; cv=none; b=BQ+nv7LMN1ImfchpESptGRTx1dla6btGyp/Pj7kyNwLvmde7O9VW9xDwH1yYecFRIZCJBk6bW6/x4B4m/MG5fSG3BVAqiLmImvNoztflcPBc20IiLJRLQr/7da83HpXWdfHX5aK2z99Vzm0mLmiWXBm5IzyptdssORMIxcWs/Hw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725503959; c=relaxed/simple;
-	bh=t5gUN35NyAQwJ+VAaM9GAaq6Wc8eeeUyKamvEH7jRFk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RzZZ56C2QUjvxv+u+u1vDINzq2IKclcK3ZaguwgqQU0bfd/Bt09FfE+3GEIwFLgGW4Ai+UiEWaULiFq/Ms6EUzZRxWlYWUZaYUBs9jQbyrJ6k5d+NkcHc6biy2rMScIix3Z/CSEkDTBMfGk/84THJ+AT7DsGDT5eou6do1yaRss=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=sWFdpdyE; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1725523509; c=relaxed/simple;
+	bh=SLJolgqxxpCuR5zbqIclh1OOtja/y7k9ppSY8hpWXVc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tf27qbpso+FfpJYShA4dkerrZf+/EgstWOFcGLj/daCTbfVD+bbZyGSWtE5Vk+ghLaVob11K+cX2uqCdk/f1u0PM7ORkUlal/igXsPYr9od0GQBhLQ+cSvgbxyDP7B6FZlcwi3qUOV5v+ZSNw0LxrRsA0L1QUI84zfA81bvNuPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NFmvtyFL; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="sWFdpdyE"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=C7UaHnFcfniqQHIyC+R8XhyfgLVAne22VB9LaJURPcc=; b=sWFdpdyEafedT2UGJdR/z9PBVg
-	qXERqE0XXZAy24H8J9MN60yaM/yA4ZiaaopipyZ6Y/H2NItu3BIzH3dJ1no2cABcqZFwtTmKHCj+/
-	USDY6DC3T69sm+jb87l60HaZyNeIuQ5GlVhkR/j2rA1I/fvoh3qVudTtSFsZB++r/X+rJ/V9OxTL5
-	7JnOVSDyNQgaWdqbhmbL3B7fTnfwIwjqkr2zM7WJvdnQ+bjfvtLpoZR6NlmzOVHACplRXg4vKvb1D
-	sypwOT8ISGkStDLbtWO7B6h/LwcUM9nINLHCO96XXrOYu3A5w2qBjPi8f+SMrkKtThlqwb+SdYoUh
-	DqOIiP/Q==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1sm1yB-000DLc-1D;
-	Thu, 05 Sep 2024 10:21:50 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 05 Sep 2024 10:21:49 +0800
-Date: Thu, 5 Sep 2024 10:21:49 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: kernel test robot <lkp@intel.com>
-Cc: oe-kbuild-all@lists.linux.dev,
-	Linux Memory Management List <linux-mm@kvack.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [PATCH] crypto: octeontx* - Select CRYPTO_AUTHENC
-Message-ID: <ZtkVvQfNrtZvmbsm@gondor.apana.org.au>
-References: <202409042013.gT2ZI4wR-lkp@intel.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NFmvtyFL"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B0F4C4CEC3;
+	Thu,  5 Sep 2024 08:04:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725523508;
+	bh=SLJolgqxxpCuR5zbqIclh1OOtja/y7k9ppSY8hpWXVc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=NFmvtyFL35bPrTmXqvsQH8UI6oTD7GEbaTrMQPLHuvCEPh8/1G68QZklDC6EDxDos
+	 tci5smfQ/EP2p/jjnT4/qS+chI+hg0AzYA/Ik346w809sHnZszg/DX4gUMO0anSdBg
+	 fPlE5QKrO1+O/iC4cHPAlDoLhKJjf1j61KuYxEiBTypI5n9ygD8MOZZEcHbXiDT4MV
+	 pe+/4jymtMLw5CKPLbAsJ2vkjACivy1y0js5uTdR+WZBXpXC5xkPN+lA/wHSSaj0t8
+	 BRhEwWxYCqUlrSrpwNkCX0YsQ4ZaHyVBOt0ihznESA3iDb7m+ErIf+MTFfKLT1UDav
+	 6vB84x7aB8MxA==
+Message-ID: <70c75241-b6f1-4e61-8451-26839ec71317@kernel.org>
+Date: Thu, 5 Sep 2024 10:04:50 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202409042013.gT2ZI4wR-lkp@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 16/21] dt-bindings: spi: document support for SA8255p
+To: Nikunj Kela <quic_nkela@quicinc.com>, Andrew Lunn <andrew@lunn.ch>
+Cc: andersson@kernel.org, konradybcio@kernel.org, robh@kernel.org,
+ krzk+dt@kernel.org, conor+dt@kernel.org, rafael@kernel.org,
+ viresh.kumar@linaro.org, herbert@gondor.apana.org.au, davem@davemloft.net,
+ sudeep.holla@arm.com, andi.shyti@kernel.org, tglx@linutronix.de,
+ will@kernel.org, robin.murphy@arm.com, joro@8bytes.org,
+ jassisinghbrar@gmail.com, lee@kernel.org, linus.walleij@linaro.org,
+ amitk@kernel.org, thara.gopinath@gmail.com, broonie@kernel.org,
+ cristian.marussi@arm.com, rui.zhang@intel.com, lukasz.luba@arm.com,
+ wim@linux-watchdog.org, linux@roeck-us.net, linux-arm-msm@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-pm@vger.kernel.org, linux-crypto@vger.kernel.org,
+ arm-scmi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-i2c@vger.kernel.org, iommu@lists.linux.dev,
+ linux-gpio@vger.kernel.org, linux-serial@vger.kernel.org,
+ linux-spi@vger.kernel.org, linux-watchdog@vger.kernel.org,
+ kernel@quicinc.com, quic_psodagud@quicinc.com,
+ Praveen Talari <quic_ptalari@quicinc.com>
+References: <20240828203721.2751904-1-quic_nkela@quicinc.com>
+ <20240903220240.2594102-1-quic_nkela@quicinc.com>
+ <20240903220240.2594102-17-quic_nkela@quicinc.com>
+ <sdxhnqvdbcpmbp3l7hcnsrducpa5zrgbmkykwfluhrthqhznxi@6i4xiqrre3qg>
+ <b369bd73-ce2f-4373-8172-82c0cca53793@quicinc.com>
+ <9a655c1c-97f6-4606-8400-b3ce1ed3c8bf@kernel.org>
+ <516f17e6-b4b4-4f88-a39f-cc47a507716a@quicinc.com>
+ <2f11f622-1a00-4558-bde9-4871cdc3d1a6@lunn.ch>
+ <204f5cfe-d1ed-40dc-9175-d45f72395361@quicinc.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <204f5cfe-d1ed-40dc-9175-d45f72395361@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Sep 04, 2024 at 08:22:57PM +0800, kernel test robot wrote:
->
-> All errors (new ones prefixed by >>):
+On 04/09/2024 23:06, Nikunj Kela wrote:
 > 
->    s390-linux-ld: drivers/crypto/marvell/octeontx/otx_cptvf_algs.o: in function `otx_cpt_aead_cbc_aes_sha_setkey':
-> >> otx_cptvf_algs.c:(.text+0x1daa): undefined reference to `crypto_authenc_extractkeys'
->    s390-linux-ld: drivers/crypto/marvell/octeontx/otx_cptvf_algs.o: in function `otx_cpt_aead_ecb_null_sha_setkey':
->    otx_cptvf_algs.c:(.text+0x1e12): undefined reference to `crypto_authenc_extractkeys'
+> On 9/4/2024 9:58 AM, Andrew Lunn wrote:
+>>> Sorry, didn't realize SPI uses different subject format than other
+>>> subsystems. Will fix in v3. Thanks
+>> Each subsystem is free to use its own form. e.g for netdev you will
+>> want the prefix [PATCH net-next v42] net: stmmac: dwmac-qcom-ethqos:
+> of course they are! No one is disputing that.
+>>
+>> This is another reason why you should be splitting these patches per
+>> subsystem, and submitting both the DT bindings and the code changes as
+>> a two patch patchset. You can then learn how each subsystem names its
+>> patches.
+> 
+> Qualcomm QUPs chips have serial engines that can be configured as
+> UART/I2C/SPI so QUPs changes require to be pushed in one series for all
+> 3 subsystems as they all are dependent.
 
----8<---
-Select CRYPTO_AUTHENC as the function crypto_authenec_extractkeys
-may not be available without it.
+No, they are not dependent. They have never been. Look how all other
+upstreaming process worked in the past.
 
-Fixes: 311eea7e37c4 ("crypto: octeontx - Fix authenc setkey")
-Fixes: 7ccb750dcac8 ("crypto: octeontx2 - Fix authenc setkey")
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202409042013.gT2ZI4wR-lkp@intel.com/
 
-diff --git a/drivers/crypto/marvell/Kconfig b/drivers/crypto/marvell/Kconfig
-index a48591af12d0..78217577aa54 100644
---- a/drivers/crypto/marvell/Kconfig
-+++ b/drivers/crypto/marvell/Kconfig
-@@ -28,6 +28,7 @@ config CRYPTO_DEV_OCTEONTX_CPT
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_HASH
- 	select CRYPTO_AEAD
-+	select CRYPTO_AUTHENC
- 	select CRYPTO_DEV_MARVELL
- 	help
- 		This driver allows you to utilize the Marvell Cryptographic
-@@ -47,6 +48,7 @@ config CRYPTO_DEV_OCTEONTX2_CPT
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_HASH
- 	select CRYPTO_AEAD
-+	select CRYPTO_AUTHENC
- 	select NET_DEVLINK
- 	help
- 		This driver allows you to utilize the Marvell Cryptographic
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Best regards,
+Krzysztof
+
