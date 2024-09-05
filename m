@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BF8D152166;
-	Thu,  5 Sep 2024 17:00:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FA121A0B0F;
+	Thu,  5 Sep 2024 17:26:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725555633; cv=none; b=c66yxU20ULN942S87VBLzkUwFrVW05jdSqMB2Ziag7QeOrMOgbt+KSVTloxUkOzvfMOwY1BnRhwHaTh2bKyoNlghD9K2MHWfrXo90dUGOz/2LsElPHrgWYtgfn4GHW4uqSKEDxE6rQbsEEeMj6YxNgoDgZGx2FYkgw4LLFi8ah8=
+	t=1725557162; cv=none; b=rh70wNAZM2BzUIqUWkZ+odv/GHSaRk/Yl2YOutMOmQ74rywUMqYPVYI+Er+XfJaKqhEoLSd9nRW9casY70BlY1ODWh+2GeOBs1/kp9JwJuzqW8xNiQso/cfXpxBFDYXA05kU/6pTkoVWXBL6DutLv4D/pE0RlQOo1l3EIvGDrpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725555633; c=relaxed/simple;
-	bh=/vubQF0Ug67aNHJMpNq07RHqPnrfb0UDXIiDsimGUhk=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=pGTfWemsw45ywQXHCz0wLRVYkW3dUATtCJ/STgOa5RRqZQcamFiGhMK3wpdIlzfkNnbv4iECzzAxQJHNmQE3tDyKrJOaGed/rNTDk1+bnzZOjQjAx6uju7ud6twZBAP1/gfrt5T6LQLynI2yhpFhCA8YnDYL9sPX5+gbb9G4nG0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l2ERLA1M; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1725557162; c=relaxed/simple;
+	bh=TPcCpVwd6OLK+DNUAQc3r7RymbnYaco16JLBdrmDVnE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nD19/KSiYeBou9kXRMwqSSuVlguVugQkSDT41AJmqJ5U9q50IjWr+228Knq04B6fCtw+/BU0SCF38QkoMLbSS9quxuqqch5jUuXdiE6gPxxEX9uv1VtMhUlp3HnkljGmJeCFmwpHOp+laeXuZLuRbQNkNk/UK7KZQjODDnWyw3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fubB02df; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l2ERLA1M"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C5BBC4CEC3;
-	Thu,  5 Sep 2024 17:00:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fubB02df"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 584A0C4CEC3;
+	Thu,  5 Sep 2024 17:25:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725555633;
-	bh=/vubQF0Ug67aNHJMpNq07RHqPnrfb0UDXIiDsimGUhk=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=l2ERLA1MlGAAqieYGfgLgy2w5ppbiEBqMzF2KezkfT6cgpbAiZm7meuhcFBMRRT07
-	 H0XP6sdsiORxGJ12xT2VEx4J0FTn3tP+XmlPaJ84ZHSh8h3Cjs2Czb4kbxlNvwcRJL
-	 fVqVeu7uMB0sLOq/cfzk8a8EFdgrPapiUcQHYMuSYBoNmFhklhaFmyJ5k/nnVE0XUE
-	 pUa/qcy85UiZgvo/TRwjuFVQTQY0ss9FFUAG0xgZQZHxg9DuwOTUVv8AMCNYhNUzbR
-	 EeY2xQxxf9ToilY7h6VRKg2zfY3TTDGTTm/AkOrL20UuqsvgjsToNx8g/VfU63Y5hZ
-	 Lngx4WL2NXviQ==
-Message-ID: <644f0bfd-bd96-4dca-9bf9-203d423cfe01@kernel.org>
-Date: Thu, 5 Sep 2024 19:00:15 +0200
+	s=k20201202; t=1725557162;
+	bh=TPcCpVwd6OLK+DNUAQc3r7RymbnYaco16JLBdrmDVnE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=fubB02dffWFKHo3UPME+hCLFarreJUMSeGCujyBD70Y3ssvPZuM74x7GQpter6vnL
+	 rPbkRMvSoPPxMnhyg44SKCxTSTwLPY492+iNoUeqR228F+MX6t5n153dm+4MWs1Pcj
+	 mvDIGWZ5S7bPGshxR8zyFW5u1bqjNWmWZAj6D30sOLPitEkejdEo49EKw3ji7Z+C5V
+	 IKTEpgilCU+l1DyCi8uvq2acr+d1SKozOW9XELy1Bd3YtuV7CxfNSvE+eBDMhYFa+u
+	 TA3vry/Oi+NxTqSLghj0ROFfFqCglWhGjziqApIHwzjuHIYkXWsYRQWkZhiwMLDntb
+	 4VRus7WM+7Rsw==
+Message-ID: <eb517a14-268a-4ee1-b330-0c440054e2b8@kernel.org>
+Date: Thu, 5 Sep 2024 19:25:56 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,42 +35,15 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 16/21] dt-bindings: spi: document support for SA8255p
+Subject: Re: [PATCH v1 1/1] dt-bindings: crypto: Document support for SPAcc
+To: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>,
+ devicetree@vger.kernel.org, herbert@gondor.apana.org.au,
+ linux-crypto@vger.kernel.org, robh@kernel.org
+Cc: Ruud.Derwig@synopsys.com, manjunath.hadli@vayavyalabs.com,
+ bhoomikak@vayavyalabs.com
+References: <20240905150910.239832-1-pavitrakumarm@vayavyalabs.com>
+ <20240905150910.239832-2-pavitrakumarm@vayavyalabs.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Nikunj Kela <quic_nkela@quicinc.com>, Andrew Lunn <andrew@lunn.ch>
-Cc: andersson@kernel.org, konradybcio@kernel.org, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org, rafael@kernel.org,
- viresh.kumar@linaro.org, herbert@gondor.apana.org.au, davem@davemloft.net,
- sudeep.holla@arm.com, andi.shyti@kernel.org, tglx@linutronix.de,
- will@kernel.org, robin.murphy@arm.com, joro@8bytes.org,
- jassisinghbrar@gmail.com, lee@kernel.org, linus.walleij@linaro.org,
- amitk@kernel.org, thara.gopinath@gmail.com, broonie@kernel.org,
- cristian.marussi@arm.com, rui.zhang@intel.com, lukasz.luba@arm.com,
- wim@linux-watchdog.org, linux@roeck-us.net, linux-arm-msm@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-pm@vger.kernel.org, linux-crypto@vger.kernel.org,
- arm-scmi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-i2c@vger.kernel.org, iommu@lists.linux.dev,
- linux-gpio@vger.kernel.org, linux-serial@vger.kernel.org,
- linux-spi@vger.kernel.org, linux-watchdog@vger.kernel.org,
- kernel@quicinc.com, quic_psodagud@quicinc.com,
- Praveen Talari <quic_ptalari@quicinc.com>
-References: <20240828203721.2751904-1-quic_nkela@quicinc.com>
- <20240903220240.2594102-1-quic_nkela@quicinc.com>
- <20240903220240.2594102-17-quic_nkela@quicinc.com>
- <sdxhnqvdbcpmbp3l7hcnsrducpa5zrgbmkykwfluhrthqhznxi@6i4xiqrre3qg>
- <b369bd73-ce2f-4373-8172-82c0cca53793@quicinc.com>
- <9a655c1c-97f6-4606-8400-b3ce1ed3c8bf@kernel.org>
- <516f17e6-b4b4-4f88-a39f-cc47a507716a@quicinc.com>
- <2f11f622-1a00-4558-bde9-4871cdc3d1a6@lunn.ch>
- <204f5cfe-d1ed-40dc-9175-d45f72395361@quicinc.com>
- <70c75241-b6f1-4e61-8451-26839ec71317@kernel.org>
- <75768451-4c85-41fa-82b0-8847a118ea0a@quicinc.com>
- <ce4d6ea9-0ba7-4587-b4a7-3dcb2d6bb1a6@kernel.org>
- <4896510e-6e97-44e0-b3d7-7a7230f935ec@quicinc.com>
- <b1ad1c7a-0995-48e0-8ebc-46a39a5ef4b3@kernel.org>
- <515a2837-69c3-47b2-978b-68ad3f6ad0fc@quicinc.com>
- <f0cd5f5c-270f-4d9b-8169-be6180fc9925@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -115,66 +88,40 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <f0cd5f5c-270f-4d9b-8169-be6180fc9925@kernel.org>
+In-Reply-To: <20240905150910.239832-2-pavitrakumarm@vayavyalabs.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 05/09/2024 18:56, Krzysztof Kozlowski wrote:
-> On 05/09/2024 18:08, Nikunj Kela wrote:
->>
->> On 9/5/2024 7:39 AM, Krzysztof Kozlowski wrote:
->>> On 05/09/2024 16:15, Nikunj Kela wrote:
->>>> On 9/5/2024 7:09 AM, Krzysztof Kozlowski wrote:
->>>>> On 05/09/2024 16:03, Nikunj Kela wrote:
->>>>>> On 9/5/2024 1:04 AM, Krzysztof Kozlowski wrote:
->>>>>>> On 04/09/2024 23:06, Nikunj Kela wrote:
->>>>>>>> On 9/4/2024 9:58 AM, Andrew Lunn wrote:
->>>>>>>>>> Sorry, didn't realize SPI uses different subject format than other
->>>>>>>>>> subsystems. Will fix in v3. Thanks
->>>>>>>>> Each subsystem is free to use its own form. e.g for netdev you will
->>>>>>>>> want the prefix [PATCH net-next v42] net: stmmac: dwmac-qcom-ethqos:
->>>>>>>> of course they are! No one is disputing that.
->>>>>>>>> This is another reason why you should be splitting these patches per
->>>>>>>>> subsystem, and submitting both the DT bindings and the code changes as
->>>>>>>>> a two patch patchset. You can then learn how each subsystem names its
->>>>>>>>> patches.
->>>>>>>> Qualcomm QUPs chips have serial engines that can be configured as
->>>>>>>> UART/I2C/SPI so QUPs changes require to be pushed in one series for all
->>>>>>>> 3 subsystems as they all are dependent.
->>>>>>> No, they are not dependent. They have never been. Look how all other
->>>>>>> upstreaming process worked in the past.
->>>>>> Top level QUP node(patch#18) includes i2c,spi,uart nodes.
->>>>>> soc/qcom/qcom,geni-se.yaml validate those subnodes against respective
->>>>>> yaml. The example that is added in YAML file for QUP node will not find
->>>>>> sa8255p compatibles if all 4 yaml(qup, i2c, spi, serial nodes) are not
->>>>>> included in the same series.
->>>>>>
->>>>> So where is the dependency? I don't see it. 
->>>> Ok, what is your suggestion on dt-schema check failure in that case as I
->>>> mentioned above? Shall we remove examples from yaml that we added?
->>> I don't understand what sort of failure you want to fix and why examples
->>> have any problem here. 
->>
->> If the QUPs yaml changes are not included in the same series with
+On 05/09/2024 17:09, Pavitrakumar M wrote:
+> Add DT bindings related to the SPAcc driver for Documentation.
+> DWC Synopsys Security Protocol Accelerator(SPAcc) Hardware Crypto
+> Engine is a crypto IP designed by Synopsys.
 > 
-> They cannot be included in the same series. You just think that
-> including here solves the problem so go ahead, simulate the merging:
-> 1. Bjorn applies soc/qcom/qcom,geni-se.yaml patch and tests. His tree
-> MUST build, so it also must pass dt_binding_check.
-> Does it pass? No.
-> 
-> 2. SPI maintainer... ah, no point even going there.
-> 
->> i2c,serial yaml changes, you see these errors:
->>
->> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/soc/qcom/qcom,geni-se.example.dtb: geniqup@9c0000: serial@990000:compatible:0: 'qcom,sa8255p-geni-uart' is not one of ['qcom,geni-uart', 'qcom,geni-debug-uart']
->> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/soc/qcom/qcom,geni-se.example.dtb: geniqup@9c0000: i2c@984000:compatible:0: 'qcom,sa8255p-geni-i2c' is not one of ['qcom,geni-i2c', 'qcom,geni-i2c-master-hub']
-> 
-> Don't grow examples if not needed. Or create dependencies and ask
-> maintainers to cross-merge.
 
-Or soc/geni-se binding could be also converted to just list compatibles
-instead of referencing other schema, just like MDSS.
+<form letter>
+Please use scripts/get_maintainers.pl to get a list of necessary people
+and lists to CC (and consider --no-git-fallback argument). It might
+happen, that command when run on an older kernel, gives you outdated
+entries. Therefore please be sure you base your patches on recent Linux
+kernel.
+
+Tools like b4 or scripts/get_maintainer.pl provide you proper list of
+people, so fix your workflow. Tools might also fail if you work on some
+ancient tree (don't, instead use mainline) or work on fork of kernel
+(don't, instead use mainline). Just use b4 and everything should be
+fine, although remember about `b4 prep --auto-to-cc` if you added new
+patches to the patchset.
+</form letter>
+
+You already sent it... and now send again? That's like third time!
+Version your patches and provide changelog under ---.
+
+
+Anyway, this is just pointless without users. No explanation either. :/
+
+I won't review it since you keep sending the same buggy code, without
+changes.
+
 
 Best regards,
 Krzysztof
