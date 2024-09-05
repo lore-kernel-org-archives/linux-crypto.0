@@ -1,52 +1,54 @@
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0950D198E6E
-	for <linux-crypto@vger.kernel.org>; Thu,  5 Sep 2024 11:26:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44A041991D4
+	for <linux-crypto@vger.kernel.org>; Thu,  5 Sep 2024 11:26:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725535594; cv=none; b=l0goMofZG8vvO3W1uEhhaB5C+8KwDD7f2FBJVVe1NOVNB4ELutCAK2JFBYyeiUAVfbda+O1MXt7MBUQySoGVSbCSmefHClqEkeuuBYU0HVl1K1/K/rm+lr8l83GDya8GtmoePHNlxkV5Rsm+2cR4gboe1INVmSQFo2l3ceTl9fU=
+	t=1725535599; cv=none; b=GZAfe3vhYMZXUEeWmy5B/xcqXJFuZ7KEvAxko77FmezFEI7w9r8370w3ReQDOlR6wUsv6zOQnfFZ5iylCxOKL021f2S94SNY+pcntiOH1CEaEAoFFyIb+y1a5w482eQbd1XYGZexKj8tBVS4Uaawi6AVHU9YlOGq9hgeAsvSgcg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725535594; c=relaxed/simple;
-	bh=WLkEW3TQoHM0CaqvHP+UnEcZrNRj2Yf8ItE7bUlRtS8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=oTjNMWBOp8zIU4BGnbKfxhtP3H0TdrreK3cPutx7tfCq6W71PsT5sub+cEF1e2D3kHjoFw006DDtPSN1TR4W7Nx7XYAUre7rNnWSw6G/maBiGzfSYIUWNlYtCN9dqSxb3qoh7PMffJNwaIT/qqQ5gDpbyFb5hyTE6TqFief+B0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=IbzWBDqM; arc=none smtp.client-ip=209.85.214.169
+	s=arc-20240116; t=1725535599; c=relaxed/simple;
+	bh=uPKZajMj0+4NDMXOog9v35p92NDX8Zmoqti6dst4Gcw=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=n2mNoxMCH5rgxKVGhpD3iPVdFESXMv2x6/2Se0KjhObuqSGAQeR5VAqnpeLDpcPzZ7UT9zyGnRfzKmPHRJspXOOUCIom1W/y2xbjzSzaOSqVjBBvyl/9LA52MuGr0hCp3ill4uz5OcnqjlW0S14ES0l9LhC2NG039H10X3LdSpc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=PJHlilPF; arc=none smtp.client-ip=209.85.214.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="IbzWBDqM"
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-202508cb8ebso5490745ad.3
-        for <linux-crypto@vger.kernel.org>; Thu, 05 Sep 2024 04:26:32 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="PJHlilPF"
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-20536dcc6e9so4789215ad.2
+        for <linux-crypto@vger.kernel.org>; Thu, 05 Sep 2024 04:26:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vayavyalabs.com; s=google; t=1725535592; x=1726140392; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=sETn7qpcDB4MO8FELll1einBheR1j7SuMJsqhl5kLhI=;
-        b=IbzWBDqMVC+Hp/NzEdJ6U294LRXFqcjOe+/0OBZbBT+u4PRPbPrC13AzA0ohZB47+L
-         b/UlbjST5KV8ZrXETyfMJyngg+c76ZCu1RTrZlJWsEFtWYDuTZ4PMFhA/UwTqmiBcwhz
-         Z3M7ltLTvQ1m1IpvvCA+mSYIN63h2a70yxc3o=
+        d=vayavyalabs.com; s=google; t=1725535597; x=1726140397; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6E6kzqN7sw0Bm/x9wPsmhlMXiVbetaL6tQQYNOBhsTk=;
+        b=PJHlilPFtUFptyZYWqb1zp+47wMREy3qr8tVM31O1fUzzZnjoSKePLk1asTS0JXmm8
+         Arux5+Yzd7duw6x7eyUgdlsH71DdSCqgLqsJpUOHPBsFSofTDTDa66ToP/cBWIZCitfU
+         lmt9lER5n/cBeqc3t5mOW69SEtmuuNcmdXESI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725535592; x=1726140392;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sETn7qpcDB4MO8FELll1einBheR1j7SuMJsqhl5kLhI=;
-        b=HvyVKiQO/ofEimQrXggiPr8c9uRa47U6EGqK1DhbVqP7lDuLhNEGEhMeyJdxRiFg17
-         ABPLp/CT5jHUJoh7km56rNi7pGVz3HF+sKVjDW5ypEYbLAyCHgiq9Ew5eyTTa5s8f89p
-         CRq0uPtqKBHj0u6fnf+Tg1it7fnKX+518LcSIbFU82ulikcJmku0r6rrFUI6KGZOijf4
-         dgqcCenoNyidX+9svn1fG4xAk1XJWo6m9FCtpMzZ0aMR+guD6kfn8WI/vSmRpHnWoEIf
-         UkBQs65PovVBK8xIhI0GUcwA4Axll1ihTfgiBvwCjfsYsAdoRtoR7PEQhDk6HCsAx+E3
-         AN3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXfGsvNB9woBbS2Hc5bNDeqOZo0T0wodFh3wOXmGFUHJnF8Td1y/r4Um6Vo1aVwdAxI/pqO5p8pHmPIMdA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKI0Lb4DqOybX82ZKqiM+j1GHrSYno3X/i5nPlAdyg5Hb9CVGH
-	Y1x0jl5VkYyBDGheOqt7x7B6Stcxmp679KpyOoI7NqajRQ+Blilyoi+l/MCISn4=
-X-Google-Smtp-Source: AGHT+IGunYwZhCrW2FU7qzUCYUDtQWGncMBIDUW0JVoWEUsZn5tzewsZALt9L2+ufDVp9wFgMgxvjw==
-X-Received: by 2002:a17:903:41cf:b0:206:c911:9d75 with SMTP id d9443c01a7336-206c9119ff2mr45269485ad.20.1725535592269;
-        Thu, 05 Sep 2024 04:26:32 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1725535597; x=1726140397;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6E6kzqN7sw0Bm/x9wPsmhlMXiVbetaL6tQQYNOBhsTk=;
+        b=Geo/Ss/Vp6O8sndHnrvBr59Nt+7Fao+F7FXeQgsVrIXCdaDGYa5r3Hx/oCBJngB6bF
+         QhVczP+Wn3akJUL1ybiX1LSdynVVjh1YVbexDVYX7JC4kAC/Nb/l0hiA7ThNKcVqpRT/
+         7lnF4xNwHRaarBZWvEqxrBcvCdd7faPUdekD6SPGhMFhjcye6UXYBLJBGvL9Tp34RTjy
+         qmSmTdwO83lShi2pFsKuqHEcN4s/YF4+s7CgIAxCOWYzVWOnponNksIbYueMsabqhOEs
+         0F99Et5JhhKjgmvmXxk+qiSAB0CMys6oO7zcsQi7Rey5lmZEbt2Ly7rVGJeynXOWFf4C
+         r92g==
+X-Forwarded-Encrypted: i=1; AJvYcCWk0jJK3p3hWd90oGeeCtNY3xpO5GRgA5z87PWDBSYZtbhkK9TMu/speObXQqf+XvPL9qP9TlI6fQl2KQU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQcUX3ih/+3iWj4TY3kxMQaeTQRn+9oFBiuNM3guAx3aFzovlC
+	ZICZkFk4vRMFXR8wOIfgW6Co0IOBgm4GqenZcMsA591QJqnJNepDtKuEDshyWRQ=
+X-Google-Smtp-Source: AGHT+IGDiAam5e5vgT9ZHTVv+6stZBUzL5d+scDc2Ygdburm03QlPWrwuyEUEv/WOqY+DXJe9IiFRA==
+X-Received: by 2002:a17:903:2285:b0:205:4e15:54c8 with SMTP id d9443c01a7336-2054e15577fmr186548705ad.61.1725535597501;
+        Thu, 05 Sep 2024 04:26:37 -0700 (PDT)
 Received: from localhost.localdomain ([103.108.57.9])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-206ae9138c0sm27445395ad.9.2024.09.05.04.26.29
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-206ae9138c0sm27445395ad.9.2024.09.05.04.26.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Sep 2024 04:26:31 -0700 (PDT)
+        Thu, 05 Sep 2024 04:26:37 -0700 (PDT)
 From: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
 To: devicetree@vger.kernel.org,
 	herbert@gondor.apana.org.au,
@@ -56,10 +58,12 @@ Cc: Ruud.Derwig@synopsys.com,
 	manjunath.hadli@vayavyalabs.com,
 	bhoomikak@vayavyalabs.com,
 	Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
-Subject: [PATCH 0/1] dt-bindings: crypto: Document support for SPAcc
-Date: Thu,  5 Sep 2024 16:56:21 +0530
-Message-Id: <20240905112622.237681-1-pavitrakumarm@vayavyalabs.com>
+Subject: [PATCH 1/1] dt-bindings: crypto: Document support for SPAcc
+Date: Thu,  5 Sep 2024 16:56:22 +0530
+Message-Id: <20240905112622.237681-2-pavitrakumarm@vayavyalabs.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20240905112622.237681-1-pavitrakumarm@vayavyalabs.com>
+References: <20240905112622.237681-1-pavitrakumarm@vayavyalabs.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -68,22 +72,103 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-DT bindings related to the SPAcc driver.
-DWC Synopsys Security Protocol Accelerator(SPAcc)
-Hardware Crypto Engine is a crypto IP designed by
-Synopsys.
-SPAcc can be configured as virtual SPAcc. The device supports 8 virtual
-SPAccs. They have their seperate register banks and context memories.
+Add DT bindings related to the SPAcc driver for Documentation.
+DWC Synopsys Security Protocol Accelerator(SPAcc) Hardware Crypto
+Engine is a crypto IP designed by Synopsys.
 
-Pavitrakumar M (1):
-  dt-bindings: crypto: Document support for SPAcc
-
+Signed-off-by: Bhoomika K <bhoomikak@vayavyalabs.com>
+Signed-off-by: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>
+Acked-by: Ruud Derwig <Ruud.Derwig@synopsys.com>
+---
  .../bindings/crypto/snps,dwc-spacc.yaml       | 79 +++++++++++++++++++
  1 file changed, 79 insertions(+)
  create mode 100644 Documentation/devicetree/bindings/crypto/snps,dwc-spacc.yaml
 
-
-base-commit: b8fc70ab7b5f3afbc4fb0587782633d7fcf1e069
+diff --git a/Documentation/devicetree/bindings/crypto/snps,dwc-spacc.yaml b/Documentation/devicetree/bindings/crypto/snps,dwc-spacc.yaml
+new file mode 100644
+index 000000000000..dc5b38cd5e1e
+--- /dev/null
++++ b/Documentation/devicetree/bindings/crypto/snps,dwc-spacc.yaml
+@@ -0,0 +1,79 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/crypto/snps,dwc-spacc.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Synopsys DesignWare Security Protocol Accelerator(SPAcc) Crypto Engine
++
++maintainers:
++  - Ruud Derwig <Ruud.Derwig@synopsys.com>
++
++description:
++  DWC Synopsys Security Protocol Accelerator(SPAcc) Hardware Crypto Engine is
++  a crypto IP designed by Synopsys, that can accelerate cryptographic
++  operations.
++
++properties:
++  compatible:
++    contains:
++      enum:
++        - snps,dwc-spacc
++        - snps,dwc-spacc-6.0
++
++  reg:
++    maxItems: 1
++
++  interrupts:
++    maxItems: 1
++
++  clocks:
++    maxItems: 1
++
++  clock-names:
++    maxItems: 1
++
++  little-endian: true
++
++  vspacc-priority:
++    $ref: /schemas/types.yaml#/definitions/uint32
++    description:
++      Set priority mode on the Virtual SPAcc. This is Virtual SPAcc priority
++      weight. Its used in priority arbitration of the Virtual SPAccs.
++    minimum: 0
++    maximum: 15
++    default: 0
++
++  vspacc-index:
++    $ref: /schemas/types.yaml#/definitions/uint32
++    description: Virtual spacc index for validation and driver functioning.
++    minimum: 0
++    maximum: 7
++
++  spacc-wdtimer:
++    $ref: /schemas/types.yaml#/definitions/uint32
++    description: Watchdog timer count to replace the default value in driver.
++    minimum: 0x19000
++    maximum: 0xFFFFF
++
++required:
++  - compatible
++  - reg
++  - interrupts
++
++additionalProperties: false
++
++examples:
++  - |
++    spacc@40000000 {
++        compatible = "snps,dwc-spacc";
++        reg = <0x40000000 0x3FFFF>;
++        interrupt-parent = <&gic>;
++        interrupts = <0 89 4>;
++        clocks = <&clock>;
++        clock-names = "ref_clk";
++        vspacc-priority = <4>;
++        spacc-wdtimer = <10000>;
++        vspacc-index = <0>;
++        little-endian;
++    };
 -- 
 2.25.1
 
