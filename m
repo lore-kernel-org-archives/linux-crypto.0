@@ -1,48 +1,43 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from sender4-of-o51.zoho.com (sender4-of-o51.zoho.com [136.143.188.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CA63149C7B;
-	Wed,  4 Sep 2024 23:51:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725493903; cv=none; b=NftfrKXHuXMdccNVeM1lIaRM5V2hy2FONWdk/aEJmDkN+JG1sjtDdH0sM3Bl2N3XzuGbdoNrds7C2T/vmEMTl61Q4FdYd7PcFNFwUWQgODEIDtyJ5i39F/oBKiTlXv6phK94MOtF3/ZHwuFVchSqiXYrXhb8x1svs1raajFqGfc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725493903; c=relaxed/simple;
-	bh=KdN6M0uDTjRcTutonoP706+oqdXzsVro5VbFV4XpmDo=;
-	h=Message-ID:Date:MIME-Version:Subject:CC:References:From:
-	 In-Reply-To:Content-Type; b=jHKC6ENonppsJ+Rtrge5F54PfSjcwPP5WA5WK9X2FnzMS5GJXcsvZ7zwTLsyx+zsAwxRtX5JbRkreStpLC9hSMypGKEuSVM9ZJ4KYgsw0eXniNn8ZOVB8siBhEUXhHu7U7JQiHvJWuohtHKnMdEDICtHqooYDRggK/iDoI6zZuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=jzSdou/9; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4048D747F;
+	Thu,  5 Sep 2024 01:03:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725498208; cv=pass; b=O6JQFjsizKPNKB44ETJ3Zpfki8R2G1KcFZEGpeBS4c7Y8H31aftosSxOfFqaOwMD+KpsCtJUUUK5d0NK4m7kIBvCkucm000tBMAZVqR+kvYlNcV3M9niuzc/08KCZUnkK8VdzG2mgNa7h+cCwIjlktbD7udmBOpIYnVzFi1pB0s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725498208; c=relaxed/simple;
+	bh=xvwm9ULyMATN4LUA3hXl7b+4PDyb925p3YwCKiJ8Ud8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nWtZmMLJsfax72NqysVLJCIjEwfLuSwah1B9ndnMDRNNfk3Pm7IsWmgUucncmYmg9LZ5rDZqtitMDeDaRZFtj/EPu0d5T0EAZ7YviMzRTC9mGlid5WqMV1SK0voTMEshpOUImOxYrjYAzgfUpfR7mw+1qzMc+QuTfJZl1CV1JZQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=apertussolutions.com; spf=pass smtp.mailfrom=apertussolutions.com; dkim=pass (1024-bit key) header.d=apertussolutions.com header.i=dpsmith@apertussolutions.com header.b=I1LE+zDb; arc=pass smtp.client-ip=136.143.188.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=apertussolutions.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=apertussolutions.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="jzSdou/9"
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 484N5KDK031912;
-	Wed, 4 Sep 2024 23:51:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject; s=qcppdkim1; bh=4/l
-	hBqWBq1YTQ539+j2Ux48JjcsIdAodVI3iskgBfkg=; b=jzSdou/9Ek+6lJRwJyk
-	KhUFI7YCM1sAif6GkLWh8Wxn0VfFuFVphGUEvt9JcahSXLMijZjCgvNLVVNgWlPx
-	cEhKzNUGbRHBVBHGgBeQHTyj44y/NNChvStZEk2mDWHm1ifIGxP9tr3mWyMDxZqS
-	3kh8HBKV08jJY7bqZ1NAGGZCaXkIw4VlcA1sNKhbS6eLsDVZ6mvYp933ytSEtKl3
-	c06GSRHyJVMwF1xKAmzxlgTQi673R+qHk7kG7Xv7gkGglN/qHk4MhWcqkeCsQNda
-	76DZK+RD8kDLiZsA2fnelMLnRw0VDENjRiFiD8NosSduOPc5RgZwaXLFDYkclGQP
-	vzw==
-Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 41bt674cha-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 04 Sep 2024 23:51:04 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 484Np2fZ012201
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 4 Sep 2024 23:51:02 GMT
-Received: from [10.110.102.234] (10.80.80.8) by nasanex01b.na.qualcomm.com
- (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 4 Sep 2024
- 16:50:58 -0700
-Message-ID: <1732bde7-aa72-4861-aa0a-414d55f68107@quicinc.com>
-Date: Wed, 4 Sep 2024 16:50:58 -0700
+	dkim=pass (1024-bit key) header.d=apertussolutions.com header.i=dpsmith@apertussolutions.com header.b="I1LE+zDb"
+ARC-Seal: i=1; a=rsa-sha256; t=1725498125; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=n1GwapKlqf/G11f9bXZyxIoD7k1R7NbcQOIf95YR2qUGUiwderqOqQrraRlVfwxxRmR7Re8k3NeGCmtIy2TiXvQ+zKn62wu26gh7hkiumSYANKK1u21gQgWZHbpTZl0/cgMaDaT0S7xvzFbJUhmcuijt+lurWYeobverSdHkkmQ=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1725498125; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=MHhhgvQoIAOSgBKwKAFzW1nw5ZFZN5DJupDzq3j2bCE=; 
+	b=GnTIR0gSukchwjgWOItZ87i59diBhrbv1skYdEbrSqqZAONm+7S3KqrsBqEsYyOOqZj8dHTuDwBXLot2xYpClR5gjGUVW/mbeADllJ80vbvfFg9TMghEUFFa7W15JVS6l4pm9kzZrI1x9hxlHRE+UVUVGbgQPzjUxuGIRicNjXo=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=apertussolutions.com;
+	spf=pass  smtp.mailfrom=dpsmith@apertussolutions.com;
+	dmarc=pass header.from=<dpsmith@apertussolutions.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1725498125;
+	s=zoho; d=apertussolutions.com; i=dpsmith@apertussolutions.com;
+	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=MHhhgvQoIAOSgBKwKAFzW1nw5ZFZN5DJupDzq3j2bCE=;
+	b=I1LE+zDbqGpOlfJl+BMuEOWTcR58dv4I/SqGYrYELweuXSrWu940A6fkSzqPXilW
+	JjrMes/NSWEf39/p6FkNSCnlDXf1zVEviNihPq/lT6Tz6DsS6XbwKS/d2sp56PINbGM
+	b/FYT7akWAq84UiE+6YlPxp0pbVAFdENRxnGF+OA=
+Received: by mx.zohomail.com with SMTPS id 1725498123590524.2720733626318;
+	Wed, 4 Sep 2024 18:02:03 -0700 (PDT)
+Message-ID: <1a1f0c41-70de-4f46-b91d-6dc7176893ee@apertussolutions.com>
+Date: Wed, 4 Sep 2024 21:01:59 -0400
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -50,223 +45,104 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 00/21] arm64: qcom: Introduce SA8255p Ride platform
-CC: <andersson@kernel.org>, <konradybcio@kernel.org>, <robh@kernel.org>,
-        <krzk+dt@kernel.org>, <conor+dt@kernel.org>, <rafael@kernel.org>,
-        <viresh.kumar@linaro.org>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>, <sudeep.holla@arm.com>, <andi.shyti@kernel.org>,
-        <tglx@linutronix.de>, <will@kernel.org>, <robin.murphy@arm.com>,
-        <joro@8bytes.org>, <jassisinghbrar@gmail.com>, <lee@kernel.org>,
-        <linus.walleij@linaro.org>, <amitk@kernel.org>,
-        <thara.gopinath@gmail.com>, <broonie@kernel.org>,
-        <cristian.marussi@arm.com>, <rui.zhang@intel.com>,
-        <lukasz.luba@arm.com>, <wim@linux-watchdog.org>, <linux@roeck-us.net>,
-        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-pm@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>, <arm-scmi@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-i2c@vger.kernel.org>,
-        <iommu@lists.linux.dev>, <linux-gpio@vger.kernel.org>,
-        <linux-serial@vger.kernel.org>, <linux-spi@vger.kernel.org>,
-        <linux-watchdog@vger.kernel.org>, <kernel@quicinc.com>,
-        <quic_psodagud@quicinc.com>
-References: <20240828203721.2751904-1-quic_nkela@quicinc.com>
- <20240903220240.2594102-1-quic_nkela@quicinc.com>
+Subject: Re: [PATCH v9 06/19] x86: Add early SHA-1 support for Secure Launch
+ early measurements
+To: Andy Lutomirski <luto@amacapital.net>,
+ Thomas Gleixner <tglx@linutronix.de>
+Cc: "Eric W. Biederman" <ebiederm@xmission.com>,
+ Eric Biggers <ebiggers@kernel.org>,
+ Ross Philipson <ross.philipson@oracle.com>, linux-kernel@vger.kernel.org,
+ x86@kernel.org, linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
+ linux-efi@vger.kernel.org, iommu@lists.linux-foundation.org,
+ mingo@redhat.com, bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com,
+ ardb@kernel.org, mjg59@srcf.ucam.org, James.Bottomley@hansenpartnership.com,
+ peterhuewe@gmx.de, jarkko@kernel.org, jgg@ziepe.ca, nivedita@alum.mit.edu,
+ herbert@gondor.apana.org.au, davem@davemloft.net, corbet@lwn.net,
+ dwmw2@infradead.org, baolu.lu@linux.intel.com, kanth.ghatraju@oracle.com,
+ andrew.cooper3@citrix.com, trenchboot-devel@googlegroups.com
+References: <20240531010331.134441-1-ross.philipson@oracle.com>
+ <20240531010331.134441-7-ross.philipson@oracle.com>
+ <20240531021656.GA1502@sol.localdomain>
+ <874jaegk8i.fsf@email.froward.int.ebiederm.org>
+ <5b1ce8d3-516d-4dfd-a976-38e5cee1ef4e@apertussolutions.com>
+ <87ttflli09.ffs@tglx>
+ <CALCETrXQ7rChWLDqTG0+KY7rsfajSPguMnHO1G4VJi_mgwN9Zw@mail.gmail.com>
 Content-Language: en-US
-From: Nikunj Kela <quic_nkela@quicinc.com>
-In-Reply-To: <20240903220240.2594102-1-quic_nkela@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: mGB5siCCyWRh_cGjj_b1FVY16FVhkQZJ
-X-Proofpoint-GUID: mGB5siCCyWRh_cGjj_b1FVY16FVhkQZJ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-04_21,2024-09-04_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
- bulkscore=0 mlxscore=0 impostorscore=0 suspectscore=0 phishscore=0
- mlxlogscore=999 lowpriorityscore=0 spamscore=0 clxscore=1015
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2407110000 definitions=main-2409040180
+From: "Daniel P. Smith" <dpsmith@apertussolutions.com>
+In-Reply-To: <CALCETrXQ7rChWLDqTG0+KY7rsfajSPguMnHO1G4VJi_mgwN9Zw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
-Hi All,
+Hi Luto.
 
-I have decided to split this series into multiple smaller ones as follows:
+On 8/28/24 23:17, Andy Lutomirski wrote:
+> On Thu, Aug 15, 2024 at 12:10 PM Thomas Gleixner <tglx@linutronix.de> wrote:
+>>
+>> On Thu, Aug 15 2024 at 13:38, Daniel P. Smith wrote:
+>>> On 5/31/24 09:54, Eric W. Biederman wrote:
+>>>> Eric Biggers <ebiggers@kernel.org> writes:
+>>>>> That paragraph is also phrased as a hypothetical, "Even if we'd prefer to use
+>>>>> SHA-256-only".  That implies that you do not, in fact, prefer SHA-256 only.  Is
+>>>>> that the case?  Sure, maybe there are situations where you *have* to use SHA-1,
+>>>>> but why would you not at least *prefer* SHA-256?
+>>>>
+>>>> Yes.  Please prefer to use SHA-256.
+>>>>
+>>>> Have you considered implementing I think it is SHA1-DC (as git has) that
+>>>> is compatible with SHA1 but blocks the known class of attacks where
+>>>> sha1 is actively broken at this point?
+>>>
+>>> We are using the kernel's implementation, addressing what the kernel
+>>> provides is beyond our efforts. Perhaps someone who is interested in
+>>> improving the kernel's SHA1 could submit a patch implementing/replacing
+>>> it with SHA1-DC, as I am sure the maintainers would welcome the help.
+>>
+>> Well, someone who is interested to get his "secure" code merged should
+>> have a vested interested to have a non-broken SHA1 implementation if
+>> there is a sensible requirement to use SHA1 in that new "secure" code,
+>> no?
+>>
+>> Just for the record. The related maintainers can rightfully decide to
+>> reject known broken "secure" code on a purely technical argument.
+>>
+> 
+> Wait, hold on a second.
+> 
+> SHA1-DC isn't SHA1.  It's a different hash function that is mostly
+> compatible with SHA1, is different on some inputs, and is maybe more
+> secure.  But the _whole point_ of using SHA1 in the TPM code (well,
+> this really should be the whole point for new applications) is to
+> correctly cap the SHA1 PCRs so we can correctly _turn them off_ in the
+> best way without breaking compatibility with everything that might
+> read the event log.  I think that anyone suggesting using SHA1-DC for
+> this purpose should give some actual analysis as to why they think
+> it's an improvement, let alone even valid.
 
-- Patches 1/21 - 11/21, 13/21 - 14/21, 19/21: will split them to each
-subsystem specific patch sets.
+I would say at a minimum it is to provide a means to cap the PCRs. 
+Devices with TPM1.2 are still prevalent in the wild for which members of 
+the TrenchBoot community support, and there are still valid (and secure) 
+verification uses for SHA1 that I outlined in my previous response.
 
-- Patches 15/21 - 18/21: will come in separate series along with QUPs
-driver changes.
+> Ross et al, can you confirm that your code actually, at least by
+> default and with a monstrous warning to anyone who tries to change the
+> default, caps SHA1 PCRs if SHA256 is available?  And then can we maybe
+> all stop hassling the people trying to develop this series about the
+> fact that they're doing their best with the obnoxious system that the
+> TPM designers gave them?
 
-- Patches 20/21 - 21/21: will come in separate series after above two
-sets are accepted.
+Our goal is to keep control in the hands of the user, not making 
+unilateral decisions on their behalf. In the currently deployed 
+solutions it is left to the initrd (user) to cap the PCRs. After some 
+thinking, we can still ensure user control and give an option to cap the 
+PCRs earlier. We hope to post a v11 later this week or early next week 
+that introduces a new policy field to the existing measurement policy 
+framework. Will add/update the kernel docs with respect to the policy 
+expansion. We are also looking the best way we might add a warning to 
+the kernel log if the SHA1 bank is used beyond capping the PCRs.
 
-Thanks,
+Hopefully this answers the outstanding comments on the SHA1 thread.
 
--Nikunj
-
-
-On 9/3/2024 3:02 PM, Nikunj Kela wrote:
-> This series enables the support for SA8255p Qualcomm SoC and Ride
-> platform. This platform uses SCMI power, reset, performance, sensor
-> protocols for resources(e.g. clocks, regulator, interconnect, phy etc.)
-> management. SA8255p is a virtual platforms that uses Qualcomm smc/hvc
-> transport driver.
->
-> Multiple virtual SCMI instances are being used to achieve the parallelism.
-> SCMI platform stack runs in SMP enabled VM hence allows platform to service
-> multiple resource requests in parallel. Each device is assigned its own
-> dedicated SCMI channel and Tx/Rx doorbells.
->
-> Resource operations are grouped together to achieve better abstraction
-> and to reduce the number of requests being sent to SCMI platform(server)
-> thus improving boot time KPIs. This design approach was presented during
-> LinaroConnect 2024 conference[1].
->
-> Architecture:
-> ------------
->                                                           +--------------------+
->                                                           |   Shared Memory    |
->                                                           |                    |
->                                                           | +----------------+ |                +----------------------------------+
->      +----------------------------+                     +-+->  ufs-shmem     <-+---+            |            Linux VM              |
->      |        Firmware VM         |                     | | +----------------+ |   |            |   +----------+   +----------+    |
->      |                            |                     | |                    |   |            |   |   UFS    |   |   PCIe   |    |
->      | +---------+ f +----------+ |                     | |                    |   |            |   |  Driver  |   |  Driver  |    |
->      | |Drivers  <---+  SCMI    | |        e            | |         |          |   |            |   +--+----^--+   +----------+    |
->      | | (clks,  | g | Server   +-+---------------------+ |                    |   |            |      |    |                      |
->      | |  vreg,  +--->          | |        h              |         |          |  b|k           |     a|   l|                      |
->      | |  gpio,  |   +--^-----+-+ |                       |                    |   |            |      |    |                      |
->      | |  phy,   |      |     |   |                       |         |          |   |            |  +---v----+----+  +----------+   |
->      | |  etc.)  |      |     |   |                       |                    |   +------------+--+  UFS SCMI   |  | PCIe SCMI|   |
->      | +---------+      |     |   |                       |                    |                |  |  INSTANCE   |  | INSTANCE |   |
->      |                  |     |   |                       |  +---------------+ |                |  +-^-----+-----+  +----------+   |
->      |                  |     |   |                       |  |  pcie-shmem   | |                |    |     |                       |
->      +------------------+-----+---+                       |  +---------------+ |                +----+-----+-----------------------+
->                         |     |                           |                    |                     |     |
->                         |     |                           +--------------------+                     |     |
->                        d|IRQ i|HVC                                                                  j|IRQ c|HVC
->                         |     |                                                                      |     |
->                         |     |                                                                      |     |
-> +-----------------------+-----v----------------------------------------------------------------------+-----v------------------------------+
-> |                                                                                                                                         |
-> |                                                                                                                                         |
-> |                                                                                                                                         |
-> |                                                               HYPERVISOR                                                                |
-> |                                                                                                                                         |
-> |                                                                                                                                         |
-> +-----------------------------------------------------------------------------------------------------------------------------------------+
->
->         +--------+   +--------+                                                                         +----------+  +-----------+
->         | CLOCK  |   |  PHY   |                                                                         |   UFS    |  |   PCIe    |
->         +--------+   +--------+                                                                         +----------+  +-----------+
->
->
-> This series is based on next-20240903.
->
-> [1]: https://resources.linaro.org/en/resource/wfnfEwBhRjLV1PEAJoDDte
->
-> ---
-> Changes in v2:
->   - Patch 1/21 - 11/21
->     - Added Reviewed-by tag
->
->   - Patch 12/21
->     - Already applied in the maintainers tree
->
->   - Patch 13/21
->     - Modified subject line
->     - Fixed schema to include fallback
->
->   - Patch 14/21
->     - Added constraints
->
->   - Patch 15/21
->     - Modified schema to remove useless text
->    
->   - Patch 16/21
->     - Modified schema formatting
->     - Amended schema definition as advised
->
->   - Patch 17/21
->     - Moved allOf block after required
->     - Fixed formatting
->     - Modified schema to remove useless text
->
->   - Patch 18/21
->     - Fixed clock property changes
->
->   - Patch 19/21
->     - Fixed scmi nodename pattern
->
->   - Patch 20/21
->     - Modified subject line and description
->     - Added EPPI macro
->
->   - Patch 21/21
->     - Removed scmichannels label and alias
->     - Modified scmi node name to conform to schema
->     - Moved status property to be the last one in scmi instances
->     - Changed to lower case for cpu labels
->     - Added fallback compatible for tlmm node
->
-> Nikunj Kela (21):
->   dt-bindings: arm: qcom: add the SoC ID for SA8255P
->   soc: qcom: socinfo: add support for SA8255P
->   dt-bindings: arm: qcom: add SA8255p Ride board
->   dt-bindings: firmware: qcom,scm: document support for SA8255p
->   dt-bindings: mailbox: qcom-ipcc: document the support for SA8255p
->   dt-bindings: watchdog: qcom-wdt: document support on SA8255p
->   dt-bindings: crypto: qcom,prng: document support for SA8255p
->   dt-bindings: interrupt-controller: qcom-pdc: document support for
->     SA8255p
->   dt-bindings: soc: qcom: aoss-qmp: document support for SA8255p
->   dt-bindings: arm-smmu: document the support on SA8255p
->   dt-bindings: mfd: qcom,tcsr: document support for SA8255p
->   dt-bindings: thermal: tsens: document support on SA8255p
->   dt-bindings: pinctrl: Add SA8255p TLMM
->   dt-bindings: cpufreq: qcom-hw: document support for SA8255p
->   dt-bindings: i2c: document support for SA8255p
->   dt-bindings: spi: document support for SA8255p
->   dt-bindings: serial: document support for SA8255p
->   dt-bindings: qcom: geni-se: document support for SA8255P
->   dt-bindings: firmware: arm,scmi: allow multiple virtual instances
->   dt-bindings: arm: GIC: add ESPI and EPPI specifiers
->   arm64: dts: qcom: Add reduced functional DT for SA8255p Ride platform
->
->  .../devicetree/bindings/arm/qcom.yaml         |    6 +
->  .../bindings/cpufreq/cpufreq-qcom-hw.yaml     |   16 +
->  .../devicetree/bindings/crypto/qcom,prng.yaml |    1 +
->  .../bindings/firmware/arm,scmi.yaml           |    2 +-
->  .../bindings/firmware/qcom,scm.yaml           |    2 +
->  .../bindings/i2c/qcom,i2c-geni-qcom.yaml      |   33 +-
->  .../interrupt-controller/qcom,pdc.yaml        |    1 +
->  .../devicetree/bindings/iommu/arm,smmu.yaml   |    3 +
->  .../bindings/mailbox/qcom-ipcc.yaml           |    1 +
->  .../devicetree/bindings/mfd/qcom,tcsr.yaml    |    1 +
->  .../bindings/pinctrl/qcom,sa8775p-tlmm.yaml   |    8 +-
->  .../serial/qcom,serial-geni-qcom.yaml         |   53 +-
->  .../bindings/soc/qcom/qcom,aoss-qmp.yaml      |    1 +
->  .../bindings/soc/qcom/qcom,geni-se.yaml       |   45 +-
->  .../bindings/spi/qcom,spi-geni-qcom.yaml      |   60 +-
->  .../bindings/thermal/qcom-tsens.yaml          |    1 +
->  .../bindings/watchdog/qcom-wdt.yaml           |    1 +
->  arch/arm64/boot/dts/qcom/Makefile             |    1 +
->  arch/arm64/boot/dts/qcom/sa8255p-pmics.dtsi   |   80 +
->  arch/arm64/boot/dts/qcom/sa8255p-ride.dts     |  148 +
->  arch/arm64/boot/dts/qcom/sa8255p-scmi.dtsi    | 2312 ++++++++++++++++
->  arch/arm64/boot/dts/qcom/sa8255p.dtsi         | 2405 +++++++++++++++++
->  drivers/soc/qcom/socinfo.c                    |    1 +
->  include/dt-bindings/arm/qcom,ids.h            |    1 +
->  .../interrupt-controller/arm-gic.h            |    2 +
->  25 files changed, 5169 insertions(+), 16 deletions(-)
->  create mode 100644 arch/arm64/boot/dts/qcom/sa8255p-pmics.dtsi
->  create mode 100644 arch/arm64/boot/dts/qcom/sa8255p-ride.dts
->  create mode 100644 arch/arm64/boot/dts/qcom/sa8255p-scmi.dtsi
->  create mode 100644 arch/arm64/boot/dts/qcom/sa8255p.dtsi
->
->
-> base-commit: 6804f0edbe7747774e6ae60f20cec4ee3ad7c187
+v/r,
+dps
