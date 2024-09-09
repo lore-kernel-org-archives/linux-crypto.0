@@ -1,170 +1,77 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 091E01B14F4;
-	Mon,  9 Sep 2024 09:32:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6778C1B373B;
+	Mon,  9 Sep 2024 09:50:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725874374; cv=none; b=nmnlWw/NyoEufU2GWx0l5dbs6Z8fv/iIWUAiKkTvybjt8C/ys+XpJOl+WTuU4Rp+ILGoU7rw05dIE+odnquvfGg8apym+8dDtqgTq84nQ0geaNZ+PPMf4mDri9KfqSB3BfmUZHf/VC0PqIdV2MY6isZoXePUlWr0S73wRAKBtjc=
+	t=1725875408; cv=none; b=B1Xj+Uxeb/tvEkF0dfUS3hvESCIkPJDWOzGa7Q7xmmhFS3mYYanxl2zQiu1pVjizOy5uGsMNdmxxpQzVO6TWy7xY0ZL8byIosu1y1BJU1McYmJ2CZ5LEMHAU3/A8AhVNpc9eyuOzgdXXdq705Y4e5rL4UCXPfZ9kzHoTYBIiraE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725874374; c=relaxed/simple;
-	bh=buGd5xwNZloPD1F8N4Pqy2xO596COTWRko3aIJToFV4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=d087Q9mv3Y/141SyGtKLJ276bmBA8XCL88GG30rBvyt96BgEUQTxBmC/EyFSKBW7hIILsVOuqOVq4ttIRkKIqFfDMbX5oVZSHLLOTFkLB8AtdZ9RSVx1Ef1v/xMEDLz+rEAH83+wXVD0B5eMN8NqIswvcDUFQAJncUcc2DBSpVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=f12KhoeI; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1725875408; c=relaxed/simple;
+	bh=YNEEoZK0F87nnuxlA8ZOVCpm884g6LkdLyjxpguwzQ8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Z2ZJCYOmD6OfofwX5ZKOUw0rop0BtCpwmVR6KeoT3VsilpCCMUGU/rpPE3hulFEj8hJ9lSEW/WfJmdcbNErtXCc3UVPtsVrsdKD++aRdQPJsj7GbKOgfAo1OdqPVreprDYYzxINUCrhn12tQ9fjup73k/tV6Kx9J7LE8pIxTTTo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=CDmhO7aB; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="f12KhoeI"
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4899JvFX013790;
-	Mon, 9 Sep 2024 09:27:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	OQsyerOaepdV1mglSrbYRyv0cQwILL/OXjdz38mwZEg=; b=f12KhoeIBR+sxn2f
-	/mB+hOPGKr5lhqdCoBdq2a65ibP2/8Zah9yPT/vwSS6G0vg8C6/P0XlR1emB5Kbq
-	lbJYOn4qWwhe5EVSYfvjl0VIF5I2j5a1lxb6CnZqSFPpRgI74jH56P8WYbIOLhi1
-	q0bK0HtvfVkcxYrxTDMeWmpUQpn9YD5gOduiFlFRvgueA9tFAtNdjw+icv0oCcJx
-	+TwJ5BzuxeRjCG8TM/qdYuW9GqyQcphfvfiQqHJCJteRFjlZKvJm70dsKXGXxLgH
-	41wh5Z9kMlYHby68j0AT2RXmzEAQL++UAotSawu5p1mFA4nXKbRx1TlG0Tqd9K+u
-	gNHlTA==
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 41gy5njc3d-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 09 Sep 2024 09:27:40 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4899Rd3B001195
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 9 Sep 2024 09:27:39 GMT
-Received: from hu-mdalam-blr.qualcomm.com (10.80.80.8) by
- nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Mon, 9 Sep 2024 02:27:34 -0700
-From: Md Sadre Alam <quic_mdalam@quicinc.com>
-To: <thara.gopinath@gmail.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>, <vkoul@kernel.org>, <kees@kernel.org>,
-        <robin.murphy@arm.com>, <fenghua.yu@intel.com>, <av2082000@gmail.com>,
-        <u.kleine-koenig@pengutronix.d>, <linux-crypto@vger.kernel.org>,
-        <linux-arm-msm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <dmaengine@vger.kernel.org>, <quic_varada@quicinc.com>,
-        <quic_srichara@quicinc.com>
-CC: <quic_mdalam@quicinc.com>
-Subject: [PATCH v4 06/11] crypto: qce - Convert register r/w for sha via BAM/DMA
-Date: Mon, 9 Sep 2024 14:56:27 +0530
-Message-ID: <20240909092632.2776160-7-quic_mdalam@quicinc.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240909092632.2776160-1-quic_mdalam@quicinc.com>
-References: <20240909092632.2776160-1-quic_mdalam@quicinc.com>
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="CDmhO7aB"
+Received: by mail.gandi.net (Postfix) with ESMTPSA id BC657E0009;
+	Mon,  9 Sep 2024 09:50:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1725875403;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+n6jIuUoupEYC9it7jynGsfYtTffkj9K1qGvau67Xdk=;
+	b=CDmhO7aBGHlWdZiCpFPQW01csa4AVN722IUzlJyMVnxEH6+cWYz86FQ8OxAiz2420sGBW8
+	n4mM+Xeiq3XWkr26A66LjKTVKEUcOwxxzuN8fGsnQz+MqezxXXmz8FbHupp2jM5wyNTII+
+	3/91pxDCRwhqKtCdAH7UM0lrmRZqVlt6K8TzvIooik6D1oYcZ1zX5et1JOwT+nQJm6Sr0O
+	ftBYMd31fOBewjDuxkkM8qGAf9Y06pe0J0ErzX7ejhx+ytUd7NOMW8PgcUl1M1pLMJnA/s
+	PTf2WOuAATZlWj1jXZgZy4p/5p8WR6R3Z9x84E9Svbgp4FU5N3qoihxdVLR7wQ==
+Date: Mon, 9 Sep 2024 11:50:01 +0200
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Uros Bizjak <ubizjak@gmail.com>
+Cc: x86@kernel.org, linux-crypto@vger.kernel.org,
+ intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+ linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
+ linux-fscrypt@vger.kernel.org, linux-scsi@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ kunit-dev@googlegroups.com, linux-kernel@vger.kernel.org, Richard
+ Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>
+Subject: Re: [PATCH RESEND v2 06/19] mtd: tests: Include <linux/prandom.h>
+ instead of <linux/random.h>
+Message-ID: <20240909115001.2b05a5ce@xps-13>
+In-Reply-To: <20240909075641.258968-7-ubizjak@gmail.com>
+References: <20240909075641.258968-1-ubizjak@gmail.com>
+	<20240909075641.258968-7-ubizjak@gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: _REYzLiVFofkIzyz4lB-lZdAzpjrP8oj
-X-Proofpoint-ORIG-GUID: _REYzLiVFofkIzyz4lB-lZdAzpjrP8oj
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
- mlxlogscore=999 bulkscore=0 clxscore=1015 impostorscore=0 phishscore=0
- spamscore=0 malwarescore=0 suspectscore=0 adultscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2408220000
- definitions=main-2409090074
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: miquel.raynal@bootlin.com
 
-Convert register read/write for sha via BAM/DMA.
-with this change all the crypto register configuration
-will be done via BAM/DMA. This change will prepare command
-descriptor for all register and write it once.
+Hi Uros,
 
-Signed-off-by: Md Sadre Alam <quic_mdalam@quicinc.com>
----
+ubizjak@gmail.com wrote on Mon,  9 Sep 2024 09:53:49 +0200:
 
-Change in [v4]
+> Substitute the inclusion of <linux/random.h> header with
+> <linux/prandom.h> to allow the removal of legacy inclusion
+> of <linux/prandom.h> from <linux/random.h>.
 
-* No change 
- 
-Change in [v3]
+Acked-by: Miquel Raynal <miquel.raynal@bootlin.com>
 
-* No change
+>=20
+> Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
+> Cc: Miquel Raynal <miquel.raynal@bootlin.com>
+> Cc: Richard Weinberger <richard@nod.at>
+> Cc: Vignesh Raghavendra <vigneshr@ti.com>
 
-Change in [v2]
-
-* Added initial support to read/write crypto
-  register via BAM for SHA
-
-Change in [v1]
-
-* This patch was not included in [v1]
-
- drivers/crypto/qce/common.c | 26 +++++++++++++++++---------
- 1 file changed, 17 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/crypto/qce/common.c b/drivers/crypto/qce/common.c
-index d1da6b1938f3..d485762a3fdc 100644
---- a/drivers/crypto/qce/common.c
-+++ b/drivers/crypto/qce/common.c
-@@ -157,17 +157,19 @@ static int qce_setup_regs_ahash(struct crypto_async_request *async_req)
- 	__be32 mackey[QCE_SHA_HMAC_KEY_SIZE / sizeof(__be32)] = {0};
- 	u32 auth_cfg = 0, config;
- 	unsigned int iv_words;
-+	int ret;
- 
- 	/* if not the last, the size has to be on the block boundary */
- 	if (!rctx->last_blk && req->nbytes % blocksize)
- 		return -EINVAL;
- 
-+	qce_clear_bam_transaction(qce);
- 	qce_setup_config(qce);
- 
- 	if (IS_CMAC(rctx->flags)) {
--		qce_write(qce, REG_AUTH_SEG_CFG, 0);
--		qce_write(qce, REG_ENCR_SEG_CFG, 0);
--		qce_write(qce, REG_ENCR_SEG_SIZE, 0);
-+		qce_write_reg_dma(qce, REG_AUTH_SEG_CFG, 0, 1);
-+		qce_write_reg_dma(qce, REG_ENCR_SEG_CFG, 0, 1);
-+		qce_write_reg_dma(qce, REG_ENCR_SEG_SIZE, 0, 1);
- 		qce_clear_array(qce, REG_AUTH_IV0, 16);
- 		qce_clear_array(qce, REG_AUTH_KEY0, 16);
- 		qce_clear_array(qce, REG_AUTH_BYTECNT0, 4);
-@@ -213,18 +215,24 @@ static int qce_setup_regs_ahash(struct crypto_async_request *async_req)
- 		auth_cfg &= ~BIT(AUTH_FIRST_SHIFT);
- 
- go_proc:
--	qce_write(qce, REG_AUTH_SEG_CFG, auth_cfg);
--	qce_write(qce, REG_AUTH_SEG_SIZE, req->nbytes);
--	qce_write(qce, REG_AUTH_SEG_START, 0);
--	qce_write(qce, REG_ENCR_SEG_CFG, 0);
--	qce_write(qce, REG_SEG_SIZE, req->nbytes);
-+	qce_write_reg_dma(qce, REG_AUTH_SEG_CFG, auth_cfg, 1);
-+	qce_write_reg_dma(qce, REG_AUTH_SEG_SIZE, req->nbytes, 1);
-+	qce_write_reg_dma(qce, REG_AUTH_SEG_START, 0, 1);
-+	qce_write_reg_dma(qce, REG_ENCR_SEG_CFG, 0, 1);
-+	qce_write_reg_dma(qce, REG_SEG_SIZE, req->nbytes, 1);
- 
- 	/* get little endianness */
- 	config = qce_config_reg(qce, 1);
--	qce_write(qce, REG_CONFIG, config);
-+	qce_write_reg_dma(qce, REG_CONFIG, config, 1);
- 
- 	qce_crypto_go(qce, true);
- 
-+	ret = qce_submit_cmd_desc(qce, 0);
-+	if (ret) {
-+		dev_err(qce->dev, "Error in sha cmd descriptor\n");
-+		return ret;
-+	}
-+
- 	return 0;
- }
- #endif
--- 
-2.34.1
-
+Miqu=C3=A8l
