@@ -1,80 +1,57 @@
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 839011B9B26;
-	Mon,  9 Sep 2024 07:57:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC4D41B253B;
+	Mon,  9 Sep 2024 09:27:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725868639; cv=none; b=DnGFwXzlEx07xYz1rGT2uuYkIdSw7ZtTFlRJAntp4W8ZEE0NWiMV406ql90hmpWjz/6DTD5VPWJcdJDISK2WVp/OgBRUBsQl1XyurJ3psFOWufyMWlJvzKwKcMr3CJiESqcjiRaDE9JCLT0otznhx5qZiLZF6SQA0XFVzftNs/I=
+	t=1725874042; cv=none; b=KGex9dvp4RME+ntObldiUHqd6S72rI2bah58MIFTqgFk8JRIpwQQm9DIDPazJn6KyxmCIhufbax9LWlWiuGaKWnBVy9IPTBx21CMWdlTouSdyKRPuM1v8RGrW9+lh8liz63tghRXlbhBXntfRaEwmSeldOgqrp4McvPuHiK2FGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725868639; c=relaxed/simple;
-	bh=3uUcilVnojt4+ddh4TttNjspH/Ah42tEMA3oIXy4hyM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GZnCTGPigUydlVbEnx3rDq48h7yEVGVGRVU1szDeN1H1dEEwyBR118BTfxba0Bz9D7rReISK/7+sp8s+9NZng4hsRh9NWimjmwYmrumzh55+NT4O6QwWMARIqVAobfUdjR9FlHrgS3XPyEstC+bL4LLYldXHsOhSlFWGt0wxCGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K5TSn1Zu; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1725874042; c=relaxed/simple;
+	bh=yDoPmLCnCybyZ7A3gv5Lv3MJrFtkoX2IzAFJpJ2kHbE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nqGUhAVd9rbLlBLN0uoTjkBk6aZljncy2XpVgyhKhfhU32lrazZ6d/yAMSZ12G/wWf5cc5tn1812XJ36dHxROb0mQmDIAxjCh0H0XLtCDLAvEZ+7er3NGfVO38mfg7PDddG1ZnWpd0Dl6aOOVMnYSVzcd9ZNHmoZXXNbwbbfd5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=P39saU1m; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K5TSn1Zu"
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-374c1e5fe79so2605856f8f.1;
-        Mon, 09 Sep 2024 00:57:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725868636; x=1726473436; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=diK2vfMDlJNUyXW9lcHoHKMejPsgQZ2jk7i/6JqtmLQ=;
-        b=K5TSn1Zu9wSHyg22vRIUBJRFZE0+nW0Fx61sQgywJSYKXXLa24rlxyssEtJDaq1Mkz
-         N26Q+luc+IVHFIj1bRTkUUTHI/zFHRIqKaNalJUWYm5xcWqiKgDxb7xpeCefYsPul2n8
-         Bba6XMUX3g6obJ4S6/rElfdPZ+IsIG/w4z546vGJYNC1UuTFPjFeOniceUmzwIlWHyn0
-         0UynNYF3onJH3dpO2ZQdHi9JXqT77KzrZZqDC1ZZpeOheJV1Ztx5whzaeu+muKUMi6+K
-         x2IESbG4MFYSNwCWX4H4eAiYUiEkL8Pgl2toMjS//8s6VoRpFy4gWv0u5afnOO57z5qZ
-         mS3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725868636; x=1726473436;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=diK2vfMDlJNUyXW9lcHoHKMejPsgQZ2jk7i/6JqtmLQ=;
-        b=KvN7UiVsuoDXFVMMFR0eAgWOL8sUMfAwB9i7rNsSVMH8At2ycZfkGfgm2wOrb524Qk
-         JAPL8SYV7t64eRoWTBdwkehIzwuT8UFB853rmtQV2Fle56ou39YB7YGyOkXNCZiHpE6U
-         XCUzMAd9L/PQFH29eKSjuQvtIsoxPYKkrU/Qs/9eVRkfquPBAd8G4tNid2RGb+0vrOwe
-         zOt4n6uUOBVICspaQ+xHJq6hf7+EGBt5r7bvNsIIuXwx7sM9U2r4qJYqRUV1gRlahAjq
-         Exn0V/IcPO2L37GvQzjIbtEOIQ3zqrP+EHh5Imzb7cm9M/G+Cqcaw2/4/uGq/dcpPwvu
-         Hqhg==
-X-Forwarded-Encrypted: i=1; AJvYcCUPihdABBPFC/HaFqR4d01GlhVltIRcBfm6i2dtniSdD78m8iRYFWneq3g9MY8QZ+xCK1g=@vger.kernel.org, AJvYcCUvTkDJruDZ3Se60ORLIIgoBHHujuO6Q73h3CtRwrrgmwp16rnWn8TvbZmBexBvZp/84miLoZU+8rJP1A==@vger.kernel.org, AJvYcCV9F9AhS26NOhp0NpVtem4LWt9QFBH0+OYw4uENk9wC+WhSRR0IRphSjcJ2PjH5A5IicHZTFdHr0+4KbvaP4A==@vger.kernel.org, AJvYcCVHEyMdwXE7mDQdt7rS2YHME1Po+fspeZxn0zAU55krw17T+A/pSchs8lf/IcPN2XEkJ1QnJp1JH5XsSeg=@vger.kernel.org, AJvYcCWTencOdfl0NdzDRpMzknC25N7dB+ykjoSrVrXzAUE99VCYIooRlRAd6dgT0zdPSTWQLnDlZekypol0+mMN@vger.kernel.org, AJvYcCWZk3H3YFLZRSEwu9zZvdfXlKmo5aKycb9ngyuxZHSJa7CcDKb3YIoADOo5gHp8hPPQBAXbHgi7fK3sL8Jp@vger.kernel.org, AJvYcCWd9V4BtsAVh9z+dTYYRmfQFfZL6MFZx+YyuO92lknnWoGZBToXDg+bHLBmapEdoxtENkjVRfUnorr1/y5ubb6G@vger.kernel.org
-X-Gm-Message-State: AOJu0YyuppX+HNfvgcQNBrPy83ADsTztYvuR66OzzhMDNd6tW6WtbcnA
-	ZNRCHmuu8Bp+kJ00GF1wkEwSkCfclKeBdqXddY9Pl6hK6zE7EEId
-X-Google-Smtp-Source: AGHT+IFme0X5nXLgn/ucuf8q8ansjRE1zBSf1qUsO6JYCVp2iHcyiqIaQ+1W/AW6ZFOhV/STuqOK5w==
-X-Received: by 2002:adf:fe84:0:b0:371:8e3c:59 with SMTP id ffacd0b85a97d-378895c2578mr7417099f8f.5.1725868635798;
-        Mon, 09 Sep 2024 00:57:15 -0700 (PDT)
-Received: from fedora.iskraemeco.si ([193.77.86.250])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37895675b7esm5303001f8f.50.2024.09.09.00.57.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Sep 2024 00:57:15 -0700 (PDT)
-From: Uros Bizjak <ubizjak@gmail.com>
-To: x86@kernel.org,
-	linux-crypto@vger.kernel.org,
-	intel-gfx@lists.freedesktop.org,
-	dri-devel@lists.freedesktop.org,
-	linux-media@vger.kernel.org,
-	linux-mtd@lists.infradead.org,
-	linux-fscrypt@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	bpf@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	kunit-dev@googlegroups.com,
-	linux-kernel@vger.kernel.org
-Cc: Uros Bizjak <ubizjak@gmail.com>,
-	"Theodore Ts'o" <tytso@mit.edu>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Kent Overstreet <kent.overstreet@linux.dev>
-Subject: [PATCH RESEND v2 19/19] prandom: Include <linux/percpu.h> in <linux/prandom.h>
-Date: Mon,  9 Sep 2024 09:54:02 +0200
-Message-ID: <20240909075641.258968-20-ubizjak@gmail.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20240909075641.258968-1-ubizjak@gmail.com>
-References: <20240909075641.258968-1-ubizjak@gmail.com>
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="P39saU1m"
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4899Jp5e029465;
+	Mon, 9 Sep 2024 09:27:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=qCCinfRtNM54jw0zl8XhWZ
+	ZM1vgdqqVxKRZXgWHxe6A=; b=P39saU1mHXsbexsjwJr+rWKCMcLPlN9kiTFh52
+	m557wowH16x1obrvTYYYXptcPw7rrdyTcieN26SmWZXJywtAUutI+V6MUcevoGlb
+	80PTzLKwo3l+2NxRNcY6Qr3YnJpVQvhpXg5b0WPwckGZbZO5Q4U84MYn993uQ33R
+	/ytwv1Ljs2I7kB3l9YXp+xsQxv5gTL11ZZ5fbEXL4JH0ihzQDms3T7qwpfrvMr7y
+	emf5m5GZ9pr2oEqPKI6EK02ZDWCIY/FaLAl50fwC/DS+0eBIVskSlbwMGbVZ6q5d
+	GLfPJTD/cG7A/kcXxGS0VxX9BL5NZJGCECrY/v3M7CYJMLFQ==
+Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 41gybpjbe0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 09 Sep 2024 09:27:10 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4899R9g2002701
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 9 Sep 2024 09:27:10 GMT
+Received: from hu-mdalam-blr.qualcomm.com (10.80.80.8) by
+ nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Mon, 9 Sep 2024 02:27:04 -0700
+From: Md Sadre Alam <quic_mdalam@quicinc.com>
+To: <thara.gopinath@gmail.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>, <vkoul@kernel.org>, <kees@kernel.org>,
+        <robin.murphy@arm.com>, <fenghua.yu@intel.com>, <av2082000@gmail.com>,
+        <u.kleine-koenig@pengutronix.d>, <linux-crypto@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <dmaengine@vger.kernel.org>, <quic_varada@quicinc.com>,
+        <quic_srichara@quicinc.com>
+CC: <quic_mdalam@quicinc.com>
+Subject: [PATCH v4 00/11] dmaengine: qcom: bam_dma: add cmd descriptor support
+Date: Mon, 9 Sep 2024 14:56:21 +0530
+Message-ID: <20240909092632.2776160-1-quic_mdalam@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -82,47 +59,177 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: DTp1EuqobhqAe_07Gx8USIunGAUM-k7J
+X-Proofpoint-GUID: DTp1EuqobhqAe_07Gx8USIunGAUM-k7J
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 spamscore=0 adultscore=0
+ lowpriorityscore=0 mlxlogscore=999 clxscore=1011 bulkscore=0
+ impostorscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2408220000 definitions=main-2409090074
 
-<linux/percpu.h> include was removed from <linux/prandom.h>
-in d9f29deb7fe8 ("prandom: Remove unused include") because
-this inclusion broke arm64 due to a circular dependency
-on include files.
+Requirements:
+  In QCE crypto driver we are accessing the crypto engine registers 
+  directly via CPU read/write. Trust Zone could possibly to perform some
+  crypto operations simultaneously, a race condition will be created and
+  this could result in undefined behavior.
 
-__percpu tag is defined in include/linux/compiler_types.h, so there
-is currently no direct need for the inclusion of <linux/percpu.h>.
-However, in [1] we would like to repurpose __percpu tag as a named
-address space qualifier, where __percpu macro uses defines from
-<linux/percpu.h>.
+  To avoid this behavior we need to use BAM HW LOCK/UNLOCK feature on BAM 
+  pipes, and this LOCK/UNLOCK will be set via sending a command descriptor,
+  where the HLOS/TZ QCE crypto driver prepares a command descriptor with a
+  dummy write operation on one of the QCE crypto engine register and pass
+  the LOCK/UNLOCK flag along with it.
 
-The circular dependency was removed in xxxxxxxxxxxx ("random: Do not
-include <linux/prandom.h> in <linux/random.h>") and it cleared
-the path for the inclusion of <linux/percpu.h> in <linux/prandom.h>.
+  This feature tested with tcrypt.ko and "libkcapi" with all the AES 
+  algorithm supported by QCE crypto engine. Tested on IPQ9574 and 
+  qcm6490.LE chipset.
 
-This patch is basically a revert of d9f29deb7fe8
-("prandom: Remove unused include").
+  insmod tcrypt.ko mode=101
+  insmod tcrypt.ko mode=102
+  insmod tcrypt.ko mode=155
+  insmod tcrypt.ko mode=180
+  insmod tcrypt.ko mode=181
+  insmod tcrypt.ko mode=182
+  insmod tcrypt.ko mode=185
+  insmod tcrypt.ko mode=186
+  insmod tcrypt.ko mode=212
+  insmod tcrypt.ko mode=216
+  insmod tcrypt.ko mode=403
+  insmod tcrypt.ko mode=404
+  insmod tcrypt.ko mode=500
+  insmod tcrypt.ko mode=501
+  insmod tcrypt.ko mode=502
+  insmod tcrypt.ko mode=600
+  insmod tcrypt.ko mode=601
+  insmod tcrypt.ko mode=602
 
-[1] https://lore.kernel.org/lkml/20240812115945.484051-4-ubizjak@gmail.com/
+  Encryption command line:
+ ./kcapi -x 1 -e -c "cbc(aes)" -k
+ 8d7dd9b0170ce0b5f2f8e1aa768e01e91da8bfc67fd486d081b28254c99eb423 -i
+ 7fbc02ebf5b93322329df9bfccb635af -p 48981da18e4bb9ef7e2e3162d16b1910
+ * 8b19050f66582cb7f7e4b6c873819b71
+ *
+ Decryption command line:
+ * $ ./kcapi -x 1 -c "cbc(aes)" -k
+ 3023b2418ea59a841757dcf07881b3a8def1c97b659a4dad -i
+ 95aa5b68130be6fcf5cabe7d9f898a41 -q c313c6b50145b69a77b33404cb422598
+ * 836de0065f9d6f6a3dd2c53cd17e33a
 
-Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
-Cc: "Theodore Ts'o" <tytso@mit.edu>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: Kent Overstreet <kent.overstreet@linux.dev>
----
- include/linux/prandom.h | 1 +
- 1 file changed, 1 insertion(+)
+ * $ ./kcapi -x 3 -c sha256 -p 38f86d
+ * cc42f645c5aa76ac3154b023359b665375fc3ae42f025fe961fb0f65205ad70e
+ * $ ./kcapi -x 3 -c sha256 -p bbb300ac5eda9d
+ * 61f7b48577a613fbdfe0d6d90b49985e07a42c99e7a439b6efb76d5ec71b3d30
 
-diff --git a/include/linux/prandom.h b/include/linux/prandom.h
-index f7f1e5251c67..f2ed5b72b3d6 100644
---- a/include/linux/prandom.h
-+++ b/include/linux/prandom.h
-@@ -10,6 +10,7 @@
- 
- #include <linux/types.h>
- #include <linux/once.h>
-+#include <linux/percpu.h>
- #include <linux/random.h>
- 
- struct rnd_state {
+ ./kcapi -x 12 -c "hmac(sha256)" -k
+ 0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b -i
+ 000102030405060708090a0b0c -p f0f1f2f3f4f5f6f7f8f9 -b 42
+ *
+ 3cb25f25faacd57a90434f64d0362f2a2d2d0a90cf1a5a4c5db02d56ecc4c5bf3400720
+ 8d5b887185865
+
+ Paraller test with two different EE's (Execution Environment)
+
+ EE1 (Trust Zone)                          EE2 (HLOS)
+
+ There is a TZ application which    "libkcapi" or "tcrypt.ko" will run in 
+ will do continuous enc/dec with     continuous loop to do enc/dec with 
+ different AES algorithm supported   different algorithm supported QCE
+ by QCE crypto engine.     	     crypto engine. 
+
+1) dummy write with LOCK bit set    1) dummy write with LOCK bit set                        
+2) bam will lock all other pipes    2) bam will lock all other pipes which
+   which not belongs to current	       not belongs to current EE's, i.e tz 
+   EE's, i.e HLOS pipe and keep        pipe and keep handling current
+   handling current pipe only.         pipe only. 
+                                    3) hlos prepare data descriptor and               
+3) tz prepare data descriptor          submit to CE5
+   and submit to CE5                4) dummy write with UNLOCK bit set
+4) dummy write with UNLOCK bit      5) bam will release all the locked 
+   set                                 pipes
+5) bam will release all the locked
+   pipes                   
+
+ Upon encountering a descriptor with Lock bit set, the BAM will lock all
+ other pipes not related to the current pipe group, and keep handling the 
+ current pipe only until it sees the Un-Lock set (then it will release all
+ locked pipes). The actual locking is done on the new descriptor fetching
+ for publishing, i.e. locked pipe will not fetch new descriptors even if 
+ it got event/events adding more descriptors for this pipe.
+
+
+v4:
+  * Added feature description and test hardware
+    with test command
+  * Fixed patch version numbering
+  * Dropped dt-binding patch
+  * Dropped device tree changes
+  * Added BAM_SW_VERSION register read
+  * Handled the error path for the api dma_map_resource()
+    in probe
+  * updated the commit messages for batter redability
+  * Squash the change where qce_bam_acquire_lock() and
+    qce_bam_release_lock() api got introduce to the change where
+    the lock/unlock flag get introced
+  * changed cover letter subject heading to
+    "dmaengine: qcom: bam_dma: add cmd descriptor support"
+  * Added the very initial post for BAM lock/unlock patch link
+    as v1 to track this feature
+
+v3:
+  * https://lore.kernel.org/lkml/183d4f5e-e00a-8ef6-a589-f5704bc83d4a@quicinc.com/
+  * Addressed all the comments from v2
+  * Added the dt-binding
+  * Fix alignment issue
+  * Removed type casting from qce_write_reg_dma()
+    and qce_read_reg_dma()
+  * Removed qce_bam_txn = dma->qce_bam_txn; line from
+    qce_alloc_bam_txn() api and directly returning
+    dma->qce_bam_txn
+
+v2:
+  * https://lore.kernel.org/lkml/20231214114239.2635325-1-quic_mdalam@quicinc.com/
+  * Initial set of patches for cmd descriptor support
+  * Add client driver to use BAM lock/unlock feature
+  * Added register read/write via BAM in QCE Crypto driver
+    to use BAM lock/unlock feature
+
+v1:
+  * https://lore.kernel.org/all/1608215842-15381-1-git-send-email-mdalam@codeaurora.org/
+  * Initial support for LOCK/UNLOCK in bam_dma driver
+
+
+Md Sadre Alam (11):
+  dmaengine: qcom: bam_dma: Add bam_sw_version register read
+  dmaengine: qcom: bam_dma: add LOCK & UNLOCK flag support
+  crypto: qce - Add support for crypto address read
+  crypto: qce - Add bam dma support for crypto register r/w
+  crypto: qce - Convert register r/w for skcipher via BAM/DMA
+  crypto: qce - Convert register r/w for sha via BAM/DMA
+  crypto: qce - Convert register r/w for aead via BAM/DMA
+  crypto: qce - Add LOCK and UNLOCK flag support
+  crypto: qce - Add support for lock/unlock in skcipher
+  crypto: qce - Add support for lock/unlock in sha
+  crypto: qce - Add support for lock/unlock in aead
+
+ drivers/crypto/qce/aead.c     |   4 +
+ drivers/crypto/qce/common.c   | 141 +++++++++++++++------
+ drivers/crypto/qce/core.c     |  14 +-
+ drivers/crypto/qce/core.h     |  12 ++
+ drivers/crypto/qce/dma.c      | 232 ++++++++++++++++++++++++++++++++++
+ drivers/crypto/qce/dma.h      |  26 +++-
+ drivers/crypto/qce/sha.c      |   4 +
+ drivers/crypto/qce/skcipher.c |   4 +
+ drivers/dma/qcom/bam_dma.c    |  33 ++++-
+ include/linux/dmaengine.h     |   6 +
+ 10 files changed, 431 insertions(+), 45 deletions(-)
+
 -- 
-2.46.0
+2.34.1
 
