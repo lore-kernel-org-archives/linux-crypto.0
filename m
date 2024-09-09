@@ -1,59 +1,37 @@
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16CE71B3F29
-	for <linux-crypto@vger.kernel.org>; Mon,  9 Sep 2024 13:02:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7096842AAB;
+	Mon,  9 Sep 2024 15:57:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725886975; cv=none; b=V3wdghm3K+qB1+bOYEIIReRTm6wGC9ALZEoSY1swGYBD539HhGuaDIHGny/A8bf2DW9H2WKFHMz2NXupUrRxV9N3RMp+8O5JyeCVBVLcwClq++nMCg4f8qSKGJpFt78ZB7R/7CJk5WyExHldxtLFxQUWMZYZceWLhrJdvde6+LM=
+	t=1725897461; cv=none; b=OIjnTCE1bOutrAMHPJyeVtEKXTD/JXHtLNjJCTAQRF67QuwgE9W9RCtQi4zldxQE1VOaKg8+AZZQ+k1TX4Bkk8G/mJH/6Qp7uRN5Qh77wC6dxuyvL0YSh36VoHCAcAYO8TG2jHncyEgxTtGoVAuTerjDlyt2X0hZcS2tRStlE2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725886975; c=relaxed/simple;
-	bh=T3YX5/Lpd4lYkt45t/7q4cjSITWugSsonc6UgJRAfvs=;
+	s=arc-20240116; t=1725897461; c=relaxed/simple;
+	bh=oacz5eggXwzY8M8S+vaeXmwUAnxLro5Rgw36NkVBL04=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TP//Q2vXZXOc5ttPwa0FMllL2BzQVZOXqHY+Ox+WDWdMb7lxSjvaexvulkE3w8sYfhkm3So82u1S9YvMbAjvJUnPQPUf4wnMCkSkmatouSsQ3WlRmK0DvdBNoR2DP7gW38m42D9UlBmdyFpVwcCm/sCudgj9d4XonDKLZM2qPeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=GYOxmlB6; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=Zc4FkrrnIem7KiF9FMh3Lna0eNetvNputn8S8CNHbMFDFlktRuM5nyG52MVwWYgPcBmfZat/vh+59CeCFeXYWfbgR38PF1C4f2YybP+6lGNPiczDPwkLf2Q0zFgtjPauOCOciZDq1aMnmHrddUhEt1FjGOxwbeii5yq0alNcBUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=bOIXjvAE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="GYOxmlB6"
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a8a7cdfdd80so259147266b.0
-        for <linux-crypto@vger.kernel.org>; Mon, 09 Sep 2024 06:02:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1725886971; x=1726491771; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7mMqU87htuX/vKBzsNQkDBJ4RpNR7Zr8uFLI9xAQvGQ=;
-        b=GYOxmlB6cqxQooQnEt7X++w7jM/eK/CATiRIFTlUeVsvxT9Ux4sbdQFL2Yj3y9IIxs
-         1/hT/mWfLkUwjQW8l2PNx5z/9dOebysSNFmr2JJncBXgRbJQhZb4hNCn3LQWhoQK3uLw
-         MV1gOuwILIxvf+50GlQ3QALoWEgbLslRE+2Q64nHbx49SQ6N0NLiheIo0yVonh7UYmeT
-         6SMAMkpaiXDARG4w8d4qLxh+oSDXZAPEZQh9Oct2MBiOFq71aPVkh8y/npv7+MtEzih2
-         Awjsn9QaZNnSNtTZ7wnelsK2bB36E55nfpNa4W8U2xHredMXRNYHtN1ZsSdL2br2YUGd
-         URtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725886971; x=1726491771;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7mMqU87htuX/vKBzsNQkDBJ4RpNR7Zr8uFLI9xAQvGQ=;
-        b=AW5YpxkVVsTtN5PAt2kcuQp5NHIQqgbf253BHDAfK9sXjraNM6eyt0U0tHHMPRaO6Y
-         SOVNdv8TQqv0IJmz1GPv46layl8VuxiGrZBoSbhZMGOg6C8UzYTqduNTVNlBd5M+3hOc
-         UeZrFiPsFM+EAeV9cn0GxQ0YSmh4X4cC+/ty12Bm2UOj+ACwgZXsw0nzHu+N4rKsWq8Z
-         w9H5dkP6QKt0OMSEHwsSGE3TyliK7fQUv9vHBVAC8lH9M90+Xf4/Im36RQMF4ZulAD/D
-         82YD7Eqoc6lgvw9GzOm+uJNqX6TW29hOkt8SBHMOqDsnDOiC3nFoxLPbhAk01+Cnulv0
-         zkwA==
-X-Forwarded-Encrypted: i=1; AJvYcCW4Nb2dsOtu5FOW2wCS0Lbig3+EnRPSa3uB9Mkj6WQe1w0mb0rKFwixbL8OZX4XpBPhORumS8m5g43zCao=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzEw7w+i8Rzbc9a9NN6No4TzTp+ZGIi5papK05f7ebU5ibruEjG
-	kp+Cx58s8hBYi+Kvhwydgn9A+tidBJqeww9w/T2bU3KuQVZ5y0oUigcCNMDGR/jX9Vp9N6Mmtkr
-	A
-X-Google-Smtp-Source: AGHT+IGBCWEcHjOnjDa3tv0OU9sQsIWi0rYKMo1x8pgZwqnvO0g9WWezq8axRIpo3yitGDVIG7HaOA==
-X-Received: by 2002:a17:907:368a:b0:a86:8953:e1fe with SMTP id a640c23a62f3a-a8a8884be2cmr906103366b.47.1725886971281;
-        Mon, 09 Sep 2024 06:02:51 -0700 (PDT)
-Received: from pathway.suse.cz ([176.114.240.50])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8d25d54abbsm337715666b.203.2024.09.09.06.02.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Sep 2024 06:02:51 -0700 (PDT)
-Date: Mon, 9 Sep 2024 15:02:49 +0200
-From: Petr Mladek <pmladek@suse.com>
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="bOIXjvAE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA2F1C4CEC8;
+	Mon,  9 Sep 2024 15:57:33 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="bOIXjvAE"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1725897452;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bbWr4vi9pa8+Cqp83onNnmk1v5W+k1MGPgiQ/1MwNSc=;
+	b=bOIXjvAESpiyWOLfxiXwIhAtPOG1y1+0opyH9Q87ZwFnbiPRA4b3wNogUcxJqtsfJjafy2
+	EIPyfn290ab/wumQZS8/Njm/fN604qRqGzCtPRB3Oi6XyRiwcddBL2PngABSxf1zQ6eimS
+	KerTR+BY/Q0Rag++udJH9dHwTPIZMJ8=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 242879eb (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Mon, 9 Sep 2024 15:57:32 +0000 (UTC)
+Date: Mon, 9 Sep 2024 17:57:31 +0200
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
 To: Uros Bizjak <ubizjak@gmail.com>
 Cc: x86@kernel.org, linux-crypto@vger.kernel.org,
 	intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
@@ -61,37 +39,89 @@ Cc: x86@kernel.org, linux-crypto@vger.kernel.org,
 	linux-fscrypt@vger.kernel.org, linux-scsi@vger.kernel.org,
 	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
 	kunit-dev@googlegroups.com, linux-kernel@vger.kernel.org,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Andy Lutomirski <luto@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Jani Nikula <jani.nikula@linux.intel.com>,
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Tvrtko Ursulin <tursulin@ursulin.net>,
+	David Airlie <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Hans Verkuil <hverkuil@xs4all.nl>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Richard Weinberger <richard@nod.at>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Eric Biggers <ebiggers@kernel.org>,
+	"Theodore Y. Ts'o" <tytso@mit.edu>,
+	Jaegeuk Kim <jaegeuk@kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Hannes Reinecke <hare@suse.de>,
+	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Brendan Higgins <brendan.higgins@linux.dev>,
+	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jiri Pirko <jiri@resnulli.us>, Petr Mladek <pmladek@suse.com>,
 	Steven Rostedt <rostedt@goodmis.org>,
 	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
 	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
 	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH RESEND v2 16/19] lib/test_scanf: Include
- <linux/prandom.h> instead of <linux/random.h>
-Message-ID: <Zt7x-dJF6RzEByBO@pathway.suse.cz>
+	Stephen Hemminger <stephen@networkplumber.org>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Kent Overstreet <kent.overstreet@linux.dev>
+Subject: Re: [PATCH RESEND v2 00/19] random: Resolve circular include
+ dependency and include <linux/percpu.h>
+Message-ID: <Zt8a6_RwLG2pEnZ6@zx2c4.com>
 References: <20240909075641.258968-1-ubizjak@gmail.com>
- <20240909075641.258968-17-ubizjak@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240909075641.258968-17-ubizjak@gmail.com>
+In-Reply-To: <20240909075641.258968-1-ubizjak@gmail.com>
 
-On Mon 2024-09-09 09:53:59, Uros Bizjak wrote:
-> Substitute the inclusion of <linux/random.h> header with
-> <linux/prandom.h> to allow the removal of legacy inclusion
-> of <linux/prandom.h> from <linux/random.h>.
+Hi Uros,
+
+On Mon, Sep 09, 2024 at 09:53:43AM +0200, Uros Bizjak wrote:
+> a) Substitutes the inclusion of <linux/random.h> with the
+> inclusion of <linux/prandom.h> where needed (patches 1 - 17).
 > 
-> Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
+> b) Removes legacy inclusion of <linux/prandom.h> from
+> <linux/random.h> (patch 18).
+> 
+> c) Includes <linux/percpu.h> in <linux/prandom.h> (patch 19).
+ 
+Thanks for doing this. That seems like a fine initiative to me. (I'm
+also curious about the future percpu changes you've got planned.)
 
-I have just acked v1 and missed that there already is v2.
-Just for record:
+Tree-wise, were you expecting me to take this through random.git? And if
+so, what timeframe did you have in mind? For 6.12 next week (can you
+poke folks for acks in time?), or punt it for 6.13? Or did you have a
+different tree in mind for treewide changes (in which case, I'll send
+you an ack for the [p]random.h changes).
 
-Acked-by: Petr Mladek <pmladek@suse.com>
-
-Best Regards,
-Petr
+Regards,
+Jason
