@@ -1,77 +1,76 @@
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6778C1B373B;
-	Mon,  9 Sep 2024 09:50:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E52841B5EA9;
+	Mon,  9 Sep 2024 11:40:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725875408; cv=none; b=B1Xj+Uxeb/tvEkF0dfUS3hvESCIkPJDWOzGa7Q7xmmhFS3mYYanxl2zQiu1pVjizOy5uGsMNdmxxpQzVO6TWy7xY0ZL8byIosu1y1BJU1McYmJ2CZ5LEMHAU3/A8AhVNpc9eyuOzgdXXdq705Y4e5rL4UCXPfZ9kzHoTYBIiraE=
+	t=1725882056; cv=none; b=nAcawmbgm7Pk1n+iIBigB5AUNqjcoRxyY51GaIc6Uoails5Jt1bCreVuHfHgmS84KMquY0dAjFdyWMhF0PY3rkExzz+wHWon9KdARmCV/Is+0IC70oqFh6IMQ3fVdiiGU1BB1aKPG5ESso5nQpGQ8ywecSc6XLkTYFG8ONTyQpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725875408; c=relaxed/simple;
-	bh=YNEEoZK0F87nnuxlA8ZOVCpm884g6LkdLyjxpguwzQ8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Z2ZJCYOmD6OfofwX5ZKOUw0rop0BtCpwmVR6KeoT3VsilpCCMUGU/rpPE3hulFEj8hJ9lSEW/WfJmdcbNErtXCc3UVPtsVrsdKD++aRdQPJsj7GbKOgfAo1OdqPVreprDYYzxINUCrhn12tQ9fjup73k/tV6Kx9J7LE8pIxTTTo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=CDmhO7aB; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="CDmhO7aB"
-Received: by mail.gandi.net (Postfix) with ESMTPSA id BC657E0009;
-	Mon,  9 Sep 2024 09:50:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1725875403;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+n6jIuUoupEYC9it7jynGsfYtTffkj9K1qGvau67Xdk=;
-	b=CDmhO7aBGHlWdZiCpFPQW01csa4AVN722IUzlJyMVnxEH6+cWYz86FQ8OxAiz2420sGBW8
-	n4mM+Xeiq3XWkr26A66LjKTVKEUcOwxxzuN8fGsnQz+MqezxXXmz8FbHupp2jM5wyNTII+
-	3/91pxDCRwhqKtCdAH7UM0lrmRZqVlt6K8TzvIooik6D1oYcZ1zX5et1JOwT+nQJm6Sr0O
-	ftBYMd31fOBewjDuxkkM8qGAf9Y06pe0J0ErzX7ejhx+ytUd7NOMW8PgcUl1M1pLMJnA/s
-	PTf2WOuAATZlWj1jXZgZy4p/5p8WR6R3Z9x84E9Svbgp4FU5N3qoihxdVLR7wQ==
-Date: Mon, 9 Sep 2024 11:50:01 +0200
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Uros Bizjak <ubizjak@gmail.com>
-Cc: x86@kernel.org, linux-crypto@vger.kernel.org,
- intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
- linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
- linux-fscrypt@vger.kernel.org, linux-scsi@vger.kernel.org,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- kunit-dev@googlegroups.com, linux-kernel@vger.kernel.org, Richard
- Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>
-Subject: Re: [PATCH RESEND v2 06/19] mtd: tests: Include <linux/prandom.h>
- instead of <linux/random.h>
-Message-ID: <20240909115001.2b05a5ce@xps-13>
-In-Reply-To: <20240909075641.258968-7-ubizjak@gmail.com>
-References: <20240909075641.258968-1-ubizjak@gmail.com>
-	<20240909075641.258968-7-ubizjak@gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1725882056; c=relaxed/simple;
+	bh=vg9YjjHmNzbRmFUZcNaHHDoCIEh4knOY2NV9RZ3gN1A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oJkM9Po4uc7WwWHKKMZueY8I63XW/y2z21Z6usW/MHexhO8CGi55zKT/ZGgRH1Zrlk5sXBFZZ39pvk3LWc/ccsutP1WBj1dl/qSp69cuFe89WveC+Hq61Z6fbIsJumQp6NJXxIVLRYBcIC8owVsxRTNXcK0795NUtvFvK0UGsYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4EF98C4CEC5;
+	Mon,  9 Sep 2024 11:40:53 +0000 (UTC)
+Message-ID: <63c1a3b4-9427-446c-9a68-ae022b7b96ae@xs4all.nl>
+Date: Mon, 9 Sep 2024 13:40:51 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RESEND v2 05/19] media: vivid: Include <linux/prandom.h>
+ in vivid-vid-cap.c
+To: Uros Bizjak <ubizjak@gmail.com>, x86@kernel.org,
+ linux-crypto@vger.kernel.org, intel-gfx@lists.freedesktop.org,
+ dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
+ linux-mtd@lists.infradead.org, linux-fscrypt@vger.kernel.org,
+ linux-scsi@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com,
+ linux-kernel@vger.kernel.org
+Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
+References: <20240909075641.258968-1-ubizjak@gmail.com>
+ <20240909075641.258968-6-ubizjak@gmail.com>
+Content-Language: en-US, nl
+From: Hans Verkuil <hverkuil-cisco@xs4all.nl>
+In-Reply-To: <20240909075641.258968-6-ubizjak@gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: miquel.raynal@bootlin.com
+Content-Transfer-Encoding: 7bit
 
-Hi Uros,
-
-ubizjak@gmail.com wrote on Mon,  9 Sep 2024 09:53:49 +0200:
-
+On 09/09/2024 09:53, Uros Bizjak wrote:
 > Substitute the inclusion of <linux/random.h> header with
 > <linux/prandom.h> to allow the removal of legacy inclusion
 > of <linux/prandom.h> from <linux/random.h>.
-
-Acked-by: Miquel Raynal <miquel.raynal@bootlin.com>
-
->=20
+> 
 > Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
-> Cc: Miquel Raynal <miquel.raynal@bootlin.com>
-> Cc: Richard Weinberger <richard@nod.at>
-> Cc: Vignesh Raghavendra <vigneshr@ti.com>
 
-Miqu=C3=A8l
+Acked-by: Hans Verkuil <hverkuil-cisco@xs4all.nl>
+
+Regards,
+
+	Hans
+
+> Cc: Hans Verkuil <hverkuil@xs4all.nl>
+> Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
+> Cc: linux-media@vger.kernel.org
+> ---
+>  drivers/media/test-drivers/vivid/vivid-vid-cap.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/media/test-drivers/vivid/vivid-vid-cap.c b/drivers/media/test-drivers/vivid/vivid-vid-cap.c
+> index 69620e0a35a0..184460eb356e 100644
+> --- a/drivers/media/test-drivers/vivid/vivid-vid-cap.c
+> +++ b/drivers/media/test-drivers/vivid/vivid-vid-cap.c
+> @@ -10,6 +10,7 @@
+>  #include <linux/sched.h>
+>  #include <linux/vmalloc.h>
+>  #include <linux/videodev2.h>
+> +#include <linux/prandom.h>
+>  #include <linux/v4l2-dv-timings.h>
+>  #include <media/v4l2-common.h>
+>  #include <media/v4l2-event.h>
+
