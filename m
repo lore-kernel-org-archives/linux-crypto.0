@@ -1,183 +1,181 @@
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E18E814B06C;
-	Mon,  9 Sep 2024 18:51:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 883DD3BB47;
+	Mon,  9 Sep 2024 19:30:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725907915; cv=none; b=WKtmtOd0XUrJZO0EaKO+1LUTZm17PNKISXqzV7ZU66A/ogMU5TAnyt+zi7lwY25y2WDI4AsyG82E7SHNymcAuKNf68640a2igI8zB4+OBRVpingMW3vE/mzgkLqMsDe89AnryKT/FVY8CfKPG5pY+sSum+hFM1EWEnaxDrZMAjo=
+	t=1725910223; cv=none; b=sPJ1hIJ9RaZhtcTFTIND5wRN2FqIE0CMCnYtGo6+oSXO69VQiUO/3ivtLe9tK7BpkCv+RyR7EMUDnTHCJIVMhyimnxlK5moVnB/LogOlNDLqJxKOM9hrEuKwCEdOyR7eAeuMXvpmNCllQvxvFRMuK/EhvyaZ1pdU6gX2C1QUDxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725907915; c=relaxed/simple;
-	bh=CrCefix7HM2ao+Rd4VzDYmJ9W2K1egmuhqgLJjj2hiM=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=cO0Dm3R08SrHrvbtSi0cb8RoP0Yt/M737Wy8qbQX59FhNJa6JqDZ/EcG+c1Zz7BgwaKTtr+s60S7JNudDJCLEF1DlXruD3mg2wbOm7YX+a3iPDg0ul0HREoe6DFJM6jkflWJs+BVEsHVnH/FfgUdtVY604YFWv1+bnv/n40Ib+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.106] (31.173.81.96) by msexch01.omp.ru (10.188.4.12)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 9 Sep
- 2024 21:51:40 +0300
-Subject: Re: [PATCH] KEYS: prevent NULL pointer dereference in
- find_asymmetric_key()
-To: Jarkko Sakkinen <jarkko@kernel.org>, Roman Smirnov <r.smirnov@omp.ru>,
-	David Howells <dhowells@redhat.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
-	Andrew Zaborowski <andrew.zaborowski@intel.com>
-CC: <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
-References: <20240315103320.18754-1-r.smirnov@omp.ru>
- <CZX9T3TU6YU0.3JE9M7M3ENUE0@kernel.org>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <1b7e4576-7b64-aba1-9e23-e58605b1f5bd@omp.ru>
-Date: Mon, 9 Sep 2024 21:51:39 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	s=arc-20240116; t=1725910223; c=relaxed/simple;
+	bh=b6OUbZ3BeHYLYkH/EG1gwVc1JeKidM3XMH3k1TlcRSk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ctkY2VjS6VoRSA9p4PKvyFrfJafdyc6ZPioWVaE7miFDVDHqtOntdN06waPJx4BXDSai1Yvuey/TzxWC5xnjxokNxJLB4rYm7haE9w7B+gDXPkRLKWiUUX9rwOeJIN0ZsKi10x/LJycmaeTrv3iq2Nxa09YdEJuSFmpfdQqdMJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ULUkcW/T; arc=none smtp.client-ip=209.85.208.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ULUkcW/T"
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2f7529203ddso32291041fa.0;
+        Mon, 09 Sep 2024 12:30:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725910220; x=1726515020; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=woE07RMIM4YJ88QTc1ZNc52E+GbLSESAkfn/9qs5W1Y=;
+        b=ULUkcW/Tyq4KqCECB1ruZOR6QLr/CvsNjbWjzoxyCcU/WhgIWArNgD6Hrw1yhGPll4
+         BbZrZgIEZXqbrTyCz5p+C+9Tbi+X0PFqI41IrlA72G7t6jcMWBlXn1hl/BZg+SCsuh2c
+         oFKCu0rUDejsyES3ag6UhjvEcR2W1GTzr5kbg0wXWhMPvHEvpxtOwpBcXBjvHTzzGBbu
+         sqnxB1pvOEKsPJKaQzg3grdZ0/Uu8bags0D135h3don4qXSmUBQRCU3QRtzVQMfkooF1
+         HlLPFTAJvjpI6h/TMpxY4yeeRPn6kNraImImFM5Mm8KKJ4wPN/m+v6YW+2Qfak+UP1R/
+         BGAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725910220; x=1726515020;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=woE07RMIM4YJ88QTc1ZNc52E+GbLSESAkfn/9qs5W1Y=;
+        b=RuCISbepDlc2qBedARrKfy9NIxagwPi9nXmTanbwLrflCXWQRuuhhuWCjQakny5EQ6
+         dVVn4dHptaOm7sOC82F3tHTdP09ER5e3SmzGl5ZsrP6YG5scw8HWfaKD0b2EM3uZTBVb
+         zNDZ/FRSyRBl/NdqnyDsOVKriOmc3oSg8E0zyIeTs26kUabND98HVKFO4c8bvAy5MmSY
+         /2xrIABIyFHJhBCOpicOAc60XfsH0bzYbIbEzZArOYzZD4ZlOrDPYY+bpmUCULTgjo8A
+         +8ZspDKPaUIxdWTXnRLt+LcwKTXf1A9B9LG3W6t6t+qk4MMhhspHquyIsUy4pyFfRnSJ
+         ISzw==
+X-Forwarded-Encrypted: i=1; AJvYcCUWZUWg7h9uqj9H8UJt+bwPgqkz9ZgkEOsaRy9Xy/aV2qKsy+8XQnqzcGCWExklp6l99ypYNpXZjk7A/aY=@vger.kernel.org, AJvYcCVkJBaNvChDqj/ocGvutebX7/uNaojYcx+LCrAzQhZGySAJ5CPLHkLG6JhcOXl+Vqw4ljIl7p+ksTeulYhm@vger.kernel.org, AJvYcCVqSOkSR2NOsReuF7N46EAo+BkFxVNvQTb681abDP6RU50sup1uhTf8Ee9V+GUKaWVR+1s=@vger.kernel.org, AJvYcCW6RDHjvzcTnYUkHiG60PmsMlEL+1K0aIG96VywbwJj+PaH+/MplxHinXKs/VXnOE2RLgbIMHW6lmTayqbgcA==@vger.kernel.org, AJvYcCW7z4bLWIPfIUODOf27F4UUlvJqNNFr+ZCdIzE/r5h8c9z25IpLQMyTsmxQpVR+oJq/Bp60H/RMJQCeFA==@vger.kernel.org, AJvYcCX5yDF3sYA1ZtYht2kOSYOyf041BrFFM9nGnDK/pI8ASZzNgc2DLtVJIRC8fr37XuQplQIvQKnZxgodi9ra@vger.kernel.org, AJvYcCXxIBg5WFf32p7sF9babSrlC+lI60uayhIVZYEUGSYkcS+MLafgewbmBH08LKkYo7url+riZjAx/AQdBlRA0jzf@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxo6WQkItdOOzWO3D2oL6Li7uG1OEjihi2C2zNBMMOYUAliiV+W
+	zAM9ur2Hpy2RdE/NkwMHvKLS96g7Gqy7U6vBMVuM55hGKWLsCrvhjmlAgd9E0fFYyIeL0ZHI5/Z
+	6ffmXiWf2tXPkYBMHWvjEikHVEDs=
+X-Google-Smtp-Source: AGHT+IHGDlZWsmVxtU6Y46aEXfBA2sgXqI4naIhOyyLQHvnhEyR7+3HqFvBi8W+gcZkb/4A25yABw4d/bXms0qX89pY=
+X-Received: by 2002:a05:651c:549:b0:2f7:6277:f2be with SMTP id
+ 38308e7fff4ca-2f7727190f4mr2037391fa.22.1725910218656; Mon, 09 Sep 2024
+ 12:30:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CZX9T3TU6YU0.3JE9M7M3ENUE0@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 09/09/2024 18:32:10
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 187637 [Sep 09 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.1.5
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 32 0.3.32
- 766319f57b3d5e49f2c79a76e7d7087b621090df
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.81.96 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.81.96 in (user) dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	omp.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;lore.kernel.org:7.1.1
-X-KSE-AntiSpam-Info: FromAlignment: s
-X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.81.96
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 09/09/2024 18:36:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 9/9/2024 4:30:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+References: <20240909075641.258968-1-ubizjak@gmail.com> <Zt8a6_RwLG2pEnZ6@zx2c4.com>
+In-Reply-To: <Zt8a6_RwLG2pEnZ6@zx2c4.com>
+From: Uros Bizjak <ubizjak@gmail.com>
+Date: Mon, 9 Sep 2024 21:30:06 +0200
+Message-ID: <CAFULd4ak3n1x0tGrqiNoxvDBRw6AWgchfBO_k4aKps34DomPvA@mail.gmail.com>
+Subject: Re: [PATCH RESEND v2 00/19] random: Resolve circular include
+ dependency and include <linux/percpu.h>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: x86@kernel.org, linux-crypto@vger.kernel.org, 
+	intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org, 
+	linux-media@vger.kernel.org, linux-mtd@lists.infradead.org, 
+	linux-fscrypt@vger.kernel.org, linux-scsi@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	kunit-dev@googlegroups.com, linux-kernel@vger.kernel.org, 
+	Dave Hansen <dave.hansen@linux.intel.com>, Andy Lutomirski <luto@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, 
+	Jani Nikula <jani.nikula@linux.intel.com>, 
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>, Rodrigo Vivi <rodrigo.vivi@intel.com>, 
+	Tvrtko Ursulin <tursulin@ursulin.net>, David Airlie <airlied@gmail.com>, 
+	Daniel Vetter <daniel@ffwll.ch>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, 
+	Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, 
+	Hans Verkuil <hverkuil@xs4all.nl>, Mauro Carvalho Chehab <mchehab@kernel.org>, 
+	Miquel Raynal <miquel.raynal@bootlin.com>, Richard Weinberger <richard@nod.at>, 
+	Vignesh Raghavendra <vigneshr@ti.com>, Eric Biggers <ebiggers@kernel.org>, 
+	"Theodore Y. Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>, 
+	Linus Torvalds <torvalds@linux-foundation.org>, Hannes Reinecke <hare@suse.de>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, Brendan Higgins <brendan.higgins@linux.dev>, 
+	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>, 
+	Petr Mladek <pmladek@suse.com>, Steven Rostedt <rostedt@goodmis.org>, 
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Stephen Hemminger <stephen@networkplumber.org>, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Kent Overstreet <kent.overstreet@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 3/19/24 2:39 AM, Jarkko Sakkinen wrote:
-[...]
+On Mon, Sep 9, 2024 at 5:57=E2=80=AFPM Jason A. Donenfeld <Jason@zx2c4.com>=
+ wrote:
 
->> With the current code, in case all NULLs are passed in id_{0,1,2},
-> 
-> "current code" is not unambigious reference of any part of the kernel
-> tree. Please just write down the function name instead.
-> 
->> the kernel will first print out a WARNING and then have an oops
->> because id_2 gets dereferenced anyway.
-> 
-> Would be more exact":
-> 
-> s/print out a WARNING/emit WARN/
+> On Mon, Sep 09, 2024 at 09:53:43AM +0200, Uros Bizjak wrote:
+> > a) Substitutes the inclusion of <linux/random.h> with the
+> > inclusion of <linux/prandom.h> where needed (patches 1 - 17).
+> >
+> > b) Removes legacy inclusion of <linux/prandom.h> from
+> > <linux/random.h> (patch 18).
+> >
+> > c) Includes <linux/percpu.h> in <linux/prandom.h> (patch 19).
+>
+> Thanks for doing this. That seems like a fine initiative to me. (I'm
+> also curious about the future percpu changes you've got planned.)
 
-   Well, technically calling WARN_ON() it prints out WARNING: ... --
-hence the wording... :-)
+As explained in the cover letter, recent GCCs are able to track
+address space of variables in percpu address space from the
+declaration to its usage site. There are certain rules regarding casts
+of variables and their pointers (when this named address space is not
+considered a subspace of the generic address space), so it is possible
+to create much more effective checks for cast-from-as type casts than
+what sparse can achieve.
 
->> Note that WARN_ON() is also considered harmful by Greg Kroah-
->> Hartman since it causes the Android kernels to panic as they
->> get booted with the panic_on_warn option.
+Besides GCC, clang can define various named address space via
+address_space attribute:
 
-   As it turns out, not all Android kernels really do this thging
-(at least the Samsung's ones do, according to Greg)...
+--cut here--
+#define __as(N) __attribute__((address_space(N)))
 
-> Despite full respect to Greg, and agreeing what he had said about
-> the topic (which you are lacking lore link meaning that in all
-> cases the current description is incomplete), the only thing that
-> should be documented should be that since WARN_ON() can emit
-> panic when panic_on_warn is set in the *kernel command-line*
-> (not "option") this condition should be relaxed.
+void *foo(void __as(1) *x) { return x; }         // error
 
-   Linus' opinion seems to be that the people using panic_on_warn
-get what they deserve -- see:
+void *bar(void __as(1) *x) { return (void *)x; } // fine
+--cut here--
 
-https://lore.kernel.org/all/CAHk-=wgF7K2gSSpy=m_=K3Nov4zaceUX9puQf1TjkTJLA2XC_g@mail.gmail.com/
+When compiling this, the compiler returns:
 
->> Found by Linux Verification Center (linuxtesting.org) with Svace.
-> 
-> I'm not sure if this should be part of the commit message.
-> 
->>
->> Fixes: 7d30198ee24f ("keys: X.509 public key issuer lookup without AKID")
->> Suggested-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-> 
-> Should be reported-by.
-> 
->> Signed-off-by: Roman Smirnov <r.smirnov@omp.ru>
->> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
->> ---
->>  crypto/asymmetric_keys/asymmetric_type.c | 6 +++---
->>  1 file changed, 3 insertions(+), 3 deletions(-)
->>
->> diff --git a/crypto/asymmetric_keys/asymmetric_type.c b/crypto/asymmetric_keys/asymmetric_type.c
->> index a5da8ccd353e..f5cbd6ff14e2 100644
->> --- a/crypto/asymmetric_keys/asymmetric_type.c
->> +++ b/crypto/asymmetric_keys/asymmetric_type.c
->> @@ -60,17 +60,17 @@ struct key *find_asymmetric_key(struct key *keyring,
->>  	char *req, *p;
->>  	int len;
->>  
->> -	WARN_ON(!id_0 && !id_1 && !id_2);
->> -
-> 
-> Weird, I recall discussing about this issue in the past. Unfortunately
-> could not find the thread from lore.
+clang-as.c:3:37: error: returning '__as(1) void *' from a function
+with result type 'void *' changes address space of pointer
 
-   There was also that (denied) patch:
+Although clang currently errors out when __seg_gs and __seg_fs named
+address space designators are used, we can explore its named address
+spaces functionality to implement percpu checks for all targets. The
+percpu address space checks patchset, referred to in the cover letter,
+also supports this functionality when per_cpu_qual is defined to
+__attribute__((address_space(N))).
 
-https://lore.kernel.org/all/20240414170850.148122-1-elder@linaro.org/
+Perhaps we can use different address spaces to also handle __user,
+__iomem and __rcu address spaces. This way the compiler will be able
+to handle address space checks instead of sparse.
 
-> Anyway I agree with the code change.
-> 
->>  	if (id_0) {
->>  		lookup = id_0->data;
->>  		len = id_0->len;
->>  	} else if (id_1) {
->>  		lookup = id_1->data;
->>  		len = id_1->len;
->> -	} else {
->> +	} else if (id_2) {
->>  		lookup = id_2->data;
->>  		len = id_2->len;
->> +	} else {
+> Tree-wise, were you expecting me to take this through random.git? And if
+> so, what timeframe did you have in mind? For 6.12 next week (can you
+> poke folks for acks in time?), or punt it for 6.13? Or did you have a
+> different tree in mind for treewide changes (in which case, I'll send
+> you an ack for the [p]random.h changes).
 
-   We can perhaps place the WARN_ON(1) call here instead of where it
-is now...
+I think that the best approach is to target this patchset for linux
+6.13 via random.git tree. I will prepare a v3 after 6.12rc1, so when
+committed to random.git, the patchset will be able to spend some time
+in linux-next. This way, there will be plenty of time for CI robots to
+do additional checks also for some less popular targets (although
+individual patches are dead simple, removing these kinds of "legacy"
+includes can be tricky), and I will also be able to collect Acked-by:s
+in the meantime.
 
->> +		return ERR_PTR(-EINVAL);
->>  	}
->>  
->>  	/* Construct an identifier "id:<keyid>". */
+While the patchset is an improvement by itself, its inclusion is not
+time sensitive. The follow up percpu named address checking
+functionality requires a very recent feature (__typeof_unqual__
+keyword), which is only supported in recent compilers (gcc-14 and
+clang-20). Besides compiler support, sparse doesn't know about
+__typeof_unqual__, resulting in broken type tracing and hundreds of
+sparse errors with C=3D1 due to unknown keyword.
 
-> BR, Jarkko
+So, I think we are not in a hurry and can take the slow and safe path.
 
-MBR, Sergey
+Thanks and best regards,
+Uros.
