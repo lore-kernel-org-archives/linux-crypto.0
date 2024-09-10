@@ -1,116 +1,159 @@
-Received: from frasgout12.his.huawei.com (frasgout12.his.huawei.com [14.137.139.154])
+Received: from mailout1.hostsharing.net (mailout1.hostsharing.net [83.223.95.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66E1418C928;
-	Tue, 10 Sep 2024 14:36:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=14.137.139.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4A2319413F;
+	Tue, 10 Sep 2024 14:39:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725979002; cv=none; b=pMqb5CodPEpA3JyyqpzGjKYdFbA6jR5sWNbSxPCgVVKwfJ2xefYxBJ41lUU+35z6KgXwo2YExVUgUdGsYDyg/e/ziNOnyuJuSJs4SQKmvLf8xsgQERh/+H/MHn9UIm0a0WrswOTbXxEJpXa09xh2nT40UAiI9uUlfMLw4uoNUoY=
+	t=1725979158; cv=none; b=Tz577ucrDh4sfwPGuGac0g+zOTYS2gD4MomNuy5ALSJZVBi8FERMsfc9p2ix/0W5omFbJTwDCz4U+C+Qo0L+toJ5NmGC7+RWdwnZ4mG1jc1dKhEUxRECwbIE/ueu0L4hoq54O9denAdnvD2Gu0RG1N08V2U8Pnne+4hQ/uaIjIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725979002; c=relaxed/simple;
-	bh=wOLpU1b/pM0DovA9W+IpisxUVNxMO82yHVCaODl2umk=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=BzBDXl5WLUk9IGwdYPP2H+rCB5DF7rEN+tO2Kh53UqlAmivxMSj6WiNJ0U+eoE2xV7aSioXM6RtW+J8Jp6l2vNx0AMAkjzloEs5N7stDMPVNCp7BbduJ3UKAL8heKwpk7z/9ocVb0tgZrHj1OPlJW3UDVvkFhk+MLCtDGaqeCHU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=14.137.139.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.18.186.51])
-	by frasgout12.his.huawei.com (SkyGuard) with ESMTP id 4X35Gh1rqnz9v7Jf;
-	Tue, 10 Sep 2024 22:11:24 +0800 (CST)
-Received: from mail02.huawei.com (unknown [7.182.16.47])
-	by mail.maildlp.com (Postfix) with ESMTP id 24186140133;
-	Tue, 10 Sep 2024 22:36:34 +0800 (CST)
-Received: from [127.0.0.1] (unknown [10.204.63.22])
-	by APP1 (Coremail) with SMTP id LxC2BwDndy9oWeBmAWqmAA--.53179S2;
-	Tue, 10 Sep 2024 15:36:33 +0100 (CET)
-Message-ID: <a9502b8097841c36ca13871b22149eadd3fde355.camel@huaweicloud.com>
-Subject: Re: [PATCH v2 00/14] KEYS: Add support for PGP keys and signatures
-From: Roberto Sassu <roberto.sassu@huaweicloud.com>
-To: Jonathan McDowell <noodles@earth.li>
-Cc: dhowells@redhat.com, dwmw2@infradead.org, herbert@gondor.apana.org.au, 
- davem@davemloft.net, linux-kernel@vger.kernel.org,
- keyrings@vger.kernel.org,  linux-crypto@vger.kernel.org,
- zohar@linux.ibm.com,  linux-integrity@vger.kernel.org, Roberto Sassu
- <roberto.sassu@huawei.com>,  adrian@suse.de, ro@suse.de
-Date: Tue, 10 Sep 2024 16:36:21 +0200
-In-Reply-To: <ZsSkTs4TFfx2pK8r@earth.li>
-References: <20240818165756.629203-1-roberto.sassu@huaweicloud.com>
-	 <ZsNf1VdfkHqD8R4Q@earth.li>
-	 <f142b1c4e662d4701a2ab67fa5fc839ab7109e5e.camel@huaweicloud.com>
-	 <ZsSkTs4TFfx2pK8r@earth.li>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	s=arc-20240116; t=1725979158; c=relaxed/simple;
+	bh=hXjL36ZTUUG010MGGcWtvAiwr3c02h0fr0+QVFB949Q=;
+	h=Message-ID:From:Date:Subject:To:Cc; b=CwuRC+iKyMsyOrruUCi5Q5cat5o86BFp6E9sKaVdCc3CA7/QhCiG+3iTprujPsBVk2Scq7qedECZlvfPAXXHz8y1yU3Zxz/1GEZFha8t7U5XyQ4xJzQHMKIENM6Ex6UreNrMG/ZAgQ68w5M1hxqs5lj6ChtQ3z3yc+tpjHp7HUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=pass smtp.mailfrom=wunner.de; arc=none smtp.client-ip=83.223.95.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wunner.de
+Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by mailout1.hostsharing.net (Postfix) with ESMTPS id 776D110192657;
+	Tue, 10 Sep 2024 16:30:39 +0200 (CEST)
+Received: from localhost (unknown [89.246.108.87])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by h08.hostsharing.net (Postfix) with ESMTPSA id 4707E60A79C3;
+	Tue, 10 Sep 2024 16:30:39 +0200 (CEST)
+X-Mailbox-Line: From b74f4875ae056ff8aa20b7530fe4f41592581c63 Mon Sep 17 00:00:00 2001
+Message-ID: <cover.1725972333.git.lukas@wunner.de>
+From: Lukas Wunner <lukas@wunner.de>
+Date: Tue, 10 Sep 2024 16:30:10 +0200
+Subject: [PATCH v2 00/19] Migrate to sig_alg and templatize ecdsa
+To: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, Eric Biggers <ebiggers@google.com>, Stefan Berger <stefanb@linux.ibm.com>, Vitaly Chikunov <vt@altlinux.org>, Tadeusz Struk <tstruk@gigaio.com>, "Dimitri John Ledkov" <dimitri.ledkov@canonical.com>
+Cc: David Howells <dhowells@redhat.com>, Andrew Zaborowski <andrew.zaborowski@intel.com>, Saulo Alessandre <saulo.alessandre@tse.jus.br>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, Ignat Korchagin <ignat@cloudflare.com>, Marek Behun <kabel@kernel.org>, Varad Gautam <varadgautam@google.com>, Stephan Mueller <smueller@chronox.de>, Denis Kenzior <denkenz@gmail.com>, linux-crypto@vger.kernel.org, keyrings@vger.kernel.org, Mimi Zohar <zohar@linux.ibm.com>, Roberto Sassu <roberto.sassu@huawei.com>, Dmitry Kasatkin <dmitry.kasatkin@gmail.com>, Eric Snowberg <eric.snowberg@oracle.com>, linux-security-module@vger.kernel.org, Gonglei <arei.gonglei@huawei.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio Perez <eperezma@redhat.com>, virtualization@lists.linux.dev, zhenwei pi <pizhenwei@bytedance.com>, lei he <helei.sig11@bytedance.com>, Neal Liu <neal_liu@aspeedtech.com>, Joel Stanley <joel@jms.id.au>, Andrew Jeff
+ ery <andrew@codeconstruct.com.au>, linux-aspeed@lists.ozlabs.org, Zhiqi Song <songzhiqi1@huawei.com>, Longfang Liu <liulongfang@huawei.com>, Jia Jie Ho <jiajie.ho@starfivetech.com>, William Qiu <william.qiu@starfivetech.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-CM-TRANSID:LxC2BwDndy9oWeBmAWqmAA--.53179S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7ZF1kJFWfWr1DWr17AFyUtrb_yoW8CFW3pa
-	yrWF1ayFWkJw1SkFnav3WUGFWjy39rJF15JwnxXrykCwn0qFya9F1xKa15u3s8WFn3Cw1q
-	vrW3Ja17G398AaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxV
-	AFwI0_Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AF
-	wI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
-	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
-	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUF1
-	v3UUUUU
-X-CM-SenderInfo: purev21wro2thvvxqx5xdzvxpfor3voofrz/1tbiAgACBGbfq3sLqwACsP
 
-On Tue, 2024-08-20 at 15:12 +0100, Jonathan McDowell wrote:
-> On Mon, Aug 19, 2024 at 05:15:02PM +0200, Roberto Sassu wrote:
-> > On Mon, 2024-08-19 at 16:08 +0100, Jonathan McDowell wrote:
-> > > On Sun, Aug 18, 2024 at 06:57:42PM +0200, Roberto Sassu wrote:
-> > > > From: Roberto Sassu <roberto.sassu@huawei.com>
-> > > >=20
-> > > > Support for PGP keys and signatures was proposed by David long time=
- ago,
-> > > > before the decision of using PKCS#7 for kernel modules signatures
-> > > > verification was made. After that, there has been not enough intere=
-st to
-> > > > support PGP too.
-> > >=20
-> > > You might want to update the RFC/bis references to RFC9580, which was
-> > > published last month and updates things.
-> >=20
-> > Yes, makes sense (but probably isn't too much hassle to support more
-> > things for our purposes?)
->=20
-> I'm mostly suggesting that the comments/docs point to the latest
-> standard rather than the draft version, not changing to support the new
-> v6 keys.
->=20
-> > > Also, I see support for v2 + v3 keys, and this doesn't seem like a go=
-od
-> > > idea. There are cryptographic issues with fingerprints etc there and =
-I
-> > > can't think of a good reason you'd want the kernel to support them. T=
-he
-> > > same could probably be said of DSA key support too.
-> >=20
-> > Uhm, if I remember correctly I encountered some old PGP keys used to
-> > verify RPM packages (need to check). DSA keys are not supported, since
-> > the algorithm is not in the kernel.
->=20
-> I would question the benefit gained from using obsolete key/signature
-> types for verification (I was involved in the process of Debian dropping
-> them back in *2010* which was later than it should have been). Dropping
-> the code for that path means a smaller attack surface/maintenance
-> overhead for something that isn't giving a benefit.
+The original impetus of this series is to introduce P1363 signature
+decoding for ecdsa (patch [18/19]), which is needed by the upcoming
+SPDM library (Security Protocol and Data Model) for PCI device
+authentication.
 
-Removed support for v3 PGP signatures... but that broke openSUSE
-Tumbleweed.
+To facilitate that, move X9.62 signature decoding out of ecdsa.c and
+into a template (patch [15/19]).
 
-[  295.837602] PGPL: Signature packet with unhandled version 3
+New in v2:  Move the maximum signature size calculations for ecdsa
+out of software_key_query() and into the X9.62 template so that
+corresponding calculations can be added for P1363 without further
+cluttering up software_key_query() (patch [16/19] - [17/19]).
 
-Roberto
+New in v2:  Avoid inefficient copying from kernel buffers to sglists
+in the new templates by introducing a sig_alg backend and migrating
+all algorithms to it, per Herbert's advice (patch [02/19] - [12/19]).
+
+Clean up various smaller issues that caught my eye in ecdsa
+(patch [01/19] and [14/19]), ecrdsa (patch [19/19]) and
+ASN.1 headers (patch [13/19]).
+
+I've also accumulated various cleanups for crypto virtio on my
+development branch but will leave them for another day as this
+series is already nearing the "too big to review" threshold. ;)
+
+I've run selftests on every single commit, but further testing
+would be appreciated to raise the confidence.
+
+
+Link to v1:
+
+https://lore.kernel.org/all/cover.1722260176.git.lukas@wunner.de/
+
+Changes v1 -> v2:
+
+* [PATCH 13/19] ASN.1: Clean up include statements in public headers
+  * Drop "#include <linux/bug.h>" from <linux/asn1_encoder.h> (Jonathan)
+
+* [PATCH 14/19] crypto: ecdsa - Avoid signed integer overflow on signature
+  decoding
+  * Add code comment explaining why vlen may be larger than bufsize (Stefan)
+
+* [PATCH 15/19] crypto: ecdsa - Move X9.62 signature decoding into template
+  * Drop unnecessary "params", "param_len" and "algo" definitions from
+    ecdsa_nist_p{192,256,384,521}_tv_template[].
+  * Introduce and use struct ecdsa_raw_sig in <crypto/internal/ecc.h>.
+
+* [PATCH 18/19] crypto: ecdsa - Support P1363 signature decoding
+  * Drop unnecessary "params", "param_len" and "algo" definitions from
+    p1363_ecdsa_nist_p256_tv_template[].
+
+
+Lukas Wunner (19):
+  crypto: ecdsa - Drop unused test vector elements
+  crypto: sig - Introduce sig_alg backend
+  crypto: ecdsa - Migrate to sig_alg backend
+  crypto: ecrdsa - Migrate to sig_alg backend
+  crypto: rsa-pkcs1pad - Deduplicate set_{pub,priv}_key callbacks
+  crypto: rsassa-pkcs1 - Migrate to sig_alg backend
+  crypto: rsassa-pkcs1 - Harden digest length verification
+  crypto: rsassa-pkcs1 - Avoid copying hash prefix
+  crypto: virtio - Drop sign/verify operations
+  crypto: drivers - Drop sign/verify operations
+  crypto: akcipher - Drop sign/verify operations
+  crypto: sig - Move crypto_sig_*() API calls to include file
+  ASN.1: Clean up include statements in public headers
+  crypto: ecdsa - Avoid signed integer overflow on signature decoding
+  crypto: ecdsa - Move X9.62 signature decoding into template
+  crypto: sig - Rename crypto_sig_maxsize() to crypto_sig_keysize()
+  crypto: ecdsa - Move X9.62 signature size calculation into template
+  crypto: ecdsa - Support P1363 signature decoding
+  crypto: ecrdsa - Fix signature size calculation
+
+ Documentation/crypto/api-akcipher.rst         |   2 +-
+ Documentation/crypto/api-sig.rst              |  15 +
+ Documentation/crypto/api.rst                  |   1 +
+ Documentation/crypto/architecture.rst         |   2 +
+ crypto/Kconfig                                |   5 +-
+ crypto/Makefile                               |   5 +-
+ crypto/akcipher.c                             |  64 +-
+ crypto/asymmetric_keys/public_key.c           |  58 +-
+ crypto/ecdsa-p1363.c                          | 159 ++++
+ crypto/ecdsa-x962.c                           | 237 +++++
+ crypto/ecdsa.c                                | 209 ++---
+ crypto/ecrdsa.c                               |  64 +-
+ crypto/internal.h                             |  19 -
+ crypto/rsa-pkcs1pad.c                         | 371 +-------
+ crypto/rsa.c                                  |  17 +-
+ crypto/rsassa-pkcs1.c                         | 442 +++++++++
+ crypto/sig.c                                  | 143 +--
+ crypto/testmgr.c                              | 320 +++++--
+ crypto/testmgr.h                              | 884 +++++++++++++++---
+ drivers/crypto/aspeed/aspeed-acry.c           |   2 -
+ drivers/crypto/hisilicon/hpre/hpre_crypto.c   |   2 -
+ drivers/crypto/starfive/jh7110-rsa.c          |   2 -
+ .../virtio/virtio_crypto_akcipher_algs.c      |  65 +-
+ include/crypto/akcipher.h                     |  69 +-
+ include/crypto/internal/akcipher.h            |   4 +-
+ include/crypto/internal/ecc.h                 |  14 +
+ include/crypto/internal/rsa.h                 |  29 +
+ include/crypto/internal/sig.h                 |  80 ++
+ include/crypto/sig.h                          | 152 ++-
+ include/linux/asn1_decoder.h                  |   1 +
+ include/linux/asn1_encoder.h                  |   1 -
+ include/linux/slab.h                          |   1 +
+ include/uapi/linux/cryptouser.h               |   5 +
+ include/uapi/linux/virtio_crypto.h            |   1 +
+ security/integrity/ima/ima_main.c             |   6 +-
+ 35 files changed, 2398 insertions(+), 1053 deletions(-)
+ create mode 100644 Documentation/crypto/api-sig.rst
+ create mode 100644 crypto/ecdsa-p1363.c
+ create mode 100644 crypto/ecdsa-x962.c
+ create mode 100644 crypto/rsassa-pkcs1.c
+
+-- 
+2.43.0
 
