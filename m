@@ -1,379 +1,124 @@
-Received: from mailout3.hostsharing.net (mailout3.hostsharing.net [176.9.242.54])
+Received: from the.earth.li (the.earth.li [93.93.131.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E175F19D09E;
-	Tue, 10 Sep 2024 15:33:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.9.242.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5965F4204D;
+	Tue, 10 Sep 2024 15:34:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.93.131.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725982394; cv=none; b=OIFpVPcqEhBpAt2cgOi/x39C/bukiEiIQVUo1Q2JYnnwVALg/PJG7X1/0Gj9i6i3RrI+Ln6grMKClxKZUChsVGx421KX5SeEMjlAH1YCfGPB/MsvXKqPdmrubiyabjTW5JW/vui7A9EhGRs/0QlYNEcCMma1LHtGKI26UFlDQ1c=
+	t=1725982485; cv=none; b=homY8TL1OlR5a+FPxmTYOURoLZcF//Gz9oZNQdix28sgi22mdVL7wCswtxTeOimEYkv2bsv3AAsYki9nVe2iJIHx571Px95dAkhL4Ng5pDkZX2ZhtTX0lKkuez4Y78OdzTr+MKxpKuOO8GdVEtFR+/vm7e9D+j1khMD/ikSxCWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725982394; c=relaxed/simple;
-	bh=+70tJNDhKmOjqevtH5xBEDGhBd3t27+gve5o+W4Pz9I=;
-	h=Message-ID:In-Reply-To:References:From:Date:Subject:To:Cc; b=VezTiIEipaseKc+THvauH8JDVR+Xhb7V5I7bLnV0XTJO7fbzTFR4LNPt8FIUyPF9T9pE3yp5VGfD6Ch6PztJtwNtNnOEt3mx+2PjpyLCiJ+9aNDc4O/zkRHNbH4ZINyBnssP1psroIQwzo6eHXCkDlqR3guhlhCR9rendSx/C2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=pass smtp.mailfrom=wunner.de; arc=none smtp.client-ip=176.9.242.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wunner.de
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by mailout3.hostsharing.net (Postfix) with ESMTPS id 7B50A102A5C94;
-	Tue, 10 Sep 2024 17:33:09 +0200 (CEST)
-Received: from localhost (unknown [89.246.108.87])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by h08.hostsharing.net (Postfix) with ESMTPSA id 2F97360A8B01;
-	Tue, 10 Sep 2024 17:33:09 +0200 (CEST)
-X-Mailbox-Line: From 73e9e6b6ba2631e2d9474bd53be165b2ae8810d4 Mon Sep 17 00:00:00 2001
-Message-ID: <73e9e6b6ba2631e2d9474bd53be165b2ae8810d4.1725972335.git.lukas@wunner.de>
-In-Reply-To: <cover.1725972333.git.lukas@wunner.de>
-References: <cover.1725972333.git.lukas@wunner.de>
-From: Lukas Wunner <lukas@wunner.de>
-Date: Tue, 10 Sep 2024 16:30:28 +0200
-Subject: [PATCH v2 18/19] crypto: ecdsa - Support P1363 signature decoding
-To: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, Eric Biggers <ebiggers@google.com>, Stefan Berger <stefanb@linux.ibm.com>, Vitaly Chikunov <vt@altlinux.org>, Tadeusz Struk <tstruk@gigaio.com>
-Cc: David Howells <dhowells@redhat.com>, Andrew Zaborowski <andrew.zaborowski@intel.com>, Saulo Alessandre <saulo.alessandre@tse.jus.br>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, Ignat Korchagin <ignat@cloudflare.com>, Marek Behun <kabel@kernel.org>, Varad Gautam <varadgautam@google.com>, Stephan Mueller <smueller@chronox.de>, Denis Kenzior <denkenz@gmail.com>, linux-crypto@vger.kernel.org, keyrings@vger.kernel.org
+	s=arc-20240116; t=1725982485; c=relaxed/simple;
+	bh=Y7iQeD4hGzv3JM+SzFixGYto396Sd0RNqqi7OPzSN3A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YVNrQQ70bhxQaX71N7L8Ni6YdwybPtKZY0jOzGgkBBQUA1p4ilVS/ebEJ9YrdXvjgvS1+YWrTCf+/toouRbecziIFqNpxECFVL8FCKJORc169qC9Lr/iYM0FqcAyy5vOT+eI5tbAZe7chDaEubCIQwrVmNqYBtjitrGTuBrcfdQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=earth.li; spf=pass smtp.mailfrom=earth.li; dkim=pass (2048-bit key) header.d=earth.li header.i=@earth.li header.b=I15zwZNd; arc=none smtp.client-ip=93.93.131.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=earth.li
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=earth.li
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=earth.li header.i=@earth.li header.b="I15zwZNd"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=earth.li;
+	s=the; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:Subject:
+	Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=+recKoM7vFCwb1CTbRB4jGT2zAWewASBgrq/1E9M2bk=; b=I15zwZNdG7NLvGqEw2d8JTT3m8
+	SD6vM1xPqI2sokjlAYGNDkWWJ3WsVIfT4FimElW0Sn5uzXIluF2jac1NtsheuMsSRIkkiXhXBBOnW
+	zGpQcy5V8DGtBY6RiIDH2vFZNV2sjiLocLMxhEVpZqpzCaXyPKN2KFrlakRJLUrjsoEbwAhOzCSXx
+	OXXElYSvqUVRpaI2xBxbQ7NRHA4dE7XrShuuuUhw9bRAABWvQEKBjQq8Op2WXoVSa5aIP/v4b9vPi
+	B2YLbQFtNHllik3XTK+Mx5aKHQLYQEN02C5ftJMCnCYc8eZAxR6KQgqAVhz2NvC3pLh5xNwRfeFz/
+	mKcSl6xw==;
+Received: from noodles by the.earth.li with local (Exim 4.96)
+	(envelope-from <noodles@earth.li>)
+	id 1so2bv-004qYZ-0A;
+	Tue, 10 Sep 2024 16:16:55 +0100
+Date: Tue, 10 Sep 2024 16:16:55 +0100
+From: Jonathan McDowell <noodles@earth.li>
+To: Roberto Sassu <roberto.sassu@huaweicloud.com>
+Cc: dhowells@redhat.com, dwmw2@infradead.org, herbert@gondor.apana.org.au,
+	davem@davemloft.net, linux-kernel@vger.kernel.org,
+	keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+	zohar@linux.ibm.com, linux-integrity@vger.kernel.org,
+	Roberto Sassu <roberto.sassu@huawei.com>, adrian@suse.de,
+	ro@suse.de
+Subject: Re: [PATCH v2 00/14] KEYS: Add support for PGP keys and signatures
+Message-ID: <ZuBi56VwWxxX2Ce5@earth.li>
+References: <20240818165756.629203-1-roberto.sassu@huaweicloud.com>
+ <ZsNf1VdfkHqD8R4Q@earth.li>
+ <f142b1c4e662d4701a2ab67fa5fc839ab7109e5e.camel@huaweicloud.com>
+ <ZsSkTs4TFfx2pK8r@earth.li>
+ <a9502b8097841c36ca13871b22149eadd3fde355.camel@huaweicloud.com>
+ <6c7e34b65d73e9fa2ba0fd39b357b9eb42ee0449.camel@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6c7e34b65d73e9fa2ba0fd39b357b9eb42ee0449.camel@huaweicloud.com>
 
-Alternatively to the X9.62 encoding of ecdsa signatures, which uses
-ASN.1 and is already supported by the kernel, there's another common
-encoding called P1363.  It stores r and s as the concatenation of two
-big endian, unsigned integers.  The name originates from IEEE P1363.
+On Tue, Sep 10, 2024 at 04:51:22PM +0200, Roberto Sassu wrote:
+> On Tue, 2024-09-10 at 16:36 +0200, Roberto Sassu wrote:
+> > On Tue, 2024-08-20 at 15:12 +0100, Jonathan McDowell wrote:
+> > > On Mon, Aug 19, 2024 at 05:15:02PM +0200, Roberto Sassu wrote:
+> > > > On Mon, 2024-08-19 at 16:08 +0100, Jonathan McDowell wrote:
+> > > > > On Sun, Aug 18, 2024 at 06:57:42PM +0200, Roberto Sassu wrote:
+> > > > > > From: Roberto Sassu <roberto.sassu@huawei.com>
+> > > > > > 
+> > > > > > Support for PGP keys and signatures was proposed by David long time ago,
+> > > > > > before the decision of using PKCS#7 for kernel modules signatures
+> > > > > > verification was made. After that, there has been not enough interest to
+> > > > > > support PGP too.
+> > > > > 
+> > > > > You might want to update the RFC/bis references to RFC9580, which was
+> > > > > published last month and updates things.
+> > > > 
+> > > > Yes, makes sense (but probably isn't too much hassle to support more
+> > > > things for our purposes?)
+> > > 
+> > > I'm mostly suggesting that the comments/docs point to the latest
+> > > standard rather than the draft version, not changing to support the new
+> > > v6 keys.
+> > > 
+> > > > > Also, I see support for v2 + v3 keys, and this doesn't seem like a good
+> > > > > idea. There are cryptographic issues with fingerprints etc there and I
+> > > > > can't think of a good reason you'd want the kernel to support them. The
+> > > > > same could probably be said of DSA key support too.
+> > > > 
+> > > > Uhm, if I remember correctly I encountered some old PGP keys used to
+> > > > verify RPM packages (need to check). DSA keys are not supported, since
+> > > > the algorithm is not in the kernel.
+> > > 
+> > > I would question the benefit gained from using obsolete key/signature
+> > > types for verification (I was involved in the process of Debian dropping
+> > > them back in *2010* which was later than it should have been). Dropping
+> > > the code for that path means a smaller attack surface/maintenance
+> > > overhead for something that isn't giving a benefit.
+> > 
+> > Removed support for v3 PGP signatures... but that broke openSUSE
+> > Tumbleweed.
 
-Add a P1363 template in support of the forthcoming SPDM library
-(Security Protocol and Data Model) for PCI device authentication.
+Is this a signature from a v3 key, or a v3 signature? Unfortunately
+there are implementations which will issue a v3 signature even from a v4
+key; IIRC this ambiguity has been cleared up in the updated RFC.
 
-P1363 is prescribed by SPDM 1.2.1 margin no 44:
+> > [  295.837602] PGPL: Signature packet with unhandled version 3
+> 
+> To add more context, this patch set adds the ability to the kernel to
+> verify the PGP signature of RPM packages against Linux distributions
+> PGP keys.
 
-   "For ECDSA signatures, excluding SM2, in SPDM, the signature shall be
-    the concatenation of r and s.  The size of r shall be the size of
-    the selected curve.  Likewise, the size of s shall be the size of
-    the selected curve.  See BaseAsymAlgo in NEGOTIATE_ALGORITHMS for
-    the size of r and s.  The byte order for r and s shall be in big
-    endian order.  When placing ECDSA signatures into an SPDM signature
-    field, r shall come first followed by s."
+> The purpose of this is to verify the authenticity of such RPM packages,
+> and to extract from them file digests, which are in turn used as
+> reference values for integrity check (appraisal) with IMA.
 
-Link: https://www.dmtf.org/sites/default/files/standards/documents/DSP0274_1.2.1.pdf
-Signed-off-by: Lukas Wunner <lukas@wunner.de>
-Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
----
-Changes v1 -> v2:
-  * Drop unnecessary "params", "param_len" and "algo" definitions from
-    p1363_ecdsa_nist_p256_tv_template[].
+I don't believe allowing a v3 *key* gives a useful verification that is
+worth supporting. However unfortunately I think it sounds like support
+for v3 signatures from v4 keys is necessary.
 
- crypto/Makefile                     |   1 +
- crypto/asymmetric_keys/public_key.c |   3 +-
- crypto/ecdsa-p1363.c                | 159 ++++++++++++++++++++++++++++
- crypto/ecdsa.c                      |   8 ++
- crypto/testmgr.c                    |  18 ++++
- crypto/testmgr.h                    |  28 +++++
- include/crypto/internal/ecc.h       |   1 +
- 7 files changed, 217 insertions(+), 1 deletion(-)
- create mode 100644 crypto/ecdsa-p1363.c
+J.
 
-diff --git a/crypto/Makefile b/crypto/Makefile
-index af43a1bd1cfa..81be78d39c2d 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -55,6 +55,7 @@ $(obj)/ecdsasignature.asn1.o: $(obj)/ecdsasignature.asn1.c $(obj)/ecdsasignature
- $(obj)/ecdsa-x962.o: $(obj)/ecdsasignature.asn1.h
- ecdsa_generic-y += ecdsa.o
- ecdsa_generic-y += ecdsa-x962.o
-+ecdsa_generic-y += ecdsa-p1363.o
- ecdsa_generic-y += ecdsasignature.asn1.o
- obj-$(CONFIG_CRYPTO_ECDSA) += ecdsa_generic.o
- 
-diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
-index ec2c0e009b49..c98c1588802b 100644
---- a/crypto/asymmetric_keys/public_key.c
-+++ b/crypto/asymmetric_keys/public_key.c
-@@ -110,7 +110,8 @@ software_key_determine_akcipher(const struct public_key *pkey,
- 			return -EINVAL;
- 		*sig = false;
- 	} else if (strncmp(pkey->pkey_algo, "ecdsa", 5) == 0) {
--		if (strcmp(encoding, "x962") != 0)
-+		if (strcmp(encoding, "x962") != 0 &&
-+		    strcmp(encoding, "p1363") != 0)
- 			return -EINVAL;
- 		/*
- 		 * ECDSA signatures are taken over a raw hash, so they don't
-diff --git a/crypto/ecdsa-p1363.c b/crypto/ecdsa-p1363.c
-new file mode 100644
-index 000000000000..eaae7214d69b
---- /dev/null
-+++ b/crypto/ecdsa-p1363.c
-@@ -0,0 +1,159 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * ECDSA P1363 signature encoding
-+ *
-+ * Copyright (c) 2024 Intel Corporation
-+ */
-+
-+#include <linux/err.h>
-+#include <linux/module.h>
-+#include <crypto/algapi.h>
-+#include <crypto/sig.h>
-+#include <crypto/internal/ecc.h>
-+#include <crypto/internal/sig.h>
-+
-+struct ecdsa_p1363_ctx {
-+	struct crypto_sig *child;
-+};
-+
-+static int ecdsa_p1363_verify(struct crypto_sig *tfm,
-+			      const void *src, unsigned int slen,
-+			      const void *digest, unsigned int dlen)
-+{
-+	struct ecdsa_p1363_ctx *ctx = crypto_sig_ctx(tfm);
-+	unsigned int keylen = crypto_sig_keysize(ctx->child);
-+	unsigned int ndigits = DIV_ROUND_UP(keylen, sizeof(u64));
-+	struct ecdsa_raw_sig sig;
-+
-+	if (slen != 2 * keylen)
-+		return -EINVAL;
-+
-+	ecc_digits_from_bytes(src, keylen, sig.r, ndigits);
-+	ecc_digits_from_bytes(src + keylen, keylen, sig.s, ndigits);
-+
-+	return crypto_sig_verify(ctx->child, &sig, sizeof(sig), digest, dlen);
-+}
-+
-+static unsigned int ecdsa_p1363_key_size(struct crypto_sig *tfm)
-+{
-+	struct ecdsa_p1363_ctx *ctx = crypto_sig_ctx(tfm);
-+
-+	return crypto_sig_keysize(ctx->child);
-+}
-+
-+static unsigned int ecdsa_p1363_max_size(struct crypto_sig *tfm)
-+{
-+	struct ecdsa_p1363_ctx *ctx = crypto_sig_ctx(tfm);
-+
-+	return 2 * crypto_sig_keysize(ctx->child);
-+}
-+
-+static unsigned int ecdsa_p1363_digest_size(struct crypto_sig *tfm)
-+{
-+	struct ecdsa_p1363_ctx *ctx = crypto_sig_ctx(tfm);
-+
-+	return crypto_sig_digestsize(ctx->child);
-+}
-+
-+static int ecdsa_p1363_set_pub_key(struct crypto_sig *tfm,
-+				   const void *key, unsigned int keylen)
-+{
-+	struct ecdsa_p1363_ctx *ctx = crypto_sig_ctx(tfm);
-+
-+	return crypto_sig_set_pubkey(ctx->child, key, keylen);
-+}
-+
-+static int ecdsa_p1363_init_tfm(struct crypto_sig *tfm)
-+{
-+	struct sig_instance *inst = sig_alg_instance(tfm);
-+	struct crypto_sig_spawn *spawn = sig_instance_ctx(inst);
-+	struct ecdsa_p1363_ctx *ctx = crypto_sig_ctx(tfm);
-+	struct crypto_sig *child_tfm;
-+
-+	child_tfm = crypto_spawn_sig(spawn);
-+	if (IS_ERR(child_tfm))
-+		return PTR_ERR(child_tfm);
-+
-+	ctx->child = child_tfm;
-+
-+	return 0;
-+}
-+
-+static void ecdsa_p1363_exit_tfm(struct crypto_sig *tfm)
-+{
-+	struct ecdsa_p1363_ctx *ctx = crypto_sig_ctx(tfm);
-+
-+	crypto_free_sig(ctx->child);
-+}
-+
-+static void ecdsa_p1363_free(struct sig_instance *inst)
-+{
-+	struct crypto_sig_spawn *spawn = sig_instance_ctx(inst);
-+
-+	crypto_drop_sig(spawn);
-+	kfree(inst);
-+}
-+
-+static int ecdsa_p1363_create(struct crypto_template *tmpl, struct rtattr **tb)
-+{
-+	struct crypto_sig_spawn *spawn;
-+	struct sig_instance *inst;
-+	struct sig_alg *ecdsa_alg;
-+	u32 mask;
-+	int err;
-+
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_SIG, &mask);
-+	if (err)
-+		return err;
-+
-+	inst = kzalloc(sizeof(*inst) + sizeof(*spawn), GFP_KERNEL);
-+	if (!inst)
-+		return -ENOMEM;
-+
-+	spawn = sig_instance_ctx(inst);
-+
-+	err = crypto_grab_sig(spawn, sig_crypto_instance(inst),
-+			      crypto_attr_alg_name(tb[1]), 0, mask);
-+	if (err)
-+		goto err_free_inst;
-+
-+	ecdsa_alg = crypto_spawn_sig_alg(spawn);
-+
-+	err = -EINVAL;
-+	if (strncmp(ecdsa_alg->base.cra_name, "ecdsa", 5) != 0)
-+		goto err_free_inst;
-+
-+	err = crypto_inst_setname(sig_crypto_instance(inst), tmpl->name,
-+				  &ecdsa_alg->base);
-+	if (err)
-+		goto err_free_inst;
-+
-+	inst->alg.base.cra_priority = ecdsa_alg->base.cra_priority;
-+	inst->alg.base.cra_ctxsize = sizeof(struct ecdsa_p1363_ctx);
-+
-+	inst->alg.init = ecdsa_p1363_init_tfm;
-+	inst->alg.exit = ecdsa_p1363_exit_tfm;
-+
-+	inst->alg.verify = ecdsa_p1363_verify;
-+	inst->alg.key_size = ecdsa_p1363_key_size;
-+	inst->alg.max_size = ecdsa_p1363_max_size;
-+	inst->alg.digest_size = ecdsa_p1363_digest_size;
-+	inst->alg.set_pub_key = ecdsa_p1363_set_pub_key;
-+
-+	inst->free = ecdsa_p1363_free;
-+
-+	err = sig_register_instance(tmpl, inst);
-+	if (err) {
-+err_free_inst:
-+		ecdsa_p1363_free(inst);
-+	}
-+	return err;
-+}
-+
-+struct crypto_template ecdsa_p1363_tmpl = {
-+	.name = "p1363",
-+	.create = ecdsa_p1363_create,
-+	.module = THIS_MODULE,
-+};
-+
-+MODULE_ALIAS_CRYPTO("p1363");
-diff --git a/crypto/ecdsa.c b/crypto/ecdsa.c
-index cf8e0c5d1dd8..117526d15dde 100644
---- a/crypto/ecdsa.c
-+++ b/crypto/ecdsa.c
-@@ -298,8 +298,15 @@ static int __init ecdsa_init(void)
- 	if (ret)
- 		goto x962_tmpl_error;
- 
-+	ret = crypto_register_template(&ecdsa_p1363_tmpl);
-+	if (ret)
-+		goto p1363_tmpl_error;
-+
- 	return 0;
- 
-+p1363_tmpl_error:
-+	crypto_unregister_template(&ecdsa_x962_tmpl);
-+
- x962_tmpl_error:
- 	crypto_unregister_sig(&ecdsa_nist_p521);
- 
-@@ -318,6 +325,7 @@ static int __init ecdsa_init(void)
- static void __exit ecdsa_exit(void)
- {
- 	crypto_unregister_template(&ecdsa_x962_tmpl);
-+	crypto_unregister_template(&ecdsa_p1363_tmpl);
- 
- 	if (ecdsa_nist_p192_registered)
- 		crypto_unregister_sig(&ecdsa_nist_p192);
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 287ed2daadf4..bf266dedd07f 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -5494,6 +5494,24 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		.suite = {
- 			.hash = __VECS(nhpoly1305_tv_template)
- 		}
-+	}, {
-+		.alg = "p1363(ecdsa-nist-p192)",
-+		.test = alg_test_null,
-+	}, {
-+		.alg = "p1363(ecdsa-nist-p256)",
-+		.test = alg_test_sig,
-+		.fips_allowed = 1,
-+		.suite = {
-+			.sig = __VECS(p1363_ecdsa_nist_p256_tv_template)
-+		}
-+	}, {
-+		.alg = "p1363(ecdsa-nist-p384)",
-+		.test = alg_test_null,
-+		.fips_allowed = 1,
-+	}, {
-+		.alg = "p1363(ecdsa-nist-p521)",
-+		.test = alg_test_null,
-+		.fips_allowed = 1,
- 	}, {
- 		.alg = "pcbc(fcrypt)",
- 		.test = alg_test_skcipher,
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 2bd77eaafdf6..55aae1859d2c 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -1805,6 +1805,34 @@ static const struct sig_testvec x962_ecdsa_nist_p521_tv_template[] = {
- 	},
- };
- 
-+/*
-+ * ECDSA P1363 test vectors.
-+ *
-+ * Identical to ECDSA test vectors, except signature in "c" is P1363 encoded.
-+ */
-+static const struct sig_testvec p1363_ecdsa_nist_p256_tv_template[] = {
-+	{
-+	.key = /* secp256r1(sha256) */
-+	"\x04\xf1\xea\xc4\x53\xf3\xb9\x0e\x9f\x7e\xad\xe3\xea\xd7\x0e\x0f"
-+	"\xd6\x98\x9a\xca\x92\x4d\x0a\x80\xdb\x2d\x45\xc7\xec\x4b\x97\x00"
-+	"\x2f\xe9\x42\x6c\x29\xdc\x55\x0e\x0b\x53\x12\x9b\x2b\xad\x2c\xe9"
-+	"\x80\xe6\xc5\x43\xc2\x1d\x5e\xbb\x65\x21\x50\xb6\x37\xb0\x03\x8e"
-+	"\xb8",
-+	.key_len = 65,
-+	.m =
-+	"\x8f\x43\x43\x46\x64\x8f\x6b\x96\xdf\x89\xdd\xa9\x01\xc5\x17\x6b"
-+	"\x10\xa6\xd8\x39\x61\xdd\x3c\x1a\xc8\x8b\x59\xb2\xdc\x32\x7a\xa4",
-+	.m_size = 32,
-+	.c =
-+	"\x08\x31\xfa\x74\x0d\x1d\x21\x5d\x09\xdc\x29\x63\xa8\x1a\xad\xfc"
-+	"\xac\x44\xc3\xe8\x24\x11\x2d\xa4\x91\xdc\x02\x67\xdc\x0c\xd0\x82"
-+	"\xbd\xff\xce\xee\x42\xc3\x97\xff\xf9\xa9\x81\xac\x4a\x50\xd0\x91"
-+	"\x0a\x6e\x1b\xc4\xaf\xe1\x83\xc3\x4f\x2a\x65\x35\x23\xe3\x1d\xfa",
-+	.c_size = 64,
-+	.public_key_vec = true,
-+	},
-+};
-+
- /*
-  * EC-RDSA test vectors are generated by gost-engine.
-  */
-diff --git a/include/crypto/internal/ecc.h b/include/crypto/internal/ecc.h
-index 68db975e0963..71483e5305e1 100644
---- a/include/crypto/internal/ecc.h
-+++ b/include/crypto/internal/ecc.h
-@@ -306,4 +306,5 @@ void ecc_point_mult_shamir(const struct ecc_point *result,
- 			   const struct ecc_curve *curve);
- 
- extern struct crypto_template ecdsa_x962_tmpl;
-+extern struct crypto_template ecdsa_p1363_tmpl;
- #endif
 -- 
-2.43.0
-
+Listen to the words, they tell you what to do...
