@@ -1,84 +1,84 @@
-Received: from mailout2.hostsharing.net (mailout2.hostsharing.net [83.223.78.233])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE472195F22;
-	Tue, 10 Sep 2024 15:35:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.78.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC6E9198842;
+	Tue, 10 Sep 2024 16:55:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725982507; cv=none; b=FEvzhuvaa2qTqsVeVwkyt3HJSZRcjb59k3g8J+gE6WuhfrOpWlKru6tkNSGPtx0H0dmD82xi3jdeiN2XpS5L5ADcVKxIXoJWpV4Lm2tXfjnLMmqq2rA8xWLgrGTBJOWlCfKB2DJ9hM0RO07jNpgxbmdsqS5722enj2LhM6d/Qk8=
+	t=1725987345; cv=none; b=YC2r/YeXMf0v5VY/nEv4kob/UORFYBDdix68ygiN4m5odTQZ4cR/qpATnCxmQgeo2TKAiPfTk7okxZMlfggB2SKAaqJ//w+nibXZwvfb5Yu8lXSLO9TuP/3x43jNPLV/PJ7rMdpUJx4SNNUpFjFdqKFz2Lxcz6kqfu5tioSiaew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725982507; c=relaxed/simple;
-	bh=eZgtMdv1E6YANDrs+KDmIkrxBja+PSfHQUsMgKoVjFg=;
-	h=Message-ID:In-Reply-To:References:From:Date:Subject:To:Cc; b=JgKBhLViuK230ES6a+mq/U1Fqq7lRIrFEZnMy5Nqo3kS43xCd+5xm0dUpREfThTWYCG2146yqr4ixqEEnF9WpSlUGJhFON7V9MubdSTlkaag9AuUME9+TkGS7pPB4JlYQpe1tcX3Ba0L33JxslHtwmsfxrrsD/RzAlKCPxr4tY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=pass smtp.mailfrom=wunner.de; arc=none smtp.client-ip=83.223.78.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wunner.de
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by mailout2.hostsharing.net (Postfix) with ESMTPS id 8B1FB10323575;
-	Tue, 10 Sep 2024 17:35:03 +0200 (CEST)
-Received: from localhost (unknown [89.246.108.87])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by h08.hostsharing.net (Postfix) with ESMTPSA id 6B5F760A8B01;
-	Tue, 10 Sep 2024 17:35:03 +0200 (CEST)
-X-Mailbox-Line: From b74f4875ae056ff8aa20b7530fe4f41592581c63 Mon Sep 17 00:00:00 2001
-Message-ID: <b74f4875ae056ff8aa20b7530fe4f41592581c63.1725972335.git.lukas@wunner.de>
-In-Reply-To: <cover.1725972333.git.lukas@wunner.de>
-References: <cover.1725972333.git.lukas@wunner.de>
-From: Lukas Wunner <lukas@wunner.de>
-Date: Tue, 10 Sep 2024 16:30:29 +0200
-Subject: [PATCH v2 19/19] crypto: ecrdsa - Fix signature size calculation
-To: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, Eric Biggers <ebiggers@google.com>, Stefan Berger <stefanb@linux.ibm.com>, Vitaly Chikunov <vt@altlinux.org>, Tadeusz Struk <tstruk@gigaio.com>
-Cc: David Howells <dhowells@redhat.com>, Andrew Zaborowski <andrew.zaborowski@intel.com>, Saulo Alessandre <saulo.alessandre@tse.jus.br>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, Ignat Korchagin <ignat@cloudflare.com>, Marek Behun <kabel@kernel.org>, Varad Gautam <varadgautam@google.com>, Stephan Mueller <smueller@chronox.de>, Denis Kenzior <denkenz@gmail.com>, linux-crypto@vger.kernel.org, keyrings@vger.kernel.org
+	s=arc-20240116; t=1725987345; c=relaxed/simple;
+	bh=JScXB/yDn/yMAalsJJVsnq7kUH4Esc0s3LoE68Z1fOE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i9hT+LHGUQSIAuW/G0JGUlCFvF059vvpAKrAuP8oBmj6lRP2Z7lTD3dF1ZxFcH3WYB+hhKXNrK7SRwb3U69E3tPBCwy7orzqrJhKPMjtdt4r4EBfj8twe1ERBRnvEUN8oYxycTP/PgvQanVJBJgT5T4HtSyYkA4C1x4aHusBP6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EjkB9ZE6; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EjkB9ZE6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA44DC4CEC3;
+	Tue, 10 Sep 2024 16:55:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725987344;
+	bh=JScXB/yDn/yMAalsJJVsnq7kUH4Esc0s3LoE68Z1fOE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=EjkB9ZE6VOjrqBUcRfRB/IGW/03aiRntCIPbyiZBeqvHxaI5jKv9MwDaEG8DDCVms
+	 WBhJcAiQ4Cq9+12kFHqyGjbeONBmBIgn0n72KfpVQYgC8Cyl9UroP9T+nGG3iddOaY
+	 zmVEODx+AgQcJsB+zhOqAoZB7x3hKqjF50j3BlxAU9gjugH8ptsITaLY+Elxlr7MZi
+	 CpuAiqBlceiAqOg8kIcTrYvnqA9Bp0rCsSxI84V/pvG0URubh74hfOPnisgrrcm4Vb
+	 x73mUjdHWviA8aqphwPn8GbvnM48SNF3nyS6Gs/iX7VRUUVMeRdWM4apgyyiY+yvcF
+	 habjts3Llgr0g==
+Date: Tue, 10 Sep 2024 09:55:42 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Uros Bizjak <ubizjak@gmail.com>
+Cc: x86@kernel.org, linux-crypto@vger.kernel.org,
+	intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+	linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
+	linux-fscrypt@vger.kernel.org, linux-scsi@vger.kernel.org,
+	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	kunit-dev@googlegroups.com, linux-kernel@vger.kernel.org,
+	"Theodore Y. Ts'o" <tytso@mit.edu>,
+	Jaegeuk Kim <jaegeuk@kernel.org>
+Subject: Re: [PATCH RESEND v2 07/19] fscrypt: Include <linux/once.h> in
+ fs/crypto/keyring.c
+Message-ID: <20240910165542.GA2642@sol.localdomain>
+References: <20240909075641.258968-1-ubizjak@gmail.com>
+ <20240909075641.258968-8-ubizjak@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240909075641.258968-8-ubizjak@gmail.com>
 
-software_key_query() returns the curve size as maximum signature size
-for ecrdsa.  However it should return twice as much.
+On Mon, Sep 09, 2024 at 09:53:50AM +0200, Uros Bizjak wrote:
+> Include <linux/once.h> header to allow the removal of legacy
+> inclusion of <linux/prandom.h> from <linux/random.h>.
+> 
+> Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
+> Cc: Eric Biggers <ebiggers@kernel.org>
+> Cc: "Theodore Y. Ts'o" <tytso@mit.edu>
+> Cc: Jaegeuk Kim <jaegeuk@kernel.org>
+> ---
+> v2: Include <linux/once.h> instead of <linux/prandom.h>
+> ---
+>  fs/crypto/keyring.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/fs/crypto/keyring.c b/fs/crypto/keyring.c
+> index 6681a71625f0..82fcc5683649 100644
+> --- a/fs/crypto/keyring.c
+> +++ b/fs/crypto/keyring.c
+> @@ -22,6 +22,7 @@
+>  #include <crypto/skcipher.h>
+>  #include <linux/key-type.h>
+>  #include <linux/random.h>
+> +#include <linux/once.h>
+>  #include <linux/seq_file.h>
+>  
+>  #include "fscrypt_private.h"
 
-It's only the maximum signature size that seems to be off.  The maximum
-digest size is likewise set to the curve size, but that's correct as it
-matches the checks in ecrdsa_set_pub_key() and ecrdsa_verify().
+Acked-by: Eric Biggers <ebiggers@google.com>
 
-Signed-off-by: Lukas Wunner <lukas@wunner.de>
----
- crypto/ecrdsa.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
-
-diff --git a/crypto/ecrdsa.c b/crypto/ecrdsa.c
-index f981b31f4249..b3dd8a3ddeb7 100644
---- a/crypto/ecrdsa.c
-+++ b/crypto/ecrdsa.c
-@@ -252,6 +252,13 @@ static unsigned int ecrdsa_key_size(struct crypto_sig *tfm)
- 	return ctx->pub_key.ndigits * sizeof(u64);
- }
- 
-+static unsigned int ecrdsa_max_size(struct crypto_sig *tfm)
-+{
-+	struct ecrdsa_ctx *ctx = crypto_sig_ctx(tfm);
-+
-+	return 2 * ctx->pub_key.ndigits * sizeof(u64);
-+}
-+
- static void ecrdsa_exit_tfm(struct crypto_sig *tfm)
- {
- }
-@@ -260,6 +267,7 @@ static struct sig_alg ecrdsa_alg = {
- 	.verify		= ecrdsa_verify,
- 	.set_pub_key	= ecrdsa_set_pub_key,
- 	.key_size	= ecrdsa_key_size,
-+	.max_size	= ecrdsa_max_size,
- 	.exit		= ecrdsa_exit_tfm,
- 	.base = {
- 		.cra_name	 = "ecrdsa",
--- 
-2.43.0
-
+- Eric
