@@ -1,152 +1,96 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B87DF4EB;
-	Tue, 10 Sep 2024 00:37:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E649216C854;
+	Tue, 10 Sep 2024 09:30:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725928677; cv=none; b=roBtr6YVMxxBHugMO7V01Nj0qpD8GIGjcynrr7zTEnPomHlqCJawXU7+dFPxc+dWJa6MzNykBa9CAnjxlH0Hua4ZS/XKv4hCpGFV+rHT1Zh/zxpRL0Zy579gKQWxkL7Fdf1lasqRNA2RnfG0Abj54G7j/CMkbdCt3osTyV71WEM=
+	t=1725960643; cv=none; b=mpRtg8obUlT7yoryXI1jAPUTFpmot4LtcC0Lh4A73NnvFFldg32Zrr9G7XfoasuC2Q5e0oQRNlwjMyFuOXtjuf4t8aHCUZsKDsAP3o5Dm3VhozW7wLni2L/TPKn22/X2X4m1ACoAB+N2zMmtHMFVidyiF2voBc1Sjo08q+slhW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725928677; c=relaxed/simple;
-	bh=jr5zVGRGboL5XtozuVLN38ByT/dg4+14+mi3ttijOhM=;
+	s=arc-20240116; t=1725960643; c=relaxed/simple;
+	bh=P22qfW3/nowovXkhFrt2C3XOu/zwhHSpH61Vp/lcy5A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IynONVi+VOwrI3/gTULrbtV3ITfxXPKwt8SH9fjxBcCU9wekCYDu8OFfhQdxn4sqzNTd6wnWuZcyKegnqQkwXm8wDG+IQhmVuqIgJzXiv2N0FFUD6Qo6RYjMARTMErkgADVWFpAys88AA4J3W+hHrlScP790oCFP2qgAx9Qnam0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=ZKwT+fr4; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ok9EouKP6dUC8CGb5dvczfaii5bzJv7W7qPBMW/yohpp8VJX56FG8I1cNiO7gTkNyXtmu0HWhWB5U/LGDpYVqSmegaf0rND+CHU+cQ0I4kv45vRNSERluk4Rjg1g3DbKCAVbi+tjsHazLKShkA9XIz2rQH6hH0JUZCNvuldSfiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=DuF+t3xd; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="ZKwT+fr4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51DC3C4CEC5;
-	Tue, 10 Sep 2024 00:37:50 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="ZKwT+fr4"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1725928668;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OQLtanPdpI6IiO92yLD4QK+WpMduqZbfYjfvTA4Wjlg=;
-	b=ZKwT+fr48l6iq8LtejYrRYTAB9HVjSoYl2w9SIS8taTr8eJGaMN+UnDXFn2Y+3WPqB/R/F
-	rRaSffSolaALbBnXYJobLzN3VpV4Ezx51BMaa/1NhCLY3oqj42i7Mx1nH5OoYZ9G42zSuF
-	N4doRAUS+Xs6qZlnbpNizLgjSg5FNi8=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 9dac766c (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Tue, 10 Sep 2024 00:37:47 +0000 (UTC)
-Date: Tue, 10 Sep 2024 02:37:38 +0200
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: Uros Bizjak <ubizjak@gmail.com>
-Cc: x86@kernel.org, linux-crypto@vger.kernel.org,
-	intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-	linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
-	linux-fscrypt@vger.kernel.org, linux-scsi@vger.kernel.org,
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	kunit-dev@googlegroups.com, linux-kernel@vger.kernel.org,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Jani Nikula <jani.nikula@linux.intel.com>,
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Tvrtko Ursulin <tursulin@ursulin.net>,
-	David Airlie <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Hans Verkuil <hverkuil@xs4all.nl>,
-	Mauro Carvalho Chehab <mchehab@kernel.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Richard Weinberger <richard@nod.at>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Eric Biggers <ebiggers@kernel.org>,
-	"Theodore Y. Ts'o" <tytso@mit.edu>,
-	Jaegeuk Kim <jaegeuk@kernel.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Hannes Reinecke <hare@suse.de>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Brendan Higgins <brendan.higgins@linux.dev>,
-	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jiri Pirko <jiri@resnulli.us>, Petr Mladek <pmladek@suse.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Kent Overstreet <kent.overstreet@linux.dev>
-Subject: Re: [PATCH RESEND v2 00/19] random: Resolve circular include
- dependency and include <linux/percpu.h>
-Message-ID: <Zt-U0opo2EW8LSRJ@zx2c4.com>
-References: <20240909075641.258968-1-ubizjak@gmail.com>
- <Zt8a6_RwLG2pEnZ6@zx2c4.com>
- <CAFULd4ak3n1x0tGrqiNoxvDBRw6AWgchfBO_k4aKps34DomPvA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="DuF+t3xd"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=7vTWtWLYV3y3lWPAmfSRMP2q53xf73IcQM16aSUWQ5w=; b=DuF+t3xdILUKaI4/h4AjD4rLaH
+	N7VzbRg3QcFMDJrd2QsTc6ShZU/2CexWQAzfNZfB/1m+9OOTjQFwisRLZFtyH/TR0h9KKAKJQpxyX
+	t/UBz/I3QHtUNHkEvDuh+2kTaaejgTUamOnmTDFBndZ/qCOg5lmDwZG95cG5EnD2eqkhmYxWTJUO5
+	Bj66gRkSkW2zlIyC6xt1cevazFJpc2e2i2F0OBPSxixZA9ftcQ8zo9jjfXH4mrHEc/QryOwlbc8ox
+	jTFiK36ulK4M58cvcRq08RX2SKI8NmaXL4hk5N9XvA5t5VqyY//n4k8iCHPhtqHJsbTxzdbSWtOIR
+	xuXtPqzw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1snx2g-001Oow-1x;
+	Tue, 10 Sep 2024 17:30:25 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 10 Sep 2024 17:30:24 +0800
+Date: Tue, 10 Sep 2024 17:30:24 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: oe-kbuild@lists.linux.dev, lkp@intel.com, oe-kbuild-all@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [PATCH] crypto: n2 - Set err to EINVAL if snprintf fails for hmac
+Message-ID: <ZuARsOuhqFvIZkc0@gondor.apana.org.au>
+References: <ae2cfe53-7d2a-408b-8b18-af880d1974cc@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAFULd4ak3n1x0tGrqiNoxvDBRw6AWgchfBO_k4aKps34DomPvA@mail.gmail.com>
+In-Reply-To: <ae2cfe53-7d2a-408b-8b18-af880d1974cc@stanley.mountain>
 
-Hi Uros,
+On Tue, Sep 10, 2024 at 12:17:45PM +0300, Dan Carpenter wrote:
+> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
+> head:   89f5e14d05b4852db5ecdf222dc6a13edc633658
+> commit: 8c20982caca4b10ca79aea8134a16ea98989ca03 crypto: n2 - Silence gcc format-truncation false positive warnings
+> config: sparc-randconfig-r071-20240908 (https://download.01.org/0day-ci/archive/20240909/202409090726.TP0WfY7p-lkp@intel.com/config)
+> compiler: sparc64-linux-gcc (GCC) 14.1.0
+> 
+> If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+> | Closes: https://lore.kernel.org/r/202409090726.TP0WfY7p-lkp@intel.com/
+> 
+> smatch warnings:
+> drivers/crypto/n2_core.c:1406 __n2_register_one_hmac() error: uninitialized symbol 'err'.
 
-On Mon, Sep 09, 2024 at 09:30:06PM +0200, Uros Bizjak wrote:
-> Besides GCC, clang can define various named address space via
-> address_space attribute:
-> 
-> --cut here--
-> #define __as(N) __attribute__((address_space(N)))
-> 
-> void *foo(void __as(1) *x) { return x; }         // error
-> 
-> void *bar(void __as(1) *x) { return (void *)x; } // fine
-> --cut here--
-> 
-> When compiling this, the compiler returns:
-> 
-> clang-as.c:3:37: error: returning '__as(1) void *' from a function
-> with result type 'void *' changes address space of pointer
+---8<---
+Return EINVAL if the snprintf check fails when constructing the
+algorithm names.
 
-Super cool. Looking forward to having it all wired up and the bugs we'll
-find with it. 
+Fixes: 8c20982caca4 ("crypto: n2 - Silence gcc format-truncation false positive warnings")
+Reported-by: kernel test robot <lkp@intel.com>
+Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+Closes: https://lore.kernel.org/r/202409090726.TP0WfY7p-lkp@intel.com/
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-> I think that the best approach is to target this patchset for linux
-> 6.13 via random.git tree. I will prepare a v3 after 6.12rc1, so when
-> committed to random.git, the patchset will be able to spend some time
-> in linux-next. This way, there will be plenty of time for CI robots to
-> do additional checks also for some less popular targets (although
-> individual patches are dead simple, removing these kinds of "legacy"
-> includes can be tricky), and I will also be able to collect Acked-by:s
-> in the meantime.
-> 
-> While the patchset is an improvement by itself, its inclusion is not
-> time sensitive. The follow up percpu named address checking
-> functionality requires a very recent feature (__typeof_unqual__
-> keyword), which is only supported in recent compilers (gcc-14 and
-> clang-20). Besides compiler support, sparse doesn't know about
-> __typeof_unqual__, resulting in broken type tracing and hundreds of
-> sparse errors with C=1 due to unknown keyword.
-> 
-> So, I think we are not in a hurry and can take the slow and safe path.
-
-Okay, sure, that sounds good to me. I'll keep my eyes open for v3
-in a few weeks then.
-
-Jason
+diff --git a/drivers/crypto/n2_core.c b/drivers/crypto/n2_core.c
+index f4022d845393..eeef285277ed 100644
+--- a/drivers/crypto/n2_core.c
++++ b/drivers/crypto/n2_core.c
+@@ -1375,6 +1375,7 @@ static int __n2_register_one_hmac(struct n2_ahash_alg *n2ahash)
+ 	ahash->setkey = n2_hmac_async_setkey;
+ 
+ 	base = &ahash->halg.base;
++	err = -EINVAL;
+ 	if (snprintf(base->cra_name, CRYPTO_MAX_ALG_NAME, "hmac(%s)",
+ 		     p->child_alg) >= CRYPTO_MAX_ALG_NAME)
+ 		goto out_free_p;
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
