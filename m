@@ -1,60 +1,45 @@
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B3C913D635
-	for <linux-crypto@vger.kernel.org>; Wed, 11 Sep 2024 08:08:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D285C182C5
+	for <linux-crypto@vger.kernel.org>; Wed, 11 Sep 2024 08:12:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726042089; cv=none; b=tPrkQ+rBbboXCK35XPyALOBNlxpIy127ZpRy61ywiZw2GRmvswEWKIAqVPvsCC1LwNqPOi9Bdb0Vhby/4b9jIdIgLvwOdoPiAw06udA5bMjMLA949F1v0gQtZCPhwFU/XkSn5zXovllLEwF6yMyOWB4+yXis8i71btmlw0WFbzk=
+	t=1726042379; cv=none; b=cj0IOP7LZsOPg/W0vuIJaianUpagNEhnI3QckjheHhYye3nNb1yHOdTrrey5fRYKktzdJwpQFGCtsZBf8/kXPSp6GyWO6qTdhaQhD4K13n67iacd+bpZ+SoriMR/sQl9Nc7mgz5z3tw4PQ9S8Sxp8d47Sq0Y/ped7FFCjyemsIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726042089; c=relaxed/simple;
-	bh=BQPOpYYCQkhPUhrt8AUfxhvN0AAhfW4ksV1vz5hh/7s=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=qLDsaqt7FBHrXSehWEgUaaPCpCRM6f+RtTPSwutvy1c9sabl01O9A3lKCnpeyKHKJ9XKXQbQtykBCsHSZS//5wa4golIqyBTLY/KzjjrYr0W7eCtrxS0dEvwJtr6tqjD2CQ+vzffw8eH1e+cO7aThf21Y5p6+nSZrfnMWXERemg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=s2RIX6GT; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1726042379; c=relaxed/simple;
+	bh=OSG0K2iglxPMHvaEVwH0kPy4nGQgWwtpvhxynVWE8Jo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NhC5SlVVjYC1FYltQDLFFQ38aeS44YrmO3MRs3pTT9b9DEpNyInexYYcnZ1uu8pK7xTufIURgwZ60T5el7aTVJ34KYpE2i0vDgl21VIAWJxhZnmkFB8ofGYyzA9h0Nj2Jqfq6M/rCIrdl9pu4q2CaEoDXFM3jXsumjbwJgC5eHI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=VhwSJ24P; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="s2RIX6GT"
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4280ca0791bso60380565e9.1
-        for <linux-crypto@vger.kernel.org>; Wed, 11 Sep 2024 01:08:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1726042086; x=1726646886; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+gHVaZN7dAIfNeImX+HOoDw8Q1KwcV0Z64ECRxFwdt0=;
-        b=s2RIX6GTHCIyOwdFXoaB129FTu6ROnJhELNgT7/AAnrQiSfca7v95ApvJ55VHicLay
-         J2UDh5hotNo4mYa/WlMeFyXo8RluyhQBdlLz1A6Kt2qWW7iLW/0uUq1lhvMVDPDZOBER
-         2aSNw8RtuQ9apSScO1KkYky8Ubg1+0oLmg65wQKgRiEgsOGJukagUcAL30AfJDlNiyXf
-         uOU0wADZpUtrhqqQwfVW/YefoqDjj5MeXsDGXb6Mx9ut2yCp3Dk9KM8IcgGuMoflS/Q1
-         bvwdOoznYn9tcSF3cciJJe4zm6qFf1cJfc8hRDjqcmfjC8NeJhxGwTn6oUdruLP0z5wL
-         kvVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726042086; x=1726646886;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+gHVaZN7dAIfNeImX+HOoDw8Q1KwcV0Z64ECRxFwdt0=;
-        b=oo8r9n8+dsvhZ3rrFJgzPRaLM32qlujP0gC6t3wuqAkV/YPwEBiw/PXPCLih6q0pEc
-         qaX+syR8/xaugKgZxWDx0OXbBTH0DA10Opc47ENZSqJ+dQ6wxFrwpk3qBTPYx2wMLwzd
-         VBl9oJXi1zi1Qpoc26jaXQxSkDJC4DgnswwQgyMMAZYKfMFTvYmbxWCB4rbRU0GRe7ve
-         gWmLexz3bqHHL9faexz1j2IsXFqHxl1grF88w0EvyvDMlSe3nUcJSvwzzkEioBQKiQL7
-         LwtFmEH4DVPVI2foGviKSgv4Sl5NE5f/Z85SE0Wws7rCf43DIP9y9p6QYNE1u1QsBXc/
-         /D4Q==
-X-Gm-Message-State: AOJu0YyWTrGle7ZwtgqimPx9sYRZ/JEifVQhST1mpmv1WHd89vqzDbuN
-	h6MeakV5CfvZik1FF67D5hfA76eTb3gZb+TAGQfM/xBv618CV41AgGo2BdU41Xs=
-X-Google-Smtp-Source: AGHT+IGamNK4G2v/Eu5KK7iyvryQrssbgu9x2esoCSmnUl7pkELxj3l5jNlufi8E5on19pIFrQXZlA==
-X-Received: by 2002:a5d:51c8:0:b0:374:c2cf:c017 with SMTP id ffacd0b85a97d-3788967589fmr9943299f8f.46.1726042085472;
-        Wed, 11 Sep 2024 01:08:05 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42caeb21a68sm134547635e9.8.2024.09.11.01.08.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Sep 2024 01:08:05 -0700 (PDT)
-Date: Wed, 11 Sep 2024 11:08:01 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="VhwSJ24P"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=1tNR8DDvn+V6KtjGOM/DHfLLycpGW2+TpAKgIEKzc8I=; b=VhwSJ24P4U4HvT8u03vCNTlqlO
+	kmAYP9Z2t9wrLs/L6XZdGCXF5ZEc73T5V8K9Ayq9epH3ylv1hSjZkEQV8uBaReY/27gHxm9324vBh
+	U9LEbynhd3N6BCIsX7DTDotvebz02C90IfcuQpcExvfi03+jcsEBcAIC7n1JqeDxXFIJLJz66cnw9
+	CGDsgfkPv0J6AoqJDKT5Tb/oBXeyA2D1fyi+BfBtvGBqZl6yfTEJ6RSgRu/+xXkfoEE1YYflwENOG
+	IRBicPPPWu8y7vohjC8rr8kiivaGOF9RQen13o5UMIgZlw4CeMcPzmbYJ1kXs7xuLbxPt/D+KHahL
+	2NpgPFkw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1soIJB-001ey1-1Y;
+	Wed, 11 Sep 2024 16:12:52 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 11 Sep 2024 16:12:51 +0800
+Date: Wed, 11 Sep 2024 16:12:51 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Dan Carpenter <dan.carpenter@linaro.org>
 Cc: linux-crypto@vger.kernel.org
-Subject: [bug report] crypto: algboss - Pass instance creation error up
-Message-ID: <7f5c4907-ac4f-4b41-90d0-e00c1e552bf6@stanley.mountain>
+Subject: Re: [bug report] crypto: algboss - Pass instance creation error up
+Message-ID: <ZuFRA7c_stkYI5Rr@gondor.apana.org.au>
+References: <7f5c4907-ac4f-4b41-90d0-e00c1e552bf6@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -63,49 +48,43 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <7f5c4907-ac4f-4b41-90d0-e00c1e552bf6@stanley.mountain>
 
-Hello Herbert Xu,
+On Wed, Sep 11, 2024 at 11:08:01AM +0300, Dan Carpenter wrote:
+> Hello Herbert Xu,
+> 
+> Commit 795f85fca229 ("crypto: algboss - Pass instance creation error
+> up") from Sep 1, 2024 (linux-next), leads to the following Smatch
+> static checker warning:
+> 
+> 	crypto/algboss.c:67 cryptomgr_probe()
+> 	warn: passing zero to 'ERR_PTR'
+> 
+> crypto/algboss.c
+>     50 static int cryptomgr_probe(void *data)
+>     51 {
+>     52         struct cryptomgr_param *param = data;
+>     53         struct crypto_template *tmpl;
+>     54         int err = -ENOENT;
+>     55 
+>     56         tmpl = crypto_lookup_template(param->template);
+>     57         if (!tmpl)
+>     58                 goto out;
+>     59 
+>     60         do {
+>     61                 err = tmpl->create(tmpl, param->tb);
+>     62         } while (err == -EAGAIN && !signal_pending(current));
+>     63 
+>     64         crypto_tmpl_put(tmpl);
+>     65 
+>     66 out:
+> --> 67         param->larval->adult = ERR_PTR(err);
 
-Commit 795f85fca229 ("crypto: algboss - Pass instance creation error
-up") from Sep 1, 2024 (linux-next), leads to the following Smatch
-static checker warning:
+This is intentional.  If adult is NULL then the caller will retry
+the lookup in crypto_larval_wait.
 
-	crypto/algboss.c:67 cryptomgr_probe()
-	warn: passing zero to 'ERR_PTR'
-
-crypto/algboss.c
-    50 static int cryptomgr_probe(void *data)
-    51 {
-    52         struct cryptomgr_param *param = data;
-    53         struct crypto_template *tmpl;
-    54         int err = -ENOENT;
-    55 
-    56         tmpl = crypto_lookup_template(param->template);
-    57         if (!tmpl)
-    58                 goto out;
-    59 
-    60         do {
-    61                 err = tmpl->create(tmpl, param->tb);
-    62         } while (err == -EAGAIN && !signal_pending(current));
-    63 
-    64         crypto_tmpl_put(tmpl);
-    65 
-    66 out:
---> 67         param->larval->adult = ERR_PTR(err);
-
-I wasn't able to find anything which was using this code...
-
-This is assigned on both the success and failure paths so it means that
-crypto_larval_destroy() never calls crypto_mod_put(larval->adult).  But I don't
-really understand this code well so maybe there is nothing to free at this
-point.
-
-    68         param->larval->alg.cra_flags |= CRYPTO_ALG_DEAD;
-    69         complete_all(&param->larval->completion);
-    70         crypto_alg_put(&param->larval->alg);
-    71         kfree(param);
-    72         module_put_and_kthread_exit(0);
-    73 }
-
-regards,
-dan carpenter
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
