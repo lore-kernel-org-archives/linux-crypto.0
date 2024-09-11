@@ -1,187 +1,78 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D84C192D66;
-	Wed, 11 Sep 2024 12:12:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from cmccmta1.chinamobile.com (cmccmta4.chinamobile.com [111.22.67.137])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B401176ADE;
+	Wed, 11 Sep 2024 12:18:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.22.67.137
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726056757; cv=none; b=pjiXD/rFjQnmez/sZJvjMxQLljcwW4h3DkxgLFlMa61UTfrHmQ+TcqmO6cGA24L0kXo4AB2t0zxQnvFVU4ijoNMkmOmU6vBxydqspYYNeGFm1RT3hGabSdAoP3a5iFwT23MasXOb5oC1KeZcT2Qnbryz6sH0X3nGI0v1mMsTwbc=
+	t=1726057113; cv=none; b=lSLVpZFoQHAEpvKKoZmYx5nHNbmmVIwchVpKSEhLH2iaH6y3DFQnhjJ+UM8Yt5sM4WRzMw2v9hsTKcelYwzYKTuZdzZcR6kTltxPQd9Bt0EJ4njKf1d/cUFt1imVcDhVVPjm+8xL0Xw5CnMp+6ghS1dvuMyesZkn8kKFV/mgAbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726056757; c=relaxed/simple;
-	bh=0EI2o99U8hIYQ8IQUYKjLd+GIVu3vHz4KT+prER26z0=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=t6MuNjjwikNzgS3okdlW4Zx1M3t1Rxv+jhXFdnmST0Q10Ckp46hsnG+4UcfRyEdgR6w8berOfysMk2GxIt4UhPQNzjVowxIfX4dtgBmIVAKlPVgKTeuWSwT8LXAxy9SEH9+GpqF/RID42/41Vk3l+6r2SLNzsgRWPhppeZNEcL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kdohdKXw; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kdohdKXw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3EBFC4CEC5;
-	Wed, 11 Sep 2024 12:12:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726056757;
-	bh=0EI2o99U8hIYQ8IQUYKjLd+GIVu3vHz4KT+prER26z0=;
-	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
-	b=kdohdKXwrcp2XkrbZcoa3oJp3pWTE9KwcaVtnmSJZCBm99I8Ptkm9snxyojMmfrFp
-	 cL/AzJfbxLcgRu1+TgyrYHSZyI02RcByogUtAx0Q4sIrK4y+PfyJ0VrWUqrnPJBssQ
-	 tX0e1WYmZjwink3cV9/qt6XJClmonArB4N9Ky32H9UW6R+t5pl9AlDa5btxegPcIsF
-	 ZKQa/yNS0BGL2IISZYOOPCK7GmQ6Na9BA9qrXeP1xANT6zsjNO2IZaEMHTeBrUz5ZI
-	 +wl5x+JhXTa3QQmR17sBSLhZUw/Z46IgsgB1B6RSYEymom2nC1kSlRJMJ4l7dxflFK
-	 O02HEBs7VAp9g==
+	s=arc-20240116; t=1726057113; c=relaxed/simple;
+	bh=ljw42LRKu+ZJIRB1/tfsHKyT2lWPm3ewsOyW3NThXnI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=aMBodalUAWocg1tDeF+zq/q79wNlRM7wweVgl7M7qUvxpPp3Ww79b8JHTPoGtrTbYO5mdVX3CXUs240fxwGErYvm7ofgAoENltwF29Xl2IH7h0FkbPK8WSR5FZ8kDYdHQq6fUkp/nNafUPFL4iSPRUUsDy/q/PDMhC/Utc0/FNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cmss.chinamobile.com; spf=pass smtp.mailfrom=cmss.chinamobile.com; arc=none smtp.client-ip=111.22.67.137
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cmss.chinamobile.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cmss.chinamobile.com
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG:00000000
+Received:from spf.mail.chinamobile.com (unknown[10.188.0.87])
+	by rmmx-syy-dmz-app04-12004 (RichMail) with SMTP id 2ee466e18a8afc0-f08b6;
+	Wed, 11 Sep 2024 20:18:20 +0800 (CST)
+X-RM-TRANSID:2ee466e18a8afc0-f08b6
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG:00000000
+Received:from localhost.localdomain (unknown[223.108.79.97])
+	by rmsmtp-syy-appsvr01-12001 (RichMail) with SMTP id 2ee166e18a70e4f-cb9c7;
+	Wed, 11 Sep 2024 20:18:19 +0800 (CST)
+X-RM-TRANSID:2ee166e18a70e4f-cb9c7
+From: Tang Bin <tangbin@cmss.chinamobile.com>
+To: clabbe@baylibre.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net
+Cc: linux-crypto@vger.kernel.org,
+	linux-amlogic@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Tang Bin <tangbin@cmss.chinamobile.com>
+Subject: [PATCH] crypto: amlogic - Remove redundant assignment and error messages
+Date: Wed, 11 Sep 2024 20:17:51 +0800
+Message-Id: <20240911121751.1900-1-tangbin@cmss.chinamobile.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 11 Sep 2024 15:12:33 +0300
-Message-Id: <D43G1XSAWTQF.OG1Z8K18DUVF@kernel.org>
-Cc: "David Howells" <dhowells@redhat.com>, "Andrew Zaborowski"
- <andrew.zaborowski@intel.com>, "Saulo Alessandre"
- <saulo.alessandre@tse.jus.br>, "Jonathan Cameron"
- <Jonathan.Cameron@huawei.com>, "Ignat Korchagin" <ignat@cloudflare.com>,
- "Marek Behun" <kabel@kernel.org>, "Varad Gautam" <varadgautam@google.com>,
- "Stephan Mueller" <smueller@chronox.de>, "Denis Kenzior"
- <denkenz@gmail.com>, <linux-crypto@vger.kernel.org>,
- <keyrings@vger.kernel.org>
-Subject: Re: [PATCH v2 02/19] crypto: sig - Introduce sig_alg backend
-From: "Jarkko Sakkinen" <jarkko@kernel.org>
-To: "Lukas Wunner" <lukas@wunner.de>, "Herbert Xu"
- <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
- "Eric Biggers" <ebiggers@google.com>, "Stefan Berger"
- <stefanb@linux.ibm.com>, "Vitaly Chikunov" <vt@altlinux.org>, "Tadeusz
- Struk" <tstruk@gigaio.com>
-X-Mailer: aerc 0.18.2
-References: <cover.1725972333.git.lukas@wunner.de>
- <688e92e7db6f2de1778691bb7cdafe3bb39e73c6.1725972334.git.lukas@wunner.de>
-In-Reply-To: <688e92e7db6f2de1778691bb7cdafe3bb39e73c6.1725972334.git.lukas@wunner.de>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Tue Sep 10, 2024 at 5:30 PM EEST, Lukas Wunner wrote:
-> Commit 6cb8815f41a9 ("crypto: sig - Add interface for sign/verify")
-> began a transition of asymmetric sign/verify operations from
-> crypto_akcipher to a new crypto_sig frontend.
->
-> Internally, the crypto_sig frontend still uses akcipher_alg as backend,
-> however:
->
->    "The link between sig and akcipher is meant to be temporary.  The
->     plan is to create a new low-level API for sig and then migrate
->     the signature code over to that from akcipher."
->     https://lore.kernel.org/r/ZrG6w9wsb-iiLZIF@gondor.apana.org.au/
->
->    "having a separate alg for sig is definitely where we want to
->     be since there is very little that the two types actually share."
->     https://lore.kernel.org/r/ZrHlpz4qnre0zWJO@gondor.apana.org.au/
->
-> Take the next step of that migration and augment the crypto_sig frontend
-> with a sig_alg backend to which all algorithms can be moved.
->
-> During the migration, there will briefly be signature algorithms that
-> are still based on crypto_akcipher, whilst others are already based on
-> crypto_sig.  Allow for that by building a fork into crypto_sig_*() API
-> calls (i.e. crypto_sig_maxsize() and friends) such that one of the two
-> backends is selected based on the transform's cra_type.
->
-> Signed-off-by: Lukas Wunner <lukas@wunner.de>
-> ---
->  Documentation/crypto/api-sig.rst      |  15 +++
->  Documentation/crypto/api.rst          |   1 +
->  Documentation/crypto/architecture.rst |   2 +
->  crypto/sig.c                          | 143 +++++++++++++++++++++++++-
->  crypto/testmgr.c                      | 115 +++++++++++++++++++++
->  crypto/testmgr.h                      |  13 +++
->  include/crypto/internal/sig.h         |  80 ++++++++++++++
->  include/crypto/sig.h                  |  61 +++++++++++
->  include/uapi/linux/cryptouser.h       |   5 +
->  9 files changed, 433 insertions(+), 2 deletions(-)
->  create mode 100644 Documentation/crypto/api-sig.rst
->
-> diff --git a/Documentation/crypto/api-sig.rst b/Documentation/crypto/api-=
-sig.rst
-> new file mode 100644
-> index 000000000000..e5e87e106884
-> --- /dev/null
-> +++ b/Documentation/crypto/api-sig.rst
-> @@ -0,0 +1,15 @@
-> +Asymmetric Signature Algorithm Definitions
-> +------------------------------------------
-> +
-> +.. kernel-doc:: include/crypto/sig.h
-> +   :functions: sig_alg
-> +
-> +Asymmetric Signature API
-> +------------------------
-> +
-> +.. kernel-doc:: include/crypto/sig.h
-> +   :doc: Generic Public Key Signature API
-> +
-> +.. kernel-doc:: include/crypto/sig.h
-> +   :functions: crypto_alloc_sig crypto_free_sig crypto_sig_set_pubkey cr=
-ypto_sig_set_privkey crypto_sig_maxsize crypto_sig_sign crypto_sig_verify
-> +
-> diff --git a/Documentation/crypto/api.rst b/Documentation/crypto/api.rst
-> index ff31c30561d4..8b2a90521886 100644
-> --- a/Documentation/crypto/api.rst
-> +++ b/Documentation/crypto/api.rst
-> @@ -10,4 +10,5 @@ Programming Interface
->     api-digest
->     api-rng
->     api-akcipher
-> +   api-sig
->     api-kpp
-> diff --git a/Documentation/crypto/architecture.rst b/Documentation/crypto=
-/architecture.rst
-> index 646c3380a7ed..15dcd62fd22f 100644
-> --- a/Documentation/crypto/architecture.rst
-> +++ b/Documentation/crypto/architecture.rst
-> @@ -214,6 +214,8 @@ the aforementioned cipher types:
-> =20
->  -  CRYPTO_ALG_TYPE_AKCIPHER Asymmetric cipher
-> =20
-> +-  CRYPTO_ALG_TYPE_SIG Asymmetric signature
-> +
->  -  CRYPTO_ALG_TYPE_PCOMPRESS Enhanced version of
->     CRYPTO_ALG_TYPE_COMPRESS allowing for segmented compression /
->     decompression instead of performing the operation on one segment
+In the function meson_crypto_probe, devm_platform_ioremap_resource()
+have already contains error message, so remove the
+redundant assignment and error messages.
 
-I'd split the documentation update. It's not strictly necessary as it is
-still part of crypto (e.g. not kernel-parameters.txt) but they are still
-too disjoint logical artifacts that you need to review separately.
+Signed-off-by: Tang Bin <tangbin@cmss.chinamobile.com>
+---
+ drivers/crypto/amlogic/amlogic-gxl-core.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-> diff --git a/crypto/sig.c b/crypto/sig.c
-> index 7645bedf3a1f..4f36ceb7a90b 100644
-> --- a/crypto/sig.c
-> +++ b/crypto/sig.c
-> @@ -21,14 +21,38 @@
-> =20
->  static const struct crypto_type crypto_sig_type;
-> =20
-> +static void crypto_sig_exit_tfm(struct crypto_tfm *tfm)
-> +{
-> +	struct crypto_sig *sig =3D __crypto_sig_tfm(tfm);
-> +	struct sig_alg *alg =3D crypto_sig_alg(sig);
-> +
-> +	alg->exit(sig);
-> +}
-> +
->  static int crypto_sig_init_tfm(struct crypto_tfm *tfm)
->  {
->  	if (tfm->__crt_alg->cra_type !=3D &crypto_sig_type)
->  		return crypto_init_akcipher_ops_sig(tfm);
-> =20
-> +	struct crypto_sig *sig =3D __crypto_sig_tfm(tfm);
-> +	struct sig_alg *alg =3D crypto_sig_alg(sig);
-> +
-> +	if (alg->exit)
-> +		sig->base.exit =3D crypto_sig_exit_tfm;
-> +
-> +	if (alg->init)
-> +		return alg->init(sig);
+diff --git a/drivers/crypto/amlogic/amlogic-gxl-core.c b/drivers/crypto/amlogic/amlogic-gxl-core.c
+index f54ab0d0b..6fe248620 100644
+--- a/drivers/crypto/amlogic/amlogic-gxl-core.c
++++ b/drivers/crypto/amlogic/amlogic-gxl-core.c
+@@ -240,11 +240,9 @@ static int meson_crypto_probe(struct platform_device *pdev)
+ 	platform_set_drvdata(pdev, mc);
+ 
+ 	mc->base = devm_platform_ioremap_resource(pdev, 0);
+-	if (IS_ERR(mc->base)) {
+-		err = PTR_ERR(mc->base);
+-		dev_err(&pdev->dev, "Cannot request MMIO err=%d\n", err);
+-		return err;
+-	}
++	if (IS_ERR(mc->base))
++		return PTR_ERR(mc->base);
++
+ 	mc->busclk = devm_clk_get(&pdev->dev, "blkmv");
+ 	if (IS_ERR(mc->busclk)) {
+ 		err = PTR_ERR(mc->busclk);
+-- 
+2.33.0
 
-1. alg->exit =3D=3D NULL, alg->init =3D=3D NULL
-2. alg->exit !=3D NULL, alg->init =3D=3D NULL
-3. alg->exit =3D=3D NULL, alg->init !=3D NULL
 
-Which of the three are legit use of the API and which are not?
 
-BR, Jarkko
