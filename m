@@ -1,133 +1,111 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F34416C854;
-	Tue, 10 Sep 2024 21:48:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B3C913D635
+	for <linux-crypto@vger.kernel.org>; Wed, 11 Sep 2024 08:08:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726004926; cv=none; b=Pju6bPJ8HlO/pwPXE60Ufj+NrqQS7vAM65QWmS0ExeCQU2c2La5JoRo1V2NedX8r8TOqQlt6HcBjrxA0zX8FigCuEXiv/0skPQpW9/xpYhmsAiPlszhszpkk1ep9114NXqMtT+V62LeeuPjaS2upHqyK0pm3DilDyl4hVNVEAPk=
+	t=1726042089; cv=none; b=tPrkQ+rBbboXCK35XPyALOBNlxpIy127ZpRy61ywiZw2GRmvswEWKIAqVPvsCC1LwNqPOi9Bdb0Vhby/4b9jIdIgLvwOdoPiAw06udA5bMjMLA949F1v0gQtZCPhwFU/XkSn5zXovllLEwF6yMyOWB4+yXis8i71btmlw0WFbzk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726004926; c=relaxed/simple;
-	bh=vGPncFprsxm/fAOWXG3+i9RfL/D57gHl+J/0ZFyJTHE=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=jG2Fv7h1Uduz8QiUa1xEyfWtWzjA1vRtn5umXkY5c0MbVV27K4BedOdI1nlu4XGUXIWxI8aHpl0xwc7IWg22afoeUUhQyzoPHkYGyFpwgC1CPfk4oadPUw9+CXg9LAvTqrbQikjviBpn17Cxj5v3KjOiRH782MN1E9kpG3/F2Ws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=IzB/gmcy; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1726042089; c=relaxed/simple;
+	bh=BQPOpYYCQkhPUhrt8AUfxhvN0AAhfW4ksV1vz5hh/7s=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=qLDsaqt7FBHrXSehWEgUaaPCpCRM6f+RtTPSwutvy1c9sabl01O9A3lKCnpeyKHKJ9XKXQbQtykBCsHSZS//5wa4golIqyBTLY/KzjjrYr0W7eCtrxS0dEvwJtr6tqjD2CQ+vzffw8eH1e+cO7aThf21Y5p6+nSZrfnMWXERemg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=s2RIX6GT; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="IzB/gmcy"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48AFKRlt021760;
-	Tue, 10 Sep 2024 21:46:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:date:subject:to:cc:references:from:in-reply-to
-	:content-type:content-transfer-encoding:mime-version; s=pp1; bh=
-	CX2CcmFdyKQa10u3RE7Hlil+wr28ZSrTGQQi9hSImxo=; b=IzB/gmcyaV+UnvY4
-	TFtkw7t05j6nEAj7zvZjrTr9dacMTFITalzb8rcqWZMlAXVtq0tPSv+Ry4Pq7Je7
-	2W/3gOearyhbx5yn4xNnD8TiOKMmh6pzAYIcuhbrnknhzI6Pi7ZdNdk3GsF0WBJs
-	Sf+Bp4fA3KpzlAtgpVAsCClI11WdZ91yww9w/g/DCqV5vC6D8oGUQ6NE+f1thh87
-	C6P+vs4PQ9ZAOnLO3Mk04VuoxQSjDHIwT04CZktjSiyPxGniOgfdBP1MUanFagUv
-	IKb9HIpTz752+ygHnBGBvhkWaFlQotojNTrEKV+8FDRcaXhTx3cdt9b1vHPaT24e
-	NsHhbg==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41gc8qab2y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 10 Sep 2024 21:46:21 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 48ALkKhx005236;
-	Tue, 10 Sep 2024 21:46:20 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41gc8qab2t-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 10 Sep 2024 21:46:20 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 48AJL4H9019891;
-	Tue, 10 Sep 2024 21:46:20 GMT
-Received: from smtprelay04.dal12v.mail.ibm.com ([172.16.1.6])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 41h25pwqsf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 10 Sep 2024 21:46:19 +0000
-Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
-	by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 48ALkJG4459358
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 10 Sep 2024 21:46:19 GMT
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id EC0CD5804B;
-	Tue, 10 Sep 2024 21:46:18 +0000 (GMT)
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 57A3158055;
-	Tue, 10 Sep 2024 21:46:17 +0000 (GMT)
-Received: from [9.47.158.152] (unknown [9.47.158.152])
-	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 10 Sep 2024 21:46:17 +0000 (GMT)
-Message-ID: <20e10bf5-2ac1-4d10-bedd-7c61572fc55f@linux.ibm.com>
-Date: Tue, 10 Sep 2024 17:46:15 -0400
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 18/19] crypto: ecdsa - Support P1363 signature decoding
-To: Lukas Wunner <lukas@wunner.de>, Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Biggers <ebiggers@google.com>, Vitaly Chikunov <vt@altlinux.org>,
-        Tadeusz Struk <tstruk@gigaio.com>
-Cc: David Howells <dhowells@redhat.com>,
-        Andrew Zaborowski <andrew.zaborowski@intel.com>,
-        Saulo Alessandre <saulo.alessandre@tse.jus.br>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        Ignat Korchagin <ignat@cloudflare.com>, Marek Behun <kabel@kernel.org>,
-        Varad Gautam <varadgautam@google.com>,
-        Stephan Mueller
- <smueller@chronox.de>,
-        Denis Kenzior <denkenz@gmail.com>, linux-crypto@vger.kernel.org,
-        keyrings@vger.kernel.org
-References: <cover.1725972333.git.lukas@wunner.de>
- <73e9e6b6ba2631e2d9474bd53be165b2ae8810d4.1725972335.git.lukas@wunner.de>
-Content-Language: en-US
-From: Stefan Berger <stefanb@linux.ibm.com>
-In-Reply-To: <73e9e6b6ba2631e2d9474bd53be165b2ae8810d4.1725972335.git.lukas@wunner.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: ZZxG3LUB8lzeSRK_jilvAzve6lW-p3CZ
-X-Proofpoint-ORIG-GUID: 0ItC-gs4zkE9iI2T34SnfGiVEVaw30K0
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="s2RIX6GT"
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4280ca0791bso60380565e9.1
+        for <linux-crypto@vger.kernel.org>; Wed, 11 Sep 2024 01:08:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1726042086; x=1726646886; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+gHVaZN7dAIfNeImX+HOoDw8Q1KwcV0Z64ECRxFwdt0=;
+        b=s2RIX6GTHCIyOwdFXoaB129FTu6ROnJhELNgT7/AAnrQiSfca7v95ApvJ55VHicLay
+         J2UDh5hotNo4mYa/WlMeFyXo8RluyhQBdlLz1A6Kt2qWW7iLW/0uUq1lhvMVDPDZOBER
+         2aSNw8RtuQ9apSScO1KkYky8Ubg1+0oLmg65wQKgRiEgsOGJukagUcAL30AfJDlNiyXf
+         uOU0wADZpUtrhqqQwfVW/YefoqDjj5MeXsDGXb6Mx9ut2yCp3Dk9KM8IcgGuMoflS/Q1
+         bvwdOoznYn9tcSF3cciJJe4zm6qFf1cJfc8hRDjqcmfjC8NeJhxGwTn6oUdruLP0z5wL
+         kvVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726042086; x=1726646886;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+gHVaZN7dAIfNeImX+HOoDw8Q1KwcV0Z64ECRxFwdt0=;
+        b=oo8r9n8+dsvhZ3rrFJgzPRaLM32qlujP0gC6t3wuqAkV/YPwEBiw/PXPCLih6q0pEc
+         qaX+syR8/xaugKgZxWDx0OXbBTH0DA10Opc47ENZSqJ+dQ6wxFrwpk3qBTPYx2wMLwzd
+         VBl9oJXi1zi1Qpoc26jaXQxSkDJC4DgnswwQgyMMAZYKfMFTvYmbxWCB4rbRU0GRe7ve
+         gWmLexz3bqHHL9faexz1j2IsXFqHxl1grF88w0EvyvDMlSe3nUcJSvwzzkEioBQKiQL7
+         LwtFmEH4DVPVI2foGviKSgv4Sl5NE5f/Z85SE0Wws7rCf43DIP9y9p6QYNE1u1QsBXc/
+         /D4Q==
+X-Gm-Message-State: AOJu0YyWTrGle7ZwtgqimPx9sYRZ/JEifVQhST1mpmv1WHd89vqzDbuN
+	h6MeakV5CfvZik1FF67D5hfA76eTb3gZb+TAGQfM/xBv618CV41AgGo2BdU41Xs=
+X-Google-Smtp-Source: AGHT+IGamNK4G2v/Eu5KK7iyvryQrssbgu9x2esoCSmnUl7pkELxj3l5jNlufi8E5on19pIFrQXZlA==
+X-Received: by 2002:a5d:51c8:0:b0:374:c2cf:c017 with SMTP id ffacd0b85a97d-3788967589fmr9943299f8f.46.1726042085472;
+        Wed, 11 Sep 2024 01:08:05 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42caeb21a68sm134547635e9.8.2024.09.11.01.08.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Sep 2024 01:08:05 -0700 (PDT)
+Date: Wed, 11 Sep 2024 11:08:01 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org
+Subject: [bug report] crypto: algboss - Pass instance creation error up
+Message-ID: <7f5c4907-ac4f-4b41-90d0-e00c1e552bf6@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-10_08,2024-09-09_02,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
- mlxscore=0 lowpriorityscore=0 impostorscore=0 priorityscore=1501
- malwarescore=0 adultscore=0 clxscore=1015 mlxlogscore=747 suspectscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2408220000 definitions=main-2409100161
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
+Hello Herbert Xu,
 
+Commit 795f85fca229 ("crypto: algboss - Pass instance creation error
+up") from Sep 1, 2024 (linux-next), leads to the following Smatch
+static checker warning:
 
-On 9/10/24 10:30 AM, Lukas Wunner wrote:
-> Alternatively to the X9.62 encoding of ecdsa signatures, which uses
-> ASN.1 and is already supported by the kernel, there's another common
-> encoding called P1363.  It stores r and s as the concatenation of two
-> big endian, unsigned integers.  The name originates from IEEE P1363.
-> 
-> Add a P1363 template in support of the forthcoming SPDM library
-> (Security Protocol and Data Model) for PCI device authentication.
-> 
-> P1363 is prescribed by SPDM 1.2.1 margin no 44:
-> 
->     "For ECDSA signatures, excluding SM2, in SPDM, the signature shall be
->      the concatenation of r and s.  The size of r shall be the size of
->      the selected curve.  Likewise, the size of s shall be the size of
->      the selected curve.  See BaseAsymAlgo in NEGOTIATE_ALGORITHMS for
->      the size of r and s.  The byte order for r and s shall be in big
->      endian order.  When placing ECDSA signatures into an SPDM signature
->      field, r shall come first followed by s."
-> 
-> Link: https://www.dmtf.org/sites/default/files/standards/documents/DSP0274_1.2.1.pdf
-> Signed-off-by: Lukas Wunner <lukas@wunner.de>
-> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+	crypto/algboss.c:67 cryptomgr_probe()
+	warn: passing zero to 'ERR_PTR'
 
-Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
+crypto/algboss.c
+    50 static int cryptomgr_probe(void *data)
+    51 {
+    52         struct cryptomgr_param *param = data;
+    53         struct crypto_template *tmpl;
+    54         int err = -ENOENT;
+    55 
+    56         tmpl = crypto_lookup_template(param->template);
+    57         if (!tmpl)
+    58                 goto out;
+    59 
+    60         do {
+    61                 err = tmpl->create(tmpl, param->tb);
+    62         } while (err == -EAGAIN && !signal_pending(current));
+    63 
+    64         crypto_tmpl_put(tmpl);
+    65 
+    66 out:
+--> 67         param->larval->adult = ERR_PTR(err);
 
+I wasn't able to find anything which was using this code...
+
+This is assigned on both the success and failure paths so it means that
+crypto_larval_destroy() never calls crypto_mod_put(larval->adult).  But I don't
+really understand this code well so maybe there is nothing to free at this
+point.
+
+    68         param->larval->alg.cra_flags |= CRYPTO_ALG_DEAD;
+    69         complete_all(&param->larval->completion);
+    70         crypto_alg_put(&param->larval->alg);
+    71         kfree(param);
+    72         module_put_and_kthread_exit(0);
+    73 }
+
+regards,
+dan carpenter
