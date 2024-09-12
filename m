@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E385A1AD24C;
-	Thu, 12 Sep 2024 14:20:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34B1D15D5D9;
+	Thu, 12 Sep 2024 14:27:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726150839; cv=none; b=P5er8ESnW/51BdQgclMQkQj6o9yocHJp9kOLZbx9vrsyjirosGFpvV0M2YOGwkmnElw49cRqORDJ/9SPVBkzAUSSQ5NRIRYEgJH3VsN0ae3s5vewJKkX+xFndtSiJb7BYnOGAjOA1eRFGYilnwfdSYb4TjRSbi0WQGw6MIH2fEU=
+	t=1726151270; cv=none; b=dtcRnfDTLe4JNtgrjHeJKgj8rCShX82M2OlZkezAYLZH+oPRsaFDTFL1FzRSvuQzmPzGwHf7OsRU2Z4gbOg227FEBUBJ0aTnovXvNqh4yEIvlyWrzc1z3B0bhVT8BjGMwhuPFknpWsbp0VScaKHnHE+wrvH/dHgvBDm7p6KUshU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726150839; c=relaxed/simple;
-	bh=KAU0PY03KRqnWf3s8ERZdEBmVCwp6kPw5OS8nAMo/pw=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=cNYQtgOODZD53r+AnUEAMd+usR1MFAz3QpFz5DzJq7nn4e9yoorZcxVntEWQ8nPUlJN2F7tiMcMRRZBKwZi17ORItoj8hzlQy6vemVkOlmgOfQZIYhS/45eP1XOWkh1WHSnjsMFhdumTyIsK/ynNxEZ1wDNdGjHocg4Da1l8c18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y02RydHn; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1726151270; c=relaxed/simple;
+	bh=R9iNhmLdXJrD0HXJ+V9I+UW/8WxZygjTlvhQcx+VNh8=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
+	 References:In-Reply-To; b=i/2Tt43uXJDjpIJfjStK6+4TslYIqhf45PwUbLGQ1Pk1OUZjyB1NDyysIvhuOQfET0qZQOXhAhBlmZ6kopB7U2RAf9aUyhj8IHTSvzQfTMFH6O6Ga+bc/d+gU8QOJlChxbEidwSkgK1Wo3FerFD18Ij6OHO/Nq0rWO6ujKdplLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=doL6O8Zu; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y02RydHn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20002C4CEC3;
-	Thu, 12 Sep 2024 14:20:37 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="doL6O8Zu"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CE64C4CEC3;
+	Thu, 12 Sep 2024 14:27:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726150838;
-	bh=KAU0PY03KRqnWf3s8ERZdEBmVCwp6kPw5OS8nAMo/pw=;
-	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
-	b=Y02RydHnic95INM3A0d+6o1Xc0Vl6FbfX47eEaNNUmaWPz96aUdSgWnk/muFCiDcW
-	 Nf94vt+SsbvD+Im74H3s9RbjR1iQVFrNYOVKq303z8IZnWmbRIP08AIaSyds5qQBPH
-	 GXGqyMv5LpOZMPIacm9E9nusiDex7Z7P5XcewDlUutR12Hc4Pi/26bNJI3x4u5W9GI
-	 BnqRsdAejktrhX8/2D/wjZ34FLbLCaX/ZwGy5KUDVToD59JaM1sN6LErPWe5+WlEPd
-	 zS7KaWaYtpGVaHJozM8VK5ZfHEo09ni3QMriNyKGrmzY4yGaER7G6U7Oax0JWGDTPa
-	 XL6cxnm1XIGCg==
+	s=k20201202; t=1726151269;
+	bh=R9iNhmLdXJrD0HXJ+V9I+UW/8WxZygjTlvhQcx+VNh8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=doL6O8Zua35rWE3YInz4yJsiZIQP37eMOlxYBt7UPYKJMSfqhlGJGK6QA7ChHomld
+	 SffZVF6mGJqCf8LfEdL7YgdhLGLAwDRH+s5HeBURtWF8BAc4VSEwJbKRIrEnwDHTw3
+	 +VwNobzfIibnQnsC43cXGDYYE7Q0yNFnFJmsFgnZnVy4ulUDaUl99ngq3iR6ogB2SO
+	 lUVcd7+LTW00J3nZsmMfVAo+aXc2/c1mH5mcdyXYGdXuTNsnd6wb9c69kRsjgfkPr9
+	 QVe5mF29qWEfBjY3OQbjUIj0tzhdhH7utyhVXJTRBLVbl3boUz99XPbTqbNgM/OHuX
+	 6gfwb91cixAYg==
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -34,67 +34,63 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Date: Thu, 12 Sep 2024 17:20:34 +0300
-Message-Id: <D44DEI8HIZYP.1FP3PSAX538W4@kernel.org>
-Cc: "Herbert Xu" <herbert@gondor.apana.org.au>, "David S. Miller"
- <davem@davemloft.net>, "Eric Biggers" <ebiggers@google.com>, "Stefan
- Berger" <stefanb@linux.ibm.com>, "Vitaly Chikunov" <vt@altlinux.org>,
- "Tadeusz Struk" <tstruk@gigaio.com>, "David Howells" <dhowells@redhat.com>,
- "Andrew Zaborowski" <andrew.zaborowski@intel.com>, "Saulo Alessandre"
- <saulo.alessandre@tse.jus.br>, "Jonathan Cameron"
- <Jonathan.Cameron@huawei.com>, "Ignat Korchagin" <ignat@cloudflare.com>,
- "Marek Behun" <kabel@kernel.org>, "Varad Gautam" <varadgautam@google.com>,
- "Stephan Mueller" <smueller@chronox.de>, "Denis Kenzior"
- <denkenz@gmail.com>, <linux-crypto@vger.kernel.org>,
- <keyrings@vger.kernel.org>
-Subject: Re: [PATCH v2 04/19] crypto: ecrdsa - Migrate to sig_alg backend
+Date: Thu, 12 Sep 2024 17:27:45 +0300
+Message-Id: <D44DK087Y80R.25CNND6WHJ7EE@kernel.org>
 From: "Jarkko Sakkinen" <jarkko@kernel.org>
-To: "Lukas Wunner" <lukas@wunner.de>
+To: "Sergey Shtylyov" <s.shtylyov@omp.ru>, "Roman Smirnov"
+ <r.smirnov@omp.ru>, "David Howells" <dhowells@redhat.com>, "Herbert Xu"
+ <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
+ "Andrew Zaborowski" <andrew.zaborowski@intel.com>
+Cc: <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
+Subject: Re: [PATCH v2] KEYS: prevent NULL pointer dereference in
+ find_asymmetric_key()
 X-Mailer: aerc 0.18.2
-References: <cover.1725972333.git.lukas@wunner.de>
- <45acc8db555f80408c8b975771da34c569da45da.1725972334.git.lukas@wunner.de>
- <D43GTXWLMJ2E.258ZI34E5JRK6@kernel.org> <ZuKgwrocKlI5Qk8t@wunner.de>
-In-Reply-To: <ZuKgwrocKlI5Qk8t@wunner.de>
+References: <20240910111806.65945-1-r.smirnov@omp.ru>
+ <D42N9ASJJSUD.EG094MFWZA4Q@kernel.org>
+ <84d6b0fa-4948-fe58-c766-17f87c2a2dba@omp.ru>
+ <D43HG3PEBR4I.2INNPVZIT19ZZ@kernel.org>
+ <8774f6a2-9bec-b699-6b68-63a26019c5b3@omp.ru>
+In-Reply-To: <8774f6a2-9bec-b699-6b68-63a26019c5b3@omp.ru>
 
-On Thu Sep 12, 2024 at 11:05 AM EEST, Lukas Wunner wrote:
-> On Wed, Sep 11, 2024 at 03:49:07PM +0300, Jarkko Sakkinen wrote:
-> > On Tue Sep 10, 2024 at 5:30 PM EEST, Lukas Wunner wrote:
-> > > A sig_alg backend has just been introduced with the intent of moving =
-all
-> > > asymmetric sign/verify algorithms to it one by one.
-> > >
-> > > Migrate ecrdsa.c to the new backend.
+On Thu Sep 12, 2024 at 4:51 PM EEST, Sergey Shtylyov wrote:
+> On 9/11/24 4:18 PM, Jarkko Sakkinen wrote:
 > [...]
-> > >  	if (!ctx->curve ||
-> > >  	    !ctx->digest ||
-> > > -	    !req->src ||
-> > > +	    !src ||
-> > > +	    !digest ||
-> > >  	    !ctx->pub_key.x ||
-> > > -	    req->dst_len !=3D ctx->digest_len ||
-> > > -	    req->dst_len !=3D ctx->curve->g.ndigits * sizeof(u64) ||
-> > > +	    dlen !=3D ctx->digest_len ||
-> > > +	    dlen !=3D ctx->curve->g.ndigits * sizeof(u64) ||
-> > >  	    ctx->pub_key.ndigits !=3D ctx->curve->g.ndigits ||
-> > > -	    req->dst_len * 2 !=3D req->src_len ||
-> > > -	    WARN_ON(req->src_len > sizeof(sig)) ||
-> > > -	    WARN_ON(req->dst_len > sizeof(digest)))
-> > > +	    dlen * 2 !=3D slen ||
-> > > +	    WARN_ON(slen > ECRDSA_MAX_SIG_SIZE) ||
-> > > +	    WARN_ON(dlen > STREEBOG512_DIGEST_SIZE))
-> >=20
-> > Despite being migration I don't see no point recycling use of WARN_ON()
-> > here, given panic_on_warn kernel command-line flag.
-> >=20
-> > If you want to print to something, please do separate checks and use
-> > pr_warn() instead at most.
 >
-> The object of the patch is to migrate ecrdsa.c to sig_alg with no
-> behavioral change.
+> >>>> In find_asymmetric_key(), if all NULLs are passed in id_{0,1,2} para=
+meters
+> >>>> the kernel will first emit WARN and then have an oops because id_2 g=
+ets
+> >>>> dereferenced anyway.
+> >>>>
+> >>>> Found by Linux Verification Center (linuxtesting.org) with Svace sta=
+tic
+> >>>> analysis tool.
+> >>>
+> >>> Weird, I recall that I've either sent a patch to address the same sit=
+e
+> >>> OR have commented a patch with similar reasoning. Well, it does not
+> >>> matter, I think it this makes sense to me.
+> >>>
+> >>> You could further add to the motivation that given the panic_on_warn
+> >>> kernel command-line parameter, it is for the best limit the scope and
+> >>> use of the WARN-macro.
+> >>
+> >>    I don't understand what you mean -- this version of the patch keeps
+> >> the WARN_ON() call, it just moves that call, so that the duplicate id_=
+{0,1,2}
+> >> checks are avoided...
+> >=20
+> > I overlooked the code change (my bad sorry). Here's a better version of
+> > the first paragraph:
+> >=20
+> > "find_asymmetric_keys() has nullity checks of id_0 and id_1 but ignores
+> > validation for id_2. Check nullity also for id_2."
 >
-> If you feel the WARN_ON() is uncalled for, please submit a cleanup
-> patch.
+>    Hm, what about WARN_ON(!id_0 && !id_1 && !id_2) -- it used to check al=
+l
+> the pointers, right? I think our variant was closer to reality... :-)
 
-OK, put on consideration since I have a related series.
+Right (lazy validation, first null ignores rest)
 
 BR, Jarkko
