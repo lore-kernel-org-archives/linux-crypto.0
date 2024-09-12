@@ -1,51 +1,52 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from bmailout1.hostsharing.net (bmailout1.hostsharing.net [83.223.95.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C2EF5028C;
-	Thu, 12 Sep 2024 06:06:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC6D41552E1;
+	Thu, 12 Sep 2024 07:54:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726121206; cv=none; b=OPFLUE/o6e+3T2Tb2pvD9KtIFWj+a8m24fO3ZKe3qtrP6Svz8Lsx/QLYhit8BOT+8waWYyirCcr/CBu1rT7obiDjRmf+FIoB0LPFX3Uu4KD+91WDgbjFS4adXSHvLoPCoZc3z71duEe33djb1EbtuoSrRFVF2RVBxoWcRrWLb5Y=
+	t=1726127654; cv=none; b=Oyf5w+ks+5e7J6ACCkjzwBcjWGp/KAuWsn3g7M3x2SCCMrriFGBw21fIzIgOtfthpgj6n7K/qW1Z3btzrD8I/lhbphb5RNBnLzoNnvfMAdaQblyg7pRueRRgPsaepZVk5kT2PCHCLHBu03/Cx9MDo81B75kbJ30GIIpbtUqVAqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726121206; c=relaxed/simple;
-	bh=mN+R3ToxhkuxGdCM/aq45jOkr3+/T3AE3qU1LI66plA=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=jzmRXal8z/FS1sfw8Qup1byplC0/gc7oOYZw9jEmrBrC/jquKyBFPHpxyYC9B+fhgHy7ukc/9DffURjhgcqEg4g35mvteZa3fI4825PtWjgc8FXVTcv/RUPoAsA9bIwtybif42DJ3GslkHkjG9JO7prdRJT7TJMocmsWKrQUwlk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=Dut6C6Eb; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="Dut6C6Eb"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:Message-ID:Subject:Cc:To:
-	From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=3xlRzXI9yb+oNIsqCP0Wa4u5a4LZve9QqMy4C7Th5mc=; b=Dut6C6EbXHKl46S1QMOW38R/r8
-	3ekj8fbSVpa3M/4/NfVU0/L2n4YksdJhPe6RCzswqcuWg3XU0BC0sZSZebL3LtKud0noRiobvGk3s
-	s/vCZiFAoEpUs3s3m9eG2GLI2hq9hOkVu+/Pyiz7KuUe6mkob8ueP+ie3hXBRJSLcpskkGSmRSJDN
-	qrau35IL7NHMtOaOM/vu6KRhLjNPt0bgnC3Zh6h5EfMCiahs5z3wgoDQcFxfm3fN4JbbCQ9+0fccb
-	D2WcU7+AMLG+HPRlw3XBvisLeOAhLALpq8oK72eukqxOqnZIqQZ9rgtSG88tBc821hJ2S4hROU7Jq
-	VRGE9A6w==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1socoG-001u5Y-2v;
-	Thu, 12 Sep 2024 14:06:19 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 12 Sep 2024 14:06:18 +0800
-Date: Thu, 12 Sep 2024 14:06:18 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Uros Bizjak <ubizjak@gmail.com>
-Cc: x86@kernel.org, linux-crypto@vger.kernel.org,
-	intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-	linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
-	linux-fscrypt@vger.kernel.org, linux-scsi@vger.kernel.org,
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	kunit-dev@googlegroups.com, linux-kernel@vger.kernel.org,
-	ubizjak@gmail.com, davem@davemloft.net
-Subject: Re: [PATCH RESEND v2 02/19] crypto: testmgr: Include
- <linux/prandom.h> instead of <linux/random.h>
-Message-ID: <ZuKE2sffS3wddU3-@gondor.apana.org.au>
+	s=arc-20240116; t=1726127654; c=relaxed/simple;
+	bh=r71T/CXhTbDb0+b0A3QqRAws5X6TEZjZPKCpaLnDh9M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rBjDXhZWCYpAAWMp6BAa4IBQ8HOV9wq3thcjsLD//4EtsAdq42S1i2AHhw/vqEC3dq2Bzt8KqnL6it30Ddlw4cOR+SsEY6UaXRvkP+GQz7eSJW1n2n79xFneZsrigzdiyLQ0d1ZDEIEU6JnEqmp8n11PEk7CgByCVILHAESUoxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.95.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
+Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by bmailout1.hostsharing.net (Postfix) with ESMTPS id CCBEE300002D2;
+	Thu, 12 Sep 2024 09:54:06 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id B7B2C1252A6; Thu, 12 Sep 2024 09:54:06 +0200 (CEST)
+Date: Thu, 12 Sep 2024 09:54:06 +0200
+From: Lukas Wunner <lukas@wunner.de>
+To: Jarkko Sakkinen <jarkko@kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Biggers <ebiggers@google.com>,
+	Stefan Berger <stefanb@linux.ibm.com>,
+	Vitaly Chikunov <vt@altlinux.org>,
+	Tadeusz Struk <tstruk@gigaio.com>,
+	David Howells <dhowells@redhat.com>,
+	Andrew Zaborowski <andrew.zaborowski@intel.com>,
+	Saulo Alessandre <saulo.alessandre@tse.jus.br>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Ignat Korchagin <ignat@cloudflare.com>,
+	Marek Behun <kabel@kernel.org>,
+	Varad Gautam <varadgautam@google.com>,
+	Stephan Mueller <smueller@chronox.de>,
+	Denis Kenzior <denkenz@gmail.com>, linux-crypto@vger.kernel.org,
+	keyrings@vger.kernel.org
+Subject: Re: [PATCH v2 02/19] crypto: sig - Introduce sig_alg backend
+Message-ID: <ZuKeHmeMRyXZHyTK@wunner.de>
+References: <cover.1725972333.git.lukas@wunner.de>
+ <688e92e7db6f2de1778691bb7cdafe3bb39e73c6.1725972334.git.lukas@wunner.de>
+ <D43G1XSAWTQF.OG1Z8K18DUVF@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -54,23 +55,31 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240909075641.258968-3-ubizjak@gmail.com>
-X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel,apana.lists.os.linux.scsi
+In-Reply-To: <D43G1XSAWTQF.OG1Z8K18DUVF@kernel.org>
 
-Uros Bizjak <ubizjak@gmail.com> wrote:
-> Substitute the inclusion of <linux/random.h> header with
-> <linux/prandom.h> to allow the removal of legacy inclusion
-> of <linux/prandom.h> from <linux/random.h>.
+On Wed, Sep 11, 2024 at 03:12:33PM +0300, Jarkko Sakkinen wrote:
+> >  static int crypto_sig_init_tfm(struct crypto_tfm *tfm)
+> >  {
+> >  	if (tfm->__crt_alg->cra_type != &crypto_sig_type)
+> >  		return crypto_init_akcipher_ops_sig(tfm);
+> >  
+> > +	struct crypto_sig *sig = __crypto_sig_tfm(tfm);
+> > +	struct sig_alg *alg = crypto_sig_alg(sig);
+> > +
+> > +	if (alg->exit)
+> > +		sig->base.exit = crypto_sig_exit_tfm;
+> > +
+> > +	if (alg->init)
+> > +		return alg->init(sig);
 > 
-> Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> ---
-> crypto/testmgr.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+> 1. alg->exit == NULL, alg->init == NULL
+> 2. alg->exit != NULL, alg->init == NULL
+> 3. alg->exit == NULL, alg->init != NULL
+> 
+> Which of the three are legit use of the API and which are not?
 
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+All three are possible.  Same as crypto_akcipher_init_tfm().
+
+Thanks,
+
+Lukas
