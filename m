@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D4581A76D7;
-	Thu, 12 Sep 2024 14:12:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F3072209B;
+	Thu, 12 Sep 2024 14:19:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726150352; cv=none; b=s0twI77Vy9Wb5yLZu+QCLc6BQ0YewfE9BMwDoQEAgO9FVDQ2Nh4qvIYHF91h9rCXPzBdIuKR9eq4iKnatFZ3AQ2YOxOtasCVgneobnWKRfqJ6HRkRTWJoeEiCzxt67T1DsYzYGXPfpvymJ+9pI5mRL+DGtA/vzoDwQL2/gEFv/g=
+	t=1726150759; cv=none; b=G0RZhO8k5WTD+jSnURHXuLRUXTQB24Ux4xG4MiHsfpnD8M4pZN1QqpkHajTBNL3/f6Oz0ib+CxkyGNuIJgYuj5pdxVG4Wzw01/+l/ejD9+G2x2zX4Fu3ytAhh7dPCSqLKR+WyZegkbkj8saSrFRXM4Wn998Kb6MZZCrvAWALVHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726150352; c=relaxed/simple;
-	bh=kqayeH9yAU6QmO2yJDv3m4IZj5gcg/omaai2guG9iog=;
+	s=arc-20240116; t=1726150759; c=relaxed/simple;
+	bh=1N+76OYxt4TCHaw7AeC4HG6b7ZzM/95WgGfqaDExxLs=;
 	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:
-	 References:In-Reply-To; b=hDC7recWJVcPJEUgFKkGk05a+3PaUOTYfvCwwIoGEZMqFQ/ylIRGqH8VAdWMQ+Qqawn8LgE741SGSAgOFaGHTdOWPU5lMR1vhrwFlFN+5MeQWAJCKXnwLlEjZM675L5FNKRuaNUm9eNptEoHaKit/GYyiZ2As2ESc8aYYWI45aw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D5mUpJ3O; arc=none smtp.client-ip=10.30.226.201
+	 References:In-Reply-To; b=EagioYQ1W/Dbr7Ywp3wOyaiHdKIHGe4wndZGaSAfqxiY6v0vUSkTb9v1ID7sShfjI2QgQinEi8/V1LQgjIjhB6bV5LS+uhv/5PoYC+eBdpCRfSYgu6l8qeIZRkPm/5vJn+erVN3qcaA0dkBKSUFgABt7qRRJXPOGQIEhlCr4fVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=riOkLlVx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D5mUpJ3O"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F218C4CEC3;
-	Thu, 12 Sep 2024 14:12:29 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="riOkLlVx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84CEDC4CEC3;
+	Thu, 12 Sep 2024 14:19:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726150350;
-	bh=kqayeH9yAU6QmO2yJDv3m4IZj5gcg/omaai2guG9iog=;
+	s=k20201202; t=1726150759;
+	bh=1N+76OYxt4TCHaw7AeC4HG6b7ZzM/95WgGfqaDExxLs=;
 	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=D5mUpJ3O1koF7JP47t4FWgVsCAm+0OjzbMXhK60BjQNyg/HSbhR/HjeFHf68N3gRx
-	 IFievAqRBQu+G+UT9XXLzrN4+jjP+zaWe5wrSzNPkfMMRDOQ3lrkFKip0a/yH/qj66
-	 GXh5ML58ydTnX/DpLlYqmxZVSCTvlFprCwZhwsHhWAWimj2RDd4HBG1l7riY3nc8fy
-	 /R3LdsbUG4FuIS0JsMK6lRolM6q8Xzc+NXfP4UOeVHJg+J1Nir1Ux5uIq9AJwM6X7a
-	 8dCWrFZZhXmcv7IawZyzYDfT9NCWfnn3IT+pcDfrpyhsuF610pkN1k7htfpOiDb3CX
-	 wUEPif5hjSgLw==
+	b=riOkLlVxymhCGHZ3POAMIO58a0ANEc7vWymUeEebrpb2Pje1Pk0geSTOVmbV0Vkqn
+	 xQytI9DdZ8+PcqSvTp2zyQm5kDggYWDhx5bzvkN5R0BskLzvvXEsXa6I2M11ZQWEPq
+	 Fa5Zdo9BA+jlqXfJ9u9AONDrtH/apO8Q0Ttjaqf4/1nMhkFyJhwvWgFrpW5z2y6Ruy
+	 tsphD2l1CPnPJhcU0JXPh+yLvU251VaE30gwhNsgc7uSNDrkAKF6itsOIemZW8gHnJ
+	 LSfbKFroRziLVtSKpT7InafzfDl0a9ZlOgX8E9lMZ4xortplBoZ2YRti1lkhCNwxY2
+	 vaTRJSBwqS3xA==
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -34,89 +34,60 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Date: Thu, 12 Sep 2024 17:12:26 +0300
-Message-Id: <D44D89US0PW6.3HVNXUTP0CMFZ@kernel.org>
-Subject: Re: [PATCH v2] KEYS: prevent NULL pointer dereference in
- find_asymmetric_key()
+Date: Thu, 12 Sep 2024 17:19:15 +0300
+Message-Id: <D44DDHSNZNKO.2LVIDKUHA3LGX@kernel.org>
+Subject: Re: [PATCH v2 02/19] crypto: sig - Introduce sig_alg backend
 From: "Jarkko Sakkinen" <jarkko@kernel.org>
-To: "Sergey Shtylyov" <s.shtylyov@omp.ru>, "Roman Smirnov"
- <r.smirnov@omp.ru>, "David Howells" <dhowells@redhat.com>, "Herbert Xu"
- <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
- "Andrew Zaborowski" <andrew.zaborowski@intel.com>
-Cc: <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
+To: "Lukas Wunner" <lukas@wunner.de>
+Cc: "Herbert Xu" <herbert@gondor.apana.org.au>, "David S. Miller"
+ <davem@davemloft.net>, "Eric Biggers" <ebiggers@google.com>, "Stefan
+ Berger" <stefanb@linux.ibm.com>, "Vitaly Chikunov" <vt@altlinux.org>,
+ "Tadeusz Struk" <tstruk@gigaio.com>, "David Howells" <dhowells@redhat.com>,
+ "Andrew Zaborowski" <andrew.zaborowski@intel.com>, "Saulo Alessandre"
+ <saulo.alessandre@tse.jus.br>, "Jonathan Cameron"
+ <Jonathan.Cameron@huawei.com>, "Ignat Korchagin" <ignat@cloudflare.com>,
+ "Marek Behun" <kabel@kernel.org>, "Varad Gautam" <varadgautam@google.com>,
+ "Stephan Mueller" <smueller@chronox.de>, "Denis Kenzior"
+ <denkenz@gmail.com>, <linux-crypto@vger.kernel.org>,
+ <keyrings@vger.kernel.org>
 X-Mailer: aerc 0.18.2
-References: <20240910111806.65945-1-r.smirnov@omp.ru>
- <D42N9ASJJSUD.EG094MFWZA4Q@kernel.org>
- <84d6b0fa-4948-fe58-c766-17f87c2a2dba@omp.ru>
- <D43HG3PEBR4I.2INNPVZIT19ZZ@kernel.org>
- <D43HH3XOAXFO.2MX7FA48VOLE9@kernel.org>
- <85607ea7-a42a-1c7b-0722-e4b63a814385@omp.ru>
-In-Reply-To: <85607ea7-a42a-1c7b-0722-e4b63a814385@omp.ru>
+References: <cover.1725972333.git.lukas@wunner.de>
+ <688e92e7db6f2de1778691bb7cdafe3bb39e73c6.1725972334.git.lukas@wunner.de>
+ <D43G1XSAWTQF.OG1Z8K18DUVF@kernel.org> <ZuKeHmeMRyXZHyTK@wunner.de>
+In-Reply-To: <ZuKeHmeMRyXZHyTK@wunner.de>
 
-On Wed Sep 11, 2024 at 5:45 PM EEST, Sergey Shtylyov wrote:
-> On 9/11/24 4:19 PM, Jarkko Sakkinen wrote:
->
-> [...]
->
-> >>>>> In find_asymmetric_key(), if all NULLs are passed in id_{0,1,2} par=
-ameters
-> >>>>> the kernel will first emit WARN and then have an oops because id_2 =
-gets
-> >>>>> dereferenced anyway.
-> >>>>>
-> >>>>> Found by Linux Verification Center (linuxtesting.org) with Svace st=
-atic
-> >>>>> analysis tool.
-> >>>>
-> >>>> Weird, I recall that I've either sent a patch to address the same si=
-te
-> >>>> OR have commented a patch with similar reasoning. Well, it does not
-> >>>> matter, I think it this makes sense to me.
-> >>>>
-> >>>> You could further add to the motivation that given the panic_on_warn
-> >>>> kernel command-line parameter, it is for the best limit the scope an=
-d
-> >>>> use of the WARN-macro.
-> >>>
-> >>>    I don't understand what you mean -- this version of the patch keep=
-s
-> >>> the WARN_ON() call, it just moves that call, so that the duplicate id=
-_{0,1,2}
-> >>> checks are avoided...
-> >>
-> >> I overlooked the code change (my bad sorry). Here's a better version o=
-f
-> >> the first paragraph:
-> >>
-> >> "find_asymmetric_keys() has nullity checks of id_0 and id_1 but ignore=
-s
-> >> validation for id_2. Check nullity also for id_2."
-> >>
-> >> Yep, and it changes no situation with WARN_ON() macro for better or
-> >> worse. It would logically separate issue to discuss and address so
-> >> as far as I'm concerned, with this clarification I think the change
-> >> makes sense to me.
+On Thu Sep 12, 2024 at 10:54 AM EEST, Lukas Wunner wrote:
+> On Wed, Sep 11, 2024 at 03:12:33PM +0300, Jarkko Sakkinen wrote:
+> > >  static int crypto_sig_init_tfm(struct crypto_tfm *tfm)
+> > >  {
+> > >  	if (tfm->__crt_alg->cra_type !=3D &crypto_sig_type)
+> > >  		return crypto_init_akcipher_ops_sig(tfm);
+> > > =20
+> > > +	struct crypto_sig *sig =3D __crypto_sig_tfm(tfm);
+> > > +	struct sig_alg *alg =3D crypto_sig_alg(sig);
+> > > +
+> > > +	if (alg->exit)
+> > > +		sig->base.exit =3D crypto_sig_exit_tfm;
+> > > +
+> > > +	if (alg->init)
+> > > +		return alg->init(sig);
 > >=20
-> > Actually explicitly stating that call paths leading to WARN_ON()
-> > invocation are intact by the commit (as a reminder for future).
+> > 1. alg->exit =3D=3D NULL, alg->init =3D=3D NULL
+> > 2. alg->exit !=3D NULL, alg->init =3D=3D NULL
+> > 3. alg->exit =3D=3D NULL, alg->init !=3D NULL
+> >=20
+> > Which of the three are legit use of the API and which are not?
 >
->    OK...
->    Do you still think the Fixes tag should be dropped (and thus the
-> Reported-by tag would become unnecessary?)?
+> All three are possible.  Same as crypto_akcipher_init_tfm().
 
-Good question but I think we should keep them (spent 15 minutes thinking
-about this).
+Lot's of nitpicks but...
 
-It's a glitch at least and would not do harm for stable series to have
-it like that :-) So if you polish the message, send a new version I'll
-pick it, and put to my next PR.
+I try to understand these in detail because I rebase later on my TPM2
+ECDSA patches (series last updated in April) on top of this. I'll hold
+with that for the sake of less possible conflicts with this larger
+series.
 
-Thanks for the patience with this.
-
->
-> > BR, Jarkko
->
-> MBR, Sergey
+Many of the questions rised during the Spring about akcipher so now is
+my chance to fill the dots by asking them here.
 
 BR, Jarkko
