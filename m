@@ -1,284 +1,125 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91F6F1AC459;
-	Thu, 12 Sep 2024 13:33:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E7BF1A0BD4;
+	Thu, 12 Sep 2024 13:51:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726148009; cv=none; b=EmqjuNnTWk8joQYsgFqllxHJBaGsdqm8GTJkx5PH7UTUKJlMwdqZOJPA2NDFcu7NPHGfv4CUBmO0yNPKQO0WgGMB71YZXbWiMaUZSNs1Tjo3i8oAkBUjq/fZCYhF+xBX7HFJCe7mvECh6AxAiR7Mm83ZPlLEwmS3sJ6MJp8e/eI=
+	t=1726149110; cv=none; b=i5g2GSqvNnLlOGboZKUfGZq3v5ib9eGKcjxlIJ8+CnLCzZEBofmfqGzlAqqqBSIbSjRXthtWBSGZHakxOf9qhp28fnuvKZVo1KPsSvObSZd+xBJG7n7sGuVEZkIMVg3+62V68NZplQjs3da7JdzXDU14Sym4KLDPxyXUqCtaBi8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726148009; c=relaxed/simple;
-	bh=6z4sL3Q2vQ51GAFjH66UWeYKoPy1VOkfSaBNtywE1Xo=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=hM9Q20+0BtbCvzzyjP6jKKaFDRScHETK4zi7yayeAErtzJaY0B6PXHvwa7hEdZnXAW62x5/hVqunzJlzzs9QL/MZavGXVChgwCSOeULb+Kyrb+IogcuM7MiQ26x5sI3DfEGYeTCpF1Eo8rzWXUZkXF/glBQABt/i4aVUuXI7NEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GjORBQBE; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GjORBQBE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1897C4CEC3;
-	Thu, 12 Sep 2024 13:33:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726148009;
-	bh=6z4sL3Q2vQ51GAFjH66UWeYKoPy1VOkfSaBNtywE1Xo=;
-	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
-	b=GjORBQBE6PrefR1ukxkFRq8fCKYQLz7MQAugI9bYv3iHYjJTDrcxvjCn0+n/MwQ1C
-	 oy4MO9V4f60+vdb/68f59wN1mskL1gmRKM84z30TpT2HehHmG+J9yAkJM/zfnFtohv
-	 lFc1d6JqKOQ1gj2zqc/wahsaqQNzP/qFcoW+ffxK1rU25wD08k4tDl9BTbiOcsgFTD
-	 9CYtjt+ZW5wDzNbIDshILMD9Yz4lMNS51y+bzTt8j6vc8MdtW+1Pdub0m2D1ZJrHV0
-	 5hXrHwcC4TzAEapvhtJRjiSeM++6xIIOrJzncMjrB4PXD3VUQdOkw5kL5zxDBc9Pl8
-	 78EE0WLd3/+lQ==
+	s=arc-20240116; t=1726149110; c=relaxed/simple;
+	bh=qzHvcMNowk6NzrnJnzjlLOM0xR+661lK3QZTiFzxQc0=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=cezc3LNYIg3pXDIYllHma2ukaGt5Kg04lAHGO8XYu6+Awpxs6UwOG/7J0ukJ2a2JTB1CSZaZ9D/ZCOSWzsFsgU19OsbvkKfTNO174h7R5uOcmg6Lw5ATjS1oFqTV1W0Fhy7QvFNwa9nJGTzFYC0D35KvDMaggsd9yUTGd6dCp14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.106] (31.173.87.196) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 12 Sep
+ 2024 16:51:35 +0300
+Subject: Re: [PATCH v2] KEYS: prevent NULL pointer dereference in
+ find_asymmetric_key()
+To: Jarkko Sakkinen <jarkko@kernel.org>, Roman Smirnov <r.smirnov@omp.ru>,
+	David Howells <dhowells@redhat.com>, Herbert Xu
+	<herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
+	Andrew Zaborowski <andrew.zaborowski@intel.com>
+CC: <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
+References: <20240910111806.65945-1-r.smirnov@omp.ru>
+ <D42N9ASJJSUD.EG094MFWZA4Q@kernel.org>
+ <84d6b0fa-4948-fe58-c766-17f87c2a2dba@omp.ru>
+ <D43HG3PEBR4I.2INNPVZIT19ZZ@kernel.org>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <8774f6a2-9bec-b699-6b68-63a26019c5b3@omp.ru>
+Date: Thu, 12 Sep 2024 16:51:34 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 12 Sep 2024 16:33:25 +0300
-Message-Id: <D44CEEGVNROC.2X84S94NHI7K3@kernel.org>
-Cc: <linux-kernel@vger.kernel.org>, <keyrings@vger.kernel.org>,
- <linux-crypto@vger.kernel.org>, <zohar@linux.ibm.com>,
- <linux-integrity@vger.kernel.org>, <torvalds@linux-foundation.org>,
- "Roberto Sassu" <roberto.sassu@huawei.com>
-Subject: Re: [PATCH v3 02/14] rsa: add parser of raw format
-From: "Jarkko Sakkinen" <jarkko@kernel.org>
-To: "Roberto Sassu" <roberto.sassu@huaweicloud.com>, <dhowells@redhat.com>,
- <dwmw2@infradead.org>, <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-X-Mailer: aerc 0.18.2
-References: <20240911122911.1381864-1-roberto.sassu@huaweicloud.com>
- <20240911122911.1381864-3-roberto.sassu@huaweicloud.com>
-In-Reply-To: <20240911122911.1381864-3-roberto.sassu@huaweicloud.com>
+MIME-Version: 1.0
+In-Reply-To: <D43HG3PEBR4I.2INNPVZIT19ZZ@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 09/12/2024 13:36:58
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 187710 [Sep 12 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.1.5
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 34 0.3.34
+ 8a1fac695d5606478feba790382a59668a4f0039
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.87.196 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.87.196 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;31.173.87.196:7.1.2;omp.ru:7.1.1
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.87.196
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 09/12/2024 13:41:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 9/12/2024 10:54:00 AM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On Wed Sep 11, 2024 at 3:28 PM EEST, Roberto Sassu wrote:
-> From: Roberto Sassu <roberto.sassu@huawei.com>
->
-> Parse the RSA key with RAW format if the ASN.1 parser returns an error, t=
-o
-> avoid passing somehow the key format as parameter.
->
-> Signed-off-by: Roberto Sassu <roberto.sassu@huawei.com>
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> ---
->  crypto/rsa.c                  | 14 ++++--
->  crypto/rsa_helper.c           | 83 ++++++++++++++++++++++++++++++++++-
->  include/crypto/internal/rsa.h |  6 +++
->  3 files changed, 97 insertions(+), 6 deletions(-)
->
-> diff --git a/crypto/rsa.c b/crypto/rsa.c
-> index d9be9e86097e..66d42974d47d 100644
-> --- a/crypto/rsa.c
-> +++ b/crypto/rsa.c
-> @@ -272,8 +272,11 @@ static int rsa_set_pub_key(struct crypto_akcipher *t=
-fm, const void *key,
->  	rsa_free_mpi_key(mpi_key);
-> =20
->  	ret =3D rsa_parse_pub_key(&raw_key, key, keylen);
-> -	if (ret)
-> -		return ret;
-> +	if (ret) {
-> +		ret =3D rsa_parse_pub_key_raw(&raw_key, key, keylen);
-> +		if (ret)
-> +			return ret;
-> +	}
-> =20
->  	mpi_key->e =3D mpi_read_raw_data(raw_key.e, raw_key.e_sz);
->  	if (!mpi_key->e)
-> @@ -311,8 +314,11 @@ static int rsa_set_priv_key(struct crypto_akcipher *=
-tfm, const void *key,
->  	rsa_free_mpi_key(mpi_key);
-> =20
->  	ret =3D rsa_parse_priv_key(&raw_key, key, keylen);
-> -	if (ret)
-> -		return ret;
-> +	if (ret) {
-> +		ret =3D rsa_parse_priv_key_raw(&raw_key, key, keylen);
-> +		if (ret)
-> +			return ret;
-> +	}
-> =20
->  	mpi_key->d =3D mpi_read_raw_data(raw_key.d, raw_key.d_sz);
->  	if (!mpi_key->d)
-> diff --git a/crypto/rsa_helper.c b/crypto/rsa_helper.c
-> index 94266f29049c..40a17ebc972f 100644
-> --- a/crypto/rsa_helper.c
-> +++ b/crypto/rsa_helper.c
-> @@ -9,6 +9,7 @@
->  #include <linux/export.h>
->  #include <linux/err.h>
->  #include <linux/fips.h>
-> +#include <linux/mpi.h>
->  #include <crypto/internal/rsa.h>
->  #include "rsapubkey.asn1.h"
->  #include "rsaprivkey.asn1.h"
-> @@ -148,6 +149,42 @@ int rsa_get_qinv(void *context, size_t hdrlen, unsig=
-ned char tag,
->  	return 0;
->  }
-> =20
+On 9/11/24 4:18 PM, Jarkko Sakkinen wrote:
+[...]
 
-/*
- * Please, document me.
- */
-> +typedef int (*rsa_get_func)(void *, size_t, unsigned char,
-> +			    const void *, size_t);
-> +
-> +static int rsa_parse_key_raw(struct rsa_key *rsa_key,
-> +			     const void *key, unsigned int key_len,
-> +			     rsa_get_func *func, int n_func)
-> +{
-> +	unsigned int nbytes, len =3D key_len;
-> +	const void *key_ptr =3D key;
-> +	int ret, i;
-> +
-> +	for (i =3D 0; i < n_func; i++) {
-> +		if (key_len < 2)
-> +			return -EINVAL;
-> +
-> +		ret =3D mpi_key_length(key_ptr, len, NULL, &nbytes);
-> +		if (ret < 0)
-> +			return ret;
-> +
-> +		key_ptr +=3D 2;
-> +		key_len -=3D 2;
-> +
-> +		if (key_len < nbytes)
-> +			return -EINVAL;
-> +
-> +		ret =3D func[i](rsa_key, 0, 0, key_ptr, nbytes);
-> +		if (ret < 0)
-> +			return ret;
-> +
-> +		key_ptr +=3D nbytes;
-> +		key_len -=3D nbytes;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  /**
->   * rsa_parse_pub_key() - decodes the BER encoded buffer and stores in th=
-e
->   *                       provided struct rsa_key, pointers to the raw ke=
-y as is,
-> @@ -157,7 +194,7 @@ int rsa_get_qinv(void *context, size_t hdrlen, unsign=
-ed char tag,
->   * @key:	key in BER format
->   * @key_len:	length of key
->   *
-> - * Return:	0 on success or error code in case of error
-> + * Return:	0 on success or error code in case of error.
->   */
->  int rsa_parse_pub_key(struct rsa_key *rsa_key, const void *key,
->  		      unsigned int key_len)
-> @@ -166,6 +203,27 @@ int rsa_parse_pub_key(struct rsa_key *rsa_key, const=
- void *key,
->  }
->  EXPORT_SYMBOL_GPL(rsa_parse_pub_key);
-> =20
-> +/**
-> + * rsa_parse_pub_key_raw() - parse the RAW key and store in the provided=
- struct
-> + *                           rsa_key, pointers to the raw key as is, so =
-that
-> + *                           the caller can copy it or MPI parse it, etc=
-.
-> + *
-> + * @rsa_key:	struct rsa_key key representation
-> + * @key:	key in RAW format
-> + * @key_len:	length of key
-> + *
-> + * Return:	0 on success or error code in case of error.
-> + */
-> +int rsa_parse_pub_key_raw(struct rsa_key *rsa_key, const void *key,
-> +			  unsigned int key_len)
-> +{
-> +	rsa_get_func pub_func[] =3D {rsa_get_n, rsa_get_e};
-> +
-> +	return rsa_parse_key_raw(rsa_key, key, key_len,
-> +				 pub_func, ARRAY_SIZE(pub_func));
-> +}
-> +EXPORT_SYMBOL_GPL(rsa_parse_pub_key_raw);
-> +
->  /**
->   * rsa_parse_priv_key() - decodes the BER encoded buffer and stores in t=
-he
->   *                        provided struct rsa_key, pointers to the raw k=
-ey
-> @@ -176,7 +234,7 @@ EXPORT_SYMBOL_GPL(rsa_parse_pub_key);
->   * @key:	key in BER format
->   * @key_len:	length of key
->   *
-> - * Return:	0 on success or error code in case of error
-> + * Return:	0 on success or error code in case of error.
->   */
->  int rsa_parse_priv_key(struct rsa_key *rsa_key, const void *key,
->  		       unsigned int key_len)
-> @@ -184,3 +242,24 @@ int rsa_parse_priv_key(struct rsa_key *rsa_key, cons=
-t void *key,
->  	return asn1_ber_decoder(&rsaprivkey_decoder, rsa_key, key, key_len);
->  }
->  EXPORT_SYMBOL_GPL(rsa_parse_priv_key);
-> +
-> +/**
-> + * rsa_parse_priv_key_raw() - parse the RAW key and store in the provide=
-d struct
-> + *                            rsa_key, pointers to the raw key as is, so=
- that
-> + *                            the caller can copy it or MPI parse it, et=
-c.
+>>>> In find_asymmetric_key(), if all NULLs are passed in id_{0,1,2} parameters
+>>>> the kernel will first emit WARN and then have an oops because id_2 gets
+>>>> dereferenced anyway.
+>>>>
+>>>> Found by Linux Verification Center (linuxtesting.org) with Svace static
+>>>> analysis tool.
+>>>
+>>> Weird, I recall that I've either sent a patch to address the same site
+>>> OR have commented a patch with similar reasoning. Well, it does not
+>>> matter, I think it this makes sense to me.
+>>>
+>>> You could further add to the motivation that given the panic_on_warn
+>>> kernel command-line parameter, it is for the best limit the scope and
+>>> use of the WARN-macro.
+>>
+>>    I don't understand what you mean -- this version of the patch keeps
+>> the WARN_ON() call, it just moves that call, so that the duplicate id_{0,1,2}
+>> checks are avoided...
+> 
+> I overlooked the code change (my bad sorry). Here's a better version of
+> the first paragraph:
+> 
+> "find_asymmetric_keys() has nullity checks of id_0 and id_1 but ignores
+> validation for id_2. Check nullity also for id_2."
 
-This belongs after the parameters, here a one-liner would be a better
-choice:
+   Hm, what about WARN_ON(!id_0 && !id_1 && !id_2) -- it used to check all
+the pointers, right? I think our variant was closer to reality... :-)
 
-https://www.kernel.org/doc/Documentation/kernel-doc-nano-HOWTO.txt
+[...]
 
-Try to avoid "etc" in documentation because then I have no choice than
-stop reading your documentation and read source code instead.
+> BR, Jarkko
 
-Just enumerate everything that makes sense, no aim for perfection but
-it is like a stamp that I tried my best, and then we will refine the
-description.
-
-"etc" in the documentation encompasses also all the future changes,
-which does not encourage accuracy :-) Imcompleteness is less of a
-devil than entropy, or at least that is how I weight these matters.
-
-> + *
-> + * @rsa_key:	struct rsa_key key representation
-> + * @key:	key in RAW format
-> + * @key_len:	length of key
-> + *
-> + * Return:	0 on success or error code in case of error.
-> + */
-> +int rsa_parse_priv_key_raw(struct rsa_key *rsa_key, const void *key,
-> +			   unsigned int key_len)
-> +{
-> +	rsa_get_func priv_func[] =3D {rsa_get_n, rsa_get_e, rsa_get_d};
-> +
-> +	return rsa_parse_key_raw(rsa_key, key, key_len,
-> +				 priv_func, ARRAY_SIZE(priv_func));
-> +}
-> +EXPORT_SYMBOL_GPL(rsa_parse_priv_key_raw);
-> diff --git a/include/crypto/internal/rsa.h b/include/crypto/internal/rsa.=
-h
-> index e870133f4b77..7141e806ceea 100644
-> --- a/include/crypto/internal/rsa.h
-> +++ b/include/crypto/internal/rsa.h
-> @@ -50,8 +50,14 @@ struct rsa_key {
->  int rsa_parse_pub_key(struct rsa_key *rsa_key, const void *key,
->  		      unsigned int key_len);
-> =20
-> +int rsa_parse_pub_key_raw(struct rsa_key *rsa_key, const void *key,
-> +			  unsigned int key_len);
-> +
->  int rsa_parse_priv_key(struct rsa_key *rsa_key, const void *key,
->  		       unsigned int key_len);
-> =20
-> +int rsa_parse_priv_key_raw(struct rsa_key *rsa_key, const void *key,
-> +			   unsigned int key_len);
-> +
->  extern struct crypto_template rsa_pkcs1pad_tmpl;
->  #endif
-
-
-BR, Jarkko
+MBR, Sergey
