@@ -1,99 +1,120 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ABFA1B9849;
-	Fri, 13 Sep 2024 10:35:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 221C01D7E39;
+	Fri, 13 Sep 2024 10:46:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726223753; cv=none; b=EKxz45bnrc4MhreIN1aJH55xcTCWQ3iAi8E+DKq3dzF9mlIFABo2F6wrTkvXwkmMd1z1yXjEfIRcwZrgUXcoCP/7gulPrVyYzHFW+ZUsysQbvPD0nmWtYCRiNpu3woKlIt/QTSWbSQ8s764KQ34uWcoTLywuM9hD8KpFmnRYhN4=
+	t=1726224383; cv=none; b=hS65T82EXrSjawsMwRzD3VNRHo2Y2q+uOWzNT7uUbEUX64a/8e1RIfbr33MrFm6j24iRIqDCZEwN9AN6rerHF/ESijvPhehMCk8hfA9yi+Jjxc+qiL0umtepd8GYtCz+QyZRdkyz153fXG5/YMxxZnwQWLxinO4j9AE4Jf9KaWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726223753; c=relaxed/simple;
-	bh=QMrpPami73TETdHGs58sVyb81klDU7+CdK20WR30NXs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f7dJURgvk0yrZVvdJj7lsbNUMslVeEzoBMtdaCkFA8qgrWfMnrqcgdekjwBRf9TK1FhenFvbHWRzSYVL6012KKe+ysH8V+CLKKppQX6xR0ZoESvPTKRO1Ew9F7QFoRK/uLdppt2P/jpMhrgc8J8gMxHst4WNQFGZRlLxCvLHN2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=b0oRHCYm; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1726224383; c=relaxed/simple;
+	bh=S3OfFPhvngzIXVIBvvu2VJ7Ne9DtASb05dIPumrAuGA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BVQV6Ubx3ptMeyUN0tT8O7ZmO/xgIQnn/I8Ee74AP3BNM35UQBI8QiL9nuzghXKge+d5n6kfBsbtVrtLIjmiboqw30UtYl0/rV+KUtQ4N2cbjLuTB+mucGHVNWgEb5Lv4wCF0T/+ob5daD6PabwP3AvyHcfMyYTYbvQD1FI9Ae8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PCesijiR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="b0oRHCYm"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=0CNSbKCh69zCkNZH9jjKsEGylWzRRbRWSCCkDQw1EN4=; b=b0oRHCYmhr2BHyiELxmtqT8RHH
-	L0n+o1OocTiaM9+NYNmaOM/L1OjhoCUkRZAwChGWKWOe5cmg//ZSKgQ9WjOKSq2hobW8loM1lIgGd
-	PpraMNvXMnyAvkNRkSHW82BaW42d0xkrKZNkkoDyNx42GCxEYJJDPIuYoVWqi+gSQ3xchSyRgruFY
-	ZoowMCGpsRXlWHYODOHhL2INhN/hij7SsZgqmhUpEm+ZGYBCPYaGYQIQmsuJ2oF/XsjaFr5alfRKn
-	1ygt5YEj8V+aWEvNbAMEofsQairfmQVJALguTZLIGjIIRkUaBVPTJo3KPZfLWGngaC7saj/7RKYQ0
-	R7A1fCJw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1sp3UD-002E1K-2g;
-	Fri, 13 Sep 2024 18:35:24 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 13 Sep 2024 18:35:23 +0800
-Date: Fri, 13 Sep 2024 18:35:23 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Kamlesh Gurudasani <kamlesh@ti.com>
-Cc: Eric Biggers <ebiggers@kernel.org>, kristo@kernel.org, will@kernel.org,
-	akpm@linux-foundation.org, davem@davemloft.net,
-	mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
-	robh@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org, vigneshr@ti.com, catalin.marinas@arm.com,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org
-Subject: Re: [PATCH v3 0/6] Add support for MCRC64 engine to calculate 64-bit
- CRC in Full-CPU mode
-Message-ID: <ZuQVa8ARmd4fjAup@gondor.apana.org.au>
-References: <20240524-mcrc64-upstream-v3-0-24b94d8e8578@ti.com>
- <87tti098af.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
- <Zme3EcW4Uz8kTbTt@gondor.apana.org.au>
- <20240611031314.GA2557@sol.localdomain>
- <ZmfBxLB8RC_KNUlx@gondor.apana.org.au>
- <87cylhm3tn.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PCesijiR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0A22C4CED0;
+	Fri, 13 Sep 2024 10:46:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726224382;
+	bh=S3OfFPhvngzIXVIBvvu2VJ7Ne9DtASb05dIPumrAuGA=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=PCesijiRN0EG3csPIokYtW3nnlsM02Sn8/crXyeded6Dwiab1FXZ1fvHFnj32e9UD
+	 cUpXq9+9gb60uH+AhkYtovgYOFsLDU2WvffuKLjvouAEUdvtELf8wLcUFpeHcbx7UE
+	 PQRmFs+U5Oaa0v1kQ6ALW5DOePB1fBbdgCS1l4awJ9RecUVQQidV/f/6/CVaZvssFR
+	 9pLsHQ0AA8fyZh64QFPAmLTZOMJ5OnOGzfpFynP8FAX1vINw2F1j0K34I4XiMXX5Y8
+	 AnOGx3kl3u0eqy8V5gzcrzME/JZ336CG29Z3URffZrBjoA79xZam0o+VvZqNjuhuY4
+	 BRMp/RZi+BS3Q==
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2f75b13c2a8so24190331fa.3;
+        Fri, 13 Sep 2024 03:46:22 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUtjXwnFTNIuWnSbnkUwh3mG3eK9s80i598NqBybOM9WFflbthvaSQWT/sI23aDneB8mZCIDM+YDQLKVkBX@vger.kernel.org, AJvYcCUxlrTIMOpFB/UGvEnX4EaxQWiD2lHaNEILJooPdrIhFCtINDH8U2/jPJQxg2G0rbD6Q7BTyPkEccIO55kD@vger.kernel.org, AJvYcCXIHqZUR184CNDIy8QLX2hEkhyAs0T+fhGvgyWME+slirwUQprRnxfVIDWez3vAlwJ97UkQ4l3Cyw==@vger.kernel.org, AJvYcCXsvIfTLerldLa2wE4EUT769Y8N8i/BevX+aQ6HjWbIAv1j/whDkaAwxlbAv6SCG7OoDGHTGzzL2myKIknLJEce@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWUcLhFUar0QGK9HSPfpf6X9uw0wPDOW8TOnshNJYQhbv19RF1
+	5luUdTsRwJFNZ7u7ywM40DmK0ftvRKVaTxydIjWxdrTSABfosIyW6ovFn80ms3T0TA+hf5ZmaDd
+	AK13nl3cc9om3s4u8tZnjX+Q76js=
+X-Google-Smtp-Source: AGHT+IHgfCxPiT5vZMtaQepta9uqXpG4/5TNPzFxOmRXvEQwfvgwsKyWmN8/Fya2mEuSKQsg4t5AMIdDxMekLTQEEkM=
+X-Received: by 2002:a2e:1311:0:b0:2f3:ed34:41c9 with SMTP id
+ 38308e7fff4ca-2f787f32dc2mr26801081fa.37.1726224380930; Fri, 13 Sep 2024
+ 03:46:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87cylhm3tn.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
+References: <ZuPDZL_EIoS60L1a@gondor.apana.org.au> <1266435.1726219950@warthog.procyon.org.uk>
+In-Reply-To: <1266435.1726219950@warthog.procyon.org.uk>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Fri, 13 Sep 2024 12:46:09 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXH8nWtAzX+9xc2tLyy5d0w==JNQCMJBAbL=LdcF+XrYkw@mail.gmail.com>
+Message-ID: <CAMj1kXH8nWtAzX+9xc2tLyy5d0w==JNQCMJBAbL=LdcF+XrYkw@mail.gmail.com>
+Subject: Re: [PATCH v3 00/14] KEYS: Add support for PGP keys and signatures
+To: David Howells <dhowells@redhat.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, 
+	Roberto Sassu <roberto.sassu@huaweicloud.com>, dwmw2@infradead.org, davem@davemloft.net, 
+	linux-kernel@vger.kernel.org, keyrings@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, zohar@linux.ibm.com, 
+	linux-integrity@vger.kernel.org, torvalds@linux-foundation.org, 
+	roberto.sassu@huawei.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Sep 06, 2024 at 04:44:44PM +0530, Kamlesh Gurudasani wrote:
+On Fri, 13 Sept 2024 at 11:32, David Howells <dhowells@redhat.com> wrote:
 >
-> Just wanted to confirm, if this is being rejected primarily because
-> 1. there is no in-kernel user for crc64-iso3309
-> 2. or poor performance benefit of using it from userspace
+> Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> > Personally I don't think the argument above holds water.  With
+> > IPsec we had a similar issue of authenticating untrusted peers
+> > using public key cryptography.  In that case we successfully
+> > delegated the task to user-space and it is still how it works
+> > to this day.
 
-Essentially we don't want to add every random algorithm to the crypto
-API because we may end up having to maintain them long after the users
-have disappeared.
+This is slightly disingenuous. The kernel itself has no need to trust
+the peer - it only manages the network pipe and authenticates/decrypts
+the packets on behalf of user space.
 
-For a special-purpose algorithm like this, it's perfectly fine to have
-a custom driver to be made so that your user-space app can access the
-hardware.
+The situation would be radically different if the kernel itself would
+communicate over IPsec (or HTTPS) directly.
 
-> The context for asking is that we have another superset IP known as MCRC
-> (this one is MCRC64), which supports crc8/16/32/64(iso-3309).
-> 
-> That IP has working DMA and will give good offloading numbers.
-> 
-> We are planning to send drivers for crc8/16/32 for MCRC
-> 1.should I put efforts for crc64-iso3309 as well or
-> 2.drop the crc64-iso3309 and send only for remaining
-> crc8/16/32(standard algorithms with already in-kernel user).
-> 
-> All our devices either have MCRC or MCRC64.
+Likewise for module loading: there is no way the authentication can be
+delegated to user space, unless that user space component is
+authenticated by the kernel (and runs in a special, hardened context).
+>
+> It transpires that we do actually need at least a PGP parser in the kernel -
+> and it needs to be used prior to loading any modules: some Lenovo Thinkpads,
+> at least, may have EFI variables holding a list of keys in PGP form, not X.509
+> form.
+>
+> For example, in dmesg, you might see:
+>
+> May 16 04:01:01 localhost kernel: integrity: Loading X.509 certificate: UEFI:MokListRT (MOKvar table)
+> May 16 04:01:01 localhost kernel: integrity: Problem loading X.509 certificate -126
+>
 
-Do any existing kernel users benefit sufficiently from these algorithms
-being offloaded? If no then there is no need to bother.
+MokListRT is a shim construct, which is a component in the downstream
+distro boot chain. It is not part of EFI, and in your case, this is
+unlikely to be specific to Lenovo systems.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> On my laptop, if I dump this variable:
+>
+>         efivar -e /tmp/q --name=605dab50-e046-4300-abb6-3dd810dd8b23-MokListRT
+>
+> And then looking at the data exported:
+>
+>         file /tmp/q
+>
+> I see:
+>
+>         /tmp/q: PGP Secret Sub-key -
+>
+> The kernel doesn't currently have a PGP parser.  I've checked and the value
+> doesn't parse as ASN.1:
+>
+>         openssl asn1parse -in /tmp/q -inform DER
+>             0:d=0  hl=2 l=  21 prim: cont [ 23 ]
+>         Error in encoding
+>         001EBA93B67F0000:error:0680007B:asn1 encoding routines:ASN1_get_object:header too long:crypto/asn1/asn1_lib.c:105:
+>
+> which would suggest that it isn't X.509.
+>
+
+This should be fixed in shim not the kernel.
