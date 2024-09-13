@@ -1,81 +1,89 @@
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A96233F7;
-	Fri, 13 Sep 2024 03:00:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36E93637;
+	Fri, 13 Sep 2024 04:45:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726196422; cv=none; b=tWdB9AgereOm4HVbcjm47kEBOWWRNpGvFwdKM8wl0G6CQmX2Xtm13Nx9ruSr+s0y223qyHVFdy7lw07oQM4kyLFCPhPde1VWd27tRnCnyUeER3IZYSCVq5oarIZVygsSBIP2+A6ZfV7yCb3Rx536TKPPOpsLSh3YmjfB39oqRzg=
+	t=1726202764; cv=none; b=A43DHDO8HErgJACkmcq/hA1wmbKPZB+Wwkprdz4TisZsaYAeAusvSnKKczOo7h+FuSYe8RGfbr5UYCEopk2RrQIzrxotUSkl0zphYqPc45QMfXXi8sWxr3MRdkPFvhOACRgCX3CFbMF3L+ToDcXKzS9b7qrj2oPPllr0vNIZb/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726196422; c=relaxed/simple;
-	bh=wGcW0ryoWSmMnOrWfzgUVtd4wXwz/mJPng33ojPskp4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=uyJj4qgDW+bIWvDGQ3m59drexGnpD3Md2GxiFboa+rlmNufzNPaJpl7KJvQPo3x2YWSncXbN5sYKDvKWvWM63BkGqTCAu6F20Its8oATdVg5Q1O+ENdiyxzMFDGr8pyLRcDRz4zBzaWxdWe1XCN277jwMB1nzhwiG5427JqEX2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=XI8MblzZ; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
+	s=arc-20240116; t=1726202764; c=relaxed/simple;
+	bh=yyoIqgIg15uCi2l4PuwWGUguQNkSR5mhnUvlu+Fg9aA=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=YQDiwOmTA0MiV+DinG/55opB14cWn1IjfHpFPICzWY7C7BR9n6JIFj0QNdz/9nB207gPx6cn6Uk/DyoLHFvL+JBlwD7SFXCVQUHR/lZsgYnvf7INvg3ArN9ZvcpC9fAnmg+iCRDLGYAGstahc2/OUY7xfAfGxWU49SUkooq++qc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=A9FV5gEh; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="XI8MblzZ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
-	s=201909; t=1726196415;
-	bh=VhEvHeaOii1sg1WCaj1iaRY0Bf+Yt5n42VZMErYucL0=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=XI8MblzZWDcLAgT7rI1fbJ9/KgWBSBAfmngFygl/fEKIMKL8TsRZdq4K7rhTAYh2I
-	 QNOMH2i+uemDMWG35kp/IgIo9D9FxLtx/IU3iM3Z3QTiA05RbYwc9VVBuVAt3q7yu0
-	 SlzY4hbBMns41/2Pq5pJvmSU3kl949tK4pceWfOJVslCAYzU/ilf78Dn09DTJ8XfA7
-	 hspqMQuxEd3c4UvqSdZyP1YBaJ0l0Ar8jidyZfJMCHWduZCzJkIIjl7EBaCUXfKX2R
-	 kvb1vnLiW9hhU6uxUsbKovn1NoUyzaqrfe/ynS2UAvH98DA1o++dXT6iWSLn4okxBY
-	 20S9pWjQJ/A3A==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4X4fDv2Brgz4x9D;
-	Fri, 13 Sep 2024 13:00:15 +1000 (AEST)
-From: Michael Ellerman <mpe@ellerman.id.au>
-To: Danny Tsen <dtsen@linux.ibm.com>, linux-crypto@vger.kernel.org
-Cc: herbert@gondor.apana.org.au, leitao@debian.org, nayna@linux.ibm.com,
- appro@cryptogams.org, linux-kernel@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, ltcgcw@linux.vnet.ibm.com,
- dtsen@us.ibm.com, Danny Tsen <dtsen@linux.ibm.com>
-Subject: Re: [PATCH 1/1] crypto: Fix data mismatch over ipsec tunnel
- encrypted/decrypted with ppc64le AES/GCM module.
-In-Reply-To: <20240912174537.1409567-1-dtsen@linux.ibm.com>
-References: <20240912174537.1409567-1-dtsen@linux.ibm.com>
-Date: Fri, 13 Sep 2024 13:00:13 +1000
-Message-ID: <87seu4qmv6.fsf@mail.lhotse>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="A9FV5gEh"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:Message-ID:Subject:Cc:To:
+	From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=A0s2VVzFkU2smfywCESWrGyHM45MUn2C+xHrAF+P/h8=; b=A9FV5gEhj2Zloy+Anv1T7yTemx
+	IYzsx/tLu/r3tvg25geX1t9WZhOeh6v8NgCeFMR1Tt/KgbgKrV4DeKRmgXQ/PjSWeW2Up13Y6/dOq
+	ZJLDHZEUa8zcN9CwfQMY9OFCnNxtGaA2tZkFNvsCDNG1DSeGffalNAUOEgO2lQ/YTturkbLmQiJUo
+	Xh4aPHoUsbbm6BOE4yDiuKbRH53voC2ZaMdb0A+uawFe/lK/s1AUDtQ5oUPHCxN58j/lJRvlqZEzi
+	gDAw47uP2/0M/XuoDqoaORkdsyORyetXntZnFASOrtmy4a7yCA+BF/6GXmFuaC6yuGcvOAzrRbdOt
+	1U01+KjQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1soy1X-0029r8-0w;
+	Fri, 13 Sep 2024 12:45:25 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 13 Sep 2024 12:45:24 +0800
+Date: Fri, 13 Sep 2024 12:45:24 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Roberto Sassu <roberto.sassu@huaweicloud.com>
+Cc: dhowells@redhat.com, dwmw2@infradead.org, davem@davemloft.net,
+	linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
+	linux-crypto@vger.kernel.org, zohar@linux.ibm.com,
+	linux-integrity@vger.kernel.org, torvalds@linux-foundation.org,
+	roberto.sassu@huawei.com
+Subject: Re: [PATCH v3 00/14] KEYS: Add support for PGP keys and signatures
+Message-ID: <ZuPDZL_EIoS60L1a@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240911122911.1381864-1-roberto.sassu@huaweicloud.com>
+X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
 
-Danny Tsen <dtsen@linux.ibm.com> writes:
-> This patch is to fix an issue when simd is not usable that data mismatch
-> may occur over ipsec tunnel. The fix is to register algs as SIMD modules
-> so that the algorithm is excecuted when SIMD instructions is usable.
+Roberto Sassu <roberto.sassu@huaweicloud.com> wrote:
 >
-> A new module rfc4106(gcm(aes)) is also added. Re-write AES/GCM assembly
-> codes with smaller footprints and small performance gain.
->
-> This patch has been tested with the kernel crypto module tcrypt.ko and
-> has passed the selftest.  The patch is also tested with
-> CONFIG_CRYPTO_MANAGER_EXTRA_TESTS enabled.
->
-> Signed-off-by: Danny Tsen <dtsen@linux.ibm.com>
-> ---
->  arch/powerpc/crypto/Kconfig            |    1 +
->  arch/powerpc/crypto/aes-gcm-p10-glue.c |  141 +-
->  arch/powerpc/crypto/aes-gcm-p10.S      | 2421 +++++++++++-------------
->  3 files changed, 1187 insertions(+), 1376 deletions(-)
+> For the envisioned use cases, PGP operations cannot be done in user space,
+> since the consumers are in the kernel itself (Integrity Digest Cache and
+> IMA). Also they cannot be done in a trusted initial ram disk, since PGP
+> operations can occur also while the system is running (e.g. after software
+> package installation).
 
-As this is a bug fix it should have a Fixes: tag, and probably a stable
-Cc as well.
+Does this address Linus's objections? If not then we cannot proceed.
 
-But that diffstat is really large for a bug fix. Is there no way to fix
-the issue in a smaller patch? Even if that is just disabling the feature
-until it can be fixed in subsequent commits?
+Personally I don't think the argument above holds water.  With
+IPsec we had a similar issue of authenticating untrusted peers
+using public key cryptography.  In that case we successfully
+delegated the task to user-space and it is still how it works
+to this day.
 
-cheers
+A user-space daemon dedicated to public key crypto seems equally
+applicable to your scenario.
+
+The original application that brought public key crypto into the
+kernel was module loading.  If we really wanted to we could extend
+the user-space verification to modules too and perhaps kick all
+public key crypto out of the kernel.
+
+The complexity and lack of reviewer attention in this area means
+that we're more likely to introduce security holes into the kernel
+with such code.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
