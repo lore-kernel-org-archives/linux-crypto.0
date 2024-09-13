@@ -1,113 +1,156 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52C7C1C14;
-	Fri, 13 Sep 2024 17:37:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E62A811EB;
+	Fri, 13 Sep 2024 18:40:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726249077; cv=none; b=IWtmPMzWKlvk4Gt2ofKoxNa3pCg56R7tOC1pGFb/yI9S6O9l1vSGP+4E/ZssUMxbCzj0cSdoVUWTUtbnZ8jOstPlRQJICrVoxWyekzTohIf8dCx0ez/Pr7NVo+kx26ywZSWr+I+YFs8Q+XaEnxSE0p1/KlOpj9KFC3TCavaWkZU=
+	t=1726252859; cv=none; b=nCXnzOSqTT2N3dBoPB9MMu7LpFz1HhbfgYXeDiUTc2HIIOO/nxbeW5yWzNz/irwYxTVyt0xcB0mW1LDwlC39xL2nVeQD6DDqq6uUlcNjDE1UOqmp62J83Ag3qXDHfGyZP8pGytO22N5QRx0xb7j+l+LuCDk3AIMqPZxE9e2TLcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726249077; c=relaxed/simple;
-	bh=vibNHNRRH+3vWgI3ynOIkAiw/SlNeRRCDGEqnJuShtQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jXqr+MQdMjqRBL6OZjqv2JaqUy/mCc/c0wI2F+kYVqNhXN7ahdpJ0m487yGSbEWl1W/aHl7S7oTOjbg2OHFfg8YyzfEd7xe7B9EC9DFWH+ze6u3cH1X1brAZFlTvBSlQGM/1tnzLFLmJB9zMQuIsasqn8qWOU45WuS9gK8bd4HY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=qhLa5RT+; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="qhLa5RT+"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48DHLqtG019201;
-	Fri, 13 Sep 2024 17:37:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
-	:from:to:cc:subject:message-id:references:mime-version
-	:content-type:in-reply-to; s=pp1; bh=d7S/wbjkH88BU2FIx1D3gL3jHpT
-	+UBoRhUinazWDT44=; b=qhLa5RT+JiHRkcgwCBVaVj1VsSg5tk89+GinbM2DqIp
-	VQPGJGnfS8WX4z+CW7oZvqlTMqJwNrFJ5jNArq1Vel48Vjdl7BwEFpmrENyvWziq
-	VEToeweuDl+0nnthebTPjvDSw0vZG9kGLmlMKt0CNnTBh94FImMyqkQ0YXNXIUVn
-	48ot8ngcdp+BSYurlaNs9qIKY/CZJubLfop6eCEjF09Hm+TMzEWc364qC2D2yC7r
-	TLsnI3NknASobis7Bl7wvuiBMrwdHcqKJVdJhei8yLw+f5N8zGJLSibw7pBYqJWP
-	18GiGnsmCzsMhmCULfMNNG3VlGFA2aCSuog4XomfwQA==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41gd8m3cwv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 13 Sep 2024 17:37:53 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 48DExNDD010808;
-	Fri, 13 Sep 2024 17:37:52 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 41kmb73a16-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 13 Sep 2024 17:37:52 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 48DHbmi654460692
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 13 Sep 2024 17:37:48 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7D4BF20043;
-	Fri, 13 Sep 2024 17:37:48 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DBDD920040;
-	Fri, 13 Sep 2024 17:37:47 +0000 (GMT)
-Received: from osiris (unknown [9.171.6.86])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Fri, 13 Sep 2024 17:37:47 +0000 (GMT)
-Date: Fri, 13 Sep 2024 19:37:46 +0200
-From: Heiko Carstens <hca@linux.ibm.com>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>,
-        Stefan Liebler <stli@linux.ibm.com>, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: Re: [PATCH 7/7] s390/vdso: Wire up getrandom() vdso implementation
-Message-ID: <20240913173746.30385-D-hca@linux.ibm.com>
-References: <20240913130544.2398678-1-hca@linux.ibm.com>
- <20240913130544.2398678-8-hca@linux.ibm.com>
- <ZuRD58DrEzzcXKZg@zx2c4.com>
- <20240913141651.30385-A-hca@linux.ibm.com>
- <ZuRS0sz_9_mkHsnl@zx2c4.com>
+	s=arc-20240116; t=1726252859; c=relaxed/simple;
+	bh=D+I8GQYbtdFqu//u3VQ9wkisq1yyy0w6iTNBsqfKPiA=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nStzvArSglSQD94n8+E+uFBMolcY48VzQCZ9dWTTWfRbw39yrlnoLAlTCcYl9BO3JsdZ2CwTlmub+hX9+pxK8spxSMnfzgE5xdzdioY4xvnOpygzbRanJK7Q0gw1dlbmaiJPZezRzLvmELRLmxQ/Kqt5b7A19ZjIvKJCAhvDLuc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4X53213XD4z67kr9;
+	Sat, 14 Sep 2024 02:37:13 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id DF2A8140A77;
+	Sat, 14 Sep 2024 02:40:53 +0800 (CST)
+Received: from localhost (10.48.150.243) by frapeml500008.china.huawei.com
+ (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 13 Sep
+ 2024 20:40:52 +0200
+Date: Fri, 13 Sep 2024 19:40:49 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Lukas Wunner <lukas@wunner.de>
+CC: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
+	<davem@davemloft.net>, Eric Biggers <ebiggers@google.com>, Stefan Berger
+	<stefanb@linux.ibm.com>, Vitaly Chikunov <vt@altlinux.org>, Tadeusz Struk
+	<tstruk@gigaio.com>, David Howells <dhowells@redhat.com>, Andrew Zaborowski
+	<andrew.zaborowski@intel.com>, Saulo Alessandre
+	<saulo.alessandre@tse.jus.br>, Ignat Korchagin <ignat@cloudflare.com>, Marek
+ Behun <kabel@kernel.org>, Varad Gautam <varadgautam@google.com>, Denis
+ Kenzior <denkenz@gmail.com>, <linux-crypto@vger.kernel.org>,
+	<keyrings@vger.kernel.org>
+Subject: Re: [PATCH v2 02/19] crypto: sig - Introduce sig_alg backend
+Message-ID: <20240913194049.000030d9@Huawei.com>
+In-Reply-To: <688e92e7db6f2de1778691bb7cdafe3bb39e73c6.1725972334.git.lukas@wunner.de>
+References: <cover.1725972333.git.lukas@wunner.de>
+	<688e92e7db6f2de1778691bb7cdafe3bb39e73c6.1725972334.git.lukas@wunner.de>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZuRS0sz_9_mkHsnl@zx2c4.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: bFATFXXoS8TIMWBzc_yMd9eoDzmSksXR
-X-Proofpoint-ORIG-GUID: bFATFXXoS8TIMWBzc_yMd9eoDzmSksXR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-13_11,2024-09-13_02,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- impostorscore=0 suspectscore=0 clxscore=1015 phishscore=0 spamscore=0
- lowpriorityscore=0 adultscore=0 mlxscore=0 mlxlogscore=679 bulkscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2408220000 definitions=main-2409130125
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100004.china.huawei.com (7.191.162.219) To
+ frapeml500008.china.huawei.com (7.182.85.71)
 
-On Fri, Sep 13, 2024 at 04:57:22PM +0200, Jason A. Donenfeld wrote:
-> On Fri, Sep 13, 2024 at 04:16:51PM +0200, Heiko Carstens wrote:
-> > On Fri, Sep 13, 2024 at 03:53:43PM +0200, Jason A. Donenfeld wrote:
-> > > On Fri, Sep 13, 2024 at 03:05:43PM +0200, Heiko Carstens wrote:
-> > > > The vdso testcases vdso_test_getrandom and vdso_test_chacha pass.
-> > > 
-> > > I'd be curious to see the results of ./vdso_test_getrandom bench-single
-> > > and such.
-> > 
-> > It looks like this with two layers of hypervisors in between, but that
-> > shouldn't matter too much for this type of workload:
-> > 
-> > $ ./vdso_test_getrandom bench-single
-> >    vdso: 25000000 times in 0.493703559 seconds
-> >    libc: 25000000 times in 6.371764073 seconds
-> > syscall: 25000000 times in 6.584025337 seconds
+On Tue, 10 Sep 2024 16:30:12 +0200
+Lukas Wunner <lukas@wunner.de> wrote:
+
+> Commit 6cb8815f41a9 ("crypto: sig - Add interface for sign/verify")
+> began a transition of asymmetric sign/verify operations from
+> crypto_akcipher to a new crypto_sig frontend.
 > 
-> Cool. I'll amend that to the commit message, perhaps, so we have some
-> historical snapshot of what it does. What cpu generation/model is this?
+> Internally, the crypto_sig frontend still uses akcipher_alg as backend,
+> however:
+> 
+>    "The link between sig and akcipher is meant to be temporary.  The
+>     plan is to create a new low-level API for sig and then migrate
+>     the signature code over to that from akcipher."
+>     https://lore.kernel.org/r/ZrG6w9wsb-iiLZIF@gondor.apana.org.au/
+> 
+>    "having a separate alg for sig is definitely where we want to
+>     be since there is very little that the two types actually share."
+>     https://lore.kernel.org/r/ZrHlpz4qnre0zWJO@gondor.apana.org.au/
+> 
+> Take the next step of that migration and augment the crypto_sig frontend
+> with a sig_alg backend to which all algorithms can be moved.
+> 
+> During the migration, there will briefly be signature algorithms that
+> are still based on crypto_akcipher, whilst others are already based on
+> crypto_sig.  Allow for that by building a fork into crypto_sig_*() API
+> calls (i.e. crypto_sig_maxsize() and friends) such that one of the two
+> backends is selected based on the transform's cra_type.
+> 
+> Signed-off-by: Lukas Wunner <lukas@wunner.de>
 
-That was on a z16 machine.
+Hi Lukas,
+
+A few trivial comments.
+
+Jonathan
+
+> diff --git a/crypto/sig.c b/crypto/sig.c
+> index 7645bedf3a1f..4f36ceb7a90b 100644
+> --- a/crypto/sig.c
+> +++ b/crypto/sig.c
+
+> @@ -68,6 +93,14 @@ EXPORT_SYMBOL_GPL(crypto_alloc_sig);
+>  
+>  int crypto_sig_maxsize(struct crypto_sig *tfm)
+>  {
+> +	if (crypto_sig_tfm(tfm)->__crt_alg->cra_type != &crypto_sig_type)
+> +		goto akcipher;
+> +
+> +	struct sig_alg *alg = crypto_sig_alg(tfm);
+> +
+> +	return alg->max_size(tfm);
+> +
+> +akcipher:
+
+Neat trick for temporary retention of the code.
+Hideous code in the meantime ;) Not that I have a better idea.
+
+>  	struct crypto_akcipher **ctx = crypto_sig_ctx(tfm);
+>  
+>  	return crypto_akcipher_maxsize(*ctx);
+
+> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+> index f02cb075bd68..bb21378aa510 100644
+> --- a/crypto/testmgr.c
+> +++ b/crypto/testmgr.c
+...
+
+> @@ -4317,6 +4324,114 @@ static int alg_test_akcipher(const struct alg_test_desc *desc,
+>  	return err;
+>  }
+>  
+> +static int test_sig_one(struct crypto_sig *tfm, const struct sig_testvec *vecs)
+> +{
+> +	u8 *ptr, *key __free(kfree);
+I would move definition of key down to where the constructor is.
+Current pattern is fine until some extra code sneaks inbetween with
+an error return.
+
+> +	int err, sig_size;
+> +
+> +	key = kmalloc(vecs->key_len + 2 * sizeof(u32) + vecs->param_len,
+> +		      GFP_KERNEL);
+> +	if (!key)
+> +		return -ENOMEM;
+
+git a/include/crypto/internal/sig.h b/include/crypto/internal/sig.h
+> index 97cb26ef8115..b16648c1a986 100644
+> --- a/include/crypto/internal/sig.h
+> +++ b/include/crypto/internal/sig.h
+
+> +static inline struct crypto_sig *crypto_spawn_sig(struct crypto_sig_spawn
+> +								   *spawn)
+
+That's an odd wrap. I'd just go long where this happens and slightly past 80 chars.
+
+
+> +{
+> +	return crypto_spawn_tfm2(&spawn->base);
+> +}
+
