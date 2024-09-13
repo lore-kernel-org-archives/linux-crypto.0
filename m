@@ -1,47 +1,69 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B18ADF60;
-	Fri, 13 Sep 2024 15:24:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 778521EEE4;
+	Fri, 13 Sep 2024 17:32:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726241061; cv=none; b=uqlHgrgCV1uowwFilPhhdg3sfg4IevKLpFSZpsLJKk2JzgBO4K9xBYhruS9GqGcRiHATocNQyySRkel8oYWY1+KI6SdpeA/4CTN68VrYJtRU/49pVlvbY6phPTcq3OqUwVDqyjFhPTxLxN3QdAAnREYLOTNRJ7jFXtWC6XGVTME=
+	t=1726248737; cv=none; b=nrys01oYlUfyCCGm1Anrss1heM/LVCJ0otOcKf06QjWVwOKUUP/cJ1PRw7IWoeNbQzEI0g3yBewJUEsuP/Y8Ylk+B7BpWNsVQ/jwA6XBZHG8Vw6HCveS9qJcxXJcvDNMUX3eSIwQzNqKHqHJGhJm92sFV77fRR/e1eCUIZ+Au2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726241061; c=relaxed/simple;
-	bh=TMNMs4HtYJvT6NaxwWsmzpLmeJxFJfj5zW4IvRl5s9E=;
+	s=arc-20240116; t=1726248737; c=relaxed/simple;
+	bh=pzA7ZMZZoVgNpmaWFc0CC225Ch3A3u6mzfsVUDrccy0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f027HhCi2CRdQ0NDzER4XqRyYxtFlQ9kQbm/wyElzKj+Dn0ubmfseZgNZiDbJLV8cfgzE6AAlRwvSPYIpTguiNP8e+B87LaC3xPpzJ31uyP4ZMgLyiYH7uRVxE7hy9tKTJngBgKbLsN+W+19KvwnGoCF+dYVqiMPpsRNUrY5vnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=kcj+StYk; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=FU4z9DP5kG9za5wbVc2lU61oupeB6Pks77rjT5im6gHqZgCeILqPvPv9dyWiZe0G4QfOGGmtOVpT9bSOgan5HraY63zA0fG8UqQ6toZwetnbb1LjmbNa7+6yva9aGSpPNqBTuJxroCh8jbWkMW7sNpzR1IPlrDA2tg3LgCHRyqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=SeVAv5rb; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="kcj+StYk"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AB2BC4CEC5;
-	Fri, 13 Sep 2024 15:24:19 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="kcj+StYk"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1726241058;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6kImf0YUfHWU4wjUSEueON/4b/Zh/8CSocVTzKpWd90=;
-	b=kcj+StYkkcTMCbpR8WtjaAX0JckGaUOvQ+4jkXuz8aU4z+bCwCM9mWtQcgBqxRaCoptbHt
-	kcJlLxMkXx2AaDRQE6wuFOnGIk6yzfjE9/YTHxCEcK1F8zjKAi5Re30iEbB+5gCjMpTG26
-	JQD+grpCggNPIMbZYrLOgqHq/x8TJuw=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id e581d9a2 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Fri, 13 Sep 2024 15:24:18 +0000 (UTC)
-Date: Fri, 13 Sep 2024 17:24:16 +0200
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: Heiko Carstens <hca@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="SeVAv5rb"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48DHLhtX025025;
+	Fri, 13 Sep 2024 17:32:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
+	:from:to:cc:subject:message-id:references:mime-version
+	:content-type:in-reply-to; s=pp1; bh=QnKufj0sD+PZoQG/V9Fz2QjNWrI
+	8Gvwt12+jULSnV+0=; b=SeVAv5rbtltW6SAgQMF+DzHSgsRDHIGUsCnOuFBenmE
+	UBDwWoEzNix9XtZBs8kuNCYbw3Vv5vG7g5WACVneFb6UhMWSV8pjoDNXtBBO/v/Y
+	ETGD+OG/L2RO37S4ewyYCwQXMkSOr5GD3Ql4999FGLepgiqiKlfCXI+64U7Wqeyp
+	qXUszcKqmmkn9ntsN3kExYN9qzc93SZKwPSqUiHMbdsJALyjriwgEY303mNMA7tD
+	o5ImiZ7sB3u05Bo3zL+SJHDXRwuUElUpKQa2AD5xgefL9IIolhw9OjXOWiXuYuIE
+	8oeB8VUlTczvJJj9fbkua/iSPAIeEWMFYfR3SBHRvAA==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41gc8qusv7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 13 Sep 2024 17:32:13 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 48DFGMtg010729;
+	Fri, 13 Sep 2024 17:32:12 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 41kmb7391e-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 13 Sep 2024 17:32:12 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 48DHW8b253215732
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 13 Sep 2024 17:32:08 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7590A20043;
+	Fri, 13 Sep 2024 17:32:08 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D301320040;
+	Fri, 13 Sep 2024 17:32:07 +0000 (GMT)
+Received: from osiris (unknown [9.171.6.86])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Fri, 13 Sep 2024 17:32:07 +0000 (GMT)
+Date: Fri, 13 Sep 2024 19:32:06 +0200
+From: Heiko Carstens <hca@linux.ibm.com>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
 Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Harald Freudenberger <freude@linux.ibm.com>,
-	Stefan Liebler <stli@linux.ibm.com>, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Stefan Liebler <stli@linux.ibm.com>, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org
 Subject: Re: [PATCH 7/7] s390/vdso: Wire up getrandom() vdso implementation
-Message-ID: <ZuRZIPNBO1BMznUL@zx2c4.com>
+Message-ID: <20240913173206.30385-C-hca@linux.ibm.com>
 References: <20240913130544.2398678-1-hca@linux.ibm.com>
  <20240913130544.2398678-8-hca@linux.ibm.com>
  <ZuRWmJTWqmD92D8d@zx2c4.com>
@@ -52,9 +74,20 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <ZuRYoVIrg28kBKqb@zx2c4.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: eTsnFCQgIgAm6HIewvB69RXkhB0rMtH1
+X-Proofpoint-ORIG-GUID: eTsnFCQgIgAm6HIewvB69RXkhB0rMtH1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-13_11,2024-09-13_02,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
+ mlxscore=0 lowpriorityscore=0 impostorscore=0 priorityscore=1501
+ malwarescore=0 adultscore=0 clxscore=1015 mlxlogscore=610 suspectscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2408220000 definitions=main-2409130121
 
 On Fri, Sep 13, 2024 at 05:22:09PM +0200, Jason A. Donenfeld wrote:
 > On Fri, Sep 13, 2024 at 05:13:28PM +0200, Jason A. Donenfeld wrote:
@@ -74,17 +107,31 @@ On Fri, Sep 13, 2024 at 05:22:09PM +0200, Jason A. Donenfeld wrote:
 > have and this is just my toolchain being crappy. Or, if it's not a
 > normal thing to have, do we need to add it to the selftests Makefile?
 
-I can squash this into the commit, for example:
+That needs to be fixed differently, since the kernel build would also
+fail when building for z10. Could you squash the below fix into this
+patch, please?
 
-diff --git a/tools/testing/selftests/vDSO/Makefile b/tools/testing/selftests/vDSO/Makefile
-index af9cedbf5357..66a825278b36 100644
---- a/tools/testing/selftests/vDSO/Makefile
-+++ b/tools/testing/selftests/vDSO/Makefile
-@@ -43,3 +43,6 @@ $(OUTPUT)/vdso_test_chacha: CFLAGS += -idirafter $(top_srcdir)/tools/include \
-                                       -idirafter $(top_srcdir)/arch/$(SRCARCH)/include \
-                                       -idirafter $(top_srcdir)/include \
-                                       -D__ASSEMBLY__ -Wa,--noexecstack
-+ifeq ($(ARCH),s390)
-+$(OUTPUT)/vdso_test_chacha: CFLAGS += -march=arch9
-+endif
+That way the compiler will still generate the correct code even if
+compiled with a lower march flag. There is already a guard in place
+(test_facility()), which prevents that this code will be executed if
+the machine does not know the instruction.
 
+So for the kernel itself including the vdso code, everything is
+correct now. But similar checks are missing within vdso_test_chacha.c.
+I'll provide something for that, so that the test case will be skipped
+if the required instructions are missing, but not today.
+
+diff --git a/arch/s390/kernel/vdso64/vgetrandom-chacha.S b/arch/s390/kernel/vdso64/vgetrandom-chacha.S
+index ecd44cf0eaba..d802b0a96f41 100644
+--- a/arch/s390/kernel/vdso64/vgetrandom-chacha.S
++++ b/arch/s390/kernel/vdso64/vgetrandom-chacha.S
+@@ -144,7 +144,8 @@ SYM_FUNC_START(__arch_chacha20_blocks_nostack)
+ .Lstoredone:
+ 
+ 	/* ++COPY3.COUNTER */
+-	alsih	%r3,1
++	/* alsih %r3,1 */
++	.insn	rilu,0xcc0a00000000,%r3,1
+ 	alcr	%r3,%r1
+ 	VLVGG	COPY3,%r3,0
+ 
