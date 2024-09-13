@@ -1,93 +1,110 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 766731487DD;
-	Fri, 13 Sep 2024 19:23:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AC3B13CAA5;
+	Fri, 13 Sep 2024 19:51:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726255406; cv=none; b=XiWLj7N+LNw3KwgfyjGket7g6g7qzf1epCwrqFvimJxcWcC2HHF2d44bEPOC3VQ19wFoq9ebtnS2h2IukWkAlFkHV3m3f3Go2kyivk/0jJJPnsiJXmDyzKQe0Hp6h7wdcS0ShwxFrJ6zRb6X0UqrzYDScDMUmgC868G7fGULQA4=
+	t=1726257070; cv=none; b=aCsVV8XhqJJgnGvvfgSAyCSuQhbAOhx1lplD1VLr3vqPm0NdARU1jR6nWDKl/lrUaaqAL1zFR4NBbIU3XWBdUHi46qoDR92rAED8DUyQCB3e7vZQByWmCxk5cL64yqKBRgaL4/YTEfiymHCcZjIpiLEleSgf29KSLeX0dQKHRAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726255406; c=relaxed/simple;
-	bh=g+we6zXlRF0K6r7vmZ6GDKa/NiVEm5StyEJsa3ai1Q0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uYg9a+889aUkGZ3I/GX7sJqn1yLGhlyspmt8HjoapXRLfUGwFVXwmQDJxlThyvRiLw6Q9Fcae+Ra+MaLd+5OifQNVXXYn4MFAShUXui9o79GNQ+aNnEUnqXaaSKSfn+OVRg8Bu398D3qieTMzsRQWnv7Ip/ny7I4LMfcZQuv5+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=iqVaYpSF; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1726257070; c=relaxed/simple;
+	bh=W2r+kS904i1eF8SnmU6ynsgUgAqTin0VQq7IlkO2umU=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=gFPv8y6LNhpnoR3CV0dvlOSRjpJytDkYZwlMGW1eJKJt/HaBbfuleLRVeYDwceZ2GfuZtO/ARjECRnnZ/oHlqn44sjrpiQpgTiphEspM/B1j+hnlH8JRNlr007EXhCfNSzgLTwJLb4wn8MT3Mws6tG7PobbUTAuYPfy03zzxJjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XTWlhpV0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="iqVaYpSF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8FF2C4CEC0;
-	Fri, 13 Sep 2024 19:23:24 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="iqVaYpSF"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1726255403;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gRexsgTMh+myIiZRscYFbD1nR7aA5ysUH5XGp1Tlp7Y=;
-	b=iqVaYpSFmuqJS/EdM5oDqxY2LQzVTZFAYQulKseyvnZmHLVK/DE49vWb0PUK1vNuOI/a51
-	d6ZKtvRqOhSwajEr79L3BzwYkbTqqzx9h2HX+OcRVWHVcDbYGwYRM1VMRLtk7CUyZv2Xka
-	Nm9OEG0/yDyTZQCq/C3JhJMnu09M5Jo=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 745eb482 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Fri, 13 Sep 2024 19:23:22 +0000 (UTC)
-Date: Fri, 13 Sep 2024 21:23:20 +0200
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: Heiko Carstens <hca@linux.ibm.com>
-Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Harald Freudenberger <freude@linux.ibm.com>,
-	Stefan Liebler <stli@linux.ibm.com>, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: Re: [PATCH 7/7] s390/vdso: Wire up getrandom() vdso implementation
-Message-ID: <ZuSRKLFdYI1gCHh9@zx2c4.com>
-References: <20240913130544.2398678-1-hca@linux.ibm.com>
- <20240913130544.2398678-8-hca@linux.ibm.com>
- <ZuRWmJTWqmD92D8d@zx2c4.com>
- <ZuRYoVIrg28kBKqb@zx2c4.com>
- <20240913173206.30385-C-hca@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XTWlhpV0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6F91C4CEC0;
+	Fri, 13 Sep 2024 19:51:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726257069;
+	bh=W2r+kS904i1eF8SnmU6ynsgUgAqTin0VQq7IlkO2umU=;
+	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
+	b=XTWlhpV0GW6n8Q0Y46b6EcDU34hs45fEGQJLJGqwssA0KF91mvCmAgMPv/ZVxDD/o
+	 21rNvfs4sFftS1IPadMy1LpstLfVsRXLICQJVZPs1H5KFZG6g91GoTTxvvGx15eWZU
+	 ZkVjwxnFu7e0lTE03QIRoA7vcvU10T4XUy4ZMIPsx/Dr14ym9syQfhEd68sXngddbK
+	 BzJxkzvkK87z4sctn3NVyD5+u6kRy5XD3dQ6xMAVVd0QAi55RpDKJ4JqURfCx90N7c
+	 afnIzGTgmrit/dzA46aPrZhLxCQnHWvGbpIUIP0mqe0SOiSqSLLbrW0D572JpmQq5l
+	 ut64rM77w5GYw==
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240913173206.30385-C-hca@linux.ibm.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 13 Sep 2024 22:51:04 +0300
+Message-Id: <D45F23O3EX54.1NDMXAY5G7AL3@kernel.org>
+Cc: <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
+Subject: Re: [PATCH v2] KEYS: prevent NULL pointer dereference in
+ find_asymmetric_key()
+From: "Jarkko Sakkinen" <jarkko@kernel.org>
+To: "Sergey Shtylyov" <s.shtylyov@omp.ru>, "Roman Smirnov"
+ <r.smirnov@omp.ru>, "David Howells" <dhowells@redhat.com>, "Herbert Xu"
+ <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>,
+ "Andrew Zaborowski" <andrew.zaborowski@intel.com>
+X-Mailer: aerc 0.17.0
+References: <20240910111806.65945-1-r.smirnov@omp.ru>
+ <D42N9ASJJSUD.EG094MFWZA4Q@kernel.org>
+ <84d6b0fa-4948-fe58-c766-17f87c2a2dba@omp.ru>
+ <D43HG3PEBR4I.2INNPVZIT19ZZ@kernel.org>
+ <D43HH3XOAXFO.2MX7FA48VOLE9@kernel.org>
+ <85607ea7-a42a-1c7b-0722-e4b63a814385@omp.ru>
+In-Reply-To: <85607ea7-a42a-1c7b-0722-e4b63a814385@omp.ru>
 
-On Fri, Sep 13, 2024 at 07:32:06PM +0200, Heiko Carstens wrote:
-> On Fri, Sep 13, 2024 at 05:22:09PM +0200, Jason A. Donenfeld wrote:
-> > On Fri, Sep 13, 2024 at 05:13:28PM +0200, Jason A. Donenfeld wrote:
-> > > On Fri, Sep 13, 2024 at 03:05:43PM +0200, Heiko Carstens wrote:
-> > > > The vdso testcases vdso_test_getrandom and vdso_test_chacha pass.
-> > > 
-> > > I'm trying to cross compile this but I'm getting:
-> > > 
-> > >   CC       vdso_test_chacha
-> > > /home/zx2c4/Projects/random-linux/tools/testing/selftests/../../../tools/arch/s390/vdso/vgetrandom-chacha.S: Assembler messages:
-> > > /home/zx2c4/Projects/random-linux/tools/testing/selftests/../../../tools/arch/s390/vdso/vgetrandom-chacha.S:147: Error: Unrecognized opcode: `alsih'
-> > > 
-> > > Any idea what's up?
-> > 
-> > Looks like I needed `-march=arch9`. I can potentially rebuild my
-> > toolchains to do this by default, though, if that's a normal thing to
-> > have and this is just my toolchain being crappy. Or, if it's not a
-> > normal thing to have, do we need to add it to the selftests Makefile?
-> 
-> That needs to be fixed differently, since the kernel build would also
-> fail when building for z10. Could you squash the below fix into this
-> patch, please?
+On Wed Sep 11, 2024 at 5:45 PM EEST, Sergey Shtylyov wrote:
+> On 9/11/24 4:19 PM, Jarkko Sakkinen wrote:
+>
+> [...]
+>
+> >>>>> In find_asymmetric_key(), if all NULLs are passed in id_{0,1,2} par=
+ameters
+> >>>>> the kernel will first emit WARN and then have an oops because id_2 =
+gets
+> >>>>> dereferenced anyway.
+> >>>>>
+> >>>>> Found by Linux Verification Center (linuxtesting.org) with Svace st=
+atic
+> >>>>> analysis tool.
+> >>>>
+> >>>> Weird, I recall that I've either sent a patch to address the same si=
+te
+> >>>> OR have commented a patch with similar reasoning. Well, it does not
+> >>>> matter, I think it this makes sense to me.
+> >>>>
+> >>>> You could further add to the motivation that given the panic_on_warn
+> >>>> kernel command-line parameter, it is for the best limit the scope an=
+d
+> >>>> use of the WARN-macro.
+> >>>
+> >>>    I don't understand what you mean -- this version of the patch keep=
+s
+> >>> the WARN_ON() call, it just moves that call, so that the duplicate id=
+_{0,1,2}
+> >>> checks are avoided...
+> >>
+> >> I overlooked the code change (my bad sorry). Here's a better version o=
+f
+> >> the first paragraph:
+> >>
+> >> "find_asymmetric_keys() has nullity checks of id_0 and id_1 but ignore=
+s
+> >> validation for id_2. Check nullity also for id_2."
+> >>
+> >> Yep, and it changes no situation with WARN_ON() macro for better or
+> >> worse. It would logically separate issue to discuss and address so
+> >> as far as I'm concerned, with this clarification I think the change
+> >> makes sense to me.
+> >=20
+> > Actually explicitly stating that call paths leading to WARN_ON()
+> > invocation are intact by the commit (as a reminder for future).
+>
+>    OK...
+>    Do you still think the Fixes tag should be dropped (and thus the
+> Reported-by tag would become unnecessary?)?
 
-Done.
+I think we can keep them.
 
-> So for the kernel itself including the vdso code, everything is
-> correct now. But similar checks are missing within vdso_test_chacha.c.
-> I'll provide something for that, so that the test case will be skipped
-> if the required instructions are missing, but not today.
-
-Okay. I would assume no rush there, because it's unlikely there are
-those machines part of kselftest fleets anyway?
-
-Jason
+BR, Jarkko
