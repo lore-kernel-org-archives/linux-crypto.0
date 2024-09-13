@@ -1,125 +1,127 @@
-Received: from mxe.seznam.cz (mxe.seznam.cz [77.75.78.34])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E5371D67AB
-	for <linux-crypto@vger.kernel.org>; Fri, 13 Sep 2024 10:59:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=77.75.78.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 002851C233D;
+	Fri, 13 Sep 2024 11:12:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726225155; cv=none; b=GcO4BpQ9pVksUcn68S1o024REG3PQUiGxhew4Gu9zH9jVCYA/6gSV20Fj/7/Bop2Qq45g+f+HMx/7XDUIlk+BI12sFNS8BrVtUyfkKJztTTGzJr3EfJZE8s3XMNTxAbe9hQyYwcdeBzzn+xew6C5oQ0aKHV2BrtokUgCOch4OiQ=
+	t=1726225943; cv=none; b=k19g0djy/EwkcDMlJUrdjbVGJbYRO2NBI79tfT6v2TeIkGDXYOPHxhOgfQr5U6T87dnXlga6Vbo6c7Bsw4a2N5GMKm2K/Vjt8xqWw+kkbxs6RVrVPnOYR8nTSzUKmFEhwweb3x8kbjkmQj28bgzSWW05L1bpCiv0bdknsp/4Wlo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726225155; c=relaxed/simple;
-	bh=LsVl0Voqd1ckeCDn0W+7B7IVZDgwFBAd008MHYFeKtQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:Mime-Version:Content-Type; b=gLBmGUT1tIPAZ02lfjdTDZ4hjOBj1r4gIbcjkG2UZlZmVA1iRLCXxdMokSZOysG0WYNXFvEVwZeJJwtkPG5DiLU3eFwn5a4gPq9tXLiWjzQp8BlC1iDjqtNPEpQjioMjFQvHt6P3S0ZEJ5YSiWMEbMFRyD61rB6P3s24Ahw0ntU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=email.cz; spf=pass smtp.mailfrom=email.cz; dkim=pass (2048-bit key) header.d=email.cz header.i=@email.cz header.b=S6g1BsX4; arc=none smtp.client-ip=77.75.78.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=email.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=email.cz
+	s=arc-20240116; t=1726225943; c=relaxed/simple;
+	bh=leVDogQs/XcJJFm1mFY1ASj8KE9FJeY3iXaZbhsn0WY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=q9DOx7sgT8qiy4JhC1GMvIC6iaVuKCQyDYjDHhI3avF/pjgnaq9hZJqFFfkC2yRHHTt0Msb6NoXrJlq9y4od0VTzuhMs+VuURgW2meuOmFnavAcbf6csbOk/A8i01WjGTAgH1bmwjLWBDzaPVxDkA4U4RcUncmCwdmuLnPDiyYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=gjGnN6Sg; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=email.cz header.i=@email.cz header.b="S6g1BsX4"
-Received: from email.seznam.cz
-	by smtpc-mxe-7bdd9d48f6-vf57s
-	(smtpc-mxe-7bdd9d48f6-vf57s [2a02:598:64:8a00::1000:aed])
-	id 7fb00c968144be3c7f3e828e;
-	Fri, 13 Sep 2024 12:58:23 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=email.cz;
-	s=szn20221014; t=1726225103;
-	bh=Go1Drl7Hc5TRGms6agMq/QAyf40vC00ZWCu62l3/7AM=;
-	h=Received:From:To:Cc:Subject:Date:Message-Id:Mime-Version:X-Mailer:
-	 Content-Type:Content-Transfer-Encoding;
-	b=S6g1BsX4WqcsWQ7TEqI4Q5hinoIJvlK971uJpasNtpyi20KODBcbEHsvzihB/DjqV
-	 9nTPqJhQnYYJdOQw8CpofRI/5Syg03jQhm1bU8pmFaQAAB65gkkFQxZLtSPd+8LqmD
-	 AvSDLoUXhbM1cvTN7KYpVwew2i3Lkp+4UNmtjeYapY4208NNGswyZwBKDp4pWMs4ui
-	 UCyXgwN3f76oAecxC0kh5q48tL8m4qiZSbOClyl/plisSmwjrURuYEnAlq7MWL4Z7O
-	 2vj6VopjGvtxY/dR7FI9hz9ISoXP9JFJVFsHUiLc9EpLb7rybM0QjFygLVTLY5oaFv
-	 Yg3tPrro7BdxA==
-Received: from 184-143.ktuo.cz (184-143.ktuo.cz [82.144.143.184])
-	by email.seznam.cz (szn-ebox-5.0.189) with HTTP;
-	Fri, 13 Sep 2024 12:58:21 +0200 (CEST)
-From: "Tomas Paukrt" <tomaspaukrt@email.cz>
-To: <linux-crypto@vger.kernel.org>
-Cc: "Herbert Xu" <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Shawn Guo" <shawnguo@kernel.org>,
-	"Sascha Hauer" <s.hauer@pengutronix.de>,
-	"Pengutronix Kernel Team" <kernel@pengutronix.de>,
-	"Fabio Estevam" <festevam@gmail.com>,
-	<imx@lists.linux.dev>,
-	<linux-arm-kernel@lists.infradead.org>
-Subject: =?utf-8?q?=5BPATCH=5D_crypto=3A_mxs-dcp=3A_Enable_user-space_acce?=
-	=?utf-8?q?ss_to_AES_with_hardware-bound_keys?=
-Date: Fri, 13 Sep 2024 12:58:21 +0200 (CEST)
-Message-Id: <1di.ZclR.6M4clePpGuH.1cv1hD@seznam.cz>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="gjGnN6Sg"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48DA9adk004900;
+	Fri, 13 Sep 2024 11:12:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=i
+	QhjEs8ki/xL/wsHpZzAsFpWHpcSNMnfW5ARyW8D1N8=; b=gjGnN6SgdzP1JyRO3
+	/JSnGmBTuD2hCa/XgyCDkJx0Lr8gPw7QxpthloLqqq5dC1x12VmD0o/eLpE7tJas
+	w61Jlf+vZ6DjGD9ZoXJ03KezbeYMhr6k2C+3upG7ZclTZ4pNQ7ZDMG2U953s1WSC
+	K5mvAk73Ev5p+Sqg/y5qSiFBS371cKvbwkr9rvqS7/sO+eDPdrvMAlxTz8QVVAZv
+	j0jctsSPROMr+Z7jch/F2z8LhFQLE9wvZ+UwXf74qtYqvwxTrDW0SzTFdAKpAkRR
+	//iSlsSAzQtkCZECfQW4WTpnOq7XM83iSxb+TyuLhTXqeBKMRcBFA2QQ0LK5qsIK
+	oKNmA==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41gc8qsr6h-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 13 Sep 2024 11:12:03 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 48D9dQue013566;
+	Fri, 13 Sep 2024 11:12:02 GMT
+Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 41h3cmngaa-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 13 Sep 2024 11:12:02 +0000
+Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
+	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 48DBC0XW57934088
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 13 Sep 2024 11:12:00 GMT
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 83CB658051;
+	Fri, 13 Sep 2024 11:12:00 +0000 (GMT)
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4B06058062;
+	Fri, 13 Sep 2024 11:12:00 +0000 (GMT)
+Received: from [9.61.250.246] (unknown [9.61.250.246])
+	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 13 Sep 2024 11:12:00 +0000 (GMT)
+Message-ID: <3b3e019a-0576-4ef6-a5c7-aa5ebc35d600@linux.ibm.com>
+Date: Fri, 13 Sep 2024 06:12:00 -0500
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (szn-mime-2.1.61)
-X-Mailer: szn-ebox-5.0.189
-Content-Type: text/plain;
-	charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/1] crypto: Fix data mismatch over ipsec tunnel
+ encrypted/decrypted with ppc64le AES/GCM module.
+To: Michael Ellerman <mpe@ellerman.id.au>, linux-crypto@vger.kernel.org
+Cc: herbert@gondor.apana.org.au, leitao@debian.org, nayna@linux.ibm.com,
+        appro@cryptogams.org, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, ltcgcw@linux.vnet.ibm.com,
+        dtsen@us.ibm.com
+References: <20240912174537.1409567-1-dtsen@linux.ibm.com>
+ <87seu4qmv6.fsf@mail.lhotse>
+Content-Language: en-US
+From: Danny Tsen <dtsen@linux.ibm.com>
+In-Reply-To: <87seu4qmv6.fsf@mail.lhotse>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: DDi48tHiC1lCxZTBoadouUmG7ZywYP9p
+X-Proofpoint-ORIG-GUID: DDi48tHiC1lCxZTBoadouUmG7ZywYP9p
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-13_09,2024-09-13_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
+ mlxscore=0 lowpriorityscore=0 impostorscore=0 priorityscore=1501
+ malwarescore=0 adultscore=0 clxscore=1015 mlxlogscore=999 suspectscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2408220000 definitions=main-2409130076
 
-Add an option to enable user-space access to cbc(paes) and ecb(paes)
-cipher algorithms via AF_ALG.
+Hi Michael,
 
-Signed-off-by: Tomas Paukrt <tomaspaukrt@email.cz>
----
- drivers/crypto/Kconfig   | 13 +++++++++++++
- drivers/crypto/mxs-dcp.c |  8 ++++++++
- 2 files changed, 21 insertions(+)
+I did think of that.  I can try to remove the feature first and apply 
+the subsequent changes.
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 94f23c6..4637c6f 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -460,6 +460,19 @@ config CRYPTO_DEV_MXS_DCP
- 	  To compile this driver as a module, choose M here: the module
- 	  will be called mxs-dcp.
- 
-+config CRYPTO_DEV_MXS_DCP_USER_PAES
-+	bool "Enable user-space access to AES with hardware-bound keys"
-+	depends on CRYPTO_DEV_MXS_DCP && CRYPTO_USER_API_SKCIPHER
-+	default n
-+	help
-+	  Say Y to enable user-space access to cbc(paes) and ecb(paes)
-+	  cipher algorithms via AF_ALG.
-+
-+	  In scenarios with untrustworthy users-pace, this may enable
-+	  decryption of sensitive information.
-+
-+	  If unsure, say N.
-+
- source "drivers/crypto/cavium/cpt/Kconfig"
- source "drivers/crypto/cavium/nitrox/Kconfig"
- source "drivers/crypto/marvell/Kconfig"
-diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
-index c82775d..84df1cb 100644
---- a/drivers/crypto/mxs-dcp.c
-+++ b/drivers/crypto/mxs-dcp.c
-@@ -944,7 +944,11 @@ static struct skcipher_alg dcp_aes_algs[] =3D {
- 		.base.cra_driver_name	=3D "ecb-paes-dcp",
- 		.base.cra_priority	=3D 401,
- 		.base.cra_alignmask	=3D 15,
-+#ifdef CONFIG_CRYPTO_DEV_MXS_DCP_USER_PAES
-+		.base.cra_flags		=3D CRYPTO_ALG_ASYNC,
-+#else
- 		.base.cra_flags		=3D CRYPTO_ALG_ASYNC | CRYPTO_ALG_INTERNAL,
-+#endif
- 		.base.cra_blocksize	=3D AES_BLOCK_SIZE,
- 		.base.cra_ctxsize	=3D sizeof(struct dcp_async_ctx),
- 		.base.cra_module	=3D THIS_MODULE,
-@@ -960,7 +964,11 @@ static struct skcipher_alg dcp_aes_algs[] =3D {
- 		.base.cra_driver_name	=3D "cbc-paes-dcp",
- 		.base.cra_priority	=3D 401,
- 		.base.cra_alignmask	=3D 15,
-+#ifdef CONFIG_CRYPTO_DEV_MXS_DCP_USER_PAES
-+		.base.cra_flags		=3D CRYPTO_ALG_ASYNC,
-+#else
- 		.base.cra_flags		=3D CRYPTO_ALG_ASYNC | CRYPTO_ALG_INTERNAL,
-+#endif
- 		.base.cra_blocksize	=3D AES_BLOCK_SIZE,
- 		.base.cra_ctxsize	=3D sizeof(struct dcp_async_ctx),
- 		.base.cra_module	=3D THIS_MODULE,
--- 
-2.7.4
- 
+Thanks.
+
+-Danny
+
+On 9/12/24 10:00 PM, Michael Ellerman wrote:
+> Danny Tsen <dtsen@linux.ibm.com> writes:
+>> This patch is to fix an issue when simd is not usable that data mismatch
+>> may occur over ipsec tunnel. The fix is to register algs as SIMD modules
+>> so that the algorithm is excecuted when SIMD instructions is usable.
+>>
+>> A new module rfc4106(gcm(aes)) is also added. Re-write AES/GCM assembly
+>> codes with smaller footprints and small performance gain.
+>>
+>> This patch has been tested with the kernel crypto module tcrypt.ko and
+>> has passed the selftest.  The patch is also tested with
+>> CONFIG_CRYPTO_MANAGER_EXTRA_TESTS enabled.
+>>
+>> Signed-off-by: Danny Tsen <dtsen@linux.ibm.com>
+>> ---
+>>   arch/powerpc/crypto/Kconfig            |    1 +
+>>   arch/powerpc/crypto/aes-gcm-p10-glue.c |  141 +-
+>>   arch/powerpc/crypto/aes-gcm-p10.S      | 2421 +++++++++++-------------
+>>   3 files changed, 1187 insertions(+), 1376 deletions(-)
+> As this is a bug fix it should have a Fixes: tag, and probably a stable
+> Cc as well.
+>
+> But that diffstat is really large for a bug fix. Is there no way to fix
+> the issue in a smaller patch? Even if that is just disabling the feature
+> until it can be fixed in subsequent commits?
+>
+> cheers
+>
