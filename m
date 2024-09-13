@@ -1,50 +1,49 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6D181DA2E0;
-	Fri, 13 Sep 2024 10:31:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E16341DA315;
+	Fri, 13 Sep 2024 10:31:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726223497; cv=none; b=dFP21dC4qBSf5vePz9OUgnEjQN4E7/3dxWQqVq0y3BbdsWy3b3T8yn4B4CQu7skrrriBxRbcITwMpgCA5czXz8+Di5uO6T96EuHrodvsfnjq1Ys/1uqrYCSNkgsKwV7YyewF289ULUbep85l/v6v+IxTUaetHoG5mxXUjF9GsF4=
+	t=1726223506; cv=none; b=Q5nJ3ptZuw15tykwGUAu3/xuOs4jEJmuqIj3WOtzxaBO657LmREazB7qMCKZy/8Xnlmoo1PtfS60YrvtJTnxIvWIMrYZGmWUmPQEU1ji1u+w+UWaM6pcFOodk1YrxqYPe1tsp38Ltx2e1/nkOFxFL3/AU+7FuWxy/3blghvY8hY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726223497; c=relaxed/simple;
-	bh=16qCOLFJPrMu5eOTbUdYKk4xjWjeMTKjI/SmQ58MsAY=;
+	s=arc-20240116; t=1726223506; c=relaxed/simple;
+	bh=VfzE/e2GMEtPTTZi9MH2kcW1v2jCUX3uz2k1aSyFJXo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dBWGpw8l65G3ZMaio0jdq/xWsE3xfVxWtQcULROoa+zYWsCGahW2Feyd+bvnFNBw44sWid51CXfWdpS+S7ZdhuWqvHIt+iWK59cuE+jbM5i0zkvDpjl6KTMF4nqqmzi2oek0oZj+Ix3BDj5ZjsZPfQtt9G7asT6734WCfov9LxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=d+e91Fyq; arc=none smtp.client-ip=144.6.53.87
+	 Content-Type:Content-Disposition:In-Reply-To; b=qz4/KLGRsu/8oe0mZm5C2zjONOmiALckEi8/EuLdAZY9NWvy4kXpVOCvrsJK+5tC97ID/nIhzCmzn7q68T6HrsUmfdB1yKFVYDxzm+uQcdrT2H8QuFd/12rzxZUAgDaHi3rBjHGKCX9NtX8/wMUEc3WsYYvcPfXNmsr2RygK0Gs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=BYSQ3SOd; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="d+e91Fyq"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="BYSQ3SOd"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
 	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=vjDsMPWKjB/SrhLRKU4BZ+KvCQEJb6PvxQRxNDoY5Ko=; b=d+e91FyqC56k6IQnxA4CiUCchi
-	lVzMtRCX0bsFbXdMsB2Nt6i/+JG/pMZ9EVP+HdNy/V2UNJf1VpUGL61SYEe9pC8ZLuF1xwNCxqPdm
-	mBnCBUDmvR8Et7IBtQbOtJumQxkoI6GHA23GwKT7WbYjuf4Xj2OcYNWPEDCcq4IkBgqunoZHf3EsS
-	eFBjP9AuIS6anD5DRxlkNxms3zbw9QEOSvEx5dYQBwtWy2SySxHA/vywd4XulWz/84Ep8rRtWEty9
-	rzNzX0P4IW1YrGDyoAsYxaecoKJLM+8gk0fHh6CTdi73wV/XhRjbuRNzjCLcbhhvutCDinXOUVFCo
-	STd3jtaw==;
+	bh=qfM276FFMSEBEC/xP0ee+Dgn5beownuGHgkpyoSLAoo=; b=BYSQ3SOd6Sa93tQbj3PDkeRHkl
+	L/NRovthGKy1EATKEO/54B/9+Js/EX02aRqMDVdfHdEhxvoygJ9FfLPSS8CHQ3u4JPHuf0FwYkGJx
+	LniDdpyV3tcLFJ3eohrRc5sYC6iMmnOzlpLA32ex7mP/pJ1j4kqFz+lx+serFvoSo/DfEiPfgfH8V
+	SLBTguXusIFvAOreAkiTWppUnVwjHKY4COQ4TFUrvqqqXJtdJhyUr/ffc+p2jq+MePBgY3GLEocno
+	+ZEucPRsGfiDJE2QAxqGMeirAFKKnXfGKuU9ow88RjBZhflDI+SQo82IxfNjmDJYo5FDNHX2tnMhw
+	a+OUvtTg==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1sp3QP-002DvB-2v;
-	Fri, 13 Sep 2024 18:31:28 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 13 Sep 2024 18:31:27 +0800
-Date: Fri, 13 Sep 2024 18:31:27 +0800
+	id 1sp3QY-002Dw7-2S;
+	Fri, 13 Sep 2024 18:31:37 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 13 Sep 2024 18:31:36 +0800
+Date: Fri, 13 Sep 2024 18:31:36 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Brian Masney <bmasney@redhat.com>
-Cc: davem@davemloft.net, quic_omprsing@quicinc.com,
-	neil.armstrong@linaro.org, quic_bjorande@quicinc.com,
-	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, ernesto.mnd.fernandez@gmail.com,
-	quic_jhugo@quicinc.com
-Subject: Re: [PATCH v3 0/2] crypto: qcom-rng: fix support for ACPI-based
- systems
-Message-ID: <ZuQUfxA1teMeV0Lf@gondor.apana.org.au>
-References: <20240906002521.1163311-1-bmasney@redhat.com>
+To: WangYuli <wangyuli@uniontech.com>
+Cc: davem@davemloft.net, tsbogend@alpha.franken.de,
+	linux-crypto@vger.kernel.org, linux-mips@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Maciej W . Rozycki" <macro@orcam.me.uk>,
+	Guan Wentao <guanwentao@uniontech.com>
+Subject: Re: [PATCH v3] MIPS: crypto: Clean up useless assignment operations
+Message-ID: <ZuQUiK8-elOhoiX0@gondor.apana.org.au>
+References: <C4F76EB9DD3AEFEB+20240906064002.404538-1-wangyuli@uniontech.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -53,36 +52,27 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240906002521.1163311-1-bmasney@redhat.com>
+In-Reply-To: <C4F76EB9DD3AEFEB+20240906064002.404538-1-wangyuli@uniontech.com>
 
-On Thu, Sep 05, 2024 at 08:25:19PM -0400, Brian Masney wrote:
-> The qcom-rng driver supports both ACPI and device tree based systems.
-> ACPI support was broken when the hw_random interface support was added.
-> This small series gets that working again.
+On Fri, Sep 06, 2024 at 02:40:02PM +0800, WangYuli wrote:
+> When entering the "len & sizeof(u32)" branch, len must be less than 8.
+> So after one operation, len must be less than 4.
+> At this time, "len -= sizeof(u32)" is not necessary for 64-bit CPUs.
 > 
-> This fix was boot tested on a Qualcomm Amberwing server (ACPI based) and
-> on a Qualcomm SA8775p Automotive Development Board (DT based). I also
-> verified that qcom-rng shows up in /proc/crypto on both systems.
+> After that, replace `while' loops with equivalent `for' to make the
+> code structure a little bit better by the way.
 > 
-> Changes since v2:
-> - Simplify ACPI fix based on what's done with other drivers (Brian)
-> 
-> Changes since v1:
-> - Use qcom_prng_ee_match_data instead of qcom_prng_match_data for the
->   true skip_init to match previous behavior (Ernesto)
-> - Reordered patches so fix is first (Dmitry)
-> 
-> Brian Masney (2):
->   crypto: qcom-rng: fix support for ACPI-based systems
->   crypto: qcom-rng: rename *_of_data to *_match_data
-> 
->  drivers/crypto/qcom-rng.c | 24 ++++++++++++------------
->  1 file changed, 12 insertions(+), 12 deletions(-)
-> 
-> -- 
-> 2.46.0
+> Suggested-by: Maciej W. Rozycki <macro@orcam.me.uk>
+> Link: https://lore.kernel.org/all/alpine.DEB.2.21.2406281713040.43454@angie.orcam.me.uk/
+> Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
+> Link: https://lore.kernel.org/all/ZtqZpzMH_qMQqzyc@gondor.apana.org.au/
+> Signed-off-by: Guan Wentao <guanwentao@uniontech.com>
+> Signed-off-by: WangYuli <wangyuli@uniontech.com>
+> ---
+>  arch/mips/crypto/crc32-mips.c | 70 ++++++++++++++++++-----------------
+>  1 file changed, 37 insertions(+), 33 deletions(-)
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
