@@ -1,34 +1,66 @@
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80DA4C8C0;
-	Fri, 13 Sep 2024 14:30:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 292B129CE3;
+	Fri, 13 Sep 2024 14:47:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726237874; cv=none; b=VvTC+v4dA/ejqm4Oqpd15XND52iJJlHoqLmodQyKdaPF2GV4rqKoOp7x07IugfDLFg/Klpyqg37zaS9WXF6rhjLS5IUX6q8pzR890c3timdYLejHZIQ+Rwu/1w1AzNFkdJogoTQKHDMWhrGfR++wLpF5YhZD0yjisX9uJl4vMGA=
+	t=1726238876; cv=none; b=BLYyhtkV9cPXMrAAgcpNr+8CNAs636ACUmMIcN0Bfbl+WFNXmVPmSe/7wt6V4jGlpCvlRR+EsdI7QzJgbsmaalpnef8hylLkwLdrEDh2DQOZho6nxA7nYr5n9zSN8NYW66O+bSkKcX9+Vs7K8curvdKHHZR5p68IXKBvV/Hn4SQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726237874; c=relaxed/simple;
-	bh=vn/VM5mbqa3ILpM2QKIWip9xSaN4yeJC8BD5e4XcUvg=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VskqgE3Lvvkcy9WQ5t2TpUa2ZYKMVeYP9siazvOBz7JLcfv5ne0ch2XJxCzA//a0TbBpwHyDakmtIgIbnwIQzeEn7DWjHIlW7JLFr5/ldle2Y94zppKYZVd9Ivj2GigSY62eRFfHwQVHPFP0RaFNMzqQYwK2LrbE6botmvDBWFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from localhost.localdomain (178.205.55.120) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Fri, 13 Sep
- 2024 17:30:47 +0300
-From: Roman Smirnov <r.smirnov@omp.ru>
-To: David Howells <dhowells@redhat.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>,
-	Jarkko Sakkinen <jarkko@kernel.org>, Andrew Zaborowski
-	<andrew.zaborowski@intel.com>
-CC: Roman Smirnov <r.smirnov@omp.ru>, <keyrings@vger.kernel.org>,
-	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<lvc-project@linuxtesting.org>, Sergey Shtylyov <s.shtylyov@omp.ru>, Karina
- Yankevich <k.yankevich@omp.ru>, Sergey Yudin <s.yudin@omp.ru>
-Subject: [PATCH v3] KEYS: prevent NULL pointer dereference in find_asymmetric_key()
-Date: Fri, 13 Sep 2024 17:30:09 +0300
-Message-ID: <20240913143010.117883-1-r.smirnov@omp.ru>
+	s=arc-20240116; t=1726238876; c=relaxed/simple;
+	bh=FsvMNSjsqkmpovx3KipovB3Nr37RFysiVdtAEGJB5Ko=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gecMYcY+QhKBZtT/mBO0gGGzePnaO7lv5lze1FF3YywqI0m3NI90aqsJsOdou/PjBE9PHEMY+e12BcoXh7uBOlPECC1WBwkcKxjf9N9n859I7uc6z9/olChanKWQw9ZKf8GnFcyPFpORolT8PKJBrEjT/QhIBUZNsFdACF3F2NE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=HZ4lmL5D; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HZ4lmL5D"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48D74ZVp028394;
+	Fri, 13 Sep 2024 14:42:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
+	:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding; s=pp1; bh=aA0VD6ILZwVsRCqF6gyMIXcvET
+	Ry4AHsm47dMSMexos=; b=HZ4lmL5DfAEi7SrWDWljVLFu/HrpBbdPmmOfbd5XNZ
+	DalIyxewb9m7uYdGawvPM3GwWsNir1FVhgzJPUx7n1qghWrp4Jrn5/p230j2NLvB
+	PzIwecRik9bz/0aOX3n90CY8ecNCcvyNG+L22PaFgVkLsKaZUTBzoeXZO9vGQ4Xr
+	2VyKbbWO/sRrfwv6qgDmL4GISwGTM5IGB7UJxjn0+pq8+XSHh4LhfiJuNmbQ0vNO
+	SDXFhI6gGUzO+IJFwMiVLVxOkHL0l1PvhioAVpWqOyFIYWGszElhjN7WRyKx6pQW
+	4ZQBSQOOhuTfjtfTAfT6s+j6szsR67+P3HmG+1j5sLIw==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41geg02de4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 13 Sep 2024 14:42:37 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 48DCgFTA027389;
+	Fri, 13 Sep 2024 14:42:36 GMT
+Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 41h3v3pev3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 13 Sep 2024 14:42:36 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 48DEgYu522413890
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 13 Sep 2024 14:42:35 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B762758058;
+	Fri, 13 Sep 2024 14:42:34 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5BD9858059;
+	Fri, 13 Sep 2024 14:42:34 +0000 (GMT)
+Received: from ltcden12-lp3.aus.stglabs.ibm.com (unknown [9.40.195.53])
+	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 13 Sep 2024 14:42:34 +0000 (GMT)
+From: Danny Tsen <dtsen@linux.ibm.com>
+To: linux-crypto@vger.kernel.org
+Cc: stable@vger.kernel.org, herbert@gondor.apana.org.au, leitao@debian.org,
+        nayna@linux.ibm.com, appro@cryptogams.org,
+        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        mpe@ellerman.id.au, ltcgcw@linux.vnet.ibm.com, dtsen@us.ibm.com,
+        Danny Tsen <dtsen@linux.ibm.com>
+Subject: [PATCH v2] crypto: Removing CRYPTO_AES_GCM_P10.
+Date: Fri, 13 Sep 2024 10:42:23 -0400
+Message-ID: <20240913144223.1783162-1-dtsen@linux.ibm.com>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -37,94 +69,38 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 09/13/2024 14:17:55
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 187737 [Sep 13 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.1.5
-X-KSE-AntiSpam-Info: Envelope from: r.smirnov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 34 0.3.34
- 8a1fac695d5606478feba790382a59668a4f0039
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.205.55.120 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.205.55.120 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1
-X-KSE-AntiSpam-Info: FromAlignment: s
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.205.55.120
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 09/13/2024 14:22:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 9/13/2024 12:44:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: -CEw3quGPWS97YQJeKZRXaB0Yg4lcMyu
+X-Proofpoint-ORIG-GUID: -CEw3quGPWS97YQJeKZRXaB0Yg4lcMyu
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-13_11,2024-09-13_02,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
+ lowpriorityscore=0 suspectscore=0 mlxlogscore=808 priorityscore=1501
+ adultscore=0 clxscore=1011 spamscore=0 bulkscore=0 phishscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2408220000 definitions=main-2409130102
 
-In find_asymmetric_key(), if all NULLs are passed in the id_{0,1,2}
-arguments, the kernel will first emit WARN but then have an oops
-because id_2 gets dereferenced anyway.
+Disabling CRYPTO_AES_GCM_P10 in Kconfig first so that we can apply the
+subsequent patches to fix data mismatch over ipsec tunnel.
 
-Add the missing id_2 check and move WARN_ON() to the final else branch
-to avoid duplicate NULL checks.
-
-Found by Linux Verification Center (linuxtesting.org) with Svace static
-analysis tool.
-
-Fixes: 7d30198ee24f ("keys: X.509 public key issuer lookup without AKID")
-Suggested-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-Signed-off-by: Roman Smirnov <r.smirnov@omp.ru>
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+Signed-off-by: Danny Tsen <dtsen@linux.ibm.com>
 ---
- V1 -> V2: updated patch description, returned WARN_ON() macro
- V2 -> V3: updated patch description
- crypto/asymmetric_keys/asymmetric_type.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ arch/powerpc/crypto/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/crypto/asymmetric_keys/asymmetric_type.c b/crypto/asymmetric_keys/asymmetric_type.c
-index a5da8ccd353e..43af5fa510c0 100644
---- a/crypto/asymmetric_keys/asymmetric_type.c
-+++ b/crypto/asymmetric_keys/asymmetric_type.c
-@@ -60,17 +60,18 @@ struct key *find_asymmetric_key(struct key *keyring,
- 	char *req, *p;
- 	int len;
+diff --git a/arch/powerpc/crypto/Kconfig b/arch/powerpc/crypto/Kconfig
+index 09ebcbdfb34f..46a4c85e85e2 100644
+--- a/arch/powerpc/crypto/Kconfig
++++ b/arch/powerpc/crypto/Kconfig
+@@ -107,6 +107,7 @@ config CRYPTO_AES_PPC_SPE
  
--	WARN_ON(!id_0 && !id_1 && !id_2);
--
- 	if (id_0) {
- 		lookup = id_0->data;
- 		len = id_0->len;
- 	} else if (id_1) {
- 		lookup = id_1->data;
- 		len = id_1->len;
--	} else {
-+	} else if (id_2) {
- 		lookup = id_2->data;
- 		len = id_2->len;
-+	} else {
-+		WARN_ON(1);
-+		return ERR_PTR(-EINVAL);
- 	}
- 
- 	/* Construct an identifier "id:<keyid>". */
+ config CRYPTO_AES_GCM_P10
+ 	tristate "Stitched AES/GCM acceleration support on P10 or later CPU (PPC)"
++	depends on BROKEN
+ 	depends on PPC64 && CPU_LITTLE_ENDIAN && VSX
+ 	select CRYPTO_LIB_AES
+ 	select CRYPTO_ALGAPI
 -- 
 2.43.0
 
