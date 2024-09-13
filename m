@@ -1,120 +1,125 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mxe.seznam.cz (mxe.seznam.cz [77.75.78.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 221C01D7E39;
-	Fri, 13 Sep 2024 10:46:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E5371D67AB
+	for <linux-crypto@vger.kernel.org>; Fri, 13 Sep 2024 10:59:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=77.75.78.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726224383; cv=none; b=hS65T82EXrSjawsMwRzD3VNRHo2Y2q+uOWzNT7uUbEUX64a/8e1RIfbr33MrFm6j24iRIqDCZEwN9AN6rerHF/ESijvPhehMCk8hfA9yi+Jjxc+qiL0umtepd8GYtCz+QyZRdkyz153fXG5/YMxxZnwQWLxinO4j9AE4Jf9KaWA=
+	t=1726225155; cv=none; b=GcO4BpQ9pVksUcn68S1o024REG3PQUiGxhew4Gu9zH9jVCYA/6gSV20Fj/7/Bop2Qq45g+f+HMx/7XDUIlk+BI12sFNS8BrVtUyfkKJztTTGzJr3EfJZE8s3XMNTxAbe9hQyYwcdeBzzn+xew6C5oQ0aKHV2BrtokUgCOch4OiQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726224383; c=relaxed/simple;
-	bh=S3OfFPhvngzIXVIBvvu2VJ7Ne9DtASb05dIPumrAuGA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BVQV6Ubx3ptMeyUN0tT8O7ZmO/xgIQnn/I8Ee74AP3BNM35UQBI8QiL9nuzghXKge+d5n6kfBsbtVrtLIjmiboqw30UtYl0/rV+KUtQ4N2cbjLuTB+mucGHVNWgEb5Lv4wCF0T/+ob5daD6PabwP3AvyHcfMyYTYbvQD1FI9Ae8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PCesijiR; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1726225155; c=relaxed/simple;
+	bh=LsVl0Voqd1ckeCDn0W+7B7IVZDgwFBAd008MHYFeKtQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:Mime-Version:Content-Type; b=gLBmGUT1tIPAZ02lfjdTDZ4hjOBj1r4gIbcjkG2UZlZmVA1iRLCXxdMokSZOysG0WYNXFvEVwZeJJwtkPG5DiLU3eFwn5a4gPq9tXLiWjzQp8BlC1iDjqtNPEpQjioMjFQvHt6P3S0ZEJ5YSiWMEbMFRyD61rB6P3s24Ahw0ntU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=email.cz; spf=pass smtp.mailfrom=email.cz; dkim=pass (2048-bit key) header.d=email.cz header.i=@email.cz header.b=S6g1BsX4; arc=none smtp.client-ip=77.75.78.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=email.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=email.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PCesijiR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0A22C4CED0;
-	Fri, 13 Sep 2024 10:46:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726224382;
-	bh=S3OfFPhvngzIXVIBvvu2VJ7Ne9DtASb05dIPumrAuGA=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=PCesijiRN0EG3csPIokYtW3nnlsM02Sn8/crXyeded6Dwiab1FXZ1fvHFnj32e9UD
-	 cUpXq9+9gb60uH+AhkYtovgYOFsLDU2WvffuKLjvouAEUdvtELf8wLcUFpeHcbx7UE
-	 PQRmFs+U5Oaa0v1kQ6ALW5DOePB1fBbdgCS1l4awJ9RecUVQQidV/f/6/CVaZvssFR
-	 9pLsHQ0AA8fyZh64QFPAmLTZOMJ5OnOGzfpFynP8FAX1vINw2F1j0K34I4XiMXX5Y8
-	 AnOGx3kl3u0eqy8V5gzcrzME/JZ336CG29Z3URffZrBjoA79xZam0o+VvZqNjuhuY4
-	 BRMp/RZi+BS3Q==
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2f75b13c2a8so24190331fa.3;
-        Fri, 13 Sep 2024 03:46:22 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUtjXwnFTNIuWnSbnkUwh3mG3eK9s80i598NqBybOM9WFflbthvaSQWT/sI23aDneB8mZCIDM+YDQLKVkBX@vger.kernel.org, AJvYcCUxlrTIMOpFB/UGvEnX4EaxQWiD2lHaNEILJooPdrIhFCtINDH8U2/jPJQxg2G0rbD6Q7BTyPkEccIO55kD@vger.kernel.org, AJvYcCXIHqZUR184CNDIy8QLX2hEkhyAs0T+fhGvgyWME+slirwUQprRnxfVIDWez3vAlwJ97UkQ4l3Cyw==@vger.kernel.org, AJvYcCXsvIfTLerldLa2wE4EUT769Y8N8i/BevX+aQ6HjWbIAv1j/whDkaAwxlbAv6SCG7OoDGHTGzzL2myKIknLJEce@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWUcLhFUar0QGK9HSPfpf6X9uw0wPDOW8TOnshNJYQhbv19RF1
-	5luUdTsRwJFNZ7u7ywM40DmK0ftvRKVaTxydIjWxdrTSABfosIyW6ovFn80ms3T0TA+hf5ZmaDd
-	AK13nl3cc9om3s4u8tZnjX+Q76js=
-X-Google-Smtp-Source: AGHT+IHgfCxPiT5vZMtaQepta9uqXpG4/5TNPzFxOmRXvEQwfvgwsKyWmN8/Fya2mEuSKQsg4t5AMIdDxMekLTQEEkM=
-X-Received: by 2002:a2e:1311:0:b0:2f3:ed34:41c9 with SMTP id
- 38308e7fff4ca-2f787f32dc2mr26801081fa.37.1726224380930; Fri, 13 Sep 2024
- 03:46:20 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=email.cz header.i=@email.cz header.b="S6g1BsX4"
+Received: from email.seznam.cz
+	by smtpc-mxe-7bdd9d48f6-vf57s
+	(smtpc-mxe-7bdd9d48f6-vf57s [2a02:598:64:8a00::1000:aed])
+	id 7fb00c968144be3c7f3e828e;
+	Fri, 13 Sep 2024 12:58:23 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=email.cz;
+	s=szn20221014; t=1726225103;
+	bh=Go1Drl7Hc5TRGms6agMq/QAyf40vC00ZWCu62l3/7AM=;
+	h=Received:From:To:Cc:Subject:Date:Message-Id:Mime-Version:X-Mailer:
+	 Content-Type:Content-Transfer-Encoding;
+	b=S6g1BsX4WqcsWQ7TEqI4Q5hinoIJvlK971uJpasNtpyi20KODBcbEHsvzihB/DjqV
+	 9nTPqJhQnYYJdOQw8CpofRI/5Syg03jQhm1bU8pmFaQAAB65gkkFQxZLtSPd+8LqmD
+	 AvSDLoUXhbM1cvTN7KYpVwew2i3Lkp+4UNmtjeYapY4208NNGswyZwBKDp4pWMs4ui
+	 UCyXgwN3f76oAecxC0kh5q48tL8m4qiZSbOClyl/plisSmwjrURuYEnAlq7MWL4Z7O
+	 2vj6VopjGvtxY/dR7FI9hz9ISoXP9JFJVFsHUiLc9EpLb7rybM0QjFygLVTLY5oaFv
+	 Yg3tPrro7BdxA==
+Received: from 184-143.ktuo.cz (184-143.ktuo.cz [82.144.143.184])
+	by email.seznam.cz (szn-ebox-5.0.189) with HTTP;
+	Fri, 13 Sep 2024 12:58:21 +0200 (CEST)
+From: "Tomas Paukrt" <tomaspaukrt@email.cz>
+To: <linux-crypto@vger.kernel.org>
+Cc: "Herbert Xu" <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Shawn Guo" <shawnguo@kernel.org>,
+	"Sascha Hauer" <s.hauer@pengutronix.de>,
+	"Pengutronix Kernel Team" <kernel@pengutronix.de>,
+	"Fabio Estevam" <festevam@gmail.com>,
+	<imx@lists.linux.dev>,
+	<linux-arm-kernel@lists.infradead.org>
+Subject: =?utf-8?q?=5BPATCH=5D_crypto=3A_mxs-dcp=3A_Enable_user-space_acce?=
+	=?utf-8?q?ss_to_AES_with_hardware-bound_keys?=
+Date: Fri, 13 Sep 2024 12:58:21 +0200 (CEST)
+Message-Id: <1di.ZclR.6M4clePpGuH.1cv1hD@seznam.cz>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <ZuPDZL_EIoS60L1a@gondor.apana.org.au> <1266435.1726219950@warthog.procyon.org.uk>
-In-Reply-To: <1266435.1726219950@warthog.procyon.org.uk>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Fri, 13 Sep 2024 12:46:09 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXH8nWtAzX+9xc2tLyy5d0w==JNQCMJBAbL=LdcF+XrYkw@mail.gmail.com>
-Message-ID: <CAMj1kXH8nWtAzX+9xc2tLyy5d0w==JNQCMJBAbL=LdcF+XrYkw@mail.gmail.com>
-Subject: Re: [PATCH v3 00/14] KEYS: Add support for PGP keys and signatures
-To: David Howells <dhowells@redhat.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, 
-	Roberto Sassu <roberto.sassu@huaweicloud.com>, dwmw2@infradead.org, davem@davemloft.net, 
-	linux-kernel@vger.kernel.org, keyrings@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, zohar@linux.ibm.com, 
-	linux-integrity@vger.kernel.org, torvalds@linux-foundation.org, 
-	roberto.sassu@huawei.com
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0 (szn-mime-2.1.61)
+X-Mailer: szn-ebox-5.0.189
+Content-Type: text/plain;
+	charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 13 Sept 2024 at 11:32, David Howells <dhowells@redhat.com> wrote:
->
-> Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> > Personally I don't think the argument above holds water.  With
-> > IPsec we had a similar issue of authenticating untrusted peers
-> > using public key cryptography.  In that case we successfully
-> > delegated the task to user-space and it is still how it works
-> > to this day.
+Add an option to enable user-space access to cbc(paes) and ecb(paes)
+cipher algorithms via AF_ALG.
 
-This is slightly disingenuous. The kernel itself has no need to trust
-the peer - it only manages the network pipe and authenticates/decrypts
-the packets on behalf of user space.
+Signed-off-by: Tomas Paukrt <tomaspaukrt@email.cz>
+---
+ drivers/crypto/Kconfig   | 13 +++++++++++++
+ drivers/crypto/mxs-dcp.c |  8 ++++++++
+ 2 files changed, 21 insertions(+)
 
-The situation would be radically different if the kernel itself would
-communicate over IPsec (or HTTPS) directly.
-
-Likewise for module loading: there is no way the authentication can be
-delegated to user space, unless that user space component is
-authenticated by the kernel (and runs in a special, hardened context).
->
-> It transpires that we do actually need at least a PGP parser in the kernel -
-> and it needs to be used prior to loading any modules: some Lenovo Thinkpads,
-> at least, may have EFI variables holding a list of keys in PGP form, not X.509
-> form.
->
-> For example, in dmesg, you might see:
->
-> May 16 04:01:01 localhost kernel: integrity: Loading X.509 certificate: UEFI:MokListRT (MOKvar table)
-> May 16 04:01:01 localhost kernel: integrity: Problem loading X.509 certificate -126
->
-
-MokListRT is a shim construct, which is a component in the downstream
-distro boot chain. It is not part of EFI, and in your case, this is
-unlikely to be specific to Lenovo systems.
-
-> On my laptop, if I dump this variable:
->
->         efivar -e /tmp/q --name=605dab50-e046-4300-abb6-3dd810dd8b23-MokListRT
->
-> And then looking at the data exported:
->
->         file /tmp/q
->
-> I see:
->
->         /tmp/q: PGP Secret Sub-key -
->
-> The kernel doesn't currently have a PGP parser.  I've checked and the value
-> doesn't parse as ASN.1:
->
->         openssl asn1parse -in /tmp/q -inform DER
->             0:d=0  hl=2 l=  21 prim: cont [ 23 ]
->         Error in encoding
->         001EBA93B67F0000:error:0680007B:asn1 encoding routines:ASN1_get_object:header too long:crypto/asn1/asn1_lib.c:105:
->
-> which would suggest that it isn't X.509.
->
-
-This should be fixed in shim not the kernel.
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index 94f23c6..4637c6f 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -460,6 +460,19 @@ config CRYPTO_DEV_MXS_DCP
+ 	  To compile this driver as a module, choose M here: the module
+ 	  will be called mxs-dcp.
+ 
++config CRYPTO_DEV_MXS_DCP_USER_PAES
++	bool "Enable user-space access to AES with hardware-bound keys"
++	depends on CRYPTO_DEV_MXS_DCP && CRYPTO_USER_API_SKCIPHER
++	default n
++	help
++	  Say Y to enable user-space access to cbc(paes) and ecb(paes)
++	  cipher algorithms via AF_ALG.
++
++	  In scenarios with untrustworthy users-pace, this may enable
++	  decryption of sensitive information.
++
++	  If unsure, say N.
++
+ source "drivers/crypto/cavium/cpt/Kconfig"
+ source "drivers/crypto/cavium/nitrox/Kconfig"
+ source "drivers/crypto/marvell/Kconfig"
+diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
+index c82775d..84df1cb 100644
+--- a/drivers/crypto/mxs-dcp.c
++++ b/drivers/crypto/mxs-dcp.c
+@@ -944,7 +944,11 @@ static struct skcipher_alg dcp_aes_algs[] =3D {
+ 		.base.cra_driver_name	=3D "ecb-paes-dcp",
+ 		.base.cra_priority	=3D 401,
+ 		.base.cra_alignmask	=3D 15,
++#ifdef CONFIG_CRYPTO_DEV_MXS_DCP_USER_PAES
++		.base.cra_flags		=3D CRYPTO_ALG_ASYNC,
++#else
+ 		.base.cra_flags		=3D CRYPTO_ALG_ASYNC | CRYPTO_ALG_INTERNAL,
++#endif
+ 		.base.cra_blocksize	=3D AES_BLOCK_SIZE,
+ 		.base.cra_ctxsize	=3D sizeof(struct dcp_async_ctx),
+ 		.base.cra_module	=3D THIS_MODULE,
+@@ -960,7 +964,11 @@ static struct skcipher_alg dcp_aes_algs[] =3D {
+ 		.base.cra_driver_name	=3D "cbc-paes-dcp",
+ 		.base.cra_priority	=3D 401,
+ 		.base.cra_alignmask	=3D 15,
++#ifdef CONFIG_CRYPTO_DEV_MXS_DCP_USER_PAES
++		.base.cra_flags		=3D CRYPTO_ALG_ASYNC,
++#else
+ 		.base.cra_flags		=3D CRYPTO_ALG_ASYNC | CRYPTO_ALG_INTERNAL,
++#endif
+ 		.base.cra_blocksize	=3D AES_BLOCK_SIZE,
+ 		.base.cra_ctxsize	=3D sizeof(struct dcp_async_ctx),
+ 		.base.cra_module	=3D THIS_MODULE,
+-- 
+2.7.4
+ 
