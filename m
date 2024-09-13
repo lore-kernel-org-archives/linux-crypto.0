@@ -1,176 +1,72 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 962F61DC1BE;
-	Fri, 13 Sep 2024 14:02:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3288E1BAED2;
+	Fri, 13 Sep 2024 14:09:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726236165; cv=none; b=MiCHodPzc2cn+NGK05Pzk7MQxxPQ2CrJN8OyGj3024/vPumsfi0WxVIJ8idAtG8EFOhzpvRP91/+xvu4br1xL6MRXjmGFWQlInaGCCkfpVrNZluNWiAewhu2fXj376aYGhp2qToTeMcpIzoMkZNEVtJ+ZjWErAy7K88pYERumD8=
+	t=1726236584; cv=none; b=bIESxudG2ItyIrNCCZA7jczOwdgjHjFMDnFI8KfiDFkWj2P9nLpk61FtaVhqneJ8bQSE2KXo/pGF5eo+kv3WtUuVonJ/Bw0kbl75TBmLY+AVW6+gtJP4ipHOAosfJTZEZHKlrF1TyTYcp6jesgmp7JD80Evowz7O/bvKX/VaLIY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726236165; c=relaxed/simple;
-	bh=xIadB+ccdjgivCpdMAC9iTCqKmHqswcnXcqZndJso0A=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Rta3GH19kG9/g8UX5OJkVkIgzyfZOVGZaXAfqH7mL73i/DGG+4SFgz3O4pdoEVVCJOyLBaH69RZZSBijSDOXXj8kbAi9Pk1fmwUlH7OEpbzT1QF9d7Ifa35gAs/RbFxONRFTK5sX3U9CcXIiftuVOujZ7GTnFJTWMNsnvW0cLrQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=UElQ8sCn; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1726236584; c=relaxed/simple;
+	bh=nqo68CPwAeNTVOVaefx2dhA5D1MSpDN47SUiXsxpTLA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=elFSeSaAChW+lG5hIjm0zgL795t/Zk56zDHff3C6xHYDsyCUcJ5tYEOuY1tEh2kbczCNmLZfszM4bzSCTnfwjk0LBo+03UD6Ot8tYn+weqmtm+o6Vu2SpqKqTulAsNYeIDwHTBGFU6HKzhkX0aYXRSnLmMBZTqWNn2ajfEvqFto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=DLWyAYUa; arc=none smtp.client-ip=117.135.210.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="UElQ8sCn"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48D7daD9032755;
-	Fri, 13 Sep 2024 14:02:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:date:subject:to:cc:references:from:in-reply-to
-	:content-type:content-transfer-encoding:mime-version; s=pp1; bh=
-	q1qnqZh7DY6ryMgArU4Ju8GzleC6GLVXI4Bd3rfPRDM=; b=UElQ8sCnQWmar16p
-	7X4ABi+d9rh5SjANTV+huVoZ/Xi0qmklOw1ZEtUaJ3iHFEyrAY2mK6wjg9UVagVw
-	ur/RxMHrAJNihEW3l61pdjbLpH7syqnTUpiLAQWYF3nlVVF65XCv9jv1q7tvJEoa
-	J9aZX7NEdac15UnWtAu/q4ewzyBEirOqa/QxdiwNe7h/dxOao+IPOJ5kYtQoog+K
-	gzuyREsT1gvye7bvTFrgYfodG5wBHT64vU0r8o+I1r38gtxIYdOi3BmgZaeRX1uJ
-	PG8eKV35fPogodnA1pMa5YlkH4EWucRwarSv5eNPY0Sxox+8DpOmkI5YwMARDxdl
-	DwDgUA==
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41gegxag1e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 13 Sep 2024 14:02:26 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 48DBXLwQ019911;
-	Fri, 13 Sep 2024 14:02:23 GMT
-Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 41h25qejkg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 13 Sep 2024 14:02:23 +0000
-Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 48DE2MHH14484092
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 13 Sep 2024 14:02:22 GMT
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DDB2058051;
-	Fri, 13 Sep 2024 14:02:21 +0000 (GMT)
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9F7865805F;
-	Fri, 13 Sep 2024 14:02:21 +0000 (GMT)
-Received: from [9.61.250.246] (unknown [9.61.250.246])
-	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 13 Sep 2024 14:02:21 +0000 (GMT)
-Message-ID: <89493ea2-b145-489c-94a5-dad8608b9b79@linux.ibm.com>
-Date: Fri, 13 Sep 2024 09:02:21 -0500
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: Removing CRYPTO_AES_GCM_P10.
-To: Christophe Leroy <christophe.leroy@csgroup.eu>,
-        linux-crypto@vger.kernel.org
-Cc: herbert@gondor.apana.org.au, leitao@debian.org, nayna@linux.ibm.com,
-        appro@cryptogams.org, linux-kernel@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, mpe@ellerman.id.au,
-        ltcgcw@linux.vnet.ibm.com, dtsen@us.ibm.com
-References: <20240913123043.1636183-1-dtsen@linux.ibm.com>
- <4742a397-eb68-4a79-a2fa-fc45a81e7c2b@csgroup.eu>
-Content-Language: en-US
-From: Danny Tsen <dtsen@linux.ibm.com>
-In-Reply-To: <4742a397-eb68-4a79-a2fa-fc45a81e7c2b@csgroup.eu>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: xSGeI4CdAPMDSHJQLkSpkRO4NYNF-uGP
-X-Proofpoint-ORIG-GUID: xSGeI4CdAPMDSHJQLkSpkRO4NYNF-uGP
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="DLWyAYUa"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=2XYm+
+	sihFrep2cxVYONJkXmPAq6DNiuqhawRHHOXt/Y=; b=DLWyAYUaMdRMAR9XV5qrv
+	IkA27P4Wvmc4y/a9doo9KKoc+VCof0FlFJTFzhvNoSZb71+vZ0R4EHpCBHcapDGX
+	39YhXQztIjTQMQXS99WiAJJ5Xw3tA9aK4+hzAJEAKzMHNbA/6aBsrguQciyPFObr
+	kW11Wb9Hevu8fIDK1ZJwt0=
+Received: from localhost.localdomain (unknown [58.243.42.99])
+	by gzga-smtp-mta-g2-1 (Coremail) with SMTP id _____wD3321oR+RmyEEhFw--.58616S2;
+	Fri, 13 Sep 2024 22:08:41 +0800 (CST)
+From: Qianqiang Liu <qianqiang.liu@163.com>
+To: herbert@gondor.apana.org.au
+Cc: davem@davemloft.net,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Qianqiang Liu <qianqiang.liu@163.com>
+Subject: [PATCH] crypto: lib/mpi - Fix an "Uninitialized scalar variable" issue
+Date: Fri, 13 Sep 2024 22:07:42 +0800
+Message-Id: <20240913140741.5944-1-qianqiang.liu@163.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-13_10,2024-09-13_02,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=999
- lowpriorityscore=0 suspectscore=0 priorityscore=1501 bulkscore=0
- adultscore=0 impostorscore=0 clxscore=1011 malwarescore=0 mlxscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2408220000 definitions=main-2409130095
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD3321oR+RmyEEhFw--.58616S2
+X-Coremail-Antispam: 1Uf129KBjvdXoWrZFyUtr17GFyrZr47JFykuFg_yoWxZrg_GF
+	9YgF10qr10yrW0qr4rKFW2yr4I9r4fWrWrK3WxGryUKasFyrZxuFnrXr1qqF98urWSqF43
+	ZwsIya45Ar13AjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7xRiubyJUUUUU==
+X-CM-SenderInfo: xtld01pldqwhxolxqiywtou0bp/1tbiLwlZamVOGURLQgAAsq
 
-Got it.  Thanks.
+The "err" variable may be returned without an initialized value.
 
--Danny
+Fixes: 8e3a67f2de87 ("crypto: lib/mpi - Add error checks to extension")
+Signed-off-by: Qianqiang Liu <qianqiang.liu@163.com>
+---
+ lib/crypto/mpi/mpi-mul.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On 9/13/24 8:55 AM, Christophe Leroy wrote:
->
->
-> Le 13/09/2024 à 14:30, Danny Tsen a écrit :
->> [Vous ne recevez pas souvent de courriers de dtsen@linux.ibm.com. 
->> Découvrez pourquoi ceci est important à 
->> https://aka.ms/LearnAboutSenderIdentification ]
->>
->> Removing CRYPTO_AES_GCM_P10 in Kconfig first so that we can apply the
->> subsequent patches to fix data mismatch over ipsec tunnel.
->
-> To deactivate a driver, all you have to do is to add:
->
->     depends on BROKEN
->
-> Christophe
->
->
->>
->> Signed-off-by: Danny Tsen <dtsen@linux.ibm.com>
->> ---
->>   arch/powerpc/crypto/Kconfig | 32 ++++++++++++++++----------------
->>   1 file changed, 16 insertions(+), 16 deletions(-)
->>
->> diff --git a/arch/powerpc/crypto/Kconfig b/arch/powerpc/crypto/Kconfig
->> index 09ebcbdfb34f..96ca2c4c8827 100644
->> --- a/arch/powerpc/crypto/Kconfig
->> +++ b/arch/powerpc/crypto/Kconfig
->> @@ -105,22 +105,22 @@ config CRYPTO_AES_PPC_SPE
->>            architecture specific assembler implementations that work 
->> on 1KB
->>            tables or 256 bytes S-boxes.
->>
->> -config CRYPTO_AES_GCM_P10
->> -       tristate "Stitched AES/GCM acceleration support on P10 or 
->> later CPU (PPC)"
->> -       depends on PPC64 && CPU_LITTLE_ENDIAN && VSX
->> -       select CRYPTO_LIB_AES
->> -       select CRYPTO_ALGAPI
->> -       select CRYPTO_AEAD
->> -       select CRYPTO_SKCIPHER
->> -       help
->> -         AEAD cipher: AES cipher algorithms (FIPS-197)
->> -         GCM (Galois/Counter Mode) authenticated encryption mode 
->> (NIST SP800-38D)
->> -         Architecture: powerpc64 using:
->> -           - little-endian
->> -           - Power10 or later features
->> -
->> -         Support for cryptographic acceleration instructions on 
->> Power10 or
->> -         later CPU. This module supports stitched acceleration for 
->> AES/GCM.
->> +#config CRYPTO_AES_GCM_P10
->> +#      tristate "Stitched AES/GCM acceleration support on P10 or 
->> later CPU (PPC)"
->> +#      depends on PPC64 && CPU_LITTLE_ENDIAN && VSX
->> +#      select CRYPTO_LIB_AES
->> +#      select CRYPTO_ALGAPI
->> +#      select CRYPTO_AEAD
->> +#      select CRYPTO_SKCIPHER
->> +#      help
->> +#        AEAD cipher: AES cipher algorithms (FIPS-197)
->> +#        GCM (Galois/Counter Mode) authenticated encryption mode 
->> (NIST SP800-38D)
->> +#        Architecture: powerpc64 using:
->> +#          - little-endian
->> +#          - Power10 or later features
->> +#
->> +#        Support for cryptographic acceleration instructions on 
->> Power10 or
->> +#        later CPU. This module supports stitched acceleration for 
->> AES/GCM.
->>
->>   config CRYPTO_CHACHA20_P10
->>          tristate "Ciphers: ChaCha20, XChacha20, XChacha12 (P10 or 
->> later)"
->> -- 
->> 2.43.0
->>
->>
+diff --git a/lib/crypto/mpi/mpi-mul.c b/lib/crypto/mpi/mpi-mul.c
+index 892a246216b9..7e6ff1ce3e9b 100644
+--- a/lib/crypto/mpi/mpi-mul.c
++++ b/lib/crypto/mpi/mpi-mul.c
+@@ -21,7 +21,7 @@ int mpi_mul(MPI w, MPI u, MPI v)
+ 	int usign, vsign, sign_product;
+ 	int assign_wp = 0;
+ 	mpi_ptr_t tmp_limb = NULL;
+-	int err;
++	int err = 0;
+ 
+ 	if (u->nlimbs < v->nlimbs) {
+ 		/* Swap U and V. */
+-- 
+2.34.1
+
