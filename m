@@ -1,56 +1,57 @@
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 725531DA62E;
-	Fri, 13 Sep 2024 13:05:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 382311DA63A;
+	Fri, 13 Sep 2024 13:05:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726232753; cv=none; b=NhhJRYWRM5ObHwzDm395DjpSzh33ESK07Nm4zimhGsFvMrVKKOoVucAOAOJTR5mDJqCFpe/ecKjrXaaxT0Mkc92bBU+TZKwWSUDcRqpTythtHJ37ScCxJFQsBmM1iKoX7vgcpLHPw7fn2X1WgFFPaLzrT1MufTb3UbsqPvQtVO4=
+	t=1726232753; cv=none; b=Mbbijp2QT8otMpVh4cr+FazLddObgGBkAovRuQ3ZHYZiznfsiUNnTL+bUEjWX7Uw7lWK2Fvo+gokOy9cxyDSsU689+v65CdrFLyEcADPIImfTioIOLJVzlJtmQQNnyuqjR+bwnnmpT9dr3um0EBGLwxfeJBaucaJzyx7EpUoPT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1726232753; c=relaxed/simple;
-	bh=ka0rqxcS2NBCAjK5Qw+iwYfxA/+ZTEiCWcrpXvkpRxQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XFNAXT7+MpSnL/yA8CH3YpjJhbnq1/x9XUjdIYDTVjC4S4B1kmdtCtIQ0MfK0fsLMaP59yHebvZ0RgVD3nKNi5dlFLGJfqm1WOOsrYaZIakzdi5XKvCn2tA62o2kaS4ulvW6UVxlUJHh3WbENKubIvX3ITAmbriavsqvbZ0Weow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=DGMmQmi1; arc=none smtp.client-ip=148.163.158.5
+	bh=XuYhqwU7zJfFWBBPFkJwQ+AWb6A0cRgb3KCbwUj0fkE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=mvvspBKnVP7EzAgKXs0Lcg1ECNMq/j8p/HOg70iKeCABaJQBQYVQGyBnmnbPEsEdA8/TA9/TW6A1ZvqMDlgGTwkiJKI1i8MnM6NY6qR8H0//eFm9GTy7oDd8HoxeEuDru6D06tjaXH6bJ6wVE3Ba3+B711Vd+I7P6GnNY1Hp4HA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=K9l8/rwl; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="DGMmQmi1"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48DBLjw5005775;
-	Fri, 13 Sep 2024 13:05:49 GMT
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="K9l8/rwl"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48D7nsSE013634;
+	Fri, 13 Sep 2024 13:05:51 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
-	:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding; s=pp1; bh=HjynV7dZyRjGp2iCQjnPneTVJO
-	QAyBkiMk81rcoRE/E=; b=DGMmQmi1Vfoufw4Bkyr9BhJ5UvasSANmchFje9Hi+T
-	1on6iibAPZdfSJ29vPekwDYcOku7JPcwZP5JZBWf260xtVTgV/zDtDUksoBpcjYb
-	t4bbUGIs3V9ixStWCPmyCytLhlzsiWSb8bAvPQXkwNohuPUI9AKlN8u+U/M4XpSZ
-	lBdYCktaPjhjDCWq4frmqfeGXfq+lSj9bU+ftMHf36MiCBkL4d+K/DE7D4VtsmwF
-	x3uCTV7b/8DERz2LkugrWrE0PB/wycvF+JSI2+I1GaJsnI8eJ/sNL1vCz8Fo1anS
-	Tl2ncdHrZkbb1YqZRrS4MZj30zjs7is34Y2k8+GBDHDw==
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41gc8qtamh-1
+	:to:cc:subject:date:message-id:in-reply-to:references
+	:mime-version:content-transfer-encoding; s=pp1; bh=lLFW1eSbEh2sb
+	EVG/GFtT5Z0LU4t4XDUY8zrqEjn5Lo=; b=K9l8/rwlF0nnL1TdaSHmiUGnUtHpi
+	q0sJRAh3wDMtA6OJpoJguDIqL7ZYVINYqgU6f62kNFXZzAnAOVOVg6klDNo/HMSX
+	QxmIyb0XZyq+vIDcBJd/3nOIUfhQPOKEeymunX7OQHiAKKUdfTPU2v3bQOFpXYuf
+	Zz9fs8Leo9mdN4coSV8F16dVvCFasFjYykrwbfTndlWZJ9dKIZt0PHyZR77cDN0K
+	BRJfT3pGRvS4YsyCCsS7G38iDz9g5D+Mmp/13L1XiQ3lo7vxTZxtGwKFWx+q5vKi
+	63QgZEGAAASQ5bgvBiy2rPkPuesxihSt5l0um17zZzlAhHsy86sB8ItJQ==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41gd8m1w4r-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 13 Sep 2024 13:05:49 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 48DCFWEG010793;
-	Fri, 13 Sep 2024 13:05:48 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 41kmb71vhv-1
+	Fri, 13 Sep 2024 13:05:50 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 48DC1m5G032073;
+	Fri, 13 Sep 2024 13:05:50 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 41h2nn666k-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 13 Sep 2024 13:05:48 +0000
+	Fri, 13 Sep 2024 13:05:50 +0000
 Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 48DD5iD343778534
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 48DD5kTR36372758
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 13 Sep 2024 13:05:44 GMT
+	Fri, 13 Sep 2024 13:05:46 GMT
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7F36320043;
-	Fri, 13 Sep 2024 13:05:44 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 3D2F120040;
+	Fri, 13 Sep 2024 13:05:46 +0000 (GMT)
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3762A20040;
-	Fri, 13 Sep 2024 13:05:44 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id EB9012004B;
+	Fri, 13 Sep 2024 13:05:45 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
 	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 13 Sep 2024 13:05:44 +0000 (GMT)
+	Fri, 13 Sep 2024 13:05:45 +0000 (GMT)
 From: Heiko Carstens <hca@linux.ibm.com>
 To: "Jason A . Donenfeld" <Jason@zx2c4.com>
 Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
@@ -60,10 +61,12 @@ Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
         Harald Freudenberger <freude@linux.ibm.com>,
         Stefan Liebler <stli@linux.ibm.com>, linux-kernel@vger.kernel.org,
         linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: [PATCH 0/7] s390/vdso: getrandom() vdso implementation
-Date: Fri, 13 Sep 2024 15:05:36 +0200
-Message-ID: <20240913130544.2398678-1-hca@linux.ibm.com>
+Subject: [PATCH 5/7] s390/vdso: Allow alternatives in vdso code
+Date: Fri, 13 Sep 2024 15:05:41 +0200
+Message-ID: <20240913130544.2398678-6-hca@linux.ibm.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240913130544.2398678-1-hca@linux.ibm.com>
+References: <20240913130544.2398678-1-hca@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -72,71 +75,85 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: _YpvvZE8HFa6yQq9mWMFb-nqqhS-vLwV
-X-Proofpoint-ORIG-GUID: _YpvvZE8HFa6yQq9mWMFb-nqqhS-vLwV
+X-Proofpoint-GUID: GK6W9mLi6BybWCboA39Wm71uXlt-4Hxq
+X-Proofpoint-ORIG-GUID: GK6W9mLi6BybWCboA39Wm71uXlt-4Hxq
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
  definitions=2024-09-13_09,2024-09-13_02,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
- mlxscore=0 lowpriorityscore=0 impostorscore=0 priorityscore=1501
- malwarescore=0 adultscore=0 clxscore=1015 mlxlogscore=295 suspectscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 suspectscore=0 clxscore=1015 phishscore=0 spamscore=0
+ lowpriorityscore=0 adultscore=0 mlxscore=0 mlxlogscore=913 bulkscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.19.0-2408220000 definitions=main-2409130087
 
-Hi Jason,
+Implement the infrastructure required to allow alternatives in vdso code.
 
-quite late but finally the s390 vdso getrandom implementation which applies
-on top of your random git tree.
+Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
+---
+ arch/s390/kernel/vdso.c              | 19 +++++++++++++++++++
+ arch/s390/kernel/vdso64/vdso64.lds.S |  4 ++++
+ 2 files changed, 23 insertions(+)
 
-As a prerequisite this requires some changes to s390 core code to allow
-alternatives in vdso code. It is fine when all of this gets routed via your
-tree.
-
-Please note that the first patch of this series is already in linux-next
-[1], but given that it is so small it seems to be the easiest to apply it
-also on your tree; but I'm sure somebody will complain :)
-
-Thanks,
-Heiko
-
-[1] 0147addc4fb7 ("s390/facility: Disable compile time optimization for decompressor code")
-
-Heiko Carstens (7):
-  s390/facility: Disable compile time optimization for decompressor code
-  s390/alternatives: Remove ALT_FACILITY_EARLY
-  s390/facility: Let test_facility() generate static branch if possible
-  s390/module: Provide find_section() helper
-  s390/vdso: Allow alternatives in vdso code
-  s390/vdso: Move vdso symbol handling to separate header file
-  s390/vdso: Wire up getrandom() vdso implementation
-
- arch/s390/Kconfig                           |   1 +
- arch/s390/include/asm/alternative.h         |   6 +-
- arch/s390/include/asm/facility.h            |  37 +++-
- arch/s390/include/asm/fpu-insn-asm.h        |  22 +++
- arch/s390/include/asm/module.h              |  14 ++
- arch/s390/include/asm/vdso-symbols.h        |  17 ++
- arch/s390/include/asm/vdso.h                |  12 --
- arch/s390/include/asm/vdso/getrandom.h      |  40 +++++
- arch/s390/include/asm/vdso/vsyscall.h       |  15 ++
- arch/s390/kernel/compat_signal.c            |   2 +-
- arch/s390/kernel/entry.S                    |   2 +-
- arch/s390/kernel/signal.c                   |   2 +-
- arch/s390/kernel/vdso.c                     |  26 ++-
- arch/s390/kernel/vdso64/Makefile            |   9 +-
- arch/s390/kernel/vdso64/vdso.h              |   1 +
- arch/s390/kernel/vdso64/vdso64.lds.S        |   7 +
- arch/s390/kernel/vdso64/vgetrandom-chacha.S | 184 ++++++++++++++++++++
- arch/s390/kernel/vdso64/vgetrandom.c        |  14 ++
- tools/arch/s390/vdso                        |   1 +
- tools/testing/selftests/vDSO/Makefile       |   2 +-
- 20 files changed, 378 insertions(+), 36 deletions(-)
- create mode 100644 arch/s390/include/asm/vdso-symbols.h
- create mode 100644 arch/s390/include/asm/vdso/getrandom.h
- create mode 100644 arch/s390/kernel/vdso64/vgetrandom-chacha.S
- create mode 100644 arch/s390/kernel/vdso64/vgetrandom.c
- create mode 120000 tools/arch/s390/vdso
-
+diff --git a/arch/s390/kernel/vdso.c b/arch/s390/kernel/vdso.c
+index 2f967ac2b8e3..8e4e6b316337 100644
+--- a/arch/s390/kernel/vdso.c
++++ b/arch/s390/kernel/vdso.c
+@@ -12,12 +12,14 @@
+ #include <linux/errno.h>
+ #include <linux/init.h>
+ #include <linux/kernel.h>
++#include <linux/module.h>
+ #include <linux/mm.h>
+ #include <linux/slab.h>
+ #include <linux/smp.h>
+ #include <linux/time_namespace.h>
+ #include <linux/random.h>
+ #include <vdso/datapage.h>
++#include <asm/alternative.h>
+ #include <asm/vdso.h>
+ 
+ extern char vdso64_start[], vdso64_end[];
+@@ -250,8 +252,25 @@ static struct page ** __init vdso_setup_pages(void *start, void *end)
+ 	return pagelist;
+ }
+ 
++static void vdso_apply_alternatives(void)
++{
++	const struct elf64_shdr *alt, *shdr;
++	struct alt_instr *start, *end;
++	const struct elf64_hdr *hdr;
++
++	hdr = (struct elf64_hdr *)vdso64_start;
++	shdr = (void *)hdr + hdr->e_shoff;
++	alt = find_section(hdr, shdr, ".altinstructions");
++	if (!alt)
++		return;
++	start = (void *)hdr + alt->sh_offset;
++	end = (void *)hdr + alt->sh_offset + alt->sh_size;
++	apply_alternatives(start, end);
++}
++
+ static int __init vdso_init(void)
+ {
++	vdso_apply_alternatives();
+ 	vdso64_mapping.pages = vdso_setup_pages(vdso64_start, vdso64_end);
+ 	if (IS_ENABLED(CONFIG_COMPAT))
+ 		vdso32_mapping.pages = vdso_setup_pages(vdso32_start, vdso32_end);
+diff --git a/arch/s390/kernel/vdso64/vdso64.lds.S b/arch/s390/kernel/vdso64/vdso64.lds.S
+index 37e2a505e81d..fa02c6ae3cac 100644
+--- a/arch/s390/kernel/vdso64/vdso64.lds.S
++++ b/arch/s390/kernel/vdso64/vdso64.lds.S
+@@ -42,6 +42,10 @@ SECTIONS
+ 	.rodata		: { *(.rodata .rodata.* .gnu.linkonce.r.*) }
+ 	.rodata1	: { *(.rodata1) }
+ 
++	. = ALIGN(8);
++	.altinstructions	: { *(.altinstructions) }
++	.altinstr_replacement	: { *(.altinstr_replacement) }
++
+ 	.dynamic	: { *(.dynamic) }		:text	:dynamic
+ 
+ 	.eh_frame_hdr	: { *(.eh_frame_hdr) }		:text	:eh_frame_hdr
 -- 
 2.43.0
 
