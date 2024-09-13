@@ -1,121 +1,90 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F28F01D58A3
-	for <linux-crypto@vger.kernel.org>; Fri, 13 Sep 2024 09:32:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B8FC1272A6
+	for <linux-crypto@vger.kernel.org>; Fri, 13 Sep 2024 10:19:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726219964; cv=none; b=qFl9jIeyHaAg+602W3MSo2Eb0yuMXP5T1GYG2XRRCwQUkD6FoimzShEngBHGX1sp5MBZgfDqHjT0pqIIeSb8bQ0xK8pOkBHu6byFFF4Mqqic8lNRPxPcOVU+e0YelwXRKOBfw8JL7sxyVM6FdPbsdCuvyjFtX9MIBXQWQr3P3Tg=
+	t=1726222788; cv=none; b=IsrgM3dKpE7de4AmigEtE5bCHcy6k9y+cbpOLSLsUntATyHZqXlynSsTZ1sCUaReCiykPX81id6UOxRHkEad15GcgGF439TRc+SKHvjP897+ZhShoZV1QqQV22aIwLdGkMmylHGzUtQ+IRYKxsY/IDNXlXpnKAPEWwkohw/mYSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726219964; c=relaxed/simple;
-	bh=4O2NPtM1NLF8/x7jRBau7jSt45OgkOZjXoYGaAykKhw=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=IxMWdKzKj44oGjs2lhYWzkuEcJq84fCAdPTiRVBaCtP2KUhVTDDhWvtVffPFPgpd7CA+8RozLw4w8MTq77YVNYn27MZosrvcliapOAAEEr1uPSs4axdvb7oTvgvJUT3zgXn3dBjiRvnDH6STIZXDn7tVwrhIpr22XcxEVMqrxMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JTwWcYH4; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1726222788; c=relaxed/simple;
+	bh=PMFZ7A8Sj0yMRXBDm/g2jC60Ro2xvUbuMvpnPh/qnig=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ux1bVVC1Q9iKMEy7ATf2GHVuKqJqYEAM989drZYQNmBSGAslwR8FUgpu+GeMg8pzoGSAhaUrrrsHn2rX6wh5jEQNMqOlvYWwSeWtQwhuV1Dmldqe9J8Xjx/fz7q6QdwU2jXbAgGcTsd/oV8tdCcWibj668rhGtHbb/VZl+idgPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=IRW4kvBn; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JTwWcYH4"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1726219962;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pKVcQh0mMWfw7YNLqAXgPrezuHhuotyVKCaDrGzitZI=;
-	b=JTwWcYH4HqnN+GZ42XMaEtUkdGptFOqTn2yu1Vu5TAgxoqHmNRNrwj4zQGc98yV40HjFHH
-	liwJEG/xhVIBCS20mT4myYYO49oKLefZNajMMwGP35hhyCC1ANnRe53yeUzG7CQ8B9NQ76
-	mqtaw5V8jEheAUAXhGpjFXuMOQDsmaY=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-70-lLH3y46ROHGoR321_9vN-A-1; Fri,
- 13 Sep 2024 05:32:38 -0400
-X-MC-Unique: lLH3y46ROHGoR321_9vN-A-1
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EA49D19560AB;
-	Fri, 13 Sep 2024 09:32:35 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.67])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D2B8C1956086;
-	Fri, 13 Sep 2024 09:32:31 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <ZuPDZL_EIoS60L1a@gondor.apana.org.au>
-References: <ZuPDZL_EIoS60L1a@gondor.apana.org.au>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: dhowells@redhat.com, Roberto Sassu <roberto.sassu@huaweicloud.com>,
-    dwmw2@infradead.org, davem@davemloft.net,
-    linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
-    linux-crypto@vger.kernel.org, zohar@linux.ibm.com,
-    linux-integrity@vger.kernel.org, torvalds@linux-foundation.org,
-    roberto.sassu@huawei.com
-Subject: Re: [PATCH v3 00/14] KEYS: Add support for PGP keys and signatures
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="IRW4kvBn"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=wnjZmjd4Wy+T54pRyFjKLH429gdVCH831i4iiY1Mbsc=; b=IRW4kvBn0o7Ur2ggV3HLkgRHGH
+	6a6a/sVOhiNvlpFXMgglwBd/qt6UYgj7lMaQxqIUECVV8fRe6nLfPHkhRx8Zwz1KXl9gNuEuIkztz
+	r1Wp2EIdwFWmD0sTPhsZF05ZAvAoS/NKEOorzWx3KAjcWY0EPA+VmPjXUatULgFlMToLbDjsZ9b4H
+	mCVL5MtrRDav1Pb5nt2z9FCsApLI4r3cJLwYqOd7hwQAUzvD0O2TM6HWsoJn4RpGZNY7rsx46HqTJ
+	DDtx7InxCBS5pSXkwSh9pgCzwZi/JbLwINYXNXOlEjJkujYgnLaazvEqTA8bG/Ylnx7lH/mPVlwrI
+	iaFSbEnw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1sp3Eh-002Dim-0c;
+	Fri, 13 Sep 2024 18:19:21 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 13 Sep 2024 18:19:20 +0800
+Date: Fri, 13 Sep 2024 18:19:20 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Li Zetao <lizetao1@huawei.com>
+Cc: giovanni.cabiddu@intel.com, davem@davemloft.net,
+	lucas.segarra.fernandez@intel.com, damian.muszynski@intel.com,
+	qat-linux@intel.com, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH -next] crypto: qat - remove redundant null pointer checks
+ in adf_dbgfs_init()
+Message-ID: <ZuQRqP9CgDp7cuGi@gondor.apana.org.au>
+References: <20240903144230.2005570-1-lizetao1@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1266434.1726219950.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 13 Sep 2024 10:32:30 +0100
-Message-ID: <1266435.1726219950@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240903144230.2005570-1-lizetao1@huawei.com>
 
-Herbert Xu <herbert@gondor.apana.org.au> wrote:
+On Tue, Sep 03, 2024 at 10:42:30PM +0800, Li Zetao wrote:
+> Since the debugfs_create_dir() never returns a null pointer, checking
+> the return value for a null pointer is redundant, and using IS_ERR is
+> safe enough.
+> 
+> Signed-off-by: Li Zetao <lizetao1@huawei.com>
+> ---
+>  drivers/crypto/intel/qat/qat_common/adf_dbgfs.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/crypto/intel/qat/qat_common/adf_dbgfs.c b/drivers/crypto/intel/qat/qat_common/adf_dbgfs.c
+> index c42f5c25aabd..ec2c712b9006 100644
+> --- a/drivers/crypto/intel/qat/qat_common/adf_dbgfs.c
+> +++ b/drivers/crypto/intel/qat/qat_common/adf_dbgfs.c
+> @@ -30,7 +30,7 @@ void adf_dbgfs_init(struct adf_accel_dev *accel_dev)
+>  		 pci_name(accel_dev->accel_pci_dev.pci_dev));
+>  
+>  	ret = debugfs_create_dir(name, NULL);
+> -	if (IS_ERR_OR_NULL(ret))
+> +	if (IS_ERR(ret))
+>  		return;
 
-> Personally I don't think the argument above holds water.  With
-> IPsec we had a similar issue of authenticating untrusted peers
-> using public key cryptography.  In that case we successfully
-> delegated the task to user-space and it is still how it works
-> to this day.
+There is no point in creating patches like this.  It doesn't
+make the code better at all.  IS_ERR_OR_NULL usually compiles
+to a single branch just like IS_ERR.
 
-It transpires that we do actually need at least a PGP parser in the kernel=
- -
-and it needs to be used prior to loading any modules: some Lenovo Thinkpad=
-s,
-at least, may have EFI variables holding a list of keys in PGP form, not X=
-.509
-form.
+However, I have to say that this code is actually buggy.  Surely
+this function should be passing the error back up so that it does
+not try to create anything under the non-existant dbgfs directory?
 
-For example, in dmesg, you might see:
-
-May 16 04:01:01 localhost kernel: integrity: Loading X.509 certificate: UE=
-FI:MokListRT (MOKvar table)
-May 16 04:01:01 localhost kernel: integrity: Problem loading X.509 certifi=
-cate -126
-
-On my laptop, if I dump this variable:
-
-	efivar -e /tmp/q --name=3D605dab50-e046-4300-abb6-3dd810dd8b23-MokListRT
-
-And then looking at the data exported:
-
-	file /tmp/q
-
-I see:
-
-	/tmp/q: PGP Secret Sub-key -
-
-The kernel doesn't currently have a PGP parser.  I've checked and the valu=
-e
-doesn't parse as ASN.1:
-
-	openssl asn1parse -in /tmp/q -inform DER
-	    0:d=3D0  hl=3D2 l=3D  21 prim: cont [ 23 ]       =
-
-	Error in encoding
-	001EBA93B67F0000:error:0680007B:asn1 encoding routines:ASN1_get_object:he=
-ader too long:crypto/asn1/asn1_lib.c:105:
-
-which would suggest that it isn't X.509.
-
-David
-
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
