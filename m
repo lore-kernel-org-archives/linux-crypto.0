@@ -1,156 +1,93 @@
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E62A811EB;
-	Fri, 13 Sep 2024 18:40:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 766731487DD;
+	Fri, 13 Sep 2024 19:23:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726252859; cv=none; b=nCXnzOSqTT2N3dBoPB9MMu7LpFz1HhbfgYXeDiUTc2HIIOO/nxbeW5yWzNz/irwYxTVyt0xcB0mW1LDwlC39xL2nVeQD6DDqq6uUlcNjDE1UOqmp62J83Ag3qXDHfGyZP8pGytO22N5QRx0xb7j+l+LuCDk3AIMqPZxE9e2TLcE=
+	t=1726255406; cv=none; b=XiWLj7N+LNw3KwgfyjGket7g6g7qzf1epCwrqFvimJxcWcC2HHF2d44bEPOC3VQ19wFoq9ebtnS2h2IukWkAlFkHV3m3f3Go2kyivk/0jJJPnsiJXmDyzKQe0Hp6h7wdcS0ShwxFrJ6zRb6X0UqrzYDScDMUmgC868G7fGULQA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726252859; c=relaxed/simple;
-	bh=D+I8GQYbtdFqu//u3VQ9wkisq1yyy0w6iTNBsqfKPiA=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nStzvArSglSQD94n8+E+uFBMolcY48VzQCZ9dWTTWfRbw39yrlnoLAlTCcYl9BO3JsdZ2CwTlmub+hX9+pxK8spxSMnfzgE5xdzdioY4xvnOpygzbRanJK7Q0gw1dlbmaiJPZezRzLvmELRLmxQ/Kqt5b7A19ZjIvKJCAhvDLuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4X53213XD4z67kr9;
-	Sat, 14 Sep 2024 02:37:13 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id DF2A8140A77;
-	Sat, 14 Sep 2024 02:40:53 +0800 (CST)
-Received: from localhost (10.48.150.243) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 13 Sep
- 2024 20:40:52 +0200
-Date: Fri, 13 Sep 2024 19:40:49 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Lukas Wunner <lukas@wunner.de>
-CC: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
-	<davem@davemloft.net>, Eric Biggers <ebiggers@google.com>, Stefan Berger
-	<stefanb@linux.ibm.com>, Vitaly Chikunov <vt@altlinux.org>, Tadeusz Struk
-	<tstruk@gigaio.com>, David Howells <dhowells@redhat.com>, Andrew Zaborowski
-	<andrew.zaborowski@intel.com>, Saulo Alessandre
-	<saulo.alessandre@tse.jus.br>, Ignat Korchagin <ignat@cloudflare.com>, Marek
- Behun <kabel@kernel.org>, Varad Gautam <varadgautam@google.com>, Denis
- Kenzior <denkenz@gmail.com>, <linux-crypto@vger.kernel.org>,
-	<keyrings@vger.kernel.org>
-Subject: Re: [PATCH v2 02/19] crypto: sig - Introduce sig_alg backend
-Message-ID: <20240913194049.000030d9@Huawei.com>
-In-Reply-To: <688e92e7db6f2de1778691bb7cdafe3bb39e73c6.1725972334.git.lukas@wunner.de>
-References: <cover.1725972333.git.lukas@wunner.de>
-	<688e92e7db6f2de1778691bb7cdafe3bb39e73c6.1725972334.git.lukas@wunner.de>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	s=arc-20240116; t=1726255406; c=relaxed/simple;
+	bh=g+we6zXlRF0K6r7vmZ6GDKa/NiVEm5StyEJsa3ai1Q0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uYg9a+889aUkGZ3I/GX7sJqn1yLGhlyspmt8HjoapXRLfUGwFVXwmQDJxlThyvRiLw6Q9Fcae+Ra+MaLd+5OifQNVXXYn4MFAShUXui9o79GNQ+aNnEUnqXaaSKSfn+OVRg8Bu398D3qieTMzsRQWnv7Ip/ny7I4LMfcZQuv5+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=iqVaYpSF; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="iqVaYpSF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8FF2C4CEC0;
+	Fri, 13 Sep 2024 19:23:24 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="iqVaYpSF"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1726255403;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gRexsgTMh+myIiZRscYFbD1nR7aA5ysUH5XGp1Tlp7Y=;
+	b=iqVaYpSFmuqJS/EdM5oDqxY2LQzVTZFAYQulKseyvnZmHLVK/DE49vWb0PUK1vNuOI/a51
+	d6ZKtvRqOhSwajEr79L3BzwYkbTqqzx9h2HX+OcRVWHVcDbYGwYRM1VMRLtk7CUyZv2Xka
+	Nm9OEG0/yDyTZQCq/C3JhJMnu09M5Jo=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 745eb482 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Fri, 13 Sep 2024 19:23:22 +0000 (UTC)
+Date: Fri, 13 Sep 2024 21:23:20 +0200
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Heiko Carstens <hca@linux.ibm.com>
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Harald Freudenberger <freude@linux.ibm.com>,
+	Stefan Liebler <stli@linux.ibm.com>, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: Re: [PATCH 7/7] s390/vdso: Wire up getrandom() vdso implementation
+Message-ID: <ZuSRKLFdYI1gCHh9@zx2c4.com>
+References: <20240913130544.2398678-1-hca@linux.ibm.com>
+ <20240913130544.2398678-8-hca@linux.ibm.com>
+ <ZuRWmJTWqmD92D8d@zx2c4.com>
+ <ZuRYoVIrg28kBKqb@zx2c4.com>
+ <20240913173206.30385-C-hca@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100004.china.huawei.com (7.191.162.219) To
- frapeml500008.china.huawei.com (7.182.85.71)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240913173206.30385-C-hca@linux.ibm.com>
 
-On Tue, 10 Sep 2024 16:30:12 +0200
-Lukas Wunner <lukas@wunner.de> wrote:
-
-> Commit 6cb8815f41a9 ("crypto: sig - Add interface for sign/verify")
-> began a transition of asymmetric sign/verify operations from
-> crypto_akcipher to a new crypto_sig frontend.
+On Fri, Sep 13, 2024 at 07:32:06PM +0200, Heiko Carstens wrote:
+> On Fri, Sep 13, 2024 at 05:22:09PM +0200, Jason A. Donenfeld wrote:
+> > On Fri, Sep 13, 2024 at 05:13:28PM +0200, Jason A. Donenfeld wrote:
+> > > On Fri, Sep 13, 2024 at 03:05:43PM +0200, Heiko Carstens wrote:
+> > > > The vdso testcases vdso_test_getrandom and vdso_test_chacha pass.
+> > > 
+> > > I'm trying to cross compile this but I'm getting:
+> > > 
+> > >   CC       vdso_test_chacha
+> > > /home/zx2c4/Projects/random-linux/tools/testing/selftests/../../../tools/arch/s390/vdso/vgetrandom-chacha.S: Assembler messages:
+> > > /home/zx2c4/Projects/random-linux/tools/testing/selftests/../../../tools/arch/s390/vdso/vgetrandom-chacha.S:147: Error: Unrecognized opcode: `alsih'
+> > > 
+> > > Any idea what's up?
+> > 
+> > Looks like I needed `-march=arch9`. I can potentially rebuild my
+> > toolchains to do this by default, though, if that's a normal thing to
+> > have and this is just my toolchain being crappy. Or, if it's not a
+> > normal thing to have, do we need to add it to the selftests Makefile?
 > 
-> Internally, the crypto_sig frontend still uses akcipher_alg as backend,
-> however:
-> 
->    "The link between sig and akcipher is meant to be temporary.  The
->     plan is to create a new low-level API for sig and then migrate
->     the signature code over to that from akcipher."
->     https://lore.kernel.org/r/ZrG6w9wsb-iiLZIF@gondor.apana.org.au/
-> 
->    "having a separate alg for sig is definitely where we want to
->     be since there is very little that the two types actually share."
->     https://lore.kernel.org/r/ZrHlpz4qnre0zWJO@gondor.apana.org.au/
-> 
-> Take the next step of that migration and augment the crypto_sig frontend
-> with a sig_alg backend to which all algorithms can be moved.
-> 
-> During the migration, there will briefly be signature algorithms that
-> are still based on crypto_akcipher, whilst others are already based on
-> crypto_sig.  Allow for that by building a fork into crypto_sig_*() API
-> calls (i.e. crypto_sig_maxsize() and friends) such that one of the two
-> backends is selected based on the transform's cra_type.
-> 
-> Signed-off-by: Lukas Wunner <lukas@wunner.de>
+> That needs to be fixed differently, since the kernel build would also
+> fail when building for z10. Could you squash the below fix into this
+> patch, please?
 
-Hi Lukas,
+Done.
 
-A few trivial comments.
+> So for the kernel itself including the vdso code, everything is
+> correct now. But similar checks are missing within vdso_test_chacha.c.
+> I'll provide something for that, so that the test case will be skipped
+> if the required instructions are missing, but not today.
 
-Jonathan
+Okay. I would assume no rush there, because it's unlikely there are
+those machines part of kselftest fleets anyway?
 
-> diff --git a/crypto/sig.c b/crypto/sig.c
-> index 7645bedf3a1f..4f36ceb7a90b 100644
-> --- a/crypto/sig.c
-> +++ b/crypto/sig.c
-
-> @@ -68,6 +93,14 @@ EXPORT_SYMBOL_GPL(crypto_alloc_sig);
->  
->  int crypto_sig_maxsize(struct crypto_sig *tfm)
->  {
-> +	if (crypto_sig_tfm(tfm)->__crt_alg->cra_type != &crypto_sig_type)
-> +		goto akcipher;
-> +
-> +	struct sig_alg *alg = crypto_sig_alg(tfm);
-> +
-> +	return alg->max_size(tfm);
-> +
-> +akcipher:
-
-Neat trick for temporary retention of the code.
-Hideous code in the meantime ;) Not that I have a better idea.
-
->  	struct crypto_akcipher **ctx = crypto_sig_ctx(tfm);
->  
->  	return crypto_akcipher_maxsize(*ctx);
-
-> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-> index f02cb075bd68..bb21378aa510 100644
-> --- a/crypto/testmgr.c
-> +++ b/crypto/testmgr.c
-...
-
-> @@ -4317,6 +4324,114 @@ static int alg_test_akcipher(const struct alg_test_desc *desc,
->  	return err;
->  }
->  
-> +static int test_sig_one(struct crypto_sig *tfm, const struct sig_testvec *vecs)
-> +{
-> +	u8 *ptr, *key __free(kfree);
-I would move definition of key down to where the constructor is.
-Current pattern is fine until some extra code sneaks inbetween with
-an error return.
-
-> +	int err, sig_size;
-> +
-> +	key = kmalloc(vecs->key_len + 2 * sizeof(u32) + vecs->param_len,
-> +		      GFP_KERNEL);
-> +	if (!key)
-> +		return -ENOMEM;
-
-git a/include/crypto/internal/sig.h b/include/crypto/internal/sig.h
-> index 97cb26ef8115..b16648c1a986 100644
-> --- a/include/crypto/internal/sig.h
-> +++ b/include/crypto/internal/sig.h
-
-> +static inline struct crypto_sig *crypto_spawn_sig(struct crypto_sig_spawn
-> +								   *spawn)
-
-That's an odd wrap. I'd just go long where this happens and slightly past 80 chars.
-
-
-> +{
-> +	return crypto_spawn_tfm2(&spawn->base);
-> +}
-
+Jason
