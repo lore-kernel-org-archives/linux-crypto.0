@@ -1,77 +1,126 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D37610E9
-	for <linux-crypto@vger.kernel.org>; Sat, 14 Sep 2024 08:50:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D674113A27D;
+	Sat, 14 Sep 2024 11:01:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726303837; cv=none; b=Qld1DgTvIKACCNURTtKbeosDwHWhxXWXO6egq1wsWvQHVH6vc0NhDaDC2agjCfeBEDhDocqVaQ0FPSpMFdh2+5ObRYfLAkcosvFVGyoLz5drKnMYUONXr7qbHWV+rTilJDFqRN3d8i5RudXOGl1r12RgKyk29jvcuZ04LY8FZVs=
+	t=1726311685; cv=none; b=gfTXdkNl4ZY/lSyIKFymAu3pmWHZ0VZTshSUOpyodqom9YfDj2TuyDkRaE+KN/CnHH2rnSBXfT2a1G55Gr5eyfNVO9ItPyNS7kyRKnojqKEdLjoYukQrq19wprGwo9OXJ6oPaIPT+VrVmvyZZWMOVf9gwHttx70Of2yOeL52m3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726303837; c=relaxed/simple;
-	bh=gd+9LppoYpyr4wbbldXUqIltiNIW7G606YSOcX9+lBg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r/ND/AzU4orfDGE9SDYymncCtxZPDU1fWlehtu98bCcSMwck+Ba42zdhv3qM5e1kqNPGpR44ccGMAC46f9u4LDqxMjkzKN2Zany1odLmSFqRe2CT+c7iXDo6xGWV4yfuhV64PYDoTZmc58xy9xLe4p21QaWwfB4PK8FdnadlJ3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=OhX5Sk9m; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="OhX5Sk9m"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD310C4CECC;
-	Sat, 14 Sep 2024 08:50:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1726303837;
-	bh=gd+9LppoYpyr4wbbldXUqIltiNIW7G606YSOcX9+lBg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OhX5Sk9mpioweVdJXs9tz/0EiJ6VA/I1Ouh3Q/iMN9h2nWfqMBAnSUdn6f84r8tdr
-	 kUrGuVRBbXIRn8C59AmgxZkR19qIlXaVW+Gd9biUh1ID3N2uAcvzZFNq/HxR2DMRBR
-	 5XKieIDaz0j6LoOpMNwBT6Dtj1ndI7S6RhFuJvBY=
-Date: Sat, 14 Sep 2024 10:50:33 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>,
-	Li Zetao <lizetao1@huawei.com>, davem@davemloft.net,
-	lucas.segarra.fernandez@intel.com, damian.muszynski@intel.com,
-	qat-linux@intel.com, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH -next] crypto: qat - remove redundant null pointer checks
- in adf_dbgfs_init()
-Message-ID: <2024091452-freight-irritant-f160@gregkh>
-References: <20240903144230.2005570-1-lizetao1@huawei.com>
- <ZuQRqP9CgDp7cuGi@gondor.apana.org.au>
- <ZuRRxIjK8WMvStJ+@gcabiddu-mobl.ger.corp.intel.com>
- <ZuVL5buxgkqSEzPU@gondor.apana.org.au>
+	s=arc-20240116; t=1726311685; c=relaxed/simple;
+	bh=2cdpzxaJak4sk84HBja4AHAxecY3fd/vX4aFAisLU1w=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=EENgzL/bXmGrJ8FEUGmqvqcb/43bxAPVuEB28YjXhBd4AcJU+0mi3n6zXTx/qfd0MDzIM3CQB57/QtaUeJyJZj9RjMaxxauCayZvH40xyBQ6eQ1j2ZSlzwxJYr1f6toHUNob5iaqgPhiyO9vTzCkcs3EcCyBH9QDuq1b6aC8Zkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4X5Sps3z0Szfc1B;
+	Sat, 14 Sep 2024 18:59:01 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (unknown [7.193.23.164])
+	by mail.maildlp.com (Postfix) with ESMTPS id 82CF414035F;
+	Sat, 14 Sep 2024 19:01:13 +0800 (CST)
+Received: from localhost.localdomain (10.69.192.56) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Sat, 14 Sep 2024 19:01:13 +0800
+From: Weili Qian <qianweili@huawei.com>
+To: <herbert@gondor.apana.org.au>
+CC: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<liulongfang@huawei.com>, <shenyang39@huawei.com>
+Subject: [PATCH] crypto: hisilicon/hpre - enable all clusters clock gating
+Date: Sat, 14 Sep 2024 18:57:16 +0800
+Message-ID: <20240914105716.20840-1-qianweili@huawei.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZuVL5buxgkqSEzPU@gondor.apana.org.au>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
 
-On Sat, Sep 14, 2024 at 04:40:05PM +0800, Herbert Xu wrote:
-> On Fri, Sep 13, 2024 at 03:52:52PM +0100, Cabiddu, Giovanni wrote:
-> >
-> > As I understand it, there is no need to check the return value of
-> > debugfs_create_*() functions. See f0fcf9ade46a ("crypto: qat - no need to check
-> > return value of debugfs_create functions"), where all checks after the
-> > debugfs_create_*() were removed.
-> 
-> Right.
-> 
-> > In this particular case, the check is present only to avoid attempting to
-> > create attributes if the directory is missing, since we know such an
-> > attempt will fail.
-> 
-> I think this is still buggy.  That if statement should be removed
-> as otherwise subsequent calls to debugfs_create_file will provide a
-> NULL parent dentry instead of an error parent dentry.  This causes
-> debugfs to do things differently.
+Currently, the driver enables clock gating for only one cluster.
+However, the new hardware has three clusters. Therefore, clock
+gating needs to be enabled based on the number of clusters on the
+current hardware.
 
-debugfs, if something goes wrong, will return a real error, never NULL,
-so any return value from a call can be passed back in.
+Signed-off-by: Weili Qian <qianweili@huawei.com>
+---
+ drivers/crypto/hisilicon/hpre/hpre_main.c | 40 +++++++++++++++--------
+ 1 file changed, 26 insertions(+), 14 deletions(-)
 
-Ideally I want to make debugfs return values just a "opaque token" so
-please just treat it like that (and ignore the fact that it's a dentry.)
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
+index 6b536ad2ada5..23e8fb9414af 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_main.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
+@@ -593,6 +593,8 @@ static void hpre_close_sva_prefetch(struct hisi_qm *qm)
+ 
+ static void hpre_enable_clock_gate(struct hisi_qm *qm)
+ {
++	unsigned long offset;
++	u8 clusters_num, i;
+ 	u32 val;
+ 
+ 	if (qm->ver < QM_HW_V3)
+@@ -606,17 +608,23 @@ static void hpre_enable_clock_gate(struct hisi_qm *qm)
+ 	val |= HPRE_PEH_CFG_AUTO_GATE_EN;
+ 	writel(val, qm->io_base + HPRE_PEH_CFG_AUTO_GATE);
+ 
+-	val = readl(qm->io_base + HPRE_CLUSTER_DYN_CTL);
+-	val |= HPRE_CLUSTER_DYN_CTL_EN;
+-	writel(val, qm->io_base + HPRE_CLUSTER_DYN_CTL);
+-
+-	val = readl_relaxed(qm->io_base + HPRE_CORE_SHB_CFG);
+-	val |= HPRE_CORE_GATE_EN;
+-	writel(val, qm->io_base + HPRE_CORE_SHB_CFG);
++	clusters_num = qm->cap_tables.dev_cap_table[HPRE_CLUSTER_NUM_CAP_IDX].cap_val;
++	for (i = 0; i < clusters_num; i++) {
++		offset = (unsigned long)i * HPRE_CLSTR_ADDR_INTRVL;
++		val = readl(qm->io_base + offset + HPRE_CLUSTER_DYN_CTL);
++		val |= HPRE_CLUSTER_DYN_CTL_EN;
++		writel(val, qm->io_base + offset + HPRE_CLUSTER_DYN_CTL);
++
++		val = readl(qm->io_base + offset + HPRE_CORE_SHB_CFG);
++		val |= HPRE_CORE_GATE_EN;
++		writel(val, qm->io_base + offset + HPRE_CORE_SHB_CFG);
++	}
+ }
+ 
+ static void hpre_disable_clock_gate(struct hisi_qm *qm)
+ {
++	unsigned long offset;
++	u8 clusters_num, i;
+ 	u32 val;
+ 
+ 	if (qm->ver < QM_HW_V3)
+@@ -630,13 +638,17 @@ static void hpre_disable_clock_gate(struct hisi_qm *qm)
+ 	val &= ~HPRE_PEH_CFG_AUTO_GATE_EN;
+ 	writel(val, qm->io_base + HPRE_PEH_CFG_AUTO_GATE);
+ 
+-	val = readl(qm->io_base + HPRE_CLUSTER_DYN_CTL);
+-	val &= ~HPRE_CLUSTER_DYN_CTL_EN;
+-	writel(val, qm->io_base + HPRE_CLUSTER_DYN_CTL);
+-
+-	val = readl_relaxed(qm->io_base + HPRE_CORE_SHB_CFG);
+-	val &= ~HPRE_CORE_GATE_EN;
+-	writel(val, qm->io_base + HPRE_CORE_SHB_CFG);
++	clusters_num = qm->cap_tables.dev_cap_table[HPRE_CLUSTER_NUM_CAP_IDX].cap_val;
++	for (i = 0; i < clusters_num; i++) {
++		offset = (unsigned long)i * HPRE_CLSTR_ADDR_INTRVL;
++		val = readl(qm->io_base + offset + HPRE_CLUSTER_DYN_CTL);
++		val &= ~HPRE_CLUSTER_DYN_CTL_EN;
++		writel(val, qm->io_base + offset + HPRE_CLUSTER_DYN_CTL);
++
++		val = readl(qm->io_base + offset + HPRE_CORE_SHB_CFG);
++		val &= ~HPRE_CORE_GATE_EN;
++		writel(val, qm->io_base + offset + HPRE_CORE_SHB_CFG);
++	}
+ }
+ 
+ static int hpre_set_user_domain_and_cache(struct hisi_qm *qm)
+-- 
+2.33.0
 
-thanks,
-
-greg k-h
