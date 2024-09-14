@@ -1,106 +1,74 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC49C1CEE91;
-	Sat, 14 Sep 2024 11:36:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D9F61CEE91;
+	Sat, 14 Sep 2024 11:39:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726313799; cv=none; b=IaiAxN7z5VZNGmCUU+qnRscUTFqPq39LoKbSpq16DrTu7Q7j7w6AB63t8G6qiKomD2jNmFM+BohDTWxwnwTZofhAf4BOfTu6VpffVk7WVJvUjZLNZN1KGKcXcC4gCdPc2GBZflsBMnVbScoik/qidDRStK/yX3XPyEc2B8kKNEY=
+	t=1726313945; cv=none; b=LPO2C/aYAwMBQSMLf3R9X9zc9GLX6AumL0Yh6lq3DanSmEwcm3ZAUhkdaLkvXYWGwcBXGS/dWSq0RCJJU6rpq3ooCedWf7MCV05Hft8AuKMJmxIEfIFu/qsoPVK1bb1abpfFgWSixig1xibI1J2r/XOVFP327+zycSsdAHYJO2I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726313799; c=relaxed/simple;
-	bh=qnVKswh1C/VcMi/8JBHh5XHeNODqo3B7FYnosOg1iQ8=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=WS1eTaXkEOJpStB0rTXv7uso+8ku1JXB8yKNCQNmUPgwJJijACuMn18+NEtGiCm02KzWFsfMpWP1S2f2B8EstUrjmgd10uQLwBbqOqCCSPiCUhR0jyH140ZUUHAcjv+mlFDDeQKYktuBqjeddS5lKy6kQvXShoOgr8JEKDiy2Ds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pC0rAyg/; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1726313945; c=relaxed/simple;
+	bh=ZetxoFkJPQb/caRq2nXVle/q6AKRnAsQAsgPvbySKdk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dzy1VX3qEQRSRi0xOZ/MjIdTrg3xeDi0hTI6VHMAUo9Z40+TBuKmrGJ6Umi56/MZ94EE4Wp6ymXvrs4sgaIZasspUmoBk3tC2lqD//KXDzr6lhk+AAHg326Yrh2TB6w0s543lhI9qU0XO48g+JKHdtgpW0RYvGSXqaZQH1B5Ez4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=HN7cIBNT; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pC0rAyg/"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E2ECC4CEC0;
-	Sat, 14 Sep 2024 11:36:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726313799;
-	bh=qnVKswh1C/VcMi/8JBHh5XHeNODqo3B7FYnosOg1iQ8=;
-	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
-	b=pC0rAyg/AeP9bBL1eEWSuL3M3eNWRaTA3iUMWDTHAej2H9t8eARMY6EJKXkSpY7qd
-	 Fvs6jnJ83YZZsJUyW8C2W/c3aJfR4HNWSO7BkIFnKmHUczs2lShv378hyR+gaIiHDj
-	 ufksGhjE7KFs2CJKAMsBNtNV8xh5mQo32I8XCEpwCHafAxHNJDCw1TB2YMaTqWZCVq
-	 fCCJP2bPvoeuJsRBQiKDTbNbQDM4tKpi2Cr+k8RgVqUujO+Ggzlu0//Xn5d1dTD2mh
-	 oIivRCysd3rT07AMHAqVV22jii4bgcJ2WfzWp/YI0zDDF/tZq+qXzL2Qrmq0lCJYPg
-	 cC1eBCEyzQWwg==
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="HN7cIBNT"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=gLxnozObWeiGuYd0f0ninBdAY8bV9ObeswetAFDkWzQ=; b=HN7cIBNTWgHHX5Smzgag+JL5FV
+	Xx2EKCftFIN621TlZZanyUmSlOcJP7Ab/2TzA3ERe0EerCBvDe9yJ6tz3hg9mklMbM5ZlK7LMkFOW
+	FsYyKOV/i+s2GGGdESp1ywtRWazaHuEzPE6ZUT1O9w0MBG3FFfz6M38utx2degT9Wpm1RozhwM/t/
+	lLpCa7HBidzbzY1NeeeR3z10daiJ5bSmmsaFqWZnMKLZOmUAep6AGbZx0X/+sljIsVxYu/nKYfRnj
+	XlvkoWYQSXE+2DHN2sIc+8ZHnYCxRQ3nviOm8bWG2YDMfNQTSwUXfpJqHKnB1ZDTFk+MfQJIpdgqf
+	mitymivQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1spQxE-002Sd2-2O;
+	Sat, 14 Sep 2024 19:38:55 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 14 Sep 2024 19:38:54 +0800
+Date: Sat, 14 Sep 2024 19:38:54 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Tomas Paukrt <tomaspaukrt@email.cz>
+Cc: linux-crypto@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>, imx@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH] crypto: mxs-dcp: Enable user-space access to AES with
+ hardware-bound keys
+Message-ID: <ZuV1zguLBsBZnGB5@gondor.apana.org.au>
+References: <1di.ZclR.6M4clePpGuH.1cv1hD@seznam.cz>
+ <ZuVKtuMqiCu67hn2@gondor.apana.org.au>
+ <24h.ZcXr.7FvRaSxxibG.1cvNHL@seznam.cz>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Sat, 14 Sep 2024 14:36:35 +0300
-Message-Id: <D45Z61F5DSHN.1PJB50JEMACEW@kernel.org>
-Cc: <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>, "Sergey
- Shtylyov" <s.shtylyov@omp.ru>, "Karina Yankevich" <k.yankevich@omp.ru>,
- "Sergey Yudin" <s.yudin@omp.ru>
-Subject: Re: [PATCH v3] KEYS: prevent NULL pointer dereference in
- find_asymmetric_key()
-From: "Jarkko Sakkinen" <jarkko@kernel.org>
-To: "Roman Smirnov" <r.smirnov@omp.ru>, "David Howells"
- <dhowells@redhat.com>, "Herbert Xu" <herbert@gondor.apana.org.au>, "David S
- . Miller" <davem@davemloft.net>, "Andrew Zaborowski"
- <andrew.zaborowski@intel.com>
-X-Mailer: aerc 0.18.2
-References: <20240913143010.117883-1-r.smirnov@omp.ru>
-In-Reply-To: <20240913143010.117883-1-r.smirnov@omp.ru>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <24h.ZcXr.7FvRaSxxibG.1cvNHL@seznam.cz>
 
-On Fri Sep 13, 2024 at 5:30 PM EEST, Roman Smirnov wrote:
-> In find_asymmetric_key(), if all NULLs are passed in the id_{0,1,2}
-> arguments, the kernel will first emit WARN but then have an oops
-> because id_2 gets dereferenced anyway.
->
-> Add the missing id_2 check and move WARN_ON() to the final else branch
-> to avoid duplicate NULL checks.
->
-> Found by Linux Verification Center (linuxtesting.org) with Svace static
-> analysis tool.
->
-> Fixes: 7d30198ee24f ("keys: X.509 public key issuer lookup without AKID")
-> Suggested-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-> Signed-off-by: Roman Smirnov <r.smirnov@omp.ru>
-> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-> ---
->  V1 -> V2: updated patch description, returned WARN_ON() macro
->  V2 -> V3: updated patch description
->  crypto/asymmetric_keys/asymmetric_type.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
->
-> diff --git a/crypto/asymmetric_keys/asymmetric_type.c b/crypto/asymmetric=
-_keys/asymmetric_type.c
-> index a5da8ccd353e..43af5fa510c0 100644
-> --- a/crypto/asymmetric_keys/asymmetric_type.c
-> +++ b/crypto/asymmetric_keys/asymmetric_type.c
-> @@ -60,17 +60,18 @@ struct key *find_asymmetric_key(struct key *keyring,
->  	char *req, *p;
->  	int len;
-> =20
-> -	WARN_ON(!id_0 && !id_1 && !id_2);
-> -
->  	if (id_0) {
->  		lookup =3D id_0->data;
->  		len =3D id_0->len;
->  	} else if (id_1) {
->  		lookup =3D id_1->data;
->  		len =3D id_1->len;
-> -	} else {
-> +	} else if (id_2) {
->  		lookup =3D id_2->data;
->  		len =3D id_2->len;
-> +	} else {
-> +		WARN_ON(1);
-> +		return ERR_PTR(-EINVAL);
->  	}
-> =20
->  	/* Construct an identifier "id:<keyid>". */
+On Sat, Sep 14, 2024 at 01:32:37PM +0200, Tomas Paukrt wrote:
+> 
+> Please see the comment in the following patch: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=3d16af0b4cfac4b2c3b238e2ec37b38c2f316978
+> 
+> The goal of this change is to allow some users to use AES with hardware-bound keys from user-space without compromising others.
 
-Thanks this works for me at least. David do you have objections?
-If not, I'll pick it up for my v6.12 PR.
+In that case I would suggest introducing a flag so that the key
+can only be accessed through the keyring subsystem.
 
-BR, Jarkko
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
