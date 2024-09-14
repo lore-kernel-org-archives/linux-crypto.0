@@ -1,78 +1,106 @@
-Received: from mxc.seznam.cz (mxc.seznam.cz [77.75.79.23])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EB7E1DA5E
-	for <linux-crypto@vger.kernel.org>; Sat, 14 Sep 2024 11:33:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=77.75.79.23
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC49C1CEE91;
+	Sat, 14 Sep 2024 11:36:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726313613; cv=none; b=iWxujoLzycWNQKLQZ7V5DA1GUuG2xZXR8zUshEaX+jUQOLO8Yb4JOPMowJypqrxE3wqyUY5XQYZMYMunnWoJTjs7QPsB/sXpj4ura7I6Xo71B99LGfk2kyXlGfArNas8FxCgX8YIyleZx1sHvNS0M+7IINNQeyIs+ySM01AWs50=
+	t=1726313799; cv=none; b=IaiAxN7z5VZNGmCUU+qnRscUTFqPq39LoKbSpq16DrTu7Q7j7w6AB63t8G6qiKomD2jNmFM+BohDTWxwnwTZofhAf4BOfTu6VpffVk7WVJvUjZLNZN1KGKcXcC4gCdPc2GBZflsBMnVbScoik/qidDRStK/yX3XPyEc2B8kKNEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726313613; c=relaxed/simple;
-	bh=tfC0wjxNe5XKrSkQAza0Tqj6HlthCa21GJt+GYVR5fs=;
-	h=From:To:Cc:Subject:Date:Message-Id:References:In-Reply-To:
-	 Mime-Version:Content-Type; b=FRrqcyyRPikE+L5xmMkJjn3JPGUSJgIab9mjSMxzR/0WL4B7s5ExJN6vuJX4LQ4S+UF4OpmK49YUiWo+V+4HMaovGGv0tt3yGpFE/Uc4EemFnlNTh9O4Tjolnb6S2/pnCh8OhrhZN9z7nfJqaxcTU6G2xiKILrREwwIjQHDBdQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=email.cz; spf=pass smtp.mailfrom=email.cz; dkim=pass (2048-bit key) header.d=email.cz header.i=@email.cz header.b=VAcN3xwi; arc=none smtp.client-ip=77.75.79.23
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=email.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=email.cz
+	s=arc-20240116; t=1726313799; c=relaxed/simple;
+	bh=qnVKswh1C/VcMi/8JBHh5XHeNODqo3B7FYnosOg1iQ8=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=WS1eTaXkEOJpStB0rTXv7uso+8ku1JXB8yKNCQNmUPgwJJijACuMn18+NEtGiCm02KzWFsfMpWP1S2f2B8EstUrjmgd10uQLwBbqOqCCSPiCUhR0jyH140ZUUHAcjv+mlFDDeQKYktuBqjeddS5lKy6kQvXShoOgr8JEKDiy2Ds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pC0rAyg/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=email.cz header.i=@email.cz header.b="VAcN3xwi"
-Received: from email.seznam.cz
-	by smtpc-mxc-58959dfbcf-mrxrj
-	(smtpc-mxc-58959dfbcf-mrxrj [2a02:598:64:8a00::1000:460])
-	id 47b8da75b94c68df4736546d;
-	Sat, 14 Sep 2024 13:32:39 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=email.cz;
-	s=szn20221014; t=1726313559;
-	bh=tfC0wjxNe5XKrSkQAza0Tqj6HlthCa21GJt+GYVR5fs=;
-	h=Received:From:To:Cc:Subject:Date:Message-Id:References:
-	 In-Reply-To:Mime-Version:X-Mailer:Content-Type:
-	 Content-Transfer-Encoding;
-	b=VAcN3xwiOAFmCHVPhhq4NUNwOrJtOAYMZuQ8Dm9Cn0Db0p48iVTQgB3dDcJMOfDD9
-	 DVGVlyJxHy/8r+cyVjc2zrXvXBzNpOJApUkE88l1KQBHypL6uxF0ntlULnJNFVtmN0
-	 ZleVrTEkpXntdUbKmZc/dAYZEgfKHUcoao5nZ1IimVH92WIICX1Kr0H6CvwEsYXXQi
-	 IJ4kLTJRdapfZclvC63hUeGdpAnlFd4dPt5cq0QK97+4Tc+aM7jyuL8AzHUoHwsx5g
-	 jOpy8E6YFvdsYr7bPZRaylx7Rdg1kJUHGeDaRui7sldRoyyZfmKdsbviP9vvu5kQuB
-	 o1m/ACG0YPrYQ==
-Received: from 184-143.ktuo.cz (184-143.ktuo.cz [82.144.143.184])
-	by email.seznam.cz (szn-ebox-5.0.189) with HTTP;
-	Sat, 14 Sep 2024 13:32:37 +0200 (CEST)
-From: "Tomas Paukrt" <tomaspaukrt@email.cz>
-To: "Herbert Xu" <herbert@gondor.apana.org.au>
-Cc: <linux-crypto@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Shawn Guo" <shawnguo@kernel.org>,
-	"Sascha Hauer" <s.hauer@pengutronix.de>,
-	"Pengutronix Kernel Team" <kernel@pengutronix.de>,
-	"Fabio Estevam" <festevam@gmail.com>,
-	<imx@lists.linux.dev>,
-	<linux-arm-kernel@lists.infradead.org>
-Subject: =?utf-8?q?Re=3A_=5BPATCH=5D_crypto=3A_mxs-dcp=3A_Enable_user-spac?=
-	=?utf-8?q?e_access_to_AES_with_hardware-bound_keys?=
-Date: Sat, 14 Sep 2024 13:32:37 +0200 (CEST)
-Message-Id: <24h.ZcXr.7FvRaSxxibG.1cvNHL@seznam.cz>
-References: <1di.ZclR.6M4clePpGuH.1cv1hD@seznam.cz>
-	<ZuVKtuMqiCu67hn2@gondor.apana.org.au>
-In-Reply-To: <ZuVKtuMqiCu67hn2@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pC0rAyg/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E2ECC4CEC0;
+	Sat, 14 Sep 2024 11:36:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726313799;
+	bh=qnVKswh1C/VcMi/8JBHh5XHeNODqo3B7FYnosOg1iQ8=;
+	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
+	b=pC0rAyg/AeP9bBL1eEWSuL3M3eNWRaTA3iUMWDTHAej2H9t8eARMY6EJKXkSpY7qd
+	 Fvs6jnJ83YZZsJUyW8C2W/c3aJfR4HNWSO7BkIFnKmHUczs2lShv378hyR+gaIiHDj
+	 ufksGhjE7KFs2CJKAMsBNtNV8xh5mQo32I8XCEpwCHafAxHNJDCw1TB2YMaTqWZCVq
+	 fCCJP2bPvoeuJsRBQiKDTbNbQDM4tKpi2Cr+k8RgVqUujO+Ggzlu0//Xn5d1dTD2mh
+	 oIivRCysd3rT07AMHAqVV22jii4bgcJ2WfzWp/YI0zDDF/tZq+qXzL2Qrmq0lCJYPg
+	 cC1eBCEyzQWwg==
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (szn-mime-2.1.61)
-X-Mailer: szn-ebox-5.0.189
-Content-Type: text/plain;
-	charset=utf-8
+Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Sat, 14 Sep 2024 14:36:35 +0300
+Message-Id: <D45Z61F5DSHN.1PJB50JEMACEW@kernel.org>
+Cc: <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>, "Sergey
+ Shtylyov" <s.shtylyov@omp.ru>, "Karina Yankevich" <k.yankevich@omp.ru>,
+ "Sergey Yudin" <s.yudin@omp.ru>
+Subject: Re: [PATCH v3] KEYS: prevent NULL pointer dereference in
+ find_asymmetric_key()
+From: "Jarkko Sakkinen" <jarkko@kernel.org>
+To: "Roman Smirnov" <r.smirnov@omp.ru>, "David Howells"
+ <dhowells@redhat.com>, "Herbert Xu" <herbert@gondor.apana.org.au>, "David S
+ . Miller" <davem@davemloft.net>, "Andrew Zaborowski"
+ <andrew.zaborowski@intel.com>
+X-Mailer: aerc 0.18.2
+References: <20240913143010.117883-1-r.smirnov@omp.ru>
+In-Reply-To: <20240913143010.117883-1-r.smirnov@omp.ru>
 
-> Why not just expose it uncondtionally?
+On Fri Sep 13, 2024 at 5:30 PM EEST, Roman Smirnov wrote:
+> In find_asymmetric_key(), if all NULLs are passed in the id_{0,1,2}
+> arguments, the kernel will first emit WARN but then have an oops
+> because id_2 gets dereferenced anyway.
+>
+> Add the missing id_2 check and move WARN_ON() to the final else branch
+> to avoid duplicate NULL checks.
+>
+> Found by Linux Verification Center (linuxtesting.org) with Svace static
+> analysis tool.
+>
+> Fixes: 7d30198ee24f ("keys: X.509 public key issuer lookup without AKID")
+> Suggested-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+> Signed-off-by: Roman Smirnov <r.smirnov@omp.ru>
+> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+> ---
+>  V1 -> V2: updated patch description, returned WARN_ON() macro
+>  V2 -> V3: updated patch description
+>  crypto/asymmetric_keys/asymmetric_type.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+>
+> diff --git a/crypto/asymmetric_keys/asymmetric_type.c b/crypto/asymmetric=
+_keys/asymmetric_type.c
+> index a5da8ccd353e..43af5fa510c0 100644
+> --- a/crypto/asymmetric_keys/asymmetric_type.c
+> +++ b/crypto/asymmetric_keys/asymmetric_type.c
+> @@ -60,17 +60,18 @@ struct key *find_asymmetric_key(struct key *keyring,
+>  	char *req, *p;
+>  	int len;
+> =20
+> -	WARN_ON(!id_0 && !id_1 && !id_2);
+> -
+>  	if (id_0) {
+>  		lookup =3D id_0->data;
+>  		len =3D id_0->len;
+>  	} else if (id_1) {
+>  		lookup =3D id_1->data;
+>  		len =3D id_1->len;
+> -	} else {
+> +	} else if (id_2) {
+>  		lookup =3D id_2->data;
+>  		len =3D id_2->len;
+> +	} else {
+> +		WARN_ON(1);
+> +		return ERR_PTR(-EINVAL);
+>  	}
+> =20
+>  	/* Construct an identifier "id:<keyid>". */
 
-Please see the comment in the following patch: https://git.kernel.org/pub/=
-scm/linux/kernel/git/torvalds/linux.git/commit/?id=3D3d16af0b4cfac4b2c3b23=
-8e2ec37b38c2f316978
+Thanks this works for me at least. David do you have objections?
+If not, I'll pick it up for my v6.12 PR.
 
-The goal of this change is to allow some users to use AES with hardware-bo=
-und keys from user-space without compromising others.
-
-Best regards
-
-Tomas
+BR, Jarkko
