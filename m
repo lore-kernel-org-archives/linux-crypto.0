@@ -1,120 +1,81 @@
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6D83153836;
-	Fri, 13 Sep 2024 20:16:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FA95522F;
+	Sat, 14 Sep 2024 00:54:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726258566; cv=none; b=e343aLKakTiEgWhm84uZ4+Nz8OdTOedAJn48IhvsZPmMCM58TSS9R5a0gXVc+sQpAi8URa0B5F5EB0NHfHpp9a5FdrY4FZsLtNrg3lD/+KoFGK5tGHNgOXZ2TjCLYgKi+RtQV91hZ7+u0k8NLanTkInw0pIWqqM0toH2JJIKq3Q=
+	t=1726275276; cv=none; b=jAvq8KJeRTIjWaoutxgU9m6T/+5rYsgS+Y374MGoUqLIm5hag+BKNYA15TX6oak403X/kKoyzGGBrGymH5lfgwykxbw7NzzN3zyYdQe4BCPLb69LcuNj3OSkgg4Gu4U2tErzkk75T7wZlFONMtxelpZUZcILXWyodBULWa+uGIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726258566; c=relaxed/simple;
-	bh=Ekbb1Q88jFmCxW2b8lXU7X0MWMz236zAwpvL67zG9ig=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qgAdBG2/+oPjEfEL1fRhnnsMYabwxYL7CTqS01e485N1wu4Z5l2/f6bMKdQBQzmbrc8ChhlbYAh6UQAOKMuOVctibTxHE7bM22AyNSvyGXmTWK6kFmb1j5yg1wPlCMh3NDMYFYGCKF7ySJIoz6Zu495jRgUB5BRuRDr881voOsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=auACBlqy; arc=none smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	s=arc-20240116; t=1726275276; c=relaxed/simple;
+	bh=71Mxsc00Dm7BfW+xFXzkqgOTmD7+9+zL0cKzfS1bR0o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S84j3LYeDuzVwfvR8eFnoUkNLYTofL4CH5VddDfYFrdTqLh3RCKOklZmhbWiplkx5tKBxWW57tAKYT5bGCaD5oLh32pbIWa0hkelHjzhc5hPg5hWdBldSJC+9bhyAsjbOBfM9MBikha2pZHmfuRcROG+L+uKQCB2V+kellJ0Pbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=Iv5qEgsF; arc=none smtp.client-ip=117.135.210.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="auACBlqy"
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48DJ0c9L016842;
-	Fri, 13 Sep 2024 20:10:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=
-	from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding; s=corp-2023-11-20; bh=E
-	cqTseYjTndPo7qnnktrBgiljIE8peMHL6Zd2VChAJc=; b=auACBlqyc9a/KDE4j
-	iIO78V9N/oYd3XOL2ArBn8Gqo0JJcRnxKIEWy2lyE5cqBxXq4NmHUf3AoSD3Q0hq
-	e+BNGwRW92sxatocgiLlDctQuwnSRh58knLd+ybAPv/mkbNk1OptnILomzcdJ/D/
-	ZDh3cVHwNWT4FBLKgFS4IHLOzguKZpXk7E1dAeTQgkdOt1cI9B21ijuG1GiVWs1Y
-	rKNY96kaFqAeJ9PzrV2YEk+TtDPbPZhP7vnogHuzhyO0dEBrYuhoSeqf7VntgHPI
-	RY81r1Ihia38uUQjQFOoMebqyIhRoP1koxQwoN4eI6f+S5ouuxXkau5wO9NRjgSw
-	9hbrA==
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 41geq9xcaf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 13 Sep 2024 20:10:33 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 48DJ6wZE033703;
-	Fri, 13 Sep 2024 20:10:33 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 41gd9d3ma4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Fri, 13 Sep 2024 20:10:33 +0000
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 48DKAWfg020873;
-	Fri, 13 Sep 2024 20:10:32 GMT
-Received: from localhost.us.oracle.com (bur-virt-x6-2-100.us.oracle.com [10.153.92.40])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 41gd9d3m7s-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Fri, 13 Sep 2024 20:10:32 +0000
-From: Ross Philipson <ross.philipson@oracle.com>
-To: linux-kernel@vger.kernel.org, x86@kernel.org,
-        linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
-        linux-efi@vger.kernel.org, iommu@lists.linux-foundation.org
-Cc: ross.philipson@oracle.com, dpsmith@apertussolutions.com,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
-        dave.hansen@linux.intel.com, ardb@kernel.org, mjg59@srcf.ucam.org,
-        James.Bottomley@hansenpartnership.com, peterhuewe@gmx.de,
-        jarkko@kernel.org, jgg@ziepe.ca, luto@amacapital.net,
-        nivedita@alum.mit.edu, herbert@gondor.apana.org.au,
-        davem@davemloft.net, corbet@lwn.net, ebiederm@xmission.com,
-        dwmw2@infradead.org, baolu.lu@linux.intel.com,
-        kanth.ghatraju@oracle.com, andrew.cooper3@citrix.com,
-        trenchboot-devel@googlegroups.com
-Subject: [PATCH v11 02/20] x86: Secure Launch Kconfig
-Date: Fri, 13 Sep 2024 13:04:59 -0700
-Message-Id: <20240913200517.3085794-3-ross.philipson@oracle.com>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20240913200517.3085794-1-ross.philipson@oracle.com>
-References: <20240913200517.3085794-1-ross.philipson@oracle.com>
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="Iv5qEgsF"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Date:From:Subject:Message-ID:MIME-Version:
+	Content-Type; bh=lJkbF3iMBGWJtvxgguGivuOXH7NOw6sqGg/07oPeCKY=;
+	b=Iv5qEgsFeIlK39z6jCZ8QBhaKjREdUZLof6lyp7noqy+zevZk3DLXGSr/49bB3
+	yh9FaNkLGmt8JJ8XOgFPZrbNmF83yNdWwhh57DY1WljnIYV2Hny5ZE+Y8hIGNz5j
+	DFeF9ajnYOp+hJYq/2todgsPSff2sHn0jDyqTXpDfwd1U=
+Received: from localhost (unknown [120.26.85.94])
+	by gzsmtp1 (Coremail) with SMTP id sCgvCgDn_SmL3uRmgAKRBg--.34555S2;
+	Sat, 14 Sep 2024 08:53:31 +0800 (CST)
+Date: Sat, 14 Sep 2024 08:53:30 +0800
+From: Qianqiang Liu <qianqiang.liu@163.com>
+To: davem@davemloft.net
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: lib/mpi - Fix an "Uninitialized scalar variable"
+ issue
+Message-ID: <ZuTeivSjXN_uP-dZ@iZbp1asjb3cy8ks0srf007Z>
+References: <20240913140741.5944-1-qianqiang.liu@163.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-13_11,2024-09-13_02,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 suspectscore=0 phishscore=0
- spamscore=0 malwarescore=0 adultscore=0 mlxscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2408220000
- definitions=main-2409130143
-X-Proofpoint-ORIG-GUID: qD11seGVYcFoJ9CGrRQlvaZVq1RAvV5T
-X-Proofpoint-GUID: qD11seGVYcFoJ9CGrRQlvaZVq1RAvV5T
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240913140741.5944-1-qianqiang.liu@163.com>
+X-CM-TRANSID:sCgvCgDn_SmL3uRmgAKRBg--.34555S2
+X-Coremail-Antispam: 1Uf129KBjvdXoWrKrWrZFy3Aw1DCr18Ww1rZwb_yoW3tFg_WF
+	nYgF40gr18Jr10vr4FkFW2qa1F9F4F9rWrK3WxJry5tasFyrW3WFs7Xr1DXFZ8Cr4IqF43
+	Zr43Aa4akr13AjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IU84CJDUUUUU==
+X-CM-SenderInfo: xtld01pldqwhxolxqiywtou0bp/1tbiRQtaamXAo6DjzAAAs3
 
-Initial bits to bring in Secure Launch functionality. Add Kconfig
-options for compiling in/out the Secure Launch code.
+On Fri, Sep 13, 2024 at 10:07:42PM +0800, Qianqiang Liu wrote:
+> The "err" variable may be returned without an initialized value.
+> 
+> Fixes: 8e3a67f2de87 ("crypto: lib/mpi - Add error checks to extension")
+> Signed-off-by: Qianqiang Liu <qianqiang.liu@163.com>
+> ---
+>  lib/crypto/mpi/mpi-mul.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/lib/crypto/mpi/mpi-mul.c b/lib/crypto/mpi/mpi-mul.c
+> index 892a246216b9..7e6ff1ce3e9b 100644
+> --- a/lib/crypto/mpi/mpi-mul.c
+> +++ b/lib/crypto/mpi/mpi-mul.c
+> @@ -21,7 +21,7 @@ int mpi_mul(MPI w, MPI u, MPI v)
+>  	int usign, vsign, sign_product;
+>  	int assign_wp = 0;
+>  	mpi_ptr_t tmp_limb = NULL;
+> -	int err;
+> +	int err = 0;
+>  
+>  	if (u->nlimbs < v->nlimbs) {
+>  		/* Swap U and V. */
+> -- 
+> 2.34.1
 
-Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
----
- arch/x86/Kconfig | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+Could you please review this patch?
 
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index 007bab9f2a0e..24df5f468fdc 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -2056,6 +2056,17 @@ config EFI_RUNTIME_MAP
- 
- 	  See also Documentation/ABI/testing/sysfs-firmware-efi-runtime-map.
- 
-+config SECURE_LAUNCH
-+	bool "Secure Launch support"
-+	depends on X86_64 && X86_X2APIC && TCG_TPM && CRYPTO_LIB_SHA1 && CRYPTO_LIB_SHA256
-+	help
-+	   The Secure Launch feature allows a kernel to be loaded
-+	   directly through an Intel TXT measured launch. Intel TXT
-+	   establishes a Dynamic Root of Trust for Measurement (DRTM)
-+	   where the CPU measures the kernel image. This feature then
-+	   continues the measurement chain over kernel configuration
-+	   information and init images.
-+
- source "kernel/Kconfig.hz"
- 
- config ARCH_SUPPORTS_KEXEC
 -- 
-2.39.3
+Best,
+Qianqiang Liu
 
