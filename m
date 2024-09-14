@@ -1,73 +1,76 @@
-Received: from mxc.seznam.cz (mxc.seznam.cz [77.75.79.23])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D34B546425
-	for <linux-crypto@vger.kernel.org>; Sat, 14 Sep 2024 12:43:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=77.75.79.23
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD4B64C83
+	for <linux-crypto@vger.kernel.org>; Sat, 14 Sep 2024 13:58:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726317797; cv=none; b=RbrEvZVn+iJ+4OO0qMKO8mMbp4YO0vGFTsMHwhfwOFwIThNztN9VacoScnP0y2uzXSgUHooWkQS8QN49LvShN8spBP8J6A3LIaiJoXxXdy33qxMqGhS1+rHaD0Bg9w2tR4E7/dYih5JX7nTqQHEsBLtQw9uC/OXjkweX2nG1+Oo=
+	t=1726322307; cv=none; b=pWSpdW0BqweZxMmMKzxYj87rXeiPeQSa3IqwC37giPy/aEUTEQnaBbXhruj0ztSCXAwtUyA+D36NV8zA9ErbaxCN8oh/FfhY4zM64XJMHmROcxwFOnEijNUcnEmRxbSeGkpfBcHhLk50PTpfMa6ibb3NgQzE6JYTlhCVb7+O0PQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726317797; c=relaxed/simple;
-	bh=8gDdLYHG/bPQhFBekHGZlHMBrkBrj2F7insIxZX006A=;
-	h=From:To:Cc:Subject:Date:Message-Id:References:In-Reply-To:
-	 Mime-Version:Content-Type; b=kedfPHZCTbdrw4IxogihaZlimoDGJiWsUttNJi1/+uMJReF1/d4cunnj1Qp+VdXsyotJyZmLKZ0ogJ9AVW/dZHiw03+uSGM3+O8mZbtteg6klVRRBAG1zUhPhQo+mCihj3dGlhBn/LR1f5Emg/CTNkgbmJunNikETPMsPVVdl4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=email.cz; spf=pass smtp.mailfrom=email.cz; dkim=pass (2048-bit key) header.d=email.cz header.i=@email.cz header.b=hmPKfbJn; arc=none smtp.client-ip=77.75.79.23
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=email.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=email.cz
+	s=arc-20240116; t=1726322307; c=relaxed/simple;
+	bh=VpK8Dm9AktFl9wlvolpt2HDdajA+d5H76nyTmATw7Jo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZIpEX7Ks7Wy0RJEUGIUTtOyCpC113PHW+KsdAoY4Pj6KGMiSuXkSbRGE8nGaDIErxdO1BfkDAd8Xf19d3t+Odpu2kqaxo3HNzLL02sgTUGioUDniktYJ5RF//FHDqlxycU45zXsL1zfbJMvNnTRX3WqBirVWCW79tl73sT08ex0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=zSNvCV8i; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=email.cz header.i=@email.cz header.b="hmPKfbJn"
-Received: from email.seznam.cz
-	by smtpc-mxc-75d4bf4556-9mrqt
-	(smtpc-mxc-75d4bf4556-9mrqt [2a02:598:128:8a00::1000:99a])
-	id 1ffe80ede10a32471f700ef5;
-	Sat, 14 Sep 2024 14:43:12 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=email.cz;
-	s=szn20221014; t=1726317792;
-	bh=8gDdLYHG/bPQhFBekHGZlHMBrkBrj2F7insIxZX006A=;
-	h=Received:From:To:Cc:Subject:Date:Message-Id:References:
-	 In-Reply-To:Mime-Version:X-Mailer:Content-Type:
-	 Content-Transfer-Encoding;
-	b=hmPKfbJnOAjk5VVxd4w7jvMUWaU3oDmnTY2e/tP9XTm/cEEIOvCjtlGGrkAhLtbSq
-	 cP5404FJxfGP/9CBlzb2O+Oi+mw2r4TQaGCpC1ndmwNnRLJsew6PsQSrI1LvHR9uAG
-	 66lXpnQZfQg+MAZng5xaBb4uHchfxR7KEnu9pAuVOfvtfvQY8P0QK7ulL3y8aWRmqM
-	 3aJXJbCnEvLEc0F7R7P5r00j21K/oS2Ohj+Bf5g7qTBrCeCrcZEFDmvYrz0B5YEtDr
-	 Nzshsdcq+FsU+BLh2tD3aW/KjfmYByG6WCLc1qaeJXabQrwvhAq6zJVSPua2TgfOZn
-	 zF3GDIUMLEz3w==
-Received: from 184-143.ktuo.cz (184-143.ktuo.cz [82.144.143.184])
-	by email.seznam.cz (szn-ebox-5.0.189) with HTTP;
-	Sat, 14 Sep 2024 14:41:23 +0200 (CEST)
-From: "Tomas Paukrt" <tomaspaukrt@email.cz>
-To: "Herbert Xu" <herbert@gondor.apana.org.au>
-Cc: <linux-crypto@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Shawn Guo" <shawnguo@kernel.org>,
-	"Sascha Hauer" <s.hauer@pengutronix.de>,
-	"Pengutronix Kernel Team" <kernel@pengutronix.de>,
-	"Fabio Estevam" <festevam@gmail.com>,
-	<imx@lists.linux.dev>,
-	<linux-arm-kernel@lists.infradead.org>
-Subject: =?utf-8?q?Re=3A_=5BPATCH=5D_crypto=3A_mxs-dcp=3A_Enable_user-spac?=
-	=?utf-8?q?e_access_to_AES_with_hardware-bound_keys?=
-Date: Sat, 14 Sep 2024 14:41:23 +0200 (CEST)
-Message-Id: <26J.ZcYd.2XLMv9N98Uy.1cvOHp@seznam.cz>
-References: <1di.ZclR.6M4clePpGuH.1cv1hD@seznam.cz>
-	<ZuVKtuMqiCu67hn2@gondor.apana.org.au>
-	<24h.ZcXr.7FvRaSxxibG.1cvNHL@seznam.cz>
-	<ZuV1zguLBsBZnGB5@gondor.apana.org.au>
-In-Reply-To: <ZuV1zguLBsBZnGB5@gondor.apana.org.au>
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="zSNvCV8i"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C588FC4CEC0;
+	Sat, 14 Sep 2024 13:58:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1726322307;
+	bh=VpK8Dm9AktFl9wlvolpt2HDdajA+d5H76nyTmATw7Jo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=zSNvCV8inW3gIGfm4pi5VaRdtYxoV85zHyNAk+K/nfK3AzBsqIYDZmPxKeuv7yMpj
+	 ydzL63LPwOa5phiWO1dAKArsxt7ybCMR+3WHCtG/jVFlQunmxmutbGLXsrijoq7b6H
+	 8Pvm/M3M2ZEmNoq6kGhG6kF/pUrftWsjwanVuoR4=
+Date: Sat, 14 Sep 2024 15:58:24 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>,
+	Li Zetao <lizetao1@huawei.com>, davem@davemloft.net,
+	lucas.segarra.fernandez@intel.com, damian.muszynski@intel.com,
+	qat-linux@intel.com, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH -next] crypto: qat - remove redundant null pointer checks
+ in adf_dbgfs_init()
+Message-ID: <2024091453-champion-driveway-f9fe@gregkh>
+References: <20240903144230.2005570-1-lizetao1@huawei.com>
+ <ZuQRqP9CgDp7cuGi@gondor.apana.org.au>
+ <ZuRRxIjK8WMvStJ+@gcabiddu-mobl.ger.corp.intel.com>
+ <ZuVL5buxgkqSEzPU@gondor.apana.org.au>
+ <2024091452-freight-irritant-f160@gregkh>
+ <ZuV2L2WQXSEgcsy6@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (szn-mime-2.1.61)
-X-Mailer: szn-ebox-5.0.189
-Content-Type: text/plain;
-	charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZuV2L2WQXSEgcsy6@gondor.apana.org.au>
 
-> In that case I would suggest introducing a flag so that the key
-> can only be accessed through the keyring subsystem.
+On Sat, Sep 14, 2024 at 07:40:31PM +0800, Herbert Xu wrote:
+> On Sat, Sep 14, 2024 at 10:50:33AM +0200, Greg Kroah-Hartman wrote:
+> >
+> > > I think this is still buggy.  That if statement should be removed
+> > > as otherwise subsequent calls to debugfs_create_file will provide a
+> > > NULL parent dentry instead of an error parent dentry.  This causes
+> > > debugfs to do things differently.
+> > 
+> > debugfs, if something goes wrong, will return a real error, never NULL,
+> > so any return value from a call can be passed back in.
+> 
+> Right, that's why we should remove the if statement so that the
+> error is saved and can then be passed back into the next debugfs
+> call.
+> 
+> With the error-checking if statement there, the error is discarded
+> and the next debugfs call from this driver will simply get a NULL
+> parent dentry.
 
-Do you mean CRYPTO_ALG_KERN_DRIVER_ONLY instead of CRYPTO_ALG_INTERNAL or =
-something else?
+Sorry, but yes, we are in agreement here, sorry, been reviewing a lot of
+these "clean up" fixes that were wrong and got them confused.
+
+thanks,
+
+greg k-h
