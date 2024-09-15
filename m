@@ -1,77 +1,88 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from msa.smtpout.orange.fr (msa-209.smtpout.orange.fr [193.252.23.209])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4929F9FE;
-	Sun, 15 Sep 2024 09:31:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 540AE198A03
+	for <linux-crypto@vger.kernel.org>; Sun, 15 Sep 2024 10:22:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.23.209
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726392695; cv=none; b=NJ8SiDPbAx4JGjtzKHK22igbj2qFhTVsiZl4rh30VeH9yXeh2+ngxBbTPw++//hQFBi3VTqUvT1GJXr0l3vcAhbng9W6PWoCEJwOhudHE1BZiG+jP40ScXX60F9t+l88lOa1hg9L5JdeEBF/+XEgfaV8wdZVR+/Pg3VRePOTJW4=
+	t=1726395752; cv=none; b=DmLfcwZQDSjWyKwMTvibfE/0XDvkW4m9cwHgb+wMj51+NKVeWI1hmpCuYYohcUjQHXbc7WGG9FkN64iHNF9CC6FEwHJQS5IhuqOMQVVicwlm3WJtRDuN79eq6L4VjM3hyaVWtBhxkzwHqCoaYZiR+Fq3fHqAfSPBKwZ2G+opgqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726392695; c=relaxed/simple;
-	bh=yppjmLWuJ3670sLldCSPPm9d/33OxriK4GwJ9hrv0Mg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gmEYSEM1+WmYf9zLkW9L0Ox5MkhQWY7JvPv/pe2Fxboe2zmfrmEiszNiYSmCM+w93QTfvDA+Om/Y720ILK+osyK9HabwVDbyL5dJ8KC4Ia4kgUyVqL83B8Hr8MKxiC1EN2JaQ0lc4cc3oPGRy2g/KPR4cqPgESoSmcYgYdDK7mU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=Z07ZUWCD; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1726395752; c=relaxed/simple;
+	bh=OU121EH3o4oNFUMkKEQJk2Axn51rBYd2m3eyMY5uI+0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Z6CJoJiCbT8Jk3+w8TO7kkHjUNCRIqstBBBsYHYvfNKfVbVZopY+bNo2BuPP1ASqTHi+Dj662mps16OACCNz7zy6n476ivUaY5mpCLB/T6bX9bPI4BeWm1pEqHuTzLpls+fEeMorRV2EOskayorvwnzl4Zfg0ldOItb8dFbvAFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=bmtKmoke; arc=none smtp.client-ip=193.252.23.209
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="Z07ZUWCD"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=+eX5kV2Nmw0M6Y+JlJL5bjBjSaQL+XEI8lPe/DK8+pI=; b=Z07ZUWCDCfjii/QqB/7RFV8L4d
-	VhBsg6Z6+PCpxqn6s917cG7cGWUf9jLOB+DW44IOhBQUHKAshoepC09x8bOw14B82gsUJdtmjarfU
-	JBkSUlsIzyVOljZ9w6kgRwMIicn+hmqVKWsNXeAIlNRUH9bjcn5phETN8MN4leAIcCdchC0LZGXMo
-	CLhyYiZ3suCOE78pufjIuR4BStYbMV9t3V/4GvZF8JLm1rRPEAtF30QFXFg6b+mLdKcA+v3+wOvOQ
-	VQvTtA+eiIjhB56h8SZqJbt9x1ZgayEsM2CN2i85x82L8NSdNpaabs1eu9cCqszBYxm4brY1ni8Qg
-	scfSsbAA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1splRA-002bma-3D;
-	Sun, 15 Sep 2024 17:31:11 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 15 Sep 2024 17:31:10 +0800
-Date: Sun, 15 Sep 2024 17:31:10 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Roberto Sassu <roberto.sassu@huaweicloud.com>, dhowells@redhat.com,
-	dwmw2@infradead.org, davem@davemloft.net,
-	linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org, zohar@linux.ibm.com,
-	linux-integrity@vger.kernel.org, roberto.sassu@huawei.com,
-	linux-security-module@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH v3 00/14] KEYS: Add support for PGP keys and signatures
-Message-ID: <ZuapXswFUxsFxjgH@gondor.apana.org.au>
-References: <ZuPDZL_EIoS60L1a@gondor.apana.org.au>
- <b4a3e55650a9e9f2302cf093e5cc8e739b4ac98f.camel@huaweicloud.com>
- <CAHk-=wiU24MGO7LZ1ZZYpQJr1+CSFG9VnB0Nyy4xZSSc_Zu0rg@mail.gmail.com>
- <ZuaVzQqkwwjbUHSh@gondor.apana.org.au>
- <CAHk-=wgnG+C3fVB+dwZYi_ZEErnd_jFbrkN+xc__om3d=7optQ@mail.gmail.com>
- <ZualreC25wViRHBq@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="bmtKmoke"
+Received: from fedora.home ([90.11.132.44])
+	by smtp.orange.fr with ESMTPA
+	id pmOdsbBSBEyYjpmOds4NCu; Sun, 15 Sep 2024 12:22:26 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1726395746;
+	bh=pf3gB7OINiM24+3hvi+hf8vNJkXkS4txKpVd54g/XEk=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=bmtKmokedW7XLT6H76D4hhh4SycDGMbapwut5bWGn8EZ78Pd2vzVs0WtPBqluEgMj
+	 qMYDbadJ0Imru+KPx3ascteN4xiMHNpg+TlsybVPM9tbyef5lYU9H5vITEDqCaCUCd
+	 5IPQJyHnABNT/yWfyRXgII6W3BAoza05EE7DnStniJ0nHG0km/oSIxcnH1v6nRQAWE
+	 Z6Zg2glkYjswINBbeRTzfsPPpWe1pFHQJB1kc/aQIx37ELhsDVV/Lk8YBiwnvmowhQ
+	 7O1fKecDUXjZyrUqVbJblBCdO5cVH2RIBql0UWHGa86GDfAUnTWh2Qfv6H5YsmXfd/
+	 Q1/kSdUbexPnA==
+X-ME-Helo: fedora.home
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Sun, 15 Sep 2024 12:22:26 +0200
+X-ME-IP: 90.11.132.44
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+To: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+	Pankaj Gupta <pankaj.gupta@nxp.com>,
+	Gaurav Jain <gaurav.jain@nxp.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Andrey Smirnov <andrew.smirnov@gmail.com>
+Cc: linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	linux-crypto@vger.kernel.org
+Subject: [PATCH 1/2] crypto: caam: Fix the pointer passed to caam_qi_shutdown()
+Date: Sun, 15 Sep 2024 12:22:12 +0200
+Message-ID: <c76ff86fe3ec40776646f4e5ebd5f0900ca48b37.1726395689.git.christophe.jaillet@wanadoo.fr>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZualreC25wViRHBq@gondor.apana.org.au>
+Content-Transfer-Encoding: 8bit
 
-On Sun, Sep 15, 2024 at 05:15:25PM +0800, Herbert Xu wrote:
->
-> Roberto, correct me if I'm wrong but your intended use case is
-> the following patch series, right?
+The type of the last parameter given to devm_add_action_or_reset() is
+"struct caam_drv_private *", but in caam_qi_shutdown(), it is casted to
+"struct device *".
 
-Actually the meat of the changes is in the following series:
+Pass the correct parameter to devm_add_action_or_reset() so that the
+resources are released as expected.
 
-https://lore.kernel.org/linux-integrity/20240905150543.3766895-1-roberto.sassu@huaweicloud.com/
+Fixes: f414de2e2fff ("crypto: caam - use devres to de-initialize QI")
+Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+---
+This patch is speculative review with care.
+---
+ drivers/crypto/caam/qi.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Cheers,
+diff --git a/drivers/crypto/caam/qi.c b/drivers/crypto/caam/qi.c
+index f6111ee9ed34..8ed2bb01a619 100644
+--- a/drivers/crypto/caam/qi.c
++++ b/drivers/crypto/caam/qi.c
+@@ -794,7 +794,7 @@ int caam_qi_init(struct platform_device *caam_pdev)
+ 
+ 	caam_debugfs_qi_init(ctrlpriv);
+ 
+-	err = devm_add_action_or_reset(qidev, caam_qi_shutdown, ctrlpriv);
++	err = devm_add_action_or_reset(qidev, caam_qi_shutdown, qidev);
+ 	if (err)
+ 		goto fail2;
+ 
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.46.0
+
