@@ -1,125 +1,113 @@
-Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 851C6200DE;
-	Sun, 15 Sep 2024 06:08:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.248
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19C3E1CF93
+	for <linux-crypto@vger.kernel.org>; Sun, 15 Sep 2024 07:11:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726380505; cv=none; b=nZjMJZcsOe6QtWyPJgotNO03opgEyRkL4zDYonO74b3wdGCtEQRHMMeQEAOf88B463aA2Zznh0VJMFSDCcwoZ3gBbVfr5ub3AYPGDPMlhBGOnmWH8/BvEUfqIvvecJNmnfrStZSt568Cmn3OIz54HVNDHhRrfsw1FdVasHf75T4=
+	t=1726384287; cv=none; b=P1DmLVsZHmrieyeZ1qaYuRo8pgNQOSvBXaZHDOdBTiKaE8dpySUdtC1DTZ6kw5NZz/pY6GHNcg8cb0HO8bVaxYGnR7BmrWO5FLmpPOlVNybRDAEX8gC1rDocTh/96TNhALlYssgJ0j8AcF9rmXjxbRA5ZMSuHmrZ6sAOpz9bxyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726380505; c=relaxed/simple;
-	bh=L3eJl6CdvysS8D+2/c8wFT9mytYLO1s6eBj3mjV8OjQ=;
-	h=From:To:CC:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=K/o2jnc1RQ5XV9ieZlJI8VilIGi0vFtxmEKipZfK84A5qcppK9ajtD3sfke6EDsKS7IDmcfLush7etwwu1duGTsKRl8TCugVZQggsssQr2+ZRIDgx+lrboJmhCv7Ubvt7CCsD/BLh6+momepLd1pp3KMagvo3wGbPf/qljQZ7As=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=R+xzG2YJ; arc=none smtp.client-ip=198.47.23.248
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+	s=arc-20240116; t=1726384287; c=relaxed/simple;
+	bh=xjWojUc1mLB5ktKYpFXYU5sO8vFqeC4TxRTtvNAcNTk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GOt2XmaLd+bUPT4lH4h+d9IjJ+299zhUK4sLltaOdXJ5tkKc7efB8/p8Vl8vwVR9+g1wJYbaWLtZQQtxlK6HY0o+MLp6HfS+S4LDOqCHW57dkFuVrgCQ3V/9z4SjlIP8BoZRlKjUAh1SLtnHUuMwT5vvxGIQziwMYEXCEYVft9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=g7MfO1ZT; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="R+xzG2YJ"
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 48F67bol080272;
-	Sun, 15 Sep 2024 01:07:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1726380457;
-	bh=6R4bT4eG+pR13vlD+1lb47ZNgfISERBM6UKaIOkTBQ8=;
-	h=From:To:CC:Subject:In-Reply-To:References:Date;
-	b=R+xzG2YJQndSEIKqNk3CDItHvOpmLqJwxfZPPp9/2IYsRgKG45vAJhe2iI/fY1WzU
-	 ldddRPjr2ogRkRtAjrvsN4+AI/l/7a5dHoEJV55BMDcZipUd7dH93lyIzAgBIMqP8b
-	 Yt2/mSX6+2i8tf7HXiNblUOjJsJIFdklMZmIA9oc=
-Received: from DFLE104.ent.ti.com (dfle104.ent.ti.com [10.64.6.25])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 48F67b6q020473
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Sun, 15 Sep 2024 01:07:37 -0500
-Received: from flwvowa01.ent.ti.com (10.64.41.90) by DFLE104.ent.ti.com
- (10.64.6.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Sun, 15
- Sep 2024 01:07:37 -0500
-Received: from DFLE102.ent.ti.com (10.64.6.23) by flwvowa01.ent.ti.com
- (10.64.41.90) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.2507.34; Sun, 15 Sep
- 2024 01:07:37 -0500
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE102.ent.ti.com
- (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Sun, 15 Sep 2024 01:07:37 -0500
-Received: from localhost (kamlesh.dhcp.ti.com [172.24.227.123])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 48F67a7E048692;
-	Sun, 15 Sep 2024 01:07:36 -0500
-From: Kamlesh Gurudasani <kamlesh@ti.com>
-To: Danny Tsen <dtsen@linux.ibm.com>, <linux-crypto@vger.kernel.org>
-CC: <herbert@gondor.apana.org.au>, <leitao@debian.org>, <nayna@linux.ibm.com>,
-        <appro@cryptogams.org>, <linux-kernel@vger.kernel.org>,
-        <linuxppc-dev@lists.ozlabs.org>, <ltcgcw@linux.vnet.ibm.com>,
-        <dtsen@us.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH 1/1] crypto: Fix data mismatch over ipsec tunnel
- encrypted/decrypted with ppc64le AES/GCM module.
-In-Reply-To: <83a1ce2f-c633-42cb-92c6-2477cd2e47f2@linux.ibm.com>
-References: <20240912174537.1409567-1-dtsen@linux.ibm.com>
- <87seu4qmv6.fsf@mail.lhotse>
- <875xr0m5ss.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
- <83a1ce2f-c633-42cb-92c6-2477cd2e47f2@linux.ibm.com>
-Date: Sun, 15 Sep 2024 11:37:35 +0530
-Message-ID: <8734m1mouw.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="g7MfO1ZT"
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a9018103214so481314166b.3
+        for <linux-crypto@vger.kernel.org>; Sun, 15 Sep 2024 00:11:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1726384284; x=1726989084; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Yc55qxpiIVFj7PWD1KIvBrEfXf3cIQSNj9lFEjAYl9E=;
+        b=g7MfO1ZTCqtEcsI2uxXwQYB41trv/aYnxKEeu/ZUWPq9H1MbiarpVfCXhjRQ4/cdfr
+         a70CAIBqKCYm/2/woaPgbGTv3FMv6GVEpbrAcXvkH/UWoTmjiF8xWaSWZYYtoxxy9IPj
+         h0R1zuhcy2MZg3z2EFD1uLOkeOSKPEOtpIBa8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726384284; x=1726989084;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Yc55qxpiIVFj7PWD1KIvBrEfXf3cIQSNj9lFEjAYl9E=;
+        b=vq0KovkfJPKCe1WIgEhs+26inDTdS+XJvjug4iIIf7TT+IS/onqs9Cu+SmYFbbiLjB
+         xgHpaWspkH7sFvGeit6XxMRqDoDOsNW6pYuBmvxRbv7b+yJthrkbDus7RI4yg1fa5aWm
+         K461j1NF0zx20K0ZzNCkNydxS0IoGbw85lxbwptJon0AKbXHkqJlTSBcadymVC5oQoM5
+         wDf+EyX3p+uH/uMM+bRuBHveGwIhB0aIb5BqbNTPp/PpQDG/YsfnTu1Q0MNc6X4mZs+o
+         iT6GYrbAXxjzkCC8fl7OGjniW7cNS909BeSjanOaHLDOWUgGMTce3FQ4yWu4KNO53BmW
+         QPUw==
+X-Forwarded-Encrypted: i=1; AJvYcCXc9De1CTqqbgLKbAg2ZFGyeOQgVQsauHxHuhd3XS8zl2d/p2cd9UoqWWhZNZNOGoc5Tda6iND7XE87n3Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxfVTf7YnbNtoyOwOSB5hZK8vGrCswCFLRG7LTiiicQeKdl+cjJ
+	iRAghq3UYNTETydpR/iV+Wb3l3nIMYTcY1v2YzVa++WlV6aklUesUJYcCfmpz53Ij48LjCyssI+
+	LdqytXA==
+X-Google-Smtp-Source: AGHT+IFw3nfYF26K5GAlbscuvYBbTRdHz+04d6OFW8a/lXTqVCtAsYmnEPIBOC48k4Nji4mbURHgag==
+X-Received: by 2002:a17:907:d5a1:b0:a8a:715d:8739 with SMTP id a640c23a62f3a-a902964cf9fmr1015941366b.53.1726384283949;
+        Sun, 15 Sep 2024 00:11:23 -0700 (PDT)
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com. [209.85.208.51])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c42bb5ee43sm1359813a12.50.2024.09.15.00.11.21
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 15 Sep 2024 00:11:23 -0700 (PDT)
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5c42bda005eso1281960a12.0
+        for <linux-crypto@vger.kernel.org>; Sun, 15 Sep 2024 00:11:21 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUUlxZRGcBerP1sPHc7wx2OZ8DjHUZiNHlmTTrZGzAyva0RIzISadS3Cw90g7o60n1ilasWzdhY8pvbO1Q=@vger.kernel.org
+X-Received: by 2002:a05:6402:5193:b0:5c2:7002:7cf8 with SMTP id
+ 4fb4d7f45d1cf-5c413e1f43bmr8669748a12.17.1726384281208; Sun, 15 Sep 2024
+ 00:11:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+References: <ZuPDZL_EIoS60L1a@gondor.apana.org.au> <b4a3e55650a9e9f2302cf093e5cc8e739b4ac98f.camel@huaweicloud.com>
+In-Reply-To: <b4a3e55650a9e9f2302cf093e5cc8e739b4ac98f.camel@huaweicloud.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Sun, 15 Sep 2024 09:11:04 +0200
+X-Gmail-Original-Message-ID: <CAHk-=wiU24MGO7LZ1ZZYpQJr1+CSFG9VnB0Nyy4xZSSc_Zu0rg@mail.gmail.com>
+Message-ID: <CAHk-=wiU24MGO7LZ1ZZYpQJr1+CSFG9VnB0Nyy4xZSSc_Zu0rg@mail.gmail.com>
+Subject: Re: [PATCH v3 00/14] KEYS: Add support for PGP keys and signatures
+To: Roberto Sassu <roberto.sassu@huaweicloud.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, dhowells@redhat.com, dwmw2@infradead.org, 
+	davem@davemloft.net, linux-kernel@vger.kernel.org, keyrings@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, zohar@linux.ibm.com, 
+	linux-integrity@vger.kernel.org, roberto.sassu@huawei.com, 
+	linux-security-module@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Danny Tsen <dtsen@linux.ibm.com> writes:
-
-> Yes, checkpath was run.
-
-As you're splitting the patches anyways, this may not be
-needed anymore, but below is guideline for subject line.
-
-https://docs.kernel.org/process/submitting-patches.html
-
-"For these reasons, the summary must be no more than 70-75 characters,
-and it must describe both what the patch changes, as well as why the
-patch might be necessary.
-It is challenging to be both succinct and descriptive, but that is what
-a well-written summary should do."
-
-I guess check patch is not checking that.
-
-Also avoid top posting,
-
-Read "Use trimmed interleaved replies in email discussions" from above
-document.
-
-Kamlesh
-
+On Fri, 13 Sept 2024 at 10:30, Roberto Sassu
+<roberto.sassu@huaweicloud.com> wrote:
 >
-> Not sure what you mean by "some indentation changes.(This can't go with 
-> fixes patch, will just add the noise)"
+> On Fri, 2024-09-13 at 12:45 +0800, Herbert Xu wrote:
+> >
+> > Does this address Linus's objections? If not then we cannot proceed.
 >
-> Thanks.
->
-...
->>> As this is a bug fix it should have a Fixes: tag, and probably a stable
->>> Cc as well.
->>>
->>> But that diffstat is really large for a bug fix. Is there no way to fix
->>> the issue in a smaller patch? Even if that is just disabling the feature
->>> until it can be fixed in subsequent commits?
->>>
->>> cheers
->> The commit message says "The fix is to register algs as SIMD modules"
->>
->> and
->>
->> "A new module rfc4106(gcm(aes)) is also added."
->>
->> and I also see some indentation changes.(This can't go with fixes patch,
->> will just add the noise)
->>
->> Would suggest to break the patch in three.
->>
->> I see a big subject line, have you ran the checkpatch?
->>
->> Kamlesh
->>
+> I hope to get an answer from him.
+
+So honestly, just the series adding pgp key verification I have no
+objection to. The use case where some firmware uses pgp to validate
+allowed keys in EFI variables etc sounds like a "ok, then we need to
+parse them".
+
+The objections I had were against the whole "start doing policy in
+kernel", with what sounded like actually parsing and unpacking rpm
+contents and verifying them with a pgp key. *That* still sounds like a
+disaster to me, and is the part that made me go "why isn't that done
+in user space together with then generating the fsverifty
+information"?
+
+The argument that the kernel is the only part of the system you trust
+is bogus. The kernel does nothing on its own (apart from device
+enumeration etc of course), so if you have no trustworthy user space,
+then you might as well just give up entirely. At a *minimum* you have
+initrd, and that can then be the start of a chain of user space trust.
+
+Parsing rpm files in the kernel really sounds horrendous. But that
+doesn't mean that I hate *this* series that just adds pgp key handling
+in case there are other valid uses for it.
+
+But maybe I misunderstood the original suggestion from Roberto.
+
+              Linus
