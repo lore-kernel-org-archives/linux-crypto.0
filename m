@@ -1,96 +1,116 @@
-Received: from smtp.smtpout.orange.fr (smtp-14.smtpout.orange.fr [80.12.242.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout11.his.huawei.com (frasgout11.his.huawei.com [14.137.139.23])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9189A1C3F34
-	for <linux-crypto@vger.kernel.org>; Sun, 15 Sep 2024 10:22:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3756D184E;
+	Sun, 15 Sep 2024 10:52:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=14.137.139.23
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726395760; cv=none; b=VunJkNQNt+Lk4mCicER2AmaZK3CMIPXDOPu2jFWDUEs7PUkdZYvU6MpkwotaGs3Lc3KoTgV4XvWEms685cYuN/2zCipgFt+6L/U5JPUzAeewXudwvrQNO71V4/kk7HF6cAQMsFoi/dowOZZhz3OvQ532ksVUBsqGzSekowdeOtY=
+	t=1726397530; cv=none; b=uN2txjkaqps+WOhsUmvaoeVhQOoC7NHYneDi24ZKi1mbiwlftVCjX2fJ1VY+MJt6YTJ4cczQ6X/HCdPKdzwxt2QRbAfndfNNbN1N8VoeVyOB958URa//fomcPYiEdrCC6rCP5PzFzwHGQWsHLt7chXt4Bdnv0HR005HG5qD+TP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726395760; c=relaxed/simple;
-	bh=S74zkBCTJVoMvfgdF3C8kbmEEtlOZke6fPgWm/7apxA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fZj+PuU9LAJ3au0eWgmeBygGpJrKnnXIoeXrPS0tOqIZQm3W41UFVr03kR9WblWfLT0KGstbF05tGeC6+3PC5vNA2O84pW3I/sYhOOSKVIwQC2QUB/DgJpQkU40CsKdI4ViuKXEO9MH+jFUoEaI9UC59Z1c7zEnLMi/kxwSgMMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=bYwi5Jui; arc=none smtp.client-ip=80.12.242.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="bYwi5Jui"
-Received: from fedora.home ([90.11.132.44])
-	by smtp.orange.fr with ESMTPA
-	id pmOdsbBSBEyYjpmOjs4NDf; Sun, 15 Sep 2024 12:22:30 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1726395750;
-	bh=QJU9nstI/6k1pq+QgbDB9umkGIEs7lvcbyaDAjb6GFA=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=bYwi5JuiVnX7Uxf1k9AANeU5InksWPESh2I3OXVqhDQUe5fcHmS9qtJwoSmHO3sSc
-	 kmCxh15yDntdRBLPrwFRvMUOYToMPXvFEWl/3ZfyMRE0jxuCRyaQ7FO6n6XxXHJXKF
-	 QjdXZiAID4h9ezA65mr0kWaLV6ITSJW4fn7Sjlu0Edw4gPI/ArUfihjmkorK5viseV
-	 x7aOXTkeRoL5GNdLjWggDjmaRO10bKWOAcHnDq/9Tqou7gu7vlHvZxsRssP2XgHVpN
-	 ZLHr5L3iQ5gjYtmU3n8jHDU0QA5VekHoLj5XNG7nQyx7YSulBntSMO4WsMzL57Hb+1
-	 upMZTpu5q6TEw==
-X-ME-Helo: fedora.home
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Sun, 15 Sep 2024 12:22:30 +0200
-X-ME-IP: 90.11.132.44
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-	Pankaj Gupta <pankaj.gupta@nxp.com>,
-	Gaurav Jain <gaurav.jain@nxp.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	linux-crypto@vger.kernel.org
-Subject: [PATCH 2/2] crypto: caam: Slightly simplify platform_device()
-Date: Sun, 15 Sep 2024 12:22:13 +0200
-Message-ID: <27c5e9ef2c4b1d40470e4ea41988840e5d12926c.1726395689.git.christophe.jaillet@wanadoo.fr>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <c76ff86fe3ec40776646f4e5ebd5f0900ca48b37.1726395689.git.christophe.jaillet@wanadoo.fr>
-References: <c76ff86fe3ec40776646f4e5ebd5f0900ca48b37.1726395689.git.christophe.jaillet@wanadoo.fr>
+	s=arc-20240116; t=1726397530; c=relaxed/simple;
+	bh=nTZPj6uwDfR1desg7EOtuQJmR6Ust8e7oYW8MzabxJQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jzfuebfHmBF6C+oiKdEpN+pawumEZwWITJVWV6CoVm/SglgyW0nbuEpCejqBglPz3mGJlkCRBJGDWpdTEoEcDymzSSIS26nCosKRZDysdZlxfWnVrzKz8OExqvB4gSlc6AkCxUhhViC+1Fc72FCZfraOJlNivUGtnyJyCtGT6lg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=14.137.139.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.18.186.29])
+	by frasgout11.his.huawei.com (SkyGuard) with ESMTP id 4X649h3KNzz9v7Hm;
+	Sun, 15 Sep 2024 18:32:24 +0800 (CST)
+Received: from mail02.huawei.com (unknown [7.182.16.27])
+	by mail.maildlp.com (Postfix) with ESMTP id 83D44140413;
+	Sun, 15 Sep 2024 18:51:53 +0800 (CST)
+Received: from [10.81.210.187] (unknown [10.81.210.187])
+	by APP2 (Coremail) with SMTP id GxC2BwCX+clAvOZmO134AA--.24823S2;
+	Sun, 15 Sep 2024 11:51:53 +0100 (CET)
+Message-ID: <85f25b5f-cbf0-4032-9502-5fa0f7d07849@huaweicloud.com>
+Date: Sun, 15 Sep 2024 12:51:39 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 00/14] KEYS: Add support for PGP keys and signatures
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, dhowells@redhat.com,
+ dwmw2@infradead.org, davem@davemloft.net, linux-kernel@vger.kernel.org,
+ keyrings@vger.kernel.org, linux-crypto@vger.kernel.org, zohar@linux.ibm.com,
+ linux-integrity@vger.kernel.org, roberto.sassu@huawei.com,
+ linux-security-module@vger.kernel.org
+References: <ZuPDZL_EIoS60L1a@gondor.apana.org.au>
+ <b4a3e55650a9e9f2302cf093e5cc8e739b4ac98f.camel@huaweicloud.com>
+ <CAHk-=wiU24MGO7LZ1ZZYpQJr1+CSFG9VnB0Nyy4xZSSc_Zu0rg@mail.gmail.com>
+Content-Language: en-US
+From: Roberto Sassu <roberto.sassu@huaweicloud.com>
+In-Reply-To: <CAHk-=wiU24MGO7LZ1ZZYpQJr1+CSFG9VnB0Nyy4xZSSc_Zu0rg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:GxC2BwCX+clAvOZmO134AA--.24823S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7AF1Uur48AFy7Cr1rXFWDJwb_yoW8trykpF
+	Z5W3yDC3WkXF97CwnrKw47uw1F9ws3Ja15GF9xJ3s8A3W5Krn2kw12qr47Xa4qkws7CF12
+	vrW5tryj93Z8ZaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxV
+	AFwI0_Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AF
+	wI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
+	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
+	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
+	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUF1
+	v3UUUUU
+X-CM-SenderInfo: purev21wro2thvvxqx5xdzvxpfor3voofrz/1tbiAQAHBGbmQnQBnQAAso
 
-'ctrldev' and 'qidev' are the same.
-Remove the former to slightly simplify the code.
+On 9/15/2024 9:11 AM, Linus Torvalds wrote:
+> On Fri, 13 Sept 2024 at 10:30, Roberto Sassu
 
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
----
-This is a follow up to commit 6b175685b4a1 ("crypto: caam/qi - don't
-allocate an extra platform device")
----
- drivers/crypto/caam/qi.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+[...]
 
-diff --git a/drivers/crypto/caam/qi.c b/drivers/crypto/caam/qi.c
-index 8ed2bb01a619..7701d00bcb3a 100644
---- a/drivers/crypto/caam/qi.c
-+++ b/drivers/crypto/caam/qi.c
-@@ -733,7 +733,7 @@ static void free_caam_qi_pcpu_netdev(const cpumask_t *cpus)
- int caam_qi_init(struct platform_device *caam_pdev)
- {
- 	int err, i;
--	struct device *ctrldev = &caam_pdev->dev, *qidev;
-+	struct device *qidev = &caam_pdev->dev;
- 	struct caam_drv_private *ctrlpriv;
- 	const cpumask_t *cpus = qman_affine_cpus();
- 	cpumask_var_t clean_mask;
-@@ -742,8 +742,7 @@ int caam_qi_init(struct platform_device *caam_pdev)
- 	if (!zalloc_cpumask_var(&clean_mask, GFP_KERNEL))
- 		goto fail_cpumask;
- 
--	ctrlpriv = dev_get_drvdata(ctrldev);
--	qidev = ctrldev;
-+	ctrlpriv = dev_get_drvdata(qidev);
- 
- 	/* Initialize the congestion detection */
- 	err = init_cgr(qidev);
--- 
-2.46.0
+> The objections I had were against the whole "start doing policy in
+> kernel", with what sounded like actually parsing and unpacking rpm
+> contents and verifying them with a pgp key. *That* still sounds like a
+> disaster to me, and is the part that made me go "why isn't that done
+> in user space together with then generating the fsverifty
+> information"?
+
+In my opinion, trusting root in this situation is not ideal. Trusting 
+root means trusting all applications that root can run, that they will 
+verify PGP signatures of fsverity digests with Linux distribution keys. 
+In order to trust them, we would need to check the integrity of all 
+those applications, in particular file read and IPC with the rest of the 
+system.
+
+A safer way to achieve the same goal is to let the kernel verify PGP 
+signatures, assuming that the kernel is more privileged and cannot be 
+tampered by root (for example, by using the 'lockdown' LSM). Since the 
+PGP keys of the Linux distribution would be embedded in the kernel image 
+(or certified by the embedded ones), trusting the system would require 
+only to verify the kernel image itself (for example, with the boot loader).
+
+Kernel-based policy enforcement is currently adopted by other LSMs, such 
+as SELinux. SELinux also parses and enforces a policy sent from user 
+space in the kernel. This does not mean that the policy itself is in the 
+kernel, but that the kernel is the only component in the position of 
+enforcing the policy without trusting all applications that root can run.
+
+Roberto
+
+> The argument that the kernel is the only part of the system you trust
+> is bogus. The kernel does nothing on its own (apart from device
+> enumeration etc of course), so if you have no trustworthy user space,
+> then you might as well just give up entirely. At a *minimum* you have
+> initrd, and that can then be the start of a chain of user space trust.
+> 
+> Parsing rpm files in the kernel really sounds horrendous. But that
+> doesn't mean that I hate *this* series that just adds pgp key handling
+> in case there are other valid uses for it.
+> 
+> But maybe I misunderstood the original suggestion from Roberto.
+> 
+>                Linus
 
