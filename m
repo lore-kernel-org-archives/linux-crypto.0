@@ -1,121 +1,128 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f52.google.com (mail-vs1-f52.google.com [209.85.217.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEDC514AA9;
-	Mon, 16 Sep 2024 05:13:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 721111F5F6;
+	Mon, 16 Sep 2024 06:16:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726463584; cv=none; b=T/5vYMPTFEMrFVy3K4ldyH/1alvEey2fIrkvOZoDP6YLJGLCPDq2+XIor0xjFA5rvwYbK23g1UmkyESqP4AtOGajtvSlD73VJCqcf53dqSJGntEcoIbWcJuhdfrzlGgATAnN2yLY1Q2+y14T9UvHcTX5FQvknCSmIFW1gTtOWpo=
+	t=1726467394; cv=none; b=G/PaxMD1LxMDuVfZK6tQ2vIN4S3gC6VSYun7f1gvVe24D2PJaPK51TedwsvV3ym2j9ttb0ZQ1MDVTGZWUcF5tbvu+PHpwGbt1bYy47qup/n1MT2Oxhx4S4EtupHwj0mhXjZFzcI2lhA4BJpu9uYos04cB3BW+NgaOky26NcMdjo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726463584; c=relaxed/simple;
-	bh=gnp0mpQBbM6SMN7JZQ2MMuhgpM4lmrntx89qvrqHR0k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=QagGxE3FyziHkt6XdeiVz9yIdCdrWSlcccxfUCzk93I5DJUssIWLwav08XxbVWrqd1mmFx7Ak42ApI55VLS6E4b1ZlxLXW+C3jdwgPbPxMT9108SviAlMyUtKG9RXfIo81ivA3C2FNB00tu5T0Wv44RpE7HF76He1Xex/x28FKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=lJgXMiUC; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1726467394; c=relaxed/simple;
+	bh=aTB/qw9kD2XFLPT5/Fkbc2KOQyfZHYVKWvGk08K+AgI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VC/Jqm4xBQuTwG9VkoP3uMEDzy/Dnro7FvglKLkXnorfouHJ/U1Iz8TfeJApf1utEa5qqPd/poahzklDrh6vyaZaUTzmbkxbhxxK1r/4j5rtjtnW0teeZcFVVl46yA4uCH2xVlDdwmOVbQcCqApJzEA2hzqRWil8BuaImbNBiDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l2Gjd1Jy; arc=none smtp.client-ip=209.85.217.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="lJgXMiUC"
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48FNsxUG028424;
-	Mon, 16 Sep 2024 05:07:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	CAAcZuecdfzQYLqNroZXOBVabLrdH0t/pE3SxzUSCNg=; b=lJgXMiUCGB+NpR60
-	3i84/PZLaKL9OVzYnzAmuFu0ZKeGzxyk69kEbtWq43G1P/0oAJGew5N5pHL954qR
-	XVqCFDi4u41SxTg2etiLc+5AXS0tGiDf3WVUwXGYGFzpn4FTd9LTVoH6gSkxPMwa
-	ZD5t/zGHsLwTW+FsRNDQfsdrPskSImfWMrWggiL9d9szilU48MRIJZZf8l2SU6/N
-	TxR/G0YERiT6wNyqt4ia3q6rsbojrxWB4b81sBFStoAgY5G9INRttMBQlk6yV1BA
-	9PHm3Vg39ofLYCYzysZnCfctgn1Jcw5P85PzfhKUeo0iCUaYYASoTW5kLnWWrtAc
-	lCQISg==
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 41n4hfau96-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 16 Sep 2024 05:07:47 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 48G57kP2030707
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 16 Sep 2024 05:07:46 GMT
-Received: from [10.226.59.182] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Sun, 15 Sep
- 2024 22:07:46 -0700
-Message-ID: <da23b318-1d65-c001-1dc2-8ba66abe9d6f@quicinc.com>
-Date: Sun, 15 Sep 2024 23:07:44 -0600
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l2Gjd1Jy"
+Received: by mail-vs1-f52.google.com with SMTP id ada2fe7eead31-49bbbebc26dso1331329137.0;
+        Sun, 15 Sep 2024 23:16:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726467392; x=1727072192; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=X/pWnXCVlNoJ6VkECBnDb2dCNBxxBagSxuCXe+0vj/U=;
+        b=l2Gjd1JyEitRZ1w3nwVvpm085GHlb4BEL5hwUGyNAzK6iv8gd3iulFO1EhLcyElYqA
+         LAztGfJ/I3T7Ksjf988EwHaGpg8Es8L7UnEK/larYb9Q9RiI205Hi4ZPYU0sKKtZXjCr
+         9ZlYuynTC+9aasO9GFhxWjjtbsxNimdEEfkJ5ZE+v47YmUfOWx/lL8H21q7wp2upAFj+
+         NUKVrHXn4+mHAPKvZmUxNvQGSD4vdG6+6HkJRNMGl00FCPNId5xozcYmgPk+PbimPcIy
+         In+7eI4lGwpSIrsWTtLYO4+9EgqcgeIGsrl4plR5qJJltfRhMAY4we+NhH+y+mnPS8My
+         ThKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726467392; x=1727072192;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=X/pWnXCVlNoJ6VkECBnDb2dCNBxxBagSxuCXe+0vj/U=;
+        b=lF3i80YcKj92ES3fa2bGZmnjDbVkufvu1Ge360zpF2qhQLEOsbYvtuQgg9Ygo9fYgI
+         iPwJ7IS4CjKopwkwWP0tffqJYeE1zXyNX8Anq0x6Kub1J2YSOMIuoQWV1xs+ErE6XPRT
+         uDz51mOFxjUJD3Vx7hmqvnxR2EDj6rfO9+yKImxBSdem0EuJoRTviJ5bhTO7Cr5MEpbC
+         MuQNG1IcUZHuPs/rC2xP47FJ9dEQYS9W9h6x8Mxe8JZJO7R2wSCcT+AOYHiQyB15tEnu
+         kO48rGUZik4A5mt0i3xP6HDT1jxZgryaoSBUwZP4J+dAM2PHAggFCUwZxwiyh1an4piG
+         zViA==
+X-Forwarded-Encrypted: i=1; AJvYcCUVoJrxbnEXT8ARzagG+CFUZHSqMzGFo0a9czG4w6WJwe5vKHE1HOkkVKqBwfypFbkxet13y8uZ8Q4KY0/j@vger.kernel.org, AJvYcCVHHey3ndOAW7GmSVLZikNINEfn9/7M2umhRHuZk+1G602iWKg8QEGZedhue9p++VDVd3lWC/6wOoVRnWQX@vger.kernel.org, AJvYcCXUnEuLiMBYhoN8J24tYQc19j+h/b/vbNnXpLZ6AnkiBCvNOKIdguW33/3f2nG3A8UYCOhkAf+PolE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+yzTnHakuFIxGDu5DJ06c5bIbQbNaiEKecDzJSif6uAeKKlRf
+	xe4GENCqS2NnjweyVSIXoYRKJNw3xaiQlsbk0u9Al5vZxwWnEt1PmZZ+9J90gjr2YLcWN5xRpXh
+	Wm32MWx10dnwzcV7WAXX0GdYqrzw=
+X-Google-Smtp-Source: AGHT+IHuDb4AshHoNGEtNLYb9Aqw/hI5Qvqs88n6Gf2duV4ShPpQUJ+XqeS6TANXDbbWCyu71nmrOqVR6aM2RpwtFvg=
+X-Received: by 2002:a05:6102:ccf:b0:48f:db3d:593e with SMTP id
+ ada2fe7eead31-49d41513e1fmr10472930137.14.1726467392099; Sun, 15 Sep 2024
+ 23:16:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.0
-Subject: Re: qcom-rng is broken for acpi
-Content-Language: en-US
-To: Brian Masney <bmasney@redhat.com>
-CC: =?UTF-8?Q?Ernesto_A=2e_Fern=c3=a1ndez?= <ernesto.mnd.fernandez@gmail.com>,
-        Trilok Soni <quic_tsoni@quicinc.com>, <linux-crypto@vger.kernel.org>,
-        "Herbert Xu" <herbert@gondor.apana.org.au>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        <linux-arm-msm@vger.kernel.org>,
-        Om Prakash Singh
-	<quic_omprsing@quicinc.com>
-References: <20240828184019.GA21181@eaf>
- <a8914563-d158-4141-b022-340081062440@quicinc.com>
- <20240828201313.GA26138@eaf>
- <CABx5tq+ZFpTDdjV7R5HSEFyNoR5VUYDHm89JEHvKb-9TW6Oejw@mail.gmail.com>
- <f6075361-1766-35a5-c7ac-cc3eb416a4e1@quicinc.com>
- <CABx5tqJomV_Su2NmyBBgipOiiby5sF7LAo_kdvhYT6oNYwVpVA@mail.gmail.com>
-From: Jeffrey Hugo <quic_jhugo@quicinc.com>
-In-Reply-To: <CABx5tqJomV_Su2NmyBBgipOiiby5sF7LAo_kdvhYT6oNYwVpVA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: OwG_ZnzRy1hofcxENBlNh5A__DhprHuA
-X-Proofpoint-ORIG-GUID: OwG_ZnzRy1hofcxENBlNh5A__DhprHuA
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- clxscore=1011 phishscore=0 malwarescore=0 mlxlogscore=494 mlxscore=0
- impostorscore=0 adultscore=0 suspectscore=0 lowpriorityscore=0 spamscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2408220000 definitions=main-2409160030
+References: <cover.1714581792.git.andre.glover@linux.intel.com> <8fe04e86f0907588d210885ac91965960f97f450.1714581792.git.andre.glover@linux.intel.com>
+In-Reply-To: <8fe04e86f0907588d210885ac91965960f97f450.1714581792.git.andre.glover@linux.intel.com>
+From: Barry Song <21cnbao@gmail.com>
+Date: Mon, 16 Sep 2024 14:16:20 +0800
+Message-ID: <CAGsJ_4xREUbRWRZEO8EiEBdP9YN0Wip4_p58Cca=B4ZdPb7Mpg@mail.gmail.com>
+Subject: Re: [RFC PATCH 2/3] crypto: add by_n attribute to acomp_req
+To: Andre Glover <andre.glover@linux.intel.com>
+Cc: tom.zanussi@linux.intel.com, minchan@kernel.org, senozhatsky@chromium.org, 
+	hannes@cmpxchg.org, yosryahmed@google.com, nphamcs@gmail.com, 
+	chengming.zhou@linux.dev, herbert@gondor.apana.org.au, davem@davemloft.net, 
+	fenghua.yu@intel.com, dave.jiang@intel.com, wajdi.k.feghali@intel.com, 
+	james.guilford@intel.com, vinodh.gopal@intel.com, bala.seshasayee@intel.com, 
+	heath.caldwell@intel.com, kanchana.p.sridhar@intel.com, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org, ryan.roberts@arm.com, 
+	linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 9/5/2024 6:14 PM, Brian Masney wrote:
-> Hi Jeffrey,
-> 
-> On Thu, Aug 29, 2024 at 11:01 AM Jeffrey Hugo <quic_jhugo@quicinc.com> wrote:
->> Interesting, I haven't seen this in my testing.  I'll go swing back and
->> try to figure out why.
->>
->> For future reference, I'm still supporting Amberwing/QDF2400.
->> Addressing emails to me is a good way to get my attention.
-> 
-> I also see an unrelated error when booting the Qualcomm Amberwing with
-> 6.11.0-rc5:
-> 
-> [   14.159483] arm-smmu-v3-pmcg arm-smmu-v3-pmcg.1.auto: error
-> -EINVAL: invalid resource (null)
-> [   14.167076] arm-smmu-v3-pmcg arm-smmu-v3-pmcg.1.auto: probe with
-> driver arm-smmu-v3-pmcg failed with error -22
-> [   14.177707] arm-smmu-v3-pmcg arm-smmu-v3-pmcg.2.auto: error
-> -EINVAL: invalid resource (null)
-> [   14.185557] arm-smmu-v3-pmcg arm-smmu-v3-pmcg.2.auto: probe with
-> driver arm-smmu-v3-pmcg failed with error -22
-> ...
-> 
-> I spent 20 minutes troubleshooting this in the arm smmu driver,
-> however I didn't see anything obvious. I attached the full dmesg.
-> Ernesto: Are you seeing that on your Amberwing?
+On Thu, May 2, 2024 at 5:46=E2=80=AFAM Andre Glover
+<andre.glover@linux.intel.com> wrote:
+>
+> Add the 'by_n' attribute to the acomp_req. The 'by_n' attribute can be
+> used a directive by acomp crypto algorithms for splitting compress and
+> decompress operations into "n" separate jobs.
 
-Yes, looks like it first pops up 6.11-rc1.
-Nothing is jumping out at me.  I'm running a bisect to see if it gives a 
-clue.
+Hi Andre,
 
--Jeff
+I am definitely in favor of the patchset idea. However, I'm not convinced t=
+hat a
+separate by_n API is necessary. Couldn=E2=80=99t this functionality be hand=
+led
+automatically within your driver? For instance, if a large folio is detecte=
+d,
+could it automatically apply the by_n concept?
+
+Am I overlooking something that makes exposing the API necessary in
+this case?
+
+>
+> Signed-off-by: Andre Glover <andre.glover@linux.intel.com>
+> ---
+>  include/crypto/acompress.h | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/include/crypto/acompress.h b/include/crypto/acompress.h
+> index 2b73cef2f430..c687729e1966 100644
+> --- a/include/crypto/acompress.h
+> +++ b/include/crypto/acompress.h
+> @@ -25,6 +25,7 @@
+>   * @slen:      Size of the input buffer
+>   * @dlen:      Size of the output buffer and number of bytes produced
+>   * @flags:     Internal flags
+> + * @by_n:      by_n setting used by acomp alg
+>   * @__ctx:     Start of private context data
+>   */
+>  struct acomp_req {
+> @@ -34,6 +35,7 @@ struct acomp_req {
+>         unsigned int slen;
+>         unsigned int dlen;
+>         u32 flags;
+> +       u32 by_n;
+>         void *__ctx[] CRYPTO_MINALIGN_ATTR;
+>  };
+>
+> --
+> 2.27.0
+>
+
+Thanks
+Barry
