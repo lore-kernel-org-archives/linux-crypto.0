@@ -1,137 +1,104 @@
-Received: from wind.enjellic.com (wind.enjellic.com [76.10.64.91])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 347E9200A3;
-	Tue, 17 Sep 2024 11:29:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=76.10.64.91
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17F8A15E5BB
+	for <linux-crypto@vger.kernel.org>; Tue, 17 Sep 2024 12:39:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726572589; cv=none; b=VOCgToaa+ZwUeuPvBkFmOEiPRZQYUT/q1P3TWP5+O5Wfj8OWRGdNF6UBhQ73ooVZnymvlqzOxROGbPbum7QhW/pAEO9SVh2wJWpW5h93HH5lOOpnkjtwlAfkBKzNQ5y0ePHqgnOGif2NI6KgIjxPJNAbZydkiXnQYX0GQYCIFnk=
+	t=1726576748; cv=none; b=jYWb4K67Nhw6Tt/B7XmVnMd4D9RsOOCs5PkrNrzyi/hpg+LPBziTKvEGzLcK828e50yj7z2N3T360a9kfOPFbu11qOhyl5n0D+fJegCgHJh1M9TGLmA0e6oIzs6yPfTWOXFeGW045tpujIC6AjwCBHkLND3ow8ne5s4srbovj34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726572589; c=relaxed/simple;
-	bh=BSUGbVFzo/XLFC1Eb0wbRRxSENs3PhgBjIFbMO9VrPU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Mime-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L5cBAFvqxGf7M1vnhkcXBk02LanXQxNAEHDLEZOg4ZGS9j3XQbM3vsliiwkcAYQ/Bd4ccYKrTKIrkShY8MwSYA2n31p1XMcLxPauN4cIs9LtxTvfzQBREQdm8aCFqWw3DEIf1VLAV7nDG7WiSDhubXsHvCXYDdVDLnde502G4YY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=enjellic.com; spf=pass smtp.mailfrom=wind.enjellic.com; arc=none smtp.client-ip=76.10.64.91
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=enjellic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wind.enjellic.com
-Received: from wind.enjellic.com (localhost [127.0.0.1])
-	by wind.enjellic.com (8.15.2/8.15.2) with ESMTP id 48HBRQaS014263;
-	Tue, 17 Sep 2024 06:27:26 -0500
-Received: (from greg@localhost)
-	by wind.enjellic.com (8.15.2/8.15.2/Submit) id 48HBROCL014262;
-	Tue, 17 Sep 2024 06:27:24 -0500
-Date: Tue, 17 Sep 2024 06:27:24 -0500
-From: "Dr. Greg" <greg@enjellic.com>
-To: Roberto Sassu <roberto.sassu@huaweicloud.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        Linus Torvalds <torvalds@linux-foundation.org>, dhowells@redhat.com,
-        dwmw2@infradead.org, davem@davemloft.net, linux-kernel@vger.kernel.org,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        zohar@linux.ibm.com, linux-integrity@vger.kernel.org,
-        roberto.sassu@huawei.com, linux-security-module@vger.kernel.org,
-        Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH v3 00/14] KEYS: Add support for PGP keys and signatures
-Message-ID: <20240917112724.GA14167@wind.enjellic.com>
-Reply-To: "Dr. Greg" <greg@enjellic.com>
-References: <ZuPDZL_EIoS60L1a@gondor.apana.org.au> <b4a3e55650a9e9f2302cf093e5cc8e739b4ac98f.camel@huaweicloud.com> <CAHk-=wiU24MGO7LZ1ZZYpQJr1+CSFG9VnB0Nyy4xZSSc_Zu0rg@mail.gmail.com> <ZuaVzQqkwwjbUHSh@gondor.apana.org.au> <CAHk-=wgnG+C3fVB+dwZYi_ZEErnd_jFbrkN+xc__om3d=7optQ@mail.gmail.com> <ZualreC25wViRHBq@gondor.apana.org.au> <ZuapXswFUxsFxjgH@gondor.apana.org.au> <2541abb8-68b5-4e6a-b309-a001ecdfbea1@huaweicloud.com>
+	s=arc-20240116; t=1726576748; c=relaxed/simple;
+	bh=148/lEGgmgGxbrTXtSWwdIBZ4Yuze3Yabt2s1Uo9KjY=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=IhVm+LI24TzuO4vGSTpaLoQr47PJwRTSRyHuFRGOZHzuU4Apun0ABBfyb9gdXijZMNb16Z3/LBOZaT6UI+3PGOh/Rgm7lqxSpdyOPWvg2ToAAovu5m9YmV3OpaRnEP5wxQaAHNfMNkNRIJfU0WS+HrM/IbAu+IRCLVX8BgIXdWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=VcsVdfnk; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VcsVdfnk"
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5c255e3c327so7172431a12.1
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Sep 2024 05:39:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1726576745; x=1727181545; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=yz2qir9ddPeGAiVRdxv7WrzwH5Kt/9L2kVnL+tcULxk=;
+        b=VcsVdfnkQZX//dHRC7IZY+R6eiwTC8FVx+jKFEQfxia1UtSCVvC+pW2j026QQxkiGK
+         fdrlHEubkDrb18paFOE0bvDK1n0VEuYK8Ng+MBer1ADeuRtLf6dupusTJubzmACWGv1f
+         NldmGGzRd+TTGH6KTFqz+RPlnBdJ3+2JcQ3ZRg6g6g9WLjUxL+iH3n90UmBt6J0+GdXI
+         C6VDlm6EYbUskIgqPkk89NHVzSsSmp+oeCUdIKPLagVc97yf05IEQv9F7/Au8UO0k3Kf
+         cqwmGUzqcFASsIEu3Fg41NJoqdicb8nNbHoosZClR/yret2IBJLNXpfmfkMBlsRTFA0t
+         vueg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726576745; x=1727181545;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yz2qir9ddPeGAiVRdxv7WrzwH5Kt/9L2kVnL+tcULxk=;
+        b=P8Uwl45Uo2nFjDHsE0MytEAqrdcocbrl+FFHiDRQ/UnojGX7kWLumgFxMCEwgW/nYN
+         xmp5Nwq67pwxhNSe/BuZaaLGdPR6n+CpYlQ05Tnvs5DS99kcpbxGACALmHnYekhdc1am
+         EMQoet7H+JRR3Ohts61O7TvGR75FQQ+tGC8PWgZNRTQKaPmL3EiwJ/G14UxW8CEB/rsf
+         wQG6saljdWiUQ+J0q0G43Xh94VCwSGDoyMLWVAk/AF8gmP9oW3SrDsGLYztPUrjGDyjf
+         jfM40ZZsKOGuORPlJEnOFJn/DQn/kPWuuLSTjiFN1vatJ5/t03NGQjHmPuHaVfO3Z6F+
+         O3CA==
+X-Gm-Message-State: AOJu0YyLRn43dDo8+DyaBNS3jbzqz7+8kbjGv3GBci0auhS94zWlAF/Z
+	BOgwdjhZF+mvZDWRE2tXJWS61plZHvRu6bAyF/Nuhm4dwhzYuFKOyZspo/HQ+Mk=
+X-Google-Smtp-Source: AGHT+IECmxGumBVlRXvrBTW4hUFGT2ZndGSPGKd6LUX3PzShZtwbduSSstPVT6+ifgdxnZK5sCXeQg==
+X-Received: by 2002:a17:906:c153:b0:a8a:8a31:c481 with SMTP id a640c23a62f3a-a9029615808mr2318964166b.42.1726576745327;
+        Tue, 17 Sep 2024 05:39:05 -0700 (PDT)
+Received: from lino.lan ([85.235.12.238])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a90610968b9sm442738466b.5.2024.09.17.05.39.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Sep 2024 05:39:04 -0700 (PDT)
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Tue, 17 Sep 2024 14:39:03 +0200
+Subject: [PATCH] hwrng: iproc-r200: enable on BCMBCA
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2541abb8-68b5-4e6a-b309-a001ecdfbea1@huaweicloud.com>
-User-Agent: Mutt/1.4i
-X-Greylist: Sender passed SPF test, not delayed by milter-greylist-4.2.3 (wind.enjellic.com [127.0.0.1]); Tue, 17 Sep 2024 06:27:26 -0500 (CDT)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240917-bcmbca-hwrng-iproc-r200-v1-1-58cf8a83ad97@linaro.org>
+X-B4-Tracking: v=1; b=H4sIAGZ46WYC/x3MMQqAMAxA0atIZgNNEaxeRRxsGzWDVVJQQby7x
+ fEN/z+QWYUz9NUDyqdk2VMB1RWEdUoLo8RisMY2pqMWfdh8mHC9NC0oh+4B1RqDMXIkctZR66D
+ Uh/Is938exvf9APNRfdFpAAAA
+To: Olivia Mackall <olivia@selenic.com>, 
+ Herbert Xu <herbert@gondor.apana.org.au>, 
+ William Zhang <william.zhang@broadcom.com>, 
+ Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: linux-crypto@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>
+X-Mailer: b4 0.14.0
 
-On Sun, Sep 15, 2024 at 07:52:13PM +0200, Roberto Sassu wrote:
+The Broadcom Broadband Access (BCA) SoC:s include the
+iproc r200 hwrng so enable it to be selected for these
+platforms.
 
-Good morning, I hope the day is starting well for everyone.
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+---
+ drivers/char/hw_random/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> On 9/15/2024 11:31 AM, Herbert Xu wrote:
-> >On Sun, Sep 15, 2024 at 05:15:25PM +0800, Herbert Xu wrote:
-> >>
-> >>Roberto, correct me if I'm wrong but your intended use case is
-> >>the following patch series, right?
-> >
-> >Actually the meat of the changes is in the following series:
-> >
-> >https://lore.kernel.org/linux-integrity/20240905150543.3766895-1-roberto.sassu@huaweicloud.com/
+diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+index 01e2e1ef82cf..84d46b2a44f4 100644
+--- a/drivers/char/hw_random/Kconfig
++++ b/drivers/char/hw_random/Kconfig
+@@ -101,7 +101,7 @@ config HW_RANDOM_BCM2835
+ 
+ config HW_RANDOM_IPROC_RNG200
+ 	tristate "Broadcom iProc/STB RNG200 support"
+-	depends on ARCH_BCM_IPROC || ARCH_BCM2835 || ARCH_BRCMSTB || COMPILE_TEST
++	depends on ARCH_BCM_IPROC || ARCH_BCM2835 || ARCH_BCMBCA || ARCH_BRCMSTB || COMPILE_TEST
+ 	default HW_RANDOM
+ 	help
+ 	  This driver provides kernel-side support for the RNG200
 
-> Yes, correct. The idea is to verify the authenticity of RPM headers,
-> extract the file digests from them, and use those file digests as
-> reference values for integrity checking of files accessed by user
-> space processes.
->
-> If the calculated digest of a file being accessed matches one
-> extracted from the RPM header, access is granted otherwise it is
-> denied.
+---
+base-commit: 98f7e32f20d28ec452afb208f9cffc08448a2652
+change-id: 20240917-bcmbca-hwrng-iproc-r200-dded11828178
 
-Based on the above response and your comment:
+Best regards,
+-- 
+Linus Walleij <linus.walleij@linaro.org>
 
-"The security policy I want to enforce is: all code that the system
-executes has been built by a trusted source (e.g. a Linux
-distribution)."
-
-From the following URL:
-
-https://lore.kernel.org/linux-integrity/b4a3e55650a9e9f2302cf093e5cc8e739b4ac98f.camel@huaweicloud.com/#t
-
-What you are advocating for then, with this patch series and the
-digest cache series, is a security policy that requires signed code
-execution, correct?
-
-Nothing wrong with that, it is a reasonable security desire, but it
-seems wrong to conflate that with the implementation of the digest
-cache.  There is a great deal of utility in a digest cache but it
-doesn't require the need to parse RPM header information and/or TLV
-sequences in the kernel.
-
-That would only appear to be a requirement if your goal is a signed
-executable policy that is implemented through a packaging medium,
-correct?
-
-To wit:
-
-If I have security infrastructure that gives me confidence in the
-integrity of the files on my media, I can populate a digest cache with
-a simple ASCII list of pathnames fed into the kernel at boot time.
-
-If I don't have confidence in the integrity of the files on my media I
-could append a known good checksum to each pathname with the last
-entry in the list being a PGP signature over the input stream.
-
-I brought the following issue up in the patch series that Herbert
-links to above, but will do so here, since I believe it has relevance
-to this conversation as well.
-
-If the goal is to have the digest cache be relevant from an integrity
-perspective, particularly a signed code policy, you have to physically
-read every file that has a digest value in the RPM digest list.
-Otherwise the scheme is vulnerable to a Time Of Measurement Time Of
-Use (TOMTOU) vulnerability scenario, correct?
-
-This requires that one needs to experience a latency hit at least
-once, presumably at boot when you prime the digest cache, correct?
-
-An alternative approach may be to separate the RPM/TLV parsing code
-from the digest code and implement RPM/Debian/whatever parsing in a
-loadable module that would in turn populate the digest cache.
-
-That may be a more acceptable strategy since it places the potential
-security vulnerabilities of a parser into something that an entity
-that is interested in a signed code policy would consider to be an
-acceptable tradeoff from a security perspective.
-
-> Roberto
-
-Hopefully the above comments and clarifications will be helpful in
-furthering additional discussion.
-
-Have a good day.
-
-As always,
-Dr. Greg
-
-The Quixote Project - Flailing at the Travails of Cybersecurity
-              https://github.com/Quixote-Project
