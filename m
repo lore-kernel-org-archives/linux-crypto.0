@@ -1,236 +1,203 @@
-Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
+Received: from APC01-TYZ-obe.outbound.protection.outlook.com (mail-tyzapc01on2051.outbound.protection.outlook.com [40.107.117.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3625A191F74;
-	Thu, 19 Sep 2024 07:08:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726729710; cv=none; b=Ztr48oJvwxYO8kl1CKNrYn2MhxruKgK4EGzri/5Ru992E2pXF8suGbuXEu0Z1TVPdo3OppBbB4Cx5PuCv67TlyezBkuFArFHgyJTfwM5dfjm2zMRKR9AYIn6Jpr7RIM0gRDGJT+XqZif3WMosPHukw0o2L+0tWuMiwz0u8REUXM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726729710; c=relaxed/simple;
-	bh=+jswPnTjUBFJ2tndsS3fsCBd6aFxviaBp2KnFOJaAF4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qkkYl2tG1DcADust0EWb9U1bVZjvjWEH9aImukC4x1A20c14u8SxEY1vrHsBcLusTl3VrT/aAWdgTtL6ysRXz3AKUfi3iIv0wchl4vPA4gyo8ectXnuJBDMHyfJHyoqY0gpC2askpgEY5+5OXTi/HcY2lbZ3ndZ1zFnS0O0IXEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
-Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4X8RSV2VlQz9tQt;
-	Thu, 19 Sep 2024 09:08:26 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 0GgCnPIhWzuN; Thu, 19 Sep 2024 09:08:26 +0200 (CEST)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4X8RSV1NVVz9tQs;
-	Thu, 19 Sep 2024 09:08:26 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 1C3148B775;
-	Thu, 19 Sep 2024 09:08:26 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id epjVah3m3Yyp; Thu, 19 Sep 2024 09:08:26 +0200 (CEST)
-Received: from [192.168.234.38] (unknown [192.168.234.38])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 890448B763;
-	Thu, 19 Sep 2024 09:08:25 +0200 (CEST)
-Message-ID: <77655d9e-fc05-4300-8f0d-7b2ad840d091@csgroup.eu>
-Date: Thu, 19 Sep 2024 09:08:25 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3A611922FA;
+	Thu, 19 Sep 2024 07:35:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.117.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726731339; cv=fail; b=G7TAlDdK3sWOAXPTNs/Kggp5MCFEilKokllSk2oIz9lf1Hc12cxrKgVTQ3+btB8bUt0mqoQ2GdSMLt5CvTBFlWGZuBo3bNhTrrI5LQdQ9Iegb03OlZt7yatheuMQ2JamTU6AqAI0tHFDsy4FRDSAhco2PIKrtuAi8PW4bAxDusQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726731339; c=relaxed/simple;
+	bh=Im0NHazUHrGMyLwZ6fL9txiRP95yUUm9PQ57r3RklDI=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=gQ/n/scZyWHh6co3iL66U4oCckt6s12lBjIAI3V0YTPl+eg+efSWCZgUlqvwpMBJp6lRyEWcDVkHpxcRRTKIT8pmiOaQmHOuWl3Htk+XDbyCf6JN/Z1vRNSf02WqSXDvRLz+NiWJgzXuO1w/utVrmkZlDexornE3sXZShQtMzP4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com; spf=pass smtp.mailfrom=vivo.com; dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b=VQBqYeSd; arc=fail smtp.client-ip=40.107.117.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivo.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b="VQBqYeSd"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=cZwvKjgkm/zBIX9/aPZ1BHKrRHmYaKtGwehpYiifoMWLTCp8YmjU7jmBYsxadpSycc3LXBL3lD4hS1k2GWWoXHFdsEWBuECXQsdeFV0WDKb6fvdZ0Vn/pxcsb0WX12p4hrGKERgBNHk09xEPn5kcXqs2u9hYDFhNhrIyeLx9L4oHw8zZDjrmqaG0RewIRzR1U089StvcOKwHsJWQilUbHNP+9rYoE8VTd2jRi/8wbGaLnREET21Wih58M6NRI5npKaMxnwPKU/ABPuEWX+0kCfTn69iG07GWHDqgow/Ik+PqLRt7ggBVcDApgozCsX+0Um0LRwfg8zNJRjwGHROrwQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=OqMM/vNfWBeSFyN3WRhNgtRO9GikQKPID/azMGLNeDY=;
+ b=weuAQtb25IpNOEkHaMUEh7KdiNXlGCR1q52xiGSWv/AbH8udnQfChAsRuJTQSM7uxiBXUHcw/T9QtoDoiea0jzNeWlg36HynUhXk1aWAyju9gEK+tRyBAS7/6ZHOPepvt0497uFCfyAUPy6UJWYC2XJPzI3HvpuuxjA50nQw7wWqLmeTSa0Cvnqelaak1yjYsUOYPfMyVsJU7VQOSNK9fV+Hke2ty9GluLu9XT6qFbyLbTJPA5RnN6cqJVva5bNrGCtkhOeLTbLIUPywyBXGi5OLu5/9ukAfr87bEpESLRdKITmo2R5bFO3fjvEBd4P0Ef3U43lz7pgFT8T/DF7pHA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
+ dkim=pass header.d=vivo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=OqMM/vNfWBeSFyN3WRhNgtRO9GikQKPID/azMGLNeDY=;
+ b=VQBqYeSdJbv1nEn6kCo7Pu/plZ1ZnjrAYrmFECXgFEoj0hAiAgyeffq+efzjaLICLVVJBk4ULo4kzT5JRzIq9oDTcM2YzlXrXNuT0qqB/xFC6nLow5rZ1aSuPmKxU2BpwE3xl/uZn3oDSmlT/l00/4zcH6FfFAZI7HhlRsdt690CrGkXkZCsYz17uCVOlJy64rb7NJxb4elkAsAiAIibCWMm986NAGFJTmQ4Ef/YljfcozajrR4CXdtYeD2skgjHh5PpmE7ZAfuvcpYqUq9SWFrnYYWGjtY+XXeMVVvt5BTqh9lCQWBZCpJ3tqNPa5vT8NBPPOp4E8EDWjpIU1pbNg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=vivo.com;
+Received: from TYZPR06MB4461.apcprd06.prod.outlook.com (2603:1096:400:82::8)
+ by KL1PR06MB6865.apcprd06.prod.outlook.com (2603:1096:820:10d::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7962.24; Thu, 19 Sep
+ 2024 07:35:33 +0000
+Received: from TYZPR06MB4461.apcprd06.prod.outlook.com
+ ([fe80::9c62:d1f5:ede3:1b70]) by TYZPR06MB4461.apcprd06.prod.outlook.com
+ ([fe80::9c62:d1f5:ede3:1b70%5]) with mapi id 15.20.7982.018; Thu, 19 Sep 2024
+ 07:35:33 +0000
+From: Yu Jiaoliang <yujiaoliang@vivo.com>
+To: Gilad Ben-Yossef <gilad@benyossef.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: opensource.kernel@vivo.com
+Subject: [PATCH v1] crypto: ccree - Fix typo in comment
+Date: Thu, 19 Sep 2024 15:35:20 +0800
+Message-Id: <20240919073521.1688740-1-yujiaoliang@vivo.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: TYCP301CA0070.JPNP301.PROD.OUTLOOK.COM
+ (2603:1096:405:7d::12) To TYZPR06MB4461.apcprd06.prod.outlook.com
+ (2603:1096:400:82::8)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 2/3] LoongArch: vDSO: Wire up getrandom() vDSO
- implementation
-To: Xi Ruoyao <xry111@xry111.site>, "Jason A . Donenfeld" <Jason@zx2c4.com>,
- Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>
-Cc: linux-crypto@vger.kernel.org, loongarch@lists.linux.dev,
- linux-kernel@vger.kernel.org, Jinyang He <hejinyang@loongson.cn>,
- Tiezhu Yang <yangtiezhu@loongson.cn>, Arnd Bergmann <arnd@arndb.de>
-References: <20240901061315.15693-1-xry111@xry111.site>
- <20240901061315.15693-3-xry111@xry111.site>
-Content-Language: fr-FR
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-In-Reply-To: <20240901061315.15693-3-xry111@xry111.site>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: TYZPR06MB4461:EE_|KL1PR06MB6865:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1072c98d-7081-448e-6367-08dcd87da52e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|52116014|366016|1800799024|376014|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?+s3zyZbRDouMvM95LMPrFLS7lueYAYU6yinIxI6ufSekpCUTEFafgKmTSZV1?=
+ =?us-ascii?Q?2qCWROYeo1Ig5u7sRF5tekYEdlQZ0cv3iurMI6Eq6/6ynh+x0+4gzvnGpzRa?=
+ =?us-ascii?Q?8agsom/gv6WNSRAlZa9ZIJOnmkFvcbcCB2grRKre//Xz9ED6ic7yQKwCmu+Y?=
+ =?us-ascii?Q?qcoyPK96D1ipXeaZJrhupuD7Dpn/l+4JeMBq1pncEGIhXXUHzpU6DWqpEA1g?=
+ =?us-ascii?Q?C+cyOfNnQxKW4p46J3wldmljAAowd89aWMkaWdpIYVfQBz7px5uzVHpNFTvF?=
+ =?us-ascii?Q?r3ewVv/KJsLLzU7lip32F2g9CeUygoAO8jlEXoDmVg5UR3dHMso/jLU9gRo0?=
+ =?us-ascii?Q?kIwFawcSYE5Vl1u4/11jLIm8vylxiVe75IzhfFB2pz0R17cn5CtKyVKHRK3W?=
+ =?us-ascii?Q?85eOJIBYKn6A6JTs5Hm0v26kLI4rxui+HPdAgOijNhkFEOzalgO6CZjPOO+7?=
+ =?us-ascii?Q?ARl5nj00Fvv+AdgqtznAnfkAmcqoZRWkLiwhCwKC6gfKT3iB3j4VMf8evB3C?=
+ =?us-ascii?Q?7597YPUE6Wmy35aPiMUpVRnc5SRemWTcST3nHHQ6Ntgs1BW0+tY+3UAt9tKY?=
+ =?us-ascii?Q?WxUlFuk+q77lgvLsI6LUO3rCRKkkjmTIaoxO3tNGXC81tr6N+X5Eq5lEJO5B?=
+ =?us-ascii?Q?+zbLryCYR2MwSXJMurYeZz8ZlfvDm1gKZWrYzdEGD1M5TqqKopdtR/WozRXx?=
+ =?us-ascii?Q?TTBSzeLfeq0wOMOPY8+K9KW5demIufzJnwLBv1FMtX+2THlozu9I7N8h6E2k?=
+ =?us-ascii?Q?tfjgr7cOdp11AyZvHgB1cKx3VB4nT4EjlKCu288uY6zG0uCZTTBuxd3dUwxz?=
+ =?us-ascii?Q?UCRW2JpVKKVh7sLgyGR71pZHqrgmGId2dlombkdlohl0lmbK7u7Ze/AzrVuS?=
+ =?us-ascii?Q?5UzTlYccHLDxyDaElSOoa1uFQShADj1t0ActUayl9/KulQTijPsTOhHO5Unk?=
+ =?us-ascii?Q?8n1DfOxVSm17kEIZCaK2kgPAA9QuRLHKmR0TsSFgdK808bO2FRAdOQwtGlD6?=
+ =?us-ascii?Q?GgKv9+CnHFapi0Tjdna8Ipc3EopZERL1zc+9NbB6Ll2+Uh6EEsI95Oq3Sy3V?=
+ =?us-ascii?Q?CgxoeCtdeafV0hQgfdrPbaeom0xwaTh22ogutgRLsBYBQpIldhaL4MzIaL3n?=
+ =?us-ascii?Q?LRU9Indmrr0pMMGdQDdD3ZuFBaeH8t7L2D5UeD3+v1+XYswosLWB3zOSWSXq?=
+ =?us-ascii?Q?E1UxmD/BmcwmLFAlu2FqMcLiH7L+kscsRkfcDqkvwHpIF1GqKQRgCC5C99K/?=
+ =?us-ascii?Q?RLJV0V7LZ5cs0kcRZIQRtZ8SQYPPxRzOkeDFKtUfAuE0DFALb7MYBXtAPKCw?=
+ =?us-ascii?Q?bcIUIPwVHSbYwyiYKCAzexboKG5T47sTpIGYqmY82VPOUN7m/fqYfdCipp8p?=
+ =?us-ascii?Q?giktq3iBkj/RHSLHHscOFXdV1E38gDJCKWdHSAzjzjcYaJhNCg=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TYZPR06MB4461.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(366016)(1800799024)(376014)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?TEn7+7VJCJiQahC25IHZK+vW8lbcDsd099dFchxBm/0l1rfmlPb5ApanGefI?=
+ =?us-ascii?Q?pQH18sMr8C2c1sTbbRKJo2BFVt6ummjKbha1MfD85YL+8vuPL0PFzJwpqFqq?=
+ =?us-ascii?Q?vzq4DJySz3/UBLKWdyr7d63o0dmVZI96IpexHsd9kYRQ+5p7ZgGKgfZIL24b?=
+ =?us-ascii?Q?/T0uycr9+hdelpIg6WNNx5h3yInpfWrGAyU6PTOertERyCRw37dqRTM4luB6?=
+ =?us-ascii?Q?9UKnybmQBLnQfSLFuD72a+kcK+cDIre1OO3EidHknL1+4Yr5QayEXm5gMQ43?=
+ =?us-ascii?Q?W82oveAydBpyWoDLT+8pclDOdVrv/e/yI3VK8VR4WcI8pY3vD3Vjh9eUlZdP?=
+ =?us-ascii?Q?ZF4gyuo508RZivDnS/wZmJQob3z3OIOkJDKOQ4WJ3z9SXmfQYh808dySfRka?=
+ =?us-ascii?Q?vWr5uXwCXKgC4SSoJeyyKbqMntvKEJMn7CvaCCFZpC7AgiyljZKkDNQOvET9?=
+ =?us-ascii?Q?g9owWW+OPWHQfhdUyNeB5JYW8dT39BkTPuCFdJZKGpLjZLt4nseEgdz2tr/Q?=
+ =?us-ascii?Q?d5mv0ZaWlpXQsOH4+4YYuuoYafqEJQscUyw3ZQMxIGANyBCh/jc4vwA/o6Bx?=
+ =?us-ascii?Q?tE6WX1dDHGXywvLBRKb377clIJl2HP2Q9xk7jNscFXd67oaJY+lZTn4R69aJ?=
+ =?us-ascii?Q?Qlb1RQHaK5cn/lQEKPWJB/Xdl0TXvbGoE7XdmlJRpay2S+X6CzyMQNjCU5hb?=
+ =?us-ascii?Q?93XTM9aDy+UNcECK/hGfx+T+zoZB9MwgijQmQuOFIFSY1ktDHA0EBypJE0fd?=
+ =?us-ascii?Q?9d3Y3L6l1KpbfrwQpNb2TKbztGosUCrELzp/HDu6xVRlSCZ2zJxL5qiWwPGI?=
+ =?us-ascii?Q?7AVtnCmid6UYXlKh7RV0gLxrD45nc8Zizv2hvaCkzC+neTUarNe2L/CaaH8O?=
+ =?us-ascii?Q?vGYzjzF4Xid/ywk3J940cgjIfMq70hiRtof1UP+JV3+KES627bBpmtqNzo69?=
+ =?us-ascii?Q?fpiQl6qE4fhJX22fQnhmlJf/YuHqY1/EvZNGEqaRbM1i3IrF6EnDX5G2c27y?=
+ =?us-ascii?Q?y19qd1VucA36wSELU8x3hdMfO4fAF8t6VZjV0Ed4suJl2Aems5LruAkQo6UU?=
+ =?us-ascii?Q?DirpXZnV7p9/UABgHpRvaLSiYr5VYEWAGvnpIEymn8ZO/JvfOapdOsbaH+/o?=
+ =?us-ascii?Q?DjMnrhhBdLX65t5FtPHvHbOjML4uWEn6EAnjft4wRWHmCcEebv6J3csND/wb?=
+ =?us-ascii?Q?pIpO5AH789VEVZvodAv1XnAQqBYwKS2HQ+sZGHxyHObEIRDtDUapNyEjsz/j?=
+ =?us-ascii?Q?veUkL0/MUU9VMz1S5+0WOizVGsw4lykrRVefHK92w+wgvICAjP+wvAses/f1?=
+ =?us-ascii?Q?Hz66JfZjcq3UYz/B/B9EW0bAEahInMIUwvuNSQtLMARHj0BvfsjSzsgPU/ey?=
+ =?us-ascii?Q?cozVGTWtfHIGWvQj2It/XneeGwPceqleoVlv+u1+TazGjB3W2Y84YY2QuYO6?=
+ =?us-ascii?Q?OOjNV7wwottDPuHSAJSghbLnHlouD4lF7KeCzK7FFSSkkEWaz+910/5/kNOy?=
+ =?us-ascii?Q?HcZf1/eKR5CFCO2zu1oaGfm55ByqJip00GRm07lsXdTkGBWt98UAaDi64FpN?=
+ =?us-ascii?Q?pch4SvXPiJMY1vukIY5PHdboSVep5YwRwEt7/2Uz?=
+X-OriginatorOrg: vivo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1072c98d-7081-448e-6367-08dcd87da52e
+X-MS-Exchange-CrossTenant-AuthSource: TYZPR06MB4461.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Sep 2024 07:35:33.5086
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: PFwR347NExbSdRrm14GVh0J/oYr4WwSBOorjKLu6eyd+sibRnIq79lCfj8vjYA+YX7n4c6TS6gydXnwXHOASQw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: KL1PR06MB6865
 
-Hi Xi,
+Corrected typos in comment:
+Asynchronize->Asynchronous,
+encryped->encrypted,
+decryped->decrypted,
+fallabck->fallback.
 
-Le 01/09/2024 à 08:13, Xi Ruoyao a écrit :
-> Hook up the generic vDSO implementation to the LoongArch vDSO data page
-> by providing the required __arch_chacha20_blocks_nostack,
-> __arch_get_k_vdso_rng_data, and getrandom_syscall implementations.
-> 
-> Signed-off-by: Xi Ruoyao <xry111@xry111.site>
-> ---
+Signed-off-by: Yu Jiaoliang <yujiaoliang@vivo.com>
+---
+ drivers/crypto/ccree/cc_aead.c   | 4 ++--
+ drivers/crypto/ccree/cc_cipher.c | 2 +-
+ drivers/crypto/ccree/cc_hash.c   | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-...
+diff --git a/drivers/crypto/ccree/cc_aead.c b/drivers/crypto/ccree/cc_aead.c
+index 5ef39d682389..81533681f7fb 100644
+--- a/drivers/crypto/ccree/cc_aead.c
++++ b/drivers/crypto/ccree/cc_aead.c
+@@ -2226,7 +2226,7 @@ static int cc_rfc4543_gcm_encrypt(struct aead_request *req)
+ 
+ 	memset(areq_ctx, 0, sizeof(*areq_ctx));
+ 
+-	//plaintext is not encryped with rfc4543
++	//plaintext is not encrypted with rfc4543
+ 	areq_ctx->plaintext_authenticate_only = true;
+ 
+ 	/* No generated IV required */
+@@ -2277,7 +2277,7 @@ static int cc_rfc4543_gcm_decrypt(struct aead_request *req)
+ 
+ 	memset(areq_ctx, 0, sizeof(*areq_ctx));
+ 
+-	//plaintext is not decryped with rfc4543
++	//plaintext is not decrypted with rfc4543
+ 	areq_ctx->plaintext_authenticate_only = true;
+ 
+ 	/* No generated IV required */
+diff --git a/drivers/crypto/ccree/cc_cipher.c b/drivers/crypto/ccree/cc_cipher.c
+index 3fb667a17bbb..d39c067672fd 100644
+--- a/drivers/crypto/ccree/cc_cipher.c
++++ b/drivers/crypto/ccree/cc_cipher.c
+@@ -179,7 +179,7 @@ static int cc_cipher_init(struct crypto_tfm *tfm)
+ 		}
+ 		max_key_buf_size <<= 1;
+ 
+-		/* Alloc fallabck tfm or essiv when key size != 256 bit */
++		/* Alloc fallback tfm or essiv when key size != 256 bit */
+ 		ctx_p->fallback_tfm =
+ 			crypto_alloc_skcipher(name, 0, CRYPTO_ALG_NEED_FALLBACK | CRYPTO_ALG_ASYNC);
+ 
+diff --git a/drivers/crypto/ccree/cc_hash.c b/drivers/crypto/ccree/cc_hash.c
+index f418162932fe..d0612bec4d58 100644
+--- a/drivers/crypto/ccree/cc_hash.c
++++ b/drivers/crypto/ccree/cc_hash.c
+@@ -1577,7 +1577,7 @@ struct cc_hash_template {
+ 
+ /* hash descriptors */
+ static struct cc_hash_template driver_hash[] = {
+-	//Asynchronize hash template
++	//Asynchronous hash template
+ 	{
+ 		.name = "sha1",
+ 		.driver_name = "sha1-ccree",
+-- 
+2.34.1
 
-> diff --git a/arch/loongarch/vdso/vgetrandom-chacha.S b/arch/loongarch/vdso/vgetrandom-chacha.S
-> new file mode 100644
-> index 000000000000..7e86a50f6e85
-> --- /dev/null
-> +++ b/arch/loongarch/vdso/vgetrandom-chacha.S
-> @@ -0,0 +1,242 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (C) 2024 Xi Ruoyao <xry111@xry111.site>. All Rights Reserved.
-> + */
-> +
-> +#include <asm/asm.h>
-> +#include <asm/regdef.h>
-> +#include <linux/linkage.h>
-> +
-> +.text
-> +
-> +/* Salsa20 quarter-round */
-> +.macro	QR	a b c d
-> +	add.w		\a, \a, \b
-> +	xor		\d, \d, \a
-> +	rotri.w		\d, \d, 16
-> +
-> +	add.w		\c, \c, \d
-> +	xor		\b, \b, \c
-> +	rotri.w		\b, \b, 20
-> +
-> +	add.w		\a, \a, \b
-> +	xor		\d, \d, \a
-> +	rotri.w		\d, \d, 24
-> +
-> +	add.w		\c, \c, \d
-> +	xor		\b, \b, \c
-> +	rotri.w		\b, \b, 25
-> +.endm
-> +
-
-I know nothing about Loongarch assembly and execution performance, but I 
-see that GCC groups operations by 4 when building 
-reference_chacha20_blocks() from vdso_test_chacha, see below.
-
-Shouldn't you do the same and group ROUNDs by 4 just like I did on 
-powerpc ? 
-(https://github.com/torvalds/linux/blob/master/arch/powerpc/kernel/vdso/vgetrandom-chacha.S)
-
-0000000000000134 <.L3>:
-  134:	001061d8 	add.w       	$s1, $t2, $s1
-  138:	0015c312 	xor         	$t6, $s1, $t4
-  13c:	26000070 	ldptr.d     	$t4, $sp, 0
-  140:	001036d6 	add.w       	$fp, $fp, $t1
-  144:	001065f9 	add.w       	$s2, $t3, $s2
-  148:	0010335a 	add.w       	$s3, $s3, $t0
-  14c:	00159ad3 	xor         	$t7, $fp, $a2
-  150:	0015c344 	xor         	$a0, $s3, $t4
-  154:	0015c731 	xor         	$t5, $s2, $t5
-  158:	004cc273 	rotri.w     	$t7, $t7, 0x10
-  15c:	004cc252 	rotri.w     	$t6, $t6, 0x10
-  160:	004cc231 	rotri.w     	$t5, $t5, 0x10
-  164:	004cc084 	rotri.w     	$a0, $a0, 0x10
-  168:	00104766 	add.w       	$a2, $s4, $t5
-  16c:	00102088 	add.w       	$a4, $a0, $a4
-  170:	00102669 	add.w       	$a5, $t7, $a5
-  174:	001048e7 	add.w       	$a3, $a3, $t6
-  178:	0015b530 	xor         	$t4, $a5, $t1
-  17c:	0015b10c 	xor         	$t0, $a4, $t0
-  180:	0015b8ee 	xor         	$t2, $a3, $t2
-  184:	0015bccf 	xor         	$t3, $a2, $t3
-  188:	004cd18d 	rotri.w     	$t1, $t0, 0x14
-  18c:	004cd210 	rotri.w     	$t4, $t4, 0x14
-  190:	004cd1ce 	rotri.w     	$t2, $t2, 0x14
-  194:	004cd1ef 	rotri.w     	$t3, $t3, 0x14
-  198:	001042d6 	add.w       	$fp, $fp, $t4
-  19c:	00103b18 	add.w       	$s1, $s1, $t2
-  1a0:	00103f39 	add.w       	$s2, $s2, $t3
-  1a4:	0010375a 	add.w       	$s3, $s3, $t1
-  1a8:	0015ced3 	xor         	$t7, $fp, $t7
-  1ac:	0015cb12 	xor         	$t6, $s1, $t6
-  1b0:	0015c731 	xor         	$t5, $s2, $t5
-  1b4:	00159344 	xor         	$a0, $s3, $a0
-  1b8:	004ce274 	rotri.w     	$t8, $t7, 0x18
-  1bc:	004ce084 	rotri.w     	$a0, $a0, 0x18
-  1c0:	004ce253 	rotri.w     	$t7, $t6, 0x18
-  1c4:	004ce232 	rotri.w     	$t6, $t5, 0x18
-  1c8:	00105129 	add.w       	$a5, $a5, $t8
-  1cc:	00101111 	add.w       	$t5, $a4, $a0
-  1d0:	00104ce7 	add.w       	$a3, $a3, $t7
-  1d4:	001048c6 	add.w       	$a2, $a2, $t6
-  1d8:	0015c130 	xor         	$t4, $a5, $t4
-  1dc:	0015b8ee 	xor         	$t2, $a3, $t2
-  1e0:	0015bccf 	xor         	$t3, $a2, $t3
-  1e4:	0015b62d 	xor         	$t1, $t5, $t1
-  1e8:	004ce610 	rotri.w     	$t4, $t4, 0x19
-  1ec:	004ce5ce 	rotri.w     	$t2, $t2, 0x19
-  1f0:	004ce5ef 	rotri.w     	$t3, $t3, 0x19
-  1f4:	004ce5ad 	rotri.w     	$t1, $t1, 0x19
-  1f8:	00103ad6 	add.w       	$fp, $fp, $t2
-  1fc:	00103f18 	add.w       	$s1, $s1, $t3
-  200:	00103739 	add.w       	$s2, $s2, $t1
-  204:	0010435a 	add.w       	$s3, $s3, $t4
-  208:	001592c4 	xor         	$a0, $fp, $a0
-  20c:	0015d314 	xor         	$t8, $s1, $t8
-  210:	0015cf33 	xor         	$t7, $s2, $t7
-  214:	0015cb52 	xor         	$t6, $s3, $t6
-  218:	004cc084 	rotri.w     	$a0, $a0, 0x10
-  21c:	004cc294 	rotri.w     	$t8, $t8, 0x10
-  220:	004cc273 	rotri.w     	$t7, $t7, 0x10
-  224:	004cc252 	rotri.w     	$t6, $t6, 0x10
-  228:	001010dc 	add.w       	$s5, $a2, $a0
-  22c:	0010523d 	add.w       	$s6, $t5, $t8
-  230:	00104d3e 	add.w       	$s7, $a5, $t7
-  234:	001048ff 	add.w       	$s8, $a3, $t6
-  238:	0015c3ec 	xor         	$t0, $s8, $t4
-  23c:	0015bb8e 	xor         	$t2, $s5, $t2
-  240:	0015bfaf 	xor         	$t3, $s6, $t3
-  244:	0015b7cd 	xor         	$t1, $s7, $t1
-  248:	004cd1ad 	rotri.w     	$t1, $t1, 0x14
-  24c:	004cd18c 	rotri.w     	$t0, $t0, 0x14
-  250:	004cd1ce 	rotri.w     	$t2, $t2, 0x14
-  254:	004cd1ef 	rotri.w     	$t3, $t3, 0x14
-  258:	00103ad7 	add.w       	$s0, $fp, $t2
-  25c:	00103f0a 	add.w       	$a6, $s1, $t3
-  260:	0010372b 	add.w       	$a7, $s2, $t1
-  264:	00103341 	add.w       	$ra, $s3, $t0
-  268:	001592e4 	xor         	$a0, $s0, $a0
-  26c:	0015d154 	xor         	$t8, $a6, $t8
-  270:	0015cd73 	xor         	$t7, $a7, $t7
-  274:	0015c832 	xor         	$t6, $ra, $t6
-  278:	004ce084 	rotri.w     	$a0, $a0, 0x18
-  27c:	004ce294 	rotri.w     	$t8, $t8, 0x18
-  280:	004ce273 	rotri.w     	$t7, $t7, 0x18
-  284:	004ce252 	rotri.w     	$t6, $t6, 0x18
-  288:	0010139c 	add.w       	$s5, $s5, $a0
-  28c:	001053bd 	add.w       	$s6, $s6, $t8
-  290:	00104fde 	add.w       	$s7, $s7, $t7
-  294:	00104bff 	add.w       	$s8, $s8, $t6
-  298:	0015b7d1 	xor         	$t5, $s7, $t1
-  29c:	0015bb8e 	xor         	$t2, $s5, $t2
-  2a0:	0015b3ed 	xor         	$t1, $s8, $t0
-  2a4:	0015bfaf 	xor         	$t3, $s6, $t3
-  2a8:	0040808c 	slli.w      	$t0, $a0, 0x0
-  2ac:	004ce631 	rotri.w     	$t5, $t5, 0x19
-  2b0:	004ce5ce 	rotri.w     	$t2, $t2, 0x19
-  2b4:	004ce5ef 	rotri.w     	$t3, $t3, 0x19
-  2b8:	004ce5ad 	rotri.w     	$t1, $t1, 0x19
-  2bc:	2700006c 	stptr.d     	$t0, $sp, 0
-  2c0:	02bffca5 	addi.w      	$a1, $a1, -1(0xfff)
-  2c4:	0040822c 	slli.w      	$t0, $t5, 0x0
-  2c8:	004082f6 	slli.w      	$fp, $s0, 0x0
-  2cc:	0040839b 	slli.w      	$s4, $s5, 0x0
-  2d0:	004081ce 	slli.w      	$t2, $t2, 0x0
-  2d4:	00408158 	slli.w      	$s1, $a6, 0x0
-  2d8:	00408286 	slli.w      	$a2, $t8, 0x0
-  2dc:	004083a8 	slli.w      	$a4, $s6, 0x0
-  2e0:	004081ef 	slli.w      	$t3, $t3, 0x0
-  2e4:	00408179 	slli.w      	$s2, $a7, 0x0
-  2e8:	00408270 	slli.w      	$t4, $t7, 0x0
-  2ec:	004083c9 	slli.w      	$a5, $s7, 0x0
-  2f0:	0040803a 	slli.w      	$s3, $ra, 0x0
-  2f4:	00408251 	slli.w      	$t5, $t6, 0x0
-  2f8:	004083e7 	slli.w      	$a3, $s8, 0x0
-  2fc:	004081ad 	slli.w      	$t1, $t1, 0x0
-  300:	47fe34bf 	bnez        	$a1, -460(0x7ffe34)	# 134 <.L3>
-
-Christophe
