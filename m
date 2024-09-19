@@ -1,147 +1,114 @@
-Received: from mx.swemel.ru (mx.swemel.ru [95.143.211.150])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A44A18A6DD;
-	Wed, 18 Sep 2024 13:35:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.143.211.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33B9A13AF2;
+	Thu, 19 Sep 2024 04:55:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726666541; cv=none; b=NMjP9h3uLXp6IaRbk/OcGPi9yHO5yR+BOapbXOidRWqTaL4332cBmeolYt29rnrNSOCaLkz5BVd8Pkm6CjqCQuD4qydlqdKXaFm8Am4nGElm2bymuwFVapI2Q/jYMOeCJ9Dj8NA6ay6BJSYqzKtiHXBiaP3xjTgGik/8sAy5DyQ=
+	t=1726721755; cv=none; b=PkxgdOktBFvV612cfCjLH0VdkzH0kVS95W5ZF/hRZV5OE2L9NoAvg+xa6CcuebjUOf6Z9pDZUQYXBfyS4M9pSX3d9guK6VXaEjLILLYI7uy3nP3+TNHvi0yec0eMFu8V+qe0EIGzH0Tdfw7gh50NNnnGNfLtmhTCU/V3F4hK+fk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726666541; c=relaxed/simple;
-	bh=/52IVHc/NTkBvm8L3sxPZuxa9A4h17uSDjMZuirkVn4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ucwS3DAeF2qBam2nMPawsNamhLLKK+gWZeLeUuecHHeUwpFctJI4l2T4KTntHesjobvH0Br9MYkbVNrGHtHd8UPB9x4aElx/ryZ0jYylvZrv9cIFlD6RhuDgaQXurBQZem0fIFKMAs2gmdyc4jqcDQz5vUuLfQmGAyWllKRornE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru; spf=pass smtp.mailfrom=swemel.ru; dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b=kCn2M1CJ; arc=none smtp.client-ip=95.143.211.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=swemel.ru
+	s=arc-20240116; t=1726721755; c=relaxed/simple;
+	bh=HvB7eymv7NaOLCA8lH14ygHPc0r0KGHTISwP3o5W56c=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Whd6ugl0UnaKYVRkwoaFaYxJZGP1xWgVxF3GRG+RFpNonC6oC7wjQeN0YaiVKhxskXDjS4fUazIlKXEosTZSTuTseeCK4eHzaFlLccDbL0rwwQjLh6l4QaS1wz/pbjZmU0HXM3+coB1TUVZzPhkhgiYcaWtGnJvKjKomttH91iw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=VU5t/152; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b="kCn2M1CJ"
-From: Denis Arefev <arefev@swemel.ru>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=swemel.ru; s=mail;
-	t=1726666528;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=6iZPEcJvMkcWKUBD/0467df4sgmYuJ1Z8PWqRKldrdM=;
-	b=kCn2M1CJ7GNmysdNWldBqObNwo8iu3sNgAA1J14vdExvVBnrp4iGySW+RDdTy4eYGYw0Z9
-	cd9G8lm4ESgtUw9wI0i00pbIoz35bwqprOVOsaiyxZO7VK803s6E+FVvkQfXHbbdJ/xB9f
-	xVAgwQJryJvYx56YEdgBE743EMfBSWs=
-To: stable@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Tim Chen <tim.c.chen@linux.intel.com>,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
-	Vitaly Chikunov <vt@altlinux.org>
-Subject: [PATCH 5.10] crypto: tcrypt - Fix missing return value check
-Date: Wed, 18 Sep 2024 16:35:28 +0300
-Message-Id: <20240918133528.80563-1-arefev@swemel.ru>
+	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="VU5t/152"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+	s=201909; t=1726721748;
+	bh=MUErbNaxrktoTpPsP7kf+5jpJMqTd7jZyOeBef4Dt5M=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=VU5t/152fmhMt0CYkNKVCVGLcCp6XHTDmv/VwV4yScPxg/LAYyqzs85wvHc0X2JWK
+	 9kgkbrGiZXoyB6ksDVdM9I5vEXfJoAWMv+fw6T5w3TWmn9P4fqhxnk4zKwacDKEGoa
+	 yc2nyUeiOH8T3qpJjSMBn+l1yDUvP1jsmoMZZjFKRwFRgjfzlr2vYOOyucnu+avrvh
+	 HuwB8n/UrTN5tg3DSiwyCRMlPW5rKUiuwkbFOdYkTOE9Y4XOtTCrTKvQ5vS1Kj+4GS
+	 Y9jpQcR+zgsjYA+H3OYm0LP/b4KBP0/KlXJDJTDRVcBOXmGwOfP5uiMx+HbDB/oNoN
+	 WSa3ymoHYee8g==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4X8NWS0mLJz4x6l;
+	Thu, 19 Sep 2024 14:55:48 +1000 (AEST)
+From: Michael Ellerman <mpe@ellerman.id.au>
+To: Danny Tsen <dtsen@linux.ibm.com>, linux-crypto@vger.kernel.org
+Cc: herbert@gondor.apana.org.au, leitao@debian.org, nayna@linux.ibm.com,
+ appro@cryptogams.org, linux-kernel@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, ltcgcw@linux.vnet.ibm.com,
+ dtsen@us.ibm.com, Danny Tsen <dtsen@linux.ibm.com>
+Subject: Re: [PATCH] crypto: Removing CRYPTO_AES_GCM_P10.
+In-Reply-To: <20240913123043.1636183-1-dtsen@linux.ibm.com>
+References: <20240913123043.1636183-1-dtsen@linux.ibm.com>
+Date: Thu, 19 Sep 2024 14:55:47 +1000
+Message-ID: <87r09gp7ho.fsf@mail.lhotse>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-From: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Danny Tsen <dtsen@linux.ibm.com> writes:
+> Removing CRYPTO_AES_GCM_P10 in Kconfig first so that we can apply the
+> subsequent patches to fix data mismatch over ipsec tunnel.
 
-[ Upstream commit 7b3d52683b3a47c0ba1dfd6b5994a3a795b06972 ]
+This change log needs to stand on its own. ie. it needs to explain what
+the problem is and why the feature is being disabled, without reference
+to subsequent patches (which will probably be merged separately).
 
-There are several places where the return value check of crypto_aead_setkey
-and crypto_aead_setauthsize were lost. It is necessary to add these checks.
+It should also have a Fixes/stable tag.
 
-At the same time, move the crypto_aead_setauthsize() call out of the loop,
-and only need to call it once after load transform.
+And as Christophe said, just adding a dependency on BROKEN is
+sufficient.
 
-Fixes: 53f52d7aecb4 ("crypto: tcrypt - Added speed tests for AEAD crypto alogrithms in tcrypt test suite")
-Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Reviewed-by: Vitaly Chikunov <vt@altlinux.org>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Denis Arefev <arefev@swemel.ru>
----
- crypto/tcrypt.c | 29 +++++++++++++++++++----------
- 1 file changed, 19 insertions(+), 10 deletions(-)
+cheers
 
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index 7972d2784b3b..580c50afa587 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -290,6 +290,11 @@ static void test_mb_aead_speed(const char *algo, int enc, int secs,
- 	}
- 
- 	ret = crypto_aead_setauthsize(tfm, authsize);
-+	if (ret) {
-+		pr_err("alg: aead: Failed to setauthsize for %s: %d\n", algo,
-+		       ret);
-+		goto out_free_tfm;
-+	}
- 
- 	for (i = 0; i < num_mb; ++i)
- 		if (testmgr_alloc_buf(data[i].xbuf)) {
-@@ -315,7 +320,7 @@ static void test_mb_aead_speed(const char *algo, int enc, int secs,
- 	for (i = 0; i < num_mb; ++i) {
- 		data[i].req = aead_request_alloc(tfm, GFP_KERNEL);
- 		if (!data[i].req) {
--			pr_err("alg: skcipher: Failed to allocate request for %s\n",
-+			pr_err("alg: aead: Failed to allocate request for %s\n",
- 			       algo);
- 			while (i--)
- 				aead_request_free(data[i].req);
-@@ -565,13 +570,19 @@ static void test_aead_speed(const char *algo, int enc, unsigned int secs,
- 	sgout = &sg[9];
- 
- 	tfm = crypto_alloc_aead(algo, 0, 0);
--
- 	if (IS_ERR(tfm)) {
- 		pr_err("alg: aead: Failed to load transform for %s: %ld\n", algo,
- 		       PTR_ERR(tfm));
- 		goto out_notfm;
- 	}
- 
-+	ret = crypto_aead_setauthsize(tfm, authsize);
-+	if (ret) {
-+		pr_err("alg: aead: Failed to setauthsize for %s: %d\n", algo,
-+		       ret);
-+		goto out_noreq;
-+	}
-+
- 	crypto_init_wait(&wait);
- 	printk(KERN_INFO "\ntesting speed of %s (%s) %s\n", algo,
- 			get_driver_name(crypto_aead, tfm), e);
-@@ -607,8 +618,13 @@ static void test_aead_speed(const char *algo, int enc, unsigned int secs,
- 					break;
- 				}
- 			}
-+
- 			ret = crypto_aead_setkey(tfm, key, *keysize);
--			ret = crypto_aead_setauthsize(tfm, authsize);
-+			if (ret) {
-+				pr_err("setkey() failed flags=%x: %d\n",
-+					crypto_aead_get_flags(tfm), ret);
-+				goto out;
-+			}
- 
- 			iv_len = crypto_aead_ivsize(tfm);
- 			if (iv_len)
-@@ -618,15 +634,8 @@ static void test_aead_speed(const char *algo, int enc, unsigned int secs,
- 			printk(KERN_INFO "test %u (%d bit key, %d byte blocks): ",
- 					i, *keysize * 8, *b_size);
- 
--
- 			memset(tvmem[0], 0xff, PAGE_SIZE);
- 
--			if (ret) {
--				pr_err("setkey() failed flags=%x\n",
--						crypto_aead_get_flags(tfm));
--				goto out;
--			}
--
- 			sg_init_aead(sg, xbuf, *b_size + (enc ? 0 : authsize),
- 				     assoc, aad_size);
- 
--- 
-2.25.1
 
+> diff --git a/arch/powerpc/crypto/Kconfig b/arch/powerpc/crypto/Kconfig
+> index 09ebcbdfb34f..96ca2c4c8827 100644
+> --- a/arch/powerpc/crypto/Kconfig
+> +++ b/arch/powerpc/crypto/Kconfig
+> @@ -105,22 +105,22 @@ config CRYPTO_AES_PPC_SPE
+>  	  architecture specific assembler implementations that work on 1KB
+>  	  tables or 256 bytes S-boxes.
+>  
+> -config CRYPTO_AES_GCM_P10
+> -	tristate "Stitched AES/GCM acceleration support on P10 or later CPU (PPC)"
+> -	depends on PPC64 && CPU_LITTLE_ENDIAN && VSX
+> -	select CRYPTO_LIB_AES
+> -	select CRYPTO_ALGAPI
+> -	select CRYPTO_AEAD
+> -	select CRYPTO_SKCIPHER
+> -	help
+> -	  AEAD cipher: AES cipher algorithms (FIPS-197)
+> -	  GCM (Galois/Counter Mode) authenticated encryption mode (NIST SP800-38D)
+> -	  Architecture: powerpc64 using:
+> -	    - little-endian
+> -	    - Power10 or later features
+> -
+> -	  Support for cryptographic acceleration instructions on Power10 or
+> -	  later CPU. This module supports stitched acceleration for AES/GCM.
+> +#config CRYPTO_AES_GCM_P10
+> +#	tristate "Stitched AES/GCM acceleration support on P10 or later CPU (PPC)"
+> +#	depends on PPC64 && CPU_LITTLE_ENDIAN && VSX
+> +#	select CRYPTO_LIB_AES
+> +#	select CRYPTO_ALGAPI
+> +#	select CRYPTO_AEAD
+> +#	select CRYPTO_SKCIPHER
+> +#	help
+> +#	  AEAD cipher: AES cipher algorithms (FIPS-197)
+> +#	  GCM (Galois/Counter Mode) authenticated encryption mode (NIST SP800-38D)
+> +#	  Architecture: powerpc64 using:
+> +#	    - little-endian
+> +#	    - Power10 or later features
+> +#
+> +#	  Support for cryptographic acceleration instructions on Power10 or
+> +#	  later CPU. This module supports stitched acceleration for AES/GCM.
+>  
+>  config CRYPTO_CHACHA20_P10
+>  	tristate "Ciphers: ChaCha20, XChacha20, XChacha12 (P10 or later)"
+> -- 
+> 2.43.0
