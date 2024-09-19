@@ -1,219 +1,152 @@
-Received: from xry111.site (xry111.site [89.208.246.23])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA5BA19923A;
-	Thu, 19 Sep 2024 09:15:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.208.246.23
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48574178378;
+	Thu, 19 Sep 2024 11:13:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726737316; cv=none; b=PETmN+jTaOpBNUje4z8iYL//1ieGLC4IPHyiQ65gDbZE+a0kEb1+HZmSjFXBeC7KEwwfSB0hM3xvYJY6z9fD5JwaTVrSZ9pyFMNwGllB0uxv/4bpbUhrriKgXZm+aGThnfo68LtXShFrgf2KsCqvp12CjrBTdN3S3KxkPSRswTY=
+	t=1726744418; cv=none; b=rUik3U59R6Tls9NYSdK3y8RhPQGXdca57o2dcMOAvmpF95X31p/fbDhcM3wP5EsmEfvmPrt3naiWPwWuwkJYyYJDpYph5nTIzO41Q7FBeGgbkgKqhFjscFVwbQgUsK4HZsEoz8GivPDVh7R2nPM707ABBsgwJdAjEj8BRlFiBb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726737316; c=relaxed/simple;
-	bh=fATvW7iQsYXiTRNgtaIKzfalGKexhL+LRn4S4Af4+5U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GTwgixVjiu9G3aZ+6jeNFHg1fLJMyU+/ONRtt+DD7PrqvRVTX+eNsPiLcXWO9tbnQuayz1wRPIOKEnv4LnAO6qI91h+AGQt7pKK8bzOll4mm/rAFBe09IEAWcc1x+StgXdSZsIujNTE23VOii1+bENu0zc0FpLPXK60whueogMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site; spf=pass smtp.mailfrom=xry111.site; dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b=Clk8+ZPi; arc=none smtp.client-ip=89.208.246.23
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xry111.site
+	s=arc-20240116; t=1726744418; c=relaxed/simple;
+	bh=+ybNVxibXRIh3nqxbEaGvkG8dJLz9hZXiA4MTb9SMBU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CuQu6NiS0NMoAljT8j8x01c7lE+ggS7pFOhpN9OHxRvieInVHg+quIgCVqO5p7ffWDQGw80hBx/HCzOAUqsHbN/6jZHBqfkjs98aYOOAkBwdKhBejxa89FARi3IGVfb7HeNRee8d1LMl4YCauR19HyebxFZt9wmIigy955Chi7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=nfNp3Jat; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b="Clk8+ZPi"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=xry111.site;
-	s=default; t=1726737312;
-	bh=aFKJJmURFaPw+asq2tdcv0On18yd9zEY6SJL9ZneaXI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Clk8+ZPizELyKP6lNUu192JUSy6d44q5qDSKnWBV/5/Ic7Yfr3cy7CpedRj5Ybb2H
-	 ChO+RVqyMpB9/UY5Tf7f1Aa8kCWv2odpVLUdtv7Jjf1EcQHzlLxuxvYCVWxKJ3Kkjx
-	 3wijvGKKnRYMeFJj56ofD0OAzfa0fBaFrtZB9sJo=
-Received: from stargazer.. (unknown [IPv6:240e:454:4210:56c7:2cd3:45cf:a0a4:496e])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (secp384r1) server-digest SHA384)
-	(Client did not present a certificate)
-	(Authenticated sender: xry111@xry111.site)
-	by xry111.site (Postfix) with ESMTPSA id D7B211A404B;
-	Thu, 19 Sep 2024 05:14:22 -0400 (EDT)
-From: Xi Ruoyao <xry111@xry111.site>
-To: "Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	WANG Xuerui <kernel@xen0n.name>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: linux-crypto@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	Jinyang He <hejinyang@loongson.cn>,
-	Tiezhu Yang <yangtiezhu@loongson.cn>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Xi Ruoyao <xry111@xry111.site>
-Subject: [PATCH] LoongArch: vDSO: Tune the chacha20 implementation
-Date: Thu, 19 Sep 2024 17:13:59 +0800
-Message-ID: <20240919091359.7023-1-xry111@xry111.site>
-X-Mailer: git-send-email 2.46.1
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="nfNp3Jat"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48J6GKgl030026;
+	Thu, 19 Sep 2024 11:06:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=r
+	fTOEAXZNZarvbG2AF5ajeIf7S3tcYldEG1+ILtAxS8=; b=nfNp3JatxK7CrVZdh
+	1tRJiujGQ7yVv6IiviOr2r/96PFplZzRo9ChwyZ3cU9FXinTUiJ1ptvLOkQazj1I
+	U2fszw8SaodAhIB+XqHTgpFl4ZNQmuylN8adkkM9nm6AZzmncsOiYnFw/dgedJTG
+	xMHAJg6g8dCJO1xOpxzCSL++XYZiIj/4hlG5NluPk19bYT6LZT62IXD1Z28pxIVh
+	izV7HvHOI2jJ/wbQWZ7pQaaImFnVkIB7IXgpEduiPiesEXLJKBtVxnGG6+9q2LOt
+	YRFKnyrEct/weRVyovRNk6qd/QlUP0sEjnXGHt/qWgoqOmj6X7M5Nj+VBR4DEgIX
+	pI1Hw==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41n3udk82x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 19 Sep 2024 11:06:57 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 48JA3but001187;
+	Thu, 19 Sep 2024 11:06:56 GMT
+Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 41nntqgxbh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 19 Sep 2024 11:06:56 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 48JB6sRd45220240
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 19 Sep 2024 11:06:55 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C14225805E;
+	Thu, 19 Sep 2024 11:06:54 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3741958059;
+	Thu, 19 Sep 2024 11:06:54 +0000 (GMT)
+Received: from [9.61.250.246] (unknown [9.61.250.246])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 19 Sep 2024 11:06:54 +0000 (GMT)
+Message-ID: <1d8bb55a-a498-44b8-a29a-f0916518e483@linux.ibm.com>
+Date: Thu, 19 Sep 2024 06:06:53 -0500
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] crypto: Removing CRYPTO_AES_GCM_P10.
+To: Michael Ellerman <mpe@ellerman.id.au>, linux-crypto@vger.kernel.org
+Cc: herbert@gondor.apana.org.au, leitao@debian.org, nayna@linux.ibm.com,
+        appro@cryptogams.org, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, ltcgcw@linux.vnet.ibm.com,
+        dtsen@us.ibm.com
+References: <20240913123043.1636183-1-dtsen@linux.ibm.com>
+ <87r09gp7ho.fsf@mail.lhotse>
+Content-Language: en-US
+From: Danny Tsen <dtsen@linux.ibm.com>
+In-Reply-To: <87r09gp7ho.fsf@mail.lhotse>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: oB3dgjWHfI2Hj--1h9fBAB0_MbHmV2Ho
+X-Proofpoint-ORIG-GUID: oB3dgjWHfI2Hj--1h9fBAB0_MbHmV2Ho
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-19_08,2024-09-18_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
+ phishscore=0 impostorscore=0 spamscore=0 priorityscore=1501 suspectscore=0
+ adultscore=0 mlxscore=0 lowpriorityscore=0 malwarescore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2408220000
+ definitions=main-2409190071
 
-As Christophe pointed out, tuning the chacha20 implementation by
-scheduling the instructions like what GCC does can improve the
-performance.
+Thanks Michael.
 
-The tuning does not introduce too much complexity (basically it's just
-reordering some instructions).  And the tuning does not hurt readibility
-too much: actually the tuned code looks even more similar to a
-textbook-style implementation based on 128-bit vectors.  So overall it's
-a good deal to me.
-
-Tested with vdso_test_getchacha and benched with vdso_test_getrandom.
-On a LA664 the speedup is 5%, and I expect a larger speedup on LA[2-4]64
-with a lower issue rate.
-
-Suggested-by: Christophe Leroy <christophe.leroy@csgroup.eu>
-Link: https://lore.kernel.org/all/77655d9e-fc05-4300-8f0d-7b2ad840d091@csgroup.eu/
-Signed-off-by: Xi Ruoyao <xry111@xry111.site>
----
- arch/loongarch/vdso/vgetrandom-chacha.S | 92 +++++++++++++++----------
- 1 file changed, 55 insertions(+), 37 deletions(-)
-
-diff --git a/arch/loongarch/vdso/vgetrandom-chacha.S b/arch/loongarch/vdso/vgetrandom-chacha.S
-index 7e86a50f6e85..0c5f1183c480 100644
---- a/arch/loongarch/vdso/vgetrandom-chacha.S
-+++ b/arch/loongarch/vdso/vgetrandom-chacha.S
-@@ -9,23 +9,11 @@
- 
- .text
- 
--/* Salsa20 quarter-round */
--.macro	QR	a b c d
--	add.w		\a, \a, \b
--	xor		\d, \d, \a
--	rotri.w		\d, \d, 16
--
--	add.w		\c, \c, \d
--	xor		\b, \b, \c
--	rotri.w		\b, \b, 20
--
--	add.w		\a, \a, \b
--	xor		\d, \d, \a
--	rotri.w		\d, \d, 24
--
--	add.w		\c, \c, \d
--	xor		\b, \b, \c
--	rotri.w		\b, \b, 25
-+.macro	OP_4REG	op d0 d1 d2 d3 s0 s1 s2 s3
-+	\op	\d0, \d0, \s0
-+	\op	\d1, \d1, \s1
-+	\op	\d2, \d2, \s2
-+	\op	\d3, \d3, \s3
- .endm
- 
- /*
-@@ -74,6 +62,23 @@ SYM_FUNC_START(__arch_chacha20_blocks_nostack)
- /* Reuse i as copy3 */
- #define copy3		i
- 
-+/* Packs to be used with OP_4REG */
-+#define line0		state0, state1, state2, state3
-+#define line1		state4, state5, state6, state7
-+#define line2		state8, state9, state10, state11
-+#define line3		state12, state13, state14, state15
-+
-+#define	line1_perm	state5, state6, state7, state4
-+#define	line2_perm	state10, state11, state8, state9
-+#define	line3_perm	state15, state12, state13, state14
-+
-+#define	copy		copy0, copy1, copy2, copy3
-+
-+#define _16		16, 16, 16, 16
-+#define _20		20, 20, 20, 20
-+#define _24		24, 24, 24, 24
-+#define _25		25, 25, 25, 25
-+
- 	/*
- 	 * The ABI requires s0-s9 saved, and sp aligned to 16-byte.
- 	 * This does not violate the stack-less requirement: no sensitive data
-@@ -126,16 +131,38 @@ SYM_FUNC_START(__arch_chacha20_blocks_nostack)
- 	li.w		i, 10
- .Lpermute:
- 	/* odd round */
--	QR		state0, state4, state8, state12
--	QR		state1, state5, state9, state13
--	QR		state2, state6, state10, state14
--	QR		state3, state7, state11, state15
-+	OP_4REG	add.w	line0, line1
-+	OP_4REG	xor	line3, line0
-+	OP_4REG	rotri.w	line3, _16
-+
-+	OP_4REG	add.w	line2, line3
-+	OP_4REG	xor	line1, line2
-+	OP_4REG	rotri.w	line1, _20
-+
-+	OP_4REG	add.w	line0, line1
-+	OP_4REG	xor	line3, line0
-+	OP_4REG	rotri.w	line3, _24
-+
-+	OP_4REG	add.w	line2, line3
-+	OP_4REG	xor	line1, line2
-+	OP_4REG	rotri.w	line1, _25
- 
- 	/* even round */
--	QR		state0, state5, state10, state15
--	QR		state1, state6, state11, state12
--	QR		state2, state7, state8, state13
--	QR		state3, state4, state9, state14
-+	OP_4REG	add.w	line0, line1_perm
-+	OP_4REG	xor	line3_perm, line0
-+	OP_4REG	rotri.w	line3_perm, _16
-+
-+	OP_4REG	add.w	line2_perm, line3_perm
-+	OP_4REG	xor	line1_perm, line2_perm
-+	OP_4REG	rotri.w	line1_perm, _20
-+
-+	OP_4REG	add.w	line0, line1_perm
-+	OP_4REG	xor	line3_perm, line0
-+	OP_4REG	rotri.w	line3_perm, _24
-+
-+	OP_4REG	add.w	line2_perm, line3_perm
-+	OP_4REG	xor	line1_perm, line2_perm
-+	OP_4REG	rotri.w	line1_perm, _25
- 
- 	addi.w		i, i, -1
- 	bnez		i, .Lpermute
-@@ -147,10 +174,7 @@ SYM_FUNC_START(__arch_chacha20_blocks_nostack)
- 	li.w		copy3, 0x6b206574
- 
- 	/* output[0,1,2,3] = copy[0,1,2,3] + state[0,1,2,3] */
--	add.w		state0, state0, copy0
--	add.w		state1, state1, copy1
--	add.w		state2, state2, copy2
--	add.w		state3, state3, copy3
-+	OP_4REG	add.w	line0, copy
- 	st.w		state0, output, 0
- 	st.w		state1, output, 4
- 	st.w		state2, output, 8
-@@ -165,10 +189,7 @@ SYM_FUNC_START(__arch_chacha20_blocks_nostack)
- 	ld.w		state3, key, 12
- 
- 	/* output[4,5,6,7] = state[0,1,2,3] + state[4,5,6,7] */
--	add.w		state4, state4, state0
--	add.w		state5, state5, state1
--	add.w		state6, state6, state2
--	add.w		state7, state7, state3
-+	OP_4REG	add.w	line1, line0
- 	st.w		state4, output, 16
- 	st.w		state5, output, 20
- 	st.w		state6, output, 24
-@@ -181,10 +202,7 @@ SYM_FUNC_START(__arch_chacha20_blocks_nostack)
- 	ld.w		state3, key, 28
- 
- 	/* output[8,9,10,11] = state[0,1,2,3] + state[8,9,10,11] */
--	add.w		state8, state8, state0
--	add.w		state9, state9, state1
--	add.w		state10, state10, state2
--	add.w		state11, state11, state3
-+	OP_4REG	add.w	line2, line0
- 	st.w		state8, output, 32
- 	st.w		state9, output, 36
- 	st.w		state10, output, 40
--- 
-2.46.1
-
+On 9/18/24 11:55 PM, Michael Ellerman wrote:
+> Danny Tsen <dtsen@linux.ibm.com> writes:
+>> Removing CRYPTO_AES_GCM_P10 in Kconfig first so that we can apply the
+>> subsequent patches to fix data mismatch over ipsec tunnel.
+> This change log needs to stand on its own. ie. it needs to explain what
+> the problem is and why the feature is being disabled, without reference
+> to subsequent patches (which will probably be merged separately).
+>
+> It should also have a Fixes/stable tag.
+>
+> And as Christophe said, just adding a dependency on BROKEN is
+> sufficient.
+>
+> cheers
+>
+>
+>> diff --git a/arch/powerpc/crypto/Kconfig b/arch/powerpc/crypto/Kconfig
+>> index 09ebcbdfb34f..96ca2c4c8827 100644
+>> --- a/arch/powerpc/crypto/Kconfig
+>> +++ b/arch/powerpc/crypto/Kconfig
+>> @@ -105,22 +105,22 @@ config CRYPTO_AES_PPC_SPE
+>>   	  architecture specific assembler implementations that work on 1KB
+>>   	  tables or 256 bytes S-boxes.
+>>   
+>> -config CRYPTO_AES_GCM_P10
+>> -	tristate "Stitched AES/GCM acceleration support on P10 or later CPU (PPC)"
+>> -	depends on PPC64 && CPU_LITTLE_ENDIAN && VSX
+>> -	select CRYPTO_LIB_AES
+>> -	select CRYPTO_ALGAPI
+>> -	select CRYPTO_AEAD
+>> -	select CRYPTO_SKCIPHER
+>> -	help
+>> -	  AEAD cipher: AES cipher algorithms (FIPS-197)
+>> -	  GCM (Galois/Counter Mode) authenticated encryption mode (NIST SP800-38D)
+>> -	  Architecture: powerpc64 using:
+>> -	    - little-endian
+>> -	    - Power10 or later features
+>> -
+>> -	  Support for cryptographic acceleration instructions on Power10 or
+>> -	  later CPU. This module supports stitched acceleration for AES/GCM.
+>> +#config CRYPTO_AES_GCM_P10
+>> +#	tristate "Stitched AES/GCM acceleration support on P10 or later CPU (PPC)"
+>> +#	depends on PPC64 && CPU_LITTLE_ENDIAN && VSX
+>> +#	select CRYPTO_LIB_AES
+>> +#	select CRYPTO_ALGAPI
+>> +#	select CRYPTO_AEAD
+>> +#	select CRYPTO_SKCIPHER
+>> +#	help
+>> +#	  AEAD cipher: AES cipher algorithms (FIPS-197)
+>> +#	  GCM (Galois/Counter Mode) authenticated encryption mode (NIST SP800-38D)
+>> +#	  Architecture: powerpc64 using:
+>> +#	    - little-endian
+>> +#	    - Power10 or later features
+>> +#
+>> +#	  Support for cryptographic acceleration instructions on Power10 or
+>> +#	  later CPU. This module supports stitched acceleration for AES/GCM.
+>>   
+>>   config CRYPTO_CHACHA20_P10
+>>   	tristate "Ciphers: ChaCha20, XChacha20, XChacha12 (P10 or later)"
+>> -- 
+>> 2.43.0
