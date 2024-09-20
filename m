@@ -1,103 +1,78 @@
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 763831CD2C;
-	Fri, 20 Sep 2024 09:38:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05BEE17C7C9;
+	Fri, 20 Sep 2024 15:11:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726825090; cv=none; b=rZP3EysnAHl2n6T1rzc/cNUhHoVJJ8iR7fbrGlAf43I+H4glIRMK/qxxSG58GPrfFsX1m/voR0zFMwtXo5Xe8FNyD9eJzwoGkXzQ48xX3nkym3JboOfGV3jl5KRn+5XymWOgdsBuQspWG+SKCqzu1b0EPd4Krw7XAerjqUmnZYc=
+	t=1726845072; cv=none; b=Au3kpZrD0fypGOr1iAL8kh7WHtB0YCoGtbOWMW7XLvxE+/5UgPirVFyJuKiGjjlO3xhWBsIkxP/SgbEh5OhWx+o3bAWU/nxdkmmeA7GdE5X3vf0yvXbijBhT4UCyqMZjeiHtho/bJoI5WP8vMCKrYynQ0a9yB22sxzjnDf5yrbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726825090; c=relaxed/simple;
-	bh=zrcIwAMuAWkfsz35vSNkxOlMouu2YIEF3sxN+NveNUU=;
-	h=From:To:CC:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=QeRLLmoGw5mMLx0qjmWgjKqoGLVJA10a8ON7bl0M9jh3buRd7qeb2eQ8UTBFZylnyzJjk3vhBUAMmMCRT6QbFspuW7yEpMrbCNWfvS1TUjsFumQTGoNvaEWu8Se2tHUqNVSWA8tTvztRCD+zGmMv/HXW0UJHHILcCGVGlxB/blk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=a3kWlhvp; arc=none smtp.client-ip=198.47.19.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+	s=arc-20240116; t=1726845072; c=relaxed/simple;
+	bh=LHIrL4+IOK7TTq6FT8QQMFr9RgfnqS9Hr5wbe/S6Epw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZQVME6Ob7ZoqGnK0cfWsdkNOxIo5X0YysruvwwuZkV6lJUxPPHIHEGvpeMUanMO6V7Cw8+djMSqaJ6cTG7bn4pGOowpsgTe+7mFzC2Qw8+bqDYCN5wZJmvHtmacTxWtuwKE0FS3hDrPVDfdjKuf6/UWF+LgaBW5fZSrqTwuwNoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=A8Qs13nH; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="a3kWlhvp"
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 48K9bKjn025160;
-	Fri, 20 Sep 2024 04:37:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1726825040;
-	bh=D0mskHRaG8uO51XB0w+Qjupk2ywjqNEa2TOnwxQtqhQ=;
-	h=From:To:CC:Subject:In-Reply-To:References:Date;
-	b=a3kWlhvpf7IkGjWVT7lDFl5kpISZbS1j+VWuBtJR9VfBSU3nRHit4EI73t62rGy8m
-	 hMuak9pesVjAl9mfLUqywH+IJBAmsyq72nQxbgDpafsse10uCQUWAmJ3Q3itijTb/k
-	 Qfx183o9yeTivmeYQ6bqd1Ht+sdtxnzoXLoHXf5w=
-Received: from DFLE107.ent.ti.com (dfle107.ent.ti.com [10.64.6.28])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 48K9bKDD015708
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 20 Sep 2024 04:37:20 -0500
-Received: from DFLE108.ent.ti.com (10.64.6.29) by DFLE107.ent.ti.com
- (10.64.6.28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 20
- Sep 2024 04:37:20 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE108.ent.ti.com
- (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 20 Sep 2024 04:37:20 -0500
-Received: from localhost (kamlesh.dhcp.ti.com [172.24.227.123])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 48K9bJLg087632;
-	Fri, 20 Sep 2024 04:37:20 -0500
-From: Kamlesh Gurudasani <kamlesh@ti.com>
-To: Danny Tsen <dtsen@linux.ibm.com>, <linux-crypto@vger.kernel.org>
-CC: <stable@vger.kernel.org>, <herbert@gondor.apana.org.au>,
-        <leitao@debian.org>, <nayna@linux.ibm.com>, <appro@cryptogams.org>,
-        <linux-kernel@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
-        <mpe@ellerman.id.au>, <ltcgcw@linux.vnet.ibm.com>, <dtsen@us.ibm.com>,
-        Danny
- Tsen <dtsen@linux.ibm.com>
-Subject: Re: [PATCH v3] crypto: Removing CRYPTO_AES_GCM_P10.
-In-Reply-To: <20240919113637.144343-1-dtsen@linux.ibm.com>
-References: <20240919113637.144343-1-dtsen@linux.ibm.com>
-Date: Fri, 20 Sep 2024 15:07:19 +0530
-Message-ID: <87ldzmll80.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="A8Qs13nH"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80A68C4CEC3;
+	Fri, 20 Sep 2024 15:11:10 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="A8Qs13nH"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1726845068;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/sgZZCfozFmaQM131uVRt5yID4XaoLqKTLeHDmO9BnM=;
+	b=A8Qs13nHy5gGuOu7rsPLfBuYvzqkgOUO79+5OW9ZnrGY8ya/EZywhrSla32AH6zmPanvc9
+	t3Jy+cXb5R+rxElnj19IFpADdrajDNayV8G2SlrIVPnjyT3krU8DF0aLM5ynKvKn3fGp8v
+	8YOG77L+lXvC0My1wHfu3/PbDCO3Nbo=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 81ef0f0a (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Fri, 20 Sep 2024 15:11:08 +0000 (UTC)
+Date: Fri, 20 Sep 2024 17:11:05 +0200
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Xi Ruoyao <xry111@xry111.site>
+Cc: Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	linux-crypto@vger.kernel.org, loongarch@lists.linux.dev,
+	linux-kernel@vger.kernel.org, Jinyang He <hejinyang@loongson.cn>,
+	Tiezhu Yang <yangtiezhu@loongson.cn>, Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH] LoongArch: vDSO: Tune the chacha20 implementation
+Message-ID: <Zu2Qif3n7oIMweJ2@zx2c4.com>
+References: <20240919091359.7023-1-xry111@xry111.site>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240919091359.7023-1-xry111@xry111.site>
 
-Danny Tsen <dtsen@linux.ibm.com> writes:
+On Thu, Sep 19, 2024 at 05:13:59PM +0800, Xi Ruoyao wrote:
+> As Christophe pointed out, tuning the chacha20 implementation by
+> scheduling the instructions like what GCC does can improve the
+> performance.
+> 
+> The tuning does not introduce too much complexity (basically it's just
+> reordering some instructions).  And the tuning does not hurt readibility
+> too much: actually the tuned code looks even more similar to a
+> textbook-style implementation based on 128-bit vectors.  So overall it's
+> a good deal to me.
+> 
+> Tested with vdso_test_getchacha and benched with vdso_test_getrandom.
+> On a LA664 the speedup is 5%, and I expect a larger speedup on LA[2-4]64
+> with a lower issue rate.
+> 
+> Suggested-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+> Link: https://lore.kernel.org/all/77655d9e-fc05-4300-8f0d-7b2ad840d091@csgroup.eu/
+> Signed-off-by: Xi Ruoyao <xry111@xry111.site>
 
-> Data mismatch found when testing ipsec tunnel with AES/GCM crypto.
-> Disabling CRYPTO_AES_GCM_P10 in Kconfig for this feature.
->
-> Fixes: fd0e9b3e2ee6 ("crypto: p10-aes-gcm - An accelerated AES/GCM stitched implementation")
-> Fixes: cdcecfd9991f ("crypto: p10-aes-gcm - Glue code for AES/GCM stitched implementation")
-> Fixes: 45a4672b9a6e2 ("crypto: p10-aes-gcm - Update Kconfig and Makefile")
->
-> Signed-off-by: Danny Tsen <dtsen@linux.ibm.com>
-nitpick
-checkpatch complains
-Please use correct Fixes: style 'Fixes: <12 chars of sha1> ("<title line>")' -
-ie: 'Fixes: 45a4672b9a6e ("crypto: p10-aes-gcm - Update Kconfig and
-Makefile")'
+That seems like a reasonable optimization to me. I'll queue it up in
+random.git and send it in my pull next week.
 
-There is no rule for 12 characters, but it is generally preferred.
-I guess it is just a typo for you as you have correctly added other
-Fixes tag.
+Thanks.
 
-If you end up re-spinning, please correct this
-
-Also, just to understand,
-
-"A Fixes: tag indicates that the patch fixes an issue in a previous
- commit. It is used to make it easy to determine where a bug originated,
- which can help review a bug fix"
-
-from 
-https://docs.kernel.org/process/submitting-patches.html
-
-should there not be just single Fixes tag? as bug originated from one
-commit, may be the commit that actually broke the functionality.
-
-P.S.
-Not expert on this, just trying to learn.
-
-Kamlesh
+Jason
