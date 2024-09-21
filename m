@@ -1,78 +1,131 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05BEE17C7C9;
-	Fri, 20 Sep 2024 15:11:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11BAA320E;
+	Sat, 21 Sep 2024 05:16:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726845072; cv=none; b=Au3kpZrD0fypGOr1iAL8kh7WHtB0YCoGtbOWMW7XLvxE+/5UgPirVFyJuKiGjjlO3xhWBsIkxP/SgbEh5OhWx+o3bAWU/nxdkmmeA7GdE5X3vf0yvXbijBhT4UCyqMZjeiHtho/bJoI5WP8vMCKrYynQ0a9yB22sxzjnDf5yrbA=
+	t=1726895819; cv=none; b=AhRpCnDtRt6AOMzfJ/OWMkI6BktAYv8as769h70mNFy3uqsxZ92vMbwsjYY1YSjZIVtVK/OMxE88r/OKHBvPiOWCScvuxDBzO1sV6ChHRK8bUYxnFdkaExT49D4Ai0pVn0ZBmyrG6gYlG29e+uE1K3ajrD62LXr1Av6VWR6H57Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726845072; c=relaxed/simple;
-	bh=LHIrL4+IOK7TTq6FT8QQMFr9RgfnqS9Hr5wbe/S6Epw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZQVME6Ob7ZoqGnK0cfWsdkNOxIo5X0YysruvwwuZkV6lJUxPPHIHEGvpeMUanMO6V7Cw8+djMSqaJ6cTG7bn4pGOowpsgTe+7mFzC2Qw8+bqDYCN5wZJmvHtmacTxWtuwKE0FS3hDrPVDfdjKuf6/UWF+LgaBW5fZSrqTwuwNoc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=A8Qs13nH; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1726895819; c=relaxed/simple;
+	bh=ScQl6UYtagc5vPNtjCqcvlPuXz//URKuWT/fOGD5SFo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZmGVm8saB313DlgjSl78ZoKuHelf8Y7zTvDvL74+cHuiDv4utHxN97pJmNZdLGhfliW3wXZBAgYgz0RI/dgw53wkSWuYQ0t1JNVAuDpwRaQAxMgGXLh5QpK9osbga4KWRydQG/Y08+XTViq2SZtXTz2FfpamLm+5+2xtjWm9dpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=Id95Uh0T; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="A8Qs13nH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80A68C4CEC3;
-	Fri, 20 Sep 2024 15:11:10 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="A8Qs13nH"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1726845068;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/sgZZCfozFmaQM131uVRt5yID4XaoLqKTLeHDmO9BnM=;
-	b=A8Qs13nHy5gGuOu7rsPLfBuYvzqkgOUO79+5OW9ZnrGY8ya/EZywhrSla32AH6zmPanvc9
-	t3Jy+cXb5R+rxElnj19IFpADdrajDNayV8G2SlrIVPnjyT3krU8DF0aLM5ynKvKn3fGp8v
-	8YOG77L+lXvC0My1wHfu3/PbDCO3Nbo=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 81ef0f0a (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Fri, 20 Sep 2024 15:11:08 +0000 (UTC)
-Date: Fri, 20 Sep 2024 17:11:05 +0200
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: Xi Ruoyao <xry111@xry111.site>
-Cc: Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	linux-crypto@vger.kernel.org, loongarch@lists.linux.dev,
-	linux-kernel@vger.kernel.org, Jinyang He <hejinyang@loongson.cn>,
-	Tiezhu Yang <yangtiezhu@loongson.cn>, Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH] LoongArch: vDSO: Tune the chacha20 implementation
-Message-ID: <Zu2Qif3n7oIMweJ2@zx2c4.com>
-References: <20240919091359.7023-1-xry111@xry111.site>
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="Id95Uh0T"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1726895806;
+	bh=qyx/dHX7YUt7tYPdVE5RWKeFUCXghcIpaCAzPuASVKA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Id95Uh0TMdJVZiDEBKIrjFEpwJCF9A1H/c/voUcjFf9gh5bnQcyoiu77PbCHWvM3W
+	 07SUJ5XFJ8nnlFheNhmmfp67Edcp66LSRIN+sZtk6Dx7qT/FKHKN4U2uBdr9ptL2TI
+	 i2l/2ihF0fwG2U1K7e+zjqDAVcGdzywGlICGZSYVoPd08ashLz7hRLEG9uP0eKD4et
+	 WnrPQk8az/kxSzG1Zcx0HtL+3UahEY0p1xW2HUb5SOlfBnB+84L/VJkKd+7CUttfHS
+	 hkQjphjGLYEu1d41Yc+Lds62wBd7ORIZgL4MmDam0uJX2o0Pjuqb67bI8Vw2P9H9uV
+	 988q5puR1c9TQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4X9ctj1Syrz4x8Y;
+	Sat, 21 Sep 2024 15:16:44 +1000 (AEST)
+Date: Sat, 21 Sep 2024 15:16:42 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Kamlesh Gurudasani <kamlesh@ti.com>
+Cc: Danny Tsen <dtsen@linux.ibm.com>, <linux-crypto@vger.kernel.org>,
+ <stable@vger.kernel.org>, <herbert@gondor.apana.org.au>,
+ <leitao@debian.org>, <nayna@linux.ibm.com>, <appro@cryptogams.org>,
+ <linux-kernel@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
+ <mpe@ellerman.id.au>, <ltcgcw@linux.vnet.ibm.com>, <dtsen@us.ibm.com>
+Subject: Re: [PATCH v3] crypto: Removing CRYPTO_AES_GCM_P10.
+Message-ID: <20240921151642.60b89e86@canb.auug.org.au>
+In-Reply-To: <87ldzmll80.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
+References: <20240919113637.144343-1-dtsen@linux.ibm.com>
+	<87ldzmll80.fsf@kamlesh.i-did-not-set--mail-host-address--so-tickle-me>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240919091359.7023-1-xry111@xry111.site>
+Content-Type: multipart/signed; boundary="Sig_/jhSltXngbv+WsRpVn7yvHAs";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On Thu, Sep 19, 2024 at 05:13:59PM +0800, Xi Ruoyao wrote:
-> As Christophe pointed out, tuning the chacha20 implementation by
-> scheduling the instructions like what GCC does can improve the
-> performance.
-> 
-> The tuning does not introduce too much complexity (basically it's just
-> reordering some instructions).  And the tuning does not hurt readibility
-> too much: actually the tuned code looks even more similar to a
-> textbook-style implementation based on 128-bit vectors.  So overall it's
-> a good deal to me.
-> 
-> Tested with vdso_test_getchacha and benched with vdso_test_getrandom.
-> On a LA664 the speedup is 5%, and I expect a larger speedup on LA[2-4]64
-> with a lower issue rate.
-> 
-> Suggested-by: Christophe Leroy <christophe.leroy@csgroup.eu>
-> Link: https://lore.kernel.org/all/77655d9e-fc05-4300-8f0d-7b2ad840d091@csgroup.eu/
-> Signed-off-by: Xi Ruoyao <xry111@xry111.site>
+--Sig_/jhSltXngbv+WsRpVn7yvHAs
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-That seems like a reasonable optimization to me. I'll queue it up in
-random.git and send it in my pull next week.
+Hi Kamlesh,
 
-Thanks.
+On Fri, 20 Sep 2024 15:07:19 +0530 Kamlesh Gurudasani <kamlesh@ti.com> wrot=
+e:
+>
+> Danny Tsen <dtsen@linux.ibm.com> writes:
+>=20
+> > Data mismatch found when testing ipsec tunnel with AES/GCM crypto.
+> > Disabling CRYPTO_AES_GCM_P10 in Kconfig for this feature.
+> >
+> > Fixes: fd0e9b3e2ee6 ("crypto: p10-aes-gcm - An accelerated AES/GCM stit=
+ched implementation")
+> > Fixes: cdcecfd9991f ("crypto: p10-aes-gcm - Glue code for AES/GCM stitc=
+hed implementation")
+> > Fixes: 45a4672b9a6e2 ("crypto: p10-aes-gcm - Update Kconfig and Makefil=
+e")
+> >
+> > Signed-off-by: Danny Tsen <dtsen@linux.ibm.com> =20
+> nitpick
+> checkpatch complains
+> Please use correct Fixes: style 'Fixes: <12 chars of sha1> ("<title line>=
+")' -
+> ie: 'Fixes: 45a4672b9a6e ("crypto: p10-aes-gcm - Update Kconfig and
+> Makefile")'
+>=20
+> There is no rule for 12 characters, but it is generally preferred.
+> I guess it is just a typo for you as you have correctly added other
+> Fixes tag.
 
-Jason
+It should be at least 12 hex digits i.e. more is fine.  It is possible
+that some commits need more than 12 hex digits of the SHA1 to be
+uniquely identified in some git repositories already.  I guess
+checkpatch needs a patch.
+
+> Also, just to understand,
+>=20
+> "A Fixes: tag indicates that the patch fixes an issue in a previous
+>  commit. It is used to make it easy to determine where a bug originated,
+>  which can help review a bug fix"
+>=20
+> from=20
+> https://docs.kernel.org/process/submitting-patches.html
+>=20
+> should there not be just single Fixes tag? as bug originated from one
+> commit, may be the commit that actually broke the functionality.
+
+While we generally prefer that a patch only fix one bug, it is very
+possible that the bug may have been introduced in more than one commit
+e.g. in different files.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/jhSltXngbv+WsRpVn7yvHAs
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmbuVroACgkQAVBC80lX
+0GzFnwf/e23oe9Qw1Ca7dvh9xkyu30hNMVeham1rhS6bKpc17gT0szzMz8eWWdln
+m4DiWnBXv3x7L07rJ22+fiEtO9N6KZMKW5PWJzEQElsBzmMJfrSwgo/eUnODTZZx
+3LpE0RV0scL9+XdTaM1nOjy5nOHXG33QR3llmtXuJ/PG+RrEARjBXctl6tF/8uzp
+UI8R/NmiDozwvMXb+xGaTfxemK9CDZX0HRgY28XdRlz+Tz8j3FwEJQ7vdAJanzgp
+poRsA7urS2fg2KQBRVFL2oFaW/9OVWuoYmB4eXF971g0qOyBCMg8smG5n4TdRKsM
+8uHloMPT9uun/CL6E4onHEIgjddfvQ==
+=S5Bm
+-----END PGP SIGNATURE-----
+
+--Sig_/jhSltXngbv+WsRpVn7yvHAs--
