@@ -1,205 +1,107 @@
-Received: from smtpbgeu1.qq.com (smtpbgeu1.qq.com [52.59.177.22])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C95361FCF;
-	Sun, 22 Sep 2024 11:23:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.59.177.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD3E141C6D;
+	Sun, 22 Sep 2024 20:54:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727004236; cv=none; b=eFbYtMGBnaxBrjtO2Kp2CYJ4cuGWFFZr+1YfdMsmoPUM1Mq8DeYRjgMQbOkjlZR1wsIr0UUNxbcW5CG/PQ9/DRCRMCb5RbTpMr4iJklLUmh0QKBe321Sr+Q+JYhB+kxIWFS54InNNFWn0rLf7UB4bq7vz4akjyeZkgz7LkUU87I=
+	t=1727038492; cv=none; b=NJu/bxm5na5ULchCMNKWC7R3j8mJT+k/pKqUHNJYvUTTGAbpFB7/K/V5hhMbbuaG0D5gP+k6Jsg34xyHwq28Of17sR09sATvLe3AurFrV9BVMqFVtFrhuml9ZDqnpRPOxn9IC+Rq70/f95QzFW3PoOXEoIN4e+Vtv2R6mfhqH74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727004236; c=relaxed/simple;
-	bh=FnfCHbcu0VktafwVvmbAuuOLXZtPUKbqNqO0EhAL5do=;
-	h=Message-ID:Date:MIME-Version:To:References:From:Cc:Subject:
-	 In-Reply-To:Content-Type; b=chZugG3WFzc6BOPOm9xu4a2d+tG/yRg9hEaktP/syfcEEJesqBlrz1JFuwJUClNQqcTWLO+m01EgQeCV3v9Cmw3QNRA+hk4DkzqVursf/5TiPQgnqBRm/v4lnNtQ64z6FbdoArggam4Pwhcgp3Hj0ih9sMTB1u0YvfphsKMUd3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=f14SvpaG; arc=none smtp.client-ip=52.59.177.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+	s=arc-20240116; t=1727038492; c=relaxed/simple;
+	bh=CVh7N1YlbzxKEaaUtsDgOkSHfpFQMRKGkpac58HmX24=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HE+wGbzgBVBE93yLQsfAzGF60M0MgTrfS0VpGr4tWmLECjSOCB0lF2i4ve9//G07QmIIfl7CiRs8nTd7HWJBbw/RKdCZLugkckyN2nFw8PCnCzdVB95bfPzH+Yl9Q0Q3elPSPWSa9e3C3ehtKjK3ebf9lDnqs/tNH9NsRJ+I0Bs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=DsLE08ok; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="f14SvpaG"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1727004223;
-	bh=WzGBEj5rLDAOxzJMx/5NRNI4fM2/DDlSZKliKT7Vmps=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject;
-	b=f14SvpaG1wACvjC61ej73p+1rJdWjPMGYFLGA42yTkjwKfhWDDJOvN3Nne8EQrcTG
-	 7ZM1YamDI7TyztpN2/5tCYF7l/ItfQa+AYawwAz5d4OvnHCnBivoiuDh1uE9QHIKfC
-	 1n81tkNwVm7LDQX1flxff8X9LDm7LCNRchoMd7/s=
-X-QQ-mid: bizesmtpip3t1727004219t6mcbvb
-X-QQ-Originating-IP: lFUpJqlX0HkNmRWGS1UUXNm6byHW6DBQXHmep9drrMw=
-Received: from [IPV6:240e:36c:d18:fa00:e9bb:21 ( [localhost])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Sun, 22 Sep 2024 19:23:37 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 18433416527396249463
-Message-ID: <FAD000B9FEA4D995+64bdb13a-3a7e-4e9f-bc15-199f8bbeae06@uniontech.com>
-Date: Sun, 22 Sep 2024 19:23:37 +0800
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="DsLE08ok"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48MIlQHO025857;
+	Sun, 22 Sep 2024 20:49:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=S
+	XtEovATvwsh/6WdQwPpFVGwM2WcxRBkXVMZxUz43oA=; b=DsLE08okN6xtCTybL
+	ITkxg4h6eiu2/Lf+ziNTb5OkC0H7uDYhsz87HeJg4jhsaZqhTDrHWCAeMsiWrY0t
+	2H9G6hNnrShe/XGl6kqOpsrowbe97+wj05z9ThJN0CpnrYLt7CpTEoPxB7uWiGhw
+	h2yqZCY/A3/hsr+Y2z/ftVUPVmy5Frfk6MkQcJE/FqPzf9f9DLILnIVL56nT7iw9
+	7qUKUL1TIF8Vaay5869EUpF2zXidZBGAZa2vWUyVy975iQv7BEmb1uR5yVw2gxKn
+	B0PTwz4OQGyUQjofKxGmuLJ2s+2CG/XtYgZnS4kLBHYkoD/akMMbjmOH8AHnTQJn
+	BiM3w==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41snt0yydv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 22 Sep 2024 20:49:23 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 48MG63vu008684;
+	Sun, 22 Sep 2024 20:49:22 GMT
+Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 41t8v0uejw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 22 Sep 2024 20:49:22 +0000
+Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
+	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 48MKnLci22807128
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sun, 22 Sep 2024 20:49:21 GMT
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3533358056;
+	Sun, 22 Sep 2024 20:49:21 +0000 (GMT)
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AAB8F58045;
+	Sun, 22 Sep 2024 20:49:20 +0000 (GMT)
+Received: from [9.61.255.78] (unknown [9.61.255.78])
+	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Sun, 22 Sep 2024 20:49:20 +0000 (GMT)
+Message-ID: <4dbb0949-02a9-4f52-b9c5-5939d9004455@linux.ibm.com>
+Date: Sun, 22 Sep 2024 15:49:20 -0500
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-To: WangYuli <wangyuli@uniontech.com>, giovanni.cabiddu@intel.com,
- herbert@gondor.apana.org.au, davem@davemloft.net, jie.wang@intel.com,
- dong.xie@intel.com
-References: <7BF34BF48048052E+20240922111832.441807-1-wangyuli@uniontech.com>
-From: WangYuli <wangyuli@uniontech.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] crypto: Removing CRYPTO_AES_GCM_P10.
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, stable@vger.kernel.org, leitao@debian.org,
+        nayna@linux.ibm.com, appro@cryptogams.org,
+        linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        mpe@ellerman.id.au, ltcgcw@linux.vnet.ibm.com, dtsen@us.ibm.com
+References: <20240919113637.144343-1-dtsen@linux.ibm.com>
+ <Zu6SeXGNAqzVJuPS@gondor.apana.org.au>
 Content-Language: en-US
-Autocrypt: addr=wangyuli@uniontech.com; keydata=
- xjMEZoEsiBYJKwYBBAHaRw8BAQdAyDPzcbPnchbIhweThfNK1tg1imM+5kgDBJSKP+nX39DN
- IVdhbmdZdWxpIDx3YW5neXVsaUB1bmlvbnRlY2guY29tPsKJBBMWCAAxFiEEa1GMzYeuKPkg
- qDuvxdofMEb0C+4FAmaBLIgCGwMECwkIBwUVCAkKCwUWAgMBAAAKCRDF2h8wRvQL7g0UAQCH
- 3mrGM0HzOaARhBeA/Q3AIVfhS010a0MZmPTRGVfPbwD/SrncJwwPAL4GiLPEC4XssV6FPUAY
- 0rA68eNNI9cJLArOOARmgSyJEgorBgEEAZdVAQUBAQdA88W4CTLDD9fKwW9PB5yurCNdWNS7
- VTL0dvPDofBTjFYDAQgHwngEGBYIACAWIQRrUYzNh64o+SCoO6/F2h8wRvQL7gUCZoEsiQIb
- DAAKCRDF2h8wRvQL7sKvAP4mBvm7Zn1OUjFViwkma8IGRGosXAvMUFyOHVcl1RTgFQEAuJkU
- o9ERi7qS/hbUdUgtitI89efbY0TVetgDsyeQiwU=
-Cc: qat-linux@intel.com, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, bo.cui@intel.com, bruce.w.allan@intel.com,
- karen.xiang@intel.com, pingchaox.yang@intel.com
-Subject: [PATCH 1/3] crypto: qat - Correct the typo 'accelaration'
-In-Reply-To: <7BF34BF48048052E+20240922111832.441807-1-wangyuli@uniontech.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------N54MKCwh0mjNCkzcTrUB7CFc"
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------N54MKCwh0mjNCkzcTrUB7CFc
-Content-Type: multipart/mixed; boundary="------------s2eprH29of7FdOnA0Bmc2tyK";
- protected-headers="v1"
-From: WangYuli <wangyuli@uniontech.com>
-To: WangYuli <wangyuli@uniontech.com>, giovanni.cabiddu@intel.com,
- herbert@gondor.apana.org.au, davem@davemloft.net, jie.wang@intel.com,
- dong.xie@intel.com
-Cc: qat-linux@intel.com, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, bo.cui@intel.com, bruce.w.allan@intel.com,
- karen.xiang@intel.com, pingchaox.yang@intel.com
-Message-ID: <64bdb13a-3a7e-4e9f-bc15-199f8bbeae06@uniontech.com>
-Subject: [PATCH 1/3] crypto: qat - Correct the typo 'accelaration'
-References: <7BF34BF48048052E+20240922111832.441807-1-wangyuli@uniontech.com>
-In-Reply-To: <7BF34BF48048052E+20240922111832.441807-1-wangyuli@uniontech.com>
-
---------------s2eprH29of7FdOnA0Bmc2tyK
-Content-Type: multipart/mixed; boundary="------------ltEb4yjOEu066Yq7G0UMrII6"
-
---------------ltEb4yjOEu066Yq7G0UMrII6
-Content-Type: multipart/alternative;
- boundary="------------470QXHLaUu5KS0KPNnWVybgS"
-
---------------470QXHLaUu5KS0KPNnWVybgS
+From: Danny Tsen <dtsen@linux.ibm.com>
+In-Reply-To: <Zu6SeXGNAqzVJuPS@gondor.apana.org.au>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 8WOwtgfHcfk_26zwTLDhRuQUOaJF18-m
+X-Proofpoint-GUID: 8WOwtgfHcfk_26zwTLDhRuQUOaJF18-m
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-22_20,2024-09-19_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=850
+ priorityscore=1501 suspectscore=0 mlxscore=0 clxscore=1015 impostorscore=0
+ malwarescore=0 bulkscore=0 spamscore=0 phishscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2408220000
+ definitions=main-2409220159
 
-IEZyb20gZjUzNWRiMmQyYTMzMjc4ZGE5Mjg3NjdhMTQwZGQwZWQyYWRiOGZkZSBNb24gU2Vw
-IDE3IDAwOjAwOjAwIDIwMDEgDQpGcm9tOiBXYW5nWXVsaSA8d2FuZ3l1bGlAdW5pb250ZWNo
-LmNvbT4gRGF0ZTogU3VuLCAyMiBTZXAgMjAyNCAxODo0MTozNiANCiswODAwIFN1YmplY3Q6
-IFtQQVRDSCAxLzNdIGNyeXB0bzogcWF0IC0gQ29ycmVjdCB0aGUgdHlwbyAnYWNjZWxhcmF0
-aW9uJyANClRoZXJlIGlzIGEgc3BlbGxpbmcgbWlzdGFrZSBvZiAnYWNjZWxhcmF0aW9uJyB3
-aGljaCBzaG91bGQgYmUgDQonYWNjZWxlcmF0aW9uJy4gU2lnbmVkLW9mZi1ieTogV2FuZ1l1
-bGkgPHdhbmd5dWxpQHVuaW9udGVjaC5jb20+IC0tLSANCmRyaXZlcnMvY3J5cHRvL2ludGVs
-L3FhdC9xYXRfY29tbW9uL3FhdF9oYWwuYyB8IDIgKy0gMSBmaWxlIGNoYW5nZWQsIDEgDQpp
-bnNlcnRpb24oKyksIDEgZGVsZXRpb24oLSkgZGlmZiAtLWdpdCANCmEvZHJpdmVycy9jcnlw
-dG8vaW50ZWwvcWF0L3FhdF9jb21tb24vcWF0X2hhbC5jIA0KYi9kcml2ZXJzL2NyeXB0by9p
-bnRlbC9xYXQvcWF0X2NvbW1vbi9xYXRfaGFsLmMgaW5kZXggDQozMTdjYWZhOWQxMWYuLmVm
-OGE5Y2Y3NGYwYyAxMDA2NDQgLS0tIA0KYS9kcml2ZXJzL2NyeXB0by9pbnRlbC9xYXQvcWF0
-X2NvbW1vbi9xYXRfaGFsLmMgKysrIA0KYi9kcml2ZXJzL2NyeXB0by9pbnRlbC9xYXQvcWF0
-X2NvbW1vbi9xYXRfaGFsLmMgQEAgLTE2Myw3ICsxNjMsNyBAQCBpbnQgDQpxYXRfaGFsX3Nl
-dF9hZV9jdHhfbW9kZShzdHJ1Y3QgaWNwX3FhdF9md19sb2FkZXJfaGFuZGxlICpoYW5kbGUs
-IHJldHVybiANCi1FSU5WQUw7IH0gLSAvKiBTZXRzIHRoZSBhY2NlbGFyYXRpb24gZW5naW5l
-IGNvbnRleHQgbW9kZSB0byBlaXRoZXIgZm91ciANCm9yIGVpZ2h0ICovICsgLyogU2V0cyB0
-aGUgYWNjZWxlcmF0aW9uIGVuZ2luZSBjb250ZXh0IG1vZGUgdG8gZWl0aGVyIA0KZm91ciBv
-ciBlaWdodCAqLyBjc3IgPSBxYXRfaGFsX3JkX2FlX2NzcihoYW5kbGUsIGFlLCBDVFhfRU5B
-QkxFUyk7IGNzciA9IA0KSUdOT1JFX1cxQ19NQVNLICYgY3NyOyBuZXdfY3NyID0gKG1vZGUg
-PT0gNCkgPyAtLSAyLjQzLjANCg0K
---------------470QXHLaUu5KS0KPNnWVybgS
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Thanks Herbert.
 
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3DUTF=
--8">
-  </head>
-  <body>
-    <p><span style=3D"white-space: pre-wrap">From f535db2d2a33278da928767=
-a140dd0ed2adb8fde Mon Sep 17 00:00:00 2001
-From: WangYuli <a class=3D"moz-txt-link-rfc2396E" href=3D"mailto:wangyuli=
-@uniontech.com">&lt;wangyuli@uniontech.com&gt;</a>
-Date: Sun, 22 Sep 2024 18:41:36 +0800
-Subject: [PATCH 1/3] crypto: qat - Correct the typo 'accelaration'
+-Danny
 
-There is a spelling mistake of 'accelaration' which should be
-'acceleration'.
-
-Signed-off-by: WangYuli <a class=3D"moz-txt-link-rfc2396E" href=3D"mailto=
-:wangyuli@uniontech.com">&lt;wangyuli@uniontech.com&gt;</a>
----
- drivers/crypto/intel/qat/qat_common/qat_hal.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/intel/qat/qat_common/qat_hal.c b/drivers/cryp=
-to/intel/qat/qat_common/qat_hal.c
-index 317cafa9d11f..ef8a9cf74f0c 100644
---- a/drivers/crypto/intel/qat/qat_common/qat_hal.c
-+++ b/drivers/crypto/intel/qat/qat_common/qat_hal.c
-@@ -163,7 +163,7 @@ int qat_hal_set_ae_ctx_mode(struct icp_qat_fw_loader_=
-handle *handle,
-                return -EINVAL;
-        }
-=20
--       /* Sets the accelaration engine context mode to either four or ei=
-ght */
-+       /* Sets the acceleration engine context mode to either four or ei=
-ght */
-        csr =3D qat_hal_rd_ae_csr(handle, ae, CTX_ENABLES);
-        csr =3D IGNORE_W1C_MASK &amp; csr;
-        new_csr =3D (mode =3D=3D 4) ?
---=20
-2.43.0</span></p>
-  </body>
-</html>
-
---------------470QXHLaUu5KS0KPNnWVybgS--
-
---------------ltEb4yjOEu066Yq7G0UMrII6
-Content-Type: application/pgp-keys; name="OpenPGP_0xC5DA1F3046F40BEE.asc"
-Content-Disposition: attachment; filename="OpenPGP_0xC5DA1F3046F40BEE.asc"
-Content-Description: OpenPGP public key
-Content-Transfer-Encoding: quoted-printable
-
------BEGIN PGP PUBLIC KEY BLOCK-----
-
-xjMEZoEsiBYJKwYBBAHaRw8BAQdAyDPzcbPnchbIhweThfNK1tg1imM+5kgDBJSK
-P+nX39DNIVdhbmdZdWxpIDx3YW5neXVsaUB1bmlvbnRlY2guY29tPsKJBBMWCAAx
-FiEEa1GMzYeuKPkgqDuvxdofMEb0C+4FAmaBLIgCGwMECwkIBwUVCAkKCwUWAgMB
-AAAKCRDF2h8wRvQL7g0UAQCH3mrGM0HzOaARhBeA/Q3AIVfhS010a0MZmPTRGVfP
-bwD/SrncJwwPAL4GiLPEC4XssV6FPUAY0rA68eNNI9cJLArOOARmgSyJEgorBgEE
-AZdVAQUBAQdA88W4CTLDD9fKwW9PB5yurCNdWNS7VTL0dvPDofBTjFYDAQgHwngE
-GBYIACAWIQRrUYzNh64o+SCoO6/F2h8wRvQL7gUCZoEsiQIbDAAKCRDF2h8wRvQL
-7sKvAP4mBvm7Zn1OUjFViwkma8IGRGosXAvMUFyOHVcl1RTgFQEAuJkUo9ERi7qS
-/hbUdUgtitI89efbY0TVetgDsyeQiwU=3D
-=3DBlkq
------END PGP PUBLIC KEY BLOCK-----
-
---------------ltEb4yjOEu066Yq7G0UMrII6--
-
---------------s2eprH29of7FdOnA0Bmc2tyK--
-
---------------N54MKCwh0mjNCkzcTrUB7CFc
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-wnsEABYIACMWIQRrUYzNh64o+SCoO6/F2h8wRvQL7gUCZu/+OQUDAAAAAAAKCRDF2h8wRvQL7g3B
-AP0by1wcvNOq4DOqWsYYiVNiZREA7ZFvXn6mLpYXBVVeKQD/bfxyg8Auci683/bStkQgsFnIXTtK
-FlGfwNedrgAjTgc=
-=Nljl
------END PGP SIGNATURE-----
-
---------------N54MKCwh0mjNCkzcTrUB7CFc--
+On 9/21/24 4:31 AM, Herbert Xu wrote:
+> On Thu, Sep 19, 2024 at 07:36:37AM -0400, Danny Tsen wrote:
+>> Data mismatch found when testing ipsec tunnel with AES/GCM crypto.
+>> Disabling CRYPTO_AES_GCM_P10 in Kconfig for this feature.
+>>
+>> Fixes: fd0e9b3e2ee6 ("crypto: p10-aes-gcm - An accelerated AES/GCM stitched implementation")
+>> Fixes: cdcecfd9991f ("crypto: p10-aes-gcm - Glue code for AES/GCM stitched implementation")
+>> Fixes: 45a4672b9a6e2 ("crypto: p10-aes-gcm - Update Kconfig and Makefile")
+>>
+>> Signed-off-by: Danny Tsen <dtsen@linux.ibm.com>
+>> ---
+>>   arch/powerpc/crypto/Kconfig | 1 +
+>>   1 file changed, 1 insertion(+)
+> Patch applied.  Thanks.
