@@ -1,98 +1,59 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail-4319.protonmail.ch (mail-4319.protonmail.ch [185.70.43.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EACAA77F13;
-	Mon, 23 Sep 2024 14:48:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5D9219F138;
+	Mon, 23 Sep 2024 16:48:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727102912; cv=none; b=aKV3OsXshSKWkZb/I8lIfu0+cu1Cr7fvHlOfjIAzeFeMs6aAqwFriFgx96z3yvXKUKXTCsp87PRM59OfYruHs95TfHaJYBJ5yloX55yElB7Q1x6zclDgjugAmq+Csc5P7lvcUNX+aebchnhyOatByx/5NhHTULGPCxmny4L1LVA=
+	t=1727110139; cv=none; b=Vic8pEL15LiEaGA01iV+uHB9irVWd2QrCZYiJ6S3fKgTTdpCy87UuOGn8oWXbEnZc2Xi+Wyzg2ehU5viJp0CT0hoaJbiFlIbQOpVYoC884/aaL8B1WqZeDaWjC6mjRKbU3avNW4FQ6DXNoWGDndzedfsIunVy7cFdDOlotQm7VQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727102912; c=relaxed/simple;
-	bh=tByN5vh1UH7dCw150VKNLMK7ecfdnpT2N9aRTF3vmC0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EgcgyFaVhsv6xpAHd7JATxUtqvn4whW4xLKyDKT2kslgx16ausRqQFiqpkcIjqzz+45IsOF8QpjehVhIXwRYhMKLR6tp27del5ThYD3lX6NEPMewpX0gb2CYpqrU8+1rABnEPGWkhzdBm7AcLrhdXQ93ee19e7CGpiTBuENUvrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=jjLUSKzh; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1727110139; c=relaxed/simple;
+	bh=bAiicrpcuvXIdu+PFpVoDZJII26yW/Y2dVSZSXvEyTI=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=uAMzpXwVXWFZK0XnyAK8aHBgO6u7uHuqgEjtyH4AGBnixHwvNCLWF2p1imDZd1E6kcMstiB+ygjHjhA8I2iwZoCz4oUVxj2DptLK9TZFnsvIT8GjJOJfcl3Imk2/2jfX7hLIQII9eB0xPR9vc4qVixwOp831MicIRyQ64sd9g+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=SVixMpVy; arc=none smtp.client-ip=185.70.43.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="jjLUSKzh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD4C9C4CEC4;
-	Mon, 23 Sep 2024 14:48:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1727102911;
-	bh=tByN5vh1UH7dCw150VKNLMK7ecfdnpT2N9aRTF3vmC0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jjLUSKzh8tfGsls/q0RaLCS8puPvulGuHwdKQyE4bBhC/WkGxsRGySZGMrUkCvdeq
-	 DvAlsfXUU++tLsCgG3DDwDVXmtj7UIVNNWYRmA+hq3VI2TE3WruQA23kRRuj1zf4Bc
-	 3sg2mhJ1hE5WwX7Ikwee2tLr4CWLqCl0qaH8z/+k=
-Date: Mon, 23 Sep 2024 16:48:27 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Jarkko Sakkinen <jarkko@kernel.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Guangwu Zhang <guazhang@redhat.com>,
-	Peter Huewe <peterhuewe@gmx.de>, Jason Gunthorpe <jgg@ziepe.ca>,
-	linux-integrity@vger.kernel.org,
-	James Bottomley <James.Bottomley@hansenpartnership.com>
-Subject: Re: [PATCH] hwrng: core - Add WARN_ON for buggy read return values
-Message-ID: <2024092340-renovate-cornflake-4b5e@gregkh>
-References: <ZvEFQAWVgWNd9j7e@gondor.apana.org.au>
- <D4DI1M1ELFXK.2COGZN6O5HABD@kernel.org>
- <ZvE0NrOC00ojRe3t@gondor.apana.org.au>
- <D4DQJ34I5FSD.1K618VWEKI7IW@kernel.org>
+	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="SVixMpVy"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
+	s=protonmail3; t=1727110135; x=1727369335;
+	bh=1gfs9NK8z4Sb3ZQ/sTw/C1jG/iVcYvCWzQ5pw5kIq/g=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=SVixMpVy8aWtWzXbBA3jH3Kn+767c+QVO4GHbPaL4jqFbt3ri7FqbykMdxfsg006h
+	 bkGP5/bej2BRyqK1Guc4BzUlXdi3bRWRIThFLzGlDZPBhKpWsHEkhPUKzyZsiNHrAT
+	 j1J14vHdpMIbNmjlP4RYe55kNxqrs/b7fpE6pto6WZhEywTie/L4Lk1RjrQh5p2Y2j
+	 lsJF7I+YKGRciZaw61ovKT3Q3iaFD1frjpHThr7NtugKLfkRDfLWqZUyGtLjbLJC+Z
+	 aWEPLmzwjymYZyNAhcUFiM6Sb8zh3sEsnknBWCuXJwKoW63c5r4ra45BidwUI0kbTb
+	 YHfnGMLp1qhwg==
+Date: Mon, 23 Sep 2024 16:48:51 +0000
+To: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+From: Jari Ruusu <jariruusu@protonmail.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Announce loop-AES-v3.8e file/swap crypto package
+Message-ID: <Y0PDGsSUEFUwuPwSuIyYJ-TtAEwpiWlsyftpLvGNNBd4XpRc_MzU0Up6dVZwCxqB0Ux1z5zVd-lOwYGpnvBBAKOSv-CkfeMDqBmYiD7jsHQ=@protonmail.com>
+Feedback-ID: 22639318:user:proton
+X-Pm-Message-ID: d1c6e9522a85c82d3becc236238d5bc0e4c56067
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <D4DQJ34I5FSD.1K618VWEKI7IW@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 23, 2024 at 05:31:47PM +0300, Jarkko Sakkinen wrote:
-> On Mon Sep 23, 2024 at 12:26 PM EEST, Herbert Xu wrote:
->  > > +
-> > > > +		err = rng->read(rng, buffer, size, wait);
-> > > > +		if (WARN_ON_ONCE(err > 0 && err > size))
-> > > 
-> > > Are you sure you want to use WARN_ON_ONCE here instead of
-> > > pr_warn_once()? I.e. is it worth of taking down the whole
-> > > kernel?
-> >
-> > Absolutely.  If this triggers it's a serious kernel bug and we
-> > should gather as much information as possible.  pr_warn_once is
-> > not the same thing as WARN_ON_ONCE in terms of what it prints.
-> 
-> Personally I allow the use of WARN only as the last resort.
-> 
-> If you need stack printout you can always use dump_stack().
-> 
-> >
-> > If people want to turn WARNs into BUGs, then they've only got
-> > themselves to blame when the kernel goes down.  On the other
-> > hand perhaps they *do* want this to panic and we should hand
-> > it to them.
-> 
-> Actually when you turn on "panic_on_warn" the user expectation is and
-> should be that the sites where WARN is used have been hand picked with
-> consideration so that panic happens for a reason.
-> 
-> This has also been denoted repeatedly by Greg:
-> 
-> https://lore.kernel.org/linux-cve-announce/2024061828-CVE-2024-36975-6719@gregkh/
-> 
-> I should check this somewhere but actually these days a wrongly chosen
-> WARN() might lead to CVE entry. That fix was by me but I never created
-> the CVE.
-> 
-> Greg, did we have something under Documentation/ that would fully
-> address the use of WARN?
+loop-AES changes since previous release:
+- Worked around kernel interface changes on 6.11 kernels.
 
-Please see:
-	https://www.kernel.org/doc/html/latest/process/deprecated.html#bug-and-bug-on
-which describes that.  We should make it more explicit that any WARN()
-or WARN_ON() calls that can be hit by user interactions somehow, will
-end up getting a CVE id when we fix it up to not do so.
+bzip2 compressed tarball is here:
 
-thanks,
+    https://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.8e.tar.bz2
+    md5sum 92f962b8ab46ff6b3035f5dc03563dec
 
-greg k-h
+    https://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.8e.tar.bz2.sign
+
+--
+Jari Ruusu=C2=A0 4096R/8132F189 12D6 4C3A DCDA 0AA4 27BD=C2=A0 ACDF F073 3C=
+80 8132 F189
+
