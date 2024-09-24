@@ -1,76 +1,76 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A4B11A3A9C;
-	Tue, 24 Sep 2024 13:30:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E14B51AD9C0;
+	Tue, 24 Sep 2024 16:05:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727184656; cv=none; b=LIeLz0AyWtPPlVouMx8LDJaz6weh3oqsuwyys7BvYirU/f9GrWbDRqHy0DTiTycEbKZQlBb2XSsTyhQDqLoWEN5PLUDrjhDup/8G0KysAMbvO/EhzcXJKfWYlDF5NY2WtJqAmz4KEtvfd7ilexeX8HxKHWGJdNhKqmMP0NEg4o0=
+	t=1727193914; cv=none; b=PLQ5STJDdDp5n4HQsPNL8YbsjR2snfJygDpGl41P3Ic3T39b2zYHRRQn5KZBScA0GdScw44e9PCLEeslytLqp7ZLKwoNGtOZPGt+BvTeHyIiAkxBQLLzs8YwtzLYUIy2p9JoiqubsO4ny65x/c+TaJLJ/4mJ3lOXKHipe6DEbhw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727184656; c=relaxed/simple;
-	bh=Zzmag5B4d9rMI5KRInab3TIef9RWWex2VD4e5f7PNFY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eCHf/GckEDQcfHBidS5666aA156e/Gsu3xDS6bq+9mBVbWvUkK5xOAu+BU8MsrMjKKAO/qBQzJhlNOOkOxXJehJ8ZGcQgfZFwG/OLv0t1MOmkCQ1jrRo4o7V7z7F/2VjuQghSU6lc+rfxnD5aRQOrXPbClEQJMvOt97KFYi/Hgo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=owxnGKyh; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1727193914; c=relaxed/simple;
+	bh=mZ42CM4kCLM+8EKFdf2GzoGmoR2FGfpOWwtq0wy6W8c=;
+	h=Mime-Version:Content-Type:Date:Message-Id:To:Cc:Subject:From:
+	 References:In-Reply-To; b=WaBmFcI9zKyyMtVrB4ufDgSNUZAGAGwprvItdO6s4rkBZ4hHccNQw7i4BryyKbPXNAN82xCd7LPoP54jNALUIebGvfMXs/L+FJn7SegZhXG5xyh8omZZVpaOmbEaUJ1O7GCYdVU2LDo4XbJF5PJy0K8OFlrXaF03berdBZGdKsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gp3Puujc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="owxnGKyh"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=qzNhgBZN/5wjd+yDm2cjASGFuH1G1TFsEgliMH/h3wU=; b=owxnGKyhYfbroz8DQpbpVmxOAt
-	4QLOvDuzLQb8mPz3b/Nb5EanhpCGdMmRAxe2gcMmz/W6Iq9xjuECbQ96XqColG6HKP3Yvtarbxqgs
-	L2Nxtskf93tfN4LHu+VADYNTIpQl6Jb8x66i97rfYVDVhicU3xkVBYRq+rop2eHxJ0QMjMrEL7iaz
-	tFxgWMabaj82s5PfocyURJWsPADk4Egn0qHd/vqO8h5GfP5fBCEpFsQ6bF+dCvORZxWmD0bii+wIL
-	0buwVkLe4X6D8rxlA2vs2k5RFy/ObHpY9+B+r3MAWKsE3N96XGhp17kYQnBqJKtF5WyLIRB6wO4S8
-	5ur7MyUQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1st5Sr-004LDo-2R;
-	Tue, 24 Sep 2024 21:30:40 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 24 Sep 2024 21:30:39 +0800
-Date: Tue, 24 Sep 2024 21:30:39 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc: LTP List <ltp@lists.linux.it>, open list <linux-kernel@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	lkft-triage@lists.linaro.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Anders Roxell <anders.roxell@linaro.org>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Arnd Bergmann <arnd@arndb.de>, chrubis <chrubis@suse.cz>
-Subject: Re: af_alg01.c:36: TFAIL: instantiated nested hmac algorithm
- ('hmac(hmac(md5))')!
-Message-ID: <ZvK-_5QKQ2e0S2Sd@gondor.apana.org.au>
-References: <CA+G9fYtu-h_pp_hNfmx1pBg48oGeRiEDnEc4b-r3AiC_QfWiKg@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gp3Puujc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50423C4CEC7;
+	Tue, 24 Sep 2024 16:05:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727193913;
+	bh=mZ42CM4kCLM+8EKFdf2GzoGmoR2FGfpOWwtq0wy6W8c=;
+	h=Date:To:Cc:Subject:From:References:In-Reply-To:From;
+	b=gp3PuujcSy8Mg1vuUsMXXyhEud0Oj/ZzFkw9tnzymjELjGIJPVJ7QCtMPWCklGpTo
+	 m7eCb5C4byxIB2QislN26WrjiNkVKDpfZzIl57UqtmKE7aVR7kjD7Gf5YX15NPPc9o
+	 0EeL7tA0Kx/VKBjT1dHg0KTZ8iU6u0GM33F2RbZchbSjnnP3pMrlhKQOzBK+IYgH9l
+	 hPoqX6R8PxPzk47/MTWR1fg49wvHWg36GuZIV2zWs6OaHinjZCGjcJiIbWW30wc6bs
+	 8epb8UDIk5KGsQdD4xIPSBNJAraq9p3Hde1Cx1MSewCGhvknC4igakNAvnZYFgQqWp
+	 pMrpAn2BZk4YQ==
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+G9fYtu-h_pp_hNfmx1pBg48oGeRiEDnEc4b-r3AiC_QfWiKg@mail.gmail.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 24 Sep 2024 19:05:09 +0300
+Message-Id: <D4EN54C1IK1R.11JD66L931PD8@kernel.org>
+To: "Herbert Xu" <herbert@gondor.apana.org.au>, "Greg KH"
+ <gregkh@linuxfoundation.org>
+Cc: "Linux Crypto Mailing List" <linux-crypto@vger.kernel.org>, "Guangwu
+ Zhang" <guazhang@redhat.com>, "Peter Huewe" <peterhuewe@gmx.de>, "Jason
+ Gunthorpe" <jgg@ziepe.ca>, <linux-integrity@vger.kernel.org>, "James
+ Bottomley" <James.Bottomley@hansenpartnership.com>
+Subject: Re: [PATCH] hwrng: core - Add WARN_ON for buggy read return values
+From: "Jarkko Sakkinen" <jarkko@kernel.org>
+X-Mailer: aerc 0.18.2
+References: <ZvEFQAWVgWNd9j7e@gondor.apana.org.au>
+ <D4DI1M1ELFXK.2COGZN6O5HABD@kernel.org>
+ <ZvE0NrOC00ojRe3t@gondor.apana.org.au>
+ <D4DQJ34I5FSD.1K618VWEKI7IW@kernel.org>
+ <2024092340-renovate-cornflake-4b5e@gregkh>
+ <ZvHsh6by3omeYj9d@gondor.apana.org.au>
+In-Reply-To: <ZvHsh6by3omeYj9d@gondor.apana.org.au>
 
-On Tue, Sep 24, 2024 at 03:16:09PM +0530, Naresh Kamboju wrote:
+On Tue Sep 24, 2024 at 1:32 AM EEST, Herbert Xu wrote:
+> On Mon, Sep 23, 2024 at 04:48:27PM +0200, Greg KH wrote:
+> >
+> > Please see:
+> > 	https://www.kernel.org/doc/html/latest/process/deprecated.html#bug-and=
+-bug-on
+> > which describes that.  We should make it more explicit that any WARN()
+> > or WARN_ON() calls that can be hit by user interactions somehow, will
+> > end up getting a CVE id when we fix it up to not do so.
 >
-> Warning log:
-> ----------
-> tst_test.c:1617: TINFO: Timeout per run is 0h 02m 30s
-> af_alg01.c:36: TFAIL: instantiated nested hmac algorithm ('hmac(hmac(md5))')!
-> tst_af_alg.c:46: TBROK: unexpected error binding AF_ALG socket to hash
-> algorithm 'hmac(hmac(md5))': EINVAL (22)
+> If the aformentioned WARN_ON hits, then the driver has probabaly
+> already done a buffer overrun so it's a CVE anyway.
 
-This is expected.  You need to fix the test to not treat this as an
-error.
+We'll see I finally got into testing this. Sorry for latencies, I'm
+switching jobs and unfortunately German Post Office lost my priority
+mail containing contracts (sent them from Finland to Berlin) so have
+been signing, scanning etc. the whole day :-) My last week in the
+current job, and next week is the first in the new job, so this
+week is a bit bumpy.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+BR, Jarkko
