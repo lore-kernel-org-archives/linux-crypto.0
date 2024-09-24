@@ -1,72 +1,100 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7E501AC435;
-	Tue, 24 Sep 2024 18:04:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B5BB146A7B;
+	Tue, 24 Sep 2024 22:28:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727201043; cv=none; b=Mdy8C0pS0ovy57ioThkWUSn4ynYNR72+qN7eZVxeQu2DGnFNzri4Ti2zT0mBqQ5VVTUsbDzPN7FvbALj+hqVxrZH3aQmNRLJ2AiuncsMn3bguNf3m5wp3TAyeA/yQcv0bKpB0NMt8MDzn8IeHCM/iyqKH8KYtjH/TY8XRnRyY1w=
+	t=1727216921; cv=none; b=jJ1t06ZNqu2Y8qfyvUkSrjabl1kRWEpmStZfKFggm8LmxjUWwc/atC9HAGLqNMHn4x+B+oFAX0R6vUNyY474guFCHqoarlyI+O5IwYFugYbSccKdTxj2qqF4nGlDuBsR9AWRvPgEEVxBiZPrlPFYAuiFiFYd7/GmiVguy8eRSrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727201043; c=relaxed/simple;
-	bh=Nry20tYU/hvIHE+Fi9qXVD9G9iu1adf5oXjftGVvgAo=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=ekT1m881RFF3r2dTa/wyp35rklpyiCzkCHklOatQdBwkPs+FnT0UEKlwohVlmo3ISEV7NNx0a0dEoOECKMBOBjAHi60xQCgOP9u1woNlK60XXg8BPYUpymf+TCwVJkwRMf2M4Cya6dfwh2GZEWsDFChOYzzG7LeCeIXLJAH1cYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OxBL/Umo; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1727216921; c=relaxed/simple;
+	bh=GsVkTtyX/rc3JJKceprQUMQw10UNBAbWAkdmH00ea+Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=b2byGVWqnfFKvdxJ6cytK84WUkoAq56dJDMHGVcZYnGMo8BhdqsNhMi5IVXkQRtCB+Ylgmz9GoBQ5PuwEECOAK/yRW1ISz/GkyyqsNlVc+5RIYyLASGNDO/xxHxCioGeBetc1lifhF6pbEoEpWGg75oCy4cpj1CEB2HfTHLey0s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nkyw7TgU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OxBL/Umo"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88972C4CECD;
-	Tue, 24 Sep 2024 18:04:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nkyw7TgU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BF30C4CEC4;
+	Tue, 24 Sep 2024 22:28:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727201043;
-	bh=Nry20tYU/hvIHE+Fi9qXVD9G9iu1adf5oXjftGVvgAo=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=OxBL/UmoF9vKT7O8qljIN2QcCswrDnqW/w2kKuMEcAirsebRv/FrGN4AQS7cDyF2b
-	 eUH6xrJ+xpNb1vK9WDc5HvcK44JNradoO+Y3Ivl8BWIDbX5za1WgcHUK6GZZV0GEIf
-	 7PvyEsC8RP/qa+hEEVWfleA6KQ1KtF6DY33RbGoslQgV27KaarIJwuBFLkCZB7lD4A
-	 sWT5rjRhEtAAU5Tt+iS1I1eEeallit7Zhn8F5YeHBuVE6IGZFHkHwSel0/68JcigJX
-	 WCHsbGawuv1TNA8aOr6F1dngP/2dn8kJPP9+UPH9RnW6WSBXyVC4UgUZAiCYCNYJ1J
-	 l6OkcA1w0gEnQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D673806656;
-	Tue, 24 Sep 2024 18:04:07 +0000 (UTC)
-Subject: Re: [GIT PULL] Crypto Fixes for 6.12
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <ZvDbn6lSNdWG9P6f@gondor.apana.org.au>
-References: <Y5mGGrBJaDL6mnQJ@gondor.apana.org.au>
- <Y/MDmL02XYfSz8XX@gondor.apana.org.au>
- <ZEYLC6QsKnqlEQzW@gondor.apana.org.au>
- <ZJ0RSuWLwzikFr9r@gondor.apana.org.au>
- <ZOxnTFhchkTvKpZV@gondor.apana.org.au>
- <ZUNIBcBJ0VeZRmT9@gondor.apana.org.au>
- <ZZ3F/Pp1pxkdqfiD@gondor.apana.org.au>
- <ZbstBewmaIfrFocE@gondor.apana.org.au>
- <ZgFIP3x1w294DIxQ@gondor.apana.org.au>
- <ZkrC8u1NmwpldTOH@gondor.apana.org.au> <ZvDbn6lSNdWG9P6f@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <ZvDbn6lSNdWG9P6f@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.12-p2
-X-PR-Tracked-Commit-Id: 44ac4625ea002deecd0c227336c95b724206c698
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 1cfb46051db9ddb68e297eaf17270e09874ec5f3
-Message-Id: <172720104593.4145686.7072222308128375599.pr-tracker-bot@kernel.org>
-Date: Tue, 24 Sep 2024 18:04:05 +0000
+	s=k20201202; t=1727216920;
+	bh=GsVkTtyX/rc3JJKceprQUMQw10UNBAbWAkdmH00ea+Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Nkyw7TgUrMk8k6+AAj4dlvo0Wf6I9ClSsmADp20hCwN5zP6jyECmqYdCVAyE+yBvP
+	 C+szEw6AKUep9mgcNK4F6TAO1/Zq3OA0ZOBBwnP8Z1puOiiiFduOHRME8495UOR3pM
+	 EaYiogikueTz2QTg3pL6NLk8Stcqhpg6XDfCi+kH5g951Fnb4oufus6d8/LVjMKzt2
+	 IW7ELaKsWCwCW2aKtvKJeyVZubRIJqbnoO3+2jypZzqfrpStw2NDzNkJuQl9Z10h4O
+	 OqmeRNWk5rpcl3RhsSZ/9RtU6qqRceCwp+egpt42f2Y14AH24xENro7vTO7oqmTEei
+	 2Aswcn+zHAgYQ==
+Date: Tue, 24 Sep 2024 15:28:39 -0700
+From: Eric Biggers <ebiggers@kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Cc: Naresh Kamboju <naresh.kamboju@linaro.org>,
+	LTP List <ltp@lists.linux.it>,
+	open list <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	lkft-triage@lists.linaro.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Anders Roxell <anders.roxell@linaro.org>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Arnd Bergmann <arnd@arndb.de>, chrubis <chrubis@suse.cz>
+Subject: Re: af_alg01.c:36: TFAIL: instantiated nested hmac algorithm
+ ('hmac(hmac(md5))')!
+Message-ID: <20240924222839.GC1585@sol.localdomain>
+References: <CA+G9fYtu-h_pp_hNfmx1pBg48oGeRiEDnEc4b-r3AiC_QfWiKg@mail.gmail.com>
+ <ZvK-_5QKQ2e0S2Sd@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZvK-_5QKQ2e0S2Sd@gondor.apana.org.au>
 
-The pull request you sent on Mon, 23 Sep 2024 11:08:15 +0800:
+On Tue, Sep 24, 2024 at 09:30:39PM +0800, Herbert Xu wrote:
+> On Tue, Sep 24, 2024 at 03:16:09PM +0530, Naresh Kamboju wrote:
+> >
+> > Warning log:
+> > ----------
+> > tst_test.c:1617: TINFO: Timeout per run is 0h 02m 30s
+> > af_alg01.c:36: TFAIL: instantiated nested hmac algorithm ('hmac(hmac(md5))')!
+> > tst_af_alg.c:46: TBROK: unexpected error binding AF_ALG socket to hash
+> > algorithm 'hmac(hmac(md5))': EINVAL (22)
+> 
+> This is expected.  You need to fix the test to not treat this as an
+> error.
+> 
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.12-p2
+So the error code changed from ENOENT to EINVAL.  These particular LTP tests
+(af_alg01 and af_alg03) could check for either ENOENT or EINVAL, and it would
+preserve the main point of the tests.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/1cfb46051db9ddb68e297eaf17270e09874ec5f3
+I do feel that the previous error code, ENOENT, was more logical though.  From
+userspace's perspective, these invalid algorithms don't exist and don't need to
+be treated any different from other algorithms that don't exist.
 
-Thank you!
+Has it been checked what else in userspace might need to be updated as a result
+of this change?
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Looking at libkcapi for example
+(https://github.com/smuellerDD/libkcapi/blob/master/lib/kcapi.h#L125) it passes
+the error code up and documents it as part of its API:
+
+     * @return 0 upon success;
+     *         -ENOENT - algorithm not available;
+     *         -EOPNOTSUPP - AF_ALG family not available;
+     *         -EINVAL - accept syscall failed
+     *         -ENOMEM - cipher handle cannot be allocated
+     */
+    int kcapi_cipher_init(struct kcapi_handle **handle, const char *ciphername,
+                          uint32_t flags);
+
+So that is now wrong, as "algorithm not available" can now be either ENOENT or
+EINVAL.
+
+I don't really see the reason for this churn.  The kernel commit which made this
+change (795f85fca229) provides no explanation either.
+
+- Eric
