@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B42415CD46;
-	Wed, 25 Sep 2024 11:36:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45E3D18454E;
+	Wed, 25 Sep 2024 11:36:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727264217; cv=none; b=qOcxb7rO9UAQZoSz31dGw6k8ULxTMGK4kepmh28ilQ9o/RF0vRQZNekDMBo/onU7E582BBNw+oGtKj8qJDTR2lSVHu8nl070dtKNWE2pQc8HfB9lEPYzWQE6JLCYrw0nMNLrqykOYyxjLHnPQp+hbppKRccl+WhU1elWEllArfs=
+	t=1727264220; cv=none; b=ayY/QEiqRsygUiRqRTn8sKYt4PSR9TLSDhg5g8IcvyhVVg2jqUSoPZVshr/YbgtBUOI5f3M4daMgbKAlyyqjmuG9ZY15zQNu69yfGc30ZmBFsoTGs+wNvta88gcJwCIAj/ArGMjTxu/hTwKcliRSxtJDjY5REDIZfMgwxQ3nIYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727264217; c=relaxed/simple;
-	bh=2ofue6IgWwenVCw5oZtnm3HvbNU3uirXO7YFwU73YZQ=;
+	s=arc-20240116; t=1727264220; c=relaxed/simple;
+	bh=j2ccaSimKF2NNMPi13mrXqJW3ypLQwa+rgFCkI95JDc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=T39x6jfqdRZbn0pgpYxIP1m41vIsrHrGsx9HkwNplcJHXx4tri1+grgXdlPMN3PUiTpCUAbbhf/kODY/+QWhOQq0qvpOuta0rs2u8ZteRQDxVHfj7BuTqYTI/QzHDGe4dCvJYUy10wCQ8eED9hdULtrZD6696yz/OKwuuVY6glA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G4aV1fRJ; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=U5gr9zTnVcdUFhegdV3L0c6bt660rANrcRBlZzKBD683nuWd+9x/ZSnBCITaLJtTIwybz/NXYshls31MoAEPYZa1ohrYoDI23Jnt7qUrc+dmaj6T5c81F1HtmUNw6GilkRg6dlzwJA9z3Q6ggw/dYi8ijtjIJxE+HhDev/1wpOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sbj0WDsq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G4aV1fRJ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88227C4CEC3;
-	Wed, 25 Sep 2024 11:36:55 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sbj0WDsq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6450C4CEC3;
+	Wed, 25 Sep 2024 11:36:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727264216;
-	bh=2ofue6IgWwenVCw5oZtnm3HvbNU3uirXO7YFwU73YZQ=;
+	s=k20201202; t=1727264219;
+	bh=j2ccaSimKF2NNMPi13mrXqJW3ypLQwa+rgFCkI95JDc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=G4aV1fRJ0DFVHiXBuLsppytmChvNKIA9FQNQoHxwpbrY1DhJ0zAvxrJs5V18P9LZ8
-	 8skWBkjYx/IPwUmvTJS55gqxtTyFWkKQG8uLoDIiBGvweYK2QVOcnzp0233enzo53b
-	 551mqqj7juivTUvrUDm45hJbw8yLt5woYshQFf5Y98gHINaY8NSTRSooXuycHVhcI3
-	 /sS5z5ouaAiqH4brM15UH9EM7puPInMG7N36e6V9m/T+alFcENuUuzNROYilh7sftq
-	 5buANm+uOGLTIqZCJSUstsXVo+k3SoSPgC/HyP0Eo7flIsEMhgkZzafxDxpjABBz/g
-	 3roSqHPZlqCVQ==
+	b=Sbj0WDsqL+fxBeEihIjjyMSjipqYMyj9bwYOUKh4UBpbpuzqNQYDbK/gHZTPypQVC
+	 ft3CNKH3OUdZdIRINl+ZNcPcwzUixKagdk8kMuVEzf/y+FxVMhD3Lm/1zF98mJX5xR
+	 PUsg0DT/FM4fFIvpzjS9oB6w/ZXatMy/kt7Ja9rlBX/kKSY0v3j2cXpzdTGvjrbnxE
+	 Hu17weJ4cggmFLZ8ntOI4Wh3yRMXClLLMcWo2CQcjxbZccBD/Ws0+bnMeHuP0bo+UY
+	 YRdn7+poXGbY+HIUwh009ZTjcv+RvHCmfv9saDoUltgQwIIhS1b26rNHFJ9mRNmK6G
+	 +Q9qA4hROqfig==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -36,9 +36,9 @@ Cc: Herbert Xu <herbert@gondor.apana.org.au>,
 	schalla@marvell.com,
 	davem@davemloft.net,
 	linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.11 007/244] crypto: octeontx - Fix authenc setkey
-Date: Wed, 25 Sep 2024 07:23:48 -0400
-Message-ID: <20240925113641.1297102-7-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.11 008/244] crypto: octeontx2 - Fix authenc setkey
+Date: Wed, 25 Sep 2024 07:23:49 -0400
+Message-ID: <20240925113641.1297102-8-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240925113641.1297102-1-sashal@kernel.org>
 References: <20240925113641.1297102-1-sashal@kernel.org>
@@ -55,7 +55,7 @@ Content-Transfer-Encoding: 8bit
 
 From: Herbert Xu <herbert@gondor.apana.org.au>
 
-[ Upstream commit 311eea7e37c4c0b44b557d0c100860a03b4eab65 ]
+[ Upstream commit 7ccb750dcac8abbfc7743aab0db6a72c1c3703c7 ]
 
 Use the generic crypto_authenc_extractkeys helper instead of custom
 parsing code that is slightly broken.  Also fix a number of memory
@@ -68,48 +68,48 @@ extra-long keys.
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- .../crypto/marvell/octeontx/otx_cptvf_algs.c  | 261 +++++++-----------
- 1 file changed, 93 insertions(+), 168 deletions(-)
+ .../marvell/octeontx2/otx2_cptvf_algs.c       | 254 +++++++-----------
+ 1 file changed, 90 insertions(+), 164 deletions(-)
 
-diff --git a/drivers/crypto/marvell/octeontx/otx_cptvf_algs.c b/drivers/crypto/marvell/octeontx/otx_cptvf_algs.c
-index 3c5d577d8f0d5..0a1b85ad0057f 100644
---- a/drivers/crypto/marvell/octeontx/otx_cptvf_algs.c
-+++ b/drivers/crypto/marvell/octeontx/otx_cptvf_algs.c
-@@ -17,7 +17,6 @@
- #include <crypto/sha2.h>
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c b/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
+index 1604fc58dc13e..5aa56f20f888c 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
++++ b/drivers/crypto/marvell/octeontx2/otx2_cptvf_algs.c
+@@ -11,7 +11,6 @@
  #include <crypto/xts.h>
+ #include <crypto/gcm.h>
  #include <crypto/scatterwalk.h>
 -#include <linux/rtnetlink.h>
  #include <linux/sort.h>
  #include <linux/module.h>
- #include "otx_cptvf.h"
-@@ -66,6 +65,8 @@ static struct cpt_device_table ae_devices = {
+ #include "otx2_cptvf.h"
+@@ -55,6 +54,8 @@ static struct cpt_device_table se_devices = {
  	.count = ATOMIC_INIT(0)
  };
  
-+static struct otx_cpt_sdesc *alloc_sdesc(struct crypto_shash *alg);
++static struct otx2_cpt_sdesc *alloc_sdesc(struct crypto_shash *alg);
 +
  static inline int get_se_device(struct pci_dev **pdev, int *cpu_num)
  {
- 	int count, ret = 0;
-@@ -509,44 +510,61 @@ static int cpt_aead_init(struct crypto_aead *tfm, u8 cipher_type, u8 mac_type)
+ 	int count;
+@@ -598,40 +599,56 @@ static int cpt_aead_init(struct crypto_aead *atfm, u8 cipher_type, u8 mac_type)
  	ctx->cipher_type = cipher_type;
  	ctx->mac_type = mac_type;
  
 +	switch (ctx->mac_type) {
-+	case OTX_CPT_SHA1:
++	case OTX2_CPT_SHA1:
 +		ctx->hashalg = crypto_alloc_shash("sha1", 0, 0);
 +		break;
 +
-+	case OTX_CPT_SHA256:
++	case OTX2_CPT_SHA256:
 +		ctx->hashalg = crypto_alloc_shash("sha256", 0, 0);
 +		break;
 +
-+	case OTX_CPT_SHA384:
++	case OTX2_CPT_SHA384:
 +		ctx->hashalg = crypto_alloc_shash("sha384", 0, 0);
 +		break;
 +
-+	case OTX_CPT_SHA512:
++	case OTX2_CPT_SHA512:
 +		ctx->hashalg = crypto_alloc_shash("sha512", 0, 0);
 +		break;
 +	}
@@ -117,34 +117,38 @@ index 3c5d577d8f0d5..0a1b85ad0057f 100644
 +	if (IS_ERR(ctx->hashalg))
 +		return PTR_ERR(ctx->hashalg);
 +
-+	crypto_aead_set_reqsize_dma(tfm, sizeof(struct otx_cpt_req_ctx));
-+
-+	if (!ctx->hashalg)
-+		return 0;
++	if (ctx->hashalg) {
++		ctx->sdesc = alloc_sdesc(ctx->hashalg);
++		if (!ctx->sdesc) {
++			crypto_free_shash(ctx->hashalg);
++			return -ENOMEM;
++		}
++	}
 +
  	/*
  	 * When selected cipher is NULL we use HMAC opcode instead of
  	 * FLEXICRYPTO opcode therefore we don't need to use HASH algorithms
  	 * for calculating ipad and opad
  	 */
- 	if (ctx->cipher_type != OTX_CPT_CIPHER_NULL) {
+-	if (ctx->cipher_type != OTX2_CPT_CIPHER_NULL) {
 -		switch (ctx->mac_type) {
--		case OTX_CPT_SHA1:
+-		case OTX2_CPT_SHA1:
 -			ctx->hashalg = crypto_alloc_shash("sha1", 0,
 -							  CRYPTO_ALG_ASYNC);
 -			if (IS_ERR(ctx->hashalg))
 -				return PTR_ERR(ctx->hashalg);
 -			break;
 -
--		case OTX_CPT_SHA256:
+-		case OTX2_CPT_SHA256:
 -			ctx->hashalg = crypto_alloc_shash("sha256", 0,
 -							  CRYPTO_ALG_ASYNC);
 -			if (IS_ERR(ctx->hashalg))
 -				return PTR_ERR(ctx->hashalg);
 -			break;
++	if (ctx->cipher_type != OTX2_CPT_CIPHER_NULL && ctx->hashalg) {
 +		int ss = crypto_shash_statesize(ctx->hashalg);
  
--		case OTX_CPT_SHA384:
+-		case OTX2_CPT_SHA384:
 -			ctx->hashalg = crypto_alloc_shash("sha384", 0,
 -							  CRYPTO_ALG_ASYNC);
 -			if (IS_ERR(ctx->hashalg))
@@ -152,11 +156,12 @@ index 3c5d577d8f0d5..0a1b85ad0057f 100644
 -			break;
 +		ctx->ipad = kzalloc(ss, GFP_KERNEL);
 +		if (!ctx->ipad) {
++			kfree(ctx->sdesc);
 +			crypto_free_shash(ctx->hashalg);
 +			return -ENOMEM;
 +		}
  
--		case OTX_CPT_SHA512:
+-		case OTX2_CPT_SHA512:
 -			ctx->hashalg = crypto_alloc_shash("sha512", 0,
 -							  CRYPTO_ALG_ASYNC);
 -			if (IS_ERR(ctx->hashalg))
@@ -165,23 +170,13 @@ index 3c5d577d8f0d5..0a1b85ad0057f 100644
 +		ctx->opad = kzalloc(ss, GFP_KERNEL);
 +		if (!ctx->opad) {
 +			kfree(ctx->ipad);
++			kfree(ctx->sdesc);
 +			crypto_free_shash(ctx->hashalg);
 +			return -ENOMEM;
  		}
  	}
- 
--	crypto_aead_set_reqsize_dma(tfm, sizeof(struct otx_cpt_req_ctx));
-+	ctx->sdesc = alloc_sdesc(ctx->hashalg);
-+	if (!ctx->sdesc) {
-+		kfree(ctx->opad);
-+		kfree(ctx->ipad);
-+		crypto_free_shash(ctx->hashalg);
-+		return -ENOMEM;
-+	}
- 
- 	return 0;
- }
-@@ -602,8 +620,7 @@ static void otx_cpt_aead_exit(struct crypto_aead *tfm)
+ 	switch (ctx->cipher_type) {
+@@ -713,8 +730,7 @@ static void otx2_cpt_aead_exit(struct crypto_aead *tfm)
  
  	kfree(ctx->ipad);
  	kfree(ctx->opad);
@@ -189,10 +184,10 @@ index 3c5d577d8f0d5..0a1b85ad0057f 100644
 -		crypto_free_shash(ctx->hashalg);
 +	crypto_free_shash(ctx->hashalg);
  	kfree(ctx->sdesc);
- }
  
-@@ -699,7 +716,7 @@ static inline void swap_data64(void *buf, u32 len)
- 		*dst = cpu_to_be64p(src);
+ 	if (ctx->fbk_cipher) {
+@@ -788,7 +804,7 @@ static inline void swap_data64(void *buf, u32 len)
+ 		cpu_to_be64s(src);
  }
  
 -static int copy_pad(u8 mac_type, u8 *out_pad, u8 *in_pad)
@@ -200,25 +195,25 @@ index 3c5d577d8f0d5..0a1b85ad0057f 100644
  {
  	struct sha512_state *sha512;
  	struct sha256_state *sha256;
-@@ -707,22 +724,19 @@ static int copy_pad(u8 mac_type, u8 *out_pad, u8 *in_pad)
+@@ -796,22 +812,19 @@ static int copy_pad(u8 mac_type, u8 *out_pad, u8 *in_pad)
  
  	switch (mac_type) {
- 	case OTX_CPT_SHA1:
+ 	case OTX2_CPT_SHA1:
 -		sha1 = (struct sha1_state *) in_pad;
 +		sha1 = (struct sha1_state *)pad;
  		swap_data32(sha1->state, SHA1_DIGEST_SIZE);
 -		memcpy(out_pad, &sha1->state, SHA1_DIGEST_SIZE);
  		break;
  
- 	case OTX_CPT_SHA256:
+ 	case OTX2_CPT_SHA256:
 -		sha256 = (struct sha256_state *) in_pad;
 +		sha256 = (struct sha256_state *)pad;
  		swap_data32(sha256->state, SHA256_DIGEST_SIZE);
 -		memcpy(out_pad, &sha256->state, SHA256_DIGEST_SIZE);
  		break;
  
- 	case OTX_CPT_SHA384:
- 	case OTX_CPT_SHA512:
+ 	case OTX2_CPT_SHA384:
+ 	case OTX2_CPT_SHA512:
 -		sha512 = (struct sha512_state *) in_pad;
 +		sha512 = (struct sha512_state *)pad;
  		swap_data64(sha512->state, SHA512_DIGEST_SIZE);
@@ -226,7 +221,7 @@ index 3c5d577d8f0d5..0a1b85ad0057f 100644
  		break;
  
  	default:
-@@ -732,55 +746,53 @@ static int copy_pad(u8 mac_type, u8 *out_pad, u8 *in_pad)
+@@ -821,55 +834,54 @@ static int copy_pad(u8 mac_type, u8 *out_pad, u8 *in_pad)
  	return 0;
  }
  
@@ -234,7 +229,7 @@ index 3c5d577d8f0d5..0a1b85ad0057f 100644
 +static int aead_hmac_init(struct crypto_aead *cipher,
 +			  struct crypto_authenc_keys *keys)
  {
- 	struct otx_cpt_aead_ctx *ctx = crypto_aead_ctx_dma(cipher);
+ 	struct otx2_cpt_aead_ctx *ctx = crypto_aead_ctx_dma(cipher);
 -	int state_size = crypto_shash_statesize(ctx->hashalg);
  	int ds = crypto_shash_digestsize(ctx->hashalg);
  	int bs = crypto_shash_blocksize(ctx->hashalg);
@@ -252,59 +247,59 @@ index 3c5d577d8f0d5..0a1b85ad0057f 100644
 +		ret = crypto_shash_digest(&ctx->sdesc->shash, keys->authkey,
 +					  authkeylen, ctx->key);
 +		if (ret)
-+			return ret;
-+		authkeylen = ds;
-+	} else
-+		memcpy(ctx->key, keys->authkey, authkeylen);
++			goto calc_fail;
  
 -	ctx->ipad = kzalloc(bs, GFP_KERNEL);
 -	if (!ctx->ipad) {
 -		ret = -ENOMEM;
 -		goto calc_fail;
 -	}
-+	ctx->enc_key_len = keys->enckeylen;
-+	ctx->auth_key_len = authkeylen;
++		authkeylen = ds;
++	} else
++		memcpy(ctx->key, keys->authkey, authkeylen);
  
 -	ctx->opad = kzalloc(bs, GFP_KERNEL);
 -	if (!ctx->opad) {
 -		ret = -ENOMEM;
 -		goto calc_fail;
 -	}
-+	if (ctx->cipher_type == OTX_CPT_CIPHER_NULL)
-+		return keys->enckeylen ? -EINVAL : 0;
++	ctx->enc_key_len = keys->enckeylen;
++	ctx->auth_key_len = authkeylen;
  
 -	ipad = kzalloc(state_size, GFP_KERNEL);
 -	if (!ipad) {
 -		ret = -ENOMEM;
 -		goto calc_fail;
+-	}
++	if (ctx->cipher_type == OTX2_CPT_CIPHER_NULL)
++		return keys->enckeylen ? -EINVAL : 0;
+ 
+-	opad = kzalloc(state_size, GFP_KERNEL);
+-	if (!opad) {
+-		ret = -ENOMEM;
+-		goto calc_fail;
 +	switch (keys->enckeylen) {
 +	case AES_KEYSIZE_128:
-+		ctx->key_type = OTX_CPT_AES_128_BIT;
++		ctx->key_type = OTX2_CPT_AES_128_BIT;
 +		break;
 +	case AES_KEYSIZE_192:
-+		ctx->key_type = OTX_CPT_AES_192_BIT;
++		ctx->key_type = OTX2_CPT_AES_192_BIT;
 +		break;
 +	case AES_KEYSIZE_256:
-+		ctx->key_type = OTX_CPT_AES_256_BIT;
++		ctx->key_type = OTX2_CPT_AES_256_BIT;
 +		break;
 +	default:
 +		/* Invalid key length */
 +		return -EINVAL;
  	}
  
--	opad = kzalloc(state_size, GFP_KERNEL);
--	if (!opad) {
--		ret = -ENOMEM;
--		goto calc_fail;
--	}
-+	memcpy(ctx->key + authkeylen, keys->enckey, keys->enckeylen);
- 
 -	if (authkeylen > bs) {
 -		ret = crypto_shash_digest(&ctx->sdesc->shash, ctx->key,
 -					  authkeylen, ipad);
 -		if (ret)
 -			goto calc_fail;
--
++	memcpy(ctx->key + authkeylen, keys->enckey, keys->enckeylen);
+ 
 -		authkeylen = ds;
 -	} else {
 -		memcpy(ipad, ctx->key, authkeylen);
@@ -316,7 +311,7 @@ index 3c5d577d8f0d5..0a1b85ad0057f 100644
  	memset(ipad + authkeylen, 0, bs - authkeylen);
  	memcpy(opad, ipad, bs);
  
-@@ -798,7 +810,7 @@ static int aead_hmac_init(struct crypto_aead *cipher)
+@@ -887,7 +899,7 @@ static int aead_hmac_init(struct crypto_aead *cipher)
  	crypto_shash_init(&ctx->sdesc->shash);
  	crypto_shash_update(&ctx->sdesc->shash, ipad, bs);
  	crypto_shash_export(&ctx->sdesc->shash, ipad);
@@ -325,7 +320,7 @@ index 3c5d577d8f0d5..0a1b85ad0057f 100644
  	if (ret)
  		goto calc_fail;
  
-@@ -806,25 +818,9 @@ static int aead_hmac_init(struct crypto_aead *cipher)
+@@ -895,25 +907,9 @@ static int aead_hmac_init(struct crypto_aead *cipher)
  	crypto_shash_init(&ctx->sdesc->shash);
  	crypto_shash_update(&ctx->sdesc->shash, opad, bs);
  	crypto_shash_export(&ctx->sdesc->shash, opad);
@@ -352,107 +347,98 @@ index 3c5d577d8f0d5..0a1b85ad0057f 100644
  	return ret;
  }
  
-@@ -832,57 +828,15 @@ static int otx_cpt_aead_cbc_aes_sha_setkey(struct crypto_aead *cipher,
- 					   const unsigned char *key,
- 					   unsigned int keylen)
+@@ -921,87 +917,17 @@ static int otx2_cpt_aead_cbc_aes_sha_setkey(struct crypto_aead *cipher,
+ 					    const unsigned char *key,
+ 					    unsigned int keylen)
  {
--	struct otx_cpt_aead_ctx *ctx = crypto_aead_ctx_dma(cipher);
+-	struct otx2_cpt_aead_ctx *ctx = crypto_aead_ctx_dma(cipher);
 -	struct crypto_authenc_key_param *param;
 -	int enckeylen = 0, authkeylen = 0;
 -	struct rtattr *rta = (void *)key;
--	int status = -EINVAL;
 -
 -	if (!RTA_OK(rta, keylen))
--		goto badkey;
--
+-		return -EINVAL;
++	struct crypto_authenc_keys authenc_keys;
+ 
 -	if (rta->rta_type != CRYPTO_AUTHENC_KEYA_PARAM)
--		goto badkey;
+-		return -EINVAL;
 -
 -	if (RTA_PAYLOAD(rta) < sizeof(*param))
--		goto badkey;
+-		return -EINVAL;
 -
 -	param = RTA_DATA(rta);
 -	enckeylen = be32_to_cpu(param->enckeylen);
 -	key += RTA_ALIGN(rta->rta_len);
 -	keylen -= RTA_ALIGN(rta->rta_len);
 -	if (keylen < enckeylen)
--		goto badkey;
-+	struct crypto_authenc_keys authenc_keys;
-+	int status;
- 
--	if (keylen > OTX_CPT_MAX_KEY_SIZE)
--		goto badkey;
+-		return -EINVAL;
+-
+-	if (keylen > OTX2_CPT_MAX_KEY_SIZE)
+-		return -EINVAL;
 -
 -	authkeylen = keylen - enckeylen;
 -	memcpy(ctx->key, key, keylen);
 -
 -	switch (enckeylen) {
 -	case AES_KEYSIZE_128:
--		ctx->key_type = OTX_CPT_AES_128_BIT;
+-		ctx->key_type = OTX2_CPT_AES_128_BIT;
 -		break;
 -	case AES_KEYSIZE_192:
--		ctx->key_type = OTX_CPT_AES_192_BIT;
+-		ctx->key_type = OTX2_CPT_AES_192_BIT;
 -		break;
 -	case AES_KEYSIZE_256:
--		ctx->key_type = OTX_CPT_AES_256_BIT;
+-		ctx->key_type = OTX2_CPT_AES_256_BIT;
 -		break;
 -	default:
 -		/* Invalid key length */
--		goto badkey;
+-		return -EINVAL;
 -	}
 -
 -	ctx->enc_key_len = enckeylen;
 -	ctx->auth_key_len = authkeylen;
 -
--	status = aead_hmac_init(cipher);
-+	status = crypto_authenc_extractkeys(&authenc_keys, key, keylen);
- 	if (status)
- 		goto badkey;
- 
--	return 0;
-+	status = aead_hmac_init(cipher, &authenc_keys);
-+
- badkey:
- 	return status;
+-	return aead_hmac_init(cipher);
++	return crypto_authenc_extractkeys(&authenc_keys, key, keylen) ?:
++	       aead_hmac_init(cipher, &authenc_keys);
  }
-@@ -891,36 +845,7 @@ static int otx_cpt_aead_ecb_null_sha_setkey(struct crypto_aead *cipher,
- 					    const unsigned char *key,
- 					    unsigned int keylen)
+ 
+ static int otx2_cpt_aead_ecb_null_sha_setkey(struct crypto_aead *cipher,
+ 					     const unsigned char *key,
+ 					     unsigned int keylen)
  {
--	struct otx_cpt_aead_ctx *ctx = crypto_aead_ctx_dma(cipher);
+-	struct otx2_cpt_aead_ctx *ctx = crypto_aead_ctx_dma(cipher);
 -	struct crypto_authenc_key_param *param;
 -	struct rtattr *rta = (void *)key;
 -	int enckeylen = 0;
 -
 -	if (!RTA_OK(rta, keylen))
--		goto badkey;
+-		return -EINVAL;
 -
 -	if (rta->rta_type != CRYPTO_AUTHENC_KEYA_PARAM)
--		goto badkey;
+-		return -EINVAL;
 -
 -	if (RTA_PAYLOAD(rta) < sizeof(*param))
--		goto badkey;
+-		return -EINVAL;
 -
 -	param = RTA_DATA(rta);
 -	enckeylen = be32_to_cpu(param->enckeylen);
 -	key += RTA_ALIGN(rta->rta_len);
 -	keylen -= RTA_ALIGN(rta->rta_len);
 -	if (enckeylen != 0)
--		goto badkey;
+-		return -EINVAL;
 -
--	if (keylen > OTX_CPT_MAX_KEY_SIZE)
--		goto badkey;
+-	if (keylen > OTX2_CPT_MAX_KEY_SIZE)
+-		return -EINVAL;
 -
 -	memcpy(ctx->key, key, keylen);
 -	ctx->enc_key_len = enckeylen;
 -	ctx->auth_key_len = keylen;
+-
 -	return 0;
--badkey:
--	return -EINVAL;
-+	return otx_cpt_aead_cbc_aes_sha_setkey(cipher, key, keylen);
++	return otx2_cpt_aead_cbc_aes_sha_setkey(cipher, key, keylen);
  }
  
- static int otx_cpt_aead_gcm_aes_setkey(struct crypto_aead *cipher,
+ static int otx2_cpt_aead_gcm_aes_setkey(struct crypto_aead *cipher,
 -- 
 2.43.0
 
