@@ -1,128 +1,144 @@
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout13.his.huawei.com (frasgout13.his.huawei.com [14.137.139.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0267539AD6
-	for <linux-crypto@vger.kernel.org>; Wed, 25 Sep 2024 15:01:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF9981D5AB0;
+	Thu, 26 Sep 2024 09:42:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=14.137.139.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727276512; cv=none; b=Ey24UID3/xSEXNnfyO2o9KsQzRtOtX72QGyXXPvXJxwpNsV3OOFNQ+0hjRNq7w30wLRY1ggT1lWYuh/kgvWz1vxDQvaZfjr5QvB1CEWPemvPFAKNZCr9ZBu4AdhMcFjARLLypvGvfvv69J1YIt+jgvmGTRB7VkQeJN9yXAqS/zs=
+	t=1727343744; cv=none; b=r+uMtbTinp952zdp6tfhwmUPp4QKu8AoYf0K1WboV7XJRUMs8XFQEtuG0+C2XiG1KuGDjMcchzcIbiv4TNV1mfzYAa++sDLhdiFwZj/bfWhVhmIW1UAroSqgXgchmFjtT46Belna//KAMJBlpTZtbjjubhfjuirX3Rw/DkEJ7FE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727276512; c=relaxed/simple;
-	bh=HyezUH8s4vB3bE8d9XKTG58UQRvZwYgHO4cj+l8WGCs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E5CeQERugO6M4nxfZFct2aDfvKYp1RyX460Y/DtLEF2oWwtQy9lWABcaW2HVCYTtOR7pRHH2c6Y/fAegvi6PGGEbhdjVr6TmUr+9CcJAjyGHRi9gGYFAhyap0E7CISJvxBwALq5RH8Lc+Be1GI0kHm25kx3aVh7kbM0qKUxYlR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=omoHMJqQ; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="omoHMJqQ"
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-378f600e090so3920271f8f.3
-        for <linux-crypto@vger.kernel.org>; Wed, 25 Sep 2024 08:01:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1727276508; x=1727881308; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=a+DIs+cjfT3JD55mRAd2TBTt3EC9HtAmYb81V/vRFFU=;
-        b=omoHMJqQQquU9+SzmRf3jVcybk8bIgw6mPAn8HvsvvA5Uh/hC26ISRJ1EzH8ZNhUU5
-         91NEqnK+pFsdMWz2Qs+PULlGV1LGlphOQUB9jsgD0o46p79hKbBgs0Be4vTETUD290cL
-         Q5GD0UAzyuFgLOBSP8MbfYtJQ/PEW2Fw7mDdd5tWgsykY8m1FEDOHRy08xB5s+EQ6TOx
-         0Xh/n5HMNGtApTpFY3g7ZhmpzGR76xOAg92ju3E7Vcx+ytQQibJQf//UyCUcZyUI0yKG
-         KEqVLNmLBmHLcGZQ9n0vh+1oUntWgTDgT49wIY+970scMo+EhnmuKMoRYSFhWGqregbA
-         5lDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727276508; x=1727881308;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=a+DIs+cjfT3JD55mRAd2TBTt3EC9HtAmYb81V/vRFFU=;
-        b=mi9kdn1gZLBZ5Deucrvfb9fLOpPx9KULV287htGKr3dFThqT8gf884KlYc1BRgYofn
-         pd8pvtt6n4DU7ZgQj9ZEqqr2FHIJ2YdIWcj8te6y2sL3yX8wgmcTFzh4yJ6LJTQ6c5fv
-         keW237+Mchh9RWf58iSj9I43NKBwQu/VFJiRcBOQHxbPN+1dSaxk+RAxtsHFR8EPG1dt
-         bUbN16z+mwGjew0PPVov/RUG9uTyRZFIn7C9Kb6KvQYFOMPGoTM5YQ/48t2o0mDwrzc9
-         5+nCdAQsVjZNeBKWunBOEClKsBp8VIwVyMABnHyRjJbnOO2XNII3vdTN5wMXyazhZ5SV
-         74Vw==
-X-Forwarded-Encrypted: i=1; AJvYcCUZY1tHbvrrRe0tBdJnRZQ9ZQR3zHSM51VyTzvjagtwWLUfyA/ZaJRsci0fFLKpGxgwNRz0Azv3d2rZIGw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwUYJcfu4fjxPZRNiWpLjenvnnYnFxJX6ZwoW0HxLe6aZd+F3JL
-	OM/LTmdcgvn3/sUo1YcFRmUxQQVVIyNziKksquKPx82uVzDGKo5dyhQXcm+1YGcfrPA0Amqx5mC
-	vsck=
-X-Google-Smtp-Source: AGHT+IHfbzpphdy6WAUwhQp1pcPNJKsRYShLsVQDedS0f/0PBeU1GtCFcb/lDjITm8qpA3o3J6cTfg==
-X-Received: by 2002:adf:f5d2:0:b0:374:c56e:1d44 with SMTP id ffacd0b85a97d-37cc24c9fd3mr2148358f8f.48.1727276508205;
-        Wed, 25 Sep 2024 08:01:48 -0700 (PDT)
-Received: from Red ([2a01:cb1d:3d3:3500:4a02:2aff:fe07:1efc])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-37cbc2c1eb8sm4233697f8f.42.2024.09.25.08.01.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Sep 2024 08:01:47 -0700 (PDT)
-Date: Wed, 25 Sep 2024 17:01:42 +0200
-From: Corentin LABBE <clabbe@baylibre.com>
-To: Janpieter Sollie <janpieter.sollie@kabelmail.de>
-Cc: linux.amoon@gmail.com, Jason@zx2c4.com, heiko@sntech.de,
-	herbert@gondor.apana.org.au, hl@rock-chips.com,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-rockchip@lists.infradead.org, mike.rudenko@gmail.com,
-	robin.murphy@arm.com, shawn.lin@rock-chips.com,
-	troy.lin@rock-chips.com, ty@wevs.org
-Subject: Re: [PATCH] hw_random: rockchip: import driver from vendor tree
-Message-ID: <ZvQl1i2TfA6JYUDH@Red>
-References: <CANAwSgTTzZOwBaR9zjJ5VMpxm5BydtW6rB2S7jg+dnoX8hAoWg@mail.gmail.com>
- <ef2f6e41-bf9e-470e-a416-fda7ce5d8a51@kabelmail.de>
+	s=arc-20240116; t=1727343744; c=relaxed/simple;
+	bh=1A66KUQny3XYl3qfAxlytmnNKD9XatLJzpTiE30l9Oc=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=nNFZgxRwTnD3MQaN+L/BxBCniK4LOVStNa4rmzKyA2viA1yLNDBKG7CpusoZ7E0zKgtU4vPwTvJz9iegJ3/T6jpMDyycCnCLut8b16SokwXOYPwL6fb7ZpQHmOyymI50cIegevouj2AvHofuwWPBJO0swi15c1iWcOLr0Bs5yoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=14.137.139.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.18.186.29])
+	by frasgout13.his.huawei.com (SkyGuard) with ESMTP id 4XDp602Rvxz9v7N8;
+	Thu, 26 Sep 2024 17:22:32 +0800 (CST)
+Received: from mail02.huawei.com (unknown [7.182.16.47])
+	by mail.maildlp.com (Postfix) with ESMTP id 6593514097F;
+	Thu, 26 Sep 2024 17:42:08 +0800 (CST)
+Received: from [127.0.0.1] (unknown [10.204.63.22])
+	by APP1 (Coremail) with SMTP id LxC2BwA3yC9jLPVmEMGqAQ--.33238S2;
+	Thu, 26 Sep 2024 10:42:07 +0100 (CET)
+Message-ID: <a991cf4187bced19485e28a5542ac446b92f864e.camel@huaweicloud.com>
+Subject: Re: [PATCH v3 00/14] KEYS: Add support for PGP keys and signatures
+From: Roberto Sassu <roberto.sassu@huaweicloud.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>, Herbert Xu
+	 <herbert@gondor.apana.org.au>
+Cc: dhowells@redhat.com, dwmw2@infradead.org, davem@davemloft.net, 
+	linux-kernel@vger.kernel.org, keyrings@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, zohar@linux.ibm.com, 
+	linux-integrity@vger.kernel.org, roberto.sassu@huawei.com, 
+	linux-security-module@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>
+Date: Thu, 26 Sep 2024 11:41:51 +0200
+In-Reply-To: <CAHk-=wgnG+C3fVB+dwZYi_ZEErnd_jFbrkN+xc__om3d=7optQ@mail.gmail.com>
+References: <ZuPDZL_EIoS60L1a@gondor.apana.org.au>
+	 <b4a3e55650a9e9f2302cf093e5cc8e739b4ac98f.camel@huaweicloud.com>
+	 <CAHk-=wiU24MGO7LZ1ZZYpQJr1+CSFG9VnB0Nyy4xZSSc_Zu0rg@mail.gmail.com>
+	 <ZuaVzQqkwwjbUHSh@gondor.apana.org.au>
+	 <CAHk-=wgnG+C3fVB+dwZYi_ZEErnd_jFbrkN+xc__om3d=7optQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ef2f6e41-bf9e-470e-a416-fda7ce5d8a51@kabelmail.de>
+X-CM-TRANSID:LxC2BwA3yC9jLPVmEMGqAQ--.33238S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxGFWfKF4fWFWUAF18CrW3Jrb_yoW5AF1Upa
+	9YqF1Ykr1kJr4Ikws2k3WUZryF9ws3Ja45Wr93J34rA3yYvF12vr1I9F43XF129r1xGa1U
+	trsIqF90ka4qv3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxV
+	AFwI0_Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AF
+	wI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
+	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
+	0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
+	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUF1
+	v3UUUUU
+X-CM-SenderInfo: purev21wro2thvvxqx5xdzvxpfor3voofrz/1tbiAgASBGb0w30FQQAAs8
 
-Le Mon, Sep 23, 2024 at 09:48:54AM +0200, Janpieter Sollie a écrit :
-> 
-> Hi everybody,
-> 
-> Is there any chance this random driver will be upstreamed?
-> I'm using it instead of the built-in crypto driver (rk3328-crypto), as this crypto driver showed 
-> the following:
-> 
-> > [     9.270549] rk3288-crypto ff060000.crypto: will run requests pump with realtime priority
-> > [     9.270687] rk3288-crypto ff060000.crypto: Register ecb(aes) as ecb-aes-rk
-> > [     9.270808] rk3288-crypto ff060000.crypto: Register cbc(aes) as cbc-aes-rk
-> > [     9.270831] rk3288-crypto ff060000.crypto: Register ecb(des) as ecb-des-rk
-> > [     9.270848] rk3288-crypto ff060000.crypto: Register cbc(des) as cbc-des-rk
-> > [     9.270864] rk3288-crypto ff060000.crypto: Register ecb(des3_ede) as ecb-des3-ede-rk
-> > [     9.270880] rk3288-crypto ff060000.crypto: Register cbc(des3_ede) as cbc-des3-ede-rk
-> > [     9.270896] rk3288-crypto ff060000.crypto: Register sha1 as rk-sha1
-> > [     9.270915] rk3288-crypto ff060000.crypto: Register sha256 as rk-sha256
-> > [     9.270932] rk3288-crypto ff060000.crypto: Register md5 as rk-md5
-> 
-> so the options here are pretty useless:
-> standard tls / ssh (ktls anyone?) almost never uses ecb or cbc ciphers, and about des ... yeah, 
-> won't dig into that one.
-> I think a rk3328 device will actually benefit more from a entropy source (even if it's not 
-> high-quality) than from sha1/256 which are almost always covered by armv8 crypto extensions.
-> I tried this patch (and disabled the crypto device in dts), it works.
-> Off course there are FIPS failures, but the user employing a rk3328 board probably knows this is 
-> not a high-security device.
-> 
-> Any chances here? applying the patch on 6.6.48 (even with clang thinLTO) works flawlessly.
-> 
-> kind regards,
-> 
-> Janpieter Sollie
+On Sun, 2024-09-15 at 10:40 +0200, Linus Torvalds wrote:
+> On Sun, 15 Sept 2024 at 10:08, Herbert Xu <herbert@gondor.apana.org.au> w=
+rote:
+> >=20
+> > If the aformentioned EFI use-case is bogus, then distro package
+> > verification is going to be the only application for PGP keys in
+> > the kernel.
+>=20
+> So I haven't actually seen _that_ series, but as mentioned it does
+> smell pretty conceptually broken to me.
+>=20
+> But hey, code talks, bullshit walks. People can most certainly try to
+> convince me.
 
-Did you test if it really works by testing entropy output QUALITY ?
+The solution has three parts.
 
-I asked how the serie was tested and the sender never answered raising a big red flag.
-If you check the thread, someone tested and the quality bringed by the vendor driver is really BAD.
-This is due to the fact that their sample value was really too short.
-So as-is, this serie is a security issue to the randomness quality.
+1. The kernel verifies the RPM header with a PGP key embedded in the
+kernel, and provided by the Linux distribution vendor.
 
-I need to regrab some time finishing, my patch adding support for it on intree crypto driver.
-I found an old tree that I push here https://github.com/montjoie/linux/tree/rk3288-trng
-This is not a final patch, but it could help finding a correct value of sample via the debugfs.
-I dont remember which value of sample was necessary to obtain a minimal quality. (perhaps 500 since it seems the default in my patch).
+2. The Integrity Digest Cache parses the verified RPM header in the
+kernel and feeds one of the existing LSMs (IMA, IPE and BPF LSM) with
+the digests extracted from the RPM header.
 
-Unfortunatly, I cannot test it immediatly, as my CI controller got some HW issue, and I need to fix them.
+3. The LSMs compare the fsverity digest they find in the filesystem
+with the authenticated ones from the RPM header, and might deny access
+to the file if the digests don't match.
 
-Regards
+At this point, RPM headers don't contain fsverity digests, only file
+content digests, but this is an orthogonal problem.
+
+
+I had a look at previous threads on similar topics, to find your
+position on the matter.
+
+I got that you would not be probably against (1), and maybe not (3).
+
+However, we still need a source telling whether the fsverity digest in
+the filesystem is the same of one calculated by Linux distributions
+during build. That is what the Integrity Digest Cache provides.
+
+Regarding (2), maybe I'm missing something fundamental, but isn't
+parsing the ELF format of kernel modules from the kernel similar?
+
+Cannot really go to user space at this point, since the authenticated
+fsverity digests are directly consumed by LSMs. Also, as David pointed
+out in this thread [1], there is no obligation for user space to call
+any signature verification function before executing a file, this task
+must be done by an LSM.
+
+I'm aware that we should not run unnecessary code in the kernel. I
+tried to mitigate this issue by striping the parsing functionality to
+the minimum (220 LOC), and formally verifying it with the Frama-C
+static analyzer. The parser is available here [2].
+
+I'm also aware that this is not the long term solution, but I didn't
+find much support on the alternatives, like a trustworthy user mode
+driver [3][4] (isolated from other root processes) and signed eBPF
+programs [5].
+
+What it would be the right way to proceed, in your opinion?
+
+Thanks
+
+Roberto
+
+[1] https://lore.kernel.org/linux-kernel/32081.1171560770@redhat.com/
+[2] https://lore.kernel.org/linux-integrity/20240905150543.3766895-9-robert=
+o.sassu@huaweicloud.com/
+[3] https://lore.kernel.org/lkml/20230317145240.363908-1-roberto.sassu@huaw=
+eicloud.com/#t
+[4] https://lore.kernel.org/linux-integrity/eb31920bd00e2c921b0aa6ebed8745c=
+b0130b0e1.camel@huaweicloud.com/
+[5] https://lwn.net/Articles/853489/
+
