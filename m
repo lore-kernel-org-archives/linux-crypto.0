@@ -1,169 +1,148 @@
-Received: from wind.enjellic.com (wind.enjellic.com [76.10.64.91])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34E3ED53C;
-	Fri, 27 Sep 2024 01:36:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=76.10.64.91
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AED0200A3;
+	Fri, 27 Sep 2024 16:03:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727401002; cv=none; b=avIHuV+TsxMMR0lT4N8LjW9nRNuGJYSE/xiSkUMHYRTTXIuK5afhT+ibhl0PO0w/5Fw7On7wP8pSOqRdulfpScBeTTizJkaLV6aUYLcA6V4Xheu3vOuOGSKEnNAqxegpZBhZo1ITQvBl9KmlzbGsjwFMG2UA81CIUepHNALT1Yc=
+	t=1727453013; cv=none; b=MrrXRxXvge4FZX/6V/gMtdkflTbVltOSoutChF3PFNYTSPcn8pc1zYY2y5vCBvt9NrA8s/kzkdhlh/1NiXv/AXFQP+AqVDN6Ohb1EmEdPSYX6MtYXvS9In+fFEPxGL6FUo5oSQ4g6qMpUtcN8g7E9vDTO1zDVFoVgN8FAaZYOfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727401002; c=relaxed/simple;
-	bh=hFdP5aaaibBZ8KCNQ8ZKquKbDyruQ6qDPnUlk8g7+Cw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Mime-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ylji0gj8tJ00SXnTfxhWvuJ3HGLYx0weTngXTjbVdoeUBBAWWvImRGNtV3QzkvgjDKRGGJGBnxy5B/CU3r41k9ZDve0AlHZleWIXvT1MAHLRgcWuscOV1HvRN2Y6Tcb6E7R0o1qyXfkvOtpi7JTb6yMSfFcZWiCH+b4O7xa3jKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=enjellic.com; spf=pass smtp.mailfrom=wind.enjellic.com; arc=none smtp.client-ip=76.10.64.91
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=enjellic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wind.enjellic.com
-Received: from wind.enjellic.com (localhost [127.0.0.1])
-	by wind.enjellic.com (8.15.2/8.15.2) with ESMTP id 48R1PxJ1000683;
-	Thu, 26 Sep 2024 20:25:59 -0500
-Received: (from greg@localhost)
-	by wind.enjellic.com (8.15.2/8.15.2/Submit) id 48R1PvPj000682;
-	Thu, 26 Sep 2024 20:25:57 -0500
-Date: Thu, 26 Sep 2024 20:25:57 -0500
-From: "Dr. Greg" <greg@enjellic.com>
-To: Roberto Sassu <roberto.sassu@huaweicloud.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>, dhowells@redhat.com,
-        dwmw2@infradead.org, davem@davemloft.net, linux-kernel@vger.kernel.org,
-        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        zohar@linux.ibm.com, linux-integrity@vger.kernel.org,
-        roberto.sassu@huawei.com, linux-security-module@vger.kernel.org,
-        Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH v3 00/14] KEYS: Add support for PGP keys and signatures
-Message-ID: <20240927012557.GA634@wind.enjellic.com>
-Reply-To: "Dr. Greg" <greg@enjellic.com>
-References: <ZuPDZL_EIoS60L1a@gondor.apana.org.au> <b4a3e55650a9e9f2302cf093e5cc8e739b4ac98f.camel@huaweicloud.com> <CAHk-=wiU24MGO7LZ1ZZYpQJr1+CSFG9VnB0Nyy4xZSSc_Zu0rg@mail.gmail.com> <ZuaVzQqkwwjbUHSh@gondor.apana.org.au> <CAHk-=wgnG+C3fVB+dwZYi_ZEErnd_jFbrkN+xc__om3d=7optQ@mail.gmail.com> <a991cf4187bced19485e28a5542ac446b92f864e.camel@huaweicloud.com>
+	s=arc-20240116; t=1727453013; c=relaxed/simple;
+	bh=eMlisuPU8aSOMFD/1F9ex1awVaAko4nscyew5rE08e0=;
+	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
+	 MIME-Version:Content-Type; b=hCWzJQVUJrYvckMBhJGM8Jai6ApBbJ4WbrmyW5aKYCQWFdtkzGWIC97WT62KdDpmTEJi/HDwl7EQtvtnjZ/+H8hRTFZ67qsjMDfAtebuVnbZIqHVO/nsJ6XfhFl5t/jcg/I5zxHh/XzW4kDJ4mqqYbIn1THAxDUofHXR3VeVnbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lDm6s4gI; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lDm6s4gI"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1727453013; x=1758989013;
+  h=from:to:cc:references:in-reply-to:subject:date:
+   message-id:mime-version:content-transfer-encoding;
+  bh=eMlisuPU8aSOMFD/1F9ex1awVaAko4nscyew5rE08e0=;
+  b=lDm6s4gIbOO88J7/9+3Yp5y2ZS+hcmAfRvbfrGwRY1emBnGvf34itdF4
+   tUc/Pa8PBr+9azoPyD+7sw6XSiSNYzpDmYxMlMBI1edIBcIDr/31d9WQq
+   PJOoUlQJv/tUjDRwTVovmv6gvglBMwkXVp4IQxoRxNxAjr9oWVpQLoqsj
+   L04oqPRZYsz1rGAuAvdm1TFDVvteVFF4/NoBIfxkPYnmpm0VAGJyDL/fR
+   qQjwoHKzEwIldJ+73dSBMT7+dWBpJ6OtcNgCBCuD5FZ3lh/qBjSAD9VLJ
+   USB6Pn2u+buvGRLZPW2yjE19ohbtYXjeDQdoB3Au0t+nkAXQDSEiqLHTo
+   A==;
+X-CSE-ConnectionGUID: 9s6ZIaDlSKuz1zlPaVMYlQ==
+X-CSE-MsgGUID: Smb4eAr0SfayX9z5wL2tnA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11208"; a="49129852"
+X-IronPort-AV: E=Sophos;i="6.11,159,1725346800"; 
+   d="scan'208";a="49129852"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Sep 2024 09:03:32 -0700
+X-CSE-ConnectionGUID: WYjpbBapSlSP2KIipdKD+A==
+X-CSE-MsgGUID: D9tt5ylpQWCX5Qd1hHyaOw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,159,1725346800"; 
+   d="scan'208";a="73004773"
+Received: from bseshasa-mobl.amr.corp.intel.com (HELO bseshasaMOBL) ([10.246.171.145])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Sep 2024 09:03:28 -0700
+From: <bala.seshasayee@linux.intel.com>
+To: "'Barry Song'" <21cnbao@gmail.com>
+Cc: <tom.zanussi@linux.intel.com>,
+	<minchan@kernel.org>,
+	<senozhatsky@chromium.org>,
+	<hannes@cmpxchg.org>,
+	<yosryahmed@google.com>,
+	<nphamcs@gmail.com>,
+	<chengming.zhou@linux.dev>,
+	<herbert@gondor.apana.org.au>,
+	<davem@davemloft.net>,
+	"Yu, Fenghua" <fenghua.yu@intel.com>,
+	"Jiang, Dave" <dave.jiang@intel.com>,
+	"Feghali, Wajdi K" <wajdi.k.feghali@intel.com>,
+	"Guilford, James" <james.guilford@intel.com>,
+	"Gopal, Vinodh" <vinodh.gopal@intel.com>,
+	"Caldwell, Heath" <heath.caldwell@intel.com>,
+	"Sridhar, Kanchana P" <Kanchana.P.Sridhar@intel.com>,
+	<linux-kernel@vger.kernel.org>,
+	<linux-mm@kvack.org>,
+	<ryan.roberts@arm.com>,
+	<linux-crypto@vger.kernel.org>,
+	<dmaengine@vger.kernel.org>
+References: <cover.1714581792.git.andre.glover@linux.intel.com> <8fe04e86f0907588d210885ac91965960f97f450.1714581792.git.andre.glover@linux.intel.com> <CAGsJ_4xREUbRWRZEO8EiEBdP9YN0Wip4_p58Cca=B4ZdPb7Mpg@mail.gmail.com>
+In-Reply-To: <CAGsJ_4xREUbRWRZEO8EiEBdP9YN0Wip4_p58Cca=B4ZdPb7Mpg@mail.gmail.com>
+Subject: RE: [RFC PATCH 2/3] crypto: add by_n attribute to acomp_req
+Date: Fri, 27 Sep 2024 09:03:27 -0700
+Message-ID: <000001db10f6$cb3ca4b0$61b5ee10$@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a991cf4187bced19485e28a5542ac446b92f864e.camel@huaweicloud.com>
-User-Agent: Mutt/1.4i
-X-Greylist: Sender passed SPF test, not delayed by milter-greylist-4.2.3 (wind.enjellic.com [127.0.0.1]); Thu, 26 Sep 2024 20:26:00 -0500 (CDT)
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQHanBEURTUo4d1RW0OV8cvHU+0CnrJax8IAgBHsYLA=
+Content-Language: en-us
 
-On Thu, Sep 26, 2024 at 11:41:51AM +0200, Roberto Sassu wrote:
 
-Good evening, I hope the week has gone well for everyone.
 
-> On Sun, 2024-09-15 at 10:40 +0200, Linus Torvalds wrote:
-> > On Sun, 15 Sept 2024 at 10:08, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> > > 
-> > > If the aformentioned EFI use-case is bogus, then distro package
-> > > verification is going to be the only application for PGP keys in
-> > > the kernel.
-> > 
-> > So I haven't actually seen _that_ series, but as mentioned it does
-> > smell pretty conceptually broken to me.
-> > 
-> > But hey, code talks, bullshit walks. People can most certainly try to
-> > convince me.
+> -----Original Message-----
+> From: Barry Song <21cnbao@gmail.com>
+> Sent: Sunday, September 15, 2024 11:16 PM
+> To: Andre Glover <andre.glover@linux.intel.com>
+> Cc: tom.zanussi@linux.intel.com; minchan@kernel.org;
+> senozhatsky@chromium.org; hannes@cmpxchg.org; yosryahmed@google.com;
+> nphamcs@gmail.com; chengming.zhou@linux.dev;
+> herbert@gondor.apana.org.au; davem@davemloft.net; Yu, Fenghua
+> <fenghua.yu@intel.com>; Jiang, Dave <dave.jiang@intel.com>; Feghali, =
+Wajdi K
+> <wajdi.k.feghali@intel.com>; Guilford, James =
+<james.guilford@intel.com>; Gopal,
+> Vinodh <vinodh.gopal@intel.com>; Seshasayee, Bala
+> <bala.seshasayee@intel.com>; Caldwell, Heath =
+<heath.caldwell@intel.com>;
+> Sridhar, Kanchana P <kanchana.p.sridhar@intel.com>; linux-
+> kernel@vger.kernel.org; linux-mm@kvack.org; ryan.roberts@arm.com; =
+linux-
+> crypto@vger.kernel.org; dmaengine@vger.kernel.org
+> Subject: Re: [RFC PATCH 2/3] crypto: add by_n attribute to acomp_req
+>=20
+> On Thu, May 2, 2024 at 5:46=E2=80=AFAM Andre Glover =
+<andre.glover@linux.intel.com>
+> wrote:
+> >
+> > Add the 'by_n' attribute to the acomp_req. The 'by_n' attribute can =
+be
+> > used a directive by acomp crypto algorithms for splitting compress =
+and
+> > decompress operations into "n" separate jobs.
+>=20
+> Hi Andre,
+>=20
+> I am definitely in favor of the patchset idea. However, I'm not =
+convinced that a
+> separate by_n API is necessary. Couldn=E2=80=99t this functionality be =
+handled
+> automatically within your driver? For instance, if a large folio is =
+detected, could it
+> automatically apply the by_n concept?
+>=20
+> Am I overlooking something that makes exposing the API necessary in =
+this case?
 
-> The solution has three parts.
-> 
-> 1. The kernel verifies the RPM header with a PGP key embedded in the
-> kernel, and provided by the Linux distribution vendor.
-> 
-> 2. The Integrity Digest Cache parses the verified RPM header in the
-> kernel and feeds one of the existing LSMs (IMA, IPE and BPF LSM) with
-> the digests extracted from the RPM header.
-> 
-> 3. The LSMs compare the fsverity digest they find in the filesystem
-> with the authenticated ones from the RPM header, and might deny access
-> to the file if the digests don't match.
-> 
-> At this point, RPM headers don't contain fsverity digests, only file
-> content digests, but this is an orthogonal problem.
+Hi Barry,
 
-So from the above, can it be assumed that the RPM parsing code isn't
-useful until the RPM packages contain fsverity root hashes?
+The 'deflate-iaa-canned' compression algorithm is fully compatible with =
+the deflate standard. Andre's patchset introduces 'canned-by_n' as a new =
+compression algorithm, which is not a deflate stream since it has a =
+different header (for the by_n chunks).
+The same 'canned-by_n' algorithm along with the value of the acomp_req =
+=E2=80=98by_n=E2=80=99 attribute would be used to compress and =
+decompress a given input buffer.
+Furthermore, with a tunable 'by_n' , the user can experiment with =
+different values of by_n for different mTHP sizes to understand =
+trade-offs in performance vs. compression ratio.
 
-In addition, and we mentioned this previously in this thread, it seems
-that one needs to 'eat' a full read of a file, at least once, in order
-to generate an fsverity digest that is consistent with the actual
-on-disk contents of the file.
+Thanks
+Bala
 
-So, once again, the notion of the implementation of a generic digest
-cache would seem to be orthogonal to the issue of verifying that the
-digest values in the cache are from a 'known good' source.
-
-> I had a look at previous threads on similar topics, to find your
-> position on the matter.
-> 
-> I got that you would not be probably against (1), and maybe not (3).
-> 
-> However, we still need a source telling whether the fsverity digest in
-> the filesystem is the same of one calculated by Linux distributions
-> during build. That is what the Integrity Digest Cache provides.
-> 
-> Regarding (2), maybe I'm missing something fundamental, but isn't
-> parsing the ELF format of kernel modules from the kernel similar?
-> 
-> Cannot really go to user space at this point, since the authenticated
-> fsverity digests are directly consumed by LSMs. Also, as David pointed
-> out in this thread [1], there is no obligation for user space to call
-> any signature verification function before executing a file, this task
-> must be done by an LSM.
-> 
-> I'm aware that we should not run unnecessary code in the kernel. I
-> tried to mitigate this issue by striping the parsing functionality to
-> the minimum (220 LOC), and formally verifying it with the Frama-C
-> static analyzer. The parser is available here [2].
-> 
-> I'm also aware that this is not the long term solution, but I didn't
-> find much support on the alternatives, like a trustworthy user mode
-> driver [3][4] (isolated from other root processes) and signed eBPF
-> programs [5].
-
-We mentioned this previously in the related threads you cite, our TSEM
-LSM implementation allows the kernel to determine whether or not a
-userspace process or the entirety of userspace should be 'trusted' at
-any point in time.
-
-The security footprint/model of a digest 'priming' workload is going
-to be extremely small.  If the priming workload is invoked early in
-the boot process the kernel can have assurance that neither the
-priming workload or the surrounding userspace has commited any actions
-that would be considered to make the system untrusted.
-
-> What it would be the right way to proceed, in your opinion?
-
-Alternatively, we had suggested previously that the RPM parsing code
-may be a good candidate for implementation with a separate kernel
-loadable module.  That places the parsing code in the kernel to meet
-your security requirement and there is standardized infrastructure for
-module signing that would ensure the integrity of the parser.
-
-The module surfaces a pseudo-file through securityfs that userspace
-can use to feed the RPM header into the kernel to drive the population
-of the digest cache.  The parser only needs to be resident and
-operative long enough to initialize the digest cache of a trusted
-system and a kernel loadable module would seem to be consistent with
-that model.
-
-Once again, priming the digest cache with known good digests seems to
-be an issue orthogonal to the implementation of the digest cache
-itself.
-
-We would be interested in knowing if we are misunderstanding the model
-you are trying to achieve.
-
-> Thanks
-> 
-> Roberto
-> 
-> [1] https://lore.kernel.org/linux-kernel/32081.1171560770@redhat.com/
-> [2] https://lore.kernel.org/linux-integrity/20240905150543.3766895-9-roberto.sassu@huaweicloud.com/
-> [3] https://lore.kernel.org/lkml/20230317145240.363908-1-roberto.sassu@huaweicloud.com/#t
-> [4] https://lore.kernel.org/linux-integrity/eb31920bd00e2c921b0aa6ebed8745cb0130b0e1.camel@huaweicloud.com/
-> [5] https://lwn.net/Articles/853489/
-
-Have a good weekend.
-
-As always,
-Dr. Greg
-
-The Quixote Project - Flailing at the Travails of Cybersecurity
-              https://github.com/Quixote-Project
