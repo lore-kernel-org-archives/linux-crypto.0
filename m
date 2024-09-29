@@ -1,44 +1,41 @@
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66497AD2F;
-	Sun, 29 Sep 2024 01:24:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 636FC14F105;
+	Sun, 29 Sep 2024 11:26:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727573094; cv=none; b=CWCeDLcFXDBKbr3yH53mRywjndvWEs/nmrPMglS8Vq9ARjuSdpt2zVJpkg+6YdZClhO+3Etu064bdHDOHXGUeIllpCS7m4a6pl6KBBL7OvxlsFhqpCrsmOhaJJIw1ZmBlykOaiAB7h6DjTv14cJQ664vXrI2unMExK4GVtG6jrQ=
+	t=1727609200; cv=none; b=K27/kCPZZfYpTXDt284AKMS9i0/5cvwIZkF5d9mhSUxU1N3f4slQgu5YFryF0sGLVG3UfkYRmUcFjSoCtr3KZjcyQmA6zw66BnP7dOTWJsBSVUciVjwPg2DjSczjZYqLxXb+HRXrRBzCeaWuhM2k49g31qRTZ0uRk+4zKxn6h/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727573094; c=relaxed/simple;
-	bh=265DAUjUcq4+eox17EL9S3KP5DNC3weRg6P3a+3EIGM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PyRoYv9qc1P+NQpeCfou6y/OZxtiehqYQ2tfdUYutkmrm46LhwHuwCeTTEDFNaXu1LPlnue+Lh/P1SE9TvxgrSPuN7m/LJ9yiAoq2Af0ETw9+uhtbWp2ay6+mE6m0uCBIm+bdqUmmq0PePpj6RVdx42Mz2Gt5slIe2D2juEYgMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=oMT6jTaR; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="oMT6jTaR"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=cyho00Y/D0RN2sK64ufzlsvVId69W+370Af2hc3LCu0=; b=oMT6jTaRpy7hy49E
-	pgp+sVjf3tURy9krCCDvVeo5Psgstvu71rsKzCQH9ySiAN8KbNWVB8PkujscRQeljAnvBLtljPET4
-	7K2uM6fBAwZ+tlYRb/SgTVFI5xUv+t3gvWieGBm0lSXOkTnG7aLdgkcl8/NrWJ5R5qHda0pT+QnZx
-	hvILxEuCYRsyqN5We3eo0bLCbMNxGyQXakzg+Stn0aG+2zOOGZwWLEkJHO+f7yOTx5TiYiRTlRWm/
-	Ox7r+8169BDisL4n2jBdv9JfkIkk90KeG6A0oP6LR/lSwOIX7nMgM6j08HiKytTOTQhOhfc+Tirdl
-	MKcLhc2eSq3NUDQy5g==;
-Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
-	by mx.treblig.org with esmtp (Exim 4.96)
-	(envelope-from <linux@treblig.org>)
-	id 1suig0-007mVh-0V;
-	Sun, 29 Sep 2024 01:24:44 +0000
-From: linux@treblig.org
-To: giovanni.cabiddu@intel.com,
-	herbert@gondor.apana.org.au
-Cc: qat-linux@intel.com,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH] crypto: qat - remove unused adf_devmgr_get_first
-Date: Sun, 29 Sep 2024 02:24:41 +0100
-Message-ID: <20240929012442.435921-1-linux@treblig.org>
-X-Mailer: git-send-email 2.46.2
+	s=arc-20240116; t=1727609200; c=relaxed/simple;
+	bh=c1XklPJtWvPHJyrb4WS4LW40c61PjT9mPdjAvUCm0m8=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hOJlTM9CO4ETt3GhH5UhPpZ58z4UiSDxM8uoWQ9tAenxTNESyWVLhAW89wt6lilCA7+znUz/MOzAqKjZLzfmBNsHTVaZdRp+Gu1TpUbenzqIN5x02MNOZKf7+NUbXa4GYOmieGqljNBV7OUuO1hc9FrD2Q2959OFJae7UpmcmCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4XGhgy2w8cz1T844;
+	Sun, 29 Sep 2024 19:25:02 +0800 (CST)
+Received: from kwepemd200024.china.huawei.com (unknown [7.221.188.85])
+	by mail.maildlp.com (Postfix) with ESMTPS id A48B11402CA;
+	Sun, 29 Sep 2024 19:26:32 +0800 (CST)
+Received: from localhost.huawei.com (10.90.30.45) by
+ kwepemd200024.china.huawei.com (7.221.188.85) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Sun, 29 Sep 2024 19:26:32 +0800
+From: Chenghai Huang <huangchenghai2@huawei.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<liulongfang@huawei.com>, <shenyang39@huawei.com>, <qianweili@huawei.com>,
+	<linwenkai6@hisilicon.com>, <wangzhou1@hisilicon.com>,
+	<huangchenghai2@huawei.com>
+Subject: [PATCH 2/2] crypto: hisilicon/sec2 - fix for aead invalid authsize
+Date: Sun, 29 Sep 2024 19:26:30 +0800
+Message-ID: <20240929112630.863282-3-huangchenghai2@huawei.com>
+X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20240929112630.863282-1-huangchenghai2@huawei.com>
+References: <20240929112630.863282-1-huangchenghai2@huawei.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -46,55 +43,152 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemd200024.china.huawei.com (7.221.188.85)
 
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
+When the digest alg is HMAC-SHAx or another, the authsize may be less
+than 4 bytes and mac_len of the BD is set to zero, the hardware considers
+it a BD configuration error and reports a ras error, so the sec driver
+needs to switch to software calculation in this case, this patch add a
+check for it and remove unnecessary check that has been done by crypto.
 
-adf_devmgr_get_first has been unused since commit
-4a4b0bad0653 ("crypto: qat - fix crypto_get_instance_node function")
-
-Remove it.
-
-(Build tested only, I don't own the hardware)
-
-Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+Fixes: 2f072d75d1ab ("crypto: hisilicon - Add aead support on SEC2")
+Signed-off-by: Wenkai Lin <linwenkai6@hisilicon.com>
+Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
 ---
- drivers/crypto/intel/qat/qat_common/adf_common_drv.h |  1 -
- drivers/crypto/intel/qat/qat_common/adf_dev_mgr.c    | 10 ----------
- 2 files changed, 11 deletions(-)
+ drivers/crypto/hisilicon/sec2/sec_crypto.c | 59 ++++++++++++----------
+ 1 file changed, 31 insertions(+), 28 deletions(-)
 
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_common_drv.h b/drivers/crypto/intel/qat/qat_common/adf_common_drv.h
-index f7ecabdf7805..eaa6388a6678 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_common_drv.h
-+++ b/drivers/crypto/intel/qat/qat_common/adf_common_drv.h
-@@ -69,7 +69,6 @@ void adf_devmgr_rm_dev(struct adf_accel_dev *accel_dev,
- 		       struct adf_accel_dev *pf);
- struct list_head *adf_devmgr_get_head(void);
- struct adf_accel_dev *adf_devmgr_get_dev_by_id(u32 id);
--struct adf_accel_dev *adf_devmgr_get_first(void);
- struct adf_accel_dev *adf_devmgr_pci_to_accel_dev(struct pci_dev *pci_dev);
- int adf_devmgr_verify_id(u32 id);
- void adf_devmgr_get_num_dev(u32 *num);
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_dev_mgr.c b/drivers/crypto/intel/qat/qat_common/adf_dev_mgr.c
-index 96ddd1c419c4..34b9f7731c78 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_dev_mgr.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_dev_mgr.c
-@@ -276,16 +276,6 @@ void adf_devmgr_rm_dev(struct adf_accel_dev *accel_dev,
- }
- EXPORT_SYMBOL_GPL(adf_devmgr_rm_dev);
+diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+index 470c2b422fa9..18b894ac282c 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
++++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+@@ -1114,10 +1114,7 @@ static int sec_aead_setauthsize(struct crypto_aead *aead, unsigned int authsize)
+ 	struct sec_ctx *ctx = crypto_tfm_ctx(tfm);
+ 	struct sec_auth_ctx *a_ctx = &ctx->a_ctx;
  
--struct adf_accel_dev *adf_devmgr_get_first(void)
--{
--	struct adf_accel_dev *dev = NULL;
+-	if (unlikely(a_ctx->fallback_aead_tfm))
+-		return crypto_aead_setauthsize(a_ctx->fallback_aead_tfm, authsize);
 -
--	if (!list_empty(&accel_table))
--		dev = list_first_entry(&accel_table, struct adf_accel_dev,
--				       list);
--	return dev;
--}
+-	return 0;
++	return crypto_aead_setauthsize(a_ctx->fallback_aead_tfm, authsize);
+ }
+ 
+ static int sec_aead_fallback_setkey(struct sec_auth_ctx *a_ctx,
+@@ -1154,13 +1151,7 @@ static int sec_aead_setkey(struct crypto_aead *tfm, const u8 *key,
+ 		}
+ 		memcpy(c_ctx->c_key, key, keylen);
+ 
+-		if (unlikely(a_ctx->fallback_aead_tfm)) {
+-			ret = sec_aead_fallback_setkey(a_ctx, tfm, key, keylen);
+-			if (ret)
+-				return ret;
+-		}
 -
- /**
-  * adf_devmgr_pci_to_accel_dev() - Get accel_dev associated with the pci_dev.
-  * @pci_dev:  Pointer to PCI device.
+-		return 0;
++		return sec_aead_fallback_setkey(a_ctx, tfm, key, keylen);
+ 	}
+ 
+ 	ret = crypto_authenc_extractkeys(&keys, key, keylen);
+@@ -1185,6 +1176,12 @@ static int sec_aead_setkey(struct crypto_aead *tfm, const u8 *key,
+ 		goto bad_key;
+ 	}
+ 
++	ret = sec_aead_fallback_setkey(a_ctx, tfm, key, keylen);
++	if (ret) {
++		dev_err(dev, "set sec fallback key err!\n");
++		goto bad_key;
++	}
++
+ 	return 0;
+ 
+ bad_key:
+@@ -1900,8 +1897,10 @@ static void sec_aead_exit(struct crypto_aead *tfm)
+ 
+ static int sec_aead_ctx_init(struct crypto_aead *tfm, const char *hash_name)
+ {
++	struct aead_alg *alg = crypto_aead_alg(tfm);
+ 	struct sec_ctx *ctx = crypto_aead_ctx(tfm);
+-	struct sec_auth_ctx *auth_ctx = &ctx->a_ctx;
++	struct sec_auth_ctx *a_ctx = &ctx->a_ctx;
++	const char *aead_name = alg->base.cra_name;
+ 	int ret;
+ 
+ 	ret = sec_aead_init(tfm);
+@@ -1910,12 +1909,22 @@ static int sec_aead_ctx_init(struct crypto_aead *tfm, const char *hash_name)
+ 		return ret;
+ 	}
+ 
+-	auth_ctx->hash_tfm = crypto_alloc_shash(hash_name, 0, 0);
+-	if (IS_ERR(auth_ctx->hash_tfm)) {
++	a_ctx->hash_tfm = crypto_alloc_shash(hash_name, 0, 0);
++	if (IS_ERR(a_ctx->hash_tfm)) {
+ 		dev_err(ctx->dev, "aead alloc shash error!\n");
+ 		sec_aead_exit(tfm);
+-		return PTR_ERR(auth_ctx->hash_tfm);
++		return PTR_ERR(a_ctx->hash_tfm);
++	}
++
++	a_ctx->fallback_aead_tfm = crypto_alloc_aead(aead_name, 0,
++						     CRYPTO_ALG_NEED_FALLBACK | CRYPTO_ALG_ASYNC);
++	if (IS_ERR(a_ctx->fallback_aead_tfm)) {
++		dev_err(ctx->dev, "aead driver alloc fallback tfm error!\n");
++		crypto_free_shash(ctx->a_ctx.hash_tfm);
++		sec_aead_exit(tfm);
++		return PTR_ERR(a_ctx->fallback_aead_tfm);
+ 	}
++	a_ctx->fallback = false;
+ 
+ 	return 0;
+ }
+@@ -1924,6 +1933,7 @@ static void sec_aead_ctx_exit(struct crypto_aead *tfm)
+ {
+ 	struct sec_ctx *ctx = crypto_aead_ctx(tfm);
+ 
++	crypto_free_aead(ctx->a_ctx.fallback_aead_tfm);
+ 	crypto_free_shash(ctx->a_ctx.hash_tfm);
+ 	sec_aead_exit(tfm);
+ }
+@@ -2208,15 +2218,15 @@ static int sec_aead_spec_check(struct sec_ctx *ctx, struct sec_req *sreq)
+ 	struct device *dev = ctx->dev;
+ 	int ret;
+ 
+-	if (unlikely(req->cryptlen + req->assoclen > MAX_INPUT_DATA_LEN ||
+-	    req->assoclen > SEC_MAX_AAD_LEN)) {
+-		dev_err(dev, "aead input spec error!\n");
++	/* Hardware does not handle cases where authsize is less than 4 bytes */
++	if (unlikely(sz < MIN_MAC_LEN)) {
++		ctx->a_ctx.fallback = true;
+ 		return -EINVAL;
+ 	}
+ 
+-	if (unlikely((c_mode == SEC_CMODE_GCM && sz < DES_BLOCK_SIZE) ||
+-		     (c_mode == SEC_CMODE_CCM && (sz < MIN_MAC_LEN || sz & MAC_LEN_MASK)))) {
+-		dev_err(dev, "aead input mac length error!\n");
++	if (unlikely(req->cryptlen + req->assoclen > MAX_INPUT_DATA_LEN ||
++	    req->assoclen > SEC_MAX_AAD_LEN)) {
++		dev_err(dev, "aead input spec error!\n");
+ 		return -EINVAL;
+ 	}
+ 
+@@ -2288,16 +2298,9 @@ static int sec_aead_soft_crypto(struct sec_ctx *ctx,
+ 				bool encrypt)
+ {
+ 	struct sec_auth_ctx *a_ctx = &ctx->a_ctx;
+-	struct device *dev = ctx->dev;
+ 	struct aead_request *subreq;
+ 	int ret;
+ 
+-	/* Kunpeng920 aead mode not support input 0 size */
+-	if (!a_ctx->fallback_aead_tfm) {
+-		dev_err(dev, "aead fallback tfm is NULL!\n");
+-		return -EINVAL;
+-	}
+-
+ 	subreq = aead_request_alloc(a_ctx->fallback_aead_tfm, GFP_KERNEL);
+ 	if (!subreq)
+ 		return -ENOMEM;
 -- 
-2.46.2
+2.33.0
 
