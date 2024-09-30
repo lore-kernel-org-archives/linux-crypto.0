@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19946189902;
-	Mon, 30 Sep 2024 13:25:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53B0C1DA3D;
+	Mon, 30 Sep 2024 13:34:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727702743; cv=none; b=m0wh6YjUM4dPxRnjCWbc4GX4TfG3uY5StBq9H/7apiTI+YSNFwRHZATI+OhiFL2BJz+eLIHUlDElt1tzdCkSy/skICu3WwKLXe4JiqA+vDTcACxoYaNJHDDpXkFpVU1u5aJRFKaksSMOZEGHrLpXp/f7HpvwkKWskfIev5OH0eA=
+	t=1727703286; cv=none; b=exi6N15CEQkxyIVOwgfSjcb30jhooX2x+PEqW3xpLM2NxkQPmmIGh6boU23FAbMWpnJiKhT8hcohf03KTRNfYUWLo0P6bFgsrbj40YE6B40Fp0CNjMPZpCN3TYLhL+Orpd4bl6ij96k0AIlxKc7IP2GyN9B8mPoZwgXi5toqJW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727702743; c=relaxed/simple;
-	bh=AgxyAnJ5EQ/LR3SVJtEalqWx68cjEE7WvGTJNPg4MJY=;
+	s=arc-20240116; t=1727703286; c=relaxed/simple;
+	bh=VzrKIg1Ki7EopKHoTRFn20chqJoSZWgF2LfGVWnMCTo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UhDV10T5gjLC+kPS30vfUE5zvwEyxGjjQiJ9IT4I9ksIbZxOJOSdS52Yq/gH9GyLfqIkSye+eYQ1+TOJu0hNYrhkVbxgV898Zktp1/HjLHhwpXa+wmfWbAvt0tOEW54tkEWy5yiqsJgEHwKV/ioBniSnq9xeGNifEltf0Kba3zY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r+PFsEo6; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=SORBXkWQimx2l5v0v1LI78rpokoBTNgZ2vr8nEllEY1P7llXKcrEgqPAcVUMJt8b4V5x60K09CkgFNujacaaadngbERCJFAAQYYuTsMsszraJ7MlJtucy2cyATpmSgwrSDuucCZ9Wdw0Anpf4jhw1DMeWq/UlXX3elp94i0Ft+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eCD0XQap; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r+PFsEo6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14BE8C4CECF;
-	Mon, 30 Sep 2024 13:25:38 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eCD0XQap"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B10EAC4CEC7;
+	Mon, 30 Sep 2024 13:34:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727702742;
-	bh=AgxyAnJ5EQ/LR3SVJtEalqWx68cjEE7WvGTJNPg4MJY=;
+	s=k20201202; t=1727703286;
+	bh=VzrKIg1Ki7EopKHoTRFn20chqJoSZWgF2LfGVWnMCTo=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=r+PFsEo6FraBZuvaXE0ZiuhmI5gaG2OLqM/Ej34DNje4AnqzPexqyMeJbffhI8Lkm
-	 9Z33ljcE25eOP/Y0HsPQoDvLNT4hGTHCsrXJJ4hcu1g4xYK9vGcG8IlGedWnI4rz01
-	 y5NOseuPwbvFa19YzfFd01ibCL67UgmDL1wWNmE4Bvjj+EqlOonJ9mGe6IgXbQDGW3
-	 9z8z6PoBOpXJOmMDOKbTNwBxqVUNrlZr0mkx2xOniPSQBms/ao5UCPGldDNzsqWDeF
-	 GNbPxcQ2+p+TFQ5YRLw3LiuwnrJI1xMk9aFA15MNjEYP0I86o79OLKjQT+/L/hzHbt
-	 5it+AVW3b7auw==
-Message-ID: <3cc10e1c-bec7-4432-a067-72f8eb514b5f@kernel.org>
-Date: Mon, 30 Sep 2024 15:25:37 +0200
+	b=eCD0XQap/4TtomxVJ7TK2DvcbASEYlCoRwZtxRpRt+Td7vRdUw2wIZn3cobLOGoEg
+	 qyXoqVP9GrkBqQvG+n3aP19WXBigjRNzpCxDQItofCs4woPTUgPEhjnFZo5NE5goTT
+	 I+/VvUH8ePBMpJ9Rhpll+OPeJ11aT9Cgu9G0iY35lKXCJmFfDIPiqFZNnTckbNUfWU
+	 xJLCYnJ7vd5pqqjgDgtjGWdjXHosSQXLTUUeKhsB4Zepx120t49tGvbXsIwizKVj/W
+	 dIftxy6Y2g7QUAxEp3ME+NBbPEMPRNM5uBnhHF6ZhorELgXzUwS2uRBPaXDw4lrg/X
+	 QiVC5bLpvsLxQ==
+Message-ID: <96ee9d92-4344-44de-a398-68edcf29c546@kernel.org>
+Date: Mon, 30 Sep 2024 15:34:40 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,14 +35,14 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 4/7] Add SPAcc AEAD support
+Subject: Re: [PATCH v9 1/7] Add SPAcc Skcipher support
 To: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>,
  devicetree@vger.kernel.org, herbert@gondor.apana.org.au,
  linux-crypto@vger.kernel.org, robh@kernel.org
 Cc: Ruud.Derwig@synopsys.com, manjunath.hadli@vayavyalabs.com,
  bhoomikak@vayavyalabs.com, Shweta Raikar <shwetar@vayavyalabs.com>
 References: <20240930093054.215809-1-pavitrakumarm@vayavyalabs.com>
- <20240930093054.215809-5-pavitrakumarm@vayavyalabs.com>
+ <20240930093054.215809-2-pavitrakumarm@vayavyalabs.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -88,192 +88,432 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20240930093054.215809-5-pavitrakumarm@vayavyalabs.com>
+In-Reply-To: <20240930093054.215809-2-pavitrakumarm@vayavyalabs.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 30/09/2024 11:30, Pavitrakumar M wrote:
-> Add AEAD support to SPAcc driver.
-> Below are the supported AEAD algos:
-> - ccm(sm4)
-> - ccm(aes)
-> - gcm(sm4)
-> - gcm(aes)
-> - rfc7539(chacha20,poly1305)
+> Add SPAcc Skcipher support to Synopsys Protocol Accelerator(SPAcc) IP,
+> which is a crypto accelerator engine.
+> SPAcc supports ciphers, hashes and AEAD algorithms such as
+> AES in different modes, SHA variants, AES-GCM, Chacha-poly1305 etc.
+> 
 
 ...
 
 > +
-> +struct spacc_iv_buf {
-> +	unsigned char iv[SPACC_MAX_IV_SIZE];
-> +	unsigned char spacc_adata[ADATA_BUF_SIZE];
-> +	struct scatterlist sg[2], spacc_adata_sg[2];
-> +	struct scatterlist *spacc_ptextsg, temp_aad[2];
-> +};
+> +	/* reset registers */
+> +	writel(0, spacc->regmap + SPACC_REG_IRQ_CTRL);
+> +	writel(0, spacc->regmap + SPACC_REG_IRQ_EN);
+> +	writel(0xFFFFFFFF, spacc->regmap + SPACC_REG_IRQ_STAT);
 > +
-> +static struct kmem_cache *spacc_iv_pool;
-
-How do you handle multiple devices? I don't see it...
-
+> +	writel(0, spacc->regmap + SPACC_REG_SRC_PTR);
+> +	writel(0, spacc->regmap + SPACC_REG_DST_PTR);
+> +	writel(0, spacc->regmap + SPACC_REG_PROC_LEN);
+> +	writel(0, spacc->regmap + SPACC_REG_ICV_LEN);
+> +	writel(0, spacc->regmap + SPACC_REG_PRE_AAD_LEN);
 > +
-> +static struct mode_tab possible_aeads[] = {
-> +	{ MODE_TAB_AEAD("rfc7539(chacha20,poly1305)",
-> +			CRYPTO_MODE_CHACHA20_POLY1305, CRYPTO_MODE_NULL,
-> +			16, 12, 1), .keylen = { 16, 24, 32 }
-> +	},
-> +	{ MODE_TAB_AEAD("gcm(aes)",
-> +			CRYPTO_MODE_AES_GCM, CRYPTO_MODE_NULL,
-> +			16, 12, 1), .keylen = { 16, 24, 32 }
-> +	},
-> +	{ MODE_TAB_AEAD("gcm(sm4)",
-> +			CRYPTO_MODE_SM4_GCM, CRYPTO_MODE_NULL,
-> +			16, 12, 1), .keylen = { 16 }
-> +	},
-> +	{ MODE_TAB_AEAD("ccm(aes)",
-> +			CRYPTO_MODE_AES_CCM, CRYPTO_MODE_NULL,
-> +			16, 16, 1), .keylen = { 16, 24, 32 }
-> +	},
-> +	{ MODE_TAB_AEAD("ccm(sm4)",
-> +			CRYPTO_MODE_SM4_CCM, CRYPTO_MODE_NULL,
-> +			16, 16, 1), .keylen = { 16, 24, 32 }
-> +	},
-> +};
-
-...
-
+> +	pdu_ddt_free(&ddt);
+> +	dma_free_coherent(get_ddt_device(), 256, virt, dma);
 > +
-> +static int spacc_register_aead(unsigned int aead_mode,
-> +			       struct platform_device *spacc_pdev)
+> +	return CRYPTO_OK;
+> +}
+> +
+> +/* free up the memory */
+> +void spacc_fini(struct spacc_device *spacc)
 > +{
-> +	int rc;
-> +	struct spacc_alg *salg;
+> +	vfree(spacc->ctx);
+> +	vfree(spacc->job);
+> +}
 > +
-> +	salg = kmalloc(sizeof(*salg), GFP_KERNEL);
-> +	if (!salg)
-> +		return -ENOMEM;
+> +int spacc_init(void __iomem *baseaddr, struct spacc_device *spacc,
+> +	       struct pdu_info *info)
+> +{
+> +	unsigned long id;
+> +	char version_string[3][16]  = { "SPACC", "SPACC-PDU" };
+> +	char idx_string[2][16]      = { "(Normal Port)", "(Secure Port)" };
+> +	char dma_type_string[4][16] = { "Unknown", "Scattergather", "Linear",
+> +					"Unknown" };
 > +
-> +	salg->mode	= &possible_aeads[aead_mode];
-> +	salg->dev[0]	= &spacc_pdev->dev;
-> +	salg->dev[1]	= NULL;
-> +	salg->calg	= &salg->alg.aead.base;
-> +	salg->alg.aead	= spacc_aead_algs;
+> +	if (!baseaddr) {
+> +		pr_debug("ERR: baseaddr is NULL\n");
+
+You must use dev_ instead.
+
+> +		return -1;
+
+What is -1? No, use errno numbers.
+
+> +	}
+> +	if (!spacc) {
+> +		pr_debug("ERR: spacc is NULL\n");
+> +		return -1;
+
+Same problems. How is this even possible? Don't add dead code.
+
+> +	}
 > +
-> +	spacc_init_aead_alg(salg->calg, salg->mode);
+> +	memset(spacc, 0, sizeof(*spacc));
+> +	spin_lock_init(&spacc->lock);
+> +	spin_lock_init(&spacc->ctx_lock);
 > +
-> +	salg->alg.aead.ivsize		  = salg->mode->ivlen;
-> +	salg->alg.aead.maxauthsize	  = salg->mode->hashlen;
-> +	salg->alg.aead.base.cra_blocksize = salg->mode->blocklen;
+> +	/* assign the baseaddr*/
+
+The missing space before */ is just sloppy. Please write good, readable
+code so review will be able to focus on important things not such nitpicks.
+
+> +	spacc->regmap = baseaddr;
 > +
-> +	salg->keylen_mask = possible_aeads[aead_mode].keylen_mask;
+> +	/* version info*/
+> +	spacc->config.version     = info->spacc_version.version;
+> +	spacc->config.pdu_version = (info->pdu_config.major << 4) |
+> +				    info->pdu_config.minor;
+> +	spacc->config.project     = info->spacc_version.project;
+> +	spacc->config.is_pdu      = info->spacc_version.is_pdu;
+> +	spacc->config.is_qos      = info->spacc_version.qos;
 > +
-> +	if (salg->mode->aead.ciph & SPACC_MANGLE_IV_FLAG) {
-> +		switch (salg->mode->aead.ciph & 0x7F00) {
-> +		case SPACC_MANGLE_IV_RFC3686: /*CTR*/
-> +		case SPACC_MANGLE_IV_RFC4106: /*GCM*/
-> +		case SPACC_MANGLE_IV_RFC4543: /*GMAC*/
-> +		case SPACC_MANGLE_IV_RFC4309: /*CCM*/
-> +		case SPACC_MANGLE_IV_RFC8998: /*GCM/CCM*/
-> +			salg->alg.aead.ivsize  = 12;
-> +			break;
+> +	/* misc*/
+> +	spacc->config.is_partial        = info->spacc_version.partial;
+> +	spacc->config.num_ctx           = info->spacc_config.num_ctx;
+> +	spacc->config.ciph_page_size    = 1U <<
+> +					  info->spacc_config.ciph_ctx_page_size;
+> +
+> +	spacc->config.hash_page_size    = 1U <<
+> +					  info->spacc_config.hash_ctx_page_size;
+> +
+> +	spacc->config.dma_type          = info->spacc_config.dma_type;
+> +	spacc->config.idx               = info->spacc_version.vspacc_id;
+> +	spacc->config.cmd0_fifo_depth   = info->spacc_config.cmd0_fifo_depth;
+> +	spacc->config.cmd1_fifo_depth   = info->spacc_config.cmd1_fifo_depth;
+> +	spacc->config.cmd2_fifo_depth   = info->spacc_config.cmd2_fifo_depth;
+> +	spacc->config.stat_fifo_depth   = info->spacc_config.stat_fifo_depth;
+> +	spacc->config.fifo_cnt          = 1;
+> +	spacc->config.is_ivimport       = info->spacc_version.ivimport;
+> +
+> +	/* ctrl register map*/
+> +	if (spacc->config.version <= 0x4E)
+> +		spacc->config.ctrl_map = spacc_ctrl_map[SPACC_CTRL_VER_0];
+> +	else if (spacc->config.version <= 0x60)
+> +		spacc->config.ctrl_map = spacc_ctrl_map[SPACC_CTRL_VER_1];
+> +	else
+> +		spacc->config.ctrl_map = spacc_ctrl_map[SPACC_CTRL_VER_2];
+> +
+> +	spacc->job_next_swid   = 0;
+> +	spacc->wdcnt           = 0;
+> +	spacc->config.wd_timer = SPACC_WD_TIMER_INIT;
+> +
+> +	/* version 4.10 uses IRQ,
+
+Please use Linux coding style comments for given subsystem. See Coding
+style.
+
+> +	 * above uses WD and we don't support below 4.00
+> +	 */
+> +	if (spacc->config.version < 0x40) {
+> +		pr_debug("ERR: Unsupported SPAcc version\n");
+> +		return -EIO;
+> +	} else if (spacc->config.version < 0x4B) {
+> +		spacc->op_mode = SPACC_OP_MODE_IRQ;
+> +	} else {
+> +		spacc->op_mode = SPACC_OP_MODE_WD;
+> +	}
+> +
+> +	/* set threshold and enable irq
+> +	 * on 4.11 and newer cores we can derive this
+> +	 * from the HW reported depths.
+> +	 */
+> +	if (spacc->config.stat_fifo_depth == 1)
+> +		spacc->config.ideal_stat_level = 1;
+> +	else if (spacc->config.stat_fifo_depth <= 4)
+> +		spacc->config.ideal_stat_level =
+> +					spacc->config.stat_fifo_depth - 1;
+> +	else if (spacc->config.stat_fifo_depth <= 8)
+> +		spacc->config.ideal_stat_level =
+> +					spacc->config.stat_fifo_depth - 2;
+> +	else
+> +		spacc->config.ideal_stat_level =
+> +					spacc->config.stat_fifo_depth - 4;
+> +
+> +	/* determine max PROClen value */
+> +	writel(0xFFFFFFFF, spacc->regmap + SPACC_REG_PROC_LEN);
+> +	spacc->config.max_msg_size = readl(spacc->regmap + SPACC_REG_PROC_LEN);
+> +
+> +	/* read config info*/
+> +	if (spacc->config.is_pdu) {
+> +		pr_debug("PDU:\n");
+> +		pr_debug("   MAJOR      : %u\n", info->pdu_config.major);
+> +		pr_debug("   MINOR      : %u\n", info->pdu_config.minor);
+
+
+Why?
+
+> +	}
+> +
+> +	id = readl(spacc->regmap + SPACC_REG_ID);
+> +	pr_debug("SPACC ID: (%08lx)\n", (unsigned long)id);
+> +	pr_debug("   MAJOR      : %x\n", info->spacc_version.major);
+> +	pr_debug("   MINOR      : %x\n", info->spacc_version.minor);
+> +	pr_debug("   QOS        : %x\n", info->spacc_version.qos);
+> +	pr_debug("   IVIMPORT   : %x\n", spacc->config.is_ivimport);
+
+What are you going to debug here?
+
+> +
+> +	if (spacc->config.version >= 0x48)
+> +		pr_debug("   TYPE       : %lx (%s)\n", SPACC_ID_TYPE(id),
+> +			version_string[SPACC_ID_TYPE(id) & 3]);
+> +
+> +	pr_debug("   AUX        : %x\n", info->spacc_version.qos);
+> +	pr_debug("   IDX        : %lx %s\n", SPACC_ID_VIDX(id),
+> +			spacc->config.is_secure ?
+> +			(idx_string[spacc->config.is_secure_port & 1]) : "");
+> +	pr_debug("   PARTIAL    : %x\n", info->spacc_version.partial);
+> +	pr_debug("   PROJECT    : %x\n", info->spacc_version.project);
+> +
+> +	if (spacc->config.version >= 0x48)
+> +		id = readl(spacc->regmap + SPACC_REG_CONFIG);
+> +	else
+> +		id = 0xFFFFFFFF;
+> +
+> +	pr_debug("SPACC CFG: (%08lx)\n", id);
+> +	pr_debug("   CTX CNT    : %u\n", info->spacc_config.num_ctx);
+> +	pr_debug("   VSPACC CNT : %u\n", info->spacc_config.num_vspacc);
+> +	pr_debug("   CIPH SZ    : %-3lu bytes\n", 1UL <<
+> +				  info->spacc_config.ciph_ctx_page_size);
+> +	pr_debug("   HASH SZ    : %-3lu bytes\n", 1UL <<
+> +				  info->spacc_config.hash_ctx_page_size);
+> +	pr_debug("   DMA TYPE   : %u (%s)\n", info->spacc_config.dma_type,
+> +			dma_type_string[info->spacc_config.dma_type & 3]);
+> +	pr_debug("   MAX PROCLEN: %lu bytes\n", (unsigned long)
+> +				  spacc->config.max_msg_size);
+> +	pr_debug("   FIFO CONFIG :\n");
+> +	pr_debug("      CMD0 DEPTH: %d\n", spacc->config.cmd0_fifo_depth);
+
+You could not flood dmesg with more debugging, could you?
+
+
+> +
+> +	if (spacc->config.is_qos) {
+> +		pr_debug("      CMD1 DEPTH: %d\n",
+> +				spacc->config.cmd1_fifo_depth);
+> +		pr_debug("      CMD2 DEPTH: %d\n",
+> +				spacc->config.cmd2_fifo_depth);
+> +	}
+> +	pr_debug("      STAT DEPTH: %d\n", spacc->config.stat_fifo_depth);
+> +
+> +	if (spacc->config.dma_type == SPACC_DMA_DDT) {
+> +		writel(0x1234567F, baseaddr + SPACC_REG_DST_PTR);
+> +		writel(0xDEADBEEF, baseaddr + SPACC_REG_SRC_PTR);
+> +
+> +		if (((readl(baseaddr + SPACC_REG_DST_PTR)) !=
+> +					(0x1234567F & SPACC_DST_PTR_PTR)) ||
+> +		    ((readl(baseaddr + SPACC_REG_SRC_PTR)) !=
+> +		     (0xDEADBEEF & SPACC_SRC_PTR_PTR))) {
+> +			pr_debug("ERR: Failed to set pointers\n");
+> +			goto ERR;
 > +		}
 > +	}
 > +
-> +	rc = crypto_register_aead(&salg->alg.aead);
-> +	if (rc < 0) {
-> +		kfree(salg);
-> +		return rc;
-> +	}
+> +	/* zero the IRQ CTRL/EN register
+> +	 * (to make sure we're in a sane state)
+> +	 */
+> +	writel(0, spacc->regmap + SPACC_REG_IRQ_CTRL);
+> +	writel(0, spacc->regmap + SPACC_REG_IRQ_EN);
+> +	writel(0xFFFFFFFF, spacc->regmap + SPACC_REG_IRQ_STAT);
 > +
-> +	dev_dbg(salg->dev[0], "Registered %s\n", salg->mode->name);
+> +	/* init cache*/
+> +	memset(&spacc->cache, 0, sizeof(spacc->cache));
+> +	writel(0, spacc->regmap + SPACC_REG_SRC_PTR);
+> +	writel(0, spacc->regmap + SPACC_REG_DST_PTR);
+> +	writel(0, spacc->regmap + SPACC_REG_PROC_LEN);
+> +	writel(0, spacc->regmap + SPACC_REG_ICV_LEN);
+> +	writel(0, spacc->regmap + SPACC_REG_ICV_OFFSET);
+> +	writel(0, spacc->regmap + SPACC_REG_PRE_AAD_LEN);
+> +	writel(0, spacc->regmap + SPACC_REG_POST_AAD_LEN);
+> +	writel(0, spacc->regmap + SPACC_REG_IV_OFFSET);
+> +	writel(0, spacc->regmap + SPACC_REG_OFFSET);
+> +	writel(0, spacc->regmap + SPACC_REG_AUX_INFO);
+> +
+> +	spacc->ctx = vmalloc(sizeof(struct spacc_ctx) * spacc->config.num_ctx);
+> +	if (!spacc->ctx)
+> +		goto ERR;
+> +
+> +	spacc->job = vmalloc(sizeof(struct spacc_job) * SPACC_MAX_JOBS);
+> +	if (!spacc->job)
+> +		goto ERR;
+> +
+> +	/* initialize job_idx and lookup table */
+> +	spacc_job_init_all(spacc);
+> +
+> +	/* initialize contexts */
+> +	spacc_ctx_init_all(spacc);
+> +
+> +	/* autodetect and set string size setting*/
+> +	if (spacc->config.version == 0x61 || spacc->config.version >= 0x65)
+> +		spacc_xof_stringsize_autodetect(spacc);
+> +
+> +	return CRYPTO_OK;
 
-Drop, too trivial.
+??? Please do not redefine numbers.
+
+Missing blank line
+
+> +ERR:
+
+
+> +	spacc_fini(spacc);
+> +	pr_debug("ERR: Crypto Failed\n");
+
+Drop
+
+
 
 > +
-> +	mutex_lock(&spacc_aead_alg_mutex);
-> +	list_add(&salg->list, &spacc_aead_alg_list);
-> +	mutex_unlock(&spacc_aead_alg_mutex);
+> +	return -EIO;
+> +}
+> +
+> +/* callback function to initialize tasklet running */
+> +void spacc_pop_jobs(unsigned long data)
+> +{
+> +	int num = 0;
+> +	struct spacc_priv *priv =  (struct spacc_priv *)data;
+> +	struct spacc_device *spacc = &priv->spacc;
+> +
+> +	/* decrement the WD CNT here since
+> +	 * now we're actually going to respond
+> +	 * to the IRQ completely
+> +	 */
+> +	if (spacc->wdcnt)
+> +		--(spacc->wdcnt);
+> +
+> +	spacc_pop_packets(spacc, &num);
+> +}
+> +
+> +int spacc_remove(struct platform_device *pdev)
+> +{
+> +	struct spacc_device *spacc;
+> +	struct spacc_priv *priv = platform_get_drvdata(pdev);
+> +
+> +	/* free test vector memory*/
+> +	spacc = &priv->spacc;
+> +	spacc_fini(spacc);
+> +
+> +	tasklet_kill(&priv->pop_jobs);
+> +
+> +	/* devm functions do proper cleanup */
+> +	pdu_mem_deinit(&pdev->dev);
+> +	dev_dbg(&pdev->dev, "removed!\n");
 > +
 > +	return 0;
 > +}
 > +
-> +int probe_aeads(struct platform_device *spacc_pdev)
+> +int spacc_set_key_exp(struct spacc_device *spacc, int job_idx)
 > +{
-> +	int err;
-> +	unsigned int x, y;
-> +	struct spacc_priv *priv = NULL;
+> +	struct spacc_ctx *ctx = NULL;
+> +	struct spacc_job *job = NULL;
 > +
-> +	size_t alloc_size = max_t(unsigned long,
-> +			roundup_pow_of_two(sizeof(struct spacc_iv_buf)),
-> +			dma_get_cache_alignment());
-> +
-> +	spacc_iv_pool = kmem_cache_create("spacc-aead-iv", alloc_size,
-> +					  alloc_size, 0, NULL);
-> +
-> +	if (!spacc_iv_pool)
-> +		return -ENOMEM;
-> +
-> +	for (x = 0; x < ARRAY_SIZE(possible_aeads); x++) {
-> +		possible_aeads[x].keylen_mask = 0;
-> +		possible_aeads[x].valid       = 0;
+> +	if (job_idx < 0 || job_idx >= SPACC_MAX_JOBS) {
+> +		pr_debug("ERR: Invalid Job id specified (out of range)\n");
+> +		return -ENXIO;
 > +	}
 > +
-> +	/* compute cipher key masks (over all devices) */
-> +	priv = dev_get_drvdata(&spacc_pdev->dev);
+> +	job = &spacc->job[job_idx];
+> +	ctx = context_lookup_by_job(spacc, job_idx);
 > +
-> +	for (x = 0; x < ARRAY_SIZE(possible_aeads); x++) {
-> +		for (y = 0; y < ARRAY_SIZE(possible_aeads[x].keylen); y++) {
-> +			if (spacc_isenabled(&priv->spacc,
-> +					    possible_aeads[x].aead.ciph & 0xFF,
-> +					possible_aeads[x].keylen[y]))
-> +				possible_aeads[x].keylen_mask |= 1u << y;
-> +		}
+> +	if (!ctx) {
+> +		pr_debug("ERR: Failed to find ctx id\n");
+> +		return -EIO;
 > +	}
 > +
-> +	/* scan for combined modes */
-> +	priv = dev_get_drvdata(&spacc_pdev->dev);
+> +	job->ctrl |= SPACC_CTRL_MASK(SPACC_CTRL_KEY_EXP);
 > +
-> +	for (x = 0; x < ARRAY_SIZE(possible_aeads); x++) {
-> +		if (!possible_aeads[x].valid && possible_aeads[x].keylen_mask) {
-> +			if (spacc_isenabled(&priv->spacc,
-> +					    possible_aeads[x].aead.hash & 0xFF,
-> +					possible_aeads[x].hashlen)) {
-> +
-> +				possible_aeads[x].valid = 1;
-> +				err = spacc_register_aead(x, spacc_pdev);
-> +				if (err < 0)
-> +					goto error;
-> +			}
-> +		}
-> +	}
-> +
-> +	return 0;
-> +
-> +error:
-> +	return err;
+> +	return CRYPTO_OK;
+
+This code has terrible quality and does not fit basic Linux coding
+style. Why v9 has trivial issues like this? I don't understand.
+
+Please cleanup your code thoroughly from all such weird
+all-platform-Windows-downstream junk.
+
+This code is just not ready for submission.
+
 > +}
+
+
 > +
-> +int spacc_unregister_aead_algs(void)
-
-Why do you make it global but without headers? Or you split the change
-so weirdly that header is not here?
-
+> +int spacc_compute_xcbc_key(struct spacc_device *spacc, int mode_id,
+> +			   int job_idx, const unsigned char *key,
+> +			   int keylen, unsigned char *xcbc_out)
 > +{
-> +	struct spacc_alg *salg, *tmp;
+> +	unsigned char *buf;
+> +	dma_addr_t bufphys;
+> +	struct pdu_ddt ddt;
+> +	unsigned char iv[16];
+> +	int err, i, handle, usecbc, ctx_idx;
 > +
-> +	mutex_lock(&spacc_aead_alg_mutex);
+> +	if (job_idx >= 0 && job_idx < SPACC_MAX_JOBS)
+> +		ctx_idx = spacc->job[job_idx].ctx_idx;
+> +	else
+> +		ctx_idx = -1;
 > +
-> +	list_for_each_entry_safe(salg, tmp, &spacc_aead_alg_list, list) {
-> +		crypto_unregister_alg(salg->calg);
-> +		list_del(&salg->list);
-> +		kfree(salg);
+> +	if (mode_id == CRYPTO_MODE_MAC_XCBC) {
+> +		/* figure out if we can schedule the key  */
+> +		if (spacc_isenabled(spacc, CRYPTO_MODE_AES_ECB, 16))
+> +			usecbc = 0;
+> +		else if (spacc_isenabled(spacc, CRYPTO_MODE_AES_CBC, 16))
+> +			usecbc = 1;
+> +		else
+> +			return -1;
+> +	} else if (mode_id == CRYPTO_MODE_MAC_SM4_XCBC) {
+> +		/* figure out if we can schedule the key  */
+> +		if (spacc_isenabled(spacc, CRYPTO_MODE_SM4_ECB, 16))
+> +			usecbc = 0;
+> +		else if (spacc_isenabled(spacc, CRYPTO_MODE_SM4_CBC, 16))
+> +			usecbc = 1;
+> +		else
+> +			return -1;
+> +	} else {
+> +		return -1;
+
+What is -1?
+
 > +	}
 > +
-> +	mutex_unlock(&spacc_aead_alg_mutex);
+> +	memset(iv, 0, sizeof(iv));
+> +	memset(&ddt, 0, sizeof(ddt));
 > +
-> +	kmem_cache_destroy(spacc_iv_pool);
+> +	buf = dma_alloc_coherent(get_ddt_device(), 64, &bufphys, GFP_KERNEL);
+> +	if (!buf)
+> +		return -EINVAL;
+
+and here -EINVAL? So what was the meaning of -1?
+
+This is terrible code.
+
+
+
+> --- /dev/null
+> +++ b/drivers/crypto/dwc-spacc/spacc_device.c
+> @@ -0,0 +1,296 @@
+> +// SPDX-License-Identifier: GPL-2.0
 > +
-> +	return 0;
-> +}
+> +#include <linux/module.h>
+> +#include <linux/interrupt.h>
+> +#include <linux/dma-mapping.h>
+> +#include <linux/platform_device.h>
+> +#include "spacc_device.h"
+> +
+> +static struct platform_device *spacc_pdev;
+
+This is too much. NAK.
+
+Code has terrible quality but what is worse: you ignored several
+comments, which means code does not improve. You send the same code over
+and over.
+
+Sending same code with same junk is not acceptable. You waste reviewer's
+time.
+
 
 Best regards,
 Krzysztof
