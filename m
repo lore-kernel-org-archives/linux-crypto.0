@@ -1,117 +1,102 @@
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46C3DAD24;
-	Sun, 29 Sep 2024 13:21:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1926815CD74
+	for <linux-crypto@vger.kernel.org>; Mon, 30 Sep 2024 07:38:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727616121; cv=none; b=TR+7OmiNZlsLKh4HUceKREqG6CPIjpzNPA+eRww0CvlyWHJy6QyKALa0Rzv3gZw2Bla/ttiNOBXgBs2dlurBocWr0bh1VTC9qYogQRaxdk83PX7tQi4M131Cebhsi9HkxlBDri7qSMidxQsQGf3/h4BIiG5fbsKZ3CJW7rEw2DQ=
+	t=1727681932; cv=none; b=iSEd/+qKEBumaHumwIDJvzjmlxgr4/ZxQJiUG9j9bnu6jCCryyZtRLlzeMwZmy0Wv2VQtDc2r9fUPLsnwKnI9plOEvUd5eWgPleWnhbUERKGNwntihZTL5Rqf0JV0yN0eU9u5fw7A7mgWg0Iy2Ek8TYbWQyLc7wpmfzZenkKKGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727616121; c=relaxed/simple;
-	bh=WYnuVxqd5hSPhIFrTOAnB7iby9Oq77UsN/+a6q5jE3A=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XggQ3nq2orJlkVVLMwBJr4hyN3bDEeUZHxSpWH6KF5IWQQNofs/shRL0UHT1sEPW+wk6Iv2VjX76hzuAFWlsM4VHQgd6wxrtTxN3j2vo4HSvCF7IOiLWW75GgHkXRPaU5qOkr3+bEpTDGHD/5x4W8k6WmyRS+suHcbk6GtXISKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=loCtGb3W; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+	s=arc-20240116; t=1727681932; c=relaxed/simple;
+	bh=mnXyjA99r+I4vi5MP23mVdJb3eIlFCw2FUcVFrjxtcU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rvl2sktNnRBMi9TXoCyuxBv3/ISxhs/iE7c8fv53d1LK2iGR/NYh6v/vvv27NY5yFGHvGPS2Znaz8GAVSaTsBvaYVzx7d6YLOWy5vfyTwfOmgc04UaDJwRi6LJLWXfODAb32/3jmYv21N3MR+IhU6l//fZr+cyBQr9yljk1FIyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EURiu0jt; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="loCtGb3W"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=OhfsAlvF10vePpQdEHFo+AXyae0n1XmhLg+/AjvLFKk=; b=loCtGb3Wzw7vom0Z
-	KXvELTEOIj6u/SNswcddnB7loY2XoVHahkJ7meUTBvkj8ZpmrebVTre7yHGHXQ0tO//47IOx0y0g0
-	vlnW2dIh3Qcr8WUwZEAcBk8faOClKgdnLMx8kB6cKTG3CHWYE+fBZyPJ7aIE4uzEcCDiWuJh47v4H
-	WluKqe6dQ/i066Hxn3uNFNXggBaJZPz1269uAVNN6nDfyAmUoQD3R/tWzgOCpOq8hRPc6qmjsStZx
-	nOIJeUcHLyTImD9iQpHvB1m0pslgPaPQ72HAaT3Xk2nqP96/5wzuErPswyfF0LXkDakAoHyr5LtCX
-	LneBH9NcI6nr3DPQcQ==;
-Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
-	by mx.treblig.org with esmtp (Exim 4.96)
-	(envelope-from <linux@treblig.org>)
-	id 1suts0-007opV-34;
-	Sun, 29 Sep 2024 13:21:52 +0000
-From: linux@treblig.org
-To: dan.j.williams@intel.com,
-	herbert@gondor.apana.org.au
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH] async_xor: Remove unused 'async_xor_val'
-Date: Sun, 29 Sep 2024 14:21:48 +0100
-Message-ID: <20240929132148.44792-1-linux@treblig.org>
-X-Mailer: git-send-email 2.46.2
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EURiu0jt"
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5c88b5c375fso2339050a12.3
+        for <linux-crypto@vger.kernel.org>; Mon, 30 Sep 2024 00:38:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727681929; x=1728286729; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Mu1FB52TfR8Hv6dzBjCHh1EvkBSWyJUL9d5aFAmGK1E=;
+        b=EURiu0jtP5zv9/AWsr5O87hTBAGCwk7qSbr8MzyEHlQLowxEKNHlub4w5zVkyYHGz5
+         KloI4K/gz+czD0ZesD2Yn9s7qXlNW/SNHQq0LRiiKeBz0B4Lz4p7UiiKrCACdhIY+TRe
+         KgYRo//RB16K6ZwQE3ZDw7riqNIgROYDfZqdRhK5SSvpIX4vyTrwJpMFI7WYRUQ5XM/A
+         cmzvZQksPrtzXhJNRtS8Wx1A652c11Jp4Xb+lFBbmhA7uL4yqJ6SeLr1kMsK+kUj1bUn
+         GeqylJxG9tsXqn9ZZmt6sDnwS1+Z2Xi1saJYObdjmZ1yY2YoLDUwuqXYjuhqttxj3JPm
+         ZJvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727681929; x=1728286729;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Mu1FB52TfR8Hv6dzBjCHh1EvkBSWyJUL9d5aFAmGK1E=;
+        b=CL+p+zrl7gC4M0X7nmOLqiRYx80vd/m3yWKX8/1o9VrZTEkoexFLHox6g6rXps9k9D
+         fle2NwD2lTnbarrmxaLC7heSaBzy+0nL1+6ft1lmra67rsAiji36MijGqh30bqw1Ugkr
+         mc+v42uzT1khq5HqrOsM26Tye0jqW4kb+/uUIe7SGAAGb5qsJDK5Mo2zJHv1ypdGGPJ6
+         i+p80TZP8awXNY56R1zEln9OApnyTNaWvJl9978L7fR7LZHrQle/7P/Idm239/vpFw74
+         BXNRQ4VBViifVQ5UCJHnsff5LrmoHqrlsFnIzzNA5W5GqGTps6tplO6f9WSSpGn5tg2j
+         6CEQ==
+X-Gm-Message-State: AOJu0Ywm/6dJH4QWhQFVMI7C7thRuJMsGi/pdqbEe+Xu+8r5UO3UP4rF
+	NFQV8D7amKA+0ZorejSWUv3oSmiWQtCd0FKsGyZGu6qRisOM9g58wJAMBOsYfUZQu9b+ILDnww3
+	6Gb8rSaW0tYHqP5V7cb5gKOyfeSz6BIjbftQ=
+X-Google-Smtp-Source: AGHT+IFKej1xaZ7y+n3ncyPcgirncJ717KwW+uNWKSuzeE9uguEUxmn9bOQYe+6rAMu5ep2DNbGRb5Yw9G+VeEpE1h4=
+X-Received: by 2002:a05:6402:50d4:b0:5c5:c4b9:e68f with SMTP id
+ 4fb4d7f45d1cf-5c8824ccc1dmr10333983a12.5.1727681929185; Mon, 30 Sep 2024
+ 00:38:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAFXBA=kKHa5gGqOKGnJ5vN=XF9i3GB=OTUZZxbfpU5cks=fW3A@mail.gmail.com>
+ <ZvEasINIFePe1tE7@gondor.apana.org.au>
+In-Reply-To: <ZvEasINIFePe1tE7@gondor.apana.org.au>
+From: Harsh Jain <harshjain.prof@gmail.com>
+Date: Mon, 30 Sep 2024 13:08:37 +0530
+Message-ID: <CAFXBA=nKkV8tviqpzYFCqY1rjOKKDD8Z_T=poqjStWTLcP1Kbg@mail.gmail.com>
+Subject: Re: HASH_MAX_DESCSIZE warn_on on init tfm with HMAC template
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, Stephan Mueller <smueller@chronox.de>, h.jain@amd.com, 
+	harsha.harsha@amd.com, sarat.chand.savitala@amd.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
+On Mon, Sep 23, 2024 at 1:07=E2=80=AFPM Herbert Xu <herbert@gondor.apana.or=
+g.au> wrote:
+>
+> On Mon, Sep 23, 2024 at 12:39:11PM +0530, Harsh Jain wrote:
+> >
+> > What should be the preferred fix for this.
+> > 1. Increase the size of HASH_MAX_DESCSIZE macro by 8.
+> > 2. Register "versal-sha3-384" as ahash algo.
+>
+> Please hold onto your algorithm for a while.  When I'm done with
+> the multibuffer ahash interface hopefully we can say goodbye to
+> shash once and for all.
+>
+> The plan is to allow ahash users to supply virtual pointer addresses
+> instead to SG lists (if they wish), and the API will provide help
+> to the drivers by automatically copying them and turning them into
+> SG lists.
+>
+> For the shash algorithms the API will walk the input data for them
+> and if the input is a virtual pointer, then there will be no overhead
+> at all.
+>
+> Thanks,
 
-async_xor_val has been unused since commit
-a7c224a820c3 ("md/raid5: convert to new xor compution interface")
+Hi Herbert,
 
-Remove it.
+Any idea when multi buffer ahash related changes will be pushed?
 
-Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
----
- crypto/async_tx/async_xor.c | 26 --------------------------
- include/linux/async_tx.h    |  5 -----
- 2 files changed, 31 deletions(-)
-
-diff --git a/crypto/async_tx/async_xor.c b/crypto/async_tx/async_xor.c
-index 1a3855284091..2c499654a36c 100644
---- a/crypto/async_tx/async_xor.c
-+++ b/crypto/async_tx/async_xor.c
-@@ -389,32 +389,6 @@ async_xor_val_offs(struct page *dest, unsigned int offset,
- }
- EXPORT_SYMBOL_GPL(async_xor_val_offs);
- 
--/**
-- * async_xor_val - attempt a xor parity check with a dma engine.
-- * @dest: destination page used if the xor is performed synchronously
-- * @src_list: array of source pages
-- * @offset: offset in pages to start transaction
-- * @src_cnt: number of source pages
-- * @len: length in bytes
-- * @result: 0 if sum == 0 else non-zero
-- * @submit: submission / completion modifiers
-- *
-- * honored flags: ASYNC_TX_ACK
-- *
-- * src_list note: if the dest is also a source it must be at index zero.
-- * The contents of this array will be overwritten if a scribble region
-- * is not specified.
-- */
--struct dma_async_tx_descriptor *
--async_xor_val(struct page *dest, struct page **src_list, unsigned int offset,
--	      int src_cnt, size_t len, enum sum_check_flags *result,
--	      struct async_submit_ctl *submit)
--{
--	return async_xor_val_offs(dest, offset, src_list, NULL, src_cnt,
--			len, result, submit);
--}
--EXPORT_SYMBOL_GPL(async_xor_val);
--
- MODULE_AUTHOR("Intel Corporation");
- MODULE_DESCRIPTION("asynchronous xor/xor-zero-sum api");
- MODULE_LICENSE("GPL");
-diff --git a/include/linux/async_tx.h b/include/linux/async_tx.h
-index 5cc73d7e5b52..1ca9f9e05f4f 100644
---- a/include/linux/async_tx.h
-+++ b/include/linux/async_tx.h
-@@ -167,11 +167,6 @@ async_xor_offs(struct page *dest, unsigned int offset,
- 		struct page **src_list, unsigned int *src_offset,
- 		int src_cnt, size_t len, struct async_submit_ctl *submit);
- 
--struct dma_async_tx_descriptor *
--async_xor_val(struct page *dest, struct page **src_list, unsigned int offset,
--	      int src_cnt, size_t len, enum sum_check_flags *result,
--	      struct async_submit_ctl *submit);
--
- struct dma_async_tx_descriptor *
- async_xor_val_offs(struct page *dest, unsigned int offset,
- 		struct page **src_list, unsigned int *src_offset,
--- 
-2.46.2
-
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
