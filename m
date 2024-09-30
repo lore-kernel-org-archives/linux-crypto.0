@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1375017C22B;
-	Mon, 30 Sep 2024 13:22:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CEFF17C22B;
+	Mon, 30 Sep 2024 13:23:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727702532; cv=none; b=QRf8lfz5PBzZ++Cmk39kQSwpppsluriV/U30DlQ2H8IdETtRNAWW1gAtYDhPmS/4C3ZMnIPf+fULzFSvTCAiJE37ajyWuKCusk4o11eVy+TVTNO0pwF9uCYvC8jW5LSEXP2Dk6YvDbjyLzHaiTXVi8PMyACdQy4s3Phh9AsftKI=
+	t=1727702600; cv=none; b=rNMdOk4Ef12mmY//iAfJbTSs4kl/QVHtKvCNtRFIFLuNdw+zMLIcZTeuZ/4xKh9+FRl94p3xb8ubvjvMB4ZOptgzWAiCaaetT1ZoIWa5uP688GwmDs52wR8ab1AkwQFnfgdFGTTK8ydBK4a2coGwFMAsC6EKLUfIh+1NoybHK/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727702532; c=relaxed/simple;
-	bh=LUwXOpgxE9vUUfbb4l3oiHObMg8Nt/O9lMm9xQE8c0k=;
+	s=arc-20240116; t=1727702600; c=relaxed/simple;
+	bh=8qGGGMo6W1hUAjttcnvSyX1tJjFh9ZcUxzNa5+Ahz0k=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XPnlewaJDWFVCOJl7UbkG5r5iH9r+yvHVqZ0Uvl3R8fGDKFFXuP3R3qGXj4s3b0hjvOwLqtbUx8HAm8lyqM5zR+MURvWpz7kcMIW89k7X6n8E/nzcIAFGWqVbfLrGqucXyTwm+WOCuKxtdrn30nGQvNPtbhIdcbhX17+f1PesFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zo4MVrxx; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=OooRJzQM/Sa2VbfaLEgfwm0q42JXcUfGCazWYSo8lFFIDu7U/TM+90H5wWboxwNccJ5uu0Vi4s2i55L9B2gYU1RNxhzG4NegJmXNYwfBgKJ1d4XtHCbleHnrUF4wz1v/fCZ73f8FLBfLQTb85YRqfjNBDcVr5rmLqWAoajgNOqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TnUtVFkp; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zo4MVrxx"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 555CDC4CEC7;
-	Mon, 30 Sep 2024 13:22:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TnUtVFkp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6AC8C4CEC7;
+	Mon, 30 Sep 2024 13:23:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727702531;
-	bh=LUwXOpgxE9vUUfbb4l3oiHObMg8Nt/O9lMm9xQE8c0k=;
+	s=k20201202; t=1727702600;
+	bh=8qGGGMo6W1hUAjttcnvSyX1tJjFh9ZcUxzNa5+Ahz0k=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Zo4MVrxxxZlqNLg6XiXd8NanmsKchb3Cxt0ZuiO/0GR7itdqUMnmuRK3oZy/eO8/C
-	 vTmP4gEwNrg6FZJ0HlWPMRlV/4v1jK4/PYXKGY44tEWIGbyEB8yvklPSkMORDWp0B3
-	 7GZjWFdkDOuJ/8vYAWW/y+nf0MzvES3aldGm7/a4spMeiv3RXLcDbp96mh4YBf1i6t
-	 uwKNs8WYaLTtbO58Dat/DcK941aOXrCNqON4nOmQlucjutW7Scefkb22C4GbD71VvF
-	 7xTyyfWgzDepO3wNewYLaKX1nCEWBNkFABDrayWrDA2ost6Bl3KgMGuzQR1qUtJuAM
-	 XaTWJBh6Sw3qQ==
-Message-ID: <2d92ac28-db71-4788-ac98-3a9af95bf8f0@kernel.org>
-Date: Mon, 30 Sep 2024 15:22:07 +0200
+	b=TnUtVFkp9no8DxYs3yOmxGfS8eN7NlIOgHeU2dMon3J0SEDuSf8bM6TdOWuaaz3vM
+	 4mCVi5pOq3cQP+GXJwsPixhgMsjgukHiq+W+ymSdadawpFwTvuhB1PnTiWJvnVtjPO
+	 OAuA7TBVnAdPrtjvHT+oCGZtz7FgqY4i0DOT/J/96o5fLJpr1Jd+EL82/EWY32QaQP
+	 Eam6648pbTSmSFyPB45FThARXtfOK4cKrqA9tUDCmplLnXMdKBwWKKGIW8PHes7hU9
+	 DFjLqyuNV/MKltGLcg8j6lcyiss7jatSf+vxfb5lTW9yVJCgu8B8ElmNqKZwSP0ac6
+	 1f3rZcpYzwCGg==
+Message-ID: <f0f22e3a-4373-4f32-9e3e-641e21d1142c@kernel.org>
+Date: Mon, 30 Sep 2024 15:23:14 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,14 +35,14 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 6/7] Add SPAcc compilation in crypto
+Subject: Re: [PATCH v9 5/7] Add SPAcc Kconfig and Makefile
 To: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>,
  devicetree@vger.kernel.org, herbert@gondor.apana.org.au,
  linux-crypto@vger.kernel.org, robh@kernel.org
 Cc: Ruud.Derwig@synopsys.com, manjunath.hadli@vayavyalabs.com,
  bhoomikak@vayavyalabs.com, Shweta Raikar <shwetar@vayavyalabs.com>
 References: <20240930093054.215809-1-pavitrakumarm@vayavyalabs.com>
- <20240930093054.215809-7-pavitrakumarm@vayavyalabs.com>
+ <20240930093054.215809-6-pavitrakumarm@vayavyalabs.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -88,12 +88,12 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20240930093054.215809-7-pavitrakumarm@vayavyalabs.com>
+In-Reply-To: <20240930093054.215809-6-pavitrakumarm@vayavyalabs.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 30/09/2024 11:30, Pavitrakumar M wrote:
-> Add SPAcc compilation to crypto subsystem
+> Add Makefile and Kconfig for SPAcc driver.
 > 
 > Co-developed-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
 > Signed-off-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
@@ -101,18 +101,13 @@ On 30/09/2024 11:30, Pavitrakumar M wrote:
 > Signed-off-by: Shweta Raikar <shwetar@vayavyalabs.com>
 > Signed-off-by: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
 > Signed-off-by: Manjunath Hadli <manjunath.hadli@vayavyalabs.com>
+> Acked-by: Ruud Derwig <Ruud.Derwig@synopsys.com>
+> ---
+>  drivers/crypto/dwc-spacc/Kconfig  | 94 +++++++++++++++++++++++++++++++
+>  drivers/crypto/dwc-spacc/Makefile | 16 ++++++
 
-Four people contributed to simple Makefile change? How is this even
-possible?
-
-This patch should not be split.
-
-Please use subject prefixes matching the subsystem. You can get them for
-example with `git log --oneline -- DIRECTORY_OR_FILE` on the directory
-your patch is touching. For bindings, the preferred subjects are
-explained here:
-https://www.kernel.org/doc/html/latest/devicetree/bindings/submitting-patches.html#i-for-patch-submitters
-
+Why you have two patches touching makefiles and Kconfig? This split is
+just not logical.
 
 
 Best regards,
