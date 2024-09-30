@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C101D2AE8E;
-	Mon, 30 Sep 2024 13:20:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1375017C22B;
+	Mon, 30 Sep 2024 13:22:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727702447; cv=none; b=alGIXJNV9joKrHgIB/tzkvVOYZ41Cg6LWkeOH34i1mpwX6OUITSRgsKR1um3lOVevlr23rfWAW4BjDQH6zCImZ2ZXxYlrlXBdS6TAz1f8vNrTYp+2YDClk214gqe0abnxTpUpKSm5f+gNqYDB3jyN2BJMiNG9PYooXAB5nGYC5M=
+	t=1727702532; cv=none; b=QRf8lfz5PBzZ++Cmk39kQSwpppsluriV/U30DlQ2H8IdETtRNAWW1gAtYDhPmS/4C3ZMnIPf+fULzFSvTCAiJE37ajyWuKCusk4o11eVy+TVTNO0pwF9uCYvC8jW5LSEXP2Dk6YvDbjyLzHaiTXVi8PMyACdQy4s3Phh9AsftKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727702447; c=relaxed/simple;
-	bh=7yPTf+5rpm2JBn+xyiBLbMxwUXCTkpKrWcEhfDqS2vA=;
+	s=arc-20240116; t=1727702532; c=relaxed/simple;
+	bh=LUwXOpgxE9vUUfbb4l3oiHObMg8Nt/O9lMm9xQE8c0k=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ok6XgECtaaohLHEPmV7EqvEGcLvhZek6+3aLUw9MgYJxr7hvJT23eCIqGp3Jm26+CXpeF3B/1Shuq/uBHvG8mTwMfKBf2hSTOL4aO/US0TNxRib136Xwc7d0LE1Eyh0cyziXKCHZzCdN7elXaI/i1wpK+LEVQ8NDrlOb+lvJUF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QVT7V28h; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=XPnlewaJDWFVCOJl7UbkG5r5iH9r+yvHVqZ0Uvl3R8fGDKFFXuP3R3qGXj4s3b0hjvOwLqtbUx8HAm8lyqM5zR+MURvWpz7kcMIW89k7X6n8E/nzcIAFGWqVbfLrGqucXyTwm+WOCuKxtdrn30nGQvNPtbhIdcbhX17+f1PesFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zo4MVrxx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QVT7V28h"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14F93C4CECE;
-	Mon, 30 Sep 2024 13:20:44 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zo4MVrxx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 555CDC4CEC7;
+	Mon, 30 Sep 2024 13:22:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727702447;
-	bh=7yPTf+5rpm2JBn+xyiBLbMxwUXCTkpKrWcEhfDqS2vA=;
+	s=k20201202; t=1727702531;
+	bh=LUwXOpgxE9vUUfbb4l3oiHObMg8Nt/O9lMm9xQE8c0k=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=QVT7V28hXRGCH0hcD6fq8nXBkvKV2U2AKBX2oDn7wTcNbKj9Ehp/k3dFAgq6hQh1w
-	 fFSxydcqg7EG6qfu0MdqAeLNgcacgts4a7EhZxA7JH4nSxZRZDsjXayP2G9A6L+Cs0
-	 /PE7GVAOGLKD1RAGvBxEuyRganrCOlcSbl19UgRA4YAquOgy1Ct2XHHaoP3D5ARpjw
-	 iYnkJ+7FOs5s9lk6MhYR8AYONea1fk5lCuCgzI13IXuFSM32j0IDDOM+/5ib2dLn4L
-	 Kit5ay6Wp7smM4ehSAjxpNnu0dlAPoL9mtNiiKns6sF/m69qaIXfT858ktBhRrF4OC
-	 u3U46SWWK8QXA==
-Message-ID: <6ae71793-4188-4356-b314-e2d2db5b3cb1@kernel.org>
-Date: Mon, 30 Sep 2024 15:20:42 +0200
+	b=Zo4MVrxxxZlqNLg6XiXd8NanmsKchb3Cxt0ZuiO/0GR7itdqUMnmuRK3oZy/eO8/C
+	 vTmP4gEwNrg6FZJ0HlWPMRlV/4v1jK4/PYXKGY44tEWIGbyEB8yvklPSkMORDWp0B3
+	 7GZjWFdkDOuJ/8vYAWW/y+nf0MzvES3aldGm7/a4spMeiv3RXLcDbp96mh4YBf1i6t
+	 uwKNs8WYaLTtbO58Dat/DcK941aOXrCNqON4nOmQlucjutW7Scefkb22C4GbD71VvF
+	 7xTyyfWgzDepO3wNewYLaKX1nCEWBNkFABDrayWrDA2ost6Bl3KgMGuzQR1qUtJuAM
+	 XaTWJBh6Sw3qQ==
+Message-ID: <2d92ac28-db71-4788-ac98-3a9af95bf8f0@kernel.org>
+Date: Mon, 30 Sep 2024 15:22:07 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,14 +35,14 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 7/7] dt-bindings: crypto: Document support for SPAcc
+Subject: Re: [PATCH v9 6/7] Add SPAcc compilation in crypto
 To: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>,
  devicetree@vger.kernel.org, herbert@gondor.apana.org.au,
  linux-crypto@vger.kernel.org, robh@kernel.org
 Cc: Ruud.Derwig@synopsys.com, manjunath.hadli@vayavyalabs.com,
- bhoomikak@vayavyalabs.com
+ bhoomikak@vayavyalabs.com, Shweta Raikar <shwetar@vayavyalabs.com>
 References: <20240930093054.215809-1-pavitrakumarm@vayavyalabs.com>
- <20240930093054.215809-8-pavitrakumarm@vayavyalabs.com>
+ <20240930093054.215809-7-pavitrakumarm@vayavyalabs.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -88,61 +88,32 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20240930093054.215809-8-pavitrakumarm@vayavyalabs.com>
+In-Reply-To: <20240930093054.215809-7-pavitrakumarm@vayavyalabs.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 30/09/2024 11:30, Pavitrakumar M wrote:
-> Add DT bindings related to the SPAcc driver for Documentation.
-> DWC Synopsys Security Protocol Accelerator(SPAcc) Hardware Crypto
-> Engine is a crypto IP designed by Synopsys.
+> Add SPAcc compilation to crypto subsystem
 > 
 > Co-developed-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
 > Signed-off-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
-> Co-developed-by: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+> Co-developed-by: Shweta Raikar <shwetar@vayavyalabs.com>
+> Signed-off-by: Shweta Raikar <shwetar@vayavyalabs.com>
 > Signed-off-by: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-> Acked-by: Ruud Derwig <Ruud.Derwig@synopsys.com>
-> ---
->  .../bindings/crypto/snps,dwc-spacc.yaml       | 71 +++++++++++++++++++
->  1 file changed, 71 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/crypto/snps,dwc-spacc.yaml
+> Signed-off-by: Manjunath Hadli <manjunath.hadli@vayavyalabs.com>
 
-Bindings come before users, so please re-order your patches.
+Four people contributed to simple Makefile change? How is this even
+possible?
 
-> 
-> diff --git a/Documentation/devicetree/bindings/crypto/snps,dwc-spacc.yaml b/Documentation/devicetree/bindings/crypto/snps,dwc-spacc.yaml
-> new file mode 100644
-> index 000000000000..6b94d0aa7280
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/crypto/snps,dwc-spacc.yaml
-> @@ -0,0 +1,71 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/crypto/snps,dwc-spacc.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Synopsys DesignWare Security Protocol Accelerator(SPAcc) Crypto Engine
-> +
-> +maintainers:
-> +  - Ruud Derwig <Ruud.Derwig@synopsys.com>
-> +
-> +description:
-> +  DWC Synopsys Security Protocol Accelerator(SPAcc) Hardware Crypto Engine is
-> +  a crypto IP designed by Synopsys, that can accelerate cryptographic
-> +  operations.
-> +
-> +properties:
-> +  compatible:
-> +    contains:
+This patch should not be split.
 
-Nope, you cannot have contains. From where did you get it? Please use
-existing, recent bindings as starting point or just use exampl-eschema.
+Please use subject prefixes matching the subsystem. You can get them for
+example with `git log --oneline -- DIRECTORY_OR_FILE` on the directory
+your patch is touching. For bindings, the preferred subjects are
+explained here:
+https://www.kernel.org/doc/html/latest/devicetree/bindings/submitting-patches.html#i-for-patch-submitters
 
-Eh, you already got this comment and just ignored it.
 
-You ignored all other comments as well. This is quite disappointing to
-ask us to do the same review over and over.
 
 Best regards,
 Krzysztof
