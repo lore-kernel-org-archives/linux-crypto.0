@@ -1,115 +1,111 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CEFF17C22B;
-	Mon, 30 Sep 2024 13:23:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24CD6189902;
+	Mon, 30 Sep 2024 13:25:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727702600; cv=none; b=rNMdOk4Ef12mmY//iAfJbTSs4kl/QVHtKvCNtRFIFLuNdw+zMLIcZTeuZ/4xKh9+FRl94p3xb8ubvjvMB4ZOptgzWAiCaaetT1ZoIWa5uP688GwmDs52wR8ab1AkwQFnfgdFGTTK8ydBK4a2coGwFMAsC6EKLUfIh+1NoybHK/E=
+	t=1727702736; cv=none; b=IN5NwwZiIEUZECD30iagT6nlW22oamE2zNl5byG2XHTbJaJxSh3YlubAS5b9kt3uXDsu/mrAcIwoCUq3p6zP5zkL+b2uZe5Bc1url/Qj9TIMN9KfQCaM9RXEIdSez2l/kmRWCEhkGQgG4FTH+jSWthV4BfUFHSehaTKUJIHfKG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727702600; c=relaxed/simple;
-	bh=8qGGGMo6W1hUAjttcnvSyX1tJjFh9ZcUxzNa5+Ahz0k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OooRJzQM/Sa2VbfaLEgfwm0q42JXcUfGCazWYSo8lFFIDu7U/TM+90H5wWboxwNccJ5uu0Vi4s2i55L9B2gYU1RNxhzG4NegJmXNYwfBgKJ1d4XtHCbleHnrUF4wz1v/fCZ73f8FLBfLQTb85YRqfjNBDcVr5rmLqWAoajgNOqM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TnUtVFkp; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1727702736; c=relaxed/simple;
+	bh=rKeduMaBcHPLE6uLEyj4xQk5w+Q6ZbXl7XazbceKx6A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OlWSpjDRsg5Bw7hbJdsMXiGN+qsyWS9YLyvQBaNuUZ8Duvx6PUPI2QMBoFiBoPJ3xaWwpEUtVm5V3kzb5f4/PehUQgMIuznzx1qe/wsPxXVCRsIpMzVP+USPCKcz/fv21ckkXbAoXy/finVeMbT1+L0b6OavHQS4CmYYJ1NZMAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=dXFfvD0p; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TnUtVFkp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6AC8C4CEC7;
-	Mon, 30 Sep 2024 13:23:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727702600;
-	bh=8qGGGMo6W1hUAjttcnvSyX1tJjFh9ZcUxzNa5+Ahz0k=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=TnUtVFkp9no8DxYs3yOmxGfS8eN7NlIOgHeU2dMon3J0SEDuSf8bM6TdOWuaaz3vM
-	 4mCVi5pOq3cQP+GXJwsPixhgMsjgukHiq+W+ymSdadawpFwTvuhB1PnTiWJvnVtjPO
-	 OAuA7TBVnAdPrtjvHT+oCGZtz7FgqY4i0DOT/J/96o5fLJpr1Jd+EL82/EWY32QaQP
-	 Eam6648pbTSmSFyPB45FThARXtfOK4cKrqA9tUDCmplLnXMdKBwWKKGIW8PHes7hU9
-	 DFjLqyuNV/MKltGLcg8j6lcyiss7jatSf+vxfb5lTW9yVJCgu8B8ElmNqKZwSP0ac6
-	 1f3rZcpYzwCGg==
-Message-ID: <f0f22e3a-4373-4f32-9e3e-641e21d1142c@kernel.org>
-Date: Mon, 30 Sep 2024 15:23:14 +0200
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="dXFfvD0p"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EF3DC4CEC7;
+	Mon, 30 Sep 2024 13:25:27 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="dXFfvD0p"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1727702725;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rKeduMaBcHPLE6uLEyj4xQk5w+Q6ZbXl7XazbceKx6A=;
+	b=dXFfvD0pzN/lc7Zyj6rLMq0x6DKjxy8OqAHBqn+qtJ43zHTATycrbS7rm22ctRbL6iikVl
+	TLAfIbXZbAkzbjmGL6uqyArqHOVwHEojNYXu45w+flpm8qXh+olQ+0Gr67gAA0PGRcLnK4
+	2Z6x5IK2u713cESvl9/DEH8CaEz3se8=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id c2513a7e (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Mon, 30 Sep 2024 13:25:25 +0000 (UTC)
+Date: Mon, 30 Sep 2024 15:25:17 +0200
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Uros Bizjak <ubizjak@gmail.com>
+Cc: x86@kernel.org, linux-crypto@vger.kernel.org,
+	intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+	linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
+	linux-fscrypt@vger.kernel.org, linux-scsi@vger.kernel.org,
+	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	kunit-dev@googlegroups.com, linux-kernel@vger.kernel.org,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Andy Lutomirski <luto@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Jani Nikula <jani.nikula@linux.intel.com>,
+	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Tvrtko Ursulin <tursulin@ursulin.net>,
+	David Airlie <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Hans Verkuil <hverkuil@xs4all.nl>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Richard Weinberger <richard@nod.at>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Eric Biggers <ebiggers@kernel.org>,
+	"Theodore Y. Ts'o" <tytso@mit.edu>,
+	Jaegeuk Kim <jaegeuk@kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Hannes Reinecke <hare@suse.de>,
+	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Brendan Higgins <brendan.higgins@linux.dev>,
+	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jiri Pirko <jiri@resnulli.us>, Petr Mladek <pmladek@suse.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Kent Overstreet <kent.overstreet@linux.dev>
+Subject: Re: [PATCH v3 00/19] random: Resolve circular include dependency and
+ include <linux/percpu.h>
+Message-ID: <ZvqmvZ2wopxPwYZt@zx2c4.com>
+References: <20240930123702.803617-1-ubizjak@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 5/7] Add SPAcc Kconfig and Makefile
-To: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>,
- devicetree@vger.kernel.org, herbert@gondor.apana.org.au,
- linux-crypto@vger.kernel.org, robh@kernel.org
-Cc: Ruud.Derwig@synopsys.com, manjunath.hadli@vayavyalabs.com,
- bhoomikak@vayavyalabs.com, Shweta Raikar <shwetar@vayavyalabs.com>
-References: <20240930093054.215809-1-pavitrakumarm@vayavyalabs.com>
- <20240930093054.215809-6-pavitrakumarm@vayavyalabs.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
- cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
- JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
- gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
- J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
- NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
- BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
- vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
- Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
- TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
- S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
- FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJgPO8PBQkUX63hAAoJEBuTQ307
- QWKbBn8P+QFxwl7pDsAKR1InemMAmuykCHl+XgC0LDqrsWhAH5TYeTVXGSyDsuZjHvj+FRP+
- gZaEIYSw2Yf0e91U9HXo3RYhEwSmxUQ4Fjhc9qAwGKVPQf6YuQ5yy6pzI8brcKmHHOGrB3tP
- /MODPt81M1zpograAC2WTDzkICfHKj8LpXp45PylD99J9q0Y+gb04CG5/wXs+1hJy/dz0tYy
- iua4nCuSRbxnSHKBS5vvjosWWjWQXsRKd+zzXp6kfRHHpzJkhRwF6ArXi4XnQ+REnoTfM5Fk
- VmVmSQ3yFKKePEzoIriT1b2sXO0g5QXOAvFqB65LZjXG9jGJoVG6ZJrUV1MVK8vamKoVbUEe
- 0NlLl/tX96HLowHHoKhxEsbFzGzKiFLh7hyboTpy2whdonkDxpnv/H8wE9M3VW/fPgnL2nPe
- xaBLqyHxy9hA9JrZvxg3IQ61x7rtBWBUQPmEaK0azW+l3ysiNpBhISkZrsW3ZUdknWu87nh6
- eTB7mR7xBcVxnomxWwJI4B0wuMwCPdgbV6YDUKCuSgRMUEiVry10xd9KLypR9Vfyn1AhROrq
- AubRPVeJBf9zR5UW1trJNfwVt3XmbHX50HCcHdEdCKiT9O+FiEcahIaWh9lihvO0ci0TtVGZ
- MCEtaCE80Q3Ma9RdHYB3uVF930jwquplFLNF+IBCn5JRzsFNBFVDXDQBEADNkrQYSREUL4D3
- Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
- MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
- OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
- GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
- 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
- YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
- 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
- BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
- JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
- 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
- YpsFAmA872oFCRRflLYACgkQG5NDfTtBYpvScw/9GrqBrVLuJoJ52qBBKUBDo4E+5fU1bjt0
- Gv0nh/hNJuecuRY6aemU6HOPNc2t8QHMSvwbSF+Vp9ZkOvrM36yUOufctoqON+wXrliEY0J4
- ksR89ZILRRAold9Mh0YDqEJc1HmuxYLJ7lnbLYH1oui8bLbMBM8S2Uo9RKqV2GROLi44enVt
- vdrDvo+CxKj2K+d4cleCNiz5qbTxPUW/cgkwG0lJc4I4sso7l4XMDKn95c7JtNsuzqKvhEVS
- oic5by3fbUnuI0cemeizF4QdtX2uQxrP7RwHFBd+YUia7zCcz0//rv6FZmAxWZGy5arNl6Vm
- lQqNo7/Poh8WWfRS+xegBxc6hBXahpyUKphAKYkah+m+I0QToCfnGKnPqyYIMDEHCS/RfqA5
- t8F+O56+oyLBAeWX7XcmyM6TGeVfb+OZVMJnZzK0s2VYAuI0Rl87FBFYgULdgqKV7R7WHzwD
- uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
- 7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
- 5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20240930093054.215809-6-pavitrakumarm@vayavyalabs.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240930123702.803617-1-ubizjak@gmail.com>
 
-On 30/09/2024 11:30, Pavitrakumar M wrote:
-> Add Makefile and Kconfig for SPAcc driver.
-> 
-> Co-developed-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
-> Signed-off-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
-> Co-developed-by: Shweta Raikar <shwetar@vayavyalabs.com>
-> Signed-off-by: Shweta Raikar <shwetar@vayavyalabs.com>
-> Signed-off-by: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-> Signed-off-by: Manjunath Hadli <manjunath.hadli@vayavyalabs.com>
-> Acked-by: Ruud Derwig <Ruud.Derwig@synopsys.com>
-> ---
->  drivers/crypto/dwc-spacc/Kconfig  | 94 +++++++++++++++++++++++++++++++
->  drivers/crypto/dwc-spacc/Makefile | 16 ++++++
+Hi Uros,
 
-Why you have two patches touching makefiles and Kconfig? This split is
-just not logical.
+Per your plan, I took this into random.git, and we'll now see if being
+in next unearths some problems over the next week or two.
 
-
-Best regards,
-Krzysztof
-
+Jason
