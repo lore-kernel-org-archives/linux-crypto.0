@@ -1,128 +1,149 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2E9319C540;
-	Mon, 30 Sep 2024 12:37:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C101D2AE8E;
+	Mon, 30 Sep 2024 13:20:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727699858; cv=none; b=E3F403grfAK8tgcx/5xKEnpnqX17PU0/JIUl03P1j8h04k7Pl4faxKlWeFhUPdIbWCsZZa46Jltn1wBanQXigg3vrhR0WU3Y/wNwDuQF8uirh5j0vJDv0cP6r6MchOQ7FKpxkozHPdVzRQiCtY8PUgS7iZ3spww7zexqyU+qMWQ=
+	t=1727702447; cv=none; b=alGIXJNV9joKrHgIB/tzkvVOYZ41Cg6LWkeOH34i1mpwX6OUITSRgsKR1um3lOVevlr23rfWAW4BjDQH6zCImZ2ZXxYlrlXBdS6TAz1f8vNrTYp+2YDClk214gqe0abnxTpUpKSm5f+gNqYDB3jyN2BJMiNG9PYooXAB5nGYC5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727699858; c=relaxed/simple;
-	bh=tjQh285Zc+G9Xm9tSEh9EovHMoX5eFJh64k3SUZLibA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=G4rfGi60NkD1xzyK6DIIPc6/BErFrnKyU+A3mxCgQxUsG5+dip96qkCUf5BlDVrWHeS6K5iM6fcZScuwLH7asWkG/ohFBPbUxM9t3oIxwJ6X+5QaqZW7MsJuePGpSznA6vKmiK1plGYdZCAVQ47vUIIebnvDkumgnLaICPpljTM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hxnBRV00; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1727702447; c=relaxed/simple;
+	bh=7yPTf+5rpm2JBn+xyiBLbMxwUXCTkpKrWcEhfDqS2vA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ok6XgECtaaohLHEPmV7EqvEGcLvhZek6+3aLUw9MgYJxr7hvJT23eCIqGp3Jm26+CXpeF3B/1Shuq/uBHvG8mTwMfKBf2hSTOL4aO/US0TNxRib136Xwc7d0LE1Eyh0cyziXKCHZzCdN7elXaI/i1wpK+LEVQ8NDrlOb+lvJUF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QVT7V28h; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hxnBRV00"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-42cb1e623d1so40078205e9.0;
-        Mon, 30 Sep 2024 05:37:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727699855; x=1728304655; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=b0+j8HZP1cVf+QQUDZOhjhaodRPqf5Kzd1FP1uUxc6s=;
-        b=hxnBRV00bnxZXi7Rt/x9shr35Na6wfQFg6KGQ0BKdbZMu1QmH0hK9/BbFBcPmyRoaz
-         52vH59w8qCudS2ywsuv8w2RQoUYoUJKiNnYWr+EPUK/1kzGeXSbxvg5l7sofO4FAb8WF
-         YHGfYL3WGJZBeWYTckyDgubwrUfsFS0l3U8AnSliNJjHEhTVEYjb0WoFdDdElUiiOq3L
-         5kqGL4qrmtA0maWRLc6nhEZVO/N5Xz3zPg09s+zEtkfC+a4AjvLaFlB/gKwzyKv9VM+i
-         esz4GQADaYl/0EMDgE9oHgR8iZzwz++cisocuuA7Yf6HzQMtep/NGTJINZ+ky1ddqKH3
-         SLrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727699855; x=1728304655;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=b0+j8HZP1cVf+QQUDZOhjhaodRPqf5Kzd1FP1uUxc6s=;
-        b=oSyPut9FuQas8DjUzcB5Jah6nQkUtEnyJGAFIlPbfa4Rj1LS1HvV5BHWxP1BV9dqn5
-         W7cirkmoYKFjEqfm8CEj+ypaeBAIALHvnEqb1PlmaFacH5ZWv3XNNhCbj6nR1KTENRm6
-         JpTV85j0lDj0Z4ViJ3+HlA6SGv9GPGvJjvqZ8syCAVTV2krmAAXklbo1X4c3nKo/nuUD
-         4I0PjHekzoDQ+vbjupLW36//sGIdX7QWo6sPV8HVGmNQkZSfzuEEoq4EI7MQm8kziCBW
-         y1XOuaQa7QDqa+zzB5zq0tSFMsnb7BlUBtYEet19Mv0VqOOnO1aT8xabW1xYSkn9LfX/
-         7lyA==
-X-Forwarded-Encrypted: i=1; AJvYcCVTmTdMSqKQfVcW2NFXxvVQVfYwRZJKqb7HC/WKq2RLYl0KM/HZnL6U4Nw2LI9TzJbTP28Dyftkcl5ktXaw@vger.kernel.org, AJvYcCW+nPqAS7cuqRtNVZ3oEnstIe0YaKHTu0DeWkQ4ylY4Q2YaWLVNaIVp2OYLxVUi64oRmJz/jKjCAPbEHVvWIZ/i@vger.kernel.org, AJvYcCWEnDkBif+Go5iJjgmpQiOSFlkClzTlryEevms1oE9MNtOHivmE92JuU8tQ5XgG1WckgA8=@vger.kernel.org, AJvYcCWhg9unkSKmoeLmQOKoUwmzZ5RD9d7dq26qh+WBsksqH2RNxCzu8KZPNgwiaSQA8yv4UO2cuXOEpfq851p2wA==@vger.kernel.org, AJvYcCX9rPe8uIcDtSo8DUpRMkRtZkTrvEHNqeajV7YriZL5krAEoQyyTAsXi36tRvwrSiul7NcSePs8CaDgsiw=@vger.kernel.org, AJvYcCXCkzqDm8SwT4dH0raMw25FTCUZ2H20qpvZJOvwCt1wkRCGwvofsvKtA7b83Okm2Oc/mIAhfdiCGr0lMA==@vger.kernel.org, AJvYcCXkgjl9JnvujxsgZ9qps1idZlxQOqxvU+BzkuB1yaGXdafH35nxWdcyD7NhoFA4wqMKY+FtH1CeGwi8U+2f@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywx3TVSIeS0ug+XqYcbDj+nKdwk5TB4HedOdNnmfOB/MlN6Qz1i
-	+ctSDSpZbnWN//UDVqzTbXjw4/QfitjYNavztYGa8MI16c6rod/KxU2fiMl0YAY=
-X-Google-Smtp-Source: AGHT+IHdC1cyaWvS05r5143QqcQIcUYzzrxVQfsNi8sq552bi8Bx4Z/Dm3LJ5ZgNcGYz44ssbU9Czw==
-X-Received: by 2002:a05:600c:1da6:b0:42c:b187:bde9 with SMTP id 5b1f17b1804b1-42f584a2dd7mr90988995e9.30.1727699855019;
-        Mon, 30 Sep 2024 05:37:35 -0700 (PDT)
-Received: from fedora.iskraemeco.si ([193.77.86.250])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42e96a52308sm149011355e9.43.2024.09.30.05.37.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Sep 2024 05:37:34 -0700 (PDT)
-From: Uros Bizjak <ubizjak@gmail.com>
-To: x86@kernel.org,
-	linux-crypto@vger.kernel.org,
-	intel-gfx@lists.freedesktop.org,
-	dri-devel@lists.freedesktop.org,
-	linux-media@vger.kernel.org,
-	linux-mtd@lists.infradead.org,
-	linux-fscrypt@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	bpf@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	kunit-dev@googlegroups.com,
-	linux-kernel@vger.kernel.org
-Cc: Uros Bizjak <ubizjak@gmail.com>,
-	"Theodore Ts'o" <tytso@mit.edu>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Kent Overstreet <kent.overstreet@linux.dev>
-Subject: [PATCH v3 19/19] prandom: Include <linux/percpu.h> in <linux/prandom.h>
-Date: Mon, 30 Sep 2024 14:33:30 +0200
-Message-ID: <20240930123702.803617-20-ubizjak@gmail.com>
-X-Mailer: git-send-email 2.46.2
-In-Reply-To: <20240930123702.803617-1-ubizjak@gmail.com>
-References: <20240930123702.803617-1-ubizjak@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QVT7V28h"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14F93C4CECE;
+	Mon, 30 Sep 2024 13:20:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727702447;
+	bh=7yPTf+5rpm2JBn+xyiBLbMxwUXCTkpKrWcEhfDqS2vA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=QVT7V28hXRGCH0hcD6fq8nXBkvKV2U2AKBX2oDn7wTcNbKj9Ehp/k3dFAgq6hQh1w
+	 fFSxydcqg7EG6qfu0MdqAeLNgcacgts4a7EhZxA7JH4nSxZRZDsjXayP2G9A6L+Cs0
+	 /PE7GVAOGLKD1RAGvBxEuyRganrCOlcSbl19UgRA4YAquOgy1Ct2XHHaoP3D5ARpjw
+	 iYnkJ+7FOs5s9lk6MhYR8AYONea1fk5lCuCgzI13IXuFSM32j0IDDOM+/5ib2dLn4L
+	 Kit5ay6Wp7smM4ehSAjxpNnu0dlAPoL9mtNiiKns6sF/m69qaIXfT858ktBhRrF4OC
+	 u3U46SWWK8QXA==
+Message-ID: <6ae71793-4188-4356-b314-e2d2db5b3cb1@kernel.org>
+Date: Mon, 30 Sep 2024 15:20:42 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 7/7] dt-bindings: crypto: Document support for SPAcc
+To: Pavitrakumar M <pavitrakumarm@vayavyalabs.com>,
+ devicetree@vger.kernel.org, herbert@gondor.apana.org.au,
+ linux-crypto@vger.kernel.org, robh@kernel.org
+Cc: Ruud.Derwig@synopsys.com, manjunath.hadli@vayavyalabs.com,
+ bhoomikak@vayavyalabs.com
+References: <20240930093054.215809-1-pavitrakumarm@vayavyalabs.com>
+ <20240930093054.215809-8-pavitrakumarm@vayavyalabs.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
+ cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
+ JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
+ gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
+ J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
+ NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
+ BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
+ vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
+ Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
+ TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzSVLcnp5c3p0b2Yg
+ S296bG93c2tpIDxrcnprQGtlcm5lbC5vcmc+wsGVBBMBCgA/AhsDBgsJCAcDAgYVCAIJCgsE
+ FgIDAQIeAQIXgBYhBJvQfg4MUfjVlne3VBuTQ307QWKbBQJgPO8PBQkUX63hAAoJEBuTQ307
+ QWKbBn8P+QFxwl7pDsAKR1InemMAmuykCHl+XgC0LDqrsWhAH5TYeTVXGSyDsuZjHvj+FRP+
+ gZaEIYSw2Yf0e91U9HXo3RYhEwSmxUQ4Fjhc9qAwGKVPQf6YuQ5yy6pzI8brcKmHHOGrB3tP
+ /MODPt81M1zpograAC2WTDzkICfHKj8LpXp45PylD99J9q0Y+gb04CG5/wXs+1hJy/dz0tYy
+ iua4nCuSRbxnSHKBS5vvjosWWjWQXsRKd+zzXp6kfRHHpzJkhRwF6ArXi4XnQ+REnoTfM5Fk
+ VmVmSQ3yFKKePEzoIriT1b2sXO0g5QXOAvFqB65LZjXG9jGJoVG6ZJrUV1MVK8vamKoVbUEe
+ 0NlLl/tX96HLowHHoKhxEsbFzGzKiFLh7hyboTpy2whdonkDxpnv/H8wE9M3VW/fPgnL2nPe
+ xaBLqyHxy9hA9JrZvxg3IQ61x7rtBWBUQPmEaK0azW+l3ysiNpBhISkZrsW3ZUdknWu87nh6
+ eTB7mR7xBcVxnomxWwJI4B0wuMwCPdgbV6YDUKCuSgRMUEiVry10xd9KLypR9Vfyn1AhROrq
+ AubRPVeJBf9zR5UW1trJNfwVt3XmbHX50HCcHdEdCKiT9O+FiEcahIaWh9lihvO0ci0TtVGZ
+ MCEtaCE80Q3Ma9RdHYB3uVF930jwquplFLNF+IBCn5JRzsFNBFVDXDQBEADNkrQYSREUL4D3
+ Gws46JEoZ9HEQOKtkrwjrzlw/tCmqVzERRPvz2Xg8n7+HRCrgqnodIYoUh5WsU84N03KlLue
+ MNsWLJBvBaubYN4JuJIdRr4dS4oyF1/fQAQPHh8Thpiz0SAZFx6iWKB7Qrz3OrGCjTPcW6ei
+ OMheesVS5hxietSmlin+SilmIAPZHx7n242u6kdHOh+/SyLImKn/dh9RzatVpUKbv34eP1wA
+ GldWsRxbf3WP9pFNObSzI/Bo3kA89Xx2rO2roC+Gq4LeHvo7ptzcLcrqaHUAcZ3CgFG88CnA
+ 6z6lBZn0WyewEcPOPdcUB2Q7D/NiUY+HDiV99rAYPJztjeTrBSTnHeSBPb+qn5ZZGQwIdUW9
+ YegxWKvXXHTwB5eMzo/RB6vffwqcnHDoe0q7VgzRRZJwpi6aMIXLfeWZ5Wrwaw2zldFuO4Dt
+ 91pFzBSOIpeMtfgb/Pfe/a1WJ/GgaIRIBE+NUqckM+3zJHGmVPqJP/h2Iwv6nw8U+7Yyl6gU
+ BLHFTg2hYnLFJI4Xjg+AX1hHFVKmvl3VBHIsBv0oDcsQWXqY+NaFahT0lRPjYtrTa1v3tem/
+ JoFzZ4B0p27K+qQCF2R96hVvuEyjzBmdq2esyE6zIqftdo4MOJho8uctOiWbwNNq2U9pPWmu
+ 4vXVFBYIGmpyNPYzRm0QPwARAQABwsF8BBgBCgAmAhsMFiEEm9B+DgxR+NWWd7dUG5NDfTtB
+ YpsFAmA872oFCRRflLYACgkQG5NDfTtBYpvScw/9GrqBrVLuJoJ52qBBKUBDo4E+5fU1bjt0
+ Gv0nh/hNJuecuRY6aemU6HOPNc2t8QHMSvwbSF+Vp9ZkOvrM36yUOufctoqON+wXrliEY0J4
+ ksR89ZILRRAold9Mh0YDqEJc1HmuxYLJ7lnbLYH1oui8bLbMBM8S2Uo9RKqV2GROLi44enVt
+ vdrDvo+CxKj2K+d4cleCNiz5qbTxPUW/cgkwG0lJc4I4sso7l4XMDKn95c7JtNsuzqKvhEVS
+ oic5by3fbUnuI0cemeizF4QdtX2uQxrP7RwHFBd+YUia7zCcz0//rv6FZmAxWZGy5arNl6Vm
+ lQqNo7/Poh8WWfRS+xegBxc6hBXahpyUKphAKYkah+m+I0QToCfnGKnPqyYIMDEHCS/RfqA5
+ t8F+O56+oyLBAeWX7XcmyM6TGeVfb+OZVMJnZzK0s2VYAuI0Rl87FBFYgULdgqKV7R7WHzwD
+ uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
+ 7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
+ 5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
+In-Reply-To: <20240930093054.215809-8-pavitrakumarm@vayavyalabs.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-<linux/percpu.h> include was removed from <linux/prandom.h>
-in d9f29deb7fe8 ("prandom: Remove unused include") because
-this inclusion broke arm64 due to a circular dependency
-on include files.
+On 30/09/2024 11:30, Pavitrakumar M wrote:
+> Add DT bindings related to the SPAcc driver for Documentation.
+> DWC Synopsys Security Protocol Accelerator(SPAcc) Hardware Crypto
+> Engine is a crypto IP designed by Synopsys.
+> 
+> Co-developed-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
+> Signed-off-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
+> Co-developed-by: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+> Signed-off-by: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
+> Acked-by: Ruud Derwig <Ruud.Derwig@synopsys.com>
+> ---
+>  .../bindings/crypto/snps,dwc-spacc.yaml       | 71 +++++++++++++++++++
+>  1 file changed, 71 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/snps,dwc-spacc.yaml
 
-__percpu tag is defined in include/linux/compiler_types.h, so there
-is currently no direct need for the inclusion of <linux/percpu.h>.
-However, in [1] we would like to repurpose __percpu tag as a named
-address space qualifier, where __percpu macro uses defines from
-<linux/percpu.h>.
+Bindings come before users, so please re-order your patches.
 
-The circular dependency was removed in ddd8e37ebaa1 ("random: Do not
-include <linux/prandom.h> in <linux/random.h>") and it cleared
-the path for the inclusion of <linux/percpu.h> in <linux/prandom.h>.
+> 
+> diff --git a/Documentation/devicetree/bindings/crypto/snps,dwc-spacc.yaml b/Documentation/devicetree/bindings/crypto/snps,dwc-spacc.yaml
+> new file mode 100644
+> index 000000000000..6b94d0aa7280
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/crypto/snps,dwc-spacc.yaml
+> @@ -0,0 +1,71 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/crypto/snps,dwc-spacc.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Synopsys DesignWare Security Protocol Accelerator(SPAcc) Crypto Engine
+> +
+> +maintainers:
+> +  - Ruud Derwig <Ruud.Derwig@synopsys.com>
+> +
+> +description:
+> +  DWC Synopsys Security Protocol Accelerator(SPAcc) Hardware Crypto Engine is
+> +  a crypto IP designed by Synopsys, that can accelerate cryptographic
+> +  operations.
+> +
+> +properties:
+> +  compatible:
+> +    contains:
 
-This patch is basically a revert of d9f29deb7fe8
-("prandom: Remove unused include").
+Nope, you cannot have contains. From where did you get it? Please use
+existing, recent bindings as starting point or just use exampl-eschema.
 
-[1] https://lore.kernel.org/lkml/20240812115945.484051-4-ubizjak@gmail.com/
+Eh, you already got this comment and just ignored it.
 
-Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
-Cc: "Theodore Ts'o" <tytso@mit.edu>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: Kent Overstreet <kent.overstreet@linux.dev>
----
- include/linux/prandom.h | 1 +
- 1 file changed, 1 insertion(+)
+You ignored all other comments as well. This is quite disappointing to
+ask us to do the same review over and over.
 
-diff --git a/include/linux/prandom.h b/include/linux/prandom.h
-index f7f1e5251c67..f2ed5b72b3d6 100644
---- a/include/linux/prandom.h
-+++ b/include/linux/prandom.h
-@@ -10,6 +10,7 @@
- 
- #include <linux/types.h>
- #include <linux/once.h>
-+#include <linux/percpu.h>
- #include <linux/random.h>
- 
- struct rnd_state {
--- 
-2.46.2
+Best regards,
+Krzysztof
 
