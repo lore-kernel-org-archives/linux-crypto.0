@@ -1,107 +1,71 @@
-Received: from bmailout1.hostsharing.net (bmailout1.hostsharing.net [83.223.95.100])
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AE8B156C4D;
-	Tue,  1 Oct 2024 09:17:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0E7519F429
+	for <linux-crypto@vger.kernel.org>; Tue,  1 Oct 2024 10:42:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727774245; cv=none; b=LAn8YHZtjkP5IPY4imbnMrh7Bp5kC5i2MyAlCIhT6rtJZZSfUDjjbWsVaPDgsJoi99HrEEBrFLKuEyM9bsEFDaw9tyJD7NAI98IvYEBkWi5LeMVZY9oHEXOs/RgzRYtGWSuZIMZBDPpcyRECfv4m+PILyR9deS8D+tIOGFc1Vyg=
+	t=1727779361; cv=none; b=edlNEZLQH0jqUdWewd8mPE3D2d07+JJyl5w5dqvmkV11jYebZ9DjfbjLv7U4cf5k2o69Q1pdvEr7AiBr6jodyn2m4HRVgWDX1Ozy94yBx+PVBo7/eb32860SAMevVzZsBwh5o/BX754I9zobPj2WZPuJEsCoFD+v85YqU75Wk3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727774245; c=relaxed/simple;
-	bh=Svfo0+CJ5fp0FFu0PWEawg5jgBrmgSL3AB7+TqvSeUM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fp23m8iwZSn7yow2tiVr4NxZqGSCkIy+wC8UY8wYWWTRSg3/PYkJ0Xd5ja2nnshQq2xpsxSkqYJl7jrJ6k529BRsKzM4tfOhz7XthQGgRXkLJLDM6nDfzNrI4u/pmrwQ8udB7RNwipl6ko+ukYdBQlTIuF/Rfbz0XvEJqVQ2dA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.95.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout1.hostsharing.net (Postfix) with ESMTPS id A75BC30008F12;
-	Tue,  1 Oct 2024 11:17:13 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id 89069230E25; Tue,  1 Oct 2024 11:17:13 +0200 (CEST)
-Date: Tue, 1 Oct 2024 11:17:13 +0200
-From: Lukas Wunner <lukas@wunner.de>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Biggers <ebiggers@google.com>,
-	Stefan Berger <stefanb@linux.ibm.com>,
-	Vitaly Chikunov <vt@altlinux.org>,
-	Tadeusz Struk <tstruk@gigaio.com>,
-	Dimitri John Ledkov <dimitri.ledkov@canonical.com>
-Cc: David Howells <dhowells@redhat.com>,
-	Andrew Zaborowski <andrew.zaborowski@intel.com>,
-	Saulo Alessandre <saulo.alessandre@tse.jus.br>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Ignat Korchagin <ignat@cloudflare.com>,
-	Marek Behun <kabel@kernel.org>,
-	Varad Gautam <varadgautam@google.com>,
-	Stephan Mueller <smueller@chronox.de>,
-	Denis Kenzior <denkenz@gmail.com>, linux-crypto@vger.kernel.org,
-	keyrings@vger.kernel.org, Mimi Zohar <zohar@linux.ibm.com>,
-	Roberto Sassu <roberto.sassu@huawei.com>,
-	Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-	Eric Snowberg <eric.snowberg@oracle.com>,
-	linux-security-module@vger.kernel.org,
-	Gonglei <arei.gonglei@huawei.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio Perez <eperezma@redhat.com>, virtualization@lists.linux.dev,
-	zhenwei pi <pizhenwei@bytedance.com>,
-	lei he <helei.sig11@bytedance.com>,
-	Neal Liu <neal_liu@aspeedtech.com>, Joel Stanley <joel@jms.id.au>,
-	Andrew Jeff ery <andrew@codeconstruct.com.au>,
-	linux-aspeed@lists.ozlabs.org, Zhiqi Song <songzhiqi1@huawei.com>,
-	Longfang Liu <liulongfang@huawei.com>,
-	Jia Jie Ho <jiajie.ho@starfivetech.com>,
-	William Qiu <william.qiu@starfivetech.com>
-Subject: Re: [PATCH v2 00/19] Migrate to sig_alg and templatize ecdsa
-Message-ID: <Zvu-GV-vtDJHKf51@wunner.de>
-References: <cover.1725972333.git.lukas@wunner.de>
+	s=arc-20240116; t=1727779361; c=relaxed/simple;
+	bh=VvfFsYcWmy08K83MkxWEZhNUI9bL28AX1RnBeR/0Ubg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=o/aqQBo8KxGy5cHhK9QNPyMkorAh2KVhMGXvfI+bFCWW3G0z+mRvg8Ot7TBF2S6RnzbgUC50j5xW8Rc5IjAnE/vmWMtnZmINgi/PcGUiukqQE4APQ0xeADe7GnLpks0ZXH8vFE6clGdLtt/eLinDFo29DcFC7rJ56pIMJ+IiCOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ghiti.fr; spf=pass smtp.mailfrom=ghiti.fr; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ghiti.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ghiti.fr
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 4C31DE0008;
+	Tue,  1 Oct 2024 10:42:36 +0000 (UTC)
+Message-ID: <2f8913ab-b9e7-4fa8-ac9c-67d05b9e8beb@ghiti.fr>
+Date: Tue, 1 Oct 2024 12:42:36 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1725972333.git.lukas@wunner.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: crypto: starfive: kernel oops when unloading jh7110_crypto module
+ and loading it again
+Content-Language: en-US
+To: JiaJie Ho <jiajie.ho@starfivetech.com>,
+ Aurelien Jarno <aurelien@aurel32.net>,
+ William Qiu <william.qiu@starfivetech.com>
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+ "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+ E Shattow <lucent@gmail.com>
+References: <ZspDyIZiG8kvXaoS@aurel32.net>
+ <NT0PR01MB11822312703A78C4F17C302B8A8B2@NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn>
+From: Alexandre Ghiti <alex@ghiti.fr>
+In-Reply-To: <NT0PR01MB11822312703A78C4F17C302B8A8B2@NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: alex@ghiti.fr
 
-Hi Herbert,
+Hi Jia Jie,
 
-On Tue, Sep 10, 2024 at 04:30:10PM +0200, Lukas Wunner wrote:
-> The original impetus of this series is to introduce P1363 signature
-> decoding for ecdsa (patch [18/19]), which is needed by the upcoming
-> SPDM library (Security Protocol and Data Model) for PCI device
-> authentication.
-> 
-> To facilitate that, move X9.62 signature decoding out of ecdsa.c and
-> into a template (patch [15/19]).
-> 
-> New in v2:  Move the maximum signature size calculations for ecdsa
-> out of software_key_query() and into the X9.62 template so that
-> corresponding calculations can be added for P1363 without further
-> cluttering up software_key_query() (patch [16/19] - [17/19]).
-> 
-> New in v2:  Avoid inefficient copying from kernel buffers to sglists
-> in the new templates by introducing a sig_alg backend and migrating
-> all algorithms to it, per Herbert's advice (patch [02/19] - [12/19]).
-> 
-> Clean up various smaller issues that caught my eye in ecdsa
-> (patch [01/19] and [14/19]), ecrdsa (patch [19/19]) and
-> ASN.1 headers (patch [13/19]).
+On 26/08/2024 04:04, JiaJie Ho wrote:
+>> I have been testing the jh7110_crypto module on a VisionFive 1.2a board,
+>> running a 6.11-rc4 kernel. To benchmark the crypto with and without
+>> acceleration, I have unloaded the module, and later on I loaded it again.
+>> Unloading it works fine, but when loading it again, I get the following kernel
+>> oops:
+>>
+> Hi, I'll investigate it. Thanks for reporting this.
 
-This series was submitted at the tail end of the v6.11 cycle.
-It still applies cleanly to v6.12-rc1 though, so I'm not sure
-whether to resubmit.
 
-Is there anything you want me to change?
+Did you have time to look into this?
 
-Thanks!
+Thanks,
 
-Lukas
+Alex
+
+
+>
+> Best regards,
+> Jia Jie
+>
+> _______________________________________________
+> linux-riscv mailing list
+> linux-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-riscv
