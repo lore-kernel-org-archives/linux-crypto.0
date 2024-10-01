@@ -1,105 +1,107 @@
-Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bmailout1.hostsharing.net (bmailout1.hostsharing.net [83.223.95.100])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E31D11BBBE8
-	for <linux-crypto@vger.kernel.org>; Tue,  1 Oct 2024 07:23:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AE8B156C4D;
+	Tue,  1 Oct 2024 09:17:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727767430; cv=none; b=Z/sJc5pVFsJb2YZz/xvFN342CCHBl5Po8nhzo6Hs/q59YIRL7NKC6MUabe1grpKCE6pIutNOYvGoPl3fwoH4SqSECRCQT5jJkfHXBgrBT66e59ZeDtjnA5aE/goHsXmZTreGwyj50n7lVxfW2+47JLvPUn9yTD0LcdRi987eckw=
+	t=1727774245; cv=none; b=LAn8YHZtjkP5IPY4imbnMrh7Bp5kC5i2MyAlCIhT6rtJZZSfUDjjbWsVaPDgsJoi99HrEEBrFLKuEyM9bsEFDaw9tyJD7NAI98IvYEBkWi5LeMVZY9oHEXOs/RgzRYtGWSuZIMZBDPpcyRECfv4m+PILyR9deS8D+tIOGFc1Vyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727767430; c=relaxed/simple;
-	bh=BUh6tRVRUSnz9JRAFV/mB0Ih/eQ7zBStnIqe5JL16Pw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=e/0S/MtY4nzmbQM4W7DDxMy4fYbBYr0yowBfi1W5oiA5yVtQJs9VCY76HYaaN1CpnUgWc02/5oGJ7ml8Z2cD0asEQhslrDDT2sO/Cq9w7ELqiSRWchPR4pjS3dEesvRe9b9JzNnMluIuLLxe6OENx9qR7G3rFkw2lmCt2XddHLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com; spf=pass smtp.mailfrom=vayavyalabs.com; dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b=GQGBC/XP; arc=none smtp.client-ip=209.85.219.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=vayavyalabs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vayavyalabs.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=vayavyalabs.com header.i=@vayavyalabs.com header.b="GQGBC/XP"
-Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-e026a2238d8so4919900276.0
-        for <linux-crypto@vger.kernel.org>; Tue, 01 Oct 2024 00:23:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vayavyalabs.com; s=google; t=1727767428; x=1728372228; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3BDVsIR+AWM8VLHO3U4ofx1mhP0jR6b5o+0aZeIJ+kg=;
-        b=GQGBC/XPbjZiOyTJ67R62LKspFFlSjxSb+MO2aDww/940E6b9FNxtywJE6oNO0uaMP
-         G6CIlQe37QNbIbhQeAwKE7jjGc5E2KaxFsb54m+SUo9G4vGITMzkD9mJmO+W1IkbGdSA
-         16kzqBnYdd98g/ul1A2vaddHfycanQW3nTm/8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727767428; x=1728372228;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3BDVsIR+AWM8VLHO3U4ofx1mhP0jR6b5o+0aZeIJ+kg=;
-        b=lm8fbkMfprOTQFZGOkD++Za9y/o41FfocdaP0tUrJYa2aJSv/sIhwtzAjqxnO16wYN
-         /iT4ECWUmw9DImE0zohh3/GfLy/koPCIbuc99QBMjyFi03yb+vnCSk4hOpan6iuHDPl7
-         5XVa2uQfSsQFzKrAD5LFNWDtK3ARsNOVkDcFVQ8r7Dgp0yQadr0UtkSxgqPWDlhWcFXe
-         cXdfk3/0kSZrm/9qZeVeIluBrCasqLC2aO4gkHxJ2+me5jwtYPo3vTpvXz8+QixEgGIh
-         1iSb8JI4xrMAEDoteKpdV3HVYUihsULTYYFIpx6Hyeg0HLhm5tfDujUfLsA+Q9GN9zvZ
-         BGZA==
-X-Forwarded-Encrypted: i=1; AJvYcCW8/yswtMARfjSzrdG41yr4us1HIhT8Ig4TYLiBj3N2/KPUOiNYUn503y2cgxwH54gCBcWPqeoCez1/ZJ0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxyzxQ9UmVpDLcRYfSNND4AgELYQEq84hfXnHYJrXuYCn2XWgiY
-	MRynaI7HCHTOM70poDxtYdu4hUqtA3VRNwOzb1iV5dbgIOC9iCdZnTj/1WiGH2fZ9/WByE9WMWU
-	b0KKhVVBeKKAzXNxCkNWJJ9RWEqS0u4xCtyOaFw==
-X-Google-Smtp-Source: AGHT+IEDx6s60OXbbnFg6D7pGUQUUjMuK6DZaBWnI4T3NO+xHZKD4YwwtWu09YZ4TXBLLfXRKiJEiRFbWe3k2eo7T5Y=
-X-Received: by 2002:a05:6902:70c:b0:e26:2bb7:19d4 with SMTP id
- 3f1490d57ef6-e262bb72ce4mr1861696276.7.1727767427893; Tue, 01 Oct 2024
- 00:23:47 -0700 (PDT)
+	s=arc-20240116; t=1727774245; c=relaxed/simple;
+	bh=Svfo0+CJ5fp0FFu0PWEawg5jgBrmgSL3AB7+TqvSeUM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Fp23m8iwZSn7yow2tiVr4NxZqGSCkIy+wC8UY8wYWWTRSg3/PYkJ0Xd5ja2nnshQq2xpsxSkqYJl7jrJ6k529BRsKzM4tfOhz7XthQGgRXkLJLDM6nDfzNrI4u/pmrwQ8udB7RNwipl6ko+ukYdBQlTIuF/Rfbz0XvEJqVQ2dA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.95.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
+Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by bmailout1.hostsharing.net (Postfix) with ESMTPS id A75BC30008F12;
+	Tue,  1 Oct 2024 11:17:13 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id 89069230E25; Tue,  1 Oct 2024 11:17:13 +0200 (CEST)
+Date: Tue, 1 Oct 2024 11:17:13 +0200
+From: Lukas Wunner <lukas@wunner.de>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Biggers <ebiggers@google.com>,
+	Stefan Berger <stefanb@linux.ibm.com>,
+	Vitaly Chikunov <vt@altlinux.org>,
+	Tadeusz Struk <tstruk@gigaio.com>,
+	Dimitri John Ledkov <dimitri.ledkov@canonical.com>
+Cc: David Howells <dhowells@redhat.com>,
+	Andrew Zaborowski <andrew.zaborowski@intel.com>,
+	Saulo Alessandre <saulo.alessandre@tse.jus.br>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Ignat Korchagin <ignat@cloudflare.com>,
+	Marek Behun <kabel@kernel.org>,
+	Varad Gautam <varadgautam@google.com>,
+	Stephan Mueller <smueller@chronox.de>,
+	Denis Kenzior <denkenz@gmail.com>, linux-crypto@vger.kernel.org,
+	keyrings@vger.kernel.org, Mimi Zohar <zohar@linux.ibm.com>,
+	Roberto Sassu <roberto.sassu@huawei.com>,
+	Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+	Eric Snowberg <eric.snowberg@oracle.com>,
+	linux-security-module@vger.kernel.org,
+	Gonglei <arei.gonglei@huawei.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio Perez <eperezma@redhat.com>, virtualization@lists.linux.dev,
+	zhenwei pi <pizhenwei@bytedance.com>,
+	lei he <helei.sig11@bytedance.com>,
+	Neal Liu <neal_liu@aspeedtech.com>, Joel Stanley <joel@jms.id.au>,
+	Andrew Jeff ery <andrew@codeconstruct.com.au>,
+	linux-aspeed@lists.ozlabs.org, Zhiqi Song <songzhiqi1@huawei.com>,
+	Longfang Liu <liulongfang@huawei.com>,
+	Jia Jie Ho <jiajie.ho@starfivetech.com>,
+	William Qiu <william.qiu@starfivetech.com>
+Subject: Re: [PATCH v2 00/19] Migrate to sig_alg and templatize ecdsa
+Message-ID: <Zvu-GV-vtDJHKf51@wunner.de>
+References: <cover.1725972333.git.lukas@wunner.de>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240930093054.215809-1-pavitrakumarm@vayavyalabs.com>
- <20240930093054.215809-8-pavitrakumarm@vayavyalabs.com> <fsp2l2ktvwznm64kwlb23yxlvioi47inzdwcngowbvet43us4k@svi4b7eq7gx7>
-In-Reply-To: <fsp2l2ktvwznm64kwlb23yxlvioi47inzdwcngowbvet43us4k@svi4b7eq7gx7>
-From: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-Date: Tue, 1 Oct 2024 12:53:36 +0530
-Message-ID: <CALxtO0nPzYpW7n37c5hdcigQtq+NOSxaPmLqeiwwiB8kumHjWw@mail.gmail.com>
-Subject: Re: [PATCH v9 7/7] dt-bindings: crypto: Document support for SPAcc
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: devicetree@vger.kernel.org, herbert@gondor.apana.org.au, 
-	linux-crypto@vger.kernel.org, robh@kernel.org, Ruud.Derwig@synopsys.com, 
-	manjunath.hadli@vayavyalabs.com, bhoomikak@vayavyalabs.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1725972333.git.lukas@wunner.de>
 
-Hi Krzysztof,
-  I fully agree, some things got missed out; they were supposed to be addre=
-ssed
-  in the v9 patch. Not contesting that. My apologies.
+Hi Herbert,
 
-  We are doing a code cleanup based on your inputs and previous comments.
-  I will address everything.
+On Tue, Sep 10, 2024 at 04:30:10PM +0200, Lukas Wunner wrote:
+> The original impetus of this series is to introduce P1363 signature
+> decoding for ecdsa (patch [18/19]), which is needed by the upcoming
+> SPDM library (Security Protocol and Data Model) for PCI device
+> authentication.
+> 
+> To facilitate that, move X9.62 signature decoding out of ecdsa.c and
+> into a template (patch [15/19]).
+> 
+> New in v2:  Move the maximum signature size calculations for ecdsa
+> out of software_key_query() and into the X9.62 template so that
+> corresponding calculations can be added for P1363 without further
+> cluttering up software_key_query() (patch [16/19] - [17/19]).
+> 
+> New in v2:  Avoid inefficient copying from kernel buffers to sglists
+> in the new templates by introducing a sig_alg backend and migrating
+> all algorithms to it, per Herbert's advice (patch [02/19] - [12/19]).
+> 
+> Clean up various smaller issues that caught my eye in ecdsa
+> (patch [01/19] and [14/19]), ecrdsa (patch [19/19]) and
+> ASN.1 headers (patch [13/19]).
 
-Warm regards,
-PK
+This series was submitted at the tail end of the v6.11 cycle.
+It still applies cleanly to v6.12-rc1 though, so I'm not sure
+whether to resubmit.
 
+Is there anything you want me to change?
 
+Thanks!
 
-On Tue, Oct 1, 2024 at 12:03=E2=80=AFPM Krzysztof Kozlowski <krzk@kernel.or=
-g> wrote:
->
-> On Mon, Sep 30, 2024 at 03:00:54PM +0530, Pavitrakumar M wrote:
-> > Add DT bindings related to the SPAcc driver for Documentation.
-> > DWC Synopsys Security Protocol Accelerator(SPAcc) Hardware Crypto
-> > Engine is a crypto IP designed by Synopsys.
-> >
-> > Co-developed-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
-> > Signed-off-by: Bhoomika Kadabi <bhoomikak@vayavyalabs.com>
-> > Co-developed-by: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-> > Signed-off-by: Pavitrakumar Managutte <pavitrakumarm@vayavyalabs.com>
-> > Acked-by: Ruud Derwig <Ruud.Derwig@synopsys.com>
->
-> Please run scripts/checkpatch.pl and fix reported warnings. Then please
-> run  and (probably) fix more warnings.
-> Some warnings can be ignored, especially from --strict run, but the code
-> here looks like it needs a fix. Feel free to get in touch if the warning
-> is not clear.
->
-> Best regards,
-> Krzysztof
->
+Lukas
