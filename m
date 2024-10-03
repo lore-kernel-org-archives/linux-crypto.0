@@ -1,193 +1,185 @@
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2068.outbound.protection.outlook.com [40.107.94.68])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A19FE197A6A;
-	Wed,  2 Oct 2024 21:52:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.68
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727905982; cv=fail; b=BWcKMjC7zPD4uhatjAqJEhGyVCtTDcTEGc8vn9GM8Lrgytp4x+8iJLZo7uSXoFssV0LyhA/z30UGlJpzmR8ZMa2d7s2YS7DtSVIO31Esis0NbLzX7bCgprcFwakkZ0EgfxlD4G/LPVB6IxNil6wnMTfIs1luEAJCYM663e5T3Ws=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727905982; c=relaxed/simple;
-	bh=PtC88pH0CPwpxL0IBG4uJtx3WeoBhRecuzxposAZpBk=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=lTKIb+t9bN9w8xpDB2FRypPv0WzUY3lGQe+mPTmnoSVHXIKv2MRmmRAm4PHvKpgGLrz7ADCgBzkINc8gQAbwIwIGZNhjSrKBcYjXGvsR0NlLO9GjzNfmRgC/vXIbepHKaCsiaBSZzyeJMtPhRYW+CMMPB/3e4DojXKJe7pKXj9c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=NGEViO/i; arc=fail smtp.client-ip=40.107.94.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F4CF40BF2;
+	Thu,  3 Oct 2024 06:38:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727937507; cv=none; b=BNokwCFKL6Gb+OWQmfnKQLccQ8Ot62aiVDEQjIGHX0OW4nT/aHjgBOXxIEBrpPiHTSe2yvbIvFOzpX5nm3EdatEC4V5HBzoNurbVDOmeZBCvXHmHJQlVARNl72zVns6xrqwZCVGB6cN4LCurDw8MZNWGuNXX1F8Ltr0WVjJVWys=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727937507; c=relaxed/simple;
+	bh=qz/wQUkt3pi1fxpJs3vuvBgTZ1SXry1uNY0xAdlOrMo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kMvQWpILDl5v2jAVP0SgdvH56IYpruCzYUcgK9d0q8b4qO2kpAhYUOWr05TlLA42UHx+dg+DsTMIQe2ENdme2HBGCNNxoEMTaZqjIK/rLjZui8N/ylN4pR9LjyXl1QXzpxsOCrQ8mKkmwG7Na25ts0ka3sojV/HffMDC4dzTfPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=UAI18LAM; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="NGEViO/i"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=t3Skzbn8M2Tpl9QP8+VNRei+PNiEBZ5hKivkcQGvugyDdchJNSXX3FX2HG87dE5sX9pGsMV42Guz1LnyLN8kh102Omb3E0WSA67HUg97OE3/mZSfTAa0q1KFRtuSwoVdlBiiDShHnPZsDltU9DdeEuornqzoXvQETzd9gHPfWY4ZnXSHa5QtZxLEH/uzbITIofmL4QSg5LJLSvs90bXjcANF30xbes4HgBL0HwL9gLEpzBHowICfZQfSPU82QwRrI31WIeHYJv5OZEY3fMrJ+U4fPQcOOMhR0bdVKg4I8rHjd+s6wukErt6c2SaoYHWB0sGMf0NQbnLMnRfgpZNEag==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=D2ERhcMiKZTzzWHCGTTPY1yiLXBxOr+aujWcqCJDstE=;
- b=v3NT+SvyQer0xBZQWQKGNYSqXkr97q7nZXwtjEmhTgqARtK3FuIyVj+dq3K0Aig14B/5a7b5KEokanJs0+HTtAdpyiqfAXey0PtDXt/X4YvJ2qSDB09zAScHquSnPezr3jm65ocxhBKOtzrgNAsQZ1BAoY7erkccmyANuGiOlfYRoO37V6alw9IJ3odXJXVOG98g4PgTV6bdhdjsmQ52dN+J8lfUBaQWlaec2RLR2qwRYC0tbQ1wxcSsq4M1YDdvacUEVsEBH+bN3VGNGLCBKSjW+mqSKNo1DSgQ56Zg55/nlX7eevoOc9D2JXmRBcyuGi62RyiKs480J/BDx3hB0Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=D2ERhcMiKZTzzWHCGTTPY1yiLXBxOr+aujWcqCJDstE=;
- b=NGEViO/ibuCJpvb5JtqBP2J8tNTZYsBt89MzlKjmJkplpIbyMcpwkQUWUhmgqH2AIbaydyRtv1KQAj/fpYLvJbq+qtDVJZpLv7VNaq3WunzSCMO7CALhjipkrvXbwVCKA3JibHolJjZMnDSkNr3HEk9Ri2dbkLUuMmNuU4upLTM=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5070.namprd12.prod.outlook.com (2603:10b6:5:389::22)
- by BL1PR12MB5874.namprd12.prod.outlook.com (2603:10b6:208:396::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8026.16; Wed, 2 Oct
- 2024 21:52:56 +0000
-Received: from DM4PR12MB5070.namprd12.prod.outlook.com
- ([fe80::20a9:919e:fd6b:5a6e]) by DM4PR12MB5070.namprd12.prod.outlook.com
- ([fe80::20a9:919e:fd6b:5a6e%5]) with mapi id 15.20.8026.016; Wed, 2 Oct 2024
- 21:52:56 +0000
-Message-ID: <df49ffea-e1fa-43f9-6b78-10bf6a416b35@amd.com>
-Date: Wed, 2 Oct 2024 16:52:54 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v2 3/3] x86/sev: Add SEV-SNP CipherTextHiding support
-Content-Language: en-US
-To: Ashish Kalra <Ashish.Kalra@amd.com>, seanjc@google.com,
- pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, hpa@zytor.com, herbert@gondor.apana.org.au
-Cc: x86@kernel.org, john.allen@amd.com, davem@davemloft.net,
- michael.roth@amd.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org
-References: <cover.1726602374.git.ashish.kalra@amd.com>
- <f2b12d3c76b4e40a85da021ee2b7eaeda1dd69f0.1726602374.git.ashish.kalra@amd.com>
-From: Tom Lendacky <thomas.lendacky@amd.com>
-In-Reply-To: <f2b12d3c76b4e40a85da021ee2b7eaeda1dd69f0.1726602374.git.ashish.kalra@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA1P222CA0058.NAMP222.PROD.OUTLOOK.COM
- (2603:10b6:806:2c1::9) To DM4PR12MB5070.namprd12.prod.outlook.com
- (2603:10b6:5:389::22)
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="UAI18LAM"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4936Nw82019701;
+	Thu, 3 Oct 2024 06:38:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=b
+	+gzo4utoDfKCg2QIw2CU0gA0a/fOr1VNQALEIVPkkk=; b=UAI18LAMg03LKnFGM
+	Q4xc3i0Pqg9YIW/ZJEhz6m0pMkNFzF/Nrk7reYbXV5skpnTqvl/VIKrUrB1e2Jjp
+	i4D1ro7OjQz43X0BaGAa9xF8HHUUE2gVvvVWmkKpyzqrGyqEUfmAzOS0QyNm4oN2
+	jCrggGdMze8vDKltmXKuB2qI+t3OYNsFM/NAOtwllrSgNGTfAUI/NwnIlKQhOZrF
+	dW94iNQHlYbfogGAsVOxVuC7nxOUBfPaZ4l8VOsf3iLU2zAZrHWUxrCMa0PXTbWv
+	RfK3l0uPOm9I9Lj+FoQAJxXgu4J0JKDJKvp6WxM/LufuCngDqtJVnz6XCPt9Goer
+	8GLwQ==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 421nyc0257-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 03 Oct 2024 06:38:05 +0000 (GMT)
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4936X6N5012246;
+	Thu, 3 Oct 2024 06:38:05 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 421nyc024n-9
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 03 Oct 2024 06:38:05 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4934TsiL018356;
+	Thu, 3 Oct 2024 06:19:37 GMT
+Received: from smtprelay01.wdc07v.mail.ibm.com ([172.16.1.68])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 41xw4n6bm8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 03 Oct 2024 06:19:37 +0000
+Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
+	by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4936JbN251249672
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 3 Oct 2024 06:19:37 GMT
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E8D1958055;
+	Thu,  3 Oct 2024 06:19:36 +0000 (GMT)
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3BDDF5805E;
+	Thu,  3 Oct 2024 06:19:31 +0000 (GMT)
+Received: from [9.43.46.102] (unknown [9.43.46.102])
+	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  3 Oct 2024 06:19:29 +0000 (GMT)
+Message-ID: <eabd6384-0b3f-4112-92d4-7cae4bc3f61f@linux.ibm.com>
+Date: Thu, 3 Oct 2024 11:49:27 +0530
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|BL1PR12MB5874:EE_
-X-MS-Office365-Filtering-Correlation-Id: 66f227de-eb11-4f64-d46a-08dce32c930c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?cERKWVNYMHl5OUI1Z1JYZzNCZG9qQWp0UU1aQWdQME12RHJFZGIrVFJVWFZE?=
- =?utf-8?B?ZGZzTXNPNnVBajl5NWo4Rjl1VzlhQXlmR1UxUU9wTDRoM09oQnhadnFyZE91?=
- =?utf-8?B?Rm9RUUF6RjlWTkxKbG1ublZSSWZYamhGNEo3TWpGYkVPbUxYdlI4Nndha0hz?=
- =?utf-8?B?R0FFWmYwdXI5K0I3cnNqUFo0c05WU0lrWHVFVTExNGhSbGFBZ1E0Z0RUR05u?=
- =?utf-8?B?QVBzUGVNTEZ3cXNRNzJPU0VPaExrMnJ6RTJSdHBkL1dwQkIxcHEzMXZFTWxm?=
- =?utf-8?B?ZDJ0VVlYZDZLV3hWMzRZb3psR24rZk5FNHlBUHpVaGIvMGJ4R25iUW5sK2R6?=
- =?utf-8?B?NzNHYTR3ZlVydnAvMHZsaUlTbkFYMUptTGErYU5wTytsamdPdTc5dkhLUCs5?=
- =?utf-8?B?NUV5eG9DZFdjMWhPRVlEQnNHK0RrOStpRmVQWXRDemRucEpQRWRmcFIwalM2?=
- =?utf-8?B?RXdzS28wbGVKSHMzK0dwcmw5UlhoNExzRFBNTUVjVGMvMWxobXJVOGxnVVRt?=
- =?utf-8?B?UTh6YVZCRk5vUFpPUW05OU10dklnRG9sL2dPUHpvMXNCM2ZJRHFpSmFaZzdP?=
- =?utf-8?B?b296dEN3WGlGay9CTzk0dytkSEFvcWViT2VZbDZKNDltdVk0VEliSE5tYW9E?=
- =?utf-8?B?MWRuTi9SaFI2ZjdRQ09CVytFWFh4QkZsZEROSldGWE44TjZsOVJFMENaNWRS?=
- =?utf-8?B?TDkwVGFKR3hZcHNsbDVYem5Kc2xSSnZHRHlyVHV0bGxEQ09ySHFaeWp0VmJO?=
- =?utf-8?B?bWFSMFNNM0VKY0NibXZFL1VMV2xxRnMwYWovbkhVZHYvQXlHRDA4T1o1NG1F?=
- =?utf-8?B?ZkpReW1MbkJGWW1OaENDT0VrV1B6NXhINEFmTjFrc1lodkY0YU0vbTJVRDA0?=
- =?utf-8?B?dGZSMlpKSmtHSjBTbXBoTkRNREpHc0wvbzlpNWVOZmFJVjVGREVUQlRmTm1k?=
- =?utf-8?B?SkFGUmx2RVdncnU1ZUd4ZUdBbURoMFhRTFBGYTM1K3dMZmpSZHZxYTJCTjZi?=
- =?utf-8?B?dHdNK1lKM0dYWnl1NGxzUm9oSk4zemt1UVg2UUY0RXNYSTYraWVvbUhmaGRD?=
- =?utf-8?B?U05XbmRvN2ZLNzVjYnBqZVJnMHVaTytlUDBaT1pVSnRRR0JsK0VqLzdMQW5t?=
- =?utf-8?B?akgzVEpQTGtWSm9FUEVzc3VuZVUrUmJ6MER3RWR3aEJFZDM4T3pQY0ZJZCt0?=
- =?utf-8?B?Zm5jYW1hczI1QVArQ3YwOXhKUVpoWjA0Rm9tOFA0bnRicVBPeHE5R2tKQ0l1?=
- =?utf-8?B?aVAvTDlVQkR2T0hKYXF4bDJ3NUtqTytzTzdTNVQwTEF2cFd0WThTd1lOaTFa?=
- =?utf-8?B?ejE1c0QwckwrN3V4dzJZNHkrQWVVOHd3Nm51T2djMzdPMkk1eENyTEFWanlP?=
- =?utf-8?B?dzJPMnhDcFhXMHVmaXEzd2hFSlVNeGxjYW53ZmpQbFY3ZGpyVGpZWUVDR3Bu?=
- =?utf-8?B?QVBaenZqcmpNcDg5T0dFL0FWeHRua00rZzBXZlZPT2pKQnJjUUpzYTU1czdr?=
- =?utf-8?B?TGhMa0dQeEQ5SExUNFQxbWZpOHVSWitaMWVPWkdzK002ajcrbzlYTmh4UUlt?=
- =?utf-8?B?bWJvWWpaUWxvblVTKzVuelVNSHBGR2tzTkZZMXBEakpkM2I1bVNOcm1IdVZ3?=
- =?utf-8?B?MHVlNlNLZ1haaG5hdnBtbDFwOFFNZ0dMTm0wYjhlMERoSWs4LzI1bDhGR0Yw?=
- =?utf-8?B?amc0UStBRm5qZ1N4L2xjR1JkZHAxSldSOGlEUmo5aFVUalh1OVdKaDNRPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?V2lodElWZWxLeWF5MDVkcy9TcjNwY05TVWlWbWIxazB6U2h5WG9KMTRhVGRK?=
- =?utf-8?B?a0xqbTg0ZXYxSC9JbUswV0lFQ3h4VWV1S3dZaWtyVjdRb0VkeDRna0JxdjZ5?=
- =?utf-8?B?SFEyb3A4eDRXZXlWWnVsN0cxUWN5UWVLUWIzVmdnZktOYUI5bEF3ZEpQSXpk?=
- =?utf-8?B?LzYzV2RiY25OMDA5bk4yNjJVa3FtQ002Q1c3WkEzL2tFNHY2T2UwUGUzZ21L?=
- =?utf-8?B?ZjRjVmtOVVJmdjdlSnJIZ21JaU8ycEQvWWZ3QWwycXRFK202WGRheTdiYkdB?=
- =?utf-8?B?ZVRBZXRsSjNFa0I0aEw1NDlVZXZPUzRnSW16OTFVUmpmR1hMYTBieWJLL3g0?=
- =?utf-8?B?cXJDaGZUWTF3UmxIN2VnbE4weEZUcGE0WHR6N1UyWStnL2pJSmZwT3FzeW1u?=
- =?utf-8?B?ajZLT0FVb1hPU1NuRFpXR3pqcnJhajFLZ3BDeXpKUFlpanZ1bUIrUmVsNG54?=
- =?utf-8?B?ZE8yZGhuL3pva3JCeDNlVk1MNmROMWhyTThoRHJvNnIwN3pkVVVmNTJxZFJE?=
- =?utf-8?B?TkNqU040TlN4bkpYV3hTd2d2N1ZDMUpxNVI3L3VHR1AwbTVHL0RIV056a3Q4?=
- =?utf-8?B?ZSswL3VCemxLRDNIbVhuWWErb3VTb3FIeFpqZUw4RTZxdE4vaW1LT3lTSFFs?=
- =?utf-8?B?MllkdHhyVzBZaDNLcUZZY2wxU3hHV24zSEYvY1Z0Nmp1MXN3NEkwVUJ2UTkx?=
- =?utf-8?B?cG02K0Y2QlMrWGZwZTg4VGdKMzJlcnp1cWZrMUtoRmhpNXZybWNtSU0zKzhG?=
- =?utf-8?B?bVlpbXZHNmNzcjNtdE5ocjE1QVRVVmYreXd4WXQ1TzFrdlVmT0JFVUd6ZGFw?=
- =?utf-8?B?aWFJdnVqc0tyNU1sOVdnUmRabGN2bzFxVEU5QThHRlM5eEt6ZXlzNjA1ajJw?=
- =?utf-8?B?Yk9nV2gzZnNMZFFLNFpKdXcxaFppU29UN1Z1RjRza1AwWDJ3Nkg3MnkwdWN1?=
- =?utf-8?B?MGVuZWtDeldBOCtnU3dITlFyU284elY0VzNZVzhucU9oOEZzb29PKzg0U2gr?=
- =?utf-8?B?MUVEOGp0cTV0d1U3WWRKb3lzWm5uNTB3ejJKVlBpTzNKeGxZVjdtZnpmT3E2?=
- =?utf-8?B?NWhMbVdFMEN3TlAwVDFRd3NweWE0TE43d1E5cG8vWFdFZFVvWGZPTXkybzRQ?=
- =?utf-8?B?YnlFUldxdjUxTkFrN2NUSnpwcTdqRlFqYWZtd1MyL2hEKys3NmQydmhPejVC?=
- =?utf-8?B?Umd6TFUyMVRpMDBOME5nYncvWmJpMERUcWNRM0pxTnFjanEzLzA2NG4rWi9Y?=
- =?utf-8?B?RG4wcDM1Rjl3YkFybmRqRVpCcDZTbGxrcGNGMWlVeFZIdUZGRG95Q0pRSS9O?=
- =?utf-8?B?QnVEdEFjMmpvRW9wR2JHWFUyV2FhTk9CUDJad2RLbkcvSlRWa3RJYmhSOU82?=
- =?utf-8?B?eWVMVTBrNUhsVzFvOTMrTGh3TkNlQURzcmlRSm1QUVhiQ1ljZUxUeUp0cmdF?=
- =?utf-8?B?TUxkWlRCNXVpNXN4TjltQXdBL1ZlMFMyRkZYdVFWbkh4d2ExTVByTjNseDBG?=
- =?utf-8?B?dk1JUUh6WC9VazhIVW5HYWVBYy9QNFQ2UTdXZVVDQlRGUEZheENSS2cwUTEy?=
- =?utf-8?B?WDFFaUJndkJwVzRtbzlHemI4b2JENGs1V3NnM1FBV1hxNHNuejJYNURkd0Rv?=
- =?utf-8?B?dTZLSjN1eW9zNEp6Z21yTlFmc3h1L0J5TWwyV3VMeUhleWVaTnZDcnAvcnVp?=
- =?utf-8?B?dnRpQXFzYnY0OCtySEQyNUlGcGxZQno0WFh2VDltV3VuZ3BzUnNLUFJ3VjF6?=
- =?utf-8?B?cUw1cG5EaDc3U0twZVpqYnA0bDNjRlBnUzUzcnpGVjhSYUt5NWpPMy9Dclc3?=
- =?utf-8?B?VXUzYVlCWnA3aloxbUpYUTk1QkI4Rms4eW44S3NJNmRzVE1YdThuOE90akx3?=
- =?utf-8?B?Sm95VCtCWXVodGxxZGRwN3MzamdZU2xSdW1KOWs1UWR0bWI4aFlESnM1SXJt?=
- =?utf-8?B?NDhOdEhRSVR2akFvcWRkeVFrbzRCTHJvZ1pkK2diWUNsRWpmZ2tsSUx4UHZr?=
- =?utf-8?B?VVhtWTRRY2RQRS85WXk3b0htcEJEOWNRdjhBM2ljbjg0b2tRbWFLNVRlMUNl?=
- =?utf-8?B?dFc5T3FLSG9Udm1oT3ljTDk0aWEvVktDNVhYeU1yM0NTMGFQTm12S0x5cTZq?=
- =?utf-8?Q?jdMBa2Uvvc3ZQyFHg1tL88Y7E?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 66f227de-eb11-4f64-d46a-08dce32c930c
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5070.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Oct 2024 21:52:56.6266
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2RAwllbdiVv0wmd+2kg6hLRTI874mnwPZHMwjWIZOJ+ikSWuMzGkjE6PflIfBwcoMJnvo6K3/kHajhaJAQ5Uaw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5874
+User-Agent: Mozilla Thunderbird
+Subject: Re: BUG: Kernel NULL pointer dereference on read at 0x00000000 in
+ pnv_get_random_long()
+To: Corentin LABBE <clabbe@baylibre.com>, mpe@ellerman.id.au,
+        npiggin@gmail.com, christophe.leroy@csgroup.eu, naveen@kernel.org
+Cc: linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, olivia@selenic.com,
+        herbert@gondor.apana.org.au
+References: <Zv02AMOBJ5a2lrF0@Red>
+Content-Language: en-US
+From: Madhavan Srinivasan <maddy@linux.ibm.com>
+In-Reply-To: <Zv02AMOBJ5a2lrF0@Red>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Y4Jw8El7YCzrBI6fpKR-VV6Ztb3aVOrx
+X-Proofpoint-ORIG-GUID: ybG4ByxBZfIO1UFcUfiZ60cJ-iRDoWus
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-03_04,2024-10-03_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=659 bulkscore=0
+ impostorscore=0 lowpriorityscore=0 priorityscore=1501 clxscore=1011
+ adultscore=0 suspectscore=0 mlxscore=0 spamscore=0 phishscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2408220000 definitions=main-2410030043
 
-On 9/17/24 15:16, Ashish Kalra wrote:
-> From: Ashish Kalra <ashish.kalra@amd.com>
-> 
-> Ciphertext hiding prevents host accesses from reading the ciphertext of
-> SNP guest private memory. Instead of reading ciphertext, the host reads
-> will see constant default values (0xff).
-> 
-> Ciphertext hiding separates the ASID space into SNP guest ASIDs and host
-> ASIDs. All SNP active guests must have an ASID less than or equal to
-> MAX_SNP_ASID provided to the SNP_INIT_EX command. All SEV-legacy guests
-> (SEV and SEV-ES) must be greater than MAX_SNP_ASID.
-> 
-> This patch-set adds a new module parameter to the CCP driver defined as
-> max_snp_asid which is a user configurable MAX_SNP_ASID to define the
-> system-wide maximum SNP ASID value. If this value is not set, then the
-> ASID space is equally divided between SEV-SNP and SEV-ES guests.
-> 
-> Ciphertext hiding needs to be enabled on SNP_INIT_EX and therefore this
-> new module parameter has to added to the CCP driver.
-> 
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> ---
->  arch/x86/kvm/svm/sev.c       | 26 ++++++++++++++----
->  drivers/crypto/ccp/sev-dev.c | 52 ++++++++++++++++++++++++++++++++++++
->  include/linux/psp-sev.h      | 12 +++++++--
->  3 files changed, 83 insertions(+), 7 deletions(-)
 
-I missed this on initial review. This change goes across multiple
-maintainers trees, so you should split this patch to do the CCP updates
-first and then the KVM updates.
 
-Thanks,
-Tom
+On 10/2/24 5:31 PM, Corentin LABBE wrote:
+> Hello
+> 
+> I have a 8335-GCA POWER8 which got a kernel crash during boot:
+> [   11.754238] Kernel attempted to read user page (0) - exploit attempt? (uid: 0)
+> [   11.754437] BUG: Kernel NULL pointer dereference on read at 0x00000000
+> [   11.754499] Faulting instruction address: 0xc0000000000c3758
+> [   11.754518] Oops: Kernel access of bad area, sig: 11 [#1]
+> [   11.754534] LE PAGE_SIZE=64K MMU=Hash SMP NR_CPUS=2048 NUMA PowerNV
+> [   11.754699] Modules linked in: powernv_rng(+) ecb ctr sr_mod hid ofpart fb_sys_fops cdrom i2c_algo_bit powernv_flash sg mtd vmx_crypto(+) ipmi_powernv ipmi_devintf at24(+) ipmi_msghandler opal_prd regmap_i2c nfsd gf128mul auth_rpcgss nfs_acl lockd grace sunrpc drm fuse configfs loop drm_panel_orientation_quirks ip_tables x_tables autofs4 uas usb_storage ext4 crc16 mbcache jbd2 crc32c_generic dm_mod xhci_pci xhci_hcd sd_mod t10_pi crc64_rocksoft crc64 crc_t10dif crct10dif_generic crct10dif_common usbcore tg3 libphy crc32c_vpmsum ahci usb_common libahci
+> [   11.754869] CPU: 25 PID: 1332 Comm: (udev-worker) Not tainted 6.1.106 #4 
+> [   11.754890] Hardware name: 8335-GCA POWER8 (raw) 0x4d0200 opal:skiboot-5.4.8-5787ad3 PowerNV
+> [   11.754926] NIP:  c0000000000c3758 LR: c0000000000c3754 CTR: 0000000000000000
+> [   11.754947] REGS: c00000000ec3af70 TRAP: 0300   Not tainted  (6.1.106)
+> [   11.754966] MSR:  900000000280b033 <SF,HV,VEC,VSX,EE,FP,ME,IR,DR,RI,LE>  CR: 44222282  XER: 20000000
+> [   11.755168] CFAR: c0000000001dfbb4 DAR: 0000000000000000 DSISR: 40000000 IRQMASK: 0 
+>                GPR00: c0000000000c3754 c00000000ec3b210 c00000000113cd00 000000000000002c 
+>                GPR04: 00000000ffff7fff c00000000ec3b010 c00000000ec3b008 0000000ff57e0000 
+>                GPR08: 0000000000000027 c000000ff7907f98 0000000000000001 0000000000002200 
+>                GPR12: 0000000000000000 c000000ffffeaf00 0000000000000020 0000000022000000 
+>                GPR16: 0000000000000000 0000000000000000 0000000000000009 000000013c86f5d8 
+>                GPR20: 0000000000000000 000001002cd75d90 0000000000000000 0000000000000005 
+>                GPR24: 000001002cd794a0 000001002cd75d90 c00000000285e6fc c000000000f9e4a0 
+>                GPR28: 0000000000000003 0000000000000004 0000000000000000 c0000010103ca180 
+> [   11.755363] NIP [c0000000000c3758] pnv_get_random_long+0x88/0x170
+> [   11.755386] LR [c0000000000c3754] pnv_get_random_long+0x84/0x170
+> [   11.755407] Call Trace:
+> [   11.755416] [c00000000ec3b210] [c0000000000c3754] pnv_get_random_long+0x84/0x170 (unreliable)
+> [   11.755444] [c00000000ec3b280] [c008000021c50130] powernv_rng_read+0x98/0x120 [powernv_rng]
+> [   11.755473] [c00000000ec3b300] [c00000000091ac88] add_early_randomness+0x88/0x150
+> [   11.755577] [c00000000ec3b340] [c00000000091b2c4] hwrng_register+0x344/0x420
+> [   11.755678] [c00000000ec3b3a0] [c00000000091b408] devm_hwrng_register+0x68/0xf0
+> [   11.755703] [c00000000ec3b3e0] [c008000021c5003c] powernv_rng_probe+0x34/0x90 [powernv_rng]
+> [   11.755728] [c00000000ec3b450] [c000000000949218] platform_probe+0x78/0x110
+> [   11.755750] [c00000000ec3b4d0] [c0000000009442d8] really_probe+0x108/0x590
+> [   11.755773] [c00000000ec3b560] [c000000000944814] __driver_probe_device+0xb4/0x230
+> [   11.755799] [c00000000ec3b5e0] [c0000000009449e4] driver_probe_device+0x54/0x130
+> [   11.755824] [c00000000ec3b620] [c0000000009456d8] __driver_attach+0x158/0x2b0
+> [   11.755850] [c00000000ec3b6a0] [c000000000940764] bus_for_each_dev+0xb4/0x140
+> [   11.755874] [c00000000ec3b700] [c000000000943734] driver_attach+0x34/0x50
+> [   11.755896] [c00000000ec3b720] [c000000000942d88] bus_add_driver+0x218/0x300
+> [   11.755921] [c00000000ec3b7b0] [c000000000946b84] driver_register+0xb4/0x1c0
+> [   11.755947] [c00000000ec3b820] [c000000000948b98] __platform_driver_register+0x38/0x50
+> [   11.755969] [c00000000ec3b840] [c008000021c501e8] powernv_rng_driver_init+0x30/0x4c [powernv_rng]
+> [   11.755997] [c00000000ec3b860] [c0000000000121b0] do_one_initcall+0x80/0x320
+> [   11.756020] [c00000000ec3b940] [c0000000002198bc] do_init_module+0x6c/0x290
+> [   11.756042] [c00000000ec3b9c0] [c00000000021d118] __do_sys_finit_module+0xd8/0x190
+> [   11.756066] [c00000000ec3baf0] [c00000000002b038] system_call_exception+0x138/0x260
+> [   11.756091] [c00000000ec3be10] [c00000000000c654] system_call_common+0xf4/0x258
+> [   11.756117] --- interrupt: c00 at 0x7fffaae9a9e4
+> [   11.756134] NIP:  00007fffaae9a9e4 LR: 00007fffab110500 CTR: 0000000000000000
+> [   11.756153] REGS: c00000000ec3be80 TRAP: 0c00   Not tainted  (6.1.106)
+> [   11.762944] MSR:  900000000280f033 <SF,HV,VEC,VSX,EE,PR,FP,ME,IR,DR,RI,LE>  CR: 24222248  XER: 00000000
+> [   11.765251] IRQMASK: 0 
+>                GPR00: 0000000000000161 00007ffff4b57210 00007fffaafa6f00 0000000000000006 
+>                GPR04: 00007fffab11be88 0000000000000000 0000000000000006 0000000000000000 
+>                GPR08: 0000000000000000 0000000000000000 0000000000000000 0000000000000000 
+>                GPR12: 0000000000000000 00007fffab1fe240 0000000000000020 0000000022000000 
+>                GPR16: 0000000000000000 0000000000000000 0000000000000009 000000013c86f5d8 
+>                GPR20: 0000000000000000 000001002cd75d90 0000000000000000 0000000000000005 
+>                GPR24: 000001002cd794a0 000001002cd75d90 0000000022000000 000001002cd32120 
+>                GPR28: 00007fffab11be88 0000000000020000 0000000000000000 000001002cd75d90 
+> [   11.773845] NIP [00007fffaae9a9e4] 0x7fffaae9a9e4
+> [   11.774334] LR [00007fffab110500] 0x7fffab110500
+> [   11.774347] --- interrupt: c00
+> [   11.779698] Instruction dump:
+> [   11.779711] e88952f8 38634198 3bde52f8 4811c439 60000000 e94d0030 3c62ffe4 386341c0 
+> [   11.779739] 7fcaf02a 7fc4f378 4811c41d 60000000 <e93e0000> 7c0004ac e9490000 0c0a0000 
+> [   11.779782] ---[ end trace 0000000000000000 ]---
+> 
+> This happen on stock debian 6.1.0-23-powerpc64le.
+
+I am not able to recreate this in my setup. 
+Have tried stable 6.1.106, 6.1.100 and also latest upstream with powernv_defconfig.
+Can you share the config file. 
+
+Maddy
 
 > 
+> I debugged a bit and the crash happen in arch/powerpc/platforms/powernv/rng.c in pnv_get_random_long()
+> The call rng = get_cpu_var(pnv_rng) return null and so rng is dereferenced via ->regs just after.
+> 
+> I have no real idea on how to fix properly (appart adding a "!rng return 0" test)
+> 
+> Regards
+> 
+
