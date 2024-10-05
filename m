@@ -1,52 +1,55 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69E634085D;
-	Sat,  5 Oct 2024 05:32:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 476944085D
+	for <linux-crypto@vger.kernel.org>; Sat,  5 Oct 2024 05:32:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728106324; cv=none; b=V9LhhOTdZus2c1Q29SX8N2VJ4ovvcywWnW8GgMwc2TWKzAhp/Bkfm2sFUap92RRsopU1YDE+YOGJr2wVN1sZTn4YtxFcVLPVqG5NTVD3a9pXTvbQC9dfSSn6tlnOg4R5S70mMAkYyGYueTnXTOlHSwWEtZZOEbxKIV7Vwp5/etU=
+	t=1728106339; cv=none; b=RK/artbH/bTHQ5Kr0McWwo7eNMhVoWgLGXkLWgMnWiJjAna89RTjQBXgpAa4EO5/ge8S4I6mNlbUKuPGqwsMbYvwZMI59F9I31ch9Fd/ul+5MGrm250xciQpB8FppPD6PqaW30dO42DtDv9yG7U23UtDvfFHsPEOAqdniHV8Quk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728106324; c=relaxed/simple;
-	bh=/NjnvWP50ak7RDdpDyrL7mk1KcXJcGuksMwjQx3L6F0=;
+	s=arc-20240116; t=1728106339; c=relaxed/simple;
+	bh=lJems2rndXxhZRa/h8RbEd7hiQPEu5dtgt6wjX5Chn4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dRbFrcRaskw7loAVCY7xrPMnO7TnGngbBbaFLpSPMptba54NeunMILt4ZHpQF3MI+Y+OcUXF+jQ3kCtGqFVczW/JQ26OybDnuD14ePTqYJSx2AjXlqbaVg4CwE5x5fTUakiIrQyPMb0SmcABEp3HggJq2vhZcZsvshqRjA44FCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=DwCol7qg; arc=none smtp.client-ip=144.6.53.87
+	 Content-Type:Content-Disposition:In-Reply-To; b=S1vXPxXldTrm4iv6f/1BoBaXw9np37CGyjK+D6JSHTG+K2KqvLFU9M8BE2NXZ6KisY1jNirnMQi+EZZpDoL7KZo2tLHgHhwrv1bMOuUXdM78eOlGu4Ek/BWMFvfrRfHqsyLCiii6+IBCGjjY1weXWP7fgJOYiXZge63PaZaceiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=AsxO2+vW; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="DwCol7qg"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="AsxO2+vW"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
 	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=BdxwkcWtARqhLRBb5Hx4g5CZ23Wm0CyPyT25I6IwC5U=; b=DwCol7qgV3Jt7pG6LmZOEyAsUV
-	QNYiFD28ZRSKO6VnBGIhb9P1oz3zOfWULovELtWMY8PYRn3AA4cl5mIoNhJS8yf75xGNLIhg/Xmmi
-	u1/Rt5AT+sGqITDyS1Hk6HAJxKK7NP+iGZE0o7QgHmR30mwlyiHwIwZg6GCB2112O2delMkaaggn9
-	30I0ffjDnA9lICFz24VloayI9szX+VvKV+bT7gUHin2eP6rPCeDAC6JvYt5FVPSGOQajsOstIFTZO
-	z52O4U3oXOvVduENZipfoANL/p8mlIuuQPAJofy7mNRp1j1XJ3652G0IZT5bI2iPaABMcRf6lVKsH
-	EmDeAQPA==;
+	bh=cS823GGkUlwKr1tWh/BPj/2dBxVq0Ew2zcjy+LSSSiw=; b=AsxO2+vWst/riX6Oa2ARFaNxs1
+	JsF5xpNmCUrNCgnEijFvKjDdz2KKyL/rj7e9njC+Z4YIuSyrRoVUD6SG4J1HBFiKovMIePwY1aBmn
+	y/WBEfBdJlLUZrpQztUlOVV7Drj4tK2n47FAmaoCXWLjBjh05C8sTb/7tOkNiYsy8lnugUsimIm2a
+	f/H/eqMM7XmKS8E8bHW9EA3swwwwzOZ3crSuEsRYGCVR60ZzRxmDJFujWFVPBP5bDN+zq3RUf4MxM
+	dih3V+BK4W1EGwwWzR83wiZFu/pkH+G9Vh8fQ1M3TrxX/QPwccQdBVO9arFHDzOAl4mXPu87frRCO
+	WXVDiv6A==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1swxEX-0071W9-17;
-	Sat, 05 Oct 2024 13:31:52 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 05 Oct 2024 13:31:50 +0800
-Date: Sat, 5 Oct 2024 13:31:50 +0800
+	id 1swxEt-0071X5-2v;
+	Sat, 05 Oct 2024 13:32:14 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 05 Oct 2024 13:32:13 +0800
+Date: Sat, 5 Oct 2024 13:32:13 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-	Pankaj Gupta <pankaj.gupta@nxp.com>,
-	Gaurav Jain <gaurav.jain@nxp.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andrey Smirnov <andrew.smirnov@gmail.com>,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 1/2] crypto: caam: Fix the pointer passed to
- caam_qi_shutdown()
-Message-ID: <ZwDPRsqCIphpCiHP@gondor.apana.org.au>
-References: <c76ff86fe3ec40776646f4e5ebd5f0900ca48b37.1726395689.git.christophe.jaillet@wanadoo.fr>
+To: "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>
+Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	lucas.segarra.fernandez@intel.com, damian.muszynski@intel.com,
+	Li Zetao <lizetao1@huawei.com>, davem@davemloft.net
+Subject: Re: [PATCH] crypto: qat - remove check after debugfs_create_dir()
+Message-ID: <ZwDPXY8RX8DVMx0k@gondor.apana.org.au>
+References: <20240903144230.2005570-1-lizetao1@huawei.com>
+ <ZuQRqP9CgDp7cuGi@gondor.apana.org.au>
+ <ZuRRxIjK8WMvStJ+@gcabiddu-mobl.ger.corp.intel.com>
+ <ZuVL5buxgkqSEzPU@gondor.apana.org.au>
+ <2024091452-freight-irritant-f160@gregkh>
+ <ZuV2L2WQXSEgcsy6@gondor.apana.org.au>
+ <2024091453-champion-driveway-f9fe@gregkh>
+ <Zuf9m8HgYbXp3yIJ@gcabiddu-mobl.ger.corp.intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -55,25 +58,28 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c76ff86fe3ec40776646f4e5ebd5f0900ca48b37.1726395689.git.christophe.jaillet@wanadoo.fr>
+In-Reply-To: <Zuf9m8HgYbXp3yIJ@gcabiddu-mobl.ger.corp.intel.com>
 
-On Sun, Sep 15, 2024 at 12:22:12PM +0200, Christophe JAILLET wrote:
-> The type of the last parameter given to devm_add_action_or_reset() is
-> "struct caam_drv_private *", but in caam_qi_shutdown(), it is casted to
-> "struct device *".
+On Mon, Sep 16, 2024 at 10:42:51AM +0100, Cabiddu, Giovanni wrote:
+> The debugfs functions are guaranteed to return a valid error code
+> instead of NULL upon failure. Consequently, the driver can directly
+> propagate any error returned without additional checks.
 > 
-> Pass the correct parameter to devm_add_action_or_reset() so that the
-> resources are released as expected.
+> Remove the unnecessary `if` statement after debugfs_create_dir(). If
+> this function fails, the error code is stored in accel_dev->debugfs_dir
+> and utilized in subsequent debugfs calls.
 > 
-> Fixes: f414de2e2fff ("crypto: caam - use devres to de-initialize QI")
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> Additionally, since accel_dev->debugfs_dir is assured to be non-NULL,
+> remove the superfluous NULL pointer checks within the adf_dbgfs_add()
+> and adf_dbgfs_rm().
+> 
+> Fixes: 9260db6640a6 ("crypto: qat - move dbgfs init to separate file")
+> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 > ---
-> This patch is speculative review with care.
-> ---
->  drivers/crypto/caam/qi.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  drivers/crypto/intel/qat/qat_common/adf_dbgfs.c | 13 +------------
+>  1 file changed, 1 insertion(+), 12 deletions(-)
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
