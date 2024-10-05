@@ -1,47 +1,50 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53F7E322B;
-	Sat,  5 Oct 2024 05:29:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E37273F9CC;
+	Sat,  5 Oct 2024 05:30:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728106184; cv=none; b=OCO24ejchXaX8fb6j6x2SpWynP9r+4S7rewC8EnYxhplbVyMuinn7P5Jt6z1v8jbvFSDmutcpgkx9Sc7ugKSLUZ3kfRp3RmHTRJEUzzJTyGq7eGWnWb5wmDOkYVicN1DinaJ6ygHEQV6O7YImZvIjEB1hXhg+IsUBb9HlT7WQGI=
+	t=1728106214; cv=none; b=c7KKBWjL05YKajhXgkI8g6aI/PYs82ksoCUb5wSQd4ZNX1gdSAbA+w/u17I46A/0MQOU0QJjhyhZ8S6LL39nUXZzRBceybodzQKQv0y2SAcZxbhifqnXOGgyPhdW6hGaSXQf63JJtMIGm/CiGr896LAoBG30qMa2oC82yaw+z9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728106184; c=relaxed/simple;
-	bh=mIluBhSVaAAZ85GoTd9dKYLsIfMXB8BikfEvmvGa6zc=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=SpKQjFmDlaNda4cK1G7CD8WEIgbSY2RblGoqr2YMIIjN/2miBuOUSP5Mz2zQZk4Mt1YtoudJXHPefQ1/X3Ru7IkQ786QReS0rTOVA+oldvZVgyku9eCLDAa4fxSevdvtBUmUvJ57bf7pdvPy0mQR7fMfXMGi8gd7MVsSD5B2IYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=f+BallSl; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1728106214; c=relaxed/simple;
+	bh=iMLvLpJSZj8POdkM9kL78IoIXYLyMWTnpDjK0BArSTE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N0pjI0xQD0JFOic5YwDJutMS2QD86/9/+JOW/3HjxlHoaVeKsA+sUeHtmqT+ZR9bayRf1JZpUBePRJHtIIdq9sr1d5E+mXRRHe4drz0+tBcNhgj7ike86s55QqCkgxRHnW4sL8GS8xeOY/2qJR9KvzD7VVLuSDR6nEnrcYzsgcA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=apjMNx4f; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="f+BallSl"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="apjMNx4f"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:Message-ID:Subject:Cc:To:
-	From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=bgduNDVUW7IvjOOcmNkqrjQO4EKeMg7qKlVmi8rGSvY=; b=f+BallSlkzMTTgal6Cr+VOLySp
-	nhwyNsi6o9+VaxF3sUOA2ymt649gi5QTyQhhycL8RLD7d7z7xWXn5g1n7xB7J9cw8fjJumEnxgBEX
-	aeRQsf3zTIBHKYmG0MpfmABmjPV46c6QSF4twBiOl1U84ZRfWW+7oyuG9seetZHq9Da/+obbqD/Mx
-	qBVw8D0t/Ni992msyDcC2W4IA9Huz3re843hB2un15Fa1IvDw02Ol7TRgVu785v3EoAohch/G7UWu
-	UsW2zju5w2VXyhiQZ87yrBZCobAK8d4wlsu0lPI7zEVJ/OwV7FqKh1xU3Y0zZET3HyUwol1Ut7Anm
-	HV9ANv5w==;
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=22G6hUsHewmhwV2ekiJ9Lvm0h+XG3V2n6wsZ7AJFomI=; b=apjMNx4fJVxc0ahgE/I8Ov6x1J
+	OdixjTPWdFkp+GF2sBDaOA35LW+LCwOiw80aWeUa1s4Ts9BrxoudZ5Kl/2HQrioo0WIARFuj2yIRS
+	ZpxlXLP0TwKMIDs8a3QBlt3gNnEBOZl2Z0Vj+WuhGTQ93n/RDK0y9cu5Jq/kNGXk2qFw6CaHkqWBD
+	ekhZALJG6ssGxevISNNGMLH37TFMyTGgiCkXznhlyWgYhi6GYrSMiYlLnJ1FjEUrbxaMRg7PMimEq
+	xZwl1JSUXSKd+cisMNDQaJE1s7GDP6Ybe5v0auL8fTHpce3/Nzy7ixTo5JLPyRTgE18I3K4t0m2fT
+	SfeVJguA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1swxCH-0071T0-35;
-	Sat, 05 Oct 2024 13:29:32 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 05 Oct 2024 13:29:31 +0800
-Date: Sat, 5 Oct 2024 13:29:31 +0800
+	id 1swxCr-0071Tj-28;
+	Sat, 05 Oct 2024 13:30:08 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 05 Oct 2024 13:30:07 +0800
+Date: Sat, 5 Oct 2024 13:30:07 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Tang Bin <tangbin@cmss.chinamobile.com>
-Cc: clabbe@baylibre.com, davem@davemloft.net, linux-crypto@vger.kernel.org,
-	linux-amlogic@lists.infradead.org, linux-kernel@vger.kernel.org,
-	tangbin@cmss.chinamobile.com
-Subject: Re: [PATCH] crypto: amlogic - Remove redundant assignment and error
- messages
-Message-ID: <ZwDOu3C70Q1MwG-l@gondor.apana.org.au>
+To: Tomas Paukrt <tomaspaukrt@email.cz>
+Cc: linux-crypto@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>, imx@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH] crypto: mxs-dcp: Fix AES-CBC with hardware-bound keys
+Message-ID: <ZwDO3zqppqOZeSLg@gondor.apana.org.au>
+References: <1Wx.Zci3.5c7{vqn25ku.1cv07F@seznam.cz>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -50,18 +53,17 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240911121751.1900-1-tangbin@cmss.chinamobile.com>
-X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
+In-Reply-To: <1Wx.Zci3.5c7{vqn25ku.1cv07F@seznam.cz>
 
-Tang Bin <tangbin@cmss.chinamobile.com> wrote:
-> In the function meson_crypto_probe, devm_platform_ioremap_resource()
-> have already contains error message, so remove the
-> redundant assignment and error messages.
+On Fri, Sep 13, 2024 at 11:11:43AM +0200, Tomas Paukrt wrote:
+> Fix passing an initialization vector in the payload field which
+> is necessary for AES in CBC mode even with hardware-bound keys.
 > 
-> Signed-off-by: Tang Bin <tangbin@cmss.chinamobile.com>
+> Fixes: 3d16af0b4cfa ("crypto: mxs-dcp: Add support for hardware-bound keys")
+> Signed-off-by: Tomas Paukrt <tomaspaukrt@email.cz>
 > ---
-> drivers/crypto/amlogic/amlogic-gxl-core.c | 8 +++-----
-> 1 file changed, 3 insertions(+), 5 deletions(-)
+>  drivers/crypto/mxs-dcp.c | 20 ++++++++++++--------
+>  1 file changed, 12 insertions(+), 8 deletions(-)
 
 Patch applied.  Thanks.
 -- 
