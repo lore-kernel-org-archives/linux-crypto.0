@@ -1,53 +1,46 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57F9B28EC;
-	Sun,  6 Oct 2024 03:06:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89EAA15444E;
+	Sun,  6 Oct 2024 09:11:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728183981; cv=none; b=agST9wcficoTIPXKq8JkGXBfHiNbtUjHZAV5V4YyCMpqw36dMFguTjzwk4NJRyMPiZC9YTzNewR0jrB69AASR2jLj+yJUtTmFhvwuSD28CW29ucLz2JqNt2HKKfAHQOpHT40o35s/4mAFVDVZQ5ufhxdmpW3MLksUdhIVV+/GSM=
+	t=1728205897; cv=none; b=Mr94HX7M5M97eDYQXumkqbun9Wg43dLi2Un8fVf+eATpA27Me7bW/yHQJhDg+P/LjrWcpgTokrtq4UDMGGmuW/ng34p4wwiJl+fItQi3Pdhqm3W1R/iNq8dfnpQraI/sLUe3H9HoiyTkyvqftCzt921g5fdqRi3y0kvxNcHrmxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728183981; c=relaxed/simple;
-	bh=ETNj5oHnep03n1zYQGiydmptlifreHJ4JKWMm0PPgOc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sNMM8+nE7g131Q93rKNt27ijmFmNQ6gOIvT9HOM0ZXErkptejG8+r57ggVbPiPARTEr9h5f+rcSwNgxpCzbij2UoXkzM/eR0jl0Rriv2+jCSkLgSYgPbHxTXeAID5YqZMmyXmA6d6jemEfaqruSZv7lzSRaKSu0MP5AWlX28ByI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hV2G4zpX; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1728205897; c=relaxed/simple;
+	bh=xlKlKgRuc8qjN4G3/Tzxa0cyrZ3RlG9lR8hrI9QjqKA=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=Wrh8QVmNczSZ9ojoamgqOZokeVQgcNLSLVTdbnGaWkNZHz4GryLW5S6MJuw+9BUZ7CqGGQrXSZDKAMowDjVa8/Egs1T15RT9TrRYu3TP+tiZMrfGiy+oBwKhMftd7uEyKEg62WBkqG6f8o8tgiiMsg/iuJPikzQP24F8CEk/+bY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=bDCb6nn5; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hV2G4zpX"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69497C4CEC7;
-	Sun,  6 Oct 2024 03:06:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728183980;
-	bh=ETNj5oHnep03n1zYQGiydmptlifreHJ4JKWMm0PPgOc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hV2G4zpXb6FS3EYmY1dNy7oN22blnsHgQ6m/M/VOeC5FAHoXgwfS3NNr7uHlPd5xs
-	 pJ4tcEZukTm6rKvLbw7Z+m4cw2IetDpX7wJeo14/w3PQkA8crC+EywxkvN8WNG5CHg
-	 HBvlAbRNCuojtTRWZ8uiUioVZPHt2n120hQkRXcdDWjP7YZmjOizjk/Y+B9HZHuI8b
-	 fTNvNUi59ae11aZ5Aoe41bWi0NABLzyPp8T4YxQIQ+L8AwLJo11T7OQKT///485X3A
-	 uFGYSGHJQRbw/ovW87FUXar/vRiYm0Et8a0k3qKTlJS3lTGqupuZ0seIoWSZm7oyjW
-	 vOLoerDuHyMDw==
-Date: Sat, 5 Oct 2024 20:06:18 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: kernel test robot <oliver.sang@intel.com>, oe-lkp@lists.linux.dev,
-	lkp@intel.com, linux-crypto@vger.kernel.org, ltp@lists.linux.it,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	"Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH] crypto: api - Fix generic algorithm self-test races
-Message-ID: <20241006030618.GA30755@sol.localdomain>
-References: <ZsBJ5H4JExArHGVw@gondor.apana.org.au>
- <ZsBKG0la0m69Dyq3@gondor.apana.org.au>
- <20240827184839.GD2049@sol.localdomain>
- <Zs6SiBOdasO9Thd1@gondor.apana.org.au>
- <20240830175154.GA48019@sol.localdomain>
- <ZtQgVOnK6WzdIDlU@gondor.apana.org.au>
- <20240902170554.GA77251@sol.localdomain>
- <ZtZFOgh3WylktM1E@gondor.apana.org.au>
- <20241005222448.GB10813@sol.localdomain>
- <ZwHfiNsP7fUvDwbH@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="bDCb6nn5"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:Message-ID:Subject:Cc:To:
+	From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=WlRrQ+D7JLm1BG4Mvs34iW8Ec+6c18hoPBAnK0niUA4=; b=bDCb6nn5MNs28YJUHuNsYgkxEN
+	87XxNAP7hFsdBW7nA1JjPuXQymL8tmHTV3oUJyojyqZTQKMrWUg4myeF4Z261+j1DwPsCUdXD68Wl
+	PHSor409Wkqp8wAZiH+yrNVnf9ydjPLhU4m3yAXQetCfajCVSqF6RleExaROcfkLY1bFW7yaHk7dP
+	O9bANMGAIsD111KnpPv9jXCi+mvI4f0sXbymrVS/FD065WKPzBhjF9PxkosBEOfyKAdmm+vZ3omYr
+	TtWl9VSOeZ+UE2Ckbykbl0H9Qk3JLb+gUsOiJQ0OD9lkxDdxWV1vDeYhCZPKvoDsqSc+qZy1HtTzN
+	CPePNMKQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1sxN8X-007Dj5-1k;
+	Sun, 06 Oct 2024 17:11:24 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 06 Oct 2024 17:11:23 +0800
+Date: Sun, 6 Oct 2024 17:11:23 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Klaus Kudielka <klaus.kudielka@gmail.com>
+Cc: regressions@lists.linux.dev, linux-kernel@vger.kernel.org,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [REGRESSION] alg: ahash: Several tests fail during boot on
+ Turris Omnia
+Message-ID: <ZwJUO5Nz3S7EeqO6@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -56,54 +49,20 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZwHfiNsP7fUvDwbH@gondor.apana.org.au>
+In-Reply-To: <ef7c7a96a73161e0f5061503242a8d3eddef121f.camel@gmail.com>
+X-Newsgroups: apana.lists.os.linux.kernel
 
-On Sun, Oct 06, 2024 at 08:53:28AM +0800, Herbert Xu wrote:
-> On Sat, Oct 05, 2024 at 03:24:48PM -0700, Eric Biggers wrote:
-> >
-> > The tests are still failing on upstream:
-> > 
-> > [    0.343845] alg: self-tests for rfc4106(gcm(aes)) using rfc4106(gcm_base(ctr(aes-generic),ghash-generic)) failed (rc=-2)
-> 
-> You're right.  I only disabled the warnings at the point of
-> allocation, the overall self-test warning is still there.  Let
-> me get rid of them too.
-> 
-> > Besides the test failures, it looks like there's no longer any guarantee that
-> > algorithms are actually available now that their module is loaded.
-> 
-> That would indeed be a bug.  But I haven't seen it in practice.
-> Although the s390 folks were reporting some weird errors with
-> dm-crypt, they have recently disappeared.
-> 
-> If you do see an actual failure please report it and then I'll
-> consider reverting it until it's fixed.
-> 
-> > E.g. consider if someone does 'modprobe aesni-intel' and then immediately
-> > creates a dm-crypt device.  Now it sounds like the AES-NI algorithms might not
-> > have finished being tested yet and the generic algorithms can be used instead,
-> > resulting in a performance regression.
-> 
-> That is not the case.  After modprobe returns, the algorithm is
-> guaranteed to have been registered.  Yes it is untested, but that
-> should not be a problem because a test larval will have been created
-> and all users looking for that algorithm will be waiting on that
-> test larval.
+Klaus Kudielka <klaus.kudielka@gmail.com> wrote:
+>
+> [    0.330736] alg: ahash: mv-hmac-sha256 test failed (wrong result) on test vector 1, cfg="init+update+final aligned buffer"
+> [    0.332541] alg: ahash: mv-hmac-md5 test failed (wrong result) on test vector 1, cfg="init+update+final aligned buffer"
+> [    0.341851] alg: self-tests for hmac(sha256) using mv-hmac-sha256 failed (rc=-22)
+> [    0.352648] alg: self-tests for hmac(md5) using mv-hmac-md5 failed (rc=-22)
 
-I'm not sure about that, since the code that looks up algorithms only looks for
-algorithms that already have the CRYPTO_ALG_TESTED flag.
+Please post your kernel config file.
 
-> > I understand that you want to try to fix the edge cases in "fallback" ciphers.
-> > But "fallback" ciphers have always seemed like a bad design due to how they use
-> > the crypto API recursively.  I think the algorithms that use them should
-> > generally be migrated off of them, e.g. as I did in commit f235bc11cc95
-> > ("crypto: arm/aes-neonbs - go back to using aes-arm directly").  That fixed the
-> > problem in aes-neonbs that seems to have triggered this work in the first place.
-> 
-> Yes getting rid of fallbacks is nice, but this it not the reason why
-> we're making self-test asynchronous.  The primary issue with synchronous
-> self-tests is the modprobe dead-lock.
-
-That problem is caused by the use of fallback ciphers, though.
-
-- Eric
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
