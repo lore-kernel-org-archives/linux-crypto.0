@@ -1,48 +1,48 @@
 Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C90114AD17;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C9541B9831;
 	Mon,  7 Oct 2024 13:32:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728307971; cv=none; b=pnT2NZcTLFESsfxD/XQo806ku1Kwwap0pRHYIrupI6FODfTa2yQiYgrQlDKLsw8yLU9LJbGvW4h/paxlafdc2YGBZzAXvGm8ci15Hc1ow6aXI5ODfeI3U0/xQbNjWqMZ7/ihWrbumgyPHMYgFLarXM8puO6c2JK7x0/K0OR9ZXA=
+	t=1728307971; cv=none; b=c8eKfzQfULM6D4vpp9swrnB/dVCE55DghkgDj0Byxt5g7tM278iiqqOMJDcn/91y2eb1QlOo8Jv4wvWKqTqUeThDAK4TvoIEyL5menvNZvMnlsCCgpZHCEZPQh1p9oOUTqDLYQJSU8yPgYuafBIafFO29MaMk+bGYRzlM/8j1Es=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1728307971; c=relaxed/simple;
-	bh=PFx9f1Tnm7BVK8PDs+lrbmOWcpFk+mbvlLZOtY/CyQI=;
+	bh=KoXBc4t3bg4UfivhjTYJkdHDpgUtKaI0eYpbucFFwrY=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UrRRIpgbeCFFiwEN6nfAkHN2690SpF3ryeX3VjzwbT5gI173SOazHkZf7f5twbHGkCS/QfpdUv1XaG+dNZ8nJQ49LWTuaA5WWTNrURhOCGlPoSpWXiLy7bYM6lGE9PcbixEwufe6OafIhKTbZrLEuZf36JK25jt6NWUKANvdQto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=zUfwjcCQ; arc=none smtp.client-ip=185.132.182.106
+	 MIME-Version:Content-Type; b=fqV+DgL7cjIzJzS1RyT7x9HL8xmyYFDT/5HpdJ9bASA8V5mZJlpoJtpLlUzhOasjLFoqWLTizpvQihXyjPdClyDOrs4uU1Z4hkIVcdsiPLdeFjGiXWViZQ8WwYrNaOXHIdjG7rQGIZ+0aAOPPdN033cuhLRTjKfWQmq8fLndNXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=dBsatN6y; arc=none smtp.client-ip=185.132.182.106
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="zUfwjcCQ"
-Received: from pps.filterd (m0288072.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 497Agrgm006897;
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="dBsatN6y"
+Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 497B4G5b021715;
 	Mon, 7 Oct 2024 15:32:15 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=selector1; bh=
-	xKQ8+KejSv5zCIILbnJcVY8vIedW2kPb2Uj4ri0BLZw=; b=zUfwjcCQPqf3zzuR
-	MCzRCe5YqHcqJx4NgSCSNpHDULO/w5wPZqhHAkuGJOV1zIgjA0PKdqlW6+nIM/XT
-	Fb4ECgIP9HSU/NHWOHS8ZzQp5SvoTQpH9vmiIaxbbIlbNQYR7RlpMVhhFLieR+aF
-	d7oPYeqzJV8/Rmo2DX6HMN2Ra1O7G2NQWXYtndS7x8ABbseJnWtAeLfmOLTcL29e
-	Ena9I5Lsz6z1wncncHelgc59dXQiiRRrEEegAXxD/mVyeEElCvkv+5HcXfczJ3N8
-	vp6hYV8otfTyr43sGZSEjbX+I1eAt5ROh0HVoqGIFGiX8uoXJD4IKbCKgKALjvKK
-	fRKV1g==
+	Kb/Wv4RQ9boMDu8e4FgyKdarjG40Bi/qBXrF2ODld5E=; b=dBsatN6yjAkVg+uC
+	enJ5nDH/TG9y4/QizZ/vCg4mIWhDfmxOqQ9R/gapsLMNFWla8t80cck+RHqogTQZ
+	QYsiurOdR63xCB8FpftVy/JrOA+JKNxCMBcWCyfnaVWQguQOC4EjBf9sMvm//UW7
+	rxw0IxuLDBWToP3+bZKg6RqlCPkc6DI6GbETwpGEihCEsyu8oVn3g1xmwtnpHlNq
+	rGaQLpDnhBGKMidXFycC24GMXdXTOqSZWbdFYea1ec3NMSCKgVcDF0moeHkq0usz
+	ncm5s7iNRBtGI/wUoJtULxjhSg7mqt8u5jGKdH1mcJCafY+6NRyAxpXsTxsZA76T
+	bkdvyA==
 Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 422xv714xp-1
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 423f10pdkh-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 07 Oct 2024 15:32:15 +0200 (MEST)
+	Mon, 07 Oct 2024 15:32:14 +0200 (MEST)
 Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 7D9E24004F;
-	Mon,  7 Oct 2024 15:30:40 +0200 (CEST)
+	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id AEDD44004B;
+	Mon,  7 Oct 2024 15:30:37 +0200 (CEST)
 Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 78F7527E2A2;
-	Mon,  7 Oct 2024 15:28:58 +0200 (CEST)
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 3C338279E8C;
+	Mon,  7 Oct 2024 15:27:46 +0200 (CEST)
 Received: from localhost (10.48.86.225) by SHFDAG1NODE1.st.com (10.75.129.69)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.37; Mon, 7 Oct
- 2024 15:28:58 +0200
+ 2024 15:27:45 +0200
 From: Gatien Chevallier <gatien.chevallier@foss.st.com>
 To: Olivia Mackall <olivia@selenic.com>,
         Herbert Xu
@@ -65,9 +65,9 @@ CC: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
  Yingliang <yangyingliang@huawei.com>,
         Gatien Chevallier
 	<gatien.chevallier@foss.st.com>
-Subject: [PATCH 4/4] arm64: dts: st: add RNG node on stm32mp251
-Date: Mon, 7 Oct 2024 15:27:21 +0200
-Message-ID: <20241007132721.168428-5-gatien.chevallier@foss.st.com>
+Subject: [PATCH 1/4] dt-bindings: rng: add st,stm32mp25-rng support
+Date: Mon, 7 Oct 2024 15:27:18 +0200
+Message-ID: <20241007132721.168428-2-gatien.chevallier@foss.st.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20241007132721.168428-1-gatien.chevallier@foss.st.com>
 References: <20241007132721.168428-1-gatien.chevallier@foss.st.com>
@@ -85,35 +85,85 @@ X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
  definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
 
-Update the device-tree stm32mp251.dtsi by adding the Random Number
-Generator(RNG) node.
+Add RNG STM32MP25x platforms compatible. Update the clock
+properties management to support all versions.
 
 Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
 ---
- arch/arm64/boot/dts/st/stm32mp251.dtsi | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ .../devicetree/bindings/rng/st,stm32-rng.yaml | 41 +++++++++++++++++--
+ 1 file changed, 38 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/boot/dts/st/stm32mp251.dtsi b/arch/arm64/boot/dts/st/stm32mp251.dtsi
-index 1167cf63d7e8..40b96353a803 100644
---- a/arch/arm64/boot/dts/st/stm32mp251.dtsi
-+++ b/arch/arm64/boot/dts/st/stm32mp251.dtsi
-@@ -493,6 +493,16 @@ uart8: serial@40380000 {
- 				status = "disabled";
- 			};
+diff --git a/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml b/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml
+index 340d01d481d1..c92ce92b6ac9 100644
+--- a/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml
++++ b/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml
+@@ -18,12 +18,19 @@ properties:
+     enum:
+       - st,stm32-rng
+       - st,stm32mp13-rng
++      - st,stm32mp25-rng
  
-+			rng: rng@42020000 {
-+				compatible = "st,stm32mp25-rng";
-+				reg = <0x42020000 0x400>;
-+				clocks = <&clk_rcbsec>, <&rcc CK_BUS_RNG>;
-+				clock-names = "rng_clk", "rng_hclk";
-+				resets = <&rcc RNG_R>;
-+				access-controllers = <&rifsc 92>;
-+				status = "disabled";
-+			};
+   reg:
+     maxItems: 1
+ 
+   clocks:
+-    maxItems: 1
++    minItems: 1
++    maxItems: 2
 +
- 			spi8: spi@46020000 {
- 				#address-cells = <1>;
- 				#size-cells = <0>;
++  clock-names:
++    items:
++      - const: rng_clk
++      - const: rng_hclk
+ 
+   resets:
+     maxItems: 1
+@@ -57,15 +64,43 @@ allOf:
+       properties:
+         st,rng-lock-conf: false
+ 
++  - if:
++      properties:
++        compatible:
++          contains:
++            enum:
++              - st,stm32mp25-rng
++    then:
++      properties:
++        clocks:
++          description: >
++            RNG bus clock must be named "rng_hclk". The RNG kernel clock
++            must be named "rng_clk".
++          maxItems: 2
++      required:
++        - clock-names
++    else:
++      properties:
++        clocks:
++          maxItems: 1
++
+ additionalProperties: false
+ 
+ examples:
+   - |
+-    #include <dt-bindings/clock/stm32mp1-clks.h>
+     rng@54003000 {
+       compatible = "st,stm32-rng";
+       reg = <0x54003000 0x400>;
+-      clocks = <&rcc RNG1_K>;
++      clocks = <&rcc 124>;
+     };
+ 
++  - |
++    rng: rng@42020000 {
++      compatible = "st,stm32mp25-rng";
++      reg = <0x42020000 0x400>;
++      clocks = <&clk_rcbsec>, <&rcc 110>;
++      clock-names = "rng_clk", "rng_hclk";
++      resets = <&rcc 97>;
++      access-controllers = <&rifsc 92>;
++    };
+ ...
 -- 
 2.25.1
 
