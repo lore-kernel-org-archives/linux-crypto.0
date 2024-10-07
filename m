@@ -1,38 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B6DC6AAD
-	for <linux-crypto@vger.kernel.org>; Mon,  7 Oct 2024 01:24:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51CC5C156;
+	Mon,  7 Oct 2024 01:24:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728264296; cv=none; b=eNqvlqiYFJMaIr/xSzbqYUxYZYa3K0zRHnulCFf2+31X0uf04t6AibT7J9KlWAnMv+DEhAEpRh/I4u4krgiibCYYBLayNDc+Kt1XSxpOXL5nla5F9YF8imToktpgIHBu0wpQXXdYS75hYrYeQlwMFeSdfm5RQr+Ol7DyOZ7FBxU=
+	t=1728264296; cv=none; b=XP9gYtrq2p2P+Hsi3iiTwPGAPfzDcDDVZa2sFU/Tec11x+XOPBHAaRYxQvCp9qAYEI2tlce37Hz3CXkyv98GrVwbGG/aCE642pFaqxG4yfJlNtN12ZNw2jMeZBZ2oL7RxTdI9Q8dLBbACBtTfv6BoVJ/COk1O9noIAKqiCML8NA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1728264296; c=relaxed/simple;
-	bh=MW/IHp1E7rwSyNuBU2jVTzCs62qHX7IsBPgwGhUHeXw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AU9OSQmjRJxA74VdeyryiZIIuvVDubCnI7nx0746Z5caJAVAR7H3Gnbt3+dP1uicWVcqfSzZo4PzCyE9gylb8sZ7/jkLoDHGzqJjehGSnJZfT3EFnnQdvt3/BuFFdhcG3YNkenmwCUTxugCBKn0wpmENBjohYN/VJ3EOaBiIlMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gDWz19HF; arc=none smtp.client-ip=10.30.226.201
+	bh=WCm/xfTBodlqj4bAKzAchL/blZIThgBRMTL2D1XRc6E=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=AgMUSyKQWRByXdiSPyTSfneRgt5Np3RvdQ+bDkyfjCb1VSMiWYHBqkbKXW3B5ynkQcE4ZpYZfjhjVPeqej1J3VyBl0yNzDO883i/XT3eCHriF1hgbLTAQB6JkUc4nsjIp/XK4ZOiDINmdO+FTulQqUMWsJW09yuM1TepUR2R8TI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dHCH8QY0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gDWz19HF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64D12C4CEC5;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dHCH8QY0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B34E6C4CECC;
 	Mon,  7 Oct 2024 01:24:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1728264295;
-	bh=MW/IHp1E7rwSyNuBU2jVTzCs62qHX7IsBPgwGhUHeXw=;
-	h=From:To:Cc:Subject:Date:From;
-	b=gDWz19HFKp5h31gOsG4XQW9leqr0RqjhGHPiVvFXZVTZmAanf9D6heSYP2r1K5WhP
-	 I/y6M2Z+8rNa4RX38n7s8gYLejeSpIK/UaQr6HdqwLh8c07dBdzog+W4t6DJ21HJZI
-	 JUhmW+U995yqGZ6kKepbrQUIFwEdpqpEAUqN5rM4FUAURx0wYF+5+y7XPFOItqoy+x
-	 RRcx+za7/bVcZfnXybfiWS1Hh+rcfwlCDncpapO9b6pOn4uWD2gnWI6PyrB8/Mt5TL
-	 Z/eIzXXdP9BAQtsWUvzvVKQ6mGE+coQqECRhAz+xmZoZzccaEtTq8qXv2D62Xhi1zl
-	 tYXxnZkUsNNSg==
+	bh=WCm/xfTBodlqj4bAKzAchL/blZIThgBRMTL2D1XRc6E=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=dHCH8QY0ZXyEg2C+QRZGwoRijb0ZYP98j15RbnIj0xpbmInWugI1WP/16g5MG0gkq
+	 sJLKqd47QLOFtzx86pGpGw6HbaD3D2COBr8JA5Yp1kHFiUfEw1zabd4aiJTKvl1J+a
+	 ZQDvdAixuafMQ6YotvbpxU7p6W00zg9wj37b9WRsQHpYRotTGsCRHsPVw5z3hlxMwJ
+	 sZn6A99qgdUvuj7whS9oJOYonxQKROWvoy7NDVyRlFZyaN1jyGcgMOqZmPz666tNit
+	 6l4pH1XdvzgS7X3elzgyOotEJZHdfLsiLrths1XG1qsRIS5d90F1DSHlAWunn24IFG
+	 xoNd569qORQcQ==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: x86@kernel.org,
-	Ondrej Mosnacek <omosnace@redhat.com>
-Subject: [PATCH 00/10] AEGIS x86 assembly tuning
-Date: Sun,  6 Oct 2024 18:24:20 -0700
-Message-ID: <20241007012430.163606-1-ebiggers@kernel.org>
+	Ondrej Mosnacek <omosnace@redhat.com>,
+	stable@vger.kernel.org
+Subject: [PATCH 01/10] crypto: x86/aegis128 - access 32-bit arguments as 32-bit
+Date: Sun,  6 Oct 2024 18:24:21 -0700
+Message-ID: <20241007012430.163606-2-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.46.2
+In-Reply-To: <20241007012430.163606-1-ebiggers@kernel.org>
+References: <20241007012430.163606-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -41,41 +45,155 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series cleans up the AES-NI optimized implementation of AEGIS-128.
+From: Eric Biggers <ebiggers@google.com>
 
-Performance is improved by 1-5% depending on the input lengths.  Binary
-code size is reduced by about 20% (measuring glue + assembly combined),
-and source code length is reduced by about 150 lines.
+Fix the AEGIS assembly code to access 'unsigned int' arguments as 32-bit
+values instead of 64-bit, since the upper bits of the corresponding
+64-bit registers are not guaranteed to be zero.
 
-The first patch also fixes a bug which could theoretically cause
-incorrect behavior but was seemingly not being encountered in practice.
+Note: there haven't been any reports of this bug actually causing
+incorrect behavior.  Neither gcc nor clang guarantee zero-extension to
+64 bits, but zero-extension is likely to happen in practice because most
+instructions that operate on 32-bit registers zero-extend to 64 bits.
 
-Note: future optimizations for AEGIS-128 could involve adding AVX512 /
-AVX10 optimized assembly code.  However, unfortunately due to the way
-that AEGIS-128 is specified, its level of parallelism is limited, and it
-can't really take advantage of vector lengths greater than 128 bits.
-So, probably this would provide only another modest improvement, mostly
-coming from being able to use the ternary logic instructions.
+Fixes: 1d373d4e8e15 ("crypto: x86 - Add optimized AEGIS implementations")
+Cc: stable@vger.kernel.org
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ arch/x86/crypto/aegis128-aesni-asm.S | 29 ++++++++++++++--------------
+ 1 file changed, 15 insertions(+), 14 deletions(-)
 
-Eric Biggers (10):
-  crypto: x86/aegis128 - access 32-bit arguments as 32-bit
-  crypto: x86/aegis128 - remove no-op init and exit functions
-  crypto: x86/aegis128 - eliminate some indirect calls
-  crypto: x86/aegis128 - don't bother with special code for aligned data
-  crypto: x86/aegis128 - optimize length block preparation using SSE4.1
-  crypto: x86/aegis128 - improve assembly function prototypes
-  crypto: x86/aegis128 - optimize partial block handling using SSE4.1
-  crypto: x86/aegis128 - take advantage of block-aligned len
-  crypto: x86/aegis128 - remove unneeded FRAME_BEGIN and FRAME_END
-  crypto: x86/aegis128 - remove unneeded RETs
-
- arch/x86/crypto/Kconfig               |   4 +-
- arch/x86/crypto/aegis128-aesni-asm.S  | 532 ++++++++++----------------
- arch/x86/crypto/aegis128-aesni-glue.c | 145 ++++---
- 3 files changed, 261 insertions(+), 420 deletions(-)
-
-
-base-commit: 9852d85ec9d492ebef56dc5f229416c925758edc
+diff --git a/arch/x86/crypto/aegis128-aesni-asm.S b/arch/x86/crypto/aegis128-aesni-asm.S
+index ad7f4c891625..2de859173940 100644
+--- a/arch/x86/crypto/aegis128-aesni-asm.S
++++ b/arch/x86/crypto/aegis128-aesni-asm.S
+@@ -19,11 +19,11 @@
+ #define MSG	%xmm5
+ #define T0	%xmm6
+ #define T1	%xmm7
+ 
+ #define STATEP	%rdi
+-#define LEN	%rsi
++#define LEN	%esi
+ #define SRC	%rdx
+ #define DST	%rcx
+ 
+ .section .rodata.cst16.aegis128_const, "aM", @progbits, 32
+ .align 16
+@@ -74,50 +74,50 @@
+  */
+ SYM_FUNC_START_LOCAL(__load_partial)
+ 	xor %r9d, %r9d
+ 	pxor MSG, MSG
+ 
+-	mov LEN, %r8
++	mov LEN, %r8d
+ 	and $0x1, %r8
+ 	jz .Lld_partial_1
+ 
+-	mov LEN, %r8
++	mov LEN, %r8d
+ 	and $0x1E, %r8
+ 	add SRC, %r8
+ 	mov (%r8), %r9b
+ 
+ .Lld_partial_1:
+-	mov LEN, %r8
++	mov LEN, %r8d
+ 	and $0x2, %r8
+ 	jz .Lld_partial_2
+ 
+-	mov LEN, %r8
++	mov LEN, %r8d
+ 	and $0x1C, %r8
+ 	add SRC, %r8
+ 	shl $0x10, %r9
+ 	mov (%r8), %r9w
+ 
+ .Lld_partial_2:
+-	mov LEN, %r8
++	mov LEN, %r8d
+ 	and $0x4, %r8
+ 	jz .Lld_partial_4
+ 
+-	mov LEN, %r8
++	mov LEN, %r8d
+ 	and $0x18, %r8
+ 	add SRC, %r8
+ 	shl $32, %r9
+ 	mov (%r8), %r8d
+ 	xor %r8, %r9
+ 
+ .Lld_partial_4:
+ 	movq %r9, MSG
+ 
+-	mov LEN, %r8
++	mov LEN, %r8d
+ 	and $0x8, %r8
+ 	jz .Lld_partial_8
+ 
+-	mov LEN, %r8
++	mov LEN, %r8d
+ 	and $0x10, %r8
+ 	add SRC, %r8
+ 	pslldq $8, MSG
+ 	movq (%r8), T0
+ 	pxor T0, MSG
+@@ -137,11 +137,11 @@ SYM_FUNC_END(__load_partial)
+  *   %r8
+  *   %r9
+  *   %r10
+  */
+ SYM_FUNC_START_LOCAL(__store_partial)
+-	mov LEN, %r8
++	mov LEN, %r8d
+ 	mov DST, %r9
+ 
+ 	movq T0, %r10
+ 
+ 	cmp $8, %r8
+@@ -675,11 +675,11 @@ SYM_TYPED_FUNC_START(crypto_aegis128_aesni_dec_tail)
+ 
+ 	movdqa MSG, T0
+ 	call __store_partial
+ 
+ 	/* mask with byte count: */
+-	movq LEN, T0
++	movd LEN, T0
+ 	punpcklbw T0, T0
+ 	punpcklbw T0, T0
+ 	punpcklbw T0, T0
+ 	punpcklbw T0, T0
+ 	movdqa .Laegis128_counter(%rip), T1
+@@ -700,11 +700,12 @@ SYM_TYPED_FUNC_START(crypto_aegis128_aesni_dec_tail)
+ 	RET
+ SYM_FUNC_END(crypto_aegis128_aesni_dec_tail)
+ 
+ /*
+  * void crypto_aegis128_aesni_final(void *state, void *tag_xor,
+- *                                  u64 assoclen, u64 cryptlen);
++ *                                  unsigned int assoclen,
++ *                                  unsigned int cryptlen);
+  */
+ SYM_FUNC_START(crypto_aegis128_aesni_final)
+ 	FRAME_BEGIN
+ 
+ 	/* load the state: */
+@@ -713,12 +714,12 @@ SYM_FUNC_START(crypto_aegis128_aesni_final)
+ 	movdqu 0x20(STATEP), STATE2
+ 	movdqu 0x30(STATEP), STATE3
+ 	movdqu 0x40(STATEP), STATE4
+ 
+ 	/* prepare length block: */
+-	movq %rdx, MSG
+-	movq %rcx, T0
++	movd %edx, MSG
++	movd %ecx, T0
+ 	pslldq $8, T0
+ 	pxor T0, MSG
+ 	psllq $3, MSG /* multiply by 8 (to get bit count) */
+ 
+ 	pxor STATE3, MSG
 -- 
 2.46.2
 
