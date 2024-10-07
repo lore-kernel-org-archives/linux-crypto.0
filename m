@@ -1,76 +1,62 @@
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9D461D1F5A;
-	Mon,  7 Oct 2024 13:32:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ECDC14AD17
+	for <linux-crypto@vger.kernel.org>; Mon,  7 Oct 2024 13:42:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728307972; cv=none; b=UGIvMFiJNNTZk1KbMS8BCF7RAoxO9AzgCxx4Kexcz69sa+X5RdAQevQKI5bsXosfQGNQd2aFMe1Na/DdUJ7ROwu8k+lrBzPVvMy/Ck1VdKyyocB3+wQnJ0V/bfEIjHtZmqofyQ8ZfviAZoabonx1GZNPB6HEWcSS7x+ZCFntpuI=
+	t=1728308574; cv=none; b=IbNXR85wW3UFCipyM0K8U2dZGrC2Nwpjn7K4TzomvWnBuetzGpZBIHfIvFt21qt/c58bUB0/lybzFFKsVNrcaLTK8ZWN7txJBbgZ8j/nQL6mrYgneI1hd/P2XzcENjRAjsybZVGCeNaDdxpwKtRUKpfL/4PerSo5NWwy+r2yB40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728307972; c=relaxed/simple;
-	bh=rgzOPtb+8Y7nLdLgZ3t7vquvJq3BTWxEvp+C4nvrxPc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KAY7ASmuOY7z0UHRzTZRxMHTKNEVuVfhn4myGtHhoDlWiDge9rd3pEGDuYiWC7P4dyqQ/tAfAuFyNwIKFEuERRU1y6cmRz6rsB8yIVJB1VeMRmJl/JW7NmfCEwn4Awax2xAQjbRHlpCE3pel6zMq+AVeLzh0IEHpbLpPr01JDcs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=fPo4Im+R; arc=none smtp.client-ip=185.132.182.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+	s=arc-20240116; t=1728308574; c=relaxed/simple;
+	bh=ykWbEmOc0cTMIS7NTd2d6mgKnPXcLUzyYMeiivYxloE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KFSlYUl9EYd6YwFBi32KT0iYyxVx6Kp53s+SBGJhSifBdHt2uWWQPnjCuqmz1Il7BU+cjJg7fRK2j+HGwaTgL5cgoQHhHC+77swTPXL48VXOhn5mWoklcpkUVGipMzzoZE0jlDVeBnT0TWbAA0bKBiOIBTJZC+NzFDHEp/NJoDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=none smtp.mailfrom=ecsmtp.ir.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Hu3x9qoW; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ecsmtp.ir.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="fPo4Im+R"
-Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4978wkwM023351;
-	Mon, 7 Oct 2024 15:32:15 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=selector1; bh=
-	u7NukRJuVqIxIvFeEgDqcmResbhaXgq3ShhJIAUsN48=; b=fPo4Im+RjVokk4oZ
-	zMvdHlchU1YMM27ZiFUUvs5Nf88vBIqCdqu05km05i4eCFzGs4zH2GbbiywjsI9v
-	+I5U5c0jxa3e9JOiCdD2ZG/52GY5njGnJaYCxF7TYhiqRFFynfoiHP0tguE5Geo0
-	mEDiIDYcSVSHj9OD2Vnnh+XZLs/3T3ZdPiRCbSdjjd7xHe01ATlJp3PJxKo/xBRG
-	kBiQ9qG26W+0D0V35qftGWNuoLWXCQqxpEOY9zr7aYWGCuvUi05gliMxxbe4+Sfh
-	aDNiV13zUuARL8TjCGCkA0+dp+ZKcJpbswW1sB6v9x4icaZiXlMjV4cGAsWVE9Au
-	zbat+w==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 423f10pdkj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 07 Oct 2024 15:32:15 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id AFEE34004D;
-	Mon,  7 Oct 2024 15:30:37 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id B32A027A507;
-	Mon,  7 Oct 2024 15:27:47 +0200 (CEST)
-Received: from localhost (10.48.86.225) by SHFDAG1NODE1.st.com (10.75.129.69)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.37; Mon, 7 Oct
- 2024 15:27:47 +0200
-From: Gatien Chevallier <gatien.chevallier@foss.st.com>
-To: Olivia Mackall <olivia@selenic.com>,
-        Herbert Xu
-	<herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre
- Torgue <alexandre.torgue@foss.st.com>,
-        Marek Vasut <marex@denx.de>
-CC: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
-        Lionel Debieve <lionel.debieve@foss.st.com>,
-        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        Yang
- Yingliang <yangyingliang@huawei.com>,
-        Gatien Chevallier
-	<gatien.chevallier@foss.st.com>
-Subject: [PATCH 3/4] hwrng: stm32 - update STM32MP15 RNG max clock frequency
-Date: Mon, 7 Oct 2024 15:27:20 +0200
-Message-ID: <20241007132721.168428-4-gatien.chevallier@foss.st.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20241007132721.168428-1-gatien.chevallier@foss.st.com>
-References: <20241007132721.168428-1-gatien.chevallier@foss.st.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Hu3x9qoW"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1728308574; x=1759844574;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ykWbEmOc0cTMIS7NTd2d6mgKnPXcLUzyYMeiivYxloE=;
+  b=Hu3x9qoWgFIciSua+PuXn1eWQrQL7XP9Tdxi7JDJoQDEpE1LCwpb7aE2
+   9EEe2/Hzg0XGHh/CeWooK4Rhfh8TbG91axsbRZ2JEyjCJBlxnFTleMbnf
+   to751WBAVRAf+ky7+FUmAma3ANRIVdLKAkrWnlpTOjHTA2ZdZBSxvKwIP
+   J0SigHhcXKNr6ypU4uWsm8LOwwMbfOAoqfabmlMKoBDqpjRX1B+BTM+kp
+   VLIKT3mA1TOvjpjdKKdGQxOnZB2bSAo0w46LDYS98F76x1UG/+PRiE4AI
+   kO7D9J1AUp2tSyPmAnrIZ47kBjsRigPbb2/ZtBV621kyE9HC7nLxwsCdU
+   A==;
+X-CSE-ConnectionGUID: gJCr1aRgRNWLv2TmSIacEg==
+X-CSE-MsgGUID: iCGeWEHkQaOl+UCvg8KUqQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11218"; a="38585133"
+X-IronPort-AV: E=Sophos;i="6.11,184,1725346800"; 
+   d="scan'208";a="38585133"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Oct 2024 06:42:53 -0700
+X-CSE-ConnectionGUID: jmvMIOsZStmVbpHk3xbVmw==
+X-CSE-MsgGUID: 3y9dAU+VTyqelBd5bkJNuA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,184,1725346800"; 
+   d="scan'208";a="80310233"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by orviesa003.jf.intel.com with ESMTP; 07 Oct 2024 06:42:51 -0700
+Received: from sivswdev10.ir.intel.com (sivswdev10.ir.intel.com [10.237.217.4])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id B9C9B27BD9;
+	Mon,  7 Oct 2024 14:42:50 +0100 (IST)
+Received: by sivswdev10.ir.intel.com (Postfix, from userid 11379147)
+	id 88FC118007ED; Mon,  7 Oct 2024 14:42:50 +0100 (IST)
+From: Ahsan Atta <ahsan.atta@intel.com>
+To: herbert@gondor.apana.org.au
+Cc: linux-crypto@vger.kernel.org,
+	qat-linux@intel.com,
+	Ahsan Atta <ahsan.atta@intel.com>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH] crypto: qat - remove faulty arbiter config reset
+Date: Mon,  7 Oct 2024 14:42:40 +0100
+Message-Id: <20241007134240.12278-1-ahsan.atta@intel.com>
+X-Mailer: git-send-email 2.32.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -78,34 +64,38 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
 
-RNG max clock frequency can be updated to 48MHz for stm32mp1x
-platforms according to the latest specifications.
+Resetting the service arbiter config can cause potential issues
+related to response ordering and ring flow control check in the
+event of AER or device hang. This is because it results in changing
+the default response ring size from 32 bytes to 16 bytes. The service
+arbiter config reset also disables response ring flow control check.
+Thus, by removing this reset we can prevent the service arbiter from
+being configured inappropriately, which leads to undesired device
+behaviour in the event of errors.
 
-Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+Fixes: 7afa232e76ce ("crypto: qat - Intel(R) QAT DH895xcc accelerator")
+Signed-off-by: Ahsan Atta <ahsan.atta@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 ---
- drivers/char/hw_random/stm32-rng.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/intel/qat/qat_common/adf_hw_arbiter.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/drivers/char/hw_random/stm32-rng.c b/drivers/char/hw_random/stm32-rng.c
-index e7051005768d..9f1c95218a5b 100644
---- a/drivers/char/hw_random/stm32-rng.c
-+++ b/drivers/char/hw_random/stm32-rng.c
-@@ -552,7 +552,7 @@ static const struct stm32_rng_data stm32mp13_rng_data = {
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_hw_arbiter.c b/drivers/crypto/intel/qat/qat_common/adf_hw_arbiter.c
+index 65bd26b25abc..f93d9cca70ce 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_hw_arbiter.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_hw_arbiter.c
+@@ -90,10 +90,6 @@ void adf_exit_arb(struct adf_accel_dev *accel_dev)
  
- static const struct stm32_rng_data stm32_rng_data = {
- 	.has_cond_reset = false,
--	.max_clock_rate = 3000000,
-+	.max_clock_rate = 48000000,
- 	.nb_clock = 1,
- };
+ 	hw_data->get_arb_info(&info);
  
+-	/* Reset arbiter configuration */
+-	for (i = 0; i < ADF_ARB_NUM; i++)
+-		WRITE_CSR_ARB_SARCONFIG(csr, arb_off, i, 0);
+-
+ 	/* Unmap worker threads to service arbiters */
+ 	for (i = 0; i < hw_data->num_engines; i++)
+ 		WRITE_CSR_ARB_WT2SAM(csr, arb_off, wt_off, i, 0);
 -- 
-2.25.1
+2.32.0
 
