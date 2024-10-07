@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67B22171A7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63BE8168C7
 	for <linux-crypto@vger.kernel.org>; Mon,  7 Oct 2024 01:24:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728264298; cv=none; b=lffOSZUlB0XTPUpVtL9qnVVCr2GhS7K1b1YnLeEozPQ+towYSEpTYca6qkH3n4Q2fqWY73UuVysQejcljE5tWqbwvxouieBU05Q/FNk4iiyYLCzDNDQzORH46mrbRSUZ4U8jWm/kFhAyIQveaO8t5rvxuDACfubOXXeiXr8a0hs=
+	t=1728264298; cv=none; b=PI9xx0ySvJrcUushmRVplfJuj69crsoa8Vb2UYTsVn/EtqCylyEwDKPwKYwghQ/cRV7/kDstxszki1vomKMj1oDqw6iG4gnmi1pMlI/cxruufa+EZgjfNkbjbdfki9OBbe4AUeoG/ceGlNrdYu7WQXCxmnFRrAwznkWGn9oV6g0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1728264298; c=relaxed/simple;
-	bh=etMS4ksedaC5t40wm3xvIHtyMMS1+QhxCXZeiCycsME=;
+	bh=gInMbYGUdgv9AowtvjI8ndZgLAUiybRpck554YHWjbE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aso+2nvBANHboC0ME942BSuOIFV+pzJOETz6mQBVFRm+9IHGUnizvuJD/T8aBxcIwBl36/c8rG2lUN0zy39emd0JYyEDN5k3G4uRa0NzHolNfK7JXYEL2wf0JOw3iou3Yr/C+x7qajr3DBL3XIAuHBGuySgl6CXxRjm0iIt1FRo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eTK5Oci8; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=srTH1+geEkGgDw7DodwMc2tVYdkfRDB8VmadOL7wbYiejFlgH6RUAwL474hpoqEZ28JUlyL778opNZ8w9q2OKa6Kg0BNpIRMbm7Q1HQaNRnKgxkQqPypISP6L5Mz/8H651kcFLY7v0lsDGcSlA+RoX2aUoi5gFJrJOYhtIjEkTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ke7NYULm; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eTK5Oci8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9792C4CEC5;
-	Mon,  7 Oct 2024 01:24:57 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ke7NYULm"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A558C4CECF;
+	Mon,  7 Oct 2024 01:24:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1728264298;
-	bh=etMS4ksedaC5t40wm3xvIHtyMMS1+QhxCXZeiCycsME=;
+	bh=gInMbYGUdgv9AowtvjI8ndZgLAUiybRpck554YHWjbE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=eTK5Oci8VBRytUcq5Di68aFacGeiZsnqGWBDG7wbqPGpTxk8EhnlNHAh4UqwrdXGw
-	 jARd2JGbkvQ1C1pzpuQnmuudjcZndEvBardFR+431M5hLjuuGYDGzZVvI575mD/r3H
-	 iYMsK4zFNytjYGmdHJDp86oD0D0TJvclZw0SG247wH97j0BflrtuF7RDNqhPd3vpOk
-	 Op1LkS1gGE7c0rt58oiozQKJ4yItfJ0yPfNnhGZdets0QSM7QuLqiJpKfcegb/65hd
-	 AE6CIRsXnQF89VdtbP8FlTcVoDu+4TslXPXMOSMpwEn8yb8IttZdLE8NeG3c7YhJfB
-	 pFDPmoPwVlEWA==
+	b=Ke7NYULmpi8xONzgyh3hrw04wQ06gkVa9k4pGfC05LA+b7KEXV/eR3rUjkQP7Kvfl
+	 GLYyes23gW6eEqLHCi5NHCk1hiy0AeuFmAelLsA93Ykwiq3lC5QMAPl9HbYhtvSeG0
+	 9mciIe/fAtIR3WsP5JSjwx0KoHJq70HAz0ePaO8G8UlljE5t4vxQgI+DvSeQfCooNo
+	 VMjCmPDb5B5w64kpb80LrYO7IL5jGVRIyqB8ZZBg/NbzXoDa9glb3w8iU3TtPKW7cB
+	 xOYfO5VzyvmLa29l8+jY7+87/a3b+M9pSKIWO4yB482DJnnW/KCldopR8ojTzpD0LW
+	 dt9lR/32zMzYA==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: x86@kernel.org,
 	Ondrej Mosnacek <omosnace@redhat.com>
-Subject: [PATCH 08/10] crypto: x86/aegis128 - take advantage of block-aligned len
-Date: Sun,  6 Oct 2024 18:24:28 -0700
-Message-ID: <20241007012430.163606-9-ebiggers@kernel.org>
+Subject: [PATCH 09/10] crypto: x86/aegis128 - remove unneeded FRAME_BEGIN and FRAME_END
+Date: Sun,  6 Oct 2024 18:24:29 -0700
+Message-ID: <20241007012430.163606-10-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.46.2
 In-Reply-To: <20241007012430.163606-1-ebiggers@kernel.org>
 References: <20241007012430.163606-1-ebiggers@kernel.org>
@@ -46,176 +46,320 @@ Content-Transfer-Encoding: 8bit
 
 From: Eric Biggers <ebiggers@google.com>
 
-Update a caller of aegis128_aesni_ad() to round down the length to a
-block boundary.  After that, aegis128_aesni_ad(), aegis128_aesni_enc(),
-and aegis128_aesni_dec() are only passed whole blocks.  Update the
-assembly code to take advantage of that, which eliminates some unneeded
-instructions.  For aegis128_aesni_enc() and aegis128_aesni_dec(), the
-length is also always nonzero, so stop checking for zero length.
+Stop using FRAME_BEGIN and FRAME_END in the AEGIS assembly functions,
+since all these functions are now leaf functions.  This eliminates some
+unnecessary instructions.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- arch/x86/crypto/aegis128-aesni-asm.S  | 37 +++++++++++----------------
- arch/x86/crypto/aegis128-aesni-glue.c |  4 +--
- 2 files changed, 17 insertions(+), 24 deletions(-)
+ arch/x86/crypto/aegis128-aesni-asm.S | 34 ----------------------------
+ 1 file changed, 34 deletions(-)
 
 diff --git a/arch/x86/crypto/aegis128-aesni-asm.S b/arch/x86/crypto/aegis128-aesni-asm.S
-index b5c7abc9a0d4..583e4515e1f1 100644
+index 583e4515e1f1..e025c6bfadbd 100644
 --- a/arch/x86/crypto/aegis128-aesni-asm.S
 +++ b/arch/x86/crypto/aegis128-aesni-asm.S
-@@ -188,19 +188,21 @@ SYM_FUNC_START(aegis128_aesni_init)
+@@ -6,11 +6,10 @@
+  * Copyright (C) 2017-2018 Red Hat, Inc. All rights reserved.
+  * Copyright 2024 Google LLC
+  */
+ 
+ #include <linux/linkage.h>
+-#include <asm/frame.h>
+ 
+ #define STATE0	%xmm0
+ #define STATE1	%xmm1
+ #define STATE2	%xmm2
+ #define STATE3	%xmm3
+@@ -144,11 +143,10 @@
+  */
+ SYM_FUNC_START(aegis128_aesni_init)
+ 	.set STATEP, %rdi
+ 	.set KEYP, %rsi
+ 	.set IVP, %rdx
+-	FRAME_BEGIN
+ 
+ 	/* load IV: */
+ 	movdqu (IVP), T1
+ 
+ 	/* load key: */
+@@ -180,12 +178,10 @@ SYM_FUNC_START(aegis128_aesni_init)
+ 	movdqu STATE0, 0x00(STATEP)
+ 	movdqu STATE1, 0x10(STATEP)
+ 	movdqu STATE2, 0x20(STATEP)
+ 	movdqu STATE3, 0x30(STATEP)
+ 	movdqu STATE4, 0x40(STATEP)
+-
+-	FRAME_END
+ 	RET
  SYM_FUNC_END(aegis128_aesni_init)
  
  /*
   * void aegis128_aesni_ad(struct aegis_state *state, const u8 *data,
-  *			  unsigned int len);
-+ *
-+ * len must be a multiple of 16.
+@@ -195,11 +191,10 @@ SYM_FUNC_END(aegis128_aesni_init)
   */
  SYM_FUNC_START(aegis128_aesni_ad)
  	.set STATEP, %rdi
  	.set SRC, %rsi
  	.set LEN, %edx
- 	FRAME_BEGIN
+-	FRAME_BEGIN
  
--	cmp $0x10, LEN
--	jb .Lad_out
-+	test LEN, LEN
-+	jz .Lad_out
+ 	test LEN, LEN
+ 	jz .Lad_out
  
  	/* load the state: */
- 	movdqu 0x00(STATEP), STATE0
- 	movdqu 0x10(STATEP), STATE1
- 	movdqu 0x20(STATEP), STATE2
-@@ -211,40 +213,35 @@ SYM_FUNC_START(aegis128_aesni_ad)
- .Lad_loop:
- 	movdqu 0x00(SRC), MSG
- 	aegis128_update
- 	pxor MSG, STATE4
- 	sub $0x10, LEN
--	cmp $0x10, LEN
--	jl .Lad_out_1
-+	jz .Lad_out_1
+@@ -249,51 +244,45 @@ SYM_FUNC_START(aegis128_aesni_ad)
+ 	movdqu STATE0, 0x00(STATEP)
+ 	movdqu STATE1, 0x10(STATEP)
+ 	movdqu STATE2, 0x20(STATEP)
+ 	movdqu STATE3, 0x30(STATEP)
+ 	movdqu STATE4, 0x40(STATEP)
+-	FRAME_END
+ 	RET
  
- 	movdqu 0x10(SRC), MSG
- 	aegis128_update
- 	pxor MSG, STATE3
- 	sub $0x10, LEN
--	cmp $0x10, LEN
--	jl .Lad_out_2
-+	jz .Lad_out_2
+ .Lad_out_1:
+ 	movdqu STATE4, 0x00(STATEP)
+ 	movdqu STATE0, 0x10(STATEP)
+ 	movdqu STATE1, 0x20(STATEP)
+ 	movdqu STATE2, 0x30(STATEP)
+ 	movdqu STATE3, 0x40(STATEP)
+-	FRAME_END
+ 	RET
  
- 	movdqu 0x20(SRC), MSG
- 	aegis128_update
- 	pxor MSG, STATE2
- 	sub $0x10, LEN
--	cmp $0x10, LEN
--	jl .Lad_out_3
-+	jz .Lad_out_3
+ .Lad_out_2:
+ 	movdqu STATE3, 0x00(STATEP)
+ 	movdqu STATE4, 0x10(STATEP)
+ 	movdqu STATE0, 0x20(STATEP)
+ 	movdqu STATE1, 0x30(STATEP)
+ 	movdqu STATE2, 0x40(STATEP)
+-	FRAME_END
+ 	RET
  
- 	movdqu 0x30(SRC), MSG
- 	aegis128_update
- 	pxor MSG, STATE1
- 	sub $0x10, LEN
--	cmp $0x10, LEN
--	jl .Lad_out_4
-+	jz .Lad_out_4
+ .Lad_out_3:
+ 	movdqu STATE2, 0x00(STATEP)
+ 	movdqu STATE3, 0x10(STATEP)
+ 	movdqu STATE4, 0x20(STATEP)
+ 	movdqu STATE0, 0x30(STATEP)
+ 	movdqu STATE1, 0x40(STATEP)
+-	FRAME_END
+ 	RET
  
- 	movdqu 0x40(SRC), MSG
- 	aegis128_update
- 	pxor MSG, STATE0
- 	sub $0x10, LEN
--	cmp $0x10, LEN
--	jl .Lad_out_0
-+	jz .Lad_out_0
+ .Lad_out_4:
+ 	movdqu STATE1, 0x00(STATEP)
+ 	movdqu STATE2, 0x10(STATEP)
+ 	movdqu STATE3, 0x20(STATEP)
+ 	movdqu STATE4, 0x30(STATEP)
+ 	movdqu STATE0, 0x40(STATEP)
+-	FRAME_END
+ 	RET
  
- 	add $0x50, SRC
- 	jmp .Lad_loop
+ .Lad_out:
+-	FRAME_END
+ 	RET
+ SYM_FUNC_END(aegis128_aesni_ad)
  
- 	/* store the state: */
-@@ -310,28 +307,26 @@ SYM_FUNC_END(aegis128_aesni_ad)
- 
- 	aegis128_update
- 	pxor MSG, \s4
- 
- 	sub $0x10, LEN
--	cmp $0x10, LEN
--	jl .Lenc_out_\i
-+	jz .Lenc_out_\i
- .endm
- 
- /*
-  * void aegis128_aesni_enc(struct aegis_state *state, const u8 *src, u8 *dst,
-  *			   unsigned int len);
-+ *
-+ * len must be nonzero and a multiple of 16.
-  */
+ .macro encrypt_block s0 s1 s2 s3 s4 i
+ 	movdqu (\i * 0x10)(SRC), MSG
+@@ -321,11 +310,10 @@ SYM_FUNC_END(aegis128_aesni_ad)
  SYM_FUNC_START(aegis128_aesni_enc)
  	.set STATEP, %rdi
  	.set SRC, %rsi
  	.set DST, %rdx
  	.set LEN, %ecx
- 	FRAME_BEGIN
+-	FRAME_BEGIN
  
--	cmp $0x10, LEN
--	jb .Lenc_out
--
  	/* load the state: */
  	movdqu 0x00(STATEP), STATE0
  	movdqu 0x10(STATEP), STATE1
  	movdqu 0x20(STATEP), STATE2
- 	movdqu 0x30(STATEP), STATE3
-@@ -457,28 +452,26 @@ SYM_FUNC_END(aegis128_aesni_enc_tail)
+@@ -349,51 +337,45 @@ SYM_FUNC_START(aegis128_aesni_enc)
+ 	movdqu STATE4, 0x00(STATEP)
+ 	movdqu STATE0, 0x10(STATEP)
+ 	movdqu STATE1, 0x20(STATEP)
+ 	movdqu STATE2, 0x30(STATEP)
+ 	movdqu STATE3, 0x40(STATEP)
+-	FRAME_END
+ 	RET
  
- 	aegis128_update
- 	pxor MSG, \s4
+ .Lenc_out_1:
+ 	movdqu STATE3, 0x00(STATEP)
+ 	movdqu STATE4, 0x10(STATEP)
+ 	movdqu STATE0, 0x20(STATEP)
+ 	movdqu STATE1, 0x30(STATEP)
+ 	movdqu STATE2, 0x40(STATEP)
+-	FRAME_END
+ 	RET
  
- 	sub $0x10, LEN
--	cmp $0x10, LEN
--	jl .Ldec_out_\i
-+	jz .Ldec_out_\i
- .endm
+ .Lenc_out_2:
+ 	movdqu STATE2, 0x00(STATEP)
+ 	movdqu STATE3, 0x10(STATEP)
+ 	movdqu STATE4, 0x20(STATEP)
+ 	movdqu STATE0, 0x30(STATEP)
+ 	movdqu STATE1, 0x40(STATEP)
+-	FRAME_END
+ 	RET
+ 
+ .Lenc_out_3:
+ 	movdqu STATE1, 0x00(STATEP)
+ 	movdqu STATE2, 0x10(STATEP)
+ 	movdqu STATE3, 0x20(STATEP)
+ 	movdqu STATE4, 0x30(STATEP)
+ 	movdqu STATE0, 0x40(STATEP)
+-	FRAME_END
+ 	RET
+ 
+ .Lenc_out_4:
+ 	movdqu STATE0, 0x00(STATEP)
+ 	movdqu STATE1, 0x10(STATEP)
+ 	movdqu STATE2, 0x20(STATEP)
+ 	movdqu STATE3, 0x30(STATEP)
+ 	movdqu STATE4, 0x40(STATEP)
+-	FRAME_END
+ 	RET
+ 
+ .Lenc_out:
+-	FRAME_END
+ 	RET
+ SYM_FUNC_END(aegis128_aesni_enc)
  
  /*
-  * void aegis128_aesni_dec(struct aegis_state *state, const u8 *src, u8 *dst,
-  *			   unsigned int len);
-+ *
-+ * len must be nonzero and a multiple of 16.
-  */
+  * void aegis128_aesni_enc_tail(struct aegis_state *state, const u8 *src,
+@@ -402,11 +384,10 @@ SYM_FUNC_END(aegis128_aesni_enc)
+ SYM_FUNC_START(aegis128_aesni_enc_tail)
+ 	.set STATEP, %rdi
+ 	.set SRC, %rsi
+ 	.set DST, %rdx
+ 	.set LEN, %ecx	/* {load,store}_partial rely on this being %ecx */
+-	FRAME_BEGIN
+ 
+ 	/* load the state: */
+ 	movdqu 0x00(STATEP), STATE0
+ 	movdqu 0x10(STATEP), STATE1
+ 	movdqu 0x20(STATEP), STATE2
+@@ -434,12 +415,10 @@ SYM_FUNC_START(aegis128_aesni_enc_tail)
+ 	movdqu STATE4, 0x00(STATEP)
+ 	movdqu STATE0, 0x10(STATEP)
+ 	movdqu STATE1, 0x20(STATEP)
+ 	movdqu STATE2, 0x30(STATEP)
+ 	movdqu STATE3, 0x40(STATEP)
+-
+-	FRAME_END
+ 	RET
+ SYM_FUNC_END(aegis128_aesni_enc_tail)
+ 
+ .macro decrypt_block s0 s1 s2 s3 s4 i
+ 	movdqu (\i * 0x10)(SRC), MSG
+@@ -466,11 +445,10 @@ SYM_FUNC_END(aegis128_aesni_enc_tail)
  SYM_FUNC_START(aegis128_aesni_dec)
  	.set STATEP, %rdi
  	.set SRC, %rsi
  	.set DST, %rdx
  	.set LEN, %ecx
- 	FRAME_BEGIN
+-	FRAME_BEGIN
  
--	cmp $0x10, LEN
--	jb .Ldec_out
--
  	/* load the state: */
  	movdqu 0x00(STATEP), STATE0
  	movdqu 0x10(STATEP), STATE1
  	movdqu 0x20(STATEP), STATE2
- 	movdqu 0x30(STATEP), STATE3
-diff --git a/arch/x86/crypto/aegis128-aesni-glue.c b/arch/x86/crypto/aegis128-aesni-glue.c
-index 739d92c85790..32a42a7dcd3b 100644
---- a/arch/x86/crypto/aegis128-aesni-glue.c
-+++ b/arch/x86/crypto/aegis128-aesni-glue.c
-@@ -85,12 +85,12 @@ static void crypto_aegis128_aesni_process_ad(
- 				pos = 0;
- 				left -= fill;
- 				src += fill;
- 			}
+@@ -494,51 +472,45 @@ SYM_FUNC_START(aegis128_aesni_dec)
+ 	movdqu STATE4, 0x00(STATEP)
+ 	movdqu STATE0, 0x10(STATEP)
+ 	movdqu STATE1, 0x20(STATEP)
+ 	movdqu STATE2, 0x30(STATEP)
+ 	movdqu STATE3, 0x40(STATEP)
+-	FRAME_END
+ 	RET
  
--			aegis128_aesni_ad(state, src, left);
+ .Ldec_out_1:
+ 	movdqu STATE3, 0x00(STATEP)
+ 	movdqu STATE4, 0x10(STATEP)
+ 	movdqu STATE0, 0x20(STATEP)
+ 	movdqu STATE1, 0x30(STATEP)
+ 	movdqu STATE2, 0x40(STATEP)
+-	FRAME_END
+ 	RET
+ 
+ .Ldec_out_2:
+ 	movdqu STATE2, 0x00(STATEP)
+ 	movdqu STATE3, 0x10(STATEP)
+ 	movdqu STATE4, 0x20(STATEP)
+ 	movdqu STATE0, 0x30(STATEP)
+ 	movdqu STATE1, 0x40(STATEP)
+-	FRAME_END
+ 	RET
+ 
+ .Ldec_out_3:
+ 	movdqu STATE1, 0x00(STATEP)
+ 	movdqu STATE2, 0x10(STATEP)
+ 	movdqu STATE3, 0x20(STATEP)
+ 	movdqu STATE4, 0x30(STATEP)
+ 	movdqu STATE0, 0x40(STATEP)
+-	FRAME_END
+ 	RET
+ 
+ .Ldec_out_4:
+ 	movdqu STATE0, 0x00(STATEP)
+ 	movdqu STATE1, 0x10(STATEP)
+ 	movdqu STATE2, 0x20(STATEP)
+ 	movdqu STATE3, 0x30(STATEP)
+ 	movdqu STATE4, 0x40(STATEP)
+-	FRAME_END
+ 	RET
+ 
+ .Ldec_out:
+-	FRAME_END
+ 	RET
+ SYM_FUNC_END(aegis128_aesni_dec)
+ 
+ /*
+  * void aegis128_aesni_dec_tail(struct aegis_state *state, const u8 *src,
+@@ -547,11 +519,10 @@ SYM_FUNC_END(aegis128_aesni_dec)
+ SYM_FUNC_START(aegis128_aesni_dec_tail)
+ 	.set STATEP, %rdi
+ 	.set SRC, %rsi
+ 	.set DST, %rdx
+ 	.set LEN, %ecx	/* {load,store}_partial rely on this being %ecx */
+-	FRAME_BEGIN
+ 
+ 	/* load the state: */
+ 	movdqu 0x00(STATEP), STATE0
+ 	movdqu 0x10(STATEP), STATE1
+ 	movdqu 0x20(STATEP), STATE2
+@@ -584,12 +555,10 @@ SYM_FUNC_START(aegis128_aesni_dec_tail)
+ 	movdqu STATE4, 0x00(STATEP)
+ 	movdqu STATE0, 0x10(STATEP)
+ 	movdqu STATE1, 0x20(STATEP)
+ 	movdqu STATE2, 0x30(STATEP)
+ 	movdqu STATE3, 0x40(STATEP)
 -
-+			aegis128_aesni_ad(state, src,
-+					  left & ~(AEGIS128_BLOCK_SIZE - 1));
- 			src += left & ~(AEGIS128_BLOCK_SIZE - 1);
- 			left &= AEGIS128_BLOCK_SIZE - 1;
- 		}
+-	FRAME_END
+ 	RET
+ SYM_FUNC_END(aegis128_aesni_dec_tail)
  
- 		memcpy(buf.bytes + pos, src, left);
+ /*
+  * void aegis128_aesni_final(struct aegis_state *state,
+@@ -599,11 +568,10 @@ SYM_FUNC_END(aegis128_aesni_dec_tail)
+ SYM_FUNC_START(aegis128_aesni_final)
+ 	.set STATEP, %rdi
+ 	.set TAG_XOR, %rsi
+ 	.set ASSOCLEN, %edx
+ 	.set CRYPTLEN, %ecx
+-	FRAME_BEGIN
+ 
+ 	/* load the state: */
+ 	movdqu 0x00(STATEP), STATE0
+ 	movdqu 0x10(STATEP), STATE1
+ 	movdqu 0x20(STATEP), STATE2
+@@ -634,9 +602,7 @@ SYM_FUNC_START(aegis128_aesni_final)
+ 	pxor STATE2, MSG
+ 	pxor STATE3, MSG
+ 	pxor STATE4, MSG
+ 
+ 	movdqu MSG, (TAG_XOR)
+-
+-	FRAME_END
+ 	RET
+ SYM_FUNC_END(aegis128_aesni_final)
 -- 
 2.46.2
 
