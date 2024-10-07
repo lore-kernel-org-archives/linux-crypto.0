@@ -1,48 +1,60 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5282155392;
-	Mon,  7 Oct 2024 08:27:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBC5B18BC0E;
+	Mon,  7 Oct 2024 08:31:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728289636; cv=none; b=OPGYaKocg1Ucf/wQKgGEnUGRwg/zSVUQkNdP6zeY4uAB/dQofvOPzRT6U3N9hNNNfz6NELC7O5eOc1cA2vq9U8OQUKMUxOnmidD58L/0M/zctS/pcLRlM8ztu4f4AjKNEhxymAQEdkgbFP2R3NBo7wBI5GkG2yzhqUvsxz+EHT0=
+	t=1728289889; cv=none; b=pumCg5KHFumv0yWFoKGBcJ5ZwZb8Ryi6zutgO0zlVbGZG+79fiw4ecPQC0CM5PNcy1079dN8pRAvflq+72gQicB3CU5hgJ9HmK2f5E5C9cuNn5wz29o+qpvV6ldBz5ma7ScE4fIrfR8LbWymHkc3NEdvqHZ14oRU9f+DH6PRuts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728289636; c=relaxed/simple;
-	bh=/DEumeMKfYtmKeu9QKHlVKoKRxxkOKCMbAFMFiaIbP4=;
+	s=arc-20240116; t=1728289889; c=relaxed/simple;
+	bh=89urqJJgFTOZNaFSFBdrQbwkUJpxAwJPDjwRzmGQk8Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YnS1+QNtxYtrAq1KZjx/rBGa0zJzvBZL3M42CZtytxJm4dC/3WRzDfOyiwHKJL2Y+uQXVURzD4sSnFBkX8B5DLXo/f5ymcbmbRTUElheks4mr5OCeP06MKmaBT/d9eVlBafpB2lyLfIi0fAiXMTjnfAyuJcWno9zJPbzBdaK2fA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=j3hAgh86; arc=none smtp.client-ip=144.6.53.87
+	 Content-Type:Content-Disposition:In-Reply-To; b=eZ0hVXA8zXmYjG8vCCcSjmh0xgAfWd+5ZtypyXloGEo5yLMCmpxIo5n94IkIEIFCXmR1LFLCNLfjbZJDEIi3sXBQzfN0Cg+HN3i8vtLi/bNCYqDcOL4hmA7bnyQvGQR80KaIpV+PK3gjxVxS3+hFDJ8g2F/oZaS2gxlkR/MYaQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=LGLOdpO+; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="j3hAgh86"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="LGLOdpO+"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
 	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=RuyZ7+6pKeGTHQngiptrZxInMDTe3rjS9S1l0dgXSeU=; b=j3hAgh865YBLbTpZbpfzCjAs53
-	7A+n696DJR25kPKbEB5eJEGxMwMT2zK5bYihQM5CGNEdmZtf/RPdUAKrCGz19gpBYCmIUj5bvvhhH
-	8Jo7+/HFxbuHG7ONNMjuIfMClztsNBBt1N//yH1taXnIlYSlDyhrymBfvbNIwZOuSALN6aPLUCkbR
-	7RCoJOdJTxcGH1FN5PbqOcV1s9nzlHBw7PlLK94LXs3Ev8SS2/WK9v26fTHcFcTtrciO+fK9vfxzF
-	mHAfl0hGzX9F3UcNXoGiYUBKtTuZMaxjM7sS/IUFIFUmd1YjOyGTCWq4XycMTWxfvpmu82oVYNa7j
-	iq4vBFaQ==;
+	bh=GcToCRPaIztkagLop0+41I63NBz+F4uN8r4VJ4+Mb3M=; b=LGLOdpO+ZiyWz5P8pqeemo5ZDZ
+	k+5YEArr0MzSrn/sdR/n5yZkbGPY/9numMySxhYRDCATlRqyJCx1PPJYm7MXeubgs1uK4R0SNCvkN
+	bahmEHYesIlRGRrVTrAWTXOb4E3qCjvxHKJvw9P4n32xvkF0clFu8C7YP8NX43h9b7kddvxV0/Uhs
+	qycBoSEpMdIuksTeoZkjvxmUFORbcny9c6sVncCohiPz7HavDCblR4DTjX7HnzbeFrxy1j0pvucLS
+	GFCGQxJ+I0AGS7EyHkZYq/Rg4156Khy2OaObcLEtw5JKBT7rOwDTAMucpw0McXhrx5VQyzavQrGlY
+	wbHUgWAw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1sxivI-007Orm-0g;
-	Mon, 07 Oct 2024 16:27:10 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 07 Oct 2024 16:27:09 +0800
-Date: Mon, 7 Oct 2024 16:27:09 +0800
+	id 1sxizN-007Ouk-0m;
+	Mon, 07 Oct 2024 16:31:23 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 07 Oct 2024 16:31:22 +0800
+Date: Mon, 7 Oct 2024 16:31:22 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Klaus Kudielka <klaus.kudielka@gmail.com>
-Cc: regressions@lists.linux.dev, linux-kernel@vger.kernel.org,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [REGRESSION] alg: ahash: Several tests fail during boot on
- Turris Omnia
-Message-ID: <ZwObXYVHJlBaKuj2@gondor.apana.org.au>
-References: <ZwJUO5Nz3S7EeqO6@gondor.apana.org.au>
- <1fc4db6269245de4c626f029a46efef246ee7232.camel@gmail.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: kernel test robot <oliver.sang@intel.com>, oe-lkp@lists.linux.dev,
+	lkp@intel.com, linux-crypto@vger.kernel.org, ltp@lists.linux.it,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH] crypto: api - Fix generic algorithm self-test races
+Message-ID: <ZwOcWtgj3YaAvocJ@gondor.apana.org.au>
+References: <20240827184839.GD2049@sol.localdomain>
+ <Zs6SiBOdasO9Thd1@gondor.apana.org.au>
+ <20240830175154.GA48019@sol.localdomain>
+ <ZtQgVOnK6WzdIDlU@gondor.apana.org.au>
+ <20240902170554.GA77251@sol.localdomain>
+ <ZtZFOgh3WylktM1E@gondor.apana.org.au>
+ <20241005222448.GB10813@sol.localdomain>
+ <ZwHfiNsP7fUvDwbH@gondor.apana.org.au>
+ <20241006030618.GA30755@sol.localdomain>
+ <ZwNkVv5WWrmpOmqN@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -51,38 +63,28 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1fc4db6269245de4c626f029a46efef246ee7232.camel@gmail.com>
+In-Reply-To: <ZwNkVv5WWrmpOmqN@gondor.apana.org.au>
 
-On Sun, Oct 06, 2024 at 11:23:12AM +0200, Klaus Kudielka wrote:
+On Mon, Oct 07, 2024 at 12:32:22PM +0800, Herbert Xu wrote:
 >
-> Here we go.
+> PS it looks like there is an actual report of things breaking with
+> async testing in mv_cesa so I might revert/disable the async testing
+> after all.
 
-Thanks!
+It looks like it wasn't a bug in the async self-test.
 
-I see where the problem is.  Unfortunately this is not a regression,
-but instead we've managed to identify an existing bug.
+Instead this appears to be a real bug that was discovered by the
+async testing (because we now run all the tests at the same time,
+thus testing the whether the driver deals with parallel requests
+or not).
 
-The cesa driver is buggy when you invoke it in parallel.  This
-would've previously resulted in incorrect hashes being produced,
-which would not be easily discoverable (networking users would
-simply retry if they hit this, while storage probably doesn't
-use these algorithms at all).
+This is a bit accidental, because the driver in question registered
+multiple hash algorithms.  Had it only registered one, then nothing
+would have changed.
 
-What happened here is that the new async testing launches all
-built-in algorithm self-tests at the same time and in parallel.
-Previously self-tests of built-in algorithms were launched one-by-one
-so there is only ever one test in flight at any moment.
-
-This causes the cesa driver to be invoked in parallel, thus
-triggering the buggy code where two hash requests would be submitted
-to the hardware at the same time.
-
-So I think it's a good thing that the self-test has managed to
-discover this by itself and the result is also harmless, the buggy
-algorithms are disabled.
-
-I'll try to fix this but it's going to take some effort and I'll need
-your help as I don't have the hardware myself.
+Is this something that we could improve in testmgr? Perhaps we can
+add a bit of parallelism ourselves to cover the case where a driver
+only registers one hash algorithm.
 
 Cheers,
 -- 
