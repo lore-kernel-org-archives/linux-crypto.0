@@ -1,188 +1,163 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A52401E0084;
-	Tue,  8 Oct 2024 20:13:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99107215003
+	for <linux-crypto@vger.kernel.org>; Tue,  8 Oct 2024 20:38:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728418432; cv=none; b=JiG3QMX05ztog4aWdIkX+Pih4QrMMK/wUR1OAVXuQM4/aHf9eDCaTSUfLfuZHWFgE1Z2Z3ZJSaAYp+1jkulGoLj+sroj1JfKYNz3/7NFbmh+o6QaG6hdRxrlRqlwaM2fvfdUCeaJtWj5J0X9nbDIEsvfvqQ6q8ynIuGlBtRNAUc=
+	t=1728419890; cv=none; b=VdJM+gmikBEx4DELvj/jYDq9aUoXoL+ebxi9pEFGIvkWzRzZQk32s//Sw8BTyR+gHYZDpDkXdfT9gHDHGX19sVFRFZXzqWjYrCADkpS9NQrBtONzwVlYVobfosMzltLkeosJ/E/Bsm2+I+vlhF3oXh0NQhTOdhPljOMvPp0S0bk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728418432; c=relaxed/simple;
-	bh=I/DZ9lnQOuBt/9V2BmOL3gHe+sJH5lYhN2OxzJdXjww=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
-	 In-Reply-To:Content-Type; b=bPZZtkSOCTTpC+UIjaqNT5TJnHDFZrL2b9KH7Vd8aFcd3sDRHYIS5XM8a6I89XUczgBte8g23kTImM8caUWp73EimNf7qrLQP4IftnByjaxq6L/h/V9PYvEsHVjvb+S5nn1eJWO8FJ4N4w7MR/ZV5maSQq6ukVufj9na4R8ekJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=fVn8BvqR; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1728419890; c=relaxed/simple;
+	bh=jBKc56vBxPYaOUWcC+VFZKlnp8sdizUoPysD1KL2n2Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R9hxaFCZfFLwnFxoE8pcsaXAydYU0GwOgr6rmCIpMx5h37u2P1xfx0CYRFXuLNDr9PGcovNB3FjmTovUUbKSdbeWgDCwU6ohDhLNESS2h6hWDxuFyTM1f5joi0uLr58h9u/KFnYHmubIdTLd+NWQR8uJat4+UppM/s1D+YqgT2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=18fWZBkO; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="fVn8BvqR"
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 498ALTQA000686;
-	Tue, 8 Oct 2024 20:08:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	p+BG68dSqKZgJmv0l0cKbSJIH0F3D9hqmRfeyh2Yzuc=; b=fVn8BvqRKXQ6mQcO
-	D8QKaKOAl7yO91WkKaMzHSPfQAUp1Qjbx0AmNJjr/Wsqm4xgWAKGkz1fl0J4uEzW
-	m4euxwgJpuOHGHHMBomemVG9+e3hqB3xZR8TTzHUSTwQV6w0ZhTweChTVVaT+Zyt
-	K8uWCb5v1Fd+QGlJjk8A6KTNa6zHXMUbCgwkNaveg1h0P0Bt1lwjMtNh8NrrLQX5
-	Z9nNmwXpL6NA4MNwRNOnBlK5SCaNwfU/Oi08pR0k/gKxqS3MKR951PwoCfYfQr56
-	RGvOaWeM/PKG2LE/Yq+mZeB+XzBk/uepdnlKZl7+5AtUjvAEFDkESgDrhOKmO6Su
-	FLHlAg==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4252wssmq1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 08 Oct 2024 20:08:41 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 498K8eeL011507
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 8 Oct 2024 20:08:40 GMT
-Received: from [10.226.59.182] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 8 Oct 2024
- 13:08:40 -0700
-Message-ID: <00a837bc-b793-5e50-af38-633a0e6a35bf@quicinc.com>
-Date: Tue, 8 Oct 2024 14:08:39 -0600
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="18fWZBkO"
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a9951fba3b4so404169666b.1
+        for <linux-crypto@vger.kernel.org>; Tue, 08 Oct 2024 13:38:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1728419885; x=1729024685; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jBKc56vBxPYaOUWcC+VFZKlnp8sdizUoPysD1KL2n2Y=;
+        b=18fWZBkO9cDHNP5XkQ39MRLClR2iDC1zySqkncD3SsZKu5Rgs7Dl8pH8lKJp2p962M
+         ZQCXVVOIGzjU5UY81OJcQw0kiLkVxi82epBgL4dI4RqabJSCfzsJV/w4rEU39jnWCoY7
+         yG6e+6Huic3MWrYC1oSE1/3jjgRJEPNAKN3ZTXu7yDRI5rDcTHA6JVJ03K88LUsNIndN
+         hxu1wyd0FmRvkB0XvGhYzl60f9BZXhmzkblJFg6rToFyXPRB5BLZ/aQ9AquxPwlKwAUC
+         26vZdSJyysWVJfHabIaR2zJD8Gkd7meZi0reyXepjlExZa64VCzKDkCcaGkjDZZZyvzq
+         ni5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728419885; x=1729024685;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jBKc56vBxPYaOUWcC+VFZKlnp8sdizUoPysD1KL2n2Y=;
+        b=KnIp3b2czfa28nzc5ll6mxSg5SJiVsWgtHrZzBfocmrbvna3WlA0NbNXY9jjiW6L4K
+         tOgXaBcPdxMMTcltSAvUHOoY9v57K+G1mMT7ZsjjVaXKqtcihskCGd2a7ynavYr1fbp4
+         V+jefVIxpkgtlrAwK+yxWaoAgBZEuWPhoWpiYuV3kidRvpZnvhYUPC3pJYUU3jLvdEsY
+         K+jqME5b0io/oTLiOtuy58ZRC//nRDmA3P1djSWSIRVpousq+z/0+X69kT6OysYnLdJr
+         bRh78xwiF0vrgyyBHhidzasGueaskYax9cGPW7e+0+Tnzcu58LKXk2jFTGaPefaoAy5v
+         XXXg==
+X-Forwarded-Encrypted: i=1; AJvYcCVe01nCpH9gNeZXwAP9VFZ1v5TDD8wTGA1Rd8j0Y/PlFbn5tsOmUExaul4V1kGa5mukSphNQJixibBxLzA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yypox8OvCK2GjJDRjJISqQNP7yLY2Sn24f4WO9qaFScqGa/EpyO
+	1HhVxzk0GqVP9Zp3AAPq4Z9MraNXIakSpA08iHs12k4ucyiko2BXtPC1vxJ8JUA=
+X-Google-Smtp-Source: AGHT+IFQsuFQDnMORn6KRqls83kXMRALTmz1xji/Zv3nzyXsaV17OwyYMIY5gtZ7u9n9SjQRNHRlFg==
+X-Received: by 2002:a17:907:94d4:b0:a8d:250a:52b2 with SMTP id a640c23a62f3a-a998d114bbemr3268366b.6.1728419884897;
+        Tue, 08 Oct 2024 13:38:04 -0700 (PDT)
+Received: from localhost ([2a02:8071:b783:6940:c420:a9b6:c5e1:5b65])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a996274deeesm196971266b.103.2024.10.08.13.38.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Oct 2024 13:38:04 -0700 (PDT)
+Date: Tue, 8 Oct 2024 22:38:02 +0200
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
+To: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+Cc: Ulf Hansson <ulf.hansson@linaro.org>, 
+	Sakari Ailus <sakari.ailus@linux.intel.com>, dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org, 
+	linux-bluetooth@vger.kernel.org, linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	dmaengine@vger.kernel.org, linux-gpio@vger.kernel.org, amd-gfx@lists.freedesktop.org, 
+	nouveau@lists.freedesktop.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-i2c@vger.kernel.org, linux-i3c@lists.infradead.org, 
+	linux-iio@vger.kernel.org, linux-input@vger.kernel.org, patches@opensource.cirrus.com, 
+	iommu@lists.linux.dev, imx@lists.linux.dev, linux-mediatek@lists.infradead.org, 
+	linux-media@vger.kernel.org, linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org, 
+	netdev@vger.kernel.org, linux-wireless@vger.kernel.org, linux-pci@vger.kernel.org, 
+	linux-phy@lists.infradead.org, linux-pwm@vger.kernel.org, linux-remoteproc@vger.kernel.org, 
+	linux-sound@vger.kernel.org, linux-spi@vger.kernel.org, linux-staging@lists.linux.dev, 
+	linux-usb@vger.kernel.org, linux-serial@vger.kernel.org, greybus-dev@lists.linaro.org, 
+	asahi@lists.linux.dev, rafael@kernel.org, Andy Shevchenko <andy.shevchenko@gmail.com>
+Subject: Re: [PATCH 00/51] treewide: Switch to __pm_runtime_put_autosuspend()
+Message-ID: <ttmnzgsdyng5vab63pvj7csrotbsmwnultjelvdotrvyg2snac@iv7afgect5f3>
+References: <20241004094101.113349-1-sakari.ailus@linux.intel.com>
+ <CAPDyKFp0N6UJhnHS164Tdf=xkWB0jzq65L9TdvYazeBQ-6WjeQ@mail.gmail.com>
+ <20241007184924.GH14766@pendragon.ideasonboard.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.0
-Subject: Re: qcom-rng is broken for acpi
-Content-Language: en-US
-From: Jeffrey Hugo <quic_jhugo@quicinc.com>
-To: Brian Masney <bmasney@redhat.com>
-CC: =?UTF-8?Q?Ernesto_A=2e_Fern=c3=a1ndez?= <ernesto.mnd.fernandez@gmail.com>,
-        Trilok Soni <quic_tsoni@quicinc.com>, <linux-crypto@vger.kernel.org>,
-        "Herbert Xu" <herbert@gondor.apana.org.au>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        <linux-arm-msm@vger.kernel.org>,
-        Om Prakash Singh
-	<quic_omprsing@quicinc.com>
-References: <20240828184019.GA21181@eaf>
- <a8914563-d158-4141-b022-340081062440@quicinc.com>
- <20240828201313.GA26138@eaf>
- <CABx5tq+ZFpTDdjV7R5HSEFyNoR5VUYDHm89JEHvKb-9TW6Oejw@mail.gmail.com>
- <f6075361-1766-35a5-c7ac-cc3eb416a4e1@quicinc.com>
- <CABx5tqJomV_Su2NmyBBgipOiiby5sF7LAo_kdvhYT6oNYwVpVA@mail.gmail.com>
- <da23b318-1d65-c001-1dc2-8ba66abe9d6f@quicinc.com>
- <e6299c6d-dc18-eb05-2af5-8f8d885831c9@quicinc.com>
- <CABx5tqKWNCoE_9-MX+9unVLK8eqaJZiK6SC2RWMXDRzVayQLkQ@mail.gmail.com>
- <7f735c0e-d052-15ed-8db8-214881811816@quicinc.com>
-In-Reply-To: <7f735c0e-d052-15ed-8db8-214881811816@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: kg_tjQSn2K3NYNIgnmnvYMbzlZlgtr7u
-X-Proofpoint-GUID: kg_tjQSn2K3NYNIgnmnvYMbzlZlgtr7u
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- mlxlogscore=999 priorityscore=1501 spamscore=0 mlxscore=0 suspectscore=0
- impostorscore=0 malwarescore=0 bulkscore=0 clxscore=1011 adultscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2410080130
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="2ocqjla6tcmukjn3"
+Content-Disposition: inline
+In-Reply-To: <20241007184924.GH14766@pendragon.ideasonboard.com>
 
-On 9/17/2024 3:24 PM, Jeffrey Hugo wrote:
-> On 9/16/2024 1:40 PM, Brian Masney wrote:
->> On Mon, Sep 16, 2024 at 1:42 PM Jeffrey Hugo <quic_jhugo@quicinc.com> 
->> wrote:
->>> Bisect pointed to the following which makes zero sense -
->> [snip]
->>> I wonder if bisect-ability got broken somehow.
->>>
->>> I'm going to try to do a bit of a manual bisect to see if I can avoid
->>> whatever glitch (possibly self induced) I seem to have hit.
->>
->> I've seen this happen if the error is due to a race condition and only
->> happens part of the time. When you are testing a kernel, try booting
->> the system up to 3 times before you run 'git bisect good' against a
->> particular iteration.
-> 
-> Found some issues with my initial bisect effort.
-> 
-> New run points to:
-> 
-> commit 1b0e3ea9301a422003d385cda8f8dee6c878ad05
-> Author: Yicong Yang <yangyicong@hisilicon.com>
-> Date:   Mon Aug 14 21:16:42 2023 +0800
-> 
->      perf/smmuv3: Add MODULE_ALIAS for module auto loading
-> 
->      On my ACPI based arm64 server, if the SMMUv3 PMU is configured as
->      module it won't be loaded automatically after booting even if the
->      device has already been scanned and added. It's because the module
->      lacks a platform alias, the uevent mechanism and userspace tools
->      like udevd make use of this to find the target driver module of the
->      device. This patch adds the missing platform alias of the module,
->      then module will be loaded automatically if device exists.
-> 
->      Before this patch:
->      [root@localhost tmp]# modinfo arm_smmuv3_pmu | grep alias
->      alias:          of:N*T*Carm,smmu-v3-pmcgC*
->      alias:          of:N*T*Carm,smmu-v3-pmcg
-> 
->      After this patch:
->      [root@localhost tmp]# modinfo arm_smmuv3_pmu | grep alias
->      alias:          platform:arm-smmu-v3-pmcg
->      alias:          of:N*T*Carm,smmu-v3-pmcgC*
->      alias:          of:N*T*Carm,smmu-v3-pmcg
-> 
->      Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
->      Link: 
-> https://lore.kernel.org/r/20230814131642.65263-1-yangyicong@huawei.com
->      Signed-off-by: Will Deacon <will@kernel.org>
-> 
->   drivers/perf/arm_smmuv3_pmu.c | 1 +
->   1 file changed, 1 insertion(+)
-> 
-> 
-> This one seems to make a bit more sense, and reverting it does make the 
-> prints go away.  Feels like either the driver is getting triggered 
-> earlier, or wasn't getting triggered before at all.
-> 
-> I plan to come back to this later in the week to dig more.
 
-Or apparently 3 weeks later since life has a funny way of having other 
-plans.
+--2ocqjla6tcmukjn3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Prior to the above change, the arm_smmuv3_pmu module can be manually 
-loaded via modprobe, and the same errors will appear.  This looks like 
-an existing issue, that was just made visible, rather than something 
-"newly" introduced.
+Hello,
 
-arm_smmuv3_pmu is failing to obtain the second resource.  It is 
-consuming a device that is created by the IORT table parser - 
-drivers/acpi/arm64/iort.c
+On Mon, Oct 07, 2024 at 09:49:24PM +0300, Laurent Pinchart wrote:
+> On Fri, Oct 04, 2024 at 04:38:36PM +0200, Ulf Hansson wrote:
+> > On Fri, 4 Oct 2024 at 11:41, Sakari Ailus <sakari.ailus@linux.intel.com=
+> wrote:
+> > >
+> > > Hello everyone,
+> > >
+> > > This set will switch the users of pm_runtime_put_autosuspend() to
+> > > __pm_runtime_put_autosuspend() while the former will soon be re-purpo=
+sed
+> > > to include a call to pm_runtime_mark_last_busy(). The two are almost
+> > > always used together, apart from bugs which are likely common. Going
+> > > forward, most new users should be using pm_runtime_put_autosuspend().
+> > >
+> > > Once this conversion is done and pm_runtime_put_autosuspend() re-purp=
+osed,
+> > > I'll post another set to merge the calls to __pm_runtime_put_autosusp=
+end()
+> > > and pm_runtime_mark_last_busy().
+> >=20
+> > That sounds like it could cause a lot of churns.
+> >=20
+> > Why not add a new helper function that does the
+> > pm_runtime_put_autosuspend() and the pm_runtime_mark_last_busy()
+> > things? Then we can start moving users over to this new interface,
+> > rather than having this intermediate step?
+>=20
+> I think the API would be nicer if we used the shortest and simplest
+> function names for the most common use cases. Following
+> pm_runtime_put_autosuspend() with pm_runtime_mark_last_busy() is that
+> most common use case. That's why I like Sakari's approach of repurposing
+> pm_runtime_put_autosuspend(), and introducing
+> __pm_runtime_put_autosuspend() for the odd cases where
+> pm_runtime_mark_last_busy() shouldn't be called.
 
-arm_smmu_v3_pmcg_init_resources() has a relevant comment for this issue-
+That's ok for me. However this patch series isn't the optimal path to
+there because most drivers (i.e. those that already today do
+pm_runtime_mark_last_busy() in combination with
+pm_runtime_put_autosuspend()) have to be patched twice.
 
-/*
-  * The initial version in DEN0049C lacked a way to describe register
-  * page 1, which makes it broken for most PMCG implementations; in
-  * that case, just let the driver fail gracefully if it expects to
-  * find a second memory resource.
-  */
+The saner route is: Only convert the drivers with a sole
+pm_runtime_put_autosuspend() (i.e. without pm_runtime_mark_last_busy())
+to __pm_runtime_put_autosuspend(). Then add the mark_last_busy() bits to
+pm_runtime_put_autosuspend() and then drop the explicit calls to
+pm_runtime_mark_last_busy() before pm_runtime_put_autosuspend().
 
-Checking the IORT implementation, we do advertise revision 0.  I'm not 
-certain, but I'm guessing this spec update occurred after the last 
-firmware release of QDF2400.  I believe a FW update is unlikely so I 
-suspect the options are -
+(Note this doesn't take into account Rafael's position that
+pm_runtime_put() might be the saner option. My argument applies for that
+conversion analogously.)
 
-1. Ignore the errors
-2. Disable the driver on this platform
-3. Use the ACPI initramfs override feature to silence the errors at the 
-IORT table
+Best regards
+Uwe
 
-Probably not the resolution we'd like, but this does feel like a final 
-conclusion.
+--2ocqjla6tcmukjn3
+Content-Type: application/pgp-signature; name="signature.asc"
 
--Jeff
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmcFmCEACgkQj4D7WH0S
+/k6xnwf/QOZhbtT562rFFa3JIiBatDxTcqyEXoXClrP7jSyQFY/VFzq2S2jRHOFt
+wM6zQUX1bTUqDtC4HozJIbQDjLxd3qFgc5RoTRLV8VhRJbcq9cOo5Nf1h4KJ5Ip9
+nhpzoHwUHoEjEHj1f9UvEWfnFAVCSLFxgb14ZDHZyb2pQue3G5OYI2f2cJYT8YVB
+xQktDFp7rUu4xWDTzoIxNKvR1Ipy5fGxdf9R2/+IQhW64sWuDG2ZH6tAmfn6mEb8
+ecspbesJx+NMbZ06Zl7wqBvyj/DpQGgPaCnWUQ5cI0Of/kOzqxh4+65JK68CLLs0
+/Goin2zz55IZITGC5zHuAA07bW/c7Q==
+=7Wup
+-----END PGP SIGNATURE-----
+
+--2ocqjla6tcmukjn3--
