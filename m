@@ -1,87 +1,67 @@
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1691F16EB42;
-	Tue,  8 Oct 2024 06:29:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+Received: from cmccmta1.chinamobile.com (cmccmta2.chinamobile.com [111.22.67.135])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 057122038BD;
+	Tue,  8 Oct 2024 07:22:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.22.67.135
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728368972; cv=none; b=jNiXF+MmEp2qMxPsyoGmDEfGFIjEcIyQhgoK2FTiWYbJZekrGxncclwUqzCZ/FWr+IFQedT3HVgb79/XfN+/drSpl7h+3bFGv+jNOaFD7Mv3dmDgxY9slkCF4o9olzdPMF13YCGoEVSokoDQkKAGnlFebOV0iGCE6SUH8SOnm90=
+	t=1728372179; cv=none; b=jUxclQTk7H9VhqcPl7Kp6aAdOrIi7adTVkYH2uh5rjJnxNzELjjF7kRjjF5pffdVIv+nW9f34+lpwgG45OUW/GkWE0EK+JuN/MJLN79zPLqLiKdNoR2NB+QyR3pYYbLLuUk/lFIEa5+Lqrptx9oVJCz+HMM96stVScmwCQ+ZaqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728368972; c=relaxed/simple;
-	bh=A+XGWibJ5wCrMh61FWIyGIproZa6J8qxhLcDAG1RBQE=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=Eo1u1nMZa/7OUICLwy298oreTObPgTMqDrLPfJk7G/UBccneh8Nd0Krvpidvd6v0aJ7Ij5LuVCUUhlw093UstXsufvYaBP989fW5Q/zo+j21Zlz08RkZG9Dzj67O8xxTuLlOkyL7841E41BDFU5564jCbitpulzDdJz7l1TVagI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=dxDLcK24; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="dxDLcK24"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1728368967;
-	bh=IsQ+J2Ndan5azomYips/VhPYX5BYOhyuF7G1A+/FGU0=;
-	h=Date:From:To:Cc:Subject:From;
-	b=dxDLcK24zmebYiYL0lA4LfvEyOo+pA9kn3oP7KHhiUY02PGCBCX4mmt844wTOy+xc
-	 icrWRsJshObaXdSLZS/RVlHVRMNNT6ZTZuuLaLyosxg5jKpWI+X1Ztj78BiLqo8Trw
-	 yhkqhiLVCJDg7+UdBHFfZDzR4akU8QCrzVaobpYR7uaesS0LwCnOe73WBwhNcTTER3
-	 Tzt0Fbw6Pt/wWT+xyIMC0Y93cq/Moc3XOcRS6TDfuHEGuk9/bQVj2CwJCJCc6AqS3m
-	 dUe14ijJAf3/ep4ZwAwv5d1bejLBSX75Y5GdJ2LMOH1zmh08IQSprNsIZFnUx1MVgY
-	 jsB4PwOde6ptg==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4XN5hk1N0Vz4wb0;
-	Tue,  8 Oct 2024 17:29:26 +1100 (AEDT)
-Date: Tue, 8 Oct 2024 17:29:26 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Herbert Xu <herbert@gondor.apana.org.au>, Linux Crypto List
- <linux-crypto@vger.kernel.org>
-Cc: Lukas Wunner <lukas@wunner.de>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: build warning after merge of the crypto tree
-Message-ID: <20241008172926.0b995ea7@canb.auug.org.au>
+	s=arc-20240116; t=1728372179; c=relaxed/simple;
+	bh=UuLI0zDrCi7LCedc02GhHPMfdvFyZ3e4qegkfmmgw2g=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=W9nYxMR1RXsrVAEalbIyYByWKOPT4vvh7SDHxWSjR+UfhILUt0CTbvKv+dKUxL6as8wb+Ugxbbpcn4uS4xHU89feNllSviM7Zk19VGzhg5pYSt0BstdSv0PjEw7sjXC6HKPzTnIeo6PfLHtpmqwCXBm10ILx/as/cYMefsJPhPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cmss.chinamobile.com; spf=pass smtp.mailfrom=cmss.chinamobile.com; arc=none smtp.client-ip=111.22.67.135
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cmss.chinamobile.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cmss.chinamobile.com
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG:00000000
+Received:from spf.mail.chinamobile.com (unknown[10.188.0.87])
+	by rmmx-syy-dmz-app03-12003 (RichMail) with SMTP id 2ee36704ddcbfbc-b07cc;
+	Tue, 08 Oct 2024 15:22:51 +0800 (CST)
+X-RM-TRANSID:2ee36704ddcbfbc-b07cc
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG:00000000
+Received:from ubuntu.localdomain (unknown[10.55.1.71])
+	by rmsmtp-syy-appsvr04-12004 (RichMail) with SMTP id 2ee46704ddca1cd-93490;
+	Tue, 08 Oct 2024 15:22:51 +0800 (CST)
+X-RM-TRANSID:2ee46704ddca1cd-93490
+From: Zhu Jun <zhujun2@cmss.chinamobile.com>
+To: olivia@selenic.com
+Cc: herbert@gondor.apana.org.au,
+	zhujun2@cmss.chinamobile.com,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] drivers/histb-rng: Fix the wrong format specifier
+Date: Tue,  8 Oct 2024 00:22:48 -0700
+Message-Id: <20241008072248.12681-1-zhujun2@cmss.chinamobile.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/TKdfoFQeWsZjzjQG8m9Jph0";
- protocol="application/pgp-signature"; micalg=pgp-sha256
 
---Sig_/TKdfoFQeWsZjzjQG8m9Jph0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+The format specifier of "unsigned int" in printf() should be "%u", not
+"%d".
 
-Hi all,
+Signed-off-by: Zhu Jun <zhujun2@cmss.chinamobile.com>
+---
+ drivers/char/hw_random/histb-rng.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-After merging the crypto tree, today's linux-next build (htmldocs)
-produced this warning:
+diff --git a/drivers/char/hw_random/histb-rng.c b/drivers/char/hw_random/histb-rng.c
+index f652e1135e4b..1b91e88cc4c0 100644
+--- a/drivers/char/hw_random/histb-rng.c
++++ b/drivers/char/hw_random/histb-rng.c
+@@ -89,7 +89,7 @@ depth_show(struct device *dev, struct device_attribute *attr, char *buf)
+ 	struct histb_rng_priv *priv = dev_get_drvdata(dev);
+ 	void __iomem *base = priv->base;
+ 
+-	return sprintf(buf, "%d\n", histb_rng_get_depth(base));
++	return sprintf(buf, "%u\n", histb_rng_get_depth(base));
+ }
+ 
+ static ssize_t
+-- 
+2.17.1
 
-include/crypto/akcipher.h:1: warning: 'Generic Public Key API' not found
 
-Introduced by commit
 
-  6b34562f0cfe ("crypto: akcipher - Drop sign/verify operations")
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/TKdfoFQeWsZjzjQG8m9Jph0
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmcE0UYACgkQAVBC80lX
-0Gx2Jgf/WDUiJIcjrFaksEaWx9KdSvYBu8riWCF5SU5pejpslre9D5fmcb+g3Mni
-RuqjNHjSxLqm/cO1PQjSWjyJhy6MVZtXKa0a0jlDxKHZx1KZfLepRMgUHh4oCKL2
-GYZcVG9fCT9nZdWeHesgtehw9mmu1KUkzVasD4dPUXm4nkEeL/VQtXHOyl1hssHZ
-3h9L7kRJE5gA5k6Y0NJPyDPxlNjXayNpYCEmC0/3h69KzPEkMWNWfKdxrotx0gDB
-o9J+61AEKytmqa+4ZtxrHiDkVy322U85EA8iErgcZTWanJK6o3b+ffUnbEcJDqia
-9rp+JPbMrz+otMlPkRznOA56vUYcbA==
-=Xrjb
------END PGP SIGNATURE-----
-
---Sig_/TKdfoFQeWsZjzjQG8m9Jph0--
