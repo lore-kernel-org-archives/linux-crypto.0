@@ -1,183 +1,188 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C67A220B1E5;
-	Tue,  8 Oct 2024 18:25:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A52401E0084;
+	Tue,  8 Oct 2024 20:13:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728411908; cv=none; b=iY4WxDlRVJ4m4OGBPQ1ELg85C6r0yZ+QDYeTfC1N+NEWbdte9IXY2ireisz0C8oJQSkjTtmfLl2Fawg/WyizRNiveUVThcMuOPPd37ItABn/GUNRI29vPt51qdQprLEIZJBhrKNxN2e0Eh524SuD1DrWZlkspZUJ0ccktCXb7Mk=
+	t=1728418432; cv=none; b=JiG3QMX05ztog4aWdIkX+Pih4QrMMK/wUR1OAVXuQM4/aHf9eDCaTSUfLfuZHWFgE1Z2Z3ZJSaAYp+1jkulGoLj+sroj1JfKYNz3/7NFbmh+o6QaG6hdRxrlRqlwaM2fvfdUCeaJtWj5J0X9nbDIEsvfvqQ6q8ynIuGlBtRNAUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728411908; c=relaxed/simple;
-	bh=gbTLwyB5anW/NVNa27O4GYEgcT7Zt8zwGlDOBl4w9X4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DSjJ3y7jGCHPN0opTgBqBhLeVfPa0Y6k3x4lo2gFVhGf+YIXbRfaJHdkCYrJtWpj41BhLpVVGwnlq+UUDc0oVHa4+ULwK2vSOh9Iihv9qEZD8L1PG01Wuw4lQNgus1HhQsHBqwrmhWFcAPQIDmycPDt0RIAoPq6xgw5TFhRiC+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QWv3+c7h; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1728418432; c=relaxed/simple;
+	bh=I/DZ9lnQOuBt/9V2BmOL3gHe+sJH5lYhN2OxzJdXjww=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
+	 In-Reply-To:Content-Type; b=bPZZtkSOCTTpC+UIjaqNT5TJnHDFZrL2b9KH7Vd8aFcd3sDRHYIS5XM8a6I89XUczgBte8g23kTImM8caUWp73EimNf7qrLQP4IftnByjaxq6L/h/V9PYvEsHVjvb+S5nn1eJWO8FJ4N4w7MR/ZV5maSQq6ukVufj9na4R8ekJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=fVn8BvqR; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QWv3+c7h"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 579F8C4CED3;
-	Tue,  8 Oct 2024 18:25:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728411907;
-	bh=gbTLwyB5anW/NVNa27O4GYEgcT7Zt8zwGlDOBl4w9X4=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=QWv3+c7hgheNar52dT93kuaRJqQGwrTlm+2qt+dJoGyQzAHIgU0jubrC8ThWhyZIZ
-	 RS8ECJijkXPnKWXZt/DHYo4oNlel2cdA7QmeMfgDuBLkCfLLpl6vQcl4DNTcV5EyFH
-	 5h8XYKukhwE21LUBMtMTij4WxRmO6XhWfjQaEwayPWgg9ncS5s6vbgtpgFKR2d4Ze1
-	 U8RaeSIFzvB8vNoypQgBEdP43kZiPZVbc5vt/+kjhif0hCbio5j23Z7Fbcd2MdU+Eu
-	 u4mqS8NwdiP912BRPYfCL4ckK1zD9U7UpC3cflIOLH9kTp0r9qM6ScGNZWHbmYuBvP
-	 5BPH6goJRp7XQ==
-Received: by mail-oo1-f45.google.com with SMTP id 006d021491bc7-5e5d0a80db4so3217626eaf.3;
-        Tue, 08 Oct 2024 11:25:07 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCU3C3tK00jRXhoDZ96Dzj87jGGWiyg2EPXq2wo8twXZRCit9AeTBQH0qi7g71NeR3ndkIDf6zbCO2tCxOF3Go0=@vger.kernel.org, AJvYcCUD9UjTrJPYFCwGiVUYkyUEeZBiugwoiKWgkR6f1ZvJQUXSh7pQwb/ehWVwZSj34Obki6ROqP4T+Nwp@vger.kernel.org, AJvYcCUPVbBzCw6zvLiCONNyI1ddGYtUzA+MHpEDBCAsW6t6M65XCOKNj56eshvi2CmN/CpJORuxiTRooGbqUVBR1clH@vger.kernel.org, AJvYcCUafMoirgA3e5dJkDINiZqnh5qLjlbeI47XxJzi6PBgWdYgzJC00+bADWoklUhSt3fTGKXgi/2b7Cs=@vger.kernel.org, AJvYcCUdD/AhSYyBNDirh3PISBiwwXRNURiDVDcxQf77QQEDXCi3oTIY1JW+fz4/Zi5cCG7IsIVcnpYom8xN0XA=@vger.kernel.org, AJvYcCVKjPj8S9Cx++kzEGvwFgrQJ5Ii5xMsQlR05NMOg45G5iaauB8vEZpCTeJI6P5uFkoXKuBGJDKCo+nem6s=@vger.kernel.org, AJvYcCVL45VzJJc9nt6spfbiiO6L9DTnzo7i3yke7UoO/oTfZAtHo/vlmCCdXaBDUIv/E6ydRcx/oQplLjjzoA7H@vger.kernel.org, AJvYcCVMz5l8ZPHKtmjYCxJBkY4DRurKhkDBubjnyu3jKklDdLaVd6ej5iYbecElBzbNN/lfRjj4gAvLQyjH@vger.kernel.org, AJvYcCVTcIwXSAUbucn8TVDe1qx0PSHPmATijxKPLeBF/liopYXcLQ8ScAgnF3Yqj0X5rhu4cG5E48jqB8mc@vger.kernel.org, AJvYcCWClUGOO7yG560xUvaFYQCo7slmKdQbsRUjiXB1uhxLvpc+HouPwj4fFoi+FEBisNLRNDd1VQVWiaYj@vger.kernel.org, AJvYcCWOEzBzz0LjlFp6HFvZ11F5QnLq5gjO/21J41JjqVltZc+rpksNlzjeDYalgS79mIC58zE0xBoS@vger.kernel.org, AJvYcCWULSQYYztWyt0PcUroL3N0kIvSh9DCjJZM98nMzpRDokvJjojrZrBiVQDakYuM4uzVnRAV/gE1Sxxi@vger.kernel.org, AJvYcCWgM7Gzxm3gksn1fv9oUHSIJdAhDMK/c6wMzi8J+4YrDwp7epUQPKTEk0BxwOgVby4JbrU4dCZLlTRV@vger.kernel.org, AJvYcCWgXdWexWcVGuVAFwrVWY48r1t9Edbc4p9omIYy5/zgYxMqkiS5sbXJiYfIIlbuXNrhESuKJGWJvHyDiA==@vger.kernel.org, AJvYcCWxiJ/5XtFlUli+/zTZtnfq87fGeioVam9UlDjBmhZoMk8Gu976EkD63HnmmqLXDlr7LvNr4HVIJH9Ql2A7Ryfy/w==@vger.kernel.org, AJvYcCX3ch1TTIOzPm7XF+W4zOr7q8QsmZwzR1oJ6GKkz9XQ7vvlp/fHRjHux9+g6nUd4Z7CK8d5lW0ih6JDg28p@vger.kernel.org, AJvYcCX53X85N4Ri3qdiFm276KT5SNw18oK2Tre6x/w5VUfxRK+Pdh/J9GkRjmO26bM+wd3NMHx4AZ25PlEO@vger.kernel.org, AJvYcCX6L4fi/TdH5zDCtPYXvMzGM/qWvxLz34wO/6FzIoBhCYOEckc7qxU6Wy8CYN8mt+zVyjyO7nLMlK+3@vger.kernel.org, AJvYcCXCupac8c380ExASXZG1cOW3GSRrTD4pOsNa//Ehzy7Mc9+nhrMK91rRqiQYYUUNzHoUj4qEvu62hzFjFM=@vger.kernel.org, AJvYcCXN28OzyeGZgOPyw9ddKIIB6Tx6vMl50ZBIBrdKVVHELeHm6OnE7vFC/CpfnJolMr7yZJBzEiCuiH6TWjk1@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDtei8K4c+yglZWIg+wthGPZHkZ7UnsIQmNflJFGICsDhc9KZf
-	6UGNS75k6Og3dhkPiDn96OjfZNpuVrvIjIr8L8jxLZ+rzJat6qBtCvWOpeT+mLhY8C7hDo0/oWm
-	HENFfnjpCC32JdxMZanz8yplv9AQ=
-X-Google-Smtp-Source: AGHT+IE8/UzrmOfg0dgL+a7sFpnmZmTmVZlVfZVXeH9h9sR6Zbx0f+k3/XHDUWx/NQFfJo1odWsZ7gtN5j50xL2u+GA=
-X-Received: by 2002:a05:6820:228e:b0:5e1:d741:6f04 with SMTP id
- 006d021491bc7-5e7cc079979mr12626737eaf.3.1728411906564; Tue, 08 Oct 2024
- 11:25:06 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="fVn8BvqR"
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 498ALTQA000686;
+	Tue, 8 Oct 2024 20:08:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	p+BG68dSqKZgJmv0l0cKbSJIH0F3D9hqmRfeyh2Yzuc=; b=fVn8BvqRKXQ6mQcO
+	D8QKaKOAl7yO91WkKaMzHSPfQAUp1Qjbx0AmNJjr/Wsqm4xgWAKGkz1fl0J4uEzW
+	m4euxwgJpuOHGHHMBomemVG9+e3hqB3xZR8TTzHUSTwQV6w0ZhTweChTVVaT+Zyt
+	K8uWCb5v1Fd+QGlJjk8A6KTNa6zHXMUbCgwkNaveg1h0P0Bt1lwjMtNh8NrrLQX5
+	Z9nNmwXpL6NA4MNwRNOnBlK5SCaNwfU/Oi08pR0k/gKxqS3MKR951PwoCfYfQr56
+	RGvOaWeM/PKG2LE/Yq+mZeB+XzBk/uepdnlKZl7+5AtUjvAEFDkESgDrhOKmO6Su
+	FLHlAg==
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4252wssmq1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 08 Oct 2024 20:08:41 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 498K8eeL011507
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 8 Oct 2024 20:08:40 GMT
+Received: from [10.226.59.182] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 8 Oct 2024
+ 13:08:40 -0700
+Message-ID: <00a837bc-b793-5e50-af38-633a0e6a35bf@quicinc.com>
+Date: Tue, 8 Oct 2024 14:08:39 -0600
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241004094101.113349-1-sakari.ailus@linux.intel.com>
- <CAPDyKFp0N6UJhnHS164Tdf=xkWB0jzq65L9TdvYazeBQ-6WjeQ@mail.gmail.com>
- <20241007184924.GH14766@pendragon.ideasonboard.com> <CAPDyKFpQVnF7eQv3dup8k-3EijnMjuveCG9sZ=Rpey1Y6MBJEg@mail.gmail.com>
- <20241007222502.GG30699@pendragon.ideasonboard.com> <CAPDyKFrGNwna6Y2pqSRaBbRYHKRaD2ayqQHLtoqLPOu9Et7qTg@mail.gmail.com>
-In-Reply-To: <CAPDyKFrGNwna6Y2pqSRaBbRYHKRaD2ayqQHLtoqLPOu9Et7qTg@mail.gmail.com>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Tue, 8 Oct 2024 20:24:55 +0200
-X-Gmail-Original-Message-ID: <CAJZ5v0jvJyS7D5-wURi2kyWN-rmNa+YqupeQJ000pQRVd9VBcQ@mail.gmail.com>
-Message-ID: <CAJZ5v0jvJyS7D5-wURi2kyWN-rmNa+YqupeQJ000pQRVd9VBcQ@mail.gmail.com>
-Subject: Re: [PATCH 00/51] treewide: Switch to __pm_runtime_put_autosuspend()
-To: Ulf Hansson <ulf.hansson@linaro.org>, 
-	Laurent Pinchart <laurent.pinchart@ideasonboard.com>, 
-	Sakari Ailus <sakari.ailus@linux.intel.com>
-Cc: dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, linux-clk@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, amd-gfx@lists.freedesktop.org, 
-	nouveau@lists.freedesktop.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-i2c@vger.kernel.org, 
-	linux-i3c@lists.infradead.org, linux-iio@vger.kernel.org, 
-	linux-input@vger.kernel.org, patches@opensource.cirrus.com, 
-	iommu@lists.linux.dev, imx@lists.linux.dev, 
-	linux-mediatek@lists.infradead.org, linux-media@vger.kernel.org, 
-	linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org, 
-	netdev@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	linux-pci@vger.kernel.org, linux-phy@lists.infradead.org, 
-	linux-pwm@vger.kernel.org, linux-remoteproc@vger.kernel.org, 
-	linux-sound@vger.kernel.org, linux-spi@vger.kernel.org, 
-	linux-staging@lists.linux.dev, linux-usb@vger.kernel.org, 
-	linux-serial@vger.kernel.org, greybus-dev@lists.linaro.org, 
-	asahi@lists.linux.dev, Andy Shevchenko <andy.shevchenko@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.0
+Subject: Re: qcom-rng is broken for acpi
+Content-Language: en-US
+From: Jeffrey Hugo <quic_jhugo@quicinc.com>
+To: Brian Masney <bmasney@redhat.com>
+CC: =?UTF-8?Q?Ernesto_A=2e_Fern=c3=a1ndez?= <ernesto.mnd.fernandez@gmail.com>,
+        Trilok Soni <quic_tsoni@quicinc.com>, <linux-crypto@vger.kernel.org>,
+        "Herbert Xu" <herbert@gondor.apana.org.au>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        <linux-arm-msm@vger.kernel.org>,
+        Om Prakash Singh
+	<quic_omprsing@quicinc.com>
+References: <20240828184019.GA21181@eaf>
+ <a8914563-d158-4141-b022-340081062440@quicinc.com>
+ <20240828201313.GA26138@eaf>
+ <CABx5tq+ZFpTDdjV7R5HSEFyNoR5VUYDHm89JEHvKb-9TW6Oejw@mail.gmail.com>
+ <f6075361-1766-35a5-c7ac-cc3eb416a4e1@quicinc.com>
+ <CABx5tqJomV_Su2NmyBBgipOiiby5sF7LAo_kdvhYT6oNYwVpVA@mail.gmail.com>
+ <da23b318-1d65-c001-1dc2-8ba66abe9d6f@quicinc.com>
+ <e6299c6d-dc18-eb05-2af5-8f8d885831c9@quicinc.com>
+ <CABx5tqKWNCoE_9-MX+9unVLK8eqaJZiK6SC2RWMXDRzVayQLkQ@mail.gmail.com>
+ <7f735c0e-d052-15ed-8db8-214881811816@quicinc.com>
+In-Reply-To: <7f735c0e-d052-15ed-8db8-214881811816@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: kg_tjQSn2K3NYNIgnmnvYMbzlZlgtr7u
+X-Proofpoint-GUID: kg_tjQSn2K3NYNIgnmnvYMbzlZlgtr7u
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ mlxlogscore=999 priorityscore=1501 spamscore=0 mlxscore=0 suspectscore=0
+ impostorscore=0 malwarescore=0 bulkscore=0 clxscore=1011 adultscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410080130
 
-On Tue, Oct 8, 2024 at 12:35=E2=80=AFAM Ulf Hansson <ulf.hansson@linaro.org=
-> wrote:
->
-> On Tue, 8 Oct 2024 at 00:25, Laurent Pinchart
-> <laurent.pinchart@ideasonboard.com> wrote:
-> >
-> > Hi Ulf,
-> >
-> > On Tue, Oct 08, 2024 at 12:08:24AM +0200, Ulf Hansson wrote:
-> > > On Mon, 7 Oct 2024 at 20:49, Laurent Pinchart wrote:
-> > > > On Fri, Oct 04, 2024 at 04:38:36PM +0200, Ulf Hansson wrote:
-> > > > > On Fri, 4 Oct 2024 at 11:41, Sakari Ailus wrote:
-> > > > > >
-> > > > > > Hello everyone,
-> > > > > >
-> > > > > > This set will switch the users of pm_runtime_put_autosuspend() =
-to
-> > > > > > __pm_runtime_put_autosuspend() while the former will soon be re=
--purposed
-> > > > > > to include a call to pm_runtime_mark_last_busy(). The two are a=
-lmost
-> > > > > > always used together, apart from bugs which are likely common. =
-Going
-> > > > > > forward, most new users should be using pm_runtime_put_autosusp=
-end().
-> > > > > >
-> > > > > > Once this conversion is done and pm_runtime_put_autosuspend() r=
-e-purposed,
-> > > > > > I'll post another set to merge the calls to __pm_runtime_put_au=
-tosuspend()
-> > > > > > and pm_runtime_mark_last_busy().
-> > > > >
-> > > > > That sounds like it could cause a lot of churns.
-> > > > >
-> > > > > Why not add a new helper function that does the
-> > > > > pm_runtime_put_autosuspend() and the pm_runtime_mark_last_busy()
-> > > > > things? Then we can start moving users over to this new interface=
-,
-> > > > > rather than having this intermediate step?
-> > > >
-> > > > I think the API would be nicer if we used the shortest and simplest
-> > > > function names for the most common use cases. Following
-> > > > pm_runtime_put_autosuspend() with pm_runtime_mark_last_busy() is th=
-at
-> > > > most common use case. That's why I like Sakari's approach of repurp=
-osing
-> > > > pm_runtime_put_autosuspend(), and introducing
-> > > > __pm_runtime_put_autosuspend() for the odd cases where
-> > > > pm_runtime_mark_last_busy() shouldn't be called.
-> > >
-> > > Okay, so the reason for this approach is because we couldn't find a
-> > > short and descriptive name that could be used in favor of
-> > > pm_runtime_put_autosuspend(). Let me throw some ideas at it and maybe
-> > > you like it - or not. :-)
-> >
-> > I like the idea at least :-)
-> >
-> > > I don't know what options you guys discussed, but to me the entire
-> > > "autosuspend"-suffix isn't really that necessary in my opinion. There
-> > > are more ways than calling pm_runtime_put_autosuspend() that triggers
-> > > us to use the RPM_AUTO flag for rpm_suspend(). For example, just
-> > > calling pm_runtime_put() has the similar effect.
-> >
-> > To be honest, I'm lost there. pm_runtime_put() calls
-> > __pm_runtime_idle(RPM_GET_PUT | RPM_ASYNC), while
-> > pm_runtime_put_autosuspend() calls __pm_runtime_suspend(RPM_GET_PUT |
-> > RPM_ASYNC | RPM_AUTO).
->
-> __pm_runtime_idle() ends up calling rpm_idle(), which may call
-> rpm_suspend() - if it succeeds to idle the device. In that case, it
-> tags on the RPM_AUTO flag in the call to rpm_suspend(). Quite similar
-> to what is happening when calling pm_runtime_put_autosuspend().
+On 9/17/2024 3:24 PM, Jeffrey Hugo wrote:
+> On 9/16/2024 1:40 PM, Brian Masney wrote:
+>> On Mon, Sep 16, 2024 at 1:42 PM Jeffrey Hugo <quic_jhugo@quicinc.com> 
+>> wrote:
+>>> Bisect pointed to the following which makes zero sense -
+>> [snip]
+>>> I wonder if bisect-ability got broken somehow.
+>>>
+>>> I'm going to try to do a bit of a manual bisect to see if I can avoid
+>>> whatever glitch (possibly self induced) I seem to have hit.
+>>
+>> I've seen this happen if the error is due to a race condition and only
+>> happens part of the time. When you are testing a kernel, try booting
+>> the system up to 3 times before you run 'git bisect good' against a
+>> particular iteration.
+> 
+> Found some issues with my initial bisect effort.
+> 
+> New run points to:
+> 
+> commit 1b0e3ea9301a422003d385cda8f8dee6c878ad05
+> Author: Yicong Yang <yangyicong@hisilicon.com>
+> Date:   Mon Aug 14 21:16:42 2023 +0800
+> 
+>      perf/smmuv3: Add MODULE_ALIAS for module auto loading
+> 
+>      On my ACPI based arm64 server, if the SMMUv3 PMU is configured as
+>      module it won't be loaded automatically after booting even if the
+>      device has already been scanned and added. It's because the module
+>      lacks a platform alias, the uevent mechanism and userspace tools
+>      like udevd make use of this to find the target driver module of the
+>      device. This patch adds the missing platform alias of the module,
+>      then module will be loaded automatically if device exists.
+> 
+>      Before this patch:
+>      [root@localhost tmp]# modinfo arm_smmuv3_pmu | grep alias
+>      alias:          of:N*T*Carm,smmu-v3-pmcgC*
+>      alias:          of:N*T*Carm,smmu-v3-pmcg
+> 
+>      After this patch:
+>      [root@localhost tmp]# modinfo arm_smmuv3_pmu | grep alias
+>      alias:          platform:arm-smmu-v3-pmcg
+>      alias:          of:N*T*Carm,smmu-v3-pmcgC*
+>      alias:          of:N*T*Carm,smmu-v3-pmcg
+> 
+>      Signed-off-by: Yicong Yang <yangyicong@hisilicon.com>
+>      Link: 
+> https://lore.kernel.org/r/20230814131642.65263-1-yangyicong@huawei.com
+>      Signed-off-by: Will Deacon <will@kernel.org>
+> 
+>   drivers/perf/arm_smmuv3_pmu.c | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> 
+> This one seems to make a bit more sense, and reverting it does make the 
+> prints go away.  Feels like either the driver is getting triggered 
+> earlier, or wasn't getting triggered before at all.
+> 
+> I plan to come back to this later in the week to dig more.
 
-Right.
+Or apparently 3 weeks later since life has a funny way of having other 
+plans.
 
-For almost everybody, except for a small bunch of drivers that
-actually have a .runtime_idle() callback, pm_runtime_put() is
-literally equivalent to pm_runtime_put_autosuspend().
+Prior to the above change, the arm_smmuv3_pmu module can be manually 
+loaded via modprobe, and the same errors will appear.  This looks like 
+an existing issue, that was just made visible, rather than something 
+"newly" introduced.
 
-So really the question is why anyone who doesn't provide a
-.runtime_idle() callback bothers with using this special
-pm_runtime_put_autosuspend() thing, which really means "do a
-runtime_put(), but skip my .runtime_idle() callback".
+arm_smmuv3_pmu is failing to obtain the second resource.  It is 
+consuming a device that is created by the IORT table parser - 
+drivers/acpi/arm64/iort.c
 
-> >
-> > >
-> > > Moreover, it's similar for pm_runtime_mark_last_busy(), it's called
-> > > during rpm_resume() too, for example. So why bother about having
-> > > "mark_last_busy" in the new name too.
-> > >
-> > > That said, my suggestion is simply "pm_runtime_put_suspend".
-> >
-> > Can we do even better, and make pm_runtime_put() to handle autosuspend
-> > automatically when autosuspend is enabled ?
->
-> As stated above, this is already the case.
+arm_smmu_v3_pmcg_init_resources() has a relevant comment for this issue-
 
-What really is needed appears to be a combination of
-pm_runtime_mark_last_busy() with pm_runtime_put().
+/*
+  * The initial version in DEN0049C lacked a way to describe register
+  * page 1, which makes it broken for most PMCG implementations; in
+  * that case, just let the driver fail gracefully if it expects to
+  * find a second memory resource.
+  */
 
-Granted, pm_runtime_put() could do the pm_runtime_mark_last_busy()
-thing automatically if autosuspend is enabled and the only consequence
-of it might be delaying a suspend of the device until its autosuspend
-timer expires, which should not be a problem in the vast majority of
-cases.
+Checking the IORT implementation, we do advertise revision 0.  I'm not 
+certain, but I'm guessing this spec update occurred after the last 
+firmware release of QDF2400.  I believe a FW update is unlikely so I 
+suspect the options are -
+
+1. Ignore the errors
+2. Disable the driver on this platform
+3. Use the ACPI initramfs override feature to silence the errors at the 
+IORT table
+
+Probably not the resolution we'd like, but this does feel like a final 
+conclusion.
+
+-Jeff
