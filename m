@@ -1,106 +1,87 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73DB1143C6E;
-	Mon,  7 Oct 2024 23:28:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1691F16EB42;
+	Tue,  8 Oct 2024 06:29:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728343712; cv=none; b=bxtlkFVR8RC45I4A2sTmvTNdFC/cRSQWMqs42EXb863+8f5a6mL2bpk5Rl1bPiBgCVhc10EaZhlGCn+b4IVbkCEMx7W40qYjlpbxWiqHKQDYJTKxF70bfGFC1zTYRpRTsWcKsrMLz+TIzNlVFu8eI4PEB0QNPIpDV/z2ahfBSEk=
+	t=1728368972; cv=none; b=jNiXF+MmEp2qMxPsyoGmDEfGFIjEcIyQhgoK2FTiWYbJZekrGxncclwUqzCZ/FWr+IFQedT3HVgb79/XfN+/drSpl7h+3bFGv+jNOaFD7Mv3dmDgxY9slkCF4o9olzdPMF13YCGoEVSokoDQkKAGnlFebOV0iGCE6SUH8SOnm90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728343712; c=relaxed/simple;
-	bh=OYyXaazKvTv0jvhByYk/tw4TvzJy78FWvuxtnFj1VK0=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=QqYoMnc0ffKchSvJqj9043SbcP5s/7uobRId9ri0evB1b3e1B3VIem0A6cfZadxnJAceQeMcE/UezMu3O5oXqCbmcVZxWO32dlgTPqNJ9/AYek6mE6SJ0m24TqCsWIninFwSsmdhkdqXHvT7ZvgpDcmQWk8QwF5iR5anpYQTBoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AZBuJGir; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1728368972; c=relaxed/simple;
+	bh=A+XGWibJ5wCrMh61FWIyGIproZa6J8qxhLcDAG1RBQE=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=Eo1u1nMZa/7OUICLwy298oreTObPgTMqDrLPfJk7G/UBccneh8Nd0Krvpidvd6v0aJ7Ij5LuVCUUhlw093UstXsufvYaBP989fW5Q/zo+j21Zlz08RkZG9Dzj67O8xxTuLlOkyL7841E41BDFU5564jCbitpulzDdJz7l1TVagI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=dxDLcK24; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AZBuJGir"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81F8FC4CEC6;
-	Mon,  7 Oct 2024 23:28:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728343712;
-	bh=OYyXaazKvTv0jvhByYk/tw4TvzJy78FWvuxtnFj1VK0=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=AZBuJGirIN51PZPFLqT8zKOIqo9llVtkvVhnKiRbctdADqMn7OjYW047X4RTYjLrt
-	 qGUzGNIvlayd/Ik59/A7+aAj6sXrQLkYlHmt0WVDESBsJxfwafoFMJ0CDmBTSeCX3A
-	 bPtgGEKff9nhZQO6JeZmUcJ5t62S66lUMlynkibdD5hw/4bSkGGiKBOjwrRww0lE3P
-	 +qc/d4aErBxJBwZc6rV0XKNRjCJD/BnAC7hgA9I36ovAFvhAXp/LzriiUsoR4UWwqa
-	 1mcMSEroJwLvAdU2Hzt3cVL40bV4ICcXwMS11c3ML51unukJi4sd22uPJfwqyfzQFH
-	 0D1063hILmWAg==
-Message-ID: <58aa06044c8b570791a92a1a2a9062b9a477e246.camel@kernel.org>
-Subject: Re: [PATCH] hwrng: core - Add WARN_ON for buggy read return values
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>, James Bottomley
-	 <James.Bottomley@HansenPartnership.com>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, Guangwu Zhang
-	 <guazhang@redhat.com>, Peter Huewe <peterhuewe@gmx.de>, Jason Gunthorpe
-	 <jgg@ziepe.ca>, linux-integrity@vger.kernel.org, James Bottomley
-	 <James.Bottomley@hansenpartnership.com>
-Date: Tue, 08 Oct 2024 02:28:27 +0300
-In-Reply-To: <ZvX_Zj8PAXcFJPLU@gondor.apana.org.au>
-References: <ZvEFQAWVgWNd9j7e@gondor.apana.org.au>
-	 <D4DI1M1ELFXK.2COGZN6O5HABD@kernel.org>
-	 <ZvE0NrOC00ojRe3t@gondor.apana.org.au>
-	 <D4DQJ34I5FSD.1K618VWEKI7IW@kernel.org>
-	 <2024092340-renovate-cornflake-4b5e@gregkh>
-	 <ZvHsh6by3omeYj9d@gondor.apana.org.au>
-	 <D4EN54C1IK1R.11JD66L931PD8@kernel.org>
-	 <D4EP817NLQY9.35RSWO8IFXRL0@kernel.org>
-	 <ZvX_Zj8PAXcFJPLU@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="dxDLcK24"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1728368967;
+	bh=IsQ+J2Ndan5azomYips/VhPYX5BYOhyuF7G1A+/FGU0=;
+	h=Date:From:To:Cc:Subject:From;
+	b=dxDLcK24zmebYiYL0lA4LfvEyOo+pA9kn3oP7KHhiUY02PGCBCX4mmt844wTOy+xc
+	 icrWRsJshObaXdSLZS/RVlHVRMNNT6ZTZuuLaLyosxg5jKpWI+X1Ztj78BiLqo8Trw
+	 yhkqhiLVCJDg7+UdBHFfZDzR4akU8QCrzVaobpYR7uaesS0LwCnOe73WBwhNcTTER3
+	 Tzt0Fbw6Pt/wWT+xyIMC0Y93cq/Moc3XOcRS6TDfuHEGuk9/bQVj2CwJCJCc6AqS3m
+	 dUe14ijJAf3/ep4ZwAwv5d1bejLBSX75Y5GdJ2LMOH1zmh08IQSprNsIZFnUx1MVgY
+	 jsB4PwOde6ptg==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4XN5hk1N0Vz4wb0;
+	Tue,  8 Oct 2024 17:29:26 +1100 (AEDT)
+Date: Tue, 8 Oct 2024 17:29:26 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Herbert Xu <herbert@gondor.apana.org.au>, Linux Crypto List
+ <linux-crypto@vger.kernel.org>
+Cc: Lukas Wunner <lukas@wunner.de>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: build warning after merge of the crypto tree
+Message-ID: <20241008172926.0b995ea7@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/TKdfoFQeWsZjzjQG8m9Jph0";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On Fri, 2024-09-27 at 08:42 +0800, Herbert Xu wrote:
-> On Tue, Sep 24, 2024 at 08:43:00PM +0300, Jarkko Sakkinen wrote:
-> >=20
-> > Without any traces that would provide more information I don't see
-> > the smoking gun.
->=20
-> I haven't confirmed that it's definitely the tpm2 driver, it's just
-> based on the backtrace.=C2=A0 Hopefully my patch will confirm it one way
-> or the other.=C2=A0 Here is the backtrace:
+--Sig_/TKdfoFQeWsZjzjQG8m9Jph0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Agreed.
+Hi all,
 
->=20
-> [=C2=A0 100.784159] vmd 0000:c2:00.5: Bound to PCI domain 10002=20
-> [=C2=A0 100.786209] Monitor-Mwait will be used to enter C-1 state=20
-> [=C2=A0 100.786225] Monitor-Mwait will be used to enter C-2 state=20
-> [=C2=A0 100.786244] ACPI: \_SB_.SCK0.C000: Found 2 idle states=20
-> [=C2=A0 100.823093] input: Power Button as
-> /devices/LNXSYSTM:00/LNXPWRBN:00/input/input0=20
-> [=C2=A0 100.823636] ACPI: button: Power Button [PWRF]=20
-> [=C2=A0 100.905756] ERST: Error Record Serialization Table (ERST) support
-> is initialized.=20
-> [=C2=A0 100.905858] pstore: Using crash dump compression: deflate=20
-> [=C2=A0 100.905861] pstore: Registered erst as persistent store backend=
-=20
-> [=C2=A0 100.907044] Serial: 8250/16550 driver, 4 ports, IRQ sharing
-> enabled=20
-> [=C2=A0 100.908305] 00:03: ttyS0 at I/O 0x3f8 (irq =3D 4, base_baud =3D
-> 115200) is a 16550A=20
-> [=C2=A0 100.926608] 00:04: ttyS1 at I/O 0x2f8 (irq =3D 3, base_baud =3D
-> 115200) is a 16550A=20
-> [=C2=A0 100.942953] Non-volatile memory driver v1.3=20
-> [=C2=A0 100.947908] tpm_tis MSFT0101:00: 2.0 TPM (device-id 0x1B, rev-id
-> 22)=20
-> [=C2=A0 101.226913] ACPI: bus type drm_connector registered=20
-> [=C2=A0 101.229708] alg: ecdh-nist-p256 (ecdh-nist-p256-generic) is
-> disabled due to FIPS=20
-> [=C2=A0 101.229745] tpm tpm0: crypto ecdh allocation failed=20
-> [=C2=A0 101.236311] tpm tpm0: A TPM error (708) occurred start auth
+After merging the crypto tree, today's linux-next build (htmldocs)
+produced this warning:
 
-I guess it is TPM2_StartAuthSession returning TPM_RC_VALUE. Probably
-James should look into this as the bus encryption code is clearly
-tripping here.
+include/crypto/akcipher.h:1: warning: 'Generic Public Key API' not found
 
-I'm on second week on a new job so cannot promise any bandwidth
-yet this week. Earliest next week...
+Introduced by commit
 
-BR, Jarkko
+  6b34562f0cfe ("crypto: akcipher - Drop sign/verify operations")
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/TKdfoFQeWsZjzjQG8m9Jph0
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmcE0UYACgkQAVBC80lX
+0Gx2Jgf/WDUiJIcjrFaksEaWx9KdSvYBu8riWCF5SU5pejpslre9D5fmcb+g3Mni
+RuqjNHjSxLqm/cO1PQjSWjyJhy6MVZtXKa0a0jlDxKHZx1KZfLepRMgUHh4oCKL2
+GYZcVG9fCT9nZdWeHesgtehw9mmu1KUkzVasD4dPUXm4nkEeL/VQtXHOyl1hssHZ
+3h9L7kRJE5gA5k6Y0NJPyDPxlNjXayNpYCEmC0/3h69KzPEkMWNWfKdxrotx0gDB
+o9J+61AEKytmqa+4ZtxrHiDkVy322U85EA8iErgcZTWanJK6o3b+ffUnbEcJDqia
+9rp+JPbMrz+otMlPkRznOA56vUYcbA==
+=Xrjb
+-----END PGP SIGNATURE-----
+
+--Sig_/TKdfoFQeWsZjzjQG8m9Jph0--
