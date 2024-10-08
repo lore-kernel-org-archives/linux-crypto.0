@@ -1,67 +1,74 @@
-Received: from cmccmta1.chinamobile.com (cmccmta2.chinamobile.com [111.22.67.135])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 057122038BD;
-	Tue,  8 Oct 2024 07:22:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.22.67.135
+Received: from mailout1.hostsharing.net (mailout1.hostsharing.net [83.223.95.204])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D98F1422A8;
+	Tue,  8 Oct 2024 09:22:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728372179; cv=none; b=jUxclQTk7H9VhqcPl7Kp6aAdOrIi7adTVkYH2uh5rjJnxNzELjjF7kRjjF5pffdVIv+nW9f34+lpwgG45OUW/GkWE0EK+JuN/MJLN79zPLqLiKdNoR2NB+QyR3pYYbLLuUk/lFIEa5+Lqrptx9oVJCz+HMM96stVScmwCQ+ZaqQ=
+	t=1728379337; cv=none; b=XE0TWHpkMMHsgOP8LaECXd+dRxvd1g30Tgv9VDuPpQ/iZbYOQOMG0FDQdVrBNLhdktnNqJdfIAqXGQhqm/KlG4COJMvMZvJfJYRYgueQwZd7rFzs5GJAooS3GHjx8h5c4K5rBw5w2mhpG1g8FzsP8y6YMtsEaV1Gh5F2yaNVx60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728372179; c=relaxed/simple;
-	bh=UuLI0zDrCi7LCedc02GhHPMfdvFyZ3e4qegkfmmgw2g=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=W9nYxMR1RXsrVAEalbIyYByWKOPT4vvh7SDHxWSjR+UfhILUt0CTbvKv+dKUxL6as8wb+Ugxbbpcn4uS4xHU89feNllSviM7Zk19VGzhg5pYSt0BstdSv0PjEw7sjXC6HKPzTnIeo6PfLHtpmqwCXBm10ILx/as/cYMefsJPhPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cmss.chinamobile.com; spf=pass smtp.mailfrom=cmss.chinamobile.com; arc=none smtp.client-ip=111.22.67.135
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cmss.chinamobile.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cmss.chinamobile.com
-X-RM-TagInfo: emlType=0                                       
-X-RM-SPAM-FLAG:00000000
-Received:from spf.mail.chinamobile.com (unknown[10.188.0.87])
-	by rmmx-syy-dmz-app03-12003 (RichMail) with SMTP id 2ee36704ddcbfbc-b07cc;
-	Tue, 08 Oct 2024 15:22:51 +0800 (CST)
-X-RM-TRANSID:2ee36704ddcbfbc-b07cc
-X-RM-TagInfo: emlType=0                                       
-X-RM-SPAM-FLAG:00000000
-Received:from ubuntu.localdomain (unknown[10.55.1.71])
-	by rmsmtp-syy-appsvr04-12004 (RichMail) with SMTP id 2ee46704ddca1cd-93490;
-	Tue, 08 Oct 2024 15:22:51 +0800 (CST)
-X-RM-TRANSID:2ee46704ddca1cd-93490
-From: Zhu Jun <zhujun2@cmss.chinamobile.com>
-To: olivia@selenic.com
-Cc: herbert@gondor.apana.org.au,
-	zhujun2@cmss.chinamobile.com,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] drivers/histb-rng: Fix the wrong format specifier
-Date: Tue,  8 Oct 2024 00:22:48 -0700
-Message-Id: <20241008072248.12681-1-zhujun2@cmss.chinamobile.com>
-X-Mailer: git-send-email 2.17.1
+	s=arc-20240116; t=1728379337; c=relaxed/simple;
+	bh=sx2bYHHOLMoqNBBAD2+N3p3EeNsNG2rOO0solnU55E4=;
+	h=Message-ID:In-Reply-To:References:From:Date:Subject:To:Cc; b=ig9p6vvmYx2fH86Nw4K+TqgoSlHPuOJMqgqafAWwg7noMNbEMHVSscofnvSYaJP5ZfqZobDuI1UNzUVCFcZk8GxVB7oQVhf65VySytSWZOpW9vVNuU9vw3ElTpox2r2jIVhheJvn52k0dOVx/0s1Ix9sUciwV3xpR+rui0eColA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=pass smtp.mailfrom=wunner.de; arc=none smtp.client-ip=83.223.95.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wunner.de
+Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by mailout1.hostsharing.net (Postfix) with ESMTPS id 2013D101917BB;
+	Tue,  8 Oct 2024 11:13:12 +0200 (CEST)
+Received: from localhost (unknown [89.246.108.87])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by h08.hostsharing.net (Postfix) with ESMTPSA id DA15C602DD59;
+	Tue,  8 Oct 2024 11:13:11 +0200 (CEST)
+X-Mailbox-Line: From 89d99476b2b57bcd3e306996ec4a60db1706253f Mon Sep 17 00:00:00 2001
+Message-ID: <89d99476b2b57bcd3e306996ec4a60db1706253f.1728378559.git.lukas@wunner.de>
+In-Reply-To: <20241008172926.0b995ea7@canb.auug.org.au>
+References: <20241008172926.0b995ea7@canb.auug.org.au>
+From: Lukas Wunner <lukas@wunner.de>
+Date: Tue, 8 Oct 2024 11:12:01 +0200
+Subject: [PATCH cryptodev-2.6] crypto: doc - Fix akcipher title reference
+To: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, linux-next@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
-The format specifier of "unsigned int" in printf() should be "%u", not
-"%d".
+Stephen reports a documentation build warning for "make htmldocs"
+introduced by recent commit 6b34562f0cfe ("crypto: akcipher - Drop
+sign/verify operations").
 
-Signed-off-by: Zhu Jun <zhujun2@cmss.chinamobile.com>
+The commit renamed a paragraph title in a header file, but neglected to
+amend the title reference in the API documentation.  Fix it.
+
+Fixes: 6b34562f0cfe ("crypto: akcipher - Drop sign/verify operations")
+Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+Closes: https://lore.kernel.org/all/20241008172926.0b995ea7@canb.auug.org.au/
+Signed-off-by: Lukas Wunner <lukas@wunner.de>
 ---
- drivers/char/hw_random/histb-rng.c | 2 +-
+ Documentation/crypto/api-akcipher.rst | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/char/hw_random/histb-rng.c b/drivers/char/hw_random/histb-rng.c
-index f652e1135e4b..1b91e88cc4c0 100644
---- a/drivers/char/hw_random/histb-rng.c
-+++ b/drivers/char/hw_random/histb-rng.c
-@@ -89,7 +89,7 @@ depth_show(struct device *dev, struct device_attribute *attr, char *buf)
- 	struct histb_rng_priv *priv = dev_get_drvdata(dev);
- 	void __iomem *base = priv->base;
+diff --git a/Documentation/crypto/api-akcipher.rst b/Documentation/crypto/api-akcipher.rst
+index 6f47cc70eca0..ca1ecdd4a7d3 100644
+--- a/Documentation/crypto/api-akcipher.rst
++++ b/Documentation/crypto/api-akcipher.rst
+@@ -8,7 +8,7 @@ Asymmetric Cipher API
+ ---------------------
  
--	return sprintf(buf, "%d\n", histb_rng_get_depth(base));
-+	return sprintf(buf, "%u\n", histb_rng_get_depth(base));
- }
+ .. kernel-doc:: include/crypto/akcipher.h
+-   :doc: Generic Public Key API
++   :doc: Generic Public Key Cipher API
  
- static ssize_t
+ .. kernel-doc:: include/crypto/akcipher.h
+    :functions: crypto_alloc_akcipher crypto_free_akcipher crypto_akcipher_set_pub_key crypto_akcipher_set_priv_key crypto_akcipher_maxsize crypto_akcipher_encrypt crypto_akcipher_decrypt
 -- 
-2.17.1
-
-
+2.43.0
 
