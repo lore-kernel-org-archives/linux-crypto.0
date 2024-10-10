@@ -1,180 +1,106 @@
-Received: from smtp.jvdsn.com (smtp.jvdsn.com [129.153.194.31])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7026F179A3
-	for <linux-crypto@vger.kernel.org>; Thu, 10 Oct 2024 02:57:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.153.194.31
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C8F463D;
+	Thu, 10 Oct 2024 06:06:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728529042; cv=none; b=Uc0aGaFVe2y468mgQNMz5mcUEwXrEaictp7oHSYnZ56RRYvDVsY8hCRkx3i1Ujw+DpsQTfYB4+u9TqBKrgUJmE5nfA5Z8/5IQSuyCeij45ETn147p4e8vt36IxV9LM3SiUcPbvoaT7ROLVaLm+kIO/3epDk18UHg55vYvy9bTL0=
+	t=1728540367; cv=none; b=qHBepl9TiNeTxdqiQz51GGiYTn4VmgeRgvOips+C2ciawPOMj08UTUiYE0bg6D2skLN4NHeMsu1IyaMFbTv0wF6imaDlbD9WEOndsA3XOxaSoYHZOnGGWAcw0ns2IbWivG9kcq0eoci1jFMrlbkGnhzwVl7HbfnBCHKlR0O9uV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728529042; c=relaxed/simple;
-	bh=3pgGgg/8xGkhEcXyoI2JirCDtveLVM146RhkyI4/dP8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OQtCokv21Iwr11FVt9VRnI2gR+xSgutru08sumK8bbT8BcE1k8kXu9uVfn72lxYgfP1zv5M90PlzNmgxvIThjMs/UbEi2owL/wpjHjDnDrezwhZW/Xtn2H6zxy1PEOw5Djp16a/HJ2txN3wYoSZd0d+Xw3xNegWmOSK5Vwn1mpU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jvdsn.com; spf=pass smtp.mailfrom=jvdsn.com; dkim=pass (2048-bit key) header.d=jvdsn.com header.i=@jvdsn.com header.b=p5Ix1ZS8; arc=none smtp.client-ip=129.153.194.31
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=jvdsn.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvdsn.com
+	s=arc-20240116; t=1728540367; c=relaxed/simple;
+	bh=B2NxE/VURy/vjBy0GHUs/N24pfT7iFiiBWoSUrtvJ0U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BMKY3dbQ0HGhl1Z4o/IA4qvFceQcXGf11ITbOUfk9f5Rxl20UCMt3otEiy7euEXoo6pfqac6s9ttdCTWpeI8TqehvFuO5aHL9k8Uz9b7QfwrbS6wvY0Y6ZoN81FmEZ+DyELVGotESYljwZxjOjRAkT840Aw1pK5d8eP94yeG++I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=fnuRMqLZ; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jvdsn.com header.i=@jvdsn.com header.b="p5Ix1ZS8"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=jvdsn.com; s=mail;
-	t=1728528487; bh=3pgGgg/8xGkhEcXyoI2JirCDtveLVM146RhkyI4/dP8=;
-	h=From:To:Cc:Subject:Date;
-	b=p5Ix1ZS8PzG06FEWlKr/oFOcVQOiajHF6cWtn0PqeSjz0AW+JcvuOaroFi17RHg4A
-	 aN4EGG0SvGl3dSgwia1kenlpH9FjXYO2aP1L+SL/l/jos2lXWZxFQzPbJW9ioS4wqH
-	 6IpKmudG1V4sykSEncw/3NvrXyfmgy2A+4c+b7N4C8y9dV1WyC2bgOW6oVwhAApSoB
-	 /dgzmDqGwUIIAMHhHybQbAbL55h/SrxEAnMsXE77ARdxEJQox2pNQOxEXuXS0/cGVo
-	 GzMU6tXdWqdK0Ky8Jl1vvp/WBZcfYW3VVQfcW3+iNiYEmXtQhh3I9r8IF6HZ+IEzQY
-	 gX466g2XEGszQ==
-From: Joachim Vandersmissen <git@jvdsn.com>
-To: linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Stephan Mueller <smueller@chronox.de>
-Cc: Joachim Vandersmissen <git@jvdsn.com>
-Subject: [PATCH] crypto: jitter - output full sample from test interface
-Date: Wed,  9 Oct 2024 21:47:34 -0500
-Message-ID: <20241010024734.75871-1-git@jvdsn.com>
-X-Mailer: git-send-email 2.46.1
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="fnuRMqLZ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=6XUnNZxdV444hVjpvvyIdb/pQ4HNS1/DPVIt1z8Oi3M=; b=fnuRMqLZ0sBmx/sXo7vulvdPVn
+	4WaRmpEVAMy6omDESvcQewfyn05mcKwfqQlD5gu+Q1QIQLOohxJP7xd8604d7eAKcptfJpvppdfrB
+	6rXtGtsjIzX+vDwIn7LHCalKJMh6+ZA+J0qxH3eGEw9q+/8i+o+rYW6eIxH2a9JXMdYwzdY92img3
+	ykR16cWAo9tucP4dSADxxZCUklzaWqidcQH5VkmQz2Ra2XgRN5sUBQR30tAXqKFfSpBYAjTcQi6kp
+	lPbF/O5Xz6xhtbH7CAlliq/AlrFm7eofUscBu6zhmhYOtp2xfRLRvOTPuscxhmQtO+6c8Hi0bIbww
+	wFCbN7FA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1sym9H-008FZ1-01;
+	Thu, 10 Oct 2024 14:05:57 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 10 Oct 2024 14:05:56 +0800
+Date: Thu, 10 Oct 2024 14:05:56 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Klaus Kudielka <klaus.kudielka@gmail.com>
+Cc: regressions@lists.linux.dev, linux-kernel@vger.kernel.org,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Boris Brezillon <bbrezillon@kernel.org>,
+	Arnaud Ebalard <arno@natisbad.org>,
+	Romain Perier <romain.perier@free-electrons.com>
+Subject: Re: [REGRESSION] alg: ahash: Several tests fail during boot on
+ Turris Omnia
+Message-ID: <ZwduxHxQtHdzz-kl@gondor.apana.org.au>
+References: <ZwJUO5Nz3S7EeqO6@gondor.apana.org.au>
+ <1fc4db6269245de4c626f029a46efef246ee7232.camel@gmail.com>
+ <ZwObXYVHJlBaKuj2@gondor.apana.org.au>
+ <38a275a4e0224266ceb9ce822e3860fe9209d50c.camel@gmail.com>
+ <ZwZAExmK52txvHE8@gondor.apana.org.au>
+ <7e38e34adddb14d0a23a13cf738b6b7cccbfce6f.camel@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7e38e34adddb14d0a23a13cf738b6b7cccbfce6f.camel@gmail.com>
 
-The Jitter RNG time delta is computed based on the difference of two
-high-resolution, 64-bit time stamps. However, the test interface added
-in 69f1c387ba only outputs the lower 32 bits of those time stamps. To
-ensure all information is available during the evaluation process of
-the Jitter RNG, output the full 64-bit time stamps.
+On Wed, Oct 09, 2024 at 06:48:21PM +0200, Klaus Kudielka wrote:
+>
+> Oh, I had to increase log_buf_len, to catch everything. Booting is really slow now ;)
+> Full dmesg output is attached.
 
-Any clients collecting data from the test interface will need to be
-updated to take this change into account.
+Thanks! This is very helpful.
 
-Additionally, the size of the temporary buffer that holds the data for
-user space has been clarified. Previously, this buffer was
-JENT_TEST_RINGBUFFER_SIZE (= 1000) bytes in size, however that value
-represents the number of samples held in the kernel space ring buffer,
-with each sample taking 8 (previously 4) bytes.
+> [    4.118765] mv_cesa_ahash_queue_req: 0 (ptrval)
+> [    4.121966] mv_cesa_ahash_queue_req: 0 (ptrval)
+> [    4.126678] mv_cesa_int: 0 0x4ea1 0x80
+> [    4.131394] mv_cesa_ahash_queue_req: 0 (ptrval)
+> [    4.135927] mv_cesa_ahash_complete: 0 (ptrval)
+> [    4.153221] mv_cesa_ahash_req_cleanup: 0 (ptrval)
+> [    4.157942] mv_cesa_int: 0 0x4ea1 0x80
+> [    4.157949] alg: ahash: mv-sha256 test failed (wrong result) on test vector 3, cfg="import/export"
+> [    4.161699] mv_cesa_ahash_complete: 0 (ptrval)
+> [    4.170686] alg: self-tests for sha256 using mv-sha256 failed (rc=-22)
+> [    4.175132] mv_cesa_ahash_complete: 0 (ptrval)
+> [    4.175136] mv_cesa_ahash_req_cleanup: 0 (ptrval)
+> [    4.179589] ------------[ cut here ]------------
+> [    4.184304] mv_cesa_ahash_req_cleanup: 0 (ptrval)
 
-Rather than increasing the size to allow for all 1000 samples to be
-output, we keep it at 1000 bytes, but clarify that this means at most
-125 64-bit samples will be output every time this interface is called.
+As I suspected, the first multi-request op on a single engine
+triggers a failure.  This looks like a bug in the TDMA chaining
+code.
 
-Reviewed-by: Stephan Mueller <smueller@chronox.de>
-Signed-off-by: Joachim Vandersmissen <git@jvdsn.com>
----
- crypto/jitterentropy-testing.c | 31 ++++++++++++++++---------------
- crypto/jitterentropy.h         |  4 ++--
- 2 files changed, 18 insertions(+), 17 deletions(-)
+It is chaining what appears to be a live request.  In other words
+after we have already passed a chain to the hardware, we appear
+to be adding new entries to the end of the chain in
+mv_cesa_tdma_chain by assigning last->next_dma.
 
-diff --git a/crypto/jitterentropy-testing.c b/crypto/jitterentropy-testing.c
-index 5cb6a77b8e3b..21c9d7c3269a 100644
---- a/crypto/jitterentropy-testing.c
-+++ b/crypto/jitterentropy-testing.c
-@@ -15,7 +15,7 @@
- #define JENT_TEST_RINGBUFFER_MASK	(JENT_TEST_RINGBUFFER_SIZE - 1)
- 
- struct jent_testing {
--	u32 jent_testing_rb[JENT_TEST_RINGBUFFER_SIZE];
-+	u64 jent_testing_rb[JENT_TEST_RINGBUFFER_SIZE];
- 	u32 rb_reader;
- 	atomic_t rb_writer;
- 	atomic_t jent_testing_enabled;
-@@ -72,7 +72,7 @@ static void jent_testing_fini(struct jent_testing *data, u32 boot)
- 	pr_warn("Disabling data collection\n");
- }
- 
--static bool jent_testing_store(struct jent_testing *data, u32 value,
-+static bool jent_testing_store(struct jent_testing *data, u64 value,
- 			       u32 *boot)
- {
- 	unsigned long flags;
-@@ -156,20 +156,20 @@ static int jent_testing_reader(struct jent_testing *data, u32 *boot,
- 		}
- 
- 		/* We copy out word-wise */
--		if (outbuflen < sizeof(u32)) {
-+		if (outbuflen < sizeof(u64)) {
- 			spin_unlock_irqrestore(&data->lock, flags);
- 			goto out;
- 		}
- 
- 		memcpy(outbuf, &data->jent_testing_rb[data->rb_reader],
--		       sizeof(u32));
-+		       sizeof(u64));
- 		data->rb_reader++;
- 
- 		spin_unlock_irqrestore(&data->lock, flags);
- 
--		outbuf += sizeof(u32);
--		outbuflen -= sizeof(u32);
--		collected_data += sizeof(u32);
-+		outbuf += sizeof(u64);
-+		outbuflen -= sizeof(u64);
-+		collected_data += sizeof(u64);
- 	}
- 
- out:
-@@ -189,16 +189,17 @@ static int jent_testing_extract_user(struct file *file, char __user *buf,
- 
- 	/*
- 	 * The intention of this interface is for collecting at least
--	 * 1000 samples due to the SP800-90B requirements. So, we make no
--	 * effort in avoiding allocating more memory that actually needed
--	 * by the user. Hence, we allocate sufficient memory to always hold
--	 * that amount of data.
-+	 * 1000 samples due to the SP800-90B requirements. However, due to
-+	 * memory and performance constraints, it is not desirable to allocate
-+	 * 8000 bytes of memory. Instead, we allocate space for only 125
-+	 * samples, which will allow the user to collect all 1000 samples using
-+	 * 8 calls to this interface.
- 	 */
--	tmp = kmalloc(JENT_TEST_RINGBUFFER_SIZE + sizeof(u32), GFP_KERNEL);
-+	tmp = kmalloc(125 * sizeof(u64) + sizeof(u64), GFP_KERNEL);
- 	if (!tmp)
- 		return -ENOMEM;
- 
--	tmp_aligned = PTR_ALIGN(tmp, sizeof(u32));
-+	tmp_aligned = PTR_ALIGN(tmp, sizeof(u64));
- 
- 	while (nbytes) {
- 		int i;
-@@ -212,7 +213,7 @@ static int jent_testing_extract_user(struct file *file, char __user *buf,
- 			schedule();
- 		}
- 
--		i = min_t(int, nbytes, JENT_TEST_RINGBUFFER_SIZE);
-+		i = min_t(int, nbytes, 125 * sizeof(u64));
- 		i = reader(tmp_aligned, i);
- 		if (i <= 0) {
- 			if (i < 0)
-@@ -251,7 +252,7 @@ static struct jent_testing jent_raw_hires = {
- 	.read_wait = __WAIT_QUEUE_HEAD_INITIALIZER(jent_raw_hires.read_wait)
- };
- 
--int jent_raw_hires_entropy_store(__u32 value)
-+int jent_raw_hires_entropy_store(__u64 value)
- {
- 	return jent_testing_store(&jent_raw_hires, value, &boot_raw_hires_test);
- }
-diff --git a/crypto/jitterentropy.h b/crypto/jitterentropy.h
-index aa4728675ae2..4c5dbf2a8d8f 100644
---- a/crypto/jitterentropy.h
-+++ b/crypto/jitterentropy.h
-@@ -22,11 +22,11 @@ extern struct rand_data *jent_entropy_collector_alloc(unsigned int osr,
- extern void jent_entropy_collector_free(struct rand_data *entropy_collector);
- 
- #ifdef CONFIG_CRYPTO_JITTERENTROPY_TESTINTERFACE
--int jent_raw_hires_entropy_store(__u32 value);
-+int jent_raw_hires_entropy_store(__u64 value);
- void jent_testing_init(void);
- void jent_testing_exit(void);
- #else /* CONFIG_CRYPTO_JITTERENTROPY_TESTINTERFACE */
--static inline int jent_raw_hires_entropy_store(__u32 value) { return 0; }
-+static inline int jent_raw_hires_entropy_store(__u64 value) { return 0; }
- static inline void jent_testing_init(void) { }
- static inline void jent_testing_exit(void) { }
- #endif /* CONFIG_CRYPTO_JITTERENTROPY_TESTINTERFACE */
+Unfortunately I don't have documentation for this hardware so I can't
+say whether this is definitely illegal but it certainly smells bad :)
+
+Boris, what are the rules of engagement for TDMA chaining?
+
+Is it really OK to add new entries to the chain after it has been
+given over to the hardware?
+
+Thanks,
 -- 
-2.46.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
