@@ -1,57 +1,57 @@
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1286C1E7C27;
-	Thu, 10 Oct 2024 19:45:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B5131E572D;
+	Thu, 10 Oct 2024 19:45:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728589529; cv=none; b=EFPhTyWvc0F5dhCANxva9Id1igBWC+POh1AuFPu5z+BeQgZpuE0zHDUCRIY6EmU+u4OAlvamwYZk/knyDgxag1GiplSUWgR1SdwlxRu1l2lyDpU2/AKee1T20PyZit5MKB7/4okD8sKlHEbC/hn7hrHfndYWNn/5aNZC2rg4mKE=
+	t=1728589529; cv=none; b=rLts7WgEuyQc6olFSyPptuzQPFIbtD64zgQZc+I7x/t2A9l6VhsLfLTrlPaAclCfdNs1NaKT8J8uxaeDHnwv0ajeoGsf9GXlK8PqF8A17TjQYd4OULTKc2wT183RAmgLIsj1wyPvqnxsm4uJ+qlcneDbLKBfXDFh+eOgGyLjpvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1728589529; c=relaxed/simple;
-	bh=Av1xCzAK+uKt7P3u8vHTcsZRd7/NW6AnUr8uFgMtcA8=;
+	bh=Z/AKn3jdK5QJr21NEh6M/axjNX6uEKUZyzNVe8ZBoCA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AGoUSLQNMYcwwXkNi8bjJx8TO4wqWLMjy/NZ2ajrPUmxdfgNHzzxE1fUntwiF3ioV7KJ7UCU6CpQ8UXtWpx/mrmJVk7cc8GMNq49J26GVBePzYQizlonhG2qUEWEZrykb7kmATpX3aJFPzCCFRpTD08t0joMwVTN2GZQXgGUCsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=geSU3+U9; arc=none smtp.client-ip=209.85.210.171
+	 MIME-Version; b=XDEIYNOdmH5Ut7hBiFwVpOGY2bwI1ApiRGTJrAfZIdIbsmwZIV/h7g3RVBFplDJJvCk4XmnR/d6ggkFPNPqbWTDhFGKA7CSXMD/+zf1rPUgWJhg2zaiR7WhWMMg5dtwpKfkklyCg82zGPjJ1SDR+DkRTr3HTMC8GGtvhbr1Dcek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OzD9dJEq; arc=none smtp.client-ip=209.85.210.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="geSU3+U9"
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-71e05198d1dso964630b3a.1;
-        Thu, 10 Oct 2024 12:45:25 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OzD9dJEq"
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-71e038f3835so1274507b3a.0;
+        Thu, 10 Oct 2024 12:45:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1728589525; x=1729194325; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1728589526; x=1729194326; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3nfabQEDdcv7hLN1dH0q/bo0Hp0JIO5gPIPoowAAauU=;
-        b=geSU3+U9uzNM6dFi8QiolUdgvZhysunDI0GZGmb4bZKbEy72be9SO7egQA7QJamzE4
-         tv/tXJmTnSIOa+j+BFN4MRanLW8o4PVeZjBwqNj74SCOfPDBIeudlCDsdjS47i9aS0Yb
-         JOmbJg/+SzL34B5L0gLlkU3S2uiQ06zNYR0wgXOXL/eSX2bYtYbpJlmT/YG8UcJn0cf8
-         FKnGt/BKKaqrlNJ2Hf/21ZBDQVXzw+sxRohiadV/mlANIC3AW0PRutGXmyqSYYRnTHBe
-         cecaCu2eZfZ09BT/0moUv1mUjGiVhyDTWBsLP5VzGfpFyJbkTlreLlOTdRr1c2jU/BmN
-         fNEQ==
+        bh=+3EI4XTDmYBqzGsZ4sox7/pa5h3v/nZZ5pZc9pzFM5I=;
+        b=OzD9dJEqCKwLN184uh9UGd+Ratf/TbPdmh4oo2vButKohat7orITGKpyvDzCquzh4q
+         FsRRAFrPB3n9yyMosz1BQW8I0H7Bqt1VsNkMuzvWp0DipcMd7cEUj07zHKwtLnL94kS+
+         W2ijaVRlMdvFqbCe/8O/DBhFe9Lkym4NNPnIH+tc4iZZfWTsTSxCcbd1QSGiCOKsWstt
+         Rkq10uqaUxFgk6byR+iNBXU9iEelfMpHo6H4Jvglu+6QQ/TZt3APe4cMYc86NYUvQSIV
+         tDrh/gz3IV8meGca4Uipx4eqUZGnp1+WP00DNCOGhq8qgyi1kT/O9hzn+c8mQaIJ+Sy2
+         f4Fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728589525; x=1729194325;
+        d=1e100.net; s=20230601; t=1728589526; x=1729194326;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=3nfabQEDdcv7hLN1dH0q/bo0Hp0JIO5gPIPoowAAauU=;
-        b=u31gu/Qnko4cQ0kFUougTrUNZuGXjTHo+1gsQnAE31xOkFgW7ohpgRuLooydqdXV+t
-         lfq5H1JvyY9+bcyeutZQsoWrD/E6f8O1t+zH/tDn4dpHB3iiz/hNhhNjxRdTxlEruF6O
-         DVKEJcpPbhlKExZmSDTIAFPVpCK6v3YzzL38tvyH77XYczDxmq2r6BIOULABoqqi9fUh
-         gJi36WpO9ZQu4BZGdNgqGeFAt87D22bUo815vR03vM202KO+Vw4ghY0N6kOfqgbABA1S
-         rvma3Vo5YNH0k5itHkkxFfGsPEP2Tmj8jjQm5/EBQckEY9GI+oFo0KyZYRnwRuTpRgXx
-         j27w==
-X-Forwarded-Encrypted: i=1; AJvYcCUgv0tNQHPJz7p1fyT5Koqr7ZcLT4qaP9dR9RhWy9eu9Zyb88aC3t0nVsF0rbTHe/ChI6ARCfkwPbeDkV0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYYJTP+EQyvr1c1UUmq/ClJ92vphYE8j14dkoTwkFxL4gCnIgL
-	0yPUQLOcXq1UP6PHBH815G+fLcOO644OOX/1QJtRSNyQ7XAlhWRUZ73wLL6h
-X-Google-Smtp-Source: AGHT+IHlqQU/t6YV4KmGc30H4lcfsZuM7HVN21cEg0okeM9ski00r/ZlMssJcZnNTe+yZdSU1TWQJQ==
-X-Received: by 2002:a05:6a00:2314:b0:71d:fbff:a4b6 with SMTP id d2e1a72fcca58-71e380c5f82mr264766b3a.28.1728589525085;
-        Thu, 10 Oct 2024 12:45:25 -0700 (PDT)
+        bh=+3EI4XTDmYBqzGsZ4sox7/pa5h3v/nZZ5pZc9pzFM5I=;
+        b=G4HOYW36XZ1mQ0guE8oxzuNaF1Zw05HU8cBrWPcHJQ/Bw2gfFvfFNc2Tb+8diQamJY
+         ypOwRA7IcMMydOAxPIkOOIhW39qpY1bYJ5SDUL7tE/b3jS18XkqbXqgpy4WA2V0R5wrr
+         YfPKY83TDRkp+hqOYLaiy063AojL88gPoXP0Mc8FWmpDo2ZIDatOmDKhoohoYebPGU6I
+         d6RWGyYjAQMklGEVU6I0Ovpxzlh12HYJBhkMkdZ0AoOhEIEwGuMBMdYdK5rxgbInBwhj
+         E3FfLRLYgQPw0ClWvLsGiAfhLXiTssNFH4CI7q7yVwcJ8TdNT+8rNdynMmDC2kbyk497
+         zlrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX8WpcwfRn++aSnH1zMVE40GwmSh6rSoifR2IJx+Thgav8j4w0JLobolohw/jnqhqaP3FyAekxgDcjnYyw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy0RYrYw19/isXrHL4Qa/rJFQYg+YgS5eJu+6l2cK2HNQEKMeWI
+	EbQYEYmdhhMt+iUnoVLzduyoP6NONiyJCSx2TwWdTkWORPRmU/dpirteUqO4
+X-Google-Smtp-Source: AGHT+IHJuZRDWcftnPRua4fr9uRoKs7TTb6YTz0GeS+hpwkLoxjCCAZmkRNuK3lfqm3lBYPdzs0xWQ==
+X-Received: by 2002:a05:6a21:4006:b0:1c8:a5ba:d2ba with SMTP id adf61e73a8af0-1d8bcf356admr168084637.22.1728589526287;
+        Thu, 10 Oct 2024 12:45:26 -0700 (PDT)
 Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7ea448fe50csm1374762a12.29.2024.10.10.12.45.23
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7ea448fe50csm1374762a12.29.2024.10.10.12.45.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Oct 2024 12:45:24 -0700 (PDT)
+        Thu, 10 Oct 2024 12:45:26 -0700 (PDT)
 From: Rosen Penev <rosenp@gmail.com>
 To: linux-crypto@vger.kernel.org
 Cc: Boris Brezillon <bbrezillon@kernel.org>,
@@ -62,9 +62,9 @@ Cc: Boris Brezillon <bbrezillon@kernel.org>,
 	Rosen Penev <rosenp@gmail.com>,
 	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
 	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCHv2 4/5] crypto: cesa: move loop to mv_cesa_put_sram
-Date: Thu, 10 Oct 2024 12:45:16 -0700
-Message-ID: <20241010194517.18635-5-rosenp@gmail.com>
+Subject: [PATCHv2 5/5] crypto: cesa: use devm_platform_get_and_ioremap_resource
+Date: Thu, 10 Oct 2024 12:45:17 -0700
+Message-ID: <20241010194517.18635-6-rosenp@gmail.com>
 X-Mailer: git-send-email 2.46.2
 In-Reply-To: <20241010194517.18635-1-rosenp@gmail.com>
 References: <20241010194517.18635-1-rosenp@gmail.com>
@@ -76,73 +76,46 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Simpler to move it there. More readable remove.
+Removes separate steps. Requires index instead of name.
 
 Signed-off-by: Rosen Penev <rosenp@gmail.com>
 ---
- drivers/crypto/marvell/cesa/cesa.c | 31 +++++++++++++++---------------
- 1 file changed, 16 insertions(+), 15 deletions(-)
+ drivers/crypto/marvell/cesa/cesa.c | 15 +--------------
+ 1 file changed, 1 insertion(+), 14 deletions(-)
 
 diff --git a/drivers/crypto/marvell/cesa/cesa.c b/drivers/crypto/marvell/cesa/cesa.c
-index 21e13f4a1f48..a65f328b7094 100644
+index a65f328b7094..ef4b1c2336bb 100644
 --- a/drivers/crypto/marvell/cesa/cesa.c
 +++ b/drivers/crypto/marvell/cesa/cesa.c
-@@ -416,17 +416,23 @@ static int mv_cesa_get_sram(struct platform_device *pdev, int idx)
- 	return 0;
- }
- 
--static void mv_cesa_put_sram(struct platform_device *pdev, int idx)
-+static void mv_cesa_put_sram(struct platform_device *pdev)
+@@ -375,7 +375,6 @@ static int mv_cesa_get_sram(struct platform_device *pdev, int idx)
  {
  	struct mv_cesa_dev *cesa = platform_get_drvdata(pdev);
--	struct mv_cesa_engine *engine = &cesa->engines[idx];
-+	const struct mv_cesa_caps *caps = &orion_caps;
-+	int i;
+ 	struct mv_cesa_engine *engine = &cesa->engines[idx];
+-	const char *res_name = "sram";
+ 	struct resource *res;
  
--	if (engine->pool)
--		gen_pool_free(engine->pool, (unsigned long)engine->sram_pool,
--			      cesa->sram_size);
--	else
--		dma_unmap_resource(cesa->dev, engine->sram_dma,
--				   cesa->sram_size, DMA_BIDIRECTIONAL, 0);
-+	for (i = 0; i < caps->nengines; i++) {
-+		struct mv_cesa_engine *engine = &cesa->engines[i];
-+		if (engine->pool)
-+			gen_pool_free(engine->pool,
-+				      (unsigned long)engine->sram_pool,
-+				      cesa->sram_size);
-+		else
-+			dma_unmap_resource(cesa->dev, engine->sram_dma,
-+					   cesa->sram_size, DMA_BIDIRECTIONAL,
-+					   0);
-+	}
- }
+ 	engine->pool = of_gen_pool_get(cesa->dev->of_node,
+@@ -391,19 +390,7 @@ static int mv_cesa_get_sram(struct platform_device *pdev, int idx)
+ 		return -ENOMEM;
+ 	}
  
- static int mv_cesa_probe(struct platform_device *pdev)
-@@ -566,21 +572,16 @@ static int mv_cesa_probe(struct platform_device *pdev)
- 	return 0;
- 
- err_cleanup:
--	for (i = 0; i < caps->nengines; i++)
--		mv_cesa_put_sram(pdev, i);
+-	if (cesa->caps->nengines > 1) {
+-		if (!idx)
+-			res_name = "sram0";
+-		else
+-			res_name = "sram1";
+-	}
 -
-+	mv_cesa_put_sram(pdev);
- 	return ret;
- }
- 
- static void mv_cesa_remove(struct platform_device *pdev)
- {
- 	struct mv_cesa_dev *cesa = platform_get_drvdata(pdev);
--	int i;
- 
- 	mv_cesa_remove_algs(cesa);
+-	res = platform_get_resource_byname(pdev, IORESOURCE_MEM,
+-					   res_name);
+-	if (!res || resource_size(res) < cesa->sram_size)
+-		return -EINVAL;
 -
--	for (i = 0; i < cesa->caps->nengines; i++)
--		mv_cesa_put_sram(pdev, i);
-+	mv_cesa_put_sram(pdev);
- }
+-	engine->sram = devm_ioremap_resource(cesa->dev, res);
++	engine->sram = devm_platform_get_and_ioremap_resource(pdev, idx, &res);
+ 	if (IS_ERR(engine->sram))
+ 		return PTR_ERR(engine->sram);
  
- static const struct platform_device_id mv_cesa_plat_id_table[] = {
 -- 
 2.46.2
 
