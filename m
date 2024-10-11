@@ -1,191 +1,329 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx08-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F7F321730A;
-	Fri, 11 Oct 2024 12:41:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 374778121F;
+	Fri, 11 Oct 2024 15:47:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.207.212.93
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728650494; cv=none; b=U87/22+wUC5j9YUe/ZnPk0ge9pdIfbeU/0YJ4/YlYoAh0FFazJluzySOiO6iIunzj/ChTGuNckzFLomSEZ7Cb6q2YG0gXVzTh76dW/Ui9GJPMStLSHVbjkpCF8hozRYAud1mmUoJyb7JCOBLGHvbq1F4V9h/t8JdNfyLW9bxbk0=
+	t=1728661666; cv=none; b=hvh7+CBpFFddCjwhMpU7QB63//KA5lDRC7I3bZZqjUoYSsmShTBxdrIPyKYYLCWokxBt2WdcbGpdqpzAGB0LZf2R4oFhaMgC9Ntd5CUXMrALrSqetTBvgxyMAdDoq/Jkr3BjthYq0sqlfe0M13ZzvRW/m1ns31PHqWHXLfyHIyM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728650494; c=relaxed/simple;
-	bh=kKwIBpA5S9LrkqJJ8uWuWlSej++5KBbnyVr7S5xV7hM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t8zmLRnFTzZ08nWteGJERcLwPV/yPQ9IiWdzkrWSh/5WttvferKLzGs9cb1jLAhu/Fv+7IpgXAg7q/QTSzeqBb/r4VfhRnapVdQTMETVo4NygA4V5v79kupIkSSawnkfbsYwt6zFldY+qKO1DBpzaxOSi9CWCtn/3gYwqOkIiEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=XZ15mkIO; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1728661666; c=relaxed/simple;
+	bh=pY3HPUzNjPgjv0Cmibc6l9JbTz0qD5wkGAYRN/dsxf0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
+	 In-Reply-To:To:CC; b=ojiqoaAH4OdRJhVCejwuQYjFkp6V6hndWbets9vVNWn48ywlhWj44XHlWkelf99+Li2Ez5savCVqc6pk5ZJNZjDboQRp4zs5r1CWb+uY3Cj94pUq8pqphizP3tZ0Da/r2aW5viUW+iU9oS5F4rdk4zOEm+IEORjtr9SUhg0BslM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=nvDTr9PX; arc=none smtp.client-ip=91.207.212.93
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="XZ15mkIO"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49BCIPi5014179;
-	Fri, 11 Oct 2024 12:36:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
-	:from:to:cc:subject:message-id:references:mime-version
-	:content-type:in-reply-to; s=pp1; bh=ND/BSurEfjKN+V4F/rAvWp3jhJc
-	4pT8i9hJ4NX9vjiY=; b=XZ15mkIOJRTJEBPIsBi4fFlzYbUNu/60f0S4zmVvo0u
-	CcwhnnZeERHElbwRDaGOOjhQ4BETF/ErzQ2ghLbvp8TsFqaBNu2Jan5/AG2tduFP
-	rDVdDfZT48Gh9TzVWq98YL5+oB6X3bNJrKurcnA3wYw3YpBPn6/ZlyvoSCfddZfr
-	rFK5JizqkZBLx4IqQkzblqDl1RlfwQ7UZwzjW/fLzA87cmCXu0vNXCudkXZro5g8
-	9q1mrf+3kTnua2ndq4zVsaNIlIw/1kRkRSDcH2rxAPIepCSFWNJujW4UYO9c/r1G
-	FzSNMWCcST+/yzR10n456CYBvXdyRcVEhp+ckHWFNLw==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4271s1gth3-1
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="nvDTr9PX"
+Received: from pps.filterd (m0369457.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49BCM4jP004698;
+	Fri, 11 Oct 2024 17:47:04 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=selector1; bh=
+	zvHyj2kl9ZF339cIQfBGt0O6QAjQz8aYGjJ+YqPTeOE=; b=nvDTr9PXdtkpB33l
+	RnKwqZmHB90vrQEeUYkSYqrKTcZWwGoGnJERUX6fqxO6a9+Yt3EcHO0D5sna53dI
+	SnF6teRQ02+TlViCCeVuW7HCj6DnqQiIRcO4W4XS0gqiKMppQPK+16QwWPKyPrb2
+	7er5VEb2cDM0EjceDnKAfBEYLxhfMLDLNCSmDTlIF3hYkjzuMbA7jEglMp5FS6BK
+	MzEuNYvS3wM+emfaHn1NLqaWf28artTCWr7Yn+25FIM+zi5Ru5pgY/66mvaPiyPV
+	CefvERY/yE8qT0ZtWVPWg5hF4wXdmOi8PrWdSueq8TPVH/+VdBwNJiKIn3fkVn0O
+	AM3DMg==
+Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 425w7xtut0-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 11 Oct 2024 12:36:17 +0000 (GMT)
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49BCaHTn021926;
-	Fri, 11 Oct 2024 12:36:17 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4271s1gtgx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 11 Oct 2024 12:36:17 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49BBD8qq030153;
-	Fri, 11 Oct 2024 12:36:16 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 423gsn5g70-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 11 Oct 2024 12:36:15 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49BCaEx052625696
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 11 Oct 2024 12:36:14 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 01F8020040;
-	Fri, 11 Oct 2024 12:36:14 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 85A3820049;
-	Fri, 11 Oct 2024 12:36:11 +0000 (GMT)
-Received: from linux.ibm.com (unknown [9.124.219.55])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Fri, 11 Oct 2024 12:36:11 +0000 (GMT)
-Date: Fri, 11 Oct 2024 18:06:09 +0530
-From: Vishal Chourasia <vishalc@linux.ibm.com>
-To: Michael Ellerman <mpe@ellerman.id.au>
-Cc: linuxppc-dev@lists.ozlabs.org, Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Naveen N Rao <naveen@kernel.org>,
-        Madhavan Srinivasan <maddy@linux.ibm.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: drivers/nx: Invalid wait context issue when rebooting
-Message-ID: <Zwkbuah8myR4JeFI@linux.ibm.com>
-References: <ZwjjXJ5UtZ28FH6s@linux.ibm.com>
- <87wmif53iw.fsf@mail.lhotse>
+	Fri, 11 Oct 2024 17:47:04 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 313A8400A2;
+	Fri, 11 Oct 2024 17:45:50 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 9ADE829E027;
+	Fri, 11 Oct 2024 17:43:16 +0200 (CEST)
+Received: from localhost (10.252.28.117) by SHFDAG1NODE1.st.com (10.75.129.69)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.37; Fri, 11 Oct
+ 2024 17:43:16 +0200
+From: Gatien Chevallier <gatien.chevallier@foss.st.com>
+Date: Fri, 11 Oct 2024 17:41:42 +0200
+Subject: [PATCH v2 2/4] hwrng: stm32 - implement support for STM32MP25x
+ platforms
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87wmif53iw.fsf@mail.lhotse>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: OwLPFC_RnG-lSw0HyAgnAzsytsTIWg-L
-X-Proofpoint-GUID: wF05QEk1go1W1xiHRnFkFyqRNNtDKd_f
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-ID: <20241011-rng-mp25-v2-v2-2-76fd6170280c@foss.st.com>
+References: <20241011-rng-mp25-v2-v2-0-76fd6170280c@foss.st.com>
+In-Reply-To: <20241011-rng-mp25-v2-v2-0-76fd6170280c@foss.st.com>
+To: Olivia Mackall <olivia@selenic.com>,
+        Herbert Xu
+	<herbert@gondor.apana.org.au>,
+        Rob Herring <robh@kernel.org>,
+        Krzysztof
+ Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue
+	<alexandre.torgue@foss.st.com>,
+        Lionel Debieve <lionel.debieve@foss.st.com>, <marex@denx.de>
+CC: <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+        Gatien Chevallier <gatien.chevallier@foss.st.com>
+X-Mailer: b4 0.14.2
+X-ClientProxiedBy: EQNCAS1NODE4.st.com (10.75.129.82) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
 X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-11_09,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- mlxlogscore=999 impostorscore=0 clxscore=1015 priorityscore=1501
- adultscore=0 mlxscore=0 bulkscore=0 malwarescore=0 suspectscore=0
- spamscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2410110084
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
 
-On Fri, Oct 11, 2024 at 09:37:27PM +1100, Michael Ellerman wrote:
-> Vishal Chourasia <vishalc@linux.ibm.com> writes:
-> > Hi,
-> > I am getting Invalid wait context warning printed when rebooting lpar
-> >
-> > kexec/61926 is trying to acquire `of_reconfig_chain.rwsem` while holding
-> > spinlock `devdata_mutex`
-> >
-> > Note: Name of the spinlock is misleading.
-> 
-> Oof, yeah let's rename that to devdata_spinlock at least.
-> 
-> > In my case, I compiled a new vmlinux file and loaded it into the running
-> > kernel using `kexec -l` and then hit `reboot`
-> >
-> > dmesg:
-> > ------
-> >
-> > [ BUG: Invalid wait context ]
-> > 6.11.0-test2-10547-g684a64bf32b6-dirty #79 Not tainted
-> 
-> Is that v6.11 plus ~10,000 patches? O_o
-> 
-> Ah no, 684a64bf32b6 is roughly v6.12-rc1. Maybe if you fetch tags into
-> your tree you will get a more sensible version string?
-> 
-> Could also be good to try v6.12-rc2.
-> 
-> > -----------------------------
-> > kexec/61926 is trying to lock:
-> > c000000002d8b590 ((of_reconfig_chain).rwsem){++++}-{4:4}, at: blocking_notifier_chain_unregister+0x44/0xa0
-> > other info that might help us debug this:
-> > context-{5:5}
-> > 4 locks held by kexec/61926:
-> >  #0: c000000002926c70 (system_transition_mutex){+.+.}-{4:4}, at: __do_sys_reboot+0xf8/0x2e0
-> >  #1: c00000000291af30 (&dev->mutex){....}-{4:4}, at: device_shutdown+0x160/0x310
-> >  #2: c000000051011938 (&dev->mutex){....}-{4:4}, at: device_shutdown+0x174/0x310
-> >  #3: c000000002d88070 (devdata_mutex){....}-{3:3}, at: nx842_remove+0xac/0x1bc
->   
-> That's pretty conclusive.
-> 
-> I don't understand why you're the first person to see this. I can't see
-> that any of the relevant code has changed recently. Unless something in
-> lockdep itself changed?
-bug is thrown in the reboot path, could that be it?
-I will do a bisect to verify the second part of your question.
+Implement the support for STM32MP25x platforms. On this platform, a
+security clock is shared between some hardware blocks. For the RNG,
+it is the RNG kernel clock. Therefore, the gate is no more shared
+between the RNG bus and kernel clocks as on STM32MP1x platforms and
+the bus clock has to be managed on its own.
 
-Thanks
-> 
-> Did you just start seeing this on recent kernels? Can you bisect?
-> 
-> > stack backtrace:
-> > CPU: 2 UID: 0 PID: 61926 Comm: kexec Not tainted 6.11.0-test2-10547-g684a64bf32b6-dirty #79
-> > Hardware name: IBM,9080-HEX POWER10 (architected) 0x800200 0xf000006 of:IBM,FW1060.00 (NH1060_012) hv:phyp pSeries
-> > Call Trace:
-> > [c0000000bb577400] [c000000001239704] dump_stack_lvl+0xc8/0x130 (unreliable)
-> > [c0000000bb577440] [c000000000248398] __lock_acquire+0xb68/0xf00
-> > [c0000000bb577550] [c000000000248820] lock_acquire.part.0+0xf0/0x2a0
-> > [c0000000bb577670] [c00000000127faa0] down_write+0x70/0x1e0
-> > [c0000000bb5776b0] [c0000000001acea4] blocking_notifier_chain_unregister+0x44/0xa0
-> > [c0000000bb5776e0] [c000000000e2312c] of_reconfig_notifier_unregister+0x2c/0x40
-> > [c0000000bb577700] [c000000000ded24c] nx842_remove+0x148/0x1bc
-> > [c0000000bb577790] [c00000000011a114] vio_bus_remove+0x54/0xc0
-> > [c0000000bb5777c0] [c000000000c1a44c] device_shutdown+0x20c/0x310
-> > [c0000000bb577850] [c0000000001b0ab4] kernel_restart_prepare+0x54/0x70
-> > [c0000000bb577870] [c000000000308718] kernel_kexec+0xa8/0x110
-> > [c0000000bb5778e0] [c0000000001b1144] __do_sys_reboot+0x214/0x2e0
-> > [c0000000bb577a40] [c000000000032f98] system_call_exception+0x148/0x310
-> > [c0000000bb577e50] [c00000000000cedc] system_call_vectored_common+0x15c/0x2ec
-> 
-> I don't see why of_reconfig_notifier_unregister() needs to be called
-> with the devdata_mutext held, but I haven't looked that closely at it.
-> 
-> So the change below might work.
-> 
-> cheers
-> 
-> diff --git a/drivers/crypto/nx/nx-common-pseries.c b/drivers/crypto/nx/nx-common-pseries.c
-> index 35f2d0d8507e..a2050c5fb11d 100644
-> --- a/drivers/crypto/nx/nx-common-pseries.c
-> +++ b/drivers/crypto/nx/nx-common-pseries.c
-> @@ -1122,10 +1122,11 @@ static void nx842_remove(struct vio_dev *viodev)
->  
->  	crypto_unregister_alg(&nx842_pseries_alg);
->  
-> +	of_reconfig_notifier_unregister(&nx842_of_nb);
-> +
->  	spin_lock_irqsave(&devdata_mutex, flags);
->  	old_devdata = rcu_dereference_check(devdata,
->  			lockdep_is_held(&devdata_mutex));
-> -	of_reconfig_notifier_unregister(&nx842_of_nb);
->  	RCU_INIT_POINTER(devdata, NULL);
->  	spin_unlock_irqrestore(&devdata_mutex, flags);
->  	synchronize_rcu();
-> 
+Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+---
+
+Changes in V2
+	-Renamed RNG clocks to "core" and "bus"
+	-Use clk_bulk_* APIs instead of handling each clock. Just make
+	 sure that the RNG core clock is first
+---
+ drivers/char/hw_random/stm32-rng.c | 85 ++++++++++++++++++++++++++++++--------
+ 1 file changed, 67 insertions(+), 18 deletions(-)
+
+diff --git a/drivers/char/hw_random/stm32-rng.c b/drivers/char/hw_random/stm32-rng.c
+index 9d041a67c295a54d283d235bbcf5a9ab7a8baa5c..62aa9f87415d2518b0c1cb5fb51b0b646422ed35 100644
+--- a/drivers/char/hw_random/stm32-rng.c
++++ b/drivers/char/hw_random/stm32-rng.c
+@@ -49,6 +49,7 @@
+ 
+ struct stm32_rng_data {
+ 	uint	max_clock_rate;
++	uint	nb_clock;
+ 	u32	cr;
+ 	u32	nscr;
+ 	u32	htcr;
+@@ -72,7 +73,7 @@ struct stm32_rng_private {
+ 	struct hwrng rng;
+ 	struct device *dev;
+ 	void __iomem *base;
+-	struct clk *clk;
++	struct clk_bulk_data *clk_bulk;
+ 	struct reset_control *rst;
+ 	struct stm32_rng_config pm_conf;
+ 	const struct stm32_rng_data *data;
+@@ -266,7 +267,7 @@ static uint stm32_rng_clock_freq_restrain(struct hwrng *rng)
+ 	unsigned long clock_rate = 0;
+ 	uint clock_div = 0;
+ 
+-	clock_rate = clk_get_rate(priv->clk);
++	clock_rate = clk_get_rate(priv->clk_bulk[0].clk);
+ 
+ 	/*
+ 	 * Get the exponent to apply on the CLKDIV field in RNG_CR register
+@@ -276,7 +277,7 @@ static uint stm32_rng_clock_freq_restrain(struct hwrng *rng)
+ 	while ((clock_rate >> clock_div) > priv->data->max_clock_rate)
+ 		clock_div++;
+ 
+-	pr_debug("RNG clk rate : %lu\n", clk_get_rate(priv->clk) >> clock_div);
++	pr_debug("RNG clk rate : %lu\n", clk_get_rate(priv->clk_bulk[0].clk) >> clock_div);
+ 
+ 	return clock_div;
+ }
+@@ -288,7 +289,7 @@ static int stm32_rng_init(struct hwrng *rng)
+ 	int err;
+ 	u32 reg;
+ 
+-	err = clk_prepare_enable(priv->clk);
++	err = clk_bulk_prepare_enable(priv->data->nb_clock, priv->clk_bulk);
+ 	if (err)
+ 		return err;
+ 
+@@ -328,7 +329,7 @@ static int stm32_rng_init(struct hwrng *rng)
+ 							(!(reg & RNG_CR_CONDRST)),
+ 							10, 50000);
+ 		if (err) {
+-			clk_disable_unprepare(priv->clk);
++			clk_bulk_disable_unprepare(priv->data->nb_clock, priv->clk_bulk);
+ 			dev_err(priv->dev, "%s: timeout %x!\n", __func__, reg);
+ 			return -EINVAL;
+ 		}
+@@ -356,12 +357,13 @@ static int stm32_rng_init(struct hwrng *rng)
+ 						reg & RNG_SR_DRDY,
+ 						10, 100000);
+ 	if (err || (reg & ~RNG_SR_DRDY)) {
+-		clk_disable_unprepare(priv->clk);
++		clk_bulk_disable_unprepare(priv->data->nb_clock, priv->clk_bulk);
+ 		dev_err(priv->dev, "%s: timeout:%x SR: %x!\n", __func__, err, reg);
++
+ 		return -EINVAL;
+ 	}
+ 
+-	clk_disable_unprepare(priv->clk);
++	clk_bulk_disable_unprepare(priv->data->nb_clock, priv->clk_bulk);
+ 
+ 	return 0;
+ }
+@@ -379,7 +381,8 @@ static int __maybe_unused stm32_rng_runtime_suspend(struct device *dev)
+ 	reg = readl_relaxed(priv->base + RNG_CR);
+ 	reg &= ~RNG_CR_RNGEN;
+ 	writel_relaxed(reg, priv->base + RNG_CR);
+-	clk_disable_unprepare(priv->clk);
++
++	clk_bulk_disable_unprepare(priv->data->nb_clock, priv->clk_bulk);
+ 
+ 	return 0;
+ }
+@@ -389,7 +392,7 @@ static int __maybe_unused stm32_rng_suspend(struct device *dev)
+ 	struct stm32_rng_private *priv = dev_get_drvdata(dev);
+ 	int err;
+ 
+-	err = clk_prepare_enable(priv->clk);
++	err = clk_bulk_prepare_enable(priv->data->nb_clock, priv->clk_bulk);
+ 	if (err)
+ 		return err;
+ 
+@@ -403,7 +406,7 @@ static int __maybe_unused stm32_rng_suspend(struct device *dev)
+ 
+ 	writel_relaxed(priv->pm_conf.cr, priv->base + RNG_CR);
+ 
+-	clk_disable_unprepare(priv->clk);
++	clk_bulk_disable_unprepare(priv->data->nb_clock, priv->clk_bulk);
+ 
+ 	return 0;
+ }
+@@ -414,7 +417,7 @@ static int __maybe_unused stm32_rng_runtime_resume(struct device *dev)
+ 	int err;
+ 	u32 reg;
+ 
+-	err = clk_prepare_enable(priv->clk);
++	err = clk_bulk_prepare_enable(priv->data->nb_clock, priv->clk_bulk);
+ 	if (err)
+ 		return err;
+ 
+@@ -434,7 +437,7 @@ static int __maybe_unused stm32_rng_resume(struct device *dev)
+ 	int err;
+ 	u32 reg;
+ 
+-	err = clk_prepare_enable(priv->clk);
++	err = clk_bulk_prepare_enable(priv->data->nb_clock, priv->clk_bulk);
+ 	if (err)
+ 		return err;
+ 
+@@ -462,7 +465,7 @@ static int __maybe_unused stm32_rng_resume(struct device *dev)
+ 							reg & ~RNG_CR_CONDRST, 10, 100000);
+ 
+ 		if (err) {
+-			clk_disable_unprepare(priv->clk);
++			clk_bulk_disable_unprepare(priv->data->nb_clock, priv->clk_bulk);
+ 			dev_err(priv->dev, "%s: timeout:%x CR: %x!\n", __func__, err, reg);
+ 			return -EINVAL;
+ 		}
+@@ -472,7 +475,7 @@ static int __maybe_unused stm32_rng_resume(struct device *dev)
+ 		writel_relaxed(reg, priv->base + RNG_CR);
+ 	}
+ 
+-	clk_disable_unprepare(priv->clk);
++	clk_bulk_disable_unprepare(priv->data->nb_clock, priv->clk_bulk);
+ 
+ 	return 0;
+ }
+@@ -484,9 +487,19 @@ static const struct dev_pm_ops __maybe_unused stm32_rng_pm_ops = {
+ 				stm32_rng_resume)
+ };
+ 
++static const struct stm32_rng_data stm32mp25_rng_data = {
++	.has_cond_reset = true,
++	.max_clock_rate = 48000000,
++	.nb_clock = 2,
++	.cr = 0x00F00D00,
++	.nscr = 0x2B5BB,
++	.htcr = 0x969D,
++};
++
+ static const struct stm32_rng_data stm32mp13_rng_data = {
+ 	.has_cond_reset = true,
+ 	.max_clock_rate = 48000000,
++	.nb_clock = 1,
+ 	.cr = 0x00F00D00,
+ 	.nscr = 0x2B5BB,
+ 	.htcr = 0x969D,
+@@ -495,9 +508,14 @@ static const struct stm32_rng_data stm32mp13_rng_data = {
+ static const struct stm32_rng_data stm32_rng_data = {
+ 	.has_cond_reset = false,
+ 	.max_clock_rate = 3000000,
++	.nb_clock = 1,
+ };
+ 
+ static const struct of_device_id stm32_rng_match[] = {
++	{
++		.compatible = "st,stm32mp25-rng",
++		.data = &stm32mp25_rng_data,
++	},
+ 	{
+ 		.compatible = "st,stm32mp13-rng",
+ 		.data = &stm32mp13_rng_data,
+@@ -525,10 +543,6 @@ static int stm32_rng_probe(struct platform_device *ofdev)
+ 	if (IS_ERR(priv->base))
+ 		return PTR_ERR(priv->base);
+ 
+-	priv->clk = devm_clk_get(&ofdev->dev, NULL);
+-	if (IS_ERR(priv->clk))
+-		return PTR_ERR(priv->clk);
+-
+ 	priv->rst = devm_reset_control_get(&ofdev->dev, NULL);
+ 	if (!IS_ERR(priv->rst)) {
+ 		reset_control_assert(priv->rst);
+@@ -551,6 +565,41 @@ static int stm32_rng_probe(struct platform_device *ofdev)
+ 	priv->rng.read = stm32_rng_read;
+ 	priv->rng.quality = 900;
+ 
++	if (!priv->data->nb_clock || priv->data->nb_clock > 2)
++		return -EINVAL;
++
++	priv->clk_bulk = devm_kzalloc(dev, priv->data->nb_clock * sizeof(*priv->clk_bulk),
++				      GFP_KERNEL);
++	if (!priv->clk_bulk)
++		return -ENOMEM;
++
++	if (priv->data->nb_clock == 2) {
++		struct clk *clk;
++		struct clk *bus_clk;
++
++		clk = devm_clk_get(&ofdev->dev, "core");
++		if (IS_ERR(clk))
++			return PTR_ERR(clk);
++
++		bus_clk = devm_clk_get(&ofdev->dev, "bus");
++		if (IS_ERR(clk))
++			return PTR_ERR(bus_clk);
++
++		priv->clk_bulk[0].clk = clk;
++		priv->clk_bulk[0].id = "core";
++		priv->clk_bulk[1].clk = bus_clk;
++		priv->clk_bulk[1].id = "bus";
++	} else {
++		struct clk *clk;
++
++		clk = devm_clk_get(&ofdev->dev, NULL);
++		if (IS_ERR(clk))
++			return PTR_ERR(clk);
++
++		priv->clk_bulk[0].clk = clk;
++		priv->clk_bulk[0].id = "core";
++	}
++
+ 	pm_runtime_set_autosuspend_delay(dev, 100);
+ 	pm_runtime_use_autosuspend(dev);
+ 	pm_runtime_enable(dev);
+
+-- 
+2.25.1
+
