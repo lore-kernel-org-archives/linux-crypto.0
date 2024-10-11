@@ -1,123 +1,196 @@
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A37F199941;
-	Fri, 11 Oct 2024 16:18:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 612531A070E;
+	Fri, 11 Oct 2024 17:26:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728663531; cv=none; b=IqSjC1emxMXTNVeQYLK/UqJ+ntcFMDlGwuBQqV0uLUaqUnonHcVFnEiE4Ej+0Wv2cvnde7SPLk5qFWXsxxsYiILvzTUsFmGgIfsp8h4z8NCPqh7uNjtCU6fWp+3zqO2M04+0Q8IrvCytW4CR/t10Dunplxp3GZWu+mG4DNyAAzY=
+	t=1728667565; cv=none; b=W86+GgzTZ+6VbEbLqA4yBHlXsD7JLNketuEiinr2qgRwhLIvMFaMl67rcuvIg5LUBrh/FBzVtPPzXnNsWtG3k0Ah+YlSnzHL4RttQ+zdGU8Brxf9AhJxVkeXrOszqMoIHSutXAfFM71Lkv0yG8QJH4RbuCgXtnvB5XKE9cpvWvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728663531; c=relaxed/simple;
-	bh=K8T7vhTjxPwqAkaEtzLdQLN6TXzL+1tWceYblP+OEbw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=D3NY1nxnZR4J7TnQepxj3l/niXgLOtn/0LtS1I1MX02bWCfsawDsqPZwgLfB3CCp3QOiswrQJ8DUAd6SaQ8prec4q5JPu3x6WwgMz0HdZfOrWr1iFfhEpViELjtd0v/g/SxhujmKcJJQg31mjUVaCb/3BndNB3w1zXELL7p6BKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=CdN6M5+6; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+	s=arc-20240116; t=1728667565; c=relaxed/simple;
+	bh=d4XdU7LwmImoIfgJxzrFLRWHX5GkzhJSbQ2gevvsFFw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ctr9vR4tR2W64pQpWpcqsW/iSw5x9GbS+ZBWR/wF2Hs0oWNkUAKqIGEb3eTeq+S8fobhuL+vGAoeQq6VDKC3qsBR3N5lfzU9lE6N//e8sD/8YG+0FPX2+FDI03kL9YPhiC1IE3IbStMNev3/wSMU92VnCI/LAoPB7QitQTq4PsI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=gD64PAQg; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="CdN6M5+6"
-Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 50E0A89386;
-	Fri, 11 Oct 2024 18:18:46 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1728663527;
-	bh=knbUJOYVVLigaFfV1Maa2Dmr2xPGKb/0OGh2oD7ajnc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=CdN6M5+61CW/RsuLF2CiAF7HwXoGjWwV3QO2LOJZnE5aPSwVMz6r+Zqnze/igo3Ve
-	 sKuAzGuS2xr+hFxb4CRng2n7vK/0cdRVXLSnUZ47aoGg2AQw0AMHIXweUbbU6xu/bc
-	 o9dvSJ/AeAi4Ml+PN5mmA82aU/jg4gkEtFb0yMDdi3N4UeFd01X/q/Q/k9NAAopkgh
-	 M38tnEEooMrO//ioA5EDR83nD+qISHOokq2DX0zp5NI6p7h+LHlpigF4sfKxFgu9gX
-	 J+IQr6sdOLvw3RH4gUVNdAXyeE4PHDU5Fugl1vHF/VfSFgsZOpbM6bo2V9X5x6eYZs
-	 ucOPxHN824bTA==
-Message-ID: <5db8deb4-8da6-44ef-91ab-7489975cc9e5@denx.de>
-Date: Fri, 11 Oct 2024 18:18:10 +0200
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="gD64PAQg"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49BGj2gs020365;
+	Fri, 11 Oct 2024 17:20:40 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
+	:from:to:cc:subject:message-id:references:mime-version
+	:content-type:in-reply-to; s=pp1; bh=qHmCblbnT4h7Ll7/4j0U3z5eo/7
+	FTineVarzU4VqC4A=; b=gD64PAQgidBAXddYtz5jaaON0ZL6wA2rXPcIK3T8vxw
+	WnTrEgnJVsLhdLqdgLYj1ic65/O6Zr3HRJUqR3jy9fi1Ox9lfKIUerpdlyNjuHpQ
+	q/0FJEII34EK/fT7NQ0u46krnIV+aZCFrOGpBxzN8yptStXfyWVx/p8lIem2y6Kj
+	LuZJcWlYkUPEjG1aiYWz3m1IC95/pGLXUb97M6j61RteZ13SHgf+7SqNG5+RYfno
+	4jWSnZ7fUL7UWTvzR0r+IXiJXV4VpnsVC3tmzMY/USBPcKWaeJNirJPKYEfP7gHS
+	gc3lYFluJ1YUmL2Pr3eE6vDrBPABGwr46AJ1wPeY+lQ==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4277tgg4qq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 11 Oct 2024 17:20:39 +0000 (GMT)
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49BHH8AP020562;
+	Fri, 11 Oct 2024 17:20:39 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4277tgg4qm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 11 Oct 2024 17:20:39 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49BGOQgB011535;
+	Fri, 11 Oct 2024 17:20:38 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 423g5y6w5p-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 11 Oct 2024 17:20:38 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49BHKa0e40173902
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 11 Oct 2024 17:20:36 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BFD4D20043;
+	Fri, 11 Oct 2024 17:20:36 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6496C20040;
+	Fri, 11 Oct 2024 17:20:34 +0000 (GMT)
+Received: from linux.ibm.com (unknown [9.124.219.55])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Fri, 11 Oct 2024 17:20:34 +0000 (GMT)
+Date: Fri, 11 Oct 2024 22:50:31 +0530
+From: Vishal Chourasia <vishalc@linux.ibm.com>
+To: Michael Ellerman <mpe@ellerman.id.au>
+Cc: linuxppc-dev@lists.ozlabs.org, Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Naveen N Rao <naveen@kernel.org>,
+        Madhavan Srinivasan <maddy@linux.ibm.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: drivers/nx: Invalid wait context issue when rebooting
+Message-ID: <ZwleX01sala8Rc3-@linux.ibm.com>
+References: <ZwjjXJ5UtZ28FH6s@linux.ibm.com>
+ <87wmif53iw.fsf@mail.lhotse>
+ <ZwkPT3H_WVd5KyZQ@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/4] hwrng: stm32 - implement support for STM32MP25x
- platforms
-To: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>,
- Olivia Mackall <olivia@selenic.com>, Herbert Xu
- <herbert@gondor.apana.org.au>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>
-Cc: =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
- Lionel Debieve <lionel.debieve@foss.st.com>, linux-crypto@vger.kernel.org,
- devicetree@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Yang Yingliang <yangyingliang@huawei.com>
-References: <20241007132721.168428-1-gatien.chevallier@foss.st.com>
- <20241007132721.168428-3-gatien.chevallier@foss.st.com>
- <2fad1566-49f9-4586-b0d4-8a4a12f9e69e@denx.de>
- <9283caeb-1b84-43c2-a8a4-6b43a6962f34@foss.st.com>
- <b4932f99-cda4-42ef-88d8-461ca6e8cefd@denx.de>
- <6a4cccb4-9e55-437d-925b-5f5bb1804159@foss.st.com>
- <c59f3593-cb69-48c6-ab0e-f1275c7e5477@denx.de>
- <3817a22e-72aa-45d3-8e16-19c703f7f7af@foss.st.com>
-Content-Language: en-US
-From: Marek Vasut <marex@denx.de>
-In-Reply-To: <3817a22e-72aa-45d3-8e16-19c703f7f7af@foss.st.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZwkPT3H_WVd5KyZQ@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Mf_Y6sY-NXVwBknLbevm1FOmpe1qMtCC
+X-Proofpoint-ORIG-GUID: XABgsGASvsuwhi3rAvjn_8r01EzCr0fL
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-11_14,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
+ mlxscore=0 bulkscore=0 clxscore=1015 impostorscore=0 priorityscore=1501
+ spamscore=0 mlxlogscore=999 adultscore=0 phishscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
+ definitions=main-2410110118
 
-On 10/11/24 5:51 PM, Gatien CHEVALLIER wrote:
-> 
-> 
-> On 10/11/24 14:38, Marek Vasut wrote:
->> On 10/11/24 2:07 PM, Gatien CHEVALLIER wrote:
->>>
->>>
->>> On 10/11/24 13:24, Marek Vasut wrote:
->>>> On 10/11/24 11:55 AM, Gatien CHEVALLIER wrote:
->>>>>
->>>>>
->>>>> On 10/7/24 15:54, Marek Vasut wrote:
->>>>>> On 10/7/24 3:27 PM, Gatien Chevallier wrote:
->>>>>>> Implement the support for STM32MP25x platforms. On this platform, a
->>>>>>> security clock is shared between some hardware blocks. For the RNG,
->>>>>>> it is the RNG kernel clock. Therefore, the gate is no more shared
->>>>>>> between the RNG bus and kernel clocks as on STM32MP1x platforms and
->>>>>>> the bus clock has to be managed on its own.
->>>>>>>
->>>>>>> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
->>>>>> A bit of a higher-level design question -- can you use drivers/ 
->>>>>> clk/ clk-bulk.c clk_bulk_*() to handle all these disparate count 
->>>>>> of clock easily ?
->>>>>
->>>>> Hi, I'd like to make sure that we enable the core clock before the bus
->>>>> clock so that the RNG hardware block can start its internal tests 
->>>>> while
->>>>> we ungate the bus clock. It's not a strong opinion but it feels 
->>>>> better.
->>>> Maybe this could still work if the struct clk_bulk_data {} is 
->>>> ordered that way, so the bus clock are first, and the rest afterward ?
->>>
->>> I guess you meant, the core first.
->>
->> Err, yes, core.
->>
->>> Putting the bus clock first with the updated YAML doc generates a
->>> warning when checking the bindings. I guess what you propose is OK
->>> then. Core clock is defined first in the device tree.
->>
->> Not in DT, leave DT as-is. Look at struct clk_bulk_data , I think when 
->> you use the clk_bulk_*() functions, you pass in a list of struct 
->> clk_bulk_data, which each describes one clock, so just make sure that 
->> list of struct clk_bulk_data in the driver is ordered the way you need 
->> it to be ordered and you should be fine.
-> 
-> I've sent a V2 with something that is functional but not aesthetic.
-> You'll tell me if that's what you had in mind.
-I sent you a slightly tweaked example which should work too and should 
-be a bit nicer.
+On Fri, Oct 11, 2024 at 05:13:11PM +0530, Vishal Chourasia wrote:
+> On Fri, Oct 11, 2024 at 09:37:27PM +1100, Michael Ellerman wrote:
+> > Vishal Chourasia <vishalc@linux.ibm.com> writes:
+> > > Hi,
+> > > I am getting Invalid wait context warning printed when rebooting lpar
+> > >
+> > > kexec/61926 is trying to acquire `of_reconfig_chain.rwsem` while holding
+> > > spinlock `devdata_mutex`
+> > >
+> > > Note: Name of the spinlock is misleading.
+> > 
+> > Oof, yeah let's rename that to devdata_spinlock at least.
+> > 
+> > > In my case, I compiled a new vmlinux file and loaded it into the running
+> > > kernel using `kexec -l` and then hit `reboot`
+> > >
+> > > dmesg:
+> > > ------
+> > >
+> > > [ BUG: Invalid wait context ]
+> > > 6.11.0-test2-10547-g684a64bf32b6-dirty #79 Not tainted
+> > 
+> > Is that v6.11 plus ~10,000 patches? O_o
+> > 
+> > Ah no, 684a64bf32b6 is roughly v6.12-rc1. Maybe if you fetch tags into
+> > your tree you will get a more sensible version string?
+> > 
+> > Could also be good to try v6.12-rc2.
+> Sure.
+> > 
+> > > -----------------------------
+> > > kexec/61926 is trying to lock:
+> > > c000000002d8b590 ((of_reconfig_chain).rwsem){++++}-{4:4}, at: blocking_notifier_chain_unregister+0x44/0xa0
+> > > other info that might help us debug this:
+> > > context-{5:5}
+> > > 4 locks held by kexec/61926:
+> > >  #0: c000000002926c70 (system_transition_mutex){+.+.}-{4:4}, at: __do_sys_reboot+0xf8/0x2e0
+> > >  #1: c00000000291af30 (&dev->mutex){....}-{4:4}, at: device_shutdown+0x160/0x310
+> > >  #2: c000000051011938 (&dev->mutex){....}-{4:4}, at: device_shutdown+0x174/0x310
+> > >  #3: c000000002d88070 (devdata_mutex){....}-{3:3}, at: nx842_remove+0xac/0x1bc
+> >   
+> > That's pretty conclusive.
+> > 
+> > I don't understand why you're the first person to see this. I can't see
+> > that any of the relevant code has changed recently. Unless something in
+> > lockdep itself changed?
+> > 
+> > Did you just start seeing this on recent kernels? Can you bisect?
+> Yes. Sure, I will try bisecting, and get back.
+I tested for v6.0, v6.6, v6.9 kernel version, and all of them hit this
+bug. 
+
+Also, this bug is hit when I load the vmlinux file using `kexec -l`
+and do a reboot.
+> > 
+> > > stack backtrace:
+> > > CPU: 2 UID: 0 PID: 61926 Comm: kexec Not tainted 6.11.0-test2-10547-g684a64bf32b6-dirty #79
+> > > Hardware name: IBM,9080-HEX POWER10 (architected) 0x800200 0xf000006 of:IBM,FW1060.00 (NH1060_012) hv:phyp pSeries
+> > > Call Trace:
+> > > [c0000000bb577400] [c000000001239704] dump_stack_lvl+0xc8/0x130 (unreliable)
+> > > [c0000000bb577440] [c000000000248398] __lock_acquire+0xb68/0xf00
+> > > [c0000000bb577550] [c000000000248820] lock_acquire.part.0+0xf0/0x2a0
+> > > [c0000000bb577670] [c00000000127faa0] down_write+0x70/0x1e0
+> > > [c0000000bb5776b0] [c0000000001acea4] blocking_notifier_chain_unregister+0x44/0xa0
+> > > [c0000000bb5776e0] [c000000000e2312c] of_reconfig_notifier_unregister+0x2c/0x40
+> > > [c0000000bb577700] [c000000000ded24c] nx842_remove+0x148/0x1bc
+> > > [c0000000bb577790] [c00000000011a114] vio_bus_remove+0x54/0xc0
+> > > [c0000000bb5777c0] [c000000000c1a44c] device_shutdown+0x20c/0x310
+> > > [c0000000bb577850] [c0000000001b0ab4] kernel_restart_prepare+0x54/0x70
+> > > [c0000000bb577870] [c000000000308718] kernel_kexec+0xa8/0x110
+> > > [c0000000bb5778e0] [c0000000001b1144] __do_sys_reboot+0x214/0x2e0
+> > > [c0000000bb577a40] [c000000000032f98] system_call_exception+0x148/0x310
+> > > [c0000000bb577e50] [c00000000000cedc] system_call_vectored_common+0x15c/0x2ec
+> > 
+> > I don't see why of_reconfig_notifier_unregister() needs to be called
+> > with the devdata_mutext held, but I haven't looked that closely at it.
+> > 
+> > So the change below might work.
+> > 
+> > cheers
+> > 
+> > diff --git a/drivers/crypto/nx/nx-common-pseries.c b/drivers/crypto/nx/nx-common-pseries.c
+> > index 35f2d0d8507e..a2050c5fb11d 100644
+> > --- a/drivers/crypto/nx/nx-common-pseries.c
+> > +++ b/drivers/crypto/nx/nx-common-pseries.c
+> > @@ -1122,10 +1122,11 @@ static void nx842_remove(struct vio_dev *viodev)
+> >  
+> >  	crypto_unregister_alg(&nx842_pseries_alg);
+> >  
+> > +	of_reconfig_notifier_unregister(&nx842_of_nb);
+> > +
+> >  	spin_lock_irqsave(&devdata_mutex, flags);
+> >  	old_devdata = rcu_dereference_check(devdata,
+> >  			lockdep_is_held(&devdata_mutex));
+> > -	of_reconfig_notifier_unregister(&nx842_of_nb);
+> >  	RCU_INIT_POINTER(devdata, NULL);
+> >  	spin_unlock_irqrestore(&devdata_mutex, flags);
+> >  	synchronize_rcu();
+> > 
