@@ -1,155 +1,135 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from CHN02-BJS-obe.outbound.protection.partner.outlook.cn (mail-bjschn02on2122.outbound.protection.partner.outlook.cn [139.219.17.122])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA1EE207A0C;
-	Fri, 11 Oct 2024 08:36:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728635774; cv=none; b=SasrxZt5UBPFfyoKdTihyZwu7VFachJdyKoY+5K4IpUV+NiXxf9vMjhLd/EyPkSeqL0CyUVu/GnBdYPZXJbOSECEaRbj0YSAE03SCBV4YjJa0n2fzEqeRF7QKxC8eUhnHLQx1qRZNmM53Ggjb7riMExsdqK91MsZznH3cKyC/Rg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728635774; c=relaxed/simple;
-	bh=I6FRCuV7Vnu0EvQ+TRa/KiQ5GgLAW5QMGmhXXROBoPw=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=feoGX4ihUMXLoTP4F+nx6iiEKgEwMz386svk1lWjhXp1tkmQ//zUORR3L3Vp7bjF0VSx8Xh79M6g3lCByWBPcI6JMUKOmly1lIU0MivLDuaWtRR1l9S6b8EZfKTpeVzkicwIHSxYHQy/e1D96lF+xnzTpYL6mA8MoluIotG4tDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=XidGh6YD; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="XidGh6YD"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49B89dvI031301;
-	Fri, 11 Oct 2024 08:35:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
-	:from:to:subject:message-id:mime-version:content-type; s=pp1;
-	 bh=IVWnUqBc7KoYC8Ep0cjezeb2FP0REpJ9XdOmTQCedXM=; b=XidGh6YDhJPF
-	l6L2PBlK/7/XEojtoEsCWGzhQOI9IRMe0f9f4jxVa7ewUVxniKPj0DsFLYWIhUCm
-	z0/LEM2k3fSw/zxl147+c2jWmbBpy0Fx8JxSblI39+Xd6LTm+cFUyeS0zRXZiOr1
-	iIpfa4wsDOoTrSLWbjJVcPgYXNId6njOmpe6PIRIlssxzwg5NBF9PLRYo1XkyQWX
-	RiJ0TjogjOzBShENXpjXcqUxZzpXlRKD6ce3q+gvGYJ0/jw4jJ93H3FoTwE5URyO
-	iAcMTZVCXWOSwCGwCHtxxP3PhhTQljg9nAjB5Fon/5NT7CpshPfQdFpIJoVqqFvZ
-	ciHGMM+MNQ==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42708qr3t7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 11 Oct 2024 08:35:49 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49B8Zm6u019371;
-	Fri, 11 Oct 2024 08:35:48 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42708qr3t4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 11 Oct 2024 08:35:48 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49B4xjXT022678;
-	Fri, 11 Oct 2024 08:35:47 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 423h9kc6c2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 11 Oct 2024 08:35:47 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49B8ZjeZ43712842
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 11 Oct 2024 08:35:45 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C7B2B20043;
-	Fri, 11 Oct 2024 08:35:45 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9F3C020040;
-	Fri, 11 Oct 2024 08:35:43 +0000 (GMT)
-Received: from linux.ibm.com (unknown [9.124.219.55])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Fri, 11 Oct 2024 08:35:43 +0000 (GMT)
-Date: Fri, 11 Oct 2024 14:05:40 +0530
-From: Vishal Chourasia <vishalc@linux.ibm.com>
-To: linuxppc-dev@lists.ozlabs.org, Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Naveen N Rao <naveen@kernel.org>,
-        Madhavan Srinivasan <maddy@linux.ibm.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: drivers/nx: Invalid wait context issue when rebooting
-Message-ID: <ZwjjXJ5UtZ28FH6s@linux.ibm.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9C0720ADE4
+	for <linux-crypto@vger.kernel.org>; Fri, 11 Oct 2024 08:53:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.17.122
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1728636817; cv=fail; b=oBV4siEi1zZqabxExZe57Zjvg2XJRDZFOKiWJ6CGTykaGW8XiN9CnC45NT0Zvg80UM/8ch89182FQazhUJr/51jg7JILjI7jP/N5iAV+/knv740IK68j3PWapatHxl83i6pvR5+K+BtxCqzny8QuAfjyWz861bXh145KdWLROKM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1728636817; c=relaxed/simple;
+	bh=7bBDz0M+4RtTNxAMLjwKiPp4DBqGFuREPG4Q41VVVCk=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=cPc4LIkzNLDrY6H2S5KwbbJEm6v23jb+gUZs4gybWnYoC30nnrti/C8wJDdnJ1uL2ASEd8DBFNTd9L7Q3wMcCPnRMZy+T9ycM3vDsCP1eBQxiIW3xDQTNKrxAxlDPzJ+qFriM/RF7mvSqpMy8Ekdv/NUEzlqcqHDJoNRXgVe7qA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.17.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GvqtkIQFE4UStLBsBe9wWRbFw59536oc2NinFPTrHMY6r1quzKk/gjRidPabh7dYQ3OYG77PXsFbksNMTwTau4aV72kEU1tA6ydM3d0m0yFe/PVOgeKAF9k0mUJuquW6MVygyhOBAyg0bxn/wbQ9RTG4erg8x2t0LU9KXHjGPJKUFNLVeXMly+Sxu6KE08tZF7Ge0KzZVAHknCNOYnWOgxkLC1e5qastKuB9E0zFuAbCvm91NopXNy7bTFkbSHKG/nxTRDdq/DY679JoIIwihWIzzsgkDVcjCT0UiylG7rv4Sb6Reyge7N9MHjxDuj+FGisKuWtLagtMMqualhARlw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7bBDz0M+4RtTNxAMLjwKiPp4DBqGFuREPG4Q41VVVCk=;
+ b=aRasW6lJG11x47wvSorDKXRu8YEeYuOvTVoS9ykijf6VoFGT64HWM5tO7aiiQlLhUzsRlDvXU2Wa40N3J+JBsWIFYzw6RSbmo81QsBuRjdlIucQ/UxMIOmd6AGGiscCQYQmw15DD8JBnSY4VPrB3qqMzk2uMku+ZtvWwcfs7OEkC6bzze0+s6zYYAbN4XF6U6NCdkj7pdKVQsVUhxJt0OF6orYqZu5KbgFFDpqDNsyK/VGUf1H/CTaYCPe9170rJe3VKdzbtVo5nJFfrTw10pveCj0e2uJll1wn52CqUy6RA4MpKaL/Mg2am7TproTObLn/Sm2UIT32mJIJp7yIwnA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=starfivetech.com; dmarc=pass action=none
+ header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
+Received: from NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c510:10::10) by NT0PR01MB1325.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c510:f::11) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.18; Fri, 11 Oct
+ 2024 08:19:17 +0000
+Received: from NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn
+ ([fe80::f92e:ed2b:961a:ffca]) by
+ NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn ([fe80::f92e:ed2b:961a:ffca%5])
+ with mapi id 15.20.8048.017; Fri, 11 Oct 2024 08:19:17 +0000
+From: JiaJie Ho <jiajie.ho@starfivetech.com>
+To: Alexandre Ghiti <alex@ghiti.fr>, Aurelien Jarno <aurelien@aurel32.net>,
+	William Qiu <william.qiu@starfivetech.com>
+CC: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>, E
+ Shattow <lucent@gmail.com>
+Subject: RE: crypto: starfive: kernel oops when unloading jh7110_crypto module
+ and loading it again
+Thread-Index: AQHa9mUCPj6ctnsii0mHD65iohBobLI4y46QgDkk6QCAD4zAkA==
+Date: Fri, 11 Oct 2024 08:19:17 +0000
+Message-ID:
+ <NT0PR01MB1182D96E1C65D6AFAA88D0758A792@NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=starfivetech.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: NT0PR01MB1182:EE_|NT0PR01MB1325:EE_
+x-ms-office365-filtering-correlation-id: a5819504-5d67-4b60-7878-08dce9cd663e
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|41320700013|1800799024|38070700018;
+x-microsoft-antispam-message-info:
+ HXJ1GkTim/disqJjkrhCLML3fyS9UrS55jCRQ7NyjRxG+whT3QeXhMZpnAL6bOrxdtVc7pQXSTfC9zkC0yF7hixQvm0JUX+art4h9ubxh+kYD0Z3MCgjDwLBrI1lrnyWmbL1BN9mpXEm5hGl7dnhATDq+dZMDMpOOaEUE6o46hhtIaJEcva/pMqUvJ9HFrAdRNUlS1j3wQK/kIIB2LS2CLm0WLSnO+t8kOwDF46bBUd14zDGrUR4kWObyBLdqj3GE+MOoVBGl5u/4/YzQdGUZ7LVgVOQYqC8iTqRS6/YI7EApAKH8J+7u/eK6iOKALFZ/OLGACXvso+fst9p/eGH9+EOAhNr3Hq+KfzEuenBHrnto74xT4Nc7xpLoy0PlkAx6c54teEc0ohTYK1iO8176yKhPov9Fw+8OyojGGrWGzPLsHx4bfy5RztE6720bSxoO3aqUQkcBPV89UXSae5kwYksoMIvsIPYuzGKMSHGev8nxGbQgFHl0IBBm46zonBoRoCh/VvobugliHy5q8WjD6C8kiIEuXZWsJ2bKoRfca39ZHRyyhjTRx6zbMiyHJQOizNEj/oV5GftS61h6j1WNwkKd3/VDJ7SPLpiGJMqosl5PFdCIe6rDuAzEa97FX2o
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(366016)(41320700013)(1800799024)(38070700018);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?c3UxdXk4Smp4Sm15enp3YUpYajIvTTErOEtETndDbTkzSWNIUlk4NkhWVy9E?=
+ =?utf-8?B?djJ2VmkzeEp5SGcrd3FmSEEvVHB1TGJaMHhXSFBYSlZYZitEeTBRR0JnWVR2?=
+ =?utf-8?B?aDdBUkxEWGN6RzFEbWI5alV5b3JyM1FyMUNuNk1tazB6dU9HbVpVYXNOZ3Fk?=
+ =?utf-8?B?NUliMXFUK1l4dWd6T3pQSE1Ya3E4SXAvOTNuNkhxS090N3F1ZFhKbkh3SU52?=
+ =?utf-8?B?Rk43K0VqZ3NncXdZTXFKR0lVRzFncmhaazgvK2VBdzgxaURrdFlqUGJtMUVn?=
+ =?utf-8?B?blhIU21UOFdDQXk4ekU0aTdYV2JadE5yYUZScFBEZ3FyS0hBZkxwZlpaRnA1?=
+ =?utf-8?B?WUR3dU1IYmxDWVNFdHhyL3djSHlTK0xRdUpuZzltRHpIODJncTZvSTArRWls?=
+ =?utf-8?B?eXc4T0hLbHA3c0ZtQ3pOYWdaWTBlWmkydVlSSzZVK29EMm1ZZnhEazdYM0xB?=
+ =?utf-8?B?eCt4QzhLdTVFN1BlRHJyaGIyMjlKSUtnVFlDamd3bGlTcjlKLy92U3VKNzhT?=
+ =?utf-8?B?cGlyUjlWV2NQTzdlQzYzQTBNZVBRNmpBVG5nODI2THgzT09ISEpSeFBsYUh1?=
+ =?utf-8?B?dDMvYnk4SGkxUHQwYmFlODdkekV1OUcvV0FTS2xVbStkSjYxK2FubUs0TlVI?=
+ =?utf-8?B?N2hNUHl5U2hybS9ySWdDQ1FENEthODBBM010SVI5UStvR0ttbFJlZ1RRNE15?=
+ =?utf-8?B?cHdFS3lTSDVsbWZCSllqOGpocGhSTmFQMDByMDUvbkp1Vnd1N0NvMTRSdHNO?=
+ =?utf-8?B?cEt1cm5BL2J0YS9sdWFDaFdzSmorbXdYaDhLdXcybUc1N1pyTzdKUGhTcUFR?=
+ =?utf-8?B?OWRXSjUzZHRONmVLa0srTkplYThhdjdhWSs3Vm5RaXVGRnV5SXRpZ1hEQkFD?=
+ =?utf-8?B?TDQyQndidmE3Q1o4MlBUc0s3eFh1c3A4ZFN6Z3hjN3dnTU1FdFVLOE1BMkhn?=
+ =?utf-8?B?V2lCaFUyWTNHZTBEczVDYzhPd2UzMmhwbkthSklnMUs5bURJcFVOSEhyQ1Nt?=
+ =?utf-8?B?OXVOVjVPME9Pa1BGR3RndlRNbFJmSXNWN0g5R05DRnBEOUNscEtMSGZwQkJn?=
+ =?utf-8?B?ZTdva3pvd1kwMjMwYXk1MG1WZjdkRWxWUGxoYjVWK21ZS2EvWm9iVnZScDJU?=
+ =?utf-8?B?anNzRUNxTWxtREJuTHV0VHNKWXBGZW1sdTJYcVI5SW5nV3dzcFlaVGVMSWlw?=
+ =?utf-8?B?YWNFQXdicHVWR1RVWTFMZElmVGtxTW1GMWxGQWdVR1RQbUJ3eHM4ZENxZ1dr?=
+ =?utf-8?B?ZExwdGpmWUdLTXN0enlIRnM1MVZ0cDNFelUwNDg1a09YaWR1Q2FyRys4ZE54?=
+ =?utf-8?B?WXJCY2Rhd0xCcHBic2JnQW1MeUpCUjVWcnRvaVdjSHNRWTFuUlNYbW1nVFc0?=
+ =?utf-8?B?Qi9haHNtUkZWZW9sWmlhMEU2bjgrNGJ0NUI3eEgzWGJtM2JvRGRHWEFGb1g0?=
+ =?utf-8?B?cU5WZHRPa0h6QUFVUkF0TjBIWVA3cTBTa0pCbWVxVDZ0cHc0M1czcmlDQ09F?=
+ =?utf-8?B?c2pKWkk3Uk5TcHZJU1J3UW9NL2Y3QlhsUEhiZCtmQ1ZvRzdGWC9DNUhyK0c0?=
+ =?utf-8?B?RFNvc3l1aEcwd1VSNjZiRkdnUXJLQm9nNmVTOWZCWWwrM0NKZjROMTJQZzlD?=
+ =?utf-8?B?cHNHb2xYZlhOZmNsV0RFTk5sTmRLWEQ4RUdOWWZDaGdqODRrZENXNWNPWW9o?=
+ =?utf-8?B?dWVCTFVQbkpkclZFSng2MFMvZGkyMnZJMFFONkltZDRHaEVpdGV3aFZDeXI5?=
+ =?utf-8?B?OXd2ZE1JTWJYSmJXRVg5UVd3MFRtZlJ2TTUzS3BZeGNyYlgrd0xSWVRrdmNX?=
+ =?utf-8?B?Y2FoODBCUk9MMXJKVWlDaEN2RXlaR2pncjVzMWVSZXBkL1RmZXJXSm94MHY3?=
+ =?utf-8?B?MmpXanJRTytjdVpKc1NpZkhCeitvbVE5a1lIZFBsaGkzajRteFpob3Y5UTNP?=
+ =?utf-8?B?Yi83bElSUi90VzVEcVhJakJCTGZmMzRCVHZDMTNra2lWa2RjKzJsMzlhMHR2?=
+ =?utf-8?B?QnN5SGJuRzg3N2RrNUVRSmJlQXVGckkwblYwVFVBOFhmdzNhTVVTa1JrNVFV?=
+ =?utf-8?B?VzFLVmRQZHZPdEpwSHQrbVRiZVoybmg0Uk01c1UwbUVpNmFpYmVXSEwxNm5T?=
+ =?utf-8?Q?ySpeREzN1ltAER9uutrMxGd5A?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: vxZHi6rthh7m2OtbHS_khjM-cTfgkE0e
-X-Proofpoint-ORIG-GUID: d2J60pvt6eaUPdm-uwTvgx7YbKmz78WZ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-11_06,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 impostorscore=0
- adultscore=0 mlxscore=0 suspectscore=0 spamscore=0 bulkscore=0
- mlxlogscore=235 lowpriorityscore=0 phishscore=0 malwarescore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2410110055
+X-OriginatorOrg: starfivetech.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: NT0PR01MB1182.CHNPR01.prod.partner.outlook.cn
+X-MS-Exchange-CrossTenant-Network-Message-Id: a5819504-5d67-4b60-7878-08dce9cd663e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Oct 2024 08:19:17.2078
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 0x0RQGQnXDjD/CFe5ctkfiq9djrm8mrYeovzjH56HOtLnLrJMjaes6aZFUHltA/Z0jOufwhaV9wN9l9S3EEuGHYrzlRvzRmIDbFSPfDfO7I=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: NT0PR01MB1325
 
-Hi,
-I am getting Invalid wait context warning printed when rebooting lpar
-
-kexec/61926 is trying to acquire `of_reconfig_chain.rwsem` while holding
-spinlock `devdata_mutex`
-
-Note: Name of the spinlock is misleading.
-
-In my case, I compiled a new vmlinux file and loaded it into the running
-kernel using `kexec -l` and then hit `reboot`
-
-dmesg:
-------
-
-[ BUG: Invalid wait context ]
-6.11.0-test2-10547-g684a64bf32b6-dirty #79 Not tainted
------------------------------
-kexec/61926 is trying to lock:
-c000000002d8b590 ((of_reconfig_chain).rwsem){++++}-{4:4}, at: blocking_notifier_chain_unregister+0x44/0xa0
-other info that might help us debug this:
-context-{5:5}
-4 locks held by kexec/61926:
- #0: c000000002926c70 (system_transition_mutex){+.+.}-{4:4}, at: __do_sys_reboot+0xf8/0x2e0
- #1: c00000000291af30 (&dev->mutex){....}-{4:4}, at: device_shutdown+0x160/0x310
- #2: c000000051011938 (&dev->mutex){....}-{4:4}, at: device_shutdown+0x174/0x310
- #3: c000000002d88070 (devdata_mutex){....}-{3:3}, at: nx842_remove+0xac/0x1bc
-stack backtrace:
-CPU: 2 UID: 0 PID: 61926 Comm: kexec Not tainted 6.11.0-test2-10547-g684a64bf32b6-dirty #79
-Hardware name: IBM,9080-HEX POWER10 (architected) 0x800200 0xf000006 of:IBM,FW1060.00 (NH1060_012) hv:phyp pSeries
-Call Trace:
-[c0000000bb577400] [c000000001239704] dump_stack_lvl+0xc8/0x130 (unreliable)
-[c0000000bb577440] [c000000000248398] __lock_acquire+0xb68/0xf00
-[c0000000bb577550] [c000000000248820] lock_acquire.part.0+0xf0/0x2a0
-[c0000000bb577670] [c00000000127faa0] down_write+0x70/0x1e0
-[c0000000bb5776b0] [c0000000001acea4] blocking_notifier_chain_unregister+0x44/0xa0
-[c0000000bb5776e0] [c000000000e2312c] of_reconfig_notifier_unregister+0x2c/0x40
-[c0000000bb577700] [c000000000ded24c] nx842_remove+0x148/0x1bc
-[c0000000bb577790] [c00000000011a114] vio_bus_remove+0x54/0xc0
-[c0000000bb5777c0] [c000000000c1a44c] device_shutdown+0x20c/0x310
-[c0000000bb577850] [c0000000001b0ab4] kernel_restart_prepare+0x54/0x70
-[c0000000bb577870] [c000000000308718] kernel_kexec+0xa8/0x110
-[c0000000bb5778e0] [c0000000001b1144] __do_sys_reboot+0x214/0x2e0
-[c0000000bb577a40] [c000000000032f98] system_call_exception+0x148/0x310
-[c0000000bb577e50] [c00000000000cedc] system_call_vectored_common+0x15c/0x2ec
---- interrupt: 3000 at 0x7fffa07e7df8
-NIP:  00007fffa07e7df8 LR: 00007fffa07e7df8 CTR: 0000000000000000
-REGS: c0000000bb577e80 TRAP: 3000   Not tainted  (6.11.0-test2-10547-g684a64bf32b6-dirty)
-MSR:  800000000280f033   CR: 48022484  XER: 00000000
-IRQMASK: 0
-GPR00: 0000000000000058 00007ffff961f1e0 00007fffa08f7100 fffffffffee1dead
-GPR04: 0000000028121969 0000000045584543 0000000000000000 0000000000000003
-GPR08: 0000000000000003 0000000000000000 0000000000000000 0000000000000000
-GPR12: 0000000000000000 00007fffa0a9b360 ffffffffffffffff 0000000000000000
-GPR16: 0000000000000001 0000000000000002 0000000000000001 0000000000000001
-GPR20: 000000011710f520 0000000000000000 0000000000000000 0000000000000001
-GPR24: 0000000129be0480 0000000000000003 0000000000000003 00007ffff961f2b0
-GPR28: 00000001170f2d30 00000001170f2d28 00007fffa08f18d0 0000000129be04a0
-NIP [00007fffa07e7df8] 0x7fffa07e7df8
-LR [00007fffa07e7df8] 0x7fffa07e7df8
---- interrupt: 3000
-
-
+SGkgQWxleC9BdXJlbGlhbg0KPiBPbiAyNi8wOC8yMDI0IDA0OjA0LCBKaWFKaWUgSG8gd3JvdGU6
+DQo+ID4+IEkgaGF2ZSBiZWVuIHRlc3RpbmcgdGhlIGpoNzExMF9jcnlwdG8gbW9kdWxlIG9uIGEg
+VmlzaW9uRml2ZSAxLjJhDQo+ID4+IGJvYXJkLCBydW5uaW5nIGEgNi4xMS1yYzQga2VybmVsLiBU
+byBiZW5jaG1hcmsgdGhlIGNyeXB0byB3aXRoIGFuZA0KPiA+PiB3aXRob3V0IGFjY2VsZXJhdGlv
+biwgSSBoYXZlIHVubG9hZGVkIHRoZSBtb2R1bGUsIGFuZCBsYXRlciBvbiBJIGxvYWRlZCBpdA0K
+PiBhZ2Fpbi4NCj4gPj4gVW5sb2FkaW5nIGl0IHdvcmtzIGZpbmUsIGJ1dCB3aGVuIGxvYWRpbmcg
+aXQgYWdhaW4sIEkgZ2V0IHRoZQ0KPiA+PiBmb2xsb3dpbmcga2VybmVsDQo+ID4+IG9vcHM6DQo+
+ID4+DQo+ID4gSGksIEknbGwgaW52ZXN0aWdhdGUgaXQuIFRoYW5rcyBmb3IgcmVwb3J0aW5nIHRo
+aXMuDQo+IA0KPiANCj4gRGlkIHlvdSBoYXZlIHRpbWUgdG8gbG9vayBpbnRvIHRoaXM/DQo+IA0K
+DQpUaGUgQUVTIGNjbSBtb2RlIHdpbGwgaW50ZXJtaXR0ZW50bHkgcHJvZHVjZSBhIHdyb25nIHRh
+ZyBmb3Igbm9uLWJsb2Nrc2l6ZQ0KYWxpZ25lZCBwbGFpbnRleHQgYWZ0ZXIgZmV3IHRob3VzYW5k
+IG9wcy4gDQpJJ2xsIHZlcmlmeSB0aGlzIHdpdGggdGhlIGhhcmR3YXJlIHRlYW0gYW5kIHN1Ym1p
+dCBhIHBhdGNoIHRvIGRpc2FibGUgY2NtLg0KUGxlYXNlIGRvIG5vdCB1c2UgY2NtIGZvciBub3cu
+DQoNClRoYW5rcyBhZ2FpbiBmb3IgZGlzY292ZXJpbmcgdGhpcyBhbmQgc29ycnkgZm9yIHRoZSBs
+YXRlIHJlc3BvbnNlLg0KDQpCZXN0IHJlZ2FyZHMsDQpKaWEgSmllDQo=
