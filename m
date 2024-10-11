@@ -1,141 +1,144 @@
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FAB78121F;
-	Fri, 11 Oct 2024 15:58:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 057385381E
+	for <linux-crypto@vger.kernel.org>; Fri, 11 Oct 2024 16:04:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728662312; cv=none; b=NlU/k01P085Rrj0CrvkRpW6CYZLFQk8QEC6Y6mfZyxzwDY4+KE51CPjEqOMyqT0cjDNEy0sipFlfzJtWZ4sW57Eiue2/RaPBoNmSGhSRWTnL+8atiaCkSh4CXZxtHTuLLRqRjDc2NiC/39nUUII8sqsbfdcGktCPXB4zv1kIvW4=
+	t=1728662695; cv=none; b=tJHigF5OZjXAaFN0jRC9THxraM6LJb6AtVE1412mnPrhUxRXMZTW7GvXgYoPZzHBKowuNoLnAZKpbD/uA/nh8paA/uffwzqIP997e+Vp1sHM4DQq74XBE2bRw0gHGH8tQxxBSDt7Md1M5mQMCQKCa8cbSHwM0XIBPsYx2/2+Igw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728662312; c=relaxed/simple;
-	bh=/s8DCE6D6Ua9EmUIktxcY8jd/379RJ43MxlXPbFrHJQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Wb6N0HPat7oZflByVr7NwODE2IkQOZtc/EFlDCotbu5/qzlK8SSuD1bgGmXrfk4mV1dCNH8BgdXZGxzExcfYn53fm5HjsztGZ4ywP2hZLNhsM/HhfHNX63/HljKchfq00/S6cbLKwy8HhI8HFG81zOSskc1zPPVCXFCQPFlR5J4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=7nccX1ru; arc=none smtp.client-ip=185.132.182.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+	s=arc-20240116; t=1728662695; c=relaxed/simple;
+	bh=/WvOYSc1S4lLGzVHzV0yvKIKVV854XtzSnHOuroJvCw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=CMCKloOccjE77ek2l+QJp+ZauJTczovulkN6CTYj2y+9lFhT0W3+oUCU5qIWjtc0wu3CsFOIK2M1hYq1BjV/pku9NKLCRv/TFvLFwmabqwpu9HCi+g7dBkTXVyyKqjNizbJnQAppMoKbcBVTJbOMIhdrnMw1b7aYrGoBm1LOh3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gzNcBMM4; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="7nccX1ru"
-Received: from pps.filterd (m0241204.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49BC8t96019689;
-	Fri, 11 Oct 2024 17:58:00 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=selector1; bh=
-	OHz3y/5Y8VHqEKFRloReVKDmCuuarSXTQ79JSws0eF8=; b=7nccX1ruGj+/RJf9
-	rK/uSIr4NPAKKO8VIXpBqEOA4lntUsw+0JRg4gtm6sYhEUEGUzJdThCPkOeuByAO
-	ixoLsOYlGzxysELO7+kBOD2w5YocEqPI3pmDfcFT2mvC3bOrzA4xuzEsI1q+ciU6
-	rmGmsClwiV+v4BY9iJSXpIKF6gtZSEP6y0Afe8osLqknFKnY0YgUhu2LChWSpzsF
-	6U4p8MpDjXN+lZAfjNXm8QaLHUPUrx2EIS2Tn4eOSWZKlfb9mgY6pviYJ5tPvx5f
-	zNWcs/12q2vUeWFXGZqpeol7G/HhMPFoiKD84AR5bDwA7Yi5Hl2PYnGCZsUJUTUx
-	MPIR6A==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 4263439v5r-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 11 Oct 2024 17:58:00 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id C685440048;
-	Fri, 11 Oct 2024 17:56:29 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 35AE229ADFB;
-	Fri, 11 Oct 2024 17:51:34 +0200 (CEST)
-Received: from [10.252.28.117] (10.252.28.117) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.37; Fri, 11 Oct
- 2024 17:51:33 +0200
-Message-ID: <3817a22e-72aa-45d3-8e16-19c703f7f7af@foss.st.com>
-Date: Fri, 11 Oct 2024 17:51:32 +0200
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gzNcBMM4"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e3497c8eb0so11176647b3.0
+        for <linux-crypto@vger.kernel.org>; Fri, 11 Oct 2024 09:04:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1728662692; x=1729267492; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aTr2NdjN0dv7LipVyeTPEwovi9SHaz0obBqhvYr++Oc=;
+        b=gzNcBMM4TN6Nrc4/633uTrsGvQ/7HbUSRo6gC8GbnlZi+CB86X2gdOG6NEAnqVXYWm
+         9qeuEssDjf7BM5+D7q5Mqa8wIR5vrMtULt103nz2cgNJe0Kqrs6UkLYLW1L+KBrqa9TE
+         u14Ou8Ckf2NsLfbAtPMZ3Z0e/lehdgig8LY6yDNWJqvhAi5MttucKN24r9brs8U/+Gcx
+         r9omklaY69Hs6kAclRTHcGcIdjBAZA8l2X3XG/axDkVLq1u6uZz7Z6cZqSqNr7w8xVrD
+         1YmPZRPxEFYf9BZ9uFWztqJTfSBBvC8eObrbYuCDk6m6M/CpXxbXktFr4NvV+7/bBVlS
+         +VGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728662692; x=1729267492;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=aTr2NdjN0dv7LipVyeTPEwovi9SHaz0obBqhvYr++Oc=;
+        b=Lky4kAz4PVrHCaBPYI6lEw9fzkKO7YQXTp/lhgOItk7YIFk5D8cEV+3nXpAhsjGzja
+         u+u1TaTnHZke7KORkrQ7xFBNFuBKOZ7tuG3Wax3ggF1UxMD391s0uLnyLUVyKdEmui/p
+         7MbyeUaBylCsNahPkfBkDRO/kThKdOX/FJGdth6LN7vSw6pcfnunRUCzPQHccwVbFpw3
+         DG7X2sykLBTXJMh22PtJfoQVCiW4dxAZQZGxRylW6gqAbF0Vgu0934HvDVz8wk/L+LAV
+         xlHS+nVHQj1GEB3VtdGn0AX89J76ymnmUwOz+lkCYGEnOk76FFBEYhS6D+JvyMwz3O7c
+         5oiA==
+X-Forwarded-Encrypted: i=1; AJvYcCXVu5lgEYUC9KHj4li2IP/hvH0bgJPQ+3jpBbEE6CrDSA7ZWIs2s50bIbSgpZg3my8TL9casaCukq3fxnw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0Ub889t2Vwzf6ugH5ECBdFwena7Zkg26yysh7Iz0aP51wOAPS
+	5Wn1rdIL4r3Cnz9Q+q7oa/vR0HNnh5mV253zka6g+j9wPmKqNFcnA8sxe+qt11UwJilKC1D7cbl
+	lBg==
+X-Google-Smtp-Source: AGHT+IEFPFvz0vBCZ+g1VXJWRI0wYgSDpPxyfmUPvTa83pFlFfSeBq9osRJtahZ4BOBwU65AgtshdTp74Lo=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:6887:b0:6e2:ac0a:8982 with SMTP id
+ 00721157ae682-6e32f07e518mr2515757b3.0.1728662691997; Fri, 11 Oct 2024
+ 09:04:51 -0700 (PDT)
+Date: Fri, 11 Oct 2024 09:04:50 -0700
+In-Reply-To: <3319bfba-4918-471e-9ddd-c8d08f03e1c4@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/4] hwrng: stm32 - implement support for STM32MP25x
- platforms
-To: Marek Vasut <marex@denx.de>, Olivia Mackall <olivia@selenic.com>,
-        Herbert
- Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre
- Torgue <alexandre.torgue@foss.st.com>
-CC: =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
-        Lionel
- Debieve <lionel.debieve@foss.st.com>,
-        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        Yang
- Yingliang <yangyingliang@huawei.com>
-References: <20241007132721.168428-1-gatien.chevallier@foss.st.com>
- <20241007132721.168428-3-gatien.chevallier@foss.st.com>
- <2fad1566-49f9-4586-b0d4-8a4a12f9e69e@denx.de>
- <9283caeb-1b84-43c2-a8a4-6b43a6962f34@foss.st.com>
- <b4932f99-cda4-42ef-88d8-461ca6e8cefd@denx.de>
- <6a4cccb4-9e55-437d-925b-5f5bb1804159@foss.st.com>
- <c59f3593-cb69-48c6-ab0e-f1275c7e5477@denx.de>
-Content-Language: en-US
-From: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-In-Reply-To: <c59f3593-cb69-48c6-ab0e-f1275c7e5477@denx.de>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: EQNCAS1NODE4.st.com (10.75.129.82) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+Mime-Version: 1.0
+References: <cover.1726602374.git.ashish.kalra@amd.com> <f2b12d3c76b4e40a85da021ee2b7eaeda1dd69f0.1726602374.git.ashish.kalra@amd.com>
+ <CAMkAt6o_963tc4fiS4AFaD6Zb3-LzPZiombaetjFp0GWHzTfBQ@mail.gmail.com> <3319bfba-4918-471e-9ddd-c8d08f03e1c4@amd.com>
+Message-ID: <ZwlMojz-z0gBxJfQ@google.com>
+Subject: Re: [PATCH v2 3/3] x86/sev: Add SEV-SNP CipherTextHiding support
+From: Sean Christopherson <seanjc@google.com>
+To: Ashish Kalra <ashish.kalra@amd.com>
+Cc: Peter Gonda <pgonda@google.com>, pbonzini@redhat.com, tglx@linutronix.de, 
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
+	herbert@gondor.apana.org.au, x86@kernel.org, john.allen@amd.com, 
+	davem@davemloft.net, thomas.lendacky@amd.com, michael.roth@amd.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Oct 02, 2024, Ashish Kalra wrote:
+> Hello Peter,
+>=20
+> On 10/2/2024 9:58 AM, Peter Gonda wrote:
+> > On Tue, Sep 17, 2024 at 2:17=E2=80=AFPM Ashish Kalra <Ashish.Kalra@amd.=
+com> wrote:
+> >> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev=
+.c
+> >> index 564daf748293..77900abb1b46 100644
+> >> --- a/drivers/crypto/ccp/sev-dev.c
+> >> +++ b/drivers/crypto/ccp/sev-dev.c
+> >> @@ -73,11 +73,27 @@ static bool psp_init_on_probe =3D true;
+> >>  module_param(psp_init_on_probe, bool, 0444);
+> >>  MODULE_PARM_DESC(psp_init_on_probe, "  if true, the PSP will be initi=
+alized on module init. Else the PSP will be initialized on the first comman=
+d requiring it");
+> >>
+> >> +static bool cipher_text_hiding =3D true;
+> >> +module_param(cipher_text_hiding, bool, 0444);
+> >> +MODULE_PARM_DESC(cipher_text_hiding, "  if true, the PSP will enable =
+Cipher Text Hiding");
+> >> +
+> >> +static int max_snp_asid;
+> >> +module_param(max_snp_asid, int, 0444);
+> >> +MODULE_PARM_DESC(max_snp_asid, "  override MAX_SNP_ASID for Cipher Te=
+xt Hiding");
+> > My read of the spec is if Ciphertext hiding is not enabled there is no
+> > additional split in the ASID space. Am I understanding that correctly?
+> Yes that is correct.
+> > If so, I don't think we want to enable ciphertext hiding by default
+> > because it might break whatever management of ASIDs systems already
+> > have. For instance right now we have to split SEV-ES and SEV ASIDS,
+> > and SNP guests need SEV-ES ASIDS. This change would half the # of SNP
+> > enable ASIDs on a system.
+>=20
+> My thought here is that we probably want to enable Ciphertext hiding by
+> default as that should fix any security issues and concerns around SNP
+> encryption as .Ciphertext hiding prevents host accesses from reading the
+> ciphertext of SNP guest private memory.
+>=20
+> This patch does add a new CCP module parameter, max_snp_asid, which can b=
+e
+> used to dedicate all SEV-ES ASIDs to SNP guests.
+>=20
+> >
+> > Also should we move the ASID splitting code to be all in one place?
+> > Right now KVM handles it in sev_hardware_setup().
+>=20
+> Yes, but there is going to be a separate set of patches to move all ASID
+> handling code to CCP module.
+>=20
+> This refactoring won't be part of the SNP ciphertext hiding support patch=
+es.
 
+It should, because that's not a "refactoring", that's a change of roles and
+responsibilities.  And this series does the same; even worse, this series l=
+eaves
+things in a half-baked state, where the CCP and KVM have a weird shared own=
+ership
+of ASID management.
 
-On 10/11/24 14:38, Marek Vasut wrote:
-> On 10/11/24 2:07 PM, Gatien CHEVALLIER wrote:
->>
->>
->> On 10/11/24 13:24, Marek Vasut wrote:
->>> On 10/11/24 11:55 AM, Gatien CHEVALLIER wrote:
->>>>
->>>>
->>>> On 10/7/24 15:54, Marek Vasut wrote:
->>>>> On 10/7/24 3:27 PM, Gatien Chevallier wrote:
->>>>>> Implement the support for STM32MP25x platforms. On this platform, a
->>>>>> security clock is shared between some hardware blocks. For the RNG,
->>>>>> it is the RNG kernel clock. Therefore, the gate is no more shared
->>>>>> between the RNG bus and kernel clocks as on STM32MP1x platforms and
->>>>>> the bus clock has to be managed on its own.
->>>>>>
->>>>>> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
->>>>> A bit of a higher-level design question -- can you use drivers/clk/ 
->>>>> clk-bulk.c clk_bulk_*() to handle all these disparate count of 
->>>>> clock easily ?
->>>>
->>>> Hi, I'd like to make sure that we enable the core clock before the bus
->>>> clock so that the RNG hardware block can start its internal tests while
->>>> we ungate the bus clock. It's not a strong opinion but it feels better.
->>> Maybe this could still work if the struct clk_bulk_data {} is ordered 
->>> that way, so the bus clock are first, and the rest afterward ?
->>
->> I guess you meant, the core first.
-> 
-> Err, yes, core.
-> 
->> Putting the bus clock first with the updated YAML doc generates a
->> warning when checking the bindings. I guess what you propose is OK
->> then. Core clock is defined first in the device tree.
-> 
-> Not in DT, leave DT as-is. Look at struct clk_bulk_data , I think when 
-> you use the clk_bulk_*() functions, you pass in a list of struct 
-> clk_bulk_data, which each describes one clock, so just make sure that 
-> list of struct clk_bulk_data in the driver is ordered the way you need 
-> it to be ordered and you should be fine.
-
-I've sent a V2 with something that is functional but not aesthetic.
-You'll tell me if that's what you had in mind.
-
-Best regards,
-Gatien
+I'm ok with essentially treating CipherText Hiding enablement as an extensi=
+on of
+firmware, e.g. it's better than having to go into UEFI settings to toggle t=
+he
+feature on/off.  But we need to have a clear, well-defined vision for how w=
+e want
+this all to look in the end.=20
