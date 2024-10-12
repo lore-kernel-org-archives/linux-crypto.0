@@ -1,41 +1,40 @@
-Received: from mout.web.de (mout.web.de [217.72.192.78])
+Received: from mout.web.de (mout.web.de [212.227.17.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89DABEEB3;
-	Sat, 12 Oct 2024 15:00:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE00A11CA0;
+	Sat, 12 Oct 2024 15:05:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728745262; cv=none; b=fyuttO5g19KwEcKe41Yq+dRhAD4oHqx4W14aeS1PU9gycjNyoqQBTrp2Q31OCwQ79aL2vuKAIDKOhDNMJncrXjcNByIHRz/ElKo/6ZDK5ByAmeBbZewoJjl/nc0sYKHWxXVRxbtKpBJJ3OUuiXOstLyD1Y9tx+jkPg16tZUU7Dg=
+	t=1728745563; cv=none; b=WZNrY8UyjVaJ/vV5Ppf6gSbEI2Oki2Cm0LIkdpuYwtGlcCsez0C6EuRkYirfFZMFCXfRk7nwil+x7Hu3r3GQSWT2MaxNZTpPkWUg6Ki6ihrGD6mXy8w5azDexKOEUZ1LnzYdeIkZatMw8K5CCoezLoif0n9Qr3p0dCPj7VkEdYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728745262; c=relaxed/simple;
-	bh=JKfmqF9liqzzy2iYpeKbDBgsoMcjKO0fNtphf9lzs+s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DIRWDKByZnIex1tzBzZiWd3ITzoVhuxf+PTj7UzJ3qOOwPju1qP3KZJKFHF6Nehq7EygpPgxY2WiXxKVMHdj4/trPP1JEiQscyEuaeu+fXrG8YaThMm25kWckser7MSJXznoFy1g3NLkF8ugykfk7/4ri5NGWFlAMXFLtPKJzPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=Y6/o8Peo; arc=none smtp.client-ip=217.72.192.78
+	s=arc-20240116; t=1728745563; c=relaxed/simple;
+	bh=S7tpWXAulEfXczQ3Q38hJ+twqbJoVUYqxTYPsyXWQAs=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=MgF5GIOhk6KtoUmHmXUEhKeGrrA4I+XfEKATHkQMBN993HBW0P6CwXDqW/GEUmBEK20gmViWmTHMGsc2kYXUO+cjkJ3jlNpCGryupG7P4WUMd9egozTma4keCYxxxaEBiO76m/tziWQkvR2Ld7xCta1xrsaXImKTwkQ8sphSBhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=mB5gCau/; arc=none smtp.client-ip=212.227.17.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="Y6/o8Peo"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="mB5gCau/"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1728745228; x=1729350028; i=markus.elfring@web.de;
-	bh=X0kQaLCXNNFr7S3GcaSa1PHybmMltmCt0iklqZF7ttE=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=Y6/o8PeoTUgmaRqlqkY3dB9pa2jDjpmcXuD0etD8OHLbYEQe+u92Dp8D1nQ/ZQE9
-	 qFWljPWNoXpdT06Q+wF6EG6yP042VO/DQVZO+wy9hWCG7oXHjp4yBQAuebkBzntD6
-	 ewCx+7JRQXsXVtZOMIniME9e+L5780JHkTbsyFCNV97ilrA/Q+63M/Z+Tki1eWsiA
-	 aYfmngqtWlqR+L5+NMdn89qr3F3JiUqRAHNwcYVpL2YoypDWTL+hl4CkeHmEM3ONu
-	 HdxPghtwzaYyagjQqpgTzOWJOHP6O21FaiLlFplhiRohgMVncK7V8M2UMsgzmHZvE
-	 NBieW/W7LLHgVxHrIA==
+	s=s29768273; t=1728745546; x=1729350346; i=markus.elfring@web.de;
+	bh=+ooXuq3xV3z4uSkz3ZVk+MJfz76w0jaExrA46M+2cv0=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:From:To:
+	 Cc:References:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=mB5gCau/k1VhxMqmcYv/PZYNtCN2vdaUlOrNAp2UpK3D/qKpAkZsygM5BlJpPrxv
+	 qaK8ynBvXwLIudN/9DUvCm9b2HfBo/u67xkO9Sefp0/wNfBvk+clD1i1jDS9e5eXz
+	 SlKhyc2XiiMMfAbW0td0odw/Mo2gUjBgxo8/KmMlIQpafpzzOk930cSzwgAxMaetn
+	 vx9WrTj+A06er38BfMptKertQTpyF7kkTF9zy6GH2qkjyHsGeQosfMUHf6lfEwKJZ
+	 ENBvMd7/lKRCBPClFcIlEZqNuSFK9nMYWbsflHVTtoLRPFvSQNLda38CRvk/JSNZT
+	 +RtdAPQ8WfNovrV9CQ==
 X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.89.95]) by smtp.web.de (mrweb105
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1MadzU-1tVwDR47R4-00aTok; Sat, 12
- Oct 2024 17:00:28 +0200
-Message-ID: <ee5f409e-4412-41cd-b8d8-92872770f04d@web.de>
-Date: Sat, 12 Oct 2024 17:00:26 +0200
+Received: from [192.168.178.21] ([94.31.89.95]) by smtp.web.de (mrweb106
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1MsaRt-1tnu7d2fc3-00qzpE; Sat, 12
+ Oct 2024 17:05:46 +0200
+Message-ID: <265021be-5349-4bda-88af-80b3796a4b88@web.de>
+Date: Sat, 12 Oct 2024 17:05:44 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -43,8 +42,9 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH v3 0/3] lib: Extending support for scope-based resource
- management
+Subject: [PATCH v3 1/3] crypto: lib/mpi - Extend support for scope-based
+ resource management
+From: Markus Elfring <Markus.Elfring@web.de>
 To: linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
  Andrew Morton <akpm@linux-foundation.org>,
  Herbert Xu <herbert@gondor.apana.org.au>,
@@ -56,67 +56,74 @@ References: <bc5ce9ad-acbd-4f3b-91d6-10cf62bf5afc@web.de>
  <ZwDPp4bU1J5uEgQe@gondor.apana.org.au>
  <9ddc71e7-e98a-4fa8-b140-4035dd2874b6@web.de>
  <ZweTCO8cFtP_pvOu@gondor.apana.org.au>
+ <ee5f409e-4412-41cd-b8d8-92872770f04d@web.de>
 Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <ZweTCO8cFtP_pvOu@gondor.apana.org.au>
+In-Reply-To: <ee5f409e-4412-41cd-b8d8-92872770f04d@web.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:04x1Qu41RKT6NrhjVRibY1avpWcRN9Pu9Z3/w2xVBhJ3tfLQcXh
- 9AnX1SEWF+sQANcWwvdXJruwbIys5kJmk11MZ5FmNEKUhESXylY1RVf3kaAVaYavlCigG0h
- /e4bfPW2Pm9t4X3pwly2vPY7U+8Oiw6J9diITObaQw659EIy8dFy43PyRYWFbwnyf4iEocu
- 0MI0m21CHD88PGORAirlw==
+X-Provags-ID: V03:K1:e/7I/RLhJfIa7NP5KTPnYC8Kqi2cfRLkbKskE2NubKjz4YbgJ6f
+ R1G2FFVIS6kyL28qv6EBJpUDTGg7tZwNTMqSYcAxkyFxQloOeBTOHYHF5mDeTFW59nxN+MW
+ 2jXMGHF1zCQ6XHCBLOd0UDUdzhYibRrmW7w9XTd/h3kPKSPAUAzQUbin/UYsuzcp+Pd2uSD
+ wayQdPB6xOFa+/+JTOrBw==
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:5op4WafLHZU=;eH58ZpmUhcb1iNkBFMw9pmDKBQi
- qteEas3R8vWZ8OGNrnKxjjqZ7+5gj/7TkBZcn779Qpb4HFQyVVMNBDJ1MqIAIhD9qsRP6g/Y+
- SaLNQxdZoUbq3iOyPCTUqJFC30X8gZHVqa2Kb3kJAynVqbmhBDYLRVeAaN3hhfB1MZD0DmHFG
- r4gLN1ZuvuhtPLNjZQ+r/g6KefV997yLUMFxIUKrX4TzB/D3wKd32MGtEw6IoYutckj/ABSMR
- g4spcXs4APIw9LhoNVYry6zVQweKvE1YGQi3Q86eQgNfIsdaRkutEYB5lPFsEl3y/CpL34glJ
- m9Y2UE5JeO1/IrzBFpdR7MMHAfO2ouA726Ier97UfNosBQQNpIxO/5QI0STnzFFuAu7eGPztj
- /pLlGBbDW7gtW1FPyMp2mO9uwAggv3jLFfLhnXS51y5dTXdo+gqh9tJx08EVT80AYY7C3wQ0h
- AnAg1ojy3SerVXAzAOi9y3oiNEF0206lAfBi+3U0U6ZfZiDC5cC2t5pD+/q7BVQqP9IRL9iB8
- Gv0mB70kFJyDrIqGognasT85vCvqxF1neJRFwTKx2FKc/dIwGmLolNoL5Gi4/LvWxiSM10uqt
- lUF21B304B4cPOMg7FqdMBI+Xpo9KK8ayrx3cN7KCsnnEXi6XARvvgxBYMLpeE/lsbXqqgIxE
- ViZqhgPsZWAZpv+mJWr2gC61mQUymB1r4vTH1P0zVYocQbyWSVU/jtcVQbDiCcF8E+HlSzYP5
- VXdKkJRsY3b3+kZ22e38h4eDpjHxZyLAh071eT8VF5xiDsvUUVi8qddoaP2j1nprq29dPs60G
- jvVTvHWiYLt9G+3AQgKNWoYg==
+UI-OutboundReport: notjunk:1;M01:P0:dHaS+jlx2Us=;48wLR3yji6IMcPOw0nB/ENK2lgy
+ caUPnTBDAK/Cj4XieFzJ+fbMGIXASzp3pBr/AZEa6fWEJATEVtA77wqHFDK41Xe52IvMcUGbi
+ ECl5D5Q7A+QPQy/j19ItORRss3YUBSQDXBN6zJ1Pe36Lp6VaS06iTa88Kj5gQlVu2pJ6vmTaD
+ h0p+qk5NHGeF4TFC3lwExKQDBNLIswyTiYqRcyB+K8hgB2Ibdfa2yqx47i2D7d8AL7ar0eppX
+ m9ywun8TD8RdH6sH6qdm9noES9X/omFkqITAM75Jdzu399HDrvTO1HTbQZX7xoRIZox4EzGC+
+ hY+a+HzvT8JFVbHUvgqEzHa5vRGzKz3EVeN7LwSk6h/VI5fkDFZaYqmjxK1CR23ACV9GQsxB0
+ lEzjGn2p4U88980Q6EfTWdTekC4kLv4mQr8YOltffnvqPuj0ODyTW5qaCFhcFFJwvNKvnMDFg
+ LI50eYdPw62bntLuDYv0hiwVci0zk8Qa/q4zJzXxS9KLyOG87dTh++5B+ESS9CanQEi4DiYa9
+ +eUKoa1hTfcgtWzHVy9PPhISdRnqNsebKuIQnvKA3IrD2MnGTig416PDiep7DOtEh6dz1B4Qh
+ 85Agz/FW3ru8bLJ38GBBu1RLa3819cuu5NzLvYvWTCd5NCsD3i/E4KYn3Si1y7Cly5124aftM
+ lDui95omwvwIguXK8uBbNwSjHj3Ylx40A4Cp8vJgNeuEw5TL0oXgXD35soF2qclh0ViMjcoGb
+ aA8EQdwQ5p0/CsJZ0PMb5lUBj3Ed2PPWDAAqmkaELv7vc6rExWIT2esYHv13Lf+jKnoLR9lAy
+ PJcchPiGbbS64I0aCQjcUIkQ==
 
 From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Sat, 12 Oct 2024 15:48:05 +0200
+Date: Wed, 18 Sep 2024 11:06:35 +0200
 
-Some development ideas were taken into account according to evolving discu=
-ssions.
+Scope-based resource management became supported for some
+programming interfaces by contributions of Peter Zijlstra on 2023-05-26.
+See also the commit 54da6a0924311c7cf5015533991e44fb8eb12773 ("locking:
+Introduce __cleanup() based infrastructure").
 
-Markus Elfring (3):
-  crypto: lib/mpi - Extend support for scope-based resource management
-  lib/digsig: Use scope-based resource management for two MPI variables
-    in digsig_verify_rsa()
-  lib/digsig: Use scope-based resource management for two variables
-    in digsig_verify_rsa()
+Thus add a macro call so that the attribute =E2=80=9C__free(mpi_free)=E2=
+=80=9D can be
+applied accordingly.
 
- include/linux/mpi.h |   4 ++
- lib/digsig.c        | 107 +++++++++++++++++++++++---------------------
- 2 files changed, 59 insertions(+), 52 deletions(-)
-
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+=2D--
 
 V3:
-* Applications were added as requested (by Herbert Xu) for the proposed
-  programming interface extension.
-
-* Further adjustments were provided for the demonstration of an evolving
-  programming interface.
+This suggestion was integrated into a patch series.
 
 
-V2:
-The kernel build service pointed out that the proposed identifier =E2=80=
-=9CT_=E2=80=9D
-was not recognised by the compiler.
-Thus reserved identifiers need still be applied also at such a place inste=
-ad
-so far.
-I became curious under which circumstances corresponding development conce=
-rns
-will be reconsidered any more.
+ include/linux/mpi.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
+diff --git a/include/linux/mpi.h b/include/linux/mpi.h
+index 47be46f36435..6fbcb88ce296 100644
+=2D-- a/include/linux/mpi.h
++++ b/include/linux/mpi.h
+@@ -19,6 +19,8 @@
+
+ #include <linux/types.h>
+ #include <linux/scatterlist.h>
++#include <linux/cleanup.h>
++#include <linux/err.h>
+
+ #define BYTES_PER_MPI_LIMB	(BITS_PER_LONG / 8)
+ #define BITS_PER_MPI_LIMB	BITS_PER_LONG
+@@ -44,6 +46,8 @@ typedef struct gcry_mpi *MPI;
+ /*-- mpiutil.c --*/
+ MPI mpi_alloc(unsigned nlimbs);
+ void mpi_free(MPI a);
++DEFINE_FREE(mpi_free, MPI, if (!IS_ERR_OR_NULL(_T)) mpi_free(_T))
++
+ int mpi_resize(MPI a, unsigned nlimbs);
+
+ MPI mpi_copy(MPI a);
 =2D-
 2.46.1
 
