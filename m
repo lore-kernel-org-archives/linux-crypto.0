@@ -1,93 +1,67 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from albert.telenet-ops.be (albert.telenet-ops.be [195.130.137.90])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C987C149C4D;
-	Mon, 14 Oct 2024 07:29:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 700AE14A60F
+	for <linux-crypto@vger.kernel.org>; Mon, 14 Oct 2024 08:38:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.130.137.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728890948; cv=none; b=FGWMOzpSuk/jRjjjnN3SdIdMAhvwcEQFaJhfYCQd92T5GYUuWUFfaPO+HfM6os1Cuo3Mk8u40VISgxxafIHR0QFLVXiv6yxlQH+qDdrEPmfKmXB8FyP0z0bN0FJKPSgRhLECZURRaDoBzWjpdXwH/KgIonjmrzSCJgCqkHHKjgQ=
+	t=1728895110; cv=none; b=Vlee5nJaEvRgEw3W0jbXlCo3DOeI/poOOwI1NtOMjNqTFRw3hoHTBxs4ShU1iS5NrhJJQT7OeqYqgRnlnuJMChTCBHp2N+Op7fqgXKj1tm2fXyDPZ+qrz/87rLI7X+cBEuMVc3qZaui7ACrcve7jZvVWTK5ZszsP2Xa5cjd6y4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728890948; c=relaxed/simple;
-	bh=aveYbHuznRE0CLFdZ+yNLmHKHVrJklEvhvr//84Jf90=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o/71nDAWRbQ8zZZbwxubLoSWHS25BjmtPSqT5OL6FqF3iuhsjWE5TeYEoSB6ZpR/UW8GxCfltlLV/o9HGfHXAjOH0IzOWEhR22F4j0PMoLKHvQVCZfSo3XGX53HZ+isSnYfp+QBxp7OF05mIbK8QE3ixRoJ3S7jfs2VGjiLYEMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UD/1c2LK; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UD/1c2LK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C0ADC4CEC3;
-	Mon, 14 Oct 2024 07:29:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728890948;
-	bh=aveYbHuznRE0CLFdZ+yNLmHKHVrJklEvhvr//84Jf90=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UD/1c2LKksdY8WX41g8hpgrOafZHQxS2jZbkPQmSAWT8PQy832/+4yjjQF9MGhP9G
-	 s6vGp6gY7hY8yJH4b6vQtHv/tJ7K6VceKLS8B0/O0EQmtYZnSNN6tNMrC89Y+ag3Ga
-	 xuzpnhBhYWq/P7uDaEoVwPQ/lzxInnUVfSOz2a0bMTe3RA+kyMo7T/KT73CxV4r937
-	 9vBKfPQ4mGa4FZUuaoMGv3+4kl0MyYu8tgO/ULRexs7erxyaLB9NfhuZGA1dYJpaHR
-	 cQaKi73VLfIhO1sD3RC7lFKovrwRhlHXRYHP73ZyaULJmO28eDCX28hLILAXnqiArW
-	 m2ydyy7inoZeA==
-Date: Mon, 14 Oct 2024 09:29:03 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Gatien Chevallier <gatien.chevallier@foss.st.com>
-Cc: Olivia Mackall <olivia@selenic.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Lionel Debieve <lionel.debieve@foss.st.com>, marex@denx.de, linux-crypto@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/4] dt-bindings: rng: add st,stm32mp25-rng support
-Message-ID: <v4c7vwoqfposhm3bxnidjzwb7via7flf2em45qbgjjncwfvv74@n2rsz3ujpdoc>
-References: <20241011-rng-mp25-v2-v2-0-76fd6170280c@foss.st.com>
- <20241011-rng-mp25-v2-v2-1-76fd6170280c@foss.st.com>
+	s=arc-20240116; t=1728895110; c=relaxed/simple;
+	bh=/dUWEIi+InAp3Vp2QtogS30edtdBl+MDwOreGHW9KvY=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=Fg+IEkcr1YTbUF+Yg1w2RBn1NVc0FbR9UzvSeWoEt00dPCrmFJvJczLXbsfhxacNZB9U9DXkH0qjZITzZ8uNZu3VwpLzfOYB5Y2aIEa7iPFrUMat9wkwpbtzRAGmomTkIL5tBS+M8iTZfGGfcrRE8dS6N/4jk+F1Oz/sV5O4DQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; arc=none smtp.client-ip=195.130.137.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
+Received: from ramsan.of.borg ([IPv6:2a02:1810:ac12:ed80:3f20:7967:2d40:9ad2])
+	by albert.telenet-ops.be with cmsmtp
+	id Q8eL2D00W54R7sz068eL3A; Mon, 14 Oct 2024 10:38:20 +0200
+Received: from geert (helo=localhost)
+	by ramsan.of.borg with local-esmtp (Exim 4.95)
+	(envelope-from <geert@linux-m68k.org>)
+	id 1t0Gaq-003k6x-Jb;
+	Mon, 14 Oct 2024 10:38:20 +0200
+Date: Mon, 14 Oct 2024 10:38:20 +0200 (CEST)
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+To: linux-kernel@vger.kernel.org
+cc: linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+    dmaengine@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: Build regressions/improvements in v6.12-rc3
+In-Reply-To: <20241014072731.3807160-1-geert@linux-m68k.org>
+Message-ID: <711d7f6d-b785-7560-f4dc-c6aad2cce99@linux-m68k.org>
+References: <CAHk-=wg061j_0+a0wen8E-wxSzKx_TGCkKw-r1tvsp5fLeT0pA@mail.gmail.com> <20241014072731.3807160-1-geert@linux-m68k.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241011-rng-mp25-v2-v2-1-76fd6170280c@foss.st.com>
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 
-On Fri, Oct 11, 2024 at 05:41:41PM +0200, Gatien Chevallier wrote:
->    clocks:
-> -    maxItems: 1
-> +    minItems: 1
-> +    maxItems: 2
-> +
-> +  clock-names:
-> +    minItems: 1
-> +    items:
-> +      - const: core
-> +      - const: bus
->  
->    resets:
->      maxItems: 1
-> @@ -57,6 +65,26 @@ allOf:
->        properties:
->          st,rng-lock-conf: false
->  
-> +  - if:
-> +      properties:
-> +        compatible:
-> +          contains:
-> +            enum:
-> +              - st,stm32-rng
-> +              - st,stm32mp13-rng
-> +    then:
-> +      properties:
-> +        clocks:
-> +          maxItems: 1
-> +        clock-names: false
-> +    else:
-> +      properties:
-> +        clocks:
-> +          minItems: 2
-> +          maxItems: 2
+On Mon, 14 Oct 2024, Geert Uytterhoeven wrote:
+> JFYI, when comparing v6.12-rc3[1] to v6.12-rc2[3], the summaries are:
+>  - build errors: +3/-1
 
-Missing clock-names constraint. They *always* go in sync with clocks.
+   + /kisskb/src/crypto/async_tx/async_tx.c: error: no previous prototype for '__async_tx_find_channel' [-Werror=missing-prototypes]:  => 43:1
 
-Best regards,
-Krzysztof
+powerpc-gcc{5,13}/ppc44x_allmodconfig
 
+   + /kisskb/src/drivers/net/ethernet/freescale/fs_enet/mii-bitbang.c: error: format '%x' expects argument of type 'unsigned int', but argument 4 has type 'resource_size_t {aka long long unsigned int}' [-Werror=format=]:  => 126:37
+   + /kisskb/src/drivers/net/ethernet/freescale/fs_enet/mii-bitbang.c: error: format '%x' expects argument of type 'unsigned int', but argument 4 has type 'resource_size_t' {aka 'long long unsigned int'} [-Werror=format=]:  => 126:46
+
+powerpc-gcc{5,13}/ppc85xx_allmodconfig
+
+> [1] http://kisskb.ellerman.id.au/kisskb/branch/linus/head/8e929cb546ee42c9a61d24fae60605e9e3192354/ (all 194 configs)
+> [3] http://kisskb.ellerman.id.au/kisskb/branch/linus/head/8cf0b93919e13d1e8d4466eb4080a4c4d9d66d7b/ (131 out of 194 configs)
+
+Gr{oetje,eeting}s,
+
+ 						Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+ 							    -- Linus Torvalds
