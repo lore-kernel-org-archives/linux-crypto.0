@@ -1,73 +1,90 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4CBA156C69;
-	Mon, 14 Oct 2024 10:29:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 287E71ABEC2;
+	Mon, 14 Oct 2024 11:00:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728901745; cv=none; b=BlllqkqbXk0EUHG/GBaLOPUlvqEef/9euzpzwAIqwIcyLVHDMElhBdxPGsAKkY+96lCZdQdJ/eKVy5MljuLuvDJ5hQxniF8NsGGVKclR9ik8r5Lu3KhY0gwMAXtb6IPCHkkSVbqtcc8IyXOHm2gDaMJGr/AXeCP8LCYMJmm/3/o=
+	t=1728903630; cv=none; b=j3FKzySwP5OqhrBzYg88erNZyfyDkrRAubHBgI0FwOCvC1ErYOU9jAzltDlfljc4iwOS6kIsyvKaiwSSkHtRLzFJUYLC7qXZwake0H96C0O0DA+jxik+BrfPX8VGh3xCxpmjPHsElV9APniINFKYMSbWdkyaExCu6O8fRutOq58=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728901745; c=relaxed/simple;
-	bh=sV4Rp0TPVdzNhXz3lQhbAY5z63glc6lEzRRa41dAlHM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r+UffQVTqSpXYtYP+TZvHKeKr4VHO0c00KdVY7Bz0ZkmKX+HXbZz1N/pJVngID3hlO1skqNnn5ZBekWaTWVK5P5EtV5tplZqdK+6Wp4STveRM2FmRDIeQ7xzUgbpj7O6+83rIOHaF/PFmlNE7wov7CB/hEdwy0ROcfa1rI3Umnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ikZEIJ/q; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ikZEIJ/q"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30349C4CEC6;
-	Mon, 14 Oct 2024 10:29:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728901744;
-	bh=sV4Rp0TPVdzNhXz3lQhbAY5z63glc6lEzRRa41dAlHM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ikZEIJ/q02U0sgjPnYZhDgFSO09fOvHPApoO/qznd/NsKTgq3fuYKg+kXdQTGNoEZ
-	 ZdFP15gv+6ZSyxLOY2vpWe0MBh7ZPpkBcKv3Tb8GreZmO9kMzaoI9uwelL2IjjNl1K
-	 jD+ZzMqTMRAlNrfljDijm7JGdgsjeAji5YeZ9YYpK5UaHToAZIvGR693yNbzd9d0Xr
-	 QPawXFjCLH4+C1hfbNJuxRoa1chGFiuBxqD4qAa77jUYwF+rR5fGD54Qx8MvXtm6j5
-	 uHpxIbm+YJW4fX2DBOBHsPjR/Q7mpg942cp4wID2LsxrsUMfgq1PY70kbK8DN5Fjbn
-	 Hdfns0E4XIb0A==
-Date: Mon, 14 Oct 2024 11:29:00 +0100
-From: Simon Horman <horms@kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, dmaengine@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: Build regressions/improvements in v6.12-rc3
-Message-ID: <20241014102900.GS77519@kernel.org>
-References: <CAHk-=wg061j_0+a0wen8E-wxSzKx_TGCkKw-r1tvsp5fLeT0pA@mail.gmail.com>
- <20241014072731.3807160-1-geert@linux-m68k.org>
- <711d7f6d-b785-7560-f4dc-c6aad2cce99@linux-m68k.org>
- <20241014085819.GO77519@kernel.org>
- <CAMuHMdWedOgc4S12FwQR8_80aqgRJ2pwrKWsNb5Svt6776ti3Q@mail.gmail.com>
+	s=arc-20240116; t=1728903630; c=relaxed/simple;
+	bh=okh2xOh5wgCtK9kRDqrLV21h53I8WCAc98ujORU0NRc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=UntcL54c4UNhHx+Nibc5dOHGPpczYPsTVe7MV87PH4ZADklAe3BUteHBijenE2xqS3XbPOw0jpkVM8+xKGlTj68lHD2j6HQWgi+VqFasvxCgUDvy4duffmwmbvY/mGG6rvjYBs5mgDKMj9uThUAbLUR/AyvTBpnBnvfzwgCpiGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 61C921688;
+	Mon, 14 Oct 2024 04:00:58 -0700 (PDT)
+Received: from e125769.cambridge.arm.com (e125769.cambridge.arm.com [10.1.196.27])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0597C3F51B;
+	Mon, 14 Oct 2024 04:00:25 -0700 (PDT)
+From: Ryan Roberts <ryan.roberts@arm.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	David Hildenbrand <david@redhat.com>,
+	Greg Marsden <greg.marsden@oracle.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Ivan Ivanov <ivan.ivanov@suse.com>,
+	Kalesh Singh <kaleshsingh@google.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Matthias Brugger <mbrugger@suse.com>,
+	Miroslav Benes <mbenes@suse.cz>,
+	Will Deacon <will@kernel.org>
+Cc: Ryan Roberts <ryan.roberts@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org
+Subject: [RFC PATCH v1 20/57] crypto: Remove PAGE_SIZE compile-time constant assumption
+Date: Mon, 14 Oct 2024 11:58:27 +0100
+Message-ID: <20241014105912.3207374-20-ryan.roberts@arm.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20241014105912.3207374-1-ryan.roberts@arm.com>
+References: <20241014105514.3206191-1-ryan.roberts@arm.com>
+ <20241014105912.3207374-1-ryan.roberts@arm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMuHMdWedOgc4S12FwQR8_80aqgRJ2pwrKWsNb5Svt6776ti3Q@mail.gmail.com>
 
-On Mon, Oct 14, 2024 at 11:18:14AM +0200, Geert Uytterhoeven wrote:
-> Hi Simon,
-> 
-> On Mon, Oct 14, 2024 at 10:58 AM Simon Horman <horms@kernel.org> wrote:
-> > On Mon, Oct 14, 2024 at 10:38:20AM +0200, Geert Uytterhoeven wrote:
-> > >   + /kisskb/src/drivers/net/ethernet/freescale/fs_enet/mii-bitbang.c: error: format '%x' expects argument of type 'unsigned int', but argument 4 has type 'resource_size_t {aka long long unsigned int}' [-Werror=format=]:  => 126:37
-> > >   + /kisskb/src/drivers/net/ethernet/freescale/fs_enet/mii-bitbang.c: error: format '%x' expects argument of type 'unsigned int', but argument 4 has type 'resource_size_t' {aka 'long long unsigned int'} [-Werror=format=]:  => 126:46
-> >
-> > I wonder what the correct string format is in these cases?
-> > I didn't have a good idea the last time I looked.
-> 
-> "%pa" + taking the address of the resource_size_t object.
-> 
-> https://elixir.bootlin.com/linux/v6.11.3/source/Documentation/core-api/printk-formats.rst#L229
+To prepare for supporting boot-time page size selection, refactor code
+to remove assumptions about PAGE_SIZE being compile-time constant. Code
+intended to be equivalent when compile-time page size is active.
 
-Thanks,
+Updated BUILD_BUG_ON() to test against limit.
 
-These format problems seem to have been introduced quite some time ago
-by commit 9d9326d3bc0e ("phy: Change mii_bus id field to a string").
-I'll send some patches to address the ones introduced by that patch
-that I was able to still find in-tree.
+Signed-off-by: Ryan Roberts <ryan.roberts@arm.com>
+---
+
+***NOTE***
+Any confused maintainers may want to read the cover note here for context:
+https://lore.kernel.org/all/20241014105514.3206191-1-ryan.roberts@arm.com/
+
+ crypto/lskcipher.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/crypto/lskcipher.c b/crypto/lskcipher.c
+index cdb4897c63e6f..2b84cefba7cd1 100644
+--- a/crypto/lskcipher.c
++++ b/crypto/lskcipher.c
+@@ -79,8 +79,8 @@ static int crypto_lskcipher_crypt_unaligned(
+ 	u8 *tiv;
+ 	u8 *p;
+ 
+-	BUILD_BUG_ON(MAX_CIPHER_BLOCKSIZE > PAGE_SIZE ||
+-		     MAX_CIPHER_ALIGNMASK >= PAGE_SIZE);
++	BUILD_BUG_ON(MAX_CIPHER_BLOCKSIZE > PAGE_SIZE_MIN ||
++		     MAX_CIPHER_ALIGNMASK >= PAGE_SIZE_MIN);
+ 
+ 	tiv = kmalloc(PAGE_SIZE, GFP_ATOMIC);
+ 	if (!tiv)
+-- 
+2.43.0
+
