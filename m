@@ -1,134 +1,150 @@
-Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+Received: from mailout2.hostsharing.net (mailout2.hostsharing.net [83.223.78.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66A8C14A60F;
-	Mon, 14 Oct 2024 09:36:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.207.212.93
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C93A156256
+	for <linux-crypto@vger.kernel.org>; Mon, 14 Oct 2024 09:51:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.78.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728898615; cv=none; b=ZNJHMRgyc8MOxg3vnK7zeGn/OGvjbp0aCK3F3HNdZCyMdJil779YiSAQmuuYOQKweLlX1MUd4Ja1NTinMEn+fjYyJW9ZkOrDAXDWOMK+nZAlwbJ65hz6Qi3R4NFk1nzY7O1TbG01EYzM8AdaxuzMjFBytXgT8kGN5qDeMsffysw=
+	t=1728899494; cv=none; b=OoujxZ7SHyUh88I6by23GS+61DkMgqqi0WQsD+NmJy2Yx5NODc2e+sbVmyS+fNI9A6oGw2pWhLIMHbqQXnIsGk2ctRLCn+BRwy1MDrTlyXH2O83pd1kOQsy1BnztF1iN45e6gJZ0H9BIU0AD54EOG6KZXOQawxMAKOQzqQFnDx4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728898615; c=relaxed/simple;
-	bh=SsDzFXoQvN4gh5FLsiwia3cjb9QC2/XbGclc+wnSFVI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=UPTmNyp2PZzRIrtvAhm7zpghq3q+zzozmIyqaKe+p/B+CCTc/mQ7V432enQUsDyBwaZcNZf++PUzqsVBKF1lUVfhF0uYlHPLXsuovUEjKrHq8XQuQLyAcER/uB6Kr9p2QtEWntAN2R+jQMTMoRWmDWmvlO67th4baAMwACxBmQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=WqQK5CrW; arc=none smtp.client-ip=91.207.212.93
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="WqQK5CrW"
-Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49E54WgY026996;
-	Mon, 14 Oct 2024 11:36:05 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=selector1; bh=
-	Y1wWLgOdlus18jZTNI/TrhpX0Z0nvcFkl1+WB4i8ztY=; b=WqQK5CrWjeZU47tj
-	TsOh53c8+xSff02acMn8k+DhbbZPamiST1OctOcQIaKOHg7ry+zkJAgEMZOYiVjx
-	clyOOSGk4Kd5XVYJr0NE6rzaSHY32/152XI4UACSiC0q18GkTDPwgiwY0knbE/yJ
-	67b/yOpXeKzXu+6OOnz84sDQXeAcdRpX/yfsjUPsPdgQ8+CWgPaixmbhAa4Ba4Zj
-	axUgqsFOJDFxop5hMmG66RMt9CKftlLcPdtHVM5WtdYy5YxhsINrwF/7ya9qOZz0
-	+Gs9T2KAb6iDk1aGz4Hajs9U5uyXsa++0tGpviOVcKq34Lbffg3RhNrqNVjou6eO
-	BOcK9A==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 427e85qff8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 14 Oct 2024 11:36:05 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id A30B64004C;
-	Mon, 14 Oct 2024 11:34:48 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 4277D25F512;
-	Mon, 14 Oct 2024 11:31:41 +0200 (CEST)
-Received: from [10.252.14.29] (10.252.14.29) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.37; Mon, 14 Oct
- 2024 11:31:40 +0200
-Message-ID: <f8c4de66-1d4f-480b-9137-f91e0323ecde@foss.st.com>
-Date: Mon, 14 Oct 2024 11:31:39 +0200
+	s=arc-20240116; t=1728899494; c=relaxed/simple;
+	bh=Mi1kRey+SakT7K4CNgM7OVwB5YrrjM85Non+7rT0NKQ=;
+	h=Message-ID:From:Date:Subject:To:Cc; b=XMHLo0cYq1VF+EMeIMztdlMd0vQvQStbNqzdhQ5ab298zbBUnRYoLX6dpcmmKPn3oxNBiRf8cJvQy28/35GfTUh3DE85aE+cERhkGVEFqIKL9R3o8+Ao0D24eUv6n12Kya3voHTXfpVqcYVK34HPo5/CXvqcN5wXlqvl7DuAUHg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=pass smtp.mailfrom=wunner.de; arc=none smtp.client-ip=83.223.78.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wunner.de
+Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by mailout2.hostsharing.net (Postfix) with ESMTPS id 68162103B3F3A;
+	Mon, 14 Oct 2024 11:43:09 +0200 (CEST)
+Received: from localhost (unknown [89.246.108.87])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by h08.hostsharing.net (Postfix) with ESMTPSA id 4941860E4720;
+	Mon, 14 Oct 2024 11:43:09 +0200 (CEST)
+X-Mailbox-Line: From ff7a28cddfc28e7a3fb8292c680510f35ec54391 Mon Sep 17 00:00:00 2001
+Message-ID: <ff7a28cddfc28e7a3fb8292c680510f35ec54391.1728898147.git.lukas@wunner.de>
+From: Lukas Wunner <lukas@wunner.de>
+Date: Mon, 14 Oct 2024 11:43:01 +0200
+Subject: [PATCH cryptodev-2.6] crypto: sig - Fix oops on KEYCTL_PKEY_QUERY for
+ RSA keys
+To: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>
+Cc: David Howells <dhowells@redhat.com>, linux-crypto@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/4] dt-bindings: rng: add st,stm32mp25-rng support
-To: Krzysztof Kozlowski <krzk@kernel.org>
-CC: Olivia Mackall <olivia@selenic.com>,
-        Herbert Xu
-	<herbert@gondor.apana.org.au>,
-        Rob Herring <robh@kernel.org>,
-        Krzysztof
- Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Maxime
- Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue
-	<alexandre.torgue@foss.st.com>,
-        Lionel Debieve <lionel.debieve@foss.st.com>, <marex@denx.de>,
-        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-References: <20241011-rng-mp25-v2-v2-0-76fd6170280c@foss.st.com>
- <20241011-rng-mp25-v2-v2-1-76fd6170280c@foss.st.com>
- <v4c7vwoqfposhm3bxnidjzwb7via7flf2em45qbgjjncwfvv74@n2rsz3ujpdoc>
-Content-Language: en-US
-From: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-In-Reply-To: <v4c7vwoqfposhm3bxnidjzwb7via7flf2em45qbgjjncwfvv74@n2rsz3ujpdoc>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: EQNCAS1NODE4.st.com (10.75.129.82) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
 
+Commit a2471684dae2 ("crypto: ecdsa - Move X9.62 signature size
+calculation into template") introduced ->max_size() and ->digest_size()
+callbacks to struct sig_alg.  They return an algorithm's maximum
+signature size and digest size, respectively.
 
+For algorithms which lack these callbacks, crypto_register_sig() was
+amended to use the ->key_size() callback instead.
 
-On 10/14/24 09:29, Krzysztof Kozlowski wrote:
-> On Fri, Oct 11, 2024 at 05:41:41PM +0200, Gatien Chevallier wrote:
->>     clocks:
->> -    maxItems: 1
->> +    minItems: 1
->> +    maxItems: 2
->> +
->> +  clock-names:
->> +    minItems: 1
->> +    items:
->> +      - const: core
->> +      - const: bus
->>   
->>     resets:
->>       maxItems: 1
->> @@ -57,6 +65,26 @@ allOf:
->>         properties:
->>           st,rng-lock-conf: false
->>   
->> +  - if:
->> +      properties:
->> +        compatible:
->> +          contains:
->> +            enum:
->> +              - st,stm32-rng
->> +              - st,stm32mp13-rng
->> +    then:
->> +      properties:
->> +        clocks:
->> +          maxItems: 1
->> +        clock-names: false
->> +    else:
->> +      properties:
->> +        clocks:
->> +          minItems: 2
->> +          maxItems: 2
-> 
-> Missing clock-names constraint. They *always* go in sync with clocks.
-> 
-> Best regards,
-> Krzysztof
-> 
+However the commit neglected to also amend sig_register_instance().
+As a result, the ->max_size() and ->digest_size() callbacks remain NULL
+pointers if instances do not define them.  A KEYCTL_PKEY_QUERY system
+call results in an oops for such instances:
 
-Done for V3,
+  BUG: kernel NULL pointer dereference, address: 0000000000000000
+  Call Trace:
+  software_key_query+0x169/0x370
+  query_asymmetric_key+0x67/0x90
+  keyctl_pkey_query+0x86/0x120
+  __do_sys_keyctl+0x428/0x480
+  do_syscall_64+0x4b/0x110
 
-Best regards,
-Gatien
+The only instances affected by this are "pkcs1(rsa, ...)".
+
+Fix by moving the callback checks from crypto_register_sig() to
+sig_prepare_alg(), which is also invoked by sig_register_instance().
+Change the return type of sig_prepare_alg() from void to int to be able
+to return errors.  This matches other algorithm types, see e.g.
+aead_prepare_alg() or ahash_prepare_alg().
+
+Fixes: a2471684dae2 ("crypto: ecdsa - Move X9.62 signature size calculation into template")
+Signed-off-by: Lukas Wunner <lukas@wunner.de>
+---
+ crypto/sig.c | 36 ++++++++++++++++++++++++------------
+ 1 file changed, 24 insertions(+), 12 deletions(-)
+
+diff --git a/crypto/sig.c b/crypto/sig.c
+index be5ac0e59384..5e1f1f739da2 100644
+--- a/crypto/sig.c
++++ b/crypto/sig.c
+@@ -84,15 +84,6 @@ struct crypto_sig *crypto_alloc_sig(const char *alg_name, u32 type, u32 mask)
+ }
+ EXPORT_SYMBOL_GPL(crypto_alloc_sig);
+ 
+-static void sig_prepare_alg(struct sig_alg *alg)
+-{
+-	struct crypto_alg *base = &alg->base;
+-
+-	base->cra_type = &crypto_sig_type;
+-	base->cra_flags &= ~CRYPTO_ALG_TYPE_MASK;
+-	base->cra_flags |= CRYPTO_ALG_TYPE_SIG;
+-}
+-
+ static int sig_default_sign(struct crypto_sig *tfm,
+ 			    const void *src, unsigned int slen,
+ 			    void *dst, unsigned int dlen)
+@@ -113,7 +104,7 @@ static int sig_default_set_key(struct crypto_sig *tfm,
+ 	return -ENOSYS;
+ }
+ 
+-int crypto_register_sig(struct sig_alg *alg)
++static int sig_prepare_alg(struct sig_alg *alg)
+ {
+ 	struct crypto_alg *base = &alg->base;
+ 
+@@ -132,7 +123,22 @@ int crypto_register_sig(struct sig_alg *alg)
+ 	if (!alg->digest_size)
+ 		alg->digest_size = alg->key_size;
+ 
+-	sig_prepare_alg(alg);
++	base->cra_type = &crypto_sig_type;
++	base->cra_flags &= ~CRYPTO_ALG_TYPE_MASK;
++	base->cra_flags |= CRYPTO_ALG_TYPE_SIG;
++
++	return 0;
++}
++
++int crypto_register_sig(struct sig_alg *alg)
++{
++	struct crypto_alg *base = &alg->base;
++	int err;
++
++	err = sig_prepare_alg(alg);
++	if (err)
++		return err;
++
+ 	return crypto_register_alg(base);
+ }
+ EXPORT_SYMBOL_GPL(crypto_register_sig);
+@@ -146,9 +152,15 @@ EXPORT_SYMBOL_GPL(crypto_unregister_sig);
+ int sig_register_instance(struct crypto_template *tmpl,
+ 			  struct sig_instance *inst)
+ {
++	int err;
++
+ 	if (WARN_ON(!inst->free))
+ 		return -EINVAL;
+-	sig_prepare_alg(&inst->alg);
++
++	err = sig_prepare_alg(&inst->alg);
++	if (err)
++		return err;
++
+ 	return crypto_register_instance(tmpl, sig_crypto_instance(inst));
+ }
+ EXPORT_SYMBOL_GPL(sig_register_instance);
+-- 
+2.43.0
+
