@@ -1,165 +1,172 @@
-Received: from smtp.smtpout.orange.fr (smtp-22.smtpout.orange.fr [80.12.242.22])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21990231C94;
-	Mon, 14 Oct 2024 20:29:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38AD71CF2AF
+	for <linux-crypto@vger.kernel.org>; Mon, 14 Oct 2024 22:32:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.85.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728937762; cv=none; b=tNft9clRzcctuQsDn/W/23+tA9for6jUedHEGhVwg7NnDcchbRonlZOBoEP7Uhlp2ORtaFck9yhfsJW+XHz+QBTZ4N5JBVNBxPLRDBof1dMfgq4lbFpB6hjyQEWteV43y4H8WBLqQzTd2WiTc7M06F4Ffzktm2Q5c6L4/NrDKKY=
+	t=1728945174; cv=none; b=BJirKk+5CrJSazV44PhId5xQ9X77LmzTyiZNklOhG7sxirsBRXgM533R4p3Wtf2Iearj2cLuV3FYM0p2qPuDOGIZeXlHedaRXdpD/GDCzYBOGg/EeCmmznLPG0knitAZVQPkkpHevsSzhhPu9+4+Rj8GEfbz7koi/2JgTPGX6fY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728937762; c=relaxed/simple;
-	bh=XaDIO2IuND1/j9idtykS1sX9MRhoJ+szidhKrSx3ems=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UCaIh/Q3qZU8ixF2+TAKskc/ctdosHzbwXN/VLQVDsNSNNWqGOnmKWhgraS/e+5K2abTDQTOuMQA7RT9UcjmM+/Zmpr8olxoIqvygTntK9VFYkNfBom7i5XxMLjauN+SoiIdb4yvLijLpQ8wVsymWgQ8Ll7+wPx0vkhFxzC+HUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=ryKw7AOS; arc=none smtp.client-ip=80.12.242.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="ryKw7AOS"
-Received: from localhost.localdomain ([90.11.132.44])
-	by smtp.orange.fr with ESMTPA
-	id 0RA7t2ZE7WNPK0RA7tHNhp; Mon, 14 Oct 2024 21:55:34 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1728935735;
-	bh=hD0vo8WyvWoRZVSSpg8GQUmRbzOmqsIeAIrHbUQl8aQ=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=ryKw7AOSpn/wl0TBFALbQKCMzujsKExflrgTqF7ZEXTsrRCAQTl5s4ZqIibRF7uah
-	 C9ngNMq+wfQW+1s2zt15bLZH3gZTh1JlqP3ZCnt+KrY5GIkPX2tQPcBniGngQ2xVrf
-	 /dIu/+1+I61yHh8GDcg0Yd6doVt4Wr7sgk9aV5O5/Fii2hjCyQ+IZ33M7vDxlcnNmU
-	 fKvcRscxKLhS10cDzWqFKcgI5/Yxuzk4Udx2CB+YB2+Q3DQAvkylsBVp5BVs4haXFU
-	 6yS/MXpVKXIGyhXIb/xFcfz1uFte4pUs43gcsK4lQ+nmwQdYWgYHbHipK24aYeJkPp
-	 A2XVNxVOQngYg==
-X-ME-Helo: localhost.localdomain
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Mon, 14 Oct 2024 21:55:35 +0200
-X-ME-IP: 90.11.132.44
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-	qat-linux@intel.com,
-	linux-crypto@vger.kernel.org
-Subject: [PATCH] crypto: qat - Constify struct pm_status_row
-Date: Mon, 14 Oct 2024 21:55:17 +0200
-Message-ID: <ab26d264baec1f3233e832c0c2fa723e3be21a04.1728935687.git.christophe.jaillet@wanadoo.fr>
-X-Mailer: git-send-email 2.47.0
+	s=arc-20240116; t=1728945174; c=relaxed/simple;
+	bh=lOgJFq0LLEJA0XwyBLiDDV1tjkLg9QoAS9sBzOHo3SU=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=llusKAwsSmRiPqYz+k1O5aXJTp/DYjfFGSYrP1oZJYzbhtsnP+8LuX7k9oJmH60KT/O1+P1sfx/GrgLbFtZjoGMX4kURYRke10ph+OxtWZfWWKu7YtxPYDxkAfcQ2x00d2OI9VMCpJ3AeGG6tUsUxlEPAaQWrrTDWwwjPOKtoko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.85.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-248-g4t_2AaNPGeNePHQ-LTnjg-1; Mon, 14 Oct 2024 23:32:49 +0100
+X-MC-Unique: g4t_2AaNPGeNePHQ-LTnjg-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 14 Oct
+ 2024 23:32:48 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Mon, 14 Oct 2024 23:32:48 +0100
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Eric Biggers' <ebiggers@kernel.org>
+CC: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"x86@kernel.org" <x86@kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, Ard Biesheuvel <ardb@kernel.org>, "Josh
+ Poimboeuf" <jpoimboe@kernel.org>, Peter Zijlstra <peterz@infradead.org>
+Subject: RE: [PATCH 3/3] crypto: x86/crc32c - eliminate jump table and
+ excessive unrolling
+Thread-Topic: [PATCH 3/3] crypto: x86/crc32c - eliminate jump table and
+ excessive unrolling
+Thread-Index: AQHbHfE2Of1hyBaCckeJTHnfIiWE7LKGaWewgAAg9QCAADe7IA==
+Date: Mon, 14 Oct 2024 22:32:48 +0000
+Message-ID: <00c9c7c84e9043689942fc1f36e28591@AcuMS.aculab.com>
+References: <20241014042447.50197-1-ebiggers@kernel.org>
+ <20241014042447.50197-4-ebiggers@kernel.org>
+ <a6c0c04a0486404ca4db3fd57a809d5b@AcuMS.aculab.com>
+ <20241014190142.GA1137@sol.localdomain>
+In-Reply-To: <20241014190142.GA1137@sol.localdomain>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-'struct pm_status_row' are not modified in this driver.
+...
+> > Do you need to unroll it at all?
 
-Constifying this structure moves some data to a read-only section, so
-increases overall security.
+> It looks like on most CPUs, no.  On Haswell, Emerald Rapids, Zen 2 it doe=
+s not
+> make a significant difference.  However, it helps on Zen 5.
 
-Update the prototype of some functions accordingly.
+I wonder if one of the loop instructions is using the ALU
+unit you really want to be processing a crc32?
+If the cpu has fused arithmetic+jump u-ops then trying to get the
+decoder to use one of those may help.
 
-On a x86_64, with allmodconfig, as an example:
-Before:
-======
-   text	   data	    bss	    dec	    hex	filename
-   4400	   1059	      0	   5459	   1553	drivers/crypto/intel/qat/qat_common/adf_gen4_pm_debugfs.o
+Is Zen 5 actually slower than the other systems?
+I've managed to get clock cycle counts using the performance counters
+that more of less match the predicted values.
+You can't use 'rdtsc' because the cpu frequence isn't stable.
 
-After:
-=====
-   text	   data	    bss	    dec	    hex	filename
-   5216	    243	      0	   5459	   1553	drivers/crypto/intel/qat/qat_common/adf_gen4_pm_debugfs.o
+...
+> > If you are really lucky you'll get two memory reads/clock.
+> > So you won't ever to do than two crc32/clock.
+> > Looking at Agner's instruction latency tables I don't think
+> > any cpu can do more that one per clock, or pipeline them.
+> > I think that means you don't even need two (never mind 3)
+> > buffers.
+>=20
+> On most Intel and AMD CPUs (I tested Haswell for old Intel, Emerald Rapid=
+s for
+> new Intel, and Zen 2 for slightly-old AMD), crc32q has 3 cycle latency an=
+d 1 per
+> cycle throughput.  So you do need at least 3 streams.
 
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
----
-Compile tested only.
----
- .../intel/qat/qat_common/adf_gen4_pm_debugfs.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+Bah, I missed the latency column :-)
 
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_pm_debugfs.c b/drivers/crypto/intel/qat/qat_common/adf_gen4_pm_debugfs.c
-index ee0b5079de3e..2e4095c4c12c 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_gen4_pm_debugfs.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_pm_debugfs.c
-@@ -42,13 +42,13 @@ struct pm_status_row {
- 	const char *key;
- };
- 
--static struct pm_status_row pm_fuse_rows[] = {
-+static const struct pm_status_row pm_fuse_rows[] = {
- 	PM_INFO_REGSET_ENTRY(fusectl0, ENABLE_PM),
- 	PM_INFO_REGSET_ENTRY(fusectl0, ENABLE_PM_IDLE),
- 	PM_INFO_REGSET_ENTRY(fusectl0, ENABLE_DEEP_PM_IDLE),
- };
- 
--static struct pm_status_row pm_info_rows[] = {
-+static const struct pm_status_row pm_info_rows[] = {
- 	PM_INFO_REGSET_ENTRY(pm.status, CPM_PM_STATE),
- 	PM_INFO_REGSET_ENTRY(pm.status, PENDING_WP),
- 	PM_INFO_REGSET_ENTRY(pm.status, CURRENT_WP),
-@@ -59,7 +59,7 @@ static struct pm_status_row pm_info_rows[] = {
- 	PM_INFO_REGSET_ENTRY(pm.main, THR_VALUE),
- };
- 
--static struct pm_status_row pm_ssm_rows[] = {
-+static const struct pm_status_row pm_ssm_rows[] = {
- 	PM_INFO_REGSET_ENTRY(ssm.pm_enable, SSM_PM_ENABLE),
- 	PM_INFO_REGSET_ENTRY32(ssm.active_constraint, ACTIVE_CONSTRAINT),
- 	PM_INFO_REGSET_ENTRY(ssm.pm_domain_status, DOMAIN_POWER_GATED),
-@@ -83,7 +83,7 @@ static struct pm_status_row pm_ssm_rows[] = {
- 	PM_INFO_REGSET_ENTRY(ssm.pm_managed_status, WCP_MANAGED_COUNT),
- };
- 
--static struct pm_status_row pm_log_rows[] = {
-+static const struct pm_status_row pm_log_rows[] = {
- 	PM_INFO_REGSET_ENTRY32(event_counters.host_msg, HOST_MSG_EVENT_COUNT),
- 	PM_INFO_REGSET_ENTRY32(event_counters.sys_pm, SYS_PM_EVENT_COUNT),
- 	PM_INFO_REGSET_ENTRY32(event_counters.local_ssm, SSM_EVENT_COUNT),
-@@ -91,7 +91,7 @@ static struct pm_status_row pm_log_rows[] = {
- 	PM_INFO_REGSET_ENTRY32(event_counters.unknown, UNKNOWN_EVENT_COUNT),
- };
- 
--static struct pm_status_row pm_event_rows[ICP_QAT_NUMBER_OF_PM_EVENTS] = {
-+static const struct pm_status_row pm_event_rows[ICP_QAT_NUMBER_OF_PM_EVENTS] = {
- 	PM_INFO_REGSET_ENTRY32(event_log[0], EVENT0),
- 	PM_INFO_REGSET_ENTRY32(event_log[1], EVENT1),
- 	PM_INFO_REGSET_ENTRY32(event_log[2], EVENT2),
-@@ -102,14 +102,14 @@ static struct pm_status_row pm_event_rows[ICP_QAT_NUMBER_OF_PM_EVENTS] = {
- 	PM_INFO_REGSET_ENTRY32(event_log[7], EVENT7),
- };
- 
--static struct pm_status_row pm_csrs_rows[] = {
-+static const struct pm_status_row pm_csrs_rows[] = {
- 	PM_INFO_REGSET_ENTRY32(pm.fw_init, CPM_PM_FW_INIT),
- 	PM_INFO_REGSET_ENTRY32(pm.status, CPM_PM_STATUS),
- 	PM_INFO_REGSET_ENTRY32(pm.main, CPM_PM_MASTER_FW),
- 	PM_INFO_REGSET_ENTRY32(pm.pwrreq, CPM_PM_PWRREQ),
- };
- 
--static int pm_scnprint_table(char *buff, struct pm_status_row *table,
-+static int pm_scnprint_table(char *buff, const struct pm_status_row *table,
- 			     u32 *pm_info_regs, size_t buff_size, int table_len,
- 			     bool lowercase)
- {
-@@ -131,7 +131,7 @@ static int pm_scnprint_table(char *buff, struct pm_status_row *table,
- 	return wr;
- }
- 
--static int pm_scnprint_table_upper_keys(char *buff, struct pm_status_row *table,
-+static int pm_scnprint_table_upper_keys(char *buff, const struct pm_status_row *table,
- 					u32 *pm_info_regs, size_t buff_size,
- 					int table_len)
- {
-@@ -139,7 +139,7 @@ static int pm_scnprint_table_upper_keys(char *buff, struct pm_status_row *table,
- 				 table_len, false);
- }
- 
--static int pm_scnprint_table_lower_keys(char *buff, struct pm_status_row *table,
-+static int pm_scnprint_table_lower_keys(char *buff, const struct pm_status_row *table,
- 					u32 *pm_info_regs, size_t buff_size,
- 					int table_len)
- {
--- 
-2.47.0
+> AMD Zen 5 has much higher crc32q throughput and seems to want up to 7 str=
+eams.
+> This is not implemented yet.
+
+The copy of the tables I have is old - doesn't contain Zen-5.
+Does that mean that 2 (or more) of its alu 'units' can do crc32
+so you can do more than 1/clock (along with the memory reads).
+
+One thought is how much of it is actually worth while!
+If the data isn't already in the L1 data cache then the cache
+loads almost certainly dominate - especially if you have to
+do out to 'real memory'.
+You can benchmark the loops by repeatedly accessing the same
+data - but that isn't what will actually happen.
+
+> > Most modern x86 can do 4 or 5 (or even more) ALU operations
+> > per clock - depending on the combination of instructions.
+> >
+> > Replace the loop termination with a comparison of 'bufp'
+> > against a pre-calculated limit and you get two instructions
+> > (that might get merged into one u-op) for the loop overhead.
+> > They'll run in parallel with the crc32q instructions.
+>=20
+> That's actually still three instructions: add, cmp, and jne.
+
+I was really thinking of the loop I quoted later.
+The one that uses negative offsets from the end of the buffer.
+That has an 'add' and a 'jnz' - which might even fuse into a
+single u-op.
+Maybe even constrained to p6 - so won't go near p1.
+(I don't have a recent AMD cpu)
+
+It may not actually matter.
+The add/subtract/cmp are only dependant on themselves.
+Similarly the jne is only dependant on the result of the sub/cmp.
+In principle they can all run in the same clock (for different
+loop cycles) since the rest of the loop only needs one of the
+ALU blocks (on Intel only P1 can do crc).
+But I failed to get a 1 clock loop (using ADC - which doesn't
+have a latency issue).
+It might be impossible because a predicted-taken conditional jmp
+has a latency of 2.
+
+> I tried it on both Intel and AMD, and it did not help.
+>=20
+> > I've never managed to get a 1-clock loop, but two is easy.
+> > You might find that just:
+> > 10:
+> > =09crc32q=09(bufp), crc
+> > =09crc32q=098(bufp), crc
+> > =09add=09=09$16, bufp
+> > =09cmp=09=09bufp, buf_lim
+> > =09jne=09=0910b
+> > will run at 8 bytes/clock on modern intel cpu.
+>=20
+> No, the latency of crc32q is still three cycles.  You need three streams.
+
+If you need three streams to get one crc32/clock then, in theory,
+you can get two more simple ALU ops, at least one memory read and
+a jump in every clock - even on Sandy bridge.
+So they are unlikely to dominate the loop whatever you do.
+
+If the loop is too long you can get a stall (probably) because a register
+has to be read back from the real register file and not just forwarded
+from a previous use/alu result.
+I've gained a clock back by adding an extra instruction in the middle
+of a loop!
+But the not-unrolled (multi-stream) loop isn't long enough for that
+to be an issue.
+
+Enough rambling.
+
+=09David
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
+PT, UK
+Registration No: 1397386 (Wales)
 
