@@ -1,68 +1,73 @@
-Received: from mailout3.hostsharing.net (mailout3.hostsharing.net [176.9.242.54])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85C9A1BC58
-	for <linux-crypto@vger.kernel.org>; Mon, 14 Oct 2024 10:13:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.9.242.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4CBA156C69;
+	Mon, 14 Oct 2024 10:29:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728900804; cv=none; b=r/LCsWpBcJNKfzSvLztbqp88qcrSI7eHBn7V79NJ0WQgIBoq8F2toI+spv2SVOQEuFXgJsRVxVngJoPhBQTz7HOiUcLPFT8pSdH/wD2OVDvdKUAD8czgtzLbmPCwYxj/PNI5iqLcakft4nsG+ACvP5gZqF/rCm10miEhhT1vZLE=
+	t=1728901745; cv=none; b=BlllqkqbXk0EUHG/GBaLOPUlvqEef/9euzpzwAIqwIcyLVHDMElhBdxPGsAKkY+96lCZdQdJ/eKVy5MljuLuvDJ5hQxniF8NsGGVKclR9ik8r5Lu3KhY0gwMAXtb6IPCHkkSVbqtcc8IyXOHm2gDaMJGr/AXeCP8LCYMJmm/3/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728900804; c=relaxed/simple;
-	bh=KzqWPAxOFjjQfmivOb2n5l2Nr8ARXryRdqsJqFnwyH0=;
-	h=Message-ID:From:Date:Subject:To:Cc; b=GPZLAXVjOyR9CFBOj+83cS5F7/+h5M+8IuKpMRa6aTxHMdfnXZ1bC4TLIngfwtNseeBoOF27BwDz4B+iZSYlSJaVjyp4tEKSKSuT0/lCxFcDmIsCs1iCEDKHUgWPjEQOm1fEOOCKWoPCXCwY+xgtn0nbDkOVC/+gZBOMJlTnWIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=pass smtp.mailfrom=wunner.de; arc=none smtp.client-ip=176.9.242.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wunner.de
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by mailout3.hostsharing.net (Postfix) with ESMTPS id 59F59102E7ECB;
-	Mon, 14 Oct 2024 12:05:03 +0200 (CEST)
-Received: from localhost (unknown [89.246.108.87])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by h08.hostsharing.net (Postfix) with ESMTPSA id 1DDC160FC0F1;
-	Mon, 14 Oct 2024 12:05:03 +0200 (CEST)
-X-Mailbox-Line: From e843333c7b9522f7cd3b609e4eae7da3ddb8405c Mon Sep 17 00:00:00 2001
-Message-ID: <e843333c7b9522f7cd3b609e4eae7da3ddb8405c.1728900075.git.lukas@wunner.de>
-From: Lukas Wunner <lukas@wunner.de>
-Date: Mon, 14 Oct 2024 12:04:41 +0200
-Subject: [PATCH] crypto: ecdsa - Update Kconfig help text for NIST P521
-To: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>
-Cc: Stefan Berger <stefanb@linux.ibm.com>, linux-crypto@vger.kernel.org
+	s=arc-20240116; t=1728901745; c=relaxed/simple;
+	bh=sV4Rp0TPVdzNhXz3lQhbAY5z63glc6lEzRRa41dAlHM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=r+UffQVTqSpXYtYP+TZvHKeKr4VHO0c00KdVY7Bz0ZkmKX+HXbZz1N/pJVngID3hlO1skqNnn5ZBekWaTWVK5P5EtV5tplZqdK+6Wp4STveRM2FmRDIeQ7xzUgbpj7O6+83rIOHaF/PFmlNE7wov7CB/hEdwy0ROcfa1rI3Umnc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ikZEIJ/q; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ikZEIJ/q"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30349C4CEC6;
+	Mon, 14 Oct 2024 10:29:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728901744;
+	bh=sV4Rp0TPVdzNhXz3lQhbAY5z63glc6lEzRRa41dAlHM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ikZEIJ/q02U0sgjPnYZhDgFSO09fOvHPApoO/qznd/NsKTgq3fuYKg+kXdQTGNoEZ
+	 ZdFP15gv+6ZSyxLOY2vpWe0MBh7ZPpkBcKv3Tb8GreZmO9kMzaoI9uwelL2IjjNl1K
+	 jD+ZzMqTMRAlNrfljDijm7JGdgsjeAji5YeZ9YYpK5UaHToAZIvGR693yNbzd9d0Xr
+	 QPawXFjCLH4+C1hfbNJuxRoa1chGFiuBxqD4qAa77jUYwF+rR5fGD54Qx8MvXtm6j5
+	 uHpxIbm+YJW4fX2DBOBHsPjR/Q7mpg942cp4wID2LsxrsUMfgq1PY70kbK8DN5Fjbn
+	 Hdfns0E4XIb0A==
+Date: Mon, 14 Oct 2024 11:29:00 +0100
+From: Simon Horman <horms@kernel.org>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, dmaengine@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: Build regressions/improvements in v6.12-rc3
+Message-ID: <20241014102900.GS77519@kernel.org>
+References: <CAHk-=wg061j_0+a0wen8E-wxSzKx_TGCkKw-r1tvsp5fLeT0pA@mail.gmail.com>
+ <20241014072731.3807160-1-geert@linux-m68k.org>
+ <711d7f6d-b785-7560-f4dc-c6aad2cce99@linux-m68k.org>
+ <20241014085819.GO77519@kernel.org>
+ <CAMuHMdWedOgc4S12FwQR8_80aqgRJ2pwrKWsNb5Svt6776ti3Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMuHMdWedOgc4S12FwQR8_80aqgRJ2pwrKWsNb5Svt6776ti3Q@mail.gmail.com>
 
-Commit a7d45ba77d3d ("crypto: ecdsa - Register NIST P521 and extend test
-suite") added support for ECDSA signature verification using NIST P521,
-but forgot to amend the Kconfig help text.  Fix it.
+On Mon, Oct 14, 2024 at 11:18:14AM +0200, Geert Uytterhoeven wrote:
+> Hi Simon,
+> 
+> On Mon, Oct 14, 2024 at 10:58 AM Simon Horman <horms@kernel.org> wrote:
+> > On Mon, Oct 14, 2024 at 10:38:20AM +0200, Geert Uytterhoeven wrote:
+> > >   + /kisskb/src/drivers/net/ethernet/freescale/fs_enet/mii-bitbang.c: error: format '%x' expects argument of type 'unsigned int', but argument 4 has type 'resource_size_t {aka long long unsigned int}' [-Werror=format=]:  => 126:37
+> > >   + /kisskb/src/drivers/net/ethernet/freescale/fs_enet/mii-bitbang.c: error: format '%x' expects argument of type 'unsigned int', but argument 4 has type 'resource_size_t' {aka 'long long unsigned int'} [-Werror=format=]:  => 126:46
+> >
+> > I wonder what the correct string format is in these cases?
+> > I didn't have a good idea the last time I looked.
+> 
+> "%pa" + taking the address of the resource_size_t object.
+> 
+> https://elixir.bootlin.com/linux/v6.11.3/source/Documentation/core-api/printk-formats.rst#L229
 
-Fixes: a7d45ba77d3d ("crypto: ecdsa - Register NIST P521 and extend test
-suite")
-Signed-off-by: Lukas Wunner <lukas@wunner.de>
----
- crypto/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thanks,
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index b3fb3b2ae12f..6b0bfbccac08 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -296,7 +296,7 @@ config CRYPTO_ECDSA
- 	help
- 	  ECDSA (Elliptic Curve Digital Signature Algorithm) (FIPS 186,
- 	  ISO/IEC 14888-3)
--	  using curves P-192, P-256, and P-384
-+	  using curves P-192, P-256, P-384 and P-521
- 
- 	  Only signature verification is implemented.
- 
--- 
-2.43.0
-
+These format problems seem to have been introduced quite some time ago
+by commit 9d9326d3bc0e ("phy: Change mii_bus id field to a string").
+I'll send some patches to address the ones introduced by that patch
+that I was able to still find in-tree.
