@@ -1,104 +1,135 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B63BC1AC45F;
-	Mon, 14 Oct 2024 18:55:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3D9013C810;
+	Mon, 14 Oct 2024 19:01:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728932109; cv=none; b=k1vZEfro2UoYm1x1i28bwLBwyPcuxtmHrOLSbqfzc2Hal5Xx3ClAbuC3ZXb7TXzRoSi0GS4dtbtxFkJ+zFWvb9lGNWa5xmXBoEbkbZG8TrMS6FmFtlL0ftrnoxRZ+NtcHZAVkxAuQI+IWVfY5CciqITZvxyeel50C61p9Cn1Au0=
+	t=1728932505; cv=none; b=hnpfOFhNpzFsqGjVUhpyTLnMWZtDj9trKMzOM/Nw4Jv8EJYFUYrrM4bv9BpxtTq/uXd797rDuFeTu3rhZh6EQ1q1XZOvpStXrc79NzKMY9YRjb0e5s1RIRL96DKigpu4Tycf6hY4UVqzfVr+1pc2SqlGJmll92EUM1lsCl1+VBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728932109; c=relaxed/simple;
-	bh=MEnARyCy8ZhQv5hcAqw282lo3d4lT4pcqhEA+2UdDrg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=s/NsncBp8KjDimLn5vRk67Ud09Gvto2BFxdub4WCpvuVP6PRaEcX2dtmjgQDyrY53inH0u+IiubWOpNikWDqFekWXWInj31H+p2a5zFmTTeu6vrSDK09TK+XAFBumgX9j4Wv4vAY7iN6zsZW3uPTulMpLyK7zBJ+ADqlv2L0Qb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V+QYDmC9; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1728932505; c=relaxed/simple;
+	bh=4B/4MKRiZMEAx3KlSKct+QBFZ1DTuDQEOf7PADj4UYE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=njYqvPwxwQLmBEBIRhLRX21BeUF13bWYbNpuMU4Pp8seKt5BjTsL/jQXV5Ty1AipwNhgQgMHPUOH6hf6TMVpWf92faoMvDvgqHJW0PEp9a8C3ZckMhMHEo9+AK3HesuL8d2ZKE0vEZBdjpJX0nxIXFNMCqJ5D4hGNb5RRToko5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=llYDHDQI; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V+QYDmC9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21E58C4CECE;
-	Mon, 14 Oct 2024 18:55:09 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="llYDHDQI"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A59AC4CEC3;
+	Mon, 14 Oct 2024 19:01:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1728932109;
-	bh=MEnARyCy8ZhQv5hcAqw282lo3d4lT4pcqhEA+2UdDrg=;
-	h=From:To:Cc:Subject:Date:From;
-	b=V+QYDmC99fszEIk3HlXB8O6GjJLEOYQ5uaZhSEU1gg2vN9IVRJ3YS1SG+Hg0CsHBX
-	 yGChbHNPxdIOXbOq+G2gsqsaI1jOb9lOiyrL9I6bjHcb4lKPw/Y9Ek5RmqwqqBm+GY
-	 LLWkucAXtNcopZcFEjY2hQFcSMy6RpGK43Mp8Fyr+my4eWg6ITndqmCPozR0za7Xko
-	 PBh2F3/5jZcx9gK91uy3WAUjN1efdpqNXCvyrY9JuqCF6L8+5CR22Q+e5SS9jZxARa
-	 x8wPNsUkF2DUeqsIJ3fGF9mDf/KZbmUKUBoA5zsA7cT6h2WRHYtKINpeq04Bs4Z7aL
-	 tHfaXlm0J4K7w==
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Jayesh Choudhary <j-choudhary@ti.com>
-Cc: linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] dt-bindings: rng: Add Marvell Armada RNG support
-Date: Mon, 14 Oct 2024 13:54:57 -0500
-Message-ID: <20241014185457.1827734-1-robh@kernel.org>
-X-Mailer: git-send-email 2.45.2
+	s=k20201202; t=1728932504;
+	bh=4B/4MKRiZMEAx3KlSKct+QBFZ1DTuDQEOf7PADj4UYE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=llYDHDQIkfBeL0ZFDnSSgtqfLxoWdgvdPQQopLaTh+W9roGjh6pHAihxCtKvjbeiz
+	 wrXDNxYaPBV1FqD3nwk/3XYS6tVExcudDEkF40u11/es90SNLxLgEqHKl90Bz1sm8/
+	 UE+OSwTwgfZeTZ5J5FhTealJUO8mYpq5b9wbmYQA9b1Lwm5kbcD2A7Hz0MRFUXysVb
+	 ql+tPM3W3hmDIUQGaM4lwFS/ufGdl+dQJJAMuhF3Jax0Bp7+aq6uc1oeUo74yE6RY1
+	 KUoQCo+a8R1KttTQuGt8RzU9Ij4Kv1zZJNls5IYCd4SPowfxKwEAOsnoFw2o4vmQBx
+	 EZr/wgp+Hbv9A==
+Date: Mon, 14 Oct 2024 12:01:42 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: David Laight <David.Laight@aculab.com>
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"x86@kernel.org" <x86@kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [PATCH 3/3] crypto: x86/crc32c - eliminate jump table and
+ excessive unrolling
+Message-ID: <20241014190142.GA1137@sol.localdomain>
+References: <20241014042447.50197-1-ebiggers@kernel.org>
+ <20241014042447.50197-4-ebiggers@kernel.org>
+ <a6c0c04a0486404ca4db3fd57a809d5b@AcuMS.aculab.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a6c0c04a0486404ca4db3fd57a809d5b@AcuMS.aculab.com>
 
-The Marvell Armada RNG uses the same IP as TI from Inside Secure and is
-already using the binding. The only missing part is the
-"marvell,armada-8k-rng" compatible string.
+On Mon, Oct 14, 2024 at 04:30:05PM +0000, David Laight wrote:
+> From: Eric Biggers
+> > Sent: 14 October 2024 05:25
+> > 
+> > crc32c-pcl-intel-asm_64.S has a loop with 1 to 127 iterations fully
+> > unrolled and uses a jump table to jump into the correct location.  This
+> > optimization is misguided, as it bloats the binary code size and
+> > introduces an indirect call.  x86_64 CPUs can predict loops well, so it
+> > is fine to just use a loop instead.  Loop bookkeeping instructions can
+> > compete with the crc instructions for the ALUs, but this is easily
+> > mitigated by unrolling the loop by a smaller amount, such as 4 times.
+> 
+> Do you need to unroll it at all?
 
-Rename the binding to inside-secure,safexcel-eip76.yaml to better
-reflect it is multi-vendor, licensed IP and to follow the naming
-convention using compatible string.
+It looks like on most CPUs, no.  On Haswell, Emerald Rapids, Zen 2 it does not
+make a significant difference.  However, it helps on Zen 5.
 
-Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
----
- ...g.yaml => inside-secure,safexcel-eip76.yaml} | 17 +++++++++++------
- 1 file changed, 11 insertions(+), 6 deletions(-)
- rename Documentation/devicetree/bindings/rng/{omap_rng.yaml => inside-secure,safexcel-eip76.yaml} (79%)
+> > +	# Unroll the loop by a factor of 4 to reduce the overhead of the loop
+> > +	# bookkeeping instructions, which can compete with crc32q for the ALUs.
+> > +.Lcrc_3lanes_4x_loop:
+> > +	crc32q	(bufp), crc_init_q
+> > +	crc32q	(bufp,chunk_bytes_q), crc1
+> > +	crc32q	(bufp,chunk_bytes_q,2), crc2
+> > +	crc32q	8(bufp), crc_init_q
+> > +	crc32q	8(bufp,chunk_bytes_q), crc1
+> > +	crc32q	8(bufp,chunk_bytes_q,2), crc2
+> > +	crc32q	16(bufp), crc_init_q
+> > +	crc32q	16(bufp,chunk_bytes_q), crc1
+> > +	crc32q	16(bufp,chunk_bytes_q,2), crc2
+> > +	crc32q	24(bufp), crc_init_q
+> > +	crc32q	24(bufp,chunk_bytes_q), crc1
+> > +	crc32q	24(bufp,chunk_bytes_q,2), crc2
+> > +	add	$32, bufp
+> > +	sub	$4, %eax
+> > +	jge	.Lcrc_3lanes_4x_loop
+> 
+> If you are really lucky you'll get two memory reads/clock.
+> So you won't ever to do than two crc32/clock.
+> Looking at Agner's instruction latency tables I don't think
+> any cpu can do more that one per clock, or pipeline them.
+> I think that means you don't even need two (never mind 3)
+> buffers.
 
-diff --git a/Documentation/devicetree/bindings/rng/omap_rng.yaml b/Documentation/devicetree/bindings/rng/inside-secure,safexcel-eip76.yaml
-similarity index 79%
-rename from Documentation/devicetree/bindings/rng/omap_rng.yaml
-rename to Documentation/devicetree/bindings/rng/inside-secure,safexcel-eip76.yaml
-index c0ac4f68ea54..0877eb44f9ed 100644
---- a/Documentation/devicetree/bindings/rng/omap_rng.yaml
-+++ b/Documentation/devicetree/bindings/rng/inside-secure,safexcel-eip76.yaml
-@@ -1,20 +1,25 @@
- # SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
- %YAML 1.2
- ---
--$id: http://devicetree.org/schemas/rng/omap_rng.yaml#
-+$id: http://devicetree.org/schemas/rng/inside-secure,safexcel-eip76.yaml#
- $schema: http://devicetree.org/meta-schemas/core.yaml#
- 
--title: OMAP SoC and Inside-Secure HWRNG Module
-+title: Inside-Secure HWRNG Module
- 
- maintainers:
-   - Jayesh Choudhary <j-choudhary@ti.com>
- 
- properties:
-   compatible:
--    enum:
--      - ti,omap2-rng
--      - ti,omap4-rng
--      - inside-secure,safexcel-eip76
-+    oneOf:
-+      - enum:
-+          - ti,omap2-rng
-+          - ti,omap4-rng
-+          - inside-secure,safexcel-eip76
-+      - items:
-+          - enum:
-+              - marvell,armada-8k-rng
-+          - const: inside-secure,safexcel-eip76
- 
-   ti,hwmods:
-     const: rng
--- 
-2.45.2
+On most Intel and AMD CPUs (I tested Haswell for old Intel, Emerald Rapids for
+new Intel, and Zen 2 for slightly-old AMD), crc32q has 3 cycle latency and 1 per
+cycle throughput.  So you do need at least 3 streams.
 
+AMD Zen 5 has much higher crc32q throughput and seems to want up to 7 streams.
+This is not implemented yet.
+
+> Most modern x86 can do 4 or 5 (or even more) ALU operations
+> per clock - depending on the combination of instructions.
+> 
+> Replace the loop termination with a comparison of 'bufp'
+> against a pre-calculated limit and you get two instructions
+> (that might get merged into one u-op) for the loop overhead.
+> They'll run in parallel with the crc32q instructions.
+
+That's actually still three instructions: add, cmp, and jne.
+
+I tried it on both Intel and AMD, and it did not help.
+
+> I've never managed to get a 1-clock loop, but two is easy.
+> You might find that just:
+> 10:
+> 	crc32q	(bufp), crc
+> 	crc32q	8(bufp), crc
+> 	add		$16, bufp
+> 	cmp		bufp, buf_lim
+> 	jne		10b
+> will run at 8 bytes/clock on modern intel cpu.
+
+No, the latency of crc32q is still three cycles.  You need three streams.
+
+> You can write that in C with a simple asm function for the crc32
+> instruction itself.
+
+Well, the single-stream CRC32C implementation already does that; see
+arch/x86/crypto/crc32c-intel_glue.c.  Things are not as simple for this
+multi-stream implementation, which uses pclmulqdq to combine the CRCs.
+
+- Eric
