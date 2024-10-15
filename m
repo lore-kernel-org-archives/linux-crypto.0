@@ -1,22 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B09F721E3A7;
-	Tue, 15 Oct 2024 22:22:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A75AF1B0F0F;
+	Tue, 15 Oct 2024 22:22:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729030976; cv=none; b=o5yMXfhyh03nSr2lnD+Mg9i5YDljdBQLdGRiu0eZGqSFGuedBtl1YAItD9EKTSD2y+Vv/LP+xB5bKEzP1en0VyWEgXH9ot0teLRERLyqU1zpbYDUQcJIwQGqVBcZQo5s782hRciTV72TIVoHOoV8Cugj+Q56TplPKiv0QDUYvSc=
+	t=1729030977; cv=none; b=r+kU+GscUPToqkdkvH1G/P6b06yVUf1EE6lMtTeJ6/s1jCcsMYR2610wmhboxIRg0ExWhgkHq7/2TsXPyAW+lyshTWtn/T2xULExUAFbc5IFMRQOFHTQsO6qBsRGrKIClnlBrdE7YFs/SSIGSy5J2Mdt6vPrBK2xpC58Hjt2FBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729030976; c=relaxed/simple;
-	bh=ChJp3FkdlrjyBMH8e4YX8Xck6vININFbQO4OvSITy5E=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ejhJ8tiJ6EZxf3SkjgoGekEDFqdx2ZSml58sHVz9RdkfUsHpRPnXAwHvvgNljaPgkzUU6PKkI4iWj4OHzAoMpYgkN0L3x7nG015OPBfcJ1QUWnvnoovcitvfmr3whTNm2CqlnwnK1168ciKfOG2gTW//w2Ue8I6NCf6tf9aF5Ow=
+	s=arc-20240116; t=1729030977; c=relaxed/simple;
+	bh=Hyol+qnMXN5hFfxO1tenvEfNy6Zotd9r1odI5pxqgm8=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=dQORGs4lSjdT3QMLbCqAk3+EVYo7FJDpQKMvHZmwbPRdID+iiey+S9vMIuNe+DII7gp9IY0b+/PNlFW4/fc8dIn1vGM6v/2IOo6VOikT2TmSC7tM3tVJ+FwmRmw8zroSxxlCAA2PuG1no1ZwdAeWJYGtKRXchfnlKNO/w+wVXLg=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E91ADDA7;
-	Tue, 15 Oct 2024 15:23:22 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8D5D81691;
+	Tue, 15 Oct 2024 15:23:24 -0700 (PDT)
 Received: from u200865.usa.arm.com (U203867.austin.arm.com [10.118.30.35])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 030F23F71E;
-	Tue, 15 Oct 2024 15:22:53 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D872D3F71E;
+	Tue, 15 Oct 2024 15:22:54 -0700 (PDT)
 From: Jeremy Linton <jeremy.linton@arm.com>
 To: linux-kernel@vger.kernel.org
 Cc: akpm@linux-foundation.org,
@@ -32,10 +33,12 @@ Cc: akpm@linux-foundation.org,
 	linux-kbuild@vger.kernel.org,
 	keyrings@vger.kernel.org,
 	Jeremy Linton <jeremy.linton@arm.com>
-Subject: [RFC 0/5] Another initramfs signature checking set
-Date: Tue, 15 Oct 2024 17:22:30 -0500
-Message-ID: <20241015222235.71040-1-jeremy.linton@arm.com>
+Subject: [RFC 2/5] KEYS/certs: Start the builtin key and cert system earlier
+Date: Tue, 15 Oct 2024 17:22:32 -0500
+Message-ID: <20241015222235.71040-3-jeremy.linton@arm.com>
 X-Mailer: git-send-email 2.46.2
+In-Reply-To: <20241015222235.71040-1-jeremy.linton@arm.com>
+References: <20241015222235.71040-1-jeremy.linton@arm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -44,51 +47,80 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-With the advent of UKI's wrapping kernel and cpio archives up into
-single UEFI PE executables it seems like its probably time to
-reconsider whether the core idea of signing the initrd and verifying
-it in its entirely is a useful function of the core kernel.
+This exists at the moment to assure that the module signature checking
+logic can be utilized before the initramfs is mounted.
 
-Moving this functionality in the kernel should provide a similar
-security statement to the UKIs with a more traditional kernel + initrd
-boot flow and the ability to have a single kernel image that
-selects between multiple signed initrd images. Say a normal boot
-image, and a recovery image.
+Assuming we want to use the built in keys as well as MOK's to validate
+an init image, is just moving this stuff earlier in the boot process
+the right choice?
 
-This set is a very basic implementation of that concept using the kernel
-built in trusted keyring, and a signature format that is similar to the
-existing module signature. The core change is quite trivial with the larger
-questions around the policy for enforcing or simply checking
-for a valid signature. I've considered various policies, tying it to
-lockdown/etc but this set simply enforces it by default with an kernel
-parameter to override the behavior.
+Signed-off-by: Jeremy Linton <jeremy.linton@arm.com>
+---
+ certs/blacklist.c                        | 2 +-
+ certs/system_keyring.c                   | 4 ++--
+ crypto/asymmetric_keys/asymmetric_type.c | 2 +-
+ crypto/asymmetric_keys/x509_public_key.c | 2 +-
+ 4 files changed, 5 insertions(+), 5 deletions(-)
 
-Outside of the core patch the largest change revolves around making
-sure that the asymmetric key and built in cert/keyring/blacklist logic
-is started much earlier in the boot process than normal. This means
-that beyond the hacky _initcall changes in patch 2 there are a bit of
-additional Kconfig changes necessary.
-
-Finally, before the RFC is dropped there are a number of
-/Documentation changes that will be completed as needed.
-
-Jeremy Linton (5):
-  initramfs: Add initramfs signature checking
-  KEYS/certs: Start the builtin key and cert system earlier
-  initramfs: Use existing module signing infrastructure
-  sign-file: Add -i option to sign initramfs images
-  initramfs: Enforce initramfs signature
-
- certs/blacklist.c                        |  2 +-
- certs/system_keyring.c                   |  4 +-
- crypto/asymmetric_keys/asymmetric_type.c |  2 +-
- crypto/asymmetric_keys/x509_public_key.c |  2 +-
- include/linux/initrd.h                   |  3 +
- init/initramfs.c                         | 84 +++++++++++++++++++++++-
- scripts/sign-file.c                      | 11 +++-
- usr/Kconfig                              |  9 +++
- 8 files changed, 109 insertions(+), 8 deletions(-)
-
+diff --git a/certs/blacklist.c b/certs/blacklist.c
+index 675dd7a8f07a..e644dd4cfc2b 100644
+--- a/certs/blacklist.c
++++ b/certs/blacklist.c
+@@ -356,7 +356,7 @@ static int __init blacklist_init(void)
+ /*
+  * Must be initialised before we try and load the keys into the keyring.
+  */
+-device_initcall(blacklist_init);
++fs_initcall(blacklist_init);
+ 
+ #ifdef CONFIG_SYSTEM_REVOCATION_LIST
+ /*
+diff --git a/certs/system_keyring.c b/certs/system_keyring.c
+index 9de610bf1f4b..81a86418cb00 100644
+--- a/certs/system_keyring.c
++++ b/certs/system_keyring.c
+@@ -260,7 +260,7 @@ static __init int system_trusted_keyring_init(void)
+ /*
+  * Must be initialised before we try and load the keys into the keyring.
+  */
+-device_initcall(system_trusted_keyring_init);
++subsys_initcall(system_trusted_keyring_init);
+ 
+ __init int load_module_cert(struct key *keyring)
+ {
+@@ -293,7 +293,7 @@ static __init int load_system_certificate_list(void)
+ 
+ 	return x509_load_certificate_list(p, size, builtin_trusted_keys);
+ }
+-late_initcall(load_system_certificate_list);
++fs_initcall_sync(load_system_certificate_list);
+ 
+ #ifdef CONFIG_SYSTEM_DATA_VERIFICATION
+ 
+diff --git a/crypto/asymmetric_keys/asymmetric_type.c b/crypto/asymmetric_keys/asymmetric_type.c
+index 43af5fa510c0..a0607e8cdafc 100644
+--- a/crypto/asymmetric_keys/asymmetric_type.c
++++ b/crypto/asymmetric_keys/asymmetric_type.c
+@@ -681,5 +681,5 @@ static void __exit asymmetric_key_cleanup(void)
+ 	unregister_key_type(&key_type_asymmetric);
+ }
+ 
+-module_init(asymmetric_key_init);
++subsys_initcall(asymmetric_key_init);
+ module_exit(asymmetric_key_cleanup);
+diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
+index 8409d7d36cb4..391db5f1ede6 100644
+--- a/crypto/asymmetric_keys/x509_public_key.c
++++ b/crypto/asymmetric_keys/x509_public_key.c
+@@ -246,7 +246,7 @@ static void __exit x509_key_exit(void)
+ 	unregister_asymmetric_key_parser(&x509_key_parser);
+ }
+ 
+-module_init(x509_key_init);
++fs_initcall(x509_key_init);
+ module_exit(x509_key_exit);
+ 
+ MODULE_DESCRIPTION("X.509 certificate parser");
 -- 
 2.46.0
 
