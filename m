@@ -1,23 +1,23 @@
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E21DD21E3DB;
-	Tue, 15 Oct 2024 22:22:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BD781B6CED;
+	Tue, 15 Oct 2024 22:22:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729030977; cv=none; b=BARBFdB4jjSsy32lYy+qIS89SsasddG1QDsOWuppAAqIh3I0LbU1420AlBW6FTDH41MBKwBstBCneMSKIYXfVORuKWwQNmHrk/6Ux8/6V59K2JnbzofTQBmhcFres5al2wt8TCB3YsIq3F1rYV72Bmd/6VGZuPoCH71mXbqjWow=
+	t=1729030977; cv=none; b=NCbFFRuugUkMZlbNfeJ/dTbfWADR3fEcOFrxhzxo565Ip8k9cN6Kqt9qlBtHelX3joHb4l7uUOB49FGaompuwF/T1AMeXTwcDyzWLdx9AUyiKzB4gr+JQXZ5v8EXIjZjV+LzpT83tC3evC0nlCudYZEN2Jkp+V6sa4j33tYN+Gs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1729030977; c=relaxed/simple;
-	bh=a/9waGCx6zmCoPndDtrnBw09clAutUJbVmjhCyxxTzI=;
+	bh=BqOeHEtc1k32tWuUWaZhaEli3OQ7/QlXnTlOvCW7df4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=vDG9QERH4P59SbzhB+5vjg5wPmK7MUGh97bFxJsVIx4iGu4n+ucoAnD0tccVJJKNNPhyhMZEP2nPq8BwHhuZvg0SxFiW7p46AHcf9oKUrpi+VgfYkHKbBDcafaFkNh95wPXSgpm0/GerA0sKCXvYwIqeoZfCmPUa2CfKeqsgLek=
+	 MIME-Version; b=SK7puA3ux2LjDTE281AReWJc7NvDFrvAK1ly88sHBhVl4AHxzfqxfIQ+8xctW7WtccL5C/XAy8S+WKOpxkYIEpwwySNqqpNbnkxfdoXADGX9K4Z1PCyMcLoqI8VPMRopJFWB8HSNllOV4hHRVqHoS0AMqJ309Qy2zHGXldL6Az4=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CB6D71007;
-	Tue, 15 Oct 2024 15:23:23 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2C9811692;
+	Tue, 15 Oct 2024 15:23:25 -0700 (PDT)
 Received: from u200865.usa.arm.com (U203867.austin.arm.com [10.118.30.35])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 226023F71E;
-	Tue, 15 Oct 2024 15:22:54 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 784793F71E;
+	Tue, 15 Oct 2024 15:22:55 -0700 (PDT)
 From: Jeremy Linton <jeremy.linton@arm.com>
 To: linux-kernel@vger.kernel.org
 Cc: akpm@linux-foundation.org,
@@ -33,9 +33,9 @@ Cc: akpm@linux-foundation.org,
 	linux-kbuild@vger.kernel.org,
 	keyrings@vger.kernel.org,
 	Jeremy Linton <jeremy.linton@arm.com>
-Subject: [RFC 1/5] initramfs: Add initramfs signature checking
-Date: Tue, 15 Oct 2024 17:22:31 -0500
-Message-ID: <20241015222235.71040-2-jeremy.linton@arm.com>
+Subject: [RFC 3/5] initramfs: Use existing module signing infrastructure
+Date: Tue, 15 Oct 2024 17:22:33 -0500
+Message-ID: <20241015222235.71040-4-jeremy.linton@arm.com>
 X-Mailer: git-send-email 2.46.2
 In-Reply-To: <20241015222235.71040-1-jeremy.linton@arm.com>
 References: <20241015222235.71040-1-jeremy.linton@arm.com>
@@ -47,43 +47,149 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Various root-level processes, configurations, and the like can exist
-in the initramfs provided by the boot loader. The kernel does a
-reasonable job of signature checking and blocking unsigned code from
-running in the kernel, but this is only one aspect of system
-security. The remaining init and early startup code running in
-userspace are just as critical to system security.
+Adding some security checks around the configuration data and early
+init processes running on the machine is a good idea. There is a move
+to do this via systemd UKIs using the UEFI and shim infrastructure to
+wrap a kernel and its associated initramfs into a single PE
+executable, which is then validated and measured together. The
+existing kernel boot methods can also provide a similar level of
+security by leveraging the kernel's signing and validation
+infrastructure to check a signature on the initramfs.
 
-This option provides a basic initramfs signature check, which reuses
-the module signature checking infrastructure to validate the boot
-loader provided initramfs. Later, a system policy can allow or deny
-images that fail the signature check.
+Kernel-validated initramfs images maintain the existing UEFI boot flow
+while enabling functionality on non-UEFI machines. They keep the UEFI
+secure boot verification separate from current and future choices over
+how the kernel verifies data used after it boots. Additionally, this
+makes it possible for multiple signed initramfs images, for example,
+debug and recovery images, to share a single kernel image.
+
+Let's reuse the kernel's sign-file utility, which appends a trailing
+signature, signature description, and module signature string to sign
+the initramfs. Then, immediately before we unpack the image, detect if
+there is a signature, validate it, and strip it off. Then, with a
+later patch, we can decide what happens when the image is unsigned or
+cannot be verified.
 
 Signed-off-by: Jeremy Linton <jeremy.linton@arm.com>
 ---
- usr/Kconfig | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ include/linux/initrd.h |  3 ++
+ init/initramfs.c       | 67 +++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 69 insertions(+), 1 deletion(-)
 
-diff --git a/usr/Kconfig b/usr/Kconfig
-index 9279a2893ab0..a9c0dc0112eb 100644
---- a/usr/Kconfig
-+++ b/usr/Kconfig
-@@ -32,6 +32,15 @@ config INITRAMFS_FORCE
- 	  and is useful if you cannot or don't want to change the image
- 	  your bootloader passes to the kernel.
+diff --git a/include/linux/initrd.h b/include/linux/initrd.h
+index f1a1f4c92ded..e123d3cb39bb 100644
+--- a/include/linux/initrd.h
++++ b/include/linux/initrd.h
+@@ -5,6 +5,9 @@
  
-+config INITRAMFS_SIG
-+	bool "Validate signed initramfs images"
-+	depends on SYSTEM_DATA_VERIFICATION
-+	help
-+	  This option validates that image provided by the
-+	  bootloader is signed. The decision to accept or
-+	  reject the image is then left to the kernel lockdown
-+	  logic.
+ #define INITRD_MINOR 250 /* shouldn't collide with /dev/ram* too soon ... */
+ 
++/* the len here equals the modsig string len */
++#define INITRD_SIG_STRING "~initrd signature appended~\n"
 +
- config INITRAMFS_ROOT_UID
- 	int "User ID to map to 0 (user root)"
- 	depends on INITRAMFS_SOURCE!=""
+ /* starting block # of image */
+ extern int rd_image_start;
+ 
+diff --git a/init/initramfs.c b/init/initramfs.c
+index bc911e466d5b..d2d2c68016c2 100644
+--- a/init/initramfs.c
++++ b/init/initramfs.c
+@@ -1,5 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0
+ #include <linux/init.h>
++#include <linux/initrd.h>
+ #include <linux/async.h>
+ #include <linux/fs.h>
+ #include <linux/slab.h>
+@@ -14,6 +15,7 @@
+ #include <linux/kstrtox.h>
+ #include <linux/memblock.h>
+ #include <linux/mm.h>
++#include <linux/module_signature.h>
+ #include <linux/namei.h>
+ #include <linux/init_syscalls.h>
+ #include <linux/umh.h>
+@@ -688,8 +690,69 @@ static void __init populate_initrd_image(char *err)
+ }
+ #endif /* CONFIG_BLK_DEV_RAM */
+ 
++static int __init initrd_signature_check(size_t *initrd_len)
++{
++	struct module_signature *ms;
++	size_t sig_len;
++	int ret = -ENODATA;
++	const size_t m_len = sizeof(INITRD_SIG_STRING) - 1;
++
++	*initrd_len = (initrd_end - initrd_start);
++
++	if (*initrd_len < (m_len + sizeof(*ms)))
++		goto fail;
++
++	if (memcmp((char *)(initrd_end - m_len), INITRD_SIG_STRING, m_len)) {
++		pr_info("unsigned initramfs\n");
++		goto fail;
++	}
++
++	/* remove module sig string from len computations going forward */
++	*initrd_len -= m_len;
++
++	ms = (struct module_signature *)(initrd_end - sizeof(*ms) - m_len);
++
++	ret = mod_check_sig(ms, *initrd_len, "initramfs");
++	if (ret)
++		goto fail;
++
++	sig_len = be32_to_cpu(ms->sig_len);
++	*initrd_len -= sizeof(*ms) + sig_len;
++
++#ifdef CONFIG_INITRAMFS_SIG
++	ret = verify_pkcs7_signature((char *)initrd_start, *initrd_len,
++				     (char *)(initrd_start + *initrd_len),
++				     sig_len,
++				     VERIFY_USE_SECONDARY_KEYRING,
++				     VERIFYING_UNSPECIFIED_SIGNATURE,
++				     NULL, NULL);
++
++	switch (ret) {
++	case 0:
++		pr_info("initramfs: valid signature\n");
++		break;
++	case -ENODATA:
++		pr_err("initramfs: invalid signature\n");
++		break;
++	case -ENOPKG:
++		pr_err("initramfs: unsupported crypto\n");
++		break;
++	case -ENOKEY:
++		pr_err("initramfs: unknown key\n");
++		break;
++	default:
++		pr_err("initramfs: unknown error %d\n", ret);
++	}
++#endif
++
++fail:
++	return ret;
++}
++
+ static void __init do_populate_rootfs(void *unused, async_cookie_t cookie)
+ {
++	size_t initrd_len;
++
+ 	/* Load the built in initramfs */
+ 	char *err = unpack_to_rootfs(__initramfs_start, __initramfs_size);
+ 	if (err)
+@@ -703,7 +766,9 @@ static void __init do_populate_rootfs(void *unused, async_cookie_t cookie)
+ 	else
+ 		printk(KERN_INFO "Unpacking initramfs...\n");
+ 
+-	err = unpack_to_rootfs((char *)initrd_start, initrd_end - initrd_start);
++	initrd_signature_check(&initrd_len);
++
++	err = unpack_to_rootfs((char *)initrd_start, initrd_len);
+ 	if (err) {
+ #ifdef CONFIG_BLK_DEV_RAM
+ 		populate_initrd_image(err);
 -- 
 2.46.0
 
