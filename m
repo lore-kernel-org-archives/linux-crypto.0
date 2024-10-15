@@ -1,110 +1,68 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C300916CD1D;
-	Tue, 15 Oct 2024 04:53:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77D72189B88;
+	Tue, 15 Oct 2024 06:24:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728967987; cv=none; b=al56H8u9uyol8nFW3FmaRB6NVvN/dfMLBbemSqW2yfowbwO7cVdqROrjLKL3E5oYd3SeNORT9D7OM3s+bdkHzJ2BUFEIImr0RjbyAJMIPYX6heURVfOxEVJaBGzaivSkqhl/20yFEnscH4U6baPmY1WUPwltvHd9a9TsQwNMYnM=
+	t=1728973463; cv=none; b=SVxRRNBMyp4YdtwbK0B0aXPatcoxaPOp5rtITqGgG+/fTZ+DULUfsvJsNhuTrMYPyoJj9r8i1FeSxjIDDisgkXLo7HkcehNYCxTTny7qFwe+G2OcRQbcUN8h/czDMcZI4eb94EvCzZ2BcJ4MgCGRCrOZLcHxLM6IyJE2Uet31ww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728967987; c=relaxed/simple;
-	bh=BqrNUw2K7RUtZMlq1Lf6fghkPnyhYNWO4K/G+1gUWMM=;
+	s=arc-20240116; t=1728973463; c=relaxed/simple;
+	bh=FqxeBKUSF4YzO24qe/B/5MSnoqbuPJw/4FZvim8DKts=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JYi951sP3YPhakOzBvcjiOiAmt2nSGKJH9vwyMGNmeeuSbTtjGC8ykjGk4rJBcBJXqonozxW6ovidMCjbtag9L+Ufl4AKbO1wLXGXGqpSDYIkjBrv5C+V0M9lXHS3m6wjp4Ww161a667dX25x2DTmtiFEPr2sxMrvcg3DGUF/zI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=pYcnStbb; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=e9SWZoMa3SX2V0waHed2wjaZ58DqhhsTVwPnuqslTeqXo/sjlEDcn09M0VZqNr0GiOLRNZo0Vrs91fwV9Dys0MfHWlS8n4pwY5+o7kKHJpOapvFU8XP/nYfFcNonjaqnIeowLH6uEnGpJ/BlWB579cpmPpPYbIEWnQ0bl8Ioi60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oxrUFvCC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="pYcnStbb"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=BWsizNzSrPZ+r+201ZIsYtk0J5IsZolcXemWtkjSrFI=; b=pYcnStbbYju0pDNtlPl/UI7wGL
-	zjYLz5a8i0LdHbzkKONRsKK2uzqOxpIsOZDa/oiGjAj5Jo+P1ByV7gP8A522DX6JG4VXOb/r7CW7m
-	SOCuDLTGUxBqD98HtmK5JjWExJDqWjoyzT+T+RmCZJzzTUbMPL1KK0rQWwc8tz7jWN89coVSoO4d0
-	cSBO5rs7EftTdk9IH5jSOyWOpsSbKHAhGENrc5Mdgi01LHH0sU1j7o3RE1SlZSzP8mWAa0pLJr/tp
-	H/7gwJCp62sNF4Qmp266N1v10DR60iYNwNoqOadBVEy+PDc+ruAkDovUNZmGyLig8nISV+3yZLzRb
-	+RBstA9A==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1t0ZOI-009QEG-20;
-	Tue, 15 Oct 2024 12:52:53 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 15 Oct 2024 12:52:52 +0800
-Date: Tue, 15 Oct 2024 12:52:52 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Klaus Kudielka <klaus.kudielka@gmail.com>
-Cc: regressions@lists.linux.dev, linux-kernel@vger.kernel.org,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Boris Brezillon <bbrezillon@kernel.org>,
-	Arnaud Ebalard <arno@natisbad.org>,
-	Romain Perier <romain.perier@free-electrons.com>
-Subject: Re: [REGRESSION] alg: ahash: Several tests fail during boot on
- Turris Omnia
-Message-ID: <Zw31JIEyh28vK9q7@gondor.apana.org.au>
-References: <ZwJUO5Nz3S7EeqO6@gondor.apana.org.au>
- <1fc4db6269245de4c626f029a46efef246ee7232.camel@gmail.com>
- <ZwObXYVHJlBaKuj2@gondor.apana.org.au>
- <38a275a4e0224266ceb9ce822e3860fe9209d50c.camel@gmail.com>
- <ZwZAExmK52txvHE8@gondor.apana.org.au>
- <7e38e34adddb14d0a23a13cf738b6b7cccbfce6f.camel@gmail.com>
- <ZwduxHxQtHdzz-kl@gondor.apana.org.au>
- <ZwePSPG8aWm6mwKK@gondor.apana.org.au>
- <15fadc356b73a1e8e24183f284b5c0a44a53e679.camel@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oxrUFvCC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F53AC4CECD;
+	Tue, 15 Oct 2024 06:24:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1728973463;
+	bh=FqxeBKUSF4YzO24qe/B/5MSnoqbuPJw/4FZvim8DKts=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=oxrUFvCCXqq8tRPyBfrXUgFV6loELPv0mo85a/RPryoaejKqn/IRhMeFtPKqkc5N8
+	 9EWqmeW2UVpbdfRkZA9uoAGG3zbx37SvGzWHSeg53NlaLKUPX0Dt+4BvANEkRIYgK0
+	 q5OPuxtetCYGXbyjm8fjjQcc3KbK4vByglPKPe+eBAitKmR48TFtQyYkYfTzgK847j
+	 3ARKBm3sTBH+9acpgyXzMCbzu2tdnr4ZLB/6cAbDZnZTm++zOKw5J5OV/XH+8SMJCf
+	 aZgacKQqmkbLxmxKDfcHDB1PkcbbvPYFagHdBlBH9lYHowp4QJe46+Ig/PkrE4dVy5
+	 cPh8Fd3qlildQ==
+Date: Tue, 15 Oct 2024 08:24:18 +0200
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Olivia Mackall <olivia@selenic.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Jayesh Choudhary <j-choudhary@ti.com>, 
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] dt-bindings: rng: Add Marvell Armada RNG support
+Message-ID: <zy2mqac5jxh7eyxk3lazdsplthlmluvtvqtyuth37jvqxijym2@jzjqpjkxg24n>
+References: <20241014185457.1827734-1-robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <15fadc356b73a1e8e24183f284b5c0a44a53e679.camel@gmail.com>
+In-Reply-To: <20241014185457.1827734-1-robh@kernel.org>
 
-On Thu, Oct 10, 2024 at 07:35:33PM +0200, Klaus Kudielka wrote:
->
-> Hmmm, not really (patch applied on top of 6.12-rc2). 5 algorithms failed self-test.
+On Mon, Oct 14, 2024 at 01:54:57PM -0500, Rob Herring (Arm) wrote:
+> The Marvell Armada RNG uses the same IP as TI from Inside Secure and is
+> already using the binding. The only missing part is the
+> "marvell,armada-8k-rng" compatible string.
+> 
+> Rename the binding to inside-secure,safexcel-eip76.yaml to better
+> reflect it is multi-vendor, licensed IP and to follow the naming
+> convention using compatible string.
+> 
+> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+> ---
+>  ...g.yaml => inside-secure,safexcel-eip76.yaml} | 17 +++++++++++------
+>  1 file changed, 11 insertions(+), 6 deletions(-)
+>  rename Documentation/devicetree/bindings/rng/{omap_rng.yaml => inside-secure,safexcel-eip76.yaml} (79%)
 
-OK, let's try disabling TDMA altogether.  And if it still fails with
-this could you please bring back the printk patch and send me the
-result of it with TDMA disabled please?
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-Thanks!
+Best regards,
+Krzysztof
 
-diff --git a/drivers/crypto/marvell/cesa/cesa.c b/drivers/crypto/marvell/cesa/cesa.c
-index 5fd31ba715c2..a3f0465aa178 100644
---- a/drivers/crypto/marvell/cesa/cesa.c
-+++ b/drivers/crypto/marvell/cesa/cesa.c
-@@ -278,7 +278,7 @@ static const struct mv_cesa_caps kirkwood_caps = {
- 	.ncipher_algs = ARRAY_SIZE(orion_cipher_algs),
- 	.ahash_algs = orion_ahash_algs,
- 	.nahash_algs = ARRAY_SIZE(orion_ahash_algs),
--	.has_tdma = true,
-+	.has_tdma = false,
- };
- 
- static const struct mv_cesa_caps armada_370_caps = {
-@@ -287,7 +287,7 @@ static const struct mv_cesa_caps armada_370_caps = {
- 	.ncipher_algs = ARRAY_SIZE(armada_370_cipher_algs),
- 	.ahash_algs = armada_370_ahash_algs,
- 	.nahash_algs = ARRAY_SIZE(armada_370_ahash_algs),
--	.has_tdma = true,
-+	.has_tdma = false,
- };
- 
- static const struct mv_cesa_caps armada_xp_caps = {
-@@ -296,7 +296,7 @@ static const struct mv_cesa_caps armada_xp_caps = {
- 	.ncipher_algs = ARRAY_SIZE(armada_370_cipher_algs),
- 	.ahash_algs = armada_370_ahash_algs,
- 	.nahash_algs = ARRAY_SIZE(armada_370_ahash_algs),
--	.has_tdma = true,
-+	.has_tdma = false,
- };
- 
- static const struct of_device_id mv_cesa_of_match_table[] = {
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
