@@ -1,127 +1,100 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0C411C07CC
-	for <linux-crypto@vger.kernel.org>; Tue, 15 Oct 2024 12:48:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3030E1C07DF;
+	Tue, 15 Oct 2024 13:11:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728996529; cv=none; b=ephsZi6YHmgV4Bz+7+AitiG9b2q6JnwaXEKYNgYAUUPktLXkIqCrX/VT5Hxd32ic0y+wEHHagOGsFaGi6HGQdSZolOfIROSSKwEvN2pkpdUY2QMnYAecBxFzUioz4YV4jR6LGYpa/f/mytC7MQy8Pg4dSZ0i1QGGLfqMq+QEjbM=
+	t=1728997889; cv=none; b=YfCrEJacrOrIHQQ6WkhcG3RwfftYGQJaeJOnmwmlAoBjFIsOOVyxLf5vBPKc1ncUywwboSbAZbp8gGvIYonUX015rdh3yL0erqs75ZOzlIAAhAn32vLKyvQ9z0HYgm64hhNAcnp7HrXEetRpbc7ciKa56WJAueOKoNdJfju8c8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728996529; c=relaxed/simple;
-	bh=zA35WNDDO+XTEpqOhjl4AE+3mcFrw8fEePuTw1HQyOU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Nea7CGtEy9z54nV48QcSqv+73eZEy790yUns6JpDgPwvK/AdoaEupeqTvw/A+BM85+hZv6xmdLY5zn6unyRRz6TPex8XKyvUV42fOdSrulBh07VRE4l/tfNuRhRtu+vD0wR9aR8EhO3+5UNxbNn8bMiAZeODIHfY7UhlnEfxOkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BSEQltfe; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1728997889; c=relaxed/simple;
+	bh=6DubvOfcNitNNbFc4/CgkMkTSuW14iGdJHkB/Kq4p0U=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=OcuI1LW+oSEGT33Iu1QKFthYWlHI4moyMn0nguqob2JG0YnOLhTBYhk7CAmCU4WDtqlIVQ9k4Mx/3Pa0vo69gsrm/gjTm401Hogi4bRX4/OR5/Jga3cFK9MmJd7vIfNRtFMLK3EUcviIJyRw0Qu2eQ1Ccbuo+eSh7q43cDzdClc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BzdAt1J7; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BSEQltfe"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1728996526;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6muWU/G2Bo0tGqDvLyx/Zy7bm86G9nhd+maNiujTvg4=;
-	b=BSEQltfew5R++SKzWc6Nsgf8vBbDFRnMOunOwFroF+zhirv3wT1eiKN/ITe+6v/3EK7eGF
-	sai97iZJIScsKYuITAlWIOUVG8rsQ0zbDvlHYbYRvQbZBVhm2l3d7Rpd6DYW1T2dzI5ELW
-	qFTalNUTPqE4diMcUjinu2n9XY4+16E=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-9-UqT4OrjTNESOlInhBsCUIQ-1; Tue, 15 Oct 2024 08:48:45 -0400
-X-MC-Unique: UqT4OrjTNESOlInhBsCUIQ-1
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2e2c07adf0aso5371690a91.3
-        for <linux-crypto@vger.kernel.org>; Tue, 15 Oct 2024 05:48:45 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BzdAt1J7"
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-37d447de11dso3883302f8f.1;
+        Tue, 15 Oct 2024 06:11:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1728997884; x=1729602684; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+1IE6vo5EI0G+9qqkm/qKlmdaFnB9SlCUS7LfmzYM5M=;
+        b=BzdAt1J7iEF2fUEizcyFJt+udH8eMoxVwTpVXColip1YsoYF3gWKGQ3MK6o5189JGi
+         /HmqLjUqmLHxyXr8yHfg4maBHXQx4b/qywTwKF+RfDgzeCbMOAZxKRB6Or9SSZioJOPy
+         PB4MsZ1UdQIBeGn5EKZnnN82XRkt1O+uvjuGF2Lu0XUykNVbkp74qC5MM2QoE4ft4sdD
+         oKIo8Ak87U+SrWJRGh8A+P4pjpFAB9t/WjytC97hER9La4xiNxHzpKv5HWyvISkOBxaI
+         CVg6jXhCX+0T+gaBQJZaambhJ0JqXDxE4nkA4LyubkKFWrcJvFi9XUxitfgZ+k9zWtYW
+         EaKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1728996524; x=1729601324;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6muWU/G2Bo0tGqDvLyx/Zy7bm86G9nhd+maNiujTvg4=;
-        b=Xm7qhQM3Jixq7TfomC5G2Y3zsyFFCxC8TmBVJtRcpIJE7kfaroNizH+szEefMj4E3M
-         +CYqqo/5humgGbx335LX6W8KhSeCo4zKrvUMhThFw6q19kuR0a25QTxadDo8KooECP4q
-         Q2G58z53l7LL4HWMlDRbLPxRpPX1KKTQvZ5QAZzq1BfRQc5hGUl/dl7vjwq86qd0HBW5
-         /mcCTLfFGSGIR8ASeppErPxbbOZ6KZEZls89oOrh+PWLCUY6NaZj+TFWqtyHmy6tcXHm
-         oMC+FJ0nay/733M7NlwRAVcMz6wzCx6aoBAOLvHt+Z3wWkFNVa0QkYGVSRpQKjjuBctT
-         r8hQ==
-X-Gm-Message-State: AOJu0YymFO0wfEop/K49S3rLxzvz7UBzfOJEI6cps6F5NlwRtvs1t/Le
-	OZNh5ipxuBf5WHSXufSRx38+Dle2JYJnImM4MrG+GLvlB4GvxHOWJPzvy9uFPc8NeA5rmdDoE/P
-	VM0V/vWahNowsttFxl8UkykarqY/YnOK0yJiYRgcmIupq92Wo8z9vfqCKJy7eOoY5gcIEKenAAn
-	/9KTseqOUCBoVVh88U12gRQCRBopiCkyuZRBc5
-X-Received: by 2002:a17:90a:7c4d:b0:2e2:e545:82c5 with SMTP id 98e67ed59e1d1-2e3ab7c4dabmr67475a91.3.1728996524512;
-        Tue, 15 Oct 2024 05:48:44 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IENLPN4SUdlL8Vm5gV+JHk5pQXSA2RYz01XXpd55CQcnZO8Y5U4ROQnm3ua8cjaE1RY+RuZTyiy9zW9xQhx0R8=
-X-Received: by 2002:a17:90a:7c4d:b0:2e2:e545:82c5 with SMTP id
- 98e67ed59e1d1-2e3ab7c4dabmr67458a91.3.1728996524069; Tue, 15 Oct 2024
- 05:48:44 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1728997884; x=1729602684;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+1IE6vo5EI0G+9qqkm/qKlmdaFnB9SlCUS7LfmzYM5M=;
+        b=R1EHm4UATOdj0qz0NkniWjTWH/mEhu+X32C9B9AyhXtE3A6y4PAzO8+JGZYv4IseGD
+         Y23vnAGi7ykn/jcEigAnuotDr5+elVy+g6YBrAXS1WObT64uCtLkjvGBItrrdD1A1+YD
+         Ahw2CmbPLWH/nGKyX7gnMcMf+iKLr6uMDlERKP3QzvdlFnKPXW7/4q2EpUBjYcNQdUtl
+         lVDLmiHalbv6Ki2mu2OTIAZVbuYc49/x0x1mSlbGJffF6J9nKoMqO0f3Xr2HyxkZPqU3
+         nPwONLI1IlM9NSI7J5uBkcK8wd+bpxMmqR1T/qvnUL+6VdZC0n7jXMvimnCxONAIQFBX
+         acQg==
+X-Forwarded-Encrypted: i=1; AJvYcCVB+6p08wnYFw7tLZOCzTuqSWOuB5BlKS/KwLwTNMxHnQTkM/RhdrAsyU4sbIpQz4RrwiHXD7JbNHUZRXc=@vger.kernel.org, AJvYcCWJInoTamc16vKuZtgWFYHZjnDwt6YT3LDanHb4nflRSzQ2q8T90pnSA7+gPxDkNvV2rwe5yEWFW3nulUd2@vger.kernel.org, AJvYcCXcgTaaEV6CI66e/7qpSSU6TcMHDwYLT+au9uA0vDSs0RZjGjOhSs+PzjyC9oASAAhFz530qNvYZCB9bSE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzYmyPp1b2Tjacp/gBpKS4DWx8lWOnNn5j7qSV/59mge9o4jibR
+	OfGeczRQ0kHw0e6ttNR08rPEkbvxJStiwyfxZkg+IubHeLIDjwG9
+X-Google-Smtp-Source: AGHT+IGQFWTBXvU5wXNEk0QGqxDOUX4gnEXP4PmUa1kS6aTrW558NclQ2ZVgyZ8GZr0QFArTBlc2Kg==
+X-Received: by 2002:a5d:4244:0:b0:37d:30e7:3865 with SMTP id ffacd0b85a97d-37d5521ac3fmr10146183f8f.34.1728997884177;
+        Tue, 15 Oct 2024 06:11:24 -0700 (PDT)
+Received: from localhost ([194.120.133.34])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d7fbf857fsm1552386f8f.74.2024.10.15.06.11.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Oct 2024 06:11:23 -0700 (PDT)
+From: Colin Ian King <colin.i.king@gmail.com>
+To: Akhil R <akhilrajeev@nvidia.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Thierry Reding <thierry.reding@gmail.com>,
+	Jonathan Hunter <jonathanh@nvidia.com>,
+	linux-crypto@vger.kernel.org,
+	linux-tegra@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH][next] crypto: tegra: remove redundant error check on ret
+Date: Tue, 15 Oct 2024 14:11:22 +0100
+Message-Id: <20241015131122.152046-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241007012430.163606-1-ebiggers@kernel.org>
-In-Reply-To: <20241007012430.163606-1-ebiggers@kernel.org>
-From: Ondrej Mosnacek <omosnace@redhat.com>
-Date: Tue, 15 Oct 2024 14:48:33 +0200
-Message-ID: <CAFqZXNtaDNVd_RAT-zM4zMEdT8hBqecYp_j0FvcuxWTaMtf81Q@mail.gmail.com>
-Subject: Re: [PATCH 00/10] AEGIS x86 assembly tuning
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Mon, Oct 7, 2024 at 3:33=E2=80=AFAM Eric Biggers <ebiggers@kernel.org> w=
-rote:
->
-> This series cleans up the AES-NI optimized implementation of AEGIS-128.
->
-> Performance is improved by 1-5% depending on the input lengths.  Binary
-> code size is reduced by about 20% (measuring glue + assembly combined),
-> and source code length is reduced by about 150 lines.
->
-> The first patch also fixes a bug which could theoretically cause
-> incorrect behavior but was seemingly not being encountered in practice.
->
-> Note: future optimizations for AEGIS-128 could involve adding AVX512 /
-> AVX10 optimized assembly code.  However, unfortunately due to the way
-> that AEGIS-128 is specified, its level of parallelism is limited, and it
-> can't really take advantage of vector lengths greater than 128 bits.
-> So, probably this would provide only another modest improvement, mostly
-> coming from being able to use the ternary logic instructions.
->
-> Eric Biggers (10):
->   crypto: x86/aegis128 - access 32-bit arguments as 32-bit
->   crypto: x86/aegis128 - remove no-op init and exit functions
->   crypto: x86/aegis128 - eliminate some indirect calls
->   crypto: x86/aegis128 - don't bother with special code for aligned data
->   crypto: x86/aegis128 - optimize length block preparation using SSE4.1
->   crypto: x86/aegis128 - improve assembly function prototypes
->   crypto: x86/aegis128 - optimize partial block handling using SSE4.1
->   crypto: x86/aegis128 - take advantage of block-aligned len
->   crypto: x86/aegis128 - remove unneeded FRAME_BEGIN and FRAME_END
->   crypto: x86/aegis128 - remove unneeded RETs
->
->  arch/x86/crypto/Kconfig               |   4 +-
->  arch/x86/crypto/aegis128-aesni-asm.S  | 532 ++++++++++----------------
->  arch/x86/crypto/aegis128-aesni-glue.c | 145 ++++---
->  3 files changed, 261 insertions(+), 420 deletions(-)
->
->
-> base-commit: 9852d85ec9d492ebef56dc5f229416c925758edc
-> --
-> 2.46.2
->
+Currently there is an unnecessary error check on ret without a proceeding
+assignment to ret that needs checking. The check is redundant and can be
+removed.
 
-Nice work!
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+---
+ drivers/crypto/tegra/tegra-se-aes.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-Notwithstanding my non-blocking comment on patch #3:
-
-Reviewed-by: Ondrej Mosnacek <omosnace@redhat.com>
-
---
-Ondrej Mosnacek
-Senior Software Engineer, Linux Security - SELinux kernel
-Red Hat, Inc.
+diff --git a/drivers/crypto/tegra/tegra-se-aes.c b/drivers/crypto/tegra/tegra-se-aes.c
+index ae7a0f8435fc..9d130592cc0a 100644
+--- a/drivers/crypto/tegra/tegra-se-aes.c
++++ b/drivers/crypto/tegra/tegra-se-aes.c
+@@ -1180,8 +1180,6 @@ static int tegra_ccm_do_one_req(struct crypto_engine *engine, void *areq)
+ 			goto out;
+ 	} else {
+ 		rctx->cryptlen = req->cryptlen - ctx->authsize;
+-		if (ret)
+-			goto out;
+ 
+ 		/* CTR operation */
+ 		ret = tegra_ccm_do_ctr(ctx, rctx);
+-- 
+2.39.5
 
