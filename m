@@ -1,205 +1,229 @@
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55189142E77
-	for <linux-crypto@vger.kernel.org>; Tue, 15 Oct 2024 14:15:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 296811CB9E5
+	for <linux-crypto@vger.kernel.org>; Tue, 15 Oct 2024 15:05:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729001732; cv=none; b=KHws9RfSVRzWAYnXkis9mvNnQfCs0LZCjlesPKeBfpX90rwZTZVbJTtQkWm4oxh2ZUCqWCKkTyaxik7xmBa1URd6ta0TcRVk2jKiXs869vi3msYYwY7nO3Yftv/S6Fe+aBlmJ/dGC4cD2glfhUrpIGCHgVAob9ykp/S++QjVv2Y=
+	t=1729004744; cv=none; b=YkXEu7FfaiekuMXmXJyKmiwF90vYj/j0g+U+ObrG4K/tLRimOFPMHugpXOLiOYILbaZxup5fbHaRSzEKya/WQLzBLp7WomqvBwTLoN8CRjyN/xdPIJ3UEZisegIpa22Vj0ddGOO8neOewt324v5zAIOckagMyio2p3xjtCBN2XI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729001732; c=relaxed/simple;
-	bh=Z1aPPooDls2taVn+gi0sXyVQV8kJ8ey67lZ9fVQtJxE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=aU0JW7uXDRGkjl3SV9yrDfOfmtW1jx00CEhto6oqrcQOrD4XP/0zVhadN5kqJj55kImEQ3f4Hf47YTe1flAoa8klkV3HjSHco6LxHGn2SbN/yq4XXi+dO3II9U9N2+xu6VUjy3Dkuo41t/PBh4tAKKw7+fJGiyR9uMFsszcoz0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=klf2AMrW; arc=none smtp.client-ip=209.85.221.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com
+	s=arc-20240116; t=1729004744; c=relaxed/simple;
+	bh=E5jd1CrJvmV33pLcnCAUbcdlk4ZziDaQZzO8AZMc26E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kXo1MplO1TcFAFshG47ZLgdzNlqjaJD/eC2zUJS6bbUpOS4Z/dducjFOd1bNnxsSP41+EEFeWUzqWIsoyacBClUXRxwf9eCUAd/+F8ioK+7+RSKJiqPs6J2LBG4nksPt3C3LhhEItHpIPlyBtQGK+NxPM02OWXf2uhDd3MfTHZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=JjS9k/Uz; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=3Yp/strL; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=JjS9k/Uz; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=3Yp/strL; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="klf2AMrW"
-Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-37d609ef9f7so1354065f8f.3
-        for <linux-crypto@vger.kernel.org>; Tue, 15 Oct 2024 07:15:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729001729; x=1729606529; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8CxPmpBAP8eCjtMdTvIIYVSJhCFUv2sFvYcbHhPChyY=;
-        b=klf2AMrWzvNeZBZ7cC2iClnutLAIkDAoJ/uudqI76/Nx0/N7gbbHtmQAmmsRbW61gF
-         vGEAFQrpjyDosW1nqBRMFNCg97PwtwDgXeA7+tFDYloPYjdkIybRGL6a6AXu9LEzlDUY
-         /mLJglngTYiW3SshTd37GvBQLQD0iAsvTa8/lKS7Wsoy9pNV8LoZJ5hkMC8MJnEUBhqV
-         2sw6N6SxIx6SHEApVGAgH73auPwBCVSCsjE3ge0nu+STq8r0EWo1QoiIgJXiwQUnjtC6
-         B0vwzIBdzPwm3xveQ6yTTY9NkHWxAUBFrHMuyFDUy5yaXVyJNn8alxvlhPclD1k7/Csf
-         ZZPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729001729; x=1729606529;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8CxPmpBAP8eCjtMdTvIIYVSJhCFUv2sFvYcbHhPChyY=;
-        b=EaiIvbI6eADoguxV8456KH/RePSd4q5mChZdLWSe44R5AVuNRXXVPJOI1uWRO1JTpG
-         Zs6hVyzCp1QzEEXrFEoSfKg7V4MsVYilKvni4yV9BLsTjzJDYy70vKBl4CvzrRkabIzn
-         5GZdhMhEJU3nmxIb+zSbpGGkm53aXb27z9OUxkDZipM/uF9twlICDNAyYPVDl6D24Uf/
-         4dzrrqwGfq3KdLJp8exKphYjxlcvrA6yCjjfEOFKfPmnhokONah5aYCbwBM2ax5d+9pC
-         KZE4Nr9wHUL2ZtDI9vHq4HQQNQTcCCanV1+W8WeeUe79UU3frs+uTqNvQPEHgrPWDu6x
-         WJFw==
-X-Gm-Message-State: AOJu0Yw1APhrqeib/bi6iqUfDX1+oj6gKZmMD4ycYQ/yJpL6zUqk1cEk
-	U5wCWADmEjfEzVqQsCGw+gAkJwJBraCVj/RNA7gIkqhpWUaJvnB38KK1lSdC3QKpXAxicFE+tZi
-	Pq2jEBiDixiDtmS2caFXa2kRqDWy05aO271BD4Q/xhZ2N0OZWBgtJql+yw/ZAYS4IrwvJnq98Xg
-	8+5X14q/QFdHWzo5G2HJnRG7XoHULepg==
-X-Google-Smtp-Source: AGHT+IHLLxVIYbMv3FLoPzUWQvuVMjRWgHzzi75eychuiPSYTRrqwBaSf1ewYX77XMNsLQT/1p+6qqnd
-X-Received: from palermo.c.googlers.com ([fda3:e722:ac3:cc00:7b:198d:ac11:8138])
- (user=ardb job=sendgmr) by 2002:a5d:4d88:0:b0:37d:4722:57 with SMTP id
- ffacd0b85a97d-37d86d9ceb0mr157f8f.8.1729001728542; Tue, 15 Oct 2024 07:15:28
- -0700 (PDT)
-Date: Tue, 15 Oct 2024 16:15:17 +0200
-In-Reply-To: <20241015141514.3000757-4-ardb+git@google.com>
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="JjS9k/Uz";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="3Yp/strL";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="JjS9k/Uz";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="3Yp/strL"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 41BE71F450;
+	Tue, 15 Oct 2024 15:05:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1729004741; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=j4xT9U7FDOMzMZFomABcNhM50Qz+zE1JWPc8NJdw1JQ=;
+	b=JjS9k/UzFZPG+OpwJbAW6Szg4sk44b8IxHSnMaSSmyaqCnGbLMf97oLaEN3nWiBAhDcoQz
+	eeGuirNmd23AAe+2BWauMQ+Ec0D+e7N9PCZ46W5ZjqMNC0n4W8p87cPvOAOqcgZ+M8z35E
+	kI1mjMmv/+rvU02ff/raRh6SGKX+694=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1729004741;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=j4xT9U7FDOMzMZFomABcNhM50Qz+zE1JWPc8NJdw1JQ=;
+	b=3Yp/strLS0z7W8iBU7rxJA7dWx+HCsOd4IZeUjbauwsct3hImsvgkGrzMYAsCm4WQFAH/6
+	QQoX9IQmdQ/rYABQ==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b="JjS9k/Uz";
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="3Yp/strL"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1729004741; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=j4xT9U7FDOMzMZFomABcNhM50Qz+zE1JWPc8NJdw1JQ=;
+	b=JjS9k/UzFZPG+OpwJbAW6Szg4sk44b8IxHSnMaSSmyaqCnGbLMf97oLaEN3nWiBAhDcoQz
+	eeGuirNmd23AAe+2BWauMQ+Ec0D+e7N9PCZ46W5ZjqMNC0n4W8p87cPvOAOqcgZ+M8z35E
+	kI1mjMmv/+rvU02ff/raRh6SGKX+694=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1729004741;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=j4xT9U7FDOMzMZFomABcNhM50Qz+zE1JWPc8NJdw1JQ=;
+	b=3Yp/strLS0z7W8iBU7rxJA7dWx+HCsOd4IZeUjbauwsct3hImsvgkGrzMYAsCm4WQFAH/6
+	QQoX9IQmdQ/rYABQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2229113A42;
+	Tue, 15 Oct 2024 15:05:41 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id su1oAMWEDmfaEQAAD6G6ig
+	(envelope-from <hare@suse.de>); Tue, 15 Oct 2024 15:05:41 +0000
+Message-ID: <e9ea2690-b3ac-47f0-a148-9e355841b6d0@suse.de>
+Date: Tue, 15 Oct 2024 17:05:40 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241015141514.3000757-4-ardb+git@google.com>
-X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4002; i=ardb@kernel.org;
- h=from:subject; bh=XEFH/aVkBNoR48BTtlFJeWHZfRlCtF6XDXXhHKYRsHM=;
- b=owGbwMvMwCFmkMcZplerG8N4Wi2JIZ2v4ss0noL+aY0uItNPfTh4tYP/SouYr/KeCyHH9k+8a
- puxqzq8o5SFQYyDQVZMkUVg9t93O09PlKp1niULM4eVCWQIAxenAExEsZiRYTGf+tLH/lWb5I/u
- efTx405vyd3xUspzV39Mkmicccru+AJGhuW1XJqiu8WDTooKH536VuWjWriZg1qvsSVfreMq87O b2QE=
-X-Mailer: git-send-email 2.47.0.rc1.288.g06298d1525-goog
-Message-ID: <20241015141514.3000757-6-ardb+git@google.com>
-Subject: [PATCH 2/2] crypto/crc32c: Provide crc32c-base alias to enable fuzz testing
-From: Ard Biesheuvel <ardb+git@google.com>
-To: linux-crypto@vger.kernel.org
-Cc: ebiggers@kernel.org, herbert@gondor.apana.org.au, 
-	Ard Biesheuvel <ardb@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/9] crypto,fs: Separate out hkdf_extract() and
+ hkdf_expand()
+To: Eric Biggers <ebiggers@kernel.org>, Hannes Reinecke <hare@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
+ Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org,
+ linux-crypto@vger.kernel.org
+References: <20241011155430.43450-1-hare@kernel.org>
+ <20241011155430.43450-2-hare@kernel.org>
+ <20241014193814.GB1137@sol.localdomain>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20241014193814.GB1137@sol.localdomain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 41BE71F450
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.de:email,suse.de:dkim,suse.de:mid];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Score: -4.51
+X-Spam-Flag: NO
 
-From: Ard Biesheuvel <ardb@kernel.org>
+On 10/14/24 21:38, Eric Biggers wrote:
+> On Fri, Oct 11, 2024 at 05:54:22PM +0200, Hannes Reinecke wrote:
+>> Separate out the HKDF functions into a separate module to
+>> to make them available to other callers.
+>> And add a testsuite to the module with test vectors
+>> from RFC 5869 to ensure the integrity of the algorithm.
+> 
+> integrity => correctness
+> 
+Okay.
 
-crc32-generic is backed by the architecture's CRC-32c library, which may
-offer a variety of implementations depending on the capabilities of the
-platform. These are not covered by the crypto subsystem's fuzz testing
-capabilities because crc32c-generic is the reference driver that the
-fuzzing logic uses as a source of truth.
+>> +config CRYPTO_HKDF
+>> +	tristate
+>> +	select CRYPTO_SHA1 if !CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
+>> +	select CRYPTO_SHA256 if !CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
+>> +	select CRYPTO_HASH2
+> 
+> Any thoughts on including SHA512 tests instead of SHA1, given that SHA1 is
+> obsolete and should not be used?
+> 
+Hmm. The original implementation did use SHA1, so I used that.
+But sure I can look into changing that.
 
-Fix this by proving a crc32c-base implementation which is always based
-on the generic C implementation, and wire it up as the reference
-implementation for the fuzz tester.
+>> +int hkdf_expand(struct crypto_shash *hmac_tfm,
+>> +		const u8 *info, unsigned int infolen,
+>> +		u8 *okm, unsigned int okmlen)
+>> +{
+>> +	SHASH_DESC_ON_STACK(desc, hmac_tfm);
+>> +	unsigned int i, hashlen = crypto_shash_digestsize(hmac_tfm);
+>> +	int err;
+>> +	const u8 *prev = NULL;
+>> +	u8 counter = 1;
+>> +	u8 tmp[HASH_MAX_DIGESTSIZE];
+>> +
+>> +	if (WARN_ON(okmlen > 255 * hashlen ||
+>> +		    hashlen > HASH_MAX_DIGESTSIZE))
+>> +		return -EINVAL;
+> 
+> The crypto API guarantees HASH_MAX_DIGESTSIZE, so checking that again is not
+> very useful.
+> 
+Okay, will be removing that check.
 
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
----
- crypto/crc32c_generic.c | 72 ++++++++++++++------
- crypto/testmgr.c        |  1 +
- 2 files changed, 51 insertions(+), 22 deletions(-)
+>> +
+>> +	memzero_explicit(tmp, HASH_MAX_DIGESTSIZE);
+> 
+> The zeroization above is unnecessary.  If it's done anyway, it is just an
+> initialization, so it should use an initializer '= {}' instead of
+> memzero_explicit() which is intended for "destruction".
+> 
+Ok.
 
-diff --git a/crypto/crc32c_generic.c b/crypto/crc32c_generic.c
-index a8c90b3f4c6c..0a7543dbc515 100644
---- a/crypto/crc32c_generic.c
-+++ b/crypto/crc32c_generic.c
-@@ -80,6 +80,17 @@ static int chksum_setkey(struct crypto_shash *tfm, const u8 *key,
- 	return 0;
- }
- 
-+#ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
-+static int chksum_update_base(struct shash_desc *desc, const u8 *data,
-+			      unsigned int length)
-+{
-+	struct chksum_desc_ctx *ctx = shash_desc_ctx(desc);
-+
-+	ctx->crc = __crc32c_le_base(ctx->crc, data, length);
-+	return 0;
-+}
-+#endif
-+
- static int chksum_update(struct shash_desc *desc, const u8 *data,
- 			 unsigned int length)
- {
-@@ -127,35 +138,52 @@ static int crc32c_cra_init(struct crypto_tfm *tfm)
- 	return 0;
- }
- 
--static struct shash_alg alg = {
--	.digestsize		=	CHKSUM_DIGEST_SIZE,
--	.setkey			=	chksum_setkey,
--	.init		=	chksum_init,
--	.update		=	chksum_update,
--	.final		=	chksum_final,
--	.finup		=	chksum_finup,
--	.digest		=	chksum_digest,
--	.descsize		=	sizeof(struct chksum_desc_ctx),
--	.base			=	{
--		.cra_name		=	"crc32c",
--		.cra_driver_name	=	"crc32c-generic",
--		.cra_priority		=	100,
--		.cra_flags		=	CRYPTO_ALG_OPTIONAL_KEY,
--		.cra_blocksize		=	CHKSUM_BLOCK_SIZE,
--		.cra_ctxsize		=	sizeof(struct chksum_ctx),
--		.cra_module		=	THIS_MODULE,
--		.cra_init		=	crc32c_cra_init,
--	}
--};
-+static struct shash_alg algs[] = {{
-+	.digestsize		= CHKSUM_DIGEST_SIZE,
-+	.setkey			= chksum_setkey,
-+	.init			= chksum_init,
-+	.update			= chksum_update,
-+	.final			= chksum_final,
-+	.finup			= chksum_finup,
-+	.digest			= chksum_digest,
-+	.descsize		= sizeof(struct chksum_desc_ctx),
-+
-+	.base.cra_name		= "crc32c",
-+	.base.cra_driver_name	= "crc32c-generic",
-+	.base.cra_priority	= 100,
-+	.base.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
-+	.base.cra_blocksize	= CHKSUM_BLOCK_SIZE,
-+	.base.cra_ctxsize	= sizeof(struct chksum_ctx),
-+	.base.cra_module	= THIS_MODULE,
-+	.base.cra_init		= crc32c_cra_init,
-+#ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
-+}, {
-+	.digestsize		= CHKSUM_DIGEST_SIZE,
-+	.setkey			= chksum_setkey,
-+	.init			= chksum_init,
-+	.update			= chksum_update_base,
-+	.final			= chksum_final,
-+	.digest			= chksum_digest,
-+	.descsize		= sizeof(struct chksum_desc_ctx),
-+
-+	.base.cra_name		= "crc32c",
-+	.base.cra_driver_name	= "crc32c-base",
-+	.base.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
-+	.base.cra_blocksize	= CHKSUM_BLOCK_SIZE,
-+	.base.cra_ctxsize	= sizeof(struct chksum_ctx),
-+	.base.cra_module	= THIS_MODULE,
-+	.base.cra_init		= crc32c_cra_init,
-+#endif
-+}};
- 
- static int __init crc32c_mod_init(void)
- {
--	return crypto_register_shash(&alg);
-+	return crypto_register_shashes(algs, ARRAY_SIZE(algs));
- }
- 
- static void __exit crc32c_mod_fini(void)
- {
--	crypto_unregister_shash(&alg);
-+	crypto_unregister_shashes(algs, ARRAY_SIZE(algs));
- }
- 
- subsys_initcall(crc32c_mod_init);
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index e0d6bfcc13e6..c3f1cfe9e17e 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -4700,6 +4700,7 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		}
- 	}, {
- 		.alg = "crc32c",
-+		.generic_driver = "crc32c-base",
- 		.test = alg_test_crc32c,
- 		.fips_allowed = 1,
- 		.suite = {
+>> +MODULE_ALIAS_CRYPTO("hkdf");
+> 
+> This alias does not make sense and is unnecessary.  These are library functions
+> that are not exposed by name through the crypto API, so there is no need to wire
+> them up to the module autoloading accordingly.
+> 
+Ok.
+
+>> diff --git a/include/crypto/hkdf.h b/include/crypto/hkdf.h
+>> new file mode 100644
+>> index 000000000000..c1f23a32a6b6
+>> --- /dev/null
+>> +++ b/include/crypto/hkdf.h
+>> @@ -0,0 +1,18 @@
+>> +/* SPDX-License-Identifier: GPL-2.0 */
+>> +/*
+>> + * HKDF: HMAC-based Key Derivation Function (HKDF), RFC 5869
+>> + *
+>> + * Extracted from fs/crypto/hkdf.c, which has
+>> + * Copyright 2019 Google LLC
+>> + */
+>> +
+>> +#ifndef _CRYPTO_HKDF_H
+>> +#define _CRYPTO_HKDF_H
+>> +
+>> +int hkdf_extract(struct crypto_shash *hmac_tfm, const u8 *ikm,
+>> +		 unsigned int ikmlen, const u8 *salt, unsigned int saltlen,
+>> +		 u8 *prk);
+>> +int hkdf_expand(struct crypto_shash *hmac_tfm,
+>> +		const u8 *info, unsigned int infolen,
+>> +		u8 *okm, unsigned int okmlen);
+>> +#endif
+> 
+> This needs to include <crypto/hash.h>.
+> 
+> Otherwise there will be errors if someone includes this as their first header.
+> 
+Will do.
+
+Thanks for the review!
+
+Cheers,
+
+Hannes
 -- 
-2.47.0.rc1.288.g06298d1525-goog
-
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
