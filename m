@@ -1,138 +1,294 @@
-Received: from mout-p-103.mailbox.org (mout-p-103.mailbox.org [80.241.56.161])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 004A428691
-	for <linux-crypto@vger.kernel.org>; Tue, 15 Oct 2024 18:08:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.161
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3F191FE105;
+	Tue, 15 Oct 2024 21:28:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729015740; cv=none; b=t/WU1y/MazWWPvy1zRi0H4aAAlNeRYyeuKJaGxNGXQB8z0TP66VWrYviBhcH7EFJuuqKuaUFAgtDVviry/+AgBu98QMPW9X+nwxqF18aeuJ81ZmrzFCMhbeGakosW24ZbjnvxgoQrKQ7rkD4mpF4U7Xf5bHFFylb/3XHaudrezI=
+	t=1729027736; cv=none; b=K9j+gmqaBtGUzWkITOiPyA6gu3NAFWYVMKx2qDmG7YY8ehT4bkKLoVbmfMV09GX/T7u2WSmUQutlPfSpkSDouraRE3sFwGdSsSAu85MTNOsF94F01orTG8L9yquRymS7OYPv3lUwMINgJnHSEsuAVKIjEaKGcD8Ddo6vtajfQV8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729015740; c=relaxed/simple;
-	bh=rTeXxu4zOBdMiBEx4bPscqjStv4MuYpxDy8ZIwCvlMw=;
-	h=Date:From:To:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=k/pxZYqHg69f1E/2eqOwrJA3hga/ZAWD3WA8miAyoDuMcVcJao1hXkGvZd/d/dymA+NILrDmxodi184ZD6uPmJzr63VsWl8vBOuVG6Ev28a78/dwRzWh8nwfa3Vk6zDSHNGCCvtLbkoQeqW39/zfNEyJqfNzeY72eGs2pwcYPZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=C1A/nYmL; arc=none smtp.client-ip=80.241.56.161
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
+	s=arc-20240116; t=1729027736; c=relaxed/simple;
+	bh=xPCIn32QQfr54O0zHazFhSN5jue+7V076iFkE2q84Ik=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pMcbt1vhFnG+4jf5nMNyQkJSO7ft9Rjz8I11zdnJ2/567ooBWBOtlkFO1iseye9UKx54G4eEt5rFde+G727vlQViJpO6U6wnM9WWm93fXROKnl+w1Q5frZo2NH+Wq8iGEfV2dG3nPSczLbjtrK8vgNzskC6wBtgEnnUFpF3HrIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Itum5/FW; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="C1A/nYmL"
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [10.196.197.102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-103.mailbox.org (Postfix) with ESMTPS id 4XShtY29BDz9spX;
-	Tue, 15 Oct 2024 20:08:53 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1729015733;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=n2O0CGtlmSLtyi1V1Gdir82UkI1dOC9PgLmdQl5tRWE=;
-	b=C1A/nYmLmfNQWIZhgEJr6l24TYpcYdv0/AZ6Xn31UmhFKg2lsJXAxX8qNk6LYa1osom1XG
-	KgiqWegGKdfc8thAkdQ+Q6w02UOKw753W8cvaHhc59d5L551bw/Q8c+xsD0o+gtTbfaM1l
-	V3k2+igM5UEyI/KZHdvQfWi3fHqtuXnc8RVNN4vot3Umkj+kKWXrR9zr5NcrTCHwoFxQz6
-	FeSruU/ZwNREGC+985YIxPGWgMforXzDn2lEmzIgxLNqIHoXqxMFkqor9jSbifLpr4QDVc
-	k1AfuDKtNXk0x9AEoZAkDuSNOQHwYZnYnCpuEnpbysdXLthfovgTedexazjxtA==
-Date: Tue, 15 Oct 2024 20:08:50 +0200
-From: Erhard Furtner <erhard_f@mailbox.org>
-To: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
-Subject: Re: WARNING: CPU: 1 PID: 81 at crypto/testmgr.c:5931
- alg_test+0x2a4/0x300 (Thinkpad T60, v6.12-rc2)
-Message-ID: <20241015200850.6a1d0e2e@yea>
-In-Reply-To: <20241010013829.68da351d@yea>
-References: <20241010013829.68da351d@yea>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Itum5/FW"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1729027735; x=1760563735;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=xPCIn32QQfr54O0zHazFhSN5jue+7V076iFkE2q84Ik=;
+  b=Itum5/FW6XD/fgdSiRUkMKmVDGPJ91QoXD6QAXPLKjWSHrUrXdEeBIKE
+   f9fBR7ZYF0Y6fXvdDgqOrSUtTY3H/wmyvKzsD3wzbB0tw60w/ayrO1bxe
+   43Sn+dTrRzRVXQ1APeD+vRewl4XX1ARW6nwzh0Zgm0di8knKk/158U33Y
+   ANPrwnvILwwzovj0p0z6rvLxbgzwmQ0Yq1ZojjV71apgF3zBIluz830zD
+   CtgW1wrETa2vsitYJYPPn/GSQlrAhQrtFnBN6bBIBOJCZZUu2enXJlDp/
+   dDmjWAQBVo6wwVeHOWCmJLH5VOH6DIHHwIz8aHBRVhiZu3IAaNfsovH9T
+   w==;
+X-CSE-ConnectionGUID: QcPSu1VYRfyzTlYRclyO0A==
+X-CSE-MsgGUID: vUbFVdfxRM2dbAtTZDGBQA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11225"; a="27891399"
+X-IronPort-AV: E=Sophos;i="6.11,206,1725346800"; 
+   d="scan'208";a="27891399"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Oct 2024 14:28:54 -0700
+X-CSE-ConnectionGUID: 9ed/BWG1Q563Zf26f963sw==
+X-CSE-MsgGUID: GLmnR+SHT5mHPhynDws5YQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,206,1725346800"; 
+   d="scan'208";a="78861952"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by orviesa008.jf.intel.com with ESMTP; 15 Oct 2024 14:28:52 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1t0p61-000Jx7-0T;
+	Tue, 15 Oct 2024 21:28:49 +0000
+Date: Wed, 16 Oct 2024 05:27:52 +0800
+From: kernel test robot <lkp@intel.com>
+To: Markus Elfring <Markus.Elfring@web.de>, linux-crypto@vger.kernel.org,
+	kernel-janitors@vger.kernel.org,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Peter Zijlstra <peterz@infradead.org>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Linux Memory Management List <linux-mm@kvack.org>,
+	LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3 2/3] lib/digsig: Use scope-based resource management
+ for two MPI variables in digsig_verify_rsa()
+Message-ID: <202410160438.SOIZeFku-lkp@intel.com>
+References: <300a0376-f003-4862-bb16-7e004733c9c1@web.de>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-MBO-RS-META: 3pncc7pqyjz85ubq65pmd3xh9zfx7mmz
-X-MBO-RS-ID: 48ffddb00815e70245e
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <300a0376-f003-4862-bb16-7e004733c9c1@web.de>
 
-On Thu, 10 Oct 2024 01:38:29 +0200
-Erhard Furtner <erhard_f@mailbox.org> wrote:
+Hi Markus,
 
-> On kernel v6.12-rc2 this warning shows up at boot on my Thinkpad T60:
-> 
-> [...]
-> alg: akcipher: decrypt test failed. err -1
-> alg: akcipher: test 1 failed for rsa-generic, err=-1
-> alg: self-tests for rsa using rsa-generic failed (rc=-1)
-> ------------[ cut here ]------------
-> alg: self-tests for rsa using rsa-generic failed (rc=-1)
-> WARNING: CPU: 1 PID: 81 at crypto/testmgr.c:5931 alg_test+0x2a4/0x300
-> Modules linked in:
-> CPU: 1 UID: 0 PID: 81 Comm: cryptomgr_test Not tainted 6.12.0-rc2-P3 #3
-> Hardware name: LENOVO 2007F2G/2007F2G, BIOS 79ETE7WW (2.27 ) 03/21/2011
-> EIP: alg_test+0x2a4/0x300
-> Code: 53 68 0b 27 9a c9 e8 e3 7f 3e 00 83 c4 10 89 f0 be fe ff ff ff 83 ff fe 74 9b 57 50 53 68 cd 80 9a c9 e8 37 a2 cb ff 83 c4 10 <0f> 0b 89 fe eb 85 68 ef 66 95 c9 53 56 68 ce 89 9b c9 e8 7d 7d 3e
-> EAX: 00000000 EBX: c1d2fa80 ECX: 00000000 EDX: 00000000
-> ESI: fffffffe EDI: ffffffff EBP: c1a4bf60 ESP: c1a4bec8
-> DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068 EFLAGS: 00010282
-> CR0: 80050033 CR2: 00000000 CR3: 09b7c000 CR4: 000006f0
-> Call Trace:
->  ? show_regs+0x4e/0x5c
->  ? __warn+0x87/0xdc
->  ? alg_test+0x2a4/0x300
->  ? report_bug+0x94/0x108
->  ? exc_overflow+0x3c/0x3c
->  ? handle_bug+0x41/0x60
->  ? exc_invalid_op+0x17/0x40
->  ? handle_exception+0x101/0x101
->  ? exc_overflow+0x3c/0x3c
->  ? alg_test+0x2a4/0x300
->  ? exc_overflow+0x3c/0x3c
->  ? alg_test+0x2a4/0x300
->  ? __switch_to_asm+0x88/0xe4
->  ? __switch_to_asm+0x82/0xe4
->  ? __switch_to_asm+0x7c/0xe4
->  ? __switch_to_asm+0x76/0xe4
->  ? __switch_to_asm+0x70/0xe4
->  ? __switch_to_asm+0x6a/0xe4
->  ? __switch_to_asm+0x64/0xe4
->  ? __switch_to_asm+0x5e/0xe4
->  ? __switch_to_asm+0x58/0xe4
->  ? __switch_to_asm+0x52/0xe4
->  ? __switch_to_asm+0x4c/0xe4
->  ? __switch_to_asm+0x46/0xe4
->  ? _raw_spin_unlock+0x8/0xc
->  ? finish_task_switch+0x98/0x244
->  ? __switch_to_asm+0x1c/0xe4
->  ? __switch_to_asm+0x16/0xe4
->  ? __schedule+0x587/0x7a4
->  cryptomgr_test+0x1c/0x38
->  kthread+0xc4/0xd0
->  ? crypto_alg_put+0x40/0x40
->  ? kthread_blkcg+0x24/0x24
->  ? kthread_blkcg+0x24/0x24
->  ret_from_fork+0x31/0x3c
->  ret_from_fork_asm+0x12/0x18
->  entry_INT80_32+0xf0/0xf0
-> ---[ end trace 0000000000000000 ]---
+kernel test robot noticed the following build warnings:
 
-v6.12-rc3 still affected. So I bisected the issue to the following commit:
+[auto build test WARNING on akpm-mm/mm-nonmm-unstable]
+[also build test WARNING on herbert-crypto-2.6/master herbert-cryptodev-2.6/master linus/master v6.12-rc3 next-20241015]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
- # git bisect good
-5a72a244bac3e8663834d88bb0b4f9069203e5e0 is the first bad commit
-commit 5a72a244bac3e8663834d88bb0b4f9069203e5e0
-Author: Herbert Xu <herbert@gondor.apana.org.au>
-Date:   Sat Aug 10 14:21:02 2024 +0800
+url:    https://github.com/intel-lab-lkp/linux/commits/Markus-Elfring/crypto-lib-mpi-Extend-support-for-scope-based-resource-management/20241012-231156
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm.git mm-nonmm-unstable
+patch link:    https://lore.kernel.org/r/300a0376-f003-4862-bb16-7e004733c9c1%40web.de
+patch subject: [PATCH v3 2/3] lib/digsig: Use scope-based resource management for two MPI variables in digsig_verify_rsa()
+config: arm-randconfig-002-20241016 (https://download.01.org/0day-ci/archive/20241016/202410160438.SOIZeFku-lkp@intel.com/config)
+compiler: clang version 20.0.0git (https://github.com/llvm/llvm-project 70e0a7e7e6a8541bcc46908c592eed561850e416)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241016/202410160438.SOIZeFku-lkp@intel.com/reproduce)
 
-    crypto: rsa - Check MPI allocation errors
-    
-    Fixes: 6637e11e4ad2 ("crypto: rsa - allow only odd e and restrict value in FIPS mode")
-    Fixes: f145d411a67e ("crypto: rsa - implement Chinese Remainder Theorem for faster private key operation")
-    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410160438.SOIZeFku-lkp@intel.com/
 
- crypto/rsa.c | 19 ++++++++++++-------
- 1 file changed, 12 insertions(+), 7 deletions(-)
+All warnings (new ones prefixed by >>):
+
+   In file included from lib/digsig.c:25:
+   In file included from include/linux/mpi.h:21:
+   In file included from include/linux/scatterlist.h:8:
+   In file included from include/linux/mm.h:2213:
+   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
+     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
+         |                               ~~~~~~~~~~~ ^ ~~~
+>> lib/digsig.c:176:3: warning: label at end of compound statement is a C23 extension [-Wc23-extensions]
+     176 |                 }
+         |                 ^
+   lib/digsig.c:178:2: warning: label at end of compound statement is a C23 extension [-Wc23-extensions]
+     178 |         }
+         |         ^
+   3 warnings generated.
 
 
-Reverting 5a72a244bac3e8663834d88bb0b4f9069203e5e0 on top of v6.12-rc3 fixes the failure.
+vim +176 lib/digsig.c
 
-Regards,
-Erhard
+    16	
+    17	#include <linux/err.h>
+    18	#include <linux/module.h>
+    19	#include <linux/slab.h>
+    20	#include <linux/key.h>
+    21	#include <linux/crypto.h>
+    22	#include <crypto/hash.h>
+    23	#include <crypto/sha1.h>
+    24	#include <keys/user-type.h>
+  > 25	#include <linux/mpi.h>
+    26	#include <linux/digsig.h>
+    27	
+    28	static struct crypto_shash *shash;
+    29	
+    30	static const char *pkcs_1_v1_5_decode_emsa(const unsigned char *msg,
+    31							unsigned long  msglen,
+    32							unsigned long  modulus_bitlen,
+    33							unsigned long *outlen)
+    34	{
+    35		unsigned long modulus_len, ps_len, i;
+    36	
+    37		modulus_len = (modulus_bitlen >> 3) + (modulus_bitlen & 7 ? 1 : 0);
+    38	
+    39		/* test message size */
+    40		if ((msglen > modulus_len) || (modulus_len < 11))
+    41			return NULL;
+    42	
+    43		/* separate encoded message */
+    44		if (msg[0] != 0x00 || msg[1] != 0x01)
+    45			return NULL;
+    46	
+    47		for (i = 2; i < modulus_len - 1; i++)
+    48			if (msg[i] != 0xFF)
+    49				break;
+    50	
+    51		/* separator check */
+    52		if (msg[i] != 0)
+    53			/* There was no octet with hexadecimal value 0x00
+    54			to separate ps from m. */
+    55			return NULL;
+    56	
+    57		ps_len = i - 2;
+    58	
+    59		*outlen = (msglen - (2 + ps_len + 1));
+    60	
+    61		return msg + 2 + ps_len + 1;
+    62	}
+    63	
+    64	/*
+    65	 * RSA Signature verification with public key
+    66	 */
+    67	static int digsig_verify_rsa(struct key *key,
+    68			    const char *sig, int siglen,
+    69			       const char *h, int hlen)
+    70	{
+    71		int err = -EINVAL;
+    72		unsigned long len;
+    73		unsigned long mlen, mblen;
+    74		unsigned int l;
+    75		int head, i;
+    76		unsigned char *out1 = NULL;
+    77		const char *m;
+    78		MPI pkey[2];
+    79		uint8_t *p, *datap;
+    80		const uint8_t *endp;
+    81		const struct user_key_payload *ukp;
+    82		struct pubkey_hdr *pkh;
+    83	
+    84		down_read(&key->sem);
+    85		ukp = user_key_payload_locked(key);
+    86	
+    87		if (!ukp) {
+    88			/* key was revoked before we acquired its semaphore */
+    89			err = -EKEYREVOKED;
+    90			goto err1;
+    91		}
+    92	
+    93		if (ukp->datalen < sizeof(*pkh))
+    94			goto err1;
+    95	
+    96		pkh = (struct pubkey_hdr *)ukp->data;
+    97	
+    98		if (pkh->version != 1)
+    99			goto err1;
+   100	
+   101		if (pkh->algo != PUBKEY_ALGO_RSA)
+   102			goto err1;
+   103	
+   104		if (pkh->nmpi != 2)
+   105			goto err1;
+   106	
+   107		datap = pkh->mpi;
+   108		endp = ukp->data + ukp->datalen;
+   109	
+   110		for (i = 0; i < pkh->nmpi; i++) {
+   111			unsigned int remaining = endp - datap;
+   112			pkey[i] = mpi_read_from_buffer(datap, &remaining);
+   113			if (IS_ERR(pkey[i])) {
+   114				err = PTR_ERR(pkey[i]);
+   115				goto free_keys;
+   116			}
+   117			datap += remaining;
+   118		}
+   119	
+   120		mblen = mpi_get_nbits(pkey[0]);
+   121		mlen = DIV_ROUND_UP(mblen, 8);
+   122	
+   123		if (mlen == 0) {
+   124			err = -EINVAL;
+   125			goto free_keys;
+   126		}
+   127	
+   128		err = -ENOMEM;
+   129	
+   130		out1 = kzalloc(mlen, GFP_KERNEL);
+   131		if (!out1)
+   132			goto free_keys;
+   133	
+   134		{
+   135			unsigned int nret = siglen;
+   136			MPI in __free(mpi_free) = mpi_read_from_buffer(sig, &nret);
+   137	
+   138			if (IS_ERR(in)) {
+   139				err = PTR_ERR(in);
+   140				goto in_exit;
+   141			}
+   142	
+   143			{
+   144				MPI res __free(mpi_free) = mpi_alloc(mpi_get_nlimbs(in) * 2);
+   145	
+   146				if (!res)
+   147					goto res_exit;
+   148	
+   149				err = mpi_powm(res, in, pkey[1], pkey[0]);
+   150				if (err)
+   151					goto res_exit;
+   152	
+   153				if (mpi_get_nlimbs(res) * BYTES_PER_MPI_LIMB > mlen) {
+   154					err = -EINVAL;
+   155					goto res_exit;
+   156				}
+   157	
+   158				p = mpi_get_buffer(res, &l, NULL);
+   159				if (!p) {
+   160					err = -EINVAL;
+   161					goto res_exit;
+   162				}
+   163	
+   164				len = mlen;
+   165				head = len - l;
+   166				memset(out1, 0, head);
+   167				memcpy(out1 + head, p, l);
+   168	
+   169				kfree(p);
+   170	
+   171				m = pkcs_1_v1_5_decode_emsa(out1, len, mblen, &len);
+   172	
+   173				if (!m || len != hlen || memcmp(m, h, hlen))
+   174					err = -EINVAL;
+   175	res_exit:
+ > 176			}
+   177	in_exit:
+   178		}
+   179	
+   180		kfree(out1);
+   181	free_keys:
+   182		while (--i >= 0)
+   183			mpi_free(pkey[i]);
+   184	err1:
+   185		up_read(&key->sem);
+   186	
+   187		return err;
+   188	}
+   189	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
