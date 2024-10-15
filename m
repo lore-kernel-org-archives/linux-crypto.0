@@ -1,207 +1,353 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 761C7189BB2;
-	Tue, 15 Oct 2024 11:19:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7C022296F8
+	for <linux-crypto@vger.kernel.org>; Tue, 15 Oct 2024 12:41:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1728991166; cv=none; b=rfsWCo+SnPkSgvDnPKCcWVZJsxsY+hv1nd/577s1JFvQJ/CorPEZVl2M1IVWO0PL9kl2rIQ5pfo2VDv3U/2/3Uzg9Ce9OYCEhjMhmlqlf9mlsJ7H2F5A/OHQMO5OFj7or80kX3gUMKTzJfx93TDajpJqNomGeH7WhT/7f4hcT/w=
+	t=1728996113; cv=none; b=fJ+x1TFwCtenBLkLUtQqyf5RklRxvkQipsXKg2xuyNS/jv1Tj62I2zAoB23Ca+XUeNJo/zNrNX91aifKnusR15mW2AsPx7jGjafDcY5mdaIRRiEfoDkcLSDN+EJTIlmZXbAe/KC5RxuKKjXNQLqk9Tn0JI5YDelKcaRY37eqzII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1728991166; c=relaxed/simple;
-	bh=n8pKS2FYlNvODSKTpt3Q5i1QcUBZTc/iMW0nOtmXnxs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=hyE7i8ZbUY1sgVe4KwX/+lWkpxJTSoG0P37CbYWrEhc60GisPJK/AXQ2DKMgG/v89kzZhGJRR3Bi0kOyXqgzSoTPIrpMIxXt/P4qWjLPaZaCLNjBQasmdZWs0tBhyWI2CXNCE5Qg77F7QmaaaXw1TwmtIIbR6ToFT5LCl/OrGPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=edjaCSrG; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1728996113; c=relaxed/simple;
+	bh=OfviBuLM5yc+5zz4NTiiocvo4IZnn7Fq2wWEKSe8Wt0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LWfWIjbRIImOD0E33pXL4nHxdVAHln9iVZ6Ypnpf5dJvoI6v8m9uwYwUjGbGayjzH5QazeTBL0b4YZ1k60ZIx24WzMyOWxWct4iNVkSJ5jN7/BByAK9DuqHamiUYzxkjVALUanRagB0A2NQlWA3FsqXByX5AqgPRFeBQi1Osy/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O+kc0xgr; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="edjaCSrG"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49F8PH4X023708;
-	Tue, 15 Oct 2024 11:19:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=dqT2a81M4rhuVSAu7Pxl90+Rd3G4TA
-	AyQ30vfsM+Z8c=; b=edjaCSrGojKuBo6dnqK7/pXemOZTGZpW0eKQemw9PbfhM9
-	cotuXaXUQJlbinPbvRH71SKIL3MR67tvvcNr1zhX5FQAZp2bqHadL63pPIh/BD3x
-	jeIJMrHWtvUN2q/DrXDSEj+k5GA+Q0ozPyN8Dai3zWwHZkAemR3Ad9Kh0mwpK/i4
-	d4zpqaGts4sRGqiXHcdmeF0WfTDkxKkDD9XIVjldfHMdYtERspe3nmzzduozAhKv
-	g+WQLTBxtOWFnJ4cTlkZRGZjeDn5Pb7v56rMKRvEYiBiAbiPWcFRd1r7j5zeBoTo
-	T1nD+irpeHYRzVhGmRKis1i0DYAI0/q17aFExTpw==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 429mv4ruan-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 15 Oct 2024 11:19:10 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 49FBJ99u022186;
-	Tue, 15 Oct 2024 11:19:09 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 429mv4ruag-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 15 Oct 2024 11:19:09 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49FAqvZp002426;
-	Tue, 15 Oct 2024 11:19:08 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4284emkfsc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 15 Oct 2024 11:19:08 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49FBJ44N52691326
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 15 Oct 2024 11:19:04 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 84CF12004B;
-	Tue, 15 Oct 2024 11:19:01 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A1D8F20043;
-	Tue, 15 Oct 2024 11:18:58 +0000 (GMT)
-Received: from linux.ibm.com (unknown [9.39.24.36])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Tue, 15 Oct 2024 11:18:58 +0000 (GMT)
-Date: Tue, 15 Oct 2024 16:48:53 +0530
-From: Vishal Chourasia <vishalc@linux.ibm.com>
-To: Ritesh Harjani <ritesh.list@gmail.com>
-Cc: Michael Ellerman <mpe@ellerman.id.au>, linuxppc-dev@lists.ozlabs.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>,
-        Naveen N Rao <naveen@kernel.org>,
-        Madhavan Srinivasan <maddy@linux.ibm.com>,
-        Sourabh Jain <sourabhjain@linux.ibm.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: drivers/nx: Invalid wait context issue when rebooting
-Message-ID: <Zw5PnZEXcMPJdwwy@linux.ibm.com>
-References: <ZwjjXJ5UtZ28FH6s@linux.ibm.com>
- <87wmif53iw.fsf@mail.lhotse>
- <ZwkbOJN5Jmjy_wkJ@linux.ibm.com>
- <87a5f6zxbn.fsf@gmail.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87a5f6zxbn.fsf@gmail.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 2GMpzWhjUOukLK5eUVm_v-I1enkD2lMB
-X-Proofpoint-ORIG-GUID: Q2drQnzHCd9e9bf6i_OihRd7djsPDkxl
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O+kc0xgr"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1728996109;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=12B52zMIvLi2K16gCWbxFl7NinVJ60oE+hAS5DLVaHE=;
+	b=O+kc0xgr1uKWbka1/0DhwNqGnXA8kD+uFrVCmA31P1gGU8cHm1fpnKYVL0MMoHn6tI1F7R
+	a3J0Bd6Dm6xJv/9Zhj+O0w65UKLp4mcTquhKxIZX6HwfymOLoQcYsWh72Y+t0vP6fF+Y9d
+	cEfk94lmXniLgn2dW7kHmZrAgC4Adb8=
+Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
+ [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-270-nxZbGcE0N8apb9SHt8RE8w-1; Tue, 15 Oct 2024 08:41:48 -0400
+X-MC-Unique: nxZbGcE0N8apb9SHt8RE8w-1
+Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-6818fa37eecso5980259a12.1
+        for <linux-crypto@vger.kernel.org>; Tue, 15 Oct 2024 05:41:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1728996106; x=1729600906;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=12B52zMIvLi2K16gCWbxFl7NinVJ60oE+hAS5DLVaHE=;
+        b=TyEPIHPjRqjHPsupRbPfxOM+v48eRhlsao044Wx79CN0aH1Sxk0kZT+Xp+8cKcDrt8
+         RWKzyL+KcvkUq6IWBPQ+cbe1elY601W1hkzDhpC1kkNbDDGu47S//JEE0UNAaC05lbKz
+         hicscMTKdfSZM5GyjpTfcRr4+Gx5OrqWjs0JUKIWPiuggoSeuCsWlz5sSMlhqKvHPjL/
+         yyAFP9PTmuLZWn87fDHVOPZOPgnCqmFe+Z3d3UT7uIzIruqy6H1p28087i0m0M4mvbn7
+         +Jm1qLi/2j6LQFD7FtvzYhWEISvV00A06uya8QbmsIMqepNl/HdKSuPIgtj50FEKdiMm
+         VXrw==
+X-Gm-Message-State: AOJu0Yw3uz1twYputnwkLQith3XUOTMcXXgHwKWnV8rtHtxkOPy1y+/4
+	E0xM0TL8JkYweH4A9Tn75ju7IB7qN6k8bBAv5+Nn6RnJvJNS98um0GA4fs17AuLCi3FGoXpjAjU
+	vKW15PB2IzTqZ+ESWu0hDKwn+Kc1StSmild/6noDvgz9CND+WJEs0mXfdW6EXx6XJun5Wj78u35
+	8K8Ruo5awtycmOB3Zev22L1yHOYGzzwzcNoaKtWkjshr2J
+X-Received: by 2002:a05:6a21:3947:b0:1d9:2a8:ce2a with SMTP id adf61e73a8af0-1d902a8d057mr601315637.45.1728996106391;
+        Tue, 15 Oct 2024 05:41:46 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFurt9HvsiPhFwiCmlx1h4NEMdisOa9Jt0B//ynIBB++Xg7UD8RMIpzY6go9YHX1vAxLmhFOXOe3zExMvBK7yA=
+X-Received: by 2002:a05:6a21:3947:b0:1d9:2a8:ce2a with SMTP id
+ adf61e73a8af0-1d902a8d057mr601295637.45.1728996106028; Tue, 15 Oct 2024
+ 05:41:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
- mlxscore=0 suspectscore=0 phishscore=0 adultscore=0 priorityscore=1501
- impostorscore=0 bulkscore=0 malwarescore=0 mlxlogscore=710
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2410150072
+References: <20241007012430.163606-1-ebiggers@kernel.org> <20241007012430.163606-4-ebiggers@kernel.org>
+In-Reply-To: <20241007012430.163606-4-ebiggers@kernel.org>
+From: Ondrej Mosnacek <omosnace@redhat.com>
+Date: Tue, 15 Oct 2024 14:41:34 +0200
+Message-ID: <CAFqZXNsoJdJi51CiTxCzsk3Xpt88EeVYDRAzAk8Jgph_DoFKOg@mail.gmail.com>
+Subject: Re: [PATCH 03/10] crypto: x86/aegis128 - eliminate some indirect calls
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 14, 2024 at 05:54:44PM +0530, Ritesh Harjani wrote:
-> Vishal Chourasia <vishalc@linux.ibm.com> writes:
-> 
-> > On Fri, Oct 11, 2024 at 09:37:27PM +1100, Michael Ellerman wrote:
-> >> 
-> >> I don't see why of_reconfig_notifier_unregister() needs to be called
-> >> with the devdata_mutext held, but I haven't looked that closely at it.
-> >> 
-> >> So the change below might work.
-> >> 
-> >> cheers
-> >> 
-> >> diff --git a/drivers/crypto/nx/nx-common-pseries.c b/drivers/crypto/nx/nx-common-pseries.c
-> >> index 35f2d0d8507e..a2050c5fb11d 100644
-> >> --- a/drivers/crypto/nx/nx-common-pseries.c
-> >> +++ b/drivers/crypto/nx/nx-common-pseries.c
-> >> @@ -1122,10 +1122,11 @@ static void nx842_remove(struct vio_dev *viodev)
-> >>  
-> >>  	crypto_unregister_alg(&nx842_pseries_alg);
-> >>  
-> >> +	of_reconfig_notifier_unregister(&nx842_of_nb);
-> >> +
-> >>  	spin_lock_irqsave(&devdata_mutex, flags);
-> >>  	old_devdata = rcu_dereference_check(devdata,
-> >>  			lockdep_is_held(&devdata_mutex));
-> >> -	of_reconfig_notifier_unregister(&nx842_of_nb);
-> >>  	RCU_INIT_POINTER(devdata, NULL);
-> >>  	spin_unlock_irqrestore(&devdata_mutex, flags);
-> >>  	synchronize_rcu();
-> >> 
-> > With above changes, I see another similar bug, but what's strange is
-> > swapper does not hold any lock and still this bug is being triggered
-> 
-> Looking at the below stack, it looks like you discovered a new problem
-> after the above problem was fixed with the above changes.
-> (So maybe you could submit this fix along with [1])
-Sure, Ritesh. I have posted another version with the fix.
-https://lore.kernel.org/all/20241015105551.1817348-2-vishalc@linux.ibm.com
+On Mon, Oct 7, 2024 at 3:33=E2=80=AFAM Eric Biggers <ebiggers@kernel.org> w=
+rote:
+>
+> From: Eric Biggers <ebiggers@google.com>
+>
+> Instead of using a struct of function pointers to decide whether to call
+> the encryption or decryption assembly functions, use a conditional
+> branch on a bool.  Force-inline the functions to avoid actually
+> generating the branch.  This improves performance slightly since
+> indirect calls are slow.  Remove the now-unnecessary CFI stubs.
 
-> Also looking at the history of changes, seems the above problem always
-> existed. Not sure why it wasn't caught earlier then?
-> 
-> [1]: https://lore.kernel.org/linuxppc-dev/ZwyqD-w5hEhrnqTB@linux.ibm.com/T/#u
-> 
-> I am not much aware of the below code paths. Nor it is evident from the
-> stack on why "Invalid wait context". Maybe you can give git bisect a try
-> for below issue (or can also wait for someone to comment on below stack).
-> (But you might have to keep the nx-common-pseries driver disabled for git bisect to work). 
-I will see if I can find a good commit and then carry out the bisect.
-> 
-> >
-> > =============================
-> > [ BUG: Invalid wait context ]
-> > 6.12.0-rc2-fix-invalid-wait-context-00222-g7d2910da7039-dirty #84 Not tainted
-> > -----------------------------
-> > swapper/2/0 is trying to lock:
-> > c000000004062128 (&xibm->lock){....}-{3:3}, at: xive_spapr_put_ipi+0xb8/0x120
-> > other info that might help us debug this:
-> > context-{2:2}
-> > no locks held by swapper/2/0.
-> > stack backtrace:
-> > CPU: 2 UID: 0 PID: 0 Comm: swapper/2 Not tainted 6.12.0-rc2-fix-invalid-wait-context-00222-g7d2910da7039-dirty #84
-> > Hardware name: IBM,9080-HEX POWER10 (architected) 0x800200 0xf000006 of:IBM,FW1060.00 (NH1060_012) hv:phyp pSeries
-> > Call Trace:
-> > [c000000004ac3420] [c00000000130d2e4] dump_stack_lvl+0xc8/0x130 (unreliable)
-> > [c000000004ac3460] [c000000000312ca8] __lock_acquire+0xb68/0xf00
-> > [c000000004ac3570] [c000000000313130] lock_acquire.part.0+0xf0/0x2a0
-> > [c000000004ac3690] [c0000000013955b8] _raw_spin_lock_irqsave+0x78/0x130
-> > kexec: waiting for cpu 2 (physical 2) to enter 2 state
-> > [c000000004ac36d0] [c000000000194798] xive_spapr_put_ipi+0xb8/0x120
-> > [c000000004ac3710] [c000000001383728] xive_cleanup_cpu_ipi+0xc8/0xf0
-> > [c000000004ac3750] [c0000000013837f4] xive_teardown_cpu+0xa4/0x100
-> > [c000000004ac3780] [c0000000001d2cc4] pseries_kexec_cpu_down+0x54/0x1e0
-> > [c000000004ac3800] [c000000000213674] kexec_smp_down+0x124/0x1f0
-> > [c000000004ac3890] [c0000000003c9ddc] __flush_smp_call_function_queue+0x28c/0xad0
-> > [c000000004ac3950] [c00000000005fb64] smp_ipi_demux_relaxed+0xe4/0xf0
-> > [c000000004ac3990] [c0000000000593d8] doorbell_exception+0x108/0x2f0
-> > [c000000004ac3a20] [c00000000000a26c] doorbell_super_common_virt+0x28c/0x290
-> > --- interrupt: a00 at plpar_hcall_norets_notrace+0x18/0x2c
-> > NIP:  c0000000001bee18 LR: c0000000013867a8 CTR: 0000000000000000
-> > REGS: c000000004ac3a50 TRAP: 0a00   Not tainted  (6.12.0-rc2-fix-invalid-wait-context-00222-g7d2910da7039-dirty)
-> > MSR:  800000000280b033 <SF,VEC,VSX,EE,FP,ME,IR,DR,RI,LE>  CR: 22000242  XER: 00000001
-> > CFAR: 0000000000000000 IRQMASK: 0
-> > GPR00: 0000000000000000 c000000004ac3cf0 c000000001e37600 0000000000000000
-> > GPR04: 0000000000000000 0000000000000000 0001dc4f97750361 0000000000010000
-> > GPR08: 00000000000000c0 0000000000000080 0001dc4f97750554 0000000000000080
-> > GPR12: 0000000000000000 c0000007fffee480 0000000000000000 0000000000000000
-> > GPR16: 0000000000000000 0000000000000000 0000000000000000 0000000000000000
-> > GPR20: 0000000000000000 c000000002ebf778 0000000000000000 00000043a215d824
-> > GPR24: 0000000000000000 c000000000ec0f80 c000000002ebf778 0000000000000000
-> > GPR28: 0000000000000000 0000000000000001 c0000000021a2300 c0000000021a2308
-> > NIP [c0000000001bee18] plpar_hcall_norets_notrace+0x18/0x2c
-> > LR [c0000000013867a8] check_and_cede_processor+0x48/0x80
-> > --- interrupt: a00
-> > [c000000004ac3cf0] [0000000000982538] 0x982538 (unreliable)
-> > [c000000004ac3d50] [c000000001386874] dedicated_cede_loop+0x94/0x1a0
-> > [c000000004ac3da0] [c00000000138584c] cpuidle_enter_state+0x10c/0x8a8
-> > [c000000004ac3e50] [c000000000ec0f80] cpuidle_enter+0x50/0x80
-> > [c000000004ac3e90] [c0000000002ba9c8] call_cpuidle+0x48/0xa0
-> > [c000000004ac3eb0] [c0000000002cec54] cpuidle_idle_call+0x164/0x250
-> > [c000000004ac3f00] [c0000000002cee74] do_idle+0x134/0x1d0
-> > [c000000004ac3f50] [c0000000002cf34c] cpu_startup_entry+0x4c/0x50
-> > [c000000004ac3f80] [c0000000000607d0] start_secondary+0x280/0x2b0
-> > [c000000004ac3fe0] [c00000000000e058] start_secondary_prolog+0x10/0x14
-> 
-> -ritesh
+Wouldn't the compiler be able to optimize out the indirect calls
+already if you merely force-inline the functions without the other
+changes? Then again, it's just a few places that grow the if-else, so
+I'm fine with the boolean approach, too.
+
+>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>  arch/x86/crypto/aegis128-aesni-asm.S  |  9 ++--
+>  arch/x86/crypto/aegis128-aesni-glue.c | 74 +++++++++++++--------------
+>  2 files changed, 40 insertions(+), 43 deletions(-)
+>
+> diff --git a/arch/x86/crypto/aegis128-aesni-asm.S b/arch/x86/crypto/aegis=
+128-aesni-asm.S
+> index 2de859173940..1b57558548c7 100644
+> --- a/arch/x86/crypto/aegis128-aesni-asm.S
+> +++ b/arch/x86/crypto/aegis128-aesni-asm.S
+> @@ -5,11 +5,10 @@
+>   * Copyright (c) 2017-2018 Ondrej Mosnacek <omosnacek@gmail.com>
+>   * Copyright (C) 2017-2018 Red Hat, Inc. All rights reserved.
+>   */
+>
+>  #include <linux/linkage.h>
+> -#include <linux/cfi_types.h>
+>  #include <asm/frame.h>
+>
+>  #define STATE0 %xmm0
+>  #define STATE1 %xmm1
+>  #define STATE2 %xmm2
+> @@ -401,11 +400,11 @@ SYM_FUNC_END(crypto_aegis128_aesni_ad)
+>
+>  /*
+>   * void crypto_aegis128_aesni_enc(void *state, unsigned int length,
+>   *                                const void *src, void *dst);
+>   */
+> -SYM_TYPED_FUNC_START(crypto_aegis128_aesni_enc)
+> +SYM_FUNC_START(crypto_aegis128_aesni_enc)
+>         FRAME_BEGIN
+>
+>         cmp $0x10, LEN
+>         jb .Lenc_out
+>
+> @@ -498,11 +497,11 @@ SYM_FUNC_END(crypto_aegis128_aesni_enc)
+>
+>  /*
+>   * void crypto_aegis128_aesni_enc_tail(void *state, unsigned int length,
+>   *                                     const void *src, void *dst);
+>   */
+> -SYM_TYPED_FUNC_START(crypto_aegis128_aesni_enc_tail)
+> +SYM_FUNC_START(crypto_aegis128_aesni_enc_tail)
+>         FRAME_BEGIN
+>
+>         /* load the state: */
+>         movdqu 0x00(STATEP), STATE0
+>         movdqu 0x10(STATEP), STATE1
+> @@ -555,11 +554,11 @@ SYM_FUNC_END(crypto_aegis128_aesni_enc_tail)
+>
+>  /*
+>   * void crypto_aegis128_aesni_dec(void *state, unsigned int length,
+>   *                                const void *src, void *dst);
+>   */
+> -SYM_TYPED_FUNC_START(crypto_aegis128_aesni_dec)
+> +SYM_FUNC_START(crypto_aegis128_aesni_dec)
+>         FRAME_BEGIN
+>
+>         cmp $0x10, LEN
+>         jb .Ldec_out
+>
+> @@ -652,11 +651,11 @@ SYM_FUNC_END(crypto_aegis128_aesni_dec)
+>
+>  /*
+>   * void crypto_aegis128_aesni_dec_tail(void *state, unsigned int length,
+>   *                                     const void *src, void *dst);
+>   */
+> -SYM_TYPED_FUNC_START(crypto_aegis128_aesni_dec_tail)
+> +SYM_FUNC_START(crypto_aegis128_aesni_dec_tail)
+>         FRAME_BEGIN
+>
+>         /* load the state: */
+>         movdqu 0x00(STATEP), STATE0
+>         movdqu 0x10(STATEP), STATE1
+> diff --git a/arch/x86/crypto/aegis128-aesni-glue.c b/arch/x86/crypto/aegi=
+s128-aesni-glue.c
+> index 96586470154e..deb39cef0be1 100644
+> --- a/arch/x86/crypto/aegis128-aesni-glue.c
+> +++ b/arch/x86/crypto/aegis128-aesni-glue.c
+> @@ -54,20 +54,10 @@ struct aegis_state {
+>
+>  struct aegis_ctx {
+>         struct aegis_block key;
+>  };
+>
+> -struct aegis_crypt_ops {
+> -       int (*skcipher_walk_init)(struct skcipher_walk *walk,
+> -                                 struct aead_request *req, bool atomic);
+> -
+> -       void (*crypt_blocks)(void *state, unsigned int length, const void=
+ *src,
+> -                            void *dst);
+> -       void (*crypt_tail)(void *state, unsigned int length, const void *=
+src,
+> -                          void *dst);
+> -};
+> -
+>  static void crypto_aegis128_aesni_process_ad(
+>                 struct aegis_state *state, struct scatterlist *sg_src,
+>                 unsigned int assoclen)
+>  {
+>         struct scatter_walk walk;
+> @@ -112,24 +102,41 @@ static void crypto_aegis128_aesni_process_ad(
+>                 memset(buf.bytes + pos, 0, AEGIS128_BLOCK_SIZE - pos);
+>                 crypto_aegis128_aesni_ad(state, AEGIS128_BLOCK_SIZE, buf.=
+bytes);
+>         }
+>  }
+>
+> -static void crypto_aegis128_aesni_process_crypt(
+> -               struct aegis_state *state, struct skcipher_walk *walk,
+> -               const struct aegis_crypt_ops *ops)
+> +static __always_inline void
+> +crypto_aegis128_aesni_process_crypt(struct aegis_state *state,
+> +                                   struct skcipher_walk *walk, bool enc)
+>  {
+>         while (walk->nbytes >=3D AEGIS128_BLOCK_SIZE) {
+> -               ops->crypt_blocks(state,
+> -                                 round_down(walk->nbytes, AEGIS128_BLOCK=
+_SIZE),
+> -                                 walk->src.virt.addr, walk->dst.virt.add=
+r);
+> +               if (enc)
+> +                       crypto_aegis128_aesni_enc(
+> +                                       state,
+> +                                       round_down(walk->nbytes,
+> +                                                  AEGIS128_BLOCK_SIZE),
+> +                                       walk->src.virt.addr,
+> +                                       walk->dst.virt.addr);
+> +               else
+> +                       crypto_aegis128_aesni_dec(
+> +                                       state,
+> +                                       round_down(walk->nbytes,
+> +                                                  AEGIS128_BLOCK_SIZE),
+> +                                       walk->src.virt.addr,
+> +                                       walk->dst.virt.addr);
+>                 skcipher_walk_done(walk, walk->nbytes % AEGIS128_BLOCK_SI=
+ZE);
+>         }
+>
+>         if (walk->nbytes) {
+> -               ops->crypt_tail(state, walk->nbytes, walk->src.virt.addr,
+> -                               walk->dst.virt.addr);
+> +               if (enc)
+> +                       crypto_aegis128_aesni_enc_tail(state, walk->nbyte=
+s,
+> +                                                      walk->src.virt.add=
+r,
+> +                                                      walk->dst.virt.add=
+r);
+> +               else
+> +                       crypto_aegis128_aesni_dec_tail(state, walk->nbyte=
+s,
+> +                                                      walk->src.virt.add=
+r,
+> +                                                      walk->dst.virt.add=
+r);
+>                 skcipher_walk_done(walk, 0);
+>         }
+>  }
+>
+>  static struct aegis_ctx *crypto_aegis128_aesni_ctx(struct crypto_aead *a=
+ead)
+> @@ -160,71 +167,62 @@ static int crypto_aegis128_aesni_setauthsize(struct=
+ crypto_aead *tfm,
+>         if (authsize < AEGIS128_MIN_AUTH_SIZE)
+>                 return -EINVAL;
+>         return 0;
+>  }
+>
+> -static void crypto_aegis128_aesni_crypt(struct aead_request *req,
+> -                                       struct aegis_block *tag_xor,
+> -                                       unsigned int cryptlen,
+> -                                       const struct aegis_crypt_ops *ops=
+)
+> +static __always_inline void
+> +crypto_aegis128_aesni_crypt(struct aead_request *req,
+> +                           struct aegis_block *tag_xor,
+> +                           unsigned int cryptlen, bool enc)
+>  {
+>         struct crypto_aead *tfm =3D crypto_aead_reqtfm(req);
+>         struct aegis_ctx *ctx =3D crypto_aegis128_aesni_ctx(tfm);
+>         struct skcipher_walk walk;
+>         struct aegis_state state;
+>
+> -       ops->skcipher_walk_init(&walk, req, true);
+> +       if (enc)
+> +               skcipher_walk_aead_encrypt(&walk, req, true);
+> +       else
+> +               skcipher_walk_aead_decrypt(&walk, req, true);
+>
+>         kernel_fpu_begin();
+>
+>         crypto_aegis128_aesni_init(&state, ctx->key.bytes, req->iv);
+>         crypto_aegis128_aesni_process_ad(&state, req->src, req->assoclen)=
+;
+> -       crypto_aegis128_aesni_process_crypt(&state, &walk, ops);
+> +       crypto_aegis128_aesni_process_crypt(&state, &walk, enc);
+>         crypto_aegis128_aesni_final(&state, tag_xor, req->assoclen, crypt=
+len);
+>
+>         kernel_fpu_end();
+>  }
+>
+>  static int crypto_aegis128_aesni_encrypt(struct aead_request *req)
+>  {
+> -       static const struct aegis_crypt_ops OPS =3D {
+> -               .skcipher_walk_init =3D skcipher_walk_aead_encrypt,
+> -               .crypt_blocks =3D crypto_aegis128_aesni_enc,
+> -               .crypt_tail =3D crypto_aegis128_aesni_enc_tail,
+> -       };
+> -
+>         struct crypto_aead *tfm =3D crypto_aead_reqtfm(req);
+>         struct aegis_block tag =3D {};
+>         unsigned int authsize =3D crypto_aead_authsize(tfm);
+>         unsigned int cryptlen =3D req->cryptlen;
+>
+> -       crypto_aegis128_aesni_crypt(req, &tag, cryptlen, &OPS);
+> +       crypto_aegis128_aesni_crypt(req, &tag, cryptlen, true);
+>
+>         scatterwalk_map_and_copy(tag.bytes, req->dst,
+>                                  req->assoclen + cryptlen, authsize, 1);
+>         return 0;
+>  }
+>
+>  static int crypto_aegis128_aesni_decrypt(struct aead_request *req)
+>  {
+>         static const struct aegis_block zeros =3D {};
+>
+> -       static const struct aegis_crypt_ops OPS =3D {
+> -               .skcipher_walk_init =3D skcipher_walk_aead_decrypt,
+> -               .crypt_blocks =3D crypto_aegis128_aesni_dec,
+> -               .crypt_tail =3D crypto_aegis128_aesni_dec_tail,
+> -       };
+> -
+>         struct crypto_aead *tfm =3D crypto_aead_reqtfm(req);
+>         struct aegis_block tag;
+>         unsigned int authsize =3D crypto_aead_authsize(tfm);
+>         unsigned int cryptlen =3D req->cryptlen - authsize;
+>
+>         scatterwalk_map_and_copy(tag.bytes, req->src,
+>                                  req->assoclen + cryptlen, authsize, 0);
+>
+> -       crypto_aegis128_aesni_crypt(req, &tag, cryptlen, &OPS);
+> +       crypto_aegis128_aesni_crypt(req, &tag, cryptlen, false);
+>
+>         return crypto_memneq(tag.bytes, zeros.bytes, authsize) ? -EBADMSG=
+ : 0;
+>  }
+>
+>  static struct aead_alg crypto_aegis128_aesni_alg =3D {
+> --
+> 2.46.2
+>
+
+
+--
+Ondrej Mosnacek
+Senior Software Engineer, Linux Security - SELinux kernel
+Red Hat, Inc.
+
