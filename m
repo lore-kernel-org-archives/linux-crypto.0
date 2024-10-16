@@ -1,59 +1,47 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 645681885A0;
-	Wed, 16 Oct 2024 04:27:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5534721E3A4
+	for <linux-crypto@vger.kernel.org>; Wed, 16 Oct 2024 05:36:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729052859; cv=none; b=DnYvBWnjC2txetsHARXQ3HcXxvPFAYd9BaFc7O8mCN1pLn6BXQGHOi8gf8D9zXS7ciz+viedMGbgKnW3bmJWR0LmSl6IoK1Qb7v95Ta9j579zKsX+z4gRnif+jyj9aQE9a91yGPMWRZz5BO+XPOvPCU49+jyjLtUHJjckD/w7TA=
+	t=1729056986; cv=none; b=jwgwYqfRZ8YcrsDUE6tq+z42+Mq5wlwBsu7cBhR+iRH2eaL29bjUr698mf4AknFYNm+jF1rsAFAFja4QUlR2EUNwQK/GdqCy8atvEbPSqQw18/GWl8rUDYT0eTLZikW1dIArCuvDP8u3289/UKWMBy2tsPlHf2dcVb8nSEj10vs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729052859; c=relaxed/simple;
-	bh=hVLTmQoIR4NnPP/Mi71p3DtZcSEuUiBYU5Kz9KmXAhM=;
+	s=arc-20240116; t=1729056986; c=relaxed/simple;
+	bh=YAkcNuc7w+ud53HC8+sEVfFu0Bc9K3din0o/9iVdyAM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Pzld0DGWNb3/GfaSgPz4uZ6t4sHxZVDgPLGxpU9hNruMbfaOwpJRoLJo+pHvCyUqkR1Ncb6mwArclPE7ShStcmieB1kcbTMEXAm18C5kCSQkmZegmYVwkd2vhHINJQX0dwFpzU2D22ifvxO43BIwXvxKdW8Db8R/BeoIrKYJQjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=W2RmBfMV; arc=none smtp.client-ip=144.6.53.87
+	 Content-Type:Content-Disposition:In-Reply-To; b=OVQXNq97ee4gDmqlVL4L8aI73vmbDDaiRVqeGQcBG/WX8ZqodDME9FkrNdjOO4rzqBKys3wbuWOmFLHaNh+Tb9xDgl+B4MaNSK+Vx0I0/D7Oro5Hh36jE0EWW0+ESWYpMThun3hpgqBUtMx2q4j+YTmFsQjLOYh0YoDHYQn/gMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=nRq8vJvp; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="W2RmBfMV"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="nRq8vJvp"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
 	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=NW9YDCtZFYicQcANZrspiKTFqONICzgJfERuIxJwwNk=; b=W2RmBfMVuKF8/X6cU1pFP4vbbb
-	m5RHycH82wjxokH01lOZgqBFHEhKONi0FdfoEJK+01FFvXf//SUdl92CaDJPeCoWtj3PhcoaypIXV
-	LyF73HIlP6Q/dyECLqlm043QnjiOeC0DmpewYgvQ3mRZQm8/n4k+vJi9An9kHyPMGe9ADvgJsRvAt
-	qcHMWZmUshTbNOloHXs7ek80fDS9ZCxPwsU+buExbS4NJ7uPG3Kf5geu7/+27yr7iqe5K6njSqrpq
-	0ypVFFtu/u21DI9SQWnss/ETObnxzOI1s4pmeKEctoNJ5ovnm5uDUGFUuOkcr5iHssc1RpEYT0Gev
-	Y68j3kvA==;
+	bh=l6KocrtSzSeGXRmVSncMMl+FJxJparTDRq6szRJdFP8=; b=nRq8vJvpptuh2IStxLuT5Rv6e7
+	2n5lbe0wEMDWB+eCkPny0cVisHmNMikuTCc9s6036gv+v/SqhWmAHyyW+5ICovsDBRpZqiU8P+1p6
+	DL2btsrPBTKW+VEoLmU+qc0gUwAZeiiQdNwftoCFXzH3RauTRWmDMNP+M3TwvBaDmQiGlvlocII3g
+	kcwJBmU/WpGQgmzGXVQUPp/Uha5OEqAyqGvRI+s2uRw7domi8Ua9Lza8hwhedF3PLYE89a9zs21U6
+	XqJmXw9y6P/5RCeIcFefMyx5GeSpldOkSMRyumgxXIsToGH8MS/HwlFEqwNN9h1cyWq2HlSLjAGM7
+	yZShe4dw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1t0vTI-009jQQ-2p;
-	Wed, 16 Oct 2024 12:27:31 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 16 Oct 2024 12:27:30 +0800
-Date: Wed, 16 Oct 2024 12:27:30 +0800
+	id 1t0wXm-009k1o-1I;
+	Wed, 16 Oct 2024 13:36:13 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 16 Oct 2024 13:36:12 +0800
+Date: Wed, 16 Oct 2024 13:36:12 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Klaus Kudielka <klaus.kudielka@gmail.com>
-Cc: regressions@lists.linux.dev, linux-kernel@vger.kernel.org,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Boris Brezillon <bbrezillon@kernel.org>,
-	Arnaud Ebalard <arno@natisbad.org>,
-	Romain Perier <romain.perier@free-electrons.com>
-Subject: Re: [REGRESSION] alg: ahash: Several tests fail during boot on
- Turris Omnia
-Message-ID: <Zw9AsgqKHJfySScx@gondor.apana.org.au>
-References: <1fc4db6269245de4c626f029a46efef246ee7232.camel@gmail.com>
- <ZwObXYVHJlBaKuj2@gondor.apana.org.au>
- <38a275a4e0224266ceb9ce822e3860fe9209d50c.camel@gmail.com>
- <ZwZAExmK52txvHE8@gondor.apana.org.au>
- <7e38e34adddb14d0a23a13cf738b6b7cccbfce6f.camel@gmail.com>
- <ZwduxHxQtHdzz-kl@gondor.apana.org.au>
- <ZwePSPG8aWm6mwKK@gondor.apana.org.au>
- <15fadc356b73a1e8e24183f284b5c0a44a53e679.camel@gmail.com>
- <Zw31JIEyh28vK9q7@gondor.apana.org.au>
- <5db212655dc98945fa3f529925821879a03ff554.camel@gmail.com>
+To: Erhard Furtner <erhard_f@mailbox.org>
+Cc: linux-crypto@vger.kernel.org
+Subject: Re: WARNING: CPU: 1 PID: 81 at crypto/testmgr.c:5931
+ alg_test+0x2a4/0x300 (Thinkpad T60, v6.12-rc2)
+Message-ID: <Zw9QzDg5StgUflMV@gondor.apana.org.au>
+References: <20241010013829.68da351d@yea>
+ <20241015200850.6a1d0e2e@yea>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -62,23 +50,59 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5db212655dc98945fa3f529925821879a03ff554.camel@gmail.com>
+In-Reply-To: <20241015200850.6a1d0e2e@yea>
 
-On Tue, Oct 15, 2024 at 07:38:27PM +0200, Klaus Kudielka wrote:
+On Tue, Oct 15, 2024 at 08:08:50PM +0200, Erhard Furtner wrote:
 >
-> So, I applied the TDMA-disable patch, and I saw the same errors.
-> Then, I applied the printk patch on top of that, and here is the result.
+> v6.12-rc3 still affected. So I bisected the issue to the following commit:
 > 
-> Not sure, whether this makes any sense...
+>  # git bisect good
+> 5a72a244bac3e8663834d88bb0b4f9069203e5e0 is the first bad commit
+> commit 5a72a244bac3e8663834d88bb0b4f9069203e5e0
+> Author: Herbert Xu <herbert@gondor.apana.org.au>
+> Date:   Sat Aug 10 14:21:02 2024 +0800
+> 
+>     crypto: rsa - Check MPI allocation errors
+>     
+>     Fixes: 6637e11e4ad2 ("crypto: rsa - allow only odd e and restrict value in FIPS mode")
+>     Fixes: f145d411a67e ("crypto: rsa - implement Chinese Remainder Theorem for faster private key operation")
+>     Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> 
+>  crypto/rsa.c | 19 ++++++++++++-------
+>  1 file changed, 12 insertions(+), 7 deletions(-)
+> 
+> 
+> Reverting 5a72a244bac3e8663834d88bb0b4f9069203e5e0 on top of v6.12-rc3 fixes the failure.
 
-Interesting, I think this shows that the non-TDMA path doesn't
-work at all :)
+Thanks.
 
-Can you apply the TDMA-disable patch, and revert the asynchronous
-self-test patch? If it still fails, then we'll know for sure that
-the non-TDMA path is simply broken.
+This patch should fix the problem and I'll push it into 6.12-rc.
 
-Thanks,
+commit 6100da511bd21d3ccb0a350c429579e8995a830e
+Author: Qianqiang Liu <qianqiang.liu@163.com>
+Date:   Fri Sep 13 22:07:42 2024 +0800
+
+    crypto: lib/mpi - Fix an "Uninitialized scalar variable" issue
+    
+    The "err" variable may be returned without an initialized value.
+    
+    Fixes: 8e3a67f2de87 ("crypto: lib/mpi - Add error checks to extension")
+    Signed-off-by: Qianqiang Liu <qianqiang.liu@163.com>
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/lib/crypto/mpi/mpi-mul.c b/lib/crypto/mpi/mpi-mul.c
+index 892a246216b9..7e6ff1ce3e9b 100644
+--- a/lib/crypto/mpi/mpi-mul.c
++++ b/lib/crypto/mpi/mpi-mul.c
+@@ -21,7 +21,7 @@ int mpi_mul(MPI w, MPI u, MPI v)
+ 	int usign, vsign, sign_product;
+ 	int assign_wp = 0;
+ 	mpi_ptr_t tmp_limb = NULL;
+-	int err;
++	int err = 0;
+ 
+ 	if (u->nlimbs < v->nlimbs) {
+ 		/* Swap U and V. */
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
