@@ -1,50 +1,46 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 555BF14F135;
-	Wed, 16 Oct 2024 17:29:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE27618660A;
+	Wed, 16 Oct 2024 17:35:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729099747; cv=none; b=FCJr6JhuT05JPzHjZlayLvTz2rzbOMfpa2oFPg41YMgGn5bl3YcA67HbmW8h2SeQdhc43ecZkCe7xlsGJmYYfAeY2/gm0Ky997hKKl05ptZjQON6/V9MzJc3O+tjgPd5DR9qRkRZzW4E/SEp3Rn3CGC1QsJkXgrIZPwprNpulcA=
+	t=1729100143; cv=none; b=SJLIcrIaToPeL6IG1yG9Ir2hPll4dHn2Yo4op+CYCHie/ZiBY4wNNNALnlqI0fcMQqXuwOX45PH5Vh9FP3woICODv+qt+zcLm/9YQ1XErwfXccnHVx6CJUBPwO32pYLuff5VUs/MEaQqlZ9pXoma9uizVNKAbLP4YZZwXa0ftBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729099747; c=relaxed/simple;
-	bh=BW13X3BVPZ8dJHNzenWTM18AmsI72wIJFWJRFxPbA0w=;
+	s=arc-20240116; t=1729100143; c=relaxed/simple;
+	bh=ROiqOKc+y+FMS/tbuJk2v1Iu+PyGJTcxIghGmgkwt3I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aFTb8n5t6uSlUZnLpTPZwb/VzgmpaN6+SHnNJ12zONPSNCfc0LE6in1j77wxcvYzHezevOhk/6Mg9OMqkiO3ngvkJo3Pv7ZZEuRKvMxp8r/65AvalLDur8Gf34jizUn+DHPu4dZT6fyrvKVC4JQdI+m8JabGU8v6va6BCKffnq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N/a6bKwS; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=rfUJW7m5fAd4ulK7c2P6xCeaqCVi4roMEr4/KZA5eldXLqepUiRheefg7+JjU+lpqN+l4QXYkTwmb7zW0WLBumhyV+6DHs+EKjA3qxZ7AwubM0FX+qsge2wjeZrjmeaV35miapA2l3weMC6J1PYRA+wUXP6shWkIn+1+96OjuSE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W5LUU7qE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N/a6bKwS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF607C4CEC5;
-	Wed, 16 Oct 2024 17:29:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W5LUU7qE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EA1BC4CEC5;
+	Wed, 16 Oct 2024 17:35:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729099746;
-	bh=BW13X3BVPZ8dJHNzenWTM18AmsI72wIJFWJRFxPbA0w=;
+	s=k20201202; t=1729100143;
+	bh=ROiqOKc+y+FMS/tbuJk2v1Iu+PyGJTcxIghGmgkwt3I=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=N/a6bKwSdQt80+PgmhqSCXpEJlLy1Kt/p6ix2RBJIjIjzLrBVYeNAdeL8JivXMyWz
-	 G2lSzWlDR9whzWNn9f+uPWy96Ht2iPsPt1sfoZfQlEjSXrJakazkI3je8ttJtX06Hc
-	 5iargpPCCPjnpkL6mwyeygX+e0d9Svw7ui7eqyFDnNwY2oqpUEykj541iT/W79Ms7v
-	 8Ew1J4NNk8FWNuhslTqE233QgI/jwVmXVQ58DCHq814IA4tvSwDkslqNW+wrnTL28k
-	 iTC/lIYGsK/s959v2qteA8TrDJzysBrZhH1CIPZcKVBBY05Nqit0pEoXYGK9pooGol
-	 E6SQen2iKafZw==
-Date: Wed, 16 Oct 2024 12:29:05 -0500
+	b=W5LUU7qEFpvKqi3O2xhYVd43GB0ADaT7hxeehOdOcOcEi4Fog3Px8Mx6PMmURQQo3
+	 jVdfeS1Ux65MfJNnd0/7OaIu/lAmBR+wsE6/Ibhjuwxp2uLnVSsKMlmMKwpKMDeKfy
+	 aatMYhD45+l9c/az4Bbc9R4N5i4u1I7c5G8/BDlfTNmAs12NXTbqiZxnIbNVhqoGZi
+	 Z0US7eucQo6p+GFkDjl+0U6FcADFLyxc7zLaNb4uDfMJQ+FgsBVkr+mji58P50W8w2
+	 bG+v5wBwVd3caDLvUDbaSRctTGVhMbJmPgu0N7CBibfOmZxg8rGwn/j1o8Y0zL/yay
+	 h5xL438CW5JMw==
+Date: Wed, 16 Oct 2024 12:35:42 -0500
 From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Gatien Chevallier <gatien.chevallier@foss.st.com>
-Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	linux-crypto@vger.kernel.org,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	devicetree@vger.kernel.org, marex@denx.de,
-	Olivia Mackall <olivia@selenic.com>,
-	Lionel Debieve <lionel.debieve@foss.st.com>,
-	linux-kernel@vger.kernel.org,
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: upstream@airoha.com, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Olivia Mackall <olivia@selenic.com>, linux-crypto@vger.kernel.org,
+	devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Aurelien Jarno <aurelien@aurel32.net>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Conor Dooley <conor+dt@kernel.org>,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v4 1/4] dt-bindings: rng: add st,stm32mp25-rng support
-Message-ID: <172909974498.2070654.12815494490287458504.robh@kernel.org>
-References: <20241016-rng-mp25-v2-v4-0-5dca590cb092@foss.st.com>
- <20241016-rng-mp25-v2-v4-1-5dca590cb092@foss.st.com>
+	Lorenzo Bianconi <lorenzo@kernel.org>, linux-kernel@vger.kernel.org,
+	Francesco Dolcini <francesco.dolcini@toradex.com>,
+	Daniel Golle <daniel@makrotopia.org>
+Subject: Re: [PATCH 1/2] dt-bindings: rng: add support for Airoha EN7581 TRNG
+Message-ID: <172910014160.2079862.17744202694058478290.robh@kernel.org>
+References: <20241016151845.23712-1-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -53,29 +49,22 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241016-rng-mp25-v2-v4-1-5dca590cb092@foss.st.com>
+In-Reply-To: <20241016151845.23712-1-ansuelsmth@gmail.com>
 
 
-On Wed, 16 Oct 2024 10:04:18 +0200, Gatien Chevallier wrote:
-> Add RNG STM32MP25x platforms compatible. Update the clock
-> properties management to support all versions.
+On Wed, 16 Oct 2024 17:18:41 +0200, Christian Marangi wrote:
+> Add support for Airoha EN7581 True Random Number generator.
 > 
-> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+> This module can generate up to 4bytes of raw data at times and support
+> self health test at startup. The module gets noise for randomness from
+> various source from ADC, AP, dedicated clocks and other devices attached
+> to the SoC producing true random numbers.
+> 
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 > ---
-> Changes in V4:
-> 	- Changed the restrictions on clock-names per compatible
-> 	- Removed a useless constraint on clocks Items
-> 
-> Changes in V3:
-> 	- Add constraint on clock-names for st,stm32mp25-rng compatible
-> 
-> Changes in V2
-> 	-Fix missing min/maxItems
-> 	-Removed MP25 RNG example
-> 	-Renamed RNG clocks for mp25 to "core" and "bus"
-> ---
->  .../devicetree/bindings/rng/st,stm32-rng.yaml      | 28 +++++++++++++++++++++-
->  1 file changed, 27 insertions(+), 1 deletion(-)
+>  .../bindings/rng/airoha,en7581-trng.yaml      | 38 +++++++++++++++++++
+>  1 file changed, 38 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/rng/airoha,en7581-trng.yaml
 > 
 
 Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
