@@ -1,110 +1,174 @@
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7407B67E;
-	Wed, 16 Oct 2024 05:51:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1095518E772
+	for <linux-crypto@vger.kernel.org>; Wed, 16 Oct 2024 06:40:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729057903; cv=none; b=IACOoj/3XEsffcOCjxBl1k6zOwah+0hyhOhQwmLH/4Co4CuPmFTsqBy505s44fZJqj5ORkd+ZLHNtPH86INXFI/D2XQeV1d6Z7sRMx9pu79p2GaCjPBAzVBMhiJ3WnwKqrj59ilem/4uubOf8tV8DSp4HUrBqdtPBf8NXq8xEBU=
+	t=1729060859; cv=none; b=tkx8405qOY/O+RpOdPL7/CUVG6OHyVsvq3Yp9TsO7GSfEsOFa3ZN7U3cJ8FsoGfSjxUg9dmYK3co6reBmIPbpsOAF9/FyI8IwTHr+1CtQYUhw69bqI0kP95/6Nz7U/YS+sPG69gg7Pn8q5DTF9hTOxOsWexlqK/wSEcsj9Smaeg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729057903; c=relaxed/simple;
-	bh=Ewgkb9Wn/3FQ0Pr73GfDMt7CgKYxSWWI5TOHTj8Ki8g=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=G9DSzmLcrOx/bfJ6y527Tc0mnBhflvOmqvPdJQkhtE1HzGjcxk07t5IMYnxAp+Zd2CZnCyQ4MZqEjtPivXyICI8XDy5mJcgp735A1Nkt9sGOiLGqlJCKeMS866wnjXhM2rLZ+wyFjrwzyc3Xve+GeNSz9cxXm86LgRskvPJn4fo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hv5jQLWc; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1729060859; c=relaxed/simple;
+	bh=y1GkrEbMne2hN4G50vtd3yXpt91i5pbr0/N+737j6HQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tK+b3oEmvll/8X9G+Cp5MCpOPvyntxe2Z/7BT3ztfXUREDLNcCEB+cpNNQlKac3jD1wPhWRrlX517+TrUtsVOP40DcSLkRTXHHZkgBVBQ6SqdWGMyGiUuPx+uo8C60Pm3zd0M7afYoPrThUWLv2mghbgYM6F2xaB4LeucLJk+tM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=BHzVj3fW; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=gmyfamEO; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=uBkRXVx3; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Oj1rxwVH; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hv5jQLWc"
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-37d808ae924so1011624f8f.0;
-        Tue, 15 Oct 2024 22:51:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1729057900; x=1729662700; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Ewgkb9Wn/3FQ0Pr73GfDMt7CgKYxSWWI5TOHTj8Ki8g=;
-        b=hv5jQLWce5d0Oc+E0qIvwJrrOd00Y+iNGiRx5wTiMd92no/3e06BBqMPeVXNgvZwon
-         IgurUHgXlDGKSdclfsUe3bkiUZ/6Vt3cugXEtOF0S+b+JW10v3RMjKU5w9s2o1FRv8r9
-         iQbmqx3HwxuHMzSZ+YAJ8vKWoOXt9q4rqXSb8bgzv79LZhtvk2LABHw/ZrdAsTAIwB3V
-         Eky5v897jEd0j08qe3+rvxbeutuPp0g8vzR/Nq6SJ4ayMDZlpbvGNRpq0LE3urKZT4L3
-         287HaNsE4wur4KZOWgdwIrfawSohoL8g+JmujEqFcCheKyaVqWM0bSagRGiElwUWh33h
-         k05g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729057900; x=1729662700;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Ewgkb9Wn/3FQ0Pr73GfDMt7CgKYxSWWI5TOHTj8Ki8g=;
-        b=eCEogiEWcBeqUyFxPqcUcazMKgSTirJWPGbKqaqInu9Srrnn3Z4571wHM+vjzh2d6D
-         sss1VzH3V1+ddRCzlXODghWvQUDS03YtvxdR9muwkCPmJ0Bk187y3Zh5D0RNyyjWS2kF
-         PnYbIuoo/JN/kJIkI4c2cHi0hrbEHYj3ds333pdl2RTv+liCX7ubW1AQ1+1JCT2RJG1j
-         dsszR0f1a9h9C3mvmedtdxWCbVNIkAE4R+CZSJQJw4kBkFCXOLpCQgjVDUX/B/4wyn3d
-         ItnD15fO5j+e7WOK/UzxlBqpqhRXkYB8HHV+8iTw1NL+EMj6zbXdMjSlOKsUgFWHK9NY
-         xEdg==
-X-Forwarded-Encrypted: i=1; AJvYcCXYVfM9B+JVWT057sL7U1k1wGHKJogSFXJUYJJnmZNbkb1quM6QRDxsR/TuieEcL6DQUjRnO3N4tTaafbg=@vger.kernel.org, AJvYcCXvRFC2u4LMzDdBgHwCQE0Df2aEgJvYNA5J5cGg1I/FYEQQF4sJnXAK/czBW1NFoW6mpWTwvBrlWBT9mKrK@vger.kernel.org
-X-Gm-Message-State: AOJu0YyTU8/9bPpWdWw0UV6u34WD8l0JhTLCZ7fgTYSVaWn2bvW/pycj
-	K8ioyFzjfkv7yiea7PEVKczlfnJRR03OuV/dDG6e9r1FyLbXYAOG
-X-Google-Smtp-Source: AGHT+IGG+VSZkImyOL6QNrq28Q8mz8xCnrVJoJEtOZgMGGpNZc0RJ09HoI6sfiW/UD12giBs8jdB0g==
-X-Received: by 2002:adf:ea41:0:b0:37d:4cd6:6f2f with SMTP id ffacd0b85a97d-37d86ba83b6mr1775930f8f.3.1729057899920;
-        Tue, 15 Oct 2024 22:51:39 -0700 (PDT)
-Received: from ?IPv6:2a02:168:6806:0:98d9:e1d9:9a9e:88ea? ([2a02:168:6806:0:98d9:e1d9:9a9e:88ea])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d7fbf8313sm3336774f8f.66.2024.10.15.22.51.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Oct 2024 22:51:39 -0700 (PDT)
-Message-ID: <2ae8006f3cfc40ae66b34659365596ac8507d1da.camel@gmail.com>
-Subject: Re: [REGRESSION] alg: ahash: Several tests fail during boot on
- Turris Omnia
-From: Klaus Kudielka <klaus.kudielka@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: regressions@lists.linux.dev, linux-kernel@vger.kernel.org, Linux Crypto
- Mailing List <linux-crypto@vger.kernel.org>, Boris Brezillon
- <bbrezillon@kernel.org>, Arnaud Ebalard	 <arno@natisbad.org>, Romain Perier
- <romain.perier@free-electrons.com>
-Date: Wed, 16 Oct 2024 07:51:38 +0200
-In-Reply-To: <Zw9AsgqKHJfySScx@gondor.apana.org.au>
-References: <1fc4db6269245de4c626f029a46efef246ee7232.camel@gmail.com>
-	 <ZwObXYVHJlBaKuj2@gondor.apana.org.au>
-	 <38a275a4e0224266ceb9ce822e3860fe9209d50c.camel@gmail.com>
-	 <ZwZAExmK52txvHE8@gondor.apana.org.au>
-	 <7e38e34adddb14d0a23a13cf738b6b7cccbfce6f.camel@gmail.com>
-	 <ZwduxHxQtHdzz-kl@gondor.apana.org.au>
-	 <ZwePSPG8aWm6mwKK@gondor.apana.org.au>
-	 <15fadc356b73a1e8e24183f284b5c0a44a53e679.camel@gmail.com>
-	 <Zw31JIEyh28vK9q7@gondor.apana.org.au>
-	 <5db212655dc98945fa3f529925821879a03ff554.camel@gmail.com>
-	 <Zw9AsgqKHJfySScx@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.0-1+b1 
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="BHzVj3fW";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="gmyfamEO";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="uBkRXVx3";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Oj1rxwVH"
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id E388B1F839;
+	Wed, 16 Oct 2024 06:40:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1729060855; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9R5uIroVqXXx3QtUxVOQW3D+wg8+A9m7sxTYmWRD9pc=;
+	b=BHzVj3fWpvSNZdtCEKm1649cqZgMa7zbtVlfjriDRKG0eVlEG+yODrjDZHLbO13Mcta3Zr
+	coY6TGATHNvXqftjHzlvw58fXepuy5KqSSKFTHEBQQUiCpHPOzZvJ4MJ8H7AsKl0n0kKge
+	HQm7Eah1koVHFGNYMExjADQNs7t7HC4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1729060855;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9R5uIroVqXXx3QtUxVOQW3D+wg8+A9m7sxTYmWRD9pc=;
+	b=gmyfamEOqo5i4uOrqZUmxcYXXjtgva84L1x5aMlvtpUzXuY6k9IjdrngvKRq/nH5SvfN4Y
+	8OCp9wSsDonA0pCQ==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=uBkRXVx3;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=Oj1rxwVH
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1729060854; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9R5uIroVqXXx3QtUxVOQW3D+wg8+A9m7sxTYmWRD9pc=;
+	b=uBkRXVx3ybptv43P25tpsq6Nq8+gU8Phr9pC0E9BZVI5K1U4QmXv/OLSoYHJiQ5/HBGwCb
+	+08J2dIxTR55WfXfNNPc95fsuX3yc9LnQEa+dMQdS+HJtUY/RC9HDQIJ5PUn9s0xFynqUJ
+	GTnxPj1qEmcv+kPHxYb9pcvO37375ok=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1729060854;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9R5uIroVqXXx3QtUxVOQW3D+wg8+A9m7sxTYmWRD9pc=;
+	b=Oj1rxwVHhTuCe+gpjFgJ6PyggTy8rMk6nKryEWb4qiizMfxMS8T+Oga2S/Gue34I1Q7p8s
+	NtSaN9pJnGuXnOBQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9931613433;
+	Wed, 16 Oct 2024 06:40:54 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id esS1I/ZfD2fdBQAAD6G6ig
+	(envelope-from <hare@suse.de>); Wed, 16 Oct 2024 06:40:54 +0000
+Message-ID: <83934544-0e4e-42eb-a15b-8189a46273c7@suse.de>
+Date: Wed, 16 Oct 2024 08:40:54 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/9] crypto,fs: Separate out hkdf_extract() and
+ hkdf_expand()
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Hannes Reinecke <hare@kernel.org>, Christoph Hellwig <hch@lst.de>,
+ Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
+ linux-nvme@lists.infradead.org, linux-crypto@vger.kernel.org
+References: <20241011155430.43450-1-hare@kernel.org>
+ <20241011155430.43450-2-hare@kernel.org>
+ <20241014193814.GB1137@sol.localdomain>
+ <e9ea2690-b3ac-47f0-a148-9e355841b6d0@suse.de>
+ <20241015154110.GA2444622@google.com>
+Content-Language: en-US
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20241015154110.GA2444622@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: E388B1F839
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	ARC_NA(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:dkim,suse.de:mid];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Score: -4.51
+X-Spam-Flag: NO
 
-On Wed, 2024-10-16 at 12:27 +0800, Herbert Xu wrote:
-> On Tue, Oct 15, 2024 at 07:38:27PM +0200, Klaus Kudielka wrote:
-> >=20
-> > So, I applied the TDMA-disable patch, and I saw the same errors.
-> > Then, I applied the printk patch on top of that, and here is the result=
-.
-> >=20
-> > Not sure, whether this makes any sense...
->=20
-> Interesting, I think this shows that the non-TDMA path doesn't
-> work at all :)
->=20
-> Can you apply the TDMA-disable patch, and revert the asynchronous
-> self-test patch? If it still fails, then we'll know for sure that
-> the non-TDMA path is simply broken.
->=20
+On 10/15/24 17:41, Eric Biggers wrote:
+> On Tue, Oct 15, 2024 at 05:05:40PM +0200, Hannes Reinecke wrote:
+>> On 10/14/24 21:38, Eric Biggers wrote:
+>>> On Fri, Oct 11, 2024 at 05:54:22PM +0200, Hannes Reinecke wrote:
+>>>> Separate out the HKDF functions into a separate module to
+>>>> to make them available to other callers.
+>>>> And add a testsuite to the module with test vectors
+>>>> from RFC 5869 to ensure the integrity of the algorithm.
+>>>
+>>> integrity => correctness
+>>>
+>> Okay.
+>>
+>>>> +config CRYPTO_HKDF
+>>>> +	tristate
+>>>> +	select CRYPTO_SHA1 if !CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
+>>>> +	select CRYPTO_SHA256 if !CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
+>>>> +	select CRYPTO_HASH2
+>>>
+>>> Any thoughts on including SHA512 tests instead of SHA1, given that SHA1 is
+>>> obsolete and should not be used?
+>>>
+>> Hmm. The original implementation did use SHA1, so I used that.
+>> But sure I can look into changing that.
+> 
+> If you're talking about fs/crypto/hkdf.c which is where you're borrowing the
+> code from, that uses SHA512.
+> 
+Actually, I was talking about the test vectors themselves. RFC 5869 only 
+gives test vectors for SHA1 and SHA256, so that's what I've used.
+I've found additional test vectors for the other functions at
+https://github.com/brycx/Test-Vector-Generation/blob/master/HKDF/hkdf-hmac-sha2-test-vectors.md
+so I'll be using them for adding tests for SHA384 and SHA512 (TLS on 
+NVMe-over-TCP is using SHA384, too) and delete the SHA1 ones.
 
-Just to be sure, I checked again:
-- Plain 6.11.0 -> all self-tests PASSED
-- Non-TDMA patch on top of 6.11.0 -> ahash self-tests FAIL
+Cheers,
 
-I tend to agree - it was a nice try, but non-TDMA doesn't work at all.
+Hannes
+-- 
+Dr. Hannes Reinecke                  Kernel Storage Architect
+hare@suse.de                                +49 911 74053 688
+SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
+HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
 
-Cheers, Klaus
