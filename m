@@ -1,99 +1,65 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93AEF1D63D1;
-	Tue, 15 Oct 2024 22:22:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3751D13B2A9
+	for <linux-crypto@vger.kernel.org>; Wed, 16 Oct 2024 02:20:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729030979; cv=none; b=EuQ37T/V/kAWMXIaAAor2M3FbIvPiLNv/L6GHuFa4aoQ1w5uFlRcI9hah+8fFUl3i4ldFpRoxrl6Mg3HVzjKftWasiEkp8XQFNnhB8Fa7Ehd7WJf9AAe9ikkYLC61v8kjBmwfQIp52RPkuB5Q1freYA3teE0zGPATlhGY96Yxpo=
+	t=1729045253; cv=none; b=koo3ApxpCYJdUe9SfD+6oCjOU8/U9srVsuRA2qVpwyzVQBTYjLjfQivJEAJ/oaARVVj+eixoCYXwLWcUAI1EqwqYIEuTkmWOkFI+FhwIm+n/hVvU8ne6G1guttEAWrA5/PGhdqOw7WOStNCMX2IjPwlzQagPJxPmoBGn6yF7iDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729030979; c=relaxed/simple;
-	bh=ROp3gViwuilByaFBglCxEIAqRG+QJMVwFVRVm1Z13d4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NaaDypZZEA2gh0rKhbTzaXmn+aXJOywwSe8Gshe+E4cjGMP+U6CejaZ89064l3IomOQTcdNO7ejDkPga4FhHz8zI/xBt7pKlYCVAuihO7Xhe7FaIxkOZTswN6BGkVZOcXrLliFlJCYU4dNuyNMSADh85G1LNtDoRRkdxIAD/tYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 52CE416A3;
-	Tue, 15 Oct 2024 15:23:26 -0700 (PDT)
-Received: from u200865.usa.arm.com (U203867.austin.arm.com [10.118.30.35])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9E62C3F71E;
-	Tue, 15 Oct 2024 15:22:56 -0700 (PDT)
-From: Jeremy Linton <jeremy.linton@arm.com>
-To: linux-kernel@vger.kernel.org
-Cc: akpm@linux-foundation.org,
-	hch@lst.de,
-	gregkh@linuxfoundation.org,
-	graf@amazon.com,
-	lukas@wunner.de,
-	wufan@linux.microsoft.com,
-	brauner@kernel.org,
-	jsperbeck@google.com,
-	ardb@kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-kbuild@vger.kernel.org,
-	keyrings@vger.kernel.org,
-	Jeremy Linton <jeremy.linton@arm.com>
-Subject: [RFC 5/5] initramfs: Enforce initramfs signature
-Date: Tue, 15 Oct 2024 17:22:35 -0500
-Message-ID: <20241015222235.71040-6-jeremy.linton@arm.com>
-X-Mailer: git-send-email 2.46.2
-In-Reply-To: <20241015222235.71040-1-jeremy.linton@arm.com>
-References: <20241015222235.71040-1-jeremy.linton@arm.com>
+	s=arc-20240116; t=1729045253; c=relaxed/simple;
+	bh=NrtfsvshYZeCzMYCvYC9SOGWo+5vObYp1haJCA6i6m0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wbo6xfWvQV2GA62LQWoSqq4Ln+Wlvb29NhbSCruR/iLlBVWVFGjUvxUPDVgU4KcbpAdIzI4IKWqJdHFwNYOKksr+S1orUZUA0EWnpmbJZpdjZQ+iDvrl09fmb7Z+f9lnvQarlUx3c9baCL1fka3Fo2Oyzs+gYX7ZktIelS7qkZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ic4ZlSN1; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ic4ZlSN1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A204CC4CEC6;
+	Wed, 16 Oct 2024 02:20:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729045252;
+	bh=NrtfsvshYZeCzMYCvYC9SOGWo+5vObYp1haJCA6i6m0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ic4ZlSN1MQgwSXFKt1/zgIfJU3DoLYpnKLyI/czKIHJBRvFxbeZ20ubVVzISEu+ZS
+	 ZaKC/r27uU7cefr4clHdU9StxHBCFC8ndKpt6+xLUCmTQoufs0QLDISAfDP0FpgX4h
+	 oGhxcxeAz5kBfgDaxKHJZG2N76qt5sYCsShUGRHCJs9k0Ab75Dzwe9adyCDNVTnBMP
+	 e/MyIM74Yrb1aDKjftrMMy2VNheQhlajET2PzHbfppSeXR+ZZ9+UYH6FSPwU5JwjP0
+	 BY0bY4rgkAtLoUvNVhuTekHFqcAUvHHZo61RvKIW0UmC8FlmuB/fSewMk7mtQh207g
+	 MQScENIIQi4Lg==
+Date: Tue, 15 Oct 2024 19:20:51 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Ard Biesheuvel <ardb+git@google.com>
+Cc: linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+	Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH 0/2] crypto: Enable fuzz testing for generic crc32/crc32c
+Message-ID: <20241016022051.GA1138@sol.localdomain>
+References: <20241015141514.3000757-4-ardb+git@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241015141514.3000757-4-ardb+git@google.com>
 
-Now that the infrastructure is in place to verify and sign initramfs
-images, let's refuse them if the signature is invalid. Additionally, a
-command-line option `initrdsig=[enforcing|checking]` is provided to
-switch between failing to boot or reporting signature failures.
+On Tue, Oct 15, 2024 at 04:15:15PM +0200, Ard Biesheuvel wrote:
+> From: Ard Biesheuvel <ardb@kernel.org>
+> 
+> crc32-generic and crc32c-generic are built around the architecture
+> library code for CRC-32, and the lack of distinct drivers for this arch
+> code means they are lacking test coverage.
+> 
+> Fix this by providing another, truly generic driver built on top of the
+> generic C code when fuzz testing is enabled.
 
-Signed-off-by: Jeremy Linton <jeremy.linton@arm.com>
----
- init/initramfs.c | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
+Wouldn't it make more sense to make crc32-generic actually be the generic
+implementation, and add crc32-arm64 and crc32-riscv?  Likewise for crc32c.  That
+is the usual way that the algorithms get wired up.
 
-diff --git a/init/initramfs.c b/init/initramfs.c
-index d2d2c68016c2..bb42ba6c0730 100644
---- a/init/initramfs.c
-+++ b/init/initramfs.c
-@@ -573,6 +573,20 @@ static int __init initramfs_async_setup(char *str)
- }
- __setup("initramfs_async=", initramfs_async_setup);
- 
-+static bool  __initdata enforce_initrd_sig = IS_ENABLED(CONFIG_INITRAMFS_SIG);
-+#ifdef CONFIG_INITRAMFS_SIG
-+static int __init initrd_sig_setup(char *str)
-+{
-+	if (!strcmp(str, "enforcing"))
-+		enforce_initrd_sig = true;
-+	else if (!strcmp(str, "checking"))
-+		enforce_initrd_sig = false;
-+	return 1;
-+}
-+__setup("initrdsig=", initrd_sig_setup);
-+#endif
-+
-+
- extern char __initramfs_start[];
- extern unsigned long __initramfs_size;
- #include <linux/initrd.h>
-@@ -766,7 +780,10 @@ static void __init do_populate_rootfs(void *unused, async_cookie_t cookie)
- 	else
- 		printk(KERN_INFO "Unpacking initramfs...\n");
- 
--	initrd_signature_check(&initrd_len);
-+	if (initrd_signature_check(&initrd_len) && enforce_initrd_sig) {
-+		printk(KERN_EMERG "Initramfs signature required\n");
-+		goto done;
-+	}
- 
- 	err = unpack_to_rootfs((char *)initrd_start, initrd_len);
- 	if (err) {
--- 
-2.46.0
+Even if we take a shortcut and don't do that, the naming could at least be more
+consistent, e.g. rename the existing crc32-generic to crc32-lib and add
+crc32-generic alongside that.
 
+- Eric
