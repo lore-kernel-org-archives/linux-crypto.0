@@ -1,46 +1,50 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA3B516BE39
-	for <linux-crypto@vger.kernel.org>; Wed, 16 Oct 2024 16:27:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 555BF14F135;
+	Wed, 16 Oct 2024 17:29:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729096048; cv=none; b=sa1JaNk4h6uWR7cC3sfzj/Xo4dk943ixSJOc3yX1FiLns0VZXYrj15VZwpj4SJNQGPqg0W2z1YR09EYN5xECeaDjm4PmvKIQPUSSjG6LX66EJjQIcDshzZ01fOHfYHpbkO1DtF2usdk4enWrh2/TefZQhIGUAOZefUj9zq0qpho=
+	t=1729099747; cv=none; b=FCJr6JhuT05JPzHjZlayLvTz2rzbOMfpa2oFPg41YMgGn5bl3YcA67HbmW8h2SeQdhc43ecZkCe7xlsGJmYYfAeY2/gm0Ky997hKKl05ptZjQON6/V9MzJc3O+tjgPd5DR9qRkRZzW4E/SEp3Rn3CGC1QsJkXgrIZPwprNpulcA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729096048; c=relaxed/simple;
-	bh=Sj4hHfajy07xXHZDC3iAWKW0T1zkzy/GdmxY5XAzHYc=;
+	s=arc-20240116; t=1729099747; c=relaxed/simple;
+	bh=BW13X3BVPZ8dJHNzenWTM18AmsI72wIJFWJRFxPbA0w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c6NT8ILsrb8VTo1kDbZxYy5kybV/nPqyByyvc85iB5RE9Qk2HK9Q+Hn9szO+25vgUPtNoj/KvhXtFc6gzHWeaFVEeUSmfTTJgDNZIUXKjmcFfbZ6znhPqc/CH00sF7L1LAg/0Ev+5XolWZMuzDLeF5hou0dPAM2QOWZVJURaESk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kcKtRxtC; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=aFTb8n5t6uSlUZnLpTPZwb/VzgmpaN6+SHnNJ12zONPSNCfc0LE6in1j77wxcvYzHezevOhk/6Mg9OMqkiO3ngvkJo3Pv7ZZEuRKvMxp8r/65AvalLDur8Gf34jizUn+DHPu4dZT6fyrvKVC4JQdI+m8JabGU8v6va6BCKffnq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N/a6bKwS; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kcKtRxtC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33C08C4CEC5;
-	Wed, 16 Oct 2024 16:27:27 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N/a6bKwS"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF607C4CEC5;
+	Wed, 16 Oct 2024 17:29:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729096047;
-	bh=Sj4hHfajy07xXHZDC3iAWKW0T1zkzy/GdmxY5XAzHYc=;
+	s=k20201202; t=1729099746;
+	bh=BW13X3BVPZ8dJHNzenWTM18AmsI72wIJFWJRFxPbA0w=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kcKtRxtCXa501eMxIPR/9mPZSc4GwjCE+oKxZR/c6WhgB3+Urvf06JSqrmuP33iXg
-	 dQ3RTyrB/U7AGc+wo/qGIatq2EGyWZ2QsjnmuMvFC8qmQetVqVbVU8jBiuaRp7Eru0
-	 YPQ+9nsZHzSQ9EB4k9TH+tb3pIpd3FHJwopOfo2v7SE7GUD0d8uoHAS1nvsx6WQ7fb
-	 gZv4Zt/cEkZLZnGdpD6fODB82i/onUwrew3m0zRxPfv4ccWhaGle871mvGIFy7wjrp
-	 YKuqXznqV1/Yy0SCLRas6uoVxZQdyjSBmhpXm3MyKj8G+/JMokGGRgBSIP0aQPLLr0
-	 XOCYR0YmR4azQ==
-Date: Wed, 16 Oct 2024 16:27:25 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: Hannes Reinecke <hare@suse.de>
-Cc: Hannes Reinecke <hare@kernel.org>, Christoph Hellwig <hch@lst.de>,
-	Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
-	linux-nvme@lists.infradead.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 1/9] crypto,fs: Separate out hkdf_extract() and
- hkdf_expand()
-Message-ID: <20241016162725.GB3228925@google.com>
-References: <20241011155430.43450-1-hare@kernel.org>
- <20241011155430.43450-2-hare@kernel.org>
- <20241014193814.GB1137@sol.localdomain>
- <e9ea2690-b3ac-47f0-a148-9e355841b6d0@suse.de>
- <20241015154110.GA2444622@google.com>
- <83934544-0e4e-42eb-a15b-8189a46273c7@suse.de>
+	b=N/a6bKwSdQt80+PgmhqSCXpEJlLy1Kt/p6ix2RBJIjIjzLrBVYeNAdeL8JivXMyWz
+	 G2lSzWlDR9whzWNn9f+uPWy96Ht2iPsPt1sfoZfQlEjSXrJakazkI3je8ttJtX06Hc
+	 5iargpPCCPjnpkL6mwyeygX+e0d9Svw7ui7eqyFDnNwY2oqpUEykj541iT/W79Ms7v
+	 8Ew1J4NNk8FWNuhslTqE233QgI/jwVmXVQ58DCHq814IA4tvSwDkslqNW+wrnTL28k
+	 iTC/lIYGsK/s959v2qteA8TrDJzysBrZhH1CIPZcKVBBY05Nqit0pEoXYGK9pooGol
+	 E6SQen2iKafZw==
+Date: Wed, 16 Oct 2024 12:29:05 -0500
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Gatien Chevallier <gatien.chevallier@foss.st.com>
+Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	linux-crypto@vger.kernel.org,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	devicetree@vger.kernel.org, marex@denx.de,
+	Olivia Mackall <olivia@selenic.com>,
+	Lionel Debieve <lionel.debieve@foss.st.com>,
+	linux-kernel@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Conor Dooley <conor+dt@kernel.org>,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v4 1/4] dt-bindings: rng: add st,stm32mp25-rng support
+Message-ID: <172909974498.2070654.12815494490287458504.robh@kernel.org>
+References: <20241016-rng-mp25-v2-v4-0-5dca590cb092@foss.st.com>
+ <20241016-rng-mp25-v2-v4-1-5dca590cb092@foss.st.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,46 +53,30 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <83934544-0e4e-42eb-a15b-8189a46273c7@suse.de>
+In-Reply-To: <20241016-rng-mp25-v2-v4-1-5dca590cb092@foss.st.com>
 
-On Wed, Oct 16, 2024 at 08:40:54AM +0200, Hannes Reinecke wrote:
-> On 10/15/24 17:41, Eric Biggers wrote:
-> > On Tue, Oct 15, 2024 at 05:05:40PM +0200, Hannes Reinecke wrote:
-> > > On 10/14/24 21:38, Eric Biggers wrote:
-> > > > On Fri, Oct 11, 2024 at 05:54:22PM +0200, Hannes Reinecke wrote:
-> > > > > Separate out the HKDF functions into a separate module to
-> > > > > to make them available to other callers.
-> > > > > And add a testsuite to the module with test vectors
-> > > > > from RFC 5869 to ensure the integrity of the algorithm.
-> > > > 
-> > > > integrity => correctness
-> > > > 
-> > > Okay.
-> > > 
-> > > > > +config CRYPTO_HKDF
-> > > > > +	tristate
-> > > > > +	select CRYPTO_SHA1 if !CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
-> > > > > +	select CRYPTO_SHA256 if !CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
-> > > > > +	select CRYPTO_HASH2
-> > > > 
-> > > > Any thoughts on including SHA512 tests instead of SHA1, given that SHA1 is
-> > > > obsolete and should not be used?
-> > > > 
-> > > Hmm. The original implementation did use SHA1, so I used that.
-> > > But sure I can look into changing that.
-> > 
-> > If you're talking about fs/crypto/hkdf.c which is where you're borrowing the
-> > code from, that uses SHA512.
-> > 
-> Actually, I was talking about the test vectors themselves. RFC 5869 only
-> gives test vectors for SHA1 and SHA256, so that's what I've used.
-> I've found additional test vectors for the other functions at
-> https://github.com/brycx/Test-Vector-Generation/blob/master/HKDF/hkdf-hmac-sha2-test-vectors.md
-> so I'll be using them for adding tests for SHA384 and SHA512 (TLS on
-> NVMe-over-TCP is using SHA384, too) and delete the SHA1 ones.
 
-Right, it's an old spec, so that's why it has SHA1.  Using SHA512 test vectors
-from elsewhere, or generating your own test vectors using a known-good
-implementation, would be fine though.
+On Wed, 16 Oct 2024 10:04:18 +0200, Gatien Chevallier wrote:
+> Add RNG STM32MP25x platforms compatible. Update the clock
+> properties management to support all versions.
+> 
+> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+> ---
+> Changes in V4:
+> 	- Changed the restrictions on clock-names per compatible
+> 	- Removed a useless constraint on clocks Items
+> 
+> Changes in V3:
+> 	- Add constraint on clock-names for st,stm32mp25-rng compatible
+> 
+> Changes in V2
+> 	-Fix missing min/maxItems
+> 	-Removed MP25 RNG example
+> 	-Renamed RNG clocks for mp25 to "core" and "bus"
+> ---
+>  .../devicetree/bindings/rng/st,stm32-rng.yaml      | 28 +++++++++++++++++++++-
+>  1 file changed, 27 insertions(+), 1 deletion(-)
+> 
 
-- Eric
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+
