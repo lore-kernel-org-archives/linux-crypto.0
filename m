@@ -1,276 +1,186 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 498C6206066;
-	Wed, 16 Oct 2024 11:22:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6394F208967
+	for <linux-crypto@vger.kernel.org>; Wed, 16 Oct 2024 12:41:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729077734; cv=none; b=YgAhUBVphBKcEccdafscNsJsj6rdjG5T7QgSGiF38C9ADADV8feLa3I8fDtUyh9/tfVfrow1ZVjqiKW9w9qvM+Q9Xqg5h3R6xwuLnax1ABZYAaSvIadjOpcDZdf06KdopaFmIWYby8pcWZhc4O8XoAeSOj4apUpm3s/jMT6EI6o=
+	t=1729082509; cv=none; b=EKH6w6dbI1aqDSt5G1qfndKH1z+yl0cUx06906QFDSR/ooAfcSL9IyJ8/fUQQ14pV2qFdtMPtlxg4TnsH4SY4SK0karo5sNzMN2OCUFd4C4H5b7bjRhk5nieDxD6O5RNuApaqdp5zYN3HnmVUdpY+PAxSPEPDTn0Yttu/rv1lgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729077734; c=relaxed/simple;
-	bh=Gau0sTeAKP4PxxVTvgkDOWCBf/ZUVWIEi4VtTvfm0rk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mcHQXkobGPt0LC8L66vOsQfpgMSR0hiwZZufftMkHxHIxl0SiduYH18+BS9YT/u2oMUrHyNmTf7jgGm1Tr8RNnr8WeUlQE+gSI4rfGeMgDu/SwjswRRkOGtXhn0sF1MT0a7z8R67ePH5Ie/3OcNxSBr8y6Ggs2yASCGzs6q0RF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Pc9Nav5h; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1729082509; c=relaxed/simple;
+	bh=7s7mxb8AWORUrhpnBZAuRs0KJYeixrfxteXdwF3mTU0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=iCkIevkVyENd6fRviP7ASNMdrHRxfl010suUtdvAcfwx4TMCP4A8VRBFu8I1XZ87E0qGsGvvSEWMY/+35qN8cz4koxDBuN0U7gqmyNg9GYOoAMsa/gbbPLphN9z5elPfrQu8P/1tHAZ/yHaquwIDIcdkAAvPt7OteGVFS/ENE4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Nvt28Qux; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Pc9Nav5h"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729077732; x=1760613732;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Gau0sTeAKP4PxxVTvgkDOWCBf/ZUVWIEi4VtTvfm0rk=;
-  b=Pc9Nav5hkW70ooy7/1CypARVAAld8kdAqRH3tzwKXjUfwGMK5yCXpQBO
-   0W/ooFiAL4G2fejlfXlXswSBygzQwy3jMHtUpwZm+Zf7oqF81Ftzfav2K
-   o9Ieat1PJEaoPhLHhSeGntgpganZZLCnbvqf3socR95h2dgR7yWJh1w+e
-   ukHqbk8MOmSDaRVc9jtN+5J+bZDazKCF6BV+AHWHnBYSBY1FQM754femJ
-   dk/amQtaMdK0AcGO6RwUktpd+6qb/rgBfPBjXSYgd1xhZOf+YEyeHAEE8
-   x9hSXm6fxDrfBI1lU0a+xykfCkm78WD5LiMXye21PgZTNslZEwKSSk6bn
-   g==;
-X-CSE-ConnectionGUID: 6MHXf17qSLmpg62V9FShUA==
-X-CSE-MsgGUID: WmeBFeIkRvuuxQjIUgPuWw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11226"; a="32317972"
-X-IronPort-AV: E=Sophos;i="6.11,207,1725346800"; 
-   d="scan'208";a="32317972"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Oct 2024 04:22:12 -0700
-X-CSE-ConnectionGUID: 8j/7+9XOS+SQsZvNVHkwvw==
-X-CSE-MsgGUID: 9Iz2gBfdTWe9P65TlLL2GQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,207,1725346800"; 
-   d="scan'208";a="78083159"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by orviesa009.jf.intel.com with ESMTP; 16 Oct 2024 04:22:10 -0700
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1t126R-000Kpv-0m;
-	Wed, 16 Oct 2024 11:22:07 +0000
-Date: Wed, 16 Oct 2024 19:21:14 +0800
-From: kernel test robot <lkp@intel.com>
-To: Markus Elfring <Markus.Elfring@web.de>, linux-crypto@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>,
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nvt28Qux"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1729082505;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=sR2BJapihNLggAZsP9A0NQSPFnGH7MhHauwtA745mN0=;
+	b=Nvt28QuxR9kNPbcjfnPgDIpDNASRY+0u/CQxTVu7WMUvohaeSN8x1to+s3fV72eUJkKrPT
+	M05VY7N8UAxLbLK90NvPFOHNCPgacV++JkBj7HaMH473fYl7F9XLat7z2eoTKFyNUNE1eO
+	7DzkwhTKlCy9xro/O/Q+DL8GZmGtWPM=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-379-Ld5PdxjeNcCs_TtBJDETXg-1; Wed, 16 Oct 2024 08:41:44 -0400
+X-MC-Unique: Ld5PdxjeNcCs_TtBJDETXg-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4312acda5f6so25409335e9.1
+        for <linux-crypto@vger.kernel.org>; Wed, 16 Oct 2024 05:41:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729082503; x=1729687303;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sR2BJapihNLggAZsP9A0NQSPFnGH7MhHauwtA745mN0=;
+        b=IR9PD1s/3S6A1e1vYSFvv4S5pjuQeAgaPeNcDP01lWcHnjHVOTLR6+BAPtTulmZoMi
+         YF0Eac/9zRlbavj1gb5H5l7/J1b735CYvF1ZwqiaiKFiO/ZvqiUQ7b+nauVfHKQGpbsV
+         rArOK61eKn0dK4S/OS/C+sAaSeujADPmj7r+QP4ofJ5tbbLHqLnaEAcHiST7ad/x4lOs
+         Yn9k8whrK/kmC+BCw1s4ye64SKoNNvTc+0ZSewuqY2xVgOqtvQRBGveFzVFZ14MJQWoH
+         6dMYWgWgERtTqyvQzLDFU5By5v5D62Sju7oJ8vjJ2JzHOoCZ/9dBGnaB+40r0yPARwGT
+         ReBg==
+X-Forwarded-Encrypted: i=1; AJvYcCUSW0t+rCBRA8n9MIsWnqDrQFo6i1K4IMI9whkPGNB4bfZ9Hlvo3qjjH6AfM4J4ao3wliwqB1rjIXssi+w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxfefoF14uz/QGzO3GL/5Z+xBBZJ8p9TTkqwuYBeZa5sv3J1ULF
+	0dnRNoyj8S6c2T/fFnxuq4x3igugtvMui/vdSPlF4TpKtckSI9aDERLyX0amjSjyZLvzri9vezF
+	mBlmbJgPKR5UeJ9LK9OokSwsx2kZ6XiEwwOEMkMttAhpwgaekUbck0PyVftpsMA==
+X-Received: by 2002:a05:600c:4514:b0:431:157a:986e with SMTP id 5b1f17b1804b1-4314a31d357mr28401025e9.20.1729082502973;
+        Wed, 16 Oct 2024 05:41:42 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEf6DkLObKhMSbcWX25Z8cQR8BxA15anQyPPh8evt92tsHg1K+r+MKmZynxnhYXfRl0KAulLQ==
+X-Received: by 2002:a05:600c:4514:b0:431:157a:986e with SMTP id 5b1f17b1804b1-4314a31d357mr28400355e9.20.1729082502483;
+        Wed, 16 Oct 2024 05:41:42 -0700 (PDT)
+Received: from eisenberg.muc.redhat.com (nat-pool-muc-t.redhat.com. [149.14.88.26])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d7fa8ffd6sm4246879f8f.50.2024.10.16.05.41.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Oct 2024 05:41:42 -0700 (PDT)
+From: Philipp Stanner <pstanner@redhat.com>
+To: Jonathan Corbet <corbet@lwn.net>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	Peter Zijlstra <peterz@infradead.org>
-Cc: oe-kbuild-all@lists.linux.dev,
-	Linux Memory Management List <linux-mm@kvack.org>,
-	LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v3 2/3] lib/digsig: Use scope-based resource management
- for two MPI variables in digsig_verify_rsa()
-Message-ID: <202410161914.lY62TWL3-lkp@intel.com>
-References: <300a0376-f003-4862-bb16-7e004733c9c1@web.de>
+	"David S. Miller" <davem@davemloft.net>,
+	Boris Brezillon <bbrezillon@kernel.org>,
+	Arnaud Ebalard <arno@natisbad.org>,
+	Srujana Challa <schalla@marvell.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+	Kalle Valo <kvalo@kernel.org>,
+	Serge Semin <fancer.lancer@gmail.com>,
+	Jon Mason <jdmason@kudzu.us>,
+	Dave Jiang <dave.jiang@intel.com>,
+	Allen Hubbe <allenbh@gmail.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Kevin Cernekee <cernekee@gmail.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	Jaroslav Kysela <perex@perex.cz>,
+	Takashi Iwai <tiwai@suse.com>,
+	Mark Brown <broonie@kernel.org>,
+	David Lechner <dlechner@baylibre.com>,
+	Philipp Stanner <pstanner@redhat.com>,
+	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+	Jie Wang <jie.wang@intel.com>,
+	Tero Kristo <tero.kristo@linux.intel.com>,
+	Adam Guerin <adam.guerin@intel.com>,
+	Shashank Gupta <shashank.gupta@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	Nithin Dabilpuram <ndabilpuram@marvell.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
+	Gregory Greenman <gregory.greenman@intel.com>,
+	Benjamin Berg <benjamin.berg@intel.com>,
+	Yedidya Benshimol <yedidya.ben.shimol@intel.com>,
+	Breno Leitao <leitao@debian.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	=?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Cc: linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-ide@vger.kernel.org,
+	qat-linux@intel.com,
+	linux-crypto@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	ntb@lists.linux.dev,
+	linux-pci@vger.kernel.org,
+	linux-serial@vger.kernel.org,
+	linux-sound@vger.kernel.org
+Subject: [PATCH v4 00/10] Remove pcim_iomap_regions_request_all()
+Date: Wed, 16 Oct 2024 14:41:22 +0200
+Message-ID: <20241016124136.41540-1-pstanner@redhat.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <300a0376-f003-4862-bb16-7e004733c9c1@web.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Markus,
+Changes in v4:
+  - Add Acked-by's from Giovanni and Kalle.
 
-kernel test robot noticed the following build errors:
+Changes in v3:
+  - Add missing full stops to commit messages (Andy).
 
-[auto build test ERROR on akpm-mm/mm-nonmm-unstable]
-[also build test ERROR on herbert-crypto-2.6/master herbert-cryptodev-2.6/master linus/master v6.12-rc3 next-20241016]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Markus-Elfring/crypto-lib-mpi-Extend-support-for-scope-based-resource-management/20241012-231156
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm.git mm-nonmm-unstable
-patch link:    https://lore.kernel.org/r/300a0376-f003-4862-bb16-7e004733c9c1%40web.de
-patch subject: [PATCH v3 2/3] lib/digsig: Use scope-based resource management for two MPI variables in digsig_verify_rsa()
-config: hexagon-randconfig-r064-20241016 (https://download.01.org/0day-ci/archive/20241016/202410161914.lY62TWL3-lkp@intel.com/config)
-compiler: clang version 15.0.7 (https://github.com/llvm/llvm-project 8dfdcc7b7bf66834a761bd8de445840ef68e4d1a)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241016/202410161914.lY62TWL3-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202410161914.lY62TWL3-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from lib/digsig.c:25:
-   In file included from include/linux/mpi.h:21:
-   In file included from include/linux/scatterlist.h:9:
-   In file included from arch/hexagon/include/asm/io.h:328:
-   include/asm-generic/io.h:548:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-           val = __raw_readb(PCI_IOBASE + addr);
-                             ~~~~~~~~~~ ^
-   include/asm-generic/io.h:561:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-           val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
-                                                           ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
-   #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
-                                                     ^
-   In file included from lib/digsig.c:25:
-   In file included from include/linux/mpi.h:21:
-   In file included from include/linux/scatterlist.h:9:
-   In file included from arch/hexagon/include/asm/io.h:328:
-   include/asm-generic/io.h:574:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-           val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
-                                                           ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
-   #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
-                                                     ^
-   In file included from lib/digsig.c:25:
-   In file included from include/linux/mpi.h:21:
-   In file included from include/linux/scatterlist.h:9:
-   In file included from arch/hexagon/include/asm/io.h:328:
-   include/asm-generic/io.h:585:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-           __raw_writeb(value, PCI_IOBASE + addr);
-                               ~~~~~~~~~~ ^
-   include/asm-generic/io.h:595:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-           __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
-                                                         ~~~~~~~~~~ ^
-   include/asm-generic/io.h:605:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-           __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
-                                                         ~~~~~~~~~~ ^
->> lib/digsig.c:176:3: error: expected statement
-                   }
-                   ^
-   lib/digsig.c:178:2: error: expected statement
-           }
-           ^
-   6 warnings and 2 errors generated.
+Changes in v2:
+  - Fix a bug in patch №4 ("crypto: marvell ...") where an error code
+    was not set before printing it. (Me)
+  - Apply Damien's Reviewed- / Acked-by to patches 1, 2 and 10. (Damien)
+  - Apply Serge's Acked-by to patch №7. (Serge)
+  - Apply Jiri's Reviewed-by to patch №8. (Jiri)
+  - Apply Takashi Iwai's Reviewed-by to patch №9. (Takashi)
 
 
-vim +176 lib/digsig.c
+Hi all,
 
-    63	
-    64	/*
-    65	 * RSA Signature verification with public key
-    66	 */
-    67	static int digsig_verify_rsa(struct key *key,
-    68			    const char *sig, int siglen,
-    69			       const char *h, int hlen)
-    70	{
-    71		int err = -EINVAL;
-    72		unsigned long len;
-    73		unsigned long mlen, mblen;
-    74		unsigned int l;
-    75		int head, i;
-    76		unsigned char *out1 = NULL;
-    77		const char *m;
-    78		MPI pkey[2];
-    79		uint8_t *p, *datap;
-    80		const uint8_t *endp;
-    81		const struct user_key_payload *ukp;
-    82		struct pubkey_hdr *pkh;
-    83	
-    84		down_read(&key->sem);
-    85		ukp = user_key_payload_locked(key);
-    86	
-    87		if (!ukp) {
-    88			/* key was revoked before we acquired its semaphore */
-    89			err = -EKEYREVOKED;
-    90			goto err1;
-    91		}
-    92	
-    93		if (ukp->datalen < sizeof(*pkh))
-    94			goto err1;
-    95	
-    96		pkh = (struct pubkey_hdr *)ukp->data;
-    97	
-    98		if (pkh->version != 1)
-    99			goto err1;
-   100	
-   101		if (pkh->algo != PUBKEY_ALGO_RSA)
-   102			goto err1;
-   103	
-   104		if (pkh->nmpi != 2)
-   105			goto err1;
-   106	
-   107		datap = pkh->mpi;
-   108		endp = ukp->data + ukp->datalen;
-   109	
-   110		for (i = 0; i < pkh->nmpi; i++) {
-   111			unsigned int remaining = endp - datap;
-   112			pkey[i] = mpi_read_from_buffer(datap, &remaining);
-   113			if (IS_ERR(pkey[i])) {
-   114				err = PTR_ERR(pkey[i]);
-   115				goto free_keys;
-   116			}
-   117			datap += remaining;
-   118		}
-   119	
-   120		mblen = mpi_get_nbits(pkey[0]);
-   121		mlen = DIV_ROUND_UP(mblen, 8);
-   122	
-   123		if (mlen == 0) {
-   124			err = -EINVAL;
-   125			goto free_keys;
-   126		}
-   127	
-   128		err = -ENOMEM;
-   129	
-   130		out1 = kzalloc(mlen, GFP_KERNEL);
-   131		if (!out1)
-   132			goto free_keys;
-   133	
-   134		{
-   135			unsigned int nret = siglen;
-   136			MPI in __free(mpi_free) = mpi_read_from_buffer(sig, &nret);
-   137	
-   138			if (IS_ERR(in)) {
-   139				err = PTR_ERR(in);
-   140				goto in_exit;
-   141			}
-   142	
-   143			{
-   144				MPI res __free(mpi_free) = mpi_alloc(mpi_get_nlimbs(in) * 2);
-   145	
-   146				if (!res)
-   147					goto res_exit;
-   148	
-   149				err = mpi_powm(res, in, pkey[1], pkey[0]);
-   150				if (err)
-   151					goto res_exit;
-   152	
-   153				if (mpi_get_nlimbs(res) * BYTES_PER_MPI_LIMB > mlen) {
-   154					err = -EINVAL;
-   155					goto res_exit;
-   156				}
-   157	
-   158				p = mpi_get_buffer(res, &l, NULL);
-   159				if (!p) {
-   160					err = -EINVAL;
-   161					goto res_exit;
-   162				}
-   163	
-   164				len = mlen;
-   165				head = len - l;
-   166				memset(out1, 0, head);
-   167				memcpy(out1 + head, p, l);
-   168	
-   169				kfree(p);
-   170	
-   171				m = pkcs_1_v1_5_decode_emsa(out1, len, mblen, &len);
-   172	
-   173				if (!m || len != hlen || memcmp(m, h, hlen))
-   174					err = -EINVAL;
-   175	res_exit:
- > 176			}
-   177	in_exit:
-   178		}
-   179	
-   180		kfree(out1);
-   181	free_keys:
-   182		while (--i >= 0)
-   183			mpi_free(pkey[i]);
-   184	err1:
-   185		up_read(&key->sem);
-   186	
-   187		return err;
-   188	}
-   189	
+the PCI subsystem is currently working on cleaning up its devres API. To
+do so, a few functions will be replaced with better alternatives.
+
+This series removes pcim_iomap_regions_request_all(), which has been
+deprecated already, and accordingly replaces the calls to
+pcim_iomap_table() (which were only necessary because of
+pcim_iomap_regions_request_all() in the first place) with calls to
+pcim_iomap().
+
+Would be great if you can take a look whether this behaves as you
+intended for your respective component.
+
+Cheers,
+Philipp
+
+Philipp Stanner (10):
+  PCI: Make pcim_request_all_regions() a public function
+  ata: ahci: Replace deprecated PCI functions
+  crypto: qat - replace deprecated PCI functions
+  crypto: marvell - replace deprecated PCI functions
+  intel_th: pci: Replace deprecated PCI functions
+  wifi: iwlwifi: replace deprecated PCI functions
+  ntb: idt: Replace deprecated PCI functions
+  serial: rp2: Replace deprecated PCI functions
+  ALSA: korg1212: Replace deprecated PCI functions
+  PCI: Remove pcim_iomap_regions_request_all()
+
+ .../driver-api/driver-model/devres.rst        |  1 -
+ drivers/ata/acard-ahci.c                      |  6 +-
+ drivers/ata/ahci.c                            |  6 +-
+ drivers/crypto/intel/qat/qat_420xx/adf_drv.c  | 11 +++-
+ drivers/crypto/intel/qat/qat_4xxx/adf_drv.c   | 11 +++-
+ .../marvell/octeontx2/otx2_cptpf_main.c       | 14 +++--
+ .../marvell/octeontx2/otx2_cptvf_main.c       | 13 ++--
+ drivers/hwtracing/intel_th/pci.c              |  9 ++-
+ .../net/wireless/intel/iwlwifi/pcie/trans.c   | 16 ++---
+ drivers/ntb/hw/idt/ntb_hw_idt.c               | 13 ++--
+ drivers/pci/devres.c                          | 59 +------------------
+ drivers/tty/serial/rp2.c                      | 12 ++--
+ include/linux/pci.h                           |  3 +-
+ sound/pci/korg1212/korg1212.c                 |  6 +-
+ 14 files changed, 76 insertions(+), 104 deletions(-)
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.47.0
+
