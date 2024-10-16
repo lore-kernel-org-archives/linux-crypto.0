@@ -1,237 +1,183 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2073.outbound.protection.outlook.com [40.107.95.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 720D6212EF9
-	for <linux-crypto@vger.kernel.org>; Wed, 16 Oct 2024 12:42:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729082526; cv=none; b=jCB5E/fp2c5EPIutji12Q5FkiNQG33RKb9igqbg5pZVXbb7fNm8aPk5QGOmguJCTP9+bhdbQ3Sk/tG29muaef1xilFoaNYVBTaYAGEwCL/AL0U9F+votkQqku9psmiLiX4g70te1V1CLty2MIzVzxFRWP7TybFZx/qMgChEEwEc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729082526; c=relaxed/simple;
-	bh=xeBMFrWniQWPsGN4NVOp7U+TERIRvwx/CXaeZ/U1fmE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lvIya/ufRqKU2hrpsyfBWS28IH/DEPbCkHg/CRm/zDj73p/7ch4s835yH5T4wV59lBkkV0DC2hWMhg8qAAQ8KwiRuQMWkgk1j1YMqi+3nn/XW5JUxKQq9jBKSn7y9w78EevwtbgSkKfS9SSX/dcm0RzCnhzjmuJhW34lJibXZM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BUk1D4Rn; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C5CC522A;
+	Wed, 16 Oct 2024 12:50:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.73
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729083041; cv=fail; b=oqJjLljGNXzr7eLcELnOGZLajBoI5jsGRNzx1OZjhzr0ZVMbOxA1HibNjunCymckNrdpHRp4jgKntTVS4E+41hykhOYNlwCc2nZsc2GKRyun2kNCIRYRpIPOL1iW2mre+UlkW95337eThRhaX+t0yVXgaaQdCcogrxoPjQYL+sM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729083041; c=relaxed/simple;
+	bh=9KgO/QnyZFqVrtWZ6TDwrzR6zs2TPfYoBtncan7A23w=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=ehj9+bknh+viy+hrfMyXRMERnDRwofamlazoIFjpPt2q80Hg6Ksvx5B45Mc81qJNQ88genkDuHsH5WLCujlG7AKk/K0BSRtvhu9FrC91/D9UxbJ/AuTezPa8G4V12tOIHG5dDzO6U2JEEaTlE8NrYmSdryi7gL/UflPgJfHDz6o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Dj5LiD/o; arc=fail smtp.client-ip=40.107.95.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BUk1D4Rn"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729082523;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZRGVJdsI4KeDAeg9imgjHK9adQHetOZy1n8XhZE2xHU=;
-	b=BUk1D4RnRjS9fv23GuX2Ay080o8xN2qH6cg3iawOqBvH9JatUXULtHhFQdqV6g9NgSHnsS
-	TwN4dsqIUdSDgYTaP0f7c4sg08CA0YAgKCVtzA56YwK8Ymw9g371J6M7Dgy8nhnpJjiGuk
-	B7DqVxqpin1axOTy0Y+FaEhLoj2vmnA=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-502-s09PZWOCOFeU2lmnlhZykA-1; Wed, 16 Oct 2024 08:42:02 -0400
-X-MC-Unique: s09PZWOCOFeU2lmnlhZykA-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43111c47d0bso35478845e9.2
-        for <linux-crypto@vger.kernel.org>; Wed, 16 Oct 2024 05:42:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729082521; x=1729687321;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZRGVJdsI4KeDAeg9imgjHK9adQHetOZy1n8XhZE2xHU=;
-        b=cp5hymVooTmNPR8H8119Twx1IKU/84/eaakHjztVIwh2ufrO899qeaGRq/mlESzfxA
-         0xlCVRuYkDwFUsg5WiFZPctgPUXyMfcx6sSlCMlDWfgS9qXRsTjAfRpcfc+Ocd6p530o
-         MiRHCdtDS5t7PN41UC4soIU9umK/LGNK31WvDEOzsWxyGDgye8zFjSWr1Y2DVUZws3Ca
-         vTgsdgtuhh1v5mToRW4XaVE9GEFMt+T64qgsnZ1m2RDWCtBrS00G0I9fwxKfrFxguzuq
-         8aWan8NQaYY6m3GRUU0e8EhAN5AJe3V3jE/O3261kstZAbt/HDGIZPn5ViJrqYmeWlBB
-         WsWw==
-X-Forwarded-Encrypted: i=1; AJvYcCWyN6+/hZi1SFS9XP6ysQGNYBQWLeTEc8k3v5Y/zckiCVtsIpTZeMFxgdNRb/vVQgiJj5Zql1lTRlscRS0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLl8t9QIUvcSM6NiSGNHxuryEmrutvo+S56nti/qXPaNv8Z0Rq
-	xiggFqwNumEG82gZ7IkRW6sSnis6ilhZsYrnOsN/TWG6DPPWEs/nSDk/nNngn+M/DD4VEZzjgwi
-	zOCLH9eg6rIMDYiGqVgfegBbV0Q0RResY79TEklmIizkE4dLYke/gv85nnBWKJQ==
-X-Received: by 2002:a05:600c:4455:b0:431:5522:e009 with SMTP id 5b1f17b1804b1-4315522e18bmr6220415e9.12.1729082521429;
-        Wed, 16 Oct 2024 05:42:01 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGE3P1Sf2DjAjua7QaSHPu6bkCGVM+tumEiRjRf2AVFHTw3nylGoruyKCB/DirRoG2V4OxriA==
-X-Received: by 2002:a05:600c:4455:b0:431:5522:e009 with SMTP id 5b1f17b1804b1-4315522e18bmr6219795e9.12.1729082521006;
-        Wed, 16 Oct 2024 05:42:01 -0700 (PDT)
-Received: from eisenberg.muc.redhat.com (nat-pool-muc-t.redhat.com. [149.14.88.26])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37d7fa8ffd6sm4246879f8f.50.2024.10.16.05.41.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Oct 2024 05:42:00 -0700 (PDT)
-From: Philipp Stanner <pstanner@redhat.com>
-To: Jonathan Corbet <corbet@lwn.net>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Niklas Cassel <cassel@kernel.org>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Boris Brezillon <bbrezillon@kernel.org>,
-	Arnaud Ebalard <arno@natisbad.org>,
-	Srujana Challa <schalla@marvell.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
-	Kalle Valo <kvalo@kernel.org>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	Jon Mason <jdmason@kudzu.us>,
-	Dave Jiang <dave.jiang@intel.com>,
-	Allen Hubbe <allenbh@gmail.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Kevin Cernekee <cernekee@gmail.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jiri Slaby <jirislaby@kernel.org>,
-	Jaroslav Kysela <perex@perex.cz>,
-	Takashi Iwai <tiwai@suse.com>,
-	Mark Brown <broonie@kernel.org>,
-	David Lechner <dlechner@baylibre.com>,
-	Philipp Stanner <pstanner@redhat.com>,
-	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
-	Jie Wang <jie.wang@intel.com>,
-	Tero Kristo <tero.kristo@linux.intel.com>,
-	Adam Guerin <adam.guerin@intel.com>,
-	Shashank Gupta <shashank.gupta@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Bharat Bhushan <bbhushan2@marvell.com>,
-	Nithin Dabilpuram <ndabilpuram@marvell.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
-	Gregory Greenman <gregory.greenman@intel.com>,
-	Benjamin Berg <benjamin.berg@intel.com>,
-	Yedidya Benshimol <yedidya.ben.shimol@intel.com>,
-	Breno Leitao <leitao@debian.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	=?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Cc: linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-ide@vger.kernel.org,
-	qat-linux@intel.com,
-	linux-crypto@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	ntb@lists.linux.dev,
-	linux-pci@vger.kernel.org,
-	linux-serial@vger.kernel.org,
-	linux-sound@vger.kernel.org
-Subject: [PATCH v4 10/10] PCI: Remove pcim_iomap_regions_request_all()
-Date: Wed, 16 Oct 2024 14:41:32 +0200
-Message-ID: <20241016124136.41540-11-pstanner@redhat.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241016124136.41540-1-pstanner@redhat.com>
-References: <20241016124136.41540-1-pstanner@redhat.com>
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Dj5LiD/o"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Sp0Ur+aKsLFSZal42/whUNRHQmV+Fk8a1gYw75pZlP1N2DbgysJAS0CgFT296vPAwgksTngZhZR2Sfp2D5K4052Ra6yLSRkyrwP59KEoUbLtNYqfhpqDK0SIsXf9td4ZnCOBm3vsRrpYuUVo/j3vLIHrw4tLJfmDuw+XM/8rWTRe2g+VrBRbi1GfD1AAnYGjFiHMQb+h+sKQQZixjLf+aaycHiBEWBY31bIpXAqWeaqjT/N49FE1Y3BbHa+ZZYuUOh7smOD9tjwwicFhWIG6zpNyVcK5uThRqVzbCwYjV2x9L1l8z54hBhKcfWKdlMqXiZCLyN19psM6YaLGCDFfkQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9KgO/QnyZFqVrtWZ6TDwrzR6zs2TPfYoBtncan7A23w=;
+ b=hqdy97+bcGq1jd7Vq9ZICt3JRybi+mLb5nVQx8hEaRsfbyxt5rVUydVgZTdKT1c6tKvkXC9HQC+gqwJIpmbtpe0WYegr41+bA3SL6da4tFnk3NKnVrEjqo13LNbYeyF2/zfrY2rEap+hmrF3yIcrlCLHz5DcLjy40LU9vsbYghz8DrfkzBXjVBUk/kCLFxH6Pgh4NYnt9S1d0WrIZ6kVZ2G8e+kParV8NqgfT3pKJAKkQPzKAAe23e7fw5ihqII5rVbFQEUm9c2C6kJ7C5WSa58Amq/jwPnmWhMU+gGGX/E+RFR68nGkwn0XKwhoVeCxNIFuYkQ/wjV9c13X+sheVw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9KgO/QnyZFqVrtWZ6TDwrzR6zs2TPfYoBtncan7A23w=;
+ b=Dj5LiD/olDqchddCU7mlpWXetD/D0DZyiKAWlMeTrkqSmEBtKOo8nkhWkb1b0XrNU+awOYeDtDLibp/HfJCHqPjhmQmGa2oDQUii3d3YAGDBJ0ODlr8v3ODZ490mnKa6fvE1JfAtNsSq3I9ZL9cosgAjlFZh/W6+QbJ2tJJjmKHG/kvyRlMNAjq6oXSBXpv76X06EypsFedduEfjVsLBItaYs/cBjqDTKEdmAkuPocDdR+oNI5UtSH8PAPiQuQEVCQg/8iTS0wrwXdz5saPOD5qWSiYoOU1L8KO0TDquAlpBqlHNJCAGiFoXMJDw+YYSqFxB5FHYb180s3CT1IapJQ==
+Received: from PH7PR12MB8178.namprd12.prod.outlook.com (2603:10b6:510:2b3::19)
+ by PH7PR12MB5831.namprd12.prod.outlook.com (2603:10b6:510:1d6::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.18; Wed, 16 Oct
+ 2024 12:50:36 +0000
+Received: from PH7PR12MB8178.namprd12.prod.outlook.com
+ ([fe80::77bb:a9fb:c75b:f530]) by PH7PR12MB8178.namprd12.prod.outlook.com
+ ([fe80::77bb:a9fb:c75b:f530%2]) with mapi id 15.20.8069.016; Wed, 16 Oct 2024
+ 12:50:36 +0000
+From: Akhil R <akhilrajeev@nvidia.com>
+To: Colin Ian King <colin.i.king@gmail.com>, Herbert Xu
+	<herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>,
+	Thierry Reding <thierry.reding@gmail.com>, Jon Hunter <jonathanh@nvidia.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
+CC: "kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH][next] crypto: tegra: remove redundant error check on ret
+Thread-Topic: [PATCH][next] crypto: tegra: remove redundant error check on ret
+Thread-Index: AQHbHwO/M2MdfKx+RkCsL86dgTDkpLKJTmDw
+Date: Wed, 16 Oct 2024 12:50:36 +0000
+Message-ID:
+ <PH7PR12MB817831120ABC8F0C44DCAD7BC0462@PH7PR12MB8178.namprd12.prod.outlook.com>
+References: <20241015131122.152046-1-colin.i.king@gmail.com>
+In-Reply-To: <20241015131122.152046-1-colin.i.king@gmail.com>
+Accept-Language: en-IN, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH7PR12MB8178:EE_|PH7PR12MB5831:EE_
+x-ms-office365-filtering-correlation-id: 05eda14a-4457-407a-795d-08dcede1215b
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|366016|10070799003|376014|38070700018;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?NnRwQytUa2tkdWJ3SWtxbUpCQkpwNjJvWWVrTk96aFpPOVlRck1tOHJoU2s3?=
+ =?utf-8?B?K0U3R3pTdUwyQnVuWURjcDhFakczcWJDN2hpZGx6eEM0Q0oyNVVLQndWa0dk?=
+ =?utf-8?B?enpOTnM5enoxdnExZTVmQW1tZ3d5ZWxaMUxPaWtNTkZKZ0R1V3NVVUJONXhV?=
+ =?utf-8?B?MXZwbXZsQzNBRG55alhNT0tKWklhcUtFYmhnVUJ3RmVLYzAwUDg1RmdRaW5Q?=
+ =?utf-8?B?OXpDWndObFlvYUNULzlCUzRQTGt0T1RaemUxUW5PaElGRDdvZUQybDRHdmMz?=
+ =?utf-8?B?NndERUpzM2RpQXNsa2RVbDA2SWJVT3hrVHJZanlpQjd0QldNbGhUWlpCY3Vz?=
+ =?utf-8?B?ckZiOWpCSlEydWJORkFZajJYUGYvNmpoRFNONDhoRENKREx5OE03SDdzdlVa?=
+ =?utf-8?B?S2tvVTQxRzVlSFVmeUE1aW1zbWlielpXUHl6cFBCTGQvRFBRQXNsQnd6Mzky?=
+ =?utf-8?B?bThkYUNaclB4SGlXUjBpSG1DdnVESzJ1ai9NV256VEtqdDBCdldmb01wLzVY?=
+ =?utf-8?B?dXJvR2hqaHlMcnd0ZTFqd24vYU1sNVg0NW5yTFl4ZHNZUExYTzdXTm54QVUv?=
+ =?utf-8?B?bm1TWkFpTExPS3BjQys4NmJLV3hDdjhRT01PdTRScWk3S3k3Q3FBMzBEYmpo?=
+ =?utf-8?B?NUJ1am5RaHZaMlZkV2dsZHJreEVseUpwRWljY3M2OXZOTUh4QkE0ZzVLQklk?=
+ =?utf-8?B?eU1saHlVVkRRdkEyampCV2lleDZMdjlmYnErNEZFano0NVVtMHhtRnRmQjNI?=
+ =?utf-8?B?dWNXR3ZndmNIL1d3RmY0YUNqTUNQL256S3U4WXgrM0hLRE1iaDlLak5DaGZX?=
+ =?utf-8?B?MTB0U1c3eFJTSHczcGRvZ3lOaUtwclExRHFRMXdXVk41aFNpRys1ekxOck42?=
+ =?utf-8?B?eVYxY1NMeFl2TzM4aEhDeDBSMnVmNHJaUnNLR1QzcnRocjR2dXVISGEyUHky?=
+ =?utf-8?B?a1ZLNkdSeExrMlh5L1YxcTdqRm5rRGg0d2NSdlNoa0FXeUxNYkovTmVRMGtG?=
+ =?utf-8?B?TVZtZnI3K2hQeHlreGlsMWl1V2NZVUxPY3BvUGU3TkZaQ1RBT3d6bUNRa2RO?=
+ =?utf-8?B?aHl1L2N5YTFaQTd2bTUyb0V3SS8wT1lKY0dqLzVaTElTdlVxZFptK0NZc0t1?=
+ =?utf-8?B?c0NoVEhXVkthUE1XQ0ZDY1l5TGk3Ni9MKzVyaUhVdWlIT2Jrak9EMzNtemxG?=
+ =?utf-8?B?NTJJTTJpSXpIdzVzM2x0VlB4bUVQTThFWVBySHBRcTZPRXpaaW9UZnJ0emhR?=
+ =?utf-8?B?VUFtcTVkSjRKR21PNUpScFZwL1J4TVFTcldLaktuMDlsa2hXcWk1cSt4QWZ0?=
+ =?utf-8?B?VnN6b3VCQWtySGhtVTVjM3Zld3pTMlNqMGhrTXFrWkdWaXRRdlZpV3ROYWZP?=
+ =?utf-8?B?MUFOM3VBZzQvZkV2SHE1ZGJ5Tm41b2ptOU1vdnd3ZXN2cUUyTHkrR2RSdHI5?=
+ =?utf-8?B?WFZLZks1aE1ZWGVQVGlDZ0hBQitNMmpkV0pWMmZSR3JqTHNyL3BEZ0hHSk4y?=
+ =?utf-8?B?Wnk1bDdpMDE3WUZMNWlJdUZWc29KUlpHOVZHMXpOdFkwUzVLaVlOSEFXM0NJ?=
+ =?utf-8?B?bDdqbVFKWlhNOEZxWFR5UVhsTmNKWXhPM0NIeGRrMGlPYTF0UUNpSmdqVHRV?=
+ =?utf-8?B?c2hRcEkveVJiaWU4M3E3ZmNxUHNDTno4V2VZenFYdjBvUmNaeVd0eS9jK1Fi?=
+ =?utf-8?B?SWxSVjQyMzE1c2hIQVFhOGJvdE1PYVJGUFR1RERZczRydlEzKzVvb0F1bHZL?=
+ =?utf-8?B?bGRES3J6QzhRSlFJMDFyWGw4WHlTN1ExN3NnWDBFSmNVNkhTdStQbWlIMUlK?=
+ =?utf-8?B?WWw4a2puS3JSUHYybVAvZz09?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB8178.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(10070799003)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?a29EQ1hMS2dNZDBJNzhkUnYrNzQ5WkdZTnlBWkVIL2F2eXp1UG1ycmljRlll?=
+ =?utf-8?B?MjlSNytxazdkYUNpdjVjR0tld1FWZUl0all5T2VsTUQzVkFGeHdmRlR2bTVx?=
+ =?utf-8?B?WnNwWENELyszUG5oVTNLRUFWNG8rV1FwekhrVkF6UE9jb2wvVXhCMmx3M2NQ?=
+ =?utf-8?B?b0tvU2gvTnVVcGZCb2w4RFAzSzRFeGJhbDhzMzh2VEQ3V3BTSDhTTS9UYXBs?=
+ =?utf-8?B?alZHVWF0bGFud0tXb1JZc2hjOXloMzdQWGJQeWhTZlVpUUxYRklnNDBwTFpt?=
+ =?utf-8?B?S2wvL3VsY2F3OXVVNDNsa1VmenJvcEFTZU9CS2Z6WmNuV3lITHJNdHVXRFJr?=
+ =?utf-8?B?a0dua1BpNnNYMlNPUG1KSGphWGhNM0lDRUxwM0o5d01tWHZrSzNNRWgyUHEr?=
+ =?utf-8?B?bHhxTkJ0VnUxc1lBbnpDUnpYQ1RrSVRINXBOQlZhMFFlUDNtVDgyK2xFSXIx?=
+ =?utf-8?B?blUvNUZxS21HVE9KSWpweXM1UW1PZEFaT0QzTWlaOTZSMFBicjJrRU4wMVp5?=
+ =?utf-8?B?b2pJdjEwM1ZpSDdOVFhidncvbGx4Ui8vdjN2KzBZSmtZS3QzWERydSsra0NB?=
+ =?utf-8?B?bXVsVVNDcnFuQmJFcHFmcW1UWGpKbHJ5bERBL01aTFZiMk4zRUZVV2QzL1d3?=
+ =?utf-8?B?a3pOaGMySHIrQWsyQnNQOWlLbVpJdVViOTl4TnpEQnU3ZWNKUTVtNWJ2VCtq?=
+ =?utf-8?B?ODVwamloWGdhU3NhOElPOTJGNjlsZlJRQklCWkhUcnpIeUNhWkhIZ2JPRC9Z?=
+ =?utf-8?B?aVJUVDZ4QUVnR0ZEakJ6eWtPcGJsVm1qY0orNXVJUTZTRlAzZ1RtNjJXRHp0?=
+ =?utf-8?B?bmREdWsrdFhHdGxTYUpmTDFOREF0eVJ3Rm9ENlBnS3VkN1dtcWhuQUNXZTZz?=
+ =?utf-8?B?Y0RvK01DQ3NNUXU1cVNmc1FKVC80N2haY1VlbVBwR29tNWkxTnJ5bjZlWTBo?=
+ =?utf-8?B?L3RNRUVYU3h5Q3BQSC9zKzJIRk9ZVTlMV09SckF0NzN5MUpRQnhSendQNHEx?=
+ =?utf-8?B?eGNBcnBRTkVjVlFmTW5rVmlZTmRnTno0OWdEeE5jcWJFaVJrdC9kTVhXMWlP?=
+ =?utf-8?B?ZTZ3akhNNDArZzdZTFBzYmxKZUpTTlJRNmNva3ZCK0owNjJqQ01YN3BQNDhV?=
+ =?utf-8?B?RGUraHZzVzdBTGtqZWJQN3J5VVVaNFE3c2xhN0ZXQXJhNmdOM3MzdXlUQzNI?=
+ =?utf-8?B?MnBSeUNwSXVsd0tmY2htK3ZMc1FFOHRhd09YanZpbGxqT08wR0MwZEZPQjFo?=
+ =?utf-8?B?dGd2NXpudVVYUmpvTFFTN1U5WlB5MXdtb3oxY2o1RkFDTDVGSkJqWjN3VXEx?=
+ =?utf-8?B?YzdCQkpuZ2E1dzRVRWk1aHJneFk1WnFkL3dpNlRWamVtRDd2cU93bkY0S0ZX?=
+ =?utf-8?B?SFZpS3pzRkpoMFZocnFJU1FBbldYZjk4U1N3OEhVQk5mNGJWOEZhaGp3N3VT?=
+ =?utf-8?B?N1NUc2NFRVJNb0VwTHlmcXVUa2lVS2dpRU1GcVk3S09ucjdDTTJXd0NSN3g4?=
+ =?utf-8?B?Q2U0RXZYUFFmMWZqaWhxRDE4OG9GWjBZZHVZQXNIbnJGUUF2cjV1R1FCK0pv?=
+ =?utf-8?B?MWJ0YlhybWdRN3ZmZE52NGk0YTRteDdCSFUyQ0d1dHZFT0grMzM0M1BCcTAr?=
+ =?utf-8?B?S253SGZ6WnhjOG80QjNQL1N3VFV5V0lRUE96cURSMlM5TVJWTEkwQnVRSldM?=
+ =?utf-8?B?bUUwWk9jc1lsZUtUR2VmYlNVUHJxRkRNSTZuNE4wMmtsS0JWbjY3SHhVN09v?=
+ =?utf-8?B?TDJlcjVTdWJqWXNjMVRhOSt5Y0ZZdklTZGt4OUF1QXZlYkhWUTBIdTBHc3FJ?=
+ =?utf-8?B?Nzg0T2ZnbzY3a1U5UXFxRTRGSDhZYmJMSmhrMXhkK3ZsdXVuTTA0UUVFMnpp?=
+ =?utf-8?B?L3RtRk9SRGlBc3FiN29yRytTYTRCbWhYb1h5dUlTR0ZEeWloNU42WGFBaStI?=
+ =?utf-8?B?WEdIQ2xwWVAwTHBFQlhBZ3ZrczI1ZEpXTkgrZGEzTXFXTTI1OFNPUFpiMUNL?=
+ =?utf-8?B?Um5NTGtUNXpiWTR2bmJvbS9VamFBZDZKYVZEam8xcmxYN3paNnVoQjhuaGhp?=
+ =?utf-8?B?TmJUSXlOMXhyTUxGZ3FFc0xtRE1maENmRGh5SW1uMTJWd2N1OGpzZ2NDWVZI?=
+ =?utf-8?B?bVYwZlpxN0htV3NFcEM0NWw5ZktrdndsMWI3Zi9pYkN6emZGZDdGMENJWVB1?=
+ =?utf-8?Q?Gg/fMOEWAZaccgvwiwdGqeFnyfXm4K6lbfrpN/qz+OJv?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB8178.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 05eda14a-4457-407a-795d-08dcede1215b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Oct 2024 12:50:36.2655
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: e8WyTS22iK2jwKsjsvHQ5j6pE33AFyGcUYThhXh/ABxfTjZN5s4WCsM6WXCkzQliyE1dEgMhMhPIIcK0jA6E9A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5831
 
-pcim_iomap_regions_request_all() had been deprecated in
-commit e354bb84a4c1 ("PCI: Deprecate pcim_iomap_table(),
-pcim_iomap_regions_request_all()").
-
-All users of this function have been ported to other interfaces by now.
-
-Remove pcim_iomap_regions_request_all().
-
-Signed-off-by: Philipp Stanner <pstanner@redhat.com>
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
----
- .../driver-api/driver-model/devres.rst        |  1 -
- drivers/pci/devres.c                          | 56 -------------------
- include/linux/pci.h                           |  2 -
- 3 files changed, 59 deletions(-)
-
-diff --git a/Documentation/driver-api/driver-model/devres.rst b/Documentation/driver-api/driver-model/devres.rst
-index 5f2ee8d717b1..3a30cf4f6c0d 100644
---- a/Documentation/driver-api/driver-model/devres.rst
-+++ b/Documentation/driver-api/driver-model/devres.rst
-@@ -394,7 +394,6 @@ PCI
-   pcim_enable_device()		: after success, some PCI ops become managed
-   pcim_iomap()			: do iomap() on a single BAR
-   pcim_iomap_regions()		: do request_region() and iomap() on multiple BARs
--  pcim_iomap_regions_request_all() : do request_region() on all and iomap() on multiple BARs
-   pcim_iomap_table()		: array of mapped addresses indexed by BAR
-   pcim_iounmap()		: do iounmap() on a single BAR
-   pcim_iounmap_regions()	: do iounmap() and release_region() on multiple BARs
-diff --git a/drivers/pci/devres.c b/drivers/pci/devres.c
-index 2a64da5c91fb..319a477a2135 100644
---- a/drivers/pci/devres.c
-+++ b/drivers/pci/devres.c
-@@ -959,62 +959,6 @@ int pcim_request_all_regions(struct pci_dev *pdev, const char *name)
- }
- EXPORT_SYMBOL(pcim_request_all_regions);
- 
--/**
-- * pcim_iomap_regions_request_all - Request all BARs and iomap specified ones
-- *			(DEPRECATED)
-- * @pdev: PCI device to map IO resources for
-- * @mask: Mask of BARs to iomap
-- * @name: Name associated with the requests
-- *
-- * Returns: 0 on success, negative error code on failure.
-- *
-- * Request all PCI BARs and iomap regions specified by @mask.
-- *
-- * To release these resources manually, call pcim_release_region() for the
-- * regions and pcim_iounmap() for the mappings.
-- *
-- * This function is DEPRECATED. Don't use it in new code. Instead, use one
-- * of the pcim_* region request functions in combination with a pcim_*
-- * mapping function.
-- */
--int pcim_iomap_regions_request_all(struct pci_dev *pdev, int mask,
--				   const char *name)
--{
--	int bar;
--	int ret;
--	void __iomem **legacy_iomap_table;
--
--	ret = pcim_request_all_regions(pdev, name);
--	if (ret != 0)
--		return ret;
--
--	for (bar = 0; bar < PCI_STD_NUM_BARS; bar++) {
--		if (!mask_contains_bar(mask, bar))
--			continue;
--		if (!pcim_iomap(pdev, bar, 0))
--			goto err;
--	}
--
--	return 0;
--
--err:
--	/*
--	 * If bar is larger than 0, then pcim_iomap() above has most likely
--	 * failed because of -EINVAL. If it is equal 0, most likely the table
--	 * couldn't be created, indicating -ENOMEM.
--	 */
--	ret = bar > 0 ? -EINVAL : -ENOMEM;
--	legacy_iomap_table = (void __iomem **)pcim_iomap_table(pdev);
--
--	while (--bar >= 0)
--		pcim_iounmap(pdev, legacy_iomap_table[bar]);
--
--	pcim_release_all_regions(pdev);
--
--	return ret;
--}
--EXPORT_SYMBOL(pcim_iomap_regions_request_all);
--
- /**
-  * pcim_iounmap_regions - Unmap and release PCI BARs
-  * @pdev: PCI device to map IO resources for
-diff --git a/include/linux/pci.h b/include/linux/pci.h
-index 3b151c8331e5..b59197635c5c 100644
---- a/include/linux/pci.h
-+++ b/include/linux/pci.h
-@@ -2301,8 +2301,6 @@ void pcim_iounmap(struct pci_dev *pdev, void __iomem *addr);
- void __iomem * const *pcim_iomap_table(struct pci_dev *pdev);
- int pcim_request_region(struct pci_dev *pdev, int bar, const char *name);
- int pcim_iomap_regions(struct pci_dev *pdev, int mask, const char *name);
--int pcim_iomap_regions_request_all(struct pci_dev *pdev, int mask,
--				   const char *name);
- void pcim_iounmap_regions(struct pci_dev *pdev, int mask);
- void __iomem *pcim_iomap_range(struct pci_dev *pdev, int bar,
- 				unsigned long offset, unsigned long len);
--- 
-2.47.0
-
+PiBDdXJyZW50bHkgdGhlcmUgaXMgYW4gdW5uZWNlc3NhcnkgZXJyb3IgY2hlY2sgb24gcmV0IHdp
+dGhvdXQgYSBwcm9jZWVkaW5nDQo+IGFzc2lnbm1lbnQgdG8gcmV0IHRoYXQgbmVlZHMgY2hlY2tp
+bmcuIFRoZSBjaGVjayBpcyByZWR1bmRhbnQgYW5kIGNhbiBiZQ0KPiByZW1vdmVkLg0KPiANCj4g
+U2lnbmVkLW9mZi1ieTogQ29saW4gSWFuIEtpbmcgPGNvbGluLmkua2luZ0BnbWFpbC5jb20+DQo+
+IC0tLQ0KPiAgZHJpdmVycy9jcnlwdG8vdGVncmEvdGVncmEtc2UtYWVzLmMgfCAyIC0tDQo+ICAx
+IGZpbGUgY2hhbmdlZCwgMiBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9kcml2ZXJz
+L2NyeXB0by90ZWdyYS90ZWdyYS1zZS1hZXMuYyBiL2RyaXZlcnMvY3J5cHRvL3RlZ3JhL3RlZ3Jh
+LXNlLQ0KPiBhZXMuYw0KPiBpbmRleCBhZTdhMGY4NDM1ZmMuLjlkMTMwNTkyY2MwYSAxMDA2NDQN
+Cj4gLS0tIGEvZHJpdmVycy9jcnlwdG8vdGVncmEvdGVncmEtc2UtYWVzLmMNCj4gKysrIGIvZHJp
+dmVycy9jcnlwdG8vdGVncmEvdGVncmEtc2UtYWVzLmMNCj4gQEAgLTExODAsOCArMTE4MCw2IEBA
+IHN0YXRpYyBpbnQgdGVncmFfY2NtX2RvX29uZV9yZXEoc3RydWN0IGNyeXB0b19lbmdpbmUNCj4g
+KmVuZ2luZSwgdm9pZCAqYXJlcSkNCj4gICAgICAgICAgICAgICAgICAgICAgICAgZ290byBvdXQ7
+DQo+ICAgICAgICAgfSBlbHNlIHsNCj4gICAgICAgICAgICAgICAgIHJjdHgtPmNyeXB0bGVuID0g
+cmVxLT5jcnlwdGxlbiAtIGN0eC0+YXV0aHNpemU7DQo+IC0gICAgICAgICAgICAgICBpZiAocmV0
+KQ0KPiAtICAgICAgICAgICAgICAgICAgICAgICBnb3RvIG91dDsNCj4gDQo+ICAgICAgICAgICAg
+ICAgICAvKiBDVFIgb3BlcmF0aW9uICovDQo+ICAgICAgICAgICAgICAgICByZXQgPSB0ZWdyYV9j
+Y21fZG9fY3RyKGN0eCwgcmN0eCk7DQo+IC0tDQoNCkFncmVlZC4gVGhhbmtzIGZvciBwb2ludGlu
+Zy4NCg0KQWNrZWQtYnk6IEFraGlsIFIgPGFraGlscmFqZWV2QG52aWRpYS5jb20+DQoNClJlZ2Fy
+ZHMsDQpBa2hpbA0K
