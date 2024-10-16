@@ -1,47 +1,59 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 125C613C908
-	for <linux-crypto@vger.kernel.org>; Wed, 16 Oct 2024 04:15:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 645681885A0;
+	Wed, 16 Oct 2024 04:27:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729052135; cv=none; b=gPufakg0kXYGsNqb35W1Os8guvz9Y6yftrs7TR+UCVf/oQ9vWMaO2zmLhF83u6Zmgz+105Hx2yeDe3mu5R3bz29Z6hop8P3y2IR/7gdu7osSXtNCkpab3bcA31nWmxiDwwjeEaOrKHHnhO6H3y1/hVdsCwgzGHKelLr6zPd9CW8=
+	t=1729052859; cv=none; b=DnYvBWnjC2txetsHARXQ3HcXxvPFAYd9BaFc7O8mCN1pLn6BXQGHOi8gf8D9zXS7ciz+viedMGbgKnW3bmJWR0LmSl6IoK1Qb7v95Ta9j579zKsX+z4gRnif+jyj9aQE9a91yGPMWRZz5BO+XPOvPCU49+jyjLtUHJjckD/w7TA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729052135; c=relaxed/simple;
-	bh=EH2Kad6apna3V6fCJPn9M4+Lrju73vUU6xJoxlU5phk=;
+	s=arc-20240116; t=1729052859; c=relaxed/simple;
+	bh=hVLTmQoIR4NnPP/Mi71p3DtZcSEuUiBYU5Kz9KmXAhM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dhmW5DLlGWojEj4rm3eBqtaBHKZFxxk5fwnTCWrIh6K9Lt9Hzu2dYb9AlKPsEGuV22Wfes5ld50tEK8CjRxyL4Ss6+gfMxmgOcvCHfYnctBkGVt4RblbpdHn4NDBIwSj4Qqfpb4Yne8V7I/c6SoGqej7gP+gLoFvq5BE+Gqr2ys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=bJ7n+pwN; arc=none smtp.client-ip=144.6.53.87
+	 Content-Type:Content-Disposition:In-Reply-To; b=Pzld0DGWNb3/GfaSgPz4uZ6t4sHxZVDgPLGxpU9hNruMbfaOwpJRoLJo+pHvCyUqkR1Ncb6mwArclPE7ShStcmieB1kcbTMEXAm18C5kCSQkmZegmYVwkd2vhHINJQX0dwFpzU2D22ifvxO43BIwXvxKdW8Db8R/BeoIrKYJQjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=W2RmBfMV; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="bJ7n+pwN"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="W2RmBfMV"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
 	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=R2Q8N6orZLNFrMoE5EAkk4NEdcbZvVsJH/QybQ7Jakk=; b=bJ7n+pwNTc1yTbS5LDyizvwMXa
-	KXb/IetGIduBaHMaVt7uzxw54NtpIob2XFsxcqCy7Y9YSPCdv6l8YpFEIblc1OEQySQOg/Gc6N92D
-	ZnZ0+y0dR//cxMUc2dPGBPqMlcAkTvDtCjOwiQWoNjcQXMutTw4hHFm8su72fbDHshKSTIDk1bI3X
-	XSEakHk/zqGXO2cvAc39DwbQFgz0Er3Eu5V49x0YQl91a91ynqbVkT7wonmYMs+IyZYORc/GUuydT
-	rIc9hnyWKJt7NgAW0Hahfdp/VqyjBaqNNLn7LV5jC+1qwyDHRk3Hl4Y43cjac0L6lcCzYW4+nZBjG
-	wGuv1CJQ==;
+	bh=NW9YDCtZFYicQcANZrspiKTFqONICzgJfERuIxJwwNk=; b=W2RmBfMVuKF8/X6cU1pFP4vbbb
+	m5RHycH82wjxokH01lOZgqBFHEhKONi0FdfoEJK+01FFvXf//SUdl92CaDJPeCoWtj3PhcoaypIXV
+	LyF73HIlP6Q/dyECLqlm043QnjiOeC0DmpewYgvQ3mRZQm8/n4k+vJi9An9kHyPMGe9ADvgJsRvAt
+	qcHMWZmUshTbNOloHXs7ek80fDS9ZCxPwsU+buExbS4NJ7uPG3Kf5geu7/+27yr7iqe5K6njSqrpq
+	0ypVFFtu/u21DI9SQWnss/ETObnxzOI1s4pmeKEctoNJ5ovnm5uDUGFUuOkcr5iHssc1RpEYT0Gev
+	Y68j3kvA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1t0vHc-009jGg-0Q;
-	Wed, 16 Oct 2024 12:15:26 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 16 Oct 2024 12:15:25 +0800
-Date: Wed, 16 Oct 2024 12:15:25 +0800
+	id 1t0vTI-009jQQ-2p;
+	Wed, 16 Oct 2024 12:27:31 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 16 Oct 2024 12:27:30 +0800
+Date: Wed, 16 Oct 2024 12:27:30 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Ard Biesheuvel <ardb+git@google.com>, linux-crypto@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH 0/2] crypto: Enable fuzz testing for generic crc32/crc32c
-Message-ID: <Zw893e1MySfQRjK0@gondor.apana.org.au>
-References: <20241015141514.3000757-4-ardb+git@google.com>
- <20241016022051.GA1138@sol.localdomain>
+To: Klaus Kudielka <klaus.kudielka@gmail.com>
+Cc: regressions@lists.linux.dev, linux-kernel@vger.kernel.org,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Boris Brezillon <bbrezillon@kernel.org>,
+	Arnaud Ebalard <arno@natisbad.org>,
+	Romain Perier <romain.perier@free-electrons.com>
+Subject: Re: [REGRESSION] alg: ahash: Several tests fail during boot on
+ Turris Omnia
+Message-ID: <Zw9AsgqKHJfySScx@gondor.apana.org.au>
+References: <1fc4db6269245de4c626f029a46efef246ee7232.camel@gmail.com>
+ <ZwObXYVHJlBaKuj2@gondor.apana.org.au>
+ <38a275a4e0224266ceb9ce822e3860fe9209d50c.camel@gmail.com>
+ <ZwZAExmK52txvHE8@gondor.apana.org.au>
+ <7e38e34adddb14d0a23a13cf738b6b7cccbfce6f.camel@gmail.com>
+ <ZwduxHxQtHdzz-kl@gondor.apana.org.au>
+ <ZwePSPG8aWm6mwKK@gondor.apana.org.au>
+ <15fadc356b73a1e8e24183f284b5c0a44a53e679.camel@gmail.com>
+ <Zw31JIEyh28vK9q7@gondor.apana.org.au>
+ <5db212655dc98945fa3f529925821879a03ff554.camel@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -50,17 +62,21 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241016022051.GA1138@sol.localdomain>
+In-Reply-To: <5db212655dc98945fa3f529925821879a03ff554.camel@gmail.com>
 
-On Tue, Oct 15, 2024 at 07:20:51PM -0700, Eric Biggers wrote:
+On Tue, Oct 15, 2024 at 07:38:27PM +0200, Klaus Kudielka wrote:
 >
-> Wouldn't it make more sense to make crc32-generic actually be the generic
-> implementation, and add crc32-arm64 and crc32-riscv?  Likewise for crc32c.  That
-> is the usual way that the algorithms get wired up.
+> So, I applied the TDMA-disable patch, and I saw the same errors.
+> Then, I applied the printk patch on top of that, and here is the result.
+> 
+> Not sure, whether this makes any sense...
 
-Agreed.  The library interface can expose the optimal algorithm,
-but the Crypto API should not expose the library interface and
-should instead hook directly to the C implementation.
+Interesting, I think this shows that the non-TDMA path doesn't
+work at all :)
+
+Can you apply the TDMA-disable patch, and revert the asynchronous
+self-test patch? If it still fails, then we'll know for sure that
+the non-TDMA path is simply broken.
 
 Thanks,
 -- 
