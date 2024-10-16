@@ -1,174 +1,122 @@
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1095518E772
-	for <linux-crypto@vger.kernel.org>; Wed, 16 Oct 2024 06:40:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04598198856;
+	Wed, 16 Oct 2024 07:12:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729060859; cv=none; b=tkx8405qOY/O+RpOdPL7/CUVG6OHyVsvq3Yp9TsO7GSfEsOFa3ZN7U3cJ8FsoGfSjxUg9dmYK3co6reBmIPbpsOAF9/FyI8IwTHr+1CtQYUhw69bqI0kP95/6Nz7U/YS+sPG69gg7Pn8q5DTF9hTOxOsWexlqK/wSEcsj9Smaeg=
+	t=1729062775; cv=none; b=ih6OiJ4XlCi1CsxmpwSuufreLJ0qaYR8JJTKi7+SBEIsxrWblmj47bFaEVw0WE/IhCKbjN8ooODt3H/H49Qb/qj3fPBWoixCHAiQ93EnDiMmoNxkaRTBR+DMLRieszD0XDAty1dUIKaZugtCFweIIk+9tsxGv09BQvjXybFrEKY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729060859; c=relaxed/simple;
-	bh=y1GkrEbMne2hN4G50vtd3yXpt91i5pbr0/N+737j6HQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tK+b3oEmvll/8X9G+Cp5MCpOPvyntxe2Z/7BT3ztfXUREDLNcCEB+cpNNQlKac3jD1wPhWRrlX517+TrUtsVOP40DcSLkRTXHHZkgBVBQ6SqdWGMyGiUuPx+uo8C60Pm3zd0M7afYoPrThUWLv2mghbgYM6F2xaB4LeucLJk+tM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=BHzVj3fW; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=gmyfamEO; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=uBkRXVx3; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=Oj1rxwVH; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1729062775; c=relaxed/simple;
+	bh=ERP/V9quL5zaqNb+BLJAb9v0NmJzVN/qNhNcZIV8Ip0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ganDxFEfOFnN2+QDCuLJIT/my3XHQ5b7qlQ6SlTWTXFPwJKwCMXk7h4TdangswT2mem5g5sFJDRiiLo1OqDBj9+81B2jZt1KpQAt4l9GCOmnLYoJ6+3YB6WWlowsM/Zmeds8i3UQKPUZu2GpJrwJrqj/euMuAo+spUGZ7Mxrcfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k3tdDYMn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="BHzVj3fW";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="gmyfamEO";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="uBkRXVx3";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="Oj1rxwVH"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id E388B1F839;
-	Wed, 16 Oct 2024 06:40:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1729060855; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9R5uIroVqXXx3QtUxVOQW3D+wg8+A9m7sxTYmWRD9pc=;
-	b=BHzVj3fWpvSNZdtCEKm1649cqZgMa7zbtVlfjriDRKG0eVlEG+yODrjDZHLbO13Mcta3Zr
-	coY6TGATHNvXqftjHzlvw58fXepuy5KqSSKFTHEBQQUiCpHPOzZvJ4MJ8H7AsKl0n0kKge
-	HQm7Eah1koVHFGNYMExjADQNs7t7HC4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1729060855;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9R5uIroVqXXx3QtUxVOQW3D+wg8+A9m7sxTYmWRD9pc=;
-	b=gmyfamEOqo5i4uOrqZUmxcYXXjtgva84L1x5aMlvtpUzXuY6k9IjdrngvKRq/nH5SvfN4Y
-	8OCp9wSsDonA0pCQ==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=uBkRXVx3;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=Oj1rxwVH
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1729060854; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9R5uIroVqXXx3QtUxVOQW3D+wg8+A9m7sxTYmWRD9pc=;
-	b=uBkRXVx3ybptv43P25tpsq6Nq8+gU8Phr9pC0E9BZVI5K1U4QmXv/OLSoYHJiQ5/HBGwCb
-	+08J2dIxTR55WfXfNNPc95fsuX3yc9LnQEa+dMQdS+HJtUY/RC9HDQIJ5PUn9s0xFynqUJ
-	GTnxPj1qEmcv+kPHxYb9pcvO37375ok=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1729060854;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9R5uIroVqXXx3QtUxVOQW3D+wg8+A9m7sxTYmWRD9pc=;
-	b=Oj1rxwVHhTuCe+gpjFgJ6PyggTy8rMk6nKryEWb4qiizMfxMS8T+Oga2S/Gue34I1Q7p8s
-	NtSaN9pJnGuXnOBQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9931613433;
-	Wed, 16 Oct 2024 06:40:54 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id esS1I/ZfD2fdBQAAD6G6ig
-	(envelope-from <hare@suse.de>); Wed, 16 Oct 2024 06:40:54 +0000
-Message-ID: <83934544-0e4e-42eb-a15b-8189a46273c7@suse.de>
-Date: Wed, 16 Oct 2024 08:40:54 +0200
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k3tdDYMn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91DE1C4CECE;
+	Wed, 16 Oct 2024 07:12:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729062774;
+	bh=ERP/V9quL5zaqNb+BLJAb9v0NmJzVN/qNhNcZIV8Ip0=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=k3tdDYMnMn2EHt29yocTmwTnOkcezrB4n6Nkwgn9hfrvMwJIO6s4Uu85rWSzylBFO
+	 oO0I5zsczfYgRSGtp/Rz3d8p55xYDfhGcjtmsxbI+OGVbXp5Y37jF3+d3v1Ow22TDT
+	 QQaB3Q8qLqirh89B5qDDqRqIVTcNPNIzN9Z6aUow7ZHYxZBqoNtFV96rtQ0ruI0OdQ
+	 jwXry9IoEQ0ytsoLC4Ey/N7mQAFCGITos4qFeBUzVtYdVIrlz3YL2PwPfsGRCUZdCO
+	 7T8YMKDl87E+yyx2XknlgRI0HKc9IjdzVPpGBizxVu7SiCl65ISiz8T3+/5wQDtN+g
+	 L+3BwoZqP4rlQ==
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2fb3110b964so51967261fa.1;
+        Wed, 16 Oct 2024 00:12:54 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVtHyHvw920qqVZvaZP6Wp4zmZD4hlCLYJcF3s5Jh9FbHCm64sz4MV92kEPe2tRSMAXIAwKEiKt7oL6/Gs=@vger.kernel.org, AJvYcCXpJ9lW4TlApJQB28MsMe0q93PGqHTOCFCuOxqxjkZVIXStburHCV0mUSHuu4pxFXKERK82d5NUMUcjb7I3@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzc+ZkUWCHk7SwmwHHhU+DYYN+2K225DAwrfx353lbroBqSVae+
+	j62PKRGxcHTQJGbcg0vTehWWg91bfodhQnNfHrRDaKaVs3UMl42u8CdZvldWgye4+vlwaH9tjhr
+	Vp5YFw90UbEYoCMty0vM1vuxgC6M=
+X-Google-Smtp-Source: AGHT+IE2fsDuHS8YKfzAa525WvUxixku7LEcXD/dmEJI5v5SrcLGkozp3KOoyK4IpDk+xU+agLAtLeozxYnKH4F9gWw=
+X-Received: by 2002:a2e:a990:0:b0:2fb:5a7e:504f with SMTP id
+ 38308e7fff4ca-2fb5a7e5276mr33368691fa.35.1729062772925; Wed, 16 Oct 2024
+ 00:12:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/9] crypto,fs: Separate out hkdf_extract() and
- hkdf_expand()
+References: <20241015104138.2875879-4-ardb+git@google.com> <20241015104138.2875879-6-ardb+git@google.com>
+ <20241016030349.GD1138@sol.localdomain>
+In-Reply-To: <20241016030349.GD1138@sol.localdomain>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Wed, 16 Oct 2024 09:12:41 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXHDqD29TzE=2cw55qeKrnybgkYFCdy4jU_4E=OaUOkZNg@mail.gmail.com>
+Message-ID: <CAMj1kXHDqD29TzE=2cw55qeKrnybgkYFCdy4jU_4E=OaUOkZNg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] arm64/crc32: Implement 4-way interleave using PMULL
 To: Eric Biggers <ebiggers@kernel.org>
-Cc: Hannes Reinecke <hare@kernel.org>, Christoph Hellwig <hch@lst.de>,
- Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>,
- linux-nvme@lists.infradead.org, linux-crypto@vger.kernel.org
-References: <20241011155430.43450-1-hare@kernel.org>
- <20241011155430.43450-2-hare@kernel.org>
- <20241014193814.GB1137@sol.localdomain>
- <e9ea2690-b3ac-47f0-a148-9e355841b6d0@suse.de>
- <20241015154110.GA2444622@google.com>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20241015154110.GA2444622@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: E388B1F839
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,suse.de:dkim,suse.de:mid];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Score: -4.51
-X-Spam-Flag: NO
+Cc: Ard Biesheuvel <ardb+git@google.com>, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	herbert@gondor.apana.org.au, will@kernel.org, catalin.marinas@arm.com, 
+	Kees Cook <kees@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On 10/15/24 17:41, Eric Biggers wrote:
-> On Tue, Oct 15, 2024 at 05:05:40PM +0200, Hannes Reinecke wrote:
->> On 10/14/24 21:38, Eric Biggers wrote:
->>> On Fri, Oct 11, 2024 at 05:54:22PM +0200, Hannes Reinecke wrote:
->>>> Separate out the HKDF functions into a separate module to
->>>> to make them available to other callers.
->>>> And add a testsuite to the module with test vectors
->>>> from RFC 5869 to ensure the integrity of the algorithm.
->>>
->>> integrity => correctness
->>>
->> Okay.
->>
->>>> +config CRYPTO_HKDF
->>>> +	tristate
->>>> +	select CRYPTO_SHA1 if !CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
->>>> +	select CRYPTO_SHA256 if !CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
->>>> +	select CRYPTO_HASH2
->>>
->>> Any thoughts on including SHA512 tests instead of SHA1, given that SHA1 is
->>> obsolete and should not be used?
->>>
->> Hmm. The original implementation did use SHA1, so I used that.
->> But sure I can look into changing that.
-> 
-> If you're talking about fs/crypto/hkdf.c which is where you're borrowing the
-> code from, that uses SHA512.
-> 
-Actually, I was talking about the test vectors themselves. RFC 5869 only 
-gives test vectors for SHA1 and SHA256, so that's what I've used.
-I've found additional test vectors for the other functions at
-https://github.com/brycx/Test-Vector-Generation/blob/master/HKDF/hkdf-hmac-sha2-test-vectors.md
-so I'll be using them for adding tests for SHA384 and SHA512 (TLS on 
-NVMe-over-TCP is using SHA384, too) and delete the SHA1 ones.
+On Wed, 16 Oct 2024 at 05:03, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> On Tue, Oct 15, 2024 at 12:41:40PM +0200, Ard Biesheuvel wrote:
+> > From: Ard Biesheuvel <ardb@kernel.org>
+> >
+> > Now that kernel mode NEON no longer disables preemption, using FP/SIMD
+> > in library code which is not obviously part of the crypto subsystem is
+> > no longer problematic, as it will no longer incur unexpected latencies.
+> >
+> > So accelerate the CRC-32 library code on arm64 to use a 4-way
+> > interleave, using PMULL instructions to implement the folding.
+> >
+> > On Apple M2, this results in a speedup of 2 - 2.8x when using input
+> > sizes of 1k - 8k. For smaller sizes, the overhead of preserving and
+> > restoring the FP/SIMD register file may not be worth it, so 1k is used
+> > as a threshold for choosing this code path.
+> >
+> > The coefficient tables were generated using code provided by Eric. [0]
+> >
+> > [0] https://github.com/ebiggers/libdeflate/blob/master/scripts/gen_crc32_multipliers.c
+> >
+> > Cc: Eric Biggers <ebiggers@kernel.org>
+> > Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+> > ---
+> >  arch/arm64/lib/Makefile      |   2 +-
+> >  arch/arm64/lib/crc32-glue.c  |  36 +++
+> >  arch/arm64/lib/crc32-pmull.S | 240 ++++++++++++++++++++
+> >  3 files changed, 277 insertions(+), 1 deletion(-)
+>
+> Thanks for doing this!  The new code looks good to me.  4-way does seem like the
+> right choice for arm64.
+>
 
-Cheers,
+Agreed.
 
-Hannes
--- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+> I'd recommend calling the file crc32-4way.S and the functions
+> crc32*_arm64_4way(), rather than crc32-pmull.S and crc32*_pmull().  This would
+> avoid confusion with a CRC implementation that is actually based entirely on
+> pmull (which is possible).
 
+I'm well aware :-)
+
+commit 8fefde90e90c9f5c2770e46ceb127813d3f20c34
+Author: Ard Biesheuvel <ardb@kernel.org>
+Date:   Mon Dec 5 18:42:27 2016 +0000
+
+    crypto: arm64/crc32 - accelerated support based on x86 SSE implementation
+
+commit 598b7d41e544322c8c4f3737ee8ddf905a44175e
+Author: Ard Biesheuvel <ardb@kernel.org>
+Date:   Mon Aug 27 13:02:45 2018 +0200
+
+    crypto: arm64/crc32 - remove PMULL based CRC32 driver
+
+I removed it because it wasn't actually faster, although that might be
+different on modern cores.
+
+>  The proposed implementation uses the crc32
+> instructions to do most of the work and only uses pmull for combining the CRCs.
+> Yes, crc32c-pcl-intel-asm_64.S made this same mistake, but it is a mistake, IMO.
+>
+
+Yeah good point.
