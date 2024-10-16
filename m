@@ -1,113 +1,78 @@
-Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 506B61D26E0;
-	Wed, 16 Oct 2024 08:06:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.207.212.93
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 287561D172E;
+	Wed, 16 Oct 2024 09:53:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729066009; cv=none; b=EtSXiOLSgIG43lr36kOwMAIzQUVVKZ7xLW0iT1GoMcV8pAZs7HAjwDskfANU2/wMp5qG/AAra+XONmH/xd6R+KaG4EYg1+6RQeuOii5uMl5hBRrHsypyyK1+CQY1mkAkhLbp7LrjvU8p44xWA6B3gX+G8wl9YcEq7S7Waetfy+s=
+	t=1729072431; cv=none; b=GQt6eodp7S6tBZRYFlFrdfe0gBxOxWiom498ACZXl7qvuQhOg49iCMDFqgLYA2ssDtwiDuP+vOtSP6aF1o8FRy17vxuDqvgPZ2IHwRcN7+/lLJjWmOFQ4gEL1TNCfif9qx6oBE8+QlAeqAtmMNH/6P/nPqpyOrh+kQ4sqKSxWMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729066009; c=relaxed/simple;
-	bh=I4iWyFgFIpIpyNQzJqLRDERhYBCEmkQ41tqVFqd2kk8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=iQWoBq7zEdUMMPF6Wyi+Iqub5V7JY75oZA/2TTRqXcgmgY1+7OudA4B8jOY71EhRzZ3sXeYfTQo3EuSTl6fa/GtQJE+llSRvEaASEBADnpRkn8Fv1A7CBuqeJo1C8/Y0/e64Q4TBEgAKruXBMTOvE+rl5WtI6Ewhpj54frfKBRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=tY+4DGXF; arc=none smtp.client-ip=91.207.212.93
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+	s=arc-20240116; t=1729072431; c=relaxed/simple;
+	bh=fEDaxA673Vw1JjJLbhAzYRCPIrt04bAsMDObPTvA13w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u3RbbrLo76wFbI2oNRH37MKElxG4qAprcm1z0OCmFna82ENowbf8h0keMK/SVADR5Ssw81oRzyTKudBDWbkn/5zfQ4ALNN6uEPJOJ8VtOnOWLNTlYA0A6PEWyAsZyHVgGW61aZ4apayD7C3864/6boXLn22NZS/VfvJtIKeGWJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=kSEHDwTB; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="tY+4DGXF"
-Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49G3SgLE011399;
-	Wed, 16 Oct 2024 10:06:26 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=selector1; bh=
-	QYf7I5bZM+g/zbxxwONC8wmKlEdNvZg+vARUi+5HicI=; b=tY+4DGXFGVQN7z+3
-	7G/HdKmFOCq1mtJoKRlPdY5CyHRprLFsgcWUirLNBnKEb1lLdG+vBNrclGsNdlhh
-	4/Q1DGod6MtC5unDD3bYONam8k8PeAtCvQRhSTRUjorN4uBkWUtXrHz59tCnlU0A
-	IU2VrNsS95CoeVdVdhrnHD3Zo0JpPcA72bXoGGjZsGBe9IBgWwpGLD6S+hZS/KqM
-	B8UZjIVpB1775y8ix7jZxvAu8DBfkwwYRZpXRTdQX6Fqbm8vQYR42knGhddaQDIE
-	iNrcP0+fV4V0Th+ykhpN9aTYEwT0hK5S65JdVNqdWFi0/Depo4iWnBXoVrx0HjFc
-	m/aF3A==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 429qybc30u-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 16 Oct 2024 10:06:26 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 0CC664004A;
-	Wed, 16 Oct 2024 10:05:18 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 6071323CB55;
-	Wed, 16 Oct 2024 10:04:34 +0200 (CEST)
-Received: from localhost (10.48.86.225) by SHFDAG1NODE1.st.com (10.75.129.69)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.37; Wed, 16 Oct
- 2024 10:04:34 +0200
-From: Gatien Chevallier <gatien.chevallier@foss.st.com>
-Date: Wed, 16 Oct 2024 10:04:20 +0200
-Subject: [PATCH v4 3/4] hwrng: stm32 - update STM32MP15 RNG max clock
- frequency
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="kSEHDwTB"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=i0wsD/ovG4OKkjkMk1uF4FxWjJEvBUcY2NZhQNdcuX4=; b=kSEHDwTBJ8DiFZhQrmfhkVqlAG
+	WeNzX9Ej2/DxILBzGRhQEOwpzZ1kHBRnPgQrUq2St5MmK5uNJn/H58MyNPFKnbJhK7nuCYoeHObYL
+	lWnQF6g9QUuv4nYvkz5Wlf906V8oMiu3A5zkmY+CN5i+f0E0Tln6WbVfx95n4UKnUBWW1hZ2TAdU9
+	Bd+YEXD4/6dJkbgVGO0tme9OlxzTHIVNMj/4nHx6nvmd2+3nE2+RKDrSToNcfBZukomC0Db1bHiqt
+	YqxQhWACNv/LwERwlqNc0kEMjdTm5RLjJbafiCIBaWWn7qrH+vdkve0nK4FSFwyWpsYMNIXInYZ1h
+	sExQ5LrA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1t10Yz-009nXk-34;
+	Wed, 16 Oct 2024 17:53:44 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 16 Oct 2024 17:53:43 +0800
+Date: Wed, 16 Oct 2024 17:53:43 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Klaus Kudielka <klaus.kudielka@gmail.com>
+Cc: regressions@lists.linux.dev, linux-kernel@vger.kernel.org,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Boris Brezillon <bbrezillon@kernel.org>,
+	Arnaud Ebalard <arno@natisbad.org>,
+	Romain Perier <romain.perier@free-electrons.com>
+Subject: Re: [REGRESSION] alg: ahash: Several tests fail during boot on
+ Turris Omnia
+Message-ID: <Zw-NJwLXXQ0DwR8b@gondor.apana.org.au>
+References: <38a275a4e0224266ceb9ce822e3860fe9209d50c.camel@gmail.com>
+ <ZwZAExmK52txvHE8@gondor.apana.org.au>
+ <7e38e34adddb14d0a23a13cf738b6b7cccbfce6f.camel@gmail.com>
+ <ZwduxHxQtHdzz-kl@gondor.apana.org.au>
+ <ZwePSPG8aWm6mwKK@gondor.apana.org.au>
+ <15fadc356b73a1e8e24183f284b5c0a44a53e679.camel@gmail.com>
+ <Zw31JIEyh28vK9q7@gondor.apana.org.au>
+ <5db212655dc98945fa3f529925821879a03ff554.camel@gmail.com>
+ <Zw9AsgqKHJfySScx@gondor.apana.org.au>
+ <2ae8006f3cfc40ae66b34659365596ac8507d1da.camel@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20241016-rng-mp25-v2-v4-3-5dca590cb092@foss.st.com>
-References: <20241016-rng-mp25-v2-v4-0-5dca590cb092@foss.st.com>
-In-Reply-To: <20241016-rng-mp25-v2-v4-0-5dca590cb092@foss.st.com>
-To: Olivia Mackall <olivia@selenic.com>,
-        Herbert Xu
-	<herbert@gondor.apana.org.au>,
-        Rob Herring <robh@kernel.org>,
-        Krzysztof
- Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Maxime
- Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue
-	<alexandre.torgue@foss.st.com>,
-        Lionel Debieve <lionel.debieve@foss.st.com>, <marex@denx.de>
-CC: <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        Gatien Chevallier <gatien.chevallier@foss.st.com>
-X-Mailer: b4 0.14.2
-X-ClientProxiedBy: EQNCAS1NODE3.st.com (10.75.129.80) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2ae8006f3cfc40ae66b34659365596ac8507d1da.camel@gmail.com>
 
-RNG max clock frequency can be updated to 48MHz for stm32mp1x
-platforms according to the latest specifications.
+On Wed, Oct 16, 2024 at 07:51:38AM +0200, Klaus Kudielka wrote:
+>
+> I tend to agree - it was a nice try, but non-TDMA doesn't work at all.
 
-Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
-Reviewed-by: Marek Vasut <marex@denx.de>
----
+Alright, so next I'm going to try to make TDMA entirely single-
+threaded and see if that fixes it.
 
-Changes in V3:
-	- Added Marek's tag
----
- drivers/char/hw_random/stm32-rng.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/char/hw_random/stm32-rng.c b/drivers/char/hw_random/stm32-rng.c
-index 279328902bf89af15b8ca9df9a061bf2a1ddcf55..5b4fb35bcb5cf7faa257286660b88c5840f0d07d 100644
---- a/drivers/char/hw_random/stm32-rng.c
-+++ b/drivers/char/hw_random/stm32-rng.c
-@@ -508,7 +508,7 @@ static const struct stm32_rng_data stm32mp13_rng_data = {
- 
- static const struct stm32_rng_data stm32_rng_data = {
- 	.has_cond_reset = false,
--	.max_clock_rate = 3000000,
-+	.max_clock_rate = 48000000,
- 	.nb_clock = 1,
- };
- 
-
+Thanks,
 -- 
-2.25.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
