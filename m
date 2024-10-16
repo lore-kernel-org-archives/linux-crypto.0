@@ -1,47 +1,56 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5534721E3A4
-	for <linux-crypto@vger.kernel.org>; Wed, 16 Oct 2024 05:36:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B84318C026;
+	Wed, 16 Oct 2024 05:38:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729056986; cv=none; b=jwgwYqfRZ8YcrsDUE6tq+z42+Mq5wlwBsu7cBhR+iRH2eaL29bjUr698mf4AknFYNm+jF1rsAFAFja4QUlR2EUNwQK/GdqCy8atvEbPSqQw18/GWl8rUDYT0eTLZikW1dIArCuvDP8u3289/UKWMBy2tsPlHf2dcVb8nSEj10vs=
+	t=1729057088; cv=none; b=TQQsVaVdc+cCvS1C/LvTF86QJ7hCzfNnKorWwrEzP+BQB7md+IXN/jr+hf4wqXIbe1YP+CK1M7nixJTt20LDp3EqJYuizAWkqJIwh2vIcOEu3djOToAuvvb4yZbnAsaB6BZGuOaeHWK1gK5VvVR2uOkt+1JHPGiiQ2Q2z2M9LLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729056986; c=relaxed/simple;
-	bh=YAkcNuc7w+ud53HC8+sEVfFu0Bc9K3din0o/9iVdyAM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OVQXNq97ee4gDmqlVL4L8aI73vmbDDaiRVqeGQcBG/WX8ZqodDME9FkrNdjOO4rzqBKys3wbuWOmFLHaNh+Tb9xDgl+B4MaNSK+Vx0I0/D7Oro5Hh36jE0EWW0+ESWYpMThun3hpgqBUtMx2q4j+YTmFsQjLOYh0YoDHYQn/gMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=nRq8vJvp; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1729057088; c=relaxed/simple;
+	bh=Hxe61mAHxlkAQeFoMnrNm2digeS8SBoYNPLuYngb7fc=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H6oBu7YhTo6WDDOUedXSIbLiPwUO6HJ3cw3l8k4X8TnXwIYDJOTujrqvl6NPSyJm6gCCfzahFhmWFmZ0KgiJcAqIcs+eD9MowZO4d23A8b4XWcAGXcQa0RK7L4D9QalqDFveO+1k+/aAvk6upAmvRr33d3uMFX+2OAktpeVDIYg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=gmAPymUo; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="nRq8vJvp"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="gmAPymUo"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Subject:To:From:Date:Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=l6KocrtSzSeGXRmVSncMMl+FJxJparTDRq6szRJdFP8=; b=nRq8vJvpptuh2IStxLuT5Rv6e7
-	2n5lbe0wEMDWB+eCkPny0cVisHmNMikuTCc9s6036gv+v/SqhWmAHyyW+5ICovsDBRpZqiU8P+1p6
-	DL2btsrPBTKW+VEoLmU+qc0gUwAZeiiQdNwftoCFXzH3RauTRWmDMNP+M3TwvBaDmQiGlvlocII3g
-	kcwJBmU/WpGQgmzGXVQUPp/Uha5OEqAyqGvRI+s2uRw7domi8Ua9Lza8hwhedF3PLYE89a9zs21U6
-	XqJmXw9y6P/5RCeIcFefMyx5GeSpldOkSMRyumgxXIsToGH8MS/HwlFEqwNN9h1cyWq2HlSLjAGM7
-	yZShe4dw==;
+	bh=LEUMOUUfHvcGVlzJzuX6lug3Qy5DEcFG85wA77pcj/Q=; b=gmAPymUoB7wzAETPguk2Faq52B
+	ZQ9G5rH7qNUXbhetiZR95aYBZB+5Sip9+LIJXS8W9P9crnXx7Ys6/3Zt7tovNqpOkNyWmjG3P+nNN
+	GV721lpGaasuyxJON7GjFlwZ34jTV+euI4nQ0n44ecsIwcyiYrr9i3MThXWJI48f4pdmtcGIJueb6
+	ALWQ1SqpubZ2qVQDXrc8D6srl0e+N4AnVix76mEddDDyasb4IYHRiHYgp9xxf8G+P3T/K3w2i5EPs
+	1dnpF+4v/4Yb1//gY2GdysnQBgWUBZaFhmrf5bqmzM1PG1AEXN0KhjbkROw1vQQzYJZO8aWD+mY61
+	RGcBScCA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1t0wXm-009k1o-1I;
-	Wed, 16 Oct 2024 13:36:13 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 16 Oct 2024 13:36:12 +0800
-Date: Wed, 16 Oct 2024 13:36:12 +0800
+	id 1t0wZR-009k2L-2z;
+	Wed, 16 Oct 2024 13:37:56 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 16 Oct 2024 13:37:55 +0800
+Date: Wed, 16 Oct 2024 13:37:55 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Erhard Furtner <erhard_f@mailbox.org>
-Cc: linux-crypto@vger.kernel.org
-Subject: Re: WARNING: CPU: 1 PID: 81 at crypto/testmgr.c:5931
- alg_test+0x2a4/0x300 (Thinkpad T60, v6.12-rc2)
-Message-ID: <Zw9QzDg5StgUflMV@gondor.apana.org.au>
-References: <20241010013829.68da351d@yea>
- <20241015200850.6a1d0e2e@yea>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [GIT PULL] Crypto Fixes for 6.12
+Message-ID: <Zw9RM_jNu9vqp9T8@gondor.apana.org.au>
+References: <Y/MDmL02XYfSz8XX@gondor.apana.org.au>
+ <ZEYLC6QsKnqlEQzW@gondor.apana.org.au>
+ <ZJ0RSuWLwzikFr9r@gondor.apana.org.au>
+ <ZOxnTFhchkTvKpZV@gondor.apana.org.au>
+ <ZUNIBcBJ0VeZRmT9@gondor.apana.org.au>
+ <ZZ3F/Pp1pxkdqfiD@gondor.apana.org.au>
+ <ZbstBewmaIfrFocE@gondor.apana.org.au>
+ <ZgFIP3x1w294DIxQ@gondor.apana.org.au>
+ <ZkrC8u1NmwpldTOH@gondor.apana.org.au>
+ <ZvDbn6lSNdWG9P6f@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -50,59 +59,41 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241015200850.6a1d0e2e@yea>
+In-Reply-To: <ZvDbn6lSNdWG9P6f@gondor.apana.org.au>
 
-On Tue, Oct 15, 2024 at 08:08:50PM +0200, Erhard Furtner wrote:
->
-> v6.12-rc3 still affected. So I bisected the issue to the following commit:
-> 
->  # git bisect good
-> 5a72a244bac3e8663834d88bb0b4f9069203e5e0 is the first bad commit
-> commit 5a72a244bac3e8663834d88bb0b4f9069203e5e0
-> Author: Herbert Xu <herbert@gondor.apana.org.au>
-> Date:   Sat Aug 10 14:21:02 2024 +0800
-> 
->     crypto: rsa - Check MPI allocation errors
->     
->     Fixes: 6637e11e4ad2 ("crypto: rsa - allow only odd e and restrict value in FIPS mode")
->     Fixes: f145d411a67e ("crypto: rsa - implement Chinese Remainder Theorem for faster private key operation")
->     Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> 
->  crypto/rsa.c | 19 ++++++++++++-------
->  1 file changed, 12 insertions(+), 7 deletions(-)
-> 
-> 
-> Reverting 5a72a244bac3e8663834d88bb0b4f9069203e5e0 on top of v6.12-rc3 fixes the failure.
+Hi Linus:
 
-Thanks.
+The following changes since commit 44ac4625ea002deecd0c227336c95b724206c698:
 
-This patch should fix the problem and I'll push it into 6.12-rc.
+  crypto: powerpc/p10-aes-gcm - Disable CRYPTO_AES_GCM_P10 (2024-09-21 17:14:59 +0800)
 
-commit 6100da511bd21d3ccb0a350c429579e8995a830e
-Author: Qianqiang Liu <qianqiang.liu@163.com>
-Date:   Fri Sep 13 22:07:42 2024 +0800
+are available in the Git repository at:
 
-    crypto: lib/mpi - Fix an "Uninitialized scalar variable" issue
-    
-    The "err" variable may be returned without an initialized value.
-    
-    Fixes: 8e3a67f2de87 ("crypto: lib/mpi - Add error checks to extension")
-    Signed-off-by: Qianqiang Liu <qianqiang.liu@163.com>
-    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.12-p3 
 
-diff --git a/lib/crypto/mpi/mpi-mul.c b/lib/crypto/mpi/mpi-mul.c
-index 892a246216b9..7e6ff1ce3e9b 100644
---- a/lib/crypto/mpi/mpi-mul.c
-+++ b/lib/crypto/mpi/mpi-mul.c
-@@ -21,7 +21,7 @@ int mpi_mul(MPI w, MPI u, MPI v)
- 	int usign, vsign, sign_product;
- 	int assign_wp = 0;
- 	mpi_ptr_t tmp_limb = NULL;
--	int err;
-+	int err = 0;
- 
- 	if (u->nlimbs < v->nlimbs) {
- 		/* Swap U and V. */
+for you to fetch changes up to e845d2399a00f866f287e0cefbd4fc7d8ef0d2f7:
+
+  crypto: marvell/cesa - Disable hash algorithms (2024-10-10 17:03:35 +0800)
+
+----------------------------------------------------------------
+This push fixes the following issues:
+
+- Remove bogus ENOENT error messages.
+- Ensure algorithm is still alive before marking it as tested.
+- Disable buggy hash algorithms in marvell/cesa.
+----------------------------------------------------------------
+
+Herbert Xu (3):
+      crypto: api - Fix liveliness check in crypto_alg_tested
+      crypto: testmgr - Hide ENOENT errors better
+      crypto: marvell/cesa - Disable hash algorithms
+
+ crypto/algapi.c                    |  2 +-
+ crypto/testmgr.c                   | 23 +++++++++++------------
+ drivers/crypto/marvell/cesa/hash.c | 12 ++++++------
+ 3 files changed, 18 insertions(+), 19 deletions(-)
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
