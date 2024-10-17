@@ -1,113 +1,101 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 288081CACF7;
-	Thu, 17 Oct 2024 08:23:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 506631D2F50;
+	Thu, 17 Oct 2024 08:30:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.128
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729153440; cv=none; b=YYzLwPUBGebXunzpfbTJUqAT0dn1haWpVvY+0JV+08z+pThLe2bnqUJZX+4CU2R5Al1Ieq0XdKDlCO5MEj3If9HjXC4lA0IICL4g++FTX8o2+Id18ikjp2QqGVvQiIaB7e7elMnJ0Tg9KAofGcR6ThmV1uAeenMqkt5Gel7SQ3k=
+	t=1729153818; cv=none; b=bhXexonB0bwlqU+GdN7FiVecL9Ugo9Y9V6fCwgmU4YW7npwP7Q3NN6zF+x0fis71nAAiDEY2SUDZhxavrDXi351LFoLwU7LWcBgu0c0VeonX1j0fKYo2ok04iioOco/ma4+PIAh5VY3/W1lkMpqZdv73dIILDPskITeMqrCR0vU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729153440; c=relaxed/simple;
-	bh=XxftJ6oXiIU+iaP5bZcCAfnmm8FL2K3XipgdpZMiRoM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hxxhyeJPFILUBoCyYyS1Lesmpq5ychRxJVL4IjxF1eVKmigsQFxqRmzCgzz9EaujF+2zOkH6MomafJWhAlKeoFUngh99O6LxHd852HmHOuEw/Ha5rGMhz1QSQe71aGr5yp71FJ5hLjMLJ6vvfhrGsqEQytqkZPiJAlShVpWL9kU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nt+RPTHy; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1729153818; c=relaxed/simple;
+	bh=yJg2JVNB33Os0yyJl8xO8PgMosQlBHi77oLNAq6b4vo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SVYo+OXT+JwndMziBDRhqliKUwfzleGBLx6JZnwoCN585crKgaw5DQDXjDR67vapeTjnRPRGEgk7Dv5toKrSd+snZe3jcD+7iOLJ/stetcgdnIYdA1DYhzLXTrqvF9/XEH3d7hQiIpEYvaf88lqRgGeoq7zgNEd5kSrD41+w06w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=R5Q+V2+0; arc=none smtp.client-ip=54.254.200.128
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nt+RPTHy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 939ABC4CEC5;
-	Thu, 17 Oct 2024 08:23:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729153438;
-	bh=XxftJ6oXiIU+iaP5bZcCAfnmm8FL2K3XipgdpZMiRoM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Nt+RPTHyHLSlO6M9XPChgoE0D4TxM75Hb17lucuM7RgMTy23r21+9tA1qryCPxdQc
-	 nn+Ec5aQ5rTe+MBoBwXEV7nIZ/17yCVBb4ZZJpWWGKWOTiTfC8eKJXmn7v9YNDtszB
-	 oHs4K4LDe6gQNHnTP/Omw3GOyvzoNh9YExmskz3wUbQZwCc5CRMGVjgsL4OjVPw16l
-	 Gu9luRuJ7fK89Zv/xC44DKStEeT6moFt0WkYwVY3dYZQX98EuzFGWTqSBAysIcANbJ
-	 nBCBT7DOKyXSZm85nBZm1ctXKG8D0p4iYTd5VExcHKEsLSdxmIK6UtN87HuiAHemZ5
-	 CtksBvd2pXFdQ==
-Date: Thu, 17 Oct 2024 10:23:54 +0200
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Antoine Tenart <atenart@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
-	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>, 
-	Boqun Feng <boqun.feng@gmail.com>, Richard van Schagen <vschagen@icloud.com>, 
-	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH v2 2/3] dt-bindings: crypto: Add Inside Secure
- SafeXcel EIP-93 crypto engine
-Message-ID: <dg346xguo5cjx6yotnrdpjyp7n7wwpwnrjvybrrbocekhltpmg@s2j734wd2rnf>
-References: <20241017004335.27471-1-ansuelsmth@gmail.com>
- <20241017004335.27471-2-ansuelsmth@gmail.com>
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="R5Q+V2+0"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1729153811;
+	bh=cSOXVSyYH+jeolxzM5y7BNDn9k3suxdDUAyCyBx02c0=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=R5Q+V2+0rmlt3tXPa9Snpx5dPwxQUcV7W2ThOqtoZAzZmHXO7Lxo3aGrW/KbjiDYw
+	 FFJJTM/Wr8wkTiJSo14lP41s4vHdAtY574+63h4HnQyUL6qcgi+jrTHurXzKQtLI/f
+	 +ihnM1+9MamQ2dM3BB+Fs/krv1/H9lV3Bo43SLTs=
+X-QQ-mid: bizesmtpsz12t1729153794tlvgso
+X-QQ-Originating-IP: FSvmCbS+hbcFjhZ6H3PKpX84FlEWti0QDze5a2poY8U=
+Received: from localhost.localdomain ( [113.57.152.160])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Thu, 17 Oct 2024 16:29:52 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 10686107487593216358
+From: WangYuli <wangyuli@uniontech.com>
+To: giovanni.cabiddu@intel.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	jie.wang@intel.com,
+	wangyuli@uniontech.com,
+	dong.xie@intel.com
+Cc: qat-linux@intel.com,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bo.cui@intel.com,
+	bruce.w.allan@intel.com,
+	karen.xiang@intel.com,
+	pingchaox.yang@intel.com
+Subject: [PATCH] crypto: qat - Fix typo "accelaration"
+Date: Thu, 17 Oct 2024 16:29:46 +0800
+Message-ID: <1D2B5A3330DAD82E+20241017082946.314361-1-wangyuli@uniontech.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241017004335.27471-2-ansuelsmth@gmail.com>
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpsz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: NN74kCj3sZL0E+EZ0M2PIlLtWb1I+9zUHnmeieC+VIYbR5SQFpB1IJin
+	dFercEK9OmKxIk+oDdNQ5vaI229hKvvEv+MokX9K8ZvH+Qpua2tQQHaekm4E7bGQ+PgcZM3
+	vV8E6Arl0cVhhqATPA9p2yW6a3jM3l7XeJHBLXxSgWFiyNwfiENWSA8Ojkq/LcTkmQxMFWE
+	ZwfcVW8MfGghCrK+8aB8c8vG4J2Bo4hqN8YCCNaycOAUPn0PLxPJdN2zJ9VFtLcy65E8CYa
+	QKN6dxfFsXheSnY08Soy3x5i/4wK3jW1kRWN/mSbUFwqLhlufNXzhM0RLk5XFr4WAttISz1
+	WNRan8IQg31m+SHx3otUL98xbu2n4M47lLtyhLKVxdFdFVEDyeuV62SpT59mAn/UublG+VK
+	Ykb3iTW6FH00+idNWzP0+AgpETsbSOlPmj/TIaBOQUrr55JX6d988NIocX6gxSLP6xd+SYd
+	OUfeaKaerQc9a9/o9/sP6TLk48K54lWBJEiDBJ4dRERr/v/sP7K/k7aVb11rZCdcNiuVnv0
+	Y/F9jsHnBoC+FehUUtI3RtNYTJENriJMO8/WuIj1ErcrXNL2MW8O0S+Qz01IwPbYi4mcDfi
+	iTzy8tSrQ5UyjsaD6aq3b8iTu4FDGusb+nEIwTHXr0qitiBeQaI3mo3pPj6eG6Gl7HRe4z7
+	4rjzVQf42IoLPWdhX2Xirc1/BRRMUxegmiRnFoGT38JIEY13QSP0qL6FCBFS07WfiSOZXR/
+	MJHixtDs7pFyeDeQmWFAkc4fMIeV5WI2xcOUWj5FxDXcMqHwksjJ/TfgJP3SA9w5wiEoHxV
+	V1HHPS6ikshl/n0AC/znZ9GgUPjas3O+R6+lhxv3WYizCFdi6EmMFzfkppTxkg1aJlfq1jj
+	LUZHTNLndLN6X5NxoysgYH3DiJfkrZ7RmLgViYqbDM/P6smr9MU6aGb6wRZ0IEaqZSK8y15
+	9+cVZbUM55EWanovESNNg9wzSW8PVqYZlFsNThXmCDZeNXinRybaWGsa8m+sZSGGNE5U=
+X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
+X-QQ-RECHKSPAM: 0
 
-On Thu, Oct 17, 2024 at 02:43:18AM +0200, Christian Marangi wrote:
- +
-> +description: |
-> +  The Inside Secure SafeXcel EIP-93 is a cryptographic engine IP block
-> +  integrated in varios devices with very different and generic name from
-> +  PKTE to simply vendor+EIP93. The real IP under the hood is actually
-> +  developed by Inside Secure and given to license to vendors.
-> +
-> +  The IP block is sold with different model based on what feature are
-> +  needed and are identified with the final letter. Each letter correspond
-> +  to a specific set of feature and multiple letter reflect the sum of the
-> +  feature set.
+There is a spelling mistake of 'accelaration' in comments which
+should be 'acceleration'.
 
-You write it is licensed to vendors, so are you sure these could be
-used alone, without vendor customizations/hookups etc? I think you
-should have a dedicated, SoC-specific compatible in the front. I am not
-sure if this was discussed already, though.
-> +
-> +  EIP-93 models:
-> +    - EIP-93i: (basic) DES/Triple DES, AES, PRNG, IPsec ESP, SRTP, SHA1
-> +    - EIP-93ie: i + SHA224/256, AES-192/256
-> +    - EIP-93is: i + SSL/DTLS/DTLS, MD5, ARC4
-> +    - EIP-93ies: i + e + s
-> +    - EIP-93iw: i + AES-XCB-MAC, AES-CCM
-> +
-> +properties:
-> +  compatible:
-> +    enum:
-> +      - inside-secure,safexcel-eip93i
-> +      - inside-secure,safexcel-eip93ie
-> +      - inside-secure,safexcel-eip93is
-> +      - inside-secure,safexcel-eip93ies
-> +      - inside-secure,safexcel-eip93iw
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  interrupts:
-> +    maxItems: 1
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +  - interrupts
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  - |
-> +    #include <dt-bindings/interrupt-controller/arm-gic.h>
-> +
-> +    crypto@1e004000 {
-> +      compatible = "inside-secure,safexcel-eip93ies";
-> +      reg = <0x1fb70000 0x1000>;
+Signed-off-by: WangYuli <wangyuli@uniontech.com>
+---
+ drivers/crypto/intel/qat/qat_common/qat_hal.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Looks like not matching unit address.
-
-Best regards,
-Krzysztof
+diff --git a/drivers/crypto/intel/qat/qat_common/qat_hal.c b/drivers/crypto/intel/qat/qat_common/qat_hal.c
+index 317cafa9d11f..ef8a9cf74f0c 100644
+--- a/drivers/crypto/intel/qat/qat_common/qat_hal.c
++++ b/drivers/crypto/intel/qat/qat_common/qat_hal.c
+@@ -163,7 +163,7 @@ int qat_hal_set_ae_ctx_mode(struct icp_qat_fw_loader_handle *handle,
+ 		return -EINVAL;
+ 	}
+ 
+-	/* Sets the accelaration engine context mode to either four or eight */
++	/* Sets the acceleration engine context mode to either four or eight */
+ 	csr = qat_hal_rd_ae_csr(handle, ae, CTX_ENABLES);
+ 	csr = IGNORE_W1C_MASK & csr;
+ 	new_csr = (mode == 4) ?
+-- 
+2.45.2
 
