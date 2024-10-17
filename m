@@ -1,219 +1,202 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918E5227387;
-	Thu, 17 Oct 2024 19:27:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729193270; cv=none; b=h0s93Ts+asn9Lr/dONqeWZzrSkJrsPzuawck4QpTC6/oYlOrubivGdj+dUWxrOylaRDOdSjbvxpKXBYL15rqn1MoxOhY1/M1frGnO5RLN97h10VbJMOJ4o8AiDYafaVq0qTkUFy6lXjK2q536ErXticwGUl6/EBzJf+DR9aLwOI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729193270; c=relaxed/simple;
-	bh=mnV5yf+yYTKcaaxgBfshBpP5wV2UjJUhow7iEdtj22I=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=YZ+Vx1ulc+/AtPTs7hPaweYHxMHfx+JnmyaAO3CgGAluiuuFrc7n/sxurPnr1LtgL6jiSExSTsWmB78rZ/XpQT9bRcZSFL8Y56nvwY0vYa1xJv401ZANbm4tBhGK/0k5/6MJDUBn1qF+sW3imVko9HVDA1NJ+FQlw06tekVs8X4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=chi2u6P7; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2B4F33997;
+	Thu, 17 Oct 2024 20:08:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1729195709; cv=fail; b=dGWJSByGduDRVunoshu1ao/gT/Lkquxpj+m/UjtNpgPV5o+gJrqDd29yhlf0FHuRCYpg1c7JW0Y8n5v8IJNHTb8dTpeO9vca7VW3q3TaS6UfLJBSjfxODpICjl41O/DO++25o2x4YRexJV/LvElmFawrX6rCyiLClTnf/d+GWaU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1729195709; c=relaxed/simple;
+	bh=PJdZ6MAFeKqlf9/wkqj7ohvFhcz67BE34e49K/8nesY=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=Hs5nI+nKN6rzyWZe/tsvAe02WdnldNKCo6d5X8+HQUQMeijR4nJDOWc4ibpOnyBJiWpfKO1Gp0QWXqsDzIVZQMZ4onSmfom5ycK/CAIFb4LagZWfh5Z3SU1U/UYO8G5I7Sf+pdkoHQRy4CG2VwE8Qu3x6rpxTWwJRmr36hCdwi4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gqD2K2EJ; arc=fail smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="chi2u6P7"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75222C4CED2;
-	Thu, 17 Oct 2024 19:27:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729193270;
-	bh=mnV5yf+yYTKcaaxgBfshBpP5wV2UjJUhow7iEdtj22I=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=chi2u6P7l6DcY8p5mmatPeZyvBKFugUZrHAZ22Mk7O7ZuKbozy72lJtyRhVKWkK/+
-	 m9uTgX5Ga9s87w8Rn3fePCSITtOmaEKvJUzHkFzqIOlHJLbJLfkwFyf7N7yIkIb0AG
-	 tLLY4eUWq85k8PeGOAzLbqQCLxMGZxB5ZyFnqHfJ1j4+JFDm3qd8tpEFh4PYeeFSPI
-	 lQW4UHq8hTIuTh6iRFZNsDK8U40wbfu6dSuROBrjoQo3P/+Z3Hcmfx1u5ei9ceZ9Jm
-	 GhgG6AUu4hf748wjqSziK5s9qtEf7UWtihHplZttX8lKRWko4NLRwu4mk3T57U7KWu
-	 SbZnfJSalKpVA==
-Message-ID: <d5be6d8cef1033d1f4b99dc6d15076638fa598ad.camel@kernel.org>
-Subject: Re: [RFC PATCH v3 06/13] clavis: Populate clavis keyring acl with
- kernel module signature
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: Eric Snowberg <eric.snowberg@oracle.com>, 
-	linux-security-module@vger.kernel.org
-Cc: dhowells@redhat.com, dwmw2@infradead.org, herbert@gondor.apana.org.au, 
- davem@davemloft.net, ardb@kernel.org, paul@paul-moore.com,
- jmorris@namei.org,  serge@hallyn.com, zohar@linux.ibm.com,
- roberto.sassu@huawei.com,  dmitry.kasatkin@gmail.com, mic@digikod.net,
- casey@schaufler-ca.com,  stefanb@linux.ibm.com, ebiggers@kernel.org,
- rdunlap@infradead.org,  linux-kernel@vger.kernel.org,
- keyrings@vger.kernel.org,  linux-crypto@vger.kernel.org,
- linux-efi@vger.kernel.org,  linux-integrity@vger.kernel.org
-Date: Thu, 17 Oct 2024 22:27:45 +0300
-In-Reply-To: <20241017155516.2582369-7-eric.snowberg@oracle.com>
-References: <20241017155516.2582369-1-eric.snowberg@oracle.com>
-	 <20241017155516.2582369-7-eric.snowberg@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gqD2K2EJ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1729195704; x=1760731704;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=PJdZ6MAFeKqlf9/wkqj7ohvFhcz67BE34e49K/8nesY=;
+  b=gqD2K2EJf5GqUoeOQsRpggtItYwDFlZzt6JsgItMkZ/hvcyX1lLrzNR6
+   TAabz7ccSCqkVWK2uauZumfClX5j4AHSyUWESiwMlDVSDJ1z7j7VgrF0d
+   8DeRKjIE+88u08QOTUt3h25CpQzuKy3GLr0TRCc4LjmHczSRxfWJSB5Ce
+   vJhWzjNWhZT6hJG8Ckh3+c1n6466ngqOn1OdzMJ4BHjGOv4rTjjvOQ1FV
+   VeY5/Y5Hm647Kd5+66weuBJG4gX5LAURzpxD+mxLqwK5ZmAek0RntWSot
+   RlEo8/F87E4qTmLAKviwoLWv8YJ2TcL+L1un/AcNm/6/H79AFe6tGmmuy
+   g==;
+X-CSE-ConnectionGUID: Xt+I89mgQPaNrqW+rS4ITQ==
+X-CSE-MsgGUID: TqlF25vgS76YM2fqnjSe2g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="28857860"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="28857860"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2024 13:08:24 -0700
+X-CSE-ConnectionGUID: uenyo32rQM284VyySjLUTQ==
+X-CSE-MsgGUID: 1MCqi7ZhSquXtD9LvocWGA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,211,1725346800"; 
+   d="scan'208";a="83214726"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmviesa005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 17 Oct 2024 13:08:23 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Thu, 17 Oct 2024 13:08:22 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Thu, 17 Oct 2024 13:08:22 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Thu, 17 Oct 2024 13:08:22 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 17 Oct 2024 13:08:21 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=lh56LwspOMhnJ3pi9iFZrHcESIDIpql1I9bzZkzPg787jFN+GeMdLxo8Ag7iuu4x68zrAvOY7GH9k6UYlo1725K84Fd9uxzDKKzlTzBSSDzFQ2QFCgPL1SbUVIdZA3Ix1+BkYxZFs2KS4AHG6zKPy9cVmwzW5zP+jKvck96cB1Ri6iyqt7NB6NO4YHfxjItELpVHSWM7B6tIaRg4apjNhNNFu4vjZ/tOE9PqGaNQamhJYTE5w1JY4H7AOxg8i1MTWQgtZsOLrH5n3tfxCwQ8s81Ow8bfrh4M0jJTJolG92INo2D0k0fI+5ov8/F2tqHZny0D8KRlNYSxTMfyFpOZsw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WI1u5PcQMawnx4P0mMkniX120R4MHu9K9f87PK27OXI=;
+ b=tq7p9Tdh80sgJFdnnjao8mQ4qeUZGwg+vh2ykQbR57kPNZN/CsOGpT61XLZJqR3qGKlByQpxLR07wuYClNOzuqK/+yWO4ehe146Ti4QXdLFhtmRGZtBJeY26qrs2eQmq2RUXUlG5uq0kEZzqMiXcWvrrGeDTRqYFKxxfCZBiYOZ3w2Jlh/s/YMHQvaS+Lj3r+SbV86ei8uY+hV7PCI4xgs3xbPYS1crVRLm9NtNxRqABu8FLJap/wtQKQv642tlONt5JF3yTmpFUucKE4+6Onlx8UQmzp79kPID9yhm4c671H5MmRAQ7Lls+XAJpZWgFTQwiT4zgBYVEt+ashR+caQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CY5PR11MB6366.namprd11.prod.outlook.com (2603:10b6:930:3a::8)
+ by MN0PR11MB5961.namprd11.prod.outlook.com (2603:10b6:208:381::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8048.26; Thu, 17 Oct
+ 2024 20:08:17 +0000
+Received: from CY5PR11MB6366.namprd11.prod.outlook.com
+ ([fe80::6826:6928:9e6:d778]) by CY5PR11MB6366.namprd11.prod.outlook.com
+ ([fe80::6826:6928:9e6:d778%5]) with mapi id 15.20.8069.016; Thu, 17 Oct 2024
+ 20:08:17 +0000
+Date: Thu, 17 Oct 2024 21:08:11 +0100
+From: "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+CC: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
+	<davem@davemloft.net>, <linux-kernel@vger.kernel.org>,
+	<kernel-janitors@vger.kernel.org>, <qat-linux@intel.com>,
+	<linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH] crypto: qat - Constify struct pm_status_row
+Message-ID: <ZxFuq6itT2KylMQg@gcabiddu-mobl.ger.corp.intel.com>
+References: <ab26d264baec1f3233e832c0c2fa723e3be21a04.1728935687.git.christophe.jaillet@wanadoo.fr>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <ab26d264baec1f3233e832c0c2fa723e3be21a04.1728935687.git.christophe.jaillet@wanadoo.fr>
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
+ Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+X-ClientProxiedBy: MI1P293CA0016.ITAP293.PROD.OUTLOOK.COM (2603:10a6:290:3::8)
+ To CY5PR11MB6366.namprd11.prod.outlook.com (2603:10b6:930:3a::8)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY5PR11MB6366:EE_|MN0PR11MB5961:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2c45e5bf-ea7b-4de1-0020-08dceee770a5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?m6yktQOp8rk3qDOKdP+CY6TJxSx4lu+egWPhTUZxft2cZDA/AMZ8Qf158S0o?=
+ =?us-ascii?Q?E3MCWLnRad5L8RbCYzK8L8vf7dhzpMv3AZMC20L7k6EXiVq1rLUw26vRscZl?=
+ =?us-ascii?Q?32Rn2cwj3uCLDUYMcN558p8kEAiQ3mctG2zxM6oEn3wzB1M2hhmFlJWF9pwH?=
+ =?us-ascii?Q?CwqRb/gbFMv/FkO1H+v8ZWwRbGryqlvByEDLn8UdlZI3fNnTzu7OtCb3vW1u?=
+ =?us-ascii?Q?Aq3VCSfzr+IEsWWghsupmwtZK82SAQqUL7neF2xlYs37a4+8AM35bkVqrkl9?=
+ =?us-ascii?Q?NWl421cagkqfn92NjJjoFUSdpkEheRV7t7FAeg3U7sxTbu6z+kfG9npW9Y9P?=
+ =?us-ascii?Q?RcwuydvJBgTPPJI/nWFQBsDq+p+K2MFIC3FYGcxkx47J9JKGAcOTQhTiNOAo?=
+ =?us-ascii?Q?0ruUkFbm0dWciy2RqIj+gPZEsGydoV+UilehVY+YpRjJKvbxNyKdy2Pe1uF4?=
+ =?us-ascii?Q?dmQwkw78VMFGNda/Dv3Lt71ejY1IPkkL4QaK8giP5gsxNQcm0VKTurVyaNE6?=
+ =?us-ascii?Q?M4TuQJ3MPPBa3h/cVxJDVnTtpZ62fu9rxxbqU6S8E9RijBv6Vk+gBYJLy65d?=
+ =?us-ascii?Q?1mFnz5dN7pqAkZCQcqtRy6yLO2K5v+tFIOwZVOMp8nhArgBnI+uFd0JmJzqQ?=
+ =?us-ascii?Q?5kBw+CzmAZU8rpYNGv5xO+mV3ccWrp4aoJwMET3btHfVvDHaaII7w3Nwp4vy?=
+ =?us-ascii?Q?kMhO0Tp++mEJ4M/QfQK9eUsz7J+I3Z7VUonXCWoSsbvY3TBpdxn9Ne4/A5G8?=
+ =?us-ascii?Q?eapl52zPvmI5OIt+vletfEY9jTjkFcetkLyC0nf0WnHsnbMBGcKf3g0f0qxb?=
+ =?us-ascii?Q?EfuD/01KrLVo/4nHaGVjKvB+AQhcTLVwWr/0EsGfobjS6pWq3AKSr8WJ9heL?=
+ =?us-ascii?Q?f2ERJ8KJoW5D11U3KkqRk2ssPAY1qQYwx4zzrYvuiTQCnBEpGHtlbXoG6Zy6?=
+ =?us-ascii?Q?O0LEg2whJ0S2Zs6388bGcgvPlTx3NXR9bz4ZCWelwEkq8fMW1Bt8kdf1cM3w?=
+ =?us-ascii?Q?b3NSYZL/BcWwV1nGoDTq7t1j7aV/YVZMrduaMbEnzSJLpgg12lLgCh85ed9Y?=
+ =?us-ascii?Q?4ZzxQMyUBQU35J0TTu7OrRBMW6KME90PCibVNac4otp/3y3KTckWqF4qLKbM?=
+ =?us-ascii?Q?jF+lhvMY+Kl0CldjoOVsDDkd2C1s2U1IyLq3ghKvq6tt+A27eGLb9OkdwOyy?=
+ =?us-ascii?Q?SfS/B3E3oTkQpSBGHcHSpvDrmfOe1ger+vBwOLPwostKyy5IdbaMSknqaPbg?=
+ =?us-ascii?Q?u41VDy2g90Heojky/yHHkaaLGKqdydhAyHzq1INJaWrB+CPrZQN60TGN5zcY?=
+ =?us-ascii?Q?FQGwjG71mrTD/5elPSTi/zC+?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6366.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?iU3wk7yIDtgTBGPcxxviGf5EFMgN9sH1FByQOsk2T66OyqqgVyTqGr79wPdy?=
+ =?us-ascii?Q?7ZBUZd2c8AwBXnH0R8cqEREyB9xyS/MWLhepKiv/nKPNzraOXE/qNxOPofS2?=
+ =?us-ascii?Q?kZ38geixeRfQY1rtcrO3emaDAG6ja0DvzUGO6znZl0HuGkNSZr22ZhVTnv5G?=
+ =?us-ascii?Q?OuGIC1ID5sZvmTfHrohMVsbjsgsi1HmTWck4LDnTu2/ork5+FyHTUoX/ojLX?=
+ =?us-ascii?Q?WKgvR0l5qKrAPJQIBKU70scvgPZ3TEDtEcpLm/mnhXWe2quZ4pF4VhDyyg1Z?=
+ =?us-ascii?Q?0ce8PmOdArnTtww8bleV3OwVqvGz5PzT6QuodQ5Biye0IFjDfui2QsWYym62?=
+ =?us-ascii?Q?uNt4QQdeHEIsFuK4H4SJLWsfS8k5jFUK9A4tdZOCmge2ax3WuyFsiew5piTc?=
+ =?us-ascii?Q?Rt3oLArENCxA6k9Ex/6FYyIlwbsBArlS9oSfIrluN7FAuZxEVbjedI6mABlQ?=
+ =?us-ascii?Q?U3OMlmaX01yEeCJ6BmdG4j+yCiBctXeOMGBYIbR8dzJagzPHGBZM7u0R7wLR?=
+ =?us-ascii?Q?kOma4GrjrbPZExA9yQ4nZEIqNfsQWROv9C+SYtGggSX0ynY3HAocn/X8aORY?=
+ =?us-ascii?Q?glok5yHN2McQdwhMGjulqZisNaVmZ4JcppK/dVRRygBqAZM4T6FVCsLxH2TY?=
+ =?us-ascii?Q?c3v73aA27AP7bl47o4aO2l8FLbs12jChELHSm30Y4Sa+fyRcXLnXZ4YPd6KX?=
+ =?us-ascii?Q?tdZj1nGXXVvAmYQbnB77JhIAr1Z8d88Z1kRaOcMWTxA0cSR8xqjFQzs/N4wA?=
+ =?us-ascii?Q?BZeQTZgRxLVflPevjlU2u3a/vzo+h7tyFgNhfBZ8MQsLESfopF5rjZf28FlR?=
+ =?us-ascii?Q?vNXXq+P0ROFAYgv2f8s+d9h2Lx+Oc5kV5OhIE9XV3GtkS3ONh1fse48u2Dwt?=
+ =?us-ascii?Q?V7i3JU21uHsbB8Wy3GEnPYZxqGtTH03NftC0NUdGgY6iqB4oZL1TyRXht8hi?=
+ =?us-ascii?Q?fEriutnypsIG8t6fQFeP5P/OYh19LYoWVv7VC0/zrfVk/nGOQACIzKj8H8AZ?=
+ =?us-ascii?Q?Ccp5ks37i82X2UDrpsGl8wrvdsKW8qZXEQyYnzL3Z+L5j29VXkHq0b2pyNUN?=
+ =?us-ascii?Q?Uq15nF92jMRtnoUs7hZmDitFI2GXhHFTFceti/vanYXtoGUkzWzhkhonNNac?=
+ =?us-ascii?Q?7nBB6XltDh5OnvJO7de5qJNs/Sgt0GMCtvPsUQcOyjwaj4IvBsFLT46BxHAY?=
+ =?us-ascii?Q?KtD5jr3CkBHYxcqG98MTyQVnwjlu5CVLpglHBKrIB4iGP2LiaitRS5cEAtdo?=
+ =?us-ascii?Q?XKJEHr22RWxZlGRAf+MqmkDHe4YxKAXpNfKdb/BBRq/6BFTZhLW+3QEC7zwZ?=
+ =?us-ascii?Q?XZyfJgO7KZEhqix9FCv+fY9hFQSwdnATiOAjA1O9bp3hLoGlbo9G3uQ3Sy3t?=
+ =?us-ascii?Q?Sj8SF+6cKRhCA/zvB8aSUN2ZGKs6uZkF0CoItGBXBwaShxGCQx4s0tCtGRxL?=
+ =?us-ascii?Q?4ObD9va1MEHKUi6ZHuUff2nvo/cpgqO+hMR/62Q+hha3IoCpvdgNiZDFDynf?=
+ =?us-ascii?Q?Bq7uAaWdXPiov7/sZLVoGlUKC0ONqwcLlnI/suKZ6pMRCB1zSv3wH/24xYnR?=
+ =?us-ascii?Q?Nem5xuCEdNfE6OvxTl0yLZR8QehkOhCUardrJktwp/1ZWuj9wn+pOdpoLhkP?=
+ =?us-ascii?Q?tA=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2c45e5bf-ea7b-4de1-0020-08dceee770a5
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6366.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Oct 2024 20:08:17.5481
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9lQfwjuT2SUbjTPkrMWINEPL9J5EL0MmiwleseQY4GyGKu14iE+X29U4D/tuX3ba6q1bE/aocxg87v5gxyuYtSBVDe516Yh6QpsLlTFOga8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR11MB5961
+X-OriginatorOrg: intel.com
 
-On Thu, 2024-10-17 at 09:55 -0600, Eric Snowberg wrote:
-> If the kernel is built with CONFIG_MODULE_SIG_KEY, get the subject
-> key identifier and add an ACL for it within the .clavis keyring.
->=20
-> Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
+On Mon, Oct 14, 2024 at 09:55:17PM +0200, Christophe JAILLET wrote:
+> 'struct pm_status_row' are not modified in this driver.
+> 
+> Constifying this structure moves some data to a read-only section, so
+> increases overall security.
+> 
+> Update the prototype of some functions accordingly.
+> 
+> On a x86_64, with allmodconfig, as an example:
+> Before:
+> ======
+>    text	   data	    bss	    dec	    hex	filename
+>    4400	   1059	      0	   5459	   1553	drivers/crypto/intel/qat/qat_common/adf_gen4_pm_debugfs.o
+> 
+> After:
+> =====
+>    text	   data	    bss	    dec	    hex	filename
+>    5216	    243	      0	   5459	   1553	drivers/crypto/intel/qat/qat_common/adf_gen4_pm_debugfs.o
+> 
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Acked-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 
-Super sound splits! Nice to review, have to give credit on this
-:-)
+Thanks,
 
-> ---
-> =C2=A0certs/.gitignore=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 1 +
-> =C2=A0certs/Makefile=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 20 ++++++++++++=
-++++++++
-> =C2=A0certs/clavis_module_acl.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
- |=C2=A0 7 +++++++
-> =C2=A0security/clavis/clavis.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 |=C2=A0 9 +++++++++
-> =C2=A0security/clavis/clavis_keyring.c | 27 +++++++++++++++++++++++++++
-> =C2=A05 files changed, 64 insertions(+)
-> =C2=A0create mode 100644 certs/clavis_module_acl.c
->=20
-> diff --git a/certs/.gitignore b/certs/.gitignore
-> index cec5465f31c1..dc99ae5a2585 100644
-> --- a/certs/.gitignore
-> +++ b/certs/.gitignore
-> @@ -3,3 +3,4 @@
-> =C2=A0/extract-cert
-> =C2=A0/x509_certificate_list
-> =C2=A0/x509_revocation_list
-> +/module_acl
-> diff --git a/certs/Makefile b/certs/Makefile
-> index f6fa4d8d75e0..f2555e5296f5 100644
-> --- a/certs/Makefile
-> +++ b/certs/Makefile
-> @@ -6,6 +6,7 @@
-> =C2=A0obj-$(CONFIG_SYSTEM_TRUSTED_KEYRING) +=3D system_keyring.o
-> system_certificates.o
-> =C2=A0obj-$(CONFIG_SYSTEM_BLACKLIST_KEYRING) +=3D blacklist.o
-> blacklist_hashes.o
-> =C2=A0obj-$(CONFIG_SYSTEM_REVOCATION_LIST) +=3D revocation_certificates.o
-> +obj-$(CONFIG_SECURITY_CLAVIS) +=3D clavis_module_acl.o
-> =C2=A0
-> =C2=A0$(obj)/blacklist_hashes.o: $(obj)/blacklist_hash_list
-> =C2=A0CFLAGS_blacklist_hashes.o :=3D -I $(obj)
-> @@ -75,6 +76,25 @@ $(obj)/signing_key.x509: $(filter-out
-> $(PKCS11_URI),$(CONFIG_MODULE_SIG_KEY)) $(
-> =C2=A0
-> =C2=A0targets +=3D signing_key.x509
-> =C2=A0
-> +ifeq ($(CONFIG_MODULE_SIG_KEY),)
-> +quiet_cmd_make_module_acl =3D GEN=C2=A0=C2=A0 $@
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cmd_make_module_acl =3D \
-> +	echo > $@
-> +else
-> +quiet_cmd_make_module_acl =3D GEN=C2=A0=C2=A0 $@
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 cmd_make_module_acl =3D \
-> +	openssl x509 -in $< -inform der -ext subjectKeyIdentifier=C2=A0 -
-> nocert | \
-> +	tail -n +2 | cut -f2 -d '=3D'| tr -d ':' | tr '[:upper:]'
-> '[:lower:]' | \
-> +	sed 's/^[ \t]*//; s/.*/"00:&",/' > $@
-> +endif
-> +
-> +$(obj)/module_acl: $(obj)/signing_key.x509 FORCE
-> +		$(call if_changed,make_module_acl)
-> +
-> +$(obj)/clavis_module_acl.o: $(obj)/module_acl
-> +
-> +targets +=3D module_acl
-> +
-> =C2=A0$(obj)/revocation_certificates.o: $(obj)/x509_revocation_list
-> =C2=A0
-> =C2=A0$(obj)/x509_revocation_list: $(CONFIG_SYSTEM_REVOCATION_KEYS)
-> $(obj)/extract-cert FORCE
-> diff --git a/certs/clavis_module_acl.c b/certs/clavis_module_acl.c
-> new file mode 100644
-> index 000000000000..fc2f694c48f9
-> --- /dev/null
-> +++ b/certs/clavis_module_acl.c
-> @@ -0,0 +1,7 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +#include <linux/kernel.h>
-> +
-> +const char __initconst *const clavis_module_acl[] =3D {
-> +#include "module_acl"
-> +	NULL
-> +};
-> diff --git a/security/clavis/clavis.h b/security/clavis/clavis.h
-> index 7b55a6050440..92f77a1939ad 100644
-> --- a/security/clavis/clavis.h
-> +++ b/security/clavis/clavis.h
-> @@ -11,4 +11,13 @@ struct asymmetric_setup_kid {
-> =C2=A0	struct asymmetric_key_id id;
-> =C2=A0	unsigned char data[CLAVIS_BIN_KID_MAX];
-> =C2=A0};
-> +
-> +#ifndef CONFIG_SYSTEM_TRUSTED_KEYRING
-> +const char __initconst *const clavis_module_acl[] =3D {
-> +	 NULL
-> +};
-> +#else
-> +extern const char __initconst *const clavis_module_acl[];
-> +#endif
-> +
-> =C2=A0#endif /* _SECURITY_CLAVIS_H_ */
-> diff --git a/security/clavis/clavis_keyring.c
-> b/security/clavis/clavis_keyring.c
-> index 00163e7f0fe9..2a18d0e77189 100644
-> --- a/security/clavis/clavis_keyring.c
-> +++ b/security/clavis/clavis_keyring.c
-> @@ -259,6 +259,31 @@ static struct key_restriction
-> *clavis_restriction_alloc(key_restrict_link_func_t
-> =C2=A0	return restriction;
-> =C2=A0}
-> =C2=A0
-> +static void clavis_add_acl(const char *const *skid_list, struct key
-> *keyring)
-> +{
-> +	const char *const *acl;
-> +	key_ref_t key;
-> +
-> +	for (acl =3D skid_list; *acl; acl++) {
-> +		key =3D key_create(make_key_ref(keyring, true),
-> +				 "clavis_key_acl",
-> +				=C2=A0 *acl,
-> +				=C2=A0 NULL,
-> +				=C2=A0 0,
-> +				=C2=A0 KEY_POS_SEARCH | KEY_POS_VIEW |
-> KEY_USR_SEARCH | KEY_USR_VIEW,
-> +				=C2=A0 KEY_ALLOC_NOT_IN_QUOTA |
-> KEY_ALLOC_BUILT_IN |
-> +				=C2=A0 KEY_ALLOC_BYPASS_RESTRICTION);
-> +		if (IS_ERR(key)) {
-> +			if (PTR_ERR(key) =3D=3D -EEXIST)
-> +				pr_info("Duplicate clavis_key_acl
-> %s\n", *acl);
-> +			else
-> +				pr_info("Problem with clavis_key_acl
-> %s: %pe\n", *acl, key);
-> +		} else {
-> +			pr_info("Added clavis_key_acl %s\n", *acl);
-> +		}
-> +	}
-> +}
-> +
-> =C2=A0static int __init clavis_keyring_init(void)
-> =C2=A0{
-> =C2=A0	struct key_restriction *restriction;
-> @@ -274,6 +299,8 @@ static int __init clavis_keyring_init(void)
-> =C2=A0	if (IS_ERR(clavis_keyring))
-> =C2=A0		panic("Can't allocate clavis keyring\n");
-> =C2=A0
-> +	clavis_add_acl(clavis_module_acl, clavis_keyring);
-> +
-> =C2=A0	return 0;
-> =C2=A0}
-> =C2=A0
-
-Not yet tagging, but neither anything to complain. LGTM
-
-BR, Jarkko
+-- 
+Giovanni
