@@ -1,101 +1,121 @@
-Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 506631D2F50;
-	Thu, 17 Oct 2024 08:30:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.128
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAB181D8A0B
+	for <linux-crypto@vger.kernel.org>; Thu, 17 Oct 2024 09:41:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729153818; cv=none; b=bhXexonB0bwlqU+GdN7FiVecL9Ugo9Y9V6fCwgmU4YW7npwP7Q3NN6zF+x0fis71nAAiDEY2SUDZhxavrDXi351LFoLwU7LWcBgu0c0VeonX1j0fKYo2ok04iioOco/ma4+PIAh5VY3/W1lkMpqZdv73dIILDPskITeMqrCR0vU=
+	t=1729158102; cv=none; b=VYf+RTiRyGZEpBreH9ZyYoIjL+n33EFWynRd8tKhAmGFSwrIO347JIscUE6L76w4QGIejgQEdYQv1kDongx/IezHrF69xCqt6qMSvk5EGh7doPL6fky/2Uwd27xSaxaWE7J45++KiuS2MeEu5FzEKA+smxa+2lZwP8LZ+pCpOvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729153818; c=relaxed/simple;
-	bh=yJg2JVNB33Os0yyJl8xO8PgMosQlBHi77oLNAq6b4vo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SVYo+OXT+JwndMziBDRhqliKUwfzleGBLx6JZnwoCN585crKgaw5DQDXjDR67vapeTjnRPRGEgk7Dv5toKrSd+snZe3jcD+7iOLJ/stetcgdnIYdA1DYhzLXTrqvF9/XEH3d7hQiIpEYvaf88lqRgGeoq7zgNEd5kSrD41+w06w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=R5Q+V2+0; arc=none smtp.client-ip=54.254.200.128
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+	s=arc-20240116; t=1729158102; c=relaxed/simple;
+	bh=/Kj92XN7TPEcHDkHB1JRCwyCnItaDsg0z5AmTq8udWo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=HIBd+dRFm5Kcb8BZwEsLteL0G975B7k5esspgHdhT9qXMTTvW91nBi1JdW18Cdck0yriTMI6oDghPkk9VwXFkRmoNfFeTRWWifuI/q6tec7K1rlJdCTPX91g3Z0Cw9MMoYlpqCL5Eo71e+NPfcaPECLhLDCnMBoTpo8kZ7+Tde8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pL3nGRy0; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="R5Q+V2+0"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1729153811;
-	bh=cSOXVSyYH+jeolxzM5y7BNDn9k3suxdDUAyCyBx02c0=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=R5Q+V2+0rmlt3tXPa9Snpx5dPwxQUcV7W2ThOqtoZAzZmHXO7Lxo3aGrW/KbjiDYw
-	 FFJJTM/Wr8wkTiJSo14lP41s4vHdAtY574+63h4HnQyUL6qcgi+jrTHurXzKQtLI/f
-	 +ihnM1+9MamQ2dM3BB+Fs/krv1/H9lV3Bo43SLTs=
-X-QQ-mid: bizesmtpsz12t1729153794tlvgso
-X-QQ-Originating-IP: FSvmCbS+hbcFjhZ6H3PKpX84FlEWti0QDze5a2poY8U=
-Received: from localhost.localdomain ( [113.57.152.160])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Thu, 17 Oct 2024 16:29:52 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 10686107487593216358
-From: WangYuli <wangyuli@uniontech.com>
-To: giovanni.cabiddu@intel.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	jie.wang@intel.com,
-	wangyuli@uniontech.com,
-	dong.xie@intel.com
-Cc: qat-linux@intel.com,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bo.cui@intel.com,
-	bruce.w.allan@intel.com,
-	karen.xiang@intel.com,
-	pingchaox.yang@intel.com
-Subject: [PATCH] crypto: qat - Fix typo "accelaration"
-Date: Thu, 17 Oct 2024 16:29:46 +0800
-Message-ID: <1D2B5A3330DAD82E+20241017082946.314361-1-wangyuli@uniontech.com>
-X-Mailer: git-send-email 2.45.2
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pL3nGRy0"
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e370139342so12609237b3.3
+        for <linux-crypto@vger.kernel.org>; Thu, 17 Oct 2024 02:41:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1729158099; x=1729762899; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=NL1g8QiMiw+GMLkaabWajcTuwbPu8SeRvj7pvi19l7E=;
+        b=pL3nGRy0lYEL81WFanb+gnKOzqO36KpIq4e8g4EhM+w8EfS9TuUh+mYfK/jpk5g5+n
+         224a3SYota+H+c7WwrvGO+AnUhUFAVH/VBEoZMtCrOW2Oucqw4Fqaa72k/S+cCMvt+x/
+         QpdFpGSYoQbvRVlSDBahrqqYNy7VO4Nl8Ms2ZQVI82Rh8LCHrTkK8pSwQR8Rhde5LLrX
+         xHrMybq3T9YDKV07v1rsH1QubWFpFBjM75+bvumsjuQoCv90O4EMcvhFzOfV1+xpCqGM
+         IzZVBHAcCGGhkIVEXcEWrmxNXdmI+2/tcg/py9wI6PAeWV7WowLNeAKwzOxBHyNOiKjD
+         0lTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729158099; x=1729762899;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=NL1g8QiMiw+GMLkaabWajcTuwbPu8SeRvj7pvi19l7E=;
+        b=pJASH/ck4Eul7+ekU5rErtDy5NPcB8dtHGQFf7E/Pe23TaHuIIckCcZNmc1NIMBzlY
+         oWCDxdgymsPrD6OPRIJPcEj44yYn8KI99E5jem6gr6DB5fJ/JAgWRoFQ7PtnCaPN6cv6
+         ohTAxvDw25+Av+qkTJlaXTxlDV/d9eD8YyiFKyBzoX3DEmVPlafMMFCVrv9gC900cjNm
+         UBVGyzcOL1Btpx6Ini/wXRYFZDbif9Y/ZWGxy0l8W4BJdenLeIW2pMKuSOKstJ8i9vkF
+         bQulLBcC2hhORwojS+nLvYKIUOXB8GVpku6tSJ5jY67xOs8hw1r3FJWlHXBV78shCsko
+         2LYw==
+X-Forwarded-Encrypted: i=1; AJvYcCUTs7KEOrLSjQDPwXNv+KCZ5Z9s+x27VNIjtQq+f+NJfNeC6lKZM7yBsS7urj+YdOsPIfvK3MzqOlFIOZc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxtkdAGeYpgHyJazbQ9bedFw3P8lUPOpUowfO/9cBv+3eD1Jw4M
+	QQh7zJAI/lhNNhooFUfK1Ac+DAsnFQmuUhOJShMYSK1aXq63Y+ivxTGOfN9giG1+iEfefA==
+X-Google-Smtp-Source: AGHT+IGjgTrn0OdrhHX3rWorpZYzZht2bXo+DDqn8QkiQ+7uwl+ZSKCW9wNflH8e1sSt3+MKmVzadN5H
+X-Received: from palermo.c.googlers.com ([fda3:e722:ac3:cc00:7b:198d:ac11:8138])
+ (user=ardb job=sendgmr) by 2002:a05:690c:6703:b0:6dd:bf69:7e06 with SMTP id
+ 00721157ae682-6e3d41e7a44mr1259657b3.7.1729158098641; Thu, 17 Oct 2024
+ 02:41:38 -0700 (PDT)
+Date: Thu, 17 Oct 2024 11:41:33 +0200
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtpsz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: NN74kCj3sZL0E+EZ0M2PIlLtWb1I+9zUHnmeieC+VIYbR5SQFpB1IJin
-	dFercEK9OmKxIk+oDdNQ5vaI229hKvvEv+MokX9K8ZvH+Qpua2tQQHaekm4E7bGQ+PgcZM3
-	vV8E6Arl0cVhhqATPA9p2yW6a3jM3l7XeJHBLXxSgWFiyNwfiENWSA8Ojkq/LcTkmQxMFWE
-	ZwfcVW8MfGghCrK+8aB8c8vG4J2Bo4hqN8YCCNaycOAUPn0PLxPJdN2zJ9VFtLcy65E8CYa
-	QKN6dxfFsXheSnY08Soy3x5i/4wK3jW1kRWN/mSbUFwqLhlufNXzhM0RLk5XFr4WAttISz1
-	WNRan8IQg31m+SHx3otUL98xbu2n4M47lLtyhLKVxdFdFVEDyeuV62SpT59mAn/UublG+VK
-	Ykb3iTW6FH00+idNWzP0+AgpETsbSOlPmj/TIaBOQUrr55JX6d988NIocX6gxSLP6xd+SYd
-	OUfeaKaerQc9a9/o9/sP6TLk48K54lWBJEiDBJ4dRERr/v/sP7K/k7aVb11rZCdcNiuVnv0
-	Y/F9jsHnBoC+FehUUtI3RtNYTJENriJMO8/WuIj1ErcrXNL2MW8O0S+Qz01IwPbYi4mcDfi
-	iTzy8tSrQ5UyjsaD6aq3b8iTu4FDGusb+nEIwTHXr0qitiBeQaI3mo3pPj6eG6Gl7HRe4z7
-	4rjzVQf42IoLPWdhX2Xirc1/BRRMUxegmiRnFoGT38JIEY13QSP0qL6FCBFS07WfiSOZXR/
-	MJHixtDs7pFyeDeQmWFAkc4fMIeV5WI2xcOUWj5FxDXcMqHwksjJ/TfgJP3SA9w5wiEoHxV
-	V1HHPS6ikshl/n0AC/znZ9GgUPjas3O+R6+lhxv3WYizCFdi6EmMFzfkppTxkg1aJlfq1jj
-	LUZHTNLndLN6X5NxoysgYH3DiJfkrZ7RmLgViYqbDM/P6smr9MU6aGb6wRZ0IEaqZSK8y15
-	9+cVZbUM55EWanovESNNg9wzSW8PVqYZlFsNThXmCDZeNXinRybaWGsa8m+sZSGGNE5U=
-X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
-X-QQ-RECHKSPAM: 0
+Mime-Version: 1.0
+X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1748; i=ardb@kernel.org;
+ h=from:subject; bh=A2qb4yG344KAaBkQYaztyqpHjkQf1nkWoa4ObJtOQZo=;
+ b=owGbwMvMwCFmkMcZplerG8N4Wi2JIV3g9lnPuYlevqv5zz9+lbff6fRSr3zNzayiJ40XqJQZy
+ Rv8M/7YUcrCIMbBICumyCIw+++7nacnStU6z5KFmcPKBDKEgYtTACZy0YfhfyqHwLsTiTP493Ex
+ Tzi9b5/49XDvbRGPgvp/Hbr7u/x0OyPDP7XrDJH+8Y8ZP014WDnzUmzswtbdZ1STtmSrdtg77ng SzwMA
+X-Mailer: git-send-email 2.47.0.rc1.288.g06298d1525-goog
+Message-ID: <20241017094132.2482168-4-ardb+git@google.com>
+Subject: [PATCH v3 0/2] arm64: Speed up CRC-32 using PMULL instructions
+From: Ard Biesheuvel <ardb+git@google.com>
+To: linux-arm-kernel@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	herbert@gondor.apana.org.au, will@kernel.org, catalin.marinas@arm.com, 
+	Ard Biesheuvel <ardb@kernel.org>, Eric Biggers <ebiggers@kernel.org>, Kees Cook <kees@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-There is a spelling mistake of 'accelaration' in comments which
-should be 'acceleration'.
+From: Ard Biesheuvel <ardb@kernel.org>
 
-Signed-off-by: WangYuli <wangyuli@uniontech.com>
----
- drivers/crypto/intel/qat/qat_common/qat_hal.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The CRC-32 code is library code, and is not part of the crypto
+subsystem. This means that callers may not generally be aware of the
+kind of implementation that backs it, and so we've refrained from using
+FP/SIMD code in the past, as it disables preemption, and this may incur
+scheduling latencies that the caller did not anticipate.
 
-diff --git a/drivers/crypto/intel/qat/qat_common/qat_hal.c b/drivers/crypto/intel/qat/qat_common/qat_hal.c
-index 317cafa9d11f..ef8a9cf74f0c 100644
---- a/drivers/crypto/intel/qat/qat_common/qat_hal.c
-+++ b/drivers/crypto/intel/qat/qat_common/qat_hal.c
-@@ -163,7 +163,7 @@ int qat_hal_set_ae_ctx_mode(struct icp_qat_fw_loader_handle *handle,
- 		return -EINVAL;
- 	}
- 
--	/* Sets the accelaration engine context mode to either four or eight */
-+	/* Sets the acceleration engine context mode to either four or eight */
- 	csr = qat_hal_rd_ae_csr(handle, ae, CTX_ENABLES);
- 	csr = IGNORE_W1C_MASK & csr;
- 	new_csr = (mode == 4) ?
+This was solved a while ago, and on arm64, kernel mode FP/SIMD no longer
+disables preemption.
+
+This means we can happily use PMULL instructions in the CRC-32 library
+code, which permits an optimization to be implemented that results in a
+speedup of 2 - 2.8x for inputs >1k in size (on Apple M2)
+
+Patch #1 implements some prepwork to handle the scalar CRC-32
+alternatives patching in C code.
+
+Changes since v2:
+- drop alternatives.h #include (#1)
+- drop unneeded branch (#2)
+- fix comment max -> min (#2)
+- add Eric's Rb
+
+Changes since v1:
+- rename crc32-pmull.S to crc32-4way.S and avoid pmull in the function
+  names to avoid confusion about the nature of the implementation;
+- polish the asm a bit, and add some comments
+- don't return via the scalar code if len dropped to 0 after calling the
+  4-way code.
+
+Cc: Eric Biggers <ebiggers@kernel.org>
+Cc: Kees Cook <kees@kernel.org>
+
+Ard Biesheuvel (2):
+  arm64/lib: Handle CRC-32 alternative in C code
+  arm64/crc32: Implement 4-way interleave using PMULL
+
+ arch/arm64/lib/Makefile     |   2 +-
+ arch/arm64/lib/crc32-4way.S | 242 ++++++++++++++++++++
+ arch/arm64/lib/crc32-glue.c |  82 +++++++
+ arch/arm64/lib/crc32.S      |  22 +-
+ 4 files changed, 331 insertions(+), 17 deletions(-)
+ create mode 100644 arch/arm64/lib/crc32-4way.S
+ create mode 100644 arch/arm64/lib/crc32-glue.c
+
 -- 
-2.45.2
+2.47.0.rc1.288.g06298d1525-goog
 
