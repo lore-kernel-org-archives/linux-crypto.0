@@ -1,109 +1,111 @@
-Received: from mail11.truemail.it (mail11.truemail.it [217.194.8.81])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 416A91DDC22;
-	Thu, 17 Oct 2024 13:39:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.194.8.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 272931DE4F5;
+	Thu, 17 Oct 2024 14:45:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729172383; cv=none; b=QnPZMeAaNoXuqtyOKy823gK0deYvmPSm1/0ax1sYGaZfW/M/jJb0bRWG9fz4SgQZOp71zaA10pLswmkPsvsCBqIHqdIkYZXx92s9yDveQb3G6Eb0UIYc7gIoQbe7TzvtvdPMOl8k7n1wcUaRVPAwHzhuH1ZtlVXIPM5uLzGwMEk=
+	t=1729176343; cv=none; b=Gl8LdrNMN3QIGt0seSmed6+aQGkVgFL2/3ZMWDJbzguHZi9DwzLSgK9Xx4p/6D5eNGwrywtEep7W7G1jGj0XxiPMLDEJ7uj47p/hE25RC2qayhedDcmdy9Vje7jp1Bryl5ftkmXnOM9F7qsmQg+8LUcxIPdbgcp2FO83KjfZnHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729172383; c=relaxed/simple;
-	bh=/Z6nbXADLiIGjPex3JCDSxQPOzXF5Or/GK2vQ2ICUEw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q2hgZUuiAi1zOZKFWlGfTyOluZbrW0ef6E0sa46DlOvmSKxBI+ww+wnTi3//vJSaeE4yOgAjfR8NkALHU/sYtAVxeUZQyKNxJXTt3gOtXfRCUrCz+smXDEjbcHTCEIh+Morm/1cnHKbXsT/EKuzwtHwhMUI1QXk0v4z7uR71+h8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it; spf=pass smtp.mailfrom=dolcini.it; dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b=YkXUNo1P; arc=none smtp.client-ip=217.194.8.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dolcini.it
+	s=arc-20240116; t=1729176343; c=relaxed/simple;
+	bh=EqPRJCJLjDPdtv0Eu74ead7xBiOUbHjQ0PiWeY4JJok=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KJCQDBJ3dkdfDs88e6UNqzaS98/C2/Ca2e9o4nyiRdaPDDt8xMZhPNp9EOg1T/4ZleGPCCAZZv5nl0dJLfsNK2Q+MBYLQ+EisKBfl+l/1pHrDOZXJjkL7JC9mz7K7pj7CGnCdFIU2MrIveiPZNjwpDr9B2l0j1FH5QmlHxhHfac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=G/36qOXP; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b="YkXUNo1P"
-Received: from francesco-nb (31-10-206-125.static.upc.ch [31.10.206.125])
-	by mail11.truemail.it (Postfix) with ESMTPA id B612E1F9C7;
-	Thu, 17 Oct 2024 15:39:37 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dolcini.it;
-	s=default; t=1729172378;
-	bh=RqKqCojaEzQZ+8p1QMDFCOmzawbTxuGxzwtudrDemAE=; h=From:To:Subject;
-	b=YkXUNo1PMxy8eEuP3x7vyw2bxc6SR/1ixpxecn6kKLYhbAlINHUw1/OMo4KKIcgOl
-	 lcI4oADlV3Q7srMrx22ObObGAAMbg6lF1nW9DtiyMFr2GPyY1P67Ud/OfyoeNQNCsq
-	 yO08+mVJ5dxgz7+e7J9WhZ4VDDXibXUoMAZz0vXuwdtbyw5s/my4geNf5HcBB/p9nB
-	 5mwcID5lHjc7lftPZ6sCxyGRG3evArW5HjUPPVosCei6rAZmLyPHEkEYXfxMzL8f7s
-	 G1Z/qnatclbyo9fp5vyBINCby/cKLV6YaYGYBVcot/nRSBrb2aU7VX198cwaBupnAa
-	 P9RHUWzO8XHGw==
-Date: Thu, 17 Oct 2024 15:39:33 +0200
-From: Francesco Dolcini <francesco@dolcini.it>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Francesco Dolcini <francesco@dolcini.it>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Francesco Dolcini <francesco.dolcini@toradex.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Aurelien Jarno <aurelien@aurel32.net>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Lorenzo Bianconi <lorenzo@kernel.org>,
-	upstream@airoha.com
-Subject: Re: [PATCH 2/2] hwrng: add support for Airoha EN7581 TRNG
-Message-ID: <20241017133933.GA31667@francesco-nb>
-References: <20241016151845.23712-1-ansuelsmth@gmail.com>
- <20241016151845.23712-2-ansuelsmth@gmail.com>
- <20241017131112.GA28955@francesco-nb>
- <67110d84.050a0220.2ae4bd.8910@mx.google.com>
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="G/36qOXP"
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49H8cafT027126;
+	Thu, 17 Oct 2024 14:45:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	UYv4KCrjkrKQWrt5tv4GwSm7giXuh0JLnt8TUNBC+0c=; b=G/36qOXP/WJ9aECy
+	8XYr1HYn+vT0NBauiQkiWFjRmG33yWJlYtBFhG3Ay0QhF7y7W+hU4/G81VqoOlUw
+	Qt6uJNryZVcpRP7jyMf1/cu8jK4A+ASj1zER+lqRmc0vCJpiPm//UZNSLZiD06JI
+	+2Hb8M/ZJQv5r/m+ML+O9mqbY2Lqt4dTAre2yZ/FtvCqUoJibWCyXWanLGfDi701
+	q8631ddYw5umwwmKjHYP3D0Rm1NxasSeplQaVQEKBqWvFPXa3DFNu5CLjv9N/SuZ
+	8xKib04APQHaYxL4bryv5LoXX6G8TvimpPIwlrImEaevaTN9qjxCltvQKeWK128s
+	fYvIVQ==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42ay8j8yu4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 17 Oct 2024 14:45:24 +0000 (GMT)
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49HEjNFB008827
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 17 Oct 2024 14:45:23 GMT
+Received: from hu-yrangana-hyd.qualcomm.com (10.80.80.8) by
+ nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Thu, 17 Oct 2024 07:45:19 -0700
+From: Yuvaraj Ranganathan <quic_yrangana@quicinc.com>
+To: Thara Gopinath <thara.gopinath@gmail.com>,
+        Herbert Xu
+	<herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Rob
+ Herring" <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        "Conor
+ Dooley" <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        "Konrad Dybcio" <konradybcio@kernel.org>,
+        Bhupesh Sharma
+	<bhupesh.sharma@linaro.org>
+CC: <linux-arm-msm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <quic_yrangana@quicinc.com>, <quic_sravank@quicinc.com>
+Subject: [PATCH V1 1/2] dt-bindings: crypto: qcom-qce: document the SA8775P crypto engine
+Date: Thu, 17 Oct 2024 20:14:59 +0530
+Message-ID: <20241017144500.3968797-2-quic_yrangana@quicinc.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20241017144500.3968797-1-quic_yrangana@quicinc.com>
+References: <20241017144500.3968797-1-quic_yrangana@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <67110d84.050a0220.2ae4bd.8910@mx.google.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: oMtgwT2BWLlNNbcrYz1vXsnGWDYqCXV3
+X-Proofpoint-ORIG-GUID: oMtgwT2BWLlNNbcrYz1vXsnGWDYqCXV3
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
+ priorityscore=1501 lowpriorityscore=0 suspectscore=0 adultscore=0
+ mlxscore=0 malwarescore=0 bulkscore=0 spamscore=0 clxscore=1015
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410170101
 
-On Thu, Oct 17, 2024 at 03:13:37PM +0200, Christian Marangi wrote:
-> On Thu, Oct 17, 2024 at 03:11:12PM +0200, Francesco Dolcini wrote:
-> > On Wed, Oct 16, 2024 at 05:18:42PM +0200, Christian Marangi wrote:
-> > > Add support for Airoha TRNG. The Airoha SoC provide a True RNG module
-> > > that can output 4 bytes of raw data at times.
-> > > 
-> > > The module makes use of various noise source to provide True Random
-> > > Number Generation.
-> > > 
-> > > On probe the module is reset to operate Health Test and verify correct
-> > > execution of it.
-> > > 
-> > > The module can also provide DRBG function but the execution mode is
-> > > mutually exclusive, running as TRNG doesn't permit to also run it as
-> > > DRBG.
-> > > 
-> > > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> > > ---
-> > >  drivers/char/hw_random/Kconfig       |  13 ++
-> > >  drivers/char/hw_random/Makefile      |   1 +
-> > >  drivers/char/hw_random/airoha-trng.c | 243 +++++++++++++++++++++++++++
-> > >  3 files changed, 257 insertions(+)
-> > >  create mode 100644 drivers/char/hw_random/airoha-trng.c
-> > > 
-> > > diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-> > > index 5912c2dd6398..bda283f290bc 100644
-> > > --- a/drivers/char/hw_random/Kconfig
-> > > +++ b/drivers/char/hw_random/Kconfig
-> > > @@ -62,6 +62,19 @@ config HW_RANDOM_AMD
-> > >  
-> > >  	  If unsure, say Y.
-> > >  
-> > > +config HW_RANDOM_AIROHA
-> > > +	tristate "Airoha True HW Random Number Generator support"
-> > > +	depends on ARCH_AIROHA || COMPILE_TEST
-> > 
-> > > +	default HW_RANDOM
-> > This should not be always enabled when HW_RANDOM is enabled. Enabling
-> > driver should be a opt-in.
-> 
-> Was following the pattern with other HW_RANDOM config. Ok will drop.
+Document the crypto engine on the SA8775P Platform.
 
-Whoops. I missed that it depends on ARCH_AIROHA. Given that dependency
-is fine to me without any change.
+Signed-off-by: Yuvaraj Ranganathan <quic_yrangana@quicinc.com>
+---
+ Documentation/devicetree/bindings/crypto/qcom-qce.yaml | 1 +
+ 1 file changed, 1 insertion(+)
 
-Francesco
+diff --git a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
+index e285e382d4ec..c09be97434ac 100644
+--- a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
++++ b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
+@@ -44,6 +44,7 @@ properties:
+ 
+       - items:
+           - enum:
++              - qcom,sa8775p-qce
+               - qcom,sc7280-qce
+               - qcom,sm6350-qce
+               - qcom,sm8250-qce
+-- 
+2.34.1
 
