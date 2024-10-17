@@ -1,53 +1,53 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E30161DA618;
-	Thu, 17 Oct 2024 10:27:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3483E1DC04D;
+	Thu, 17 Oct 2024 11:28:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729160844; cv=none; b=Qny5jvb/Swzcm1c2XSRCXxR120Gns8pGVaBwyah1EWklcvxrjJzF097BGBQEkwMCg7LkeYbCCtsw+nhvvC3HV7CCtFxGRHtlxluzzoMEnuF0cc6y21DF4fVQ3ONRXkzHw425LjGtUS7RL3RybNjUbRFjguvH0qo2bmZ0EpgQMgo=
+	t=1729164507; cv=none; b=NEwH34M3qt+hOGE4xareHQw/TpfSHIXCOVE0XXCe+WC6KL5M6951+tsLqemHlwzAjPx1iXUBV9YscH+CZG+Ps5xlfQ6+ZIuKiPFeUmolOD+pwMVcisPXtvIcEFdb/zJmXYxGB0GKTeVH/nga8bmiCaV624bjpZxQ2rNRjcnLVr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729160844; c=relaxed/simple;
-	bh=Wg6rF3xq4Ey0oW4iGbKDhGAMlW4BmliJZ60Z/nadhtQ=;
+	s=arc-20240116; t=1729164507; c=relaxed/simple;
+	bh=q7JryczOX4nhaDX8wxKx/xPO5Uos+wBPazL0dfrPQJA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YYZVptXbbw8ZK0HqBUn/ycd17kv8VjcDJSQ2W3pz+zu+R0EtT5rQQ7XQFMe2ILbA8K9+u2gEZS/e+N8mnZKFY/mDv6WmdTZxWf5XCZgeWOnAWJ5JR9vEz5/Jg36GCwpk6aRG5xQuD2xVvi8RQOYaqZbWKsYDgJ13l5SvfB4c6HM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CTzWXfEg; arc=none smtp.client-ip=192.198.163.12
+	 Content-Type:Content-Disposition:In-Reply-To; b=CgIBX/m3PWV5He/2pnlXgYQfxCHuQSnRdaGnNk7HRowQK5niknZtWQM/YVnnfmotfog4Tq4sX8EKpgn/2eDeEIk383iguglS8sVkcLng4Zs0unda2EA471hRClZQflkF68zZxbp4PBH3ppCR/JIeQwjG7ktGYZx3zvh3C+IV6CU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZjwDbFIn; arc=none smtp.client-ip=198.175.65.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CTzWXfEg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZjwDbFIn"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1729160840; x=1760696840;
+  t=1729164504; x=1760700504;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=Wg6rF3xq4Ey0oW4iGbKDhGAMlW4BmliJZ60Z/nadhtQ=;
-  b=CTzWXfEgPKcUPf2WV/JmmmHXcs+22ifwwSUIKs0oUwKqzBGgZzmgbk7d
-   0hgzsB/xY1c54SfvbRlFDNB2nEh6BUWlvqjIg0AW6DE/ztlFS/qmLE+e2
-   imRekljlxcpuRW8LsT8U5IPqBvNPGa4KPYKqUpMAMfEunMBl0EulUXdSv
-   I/AKn+Tt01W9AXcMxZTpOenClAKHVPcEpVuR6qu3Scjn8Qv1E5axtkEb/
-   Rxd/YEX9qIuGw42YLomG4qXvmwUC7FVpaffWt/HNJAhKs5MPIVdR342TG
-   FgZbqhSzpumsg/ZgT4q8E2I08K0nCimxZulfM/fOfL/NHd+jfx6ps9NbR
-   w==;
-X-CSE-ConnectionGUID: xtWNDV0VSCi5VHWx9JDi5w==
-X-CSE-MsgGUID: K9+/52yqR+ulCuODLk87lg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11227"; a="32569247"
-X-IronPort-AV: E=Sophos;i="6.11,210,1725346800"; 
-   d="scan'208";a="32569247"
+  bh=q7JryczOX4nhaDX8wxKx/xPO5Uos+wBPazL0dfrPQJA=;
+  b=ZjwDbFInhJaQB+yYxJvkyq++liLqxjCxekggNrNSJSfXeqm4+foI/ZC/
+   3bH1eVpOqcLaLOtR1xrZwi3i0dxlrEmQbaTg4SOMZt184ZHMhZOlZRXci
+   chhWwSKA5H2WF5A+F4lZaRC+/38b5c18cBN2uor2RCar0YukmSyEbN05J
+   fkGZmrH79BsZ22t8JQf3TjoBqA9FbggHYaaHzbU1x0uuPR4ulSuQJ3mqc
+   tVsVBqSB+4z0bjNicItpZarvRn2h1YUor0Okg2Jghfh9gG0Jk3faZxx8D
+   vhCCSbazZ8ergoBoAmbwNP6C4cq9hOEiTeNVV58suagHLLXQlaGBMR8m5
+   g==;
+X-CSE-ConnectionGUID: V6Gu6SvMS8aMi0KxLqVq0g==
+X-CSE-MsgGUID: +wGDMOVbSeOdOWC/1uYRmg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="28530534"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="28530534"
 Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2024 03:27:19 -0700
-X-CSE-ConnectionGUID: BgghfPaLSXie9thWfmyVgA==
-X-CSE-MsgGUID: NGryFgCARN26/cVntol++g==
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Oct 2024 04:28:23 -0700
+X-CSE-ConnectionGUID: GeuGMRC7SeaeP0Za/hiS5Q==
+X-CSE-MsgGUID: MIvSWFNYTmSXUp+2nLmp2w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,210,1725346800"; 
-   d="scan'208";a="78111661"
+   d="scan'208";a="78127436"
 Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by fmviesa006.fm.intel.com with ESMTP; 17 Oct 2024 03:27:16 -0700
+  by fmviesa006.fm.intel.com with ESMTP; 17 Oct 2024 04:28:19 -0700
 Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
 	(envelope-from <lkp@intel.com>)
-	id 1t1Nir-000MCZ-1N;
-	Thu, 17 Oct 2024 10:27:13 +0000
-Date: Thu, 17 Oct 2024 18:26:16 +0800
+	id 1t1Ofw-000MFP-2f;
+	Thu, 17 Oct 2024 11:28:16 +0000
+Date: Thu, 17 Oct 2024 19:28:03 +0800
 From: kernel test robot <lkp@intel.com>
 To: Christian Marangi <ansuelsmth@gmail.com>,
 	Olivia Mackall <olivia@selenic.com>,
@@ -62,9 +62,9 @@ To: Christian Marangi <ansuelsmth@gmail.com>,
 	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org, Lorenzo Bianconi <lorenzo@kernel.org>,
 	upstream@airoha.com
-Cc: oe-kbuild-all@lists.linux.dev
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev
 Subject: Re: [PATCH 2/2] hwrng: add support for Airoha EN7581 TRNG
-Message-ID: <202410171822.152Yno42-lkp@intel.com>
+Message-ID: <202410172126.EXJ0sOkP-lkp@intel.com>
 References: <20241016151845.23712-2-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -81,7 +81,7 @@ Hi Christian,
 kernel test robot noticed the following build errors:
 
 [auto build test ERROR on char-misc/char-misc-testing]
-[also build test ERROR on char-misc/char-misc-next char-misc/char-misc-linus robh/for-next herbert-cryptodev-2.6/master linus/master v6.12-rc3 next-20241016]
+[also build test ERROR on char-misc/char-misc-next char-misc/char-misc-linus robh/for-next herbert-cryptodev-2.6/master linus/master v6.12-rc3 next-20241017]
 [If your patch is applied to the wrong git tree, kindly drop us a note.
 And when submitting patch, we suggest to use '--base' as documented in
 https://git-scm.com/docs/git-format-patch#_base_tree_information]
@@ -90,32 +90,22 @@ url:    https://github.com/intel-lab-lkp/linux/commits/Christian-Marangi/hwrng-a
 base:   char-misc/char-misc-testing
 patch link:    https://lore.kernel.org/r/20241016151845.23712-2-ansuelsmth%40gmail.com
 patch subject: [PATCH 2/2] hwrng: add support for Airoha EN7581 TRNG
-config: arc-randconfig-001-20241017 (https://download.01.org/0day-ci/archive/20241017/202410171822.152Yno42-lkp@intel.com/config)
-compiler: arceb-elf-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241017/202410171822.152Yno42-lkp@intel.com/reproduce)
+config: i386-buildonly-randconfig-003-20241017 (https://download.01.org/0day-ci/archive/20241017/202410172126.EXJ0sOkP-lkp@intel.com/config)
+compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241017/202410172126.EXJ0sOkP-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202410171822.152Yno42-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410172126.EXJ0sOkP-lkp@intel.com/
 
 All errors (new ones prefixed by >>):
 
-   In file included from drivers/char/hw_random/airoha-trng.c:9:
-   drivers/char/hw_random/airoha-trng.c: In function 'airoha_trng_init':
->> drivers/char/hw_random/airoha-trng.c:115:34: error: implicit declaration of function 'FIELD_GET' [-Werror=implicit-function-declaration]
+>> drivers/char/hw_random/airoha-trng.c:115:6: error: call to undeclared function 'FIELD_GET'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
      115 |                                  FIELD_GET(CNT_TRANS, val) == TRNG_CNT_TRANS_VALID,
-         |                                  ^~~~~~~~~
-   include/linux/iopoll.h:47:21: note: in definition of macro 'read_poll_timeout'
-      47 |                 if (cond) \
-         |                     ^~~~
-   include/linux/iopoll.h:170:9: note: in expansion of macro 'readx_poll_timeout'
-     170 |         readx_poll_timeout(readl, addr, val, cond, delay_us, timeout_us)
-         |         ^~~~~~~~~~~~~~~~~~
-   drivers/char/hw_random/airoha-trng.c:114:15: note: in expansion of macro 'readl_poll_timeout'
-     114 |         ret = readl_poll_timeout(trng->base + TRNG_IP_RDY, val,
-         |               ^~~~~~~~~~~~~~~~~~
-   cc1: some warnings being treated as errors
+         |                                  ^
+>> drivers/char/hw_random/airoha-trng.c:115:6: error: call to undeclared function 'FIELD_GET'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+   2 errors generated.
 
 
 vim +/FIELD_GET +115 drivers/char/hw_random/airoha-trng.c
