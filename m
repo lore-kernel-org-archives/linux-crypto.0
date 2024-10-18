@@ -1,139 +1,64 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC39E20E33E;
-	Fri, 18 Oct 2024 23:53:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EC661917DE;
+	Fri, 18 Oct 2024 23:54:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729295641; cv=none; b=sqzRuzMuUytVr9ZVrjYz3Oy16DgRfTGQOoCdhIJnzp8MR25IeW1GhPuwBwR1WTW9be3Ud4QtE0BGEZOV1zEiR1Ic/rWdXbvvC7suyIpL54gH3pXQP59QaFCM6rRTkmhSaGGD8/KDxOvkP0RD3aTBs+fuXNTP5ylM6BnBduxKWlk=
+	t=1729295655; cv=none; b=Z/OwGTDEpMkAKLXWXBa/Asf2DW6v+NXtIJO9lzLHqsAYWaVAajBwiSbZ1S2eIoeaQsGMSIje2sAKUcULXgOY/nk+0lgnbkAtB8rx8CLNSrDe0OrI8R/+uu9WIadcuVhZ3Sz5LWnU4/BlgLpC/0pvnWttT3kEzBTAADxPKHkRI+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729295641; c=relaxed/simple;
-	bh=elOLD3WjAMYZQazXg2MfqiGC4poV1qZ75XpOhxfqRvA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HN3WQy3FmRr9G01cVJNI/bXLVUwRXqq876W4ZLHE9gSa97nS8mNK7qRYbHTUNNsryB6v8GTkQqANayZoKLW0UjwIufcwwtJKc2NrgRsDl4xdZLSEBuUFodq/YD+SOrQ4Rpu0qfoNaFnttQdyL6/uPjfkCJzm+U0ey3KA9XhfpEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GzNaUc0L; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1729295655; c=relaxed/simple;
+	bh=RaR858kqU+mXXHEjaDtN3IxglEfrcLqxICMUmQVAAvU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jeap6Kki+y1ayWzNA19eW+YPD3h/aZCd4TsGLkAnfYe+RK08/uy6vOXO8aTiOqCm2EYk+SENLRwNFzURrX2bL19a1tB+CzqYP8aL6W/yIn0UTq/UH8XruXibykRq7ILJueU/iiOGkrEaISfGw2fWfaWnW17Jj+NJmkkaCpc/Lkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IOMEAp6Z; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GzNaUc0L"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CFF2C4CEC3;
-	Fri, 18 Oct 2024 23:53:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IOMEAp6Z"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B996AC4CEC3;
+	Fri, 18 Oct 2024 23:54:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729295639;
-	bh=elOLD3WjAMYZQazXg2MfqiGC4poV1qZ75XpOhxfqRvA=;
-	h=From:To:Cc:Subject:Date:From;
-	b=GzNaUc0L/q0xETsXLZ74DJ6nsirKY5DimiizEpYR2NSXyNScxb+gWNQwYRacL5Ae7
-	 H2/7fJ8zYuVkb8iNbQKn14NAZErF6Vv+TW64OIb6/B2wOYoBoTtBMVuiSjMrqpb8JY
-	 ctVtERDBelfWiuQzCoxYD8KaPHUEj0Y0qfLvmoAws2hQiSmoJmEwsRfby9dia3kyxW
-	 g3dG1fb8Jlaq5haWsxiLLcrWWTErCE4YWqEANREv4u9uU1M8gjhcf9fba879ibZQgE
-	 jPxgvBbKHT6zG4GrxkODT6ZFR1x649NJyvcbWI9eCURzQO1qdXMr6FF7g5KMKuFZdl
-	 QMXVwTRg+8UhQ==
+	s=k20201202; t=1729295655;
+	bh=RaR858kqU+mXXHEjaDtN3IxglEfrcLqxICMUmQVAAvU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IOMEAp6ZWhseG8Mo9PInNTHDs1g6NylQzmgQwOGHHtF1OKFq+N45GJamoKNUOLnk+
+	 /b6TSNhnZEkvTEBVQqjOMnoJRljUpiecuCRts/PvIRdJ1B5+23YvKbIF9TFNIm5uH1
+	 TqIaGjkZb6YbFS+mzHprO8Kgmx+ySAlCCN/cRoIvm/5XtxhHmL1/6uWugOR5HtRomq
+	 zk1W+CknOt7e++9i5kmildzd2NAgJ8sMvYXmhzwfQjQ2agOxl+rZdlp6gXz1GV1RlD
+	 3yRTreqeXPs/XFT2Y1YkxizRW7l5L7n9LSfndOwpzlzmx1x80uJcVSRv4sOEmArfvB
+	 YUFKHqTNNArqw==
+Date: Fri, 18 Oct 2024 16:54:13 -0700
 From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: Ard Biesheuvel <ardb@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto - move crypto_simd_disabled_for_test to lib
-Date: Fri, 18 Oct 2024 16:53:43 -0700
-Message-ID: <20241018235343.425758-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.47.0
+To: Ard Biesheuvel <ardb+git@google.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+	will@kernel.org, catalin.marinas@arm.com,
+	Ard Biesheuvel <ardb@kernel.org>, Kees Cook <kees@kernel.org>
+Subject: Re: [PATCH v4 2/3] arm64/crc32: Reorganize bit/byte ordering macros
+Message-ID: <20241018235413.GA2589@sol.localdomain>
+References: <20241018075347.2821102-5-ardb+git@google.com>
+ <20241018075347.2821102-7-ardb+git@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241018075347.2821102-7-ardb+git@google.com>
 
-From: Eric Biggers <ebiggers@google.com>
+On Fri, Oct 18, 2024 at 09:53:50AM +0200, Ard Biesheuvel wrote:
+> From: Ard Biesheuvel <ardb@kernel.org>
+> 
+> In preparation for a new user, reorganize the bit/byte ordering macros
+> that are used to parameterize the crc32 template code and instantiate
+> CRC-32, CRC-32c and 'big endian' CRC-32.
+> 
+> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+> ---
+>  arch/arm64/lib/crc32.S | 91 +++++++++-----------
+>  1 file changed, 39 insertions(+), 52 deletions(-)
 
-Move crypto_simd_disabled_for_test to lib/ so that crypto_simd_usable()
-can be used by library code.
+Reviewed-by: Eric Biggers <ebiggers@google.com>
 
-This was discussed previously
-(https://lore.kernel.org/linux-crypto/20220716062920.210381-4-ebiggers@kernel.org/)
-but was not done because there was no use case yet.  However, this is
-now needed for the arm64 CRC32 library code.
-
-Tested with:
-    export ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu-
-    echo CONFIG_CRC32=y > .config
-    echo CONFIG_MODULES=y >> .config
-    echo CONFIG_CRYPTO=m >> .config
-    echo CONFIG_DEBUG_KERNEL=y >> .config
-    echo CONFIG_CRYPTO_MANAGER_DISABLE_TESTS=n >> .config
-    echo CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y >> .config
-    make olddefconfig
-    make -j$(nproc)
-
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- crypto/algapi.c     |  6 ------
- lib/crypto/Makefile |  2 ++
- lib/crypto/simd.c   | 11 +++++++++++
- 3 files changed, 13 insertions(+), 6 deletions(-)
- create mode 100644 lib/crypto/simd.c
-
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index 74e2261c184ca..429a832f90fe0 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -4,11 +4,10 @@
-  *
-  * Copyright (c) 2006 Herbert Xu <herbert@gondor.apana.org.au>
-  */
- 
- #include <crypto/algapi.h>
--#include <crypto/internal/simd.h>
- #include <linux/err.h>
- #include <linux/errno.h>
- #include <linux/fips.h>
- #include <linux/init.h>
- #include <linux/kernel.h>
-@@ -21,15 +20,10 @@
- 
- #include "internal.h"
- 
- static LIST_HEAD(crypto_template_list);
- 
--#ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
--DEFINE_PER_CPU(bool, crypto_simd_disabled_for_test);
--EXPORT_PER_CPU_SYMBOL_GPL(crypto_simd_disabled_for_test);
--#endif
--
- static inline void crypto_check_module_sig(struct module *mod)
- {
- 	if (fips_enabled && mod && !module_sig_ok(mod))
- 		panic("Module %s signature verification failed in FIPS mode\n",
- 		      module_name(mod));
-diff --git a/lib/crypto/Makefile b/lib/crypto/Makefile
-index 969baab8c805f..01fac1cd05a19 100644
---- a/lib/crypto/Makefile
-+++ b/lib/crypto/Makefile
-@@ -56,5 +56,7 @@ libblake2s-y					+= blake2s-selftest.o
- libchacha20poly1305-y				+= chacha20poly1305-selftest.o
- libcurve25519-y					+= curve25519-selftest.o
- endif
- 
- obj-$(CONFIG_MPILIB) += mpi/
-+
-+obj-$(CONFIG_CRYPTO_MANAGER_EXTRA_TESTS)	+= simd.o
-diff --git a/lib/crypto/simd.c b/lib/crypto/simd.c
-new file mode 100644
-index 0000000000000..9c36cb3bb49c4
---- /dev/null
-+++ b/lib/crypto/simd.c
-@@ -0,0 +1,11 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * SIMD testing utility functions
-+ *
-+ * Copyright 2024 Google LLC
-+ */
-+
-+#include <crypto/internal/simd.h>
-+
-+DEFINE_PER_CPU(bool, crypto_simd_disabled_for_test);
-+EXPORT_PER_CPU_SYMBOL_GPL(crypto_simd_disabled_for_test);
-
-base-commit: 5c20772738e1d1d7bec41664eb9d61497e53c10e
--- 
-2.47.0
-
+- Eric
