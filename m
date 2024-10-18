@@ -1,201 +1,101 @@
-Received: from flow-a6-smtp.messagingengine.com (flow-a6-smtp.messagingengine.com [103.168.172.141])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90C99200C87;
-	Fri, 18 Oct 2024 16:55:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1B7520E312;
+	Fri, 18 Oct 2024 17:03:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729270511; cv=none; b=KOD2mmAs51MLCHjZ2s3cGONdSVm3IowyGOJvn63bTS0ElyicEOYL+x8mdW1AkeICBRQZ2sCP+K4zNZLbFKH2Zk9Risip5f0dnKBEzYSrFhA72EXVMvUk4vmYiHsh32D6+kzRXySFt68tyncrCcoNsugcHEI27/haph2tpOfIgV8=
+	t=1729271033; cv=none; b=pKrVjabIsrVSaAbb8OiCx5irIgz9RSSCC9kZZ7vnPlEBYCih67gBHz9icDfwBqdH4MS0JadgI9LUNg2UOWcRhnI1ZCSse0vyNyZeTITAyJ0R/18ddJ3zVtRVtWes0mJwQXp3si8mg7aL3knMQQtBqvJflc56+ZmuMCOB1G7Gu3c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729270511; c=relaxed/simple;
-	bh=2BAp/Ks9vk62NXFUJKf9rtVKUHh7s1trWs775ygWLOI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CuRGR0ATYln4IRK+3JiNesV1NjzgrSZ/EpwxaEIT8Nv4YZ3A6imye0d4qy4v1ku30vfMR9LWUs54+lIwZDrMftrsHn8P7Z8LWLBx/X58SxI2oppUcN1T6roUtxxxd1FE41nJ0bzcozBJXI0U8sn26ohyc2R4nIcr9azcZXr770s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=benboeckel.net; spf=pass smtp.mailfrom=benboeckel.net; dkim=pass (2048-bit key) header.d=benboeckel.net header.i=@benboeckel.net header.b=k/kK18yl; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Ozye+AsI; arc=none smtp.client-ip=103.168.172.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=benboeckel.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=benboeckel.net
+	s=arc-20240116; t=1729271033; c=relaxed/simple;
+	bh=af4nOxEDaAlJUk79W7/JLGCDf5ANyyNU0ZTLqOFFHlA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=dsaUdal631TnuaUNmUS85SuI4edyGOAw8rcJcASFx+3yqqkb0hkr0L6bOc+x6yCMwrnogXTuQHREdAEPsiyjzCYyouHekMvTez6IZ6A6IElFIe9Thx2IMOM0mwHxUvYzUscl7XiWjvh8a2KoZ3Yt35SnqrhSLptF+7DaBsXC0p4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IT9DkDV9; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=benboeckel.net header.i=@benboeckel.net header.b="k/kK18yl";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Ozye+AsI"
-Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
-	by mailflow.phl.internal (Postfix) with ESMTP id 7B4D72006A2;
-	Fri, 18 Oct 2024 12:55:07 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-11.internal (MEProxy); Fri, 18 Oct 2024 12:55:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=benboeckel.net;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=fm1;
-	 t=1729270507; x=1729277707; bh=0L7B7yGnuyRElZHs/IM6086Uc6KmNfJm
-	/hpOxLBT+m4=; b=k/kK18ylY7URLjXojRDc9N4S7rJgXMLhvlNye6dGW6oNDx3E
-	V+ra4rLZWqnNummxUWVuo36cnVAcsb2q08axEPLq71LDJ0t7XgtOOL+f9MuLYjf3
-	JMB4Difrk+CrPuiPAZ8wIzUCkqnWLOHg+IcLg8gmv2f/NO5xHrBHQxVzYxCcJilZ
-	mLYcFti7O9pMSwxYT03AQ72CnTTeC/yx4sC+qtJDewaf7bEV9Xlhp702u94ZQi4L
-	3tfQ8HleHBoBmOJGdH0uA7ze2SJZkuqCepcNIj8rpdRMIicWA0hqRNh9s6jfpz/G
-	zFYyz6eFAS3PG1C5x0ZGZbJFykxb8N9lTkXKLg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1729270507; x=
-	1729277707; bh=0L7B7yGnuyRElZHs/IM6086Uc6KmNfJm/hpOxLBT+m4=; b=O
-	zye+AsIQf4jOgI2Lrrpu/tMoSW8fz2A51yo4ahp0ZBJGIvXjwp+vOkEu80Ni3wOB
-	hFv9No6bvbWBC2GA8UVx9SHY/mJLu+E5jZ5/iVUVCYL7+H5SoWZ16um5OsIplceU
-	XYfkI5EKXdnuxvKkTt4KObmHeFgogkB/Q8DULO9qqRV2sxwOMFvdTb3mjfFugyzI
-	aPZz0sOPWt3PB4396k6F0NcnZr79VutMLODwSRkRcafo8GMEnq9FQZHeK3jqWEs6
-	uV0Nhbi3IoFFBwgJlw3DTkG6s4AKF0EMccSCA6kRk6N/X0Z2zRsvnDqzNqvGolKI
-	jucxNUCF8G2dICMKnp88A==
-X-ME-Sender: <xms:6JISZ434ZPIdiHbuWYeaNcSqzVunzn9uwUZW6OtXjfW9dqoTF2Q0Tw>
-    <xme:6JISZzGePpzTvvZ4vFRXLM6wgbpJq3DsseJnyI43bL1-vYOUSX4UIh6aVMHXzdMy-
-    50pHNOM0p8E1mRPGgs>
-X-ME-Received: <xmr:6JISZw65VRONaSByRxBIL9BfylVtic9_zpXo3O7BKnP-6_dq6KrtDAOQlDUav0jo_bd6xqobLqqs>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdehfedguddtgecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtugfgjggfsehtkeertddt
-    reejnecuhfhrohhmpeeuvghnuceuohgvtghkvghluceomhgvsegsvghnsghovggtkhgvlh
-    drnhgvtheqnecuggftrfgrthhtvghrnhepudekvdejteeuudffveffhfelfefgjeehffef
-    hffhgeeiieduveehfeejffetveefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
-    hmpehmrghilhhfrhhomhepmhgvsegsvghnsghovggtkhgvlhdrnhgvthdpnhgspghrtghp
-    thhtohepvdegpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegvrhhitgdrshhnoh
-    ifsggvrhhgsehorhgrtghlvgdrtghomhdprhgtphhtthhopehlihhnuhigqdhsvggtuhhr
-    ihhthidqmhhoughulhgvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepug
-    hhohifvghllhhssehrvgguhhgrthdrtghomhdprhgtphhtthhopegufihmfidvsehinhhf
-    rhgruggvrggurdhorhhgpdhrtghpthhtohephhgvrhgsvghrthesghhonhguohhrrdgrph
-    grnhgrrdhorhhgrdgruhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhn
-    vghtpdhrtghpthhtoheprghruggssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehjrg
-    hrkhhkoheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgruhhlsehprghulhdqmhho
-    ohhrvgdrtghomh
-X-ME-Proxy: <xmx:6JISZx3LjUHM3aerHTKSZK7b6NYEiKaH4KlyNHEhZDeqdpoC7cC-Bw>
-    <xmx:6JISZ7FN2-4pTeiOluvybyQrliihhSJzxzgJAuyiQ5tNd8m8sg3R_A>
-    <xmx:6JISZ6-2P1lNIofzl5gJo4ci2r7xVPsZe2YmP6wVKj2PJdKrxxMp0Q>
-    <xmx:6JISZwmUM9wuk4eJkrqMCnfeiiCO03a_FeJiMBgfgUNX8Tmq6W2z1g>
-    <xmx:65ISZzNrDCcw7YGvFpM0DJqQP45rg1wOFv3qdff4aVAW53CXXzEXMk-5>
-Feedback-ID: iffc1478b:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 18 Oct 2024 12:55:04 -0400 (EDT)
-Date: Fri, 18 Oct 2024 12:55:03 -0400
-From: Ben Boeckel <me@benboeckel.net>
-To: Eric Snowberg <eric.snowberg@oracle.com>
-Cc: "open list:SECURITY SUBSYSTEM" <linux-security-module@vger.kernel.org>,
-	David Howells <dhowells@redhat.com>,
-	David Woodhouse <dwmw2@infradead.org>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	Ard Biesheuvel <ardb@kernel.org>,	Jarkko Sakkinen <jarkko@kernel.org>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,	Mimi Zohar <zohar@linux.ibm.com>,
-	Roberto Sassu <roberto.sassu@huawei.com>,
-	Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-	=?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>,
-	"casey@schaufler-ca.com" <casey@schaufler-ca.com>,
-	Stefan Berger <stefanb@linux.ibm.com>,
-	"ebiggers@kernel.org" <ebiggers@kernel.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-efi@vger.kernel.org" <linux-efi@vger.kernel.org>,
-	"linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>
-Subject: Re: [RFC PATCH v3 05/13] clavis: Introduce a new key type called
- clavis_key_acl
-Message-ID: <ZxKS57wBfgBZ21_g@farprobe>
-References: <20241017155516.2582369-1-eric.snowberg@oracle.com>
- <20241017155516.2582369-6-eric.snowberg@oracle.com>
- <ZxHwaGeDCBSp3Dzx@farprobe>
- <2F718293-72DA-4E7F-99FF-690276B94F34@oracle.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IT9DkDV9"
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-37d43a9bc03so1620421f8f.2;
+        Fri, 18 Oct 2024 10:03:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729271030; x=1729875830; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=SfKZpln6Wwby+6k34LZ6rWt4fai/cejuJdZ/Dg/sby4=;
+        b=IT9DkDV9tSfdK46VKtt+pLgpYBxtKVcgeLTtm83tkRFY9WI2i7joBTSs67GtdIxZ26
+         jqAjyyHY/NxfqFghvFDmPtpZFgxmlvt+5HJpfkyAMLBUuUNS+3nTu2/XJ9IiEOwFHEaO
+         AYpLVcCc/ahPb0GCOExKbkIE+CzBo6ef06FBgXI5ivzkhZU3lJmksqU/C5MrNSKeizx8
+         3UgrZaLwmui0Dtmh/mkTkYfyUS6JrjnasqZsUsYAmGVlnEvnIJk/aPvvpDBeJI9DAeQR
+         ORupYAh9NmHrVGFBfJvh4PnOsdJxyzA3R9ndH+hNFYilPECqKs5ZldlCWWj5sahkBsvE
+         XaBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729271030; x=1729875830;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SfKZpln6Wwby+6k34LZ6rWt4fai/cejuJdZ/Dg/sby4=;
+        b=vqpICrlXDQ6qQ5ihNFmJLAnc4vohKf8Pvyyfmku/csi0mWp1a6d2C0P5FPPxXmc7Vp
+         SAEFVR1QjLx35es2kg3cVrAh/E0Cd3avWeb5xfoo+bJoVl83ku4iOb0/qfdfz+jPx0ch
+         Yo+h+B9gxaXRRoN4pRR+PtsDEQslbnNuNxF119J9QstsPxUH4/Ysbm5OXsKmRxzInuUE
+         dTLdgmN2fpJivtz82WbBbZ61sU1qMYmwHz5Nad4fI9ZDjISuxvCMTzOaA5cd1gfCKcGE
+         K2KTAE+Xehq7jEDVJqQ89fR576NKS2M9ig4BEgiiHyAUC3OvnsJKaGU44GClbsta7BYB
+         r/Rg==
+X-Forwarded-Encrypted: i=1; AJvYcCUhAsLWwc1fTp+OzA+PaisrakrvZgxnXCaKaa4+LlrI2FyIeLQNeGV6bDQzKbZVp7SsarqzocauNyM96jU=@vger.kernel.org, AJvYcCWtjDLROj3dcLidzIrDrf2AUbhjZPNe9zBY4nym1YyUF3fUoalyZhJZGxJRMwoCVMoqDpv+UNU3/1+MM/Ds@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6YEgwE12UqSWkHUSTiFdVB6WcQAgm8k4KOp9uzqtMNOsblhJb
+	RJrXLtUJ8ElziptYL3XdGHJQeLIA2BJK+xsZt+L6Se8+qGFGD14S
+X-Google-Smtp-Source: AGHT+IHh24BwjL+H2O9TSvYfQkICv7T8oN8MvPb7afjAbBO+kBCCjFPjdmIU6JcBFnB4oJsH1nayAw==
+X-Received: by 2002:a05:6000:1181:b0:37d:5274:7878 with SMTP id ffacd0b85a97d-37eab6ee5afmr1740865f8f.38.1729271028219;
+        Fri, 18 Oct 2024 10:03:48 -0700 (PDT)
+Received: from localhost ([194.120.133.34])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37ecf0ed341sm2406051f8f.72.2024.10.18.10.03.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 18 Oct 2024 10:03:47 -0700 (PDT)
+From: Colin Ian King <colin.i.king@gmail.com>
+To: George Cherian <gcherian@marvell.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	David Daney <david.daney@cavium.com>,
+	linux-crypto@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH][next] crypto: cavium: Fix inverted logic on timeout end check
+Date: Fri, 18 Oct 2024 18:03:47 +0100
+Message-Id: <20241018170347.647896-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <2F718293-72DA-4E7F-99FF-690276B94F34@oracle.com>
-User-Agent: Mutt/2.2.12 (2023-09-09)
 
-On Fri, Oct 18, 2024 at 15:42:15 +0000, Eric Snowberg wrote:
-> > On Oct 17, 2024, at 11:21 PM, Ben Boeckel <me@benboeckel.net> wrote:
-> > Can this be committed to `Documentation/` and not just the Git history
-> > please?
-> 
-> This is documented, but it doesn't come in until the 8th patch in the series. 
-> Hopefully that is not an issue.
+Currently the timeout check will immediately break out of the
+while loop because timeout-- is always true on the first
+iteration because timeout was initialized to 100. The check
+is inverted, it should exit when timeout is zero. Fix this
+by adding the missing ! operator.
 
-Ah, I'll look there, thanks.
+Fixes: 9e2c7d99941d ("crypto: cavium - Add Support for Octeon-tx CPT Engine")
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+---
+ drivers/crypto/cavium/cpt/cptpf_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> >> + if (isspace(desc[i]))
-> >> + desc[i] = 0;
-> > 
-> > How is setting a space to `0` *removing* it? Surely the `isxdigit` check
-> > internally is going to reject this. Perhaps you meant to have two
-> > indices into `desc`, one read and one write and to stall the write index
-> > as long as we're reading whitespace?
-> > 
-> > Also, that whitespace is stripped is a userspace-relevant detail that
-> > should be documented.
-> 
-> This was done incase the end-user has a trailing carriage return at the
-> end of their ACL. I have updated the comment as follows:
-> 
-> +       /*
-> +        * Copy the user supplied contents, if uppercase is used, convert it to
-> +        * lowercase.  Also if the end of the ACL contains any whitespace, strip
-> +        * it out.
-> +        */
+diff --git a/drivers/crypto/cavium/cpt/cptpf_main.c b/drivers/crypto/cavium/cpt/cptpf_main.c
+index 6872ac344001..48f878460f41 100644
+--- a/drivers/crypto/cavium/cpt/cptpf_main.c
++++ b/drivers/crypto/cavium/cpt/cptpf_main.c
+@@ -44,7 +44,7 @@ static void cpt_disable_cores(struct cpt_device *cpt, u64 coremask,
+ 		dev_err(dev, "Cores still busy %llx", coremask);
+ 		grp = cpt_read_csr64(cpt->reg_base,
+ 				     CPTX_PF_EXEC_BUSY(0));
+-		if (timeout--)
++		if (!timeout--)
+ 			break;
+ 
+ 		udelay(CSR_DELAY);
+-- 
+2.39.5
 
-Well, this doesn't check the end for whitespace; any internal whitespace
-will terminate the key:
-
-    DEAD BEEF
-        ^ becomes NUL
-
-and results in the same thing as `DEAD` being passed.
-
-> > 
-> >> +static void key_acl_destroy(struct key *key)
-> >> +{
-> >> + /* It should not be possible to get here */
-> >> + pr_info("destroy clavis_key_acl denied\n");
-> >> +}
-> >> +
-> >> +static void key_acl_revoke(struct key *key)
-> >> +{
-> >> + /* It should not be possible to get here */
-> >> + pr_info("revoke clavis_key_acl denied\n");
-> >> +}
-> > 
-> > These keys cannot be destroyed or revoked? This seems…novel to me. What
-> > if there's a timeout on the key? If such keys are immortal, timeouts
-> > should also be refused?
-> 
-> All the system kernel keyrings work this way. But now that you bring this up, neither of
-> these functions are really necessary, so I will remove them in the next round.
-> 
-> >> +static int key_acl_vet_description(const char *desc)
-> >> +{
-> >> + int i, desc_len;
-> >> + s16 ktype;
-> >> +
-> >> + if (!desc)
-> >> + goto invalid;
-> >> +
-> >> + desc_len = sizeof(desc);
-> > 
-> > This should be `strlen`, no?
-> 
-> I will change this to strlen
-
-Actually, this could probably be `strnlen` using `CLAVIS_ASCII_KID_MAX +
-1` just to avoid running off into la-la land when we're going to error
-anyways. Or even `8` because we only actually care about "is at least 7
-bytes". Worth a comment either way.
-
-Looking forward to the next cycle.
-
-Thanks,
-
---Ben
