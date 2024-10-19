@@ -1,78 +1,62 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA699224CF;
-	Sat, 19 Oct 2024 00:20:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17A831DE4FE
+	for <linux-crypto@vger.kernel.org>; Sat, 19 Oct 2024 11:17:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729297246; cv=none; b=S2FjRX9BDssP/hI70Z4cvzVIRRtnSAStyFjVQ1eh+AQEnAG+CT5fK2Pp7zBcsOw2QbRtLwMhHm9ZwkTUv1+wdk/j3oFQNx+t028UAWBwiy7nU1pE/t9masaNX/74cAh3LmzhUCvIVNSAdmpo+2Jdlc8Fk+BDcOsf8N2YeWezODM=
+	t=1729336654; cv=none; b=O23DIoIh3AfCatdNImFSPK2bPCcajeXmX+9DjFc3l54SXxLRhB+Bjp7/EI8P+4e2TpwGOXzrn8ls2XjICyFF8iV0S1FpjDfrHcHCpAbZ+BPsTEULr986T8lBeZ73coaZ1Bw9yWVc0A+9I7kKQMHpGvRFCZlIqNisQncPZUsJVlk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729297246; c=relaxed/simple;
-	bh=qI5l1jsqzoUe0LmaPMq9oX46BlP9hJIre2mnGkMU4CE=;
+	s=arc-20240116; t=1729336654; c=relaxed/simple;
+	bh=Zjiq7e1fFQI6X20ENIuIYMu1sQf5Z3jfLjief1a2hqk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZnFcEAj0H/yW00l1ZXMqqPiCGGjewrVi2B9Rx851wzJbYD+4jKVVrIJOKCO7NLUmonsOZX1uMCLxOqioEcBh71mT4bluv/x8VjPaX9CgjN4aPGe7W0aUYy6UyRE8zK5RPVOTk7mvheyWEEcJyb+FfF8KXiLBcBgaosyvXKltr/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=PYB9fJvZ; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=BUIacBS3mxuBS1yfnLv7RcmCBug6rwVKck1SjnHNb8xsb+M+bwznVLBX8KkXhhmsYaRQZTziIdNbyBh/l2/fE3qzXhhA2DiQKp1O9raHjAqdBXEouBX2g4ukGaCV488CePjyi+VHMa63BSseCkRN2WGGFRERa53zn3e3dVkH9ts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nsKQxZL2; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="PYB9fJvZ"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=zdDTvBQFkrAbA5UYsiAGy1L58PcaCZM1pS4G5GVb73Q=; b=PYB9fJvZq646VxX9D/D6jU4RSV
-	WLOvBXYenBE+50AuDfcfPeNRirfZqz7oH+8dk3oc/5Zaj6H6/Ju+R5yGCtbu8SgfBB2CFvOCKic9M
-	pPX0eFVYzLLZuXXaTDRt7lA7b3jkW7eZc4E2tLDSzOPs5aMaGN4JDs1ITCn/y9qu16L738mPm5xDH
-	BwYPpZp0yUC8/9oBrPkxcL0/8g4YqpayJbJRA5lV1j1mjGaRfMghyHt47R5aNsgcgxN7vygZeK/jR
-	i40azgCN3t7PtUAHwpoBIQ9/bB43LwqBZZdeaHo7qQUkuZMEwOInEbU2oRRTcBWZlhdUzJXC+l8UP
-	nUsoHnzQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1t1xCD-00AVu7-2K;
-	Sat, 19 Oct 2024 08:19:54 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 19 Oct 2024 08:19:53 +0800
-Date: Sat, 19 Oct 2024 08:19:53 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"hannes@cmpxchg.org" <hannes@cmpxchg.org>,
-	"yosryahmed@google.com" <yosryahmed@google.com>,
-	"nphamcs@gmail.com" <nphamcs@gmail.com>,
-	"chengming.zhou@linux.dev" <chengming.zhou@linux.dev>,
-	"usamaarif642@gmail.com" <usamaarif642@gmail.com>,
-	"ryan.roberts@arm.com" <ryan.roberts@arm.com>,
-	"Huang, Ying" <ying.huang@intel.com>,
-	"21cnbao@gmail.com" <21cnbao@gmail.com>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"clabbe@baylibre.com" <clabbe@baylibre.com>,
-	"ardb@kernel.org" <ardb@kernel.org>,
-	"ebiggers@google.com" <ebiggers@google.com>,
-	"surenb@google.com" <surenb@google.com>,
-	"Accardi, Kristen C" <kristen.c.accardi@intel.com>,
-	"zanussi@kernel.org" <zanussi@kernel.org>,
-	"viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
-	"brauner@kernel.org" <brauner@kernel.org>,
-	"jack@suse.cz" <jack@suse.cz>,
-	"mcgrof@kernel.org" <mcgrof@kernel.org>,
-	"kees@kernel.org" <kees@kernel.org>,
-	"joel.granados@kernel.org" <joel.granados@kernel.org>,
-	"bfoster@redhat.com" <bfoster@redhat.com>,
-	"willy@infradead.org" <willy@infradead.org>,
-	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-	"Feghali, Wajdi K" <wajdi.k.feghali@intel.com>,
-	"Gopal, Vinodh" <vinodh.gopal@intel.com>
-Subject: Re: [RFC PATCH v1 01/13] crypto: acomp - Add a poll() operation to
- acomp_alg and acomp_req
-Message-ID: <ZxL7KUGUroiOYssf@gondor.apana.org.au>
-References: <20241018064101.336232-1-kanchana.p.sridhar@intel.com>
- <20241018064101.336232-2-kanchana.p.sridhar@intel.com>
- <ZxIUXX-FGxOO1qy1@gondor.apana.org.au>
- <SJ0PR11MB5678CE94DDBDEC00EA693293C9402@SJ0PR11MB5678.namprd11.prod.outlook.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nsKQxZL2"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1729336652; x=1760872652;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Zjiq7e1fFQI6X20ENIuIYMu1sQf5Z3jfLjief1a2hqk=;
+  b=nsKQxZL2ZmlfOFZfEaznKsN5u4Z42D08CCo0C2rLeUeGVGyMyKJtokay
+   vKsMNHn6CeE6voNdodh8spxEW6o0sPQ7fDVxI4PWbu3PhZNq6Uc7XQxpN
+   yzg/RZA0xBzi2VGG+QwiQQONT9yNqbCDyWReLjxPHNckADsX302b5HTpB
+   a+UvxZd3OVwQi+H0e5xl7VBwJBNy7MsVw0VeiZR069WkBQf6UytMUGjQx
+   msS5Q1GvfNsaKguD8/Zhj+i5jbGJ6uBl96HP4kJPc1jObw5xoaLmNVj1T
+   ITg9oEcuz0+PNvcvQIHloKOHk6lJ/wlcZEefLj/Tkvw9BYZimaIk0IwOx
+   Q==;
+X-CSE-ConnectionGUID: zQ8axplxQNWsi8ENATYBgA==
+X-CSE-MsgGUID: 8aKwJS6lSWiNt1BRYbyqeg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11230"; a="46364195"
+X-IronPort-AV: E=Sophos;i="6.11,216,1725346800"; 
+   d="scan'208";a="46364195"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Oct 2024 04:17:31 -0700
+X-CSE-ConnectionGUID: VewpjysSTHuDo4gn7sRuMA==
+X-CSE-MsgGUID: v6rEaqerTWi0W5BAs9KmaQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,216,1725346800"; 
+   d="scan'208";a="109852558"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by fmviesa001.fm.intel.com with ESMTP; 19 Oct 2024 04:17:30 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1t27SZ-000OvZ-2Q;
+	Sat, 19 Oct 2024 11:17:27 +0000
+Date: Sat, 19 Oct 2024 19:16:47 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ard Biesheuvel <ardb+git@google.com>, linux-crypto@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	ebiggers@kernel.org, herbert@gondor.apana.org.au,
+	Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH 2/2] crypto/crc32c: Provide crc32c-base alias to enable
+ fuzz testing
+Message-ID: <202410191558.TPVuZtME-lkp@intel.com>
+References: <20241015141514.3000757-6-ardb+git@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -81,27 +65,41 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <SJ0PR11MB5678CE94DDBDEC00EA693293C9402@SJ0PR11MB5678.namprd11.prod.outlook.com>
+In-Reply-To: <20241015141514.3000757-6-ardb+git@google.com>
 
-On Fri, Oct 18, 2024 at 11:01:10PM +0000, Sridhar, Kanchana P wrote:
->
-> Thanks for your code review comments. Are you referring to how the
-> async/poll interface is enabled at the level of say zswap (by setting a
-> flag in the acomp_req), followed by the iaa_crypto driver testing for
-> the flag and submitting the request and returning -EINPROGRESS.
-> Wouldn't we still need a separate API to do the polling?
+Hi Ard,
 
-Correct me if I'm wrong, but I think what you want to do is this:
+kernel test robot noticed the following build errors:
 
-	crypto_acomp_compress(req)
-	crypto_acomp_poll(req)
+[auto build test ERROR on herbert-cryptodev-2.6/master]
+[also build test ERROR on herbert-crypto-2.6/master linus/master v6.12-rc3 next-20241018]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-So instead of adding this interface, where the poll essentially
-turns the request synchronous, just move this logic into the driver,
-based on a flag bit in req.
+url:    https://github.com/intel-lab-lkp/linux/commits/Ard-Biesheuvel/crypto-crc32-Provide-crc32-base-alias-to-enable-fuzz-testing/20241015-221858
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+patch link:    https://lore.kernel.org/r/20241015141514.3000757-6-ardb%2Bgit%40google.com
+patch subject: [PATCH 2/2] crypto/crc32c: Provide crc32c-base alias to enable fuzz testing
+config: hexagon-randconfig-001-20241018 (https://download.01.org/0day-ci/archive/20241019/202410191558.TPVuZtME-lkp@intel.com/config)
+compiler: clang version 20.0.0git (https://github.com/llvm/llvm-project bfe84f7085d82d06d61c632a7bad1e692fd159e4)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241019/202410191558.TPVuZtME-lkp@intel.com/reproduce)
 
-Cheers,
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410191558.TPVuZtME-lkp@intel.com/
+
+All errors (new ones prefixed by >>, old ones prefixed by <<):
+
+>> ERROR: modpost: "__crc32c_le_base" [crypto/crc32c_generic.ko] undefined!
+
+Kconfig warnings: (for reference only)
+   WARNING: unmet direct dependencies detected for MODVERSIONS
+   Depends on [n]: MODULES [=y] && !COMPILE_TEST [=y]
+   Selected by [y]:
+   - RANDSTRUCT_FULL [=y] && (CC_HAS_RANDSTRUCT [=y] || GCC_PLUGINS [=n]) && MODULES [=y]
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
