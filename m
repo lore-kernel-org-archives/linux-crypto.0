@@ -1,72 +1,67 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D00CE18FC65
-	for <linux-crypto@vger.kernel.org>; Sat, 19 Oct 2024 11:57:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97DB517DE36
+	for <linux-crypto@vger.kernel.org>; Sat, 19 Oct 2024 11:57:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729339028; cv=none; b=ethmUekEKFM4/dnZZIckyBxxv359uZA5QbiaPE2DqS330YYWnQz0hrfn9ZBF5zf96WOqLezteu1P5voMQBkAKpUDBusYgVlgfVonhX8QJxtJog47Mfyq5gNhDsToSBjIDXCafbz8X8QwbPH34wjiRojguUglNn5/MZesTn57/4c=
+	t=1729339045; cv=none; b=C380ByGa0Q3msW58hQNjqWBlc+5Ya4eR2RiJ1gPLPAYo3zeIS8IKB4MMuScT/9fcygTJvpsHVWMMFjjvl+aZx+5Eg1eZ2TBf/PD7zSgE1R7KiZR4zTuvNN2jOFM/VkVgah8zJoczrKGALLaKk0JAn/JIf8xT87+6C5hV3By2SyM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729339028; c=relaxed/simple;
-	bh=6gC3dNzdjCfxPPSWvPNJE16oeV5l3Y7Is1nw1ftyipw=;
+	s=arc-20240116; t=1729339045; c=relaxed/simple;
+	bh=RF+gbGHFaM8flsq6zqGgKP6lN3Yu8doXn/91PQYIXUg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fhNWmJ/vbTEJGJ/hAibHD3A+1PwpNGPSj7oP7OG9EFGHGapoGPSItsCeztMODBwjoUdRhptyw1i+9TY/gavLVkOh9lO54TojFZ1ugywn0l+VCSzhpspmoBT2vKiXCcH4WdAbbF4nJ9FMkaCMuFDcOx18GhpUUdlUUlVc7EZvr5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=Stx9PQ5r; arc=none smtp.client-ip=144.6.53.87
+	 Content-Type:Content-Disposition:In-Reply-To; b=rZgn1kPT4nJoCmFZy0/0RhjjoELqET0OrvZiKIamJvUUKwriiZSOIh60oFEyi8yMkiFblbPMiKql0nIcwkKjwBdybTXAGUOSK3Mdv7yVJgFCp3zeVP5USeaUDCmXVvr1bD8Ho136BLnAvc46pdxjKVGybmQxUWe5o9ONDrfjyvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=Y3ejfSS0; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="Stx9PQ5r"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="Y3ejfSS0"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	s=formenos; h=In-Reply-To:Content-Transfer-Encoding:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=gd4bKnGxxewATgSc97WW9IAsKDjzAdQqzXrIJ7aC7GQ=; b=Stx9PQ5rgTGHbktilVhwsTcUCu
-	qDvxvP11gjmw7eJJPmFP09mj75FiKcztpeOMMjMjlLcR8TMWlzRV0FNlkYhfyeknjgu3PWPWSknjF
-	1IHvfMfKB1iuDH7xqca5yI0a6rG4vp9VUNSMWEszh004pMPAuHCvoaVQTk8VTNaV6cv2XO1QklDL6
-	S2+1dX9NZioYdCFXvwaQGmSIfgxbss8aT6QMkDZHUzxMLf6lQLYNZwjT0S5mb+RN/NLCasghjOFKp
-	xC3voOawG3i5nBugw67UIKCjviTSDE6JpBvLZXsi6ZWEOJKHi+zsv6OjfbuSWHsRwwoJyTuswqp1T
-	gk3JTQXQ==;
+	bh=8A3k6sOSOFixGvWV1wi0LZvyFrAmd3zWMDkGNVp677A=; b=Y3ejfSS0yDHmI4TBFYBm76TKxQ
+	If6iVgbRb624ZXaUT+vCSCqdzmDpVojtJXjR4vZytVjXgB/NUxf1Cf3y2jLDbLvVGhK0kAxbqOyAJ
+	aR/SIqSNdVv6JgwRMCcWyeXlodrzNaaaHyZ2313CGSUwEskK1SQDbCnNkPztes1sY/E5EbGsPRJvO
+	hPTMoWBHetMrGeMj1jBFtvw4vMYERn3veg6guTKRc6SRmHh98fUbsGHpTyqCt7O9FLEKMUOBFjrun
+	BLrQYzvoGKLSmZ7qJl1ycXoRuoduOmrmmXgOOObSFCuFiHQp/6+aVJtQSaOgv1/gN2XNcpOfVrgA2
+	fgOTb5gw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1t284l-00AaO3-01;
-	Sat, 19 Oct 2024 19:56:56 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 19 Oct 2024 19:56:55 +0800
-Date: Sat, 19 Oct 2024 19:56:54 +0800
+	id 1t2853-00AaOZ-0R;
+	Sat, 19 Oct 2024 19:57:14 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 19 Oct 2024 19:57:13 +0800
+Date: Sat, 19 Oct 2024 19:57:13 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Ahsan Atta <ahsan.atta@intel.com>
-Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: Re: [PATCH] crypto: qat - remove faulty arbiter config reset
-Message-ID: <ZxOehv1-wZiGdkY-@gondor.apana.org.au>
-References: <20241007134240.12278-1-ahsan.atta@intel.com>
+To: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>
+Cc: "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] crypto: Switch back to struct platform_driver::remove()
+Message-ID: <ZxOemUqB8FARuJXS@gondor.apana.org.au>
+References: <20241007205803.444994-9-u.kleine-koenig@baylibre.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20241007134240.12278-1-ahsan.atta@intel.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20241007205803.444994-9-u.kleine-koenig@baylibre.com>
 
-On Mon, Oct 07, 2024 at 02:42:40PM +0100, Ahsan Atta wrote:
-> Resetting the service arbiter config can cause potential issues
-> related to response ordering and ring flow control check in the
-> event of AER or device hang. This is because it results in changing
-> the default response ring size from 32 bytes to 16 bytes. The service
-> arbiter config reset also disables response ring flow control check.
-> Thus, by removing this reset we can prevent the service arbiter from
-> being configured inappropriately, which leads to undesired device
-> behaviour in the event of errors.
+On Mon, Oct 07, 2024 at 10:58:06PM +0200, Uwe Kleine-König wrote:
+> After commit 0edb555a65d1 ("platform: Make platform_driver::remove()
+> return void") .remove() is (again) the right callback to implement for
+> platform drivers.
 > 
-> Fixes: 7afa232e76ce ("crypto: qat - Intel(R) QAT DH895xcc accelerator")
-> Signed-off-by: Ahsan Atta <ahsan.atta@intel.com>
-> Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-> ---
->  drivers/crypto/intel/qat/qat_common/adf_hw_arbiter.c | 4 ----
->  1 file changed, 4 deletions(-)
+> Convert all platform drivers below drivers/crypto to use .remove(), with
+> the eventual goal to drop struct platform_driver::remove_new(). As
+> .remove() and .remove_new() have the same prototypes, conversion is done
+> by just changing the structure member name in the driver initializer.
+> 
+> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@baylibre.com>
 
 Patch applied.  Thanks.
 -- 
