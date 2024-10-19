@@ -1,43 +1,78 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBB231917EE;
-	Fri, 18 Oct 2024 23:56:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA699224CF;
+	Sat, 19 Oct 2024 00:20:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729295780; cv=none; b=MXGPL8vbQq7nIWjMsbm1mLhTT2jUKrdBv/FlHF86+mSLT9c57LWTxinzQG8t+iTzSQWRwAZ1Gt5nKnl6vGdpYfAmaI7YS0ljYi68i8WOGrCJ9ZC+01BFCClv3hSFvnIpSvkqtjG/0tNbzJUn8tUFArZ1QQT+MENfStxKDW4xbtc=
+	t=1729297246; cv=none; b=S2FjRX9BDssP/hI70Z4cvzVIRRtnSAStyFjVQ1eh+AQEnAG+CT5fK2Pp7zBcsOw2QbRtLwMhHm9ZwkTUv1+wdk/j3oFQNx+t028UAWBwiy7nU1pE/t9masaNX/74cAh3LmzhUCvIVNSAdmpo+2Jdlc8Fk+BDcOsf8N2YeWezODM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729295780; c=relaxed/simple;
-	bh=T+fck0FKE7KEsi6QVW88MImDd340gpAGDdrA780Mp+s=;
+	s=arc-20240116; t=1729297246; c=relaxed/simple;
+	bh=qI5l1jsqzoUe0LmaPMq9oX46BlP9hJIre2mnGkMU4CE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pFOyzF+Oimkp3BbK/puojJIl0RmC1jO0+eJ2aj3s1ggpV0aMtV4uY8R5wNN1wv+dD2b/CIf4SRv/r4kUNYYx28QygcH71V0YquMmgimxNg3/QBXtgFzZzcmSUL9TqnWu5MeEKDJM9WayHU7IgPfrNC08H99QfotXWRu0WK3BGO8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S9UGa620; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZnFcEAj0H/yW00l1ZXMqqPiCGGjewrVi2B9Rx851wzJbYD+4jKVVrIJOKCO7NLUmonsOZX1uMCLxOqioEcBh71mT4bluv/x8VjPaX9CgjN4aPGe7W0aUYy6UyRE8zK5RPVOTk7mvheyWEEcJyb+FfF8KXiLBcBgaosyvXKltr/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=PYB9fJvZ; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S9UGa620"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 013AEC4CEC3;
-	Fri, 18 Oct 2024 23:56:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729295780;
-	bh=T+fck0FKE7KEsi6QVW88MImDd340gpAGDdrA780Mp+s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=S9UGa620VSwNCDAaA9nRPPBBCFnlXXzqehxpGzXt4J7hiWp0fUhOxOjXMPJtcsEkJ
-	 6JbiuZtXv/nUeo9New77lOgv1o1uWW2GQXwA1wW0PK24DYlzKyFqWj57+HOkFBrRi/
-	 PE6yKEfifMu/T/LGopqT3/AOcPOTL2hiJedsr2MdMlLPlWgo/GCxTeKUkl9/xLD3vZ
-	 Q5CEHgfzvB6FM2gvKjuoeZSieUomwWCC6ZO//EN/bFPzaetzfplfxA516ScH9qbf1r
-	 pvkxX/OJLiziFZOIHBTzo+eLgYdLk8KyROU6oyhNsVy3vzEbuBXXrCq9V5LbIRrtuE
-	 VNfZTihGI5+FA==
-Date: Fri, 18 Oct 2024 16:56:18 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Ard Biesheuvel <ardb+git@google.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-	will@kernel.org, catalin.marinas@arm.com,
-	Ard Biesheuvel <ardb@kernel.org>, Kees Cook <kees@kernel.org>
-Subject: Re: [PATCH v4 3/3] arm64/crc32: Implement 4-way interleave using
- PMULL
-Message-ID: <20241018235618.GB2589@sol.localdomain>
-References: <20241018075347.2821102-5-ardb+git@google.com>
- <20241018075347.2821102-8-ardb+git@google.com>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="PYB9fJvZ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=zdDTvBQFkrAbA5UYsiAGy1L58PcaCZM1pS4G5GVb73Q=; b=PYB9fJvZq646VxX9D/D6jU4RSV
+	WLOvBXYenBE+50AuDfcfPeNRirfZqz7oH+8dk3oc/5Zaj6H6/Ju+R5yGCtbu8SgfBB2CFvOCKic9M
+	pPX0eFVYzLLZuXXaTDRt7lA7b3jkW7eZc4E2tLDSzOPs5aMaGN4JDs1ITCn/y9qu16L738mPm5xDH
+	BwYPpZp0yUC8/9oBrPkxcL0/8g4YqpayJbJRA5lV1j1mjGaRfMghyHt47R5aNsgcgxN7vygZeK/jR
+	i40azgCN3t7PtUAHwpoBIQ9/bB43LwqBZZdeaHo7qQUkuZMEwOInEbU2oRRTcBWZlhdUzJXC+l8UP
+	nUsoHnzQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1t1xCD-00AVu7-2K;
+	Sat, 19 Oct 2024 08:19:54 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 19 Oct 2024 08:19:53 +0800
+Date: Sat, 19 Oct 2024 08:19:53 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"hannes@cmpxchg.org" <hannes@cmpxchg.org>,
+	"yosryahmed@google.com" <yosryahmed@google.com>,
+	"nphamcs@gmail.com" <nphamcs@gmail.com>,
+	"chengming.zhou@linux.dev" <chengming.zhou@linux.dev>,
+	"usamaarif642@gmail.com" <usamaarif642@gmail.com>,
+	"ryan.roberts@arm.com" <ryan.roberts@arm.com>,
+	"Huang, Ying" <ying.huang@intel.com>,
+	"21cnbao@gmail.com" <21cnbao@gmail.com>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"clabbe@baylibre.com" <clabbe@baylibre.com>,
+	"ardb@kernel.org" <ardb@kernel.org>,
+	"ebiggers@google.com" <ebiggers@google.com>,
+	"surenb@google.com" <surenb@google.com>,
+	"Accardi, Kristen C" <kristen.c.accardi@intel.com>,
+	"zanussi@kernel.org" <zanussi@kernel.org>,
+	"viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+	"brauner@kernel.org" <brauner@kernel.org>,
+	"jack@suse.cz" <jack@suse.cz>,
+	"mcgrof@kernel.org" <mcgrof@kernel.org>,
+	"kees@kernel.org" <kees@kernel.org>,
+	"joel.granados@kernel.org" <joel.granados@kernel.org>,
+	"bfoster@redhat.com" <bfoster@redhat.com>,
+	"willy@infradead.org" <willy@infradead.org>,
+	"linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+	"Feghali, Wajdi K" <wajdi.k.feghali@intel.com>,
+	"Gopal, Vinodh" <vinodh.gopal@intel.com>
+Subject: Re: [RFC PATCH v1 01/13] crypto: acomp - Add a poll() operation to
+ acomp_alg and acomp_req
+Message-ID: <ZxL7KUGUroiOYssf@gondor.apana.org.au>
+References: <20241018064101.336232-1-kanchana.p.sridhar@intel.com>
+ <20241018064101.336232-2-kanchana.p.sridhar@intel.com>
+ <ZxIUXX-FGxOO1qy1@gondor.apana.org.au>
+ <SJ0PR11MB5678CE94DDBDEC00EA693293C9402@SJ0PR11MB5678.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -46,40 +81,27 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241018075347.2821102-8-ardb+git@google.com>
+In-Reply-To: <SJ0PR11MB5678CE94DDBDEC00EA693293C9402@SJ0PR11MB5678.namprd11.prod.outlook.com>
 
-On Fri, Oct 18, 2024 at 09:53:51AM +0200, Ard Biesheuvel wrote:
-> From: Ard Biesheuvel <ardb@kernel.org>
-> 
-> Now that kernel mode NEON no longer disables preemption, using FP/SIMD
-> in library code which is not obviously part of the crypto subsystem is
-> no longer problematic, as it will no longer incur unexpected latencies.
-> 
-> So accelerate the CRC-32 library code on arm64 to use a 4-way
-> interleave, using PMULL instructions to implement the folding.
-> 
-> On Apple M2, this results in a speedup of 2 - 2.8x when using input
-> sizes of 1k - 8k. For smaller sizes, the overhead of preserving and
-> restoring the FP/SIMD register file may not be worth it, so 1k is used
-> as a threshold for choosing this code path.
-> 
-> The coefficient tables were generated using code provided by Eric. [0]
-> 
-> [0] https://github.com/ebiggers/libdeflate/blob/master/scripts/gen_crc32_multipliers.c
-> 
-> Cc: Eric Biggers <ebiggers@kernel.org>
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-> ---
->  arch/arm64/lib/crc32-glue.c |  48 ++++
->  arch/arm64/lib/crc32.S      | 231 +++++++++++++++++++-
->  2 files changed, 276 insertions(+), 3 deletions(-)
+On Fri, Oct 18, 2024 at 11:01:10PM +0000, Sridhar, Kanchana P wrote:
+>
+> Thanks for your code review comments. Are you referring to how the
+> async/poll interface is enabled at the level of say zswap (by setting a
+> flag in the acomp_req), followed by the iaa_crypto driver testing for
+> the flag and submitting the request and returning -EINPROGRESS.
+> Wouldn't we still need a separate API to do the polling?
 
-Reviewed-by: Eric Biggers <ebiggers@google.com>
+Correct me if I'm wrong, but I think what you want to do is this:
 
-> +	if (len >= min_len && cpu_have_named_feature(PMULL) && crypto_simd_usable()) {
+	crypto_acomp_compress(req)
+	crypto_acomp_poll(req)
 
-Using crypto_simd_usable() here causes a build error when CRYPTO_ALGAPI2=m.
-https://lore.kernel.org/linux-crypto/20241018235343.425758-1-ebiggers@kernel.org
-will fix that.
+So instead of adding this interface, where the poll essentially
+turns the request synchronous, just move this logic into the driver,
+based on a flag bit in req.
 
-- Eric
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
