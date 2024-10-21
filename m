@@ -1,95 +1,72 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 570261CBEB6;
-	Mon, 21 Oct 2024 17:56:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EA8F1F9428;
+	Mon, 21 Oct 2024 18:27:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729533402; cv=none; b=sBmZoDA2+kHz2LcDdrbct6YhDt/mvO0Ao5y1VXPMMQxP7/OFd5hl/sQLzUZCPkhmXgpCDHegd1+yIO3LQYzEtaF5hg9ySOH83GHph36NCjOZXsggWE2WpEFiV1NgXA9qjxWzhUQaCCLXKkp7PjJsGdwgFemRPW6lCpKewyNCNpo=
+	t=1729535250; cv=none; b=i1L9XMj22dEIiLh6FSnKPIrCTZfEHlpRXEKEFz9XWlSwyM8ERJvIPD//HPUhCKosGMTAiuP92cWqJbiQL8vCr5OJBIPLOcpUwld6Iy8uocKwnaxKRNwjuV2sjH/hl+Pangt1jj0sNszA3mjvkOeYJNGMu+UCcrEFu/mfb468qlw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729533402; c=relaxed/simple;
-	bh=iOp6UPk7kp6624trt50V9GCSl7TCmUx91AXnl52vexs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AyJL+OGZwtVdd0o9uu1OLks4L11/TH3IkqaNJ/QagCRCQPer47uMTTtxkS5zRdcryA0OnWTx4D3TrGBLmvWNtt/mvBMDFD4RqWntO67QMDSuLjIj3cKqnpK9pcDHmQTqegQp34/JwSFT7YrMhNn70sh2kyRSwCJ/eDw8NgEEUrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sJQY/rj4; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1729535250; c=relaxed/simple;
+	bh=2sEOQOPHW1JywRabWfVE6g+TWK69PAQId9/YmP1/b4I=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=omyqi15+GsJ20O6hptiMoAROHhjM6ecHYXmNYP8QTBVvgrMHlL1pWlkM6bQVtfM9ugBbnl21BSArP3oxv12Yzejo0+W97teo4Mtx53t99fLttIV/IYodvHB8sfv+eNX+xabA3rtFyW1fGF8E68mdeLO9ry4r+dn4/P1dWMyg2+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S0jypGmh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sJQY/rj4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2F2FC4CEC7;
-	Mon, 21 Oct 2024 17:56:41 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S0jypGmh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1688C4CEC3;
+	Mon, 21 Oct 2024 18:27:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729533402;
-	bh=iOp6UPk7kp6624trt50V9GCSl7TCmUx91AXnl52vexs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sJQY/rj4pTIO5uEWlo1heoszsTNmf9jrwjFBD0lIbKoaTFxHVpdjurFhvf6qbFqVx
-	 3p4d5v2zCCp/LbxdIlTGmC11dWGlMVeXXfBDk8A9Aml+/MAtk2IETKhnM8m6cKxkey
-	 BZF/dYUet13hmxhgQOUCWlo2mvzJlbvIRi1nLRTDg+g177wJbtfgI05mwIy3+AOG+C
-	 2RdO3YmkeY7RM1WJnyPqFT2fPe/8kLv+1aQd4pfj1zTvRhlxt250RD3qNZbbCGpcse
-	 fs5+AtO+kgnLwq3Dm+Zt8UDEsdLr8Tbrkjy5WAyah1cfbA8sbkBGsmyodZGLNuMspU
-	 cTEE/rSNQw61A==
-Date: Mon, 21 Oct 2024 17:56:40 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: Heiko Carstens <hca@linux.ibm.com>
-Cc: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-	linux-mips@vger.kernel.org, linux-riscv@lists.infradead.org,
-	linux-s390@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	loongarch@lists.linux.dev, sparclinux@vger.kernel.org,
-	x86@kernel.org, Hendrik Brueckner <brueckner@linux.ibm.com>
-Subject: Re: [PATCH 07/15] s390/crc32: expose CRC32 functions through lib
-Message-ID: <20241021175640.GA1370449@google.com>
-References: <20241021002935.325878-1-ebiggers@kernel.org>
- <20241021002935.325878-8-ebiggers@kernel.org>
- <20241021104007.6950-E-hca@linux.ibm.com>
+	s=k20201202; t=1729535250;
+	bh=2sEOQOPHW1JywRabWfVE6g+TWK69PAQId9/YmP1/b4I=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=S0jypGmhGp5uoOK4Ozsx9ZXQmQmpem3pbft33fN/S49Jm7LNXhD95YP+FtITl3jkq
+	 TPZAN63bkusJZ4Nkb0ezkICnzmgM9p/GqTH6lcVW6JacRKlz3NyOdjvpwbqYvHlduu
+	 CmCeC5ZOTU1ucvATVBSalu8RTI/sYuExvoum13uqYOmHcpiOyhdu/Vu3hgKb8nZTrt
+	 WOdVertBUlGuRHEbU30xyfR79yVl9TUKZ6CdTJeJtKp9yQI2Tpb81CpoBFQ28u5jt2
+	 uW6GvsQ802/s0+LjWzRaYwReAFSASWWfn7Ho6kxf5lXA1oM3g694LNoLk8gTqwMPOx
+	 8Pu9AggMgZGEQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3408E3809A8A;
+	Mon, 21 Oct 2024 18:27:37 +0000 (UTC)
+Subject: Re: [GIT PULL] Crypto Fixes for 6.12
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <ZxXqbFAO9VN3ugIR@gondor.apana.org.au>
+References: <ZEYLC6QsKnqlEQzW@gondor.apana.org.au>
+ <ZJ0RSuWLwzikFr9r@gondor.apana.org.au>
+ <ZOxnTFhchkTvKpZV@gondor.apana.org.au>
+ <ZUNIBcBJ0VeZRmT9@gondor.apana.org.au>
+ <ZZ3F/Pp1pxkdqfiD@gondor.apana.org.au>
+ <ZbstBewmaIfrFocE@gondor.apana.org.au>
+ <ZgFIP3x1w294DIxQ@gondor.apana.org.au>
+ <ZkrC8u1NmwpldTOH@gondor.apana.org.au>
+ <ZvDbn6lSNdWG9P6f@gondor.apana.org.au>
+ <Zw9RM_jNu9vqp9T8@gondor.apana.org.au> <ZxXqbFAO9VN3ugIR@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-crypto.vger.kernel.org>
+X-PR-Tracked-Message-Id: <ZxXqbFAO9VN3ugIR@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.12-p4
+X-PR-Tracked-Commit-Id: cd843399d706411ff80520fb7883afeeefa76e98
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: a777c32ca42b9a8a5e5abd915883a73620d9044b
+Message-Id: <172953525589.401524.8311435958320768805.pr-tracker-bot@kernel.org>
+Date: Mon, 21 Oct 2024 18:27:35 +0000
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241021104007.6950-E-hca@linux.ibm.com>
 
-On Mon, Oct 21, 2024 at 12:40:07PM +0200, Heiko Carstens wrote:
-> What makes sure that all of the code is available automatically if the
-> CPU supports the instructions like before? I can see that all CRC32
-> related config options support also module build options.
-> 
-> Before this patch, this module and hence the fast crc32 variants were
-> loaded automatically when required CPU features were present.
-> Right now I don't how this is happening with this series.
+The pull request you sent on Mon, 21 Oct 2024 13:45:16 +0800:
 
-There's just a direct symbol dependency now.  For example
-ext4.ko -> crc32-s390.ko [crc32c_le_arch] -> crc32.ko [crc32c_le_base].
-So, crc32-$arch.ko always gets loaded when there is a user of one of the CRC32
-library functions, provided that it was enabled in the kconfig.
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.12-p4
 
-crc32-$arch then calls either the accelerated code or the base code depending on
-the CPU features.  On most architectures including s390, I made this use a
-static branch, so there is almost no overhead (much less overhead than the
-indirect call that was needed before).
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/a777c32ca42b9a8a5e5abd915883a73620d9044b
 
-This is the same way that some of the crypto library code already works.
+Thank you!
 
-> > +static int __init crc32_s390_init(void)
-> > +{
-> > +	if (cpu_have_feature(S390_CPU_FEATURE_VXRS))
-> > +		static_branch_enable(&have_vxrs);
-> > +	return 0;
-> > +}
-> > +arch_initcall(crc32_s390_init);
-> 
-> I guess this should be changed to:
-> 
-> module_cpu_feature_match(S390_CPU_FEATURE_VXRS, ...);
-> 
-> Which would make at least the library functions available if cpu
-> features are present. But this looks only like a partial solution of
-> the above described problem.
-> 
-> But maybe I'm missing something.
-
-This is not needed, as per the above.
-
-- Eric
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
