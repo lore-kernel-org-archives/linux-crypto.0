@@ -1,197 +1,129 @@
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C6D11E6DD5
-	for <linux-crypto@vger.kernel.org>; Mon, 21 Oct 2024 11:00:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A238F1DE88C;
+	Mon, 21 Oct 2024 14:57:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729508406; cv=none; b=qM4W1/Tj15h5kVeVYEpswNQb30Qkj7bUCu6RsfDFa3KQ2Ox/vJGHTjYTOagLTlDzJzY2jKY4wXltjP5a1Rb631sLlmBvFqZI70BzALXUvWRISLl/Oh7YLgZeUxgfmFiJ0iLmxueWGKJMqMlGrmc4I0T4EMnrZ4I+J2eBRpXlzWY=
+	t=1729522675; cv=none; b=pf8SfsLTVS66ks6L/BGIS3uKCLezgCpupsDHZNOgQzPQV3+jy2if0VUCC6pfEKhRYSjKSYViiJbGCiNeSh+T79vd5jgYo5KmqAMl6fTgXLhoGb4byKvdDonpjIxCqnb621E38ScmOX9Vfe5zxa6PEGSc8QZnGCxfwzumWvbEJks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729508406; c=relaxed/simple;
-	bh=v3byH3b2yN40LcVQcImhT3M3wr9xJUITrmKDPJQNLPw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UPN+LjAEyBmxKmNIIgjlxwPk6qQyjDhwibg2DrYUbt8qQLiy0v/QzMNyP3NH+SUOQewaRHmS87m8dLW3Q/B9GS1Hn4uUt6CgtExv18nnI3nk80YiEJY4pyO38Gj/dclz8FelhXNQ3Obm0Q9ncQ7DPLvVTadcSTwsAXPKYYVXpXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Rsm6B9DQ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=HgTKdWln; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Rsm6B9DQ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=HgTKdWln; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+	s=arc-20240116; t=1729522675; c=relaxed/simple;
+	bh=kJOUFMj6PXyuxDe3YoC2Je0/IAK0gMUIltuZ7HfFDHo=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Uayxhk6lEQABh+hdyQ32c7tsdsE8jBt/2UyvKPPEhR4yI7opXNDaLw1J41M+VcqBruBH1uoBHJ65oygzfzF0cwufD/907lje9lXkEKYJuNx4D4FTDHjFXIEtWJ34soqR9W6CIz14C5sDBJAqnjTRh8puI5rCUWtPl1aXvSSoaO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WqGdtjHG; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Rsm6B9DQ";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="HgTKdWln";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Rsm6B9DQ";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="HgTKdWln"
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 8350621DFC;
-	Mon, 21 Oct 2024 11:00:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1729508402; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CgK36wjlxbJdTiiaCUnolUOrYVh9ODBCeSqkr9s1y6I=;
-	b=Rsm6B9DQi4C4XN8BF3ZNWaLosM9doy3I0PeazOeCZplscIro2EFjACG3BgNxMweMBT5GMq
-	a31g5N18k+gu5ZsQexKz3ZGDKEsvktiM7uGNwUL/Tfb+95aFp0TOPdB1vjvrKSZV1pwIiN
-	tageIAx97tZ4bVog2lsiN5H065DZ1f4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1729508402;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CgK36wjlxbJdTiiaCUnolUOrYVh9ODBCeSqkr9s1y6I=;
-	b=HgTKdWlnS+4CkHxhVgejR2ufIUbKWLL0poB439oBL81rdHk1TB4nVoi2Pvqk2uU4STtGWC
-	2lK+kYKYiy8wnRDQ==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=Rsm6B9DQ;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=HgTKdWln
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1729508402; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CgK36wjlxbJdTiiaCUnolUOrYVh9ODBCeSqkr9s1y6I=;
-	b=Rsm6B9DQi4C4XN8BF3ZNWaLosM9doy3I0PeazOeCZplscIro2EFjACG3BgNxMweMBT5GMq
-	a31g5N18k+gu5ZsQexKz3ZGDKEsvktiM7uGNwUL/Tfb+95aFp0TOPdB1vjvrKSZV1pwIiN
-	tageIAx97tZ4bVog2lsiN5H065DZ1f4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1729508402;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CgK36wjlxbJdTiiaCUnolUOrYVh9ODBCeSqkr9s1y6I=;
-	b=HgTKdWlnS+4CkHxhVgejR2ufIUbKWLL0poB439oBL81rdHk1TB4nVoi2Pvqk2uU4STtGWC
-	2lK+kYKYiy8wnRDQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 658FF136DC;
-	Mon, 21 Oct 2024 11:00:02 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id I/ROGDI0FmeREwAAD6G6ig
-	(envelope-from <hare@suse.de>); Mon, 21 Oct 2024 11:00:02 +0000
-Message-ID: <56fde9ae-8e27-4ade-bdc4-99bf3f53a299@suse.de>
-Date: Mon, 21 Oct 2024 13:00:02 +0200
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WqGdtjHG"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4315abed18aso42396805e9.2;
+        Mon, 21 Oct 2024 07:57:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1729522672; x=1730127472; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=3owwwcHs1MDpHN+omOmsedchFOMoG1OAJp1p2+rcmMM=;
+        b=WqGdtjHGkn33b6/RFeUTbRK94W3wmpP+qazNx7hjrzlyQzXu1SSk7jUBsRrWVsJx1u
+         6dHuWNuEFRhjLnp8V779MHnmx1j8mVL4NgtcL6jhddaFGY2D+g2gffrbfJZAzyXFaPHM
+         gfcFFkeCVXVUMW9H81jN1QcTMPYnDGBmZ7/kBnAIyFXE7gOz3TKIpaFhNcECbjxuucMy
+         KgGFIoChTnOGJJVO8URvMVNMafI4VT3mDPzwJTIT/Q3+dOOfBXmTUm1bRTy9AizVIGYT
+         CGH1Pc5tjOkETmk6gsVJHaqBkIJYWkgHW+fiJKuekqLxG+KEkOaixGoeiCBQR747XLj6
+         Ax0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1729522672; x=1730127472;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3owwwcHs1MDpHN+omOmsedchFOMoG1OAJp1p2+rcmMM=;
+        b=laigyENrAxTNqfoIQwga1ByevdV+2x5/YI/1m/ECWgUZUdQmIrIM6DOOlOmaF5c3Mf
+         A7upgKM1N26yKTGFDaO9+3qczU0j1eef/9vyl4TlcwK0r0xvxhbXIx60BR6uq7r9KQEe
+         qQmCcAZJ2T5Q1LQ+4Izd6otzpHkTAWLED8IM5gIq+wGqtc/VqEEhnzv7BliuyFj9JgaY
+         2UEHKD4hi4hZrchvQmpJB1qO9lAFRAqoNubM4cAlb7xt99iVc2NfMxFu4T2s0eOoWNB5
+         C8OL8ErdbYhqo/nfTGK/Fjju8R533P/CdsdUj4/8LVvOeeMzrtMW0hW3qR2wD++nNjfv
+         jSXg==
+X-Forwarded-Encrypted: i=1; AJvYcCUTn8ZhixNhQL6JpCdCO9YM6UrKczolZjaDSRYJC70aLGAzZa0ra72O7pFnrn/u6Zx/FenOXV0JQdZqWhG3@vger.kernel.org, AJvYcCV3iFwytLcJt7SnL6SZ3hLotuIFaIV6b8jD2taue2Boh4w0CX9y2a9tqkZ/Xesfh/aPeRZLJJk92aXl@vger.kernel.org, AJvYcCXSp26BQ04phSf/cuVjMaQbGH76BA2llo3pCSkKmv32b609gZda8KQ4c6BRNwi2y++GnwvfGpZLl63m58lv@vger.kernel.org
+X-Gm-Message-State: AOJu0YyvLpvM739K++vbIcaq1gYlYhuZRz1p5uailvOLX5Ft4JEFZxOt
+	qwacQS/NAUYiD3sTtx01D0obb2VMgQCS9xUCD6YHbmFmvw/qpoG/w/Syhw==
+X-Google-Smtp-Source: AGHT+IEmU9LyD7il74oyZHDJiaTohk0WzR0tAbNyuFwffiexLZFKYQGfHAyBwaGs3mcOURxZ9Jl+IA==
+X-Received: by 2002:a05:600c:1c95:b0:431:6083:cd2a with SMTP id 5b1f17b1804b1-43161659c02mr100797525e9.15.1729522671501;
+        Mon, 21 Oct 2024 07:57:51 -0700 (PDT)
+Received: from localhost.localdomain (93-34-91-161.ip49.fastwebnet.it. [93.34.91.161])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4316f58adffsm60303545e9.22.2024.10.21.07.57.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Oct 2024 07:57:51 -0700 (PDT)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Antoine Tenart <atenart@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Will Deacon <will@kernel.org>,
+	Waiman Long <longman@redhat.com>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Richard van Schagen <vschagen@icloud.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	linux-crypto@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev
+Subject: [RFC PATCH v3 1/3] spinlock: extend guard with spinlock_bh variants
+Date: Mon, 21 Oct 2024 16:56:37 +0200
+Message-ID: <20241021145642.16368-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 6/9] nvme-tcp: request secure channel concatenation
-To: Sagi Grimberg <sagi@grimberg.me>, Hannes Reinecke <hare@kernel.org>,
- Christoph Hellwig <hch@lst.de>
-Cc: Keith Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org,
- Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
-References: <20241018063343.39798-1-hare@kernel.org>
- <20241018063343.39798-7-hare@kernel.org>
- <a188adf5-55be-4524-b8eb-63f7470a4b15@grimberg.me>
-Content-Language: en-US
-From: Hannes Reinecke <hare@suse.de>
-In-Reply-To: <a188adf5-55be-4524-b8eb-63f7470a4b15@grimberg.me>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 8350621DFC
-X-Spam-Score: -4.51
-X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	ARC_NA(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_HAS_DN(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	ASN(0.00)[asn:25478, ipnet:::/0, country:RU];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:mid,suse.de:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Flag: NO
-X-Spam-Level: 
 
-On 10/20/24 23:04, Sagi Grimberg wrote:
-> 
-> 
-> 
-> On 18/10/2024 9:33, Hannes Reinecke wrote:
->> Add a fabrics option 'concat' to request secure channel concatenation.
->> When secure channel concatenation is enabled a 'generated PSK' is 
->> inserted
->> into the keyring such that it's available after reset.
->>
->> Signed-off-by: Hannes Reinecke <hare@kernel.org>
->> ---
->>   drivers/nvme/host/auth.c    | 108 +++++++++++++++++++++++++++++++++++-
->>   drivers/nvme/host/fabrics.c |  34 +++++++++++-
->>   drivers/nvme/host/fabrics.h |   3 +
->>   drivers/nvme/host/nvme.h    |   2 +
->>   drivers/nvme/host/sysfs.c   |   4 +-
->>   drivers/nvme/host/tcp.c     |  47 ++++++++++++++--
->>   include/linux/nvme.h        |   7 +++
->>   7 files changed, 191 insertions(+), 14 deletions(-)
->>
-[ .. ]
->> @@ -2314,6 +2345,8 @@ static void nvme_tcp_error_recovery_work(struct 
->> work_struct *work)
->>                   struct nvme_tcp_ctrl, err_work);
->>       struct nvme_ctrl *ctrl = &tcp_ctrl->ctrl;
->> +    if (nvme_tcp_key_revoke_needed(ctrl))
->> +        nvme_auth_revoke_tls_key(ctrl);
-> 
-> Having this sprayed in various places in the code is really confusing.
-> 
-> Can you please add a small comment on each call-site? just for our 
-> future selves
-> reading this code?
-> 
-> Outside of that, patch looks good.
-> 
-Weelll ...
-We need to reset the negotiated PSK exactly in three places:
-- reset
-- error recovery
-- teardown
-Much like we need to do for every other queue-related resource.
+Extend guard APIs with missing raw/spinlock_bh variants.
 
-And in one of your previous reviews you stated that you do _not_
-want to have 'nvme_auth_revoke_tls_key()' checking if the key
-needs to be revoked, but rather have a check function.
-Otherwise I could just move the check into nvme_auth_revoke_tls_key()'
-and drop the 'revoke needed' call.
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+---
+Changes v2:
+- Add this patch
 
-Furthermore we don't need to check if the key needs to be revoked
-during teardown (answer will always be 'yes').
+ include/linux/spinlock.h | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-So I'm quite unsure what to do now ... document that we need
-to release the key when doing a reset or error recovery?
-Move the check back into nvme_auth_tls_revoke_key()?
-Hmm?
-
-Cheers,
-
-Hannes
+diff --git a/include/linux/spinlock.h b/include/linux/spinlock.h
+index 63dd8cf3c3c2..d3561c4a080e 100644
+--- a/include/linux/spinlock.h
++++ b/include/linux/spinlock.h
+@@ -548,6 +548,12 @@ DEFINE_LOCK_GUARD_1(raw_spinlock_irq, raw_spinlock_t,
+ 
+ DEFINE_LOCK_GUARD_1_COND(raw_spinlock_irq, _try, raw_spin_trylock_irq(_T->lock))
+ 
++DEFINE_LOCK_GUARD_1(raw_spinlock_bh, raw_spinlock_t,
++		    raw_spin_lock_bh(_T->lock),
++		    raw_spin_unlock_bh(_T->lock))
++
++DEFINE_LOCK_GUARD_1_COND(raw_spinlock_bh, _try, raw_spin_trylock_bh(_T->lock))
++
+ DEFINE_LOCK_GUARD_1(raw_spinlock_irqsave, raw_spinlock_t,
+ 		    raw_spin_lock_irqsave(_T->lock, _T->flags),
+ 		    raw_spin_unlock_irqrestore(_T->lock, _T->flags),
+@@ -569,6 +575,13 @@ DEFINE_LOCK_GUARD_1(spinlock_irq, spinlock_t,
+ DEFINE_LOCK_GUARD_1_COND(spinlock_irq, _try,
+ 			 spin_trylock_irq(_T->lock))
+ 
++DEFINE_LOCK_GUARD_1(spinlock_bh, spinlock_t,
++		    spin_lock_bh(_T->lock),
++		    spin_unlock_bh(_T->lock))
++
++DEFINE_LOCK_GUARD_1_COND(spinlock_bh, _try,
++			 spin_trylock_bh(_T->lock))
++
+ DEFINE_LOCK_GUARD_1(spinlock_irqsave, spinlock_t,
+ 		    spin_lock_irqsave(_T->lock, _T->flags),
+ 		    spin_unlock_irqrestore(_T->lock, _T->flags),
 -- 
-Dr. Hannes Reinecke                  Kernel Storage Architect
-hare@suse.de                                +49 911 74053 688
-SUSE Software Solutions GmbH, Frankenstr. 146, 90461 Nürnberg
-HRB 36809 (AG Nürnberg), GF: I. Totev, A. McDonald, W. Knoblich
+2.45.2
+
