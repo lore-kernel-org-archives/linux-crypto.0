@@ -1,194 +1,121 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E05A14830F;
-	Mon, 21 Oct 2024 00:29:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20866DF49;
+	Mon, 21 Oct 2024 01:13:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729470599; cv=none; b=ClkoqdmqW/rwpgIF5W1bq7oCsGhwBg9CmmrG/k1jXEBaDvnzsiSs7kDKbxcFrUCapQROWKcVAfZPRuNbaYdc/YNHtElREYspXrD/ZVg0MFtNZKzn/i/NFvtgux/G6XptOS4uMeBZQsLw5nA/xSk5Z75Mjj+qJR2WT+wiluPguZk=
+	t=1729473236; cv=none; b=hQdpFWgKGs2aKCJd9jTxiQXo5XTxjZkTmJgNPGyyDF+8ccO3ZifR8cR01g0z8pnO2AE/nhmbXgdtaaoM/gkyb3U5u+kuWlXXpv0dTwxueEMEuFF0bCTDsKIi/g13wXXsBvkZoQtPDVx7rbQTHOXX1O+wqs+qWCyR9gBFwo4QCz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729470599; c=relaxed/simple;
-	bh=2edVn3yzlgvTIcU4OYne6VaRBmOeBMvpuDRrHbVNdrI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oGoohfC3AJJKp+I9JdTM7rGeMiA+bimxvlVQmu+SCee0SBRdI8Yx7uMvS6fYNV7/XBxrGbCsaEc5lopM6st+ffv7FFT2U1nJ5KjEoUO8vmvebafRLXt7DO4xuetHDIJa4OCSukXJDopmhxQLLWr0QHCpC1TZ3Km/7I/hH/qWFP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NFFk4W0d; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1729473236; c=relaxed/simple;
+	bh=xmOFIc7UL6nimH312fjzPftPE9PYTHGVlw1oJojaILE=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=Cyof2/V6+fZ0LRWzo1bj+adQTF4u8HcGKRWOdqhdixjaptNubRbOQJGv/2seDtMpUd2WI1ZBXmWQLoPd+s4IaWytckx6neHcTn/Ydp8kDr0lxT50cd1YoLOyh1+3Q4J+d14ugEx5Y5N5ZkuGykTOQekVGn3KfrPJ9Yt6ywYFG8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=fw8e/QwJ; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NFFk4W0d"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87B75C4CEE5;
-	Mon, 21 Oct 2024 00:29:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729470598;
-	bh=2edVn3yzlgvTIcU4OYne6VaRBmOeBMvpuDRrHbVNdrI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NFFk4W0dyvHD7M3v36IIWTb5ySBBZX5uZ/VLRYiArPPR5++D/baWB8d+lyfAaBOhk
-	 rztTLk/6ilOUZBWwQxzKVpNgy7hbS+bAqO2cV8DFYmzWDyAaKEezQcPZFBrYh8vShT
-	 roh7zUz+tjlNZy+E9vuB5Q59JQnN14hGjhkd5gjyQeUJqlHGIc+Uf3/5EwjEZ4O6Ps
-	 TvEpzXEcAb/PHAsselt3G1remC4TFMm//VXM0Ciyn11PZQ9zsIxfN5iARYumUTBA9J
-	 8pJ0BrJoKwcW+JUENnQzEDWoyb2qcx6NpA2gan0ia3pz9LbggvtIVcVcrMMhn+Rn2b
-	 w+zTkdQuRqfwg==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: linux-arch@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-crypto@vger.kernel.org,
-	linux-ext4@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net,
-	linux-mips@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	linux-s390@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	loongarch@lists.linux.dev,
-	sparclinux@vger.kernel.org,
-	x86@kernel.org
-Subject: [PATCH 15/15] f2fs: switch to using the crc32 library
-Date: Sun, 20 Oct 2024 17:29:35 -0700
-Message-ID: <20241021002935.325878-16-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241021002935.325878-1-ebiggers@kernel.org>
-References: <20241021002935.325878-1-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="fw8e/QwJ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1729473229;
+	bh=h32jElHbBaqpGucnDgLckBhcNEW7fIGoLMv+rsBlEwE=;
+	h=Date:From:To:Cc:Subject:From;
+	b=fw8e/QwJBCQEBKQHFCjjdOiDIjNG3kVrn2LSB6FFe4qVmZq46yin8+pqKwiKBmbnP
+	 ZPukbqOd0hdxB+7ToRMlpkWYAUEMyd5uR88fnbYR2LFUWM3siKa3BHPr6Wvm0pCOfx
+	 aWxBO5NTEFw4EhTs22U8akCDC18xOoEwZAqu7wzuSSTgfP711GApIUN8AuZ+ErBWa/
+	 VRiyR1e//bPnrRJjT/qbBull5T4tIm62A1sgq5yK+rqsaa/o0tqK+YnHiSzkL4jTMA
+	 pVPekkqYvYRjfnnFNbw21GK6THt3J+fCPkh5iLm0x8IOg2D4enxKx6h8usEKVKCbYD
+	 AwYUltm52YHpw==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4XWy4Y4Trsz4wcr;
+	Mon, 21 Oct 2024 12:13:49 +1100 (AEDT)
+Date: Mon, 21 Oct 2024 12:13:49 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linux Crypto List <linux-crypto@vger.kernel.org>, Linux Kernel Mailing
+ List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: duplicate patch in the crypto tree
+Message-ID: <20241021121349.14a5e2c4@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="Sig_/C..pc.4S6nh+Enm3rkJxE1=";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-From: Eric Biggers <ebiggers@google.com>
+--Sig_/C..pc.4S6nh+Enm3rkJxE1=
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Now that the crc32() library function takes advantage of
-architecture-specific optimizations, it is unnecessary to go through the
-crypto API.  Just use crc32().  This is much simpler, and it improves
-performance due to eliminating the crypto API overhead.
+Hi all,
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- fs/f2fs/Kconfig |  3 +--
- fs/f2fs/f2fs.h  | 19 +------------------
- fs/f2fs/super.c | 15 ---------------
- 3 files changed, 2 insertions(+), 35 deletions(-)
+The following commit is also in the crypto-current tree as a different
+commit (but the same patch):
 
-diff --git a/fs/f2fs/Kconfig b/fs/f2fs/Kconfig
-index 68a1e23e1557c..5916a02fb46dd 100644
---- a/fs/f2fs/Kconfig
-+++ b/fs/f2fs/Kconfig
-@@ -2,12 +2,11 @@
- config F2FS_FS
- 	tristate "F2FS filesystem support"
- 	depends on BLOCK
- 	select BUFFER_HEAD
- 	select NLS
--	select CRYPTO
--	select CRYPTO_CRC32
-+	select CRC32
- 	select F2FS_FS_XATTR if FS_ENCRYPTION
- 	select FS_ENCRYPTION_ALGS if FS_ENCRYPTION
- 	select FS_IOMAP
- 	select LZ4_COMPRESS if F2FS_FS_LZ4
- 	select LZ4_DECOMPRESS if F2FS_FS_LZ4
-diff --git a/fs/f2fs/f2fs.h b/fs/f2fs/f2fs.h
-index 33f5449dc22d5..1fc5c2743c8d4 100644
---- a/fs/f2fs/f2fs.h
-+++ b/fs/f2fs/f2fs.h
-@@ -1761,13 +1761,10 @@ struct f2fs_sb_info {
- 
- 	/* For write statistics */
- 	u64 sectors_written_start;
- 	u64 kbytes_written;
- 
--	/* Reference to checksum algorithm driver via cryptoapi */
--	struct crypto_shash *s_chksum_driver;
--
- 	/* Precomputed FS UUID checksum for seeding other checksums */
- 	__u32 s_chksum_seed;
- 
- 	struct workqueue_struct *post_read_wq;	/* post read workqueue */
- 
-@@ -1941,25 +1938,11 @@ static inline unsigned int f2fs_time_to_wait(struct f2fs_sb_info *sbi,
-  * Inline functions
-  */
- static inline u32 __f2fs_crc32(struct f2fs_sb_info *sbi, u32 crc,
- 			      const void *address, unsigned int length)
- {
--	struct {
--		struct shash_desc shash;
--		char ctx[4];
--	} desc;
--	int err;
--
--	BUG_ON(crypto_shash_descsize(sbi->s_chksum_driver) != sizeof(desc.ctx));
--
--	desc.shash.tfm = sbi->s_chksum_driver;
--	*(u32 *)desc.ctx = crc;
--
--	err = crypto_shash_update(&desc.shash, address, length);
--	BUG_ON(err);
--
--	return *(u32 *)desc.ctx;
-+	return crc32(crc, address, length);
- }
- 
- static inline u32 f2fs_crc32(struct f2fs_sb_info *sbi, const void *address,
- 			   unsigned int length)
- {
-diff --git a/fs/f2fs/super.c b/fs/f2fs/super.c
-index 87ab5696bd482..003d3bcb0caa2 100644
---- a/fs/f2fs/super.c
-+++ b/fs/f2fs/super.c
-@@ -1670,12 +1670,10 @@ static void f2fs_put_super(struct super_block *sb)
- 
- 	f2fs_destroy_post_read_wq(sbi);
- 
- 	kvfree(sbi->ckpt);
- 
--	if (sbi->s_chksum_driver)
--		crypto_free_shash(sbi->s_chksum_driver);
- 	kfree(sbi->raw_super);
- 
- 	f2fs_destroy_page_array_cache(sbi);
- 	f2fs_destroy_xattr_caches(sbi);
- #ifdef CONFIG_QUOTA
-@@ -4419,19 +4417,10 @@ static int f2fs_fill_super(struct super_block *sb, void *data, int silent)
- 		INIT_LIST_HEAD(&sbi->inode_list[i]);
- 		spin_lock_init(&sbi->inode_lock[i]);
- 	}
- 	mutex_init(&sbi->flush_lock);
- 
--	/* Load the checksum driver */
--	sbi->s_chksum_driver = crypto_alloc_shash("crc32", 0, 0);
--	if (IS_ERR(sbi->s_chksum_driver)) {
--		f2fs_err(sbi, "Cannot load crc32 driver.");
--		err = PTR_ERR(sbi->s_chksum_driver);
--		sbi->s_chksum_driver = NULL;
--		goto free_sbi;
--	}
--
- 	/* set a block size */
- 	if (unlikely(!sb_set_blocksize(sb, F2FS_BLKSIZE))) {
- 		f2fs_err(sbi, "unable to set blocksize");
- 		goto free_sbi;
- 	}
-@@ -4872,12 +4861,10 @@ static int f2fs_fill_super(struct super_block *sb, void *data, int silent)
- 	fscrypt_free_dummy_policy(&F2FS_OPTION(sbi).dummy_enc_policy);
- 	kvfree(options);
- free_sb_buf:
- 	kfree(raw_super);
- free_sbi:
--	if (sbi->s_chksum_driver)
--		crypto_free_shash(sbi->s_chksum_driver);
- 	kfree(sbi);
- 	sb->s_fs_info = NULL;
- 
- 	/* give only one another chance */
- 	if (retry_cnt > 0 && skip_recovery) {
-@@ -5080,7 +5067,5 @@ module_init(init_f2fs_fs)
- module_exit(exit_f2fs_fs)
- 
- MODULE_AUTHOR("Samsung Electronics's Praesto Team");
- MODULE_DESCRIPTION("Flash Friendly File System");
- MODULE_LICENSE("GPL");
--MODULE_SOFTDEP("pre: crc32");
--
--- 
-2.47.0
+  6100da511bd2 ("crypto: lib/mpi - Fix an "Uninitialized scalar variable" i=
+ssue")
 
+This is commit
+
+  cd843399d706 ("crypto: lib/mpi - Fix an "Uninitialized scalar variable" i=
+ssue")
+
+in the crypto-current tree.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc block/elevator.c
+index 9430cde13d1a,d6b4eb5443d9..000000000000
+--- a/block/elevator.c
++++ b/block/elevator.c
+@@@ -708,23 -709,12 +708,21 @@@ void elv_iosched_load_module(struct gen
+  			    size_t count)
+  {
+  	char elevator_name[ELV_NAME_MAX];
+ +	struct elevator_type *found;
+ +	const char *name;
+ =20
+  	if (!elv_support_iosched(disk->queue))
+- 		return -EOPNOTSUPP;
++ 		return;
+ =20
+  	strscpy(elevator_name, buf, sizeof(elevator_name));
+ -	request_module("%s-iosched", strstrip(elevator_name));
+ +	name =3D strstrip(elevator_name);
+ +
+ +	spin_lock(&elv_list_lock);
+ +	found =3D __elevator_find(name);
+ +	spin_unlock(&elv_list_lock);
+ +
+ +	if (!found)
+ +		request_module("%s-iosched", name);
+-=20
+- 	return 0;
+  }
+ =20
+  ssize_t elv_iosched_store(struct gendisk *disk, const char *buf,
+
+--Sig_/C..pc.4S6nh+Enm3rkJxE1=
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmcVqs0ACgkQAVBC80lX
+0Gw1pwf/TxYb3divxta6nuL9xqF+aOkytTxFhEvEy4SdLsXvxuFsQshqpwhgSFXu
+lNP2xGYnikstRtyJfdNKY4zbyUagbxNV3Cq2O1YZKWOKvt/0vujGFRtel8tbFbbJ
+Uo5VSEfFlIPg9twEBb7MroCk9skpNJV57JdvexcjIrT0gApMu8BHebWW8DVLJZ+H
+TEfLuZnTo2IgR+goUWPLtiA6vBu6ev48PHUCV7SMkuG/d01U6ZRHiW57G0B/SbTS
+3EEGOlmarLJdETGBjjifJ6AmoCS2YmxFYw0v7CWTKJ77+lCLqOtbAJS5e682ngtV
+fbE28GO7wl39mQ1fiwNER1jYTpMnIg==
+=nDxn
+-----END PGP SIGNATURE-----
+
+--Sig_/C..pc.4S6nh+Enm3rkJxE1=--
