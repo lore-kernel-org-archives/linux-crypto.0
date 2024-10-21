@@ -1,138 +1,77 @@
-Received: from smtpbgeu2.qq.com (smtpbgeu2.qq.com [18.194.254.142])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77C0C256E;
-	Mon, 21 Oct 2024 01:48:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.194.254.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D27A22110E
+	for <linux-crypto@vger.kernel.org>; Mon, 21 Oct 2024 02:40:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729475323; cv=none; b=QsGbXzGLtTKXE38fM4kr6mS828jt7ea3foLMWmXqZSVDx8+fWOUx0fWt2zujLpz83X9TNFiVCldjJmoxxTv/Iz7lGtsgU31gU731tFlsyHvy8k9cXJWXd+iAXKJrS7iF/FqPcDEZKcj/Vh1ohW+bJmnGlSk75Gi43E9YNxFNIsM=
+	t=1729478425; cv=none; b=l293Dso2j5AGMJyXQP6JGJvQOic8UlUUlHwqkfQMna2yb+v/zW65RjLnmaicEX+g9AnzCJD5KSM4pG5H8PBNaqzM4+4eIB90x3RS104ahhueNiJSVwfyH8w+S9UsxPLVOMOwIlz36cTjAzILl7vkxTSN3ZZ+FLWMH+efkiyHu5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729475323; c=relaxed/simple;
-	bh=g7Oz2WchqaPxIcn3/FbwuwteX1Z14I41x36ekLkSuHU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EBzOXMmBg6COj1pILOzob1rckq+LJApJMqQBYS+2heZVexNe5nQQnjk3rJ0duSmnCp1HYMM4E94jAWSALkP5tMRfWuGMduapj1QnRRCYnMGBbokQKGARV0/fpRKZxyM31vxeDW+0AHcOt3nv2QEIm01xP8ndLj1VUAk4kUePb8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=Q8xQdhC9; arc=none smtp.client-ip=18.194.254.142
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="Q8xQdhC9"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1729475272;
-	bh=3Jb3+8m3q5GqSoRa3aSjH0BmD/kHkoSd7GPyOJ35dOo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=Q8xQdhC9TxXGovN06qZI/avjNXk+9M3f9bN73SOxPnWdQNFtjBRfsaEkT9KxbYbzR
-	 iJb+D0ZwPx8L4PPzDv/VWyO2FEUy2ky+mN0Zggpl2rYlRL4NkbF40c86ZsgX7CCR8K
-	 CCNXNVdcN2jdylZfVMMb3+2yo81+KrfELJxmVuxs=
-X-QQ-mid: bizesmtp80t1729475266thpnflk4
-X-QQ-Originating-IP: sLITKTob2X6UQdBdGgosOb3ERsqJEfUTqINTPTS43QY=
-Received: from [10.20.53.22] ( [113.57.152.160])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 21 Oct 2024 09:47:45 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 15121724753342584298
-Message-ID: <86C0A4FFA98AE1E7+ac00f3f7-866f-4735-a361-a7119aaa3eb0@uniontech.com>
-Date: Mon, 21 Oct 2024 09:47:45 +0800
+	s=arc-20240116; t=1729478425; c=relaxed/simple;
+	bh=6KUQovbrwqynnhoU99AxI3EF/r3gUF34rq3nkHnBdfg=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=UT97gyNwpqTQmN1zQkCq/1k1e1zWib8P+1p2DJjDQ7r+mkEJ56BOEjyK4n86sl5PLZgIB7iR33DbeZxlIwLd/cBHIIMgnoVWQqsyyG3XBoYvvTCywRxoEsEO+E0FuOq/uykObAUj/KfOgCv28W9BccxO+YJnQqlzKjkk6d6XwZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4XWzxz1V5RzpSsm;
+	Mon, 21 Oct 2024 10:38:15 +0800 (CST)
+Received: from kwepemk200016.china.huawei.com (unknown [7.202.194.82])
+	by mail.maildlp.com (Postfix) with ESMTPS id A0723180105;
+	Mon, 21 Oct 2024 10:40:12 +0800 (CST)
+Received: from [10.67.108.122] (10.67.108.122) by
+ kwepemk200016.china.huawei.com (7.202.194.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 21 Oct 2024 10:40:12 +0800
+Subject: Re: [PATCH -next] crypto: testmgr - don't generate WARN for -EAGAIN
+To: Herbert Xu <herbert@gondor.apana.org.au>
+CC: Steffen Klassert <steffen.klassert@secunet.com>, <davem@davemloft.net>,
+	<mcoquelin.stm32@gmail.com>, <alexandre.torgue@foss.st.com>,
+	<lujialin4@huawei.com>, <linux-crypto@vger.kernel.org>, Daniel Jordan
+	<daniel.m.jordan@oracle.com>
+References: <20240802114947.3984577-1-yiyang13@huawei.com>
+ <ZrG7zWxeXQn-Mkhn@gondor.apana.org.au> <ZrSZdQxeKaXVmi9E@gauss3.secunet.de>
+ <ZrSbGs646zd20TBe@gauss3.secunet.de> <ZrSftdpqJnlxd7Gx@gondor.apana.org.au>
+ <a47169a3-b357-8c8c-7c21-bf6cf1f61e5b@huawei.com>
+ <Zr1ij_rbPicAc6-f@gondor.apana.org.au>
+From: "yiyang (D)" <yiyang13@huawei.com>
+Message-ID: <f384632a-54f2-f8dc-e596-b3830d73b175@huawei.com>
+Date: Mon, 21 Oct 2024 10:40:11 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: mips/crc32 - fix the CRC32C implementation
-To: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
-Cc: linux-mips@vger.kernel.org, linux-kernel@vger.kernel.org,
- Guan Wentao <guanwentao@uniontech.com>, herbert@gondor.apana.org.au,
- davem@davemloft.net, tsbogend@alpha.franken.de
-References: <20241020180258.8060-1-ebiggers@kernel.org>
-Content-Language: en-US
-From: WangYuli <wangyuli@uniontech.com>
-In-Reply-To: <20241020180258.8060-1-ebiggers@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <Zr1ij_rbPicAc6-f@gondor.apana.org.au>
+Content-Type: text/plain; charset="gbk"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: MBN1Gf7pvZQZ6dfWcrTXiKX9h10oAehlD0N/mMsfI82cSjBbongspMb+
-	8cRJRRugBDCekNeez40gHMAq8oMcctwDF6RVoecCtI4/M54Vw8XUvQ7JQlleY84jT0TdR8X
-	JVZ7QvpY0CamyTAEvfuWovNwjp1ZfZNvOjDW4PKBWWf+vFtLRyZslsVr8KiBaq4tsmCGkar
-	IJEcvYVhS94H2USwAFAB5hJXovQccHS32Af3tJT5npfHDhoS3HET3NBJrHpoP4n1Sn1JkWL
-	OsKt29YOlVNEXgBWpIcPTacxZhIlWz33wQgbZ2xLfCiwMJydPwsxY8F1dsL3OOtWEl35/Ds
-	jGY452DmV3NdxLjc/2aqirMKK3LjxpryrGS6xt6bWsXF1c8qIbzEkR0tNNKul4eX93e2Fuo
-	NDGzFuy33DJjs6QXT5/pDp1jf2Y4LGcUT3PJSVqswXtV5Jfpt7nFs/dMLZurPgpLXjG7ti9
-	I1Bg6AvkuKMeeFlfrzmz9p0BRH/rEoPTArAmmEGTpSHHwMlrf5xtaDDfmuVZn6JofgwXEHr
-	52ZXE1biqDmk/vZuZ9nJ5Vlu+tytGWlX2CLnnE1Pe/YA6OP83sO0Q/hPPxJb5XoG0o2mQwc
-	B8lyH5TvjAoNkJpV+lZKA5AW1TZXrSMQ+7Nek1Tj4RvtHtGNAC8V3BSnTIdAV8o2vikxdyG
-	RXVEtF/TRE34Rgq+YO6kwP2637U89wAZG3sNIEKGm0adcQ6zEoQzfV/h3JLLa1t8Yoz2Bgo
-	Cz/QLFQmMRAlKO5zRQ8IPZ7MzltUn9D+ZE1TPjeUGna9uDghLSJRADpKQ7YJQahNGkcteyI
-	ABzSQU8GYDdYkpTcPe6OTmQqQjcs3PDRq+tQZzrWjdzf32lPy5J+xHbVVupo8BxOKiNnnOQ
-	yHFUjeLyhgQFrU2CjW45sQ9aNVM8adLm4FjWc/O7pm2R1wIncSe8QoBtdbAgqZjcVOVeC0R
-	xs5hNLgX2xvEmbV/MA/IEpIZW
-X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
-X-QQ-RECHKSPAM: 0
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemk200016.china.huawei.com (7.202.194.82)
 
-On 2024/10/21 02:02, Eric Biggers wrote:
 
-> From: Eric Biggers <ebiggers@google.com>
->
-> Commit ca459e5f826f ("crypto: mips/crc32 - Clean up useless assignment
-> operations") changed crc32c_mips_le_hw() to use the instructions that
-> use the "regular" CRC32 polynomial instead of the Castagnoli polynomial.
-> Therefore it can't be computing CRC32C values correctly anymore.
->
-> I haven't been successful in running a MIPS kernel in QEMU, but based on
-> code review this is the fix that is needed.
->
-> Fixes: ca459e5f826f ("crypto: mips/crc32 - Clean up useless assignment operations")
-> Cc: Guan Wentao <guanwentao@uniontech.com>
-> Cc: WangYuli <wangyuli@uniontech.com>
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
->
-> This is a regression in 6.12, so it should be fixed in a 6.12-rc.
->
->   arch/mips/crypto/crc32-mips.c | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/mips/crypto/crc32-mips.c b/arch/mips/crypto/crc32-mips.c
-> index a7a1d43a1b2ca..90eacf00cfc31 100644
-> --- a/arch/mips/crypto/crc32-mips.c
-> +++ b/arch/mips/crypto/crc32-mips.c
-> @@ -121,24 +121,24 @@ static u32 crc32c_mips_le_hw(u32 crc_, const u8 *p, unsigned int len)
->   
->   	if (IS_ENABLED(CONFIG_64BIT)) {
->   		for (; len >= sizeof(u64); p += sizeof(u64), len -= sizeof(u64)) {
->   			u64 value = get_unaligned_le64(p);
->   
-> -			CRC32(crc, value, d);
-> +			CRC32C(crc, value, d);
->   		}
->   
->   		if (len & sizeof(u32)) {
->   			u32 value = get_unaligned_le32(p);
->   
-> -			CRC32(crc, value, w);
-> +			CRC32C(crc, value, w);
->   			p += sizeof(u32);
->   		}
->   	} else {
->   		for (; len >= sizeof(u32); len -= sizeof(u32)) {
->   			u32 value = get_unaligned_le32(p);
->   
-> -			CRC32(crc, value, w);
-> +			CRC32C(crc, value, w);
->   			p += sizeof(u32);
->   		}
->   	}
->   
->   	if (len & sizeof(u16)) {
->
-> base-commit: 7fa4be6d6752512278c4cbf2d2745568626e7369
+On 2024/8/15 10:06, Herbert Xu wrote:
+> On Thu, Aug 15, 2024 at 09:25:39AM +0800, yiyang (D) wrote:
+>>
+>> Does this mean that the user needs to call the interface of the crypto layer
+>> in this case? rather than requiring the kernel to handle this.
+> 
+> No it means that pcrypt should intercept the error and retry the
+> request without going through padata.  Could you please redo the
+> patch through pcrypt?
+> 
+> Thanks,
+> 
 
-Ah...I apologize for the oversight that introduced this bug...And it's 
-indeed a necessary fix.
-Thanks,
+Hi,Herbert,I sent the patch several days ago.
+I don't know whether you have received it. I hope you have time to look
+into it, and I am still looking forward to your reply.
 
-Acked-by: WangYuli <wangyuli@uniontech.com>
--- 
-WangYuli
+patch:
+https://lore.kernel.org/all/20241015020935.296691-1-yiyang13@huawei.com/
+
+Best regards,
+Yiyang
