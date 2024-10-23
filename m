@@ -1,68 +1,68 @@
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE4D82AE74
-	for <linux-crypto@vger.kernel.org>; Wed, 23 Oct 2024 00:49:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43C911DFE1
+	for <linux-crypto@vger.kernel.org>; Wed, 23 Oct 2024 00:50:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729644564; cv=none; b=MG/mnrbcpGy5CdJolcJ6KWVJhECSDj+cmTL99ZbguPc/Zwz8tVEQ/Or/j/Qxvt1clRde/xj949g+vtgJarE30tkE7SNe5uC49ctCDEBHq/qpSVAwhtMVbyAvsWkl5RxmNLGa+P7k/45s3YzWRNfjzsPvUu9h10XYcOinZw53vYc=
+	t=1729644633; cv=none; b=QJjxlAJGk1J7TJKOsfjodiQR2Veud9lW5czwuU4WJv8khjXjsZ0Rk1icETrRN1dXjDyA92RA8RFWL2qqR7RN3FIEPGMshgk2hOimtAmFJvsil/MOQhl+JCYWr8QWthi9hTYxLxIe6Efy8qT6XbJ4q6iDvD5sKErpgbRO5n8f5c8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729644564; c=relaxed/simple;
-	bh=SljGXz63/h+3m3uwl/K21ZDFOEGEc6Jc0sc55fTNPWE=;
+	s=arc-20240116; t=1729644633; c=relaxed/simple;
+	bh=85C14LnzHSmDnVC9fmIWJXsHAZ/RskLVIvFJVK0C8MY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=vC/Lu0KecXBYOXjYGFrLv1fR7H6T6aJSbmswXYHeD0aoCD9cDcW5ENO1wu/JTeInA2ldkBdET/JheqnMhrtpXPHrQ9rblgKHtzqzIT8bFoYsSBvhzbTm4x9SlLNcdBGdohDlBDg07xhUmhMSoTakE6y+kaXUpm225HtFOnY6Dwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=D1onzLvI; arc=none smtp.client-ip=209.85.218.54
+	 To:Cc:Content-Type; b=aq54aDM73e0FK+WIJlpnJYwFFA7gstNpjy8DZ9pbZhGJneGvE4Y/M2jdlpk0dUzKMjZc5kFg1t+l/ltS2Sq0UlXVScK3THiFSzPA1Epo1dA2AMpkinZbZrHA5afz4r460hPVqiT8seCEWRdA0/aWMy2Holf+f52dZKD6XHYpZ6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=r3wFZA/R; arc=none smtp.client-ip=209.85.218.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="D1onzLvI"
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a9a0c40849cso958621866b.3
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Oct 2024 17:49:22 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r3wFZA/R"
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a99ebb390a5so59483366b.1
+        for <linux-crypto@vger.kernel.org>; Tue, 22 Oct 2024 17:50:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1729644561; x=1730249361; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1729644629; x=1730249429; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7h7Ib3rin1j+j/i/BmxIphxr1v+kKzDbsGLgavpQz7o=;
-        b=D1onzLvIdPSVywJEJ1/2ei2UbvngZsC0vHA/3IPM6SNhSfjI13Nqi1U+Zs82J4J0MR
-         1xynNeq0GuiRhDkSWVBUivLpCW4FF4P27ePAc05Ul0dXZVhymDYYO8qvXkCqVSjxAvsU
-         Rf1LgmMjYEY/XlLwp4ruAXXzS5B2nLxJdgBJX8mzVGDCsEVBCUtrhcqko63zSo+LCHHl
-         k3m6+XPLTE/YGggYT9ADMXkzcfFvonyp2ZJrCuspq8H//DrJfdcKO/CGBKEZY0Pd0lOy
-         cVRjHfQRAMFsVAX0+9lcL1m/1v6YbZBvgcJflHA7r5l3ep7WZbSbU9AAdl566FT1D4Cw
-         4/xg==
+        bh=T2RVe7tez2PJu7xFZaopsIUK4FQaSBewWT4oCCH7cRo=;
+        b=r3wFZA/R70P/zPEPQ4q4jwebcXVe7G8IvmVkyfg840/H8oFE/SdOIJfcENXb6Ph6Tg
+         ot6No2eCDh1eA3QUHGmH9hgtW9fh0JsXnGQh2etzjMAj12VXom+RVk42xlLaXFpwWO3C
+         Jc6GiU93MyIhUhbKYOQIKa+Z52bsuapfqHdSHEeHMKESvJbOLav3FAbsRzJT4C/OnjMO
+         5yuUKAHEIPf3u76mA/xoywCSBQgbvRI6I/nXn47i2/vwCvAqcVJSgEBN2EjksUuIx3Gh
+         Oy+QWtn61zDfAMis9pK8v6C/csvtHf8OrUGFJ4R0A19o4JAeiFE84Ookw7uv8SUXcbDR
+         EFAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729644561; x=1730249361;
+        d=1e100.net; s=20230601; t=1729644629; x=1730249429;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=7h7Ib3rin1j+j/i/BmxIphxr1v+kKzDbsGLgavpQz7o=;
-        b=OgmOFAM7feW9qNHMa8vtYKWQak21DYTZcdjOJ5LGmHUQ/yMALObri27H1yrSX9t12q
-         iOkvAdxjYbkKNQ0rf4+dxq5c5NccAj3agBXtuQoss+Tri4BDA8wfitEPcSHaBN40FXwz
-         a9k8zYljy1pVCH264uIT6KD0VhE2suj5kx8MMkTb+oyIgwRTTacyjyHS28C7lHRw16oZ
-         Cu+nziVBlSfjwOupr7dc+1SimGB9jliiTEzhtcTP59kFwkKc8u6eIrqC4OBSMgygvDV6
-         EuBomFNVvZfO5+YUGPR3iYwKyVXkL08m3u9W9/st9YQEej0CAvM2RYPx0p/8YkWthRPP
-         d1jg==
-X-Forwarded-Encrypted: i=1; AJvYcCXfC+badOca+OsoStwfY8Aeq/lqPXu2m3al+dB/oJ+jhMm9BQU23ZazsmTpjBYOwGuQxeG3ClyAPvfFSK0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz1feGpVxQV6oLrih2zM92teODjux3cEbqnjSRZzVE0k9FgzUrY
-	HWojFUvd5RjvFQomYydW4/kiA9xludgWXTYBPcJ4LXM8oOZffkCOeuQM5lEOoVcTv6QmOL62bel
-	Q2mRlNs94Iumj+Vq30uIw/5vd2gIS2VnmQtvZ
-X-Google-Smtp-Source: AGHT+IFMisZ4oMvMqemTXU5KgbzeivNdbDaya3XBywWCinRAAR5cqjPylB/Gg9m/GBrxRcfF6/Ojst9RWuKwv4fnkO4=
-X-Received: by 2002:a17:907:86a4:b0:a9a:1a6a:b5f5 with SMTP id
- a640c23a62f3a-a9abf964381mr65014466b.56.1729644560784; Tue, 22 Oct 2024
- 17:49:20 -0700 (PDT)
+        bh=T2RVe7tez2PJu7xFZaopsIUK4FQaSBewWT4oCCH7cRo=;
+        b=CeGwLLnmMo96/PysS/2rFWzKXZqJssM7T/vnFZIu3LjZXLSa+nI5phqCSA/T8UrDIa
+         WApRGxH9OcVh/p8KCSldX5SD/ZivpT0aJbydFg50DP1rGblhbghN+HFZFze+4o1C1iCd
+         p8H1/2FXkk2MFqNCEkjJAS4X4EoOqeMufSto9C67v+HzS+zLtqgDE5nUxV4O384rbCCh
+         JN4EtfkwCE2QSiC9+NZtMVfM8P4pyjrPkXSxStg5ZT3XuT4guxhx4BhUBIInzfCfZdBY
+         o9L/WNJ/9oABwRjof/k3oGvOUIGAYFL4atvmw6+GJ63bWNYY+I8MOpyPXQwwlMD+3BxR
+         Xp5g==
+X-Forwarded-Encrypted: i=1; AJvYcCVXLbVwtECcqoiDqBgD3ljyNWlju2EpUpjUYN55KvCfmSJ+SCq4ogtsccMthfNMFWhx1JjHFJnpOj25kzw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyy6UNCrIRFGnaYkWfp1MxiyHNNvYo1gm8CZ6qV564WCxpBoJV/
+	8xb0eOy2VMpg3LGP26oWIDzsLx1yeiXAkqOagF09b2jzVO+aB2fcLgumtN5dtnLrHaZBAHrcHD6
+	36lJp1p42H2+s6pYh2SkCfzVy5sHuZXR9CQHO
+X-Google-Smtp-Source: AGHT+IGEjIYQpmIs+gAoloBjz17prVfsvhxrsDIKUjyX4jbTSir6xX9/MpmDlwfyBofviyxuYwSskWvLQsI1isWTUW4=
+X-Received: by 2002:a17:907:6d0c:b0:a8d:2281:94d9 with SMTP id
+ a640c23a62f3a-a9aaa620d72mr577158666b.23.1729644629301; Tue, 22 Oct 2024
+ 17:50:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241018064101.336232-1-kanchana.p.sridhar@intel.com> <20241018064101.336232-5-kanchana.p.sridhar@intel.com>
-In-Reply-To: <20241018064101.336232-5-kanchana.p.sridhar@intel.com>
+References: <20241018064101.336232-1-kanchana.p.sridhar@intel.com> <20241018064101.336232-10-kanchana.p.sridhar@intel.com>
+In-Reply-To: <20241018064101.336232-10-kanchana.p.sridhar@intel.com>
 From: Yosry Ahmed <yosryahmed@google.com>
-Date: Tue, 22 Oct 2024 17:48:44 -0700
-Message-ID: <CAJD7tkZPuMGB4=ULd=znbVqk1LL8oL_gdxi8q-K+vAub33nHgQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v1 04/13] mm: zswap: zswap_compress()/decompress() can
- submit, then poll an acomp_req.
+Date: Tue, 22 Oct 2024 17:49:53 -0700
+Message-ID: <CAJD7tkbXTtG1UmQ7oPXoKUjT302a_LL4yhbQsMS6tDRG+vRNBg@mail.gmail.com>
+Subject: Re: [RFC PATCH v1 09/13] mm: zswap: Config variable to enable
+ compress batching in zswap_store().
 To: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
 Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, hannes@cmpxchg.org, 
 	nphamcs@gmail.com, chengming.zhou@linux.dev, usamaarif642@gmail.com, 
@@ -81,129 +81,131 @@ Content-Transfer-Encoding: quoted-printable
 On Thu, Oct 17, 2024 at 11:41=E2=80=AFPM Kanchana P Sridhar
 <kanchana.p.sridhar@intel.com> wrote:
 >
-> If the crypto_acomp has a poll interface registered, zswap_compress()
-> and zswap_decompress() will submit the acomp_req, and then poll() for a
-> successful completion/error status in a busy-wait loop. This allows an
-> asynchronous way to manage (potentially multiple) acomp_reqs without
-> the use of interrupts, which is supported in the iaa_crypto driver.
+> Add a new zswap config variable that controls whether zswap_store() will
+> compress a batch of pages, for instance, the pages in a large folio:
 >
-> This enables us to implement batch submission of multiple
-> compression/decompression jobs to the Intel IAA hardware accelerator,
-> which will process them in parallel; followed by polling the batch's
-> acomp_reqs for completion status.
+>   CONFIG_ZSWAP_STORE_BATCHING_ENABLED
 >
+> The existing CONFIG_CRYPTO_DEV_IAA_CRYPTO variable added in commit
+> ea7a5cbb4369 ("crypto: iaa - Add Intel IAA Compression Accelerator crypto
+> driver core") is used to detect if the system has the Intel Analytics
+> Accelerator (IAA), and the iaa_crypto module is available. If so, the
+> kernel build will prompt for CONFIG_ZSWAP_STORE_BATCHING_ENABLED. Hence,
+> users have the ability to set CONFIG_ZSWAP_STORE_BATCHING_ENABLED=3D"y" o=
+nly
+> on systems that have Intel IAA.
+>
+> If CONFIG_ZSWAP_STORE_BATCHING_ENABLED is enabled, and IAA is configured
+> as the zswap compressor, zswap_store() will process the pages in a large
+> folio in batches, i.e., multiple pages at a time. Pages in a batch will b=
+e
+> compressed in parallel in hardware, then stored. On systems without Intel
+> IAA and/or if zswap uses software compressors, pages in the batch will be
+> compressed sequentially and stored.
+>
+> The patch also implements a zswap API that returns the status of this
+> config variable.
+
+If we are compressing a large folio and batching is an option, is not
+batching ever the correct thing to do? Why is the config option
+needed?
+
+>
+> Suggested-by: Ying Huang <ying.huang@intel.com>
 > Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
 > ---
->  mm/zswap.c | 51 +++++++++++++++++++++++++++++++++++++++------------
->  1 file changed, 39 insertions(+), 12 deletions(-)
+>  include/linux/zswap.h |  6 ++++++
+>  mm/Kconfig            | 12 ++++++++++++
+>  mm/zswap.c            | 14 ++++++++++++++
+>  3 files changed, 32 insertions(+)
 >
+> diff --git a/include/linux/zswap.h b/include/linux/zswap.h
+> index d961ead91bf1..74ad2a24b309 100644
+> --- a/include/linux/zswap.h
+> +++ b/include/linux/zswap.h
+> @@ -24,6 +24,7 @@ struct zswap_lruvec_state {
+>         atomic_long_t nr_disk_swapins;
+>  };
+>
+> +bool zswap_store_batching_enabled(void);
+>  unsigned long zswap_total_pages(void);
+>  bool zswap_store(struct folio *folio);
+>  bool zswap_load(struct folio *folio);
+> @@ -39,6 +40,11 @@ bool zswap_never_enabled(void);
+>
+>  struct zswap_lruvec_state {};
+>
+> +static inline bool zswap_store_batching_enabled(void)
+> +{
+> +       return false;
+> +}
+> +
+>  static inline bool zswap_store(struct folio *folio)
+>  {
+>         return false;
+> diff --git a/mm/Kconfig b/mm/Kconfig
+> index 33fa51d608dc..26d1a5cee471 100644
+> --- a/mm/Kconfig
+> +++ b/mm/Kconfig
+> @@ -125,6 +125,18 @@ config ZSWAP_COMPRESSOR_DEFAULT
+>         default "zstd" if ZSWAP_COMPRESSOR_DEFAULT_ZSTD
+>         default ""
+>
+> +config ZSWAP_STORE_BATCHING_ENABLED
+> +       bool "Batching of zswap stores with Intel IAA"
+> +       depends on ZSWAP && CRYPTO_DEV_IAA_CRYPTO
+> +       default n
+> +       help
+> +       Enables zswap_store to swapout large folios in batches of 8 pages=
+,
+> +       rather than a page at a time, if the system has Intel IAA for har=
+dware
+> +       acceleration of compressions. If IAA is configured as the zswap
+> +       compressor, this will parallelize batch compression of upto 8 pag=
+es
+> +       in the folio in hardware, thereby improving large folio compressi=
+on
+> +       throughput and reducing swapout latency.
+> +
+>  choice
+>         prompt "Default allocator"
+>         depends on ZSWAP
 > diff --git a/mm/zswap.c b/mm/zswap.c
-> index f6316b66fb23..948c9745ee57 100644
+> index 948c9745ee57..4893302d8c34 100644
 > --- a/mm/zswap.c
 > +++ b/mm/zswap.c
-> @@ -910,18 +910,34 @@ static bool zswap_compress(struct page *page, struc=
-t zswap_entry *entry,
->         acomp_request_set_params(acomp_ctx->req, &input, &output, PAGE_SI=
-ZE, dlen);
->
->         /*
-> -        * it maybe looks a little bit silly that we send an asynchronous=
- request,
-> -        * then wait for its completion synchronously. This makes the pro=
-cess look
-> -        * synchronous in fact.
-> -        * Theoretically, acomp supports users send multiple acomp reques=
-ts in one
-> -        * acomp instance, then get those requests done simultaneously. b=
-ut in this
-> -        * case, zswap actually does store and load page by page, there i=
-s no
-> -        * existing method to send the second page before the first page =
-is done
-> -        * in one thread doing zwap.
-> -        * but in different threads running on different cpu, we have dif=
-ferent
-> -        * acomp instance, so multiple threads can do (de)compression in =
-parallel.
-> +        * If the crypto_acomp provides an asynchronous poll() interface,
-> +        * submit the descriptor and poll for a completion status.
-> +        *
-> +        * It maybe looks a little bit silly that we send an asynchronous
-> +        * request, then wait for its completion in a busy-wait poll loop=
-, or,
-> +        * synchronously. This makes the process look synchronous in fact=
-.
-> +        * Theoretically, acomp supports users send multiple acomp reques=
-ts in
-> +        * one acomp instance, then get those requests done simultaneousl=
-y.
-> +        * But in this case, zswap actually does store and load page by p=
-age,
-> +        * there is no existing method to send the second page before the
-> +        * first page is done in one thread doing zswap.
-> +        * But in different threads running on different cpu, we have dif=
-ferent
-> +        * acomp instance, so multiple threads can do (de)compression in
-> +        * parallel.
->          */
-> -       comp_ret =3D crypto_wait_req(crypto_acomp_compress(acomp_ctx->req=
-), &acomp_ctx->wait);
-> +       if (acomp_ctx->acomp->poll) {
-> +               comp_ret =3D crypto_acomp_compress(acomp_ctx->req);
-> +               if (comp_ret =3D=3D -EINPROGRESS) {
-> +                       do {
-> +                               comp_ret =3D crypto_acomp_poll(acomp_ctx-=
->req);
-> +                               if (comp_ret && comp_ret !=3D -EAGAIN)
-> +                                       break;
-> +                       } while (comp_ret);
-> +               }
-> +       } else {
-> +               comp_ret =3D crypto_wait_req(crypto_acomp_compress(acomp_=
-ctx->req), &acomp_ctx->wait);
-> +       }
-> +
-
-Is Herbert suggesting that crypto_wait_req(crypto_acomp_compress(..))
-essentially do the poll internally for IAA, and hence this change can
-be dropped?
-
->         dlen =3D acomp_ctx->req->dlen;
->         if (comp_ret)
->                 goto unlock;
-> @@ -959,6 +975,7 @@ static void zswap_decompress(struct zswap_entry *entr=
-y, struct folio *folio)
->         struct scatterlist input, output;
->         struct crypto_acomp_ctx *acomp_ctx;
->         u8 *src;
-> +       int ret;
->
->         acomp_ctx =3D raw_cpu_ptr(entry->pool->acomp_ctx);
->         mutex_lock(&acomp_ctx->mutex);
-> @@ -984,7 +1001,17 @@ static void zswap_decompress(struct zswap_entry *en=
-try, struct folio *folio)
->         sg_init_table(&output, 1);
->         sg_set_folio(&output, folio, PAGE_SIZE, 0);
->         acomp_request_set_params(acomp_ctx->req, &input, &output, entry->=
-length, PAGE_SIZE);
-> -       BUG_ON(crypto_wait_req(crypto_acomp_decompress(acomp_ctx->req), &=
-acomp_ctx->wait));
-> +       if (acomp_ctx->acomp->poll) {
-> +               ret =3D crypto_acomp_decompress(acomp_ctx->req);
-> +               if (ret =3D=3D -EINPROGRESS) {
-> +                       do {
-> +                               ret =3D crypto_acomp_poll(acomp_ctx->req)=
+> @@ -127,6 +127,15 @@ static bool zswap_shrinker_enabled =3D IS_ENABLED(
+>                 CONFIG_ZSWAP_SHRINKER_DEFAULT_ON);
+>  module_param_named(shrinker_enabled, zswap_shrinker_enabled, bool, 0644)=
 ;
-> +                               BUG_ON(ret && ret !=3D -EAGAIN);
-> +                       } while (ret);
-> +               }
-> +       } else {
-> +               BUG_ON(crypto_wait_req(crypto_acomp_decompress(acomp_ctx-=
->req), &acomp_ctx->wait));
-> +       }
->         BUG_ON(acomp_ctx->req->dlen !=3D PAGE_SIZE);
->         mutex_unlock(&acomp_ctx->mutex);
 >
+> +/*
+> + * Enable/disable batching of compressions if zswap_store is called with=
+ a
+> + * large folio. If enabled, and if IAA is the zswap compressor, pages ar=
+e
+> + * compressed in parallel in batches of say, 8 pages.
+> + * If not, every page is compressed sequentially.
+> + */
+> +static bool __zswap_store_batching_enabled =3D IS_ENABLED(
+> +       CONFIG_ZSWAP_STORE_BATCHING_ENABLED);
+> +
+>  bool zswap_is_enabled(void)
+>  {
+>         return zswap_enabled;
+> @@ -241,6 +250,11 @@ static inline struct xarray *swap_zswap_tree(swp_ent=
+ry_t swp)
+>         pr_debug("%s pool %s/%s\n", msg, (p)->tfm_name,         \
+>                  zpool_get_type((p)->zpool))
+>
+> +__always_inline bool zswap_store_batching_enabled(void)
+> +{
+> +       return __zswap_store_batching_enabled;
+> +}
+> +
+>  /*********************************
+>  * pool functions
+>  **********************************/
 > --
 > 2.27.0
 >
