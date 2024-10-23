@@ -1,48 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B495B1CF5F7;
-	Wed, 23 Oct 2024 14:30:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEB712003B3;
+	Wed, 23 Oct 2024 14:31:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729693839; cv=none; b=GZdycmYjP25vscXaTBcIecdhhqkY7OeB2VSsybHe8Y7BvIU4vZGm9b7YYjmVFTQW5puyUDdwvyVVXZu58hw9PUE9C+vNvrNjJ5+/9+bDcRPy4FqAdX2V63qS54G80BPKQAhpYEu3QGdpWU9j7lJGtZJFQFpPfpyF9YhHiLmHfAI=
+	t=1729693895; cv=none; b=aQkPvS9nQRGBAd+jxtDLyIfSB7iFq4HiNqmKdQ7mqafYY1ogC3T8AZebk7wHy9v10SOcER/buEsp5lU8NoumCXFhJ05vXYQSA0zZFnERbTJ690e48CTL3GVl85q0SVCVLzIeTWCajkDayf9CTIg4O8lVQ0SqBeJFTSBRzyxIcGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729693839; c=relaxed/simple;
-	bh=mfJRy+rYwPbNCeTCcqg3cZQ1W1UA6uLvQa3fW+Ha6cY=;
+	s=arc-20240116; t=1729693895; c=relaxed/simple;
+	bh=i7Vx2jvVeicGfJ2NymrgScV9v1hM2Tf81UnUFphjNy4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Y/ifdW5uQloHJfYEGXS4gj29ySmQ/pCwxPJfiUGg9bI20BXnXvVVaPi6D6WsnAMtQtDjDcQ/r8whPHBvaLsXSTskf4rjCnkWgQ9HMBoUoepHl4ZwH6GMTqeEfvRKWgVjIZozADEbPOUjx0qnWVZGt28/rHki9Z/jgkU8bdkqti8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VrvXcTqE; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=sFaApW7o8uV863giskgTujEWJQ5/Tlq0ODlHwcv8jJ4M+FGIDlewmymOufQ16dGdh7JOX0ypkkQba43gsy7drf/FO2j6cUu6bPL+m9F3idgp/S5tNpxEG/44o6h8kPwUOhGqc6ScQGdHB4xFuWlNeCd4anfIh2+2X+pmcc5xbyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ecaTg6/f; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VrvXcTqE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A015C4CEC6;
-	Wed, 23 Oct 2024 14:30:38 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ecaTg6/f"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7463C4CEE8;
+	Wed, 23 Oct 2024 14:31:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729693839;
-	bh=mfJRy+rYwPbNCeTCcqg3cZQ1W1UA6uLvQa3fW+Ha6cY=;
+	s=k20201202; t=1729693895;
+	bh=i7Vx2jvVeicGfJ2NymrgScV9v1hM2Tf81UnUFphjNy4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=VrvXcTqE8Z68eUpHWqnA3YKTIKTpIpUCap+D6FYpvSU6maM68fR+qnZtnm6nDeu3r
-	 WcRymjTzwbU2SomEc8eavbVOVYk5rCHho5CQc4hCtfykBG0IhZLDfYuw6t64VXww04
-	 Xr+Hy9T3G8hAQuz2knAdQZEkEIVrrEPxZVG914hcll2u/15PDJwOVEmQB7X7oTej5q
-	 IwQFOMzoCJVh0vYQs8J83McljkK1HYgWxMHwrDPoIsRRYb3oFHerTc6O+IxNkrEUMr
-	 x+1VcHROFhX6aD2NzoaxffJaXJ8XrgouNID1DlMtlM64Wb2y9lhZYjoDKxpuWHFoiL
-	 hr9HHna52Cp8A==
+	b=ecaTg6/fefjuWk7EgBVZEQJxlolNlc2YmGMK860cWqtLCAtOhxdYMRtBZASiWbWE5
+	 iuxX/WZ52Un5KVvqX5IZVhFaagyV/SaOXuiv//LYEbnspTR+h7NQr4KX8GQ2GvI0aO
+	 UOegAhl8n7dn1R2H78aQg1yGHCzHxoIDTMN/mJbxyB/z7ZgWhZzcAMgkXTn2pYXxAY
+	 ciNRR3q3FFs7YWyVDmZwWnYJLrf1ISO2a26ShGkmlHAN8PFlhxWcbMkhrhC9SelyXQ
+	 k7CWx0I1XEmg/3GDQflZojtt5VAwGua1my0Pv0EHMfVpFnwla7G0LkwsDW77exOI0w
+	 P4gHfoaoTZITA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
 Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Klaus Kudielka <klaus.kudielka@gmail.com>,
 	Sasha Levin <sashal@kernel.org>,
-	bbrezillon@kernel.org,
-	arno@natisbad.org,
-	schalla@marvell.com,
 	davem@davemloft.net,
 	linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.11 16/30] crypto: marvell/cesa - Disable hash algorithms
-Date: Wed, 23 Oct 2024 10:29:41 -0400
-Message-ID: <20241023143012.2980728-16-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 12/23] crypto: api - Fix liveliness check in crypto_alg_tested
+Date: Wed, 23 Oct 2024 10:30:56 -0400
+Message-ID: <20241023143116.2981369-12-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241023143012.2980728-1-sashal@kernel.org>
-References: <20241023143012.2980728-1-sashal@kernel.org>
+In-Reply-To: <20241023143116.2981369-1-sashal@kernel.org>
+References: <20241023143116.2981369-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -51,82 +47,48 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.11.5
+X-stable-base: Linux 6.6.58
 Content-Transfer-Encoding: 8bit
 
 From: Herbert Xu <herbert@gondor.apana.org.au>
 
-[ Upstream commit e845d2399a00f866f287e0cefbd4fc7d8ef0d2f7 ]
+[ Upstream commit b81e286ba154a4e0f01a94d99179a97f4ba3e396 ]
 
-Disable cesa hash algorithms by lowering the priority because they
-appear to be broken when invoked in parallel.  This allows them to
-still be tested for debugging purposes.
+As algorithm testing is carried out without holding the main crypto
+lock, it is always possible for the algorithm to go away during the
+test.
 
-Reported-by: Klaus Kudielka <klaus.kudielka@gmail.com>
+So before crypto_alg_tested updates the status of the tested alg,
+it checks whether it's still on the list of all algorithms.  This
+is inaccurate because it may be off the main list but still on the
+list of algorithms to be removed.
+
+Updating the algorithm status is safe per se as the larval still
+holds a reference to it.  However, killing spawns of other algorithms
+that are of lower priority is clearly a deficiency as it adds
+unnecessary churn.
+
+Fix the test by checking whether the algorithm is dead.
+
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/marvell/cesa/hash.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ crypto/algapi.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/marvell/cesa/hash.c b/drivers/crypto/marvell/cesa/hash.c
-index 8d84ad45571c7..f150861ceaf69 100644
---- a/drivers/crypto/marvell/cesa/hash.c
-+++ b/drivers/crypto/marvell/cesa/hash.c
-@@ -947,7 +947,7 @@ struct ahash_alg mv_md5_alg = {
- 		.base = {
- 			.cra_name = "md5",
- 			.cra_driver_name = "mv-md5",
--			.cra_priority = 300,
-+			.cra_priority = 0,
- 			.cra_flags = CRYPTO_ALG_ASYNC |
- 				     CRYPTO_ALG_ALLOCATES_MEMORY |
- 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
-@@ -1018,7 +1018,7 @@ struct ahash_alg mv_sha1_alg = {
- 		.base = {
- 			.cra_name = "sha1",
- 			.cra_driver_name = "mv-sha1",
--			.cra_priority = 300,
-+			.cra_priority = 0,
- 			.cra_flags = CRYPTO_ALG_ASYNC |
- 				     CRYPTO_ALG_ALLOCATES_MEMORY |
- 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
-@@ -1092,7 +1092,7 @@ struct ahash_alg mv_sha256_alg = {
- 		.base = {
- 			.cra_name = "sha256",
- 			.cra_driver_name = "mv-sha256",
--			.cra_priority = 300,
-+			.cra_priority = 0,
- 			.cra_flags = CRYPTO_ALG_ASYNC |
- 				     CRYPTO_ALG_ALLOCATES_MEMORY |
- 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
-@@ -1302,7 +1302,7 @@ struct ahash_alg mv_ahmac_md5_alg = {
- 		.base = {
- 			.cra_name = "hmac(md5)",
- 			.cra_driver_name = "mv-hmac-md5",
--			.cra_priority = 300,
-+			.cra_priority = 0,
- 			.cra_flags = CRYPTO_ALG_ASYNC |
- 				     CRYPTO_ALG_ALLOCATES_MEMORY |
- 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
-@@ -1373,7 +1373,7 @@ struct ahash_alg mv_ahmac_sha1_alg = {
- 		.base = {
- 			.cra_name = "hmac(sha1)",
- 			.cra_driver_name = "mv-hmac-sha1",
--			.cra_priority = 300,
-+			.cra_priority = 0,
- 			.cra_flags = CRYPTO_ALG_ASYNC |
- 				     CRYPTO_ALG_ALLOCATES_MEMORY |
- 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
-@@ -1444,7 +1444,7 @@ struct ahash_alg mv_ahmac_sha256_alg = {
- 		.base = {
- 			.cra_name = "hmac(sha256)",
- 			.cra_driver_name = "mv-hmac-sha256",
--			.cra_priority = 300,
-+			.cra_priority = 0,
- 			.cra_flags = CRYPTO_ALG_ASYNC |
- 				     CRYPTO_ALG_ALLOCATES_MEMORY |
- 				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index 85bc279b4233f..b3a6086042530 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -396,7 +396,7 @@ void crypto_alg_tested(const char *name, int err)
+ 	q->cra_flags |= CRYPTO_ALG_DEAD;
+ 	alg = test->adult;
+ 
+-	if (list_empty(&alg->cra_list))
++	if (crypto_is_dead(alg))
+ 		goto complete;
+ 
+ 	if (err == -ECANCELED)
 -- 
 2.43.0
 
