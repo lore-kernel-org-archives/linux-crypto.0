@@ -1,204 +1,158 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A428A1494CC
-	for <linux-crypto@vger.kernel.org>; Fri, 25 Oct 2024 15:07:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47C3F6F099;
+	Fri, 25 Oct 2024 15:31:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729868843; cv=none; b=aHM8KEPshSoghKCNyTSOBm5BbF6nHGg0FGTl7jQhbTPAHlLFmJ8trYvE05IYMVn/Euto1j6BOHZoD97yV5pmKtzli4cWW0IMHw69wicY/MlVsoplJQbBLbL2vzLmTpKUVpx2imChuU4pSOXTCsb3d2Y5TGwysITzLvTk9sO/tDg=
+	t=1729870301; cv=none; b=SKeC+xIBEFTcx1UizrEgvMJvZ7Jv24kML6KqAi0+BDWhGyH+wfGnaIehPMZb1EkE1JOnyjwpINxqqd8GGeiBxegVgp4cKd6s/m8K4lTa0WtnR/CdK3/qzMoHHVuwz+nvktMuSZpKoPjSOLTu+V+2JRXkJdtSjSayWgv6179a5I8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729868843; c=relaxed/simple;
-	bh=Cv9ifMjJi1xPgT32qiX/UlIo+09VYyucwB0zvZrpJsI=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=IUgxo9ARDPUbhYfD7IUU54jadcHGr6xzLOt/++zOxFjuA4YId+E1F0Ae66HbjSaHmZun7MHP/rbZX2tTCRFXXeRE3MArbvy0AYX8h9HDkTiQD5k9j//AFakESxh7IzDb8TlLTOqiolf/UWvJivFQqmkPJhwMmOrLBC4Jw/mSYPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aJ0QxCzM; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1729870301; c=relaxed/simple;
+	bh=/2J1GjARnQin8IDRVr7yEGcvHtYaMVqYqN1depWkivw=;
+	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=gHq8xaX/BxZrg/KaWWnWLpM/06+gFIiZfGGe4jgQ17IyI4VBB/kbiUVYsJGg9KNp8VWTBwHdQIL1tuxPysvbnjcpERy1ntJom+ltWjyQ+xUHui9CaUZp8Zq/l1sMOdXYK59eNh4mCPbCdIvxxkgQb0VVG2/dEzI859tEkjUpohs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=j0YhvipQ; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aJ0QxCzM"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1729868840;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Cv9ifMjJi1xPgT32qiX/UlIo+09VYyucwB0zvZrpJsI=;
-	b=aJ0QxCzMpJqd/2pwfZVJrErDCmIlWqhasyPHCzCaL9mlr0vMcwVerC96tpjWs5d08fOypP
-	OH7+dDu9dK4XMLMs/tmfhxQjE3N5EzCE5oVt76ZIE1zfynafs5htsy+/Ffq5vDZNq1rJLB
-	I2wQACim268gw/23wQoI2tDBIeBEm9Q=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-645-1S_qfjMaNgiz8iP7CyI5JQ-1; Fri, 25 Oct 2024 11:07:19 -0400
-X-MC-Unique: 1S_qfjMaNgiz8iP7CyI5JQ-1
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-5cbadbef8edso966781a12.3
-        for <linux-crypto@vger.kernel.org>; Fri, 25 Oct 2024 08:07:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1729868838; x=1730473638;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Cv9ifMjJi1xPgT32qiX/UlIo+09VYyucwB0zvZrpJsI=;
-        b=GDY0ag4zIw+9V99GEw63T9cH+iE/FMzO6fbvTcfLmzYpipYntAfVgsp3vSUkE+GR2I
-         XBCsGUj0oGcGhDqusfT+hBrFeDSiT0d36PIJSFpNEXhQDNctPQDukrME2ogPmmWmNGx0
-         cIkQnvl98s4Q0LQJ5JtYiWxt75lFxuJwUP7RrgPhCXZcTdpzMMKxKrqin6sjQcY2Zt+m
-         YumlD6w3NcMpOnC5ot1fH5cujpeHxKdfLdCI4wi6GXM7D9Ji+du/VdfdHdvG3CmQ/Kbj
-         vpZYe4NXlL8i7JH7ncT6e9xcvdaHvhVvdHtz8TUuUu79YizUABFlp4M51dQNkCjN4fRy
-         9cyQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU4DPKKhEsR9gPCNb/vIASHCYLJTKEsM9sPni5rxVO6iBQxeBgt/rZwYq/3yFDLUQIAKE5OHd68K5qsWN0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxmEPjgbKDfoCDYZXHAI7xEtEfSUoS6XW5/1/MuAtHn85361DZq
-	jPgk+vWjjXrESc3oqhBij8b+BOxyVR8lAZqdtjnKzaNe8OWpPTOc0luCQyK4QDSYauYU1AK0DN1
-	YUO5H+xG1MZr4hBHZ2kYfUxfPxjkyByIC/j05R4P+La3NDfqplxvxjiwGmT6IMw==
-X-Received: by 2002:a05:6402:358b:b0:5c9:7c78:4919 with SMTP id 4fb4d7f45d1cf-5cb8af9c4d3mr8212933a12.30.1729868838310;
-        Fri, 25 Oct 2024 08:07:18 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE7H/bqnsUWHShErolb2XGY4D8jRAcbmNGf/vguZUoOhS98A+ZCyAohXpBvkLBGvNllWPIolQ==
-X-Received: by 2002:a05:6402:358b:b0:5c9:7c78:4919 with SMTP id 4fb4d7f45d1cf-5cb8af9c4d3mr8212889a12.30.1729868837816;
-        Fri, 25 Oct 2024 08:07:17 -0700 (PDT)
-Received: from eisenberg.fritz.box (200116b82de5ba00738ac8dadaac7543.dip.versatel-1u1.de. [2001:16b8:2de5:ba00:738a:c8da:daac:7543])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cbb62bf6d9sm712484a12.41.2024.10.25.08.07.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Oct 2024 08:07:17 -0700 (PDT)
-Message-ID: <7d2f4230a8113b41eb696564afe8c779aadf12de.camel@redhat.com>
-Subject: Re: [PATCH 00/10] Remove pcim_iomap_regions_request_all()
-From: Philipp Stanner <pstanner@redhat.com>
-To: Jonathan Corbet <corbet@lwn.net>, Damien Le Moal <dlemoal@kernel.org>, 
- Niklas Cassel <cassel@kernel.org>, Giovanni Cabiddu
- <giovanni.cabiddu@intel.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>,  Boris Brezillon
- <bbrezillon@kernel.org>, Arnaud Ebalard <arno@natisbad.org>, Srujana Challa
- <schalla@marvell.com>,  Alexander Shishkin
- <alexander.shishkin@linux.intel.com>, Miri Korenblit
- <miriam.rachel.korenblit@intel.com>, Kalle Valo <kvalo@kernel.org>, Serge
- Semin <fancer.lancer@gmail.com>, Jon Mason <jdmason@kudzu.us>, Dave Jiang
- <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>, Bjorn Helgaas
- <bhelgaas@google.com>, Kevin Cernekee <cernekee@gmail.com>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby
- <jirislaby@kernel.org>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai
- <tiwai@suse.com>,  Mark Brown <broonie@kernel.org>, David Lechner
- <dlechner@baylibre.com>, Uwe =?ISO-8859-1?Q?Kleine-K=F6nig?=
- <u.kleine-koenig@pengutronix.de>, Jie Wang <jie.wang@intel.com>, Tero
- Kristo <tero.kristo@linux.intel.com>, Adam Guerin <adam.guerin@intel.com>,
- Shashank Gupta <shashank.gupta@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, Bharat Bhushan <bbhushan2@marvell.com>,
- Nithin Dabilpuram <ndabilpuram@marvell.com>, Johannes Berg
- <johannes.berg@intel.com>, Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
-  Gregory Greenman <gregory.greenman@intel.com>, Benjamin Berg
- <benjamin.berg@intel.com>, Yedidya Benshimol
- <yedidya.ben.shimol@intel.com>, Breno Leitao <leitao@debian.org>, Florian
- Fainelli <florian.fainelli@broadcom.com>, Ilpo =?ISO-8859-1?Q?J=E4rvinen?=
- <ilpo.jarvinen@linux.intel.com>
-Cc: linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-ide@vger.kernel.org, qat-linux@intel.com,
- linux-crypto@vger.kernel.org,  linux-wireless@vger.kernel.org,
- ntb@lists.linux.dev, linux-pci@vger.kernel.org, 
- linux-serial@vger.kernel.org, linux-sound@vger.kernel.org
-Date: Fri, 25 Oct 2024 17:07:14 +0200
-In-Reply-To: <20241025145959.185373-1-pstanner@redhat.com>
-References: <20241025145959.185373-1-pstanner@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="j0YhvipQ"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1729870300; x=1761406300;
+  h=from:date:to:cc:subject:in-reply-to:message-id:
+   references:mime-version;
+  bh=/2J1GjARnQin8IDRVr7yEGcvHtYaMVqYqN1depWkivw=;
+  b=j0YhvipQwr+avgKEPWAj6YhHi9R/9alz4VKeifNqdeE2AGDoPENP/24D
+   tP3UT9ZGMljKYCCRKonb6XIsUyMKQIo9mJKkxPu1xGSHQgAICWc2CcU/Z
+   DK+QP0P3uDUzrMGcPEd48I3e1v6gWIOS3i4VFGWq2/V/LZeSqBn/CkmEn
+   aDVeI8tlDxmEETa24zDg5q0WXsyQRsIx/3rdt9/XEp3E/fnQt54xhSpmX
+   Uj5OfqPqnVspqkgZTcttdZzDLUK11Xx4AgrnX8sBGTnKZOb83M7meNPO/
+   yL096LqSZ3NwROb9suc4s2DtLVbPEq/kHYqd7iC9/aeQ3eewZh51WcMB7
+   A==;
+X-CSE-ConnectionGUID: 8hmX+HC5QxmKoiux1pZIYQ==
+X-CSE-MsgGUID: RY1L4P91Tbqzb/CMUmcnlQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11236"; a="40935920"
+X-IronPort-AV: E=Sophos;i="6.11,232,1725346800"; 
+   d="scan'208";a="40935920"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2024 08:31:38 -0700
+X-CSE-ConnectionGUID: R52BphinSZOxfUkm8HgmHg==
+X-CSE-MsgGUID: LI6dv1k3QkeHmZVNhcth6A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,232,1725346800"; 
+   d="scan'208";a="84901931"
+Received: from ijarvine-mobl1.ger.corp.intel.com (HELO localhost) ([10.245.244.225])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2024 08:31:24 -0700
+From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Date: Fri, 25 Oct 2024 18:31:21 +0300 (EEST)
+To: Philipp Stanner <pstanner@redhat.com>
+cc: Jonathan Corbet <corbet@lwn.net>, Damien Le Moal <dlemoal@kernel.org>, 
+    Niklas Cassel <cassel@kernel.org>, 
+    Giovanni Cabiddu <giovanni.cabiddu@intel.com>, 
+    Herbert Xu <herbert@gondor.apana.org.au>, 
+    "David S. Miller" <davem@davemloft.net>, 
+    Boris Brezillon <bbrezillon@kernel.org>, 
+    Arnaud Ebalard <arno@natisbad.org>, Srujana Challa <schalla@marvell.com>, 
+    Alexander Shishkin <alexander.shishkin@linux.intel.com>, 
+    Miri Korenblit <miriam.rachel.korenblit@intel.com>, 
+    Kalle Valo <kvalo@kernel.org>, Serge Semin <fancer.lancer@gmail.com>, 
+    Jon Mason <jdmason@kudzu.us>, Dave Jiang <dave.jiang@intel.com>, 
+    Allen Hubbe <allenbh@gmail.com>, Bjorn Helgaas <bhelgaas@google.com>, 
+    Kevin Cernekee <cernekee@gmail.com>, 
+    Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+    Jiri Slaby <jirislaby@kernel.org>, Jaroslav Kysela <perex@perex.cz>, 
+    Takashi Iwai <tiwai@suse.com>, Mark Brown <broonie@kernel.org>, 
+    David Lechner <dlechner@baylibre.com>, 
+    =?ISO-8859-15?Q?Uwe_Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>, 
+    Jie Wang <jie.wang@intel.com>, Tero Kristo <tero.kristo@linux.intel.com>, 
+    Adam Guerin <adam.guerin@intel.com>, 
+    Shashank Gupta <shashank.gupta@intel.com>, 
+    Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+    Bharat Bhushan <bbhushan2@marvell.com>, 
+    Nithin Dabilpuram <ndabilpuram@marvell.com>, 
+    Johannes Berg <johannes.berg@intel.com>, 
+    Emmanuel Grumbach <emmanuel.grumbach@intel.com>, 
+    Gregory Greenman <gregory.greenman@intel.com>, 
+    Benjamin Berg <benjamin.berg@intel.com>, 
+    Yedidya Benshimol <yedidya.ben.shimol@intel.com>, 
+    Breno Leitao <leitao@debian.org>, 
+    Florian Fainelli <florian.fainelli@broadcom.com>, 
+    linux-doc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, 
+    linux-ide@vger.kernel.org, qat-linux@intel.com, 
+    linux-crypto@vger.kernel.org, linux-wireless@vger.kernel.org, 
+    ntb@lists.linux.dev, linux-pci@vger.kernel.org, 
+    linux-serial <linux-serial@vger.kernel.org>, linux-sound@vger.kernel.org
+Subject: Re: [PATCH 06/10] wifi: iwlwifi: replace deprecated PCI functions
+In-Reply-To: <20241025145959.185373-7-pstanner@redhat.com>
+Message-ID: <ea7b805a-6c8e-8060-1c6b-4d62c69f78ae@linux.intel.com>
+References: <20241025145959.185373-1-pstanner@redhat.com> <20241025145959.185373-7-pstanner@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 
-Aaaaaaaaaaaand of course I forgot to mark this series as a Version 5.
+On Fri, 25 Oct 2024, Philipp Stanner wrote:
 
-I am sorry.
+> pcim_iomap_table() and pcim_iomap_regions_request_all() have been
+> deprecated by the PCI subsystem in commit e354bb84a4c1 ("PCI: Deprecate
+> pcim_iomap_table(), pcim_iomap_regions_request_all()").
+> 
+> Replace these functions with their successors, pcim_iomap() and
+> pcim_request_all_regions().
+> 
+> Signed-off-by: Philipp Stanner <pstanner@redhat.com>
+> Acked-by: Kalle Valo <kvalo@kernel.org>
+> ---
+>  drivers/net/wireless/intel/iwlwifi/pcie/trans.c | 16 ++++------------
+>  1 file changed, 4 insertions(+), 12 deletions(-)
+> 
+> diff --git a/drivers/net/wireless/intel/iwlwifi/pcie/trans.c b/drivers/net/wireless/intel/iwlwifi/pcie/trans.c
+> index 3b9943eb6934..4b41613ad89d 100644
+> --- a/drivers/net/wireless/intel/iwlwifi/pcie/trans.c
+> +++ b/drivers/net/wireless/intel/iwlwifi/pcie/trans.c
+> @@ -3533,7 +3533,6 @@ struct iwl_trans *iwl_trans_pcie_alloc(struct pci_dev *pdev,
+>  	struct iwl_trans_pcie *trans_pcie, **priv;
+>  	struct iwl_trans *trans;
+>  	int ret, addr_size;
+> -	void __iomem * const *table;
+>  	u32 bar0;
+>  
+>  	/* reassign our BAR 0 if invalid due to possible runtime PM races */
+> @@ -3659,22 +3658,15 @@ struct iwl_trans *iwl_trans_pcie_alloc(struct pci_dev *pdev,
+>  		}
+>  	}
+>  
+> -	ret = pcim_iomap_regions_request_all(pdev, BIT(0), DRV_NAME);
+> +	ret = pcim_request_all_regions(pdev, DRV_NAME);
+>  	if (ret) {
+> -		dev_err(&pdev->dev, "pcim_iomap_regions_request_all failed\n");
+> +		dev_err(&pdev->dev, "pcim_request_all_regions failed\n");
+>  		goto out_no_pci;
+>  	}
+>  
+> -	table = pcim_iomap_table(pdev);
+> -	if (!table) {
+> -		dev_err(&pdev->dev, "pcim_iomap_table failed\n");
+> -		ret = -ENOMEM;
+> -		goto out_no_pci;
+> -	}
+> -
+> -	trans_pcie->hw_base = table[0];
+> +	trans_pcie->hw_base = pcim_iomap(pdev, 0, 0);
+>  	if (!trans_pcie->hw_base) {
+> -		dev_err(&pdev->dev, "couldn't find IO mem in first BAR\n");
+> +		dev_err(&pdev->dev, "pcim_iomap failed\n");
 
-P.
+This seems a step backwards as a human readable English error message was 
+replaced with a reference to a function name.
 
+-- 
+ i.
 
-On Fri, 2024-10-25 at 16:59 +0200, Philipp Stanner wrote:
-> All Acked-by's are in place now.
->=20
-> Changes in v5:
-> =C2=A0 - Add Acked-by's from Alexander and Bharat (the latter sent off-
-> list,
-> =C2=A0=C2=A0=C2=A0 because of some issue with receiving the previous patc=
-h sets).
->=20
-> Changes in v4:
-> =C2=A0 - Add Acked-by's from Giovanni and Kalle.
->=20
-> Changes in v3:
-> =C2=A0 - Add missing full stops to commit messages (Andy).
->=20
-> Changes in v2:
-> =C2=A0 - Fix a bug in patch =E2=84=964 ("crypto: marvell ...") where an e=
-rror code
-> =C2=A0=C2=A0=C2=A0 was not set before printing it. (Me)
-> =C2=A0 - Apply Damien's Reviewed- / Acked-by to patches 1, 2 and 10.
-> (Damien)
-> =C2=A0 - Apply Serge's Acked-by to patch =E2=84=967. (Serge)
-> =C2=A0 - Apply Jiri's Reviewed-by to patch =E2=84=968. (Jiri)
-> =C2=A0 - Apply Takashi Iwai's Reviewed-by to patch =E2=84=969. (Takashi)
->=20
->=20
-> Hi all,
->=20
-> the PCI subsystem is currently working on cleaning up its devres API.
-> To
-> do so, a few functions will be replaced with better alternatives.
->=20
-> This series removes pcim_iomap_regions_request_all(), which has been
-> deprecated already, and accordingly replaces the calls to
-> pcim_iomap_table() (which were only necessary because of
-> pcim_iomap_regions_request_all() in the first place) with calls to
-> pcim_iomap().
->=20
-> Would be great if you can take a look whether this behaves as you
-> intended for your respective component.
->=20
-> Cheers,
-> Philipp
->=20
-> Philipp Stanner (10):
-> =C2=A0 PCI: Make pcim_request_all_regions() a public function
-> =C2=A0 ata: ahci: Replace deprecated PCI functions
-> =C2=A0 crypto: qat - replace deprecated PCI functions
-> =C2=A0 crypto: marvell - replace deprecated PCI functions
-> =C2=A0 intel_th: pci: Replace deprecated PCI functions
-> =C2=A0 wifi: iwlwifi: replace deprecated PCI functions
-> =C2=A0 ntb: idt: Replace deprecated PCI functions
-> =C2=A0 serial: rp2: Replace deprecated PCI functions
-> =C2=A0 ALSA: korg1212: Replace deprecated PCI functions
-> =C2=A0 PCI: Remove pcim_iomap_regions_request_all()
->=20
-> =C2=A0.../driver-api/driver-model/devres.rst=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 |=C2=A0 1 -
-> =C2=A0drivers/ata/acard-ahci.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 |=C2=A0 6 +-
-> =C2=A0drivers/ata/ahci.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 6 +-
-> =C2=A0drivers/crypto/intel/qat/qat_420xx/adf_drv.c=C2=A0 | 11 +++-
-> =C2=A0drivers/crypto/intel/qat/qat_4xxx/adf_drv.c=C2=A0=C2=A0 | 11 +++-
-> =C2=A0.../marvell/octeontx2/otx2_cptpf_main.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 | 14 +++--
-> =C2=A0.../marvell/octeontx2/otx2_cptvf_main.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 | 13 ++--
-> =C2=A0drivers/hwtracing/intel_th/pci.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 9 ++-
-> =C2=A0.../net/wireless/intel/iwlwifi/pcie/trans.c=C2=A0=C2=A0 | 16 ++---
-> =C2=A0drivers/ntb/hw/idt/ntb_hw_idt.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 13 ++--
-> =C2=A0drivers/pci/devres.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 59 +----------------
-> --
-> =C2=A0drivers/tty/serial/rp2.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 | 12 ++--
-> =C2=A0include/linux/pci.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 3 +-
-> =C2=A0sound/pci/korg1212/korg1212.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 6 +-
-> =C2=A014 files changed, 76 insertions(+), 104 deletions(-)
->=20
-
+>  		ret = -ENODEV;
+>  		goto out_no_pci;
+>  	}
+> 
