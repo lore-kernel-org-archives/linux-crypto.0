@@ -1,295 +1,160 @@
-Received: from bmailout2.hostsharing.net (bmailout2.hostsharing.net [83.223.78.240])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5976156F30;
-	Fri, 25 Oct 2024 07:17:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.78.240
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92DDC1B6D00;
+	Fri, 25 Oct 2024 07:40:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729840636; cv=none; b=p2kLiRERmN3mcZYPsJZNRFlNDOE/SdT6CrRa8c/49lPH0EoYGJF/XfWKPttedPnnj+pSQH9RRwljYOa2tmi7u3drzOVXF+4vfJHcAaH8/0js7OhjcDvo15J3Mlvx6QFOnoXFt4IuZKcpsXJ6x9Z6PEKmIZcr8ZrrgdsiCWZWvvs=
+	t=1729842028; cv=none; b=qLf9bmpvuzV8fzTR/ceCcJoUpy26QN9f2q8JZDpFXlmJjaaRGiO5xiaRm8+DCbEx4+1hFN3WyijFCdkBk/BtI1WlavGBAChvTm0ZNfpkeygv6jZfNCo2logiB93hOTr5m+468vgfHPV0qL3AbUzS8BG+1Xwc97Hub/ydNtUbzEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729840636; c=relaxed/simple;
-	bh=X3L5ZrzP1sYwAd/R+rJxR/q4h2jfwpKsE8Gay88JkdM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KxZ6lZaur0kCjNHPxz7w2biI3ZF10nli5S6iOdS+qFzeZPRVqqmBYprfGbN3nH8yfXf/gyhn6UtAm4WQ30Ipjz+V9wFiEQSK6GYSe796CLUQ3pIJ1+NUNydzClueKzcVRPNOvJ8glplFJ6a4GcrrBFcaYVv9TLO2sJH36HjpPgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.78.240
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout2.hostsharing.net (Postfix) with ESMTPS id 769E0280138C0;
-	Fri, 25 Oct 2024 09:17:02 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id 53FD512B665; Fri, 25 Oct 2024 09:17:02 +0200 (CEST)
-Date: Fri, 25 Oct 2024 09:17:02 +0200
-From: Lukas Wunner <lukas@wunner.de>
-To: Klara Modin <klarasmodin@gmail.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Biggers <ebiggers@google.com>,
-	Stefan Berger <stefanb@linux.ibm.com>,
-	Vitaly Chikunov <vt@altlinux.org>,
-	Tadeusz Struk <tstruk@gigaio.com>,
-	David Howells <dhowells@redhat.com>,
-	Andrew Zaborowski <andrew.zaborowski@intel.com>,
-	Saulo Alessandre <saulo.alessandre@tse.jus.br>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Ignat Korchagin <ignat@cloudflare.com>,
-	Marek Behun <kabel@kernel.org>,
-	Varad Gautam <varadgautam@google.com>,
-	Stephan Mueller <smueller@chronox.de>,
-	Denis Kenzior <denkenz@gmail.com>, linux-crypto@vger.kernel.org,
-	keyrings@vger.kernel.org, Mimi Zohar <zohar@linux.ibm.com>,
-	Roberto Sassu <roberto.sassu@huawei.com>,
-	Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-	Eric Snowberg <eric.snowberg@oracle.com>,
-	linux-security-module@vger.kernel.org
-Subject: Re: [PATCH v2 06/19] crypto: rsassa-pkcs1 - Migrate to sig_alg
- backend
-Message-ID: <ZxtF7qVpAuX6YMXa@wunner.de>
-References: <cover.1725972333.git.lukas@wunner.de>
- <743afd4f298a3fad03e42ab46f913d1f51cb8b7c.1725972335.git.lukas@wunner.de>
- <2ed09a22-86c0-4cf0-8bda-ef804ccb3413@gmail.com>
- <ZxalYZwH5UiGX5uj@wunner.de>
- <9c33d208-168c-4af7-a155-9571872ede4d@gmail.com>
+	s=arc-20240116; t=1729842028; c=relaxed/simple;
+	bh=MU0jg6+43zlNLQVd5aws5IUywfNhZ0pf6SBTcrSFP0A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=msrv8eVTgXLRaDR0K4ZaIOcLUg40meGpI4+l/Z97oBrW6wRqjcYy0ZZ7gb+lR1aeC2K71cdAjcK1Q8EnN6O/U3r8MKKAM1MyJsYo7dTxLwlWhNrxG8Z1D3GiVcQr8Ec6x3AxiLeJuYzHyvcUkXznDqHtxDVCD/H36EvvQPnXfpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bns4FpYE; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bns4FpYE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34AD1C4CEC3;
+	Fri, 25 Oct 2024 07:40:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729842028;
+	bh=MU0jg6+43zlNLQVd5aws5IUywfNhZ0pf6SBTcrSFP0A=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=Bns4FpYEweNUDYPWIatTemxTcPXBriNtb6rjMCIGvpZQbQ7/qRGjK2NUk57EKd8ri
+	 Mk7HPhv+F7E7+ne72q/Ef8D3KErbLL714tyOI87uCXXzpqZPjXEj/i4/+9MWReDl8T
+	 31XCgHFlQsFjl2p95RIKGtfYYk1e4JVgIerVkCXXYdafVkZcg3QKpbq5FXjAqZ38fM
+	 DtIUhA6qC/BFjMOrnIVEq9dcd5psyxRFBFdvdxlZAU53TWdpVzWckgliF8es3kpb65
+	 T8IX9T0uVRiGneDDJjNiP5c9pbh4ac6m1We4OCbuxBE3WORWLtjtdEfr9QTbaV9H3L
+	 0RlKKzK9CtgkA==
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-539e59dadebso2249464e87.0;
+        Fri, 25 Oct 2024 00:40:28 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUAdcneLh/Jws74xknc45IZeTEe2oK6Y69+tVBiYoEj/qt+RcbmIb24PrS0Yk1dBAvk29QFalANx4ixXw==@vger.kernel.org, AJvYcCW80iP/cw78mwBoxiazcIaMp46Ss9ASatJB3w/3sU7Y98UMR3/4tQTIlcVmtbO/FNdxjEhxRc2zDbkITA==@vger.kernel.org, AJvYcCWPQSZCyhlvaeHuT9D6M1WAaY09cKDfSHPANOapyuIpYAEiD+i3pv2J3M0TMYewN6bJ5kQ4xm6RaFEKB3sW@vger.kernel.org, AJvYcCWUGbfqEO2I8386+2LsYl82NCyqnvpOA+iWbT1jCasE83dc1CGSKbsjGyWJYilhSp8Y00dNfDzQE1B8rA==@vger.kernel.org, AJvYcCWc1CJSV4iR81S8Ez/FWPtUfoS3wmWvrU3KC4Oy6D5DWeumUddqhIjoLtYwQbILekhJgwtEWPQ/8fx3@vger.kernel.org, AJvYcCWwnkYupm8hkTFzLR6MEIKC1LqDq5vgKx+LOXyDhZwKgYIUC71sM0qupPCZHqFx2etFbOY7ue93eLBJOA==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxvxTD7Kmf8juWMyZ6YXDkR1k1FEJXcMc/72l+/3L15+sUXv57y
+	ScS/gjRt+63bb2+8EfcwtL2dsPQlkrX4SSgZ7ivXf9xLUGTOiLnXXe+Uz6kZo5ghdFVyJJwP2pU
+	Z1zzFD5dUVjukdsPbavc02vgWask=
+X-Google-Smtp-Source: AGHT+IEDAFlBfPHEymedMPiV9v2ocdpZeEcg/F0dpwJWqR1hIRTo+DXjnmCVJHCSWsx5j4Mh2CDnA31kbRPsOrauBps=
+X-Received: by 2002:a05:6512:3c8c:b0:539:8f3c:457c with SMTP id
+ 2adb3069b0e04-53b23e9d130mr2447127e87.53.1729842026517; Fri, 25 Oct 2024
+ 00:40:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9c33d208-168c-4af7-a155-9571872ede4d@gmail.com>
+References: <20241021002935.325878-1-ebiggers@kernel.org>
+In-Reply-To: <20241021002935.325878-1-ebiggers@kernel.org>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Fri, 25 Oct 2024 09:40:15 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXHDo8dijRbSVuHzTddMhp4A+nc1t8AgvoENmS=DZ-kAOQ@mail.gmail.com>
+Message-ID: <CAMj1kXHDo8dijRbSVuHzTddMhp4A+nc1t8AgvoENmS=DZ-kAOQ@mail.gmail.com>
+Subject: Re: [PATCH 00/15] Wire up CRC32 library functions to arch-optimized code
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org, 
+	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net, 
+	linux-mips@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	linux-s390@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	loongarch@lists.linux.dev, sparclinux@vger.kernel.org, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Oct 23, 2024 at 12:19:45PM +0200, Klara Modin wrote:
-> On 2024-10-21 21:02, Lukas Wunner wrote:
-> > On Mon, Oct 21, 2024 at 06:08:03PM +0200, Klara Modin wrote:
-> > > This commit (1e562deacecca1f1bec7d23da526904a1e87525e in next-20241021)
-> > > seems to break connecting to wpa2-enterprise with iwd.
-[...]
-> > There is a *second* issue I discovered last week.  I cooked up
-> > a fix this morning, but haven't written a commit message yet.
-> > The patch is included below and it could indeed solve the
-> > problem because it fixes an issue introduced by the commit you
-> > identified as culprit.
-[...]
-> Tested on top of yesterday's next-20241022.
-> 
-> With the first patch only there is no change, same behavior as previously.
-> 
-> With the second patch only I get an oops, similar as the one you mentioned
-> in the first fix
-> 
-> With both patches everything seems to work as expected. Thanks!
+On Mon, 21 Oct 2024 at 02:29, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> This patchset is also available in git via:
+>
+>     git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git crc32-lib-v1
+>
+> CRC32 is a family of common non-cryptographic integrity check algorithms
+> that are fairly fast with a portable C implementation and become far
+> faster still with the CRC32 or carryless multiplication instructions
+> that most CPUs have.  9 architectures already have optimized code for at
+> least some CRC32 variants; however, except for arm64 this optimized code
+> was only accessible through the crypto API, not the library functions.
+>
+> This patchset fixes that so that the CRC32 library functions use the
+> optimized code.  This allows users to just use the library instead of
+> the crypto API.  This is much simpler and also improves performance due
+> to eliminating the crypto API overhead including an indirect call.  Some
+> examples of updating users are included at the end of the patchset.
+>
+> Note: crc32c() was a weird case.  It was a library function layered on
+> top of the crypto API, which in turn is layered on top of the real
+> library functions.  So while it was easy to use, it was still subject to
+> the crypto API overhead.  This patchset provides CRC32C acceleration in
+> the real library functions directly.
+>
+> The updated CRC32 library design is:
+>
+> - Each arch's CRC32 code (all variants) is in arch/$ARCH/lib/crc32*.
+>   This adopts what arm64 and riscv already did.  Note, the crypto
+>   directory is not used because CRC32 is not a cryptographic algorithm.
+>
+> - Weak symbols are no longer used.  Instead there are crc32*_base() and
+>   crc32*_arch(), and the appropriate ones are called based on the
+>   kconfig.  This is similar to how the ChaCha20 library code works.
+>
+> - Each arch's CRC32 code is enabled by default when CRC32 is enabled,
+>   but it can now be disabled, controlled by the choice that previously
+>   controlled the base implementation only.  It can also now be built as
+>   a module if CRC32 is a module too.
+>
+> - Instead of lots of pointless glue code that wires up each CRC32
+>   variant to the crypto API for each architecture, we now just rely on
+>   the existing shash algorithms that use the library functions.
+>
+> - As before, the library functions don't provide access to off-CPU
+>   crypto accelerators.  But these appear to have very little, if any,
+>   real-world relevance for CRC32 which is very fast on CPUs.
+>
+> Future work should apply a similar cleanup to crct10dif which is a
+> variant of CRC16.
+>
+> I tested all arches in QEMU using CONFIG_CRC32_SELFTEST and the crypto
+> self-tests, except for mips which I couldn't figure out how to do.
+>
+> This patchset has the following dependencies on recent patches:
+>
+> - "crypto - move crypto_simd_disabled_for_test to lib"
+>   (https://lore.kernel.org/linux-crypto/20241018235343.425758-1-ebiggers@kernel.org/)
+> - "crypto: x86/crc32c - jump table elimination and other cleanups"
+>   (https://lore.kernel.org/linux-crypto/20241014042447.50197-1-ebiggers@kernel.org/)
+> - "arm64: Speed up CRC-32 using PMULL instructions"
+>   (https://lore.kernel.org/linux-crypto/20241018075347.2821102-5-ardb+git@google.com/)
+> - "crypto: Enable fuzz testing for arch code"
+>   (https://lore.kernel.org/linux-crypto/20241016185722.400643-4-ardb+git@google.com/)
+> - "crypto: mips/crc32 - fix the CRC32C implementation"
+>   (https://lore.kernel.org/linux-crypto/20241020180258.8060-1-ebiggers@kernel.org/)
+>
+> Everything can be retrieved from git using the command given earlier.
+>
+> Since this patchset touches many areas, getting it merged may be
+> difficult.  One option is a pull request with the whole patchset
+> directly to Linus.  Another is to have at least patches 1-2 and the
+> above dependencies taken through the crypto tree in v6.13; then the arch
+> patches can land separately afterwards, followed by the rest.
+>
+> Eric Biggers (15):
+>   lib/crc32: drop leading underscores from __crc32c_le_base
+>   lib/crc32: improve support for arch-specific overrides
+>   arm/crc32: expose CRC32 functions through lib
+>   loongarch/crc32: expose CRC32 functions through lib
+>   mips/crc32: expose CRC32 functions through lib
+>   powerpc/crc32: expose CRC32 functions through lib
+>   s390/crc32: expose CRC32 functions through lib
+>   sparc/crc32: expose CRC32 functions through lib
+>   x86/crc32: update prototype for crc_pcl()
+>   x86/crc32: update prototype for crc32_pclmul_le_16()
+>   x86/crc32: expose CRC32 functions through lib
+>   lib/crc32: make crc32c() go directly to lib
+>   ext4: switch to using the crc32c library
+>   jbd2: switch to using the crc32c library
+>   f2fs: switch to using the crc32 library
+>
+...
+>  89 files changed, 1002 insertions(+), 2455 deletions(-)
 
-Thanks a lot for your testing efforts, this helps greatly!
+Very nice cleanup!
 
-I've dug into the source code of iwd (Intel Wireless Daemon) and
-the ell library it uses (Embedded Linux Library).
+For the series:
 
-It turns out that the patch I sent you is sufficient when using
-TLS 1.2 or newer for EAP (which I assume is true in your case).
-But the patch is *not* sufficient for TLS 1.1 or earlier.
-
-Normally RSA PKCS#1 encoding requires that the hash is prepended
-by a Full Hash Prefix (an ASN.1 sequence which identifies the
-hash algorithm used).  But it turns out there are legacy protocols
-such as TLS 1.1 or earlier as well as IKEv1 which omit the
-Full Hash Prefix.
-
-The kernel supported this prior to 1e562deacecc.  Although TLS 1.1
-was deprecated in 2021 by RFC 8996, I think we cannot just remove
-support without advance notice.
-
-So below is a new patch which reinstates support for these legacy
-protocols.  It should also fix the issue you're seeing with TLS 1.2
-or newer (which is caused by invoking KEYCTL_PKEY_QUERY without
-specifying a hash algorithm).
-
-The patch below replaces the one I sent on Monday.  You'll still
-need the other pending fix:
-
-https://lore.kernel.org/r/ff7a28cddfc28e7a3fb8292c680510f35ec54391.1728898147.git.lukas@wunner.de/
-
-Would you mind testing this combination?  It did work in my own
-testing, but if you could test it as well that would raise the
-confidence.
-
-I've looked at the source code of wpa_supplicant as well as
-various IKEv1 daemons (strongswan, libreswan, isakmpd, raccoon)
-and none of them seems to use the kernel's Key Retention Service,
-so iwd is the only known user space application affected so far.
-
-Thanks,
-
-Lukas
-
--- >8 --
-
-diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
-index c98c158..bbd07a9 100644
---- a/crypto/asymmetric_keys/public_key.c
-+++ b/crypto/asymmetric_keys/public_key.c
-@@ -93,7 +93,7 @@ static void public_key_destroy(void *payload0, void *payload3)
- 					     pkey->pkey_algo);
- 			} else {
- 				if (!hash_algo)
--					return -EINVAL;
-+					hash_algo = "none";
- 				n = snprintf(alg_name, CRYPTO_MAX_ALG_NAME,
- 					     "pkcs1(%s,%s)",
- 					     pkey->pkey_algo, hash_algo);
-diff --git a/crypto/rsassa-pkcs1.c b/crypto/rsassa-pkcs1.c
-index 9c28f1c..4d077fc9 100644
---- a/crypto/rsassa-pkcs1.c
-+++ b/crypto/rsassa-pkcs1.c
-@@ -27,6 +27,8 @@
-  * https://www.rfc-editor.org/rfc/rfc9580#table-24
-  */
- 
-+static const u8 hash_prefix_none[] = { };
-+
- static const u8 hash_prefix_md5[] = {
- 	0x30, 0x20, 0x30, 0x0c, 0x06, 0x08,	  /* SEQUENCE (SEQUENCE (OID */
- 	0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x02, 0x05,	/*	<algorithm>, */
-@@ -93,6 +95,7 @@
- 	size_t		size;
- } hash_prefixes[] = {
- #define _(X) { #X, hash_prefix_##X, sizeof(hash_prefix_##X) }
-+	_(none),
- 	_(md5),
- 	_(sha1),
- 	_(rmd160),
-@@ -119,9 +122,18 @@ static const struct hash_prefix *rsassa_pkcs1_find_hash_prefix(const char *name)
- 	return NULL;
- }
- 
--static unsigned int rsassa_pkcs1_hash_len(const struct hash_prefix *p)
-+static bool rsassa_pkcs1_invalid_hash_len(unsigned int len,
-+					  const struct hash_prefix *p)
- {
- 	/*
-+	 * Legacy protocols such as TLS 1.1 or earlier and IKE version 1
-+	 * do not prepend a Full Hash Prefix to the hash.  In that case,
-+	 * the size of the Full Hash Prefix is zero.
-+	 */
-+	if (p->data == hash_prefix_none)
-+		return false;
-+
-+	/*
- 	 * The final byte of the Full Hash Prefix encodes the hash length.
- 	 *
- 	 * This needs to be revisited should hash algorithms with more than
-@@ -130,7 +142,7 @@ static unsigned int rsassa_pkcs1_hash_len(const struct hash_prefix *p)
- 	 */
- 	static_assert(HASH_MAX_DIGESTSIZE <= 127);
- 
--	return p->data[p->size - 1];
-+	return len != p->data[p->size - 1];
- }
- 
- struct rsassa_pkcs1_ctx {
-@@ -167,7 +179,7 @@ static int rsassa_pkcs1_sign(struct crypto_sig *tfm,
- 	if (dlen < ctx->key_size)
- 		return -EOVERFLOW;
- 
--	if (slen != rsassa_pkcs1_hash_len(hash_prefix))
-+	if (rsassa_pkcs1_invalid_hash_len(slen, hash_prefix))
- 		return -EINVAL;
- 
- 	if (slen + hash_prefix->size > ctx->key_size - 11)
-@@ -237,7 +249,7 @@ static int rsassa_pkcs1_verify(struct crypto_sig *tfm,
- 	/* RFC 8017 sec 8.2.2 step 1 - length checking */
- 	if (!ctx->key_size ||
- 	    slen != ctx->key_size ||
--	    dlen != rsassa_pkcs1_hash_len(hash_prefix))
-+	    rsassa_pkcs1_invalid_hash_len(dlen, hash_prefix))
- 		return -EINVAL;
- 
- 	/* RFC 8017 sec 8.2.2 step 2 - RSA verification */
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 7d768f0..86126be 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -5540,6 +5540,12 @@ static int alg_test_null(const struct alg_test_desc *desc,
- 			.cipher = __VECS(fcrypt_pcbc_tv_template)
- 		}
- 	}, {
-+		.alg = "pkcs1(rsa,none)",
-+		.test = alg_test_sig,
-+		.suite = {
-+			.sig = __VECS(pkcs1_rsa_none_tv_template)
-+		}
-+	}, {
- 		.alg = "pkcs1(rsa,sha224)",
- 		.test = alg_test_null,
- 		.fips_allowed = 1,
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 55aae18..d4c232a 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -1983,6 +1983,61 @@ struct kpp_testvec {
- };
- 
- /*
-+ * PKCS#1 RSA test vectors for hash algorithm "none"
-+ * (i.e. the hash in "m" is not prepended by a Full Hash Prefix)
-+ *
-+ * Obtained from:
-+ * https://vcsjones.dev/sometimes-valid-rsa-dotnet/
-+ * https://gist.github.com/vcsjones/ab4c2327b53ed018eada76b75ef4fd99
-+ */
-+static const struct sig_testvec pkcs1_rsa_none_tv_template[] = {
-+	{
-+	.key =
-+	"\x30\x82\x01\x0a\x02\x82\x01\x01\x00\xa2\x63\x0b\x39\x44\xb8\xbb"
-+	"\x23\xa7\x44\x49\xbb\x0e\xff\xa1\xf0\x61\x0a\x53\x93\xb0\x98\xdb"
-+	"\xad\x2c\x0f\x4a\xc5\x6e\xff\x86\x3c\x53\x55\x0f\x15\xce\x04\x3f"
-+	"\x2b\xfd\xa9\x96\x96\xd9\xbe\x61\x79\x0b\x5b\xc9\x4c\x86\x76\xe5"
-+	"\xe0\x43\x4b\x22\x95\xee\xc2\x2b\x43\xc1\x9f\xd8\x68\xb4\x8e\x40"
-+	"\x4f\xee\x85\x38\xb9\x11\xc5\x23\xf2\x64\x58\xf0\x15\x32\x6f\x4e"
-+	"\x57\xa1\xae\x88\xa4\x02\xd7\x2a\x1e\xcd\x4b\xe1\xdd\x63\xd5\x17"
-+	"\x89\x32\x5b\xb0\x5e\x99\x5a\xa8\x9d\x28\x50\x0e\x17\xee\x96\xdb"
-+	"\x61\x3b\x45\x51\x1d\xcf\x12\x56\x0b\x92\x47\xfc\xab\xae\xf6\x66"
-+	"\x3d\x47\xac\x70\x72\xe7\x92\xe7\x5f\xcd\x10\xb9\xc4\x83\x64\x94"
-+	"\x19\xbd\x25\x80\xe1\xe8\xd2\x22\xa5\xd0\xba\x02\x7a\xa1\x77\x93"
-+	"\x5b\x65\xc3\xee\x17\x74\xbc\x41\x86\x2a\xdc\x08\x4c\x8c\x92\x8c"
-+	"\x91\x2d\x9e\x77\x44\x1f\x68\xd6\xa8\x74\x77\xdb\x0e\x5b\x32\x8b"
-+	"\x56\x8b\x33\xbd\xd9\x63\xc8\x49\x9d\x3a\xc5\xc5\xea\x33\x0b\xd2"
-+	"\xf1\xa3\x1b\xf4\x8b\xbe\xd9\xb3\x57\x8b\x3b\xde\x04\xa7\x7a\x22"
-+	"\xb2\x24\xae\x2e\xc7\x70\xc5\xbe\x4e\x83\x26\x08\xfb\x0b\xbd\xa9"
-+	"\x4f\x99\x08\xe1\x10\x28\x72\xaa\xcd\x02\x03\x01\x00\x01",
-+	.key_len = 294,
-+	.m =
-+	"\x68\xb4\xf9\x26\x34\x31\x25\xdd\x26\x50\x13\x68\xc1\x99\x26\x71"
-+	"\x19\xa2\xde\x81",
-+	.m_size = 20,
-+	.c =
-+	"\x6a\xdb\x39\xe5\x63\xb3\x25\xde\x58\xca\xc3\xf1\x36\x9c\x0b\x36"
-+	"\xb7\xd6\x69\xf9\xba\xa6\x68\x14\x8c\x24\x52\xd3\x25\xa5\xf3\xad"
-+	"\xc9\x47\x44\xde\x06\xd8\x0f\x56\xca\x2d\xfb\x0f\xe9\x99\xe2\x9d"
-+	"\x8a\xe8\x7f\xfb\x9a\x99\x96\xf1\x2c\x4a\xe4\xc0\xae\x4d\x29\x47"
-+	"\x38\x96\x51\x2f\x6d\x8e\xb8\x88\xbd\x1a\x0a\x70\xbc\x23\x38\x67"
-+	"\x62\x22\x01\x23\x71\xe5\xbb\x95\xea\x6b\x8d\x31\x62\xbf\xf0\xc4"
-+	"\xb9\x46\xd6\x67\xfc\x4c\xe6\x1f\xd6\x5d\xf7\xa9\xad\x3a\xf1\xbf"
-+	"\xa2\xf9\x66\xde\xb6\x8e\xec\x8f\x81\x8d\x1e\x3a\x12\x27\x6a\xfc"
-+	"\xae\x92\x9f\xc3\x87\xc3\xba\x8d\x04\xb8\x8f\x0f\x61\x68\x9a\x96"
-+	"\x2c\x80\x2c\x32\x40\xde\x9d\xb9\x9b\xe2\xe4\x45\x2e\x91\x47\x5c"
-+	"\x47\xa4\x9d\x02\x57\x59\xf7\x75\x5d\x5f\x32\x82\x75\x5d\xe5\x78"
-+	"\xc9\x19\x61\x46\x06\x9d\xa5\x1d\xd6\x32\x48\x9a\xdb\x09\x29\x81"
-+	"\x14\x2e\xf0\x27\xe9\x37\x13\x74\xec\xa5\xcd\x67\x6b\x19\xf6\x88"
-+	"\xf0\xc2\x8b\xa8\x7f\x2f\x76\x5a\x3e\x0c\x47\x5d\xe8\x82\x50\x27"
-+	"\x40\xce\x27\x41\x45\xa0\xcf\xaa\x2f\xd3\xad\x3c\xbf\x73\xff\x93"
-+	"\xe3\x78\x49\xd9\xa9\x78\x22\x81\x9a\xe5\xe2\x94\xe9\x40\xab\xf1",
-+	.c_size = 256,
-+	.public_key_vec = true,
-+	},
-+};
-+
-+/*
-  * PKCS#1 RSA test vectors. Obtained from CAVS testing.
-  */
- static const struct sig_testvec pkcs1_rsa_tv_template[] = {
+Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
