@@ -1,118 +1,110 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B6DF1A3A95;
-	Thu, 24 Oct 2024 19:57:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C51AB3B1AF;
+	Fri, 25 Oct 2024 01:24:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729799849; cv=none; b=vAWs1uNh8Y9tJS8nGatPxxvbnW55pG7xzZQnMC6JA6ykGCSvtSdtArxMPo1DIkYuNzzpXS999nRDyeacFMWmXkfO/3hVbnek1idjiVbnpepiRNvWxNT9FhIQmC3UG3zbic0P9QFqx0XoHNvT30GmnasrtXGxwUzqrUExpT7F5gk=
+	t=1729819502; cv=none; b=RfcpqwHAAsYIliD2N4BHDxEYCjA4OVwHTii3FQ+6KoI0iN3swgIgzKtMLKjSB/IzVi0BDIroY+YBbMA7ldSnd+5Fxqho7PjwwClVMBdkk3PKvIosqAO+xWoZRuASh68yO4VKS+9JY6zV2aDcXpbt1SMUirr461mRpALvfkJ/ukw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729799849; c=relaxed/simple;
-	bh=gOn6T3lWiKaxNxhYs41benmtcEZIjMyZ2IUbcXX00nQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hvv6hB8mVqsQkO9fwkBuHR34+/AaK7geDjHa9VnOcPRp0RnPDUEoyPUqVWGrYK+uIX1RHZObO8V5QzhBT56Yt1kBS0SufjCNgzeqJsUj6v8m3z2zQAqfoeDnSirX8tEP0b5IifLJB0rDTzw6cISrh0E4YpcJ5aIRk/NSZ7tyIFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e73TzK2G; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e73TzK2G"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70463C4CECD;
-	Thu, 24 Oct 2024 19:57:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729799849;
-	bh=gOn6T3lWiKaxNxhYs41benmtcEZIjMyZ2IUbcXX00nQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=e73TzK2Ggyd8lQr/wIg+tIKHA6B0skKLKEHIMU8ouylH6mW7IuUzfXXIOWLBo1LtH
-	 aZ7xD3r9GE+1dfWskbtU3wnTf1xOeLYUzB42pZfj0VwVD92Xau6aTiOcF59fbrYrrh
-	 fbf9nOUcuvWTE/PuF7PEK3tiSwPXCVfmF7Lsxa4GYUkuNer/bsR5uscEynYECo65hF
-	 Oxew16yGZ6ewIRda75moxkaGp8okhOJY5AgD2iazYmQoycx8fBg2VUJ315Vj7p9mWX
-	 AiKWgjeXZbIrVs96YDAvjGoWiuSvt4f0tT99053Nljxj+pQ9daw9zgtzrkbWqyKzIN
-	 YczXwSBMBsU7w==
-Date: Thu, 24 Oct 2024 19:57:21 +0000
-From: sergeh@kernel.org
-To: Eric Snowberg <eric.snowberg@oracle.com>
-Cc: "open list:SECURITY SUBSYSTEM" <linux-security-module@vger.kernel.org>,
-	David Howells <dhowells@redhat.com>,
-	David Woodhouse <dwmw2@infradead.org>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Mimi Zohar <zohar@linux.ibm.com>,
-	Roberto Sassu <roberto.sassu@huawei.com>,
-	Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-	=?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
-	"casey@schaufler-ca.com" <casey@schaufler-ca.com>,
-	Stefan Berger <stefanb@linux.ibm.com>,
-	"ebiggers@kernel.org" <ebiggers@kernel.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-efi@vger.kernel.org" <linux-efi@vger.kernel.org>,
-	"linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>
-Subject: Re: [RFC PATCH v3 08/13] clavis: Introduce new LSM called clavis
-Message-ID: <ZxqmoV-izscjbovh@lei>
-References: <20241017155516.2582369-1-eric.snowberg@oracle.com>
- <20241017155516.2582369-9-eric.snowberg@oracle.com>
- <ZxhetCy5RE1k4_Jk@lei>
- <F911D28D-F8EC-4773-8143-2B4E207DA202@oracle.com>
+	s=arc-20240116; t=1729819502; c=relaxed/simple;
+	bh=R3yO1rRlWxgpc97VNo9W2eZ8nHpFCWZ3ltYyF4bF/yM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=TwHLOOHyCIlsHrzCX207zykW+YEC8+niXfTmsQqXf9vGu+stsOcn2KKfBIvu3bqMx8SCd/9mfIO/+szmNY33a+MTKzwJ0EEFJ9KbL9E4ELmMAug7A16EZJkP0fqcnATxlyTsXEJV2kmhv79VorbPlhLc+ZXMp+mQlffu3WxF2zw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4XZQ2R2lF8z1HLDS;
+	Fri, 25 Oct 2024 09:20:31 +0800 (CST)
+Received: from kwepemm600001.china.huawei.com (unknown [7.193.23.3])
+	by mail.maildlp.com (Postfix) with ESMTPS id 12142180043;
+	Fri, 25 Oct 2024 09:24:54 +0800 (CST)
+Received: from [10.174.176.245] (10.174.176.245) by
+ kwepemm600001.china.huawei.com (7.193.23.3) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 25 Oct 2024 09:24:52 +0800
+Message-ID: <1094e5d9-208c-4c41-83cd-5a77081aa5c1@huawei.com>
+Date: Fri, 25 Oct 2024 09:24:52 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <F911D28D-F8EC-4773-8143-2B4E207DA202@oracle.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] crypto: qat - Fix missing destroy_workqueue in
+ adf_init_aer()
+To: "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>
+CC: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<ahsan.atta@intel.com>, <mun.chun.yep@intel.com>,
+	<markas.rapoportas@intel.com>, <damian.muszynski@intel.com>,
+	<furong.zhou@intel.com>, <adam.guerin@intel.com>, <zhangxiaoxu5@huawei.com>,
+	<qat-linux@intel.com>, <linux-crypto@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20241024140057.18548-1-wanghai38@huawei.com>
+ <ZxpeVD/D9Y7sfL7H@gcabiddu-mobl.ger.corp.intel.com>
+Content-Language: en-US
+From: Wang Hai <wanghai38@huawei.com>
+In-Reply-To: <ZxpeVD/D9Y7sfL7H@gcabiddu-mobl.ger.corp.intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemm600001.china.huawei.com (7.193.23.3)
 
-On Wed, Oct 23, 2024 at 07:25:21PM +0000, Eric Snowberg wrote:
-> > On Oct 22, 2024, at 8:25 PM, sergeh@kernel.org wrote:
-> > 
-> > On Thu, Oct 17, 2024 at 09:55:11AM -0600, Eric Snowberg wrote:
-> >> 
-> >> +The Clavis LSM contains a system keyring call .clavis.  It contains a single
-> > 
-> > s/call/called/
+
+
+On 2024/10/24 23:04, Cabiddu, Giovanni wrote:
+> On Thu, Oct 24, 2024 at 10:00:57PM +0800, Wang Hai wrote:
+>> The adf_init_aer() won't destroy device_reset_wq when alloc_workqueue()
+>> for device_sriov_wq failed. Add destroy_workqueue for device_reset_wq to
+>> fix this issue.
+>>
+>> Fixes: 4469f9b23468 ("crypto: qat - re-enable sriov after pf reset")
+>> Signed-off-by: Wang Hai <wanghai38@huawei.com>
+>> ---
+>>   drivers/crypto/intel/qat/qat_common/adf_aer.c | 4 +++-
+>>   1 file changed, 3 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/crypto/intel/qat/qat_common/adf_aer.c b/drivers/crypto/intel/qat/qat_common/adf_aer.c
+>> index ec7913ab00a2..907144ec7e65 100644
+>> --- a/drivers/crypto/intel/qat/qat_common/adf_aer.c
+>> +++ b/drivers/crypto/intel/qat/qat_common/adf_aer.c
+>> @@ -281,8 +281,10 @@ int adf_init_aer(void)
+>>   		return -EFAULT;
+>>   
+>>   	device_sriov_wq = alloc_workqueue("qat_device_sriov_wq", 0, 0);
+>> -	if (!device_sriov_wq)
+>> +	if (!device_sriov_wq) {
+>> +		destroy_workqueue(device_reset_wq);
+> The missing destroy_workqueue() here is intentional as the device_reset_wq
+> is destroyed in adf_exit_aer() which is called if adf_init_aer() fails,
+> see [1].
 > 
-> I will change that, thanks.
+Hi, Giovanni.
+
+Thanks for the review.
+
+If adf_init_aer() fails, it will goto err_aer and then call
+adf_exit_misc_wq() instead of goto err_pf_wq and then call
+adf_exit_aer(). So this patch is needed.
+
+static long adf_ctl_ioctl(struct file *fp, unsigned int cmd, unsigned 
+long arg)
+{
+...
+	if (adf_init_aer())
+		goto err_aer;
+...		
+err_pf_wq:
+	adf_exit_aer(); // will not be called when adf_init_aer() failed
+err_aer:
+	adf_exit_misc_wq();
+err_misc_wq:
+...
+}
+> With this change, destroy_workqueue() is called twice.
 > 
-> >> +asymmetric key that is used to validate anything added to it.  This key can
-> >> +be added during boot and must be a preexisting system kernel key.  If the
-> >> +``clavis=`` boot parameter is not used, any asymmetric key the user owns
-> > 
-> > Who is "the user", and precisely what does "owns' mean here?  Is it just
-> > restating that it must be a key already in one of the builtin or secondary
-> > or platform keyrings?
+> Regards,
 > 
-> In the case where Clavis was not provided a key id during boot, root can 
-> add a single public key to the .clavis keyring anytime afterwards.  This 
-> key does not need to be in any of the system keyrings.  Once the key is 
-> added, the Clavis LSM is enabled. The root user must also own the private 
-> key, since this is required to do the ACL signing. I will try to clarify this better 
 
-Ooh, I see.  Own it as in be able to sign things with it.  Of course.  Thanks.
-
-> in the documentation. 
-> 
-> I wouldn't expect this to be the typical way Clavis would be used. I would 
-
-Right, I wasn't asking because I would want to use it that way, but
-because it feels potentially dangerous :)
-
-> also be interested in any feedback if enabling the Clavis LSM this way 
-> following boot should be removed.  If this were removed, Clavis could 
-> only be enabled when using the boot parameter.
-
-Yeah I don't know enough to give good guidance here.  I do worry about
-UKIs enforcing only the built-in signed kernel command line and so preventing
-a user from appending their own clavis= entry.  Not knowing how this
-will end up getting deployed, I'm not sure which is the more important
-issue.
-
-> > And this is done by simply loading it into the clavis keyring, right?
-> 
-> Correct.
-> 
