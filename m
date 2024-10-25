@@ -1,117 +1,66 @@
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A14E18B484;
-	Fri, 25 Oct 2024 09:54:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8BDB21219A;
+	Fri, 25 Oct 2024 14:38:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729850077; cv=none; b=NINr0eJ29nmEu2XMvLuk62yadTe9chLir5pmMKbWZAmW/PBUJN1AxMl02azwYKn2ttuUFZCVyplY35WHXUIsfOwVDDdZhhhWgrOWpwdPByS/CZ1O+UzyGZujF7H4rS303+eoegJiXUr43omXeCVY3OEJxQ5VBX4EH3oaV9rf5lA=
+	t=1729867115; cv=none; b=VOQLLwr8E/RHVCXdK04HN3cueGKJh7I3gyxwh3FCumZ1bvsAf6LDRn/lORtS0cVZlsoOVIwGjKWti5lw0/OuRR8UnRQvHfSclXwxsUenwL1B01egkEnyLM6MJhIr4+TCKQvMnkwiPlJDPa9VV6OYgs2HKfbYqBJ9F6PiL04EbvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729850077; c=relaxed/simple;
-	bh=VaY2KYzLE62zhvzBnMR7wbJJZD8/BO9nA9OQj2/oiiY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G/o2jsZbkmwvX/Bpn19s9rP0ISZeoJTVY2hA46Knv0CT3/TTphvFBrT3Cc3sN/PNgtBfqcUHQipVol9zEfD+F89HLBjSwZQ3mReDAs+7FXupXMaPWZf5394lJrFFF+wpl1e5zoe6BnCgJ+BOfFKf/hoisuEUX7m2zHK+E/TeZsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=bBHGOoDs; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	s=arc-20240116; t=1729867115; c=relaxed/simple;
+	bh=x7wWqYTr2jfDDcO8vMIh7tjpwW6QWXTekXTUY1vyvhA=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=H7aF+kQ8aRzkbSEeHCtmEwjGEOG8piiclfTLpBucC9yIELVwfEmoKIeEcIZYuPxUu2SSyU9pYzl9NIn+WazXlo9E/1caCIUi+pER4F/u9Rtum6xagxxeDKZEkM6zl/vVDfH+0hhrtg0vH4Ky3/siop93vbTnZxbdb58PWUE4oto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GprTa6sY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="bBHGOoDs"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=scgKpMyHPoXj/z+PG5byqhezzc3ZA105Pg/BIYUr3WQ=; b=bBHGOoDswiWdw55NBzvJt0oFKw
-	qO0ehaYYnR+uxDdFrwNid6yBWxDwkpSTYyZovZSHOfYBhsnEwG4wCt9ebUfqRgoZu4Q8fO8a3LgpL
-	a0gmky0glkIaWEB/FP4K9hdM0wkR/l/xzzNEiZY74Yxos5b65+smctVEjxbMefnCYht/z4GeabQSY
-	idfKxL/PcCaVryFlt9af0BycAN6om+astwOkaQ6+TAUslgG2NlUcuWIpMt8CLt1TRM9KDzWs+Kd4l
-	ZvBY0xViLV5vvqTptopPj3RvQJi6xRQdtXMWeLOyg484x0oVqulhBmgSw1oF4oxs4rPwMKQVGhVDd
-	XO9uKhWg==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1t4H1V-0000000558l-1bIm;
-	Fri, 25 Oct 2024 09:54:26 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 9A8CE30083E; Fri, 25 Oct 2024 11:54:25 +0200 (CEST)
-Date: Fri, 25 Oct 2024 11:54:25 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Antoine Tenart <atenart@kernel.org>, Ingo Molnar <mingo@redhat.com>,
-	Will Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>, linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev, upstream@airoha.com
-Subject: Re: [PATCH v4 1/3] spinlock: extend guard with spinlock_bh variants
-Message-ID: <20241025095425.GI14555@noisy.programming.kicks-ass.net>
-References: <20241025094734.1614-1-ansuelsmth@gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GprTa6sY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3601C4CEC3;
+	Fri, 25 Oct 2024 14:38:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1729867115;
+	bh=x7wWqYTr2jfDDcO8vMIh7tjpwW6QWXTekXTUY1vyvhA=;
+	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
+	b=GprTa6sYwLx3Gq9RJ5RtLknGazNywVrvuimh7r8HaGGOpafjIx5E3T0iorfF/zanh
+	 Z25BPlDxDshwCPFibHfSBPK44hvleyrH62kGq7sKpBaC7Kt4VkqeKw8EzkOjxGkNfX
+	 3rFoKDrEktaBW+3HC4ERpahGtGKjyD7jwU8NjQWnoWiLd3zjpWUMbL1gmaTa1W+yS4
+	 NUG7qjI8h36eED11QL39G/yVmuVJOf5IU/gkDs0yg0u64cWw+1avGNIrltpt1yPtTQ
+	 d3t3RU+pJfd4UzOPRgxt7uX+fYWdWipGVjMJdEtQEQt5Amo8gBlywt5f3BSbcp2gkS
+	 zj0AbDx0hdQAw==
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241025094734.1614-1-ansuelsmth@gmail.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Fri, 25 Oct 2024 17:38:31 +0300
+Message-Id: <D54YPO281JW8.SC38DUD3YEQX@kernel.org>
+Cc: <keyrings@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] crypto: Remove unused asymmetric_keys functions
+From: "Jarkko Sakkinen" <jarkko@kernel.org>
+To: <linux@treblig.org>, <dhowells@redhat.com>,
+ <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+X-Mailer: aerc 0.18.2
+References: <20241022002434.302518-1-linux@treblig.org>
+In-Reply-To: <20241022002434.302518-1-linux@treblig.org>
 
-On Fri, Oct 25, 2024 at 11:47:22AM +0200, Christian Marangi wrote:
-> Extend guard APIs with missing raw/spinlock_bh variants.
-> 
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+On Tue Oct 22, 2024 at 3:24 AM EEST, linux wrote:
+> From: "Dr. David Alan Gilbert" <linux@treblig.org>
+>
+> encrypt_blob(), decrypt_blob() and create_signature() were some of the
+> functions added in 2018 by
+> commit 5a30771832aa ("KEYS: Provide missing asymmetric key subops for new
+> key type ops [ver #2]")
+> however, they've not been used.
+>
+> Remove them.
+>
+> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
 
-Feel free to take this through whatever tree the rest of the patches are
-targeted at. I don't think I've seen conflicting 'demand' so far.
+LGTM, thanks.
 
-Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
 
-> ---
-> Changes v4:
-> - Out of RFC
-> Changes v2:
-> - Add this patch
-> 
->  include/linux/spinlock.h | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
-> 
-> diff --git a/include/linux/spinlock.h b/include/linux/spinlock.h
-> index 63dd8cf3c3c2..d3561c4a080e 100644
-> --- a/include/linux/spinlock.h
-> +++ b/include/linux/spinlock.h
-> @@ -548,6 +548,12 @@ DEFINE_LOCK_GUARD_1(raw_spinlock_irq, raw_spinlock_t,
->  
->  DEFINE_LOCK_GUARD_1_COND(raw_spinlock_irq, _try, raw_spin_trylock_irq(_T->lock))
->  
-> +DEFINE_LOCK_GUARD_1(raw_spinlock_bh, raw_spinlock_t,
-> +		    raw_spin_lock_bh(_T->lock),
-> +		    raw_spin_unlock_bh(_T->lock))
-> +
-> +DEFINE_LOCK_GUARD_1_COND(raw_spinlock_bh, _try, raw_spin_trylock_bh(_T->lock))
-> +
->  DEFINE_LOCK_GUARD_1(raw_spinlock_irqsave, raw_spinlock_t,
->  		    raw_spin_lock_irqsave(_T->lock, _T->flags),
->  		    raw_spin_unlock_irqrestore(_T->lock, _T->flags),
-> @@ -569,6 +575,13 @@ DEFINE_LOCK_GUARD_1(spinlock_irq, spinlock_t,
->  DEFINE_LOCK_GUARD_1_COND(spinlock_irq, _try,
->  			 spin_trylock_irq(_T->lock))
->  
-> +DEFINE_LOCK_GUARD_1(spinlock_bh, spinlock_t,
-> +		    spin_lock_bh(_T->lock),
-> +		    spin_unlock_bh(_T->lock))
-> +
-> +DEFINE_LOCK_GUARD_1_COND(spinlock_bh, _try,
-> +			 spin_trylock_bh(_T->lock))
-> +
->  DEFINE_LOCK_GUARD_1(spinlock_irqsave, spinlock_t,
->  		    spin_lock_irqsave(_T->lock, _T->flags),
->  		    spin_unlock_irqrestore(_T->lock, _T->flags),
-> -- 
-> 2.45.2
-> 
+BR, Jarkko
