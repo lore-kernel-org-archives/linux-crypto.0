@@ -1,57 +1,48 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B71C13A41F;
-	Sat, 26 Oct 2024 07:02:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 822981CF96;
+	Sat, 26 Oct 2024 07:03:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729926167; cv=none; b=XKuaUNb5o+wuD3DGHAiCLhh/7Qa5PvYMIj4qeoJm9/aJFy/yQ5Hhkuy5vt44enDudjQUfEBl9N2vUMxhX7D9CDy7uv2b8pyqUbFXA1HvJbPPpYo/1abagRgVySuD7qKYlqKEV+oRLkQzHvXAqDNXfOQ9Bpi3goxRTCZ6mrkLayE=
+	t=1729926219; cv=none; b=oaYZKmL8zJcqDvfx0ziaeYOOMO+OHEX4U1Q40rGkVv0Pkbu88UtZmw8Fd4DGpvrtnSRpaxvroE1YmKncXsChkp6nm/mppZRfh9UKqj8UYSNJdDfmJVTIIYhCVsQA1aR0RQ6yptr96JiXki26nle0g2xJTSMkxMliPFqwaBBX8Fs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729926167; c=relaxed/simple;
-	bh=WFxpYvbXvofAc6CPg9TSth3RYh/dsSg/t9m5lpnjNow=;
+	s=arc-20240116; t=1729926219; c=relaxed/simple;
+	bh=H9fGZnzwcKNn6KZo3Ntsp5Charx8ZXj2oZObi1Cr8es=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FH1wKuoi2ZB7bglwP8BveRwSXJpyCRpnzv0sUAyGbLnzfk3PYUdHqva4YD78kgCcL+N4FKsxKpVZ2JarXO/mi+F5FO4tRy+q2uN8swyJ6XkjyLr2KCAOQHf126Q5JMgfPQYl+lkfO3iK19e1dsymkK2nWEUqfZE8+pSmmDlXIog=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=ojOkrDs0; arc=none smtp.client-ip=144.6.53.87
+	 Content-Type:Content-Disposition:In-Reply-To; b=DFuYvXIZ3KuAkkiQKLex7x0DU54tSpSzXfCju/sEvmara7XVXXwRn2HCj1MAGKj+WjBeG0NWboMav2HU9dEoUYpry/bPMq1nTHpdVJpS/wbGLkEAEVR07xOlvdP52UWibIHlfG6voaMB9ns/bXkfot3q+Z3fr/MT5B7k8gj39Hg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=GBd/UPkJ; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="ojOkrDs0"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="GBd/UPkJ"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
 	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=vOfR5nxbvz17I1jUUGbrnOm7gw72534O1iNYxZy8D0w=; b=ojOkrDs0dWMJCcav3D1n9Q3vtR
-	YcimPw3KwbUWy8e5jPz29yTuShPNe9ySPrO5RMCoAa/q6fJ2sCQ/WAvdrRpcH1jD0Epd155DqU+Uu
-	tCYdj9ZUIixYZt7czJi+ld9J0+2V5MkA7X1yCsVIJjDu8zr6GF6kCC7C0Y7NNfsId/MuKn1PAbKyv
-	U0vaYJTMHgZzrE+3+NTk4edxikHzdF4UNEKJ4X2/tcYfrNmyJQklAhAUkk3VZi6FUJyXB8b9wWvDb
-	0y+9hfXJMU6DqeqedVHdvfNgrAoIQwW3dzInvwUwemYKgP2owLXGYZgr9Aj9eBtQNUgEa8I0VkRIh
-	1YVzA4gw==;
+	bh=M2BQO23FpOGOopTnjnb/SBnH2W0PJxbtAGu6aviJOXA=; b=GBd/UPkJVMgSHaFTmTxNrbuQil
+	kxxy2FwTV4L88peK2+YZzcnV88swtO+6pGDGXN4y7tIcHk3A4P4OMuu2EXgBGopvy09+Vlai1cfLE
+	/tOqgK0tVzNVNcxkKc28md94bQ/q0FU/BKLEjUYJobKYUiwIlK9y3rusyKvWXEF18ufbo3bDCeWst
+	2FzP6HIHOf0iW2i9WFYBcRzx6VBbbduyT05dS4eRaw1MBtNYkOUK2hV97yFnGiCOFxFQ61QsEEcKq
+	9ZFWIGY4TwNtN2Vm+SLziLRUFB/OZ299+zdyyxHDvu7SZcbcl5QtSeX85/ZD/Fb1522vkeNWXoG3A
+	/w1K9A4w==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1t4aol-00CFzy-2w;
-	Sat, 26 Oct 2024 15:02:36 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 26 Oct 2024 15:02:35 +0800
-Date: Sat, 26 Oct 2024 15:02:35 +0800
+	id 1t4apZ-00CG16-1k;
+	Sat, 26 Oct 2024 15:03:26 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 26 Oct 2024 15:03:25 +0800
+Date: Sat, 26 Oct 2024 15:03:25 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Yuvaraj Ranganathan <quic_yrangana@quicinc.com>
-Cc: Thara Gopinath <thara.gopinath@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	quic_sravank@quicinc.com
-Subject: Re: [PATCH V1 1/2] dt-bindings: crypto: qcom-qce: document the
- SA8775P crypto engine
-Message-ID: <ZxyUC3j_H3TDZxGT@gondor.apana.org.au>
-References: <20241017144500.3968797-1-quic_yrangana@quicinc.com>
- <20241017144500.3968797-2-quic_yrangana@quicinc.com>
+To: "Everest K.C." <everestkc@everestkc.com.np>
+Cc: gcherian@marvell.com, davem@davemloft.net, skhan@linuxfoundation.org,
+	linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: cavium - Fix the if condition to exit loop after
+ timeout
+Message-ID: <ZxyUPf9qjZlSA-bK@gondor.apana.org.au>
+References: <20241018162311.4770-1-everestkc@everestkc.com.np>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -60,15 +51,25 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241017144500.3968797-2-quic_yrangana@quicinc.com>
+In-Reply-To: <20241018162311.4770-1-everestkc@everestkc.com.np>
 
-On Thu, Oct 17, 2024 at 08:14:59PM +0530, Yuvaraj Ranganathan wrote:
-> Document the crypto engine on the SA8775P Platform.
+On Fri, Oct 18, 2024 at 10:23:10AM -0600, Everest K.C. wrote:
+> The while loop breaks in the first run because of incorrect
+> if condition. It also causes the statements after the if to
+> appear dead.
+> Fix this by changing the condition from if(timeout--) to
+> if(!timeout--).
 > 
-> Signed-off-by: Yuvaraj Ranganathan <quic_yrangana@quicinc.com>
+> This bug was reported by Coverity Scan.
+> Report:
+> CID 1600859: (#1 of 1): Logically dead code (DEADCODE)
+> dead_error_line: Execution cannot reach this statement: udelay(30UL);
+> 
+> Fixes: 9e2c7d99941d ("crypto: cavium - Add Support for Octeon-tx CPT Engine")
+> Signed-off-by: Everest K.C. <everestkc@everestkc.com.np>
 > ---
->  Documentation/devicetree/bindings/crypto/qcom-qce.yaml | 1 +
->  1 file changed, 1 insertion(+)
+>  drivers/crypto/cavium/cpt/cptpf_main.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
 Patch applied.  Thanks.
 -- 
