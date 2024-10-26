@@ -1,136 +1,107 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87B871D222F;
-	Fri, 25 Oct 2024 22:31:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3621320F;
+	Sat, 26 Oct 2024 01:29:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729895514; cv=none; b=W75+aA1tIzzOAW8UyoAj754aDo215XXcoDxReoBtMxGSAIuwW5pIaK9rdjWTBXnmQPmsJM6w4zMZubztgoTzOzByki/C39w0ved8G08IPqKRfabKPa9SZ0C6NrTagK+72jjPXFixi1Alll7LWnFOD0QoWWsNaOCBWnpTqBc9Dw0=
+	t=1729906180; cv=none; b=fneLhAgtEE9jhaU7goRlaFN5hb+6a5Ge9YSd9Q+mAUVYEBN3XcDZUqTlHejM9dZvcn4NcHMbK8mjZXKPyAWExABhoyMra3p4iFq0M746bT6i6LxJh9B0ij5ipyKFVDFLR60zVZB03Pan3sbL5d+bO9RyHZU46tWSyd9mtwOxk9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729895514; c=relaxed/simple;
-	bh=mVLVxjwpOT42Kb7f4O3vXqKoUSnuXxrku5/kKxjIyIQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B0N46DIg0w4U70SUJEdVZbaqNyIq4XD5+aB6ffOpmmrf4glB4by4sQwllPglxqVbvdqiDkV8lifTSuYp1DqQoFjTNPGXoed4+gkesjwOIDNpYjhWi+4ycKF2je1G8fIzecyIhgZkCmhzpw3fXqyJlXnzss5DmokyZsY/ZMfz5ZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=de2ooFjp; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="de2ooFjp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE278C4CEC3;
-	Fri, 25 Oct 2024 22:31:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1729895514;
-	bh=mVLVxjwpOT42Kb7f4O3vXqKoUSnuXxrku5/kKxjIyIQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=de2ooFjpzQqfyvs6eWpep/LU6bZMauqxFRrPPIOcoo6RLnaqtZhiBAtYfGHHWnscC
-	 dF2y5c896ibxWAiYOAVTj7IgcnlKP5L75BhK0Tc8wjgHsq9xSq4k1kTDEtU1VCVpVV
-	 KnGgdBnEQWIoO/2j34UM4IMNdYaajjOueVlox5Cf9Q4R746AKJSlNaQMSFchAMua3K
-	 xtNbR4CRre/5BmANz4U4u0zWkBsw0zpk3Hxas9iQsUUMtnzMnCcn+DJ54uFulKs2BJ
-	 SwTm/+DeTIx0AxPhIDiLCAroqEegH6HVTKiWTZ/RBPNhDys5MIq020g5RWnq0r3QWN
-	 +fqhDOV967kMA==
-Date: Fri, 25 Oct 2024 22:31:52 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-	linux-mips@vger.kernel.org, linux-riscv@lists.infradead.org,
-	linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev,
-	sparclinux@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH v2 03/18] lib/crc32: expose whether the lib is really
- optimized at runtime
-Message-ID: <20241025223152.GC2637569@google.com>
-References: <20241025191454.72616-1-ebiggers@kernel.org>
- <20241025191454.72616-4-ebiggers@kernel.org>
- <CAMj1kXFoer+_yZJWtqBVYfYnzqL9X9bbBRomCL3LDqRcYJ6njQ@mail.gmail.com>
- <20241025213243.GA2637569@google.com>
- <CAMj1kXHZy3yPvonS5ZVof0qa0V_Lxhv5Q7i1UVf5P6D3d+=KRw@mail.gmail.com>
+	s=arc-20240116; t=1729906180; c=relaxed/simple;
+	bh=XFNQYAFUMwHr9v6sRAZkdFO7vl60vW6VXkSAxfeHd/k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=WuXqj+eML37O4rzb3ExoXgN+4CQkGv2MAKkJv4/KRMm1Yw8qJ+ETlq/8s1ZkQhiqFvl0kmdt1xBAjBfA5ijjCpbdGz5jULS0FzMkS3Rh8VrEdTlajM/rrcLyqodRkFtOeZ4NRMYtU8cvo2NGc7hpjHRDy6QCa5vQid5pDDKxuXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Xb27W4Rd4zdk7G;
+	Sat, 26 Oct 2024 09:27:03 +0800 (CST)
+Received: from kwepemm600001.china.huawei.com (unknown [7.193.23.3])
+	by mail.maildlp.com (Postfix) with ESMTPS id 2D21D1400DC;
+	Sat, 26 Oct 2024 09:29:35 +0800 (CST)
+Received: from [10.174.176.245] (10.174.176.245) by
+ kwepemm600001.china.huawei.com (7.193.23.3) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Sat, 26 Oct 2024 09:29:34 +0800
+Message-ID: <79b64eae-a00d-43d2-a537-b5ca4c84ec69@huawei.com>
+Date: Sat, 26 Oct 2024 09:29:33 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMj1kXHZy3yPvonS5ZVof0qa0V_Lxhv5Q7i1UVf5P6D3d+=KRw@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] crypto: qat - Fix missing destroy_workqueue in
+ adf_init_aer()
+To: "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>
+CC: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<ahsan.atta@intel.com>, <mun.chun.yep@intel.com>,
+	<markas.rapoportas@intel.com>, <damian.muszynski@intel.com>,
+	<furong.zhou@intel.com>, <adam.guerin@intel.com>, <zhangxiaoxu5@huawei.com>,
+	<qat-linux@intel.com>, <linux-crypto@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20241024140057.18548-1-wanghai38@huawei.com>
+ <ZxpeVD/D9Y7sfL7H@gcabiddu-mobl.ger.corp.intel.com>
+ <1094e5d9-208c-4c41-83cd-5a77081aa5c1@huawei.com>
+ <ZxtXqkbPUJPvpiW2@gcabiddu-mobl.ger.corp.intel.com>
+Content-Language: en-US
+From: Wang Hai <wanghai38@huawei.com>
+In-Reply-To: <ZxtXqkbPUJPvpiW2@gcabiddu-mobl.ger.corp.intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemm600001.china.huawei.com (7.193.23.3)
 
-On Fri, Oct 25, 2024 at 11:37:45PM +0200, Ard Biesheuvel wrote:
-> On Fri, 25 Oct 2024 at 23:32, Eric Biggers <ebiggers@kernel.org> wrote:
-> >
-> > On Fri, Oct 25, 2024 at 10:32:14PM +0200, Ard Biesheuvel wrote:
-> > > On Fri, 25 Oct 2024 at 21:15, Eric Biggers <ebiggers@kernel.org> wrote:
-> > > >
-> > > > From: Eric Biggers <ebiggers@google.com>
-> > > >
-> > > > Make the CRC32 library export some flags that indicate which CRC32
-> > > > functions are actually executing optimized code at runtime.  Set these
-> > > > correctly from the architectures that implement the CRC32 functions.
-> > > >
-> > > > This will be used to determine whether the crc32[c]-$arch shash
-> > > > algorithms should be registered in the crypto API.  btrfs could also
-> > > > start using these flags instead of the hack that it currently uses where
-> > > > it parses the crypto_shash_driver_name.
-> > > >
-> > > > Signed-off-by: Eric Biggers <ebiggers@google.com>
-> > > > ---
-> > > >  arch/arm64/lib/crc32-glue.c  | 15 +++++++++++++++
-> > > >  arch/riscv/lib/crc32-riscv.c | 15 +++++++++++++++
-> > > >  include/linux/crc32.h        | 15 +++++++++++++++
-> > > >  lib/crc32.c                  |  5 +++++
-> > > >  4 files changed, 50 insertions(+)
-> > > >
-> > > ...
-> > > > diff --git a/include/linux/crc32.h b/include/linux/crc32.h
-> > > > index 58c632533b08..bf26d454b60d 100644
-> > > > --- a/include/linux/crc32.h
-> > > > +++ b/include/linux/crc32.h
-> > > > @@ -35,10 +35,25 @@ static inline u32 __pure __crc32c_le(u32 crc, const u8 *p, size_t len)
-> > > >         if (IS_ENABLED(CONFIG_CRC32_ARCH))
-> > > >                 return crc32c_le_arch(crc, p, len);
-> > > >         return crc32c_le_base(crc, p, len);
-> > > >  }
-> > > >
-> > > > +/*
-> > > > + * crc32_optimizations contains flags that indicate which CRC32 library
-> > > > + * functions are using architecture-specific optimizations.  Unlike
-> > > > + * IS_ENABLED(CONFIG_CRC32_ARCH) it takes into account the different CRC32
-> > > > + * variants and also whether any needed CPU features are available at runtime.
-> > > > + */
-> > > > +#define CRC32_LE_OPTIMIZATION  BIT(0) /* crc32_le() is optimized */
-> > > > +#define CRC32_BE_OPTIMIZATION  BIT(1) /* crc32_be() is optimized */
-> > > > +#define CRC32C_OPTIMIZATION    BIT(2) /* __crc32c_le() is optimized */
-> > > > +#if IS_ENABLED(CONFIG_CRC32_ARCH)
-> > > > +extern u32 crc32_optimizations;
-> > > > +#else
-> > > > +#define crc32_optimizations 0
-> > > > +#endif
-> > > > +
-> > >
-> > > Wouldn't it be cleaner to add a new library function for this, instead
-> > > of using a global variable?
-> >
-> > The architecture crc32 modules need to be able to write to this.  There could be
-> > a setter function and a getter function, but just using a variable is simpler.
-> >
-> 
-> If we just add 'u32 crc32_optimizations()', there is no need for those
-> modules to have init/exit hooks, the only thing they need to export is
-> this routine.
-> 
-> Or perhaps it could even be a static inline, with the right plumbing
-> of header files. At least on arm64,
-> 
-> static inline u32 crc32_optimizations() {
->   if (!alternative_have_const_cap_likely(ARM64_HAS_CRC32))
->     return 0;
->   return CRC32_LE_OPTIMIZATION | CRC32_BE_OPTIMIZATION | CRC32C_OPTIMIZATION;
-> }
-> 
-> should be all we need.
 
-In 7 of the 9 affected arches, I already have a module_init function that checks
-the CPU features in order to set up static keys.  (arm64 and riscv already used
-alternatives patching, so I kept that.)  It's slightly convenient to set these
-flags at the same time, but yes the above solution would work too.
 
-- Eric
+On 2024/10/25 16:32, Cabiddu, Giovanni wrote:
+> On Fri, Oct 25, 2024 at 09:24:52AM +0800, Wang Hai wrote:
+>>
+>>
+>> On 2024/10/24 23:04, Cabiddu, Giovanni wrote:
+>>> On Thu, Oct 24, 2024 at 10:00:57PM +0800, Wang Hai wrote:
+>>>> The adf_init_aer() won't destroy device_reset_wq when alloc_workqueue()
+>>>> for device_sriov_wq failed. Add destroy_workqueue for device_reset_wq to
+>>>> fix this issue.
+>>>>
+>>>> Fixes: 4469f9b23468 ("crypto: qat - re-enable sriov after pf reset")
+>>>> Signed-off-by: Wang Hai <wanghai38@huawei.com>
+>>>> ---
+>>>>    drivers/crypto/intel/qat/qat_common/adf_aer.c | 4 +++-
+>>>>    1 file changed, 3 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/drivers/crypto/intel/qat/qat_common/adf_aer.c b/drivers/crypto/intel/qat/qat_common/adf_aer.c
+>>>> index ec7913ab00a2..907144ec7e65 100644
+>>>> --- a/drivers/crypto/intel/qat/qat_common/adf_aer.c
+>>>> +++ b/drivers/crypto/intel/qat/qat_common/adf_aer.c
+>>>> @@ -281,8 +281,10 @@ int adf_init_aer(void)
+>>>>    		return -EFAULT;
+>>>>    	device_sriov_wq = alloc_workqueue("qat_device_sriov_wq", 0, 0);
+>>>> -	if (!device_sriov_wq)
+>>>> +	if (!device_sriov_wq) {
+>>>> +		destroy_workqueue(device_reset_wq);
+>>> The missing destroy_workqueue() here is intentional as the device_reset_wq
+>>> is destroyed in adf_exit_aer() which is called if adf_init_aer() fails,
+>>> see [1].
+>>>
+>> Hi, Giovanni.
+>>
+>> Thanks for the review.
+>>
+>> If adf_init_aer() fails, it will goto err_aer and then call
+>> adf_exit_misc_wq() instead of goto err_pf_wq and then call
+>> adf_exit_aer(). So this patch is needed.
+> Sorry, I overlooked it. You are right.
+> On the error path I would also set device_reset_wq to NULL.
+> 	if (!device_sriov_wq) {
+> 		destroy_workqueue(device_reset_wq);
+> 		device_reset_wq = NULL;
+> 		return -EFAULT;
+> 	}
+> 
+Thanks for the suggestion, I will send a v2 patch
+> Regards,
+> 
+
