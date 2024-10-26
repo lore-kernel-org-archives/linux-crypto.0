@@ -1,46 +1,49 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89CD116EBE6;
-	Sat, 26 Oct 2024 07:04:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2D94178CDE;
+	Sat, 26 Oct 2024 07:04:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1729926251; cv=none; b=pG8xApv3Jr7tcu/K/gf5TluWX1y2B2nm1jN/jV2Ztljyu2HBV1ApXp6xe3l1+Ari6GSMv6m513QAs+YaF3HxNa3M7bum1Qkb4MRZMUp3hZRYfBkqNjp2gbYzB0my0gxEJyxRPj20mtemTm+smyDBMtrxolQx8FFWGrEqIke3IVM=
+	t=1729926282; cv=none; b=o0BNxtrMg+KTkgQsY6dTcMAd425cE1wKHPvHwdjFKxfnYzfLcgkoVxEAQWIH4uFvLqgpxrEuM9HHvzZicGPNHBJH8hf3GNW4H2M5aOYQslYgaNu7E3NGYZNoFvkbMsu24lRepI3OLKzk+uwOMr+YvRe0iJKASs8v4BwyIodCgg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1729926251; c=relaxed/simple;
-	bh=0RhtS4B5xn2cmpZIIwFuhcwXkOIudN4PHOd4CuJZo2I=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=TmuYpx9Ay44l21k1rAC69V3z6sF8ttD2I2C52KzT4dyRgRf63a5jj5kzha7YUauCzv+rbEXf10Zh7HinZQdnSdRyzJ7sqxXorpMALjDYJ3tGdKjCih17iXM/PPzFJrwuarn/i4KxPUeNJMvat6liMCZsWoDxmE9f2G2wUhLSSD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=jJvK92xW; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1729926282; c=relaxed/simple;
+	bh=4AHEfbkYfSjiISLyOMEeSwKW27HAv+1y0xWqfm6mGP0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DrlpmASLtYo/nJCEYgTnmJpxtuqUduosgp/6/rEd1CCJGqH1Dfg6KQl6V+i0RojlxyGFC0NLGxv9fiqoNcWKx72Zf97ABTi0g+AquZHI9RMejHLq4wzmqqqoS4O7F4167ZWLzyDpf7dX1UmjGT5qqkKOHHMNVHEf0BzEX7PltFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=WIcWAaJw; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="jJvK92xW"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="WIcWAaJw"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:Message-ID:Subject:Cc:To:
-	From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=dRAXR7rfKz1oJGPh1yosp7uhrSNvVs9MNNRkDpeUBqQ=; b=jJvK92xWFAPXmhZP/wRtFAXYUq
-	lqRRYiLg9TCgUnpY8le+DjPLPx7uR4VvB6rHh/XKvSQ303BPmWzFMuYBwU+IPvNjB691OaReUl3NI
-	tnsTYXp2cf2ivfEMQTGb7h3GTvHa11U9csergRANhM6bAkWU8L/FoXaq2uZdY3yrXOF+UHsB2U89I
-	PUOe6Y9GVsjC40+8GHpzeUab3R87LAqNUjhXIqWfsNyTaSmOrafp4zsjftPP/Ezr7vFp69imO7iUS
-	Lt+FDa5d2NrJQQrko27AxArl2PYOlyRf8VDpsocJi8HgOW5FLZPbONHG1mMha885MScqpfMLzmaau
-	k4ew2A5g==;
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=GyAPHbdRNpjTRD8bi2oQ4iGgZ9FyuuVKHeAWYMjPTL4=; b=WIcWAaJwG4ISeaZUWgfw77Y6pv
+	6lvQlojSDr8PjS7bjoNOhTnzMM9TtUqr6zbxZKk2xvJMKouSrO/ocYJrp5AQifhCu2aAUiN/iqMTi
+	1o4MBQg7Z5ThKV9GXm4P35u3fIfXT4BSwU1ARmW9bMQ5jUC0enUX0PvGp21G8RqCbFFM5VPHYk5mX
+	s2x870BflmoJx1d8oiaVaXD0uC7JrPgXz5Q77PNUW05mcEug1/IffmVRZ0mWc65vBpvpkXQ8/Td6I
+	ZGOZvyPYJx/Pu5SEiK4zmqT8WozlS6JyimgKKnrKx+8hb4BU05UH4fdj/dk5LDOb3m5hvY0GKJoRP
+	mLNXAqJQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1t4aqD-00CG1k-32;
-	Sat, 26 Oct 2024 15:04:07 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 26 Oct 2024 15:04:05 +0800
-Date: Sat, 26 Oct 2024 15:04:05 +0800
+	id 1t4aqf-00CG2H-1M;
+	Sat, 26 Oct 2024 15:04:34 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 26 Oct 2024 15:04:33 +0800
+Date: Sat, 26 Oct 2024 15:04:33 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-mips@vger.kernel.org,
-	linux-kernel@vger.kernel.org, guanwentao@uniontech.com,
-	wangyuli@uniontech.com
-Subject: Re: [PATCH] crypto: mips/crc32 - fix the CRC32C implementation
-Message-ID: <ZxyUZWbn2wnz3ra4@gondor.apana.org.au>
+To: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	davem@davemloft.net, Akhil R <akhilrajeev@nvidia.com>,
+	Thierry Reding <thierry.reding@gmail.com>,
+	Jonathan Hunter <jonathanh@nvidia.com>, linux-tegra@vger.kernel.org
+Subject: Re: [PATCH 1/2] crypto: tegra - remove unneeded crypto_engine_stop()
+ call
+Message-ID: <ZxyUgfp7SzOM0xr4@gondor.apana.org.au>
+References: <20241020192532.4008-1-ovidiu.panait.oss@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,32 +52,23 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241020180258.8060-1-ebiggers@kernel.org>
-X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
+In-Reply-To: <20241020192532.4008-1-ovidiu.panait.oss@gmail.com>
 
-Eric Biggers <ebiggers@kernel.org> wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On Sun, Oct 20, 2024 at 10:25:31PM +0300, Ovidiu Panait wrote:
+> The explicit crypto_engine_stop() call is not needed, as it is already
+> called internally by crypto_engine_exit().
 > 
-> Commit ca459e5f826f ("crypto: mips/crc32 - Clean up useless assignment
-> operations") changed crc32c_mips_le_hw() to use the instructions that
-> use the "regular" CRC32 polynomial instead of the Castagnoli polynomial.
-> Therefore it can't be computing CRC32C values correctly anymore.
-> 
-> I haven't been successful in running a MIPS kernel in QEMU, but based on
-> code review this is the fix that is needed.
-> 
-> Fixes: ca459e5f826f ("crypto: mips/crc32 - Clean up useless assignment operations")
-> Cc: Guan Wentao <guanwentao@uniontech.com>
-> Cc: WangYuli <wangyuli@uniontech.com>
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> Signed-off-by: Ovidiu Panait <ovidiu.panait.oss@gmail.com>
 > ---
+> Cc: Akhil R <akhilrajeev@nvidia.com>
+> Cc: Thierry Reding <thierry.reding@gmail.com>
+> Cc: Jonathan Hunter <jonathanh@nvidia.com>
+> Cc: linux-tegra@vger.kernel.org
 > 
-> This is a regression in 6.12, so it should be fixed in a 6.12-rc.
-> 
-> arch/mips/crypto/crc32-mips.c | 6 +++---
-> 1 file changed, 3 insertions(+), 3 deletions(-)
+>  drivers/crypto/tegra/tegra-se-main.c | 2 --
+>  1 file changed, 2 deletions(-)
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
