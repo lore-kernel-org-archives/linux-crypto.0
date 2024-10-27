@@ -1,84 +1,93 @@
-Received: from bout3.ijzerbout.nl (bout3.ijzerbout.nl [136.144.140.114])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 768141741CB
-	for <linux-crypto@vger.kernel.org>; Sun, 27 Oct 2024 20:00:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=136.144.140.114
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1C4D5684;
+	Sun, 27 Oct 2024 21:14:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730059261; cv=none; b=nYjoN3/FFNp6gJbhLgrS1YfI3I4XxTZNP7JCQCMUvhNWioaDhe9NKqUt3LFhjqY3e2Zks9AMjOtDLUK50m4GLRcndJr0yvFBdRfSlmt0CLp0w7wwuhAnu5+HyIA2TYjFylJIEMU7p4kl8fWKikwSbPzCR3Q1iycV1T8a8vmE/IY=
+	t=1730063649; cv=none; b=rQnaKaJuHaSYop1gPOnBM4H3Nd6+artWigtlOStqNNhJxecImbVUG+Y3pULn/j3ZmXTWHqltBqRTwaYjPKpJbU2RbNh17r5HY2zHoa2efBdJ1wuQ3mZfgslc7c0ZGjCf91jAZT1RmLQpsSOdfcvq/95//sOibNUHD+P61pjlwJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730059261; c=relaxed/simple;
-	bh=7XeDDN+XQP89iuhlxtIPMUzSiWpNSNNce3JR6Gpu7Co=;
-	h=Message-ID:Date:MIME-Version:To:From:Subject:Cc:Content-Type; b=k6l51xWEizfreG1jrF8Oe7KLRmmNQO/+K4k4wjigFko+AkStgdp9ZCv2vOgfcWPNNP65t7YFXOe+ZigATKGxR9FDdW7D1csRHheOcDX3rXzKE83lJGX53PJ6SdnOy87IFJ4S1zabTThrcJD1Oy/z5Pg3B11AcxH254esqQe/cSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ijzerbout.nl; spf=pass smtp.mailfrom=ijzerbout.nl; dkim=pass (4096-bit key) header.d=ijzerbout.nl header.i=@ijzerbout.nl header.b=c/3xKclB; arc=none smtp.client-ip=136.144.140.114
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ijzerbout.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ijzerbout.nl
+	s=arc-20240116; t=1730063649; c=relaxed/simple;
+	bh=so+AoySYcBM12c77z/LnWClqHDFKcepvmE8+98poeKE=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=QKSomf0NLa2UfLQrwVWBUhcCaI0e6WvElZ2rhA3aSmuKbpqcysNXPEs1MvOvF+3u1eOTwEnTyM8Rz8ZFEOcum0/FRbfY+iXpZb0fSSf0gCkbqNToBGfIZ/V3IZcjGGx8WWK0p1Gw2jE1tL3GPFVzZm1aa+A9twTDNXfsTIs7+qE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=n/2DeL6c; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=ijzerbout.nl header.i=@ijzerbout.nl header.b="c/3xKclB"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ijzerbout.nl; s=key;
-	t=1730059248; bh=7XeDDN+XQP89iuhlxtIPMUzSiWpNSNNce3JR6Gpu7Co=;
-	h=Date:To:From:Subject:Cc:From;
-	b=c/3xKclBotLzywWxoXr+LjPR+JSLNBxTJkN0LUFaSg87o0ldCu5fLnbT6ZpSABxeP
-	 i2dJCHLUj9aREliPgF9a5caGoewuoLZqrb6W7sR2CeWXPdyrtWRloUCtOtXVStItNY
-	 7A5MoSroCAhqjB4txFhSvA/XjXxODgY1oN5kD8MIjStk1Q5EdVzTQ+tcEsNq83VOIW
-	 S9aasyv+kYvzSXSlxiWxJMvDgSR9g1LaPg8q4HRSRjiRGJhlGMImmMFBcjcPiTAFut
-	 Y5fm+pGLX/qOz0AbYlzZZNvS+ySA727w+UKYn11IBiP1v18ew8zQW/f1sTUsloGotR
-	 YTJdDONJ9HZypciwSqkCdAWCCn3A1jERifsZwuxtas6WHJjV3nbZFrOxstpl2+efBR
-	 +UPSo+Dob7KmaI47ez4+U1ZXts3eXFZlR6YQXy10CRhOwpVSaU5rTA2/28ugrLg0hn
-	 dtSIuhJpa36RAyOUZX1Z0OG866iXdW8ipAcLhI/WhYnKWyGZyHXEk5ppKStd4EXlau
-	 KtA8caaclLB52uaCoO/GcU72ITw6yz1b8KtG2Cl6CMBj8HDWvdskFaWJJWLmkxHk1s
-	 hcUWAMgB6UXDVa6uGTt23P069JhfaLY6GA0Jtglvdp+z2Mc2XuafH7dlfNHgyqv2DD
-	 yGDHkvFmnn28SUUtCUVItyAA=
-Received: from [IPV6:2a10:3781:99:1:1ac0:4dff:fea7:ec3a] (racer.ijzerbout.nl [IPv6:2a10:3781:99:1:1ac0:4dff:fea7:ec3a])
-	by bout3.ijzerbout.nl (Postfix) with ESMTPSA id 61F4718DC39;
-	Sun, 27 Oct 2024 21:00:48 +0100 (CET)
-Message-ID: <a6c29470-2c28-4eb3-889c-88209bf45e01@ijzerbout.nl>
-Date: Sun, 27 Oct 2024 21:00:46 +0100
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="n/2DeL6c"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1730063632;
+	bh=mIWK1Jsn/3SU028ik+J4ZKdihUKmSuKh5p9duoSc4bc=;
+	h=Date:From:To:Cc:Subject:From;
+	b=n/2DeL6c4ZN6p1AsQFlt6JGrSYJU6hjGYcHuTwIFKHAqaNBH992Z3jzZ/iyWc97XJ
+	 3ktGEAthHJxO2L540VuoIICiD6JtiY9eojxWrZW3hLI9Rt1eLWt7JVsThCtFyjVp8V
+	 IIFKLAGNS9LjVkmwMPRma+2bz0e3xzbb0DsU2cnr6u7DaLRAnpe/imZgI28D19kDDi
+	 xw63UDevA7tzswg0vgV1gTmkuWo/4bL3TdXB0v8U2EaGFxheXXnkg9CVtGx9hexP21
+	 2jSg1G3yOaqP7qqIcZVHg1J1qVhjYYiGpVqrVv19AAVbqSKd3TJJUlYNYcMjk7pxQg
+	 03G5xz0zVhjmw==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Xc8QR3Prvz4x3J;
+	Mon, 28 Oct 2024 08:13:51 +1100 (AEDT)
+Date: Mon, 28 Oct 2024 08:13:32 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Herbert Xu <herbert@gondor.apana.org.au>, Linux Crypto List
+ <linux-crypto@vger.kernel.org>
+Cc: Lukas Wunner <lukas@wunner.de>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: Fixes tag needs some work in the crypto tree
+Message-ID: <20241028081332.70264ab0@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: George Cherian <gcherian@marvell.com>
-From: Kees Bakker <kees@ijzerbout.nl>
-Subject: Question about crypto: cavium - Add Support for Octeon-tx CPT Engine
-Cc: linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="Sig_/BMIWo6+TNJ9OhoHAfSUg6Xt";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-Hi George,
+--Sig_/BMIWo6+TNJ9OhoHAfSUg6Xt
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-In 2017 you added support for Octeon-tx CPT Engine
-in drivers/crypto/cavium/cpt
+Hi all,
 
-I just happen to stumble on this piece of source code.
+In commit
 
-static void cpt_disable_cores(struct cpt_device *cpt, u64 coremask,
-                   u8 type, u8 grp)
-{
-     u64 pf_exe_ctl;
-     u32 timeout = 100;
-...
-     while (grp & coremask) {
-...
-         if (timeout--)
-             break;
-...
-     }
+  6835b816d02d ("crypto: ecdsa - Update Kconfig help text for NIST P521")
 
-This looks a bit weird to me. The if condition is always true when
-the while loop runs for the first time.
+Fixes tag
 
-Looking at the code, I think the intention was to try max 100 times
-to see if the cores were actually disabled. The current code is certainly
-not doing that. Perhaps you wanted this:
-     if (--timeout == 0)
-         break;
+  Fixes: a7d45ba77d3d ("crypto: ecdsa - Register NIST P521 and extend test
 
-May I ask you to have another look at your code to see if it is really doing
-what you wanted the code to do? And note, the same is done in
-cpt_disable_all_cores().
+has these problem(s):
 
-Kind regards,
-Kees Bakker
+  - Subject has leading but no trailing parentheses
+  - Subject has leading but no trailing quotes
+
+Please do not split fixes tags over more than one line.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/BMIWo6+TNJ9OhoHAfSUg6Xt
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmcerPwACgkQAVBC80lX
+0GzVOQf/b65KoYpfb/QG5k6StU5qf+mxNJUVX7QO6obpWotGuyzdCH3VmB3RL5W+
+M2xAms21r6QmZsohUdDIzvVcMonwiV9alf0pbScEyN16rYLeafEzkkvWZIbTy9Zp
+wVXiu2IqpQ9mfRQv6YDulVaXltIR5FGR3ppOoKAwYHhuHD3EsluGZFOuuciqylZd
+MtTbdmml+7fBGGOB7FZvBNt3gRKx+vJ9o9FtStf2/wKoCA1c9ON3GV70Maxo8aTU
+teIb6CVGl2IelBW5uF8GPxWHfzrxa2W8gPKJf4+UUNLBgGstQAAGi54AqXgPsgQy
+3KxNEs+lM5aG+3/qO3ZsVYLoWBBgbA==
+=CxKY
+-----END PGP SIGNATURE-----
+
+--Sig_/BMIWo6+TNJ9OhoHAfSUg6Xt--
