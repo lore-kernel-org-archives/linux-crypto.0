@@ -1,77 +1,128 @@
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E05118DF60;
-	Tue, 29 Oct 2024 15:06:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 648E03234;
+	Tue, 29 Oct 2024 16:10:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.207.212.93
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730214372; cv=none; b=Y4WlD1bpCBygGb7ZTPo1/Z719VcUgoXM5M/SM0RyIK8kKEoGdkyedkPp6LmidCBlPOEMplSRczsf2IQqbGNQQ2VEpXOScF73xiwiUA9zq34e0qSXDrOqLyj4hZNzFjBowCb4tDgJ8D1UTaeMDhqc/CA254G+uJc+vlSKWTKvgOo=
+	t=1730218205; cv=none; b=XmMHjDeBlUZH7oLKN1DMMSgDVry+QIH9Yfll5GR8fKM2FALLz3WSbRNOf0Y8CY2HY6ukeIrhhYR9v3vj02WhDEM+0SfqrBR7JvlUmHOWDyAlZP8lIcoStHFm2sSul024Clt9eyBn8k68p78BBQIewNi0qrYw/T9tie+L8LkzVQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730214372; c=relaxed/simple;
-	bh=C/R1pSYsTwmzSuMq7B2veX8My0kFlPqurD41bbFvGZk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uk+ETd8Xa7aUBn9vHVH5htqtoTkp+1chKbLk1p3A0bH1eqaEN/QgeSF4sAvCvm73YmJL3sUR2h9FofnGI5EUeRqBSWXqaiVVu5+M80e9n4HugLUQRAP9tddl8o3uwFKQ8cIHk6v99K6WaoSzhf8S/uzMlcRXOZlWM+1ar/1asTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4XdD6f1HVmz1T9Lj;
-	Tue, 29 Oct 2024 23:03:54 +0800 (CST)
-Received: from kwepemm600001.china.huawei.com (unknown [7.193.23.3])
-	by mail.maildlp.com (Postfix) with ESMTPS id E4683140157;
-	Tue, 29 Oct 2024 23:06:03 +0800 (CST)
-Received: from huawei.com (10.175.113.133) by kwepemm600001.china.huawei.com
- (7.193.23.3) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 29 Oct
- 2024 23:06:02 +0800
-From: Wang Hai <wanghai38@huawei.com>
-To: <giovanni.cabiddu@intel.com>, <herbert@gondor.apana.org.au>,
-	<davem@davemloft.net>, <ahsan.atta@intel.com>, <mun.chun.yep@intel.com>,
-	<markas.rapoportas@intel.com>, <damian.muszynski@intel.com>,
-	<furong.zhou@intel.com>, <adam.guerin@intel.com>, <zhangxiaoxu5@huawei.com>
-CC: <qat-linux@intel.com>, <linux-crypto@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <wanghai38@huawei.com>
-Subject: [PATCH v2] crypto: qat - Fix missing destroy_workqueue in adf_init_aer()
-Date: Tue, 29 Oct 2024 23:05:23 +0800
-Message-ID: <20241029150523.52435-1-wanghai38@huawei.com>
-X-Mailer: git-send-email 2.17.1
+	s=arc-20240116; t=1730218205; c=relaxed/simple;
+	bh=/etj3LXnGgUzT1xGL8zxGHbNub1Qp6O3mhFDglnFNr8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=oVvCgr1Q4QvLG23tCmQlCwLC9fkC6MO32AYALwC5ovmXn5XJCwm2URKSNDR4ZLZ/rMO72Z7YRt0Rt3ubJaU6x5M1APUju9aTw+R5nRNbxElqg4gglcePnnYFmuCrGrPCO8K9k6jjnYP/z40Fl0ExLJDr/JeSuKIccYhD7x0HirY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=Y9E/AM1W; arc=none smtp.client-ip=91.207.212.93
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="Y9E/AM1W"
+Received: from pps.filterd (m0046661.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49TCNSpI003954;
+	Tue, 29 Oct 2024 17:09:35 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=selector1; bh=
+	mlpdC8mFCPwe2o0w0fb76h8sou5C6CVNydIQ0/PBzC0=; b=Y9E/AM1WSAbbk9Dw
+	BabgcvIpY+DAMb7QjytTXHzEJSngXLt+/i5D0W1Pj9JvPBOcCF4qIcm8789qOlTE
+	w/B2ukCqqVfzG2W1puXme/Q1EkfJW4mwzP2ewVC1jKfc+lFvA1m/OU5hwblDe+v0
+	IPh4bjUpfpGxYkdbrTpLLXfKk3h8WCB7JKYquxNmVwpWKHTpVb2kh78enIUPr1kS
+	LlM36U1MIE8/ZsQhhECjBsdGfLxX2X1peION1pi0+ABd0PVzT5IQPx+Jotc0hnim
+	u8mUNpSeHsTvlbnWLZK1oy3ehLto6VHA5RUoRlMGwdDXtTfsF2gZtKn3uZ3TP5Nd
+	3hwE6g==
+Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 42gqacqhhr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 29 Oct 2024 17:09:35 +0100 (CET)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 439A140073;
+	Tue, 29 Oct 2024 17:08:19 +0100 (CET)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id A8284268985;
+	Tue, 29 Oct 2024 17:05:25 +0100 (CET)
+Received: from [10.48.86.79] (10.48.86.79) by SHFDAG1NODE1.st.com
+ (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.37; Tue, 29 Oct
+ 2024 17:05:24 +0100
+Message-ID: <ecf451d3-8f9a-4e60-a36c-baa9a270f0c8@foss.st.com>
+Date: Tue, 29 Oct 2024 17:05:24 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm600001.china.huawei.com (7.193.23.3)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 4/4] arm64: dts: st: add RNG node on stm32mp251
+To: Gatien Chevallier <gatien.chevallier@foss.st.com>,
+        Olivia Mackall
+	<olivia@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Rob Herring
+	<robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Lionel
+ Debieve <lionel.debieve@foss.st.com>, <marex@denx.de>
+CC: <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+References: <20241016-rng-mp25-v2-v4-0-5dca590cb092@foss.st.com>
+ <20241016-rng-mp25-v2-v4-4-5dca590cb092@foss.st.com>
+Content-Language: en-US
+From: Alexandre TORGUE <alexandre.torgue@foss.st.com>
+In-Reply-To: <20241016-rng-mp25-v2-v4-4-5dca590cb092@foss.st.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EQNCAS1NODE3.st.com (10.75.129.80) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
 
-The adf_init_aer() won't destroy device_reset_wq when alloc_workqueue()
-for device_sriov_wq failed. Add destroy_workqueue for device_reset_wq to
-fix this issue.
+Dear Gatien
 
-Fixes: 4469f9b23468 ("crypto: qat - re-enable sriov after pf reset")
-Signed-off-by: Wang Hai <wanghai38@huawei.com>
----
-v1->v2: add 'device_reset_wq = NULL'
- drivers/crypto/intel/qat/qat_common/adf_aer.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+On 10/16/24 10:04, Gatien Chevallier wrote:
+> Update the device-tree stm32mp251.dtsi by adding the Random Number
+> Generator(RNG) node.
+> 
+> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+> Reviewed-by: Marek Vasut <marex@denx.de>
+> ---
+> Changes in V3
+> 	-Applied Marek tag
+> 
+> Changes in V2
+> 	-Renamed RNG clocks to "core" and "bus"
+> ---
+>   arch/arm64/boot/dts/st/stm32mp251.dtsi | 10 ++++++++++
+>   1 file changed, 10 insertions(+)
+> 
+> diff --git a/arch/arm64/boot/dts/st/stm32mp251.dtsi b/arch/arm64/boot/dts/st/stm32mp251.dtsi
+> index 1167cf63d7e87aaa15c5c1ed70a9f6511fd818d4..273da5f62294422b587b13404b499b5ffe6c148e 100644
+> --- a/arch/arm64/boot/dts/st/stm32mp251.dtsi
+> +++ b/arch/arm64/boot/dts/st/stm32mp251.dtsi
+> @@ -493,6 +493,16 @@ uart8: serial@40380000 {
+>   				status = "disabled";
+>   			};
+>   
+> +			rng: rng@42020000 {
+> +				compatible = "st,stm32mp25-rng";
+> +				reg = <0x42020000 0x400>;
+> +				clocks = <&clk_rcbsec>, <&rcc CK_BUS_RNG>;
+> +				clock-names = "core", "bus";
+> +				resets = <&rcc RNG_R>;
+> +				access-controllers = <&rifsc 92>;
+> +				status = "disabled";
+> +			};
+> +
+>   			spi8: spi@46020000 {
+>   				#address-cells = <1>;
+>   				#size-cells = <0>;
+> 
 
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_aer.c b/drivers/crypto/intel/qat/qat_common/adf_aer.c
-index ec7913ab00a2..4cb8bd83f570 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_aer.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_aer.c
-@@ -281,8 +281,11 @@ int adf_init_aer(void)
- 		return -EFAULT;
- 
- 	device_sriov_wq = alloc_workqueue("qat_device_sriov_wq", 0, 0);
--	if (!device_sriov_wq)
-+	if (!device_sriov_wq) {
-+		destroy_workqueue(device_reset_wq);
-+		device_reset_wq = NULL;
- 		return -EFAULT;
-+	}
- 
- 	return 0;
- }
--- 
-2.17.1
+Applied on stm32-next.
 
+regards
+Alex
