@@ -1,134 +1,744 @@
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E8BE4AEE0;
-	Tue, 29 Oct 2024 18:22:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35398206E95
+	for <linux-crypto@vger.kernel.org>; Tue, 29 Oct 2024 18:39:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730226163; cv=none; b=gw/Jc3ZnUab8F356MJlxOz0FywgkkFOhC9EkQFsUHDQpxwurWRmQFOmKw+p5Tr3Jpt1rraPvY3xM07c4SFJ3LQhLh70goSMx1WrWaaXJdt15VOyQRWoVPPntW5xqx5CuoHM23WCt2dv66YGhqAiANcO5xthtW6nBXM6GZjotVuA=
+	t=1730227174; cv=none; b=eo15zudaFv7dzfZ/bistUmi7smeyb/bDqEuqTdbMsa5A0AfUgOJeaDbsLt2gTosvUPGroYuAK900bRp3xsyefQxlehW69fmgikm0gPl0EfA1PuoaLmBLbG+3I+OcNtGxCBYm3J/yvLuFvQdJrBz2DOsUyyOpqUZQ2Yfdp7zDT6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730226163; c=relaxed/simple;
-	bh=cDN+Kio485uI1+mHZTMvXjvfikGTUIEBVb/zNwaom8A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VMkdSNgdmFEanuR5Vni0WX9GuvDc5UdCX2+yBl3NK/F0qvJOYvtBzJCpc4nD3izKWMht+x6i2lGtOmZH9LOYAXvwR2+7jOZYfdDXgcTsQ20TnKlgTrJinpAIG5RBUavahuiduUK9cpeFRwKW1UTaHcBmhER6ETxrPXUoWle3uoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=UzMiqvUr; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+	s=arc-20240116; t=1730227174; c=relaxed/simple;
+	bh=T2rivRAiC8Z4Tr1Eyh4GGjjedPa64v/mc1wiqkY92ww=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=b+nCo7G6V1D41HU1EuWIgrjUqaeaQPyzVu66uhtNoGGNavvksZaJjD5pyK4/dDFeq4LeaItbT2t7bSwUvBWL/hgDNRmVSa9grPxEfg8tVoBAwBTgYY/XZCvbTfxw90ucGIbiphsdPviDZ4kg2wB+VyDbA3tVrC1U+CO7+OqDC4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dionnaglaze.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cVePOZxJ; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--dionnaglaze.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="UzMiqvUr"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
-	:Subject; bh=SiVr3pgC9/d36AWyRc73mxkAo1EYW9orAH0ljPOv1w8=; b=UzMiqvUrPx/kuL7j
-	J2Z+DEND4542a672OjGgtH0sf2XyfPWYtSH0LJfqLrHq/i3tb5d/PVpn7BmVl6KiaPnReZGwS2mdf
-	HgMlL8IL6lb4zImc9Ahodvc2fBe9zOw7raVq/oKcuk0gnjn8Pfp+UlFOtRqtW8kPS1WWiyVGwwkxP
-	oAQsRBY1ysBBj9iRQLK6zaX96JkxzN3ujB4aHgbsB2PqA75Zcu/Z1JoXLDgvHd0u6+PHnIiKZS3RA
-	cbcvY+513++6r5iKgB4dcDYV+xjEdblo2z4jXjp4C0K4wJV639/XukPuqJk2qvCdmf+EMJa+/6OXr
-	0ElIJBTA2fN2iCbUgg==;
-Received: from dg by mx.treblig.org with local (Exim 4.96)
-	(envelope-from <dg@treblig.org>)
-	id 1t5qrN-00EImw-2u;
-	Tue, 29 Oct 2024 18:22:29 +0000
-Date: Tue, 29 Oct 2024 18:22:29 +0000
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
-To: dan.j.williams@intel.com, herbert@gondor.apana.org.au
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] async_xor: Remove unused 'async_xor_val'
-Message-ID: <ZyEn5f8w8Ez2Szw3@gallifrey>
-References: <20240929132148.44792-1-linux@treblig.org>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cVePOZxJ"
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6e9d6636498so79637117b3.2
+        for <linux-crypto@vger.kernel.org>; Tue, 29 Oct 2024 11:39:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730227170; x=1730831970; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=TTk3x5CChIeotgkpQE6tX++ixV+XP+5/E4fu5Geofmc=;
+        b=cVePOZxJ0NQGgWMoFSLj0lm0QbR3TswypX9cDen2KF4oSps4q9cRd8QUiyu1g7gGZX
+         nXW0WaTNTuTpNs/XArVhI4nsAJw/uzt5Qor77kRgw3qDgbVXu7IpPJrISFlZAZQdl09A
+         bV1x9QE+ylxBR9JQv9j+2824kkLlos6s7F5t4iHG2whaJxxJH1diSzFnQpFLYkvvSSdy
+         IpH0u52BZf6tG3YeBSJ6CUSnFgzR4IGGm7eczQvCF822+qQBi/7z7VdFGx2tYDvi470Q
+         blkVtItBqM4mxDpguM+LmP7YuAVFh4hE+Kf4vBCwtlUjnruNSDZj2ATPFUwkOwoQD4ue
+         SLbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730227170; x=1730831970;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TTk3x5CChIeotgkpQE6tX++ixV+XP+5/E4fu5Geofmc=;
+        b=RNn1M5EXu0vXizoFIDVWAjYbX0edHD8wFqlR2LGf6HJCMNA8NvWel6wHK/v1byER9/
+         +iFzrgyKvFs6XqiQQX0frrpRHN3EFlDLkFcqr90TRiSkuesPytNDA9UPH1kQ7c6jd9Lw
+         O/6ohqEtBOP1yfaIpf3u57A8Psn2UGUKsj+q/rtBiml8r+2a2s7eTe6Qr3Q+gDoj4jie
+         tdBaob8wDMHyRZmWY246tS1cNZBIQEjY3tvvAcN+MifEQ0BH7NBZcIEKY8F/ZoJ8KNl0
+         Y6oIkoEC8f6OA0Sm80zUfYW0J7N48fVBnLi/YJNoIpLJRE43wnBPUEAeYMNGr3hNtJAc
+         El3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXQggAbnyoZb1apHKfGqhNfBrJt8TVUS7frZl83egFdbYNMhl4mVeZ33JZ4y9qHhR30kIRuGLD5VhfYQMI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxRndVXsypRu9vql6hTBi1GJ1kjpx2ujd6+fFgARIC3tLHdI3E7
+	XOljknxp1debhiVbiUoSEemm20qENAl2Mc2PG/7BQ9baK0Vwj5Rg5ANVSTZs5pnuFW+O2zhQ5nm
+	sHaVlZ08bYIPKEojrpLp0LA==
+X-Google-Smtp-Source: AGHT+IFxFGu+8uvfJ6rFJY7cYkDeTmqIadIoyjO5UEJvePR4uc7OnxNkpGvTkaB9Ktu20kjz+v/AU1Q2xT8xxpDKWw==
+X-Received: from dionnaglaze.c.googlers.com ([fda3:e722:ac3:cc00:36:e7b8:ac13:c9e8])
+ (user=dionnaglaze job=sendgmr) by 2002:a25:9c82:0:b0:e30:d445:a7c with SMTP
+ id 3f1490d57ef6-e30d4450d48mr9276.1.1730227170103; Tue, 29 Oct 2024 11:39:30
+ -0700 (PDT)
+Date: Tue, 29 Oct 2024 18:39:03 +0000
+In-Reply-To: <20241029183907.3536683-1-dionnaglaze@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <20240929132148.44792-1-linux@treblig.org>
-X-Chocolate: 70 percent or better cocoa solids preferably
-X-Operating-System: Linux/6.1.0-21-amd64 (x86_64)
-X-Uptime: 18:22:11 up 174 days,  5:36,  1 user,  load average: 0.00, 0.00,
- 0.00
-User-Agent: Mutt/2.2.12 (2023-09-09)
+Mime-Version: 1.0
+References: <20241029183907.3536683-1-dionnaglaze@google.com>
+X-Mailer: git-send-email 2.47.0.163.g1226f6d8fa-goog
+Message-ID: <20241029183907.3536683-4-dionnaglaze@google.com>
+Subject: [PATCH 3/4] crypto: ccp: Add SNP firmware hotload support
+From: Dionna Glaze <dionnaglaze@google.com>
+To: linux-kernel@vger.kernel.org, x86@kernel.org, 
+	Tom Lendacky <thomas.lendacky@amd.com>, John Allen <john.allen@amd.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Ashish Kalra <ashish.kalra@amd.com>
+Cc: Dionna Glaze <dionnaglaze@google.com>, Michael Roth <michael.roth@amd.com>, 
+	"Borislav Petkov (AMD)" <bp@alien8.de>, linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-* linux@treblig.org (linux@treblig.org) wrote:
-> From: "Dr. David Alan Gilbert" <linux@treblig.org>
-> 
-> async_xor_val has been unused since commit
-> a7c224a820c3 ("md/raid5: convert to new xor compution interface")
-> 
-> Remove it.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+uapi changes: The status values added are defined in AMD's SEV-SNP API
+documentation as new error modes for the DOWNLOAD_FIRMWARE_EX command.
 
-Ping.
+On init, the ccp device will make /sys/class/firmware/amd/loading etc
+firmware upload API attributes available to late-load a SEV-SNP firmware
+binary.
 
-Thanks,
+The firmware upload api errors reported are actionable in the following
+ways:
+* FW_UPLOAD_ERR_HW_ERROR: the machine is in an unstable state and must
+  be reset.
+* FW_UPLOAD_ERR_RW_ERROR: the firmware update went bad but can be
+  recovered by hotloading the previous firmware version.
+  Also used in the case that the kernel used the API wrong (bug).
+* FW_UPLOAD_ERR_FW_INVALID: user error with the data provided, but no
+  instability is expected and no recovery actions are needed.
+* FW_UPLOAD_ERR_BUSY: upload attempted at a bad time either due to
+  overload or the machine is in the wrong platform state.
 
-Dave
+snp_asid_to_gctx_page_map:
+The SEV-SNP API documents that before a firmware is committed, all
+active GCTX pages should be updated with SNP_GUEST_STATUS to ensure
+their data structure remaiins consistent for the new firmware version.
+There can only be cpuid_edx(0x8000001f)-1 many SEV-SNP asids in use at
+one time, so this map associates asid to gctx in order to track which
+addresses are active gctx pages that need updating. When an asid and
+gctx page are decommissioned, the page is removed from tracking for
+update-purposes.
+Given that GCTX page creation and binding through the SNP_ACTIVATE
+command are separate, the creation operation also tracks pages that are
+yet to be bound to an asid.
 
-> ---
->  crypto/async_tx/async_xor.c | 26 --------------------------
->  include/linux/async_tx.h    |  5 -----
->  2 files changed, 31 deletions(-)
-> 
-> diff --git a/crypto/async_tx/async_xor.c b/crypto/async_tx/async_xor.c
-> index 1a3855284091..2c499654a36c 100644
-> --- a/crypto/async_tx/async_xor.c
-> +++ b/crypto/async_tx/async_xor.c
-> @@ -389,32 +389,6 @@ async_xor_val_offs(struct page *dest, unsigned int offset,
->  }
->  EXPORT_SYMBOL_GPL(async_xor_val_offs);
->  
-> -/**
-> - * async_xor_val - attempt a xor parity check with a dma engine.
-> - * @dest: destination page used if the xor is performed synchronously
-> - * @src_list: array of source pages
-> - * @offset: offset in pages to start transaction
-> - * @src_cnt: number of source pages
-> - * @len: length in bytes
-> - * @result: 0 if sum == 0 else non-zero
-> - * @submit: submission / completion modifiers
-> - *
-> - * honored flags: ASYNC_TX_ACK
-> - *
-> - * src_list note: if the dest is also a source it must be at index zero.
-> - * The contents of this array will be overwritten if a scribble region
-> - * is not specified.
-> - */
-> -struct dma_async_tx_descriptor *
-> -async_xor_val(struct page *dest, struct page **src_list, unsigned int offset,
-> -	      int src_cnt, size_t len, enum sum_check_flags *result,
-> -	      struct async_submit_ctl *submit)
-> -{
-> -	return async_xor_val_offs(dest, offset, src_list, NULL, src_cnt,
-> -			len, result, submit);
-> -}
-> -EXPORT_SYMBOL_GPL(async_xor_val);
-> -
->  MODULE_AUTHOR("Intel Corporation");
->  MODULE_DESCRIPTION("asynchronous xor/xor-zero-sum api");
->  MODULE_LICENSE("GPL");
-> diff --git a/include/linux/async_tx.h b/include/linux/async_tx.h
-> index 5cc73d7e5b52..1ca9f9e05f4f 100644
-> --- a/include/linux/async_tx.h
-> +++ b/include/linux/async_tx.h
-> @@ -167,11 +167,6 @@ async_xor_offs(struct page *dest, unsigned int offset,
->  		struct page **src_list, unsigned int *src_offset,
->  		int src_cnt, size_t len, struct async_submit_ctl *submit);
->  
-> -struct dma_async_tx_descriptor *
-> -async_xor_val(struct page *dest, struct page **src_list, unsigned int offset,
-> -	      int src_cnt, size_t len, enum sum_check_flags *result,
-> -	      struct async_submit_ctl *submit);
-> -
->  struct dma_async_tx_descriptor *
->  async_xor_val_offs(struct page *dest, unsigned int offset,
->  		struct page **src_list, unsigned int *src_offset,
-> -- 
-> 2.46.2
-> 
+synthetic_restore_required:
+Instead of tracking the status of whether an individual GCTX is safe for
+use in a firmware command, force all following commands to fail with an
+error that is indicative of needing a firmware rollback.
+
+A sev_platform_init call when only SEV-SNP VMs are expected should set
+supports_download_firmware_ex to delay legacy initialization actions.
+The firmware can only be hotloaded when legacy initialization has not
+happened.
+
+To test:
+1. Build the kernel enabling SEV-SNP as normal and add CONFIG_FW_UPLOAD=y.
+2. Add the following to your kernel_cmdline: ccp.psp_init_on_probe=0.
+3.Get an AMD SEV-SNP firmware sbin appropriate to your Epyc chip model at
+https://www.amd.com/en/developer/sev.html and extract to get a .sbin
+file.
+4. Run the following with your sbinfile in FW:
+
+echo 1 > /sys/class/firmware/snp_dlfw_ex/loading
+cat "${FW?}" > /sys/class/firmware/snp_dlfw_ex/data
+echo 0 > /sys/class/firmware/snp_dlfw_ex/loading
+
+5. Verify changes.
+There is no easy sysfs interface to SNP_PLATFORM_STATUS, you'll need an
+application to run the ioctl and interpret the results. A before and
+after should show different CURRENT_TCB, build, minor, major values
+if you were running an earlier firmware that hotloaded.
+
+CC: Ashish Kalra <ashish.kalra@amd.com>
+CC: Tom Lendacky <thomas.lendacky@amd.com>
+CC: John Allen <john.allen@amd.com>
+CC: Herbert Xu <herbert@gondor.apana.org.au>
+CC: "David S. Miller" <davem@davemloft.net>
+CC: Michael Roth <michael.roth@amd.com>
+CC: "Borislav Petkov (AMD)" <bp@alien8.de>
+
+Co-authored-by: Ashish Kalra <ashish.kalra@amd.com>
+Change-Id: Id28f9e80ea6eae565503493f874cca685c2b7f1b
+Signed-off-by: Dionna Glaze <dionnaglaze@google.com>
+---
+ drivers/crypto/ccp/Kconfig   |   2 +
+ drivers/crypto/ccp/sev-dev.c | 398 ++++++++++++++++++++++++++++++++++-
+ drivers/crypto/ccp/sev-dev.h |  14 ++
+ include/linux/psp-sev.h      |  28 +++
+ include/uapi/linux/psp-sev.h |   5 +
+ 5 files changed, 439 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/crypto/ccp/Kconfig b/drivers/crypto/ccp/Kconfig
+index f394e45e11ab4..cd9b667640e7c 100644
+--- a/drivers/crypto/ccp/Kconfig
++++ b/drivers/crypto/ccp/Kconfig
+@@ -39,6 +39,8 @@ config CRYPTO_DEV_SP_PSP
+ 	bool "Platform Security Processor (PSP) device"
+ 	default y
+ 	depends on CRYPTO_DEV_CCP_DD && X86_64 && AMD_IOMMU
++	select FW_LOADER
++        select FW_UPLOAD
+ 	help
+ 	 Provide support for the AMD Platform Security Processor (PSP).
+ 	 The PSP is a dedicated processor that provides support for key
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index 9810edbb272d2..20232308b1b61 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -223,6 +223,7 @@ static int sev_cmd_buffer_len(int cmd)
+ 	case SEV_CMD_SNP_GUEST_REQUEST:		return sizeof(struct sev_data_snp_guest_request);
+ 	case SEV_CMD_SNP_CONFIG:		return sizeof(struct sev_user_data_snp_config);
+ 	case SEV_CMD_SNP_COMMIT:		return sizeof(struct sev_data_snp_commit);
++	case SEV_CMD_SNP_DOWNLOAD_FIRMWARE_EX:	return sizeof(struct sev_data_download_firmware_ex);
+ 	default:				return 0;
+ 	}
+ 
+@@ -829,6 +830,7 @@ static int snp_reclaim_cmd_buf(int cmd, void *cmd_buf)
+ 	return 0;
+ }
+ 
++static void snp_cmd_bookkeeping_locked(int cmd, struct sev_device *sev, void *data);
+ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
+ {
+ 	struct cmd_buf_desc desc_list[CMD_BUF_DESC_MAX] = {0};
+@@ -852,6 +854,15 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
+ 	if (WARN_ON_ONCE(!data != !buf_len))
+ 		return -EINVAL;
+ 
++	/* The firmware does not coordinate all GCTX page updates. Force an
++	 * error to ensure that no new VM can be started and no active VM makes
++	 * progress on guest requests until the firmware is rolled back.
++	 */
++	if (sev->synthetic_restore_required) {
++		*psp_ret = SEV_RET_RESTORE_REQUIRED;
++		return -EBUSY;
++	}
++
+ 	/*
+ 	 * Copy the incoming data to driver's scratch buffer as __pa() will not
+ 	 * work for some memory, e.g. vmalloc'd addresses, and @data may not be
+@@ -982,6 +993,9 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
+ 	print_hex_dump_debug("(out): ", DUMP_PREFIX_OFFSET, 16, 2, data,
+ 			     buf_len, false);
+ 
++	if (!ret)
++		snp_cmd_bookkeeping_locked(cmd, sev, data);
++
+ 	return ret;
+ }
+ 
+@@ -1082,6 +1096,7 @@ static int snp_filter_reserved_mem_regions(struct resource *rs, void *arg)
+ 	return 0;
+ }
+ 
++static int sev_snp_platform_init_firmware_upload(struct sev_device *sev);
+ static int __sev_snp_init_locked(int *error)
+ {
+ 	struct psp_device *psp = psp_master;
+@@ -1179,6 +1194,8 @@ static int __sev_snp_init_locked(int *error)
+ 
+ 	sev_es_tmr_size = SNP_TMR_SIZE;
+ 
++	rc = sev_snp_platform_init_firmware_upload(sev);
++
+ 	return rc;
+ }
+ 
+@@ -1326,6 +1343,13 @@ static int _sev_platform_init_locked(struct sev_platform_init_args *args)
+ 	if (args->probe && !psp_init_on_probe)
+ 		return 0;
+ 
++	/*
++	 * Defer legacy SEV/SEV-ES support if legacy VMs are not being launched
++	 * and module psp_init_on_probe parameter is false.
++	 */
++	if (args->supports_download_firmware_ex && !psp_init_on_probe)
++		return 0;
++
+ 	return __sev_platform_init_locked(&args->error);
+ }
+ 
+@@ -1592,14 +1616,8 @@ static int sev_update_firmware(struct device *dev)
+ 		return -1;
+ 	}
+ 
+-	/*
+-	 * SEV FW expects the physical address given to it to be 32
+-	 * byte aligned. Memory allocated has structure placed at the
+-	 * beginning followed by the firmware being passed to the SEV
+-	 * FW. Allocate enough memory for data structure + alignment
+-	 * padding + SEV FW.
+-	 */
+-	data_size = ALIGN(sizeof(struct sev_data_download_firmware), 32);
++	data_size = ALIGN(sizeof(struct sev_data_download_firmware),
++			  SEV_FW_ALIGNMENT);
+ 
+ 	order = get_order(firmware->size + data_size);
+ 	p = alloc_pages(GFP_KERNEL, order);
+@@ -2224,6 +2242,366 @@ static int sev_misc_init(struct sev_device *sev)
+ 	return 0;
+ }
+ 
++#ifdef CONFIG_FW_UPLOAD
++
++static enum fw_upload_err snp_dlfw_ex_prepare(struct fw_upload *fw_upload,
++                                             const u8 *data, u32 size)
++{
++        return FW_UPLOAD_ERR_NONE;
++}
++
++static enum fw_upload_err snp_dlfw_ex_poll_complete(struct fw_upload *fw_upload)
++{
++        return FW_UPLOAD_ERR_NONE;
++}
++
++/*
++ * This may be called asynchronously with an on-going update.  All other
++ * functions are called sequentially in a single thread. To avoid contention on
++ * register accesses, only update the cancel_request flag. Other functions will
++ * check this flag and handle the cancel request synchronously.
++ */
++static void snp_dlfw_ex_cancel(struct fw_upload *fw_upload)
++{
++	struct sev_device *sev = psp_master->sev_data;
++
++        mutex_lock(&sev->fw_lock);
++        sev->fw_cancel = true;
++        mutex_unlock(&sev->fw_lock);
++}
++
++static enum fw_upload_err snp_dlfw_ex_err_translate(struct sev_device *sev, int psp_ret)
++{
++	dev_dbg(sev->dev, "Failed to update SEV firmware: %#x\n", psp_ret);
++	/*
++	 * Operation error:
++	 *   HW_ERROR: Critical error. Machine needs repairs now.
++	 *   RW_ERROR: Severe error. Roll back to the prior version to recover.
++	 * User error:
++	 *   FW_INVALID: Bad input for this interface.
++	 *   BUSY: Wrong machine state to run download_firmware_ex.
++	 */
++	switch (psp_ret) {
++	case SEV_RET_RESTORE_REQUIRED:
++		dev_warn(sev->dev, "Firmware updated but unusable\n");
++		dev_warn(sev->dev, "Need to do manual firmware rollback!!!\n");
++		return FW_UPLOAD_ERR_RW_ERROR;
++	case SEV_RET_SHUTDOWN_REQUIRED:
++		/* No state changes made. Not a hardware error. */
++		dev_warn(sev->dev, "Firmware image cannot be live updated\n");
++		return FW_UPLOAD_ERR_FW_INVALID;
++	case SEV_RET_BAD_VERSION:
++		/* No state changes made. Not a hardware error. */
++		dev_warn(sev->dev, "Firmware image is not well formed\n");
++		return FW_UPLOAD_ERR_FW_INVALID;
++		/* SEV-specific errors that can still happen. */
++	case SEV_RET_BAD_SIGNATURE:
++		/* No state changes made. Not a hardware error. */
++		dev_warn(sev->dev, "Firmware image signature is bad\n");
++		return FW_UPLOAD_ERR_FW_INVALID;
++	case SEV_RET_INVALID_PLATFORM_STATE:
++		/* Calling at the wrong time. Not a hardware error. */
++		dev_warn(sev->dev, "Firmware not updated as SEV in INIT state\n");
++		return FW_UPLOAD_ERR_BUSY;
++	case SEV_RET_HWSEV_RET_UNSAFE:
++		dev_err(sev->dev, "Firmware is unstable. Reset your machine!!!\n");
++		return FW_UPLOAD_ERR_HW_ERROR;
++		/* Kernel bug cases. */
++	case SEV_RET_INVALID_PARAM:
++		dev_err(sev->dev, "Download-firmware-EX invalid parameter\n");
++		return FW_UPLOAD_ERR_RW_ERROR;
++	case SEV_RET_INVALID_ADDRESS:
++		dev_err(sev->dev, "Download-firmware-EX invalid address\n");
++		return FW_UPLOAD_ERR_RW_ERROR;
++	default:
++		dev_err(sev->dev, "Unhandled download_firmware_ex err %d\n", psp_ret);
++		return FW_UPLOAD_ERR_HW_ERROR;
++	}
++}
++
++static enum fw_upload_err snp_dlfw_ex_write(struct fw_upload *fwl, const u8 *data,
++                                       u32 offset, u32 size, u32 *written)
++{
++	struct sev_data_download_firmware_ex *data_ex;
++	struct sev_data_snp_guest_status status_data;
++	struct sev_device *sev = fwl->dd_handle;
++	void *snp_guest_status, *fw_dest;
++	u8 api_major, api_minor, build;
++	int ret, error, order;
++	struct page *p;
++	u64 data_size;
++	bool cancel;
++
++	if (!sev)
++		return FW_UPLOAD_ERR_HW_ERROR;
++
++	mutex_lock(&sev->fw_lock);
++	cancel = sev->fw_cancel;
++	mutex_unlock(&sev->fw_lock);
++
++	if (cancel)
++		return FW_UPLOAD_ERR_CANCELED;
++
++	/*
++	 * SEV firmware update is a one-shot update operation, the write()
++	 * callback to be invoked multiple times for the same update is
++	 * unexpected.
++	 */
++	if (offset)
++		return FW_UPLOAD_ERR_INVALID_SIZE;
++
++	if (sev_get_api_version())
++		return FW_UPLOAD_ERR_HW_ERROR;
++
++	api_major = sev->api_major;
++	api_minor = sev->api_minor;
++	build     = sev->build;
++
++	data_size = ALIGN(sizeof(struct sev_data_download_firmware_ex),
++			  SEV_FW_ALIGNMENT);
++
++	order = get_order(size + data_size);
++	p = alloc_pages(GFP_KERNEL, order);
++	if (!p) {
++		ret = FW_UPLOAD_ERR_INVALID_SIZE;
++		goto fw_err;
++	}
++
++	/*
++	 * Copy firmware data to a kernel allocated contiguous
++	 * memory region.
++	 */
++	data_ex = page_address(p);
++	fw_dest = page_address(p) + data_size;
++	memcpy(fw_dest, data, size);
++
++	data_ex->address = __psp_pa(fw_dest);
++	data_ex->len = size;
++	data_ex->cmdlen = sizeof(struct sev_data_download_firmware_ex);
++
++	/*
++	 * SNP_COMMIT should be issued explicitly to commit the updated
++	 * firmware after guest context pages have been updated.
++	 */
++
++	ret = sev_do_cmd(SEV_CMD_SNP_DOWNLOAD_FIRMWARE_EX, data_ex, &error);
++
++	if (ret) {
++		ret = snp_dlfw_ex_err_translate(sev, error);
++		goto free_err;
++	}
++
++	__free_pages(p, order);
++
++	/* Need to do a DF_FLUSH after live firmware update */
++	wbinvd_on_all_cpus();
++	ret = __sev_do_cmd_locked(SEV_CMD_SNP_DF_FLUSH, NULL, &error);
++	if (ret) {
++		dev_dbg(sev->dev, "DF_FLUSH error %d\n", error);
++		ret = FW_UPLOAD_ERR_HW_ERROR;
++		goto free_err;
++	}
++
++	sev_get_api_version();
++
++	/*
++	 * Force an update of guest context pages after SEV firmware
++	 * live update by issuing SNP_GUEST_STATUS on all guest
++	 * context pages.
++	 */
++	snp_guest_status = sev_fw_alloc(PAGE_SIZE);
++	if (!snp_guest_status) {
++		ret = FW_UPLOAD_ERR_INVALID_SIZE;
++		goto free_err;
++	}
++
++	/*
++	 * After the last bound asid-to-gctx page is snp_unbound_gctx_end-many
++	 * unbound gctx pages that also need updating.
++	 */
++	for (int i = 1; i <= sev->last_snp_asid + sev->snp_unbound_gctx_end; i++) {
++		if (sev->snp_asid_to_gctx_pages_map[i]) {
++			status_data.gctx_paddr = sev->snp_asid_to_gctx_pages_map[i];
++			status_data.address = __psp_pa(snp_guest_status);
++			ret = sev_do_cmd(SEV_CMD_SNP_GUEST_STATUS, &status_data, &error);
++			if (ret) {
++				/*
++				 * Handle race with SNP VM being destroyed/decommissoned,
++				 * if guest context page invalid error is returned,
++				 * assume guest has been destroyed.
++				 */
++				if (error == SEV_RET_INVALID_GUEST)
++					continue;
++				sev->synthetic_restore_required = true;
++				dev_err(sev->dev, "Failed to update SNP GCTX after firmware update, %#x\n", error);
++				dev_err(sev->dev, "Need to do manual SNP firmware rollback!!!\n");
++				snp_free_firmware_page(snp_guest_status);
++				ret = FW_UPLOAD_ERR_RW_ERROR;
++				goto free_err;
++			}
++		}
++	}
++	snp_free_firmware_page(snp_guest_status);
++
++	if (api_major != sev->api_major || api_minor != sev->api_minor ||
++	    build != sev->build) {
++		dev_info(sev->dev, "SEV firmware updated from %d.%d.%d to %d.%d.%d\n",
++			 api_major, api_minor, build,
++			 sev->api_major, sev->api_minor, sev->build);
++	} else {
++		dev_info(sev->dev, "SEV firmware same as old %d.%d.%d\n",
++			 api_major, api_minor, build);
++	}
++
++	*written = size;
++	return FW_UPLOAD_ERR_NONE;
++
++free_err:
++	__free_pages(p, order);
++fw_err:
++	return ret;
++}
++
++static const struct fw_upload_ops snp_dlfw_ex_ops = {
++        .prepare = snp_dlfw_ex_prepare,
++        .write = snp_dlfw_ex_write,
++        .poll_complete = snp_dlfw_ex_poll_complete,
++        .cancel = snp_dlfw_ex_cancel,
++};
++
++static void sev_snp_dev_init_firmware_upload(struct sev_device *sev)
++{
++	struct fw_upload *fwl;
++
++	fwl = firmware_upload_register(THIS_MODULE, sev->dev, "snp_dlfw_ex", &snp_dlfw_ex_ops, sev);
++
++	if (IS_ERR(fwl))
++		dev_err(sev->dev, "SEV firmware upload failed to initialize, err %ld\n", PTR_ERR(fwl));
++
++	sev->fwl = fwl;
++	mutex_init(&sev->fw_lock);
++}
++
++static void sev_snp_destroy_firmware_upload(struct sev_device *sev)
++{
++	firmware_upload_unregister(sev->fwl);
++}
++
++/*
++ * After a gctx is created, it is used by snp_launch_start before getting
++ * bound to an asid. The launch protocol allocates an asid before creating a
++ * matching gctx page, so there should never be more unbound gctx pages than
++ * there are possible SNP asids.
++ *
++ * The unbound gctx pages must be updated after executing DOWNLOAD_FIRMWARE_EX
++ * and before committing the firmware.
++ */
++static void snp_gctx_create_track_locked(struct sev_device *sev, void *data)
++{
++	struct sev_data_snp_addr *gctx_create = data;
++
++	/* This condition should never happen, but is needed for memory safety. */
++	if (sev->snp_unbound_gctx_end >= sev->last_snp_asid) {
++		dev_warn(sev->dev, "Too many unbound SNP GCTX pages to track\n");
++		return;
++	}
++
++	sev->snp_unbound_gctx_pages[sev->snp_unbound_gctx_end] = gctx_create->address;
++	sev->snp_unbound_gctx_end++;
++}
++
++/*
++ * PREREQUISITE: The snp_activate command was successful, meaning the asid
++ * is in the acceptable range 1..sev->last_snp_asid.
++ *
++ * The gctx_paddr must be in the unbound gctx buffer.
++ */
++static void snp_activate_track_locked(struct sev_device *sev, void *data)
++{
++	struct sev_data_snp_activate *data_activate = data;
++
++	sev->snp_asid_to_gctx_pages_map[data_activate->asid] = data_activate->gctx_paddr;
++
++	for (int i = 0; i < sev->snp_unbound_gctx_end; i++) {
++		if (sev->snp_unbound_gctx_pages[i] == data_activate->gctx_paddr) {
++			/*
++			 * Swap the last unbound gctx page with the now-bound
++			 * gctx page to shrink the buffer.
++			 */
++			sev->snp_unbound_gctx_end--;
++			sev->snp_unbound_gctx_pages[i] = sev->snp_unbound_gctx_pages[sev->snp_unbound_gctx_end];
++			sev->snp_unbound_gctx_pages[sev->snp_unbound_gctx_end] = 0;
++			break;
++		}
++	}
++}
++
++static void snp_decommission_track_locked(struct sev_device *sev, void *data)
++{
++	struct sev_data_snp_addr *data_decommission = data;
++
++	for (int i = 1; i <= sev->last_snp_asid; i++) {
++		if (sev->snp_asid_to_gctx_pages_map[i] == data_decommission->address) {
++			sev->snp_asid_to_gctx_pages_map[i] = 0;
++			break;
++		}
++	}
++}
++
++static void snp_cmd_bookkeeping_locked(int cmd, struct sev_device *sev, void *data)
++{
++	if (!sev->snp_asid_to_gctx_pages_map)
++		return;
++
++	switch (cmd)
++	{
++	case SEV_CMD_SNP_GCTX_CREATE:
++		snp_gctx_create_track_locked(sev, data);
++		break;
++	case SEV_CMD_SNP_ACTIVATE:
++		snp_activate_track_locked(sev, data);
++		break;
++	case SEV_CMD_SNP_DECOMMISSION:
++		snp_decommission_track_locked(sev, data);
++		break;
++	default:
++		;
++	}
++}
++
++static int sev_snp_platform_init_firmware_upload(struct sev_device *sev)
++{
++	u32 max_snp_asid;
++
++	/*
++	 * cpuid_edx(0x8000001f) is the minimum SEV ASID, hence the exclusive
++	 * maximum SEV-SNP ASID. Save the inclusive maximum to avoid confusing
++	 * logic elsewhere.
++	 */
++	max_snp_asid = cpuid_edx(0x8000001f);
++	sev->last_snp_asid = max_snp_asid - 1;
++	if (sev->last_snp_asid) {
++		sev->snp_asid_to_gctx_pages_map = devm_kmalloc_array(
++			sev->dev, max_snp_asid * 2, sizeof(u64), GFP_KERNEL | __GFP_ZERO);
++		sev->snp_unbound_gctx_pages = &sev->snp_asid_to_gctx_pages_map[max_snp_asid];
++		if (!sev->snp_asid_to_gctx_pages_map) {
++			kfree(snp_range_list);
++			dev_err(sev->dev,
++				"SEV-SNP: snp_asid_to_gctx_pages_map memory allocation failed\n");
++			return -ENOMEM;
++		}
++	}
++	return 0;
++}
++
++#else
++
++static int sev_snp_platform_init_firmware_upload(struct sev_device *sev) { return 0; }
++static void sev_snp_dev_init_firmware_upload(struct sev_device *sev) { }
++static void sev_snp_destroy_firmware_upload(struct sev_device *sev) { }
++static void snp_cmd_bookkeeping_locked(int cmd, struct sev_device *sev, void *data) { }
++#endif
++
+ int sev_dev_init(struct psp_device *psp)
+ {
+ 	struct device *dev = psp->dev;
+@@ -2265,6 +2643,8 @@ int sev_dev_init(struct psp_device *psp)
+ 	if (ret)
+ 		goto e_irq;
+ 
++	sev_snp_dev_init_firmware_upload(sev);
++
+ 	dev_notice(dev, "sev enabled\n");
+ 
+ 	return 0;
+@@ -2343,6 +2723,8 @@ void sev_dev_destroy(struct psp_device *psp)
+ 		kref_put(&misc_dev->refcount, sev_exit);
+ 
+ 	psp_clear_sev_irq_handler(psp);
++
++	sev_snp_destroy_firmware_upload(sev);
+ }
+ 
+ static int snp_shutdown_on_panic(struct notifier_block *nb,
+diff --git a/drivers/crypto/ccp/sev-dev.h b/drivers/crypto/ccp/sev-dev.h
+index 3e4e5574e88a3..d6280688675d9 100644
+--- a/drivers/crypto/ccp/sev-dev.h
++++ b/drivers/crypto/ccp/sev-dev.h
+@@ -57,6 +57,20 @@ struct sev_device {
+ 	bool cmd_buf_backup_active;
+ 
+ 	bool snp_initialized;
++
++#ifdef CONFIG_FW_UPLOAD
++	/* Lock to protect fw_cancel */
++	struct mutex fw_lock;
++	struct fw_upload *fwl;
++	bool fw_cancel;
++
++	/* Firmware update management. */
++	u32 last_snp_asid;
++	bool synthetic_restore_required;
++	u64 *snp_asid_to_gctx_pages_map;
++	u64 *snp_unbound_gctx_pages;
++	u32 snp_unbound_gctx_end;
++#endif /* CONFIG_FW_UPLOAD */
+ };
+ 
+ int sev_dev_init(struct psp_device *psp);
+diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+index 903ddfea85850..61ed2f8179946 100644
+--- a/include/linux/psp-sev.h
++++ b/include/linux/psp-sev.h
+@@ -16,6 +16,15 @@
+ 
+ #define SEV_FW_BLOB_MAX_SIZE	0x4000	/* 16KB */
+ 
++/*
++ * SEV FW expects the physical address given to it to be 32
++ * byte aligned. Memory allocated has structure placed at the
++ * beginning followed by the firmware being passed to the SEV
++ * FW. Allocate enough memory for data structure + alignment
++ * padding + SEV FW.
++ */
++#define SEV_FW_ALIGNMENT	32
++
+ /**
+  * SEV platform state
+  */
+@@ -185,6 +194,22 @@ struct sev_data_download_firmware {
+ 	u32 len;				/* In */
+ } __packed;
+ 
++/**
++ * struct sev_data_download_firmware_ex - DOWNLOAD_FIRMWARE_EX command parameters
++ *
++ * @length: length of this command buffer
++ * @address: physical address of firmware image
++ * @len: len of the firmware image
++ * @commit: automatically commit the newly installed image
++ */
++struct sev_data_download_firmware_ex {
++	u32 cmdlen;				/* In */
++	u32 reserved;				/* in */
++	u64 address;				/* In */
++	u32 len;				/* In */
++	u32 commit:1; 				/* In */
++} __packed;
++
+ /**
+  * struct sev_data_get_id - GET_ID command parameters
+  *
+@@ -797,10 +822,13 @@ struct sev_data_snp_shutdown_ex {
+  * @probe: True if this is being called as part of CCP module probe, which
+  *  will defer SEV_INIT/SEV_INIT_EX firmware initialization until needed
+  *  unless psp_init_on_probe module param is set
++ * @supports_download_firmware_ex: True if legacy SEV/SEV-ES guests are not
++ *  being launched via KVM
+  */
+ struct sev_platform_init_args {
+ 	int error;
+ 	bool probe;
++	bool supports_download_firmware_ex;
+ };
+ 
+ /**
+diff --git a/include/uapi/linux/psp-sev.h b/include/uapi/linux/psp-sev.h
+index 832c15d9155bd..936464d4f282a 100644
+--- a/include/uapi/linux/psp-sev.h
++++ b/include/uapi/linux/psp-sev.h
+@@ -80,6 +80,11 @@ typedef enum {
+ 	SEV_RET_INVALID_PAGE_OWNER,
+ 	SEV_RET_INVALID_PAGE_AEAD_OFLOW,
+ 	SEV_RET_RMP_INIT_REQUIRED,
++	SEV_RET_BAD_SVN,
++	SEV_RET_BAD_VERSION,
++	SEV_RET_SHUTDOWN_REQUIRED,
++	SEV_RET_UPDATE_FAILED,
++	SEV_RET_RESTORE_REQUIRED,
+ 	SEV_RET_MAX,
+ } sev_ret_code;
+ 
 -- 
- -----Open up your eyes, open up your mind, open up your code -------   
-/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
-\        dave @ treblig.org |                               | In Hex /
- \ _________________________|_____ http://www.treblig.org   |_______/
+2.47.0.163.g1226f6d8fa-goog
+
