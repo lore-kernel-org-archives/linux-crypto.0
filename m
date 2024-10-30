@@ -1,264 +1,142 @@
-Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CC272144A7
-	for <linux-crypto@vger.kernel.org>; Wed, 30 Oct 2024 21:34:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 535582178ED
+	for <linux-crypto@vger.kernel.org>; Wed, 30 Oct 2024 21:41:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730324085; cv=none; b=JMot2rCc9WiCzUtCJe3+xa+6d+k3nmO6luI8uZoti49ARWpQ8kl5xpsmltFn1aB+lYzGHX+zD105h1FDZ0YyKh+LgOjcpLEKxz4C7WeAvYvTHePY2lM4OOTyR+uZlisTLVmDmqneF6x8mEK4nH/6Qxd6nR5WUqyIWouB5bf6RHI=
+	t=1730324507; cv=none; b=KplEHnaa233UCCORTo67Smr33RaobLKfG91vBWUS3CLJ/l15PUdmM95EWFDr+sEi6D2aUfgPzWyZ1/+2pICB7vjendWWhSm+T1xOqShXYQfQTWGfxH+G9B3Gga5nRBTXg88PPJ6ETDXIEtx2bEeYaTuZbMIT0BZbm7U/4AwkZv4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730324085; c=relaxed/simple;
-	bh=DwPw63JU7YU7EA4xKffPQMQHFNG7sL8srdFoP5jrOqA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=D0nAxv4TAbGvboADhQ7nxm/g8SSPYFWDzJGqKsPTn9wk7wlJdek6YVVHGGVBNYX+HAklTN05d3b5bWS9JDx+5xIW2WP6eKMEDJ3zaZsBBf3EPWzi2H2JzxwVVl69FuMJPnyztlU+9ue5wHAGOEqfKcoHOKtbv4Dkua9kgl3cqzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=BmyKI3+I; arc=none smtp.client-ip=209.85.166.53
+	s=arc-20240116; t=1730324507; c=relaxed/simple;
+	bh=RvmR17dczNIeoFW11OEaNexBaQ6D/CYv7PqXzDryWXg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rsBCwuMyLnYnSUjQTUtn1HSNp1zBcBiCmmYy0FXkhyAVWJSpPw92iM/RvVIe6so3o0EVudtbz0dTBiozJoay18ot2W6lWFA4YCGcrDMXtAZVVYud0PK8O5ZEWZrC3c9u6PdggKTGA2EFz95cfSGXsGKUa2t+f9IYvZsxUT0lLDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=TxTjl6FG; arc=none smtp.client-ip=209.85.219.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="BmyKI3+I"
-Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-83b2a41b81cso11755339f.0
-        for <linux-crypto@vger.kernel.org>; Wed, 30 Oct 2024 14:34:42 -0700 (PDT)
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="TxTjl6FG"
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-6cbf0e6414aso1794806d6.1
+        for <linux-crypto@vger.kernel.org>; Wed, 30 Oct 2024 14:41:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1730324082; x=1730928882; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=doqscSHfpShWQHBZSY/c6QnT4Gkd7L46DSkSZNKlIZY=;
-        b=BmyKI3+IyT9mQNM2jZdbOelveoYFZFNWGi5ps6Of3GDUgRgCjRuq+P3F/pB2R6MR5A
-         mvL/Xt+SqV76vjfQk//nfCdgq70MzyU89iJ5rOHFQB7yzF0G+J9kpYoGocs9btFosy3s
-         rta3ZMFHnBAXuqmXfaP3XJWliYzUieaETgmAs=
+        d=broadcom.com; s=google; t=1730324504; x=1730929304; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=bfzdBjgNBayDdNyFN0s82vygdMnTioCx1ueOKnyTHa8=;
+        b=TxTjl6FG4YAFHPOizymZIOzxBw4byQ+bZz8gt1c52roJc/U+xGBa4d2lj+ZWOn9WT/
+         giOM8e0jzerD00DCxeV7VFZbjBPQ1V4KWbbmR/MzGM5B7IXql38wtIHZwUi6UOVsW3AT
+         hR45fGb4tMBslrXn/MHrS7XZpvnJnY7RG0/bk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730324082; x=1730928882;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=doqscSHfpShWQHBZSY/c6QnT4Gkd7L46DSkSZNKlIZY=;
-        b=mSvyrjTIvwxZSkmdJgj5PtY7gjbehFi74WqJGLdpmMvStRQ/zvTdzSO82VTutO4XpO
-         iB7JDUZiWrSUWM33P1jfNtfzcIR6P/bHmqEI5SvgUHXD3D9nuDilqCJYPRo1bqQHspPb
-         mSoP8ZbjgLOfXI3XCFlQaHvPC4EEStkF1HvuoYzMBUf+8di29AC2BEaitORO9TmScpIi
-         wLeM2fXGuROvgef8Cm3aqs4AO4o+Onkwx6qGIEpWYBz3dJ6nfQWScVKpp0kr5DlkaVNX
-         816RkUkq+JODV7+2VQGiA4khLqfFOtoJ/aw3r0rP188oc8aG3JQ6Jk9mBZeSmZQLIw6t
-         jbTA==
-X-Forwarded-Encrypted: i=1; AJvYcCVGxYLYxs+KWbYnJTf5+ReCaSkQboKHTfZ5Gmf4vXI0BUyf6KQgqg3cWtD0o/gbk1G7Ej3k1MQ/koEAM+g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTPl8VzYIXy7ilBM/pNzBMkJdACL0dhv4nhjDw+GQPBry8e5Ox
-	IaN+Di0K7YRhDEDJpbXjaRWum/BgtCOolxLFqd5I0ktm4KmaCROSVJutcrmp6A==
-X-Google-Smtp-Source: AGHT+IFUFxxXzGw5Yp5MtqvNUqpgpiZmswpQB9hlCkuvqvVD/RBmS8Oc3Oz2FDxa1m2q/bm3wo280Q==
-X-Received: by 2002:a05:6e02:b22:b0:3a4:e63e:550 with SMTP id e9e14a558f8ab-3a4ed27817dmr169550735ab.1.1730324082208;
-        Wed, 30 Oct 2024 14:34:42 -0700 (PDT)
-Received: from lbrmn-mmayer.ric.broadcom.net ([192.19.161.248])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7ee45a13178sm33150a12.90.2024.10.30.14.34.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Oct 2024 14:34:41 -0700 (PDT)
-Received: by lbrmn-mmayer.ric.broadcom.net (Postfix, from userid 1000)
-	id EDD4F88A; Wed, 30 Oct 2024 14:34:40 -0700 (PDT)
-From: Markus Mayer <mmayer@broadcom.com>
-To: Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Aurelien Jarno <aurelien@aurel32.net>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Francesco Dolcini <francesco.dolcini@toradex.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	Rob Herring <robh@kernel.org>
-Cc: Markus Mayer <mmayer@broadcom.com>,
-	Device Tree Mailing List <devicetree@vger.kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: [PATCH 2/2] hwrng: bcm74110 - Add Broadcom BCM74110 RNG driver
-Date: Wed, 30 Oct 2024 14:33:55 -0700
-Message-ID: <20241030213400.802264-3-mmayer@broadcom.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20241030213400.802264-1-mmayer@broadcom.com>
-References: <20241030213400.802264-1-mmayer@broadcom.com>
+        d=1e100.net; s=20230601; t=1730324504; x=1730929304;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bfzdBjgNBayDdNyFN0s82vygdMnTioCx1ueOKnyTHa8=;
+        b=nTRd1KBbeXITbi6VjQY1UuMy4kcO5ssdENrxEGTeXzosaYmAjyQyqEi7vkd4fRUo3A
+         230/Fj3k7Ic8gd1g88watTcYa22Rl+coR9MzpdDnV9TubvuKyYiD+rR0QlnY/cKTWnUC
+         ZnNl25JZYQulaqPJsy1wxvH09vL5qqbTTBrvCZR/EG29UcnJqESSE+9qPGXqcyVXax9Z
+         BXAOdtPpIG+WtR8AR1LFYHDz5Bpx4q5RRset50plNwQuxyCWvCBZsE/A8XTHfP39M+Kt
+         ncgMOXuoRrXjAX7RRCTK6gk+qHzzeg+dUYK562CcDb6ZMxZB3G92Er1O90faakChrp4Y
+         cQZw==
+X-Forwarded-Encrypted: i=1; AJvYcCUfndCG6T6HsbWONsrBpdzgfXPBJ1ApfiLBaQrNsAx51mSUOEJ0zRA0rn7hCgpfSN00W33Jk/A5YM/7zW4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPTIVTlm8AiLkz7gnfbiKmla0AG9GN0rsAwbfQ/RK703jYKNtX
+	jZTt7b/mzN1/ybx/InJk198sBQS+DqL8or6E7IE5hLd4y7MtstQQTNPdfNSDWw==
+X-Google-Smtp-Source: AGHT+IFLfa1DPSp5HPKZWtt7TUZnjzOaRmXwS60hSjSPPEa5OJdyOUcDPqxoGWS8IaPVhryI4Qexwg==
+X-Received: by 2002:a05:6214:1645:b0:6d3:456e:947 with SMTP id 6a1803df08f44-6d3456e0a89mr50320226d6.14.1730324504105;
+        Wed, 30 Oct 2024 14:41:44 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d35415a62asm644386d6.80.2024.10.30.14.41.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 30 Oct 2024 14:41:42 -0700 (PDT)
+Message-ID: <c6b02317-e65f-444a-906d-e56f33dac9f4@broadcom.com>
+Date: Wed, 30 Oct 2024 14:41:38 -0700
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] hwrng: bcm74110 - Add Broadcom BCM74110 RNG driver
+To: Markus Mayer <mmayer@broadcom.com>, Olivia Mackall <olivia@selenic.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ Aurelien Jarno <aurelien@aurel32.net>, Conor Dooley <conor+dt@kernel.org>,
+ Daniel Golle <daniel@makrotopia.org>,
+ Francesco Dolcini <francesco.dolcini@toradex.com>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+ Rob Herring <robh@kernel.org>
+Cc: Device Tree Mailing List <devicetree@vger.kernel.org>,
+ Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+References: <20241030213400.802264-1-mmayer@broadcom.com>
+ <20241030213400.802264-3-mmayer@broadcom.com>
+Content-Language: en-US
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
+ xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
+ M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
+ JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
+ PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
+ KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
+ AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
+ IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
+ ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
+ bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
+ Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
+ tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
+ TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
+ zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
+ WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
+ IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
+ U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
+ 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
+ pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
+ MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
+ IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
+ gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
+ obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
+ N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
+ CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
+ C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
+ wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
+ EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
+ fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
+ MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
+ 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
+ 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
+In-Reply-To: <20241030213400.802264-3-mmayer@broadcom.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Add a driver for the random number generator present on the Broadcom
-BCM74110 SoC.
+On 10/30/24 14:33, Markus Mayer wrote:
+> Add a driver for the random number generator present on the Broadcom
+> BCM74110 SoC.
+> 
+> Signed-off-by: Markus Mayer <mmayer@broadcom.com>
+> ---
+>   drivers/char/hw_random/Kconfig        |  14 +++
+>   drivers/char/hw_random/Makefile       |   1 +
+>   drivers/char/hw_random/bcm74110-rng.c | 125 ++++++++++++++++++++++++++
+>   3 files changed, 140 insertions(+)
+>   create mode 100644 drivers/char/hw_random/bcm74110-rng.c
+> 
+> diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+> index b51d9e243f35..90ae35aeb23a 100644
+> --- a/drivers/char/hw_random/Kconfig
+> +++ b/drivers/char/hw_random/Kconfig
+> @@ -99,6 +99,20 @@ config HW_RANDOM_BCM2835
+>   
+>   	  If unsure, say Y.
+>   
+> +config HW_RANDOM_BCM74110
+> +	tristate "Broadcom BCM74110 Random Number Generator support"
+> +	depends on ARCH_BCM2835 || ARCH_BCM_NSP || ARCH_BCM_5301X || \
+> +		   ARCH_BCMBCA || BCM63XX || ARCH_BRCMSTB || COMPILE_TEST
 
-Signed-off-by: Markus Mayer <mmayer@broadcom.com>
----
- drivers/char/hw_random/Kconfig        |  14 +++
- drivers/char/hw_random/Makefile       |   1 +
- drivers/char/hw_random/bcm74110-rng.c | 125 ++++++++++++++++++++++++++
- 3 files changed, 140 insertions(+)
- create mode 100644 drivers/char/hw_random/bcm74110-rng.c
-
-diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-index b51d9e243f35..90ae35aeb23a 100644
---- a/drivers/char/hw_random/Kconfig
-+++ b/drivers/char/hw_random/Kconfig
-@@ -99,6 +99,20 @@ config HW_RANDOM_BCM2835
- 
- 	  If unsure, say Y.
- 
-+config HW_RANDOM_BCM74110
-+	tristate "Broadcom BCM74110 Random Number Generator support"
-+	depends on ARCH_BCM2835 || ARCH_BCM_NSP || ARCH_BCM_5301X || \
-+		   ARCH_BCMBCA || BCM63XX || ARCH_BRCMSTB || COMPILE_TEST
-+	default HW_RANDOM
-+	help
-+	  This driver provides kernel-side support for the Random Number
-+	  Generator hardware found on the Broadcom BCM74110 SoCs.
-+
-+	  To compile this driver as a module, choose M here: the
-+	  module will be called bcm74110-rng
-+
-+	  If unsure, say Y.
-+
- config HW_RANDOM_IPROC_RNG200
- 	tristate "Broadcom iProc/STB RNG200 support"
- 	depends on ARCH_BCM_IPROC || ARCH_BCM2835 || ARCH_BRCMSTB || COMPILE_TEST
-diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
-index 01f012eab440..283791f5462d 100644
---- a/drivers/char/hw_random/Makefile
-+++ b/drivers/char/hw_random/Makefile
-@@ -31,6 +31,7 @@ obj-$(CONFIG_HW_RANDOM_POWERNV) += powernv-rng.o
- obj-$(CONFIG_HW_RANDOM_HISI)	+= hisi-rng.o
- obj-$(CONFIG_HW_RANDOM_HISTB) += histb-rng.o
- obj-$(CONFIG_HW_RANDOM_BCM2835) += bcm2835-rng.o
-+obj-$(CONFIG_HW_RANDOM_BCM74110) += bcm74110-rng.o
- obj-$(CONFIG_HW_RANDOM_IPROC_RNG200) += iproc-rng200.o
- obj-$(CONFIG_HW_RANDOM_ST) += st-rng.o
- obj-$(CONFIG_HW_RANDOM_XGENE) += xgene-rng.o
-diff --git a/drivers/char/hw_random/bcm74110-rng.c b/drivers/char/hw_random/bcm74110-rng.c
-new file mode 100644
-index 000000000000..5c64148e91f1
---- /dev/null
-+++ b/drivers/char/hw_random/bcm74110-rng.c
-@@ -0,0 +1,125 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (c) 2024 Broadcom
-+ */
-+
-+#define pr_fmt(fmt)	KBUILD_MODNAME ": " fmt
-+
-+#include <linux/module.h>
-+#include <linux/mod_devicetable.h>
-+#include <linux/kernel.h>
-+#include <linux/io.h>
-+#include <linux/delay.h>
-+#include <linux/platform_device.h>
-+#include <linux/random.h>
-+#include <linux/hw_random.h>
-+
-+#define HOST_REV_ID		0x00
-+#define HOST_FIFO_DEPTH		0x04
-+#define HOST_FIFO_COUNT		0x08
-+#define HOST_FIFO_THRESHOLD	0x0c
-+#define HOST_FIFO_DATA		0x10
-+
-+#define HOST_FIFO_COUNT_MASK		0xffff
-+
-+/* Delay range in microseconds */
-+#define FIFO_DELAY_MIN_US		3
-+#define FIFO_DELAY_MAX_US		7
-+#define FIFO_DELAY_MAX_COUNT		10
-+
-+struct bcm74110_priv {
-+	void __iomem *base;
-+};
-+
-+static inline int bcm74110_rng_fifo_count(void __iomem *mem)
-+{
-+	return readl_relaxed(mem) & HOST_FIFO_COUNT_MASK;
-+}
-+
-+static int bcm74110_rng_read(struct hwrng *rng, void *buf, size_t max,
-+			bool wait)
-+{
-+	struct bcm74110_priv *priv = (struct bcm74110_priv *)rng->priv;
-+	void __iomem *fc_addr = priv->base + HOST_FIFO_COUNT;
-+	void __iomem *fd_addr = priv->base + HOST_FIFO_DATA;
-+	unsigned underrun_count = 0;
-+	u32 max_words = max / sizeof(u32);
-+	u32 num_words;
-+	unsigned i;
-+
-+	/*
-+	 * We need to check how many words are available in the RNG FIFO. If
-+	 * there aren't any, we need to wait for some to become available.
-+	 */
-+	while ((num_words = bcm74110_rng_fifo_count(fc_addr)) == 0) {
-+		if (!wait)
-+			return 0;
-+		/*
-+		 * As a precaution, limit how long we wait. If the FIFO doesn't
-+		 * refill within the allotted time, return 0 (=no data) to the
-+		 * caller.
-+		 */
-+		if (likely(underrun_count < FIFO_DELAY_MAX_COUNT))
-+			usleep_range(FIFO_DELAY_MIN_US, FIFO_DELAY_MAX_US);
-+		else
-+			return 0;
-+		underrun_count++;
-+	}
-+	if (num_words > max_words)
-+		num_words = max_words;
-+
-+	/* Bail early if we run out of random numbers unexpectedly */
-+	for (i = 0; i < num_words && bcm74110_rng_fifo_count(fc_addr) > 0; i++)
-+		((u32 *)buf)[i] = readl_relaxed(fd_addr);
-+
-+	return i * sizeof(u32);
-+}
-+
-+static struct hwrng bcm74110_hwrng = {
-+	.read = bcm74110_rng_read,
-+};
-+
-+static int bcm74110_rng_probe(struct platform_device *pdev)
-+{
-+	struct device *dev = &pdev->dev;
-+	struct bcm74110_priv *priv;
-+	int rc;
-+
-+	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
-+	if (!priv)
-+		return -ENOMEM;
-+
-+	bcm74110_hwrng.name = pdev->name;
-+	bcm74110_hwrng.priv = (unsigned long)priv;
-+
-+	priv->base = devm_platform_ioremap_resource(pdev, 0);
-+	if (IS_ERR(priv->base))
-+		return PTR_ERR(priv->base);
-+
-+	rc = devm_hwrng_register(dev, &bcm74110_hwrng);
-+	if (rc)
-+		dev_err(dev, "hwrng registration failed (%d)\n", rc);
-+	else
-+		dev_info(dev, "hwrng registered\n");
-+
-+	return rc;
-+}
-+
-+static const struct of_device_id bcm74110_rng_match[] = {
-+	{ .compatible	= "brcm,bcm74110-rng", },
-+	{},
-+};
-+MODULE_DEVICE_TABLE(of, bcm74110_rng_match);
-+
-+static struct platform_driver bcm74110_rng_driver = {
-+	.driver = {
-+		.name = KBUILD_MODNAME,
-+		.of_match_table = bcm74110_rng_match,
-+	},
-+	.probe	= bcm74110_rng_probe,
-+};
-+module_platform_driver(bcm74110_rng_driver);
-+
-+MODULE_AUTHOR("Markus Mayer <mmayer@broadcom.com>");
-+MODULE_DESCRIPTION("BCM 74110 Random Number Generator (RNG) driver");
-+MODULE_LICENSE("GPL v2");
+AFAICT this driver is only present on STB chips so limiting to 
+ARCH_BRCMSTB || COMPILE_TEST should suffice for now.
 -- 
-2.46.0
-
+Florian
