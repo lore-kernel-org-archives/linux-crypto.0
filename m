@@ -1,121 +1,64 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 511C91F4704
-	for <linux-crypto@vger.kernel.org>; Wed, 30 Oct 2024 11:28:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FA86433D5
+	for <linux-crypto@vger.kernel.org>; Wed, 30 Oct 2024 16:22:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730287719; cv=none; b=IXnfKNFZaR++s9zSrTRTBb/qoymKcvhza1ougEcxI4soFHLuYXRh8d1UiJvIyNmg5BiOzByuZbXG45T/ZEoXt+N6XAyNOpc+MaBpNhxgtcjncuAp2fT8lGnVjomBevSW5N85iNPeZIq/1hXFz6OcSqQ6ViS6xukd6MpbElrx0hw=
+	t=1730305366; cv=none; b=iU3+7rQoSi1J4I0X0yzFd1JBWljeh/mVIulFEaTqQ3HmsS/8/oI/HAMD8b/Ekux8CxIoTArn2QdqV6OYGbW+8cfrlTkaEXGE15gYR71C6zvMWNtHlp5GgNX0hoCQBeXYmwkVZcFkP2M6jeAA63P/gu+r8frMmzs8q3GdrBVGcAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730287719; c=relaxed/simple;
-	bh=RcTa7mPaWn9S/3FL+we6iyllf4n7RFykRGESqGJxd90=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=K6IMdEcMGl9BJIuWXmbgEEnz5yejVZJ9BPBjEtnMdPWvML6zhonfv3YjVpLo6R4O1hSrXtTgpXYQwE85BUuc+gTamIfcujO3U9CXgYMKGzCAIh3mrpH/+Ng8yFimsFyBanTSRuGq+O03DA8HRJiZsBPrr7y2tHf4EfM2kcAmQQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SnxrXjDi; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1730305366; c=relaxed/simple;
+	bh=Rz2u+giaMcc6t+VFi1N+mCWc9dZoL+swNFNm9j/rOPE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NwpHkUnab/gxovumo0gVYTxhQlE19AD/cMZnwB5vLlbVH7Mhn6OVy1Zn7Jk9rzfdyQBPsFpr6akCmztobu4oPUtDj4xK0ibhzX/FDWVFoGgl9178RyNkT4WlEajbaOzrJKa8ZwytJLoAGyqn0JH+vgCjQb5OlteJJPE5FbeXltE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=HmrARMnf; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SnxrXjDi"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730287715;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AonUKd9JFeAmu2FkelnO1Z47g8svJdBoVMsQtMVmtG0=;
-	b=SnxrXjDimBjgUX6T95zJml/beYrou6O23cav1atLuZ/PasMamrDfiRFyJr7i1tE76MQXRr
-	m5O55dJfT/0xTQeVkVseGf2oMCZEzHPzF/5WU07H9HrT6TPFULC7xCkaVsbZDPIAm6b7TF
-	BMMd2oy45qkbUkiNau0cdZtC3nRXGsA=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-394-KJ1hDsLTMD-KsO83aKddgw-1; Wed, 30 Oct 2024 07:28:34 -0400
-X-MC-Unique: KJ1hDsLTMD-KsO83aKddgw-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a99fa9f0c25so446940366b.3
-        for <linux-crypto@vger.kernel.org>; Wed, 30 Oct 2024 04:28:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730287713; x=1730892513;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AonUKd9JFeAmu2FkelnO1Z47g8svJdBoVMsQtMVmtG0=;
-        b=oSGJ1+IXSdEMmdMr4YHsAbR7zp+f0BL0GX/XToGnwPjBmzsRkwAYO7lgBAOIjT+7r6
-         njKZMhDAyU83ZHFru0IG2d1/59WJDpPOAKbY9Y9AvzFuKqJL/r7q/UhI9haEwkjVIli5
-         KpDHRN8NMmqKEdixrFQE1FVZvw33uIY3SHZMe2os/VsfM6hVml8NIYRSZg2ACmgAQn5V
-         vH6Nr9ekkSztuOu+vxFlzUNvkypnvmoO5mwsw/MRfPc/gNTf0BcDLJACwYbhJYm/MFQd
-         O4dwVTxDk1z53Lg2noWonQxDoVUtTsTxxadx8VReVs24WZBha1g6mbmsSBcQGnEALksZ
-         6q6w==
-X-Forwarded-Encrypted: i=1; AJvYcCXqX6fIKfVM3lyZ6g7N53DBN/MxTC5Ip5+K0FobNSqCM6mrD7Y2cybDupe1bhF67NpzwtSSHloUb8cJSfA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyU1lwekbEVje02ykXLPtL0zk1CcuQxiGfnF0l2hVsPIqSl/zmf
-	KiCc/2OpsnHfPdXzlPFrfLk9Rqu4PX1QAXiJtLsivk9dDjyMzibFtNxQmZW55z12EBkrE6yUIA4
-	5loZCIbHM6BoY/9tAfERl/Vau1Y98YQhb4MxESjZvqEzXaryAYuo+o8nMc9cf5A==
-X-Received: by 2002:a17:907:7e9e:b0:a99:61f7:8413 with SMTP id a640c23a62f3a-a9de5ed3f62mr1263546766b.23.1730287712719;
-        Wed, 30 Oct 2024 04:28:32 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IECBDZhscrw4tCBL0o4Kt6cCMrv9Zz8RT8gALW9gtsyNUpNxQK4eXUsQ13M5SbZdU3WEUTpkA==
-X-Received: by 2002:a17:907:7e9e:b0:a99:61f7:8413 with SMTP id a640c23a62f3a-a9de5ed3f62mr1263541666b.23.1730287712225;
-        Wed, 30 Oct 2024 04:28:32 -0700 (PDT)
-Received: from eisenberg.fritz.box ([2001:16b8:3db7:f800:98bb:372a:45f9:41e4])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9b30f58991sm557324566b.159.2024.10.30.04.28.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Oct 2024 04:28:31 -0700 (PDT)
-From: Philipp Stanner <pstanner@redhat.com>
-To: Jonathan Corbet <corbet@lwn.net>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Niklas Cassel <cassel@kernel.org>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Boris Brezillon <bbrezillon@kernel.org>,
-	Arnaud Ebalard <arno@natisbad.org>,
-	Srujana Challa <schalla@marvell.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
-	Kalle Valo <kvalo@kernel.org>,
-	Jon Mason <jdmason@kudzu.us>,
-	Dave Jiang <dave.jiang@intel.com>,
-	Allen Hubbe <allenbh@gmail.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Kevin Cernekee <cernekee@gmail.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jiri Slaby <jirislaby@kernel.org>,
-	Jaroslav Kysela <perex@perex.cz>,
-	Takashi Iwai <tiwai@suse.com>,
-	Mark Brown <broonie@kernel.org>,
-	David Lechner <dlechner@baylibre.com>,
-	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
-	Philipp Stanner <pstanner@redhat.com>,
-	Jie Wang <jie.wang@intel.com>,
-	Michal Witwicki <michal.witwicki@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Adam Guerin <adam.guerin@intel.com>,
-	Damian Muszynski <damian.muszynski@intel.com>,
-	Bharat Bhushan <bbhushan2@marvell.com>,
-	Nithin Dabilpuram <ndabilpuram@marvell.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
-	Benjamin Berg <benjamin.berg@intel.com>,
-	Breno Leitao <leitao@debian.org>,
-	Yedidya Benshimol <yedidya.ben.shimol@intel.com>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	zhang jiao <zhangjiao2@cmss.chinamobile.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	=?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Cc: linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-ide@vger.kernel.org,
-	qat-linux@intel.com,
-	linux-crypto@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	ntb@lists.linux.dev,
-	linux-pci@vger.kernel.org,
-	linux-serial@vger.kernel.org,
-	linux-sound@vger.kernel.org
-Subject: [PATCH v6 10/10] PCI: Remove pcim_iomap_regions_request_all()
-Date: Wed, 30 Oct 2024 12:27:43 +0100
-Message-ID: <20241030112743.104395-11-pstanner@redhat.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241030112743.104395-1-pstanner@redhat.com>
-References: <20241030112743.104395-1-pstanner@redhat.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HmrARMnf"
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49UFeakd020725;
+	Wed, 30 Oct 2024 16:22:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=4vD9YnzGmIrFa639YpE3bkqFqu1kzuu+2SjwY1YmY
+	c4=; b=HmrARMnfAbKF24mhp1PH2FGUyO4XDqY4dHvkNESvFEAs4TNERFXEesw9P
+	OfYs0yxT1KUFB2bUOUMtY2FgpaQNNy3+gpsQGjSyQ64QDlf1tvMsWC4V3grMW50A
+	YgFpLbw+RR5QBNrTuAJZScbBtP5bT6deadJbWDjJXGAMaucPFloC1vxgaApmlXg0
+	NB0XwgtDOfXMuO0l7RrlKbEN8BnOJOP0lQoEwfQ4XGTHxzwK1ao/kjVlzSy94eWC
+	tGnD2zR755N4CTCvsFvfkGafnzmpCWW+RkEJI648QIDDYOB5kBgX42IhMRniXOT8
+	jBQ1d6SeKTJxyHH6l8grhPCnOySFA==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42kqnar6af-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 30 Oct 2024 16:22:41 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49UFZUZL028181;
+	Wed, 30 Oct 2024 16:22:40 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 42hb4y0x6y-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 30 Oct 2024 16:22:40 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49UGMaIW15270300
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 30 Oct 2024 16:22:36 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3E15620040;
+	Wed, 30 Oct 2024 16:22:36 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E04B820043;
+	Wed, 30 Oct 2024 16:22:35 +0000 (GMT)
+Received: from funtu2.fritz.box?044ibm.com (unknown [9.179.18.237])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 30 Oct 2024 16:22:35 +0000 (GMT)
+From: Harald Freudenberger <freude@linux.ibm.com>
+To: dengler@linux.ibm.com, herbert@gondor.apana.org.au, davem@davemloft.net,
+        hca@linux.ibm.com
+Cc: linux390-list@tuxmaker.boeblingen.de.ibm.com, linux-crypto@vger.kernel.org
+Subject: [PATCH v1 0/3] New s390 specific protected key hmac
+Date: Wed, 30 Oct 2024 17:22:32 +0100
+Message-ID: <20241030162235.363533-1-freude@linux.ibm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -123,115 +66,54 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: cf-_lgfTa27p1l1SLHltcfWnY6Bd1XS9
+X-Proofpoint-ORIG-GUID: cf-_lgfTa27p1l1SLHltcfWnY6Bd1XS9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=484
+ malwarescore=0 adultscore=0 clxscore=1015 impostorscore=0 spamscore=0
+ phishscore=0 priorityscore=1501 suspectscore=0 lowpriorityscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410300127
 
-pcim_iomap_regions_request_all() have been deprecated in
-commit e354bb84a4c1 ("PCI: Deprecate pcim_iomap_table(),
-pcim_iomap_regions_request_all()").
+Add support for protected key hmac ("phmac") for s390 arch.
 
-All users of this function have been ported to other interfaces by now.
+With the latest machine generation there is now support for
+protected key (that is a key wrapped by a master key stored
+in firmware) hmac for sha2 (sha224, sha256, sha384 and sha512)
+for the s390 specific CPACF instruction kmac.
 
-Remove pcim_iomap_regions_request_all().
+This patch adds support via 4 new shashes registered as
+phmac(sha224), phmac(sha256), phmac(sha384) and phmac(sha512).
 
-Signed-off-by: Philipp Stanner <pstanner@redhat.com>
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
----
- .../driver-api/driver-model/devres.rst        |  1 -
- drivers/pci/devres.c                          | 56 -------------------
- include/linux/pci.h                           |  2 -
- 3 files changed, 59 deletions(-)
+Please note that as of now, there is no selftest enabled for
+these shashes, but the implementation has been tested with
+testcases via AF_ALG interface. However, there may come an
+improvement soon to use the available clear key hmac selftests.
 
-diff --git a/Documentation/driver-api/driver-model/devres.rst b/Documentation/driver-api/driver-model/devres.rst
-index 5f2ee8d717b1..3a30cf4f6c0d 100644
---- a/Documentation/driver-api/driver-model/devres.rst
-+++ b/Documentation/driver-api/driver-model/devres.rst
-@@ -394,7 +394,6 @@ PCI
-   pcim_enable_device()		: after success, some PCI ops become managed
-   pcim_iomap()			: do iomap() on a single BAR
-   pcim_iomap_regions()		: do request_region() and iomap() on multiple BARs
--  pcim_iomap_regions_request_all() : do request_region() on all and iomap() on multiple BARs
-   pcim_iomap_table()		: array of mapped addresses indexed by BAR
-   pcim_iounmap()		: do iounmap() on a single BAR
-   pcim_iounmap_regions()	: do iounmap() and release_region() on multiple BARs
-diff --git a/drivers/pci/devres.c b/drivers/pci/devres.c
-index 2a64da5c91fb..319a477a2135 100644
---- a/drivers/pci/devres.c
-+++ b/drivers/pci/devres.c
-@@ -959,62 +959,6 @@ int pcim_request_all_regions(struct pci_dev *pdev, const char *name)
- }
- EXPORT_SYMBOL(pcim_request_all_regions);
- 
--/**
-- * pcim_iomap_regions_request_all - Request all BARs and iomap specified ones
-- *			(DEPRECATED)
-- * @pdev: PCI device to map IO resources for
-- * @mask: Mask of BARs to iomap
-- * @name: Name associated with the requests
-- *
-- * Returns: 0 on success, negative error code on failure.
-- *
-- * Request all PCI BARs and iomap regions specified by @mask.
-- *
-- * To release these resources manually, call pcim_release_region() for the
-- * regions and pcim_iounmap() for the mappings.
-- *
-- * This function is DEPRECATED. Don't use it in new code. Instead, use one
-- * of the pcim_* region request functions in combination with a pcim_*
-- * mapping function.
-- */
--int pcim_iomap_regions_request_all(struct pci_dev *pdev, int mask,
--				   const char *name)
--{
--	int bar;
--	int ret;
--	void __iomem **legacy_iomap_table;
--
--	ret = pcim_request_all_regions(pdev, name);
--	if (ret != 0)
--		return ret;
--
--	for (bar = 0; bar < PCI_STD_NUM_BARS; bar++) {
--		if (!mask_contains_bar(mask, bar))
--			continue;
--		if (!pcim_iomap(pdev, bar, 0))
--			goto err;
--	}
--
--	return 0;
--
--err:
--	/*
--	 * If bar is larger than 0, then pcim_iomap() above has most likely
--	 * failed because of -EINVAL. If it is equal 0, most likely the table
--	 * couldn't be created, indicating -ENOMEM.
--	 */
--	ret = bar > 0 ? -EINVAL : -ENOMEM;
--	legacy_iomap_table = (void __iomem **)pcim_iomap_table(pdev);
--
--	while (--bar >= 0)
--		pcim_iounmap(pdev, legacy_iomap_table[bar]);
--
--	pcim_release_all_regions(pdev);
--
--	return ret;
--}
--EXPORT_SYMBOL(pcim_iomap_regions_request_all);
--
- /**
-  * pcim_iounmap_regions - Unmap and release PCI BARs
-  * @pdev: PCI device to map IO resources for
-diff --git a/include/linux/pci.h b/include/linux/pci.h
-index 3b151c8331e5..b59197635c5c 100644
---- a/include/linux/pci.h
-+++ b/include/linux/pci.h
-@@ -2301,8 +2301,6 @@ void pcim_iounmap(struct pci_dev *pdev, void __iomem *addr);
- void __iomem * const *pcim_iomap_table(struct pci_dev *pdev);
- int pcim_request_region(struct pci_dev *pdev, int bar, const char *name);
- int pcim_iomap_regions(struct pci_dev *pdev, int mask, const char *name);
--int pcim_iomap_regions_request_all(struct pci_dev *pdev, int mask,
--				   const char *name);
- void pcim_iounmap_regions(struct pci_dev *pdev, int mask);
- void __iomem *pcim_iomap_range(struct pci_dev *pdev, int bar,
- 				unsigned long offset, unsigned long len);
--- 
-2.47.0
+Please note that v1 does not apply to the current crypto-2.6
+or linux-next kernel trees: For crypto-2.6 there is a hmac
+patch in the pipe and for linux-next there is a collision with
+the s390/configs/*defconfig. However, the hmac code itself
+is ready for a review cycle.
+
+Holger Dengler (3):
+  crypto: api - Adjust HASH_MAX_DESCSIZE for phmac context on s390
+  s390/crypto: Add protected key hmac subfunctions for KMAC
+  s390/crypto: New s390 specific shash phmac
+
+ arch/s390/configs/debug_defconfig |   1 +
+ arch/s390/configs/defconfig       |   1 +
+ arch/s390/crypto/Makefile         |   1 +
+ arch/s390/crypto/phmac_s390.c     | 484 ++++++++++++++++++++++++++++++
+ arch/s390/include/asm/cpacf.h     |  20 +-
+ drivers/crypto/Kconfig            |  12 +
+ include/crypto/hash.h             |   7 +
+ 7 files changed, 518 insertions(+), 8 deletions(-)
+ create mode 100644 arch/s390/crypto/phmac_s390.c
+
+--
+2.43.0
 
