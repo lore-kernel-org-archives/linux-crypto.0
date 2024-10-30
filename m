@@ -1,121 +1,154 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45821213120
-	for <linux-crypto@vger.kernel.org>; Wed, 30 Oct 2024 16:27:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7772A14F90;
+	Wed, 30 Oct 2024 21:11:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730305667; cv=none; b=rRYk2LI1dJOfaKJOalfvyhWFFueDGwJY4Y1mbHQLyrKV7vImWC5HmjDqXtb7kYtzbZ7pnKk7rVfdl/NFW+PgoDPjoHjROsThpIPALQuP57N3FIpy5wykisawrcPpJ4NSN19dUU945RJzbbXKjYA7ZU1MT9/IlyJEX0MgpUGpKCU=
+	t=1730322663; cv=none; b=btWfmSMr/y/PexnDcYKHsXtpXNtvOoMcmH7dgHgxrKly+fMraUK6qrpxsWQ313DbTQMV5OALmVP0x83nwoalXy3KJjQjwLfy4/HuLM/nNpLdOq9np4X3wU7q0UG+A6Vvs9Vp9kxEpKadfk2HM7DfXIQI6kp0bVMugfl3HGZ/uxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730305667; c=relaxed/simple;
-	bh=gH4dIYL4smVNrIm8Pdjp4brdNjsA/oQnwMKxP2RFcZo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Zg9zwrTbmDqbNwvbF0hAHo+d59/ZMhtjwjveH2thh0TsrzNgRIo1mZ2UlCrYLCbtEVl2PTx62E1tTz+L/Sa2zWP87wm83C2+9vESApavGrAUBFja5ehDp7r1dcw/jJq1k/T4f0AM9nIsm6CyuJCrivCs/Qf9jLNz886GKI2lUQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=G2fhZqFJ; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1730322663; c=relaxed/simple;
+	bh=49YpfPgybjyunYRlnfXehdPEI1xELY9QE5/uJT2eRPQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=OKdXsIS+svbrCFi7nUIkBnbKoaGi7E13i1aa1umAF0RR/uqCBe5bCk9ZqMOqoyWQecBz7Nm09ymc5GW6juw/Q3fF9w2GsLeWihun5XJXkr/vDMJs2cyJHpRCr/q2cFSqQOhS3rpF3Ev6t+VTd0xSju95xYR+tas00Vn9LY+dPyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pkEQfGIc; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="G2fhZqFJ"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49UDw5Zk027181;
-	Wed, 30 Oct 2024 16:22:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pp1; bh=l5r3kwngCMWGn5ldS
-	oa+J014Fb6wpHm1WsLP5AH2/fU=; b=G2fhZqFJlwG4Qafr3zcrHIoIxli8uQHd7
-	jLjLajL9EJtmNp0biIoV8gEmnXZgptPn+NsWeGXyCA0MxWrGgfhKZfm1V5gG5Hfl
-	yynSrfiWOI8AWij4eQ6n6H5LA4P+I7r/c9KElfTaqUaJxZeIU4ah4rUQbI96N6Bq
-	F1pdSFlYaH4MTcG4i/zK9MtO+JMdzEox1LxnQEZFqU0zdB3hinuLAAnhLt+wBjvr
-	8dMoDxAZtddvJmKmYvSS7hkOSz5tadi3HfaocXKGL9kgEaDcebkBced3qve2/O98
-	QY+pemMUsSuttY7/e1ajj0uBJSMcQl+692su4g4HLgxlY5AI7k0tg==
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42j43g882q-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 30 Oct 2024 16:22:41 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 49UCjOR3024716;
-	Wed, 30 Oct 2024 16:22:40 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 42hcyjgj3c-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 30 Oct 2024 16:22:40 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 49UGMauW22020406
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 30 Oct 2024 16:22:36 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BC19C20040;
-	Wed, 30 Oct 2024 16:22:36 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 52E8E20043;
-	Wed, 30 Oct 2024 16:22:36 +0000 (GMT)
-Received: from funtu2.fritz.box?044ibm.com (unknown [9.179.18.237])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 30 Oct 2024 16:22:36 +0000 (GMT)
-From: Harald Freudenberger <freude@linux.ibm.com>
-To: dengler@linux.ibm.com, herbert@gondor.apana.org.au, davem@davemloft.net,
-        hca@linux.ibm.com
-Cc: linux390-list@tuxmaker.boeblingen.de.ibm.com, linux-crypto@vger.kernel.org
-Subject: [PATCH v1 1/3] crypto: api - Adjust HASH_MAX_DESCSIZE for phmac context on s390
-Date: Wed, 30 Oct 2024 17:22:33 +0100
-Message-ID: <20241030162235.363533-2-freude@linux.ibm.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241030162235.363533-1-freude@linux.ibm.com>
-References: <20241030162235.363533-1-freude@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pkEQfGIc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB149C4CECE;
+	Wed, 30 Oct 2024 21:11:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730322663;
+	bh=49YpfPgybjyunYRlnfXehdPEI1xELY9QE5/uJT2eRPQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=pkEQfGIccHm/wjiCrCCWe/fH7mfNqtwdKRguI2XyD+0KsDUZwN+Z3GEyLkB72KLSy
+	 ulaBG27WfSdkBPsSCq9Yjp/3JTK5hLojfRSklS9RUiQPlAcnN7CviYKk/XyzFK0ByX
+	 Ip+k/evjUE7lioJxM7T4DzxFai1kidYxX7YiT7IXRP34r0U25bFA99l8ZHQOmfqDpU
+	 1YHV4iYYti/4gl4juv7KbZgDYPOhzdN4tgMBXwvF191SrIvWNuZizINVQBdIJ1KUlB
+	 zAB3Bq3cuJ15LzgOUrz0K+qEuKnNH6URIYvoC6qQ0lGtlTrzqYvfrsPzuyf4NmCutU
+	 +Q30d8ivn5xlA==
+Date: Wed, 30 Oct 2024 16:11:00 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Philipp Stanner <pstanner@redhat.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, Damien Le Moal <dlemoal@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Boris Brezillon <bbrezillon@kernel.org>,
+	Arnaud Ebalard <arno@natisbad.org>,
+	Srujana Challa <schalla@marvell.com>,
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+	Kalle Valo <kvalo@kernel.org>, Jon Mason <jdmason@kudzu.us>,
+	Dave Jiang <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Kevin Cernekee <cernekee@gmail.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jirislaby@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
+	Takashi Iwai <tiwai@suse.com>, Mark Brown <broonie@kernel.org>,
+	David Lechner <dlechner@baylibre.com>,
+	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+	Jie Wang <jie.wang@intel.com>,
+	Michal Witwicki <michal.witwicki@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Adam Guerin <adam.guerin@intel.com>,
+	Damian Muszynski <damian.muszynski@intel.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	Nithin Dabilpuram <ndabilpuram@marvell.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
+	Benjamin Berg <benjamin.berg@intel.com>,
+	Breno Leitao <leitao@debian.org>,
+	Yedidya Benshimol <yedidya.ben.shimol@intel.com>,
+	Serge Semin <fancer.lancer@gmail.com>,
+	zhang jiao <zhangjiao2@cmss.chinamobile.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-ide@vger.kernel.org, qat-linux@intel.com,
+	linux-crypto@vger.kernel.org, linux-wireless@vger.kernel.org,
+	ntb@lists.linux.dev, linux-pci@vger.kernel.org,
+	linux-serial@vger.kernel.org, linux-sound@vger.kernel.org
+Subject: Re: [PATCH v6 00/10] Remove pcim_iomap_regions_request_all()
+Message-ID: <20241030211100.GA1220400@bhelgaas>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: FRO6EOxUHrwcfOQlmgURtLkwJ5n_e2Rs
-X-Proofpoint-ORIG-GUID: FRO6EOxUHrwcfOQlmgURtLkwJ5n_e2Rs
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 clxscore=1011
- adultscore=0 mlxscore=0 priorityscore=1501 spamscore=0 malwarescore=0
- impostorscore=0 lowpriorityscore=0 bulkscore=0 phishscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
- definitions=main-2410300123
+In-Reply-To: <20241030112743.104395-1-pstanner@redhat.com>
 
-From: Holger Dengler <dengler@linux.ibm.com>
+On Wed, Oct 30, 2024 at 12:27:33PM +0100, Philipp Stanner wrote:
+> Changes in v6:
+>   - Add Ilpo's RB to patch #1
+>   - Rephrase error log messages in patch #6. (Ilpo)
+> 
+> Changes in v5:
+>   - Add Acked-by's from Alexander and Bharat (the latter sent off-list,
+>     because of some issue with receiving the previous patch sets).
+> 
+> Changes in v4:
+>   - Add Acked-by's from Giovanni and Kalle.
+> 
+> Changes in v3:
+>   - Add missing full stops to commit messages (Andy).
+> 
+> Changes in v2:
+>   - Fix a bug in patch №4 ("crypto: marvell ...") where an error code
+>     was not set before printing it. (Me)
+>   - Apply Damien's Reviewed- / Acked-by to patches 1, 2 and 10. (Damien)
+>   - Apply Serge's Acked-by to patch №7. (Serge)
+>   - Apply Jiri's Reviewed-by to patch №8. (Jiri)
+>   - Apply Takashi Iwai's Reviewed-by to patch №9. (Takashi)
+> 
+> 
+> Hi all,
+> 
+> the PCI subsystem is currently working on cleaning up its devres API. To
+> do so, a few functions will be replaced with better alternatives.
+> 
+> This series removes pcim_iomap_regions_request_all(), which has been
+> deprecated already, and accordingly replaces the calls to
+> pcim_iomap_table() (which were only necessary because of
+> pcim_iomap_regions_request_all() in the first place) with calls to
+> pcim_iomap().
+> 
+> Would be great if you can take a look whether this behaves as you
+> intended for your respective component.
+> 
+> Cheers,
+> Philipp
+> 
+> Philipp Stanner (10):
+>   PCI: Make pcim_request_all_regions() a public function
+>   ata: ahci: Replace deprecated PCI functions
+>   crypto: qat - replace deprecated PCI functions
+>   crypto: marvell - replace deprecated PCI functions
+>   intel_th: pci: Replace deprecated PCI functions
+>   wifi: iwlwifi: replace deprecated PCI functions
+>   ntb: idt: Replace deprecated PCI functions
+>   serial: rp2: Replace deprecated PCI functions
+>   ALSA: korg1212: Replace deprecated PCI functions
+>   PCI: Remove pcim_iomap_regions_request_all()
+> 
+>  .../driver-api/driver-model/devres.rst        |  1 -
+>  drivers/ata/acard-ahci.c                      |  6 +-
+>  drivers/ata/ahci.c                            |  6 +-
+>  drivers/crypto/intel/qat/qat_420xx/adf_drv.c  | 11 +++-
+>  drivers/crypto/intel/qat/qat_4xxx/adf_drv.c   | 11 +++-
+>  .../marvell/octeontx2/otx2_cptpf_main.c       | 14 +++--
+>  .../marvell/octeontx2/otx2_cptvf_main.c       | 13 ++--
+>  drivers/hwtracing/intel_th/pci.c              |  9 ++-
+>  .../net/wireless/intel/iwlwifi/pcie/trans.c   | 16 ++---
+>  drivers/ntb/hw/idt/ntb_hw_idt.c               | 13 ++--
+>  drivers/pci/devres.c                          | 59 +------------------
+>  drivers/tty/serial/rp2.c                      | 12 ++--
+>  include/linux/pci.h                           |  3 +-
+>  sound/pci/korg1212/korg1212.c                 |  6 +-
+>  14 files changed, 76 insertions(+), 104 deletions(-)
 
-The phmac context exceeds the generic "worst case".
-Change this define to cover the s390 "worst case" but
-only for arch s390 build.
-
-Signed-off-by: Holger Dengler <dengler@linux.ibm.com>
-Signed-off-by: Harald Freudenberger <freude@linux.ibm.com>
----
- include/crypto/hash.h | 7 +++++++
- 1 file changed, 7 insertions(+)
-
-diff --git a/include/crypto/hash.h b/include/crypto/hash.h
-index 2d5ea9f9ff43..92f878270a87 100644
---- a/include/crypto/hash.h
-+++ b/include/crypto/hash.h
-@@ -158,11 +158,18 @@ struct shash_desc {
- 
- #define HASH_MAX_DIGESTSIZE	 64
- 
-+#ifdef CONFIG_S390
-+/*
-+ * The descsize for phmac on s390 exceeds the generic "worst case".
-+ */
-+#define HASH_MAX_DESCSIZE	384
-+#else
- /*
-  * Worst case is hmac(sha3-224-generic).  Its context is a nested 'shash_desc'
-  * containing a 'struct sha3_state'.
-  */
- #define HASH_MAX_DESCSIZE	(sizeof(struct shash_desc) + 360)
-+#endif
- 
- #define SHASH_DESC_ON_STACK(shash, ctx)					     \
- 	char __##shash##_desc[sizeof(struct shash_desc) + HASH_MAX_DESCSIZE] \
--- 
-2.43.0
-
+Applied to pci/devm for v6.13, thanks!
