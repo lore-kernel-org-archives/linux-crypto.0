@@ -1,154 +1,96 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7772A14F90;
-	Wed, 30 Oct 2024 21:11:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CAF221C170
+	for <linux-crypto@vger.kernel.org>; Wed, 30 Oct 2024 21:34:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730322663; cv=none; b=btWfmSMr/y/PexnDcYKHsXtpXNtvOoMcmH7dgHgxrKly+fMraUK6qrpxsWQ313DbTQMV5OALmVP0x83nwoalXy3KJjQjwLfy4/HuLM/nNpLdOq9np4X3wU7q0UG+A6Vvs9Vp9kxEpKadfk2HM7DfXIQI6kp0bVMugfl3HGZ/uxc=
+	t=1730324063; cv=none; b=j/M47KNQRjdaNBdftraiGS+OlBY5SgwPuYTq4x5K932RbvmjuQlSTV/HA6iHu/8N9MTZHXU44KGas97IM2G+7422LDIK/NQqCNmHQ6hK/UOaW7cb29pMPPmu3ATCN1b7Xy0pyiYdG0LcYWdaMp76mrYsvSKUWiYrf08875tkKTk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730322663; c=relaxed/simple;
-	bh=49YpfPgybjyunYRlnfXehdPEI1xELY9QE5/uJT2eRPQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=OKdXsIS+svbrCFi7nUIkBnbKoaGi7E13i1aa1umAF0RR/uqCBe5bCk9ZqMOqoyWQecBz7Nm09ymc5GW6juw/Q3fF9w2GsLeWihun5XJXkr/vDMJs2cyJHpRCr/q2cFSqQOhS3rpF3Ev6t+VTd0xSju95xYR+tas00Vn9LY+dPyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pkEQfGIc; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1730324063; c=relaxed/simple;
+	bh=cfEZglRfXM92Rs9VKa/QxGF7CCG/G8uo3RqbR+JtOMM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HXx1/1mftxV2VF+2GdLgzKbQkunm03bbof2zSZf1FxBWqTZiVA2m89gLJcJx0HldiPf6Xyf1tgl1iiyJxX2OU2SaXXwdf0p6L8Cal2zHZDXSB9I9um5c3Q/Z6EAOzkQdKLa9XmO2z5x7sWLjYRM0N4PeYdkNL1ykcbuINGNQFLU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=QJCFMNv3; arc=none smtp.client-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pkEQfGIc"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB149C4CECE;
-	Wed, 30 Oct 2024 21:11:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730322663;
-	bh=49YpfPgybjyunYRlnfXehdPEI1xELY9QE5/uJT2eRPQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=pkEQfGIccHm/wjiCrCCWe/fH7mfNqtwdKRguI2XyD+0KsDUZwN+Z3GEyLkB72KLSy
-	 ulaBG27WfSdkBPsSCq9Yjp/3JTK5hLojfRSklS9RUiQPlAcnN7CviYKk/XyzFK0ByX
-	 Ip+k/evjUE7lioJxM7T4DzxFai1kidYxX7YiT7IXRP34r0U25bFA99l8ZHQOmfqDpU
-	 1YHV4iYYti/4gl4juv7KbZgDYPOhzdN4tgMBXwvF191SrIvWNuZizINVQBdIJ1KUlB
-	 zAB3Bq3cuJ15LzgOUrz0K+qEuKnNH6URIYvoC6qQ0lGtlTrzqYvfrsPzuyf4NmCutU
-	 +Q30d8ivn5xlA==
-Date: Wed, 30 Oct 2024 16:11:00 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Philipp Stanner <pstanner@redhat.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, Damien Le Moal <dlemoal@kernel.org>,
-	Niklas Cassel <cassel@kernel.org>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="QJCFMNv3"
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2e56750bb0dso216739a91.0
+        for <linux-crypto@vger.kernel.org>; Wed, 30 Oct 2024 14:34:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1730324061; x=1730928861; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=57fEAwok3+kDJ02oPopU87vkGpDlety/NkYvCBCJnWo=;
+        b=QJCFMNv3e6krGhwq382HjR23u1liVL+u2cUJoX9WgQxOoKk3oUx2+NmhNxxKdjlF+P
+         CXlPyCV14Rm49MUTaUfK0bzGcU+m0B75KE78Pecvl/1EHb8SCeioR1L7DvrtK1akGjkM
+         rju8vjrEsKK8omNvWLGwWlaxnplOy07WdmY8c=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730324061; x=1730928861;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=57fEAwok3+kDJ02oPopU87vkGpDlety/NkYvCBCJnWo=;
+        b=pWu2m9ImKin4eWS0rN9Pn7A7L8dtrxsK2GkvCkSb+tNv5+xF//0mGICxlXf+Elgf/m
+         y9ElwqLra+H0icVzqWDT+Zx+GpUMCb5X6ITWD2pRciw5tPVsQeqQn1WIfL/wC8J0VgpY
+         xFh9eEEaWHS2lP2xfVlfv23hFDRDfGzQSXic7Zz8K9WrzTxfG4WVBm7YB1VEzHXlJD8I
+         jCvEnIo+E3sr4gU3kg19HLjuE+wsD2oevnfFsMv1HLTszYXgay4VLaRNdy1/BL6FmfcI
+         BJeH8p/eZS/zIyFP0tnuFqs/eY77IiNAuGm3usrArQROp9QG/bPA4av5Zyx3dEQi6XHF
+         H9xQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXST4eE0DU5YlE1rqxvAlwe+FV3QSI1l+j08wwIpZHbWUnIaiGT3d04B7VJe4lBXus1gY7F5ujtGidDzQM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywwylm1ewyWjEbcM6Gm5+WOCdn/HBOo61EMn3c9hu0C7oN2i0e3
+	7+bPdB4REb52FP6lHvxNyzOlrIvSymZNPEwUHn0o5dn4OjpTZ8bI3KtojsX5Ig==
+X-Google-Smtp-Source: AGHT+IFB0HWyN1/DBBH21gB+sB5G4OUo/anMiUMkhzLTxGINvoKiV41KlsMj+eULdwz0SKgQKoCYKg==
+X-Received: by 2002:a17:90a:8a05:b0:2e5:5e95:b389 with SMTP id 98e67ed59e1d1-2e8f11baca9mr17595045a91.35.1730324060684;
+        Wed, 30 Oct 2024 14:34:20 -0700 (PDT)
+Received: from lbrmn-mmayer.ric.broadcom.net ([192.19.161.248])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e92fa5f70fsm2372458a91.33.2024.10.30.14.34.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Oct 2024 14:34:20 -0700 (PDT)
+Received: by lbrmn-mmayer.ric.broadcom.net (Postfix, from userid 1000)
+	id 4222A886; Wed, 30 Oct 2024 14:34:19 -0700 (PDT)
+From: Markus Mayer <mmayer@broadcom.com>
+To: Olivia Mackall <olivia@selenic.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Boris Brezillon <bbrezillon@kernel.org>,
-	Arnaud Ebalard <arno@natisbad.org>,
-	Srujana Challa <schalla@marvell.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
-	Kalle Valo <kvalo@kernel.org>, Jon Mason <jdmason@kudzu.us>,
-	Dave Jiang <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Kevin Cernekee <cernekee@gmail.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jiri Slaby <jirislaby@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
-	Takashi Iwai <tiwai@suse.com>, Mark Brown <broonie@kernel.org>,
-	David Lechner <dlechner@baylibre.com>,
-	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
-	Jie Wang <jie.wang@intel.com>,
-	Michal Witwicki <michal.witwicki@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Adam Guerin <adam.guerin@intel.com>,
-	Damian Muszynski <damian.muszynski@intel.com>,
-	Bharat Bhushan <bbhushan2@marvell.com>,
-	Nithin Dabilpuram <ndabilpuram@marvell.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
-	Benjamin Berg <benjamin.berg@intel.com>,
-	Breno Leitao <leitao@debian.org>,
-	Yedidya Benshimol <yedidya.ben.shimol@intel.com>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	zhang jiao <zhangjiao2@cmss.chinamobile.com>,
+	Aurelien Jarno <aurelien@aurel32.net>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Daniel Golle <daniel@makrotopia.org>,
 	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-ide@vger.kernel.org, qat-linux@intel.com,
-	linux-crypto@vger.kernel.org, linux-wireless@vger.kernel.org,
-	ntb@lists.linux.dev, linux-pci@vger.kernel.org,
-	linux-serial@vger.kernel.org, linux-sound@vger.kernel.org
-Subject: Re: [PATCH v6 00/10] Remove pcim_iomap_regions_request_all()
-Message-ID: <20241030211100.GA1220400@bhelgaas>
+	Francesco Dolcini <francesco.dolcini@toradex.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Rob Herring <robh@kernel.org>
+Cc: Markus Mayer <mmayer@broadcom.com>,
+	Device Tree Mailing List <devicetree@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: [PATCH 0/2] hwrng: bcm74110 - Add Broadcom BCM74110 RNG driver
+Date: Wed, 30 Oct 2024 14:33:53 -0700
+Message-ID: <20241030213400.802264-1-mmayer@broadcom.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241030112743.104395-1-pstanner@redhat.com>
 
-On Wed, Oct 30, 2024 at 12:27:33PM +0100, Philipp Stanner wrote:
-> Changes in v6:
->   - Add Ilpo's RB to patch #1
->   - Rephrase error log messages in patch #6. (Ilpo)
-> 
-> Changes in v5:
->   - Add Acked-by's from Alexander and Bharat (the latter sent off-list,
->     because of some issue with receiving the previous patch sets).
-> 
-> Changes in v4:
->   - Add Acked-by's from Giovanni and Kalle.
-> 
-> Changes in v3:
->   - Add missing full stops to commit messages (Andy).
-> 
-> Changes in v2:
->   - Fix a bug in patch №4 ("crypto: marvell ...") where an error code
->     was not set before printing it. (Me)
->   - Apply Damien's Reviewed- / Acked-by to patches 1, 2 and 10. (Damien)
->   - Apply Serge's Acked-by to patch №7. (Serge)
->   - Apply Jiri's Reviewed-by to patch №8. (Jiri)
->   - Apply Takashi Iwai's Reviewed-by to patch №9. (Takashi)
-> 
-> 
-> Hi all,
-> 
-> the PCI subsystem is currently working on cleaning up its devres API. To
-> do so, a few functions will be replaced with better alternatives.
-> 
-> This series removes pcim_iomap_regions_request_all(), which has been
-> deprecated already, and accordingly replaces the calls to
-> pcim_iomap_table() (which were only necessary because of
-> pcim_iomap_regions_request_all() in the first place) with calls to
-> pcim_iomap().
-> 
-> Would be great if you can take a look whether this behaves as you
-> intended for your respective component.
-> 
-> Cheers,
-> Philipp
-> 
-> Philipp Stanner (10):
->   PCI: Make pcim_request_all_regions() a public function
->   ata: ahci: Replace deprecated PCI functions
->   crypto: qat - replace deprecated PCI functions
->   crypto: marvell - replace deprecated PCI functions
->   intel_th: pci: Replace deprecated PCI functions
->   wifi: iwlwifi: replace deprecated PCI functions
->   ntb: idt: Replace deprecated PCI functions
->   serial: rp2: Replace deprecated PCI functions
->   ALSA: korg1212: Replace deprecated PCI functions
->   PCI: Remove pcim_iomap_regions_request_all()
-> 
->  .../driver-api/driver-model/devres.rst        |  1 -
->  drivers/ata/acard-ahci.c                      |  6 +-
->  drivers/ata/ahci.c                            |  6 +-
->  drivers/crypto/intel/qat/qat_420xx/adf_drv.c  | 11 +++-
->  drivers/crypto/intel/qat/qat_4xxx/adf_drv.c   | 11 +++-
->  .../marvell/octeontx2/otx2_cptpf_main.c       | 14 +++--
->  .../marvell/octeontx2/otx2_cptvf_main.c       | 13 ++--
->  drivers/hwtracing/intel_th/pci.c              |  9 ++-
->  .../net/wireless/intel/iwlwifi/pcie/trans.c   | 16 ++---
->  drivers/ntb/hw/idt/ntb_hw_idt.c               | 13 ++--
->  drivers/pci/devres.c                          | 59 +------------------
->  drivers/tty/serial/rp2.c                      | 12 ++--
->  include/linux/pci.h                           |  3 +-
->  sound/pci/korg1212/korg1212.c                 |  6 +-
->  14 files changed, 76 insertions(+), 104 deletions(-)
+This series adds a driver for the random number generator found on the
+BCM74110 SoC.
 
-Applied to pci/devm for v6.13, thanks!
+Markus Mayer (2):
+  dt-bindings: rng: add binding for BCM74110 RNG
+  hwrng: bcm74110 - Add Broadcom BCM74110 RNG driver
+
+ .../bindings/rng/brcm,bcm74110.yaml           |  35 +++++
+ drivers/char/hw_random/Kconfig                |  14 ++
+ drivers/char/hw_random/Makefile               |   1 +
+ drivers/char/hw_random/bcm74110-rng.c         | 125 ++++++++++++++++++
+ 4 files changed, 175 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/rng/brcm,bcm74110.yaml
+ create mode 100644 drivers/char/hw_random/bcm74110-rng.c
+
+-- 
+2.46.0
+
