@@ -1,101 +1,104 @@
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 270001CC8A7;
-	Fri,  1 Nov 2024 20:34:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F8191E2846
+	for <linux-crypto@vger.kernel.org>; Fri,  1 Nov 2024 21:13:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730493269; cv=none; b=FKtJML3pmQ3K4iPHcWeVnCHnQ3gzOA6NOFpc2tPuTyZBuo4HJfe3soT0VL4MR8JDsmKIUDG+8kkihijpUe35NmBqw1gOJUeMZ0QC+5Ad2+xiI+h9s9Etx0gN1guzVkPq9uEXuB3HRKw7FIdtK/M2/l3EfdMLY8Ueq04qKOXZDws=
+	t=1730495616; cv=none; b=ANMprNTYWmpwDsRDtUSmSheKK5yHLHF626HVLUSTMkpucnduJXzeQwDtcaarCFFCr9MlBqZZNFCoO/bmS4XHvpPjyKGB1nleMH4LDpQgmYiqJpYeDaB+JJznifh5K9N9jljMLYOrcLOIlXAR+BoNAn+w62bl1AY+kD4VW+dfSZ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730493269; c=relaxed/simple;
-	bh=y5wYIh4mE+JQUP17Jx8UhGwMOPLcQWAMz4GHTnF7p18=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=g5YBQbgpfpnUAzoeOSZkdth5BN1Dw+ERXZFZZFWWo1EYxqtDRtTm4+v1GhvcGlaNIpDk6/Hlc70D6aodfYfsXDt53s58Wc7PH9l9AqUXeI/MqdvO0ushCEPLFTjAWcKxQGd351cso4w5oMgGnPJQN+PMO8xs8y4hFAT2n6rNAdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=JeAOcNd9; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=veMIp8Hu; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+	s=arc-20240116; t=1730495616; c=relaxed/simple;
+	bh=fVRyDwIDJEU3QhhtvsXhsXyGoQ+vQkIYsVbHH/ESiz0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ngt06DFxWsBD4rMf6mwciC4od16ry/i2FmXYaCcOBMzDviOpLU+o9IVJJWP1CCUZa6c4FC2KUi/kxWcXWy3nMdm2PlbkqyUoP6gow2gRHek+gFDAkFRIlCNzmNDitf379DiaaG8jbDst/Fk1XamNoyZh9MmR32SWjZ9f1uTzWyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=eXLDEFVW; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="JeAOcNd9";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="veMIp8Hu"
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1730493266;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=59h/4FnoLZZk0MjKW721si8AWaLkimLKPstUwXjURkM=;
-	b=JeAOcNd9zrq7bXVafXOI2+VYSzyPRw9xhEyPY0SVc0xT2OTXiKahuugI6qbZlJXLpmgXdz
-	S/DifpCHtGqRY77d4wpWjRyJY7j2tylDedWjt65ZEhiNjiZSeEOtRH21gcq9Hk0ZyMrP7G
-	LOIMQhkAxoAsPe8PnwY42kXvpcPVqAZIYgCfLSh6SJfsTQQr/5RAqfl3q2oKQyk4Ltxa7+
-	OIHZdyKZJnhBvKZQKt2IHL6yOoa9mnTcLfdL4qDvhLoRv6D8u7IaiccpXqnsEbT4G8diNJ
-	n1wYxp5K/qPOc7dJvFwjgG/24Zuj2pRmN+72r0Z/SLTwxo0yreEGuOo062oJ0g==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1730493266;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=59h/4FnoLZZk0MjKW721si8AWaLkimLKPstUwXjURkM=;
-	b=veMIp8Hu1Fbb53XXy+Sfvp5sOohtY6hRYmZZOUX8zQcskFrKrTVCheUAX3OX4Z0hp6Iatx
-	V3AWbIBcUUOY/lBA==
-To: Jarkko Sakkinen <jarkko@kernel.org>, Ross Philipson
- <ross.philipson@oracle.com>, linux-kernel@vger.kernel.org, x86@kernel.org,
- linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
- linux-efi@vger.kernel.org, iommu@lists.linux-foundation.org
-Cc: dpsmith@apertussolutions.com, mingo@redhat.com, bp@alien8.de,
- hpa@zytor.com, dave.hansen@linux.intel.com, ardb@kernel.org,
- mjg59@srcf.ucam.org, James.Bottomley@hansenpartnership.com,
- peterhuewe@gmx.de, jgg@ziepe.ca, luto@amacapital.net,
- nivedita@alum.mit.edu, herbert@gondor.apana.org.au, davem@davemloft.net,
- corbet@lwn.net, ebiederm@xmission.com, dwmw2@infradead.org,
- baolu.lu@linux.intel.com, kanth.ghatraju@oracle.com,
- andrew.cooper3@citrix.com, trenchboot-devel@googlegroups.com
-Subject: Re: [PATCH v11 00/20] x86: Trenchboot secure dynamic launch Linux
- kernel support
-In-Reply-To: <D5ARS5Y7EATS.2GVNSARKXKIDI@kernel.org>
-References: <20240913200517.3085794-1-ross.philipson@oracle.com>
- <D5ARS5Y7EATS.2GVNSARKXKIDI@kernel.org>
-Date: Fri, 01 Nov 2024 21:34:25 +0100
-Message-ID: <87a5eivgku.ffs@tglx>
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="eXLDEFVW"
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-71e592d7f6eso1927184b3a.3
+        for <linux-crypto@vger.kernel.org>; Fri, 01 Nov 2024 14:13:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1730495614; x=1731100414; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=MBfbdpDXvXyTc8pX+dqi/KLkO3CnvwNV1g4IugsXMhU=;
+        b=eXLDEFVWoR8NyqBugrznes+87beQuNuYqvl5Tjnes5LW2+l62xu9TvzbkmgAERp67q
+         4BjpxX1iGC1PfIwIhjCOaAm10qn4DtMVKrSU2qWeVimyUlNmzudyZCDbin+ZtuZ+0JN3
+         77gyTDoUcw5Q2LXCXGanYAN7KyImbpgINkwxg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730495614; x=1731100414;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MBfbdpDXvXyTc8pX+dqi/KLkO3CnvwNV1g4IugsXMhU=;
+        b=P3HxX6y//c7LShQyiIwDFAJCw6LMym8Fq59Zcjwwv38WTrpCNFBdAwdVVOgplFmV9Q
+         0YXwAtBNAihQ3+eOzS61dhqFK3S3bPi03TsdCf8nInNN8dmK0kiMZAehkKByvqlbM44u
+         1uHiAoH6agJoIFoh5lPIwDGSGaoyHnDBx7DsDxFnVRuhXXdSuxrTFyHDZdTEybmaMBKC
+         UrmUcvcZXH8dKzJbpCML5HZhCJezBNJJvlYWDnD/YVae+Keu0/66IK+wZuO8T+q/FBfn
+         MdsBbUzDpCyP2gzUtdA14nh7QUjB0OjF5XEHPG/IfLjmx22+T9zKTe9iOcgK3T0d0nwt
+         KquA==
+X-Forwarded-Encrypted: i=1; AJvYcCUucd9WSlNU9ONvy/0okLwsLpUKXW3NpgGtb5jiEJvyrxcDV6M6+QcUw1liltiUQ0D9FMI5ez3V9kUtKcE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKV0kxD3oaVWI9BbsoiGqixUHK1FhoMR3tFBpFX8mr4j9zKAxQ
+	TiVTdjo95FUJL9kLApXSnMv2DN0k2C4HPXeU84LNtJ/sOCNZafJ2gCqzQMIWEg==
+X-Google-Smtp-Source: AGHT+IHSF2JuOrjTjV/cyFRyjiRvzuvcMqrlb4ZbR1iu6WticcFNwva8vtTE8w1/zgmTXaNn/gruuA==
+X-Received: by 2002:a05:6a00:4603:b0:71d:f821:1981 with SMTP id d2e1a72fcca58-720c98a5ebfmr7787754b3a.4.1730495614192;
+        Fri, 01 Nov 2024 14:13:34 -0700 (PDT)
+Received: from lbrmn-mmayer.ric.broadcom.net ([192.19.161.248])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-720bc1b8992sm3109854b3a.44.2024.11.01.14.13.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Nov 2024 14:13:33 -0700 (PDT)
+Received: by lbrmn-mmayer.ric.broadcom.net (Postfix, from userid 1000)
+	id 8E67B6FC; Fri,  1 Nov 2024 14:13:32 -0700 (PDT)
+From: Markus Mayer <mmayer@broadcom.com>
+To: Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Aurelien Jarno <aurelien@aurel32.net>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Francesco Dolcini <francesco.dolcini@toradex.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Rob Herring <robh@kernel.org>
+Cc: Markus Mayer <mmayer@broadcom.com>,
+	Device Tree Mailing List <devicetree@vger.kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: [PATCH v2 0/2] hwrng: bcm74110 - Add Broadcom BCM74110 RNG driver
+Date: Fri,  1 Nov 2024 14:13:13 -0700
+Message-ID: <20241101211316.91345-1-mmayer@broadcom.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-On Fri, Nov 01 2024 at 12:28, Jarkko Sakkinen wrote:
-> On Fri Sep 13, 2024 at 11:04 PM EEST, Ross Philipson wrote:
->> A quick note on terminology. The larger open source project itself is called
->> TrenchBoot, which is hosted on Github (links below). The kernel feature enabling
->> the use of Dynamic Launch technology is referred to as "Secure Launch" within
->> the kernel code. As such the prefixes sl_/SL_ or slaunch/SLAUNCH will be seen
->> in the code. The stub code discussed above is referred to as the SL stub.
->
-> 1. I don't see any tags in most of the patches so don't get the rush. This
->    includes also patches for x86. Why I would care to review TPM patches
->    when there is over a dozen unreviewed and untested patches before it?
-> 2. TPM patches have been in circulation in and out of the patch set
->    for some time now with little or no improvement.
->
-> Why the sudden buzz? I have not heard much about this since last early
-> summer.  Have to spend some time recalling what this is about anyway. I
-> cannot trust that my tags make any sense before more reviewed/tested-by
-> tags before the TPM patches.
+This series adds a driver for the random number generator found on the
+BCM74110 SoC.
 
-If I intend to merge the patches then I surely have looked at them
-deeply. I don't have to send a reviewed-by just to apply them
-afterwards.
+Binding changes from v1:
+  - renamed binding file to brcm,bcm74110-rng.yaml
+  - ensure "brcm,bcm74110-rng" is being used instead of "...-trng"
+  - removed "|" after "description:"
+  - removed label "rng:"
 
-There was enough motion on these patches and this posting is in your
-inbox for 6 weeks now without any reaction from you.
+Code-related changes from v1:
+  - only enable the driver for ARCH_BRCMSTB || COMPILE_TEST
 
-The TPM changes are very much independent from the x86 specific ones, so
-why do you want x86 review tags in order to look at the ones which are
-specific to your subsystem especially as some of them seem to address
-real short comings there independent of trenchboot.
+Markus Mayer (2):
+  dt-bindings: rng: add binding for BCM74110 RNG
+  hwrng: bcm74110 - Add Broadcom BCM74110 RNG driver
 
-Thanks,
+ .../bindings/rng/brcm,bcm74110-rng.yaml       |  35 +++++
+ drivers/char/hw_random/Kconfig                |  13 ++
+ drivers/char/hw_random/Makefile               |   1 +
+ drivers/char/hw_random/bcm74110-rng.c         | 125 ++++++++++++++++++
+ 4 files changed, 174 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/rng/brcm,bcm74110-rng.yaml
+ create mode 100644 drivers/char/hw_random/bcm74110-rng.c
 
-        tglx
+-- 
+2.47.0
+
