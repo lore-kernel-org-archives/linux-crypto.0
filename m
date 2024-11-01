@@ -1,93 +1,177 @@
-Received: from bedivere.hansenpartnership.com (bedivere.hansenpartnership.com [96.44.175.130])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A29D913A24D;
-	Fri,  1 Nov 2024 03:17:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=96.44.175.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64074142624;
+	Fri,  1 Nov 2024 05:22:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730431071; cv=none; b=l2iuAHKU3o7A8Q/DPu6crS/nfqzBlpyNL7YiCm5tWh40tczTpaIDaZ0lJqSt0vCbnwLE5OVfTyRw1RLZHIHQG9LcyMhSgnRBV4PR8q1rtG1WB35yCWR47pVuWrtf0UQ/Oix+kRIwPUFXS0GAJfoCvyF/vC/OXpkirF4fOFVNVjw=
+	t=1730438576; cv=none; b=BjTU3MQOIv+ollAFSG/uvmLI0bYJG56QrJIIzkn3i5v1o/NLC7603GbRAjzuAesFki0MqNZ4g+N8N78enxFVLrqFArpc2SUC1lMA1PjvjHBeXHe/2DHito3q4B3QPdVQ+AsiCmofgANBVtrkwCuTYumv3zTlwQgRm9zVOItS9lo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730431071; c=relaxed/simple;
-	bh=nxjll38E6fkaKQQHuECcDsC3eYGfdaj9xNUPAl8lBo0=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=rdpsIz0/5JMhyCL7Lq6sxNOrF44M3ize/aA6xh6P3WW0S+Ku9zBcRyxmADy4DJpS2QQXE0xBmTYlPQgLsOSMPvkVkt4IINNp3cgrIgNSP41tW/hLdwSZcw4dPRw8o1ec6jHcKQtVBk+mowlSWhWNfwfT4voGMB5yxkENKsf0c4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=efDuU9/Z; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=efDuU9/Z; arc=none smtp.client-ip=96.44.175.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=HansenPartnership.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
+	s=arc-20240116; t=1730438576; c=relaxed/simple;
+	bh=pGNjlh/5TANRkDFAanOu/LKbRP8oaSiAvvCfhO4t6yI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H6Kcvv3qxJLw+YOwTM2OafQK8pwIiHp4QQvy9RW6fnDxoR5duxlf2jtPFP5kcaKMZSLR7lyuTUAk7QJALXGKKNLYTUbHRzoNRuDcet4nBbLk1aSGUaDpDjThdonkf26bLJQ8e0jYhkL9vf1mTEUB2ySNutK5m/BYuVti3Sp9TW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YYD9qxns; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="efDuU9/Z";
-	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="efDuU9/Z"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YYD9qxns"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=hansenpartnership.com; s=20151216; t=1730431066;
-	bh=nxjll38E6fkaKQQHuECcDsC3eYGfdaj9xNUPAl8lBo0=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-	b=efDuU9/Zbc3f0lTndGZZEaRkDrG0Vz4pkv0GarqSEP+mPgMbWQESJXtyMSMYAXr0k
-	 vvqCMaZ8nOjlI3hHuiTAhY+9FWTrrmCu0qw6UeP3/JoojaiyoVeoTQjmgTZTiiWhl1
-	 v80oxR3ctZUE3xhMRwCkCnopo24wBKz6RgVUs1AY=
-Received: from localhost (localhost [127.0.0.1])
-	by bedivere.hansenpartnership.com (Postfix) with ESMTP id 9E01512819B1;
-	Thu, 31 Oct 2024 23:17:46 -0400 (EDT)
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
- by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavis, port 10024)
- with ESMTP id OblsZ3dP4NMJ; Thu, 31 Oct 2024 23:17:46 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-	d=hansenpartnership.com; s=20151216; t=1730431066;
-	bh=nxjll38E6fkaKQQHuECcDsC3eYGfdaj9xNUPAl8lBo0=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-	b=efDuU9/Zbc3f0lTndGZZEaRkDrG0Vz4pkv0GarqSEP+mPgMbWQESJXtyMSMYAXr0k
-	 vvqCMaZ8nOjlI3hHuiTAhY+9FWTrrmCu0qw6UeP3/JoojaiyoVeoTQjmgTZTiiWhl1
-	 v80oxR3ctZUE3xhMRwCkCnopo24wBKz6RgVUs1AY=
-Received: from [10.250.250.46] (122x212x32x58.ap122.ftth.ucom.ne.jp [122.212.32.58])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id BDC0E12817AD;
-	Thu, 31 Oct 2024 23:17:41 -0400 (EDT)
-Message-ID: <685f3f00ddf88e961e2d861b7c783010774fe19d.camel@HansenPartnership.com>
-Subject: Re: [PATCH v11 18/20] tpm: Add sysfs interface to allow setting and
- querying the default locality
-From: James Bottomley <James.Bottomley@HansenPartnership.com>
-To: Ross Philipson <ross.philipson@oracle.com>,
- linux-kernel@vger.kernel.org,  x86@kernel.org,
- linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org, 
- linux-crypto@vger.kernel.org, kexec@lists.infradead.org, 
- linux-efi@vger.kernel.org, iommu@lists.linux-foundation.org
-Cc: dpsmith@apertussolutions.com, tglx@linutronix.de, mingo@redhat.com, 
- bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com, ardb@kernel.org, 
- mjg59@srcf.ucam.org, peterhuewe@gmx.de, jarkko@kernel.org, jgg@ziepe.ca, 
- luto@amacapital.net, nivedita@alum.mit.edu, herbert@gondor.apana.org.au, 
- davem@davemloft.net, corbet@lwn.net, ebiederm@xmission.com,
- dwmw2@infradead.org,  baolu.lu@linux.intel.com, kanth.ghatraju@oracle.com,
- andrew.cooper3@citrix.com,  trenchboot-devel@googlegroups.com
-Date: Fri, 01 Nov 2024 12:17:24 +0900
-In-Reply-To: <20240913200517.3085794-19-ross.philipson@oracle.com>
-References: <20240913200517.3085794-1-ross.philipson@oracle.com>
-	 <20240913200517.3085794-19-ross.philipson@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730438574; x=1761974574;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=pGNjlh/5TANRkDFAanOu/LKbRP8oaSiAvvCfhO4t6yI=;
+  b=YYD9qxns7tfTKNWnEINwY5oeJvXljPRcGawyhfCWqzP3K7nexPS+Kdm2
+   U1wKHQXNqFeYLkksa+mzqGjct60JItoDsUcQTWH+QggQzUbUDHJtsCBap
+   trIDOL6eVYYIC2YufcRnYU5RT4A8uV4tH8NywAnZpQviOV7/QNbBbYVN/
+   Wf96U5njp8QgfXkEYfuJPQ8ItGlrpGs/xzDuCSgZ7W5S6u/sn8RCcT+Xw
+   9LFYYKltlTM0LHoY0BggSSFiM9/33emXHC/JvwAMbnevER1UI8tov4pcB
+   ACVCn918QNYGdEQVZMR1MZSPpVrrlg25JW7spIdn5HyBnnzfduiKlRTmu
+   Q==;
+X-CSE-ConnectionGUID: jA2xccugSsu1flMsUGDkeQ==
+X-CSE-MsgGUID: E8OGjcz2QgarRGZ/LjKR8A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11242"; a="30314687"
+X-IronPort-AV: E=Sophos;i="6.11,248,1725346800"; 
+   d="scan'208";a="30314687"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2024 22:22:51 -0700
+X-CSE-ConnectionGUID: TVbU//UlQUCwNIzd8pgqTg==
+X-CSE-MsgGUID: R6mTecEmTzu92S+st927WA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,248,1725346800"; 
+   d="scan'208";a="83678534"
+Received: from qz-dev1.sh.intel.com (HELO localhost) ([10.239.147.28])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2024 22:22:44 -0700
+Date: Fri, 1 Nov 2024 13:20:11 +0800
+From: Qiang Zhang <qiang4.zhang@linux.intel.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Jens Axboe <axboe@kernel.dk>, Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Gonglei <arei.gonglei@huawei.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Viresh Kumar <viresh.kumar@linaro.org>,
+	"Chen, Jian Jun" <jian.jun.chen@intel.com>,
+	Andi Shyti <andi.shyti@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	David Hildenbrand <david@redhat.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Anton Yakovlev <anton.yakovlev@opensynergy.com>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+	Qiang Zhang <qiang4.zhang@intel.com>,
+	virtualization@lists.linux.dev, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-i2c@vger.kernel.org, netdev@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-sound@vger.kernel.org
+Subject: Re: [PATCH v2] virtio: only reset device and restore status if
+ needed in device resume
+Message-ID: <ZyRlC-5V_NTKgzXh@dev-qz>
+References: <20241031030847.3253873-1-qiang4.zhang@linux.intel.com>
+ <20241101015101.98111-1-qiang4.zhang@linux.intel.com>
+ <CACGkMEtvrBRd8BaeUiR6bm1xVX4KUGa83s03tPWPHB2U0mYfLA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACGkMEtvrBRd8BaeUiR6bm1xVX4KUGa83s03tPWPHB2U0mYfLA@mail.gmail.com>
 
-On Fri, 2024-09-13 at 13:05 -0700, Ross Philipson wrote:
-> Expose a sysfs interface to allow user mode to set and query the
-> default locality set for the TPM chip.
+On Fri, Nov 01, 2024 at 10:11:11AM +0800, Jason Wang wrote:
+> On Fri, Nov 1, 2024 at 9:54 AM <qiang4.zhang@linux.intel.com> wrote:
+> >
+> > From: Qiang Zhang <qiang4.zhang@intel.com>
+> >
+> > Virtio core unconditionally reset and restore status for all virtio
+> > devices before calling restore method. This breaks some virtio drivers
+> > which don't need to do anything in suspend and resume because they
+> > just want to keep device state retained.
+> 
+> The challenge is how can driver know device doesn't need rest.
 
-What does a user need this for?  It somewhat conflicts with the idea of
-running the kernel and user space TPM access in separate localities for
-the purposes of key release, so we can seal keys to only release in the
-kernel by policy.  When I last talked about this I thought we'd
-probably use 0 for user and, say 2, for the kernel (mainly because
-prior incarnations of this patch set seemed to access the TPM in
-locality 2 from the kernel).  It really doesn't matter *what* locality
-we use for the kernel and the user as long as it's known ahead of time
-and the user can't gain access to the kernel locality.
+Hi,
 
-Regards,
+Per my understanding to PM, in the suspend flow, device drivers need to
+1. First manage/stop accesses from upper level software and
+2. Store the volatile context into in-memory data structures.
+3. Put devices into some low power (suspended) state.
+The resume process does the reverse.
+If a device context won't loose after entering some low power state
+(optional), it's OK to skip step 2.
 
-James
+For virtio devices, spec doesn't define whether their states will lost
+after platform entering suspended state. So to work with different
+hypervisors, virtio drivers typically trigger a reset in suspend/resume
+flow. This works fine for virtio devices if following conditions are met:
+- Device state can be totally recoverable.
+- There isn't any working behaviour expected in suspended state, i.e. the
+  suspended state should be sub-state of reset.
+However, the first point may be hard to implement from driver side for some
+devices. The second point may be unacceptable for some kind of devices.
 
+For your question, for devices whose suspended state is alike reset state,
+the hypervisor have the flexibility to retain its state or not, kernel
+driver can unconditionally reset it with proper re-initialization to
+accomplish better compatibility. For others, hypervisor *must* retain
+device state and driver just keeps using it.
+
+> 
+> For example, PCI has no_soft_reset which has been done in the commit
+> "virtio: Add support for no-reset virtio PCI PM".
+> 
+> And there's a ongoing long discussion of adding suspend support in the
+> virtio spec, then driver know it's safe to suspend/resume without
+> reset.
+
+That's great! Hopefully it can fill the gap.
+Currently, I think we can safely move the reset to drivers' freeze methods,
+virtio core has no reason to take it as a common action required by all
+devices. And the reset operation can be optional skipped if driver have
+hints from device that it can retain state.
+
+> 
+> >
+> > Virtio GPIO is a typical example. GPIO states should be kept unchanged
+> > after suspend and resume (e.g. output pins keep driving the output) and
+> > Virtio GPIO driver does nothing in freeze and restore methods. But the
+> > reset operation in virtio_device_restore breaks this.
+> 
+> Is this mandated by GPIO or virtio spec? If yes, let's quote the revelant part.
+
+No. But in actual hardware design (e.g. Intel PCH GPIO), or from the
+requirement perspective, GPIO pin state can be (should support) retained
+in suspended state.
+If Virtio GPIO is used to let VM operate such physical GPIO chip indirectly,
+it can't be reset in suspend and resume. Meanwhile the hypervisor will
+retain pin states after suspension.
+
+> 
+> >
+> > Since some devices need reset in suspend and resume while some needn't,
+> > create a new helper function for the original reset and status restore
+> > logic so that virtio drivers can invoke it in their restore method
+> > if necessary.
+> 
+> How are those drivers classified?
+
+I think this depends whether hypervisor will keep devices state in platform
+suspend process. I think hypervisor should because suspend and reset are
+conceptually two different things.
+
+
+Thanks
+Qiang
