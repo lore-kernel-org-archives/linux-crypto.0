@@ -1,166 +1,134 @@
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57C1E199E8D;
-	Sat,  2 Nov 2024 17:21:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B071154423;
+	Sat,  2 Nov 2024 17:51:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730568115; cv=none; b=NPbJO5y6mdWOovCde3b1qoWm1Hz4NUWppAxZ97EK2GdKPDmXWVam+aq1EHvMIw+eZwnrfpFDhATKDbJJLzeVQWt7m0fwiSM+flYTeL2G76aERNu5ScKi09YURKPKW2cBP7dDfKpZNhLt4m+HTsuYProOX+SA0iGe3yU3kTxIfE0=
+	t=1730569880; cv=none; b=uSdHHWmt2X5Tgd6xbAooaX2wAV24L1DSy5YEzOae/dzHcwy+AcaC4ijjwN52sKmnajHZHS4guKNN58O9jUHCctQGcUrE/f3xmtlOZMP4slGEJ2uYrQp5mYpc53xjuTMHj2lk5oID+yG9KnQEYrtXdb/AeiiFfj5JpdwYLIQ/23U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730568115; c=relaxed/simple;
-	bh=7CS5N4H9kf7aemeGcQgW3i6MPpmeBBkH4/f6lovOV7g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=J/lOdYOAttfEOk6mz5o5kEvkaHtSI4CWFu7GzZA4vssFLdXSBJpLQe1MqkEIKVAjJpKas66NlV4lINf2ZWwRvqiEXk9JuX4HJGa8i+Jav0lVBsjGCH+vqiKhnU+vgjm4XZVCgKsbzrlRkF5U/v/8u279CubZHq0Wv4NLvX2uKSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MJh+HUR0; arc=none smtp.client-ip=209.85.221.54
+	s=arc-20240116; t=1730569880; c=relaxed/simple;
+	bh=YamZzvhmaDu6jNuMTIZ5BlSZQSa1W1+FOr371olPtTw=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=dFIbVR6C0C1sL/DWOG8TUKnVidhnLa5R2SXZ8Mo1Oc7nGmra1Lebory8iDy16FFM5YyI0URi2W4JMHmLOuxK+RpiVyyovMGVt5ilgKDvsceaPELJiAt2Ub3eH8daKveDbi8DsxVrq6PG3KwZO4Q8f94FBiNOSf48Ul63ilTjN10=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Kk9mIzwC; arc=none smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MJh+HUR0"
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-37d447de11dso2316012f8f.1;
-        Sat, 02 Nov 2024 10:21:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kk9mIzwC"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4315eac969aso16959575e9.1;
+        Sat, 02 Nov 2024 10:51:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730568112; x=1731172912; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=8t9oRS8jqFz7JqVHrKzcZwls154V3gx6wMcbOAYsmHY=;
-        b=MJh+HUR0MM+a2O4rSMzQnnF11VzdC6YWbqALcF8RgGGlaUbngYkkJnuC/lNDmrKwaK
-         KgqWzMGiUK7tA8ZjXKYhbHU14BuNrK4udU1kbZ/3B1IgwtuvNY7R9SOTFIeA1+xf8kyf
-         gh+EL/rpJfJrF2aY8UTUbLhu2fJOVq9zgtfJxZxKtC1bqm8ojG4ofBovomRmtC142FvX
-         1/5KmIx3vA9+OCyifAt4jcKj/okWNWqoNS0K4airkyjRZfM+CWyeFD0A+Ny5nbvQijhN
-         7DRzXMa3D14EXSKqKCMGx7ePgHl7jq5QIJWVdICXOBHPewrhOwuSyWsec+WRNc47merp
-         qCFg==
+        d=gmail.com; s=20230601; t=1730569877; x=1731174677; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=CXMuB9N8iV8ohwDfKCUDi+5Z+yxX91mIom7ZPwIqV+s=;
+        b=Kk9mIzwCOAZLGz7ACfa1C2de25Q9Eyvz4ztnzFbLy1EGbELdzofKDhSfOZwEpWvKGt
+         Mqq7ImQVtvuFiSDqe7zPVlZHFnqE1zBcQisccXfuAY1G/22Wwq2XKX370QMi9WpT39iC
+         zontc0mMajj9+LNEq2bPazTAgjQC3+RHQY2NYOK1N2Ol5Sj/QmsgZtuhltnpoEvVVa5G
+         BTEBoKJy3RP6zMjAmXoL3X8xgGAOZFAFBXaI9n5Ql2+r3Daz6dYJDxMwGdVu7Tfk907z
+         XSJ+tDaGje5vxWoNgzaUAPX7eyAgBtO1CGt4uodTstywYI7aAWmekBq7p0BRR+qIoJgz
+         XUWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730568112; x=1731172912;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8t9oRS8jqFz7JqVHrKzcZwls154V3gx6wMcbOAYsmHY=;
-        b=a6CuJUs8MF1wpFVqR1WA7c3ZNb0Oq2THAZ1kerQD/0lUdK/7F5ojHbWn1Ejd7GFKu1
-         MpIwSCFhyFSmRVY8O6waaHXqIZOWq6xL56i7SGSkBpnebOa80OuXvOFwzfs5MTzTQn6R
-         9WZFw+EyExcFy9t3xPCQ3ofa3IuFFQf1wt8xrQn17xSkkloSL7R4l0FSva+XD6djPSK0
-         mp81YQzyfzMlANxxwEyLOCUw2//3g0jD+9PkQHcxD1S5KELLxsO5zAqwLxvJ5/nivm6V
-         OWNaEcm5lv+Z+A7Js7iK1Zpy308f3qGsPYrmdqFXqr3Sp92LMKiu0cV5ThxC/eltC9j4
-         zPsw==
-X-Forwarded-Encrypted: i=1; AJvYcCU2lkJE8ygvvOoWPckNOV/J84fSvzKLFI1th0Zr1WytcihEJKnWDPM9W8Tc28TuhZhezkuC/2Tfqr1aAw==@vger.kernel.org, AJvYcCUHPJMZ4tz33UAEliO8XlkRjSjg1DrcDk7Zn+9/Vf14poLNQGH2IOoD1lIItPPLFf8/aksrAr8FNKafCQ==@vger.kernel.org, AJvYcCUmrayFmTbX7X1J50GM0TR8IjQQZYbNlzXGfafDP2wVqhGtCXdvOWQbwWIOFRuHjXPUnEG8OmmOwywlhA==@vger.kernel.org, AJvYcCV4p4gwcg+GmFQhMTZDfWOXs1xyhC7/RFdlCkGpg/e08XkeEzpiJwmrOWYwTmwNR0QO516iY02iBgBX@vger.kernel.org, AJvYcCV9cCndkOvQZkvf2Q3UpDKxitQB4Wd2U7eHKJuaJkoN1/PhvwzcKjwhUJei4Dr4Y283v3br03RBgdXjeZIM@vger.kernel.org, AJvYcCWPhLLJT60gGLNiImX/zxzAKhjQKIJ5U/HTXAbTDv3ypRNt7h2r6mDspW9W2aEKieh7DyVHyCyTbk9y9A==@vger.kernel.org, AJvYcCXJcF3AI7JrTSWPtylzR5Lglh/cUuLeNbb3K+vnM0+clCmhYdo71yRj8OhxQrQZniPViro6SB8VtNJgKDyR@vger.kernel.org, AJvYcCXi2XsNqzjWIdH88CvJjHZVn+yY/NTZEfpteXtkPRdu3RmWU62MWha56ZkjNvegAcUQA27zNRYNUItW6g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxX2+cDkW1lkUnNHGc/X1UTSPqQxXYA0u6ewUXoVln/6n29Vkq0
-	xG2CZcWeSOWCt2e3tjXweLBiZukJ+wsrWI7EAH4uk+0i19dqiAPm
-X-Google-Smtp-Source: AGHT+IGi2uIS+syMjf4Zb3uVjiFcNrb793MRtp10AmIBh8gU8g/TTGAjyc3KAIibvpjiJFec6IflZQ==
-X-Received: by 2002:a5d:5f96:0:b0:37d:324f:d3a9 with SMTP id ffacd0b85a97d-381be7add20mr8712682f8f.9.1730568111468;
-        Sat, 02 Nov 2024 10:21:51 -0700 (PDT)
-Received: from [192.168.8.100] (89-24-32-122.nat.epc.tmcz.cz. [89.24.32.122])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381c10b7b80sm8686121f8f.10.2024.11.02.10.21.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 02 Nov 2024 10:21:50 -0700 (PDT)
-Message-ID: <8784622f-ccdc-4086-83f7-50462d6369df@gmail.com>
-Date: Sat, 2 Nov 2024 18:21:48 +0100
+        d=1e100.net; s=20230601; t=1730569877; x=1731174677;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CXMuB9N8iV8ohwDfKCUDi+5Z+yxX91mIom7ZPwIqV+s=;
+        b=uFKOPGabpt6w7SsrTkLar8743+nIReF1OF0RPTENAChTCeaEZ8wWJHRN4RYh9u7+Z6
+         MFwTjFBCRl/TASM3EC/vokVxvYslxKkiYslBpYmE3UIl7vm0KnK5k3JwIaTKQ/luYbYD
+         qDpDEZ0rM1FlMfJPxDyZVmePY7A4iayGoh3qjDmnL6XblmfLnD0byY12MXjq85eOyZ3C
+         wgu28hygBkubd0JkHrsRj8psgb91Z1YfuDquiUK9coTzBd5igRvjNRc1wWe4Z8tnGL4V
+         ve9vrjb6VQRsl8b28zbDbLO3E6n7CWef7DXMTiYEoxJ9x6uujBHDtn4S3Uq9DTjePGW1
+         I2xw==
+X-Forwarded-Encrypted: i=1; AJvYcCUdQCK9Tjmor+wOSqpk4rrAH+aUdKyN32VoYcuycvl6/j6IoXUXb6nXpcL08t63vLRT2Ny7Me/kUgBqicTf@vger.kernel.org, AJvYcCWRHDC5HZkJZO5OnNRNw79f35Xs500JB5H9XgX+TDEYx7Jm2oSufX6n3sP1szw1iRivqz3Xh7dhUN2w@vger.kernel.org, AJvYcCWbuiCkuVuBTRg8RiDtxkXZZIgt6iObvwyFVoD7C3JCeccudaMaW1IJ05cb0dXi9g/LeZdyNFTmg8uUddOu@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyg74oPZdDhHPhOgN4s1HcbklndxlkyjECrxsWcFcFXRCPhl3bb
+	mcfOW0d78szuFScULS2cCcJk7Ly3Ev2JfS9fr5i3nZK9cPuXWIJr
+X-Google-Smtp-Source: AGHT+IG4ErV019b24ATJCRbM47/c0+opqsvXEfIywMoSiIaC/9Pmiq6VSJ0+BXswztHALWT6hLxtkQ==
+X-Received: by 2002:a05:600c:1d08:b0:431:559d:4103 with SMTP id 5b1f17b1804b1-4327daa3507mr83554475e9.7.1730569877333;
+        Sat, 02 Nov 2024 10:51:17 -0700 (PDT)
+Received: from localhost.localdomain (93-34-91-161.ip49.fastwebnet.it. [93.34.91.161])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-431bd9aa611sm131471715e9.34.2024.11.02.10.51.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 02 Nov 2024 10:51:16 -0700 (PDT)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Christian Marangi <ansuelsmth@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Antoine Tenart <atenart@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Will Deacon <will@kernel.org>,
+	Waiman Long <longman@redhat.com>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	linux-crypto@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev,
+	upstream@airoha.com
+Subject: [PATCH v6 1/3] spinlock: extend guard with spinlock_bh variants
+Date: Sat,  2 Nov 2024 18:50:33 +0100
+Message-ID: <20241102175045.10408-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH v2 04/18] crypto: crc32 - don't unnecessarily register
- arch algorithms
-To: Eric Biggers <ebiggers@kernel.org>,
- Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Ard Biesheuvel <ardb@kernel.org>, linux-kernel@vger.kernel.org,
- linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-crypto@vger.kernel.org, linux-ext4@vger.kernel.org,
- linux-f2fs-devel@lists.sourceforge.net, linux-mips@vger.kernel.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-scsi@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- loongarch@lists.linux.dev, sparclinux@vger.kernel.org, x86@kernel.org
-References: <20241026040958.GA34351@sol.localdomain>
- <ZyX0uGHg4Cmsk2oz@gondor.apana.org.au>
- <CAMj1kXFfPtO0vd1KqTa+QNSkRWNR7SUJ_A_zX6-Hz5HVLtLYtw@mail.gmail.com>
- <ZyX8yEqnjXjJ5itO@gondor.apana.org.au>
- <CAMj1kXHje-BwJVffAxN9G96Gy4Gom3Ca7dJ-_K7sgcrz7_k7Kw@mail.gmail.com>
- <CAMj1kXG8Nqw_f8OsFTq_UKRbca6w58g4uyRAZXCoCr=OwC2sWA@mail.gmail.com>
- <ZyYIO6RpjTFteaxH@gondor.apana.org.au>
- <20241102163605.GA28213@sol.localdomain>
-Content-Language: en-US
-From: Milan Broz <gmazyland@gmail.com>
-Autocrypt: addr=gmazyland@gmail.com; keydata=
- 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
-In-Reply-To: <20241102163605.GA28213@sol.localdomain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 11/2/24 5:36 PM, Eric Biggers wrote:
-> On Sat, Nov 02, 2024 at 07:08:43PM +0800, Herbert Xu wrote:
->> On Sat, Nov 02, 2024 at 12:05:01PM +0100, Ard Biesheuvel wrote:
->>>
->>> The only issue resulting from *not* taking this patch is that btrfs
->>> may misidentify the CRC32 implementation as being 'slow' and take an
->>> alternative code path, which does not necessarily result in worse
->>> performance.
->>
->> If we were removing crc32* (or at least crc32*-arch) from the Crypto
->> API then these patches would be redundant.  But if we're keeping them
->> because btrfs uses them then we should definitely make crc32*-arch
->> do the right thing.  IOW they should not be registered if they're
->> the same as crc32*-generic.
->>
->> Thanks,
-> 
-> I would like to eventually remove crc32 and crc32c from the crypto API, but it
-> will take some time to get all the users converted.  If there are AF_ALG users
-> it could even be impossible, though the usual culprit, iwd, doesn't appear to
-> use any CRCs, so hopefully we are fine there.
+Extend guard APIs with missing raw/spinlock_bh variants.
 
-Hi,
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+---
+Changes v5:
+- Add Ack tag
+Changes v4:
+- Out of RFC
+Changes v2:
+- Add this patch
 
-Please do not forget about dm-integrity, it can use crc32/crc32c for non-cryptographic
-integrity through crypto API.
-To test it, cryptsetup testsuite should cover these variants (integrity-compat-test).
+ include/linux/spinlock.h | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-Also, libcryptsetup can be compiled with userspace kernel crypto (AF_ALG) as a crypto backend.
-At least, I think we never used CRC32 though AF_ALG from userspace there...
-
-Thanks,
-Milan
+diff --git a/include/linux/spinlock.h b/include/linux/spinlock.h
+index 63dd8cf3c3c2..d3561c4a080e 100644
+--- a/include/linux/spinlock.h
++++ b/include/linux/spinlock.h
+@@ -548,6 +548,12 @@ DEFINE_LOCK_GUARD_1(raw_spinlock_irq, raw_spinlock_t,
+ 
+ DEFINE_LOCK_GUARD_1_COND(raw_spinlock_irq, _try, raw_spin_trylock_irq(_T->lock))
+ 
++DEFINE_LOCK_GUARD_1(raw_spinlock_bh, raw_spinlock_t,
++		    raw_spin_lock_bh(_T->lock),
++		    raw_spin_unlock_bh(_T->lock))
++
++DEFINE_LOCK_GUARD_1_COND(raw_spinlock_bh, _try, raw_spin_trylock_bh(_T->lock))
++
+ DEFINE_LOCK_GUARD_1(raw_spinlock_irqsave, raw_spinlock_t,
+ 		    raw_spin_lock_irqsave(_T->lock, _T->flags),
+ 		    raw_spin_unlock_irqrestore(_T->lock, _T->flags),
+@@ -569,6 +575,13 @@ DEFINE_LOCK_GUARD_1(spinlock_irq, spinlock_t,
+ DEFINE_LOCK_GUARD_1_COND(spinlock_irq, _try,
+ 			 spin_trylock_irq(_T->lock))
+ 
++DEFINE_LOCK_GUARD_1(spinlock_bh, spinlock_t,
++		    spin_lock_bh(_T->lock),
++		    spin_unlock_bh(_T->lock))
++
++DEFINE_LOCK_GUARD_1_COND(spinlock_bh, _try,
++			 spin_trylock_bh(_T->lock))
++
+ DEFINE_LOCK_GUARD_1(spinlock_irqsave, spinlock_t,
+ 		    spin_lock_irqsave(_T->lock, _T->flags),
+ 		    spin_unlock_irqrestore(_T->lock, _T->flags),
+-- 
+2.45.2
 
