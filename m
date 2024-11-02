@@ -1,119 +1,74 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E14C380034;
-	Sat,  2 Nov 2024 09:02:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46D9680034;
+	Sat,  2 Nov 2024 09:45:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730538174; cv=none; b=HzqwUBWV6nr4t1pqI4lC+jj3WMoiOmcNQ0ji6pOeIdawP3H48MAGtC1zt4qnG2PTIixvUOSZ9nqyzuppBtFUOjnzE7hbKUX9Jtu3ycN9bdlrarC7hl2+9VPit91goYUf/Jj+Q6/kd5KwUjZBzqOMC1R4t9KxXUOJK/ftX2UiDF8=
+	t=1730540757; cv=none; b=okC31q/qda2lwYMJkf2AX75kdALb4fucbPWjmizzis1z2rOB0ce7qcwpxncvpO+ET18KmJdoK+8MqM4jRGlkM9Xz1e4ta02XKqUShSlqi40/yRJmsRsOmC6Cy4Vh4LrXyiGvwhSjL1PxzMz36n0aW5/BGaHBB7hUx+zEfBYWwO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730538174; c=relaxed/simple;
-	bh=LBoNUIt26/rOHWnEOHVZz/A27Sk+n0iu8cOSeH8LX0E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=W+DvCPuBLR7bRFnlwK5q2H8WOY4nWQqfry8PNYIv24G4+H03IwltwtZqYyvvpSolBqApT91ARyxg/O9APQ9lBWQtxzW6SOFodYuQLVTUxJem+EVNkcU4bAh1nP1n4OTh2bALAYH0f1SwruG0JZlTAdAnGI63JNrQl7I9GJaEz34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T92cCCsw; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1730540757; c=relaxed/simple;
+	bh=3/AKilervyPC21hMELAU0HNgnAeGr1Qn3UgiDLal+ac=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=SRpNAtKgVK+fyDfzK0qP1uWNzw8GJADX5N3e0Fecv13b3OiUgKXXrkDlt9XaVu5M1CpL8P417uGeEKtTa/3BDvCauRsxfpIhHjEMAKkAU/s+PrLiJY6xAolsRL3dgajqLFLcao7MVo9Bp40aQRYB8oHUcQ+/hkqYIvydoFEFRjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=Q5Mjntzp; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T92cCCsw"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 636D3C4CED2;
-	Sat,  2 Nov 2024 09:02:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730538173;
-	bh=LBoNUIt26/rOHWnEOHVZz/A27Sk+n0iu8cOSeH8LX0E=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=T92cCCswFZ6WUioUkTmAiZjzCFTDeI+a3/42QMv5GjnyNBbMyng9Px/d+iIX2InM9
-	 3AZnttj3GzjwZ2lzOP/h3brXdgoQoGYzuA7WYBmAkbWiBU2dNjo+ZW4zQTGS7LUM1k
-	 dbtmjb2bFrO/MAiO73+Bz6l3Ktq6bELYuCzxuV4NHaB+G9uYkwiiMwZfz8JwnG0i1J
-	 n1+n5fO85Fg+fLTfst0zqL81ZEL9oe181eo59eLEmvaQkTlEzOAaKxuZUCFbWABq3Z
-	 hPDmi4z6gt370GEiK8h4bl9GY/CLtSPP2i/8/XUdz0mRl4d4nIKN4N2gugIjuys4Er
-	 8ZnA3qUSEqY+A==
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-539ebb5a20aso2823551e87.2;
-        Sat, 02 Nov 2024 02:02:53 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCULTF9pE8Zea+O+PyN2fpTAGghZvguAzRw3FmT1J4R1uplp2bN+rLpdRv4VVnEElwz4CW1wm8u4wRBkLEI=@vger.kernel.org, AJvYcCUN7Pc8+4URK/Ew0rZys2kZ2IGGPE27S18QluhBWDbIub8QitxnTTQjgbVSYxVqRuy5BuVD4l0bMW4KH2kr@vger.kernel.org, AJvYcCUmCewdJe/an1WjEgGjYjtUL2FY0VkX7r8abUhsEDgMOGoHxkKngw8PwhKbzMZ+tUjdRBK2ryBS18lL@vger.kernel.org, AJvYcCWVLhwOzSPu9nAl0gtISzkmcU8DPo9u7srTa43kR3PLjIEIuUkAwj993HnmtWu+3KuvgcZx/ENXaBUQFy9Bo9h8@vger.kernel.org, AJvYcCX8FMkL7kmTxUyipybr0gnu6zC/3Vd0KYxDdl1p5JzAQRNF6Hia6/vkistTnSFyt1yismD2t4ZRvST4@vger.kernel.org
-X-Gm-Message-State: AOJu0YwqBlbIriPCmD4Mang9w9zxjs0Tdgxm5GIAjltBzxupgtsITR1+
-	WH1MfiuK6S8BTf4zP2GAOtfEz1iP0JXUpLipi7tAjo+rqGf4IZAjKk809gSEXfCNLelYMFEafc9
-	Ds/7G9HecsxVf1U+smastyVbzTqM=
-X-Google-Smtp-Source: AGHT+IH5OhSbyxPUwoV8Hi3NZvUJk62Sk/kM4uS3eDew9nHH5ECqnhoFDJijntPKiKzAeGwvpQ6+AOtWhMBUTM8YWgU=
-X-Received: by 2002:a19:e043:0:b0:539:94aa:d512 with SMTP id
- 2adb3069b0e04-53d65e1771emr2299160e87.53.1730538171706; Sat, 02 Nov 2024
- 02:02:51 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="Q5Mjntzp"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:Message-ID:Subject:Cc:To:
+	From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=jpcaovD1uzHZkdDMg5tZvb0Z9OfX74OLNrLMh/vslrg=; b=Q5MjntzpHzBvczROcNsYoj+25t
+	CTplAOz4OXNjmKbeHRPSkC2PF8/2CQ+S9+BpzdDOraNgbvJHl1b2XbDV1IX3zldrAMVgbCnIPBjj6
+	0IWTAu3B1HtaRzbcItOeEI76Vhr65Zdrv6Hj7PnTJ9akLQTMtM7LE6EHbcKkj/xmU2QzOxWp4th0u
+	J1y5NQ3M1+7fbEZEPyWTXBC1K0HGtCKB8/SuT1fdvssCL8+XduxOZjD+6GgoigCaoEwTAJWXor6+8
+	4zJNFOI8kfLHoCcjY0lPk4C6G5wnEcy3WATqplhANsESpNXFLLJLZUN4OEO8S1bcBapdvZR08K4kj
+	Lwh8InsQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1t7AhE-00Dxdz-0Y;
+	Sat, 02 Nov 2024 17:45:29 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 02 Nov 2024 17:45:28 +0800
+Date: Sat, 2 Nov 2024 17:45:28 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: ardb@kernel.org, linux-kernel@vger.kernel.org,
+	linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-crypto@vger.kernel.org, linux-ext4@vger.kernel.org,
+	linux-f2fs-devel@lists.sourceforge.net, linux-mips@vger.kernel.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	loongarch@lists.linux.dev, sparclinux@vger.kernel.org,
+	x86@kernel.org
+Subject: Re: [PATCH v2 04/18] crypto: crc32 - don't unnecessarily register
+ arch algorithms
+Message-ID: <ZyX0uGHg4Cmsk2oz@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <D5BB5GX4KEUO.VJ2G9G9QKYRR@kernel.org> <20241102062259.2521361-1-jarkko@kernel.org>
- <D5BHBW3NUS5C.293GUI03HMTCF@kernel.org>
-In-Reply-To: <D5BHBW3NUS5C.293GUI03HMTCF@kernel.org>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Sat, 2 Nov 2024 10:02:40 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXGk8y=rZiNiDcD-8mDKJB5HkTowM7g+kjO6616MGdTQaQ@mail.gmail.com>
-Message-ID: <CAMj1kXGk8y=rZiNiDcD-8mDKJB5HkTowM7g+kjO6616MGdTQaQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 1/2] tpm, tpm_tis: Introduce TPM_IOC_SET_LOCALITY
-To: Jarkko Sakkinen <jarkko@kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>, Peter Huewe <peterhuewe@gmx.de>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	James.Bottomley@hansenpartnership.com, andrew.cooper3@citrix.com, 
-	baolu.lu@linux.intel.com, bp@alien8.de, dave.hansen@linux.intel.com, 
-	davem@davemloft.net, dpsmith@apertussolutions.com, dwmw2@infradead.org, 
-	ebiederm@xmission.com, herbert@gondor.apana.org.au, hpa@zytor.com, 
-	iommu@lists.linux-foundation.org, kanth.ghatraju@oracle.com, 
-	kexec@lists.infradead.org, linux-crypto@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-efi@vger.kernel.org, 
-	linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luto@amacapital.net, mingo@redhat.com, mjg59@srcf.ucam.org, 
-	nivedita@alum.mit.edu, ross.philipson@oracle.com, tglx@linutronix.de, 
-	trenchboot-devel@googlegroups.com, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241026040958.GA34351@sol.localdomain>
+X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel,apana.lists.os.linux.scsi
 
-On Sat, 2 Nov 2024 at 07:29, Jarkko Sakkinen <jarkko@kernel.org> wrote:
+Eric Biggers <ebiggers@kernel.org> wrote:
 >
-> On Sat Nov 2, 2024 at 8:22 AM EET, Jarkko Sakkinen wrote:
-> > DRTM needs to be able to set the locality used by kernel. Provide
-> > TPM_IOC_SET_LOCALITY operation for this purpose. It is enabled only if
-> > the kernel command-line has 'tpm.set_locality_enabled=1'. The operation
-> > is one-shot allowed only for tpm_tis for the moment.
-> >
-> > Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
-> > ---
-> > v2:
-> > - Do not ignore the return value of tpm_ioc_set_locality().
-> > - if (!(chip->flags & TPM_CHIP_FLAG_SET_LOCALITY_ENABLED))
-> > - Refined kernel-parameters.txt description.
-> > - Use __u8 instead of u8 in the uapi.
-> > - Tested with https://codeberg.org/jarkko/tpm-set-locality-test/src/branch/main/src/main.rs
->
-> This version has been also tested (and encountered bugs fixed). I wrote
-> a small test program to verify that it works linked above.
->
-> After the boot, the new ioctl can reset exactly once the locality. Other
-> benefit is that the feature can be selected per driver (at this point
-> tpm_tis drivers) and protection of the access with DAC, SELinux etc.
->
-> And thanks to the kernel command-line parameter, it is an opt-in
-> feature like it should because vast majority of users will probably
-> never use trenchboot. I.e. set 'tpm.set_locality_enable=1' to have
-> the ioctl available.
->
-> I think this is a solution that at least I could live with. It has
-> somewhat rigid commmon-sense constraints.
->
+> While testing this patchset I notice that none of the crypto API drivers for
+> crc32 or crc32c even need to be loaded on my system anymore, as everything on my
+> system that uses those algorithms (such as ext4) just uses the library APIs now.
+> That makes the "check /proc/crypto" trick stop working anyway.
 
-Before adding a kernel command line parameter, please ask yourself who
-is going to set it and where, and whether there is any risk of abuse.
-The kernel command line is external input that is not signed, and the
-only known user of this set_locality feature is internal to the
-kernel.
+What's stopping us from removing them altogether?
 
-Same for the ioctl() [as well as the read-write sysfs node]: looking
-at the code (patch 19/20) it doesn't seem like user space needs to be
-able to modify this at all, at least not for the patch set as
-presented. So for now, can we just stick with making the sysfs node
-read-only?
-
-The only thing I would recommend is exporting the set_locality()
-symbol in a module namespace, so that it is obvious that it is not
-intended for general use by other modules (although not impossible).
-E.g., CRYPTO_INTERNAL does something similar, and if
-MODULE_IMPORT_NS(CRYPTO_INTERNAL) appears in new code, reviewers are
-alerted that it accesses internal APIs rather than ones intended for
-other subsystems to use.
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
