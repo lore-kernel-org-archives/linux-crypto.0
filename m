@@ -1,75 +1,77 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB6EB45016;
-	Sat,  2 Nov 2024 10:27:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE243165F18;
+	Sat,  2 Nov 2024 10:38:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730543250; cv=none; b=YZmUxaiqI44nnfgWzsSBC6yhUIDSO51kJd5nVwL2ewZERMsCsmBS0Z9Z7sJY7Yq0TwPQUyNPby9MtJDSUmBY7QlrA/o+86SoHkPUQe/Z9hKZUE4JZhLN5oYdQ9B2+q70Ut68pA4VhB7C19fc449dORBwlheVBamwW/YxESPmP7I=
+	t=1730543939; cv=none; b=qFo5mln3t+Fg35nHl8EYtPURsBvtXRtgomQhEDRwPbQRgg9a8QMOqsKbpHKicSoFI3YmjTGvSm32He1X3NWvRY/V48tjSw9qCW0M3GdAClAqCJudAzziS2w8UkAYDtLpzducReZbODP7SRiBOb5gvhrz3It9ey4ig7jAQ1vOLZ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730543250; c=relaxed/simple;
-	bh=gJ0yfazwv53p2TN/o65RhEqRJsKdSKYFP87MLWY1nXQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y4M3ZCCtKGnM/4IjSTcpsyA0MsUAspzHaM4FzVXiwCs3AqAeEa4NoZKKqi0RSz+k9cUlKsMaJzJkEFiYfx/5aJg8c9IIBg53Tl1+8quZuC8m6dfz+cua9rmhhsOb10MOgIxmtwn3fbTRi40+zQIHsAkBO/5tFFl/VlmjM922Ys4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=EqIIcEnw; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1730543939; c=relaxed/simple;
+	bh=VBKEa56BIF6QsRkD7RAecoTuv66Z7zv8Det8m4u7ftI=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=fdimTfroDMxnB8lTKocPMvL7hborgGTTXWaWMCGV3uYoK1++GaMm5vngoDLyHqVRi2k87f5KDGMXWh+hoAJFKXIbBCtlor5yJAyJIKWvaP3r06fb830qjTRI5UryE2sb1VKkW//cmBclNBMGl+j485zdCu604MK4g9WMRHmPeTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gOtMufXP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="EqIIcEnw"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=fybUe+1EsNhgWNHapJ1oIvkjUrejrg3OJXD9IeFCVX4=; b=EqIIcEnwBGFsILwMNDuJ+a/NYj
-	I75hhgkNZHrKPTr3QCYdWhY1zIewAdE2CTexk4Ax8twG1ZXWgh9aOXQEK6nPCKtISLF0eL2HCPZDS
-	kG2zuLmTOFcnvBsh8RJCa8b+V/haBAliQ+bpbdLzZVFHCte7H+/CfaqsyS9S2pbQeK9dKzA7h+OVG
-	29Y6DpXiIHbHWGubYB/KNSiGmS75nDl8UCKGmMMARFGf+ObPtAybJhQhl3ICnEM/2W/74vJM7q+Ni
-	yHZX7uZxQgnHo4OcuRTMSnjT9v0S726Bj1CPcbbBtZ4Kjt1m4U6Qze0luC0J+/ecY2DLLJRcw77xD
-	RaxflAGg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1t7BLm-00Dy5K-2v;
-	Sat, 02 Nov 2024 18:27:23 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 02 Nov 2024 18:27:22 +0800
-Date: Sat, 2 Nov 2024 18:27:22 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Weili Qian <qianweili@huawei.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	liulongfang@huawei.com, shenyang39@huawei.com
-Subject: Re: [PATCH] crypto: hisilicon/qm - disable same error report before
- resetting
-Message-ID: <ZyX-ijCZdl0tN7Ki@gondor.apana.org.au>
-References: <20241026114429.54090-1-qianweili@huawei.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gOtMufXP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACC7DC4CEC3;
+	Sat,  2 Nov 2024 10:38:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730543938;
+	bh=VBKEa56BIF6QsRkD7RAecoTuv66Z7zv8Det8m4u7ftI=;
+	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
+	b=gOtMufXPnc1DFubhW7urf50dPP0bw7KIiI3fvULoHrreHHmwFH9QwAfpNb54uDN18
+	 kaAGkZTYHObw5uIJMbV9bUddVCc1ac0Saz5R1wPok7rFAng3z5LsAVZOXlyl/LCoCt
+	 G1hsDOSZJJDG9/uEQhCnicp3jmsm2plmYOIQmF7hHiJ/+a4a9RXHKtxhsRYhofwHAA
+	 lLkViIuMowQlJi/iR0N36yOu8ktoVAz+045SjYt1aw8Ju46YHIUBQqLfWk7NqGhDuM
+	 AEFABWsbKJAh+lmxj5cmSoWXmdQVVQTiAKI8qVrgMtzWekCyE9Ldt7bWWVUyLtMp5U
+	 CZ0rOmGMK8dyQ==
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241026114429.54090-1-qianweili@huawei.com>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Sat, 02 Nov 2024 12:38:53 +0200
+Message-Id: <D5BMMJYMVWKJ.3MIGB8KW34PR2@kernel.org>
+Cc: "Jonathan Corbet" <corbet@lwn.net>, "Peter Huewe" <peterhuewe@gmx.de>,
+ "Jason Gunthorpe" <jgg@ziepe.ca>, <James.Bottomley@hansenpartnership.com>,
+ <andrew.cooper3@citrix.com>, <baolu.lu@linux.intel.com>, <bp@alien8.de>,
+ <dave.hansen@linux.intel.com>, <davem@davemloft.net>,
+ <dpsmith@apertussolutions.com>, <dwmw2@infradead.org>,
+ <ebiederm@xmission.com>, <herbert@gondor.apana.org.au>, <hpa@zytor.com>,
+ <iommu@lists.linux-foundation.org>, <kanth.ghatraju@oracle.com>,
+ <kexec@lists.infradead.org>, <linux-crypto@vger.kernel.org>,
+ <linux-doc@vger.kernel.org>, <linux-efi@vger.kernel.org>,
+ <linux-integrity@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <luto@amacapital.net>, <mingo@redhat.com>, <mjg59@srcf.ucam.org>,
+ <nivedita@alum.mit.edu>, <ross.philipson@oracle.com>, <tglx@linutronix.de>,
+ <trenchboot-devel@googlegroups.com>, <x86@kernel.org>
+Subject: Re: [RFC PATCH v2 1/2] tpm, tpm_tis: Introduce TPM_IOC_SET_LOCALITY
+From: "Jarkko Sakkinen" <jarkko@kernel.org>
+To: "Ard Biesheuvel" <ardb@kernel.org>
+X-Mailer: aerc 0.18.2
+References: <D5BB5GX4KEUO.VJ2G9G9QKYRR@kernel.org>
+ <20241102062259.2521361-1-jarkko@kernel.org>
+ <D5BHBW3NUS5C.293GUI03HMTCF@kernel.org>
+ <CAMj1kXGk8y=rZiNiDcD-8mDKJB5HkTowM7g+kjO6616MGdTQaQ@mail.gmail.com>
+In-Reply-To: <CAMj1kXGk8y=rZiNiDcD-8mDKJB5HkTowM7g+kjO6616MGdTQaQ@mail.gmail.com>
 
-On Sat, Oct 26, 2024 at 07:44:29PM +0800, Weili Qian wrote:
-> If an error indicating that the device needs to be reset is reported,
-> disable the error reporting before device reset is complete,
-> enable the error reporting after the reset is complete to prevent
-> the same error from being reported repeatedly.
-> 
-> Fixes: eaebf4c3b103 ("crypto: hisilicon - Unify hardware error init/uninit into QM")
-> Signed-off-by: Weili Qian <qianweili@huawei.com>
-> ---
->  drivers/crypto/hisilicon/hpre/hpre_main.c | 35 ++++++++++++++---
->  drivers/crypto/hisilicon/qm.c             | 47 +++++++----------------
->  drivers/crypto/hisilicon/sec2/sec_main.c  | 35 ++++++++++++++---
->  drivers/crypto/hisilicon/zip/zip_main.c   | 35 ++++++++++++++---
->  include/linux/hisi_acc_qm.h               |  8 +++-
->  5 files changed, 110 insertions(+), 50 deletions(-)
+On Sat Nov 2, 2024 at 11:02 AM EET, Ard Biesheuvel wrote:
+> Same for the ioctl() [as well as the read-write sysfs node]: looking
+> at the code (patch 19/20) it doesn't seem like user space needs to be
+> able to modify this at all, at least not for the patch set as
+> presented. So for now, can we just stick with making the sysfs node
+> read-only?
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Short answer: I have no idea. I would not mind that but neither
+the commit message for TPM give a clue on this. Actually, I *do
+not care* if it is RO and RW but I'm neither good at guessing
+random shit.
+
+I haad to assume it was *needed* for reason that I do not know
+given that sysfs attribute was RW.
+
+BR, Jarkko
