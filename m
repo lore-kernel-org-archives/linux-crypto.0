@@ -1,54 +1,57 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B071154423;
-	Sat,  2 Nov 2024 17:51:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEE5A1AAE33;
+	Sat,  2 Nov 2024 17:51:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730569880; cv=none; b=uSdHHWmt2X5Tgd6xbAooaX2wAV24L1DSy5YEzOae/dzHcwy+AcaC4ijjwN52sKmnajHZHS4guKNN58O9jUHCctQGcUrE/f3xmtlOZMP4slGEJ2uYrQp5mYpc53xjuTMHj2lk5oID+yG9KnQEYrtXdb/AeiiFfj5JpdwYLIQ/23U=
+	t=1730569884; cv=none; b=LXEtDnn1M78uYD4lWhVAleYzf+GWRuiumVVVFUNXLv4b2KxxyN00XMfi9fGZyyNSm2/pesANi6/+PFAVQgOCDoeWQdmk/GZn/Pj5IGVYSGyRYF1L6lZuOUsxryiyttTKoYegFcZKZwR7edAxjwE1h5QU9SXtYoqa6/YXhoqDZWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730569880; c=relaxed/simple;
-	bh=YamZzvhmaDu6jNuMTIZ5BlSZQSa1W1+FOr371olPtTw=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version; b=dFIbVR6C0C1sL/DWOG8TUKnVidhnLa5R2SXZ8Mo1Oc7nGmra1Lebory8iDy16FFM5YyI0URi2W4JMHmLOuxK+RpiVyyovMGVt5ilgKDvsceaPELJiAt2Ub3eH8daKveDbi8DsxVrq6PG3KwZO4Q8f94FBiNOSf48Ul63ilTjN10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Kk9mIzwC; arc=none smtp.client-ip=209.85.128.46
+	s=arc-20240116; t=1730569884; c=relaxed/simple;
+	bh=yEI+hQHiZQY7ehD56rzBwPffwdH92W/UhMThLRYgnhc=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=RnykRkeH4q+s4C5kHqt8jz9Z6w5Cn3sbhQKLdTrgJff1Jni5pm2qq7Gp1jWZpqtgfhKcKKk9y6vEHkLvPgzF2ZGzknK8G9VfZ9WSFq8jVKi9q57h921Z1tCkHiIeD3OZwOKrgocHYrHLMUqH+YMGQk4YYWgb1H+iYUiDwZpUthE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j2dx5sXJ; arc=none smtp.client-ip=209.85.221.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kk9mIzwC"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4315eac969aso16959575e9.1;
-        Sat, 02 Nov 2024 10:51:18 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j2dx5sXJ"
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-37d6ff1cbe1so2059243f8f.3;
+        Sat, 02 Nov 2024 10:51:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730569877; x=1731174677; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=CXMuB9N8iV8ohwDfKCUDi+5Z+yxX91mIom7ZPwIqV+s=;
-        b=Kk9mIzwCOAZLGz7ACfa1C2de25Q9Eyvz4ztnzFbLy1EGbELdzofKDhSfOZwEpWvKGt
-         Mqq7ImQVtvuFiSDqe7zPVlZHFnqE1zBcQisccXfuAY1G/22Wwq2XKX370QMi9WpT39iC
-         zontc0mMajj9+LNEq2bPazTAgjQC3+RHQY2NYOK1N2Ol5Sj/QmsgZtuhltnpoEvVVa5G
-         BTEBoKJy3RP6zMjAmXoL3X8xgGAOZFAFBXaI9n5Ql2+r3Daz6dYJDxMwGdVu7Tfk907z
-         XSJ+tDaGje5vxWoNgzaUAPX7eyAgBtO1CGt4uodTstywYI7aAWmekBq7p0BRR+qIoJgz
-         XUWw==
+        d=gmail.com; s=20230601; t=1730569879; x=1731174679; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=q7A9KiIj5azyBmcBDWj3pk1ALcLPY6NaAlc3dg84Ruc=;
+        b=j2dx5sXJnN7UG+cYn7whyACK4J+u0rfZi2Rnmh4zgPq47/7y/kBWP0IG6UE+ChgZXk
+         gJX3g9crsMdi5+H8WGcCPlDYnLn3aIi3oiksVKRGaB8sfxUgQ3/y6xd7VrMBx+wIGNGZ
+         RyGRoyPjS8cTjokBYTkN+eMGnoWNX1ngHKZDokEOGg85zNGtGScG0r7zmhE6TztCFAwk
+         D5EDpHErhpmMHh7F+H71BW5rd+QBmc7t/rz8rdOuFolQhnePEJEYvNEhLh9Zg/bOSxAr
+         59E9r/GseeFG/6OGUXSHCQB8m9Ky3s40EByOCiFu3rBIe6mAAPlTSLq7ZJnhnPf59v0F
+         a17g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730569877; x=1731174677;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CXMuB9N8iV8ohwDfKCUDi+5Z+yxX91mIom7ZPwIqV+s=;
-        b=uFKOPGabpt6w7SsrTkLar8743+nIReF1OF0RPTENAChTCeaEZ8wWJHRN4RYh9u7+Z6
-         MFwTjFBCRl/TASM3EC/vokVxvYslxKkiYslBpYmE3UIl7vm0KnK5k3JwIaTKQ/luYbYD
-         qDpDEZ0rM1FlMfJPxDyZVmePY7A4iayGoh3qjDmnL6XblmfLnD0byY12MXjq85eOyZ3C
-         wgu28hygBkubd0JkHrsRj8psgb91Z1YfuDquiUK9coTzBd5igRvjNRc1wWe4Z8tnGL4V
-         ve9vrjb6VQRsl8b28zbDbLO3E6n7CWef7DXMTiYEoxJ9x6uujBHDtn4S3Uq9DTjePGW1
-         I2xw==
-X-Forwarded-Encrypted: i=1; AJvYcCUdQCK9Tjmor+wOSqpk4rrAH+aUdKyN32VoYcuycvl6/j6IoXUXb6nXpcL08t63vLRT2Ny7Me/kUgBqicTf@vger.kernel.org, AJvYcCWRHDC5HZkJZO5OnNRNw79f35Xs500JB5H9XgX+TDEYx7Jm2oSufX6n3sP1szw1iRivqz3Xh7dhUN2w@vger.kernel.org, AJvYcCWbuiCkuVuBTRg8RiDtxkXZZIgt6iObvwyFVoD7C3JCeccudaMaW1IJ05cb0dXi9g/LeZdyNFTmg8uUddOu@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyg74oPZdDhHPhOgN4s1HcbklndxlkyjECrxsWcFcFXRCPhl3bb
-	mcfOW0d78szuFScULS2cCcJk7Ly3Ev2JfS9fr5i3nZK9cPuXWIJr
-X-Google-Smtp-Source: AGHT+IG4ErV019b24ATJCRbM47/c0+opqsvXEfIywMoSiIaC/9Pmiq6VSJ0+BXswztHALWT6hLxtkQ==
-X-Received: by 2002:a05:600c:1d08:b0:431:559d:4103 with SMTP id 5b1f17b1804b1-4327daa3507mr83554475e9.7.1730569877333;
-        Sat, 02 Nov 2024 10:51:17 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1730569879; x=1731174679;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=q7A9KiIj5azyBmcBDWj3pk1ALcLPY6NaAlc3dg84Ruc=;
+        b=ODJZOpKLD/TsF5F8qWWuTWRuaO6GeGjSq3J1V37s0eBXR5rhqVbQazA0Pq4jQEORoV
+         BmaPlxB1IpwGNSnk0yPmIxhGDh3x75PEjueKMFXfn3sS85DsFGeaHEVLQyX9gWH5iJIg
+         Xy79v7FwlmE9CU1NSOYBC8Srv/Se2cmQhTbCgfP1SBvTSGwtPgix6+KTbNbVwU2dpCKq
+         BohA4lmmbLThQiQcII3/v+YMUSIAHL6+k9it5qP6+Y3bZSswJ5FgjdXVe6u2SNrEfmyC
+         LbqXTJZ5VPiREP/HdZ01r7wHiJQILJL+54cSqRFTjXTDo7Czjpw8CJmJnmAmCzQXb79G
+         E5lA==
+X-Forwarded-Encrypted: i=1; AJvYcCUJ2wUURbqzkLmXUiszX3ZiUebROu5JxtTpJa10Vh2BS9la0zf6vWL1REO7g5XtKGM/Z/TvbfDPvRqQmRlB@vger.kernel.org, AJvYcCUMY3sJPiNe3reutUeVfirsFoC1qm1RTOZg8tnNX5MXyt23WEyQiN5c0W67jMGqZmn0qgO8ogPhrwH+Wj8a@vger.kernel.org, AJvYcCVSGpQPbofOB37H1lC/TNWICO79cxs8D33xHxnZcfQQB77GNeEbTwl54EtAFDT3CYbHuCzDm/ngp9Z6@vger.kernel.org
+X-Gm-Message-State: AOJu0YytphyZNsYAyrWqk5uGtgwkosCUlASthqVTZfHagyNYiDo+D2jd
+	jh1eo9N34r1O8ideVqG71PZn1/vaElhhuCWF+bQe5ceJ2GtfhWnC
+X-Google-Smtp-Source: AGHT+IG/88Fs6owiWfglDv/qT3GWO4sjkF23tstNx+tGKllkCTOcMQ1YtJoOpjeW19r68AgBat9Ecw==
+X-Received: by 2002:a05:6000:710:b0:37d:4821:fa0 with SMTP id ffacd0b85a97d-381bea26456mr8048925f8f.48.1730569878636;
+        Sat, 02 Nov 2024 10:51:18 -0700 (PDT)
 Received: from localhost.localdomain (93-34-91-161.ip49.fastwebnet.it. [93.34.91.161])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-431bd9aa611sm131471715e9.34.2024.11.02.10.51.15
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-431bd9aa611sm131471715e9.34.2024.11.02.10.51.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 Nov 2024 10:51:16 -0700 (PDT)
+        Sat, 02 Nov 2024 10:51:18 -0700 (PDT)
 From: Christian Marangi <ansuelsmth@gmail.com>
 To: Christian Marangi <ansuelsmth@gmail.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
@@ -71,10 +74,12 @@ To: Christian Marangi <ansuelsmth@gmail.com>,
 	linux-kernel@vger.kernel.org,
 	llvm@lists.linux.dev,
 	upstream@airoha.com
-Subject: [PATCH v6 1/3] spinlock: extend guard with spinlock_bh variants
-Date: Sat,  2 Nov 2024 18:50:33 +0100
-Message-ID: <20241102175045.10408-1-ansuelsmth@gmail.com>
+Subject: [PATCH v6 2/3] dt-bindings: crypto: Add Inside Secure SafeXcel EIP-93 crypto engine
+Date: Sat,  2 Nov 2024 18:50:34 +0100
+Message-ID: <20241102175045.10408-2-ansuelsmth@gmail.com>
 X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20241102175045.10408-1-ansuelsmth@gmail.com>
+References: <20241102175045.10408-1-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -83,52 +88,106 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Extend guard APIs with missing raw/spinlock_bh variants.
+Add bindings for the Inside Secure SafeXcel EIP-93 crypto engine.
+
+The IP is present on Airoha SoC and on various Mediatek devices and
+other SoC under different names like mtk-eip93 or PKTE.
+
+All the compatible that currently doesn't have any user are defined but
+rejected waiting for an actual device that makes use of them.
 
 Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 ---
+Changes v6:
+- Add SoC specific compatible
+- Add now supported entry for compatible with no user
 Changes v5:
-- Add Ack tag
+- Comment out compatible with no current user
 Changes v4:
 - Out of RFC
+Changes v3:
+- Add SoC compatible with generic one
 Changes v2:
-- Add this patch
+- Change to better compatible
+- Add description for EIP93 models
 
- include/linux/spinlock.h | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ .../crypto/inside-secure,safexcel-eip93.yaml  | 67 +++++++++++++++++++
+ 1 file changed, 67 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/inside-secure,safexcel-eip93.yaml
 
-diff --git a/include/linux/spinlock.h b/include/linux/spinlock.h
-index 63dd8cf3c3c2..d3561c4a080e 100644
---- a/include/linux/spinlock.h
-+++ b/include/linux/spinlock.h
-@@ -548,6 +548,12 @@ DEFINE_LOCK_GUARD_1(raw_spinlock_irq, raw_spinlock_t,
- 
- DEFINE_LOCK_GUARD_1_COND(raw_spinlock_irq, _try, raw_spin_trylock_irq(_T->lock))
- 
-+DEFINE_LOCK_GUARD_1(raw_spinlock_bh, raw_spinlock_t,
-+		    raw_spin_lock_bh(_T->lock),
-+		    raw_spin_unlock_bh(_T->lock))
+diff --git a/Documentation/devicetree/bindings/crypto/inside-secure,safexcel-eip93.yaml b/Documentation/devicetree/bindings/crypto/inside-secure,safexcel-eip93.yaml
+new file mode 100644
+index 000000000000..997bf9717f9e
+--- /dev/null
++++ b/Documentation/devicetree/bindings/crypto/inside-secure,safexcel-eip93.yaml
+@@ -0,0 +1,67 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/crypto/inside-secure,safexcel-eip93.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
 +
-+DEFINE_LOCK_GUARD_1_COND(raw_spinlock_bh, _try, raw_spin_trylock_bh(_T->lock))
++title: Inside Secure SafeXcel EIP-93 cryptographic engine
 +
- DEFINE_LOCK_GUARD_1(raw_spinlock_irqsave, raw_spinlock_t,
- 		    raw_spin_lock_irqsave(_T->lock, _T->flags),
- 		    raw_spin_unlock_irqrestore(_T->lock, _T->flags),
-@@ -569,6 +575,13 @@ DEFINE_LOCK_GUARD_1(spinlock_irq, spinlock_t,
- DEFINE_LOCK_GUARD_1_COND(spinlock_irq, _try,
- 			 spin_trylock_irq(_T->lock))
- 
-+DEFINE_LOCK_GUARD_1(spinlock_bh, spinlock_t,
-+		    spin_lock_bh(_T->lock),
-+		    spin_unlock_bh(_T->lock))
++maintainers:
++  - Christian Marangi <ansuelsmth@gmail.com>
 +
-+DEFINE_LOCK_GUARD_1_COND(spinlock_bh, _try,
-+			 spin_trylock_bh(_T->lock))
++description: |
++  The Inside Secure SafeXcel EIP-93 is a cryptographic engine IP block
++  integrated in varios devices with very different and generic name from
++  PKTE to simply vendor+EIP93. The real IP under the hood is actually
++  developed by Inside Secure and given to license to vendors.
 +
- DEFINE_LOCK_GUARD_1(spinlock_irqsave, spinlock_t,
- 		    spin_lock_irqsave(_T->lock, _T->flags),
- 		    spin_unlock_irqrestore(_T->lock, _T->flags),
++  The IP block is sold with different model based on what feature are
++  needed and are identified with the final letter. Each letter correspond
++  to a specific set of feature and multiple letter reflect the sum of the
++  feature set.
++
++  EIP-93 models:
++    - EIP-93i: (basic) DES/Triple DES, AES, PRNG, IPsec ESP, SRTP, SHA1
++    - EIP-93ie: i + SHA224/256, AES-192/256
++    - EIP-93is: i + SSL/DTLS/DTLS, MD5, ARC4
++    - EIP-93ies: i + e + s
++    - EIP-93iw: i + AES-XCB-MAC, AES-CCM
++
++properties:
++  compatible:
++    oneOf:
++      - items:
++          - const: airoha,en7581-eip93
++          - const: inside-secure,safexcel-eip93ies
++      - items:
++          - not: {}
++            description: Need a SoC specific compatible
++          - enum:
++              - inside-secure,safexcel-eip93i
++              - inside-secure,safexcel-eip93ie
++              - inside-secure,safexcel-eip93is
++              - inside-secure,safexcel-eip93iw
++
++  reg:
++    maxItems: 1
++
++  interrupts:
++    maxItems: 1
++
++required:
++  - compatible
++  - reg
++  - interrupts
++
++additionalProperties: false
++
++examples:
++  - |
++    #include <dt-bindings/interrupt-controller/arm-gic.h>
++
++    crypto@1e004000 {
++      compatible = "airoha,en7581-eip93", "inside-secure,safexcel-eip93ies";
++      reg = <0x1fb70000 0x1000>;
++
++      interrupts = <GIC_SPI 44 IRQ_TYPE_LEVEL_HIGH>;
++    };
 -- 
 2.45.2
 
