@@ -1,83 +1,66 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B7B012C54B;
-	Sat,  2 Nov 2024 11:09:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDFCBEAC6;
+	Sat,  2 Nov 2024 13:13:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730545744; cv=none; b=aOqg8bwckBTUdI8RAOKOtAMcOqcDRDwtV/O/6TMZYalVLOJ5jsk61/Mez8jRGJsdicKSwo4JcuXTmda00Ygd+XLHHPQ+9kaXjWhFYweDfY+v/6vPDTjaEipQshFoY6miiRQ4AjMx7ANE7KfjW2V/58wAGJF3J++vEZglK2R7+iM=
+	t=1730553200; cv=none; b=YT3DF5tYgZdBRed/s4UmEaYdN36Qg0ovUNdGN//KiVvYjJzeWxsn7BA8Np8IAnXxs5d+l6/SYUlmypyNkm7YkRBF3KzxHNjjQ5ktq0ULAyLbVKUGJMWAQA/3yr5hK2bGfujinLfToDu6rIfk9t+SEJgtDR723kJfjUQWXWTm2J8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730545744; c=relaxed/simple;
-	bh=nclp+VCdHg8h8aYCzOEelCHk0hT48pCQRPeUZOubgD4=;
+	s=arc-20240116; t=1730553200; c=relaxed/simple;
+	bh=fY6Y0cEvgamB3GM0ZofEW4yzoPnHMdDWFzaDOTWcK5Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WFaj1HbEeGZ3O+s6PK/ZB1EHES5ZJ4hHgu+Ey/T1glfadREHytred3Y5+wfCMMqGqM98lcxuIdOhiD8CvKB6GkeydMBYpZZobS4lvpL39Ip4rXsHMUh5e8XqrV8STe2+HjtCfgtLLuZfSjcIGh8fWGCPhCE12qcMqen4LzdjWm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=ZL/lvV/0; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=JxeamTpQQI8HMDHN/qGVYGetf0MrzGiJiAzOS2cBUi5bYERxSRwag+F/UReOl6Iyt1vl4VujbrNgyxP3WxDMMa7gJ9gy6OiZYEr0LiEXIp/wUKsOdoYCaJdrGWoTSd4lZrXM5fC/yFlc8N6M/m2aFXInUWdJujaOAm/0kwReI6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JSsIJny7; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="ZL/lvV/0"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=rJjP7GEhm9Yido8/2Yi7Kg/9NXfC12+1Hc68o0sqeZo=; b=ZL/lvV/0NG+jnrygJ/ulUipBlK
-	qP9nNwqVQWNXM6Mo4bBB3wTvXS6oRzgEKSHf55UXhXhzl6CQWDcLaKiJVFPLfJWGDYzgQucVtLoXu
-	EdgtwDpESedu90LNlQ/3ESKbF6ZllB13v5NTAUox4RYWGiwG0gPbhcB9nhH9k15mZ/+NFfBDzBZhT
-	ZXkVWdsMEUU+MuBkn0bvppo0elNwSfGET6JHSBcIK+uM55LY9FOpzK7dAKO7wfzB9TVAXeFIWaCKY
-	of25XbcMJoe7WP1/TZrB8M9THZkyGx/lpgRJ1Zogfa/NIqKJhYAzvuJg9eOUYUwS6oN1RCWC7zQ1Z
-	rIC9NpXA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1t7Bzn-00DyOZ-3A;
-	Sat, 02 Nov 2024 19:08:46 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 02 Nov 2024 19:08:43 +0800
-Date: Sat, 2 Nov 2024 19:08:43 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: Eric Biggers <ebiggers@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-crypto@vger.kernel.org, linux-ext4@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net, linux-mips@vger.kernel.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	loongarch@lists.linux.dev, sparclinux@vger.kernel.org,
-	x86@kernel.org
-Subject: Re: [PATCH v2 04/18] crypto: crc32 - don't unnecessarily register
- arch algorithms
-Message-ID: <ZyYIO6RpjTFteaxH@gondor.apana.org.au>
-References: <20241026040958.GA34351@sol.localdomain>
- <ZyX0uGHg4Cmsk2oz@gondor.apana.org.au>
- <CAMj1kXFfPtO0vd1KqTa+QNSkRWNR7SUJ_A_zX6-Hz5HVLtLYtw@mail.gmail.com>
- <ZyX8yEqnjXjJ5itO@gondor.apana.org.au>
- <CAMj1kXHje-BwJVffAxN9G96Gy4Gom3Ca7dJ-_K7sgcrz7_k7Kw@mail.gmail.com>
- <CAMj1kXG8Nqw_f8OsFTq_UKRbca6w58g4uyRAZXCoCr=OwC2sWA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JSsIJny7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96A50C4CEC3;
+	Sat,  2 Nov 2024 13:13:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730553200;
+	bh=fY6Y0cEvgamB3GM0ZofEW4yzoPnHMdDWFzaDOTWcK5Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JSsIJny7Sgz9dNxWFRRe/UlE08GOdpnI7Znm/4fPHitGCANF9pYjKD18rD4bcRnl7
+	 0lP9EfELn3ewbsMt7BjqN6OGq3zF1b/EHxsjtTCrhiwh9sp5qBseDKRoUedWB25zk6
+	 ciYdtNSd9dAxkOu66nwkEapN0JnX/MXsL05MsqQMYNgrMXQX/28VHyqMkzxdmYO6Z3
+	 NepNvLx9/lRYs74uC+ei98PfIWhUNZJb2ZN9RbkFyrc0FYLwc0ogv0+csdsozlNvcJ
+	 3HQAvmDI/DeyBKdkN6aP9JaNsAGYxNtYnifefX8DvlqHiKnw68VcJRgjm+4Bm1QryX
+	 jILmSSqzUO9DQ==
+Date: Sat, 2 Nov 2024 14:13:16 +0100
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Markus Mayer <mmayer@broadcom.com>
+Cc: Olivia Mackall <olivia@selenic.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, Aurelien Jarno <aurelien@aurel32.net>, 
+	Conor Dooley <conor+dt@kernel.org>, Daniel Golle <daniel@makrotopia.org>, 
+	Florian Fainelli <florian.fainelli@broadcom.com>, Francesco Dolcini <francesco.dolcini@toradex.com>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>, 
+	Device Tree Mailing List <devicetree@vger.kernel.org>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 1/2] dt-bindings: rng: add binding for BCM74110 RNG
+Message-ID: <bz4r3qtdrarycfgnke54w4mxbtw52yav7bzofjx42ruibm2axx@pj5vhi7qy7pk>
+References: <20241101211316.91345-1-mmayer@broadcom.com>
+ <20241101211316.91345-2-mmayer@broadcom.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAMj1kXG8Nqw_f8OsFTq_UKRbca6w58g4uyRAZXCoCr=OwC2sWA@mail.gmail.com>
+In-Reply-To: <20241101211316.91345-2-mmayer@broadcom.com>
 
-On Sat, Nov 02, 2024 at 12:05:01PM +0100, Ard Biesheuvel wrote:
->
-> The only issue resulting from *not* taking this patch is that btrfs
-> may misidentify the CRC32 implementation as being 'slow' and take an
-> alternative code path, which does not necessarily result in worse
-> performance.
+On Fri, Nov 01, 2024 at 02:13:14PM -0700, Markus Mayer wrote:
+> Add a binding for the random number generator used on the BCM74110.
+> 
+> Signed-off-by: Markus Mayer <mmayer@broadcom.com>
+> ---
+>  .../bindings/rng/brcm,bcm74110-rng.yaml       | 35 +++++++++++++++++++
+>  1 file changed, 35 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/rng/brcm,bcm74110-rng.yaml
 
-If we were removing crc32* (or at least crc32*-arch) from the Crypto
-API then these patches would be redundant.  But if we're keeping them
-because btrfs uses them then we should definitely make crc32*-arch
-do the right thing.  IOW they should not be registered if they're
-the same as crc32*-generic.
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Best regards,
+Krzysztof
+
