@@ -1,40 +1,70 @@
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14FA61448E0;
-	Sat,  2 Nov 2024 02:56:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BA719474;
+	Sat,  2 Nov 2024 06:23:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730516174; cv=none; b=A+TBjWVdBE/ChJcZ+4IpCbZaqqRlpglQZ8ELACx2Ex+/UiTglEJ8WKjC0TwIYDBPaS4VO2XvWFJZdtYc2kySPQhs7O0B7FHr0hNekHXhgksv54W1BU/Ik+qx+ZeBE/XSMqUSKIdyshmmSKiOd19Rp7WRb2gVtm6dw7sf/7BJiWU=
+	t=1730528592; cv=none; b=srAKK/6tTLk6MeZbE5fOtUC+yUc2yHxpEKNjGMBaK/jF7Eh4msSVcPGPZl//iMNtZGpeKd4K70vc1fThGEPM5Nr1AOw0g4i/2DW/urbf6U61OzNWYAmRqUHsWXulxyz/epzr3nXXwqLzfawPuh33ziRl65TH5YJ46MaFt8waJtk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730516174; c=relaxed/simple;
-	bh=GEwtf78cD4y+rCJ1s3uaU/k4waiB1eqwemrGCaeuoyo=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MW8/gqilm7k9AlpanNgYRTffQgeuJVMAW5qE9Wa9kmmrTtSf/Ws/8+0y0tINBhsmeX910g/7s+5o6Gh6897Ry4pSv7N2Hbh2v53XWkPY8zVlF3u0Cwtz5wP6izMmfg29J7CXlMHCjfAcH08XLZcnjkhXeO0KfyqZd++kRCnQM2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4XgMll0fYNzQsXx;
-	Sat,  2 Nov 2024 10:54:59 +0800 (CST)
-Received: from kwepemd200024.china.huawei.com (unknown [7.221.188.85])
-	by mail.maildlp.com (Postfix) with ESMTPS id 894D9140337;
-	Sat,  2 Nov 2024 10:56:01 +0800 (CST)
-Received: from localhost.huawei.com (10.90.30.45) by
- kwepemd200024.china.huawei.com (7.221.188.85) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sat, 2 Nov 2024 10:56:00 +0800
-From: Chenghai Huang <huangchenghai2@huawei.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<liulongfang@huawei.com>, <qianweili@huawei.com>, <linwenkai6@hisilicon.com>,
-	<wangzhou1@hisilicon.com>, <huangchenghai2@huawei.com>
-Subject: [PATCH v3 1/2] crypto: hisilicon/sec2 - fix for aead icv error
-Date: Sat, 2 Nov 2024 10:55:58 +0800
-Message-ID: <20241102025559.2256734-2-huangchenghai2@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20241102025559.2256734-1-huangchenghai2@huawei.com>
-References: <20241102025559.2256734-1-huangchenghai2@huawei.com>
+	s=arc-20240116; t=1730528592; c=relaxed/simple;
+	bh=gzlKGnvzGZzthTS3QitaJ2eHRSt7oYdMJoKnxawWJRk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=gOsiUp3ByfA4ncEJ3OsFtbL4MEkgZ0GtR4F0c7l+VA4DU52ZThJbxa6L6NYkGUR/1z3vIXLRHQmdJPwhIL11L+NBFG8S89XMmGdegLqdBFtdV7D2meQJHHrW9Ygf5gPx/tQ80WeD6AAxPScVZglU73GQkKhCKqnowUp/DPANaAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mb4eV9y8; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mb4eV9y8"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D929BC4CEC3;
+	Sat,  2 Nov 2024 06:23:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730528591;
+	bh=gzlKGnvzGZzthTS3QitaJ2eHRSt7oYdMJoKnxawWJRk=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=mb4eV9y89dfN9oOHM4OhAI4OQ9Cj+BXbnE3G1iP+z3SxUwpusj+9d70QI2O0L1xsr
+	 D4ZpzGO5RyHqIe1AmcaEw2Q5a61TKTWIxJAkezKtKzPKOBI1geuWEsZsQpYfRrFF3A
+	 TGBu4UpN+3rMyk0FvZFAEvQ23i0qvzOY0W15n1sj+Pa7LBMnYql5a8YOkIpxDzyzNs
+	 MZQkrqibQSz+pxBRvg0g2FwLcG2VVMQyiYlVwdQm6X7HQ/2Xpon6NHMiPrZg/o1jv8
+	 3Ga0mxAkfPcjbBy8BwIM0kRg37tuS8DNeDQ0VUPNCGJ/oTC1X77l59oakmKgdmzPBC
+	 BRp8JCbfcljXg==
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: jarkko@kernel.org,
+	Jonathan Corbet <corbet@lwn.net>,
+	Peter Huewe <peterhuewe@gmx.de>,
+	Jason Gunthorpe <jgg@ziepe.ca>
+Cc: James.Bottomley@hansenpartnership.com,
+	andrew.cooper3@citrix.com,
+	ardb@kernel.org,
+	baolu.lu@linux.intel.com,
+	bp@alien8.de,
+	dave.hansen@linux.intel.com,
+	davem@davemloft.net,
+	dpsmith@apertussolutions.com,
+	dwmw2@infradead.org,
+	ebiederm@xmission.com,
+	herbert@gondor.apana.org.au,
+	hpa@zytor.com,
+	iommu@lists.linux-foundation.org,
+	kanth.ghatraju@oracle.com,
+	kexec@lists.infradead.org,
+	linux-crypto@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-efi@vger.kernel.org,
+	linux-integrity@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	luto@amacapital.net,
+	mingo@redhat.com,
+	mjg59@srcf.ucam.org,
+	nivedita@alum.mit.edu,
+	ross.philipson@oracle.com,
+	tglx@linutronix.de,
+	trenchboot-devel@googlegroups.com,
+	x86@kernel.org
+Subject: [RFC PATCH v2 1/2] tpm, tpm_tis: Introduce TPM_IOC_SET_LOCALITY
+Date: Sat,  2 Nov 2024 08:22:56 +0200
+Message-ID: <20241102062259.2521361-1-jarkko@kernel.org>
+X-Mailer: git-send-email 2.47.0
+In-Reply-To: <D5BB5GX4KEUO.VJ2G9G9QKYRR@kernel.org>
+References: <D5BB5GX4KEUO.VJ2G9G9QKYRR@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -42,318 +72,230 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemd200024.china.huawei.com (7.221.188.85)
 
-From: Wenkai Lin <linwenkai6@hisilicon.com>
+DRTM needs to be able to set the locality used by kernel. Provide
+TPM_IOC_SET_LOCALITY operation for this purpose. It is enabled only if
+the kernel command-line has 'tpm.set_locality_enabled=1'. The operation
+is one-shot allowed only for tpm_tis for the moment.
 
-When the AEAD algorithm is used for encryption or decryption,
-the input authentication length varies, the hardware needs to
-obtain the input length to pass the integrity check verification.
-Currently, the driver uses a fixed authentication length,which
-causes decryption failure, so the length configuration is modified.
-In addition, the step of setting the auth length is unnecessary,
-so it was deleted from the setkey function.
-
-Fixes: 2f072d75d1ab ("crypto: hisilicon - Add aead support on SEC2")
-Signed-off-by: Wenkai Lin <linwenkai6@hisilicon.com>
-Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
+Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
 ---
- drivers/crypto/hisilicon/sec2/sec.h        |   1 -
- drivers/crypto/hisilicon/sec2/sec_crypto.c | 101 +++++++++------------
- drivers/crypto/hisilicon/sec2/sec_crypto.h |  11 ---
- 3 files changed, 44 insertions(+), 69 deletions(-)
+v2:
+- Do not ignore the return value of tpm_ioc_set_locality().
+- if (!(chip->flags & TPM_CHIP_FLAG_SET_LOCALITY_ENABLED))
+- Refined kernel-parameters.txt description.
+- Use __u8 instead of u8 in the uapi.
+- Tested with https://codeberg.org/jarkko/tpm-set-locality-test/src/branch/main/src/main.rs
+v1:
+- NOTE: Only compile-tested.
+---
+ .../admin-guide/kernel-parameters.txt         |  5 ++
+ .../userspace-api/ioctl/ioctl-number.rst      |  2 +
+ drivers/char/tpm/tpm-chip.c                   |  2 +-
+ drivers/char/tpm/tpm-dev.c                    | 70 +++++++++++++++++++
+ drivers/char/tpm/tpm_tis_core.c               |  2 +
+ include/linux/tpm.h                           | 10 +++
+ include/uapi/linux/tpm.h                      | 11 +++
+ 7 files changed, 101 insertions(+), 1 deletion(-)
+ create mode 100644 include/uapi/linux/tpm.h
 
-diff --git a/drivers/crypto/hisilicon/sec2/sec.h b/drivers/crypto/hisilicon/sec2/sec.h
-index 356188bee6fb..70c3bdedb6ba 100644
---- a/drivers/crypto/hisilicon/sec2/sec.h
-+++ b/drivers/crypto/hisilicon/sec2/sec.h
-@@ -90,7 +90,6 @@ struct sec_auth_ctx {
- 	dma_addr_t a_key_dma;
- 	u8 *a_key;
- 	u8 a_key_len;
--	u8 mac_len;
- 	u8 a_alg;
- 	bool fallback;
- 	struct crypto_shash *hash_tfm;
-diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-index ae9ebbb4103d..8db995279545 100644
---- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-@@ -948,15 +948,14 @@ static int sec_aead_mac_init(struct sec_aead_req *req)
- 	struct aead_request *aead_req = req->aead_req;
- 	struct crypto_aead *tfm = crypto_aead_reqtfm(aead_req);
- 	size_t authsize = crypto_aead_authsize(tfm);
--	u8 *mac_out = req->out_mac;
- 	struct scatterlist *sgl = aead_req->src;
-+	u8 *mac_out = req->out_mac;
- 	size_t copy_size;
- 	off_t skip_size;
+diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+index 1518343bbe22..8fd9fc94c883 100644
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -6727,6 +6727,11 @@
+ 	torture.verbose_sleep_duration= [KNL]
+ 			Duration of each verbose-printk() sleep in jiffies.
  
- 	/* Copy input mac */
- 	skip_size = aead_req->assoclen + aead_req->cryptlen - authsize;
--	copy_size = sg_pcopy_to_buffer(sgl, sg_nents(sgl), mac_out,
--				       authsize, skip_size);
-+	copy_size = sg_pcopy_to_buffer(sgl, sg_nents(sgl), mac_out, authsize, skip_size);
- 	if (unlikely(copy_size != authsize))
- 		return -EINVAL;
++	tpm.set_locality_enabled= [HW,TPM]
++			Enable one-shot locality setting after the boot. The
++			operation can be performed with TPM_IOC_SET_LOCALITY
++			applied to /dev/tpm0. The default value is 0.
++
+ 	tpm_suspend_pcr=[HW,TPM]
+ 			Format: integer pcr id
+ 			Specify that at suspend time, the tpm driver
+diff --git a/Documentation/userspace-api/ioctl/ioctl-number.rst b/Documentation/userspace-api/ioctl/ioctl-number.rst
+index e4be1378ba26..3eba57ab2fb1 100644
+--- a/Documentation/userspace-api/ioctl/ioctl-number.rst
++++ b/Documentation/userspace-api/ioctl/ioctl-number.rst
+@@ -338,6 +338,8 @@ Code  Seq#    Include File                                           Comments
+ 0xA3  90-9F  linux/dtlk.h
+ 0xA4  00-1F  uapi/linux/tee.h                                        Generic TEE subsystem
+ 0xA4  00-1F  uapi/asm/sgx.h                                          <mailto:linux-sgx@vger.kernel.org>
++0xA4  00-1F  uapi/linux/tpm.h                                        TPM
++                                                                     <mailto:linux-integrity@vger.kernel.org>
+ 0xA5  01-05  linux/surface_aggregator/cdev.h                         Microsoft Surface Platform System Aggregator
+                                                                      <mailto:luzmaximilian@gmail.com>
+ 0xA5  20-2F  linux/surface_aggregator/dtx.h                          Microsoft Surface DTX driver
+diff --git a/drivers/char/tpm/tpm-chip.c b/drivers/char/tpm/tpm-chip.c
+index 7df7abaf3e52..c8016342352a 100644
+--- a/drivers/char/tpm/tpm-chip.c
++++ b/drivers/char/tpm/tpm-chip.c
+@@ -44,7 +44,7 @@ static int tpm_request_locality(struct tpm_chip *chip)
+ 	if (!chip->ops->request_locality)
+ 		return 0;
  
-@@ -1139,7 +1138,6 @@ static int sec_aead_fallback_setkey(struct sec_auth_ctx *a_ctx,
- static int sec_aead_setkey(struct crypto_aead *tfm, const u8 *key,
- 			   const u32 keylen, const enum sec_hash_alg a_alg,
- 			   const enum sec_calg c_alg,
--			   const enum sec_mac_len mac_len,
- 			   const enum sec_cmode c_mode)
- {
- 	struct sec_ctx *ctx = crypto_aead_ctx(tfm);
-@@ -1151,7 +1149,6 @@ static int sec_aead_setkey(struct crypto_aead *tfm, const u8 *key,
+-	rc = chip->ops->request_locality(chip, 0);
++	rc = chip->ops->request_locality(chip, chip->default_locality);
+ 	if (rc < 0)
+ 		return rc;
  
- 	ctx->a_ctx.a_alg = a_alg;
- 	ctx->c_ctx.c_alg = c_alg;
--	ctx->a_ctx.mac_len = mac_len;
- 	c_ctx->c_mode = c_mode;
+diff --git a/drivers/char/tpm/tpm-dev.c b/drivers/char/tpm/tpm-dev.c
+index 97c94b5e9340..d07aec98f894 100644
+--- a/drivers/char/tpm/tpm-dev.c
++++ b/drivers/char/tpm/tpm-dev.c
+@@ -13,8 +13,74 @@
+  * Device file system interface to the TPM
+  */
+ #include <linux/slab.h>
++#include <uapi/linux/tpm.h>
+ #include "tpm-dev.h"
  
- 	if (c_mode == SEC_CMODE_CCM || c_mode == SEC_CMODE_GCM) {
-@@ -1187,10 +1184,9 @@ static int sec_aead_setkey(struct crypto_aead *tfm, const u8 *key,
- 		goto bad_key;
- 	}
- 
--	if ((ctx->a_ctx.mac_len & SEC_SQE_LEN_RATE_MASK)  ||
--	    (ctx->a_ctx.a_key_len & SEC_SQE_LEN_RATE_MASK)) {
-+	if (ctx->a_ctx.a_key_len & SEC_SQE_LEN_RATE_MASK) {
- 		ret = -EINVAL;
--		dev_err(dev, "MAC or AUTH key length error!\n");
-+		dev_err(dev, "AUTH key length error!\n");
- 		goto bad_key;
- 	}
- 
-@@ -1202,27 +1198,19 @@ static int sec_aead_setkey(struct crypto_aead *tfm, const u8 *key,
- }
- 
- 
--#define GEN_SEC_AEAD_SETKEY_FUNC(name, aalg, calg, maclen, cmode)	\
--static int sec_setkey_##name(struct crypto_aead *tfm, const u8 *key,	\
--	u32 keylen)							\
--{									\
--	return sec_aead_setkey(tfm, key, keylen, aalg, calg, maclen, cmode);\
--}
--
--GEN_SEC_AEAD_SETKEY_FUNC(aes_cbc_sha1, SEC_A_HMAC_SHA1,
--			 SEC_CALG_AES, SEC_HMAC_SHA1_MAC, SEC_CMODE_CBC)
--GEN_SEC_AEAD_SETKEY_FUNC(aes_cbc_sha256, SEC_A_HMAC_SHA256,
--			 SEC_CALG_AES, SEC_HMAC_SHA256_MAC, SEC_CMODE_CBC)
--GEN_SEC_AEAD_SETKEY_FUNC(aes_cbc_sha512, SEC_A_HMAC_SHA512,
--			 SEC_CALG_AES, SEC_HMAC_SHA512_MAC, SEC_CMODE_CBC)
--GEN_SEC_AEAD_SETKEY_FUNC(aes_ccm, 0, SEC_CALG_AES,
--			 SEC_HMAC_CCM_MAC, SEC_CMODE_CCM)
--GEN_SEC_AEAD_SETKEY_FUNC(aes_gcm, 0, SEC_CALG_AES,
--			 SEC_HMAC_GCM_MAC, SEC_CMODE_GCM)
--GEN_SEC_AEAD_SETKEY_FUNC(sm4_ccm, 0, SEC_CALG_SM4,
--			 SEC_HMAC_CCM_MAC, SEC_CMODE_CCM)
--GEN_SEC_AEAD_SETKEY_FUNC(sm4_gcm, 0, SEC_CALG_SM4,
--			 SEC_HMAC_GCM_MAC, SEC_CMODE_GCM)
-+#define GEN_SEC_AEAD_SETKEY_FUNC(name, aalg, calg, cmode)				\
-+static int sec_setkey_##name(struct crypto_aead *tfm, const u8 *key, u32 keylen)	\
-+{											\
-+	return sec_aead_setkey(tfm, key, keylen, aalg, calg, cmode);			\
++static bool set_locality_enabled;
++module_param(set_locality_enabled, bool, 0644);
++
++/*
++ * Set a locality as a one-shot operation. A chip must declare support for it
++ * with %TPM_CHIP_FLAG_SET_LOCALITY_ENABLED, which will cleared after setting
++ * the locality.
++ */
++static long tpm_ioc_set_locality(struct tpm_chip *chip, u8 __user *localityp)
++{
++	u8 locality;
++
++	if (!set_locality_enabled)
++		return -ENOIOCTLCMD;
++
++	if (!(chip->flags & TPM_CHIP_FLAG_SET_LOCALITY_ENABLED))
++		return -EOPNOTSUPP;
++
++	if (copy_from_user(&locality, localityp, sizeof(locality)))
++		return -EFAULT;
++
++	if (locality >= TPM_MAX_LOCALITY)
++		return -EINVAL;
++
++	chip->default_locality = locality;
++	chip->flags &= ~TPM_CHIP_FLAG_SET_LOCALITY_ENABLED;
++	return 0;
 +}
 +
-+GEN_SEC_AEAD_SETKEY_FUNC(aes_cbc_sha1, SEC_A_HMAC_SHA1, SEC_CALG_AES, SEC_CMODE_CBC)
-+GEN_SEC_AEAD_SETKEY_FUNC(aes_cbc_sha256, SEC_A_HMAC_SHA256, SEC_CALG_AES, SEC_CMODE_CBC)
-+GEN_SEC_AEAD_SETKEY_FUNC(aes_cbc_sha512, SEC_A_HMAC_SHA512, SEC_CALG_AES, SEC_CMODE_CBC)
-+GEN_SEC_AEAD_SETKEY_FUNC(aes_ccm, 0, SEC_CALG_AES, SEC_CMODE_CCM)
-+GEN_SEC_AEAD_SETKEY_FUNC(aes_gcm, 0, SEC_CALG_AES, SEC_CMODE_GCM)
-+GEN_SEC_AEAD_SETKEY_FUNC(sm4_ccm, 0, SEC_CALG_SM4, SEC_CMODE_CCM)
-+GEN_SEC_AEAD_SETKEY_FUNC(sm4_gcm, 0, SEC_CALG_SM4, SEC_CMODE_GCM)
- 
- static int sec_aead_sgl_map(struct sec_ctx *ctx, struct sec_req *req)
++static long tpm_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
++{
++	struct file_priv *priv = file->private_data;
++	void __user *argp = (void __user *)arg;
++	struct tpm_chip *chip = priv->chip;
++	int ret;
++
++	mutex_lock(&priv->buffer_mutex);
++
++	ret = tpm_try_get_ops(chip);
++	if (ret)
++		goto out;
++
++	switch (cmd) {
++	case TPM_IOC_SET_LOCALITY:
++		ret = tpm_ioc_set_locality(chip, argp);
++		break;
++	default:
++		ret = -ENOIOCTLCMD;
++		break;
++	}
++
++	tpm_put_ops(chip);
++
++out:
++	mutex_unlock(&priv->buffer_mutex);
++	return 0;
++}
++
++#ifdef CONFIG_COMPAT
++static long tpm_compat_ioctl(struct file *filep, unsigned int cmd, unsigned long arg)
++{
++	return tpm_ioctl(filep, cmd, arg);
++}
++#endif
++
+ static int tpm_open(struct inode *inode, struct file *file)
  {
-@@ -1470,9 +1458,10 @@ static void sec_skcipher_callback(struct sec_ctx *ctx, struct sec_req *req,
- static void set_aead_auth_iv(struct sec_ctx *ctx, struct sec_req *req)
- {
- 	struct aead_request *aead_req = req->aead_req.aead_req;
--	struct sec_cipher_req *c_req = &req->c_req;
-+	struct crypto_aead *tfm = crypto_aead_reqtfm(aead_req);
-+	size_t authsize = crypto_aead_authsize(tfm);
- 	struct sec_aead_req *a_req = &req->aead_req;
--	size_t authsize = ctx->a_ctx.mac_len;
-+	struct sec_cipher_req *c_req = &req->c_req;
- 	u32 data_size = aead_req->cryptlen;
- 	u8 flage = 0;
- 	u8 cm, cl;
-@@ -1513,10 +1502,8 @@ static void set_aead_auth_iv(struct sec_ctx *ctx, struct sec_req *req)
- static void sec_aead_set_iv(struct sec_ctx *ctx, struct sec_req *req)
- {
- 	struct aead_request *aead_req = req->aead_req.aead_req;
--	struct crypto_aead *tfm = crypto_aead_reqtfm(aead_req);
--	size_t authsize = crypto_aead_authsize(tfm);
--	struct sec_cipher_req *c_req = &req->c_req;
- 	struct sec_aead_req *a_req = &req->aead_req;
-+	struct sec_cipher_req *c_req = &req->c_req;
+ 	struct tpm_chip *chip;
+@@ -59,6 +125,10 @@ static int tpm_release(struct inode *inode, struct file *file)
  
- 	memcpy(c_req->c_ivin, aead_req->iv, ctx->c_ctx.ivsize);
+ const struct file_operations tpm_fops = {
+ 	.owner = THIS_MODULE,
++	.unlocked_ioctl = tpm_ioctl,
++#ifdef CONFIG_COMPAT
++	.compat_ioctl = tpm_compat_ioctl,
++#endif
+ 	.open = tpm_open,
+ 	.read = tpm_common_read,
+ 	.write = tpm_common_write,
+diff --git a/drivers/char/tpm/tpm_tis_core.c b/drivers/char/tpm/tpm_tis_core.c
+index fdef214b9f6b..3517db710423 100644
+--- a/drivers/char/tpm/tpm_tis_core.c
++++ b/drivers/char/tpm/tpm_tis_core.c
+@@ -1111,6 +1111,8 @@ int tpm_tis_core_init(struct device *dev, struct tpm_tis_data *priv, int irq,
+ 	if (IS_ERR(chip))
+ 		return PTR_ERR(chip);
  
-@@ -1524,15 +1511,11 @@ static void sec_aead_set_iv(struct sec_ctx *ctx, struct sec_req *req)
- 		/*
- 		 * CCM 16Byte Cipher_IV: {1B_Flage,13B_IV,2B_counter},
- 		 * the  counter must set to 0x01
-+		 * CCM 16Byte Auth_IV: {1B_AFlage,13B_IV,2B_Ptext_length}
- 		 */
--		ctx->a_ctx.mac_len = authsize;
--		/* CCM 16Byte Auth_IV: {1B_AFlage,13B_IV,2B_Ptext_length} */
- 		set_aead_auth_iv(ctx, req);
--	}
--
--	/* GCM 12Byte Cipher_IV == Auth_IV */
--	if (ctx->c_ctx.c_mode == SEC_CMODE_GCM) {
--		ctx->a_ctx.mac_len = authsize;
-+	} else if (ctx->c_ctx.c_mode == SEC_CMODE_GCM) {
-+		/* GCM 12Byte Cipher_IV == Auth_IV */
- 		memcpy(a_req->a_ivin, c_req->c_ivin, SEC_AIV_SIZE);
- 	}
- }
-@@ -1542,9 +1525,11 @@ static void sec_auth_bd_fill_xcm(struct sec_auth_ctx *ctx, int dir,
- {
- 	struct sec_aead_req *a_req = &req->aead_req;
- 	struct aead_request *aq = a_req->aead_req;
-+	struct crypto_aead *tfm = crypto_aead_reqtfm(aq);
-+	size_t authsize = crypto_aead_authsize(tfm);
++	chip->flags |= TPM_CHIP_FLAG_SET_LOCALITY_ENABLED;
++
+ #ifdef CONFIG_ACPI
+ 	chip->acpi_dev_handle = acpi_dev_handle;
+ #endif
+diff --git a/include/linux/tpm.h b/include/linux/tpm.h
+index 587b96b4418e..27071ef13b7a 100644
+--- a/include/linux/tpm.h
++++ b/include/linux/tpm.h
+@@ -147,6 +147,12 @@ struct tpm_chip_seqops {
+  */
+ #define TPM2_MAX_CONTEXT_SIZE 4096
  
- 	/* C_ICV_Len is MAC size, 0x4 ~ 0x10 */
--	sec_sqe->type2.icvw_kmode |= cpu_to_le16((u16)ctx->mac_len);
-+	sec_sqe->type2.icvw_kmode |= cpu_to_le16((u16)authsize);
++/*
++ * The maximum locality (0 - 4) for a TPM, as defined in section 3.2 of the
++ * Client Platform Profile Specification.
++ */
++#define TPM_MAX_LOCALITY		4
++
+ struct tpm_chip {
+ 	struct device dev;
+ 	struct device devs;
+@@ -202,6 +208,9 @@ struct tpm_chip {
+ 	/* active locality */
+ 	int locality;
  
- 	/* mode set to CCM/GCM, don't set {A_Alg, AKey_Len, MAC_Len} */
- 	sec_sqe->type2.a_key_addr = sec_sqe->type2.c_key_addr;
-@@ -1568,9 +1553,11 @@ static void sec_auth_bd_fill_xcm_v3(struct sec_auth_ctx *ctx, int dir,
- {
- 	struct sec_aead_req *a_req = &req->aead_req;
- 	struct aead_request *aq = a_req->aead_req;
-+	struct crypto_aead *tfm = crypto_aead_reqtfm(aq);
-+	size_t authsize = crypto_aead_authsize(tfm);
++	/* the default locality used by the kernel (default 0) */
++	u8 default_locality;
++
+ #ifdef CONFIG_TCG_TPM2_HMAC
+ 	/* details for communication security via sessions */
  
- 	/* C_ICV_Len is MAC size, 0x4 ~ 0x10 */
--	sqe3->c_icv_key |= cpu_to_le16((u16)ctx->mac_len << SEC_MAC_OFFSET_V3);
-+	sqe3->c_icv_key |= cpu_to_le16((u16)authsize << SEC_MAC_OFFSET_V3);
- 
- 	/* mode set to CCM/GCM, don't set {A_Alg, AKey_Len, MAC_Len} */
- 	sqe3->a_key_addr = sqe3->c_key_addr;
-@@ -1594,11 +1581,12 @@ static void sec_auth_bd_fill_ex(struct sec_auth_ctx *ctx, int dir,
- 	struct sec_aead_req *a_req = &req->aead_req;
- 	struct sec_cipher_req *c_req = &req->c_req;
- 	struct aead_request *aq = a_req->aead_req;
-+	struct crypto_aead *tfm = crypto_aead_reqtfm(aq);
-+	size_t authsize = crypto_aead_authsize(tfm);
- 
- 	sec_sqe->type2.a_key_addr = cpu_to_le64(ctx->a_key_dma);
- 
--	sec_sqe->type2.mac_key_alg =
--			cpu_to_le32(ctx->mac_len / SEC_SQE_LEN_RATE);
-+	sec_sqe->type2.mac_key_alg = cpu_to_le32(authsize / SEC_SQE_LEN_RATE);
- 
- 	sec_sqe->type2.mac_key_alg |=
- 			cpu_to_le32((u32)((ctx->a_key_len) /
-@@ -1648,11 +1636,13 @@ static void sec_auth_bd_fill_ex_v3(struct sec_auth_ctx *ctx, int dir,
- 	struct sec_aead_req *a_req = &req->aead_req;
- 	struct sec_cipher_req *c_req = &req->c_req;
- 	struct aead_request *aq = a_req->aead_req;
-+	struct crypto_aead *tfm = crypto_aead_reqtfm(aq);
-+	size_t authsize = crypto_aead_authsize(tfm);
- 
- 	sqe3->a_key_addr = cpu_to_le64(ctx->a_key_dma);
- 
- 	sqe3->auth_mac_key |=
--			cpu_to_le32((u32)(ctx->mac_len /
-+			cpu_to_le32((u32)(authsize /
- 			SEC_SQE_LEN_RATE) << SEC_MAC_OFFSET_V3);
- 
- 	sqe3->auth_mac_key |=
-@@ -1703,9 +1693,9 @@ static void sec_aead_callback(struct sec_ctx *c, struct sec_req *req, int err)
- {
- 	struct aead_request *a_req = req->aead_req.aead_req;
- 	struct crypto_aead *tfm = crypto_aead_reqtfm(a_req);
-+	size_t authsize = crypto_aead_authsize(tfm);
- 	struct sec_aead_req *aead_req = &req->aead_req;
- 	struct sec_cipher_req *c_req = &req->c_req;
--	size_t authsize = crypto_aead_authsize(tfm);
- 	struct sec_qp_ctx *qp_ctx = req->qp_ctx;
- 	struct aead_request *backlog_aead_req;
- 	struct sec_req *backlog_req;
-@@ -1718,10 +1708,8 @@ static void sec_aead_callback(struct sec_ctx *c, struct sec_req *req, int err)
- 	if (!err && c_req->encrypt) {
- 		struct scatterlist *sgl = a_req->dst;
- 
--		sz = sg_pcopy_from_buffer(sgl, sg_nents(sgl),
--					  aead_req->out_mac,
--					  authsize, a_req->cryptlen +
--					  a_req->assoclen);
-+		sz = sg_pcopy_from_buffer(sgl, sg_nents(sgl), aead_req->out_mac,
-+					  authsize, a_req->cryptlen + a_req->assoclen);
- 		if (unlikely(sz != authsize)) {
- 			dev_err(c->dev, "copy out mac err!\n");
- 			err = -EINVAL;
-@@ -2233,7 +2221,7 @@ static int sec_aead_spec_check(struct sec_ctx *ctx, struct sec_req *sreq)
- {
- 	struct aead_request *req = sreq->aead_req.aead_req;
- 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
--	size_t authsize = crypto_aead_authsize(tfm);
-+	size_t sz = crypto_aead_authsize(tfm);
- 	u8 c_mode = ctx->c_ctx.c_mode;
- 	struct device *dev = ctx->dev;
- 	int ret;
-@@ -2244,9 +2232,8 @@ static int sec_aead_spec_check(struct sec_ctx *ctx, struct sec_req *sreq)
- 		return -EINVAL;
- 	}
- 
--	if (unlikely((c_mode == SEC_CMODE_GCM && authsize < DES_BLOCK_SIZE) ||
--	   (c_mode == SEC_CMODE_CCM && (authsize < MIN_MAC_LEN ||
--		authsize & MAC_LEN_MASK)))) {
-+	if (unlikely((c_mode == SEC_CMODE_GCM && sz < DES_BLOCK_SIZE) ||
-+		     (c_mode == SEC_CMODE_CCM && (sz < MIN_MAC_LEN || sz & MAC_LEN_MASK)))) {
- 		dev_err(dev, "aead input mac length error!\n");
- 		return -EINVAL;
- 	}
-@@ -2266,7 +2253,7 @@ static int sec_aead_spec_check(struct sec_ctx *ctx, struct sec_req *sreq)
- 	if (sreq->c_req.encrypt)
- 		sreq->c_req.c_len = req->cryptlen;
- 	else
--		sreq->c_req.c_len = req->cryptlen - authsize;
-+		sreq->c_req.c_len = req->cryptlen - sz;
- 	if (c_mode == SEC_CMODE_CBC) {
- 		if (unlikely(sreq->c_req.c_len & (AES_BLOCK_SIZE - 1))) {
- 			dev_err(dev, "aead crypto length error!\n");
-@@ -2292,7 +2279,7 @@ static int sec_aead_param_check(struct sec_ctx *ctx, struct sec_req *sreq)
- 
- 	if (ctx->sec->qm.ver == QM_HW_V2) {
- 		if (unlikely(!req->cryptlen || (!sreq->c_req.encrypt &&
--		    req->cryptlen <= authsize))) {
-+			     req->cryptlen <= authsize))) {
- 			ctx->a_ctx.fallback = true;
- 			return -EINVAL;
- 		}
-diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.h b/drivers/crypto/hisilicon/sec2/sec_crypto.h
-index 27a0ee5ad913..04725b514382 100644
---- a/drivers/crypto/hisilicon/sec2/sec_crypto.h
-+++ b/drivers/crypto/hisilicon/sec2/sec_crypto.h
-@@ -23,17 +23,6 @@ enum sec_hash_alg {
- 	SEC_A_HMAC_SHA512 = 0x15,
+@@ -348,6 +357,7 @@ enum tpm_chip_flags {
+ 	TPM_CHIP_FLAG_SUSPENDED			= BIT(8),
+ 	TPM_CHIP_FLAG_HWRNG_DISABLED		= BIT(9),
+ 	TPM_CHIP_FLAG_DISABLE			= BIT(10),
++	TPM_CHIP_FLAG_SET_LOCALITY_ENABLED	= BIT(11),
  };
  
--enum sec_mac_len {
--	SEC_HMAC_CCM_MAC   = 16,
--	SEC_HMAC_GCM_MAC   = 16,
--	SEC_SM3_MAC        = 32,
--	SEC_HMAC_SM3_MAC   = 32,
--	SEC_HMAC_MD5_MAC   = 16,
--	SEC_HMAC_SHA1_MAC   = 20,
--	SEC_HMAC_SHA256_MAC = 32,
--	SEC_HMAC_SHA512_MAC = 64,
--};
--
- enum sec_cmode {
- 	SEC_CMODE_ECB    = 0x0,
- 	SEC_CMODE_CBC    = 0x1,
+ #define to_tpm_chip(d) container_of(d, struct tpm_chip, dev)
+diff --git a/include/uapi/linux/tpm.h b/include/uapi/linux/tpm.h
+new file mode 100644
+index 000000000000..73485a184f14
+--- /dev/null
++++ b/include/uapi/linux/tpm.h
+@@ -0,0 +1,11 @@
++/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
++#ifndef _UAPI_TPM_H
++#define _UAPI_TPM_H
++
++#include <linux/types.h>
++#include <linux/ioctl.h>
++
++#define TPM_MAGIC 0xA4
++#define TPM_IOC_SET_LOCALITY _IOW(TPM_MAGIC, 0x00, __u8)
++
++#endif /* _UAPI_TPM_H */
 -- 
-2.33.0
+2.47.0
 
