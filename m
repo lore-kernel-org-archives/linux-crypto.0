@@ -1,97 +1,115 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 920E623CB;
-	Sat,  2 Nov 2024 10:52:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17947155753;
+	Sat,  2 Nov 2024 11:05:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730544737; cv=none; b=B7vHvWPYcZIqzfZnESy79f+6wOUyLnq4osnxIfelK0XOxlmuHbNqy6I4O5noEWUJBU9/3sx7IW3jsD3E9LFa2zZuJ08rFcvQnJzNEGop8D5QXgF0N9lWslwI7zomBlLhbJWCl10X2V32FnynFSd4pIouW6d+80JXYnUb5A4+k7g=
+	t=1730545515; cv=none; b=e+c1QSMiYgnNMKxebB1pI0J4NMN94pZv8hYqUzJzM8YfDHxKXPBSZpdTwrcs73uD4iydv0aqc8iLdkxFMBcAaZZlhUXocoY54oTUY9qgk2YKSXyErL79z/KaSNrwivenFKxFZwx/VOFCiblBQchaaXSywVTXvQJoE7c7nctisXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730544737; c=relaxed/simple;
-	bh=BNs0vMT9okoG3ctz2ayg1gJ18NykgP8pjbU3xi9lAVw=;
+	s=arc-20240116; t=1730545515; c=relaxed/simple;
+	bh=/5V9RBqkx2P66EvYaaaASBdjOLj2pXbKfVO3Hh2MXq0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ffwLc+2JEzB2n9go+PAJUFhn4HHoCVtuNdJrNY/CwfDPX6uv69qV4IQb72jd+89/f0V/U5gabxBEyUW0kSQLQATr+6WO7QR6Xp1Ik4e8L6HXZWu4bMDI1tlszr0E05lQQQeKHauNPtQLVYGomynevqrSqRdLVUYNmf4hXpdBfTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dK6SLEGG; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=eJsmQntV3NEmCWUc64J+AgaQrilpGh0lNasBa2Uz1sYms6ehOjg9aq4pONzcWj+rwxYS2/fj6UIgp+tNFmIaCmyljbiDV1gAvPHG/PAg535JLrd2+ONqyOjmtL6t6AL3ejgkuR/E4yXFJa2H2Ke3IPf6v6dV47E7yZKrV54hqbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aG8rN+aG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dK6SLEGG"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 225B3C4CEDC;
-	Sat,  2 Nov 2024 10:52:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aG8rN+aG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A17C1C4CED3;
+	Sat,  2 Nov 2024 11:05:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730544737;
-	bh=BNs0vMT9okoG3ctz2ayg1gJ18NykgP8pjbU3xi9lAVw=;
+	s=k20201202; t=1730545514;
+	bh=/5V9RBqkx2P66EvYaaaASBdjOLj2pXbKfVO3Hh2MXq0=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=dK6SLEGG9PayZ9NB+yOQuKF8a3NnL6Y0fIfORpLa9E298aTBP5OUL6VMVh4iN851Z
-	 q6m1AS2LNLmZtz82eBXbkqwmHhgRVGWkl0fQfg285Eoh1GljmfPdmo6+dkui06WP43
-	 e3zzoNVilyvT8Hhki3HEVDpyw1CM/LcI8+rX4XRCp61aDnYae7ysCURJH8WqEYeAUu
-	 p0YmO+QMj5j+ytAF/odZNigrvZlRGsoyi8r8YmH48uOmNKHoyTRqwweJxgTGuh1c1u
-	 QwDbNWV0qnLsOV+lWadWQo0T3rVCOCpdnUtokbDMJ40gsPNnBL9sS2uqCfWm5HeKI7
-	 31UpiW1YXO8ZQ==
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-539f7606199so462605e87.0;
-        Sat, 02 Nov 2024 03:52:17 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUIWa9us/zcLxsOFZERdaHVfCLkZFmD/4Ath7QeGwLKeqQggTpNt9wR82bxPJ5LfeK/gb8uGOjpIvdQ@vger.kernel.org, AJvYcCVsw+JccEG1faV2DFUow34k3KZYuUDKrhLlvc6pZqVq9r6DlrVWYMrQsddQKNLAbPhHp7yrxdadm5Zq7ezi@vger.kernel.org, AJvYcCWBjNcHcbOY0g16mb+ffPzQSm7SDBS4/JxbK8Opo2sjM9HVR1+/9Phq517v+NXE/plw3OVyDVGtTZjn4dw=@vger.kernel.org, AJvYcCWogYYVq4Wv/GqsGNSAg5lUOqTrc4k3TM0QXKqzjNPwchfiOuBumujDPluljp3ixqPQGOeSU8DgBF3g@vger.kernel.org, AJvYcCX4rp4Bgogqr3UzfODNg464e5IyLZ6phT6FYM7P/aODB0CkacIqo6wEFl+fc6877trDKuY8loz9eJ1s/mg71rzp@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFDzqlGHWT9FSZ9GUuUVgDD/wpIZODHc6xc6EFq3Mwf6gBIRG3
-	dzqyZ+0XjZ0UB+XcJ1qVLvt1se43V2kX1StJiJnkW7vuIQvLzRsalXcaGVnvuK5e5nqgyyC8Av9
-	DTuylpCOFZVyE0m3tvx1Xq8yamYg=
-X-Google-Smtp-Source: AGHT+IGKIsyFNydotRxNbkfDFdnL87m+LkWPywtfpMYouXaEqYk6mvq/ex/9DjHC7TO0PtB9vxAygAsd35XhXmCRUnk=
-X-Received: by 2002:a05:6512:1086:b0:539:8c02:64d5 with SMTP id
- 2adb3069b0e04-53b7ecf213cmr7778977e87.27.1730544735380; Sat, 02 Nov 2024
- 03:52:15 -0700 (PDT)
+	b=aG8rN+aGdtH1DPyPt0RE+7lAJgUL/xXXHUelv4xEoDkJGS1o2la6NNuXa5xis93nN
+	 K8IKDmq8EiG0o9WOHBCJO193R3Cwdp0VFuoF6oYHS3VAZ2z7ZDdAaNSMmOu/MMLl0R
+	 c+5IA9wcIbiEVqWbp16rgmOQIRrPNN2745gD9NAycIDtw6YYRxmQQEvGoyQopB0/Vg
+	 9k08OIbmYhcPdDTgy3bov/BTbh35m6h2xJTok/8HFYPtgtvuO45X4GGAawAIkKqaMa
+	 YSVdXfZNrwS+ONIBbLTrgDZiGfuTf4K6InWgWETrzpSoUbxTA5sO4ko6HmUl4OCzgy
+	 RXaied76n8YRQ==
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2fb470a8b27so34167561fa.1;
+        Sat, 02 Nov 2024 04:05:14 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUZdQEVfF6ZUNTDckT1GEcpU7rHjdnZStQhjHmcP9ppCzvsZqxuM6Jl3tp1dearGDWbWDrEjQkEHQcsog==@vger.kernel.org, AJvYcCV+KNhPm4NasTb1Soqg7AoyjuSrb0H7utDy4TcdndiO7I2LqH+XyNr3Fwi4djC7q5hpD4R3Oz0JzvVFwg==@vger.kernel.org, AJvYcCV3zZVVVLsvjNJdZrog2r+TzK3JeCtlcGJ28BsiPl1uEk1bbFaqAQ7wvgSvOw5N0NL63JuzjznrdOkDWA==@vger.kernel.org, AJvYcCVx59gkLsPO8wUYU/Iu8c/f9KkG17WlPy2BwAis8VY/oqhe3zFPyFla2hI0Mv9QwMhnesWJtZeKhp78Dw1v@vger.kernel.org, AJvYcCW2YpBmn/XOd/GeypxwE/523DbRv306y+slyflmEC9zOMnGCzTI9oX9Wvx+dSpo2mZvEv0heY7wqqMKVQ==@vger.kernel.org, AJvYcCWbMiQLY/MsyoOl0J6W+jN5LG5e9nqbzrfauaV7ow5kKa4u7B4ycLwKPpJ3pgdu+WGBxoLvmUAb7QB5Aw==@vger.kernel.org, AJvYcCWim29nzfa/eB7xEBR3Fj4T1PnOh2IV0rvs83C2arjz3BhfWcf1bjhxL0/icu7U3M0mT+UvG5kUYnqQ@vger.kernel.org, AJvYcCXvjITxkCMmRhLOWeMbyYvJuONbDYzSKelP/amSL0mZuowrQLGXfKcDbuyuWXmKMAk675dvOcS7GpVTgiOp@vger.kernel.org
+X-Gm-Message-State: AOJu0YyvmKQxfNvjQzOOP+jsrHI7meyRBVJWy+ExcP0Uemv92nwnUZ2w
+	s6fUBYkD+W6KtkZv4t1oafnX54BCHv62sIGWtiGA5R7ZNqAFAgig1zX5a0CIN9wmeMWZHJbcyyQ
+	t015LoXOHOXsiBkGBfOSga6y9kZ8=
+X-Google-Smtp-Source: AGHT+IE5o/Xo+U8T2tXn6oxoafBjKshUHZrf+SWe+VK5IeGRU8mut4uUUJkKbM8eXFrd2HiwYXSp4cYXTpXetvFDWaA=
+X-Received: by 2002:a2e:b8ca:0:b0:2fb:5a42:da45 with SMTP id
+ 38308e7fff4ca-2fedb46de0dmr21026331fa.16.1730545513001; Sat, 02 Nov 2024
+ 04:05:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <D5BB5GX4KEUO.VJ2G9G9QKYRR@kernel.org> <20241102062259.2521361-1-jarkko@kernel.org>
- <D5BHBW3NUS5C.293GUI03HMTCF@kernel.org> <CAMj1kXGk8y=rZiNiDcD-8mDKJB5HkTowM7g+kjO6616MGdTQaQ@mail.gmail.com>
- <D5BMMJYMVWKJ.3MIGB8KW34PR2@kernel.org>
-In-Reply-To: <D5BMMJYMVWKJ.3MIGB8KW34PR2@kernel.org>
+References: <20241026040958.GA34351@sol.localdomain> <ZyX0uGHg4Cmsk2oz@gondor.apana.org.au>
+ <CAMj1kXFfPtO0vd1KqTa+QNSkRWNR7SUJ_A_zX6-Hz5HVLtLYtw@mail.gmail.com>
+ <ZyX8yEqnjXjJ5itO@gondor.apana.org.au> <CAMj1kXHje-BwJVffAxN9G96Gy4Gom3Ca7dJ-_K7sgcrz7_k7Kw@mail.gmail.com>
+In-Reply-To: <CAMj1kXHje-BwJVffAxN9G96Gy4Gom3Ca7dJ-_K7sgcrz7_k7Kw@mail.gmail.com>
 From: Ard Biesheuvel <ardb@kernel.org>
-Date: Sat, 2 Nov 2024 11:52:03 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXExMWBAx7geuU8Uwp9CQLpJyTgYmWUw2CtKd3xT8mMFsg@mail.gmail.com>
-Message-ID: <CAMj1kXExMWBAx7geuU8Uwp9CQLpJyTgYmWUw2CtKd3xT8mMFsg@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 1/2] tpm, tpm_tis: Introduce TPM_IOC_SET_LOCALITY
-To: Jarkko Sakkinen <jarkko@kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>, Peter Huewe <peterhuewe@gmx.de>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	James.Bottomley@hansenpartnership.com, andrew.cooper3@citrix.com, 
-	baolu.lu@linux.intel.com, bp@alien8.de, dave.hansen@linux.intel.com, 
-	davem@davemloft.net, dpsmith@apertussolutions.com, dwmw2@infradead.org, 
-	ebiederm@xmission.com, herbert@gondor.apana.org.au, hpa@zytor.com, 
-	iommu@lists.linux-foundation.org, kanth.ghatraju@oracle.com, 
-	kexec@lists.infradead.org, linux-crypto@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-efi@vger.kernel.org, 
-	linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luto@amacapital.net, mingo@redhat.com, mjg59@srcf.ucam.org, 
-	nivedita@alum.mit.edu, ross.philipson@oracle.com, tglx@linutronix.de, 
-	trenchboot-devel@googlegroups.com, x86@kernel.org
+Date: Sat, 2 Nov 2024 12:05:01 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXG8Nqw_f8OsFTq_UKRbca6w58g4uyRAZXCoCr=OwC2sWA@mail.gmail.com>
+Message-ID: <CAMj1kXG8Nqw_f8OsFTq_UKRbca6w58g4uyRAZXCoCr=OwC2sWA@mail.gmail.com>
+Subject: Re: [PATCH v2 04/18] crypto: crc32 - don't unnecessarily register
+ arch algorithms
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Eric Biggers <ebiggers@kernel.org>, linux-kernel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-crypto@vger.kernel.org, linux-ext4@vger.kernel.org, 
+	linux-f2fs-devel@lists.sourceforge.net, linux-mips@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
+	linux-scsi@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	loongarch@lists.linux.dev, sparclinux@vger.kernel.org, x86@kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-On Sat, 2 Nov 2024 at 11:38, Jarkko Sakkinen <jarkko@kernel.org> wrote:
+On Sat, 2 Nov 2024 at 11:46, Ard Biesheuvel <ardb@kernel.org> wrote:
 >
-> On Sat Nov 2, 2024 at 11:02 AM EET, Ard Biesheuvel wrote:
-> > Same for the ioctl() [as well as the read-write sysfs node]: looking
-> > at the code (patch 19/20) it doesn't seem like user space needs to be
-> > able to modify this at all, at least not for the patch set as
-> > presented. So for now, can we just stick with making the sysfs node
-> > read-only?
+> On Sat, 2 Nov 2024 at 11:20, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> >
+> > On Sat, Nov 02, 2024 at 10:58:53AM +0100, Ard Biesheuvel wrote:
+> > >
+> > > At least btrfs supports a variety of checksums/hashes (crc32c, xxhash,
+> > > sha) via the shash API.
+> >
+> > OK, given that btrfs is still doing this, I think we should still
+> > register crc32c-arch conditionally.  Having it point to crc32c-generic
+> > is just confusing (at least if you use btrfs).
+> >
 >
-> Short answer: I have no idea. I would not mind that but neither
-> the commit message for TPM give a clue on this. Actually, I *do
-> not care* if it is RO and RW but I'm neither good at guessing
-> random shit.
+> Agreed. So we should take this patch.
 >
+> The current issue with btrfs is that it will misidentify
+> crc32c-generic on arm64 as being 'slow', but this was already fixed by
+> my patches that are already in cryptodev.
+>
+> On arm64, crc32 instructions are always available (the only known
+> micro-architecture that omitted them has been obsolete for years), and
+> on x86_64 the situation is similar in practice (introduced in SSE
+> 4.2), and so this patch changes very little for the majority of btrfs
+> users.
+>
+> But on architectures such as 32-bit ARM, where these instructions are
+> only available if you are booting a 32-bit kernel on a 64-bit CPU
+> (which is more common than you might think), this patch will ensure
+> that crc32-arm / crc32c-arm are only registered if the instructions
+> are actually available, and btrfs will take the slow async patch for
+> checksumming if they are not. (I seriously doubt that btrfs on 32-bit
+> ARM is a thing but who knows)
 
-You were cc'ed on the rest of the series, no?
+(actually, backpedalling a little bit - apologies)
 
-Shall we clarify this first, before proposing patches that introduce
-new ioctls() and kernel command line parameters to a security
-sensitive subsystem?
+OTOH,btrfs is the only user where this makes a difference, and its use
+of the driver name is highly questionable IMO. On x86, it shouldn't
+make a difference in practice, on arm64, it was broken for a long
+time, and on the remaining architectures, I seriously doubt that
+anyone cares about this, and so we can fix this properly if there is a
+need.
 
-My reading of 19/20 is that the secure launch module sets the default
-locality, and given that it can be built as a module, setting the
-default locality needs to be exported to modules (but as I indicated,
-this should probably be in a TPM internal module namespace)
+The only issue resulting from *not* taking this patch is that btrfs
+may misidentify the CRC32 implementation as being 'slow' and take an
+alternative code path, which does not necessarily result in worse
+performance.
 
-If setting the default locality from user space is a requirement down
-the road, we can discuss it then. For now, let's not go off into the
-weeds and derail this series even more.
+And I'd prefer static_call() / static_call_query() over a separate
+global variable to keep track of whether or not the generic code is in
+use.
