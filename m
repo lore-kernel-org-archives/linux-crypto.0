@@ -1,84 +1,94 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C49D916F0EC;
-	Sat,  2 Nov 2024 10:40:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 437A314F10E;
+	Sat,  2 Nov 2024 10:47:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730544037; cv=none; b=BYAgUcBjASHxMjACQ4B9zDcnIwLrV/BNAtB6qh9ybTuQUMortBHNVSuK3cmYhTAfaBVKX/CE+xFTHeAphgUIDsvS0yWnC5yJC1MSaJcXfddQ4vBIBzsegSYjlh8kMowclKLD0cOkdDnheRFp2uG1bHdkPuS+qYt5J9zsRRTNt14=
+	t=1730544434; cv=none; b=Zx0HOxLw1SGuMRQW3Ht+wBqCBD7qf3Et0desgt7asZW78VkClxDaBDQb6hDobhtFtOom1tt7xH4fSxqh63FRkHrxq5DREMQ2Ywlq34QTveYhssc1be3vOIVd56J/oJWCpWlbthBwVqmo7j+VGMbANuEdU6fv9ZuAWbcH1deIxe0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730544037; c=relaxed/simple;
-	bh=tV3w/NhiYLlSxyTG9f/8MYrM2eWyQSkpoUd6CUZpQ/s=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=KxKruc3ZGS3t0h0rZWHQ+YisRnnVUsqtvcg9AQJcsnLiknjVVfo4LPE/JS6wtrrXsgu0HdWESkwPu5+3ol2ikM1qcbFLpy6pJehZ57eoFJSSttu0lgdgcHYT0UyBN9f/+x6cRpHYS9fqJUlCh1algjs8qN5wpOKJtYpQ/VJPhFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YqfIep9R; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1730544434; c=relaxed/simple;
+	bh=M7FdSpu+PhluM81llzaa2KRxqj+jubQ2BPx4TOrWNTc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Kg6Xq0W1qNJ12Y2fafKQB8+qVRqg3tXpc+mw1cAekbqAGvJ8yMPG36s6CDexJGgCv6hLuDA+aPZOfbdo+cVc+Bulu1vd8dYAYDVrpVi4ZS5uRsWw87LGn784ziA+z5wFgr5cbDK4Mv0122zL9lvEd0KImS8lin5J+qzfP8ypuLc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GETuJANe; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YqfIep9R"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83A74C4CEC3;
-	Sat,  2 Nov 2024 10:40:35 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GETuJANe"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CEDAFC4CED3;
+	Sat,  2 Nov 2024 10:47:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730544037;
-	bh=tV3w/NhiYLlSxyTG9f/8MYrM2eWyQSkpoUd6CUZpQ/s=;
-	h=Date:Cc:Subject:From:To:References:In-Reply-To:From;
-	b=YqfIep9RAimhK5lG8GqaDVHqPzgB0uQJtTNYapUpHHL3VKHD63sfcJEgzueni7hxh
-	 cilOlKzjwtdBMAy/OQZ+l0IpY0UmNFTwXCvsHHnr7kkoK/43Rug3DEoVA+M1xExXzq
-	 BOTjSEjqGkivPG88YnB5MWaZUg8+CWRWayIW79lY9vYeYXYzUrSgq8nDMHSDKx2rCF
-	 8Q7UW0GpW0FwAXMD9WoKaep1r8yt4QQxPeQLyx1CeRryvMAk5IZgYpA87cz4tAe5PC
-	 cmA3WWCIh6wxIYGhm7nB1aprTmMUmQq43pnRUZGmIZNenwodP9jmmhiXWEG730hFGH
-	 Ln33GT8WM1epw==
+	s=k20201202; t=1730544433;
+	bh=M7FdSpu+PhluM81llzaa2KRxqj+jubQ2BPx4TOrWNTc=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=GETuJANeH7gctgmH/+nyiGbLZgU60kn5uvKaHdxC3jOHXyMIY+5SIP3FVcC5h/4vv
+	 2F7xHCEoHJS0lX3P7aD3ut8mIFSrFv0fHm6Op2JrumAUKGqrtpD0EWeTVv6BzOthLb
+	 cOPP8GebgckiemWtQdsi6mBWqLiYHzeSWyMzb1zENPEsHy5Xv2w9L9UtNhAaMFqePl
+	 DwhnDPyV/TgRCpycn4X3kpJ24lrXa/PI2ONFP7TokPIoc1Slpz4EGZ4aA86XjzMGou
+	 SSLprHHgimxQ0kP5J6bxA4m+lTjGXKTj+ngmbOktZM9E/03kahXIaRmHD6mbHIg0BX
+	 2ajJSBCd/ctBA==
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2fb5638dd57so25879141fa.0;
+        Sat, 02 Nov 2024 03:47:13 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCU4DaOq0oOBHqr7RTBtXSnrQr3v5FBK/T5Atky/xzgmDPSazktVcFRQA2vb5a4DG4OaXos8Dhut85tfog==@vger.kernel.org, AJvYcCUiGAEBuSp3yntmvjLEMGQv78gioPH3x5d4F6akQib/HdGhReLdQm4bd/pRRgWWgGcnB3dfreKui8TOMQ==@vger.kernel.org, AJvYcCUy/aDGqOciArXItChS1epQOvwnUO15Kpsvmw1AxtgZADLvIWJ3nNgSu2x2YjIyUXizqDHpoHkPAUwF@vger.kernel.org, AJvYcCUyQIed0/Bd5xwDYtYu+F0/ZBMDk9Zgg73pbwWmxuhmr3ULATSxgjDbGYtwv5pybYXlw55QnWEvxP1UFGfP@vger.kernel.org, AJvYcCV9kO0d6x20R8g+jwHzy0F3cDBpobbsXwh0Vl5pZUZKDgMgacKwWF8v9+roIFBmEingiED5djjVBETg7w==@vger.kernel.org, AJvYcCVuLS0g0Rs92rwnPs4LeyVkPAExATUeeJdEkiGUEey2APixwKVh58H4lrtePST/jXb1o1QJUBXTVgDnPCEW@vger.kernel.org, AJvYcCWQ0pl1zo+MvcEADpJPTj/wjX9Yf6Gb3cwo07aITc/yz5lnKxCqC1UZnz2VYdH0qU06PhbRBJ5rNvRA6A==@vger.kernel.org, AJvYcCX9Iim/kcniCRYC+mRLYlBO5dJIerj9E0ItYmy7uL6P21+nEWcb06auKVC+O+Rvhu8xYg5Zz0U69OWWMQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywa2JZ7ixjsksvcaF6YzeJ6s/mveJFduBR1ZJ+iEkrDaWt5OBVV
+	+C8DWB3J22wGc4cAT613QO1uR+NRIQ2C6wBqg+czFR0LkiUPPgBieE7+yaNmrnLayETHI83y103
+	4lntG4bdhQEbezlK+4RKQzeHEN8c=
+X-Google-Smtp-Source: AGHT+IH0WCZimX1F/VX+DWohj1qqHgkCvV1OEM1qu/eyPpSjntB2c2S/MHD4wvbHvrBfL9ia8YhfUT4VBcWPbilaETQ=
+X-Received: by 2002:a05:651c:506:b0:2fb:4603:da13 with SMTP id
+ 38308e7fff4ca-2fcbe0989bfmr124544811fa.39.1730544432162; Sat, 02 Nov 2024
+ 03:47:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Sat, 02 Nov 2024 12:40:31 +0200
-Message-Id: <D5BMNT065TE5.1SV8CSW8KEG6L@kernel.org>
-Cc: "Jonathan Corbet" <corbet@lwn.net>, "Peter Huewe" <peterhuewe@gmx.de>,
- "Jason Gunthorpe" <jgg@ziepe.ca>, <James.Bottomley@hansenpartnership.com>,
- <andrew.cooper3@citrix.com>, <baolu.lu@linux.intel.com>, <bp@alien8.de>,
- <dave.hansen@linux.intel.com>, <davem@davemloft.net>,
- <dpsmith@apertussolutions.com>, <dwmw2@infradead.org>,
- <ebiederm@xmission.com>, <herbert@gondor.apana.org.au>, <hpa@zytor.com>,
- <iommu@lists.linux-foundation.org>, <kanth.ghatraju@oracle.com>,
- <kexec@lists.infradead.org>, <linux-crypto@vger.kernel.org>,
- <linux-doc@vger.kernel.org>, <linux-efi@vger.kernel.org>,
- <linux-integrity@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
- <luto@amacapital.net>, <mingo@redhat.com>, <mjg59@srcf.ucam.org>,
- <nivedita@alum.mit.edu>, <ross.philipson@oracle.com>, <tglx@linutronix.de>,
- <trenchboot-devel@googlegroups.com>, <x86@kernel.org>
-Subject: Re: [RFC PATCH v2 1/2] tpm, tpm_tis: Introduce TPM_IOC_SET_LOCALITY
-From: "Jarkko Sakkinen" <jarkko@kernel.org>
-To: "Jarkko Sakkinen" <jarkko@kernel.org>, "Ard Biesheuvel"
- <ardb@kernel.org>
-X-Mailer: aerc 0.18.2
-References: <D5BB5GX4KEUO.VJ2G9G9QKYRR@kernel.org>
- <20241102062259.2521361-1-jarkko@kernel.org>
- <D5BHBW3NUS5C.293GUI03HMTCF@kernel.org>
- <CAMj1kXGk8y=rZiNiDcD-8mDKJB5HkTowM7g+kjO6616MGdTQaQ@mail.gmail.com>
- <D5BMMJYMVWKJ.3MIGB8KW34PR2@kernel.org>
-In-Reply-To: <D5BMMJYMVWKJ.3MIGB8KW34PR2@kernel.org>
+MIME-Version: 1.0
+References: <20241026040958.GA34351@sol.localdomain> <ZyX0uGHg4Cmsk2oz@gondor.apana.org.au>
+ <CAMj1kXFfPtO0vd1KqTa+QNSkRWNR7SUJ_A_zX6-Hz5HVLtLYtw@mail.gmail.com> <ZyX8yEqnjXjJ5itO@gondor.apana.org.au>
+In-Reply-To: <ZyX8yEqnjXjJ5itO@gondor.apana.org.au>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Sat, 2 Nov 2024 11:46:59 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXHje-BwJVffAxN9G96Gy4Gom3Ca7dJ-_K7sgcrz7_k7Kw@mail.gmail.com>
+Message-ID: <CAMj1kXHje-BwJVffAxN9G96Gy4Gom3Ca7dJ-_K7sgcrz7_k7Kw@mail.gmail.com>
+Subject: Re: [PATCH v2 04/18] crypto: crc32 - don't unnecessarily register
+ arch algorithms
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Eric Biggers <ebiggers@kernel.org>, linux-kernel@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-crypto@vger.kernel.org, linux-ext4@vger.kernel.org, 
+	linux-f2fs-devel@lists.sourceforge.net, linux-mips@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
+	linux-scsi@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	loongarch@lists.linux.dev, sparclinux@vger.kernel.org, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Sat Nov 2, 2024 at 12:38 PM EET, Jarkko Sakkinen wrote:
-> On Sat Nov 2, 2024 at 11:02 AM EET, Ard Biesheuvel wrote:
-> > Same for the ioctl() [as well as the read-write sysfs node]: looking
-> > at the code (patch 19/20) it doesn't seem like user space needs to be
-> > able to modify this at all, at least not for the patch set as
-> > presented. So for now, can we just stick with making the sysfs node
-> > read-only?
+On Sat, 2 Nov 2024 at 11:20, Herbert Xu <herbert@gondor.apana.org.au> wrote:
 >
-> Short answer: I have no idea. I would not mind that but neither
-> the commit message for TPM give a clue on this. Actually, I *do
-> not care* if it is RO and RW but I'm neither good at guessing
-> random shit.
+> On Sat, Nov 02, 2024 at 10:58:53AM +0100, Ard Biesheuvel wrote:
+> >
+> > At least btrfs supports a variety of checksums/hashes (crc32c, xxhash,
+> > sha) via the shash API.
 >
-> I haad to assume it was *needed* for reason that I do not know
-> given that sysfs attribute was RW.
+> OK, given that btrfs is still doing this, I think we should still
+> register crc32c-arch conditionally.  Having it point to crc32c-generic
+> is just confusing (at least if you use btrfs).
+>
 
-Let's put it this way: *if* write is needed this the way to do
-it now and also in the future (or along the lines). Or least
-harmful at least (single additional locality change per boot).
+Agreed. So we should take this patch.
 
-BR, Jarkko
+The current issue with btrfs is that it will misidentify
+crc32c-generic on arm64 as being 'slow', but this was already fixed by
+my patches that are already in cryptodev.
+
+On arm64, crc32 instructions are always available (the only known
+micro-architecture that omitted them has been obsolete for years), and
+on x86_64 the situation is similar in practice (introduced in SSE
+4.2), and so this patch changes very little for the majority of btrfs
+users.
+
+But on architectures such as 32-bit ARM, where these instructions are
+only available if you are booting a 32-bit kernel on a 64-bit CPU
+(which is more common than you might think), this patch will ensure
+that crc32-arm / crc32c-arm are only registered if the instructions
+are actually available, and btrfs will take the slow async patch for
+checksumming if they are not. (I seriously doubt that btrfs on 32-bit
+ARM is a thing but who knows)
