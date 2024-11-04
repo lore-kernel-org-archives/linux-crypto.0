@@ -1,145 +1,163 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02DF319B59F
-	for <linux-crypto@vger.kernel.org>; Mon,  4 Nov 2024 08:31:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A17F41C4A2B;
+	Mon,  4 Nov 2024 10:55:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730709085; cv=none; b=YOmS6Zrwlp4AZAWy5QVVgjqO7blWttSGiIGGbJm+Y2ulsu9bjkgu25PeaFWZJSBnPdMZseIUhNQv5GF1nXzUk4w8Q6Ssvjpff1vLEqzhIZpZX4/Tn/yVxpjF4DDZHjiLfRu1MyWiCPM/GBB0BEA8UhJzzHNSshNn/+dBO8EJobo=
+	t=1730717721; cv=none; b=JTqpQa6XLglfAdaqFNuDad1Wjb9oQPuk4FkQfxryqZIDdy3guZNg0/BRl5ygQJj+XwTKTYApZ/8g8BgWWxRCQa7BkdprdKRDfV+gVHoWTnbssAr281uKgQJfULB0T5pyEWgQ3m22zyxTUKEzUdzAnNtTEEowyb4e+Oa3pWHSPkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730709085; c=relaxed/simple;
-	bh=RMFwDMojD3zrSAgOcjuKC+xriirvgs/o1aANeynXSuQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=YJGUg+NPEAXDvJ9H8n1bCFMEFsfAHFHA0jYrBfTIGwhOovN6f30rLVvCvSE7B/DM1AkjbQbo5J6/AKTEd0jPXvFx3RdlLv1VSr/kaQUbpTbyBhqQPLoWl6qvKqMC9XOyoyO6o3I4Cc93/ZQeRtIV2t/28++3r9G9fr1lf12hZsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=IWKBxuYT; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1730717721; c=relaxed/simple;
+	bh=Xsd60VaJMVJJJZwPYCiMbYDsq4aVLjYnOCS09bBiIXw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=g6cL5fvZBv+zmEffI+XQ3SiFEXtxoxZeMTm6smTG4nIFRjTEtbLpBZzIvO3phr5YWn0rbeePDIpl5C5bPcvZfD7f1CvvvfWbY8csiTiIFhPtj3b3Au7z8P3nVos0RfxGUyCKja/wVBDBlNXCXTJCd5k7fJFuqNtR4dYqfsBTk4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mluckDeM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IWKBxuYT"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-43155afca99so28512945e9.1
-        for <linux-crypto@vger.kernel.org>; Mon, 04 Nov 2024 00:31:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1730709078; x=1731313878; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=T5vDLGsbEr0SVIowN1t5ye+7OUL4pjjT2D7werAFSjM=;
-        b=IWKBxuYTkq6vrWktIU4NQb+ppiLmusdhAA+wKIM7dsIqwjibfjojLeWeUzYwEXwvCL
-         dZS2u2L9YQQHdglBiFuBnLy1AHlVZOYDgoiK/TAJ4fq9bX5tkb+1ce4T2kTAfX3QF6+8
-         C6z7zn+Jp7RpdnIsnk0qO0t4hlA4Awz7z9WQj27+q89wybZw75T1rnNpuK2HKwsLz4VF
-         3LGCsJyJZuIVs5eZ+qJM2Gvy5e1EdPhLeUcNgtInjTDsJ8rlMzh0N9LCiqimUcwk8+Rq
-         lxB4gGS3Xf6LOnvHG2Ct/OtuiHTDyc6mK7ZXyVtIzSp8YID/a3pnDdhg8+g8qTx6BVPS
-         rBEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730709078; x=1731313878;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=T5vDLGsbEr0SVIowN1t5ye+7OUL4pjjT2D7werAFSjM=;
-        b=ga9Rama8LmttGEuTVutEYwYNdj/cYsBcOxS1nsCdHmU6fjoDrNuTm6B61+Xq0zdFAM
-         nxpY7hFtQb5S7ktByxWWlBDMRYythn0yMKQbFJsa6uw7Tb2cw6LxQqQQys1pdQiBHq3L
-         0Vq9nPc/N1g8UMB3sM+I1ljpGmJoK53vDl7CmDhjgfrt0tI74ETTplcWNrgwkdnrKKP9
-         /Bbt0nuEAVxEs1Gan0IzfH+FvMjcpGwrp/JM7MEd1WPXyeYtwQ1uhXd4bDdcpLTj1Ity
-         5BhEDuZ837Gy3j95ROKPVY4Bqu2L9e444+Eip1oFhgwy5eeScAIzwZpbMoyDCG6Jwiqk
-         Cbyw==
-X-Forwarded-Encrypted: i=1; AJvYcCXXUd10nu8qrHsTD8bfVAudLktCfmfaWkTfy/ZXAJVDjDs80LPYZS7whOlJrjXgfydDklatzcQgXP4kUco=@vger.kernel.org
-X-Gm-Message-State: AOJu0YypJ41gJWPv7xrmC//2g1aRVSp3F6O0BE5jzf1Ihj5+3LD+IzUR
-	xGhwtRGY6ULCWgLl+hzDXM6CTTuxuS2B5KPTNCYcHVVIUoRjMbZLZfWSJCEPb6o=
-X-Google-Smtp-Source: AGHT+IFFiT8xMGT+o7kM5vRaU6KjK8tqr+AcRQcVqXIZYuM1L7HGi9LZqQfv+QQLXIRdVtTWEYW6xA==
-X-Received: by 2002:a5d:64a7:0:b0:374:c7cd:8818 with SMTP id ffacd0b85a97d-381c79e366dmr9155476f8f.22.1730709078297;
-        Mon, 04 Nov 2024 00:31:18 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381c10d439esm12549514f8f.44.2024.11.04.00.31.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Nov 2024 00:31:17 -0800 (PST)
-Date: Mon, 4 Nov 2024 11:31:13 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: oe-kbuild@lists.linux.dev,
-	Kanchana P Sridhar <kanchana.p.sridhar@intel.com>,
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-	hannes@cmpxchg.org, yosryahmed@google.com, nphamcs@gmail.com,
-	chengming.zhou@linux.dev, usamaarif642@gmail.com,
-	ryan.roberts@arm.com, ying.huang@intel.com, 21cnbao@gmail.com,
-	akpm@linux-foundation.org, linux-crypto@vger.kernel.org,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	clabbe@baylibre.com, ardb@kernel.org, ebiggers@google.com,
-	surenb@google.com, kristen.c.accardi@intel.com, zanussi@kernel.org
-Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev, wajdi.k.feghali@intel.com,
-	vinodh.gopal@intel.com, kanchana.p.sridhar@intel.com
-Subject: Re: [PATCH v2 13/13] mm: zswap: Compress batching with Intel IAA in
- zswap_store() of large folios.
-Message-ID: <89728727-0fd2-4539-bc89-17a699d7179a@stanley.mountain>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mluckDeM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 810BDC4CED5;
+	Mon,  4 Nov 2024 10:55:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730717721;
+	bh=Xsd60VaJMVJJJZwPYCiMbYDsq4aVLjYnOCS09bBiIXw=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=mluckDeMk6i5aN2XBOA1zfp0B5xurNz8wOuuO6UKYkZqld8M1vPhMjikatVUxYIq1
+	 o/o2n4QC5unxoa1BCq0QEJuuUGosOaiWVlAfms7oPabM1IPV7T5QCnjD432LtwU6jM
+	 qNyRNziXoq7Y5K909RLvlKf7uf+1MvZd6Ak8eCwV7pk3wdhybH+DxGdKIZqFxDiZgi
+	 /iQnjicc1WrBfd1q+/hj/6yterw6uw+CgPyujA3SNAenk3a2+tEKgLA1Q7vvvsnEYL
+	 Fa4fRc5HTw91i3Ikfsm6UaVHVMpdSHGkU3B2sp1paNLh1UwprUskCBwrZH7BP89RDz
+	 Po3mKNTx8CmzQ==
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2fb5fa911aaso57807281fa.2;
+        Mon, 04 Nov 2024 02:55:21 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCURVbc2V3WeKxNTxTfQFbEMkq1xfReT+d82xiZRYFOVzGscoxL5kQYU8Xe3hmjZHl5jP5GLvJJYh/2l@vger.kernel.org, AJvYcCUT5e5bWXiA/hasTRnbN9yoMGIp4rjtAcLlgvssbentTzExdf/H/tm5ooTxYywucWJZXJymlu0Cvt2U9RVk@vger.kernel.org, AJvYcCUmoSWHgbYQWkM3VMkFWHiB3AZ+c40UTNM/L3hYlfgK5xJNccHdAKLABJn03xbOyBccVWSXAcyftgzFRA==@vger.kernel.org, AJvYcCVdoz444u4Zp09JQs1amMQhMK7cWsgqAb7BU7DYtywuVTjBiA//aB38Vyvighbi9S8OSydLuOEOOdFWvw==@vger.kernel.org, AJvYcCW+sJwmGrCaq51A6hWw2r9N4LIXoaMTpeNgJC+RPXiJsIRvX/WHj3lB/H/hCz9sst9J+jRxDI1vl0O+xQ==@vger.kernel.org, AJvYcCX8bEV+Po7jr8aaIUfUl5SAxaz3E9cO0OvSEEYDVMhmn2Jw8pFtV+R9MF7qi75izZn4lqRPsHpRAEXeQQ==@vger.kernel.org, AJvYcCXk7Grx4/0vPFia4ry3ko9yt0F7VPMAegRT1le+uRHvBTn8+tHmsNeKVd7U4twO6A0PygmjnthqHV2DLQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxTCMDGCtYWO/2MwvIBQ8Miy4LrGMRLVO6/bo1v8iXKd5MiJ3CQ
+	KSACdsfpQ7l6tULbNeiBQFWTWA5blxRl/D4BJ/UV97GahtJgF2rpG8oaRl5BwDhERorQ0s5UfrV
+	NW6UmA4g4j2poQN/q5T85S5aC0xc=
+X-Google-Smtp-Source: AGHT+IFk0/CXdpRr9EA2xNrpgIcdFsD8CEdy30mzTFb0ZlXY/QnyWMuejDDml1MTkf5LmjGORWJ2C6sLEZMa+NCqqXc=
+X-Received: by 2002:a2e:be9f:0:b0:2fb:8c9a:fe3f with SMTP id
+ 38308e7fff4ca-2fedb7c8904mr72976731fa.22.1730717719875; Mon, 04 Nov 2024
+ 02:55:19 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241103032111.333282-14-kanchana.p.sridhar@intel.com>
+References: <20241103223154.136127-1-ebiggers@kernel.org> <20241103223154.136127-4-ebiggers@kernel.org>
+In-Reply-To: <20241103223154.136127-4-ebiggers@kernel.org>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Mon, 4 Nov 2024 11:55:08 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXErAGvJ+ZK1SMQQKVbbZVhjxaWzn0gmV-xxtsoWSuwT9g@mail.gmail.com>
+Message-ID: <CAMj1kXErAGvJ+ZK1SMQQKVbbZVhjxaWzn0gmV-xxtsoWSuwT9g@mail.gmail.com>
+Subject: Re: [PATCH v3 03/18] lib/crc32: expose whether the lib is really
+ optimized at runtime
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org, 
+	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net, 
+	linux-mips@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev, 
+	sparclinux@vger.kernel.org, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Kanchana,
+On Sun, 3 Nov 2024 at 23:34, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> From: Eric Biggers <ebiggers@google.com>
+>
+> Make the CRC32 library export a function crc32_optimizations() which
+> returns flags that indicate which CRC32 functions are actually executing
+> optimized code at runtime.
+>
+> This will be used to determine whether the crc32[c]-$arch shash
+> algorithms should be registered in the crypto API.  btrfs could also
+> start using these flags instead of the hack that it currently uses where
+> it parses the crypto_shash_driver_name.
+>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-kernel test robot noticed the following build warnings:
+Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Kanchana-P-Sridhar/crypto-acomp-Define-two-new-interfaces-for-compress-decompress-batching/20241103-112337
-base:   5c4cf96cd70230100b5d396d45a5c9a332539d19
-patch link:    https://lore.kernel.org/r/20241103032111.333282-14-kanchana.p.sridhar%40intel.com
-patch subject: [PATCH v2 13/13] mm: zswap: Compress batching with Intel IAA in zswap_store() of large folios.
-config: x86_64-randconfig-161-20241104 (https://download.01.org/0day-ci/archive/20241104/202411040859.2z0MfFkR-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-| Closes: https://lore.kernel.org/r/202411040859.2z0MfFkR-lkp@intel.com/
-
-smatch warnings:
-mm/zswap.c:1788 zswap_store_propagate_errors() warn: variable dereferenced before check 'sbp->entry' (see line 1785)
-
-vim +1788 mm/zswap.c
-
-c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1771  static __always_inline void zswap_store_propagate_errors(
-c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1772  	struct zswap_store_pipeline_state *zst,
-c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1773  	u8 error_batch_idx)
-c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1774  {
-c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1775  	u8 i;
-c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1776  
-c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1777  	if (zst->errors[error_batch_idx])
-c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1778  		return;
-c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1779  
-c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1780  	for (i = 0; i < zst->nr_comp_pages; ++i) {
-c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1781  		struct zswap_store_sub_batch_page *sbp = &zst->sub_batch[i];
-c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1782  
-c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1783  		if (sbp->batch_idx == error_batch_idx) {
-c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1784  			if (!sbp->error) {
-c1252ac91d6a6a Kanchana P Sridhar 2024-11-02 @1785  				if (!IS_ERR_VALUE(sbp->entry->handle))
-                                                                                                  ^^^^^^^^^^^^^^^^^^
-Dereferenced
-
-c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1786  					zpool_free(zst->pool->zpool, sbp->entry->handle);
-c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1787  
-c1252ac91d6a6a Kanchana P Sridhar 2024-11-02 @1788  				if (sbp->entry) {
-                                                                                    ^^^^^^^^^^
-Checked too late
-
-c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1789  					zswap_entry_cache_free(sbp->entry);
-c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1790  					sbp->entry = NULL;
-c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1791  				}
-c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1792  				sbp->error = -EINVAL;
-c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1793  			}
-c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1794  		}
-c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1795  	}
-c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1796  
-c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1797  	/*
-c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1798  	 * Set zswap status for the folio to "error"
-c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1799  	 * for use in swap_writepage.
-c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1800  	 */
-c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1801  	zst->errors[error_batch_idx] = -EINVAL;
-c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1802  }
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
-
+> ---
+>  arch/arm64/lib/crc32-glue.c  | 10 ++++++++++
+>  arch/riscv/lib/crc32-riscv.c | 10 ++++++++++
+>  include/linux/crc32.h        | 15 +++++++++++++++
+>  3 files changed, 35 insertions(+)
+>
+> diff --git a/arch/arm64/lib/crc32-glue.c b/arch/arm64/lib/crc32-glue.c
+> index d7f6e1cbf0d2..15c4c9db573e 100644
+> --- a/arch/arm64/lib/crc32-glue.c
+> +++ b/arch/arm64/lib/crc32-glue.c
+> @@ -83,7 +83,17 @@ u32 __pure crc32_be_arch(u32 crc, const u8 *p, size_t len)
+>
+>         return crc32_be_arm64(crc, p, len);
+>  }
+>  EXPORT_SYMBOL(crc32_be_arch);
+>
+> +u32 crc32_optimizations(void)
+> +{
+> +       if (alternative_has_cap_likely(ARM64_HAS_CRC32))
+> +               return CRC32_LE_OPTIMIZATION |
+> +                      CRC32_BE_OPTIMIZATION |
+> +                      CRC32C_OPTIMIZATION;
+> +       return 0;
+> +}
+> +EXPORT_SYMBOL(crc32_optimizations);
+> +
+>  MODULE_LICENSE("GPL");
+>  MODULE_DESCRIPTION("arm64-optimized CRC32 functions");
+> diff --git a/arch/riscv/lib/crc32-riscv.c b/arch/riscv/lib/crc32-riscv.c
+> index a3ff7db2a1ce..53d56ab422c7 100644
+> --- a/arch/riscv/lib/crc32-riscv.c
+> +++ b/arch/riscv/lib/crc32-riscv.c
+> @@ -295,7 +295,17 @@ u32 __pure crc32_be_arch(u32 crc, const u8 *p, size_t len)
+>  legacy:
+>         return crc32_be_base(crc, p, len);
+>  }
+>  EXPORT_SYMBOL(crc32_be_arch);
+>
+> +u32 crc32_optimizations(void)
+> +{
+> +       if (riscv_has_extension_likely(RISCV_ISA_EXT_ZBC))
+> +               return CRC32_LE_OPTIMIZATION |
+> +                      CRC32_BE_OPTIMIZATION |
+> +                      CRC32C_OPTIMIZATION;
+> +       return 0;
+> +}
+> +EXPORT_SYMBOL(crc32_optimizations);
+> +
+>  MODULE_LICENSE("GPL");
+>  MODULE_DESCRIPTION("Accelerated CRC32 implementation with Zbc extension");
+> diff --git a/include/linux/crc32.h b/include/linux/crc32.h
+> index 58c632533b08..e9bd40056687 100644
+> --- a/include/linux/crc32.h
+> +++ b/include/linux/crc32.h
+> @@ -35,10 +35,25 @@ static inline u32 __pure __crc32c_le(u32 crc, const u8 *p, size_t len)
+>         if (IS_ENABLED(CONFIG_CRC32_ARCH))
+>                 return crc32c_le_arch(crc, p, len);
+>         return crc32c_le_base(crc, p, len);
+>  }
+>
+> +/*
+> + * crc32_optimizations() returns flags that indicate which CRC32 library
+> + * functions are using architecture-specific optimizations.  Unlike
+> + * IS_ENABLED(CONFIG_CRC32_ARCH) it takes into account the different CRC32
+> + * variants and also whether any needed CPU features are available at runtime.
+> + */
+> +#define CRC32_LE_OPTIMIZATION  BIT(0) /* crc32_le() is optimized */
+> +#define CRC32_BE_OPTIMIZATION  BIT(1) /* crc32_be() is optimized */
+> +#define CRC32C_OPTIMIZATION    BIT(2) /* __crc32c_le() is optimized */
+> +#if IS_ENABLED(CONFIG_CRC32_ARCH)
+> +u32 crc32_optimizations(void);
+> +#else
+> +static inline u32 crc32_optimizations(void) { return 0; }
+> +#endif
+> +
+>  /**
+>   * crc32_le_combine - Combine two crc32 check values into one. For two
+>   *                   sequences of bytes, seq1 and seq2 with lengths len1
+>   *                   and len2, crc32_le() check values were calculated
+>   *                   for each, crc1 and crc2.
+> --
+> 2.47.0
+>
+>
