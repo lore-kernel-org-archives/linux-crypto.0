@@ -1,100 +1,242 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 385141B3928
-	for <linux-crypto@vger.kernel.org>; Mon,  4 Nov 2024 12:26:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BAE670816;
+	Mon,  4 Nov 2024 15:59:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730723208; cv=none; b=lBe106bOkNg7pix3CSDYGIEl4q2dvI3ZrWk6ztco3udCcmrVW0FF1GQ976tNdEw6eUyal0B9F5R52P80KbSv6yZw9N5/VZwXir9nSAKqUN4cVFRPJwxdDHBYekL6UzKlvE0UekR4F8r9ob5xXgjUyKjrJDjDjxK1ZlsahC1SX80=
+	t=1730735942; cv=none; b=YUSkITEI5yVp0C3vD9K3CaZ6Wc42jhaWi1MSpnuxLux2D5BVC9e4Cb+Z4T7NTmkjgclxeIHZ2bK8v7gPWIS/ZmtGz4FzctB2PfuPZLApPQjVsj0Eps7BBEZLU6Fhp65bq65DkyRcu+GXqNdYRcuquZCgBmoNyIQgo2oHi1d6bvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730723208; c=relaxed/simple;
-	bh=E4z+Wm6KlbW40ytAzSS0zujIzuH5StREIzpFNEBbWcA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YnZkSAI7KB7jo/XirQFUYwf9QqO7VJULn5KqSKn/wzEb0flhvmCI2S/PNbxJ+zlWuTnsAgxNmqTz7PyYDLKka5HHOTBEmtY185gp/ox0/2aszbX3ajiFAA2eA3eZ3JyYqYZdOEw52dDEdQL7EevA5x12XCMbrjASkZYq/zSauHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4XhrLC6PJBz4f3jq9
-	for <linux-crypto@vger.kernel.org>; Mon,  4 Nov 2024 20:26:27 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id ADEC11A058E
-	for <linux-crypto@vger.kernel.org>; Mon,  4 Nov 2024 20:26:40 +0800 (CST)
-Received: from hulk-vt.huawei.com (unknown [10.67.174.121])
-	by APP4 (Coremail) with SMTP id gCh0CgAHMYV2vShnGy9RAw--.3031S2;
-	Mon, 04 Nov 2024 20:26:40 +0800 (CST)
-From: Chen Ridong <chenridong@huaweicloud.com>
-To: herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	u.kleine-koenig@baylibre.com,
-	rob.rice@broadcom.com,
-	steven.lin1@broadcom.com
-Cc: linux-crypto@vger.kernel.org,
-	chenridong@huawei.com,
-	wangweiyang2@huawei.com
-Subject: [PATCH] crypto: bcm - add error check in the ahash_hmac_init function
-Date: Mon,  4 Nov 2024 12:17:45 +0000
-Message-Id: <20241104121745.1634866-1-chenridong@huaweicloud.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1730735942; c=relaxed/simple;
+	bh=nfbYyjxKn/6I7KeeEZRpVU1jWeaAip9FWL9OkYwgvck=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DYa8muGXkI7K/f8Nx2E+bFKIWkUPPfpKxnp3q99I91dzvcm/tJjqrXHjWrI6t5Zd3t5/22hdolyul8EZHw6xYbYT9fhmHX1rQXr2HpujF6VrkuAngUmokXCfv3EEyC06KVwdcD4F6bsJUDGEzlemv3s41zD168ezRWmT7Lrcin8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L+r634Er; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L+r634Er"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93956C4CECE;
+	Mon,  4 Nov 2024 15:59:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730735941;
+	bh=nfbYyjxKn/6I7KeeEZRpVU1jWeaAip9FWL9OkYwgvck=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=L+r634Erl+WncXlEz4rsmMXCY8pHbVcHBzX48fyrMeKPL0TKRWGO+wiqFNNk2+bG3
+	 +EpXJQRdYvygLy9/3ELIAb/8ofnXplEM6wi31doRQhPpma9mFRpzKmtc8jteqnIuuQ
+	 y2hUCBnfM2JitLA7URtD/EpPbu2C3HrK6XK+ZsPGzQczgr5Ywo4JZ4LkH1xj3Rlsvd
+	 cnObx/9CHx2OljMMP4/ygK8PuiYs7OjnWWXkoHfXClw6C6fM35CEVlbxx3SdrDa+kG
+	 mKkn8iOJFfd3EOnWuF6R5QB2V6M0bDB2CQXbwqP5lD5+gYZVgejmFCy0JGPvPxHlu1
+	 YJOPQwrbsGUyg==
+Date: Mon, 4 Nov 2024 07:59:00 -0800
+From: "Darrick J. Wong" <djwong@kernel.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+	linux-mips@vger.kernel.org, linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev,
+	sparclinux@vger.kernel.org, x86@kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH v3 15/18] ext4: switch to using the crc32c library
+Message-ID: <20241104155900.GH21832@frogsfrogsfrogs>
+References: <20241103223154.136127-1-ebiggers@kernel.org>
+ <20241103223154.136127-16-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgAHMYV2vShnGy9RAw--.3031S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7uw18CF4kWFW5XFWxZw43ZFb_yoW8Jw4xpF
-	W8C3y2yrn5XFs8GFs7Xa1rCF9IgayxA343tr48J34rZ3srZrW093yxuw18ZF1UAFWrGFya
-	vr4xK34UX34UXaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUyEb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI
-	7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxV
-	Cjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY
-	6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6x
-	AIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY
-	1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IUbiF4tUUUUU==
-X-CM-SenderInfo: hfkh02xlgr0w46kxt4xhlfz01xgou0bp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241103223154.136127-16-ebiggers@kernel.org>
 
-From: Chen Ridong <chenridong@huawei.com>
+On Sun, Nov 03, 2024 at 02:31:51PM -0800, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> Now that the crc32c() library function directly takes advantage of
+> architecture-specific optimizations, it is unnecessary to go through the
+> crypto API.  Just use crc32c().  This is much simpler, and it improves
+> performance due to eliminating the crypto API overhead.
+> 
+> Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>  fs/ext4/Kconfig |  3 +--
+>  fs/ext4/ext4.h  | 25 +++----------------------
+>  fs/ext4/super.c | 15 ---------------
+>  3 files changed, 4 insertions(+), 39 deletions(-)
+> 
+> diff --git a/fs/ext4/Kconfig b/fs/ext4/Kconfig
+> index e20d59221fc0..c9ca41d91a6c 100644
+> --- a/fs/ext4/Kconfig
+> +++ b/fs/ext4/Kconfig
+> @@ -29,12 +29,11 @@ config EXT3_FS_SECURITY
+>  config EXT4_FS
+>  	tristate "The Extended 4 (ext4) filesystem"
+>  	select BUFFER_HEAD
+>  	select JBD2
+>  	select CRC16
+> -	select CRYPTO
+> -	select CRYPTO_CRC32C
+> +	select CRC32
 
-The ahash_init functions may return fails. The ahash_hmac_init should
-not return ok when ahash_init returns error. For an example, ahash_init
-will return -ENOMEM when allocation memory is error.
+Hmm.  Looking at your git branch (which was quite helpful to link to!) I
+think for XFS we don't need to change the crc32c() calls, and the only
+porting work that needs to be done is mirroring this Kconfig change?
+And that doesn't even need to be done until someone wants to get rid of
+CONFIG_LIBCRC32C, right?
 
-Fixes: 9d12ba86f818 ("crypto: brcm - Add Broadcom SPU driver")
-Signed-off-by: Chen Ridong <chenridong@huawei.com>
----
- drivers/crypto/bcm/cipher.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+>  	select FS_IOMAP
+>  	select FS_ENCRYPTION_ALGS if FS_ENCRYPTION
+>  	help
+>  	  This is the next generation of the ext3 filesystem.
+>  
+> diff --git a/fs/ext4/ext4.h b/fs/ext4/ext4.h
+> index 44b0d418143c..99aa512a7de1 100644
+> --- a/fs/ext4/ext4.h
+> +++ b/fs/ext4/ext4.h
+> @@ -31,11 +31,11 @@
+>  #include <linux/wait.h>
+>  #include <linux/sched/signal.h>
+>  #include <linux/blockgroup_lock.h>
+>  #include <linux/percpu_counter.h>
+>  #include <linux/ratelimit.h>
+> -#include <crypto/hash.h>
+> +#include <linux/crc32c.h>
+>  #include <linux/falloc.h>
+>  #include <linux/percpu-rwsem.h>
+>  #include <linux/fiemap.h>
+>  #ifdef __KERNEL__
+>  #include <linux/compat.h>
+> @@ -1660,13 +1660,10 @@ struct ext4_sb_info {
+>  	struct task_struct *s_mmp_tsk;
+>  
+>  	/* record the last minlen when FITRIM is called. */
+>  	unsigned long s_last_trim_minblks;
+>  
+> -	/* Reference to checksum algorithm driver via cryptoapi */
+> -	struct crypto_shash *s_chksum_driver;
+> -
+>  	/* Precomputed FS UUID checksum for seeding other checksums */
+>  	__u32 s_csum_seed;
+>  
+>  	/* Reclaim extents from extent status tree */
+>  	struct shrinker *s_es_shrinker;
+> @@ -2465,23 +2462,11 @@ static inline __le16 ext4_rec_len_to_disk(unsigned len, unsigned blocksize)
+>  #define DX_HASH_LAST 			DX_HASH_SIPHASH
+>  
+>  static inline u32 ext4_chksum(struct ext4_sb_info *sbi, u32 crc,
+>  			      const void *address, unsigned int length)
+>  {
+> -	struct {
+> -		struct shash_desc shash;
+> -		char ctx[4];
+> -	} desc;
+> -
+> -	BUG_ON(crypto_shash_descsize(sbi->s_chksum_driver)!=sizeof(desc.ctx));
+> -
+> -	desc.shash.tfm = sbi->s_chksum_driver;
+> -	*(u32 *)desc.ctx = crc;
+> -
+> -	BUG_ON(crypto_shash_update(&desc.shash, address, length));
+> -
+> -	return *(u32 *)desc.ctx;
+> +	return crc32c(crc, address, length);
+>  }
+>  
+>  #ifdef __KERNEL__
+>  
+>  /* hash info structure used by the directory hash */
+> @@ -3278,15 +3263,11 @@ extern void ext4_group_desc_csum_set(struct super_block *sb, __u32 group,
+>  extern int ext4_register_li_request(struct super_block *sb,
+>  				    ext4_group_t first_not_zeroed);
+>  
+>  static inline int ext4_has_metadata_csum(struct super_block *sb)
+>  {
+> -	WARN_ON_ONCE(ext4_has_feature_metadata_csum(sb) &&
+> -		     !EXT4_SB(sb)->s_chksum_driver);
+> -
+> -	return ext4_has_feature_metadata_csum(sb) &&
+> -	       (EXT4_SB(sb)->s_chksum_driver != NULL);
+> +	return ext4_has_feature_metadata_csum(sb);
+>  }
 
-diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
-index 7540eb7cd331..9e6798efbfb7 100644
---- a/drivers/crypto/bcm/cipher.c
-+++ b/drivers/crypto/bcm/cipher.c
-@@ -2415,6 +2415,7 @@ static int ahash_hmac_setkey(struct crypto_ahash *ahash, const u8 *key,
- 
- static int ahash_hmac_init(struct ahash_request *req)
- {
-+	int ret;
- 	struct iproc_reqctx_s *rctx = ahash_request_ctx(req);
- 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
- 	struct iproc_ctx_s *ctx = crypto_ahash_ctx(tfm);
-@@ -2424,7 +2425,9 @@ static int ahash_hmac_init(struct ahash_request *req)
- 	flow_log("ahash_hmac_init()\n");
- 
- 	/* init the context as a hash */
--	ahash_init(req);
-+	ret = ahash_init(req);
-+	if (ret)
-+		return ret;
- 
- 	if (!spu_no_incr_hash(ctx)) {
- 		/* SPU-M can do incr hashing but needs sw for outer HMAC */
--- 
-2.34.1
+Nit: Someone might want to
+s/ext4_has_metadata_csum/ext4_has_feature_metadata_csum/ here to get rid
+of the confusingly named trivial helper.
 
+Otherwise this logic looks ok to me, so
+Reviewed-by: Darrick J. Wong <djwong@kernel.org>
+
+--D
+
+
+>  
+>  static inline int ext4_has_group_desc_csum(struct super_block *sb)
+>  {
+>  	return ext4_has_feature_gdt_csum(sb) || ext4_has_metadata_csum(sb);
+> diff --git a/fs/ext4/super.c b/fs/ext4/super.c
+> index 16a4ce704460..1a821093cc0d 100644
+> --- a/fs/ext4/super.c
+> +++ b/fs/ext4/super.c
+> @@ -1371,12 +1371,10 @@ static void ext4_put_super(struct super_block *sb)
+>  	 * Now that we are completely done shutting down the
+>  	 * superblock, we need to actually destroy the kobject.
+>  	 */
+>  	kobject_put(&sbi->s_kobj);
+>  	wait_for_completion(&sbi->s_kobj_unregister);
+> -	if (sbi->s_chksum_driver)
+> -		crypto_free_shash(sbi->s_chksum_driver);
+>  	kfree(sbi->s_blockgroup_lock);
+>  	fs_put_dax(sbi->s_daxdev, NULL);
+>  	fscrypt_free_dummy_policy(&sbi->s_dummy_enc_policy);
+>  #if IS_ENABLED(CONFIG_UNICODE)
+>  	utf8_unload(sb->s_encoding);
+> @@ -4586,19 +4584,10 @@ static int ext4_init_metadata_csum(struct super_block *sb, struct ext4_super_blo
+>  		return -EINVAL;
+>  	}
+>  	ext4_setup_csum_trigger(sb, EXT4_JTR_ORPHAN_FILE,
+>  				ext4_orphan_file_block_trigger);
+>  
+> -	/* Load the checksum driver */
+> -	sbi->s_chksum_driver = crypto_alloc_shash("crc32c", 0, 0);
+> -	if (IS_ERR(sbi->s_chksum_driver)) {
+> -		int ret = PTR_ERR(sbi->s_chksum_driver);
+> -		ext4_msg(sb, KERN_ERR, "Cannot load crc32c driver.");
+> -		sbi->s_chksum_driver = NULL;
+> -		return ret;
+> -	}
+> -
+>  	/* Check superblock checksum */
+>  	if (!ext4_superblock_csum_verify(sb, es)) {
+>  		ext4_msg(sb, KERN_ERR, "VFS: Found ext4 filesystem with "
+>  			 "invalid superblock checksum.  Run e2fsck?");
+>  		return -EFSBADCRC;
+> @@ -5638,13 +5627,10 @@ failed_mount8: __maybe_unused
+>  	flush_work(&sbi->s_sb_upd_work);
+>  	ext4_stop_mmpd(sbi);
+>  	del_timer_sync(&sbi->s_err_report);
+>  	ext4_group_desc_free(sbi);
+>  failed_mount:
+> -	if (sbi->s_chksum_driver)
+> -		crypto_free_shash(sbi->s_chksum_driver);
+> -
+>  #if IS_ENABLED(CONFIG_UNICODE)
+>  	utf8_unload(sb->s_encoding);
+>  #endif
+>  
+>  #ifdef CONFIG_QUOTA
+> @@ -7433,8 +7419,7 @@ static void __exit ext4_exit_fs(void)
+>  }
+>  
+>  MODULE_AUTHOR("Remy Card, Stephen Tweedie, Andrew Morton, Andreas Dilger, Theodore Ts'o and others");
+>  MODULE_DESCRIPTION("Fourth Extended Filesystem");
+>  MODULE_LICENSE("GPL");
+> -MODULE_SOFTDEP("pre: crc32c");
+>  module_init(ext4_init_fs)
+>  module_exit(ext4_exit_fs)
+> -- 
+> 2.47.0
+> 
+> 
