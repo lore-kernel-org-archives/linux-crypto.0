@@ -1,187 +1,145 @@
-Received: from bg5.exmail.qq.com (bg5.exmail.qq.com [43.154.197.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C35223A0;
-	Mon,  4 Nov 2024 02:34:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.154.197.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02DF319B59F
+	for <linux-crypto@vger.kernel.org>; Mon,  4 Nov 2024 08:31:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730687692; cv=none; b=M5LHli9iHT2Yd5GIzdcJWz8YgExfnB6MEIUcYjZvbm1HA3L5xFrc7Mf3+sf1sedkLopWif/1PadgWABb4j4v64r+ektHvb1w+qm8fvcllx6Hdofhpm/PK5nAyrJe94zwiaxVjbN+8QIZbPPMGubqU1sUmKZOyIl4rZ4VYPEZPeM=
+	t=1730709085; cv=none; b=YOmS6Zrwlp4AZAWy5QVVgjqO7blWttSGiIGGbJm+Y2ulsu9bjkgu25PeaFWZJSBnPdMZseIUhNQv5GF1nXzUk4w8Q6Ssvjpff1vLEqzhIZpZX4/Tn/yVxpjF4DDZHjiLfRu1MyWiCPM/GBB0BEA8UhJzzHNSshNn/+dBO8EJobo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730687692; c=relaxed/simple;
-	bh=LBnwjIu01qb3uMzu5oQLZ1sXef4WJoJ8ZJ5HXkRpTng=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GwJT/M97aBAplMtI2f+9zjc054wEKEciVaHp516glwRhXaZKSjwyHTnD35MCTM6w/CD+Dp3SrbvzvaEVjH6yH8J+dF5NhE+GYF+0DxgLgpjtoHV/m09s/CZQimWkY5EDaJOBgovhGvKDrhdBW8UVhVEWkbYEQmBWy25bvRDa3Oc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=I0gkvfMV; arc=none smtp.client-ip=43.154.197.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+	s=arc-20240116; t=1730709085; c=relaxed/simple;
+	bh=RMFwDMojD3zrSAgOcjuKC+xriirvgs/o1aANeynXSuQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=YJGUg+NPEAXDvJ9H8n1bCFMEFsfAHFHA0jYrBfTIGwhOovN6f30rLVvCvSE7B/DM1AkjbQbo5J6/AKTEd0jPXvFx3RdlLv1VSr/kaQUbpTbyBhqQPLoWl6qvKqMC9XOyoyO6o3I4Cc93/ZQeRtIV2t/28++3r9G9fr1lf12hZsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=IWKBxuYT; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="I0gkvfMV"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1730687664;
-	bh=LBnwjIu01qb3uMzu5oQLZ1sXef4WJoJ8ZJ5HXkRpTng=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=I0gkvfMVE/MguKNe6G+/LMNLVFqz7dkh0IDG0vDntK4CNMqCoz50Tqhzb3M0pX6yE
-	 GsMB3HypNccbL/ypubSF6JPJFS7ckgk4c83b82I4kXeEhlwYuJQ9JJSgbhKj4ZgSzt
-	 6AVc0wlL51Wy3m4xPQdNrps/E4wW0CWhuFCKwvFc=
-X-QQ-mid: bizesmtp90t1730687661tfnba8nb
-X-QQ-Originating-IP: zCt886bJnOZxcI98vSCU01cM2iwZOisAeH5BvJ3W5y4=
-Received: from [10.20.6.66] ( [61.183.83.60])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 04 Nov 2024 10:34:18 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 13360692648225194716
-Message-ID: <E7AED86A89FD886F+263304da-0529-4b4c-9e23-ea2e5e3cef2c@uniontech.com>
-Date: Mon, 4 Nov 2024 10:34:18 +0800
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IWKBxuYT"
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-43155afca99so28512945e9.1
+        for <linux-crypto@vger.kernel.org>; Mon, 04 Nov 2024 00:31:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1730709078; x=1731313878; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=T5vDLGsbEr0SVIowN1t5ye+7OUL4pjjT2D7werAFSjM=;
+        b=IWKBxuYTkq6vrWktIU4NQb+ppiLmusdhAA+wKIM7dsIqwjibfjojLeWeUzYwEXwvCL
+         dZS2u2L9YQQHdglBiFuBnLy1AHlVZOYDgoiK/TAJ4fq9bX5tkb+1ce4T2kTAfX3QF6+8
+         C6z7zn+Jp7RpdnIsnk0qO0t4hlA4Awz7z9WQj27+q89wybZw75T1rnNpuK2HKwsLz4VF
+         3LGCsJyJZuIVs5eZ+qJM2Gvy5e1EdPhLeUcNgtInjTDsJ8rlMzh0N9LCiqimUcwk8+Rq
+         lxB4gGS3Xf6LOnvHG2Ct/OtuiHTDyc6mK7ZXyVtIzSp8YID/a3pnDdhg8+g8qTx6BVPS
+         rBEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730709078; x=1731313878;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=T5vDLGsbEr0SVIowN1t5ye+7OUL4pjjT2D7werAFSjM=;
+        b=ga9Rama8LmttGEuTVutEYwYNdj/cYsBcOxS1nsCdHmU6fjoDrNuTm6B61+Xq0zdFAM
+         nxpY7hFtQb5S7ktByxWWlBDMRYythn0yMKQbFJsa6uw7Tb2cw6LxQqQQys1pdQiBHq3L
+         0Vq9nPc/N1g8UMB3sM+I1ljpGmJoK53vDl7CmDhjgfrt0tI74ETTplcWNrgwkdnrKKP9
+         /Bbt0nuEAVxEs1Gan0IzfH+FvMjcpGwrp/JM7MEd1WPXyeYtwQ1uhXd4bDdcpLTj1Ity
+         5BhEDuZ837Gy3j95ROKPVY4Bqu2L9e444+Eip1oFhgwy5eeScAIzwZpbMoyDCG6Jwiqk
+         Cbyw==
+X-Forwarded-Encrypted: i=1; AJvYcCXXUd10nu8qrHsTD8bfVAudLktCfmfaWkTfy/ZXAJVDjDs80LPYZS7whOlJrjXgfydDklatzcQgXP4kUco=@vger.kernel.org
+X-Gm-Message-State: AOJu0YypJ41gJWPv7xrmC//2g1aRVSp3F6O0BE5jzf1Ihj5+3LD+IzUR
+	xGhwtRGY6ULCWgLl+hzDXM6CTTuxuS2B5KPTNCYcHVVIUoRjMbZLZfWSJCEPb6o=
+X-Google-Smtp-Source: AGHT+IFFiT8xMGT+o7kM5vRaU6KjK8tqr+AcRQcVqXIZYuM1L7HGi9LZqQfv+QQLXIRdVtTWEYW6xA==
+X-Received: by 2002:a5d:64a7:0:b0:374:c7cd:8818 with SMTP id ffacd0b85a97d-381c79e366dmr9155476f8f.22.1730709078297;
+        Mon, 04 Nov 2024 00:31:18 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381c10d439esm12549514f8f.44.2024.11.04.00.31.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Nov 2024 00:31:17 -0800 (PST)
+Date: Mon, 4 Nov 2024 11:31:13 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: oe-kbuild@lists.linux.dev,
+	Kanchana P Sridhar <kanchana.p.sridhar@intel.com>,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	hannes@cmpxchg.org, yosryahmed@google.com, nphamcs@gmail.com,
+	chengming.zhou@linux.dev, usamaarif642@gmail.com,
+	ryan.roberts@arm.com, ying.huang@intel.com, 21cnbao@gmail.com,
+	akpm@linux-foundation.org, linux-crypto@vger.kernel.org,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	clabbe@baylibre.com, ardb@kernel.org, ebiggers@google.com,
+	surenb@google.com, kristen.c.accardi@intel.com, zanussi@kernel.org
+Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev, wajdi.k.feghali@intel.com,
+	vinodh.gopal@intel.com, kanchana.p.sridhar@intel.com
+Subject: Re: [PATCH v2 13/13] mm: zswap: Compress batching with Intel IAA in
+ zswap_store() of large folios.
+Message-ID: <89728727-0fd2-4539-bc89-17a699d7179a@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 06/18] loongarch/crc32: expose CRC32 functions through
- lib
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: ardb@kernel.org, linux-arch@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
- linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
- linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-scsi@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- loongarch@lists.linux.dev, kernel@xen0n.name, chenhuacai@kernel.org,
- xry111@xry111.site, sparclinux@vger.kernel.org, x86@kernel.org
-References: <20241025191454.72616-7-ebiggers@kernel.org>
- <DA8BCDFFEACDA1C6+20241103133655.217375-1-wangyuli@uniontech.com>
- <20241103135730.GA813@quark.localdomain>
-Content-Language: en-US
-From: WangYuli <wangyuli@uniontech.com>
-Autocrypt: addr=wangyuli@uniontech.com; keydata=
- xjMEZoEsiBYJKwYBBAHaRw8BAQdAyDPzcbPnchbIhweThfNK1tg1imM+5kgDBJSKP+nX39DN
- IVdhbmdZdWxpIDx3YW5neXVsaUB1bmlvbnRlY2guY29tPsKJBBMWCAAxFiEEa1GMzYeuKPkg
- qDuvxdofMEb0C+4FAmaBLIgCGwMECwkIBwUVCAkKCwUWAgMBAAAKCRDF2h8wRvQL7g0UAQCH
- 3mrGM0HzOaARhBeA/Q3AIVfhS010a0MZmPTRGVfPbwD/SrncJwwPAL4GiLPEC4XssV6FPUAY
- 0rA68eNNI9cJLArOOARmgSyJEgorBgEEAZdVAQUBAQdA88W4CTLDD9fKwW9PB5yurCNdWNS7
- VTL0dvPDofBTjFYDAQgHwngEGBYIACAWIQRrUYzNh64o+SCoO6/F2h8wRvQL7gUCZoEsiQIb
- DAAKCRDF2h8wRvQL7sKvAP4mBvm7Zn1OUjFViwkma8IGRGosXAvMUFyOHVcl1RTgFQEAuJkU
- o9ERi7qS/hbUdUgtitI89efbY0TVetgDsyeQiwU=
-In-Reply-To: <20241103135730.GA813@quark.localdomain>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------yPwlqMleUVPPs6iT7orBXJ4O"
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: NJaUjScZH2N7a7NYy0D7VCbmSeGLx0tfSNnPIdmY8W3aBXPu4v2xCqAQ
-	jZipcnxD3tMymurqF0dyyArNJuyEYQSYWIhvd96iVv5dFL/JF0L3ocxMejDQn0hVXvn8rN7
-	+5pU6R09CR0VbNJZj7AzjnMTMo/IIpSt3YCe2CX1NlOQkQcmwQQXkHcevimyhnxUOSQUdHL
-	KDGRfqEqhYc/aJw1IzAfSUY6+9VgcX4jmo1Gr96IJQ8s7y/ilbw0j8VCZ7H2DT1Pvs/tB4e
-	ekUk8RTcz7s5sFdfjcMG6/eGPUX+n2zQFjp5uI2SbotPCT9pVMPt7DLUhMl/DrXW6luFNXA
-	hI/Yg1WVu9C6bo6jmuP2Bl+rfMg6u9iTgCCD73u7Tz1WB+6GnQcg8J97laTWk4WjK5qRvr/
-	zJ9wwB3bobVwtQa2KnVsT3LjKTC6jhHst4XrMbQGc4u2teo1hd7/vsARb5JBJnr//+6Iki0
-	mSbMqqUWgGw7OjiPI5qr3ic6l8Qd8s1X1CAZ3Ofr91x0YP65DBzyJrg8/mzanypklNphKaC
-	OBLIU/VR++OOBh0kkh0EQiwP2SlOY3WNpLCxg4qFDCOJA6+9+BSvLdl8BPMt6BnDQ9Z3cIN
-	uCjdtyjJdFYP5AORvjbKztvSAWebeNc6U+m305g/Z5chllfo5uHqyeLmwBI3Xidwk3HeKqw
-	6bjDxcYzZ1t5Or8vxm8nR4DFuVBvQ7vF6Fbc3ntE2543J5IAazBKZs2NMOu2NYxksxUwSm9
-	BCtGt6xnGG7zuK7iGq6hYvucs3rL/vzGuSygtuKAkt+6qM1On+EYGAdkkJnilb6jz0WABkD
-	KlkHLhvGe3qqqgaj+vevFro+84ECKnrul3pSYpaZJVnIv9iYUvCmgfp6KHjtchYiHHxt888
-	rO5O7tzHkYIvY4kJVQbKNgurE2PxFlZA+WUKTOM0CogUmlA0WyANz5cvy7VsCORR600tW8i
-	vvGkSyDxDVXyqxkw9ebPRS1R2/bLzZsxXsj91/8rDh49CAjfhXSMlc4vT5WwS3Qv0MZUmLN
-	mTEMn4sR+hcykQiwEx4rmOnFY6qrqI4E0zlix+1w==
-X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241103032111.333282-14-kanchana.p.sridhar@intel.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------yPwlqMleUVPPs6iT7orBXJ4O
-Content-Type: multipart/mixed; boundary="------------cIiC60yt0DtrRFabfn26CCc3";
- protected-headers="v1"
-From: WangYuli <wangyuli@uniontech.com>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: ardb@kernel.org, linux-arch@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
- linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
- linux-kernel@vger.kernel.org, linux-mips@vger.kernel.org,
- linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
- linux-scsi@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- loongarch@lists.linux.dev, kernel@xen0n.name, chenhuacai@kernel.org,
- xry111@xry111.site, sparclinux@vger.kernel.org, x86@kernel.org
-Message-ID: <263304da-0529-4b4c-9e23-ea2e5e3cef2c@uniontech.com>
-Subject: Re: [PATCH v2 06/18] loongarch/crc32: expose CRC32 functions through
- lib
-References: <20241025191454.72616-7-ebiggers@kernel.org>
- <DA8BCDFFEACDA1C6+20241103133655.217375-1-wangyuli@uniontech.com>
- <20241103135730.GA813@quark.localdomain>
-In-Reply-To: <20241103135730.GA813@quark.localdomain>
+Hi Kanchana,
 
---------------cIiC60yt0DtrRFabfn26CCc3
-Content-Type: multipart/mixed; boundary="------------YiihG54060SCpWIarDHBVU6V"
+kernel test robot noticed the following build warnings:
 
---------------YiihG54060SCpWIarDHBVU6V
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+url:    https://github.com/intel-lab-lkp/linux/commits/Kanchana-P-Sridhar/crypto-acomp-Define-two-new-interfaces-for-compress-decompress-batching/20241103-112337
+base:   5c4cf96cd70230100b5d396d45a5c9a332539d19
+patch link:    https://lore.kernel.org/r/20241103032111.333282-14-kanchana.p.sridhar%40intel.com
+patch subject: [PATCH v2 13/13] mm: zswap: Compress batching with Intel IAA in zswap_store() of large folios.
+config: x86_64-randconfig-161-20241104 (https://download.01.org/0day-ci/archive/20241104/202411040859.2z0MfFkR-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
 
-DQpPbiAyMDI0LzExLzMgMjE6NTcsIEVyaWMgQmlnZ2VycyB3cm90ZToNCj4gT24gU3VuLCBO
-b3YgMDMsIDIwMjQgYXQgMDk6MzY6NTVQTSArMDgwMCwgV2FuZ1l1bGkgd3JvdGU6DQo+PiBF
-dmVuIHRob3VnaCB0aGUgbmFycm93ZXIgQ1JDIGluc3RydWN0aW9ucyBkb2Vzbid0IHJlcXVp
-cmUgR1JMRU49NjQsIHRoZXkgc3RpbGwgKmFyZW4ndCogcGFydCBvZiBMQTMyIChMb29uZ0Fy
-Y2ggcmVmZXJlbmNlIG1hbnVhbCB2MS4xMCwgVm9sdW1lIDEsIFRhYmxlIDItMSkuDQo+PiBM
-aW5rOiBodHRwczovL2xvcmUua2VybmVsLm9yZy9hbGwvMGE3ZDBhOWUtYzU2ZS00ZWUyLWE4
-M2ItMDAxNjRhNDUwYWJlQHhlbjBuLm5hbWUvDQo+Pg0KPj4gVGhlcmVmb3JlLCB3ZSBjb3Vs
-ZCBub3QgZGlyZWN0bHkgYWRkIEFSQ0hfSEFTX0NSQzMyIHRvIGNvbmZpZyBMT09OR0FSQ0gu
-DQo+Pg0KPiBUaGVyZSdzIHN0aWxsIGEgcnVudGltZSBDUFUgZmVhdHVyZSBjaGVjayBvZiBj
-cHVfaGFzKENQVV9GRUFUVVJFX0NSQzMyKS4NCj4gU2VlIGFyY2gvbG9vbmdhcmNoL2xpYi9j
-cmMzMi1sb29uZ2FyY2guYy4gIFNvIGl0J3MgdGhlIHNhbWUgYXMgYmVmb3JlLg0KPiBBUkNI
-X0hBU19DUkMzMiBqdXN0IG1lYW5zIHRoYXQgdGhlIGZpbGUgd2lsbCBiZSBjb21waWxlZC4N
-Cj4NCj4gSWYgeW91J3JlIHRyeWluZyB0byBzYXkgdGhhdCB5b3UgdGhpbmsgdGhpcyBmaWxl
-IHNob3VsZCBiZSBidWlsdCBvbmx5IHdoZW4NCj4gQ09ORklHXzY0QklUPXksIHRoZW4gdGhh
-dCB3b3VsZCBiZSBhbiBleGlzdGluZyBidWcgc2luY2UgdGhlIGV4aXN0aW5nIGZpbGUNCj4g
-YXJjaC9sb29uZ2FyY2gvY3J5cHRvL2NyYzMyLWxvb25nYXJjaC5jIHdhcyBidWlsdCBmb3Ig
-Ym90aCAzMi1iaXQgYW5kIDY0LWJpdC4NCj4gQnV0IGlmIHlvdSB0aGluayB0aGlzIGlzIGEg
-YnVnLCBJIGNhbiBmaXggdGhpcyB0b28uDQo+DQo+IC0gRXJpYw0KPg0KDQpBY3R1YWxseSwg
-bXkgb3JpZ2luYWxseSBtZWFuIGlzIHRoYXQgZGlyZWN0bHkgZGVjbGFyaW5nIExvb25nQXJj
-aCANCkFSQ0hfSEFTX0NSQzMyIHdpdGhvdXQgZGlzdGluZ3Vpc2hpbmcgYmV0d2VlbiAzMi1i
-aXQgYW5kIDY0LWJpdCBtaWdodCANCm1pc2xlYWQgdGhvc2UgcmVhZGluZyB0aGUgY29kZS4g
-QW5kIGl0J3Mgbm90IHJpZ29yb3VzLg0KSG93ZXZlciwgYWNjb3JkaW5nIHRvIEh1YWNhaSBD
-aGVuJ3MgcmVjZW50IHJlcGx5LCB0aGVyZSBhcmUgbWFueSBzaW1pbGFyIA0KaXNzdWVzIGFu
-ZCB0aGV5IHdvbid0IGNhdXNlIGJ1aWxkIGVycm9ycyBmb3Igbm93Lg0KTGluazogDQpodHRw
-czovL2xvcmUua2VybmVsLm9yZy9hbGwvQ0FBaFYtSDVLYVhCci1UZHBEYkp3Y3JfTDBfbWJT
-dz00SjMwdXdRMnhuMllEcz1IZzJRQG1haWwuZ21haWwuY29tLw0KU28sIHRoaXMgY2hhbmdl
-IHNob3VsZCBiZSBmaW5lIGZvciBub3cuDQoNClJldmlld2VkLWJ5OiBXYW5nWXVsaSA8d2Fu
-Z3l1bGlAdW5pb250ZWNoLmNvbT4NCg0KVGhhbmtzLA0KLS0gDQpXYW5nWXVsaQ0K
---------------YiihG54060SCpWIarDHBVU6V
-Content-Type: application/pgp-keys; name="OpenPGP_0xC5DA1F3046F40BEE.asc"
-Content-Disposition: attachment; filename="OpenPGP_0xC5DA1F3046F40BEE.asc"
-Content-Description: OpenPGP public key
-Content-Transfer-Encoding: quoted-printable
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+| Closes: https://lore.kernel.org/r/202411040859.2z0MfFkR-lkp@intel.com/
 
------BEGIN PGP PUBLIC KEY BLOCK-----
+smatch warnings:
+mm/zswap.c:1788 zswap_store_propagate_errors() warn: variable dereferenced before check 'sbp->entry' (see line 1785)
 
-xjMEZoEsiBYJKwYBBAHaRw8BAQdAyDPzcbPnchbIhweThfNK1tg1imM+5kgDBJSK
-P+nX39DNIVdhbmdZdWxpIDx3YW5neXVsaUB1bmlvbnRlY2guY29tPsKJBBMWCAAx
-FiEEa1GMzYeuKPkgqDuvxdofMEb0C+4FAmaBLIgCGwMECwkIBwUVCAkKCwUWAgMB
-AAAKCRDF2h8wRvQL7g0UAQCH3mrGM0HzOaARhBeA/Q3AIVfhS010a0MZmPTRGVfP
-bwD/SrncJwwPAL4GiLPEC4XssV6FPUAY0rA68eNNI9cJLArOOARmgSyJEgorBgEE
-AZdVAQUBAQdA88W4CTLDD9fKwW9PB5yurCNdWNS7VTL0dvPDofBTjFYDAQgHwngE
-GBYIACAWIQRrUYzNh64o+SCoO6/F2h8wRvQL7gUCZoEsiQIbDAAKCRDF2h8wRvQL
-7sKvAP4mBvm7Zn1OUjFViwkma8IGRGosXAvMUFyOHVcl1RTgFQEAuJkUo9ERi7qS
-/hbUdUgtitI89efbY0TVetgDsyeQiwU=3D
-=3DBlkq
------END PGP PUBLIC KEY BLOCK-----
+vim +1788 mm/zswap.c
 
---------------YiihG54060SCpWIarDHBVU6V--
+c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1771  static __always_inline void zswap_store_propagate_errors(
+c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1772  	struct zswap_store_pipeline_state *zst,
+c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1773  	u8 error_batch_idx)
+c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1774  {
+c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1775  	u8 i;
+c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1776  
+c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1777  	if (zst->errors[error_batch_idx])
+c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1778  		return;
+c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1779  
+c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1780  	for (i = 0; i < zst->nr_comp_pages; ++i) {
+c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1781  		struct zswap_store_sub_batch_page *sbp = &zst->sub_batch[i];
+c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1782  
+c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1783  		if (sbp->batch_idx == error_batch_idx) {
+c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1784  			if (!sbp->error) {
+c1252ac91d6a6a Kanchana P Sridhar 2024-11-02 @1785  				if (!IS_ERR_VALUE(sbp->entry->handle))
+                                                                                                  ^^^^^^^^^^^^^^^^^^
+Dereferenced
 
---------------cIiC60yt0DtrRFabfn26CCc3--
+c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1786  					zpool_free(zst->pool->zpool, sbp->entry->handle);
+c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1787  
+c1252ac91d6a6a Kanchana P Sridhar 2024-11-02 @1788  				if (sbp->entry) {
+                                                                                    ^^^^^^^^^^
+Checked too late
 
---------------yPwlqMleUVPPs6iT7orBXJ4O
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1789  					zswap_entry_cache_free(sbp->entry);
+c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1790  					sbp->entry = NULL;
+c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1791  				}
+c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1792  				sbp->error = -EINVAL;
+c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1793  			}
+c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1794  		}
+c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1795  	}
+c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1796  
+c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1797  	/*
+c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1798  	 * Set zswap status for the folio to "error"
+c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1799  	 * for use in swap_writepage.
+c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1800  	 */
+c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1801  	zst->errors[error_batch_idx] = -EINVAL;
+c1252ac91d6a6a Kanchana P Sridhar 2024-11-02  1802  }
 
------BEGIN PGP SIGNATURE-----
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
-wnsEABYIACMWIQRrUYzNh64o+SCoO6/F2h8wRvQL7gUCZygyqgUDAAAAAAAKCRDF2h8wRvQL7u9/
-AQCzme1hyYUbPe1s4tK4FtfJbQ1qS/eQ5ZNWEjUnEivrLwEA0UMghFUFO/92QNK3/a3a7O8QrCGS
-Ov5jILXFpAVfTgw=
-=fG9N
------END PGP SIGNATURE-----
-
---------------yPwlqMleUVPPs6iT7orBXJ4O--
