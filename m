@@ -1,54 +1,53 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDD4E1C3038;
-	Mon,  4 Nov 2024 16:11:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD27B1C2325
+	for <linux-crypto@vger.kernel.org>; Mon,  4 Nov 2024 16:18:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730736676; cv=none; b=Ofeyr+RTKYmsa+YoBC1UfcnNar9ELxj3lx9ctWv2RlzUnUw5XBfrybAOvY4YIbzcJYdlQbMECMYFA14GhWwlEvj/uHIZKCmcEa9lq5G8GVflZpnKiwywyc17pbGR73y038UJnJAnJMT+VGB2L5ou//UYTVBLU61SBlR8oNxbEG8=
+	t=1730737093; cv=none; b=KlsbvMJtloGNFXMx0hIb66JhX+L2rzFwQYpUzxL4ij9+9dvgM0PVAYPWrYFeBfUQvSCdmUZSvmfkEmLUNHt0ysYIb+MlTIoPNrZkMTCYEQU9S2Rj8tFOn1xdAjdWLgrYoOlDHT+TH43fh7glrR11GB1WWz0GRDhwT7rdMKGLMto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730736676; c=relaxed/simple;
-	bh=jbyllvauex8tqMFMdTXvyGQZhUUfwaEX119Q+OwRS8Q=;
+	s=arc-20240116; t=1730737093; c=relaxed/simple;
+	bh=sk6U4/K3R+jeus2MgsDXnr8zNq7ciOtwdtktA7ckUVg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nPVtgA62RZ+XFB3BIDUpfWK/ZYMkZuWPzjFWu2STx4Tjw9qXhhWcfXsXyJDLEwex1f7xDhNJ0fVdhXiv0cmmkdo/djIzLPAQbBaFZdlPVqYSQ5UMpj/nwSqNnlrL/69dlLZaHjSMJGGdIB36kKyN6dIvLy75rHTWpnpDjj9Oa6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WPSqAL9r; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=s9p+CGr9ZKSWMYPoUzSLiGyskRa8dSz7iAI5akryVgSnGYkiJ/liZR8W6Xytev9brBN8s3EV+jQ51ri4xCJZvKXZ4jWd62Zbi1OIyiuIUwHI64myQKRy7+AEUnZ7GHN1IqxmCEkI5WRRIP02RtzOAmTNnh2TgNbjnQRHnIn6gbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b=B0Gfw9hb; arc=none smtp.client-ip=18.9.28.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WPSqAL9r"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CB9AC4CECE;
-	Mon,  4 Nov 2024 16:11:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730736676;
-	bh=jbyllvauex8tqMFMdTXvyGQZhUUfwaEX119Q+OwRS8Q=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WPSqAL9r7pR+YYgkjx32AH6bnZwqoXvXuHe/u3PpYj4MhpV0Im/igYgiP/e4/0jm6
-	 zGvkvBkHDYlrVGdmTx0WomIU9b1rg4A9JYT9Br8Zt9hKhdjVY9vE+YND95au5U9MMf
-	 feL6CE8owPys3IPt/U7E4h8OlYuEjJRYdRyWwPy/eNaw+PcNn14UeKXP2qA5FU3WD1
-	 80xjzPxXRuw8EIwnISGJBLSWTcp8Tvziz86C7rmecrIvGMwIlJNTHY2/NlnK2cCIeh
-	 tOhs+1WJ9pknlx7l3FMrLr6kLK4LLMZSzQ2fN3hHMSZ9xuEWXKWAeZgvVtqOLLQyQt
-	 kYDrgeRDu5zWQ==
-Date: Mon, 4 Nov 2024 10:11:14 -0600
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: upstream@airoha.com, Antoine Tenart <atenart@kernel.org>,
-	llvm@lists.linux.dev, Will Deacon <will@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Waiman Long <longman@redhat.com>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Bill Wendling <morbo@google.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>, devicetree@vger.kernel.org,
-	Ingo Molnar <mingo@redhat.com>,
-	Justin Stitt <justinstitt@google.com>
-Subject: Re: [PATCH v6 2/3] dt-bindings: crypto: Add Inside Secure SafeXcel
- EIP-93 crypto engine
-Message-ID: <173073667299.300346.12132353760971181964.robh@kernel.org>
-References: <20241102175045.10408-1-ansuelsmth@gmail.com>
- <20241102175045.10408-2-ansuelsmth@gmail.com>
+	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="B0Gfw9hb"
+Received: from cwcc.thunk.org (pool-173-48-115-131.bstnma.fios.verizon.net [173.48.115.131])
+	(authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 4A4GHDZq005094
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 4 Nov 2024 11:17:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+	t=1730737037; bh=MfBLldae6HpVT/J0uH6IxgYAl1BDd58WeCFp8bpuhVM=;
+	h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
+	b=B0Gfw9hby54Mawf3nVtoZfShOFAGukbl6ZTbcBRlBYtaOGsQCDtF0qrCRjYcyueMN
+	 kV3YMqvlfKnXp0p4fCWynaSg163bApSkqyhJqyYAnlJGmGsBqD0LP+xC7Ub8B3AkMW
+	 fCaW+bTFL4V+NDN7Mwtj3eK4pBVhp1exceawLgFrmz6mC17UMOrLmM35q5gxC4WiPa
+	 dU/am5SfTEXUCGkYocIUCIDjggZimNzSIcTYzrac8AXMHympLwlrhdp6OGCVFYpanm
+	 7zZxGz70mRgKnWKu+qePBhSgO7AcPnfmUhE92pXrgqBwyRWdRGP2hoQHMO6YFDD2gt
+	 W9K47pAC0MkrA==
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+	id 8C6D915C02FA; Mon, 04 Nov 2024 11:17:13 -0500 (EST)
+Date: Mon, 4 Nov 2024 11:17:13 -0500
+From: "Theodore Ts'o" <tytso@mit.edu>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-mips@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev,
+        sparclinux@vger.kernel.org, x86@kernel.org,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH v3 15/18] ext4: switch to using the crc32c library
+Message-ID: <20241104161713.GA43869@mit.edu>
+References: <20241103223154.136127-1-ebiggers@kernel.org>
+ <20241103223154.136127-16-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -57,37 +56,18 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241102175045.10408-2-ansuelsmth@gmail.com>
+In-Reply-To: <20241103223154.136127-16-ebiggers@kernel.org>
 
+On Sun, Nov 03, 2024 at 02:31:51PM -0800, Eric Biggers wrote:
+> Now that the crc32c() library function directly takes advantage of
+> architecture-specific optimizations, it is unnecessary to go through the
+> crypto API.  Just use crc32c().  This is much simpler, and it improves
+> performance due to eliminating the crypto API overhead.
+> 
+> Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-On Sat, 02 Nov 2024 18:50:34 +0100, Christian Marangi wrote:
-> Add bindings for the Inside Secure SafeXcel EIP-93 crypto engine.
-> 
-> The IP is present on Airoha SoC and on various Mediatek devices and
-> other SoC under different names like mtk-eip93 or PKTE.
-> 
-> All the compatible that currently doesn't have any user are defined but
-> rejected waiting for an actual device that makes use of them.
-> 
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> ---
-> Changes v6:
-> - Add SoC specific compatible
-> - Add now supported entry for compatible with no user
-> Changes v5:
-> - Comment out compatible with no current user
-> Changes v4:
-> - Out of RFC
-> Changes v3:
-> - Add SoC compatible with generic one
-> Changes v2:
-> - Change to better compatible
-> - Add description for EIP93 models
-> 
->  .../crypto/inside-secure,safexcel-eip93.yaml  | 67 +++++++++++++++++++
->  1 file changed, 67 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/crypto/inside-secure,safexcel-eip93.yaml
-> 
+Acked-by: Theodore Ts'o <tytso@mit.edu>
 
-Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+Thanks for the cleanup!
 
