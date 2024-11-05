@@ -1,72 +1,171 @@
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F8D31D6DBB
-	for <linux-crypto@vger.kernel.org>; Tue,  5 Nov 2024 13:39:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE0A31B3951
+	for <linux-crypto@vger.kernel.org>; Tue,  5 Nov 2024 13:42:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730813967; cv=none; b=Jx0w8sXeAIjl9gt3Csjc7Jnov4aZru+Q5QM67USZNa5+Xccmkp9qElotUbNtO/m064F+n2SF+A87d4yACjalYgfiysI/AZXzVmLTL+uxaGERjbffAOTA73ur3rTmaVWat89zcpIlhiQSsi7Uu89mL9mPWvoqOnnJyoL+albO2c8=
+	t=1730814129; cv=none; b=CQY33A1eSyYVfc9ncSSG9UOXSdmheqNIHkiT2zTZ5DjnbaHFqRcUNSWKTuakRV1Myir9gbKlLN1Cvbq6Wzz8BaJIH112NE01xugpKVbdTmZXzSXJuJzQJwjIWiqOS8KCYdUhG7TU3f57G/W6v7XPyelsoYyqAcq13WnICbV4Yvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730813967; c=relaxed/simple;
-	bh=9DJp7J0hyfRnz5ccj5zCZy+dzq4cjMmMG/w5+bn1Fog=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KBRXSYAO8fxK3rbkhSg5AsTbB1Tx8suGH6Z9TcbeNb43I8guvTN+cZ40YNfBLnD6fyijNzVLmCsmKI1/RrX7ruoNyIy1Bs9opuvRmOXOkx9zE86/dEVwVct2EXsL+TRsPrsdtrMRuORBnsDXxKvUfLwBdPYmYkmGdl3F4mhmWOY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b=n0sXTzpi; arc=none smtp.client-ip=18.9.28.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
+	s=arc-20240116; t=1730814129; c=relaxed/simple;
+	bh=SOrJ7VkRtcEOzHqGVdGa/P+BLxulsoETsY4GRPLrXzw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=q+KlPwDt5KOidpqGX32+l5AUZQ5EmHNw5Waqjwmq71KJx95tLr0KkQnRXRcp03AYI+3leLu9+nKmw7qR+/iFblmfG/4CgyGhvJ/8kkcMXei9X7EBIopM/905jFrNP1/SWcdBkrIBahgV6TygQiSjPm/vlTLk4b9iKD36mCXO8gU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=gHW3AzIx; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="n0sXTzpi"
-Received: from macsyma.thunk.org (guestnat-104-133-0-100.corp.google.com [104.133.0.100] (may be forged))
-	(authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 4A5Dccb4012098
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 5 Nov 2024 08:38:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
-	t=1730813921; bh=KYeCLSsUZRIrmEOMwxGqSfD7V2RsNkns3qvfU6C43UA=;
-	h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
-	b=n0sXTzpicMGl6JI0ADkVc/HiKPojEgkGYyO1pQx2dzcrnqvXsM2RZzo+Sb5svGPgc
-	 qW0SX7zl5zqRkKltYfBmUgFXDCqUkRisSud/xR5J6Tbouah7IfPO5+X+s+0mFZ/id0
-	 KJJ0kAX4lfNE8lrvU3EBvRFI9YhbvsP4WOsZDJiCLfWkjotYwy29Ajn/HIKkTf9yE5
-	 NEeFKTWS8cZ06m1TRDAbI0VH51oFtGnGm3lMEoaaiG94ccor1fss0Fcwy+3maWrH6L
-	 KfqzubfM08EeL0DYjOq/Yn2j7aagvnHNL3UgvZEC8cQqhZOWSOz17Mgc3iRw2QINym
-	 fJUtJFR76A04Q==
-Received: by macsyma.thunk.org (Postfix, from userid 15806)
-	id 7ED14340E22; Sat, 02 Nov 2024 15:26:35 -0700 (PDT)
-Date: Sat, 2 Nov 2024 15:26:35 -0700
-From: "Theodore Ts'o" <tytso@mit.edu>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-mips@vger.kernel.org, linux-riscv@lists.infradead.org,
-        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev,
-        sparclinux@vger.kernel.org, x86@kernel.org,
-        Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH v2 15/18] ext4: switch to using the crc32c library
-Message-ID: <20241102222635.GB455688@mit.edu>
-References: <20241025191454.72616-1-ebiggers@kernel.org>
- <20241025191454.72616-16-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="gHW3AzIx"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A5Ddfwm024403;
+	Tue, 5 Nov 2024 13:42:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=eBi3F+
+	CbVbvcOtKnbgvNiNSfPu8aZAwqGWpDBRobYD0=; b=gHW3AzIxAALEQW65x+kejo
+	9BqAte4aR2jDMhkh2HOa28god9kDzTzKCecSzDSaa4Lfys0VQMDvjiYiUp9JJX0b
+	CEap8NkwNIf38Ik39Pw2q6GDqAKqHAYdN8UNyucX6x3iVlJgOyWcLTm4cd8NoDRb
+	f1H1srCOflJAhB36opP2L20o6k15DmZg2+viMQc9nS9LcGGT4NxgNPYU+TDJGAgs
+	9JnR9yb9Qw2x455Lx6H6PaAUclGgVZqXMO/00UD7AMT4EwN/LSwCmPfXrowyaGXZ
+	K5xkQT207mD922rhw4O/uTzxAFtEBsyYT4SXB4K2L6sDSBevo7wJfAiY4x9j42sw
+	==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42qmepg0kq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 05 Nov 2024 13:42:00 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4A58hggB019080;
+	Tue, 5 Nov 2024 13:41:59 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 42p0mj45c9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 05 Nov 2024 13:41:59 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4A5DfuVJ19202530
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 5 Nov 2024 13:41:56 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2EFF42004B;
+	Tue,  5 Nov 2024 13:41:56 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0FDE320043;
+	Tue,  5 Nov 2024 13:41:56 +0000 (GMT)
+Received: from [9.152.224.243] (unknown [9.152.224.243])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  5 Nov 2024 13:41:56 +0000 (GMT)
+Message-ID: <b52a986c-5be2-4ed9-b1c3-841fb2d94a74@linux.ibm.com>
+Date: Tue, 5 Nov 2024 14:41:56 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241025191454.72616-16-ebiggers@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 3/3] s390/crypto: New s390 specific shash phmac
+To: Harald Freudenberger <freude@linux.ibm.com>, herbert@gondor.apana.org.au,
+        davem@davemloft.net, hca@linux.ibm.com
+Cc: linux-crypto@vger.kernel.org
+References: <20241030162235.363533-1-freude@linux.ibm.com>
+ <20241030162235.363533-4-freude@linux.ibm.com>
+Content-Language: de-DE
+From: Holger Dengler <dengler@linux.ibm.com>
+In-Reply-To: <20241030162235.363533-4-freude@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: zHggPzyMV3c8OXi6xUzMvrtPt6eI-b7Q
+X-Proofpoint-ORIG-GUID: zHggPzyMV3c8OXi6xUzMvrtPt6eI-b7Q
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 adultscore=0
+ mlxlogscore=999 malwarescore=0 clxscore=1011 lowpriorityscore=0
+ impostorscore=0 bulkscore=0 phishscore=0 mlxscore=0 priorityscore=1501
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411050105
 
-On Fri, Oct 25, 2024 at 12:14:51PM -0700, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On 30/10/2024 17:22, Harald Freudenberger wrote:
+> From: Holger Dengler <dengler@linux.ibm.com>
 > 
-> Now that the crc32c() library function directly takes advantage of
-> architecture-specific optimizations, it is unnecessary to go through the
-> crypto API.  Just use crc32c().  This is much simpler, and it improves
-> performance due to eliminating the crypto API overhead.
+> Add support for protected key hmac ("phmac") for s390 arch.
 > 
-> Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> With the latest machine generation there is now support for
+> protected key (that is a key wrapped by a master key stored
+> in firmware) hmac for sha2 (sha224, sha256, sha384 and sha512)
+> for the s390 specific CPACF instruction kmac.
+> 
+> This patch adds support via 4 new shashes registered as
+> phmac(sha224), phmac(sha256), phmac(sha384) and phmac(sha512).
+> 
+> Please note that as of now, there is no selftest enabled for
+> these shashes, but the implementation has been tested with
+> testcases via AF_ALG interface.
+> 
+> Signed-off-by: Holger Dengler <dengler@linux.ibm.com>
+> Signed-off-by: Harald Freudenberger <freude@linux.ibm.com>
+> ---
+>  arch/s390/configs/debug_defconfig |   1 +
+>  arch/s390/configs/defconfig       |   1 +
+>  arch/s390/crypto/Makefile         |   1 +
+>  arch/s390/crypto/phmac_s390.c     | 484 ++++++++++++++++++++++++++++++
+>  drivers/crypto/Kconfig            |  12 +
+>  5 files changed, 499 insertions(+)
+>  create mode 100644 arch/s390/crypto/phmac_s390.c
+> 
+[...]
+> diff --git a/arch/s390/crypto/phmac_s390.c b/arch/s390/crypto/phmac_s390.c
+> new file mode 100644
+> index 000000000000..7f68ba29626f
+> --- /dev/null
+> +++ b/arch/s390/crypto/phmac_s390.c
+> @@ -0,0 +1,484 @@
+[...]
+> +static int s390_phmac_sha2_clone_tfm(struct crypto_shash *dst,
+> +				     struct crypto_shash *src)
+> +{
+> +	struct s390_phmac_ctx *dst_ctx = crypto_shash_ctx(dst);
+> +	struct s390_phmac_ctx *src_ctx = crypto_shash_ctx(src);
+> +	int rc;
+> +
+> +	rc = s390_phmac_sha2_init_tfm(dst);
+> +	if (rc)
+> +		return rc;
+> +
+> +	if (src_ctx->key && src_ctx->keylen) {
+> +		dst_ctx->key = kmemdup(src_ctx->key, src_ctx->keylen,
+> +				       GFP_KERNEL);
+> +		if (!dst_ctx->key)
+> +			return -ENOMEM;
+> +		dst_ctx->keylen = src_ctx->keylen;
+> +		return phmac_convert_key(dst_ctx);
 
-Acked-by: Theodore Ts'o <tytso@mit.edu>
+This will clone only parts of the tfm_ctx, e.g. the function code (fc) is missing. I would highly recommend to just call setkey() here instead. 
+
+> +	}
+> +
+> +	return 0;
+> +}
+
+[...]
+> +static int __init phmac_s390_init(void)
+> +{
+> +	struct s390_hmac_alg *hmac;
+> +	int i, rc = -ENODEV;
+> +
+> +	if (!cpacf_query_func(CPACF_KLMD, CPACF_KLMD_SHA_256))
+> +		return -ENODEV;
+> +	if (!cpacf_query_func(CPACF_KLMD, CPACF_KLMD_SHA_512))
+> +		return -ENODEV;
+
+These two check are not neccessary. Please remove them.
+
+[...]
+
+-- 
+Mit freundlichen Grüßen / Kind regards
+Holger Dengler
+--
+IBM Systems, Linux on IBM Z Development
+dengler@linux.ibm.com
+
