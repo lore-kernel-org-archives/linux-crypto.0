@@ -1,321 +1,475 @@
-Received: from mail-wm1-f74.google.com (mail-wm1-f74.google.com [209.85.128.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2053.outbound.protection.outlook.com [40.107.220.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95DD81714CF
-	for <linux-crypto@vger.kernel.org>; Tue,  5 Nov 2024 16:14:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.74
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730823265; cv=none; b=e6ZXRokb78nw3gtwIc+/tFpuCCAP2TyL1kCA3x/U/gkgvxcVXOuammKW4A4ekG/ziRXQj8vh+TlPMXHe3CnC+F95DePcHa0OfKgOs9IWNFTTWPdsC77LBX2xvtkft0sfjkUmkAU4XCIMng7xHzwmwolMSq6Dm9EPZv0p3KPAuZA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730823265; c=relaxed/simple;
-	bh=oemtjBrK+K0nL8nCtNSFHCcJf4f5MzD8rkgdossOoQU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=tHEI3rIQEvPAQkVMOlaQW8gJy7+4FX0R++BCp8RJ2VQgD39LphkjzJ4HApoFT1FdC97LTbAKvW6q2/P2lv/s6fXuIXPaE3I3KwH1fhGqueaPH0XxvKaiIKGeHmp9qmmYvuZWM8Z1xdUi+/ZTohgQYh0OB9mFk1sE7QFIaHOAT5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wr5B7ezk; arc=none smtp.client-ip=209.85.128.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A5951D9A48;
+	Tue,  5 Nov 2024 21:06:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.53
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730840801; cv=fail; b=lWWnSjpb10+QDtyaYhIj20YiObD28Hc47+6EXcMcUjbLeiNGbh1eHiaJVuQNjcFbg5MLa2BDrR7PSiuGWuULI/bcAQT+zHfMXXz/CBMM0rB78bzcyDRoHh8b3CiMz1bf26vlHMlNKRtwb7VIUlkF4+y0I+Y5Ov2xTvcNT4ji95g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730840801; c=relaxed/simple;
+	bh=H7XXVX/knbhHHsy7glChgAQCkmjVwxIgLt1ndT554BM=;
+	h=Message-ID:Date:To:Cc:References:From:Subject:In-Reply-To:
+	 Content-Type:MIME-Version; b=RXNrjvEhAZfiytQ9dq0qsZ/0TplRfRHbPfbZPpMRRVYvKk3edFyLeF5ev3JhMUfO+IRc+gQJypzFEjbukW6v0bmMjegnGeaG9VapJ39Y6nAm8TamdFoE6PBO2MGe5xcdgSnEkrhrVsizs5azmAiG1H8qgHbBsUA+UudEOTBoJjI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=rqb8rjXu; arc=fail smtp.client-ip=40.107.220.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wr5B7ezk"
-Received: by mail-wm1-f74.google.com with SMTP id 5b1f17b1804b1-431518ae047so36742015e9.0
-        for <linux-crypto@vger.kernel.org>; Tue, 05 Nov 2024 08:14:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730823262; x=1731428062; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=j5C9UQXxiURmILMPEwiZdl1ShbeIW9MqWROHwJW9ezc=;
-        b=wr5B7ezkERqTDJpFRkcG0QhR5KE3vxxiP/qRayaFJqECvGCl/DppMEAuL2bHAUZrq9
-         75o6RmLMRNRSPMSOcpl8YQS4I6FAajgnV7QqR+fHhrartOo/rUQiwv7mJ9SZEwVqZaWn
-         +apVl6074YExFghG7ZIu/knL1DrkUHlTz/pYW8dMXzLCm7AkiDJQJUJk7uVRRTKHE+5H
-         Zd0OGKZzO6dhQGtGiXfvndOXbgvnZM9A+/pSTQptEh9cCncJZgNA+cCp9+hDzB/r7Bxm
-         6kLHhDbpd5evotOUMYi0wLlWs+TszKWppewCNnRCts8xbeMa0whD1LylSq45MAWSwgWN
-         WDhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730823262; x=1731428062;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=j5C9UQXxiURmILMPEwiZdl1ShbeIW9MqWROHwJW9ezc=;
-        b=kVxBZ2MOCflaHjrLJ2qIHJSQ5hDNzx6ZJ8/72Wl4YeYtNDvIoVS0jQHyyFlLtq+DxC
-         g6C8cYvuGoGIE0VMmx20lkTwth7wAbKfj/eBSSccPBEgnOhWuOYki4tD0Y2+VsaMJXyE
-         E14eIE3kIBLuEHKLMypjeNYLVtAd580rjGiZO+uTdl+kd3V4KrikNjgHq/XLyG9uwpYw
-         1icTiIvNE42pd725K90leX8MoXzSuM31ULe+39HMduNSoSCEaSRxReR38OUX/JaVO9yi
-         VWyzRgnhsXokrqa4yQ9A5M2x8ED3cLn/LXVCwjSPpaQM+2g0ZSkFBn7Tvx8LTQhAGpec
-         DS+w==
-X-Gm-Message-State: AOJu0YwWSkDvvW6kGMzLF+Tvf75/1r26lLY1LI4xp3sNzd/74n+eIIc1
-	Pew/ryAcExnVxYXbxUd4dovu17IZtEv3ONfMdWmdnd3JmFv3lUkWLQy/MuxjMjd2JZELY4U8H4c
-	QuuzrqctmUaLG66xxO5DTIyg1FQackP922sY3mqifAS99tiiIDvwbuQ3nohZGPTUgZoaIvx7g13
-	AE1RgoOMJLNkSneq4D7vplXWd2fRUPzg==
-X-Google-Smtp-Source: AGHT+IGoUtJ5+KmRmnOKl2AZ6ZxwHw9MzdvYo9g4ve3paCn9ggnLv8R8NjYp1xRcfQPf/t8joGA1v+aG
-X-Received: from palermo.c.googlers.com ([fda3:e722:ac3:cc00:7b:198d:ac11:8138])
- (user=ardb job=sendgmr) by 2002:a05:600c:6c56:b0:431:44c4:c932 with SMTP id
- 5b1f17b1804b1-432830b14dfmr1188005e9.4.1730823261778; Tue, 05 Nov 2024
- 08:14:21 -0800 (PST)
-Date: Tue,  5 Nov 2024 17:09:06 +0100
-In-Reply-To: <20241105160859.1459261-8-ardb+git@google.com>
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="rqb8rjXu"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=yjN355WayZjJ3KyRslhprL1Lb6DM0kken8kS7JWlP/lW4quYijwZMWUiZ0L2ZcHnB60RFB4gxWPR+hScDBQknMKcQI0TooYDv2Ov6xyc9EcAfyngpYahEJne4HknJlkG+yuHP/4psRoRsRxVKH3zq/vC/xz/m9va2yZbVzwE8ojK5t5iBMwRogCo+Wrd8gUw13HgtnoQ5lV+lNQ73VmWgxFsvR3WCyMasY+YaCZ+BS1/u5qJHcGtwb3hRC8rEKPTeb6ea2EphHW9D/uZzP84y4+gSUzELLqepFxd5q949T2dZ11QOLAvkIf9CN9M2dFoDMoiN+YqIAloCUpEgq5aow==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=nY3FNUKMl93lpykl+8N6hxkl3T/k+8SVfJY2TdXiyo8=;
+ b=gp7HMY5m3O5e28AjfAPURi2CoWz3IQYcf9xlqr7p5ttIt6BShBBAZNVVYz1R9HzzYqrgdjQ2kSvRCDlw6g8hQBxIs8/lvE0C2Hm0Hw3MBv617/CftEBYl0CzBZ1t6rnYllbLdEALeykmUde8qI9ZrDIhpJMl5K6b92l2v5pIltvspZ7pY3NwjkwJVw+uRvT4ahAYQxvsOZBj5QJipGd5t4JKonFDUNVDNAkzhPnx4Z/fhtgncjrG/gwok/xMWUu+CG84+SQhipoNHoTgvIs48fjSLG45sNP4ZM0rlvADPQCvsfrYhPXHrHMIMZn6l3Prfw5axXrnqmCl9Psmgnwcaw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nY3FNUKMl93lpykl+8N6hxkl3T/k+8SVfJY2TdXiyo8=;
+ b=rqb8rjXuPpQ5VJSgPjF7UKod2MH+2dasY3msbCN8nufyQfBx0NbNt2CTZvoyvhcNWCCvTj5bStYXFGpi/SjCO3KPY2b2CSxGc5y+taCkF+AQ4QXQFZghfu7omkAO9BYNEOpKqMaF7lVYswjq5cVCp95mI7mlu0wf2RvthoE2m7Q=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5070.namprd12.prod.outlook.com (2603:10b6:5:389::22)
+ by CY5PR12MB6624.namprd12.prod.outlook.com (2603:10b6:930:40::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8114.31; Tue, 5 Nov
+ 2024 21:06:34 +0000
+Received: from DM4PR12MB5070.namprd12.prod.outlook.com
+ ([fe80::20a9:919e:fd6b:5a6e]) by DM4PR12MB5070.namprd12.prod.outlook.com
+ ([fe80::20a9:919e:fd6b:5a6e%5]) with mapi id 15.20.8114.031; Tue, 5 Nov 2024
+ 21:06:34 +0000
+Message-ID: <7a8a20be-3942-5d5c-719c-2e02d0a85b6c@amd.com>
+Date: Tue, 5 Nov 2024 15:06:32 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+To: Dionna Glaze <dionnaglaze@google.com>, x86@kernel.org,
+ linux-kernel@vger.kernel.org, John Allen <john.allen@amd.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, Ashish Kalra <ashish.kalra@amd.com>
+Cc: linux-crypto@vger.kernel.org
+References: <20241105010558.1266699-1-dionnaglaze@google.com>
+ <20241105010558.1266699-4-dionnaglaze@google.com>
+Content-Language: en-US
+From: Tom Lendacky <thomas.lendacky@amd.com>
+Subject: Re: [PATCH v4 3/6] crypto: ccp: Track GCTX through sev commands
+In-Reply-To: <20241105010558.1266699-4-dionnaglaze@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA9PR13CA0151.namprd13.prod.outlook.com
+ (2603:10b6:806:28::6) To DM4PR12MB5070.namprd12.prod.outlook.com
+ (2603:10b6:5:389::22)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241105160859.1459261-8-ardb+git@google.com>
-X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
-X-Developer-Signature: v=1; a=openpgp-sha256; l=8242; i=ardb@kernel.org;
- h=from:subject; bh=wTU9qg6b3+f755RWEvZYGTwnH7lJNldlFtFrxF4nGyQ=;
- b=owGbwMvMwCFmkMcZplerG8N4Wi2JIV3LWeXwTm/eq6/+PLzxffMV+f6dLy5VnE4v+j/H7dKjp
- iUrGMSndZSyMIhxMMiKKbIIzP77bufpiVK1zrNkYeawMoEMYeDiFICJdFcw/M+SVzEreeqg4rXr
- kLXYssdCTfEb1EvidTZcF5F2f5xwQJ3hf/yc9+ums846tMnkwgr9muMJDs29N/NuXpF/YV7dMVN VjQcA
-X-Mailer: git-send-email 2.47.0.199.ga7371fff76-goog
-Message-ID: <20241105160859.1459261-14-ardb+git@google.com>
-Subject: [PATCH v2 6/6] crypto: arm/crct10dif - Implement plain NEON variant
-From: Ard Biesheuvel <ardb+git@google.com>
-To: linux-crypto@vger.kernel.org
-Cc: linux-arm-kernel@lists.infradead.org, ebiggers@kernel.org, 
-	herbert@gondor.apana.org.au, keescook@chromium.org, 
-	Ard Biesheuvel <ardb@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|CY5PR12MB6624:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2208589f-7aea-4a38-4504-08dcfdddbac0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?Ull0Vm0vcnp3WEZqRVg4bFNnMVAyS0lsU3o4eFY3UUhDcmNnNHNodDhORjJh?=
+ =?utf-8?B?RThrRWl4T1NrQys4bHFrYkd2YnlIWEI4a1RNMGNiWTE5VmNBbGdBeW0ydXZp?=
+ =?utf-8?B?TGNQSkE2eGZTdXN4T3RnR1pOR3k3RTgzODVVMEc0QVRqN3JJc0YyZXdHeThp?=
+ =?utf-8?B?ZWt0RktOdXBzbmRQZFpnSXVGMHZqTkdKYVBSWWtaU1NoVk13aHdHeDlMZmdl?=
+ =?utf-8?B?STZMNXNEWGNGQ1YwQi9IM2Jzd0tWUzFPdGZSUXZTTWllYkZ6SytIMi9WVUlX?=
+ =?utf-8?B?TEtFWDAvUFJEa3ZFdW9CYVJqbml4bFlXY3BqVEdKMFU5dFZIR08wTVE2NWxt?=
+ =?utf-8?B?dDk3SVZGa0FKL1VjS053OVUwVHFLSk84cEQxeU1ERVdTOE5FaDJ4S2NsSlcv?=
+ =?utf-8?B?ZWM5YkF3V2xaUlNXOHNBQkdrZWJ3VEFRYTRzTHFUY3RVNVQ3eHIzWlBSRzFp?=
+ =?utf-8?B?WHZZM3oxUENYMUNLdml6N1VSeW9QR2d4VkFEczUvdnFoWTFCZGM0V241bGpJ?=
+ =?utf-8?B?L1crVHVxRzZTVll0Rm9IVUxXckxiMFdCajlCRy9jM0I5RXpkUnh4Y3NLQnk2?=
+ =?utf-8?B?UDJ4T1QvMFRoVkRmdDc4cHFLUVd3V2NacDViU1A4bUp6ZC84OFJKa2RYRnAy?=
+ =?utf-8?B?NnpoVmNVcE5Nc3lWOWNVOTQzNFBSM1QzUzF2UUtZNHJzaG1kbFZ3VlJmMy96?=
+ =?utf-8?B?SmxSL2tQQllZVmRtUlp3UFpFZW9lakxpeVpiRDBDZ1VHTmw0V0ZCN2dRWUdC?=
+ =?utf-8?B?ZWZZY3BuMG1KVmppNVVBZEFqb0M4alhsT1d3cGFJUDlPYkk3cUxLZUtjUHho?=
+ =?utf-8?B?ZzdDQmpibTNXc0x5RkFnYmoyMWhoTjRnYk94bk95MkxYWFBiOGxDbVdrV0s5?=
+ =?utf-8?B?Tkc5Nk5UTkhKcVhRc2JBSnVIWS9OL0h2UTdnWGRDVXFxbzVCRVJQL09HeCtF?=
+ =?utf-8?B?Wm8rMEhMUG9hMnN0QlRveE9DUmZ6VnFFNEJncmx6U0gwVGNHbnhGbWtINnRi?=
+ =?utf-8?B?NElVaVcrVjAybHpRaTBwamMzc0FaY2VXOVBYUG1oQURQeGVPcTJacXo4MFZS?=
+ =?utf-8?B?OVJnbnRzSmFvMlJzeGJRZmZ5OG5JUUNodjJGODJER1hWeEtPL0pKSUNjM3hO?=
+ =?utf-8?B?SmZzT1lJOVdFWjVpQThnRVZKMXBWUzdhdC9xb1E4N2t2ZUxhMERETWZHWk4w?=
+ =?utf-8?B?VVdzM3g2ZXR5Uit4emVzZmpqSGtkMVh4RU4xcUIvMUJ1ZVpxdUxpTTdPRVBP?=
+ =?utf-8?B?RTVEZUExU29nOFllU2hiSS9USmtpYmhyL2ZpeHI0TG9CUXBlTFBwU2xRUVo5?=
+ =?utf-8?B?MDlmUitML1BZV1RtZ0YzU3MzUGlLM1UvY3ZWN1ZocGl4RnI0MVo1dzhiWDZG?=
+ =?utf-8?B?bVEzaE02eTc0VWNwdVFpSFBQcHM1Tk9DSCs5R2VHWHh5ODhmYUxud2ZxTEp5?=
+ =?utf-8?B?U2FReVhxeERNZ1FxYkNBV2htMGNpRm4yeUwxYWhjVkplZ21zeWVqVWU0YW9u?=
+ =?utf-8?B?OVZmdkRvbkJ1dTlsR3YzTTVaTEd1R0ZKbCs5ckNhWWtlS3NIQmZZZDRNbzA5?=
+ =?utf-8?B?a2NabmlZSTFTYitkbldkVDRUQXcxdEswVEJVaGFhN0lJTGpzcEducy9nQU96?=
+ =?utf-8?B?bFBNaHZuVWhvUm15NnpVcS9lTisvOWg4ZmhlRFp6M0hqRHMzMGwzM3VEUDd0?=
+ =?utf-8?B?WmNVWXQ5UjdIODV5QjlZRHM2L1YxRWpDZzFaNURuSHhYOVBJSm5rYXMxRkor?=
+ =?utf-8?Q?ZydFEQvsmSzUkV4DKbpYJtySWn0x/asShN9Wpbo?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?cVdFcjU2OHd5eEFEcUI1UncxK1VjOXRtckIxVW9pRk0wVGVaTVFoemUxL1B3?=
+ =?utf-8?B?UjNETVhYdzlPRXhrQVZtM28zdkFoUm9iakdsUkE2aWlKMDBpTElZWWtleDZR?=
+ =?utf-8?B?dGhoNS9TakR1ZEtQSUdnL2tRaCs1UmU4K1hZMzNQaVRyU1pueEpTdlJocGpn?=
+ =?utf-8?B?YnlnK3FPamxPV1RMQ3gvNFRETGxHKzRxZGpZR3pSenVlY3gxdkxaKzlwMk0v?=
+ =?utf-8?B?SmV2a0tBZlJpWnh2QjZUKy94UHhYb24wd1BtZlMrYjhCTEFUa3BkdW5kVDk2?=
+ =?utf-8?B?ZWxGNDJoRkdFZnpINE4wcE1KWHdCWFM0eEpWTWJBVDBhQW9rSzhEeHFKR0xM?=
+ =?utf-8?B?U2hEckovZ2t1U05XSWxvZVV0MUVyeTl2YlliUk5DNnYyb2VaSFZXUUozUkZS?=
+ =?utf-8?B?cEs2R3pUMzJOU0ZrYTNLc3Y1RE9iUTU2V1pOUlR5a2FOVUp6UXFvQnlqVTRi?=
+ =?utf-8?B?MjBWVjZBYmlxdE9OOE9OMGZZN3c5OVg1NUxDTDRiY2g4ZmJmMW9hd1VVN1JF?=
+ =?utf-8?B?RHZGR0FxWG5QMjE5V3ZPejhnZFVmd3RuQjE4QWEzR3Bpa2hHVy9zamxkNWQ0?=
+ =?utf-8?B?R3ZtVEtnZERyVkZ6SXR2NXBXR0lHRTF4NFlvNG9HQ2t2bEYyR1Vod0RuSU0v?=
+ =?utf-8?B?YkJuSlh4SmUvYjVVcEhwMHhZR3JKQnZKTXhVVFBweTZMTUwyQXppQlhZQm1C?=
+ =?utf-8?B?MUx4WG1BSUYyM2x0RWhoc1dSaUFpOENWdk45dlJ6RFZtM1RoVjBFcE5tSHhN?=
+ =?utf-8?B?RlNDUDh4VWZPUzBWRkM0QWJqSUZQSHBMV2JFdE9Ya3RJMTF4eUdTZjRrTEJv?=
+ =?utf-8?B?bFpYSkYvM1R1RW9TWHh3Y2taRnpiSkk4RkVaaFp6SDZrR0FQcWl3NDM4d0xQ?=
+ =?utf-8?B?SFpmMWxNdHQwWXVLNmFHSWJNQzFjdzVzYjk0cjJCNHE0ZUF0MXBBSU9pRVRH?=
+ =?utf-8?B?NFNVVHNLWXdCaEdmdkRrdCtLQUs5RjNxSlAvcExPQktwZDFVMVd1Wm9OQlV0?=
+ =?utf-8?B?Vy9yL0h0NVY2ZEdZNDRrTmJ6T21aZmUzajdJNHJyeW90eDRHeUpSWlJHaG5O?=
+ =?utf-8?B?eU1sRHArRjdWYXBkaFA0aVhrM01kL3FWYndoc3BEK0lBQTNrWlRtSm1UMWls?=
+ =?utf-8?B?U3JKb01rTnR1TVFqaG1DcFJOQ2tucFFrUXA1K1JZMDdyTzNjSmFSRkpLWjZh?=
+ =?utf-8?B?WThOMngyNnJSRU5MN0pINlIrUzVmK21OR0VyWEQyWVZDSHdaSlpaYTNIRy92?=
+ =?utf-8?B?bWlDRHBWUVJkR2NKUE9nc2wzWmhkV3NMSGtsTWNuaTA3Sk1ZNTNPVnNFOE5k?=
+ =?utf-8?B?MkkxeFR5NVVxbDg3WjhhVWI3aVBJL251WTF0c0lvM1lVdjRCRnNpNU5lcVZ0?=
+ =?utf-8?B?dlNXN2FiNFR5cytrRFBMcHFIZDV2T014cTdWNkg1dERiZnp1d2E3Nk1TVk0w?=
+ =?utf-8?B?dmxpdXNzTEVWc2xHR0g1bEVESFhLSXJhdHhFNWd0RmZxNDBTK0ZnQWU0UXIz?=
+ =?utf-8?B?czRiOWVkQ3M5aGZVVWR2bk9NQndmamdZRVZ2TmZjc09yZ3BsZnRFY29tSHp3?=
+ =?utf-8?B?aUJBR2NlTEpjUTRseGI1RlR3WkFFUE9jaVNsWisvVDVOVElEa0NTcTBBa0NV?=
+ =?utf-8?B?WHFmd2pPTit1ZTl1cnB5SitVcXhoRHZVWU9lc1EwSjNiOG5Fa2RXNlBaT00v?=
+ =?utf-8?B?SWp1TXl5eUhIbFUwUVQ0QUlEUkx2eGRiOUdxM3BJOFh2alFNeXhIMGlxK2Vw?=
+ =?utf-8?B?VEU4MElhVGl3ZlZJWnFoNVZOWkVhQVlpOC82TDZpZ2sxMk9zOFlpQWgwZFZv?=
+ =?utf-8?B?N1J1d21pR2VQOEQxOTB3UUJZVmRBU0JhNElOaE12MFp4clNvYjZ6eWlZdVk2?=
+ =?utf-8?B?Y0RTWjlPbGN6RVZFSHZlUmdLTElpcExoc3E1WWdRU3p0Z0VQcEIyV2tyVXQ0?=
+ =?utf-8?B?TlIrNExEelE3VHk0WUNDaktNUHRtYm5BM05VTVZoL1VyVlFGUkZybmNYVjYy?=
+ =?utf-8?B?WjdMaWNTQmZKc2Y5L09YWWFuamZhRDBYTFh1clFPREhNaVBsYzBzZVNtczY0?=
+ =?utf-8?B?QWNXRU91T210UjJGZXBrMWZpOWpaZUcwS2NvYmZRSkk4b1dUU1RRb3hyMjF3?=
+ =?utf-8?Q?/gK5PBldEML6ncKoiOuluu4uw?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2208589f-7aea-4a38-4504-08dcfdddbac0
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5070.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Nov 2024 21:06:34.4751
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: BOGzfXgoQIvU6oYrzgi+QQNUHLOl5oBE4OQoQbNUpsrdXErxt+U+xbi1w0AV/UvssXtTjb5x7+kG/jjhs78gQQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6624
 
-From: Ard Biesheuvel <ardb@kernel.org>
+On 11/4/24 19:05, Dionna Glaze wrote:
+> In preparation for SEV firmware hotloading support, add bookkeeping
+> structures for GCTX pages that are in use.
+> 
+> Compliance with SEV-SNP API section 3.3 Firmware Updates and 4.1.1
+> Live Update: before a firmware is committed, all active GCTX pages
+> should be updated with SNP_GUEST_STATUS to ensure their data structure
+> remains consistent for the new firmware version.
+> There can only be cpuid_edx(0x8000001f)-1 many SEV-SNP asids in use at
+> one time, so this map associates asid to gctx in order to track which
+> addresses are active gctx pages that need updating. When an asid and
+> gctx page are decommissioned, the page is removed from tracking for
+> update-purposes.
+> Given that GCTX page creation and binding through the SNP_ACTIVATE
+> command are separate, the creation operation also tracks pages that are
+> yet to be bound to an asid.
 
-The CRC-T10DIF algorithm produces a 16-bit CRC, and this is reflected in
-the folding coefficients, which are also only 16 bits wide.
+I believe we have an ASID "allocated" by the time we call
+snp_context_create(). And snp_decommission_context() is always called to
+remove the context. Maybe a ccp driver API to create and destroy a
+context would be good here. The ASID would be an additional parameter
+and allow for associating the guest context page to the ASID right from
+the start.
 
-This means that the polynomial multiplications involving these
-coefficients can be performed using 8-bit long polynomial multiplication
-(8x8 -> 16) in only a few steps, and this is an instruction that is part
-of the base NEON ISA, which is all most real ARMv7 cores implement. (The
-64-bit PMULL instruction is part of the crypto extensions, which are
-only implemented by 64-bit cores)
+This way you don't need an snp_unbound_gctx_pages array.
 
-The final reduction is a bit more involved, but we can delegate that to
-the generic CRC-T10DIF implementation after folding the entire input
-into a 16 byte vector.
+I think it will make the code a lot simpler, but it does add an API
+dependency between the CCP and KVM that needs to be worked out between
+the maintainers.
 
-This results in a speedup of around 6.6x on Cortex-A72 running in 32-bit
-mode. On Cortex-A8 (BeagleBone White), the results are substantially
-better than that, but not sufficiently reproducible (with tcrypt) to
-quote a number here.
+> 
+> The hotloading support depends on FW_UPLOAD, so the new functions are
+> added in a new file whose object file is conditionally included in the
+> module build.
+> 
+> Signed-off-by: Dionna Glaze <dionnaglaze@google.com>
+> ---
+>  drivers/crypto/ccp/Makefile  |   1 +
+>  drivers/crypto/ccp/sev-dev.c |   5 ++
+>  drivers/crypto/ccp/sev-dev.h |  15 +++++
+>  drivers/crypto/ccp/sev-fw.c  | 117 +++++++++++++++++++++++++++++++++++
+>  4 files changed, 138 insertions(+)
+>  create mode 100644 drivers/crypto/ccp/sev-fw.c
+> 
+> diff --git a/drivers/crypto/ccp/Makefile b/drivers/crypto/ccp/Makefile
+> index 394484929dae3..b8b5102cc7973 100644
+> --- a/drivers/crypto/ccp/Makefile
+> +++ b/drivers/crypto/ccp/Makefile
+> @@ -14,6 +14,7 @@ ccp-$(CONFIG_CRYPTO_DEV_SP_PSP) += psp-dev.o \
+>                                     platform-access.o \
+>                                     dbc.o \
+>                                     hsti.o
+> +ccp-$(CONFIG_FW_UPLOAD) += sev-fw.o
 
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
----
- arch/arm/crypto/crct10dif-ce-core.S | 98 +++++++++++++++++++-
- arch/arm/crypto/crct10dif-ce-glue.c | 45 ++++++++-
- 2 files changed, 134 insertions(+), 9 deletions(-)
+As you saw from the krobot mail, you will probably need to create
+something like CRYPTO_DEV_SP_PSP_FW_UPLOAD, which depends on
+CRYPTO_DEV_SP_PSP and FW_UPLOAD.
 
-diff --git a/arch/arm/crypto/crct10dif-ce-core.S b/arch/arm/crypto/crct10dif-ce-core.S
-index 6b72167574b2..2bbf2df9c1e2 100644
---- a/arch/arm/crypto/crct10dif-ce-core.S
-+++ b/arch/arm/crypto/crct10dif-ce-core.S
-@@ -112,6 +112,82 @@
- 	FOLD_CONST_L	.req	q10l
- 	FOLD_CONST_H	.req	q10h
- 
-+	/*
-+	 * Pairwise long polynomial multiplication of two 16-bit values
-+	 *
-+	 *   { w0, w1 }, { y0, y1 }
-+	 *
-+	 * by two 64-bit values
-+	 *
-+	 *   { x0, x1, x2, x3, x4, x5, x6, x7 }, { z0, z1, z2, z3, z4, z5, z6, z7 }
-+	 *
-+	 * where each vector element is a byte, ordered from least to most
-+	 * significant. The resulting 80-bit vectors are XOR'ed together.
-+	 *
-+	 * This can be implemented using 8x8 long polynomial multiplication, by
-+	 * reorganizing the input so that each pairwise 8x8 multiplication
-+	 * produces one of the terms from the decomposition below, and
-+	 * combining the results of each rank and shifting them into place.
-+	 *
-+	 * Rank
-+	 *  0            w0*x0 ^              |        y0*z0 ^
-+	 *  1       (w0*x1 ^ w1*x0) <<  8 ^   |   (y0*z1 ^ y1*z0) <<  8 ^
-+	 *  2       (w0*x2 ^ w1*x1) << 16 ^   |   (y0*z2 ^ y1*z1) << 16 ^
-+	 *  3       (w0*x3 ^ w1*x2) << 24 ^   |   (y0*z3 ^ y1*z2) << 24 ^
-+	 *  4       (w0*x4 ^ w1*x3) << 32 ^   |   (y0*z4 ^ y1*z3) << 32 ^
-+	 *  5       (w0*x5 ^ w1*x4) << 40 ^   |   (y0*z5 ^ y1*z4) << 40 ^
-+	 *  6       (w0*x6 ^ w1*x5) << 48 ^   |   (y0*z6 ^ y1*z5) << 48 ^
-+	 *  7       (w0*x7 ^ w1*x6) << 56 ^   |   (y0*z7 ^ y1*z6) << 56 ^
-+	 *  8            w1*x7      << 64     |        y1*z7      << 64
-+	 *
-+	 * The inputs can be reorganized into
-+	 *
-+	 *   { w0, w0, w0, w0, y0, y0, y0, y0 }, { w1, w1, w1, w1, y1, y1, y1, y1 }
-+	 *   { x0, x2, x4, x6, z0, z2, z4, z6 }, { x1, x3, x5, x7, z1, z3, z5, z7 }
-+	 *
-+	 * and after performing 8x8->16 bit long polynomial multiplication of
-+	 * each of the halves of the first vector with those of the second one,
-+	 * we obtain the following four vectors of 16-bit elements:
-+	 *
-+	 *   a := { w0*x0, w0*x2, w0*x4, w0*x6 }, { y0*z0, y0*z2, y0*z4, y0*z6 }
-+	 *   b := { w0*x1, w0*x3, w0*x5, w0*x7 }, { y0*z1, y0*z3, y0*z5, y0*z7 }
-+	 *   c := { w1*x0, w1*x2, w1*x4, w1*x6 }, { y1*z0, y1*z2, y1*z4, y1*z6 }
-+	 *   d := { w1*x1, w1*x3, w1*x5, w1*x7 }, { y1*z1, y1*z3, y1*z5, y1*z7 }
-+	 *
-+	 * Results b and c can be XORed together, as the vector elements have
-+	 * matching ranks. Then, the final XOR can be pulled forward, and
-+	 * applied between the halves of each of the remaining three vectors,
-+	 * which are then shifted into place, and XORed together to produce the
-+	 * final 80-bit result.
-+	 */
-+        .macro		pmull16x64_p8, v16, v64
-+	vext.8		q11, \v64, \v64, #1
-+	vld1.64		{q12}, [r4, :128]
-+	vuzp.8		q11, \v64
-+	vtbl.8		d24, {\v16\()_L-\v16\()_H}, d24
-+	vtbl.8		d25, {\v16\()_L-\v16\()_H}, d25
-+	bl		__pmull16x64_p8
-+	veor		\v64, q12, q14
-+        .endm
-+
-+__pmull16x64_p8:
-+	vmull.p8	q13, d23, d24
-+	vmull.p8	q14, d23, d25
-+	vmull.p8	q15, d22, d24
-+	vmull.p8	q12, d22, d25
-+
-+	veor		q14, q14, q15
-+	veor		d24, d24, d25
-+	veor		d26, d26, d27
-+	veor		d28, d28, d29
-+	vmov.i32	d25, #0
-+	vmov.i32	d29, #0
-+	vext.8		q12, q12, q12, #14
-+	vext.8		q14, q14, q14, #15
-+	veor		d24, d24, d26
-+	bx		lr
-+ENDPROC(__pmull16x64_p8)
-+
-         .macro		pmull16x64_p64, v16, v64
- 	vmull.p64	q11, \v64\()l, \v16\()_L
- 	vmull.p64	\v64, \v64\()h, \v16\()_H
-@@ -249,9 +325,9 @@ CPU_LE(	vrev64.8	q0, q0	)
- 	vswp		q0l, q0h
- 
- 	// q1 = high order part of second chunk: q7 left-shifted by 'len' bytes.
--	mov_l		r3, .Lbyteshift_table + 16
--	sub		r3, r3, len
--	vld1.8		{q2}, [r3]
-+	mov_l		r1, .Lbyteshift_table + 16
-+	sub		r1, r1, len
-+	vld1.8		{q2}, [r1]
- 	vtbl.8		q1l, {q7l-q7h}, q2l
- 	vtbl.8		q1h, {q7l-q7h}, q2h
- 
-@@ -341,9 +417,20 @@ ENTRY(crc_t10dif_pmull64)
- 
- 	vmov.u16	r0, q0l[0]
- 	bx		lr
--
- ENDPROC(crc_t10dif_pmull64)
- 
-+ENTRY(crc_t10dif_pmull8)
-+	push		{r4, lr}
-+	mov_l		r4, .L16x64perm
-+
-+	crct10dif	p8
-+
-+CPU_LE(	vrev64.8	q7, q7	)
-+	vswp		q7l, q7h
-+	vst1.64		{q7}, [r3, :128]
-+	pop		{r4, pc}
-+ENDPROC(crc_t10dif_pmull8)
-+
- 	.section	".rodata", "a"
- 	.align		4
- 
-@@ -376,3 +463,6 @@ ENDPROC(crc_t10dif_pmull64)
- 	.byte		0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f
- 	.byte		 0x0,  0x1,  0x2,  0x3,  0x4,  0x5,  0x6,  0x7
- 	.byte		 0x8,  0x9,  0xa,  0xb,  0xc,  0xd,  0xe , 0x0
-+
-+.L16x64perm:
-+	.quad		0x808080800000000, 0x909090901010101
-diff --git a/arch/arm/crypto/crct10dif-ce-glue.c b/arch/arm/crypto/crct10dif-ce-glue.c
-index 60aa79c2fcdb..a8b74523729e 100644
---- a/arch/arm/crypto/crct10dif-ce-glue.c
-+++ b/arch/arm/crypto/crct10dif-ce-glue.c
-@@ -20,6 +20,8 @@
- #define CRC_T10DIF_PMULL_CHUNK_SIZE	16U
- 
- asmlinkage u16 crc_t10dif_pmull64(u16 init_crc, const u8 *buf, size_t len);
-+asmlinkage void crc_t10dif_pmull8(u16 init_crc, const u8 *buf, size_t len,
-+				  u8 out[16]);
- 
- static int crct10dif_init(struct shash_desc *desc)
- {
-@@ -45,6 +47,27 @@ static int crct10dif_update_ce(struct shash_desc *desc, const u8 *data,
- 	return 0;
- }
- 
-+static int crct10dif_update_neon(struct shash_desc *desc, const u8 *data,
-+			         unsigned int length)
-+{
-+	u16 *crcp = shash_desc_ctx(desc);
-+	u8 buf[16] __aligned(16);
-+	u16 crc = *crcp;
-+
-+	if (length > CRC_T10DIF_PMULL_CHUNK_SIZE && crypto_simd_usable()) {
-+		kernel_neon_begin();
-+		crc_t10dif_pmull8(crc, data, length, buf);
-+		kernel_neon_end();
-+
-+		crc = 0;
-+		data = buf;
-+		length = sizeof(buf);
-+	}
-+
-+	*crcp = crc_t10dif_generic(crc, data, length);
-+	return 0;
-+}
-+
- static int crct10dif_final(struct shash_desc *desc, u8 *out)
- {
- 	u16 *crc = shash_desc_ctx(desc);
-@@ -53,7 +76,19 @@ static int crct10dif_final(struct shash_desc *desc, u8 *out)
- 	return 0;
- }
- 
--static struct shash_alg crc_t10dif_alg = {
-+static struct shash_alg algs[] = {{
-+	.digestsize		= CRC_T10DIF_DIGEST_SIZE,
-+	.init			= crct10dif_init,
-+	.update			= crct10dif_update_neon,
-+	.final			= crct10dif_final,
-+	.descsize		= CRC_T10DIF_DIGEST_SIZE,
-+
-+	.base.cra_name		= "crct10dif",
-+	.base.cra_driver_name	= "crct10dif-arm-neon",
-+	.base.cra_priority	= 150,
-+	.base.cra_blocksize	= CRC_T10DIF_BLOCK_SIZE,
-+	.base.cra_module	= THIS_MODULE,
-+}, {
- 	.digestsize		= CRC_T10DIF_DIGEST_SIZE,
- 	.init			= crct10dif_init,
- 	.update			= crct10dif_update_ce,
-@@ -65,19 +100,19 @@ static struct shash_alg crc_t10dif_alg = {
- 	.base.cra_priority	= 200,
- 	.base.cra_blocksize	= CRC_T10DIF_BLOCK_SIZE,
- 	.base.cra_module	= THIS_MODULE,
--};
-+}};
- 
- static int __init crc_t10dif_mod_init(void)
- {
--	if (!(elf_hwcap2 & HWCAP2_PMULL))
-+	if (!(elf_hwcap & HWCAP_NEON))
- 		return -ENODEV;
- 
--	return crypto_register_shash(&crc_t10dif_alg);
-+	return crypto_register_shashes(algs, 1 + !!(elf_hwcap2 & HWCAP2_PMULL));
- }
- 
- static void __exit crc_t10dif_mod_exit(void)
- {
--	crypto_unregister_shash(&crc_t10dif_alg);
-+	crypto_unregister_shashes(algs, 1 + !!(elf_hwcap2 & HWCAP2_PMULL));
- }
- 
- module_init(crc_t10dif_mod_init);
--- 
-2.47.0.199.ga7371fff76-goog
+>  
+>  obj-$(CONFIG_CRYPTO_DEV_CCP_CRYPTO) += ccp-crypto.o
+>  ccp-crypto-objs := ccp-crypto-main.o \
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> index 9810edbb272d2..9265b6d534bbe 100644
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> @@ -982,6 +982,9 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
+>  	print_hex_dump_debug("(out): ", DUMP_PREFIX_OFFSET, 16, 2, data,
+>  			     buf_len, false);
+>  
+> +	if (!ret)
+> +		snp_cmd_bookkeeping_locked(cmd, sev, data);
 
+I prefer to see this flow as:
+
+	if (ret)
+		return ret;
+
+	snp_cmd_bookkeeping_locked(cmd, sev, data);
+
+	return 0;
+
+And if you end up creating APIs to create and destroy context pages,
+then this call can be removed and each API call directly into the
+appropriate tracking function.
+
+> +
+>  	return ret;
+>  }
+>  
+> @@ -1179,6 +1182,8 @@ static int __sev_snp_init_locked(int *error)
+>  
+>  	sev_es_tmr_size = SNP_TMR_SIZE;
+>  
+> +	rc = sev_snp_platform_init_firmware_upload(sev);
+
+Since this is mainly doing memory allocation, this should be moved to
+just after the minimum firmware version check so that a failure would be
+before SNP_INIT.
+
+> +
+>  	return rc;
+>  }
+>  
+> diff --git a/drivers/crypto/ccp/sev-dev.h b/drivers/crypto/ccp/sev-dev.h
+> index 3e4e5574e88a3..28add34484ed1 100644
+> --- a/drivers/crypto/ccp/sev-dev.h
+> +++ b/drivers/crypto/ccp/sev-dev.h
+> @@ -57,6 +57,13 @@ struct sev_device {
+>  	bool cmd_buf_backup_active;
+>  
+>  	bool snp_initialized;
+> +
+> +#ifdef CONFIG_FW_UPLOAD
+
+This would be changed to whatever your new CONFIG option is.
+
+> +	u32 last_snp_asid;
+
+unsigned int max_snp_asid;
+
+> +	u64 *snp_asid_to_gctx_pages_map;
+
+s/_pages//
+
+> +	u64 *snp_unbound_gctx_pages;
+
+s/_pages//
+
+> +	u32 snp_unbound_gctx_end;
+
+unsigned int snp_unbound_gctx_end;
+
+> +#endif /* CONFIG_FW_UPLOAD */
+>  };
+>  
+>  int sev_dev_init(struct psp_device *psp);
+> @@ -65,4 +72,12 @@ void sev_dev_destroy(struct psp_device *psp);
+>  void sev_pci_init(void);
+>  void sev_pci_exit(void);
+>  
+> +#ifdef CONFIG_FW_UPLOAD
+> +void snp_cmd_bookkeeping_locked(int cmd, struct sev_device *sev, void *data);
+> +int sev_snp_platform_init_firmware_upload(struct sev_device *sev);
+> +#else
+> +static inline void snp_cmd_bookkeeping_locked(int cmd, struct sev_device *sev, void *data) { }
+> +static inline int sev_snp_platform_init_firmware_upload(struct sev_device *sev) { return 0; }
+> +#endif /* CONFIG_FW_UPLOAD */
+> +
+>  #endif /* __SEV_DEV_H */
+> diff --git a/drivers/crypto/ccp/sev-fw.c b/drivers/crypto/ccp/sev-fw.c
+> new file mode 100644
+> index 0000000000000..55a5a572da8f1
+> --- /dev/null
+> +++ b/drivers/crypto/ccp/sev-fw.c
+> @@ -0,0 +1,117 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * AMD Secure Encrypted Virtualization (SEV) firmware upload API
+> + */
+> +
+> +#include <linux/firmware.h>
+> +#include <linux/psp-sev.h>
+> +
+> +#include <asm/sev.h>
+> +
+> +#include "sev-dev.h"
+> +
+> +/*
+> + * After a gctx is created, it is used by snp_launch_start before getting
+
+s/gctx/guest context page/
+
+> + * bound to an asid. The launch protocol allocates an asid before creating a
+
+s/asid/ASID/
+
+> + * matching gctx page, so there should never be more unbound gctx pages than
+> + * there are possible SNP asids.
+> + *
+> + * The unbound gctx pages must be updated after executing DOWNLOAD_FIRMWARE_EX
+> + * and before committing the firmware.
+
+Not needed here.
+
+> + */
+> +static void snp_gctx_create_track_locked(struct sev_device *sev, void *data)
+> +{
+> +	struct sev_data_snp_addr *gctx_create = data;
+> +
+> +	/* This condition should never happen, but is needed for memory safety. */
+> +	if (sev->snp_unbound_gctx_end >= sev->last_snp_asid) {
+> +		dev_warn(sev->dev, "Too many unbound SNP GCTX pages to track\n");
+> +		return;
+
+Should this return an error and fail the command?
+
+> +	}
+> +
+> +	sev->snp_unbound_gctx_pages[sev->snp_unbound_gctx_end] = gctx_create->address;
+> +	sev->snp_unbound_gctx_end++;
+> +}
+> +
+> +/*
+> + * PREREQUISITE: The snp_activate command was successful, meaning the asid
+
+s/snp_activate/SNP_ACTIVATE/
+s/asid/ASID/
+
+> + * is in the acceptable range 1..sev->last_snp_asid.
+> + *
+> + * The gctx_paddr must be in the unbound gctx buffer.
+
+Do you mean unbound gctx array?
+
+> + */
+> +static void snp_activate_track_locked(struct sev_device *sev, void *data)
+> +{
+> +	struct sev_data_snp_activate *data_activate = data;
+> +
+> +	sev->snp_asid_to_gctx_pages_map[data_activate->asid] = data_activate->gctx_paddr;
+> +
+> +	for (int i = 0; i < sev->snp_unbound_gctx_end; i++) {
+> +		if (sev->snp_unbound_gctx_pages[i] == data_activate->gctx_paddr) {
+> +			/*
+> +			 * Swap the last unbound gctx page with the now-bound
+> +			 * gctx page to shrink the buffer.
+> +			 */
+> +			sev->snp_unbound_gctx_end--;
+> +			sev->snp_unbound_gctx_pages[i] =
+> +				sev->snp_unbound_gctx_pages[sev->snp_unbound_gctx_end];
+> +			sev->snp_unbound_gctx_pages[sev->snp_unbound_gctx_end] = 0;
+> +			break;
+> +		}
+> +	}
+
+What if it isn't found for some reason, should an error be returned and
+fail the SNP_ACTIVATE command?
+
+> +}
+> +
+> +static void snp_decommission_track_locked(struct sev_device *sev, void *data)
+> +{
+> +	struct sev_data_snp_addr *data_decommission = data;
+> +
+> +	for (int i = 1; i <= sev->last_snp_asid; i++) {
+> +		if (sev->snp_asid_to_gctx_pages_map[i] == data_decommission->address) {
+> +			sev->snp_asid_to_gctx_pages_map[i] = 0;
+> +			break;
+> +		}
+> +	}
+> +}
+> +
+> +void snp_cmd_bookkeeping_locked(int cmd, struct sev_device *sev, void *data)
+> +{
+> +	if (!sev->snp_asid_to_gctx_pages_map)
+> +		return;
+> +
+> +	switch (cmd) {
+> +	case SEV_CMD_SNP_GCTX_CREATE:
+> +		snp_gctx_create_track_locked(sev, data);
+> +		break;
+> +	case SEV_CMD_SNP_ACTIVATE:
+> +		snp_activate_track_locked(sev, data);
+> +		break;
+> +	case SEV_CMD_SNP_DECOMMISSION:
+> +		snp_decommission_track_locked(sev, data);
+> +		break;
+> +	default:
+> +		break;
+> +	}
+> +}
+> +
+> +int sev_snp_platform_init_firmware_upload(struct sev_device *sev)
+
+snp_init_guest_context_tracking
+
+> +{
+> +	u32 max_snp_asid;
+
+s/max_snp_asid/min_sev_asid/
+
+> +
+> +	/*
+> +	 * cpuid_edx(0x8000001f) is the minimum SEV ASID, hence the exclusive
+
+CPUID 0x8000001f_EDX contains the ...
+
+> +	 * maximum SEV-SNP ASID. Save the inclusive maximum to avoid confusing
+> +	 * logic elsewhere.
+> +	 */
+> +	max_snp_asid = cpuid_edx(0x8000001f);
+
+if (max_snp_asid <= 1)
+	return 0;
+
+Then the indentation below can be removed and the alignment fixed.
+
+> +	sev->last_snp_asid = max_snp_asid - 1;
+> +	if (sev->last_snp_asid) {
+> +		sev->snp_asid_to_gctx_pages_map = devm_kmalloc_array(
+> +			sev->dev, max_snp_asid * 2, sizeof(u64), GFP_KERNEL | __GFP_ZERO);
+> +		sev->snp_unbound_gctx_pages = &sev->snp_asid_to_gctx_pages_map[max_snp_asid];
+> +		if (!sev->snp_asid_to_gctx_pages_map) {
+
+I'd prefer to see the success check immediately after the allocation call.
+
+Thanks,
+Tom
+
+
+> +			dev_err(sev->dev,
+> +				"SEV-SNP: snp_asid_to_gctx_pages_map memory allocation failed\n");
+> +			return -ENOMEM;
+> +		}
+> +	}
+> +	return 0;
+> +}
