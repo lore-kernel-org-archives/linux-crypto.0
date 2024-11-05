@@ -1,453 +1,194 @@
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80AE245C18
-	for <linux-crypto@vger.kernel.org>; Tue,  5 Nov 2024 01:06:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730768786; cv=none; b=LKqWMeRXGmlLJKv34FiKwmDatinGYECRYWqia8JElObNSKby6raYGWShl6B+2QUCV74UEv3PJoYZzRjgeS7EZu0GMhBAz5AXWtIfXGENqowTtlX/aoSnFI7uyTuZJ0wNNdnBK1RhSJD6gALLPAPx/DtU9Zt8LDOLukHG1bSMVhs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730768786; c=relaxed/simple;
-	bh=/IzfL9CvW4m93cDhZ5O7Hz1vXcscHLpo5soYW7LYUBU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=XLldQ1WulR8e3OEayVgD7cwON1BctGMMETQmq6uio7yuG6GmvCpdydZ+FnHPNjqqE40GCV8eCwYnR2qs+V8N6cSk0eocLe9+GOJzc59SoPBZpx1fVo0EhycVL8TgQZR8MX5Je1DFD5O81UPN4vRNXs8cJ13KOjCG9/3/zB7Jshs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dionnaglaze.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bcVxUFe2; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--dionnaglaze.bounces.google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFFDDA94A;
+	Tue,  5 Nov 2024 01:34:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730770461; cv=fail; b=jWaqgiZamlSZga3hNsAYHMWrdV8roZHk8bkLkeUivCt4QW+PctFKTmZQmn8mlYA2qcsTOCaPiL4Qd0Se+DcKvnkN1bgCGhLPIGd7bnFHFW/RHsWWyUzrnWieSRSOrZFzYNPpXHqLYjBI/r0WSksM14XfZq0Blokj+dWvfgrjVsk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730770461; c=relaxed/simple;
+	bh=Kq+/AQFH39rrJY9ezj2wRY8L4a7LXTBxsZ985XNHysQ=;
+	h=To:Cc:Subject:From:In-Reply-To:Message-ID:References:Date:
+	 Content-Type:MIME-Version; b=fa3psEuniMCc9r4g1pOYftNOp7Fd2m1u8cwTnDynGjxDcmAWgjUT1tmQnUjVbkGSmwiweT0alVCADbAkzVttANeaHfXgrVzEiXBBXP+ce6/+Bid2oNE7qVHFqJ08cEknt99s6EerwW51M/JM6bEVAYZOy6ubhX6VBQtPcybPNRc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=dHJB/fNk; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=rqwZKjrC; arc=fail smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bcVxUFe2"
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-71e5a7bd897so5613562b3a.1
-        for <linux-crypto@vger.kernel.org>; Mon, 04 Nov 2024 17:06:24 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="dHJB/fNk";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="rqwZKjrC"
+Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A50fZfJ023927;
+	Tue, 5 Nov 2024 01:33:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=corp-2023-11-20; bh=7IB8CNdfnFOF4TldQu
+	t5IiwiWExW0itzIaBYWtKlLvk=; b=dHJB/fNkW7WQ7Bdqd1XxWyj3sPuIV/2cEv
+	0+JuwLTqIoDE3HwFeIR6snYsInpUpERifTLCVdDeZeLGGkV8TuAd26PPE4p1LvaS
+	g9UEmUpsRQBEmi6C6GGzeNMcA44IhzgyYpUHU4HcmoNKW3t/II/U3UQY7DE1mLIR
+	pWo7wBQs2hJQW2NDzF4Woxa+en9zXj3dEPh6O0CDZOjTgSgxss/qrodcSt8OlFiI
+	9iHlGF5kniFq/8bM9arjI/PwY+iT7qYKSyFiJsHpuIVoFNtMXbizXPE4sFqwleKn
+	AmkFhnuPRNjQX6+LGGJ/GI8SxMG4g5OVmndk6PAVgGYl4HyLglLA==
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 42nc4bv7ms-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 05 Nov 2024 01:33:53 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 4A50ggKd005034;
+	Tue, 5 Nov 2024 01:33:52 GMT
+Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2175.outbound.protection.outlook.com [104.47.57.175])
+	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 42p879xepe-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 05 Nov 2024 01:33:52 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=LQZ1ML04cFMXEWsudQbBc3qVUebzp2TRlCsDspgP2LopXlF5BeZbTp2Tkfzs++QfNxi2gWhmtG9opATf6Z7bBv+IQF135XZg1W0jJJlFBm0n8wyigQBGwnAauHp/G0ghAP7ijRq1LZ7drUde820YN0hQEGCYWCIYOsLveKjbd3gG9/uLvyaisSXKCx/vnf4qeltLmArqBgFhv8I3CWoFWVDNVw3HRYLn9Y+NZSLQXfJWE8zWtUIJsU3vF+5ixx3DXM9fR+L8g8dDePvCBVahjJCFkFyaMhRQ2jXZZGMeTOc1ycr78gSf6BRcT9gYYFjUHnutsNkJP0g9aZNjxDFc3w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7IB8CNdfnFOF4TldQut5IiwiWExW0itzIaBYWtKlLvk=;
+ b=AHvDPLukAj65MCoNNa5Ush2S6u/yRNjH2iBYb6M5bVfWHN2AAFE9nZw1sq/kLwIoJ/I4W+cwE4yNWcvaWB80yyFCVsfn1PlT9YXs3AP9DooA7olLXJH5a+Rxo0YC7584TSZLhpRgAC07/DN2kOABe7vYWeIdnp6IR2CnYu/nIwdfm7CXrnHEomReDAyJoc31aTdKzhhvSl+NrHjFNjU4DvjR0OLcqzBpBJth6A59HhYDf59KC+Qhk4f0kBuEkVUVMO0V2vWMMAnyoI6zeDEikwQBLuCSIdxx+FQHMqVNxehcec7laRwg53heZPjJoyQTWhRAhxzqLYIXglE8R0O7Lg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730768784; x=1731373584; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iizI1BGS8jbp1EGumTWgpgpNNFPF9nVUpu4CVNWm6HI=;
-        b=bcVxUFe2HfLdEGOHqNYuY+oM9EiPtZSHZCdI4yhDHlqt7Ib3S2ggOJzbvvIc5qPxDe
-         l5RifmJuO1p/Xxjrv84JGyvR8QMGhcuruPJIWduetULWLLmieMREZCh1N/qgu+z42K0W
-         zhTWyQO3rhjgOQVCBbux9wRfS7MLWqLeWVh38HSz19bmdfE8rSxpGMTlZZf+dc5Z6kXb
-         F9MJTiQoNjIA14WiGWcj0s48yZPjm1xjYLBkaPOlxUUMh9FCbsJFpUWex8Egwnbby54H
-         VG6ydXQy8tPuSu17cW8lHlIPB9X7RaoqOWoCV5cGaDHT/SBJ6W+j+CszddL2ThfvtlC+
-         FWrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730768784; x=1731373584;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iizI1BGS8jbp1EGumTWgpgpNNFPF9nVUpu4CVNWm6HI=;
-        b=JHwMVPjbenUqQ61t6jq6oEeHb7NF0fk1eWtYxK0andnYRphW7tHcO+beauDIVJ3wCi
-         55Vx+xHmpko8f6GUeQlFFf8t2ZWyUK7+54/s8UdhUuReGygH/NhFRWeYwE/42M3qLqhl
-         DeUvf4OCRcHZfyJpt37+tQOiLJmy7gkheP9BzLP+fiTJ6rjKQhNdFzlXynQp/iAlCOAZ
-         +U9TBjl0Z7KrR0+/zxN0xOqNlJguwXyIlrg3mKSnbp1K7u+Bn7MgF9DkGUWTj6fRmnvu
-         o4H/RARVc8RdALtAr2NjYp1lm0vICPl17Yb5gWAWD7+7/mYGcgzzCU/wJ4TTWP7siuvJ
-         r+Zw==
-X-Forwarded-Encrypted: i=1; AJvYcCXm2FgpirI2sBHa8bRu2cpN1R3k82LvWdwhD3BM4EwtifltPamFEoDAvLnoPtjR2fe4t/L+Nk6oMblAbWw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxu/5bspSvTZmXoeAGeeVSiHRDlRMAWLFtK59hsnNieEKk+vHjS
-	6Tqw+rXB+0QlystduepAq0gSC5h0e9kDXA8LR+9nQeWbq6J2yydXq1QjXMeJPrQh76gy8XXdrjH
-	GtJWFhchveuE0r9dRKc7/nw==
-X-Google-Smtp-Source: AGHT+IFY2IGtbWSAXPxiT/z81FLwvgT0S7GolQL51U68PSsc6CXYDnyycDaDfVb/TTWsrHfpiQKoTO7SLj2Dthj4+A==
-X-Received: from dionnaglaze.c.googlers.com ([fda3:e722:ac3:cc00:36:e7b8:ac13:c9e8])
- (user=dionnaglaze job=sendgmr) by 2002:a05:6a00:62c6:b0:720:b04d:8fcb with
- SMTP id d2e1a72fcca58-720b9b5c762mr34056b3a.1.1730768782716; Mon, 04 Nov 2024
- 17:06:22 -0800 (PST)
-Date: Tue,  5 Nov 2024 01:05:52 +0000
-In-Reply-To: <20241105010558.1266699-1-dionnaglaze@google.com>
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7IB8CNdfnFOF4TldQut5IiwiWExW0itzIaBYWtKlLvk=;
+ b=rqwZKjrCN0ldhFCy/X5MkVSCzCqCCPlZbaFWVs2R+FWIh4tdmVsOUQo1T2rMpXGNWF0dbauVA1qevCedS+UrRYBOdYRkB5Pcv/FpzwcYjPSEvli7AEBPNDKLXJIUQ6PUdEfxAkwTtLwmDckX0Roj8SeBrgwecNbDuBW9OuO9850=
+Received: from SN6PR10MB2957.namprd10.prod.outlook.com (2603:10b6:805:cb::19)
+ by SN7PR10MB6476.namprd10.prod.outlook.com (2603:10b6:806:2a3::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.32; Tue, 5 Nov
+ 2024 01:33:49 +0000
+Received: from SN6PR10MB2957.namprd10.prod.outlook.com
+ ([fe80::72ff:b8f4:e34b:18c]) by SN6PR10MB2957.namprd10.prod.outlook.com
+ ([fe80::72ff:b8f4:e34b:18c%4]) with mapi id 15.20.8114.015; Tue, 5 Nov 2024
+ 01:33:49 +0000
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-mips@vger.kernel.org, linux-riscv@lists.infradead.org,
+        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev,
+        sparclinux@vger.kernel.org, x86@kernel.org,
+        Ard Biesheuvel
+ <ardb@kernel.org>
+Subject: Re: [PATCH v3 18/18] scsi: target: iscsi: switch to using the
+ crc32c library
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+In-Reply-To: <20241103223154.136127-19-ebiggers@kernel.org> (Eric Biggers's
+	message of "Sun, 3 Nov 2024 14:31:54 -0800")
+Organization: Oracle Corporation
+Message-ID: <yq1bjyu5usb.fsf@ca-mkp.ca.oracle.com>
+References: <20241103223154.136127-1-ebiggers@kernel.org>
+	<20241103223154.136127-19-ebiggers@kernel.org>
+Date: Mon, 04 Nov 2024 20:33:47 -0500
+Content-Type: text/plain
+X-ClientProxiedBy: SJ0PR13CA0228.namprd13.prod.outlook.com
+ (2603:10b6:a03:2c1::23) To SN6PR10MB2957.namprd10.prod.outlook.com
+ (2603:10b6:805:cb::19)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20241105010558.1266699-1-dionnaglaze@google.com>
-X-Mailer: git-send-email 2.47.0.199.ga7371fff76-goog
-Message-ID: <20241105010558.1266699-6-dionnaglaze@google.com>
-Subject: [PATCH v4 5/6] crypto: ccp: Use firmware_upload API for SNP firmware
-From: Dionna Glaze <dionnaglaze@google.com>
-To: x86@kernel.org, linux-kernel@vger.kernel.org, 
-	Tom Lendacky <thomas.lendacky@amd.com>, John Allen <john.allen@amd.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Ashish Kalra <ashish.kalra@amd.com>
-Cc: Dionna Glaze <dionnaglaze@google.com>, linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN6PR10MB2957:EE_|SN7PR10MB6476:EE_
+X-MS-Office365-Filtering-Correlation-Id: e68e28b2-0908-4426-9f41-08dcfd39e62f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?FRuDr7RU5g2q0ZO7udvXvR7Txt0VFvkeuaUfV0aQR5Y109qNr0UMeCVoe2n+?=
+ =?us-ascii?Q?aJSI/QiCD7yea1X3Qan+I5NQDjvLVgPz4NZlVCW2Z0n6pLWs5pfgWj7u32mN?=
+ =?us-ascii?Q?dMRCM8ojRmn9G7E/pOtw6gXqTyTyxSoUkMsp8mAqvlPGab/P3MLG2rBNvjnB?=
+ =?us-ascii?Q?DTcyr+AVIqvlKRuy9g1S9Mo0Fkkkr9P0uRuPMtXnTluuP8uZ53ALYbQauY1b?=
+ =?us-ascii?Q?XmnozBjounBm+PWff0TwRYseYO/Nlnmo2zcO26pqNhm0y1COq6UMKtwoSPWd?=
+ =?us-ascii?Q?BNP7wQogcJhv2d1oYfUWpGqKihpb/M0bg6KdtINtatAU3n7STh7bF6lNMQkg?=
+ =?us-ascii?Q?oQCKFUkQl1tnwxbbe5xRyC6TZPNAtOuEMWPAyHXt6MHsh25yNsh9OUM9e5fK?=
+ =?us-ascii?Q?HuOuR5TjKjgn8vG95kVDC+1d6Ii4HR0icAerJ9mO5toBWZUvl2CmHh3yw686?=
+ =?us-ascii?Q?BrSRr8brImQ4tdQG9eYD3lzBc3qCA9RmeNRPl69lFtceooffQidqtrqSNEER?=
+ =?us-ascii?Q?ok3ryYed2OrQdg9pTxKjV+ewj/Xg0EnAtFwfw9foBZ+Kt7Q9GDyR/Sdp8JRe?=
+ =?us-ascii?Q?/2rz0NKBAXr0OuG7scXjV8gTwZhCTMtsfJrxizDeXY1lpKNEtr2xA8yiM4in?=
+ =?us-ascii?Q?Fgx/JRomgutOUlvmYj4WZC3MXtGA4YpbBaEB/7UJMtMOgwtb2riw6qg9CuIe?=
+ =?us-ascii?Q?uJuYh9ntavbFmH2At7nJuLSZ+OGZnrluOPRVTrSNDhfCfURa+oiXDAXS8HO5?=
+ =?us-ascii?Q?X8zcHFQxzWQwKii+BS+hYK9sBjh1Vlsx+Y5Sod4ApODp9FvlJedoihp2oKpW?=
+ =?us-ascii?Q?xKgmPatVNuSrikVkY+JV6fRIg5QG1rMQEPqgaSk45WXuL/gP4Y7Udatq1e+O?=
+ =?us-ascii?Q?vMnX7TekC5Bkj/Bkg9kjgyWCgykzeYIhcWsmMs4/mXAQAsyRPGiz34lVWe+Y?=
+ =?us-ascii?Q?VP4zeQRfG3IYHl7ebWwMu707FqVwbwqZ8qjd9NCYxmsptV3vVwSKKPpfr/Cz?=
+ =?us-ascii?Q?eO8KYUz2KYzffutA1Tu4i9f9Y9Tm5fdpBUW5bobYtJyNRYsOVMIeVCh8dGFt?=
+ =?us-ascii?Q?NtcZ74gTTWk9YydW17/Julye3RyaHQgYS3+dDmMZ9G+fCO26N2RY/WhqgbtM?=
+ =?us-ascii?Q?iGiu9HvKvTCZJtc18eTcywNfEgKPF/uelyK6sJ1ffEVpl+YV/yxJQwtCJUVD?=
+ =?us-ascii?Q?tEdqab3clbdAcSm7ydfHsoWIdjevrtJYcz98TMCf/Hj0/+mIindGvy2p7ilZ?=
+ =?us-ascii?Q?KmJSW5cC3ZySqNhu8nIjhjBwgKg23Yyrhl2xDt4kTLFxaaCBrpHWp8z3VwQL?=
+ =?us-ascii?Q?/ltkM9If1g2aoI6AF93n8bTt?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR10MB2957.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?5QkpAVc8Oo46ovNy4ljkzzM/A1dvIRdPxlWsTFo0JpNxmNCEI1qXqDsooKLV?=
+ =?us-ascii?Q?ttlXCpwbg/KDQX2n14mCLSpKJ8bnS8EGexmoY//uNuZ16Aavb5AjsHb2EF26?=
+ =?us-ascii?Q?THbkBergFB0nP4kIBSQYPlLkKXT4lMyfgnWkdrl+nfBPwpPeYPaGnFFOld6w?=
+ =?us-ascii?Q?mB9RRXG7D1t3W7fzsrY3i3reCJLN3mx5N27RSl8liKfzxpLeZ7Gn7Hl4zwgb?=
+ =?us-ascii?Q?moRNLscOxBr/sAMkx3IHm2tQOy53QaXN+JS0ixYMfS4pyKKbX+amIL5yajc9?=
+ =?us-ascii?Q?0B+6zyhNSJ3jhMJrqrW0+GAcscYKmfnyNWp3PLMvoOoHNlYyJ5Vqt6E9wJem?=
+ =?us-ascii?Q?RLoJOr4b+CjVaCGiOo+MCCbyOqRzK6IhTIL1bTMSUvA4gLSXhjwi/s5xOK1e?=
+ =?us-ascii?Q?l4i9LIn9EwD2x/hoRio+Chi4kfPKIAbnjn8e2KkIcpg98i8r7BPP6FLIZBKf?=
+ =?us-ascii?Q?vsx9sJFFXBA3BfaWo8aAGcz14HtoukYsk+tF7iy6Rs+1g8mXdxC53EC8pBow?=
+ =?us-ascii?Q?ThPxUc+VAOSdoaOc0ksndCCZ+Bw4AQqiGLsQXIH3RWMiv87/iNrLVooTsddB?=
+ =?us-ascii?Q?20fNew3qgHihJLbeyCOwtPvrOeoqTzd1A7BqvKt21/DXWmTkj8Ay+qi8uYlc?=
+ =?us-ascii?Q?SivrbTvW7NOy0wO8AdoHa/gs0hiqNxVvWgY4MK0+mYVrqP6ZQtkDCp/nGsrV?=
+ =?us-ascii?Q?SmKt4Bk6ds/SfBcY3Smqbo8id7vWrZ5Ap6MsRlac21MMeRLsI3q3A1LG82Vn?=
+ =?us-ascii?Q?FKs4giY4/RiOyyGRlZrH4h0tjPfsSS1zm22ss33p677I6SgEUEV/MMWOKRmb?=
+ =?us-ascii?Q?1tvhMUq2LSpU+52MpvShbU6CNMuIHa/YwAp2sx3xnwHBFl74zR182LLS5ZlV?=
+ =?us-ascii?Q?Y6BgifOwxz6eofCYfXTST6lLNhzw/o9DJec7IpSTe1k0WUZb/jyNesuBtwJs?=
+ =?us-ascii?Q?JF4UTbYdaKIfjwdwwKkD2A1/5jPfLZmGQDI7etUu2v1Hf2sQopk6vezE8KS3?=
+ =?us-ascii?Q?gsR4dd1PZLUBxBGjm/wDwNSob61ujUooPzvaOj5E/i+AyZO/KgSph4qOcHsh?=
+ =?us-ascii?Q?J5iMmbaJTZdGZWQeSpnmKChY3gOKBGmkR5Qn93UgzNm7ycxCxAbFL/opHFxz?=
+ =?us-ascii?Q?zWoKftsp6ybzFNTiXKjV4HIwe+h611lmo7krCpsQiezTiWQZAmR1c0PjcJ98?=
+ =?us-ascii?Q?uTFJ7MHBIuD/VmxqEbXjf2hvZo74pqui64tYqz9PBA7gds3LmsaDnhHTcR30?=
+ =?us-ascii?Q?9LNIhvjKe/9oeaY9OQezh6J0Hd3LOTjz5XXPTtYD1n9m75SoDPG5RB3CxV30?=
+ =?us-ascii?Q?xAhOwJ8qiTjJ9TAl1fQdH4opQ1ZzpcmCui1h7wvl8tKjSV7ywVFxvKML3wRh?=
+ =?us-ascii?Q?tH5CCmlQdjJdUWbw1SvJBMpR/TDi3KSQl5aLF/9kP1Gxul3D/kx3+liROkV1?=
+ =?us-ascii?Q?Kr/wMPXm0DdH8Oo4/ab0F9r6v4oa3zKiaX+URxXhIZFaSP6QSQ9eF+R0ja5L?=
+ =?us-ascii?Q?F/WaMjAGsjEFppG8P1irA8NlXxdfRaQCXHC9rgTYzF1tb++EMhraAYEgXske?=
+ =?us-ascii?Q?alOz3TZtctec8yn7uT2H/Zqt89laFgMiHt11sf4h+jZ5O0hTpubl9Fzv1qeb?=
+ =?us-ascii?Q?Jw=3D=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	qOTAdrk+VxxIS9XP8QJcNTaoD6J7wG6733BATC9QZ+yN8gSaVxYJ3Zh87IkXNFFfXvm/sXZHytS9LWru7uN+ME7JQA3Fhl9xCcDmQieE/N9W31Et1ndfdUpegzOfMfMRVF5zhJiHm3kPrbGIq9ytGTrmEzUuK9fsNJTAqwAPVhSB33AHWK1ecGeu9Afzg7gNUivjxSYPGMvf4/QZR0qqpX4YVwF2YdyBjMO17O1qmpVaS8FFARyyB6pmWAJilTLwCRw+qqw+fjKCbaKXTEe9HNLWfb3J4XX4vyVnMKYlACpTtfqRVXkMBOoelOivq52tryXineEx6HhQwqupMWwqJHYLavhQZQypXXcJtxu2x2f5PtbCVOOrXE3Tbhz7CP3Q0KD533RDb2YHrBhqXinP0aQXmbMvl4uYWpvWsK6TKslJ2mQfXgRif+eUn/rxI8/w7sv9tll+khZQ+Y3J6F5xyz/YsnyNpJNXRe6xrFAJbcaGzVkGcC4KkY9j4J2TE3A++4gStGrAydrg9V0fD6rMje2A3pTl4pJzWBmGHg/4Dt+iuif6sGG6xGnYvEvm+EM6rTg2p45Kfy1WuJOZBV3oV9zgSrSbxrYoXtni7y08I8E=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e68e28b2-0908-4426-9f41-08dcfd39e62f
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR10MB2957.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Nov 2024 01:33:49.7656
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2yEi59SUlAfl2Lu/OVWOOlm/x2ZrMyY2iMQxhWsKNKv8KgDEGfNFJ+eG2otCSwc6eJrd3817hfu/ia/mEf77ZopzACNPDwmipxcOS3hrmd4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR10MB6476
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-11-04_22,2024-11-04_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 adultscore=0 spamscore=0
+ mlxlogscore=999 phishscore=0 malwarescore=0 bulkscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2409260000
+ definitions=main-2411050011
+X-Proofpoint-ORIG-GUID: zs8GZAjkthqksiW3uwoFJcptg6625-0g
+X-Proofpoint-GUID: zs8GZAjkthqksiW3uwoFJcptg6625-0g
 
-On init, the ccp device will make /sys/class/firmware/amd/loading etc
-firmware upload API attributes available to late-load a SEV-SNP firmware
-binary.
 
-The firmware upload api errors reported are actionable in the following
-ways:
-* FW_UPLOAD_ERR_HW_ERROR: the machine is in an unstable state and must
-  be reset.
-* FW_UPLOAD_ERR_RW_ERROR: the firmware update went bad but can be
-  recovered by hotloading the previous firmware version.
-  Also used in the case that the kernel used the API wrong (bug).
-* FW_UPLOAD_ERR_FW_INVALID: user error with the data provided, but no
-  instability is expected and no recovery actions are needed.
-* FW_UPLOAD_ERR_BUSY: upload attempted at a bad time either due to
-  overload or the machine is in the wrong platform state.
+Eric,
 
-synthetic_restore_required:
-Instead of tracking the status of whether an individual GCTX is safe for
-use in a firmware command, force all following commands to fail with an
-error that is indicative of needing a firmware rollback.
+> Now that the crc32c() library function directly takes advantage of
+> architecture-specific optimizations, it is unnecessary to go through
+> the crypto API. Just use crc32c(). This is much simpler, and it
+> improves performance due to eliminating the crypto API overhead.
 
-To test:
-1. Build the kernel enabling SEV-SNP as normal and add CONFIG_FW_UPLOAD=y.
-2. Add the following to your kernel_cmdline: ccp.psp_init_on_probe=0.
-3.Get an AMD SEV-SNP firmware sbin appropriate to your Epyc chip model at
-https://www.amd.com/en/developer/sev.html and extract to get a .sbin
-file.
-4. Run the following with your sbinfile in FW:
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 
-echo 1 > /sys/class/firmware/snp_dlfw_ex/loading
-cat "${FW?}" > /sys/class/firmware/snp_dlfw_ex/data
-echo 0 > /sys/class/firmware/snp_dlfw_ex/loading
-
-5. Verify the firmware update message in dmesg.
-
-Co-developed-by: Ashish Kalra <ashish.kalra@amd.com>
-Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-Tested-by: Ashish Kalra <ashish.kalra@amd.com>
-Signed-off-by: Dionna Glaze <dionnaglaze@google.com>
----
- drivers/crypto/ccp/Kconfig   |   2 +
- drivers/crypto/ccp/sev-dev.c |  12 +-
- drivers/crypto/ccp/sev-dev.h |  16 +++
- drivers/crypto/ccp/sev-fw.c  | 213 +++++++++++++++++++++++++++++++++++
- 4 files changed, 241 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/crypto/ccp/Kconfig b/drivers/crypto/ccp/Kconfig
-index f394e45e11ab4..520b1c84d11f4 100644
---- a/drivers/crypto/ccp/Kconfig
-+++ b/drivers/crypto/ccp/Kconfig
-@@ -39,6 +39,8 @@ config CRYPTO_DEV_SP_PSP
- 	bool "Platform Security Processor (PSP) device"
- 	default y
- 	depends on CRYPTO_DEV_CCP_DD && X86_64 && AMD_IOMMU
-+	select FW_LOADER
-+	select FW_UPLOAD
- 	help
- 	 Provide support for the AMD Platform Security Processor (PSP).
- 	 The PSP is a dedicated processor that provides support for key
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 32f7b6147905e..8c73f023b6420 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -485,7 +485,7 @@ void snp_free_firmware_page(void *addr)
- }
- EXPORT_SYMBOL_GPL(snp_free_firmware_page);
- 
--static void *sev_fw_alloc(unsigned long len)
-+void *sev_fw_alloc(unsigned long len)
- {
- 	struct page *page;
- 
-@@ -853,6 +853,10 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
- 	if (WARN_ON_ONCE(!data != !buf_len))
- 		return -EINVAL;
- 
-+	ret = sev_snp_synthetic_error(sev, psp_ret);
-+	if (ret)
-+		return ret;
-+
- 	/*
- 	 * Copy the incoming data to driver's scratch buffer as __pa() will not
- 	 * work for some memory, e.g. vmalloc'd addresses, and @data may not be
-@@ -1523,7 +1527,7 @@ void *psp_copy_user_blob(u64 uaddr, u32 len)
- }
- EXPORT_SYMBOL_GPL(psp_copy_user_blob);
- 
--static int sev_get_api_version(void)
-+int sev_get_api_version(void)
- {
- 	struct sev_device *sev = psp_master->sev_data;
- 	struct sev_user_data_status status;
-@@ -2320,6 +2324,8 @@ int sev_dev_init(struct psp_device *psp)
- 	if (ret)
- 		goto e_irq;
- 
-+	sev_snp_dev_init_firmware_upload(sev);
-+
- 	dev_notice(dev, "sev enabled\n");
- 
- 	return 0;
-@@ -2398,6 +2404,8 @@ void sev_dev_destroy(struct psp_device *psp)
- 		kref_put(&misc_dev->refcount, sev_exit);
- 
- 	psp_clear_sev_irq_handler(psp);
-+
-+	sev_snp_dev_init_firmware_upload(sev);
- }
- 
- static int snp_shutdown_on_panic(struct notifier_block *nb,
-diff --git a/drivers/crypto/ccp/sev-dev.h b/drivers/crypto/ccp/sev-dev.h
-index 28add34484ed1..52a423e7df84f 100644
---- a/drivers/crypto/ccp/sev-dev.h
-+++ b/drivers/crypto/ccp/sev-dev.h
-@@ -59,7 +59,13 @@ struct sev_device {
- 	bool snp_initialized;
- 
- #ifdef CONFIG_FW_UPLOAD
-+	/* Lock to protect fw_cancel */
-+	struct mutex fw_lock;
-+	struct fw_upload *fwl;
-+	bool fw_cancel;
-+
- 	u32 last_snp_asid;
-+	bool synthetic_restore_required;
- 	u64 *snp_asid_to_gctx_pages_map;
- 	u64 *snp_unbound_gctx_pages;
- 	u32 snp_unbound_gctx_end;
-@@ -72,12 +78,22 @@ void sev_dev_destroy(struct psp_device *psp);
- void sev_pci_init(void);
- void sev_pci_exit(void);
- 
-+void *sev_fw_alloc(unsigned long len);
-+int sev_get_api_version(void);
-+int sev_snp_download_firmware_ex(struct sev_device *sev, const u8 *data, u32 size, int *error);
-+
- #ifdef CONFIG_FW_UPLOAD
- void snp_cmd_bookkeeping_locked(int cmd, struct sev_device *sev, void *data);
- int sev_snp_platform_init_firmware_upload(struct sev_device *sev);
-+void sev_snp_dev_init_firmware_upload(struct sev_device *sev);
-+void sev_snp_destroy_firmware_upload(struct sev_device *sev);
-+int sev_snp_synthetic_error(struct sev_device *sev, int *psp_ret);
- #else
- static inline void snp_cmd_bookkeeping_locked(int cmd, struct sev_device *sev, void *data) { }
- static inline int sev_snp_platform_init_firmware_upload(struct sev_device *sev) { return 0; }
-+static inline void sev_snp_dev_init_firmware_upload(struct sev_device *sev) { }
-+static inline void sev_snp_destroy_firmware_upload(struct sev_device *sev) { }
-+static inline int sev_snp_synthetic_error(struct sev_device *sev, int *psp_ret) { return 0; }
- #endif /* CONFIG_FW_UPLOAD */
- 
- #endif /* __SEV_DEV_H */
-diff --git a/drivers/crypto/ccp/sev-fw.c b/drivers/crypto/ccp/sev-fw.c
-index 55a5a572da8f1..97ce90f2af29a 100644
---- a/drivers/crypto/ccp/sev-fw.c
-+++ b/drivers/crypto/ccp/sev-fw.c
-@@ -4,6 +4,7 @@
-  */
- 
- #include <linux/firmware.h>
-+#include <linux/psp.h>
- #include <linux/psp-sev.h>
- 
- #include <asm/sev.h>
-@@ -115,3 +116,215 @@ int sev_snp_platform_init_firmware_upload(struct sev_device *sev)
- 	}
- 	return 0;
- }
-+
-+static enum fw_upload_err snp_dlfw_ex_prepare(struct fw_upload *fw_upload,
-+					      const u8 *data, u32 size)
-+{
-+	return FW_UPLOAD_ERR_NONE;
-+}
-+
-+static enum fw_upload_err snp_dlfw_ex_poll_complete(struct fw_upload *fw_upload)
-+{
-+	return FW_UPLOAD_ERR_NONE;
-+}
-+
-+/*
-+ * This may be called asynchronously with an on-going update.  All other
-+ * functions are called sequentially in a single thread. To avoid contention on
-+ * register accesses, only update the cancel_request flag. Other functions will
-+ * check this flag and handle the cancel request synchronously.
-+ */
-+static void snp_dlfw_ex_cancel(struct fw_upload *fw_upload)
-+{
-+	struct sev_device *sev = fw_upload->dd_handle;
-+
-+	mutex_lock(&sev->fw_lock);
-+	sev->fw_cancel = true;
-+	mutex_unlock(&sev->fw_lock);
-+}
-+
-+static enum fw_upload_err snp_dlfw_ex_err_translate(struct sev_device *sev, int psp_ret)
-+{
-+	dev_dbg(sev->dev, "Failed to update SEV firmware: %#x\n", psp_ret);
-+	/*
-+	 * Operation error:
-+	 *   HW_ERROR: Critical error. Machine needs repairs now.
-+	 *   RW_ERROR: Severe error. Roll back to the prior version to recover.
-+	 * User error:
-+	 *   FW_INVALID: Bad input for this interface.
-+	 *   BUSY: Wrong machine state to run download_firmware_ex.
-+	 */
-+	switch (psp_ret) {
-+	case SEV_RET_RESTORE_REQUIRED:
-+		dev_warn(sev->dev, "Firmware updated but unusable\n");
-+		dev_warn(sev->dev, "Need to do manual firmware rollback!!!\n");
-+		return FW_UPLOAD_ERR_RW_ERROR;
-+	case SEV_RET_SHUTDOWN_REQUIRED:
-+		/* No state changes made. Not a hardware error. */
-+		dev_warn(sev->dev, "Firmware image cannot be live updated\n");
-+		return FW_UPLOAD_ERR_FW_INVALID;
-+	case SEV_RET_BAD_VERSION:
-+		/* No state changes made. Not a hardware error. */
-+		dev_warn(sev->dev, "Firmware image is not well formed\n");
-+		return FW_UPLOAD_ERR_FW_INVALID;
-+		/* SEV-specific errors that can still happen. */
-+	case SEV_RET_BAD_SIGNATURE:
-+		/* No state changes made. Not a hardware error. */
-+		dev_warn(sev->dev, "Firmware image signature is bad\n");
-+		return FW_UPLOAD_ERR_FW_INVALID;
-+	case SEV_RET_INVALID_PLATFORM_STATE:
-+		/* Calling at the wrong time. Not a hardware error. */
-+		dev_warn(sev->dev, "Firmware not updated as SEV in INIT state\n");
-+		return FW_UPLOAD_ERR_BUSY;
-+	case SEV_RET_HWSEV_RET_UNSAFE:
-+		dev_err(sev->dev, "Firmware is unstable. Reset your machine!!!\n");
-+		return FW_UPLOAD_ERR_HW_ERROR;
-+		/* Kernel bug cases. */
-+	case SEV_RET_INVALID_PARAM:
-+		dev_err(sev->dev, "Download-firmware-EX invalid parameter\n");
-+		return FW_UPLOAD_ERR_RW_ERROR;
-+	case SEV_RET_INVALID_ADDRESS:
-+		dev_err(sev->dev, "Download-firmware-EX invalid address\n");
-+		return FW_UPLOAD_ERR_RW_ERROR;
-+	default:
-+		dev_err(sev->dev, "Unhandled download_firmware_ex err %d\n", psp_ret);
-+		return FW_UPLOAD_ERR_HW_ERROR;
-+	}
-+}
-+
-+static enum fw_upload_err snp_update_guest_statuses(struct sev_device *sev)
-+{
-+	struct sev_data_snp_guest_status status_data;
-+	void *snp_guest_status;
-+	enum fw_upload_err ret;
-+	int error;
-+
-+	/*
-+	 * Force an update of guest context pages after SEV firmware
-+	 * live update by issuing SNP_GUEST_STATUS on all guest
-+	 * context pages.
-+	 */
-+	snp_guest_status = sev_fw_alloc(PAGE_SIZE);
-+	if (!snp_guest_status)
-+		return FW_UPLOAD_ERR_INVALID_SIZE;
-+
-+	/*
-+	 * After the last bound asid-to-gctx page is snp_unbound_gctx_end-many
-+	 * unbound gctx pages that also need updating.
-+	 */
-+	for (int i = 1; i <= sev->last_snp_asid + sev->snp_unbound_gctx_end; i++) {
-+		if (sev->snp_asid_to_gctx_pages_map[i]) {
-+			status_data.gctx_paddr = sev->snp_asid_to_gctx_pages_map[i];
-+			status_data.address = __psp_pa(snp_guest_status);
-+			ret = sev_do_cmd(SEV_CMD_SNP_GUEST_STATUS, &status_data, &error);
-+			if (ret) {
-+				/*
-+				 * Handle race with SNP VM being destroyed/decommissoned,
-+				 * if guest context page invalid error is returned,
-+				 * assume guest has been destroyed.
-+				 */
-+				if (error == SEV_RET_INVALID_GUEST)
-+					continue;
-+				sev->synthetic_restore_required = true;
-+				dev_err(sev->dev, "SNP GCTX update error: %#x\n", error);
-+				dev_err(sev->dev, "Roll back SNP firmware!\n");
-+				snp_free_firmware_page(snp_guest_status);
-+				ret = FW_UPLOAD_ERR_RW_ERROR;
-+				goto fw_err;
-+			}
-+		}
-+	}
-+fw_err:
-+	snp_free_firmware_page(snp_guest_status);
-+	return ret;
-+}
-+
-+static enum fw_upload_err snp_dlfw_ex_write(struct fw_upload *fwl, const u8 *data,
-+					    u32 offset, u32 size, u32 *written)
-+{
-+	struct sev_device *sev = fwl->dd_handle;
-+	u8 api_major, api_minor, build;
-+	int ret, error;
-+	bool cancel;
-+
-+	if (!sev)
-+		return FW_UPLOAD_ERR_HW_ERROR;
-+
-+	mutex_lock(&sev->fw_lock);
-+	cancel = sev->fw_cancel;
-+	mutex_unlock(&sev->fw_lock);
-+
-+	if (cancel)
-+		return FW_UPLOAD_ERR_CANCELED;
-+
-+	/*
-+	 * SEV firmware update is a one-shot update operation, the write()
-+	 * callback to be invoked multiple times for the same update is
-+	 * unexpected.
-+	 */
-+	if (offset)
-+		return FW_UPLOAD_ERR_INVALID_SIZE;
-+
-+	if (sev_get_api_version())
-+		return FW_UPLOAD_ERR_HW_ERROR;
-+
-+	api_major = sev->api_major;
-+	api_minor = sev->api_minor;
-+	build     = sev->build;
-+
-+	ret = sev_snp_download_firmware_ex(sev, data, size, &error);
-+	if (ret)
-+		return snp_dlfw_ex_err_translate(sev, error);
-+
-+	ret = snp_update_guest_statuses(sev);
-+	if (ret)
-+		return ret;
-+
-+	sev_get_api_version();
-+	if (api_major != sev->api_major || api_minor != sev->api_minor ||
-+	    build != sev->build) {
-+		dev_info(sev->dev, "SEV firmware updated from %d.%d.%d to %d.%d.%d\n",
-+			 api_major, api_minor, build,
-+			 sev->api_major, sev->api_minor, sev->build);
-+	} else {
-+		dev_info(sev->dev, "SEV firmware same as old %d.%d.%d\n",
-+			 api_major, api_minor, build);
-+	}
-+
-+	*written = size;
-+	return FW_UPLOAD_ERR_NONE;
-+}
-+
-+static const struct fw_upload_ops snp_dlfw_ex_ops = {
-+	.prepare = snp_dlfw_ex_prepare,
-+	.write = snp_dlfw_ex_write,
-+	.poll_complete = snp_dlfw_ex_poll_complete,
-+	.cancel = snp_dlfw_ex_cancel,
-+};
-+
-+void sev_snp_dev_init_firmware_upload(struct sev_device *sev)
-+{
-+	struct fw_upload *fwl;
-+
-+	fwl = firmware_upload_register(THIS_MODULE, sev->dev, "snp_dlfw_ex", &snp_dlfw_ex_ops, sev);
-+
-+	if (IS_ERR(fwl))
-+		dev_err(sev->dev, "SEV firmware upload initialization error %ld\n", PTR_ERR(fwl));
-+
-+	sev->fwl = fwl;
-+	mutex_init(&sev->fw_lock);
-+}
-+
-+void sev_snp_destroy_firmware_upload(struct sev_device *sev)
-+{
-+	firmware_upload_unregister(sev->fwl);
-+}
-+
-+int sev_snp_synthetic_error(struct sev_device *sev, int *psp_ret)
-+{
-+	if (sev->synthetic_restore_required) {
-+		*psp_ret = SEV_RET_RESTORE_REQUIRED;
-+		return -EIO;
-+	}
-+	return 0;
-+}
 -- 
-2.47.0.199.ga7371fff76-goog
-
+Martin K. Petersen	Oracle Linux Engineering
