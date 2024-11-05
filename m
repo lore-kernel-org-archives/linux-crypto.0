@@ -1,65 +1,66 @@
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2053.outbound.protection.outlook.com [40.107.220.53])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2078.outbound.protection.outlook.com [40.107.236.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A5951D9A48;
-	Tue,  5 Nov 2024 21:06:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70A2313CFA8;
+	Tue,  5 Nov 2024 21:58:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.78
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730840801; cv=fail; b=lWWnSjpb10+QDtyaYhIj20YiObD28Hc47+6EXcMcUjbLeiNGbh1eHiaJVuQNjcFbg5MLa2BDrR7PSiuGWuULI/bcAQT+zHfMXXz/CBMM0rB78bzcyDRoHh8b3CiMz1bf26vlHMlNKRtwb7VIUlkF4+y0I+Y5Ov2xTvcNT4ji95g=
+	t=1730843930; cv=fail; b=n31784X6lnGLkUKptjMXQyUQBcXY1NfU4+/MqDY5ArKVXQ2E3r21U41LtnhzvwnldCNy2MCCFfFBkeg2qRrSxuuaVslvZW2JeQtmdPHx4aBcURrnLgqSnHi6YKRIt8VqYdP0sWoXoS47B+9adDQkKry6Jx7dLc7Xm/XbZPfM5Lk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730840801; c=relaxed/simple;
-	bh=H7XXVX/knbhHHsy7glChgAQCkmjVwxIgLt1ndT554BM=;
+	s=arc-20240116; t=1730843930; c=relaxed/simple;
+	bh=01u3AUsDZtZ9Erfd9VZR9bNKYm6ehD5e+48k6Jv6lcc=;
 	h=Message-ID:Date:To:Cc:References:From:Subject:In-Reply-To:
-	 Content-Type:MIME-Version; b=RXNrjvEhAZfiytQ9dq0qsZ/0TplRfRHbPfbZPpMRRVYvKk3edFyLeF5ev3JhMUfO+IRc+gQJypzFEjbukW6v0bmMjegnGeaG9VapJ39Y6nAm8TamdFoE6PBO2MGe5xcdgSnEkrhrVsizs5azmAiG1H8qgHbBsUA+UudEOTBoJjI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=rqb8rjXu; arc=fail smtp.client-ip=40.107.220.53
+	 Content-Type:MIME-Version; b=KlRjd8AM3Sva8sc1ynvqbNuYb0W5dbfPXMCa69A2zTfziNlOtBoKZ79ksDiPNhgNelVt7dPYIw3cPCBcd+OT6k+25Ui6QvxAeJFAkxpmxBCxHu7tC3KwveXp6t3uF8tcELsSWraXK82xFzkrhgOu9O/4a7mJ9fbVF1hN4xAQNZI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=fzzuY5b4; arc=fail smtp.client-ip=40.107.236.78
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="rqb8rjXu"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="fzzuY5b4"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=yjN355WayZjJ3KyRslhprL1Lb6DM0kken8kS7JWlP/lW4quYijwZMWUiZ0L2ZcHnB60RFB4gxWPR+hScDBQknMKcQI0TooYDv2Ov6xyc9EcAfyngpYahEJne4HknJlkG+yuHP/4psRoRsRxVKH3zq/vC/xz/m9va2yZbVzwE8ojK5t5iBMwRogCo+Wrd8gUw13HgtnoQ5lV+lNQ73VmWgxFsvR3WCyMasY+YaCZ+BS1/u5qJHcGtwb3hRC8rEKPTeb6ea2EphHW9D/uZzP84y4+gSUzELLqepFxd5q949T2dZ11QOLAvkIf9CN9M2dFoDMoiN+YqIAloCUpEgq5aow==
+ b=LWZq7YMQqXoAQUbT7/zcU/WoHUSpYwhR10bkqLkrOw5C+RKGilpENtUb/nMsbGI38xwqsTJlF0SSArEmhd/DeKx85fI7aqRHG0dGfVOyrEX3Z0eGvETBY0w1qZ+1Y1Kz25+ptj0EtwAKmQbn9yfzTa/TbUGw9eFprwDj1nH7IDDu2yP9C4WdxKjIsiMyeqMI3+dmOKs61BOXME1/3zlzpnHxoa9B+xi8eJZUCE97uZw8uI0lEvXB3cx8sh1ZwmV3GB3G1eVh6PVPP10BwvwXyyFytMbI24vmg3wkJoKKxocQtIsXCSrTu9DvEOIk7k28HRdeK44W1vqQsL692CY9BQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nY3FNUKMl93lpykl+8N6hxkl3T/k+8SVfJY2TdXiyo8=;
- b=gp7HMY5m3O5e28AjfAPURi2CoWz3IQYcf9xlqr7p5ttIt6BShBBAZNVVYz1R9HzzYqrgdjQ2kSvRCDlw6g8hQBxIs8/lvE0C2Hm0Hw3MBv617/CftEBYl0CzBZ1t6rnYllbLdEALeykmUde8qI9ZrDIhpJMl5K6b92l2v5pIltvspZ7pY3NwjkwJVw+uRvT4ahAYQxvsOZBj5QJipGd5t4JKonFDUNVDNAkzhPnx4Z/fhtgncjrG/gwok/xMWUu+CG84+SQhipoNHoTgvIs48fjSLG45sNP4ZM0rlvADPQCvsfrYhPXHrHMIMZn6l3Prfw5axXrnqmCl9Psmgnwcaw==
+ bh=i7DtbRl3+v0x0LvCtxgL9B9Sxb3ZwQ3IMCRVw402SGs=;
+ b=O3aF7Ercx4yp4ljpzlLqlRlxfpjRP8PVQzGFh51jX+bbnQYxhQTXAQ1Oop9gkUWE0U+FjwfXNLOALG3btmim/folL2PAte+xMjOIvx71rHOC4FraBS/bLEzbXk5O66CYnLom6Zd4sAvNGf3OXmCtYadr7GOamiSvjc0FAocJJq9zLjJOcKDcOF1kNjptcDU8IL9auWxRo2E5XckxFigLBVU/ZGrGNKqdn8CXYPcXA2EP5EMMABOUoccgLz1CNVlAWmIhGjl52JauXs57RViY0w/SuyXiWQb0XLZFOO8Crw9kzY7TfQvOkwxUqyI5c641Fu6n5A1zbLZlw+rVH8CLsw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nY3FNUKMl93lpykl+8N6hxkl3T/k+8SVfJY2TdXiyo8=;
- b=rqb8rjXuPpQ5VJSgPjF7UKod2MH+2dasY3msbCN8nufyQfBx0NbNt2CTZvoyvhcNWCCvTj5bStYXFGpi/SjCO3KPY2b2CSxGc5y+taCkF+AQ4QXQFZghfu7omkAO9BYNEOpKqMaF7lVYswjq5cVCp95mI7mlu0wf2RvthoE2m7Q=
+ bh=i7DtbRl3+v0x0LvCtxgL9B9Sxb3ZwQ3IMCRVw402SGs=;
+ b=fzzuY5b4A8dDIPvKaf4PJF7VxezKnbWzod6ZmpIsOYXW3Ni7uvdPaBWkdFtSqgss4bg5g89xeuZO6pO7I532/BxFD70+eXlyX4nLv3MCiWtXf4zcqeufXvlBzLsVEPmkHbBCHzjUoE6s6gzhMGTsQ/2a9cxko4ajGTcrh+0T0kQ=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from DM4PR12MB5070.namprd12.prod.outlook.com (2603:10b6:5:389::22)
- by CY5PR12MB6624.namprd12.prod.outlook.com (2603:10b6:930:40::14) with
+ by LV8PR12MB9229.namprd12.prod.outlook.com (2603:10b6:408:191::14) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8114.31; Tue, 5 Nov
- 2024 21:06:34 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8114.30; Tue, 5 Nov
+ 2024 21:58:45 +0000
 Received: from DM4PR12MB5070.namprd12.prod.outlook.com
  ([fe80::20a9:919e:fd6b:5a6e]) by DM4PR12MB5070.namprd12.prod.outlook.com
  ([fe80::20a9:919e:fd6b:5a6e%5]) with mapi id 15.20.8114.031; Tue, 5 Nov 2024
- 21:06:34 +0000
-Message-ID: <7a8a20be-3942-5d5c-719c-2e02d0a85b6c@amd.com>
-Date: Tue, 5 Nov 2024 15:06:32 -0600
+ 21:58:45 +0000
+Message-ID: <f6810eb0-3834-e5b4-6c1f-9422dfff5560@amd.com>
+Date: Tue, 5 Nov 2024 15:58:43 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.15.1
+Content-Language: en-US
 To: Dionna Glaze <dionnaglaze@google.com>, x86@kernel.org,
- linux-kernel@vger.kernel.org, John Allen <john.allen@amd.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, Ashish Kalra <ashish.kalra@amd.com>
+ linux-kernel@vger.kernel.org, Ashish Kalra <ashish.kalra@amd.com>,
+ John Allen <john.allen@amd.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, Michael Roth
+ <michael.roth@amd.com>, Borislav Petkov <bp@alien8.de>
 Cc: linux-crypto@vger.kernel.org
 References: <20241105010558.1266699-1-dionnaglaze@google.com>
- <20241105010558.1266699-4-dionnaglaze@google.com>
-Content-Language: en-US
+ <20241105010558.1266699-5-dionnaglaze@google.com>
 From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH v4 3/6] crypto: ccp: Track GCTX through sev commands
-In-Reply-To: <20241105010558.1266699-4-dionnaglaze@google.com>
+Subject: Re: [PATCH v4 4/6] crypto: ccp: Add DOWNLOAD_FIRMWARE_EX support
+In-Reply-To: <20241105010558.1266699-5-dionnaglaze@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA9PR13CA0151.namprd13.prod.outlook.com
- (2603:10b6:806:28::6) To DM4PR12MB5070.namprd12.prod.outlook.com
+X-ClientProxiedBy: SA1P222CA0111.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:806:3c5::8) To DM4PR12MB5070.namprd12.prod.outlook.com
  (2603:10b6:5:389::22)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -68,408 +69,324 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|CY5PR12MB6624:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2208589f-7aea-4a38-4504-08dcfdddbac0
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|LV8PR12MB9229:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1f31b00d-0e3f-4a07-4b9d-08dcfde50522
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Ull0Vm0vcnp3WEZqRVg4bFNnMVAyS0lsU3o4eFY3UUhDcmNnNHNodDhORjJh?=
- =?utf-8?B?RThrRWl4T1NrQys4bHFrYkd2YnlIWEI4a1RNMGNiWTE5VmNBbGdBeW0ydXZp?=
- =?utf-8?B?TGNQSkE2eGZTdXN4T3RnR1pOR3k3RTgzODVVMEc0QVRqN3JJc0YyZXdHeThp?=
- =?utf-8?B?ZWt0RktOdXBzbmRQZFpnSXVGMHZqTkdKYVBSWWtaU1NoVk13aHdHeDlMZmdl?=
- =?utf-8?B?STZMNXNEWGNGQ1YwQi9IM2Jzd0tWUzFPdGZSUXZTTWllYkZ6SytIMi9WVUlX?=
- =?utf-8?B?TEtFWDAvUFJEa3ZFdW9CYVJqbml4bFlXY3BqVEdKMFU5dFZIR08wTVE2NWxt?=
- =?utf-8?B?dDk3SVZGa0FKL1VjS053OVUwVHFLSk84cEQxeU1ERVdTOE5FaDJ4S2NsSlcv?=
- =?utf-8?B?ZWM5YkF3V2xaUlNXOHNBQkdrZWJ3VEFRYTRzTHFUY3RVNVQ3eHIzWlBSRzFp?=
- =?utf-8?B?WHZZM3oxUENYMUNLdml6N1VSeW9QR2d4VkFEczUvdnFoWTFCZGM0V241bGpJ?=
- =?utf-8?B?L1crVHVxRzZTVll0Rm9IVUxXckxiMFdCajlCRy9jM0I5RXpkUnh4Y3NLQnk2?=
- =?utf-8?B?UDJ4T1QvMFRoVkRmdDc4cHFLUVd3V2NacDViU1A4bUp6ZC84OFJKa2RYRnAy?=
- =?utf-8?B?NnpoVmNVcE5Nc3lWOWNVOTQzNFBSM1QzUzF2UUtZNHJzaG1kbFZ3VlJmMy96?=
- =?utf-8?B?SmxSL2tQQllZVmRtUlp3UFpFZW9lakxpeVpiRDBDZ1VHTmw0V0ZCN2dRWUdC?=
- =?utf-8?B?ZWZZY3BuMG1KVmppNVVBZEFqb0M4alhsT1d3cGFJUDlPYkk3cUxLZUtjUHho?=
- =?utf-8?B?ZzdDQmpibTNXc0x5RkFnYmoyMWhoTjRnYk94bk95MkxYWFBiOGxDbVdrV0s5?=
- =?utf-8?B?Tkc5Nk5UTkhKcVhRc2JBSnVIWS9OL0h2UTdnWGRDVXFxbzVCRVJQL09HeCtF?=
- =?utf-8?B?Wm8rMEhMUG9hMnN0QlRveE9DUmZ6VnFFNEJncmx6U0gwVGNHbnhGbWtINnRi?=
- =?utf-8?B?NElVaVcrVjAybHpRaTBwamMzc0FaY2VXOVBYUG1oQURQeGVPcTJacXo4MFZS?=
- =?utf-8?B?OVJnbnRzSmFvMlJzeGJRZmZ5OG5JUUNodjJGODJER1hWeEtPL0pKSUNjM3hO?=
- =?utf-8?B?SmZzT1lJOVdFWjVpQThnRVZKMXBWUzdhdC9xb1E4N2t2ZUxhMERETWZHWk4w?=
- =?utf-8?B?VVdzM3g2ZXR5Uit4emVzZmpqSGtkMVh4RU4xcUIvMUJ1ZVpxdUxpTTdPRVBP?=
- =?utf-8?B?RTVEZUExU29nOFllU2hiSS9USmtpYmhyL2ZpeHI0TG9CUXBlTFBwU2xRUVo5?=
- =?utf-8?B?MDlmUitML1BZV1RtZ0YzU3MzUGlLM1UvY3ZWN1ZocGl4RnI0MVo1dzhiWDZG?=
- =?utf-8?B?bVEzaE02eTc0VWNwdVFpSFBQcHM1Tk9DSCs5R2VHWHh5ODhmYUxud2ZxTEp5?=
- =?utf-8?B?U2FReVhxeERNZ1FxYkNBV2htMGNpRm4yeUwxYWhjVkplZ21zeWVqVWU0YW9u?=
- =?utf-8?B?OVZmdkRvbkJ1dTlsR3YzTTVaTEd1R0ZKbCs5ckNhWWtlS3NIQmZZZDRNbzA5?=
- =?utf-8?B?a2NabmlZSTFTYitkbldkVDRUQXcxdEswVEJVaGFhN0lJTGpzcEducy9nQU96?=
- =?utf-8?B?bFBNaHZuVWhvUm15NnpVcS9lTisvOWg4ZmhlRFp6M0hqRHMzMGwzM3VEUDd0?=
- =?utf-8?B?WmNVWXQ5UjdIODV5QjlZRHM2L1YxRWpDZzFaNURuSHhYOVBJSm5rYXMxRkor?=
- =?utf-8?Q?ZydFEQvsmSzUkV4DKbpYJtySWn0x/asShN9Wpbo?=
+	=?utf-8?B?TjA0YlYwQTVwMUNZMG0xZXoxbG1iQVBRY3RCcnBDWjRLT3FiL3E3UUI0d0J0?=
+ =?utf-8?B?UWF1QWdUOGFPYzF1RzVBdlVtQXo0UGExcVBoSDNlOWcvNkRzdC92bkFVUXFS?=
+ =?utf-8?B?OUFUNDNCR2JiVFRjdmFla0pPQnJLa1l6RDU0bWVBc01CQjZqUWNqZWdGKzYr?=
+ =?utf-8?B?Uk9IQkdIVkNMYlJwNU1xR2JTenhhbVp3eXhmb09HZDVIYU9nL0xaVkZaTDBw?=
+ =?utf-8?B?WW54YXZKc2R4ZVhremhxUmZWQ21INzBPNTVOWUJDZmgyZ2pUT0MxZWRBMVN0?=
+ =?utf-8?B?UmhxUWNwMUc2SGRQMDJxTEF4TW56a2JaMytLK25lZEltemhPRDVEUFp2My81?=
+ =?utf-8?B?YXBuTGk1TDFQbjdVK1BlWENmYy9naENXRkwxcEhKTCtteG5ZTzAvL081T213?=
+ =?utf-8?B?MmJ5ZVh5NDJLR0hDWkIyOTlsZ2Nhdk9HQm5jMmxFZGkzM1FZL25XaTRiUUQr?=
+ =?utf-8?B?NnJlb0lwVWJiUk0vODU2bkJXSDdlYnp2b20xWTI0Yk9CUWQyc2lUelR2MW1y?=
+ =?utf-8?B?Q25hVy8vV0VvOVMzM05lOGMzcnkwczNDNUswQVNNcEoyRjJibkVkMXlLT2hO?=
+ =?utf-8?B?Zy9XbzZUdWNUSUxDdjVLN3g5ZEtrcWVmeFBJUmpFc2NURnBvLzJmL0x3dGJs?=
+ =?utf-8?B?UnJqR2lmWE1TQWV0WWh6Ym9VNGJhOUljcExDQUQ0MUpqZ1o3N1dxcFhDck5Y?=
+ =?utf-8?B?V09XaWtybjlpMDFnNHFZZVFGcW5NUzZST3JrdDBBejJjdFFUeTl2NXFacEV4?=
+ =?utf-8?B?T3F6ZzczZk5NbWo2ZlRkRzBYVmExOFpNL3llS2JQU1NXQjVHUVlnVk5GdzdC?=
+ =?utf-8?B?cmZTVnl0VEdRbElVMFdiZ1M1bld5ZFc1bmh5cjB4QWkwaEFTcWlRQ1pOcW1B?=
+ =?utf-8?B?djU4aHk0R0NnWnQwZVFnRnFrc21RNWJ6V3JvTjMzaVAwUTkyUGdqcmZLeEpW?=
+ =?utf-8?B?NnhOZm9aZlJTTXU1aXc0ZjRoM1U1cm16Q3BCS2tOY2hxQnhLUEJ1VGNGZHpW?=
+ =?utf-8?B?MGl3aFNVblpGdjh5TkxpYVJ3dGlUY0FicDd4TllyZGRrMzhKWm56ZzdZWktR?=
+ =?utf-8?B?bEwxeTNrNmVLWEtVMGN5YnhLREtPVW1zbmI0YVU0UjJZYjhSVEhQdXEycU9o?=
+ =?utf-8?B?Uzhqck9iMXFpNndtVi8vVGhFOE82bE0yK1NSYUwwYWFCOTJkVTVIU0R1dGh5?=
+ =?utf-8?B?WEtUQ2cvTi9USk5DYWp3OTlDTTlSTFJuZStJQUFsQmMzVnplcHdkcW5BclJM?=
+ =?utf-8?B?cTA2SzE2S0VTcUVVYVdzb2J5MTZHcmo1L1JERHhTZkc1VGkrY1QyU0ZSQWg3?=
+ =?utf-8?B?ZWF6amNNVC9SMGw4b1A2cDJqWDNrWU9QMStidTUveHBrQkNFZTkxdStsUTd3?=
+ =?utf-8?B?TitlQVhraFd6bVZDOVR3VW9VOUFUK3lnalYrNk1GRCtqU1dGYU51eXFMOUFN?=
+ =?utf-8?B?eDljendHZ2JyWVpwKzhSbTNaRGdiNHRrNVc3OEJKSU9HdWJneGJUVzNIcU9o?=
+ =?utf-8?B?V0IwY1lYYXVjY2JDTFNOMUdMMjBJQ2MzWVcyZ0NBVGQ1ZmhONTJIU1RMaGNy?=
+ =?utf-8?B?clhyU2xjZVhkQU5xVlZ6K3d0RGRQZGJwTlhJRzBzQlVmdGJOZU5TMC9UaGF2?=
+ =?utf-8?B?UXNUZE9sZWJmcm5vSk1LTGFsaVFHaXhBa0lieTliSGdNWXN0bFRjM09tUnU1?=
+ =?utf-8?B?dHNRelFOODlzSnMrWVF1V016ZVNNNyt1UDhReklNN0JxeHoxc2RmM3hxWlV3?=
+ =?utf-8?Q?2MMhe/MHHBGH+nD95msL8DqNoRTBkE3SFVFBgQA?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?cVdFcjU2OHd5eEFEcUI1UncxK1VjOXRtckIxVW9pRk0wVGVaTVFoemUxL1B3?=
- =?utf-8?B?UjNETVhYdzlPRXhrQVZtM28zdkFoUm9iakdsUkE2aWlKMDBpTElZWWtleDZR?=
- =?utf-8?B?dGhoNS9TakR1ZEtQSUdnL2tRaCs1UmU4K1hZMzNQaVRyU1pueEpTdlJocGpn?=
- =?utf-8?B?YnlnK3FPamxPV1RMQ3gvNFRETGxHKzRxZGpZR3pSenVlY3gxdkxaKzlwMk0v?=
- =?utf-8?B?SmV2a0tBZlJpWnh2QjZUKy94UHhYb24wd1BtZlMrYjhCTEFUa3BkdW5kVDk2?=
- =?utf-8?B?ZWxGNDJoRkdFZnpINE4wcE1KWHdCWFM0eEpWTWJBVDBhQW9rSzhEeHFKR0xM?=
- =?utf-8?B?U2hEckovZ2t1U05XSWxvZVV0MUVyeTl2YlliUk5DNnYyb2VaSFZXUUozUkZS?=
- =?utf-8?B?cEs2R3pUMzJOU0ZrYTNLc3Y1RE9iUTU2V1pOUlR5a2FOVUp6UXFvQnlqVTRi?=
- =?utf-8?B?MjBWVjZBYmlxdE9OOE9OMGZZN3c5OVg1NUxDTDRiY2g4ZmJmMW9hd1VVN1JF?=
- =?utf-8?B?RHZGR0FxWG5QMjE5V3ZPejhnZFVmd3RuQjE4QWEzR3Bpa2hHVy9zamxkNWQ0?=
- =?utf-8?B?R3ZtVEtnZERyVkZ6SXR2NXBXR0lHRTF4NFlvNG9HQ2t2bEYyR1Vod0RuSU0v?=
- =?utf-8?B?YkJuSlh4SmUvYjVVcEhwMHhZR3JKQnZKTXhVVFBweTZMTUwyQXppQlhZQm1C?=
- =?utf-8?B?MUx4WG1BSUYyM2x0RWhoc1dSaUFpOENWdk45dlJ6RFZtM1RoVjBFcE5tSHhN?=
- =?utf-8?B?RlNDUDh4VWZPUzBWRkM0QWJqSUZQSHBMV2JFdE9Ya3RJMTF4eUdTZjRrTEJv?=
- =?utf-8?B?bFpYSkYvM1R1RW9TWHh3Y2taRnpiSkk4RkVaaFp6SDZrR0FQcWl3NDM4d0xQ?=
- =?utf-8?B?SFpmMWxNdHQwWXVLNmFHSWJNQzFjdzVzYjk0cjJCNHE0ZUF0MXBBSU9pRVRH?=
- =?utf-8?B?NFNVVHNLWXdCaEdmdkRrdCtLQUs5RjNxSlAvcExPQktwZDFVMVd1Wm9OQlV0?=
- =?utf-8?B?Vy9yL0h0NVY2ZEdZNDRrTmJ6T21aZmUzajdJNHJyeW90eDRHeUpSWlJHaG5O?=
- =?utf-8?B?eU1sRHArRjdWYXBkaFA0aVhrM01kL3FWYndoc3BEK0lBQTNrWlRtSm1UMWls?=
- =?utf-8?B?U3JKb01rTnR1TVFqaG1DcFJOQ2tucFFrUXA1K1JZMDdyTzNjSmFSRkpLWjZh?=
- =?utf-8?B?WThOMngyNnJSRU5MN0pINlIrUzVmK21OR0VyWEQyWVZDSHdaSlpaYTNIRy92?=
- =?utf-8?B?bWlDRHBWUVJkR2NKUE9nc2wzWmhkV3NMSGtsTWNuaTA3Sk1ZNTNPVnNFOE5k?=
- =?utf-8?B?MkkxeFR5NVVxbDg3WjhhVWI3aVBJL251WTF0c0lvM1lVdjRCRnNpNU5lcVZ0?=
- =?utf-8?B?dlNXN2FiNFR5cytrRFBMcHFIZDV2T014cTdWNkg1dERiZnp1d2E3Nk1TVk0w?=
- =?utf-8?B?dmxpdXNzTEVWc2xHR0g1bEVESFhLSXJhdHhFNWd0RmZxNDBTK0ZnQWU0UXIz?=
- =?utf-8?B?czRiOWVkQ3M5aGZVVWR2bk9NQndmamdZRVZ2TmZjc09yZ3BsZnRFY29tSHp3?=
- =?utf-8?B?aUJBR2NlTEpjUTRseGI1RlR3WkFFUE9jaVNsWisvVDVOVElEa0NTcTBBa0NV?=
- =?utf-8?B?WHFmd2pPTit1ZTl1cnB5SitVcXhoRHZVWU9lc1EwSjNiOG5Fa2RXNlBaT00v?=
- =?utf-8?B?SWp1TXl5eUhIbFUwUVQ0QUlEUkx2eGRiOUdxM3BJOFh2alFNeXhIMGlxK2Vw?=
- =?utf-8?B?VEU4MElhVGl3ZlZJWnFoNVZOWkVhQVlpOC82TDZpZ2sxMk9zOFlpQWgwZFZv?=
- =?utf-8?B?N1J1d21pR2VQOEQxOTB3UUJZVmRBU0JhNElOaE12MFp4clNvYjZ6eWlZdVk2?=
- =?utf-8?B?Y0RTWjlPbGN6RVZFSHZlUmdLTElpcExoc3E1WWdRU3p0Z0VQcEIyV2tyVXQ0?=
- =?utf-8?B?TlIrNExEelE3VHk0WUNDaktNUHRtYm5BM05VTVZoL1VyVlFGUkZybmNYVjYy?=
- =?utf-8?B?WjdMaWNTQmZKc2Y5L09YWWFuamZhRDBYTFh1clFPREhNaVBsYzBzZVNtczY0?=
- =?utf-8?B?QWNXRU91T210UjJGZXBrMWZpOWpaZUcwS2NvYmZRSkk4b1dUU1RRb3hyMjF3?=
- =?utf-8?Q?/gK5PBldEML6ncKoiOuluu4uw?=
+	=?utf-8?B?Y3piWjJKVnd4TEtrZU9qdTNZeTNhdUR1NWF2dGVYR1RPK1d4aHVqYjZSa2RQ?=
+ =?utf-8?B?dU1vZGw4WGlLVThuVzdqRUhSVkhSYURUb3MrdEowNExNelloRnFiM1lZYjhz?=
+ =?utf-8?B?ckFwTWhIRThQWGxLSzB1L2tVTUc1dTk5VXEzalB5WDAwZ3V4SEJMZjd0aTZY?=
+ =?utf-8?B?bFZUVmNpTXpEMDc1RG43Nk5oOHVIUnlXa2VvajJXQnZ2b1g1QjNHNERybnQ0?=
+ =?utf-8?B?K2Y4NDZrbTF6cHlMa0VQcUl2WEdENXJrUXhocXhMakx6M3R6dVV2blYzVCs4?=
+ =?utf-8?B?c2YwaGt3S05xMWp5RXBBaUtZWHZXdGVLSFB0WWNYVHp3bDcxQmZMa0NNc1NE?=
+ =?utf-8?B?cmRLR1RIeEdydm5MRDljdGxySEp4akhjUCsyMU04akpTcnlmWkg5TGQzZ0p1?=
+ =?utf-8?B?bUdzUkVvU1I1RjhuRWZieWRwaWVqeENTY0NFY0JrYjlVTkpFWmw4enhPMzhW?=
+ =?utf-8?B?VmN4cmZiMHR4anRGR2xzdjRTN2w5anZJT2MzeTBQZk84Z1JkWERjcnZvTUxJ?=
+ =?utf-8?B?MWRBSGdSU1BJSVBGZFN6c3hmejZGNldGNU8vekpIeUsvOU5Ic0tWcnRxSENi?=
+ =?utf-8?B?M1NxVUNSS3l4amhnSWszRWNMYmJtb1ZobkZCMXREM0Y5VHhOWUN6ZkJ0clhr?=
+ =?utf-8?B?Sjg3bmR2cEVyWkd1enNRT1pOU2F5eWN4Y0VsN29FR2tXeXloZFlVRnR3Q092?=
+ =?utf-8?B?Sjk0WDdWZTVlMHZTVXA1Mk41RlRRNkd5WWZDWnJUbXN6LzBraVg0YXZIRFY3?=
+ =?utf-8?B?TG9SQzVYSlZlZ2NMNFlWVW1CQWZFZUZHd2pDbzZEeEdlVGFVYlIwVkJsT2NS?=
+ =?utf-8?B?VkNjbUZIRFRaMG1rOFZyRGJCUGJXNFRlOVVnUWEwdEs2bERkTHIwSFN5T0lS?=
+ =?utf-8?B?b0pqeUUyK1JlNnJoOUJGWlpIekZ6R1JEblNGTHBCMUEycW9vdVh6OWxUeU4z?=
+ =?utf-8?B?WW5ERW1Td3ZXLzRBeHhGeDdSR1JpY1JSYjdseFArdEFtemM2SnRGcUxBaWVq?=
+ =?utf-8?B?SisvS09JWkRXaW8yK2J0dG9UNTdodHVVNDczZXV2U3ZGbEJ2ZVNJUU9ma2xs?=
+ =?utf-8?B?RTJwU05kcG5BQ0FqYTUwbHBGdFphU0RmbFNZTVJFZTdTV25ZTHpZTCtvbzFh?=
+ =?utf-8?B?Smd4TVVvYlAyVHVHL3lEL1lRMHBueldlOGZJM2JDSWdBaHA2c1pLMmdyY1Zp?=
+ =?utf-8?B?MysyTlNjMThzMzFzV1RhdFkxeEdsNHdXL25xRHM2NUJiL3M1U1NkODNmRmtv?=
+ =?utf-8?B?MFVpRkErL2VmVTJWcGhBcmJ1djZrU3FpVHlXTUM2TG1HR0hXeTlCamV2VGov?=
+ =?utf-8?B?d25YdjEwR2pmb3orb0VRT0w0Qzd0OTdROHBjdTFFNmdQU0kzb0ZmVnc2VGda?=
+ =?utf-8?B?SFlwRzBqNzJTcVNhTkQ0OE53bmhJazU5ZHd3bVJKcy9HVUJEdGhVSStwOUFF?=
+ =?utf-8?B?WWZaYmpqUSt5QUVyeitlc0pkQ1h6N0w2bVNUZEN6MWFQbGFyQ1lqTUxvOG1u?=
+ =?utf-8?B?L3JucVc2MURYTFJocEsrKzRkZUh5V1BjMk1sOTFNTFF3aHFJTWxOTWlucWZP?=
+ =?utf-8?B?SWorOE96SFY5M1UzQ3RxYWhaeXY3VElBMVZlOEVtWm5lMEErQk5mWE5STjlZ?=
+ =?utf-8?B?TElRQ0R4OW1aTHVIU0xwQmpFUFU5cUt3ejNxckRWY0lVaCttZ2VmTFlsRWtn?=
+ =?utf-8?B?RTF4ZGhJeDIyZThmb2hXdm1UQXdsRW1vTmUzSmF2STRSU0dsZUJRd0Q3RG4r?=
+ =?utf-8?B?WmlDa3pKcyttMkN3eWtFNE54b2tMV2hBRE9KaVMzc0VUQldRUWxUNUt3Y3hY?=
+ =?utf-8?B?ZGhzKytMTk1XS0l5YkdmNjBmeGlmMnJqRVJRUTNmUFJ2NXlnNWVybW10RDFB?=
+ =?utf-8?B?R1BERXB1MnpxSzFrTEkzZjI5bGNRM2c2MXNyanNaV21Ga09oMXlLWU9abFVW?=
+ =?utf-8?B?S3RKVm1adjE2ZEFvS3U2dmRQU3VZY3FRVUhoMk1mNys3Nm9XV00yZ05CNHNx?=
+ =?utf-8?B?QWR3WGU4T2lzaHhmeDFWTURPY2loNGw3SktCbGwyQUo1d2dYbkw2VFBNRmlv?=
+ =?utf-8?B?ZW9DMG5NWUtpM1pLWEtvWmtUTDZva2gvZERPWnN2eitPMEV4Ly91aGF3SWhS?=
+ =?utf-8?Q?GZsfDMRwsTQKY9VoPvo7hwdVE?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2208589f-7aea-4a38-4504-08dcfdddbac0
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1f31b00d-0e3f-4a07-4b9d-08dcfde50522
 X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5070.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Nov 2024 21:06:34.4751
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Nov 2024 21:58:45.7042
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: BOGzfXgoQIvU6oYrzgi+QQNUHLOl5oBE4OQoQbNUpsrdXErxt+U+xbi1w0AV/UvssXtTjb5x7+kG/jjhs78gQQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6624
+X-MS-Exchange-CrossTenant-UserPrincipalName: sLjbQd1gtjoQNgH7CdinzEXqcFRJn5r8aMklorWdCeLVH5WQjiaMJYYwpOKLkQjvc8KVaYi1v2db6CDkzSQUEQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9229
 
 On 11/4/24 19:05, Dionna Glaze wrote:
-> In preparation for SEV firmware hotloading support, add bookkeeping
-> structures for GCTX pages that are in use.
+> The DOWNLOAD_FIRMWARE_EX command requires cache flushing and introduces
+> new error codes that could be returned to user space.
 > 
-> Compliance with SEV-SNP API section 3.3 Firmware Updates and 4.1.1
-> Live Update: before a firmware is committed, all active GCTX pages
-> should be updated with SNP_GUEST_STATUS to ensure their data structure
-> remains consistent for the new firmware version.
-> There can only be cpuid_edx(0x8000001f)-1 many SEV-SNP asids in use at
-> one time, so this map associates asid to gctx in order to track which
-> addresses are active gctx pages that need updating. When an asid and
-> gctx page are decommissioned, the page is removed from tracking for
-> update-purposes.
-> Given that GCTX page creation and binding through the SNP_ACTIVATE
-> command are separate, the creation operation also tracks pages that are
-> yet to be bound to an asid.
+> The function is in sev-dev.c rather than sev-fw.c to avoid exposing the
+> __sev_do_cmd_locked function in the sev-dev.h header.
 
-I believe we have an ASID "allocated" by the time we call
-snp_context_create(). And snp_decommission_context() is always called to
-remove the context. Maybe a ccp driver API to create and destroy a
-context would be good here. The ASID would be an additional parameter
-and allow for associating the guest context page to the ASID right from
-the start.
+Please say "why" this is being added.
 
-This way you don't need an snp_unbound_gctx_pages array.
-
-I think it will make the code a lot simpler, but it does add an API
-dependency between the CCP and KVM that needs to be worked out between
-the maintainers.
-
-> 
-> The hotloading support depends on FW_UPLOAD, so the new functions are
-> added in a new file whose object file is conditionally included in the
-> module build.
 > 
 > Signed-off-by: Dionna Glaze <dionnaglaze@google.com>
 > ---
->  drivers/crypto/ccp/Makefile  |   1 +
->  drivers/crypto/ccp/sev-dev.c |   5 ++
->  drivers/crypto/ccp/sev-dev.h |  15 +++++
->  drivers/crypto/ccp/sev-fw.c  | 117 +++++++++++++++++++++++++++++++++++
->  4 files changed, 138 insertions(+)
->  create mode 100644 drivers/crypto/ccp/sev-fw.c
+>  drivers/crypto/ccp/sev-dev.c | 66 +++++++++++++++++++++++++++++++-----
+>  include/linux/psp-sev.h      | 26 ++++++++++++++
+>  include/uapi/linux/psp-sev.h |  5 +++
+>  3 files changed, 89 insertions(+), 8 deletions(-)
 > 
-> diff --git a/drivers/crypto/ccp/Makefile b/drivers/crypto/ccp/Makefile
-> index 394484929dae3..b8b5102cc7973 100644
-> --- a/drivers/crypto/ccp/Makefile
-> +++ b/drivers/crypto/ccp/Makefile
-> @@ -14,6 +14,7 @@ ccp-$(CONFIG_CRYPTO_DEV_SP_PSP) += psp-dev.o \
->                                     platform-access.o \
->                                     dbc.o \
->                                     hsti.o
-> +ccp-$(CONFIG_FW_UPLOAD) += sev-fw.o
-
-As you saw from the krobot mail, you will probably need to create
-something like CRYPTO_DEV_SP_PSP_FW_UPLOAD, which depends on
-CRYPTO_DEV_SP_PSP and FW_UPLOAD.
-
->  
->  obj-$(CONFIG_CRYPTO_DEV_CCP_CRYPTO) += ccp-crypto.o
->  ccp-crypto-objs := ccp-crypto-main.o \
 > diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> index 9810edbb272d2..9265b6d534bbe 100644
+> index 9265b6d534bbe..32f7b6147905e 100644
 > --- a/drivers/crypto/ccp/sev-dev.c
 > +++ b/drivers/crypto/ccp/sev-dev.c
-> @@ -982,6 +982,9 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
->  	print_hex_dump_debug("(out): ", DUMP_PREFIX_OFFSET, 16, 2, data,
->  			     buf_len, false);
+> @@ -223,6 +223,7 @@ static int sev_cmd_buffer_len(int cmd)
+>  	case SEV_CMD_SNP_GUEST_REQUEST:		return sizeof(struct sev_data_snp_guest_request);
+>  	case SEV_CMD_SNP_CONFIG:		return sizeof(struct sev_user_data_snp_config);
+>  	case SEV_CMD_SNP_COMMIT:		return sizeof(struct sev_data_snp_commit);
+> +	case SEV_CMD_SNP_DOWNLOAD_FIRMWARE_EX:	return sizeof(struct sev_data_download_firmware_ex);
+>  	default:				return 0;
+>  	}
 >  
-> +	if (!ret)
-> +		snp_cmd_bookkeeping_locked(cmd, sev, data);
-
-I prefer to see this flow as:
-
-	if (ret)
-		return ret;
-
-	snp_cmd_bookkeeping_locked(cmd, sev, data);
-
-	return 0;
-
-And if you end up creating APIs to create and destroy context pages,
-then this call can be removed and each API call directly into the
-appropriate tracking function.
-
-> +
+> @@ -1597,14 +1598,7 @@ static int sev_update_firmware(struct device *dev)
+>  		return -1;
+>  	}
+>  
+> -	/*
+> -	 * SEV FW expects the physical address given to it to be 32
+> -	 * byte aligned. Memory allocated has structure placed at the
+> -	 * beginning followed by the firmware being passed to the SEV
+> -	 * FW. Allocate enough memory for data structure + alignment
+> -	 * padding + SEV FW.
+> -	 */
+> -	data_size = ALIGN(sizeof(struct sev_data_download_firmware), 32);
+> +	data_size = ALIGN(sizeof(struct sev_data_download_firmware), SEV_FW_ALIGNMENT);
+>  
+>  	order = get_order(firmware->size + data_size);
+>  	p = alloc_pages(GFP_KERNEL, order);
+> @@ -1645,6 +1639,62 @@ static int sev_update_firmware(struct device *dev)
 >  	return ret;
 >  }
 >  
-> @@ -1179,6 +1182,8 @@ static int __sev_snp_init_locked(int *error)
->  
->  	sev_es_tmr_size = SNP_TMR_SIZE;
->  
-> +	rc = sev_snp_platform_init_firmware_upload(sev);
-
-Since this is mainly doing memory allocation, this should be moved to
-just after the minimum firmware version check so that a failure would be
-before SNP_INIT.
-
-> +
->  	return rc;
->  }
->  
-> diff --git a/drivers/crypto/ccp/sev-dev.h b/drivers/crypto/ccp/sev-dev.h
-> index 3e4e5574e88a3..28add34484ed1 100644
-> --- a/drivers/crypto/ccp/sev-dev.h
-> +++ b/drivers/crypto/ccp/sev-dev.h
-> @@ -57,6 +57,13 @@ struct sev_device {
->  	bool cmd_buf_backup_active;
->  
->  	bool snp_initialized;
-> +
-> +#ifdef CONFIG_FW_UPLOAD
-
-This would be changed to whatever your new CONFIG option is.
-
-> +	u32 last_snp_asid;
-
-unsigned int max_snp_asid;
-
-> +	u64 *snp_asid_to_gctx_pages_map;
-
-s/_pages//
-
-> +	u64 *snp_unbound_gctx_pages;
-
-s/_pages//
-
-> +	u32 snp_unbound_gctx_end;
-
-unsigned int snp_unbound_gctx_end;
-
-> +#endif /* CONFIG_FW_UPLOAD */
->  };
->  
->  int sev_dev_init(struct psp_device *psp);
-> @@ -65,4 +72,12 @@ void sev_dev_destroy(struct psp_device *psp);
->  void sev_pci_init(void);
->  void sev_pci_exit(void);
->  
-> +#ifdef CONFIG_FW_UPLOAD
-> +void snp_cmd_bookkeeping_locked(int cmd, struct sev_device *sev, void *data);
-> +int sev_snp_platform_init_firmware_upload(struct sev_device *sev);
-> +#else
-> +static inline void snp_cmd_bookkeeping_locked(int cmd, struct sev_device *sev, void *data) { }
-> +static inline int sev_snp_platform_init_firmware_upload(struct sev_device *sev) { return 0; }
-> +#endif /* CONFIG_FW_UPLOAD */
-> +
->  #endif /* __SEV_DEV_H */
-> diff --git a/drivers/crypto/ccp/sev-fw.c b/drivers/crypto/ccp/sev-fw.c
-> new file mode 100644
-> index 0000000000000..55a5a572da8f1
-> --- /dev/null
-> +++ b/drivers/crypto/ccp/sev-fw.c
-> @@ -0,0 +1,117 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * AMD Secure Encrypted Virtualization (SEV) firmware upload API
-> + */
-> +
-> +#include <linux/firmware.h>
-> +#include <linux/psp-sev.h>
-> +
-> +#include <asm/sev.h>
-> +
-> +#include "sev-dev.h"
-> +
-> +/*
-> + * After a gctx is created, it is used by snp_launch_start before getting
-
-s/gctx/guest context page/
-
-> + * bound to an asid. The launch protocol allocates an asid before creating a
-
-s/asid/ASID/
-
-> + * matching gctx page, so there should never be more unbound gctx pages than
-> + * there are possible SNP asids.
-> + *
-> + * The unbound gctx pages must be updated after executing DOWNLOAD_FIRMWARE_EX
-> + * and before committing the firmware.
-
-Not needed here.
-
-> + */
-> +static void snp_gctx_create_track_locked(struct sev_device *sev, void *data)
+> +int sev_snp_download_firmware_ex(struct sev_device *sev, const u8 *data, u32 size, int *error)
 > +{
-> +	struct sev_data_snp_addr *gctx_create = data;
+> +	struct sev_data_download_firmware_ex *data_ex;
+> +	int ret, order;
+> +	struct page *p;
+> +	u64 data_size;
+> +	void *fw_dest;
 > +
-> +	/* This condition should never happen, but is needed for memory safety. */
-> +	if (sev->snp_unbound_gctx_end >= sev->last_snp_asid) {
-> +		dev_warn(sev->dev, "Too many unbound SNP GCTX pages to track\n");
-> +		return;
+> +	data_size = ALIGN(sizeof(struct sev_data_download_firmware_ex),
+> +			  SEV_FW_ALIGNMENT);
 
-Should this return an error and fail the command?
+This can be a single line.
 
-> +	}
 > +
-> +	sev->snp_unbound_gctx_pages[sev->snp_unbound_gctx_end] = gctx_create->address;
-> +	sev->snp_unbound_gctx_end++;
-> +}
-> +
-> +/*
-> + * PREREQUISITE: The snp_activate command was successful, meaning the asid
-
-s/snp_activate/SNP_ACTIVATE/
-s/asid/ASID/
-
-> + * is in the acceptable range 1..sev->last_snp_asid.
-> + *
-> + * The gctx_paddr must be in the unbound gctx buffer.
-
-Do you mean unbound gctx array?
-
-> + */
-> +static void snp_activate_track_locked(struct sev_device *sev, void *data)
-> +{
-> +	struct sev_data_snp_activate *data_activate = data;
-> +
-> +	sev->snp_asid_to_gctx_pages_map[data_activate->asid] = data_activate->gctx_paddr;
-> +
-> +	for (int i = 0; i < sev->snp_unbound_gctx_end; i++) {
-> +		if (sev->snp_unbound_gctx_pages[i] == data_activate->gctx_paddr) {
-> +			/*
-> +			 * Swap the last unbound gctx page with the now-bound
-> +			 * gctx page to shrink the buffer.
-> +			 */
-> +			sev->snp_unbound_gctx_end--;
-> +			sev->snp_unbound_gctx_pages[i] =
-> +				sev->snp_unbound_gctx_pages[sev->snp_unbound_gctx_end];
-> +			sev->snp_unbound_gctx_pages[sev->snp_unbound_gctx_end] = 0;
-> +			break;
-> +		}
-> +	}
-
-What if it isn't found for some reason, should an error be returned and
-fail the SNP_ACTIVATE command?
-
-> +}
-> +
-> +static void snp_decommission_track_locked(struct sev_device *sev, void *data)
-> +{
-> +	struct sev_data_snp_addr *data_decommission = data;
-> +
-> +	for (int i = 1; i <= sev->last_snp_asid; i++) {
-> +		if (sev->snp_asid_to_gctx_pages_map[i] == data_decommission->address) {
-> +			sev->snp_asid_to_gctx_pages_map[i] = 0;
-> +			break;
-> +		}
-> +	}
-> +}
-> +
-> +void snp_cmd_bookkeeping_locked(int cmd, struct sev_device *sev, void *data)
-> +{
-> +	if (!sev->snp_asid_to_gctx_pages_map)
-> +		return;
-> +
-> +	switch (cmd) {
-> +	case SEV_CMD_SNP_GCTX_CREATE:
-> +		snp_gctx_create_track_locked(sev, data);
-> +		break;
-> +	case SEV_CMD_SNP_ACTIVATE:
-> +		snp_activate_track_locked(sev, data);
-> +		break;
-> +	case SEV_CMD_SNP_DECOMMISSION:
-> +		snp_decommission_track_locked(sev, data);
-> +		break;
-> +	default:
-> +		break;
-> +	}
-> +}
-> +
-> +int sev_snp_platform_init_firmware_upload(struct sev_device *sev)
-
-snp_init_guest_context_tracking
-
-> +{
-> +	u32 max_snp_asid;
-
-s/max_snp_asid/min_sev_asid/
-
+> +	order = get_order(size + data_size);
+> +	p = alloc_pages(GFP_KERNEL, order);
+> +	if (!p)
+> +		return -ENOMEM;
 > +
 > +	/*
-> +	 * cpuid_edx(0x8000001f) is the minimum SEV ASID, hence the exclusive
-
-CPUID 0x8000001f_EDX contains the ...
-
-> +	 * maximum SEV-SNP ASID. Save the inclusive maximum to avoid confusing
-> +	 * logic elsewhere.
+> +	 * Copy firmware data to a kernel allocated contiguous
+> +	 * memory region.
 > +	 */
-> +	max_snp_asid = cpuid_edx(0x8000001f);
+> +	data_ex = page_address(p);
+> +	fw_dest = page_address(p) + data_size;
+> +	memset(data_ex, 0, data_size);
+> +	memcpy(fw_dest, data, size);
+> +
+> +	data_ex->address = __psp_pa(fw_dest);
+> +	data_ex->len = size;
+> +	data_ex->cmdlen = sizeof(struct sev_data_download_firmware_ex);
+> +
+> +	/*
+> +	 * SNP_COMMIT should be issued explicitly to commit the updated
+> +	 * firmware after guest context pages have been updated.
+> +	 */
+> +	ret = sev_do_cmd(SEV_CMD_SNP_DOWNLOAD_FIRMWARE_EX, data_ex, error);
+> +
 
-if (max_snp_asid <= 1)
-	return 0;
+Remove blank line.
 
-Then the indentation below can be removed and the alignment fixed.
+> +	if (ret)
+> +		goto free_err;
+> +
+> +	__free_pages(p, order);
 
-> +	sev->last_snp_asid = max_snp_asid - 1;
-> +	if (sev->last_snp_asid) {
-> +		sev->snp_asid_to_gctx_pages_map = devm_kmalloc_array(
-> +			sev->dev, max_snp_asid * 2, sizeof(u64), GFP_KERNEL | __GFP_ZERO);
-> +		sev->snp_unbound_gctx_pages = &sev->snp_asid_to_gctx_pages_map[max_snp_asid];
-> +		if (!sev->snp_asid_to_gctx_pages_map) {
+If you remove this...
 
-I'd prefer to see the success check immediately after the allocation call.
+> +
+> +	/* Need to do a DF_FLUSH after live firmware update */
+> +	wbinvd_on_all_cpus();
+> +	ret = __sev_do_cmd_locked(SEV_CMD_SNP_DF_FLUSH, NULL, error);
+> +	if (ret) {
+> +		dev_dbg(sev->dev, "DF_FLUSH error %d\n", *error);
+> +		goto fw_err;
+
+and remove this...
+
+> +	}
+> +
+> +	return 0;
+
+... you can remove this return 0 statement and the fw_err label.
+
+> +
+> +free_err:
+> +	__free_pages(p, order);
+> +fw_err:
+> +	return ret;
+> +}
+> +
+>  static int __sev_snp_shutdown_locked(int *error, bool panic)
+>  {
+>  	struct psp_device *psp = psp_master;
+> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+> index 903ddfea85850..6a08c56cd9771 100644
+> --- a/include/linux/psp-sev.h
+> +++ b/include/linux/psp-sev.h
+> @@ -16,6 +16,15 @@
+>  
+>  #define SEV_FW_BLOB_MAX_SIZE	0x4000	/* 16KB */
+>  
+> +/*
+> + * SEV FW expects the physical address given to it to be 32
+> + * byte aligned. Memory allocated has structure placed at the
+> + * beginning followed by the firmware being passed to the SEV
+> + * FW. Allocate enough memory for data structure + alignment
+> + * padding + SEV FW.
+> + */
+> +#define SEV_FW_ALIGNMENT       32
+
+Does this need to be in include/linux/psp-sev.h or can it go in
+drivers/crypto/ccp/sev-dev.h ?
+
+> +
+>  /**
+>   * SEV platform state
+>   */
+> @@ -185,6 +194,23 @@ struct sev_data_download_firmware {
+>  	u32 len;				/* In */
+>  } __packed;
+>  
+> +/**
+> + * struct sev_data_download_firmware_ex - DOWNLOAD_FIRMWARE_EX command parameters
+> + *
+> + * @length: length of this command buffer
+> + * @address: physical address of firmware image
+> + * @len: len of the firmware image
+> + * @commit: automatically commit the newly installed image
+> + */
+> +struct sev_data_download_firmware_ex {
+> +	u32 cmdlen;				/* In */
+
+This doesn't match the name above in the comment.
+
+> +	u32 reserved;				/* In */
+> +	u64 address;				/* In */
+> +	u32 len;				/* In */
+> +	u32 commit:1;				/* In */
+> +	u32 reserved2:31;			/* In */
+
+These names typically match what is in the spec, so I would expect to
+see length, fw_paddr (or fw_address), and fw_len.
+
+> +} __packed;
+> +
+>  /**
+>   * struct sev_data_get_id - GET_ID command parameters
+>   *
+> diff --git a/include/uapi/linux/psp-sev.h b/include/uapi/linux/psp-sev.h
+> index 832c15d9155bd..936464d4f282a 100644
+> --- a/include/uapi/linux/psp-sev.h
+> +++ b/include/uapi/linux/psp-sev.h
+> @@ -80,6 +80,11 @@ typedef enum {
+>  	SEV_RET_INVALID_PAGE_OWNER,
+>  	SEV_RET_INVALID_PAGE_AEAD_OFLOW,
+>  	SEV_RET_RMP_INIT_REQUIRED,
+> +	SEV_RET_BAD_SVN,
+> +	SEV_RET_BAD_VERSION,
+> +	SEV_RET_SHUTDOWN_REQUIRED,
+> +	SEV_RET_UPDATE_FAILED,
+> +	SEV_RET_RESTORE_REQUIRED,
+
+Hmmm... yeah, as Alexey mentioned, these return values are not correct.
+
+SEV_RET_INVALID_PAGE_SIZE should follow SEV_RET_SECURE_DATA_INVALID
+
+so "SEV_RET_INVALID_KEY = 0x27" should be moved after
+SEV_RET_RMP_INIT_REQUIRED
+
+and SEV_RET_RMP_INIT_REQUIRED should be = 0x20, since RB_MODE_EXITED is
+0x1f.
+
+And then you might as well include RMP_INIT_FAILED in the list.
+
+The list should look like:
+
+	...
+	SEV_RET_SECURE_DATA_INVALID,
+	SEV_RET_INVALID_PAGE_SIZE,
+	SEV_RET_INVALID_PAGE_STATE,
+	SEV_RET_INVALID_MDATA_ENTRY,
+	SEV_RET_INVALID_PAGE_OWNER,
+	SEV_RET_AEAD_OFLOW,
+	SEV_RET_RB_MODE_EXITED,
+	SEV_RET_RMP_INIT_REQUIRED,
+	SEV_RET_BAD_SVN,
+	SEV_RET_BAD_VERSION,
+	SEV_RET_SHUTDOWN_REQUIRED,
+	SEV_RET_UPDATE_FAILED,
+	SEV_RET_RESTORE_REQUIRED,
+	SEV_RET_RMP_INIT_FAILED,
+	SEV_RET_INVALID_KEY,
+	SEV_RET_MAX,
+
+Of course this is already upstream in uapi, so I don't know how it is
+supposed to be handled.
 
 Thanks,
 Tom
 
-
-> +			dev_err(sev->dev,
-> +				"SEV-SNP: snp_asid_to_gctx_pages_map memory allocation failed\n");
-> +			return -ENOMEM;
-> +		}
-> +	}
-> +	return 0;
-> +}
+>  	SEV_RET_MAX,
+>  } sev_ret_code;
+>  
