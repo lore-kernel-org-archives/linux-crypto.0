@@ -1,151 +1,110 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 807F11D90AD
-	for <linux-crypto@vger.kernel.org>; Wed,  6 Nov 2024 09:29:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 300F41D7E4C;
+	Wed,  6 Nov 2024 11:00:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730885345; cv=none; b=GoVwU+G6ogSHYche5OWKy6kRLUyrEKIU3jlLXeZ7ULlYke2dbA+dcnTLNLQWNp6QKUWcXCzFBdEdbPFwjk5KRKqZKRjumq0prF2SGr+hb4bSO05iwgteDICAyfwySTOHDhWl3Ko4ddbJl6936ITe9i21Fn0TxMzhMUviOr70pJk=
+	t=1730890835; cv=none; b=rBLsy8LJbIzgpscoRWlVQuxPPw9RbXc2HdtSl7vXkTG0BJgKSD76aRe87HqKl7uf6wJeIr7dYXykwVq12zBjboOg/n5vGaiQUnD0wJ3ORNoyArPWG91DmPh1jmfJHEo7Qhbx+7l7yGf6f3GsbhsqWnDnhaezIE1E7CkGi9vrnL8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730885345; c=relaxed/simple;
-	bh=gD3ymZXOf1Xp+zXbXqMleltiFT4RiaNkSbFjDmEzFhY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OMtCYrxIerYSdS8wnxb+Uy8YFOrISJjWOQSdZsv0UvAIL57Kn0fWK1kLTg19uNjtvmk+PFbE0n1to1P1V+Z35E+CUwqkAI8XRclodPKSO3ekqm+opLwiSWckLT4ryxub9ezV1qb2yCkqZJmRmLIeUm64jsRn7xZsujgpnUMoXkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iB+tcl+1; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1730890835; c=relaxed/simple;
+	bh=WHO6Fbf0Co5ZuUbgBqbbt54asoPO4yQNGslciR+0aMU=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YCr0H68zJAPX5zByoJ1okcC52iLj3z/qMjPD7W8M9sx/hJHlebEHlgfvQDyybT6JJ+QNo28JIoxVF8+ntX+KlTx3fwuIeBGR+rJ5UHSYPwqm6XYQh40r/n82uFL20j2V/oVeczLRIdito/ozItN6J309xrWQnTyM0kkGU5FSyks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=VOcXmTqa; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iB+tcl+1"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730885342;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Ejx68tuVg9mOD/4Icv7MBobbv6b7kreS3ffjJVREaDU=;
-	b=iB+tcl+1AEaOuyaVACays+4G27L/FXGrXL2dIbuCiqxKb1V5xuW0i/yjHNXzMTcdHe1E+b
-	PWni14ixHNeddukW9H0Tzo6ukUoP646w2iZ1n9jCmyQMDM6ZDI8Swg/CEnelnZ77vfDwRN
-	1hmqSy9qpt2Y32oC5YzzpsWlc64I1u0=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-634-BoYqk9_NNv-XbIF8xz8SEA-1; Wed, 06 Nov 2024 04:29:00 -0500
-X-MC-Unique: BoYqk9_NNv-XbIF8xz8SEA-1
-X-Mimecast-MFC-AGG-ID: BoYqk9_NNv-XbIF8xz8SEA
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4315dd8fe7fso54994055e9.3
-        for <linux-crypto@vger.kernel.org>; Wed, 06 Nov 2024 01:29:00 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730885339; x=1731490139;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ejx68tuVg9mOD/4Icv7MBobbv6b7kreS3ffjJVREaDU=;
-        b=OjSrcTgtR64V/iAJUsmd8pTaPiRIskiAfKLF3GkLb0ZDRaK/JqtwNrO2KsL69gzlX+
-         /JCCLL33GOYD9dXYp24okUIsMvL9Qz2mLlaL9hiwnWMuK06KsOr6cf71cH1rEXQweKZr
-         r/6sYQzdIZLX4pYCtwD3e1PvTlkB2YGIrf5IMlwkY4snIWTwmxQ/rITJyoIpbJVnzC8E
-         8WXOB3k7xWpKd5dj71Ja7LnPOkOTmCOW08C7w95OY0pGhArY05O0cijHqiHcssocDETa
-         C4ntm36SW9jiGP89YJ4Br19X8T19xygI26EhJRUVFmlAq9+rd22QTHmj9a4LQpq/rW6L
-         H74w==
-X-Forwarded-Encrypted: i=1; AJvYcCXwH6Zii0/Eon0126sLjx5iZhTgorfcPEhJOEKUA9pJTOW/qLaxDICba55LaCcWVBOlpEU49lRZ1KbAmSc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YysuuItQayqy9RHevXss7caeZUuThmKRTidv5J+34wbqqW+JEGA
-	KR8lR2grUGdbv5qTaVwXpBcyGAH9ATXbBxs3UJUpjSBT/F+Lxj4d0Cs3PUN+IFjmWkC6jHk16m6
-	NCtoqfVtiduS8jUDUaoV27mBshxXWAt9uA605TImcDYJElDR99rBuln4/ZRQeWA==
-X-Received: by 2002:a05:600c:4689:b0:431:52a3:d9d5 with SMTP id 5b1f17b1804b1-432831cb9demr222901185e9.0.1730885339656;
-        Wed, 06 Nov 2024 01:28:59 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHWjjkdr5r4V7Q+Qj0G1hCbvfLQeB4lT/9xr2DmAO0MVtWQKCdBKQf0iOb506nFA0FTNUYXlA==
-X-Received: by 2002:a05:600c:4689:b0:431:52a3:d9d5 with SMTP id 5b1f17b1804b1-432831cb9demr222900675e9.0.1730885339211;
-        Wed, 06 Nov 2024 01:28:59 -0800 (PST)
-Received: from redhat.com ([2a02:14f:178:e74:5fcf:8a69:659d:f2b2])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432aa5b60cfsm15505215e9.7.2024.11.06.01.28.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Nov 2024 01:28:58 -0800 (PST)
-Date: Wed, 6 Nov 2024 04:28:53 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: qiang4.zhang@linux.intel.com, Paolo Bonzini <pbonzini@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Jens Axboe <axboe@kernel.dk>, Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Gonglei <arei.gonglei@huawei.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	"Chen, Jian Jun" <jian.jun.chen@intel.com>,
-	Andi Shyti <andi.shyti@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	David Hildenbrand <david@redhat.com>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Anton Yakovlev <anton.yakovlev@opensynergy.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	Qiang Zhang <qiang4.zhang@intel.com>,
-	virtualization@lists.linux.dev, linux-block@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-i2c@vger.kernel.org, netdev@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-sound@vger.kernel.org
-Subject: Re: [PATCH v2] virtio: only reset device and restore status if
- needed in device resume
-Message-ID: <20241106042828-mutt-send-email-mst@kernel.org>
-References: <20241031030847.3253873-1-qiang4.zhang@linux.intel.com>
- <20241101015101.98111-1-qiang4.zhang@linux.intel.com>
- <CACGkMEtvrBRd8BaeUiR6bm1xVX4KUGa83s03tPWPHB2U0mYfLA@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="VOcXmTqa"
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A663JYd024800;
+	Wed, 6 Nov 2024 11:00:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	8XZ5kGEBmjfULP5jtE/qgR3t1KVn5Jt5Sd1mWcR9+Fo=; b=VOcXmTqabCWFg3Ii
+	MPuarkM2YLoY0MoxX7SdC7AGLiJDqEh+FQ3gPc5m3C8JAngwiXwESJX0XQmGX35B
+	wlcuM6FTrc1DE54b7CWr42zA+ZCNCTQBXCCiMw2ifaRFVompY+QaNQLlvAdyLpOK
+	Fj+lz6J5Qse3R9ww5Xf+H1vM/GJLSyGkiBR/+CGpgcEUs3Xv8DVbZlF1ZGiN9M70
+	WTgSAWcobr/xkbefzcWizMxg/t647LRegsdDbyMopJQJ/RTE/4qov00zzG3WiMPx
+	obSQsbqVCebpm4HJfbNK6sQjd4mgPJ1S3PIw2wiQMTcYr5dO0rJFqXRIJUTHHzdn
+	0EfB5A==
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42r2ugrrxh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 06 Nov 2024 11:00:27 +0000 (GMT)
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+	by NALASPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4A6B0QmI011476
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 6 Nov 2024 11:00:26 GMT
+Received: from hu-yrangana-hyd.qualcomm.com (10.80.80.8) by
+ nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Wed, 6 Nov 2024 03:00:22 -0800
+From: Yuvaraj Ranganathan <quic_yrangana@quicinc.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bjorn Andersson
+	<andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>, Vinod Koul
+	<vkoul@kernel.org>
+CC: <linux-arm-msm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <quic_yrangana@quicinc.com>, <quic_sravank@quicinc.com>
+Subject: [PATCH V1 1/2] dt-bindings: crypto: qcom,prng: document QCS8300
+Date: Wed, 6 Nov 2024 16:30:01 +0530
+Message-ID: <20241106110002.3054839-2-quic_yrangana@quicinc.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20241106110002.3054839-1-quic_yrangana@quicinc.com>
+References: <20241106110002.3054839-1-quic_yrangana@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEtvrBRd8BaeUiR6bm1xVX4KUGa83s03tPWPHB2U0mYfLA@mail.gmail.com>
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: MJc86g3nDtU_9bsd8pEGhmbCKEnq4vNr
+X-Proofpoint-GUID: MJc86g3nDtU_9bsd8pEGhmbCKEnq4vNr
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ adultscore=0 mlxscore=0 suspectscore=0 priorityscore=1501 phishscore=0
+ clxscore=1015 impostorscore=0 malwarescore=0 bulkscore=0 mlxlogscore=999
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411060089
 
-On Fri, Nov 01, 2024 at 10:11:11AM +0800, Jason Wang wrote:
-> On Fri, Nov 1, 2024 at 9:54 AM <qiang4.zhang@linux.intel.com> wrote:
-> >
-> > From: Qiang Zhang <qiang4.zhang@intel.com>
-> >
-> > Virtio core unconditionally reset and restore status for all virtio
-> > devices before calling restore method. This breaks some virtio drivers
-> > which don't need to do anything in suspend and resume because they
-> > just want to keep device state retained.
-> 
-> The challenge is how can driver know device doesn't need rest.
+Document QCS8300 compatible for the True Random Number
+Generator.
 
-I actually don't remember why do we do reset on restore. Do you?
+Signed-off-by: Yuvaraj Ranganathan <quic_yrangana@quicinc.com>
+---
+ Documentation/devicetree/bindings/crypto/qcom,prng.yaml | 1 +
+ 1 file changed, 1 insertion(+)
 
-
-> For example, PCI has no_soft_reset which has been done in the commit
-> "virtio: Add support for no-reset virtio PCI PM".
-> 
-> And there's a ongoing long discussion of adding suspend support in the
-> virtio spec, then driver know it's safe to suspend/resume without
-> reset.
-> 
-> >
-> > Virtio GPIO is a typical example. GPIO states should be kept unchanged
-> > after suspend and resume (e.g. output pins keep driving the output) and
-> > Virtio GPIO driver does nothing in freeze and restore methods. But the
-> > reset operation in virtio_device_restore breaks this.
-> 
-> Is this mandated by GPIO or virtio spec? If yes, let's quote the revelant part.
-> 
-> >
-> > Since some devices need reset in suspend and resume while some needn't,
-> > create a new helper function for the original reset and status restore
-> > logic so that virtio drivers can invoke it in their restore method
-> > if necessary.
-> 
-> How are those drivers classified?
-> 
-> >
-> > Signed-off-by: Qiang Zhang <qiang4.zhang@intel.com>
-> 
-> Thanks
+diff --git a/Documentation/devicetree/bindings/crypto/qcom,prng.yaml b/Documentation/devicetree/bindings/crypto/qcom,prng.yaml
+index 048b769a73c0..2c959162e428 100644
+--- a/Documentation/devicetree/bindings/crypto/qcom,prng.yaml
++++ b/Documentation/devicetree/bindings/crypto/qcom,prng.yaml
+@@ -17,6 +17,7 @@ properties:
+           - qcom,prng-ee  # 8996 and later using EE
+       - items:
+           - enum:
++              - qcom,qcs8300-trng
+               - qcom,sa8255p-trng
+               - qcom,sa8775p-trng
+               - qcom,sc7280-trng
+-- 
+2.34.1
 
