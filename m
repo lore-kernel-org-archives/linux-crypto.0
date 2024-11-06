@@ -1,83 +1,82 @@
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71D9F1FBCBC;
-	Wed,  6 Nov 2024 12:55:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E2D32EAE0;
+	Wed,  6 Nov 2024 15:46:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730897703; cv=none; b=P/rrY8kBLwKX9PO0QP+9mLgqC/2yppO5L2j2iWe1bV0cuo2lRZ8VYywM6Iv5BiU9AxWKmjDLRMM9P20IDkrjjRA8NsWEFB341YtOyXOVOYfqEzTzdO/CY+yHnZkCU0xLNVwnjqaoLQSCIhtW+xnsh6pMltbxVeI9zU9zZxGmRwQ=
+	t=1730907965; cv=none; b=ToHDB/ABKgBparZITKxRKF+5p4hlo71ubIdrgotwrt+17p0Ga+8o6Yu8VB0qxiohm7hI2Yy8YO26+oCgqNSYcqNz5GcOntE5OTpz4hEPhMG+T6FzL/SPSgN4+S6B6BYjdKhUhW/hZd7HcDPJ3tNPQ/whwSD42cbcAOqb34ETXOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730897703; c=relaxed/simple;
-	bh=C/YyHTsrUA5cNUrNatbZfGIhA6FzfOxnYY7jmTSTWoY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=qsmNgvfqfwGZhcW/K/q+AqGmlkehSb6r/+P0q2eBC79eF4HFtsdxKVGWOvVrfFp35CKZegpqF86GfGs+xsSFEoxn+esFiU3uhmAhA6J/zpoH7Rzam9rMNCNCUddTZ4FDfV0MfvuJhMl7NGlOv33Vm3Odgm3LmtW6kQSQU+VG+9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=r3i4JO0l; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
+	s=arc-20240116; t=1730907965; c=relaxed/simple;
+	bh=jGbCrzUbZp2u5YtIo0PP6eyDGzjxS7yYzEKG15LfYOA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JdNz4a2pYgSbYPDXEgdomDv2BwMPsenD+agD+sI7emw23DEHnLYtCt8psqZrxDQP0h1xZCnmhQI07JmeZEqSJNjYa/HWnLcH3dKrX8ZqXWsMyHeGbIo5M2wW1fwDlfaDrMALTlz6Ggg+ie0JblSKrj2fTB+XwizXT6e281QRaKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oItdlH+d; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="r3i4JO0l"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
-	s=201909; t=1730897696;
-	bh=iRLJUrrpvdggs7VLYItdrnY/LsBZ/gUpUlld7wSgZg8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=r3i4JO0l9iQ/cxv6XhZ8DpOqJ1j7acgckLxkKMl4bVwXA5RGLe7UDkjwHhojgmrwP
-	 DyZG+tZetPViar+nig97Y1e3NAu0EwOv/NjD9YIC4KKcMvbLrMVIXzuPzcjqLgDovE
-	 XiM9FezvsiY0J/Ty+HMvlufgk1ad3WTlsGYrCIU1Yk/BKEnYjRiJrAmKlkNvcY8j5l
-	 H/+YXKVDwa2XdpIquKUVEghyDfsQ/Y8j7LN3e7GemCZO/Zyj9gas7PIGXGgqu5XD8P
-	 bdqWjxJ8RU72jLFr1PjZPKGKDaQlHM90aHVh9ukfSU1Vu1MCf0lC3u8psiNAsEg0yW
-	 Wh9EveL3Kt/Fw==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Xk4t25VRLz4wyh;
-	Wed,  6 Nov 2024 23:54:50 +1100 (AEDT)
-From: Michael Ellerman <mpe@ellerman.id.au>
-To: Lukas Bulwahn <lbulwahn@redhat.com>, Olivia Mackall
- <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Cc: kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org, Lukas
- Bulwahn <lukas.bulwahn@redhat.com>
-Subject: Re: [PATCH] hwrng: amd - remove reference to removed PPC_MAPLE config
-In-Reply-To: <20241106081343.66479-1-lukas.bulwahn@redhat.com>
-References: <20241106081343.66479-1-lukas.bulwahn@redhat.com>
-Date: Wed, 06 Nov 2024 23:54:52 +1100
-Message-ID: <871pzoldyb.fsf@mpe.ellerman.id.au>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oItdlH+d"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C976C4CEC6;
+	Wed,  6 Nov 2024 15:46:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730907964;
+	bh=jGbCrzUbZp2u5YtIo0PP6eyDGzjxS7yYzEKG15LfYOA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=oItdlH+dWk1lpp54VtYExAV+WCQGJpdcwNefEV2kzp9a7FSSklkL9mwp6KnpEV8jM
+	 nK7/wg+VN3nStGQDb8lKGjShRNPO2b5nnx6vjiPhX3qG0GJd3h+1SNauH7jCCrXQUk
+	 Hz9GojUCWXYrJq+ZEF4GvZmP9mAs0LG8uDdGrZb/3Vihh5NIgdlZyi49Gi33U4lI7V
+	 5Ipmn6hfOKT2IoArSbi9+PHD5RPagD1FGaHORgYPY/tkCcHU2ofhLfucgXO/51xKbk
+	 uBpVt9Bbrx8rbb/197ZeYqO9xPezzmRz2brB/WgXuOU4UHV0UT94vjaHTRCFCLLb4I
+	 4jatGmTudy4tg==
+Date: Wed, 6 Nov 2024 15:45:59 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Yuvaraj Ranganathan <quic_yrangana@quicinc.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Vinod Koul <vkoul@kernel.org>, linux-arm-msm@vger.kernel.org,
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, quic_sravank@quicinc.com
+Subject: Re: [PATCH V1 1/2] dt-bindings: crypto: qcom,prng: document QCS8300
+Message-ID: <20241106-prenatal-skinhead-238bc24b9bca@spud>
+References: <20241106110002.3054839-1-quic_yrangana@quicinc.com>
+ <20241106110002.3054839-2-quic_yrangana@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="9u2f3YU+sdQmMvdh"
+Content-Disposition: inline
+In-Reply-To: <20241106110002.3054839-2-quic_yrangana@quicinc.com>
+
+
+--9u2f3YU+sdQmMvdh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-Lukas Bulwahn <lbulwahn@redhat.com> writes:
-> From: Lukas Bulwahn <lukas.bulwahn@redhat.com>
->
-> Commit 62f8f307c80e ("powerpc/64: Remove maple platform") removes the
-> PPC_MAPLE config as a consequence of the platform=E2=80=99s removal.
->
-> The config definition of HW_RANDOM_AMD refers to this removed config opti=
-on
-> in its dependencies.
->
-> Remove the reference to the removed config option.
->
-> Signed-off-by: Lukas Bulwahn <lukas.bulwahn@redhat.com>
-> ---
->  drivers/char/hw_random/Kconfig | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On Wed, Nov 06, 2024 at 04:30:01PM +0530, Yuvaraj Ranganathan wrote:
+> Document QCS8300 compatible for the True Random Number
+> Generator.
+>=20
+> Signed-off-by: Yuvaraj Ranganathan <quic_yrangana@quicinc.com>
 
-Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
 
-Thanks for cleaning it up.
+--9u2f3YU+sdQmMvdh
+Content-Type: application/pgp-signature; name="signature.asc"
 
-There's also an EDAC and cpufreq driver that need to be removed. I
-posted the patches before [1] but need to resend them to the relevant
-maintainers and with updated change logs.
+-----BEGIN PGP SIGNATURE-----
 
-[1]: https://lore.kernel.org/linuxppc-dev/20240823112134.1314561-2-mpe@elle=
-rman.id.au/
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZyuPNwAKCRB4tDGHoIJi
+0pzdAQCCvkhsQmr40/DG0V79izAaAFFa4GjPhhhyq5UNzLmyxgD/TQ4UYdVEnj3b
+yEEEmpwU1KWEodXIG88B0IcT3d5xlQo=
+=/19M
+-----END PGP SIGNATURE-----
 
-cheers
+--9u2f3YU+sdQmMvdh--
