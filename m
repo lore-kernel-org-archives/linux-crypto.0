@@ -1,46 +1,46 @@
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 794FE20B215;
-	Wed,  6 Nov 2024 19:21:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1001E20BB26;
+	Wed,  6 Nov 2024 19:21:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730920875; cv=none; b=Q6NcNkdiSrUoE6QLUbusaVfMLlBl/VbYqGru4e5Z/DBLldqGiOOrWiu5RTN8nZrA48IpbACmsjuzdYDhQOH9XvXuzmkzrijf2AYobXBp2Q4XtILAzTNdkd7MalCnvYMmx28bX2OT/b82hBskkBngwUii3VmYMIjp0HC5aBDBLtQ=
+	t=1730920875; cv=none; b=gUbXAyq85PyPD/XJWNqRmKNAOpj71o4YIhuz7kRITatl927bHFAGMGR8jJtmv7SaxWN4nNYDM1xZ77UNCNZUGwypEfbVITqpOeSKIHsnB89Nyw+HK73d4GSBJKvEihCV1gs9jLI2PR++QmX9Y5VDwLgZeeHtOyhcZs8m9rbWkC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1730920875; c=relaxed/simple;
-	bh=dsGJj+DqE0i7pg9VVqHrElSTuA3RtibV8w9INDbEh+Q=;
+	bh=xaKYi5UD1EXb+8QE17eRVa6qtYmQdKerYV4Ficq5ajk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=rHbHShpWLzgG3L3TZM98TJrBZK1YmzDWDqrHncGuuPkxy81sHjiJPPBBvrUmeNY3jOku3VvzhB3/OxZIzsD+9rLRxNkq+Xa3RFHFjcoWRvab5okLMk4n3ZvKeFcCvtL4DHnbCmQZnCneF+KgYuZ8vjweBZqB1WP8CzOUHObXtTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XO+YyNNi; arc=none smtp.client-ip=198.175.65.11
+	 MIME-Version; b=j+hMCAFZdrD2tz6cWQAIQ7ahIgTa51APWsBqoV+AhsfcFJxo3uN9nWc+f9iN3QQ1Cdqm44Os6GU/0DTJOjGog1t1IGLzTicmTh2jdrMpLQumLmEb9gE0dDPdJ0MlljiSvJFQLOxhGHo7lnJczGxv/vQOPtPL576kwvSXmeR/dzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Eyb0Hm9+; arc=none smtp.client-ip=198.175.65.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XO+YyNNi"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Eyb0Hm9+"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1730920873; x=1762456873;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=dsGJj+DqE0i7pg9VVqHrElSTuA3RtibV8w9INDbEh+Q=;
-  b=XO+YyNNiQ0RvNADCKEmBzDHpHNKrJ7UX3aKVUe180rYckDBeJuk2a4DK
-   TF+0Ym+HHyZjdVXdS67zRmMMxG9EJsOq2Ms74m+ANVV3QhuLhNLED75Kj
-   Z68hJAlJqxuqLyzqTOmVME2LUVJEh823pftPv2d7lXIFceLKTTCoAA6P9
-   lHjWasRlS+WQaavJxJ+CDmbLNHF+WWUxM1DrOarY3HsWJetcKu/9bhIzb
-   aiOMav0LVm4Bmj44go6I02IsIsMidBB1D/79DFCzolb1in3L8H0JYfLit
-   4lBrWNU1V54FyLEH92degiKLPtrD15PWr1K8HAU3tz61BCzKcmKHqnszY
+  bh=xaKYi5UD1EXb+8QE17eRVa6qtYmQdKerYV4Ficq5ajk=;
+  b=Eyb0Hm9+yHvAbsMqQJFZ9RkjEBHqpRM5RdjGN02ECtuZSNA/f/di1SqJ
+   RiQYVqXi+SnrSw/YVBIJrA5rcnr0DaJ6Y1IqB+tA4bble/XKRdfyDLBbb
+   q8K63q5ogia6jDGDuAz5GpQuVflbQd0OYZZxyLm365hpBeCIEhaqf/bQE
+   JhibLdBjwe9ET61Lh05Oq3vLtStIp+eogCnLyikeJbsvRZOfjKuREqShu
+   KhsVPKe7lwxkkEdhEM4nFONURpGIiqv0FVTdNa67itV7YFtf4q8v6ZXKw
+   RPz2qq6khxAPYdSy04DhMFqDxOXiGtZhPLOInrRxjZRdIxiaInKqD855R
    A==;
-X-CSE-ConnectionGUID: tqeKeSb6S1mi/R/gFUrbjA==
-X-CSE-MsgGUID: KS5l0Q5hQauDjHsvgp2tAg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="41291997"
+X-CSE-ConnectionGUID: 02UzsSerRKeYS1irH52ekw==
+X-CSE-MsgGUID: ZSC9v337QDOgQ+AWfIaHow==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="41292009"
 X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="41291997"
+   d="scan'208";a="41292009"
 Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2024 11:21:10 -0800
-X-CSE-ConnectionGUID: OWkevIq+QMWqgKgle/FXXA==
-X-CSE-MsgGUID: mh/T3E6IR1CskRaqe4OZ8Q==
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2024 11:21:11 -0800
+X-CSE-ConnectionGUID: +Z5vOFvCTR6cWN9dNz77NQ==
+X-CSE-MsgGUID: FoxFzadKSE+f4ae5fyvaeQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,263,1725346800"; 
-   d="scan'208";a="88695393"
+   d="scan'208";a="88695396"
 Received: from unknown (HELO JF5300-B11A338T.jf.intel.com) ([10.242.51.115])
   by fmviesa003.fm.intel.com with ESMTP; 06 Nov 2024 11:21:10 -0800
 From: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
@@ -67,9 +67,9 @@ To: linux-kernel@vger.kernel.org,
 Cc: wajdi.k.feghali@intel.com,
 	vinodh.gopal@intel.com,
 	kanchana.p.sridhar@intel.com
-Subject: [PATCH v3 06/13] crypto: iaa - Change cpu-to-iaa mappings to evenly balance cores to IAAs.
-Date: Wed,  6 Nov 2024 11:20:58 -0800
-Message-Id: <20241106192105.6731-7-kanchana.p.sridhar@intel.com>
+Subject: [PATCH v3 07/13] crypto: iaa - Distribute compress jobs to all IAA devices on a NUMA node.
+Date: Wed,  6 Nov 2024 11:20:59 -0800
+Message-Id: <20241106192105.6731-8-kanchana.p.sridhar@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20241106192105.6731-1-kanchana.p.sridhar@intel.com>
 References: <20241106192105.6731-1-kanchana.p.sridhar@intel.com>
@@ -81,67 +81,94 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This change distributes the cpus more evenly among the IAAs in each socket.
+This change enables processes running on any logical core on a NUMA node to
+use all the IAA devices enabled on that NUMA node for compress jobs. In
+other words, compressions originating from any process in a node will be
+distributed in round-robin manner to the available IAA devices on the same
+socket. The main premise behind this change is to make sure that no
+compress engines on any IAA device are left un-utilized/under-utilized. In
+other words, the compress engines on all IAA devices are considered a
+global resource for that socket.
 
- Old algorithm to assign cpus to IAA:
- ------------------------------------
- If "nr_cpus" = nr_logical_cpus (includes hyper-threading), the current
- algorithm determines "nr_cpus_per_node" = nr_cpus / nr_nodes.
+This allows the use of all IAA devices present in a given NUMA node for
+(batched) compressions originating from zswap/zram, from all cores
+on this node.
 
- Hence, on a 2-socket Sapphire Rapids server where each socket has 56 cores
- and 4 IAA devices, nr_cpus_per_node = 112.
+A new per-cpu "global_wq_table" implements this in the iaa_crypto driver.
+We can think of the global WQ per IAA as a WQ to which all cores on
+that socket can submit compress jobs.
 
- Further, cpus_per_iaa = (nr_nodes * nr_cpus_per_node) / nr_iaa
- Hence, cpus_per_iaa = 224/8 = 28.
+To avail of this feature, the user must configure 2 WQs per IAA in order to
+enable distribution of compress jobs to multiple IAA devices.
 
- The iaa_crypto driver then assigns 28 "logical" node cpus per IAA device
- on that node, that results in this cpu-to-iaa mapping:
+Each IAA will have 2 WQs:
+ wq.0 (local WQ):
+   Used for decompress jobs from cores mapped by the cpu_to_iaa() "even
+   balancing of logical cores to IAA devices" algorithm.
+
+ wq.1 (global WQ):
+   Used for compress jobs from *all* logical cores on that socket.
+
+The iaa_crypto driver will place all global WQs from all same-socket IAA
+devices in the global_wq_table per cpu on that socket. When the driver
+receives a compress job, it will lookup the "next" global WQ in the cpu's
+global_wq_table to submit the descriptor.
+
+The starting wq in the global_wq_table for each cpu is the global wq
+associated with the IAA nearest to it, so that we stagger the starting
+global wq for each process. This results in very uniform usage of all IAAs
+for compress jobs.
+
+Two new driver module parameters are added for this feature:
+
+g_wqs_per_iaa (default 1):
+
+ /sys/bus/dsa/drivers/crypto/g_wqs_per_iaa
+
+ This represents the number of global WQs that can be configured per IAA
+ device. The default is 1, and is the recommended setting to enable the use
+ of this feature once the user configures 2 WQs per IAA using higher level
+ scripts as described in
+ Documentation/driver-api/crypto/iaa/iaa-crypto.rst.
+
+g_consec_descs_per_gwq (default 1):
+
+ /sys/bus/dsa/drivers/crypto/g_consec_descs_per_gwq
+
+ This represents the number of consecutive compress jobs that will be
+ submitted to the same global WQ (i.e. to the same IAA device) from a given
+ core, before moving to the next global WQ. The default is 1, which is also
+ the recommended setting to avail of this feature.
+
+The decompress jobs from any core will be sent to the "local" IAA, namely
+the one that the driver assigns with the cpu_to_iaa() mapping algorithm
+that evenly balances the assignment of logical cores to IAA devices on a
+NUMA node.
+
+On a 2-socket Sapphire Rapids server where each socket has 56 cores and
+4 IAA devices, this is how the compress/decompress jobs will be mapped
+when the user configures 2 WQs per IAA device (which implies wq.1 will
+be added to the global WQ table for each logical core on that NUMA node):
 
  lscpu|grep NUMA
  NUMA node(s):        2
  NUMA node0 CPU(s):   0-55,112-167
  NUMA node1 CPU(s):   56-111,168-223
 
+ Compress jobs:
+ --------------
  NUMA node 0:
- cpu   0-27    28-55  112-139  140-167
- iaa   iax1    iax3   iax5     iax7
+ All cpus (0-55,112-167) can send compress jobs to all IAA devices on the
+ socket (iax1/iax3/iax5/iax7) in round-robin manner:
+ iaa   iax1           iax3           iax5           iax7
 
  NUMA node 1:
- cpu   56-83  84-111  168-195   196-223
- iaa   iax9   iax11   iax13     iax15
+ All cpus (56-111,168-223) can send compress jobs to all IAA devices on the
+ socket (iax9/iax11/iax13/iax15) in round-robin manner:
+ iaa   iax9           iax11          iax13           iax15
 
- This appears non-optimal for a few reasons:
-
- 1) The 2 logical threads on a core will get assigned to different IAA
-    devices. For e.g.:
-      cpu 0:   iax1
-      cpu 112: iax5
- 2) One of the logical threads on a core is assigned to an IAA that is not
-    closest to that core. For e.g. cpu 112.
- 3) If numactl is used to start processes sequentially on the logical
-    cores, some of the IAA devices on the socket could be over-subscribed,
-    while some could be under-utilized.
-
-This patch introduces a scheme to more evenly balance the logical cores to
-IAA devices on a socket.
-
- New algorithm to assign cpus to IAA:
- ------------------------------------
- We introduce a function "cpu_to_iaa()" that takes a logical cpu and
- returns the IAA device closest to it.
-
- If "nr_cpus" = nr_logical_cpus (includes hyper-threading), the new
- algorithm determines "nr_cpus_per_node" = topology_num_cores_per_package().
-
- Hence, on a 2-socket Sapphire Rapids server where each socket has 56 cores
- and 4 IAA devices, nr_cpus_per_node = 56.
-
- Further, cpus_per_iaa = (nr_nodes * nr_cpus_per_node) / nr_iaa
- Hence, cpus_per_iaa = 112/8 = 14.
-
- The iaa_crypto driver then assigns 14 "logical" node cpus per IAA device
- on that node, that results in this cpu-to-iaa mapping:
-
+ Decompress jobs:
+ ----------------
  NUMA node 0:
  cpu   0-13,112-125   14-27,126-139  28-41,140-153  42-55,154-167
  iaa   iax1           iax3           iax5           iax7
@@ -150,135 +177,437 @@ IAA devices on a socket.
  cpu   56-69,168-181  70-83,182-195  84-97,196-209   98-111,210-223
  iaa   iax9           iax11          iax13           iax15
 
- This resolves the 3 issues with non-optimality of cpu-to-iaa mappings
- pointed out earlier with the existing approach.
-
-Originally-by: Tom Zanussi <tom.zanussi@linux.intel.com>
 Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
 ---
- drivers/crypto/intel/iaa/iaa_crypto_main.c | 84 ++++++++++++++--------
- 1 file changed, 54 insertions(+), 30 deletions(-)
+ drivers/crypto/intel/iaa/iaa_crypto_main.c | 305 ++++++++++++++++++++-
+ 1 file changed, 290 insertions(+), 15 deletions(-)
 
 diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-index c4b143dd1ddd..a12a8f9caa84 100644
+index a12a8f9caa84..ca0a71b8f31d 100644
 --- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
 +++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
-@@ -55,6 +55,46 @@ static struct idxd_wq *wq_table_next_wq(int cpu)
- 	return entry->wqs[entry->cur_wq];
- }
+@@ -29,14 +29,23 @@ static unsigned int nr_iaa;
+ static unsigned int nr_cpus;
+ static unsigned int nr_nodes;
+ static unsigned int nr_cpus_per_node;
+-
+ /* Number of physical cpus sharing each iaa instance */
+ static unsigned int cpus_per_iaa;
  
+ static struct crypto_comp *deflate_generic_tfm;
+ 
+ /* Per-cpu lookup table for balanced wqs */
+-static struct wq_table_entry __percpu *wq_table;
++static struct wq_table_entry __percpu *wq_table = NULL;
++
++/* Per-cpu lookup table for global wqs shared by all cpus. */
++static struct wq_table_entry __percpu *global_wq_table = NULL;
++
 +/*
-+ * Given a cpu, find the closest IAA instance.  The idea is to try to
-+ * choose the most appropriate IAA instance for a caller and spread
-+ * available workqueues around to clients.
++ * Per-cpu counter of consecutive descriptors allocated to
++ * the same wq in the global_wq_table, so that we know
++ * when to switch to the next wq in the global_wq_table.
 + */
-+static inline int cpu_to_iaa(int cpu)
-+{
-+	int node, n_cpus = 0, test_cpu, iaa = 0;
-+	int nr_iaa_per_node;
-+	const struct cpumask *node_cpus;
-+
-+	if (!nr_nodes)
-+		return 0;
-+
-+	nr_iaa_per_node = nr_iaa / nr_nodes;
-+	if (!nr_iaa_per_node)
-+		return 0;
-+
-+	for_each_online_node(node) {
-+		node_cpus = cpumask_of_node(node);
-+		if (!cpumask_test_cpu(cpu, node_cpus))
-+			continue;
-+
-+		for_each_cpu(test_cpu, node_cpus) {
-+			if ((n_cpus % nr_cpus_per_node) == 0)
-+				iaa = node * nr_iaa_per_node;
-+
-+			if (test_cpu == cpu)
-+				return iaa;
-+
-+			n_cpus++;
-+
-+			if ((n_cpus % cpus_per_iaa) == 0)
-+				iaa++;
-+		}
-+	}
-+
-+	return -1;
++static int __percpu *num_consec_descs_per_wq = NULL;
+ 
+ static struct idxd_wq *wq_table_next_wq(int cpu)
+ {
+@@ -104,26 +113,68 @@ static void wq_table_add(int cpu, struct idxd_wq *wq)
+ 
+ 	entry->wqs[entry->n_wqs++] = wq;
+ 
+-	pr_debug("%s: added iaa wq %d.%d to idx %d of cpu %d\n", __func__,
+-		 entry->wqs[entry->n_wqs - 1]->idxd->id,
+-		 entry->wqs[entry->n_wqs - 1]->id, entry->n_wqs - 1, cpu);
++	pr_debug("%s: added iaa local wq %d.%d to idx %d of cpu %d\n", __func__,
++		entry->wqs[entry->n_wqs - 1]->idxd->id,
++		entry->wqs[entry->n_wqs - 1]->id, entry->n_wqs - 1, cpu);
 +}
 +
- static void wq_table_add(int cpu, struct idxd_wq *wq)
++static void global_wq_table_add(int cpu, struct idxd_wq *wq)
++{
++	struct wq_table_entry *entry = per_cpu_ptr(global_wq_table, cpu);
++
++	if (WARN_ON(entry->n_wqs == entry->max_wqs))
++		return;
++
++	entry->wqs[entry->n_wqs++] = wq;
++
++	pr_debug("%s: added iaa global wq %d.%d to idx %d of cpu %d\n", __func__,
++		entry->wqs[entry->n_wqs - 1]->idxd->id,
++		entry->wqs[entry->n_wqs - 1]->id, entry->n_wqs - 1, cpu);
++}
++
++static void global_wq_table_set_start_wq(int cpu)
++{
++	struct wq_table_entry *entry = per_cpu_ptr(global_wq_table, cpu);
++	int start_wq = (entry->n_wqs / nr_iaa) * cpu_to_iaa(cpu);
++
++	if ((start_wq >= 0) && (start_wq < entry->n_wqs))
++		entry->cur_wq = start_wq;
+ }
+ 
+ static void wq_table_free_entry(int cpu)
  {
  	struct wq_table_entry *entry = per_cpu_ptr(wq_table, cpu);
-@@ -895,8 +935,7 @@ static int wq_table_add_wqs(int iaa, int cpu)
-  */
- static void rebalance_wq_table(void)
- {
--	const struct cpumask *node_cpus;
--	int node, cpu, iaa = -1;
-+	int cpu, iaa;
  
- 	if (nr_iaa == 0)
- 		return;
-@@ -906,37 +945,22 @@ static void rebalance_wq_table(void)
- 
- 	clear_wq_table();
- 
--	if (nr_iaa == 1) {
--		for (cpu = 0; cpu < nr_cpus; cpu++) {
--			if (WARN_ON(wq_table_add_wqs(0, cpu))) {
--				pr_debug("could not add any wqs for iaa 0 to cpu %d!\n", cpu);
--				return;
--			}
--		}
--
--		return;
--	}
--
--	for_each_node_with_cpus(node) {
--		node_cpus = cpumask_of_node(node);
--
--		for (cpu = 0; cpu <  cpumask_weight(node_cpus); cpu++) {
--			int node_cpu = cpumask_nth(cpu, node_cpus);
--
--			if (WARN_ON(node_cpu >= nr_cpu_ids)) {
--				pr_debug("node_cpu %d doesn't exist!\n", node_cpu);
--				return;
--			}
-+	for (cpu = 0; cpu < nr_cpus; cpu++) {
-+		iaa = cpu_to_iaa(cpu);
-+		pr_debug("rebalance: cpu=%d iaa=%d\n", cpu, iaa);
- 
--			if ((cpu % cpus_per_iaa) == 0)
--				iaa++;
-+		if (WARN_ON(iaa == -1)) {
-+			pr_debug("rebalance (cpu_to_iaa(%d)) failed!\n", cpu);
-+			return;
-+		}
- 
--			if (WARN_ON(wq_table_add_wqs(iaa, node_cpu))) {
--				pr_debug("could not add any wqs for iaa %d to cpu %d!\n", iaa, cpu);
--				return;
--			}
-+		if (WARN_ON(wq_table_add_wqs(iaa, cpu))) {
-+			pr_debug("could not add any wqs for iaa %d to cpu %d!\n", iaa, cpu);
-+			return;
- 		}
- 	}
+-	kfree(entry->wqs);
+-	memset(entry, 0, sizeof(*entry));
++	if (entry) {
++		kfree(entry->wqs);
++		memset(entry, 0, sizeof(*entry));
++	}
 +
-+	pr_debug("Finished rebalance local wqs.");
++	entry = per_cpu_ptr(global_wq_table, cpu);
++
++	if (entry) {
++		kfree(entry->wqs);
++		memset(entry, 0, sizeof(*entry));
++	}
+ }
+ 
+ static void wq_table_clear_entry(int cpu)
+ {
+ 	struct wq_table_entry *entry = per_cpu_ptr(wq_table, cpu);
+ 
+-	entry->n_wqs = 0;
+-	entry->cur_wq = 0;
+-	memset(entry->wqs, 0, entry->max_wqs * sizeof(struct idxd_wq *));
++	if (entry) {
++		entry->n_wqs = 0;
++		entry->cur_wq = 0;
++		memset(entry->wqs, 0, entry->max_wqs * sizeof(struct idxd_wq *));
++	}
++
++	entry = per_cpu_ptr(global_wq_table, cpu);
++
++	if (entry) {
++		entry->n_wqs = 0;
++		entry->cur_wq = 0;
++		memset(entry->wqs, 0, entry->max_wqs * sizeof(struct idxd_wq *));
++	}
+ }
+ 
+ LIST_HEAD(iaa_devices);
+@@ -163,6 +214,70 @@ static ssize_t verify_compress_store(struct device_driver *driver,
+ }
+ static DRIVER_ATTR_RW(verify_compress);
+ 
++/* Number of global wqs per iaa*/
++static int g_wqs_per_iaa = 1;
++
++static ssize_t g_wqs_per_iaa_show(struct device_driver *driver, char *buf)
++{
++	return sprintf(buf, "%d\n", g_wqs_per_iaa);
++}
++
++static ssize_t g_wqs_per_iaa_store(struct device_driver *driver,
++				     const char *buf, size_t count)
++{
++	int ret = -EBUSY;
++
++	mutex_lock(&iaa_devices_lock);
++
++	if (iaa_crypto_enabled)
++		goto out;
++
++	ret = kstrtoint(buf, 10, &g_wqs_per_iaa);
++	if (ret)
++		goto out;
++
++	ret = count;
++out:
++	mutex_unlock(&iaa_devices_lock);
++
++	return ret;
++}
++static DRIVER_ATTR_RW(g_wqs_per_iaa);
++
++/*
++ * Number of consecutive descriptors to allocate from a
++ * given global wq before switching to the next wq in
++ * the global_wq_table.
++ */
++static int g_consec_descs_per_gwq = 1;
++
++static ssize_t g_consec_descs_per_gwq_show(struct device_driver *driver, char *buf)
++{
++	return sprintf(buf, "%d\n", g_consec_descs_per_gwq);
++}
++
++static ssize_t g_consec_descs_per_gwq_store(struct device_driver *driver,
++				     const char *buf, size_t count)
++{
++	int ret = -EBUSY;
++
++	mutex_lock(&iaa_devices_lock);
++
++	if (iaa_crypto_enabled)
++		goto out;
++
++	ret = kstrtoint(buf, 10, &g_consec_descs_per_gwq);
++	if (ret)
++		goto out;
++
++	ret = count;
++out:
++	mutex_unlock(&iaa_devices_lock);
++
++	return ret;
++}
++static DRIVER_ATTR_RW(g_consec_descs_per_gwq);
++
+ /*
+  * The iaa crypto driver supports three 'sync' methods determining how
+  * compressions and decompressions are performed:
+@@ -751,7 +866,20 @@ static void free_wq_table(void)
+ 	for (cpu = 0; cpu < nr_cpus; cpu++)
+ 		wq_table_free_entry(cpu);
+ 
+-	free_percpu(wq_table);
++	if (wq_table) {
++		free_percpu(wq_table);
++		wq_table = NULL;
++	}
++
++	if (global_wq_table) {
++		free_percpu(global_wq_table);
++		global_wq_table = NULL;
++	}
++
++	if (num_consec_descs_per_wq) {
++		free_percpu(num_consec_descs_per_wq);
++		num_consec_descs_per_wq = NULL;
++	}
+ 
+ 	pr_debug("freed wq table\n");
+ }
+@@ -774,6 +902,38 @@ static int alloc_wq_table(int max_wqs)
+ 		}
+ 
+ 		entry->max_wqs = max_wqs;
++		entry->n_wqs = 0;
++		entry->cur_wq = 0;
++	}
++
++	global_wq_table = alloc_percpu(struct wq_table_entry);
++	if (!global_wq_table) {
++		free_wq_table();
++		return -ENOMEM;
++	}
++
++	for (cpu = 0; cpu < nr_cpus; cpu++) {
++		entry = per_cpu_ptr(global_wq_table, cpu);
++		entry->wqs = kzalloc(GFP_KERNEL, max_wqs * sizeof(struct wq *));
++		if (!entry->wqs) {
++			free_wq_table();
++			return -ENOMEM;
++		}
++
++		entry->max_wqs = max_wqs;
++		entry->n_wqs = 0;
++		entry->cur_wq = 0;
++	}
++
++	num_consec_descs_per_wq = alloc_percpu(int);
++	if (!num_consec_descs_per_wq) {
++		free_wq_table();
++		return -ENOMEM;
++	}
++
++	for (cpu = 0; cpu < nr_cpus; cpu++) {
++		int *num_consec_descs = per_cpu_ptr(num_consec_descs_per_wq, cpu);
++		*num_consec_descs = 0;
+ 	}
+ 
+ 	pr_debug("initialized wq table\n");
+@@ -912,9 +1072,14 @@ static int wq_table_add_wqs(int iaa, int cpu)
+ 	}
+ 
+ 	list_for_each_entry(iaa_wq, &found_device->wqs, list) {
+-		wq_table_add(cpu, iaa_wq->wq);
++
++		if (((found_device->n_wq - g_wqs_per_iaa) < 1) ||
++			(n_wqs_added < (found_device->n_wq - g_wqs_per_iaa))) {
++			wq_table_add(cpu, iaa_wq->wq);
++		}
++
+ 		pr_debug("rebalance: added wq for cpu=%d: iaa wq %d.%d\n",
+-			 cpu, iaa_wq->wq->idxd->id, iaa_wq->wq->id);
++			cpu, iaa_wq->wq->idxd->id, iaa_wq->wq->id);
+ 		n_wqs_added++;
+ 	}
+ 
+@@ -927,6 +1092,63 @@ static int wq_table_add_wqs(int iaa, int cpu)
+ 	return ret;
+ }
+ 
++static int global_wq_table_add_wqs(void)
++{
++	struct iaa_device *iaa_device;
++	int ret = 0, n_wqs_added;
++	struct idxd_device *idxd;
++	struct iaa_wq *iaa_wq;
++	struct pci_dev *pdev;
++	struct device *dev;
++	int cpu, node, node_of_cpu = -1;
++
++	for (cpu = 0; cpu < nr_cpus; cpu++) {
++
++#ifdef CONFIG_NUMA
++		node_of_cpu = -1;
++		for_each_online_node(node) {
++			const struct cpumask *node_cpus;
++			node_cpus = cpumask_of_node(node);
++			if (!cpumask_test_cpu(cpu, node_cpus))
++				continue;
++			node_of_cpu = node;
++			break;
++		}
++#endif
++		list_for_each_entry(iaa_device, &iaa_devices, list) {
++			idxd = iaa_device->idxd;
++			pdev = idxd->pdev;
++			dev = &pdev->dev;
++
++#ifdef CONFIG_NUMA
++			if (dev && (node_of_cpu != dev->numa_node))
++				continue;
++#endif
++
++			if (iaa_device->n_wq <= g_wqs_per_iaa)
++				continue;
++
++			n_wqs_added = 0;
++
++			list_for_each_entry(iaa_wq, &iaa_device->wqs, list) {
++
++				if (n_wqs_added < (iaa_device->n_wq - g_wqs_per_iaa)) {
++					n_wqs_added++;
++				}
++				else {
++					global_wq_table_add(cpu, iaa_wq->wq);
++					pr_debug("rebalance: added global wq for cpu=%d: iaa wq %d.%d\n",
++						cpu, iaa_wq->wq->idxd->id, iaa_wq->wq->id);
++				}
++			}
++		}
++
++		global_wq_table_set_start_wq(cpu);
++	}
++
++	return ret;
++}
++
+ /*
+  * Rebalance the wq table so that given a cpu, it's easy to find the
+  * closest IAA instance.  The idea is to try to choose the most
+@@ -961,6 +1183,7 @@ static void rebalance_wq_table(void)
+ 	}
+ 
+ 	pr_debug("Finished rebalance local wqs.");
++	global_wq_table_add_wqs();
  }
  
  static inline int check_completion(struct device *dev,
-@@ -2332,7 +2356,7 @@ static int __init iaa_crypto_init_module(void)
- 		pr_err("IAA couldn't find any nodes with cpus\n");
- 		return -ENODEV;
- 	}
--	nr_cpus_per_node = nr_cpus / nr_nodes;
-+	nr_cpus_per_node = topology_num_cores_per_package();
+@@ -1509,6 +1732,27 @@ static int iaa_decompress(struct crypto_tfm *tfm, struct acomp_req *req,
+ 	goto out;
+ }
  
- 	if (crypto_has_comp("deflate-generic", 0, 0))
- 		deflate_generic_tfm = crypto_alloc_comp("deflate-generic", 0, 0);
++/*
++ * Caller should make sure to call only if the
++ * per_cpu_ptr "global_wq_table" is non-NULL
++ * and has at least one wq configured.
++ */
++static struct idxd_wq *global_wq_table_next_wq(int cpu)
++{
++	struct wq_table_entry *entry = per_cpu_ptr(global_wq_table, cpu);
++	int *num_consec_descs = per_cpu_ptr(num_consec_descs_per_wq, cpu);
++
++	if ((*num_consec_descs) == g_consec_descs_per_gwq) {
++		if (++entry->cur_wq >= entry->n_wqs)
++			entry->cur_wq = 0;
++		*num_consec_descs = 0;
++	}
++
++	++(*num_consec_descs);
++
++	return entry->wqs[entry->cur_wq];
++}
++
+ static int iaa_comp_acompress(struct acomp_req *req)
+ {
+ 	struct iaa_compression_ctx *compression_ctx;
+@@ -1521,6 +1765,7 @@ static int iaa_comp_acompress(struct acomp_req *req)
+ 	struct idxd_wq *wq;
+ 	struct device *dev;
+ 	int order = -1;
++	struct wq_table_entry *entry;
+ 
+ 	compression_ctx = crypto_tfm_ctx(tfm);
+ 
+@@ -1539,8 +1784,15 @@ static int iaa_comp_acompress(struct acomp_req *req)
+ 		disable_async = true;
+ 
+ 	cpu = get_cpu();
+-	wq = wq_table_next_wq(cpu);
++	entry = per_cpu_ptr(global_wq_table, cpu);
++
++	if (!entry || entry->n_wqs == 0) {
++		wq = wq_table_next_wq(cpu);
++	} else {
++		wq = global_wq_table_next_wq(cpu);
++	}
+ 	put_cpu();
++
+ 	if (!wq) {
+ 		pr_debug("no wq configured for cpu=%d\n", cpu);
+ 		return -ENODEV;
+@@ -2393,13 +2645,32 @@ static int __init iaa_crypto_init_module(void)
+ 		goto err_sync_attr_create;
+ 	}
+ 
++	ret = driver_create_file(&iaa_crypto_driver.drv,
++				&driver_attr_g_wqs_per_iaa);
++	if (ret) {
++		pr_debug("IAA g_wqs_per_iaa attr creation failed\n");
++		goto err_g_wqs_per_iaa_attr_create;
++	}
++
++	ret = driver_create_file(&iaa_crypto_driver.drv,
++				&driver_attr_g_consec_descs_per_gwq);
++	if (ret) {
++		pr_debug("IAA g_consec_descs_per_gwq attr creation failed\n");
++		goto err_g_consec_descs_per_gwq_attr_create;
++	}
++
+ 	if (iaa_crypto_debugfs_init())
+ 		pr_warn("debugfs init failed, stats not available\n");
+ 
+ 	pr_debug("initialized\n");
+ out:
+ 	return ret;
+-
++err_g_consec_descs_per_gwq_attr_create:
++	driver_remove_file(&iaa_crypto_driver.drv,
++			   &driver_attr_g_wqs_per_iaa);
++err_g_wqs_per_iaa_attr_create:
++	driver_remove_file(&iaa_crypto_driver.drv,
++			   &driver_attr_sync_mode);
+ err_sync_attr_create:
+ 	driver_remove_file(&iaa_crypto_driver.drv,
+ 			   &driver_attr_verify_compress);
+@@ -2423,6 +2694,10 @@ static void __exit iaa_crypto_cleanup_module(void)
+ 			   &driver_attr_sync_mode);
+ 	driver_remove_file(&iaa_crypto_driver.drv,
+ 			   &driver_attr_verify_compress);
++	driver_remove_file(&iaa_crypto_driver.drv,
++			   &driver_attr_g_wqs_per_iaa);
++	driver_remove_file(&iaa_crypto_driver.drv,
++			   &driver_attr_g_consec_descs_per_gwq);
+ 	idxd_driver_unregister(&iaa_crypto_driver);
+ 	iaa_aecs_cleanup_fixed();
+ 	crypto_free_comp(deflate_generic_tfm);
 -- 
 2.27.0
 
