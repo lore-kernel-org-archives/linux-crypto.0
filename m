@@ -1,46 +1,46 @@
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D194220C316;
-	Wed,  6 Nov 2024 19:21:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCFF320C47A;
+	Wed,  6 Nov 2024 19:21:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730920877; cv=none; b=FKzZnagi9ibsCumv8+6xYqOs955m7sRGPbrTqgAIDBLNPmcA84Q1zwgJF4N/W+usyUUPIqk/o/7nPO/P8ebCWZvwJUiPvsZ6OTgMX2LOfBBEcShAVSnzest2xE1LnQ7DTcAfj9FZKkN67kjQar1j1qlQyMTG1TjbjEbmK/m0Ud0=
+	t=1730920879; cv=none; b=Qleg8629UPTx28DB3M9CrmoYXHwEgO9/n69ec3w04jJxGl0qB3zabi3+tTGuT5EWO3arsnkMnaxk/53BbrhZgfN9FPmhljmpavhKcwoDMvnAViLiM9RQLkXiyd9Fz2Bo69OR6PcrTYr5dyfufjwoWMEFtDV+EVhwUYel09fZSOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730920877; c=relaxed/simple;
-	bh=SK7AuRma8nAYQQn2EcAOmsROSQ044juQI+TJ7g6xS7U=;
+	s=arc-20240116; t=1730920879; c=relaxed/simple;
+	bh=RvYO56c7H8o1E9i8DrptIuQN+cu6z6PTo04ljSRvTjY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=G/uXTWVxLEnwmGtSTC64mfafXosJh59LM2Ll7ONoeEQXxrpT7OzkVZLQxdAWhrxdO0i0kHzz0b44ZBc5P/3NKAnBFUltRRDUXm778XAdYqTVSRp5K/OKJXRsj8WhFXk3GSSKeTSx/srx8AmTGgCVwi5nwm209MsGEWywedkhpmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mDzYePar; arc=none smtp.client-ip=198.175.65.11
+	 MIME-Version; b=WOcYgiHgg5UE1s5F/ZQLaKV2KLafw+N+qDeLI52YTRvdpy16gNXaTWwqYAIdFt3ZrguqfLPHxUJtrzZHQNWMCofVCFlpxREF8VHJR1G0n6Rg6J/2LlcRQ+g8uBofKAmyYnqs4rjayqzuLlRBkYMQfOYHsHDh5fgUFfdxwf/JSNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dlTC/1mW; arc=none smtp.client-ip=198.175.65.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mDzYePar"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dlTC/1mW"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730920876; x=1762456876;
+  t=1730920878; x=1762456878;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=SK7AuRma8nAYQQn2EcAOmsROSQ044juQI+TJ7g6xS7U=;
-  b=mDzYeParX/8A1Y6C9VZcQVcQ2gfcUHUWkchnlEnNEdGcRlbFd4ujgcSW
-   GzoBBpaAH5yJ4gSe5IJGImAp0RfraM2jiQs2z8FrBtR7FBJKl76N2xOmE
-   vasx48xImFB/NV0rQlibZwjQnoyyBa0LNCptcWXz1jq9ZxWieARX2GE7Q
-   79uuYuV4ASK0lSvnVPOan4bMnv5/oPnkIDoo0SRJCmqvMEMnruN8ffACy
-   vpJwXSz3QJsUj7ApZUvSo/beG7MtXP4VpLiqEd99y0NrMm5CR3ZWts0uG
-   xmw8oNdkXEEDXT9SVMp30qi8xMyyzK5rAfjcSWvvzUHvYzl6IUCvgGpxb
-   w==;
-X-CSE-ConnectionGUID: zisd1V5XSce84F1beUGXSg==
-X-CSE-MsgGUID: uwN0zEGeSPS7eEsS36ffOQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="41292059"
+  bh=RvYO56c7H8o1E9i8DrptIuQN+cu6z6PTo04ljSRvTjY=;
+  b=dlTC/1mWGkQ60vDWqRqa4cLt0r68H56VaoTLRMs9HWeVATrwX0tvR5tE
+   cLx+WFi68JPNKYkY9amJ5a01bDklNKNZbrtYyC8xrG3DnYE5QKGxOOAUm
+   D0/Hpk6xrlqY6W4wWAufATkbMqSb0NJBYccBEGmHuDjEc6BiHB+4XbaMv
+   P6Qh8SIDo3bE1e2zpGWIcstE/SZyAxfv/UUMwuJjqnUinhT8ZMZBsoEEq
+   ACpMMF3thIBMo8SQrOxNRnGYKs7HY3bvGGLyeptxvE4R3hSouHrDcstAL
+   NT9yU3AEuJH5782Whfgli+GWBgSzCaT6oFUVTRj2PrM2lomAuQwb7AEYM
+   g==;
+X-CSE-ConnectionGUID: 1RpJw0rvRX6t+IUIKAm17Q==
+X-CSE-MsgGUID: xdm+40cCQR6mPKP8/efdGw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="41292072"
 X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="41292059"
+   d="scan'208";a="41292072"
 Received: from fmviesa003.fm.intel.com ([10.60.135.143])
   by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2024 11:21:14 -0800
-X-CSE-ConnectionGUID: ClMLUI8HQiKSghkT7rDUWg==
-X-CSE-MsgGUID: EuVmJ52UQjmumLK5h0SBhQ==
+X-CSE-ConnectionGUID: nN2+UNtXTT6rc/74ttu3rw==
+X-CSE-MsgGUID: KjGO/gTnShy76yRTS9Bp3g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,263,1725346800"; 
-   d="scan'208";a="88695416"
+   d="scan'208";a="88695422"
 Received: from unknown (HELO JF5300-B11A338T.jf.intel.com) ([10.242.51.115])
   by fmviesa003.fm.intel.com with ESMTP; 06 Nov 2024 11:21:13 -0800
 From: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
@@ -67,9 +67,9 @@ To: linux-kernel@vger.kernel.org,
 Cc: wajdi.k.feghali@intel.com,
 	vinodh.gopal@intel.com,
 	kanchana.p.sridhar@intel.com
-Subject: [PATCH v3 11/13] mm: zswap: Allocate acomp_batch_ctx resources for a given zswap_pool.
-Date: Wed,  6 Nov 2024 11:21:03 -0800
-Message-Id: <20241106192105.6731-12-kanchana.p.sridhar@intel.com>
+Subject: [PATCH v3 12/13] mm: Add sysctl vm.compress-batching switch for compress batching during swapout.
+Date: Wed,  6 Nov 2024 11:21:04 -0800
+Message-Id: <20241106192105.6731-13-kanchana.p.sridhar@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20241106192105.6731-1-kanchana.p.sridhar@intel.com>
 References: <20241106192105.6731-1-kanchana.p.sridhar@intel.com>
@@ -81,144 +81,94 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If the zswap_pool is associated with an acomp_alg/crypto_acomp that has
-registered batch_compress() and batch_decompress() API, we can allocate the
-necessary batching resources for the pool's acomp_batch_ctx.
+The sysctl vm.compress-batching parameter is 0 by default. If the platform
+has Intel IAA, the user can run experiments with IAA compress batching of
+large folios in zswap_store() as follows:
 
-This patch makes the above determination on incurring the per-cpu memory
-footprint cost for batching, and if so, goes ahead and allocates
-SWAP_CRYPTO_BATCH_SIZE (i.e. 8) acomp_reqs/buffers for the
-pool->acomp_batch_ctx on that specific cpu.
+sysctl vm.compress-batching=1
+echo deflate-iaa > /sys/module/zswap/parameters/compressor
 
-It also "remembers" the pool's batching readiness as a result of the above,
-through a new
+This is expected to significantly improve zswap_store() latency of swapping
+out large folios due to parallel compression of 8 pages in the large folio
+at a time, in hardware.
 
-   	enum batch_comp_status can_batch_comp;
+Setting vm.compress-batching to "1" takes effect only if the zswap
+compression algorithm's crypto_acomp registers implementations for the
+batch_compress() and batch_decompress() API. In other words, compress
+batching works only with the iaa_crypto driver, that does register these
+new batching API. It is a no-op for compressors that do not register the
+batching API.
 
-member added to struct zswap_pool, for fast retrieval during
-zswap_store().
+The sysctl vm.compress-batching acts as a switch because it takes effect
+upon future zswap_store() calls on any given core. If the switch is "1",
+large folios will use parallel batched compression of the folio's pages.
+If the switch is "0", zswap_store() will use sequential compression for
+storing every page in a large folio.
 
-This allows us a way to only incur the memory footprint cost of the
-pool->acomp_batch_ctx resources for a given cpu on which zswap_store()
-needs to process a large folio.
-
-Suggested-by: Yosry Ahmed <yosryahmed@google.com>
-Suggested-by: Ying Huang <ying.huang@intel.com>
 Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
 ---
- include/linux/zswap.h |  7 ++++++
- mm/zswap.c            | 52 +++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 59 insertions(+)
+ include/linux/mm.h | 2 ++
+ kernel/sysctl.c    | 9 +++++++++
+ mm/swap.c          | 6 ++++++
+ 3 files changed, 17 insertions(+)
 
-diff --git a/include/linux/zswap.h b/include/linux/zswap.h
-index d961ead91bf1..9ad27ab3d222 100644
---- a/include/linux/zswap.h
-+++ b/include/linux/zswap.h
-@@ -7,6 +7,13 @@
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index fecd47239fa9..f61915aa2f37 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -82,8 +82,10 @@ extern const int page_cluster_max;
  
- struct lruvec;
+ #ifdef CONFIG_SYSCTL
+ extern int sysctl_legacy_va_layout;
++extern unsigned int compress_batching;
+ #else
+ #define sysctl_legacy_va_layout 0
++#define compress_batching 0
+ #endif
  
-+/*
-+ * For IAA compression batching:
-+ * Maximum number of IAA acomp compress requests that will be processed
-+ * in a batch: in parallel, if iaa_crypto async/no irq mode is enabled
-+ * (the default); else sequentially, if iaa_crypto sync mode is in effect.
-+ */
-+#define SWAP_CRYPTO_BATCH_SIZE 8UL
- extern atomic_long_t zswap_stored_pages;
+ #ifdef CONFIG_HAVE_ARCH_MMAP_RND_BITS
+diff --git a/kernel/sysctl.c b/kernel/sysctl.c
+index 79e6cb1d5c48..e298857595b4 100644
+--- a/kernel/sysctl.c
++++ b/kernel/sysctl.c
+@@ -2064,6 +2064,15 @@ static struct ctl_table vm_table[] = {
+ 		.extra1		= SYSCTL_ZERO,
+ 		.extra2		= (void *)&page_cluster_max,
+ 	},
++	{
++		.procname	= "compress-batching",
++		.data		= &compress_batching,
++		.maxlen		= sizeof(unsigned int),
++		.mode		= 0644,
++		.proc_handler	= proc_douintvec_minmax,
++		.extra1		= SYSCTL_ZERO,
++		.extra2		= SYSCTL_ONE,
++	},
+ 	{
+ 		.procname	= "dirtytime_expire_seconds",
+ 		.data		= &dirtytime_expire_interval,
+diff --git a/mm/swap.c b/mm/swap.c
+index 638a3f001676..bc4c9079769e 100644
+--- a/mm/swap.c
++++ b/mm/swap.c
+@@ -47,6 +47,9 @@
+ int page_cluster;
+ const int page_cluster_max = 31;
  
- #ifdef CONFIG_ZSWAP
-diff --git a/mm/zswap.c b/mm/zswap.c
-index 80a928cf0f7e..2af736e38213 100644
---- a/mm/zswap.c
-+++ b/mm/zswap.c
-@@ -151,6 +151,12 @@ struct crypto_acomp_ctx {
- 	bool is_sleepable;
- };
- 
-+enum batch_comp_status {
-+	UNINIT_BATCH_COMP = -1,
-+	CANNOT_BATCH_COMP = 0,
-+	BATCH_COMP_ENABLED = 1,
-+};
++/* Enable/disable compress batching during swapout. */
++unsigned int compress_batching;
 +
- /*
-  * The lock ordering is zswap_tree.lock -> zswap_pool.lru_lock.
-  * The only case where lru_lock is not acquired while holding tree.lock is
-@@ -159,6 +165,7 @@ struct crypto_acomp_ctx {
-  */
- struct zswap_pool {
- 	struct zpool *zpool;
-+	enum batch_comp_status can_batch_comp;
- 	struct crypto_acomp_ctx __percpu *acomp_ctx;
- 	struct crypto_acomp_ctx __percpu *acomp_batch_ctx;
- 	struct percpu_ref ref;
-@@ -310,6 +317,7 @@ static struct zswap_pool *zswap_pool_create(char *type, char *compressor)
- 		goto ref_fail;
- 	INIT_LIST_HEAD(&pool->list);
- 
-+	pool->can_batch_comp = UNINIT_BATCH_COMP;
- 	zswap_pool_debug("created", pool);
- 
- 	return pool;
-@@ -695,6 +703,39 @@ static int zswap_enabled_param_set(const char *val,
- 	return ret;
+ struct cpu_fbatches {
+ 	/*
+ 	 * The following folio batches are grouped together because they are protected
+@@ -1074,4 +1077,7 @@ void __init swap_setup(void)
+ 	 * Right now other parts of the system means that we
+ 	 * _really_ don't want to cluster much more
+ 	 */
++
++	/* Disable compress batching during swapout by default. */
++	compress_batching = 0;
  }
- 
-+/* Called only if sysctl vm.compress-batching is set to "1". */
-+static __always_inline bool zswap_pool_can_batch(struct zswap_pool *pool)
-+{
-+	struct crypto_acomp_ctx *acomp_ctx;
-+
-+	if ((pool->can_batch_comp == BATCH_COMP_ENABLED) &&
-+		!IS_ERR_OR_NULL((acomp_ctx = raw_cpu_ptr(pool->acomp_batch_ctx))) &&
-+		(acomp_ctx->nr_reqs == SWAP_CRYPTO_BATCH_SIZE))
-+		return true;
-+
-+	if (pool->can_batch_comp == CANNOT_BATCH_COMP)
-+		return false;
-+
-+	if ((pool->can_batch_comp == UNINIT_BATCH_COMP) && pool->acomp_batch_ctx) {
-+		acomp_ctx = raw_cpu_ptr(pool->acomp_batch_ctx);
-+
-+		if (!IS_ERR_OR_NULL(acomp_ctx)) {
-+			if ((acomp_ctx->nr_reqs == SWAP_CRYPTO_BATCH_SIZE) ||
-+			    (!acomp_ctx->nr_reqs &&
-+			     !zswap_create_acomp_ctx(raw_smp_processor_id(),
-+						     acomp_ctx,
-+						     pool->tfm_name,
-+						     SWAP_CRYPTO_BATCH_SIZE))) {
-+				pool->can_batch_comp = BATCH_COMP_ENABLED;
-+				return true;
-+			}
-+		}
-+	}
-+
-+	pool->can_batch_comp = CANNOT_BATCH_COMP;
-+	return false;
-+}
-+
- /*********************************
- * lru functions
- **********************************/
-@@ -850,6 +891,17 @@ static int zswap_create_acomp_ctx(unsigned int cpu,
- 	acomp_ctx->acomp = acomp;
- 	acomp_ctx->is_sleepable = acomp_is_async(acomp);
- 
-+	/*
-+	 * Cannot create a batching ctx without the crypto acomp alg supporting
-+	 * batch_compress and batch_decompress API.
-+	 */
-+	if ((nr_reqs > 1) && (!acomp->batch_compress || !acomp->batch_decompress)) {
-+		WARN_ONCE(1, "Cannot alloc acomp_ctx with %d reqs since crypto acomp %s\nhas not registered batch_compress() and/or batch_decompress()\n",
-+			  nr_reqs, tfm_name);
-+		ret = -ENODEV;
-+		goto buf_fail;
-+	}
-+
- 	acomp_ctx->buffers = kmalloc_node(nr_reqs * sizeof(u8 *),
- 					  GFP_KERNEL, cpu_to_node(cpu));
- 	if (!acomp_ctx->buffers)
 -- 
 2.27.0
 
