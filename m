@@ -1,57 +1,57 @@
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9341215034
-	for <linux-crypto@vger.kernel.org>; Thu,  7 Nov 2024 17:31:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28990215034
+	for <linux-crypto@vger.kernel.org>; Thu,  7 Nov 2024 17:34:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731000692; cv=none; b=WJmtubeyYHjZxSCZOu55hqi432HE1IGLUGJnW4s4vLVQY8T2s+ona2BAm41ciS+3KCHO5oxkBdhYk7EjsmvnmaFxxDDV114unpkHTg5G6GURVAGhzX2Z9OfJpojBfZZUMryajzTAVdv5NGiUnrGgTAAA7grnRPHMx6jnMxiHlxQ=
+	t=1731000857; cv=none; b=BTXoFg2bmYFT6q3brOB7ABlPGsGZ9wCtjbo5BOGvxL/CsClaYUPPNBcjuuqQW8KCp+TUOfkYc38LDcKuP3iE/4+RqXxhlAF3KtvI9AcrqyjXHYGP6UPk7tcZTGoa9oFnJNhZv1Xe3jIMOtsJwxraNNyZW4x7P82aTxTqkysU9iY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731000692; c=relaxed/simple;
-	bh=SEx+/U30fqNvvjSFTG6xjgtq4mLvscYki2ck/E3wgG8=;
+	s=arc-20240116; t=1731000857; c=relaxed/simple;
+	bh=nZxe12R/t4PRr8xSkQrlsz5xDqGIXL6AbF80acmCNIU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t9dRSRRcL0qjzgkkhGd/10cS8r2CYLEPL3wLGX9p7NqKUVE8SxkLUXGX8m9X8O5dZb8Bs1iuDtPZ3O2RzbFgmEre0RVI0nI7HqHmiR1trzCm6ujgv06JY8T4qpTWZfE8nTWDBBWrIIOPN1/q0tEvj5hZJIx4oVfoZbcLHuxrWlI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cmpxchg.org; spf=pass smtp.mailfrom=cmpxchg.org; dkim=pass (2048-bit key) header.d=cmpxchg-org.20230601.gappssmtp.com header.i=@cmpxchg-org.20230601.gappssmtp.com header.b=AtYGdgJ3; arc=none smtp.client-ip=209.85.219.53
+	 Content-Type:Content-Disposition:In-Reply-To; b=VCn7XSodOd68Q702/Iu9b/l9zqUJ9dIHlJmlJ9ktb229cC9AW+zfictSEy+ilfng0eMrsSopC1D86LGmI9EcBVkTcy9uhgdSOY+6eWuOjjPSlTzwbGxdi5HijmkZk80ssfLqPvPEYLgMpsRc6jWT5OGQrNTncGClqrkOPDnCJhg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cmpxchg.org; spf=pass smtp.mailfrom=cmpxchg.org; dkim=pass (2048-bit key) header.d=cmpxchg-org.20230601.gappssmtp.com header.i=@cmpxchg-org.20230601.gappssmtp.com header.b=hBOHqBb+; arc=none smtp.client-ip=209.85.219.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cmpxchg.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cmpxchg.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cmpxchg-org.20230601.gappssmtp.com header.i=@cmpxchg-org.20230601.gappssmtp.com header.b="AtYGdgJ3"
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-6cbe9914487so7776326d6.1
-        for <linux-crypto@vger.kernel.org>; Thu, 07 Nov 2024 09:31:30 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=cmpxchg-org.20230601.gappssmtp.com header.i=@cmpxchg-org.20230601.gappssmtp.com header.b="hBOHqBb+"
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6cbcd49b833so6807946d6.3
+        for <linux-crypto@vger.kernel.org>; Thu, 07 Nov 2024 09:34:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cmpxchg-org.20230601.gappssmtp.com; s=20230601; t=1731000689; x=1731605489; darn=vger.kernel.org;
+        d=cmpxchg-org.20230601.gappssmtp.com; s=20230601; t=1731000854; x=1731605654; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/52dHnIzYVGUdsWhfYMIa1Gi94aRC9NLX3XTIQyp/vE=;
-        b=AtYGdgJ3hy1pAx09Flqs3LPOM9qzsReMIz7Q79VSJSt7afTWy/YJYrvSoD2HE6btWy
-         vmkj9sMaWEM2t3/rcr2hJBRIefXb0pk8Ra0t9C25vtbQpTeu8PXgZjdfnussmF4tpe4R
-         KTtJJJ6QwGhR8jyZ7IRjguZ+uK7WYi3aXn2q7pFLuj5Tnf1in5FUD4vyd4D2Oa75CC79
-         qkuoRh4FZTZmdyfhr4BJ3LI4X0aXy7hr2eNtmBtQYkXHbKG990lIHuWMVEaZQzmEUtdu
-         ek8h/sbZBxy/dJ6NECX362gRVCU7H6C9njJ5m/EwUK8M6oslLS0Gq13I7M1dscZJ0niG
-         4GHw==
+        bh=cWemB79fAe6SpnaBm2nNh5Iw35FC11YRxCP1qALK8Wo=;
+        b=hBOHqBb+FDn0R+DiMuPB0rOYtz7BMu2YO2i8MiM1V9/xjT64t01B1f5stcxSDJylQi
+         EE/AM9HoQ1xY54WjKSuu7PFjVTfH4pYC8aEdMfQbkQSwiDasE4rRQr83k9hwz+gHiNkQ
+         aPqh/qP4+W1T4wcNoQWqO86XjG1d3P+C4V1MPcV/FNY2rx0mozgqphYRScVGEYU5+lal
+         unDr5H+Ph7vEEWOfzyd62sk2YAMvJ0szNFvNlbL71dXh+daBnDVw0aq1O0Q/vEXdyWH8
+         7mSDJVTWa43QMm4dTUNrBueeR0TwSn+BLhSzkolavlZvzEeDDC32r4Pcf7gi6jwUkZaR
+         5DTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731000689; x=1731605489;
+        d=1e100.net; s=20230601; t=1731000854; x=1731605654;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/52dHnIzYVGUdsWhfYMIa1Gi94aRC9NLX3XTIQyp/vE=;
-        b=NOt/15xYbZy5wEDisYhGgQiE4srEbXbYrdIgtuqJ2e0RNq4i7wQcU9yFPkIoaE6cQF
-         A1Ouj6qb3EaOmVDg8KUSJWxmMAQGQQu1iNlCKqIFckSOCMMSXKQf7QS2FlX4A/RtSJ7Q
-         v66U3UqCBqAqflM76d1TanigdkHfNIdOch7vrBAH9/u0Xb4l8wLQv7NJkSlYr3XsduGX
-         JwEMuHe0oJkiway55cYMSa0CuEnUlHM0VzYAKtoJAoC0xSYvigH12rgGMVVQQmJszriI
-         8eBwEeEXR1nkPUie1bbAnwP2xVzeatQFFbuNsCEWYZWOC1ToZli7fSZAhUVxdZ9N9RkI
-         oxeA==
-X-Forwarded-Encrypted: i=1; AJvYcCVIJ/foPVmr1oCa896m++sE4hSfcNnnI01baxLEnYWm+K7+BsBliZj7cNxqsjHIu7qaScpqngVKF0mbE0c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YypSQT2p4GRSutd3ayqjMWb/r8zDZrdWhiThNradRr3KkX3Yml2
-	YHJGoPZ1Cu92qnerG0HiRUHldMN2n5N6FDild39zjNhK40Qlaa3LjJLFFRivbJ4=
-X-Google-Smtp-Source: AGHT+IEZ6SHobqwmBLku5T22g3qb1tqmYJPcUGBA8+Da3y8UJVplvgda5z5x27uRTa0Tc+2qWv1/fg==
-X-Received: by 2002:a05:6214:329:b0:6d3:9dad:6869 with SMTP id 6a1803df08f44-6d39dad6888mr801246d6.16.1731000689463;
-        Thu, 07 Nov 2024 09:31:29 -0800 (PST)
+        bh=cWemB79fAe6SpnaBm2nNh5Iw35FC11YRxCP1qALK8Wo=;
+        b=nEnU7FBOVG9RkJoKj4h3D16O9ZG8WB0hGvyWufF6V4ReV8K5LOoSxx8sMuCi0Uzeu2
+         3hhfMMaqZ3f6dX8Gwh5oWvjlam0k1G56z92yXKPKIorcEtIZZdfefYsL6qP2P737Q8fy
+         yDQaaWAMRDzcVXS/boqv1r0QaZmatfNhbIO7372cJRgJsc0pB+AVp1wRQ7qlOseDUljY
+         0nDx+GrSyOAE5T5s+/3REZBCsqK1LELrA87Ws88p0/2azZfU7IQMQv7BUBfZ/ikI1eKd
+         JvSfq3+OIegnTNK2r3S6CxcUwP40gPykdvzcLaT29ZzGaB7uuWjyiSo3i+J6WUcednzw
+         FZLA==
+X-Forwarded-Encrypted: i=1; AJvYcCVTR4NU3XKNzd6nVHcEMp+N9W+fpSyV0/DQ3f4H8ZQo8v6j91gaZv+8Nr87ci8VSN4ThhTzzEKSofjBItc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzko9+NFiTnWSDWceFTY4Zv5nf4IQErzXY5VtLystRiHCnpgu3A
+	xQj3AHoMqnSnt7iI50G5JP01mOc1B+wyyhgrp3K2r1AzSjDlJ+sFyXMdtt0WaeI=
+X-Google-Smtp-Source: AGHT+IF89BIZHtrWpN7In5LhF5z5/XKx84pBBultLGiUVGLDmfyvJdljNxUNIPKtS6p776sAZRxOMg==
+X-Received: by 2002:a05:6214:3909:b0:6d3:9292:6ce with SMTP id 6a1803df08f44-6d39d990990mr2468756d6.27.1731000854126;
+        Thu, 07 Nov 2024 09:34:14 -0800 (PST)
 Received: from localhost ([2603:7000:c01:2716:da5e:d3ff:fee7:26e7])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d396637613sm9658116d6.116.2024.11.07.09.31.28
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d39643b384sm9773336d6.91.2024.11.07.09.34.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Nov 2024 09:31:28 -0800 (PST)
-Date: Thu, 7 Nov 2024 12:31:24 -0500
+        Thu, 07 Nov 2024 09:34:13 -0800 (PST)
+Date: Thu, 7 Nov 2024 12:34:12 -0500
 From: Johannes Weiner <hannes@cmpxchg.org>
 To: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
 Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, yosryahmed@google.com,
@@ -62,11 +62,11 @@ Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, yosryahmed@google.com,
 	clabbe@baylibre.com, ardb@kernel.org, ebiggers@google.com,
 	surenb@google.com, kristen.c.accardi@intel.com, zanussi@kernel.org,
 	wajdi.k.feghali@intel.com, vinodh.gopal@intel.com
-Subject: Re: [PATCH v3 11/13] mm: zswap: Allocate acomp_batch_ctx resources
- for a given zswap_pool.
-Message-ID: <20241107173124.GD1172372@cmpxchg.org>
+Subject: Re: [PATCH v3 12/13] mm: Add sysctl vm.compress-batching switch for
+ compress batching during swapout.
+Message-ID: <20241107173412.GE1172372@cmpxchg.org>
 References: <20241106192105.6731-1-kanchana.p.sridhar@intel.com>
- <20241106192105.6731-12-kanchana.p.sridhar@intel.com>
+ <20241106192105.6731-13-kanchana.p.sridhar@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -75,35 +75,16 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241106192105.6731-12-kanchana.p.sridhar@intel.com>
+In-Reply-To: <20241106192105.6731-13-kanchana.p.sridhar@intel.com>
 
-On Wed, Nov 06, 2024 at 11:21:03AM -0800, Kanchana P Sridhar wrote:
-> If the zswap_pool is associated with an acomp_alg/crypto_acomp that has
-> registered batch_compress() and batch_decompress() API, we can allocate the
-> necessary batching resources for the pool's acomp_batch_ctx.
+On Wed, Nov 06, 2024 at 11:21:04AM -0800, Kanchana P Sridhar wrote:
+> The sysctl vm.compress-batching parameter is 0 by default. If the platform
+> has Intel IAA, the user can run experiments with IAA compress batching of
+> large folios in zswap_store() as follows:
 > 
-> This patch makes the above determination on incurring the per-cpu memory
-> footprint cost for batching, and if so, goes ahead and allocates
-> SWAP_CRYPTO_BATCH_SIZE (i.e. 8) acomp_reqs/buffers for the
-> pool->acomp_batch_ctx on that specific cpu.
-> 
-> It also "remembers" the pool's batching readiness as a result of the above,
-> through a new
-> 
->    	enum batch_comp_status can_batch_comp;
-> 
-> member added to struct zswap_pool, for fast retrieval during
-> zswap_store().
-> 
-> This allows us a way to only incur the memory footprint cost of the
-> pool->acomp_batch_ctx resources for a given cpu on which zswap_store()
-> needs to process a large folio.
-> 
-> Suggested-by: Yosry Ahmed <yosryahmed@google.com>
-> Suggested-by: Ying Huang <ying.huang@intel.com>
-> Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
+> sysctl vm.compress-batching=1
+> echo deflate-iaa > /sys/module/zswap/parameters/compressor
 
-A general observation: this is a lot of code for a hardware specific
-feature that many CPUs and architectures do not support. Please keep
-the code self-contained, and wrap struct members and functions in a
-new CONFIG option, so that not everybody has to compile this in.
+A sysctl seems uncalled for. Can't the batching code be gated on
+deflate-iaa being the compressor? It can still be generalized later if
+another compressor is shown to benefit from batching.
