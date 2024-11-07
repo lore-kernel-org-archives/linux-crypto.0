@@ -1,205 +1,115 @@
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2076.outbound.protection.outlook.com [40.107.243.76])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA8DB1EF08E;
-	Thu,  7 Nov 2024 13:13:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.76
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730985230; cv=fail; b=IM3rwo61yGdvdr+ZSzhGKZXbsRvFbR5GGQ59GgHoT1i9rm1v4FQFAeJCBjjLJ4ah0xVbbg+dJdCXyQwRviRP89HMA9Q3IM++UKKdSdCQNhvn9pEtgfdUyJtZd54gFjguocS/PfpSWkdymzvjNqjiOS0wsgrb6xlIQVDyARfaWYo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730985230; c=relaxed/simple;
-	bh=G5+Tyb923A0DH+oLb1PbkGBpwMR7HI7AI0mPCX+AUTg=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=LARfkJLxdXCmGWErOastgl82Ta2eep3LxnUavx3VLzQPnrgpZjjFi1FRF4+uaV+eIviBlBYfGhD0+QmNlIpaUjIzWj1+BpsBAIQm4MbtP0FGx/I/MfqxT0RohsWebHynHYxM5rET/ypmsBULtpANROsrXcRGonxXi+asN6UyOFo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=UkNn+5sc; arc=fail smtp.client-ip=40.107.243.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D20061DFDB8;
+	Thu,  7 Nov 2024 14:55:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730991332; cv=none; b=ehiNCZ0Q2y/cWt27hKnb4QV3qapAgSxOGEDahprOPQSZ/raYRpuEA9G151DQayqu4xVqI/38vcp6Ge+bIAxj/278K7+/Jjk2CnOT6k8MwN8yN9P5f2Q7txGJxQlA15UzKnMoZB2EaeQH48B9ICev9lAHycRyWkP42a4MIhE16wE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730991332; c=relaxed/simple;
+	bh=HcRDTAQt784F6HXtvbTEYrL2Ax+mGjjUqslScqIg1ZM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=jTNH0oJwAXod3EYglYcqvCiKDmmFtmYet61pXcyAMAJhYvLGPU6ulu8a1YE1V0QfoD2DDtXqwkB1LBmAQxWpD9fruRyQ+pQ4PSDqgIJY3Tb3hO8r9bxJY+6IYySMZnuEGBTvbbBgHLE6RcrArsx+qeEF10ri4vFh/rBnzVOhrXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=QekwZVCw; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="UkNn+5sc"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=uwb2MgPSIk8Lo+KrbBzOUdb1AcNgRh+kJBr3apHpSGG/DpfOjbKoZ93T4Fzy1PMpdFEtOB2LWcTDd9//WudfvYJztCW6Qvl89ybnayZ4iWhBGutcScsmNurSTuFZz3E5j8OvLppDwrcoYY9fT2DzUL19N9xPr9aDV5aFvsnzPmI+EL0dSQxRhku6Pt9C51CIGJA7I6KoNUVXKI+XdsqDa/SgiHeeq3oaLvE0YBy/0eqlmuClWRAsqvyPJ/HI73gX7fMP/Qr7pY60bhpACMf9J43fAieEIv1Nq0MVRFFeLjCj2AByj7Rf3/4KOnRJqumT+Nbl4M5TT2BdjgQ5jfev3Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Y8JbIbPKHlbnw7vd9rL1hhsLaCkSjJH5S7VgyCXG18A=;
- b=cAwGDgYeL8IcsgK4fLMMItoYDp+czbpnw8ErLO2Z8oOADO03Bn4+kXCPu20QtdftesqhxdshELDNlior24YWpDQCUCxuFwhKYnBIraXQ+ugc7yZqamjOTt6KNi0NvsNC/P36Je7U5t4yPNJln221u6mbvNmga9ZB7apAUHWL3pzR+aPVtZc3aY8xGPyjh+lV91KbcsEf77NQNgf8oJ1WoQ1ZvGu+Euc6KIXoR3/SjNpZDStkmL2Rb6RJFp5KgILGqLAtTtLMOGE6M8hafi3DRw6iKXmQo0UfZFBPEqrRh2LBX8X/cdEVnYv96OKeKflokGeGDoPIDiJjG36gHbkcZA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Y8JbIbPKHlbnw7vd9rL1hhsLaCkSjJH5S7VgyCXG18A=;
- b=UkNn+5sci8LtSde0tUolQ68TGUyhsDMjaJrkjbdY3TPXmfGCmvh0ZPzYMO7HVyP4zKPg/+m24QPTbRCb/vEvKQvMQxuSJRicNpvZZHz8Z/ieUZB2eJaqJS+7OijyIDX1aRhhBdY5t2s/h6hBdJ911E2ww8d3rnVj2SbLG9gII9H2O3HoA9lJOsAQdJAVT+CQapOB7KRhLGpXBN9pyzwJKp+IuDX/jNQT4n4Ykf8Y4f3PmeuYWenV0Zpm9OcwZwcByED/g5cZUWLDmZEQDURn5q0wtP1K1d+TzfRKUljRMyPj/rxiCYNoD7XOE3cdTXomrSYzRCtpCHjwl6bzgUJ6Gw==
-Received: from PH7PR12MB8178.namprd12.prod.outlook.com (2603:10b6:510:2b3::19)
- by DM4PR12MB8474.namprd12.prod.outlook.com (2603:10b6:8:181::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.18; Thu, 7 Nov
- 2024 13:13:45 +0000
-Received: from PH7PR12MB8178.namprd12.prod.outlook.com
- ([fe80::77bb:a9fb:c75b:f530]) by PH7PR12MB8178.namprd12.prod.outlook.com
- ([fe80::77bb:a9fb:c75b:f530%5]) with mapi id 15.20.8137.018; Thu, 7 Nov 2024
- 13:13:44 +0000
-From: Akhil R <akhilrajeev@nvidia.com>
-To: Chen Ridong <chenridong@huaweicloud.com>, "herbert@gondor.apana.org.au"
-	<herbert@gondor.apana.org.au>, "davem@davemloft.net" <davem@davemloft.net>,
-	"thierry.reding@gmail.com" <thierry.reding@gmail.com>, Jon Hunter
-	<jonathanh@nvidia.com>
-CC: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
-	"chenridong@huawei.com" <chenridong@huawei.com>, "wangweiyang2@huawei.com"
-	<wangweiyang2@huawei.com>
-Subject: RE: [PATCH] crypto: tegra - do not transfer req when tegra_sha_init
- returns an error
-Thread-Topic: [PATCH] crypto: tegra - do not transfer req when tegra_sha_init
- returns an error
-Thread-Index: AQHbMRUj6zRLf8q3jk+YxFkS5F6tn7KryWsA
-Date: Thu, 7 Nov 2024 13:13:44 +0000
-Message-ID:
- <PH7PR12MB8178FB2C64F990DFD3D9D5BAC05C2@PH7PR12MB8178.namprd12.prod.outlook.com>
-References: <20241107125211.1679517-1-chenridong@huaweicloud.com>
-In-Reply-To: <20241107125211.1679517-1-chenridong@huaweicloud.com>
-Accept-Language: en-IN, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH7PR12MB8178:EE_|DM4PR12MB8474:EE_
-x-ms-office365-filtering-correlation-id: 169ac787-90b4-4ea9-d808-08dcff2e0215
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?SFquOjrKDT8WA0nf2zR/djULMSlIVa0ucdNzv+5X3j6hd32Axd5003/wvNbG?=
- =?us-ascii?Q?RRZfKpxJ5JLYgbwFVbi031cDkRQowgNkoGS+xndG7FoAVH/MUhz4Z1nJehXq?=
- =?us-ascii?Q?4k0+E3qX5uORvwLfSs5LVNR0VUEnrBiOimjv3CaugEVezjLpOqNrfLtM1hNX?=
- =?us-ascii?Q?veX+x8dikxzg3CKoVsanmL5/I2ieH9F/txFL38w9a3qnXLHfSTmFT7YPSaux?=
- =?us-ascii?Q?DMwlCOGRjORhhjP4rKPmWYKH0jpLbw1wwrXFJ4wbrtFFUJoQmuNQSk/vFZDw?=
- =?us-ascii?Q?UqXyMqgeX+z83bHFoDuIEYGlnTvX8aa83NWSs70ylhtd4OKKmb/Jc4yVKHJB?=
- =?us-ascii?Q?7wkh1cAFAFt7NYd1su1IOPLpUDSATYCjUjPgBbUloaGB/7uAiDg8tOYZYoZZ?=
- =?us-ascii?Q?NgfGvaynrun4VGDbKhT6nlHCHtN3h5kgYaPXv34FEvr8peBKI6R0cfakh/eI?=
- =?us-ascii?Q?6jrbCeKEuR9cXXE44Cin54GXbPQbPDtMBmFRYbfj5aIDojX4zzaN9knmszJU?=
- =?us-ascii?Q?3ToErHno4uRcDZPZCP1EFtBk/A/7x2mTq/yR4jU3oHqOgpXdLlkYQgWTNZFe?=
- =?us-ascii?Q?PW/D8pxW/Wm5p58zf2wahWQ2RLoMsaM2/phMz+e0zwHiPZAQCfURv2XreGZz?=
- =?us-ascii?Q?tpBAU7QlQkkyv9hpPlMpC+E53oJ88L+BWCGT51CaTRipkPP7UXMHrjkEb43C?=
- =?us-ascii?Q?BiOd0NWm+vg9sXZzPex5/0rvkUsVW9uaHXXAkdDi4GXxWP3Sg24uj4Wl62EH?=
- =?us-ascii?Q?UbCrGbK7xJ5T0jmsLXUkDfiOaDBrNbPtzoFDdKw+kfk6bFAjs31326IscBXV?=
- =?us-ascii?Q?+5tGIV8UT1oGPwyEzcuWHzxpo/CuBwEfSZzKMFVFkr3tmTbcfM1dQDw9H7sk?=
- =?us-ascii?Q?gFEsQ3VsztPOb8nIskM77jvFSRbwm6AopwesAXhTjl4Fs3z25r75LxSXdian?=
- =?us-ascii?Q?YThGsJZ5VIoiJQrnK710Zou9QIkwK3889OQ4n3k2nz0lhicBdw4BGBFHxBiJ?=
- =?us-ascii?Q?TxINWm7Nvc1YseQqQwzkr7rii2qoAL7v+g6oLsuqvOLBhr74aiCAtRfkoSmj?=
- =?us-ascii?Q?H4tF45q4zk7UhrwfwVfM+93enZ1f6jsWMLXv3nm3RoZIuGW5qEjO3GV85es/?=
- =?us-ascii?Q?2SSGRH9jC4KD9QL4AbfCS3PPSK/nmS2SCAtNsUfS0pQSpgtMSYhSu+yKxHSd?=
- =?us-ascii?Q?6NRXYsP92rrARfwtG8+iwhrRnDaV1AFhgqYdHnzAxj1Xhj+Q2FBBre5m+Aid?=
- =?us-ascii?Q?tRWOjgBFsF9ZZyL5T/HKVVz9HeIfePwfqy6BxZw/kpdWJ1XkREcGvrGjV5re?=
- =?us-ascii?Q?0s9K6RNL2rGfp8ryr9+2Pr3rpRxea1vNtYWZeMLTO+pTw7++0OJkSyc5wTh6?=
- =?us-ascii?Q?yY7uFNs=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB8178.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?Xk+edjc0s1fHQdK6i5/H/O+gqIVrQvgJmYRct26Wv1tGkqdEhBTLq8MjskmJ?=
- =?us-ascii?Q?pqQihGMcQgimCy1uPzSXxDkBfXqwotbv2fxaLplD5op6Esf8Qr5/M1oYQb87?=
- =?us-ascii?Q?R4Q6jiZ4PMuJfTKPW5X5pyNwinBa6i765Km9DB3X0ByVDMSI8ltJMmvOk4Ov?=
- =?us-ascii?Q?qlmqsxYyHS9/8ifJf3Ab8KxS7ICqJLD+uWVWlV3t0MQnxmFAfSc7Win74es4?=
- =?us-ascii?Q?RdPgFodZKW53w003EplAwdcAuU0aXy7eVnVSduPDwOXKHTQ31pmlaWh9Z21B?=
- =?us-ascii?Q?S/yKNVJTlGbgqpjYoIWBBInako20ZblO/bHDtRB+82gweYDKxxBP9oYJ6Z35?=
- =?us-ascii?Q?yTgHGMANw7DWz7h4uZiAQTYIKIt+LYwy6PZGt2AgarKA3TCNFiHGLv7+4dB0?=
- =?us-ascii?Q?YrR2NCYkM7jxaDv1blLmOBNBKvWvupKwA9pu2EZKH0bvvLgb2SllmTV6E1NK?=
- =?us-ascii?Q?TCbUaeNnocPNnjG79v7DQvq3aQerADcOGFt85MvT+ChXQHShw6FRUhWG40TC?=
- =?us-ascii?Q?SSbQt+R52ctvSUwk1h/nCqL2FWJM6uSSI+fxSqkX5fNarX0qPQmyIRIIVHHq?=
- =?us-ascii?Q?ny0XnmsGf92TFhf1D+6IbNhLP2+KK3FDUXiTO70Y8RgvqBTRmoNGQyzC8wSH?=
- =?us-ascii?Q?cFKLk2l+qm5lUYLn/HCLJLBfCEjauq2RcXcgyedsqJjmKWNE8oBr5QYPFxrY?=
- =?us-ascii?Q?ZHgOtIWPl0zpvJGiBUSLx3WxQLivHnLIroHij/LQeXxkky8IR2taW/3+Vqyg?=
- =?us-ascii?Q?qwpBGxdhOKIL4z4/6l2CLvZaL7TsIZLgy9UjtTZLYYoYboCJVezu+iXspl0u?=
- =?us-ascii?Q?LrERwcPfuEdz4byO8IgR56m6zQTDHRgxRtRSYC8/7zNtOJ3T2NzO6RBCQuzs?=
- =?us-ascii?Q?XWJnFtbDNxx/gvpP7YsZVZnn5GWpsxKX9jXTDDSFV+BniPkCdGrcmbnsnL+n?=
- =?us-ascii?Q?toje0TDQtk4i5PG429HVquxHdyox2WA+NRvOay4x8+vdIqYQn5UexGjdA6DZ?=
- =?us-ascii?Q?rX7iCq0tyVYuWbHXC/IShP95xvV7SZ3z3AUZYAonv2f8p5KERCW9DHOF10TO?=
- =?us-ascii?Q?WyZ47++EvyFbR1zA6eNTgLWSx6cM0s0AgjQ3srRZDpKkrZRZWuJ62kc17QZL?=
- =?us-ascii?Q?5cJ4bfWkk+reMsmEtDnBshWp4mxte8Mwfq12vPG8rX2aRnKUJMxlhUYoXaMl?=
- =?us-ascii?Q?uzevlN36hNoOKUOmtgD6ALbjYRiooEy0T+TsyHYLFD6aVVT4uJlq5Y5l7Zzp?=
- =?us-ascii?Q?T6EuMpjGKhY9tr8NSersi9VBR/QITFRFPpuiYzofN9fjkPRp4bIfL9OPMBiX?=
- =?us-ascii?Q?N0oMzE9GXsTeFfgPigM8nloKlp79QC+tnO5COHNCCNnEotCQIYpHT9L6yAJh?=
- =?us-ascii?Q?AxAiKw7RyApn/qKUOeVW9m7AKMqDLlh4CmCQVYGam+v9uNSJ+NRCTQGdPqD/?=
- =?us-ascii?Q?aJRGNjC+Lw3yARbU6AtNicy65wvHY1gOqcIwvpHAUngxUwDDm1hpYUFe8r+U?=
- =?us-ascii?Q?VXcVF8UKl8hnjMl5uFAVByEB5bm2ylsgyAYgF0vF9u/hEDa8vgioZxLaplH0?=
- =?us-ascii?Q?gD5kasgP5fkttlHOQHUXXuY9hxjoaoehkc8bEPrv?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="QekwZVCw"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A7EeHA6027762;
+	Thu, 7 Nov 2024 14:55:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=pp1; bh=4RpvLuIzpZ7vreiHu
+	RfsaXxPvgXmzzigTouDYZLHauo=; b=QekwZVCwuVGjEaHAckUt63yi/k/r8bEVF
+	3ZWhcjQsBRRd3n0ak0QwSiO2d/KLiUXo9W2M6olsspdLE6eD579b+tHnKhXa1ioq
+	6wbeMy/Js6p7Nen8rMQemwyoh4fP7tfSmT4zHdgzou/Ui1hXyKLs1ilDige9b+5K
+	hQ3v5xA1wiim8MrlXoXrfNgVjY52YrExakFOhw/oxr34Ejp/H4eq8lufrON4nLB4
+	v1+o4UYknbOsqA6k+x5Of/1zUegkks+o5KUsaIIqGIkKGfX8aeaGIu0YZrEg+yJk
+	kgXvrcoWgheSvbdVVrv0cdnk297/+HshW1hJEh1JDNye8++zaGqqA==
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42rygs82d5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 07 Nov 2024 14:55:28 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4A7EVanS023983;
+	Thu, 7 Nov 2024 14:55:26 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 42nxsyyrph-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 07 Nov 2024 14:55:26 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4A7EtMXi50725226
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 7 Nov 2024 14:55:22 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8F0312004F;
+	Thu,  7 Nov 2024 14:55:22 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 372EE20040;
+	Thu,  7 Nov 2024 14:55:22 +0000 (GMT)
+Received: from funtu2.boeblingen.de.ibm.com (unknown [9.152.224.229])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  7 Nov 2024 14:55:22 +0000 (GMT)
+From: Harald Freudenberger <freude@linux.ibm.com>
+To: dengler@linux.ibm.com, herbert@gondor.apana.org.au, davem@davemloft.net,
+        hca@linux.ibm.com
+Cc: linux-s390@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: [PATCH v3 1/3] crypto: api - Adjust HASH_MAX_DESCSIZE for s390-phmac context
+Date: Thu,  7 Nov 2024 15:55:19 +0100
+Message-ID: <20241107145521.424769-2-freude@linux.ibm.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20241107145521.424769-1-freude@linux.ibm.com>
+References: <20241107145521.424769-1-freude@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB8178.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 169ac787-90b4-4ea9-d808-08dcff2e0215
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Nov 2024 13:13:44.7917
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: GT/SiAg2a/m439+B5fpBlM0SnUo+zKSSyxKh/U5zXHbGW1TxCEU4DatSSzDGIZyg/ZuH51f9HCXUKGfFNx+hkA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB8474
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: obR9Rbs8O6Vqx3eXu0etN5hB8c1Ob0eF
+X-Proofpoint-GUID: obR9Rbs8O6Vqx3eXu0etN5hB8c1Ob0eF
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ suspectscore=0 priorityscore=1501 malwarescore=0 adultscore=0
+ lowpriorityscore=0 clxscore=1015 mlxscore=0 spamscore=0 bulkscore=0
+ mlxlogscore=999 phishscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2409260000 definitions=main-2411070114
 
-> From: Chen Ridong <chenridong@huawei.com>
->=20
-> The tegra_sha_init function may return an error when memory is exhausted.
-> It should not transfer the request when tegra_sha_init returns an error.
->=20
-> Fixes: 0880bb3b00c8 ("crypto: tegra - Add Tegra Security Engine driver")
-> Signed-off-by: Chen Ridong <chenridong@huawei.com>
-> ---
->  drivers/crypto/tegra/tegra-se-hash.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
->=20
-> diff --git a/drivers/crypto/tegra/tegra-se-hash.c b/drivers/crypto/tegra/=
-tegra-se-
-> hash.c
-> index 4d4bd727f498..7e888bf5f66a 100644
-> --- a/drivers/crypto/tegra/tegra-se-hash.c
-> +++ b/drivers/crypto/tegra/tegra-se-hash.c
-> @@ -612,6 +612,7 @@ static int tegra_sha_finup(struct ahash_request *req)
->=20
->  static int tegra_sha_digest(struct ahash_request *req)
->  {
-> +       int ret;
+From: Holger Dengler <dengler@linux.ibm.com>
 
-I would suggest moving this variable to below other variables for aesthetic=
-s.
-Same with the other patch for tegra_cmac_init() as well.
-.
->         struct tegra_sha_reqctx *rctx =3D ahash_request_ctx(req);
->         struct crypto_ahash *tfm =3D crypto_ahash_reqtfm(req);
->         struct tegra_sha_ctx *ctx =3D crypto_ahash_ctx(tfm);
-> @@ -619,9 +620,11 @@ static int tegra_sha_digest(struct ahash_request *re=
-q)
->         if (ctx->fallback)
->                 return tegra_sha_fallback_digest(req);
->=20
-> -       tegra_sha_init(req);
-> -       rctx->task |=3D SHA_UPDATE | SHA_FINAL;
-> +       ret =3D tegra_sha_init(req);
-> +       if (ret)
-> +               return ret;
->=20
-> +       rctx->task |=3D SHA_UPDATE | SHA_FINAL;
->         return crypto_transfer_hash_request_to_engine(ctx->se->engine, re=
-q);
->  }
->=20
-> --
-> 2.34.1
+The phmac context exceeds the generic "worst case".
+Change this define to cover the s390 specific 'phmac(sha512)'
+which is a "protected" key hmac-sha2 implementation.
 
-I think this can be combined with the other patch for tegra_cma_init() as b=
-oth are similar
-fix. Apart from the minor comment above regarding the variable position, LG=
-TM.
+Signed-off-by: Holger Dengler <dengler@linux.ibm.com>
+Signed-off-by: Harald Freudenberger <freude@linux.ibm.com>
+---
+ include/crypto/hash.h | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-Acked-by: Akhil R <akhilrajeev@nvidia.com>
+diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+index 2d5ea9f9ff43..5b724dd7c5a7 100644
+--- a/include/crypto/hash.h
++++ b/include/crypto/hash.h
+@@ -159,10 +159,9 @@ struct shash_desc {
+ #define HASH_MAX_DIGESTSIZE	 64
+ 
+ /*
+- * Worst case is hmac(sha3-224-generic).  Its context is a nested 'shash_desc'
+- * containing a 'struct sha3_state'.
++ * The max case is currently the s390 specific shash 'phmac(sha512)'.
+  */
+-#define HASH_MAX_DESCSIZE	(sizeof(struct shash_desc) + 360)
++#define HASH_MAX_DESCSIZE	(sizeof(struct shash_desc) + 376)
+ 
+ #define SHASH_DESC_ON_STACK(shash, ctx)					     \
+ 	char __##shash##_desc[sizeof(struct shash_desc) + HASH_MAX_DESCSIZE] \
+-- 
+2.43.0
 
