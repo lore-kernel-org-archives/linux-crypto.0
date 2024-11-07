@@ -1,55 +1,55 @@
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 136DC21C174
-	for <linux-crypto@vger.kernel.org>; Thu,  7 Nov 2024 23:28:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3391221C189
+	for <linux-crypto@vger.kernel.org>; Thu,  7 Nov 2024 23:29:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731022141; cv=none; b=jkNT9eaxsMLi+Al1eH5MV9nLLhUh9GHCx/rAPthMjbVttwGMInoM+ZnXw2eM+/+OZO0zVEI+CB33T6owOjXb/zD/Tmkz5M52LjLpIuoNfVnIARSoACbTqE/U9xYEsuk1LFFOfT8mFd+2nd5+AGfbQSfmfPPae3APruJcqN52luA=
+	t=1731022142; cv=none; b=gdyZ2JiaHaqtgSjYmthZdrg9Qrm1xUo4y668oeIL7tM/megcLJhvGo+B6Eqqt0GRB+U/u3JJg9BcFWJd2iBrUPnTTzFpeZNtm0wHOO+bR2BL7VaMRJzoIKY9hZMV3Nuiav8bSq2Bo1B8M2Md+i5YQ4H9Q/HyswWFigBl6y26/3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731022141; c=relaxed/simple;
-	bh=GeMVM4Ec+fn//3H9389VcZZMcj62SCQA+XOQ+JtdlTk=;
+	s=arc-20240116; t=1731022142; c=relaxed/simple;
+	bh=6WWSW1vJ35TJDlbJJB5qq6nYTs9fwiNRbSVBdPgx3NQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Tsll0LI3IqZI4NW6mqP3fxBf9wejvDI7pAfXWt8TUVgyd9VGK6mCPDRVrF9N+B8KWIUk+8fhNin+yv4ZNzs93Ah7qp8mMz9kX/uEx4WE0gRuwiLAnvAYsgZXxR7KNqn+nB6CNujz/GTG3M0bREqKFveBzANd62v5FbQIW5dxDSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dionnaglaze.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JX9FZUk/; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=t2bncRw7crBGKqjXaxI7u5n14Ger3m9IWm6Papf40Rd++Fwv9LdHhWQ2A94nhHKGcBttL1Ih7WFdCVdgh9TGooLP+2kSxWYk3x6ArqPuRjgQ0KXn2TXrmEGmNS3H++nvHH/T11dTxfB7ObLtliFry8EE5+k3uOCbjB7odx6pD5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--dionnaglaze.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=t9n5jryM; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--dionnaglaze.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JX9FZUk/"
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6ea8901dff1so32237587b3.1
-        for <linux-crypto@vger.kernel.org>; Thu, 07 Nov 2024 15:28:59 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="t9n5jryM"
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-71e7858820eso1602781b3a.2
+        for <linux-crypto@vger.kernel.org>; Thu, 07 Nov 2024 15:29:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1731022138; x=1731626938; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1731022140; x=1731626940; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/mtW86B3DSmlFKT0lotGzdj7a1N3s2uwCyGHDKQX9vU=;
-        b=JX9FZUk/e6j59NxGLo6eMoMD/5JJ1GIZ6T4TqiczfVL7UibG3f1PN5pCvADJ4MhnjS
-         GDJ3eg6ns0z2X2juoctL3TXICjhQNPE/Nayy+BmJS19l0BpAb5WK/9/Gf4ecgkpxV22n
-         ER5LlqX24cy2DbAy8NBG7kLnvFeivLklM9M3HkJSb9txouWmN2I739qR11Hqj0u5FrNi
-         3m3BccRQexo5+G77PYL4uVjiw1+7bWCnzLEVXttAOiWulXsWxveaAa9cVAZo/w/lIEjg
-         VBPKC/Y+Xtq47hTQLijVBIdmKGTFjQ7DeEVMDvTDLlGPTIF8OdU+PsMkFWPYuUAfATzS
-         HdFQ==
+        bh=Vd/jtJnQGf9IB3+kXNQoV6T2je6UfO6DAehiOVa2s+o=;
+        b=t9n5jryMvuxkkLWzOEvxOf01La2djguOC4Dy8Pi7tlZFHGjTvc3fxMJXG70s6oFVdo
+         LQKfu6pHNNaGvzbwgppBXuvphJU8kBe/+DE+Q3pV27iNIO9NUwxZkprJumGYosp2BELU
+         tB5RZ1YgLlSGRWoXc8CdWsritPKklLh4GMjBpjExxdv33XtSYfv9dzdw0JzQ9AQqD5Qh
+         LaRjJQN8dSeasmH3IIJodo84UiRgM7hQwcf1G08fBQN7HK/A+AbG45BE0sgfBiFKpSus
+         TbXH+dckazAnqosLEulcJKWWVZghweLe+jGQrsm1A492gIV06nkEYJO+/7Qonbjxcysq
+         5SaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731022138; x=1731626938;
+        d=1e100.net; s=20230601; t=1731022140; x=1731626940;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/mtW86B3DSmlFKT0lotGzdj7a1N3s2uwCyGHDKQX9vU=;
-        b=XAGXZ4PMouLEa3g82HQWef8QxW0n8N0sgVkVkE0tPPVqX+VzKx6NR0ObZFjmgW7l3k
-         MUGyDV1zBew21HBaBx+xuwiasMWYx40XDiePzpLfVLIyiwxeR/3Be3lPrqMCUyn5UwvC
-         /9mcngXD65pAFqC8TufxkhnxrfX02k8rz7BL2tSuDDDp6HzB+JH6xy1H09a721ZnT0Ss
-         LTT4aNnXyqWrOmZzMPTXQ1krgyQrPCWnPspzXVMyI9WJvmRTw+KtLIO5wu3yRmrE/3b4
-         tsky1xxE+UF4vfcGfM9P0v97DfU3sA3Xdd2usSkd1Dp30L38xGXMENWJNmyvaWw8nWGC
-         q2zg==
-X-Forwarded-Encrypted: i=1; AJvYcCULXKdPsu2mn5+3TMPVMyqqJUVQhwU4HPsVMj/CqR2g6LzTBvG7LbO5UmQMCyVbTM5Hw8oE0Cq30xqyIpM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4FeIIaFXkTkf9K9eqUhG+OlRdvWNOE7Zcc49f4fCZcQHMXZb3
-	1l6lOo5nvLp4PSAWYUHI1TSKMXx7dAa1gPf9VV3AkaOeb2yuFzDdgPKWkRimLut2xyX8n+HMq+Y
-	15QGE5KtDAn/6O4orK90WpQ==
-X-Google-Smtp-Source: AGHT+IHrNNzZrarS/YQjs+xV1rDR0GePDAFsw74nsrSHNCOrLqUNJv5SPe4CSAD/IfeNYkWr5gdo2XMmDenU30uPTw==
+        bh=Vd/jtJnQGf9IB3+kXNQoV6T2je6UfO6DAehiOVa2s+o=;
+        b=jLHmnpHgw/t3XgUOZ55hm05lNDC+JZjaLuX6fpAUj9yT8x4Dh95Ko5Wv0625S/G0T9
+         hw/dGGK0R4kbBFJySW2/2sXcDVoAdOEqE8PLN2w6PBdsAh3m9Q4k7v/ocfZ+0JZ42rac
+         nmW6yp0vJLDTGg/FmMf7s4kMHQuLKaijSGyMhl+mnsx+FglbVuPktWwBIW9PW8lYUoDj
+         jTg4ilVdEOMLUd1hToF5CHftU7uvsfK1vNTHPBHxAGMjgR8svhCUmm3vB/pqRl1kN2Wq
+         IuJq/QbbMIFxtCImLpPniLl9tfjN9ki+nrYSM9ReN8qgnzzHzg0jcynMxPiQOFogQR1i
+         3/Lw==
+X-Forwarded-Encrypted: i=1; AJvYcCVM7WkqhDPJYStgaVw622yxWBqLvosTG69l1xzeTzs4c8GJRytAhFLS71RLug9y4yi5FncgUGxdmR6arpI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBCtvrtrZJQHCiI7bLnMV0I1wsdGYbbZssa9hC9phQNwrDUGZn
+	sxbjMOc9gvgOUt/Y7TMMwn+umPrhWilMzjQHcHTO0CpEV+UYiUP66UuAzwrrk7h4osOs+NF3dKm
+	FXwJ4Antis+fLUx/u/8cILg==
+X-Google-Smtp-Source: AGHT+IG3FN+utE5DtZk1yqn4OdrPXgq7d6fljLLlDC+Gkt63/91sIHkgMPRqozoEz65kcTQskewlqi/wialMoW0yqA==
 X-Received: from dionnaglaze.c.googlers.com ([fda3:e722:ac3:cc00:36:e7b8:ac13:c9e8])
- (user=dionnaglaze job=sendgmr) by 2002:a05:690c:3501:b0:62c:f976:a763 with
- SMTP id 00721157ae682-6eaddd8b094mr187867b3.1.1731022138141; Thu, 07 Nov 2024
- 15:28:58 -0800 (PST)
-Date: Thu,  7 Nov 2024 23:24:47 +0000
+ (user=dionnaglaze job=sendgmr) by 2002:a62:b401:0:b0:71e:5f55:86f1 with SMTP
+ id d2e1a72fcca58-724133cd470mr5045b3a.5.1731022140524; Thu, 07 Nov 2024
+ 15:29:00 -0800 (PST)
+Date: Thu,  7 Nov 2024 23:24:48 +0000
 In-Reply-To: <20241107232457.4059785-1-dionnaglaze@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -59,35 +59,27 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20241107232457.4059785-1-dionnaglaze@google.com>
 X-Mailer: git-send-email 2.47.0.277.g8800431eea-goog
-Message-ID: <20241107232457.4059785-8-dionnaglaze@google.com>
-Subject: [PATCH v5 07/10] crypto: ccp: Add preferred access checking method
+Message-ID: <20241107232457.4059785-9-dionnaglaze@google.com>
+Subject: [PATCH v5 08/10] KVM: SVM: move sev_issue_cmd_external_user to new API
 From: Dionna Glaze <dionnaglaze@google.com>
 To: linux-kernel@vger.kernel.org, x86@kernel.org, 
+	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
 	Ashish Kalra <ashish.kalra@amd.com>, Tom Lendacky <thomas.lendacky@amd.com>, 
 	John Allen <john.allen@amd.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
 	"David S. Miller" <davem@davemloft.net>
 Cc: linux-coco@lists.linux.dev, Dionna Glaze <dionnaglaze@google.com>, 
-	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, Michael Roth <michael.roth@amd.com>, 
-	Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, 
-	Danilo Krummrich <dakr@redhat.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Tianfei zhang <tianfei.zhang@intel.com>, 
-	Alexey Kardashevskiy <aik@amd.com>, linux-crypto@vger.kernel.org
+	Michael Roth <michael.roth@amd.com>, Luis Chamberlain <mcgrof@kernel.org>, 
+	Russ Weight <russ.weight@linux.dev>, Danilo Krummrich <dakr@redhat.com>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Tianfei zhang <tianfei.zhang@intel.com>, Alexey Kardashevskiy <aik@amd.com>, kvm@vger.kernel.org, 
+	linux-crypto@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-sev_issue_cmd_external_user is the only function that checks permissions
-before performing its task. With the new GCTX API, it's important to
-establish permission once and have that determination dominate later API
-uses. This is implicitly how ccp has been used by dominating uses of
-sev_do_cmd by a successful sev_issue_cmd_external_user call.
-
-Consider sev_issue_cmd_external_user deprecated by
-checking if a held file descriptor passes file_is_sev, similar to the
-file_is_kvm function.
-
-This also fixes the header comment that the bad file error code is
--%EINVAL when in fact it is -%EBADF.
+ccp now prefers all calls from external drivers to dominate all calls
+into the driver on behalf of a user with a successful
+sev_check_external_user call.
 
 CC: Sean Christopherson <seanjc@google.com>
 CC: Paolo Bonzini <pbonzini@redhat.com>
@@ -111,77 +103,120 @@ CC: Alexey Kardashevskiy <aik@amd.com>
 
 Signed-off-by: Dionna Glaze <dionnaglaze@google.com>
 ---
- drivers/crypto/ccp/sev-dev.c | 13 +++++++++++--
- include/linux/psp-sev.h      | 11 ++++++++++-
- 2 files changed, 21 insertions(+), 3 deletions(-)
+ arch/x86/kvm/svm/sev.c       | 18 +++++++++++++++---
+ drivers/crypto/ccp/sev-dev.c | 12 ------------
+ include/linux/psp-sev.h      | 27 ---------------------------
+ 3 files changed, 15 insertions(+), 42 deletions(-)
 
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index d0e0152aefb32..cea41b8cdabe4 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -528,21 +528,33 @@ static int sev_bind_asid(struct kvm *kvm, unsigned int handle, int *error)
+ 	return ret;
+ }
+ 
+-static int __sev_issue_cmd(int fd, int id, void *data, int *error)
++static int sev_check_external_user(int fd)
+ {
+ 	struct fd f;
+-	int ret;
++	int ret = 0;
+ 
+ 	f = fdget(fd);
+ 	if (!fd_file(f))
+ 		return -EBADF;
+ 
+-	ret = sev_issue_cmd_external_user(fd_file(f), id, data, error);
++	if (!file_is_sev(fd_file(f)))
++		ret = -EBADF;
+ 
+ 	fdput(f);
+ 	return ret;
+ }
+ 
++static int __sev_issue_cmd(int fd, int id, void *data, int *error)
++{
++	int ret;
++
++	ret = sev_check_external_user(fd);
++	if (ret)
++		return ret;
++
++	return sev_do_cmd(id, data, error);
++}
++
+ static int sev_issue_cmd(struct kvm *kvm, int id, void *data, int *error)
+ {
+ 	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
 diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 498ec8a0deeca..f92e6a222da8a 100644
+index f92e6a222da8a..67f6425b7ed07 100644
 --- a/drivers/crypto/ccp/sev-dev.c
 +++ b/drivers/crypto/ccp/sev-dev.c
-@@ -8,6 +8,7 @@
-  */
- 
- #include <linux/bitfield.h>
-+#include <linux/file.h>
- #include <linux/module.h>
- #include <linux/kernel.h>
- #include <linux/kthread.h>
-@@ -2486,11 +2487,19 @@ static struct notifier_block snp_panic_notifier = {
- 	.notifier_call = snp_shutdown_on_panic,
- };
- 
-+bool file_is_sev(struct file *p)
-+{
-+	return p && p->f_op == &sev_fops;
-+}
-+EXPORT_SYMBOL_GPL(file_is_sev);
-+
- int sev_issue_cmd_external_user(struct file *filep, unsigned int cmd,
- 				void *data, int *error)
- {
--	if (!filep || filep->f_op != &sev_fops)
--		return -EBADF;
-+	int rc = file_is_sev(filep) ? 0 : -EBADF;
-+
-+	if (rc)
-+		return rc;
- 
- 	return sev_do_cmd(cmd, data, error);
+@@ -2493,18 +2493,6 @@ bool file_is_sev(struct file *p)
  }
+ EXPORT_SYMBOL_GPL(file_is_sev);
+ 
+-int sev_issue_cmd_external_user(struct file *filep, unsigned int cmd,
+-				void *data, int *error)
+-{
+-	int rc = file_is_sev(filep) ? 0 : -EBADF;
+-
+-	if (rc)
+-		return rc;
+-
+-	return sev_do_cmd(cmd, data, error);
+-}
+-EXPORT_SYMBOL_GPL(sev_issue_cmd_external_user);
+-
+ void sev_pci_init(void)
+ {
+ 	struct sev_device *sev = psp_master->sev_data;
 diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-index b91cbdc208f49..ed85c0cfcfcbe 100644
+index ed85c0cfcfcbe..b4164d3600702 100644
 --- a/include/linux/psp-sev.h
 +++ b/include/linux/psp-sev.h
-@@ -879,11 +879,18 @@ int sev_platform_status(struct sev_user_data_status *status, int *error);
-  * -%ENOTSUPP  if the SEV does not support SEV
-  * -%ETIMEDOUT if the SEV command timed out
-  * -%EIO       if the SEV returned a non-zero return code
-- * -%EINVAL    if the SEV file descriptor is not valid
-+ * -%EBADF     if the file pointer is bad or does not grant access
+@@ -860,30 +860,6 @@ int sev_platform_init(struct sev_platform_init_args *args);
   */
- int sev_issue_cmd_external_user(struct file *filep, unsigned int id,
- 				void *data, int *error);
+ int sev_platform_status(struct sev_user_data_status *status, int *error);
  
-+/**
-+ * file_is_sev - returns whether a file pointer is for the SEV device
-+ *
-+ * @filep - SEV device file pointer
-+ */
-+bool file_is_sev(struct file *filep);
-+
+-/**
+- * sev_issue_cmd_external_user - issue SEV command by other driver with a file
+- * handle.
+- *
+- * This function can be used by other drivers to issue a SEV command on
+- * behalf of userspace. The caller must pass a valid SEV file descriptor
+- * so that we know that it has access to SEV device.
+- *
+- * @filep - SEV device file pointer
+- * @cmd - command to issue
+- * @data - command buffer
+- * @error: SEV command return code
+- *
+- * Returns:
+- * 0 if the SEV successfully processed the command
+- * -%ENODEV    if the SEV device is not available
+- * -%ENOTSUPP  if the SEV does not support SEV
+- * -%ETIMEDOUT if the SEV command timed out
+- * -%EIO       if the SEV returned a non-zero return code
+- * -%EBADF     if the file pointer is bad or does not grant access
+- */
+-int sev_issue_cmd_external_user(struct file *filep, unsigned int id,
+-				void *data, int *error);
+-
  /**
-  * sev_guest_deactivate - perform SEV DEACTIVATE command
+  * file_is_sev - returns whether a file pointer is for the SEV device
   *
-@@ -1039,6 +1046,8 @@ static inline int sev_guest_df_flush(int *error) { return -ENODEV; }
- static inline int
- sev_issue_cmd_external_user(struct file *filep, unsigned int id, void *data, int *error) { return -ENODEV; }
+@@ -1043,9 +1019,6 @@ sev_guest_activate(struct sev_data_activate *data, int *error) { return -ENODEV;
  
-+static inline bool file_is_sev(struct file *filep) { return false; }
-+
+ static inline int sev_guest_df_flush(int *error) { return -ENODEV; }
+ 
+-static inline int
+-sev_issue_cmd_external_user(struct file *filep, unsigned int id, void *data, int *error) { return -ENODEV; }
+-
+ static inline bool file_is_sev(struct file *filep) { return false; }
+ 
  static inline void *psp_copy_user_blob(u64 __user uaddr, u32 len) { return ERR_PTR(-EINVAL); }
- 
- static inline void *snp_alloc_firmware_page(gfp_t mask)
 -- 
 2.47.0.277.g8800431eea-goog
 
