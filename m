@@ -1,95 +1,104 @@
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14BEB2076BA;
-	Thu,  7 Nov 2024 11:43:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FB262076A5;
+	Thu,  7 Nov 2024 12:08:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730979804; cv=none; b=QFbKuUVrsdE3Rp5VeobAXzu9y6QGs2jUbaiag8PaEETOGfdQwLMFtbPmjlIE1oXF5vHJdQkSquiOU49NSPPt2xzuq/UuQzekwx7lzxCYKynryaF0s0/U7OnlNTPWXx5elEriRP77mY6ugyR/PQAPiYC5MD2H/r8saDxeEyt2j38=
+	t=1730981306; cv=none; b=lsTt3Gc4nS+Yn4Osxi/oXIHrggdQZnRvgWuwHjwHNWwWbx4CqzN3p7HwdyBKx+em6j7b/n9U1RZyO4cTSUO0fIO2Ji+OVK35oCEFMYu5EykhsxXphr6MDHd05GjhtVmoBTAfvUTXgAYaOhJp2h8jsBG6qRBAKGRW97GbbEu8uZ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730979804; c=relaxed/simple;
-	bh=T028A5MmPSNjEPfr6NKkmeNU2bd2lvwO5vXFaDSPhjE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=gwlf2KN6zlErkcrH0Ac8RVizqRZsXn9+7Dr6PghPt44guY+eePUT6l2oZIjlfE0u1vEN0goqNTw2BNfrE/UGfYFgIANmx3XQfuxfKMhTveXWblsRugq9KGOLjX6oY8K6XUv3EhykHrrilTzHMnU1TqXI7+7FDVLKnPWpT75bFWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=BiEwpqK0; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
+	s=arc-20240116; t=1730981306; c=relaxed/simple;
+	bh=M3TLAFIJ4/kVYb6Psr+D6CGPXSYJcvxy5NdMfI5i/hw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=RlS8qSA+CZYzW+fjfWvk4MTfEMCsXHXaaRDzAvnnOVAD+I4HmSKN4IrIhwsRm2989yK3lFreh1qz/7//xUvAGoINmsGVrAQuTry8LL8+CJTST4EGxuQyawreo6DaqqAOl+MQ8cpiZ8L0lB/iMK3knS1ZqkyvBh0V+foS6LIfLhY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=n6dstFS/; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="BiEwpqK0"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
-	s=201909; t=1730979798;
-	bh=4Okfvzd2eQr6dRNHt7yCDBwWw5/wg/dsUal/yL3Sw/Q=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=BiEwpqK0s4x0OUCGOD+kvoaKS9tuCWyAZUnpNV+P05pY47FA+NDLfZ/JWKZp6/PeK
-	 LPiJEMlpsFmhZgbLj+pEAU9H/nqekHkImAjNmt9grjgLaFNs7JUGP9HkNorncmuHx/
-	 AZp4AlFzI9YMvuzlyB1EMBaFnxG0S2CllABXenX1m6YqEFeypKN3+u1YUFnmMfwNtg
-	 xJWlA+ULvM64H9YSotQPBK3I+svyN6uMFBK/8axmH0XDREP0LvfJESv7I5akm96VCI
-	 ujNar4HQrlP1e8LDBiJB9dmNthjjdZ3aDAgGlqI58SIdn9gkdBAG9x1ry5DnVm6lPY
-	 LM7Hgj+n5bn6Q==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4XkgF02sDzz4wcj;
-	Thu,  7 Nov 2024 22:43:16 +1100 (AEDT)
-From: Michael Ellerman <mpe@ellerman.id.au>
-To: Michal Suchanek <msuchanek@suse.de>, linuxppc-dev@lists.ozlabs.org,
- Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Michal Suchanek <msuchanek@suse.de>, "David S. Miller"
- <davem@davemloft.net>, Nicholas Piggin <npiggin@gmail.com>, Christophe
- Leroy <christophe.leroy@csgroup.eu>, Naveen N Rao <naveen@kernel.org>,
- Madhavan Srinivasan <maddy@linux.ibm.com>, Danny Tsen
- <dtsen@linux.ibm.com>, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, Nicolai Stange <nstange@suse.com>
-Subject: Re: [PATCH] aes-gcm-p10: Use the correct bit to test for P10
-In-Reply-To: <20241106121019.25629-1-msuchanek@suse.de>
-References: <20240923133040.4630-3-dtsen@linux.ibm.com>
- <20241106121019.25629-1-msuchanek@suse.de>
-Date: Thu, 07 Nov 2024 22:43:17 +1100
-Message-ID: <87h68jclre.fsf@mpe.ellerman.id.au>
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="n6dstFS/"
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A79LW0d009664;
+	Thu, 7 Nov 2024 12:08:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	8AnuIQnNPLUsevNU7FkVO1ndU0mlURvYfRqITOX9XXM=; b=n6dstFS/j0JfheMc
+	ImBLPzcHIBHcPksVPIZS0pgRJ99MSkVT50nKdtcumUaDQK4/ReoN/E2orgARYfaI
+	eorhbbcw2LnfbdNhMJdOmdWuo0uDUVreC2pDqAMCN0eQHZYczE2xgQALkXHcoj0h
+	5o4O9/8lvTJFE0buyotL3YPp+vVyzX+9PYX71xFploKC91RstiRZRqbRdI8AzApN
+	C6L99bc0mYpO9Hdyjo1YnRjUFM3p7R/LQzcyS5W9652fpd1rc/ifUJUV2rvolzgC
+	NoJ8pLbzD48p8SibOmrHGuYs4njH6mvnFiZhQxfnU5YXxVgpAWVeeS/WApbCEvMQ
+	tE4mJQ==
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42rtupgepy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 07 Nov 2024 12:08:16 +0000 (GMT)
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+	by NALASPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4A7C8F5t016657
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 7 Nov 2024 12:08:15 GMT
+Received: from [10.217.238.57] (10.80.80.8) by nalasex01b.na.qualcomm.com
+ (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 7 Nov 2024
+ 04:08:11 -0800
+Message-ID: <1eda19f0-8e9b-4629-8ad9-57d7eea572f2@quicinc.com>
+Date: Thu, 7 Nov 2024 17:38:08 +0530
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V1 0/2] Enable TRNG for QCS8300
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bjorn Andersson
+	<andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>, Vinod Koul
+	<vkoul@kernel.org>
+CC: <linux-arm-msm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <quic_sravank@quicinc.com>
+References: <20241106110002.3054839-1-quic_yrangana@quicinc.com>
+Content-Language: en-US
+From: Yuvaraj Ranganathan <quic_yrangana@quicinc.com>
+In-Reply-To: <20241106110002.3054839-1-quic_yrangana@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: -5A_3YGy1FzttJkG5Zbj34mYXut4XGRm
+X-Proofpoint-ORIG-GUID: -5A_3YGy1FzttJkG5Zbj34mYXut4XGRm
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=722 clxscore=1015
+ bulkscore=0 suspectscore=0 adultscore=0 mlxscore=0 malwarescore=0
+ spamscore=0 lowpriorityscore=0 priorityscore=1501 impostorscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411070094
 
-Michal Suchanek <msuchanek@suse.de> writes:
-> A hwcap feature bit is passed to cpu_has_feature, resulting in testing
-> for CPU_FTR_MMCRA instead of the 3.1 platform revision.
+Mistakenly uploaded the base dtsi change instead of marking dependency,
+will be posting V2 soon.
 
-Ouch. Good find.
+On 11/6/2024 4:30 PM, Yuvaraj Ranganathan wrote:
+> Add device-tree nodes to enable TRNG for QCS8300
+> 
+> Yuvaraj Ranganathan (2):
+>   dt-bindings: crypto: qcom,prng: document QCS8300
+>   arm64: dts: qcom: qcs8300: add TRNG node
+> 
+>  .../devicetree/bindings/crypto/qcom,prng.yaml |    1 +
+>  arch/arm64/boot/dts/qcom/qcs8300.dtsi         | 1380 +++++++++++++++++
+>  2 files changed, 1381 insertions(+)
+>  create mode 100644 arch/arm64/boot/dts/qcom/qcs8300.dtsi
+> 
 
-Notably all IBM Power CPUs have MMCRA set, so the feature test is
-essentially a nop.
-
-> Fixes: c954b252dee9 ("crypto: powerpc/p10-aes-gcm - Register modules as SIMD")
-
-^ which is only in linux-next so no stable tag needed.
-
-> Reported-by: Nicolai Stange <nstange@suse.com>
-> Signed-off-by: Michal Suchanek <msuchanek@suse.de>
-> ---
->  arch/powerpc/crypto/aes-gcm-p10-glue.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-
-Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
-
-cheers
-
-> diff --git a/arch/powerpc/crypto/aes-gcm-p10-glue.c b/arch/powerpc/crypto/aes-gcm-p10-glue.c
-> index e52629334cf8..1f8b67775658 100644
-> --- a/arch/powerpc/crypto/aes-gcm-p10-glue.c
-> +++ b/arch/powerpc/crypto/aes-gcm-p10-glue.c
-> @@ -414,7 +414,7 @@ static int __init p10_init(void)
->  {
->  	int ret;
->  
-> -	if (!cpu_has_feature(PPC_FEATURE2_ARCH_3_1))
-> +	if (!cpu_has_feature(CPU_FTR_ARCH_31))
->  		return 0;
->  
->  	ret = simd_register_aeads_compat(gcm_aes_algs,
-> -- 
-> 2.46.1
