@@ -1,68 +1,40 @@
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DFDD381AF;
-	Sun, 10 Nov 2024 18:51:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 131D41B95B;
+	Mon, 11 Nov 2024 01:37:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731264671; cv=none; b=tHoYKv8XNvGcggAY6nAcr8lQOr4w2HrKwGjV9WiKMAqUe5U061Tty5hMJbV71pg2rxjUkFasA1mSq72YAr8+A1rX7mPAARbjHXS9uILW0wK1iuT9VAkSviI9tSo5FLov0LoF8XiF+QnrRqbyYS2tjF1uhXD8zEHu5/pGJgoQD9A=
+	t=1731289058; cv=none; b=OCDPwoGbCnpCHpApe5qyNhJCPu46ifzebZdsqb7zBa75zcQnDh/YsZgnrNEA/Yiy3IwyqEtBKTssYzjQnTUoM/Xh1n+8Q4W4V6okc6fneWnPLy/hIw6Muvuxai+mkf/d1vOAraIv7uLbQyhyGWLBzWQ1sAa1WdE+agf5EOo5v7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731264671; c=relaxed/simple;
-	bh=hxoFXh2tf+fSHJm5jTqWTme4JJ8C+JkVWWODbJ/lMdE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iZsx5fd0WzVx2AeprwtowFOExT9ZX4pcwzl6C6on9X4RUfbkvw8PE5DvctZu4lGIlP5RYnj5u6WSvWxc33Rbm5AbyKMJH7tpO2K6wg2AQnxi4zpzCTFu/Drwr9PACBWia+MhjhAcI0HObb7T1tELnllAmEv0jBvaOCsfTk/w+IY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aGu85AiV; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aGu85AiV"
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a9ec86a67feso673535266b.1;
-        Sun, 10 Nov 2024 10:51:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731264667; x=1731869467; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=9/4pjCP82gvfS9OpswKVNnjN1UrKYwhiQEVjC6lI57Q=;
-        b=aGu85AiV/zhbXph1tydnFrJHzoPcmeREYsXAoMkx6z3FCZAkoa09mn4+IAiSFzLs0z
-         qDoAW0ArvPGXnjwjyU0Q00XArW4wi4bRBq9HS/4vhLed+aElCu81EXV16czrhzqjCups
-         Z0XKDSMm+w8X8GyDD+xvKAnYG6v3sGxae8VMt94rlxsc9AWitaltiwgHWHynF2szkKBB
-         IvWsa/ZrMB5vFDuiWqQRs9uK/5SqKGmrJDSq5hUJRVV1cdnQcwbOI/wz3HTYPJeuY+nL
-         bKDs6rFnztXVR7g2XoCzFDM84QPXGMWU9DDeMbp523VxEslzqOFYy7AztSe8UbN0p5hN
-         c/Gw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731264667; x=1731869467;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9/4pjCP82gvfS9OpswKVNnjN1UrKYwhiQEVjC6lI57Q=;
-        b=mv0m3pLRfK2cDjZxDAYTGVtZRemVbaxuLrUIOdJlpFq5EAFTgMUI6onx1uQpEpiB11
-         V1X2r8rcYYW3x9BJs+MPY5V0rrNU/zlRKruaQRXYjcGnXT4RlJPlMI88n1o4jGLu4o2B
-         UX6J7bq7yisKFDtt+b+Lt3kIIkxQphAZ1pahTY1caJlL+lY8mB5+EpH+jABlBoYt5doe
-         MGLAQ09oZf8p3yXhrWRbdeTBtNwOnHMuCekWAGgWmJUJxqVR2IyhFm3+j8Hm8GdJEKCy
-         KUHGwFgXX4ASn7ZiPCQyK9rTrAAibzgxw7ZOWGvNm5JRRTuD245K4yd/dw76rzH4kEIm
-         4i5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUwpIEFeOgOVhTCV8+oxua/PPld/2pBZY0+mODDTx9dNQtO+t4UYSpdy29wQHDPyawFE5C8lXd1J+sGl6U=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzk5Q0084viyd+TGl0j5bRlQ35hA3YZmz1aKzUN9D6JtpGbJSNK
-	vXfkspJkZAKeoqBCCk08M7mcyeWTrWW/vhW+/A9CGinCx8nepQmL
-X-Google-Smtp-Source: AGHT+IF94RU14sYzHF8bjEr+0jO9Wvs+vc/Y0hkEmXamxVU+iLlP6EtFkiM6BPwnfpFQDvOkn5ocWw==
-X-Received: by 2002:a17:907:7baa:b0:a9a:2afc:e4e4 with SMTP id a640c23a62f3a-a9ef0052ae7mr1015948166b.59.1731264667234;
-        Sun, 10 Nov 2024 10:51:07 -0800 (PST)
-Received: from localhost.localdomain ([83.168.79.145])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9ee0abea92sm502076066b.85.2024.11.10.10.51.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 10 Nov 2024 10:51:06 -0800 (PST)
-From: Karol Przybylski <karprzy7@gmail.com>
-To: bbrezillon@kernel.org,
-	arno@natisbad.org,
-	schalla@marvell.com,
+	s=arc-20240116; t=1731289058; c=relaxed/simple;
+	bh=HOkgBtHSI6baPmbqaXcaZYAi499ImxQjdx/H/6aJ44s=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Pwxx0flS/h4gGEudhtaAQnKRPzuiQckl0GLba5HMudM3CHSa7KIunCf27y4LYT37kKZON7PKrjJuqz5wgEJNsfnBF25th69SIT/RLxSXvcyou02takNa16ZRIt2spQ+raZhLCeqhUEsOnKrNwltlXY0arSoX/1I/R8ZLzh4dBBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Xmsbr3YDSz4f3nT7;
+	Mon, 11 Nov 2024 09:37:12 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 825CD1A0359;
+	Mon, 11 Nov 2024 09:37:31 +0800 (CST)
+Received: from hulk-vt.huawei.com (unknown [10.67.174.121])
+	by APP4 (Coremail) with SMTP id gCh0CgDXAIXRXzFnZ3LFBQ--.3182S2;
+	Mon, 11 Nov 2024 09:37:31 +0800 (CST)
+From: Chen Ridong <chenridong@huaweicloud.com>
+To: akhilrajeev@nvidia.com,
 	herbert@gondor.apana.org.au,
 	davem@davemloft.net,
-	karprzy7@gmail.com
+	thierry.reding@gmail.com,
+	jonathanh@nvidia.com
 Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	skhan@linuxfoundation.org
-Subject: [PATCH] crypto: marvell/cesa: fix uninit value for struct mv_cesa_op_ctx
-Date: Sun, 10 Nov 2024 19:50:58 +0100
-Message-Id: <20241110185058.2226730-1-karprzy7@gmail.com>
+	linux-tegra@vger.kernel.org,
+	chenridong@huawei.com,
+	wangweiyang2@huawei.com
+Subject: [PATCH v2] crypto: tegra - do not transfer req when tegra init fails
+Date: Mon, 11 Nov 2024 01:28:27 +0000
+Message-Id: <20241111012827.1788341-1-chenridong@huaweicloud.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -71,133 +43,80 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgDXAIXRXzFnZ3LFBQ--.3182S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7CF1UJF48ur4UtrWDKF4xCrg_yoW8uFyDpF
+	48Aayjyrn5XFZ5CF4xJF4rCF15Wasavry7G3yIyas5ZFs7Xry8Cr47CFyUXa15AFZ7try7
+	Krs2yw13Jr1YqaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUyKb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JMxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI
+	7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxV
+	Cjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY
+	6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6x
+	AIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY
+	1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUF1v3UUUUU
+X-CM-SenderInfo: hfkh02xlgr0w46kxt4xhlfz01xgou0bp/
 
-In cesa/cipher.c most declarations of struct mv_cesa_op_ctx are uninitialized.
-This causes one of the values in the struct to be left unitialized in later
-usages.
+From: Chen Ridong <chenridong@huawei.com>
 
-This patch fixes it by adding initializations in the same way it is done in
-cesa/hash.c.
+The tegra_cmac_init or tegra_sha_init function may return an error when
+memory is exhausted. It should not transfer the request when they return
+an error.
 
-Fixes errors discovered in coverity: 1600942, 1600939, 1600935, 1600934, 1600929, 1600927,
-1600925, 1600921, 1600920, 1600919, 1600915, 1600914
-
-Signed-off-by: Karol Przybylski <karprzy7@gmail.com>
+Fixes: 0880bb3b00c8 ("crypto: tegra - Add Tegra Security Engine driver")
+Signed-off-by: Chen Ridong <chenridong@huawei.com>
+Acked-by: Akhil R <akhilrajeev@nvidia.com>
 ---
- drivers/crypto/marvell/cesa/cipher.c | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+ drivers/crypto/tegra/tegra-se-aes.c  | 7 +++++--
+ drivers/crypto/tegra/tegra-se-hash.c | 7 +++++--
+ 2 files changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/marvell/cesa/cipher.c b/drivers/crypto/marvell/cesa/cipher.c
-index 0f37dfd42d85..cf62db50f958 100644
---- a/drivers/crypto/marvell/cesa/cipher.c
-+++ b/drivers/crypto/marvell/cesa/cipher.c
-@@ -489,7 +489,7 @@ static int mv_cesa_des_op(struct skcipher_request *req,
+diff --git a/drivers/crypto/tegra/tegra-se-aes.c b/drivers/crypto/tegra/tegra-se-aes.c
+index 9d130592cc0a..d734c9a56786 100644
+--- a/drivers/crypto/tegra/tegra-se-aes.c
++++ b/drivers/crypto/tegra/tegra-se-aes.c
+@@ -1750,10 +1750,13 @@ static int tegra_cmac_digest(struct ahash_request *req)
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+ 	struct tegra_cmac_ctx *ctx = crypto_ahash_ctx(tfm);
+ 	struct tegra_cmac_reqctx *rctx = ahash_request_ctx(req);
++	int ret;
  
- static int mv_cesa_ecb_des_encrypt(struct skcipher_request *req)
- {
--	struct mv_cesa_op_ctx tmpl;
-+	struct mv_cesa_op_ctx tmpl = { };
+-	tegra_cmac_init(req);
+-	rctx->task |= SHA_UPDATE | SHA_FINAL;
++	ret = tegra_cmac_init(req);
++	if (ret)
++		return ret;
  
- 	mv_cesa_set_op_cfg(&tmpl,
- 			   CESA_SA_DESC_CFG_CRYPTCM_ECB |
-@@ -500,7 +500,7 @@ static int mv_cesa_ecb_des_encrypt(struct skcipher_request *req)
++	rctx->task |= SHA_UPDATE | SHA_FINAL;
+ 	return crypto_transfer_hash_request_to_engine(ctx->se->engine, req);
+ }
  
- static int mv_cesa_ecb_des_decrypt(struct skcipher_request *req)
- {
--	struct mv_cesa_op_ctx tmpl;
-+	struct mv_cesa_op_ctx tmpl = { };
+diff --git a/drivers/crypto/tegra/tegra-se-hash.c b/drivers/crypto/tegra/tegra-se-hash.c
+index 4d4bd727f498..0b5cdd5676b1 100644
+--- a/drivers/crypto/tegra/tegra-se-hash.c
++++ b/drivers/crypto/tegra/tegra-se-hash.c
+@@ -615,13 +615,16 @@ static int tegra_sha_digest(struct ahash_request *req)
+ 	struct tegra_sha_reqctx *rctx = ahash_request_ctx(req);
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+ 	struct tegra_sha_ctx *ctx = crypto_ahash_ctx(tfm);
++	int ret;
  
- 	mv_cesa_set_op_cfg(&tmpl,
- 			   CESA_SA_DESC_CFG_CRYPTCM_ECB |
-@@ -543,7 +543,7 @@ static int mv_cesa_cbc_des_op(struct skcipher_request *req,
+ 	if (ctx->fallback)
+ 		return tegra_sha_fallback_digest(req);
  
- static int mv_cesa_cbc_des_encrypt(struct skcipher_request *req)
- {
--	struct mv_cesa_op_ctx tmpl;
-+	struct mv_cesa_op_ctx tmpl = { };
+-	tegra_sha_init(req);
+-	rctx->task |= SHA_UPDATE | SHA_FINAL;
++	ret = tegra_sha_init(req);
++	if (ret)
++		return ret;
  
- 	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_DIR_ENC);
- 
-@@ -552,7 +552,7 @@ static int mv_cesa_cbc_des_encrypt(struct skcipher_request *req)
- 
- static int mv_cesa_cbc_des_decrypt(struct skcipher_request *req)
- {
--	struct mv_cesa_op_ctx tmpl;
-+	struct mv_cesa_op_ctx tmpl = { };
- 
- 	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_DIR_DEC);
- 
-@@ -596,7 +596,7 @@ static int mv_cesa_des3_op(struct skcipher_request *req,
- 
- static int mv_cesa_ecb_des3_ede_encrypt(struct skcipher_request *req)
- {
--	struct mv_cesa_op_ctx tmpl;
-+	struct mv_cesa_op_ctx tmpl = { };
- 
- 	mv_cesa_set_op_cfg(&tmpl,
- 			   CESA_SA_DESC_CFG_CRYPTCM_ECB |
-@@ -608,7 +608,7 @@ static int mv_cesa_ecb_des3_ede_encrypt(struct skcipher_request *req)
- 
- static int mv_cesa_ecb_des3_ede_decrypt(struct skcipher_request *req)
- {
--	struct mv_cesa_op_ctx tmpl;
-+	struct mv_cesa_op_ctx tmpl = { };
- 
- 	mv_cesa_set_op_cfg(&tmpl,
- 			   CESA_SA_DESC_CFG_CRYPTCM_ECB |
-@@ -649,7 +649,7 @@ static int mv_cesa_cbc_des3_op(struct skcipher_request *req,
- 
- static int mv_cesa_cbc_des3_ede_encrypt(struct skcipher_request *req)
- {
--	struct mv_cesa_op_ctx tmpl;
-+	struct mv_cesa_op_ctx tmpl = { };
- 
- 	mv_cesa_set_op_cfg(&tmpl,
- 			   CESA_SA_DESC_CFG_CRYPTCM_CBC |
-@@ -661,7 +661,7 @@ static int mv_cesa_cbc_des3_ede_encrypt(struct skcipher_request *req)
- 
- static int mv_cesa_cbc_des3_ede_decrypt(struct skcipher_request *req)
- {
--	struct mv_cesa_op_ctx tmpl;
-+	struct mv_cesa_op_ctx tmpl = { };
- 
- 	mv_cesa_set_op_cfg(&tmpl,
- 			   CESA_SA_DESC_CFG_CRYPTCM_CBC |
-@@ -725,7 +725,7 @@ static int mv_cesa_aes_op(struct skcipher_request *req,
- 
- static int mv_cesa_ecb_aes_encrypt(struct skcipher_request *req)
- {
--	struct mv_cesa_op_ctx tmpl;
-+	struct mv_cesa_op_ctx tmpl = { };
- 
- 	mv_cesa_set_op_cfg(&tmpl,
- 			   CESA_SA_DESC_CFG_CRYPTCM_ECB |
-@@ -736,7 +736,7 @@ static int mv_cesa_ecb_aes_encrypt(struct skcipher_request *req)
- 
- static int mv_cesa_ecb_aes_decrypt(struct skcipher_request *req)
- {
--	struct mv_cesa_op_ctx tmpl;
-+	struct mv_cesa_op_ctx tmpl = { };
- 
- 	mv_cesa_set_op_cfg(&tmpl,
- 			   CESA_SA_DESC_CFG_CRYPTCM_ECB |
-@@ -778,7 +778,7 @@ static int mv_cesa_cbc_aes_op(struct skcipher_request *req,
- 
- static int mv_cesa_cbc_aes_encrypt(struct skcipher_request *req)
- {
--	struct mv_cesa_op_ctx tmpl;
-+	struct mv_cesa_op_ctx tmpl = { };
- 
- 	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_DIR_ENC);
- 
-@@ -787,7 +787,7 @@ static int mv_cesa_cbc_aes_encrypt(struct skcipher_request *req)
- 
- static int mv_cesa_cbc_aes_decrypt(struct skcipher_request *req)
- {
--	struct mv_cesa_op_ctx tmpl;
-+	struct mv_cesa_op_ctx tmpl = { };
- 
- 	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_DIR_DEC);
++	rctx->task |= SHA_UPDATE | SHA_FINAL;
+ 	return crypto_transfer_hash_request_to_engine(ctx->se->engine, req);
+ }
  
 -- 
 2.34.1
