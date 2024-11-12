@@ -1,126 +1,125 @@
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CEC61C9B75;
-	Tue, 12 Nov 2024 19:33:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CBE6218305
+	for <linux-crypto@vger.kernel.org>; Tue, 12 Nov 2024 19:48:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731440015; cv=none; b=HYTwC5N+DXr8A/Rrc9yROIBJQgE+84x0LYVcrUHkRriUoYlhrAvle+xiLmyov53q2Mqb9aFBLijRpc5Qnh5aG4nzvqSPJn+33O5JLPzu+u2cubE2K3YMTbeHZwURO4+jFeqGZ8lrarr29DLLwKSOjUqNO//waV99WhYkB1ZOFn4=
+	t=1731440890; cv=none; b=QC3bkZHsqq0lmgaXBkL2enGtMklC29i/nAVNqOjg+LAqwgSSV8ILPl8h4IrWNc/Zh59wtFWUDJM2GKIMzf2Bcdlxo+Xycz2x3XxT/xXiCqK+ecPKtTKlQhG9dezSGv5ruJiGlN207XztqVS/1n8CmSJdwUEeNnaBHkWmncBSsPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731440015; c=relaxed/simple;
-	bh=w3qyNX2H2QrqWPTFq2goSgvfzakUeX76kymsrd5YQ+8=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Y2FyxS5dZPAQu+YBvelCAbivWht67RcbyNeIIAoDEV82FdBDhk64pzb3kxaFGYeBwmTWEWdG2zdKTFeR14pTpwAcoNDpfeD50wJ7t9wh1ayYWo4HO2Mfsw4Ey2Sy/O8YNw+c1PO/zFDQE4gAydwN10RUDTCuPbVBBWL9Wf7tLcM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RsNvqSy9; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1731440890; c=relaxed/simple;
+	bh=o8eOdtHtMHFg2vs8SZ/DKu2qO40wUv2AUpZc54PgLH0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eP6C/LvKVEZ6KursypLFdv9TZRNR/FDhb1zPoLkdXkgSmiw+IwLTswS2am5hxLAiQpDWIwaMsc8ijofc3410suPkMG1KiSFkJqPJKTMTgQDRcPOB5ZLGmT7nyLf6we0gc3GJvAnfkP61tPCSnrTq3BGaY4UmISSrm+DMX/76YdQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sSBrVZ5t; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RsNvqSy9"
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-3807dd08cfcso5684917f8f.1;
-        Tue, 12 Nov 2024 11:33:33 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sSBrVZ5t"
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a9ed49edd41so1044555666b.0
+        for <linux-crypto@vger.kernel.org>; Tue, 12 Nov 2024 11:48:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731440012; x=1732044812; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=MkG1N8cbWQJiTBQoEK9Xgl0+1bD42d7g9R0q75SLLTI=;
-        b=RsNvqSy9hIpaU0tLrpz3+/5OtE38B443r5yXSCINnNHM1/tS2tGKfOMqGiuFvpyLIx
-         1QJDg2APcE3tze3wCPe7w1HyZ49CVEpHuy3qTXdzuMupL5R/qpQnofLDPA9h6yJ3onf5
-         hMFVNrGhtnTJ5/e9nPxTY5XkvsbaZ2GpjcGJgk+LhQhmlhn1ilggkgyKW3ythrZn9xCL
-         zxTO0lxfVAO1ww0ELUmiznrP2GmBFjj0uI7f69yg9htS8I6hRwu0LUPpV8+11QpVtb8W
-         3XyBiFV5bsIt1XIhgVZr4Xpi6oNj98E6zZnkR6+iEFmvRRS5R2On/2Lgi+APB/dG9Xfk
-         874Q==
+        d=google.com; s=20230601; t=1731440887; x=1732045687; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=o8eOdtHtMHFg2vs8SZ/DKu2qO40wUv2AUpZc54PgLH0=;
+        b=sSBrVZ5tXJ9/IA5CI4u+zs5VRaB9pnFRMuqszy8vMXy9gS5MTyL47Ye94QGCTRSDSD
+         V7/p4Vea8bWk+HnI2lUXWZSqOnLeeSG1aACB1xWQ8BKftUxYlHc4ChDETfjc+fxPSh8C
+         YnkwORc/eVxRtPPQwtf+UvQwNzlOq4BI56trNeEdUisIVC4HrufbDb6h8LyCGDyDRg3B
+         4zizb5rmlJgU6DhHhaBGCejiD1XOFPU7cAJykmcXVv7bSs66iUbNxLwfNtT02fLSGTa9
+         iFVBKpZ/QMIgrArM2GeOklPSqEFLeilMr1smTSV+dxwiWzpN97jBeNHvCJTJ1fBpCYhQ
+         vhpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731440012; x=1732044812;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MkG1N8cbWQJiTBQoEK9Xgl0+1bD42d7g9R0q75SLLTI=;
-        b=SuJdVAK4lLHX1jTsKezY7bkxBU9L5CdFsw/1AyN1oaU0aSK6SwQ9RNtSRYdsVHOZj7
-         BaYYHGoaEjaWyBDLKzUGDR1MSSoy8MaZ/UwZIL1yNZ6jjenOuUxRJ9V/2xcZgaQRLeJd
-         MYq40iVhqfkAZ2flAkbYKqK89tmORterKguDeBPsdZo7p8a2TmeoIorQRtBqnCqAXt3U
-         Ucsh3VyCf3JGAvfDP13EDVNnjO31Y2xyRJ6bwfyvcf2nbr82N63303Lm8uEUjV64ov4b
-         JNKA/N6KRny5F7kkKcXfBSHHD1nnmel/1kMadN4aFwwvwJVZWhXQ1Ij3mF0e/3DkINnn
-         z+Cw==
-X-Forwarded-Encrypted: i=1; AJvYcCVqrm0/QI9UjRcNcYdAcz+xECD04proEZGIqTbiaKyANwoTpNeUQL2Lf+FPl9GZZe6lkH2HTkiIFV9p7Ynn@vger.kernel.org, AJvYcCXfaJ2Wc2uYI0Bwe7ciXpuv39F0Lx8iWVvdLgrllOgz2oitZ95NNkWbwTiHljsTqWvPq+6gpxt8ppY0iHw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzUZoMmt3WOMFcv4UaSh0XaUKxYtetH5bQLUl8sMyQ3K/B1F6YD
-	CiXnTa5SJT9K5TevwVTCMFsSfZQ9utbSMSzr18dffpYBtc7cK+y5
-X-Google-Smtp-Source: AGHT+IFgwJTM/IhHEee60zDBS47L7kN9Q+Blkkfv/LqE5sDW9xPQbyIZlnwpmejRlJMCXXh5lsQYKA==
-X-Received: by 2002:a5d:6d05:0:b0:37d:4c40:699 with SMTP id ffacd0b85a97d-381f1866b54mr19287446f8f.5.1731440011720;
-        Tue, 12 Nov 2024 11:33:31 -0800 (PST)
-Received: from ?IPv6:2a02:168:6806:0:b26f:1170:8ac9:f3c9? ([2a02:168:6806:0:b26f:1170:8ac9:f3c9])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432b05e6042sm219502705e9.44.2024.11.12.11.33.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Nov 2024 11:33:31 -0800 (PST)
-Message-ID: <3f14a6d189b65182ed502d534a49ae289e12dcb8.camel@gmail.com>
-Subject: Re: [REGRESSION] alg: ahash: Several tests fail during boot on
- Turris Omnia
-From: Klaus Kudielka <klaus.kudielka@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: regressions@lists.linux.dev, linux-kernel@vger.kernel.org, Linux Crypto
- Mailing List <linux-crypto@vger.kernel.org>, Boris Brezillon
- <bbrezillon@kernel.org>, Arnaud Ebalard	 <arno@natisbad.org>, Romain Perier
- <romain.perier@free-electrons.com>
-Date: Tue, 12 Nov 2024 20:33:30 +0100
-In-Reply-To: <Zw-NJwLXXQ0DwR8b@gondor.apana.org.au>
-References: <38a275a4e0224266ceb9ce822e3860fe9209d50c.camel@gmail.com>
-	 <ZwZAExmK52txvHE8@gondor.apana.org.au>
-	 <7e38e34adddb14d0a23a13cf738b6b7cccbfce6f.camel@gmail.com>
-	 <ZwduxHxQtHdzz-kl@gondor.apana.org.au>
-	 <ZwePSPG8aWm6mwKK@gondor.apana.org.au>
-	 <15fadc356b73a1e8e24183f284b5c0a44a53e679.camel@gmail.com>
-	 <Zw31JIEyh28vK9q7@gondor.apana.org.au>
-	 <5db212655dc98945fa3f529925821879a03ff554.camel@gmail.com>
-	 <Zw9AsgqKHJfySScx@gondor.apana.org.au>
-	 <2ae8006f3cfc40ae66b34659365596ac8507d1da.camel@gmail.com>
-	 <Zw-NJwLXXQ0DwR8b@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.1-1 
+        d=1e100.net; s=20230601; t=1731440887; x=1732045687;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=o8eOdtHtMHFg2vs8SZ/DKu2qO40wUv2AUpZc54PgLH0=;
+        b=lae0bZjR7H0tyAdkr/Btoh//yRXs4ooQ12FpALIV2qgVrrcno50nYV7a0gAXzAvl9/
+         Gzve7Tmbcuvmi6ZWQqtDbQ8L3+ubWnBWcnOuPuNJS5w13Z6/FdcJEedQEtKKTvNzJYMX
+         9JOv6JNVWrIBphenKuyXSqAND69hrX/L2wwHtIOwvq81/2OIHmBkA3R8ploO6kwQ0xSO
+         8KMfnGZLXPINJvEIgjHQDBtpmU2/Ni4b6eKxhEIZm0tO05hd4xgS+3tsavtgwlIDmnBL
+         szSzUznR+P/gRltNtvnbqn0SJ+Kdem8lTckK20LZLzSR8PgDQSAPWpFTD83gmlPAVSmO
+         R60w==
+X-Forwarded-Encrypted: i=1; AJvYcCWIZOEAPg3sBhGy+VdZ6nywjIyOtlXWYyb8Qy4HXwpuAZQHlGt/qyD4bABadyKB5YF9vMcQfe8dgUfK0fU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxEPlKX6UT/iN0tfvUBePGZhmT2f7D95NRnxMz4W5kbp6fzFJkX
+	6yP5HJjU/u83RDq77B4TW85fAx43ULewS+wwujEXIyznY6X7Y6X/9UME8iqmCkNJxDvvSlP0eDj
+	CZT1RsIC2e5PQX9rKKSSCa2HRhhnswX6d2/Rv
+X-Google-Smtp-Source: AGHT+IEFgQusI2LRG8yS8c+lKwjb4SOnATX6OL+zJ6TrY0kBJRmVDcTAeTIKs1eTWUeRMWkbTKPLqC6ZZa3hgOujSU0=
+X-Received: by 2002:a17:907:318e:b0:a9a:cf6:b629 with SMTP id
+ a640c23a62f3a-a9eeff4458amr1685921066b.29.1731440886519; Tue, 12 Nov 2024
+ 11:48:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20241107232457.4059785-1-dionnaglaze@google.com>
+ <20241107232457.4059785-8-dionnaglaze@google.com> <4ec6b73f-4707-c93a-f046-213ac4d4549d@amd.com>
+In-Reply-To: <4ec6b73f-4707-c93a-f046-213ac4d4549d@amd.com>
+From: Dionna Amalie Glaze <dionnaglaze@google.com>
+Date: Tue, 12 Nov 2024 11:47:51 -0800
+Message-ID: <CAAH4kHaAqh1R6CGBKXNsO+uQnscwGo0Y06MTny8CebSWK9QMaw@mail.gmail.com>
+Subject: Re: [PATCH v5 07/10] crypto: ccp: Add preferred access checking method
+To: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org, 
+	Ashish Kalra <ashish.kalra@amd.com>, John Allen <john.allen@amd.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	linux-coco@lists.linux.dev, Sean Christopherson <seanjc@google.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	Michael Roth <michael.roth@amd.com>, Luis Chamberlain <mcgrof@kernel.org>, 
+	Russ Weight <russ.weight@linux.dev>, Danilo Krummrich <dakr@redhat.com>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Tianfei zhang <tianfei.zhang@intel.com>, Alexey Kardashevskiy <aik@amd.com>, linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2024-10-16 at 17:53 +0800, Herbert Xu wrote:
-> Alright, so next I'm going to try to make TDMA entirely single-
-> threaded and see if that fixes it.
->=20
-> Thanks,
+On Mon, Nov 11, 2024 at 2:46=E2=80=AFPM Tom Lendacky <thomas.lendacky@amd.c=
+om> wrote:
+>
+> On 11/7/24 17:24, Dionna Glaze wrote:
+> > sev_issue_cmd_external_user is the only function that checks permission=
+s
+> > before performing its task. With the new GCTX API, it's important to
+> > establish permission once and have that determination dominate later AP=
+I
+> > uses. This is implicitly how ccp has been used by dominating uses of
+> > sev_do_cmd by a successful sev_issue_cmd_external_user call.
+> >
+> > Consider sev_issue_cmd_external_user deprecated by
+> > checking if a held file descriptor passes file_is_sev, similar to the
+> > file_is_kvm function.
+> >
+> > This also fixes the header comment that the bad file error code is
+> > -%EINVAL when in fact it is -%EBADF.
+>
+> Same comment as before. This commit merely creates a helper function, so
+> this commit message is not appropriate.
+>
 
-Hi, since this was marked as "not worth tracking*, here a summary of my und=
-erstanding
+Is this a meta-comment about how the commit presupposes being in a
+series with a goal, but should have a self-contained commit message? I
+don't know what "same comment as before" you're referring to.
+How about this:
 
-- hardware: Turris Omnia, Marvell Armada 385 (same behaviour on 2 devices)
-- the crypto self-tests on the hash algorithms provided by the  Marvell CES=
-A
-  driver fail randomly (1-5 failures in 90% of the boots, rarely without fa=
-ilure)
-- this is likely a bug in the driver, which had been hidden for a long time
-- it is now exposed by parallel invocation of self-tests, introduced in v6.=
-12-rc1,
-  commit 37da5d0ffa ("crypto: api - Do not wait for tests during registrati=
-on")
-- to be safe, the algorithms in question (6 in total) have been set to prio=
-rity 0 in
-  commit e845d2399a ("crypto: marvell/cesa - Disable hash algorithms")
-- so, there should be no immediate harm by wrong hashes (at least in 6.12)
-- there were backport patches floating around, but as of today they have no=
-t
-  been picked up
-- no fix to the Marvell CESA driver has been found so far
+crypto: ccp: Add file_is_sev to identify access
 
-Consequences
+Access to the ccp driver only needs to be determined once, so
+sev_issue_cmd_external_user called in a loop (e.g. for
+SNP_LAUNCH_UPDATE) does more than it needs to.
 
-- I have decided to stop using the Marvell CESA driver on my production dev=
-ice
-- I can easily run test patches on my spare Omnia, if that helps finding a =
-fix
-- I imagine more users will run into the failing self-tests, as soon as 6.1=
-2
-  hits OpenWRT's mvebu target
+The file_is_sev function allows the caller to determine access before using
+sev_do_cmd or other API methods multiple times without extra access
+checking.
 
-Best regards, Klaus
+This also fixes the header comment that the bad file error code is
+-%EINVAL when in fact it is -%EBADF.
 
+
+
+
+--=20
+-Dionna Glaze, PhD, CISSP, CCSP (she/her)
