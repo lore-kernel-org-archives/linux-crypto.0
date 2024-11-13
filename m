@@ -1,91 +1,84 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B20018FDA7
-	for <linux-crypto@vger.kernel.org>; Wed, 13 Nov 2024 13:56:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B54113AD33
+	for <linux-crypto@vger.kernel.org>; Wed, 13 Nov 2024 14:58:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731506195; cv=none; b=piFP5eh/Ov1xGcn9MK58Phu7E6HC0YrALcAJCBZBOmkGTNc1sM8nPb9dOgwH+vNqftwOIeHa9F1xA0vATzL38uWNQY6wclSm9k+JmQ+kAa2BB5/S+rXum+5aRGZ1ekRa5yp8GCWu/IuitiPfOPvw9y3ancaQObXXPUD5gI2H6y8=
+	t=1731509899; cv=none; b=imAswJSrcYWf5MwlclbcY7UjMRaLjHLWelcBnjiwJogj8TmC79DRHhfx2/uOKDIn5oGOXOuiZY0J45mWpmDvQX9McF1kxR7mmCC7vt6ccQJnmeFQsOHn9YZiSnkLugxxktS4+tD/iEpa3uv/f2KLaNCfwBBZ14lUPES4E+GdbHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731506195; c=relaxed/simple;
-	bh=gsUS5NkYc+BSuN+B87UnPKIrPHzMI5FqQyudN3+W+4s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XpmCHTzVBdH4iEOn56geBJSfJz6DA66wH3f+3mVpzT5U51tyASWg5WSHRRTI92ZHDeu1Cp45/FXAY+xHH2pucL6zuPv5EPZaGUvOi2W+ED57PqqK8R1OYjx0xj6evmmnkhXEXrrx1VepjglkgszP8tFRDvS6mxHjtNRrxgUTt/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C5IVoU1p; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C5IVoU1p"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00C0BC4CEC3;
-	Wed, 13 Nov 2024 13:56:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731506194;
-	bh=gsUS5NkYc+BSuN+B87UnPKIrPHzMI5FqQyudN3+W+4s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=C5IVoU1pGhtU2vmp91T6VWlU4stkV0YbBXR90D0DCX9lStjm6BZRycxlkUrkvu2Ut
-	 nSb/xhJ7Y+1kAyW+0PEEGLvgZ6fQQuYz7F2F7ggdLtO9X+fz0nY6gk0MWQ1enrG51d
-	 +f3jsI+D7+gznMbQdKRa/I8T1DrEHdZierzi9L7S2hYoTK2fQn48fw8lEl76GC46MB
-	 89zKKUpx7RYBoMU2tugTqzdvn0zOAiEQv1yrBSv+rfwO4qdVfXIu1BmHZtRbsaUasi
-	 Z/Hl2nO0EorddK5pwCRXlPcVeWmSb+gLrPU2GN6CGr/gZs94UjJeqMKSetvgfzzeXC
-	 3O89wj+TIlxvQ==
-Date: Wed, 13 Nov 2024 08:56:32 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: Ard Biesheuvel <ardb+git@google.com>
-Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	herbert@gondor.apana.org.au, keescook@chromium.org,
-	Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH v2 0/6] Clean up and improve ARM/arm64 CRC-T10DIF code
-Message-ID: <20241113135632.GB794@quark.localdomain>
-References: <20241105160859.1459261-8-ardb+git@google.com>
+	s=arc-20240116; t=1731509899; c=relaxed/simple;
+	bh=exdh0jen8gJ9mpwejxT+xqA37fK0mhqlMiPwb78cBzc=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=cbLg41UusFItNhIGv+6AXa9BJka2+jsocbGCDg0v4NlhSppc86K2ojDix75HAc+jQY4jqY181B88R/uQx919JPGjZGXxAKbmMygARDpKlAkr5l5IldwdKjMJZOmoJI7js68XJsUpAe8Y6Qk4doEJta/N0OMu8zsK+pqPkO1o7b4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a6a9cb7efdso69207895ab.1
+        for <linux-crypto@vger.kernel.org>; Wed, 13 Nov 2024 06:58:17 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731509897; x=1732114697;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8GJ/SEsOZ1L2zRPT0EKbNi1emDrxhVhdS5kZc6L38K8=;
+        b=wJjgO5xkgwUiDDqxos+FP6FCxukHBzFQxxnufSxhVdHEuNzBB3IRWHkHZIXhGeP5U4
+         cExdh/EDkA3g3sxNU94XiDwP46WbSyjej7YXnH1QJThAjOMAu+bCKEp7TtsZRxIusF+H
+         daeDmC4EmEEX9gMqMB5bEwJKBpx2/A+OpHBqQr02IpLoQeLMvZiauV8WRhN4zrQIeKk/
+         tl3/jvgu+AxS4Wz3v8PF9cFLCkwt/uN1Zx6FdLSIiXVpGrb033/5U16/wq3QWJWd+8/o
+         JfnMhzzg6ZaOPMUPSc+y7LFiOQv8/0bUWFfByY4pQDxLlEy5cVmKqyj4JxCQKStTbWMw
+         MbdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVaedNDHvPRFuUjuwI35hpdfQPtjBBMnI4st8T5wDY0b7fp8+mn+NeGqB3XSUpZBu0+eZTEoWedaIMPvV0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwB3lzdcfLBadKYxAOmd/0X9BT4xXOfTrbVcssia/rgN9U4+5QU
+	nUL4cxRFi2r2w0uVqjAlwEWh6X/e5L/sT474ASQ5l+jPvtWlwFi74wF51W9xFuTy69zzJyRSPci
+	JS9ntAtW21erXjg9D1qCrqnuYX/ynEBJdOEW5mqQriA8kUwvswSALnTM=
+X-Google-Smtp-Source: AGHT+IFdpJh7swVHysfoFHkNwIHE7i3Gm322gFw+xNV0Im9qT4AgjHK3u54DyfAuje5rwqoW2/jpSgUiJFCeBK78tF2+EyGpGd8U
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241105160859.1459261-8-ardb+git@google.com>
+X-Received: by 2002:a05:6e02:1949:b0:3a6:bb36:ac1f with SMTP id
+ e9e14a558f8ab-3a6f1a45467mr205631175ab.22.1731509897270; Wed, 13 Nov 2024
+ 06:58:17 -0800 (PST)
+Date: Wed, 13 Nov 2024 06:58:17 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6734be89.050a0220.1324f8.0049.GAE@google.com>
+Subject: [syzbot] Monthly crypto report (Nov 2024)
+From: syzbot <syzbot+listbb9cdfe92636134be785@syzkaller.appspotmail.com>
+To: davem@davemloft.net, herbert@gondor.apana.org.au, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Nov 05, 2024 at 05:09:00PM +0100, Ard Biesheuvel wrote:
-> From: Ard Biesheuvel <ardb@kernel.org>
-> 
-> I realized that the generic sequence implementing 64x64 polynomial
-> multiply using 8x8 PMULL instructions, which is used in the CRC-T10DIF
-> code to implement a fallback version for cores that lack the 64x64 PMULL
-> instruction, is not very efficient.
-> 
-> The folding coefficients that are used when processing the bulk of the
-> data are only 16 bits wide, and so 3/4 of the partial results of all those
-> 8x8->16 bit multiplications do not contribute anything to the end result.
-> 
-> This means we can use a much faster implementation, producing a speedup
-> of 3.3x on Cortex-A72 without Crypto Extensions (Raspberry Pi 4).
-> 
-> The same logic can be ported to 32-bit ARM too, where it produces a
-> speedup of 6.6x compared with the generic C implementation on the same
-> platform.
-> 
-> Changes since v1:
-> - fix bug introduced in refactoring
-> - add asm comments to explain the fallback algorithm
-> - type 'u8 *out' parameter as 'u8 out[16]'
-> - avoid asm code for 16 byte inputs (a higher threshold might be more
->   appropriate but 16 is nonsensical given that the folding routine
->   returns a 16 byte output)
-> 
-> Ard Biesheuvel (6):
->   crypto: arm64/crct10dif - Remove obsolete chunking logic
->   crypto: arm64/crct10dif - Use faster 16x64 bit polynomial multiply
->   crypto: arm64/crct10dif - Remove remaining 64x64 PMULL fallback code
->   crypto: arm/crct10dif - Use existing mov_l macro instead of __adrl
->   crypto: arm/crct10dif - Macroify PMULL asm code
->   crypto: arm/crct10dif - Implement plain NEON variant
-> 
->  arch/arm/crypto/crct10dif-ce-core.S   | 249 ++++++++++-----
->  arch/arm/crypto/crct10dif-ce-glue.c   |  55 +++-
->  arch/arm64/crypto/crct10dif-ce-core.S | 335 +++++++++-----------
->  arch/arm64/crypto/crct10dif-ce-glue.c |  48 ++-
->  4 files changed, 376 insertions(+), 311 deletions(-)
+Hello crypto maintainers/developers,
 
-Reviewed-by: Eric Biggers <ebiggers@google.com>
+This is a 31-day syzbot report for the crypto subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/crypto
 
-- Eric
+During the period, 0 new issues were detected and 0 were fixed.
+In total, 4 issues are still open and 107 have already been fixed.
+
+Some of the still happening issues:
+
+Ref Crashes Repro Title
+<1> 228     Yes   BUG: unable to handle kernel paging request in crypto_skcipher_encrypt
+                  https://syzkaller.appspot.com/bug?extid=026f1857b12f5eb3f9e9
+<2> 15      Yes   KMSAN: uninit-value in sw842_compress
+                  https://syzkaller.appspot.com/bug?extid=17cae3c0a5b0acdc327d
+<3> 6       Yes   BUG: unable to handle kernel paging request in crypto_shash_update
+                  https://syzkaller.appspot.com/bug?extid=e46f29a4b409be681ad9
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
