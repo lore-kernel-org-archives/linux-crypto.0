@@ -1,44 +1,46 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE7E4135A4B;
-	Wed, 13 Nov 2024 02:18:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9A1D13C90A;
+	Wed, 13 Nov 2024 02:18:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731464332; cv=none; b=aUVZY/w2Yd8Mdbx4Hs4wdpGqZGPqyOB5xOx47LnGTFef/FwVWCEA/ZdMRBnleDbmoyR1Cj+SF/Cwk3EGmX4nsVbSGcDdkYU1aiZL2M0TpA89D+TM2Z5uet6p5oczlGftktciiEHeDXJ34m3bA5U5JQPpunHknpukjpMfD622HYE=
+	t=1731464336; cv=none; b=P+GQD7rlsV59cQx/HqZlmvZ7St4PWWqHRSsk0jcynS+mDfEEBb9TjvjDr4Ex0Q7rTrBDgJHDEVgd4u35GARPsZzZEi1JgPhOKukURhjgCT1kOa7X4DiJYSi4cDuNU/1FEQ30DjbHr3a7RtJw6Q0vsXW+EqXld/5Le/PFi8AxxHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731464332; c=relaxed/simple;
-	bh=R+T49BRN37UUA5w4UFkPqOWDNVqfE+JbaKZSCTrnzx0=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=eLjf3UCTMkcQiSvUYmNcLJts8IyNX/oFBio/Y1a11iKc9pcFdWmuTaREC3Wy43FcPTOurw/PAb8QkozGbeLKk07NquHIEhdIKp7XwBmeGuV0inygPJtOY18J5BRe1yAWGGK6Vq1IwysvBhAyGkaZzp1tm1EuSmhzePzzRp2XxTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=A21gXlkm; arc=none smtp.client-ip=205.220.180.131
+	s=arc-20240116; t=1731464336; c=relaxed/simple;
+	bh=Dm6mRQzD0qPWnY895p6MGxpmL6LblV4JIkCqyk6443w=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ETOUEXtVjSUUbE1qsywh/70TgVwAHcIK+XvzMJ7DKI3ctGcnSyOiuuJQ+bLKPTiBIcVYs7jYoHMJpisjprF045i0TlDsd4yHb1Xd8klBZYKeXgvC0cZMA8LT/2zEHjanwFBXi4vkX67QeiHYpobkp7Bp61YuehI68khPvOMG0r0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=lr8BDLr9; arc=none smtp.client-ip=205.220.168.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="A21gXlkm"
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4ACMRTIM029670;
-	Wed, 13 Nov 2024 02:18:41 GMT
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="lr8BDLr9"
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4ACMRTKg019579;
+	Wed, 13 Nov 2024 02:18:48 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=cscGNRmqzHVHhytO3tYOq3
-	UoktN7JezYFawqRhjsW70=; b=A21gXlkmYKQJWHak2kuEU8M8DH2vcuhTwjAZUs
-	zOZ7i1JkHUAt16hf+XOANkcQgget5Apd0ZgFpMYyr0lLD4ld5P1iQxwbxfvqNPa9
-	KRdIJ4yrpBKA0mgeAaBaOB/cb8RXA5T/IQd5nNH+n4RTxEIgpI/BMK107pYd/XTO
-	/7b++M5ENkYYdKVCG07+xDgVjo1nS9ovFuVcQUgGXb6+p5GFJFQVFH4o00rb6jz/
-	6iBu/MA5HZCjDQSgSh5eiAs82fvphe80SFkPbWjVc4A9z7b6QlD/6PcPsIiRzNGB
-	z0faNp/IP8wpUtNPfxM4xiqOZfQXqjwbrqo5EYKvjfNWmKiA==
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	X+58h8CFuBb03Di0DznnG4kQJwbxsWScIaiF7JzCwUw=; b=lr8BDLr9qOaT85+P
+	iyp25Z8xkoMoYv+qz6smJPDjEpR3Qq3N+HK/pwSI6O/RDVp5OG2Nggaz5R65cm6H
+	ABbUkbLNj+6y0kajOzzUAK0XeBFpvBoDK6KmLyP6jN+5UDJRoi1Q7rne/3FfRXpN
+	k36XzMwzVIHC7pkP4UqQP8uKDlLiO/34tI8K7sEvAqGgC1xx1R1vrsg5PKh6fsPN
+	Q/qCPbAuPwJFZYlhGdcaVS6/G4QnLZaP0uRmn+c6WQTHWfnCq9/vh0ecTujIW7r2
+	SxElOLwrZdlvkgqCP61fyrSUs5aYfy6spgT79DwWJSOpIL7Zg3dOJCJPuNJ+7Y2n
+	ClPuqQ==
 Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42t0469954-1
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42v1h6jxrd-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 13 Nov 2024 02:18:40 +0000 (GMT)
+	Wed, 13 Nov 2024 02:18:48 +0000 (GMT)
 Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4AD2Idsp026944
+	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4AD2ImTH027432
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 13 Nov 2024 02:18:39 GMT
+	Wed, 13 Nov 2024 02:18:48 GMT
 Received: from hu-yrangana-hyd.qualcomm.com (10.80.80.8) by
  nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Tue, 12 Nov 2024 18:18:35 -0800
+ 15.2.1544.9; Tue, 12 Nov 2024 18:18:44 -0800
 From: Yuvaraj Ranganathan <quic_yrangana@quicinc.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller"
@@ -54,10 +56,12 @@ To: Herbert Xu <herbert@gondor.apana.org.au>,
 CC: <linux-arm-msm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
         <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <quic_yrangana@quicinc.com>
-Subject: [PATCH V3 0/2] Enable TRNG for QCS8300
-Date: Wed, 13 Nov 2024 07:48:17 +0530
-Message-ID: <20241113021819.2616961-1-quic_yrangana@quicinc.com>
+Subject: [PATCH V3 2/2] arm64: dts: qcom: qcs8300: add TRNG node
+Date: Wed, 13 Nov 2024 07:48:19 +0530
+Message-ID: <20241113021819.2616961-3-quic_yrangana@quicinc.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20241113021819.2616961-1-quic_yrangana@quicinc.com>
+References: <20241113021819.2616961-1-quic_yrangana@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -70,41 +74,42 @@ X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
  nalasex01b.na.qualcomm.com (10.47.209.197)
 X-QCInternal: smtphost
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: bsmnPPvQMWzXKpAyX35NASZABM0jqcGk
-X-Proofpoint-ORIG-GUID: bsmnPPvQMWzXKpAyX35NASZABM0jqcGk
+X-Proofpoint-ORIG-GUID: knW3vd8on5yWEJ_dhgmrnB7W3jXnGr-F
+X-Proofpoint-GUID: knW3vd8on5yWEJ_dhgmrnB7W3jXnGr-F
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
  definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- bulkscore=0 clxscore=1015 priorityscore=1501 spamscore=0 suspectscore=0
- mlxlogscore=568 impostorscore=0 adultscore=0 phishscore=0 mlxscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
+ phishscore=0 adultscore=0 priorityscore=1501 mlxscore=0 clxscore=1015
+ lowpriorityscore=0 impostorscore=0 spamscore=0 mlxlogscore=922
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.19.0-2409260000 definitions=main-2411130018
 
-Add device-tree nodes to enable TRNG for QCS8300
+The qcs8300 SoC has a True Random Number Generator, add the node with
+the correct compatible set.
 
-This series depends on below patch series:
-https://lore.kernel.org/all/20240925-qcs8300_initial_dtsi-v2-0-494c40fa2a42@quicinc.com/ - Reviewed
-
+Reviewed-by: Krzysztof Kozlowski <krzk+dt@kernel.org>
 Signed-off-by: Yuvaraj Ranganathan <quic_yrangana@quicinc.com>
 ---
-Changes in v3:
- - Drop DT label as per review comments
- - Link to v2: https://lore.kernel.org/all/20241107121513.641281-1-quic_yrangana@quicinc.com/
+ arch/arm64/boot/dts/qcom/qcs8300.dtsi | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-Changes in v2:
- - Mistakenly uploaded the base dtsi change instead of marking dependency
- - Link to v1: https://lore.kernel.org/all/20241106110002.3054839-1-quic_yrangana@quicinc.com/
-
----
-Yuvaraj Ranganathan (2):
-  dt-bindings: crypto: qcom,prng: document QCS8300
-  arm64: dts: qcom: qcs8300: add TRNG node
-
- Documentation/devicetree/bindings/crypto/qcom,prng.yaml | 1 +
- arch/arm64/boot/dts/qcom/qcs8300.dtsi                   | 5 +++++
- 2 files changed, 6 insertions(+)
-
+diff --git a/arch/arm64/boot/dts/qcom/qcs8300.dtsi b/arch/arm64/boot/dts/qcom/qcs8300.dtsi
+index 2c35f96c3f28..2a3862568da2 100644
+--- a/arch/arm64/boot/dts/qcom/qcs8300.dtsi
++++ b/arch/arm64/boot/dts/qcom/qcs8300.dtsi
+@@ -588,6 +588,11 @@ &clk_virt SLAVE_QUP_CORE_0 0>,
+ 			};
+ 		};
+ 
++		rng@10d2000 {
++			compatible = "qcom,qcs8300-trng", "qcom,trng";
++			reg = <0 0x010d2000 0 0x1000>;
++		};
++
+ 		config_noc: interconnect@14c0000 {
+ 			compatible = "qcom,qcs8300-config-noc";
+ 			reg = <0x0 0x014c0000 0x0 0x13080>;
 -- 
 2.34.1
 
