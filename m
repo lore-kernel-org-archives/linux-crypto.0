@@ -1,46 +1,44 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9C432566;
-	Wed, 13 Nov 2024 04:34:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 832731632D5;
+	Wed, 13 Nov 2024 04:39:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731472466; cv=none; b=Yj4noWCeonGZxE16xZ1C0mcOj/hIzQv23tfrUTmGzSYNfgfQO7BWtoq+NJm1RfaxpsQfdwtzvjqtM5RpNGABlpng2RTkqx8EN7FKWlDqPnbIQjNm3dRJr2+UU0RgnMT4ZPORiX2oqkZWi8IU2ZouiorSr6nORhYbQnesxhmPb50=
+	t=1731472760; cv=none; b=tcCASaRJ3rmD4QABQU4rfl+UxDcGSJZl9/3kGiozYZS9sLH/0ZYQNMX6h5FXgM5MN5pFvxdrfXrZSwJzCv3PQz/D47aBDNUCWe0oaVe5qj43MAFvVoDVVT2LIDwaul/HlmAKFYvgca/02GDeyOJ9vr9vh0ERVQXBmwBOFw9v/Mc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731472466; c=relaxed/simple;
-	bh=9IR2F0n1a9tE3JOk81vWawNec85pbFnPZCFN34CLxfE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Nr7io6LV4C+f5UEsShvPu9q/R0EFmmiD9sHj3d5euTyaRTyZL3aA3M5QtU2aVpAvL7Dku4HNbVBJkI6OATj5WGlAc+uB9G55nEIen5QAK1HNfpIzZsEE/mGAtwdq413XlSwOU7F85OMPOBdajU2r8FlfWxCdLp2TSca+aLpSf0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=TTQroaE3; arc=none smtp.client-ip=205.220.180.131
+	s=arc-20240116; t=1731472760; c=relaxed/simple;
+	bh=36HWdfA6rpdsSgcWFGGWjNfbKGoi1Kqb1CetwRxafLg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KUHe8yWyg3WkrhHL5SoqdeuCg7jfD0NwgXw20E1ZZtMV8RkzGFAMo2PQzGtFWmc5v/1kjaJ9S2RAUGPotNn214a85bUBS8xhxbX7ZoJae4A1vRW7Rzg4mXtltqEPeFjdoA5uePoSatrBob0dXbyJmI6USyQbxM87g/3rKWNs0gU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=ImYhTv1T; arc=none smtp.client-ip=205.220.168.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="TTQroaE3"
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4ACMRSnK029644;
-	Wed, 13 Nov 2024 04:34:17 GMT
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="ImYhTv1T"
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4ACMRkip003749;
+	Wed, 13 Nov 2024 04:34:09 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	q3ucm7q0Unlzb9UB9y5EMOEag4Mi2ROhQRK/SnF3quM=; b=TTQroaE3hiR/xMd3
-	zarIsODf1meLcTI/fIfapAs11LsLDbaFPWQrxDK19uB9Acv257+7cBD34nztm5bh
-	G9yHR33RWVTbc7UM1jFxWjTTuKomPQDSXkbcO61B4MZmA9uUe4BvNuvwOVZaT2p5
-	IFFYh8PLqDV12wPorLjFCzNnaG6n/1Ml0ueN+janxhGZ58ojgpO4/nJRBH2EASMH
-	zxTGeZuw6gOWP5X3+FDBSZjWecdbA0n7bUwIrzDh8FhUP9YybOYzSmDel3LOqFjj
-	gbhhoRw73JZEn8p9tX5OvX3w9/e+rBuVEwxhL+sobWX5aNPfLlcMoOSol0E1wcaq
-	pyjM+w==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42t0469j7c-1
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=gitpLMpgky0G1vCtfZnSee
+	vbgIYWeVgh+yWqlBdefjc=; b=ImYhTv1TGc8Q5pRaqTsfbKjvg/t55tlmkBCDZl
+	B28rQhR5MGbW9IHjhGE2oAJrQnd8fTUlYMSTA3359Uh481Lj2mL3Njf9hrl+EQA6
+	HWyZCKI2aKnQ3KD7xYi7X8BHzU8RTCsQuwHuCBM/rU3xma019l7PyUEhLUTCu3tP
+	L7RlbnsDEFSh/A2z4zXeZ2suzDc3lsq3GuCtZg9OZQeuEf/QZlGH0+1Y24arH4wH
+	EzO59LadfMtn/YWZ1ewNCedR+DiQvZaXvPisGEm9NRq7ermzGyMNne3Xfo4LHywc
+	vpG2hPWj3XTSVRqKc5KZ3J1TQimdwhidyHKmjv1qy7jSHreA==
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42t0gm1fb7-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 13 Nov 2024 04:34:17 +0000 (GMT)
+	Wed, 13 Nov 2024 04:34:09 +0000 (GMT)
 Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-	by NALASPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4AD4YGvr000770
+	by NALASPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4AD4Y83x021354
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 13 Nov 2024 04:34:16 GMT
+	Wed, 13 Nov 2024 04:34:08 GMT
 Received: from hu-yrangana-hyd.qualcomm.com (10.80.80.8) by
  nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Tue, 12 Nov 2024 20:34:12 -0800
+ 15.2.1544.9; Tue, 12 Nov 2024 20:34:05 -0800
 From: Yuvaraj Ranganathan <quic_yrangana@quicinc.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller"
@@ -55,12 +53,10 @@ To: Herbert Xu <herbert@gondor.apana.org.au>,
 CC: <linux-arm-msm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
         <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <quic_yrangana@quicinc.com>
-Subject: [PATCH 2/2] arm64: dts: qcom: qcs8300: enable the inline crypto engine
-Date: Wed, 13 Nov 2024 10:03:51 +0530
-Message-ID: <20241113043351.2889027-3-quic_yrangana@quicinc.com>
+Subject: [PATCH 0/2] Enable Inline crypto engine for QCS8300
+Date: Wed, 13 Nov 2024 10:03:49 +0530
+Message-ID: <20241113043351.2889027-1-quic_yrangana@quicinc.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241113043351.2889027-1-quic_yrangana@quicinc.com>
-References: <20241113043351.2889027-1-quic_yrangana@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -73,51 +69,32 @@ X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
  nalasex01b.na.qualcomm.com (10.47.209.197)
 X-QCInternal: smtphost
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: 4--EQgQ-EYG4zZTEGk8v9wGXQxsg2onk
-X-Proofpoint-ORIG-GUID: 4--EQgQ-EYG4zZTEGk8v9wGXQxsg2onk
+X-Proofpoint-ORIG-GUID: IHJV86a54COcMOpCJVQ16oQ18YHv9EZz
+X-Proofpoint-GUID: IHJV86a54COcMOpCJVQ16oQ18YHv9EZz
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
  definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- bulkscore=0 clxscore=1015 priorityscore=1501 spamscore=0 suspectscore=0
- mlxlogscore=901 impostorscore=0 adultscore=0 phishscore=0 mlxscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2411130039
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
+ spamscore=0 clxscore=1015 mlxscore=0 mlxlogscore=601 lowpriorityscore=0
+ impostorscore=0 adultscore=0 priorityscore=1501 malwarescore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
+ definitions=main-2411130039
 
-Add an ICE node to qcs8300 SoC description and enable it by adding a
-phandle to the UFS node.
+Document and add device-tree node to enable Inline crypto engine for QCS8300
+
+This series depends on below patch series:
+https://lore.kernel.org/all/20240925-qcs8300_initial_dtsi-v2-0-494c40fa2a42@quicinc.com/ - Reviewed
 
 Signed-off-by: Yuvaraj Ranganathan <quic_yrangana@quicinc.com>
 ---
- arch/arm64/boot/dts/qcom/qcs8300.dtsi | 8 ++++++++
- 1 file changed, 8 insertions(+)
+Yuvaraj Ranganathan (2):
+  dt-bindings: crypto: ice: document the qcs8300 inline crypto engine
+  arm64: dts: qcom: qcs8300: enable the inline crypto engine
 
-diff --git a/arch/arm64/boot/dts/qcom/qcs8300.dtsi b/arch/arm64/boot/dts/qcom/qcs8300.dtsi
-index 2c35f96c3f28..2d6ce6014329 100644
---- a/arch/arm64/boot/dts/qcom/qcs8300.dtsi
-+++ b/arch/arm64/boot/dts/qcom/qcs8300.dtsi
-@@ -685,6 +685,7 @@ &mc_virt SLAVE_EBI1 0>,
- 					<0 0>,
- 					<0 0>,
- 					<0 0>;
-+			qcom,ice = <&ice>;
- 			status = "disabled";
- 		};
- 
-@@ -710,6 +711,13 @@ ufs_mem_phy: phy@1d87000 {
- 			status = "disabled";
- 		};
- 
-+		ice: crypto@1d88000 {
-+			compatible = "qcom,qcs8300-inline-crypto-engine",
-+				     "qcom,inline-crypto-engine";
-+			reg = <0x0 0x01d88000 0x0 0x8000>;
-+			clocks = <&gcc GCC_UFS_PHY_ICE_CORE_CLK>;
-+		};
-+
- 		tcsr_mutex: hwlock@1f40000 {
- 			compatible = "qcom,tcsr-mutex";
- 			reg = <0x0 0x01f40000 0x0 0x20000>;
+ .../bindings/crypto/qcom,inline-crypto-engine.yaml        | 1 +
+ arch/arm64/boot/dts/qcom/qcs8300.dtsi                     | 8 ++++++++
+ 2 files changed, 9 insertions(+)
+
 -- 
 2.34.1
 
