@@ -1,340 +1,147 @@
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 416A81D540;
-	Thu, 14 Nov 2024 14:45:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C88342C859
+	for <linux-crypto@vger.kernel.org>; Thu, 14 Nov 2024 15:22:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731595512; cv=none; b=ohbulq19ZTm3SKHaWYg/Dh45UoJp5VaFj45CewGpnseontJk2d/xSIcLtnlh97Kq8iW3qVHijbp91QqqzJQHM3c6/DpCKxSs9ZwAVEJtucZHURAaftwuXlOdcFgfM2XxSBej/iLvhFgGPCGhR6hd6lYcbdSevVdjYnuo1/7LsZA=
+	t=1731597727; cv=none; b=doEr0Y/sAaoRP1oOfsxWWfcwveC0Qejs+p/W6wxDkeehFIYyqLJ9A1KciCRIysXtHRPbvNN0qR4U9T+6PSCF94FBtyDnAeypGTVB9aPq621CPcnMLmmblv2It/WkH8mtHJAVEPW4GTghm7Sl9ZW1pNbNGM/BjPWr6bllkNRPCo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731595512; c=relaxed/simple;
-	bh=c+QClJAidKaBzTN7uRmphTzeL9WoMavoidhuG/L8OwY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Uv78uL0wW6MbDQ4YZt95wO/Zd82bBu3MF8mdBvAXjK4RxZ+1JdcLo1ztG0ikuE8kxjHln/RLdBzfQMvhdmw/n6/yg3zFkerQiNGo1nHfjQBRJvoHs0KSGgr+hi2lVC1JFWPAQtRBxJJGtsBKnISfBP2DzbjRfV9ARHKyXRYcaks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DpgPP2MS; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1731597727; c=relaxed/simple;
+	bh=VOeL1LHJj4CvlcHfJAl3EqutCbGarb1Yfp1+RrNPg2A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=W/ovIUuNJJWMDXabYeJxMpJr8kjaudFMmwFwYkRQXNoyV/IIxyC9PfkRewDYIAEqVxkAw70+1rx0vWGreceN3Qm/YNMLYJEmgtM/KxOaCSha4U/Ej5YZvKep//MWvbiHwFg2MpOBBz0o0nus+tGP0Ak81nubrGSQICZjHlCmxCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=fail smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=dBpPpixa; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DpgPP2MS"
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2110a622d76so6294345ad.3;
-        Thu, 14 Nov 2024 06:45:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731595510; x=1732200310; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=P4N/miMj+TGmWS0ohyBPlFx+ca8H6wpyxHTxDzJvgeM=;
-        b=DpgPP2MSTrDKLuMOpybrolIZwrKeOD3Df9C9AeTxsiKRr8piCn7XScEoAZYGWgAYB1
-         bZ8oBhF/NAXVqYvuSuLcQNNBPQ2BToLVWe/jou2X/lDyX9H8pGrI355BbxM8V6XJGX3s
-         S9vEAIPcI9PzBhtFTVtPHTF2WQV85mwOJnMW5e63Ljflcs9v7QSPdhXVzRxeG5zGub2x
-         G1tlDCaZ7MXOuQBKf1cqGk1mKjLIBEOijVLFbPDtLvqH9oH0J/12sTvxpe4lh6z3ZAP6
-         LFTUhHnfeHMeh/rB496NVrORYj1TuWbhInBXKG8/qq7/eWuZXdsuTMUeaA5yxbN3KSqm
-         eqgg==
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="dBpPpixa"
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AE6l8mL015484
+	for <linux-crypto@vger.kernel.org>; Thu, 14 Nov 2024 15:22:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	YxIxF5hLq4iWtxlLGn/AClHN0cke6/bTjCz83ShCJhM=; b=dBpPpixaORjHXdne
+	FhM/5LByOOD48ay/NrzQnuZz1NTmI9HXNMn9QQRbQlmGvyRvJsDmhXvLM6g8RBFm
+	PIWIpEo3Xm10Rq/jKOM+Mgiio+6p9iZ+GY9/TSCGy9fGzYJs096Mj4g0Ec/AxJkm
+	4gcdwXUZlxbd5RyXbZOncclyHwBdee9x+UpidfyPLayRoIUqUcaYo7/Sbx3zJhpH
+	SdXVpRvkNZkETLHuol1dl3GAtcL6ZOrhOdqqb+4OHbwCzwryIXDYxMrQN6UjfMw8
+	Zzw1qu8LteVxfjDtNBUKTfETax3KNZYzAG+O7CiF4qgEnEXTl3T5P1tikTfBQ+be
+	rSChpw==
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com [209.85.160.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42vsf35d9j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Thu, 14 Nov 2024 15:22:04 +0000 (GMT)
+Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-460f924d8bcso1313791cf.2
+        for <linux-crypto@vger.kernel.org>; Thu, 14 Nov 2024 07:22:04 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731595510; x=1732200310;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=P4N/miMj+TGmWS0ohyBPlFx+ca8H6wpyxHTxDzJvgeM=;
-        b=qj/iY+7YN2SHk0EMOXa2c842ZYaDVnKWbqBOrStVfkzf16SLOmbYfIsvr/MpspK53J
-         tQCDYPYjKCx5bj7d5ceimsxv6V1hXXeTMoyKh2W9sVJkaHJUYqoLuicGte+kk2QPFeZm
-         1IJsN2fP3ywa3UiF3F/J+Lhfg79Gqdai54264Vwsmerj4SyhSTMk3HqoZVE7bvOv6TGU
-         8zc9+0ROi26YjFXpvQ7s9462PrCQzHJuwZrd0SHsOwFYLPi1utRIawKb/PC2/+qBaBho
-         7e7DLdvFEVC5WyIBRI5XK7DZ4LB8oGJU35WcQrXG4OVplpv3T609z8wDZNsy3JREE7vN
-         5VJg==
-X-Forwarded-Encrypted: i=1; AJvYcCUGN8d6czyau8Uv6qD5GOp9C/db+a/9BFeeZ0AukHs0ZAqxsPXJI3xG9OuCouHBP616/jvAGQVNizmR/qQ=@vger.kernel.org, AJvYcCWLKdqfQYtZLkkYshy6FVfbREPoav3ZKDRa+mi8dvddD1ANoxYmMbUSXVmmymeminosNbkjAbqnOIVLoE6r@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOFqGER9uxf4MfZ8B3Wm5hHcKnHruNjuzYoxib0ebDHuQPCZi8
-	GyBmnE0q3+nRQMq9tOFuRDb4Xb6/4cjbXScU4M+biLMU1WjdVpFp
-X-Google-Smtp-Source: AGHT+IE0999Q/8nTfXBkwDEyF3u/q1q6CgeFE9IcqTQLQIHnJWjElF7feqrBmFwff1OpG8xeosJmrg==
-X-Received: by 2002:a17:902:e945:b0:20c:a175:1943 with SMTP id d9443c01a7336-21183d67aa0mr353917955ad.40.1731595510408;
-        Thu, 14 Nov 2024 06:45:10 -0800 (PST)
-Received: from localhost.localdomain ([45.137.180.202])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211c7c2d38bsm11588055ad.41.2024.11.14.06.45.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Nov 2024 06:45:10 -0800 (PST)
-From: Zhihang Shao <zhihang.shao.iscas@gmail.com>
-To: zhangchunyan@iscas.ac.cn,
-	ebiggers@kernel.org
-Cc: akpm@linux-foundation.org,
-	aou@eecs.berkeley.edu,
-	davem@davemloft.net,
-	herbert@gondor.apana.org.au,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	palmer@dabbelt.com,
-	paul.walmsley@sifive.com,
-	zhihang.shao.iscas@gmail.com
-Subject: [PATCH v2] riscv: Optimize crct10dif with zbc extension
-Date: Thu, 14 Nov 2024 14:42:04 +0000
-Message-Id: <20241114144204.427915-1-zhihang.shao.iscas@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241113134655.GA794@quark.localdomain>
-References: <20241113134655.GA794@quark.localdomain>
+        d=1e100.net; s=20230601; t=1731597723; x=1732202523;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YxIxF5hLq4iWtxlLGn/AClHN0cke6/bTjCz83ShCJhM=;
+        b=OahWAnxl7RyVq0xfHe2sj0QATSBTbE5I0RT4rCJm5YzRHVBkmcSHVt4PXY75Yaiukj
+         lUhtcJnm/XHwiApaXva71d1BnFV8BwcNo8zzp/c8Sgleh3oeFpClvQRfxD0YboC4hc93
+         Up8BJZTz2L+Wnm1v3sRf3tfv9olTfxkkblTQbDIPWsdj9FtdBq9wCCvKrcmk7fGqR7mD
+         GMIViJcUYq5lB8o3iI+leGuZ0yC1n6xjUYE0HJ7jeCaZkkfu2/vCJXbZQ5NONuaj61Bj
+         0TIPCD2LZ15Vkb4b2nMuSCoHgfMZKWgkpD6sRqAERaqxbdNl0K4cXX6znucfeD/oMbMH
+         Vwqg==
+X-Gm-Message-State: AOJu0YyZLP4xDC1n7iv0SZGVCdm/TXvG5tJ65uLzmJgXjw/2ldvjlROC
+	eOy4q9Xvs4C5DgSa5jjW8zxPo1mjZhXo/AxadnR0EjJ0683qARjHz/atlDAaX0SiP/sdP12cMN3
+	jJ5/q3I2QYArAbfCfi8LOL1NeaP4YDzQabCoqcKv1aV6v6AfwAOJb0iPTvS0GGZg=
+X-Gm-Gg: ASbGncus05sK9Jq/rr8xy8DD5OyNan9sfnXHnXIgcvqsm88OaC9fFSpFty2RNlbrhqU
+	WqcqAFEZiREC3G9BKVjDlaMf8gY99cE09ZuklHvwu9GGDZD3zAwFbmFlZtnsgO5UIWkurbz6YpG
+	AZaGtSJNyxsMhYiM4PmwHLaBBtLkxryfgx2zU/I4eCseDKanobTjwaU6E44Njt8/gPaDVYS0nEh
+	dms063n/y1/hqxshbfpf3I5tq1tpiA3m2YBRVAD/wkVbMoNOh8hkrpGp9dGVG/u9TeH1UlWvg5s
+	SHJxzzGN8D1M8z9qM+vDr4MNSVif3Js=
+X-Received: by 2002:a05:622a:1183:b0:460:787f:f51f with SMTP id d75a77b69052e-4630941ab7fmr141068371cf.13.1731597723551;
+        Thu, 14 Nov 2024 07:22:03 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH9U14TALS4SGOL99dlTJ9kdKVasrprn7rCmbpPBy5qi53TR2NVmA6bM59U5xTlcuiHukHjsQ==
+X-Received: by 2002:a05:622a:1183:b0:460:787f:f51f with SMTP id d75a77b69052e-4630941ab7fmr141068101cf.13.1731597723213;
+        Thu, 14 Nov 2024 07:22:03 -0800 (PST)
+Received: from [192.168.212.120] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa20e045385sm73577866b.144.2024.11.14.07.22.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Nov 2024 07:22:02 -0800 (PST)
+Message-ID: <0344465e-89b9-4867-85fa-670060fa1761@oss.qualcomm.com>
+Date: Thu, 14 Nov 2024 16:22:00 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] arm64: dts: qcom: qcs8300: add QCrypto nodes
+To: Yuvaraj Ranganathan <quic_yrangana@quicinc.com>,
+        Thara Gopinath <thara.gopinath@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+ <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Bhupesh Sharma <bhupesh.sharma@linaro.org>
+Cc: linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20241113055830.2918347-1-quic_yrangana@quicinc.com>
+ <20241113055830.2918347-3-quic_yrangana@quicinc.com>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <20241113055830.2918347-3-quic_yrangana@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-ORIG-GUID: Ur1aS8ALnwzdkd7OgXbok1BEA_5a694h
+X-Proofpoint-GUID: Ur1aS8ALnwzdkd7OgXbok1BEA_5a694h
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 adultscore=0
+ bulkscore=0 phishscore=0 malwarescore=0 suspectscore=0 priorityscore=1501
+ clxscore=1011 mlxscore=0 spamscore=0 lowpriorityscore=0 mlxlogscore=883
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
+ definitions=main-2411140119
 
-The current CRC-T10DIF algorithm is based on table-lookup optimization.
-Given the previous work on optimizing crc32 calculations with zbc
-extension, it is believed that this will be equally effective for
-accelerating crc-t10dif.
-Therefore, this patch offers an implementation of crc-t10dif using zbc
-extension. This can detect whether the current runtime environment
-supports zbc feature and, if so, uses it to accelerate crc-t10dif
-calculations.
+On 13.11.2024 6:58 AM, Yuvaraj Ranganathan wrote:
+> Add the QCE and Crypto BAM DMA nodes.
+> 
+> Signed-off-by: Yuvaraj Ranganathan <quic_yrangana@quicinc.com>
+> ---
+>  arch/arm64/boot/dts/qcom/qcs8300.dtsi | 24 ++++++++++++++++++++++++
+>  1 file changed, 24 insertions(+)
+> 
+> diff --git a/arch/arm64/boot/dts/qcom/qcs8300.dtsi b/arch/arm64/boot/dts/qcom/qcs8300.dtsi
+> index 2c35f96c3f28..d7007e175c15 100644
+> --- a/arch/arm64/boot/dts/qcom/qcs8300.dtsi
+> +++ b/arch/arm64/boot/dts/qcom/qcs8300.dtsi
+> @@ -710,6 +710,30 @@ ufs_mem_phy: phy@1d87000 {
+>  			status = "disabled";
+>  		};
+>  
+> +		cryptobam: dma-controller@1dc4000 {
+> +			compatible = "qcom,bam-v1.7.4", "qcom,bam-v1.7.0";
+> +			reg = <0x0 0x01dc4000 0x0 0x28000>;
+> +			interrupts = <GIC_SPI 272 IRQ_TYPE_LEVEL_HIGH>;
+> +			#dma-cells = <1>;
+> +			qcom,ee = <0>;
+> +			qcom,controlled-remotely;
+> +			num-channels = <20>;
+> +			qcom,num-ees = <4>;
+> +			iommus = <&apps_smmu 0x480 0x00>,
+> +				 <&apps_smmu 0x481 0x00>;
+> +		};
+> +
+> +		crypto: crypto@1dfa000 {
+> +			compatible = "qcom,qcs8300-qce", "qcom,qce";
+> +			reg = <0x0 0x01dfa000 0x0 0x6000>;
+> +			dmas = <&cryptobam 4>, <&cryptobam 5>;
+> +			dma-names = "rx", "tx";
+> +			iommus = <&apps_smmu 0x480 0x00>,
+> +				 <&apps_smmu 0x481 0x00>;
+> +			interconnects = <&aggre2_noc MASTER_CRYPTO_CORE0 0 &mc_virt SLAVE_EBI1 0>;
 
-This patch is tested on QEMU VM with the crypto self-tests both rv64 and
-rv32.
+QCOM_ICC_TAG_ALWAYS
 
-Signed-off-by: Zhihang Shao <zhihang.shao.iscas@gmail.com>
-
----
-v2:
-- Use crypto self-tests instead. (Eric)
-- Fix some format errors in arch/riscv/crypto/Kconfig. (Chunyan)
----
- arch/riscv/crypto/Kconfig               |  13 ++
- arch/riscv/crypto/Makefile              |   4 +
- arch/riscv/crypto/crct10dif-riscv-zbc.c | 182 ++++++++++++++++++++++++
- 3 files changed, 199 insertions(+)
- create mode 100644 arch/riscv/crypto/crct10dif-riscv-zbc.c
-
-diff --git a/arch/riscv/crypto/Kconfig b/arch/riscv/crypto/Kconfig
-index ad58dad9a580..12107bc50bb1 100644
---- a/arch/riscv/crypto/Kconfig
-+++ b/arch/riscv/crypto/Kconfig
-@@ -29,6 +29,19 @@ config CRYPTO_CHACHA_RISCV64
- 	  Architecture: riscv64 using:
- 	  - Zvkb vector crypto extension
- 
-+config CRYPTO_CRCT10DIF_RISCV
-+	tristate "Checksum: CRCT10DIF"
-+	depends on TOOLCHAIN_HAS_ZBC
-+	depends on MMU
-+	depends on RISCV_ALTERNATIVE
-+	default y
-+	help
-+	  CRCT10DIF checksum with Zbc extension optimized
-+	  To accelerate CRCT10DIF checksum, choose Y here.
-+
-+	  Architecture: riscv using:
-+	  - Zbc extension
-+
- config CRYPTO_GHASH_RISCV64
- 	tristate "Hash functions: GHASH"
- 	depends on 64BIT && RISCV_ISA_V && TOOLCHAIN_HAS_VECTOR_CRYPTO
-diff --git a/arch/riscv/crypto/Makefile b/arch/riscv/crypto/Makefile
-index 247c7bc7288c..6f849f4dc4cc 100644
---- a/arch/riscv/crypto/Makefile
-+++ b/arch/riscv/crypto/Makefile
-@@ -7,6 +7,9 @@ aes-riscv64-y := aes-riscv64-glue.o aes-riscv64-zvkned.o \
- obj-$(CONFIG_CRYPTO_CHACHA_RISCV64) += chacha-riscv64.o
- chacha-riscv64-y := chacha-riscv64-glue.o chacha-riscv64-zvkb.o
- 
-+obj-$(CONFIG_CRYPTO_CRCT10DIF_RISCV) += crct10dif-riscv.o
-+crct10dif-riscv-y := crct10dif-riscv-zbc.o
-+
- obj-$(CONFIG_CRYPTO_GHASH_RISCV64) += ghash-riscv64.o
- ghash-riscv64-y := ghash-riscv64-glue.o ghash-riscv64-zvkg.o
- 
-@@ -21,3 +24,4 @@ sm3-riscv64-y := sm3-riscv64-glue.o sm3-riscv64-zvksh-zvkb.o
- 
- obj-$(CONFIG_CRYPTO_SM4_RISCV64) += sm4-riscv64.o
- sm4-riscv64-y := sm4-riscv64-glue.o sm4-riscv64-zvksed-zvkb.o
-+
-diff --git a/arch/riscv/crypto/crct10dif-riscv-zbc.c b/arch/riscv/crypto/crct10dif-riscv-zbc.c
-new file mode 100644
-index 000000000000..01571b4286f1
---- /dev/null
-+++ b/arch/riscv/crypto/crct10dif-riscv-zbc.c
-@@ -0,0 +1,182 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Accelerated CRC-T10DIF implementation with RISC-V Zbc extension.
-+ *
-+ * Copyright (C) 2024 Institute of Software, CAS.
-+ */
-+
-+#include <asm/alternative-macros.h>
-+#include <asm/byteorder.h>
-+#include <asm/hwcap.h>
-+
-+#include <crypto/internal/hash.h>
-+
-+#include <linux/byteorder/generic.h>
-+#include <linux/crc-t10dif.h>
-+#include <linux/minmax.h>
-+#include <linux/module.h>
-+#include <linux/types.h>
-+
-+static u16 crc_t10dif_generic_zbc(u16 crc, unsigned char const *p, size_t len);
-+
-+#define CRCT10DIF_POLY 0x8bb7
-+
-+#if __riscv_xlen == 64
-+#define STEP_ORDER 3
-+
-+#define CRCT10DIF_POLY_QT_BE 0xf65a57f81d33a48a
-+
-+static inline u64 crct10dif_prep(u16 crc, unsigned long const *ptr)
-+{
-+	return ((u64)crc << 48) ^ (__force u64)__cpu_to_be64(*ptr);
-+}
-+
-+#elif __riscv_xlen == 32
-+#define STEP_ORDER 2
-+#define CRCT10DIF_POLY_QT_BE 0xf65a57f8
-+
-+static inline u32 crct10dif_prep(u16 crc, unsigned long const *ptr)
-+{
-+	return ((u32)crc << 16) ^ (__force u32)__cpu_to_be32(*ptr);
-+}
-+
-+#else
-+#error "Unexpected __riscv_xlen"
-+#endif
-+
-+static inline u16 crct10dif_zbc(unsigned long s)
-+{
-+	u16 crc;
-+
-+	asm volatile   (".option push\n"
-+			".option arch,+zbc\n"
-+			"clmulh %0, %1, %2\n"
-+			"xor    %0, %0, %1\n"
-+			"clmul  %0, %0, %3\n"
-+			".option pop\n"
-+			: "=&r" (crc)
-+			: "r"(s),
-+			  "r"(CRCT10DIF_POLY_QT_BE),
-+			  "r"(CRCT10DIF_POLY)
-+			:);
-+
-+	return crc;
-+}
-+
-+#define STEP (1 << STEP_ORDER)
-+#define OFFSET_MASK (STEP - 1)
-+
-+static inline u16 crct10dif_unaligned(u16 crc, unsigned char const *p, size_t len)
-+{
-+	size_t bits = len * 8;
-+	unsigned long s = 0;
-+	u16 crc_low = 0;
-+
-+	for (int i = 0; i < len; i++)
-+		s = *p++ | (s << 8);
-+
-+	if (len < sizeof(u16)) {
-+		s ^= crc >> (16 - bits);
-+		crc_low = crc << bits;
-+	} else {
-+		s ^= (unsigned long)crc << (bits - 16);
-+	}
-+
-+	crc = crct10dif_zbc(s);
-+	crc ^= crc_low;
-+
-+	return crc;
-+}
-+
-+static u16 crc_t10dif_generic_zbc(u16 crc, unsigned char const *p, size_t len)
-+{
-+	size_t offset, head_len, tail_len;
-+	unsigned long const *p_ul;
-+	unsigned long s;
-+
-+	offset = (unsigned long)p & OFFSET_MASK;
-+	if (offset && len) {
-+		head_len = min(STEP - offset, len);
-+		crc = crct10dif_unaligned(crc, p, head_len);
-+		p += head_len;
-+		len -= head_len;
-+	}
-+
-+	tail_len = len & OFFSET_MASK;
-+	len = len >> STEP_ORDER;
-+	p_ul = (unsigned long const *)p;
-+
-+	for (int i = 0; i < len; i++) {
-+		s = crct10dif_prep(crc, p_ul);
-+		crc = crct10dif_zbc(s);
-+		p_ul++;
-+	}
-+
-+	p = (unsigned char const *)p_ul;
-+	if (tail_len)
-+		crc = crct10dif_unaligned(crc, p, tail_len);
-+
-+	return crc;
-+}
-+
-+static int crc_t10dif_init(struct shash_desc *desc)
-+{
-+	u16 *crc = shash_desc_ctx(desc);
-+
-+	*crc = 0;
-+
-+	return 0;
-+}
-+
-+static int crc_t10dif_final(struct shash_desc *desc, u8 *out)
-+{
-+	u16 *crc = shash_desc_ctx(desc);
-+
-+	*(u16 *)out = *crc;
-+
-+	return 0;
-+}
-+
-+static int crc_t10dif_update_zbc(struct shash_desc *desc, const u8 *data,
-+				unsigned int length)
-+{
-+	u16 *crc = shash_desc_ctx(desc);
-+
-+	*crc = crc_t10dif_generic_zbc(*crc, data, length);
-+
-+	return 0;
-+}
-+
-+static struct shash_alg crc_t10dif_alg = {
-+	.digestsize		= CRC_T10DIF_DIGEST_SIZE,
-+	.init			= crc_t10dif_init,
-+	.update			= crc_t10dif_update_zbc,
-+	.final			= crc_t10dif_final,
-+	.descsize		= CRC_T10DIF_DIGEST_SIZE,
-+
-+	.base.cra_name		= "crct10dif",
-+	.base.cra_driver_name	= "crct10dif-riscv-zbc",
-+	.base.cra_priority	= 150,
-+	.base.cra_blocksize	= CRC_T10DIF_BLOCK_SIZE,
-+	.base.cra_module	= THIS_MODULE,
-+};
-+
-+static int __init crc_t10dif_mod_init(void)
-+{
-+	if (riscv_isa_extension_available(NULL, ZBC))
-+		return crypto_register_shash(&crc_t10dif_alg);
-+
-+	return -ENODEV;
-+}
-+
-+static void __exit crc_t10dif_mod_exit(void)
-+{
-+	crypto_unregister_shash(&crc_t10dif_alg);
-+}
-+
-+module_init(crc_t10dif_mod_init);
-+module_exit(crc_t10dif_mod_exit);
-+
-+MODULE_DESCRIPTION("CRC-T10DIF using RISC-V ZBC Extension");
-+MODULE_ALIAS_CRYPTO("crct10dif");
-+MODULE_LICENSE("GPL");
--- 
-2.34.1
-
+Konrad
