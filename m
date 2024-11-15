@@ -1,102 +1,77 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF5501B218E
-	for <linux-crypto@vger.kernel.org>; Fri, 15 Nov 2024 11:57:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B42193BB22;
+	Fri, 15 Nov 2024 11:58:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731671871; cv=none; b=fv6PwlBriUiC0dPwNhlH4gv75RVlZW83IxlgIrHzSdvzSJGLk29smCTQpjx0ffvKq6X69UsYRlpz1f8uEZbDhJ+5nl6154PMLWSA6J7LzSW4J6jwSkket+Ky2fxttBA3R/KZEQY/wtUDiVqmU7xxeKJItIxW2F4zvZHAphH1WRE=
+	t=1731671925; cv=none; b=epLQ1E6W8UtcJrx9JLE7PLwp8A4V3T1iFTCYD9PPJBfF9Glz0JwrM08ci+J0O+t/rV0PlWy7j3bhc8eAL7DXzt3pAhmrU1wtdq6CbWI0r6/ovBhzXbkJNUhfSyVcwLwzKWBJ1EZto/QQnvom+TvM5NJUELq3bz3V0HFEKDh+YSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731671871; c=relaxed/simple;
-	bh=tA1gjLS23L52ok5r7km+LnSPVbxkJYgxAsmGFhEsvtw=;
+	s=arc-20240116; t=1731671925; c=relaxed/simple;
+	bh=BCIW7Eqtkd/JoC4ZXWZqmDWtYnGayq/LlJ9Oqz3xXe4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P7Iy/28zJwyoOB+AXGB0QaPLqBcK8WWAKB2E/RqN/qcl8rT4AKqxLEORVOLcE162wVr+5YjOIniOW07lNADi8BVlBXtjUBHaZWDXuP48tprwdH8+W0pUvdjsCY6102TJ0+fKjXEAHPDxaq6GirqqiAU44uKVWd/2eTmD+JswNnY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=ObHsZmYv; arc=none smtp.client-ip=144.6.53.87
+	 Content-Type:Content-Disposition:In-Reply-To; b=jcSnqDfmvsreWWy9dqt0Oa2K6EBD06jppSCn7yt06CLVOcYnK++YtGVf1Y5ymRATpXYfv8F19Z0UeZMc13ma64V6mZo0vTkJZIc87t3PI+PU4lb8CdkEvbV2APk+jQF9Yrz+1CQ2EBAZZPMjfxzUOcFX73wn5AxdCQ3pJX0BiqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=AdJQJaBA; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="ObHsZmYv"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="AdJQJaBA"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	s=formenos; h=In-Reply-To:Content-Transfer-Encoding:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=+mvXcr5Z5PsIemwYslMa6Llzo3RDr0teFDNxaivqn1o=; b=ObHsZmYvQQwQWpgg2Wam4dgyAO
-	bpSn6HDHimxZ6j3KdkdVVwP5/NxWTLMu6XD8jdLvG+pt9dhlaccIqJrggmrFYIICbmOLte6HkhyJ9
-	QhBrSI8qTCynMEiEguEreh0G+G2+CiJGeiaQLiRAyTQz5C0NWElJiYdSWeDu/2NuN99YFkmUhDTib
-	P/ZML453RjKxk8mpolecU/4x9cZELXopDCZ7ahQwSGKwXPNgQiuxKx8ryh+fHtC1coc1GIU/1WoAs
-	KUIGc+G2RDUTaCJtjJigVZNl4cvoQjtYIBB1tPLclV/HSAMk/MqqZWNAoD1tU8FgDuhaIc/txVN1a
-	eYryOOBQ==;
+	bh=ln6NUFo2qRXRfJFl/RulvjbR0lolf2yFHeb6Il/5kl8=; b=AdJQJaBAWwAXJEsrsvth3BJ0xd
+	EShv8PQUIgwXqdbV4VJhtB8N1V8PZAGLCjMratcIou5WEASpf+20CbKdi9LHIdct9/Vov9k8+2x+O
+	SprrVl4US0j9Ev+PWllTbiSVOAIxYuZYgVtjh25w6LUAzASJMNxDuGu8hepsR0r77Fzh2eaafrYoW
+	QOi8CkMk40kALSP73u5a8De7MWeYKdhs/CTmXXcJRQaW0qSOOp+H5crJ5QZ7FS532uiGSeBKE/xqi
+	hdt16PBVKfsptTaa8c8RIRdPwpsHNnyIDppRwXqEpLxQ2CkUTAXQ0Vr5ztjojXE5FAwCBfgxruoaf
+	ViEv09pg==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tBuxN-00H1xs-0M;
-	Fri, 15 Nov 2024 19:57:46 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 15 Nov 2024 19:57:45 +0800
-Date: Fri, 15 Nov 2024 19:57:45 +0800
+	id 1tBuy5-00H20E-1l;
+	Fri, 15 Nov 2024 19:58:30 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 15 Nov 2024 19:58:29 +0800
+Date: Fri, 15 Nov 2024 19:58:29 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Ard Biesheuvel <ardb+git@google.com>
-Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	ebiggers@kernel.org, keescook@chromium.org,
-	Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH v2 0/6] Clean up and improve ARM/arm64 CRC-T10DIF code
-Message-ID: <Zzc3OfJj85LpI1uY@gondor.apana.org.au>
-References: <20241105160859.1459261-8-ardb+git@google.com>
+To: Lukas Bulwahn <lbulwahn@redhat.com>
+Cc: Olivia Mackall <olivia@selenic.com>, linux-crypto@vger.kernel.org,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	linuxppc-dev@lists.ozlabs.org, kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Lukas Bulwahn <lukas.bulwahn@redhat.com>
+Subject: Re: [PATCH] hwrng: amd - remove reference to removed PPC_MAPLE config
+Message-ID: <Zzc3ZUgMVFAd8xN6@gondor.apana.org.au>
+References: <20241106081343.66479-1-lukas.bulwahn@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20241105160859.1459261-8-ardb+git@google.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20241106081343.66479-1-lukas.bulwahn@redhat.com>
 
-On Tue, Nov 05, 2024 at 05:09:00PM +0100, Ard Biesheuvel wrote:
-> From: Ard Biesheuvel <ardb@kernel.org>
+On Wed, Nov 06, 2024 at 09:13:43AM +0100, Lukas Bulwahn wrote:
+> From: Lukas Bulwahn <lukas.bulwahn@redhat.com>
 > 
-> I realized that the generic sequence implementing 64x64 polynomial
-> multiply using 8x8 PMULL instructions, which is used in the CRC-T10DIF
-> code to implement a fallback version for cores that lack the 64x64 PMULL
-> instruction, is not very efficient.
+> Commit 62f8f307c80e ("powerpc/64: Remove maple platform") removes the
+> PPC_MAPLE config as a consequence of the platform’s removal.
 > 
-> The folding coefficients that are used when processing the bulk of the
-> data are only 16 bits wide, and so 3/4 of the partial results of all those
-> 8x8->16 bit multiplications do not contribute anything to the end result.
+> The config definition of HW_RANDOM_AMD refers to this removed config option
+> in its dependencies.
 > 
-> This means we can use a much faster implementation, producing a speedup
-> of 3.3x on Cortex-A72 without Crypto Extensions (Raspberry Pi 4).
+> Remove the reference to the removed config option.
 > 
-> The same logic can be ported to 32-bit ARM too, where it produces a
-> speedup of 6.6x compared with the generic C implementation on the same
-> platform.
-> 
-> Changes since v1:
-> - fix bug introduced in refactoring
-> - add asm comments to explain the fallback algorithm
-> - type 'u8 *out' parameter as 'u8 out[16]'
-> - avoid asm code for 16 byte inputs (a higher threshold might be more
->   appropriate but 16 is nonsensical given that the folding routine
->   returns a 16 byte output)
-> 
-> Ard Biesheuvel (6):
->   crypto: arm64/crct10dif - Remove obsolete chunking logic
->   crypto: arm64/crct10dif - Use faster 16x64 bit polynomial multiply
->   crypto: arm64/crct10dif - Remove remaining 64x64 PMULL fallback code
->   crypto: arm/crct10dif - Use existing mov_l macro instead of __adrl
->   crypto: arm/crct10dif - Macroify PMULL asm code
->   crypto: arm/crct10dif - Implement plain NEON variant
-> 
->  arch/arm/crypto/crct10dif-ce-core.S   | 249 ++++++++++-----
->  arch/arm/crypto/crct10dif-ce-glue.c   |  55 +++-
->  arch/arm64/crypto/crct10dif-ce-core.S | 335 +++++++++-----------
->  arch/arm64/crypto/crct10dif-ce-glue.c |  48 ++-
->  4 files changed, 376 insertions(+), 311 deletions(-)
-> 
-> -- 
-> 2.47.0.199.ga7371fff76-goog
+> Signed-off-by: Lukas Bulwahn <lukas.bulwahn@redhat.com>
+> ---
+>  drivers/char/hw_random/Kconfig | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
