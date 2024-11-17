@@ -1,90 +1,155 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B37318A92D;
-	Fri, 15 Nov 2024 23:05:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8E651392;
+	Sun, 17 Nov 2024 00:23:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731711954; cv=none; b=fDjo1GyZ3pCgDN2uHJ5/FD1CYhMQ3f4Wr1mC+gwfEa7goWGAWNlI9eRDYbZHddpUFfJR7ODhO2myv7zxwgI1HAJ+KEJCDkBC1C8LD8w2mmOecYX4EwmEfPP+wQggeH2GLEVepCcqL8Zp7FCLa2sqHmCGmH1zxA5sxJTce4ONEaQ=
+	t=1731803033; cv=none; b=dkvbCHyqG2vKcY+XSQMXDlhTonEL5tzYiVHBxPx3S+2tWqaEu8/C7+BGRjW/6r49oHMcz/9ekbo/RnVr3iNGb3nnWF2a4W+M+RFEqNTXpCKn2xa70PR/5VSJQERSWl0esXzSZ+YNYfuq4+pPwbRAjAhK3AoMyAhHZPwZbQOQSKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731711954; c=relaxed/simple;
-	bh=GM8RftUMNxoU4hzxmn4JTX8MZKYxjBFPF/mx9Z+p+zc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KSsBIQIpihpyNb0cJ1SdeNP5i0OxDhYsRijigbmNtReHaGMKjO+tQOqrlYHkuDVG1h28MYGjASQGJ1SgJ6w+sDIQAeW6GTja6oy14Ov6V55Spmy9WfvS26FuxwCbjVY++dGga9+aCzhm9E/CTu9w0RsmYgGL8YGGkWIkWJO6kL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=Jdd6g3UP; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1731803033; c=relaxed/simple;
+	bh=CnepUwceJ5j9G5NUVs6UktH+oiMT+FJpiIqYKC1mGcA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=B8Acgn3bJBzRM3qFImllAaT/1rGNEXjKm+i9XU1uSusd96cYpwjkBhouY9DxJ8UNAqW740nROByXc9CfAyYocoq9KrkgTt7YFpYx6eUDmkj/eosgq4Uo+WZhLN5siWaiJAJmYoJYX6gA6FWNayV6B7CpGGeEMNe6rr9e5kTU83k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QdBB+C8w; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="Jdd6g3UP"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=iNrmCujufagul09VCWaNFQr74RFfyRLFySNKzZRpBgk=; b=Jdd6g3UPvqg6mftQzYyWAlcPRs
-	S59qVZ5zEswJ+LhakJwH6d5jiDo6uQHmY2CJt4lGr97qHN74BCYzzBvldNtdt4KVUn45YjZ56Rb9I
-	SpFFElvjLn8X9WqV3iKYmStGETYCfgggYit68/3w/F98q+ZxwKjpFwhcdOmPRO1chO5t8P+ifZPKq
-	PIupu+2TQ3ASe8YAMv3En9kCxZgAQV9E5YNE8U1VpoIL3E2iNGA4H7tk8Su6I7w5JK1Pw1aqwWz/W
-	0pLNcI4JEiS6FniyQdoLVYqnU3wndlEjrlc26csAx5PZr2YRV/hLqKY4Wu3YISLGkNdsAK9WEGiPB
-	JyHtqVCA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tC5Nk-00HBOg-0Y;
-	Sat, 16 Nov 2024 07:05:41 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 16 Nov 2024 07:05:40 +0800
-Date: Sat, 16 Nov 2024 07:05:40 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Harald Freudenberger <freude@linux.ibm.com>
-Cc: dengler@linux.ibm.com, davem@davemloft.net, hca@linux.ibm.com,
-	linux-s390@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v4 3/3] s390/crypto: New s390 specific shash phmac
-Message-ID: <ZzfTxNSOmXDz8iQG@gondor.apana.org.au>
-References: <20241115144724.12146-1-freude@linux.ibm.com>
- <20241115144724.12146-4-freude@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QdBB+C8w"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51AC4C4CEC3;
+	Sun, 17 Nov 2024 00:23:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731803033;
+	bh=CnepUwceJ5j9G5NUVs6UktH+oiMT+FJpiIqYKC1mGcA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=QdBB+C8wOvDetydffbpqtgfNNLWzIrqbXMWelcLY8DuPmy5RGF5zfG+A0FsY+HaNG
+	 O5PCgWFRW5GIMrGbfXgQ6Hbr4YtcyZFG8IX5XfaCSbHMkjiym1yO4Kr1vWmJjTz2fZ
+	 sm8sHc6x2aDG3jtzdyegeDIKNBOQi7ERfR9RL9g136J9NuF533+AkCvwC9xhixjbJK
+	 u1l2xA91Oc3DJfkMqNMcmT3wcn905syEAe0IL49XL3ZtPbOEUqsh2M59r6C7RbJfDQ
+	 QdCEl8TCXEqTxxKPYmzGsTFdNGINwDhOyLJK07Ss4YFDkwMup0R7ZLkN14z7Cabzgs
+	 4a3bW9/6PvKqQ==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: linux-arch@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-crypto@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	x86@kernel.org,
+	Zhihang Shao <zhihang.shao.iscas@gmail.com>,
+	Ard Biesheuvel <ardb@kernel.org>
+Subject: [PATCH 00/11] Wire up CRC-T10DIF library functions to arch-optimized code
+Date: Sat, 16 Nov 2024 16:22:33 -0800
+Message-ID: <20241117002244.105200-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241115144724.12146-4-freude@linux.ibm.com>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Nov 15, 2024 at 03:47:24PM +0100, Harald Freudenberger wrote:
->
-> Please note also that this implementation actively checks for
-> non-sleeping context before attempting to derive a protected
-> key from the given raw key material. This is due to the fact
-> that it may be (in the future) that this process has to interact
-> with crypto cards and thus requires IO traffic - which requires
-> sleeping allowed context. So there is a check for in_task()
-> and if this fails, -EOPNOTSUPP is returned to the caller.
+This patchset is also available in git via:
 
-I don't think in_task is right.  You cannot sleep when spinlocks
-are held and in general there is no way to test for that:
+    git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git crc-t10dif-lib-v1
 
-/*
- * Are we running in atomic context?  WARNING: this macro cannot
- * always detect atomic context; in particular, it cannot know about
- * held spinlocks in non-preemptible kernels.  Thus it should not be
- * used in the general case to determine whether sleeping is possible.
- * Do not use in_atomic() in driver code.
- */
-#define in_atomic()     (preempt_count() != 0)
+This patchset updates the kernel's CRC-T10DIF library functions to be
+directly optimized for x86, arm, arm64, and powerpc without taking an
+unnecessary and inefficient detour through the crypto API.  It follows
+the same approach that I'm taking for CRC32 in the patchset
+https://lore.kernel.org/linux-crypto/20241103223154.136127-1-ebiggers@kernel.org
 
-While the Crypto API provides a mechanism for you to determine
-whether you can sleep (CRYPTO_TFM_REQ_MAY_SLEEP), I don't think
-it is acceptable to just randomly fail because you got called in
-a unsleepable context.
+This patchset also adds a CRC KUnit test suite that covers multiple CRC
+variants, and deletes some older ad-hoc tests that are obsoleted by it.
 
-The general solution for this problem is to make your algorithms
-asynchronous in the unsleepable context.  See how we handle this
-in crypto/simd.c.
+This patchset has several dependencies including my CRC32 patchset and
+patches queued in several trees for 6.13.  It can be retrieved from git
+using the command given above.  This is targeting 6.14.
 
-Cheers,
+Eric Biggers (11):
+  lib/crc-t10dif: stop wrapping the crypto API
+  lib/crc-t10dif: add support for arch overrides
+  crypto: crct10dif - expose arch-optimized lib function
+  x86/crc-t10dif: expose CRC-T10DIF function through lib
+  arm/crc-t10dif: expose CRC-T10DIF function through lib
+  arm64/crc-t10dif: expose CRC-T10DIF function through lib
+  powerpc/crc-t10dif: expose CRC-T10DIF function through lib
+  lib/crc_kunit.c: add KUnit test suite for CRC library functions
+  lib/crc32test: delete obsolete crc32test.c
+  powerpc/crc: delete obsolete crc-vpmsum_test.c
+  MAINTAINERS: add entry for CRC library
+
+ MAINTAINERS                                   |  11 +
+ arch/arm/Kconfig                              |   1 +
+ arch/arm/crypto/Kconfig                       |  11 -
+ arch/arm/crypto/Makefile                      |   2 -
+ arch/arm/crypto/crct10dif-ce-glue.c           | 124 ---
+ arch/arm/lib/Makefile                         |   3 +
+ .../crc-t10dif-core.S}                        |   0
+ arch/arm/lib/crc-t10dif-glue.c                |  77 ++
+ arch/arm64/Kconfig                            |   1 +
+ arch/arm64/configs/defconfig                  |   1 -
+ arch/arm64/crypto/Kconfig                     |  10 -
+ arch/arm64/crypto/Makefile                    |   3 -
+ arch/arm64/crypto/crct10dif-ce-glue.c         | 132 ---
+ arch/arm64/lib/Makefile                       |   3 +
+ .../crc-t10dif-core.S}                        |   0
+ arch/arm64/lib/crc-t10dif-glue.c              |  78 ++
+ arch/m68k/configs/amiga_defconfig             |   1 -
+ arch/m68k/configs/apollo_defconfig            |   1 -
+ arch/m68k/configs/atari_defconfig             |   1 -
+ arch/m68k/configs/bvme6000_defconfig          |   1 -
+ arch/m68k/configs/hp300_defconfig             |   1 -
+ arch/m68k/configs/mac_defconfig               |   1 -
+ arch/m68k/configs/multi_defconfig             |   1 -
+ arch/m68k/configs/mvme147_defconfig           |   1 -
+ arch/m68k/configs/mvme16x_defconfig           |   1 -
+ arch/m68k/configs/q40_defconfig               |   1 -
+ arch/m68k/configs/sun3_defconfig              |   1 -
+ arch/m68k/configs/sun3x_defconfig             |   1 -
+ arch/powerpc/Kconfig                          |   1 +
+ arch/powerpc/configs/powernv_defconfig        |   1 -
+ arch/powerpc/configs/ppc64_defconfig          |   2 -
+ arch/powerpc/crypto/Kconfig                   |  20 -
+ arch/powerpc/crypto/Makefile                  |   3 -
+ arch/powerpc/crypto/crc-vpmsum_test.c         | 133 ---
+ arch/powerpc/lib/Makefile                     |   3 +
+ .../crc-t10dif-glue.c}                        |  69 +-
+ .../{crypto => lib}/crct10dif-vpmsum_asm.S    |   2 +-
+ arch/s390/configs/debug_defconfig             |   1 -
+ arch/x86/Kconfig                              |   1 +
+ arch/x86/crypto/Kconfig                       |  10 -
+ arch/x86/crypto/Makefile                      |   3 -
+ arch/x86/crypto/crct10dif-pclmul_glue.c       | 143 ---
+ arch/x86/lib/Makefile                         |   3 +
+ arch/x86/lib/crc-t10dif-glue.c                |  51 ++
+ .../{crypto => lib}/crct10dif-pcl-asm_64.S    |   0
+ crypto/Kconfig                                |   1 +
+ crypto/Makefile                               |   3 +-
+ crypto/crct10dif_common.c                     |  82 --
+ crypto/crct10dif_generic.c                    |  82 +-
+ include/linux/crc-t10dif.h                    |  28 +-
+ lib/Kconfig                                   |  43 +-
+ lib/Kconfig.debug                             |  20 +
+ lib/Makefile                                  |   2 +-
+ lib/crc-t10dif.c                              | 156 +---
+ lib/crc32test.c                               | 852 ------------------
+ lib/crc_kunit.c                               | 428 +++++++++
+ .../testing/selftests/arm64/fp/kernel-test.c  |   3 +-
+ 57 files changed, 867 insertions(+), 1748 deletions(-)
+ delete mode 100644 arch/arm/crypto/crct10dif-ce-glue.c
+ rename arch/arm/{crypto/crct10dif-ce-core.S => lib/crc-t10dif-core.S} (100%)
+ create mode 100644 arch/arm/lib/crc-t10dif-glue.c
+ delete mode 100644 arch/arm64/crypto/crct10dif-ce-glue.c
+ rename arch/arm64/{crypto/crct10dif-ce-core.S => lib/crc-t10dif-core.S} (100%)
+ create mode 100644 arch/arm64/lib/crc-t10dif-glue.c
+ delete mode 100644 arch/powerpc/crypto/crc-vpmsum_test.c
+ rename arch/powerpc/{crypto/crct10dif-vpmsum_glue.c => lib/crc-t10dif-glue.c} (50%)
+ rename arch/powerpc/{crypto => lib}/crct10dif-vpmsum_asm.S (99%)
+ delete mode 100644 arch/x86/crypto/crct10dif-pclmul_glue.c
+ create mode 100644 arch/x86/lib/crc-t10dif-glue.c
+ rename arch/x86/{crypto => lib}/crct10dif-pcl-asm_64.S (100%)
+ delete mode 100644 crypto/crct10dif_common.c
+ delete mode 100644 lib/crc32test.c
+ create mode 100644 lib/crc_kunit.c
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.47.0
+
