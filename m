@@ -1,192 +1,90 @@
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5706214D2B7
-	for <linux-crypto@vger.kernel.org>; Mon, 18 Nov 2024 20:02:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C51A5197531;
+	Mon, 18 Nov 2024 20:54:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731960149; cv=none; b=sXRK5nzgakio9zlxhJEgPXKbgB2ArkvivSpsgPJIcjGwxYCr4SL7GWQeHjorAcJKnVTJNDsnas2QhJ9yUqxR8l+hHDurXPqzeyip7Y/RNAeXSwUvSE16fNsrqgSWojmnymWkrbQ9uY1JagNZMhehSZkGvqkDnm+jxMTqZBgpWMI=
+	t=1731963287; cv=none; b=GMmX5veiE0c3IQOIRfdUfkDTX+L2eQDqPFXPKkDJx4pfyVbo1Gc7EkEQ/KxUXQzrdPQufN3+PKRy0WmvlFf9A4BaE1ROfUZo7Nqr6cEad9p50LApf5CnwDvsjD1WJkLARkh+ZjJX5Qh4IanE3QeddGg7RidDMFDcvYDtiJXw14I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731960149; c=relaxed/simple;
-	bh=E+LBwBRF8DHoVawLtfgdfdbwEfo68/6NPCRK+oRI+No=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A2uPedJ29pvDZlwAnQeZ8N01woMSFMiHF3Jqw4luxf+Yp5VpVviYo6t/5Yae7cOcJyG+SoSoVHFCGepSW2nNOq1mEVvzV3LtSBLod+b5LeEohApPTC4P/I6qs6HCNNUpSJW3RXi6KfDjsdBwKv+y6XD+g7OplDUVOr5rhquBuCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amacapital.net; spf=pass smtp.mailfrom=amacapital.net; dkim=pass (2048-bit key) header.d=amacapital-net.20230601.gappssmtp.com header.i=@amacapital-net.20230601.gappssmtp.com header.b=M5Vg+RuI; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amacapital.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amacapital.net
+	s=arc-20240116; t=1731963287; c=relaxed/simple;
+	bh=+keMs4N1sPD/Y1I/jvOU0qdU2AEUGw51HztZHV8ciXg=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=Y5N7LhWySR1noW+5fa1ZSCC0t5QsLwECARwfU2hVcAwMqzYQvyRUEDzSAvU+WBXrG97Ta0oDfWsJvvRFxwcLGZpKGl5papkv8PhHiMxWAjoMoD8yAN5zCTlovE9tldquAYaql67dpLOqBnk2are+A4MQOBAz9JpTj88uPb/7qkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=MQaRMZai; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amacapital-net.20230601.gappssmtp.com header.i=@amacapital-net.20230601.gappssmtp.com header.b="M5Vg+RuI"
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5cecbddb574so164841a12.1
-        for <linux-crypto@vger.kernel.org>; Mon, 18 Nov 2024 12:02:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=amacapital-net.20230601.gappssmtp.com; s=20230601; t=1731960144; x=1732564944; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=F56XnCiPK1ucbtbbIcuwS+1n5yBs1+kTrZwft20AGGo=;
-        b=M5Vg+RuIEJo5nRlwRuJBceZfl7J/tp7FoRljht/aHjwm80g8gaL4PAKFGneLmac5UA
-         huSPyBi/fanJIwXS8dXkMJtp5Dcx3N2CmMWu53Bymxf5xKqPzMmeKxXpYP3E3puqyzpu
-         J/fmz+9M9Lb8KyShD9HYNb5A3p3pXfkLMkT8blTdBWRJh+YFA8PXqWFG521vWbmES848
-         tBRvstqL/iJJmmUzW7WrS2wLG1qlQpCf3f0Y5Kf1h9bG/eG2KTis3yxBjjtyrGqchec0
-         T0jjenqN5ThrFV3h6Exs7LALNdLFKzDyh/vSdyUauzmqodePjGToGNrMUUTo4FUvxQwg
-         4wpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731960144; x=1732564944;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=F56XnCiPK1ucbtbbIcuwS+1n5yBs1+kTrZwft20AGGo=;
-        b=SK+zdsLPSI6R2esICY/SmDxrQizFdb9Xs6sqga+GSaXroKT6HvRCvsEMt13SaM/CUZ
-         hUXJh/IpwuQAMGDTmqfnkWXU+WaLYMz9/5K0cOLt0fQXUYgMVLGndIMTYQjn1B8/Vskp
-         5QBPxcfMxIE4ThBka3h1S5V6qFnc1iDbVzUIMr7qawTG3XWOf/8wfD6L2H6aH0hyZIQ/
-         cg7FplJLfgGQzq4B9twQAsdvIDRDiH6wUTsFf2stiYkCWkaH1a4bKpQwSMqDXgErs4dv
-         HxmkepT0hD4qx7bHXOHVbLy99YHtOFWe1RNBEFh80eqQ6Yr3VVgxznnJm1SZJ0ue+zHY
-         panw==
-X-Forwarded-Encrypted: i=1; AJvYcCVNUGu2xJZFy/3OQE18zvgn5KipOmudVOCdMS/DS2R45cU45zz7PfDgDbCyg93/pMjHrXkpgwOkF7QI8DQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywf02heK9sBAYO98GyFdAIn0OhjKfXj6ACC2uQ+KKctgfeZE+TB
-	XJQvAuHPz8QONzApOLWU8xHegTyijExCfGQWI2cZyUFxqyzkgIZe99fx7jE3s5VieepiljUSfmK
-	Lom1pcFcB1WPuJZ2IPjBsyZ4zuTUU7r05RJSA
-X-Google-Smtp-Source: AGHT+IFoQ/M1Rp3ASKc7+vFPOEp+9oiYAQ8ueOL2fLtrqLS19jm7uOri1Atv932nS8Gcqo/IWYlS3CoMIuiDqjl4zlU=
-X-Received: by 2002:a17:907:9412:b0:a9e:d7e3:ccae with SMTP id
- a640c23a62f3a-aa483427760mr1375196366b.16.1731960144547; Mon, 18 Nov 2024
- 12:02:24 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="MQaRMZai"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1731963270;
+	bh=dv/up5UuotJfTMVa1ArB2LXUy/HZ+M2pQj9Wa2E6TXk=;
+	h=Date:From:To:Cc:Subject:From;
+	b=MQaRMZaiZikFDqrGWq+9n0LaLch5jJtrbtwfoSUhD9Hnq4gdu7O9mcb63suoUnqm1
+	 bjeLzybKYJX5vcJu4ceSFkLX4JFeEfTrn6/cMrT8XSB/9rQzcrIG5HgHSQkes6c+E+
+	 Jrhp9+pzKvUhYzC24u+/bHeo3af+GnP4rHlRIGOXW+sukdKxDZiPG+/LrzX16VH3QC
+	 SHrcrp7buEDY+J70rH+1K7S2A5PiH8pSY6O9vqUa7h23OOchcVy25WYLfuqEZ9+E1Q
+	 GFqDogFieWHI7imiJQVm42HP4pYg+EQyPwQK1KEDaag3y9mgrusAL5oHApxW2XjwS3
+	 /x69VMPDF18MQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Xsfxx6z1Hz4xfp;
+	Tue, 19 Nov 2024 07:54:29 +1100 (AEDT)
+Date: Tue, 19 Nov 2024 07:53:39 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Herbert Xu <herbert@gondor.apana.org.au>, Linux Crypto List
+ <linux-crypto@vger.kernel.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next
+ Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: duplicate patch in the crypto-current tree
+Message-ID: <20241119075339.7116dbcd@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240531010331.134441-1-ross.philipson@oracle.com>
- <20240531010331.134441-7-ross.philipson@oracle.com> <20240531021656.GA1502@sol.localdomain>
- <874jaegk8i.fsf@email.froward.int.ebiederm.org> <5b1ce8d3-516d-4dfd-a976-38e5cee1ef4e@apertussolutions.com>
- <87ttflli09.ffs@tglx> <CALCETrXQ7rChWLDqTG0+KY7rsfajSPguMnHO1G4VJi_mgwN9Zw@mail.gmail.com>
- <1a1f0c41-70de-4f46-b91d-6dc7176893ee@apertussolutions.com>
- <8a0b59a4-a5a2-42ae-bc1c-1ddc8f2aad16@apertussolutions.com>
- <CALCETrX8caT5qvCUu24hQfxUF_wUC2XdGpS2YFP6SR++7FiM3Q@mail.gmail.com>
- <c466ed57-35a8-41c0-9647-c70e588ad1d3@apertussolutions.com>
- <CALCETrW9WNNGh1dEPKfQoeU+m5q6_m97d0_bzRkZsv2LxqB_ew@mail.gmail.com>
- <ff0c8eed-8981-48c4-81d9-56b040ef1c7b@apertussolutions.com>
- <446cf9c70184885e4cec6dd4514ae8daf7accdcb.camel@HansenPartnership.com>
- <5d1e41d6-b467-4013-a0d0-45f9511c15c6@apertussolutions.com>
- <CALCETrW6vMYZo-b7N9ojVSeZLVxhZjLBjnMHsULMGP6TaVYRHA@mail.gmail.com> <9c80e779b6268fde33c93ed3765ff93b1d6d007b.camel@HansenPartnership.com>
-In-Reply-To: <9c80e779b6268fde33c93ed3765ff93b1d6d007b.camel@HansenPartnership.com>
-From: Andy Lutomirski <luto@amacapital.net>
-Date: Mon, 18 Nov 2024 12:02:13 -0800
-Message-ID: <CALCETrX4vHnVorqWjPEOP0XLaA0uUWkKikDcCXWtbs2a7EBuiA@mail.gmail.com>
-Subject: Re: [PATCH v9 06/19] x86: Add early SHA-1 support for Secure Launch
- early measurements
-To: James Bottomley <James.Bottomley@hansenpartnership.com>
-Cc: "Daniel P. Smith" <dpsmith@apertussolutions.com>, Thomas Gleixner <tglx@linutronix.de>, 
-	"Eric W. Biederman" <ebiederm@xmission.com>, Eric Biggers <ebiggers@kernel.org>, 
-	Ross Philipson <ross.philipson@oracle.com>, linux-kernel@vger.kernel.org, x86@kernel.org, 
-	linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, kexec@lists.infradead.org, 
-	linux-efi@vger.kernel.org, iommu@lists.linux-foundation.org, mingo@redhat.com, 
-	bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com, ardb@kernel.org, 
-	mjg59@srcf.ucam.org, peterhuewe@gmx.de, jarkko@kernel.org, jgg@ziepe.ca, 
-	nivedita@alum.mit.edu, herbert@gondor.apana.org.au, davem@davemloft.net, 
-	corbet@lwn.net, dwmw2@infradead.org, baolu.lu@linux.intel.com, 
-	kanth.ghatraju@oracle.com, andrew.cooper3@citrix.com, 
-	trenchboot-devel@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="Sig_/.7KF94p_M_=HG656=kKKz4=";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+
+--Sig_/.7KF94p_M_=HG656=kKKz4=
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 18, 2024 at 11:12=E2=80=AFAM James Bottomley
-<James.Bottomley@hansenpartnership.com> wrote:
->
-> On Mon, 2024-11-18 at 10:43 -0800, Andy Lutomirski wrote:
-> > Linux should not use TPM2_PCR_Extend *at all*.  Instead, Linux should
-> > exclusively use TPM2_PCR_Event.  I would expect that passing, say,
-> > the entire kernel image to TPM2_PCR_Event would be a big mistake, so
-> > instead Linux should hash the relevant data with a reasonable
-> > suggestion of hashes (which includes, mandatorily, SHA-384 and *does
-> > not* include SHA-1, and may or may not be configurable at build time
-> > to include things like SM3), concatenate them, and pass that to
-> > TPM2_PCR_Event.  And Linux should make the value that it passed to
-> > TPM2_PCR_Event readily accessible to software using it, and should
-> > also include some straightforward tooling to calculate it from a
-> > given input so that software that wants to figure out what value to
-> > expect in a PCR can easily do so.
->
-> Just for clarity, this is about how the agile log format works.  Each
-> event entry in the log contains a list of bank hashes and the extends
-> occur in log event order, so replaying a log should get you to exactly
-> the head PCR value of each bank.  If a log doesn't understand a format,
-> like SM3, then an entry for it doesn't appear in the log and a replay
-> says nothing about the PCR value.
+Hi all,
 
-I have no idea what the "agile log format" is or what all the formats
-in existence are.  I found section 4.2.4 here:
+The following commit is also in Linus Torvalds' tree as a different commit
+(but the same patch):
 
-https://trustedcomputinggroup.org/wp-content/uploads/TCG_IWG_CEL_v1_r0p41_p=
-ub.pdf
+  6100da511bd2 ("crypto: lib/mpi - Fix an "Uninitialized scalar variable" i=
+ssue")
 
-It says:
+This is commit
 
-This field contains the list of the digest values Extended. The Extend
-method varies with TPM command, so there is
-no uniform meaning of TPM Extend in this instance, and separate
-descriptions are unavoidable. If using the
-TPM2_PCR_Extend command, this field is the data sent to the TPM (i.e.,
-not the resulting value of the PCR after the
-TPM2_PCR_Extend command completes). If using the TPM2_PCR_Event
-command, this field contains the digest
-structure returned by the TPM2_PCR_Event command (that contains the
-digest(s) submitted to each PCR bank as
-the internal Extend operation). This field SHALL contain the
-information from the TPML_DIGEST_VALUES used in
-the Extend operation.
+  cd843399d706 ("crypto: lib/mpi - Fix an "Uninitialized scalar variable" i=
+ssue")
 
-So we're logging the values with which we extend the PCRs.  Once upon
-a time, someone decided it was okay to skip extending a PCR bank:
+in Linus' tree.
 
-https://google.github.io/security-research/pocs/bios/tpm-carte-blanche/writ=
-eup.html
+--=20
+Cheers,
+Stephen Rothwell
 
-and it was not a great idea.
+--Sig_/.7KF94p_M_=HG656=kKKz4=
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-There seem to be six (!) currently defined hashes: SHA1, SHA256,
-SHA384, SHA512, SM2 and SM3.  I haven't spotted anything promising not
-to add more.  It seems to be that Linux really really ought to:
+-----BEGIN PGP SIGNATURE-----
 
-(a) extend all banks.  Not all banks that the maintainers like, and
-not all banks that the maintainers knew about when having this
-discussion.  *All* banks.  That means TPM2_PCR_Event().  (Or we refuse
-to boot if there's a bank we don't like.)
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmc7qVMACgkQAVBC80lX
+0GzH5Af/eYdY74dUFqdM+gsm+tORe5vqEQQ/sAN7CtJJXlxNEY//TRz98uyWafEp
+E+JfH+i28Rlz3tirJCkbGOiVxBR7cufd2jxEhA2WMy2EKM3+8y96ZGwZMycHwyFc
+4xMzv9/T9ZAKuWSDz4+mLfnHPxjWz3xU2xAPohS9uIGW2mVNZTh0E1JCRfxUvBSF
+bAJrmCq9ItvssQUF3xD4Mv8BenLXCr4oPQgDfndvSV2r3sZ/UJ28pAlETlezCQFt
+OqmReyn7aQWnqNBuqaDcnQqpT0HKvkDg9/DBQFNbh9KNmoUQaKCCngGLKnnVOP9E
+ZsbyHuHBOvo0LiMv5iiO1tZ+L5EqWA==
+=Z0ct
+-----END PGP SIGNATURE-----
 
-(b) Make a best effort to notice if something is wrong with the TPM
-and/or someone is MITMing us and messing with us.  That means
-computing the hash algorithms we actually support and checking whether
-TPM2_PCR_Event() returns the right thing.  I'm not seeing a specific
-attack that seems likely that this prevents, but it does seem like
-decent defense in depth, and if someone chooses to provision a machine
-by reading its event log and then subsequently getting an attestation
-that a future event log matches what was read, then avoiding letting
-an attacker who temporarily controls the TPM connection from
-corrupting the results seems wise.  And I don't see anything at all
-that we gain by removing a check that (TPM's reported SHA1 =3D=3D what we
-calculated) in the name of "not supporting SHA1") other than a few
-hundred bytes of object code.  (And yes, SHA1 is much more likely to
-be supported than SM3, so it's not absurd to implement SHA1 and not
-implement SM3.)
-
->
-> For some events, the hash is actually the hash of the event entry
-> itself and for others, the entry is just a hint and the hash is of
-> something else.
->
-> I think part of the confusion stems from the twofold issues of PCRs: at
-> their simplest they were expected to provide the end policy values
-> (this turns out to be problematic because there are quite a few ways,
-> that will produce different end PCR values, that a system could get to
-> the same state).  If you don't trust a bank (or don't know about it),
-> you don't code it into a required policy statement and its value
-> becomes irrelevant.
-
-I think that "you" refers to multiple entities, and this is a problem.
-
-If the vendor of an attestation-dependent thing trusts SM3 but *Linux*
-does not like SM3, then the vendor's software should not become wildly
-insecure because Linux does not like SM3.  And, as that 2004 CVE
-shows, even two groups that are nominally associated with Microsoft
-can disagree on which banks they like, causing a vulnerability.
+--Sig_/.7KF94p_M_=HG656=kKKz4=--
