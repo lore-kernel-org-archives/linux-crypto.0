@@ -1,90 +1,136 @@
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C51A5197531;
-	Mon, 18 Nov 2024 20:54:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6290517BA3
+	for <linux-crypto@vger.kernel.org>; Mon, 18 Nov 2024 21:11:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731963287; cv=none; b=GMmX5veiE0c3IQOIRfdUfkDTX+L2eQDqPFXPKkDJx4pfyVbo1Gc7EkEQ/KxUXQzrdPQufN3+PKRy0WmvlFf9A4BaE1ROfUZo7Nqr6cEad9p50LApf5CnwDvsjD1WJkLARkh+ZjJX5Qh4IanE3QeddGg7RidDMFDcvYDtiJXw14I=
+	t=1731964299; cv=none; b=lhXGNil7j/y//moruKWAWJ0CmCdAQ6H6zViw9nMkx7VpZG8a4bmcmRt0rhTyWhcqu9sR98d6XMccrid6iEUN7FMU7oad6LBxpwxHLmIb/PXILttuh6nrN42LFYOk4e1TVMNjiWa9u0mRyx9OVJHl3LJlcKtWR6v+XFc9fiPO5Lk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731963287; c=relaxed/simple;
-	bh=+keMs4N1sPD/Y1I/jvOU0qdU2AEUGw51HztZHV8ciXg=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=Y5N7LhWySR1noW+5fa1ZSCC0t5QsLwECARwfU2hVcAwMqzYQvyRUEDzSAvU+WBXrG97Ta0oDfWsJvvRFxwcLGZpKGl5papkv8PhHiMxWAjoMoD8yAN5zCTlovE9tldquAYaql67dpLOqBnk2are+A4MQOBAz9JpTj88uPb/7qkM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=MQaRMZai; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+	s=arc-20240116; t=1731964299; c=relaxed/simple;
+	bh=kOtbBNCp3adRdpZWBVL8ZYPAf25Rxnm6dJsLV/xVdFI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=m/XE9dEcD6O2Vfm4N4KrV3mINgatqxsr5Z9Nz/bD3tz2tvFXOXkfNu4j60Oh7vx927G0ZF+JBLwQb4IMub8MtjYZk/6ZDtNNXuUvx36av7pXvZIG4VM3kKFr1LwiuG3MbA5dFCU+BKd4LlZ92ORBN9DFE6MsJlvWT2yajoCTMp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C3uFW10U; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="MQaRMZai"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1731963270;
-	bh=dv/up5UuotJfTMVa1ArB2LXUy/HZ+M2pQj9Wa2E6TXk=;
-	h=Date:From:To:Cc:Subject:From;
-	b=MQaRMZaiZikFDqrGWq+9n0LaLch5jJtrbtwfoSUhD9Hnq4gdu7O9mcb63suoUnqm1
-	 bjeLzybKYJX5vcJu4ceSFkLX4JFeEfTrn6/cMrT8XSB/9rQzcrIG5HgHSQkes6c+E+
-	 Jrhp9+pzKvUhYzC24u+/bHeo3af+GnP4rHlRIGOXW+sukdKxDZiPG+/LrzX16VH3QC
-	 SHrcrp7buEDY+J70rH+1K7S2A5PiH8pSY6O9vqUa7h23OOchcVy25WYLfuqEZ9+E1Q
-	 GFqDogFieWHI7imiJQVm42HP4pYg+EQyPwQK1KEDaag3y9mgrusAL5oHApxW2XjwS3
-	 /x69VMPDF18MQ==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Xsfxx6z1Hz4xfp;
-	Tue, 19 Nov 2024 07:54:29 +1100 (AEDT)
-Date: Tue, 19 Nov 2024 07:53:39 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Herbert Xu <herbert@gondor.apana.org.au>, Linux Crypto List
- <linux-crypto@vger.kernel.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next
- Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: duplicate patch in the crypto-current tree
-Message-ID: <20241119075339.7116dbcd@canb.auug.org.au>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C3uFW10U"
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-723db2798caso3776563b3a.0
+        for <linux-crypto@vger.kernel.org>; Mon, 18 Nov 2024 13:11:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731964298; x=1732569098; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=H7k2EW5cdsUTHpPPztp1rk43rNU6spLTObxaJJEp80E=;
+        b=C3uFW10UovSVbVVRjM2IHQoZ8puwQYOAgO/BkybiRrjerJw1IRYQPaCS+5T2guznLs
+         0XbQK6F7PFFqcRV3My0nUwkaO6F41OhIb20TpdFNiNtnNzGcPthnanD9CT6RO04DojPx
+         zz16GKTnj7k7S/AqxkwjMHQDl9DDZKcRmYBX2hWKYwjpbTZE4UwE6hH8g8ar0J+TeZTr
+         LJacYyio+1ELS1t4VggNHa5EXrIOn8EWSxUD5a4Nh1yV0oRDEbqRIXWlRhLix/yu7/X/
+         KoZZIVf8A/81XXZjyL9Y0alTNfg3duziiqwkPo65GlxFY7UZw5iaNnGUUVm9Q/b+pmkC
+         VrBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731964298; x=1732569098;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=H7k2EW5cdsUTHpPPztp1rk43rNU6spLTObxaJJEp80E=;
+        b=odHBq5ohdGMdI46Bd7d99BbXDx786B8xQQQBrXAi6ed5b25wgVg/Hptp6wAKIb2r8O
+         peZVqXOzyZc1TLKHx/U3WMeI82L0/CCx4/pv45A/hp5A50lPeWGvGtk5sjYnvVWcIuCl
+         Fu2M13KyUZZuHb2OSaydTMJJ0+qVtFOi05cGKhCo7GSkMH9v3vUrYcv01SUMvxeGYv0N
+         sfAXXhL//w3wc8AwWCA/eVx9mVHaWI0bFsGOQYecdHK1/eCZkZwndHSMNWWrAick0uZ9
+         HShkSRGnMFD8LmZpzm5zW/+GUz5Iw2lleiN9+fnYv1NhfSfhcNUCgVME9q1Bagji0IOV
+         X39Q==
+X-Gm-Message-State: AOJu0YwyBLgRH/VLHEhc6uLTuLHkNwsxjR0dNJMKmVbnAGkleYg7hhLM
+	7/gx0NPdgHTm54lwaMMaG7T8UxqSURMnFOgU0qoFRLyFKhKoSTGfxiqdPMtBetTvZs0hN4LdPbW
+	2s8/ME+IfxNyfS0Ob/mvSeObSRew=
+X-Google-Smtp-Source: AGHT+IHY//0ZFa36vru0/Q3IjGuPOl39iHO7rgTwF7sczen/B8BOY1WzmuUuBBiwLDkDb0+Na9JfFmDPUg+gPRuSip0=
+X-Received: by 2002:a17:90b:3881:b0:2ea:7329:46 with SMTP id
+ 98e67ed59e1d1-2ea73292425mr6553589a91.5.1731964297601; Mon, 18 Nov 2024
+ 13:11:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/.7KF94p_M_=HG656=kKKz4=";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+References: <CAO18KQgWZ5ChFf3c+AgO9fneoaHhBEAOcfUmRFw80xLnE68qWg@mail.gmail.com>
+ <ba984939-ab50-4450-a3c6-7b8845de1ad8@amd.com>
+In-Reply-To: <ba984939-ab50-4450-a3c6-7b8845de1ad8@amd.com>
+From: Jacobo Pantoja <jacobopantoja@gmail.com>
+Date: Mon, 18 Nov 2024 22:11:25 +0100
+Message-ID: <CAO18KQhxrXGPoBgnkVoxfRvav5M25Bx5Ymdyo3Vbg0SB5Zqp_A@mail.gmail.com>
+Subject: Re: CCP issue related to GPU pass-through?
+To: Mario Limonciello <mario.limonciello@amd.com>
+Cc: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
---Sig_/.7KF94p_M_=HG656=kKKz4=
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Thanks for answering
 
-Hi all,
+On Mon, 18 Nov 2024 at 02:20, Mario Limonciello
+<mario.limonciello@amd.com> wrote:
+>
+> Hi Jacobo,
+>
+> On 11/17/2024 11:42, Jacobo Pantoja wrote:
+> > Hi Mario / crypto mailing list:
+> >
+> > I'm trying to pass-through my AMD 5600G's integrated CPU; I can do it
+> > easily with Linux guest, but I'm being unable to do so with a Windows
+> > 11 guest (which is my end goal)
+>
+> What do you mean "pass through the CPU"?  What exactly is "working" with
+> Linux guests and what exactly is "failing" with Windows ones?
+>
+> Is this related to passing through the graphics PCI device from the APU
+> and having problems with that perhaps?
 
-The following commit is also in Linus Torvalds' tree as a different commit
-(but the same patch):
+Yes, sorry, it's "GPU" pass-through. I typed it right on the subject
+but not in the body
 
-  6100da511bd2 ("crypto: lib/mpi - Fix an "Uninitialized scalar variable" i=
-ssue")
+> > I've noted in my dmesg the following line:
+> > "ccp: unable to access the device: you might be running a broken BIOS"
+> >
+>
+> Are you trying to pass through the PCI device for the PSP to a guest?
+> What is your goal with it?
 
-This is commit
+Just want to pass the GPU, nothing else
 
-  cd843399d706 ("crypto: lib/mpi - Fix an "Uninitialized scalar variable" i=
-ssue")
+> > Tracing it a bit on the internet, I found a couple of fwupd commits
+> > done by you stating that in some platforms this is expected (e.g.
+> > 0x1649) [1]
+> > Comparing, in my motherboard I see that the Platform Security
+> > Processor is 1022:15DF, being that last number in the same code you
+> > applied the patch... but I cannot understand whether the ccp message
+> > is expected on this platform (chipset is B450, if it adds info) or
+> > not; and if this could be related to the pass-through problems.
+> >
+> > Any hints would be more than welcome
+> >
+>
+> Those messages are referring to some cryptographic acceleration IP
+> offered by the PSP on some SoCs.
+>
+> Not all BIOSes all access to it and it really is a case by case basis if
+> it's expected behavior or not.  When it's not accessible that "just"
+> means that you can't use that acceleration feature.  There are other
+> features the PCI PSP driver exports such as TEE, security attributes,
+> dynamic boost control, SEV etc.  Not all platforms support all features.
+>
+> If you're just shooting in the dark for your issue based on the warning
+> about the BIOS not offering CCP this is probably the wrong tree to bark
+> up.  If it's actually related it would be good at least for me to
+> understand what that message has to do with a Windows guest.
 
-in Linus' tree.
+I'm just trying to discard potential issues in trying to achieve the GPU
+pass-through. I'm pretty sure it is related to the way the GPU driver
+starts the hardware in Windows, because when the guest is Linux,
+just passing through the VFCT ACPI table is enough to get the GPU
+working. But in Windows there's something different and I was wondering
+if this CCP "issue" could be somehow related.
 
---=20
-Cheers,
-Stephen Rothwell
+But I get from your message that this is most likely unrelated to my
+GPU pass-through problem.
 
---Sig_/.7KF94p_M_=HG656=kKKz4=
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmc7qVMACgkQAVBC80lX
-0GzH5Af/eYdY74dUFqdM+gsm+tORe5vqEQQ/sAN7CtJJXlxNEY//TRz98uyWafEp
-E+JfH+i28Rlz3tirJCkbGOiVxBR7cufd2jxEhA2WMy2EKM3+8y96ZGwZMycHwyFc
-4xMzv9/T9ZAKuWSDz4+mLfnHPxjWz3xU2xAPohS9uIGW2mVNZTh0E1JCRfxUvBSF
-bAJrmCq9ItvssQUF3xD4Mv8BenLXCr4oPQgDfndvSV2r3sZ/UJ28pAlETlezCQFt
-OqmReyn7aQWnqNBuqaDcnQqpT0HKvkDg9/DBQFNbh9KNmoUQaKCCngGLKnnVOP9E
-ZsbyHuHBOvo0LiMv5iiO1tZ+L5EqWA==
-=Z0ct
------END PGP SIGNATURE-----
-
---Sig_/.7KF94p_M_=HG656=kKKz4=--
+Best regards
