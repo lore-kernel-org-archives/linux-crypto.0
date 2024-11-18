@@ -1,165 +1,265 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2040.outbound.protection.outlook.com [40.107.20.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8205815C0;
-	Mon, 18 Nov 2024 07:56:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731916612; cv=none; b=WAMVoNN4nY48OYBj6eHhoVZr6r9UYuVlv1PgL+ht5PBpZxYeGQV5iITEQhI9U+VFncyxmvGbjqpuXJtKFbiB3iBPw8k/2iXu9pFGPNSuxqVodNdul42lFMzXeAnTR1bmqFDhWoDi2peOpI0IOV91cu/str9lM5ry/HyRWk1Bpig=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731916612; c=relaxed/simple;
-	bh=XRS5Laoa/xEVbaSR8UV90xTLFrJMFDuLAOdrsO1+G8c=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:
-	 References:In-Reply-To; b=gNyUlGvY5de53VMfq+5Rx+NgUfi7NNW0ylPFrggJX2uja5GtjKVXMDbt+qHMTFUq8TElYKqxpj1KAYUrVkr7hn0eLS/T0jOq01Ay5auSG6HOw5rRBAdJr3jPEVOkweFKfx6uJwq2RXvg7KEnY25w5StpuYnTdlKbXB2Lpn758sA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qVPgkl8c; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1128A25760;
+	Mon, 18 Nov 2024 09:31:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.20.40
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731922274; cv=fail; b=eat+e5UC2F/evLAWSzST7dxdmc/oIl4khFSsGrj2crEdNrXTKiPUOU17Kh1XZjUT45vsPBMUPVNI/bxtSsGZYD44CAVF+1dA04L8V5+XQkWwAQCU8gCCH4l1ZxMzcOsE0SaHOE7t9uo4l2Ce4P5GMVM81WNz4VHzkhtXxZtOPZs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731922274; c=relaxed/simple;
+	bh=qHUh0pghp0MZ1K1sLiLFwzBxnVC7aUXOP9S3TUzIYfA=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=hO1zbm7ug6AVI+MZg16FzdG7oXqtOrF7rHEjKGylsEOGkQItlfZoozASyxrt6ZHoKW6srg7gARN8upwakg5axSB+0aUXowW+/oujaEc8ybpRW6olXFgKJgYOp2GnalE++AykZDVOYwj779GTDMvniYXiYrMZ6hZzmAcARGdQ0ac=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=ZEvguqNX; arc=fail smtp.client-ip=40.107.20.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qVPgkl8c"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA203C4CECC;
-	Mon, 18 Nov 2024 07:56:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731916612;
-	bh=XRS5Laoa/xEVbaSR8UV90xTLFrJMFDuLAOdrsO1+G8c=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=qVPgkl8cGGLCGk1AC/x2wcFuko6rzZtGgxyR2dBAsVcT7KlCIekG5iNzpV/l51XYj
-	 7sWf2LwUBLYdCBLHuaqmiB7my51aOb8aD2B8SFapQTupeOzLcQrxlUZ8WC3qYgS35P
-	 jOY/Znubgy+Of0t5LnSAoL9cnBbU3tDzDsDsOtrW8/w0nmANCCuywo1NGBGd7NdQT+
-	 fCCHxluKcIvmUpRK5XMy8R3FFEz0A/0S0nRFfLwaWcbc6nA+lhDVjucOXdL2l7pL4W
-	 JT7rn972MUURVL3a2V2oIHmTTMHnrFv4emtyRXjuzipBzG54APQ17oolUj5hQY+OId
-	 6ycdRKZU4DSAw==
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="ZEvguqNX"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=YGmd7641N5UiGEc0wV+A903yw2o+0Z7dZCpTM+JoqUMqYteXke0N7HfamPHDE7Mqj20aMKfeez5lqppZraJ3giFtXu1mfQe7Oon7TTSkC5EdbvKIU4yh9Xlo9xorHgTR6nxuFKkU0vx0PPWY5W5yK/Ulb+DEndLYwtc1zOHNa26oNl0J9OE9h+ZC7feresYr+5SBQ3Lp3fpxi6oJ5qXpew1ENTX92RstogjFQUUWWB467myHwfrKcdk+CqSwVB4Dr8EcGL2QmH6tJCbMTY7Op2g9MMURZyx68C7UT1uM0blZl7BdSID6ujv93QQ+UIuYN1sDZxUQz6V2zlQpT4Z3sA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+F9th1cRA0LBSfCt+oAbOzzz5HmE6n+LTQyzqzn+S78=;
+ b=RwVrcsNmVrDqRNFcOnv7D/2koP634SZU5knZMWOlK0YnPymUYIHBWQZZhsxu5GEtODf/6ZVcgYcPhJFiGIH/Cx2K2KOGBaxwia8CisFR4Le9rpLTmOuTgmDjQY/qDGd1w+cB9qfi3fI3ihdd6vdaaKmcx/P3jpaI84/f9UgUOlLqVhS4eUBPge7mcJwmljBhE47RCebuqKiI5W3Er1d1TfvtoJbzyDIPuK3y0JGYcP5zDNDFT/l1k1JW2qML7sD7ioKOUDOnbHrL4N4/JUZ23Zjpy9M+QLlEmSdPyuhOOXsAko0Vz11DNVFsAdRJ1EMVqmv3SgbwJsHUDyby2Vj+LA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+F9th1cRA0LBSfCt+oAbOzzz5HmE6n+LTQyzqzn+S78=;
+ b=ZEvguqNXfERUnJqhnKehtXrqS7fMS3iaZiMvI6cLYCFoUkdEaHHjrNdSz2S2AxnIjvfeLJXH9WMPhd/tJghNjZcngcOY3+g1Y+Bu1XcvOhRAvkaLizTKrufOVnfzjBkmY1bVfPbbUwbECf46T306HpF8WVdzp4FxhAsCMqHRUMGN5VwqvdbVegvg7bROWfFg5aAEkaQqihWyX3+zVZew6v7lxiaLbguBfU6/NVQiRpa2Voxj81JMQtG/50btXSBQPWgUDRlmsx9qwIlA2MSqK6L06U6hwvjEU+iDwnthbJ9xUvwKjZiXXD8tv01ORIDkuBAcKXMEuFZcUrZ/0iCsSQ==
+Received: from DB9PR04MB8409.eurprd04.prod.outlook.com (2603:10a6:10:244::6)
+ by DU4PR04MB10648.eurprd04.prod.outlook.com (2603:10a6:10:586::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.22; Mon, 18 Nov
+ 2024 09:31:07 +0000
+Received: from DB9PR04MB8409.eurprd04.prod.outlook.com
+ ([fe80::1436:d8ba:25b8:1637]) by DB9PR04MB8409.eurprd04.prod.outlook.com
+ ([fe80::1436:d8ba:25b8:1637%3]) with mapi id 15.20.8158.023; Mon, 18 Nov 2024
+ 09:31:06 +0000
+From: Gaurav Jain <gaurav.jain@nxp.com>
+To: Ahmad Fatoum <a.fatoum@pengutronix.de>, Horia Geanta
+	<horia.geanta@nxp.com>, Pankaj Gupta <pankaj.gupta@nxp.com>, Herbert Xu
+	<herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>,
+	Silvano Di Ninno <silvano.dininno@nxp.com>, Varun Sethi <V.Sethi@nxp.com>,
+	Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>, Sahil Malhotra
+	<sahil.malhotra@nxp.com>, Nikolaus Voss <nikolaus.voss@haag-streit.com>
+CC: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Pengutronix
+ Kernel Team <kernel@pengutronix.de>
+Subject: RE: [EXT] Re: [PATCH] crypto: caam - use JobR's space to access page
+ 0 regs
+Thread-Topic: [EXT] Re: [PATCH] crypto: caam - use JobR's space to access page
+ 0 regs
+Thread-Index: AQHbNDLCDWLDusYcd0ahxOrmX4dKwbKyAD2AgArNUHA=
+Date: Mon, 18 Nov 2024 09:31:06 +0000
+Message-ID:
+ <DB9PR04MB8409AC6672B7A209ABC8F9DAE7272@DB9PR04MB8409.eurprd04.prod.outlook.com>
+References: <20241111121020.4013077-1-gaurav.jain@nxp.com>
+ <93e915b3-ef8e-4b98-aa7f-7759ae0b3091@pengutronix.de>
+In-Reply-To: <93e915b3-ef8e-4b98-aa7f-7759ae0b3091@pengutronix.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DB9PR04MB8409:EE_|DU4PR04MB10648:EE_
+x-ms-office365-filtering-correlation-id: 3559069f-394f-40b6-1c7c-08dd07b3bab2
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|1800799024|366016|921020|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?sC6FhPUgcCd/eQe9i918y0/NCmT+NfVYqxR3XLOPwahsCk8Epr7U2+qe5iZ6?=
+ =?us-ascii?Q?qoaUwpmm3+GJnH3zd8tdtDU+uCYMxT1wy3LJvWxqwzvbHkmjBpH2QEsft5hw?=
+ =?us-ascii?Q?c7ZIo7ayn0SAxOI3SVbtf1ItH1vfHinsnCbg22w0WGIzJ2Hpz/PrkaCTlYBw?=
+ =?us-ascii?Q?khRRBicFZ0pVD+EsQeJe4ik/o7F0MhJeYBEFGm1ZoreYIuf2r11vCgAUc0ck?=
+ =?us-ascii?Q?2C/sMT1GLzWBtxrQnJB9rAMWX4hyxurC/Pr0zrFfMTvuWqsBaQ3w/KyjCbLW?=
+ =?us-ascii?Q?MwLUf737AB6Naoq8I54hpFZRpfLxO3NmRCCtMVrE5pPl3SP9XaZ0s7Lca3Nb?=
+ =?us-ascii?Q?NqUaGAEW+esRJmtPtLyRn++xq/BLHOQrVVBlT8Pajvi3KEMBXExDqYUfED/x?=
+ =?us-ascii?Q?hw74VZAFtEVB3rQcPOTqnxXpuiD6a5wq1kBwYQWBbYM4erz/00q49TUku9CK?=
+ =?us-ascii?Q?lxT1TkaJUa54P9NLnl4yTuryuqMFl0+TN2fC3ivmaWDykJ3MdN7mSSav0W8O?=
+ =?us-ascii?Q?Tt+XhUZp0g48aiQYdZv0l7IPzAAxDcxWNkFQUVc5Fk/mNrQebC6oRKrxTz9q?=
+ =?us-ascii?Q?GVUO1ZkFOnOvdhOQMegpUDTDJIOxBS/Ac0IhyWBi4KCgc+b1Vmp3B9utaAu4?=
+ =?us-ascii?Q?AX5t/OmuDx2mCc5iPV678xMwFnYLnnHkc8yAwQoW6sPCoHZOIRhT4odexBGM?=
+ =?us-ascii?Q?Xndhi6jX0XsgLqiqRtkCY/JTkuJkoi5jwy/x9Dv1ZXmmQ3MEvkf9bnIvgj44?=
+ =?us-ascii?Q?1GkX476by2NmOdfX/mzCAtWqZGX11LUb1QfE86AZDclTXQqVAxwK2Gfo/9/i?=
+ =?us-ascii?Q?sFj+xfy0/WTIK1WrfENzQwCh7Gwank51Azixw/tZrzZm8wRpgy5Z3lsIKo9P?=
+ =?us-ascii?Q?8ut/gUoDO70IDqZQp4YOiSLyjlc50lmeXuMsOi8ugdZfAiIga5rzMWjav9sB?=
+ =?us-ascii?Q?UJKGWN5Q2c+PfJPSpjSztw3oayOrl0yQHiZqsGlFl6TPQhQVvHhkYhe1L/lM?=
+ =?us-ascii?Q?Ats0fr2ntaBz7+kkTDoGq9hu1OJOpIc8boYmJtM5n1hJqfdjZqDXONH5OsBi?=
+ =?us-ascii?Q?8OoLHrcUwT3CG7zCONo/ARRF+1I9fD4FoT/tABR8M5kDaBk1Nn4o611f3ud/?=
+ =?us-ascii?Q?3u/Q6KpmXiT4kRRrsYmbnFZl4MRfOG/VWMpjbIwvIqs97y7QkJ8VDIe7V2HB?=
+ =?us-ascii?Q?OC1tmYgObL7eFjiGCDGVLYB2GD7hTs0bMTSGlJDizddA5ZI70Jwu/osyRd7z?=
+ =?us-ascii?Q?SH/qSfAIALx0/GOOeRcT3F7Y2jGwsTmB9JPGpVJu/JazgZiFlnfAuRuTsySF?=
+ =?us-ascii?Q?E2MyuCeOA6R2gEtb3dNanSWDttdCF2vhz1DuPl8B31vMB5WfPCXLZZmpxmLp?=
+ =?us-ascii?Q?qteY/IMjy6aaWMPTesRemZZ4ujvU?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9PR04MB8409.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(921020)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?QMesBmPdUT04AtouJoWWAbzjtD2mquUPJiOvbgi/OgkmW/2P3m1akz43HobZ?=
+ =?us-ascii?Q?lLhRYdbDJRNTZg64sYN9xFH12GqTng4E43tQy7Um0KgnFfsxMO59V27P2u0S?=
+ =?us-ascii?Q?HMknLqfnHloim2zFr+APLPDYuB72mDCtkfAa8CopsHxe0lgawWnOh5z/IAEY?=
+ =?us-ascii?Q?ZcfT2wiWWPMWpeZtu2UZbz0ibyUlKnEnonNpCx7CKuE+zgJVfgfvDFGhrqo0?=
+ =?us-ascii?Q?VsNaNhnpS/Xc3/pTUY+o4koHvbyns01HZBBrVkUwPAf3C0X0bKB1Q3pTOoVE?=
+ =?us-ascii?Q?n6zsNZKvoi0VLzPJqkgf4SEja7ROprpo3+kTYhlAeBMbcSOV+gArX6Shd7Yr?=
+ =?us-ascii?Q?UVrSRXqDOI9Y5151Lz2alVp8iP3L+xChB6v+PF0VZKG2aab13LqtKIOay7JU?=
+ =?us-ascii?Q?Zbqhl6UtY7lhpKXF1PM7Q0/v9lvMZPp2yVA/kddSVoV+lGjQ7fkPDhsBYfyj?=
+ =?us-ascii?Q?07GMbUF7O/CwL9eKSUcrUu6wXTYotprXo2zVp50Dtbzqc5uthLj5AvkoB3lN?=
+ =?us-ascii?Q?ShYpzsRZBsO4rTOZ404Wxq1L+kN518+ToFeE94s8KwJB6IIYUOb9Kq7k2r5d?=
+ =?us-ascii?Q?oBQTD5etkBBl8ZHwgOXm7AvY0ipl1MHnlUZP6LTaTRFzlseVXby4GHNYnhlV?=
+ =?us-ascii?Q?VgaCcQTwtmy6a9KQ+cLWkTCXMYYaV36+y3gmpuzWPucBptuJEYsQnBGbU67B?=
+ =?us-ascii?Q?kYp92+79UCuP6HwNTxytQRyAtMDH72pYDWV9kDrbcbj2cPs+DhCuaos4er5T?=
+ =?us-ascii?Q?CniC3JB9wJ96FpE0bK2R11pXZ+NksESNRP7EXMm6FBNc88cHRfqmEebonTdJ?=
+ =?us-ascii?Q?gPJ0JNBPru9ZQuzH7psPOxjHxJID+EaWmZVAmLRJcz3KrQKSGKp+Zl5+EkZS?=
+ =?us-ascii?Q?RK09QP1QwQFCbcCWa1gdOhD/1eCizGzIT00JPfcvK+FsOHeE7PoK3lLHw1uS?=
+ =?us-ascii?Q?X5dCdWNqkbPsCdcU8YQ5ccOJUz9O8/3UI4N1fXdLn9dvTsly3eQogNQ8sfFM?=
+ =?us-ascii?Q?2ssGGm3i8DM4nQtkiu3tULHH4qbxnDkYO4CTkk/ilN+znVdQa55QHTnh6Pju?=
+ =?us-ascii?Q?smlJd341XVyh5i/Ez//vtk+24E4CC/FuleaEoIoUMfMBFM6PKjzqDhuqgvOJ?=
+ =?us-ascii?Q?vSxKmTHK2i7oW7wkQICcpLvE1cUG+iMRIYgydNWoJAf2jZpgjBfUy2ADZxTM?=
+ =?us-ascii?Q?e1LCs8iw7L83t2CdqSZlusdvi7tltZNYUSVybuCxKgrX1A/7HbyPbhoJKQh0?=
+ =?us-ascii?Q?6KZLOURrsG/5GwBKQFQD+kynNCmG/gvZ1v+ZoNR6RdGFHX0/4ZoXFeg1f//f?=
+ =?us-ascii?Q?Ff4332aSQL84S2y2ADkdAUJmp3KHJXY1PRUOse37qGJSu19ghN4AmoyWTQUy?=
+ =?us-ascii?Q?+x5nCX748oG7g3soSrlU2pnYtm0soo4myuB3ZUluXX3xboYsbpA1rvgmCiW2?=
+ =?us-ascii?Q?yzsL1U+yo3cvFoeX5oWY2lp0uHUmWHNAzAQYHDRrLDoUp1EoUbvXcU6H1n9P?=
+ =?us-ascii?Q?tPzy5gkopRN63xpalztGf5tx0b7j7sMaw13sv3YAuBf/vMzIFTkgzjJ0MmXm?=
+ =?us-ascii?Q?lprVVwLiYagXivrheIUvDypOxKmfvMVq7TeLpKjf?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Mon, 18 Nov 2024 09:56:47 +0200
-Message-Id: <D5P575JLB4XC.3EYK7NN905Z5Z@kernel.org>
-Subject: Re: [PATCH v2 02/19] crypto: sig - Introduce sig_alg backend
-From: "Jarkko Sakkinen" <jarkko@kernel.org>
-To: "Lukas Wunner" <lukas@wunner.de>
-Cc: "Herbert Xu" <herbert@gondor.apana.org.au>, "David S. Miller"
- <davem@davemloft.net>, "Eric Biggers" <ebiggers@google.com>, "Stefan
- Berger" <stefanb@linux.ibm.com>, "Vitaly Chikunov" <vt@altlinux.org>,
- "Tadeusz Struk" <tstruk@gigaio.com>, "David Howells" <dhowells@redhat.com>,
- "Andrew Zaborowski" <andrew.zaborowski@intel.com>, "Saulo Alessandre"
- <saulo.alessandre@tse.jus.br>, "Jonathan Cameron"
- <Jonathan.Cameron@huawei.com>, "Ignat Korchagin" <ignat@cloudflare.com>,
- "Marek Behun" <kabel@kernel.org>, "Varad Gautam" <varadgautam@google.com>,
- "Stephan Mueller" <smueller@chronox.de>, "Denis Kenzior"
- <denkenz@gmail.com>, <linux-crypto@vger.kernel.org>,
- <keyrings@vger.kernel.org>
-X-Mailer: aerc 0.18.2
-References: <cover.1725972333.git.lukas@wunner.de>
- <688e92e7db6f2de1778691bb7cdafe3bb39e73c6.1725972334.git.lukas@wunner.de>
- <D43G1XSAWTQF.OG1Z8K18DUVF@kernel.org> <ZuKeHmeMRyXZHyTK@wunner.de>
- <D44DDHSNZNKO.2LVIDKUHA3LGX@kernel.org> <ZuMIaEktrP4j1s9l@wunner.de>
-In-Reply-To: <ZuMIaEktrP4j1s9l@wunner.de>
+MIME-Version: 1.0
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DB9PR04MB8409.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3559069f-394f-40b6-1c7c-08dd07b3bab2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Nov 2024 09:31:06.8871
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Jp4N27k5RJX/jlYUX5M9mvYyXQ8I9VyvoNb3i96AGxZMBtKZ2j8hOcwiIhkZGa59Hhcu1jaNNYSkzCdAx4DjoA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU4PR04MB10648
 
-On Thu Sep 12, 2024 at 6:27 PM EEST, Lukas Wunner wrote:
-> On Thu, Sep 12, 2024 at 05:19:15PM +0300, Jarkko Sakkinen wrote:
-> > I try to understand these in detail because I rebase later on my TPM2
-> > ECDSA patches (series last updated in April) on top of this. I'll hold
-> > with that for the sake of less possible conflicts with this larger
-> > series.
-> >=20
-> > Many of the questions rised during the Spring about akcipher so now is
-> > my chance to fill the dots by asking them here.
->
-> I assume you're referring to:
-> https://lore.kernel.org/all/20240528210823.28798-1-jarkko@kernel.org/
+Hello Ahmad
 
-Returning to this as I started to update the series. Sorry if for
-possible duplicates with my earelier response.
+> -----Original Message-----
+> From: Ahmad Fatoum <a.fatoum@pengutronix.de>
+> Sent: Monday, November 11, 2024 5:52 PM
+> To: Gaurav Jain <gaurav.jain@nxp.com>; Horia Geanta
+> <horia.geanta@nxp.com>; Pankaj Gupta <pankaj.gupta@nxp.com>; Herbert
+> Xu <herbert@gondor.apana.org.au>; David S . Miller
+> <davem@davemloft.net>; Silvano Di Ninno <silvano.dininno@nxp.com>;
+> Varun Sethi <V.Sethi@nxp.com>; Meenakshi Aggarwal
+> <meenakshi.aggarwal@nxp.com>; Sahil Malhotra
+> <sahil.malhotra@nxp.com>; Nikolaus Voss <nikolaus.voss@haag-streit.com>
+> Cc: linux-crypto@vger.kernel.org; linux-kernel@vger.kernel.org; Pengutron=
+ix
+> Kernel Team <kernel@pengutronix.de>
+> Subject: [EXT] Re: [PATCH] crypto: caam - use JobR's space to access page=
+ 0
+> regs
+>=20
+> Caution: This is an external email. Please take care when clicking links =
+or
+> opening attachments. When in doubt, report the message using the 'Report
+> this email' button
+>=20
+>=20
+> Hello Guarav,
+>=20
+> Thanks for your patch.
+>=20
+> On 11.11.24 13:10, Gaurav Jain wrote:
+> > Access to controller region is not permitted.
+>=20
+> It's permitted on most of the older SoCs. Please mention on which SoCs th=
+is
+> is no longer true and which SoCs you tested your change on.
+Yes, it is permitted on iMX6/7/8M SoCs but not on iMX8DXL/QM/QXP/8ULP.
+>=20
+> > use JobR's register space to access page 0 registers.
+> >
+> > Fixes: 6a83830f649a ("crypto: caam - warn if blob_gen key is
+> > insecure")
+>=20
+> Did the CAAM even support any of the SoCs, where this doesn't work
+> anymore back when the code was mainlined?
+Yes, for all SECO/ELE based SoCs, CAAM page 0 is not accessible from Non se=
+cure world.
+>=20
+> > Signed-off-by: Gaurav Jain <gaurav.jain@nxp.com>
+> > ---
+> >  drivers/crypto/caam/blob_gen.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/crypto/caam/blob_gen.c
+> > b/drivers/crypto/caam/blob_gen.c index 87781c1534ee..079a22cc9f02
+> > 100644
+> > --- a/drivers/crypto/caam/blob_gen.c
+> > +++ b/drivers/crypto/caam/blob_gen.c
+> > @@ -2,6 +2,7 @@
+> >  /*
+> >   * Copyright (C) 2015 Pengutronix, Steffen Trumtrar
+> <kernel@pengutronix.de>
+> >   * Copyright (C) 2021 Pengutronix, Ahmad Fatoum
+> > <kernel@pengutronix.de>
+> > + * Copyright 2024 NXP
+> >   */
+> >
+> >  #define pr_fmt(fmt) "caam blob_gen: " fmt @@ -104,7 +105,7 @@ int
+> > caam_process_blob(struct caam_blob_priv *priv,
+> >       }
+> >
+> >       ctrlpriv =3D dev_get_drvdata(jrdev->parent);
+> > -     moo =3D FIELD_GET(CSTA_MOO, rd_reg32(&ctrlpriv->ctrl-
+> >perfmon.status));
+> > +     moo =3D FIELD_GET(CSTA_MOO,
+> > + rd_reg32(&ctrlpriv->jr[0]->perfmon.status));
+>=20
+> I believe your change is correct, but I would prefer that ctrlpriv gets a
+> perfmon member that is initialized in caam_probe to either &ctrlpriv->ctr=
+l-
+> >perfmon.status or &ctrlpriv->jr[0]->perfmon.status and then the code her=
+e
+> would just use &ctrlpriv->perfmon->status.
+>=20
+> This would simplify code not only here, but also in caam_ctrl_rng_init.
+As already communicated by Horia, a separate patch is good to cover this.
 
-> Help me understand this:
-> Once you import a private key to a TPM, can you get it out again?
-
-No.
-
-> Can you generate private keys on the TPM which cannot be retrieved?
-
-Yes.
-
->
-> It would be good if the cover letter or one of the commits in your
-> series explained this.  Some of the commit messages are overly terse
-> and consist of just two or three bullet points.
-
-Yes.
-
-I'm picking right now the use case where key is uploaded to the TPM
-because:
-
-1. The creation part is more complex as data flow starts from user
-   space so it pretty much tests the edges also for a generated
-   private key.
-2. I can drop the code related to public key and add only signing
-   operation, not signature verification.
-
-My test script will along the lines of [1]. The new version of the
-series is not yet fully working so also the test is due to change.
-The idea is to get flow working where a normal public key can verify
-a signature made by the TPM chip.
-
-One area what I know probably might not be correct, is what I put
-in the 'describe' callbacks:
-
-static void tpm2_key_ecc_describe(const struct key *asymmetric_key,
-				    struct seq_file *m)
-{
-	struct tpm2_key *key =3D asymmetric_key->payload.data[asym_crypto];
-
-	if (!key) {
-		pr_err("key missing");
-		return;
-	}
-
-	seq_puts(m, "TPM2/ECDSA");
-}
-
-So any ideas what to put here are welcome (obviously).
-
-[1]
-#!/usr/bin/env bash
-
-set -e
-
-PRIMARY=3D0x81000001
-
-function egress {
-  keyctl clear @u
-  tpm2_evictcontrol -C o -c $PRIMARY 2> /dev/null
-  tpm2_getcap handles-transient
-  tpm2_getcap handles-persistent
-}
-trap egress EXIT
-
-openssl ecparam -name prime256v1 -genkey -noout -out ecc.pem
-openssl pkcs8 -topk8 -inform PEM -outform DER -nocrypt -in ecc.pem -out ecc=
-_pkcs8.der
-
-tpm2_createprimary --hierarchy o -G ecc -c owner.txt
-tpm2_evictcontrol -c owner.txt $PRIMARY
-
-# EC parameters to TPM2 blob:
-tpm2_import -C $PRIMARY -G ecc -i ecc.pem -u tpm2.pub -r tpm2.priv
-
-# TPM2 blob to ASN.1:
-tpm2_encodeobject -C $PRIMARY -u tpm2.pub -r tpm2.priv -o tpm2.pem
-openssl asn1parse -inform pem -in tpm2.pem -noout -out tpm2.der
-
-# Populate asymmetric keys:
-tpm2_ecc_key=3D$(keyctl padd asymmetric "tpm_ecc" @u < tpm2.der)
-kernel_ecc_key=3D$(keyctl padd asymmetric "kernel_ecc" @u < ecc_pkcs8.der)
-
-echo "SECRET" > doc.txt
-
-echo TPM2 ECC SIGN
-keyctl pkey_sign "$tpm2_ecc_key" 0 doc.txt hash=3Dsha256 > doc.txt.sig
-
-echo TPM2 VERIFY
-keyctl pkey_verify "$kernel_ecc_key" 0 doc.txt doc.txt.sig hash=3Dsha256
-
-BR, Jarkko
+Thanks
+Gaurav
+>=20
+> Thanks,
+> Ahmad
+>=20
+>=20
+> >       if (moo !=3D CSTA_MOO_SECURE && moo !=3D CSTA_MOO_TRUSTED)
+> >               dev_warn(jrdev,
+> >                        "using insecure test key, enable HAB to use
+> > unique device key!\n");
+>=20
+>=20
+> --
+> Pengutronix e.K.                           |                             =
+|
+> Steuerwalder Str. 21                       |
+> https://eur01.safelinks.protection.outlook.com/?url=3Dhttp%3A%2F%2Fwww.
+> pengutronix.de%2F&data=3D05%7C02%7Cgaurav.jain%40nxp.com%7C758768
+> 98a8044b366f4808dd024b7740%7C686ea1d3bc2b4c6fa92cd99c5c30163
+> 5%7C0%7C0%7C638669245367988594%7CUnknown%7CTWFpbGZsb3d8e
+> yJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIj
+> oiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=3DaaQ65iMsvuHn3q
+> 0bo5UU%2FYU7Fpyw3El7wNVHd%2BMNee0%3D&reserved=3D0  |
+> 31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    =
+|
+> Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 =
+|
