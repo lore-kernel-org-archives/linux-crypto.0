@@ -1,238 +1,481 @@
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2041.outbound.protection.outlook.com [40.107.101.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E3351D0143;
-	Thu, 21 Nov 2024 14:58:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.41
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732201085; cv=fail; b=NxtQRwwz356j8d1ah8B61+LXXmq9PVtkYEfH8faumgrs6jAT0jNPRmmKENDcsb1Rd1Ht7AY+Ig1L5DeBDG5wH0XjYWIxElKRkYxQpC/kgmVzhmQTFZxBAuH+yg7+cYvklCgJ2ZZPR+DL2p8bBNE24fJaxmW+C5w6zRX49FzDqrs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732201085; c=relaxed/simple;
-	bh=J0mtpUSj+03M5yaL5DOkaTCgBxVAtrGPHzj8pG1XlOs=;
-	h=Message-ID:Date:Subject:From:To:Cc:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=kVj/iDw8ozyYp/04YndWpyuTR2rdygyNCXNsNCTG2avZ0H8fAkkvAZlqhtzh23jCpb7RvZKJSPrcromD6kpOiUtTbgd5Iwfeb4nOq+495LYlEAhATQFv2ENc1gIE3YRWqlOaWax/DfAEIHl+ap7hK0Ak/9vXaFbT/lkC43hqHRo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=xFw8cujT; arc=fail smtp.client-ip=40.107.101.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64E171A08A3
+	for <linux-crypto@vger.kernel.org>; Thu, 21 Nov 2024 16:56:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732208165; cv=none; b=QmqfFv8zzzo+XZMOzklCWchJ2P0pj6gq2tPwmEKfjRsc3LI7glQ+Ep/6ND2WlzFlb2eZildudNu5VI3dHz0shLSBWtYhVs6WKQC+RhdynKl0zKNcDaMA/eXKU5M86ym7BuAYcWPjMBhd2sCUqfggKJvOUTEMxvG02JpGLHRDpX0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732208165; c=relaxed/simple;
+	bh=qmonLSoIS8Q9OhyvMAgmPPLJTYtpZ8xKEyMv/uvwuEs=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=iqy9duZqlPAjpxe5Sm/Nk7OS3z/zjbKUMDq0A5Y6Acrt0jMv2055SoFuWjwPVQtIoiMn6FTkl0OfvctyBE0S91eafyRXxOJYyRixLWq7XiHHpYgBJbmWAQDSMJGzw0xNi7/tSr2vGQfnL5J9gguAHZAVvQF2MoNqbjndP7A0zAk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hmBbTUNw; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="xFw8cujT"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=vRQnoOBcXGCCWaiLWUVT4nwj6BLWbX3krCS/+dMLwNVQoSsx6Jwi9pCk6jlWS9xVyuv+VmupG33Kd2mENUKqBXPLFFAOIACLOnTo5yxuzI95MXtxW9LVmY9bPHDM4xaCuYizPBanbVwlqRK4aRJs69NCq/eT6EtLLOneP5Ld0BgLjSgDXH6meAy0ybI1Wf1oipmPQolKucE+zS2bJKzdio9+NjGjQeUV6vcJTEfCAccBZAOB49tt/NgXflwbbJee3QDD2LVWT3ZAI9fRnawcZLNk0pU/ajgqHeNjkf2FduLJWXu/S2ds6d3kuHoRCrKFIiPOhk98n5VJYVBzmeLBIg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BQy+racQXlI7SXhjWMVDnTimUowxc6ln0T2PRhxiVuU=;
- b=PLUA57Zxsyw/fPN4ImMy7lT4DYkvn6S6yiyP7VtMz7yrKi6oaKEgPFYnDopbnWL+ZTygdCDsJBpu1hYav+IKWBitVlTQkj/OgVwBYq9LCXhv/OegKVG+TwPGpC9Q7VRKeoRCPWBN3uhI/ZNhcdAu2G4SMFfRcrJN8huUyAsJwUY9onTQeQn+webpLI7m4TW2gtqzKCm/PM03yV+ad4fujnvjHBFHatilSHRF71h755SCulOUZLKEuRCRxz355t4d/iHZrjKXhddWdmsj+L8LfzpE1CekxqZx/UD31IlCG+uZKy5vbwOU0yhbezcBnYWUQdZDf5A8zVqYutecnBHPEQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BQy+racQXlI7SXhjWMVDnTimUowxc6ln0T2PRhxiVuU=;
- b=xFw8cujTNkiq7OYrpTif436+gZ0JJ3c9geclTUlNtoSMOVzywULNwfAbrM/j5J9xjF368UIMmMU0L2vWmf5XhzmKBab+wxD9PJ3X04OLmXIpH28IZd3MUmc83XiloB5qPIp/TL3I8/mm0e34iagmguXK/35M20M6W0QRdTAUDn0=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BL3PR12MB9049.namprd12.prod.outlook.com (2603:10b6:208:3b8::21)
- by DM3PR12MB9434.namprd12.prod.outlook.com (2603:10b6:0:4b::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8182.14; Thu, 21 Nov
- 2024 14:57:58 +0000
-Received: from BL3PR12MB9049.namprd12.prod.outlook.com
- ([fe80::c170:6906:9ef3:ecef]) by BL3PR12MB9049.namprd12.prod.outlook.com
- ([fe80::c170:6906:9ef3:ecef%4]) with mapi id 15.20.8158.023; Thu, 21 Nov 2024
- 14:57:58 +0000
-Message-ID: <d3de477d-c9bc-40b9-b7db-d155e492981a@amd.com>
-Date: Thu, 21 Nov 2024 08:57:54 -0600
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/3] x86/sev: Add SEV-SNP CipherTextHiding support
-From: "Kalra, Ashish" <ashish.kalra@amd.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Peter Gonda <pgonda@google.com>, pbonzini@redhat.com, tglx@linutronix.de,
- mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
- herbert@gondor.apana.org.au, x86@kernel.org, john.allen@amd.com,
- davem@davemloft.net, thomas.lendacky@amd.com, michael.roth@amd.com,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org
-References: <cover.1726602374.git.ashish.kalra@amd.com>
- <f2b12d3c76b4e40a85da021ee2b7eaeda1dd69f0.1726602374.git.ashish.kalra@amd.com>
- <CAMkAt6o_963tc4fiS4AFaD6Zb3-LzPZiombaetjFp0GWHzTfBQ@mail.gmail.com>
- <3319bfba-4918-471e-9ddd-c8d08f03e1c4@amd.com> <ZwlMojz-z0gBxJfQ@google.com>
- <1e43dade-3fa7-4668-8fd8-01875ef91c2b@amd.com> <Zz5aZlDbKBr6oTMY@google.com>
- <d3e78d92-29f0-4f56-a1fe-f8131cbc2555@amd.com>
-Content-Language: en-US
-In-Reply-To: <d3e78d92-29f0-4f56-a1fe-f8131cbc2555@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN7PR04CA0173.namprd04.prod.outlook.com
- (2603:10b6:806:125::28) To BL3PR12MB9049.namprd12.prod.outlook.com
- (2603:10b6:208:3b8::21)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hmBbTUNw"
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-7ea999a79a2so1163152a12.2
+        for <linux-crypto@vger.kernel.org>; Thu, 21 Nov 2024 08:56:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1732208162; x=1732812962; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xCdmDeIAVGCNJqlBrou3ftDi64ooRpwqgbbNhTS8NEw=;
+        b=hmBbTUNwBz/gvopudBenZY/k0iSkfjrSEdEsntdn1elhjCYMRhgl2dsLV1r0r2yNw2
+         YUh/gPvjv6DM4MbvRRRI9WQCY08DYqdgFwbHOWR5QARqbFHZOHEd546ajNlrnLiT9Y66
+         1bhV1Fz2MRhToHSc0M2VWoNZJrMvB0bM4gb1K1J1y8nKcuEsRkFd23WUBqJezlM433oz
+         VVR4PBirOOmhQnAg6KjOdeE97UADRWhSf8XDUb6xdSngY7z9waSNxpdOcAThTqa2xwcP
+         RSA08cO9ffsVurgSh7NENRguknwmGXHTmnUnz370UkDN5UWzu7Gd6D4B5TtooK7lUd1c
+         6NpQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732208162; x=1732812962;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xCdmDeIAVGCNJqlBrou3ftDi64ooRpwqgbbNhTS8NEw=;
+        b=AvCEOG/o/YdGk3A+0Nm0f+kVLZRdt9IyStqHtORnUIHF8zmhE3XV7iF2IhcyNaUZlj
+         c0fIhplFcBxkEqsSUE9RWoOUPiDSwAN5d83YyclJ88ioS3mbkl75kgTuoBYU8Z0gG+KK
+         Hia7C6RDEMPAxFrWp2LppRspsg0acO+B9zcfSjoZ8bGcVUH3bdfM9tPZrKnZjzNbbSrV
+         ioWJFsdz8H5zhZ7s6KfsVxMphJ+qPl4NW9/Kmp1c7OY68T2r/lykGwN/UyP5LHx+T2Uz
+         GhkEjJW36U0Cn8MGV7Brtj8QWHFH/izNTygP2A+n8xUuwtGp1fzV8D9+CBouc5Z/3eub
+         H1Ag==
+X-Forwarded-Encrypted: i=1; AJvYcCWub/IcuY+zWYbRAKRJ1g56S+qTuiSXCrq9bHH/6jBB5F79aRL3ObG/z3c+g+wZiUgLuoXi5YeENWGV7ao=@vger.kernel.org
+X-Gm-Message-State: AOJu0YynGd9FMxTPniEj0mS83stbeYDqg5CVR8U8K/Qok6Y0fVJOT4RY
+	bvIdJGzHKXyFk4rS3W8QgG7sDu5mvZIUkN8RgfycQx8GTAIOD2t6Km70d6q82zY3pKj2EYab9AU
+	UuA==
+X-Google-Smtp-Source: AGHT+IFqEsligkGchTJZhybD3Y0vv5VNcJq7bQyFJvUo4pq53y15aqidl0xciPVfBBvJOVGUC2XRSozGo9A=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:9d:3983:ac13:c240])
+ (user=seanjc job=sendgmr) by 2002:a63:ec0c:0:b0:7ea:e735:3bec with SMTP id
+ 41be03b00d2f7-7fba7d39c32mr4294a12.7.1732208162150; Thu, 21 Nov 2024 08:56:02
+ -0800 (PST)
+Date: Thu, 21 Nov 2024 08:56:00 -0800
+In-Reply-To: <d3de477d-c9bc-40b9-b7db-d155e492981a@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL3PR12MB9049:EE_|DM3PR12MB9434:EE_
-X-MS-Office365-Filtering-Correlation-Id: 07ebe7dc-30ac-411b-3fa8-08dd0a3ce307
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|7416014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?dklrcExEZC9MQk5YSUxIQlpGQXJKcnAzaThVS1JCcHhaMGtZbDYxZlkxeStY?=
- =?utf-8?B?bjA5dDBIcXoxRFQzU2I5NTlxV2x3L1lKTjU0dHozL1JESFd0QXAzd3ZMT3RB?=
- =?utf-8?B?bzlHRzI3UnRlTkxpcUk3VXNqOWpyTlV4U1BzSkdVbGFSVDRjZ1Y1QXBJSUkv?=
- =?utf-8?B?MkZGS1ZHcithMENKWmoyM0lTaGxqMnBINXBCWlZXMjZaUEFCZFRZdExTWkxW?=
- =?utf-8?B?SjJlVjkzci83UFZ1L3RTNHl3a3p0VDFLQUEyUVovV0pPcU10WXVLcFpJTURN?=
- =?utf-8?B?UmdCUjZsVHVNNjYvY2VNWjVKY1RzeW5SUG9OYTJjYVJDcm1seEdHbTZhbjRV?=
- =?utf-8?B?YUppN0hxMDAzY1NDeGU4ZTBLN0MvK2F3Rmt4TGQ3Q3N0T2NNVTdtTHh3Tmsz?=
- =?utf-8?B?MkNLVTRyMFNBekxEUkEzUXoxdDdOUTQ4ckJkNE1JcjZMOUdNbmhrVUlzNktX?=
- =?utf-8?B?ODRZYjMrREdaSHlMTXErUEZwT2hScUh5SFpzQk4yV1ZCNDlDa3NMSTdMVStI?=
- =?utf-8?B?RlBmN1phMXVXczdQMXRJcFZRRXJGUnZpdXNHbEMxemRzaEs1VGR6T1o0bmtp?=
- =?utf-8?B?bFJUNUpTNnFMbUtDL1JybElwbnFLZ0s0dkJUMjVjUHJFZWwzQ3FhWU1tU1cz?=
- =?utf-8?B?YkpzOGovWjdHYmhTUzYxMG9qdkRmKzBoTEM4a0hWSXl5RjNib1JWMnQxcUk1?=
- =?utf-8?B?TGl4VUh4UllXV2QwZFVpT0VMZ0dJeXJqTVJpSEVTMHpFTVRVeW83OWMxbjdX?=
- =?utf-8?B?cjlVd29WZWcvR3JVb3kwY2I1YzJjNitXNW0zQXU3ZUkwT3FFMm5zYTZtUkR4?=
- =?utf-8?B?Y3R3c0tjSTRGVU0xR2ViWXhIRUI0cytOekVDaVF3dG10Z2hYNlZMQ3J5T1lH?=
- =?utf-8?B?RDRFMGVydUVDT2VsV0FmeHIya25FaW5rekNKV2UvNlNZenRDblFJMlpHNzBG?=
- =?utf-8?B?cTNINWRxdzM0NTROMkVBc1NXWThrS0VmaVhDNk9SQnE2SG05OGhuTW8vTDVZ?=
- =?utf-8?B?bk5SUHhhclNNd3YxM2dMcitqR25SRGlaYi9MR3VTR3RCUFY2OUZ4OGJVYXQw?=
- =?utf-8?B?UGQ2M2NEUzJBUVNFTUVFNjRkcDVvanhrMk1VWWNBNGRQcVdWa2R2TmtUWXQ2?=
- =?utf-8?B?NDJwYitDQ1VPRGhGSlNqSzVTSGR0SzhDVmZPL0hBclB4Sm1qNmxrYm9zWGdh?=
- =?utf-8?B?aHNTMzExSGlkMEdoRnlhTE5pTUNXdXdVTjlLV2loTWN1RDBLUU5qZldjVU4r?=
- =?utf-8?B?bGpBRUdyUC9PUHJ3Yk1QckdHUkJ6L3A5YUppVnMzSzVkL2RHWW5nUUFQWC9o?=
- =?utf-8?B?cm5RanhqQXZMN2hHblBZaEJ3UklWVzVUYS9DMVJkTWpsZm5LRVkrYlFHMzdT?=
- =?utf-8?B?NG9uTVg2eTFReUpsVEVhdjg0VDVMMmlQYWNvUnRSOWFhT2gwWHUrTkdXOWgv?=
- =?utf-8?B?ell6S2NqY2wwM2pzVlJzMjVUUk5DT0dvRVhQaUI1S2JJRGlMcTlHMjZMOUh3?=
- =?utf-8?B?RUw3YzRibDdocURhelJudTBuOUpVbVJRNHZ6enk0MTNHM2oxK09GRS9nMndp?=
- =?utf-8?B?MERsVTE2K3MwY3JQOW1iRDk2UmFybzRwd0lUTFlkWjgyQTVWK1FpVWlpeitO?=
- =?utf-8?B?UTBqZE9pbHAzVU85V3ZKdEw5Rk5OTy9YcnlURHp2dC8wVTZ5MVBjQ2h1bzFS?=
- =?utf-8?B?UTZxL2JKblczaXNhTmxYVm5EVG42R3RUaVZUQ1EyM2lxazM4a0djV09QbzE3?=
- =?utf-8?Q?zbd45n7tooc2U5AvWcLhBgpWZB+vnh44pyxWN8a?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR12MB9049.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?cldMUzg5ZFNKbzhNejFLYVFNVjE4TU9ON3I1eEZmV1ovRUlqRnlwNVJBY2p3?=
- =?utf-8?B?dW9HZDczSXNSRVcwbWJLYURpL1BOaVJEdndiZncrQUR3cld3eGxGNTFsVVlH?=
- =?utf-8?B?bUtUd3dXay92WFdjVW1zQUZCZ2FwL2wwUzNCOFh0NFRQSkRkOThkSURKbnBL?=
- =?utf-8?B?WU5reHg1VmNYUS9mR1hFSWZTUjBzQjc3V3NFZFNCQW4xTHdlOUNicDZBL212?=
- =?utf-8?B?WEdxVnQzVUtvMXNuS2o4NUFyc2YvK1NXQmkzbnU2VWt1SG0zUXpRaUIwUlZ2?=
- =?utf-8?B?Z0w1RVpPck9VV1BROVVKRTNFSFlyUk80R1J2Vmd1R3h6RXRyNzBKQ01hZHU2?=
- =?utf-8?B?RGYzNmhiUDQ5WUZDd3NzT1BlcEtyM3E4T05EWXFTQXlYQVBpTWFiWlZESmRQ?=
- =?utf-8?B?VzNHai81QllRSkNUMVBNTk01bG5OVTlMclVCbVI0N1JRaWNvT0QraGo4U0tl?=
- =?utf-8?B?ZEVaZzJqTXFNUHNmb0xaNXg0T3pQVEdaUmpGZkt0NmpNeThPWmRQQU1EMG53?=
- =?utf-8?B?TnlTNUxWZEdmaGttNTV1d3lCVVJzOUdacCtqNForRlRHK3M5UjJJK1ZWVHlN?=
- =?utf-8?B?YVY0VVNhRTcwc1Bmb3hLNVZMejRlbU1reFJtM3B3SjJtY2JVMXVqb1lzNFI3?=
- =?utf-8?B?eXcxNm1sd204WWNqUFNJTkZ0eWk4U2Q3d0hZYS8vTHV1cEtmeXpOckFxbVNz?=
- =?utf-8?B?QWEyb2JCOGlmWk9XUlIrZ1JwVWVJdkFVbnkzTG5hVWlFTnAzTG1Jak1laXRK?=
- =?utf-8?B?b1V6anc5TG9lWW1oTkg1aUtYWnVISHE1VXBiY3c3ZnlTOFFqNDRMK0dNbXlR?=
- =?utf-8?B?YUNOdHBjMzdSQWMvUXdJVlp1SWlmSnZnM3FKNkV2OTFCelBib0NyZ2Q3UXhE?=
- =?utf-8?B?dmZPWEZvSjU4OUhFMmllRCtrQnNTdERJekRXZlQ4SzRJSTV1ZU1jY2R5VjhX?=
- =?utf-8?B?bWkwWnhzSzJrbEswekRwNWc3NFhrTElpUlNRZ2ZUSk8yNWNQRUxtY1c5Nmlz?=
- =?utf-8?B?K0wrMHRFQU9vdUptVTFxOTV0S0dUdUVVdTRJMkk3VzVCZFBpVVVFeWI2RTZr?=
- =?utf-8?B?cUtadml5cVNFRmc0Uzh1b0YydUdqTzdTdlQ0NlZmK1RrdDNraGF1elJ5Rys5?=
- =?utf-8?B?eldNOG5NeEljTXhIZ1llYXo1QUtkWlMyYTVQUXJ0ZTB6cUdPZkVueHFSVDcr?=
- =?utf-8?B?Nk8zU0VGcW5CSVRFT0NXS3dBL2hsazFnQnk0R0ZudTYwVzJsRlF1TzFEUlpr?=
- =?utf-8?B?cVRtVkZxZ3ROQnRGdklMS3Bzb0ovRjRyaHk5aFM0KzlVZ2JXQlF2eDhWQXh0?=
- =?utf-8?B?T3lrTnVrSmU2OVRQNzErdXZCOUhVMmEzamdSOU1uMXJ1K053MGtsSzJITDRZ?=
- =?utf-8?B?a0tnNVhtbThNK05rbFpoVVNPd0E0eGxNN1VENHhYNlYyT1R4RlZFNGNGcnFB?=
- =?utf-8?B?cm9pOVVRZEo5YW5MbGhWWnNPNUNDZDdOdEk1TFRJWkJ4Rm1pVXB2R3d3M1h6?=
- =?utf-8?B?QkJzK3doVVJqRGFRVWJCbG92R21paW9hSFZUSVh0MkN1NnVaaThKQ2x3VDhl?=
- =?utf-8?B?L2U1TnNIcmsyaGVtRVBWanRsQk9GMzdWWW9JeDlISmh2bFNtSkxLbVZLUFpW?=
- =?utf-8?B?OEZyUzViL202bDZha3VTSWtBTFpQSzRleTFlc3lzRmg2cWFlbVoxWkRGeEt0?=
- =?utf-8?B?YXRiek1HVGNCclgyd2NrQVhPTDRaMngyaVFJOGh2eTlZazFNeXZ5QmhOdnFi?=
- =?utf-8?B?VEFhNmQxcHQ3bHhmOUlkL2ZjcmYvUVpoN21nTTZ1aUN4TW5NaHZqYlVDZjAy?=
- =?utf-8?B?Vy9TUnNmQS9xQzh4WlhnWSs0aTlBUHBkb2ZNd054Vm5FbmhFcU5GaTlIZ29O?=
- =?utf-8?B?bHh1emVFWE1qREhYTVNUVUxiQ1BvMlhqZDRUdEd2eW4wSzh5bVk3N2o1cXM5?=
- =?utf-8?B?eUJVdGZhaEhVTzh5NHhacXQwUDFyUWJCY1NFUUliMTVEQUdaTENoOGxaL0Y2?=
- =?utf-8?B?WW5RTVErLzEzWHhlM2pHZ1NlUjFCZGRZZStQZk5QbTFtMlhXTlZoZm5Lb29v?=
- =?utf-8?B?MDRQbVBCTThGRDhvMElMcGg2NWh4ZmVtUXlRclluY3pydTh4RDY0eUpvcmZQ?=
- =?utf-8?Q?ygWsGp0GM++19vBGOEmfUP3eq?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 07ebe7dc-30ac-411b-3fa8-08dd0a3ce307
-X-MS-Exchange-CrossTenant-AuthSource: BL3PR12MB9049.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Nov 2024 14:57:58.1401
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: JJljeQB8CgHndiTC36SDQIGXHFtroh680/1eteFcH8H5Cw+A2Ous0lBxdOF0PD+B3d8lXNqQDGirLAQfuu52uQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PR12MB9434
+Mime-Version: 1.0
+References: <cover.1726602374.git.ashish.kalra@amd.com> <f2b12d3c76b4e40a85da021ee2b7eaeda1dd69f0.1726602374.git.ashish.kalra@amd.com>
+ <CAMkAt6o_963tc4fiS4AFaD6Zb3-LzPZiombaetjFp0GWHzTfBQ@mail.gmail.com>
+ <3319bfba-4918-471e-9ddd-c8d08f03e1c4@amd.com> <ZwlMojz-z0gBxJfQ@google.com>
+ <1e43dade-3fa7-4668-8fd8-01875ef91c2b@amd.com> <Zz5aZlDbKBr6oTMY@google.com>
+ <d3e78d92-29f0-4f56-a1fe-f8131cbc2555@amd.com> <d3de477d-c9bc-40b9-b7db-d155e492981a@amd.com>
+Message-ID: <Zz9mIBdNpJUFpkXv@google.com>
+Subject: Re: [PATCH v2 3/3] x86/sev: Add SEV-SNP CipherTextHiding support
+From: Sean Christopherson <seanjc@google.com>
+To: Ashish Kalra <ashish.kalra@amd.com>
+Cc: Peter Gonda <pgonda@google.com>, pbonzini@redhat.com, tglx@linutronix.de, 
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
+	herbert@gondor.apana.org.au, x86@kernel.org, john.allen@amd.com, 
+	davem@davemloft.net, thomas.lendacky@amd.com, michael.roth@amd.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
+On Thu, Nov 21, 2024, Ashish Kalra wrote:
+> On 11/20/2024 5:43 PM, Kalra, Ashish wrote:
+> > 
+> > On 11/20/2024 3:53 PM, Sean Christopherson wrote:
+> >> On Tue, Nov 19, 2024, Ashish Kalra wrote:
+> >>> On 10/11/2024 11:04 AM, Sean Christopherson wrote:
+> >>>> On Wed, Oct 02, 2024, Ashish Kalra wrote:
+> >>>>> Yes, but there is going to be a separate set of patches to move all ASID
+> >>>>> handling code to CCP module.
+> >>>>>
+> >>>>> This refactoring won't be part of the SNP ciphertext hiding support patches.
+> >>>>
+> >>>> It should, because that's not a "refactoring", that's a change of roles and
+> >>>> responsibilities.  And this series does the same; even worse, this series leaves
+> >>>> things in a half-baked state, where the CCP and KVM have a weird shared ownership
+> >>>> of ASID management.
+> >>>
+> >>> Sorry for the delayed reply to your response, the SNP DOWNLOAD_FIRMWARE_EX
+> >>> patches got posted in the meanwhile and that had additional considerations of
+> >>> moving SNP GCTX pages stuff into the PSP driver from KVM and that again got
+> >>> into this discussion about splitting ASID management across KVM and PSP
+> >>> driver and as you pointed out on those patches that there is zero reason that
+> >>> the PSP driver needs to care about ASIDs. 
+> >>>
+> >>> Well, CipherText Hiding (CTH) support is one reason where the PSP driver gets
+> >>> involved with ASIDs as CTH feature has to be enabled as part of SNP_INIT_EX
+> >>> and once CTH feature is enabled, the SEV-ES ASID space is split across
+> >>> SEV-SNP and SEV-ES VMs. 
+> >>
+> >> Right, but that's just a case where KVM needs to react to the setup done by the
+> >> PSP, correct?  E.g. it's similar to SEV-ES being enabled/disabled in firmware,
+> >> only that "firmware" happens to be a kernel driver.
+> > 
+> > Yes that is true.
+> > 
+> >>
+> >>> With reference to SNP GCTX pages, we are looking at some possibilities to
+> >>> push the requirement to update SNP GCTX pages to SNP firmware and remove that
+> >>> requirement from the kernel/KVM side.
+> >>
+> >> Heh, that'd work too.
+> >>
+> >>> Considering that, I will still like to keep ASID management in KVM, there are
+> >>> issues with locking, for example, sev_deactivate_lock is used to protect SNP
+> >>> ASID allocations (or actually for protecting ASID reuse/lazy-allocation
+> >>> requiring WBINVD/DF_FLUSH) and guarding this DF_FLUSH from VM destruction
+> >>> (DEACTIVATE). Moving ASID management stuff into PSP driver will then add
+> >>> complexity of adding this synchronization between different kernel modules or
+> >>> handling locking in two different kernel modules, to guard ASID allocation in
+> >>> PSP driver with VM destruction in KVM module.
+> >>>
+> >>> There is also this sev_vmcbs[] array indexed by ASID (part of svm_cpu_data)
+> >>> which gets referenced during the ASID free code path in KVM. It just makes it
+> >>> simpler to keep ASID management stuff in KVM. 
+> >>>
+> >>> So probably we can add an API interface exported by the PSP driver something
+> >>> like is_sev_ciphertext_hiding_enabled() or sev_override_max_snp_asid()
+> >>
+> >> What about adding a cc_attr_flags entry?
+> > 
+> > Yes, that is a possibility i will look into. 
+> > 
+> > But, along with an additional cc_attr_flags entry, max_snp_asid (which is a
+> > PSP driver module parameter) also needs to be propagated to KVM, that's
+> > what i was considering passing as parameter to the above API interface.
 
+Doh, right, I managed to forget about those module params.
 
-On 11/20/2024 5:43 PM, Kalra, Ashish wrote:
+> Adding a new cc_attr_flags entry indicating CTH support is enabled.
 > 
-> On 11/20/2024 3:53 PM, Sean Christopherson wrote:
->> On Tue, Nov 19, 2024, Ashish Kalra wrote:
->>> On 10/11/2024 11:04 AM, Sean Christopherson wrote:
->>>> On Wed, Oct 02, 2024, Ashish Kalra wrote:
->>>>> Yes, but there is going to be a separate set of patches to move all ASID
->>>>> handling code to CCP module.
->>>>>
->>>>> This refactoring won't be part of the SNP ciphertext hiding support patches.
->>>>
->>>> It should, because that's not a "refactoring", that's a change of roles and
->>>> responsibilities.  And this series does the same; even worse, this series leaves
->>>> things in a half-baked state, where the CCP and KVM have a weird shared ownership
->>>> of ASID management.
->>>
->>> Sorry for the delayed reply to your response, the SNP DOWNLOAD_FIRMWARE_EX
->>> patches got posted in the meanwhile and that had additional considerations of
->>> moving SNP GCTX pages stuff into the PSP driver from KVM and that again got
->>> into this discussion about splitting ASID management across KVM and PSP
->>> driver and as you pointed out on those patches that there is zero reason that
->>> the PSP driver needs to care about ASIDs. 
->>>
->>> Well, CipherText Hiding (CTH) support is one reason where the PSP driver gets
->>> involved with ASIDs as CTH feature has to be enabled as part of SNP_INIT_EX
->>> and once CTH feature is enabled, the SEV-ES ASID space is split across
->>> SEV-SNP and SEV-ES VMs. 
->>
->> Right, but that's just a case where KVM needs to react to the setup done by the
->> PSP, correct?  E.g. it's similar to SEV-ES being enabled/disabled in firmware,
->> only that "firmware" happens to be a kernel driver.
-> 
-> Yes that is true.
-> 
->>
->>> With reference to SNP GCTX pages, we are looking at some possibilities to
->>> push the requirement to update SNP GCTX pages to SNP firmware and remove that
->>> requirement from the kernel/KVM side.
->>
->> Heh, that'd work too.
->>
->>> Considering that, I will still like to keep ASID management in KVM, there are
->>> issues with locking, for example, sev_deactivate_lock is used to protect SNP
->>> ASID allocations (or actually for protecting ASID reuse/lazy-allocation
->>> requiring WBINVD/DF_FLUSH) and guarding this DF_FLUSH from VM destruction
->>> (DEACTIVATE). Moving ASID management stuff into PSP driver will then add
->>> complexity of adding this synchronization between different kernel modules or
->>> handling locking in two different kernel modules, to guard ASID allocation in
->>> PSP driver with VM destruction in KVM module.
->>>
->>> There is also this sev_vmcbs[] array indexed by ASID (part of svm_cpu_data)
->>> which gets referenced during the ASID free code path in KVM. It just makes it
->>> simpler to keep ASID management stuff in KVM. 
->>>
->>> So probably we can add an API interface exported by the PSP driver something
->>> like is_sev_ciphertext_hiding_enabled() or sev_override_max_snp_asid()
->>
->> What about adding a cc_attr_flags entry?
-> 
-> Yes, that is a possibility i will look into. 
-> 
-> But, along with an additional cc_attr_flags entry, max_snp_asid (which is a PSP driver module parameter) also needs to be propagated to KVM, 
-> that's what i was considering passing as parameter to the above API interface.
-> 
+> And as discussed with Boris, using the cc_platform_set() to add a new attr
+> like max_asid and adding a getter interface on top to return the
+> max_snp_asid.
 
-Adding a new cc_attr_flags entry indicating CTH support is enabled.
+Actually, IMO, the behavior of _sev_platform_init_locked() and pretty much all of
+the APIs that invoke it are flawed, and make all of this way more confusing and
+convoluted than it needs to be.
 
-And as discussed with Boris, using the cc_platform_set() to add a new attr like max_asid and adding a getter interface on top to return the
-max_snp_asid.
+IIUC, SNP initialization is forced during probe purely because SNP can't be
+initialized if VMs are running.  But the only in-tree user of SEV-XXX functionality
+is KVM, and KVM depends on whatever this driver is called.  So forcing SNP
+initialization because a hypervisor could be running legacy VMs make no sense.
+Just require KVM to initialize SEV functionality if KVM wants to use SEV+.
 
-Thanks,
-Ashish
+	/*
+	 * Legacy guests cannot be running while SNP_INIT(_EX) is executing,
+	 * so perform SEV-SNP initialization at probe time.
+	 */
+	rc = __sev_snp_init_locked(&args->error); 
+
+Rather than automatically init SEV+ functionality, can we instead do something
+like the (half-baked pseudo-patch) below?  I.e. delete all paths that implicitly
+init the PSP, and force KVM to explicitly initialize the PSP if KVM wants to use
+SEV+.  Then we can put the CipherText and SNP ASID params in KVM.
+
+That would also allow (a) registering the SNP panic notifier if and only if SNP
+is actually initailized and (b) shutting down SEV+ in the PSP when KVM is unloaded.
+Arguably, the PSP should be shutdown when KVM is unloaded, irrespective of the
+CipherText and SNP ASID knobs.  But with those knobs, it becomes even more desirable,
+because it would allow userspace to reload *KVM* in order to change the CipherText
+and SNP ASID module params.  I.e. doesn't require unloading the entire CCP driver.
+
+If dropping the implicit initialization in some of the ioctls would break existing
+userspace, then maybe we could add a module param (or Kconfig?) to preserve that
+behavior?  I'm not familiar with what actually uses /dev/sev.
+
+Side topic #1, sev_pci_init() is buggy.  It should destroy SEV if getting the
+API version fails after a firmware update.
+
+Side topic #2, the version check is broken, as it returns "success" when
+initialization quite obviously failed.
+
+	if (!sev_version_greater_or_equal(SNP_MIN_API_MAJOR, SNP_MIN_API_MINOR)) {
+		dev_dbg(sev->dev, "SEV-SNP support requires firmware version >= %d:%d\n",
+			SNP_MIN_API_MAJOR, SNP_MIN_API_MINOR);
+		return 0;
+	}
+
+---
+ drivers/crypto/ccp/sev-dev.c | 102 +++++++++--------------------------
+ include/linux/psp-sev.h      |  19 ++-----
+ 2 files changed, 28 insertions(+), 93 deletions(-)
+
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index af018afd9cd7..563cc235b095 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -69,10 +69,6 @@ static char *init_ex_path;
+ module_param(init_ex_path, charp, 0444);
+ MODULE_PARM_DESC(init_ex_path, " Path for INIT_EX data; if set try INIT_EX");
+ 
+-static bool psp_init_on_probe = true;
+-module_param(psp_init_on_probe, bool, 0444);
+-MODULE_PARM_DESC(psp_init_on_probe, "  if true, the PSP will be initialized on module init. Else the PSP will be initialized on the first command requiring it");
+-
+ MODULE_FIRMWARE("amd/amd_sev_fam17h_model0xh.sbin"); /* 1st gen EPYC */
+ MODULE_FIRMWARE("amd/amd_sev_fam17h_model3xh.sbin"); /* 2nd gen EPYC */
+ MODULE_FIRMWARE("amd/amd_sev_fam19h_model0xh.sbin"); /* 3rd gen EPYC */
+@@ -1306,11 +1302,13 @@ static int __sev_platform_init_locked(int *error)
+ 	return 0;
+ }
+ 
+-static int _sev_platform_init_locked(struct sev_platform_init_args *args)
++int sev_platform_init(int *error)
+ {
+ 	struct sev_device *sev;
+ 	int rc;
+ 
++	guard(mutex)(&sev_cmd_mutex)
++
+ 	if (!psp_master || !psp_master->sev_data)
+ 		return -ENODEV;
+ 
+@@ -1319,36 +1317,17 @@ static int _sev_platform_init_locked(struct sev_platform_init_args *args)
+ 	if (sev->state == SEV_STATE_INIT)
+ 		return 0;
+ 
+-	/*
+-	 * Legacy guests cannot be running while SNP_INIT(_EX) is executing,
+-	 * so perform SEV-SNP initialization at probe time.
+-	 */
+-	rc = __sev_snp_init_locked(&args->error);
++	rc = __sev_snp_init_locked(error);
+ 	if (rc && rc != -ENODEV) {
+ 		/*
+ 		 * Don't abort the probe if SNP INIT failed,
+ 		 * continue to initialize the legacy SEV firmware.
+ 		 */
+ 		dev_err(sev->dev, "SEV-SNP: failed to INIT rc %d, error %#x\n",
+-			rc, args->error);
++			rc, *error);
+ 	}
+ 
+-	/* Defer legacy SEV/SEV-ES support if allowed by caller/module. */
+-	if (args->probe && !psp_init_on_probe)
+-		return 0;
+-
+-	return __sev_platform_init_locked(&args->error);
+-}
+-
+-int sev_platform_init(struct sev_platform_init_args *args)
+-{
+-	int rc;
+-
+-	mutex_lock(&sev_cmd_mutex);
+-	rc = _sev_platform_init_locked(args);
+-	mutex_unlock(&sev_cmd_mutex);
+-
+-	return rc;
++	return __sev_platform_init_locked(error);
+ }
+ EXPORT_SYMBOL_GPL(sev_platform_init);
+ 
+@@ -1441,16 +1420,12 @@ static int sev_ioctl_do_platform_status(struct sev_issue_cmd *argp)
+ static int sev_ioctl_do_pek_pdh_gen(int cmd, struct sev_issue_cmd *argp, bool writable)
+ {
+ 	struct sev_device *sev = psp_master->sev_data;
+-	int rc;
+ 
+ 	if (!writable)
+ 		return -EPERM;
+ 
+-	if (sev->state == SEV_STATE_UNINIT) {
+-		rc = __sev_platform_init_locked(&argp->error);
+-		if (rc)
+-			return rc;
+-	}
++	if (sev->state == SEV_STATE_UNINIT)
++		return -ENOTTY;
+ 
+ 	return __sev_do_cmd_locked(cmd, NULL, &argp->error);
+ }
+@@ -1467,6 +1442,9 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
+ 	if (!writable)
+ 		return -EPERM;
+ 
++	if (sev->state == SEV_STATE_UNINIT)
++		return -ENOTTY;
++
+ 	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
+ 		return -EFAULT;
+ 
+@@ -1489,12 +1467,6 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
+ 	data.len = input.length;
+ 
+ cmd:
+-	if (sev->state == SEV_STATE_UNINIT) {
+-		ret = __sev_platform_init_locked(&argp->error);
+-		if (ret)
+-			goto e_free_blob;
+-	}
+-
+ 	ret = __sev_do_cmd_locked(SEV_CMD_PEK_CSR, &data, &argp->error);
+ 
+ 	 /* If we query the CSR length, FW responded with expected data. */
+@@ -1584,7 +1556,6 @@ static int sev_get_firmware(struct device *dev,
+ 	return -ENOENT;
+ }
+ 
+-/* Don't fail if SEV FW couldn't be updated. Continue with existing SEV FW */
+ static int sev_update_firmware(struct device *dev)
+ {
+ 	struct sev_data_download_firmware *data;
+@@ -1732,6 +1703,9 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp, bool writable)
+ 	if (!writable)
+ 		return -EPERM;
+ 
++	if (sev->state == SEV_STATE_UNINIT)
++		return -ENOTTY;
++
+ 	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
+ 		return -EFAULT;
+ 
+@@ -1754,16 +1728,8 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp, bool writable)
+ 	data.oca_cert_address = __psp_pa(oca_blob);
+ 	data.oca_cert_len = input.oca_cert_len;
+ 
+-	/* If platform is not in INIT state then transition it to INIT */
+-	if (sev->state != SEV_STATE_INIT) {
+-		ret = __sev_platform_init_locked(&argp->error);
+-		if (ret)
+-			goto e_free_oca;
+-	}
+-
+ 	ret = __sev_do_cmd_locked(SEV_CMD_PEK_CERT_IMPORT, &data, &argp->error);
+ 
+-e_free_oca:
+ 	kfree(oca_blob);
+ e_free_pek:
+ 	kfree(pek_blob);
+@@ -1882,15 +1848,8 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
+ 	void __user *input_pdh_cert_address;
+ 	int ret;
+ 
+-	/* If platform is not in INIT state then transition it to INIT. */
+-	if (sev->state != SEV_STATE_INIT) {
+-		if (!writable)
+-			return -EPERM;
+-
+-		ret = __sev_platform_init_locked(&argp->error);
+-		if (ret)
+-			return ret;
+-	}
++	if (sev->state != SEV_STATE_INIT)
++		return -ENOTTY;
+ 
+ 	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
+ 		return -EFAULT;
+@@ -2296,6 +2255,9 @@ static void __sev_firmware_shutdown(struct sev_device *sev, bool panic)
+ {
+ 	int error;
+ 
++	atomic_notifier_chain_unregister(&panic_notifier_list,
++					 &snp_panic_notifier);
++
+ 	__sev_platform_shutdown_locked(NULL);
+ 
+ 	if (sev_es_tmr) {
+@@ -2390,9 +2352,7 @@ EXPORT_SYMBOL_GPL(sev_issue_cmd_external_user);
+ void sev_pci_init(void)
+ {
+ 	struct sev_device *sev = psp_master->sev_data;
+-	struct sev_platform_init_args args = {0};
+ 	u8 api_major, api_minor, build;
+-	int rc;
+ 
+ 	if (!sev)
+ 		return;
+@@ -2406,27 +2366,18 @@ void sev_pci_init(void)
+ 	api_minor = sev->api_minor;
+ 	build     = sev->build;
+ 
+-	if (sev_update_firmware(sev->dev) == 0)
+-		sev_get_api_version();
++	/* Don't fail if SEV FW couldn't be updated. Continue with existing SEV FW. */
++	if (sev_update_firmware(sev->dev))
++		return;
++
++	if (sev_get_api_version())
++		goto err;
+ 
+ 	if (api_major != sev->api_major || api_minor != sev->api_minor ||
+ 	    build != sev->build)
+ 		dev_info(sev->dev, "SEV firmware updated from %d.%d.%d to %d.%d.%d\n",
+ 			 api_major, api_minor, build,
+ 			 sev->api_major, sev->api_minor, sev->build);
+-
+-	/* Initialize the platform */
+-	args.probe = true;
+-	rc = sev_platform_init(&args);
+-	if (rc)
+-		dev_err(sev->dev, "SEV: failed to INIT error %#x, rc %d\n",
+-			args.error, rc);
+-
+-	dev_info(sev->dev, "SEV%s API:%d.%d build:%d\n", sev->snp_initialized ?
+-		"-SNP" : "", sev->api_major, sev->api_minor, sev->build);
+-
+-	atomic_notifier_chain_register(&panic_notifier_list,
+-				       &snp_panic_notifier);
+ 	return;
+ 
+ err:
+@@ -2443,7 +2394,4 @@ void sev_pci_exit(void)
+ 		return;
+ 
+ 	sev_firmware_shutdown(sev);
+-
+-	atomic_notifier_chain_unregister(&panic_notifier_list,
+-					 &snp_panic_notifier);
+ }
+diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+index 903ddfea8585..def40f7ea01d 100644
+--- a/include/linux/psp-sev.h
++++ b/include/linux/psp-sev.h
+@@ -790,19 +790,6 @@ struct sev_data_snp_shutdown_ex {
+ 	u32 rsvd1:31;
+ } __packed;
+ 
+-/**
+- * struct sev_platform_init_args
+- *
+- * @error: SEV firmware error code
+- * @probe: True if this is being called as part of CCP module probe, which
+- *  will defer SEV_INIT/SEV_INIT_EX firmware initialization until needed
+- *  unless psp_init_on_probe module param is set
+- */
+-struct sev_platform_init_args {
+-	int error;
+-	bool probe;
+-};
+-
+ /**
+  * struct sev_data_snp_commit - SNP_COMMIT structure
+  *
+@@ -817,7 +804,7 @@ struct sev_data_snp_commit {
+ /**
+  * sev_platform_init - perform SEV INIT command
+  *
+- * @args: struct sev_platform_init_args to pass in arguments
++ * @error: SEV firmware error code
+  *
+  * Returns:
+  * 0 if the SEV successfully processed the command
+@@ -826,7 +813,7 @@ struct sev_data_snp_commit {
+  * -%ETIMEDOUT if the SEV command timed out
+  * -%EIO       if the SEV returned a non-zero return code
+  */
+-int sev_platform_init(struct sev_platform_init_args *args);
++int sev_platform_init(int *error);
+ 
+ /**
+  * sev_platform_status - perform SEV PLATFORM_STATUS command
+@@ -951,7 +938,7 @@ void snp_free_firmware_page(void *addr);
+ static inline int
+ sev_platform_status(struct sev_user_data_status *status, int *error) { return -ENODEV; }
+ 
+-static inline int sev_platform_init(struct sev_platform_init_args *args) { return -ENODEV; }
++static inline int sev_platform_init(int *error) { return -ENODEV; }
+ 
+ static inline int
+ sev_guest_deactivate(struct sev_data_deactivate *data, int *error) { return -ENODEV; }
+
+base-commit: 43fb83c17ba2d63dfb798f0be7453ed55ca3f9c2
+-- 
 
