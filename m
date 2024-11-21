@@ -1,227 +1,179 @@
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2080.outbound.protection.outlook.com [40.107.101.80])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A03F13BAF1;
-	Wed, 20 Nov 2024 23:43:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.80
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732146234; cv=fail; b=rr0+qjtdXaSEyqFKhLpkGjeqAXk2QbON+Obd3hXXnPiYBGtj1gQPU1cp6xK/y0WK7kilkf/NMWHUIAy1B808ksMXSrogKzHZfR/mFY4T/c01FPu8kBl03JmCVyBhcU5Txn8YZ8Uw3Gdjwhm1uU6drkWYDni/SJuSg8G0oYnuZRw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732146234; c=relaxed/simple;
-	bh=H07HzoSg7fJ+55eB1EhlH/H/mw4faiVEaROSj+PCTIA=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=LiewG8NvQUGKe43mbwsyTl8DA/AkqdChlQGIBsbz++2KI5Ujdpe7s0I5Uu9OlvpClPRoEVzdbeeRjDsk5DXXb4Muc/DF6HVysU8kydspdtQPK8RbcXKTgdS/59XKu3QCVCZHe4Hl8QgoyrkvN5y+IahsIMEKzqLeRev06NIlMHs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=xI4C4ZN2; arc=fail smtp.client-ip=40.107.101.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="xI4C4ZN2"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gfh1DdCUqNqmWf48ZVNwFIb5RIOlOPsQV5ZkHzN93fQkJtKc36Mjt5dbMMzxefUUJIQPEjCV30kbAiCx8xuXtUwQYQ08R59b46pj7Q5r5i81Cs3uiRtGq2cv6UOGlN0eqPtOyu6aINSyy40GL5B7+bvd/BmfukhrWYY1SIQVB03PSp432lTeHtt+mrIavTPKdljaiQgig/YCWFAFVy9BOmmEXVB6Zv0u7jhtPJe2W3FndobY9YfOvB6hYW3ndfDot9MeyNIRjDSvF31JHsFw0MNJXebrTk/a/dEeLFe/mFL5KxogV/qEzpKMhyvwsTUKP9SZ13EwV1CrL7cFThgaOA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jOI4I4OIKvW0ArJADvrf9gB+E2RVjUYab4H+gsPlKNI=;
- b=E1/qmpVLCZqC5dv5Tp5xAbtOhdBVLoos3JDfNKe4mH31iVZf1Kzkcrby5IRthfc/3ZnTVyK9LFaZpJygX2sbjwfBuliTkSWYmm2qQZb1bduVb622h/wSbLQ81BMB/IFZMNU73Y3UuHxTzJ2WConU7RmCC0zz9gVAjgWIJ5HvidUvLXi7/vc3ZdXbtydrfvBlcDCXj9gU4dXRzRvvMaKkh7mfCyuNaaX+4AAJtbG5CjsT7J7BOr2fgICi57lUAPrS3sFRjavFF/h2ZhMZIVou4GcPf0uItg18trE8SuoSvil0alu+9RAkcGGddFTGP+qGkolfXVTiIdDUEBlZGbwYfw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jOI4I4OIKvW0ArJADvrf9gB+E2RVjUYab4H+gsPlKNI=;
- b=xI4C4ZN2v5b4UfCkhMgCQLrqX/CB1Bkk/EwczWlxx56uL3nffOyhTK8NJFecZg0sSIzQnFvef1zuIxChqJ6aygUQwYI5492GQENlW2XOf7zye+KEMO332UYK+DS4ZovhS5hyU7Bd+KwudIz7IZrvPvhrwpWtcw7yuwX4SHKeykM=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BL3PR12MB9049.namprd12.prod.outlook.com (2603:10b6:208:3b8::21)
- by IA1PR12MB6185.namprd12.prod.outlook.com (2603:10b6:208:3e7::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.21; Wed, 20 Nov
- 2024 23:43:49 +0000
-Received: from BL3PR12MB9049.namprd12.prod.outlook.com
- ([fe80::c170:6906:9ef3:ecef]) by BL3PR12MB9049.namprd12.prod.outlook.com
- ([fe80::c170:6906:9ef3:ecef%4]) with mapi id 15.20.8158.023; Wed, 20 Nov 2024
- 23:43:49 +0000
-Message-ID: <d3e78d92-29f0-4f56-a1fe-f8131cbc2555@amd.com>
-Date: Wed, 20 Nov 2024 17:43:38 -0600
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/3] x86/sev: Add SEV-SNP CipherTextHiding support
-Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>
-Cc: Peter Gonda <pgonda@google.com>, pbonzini@redhat.com, tglx@linutronix.de,
- mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
- herbert@gondor.apana.org.au, x86@kernel.org, john.allen@amd.com,
- davem@davemloft.net, thomas.lendacky@amd.com, michael.roth@amd.com,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org
-References: <cover.1726602374.git.ashish.kalra@amd.com>
- <f2b12d3c76b4e40a85da021ee2b7eaeda1dd69f0.1726602374.git.ashish.kalra@amd.com>
- <CAMkAt6o_963tc4fiS4AFaD6Zb3-LzPZiombaetjFp0GWHzTfBQ@mail.gmail.com>
- <3319bfba-4918-471e-9ddd-c8d08f03e1c4@amd.com> <ZwlMojz-z0gBxJfQ@google.com>
- <1e43dade-3fa7-4668-8fd8-01875ef91c2b@amd.com> <Zz5aZlDbKBr6oTMY@google.com>
-From: "Kalra, Ashish" <ashish.kalra@amd.com>
-In-Reply-To: <Zz5aZlDbKBr6oTMY@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA1P222CA0171.NAMP222.PROD.OUTLOOK.COM
- (2603:10b6:806:3c3::8) To BL3PR12MB9049.namprd12.prod.outlook.com
- (2603:10b6:208:3b8::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53C6C1D0E27
+	for <linux-crypto@vger.kernel.org>; Thu, 21 Nov 2024 10:44:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732185883; cv=none; b=XqojhtsKi+/zVe7b6iEZjrsUVRtKbSxiwwLI80+QTbO1aFmz/ANGpb3M4IETvWJ0wHG4kbB31rpHQLJ2Qd5YkWSm7eITk5vJ20DUbELGjergPc4xaH78dxjWww2X7S+hZVFGE9+lk4ojFKChDt0R5Gy1NFtXwWVCj+zGnVBYZ8I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732185883; c=relaxed/simple;
+	bh=zTmWI0KmNoOKw6BQqMhF3Ls+TquqPpC5m9B1f8OOaxQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KvKfjWNqrZzTB6S3OFyvWX+L6OPfUqS0HULzn2vyE+lWmNYcrLlYTRqJbJ2DQ2ZA6wvLpQC2caSH4+XQHdbKUHuAlvxw6OheQJHBYNKdY/Oo/rZ9l0Q9j4WpE8c3SwhPST6Rtl9aa78pYPctAIorw2MPb9KO5qepOEbjbRFhrCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=[IPV6:::1])
+	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
+	(envelope-from <a.fatoum@pengutronix.de>)
+	id 1tE4fk-0004fj-E2; Thu, 21 Nov 2024 11:44:29 +0100
+Message-ID: <54c5de0c-3c5f-4411-a345-a34852cf9112@pengutronix.de>
+Date: Thu, 21 Nov 2024 11:44:17 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL3PR12MB9049:EE_|IA1PR12MB6185:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2f721bf3-32d7-415a-7688-08dd09bd2e84
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?QkZKdnpqWXlnYlRxdDVBSUF5ZG8rY1lEaXpnNDlTOHZxMEFrNzVIcHNoVytx?=
- =?utf-8?B?THpaM3doNDZJRVlkekxLQXl0Nk01ZWZKZ1BNVGVZY2VVWmV5U2ovUUNMcEx2?=
- =?utf-8?B?UGFmRDhZamVMT3Fnb1VzelM0T2ZKYld0ZVdQbFBUS3ZhdGo0d3M0SnZnNlJ2?=
- =?utf-8?B?TXdXRVdGaXlhQTdtRXdFMDVXanl0RVVvMHR5ZThHVkNBWTZTRGNHMWlJeFJX?=
- =?utf-8?B?SnhWeDR0N0o2Q3UweFc0UjRzOWgxeHExYUZqSngzUjI5N3JWclFTMlI0bHNO?=
- =?utf-8?B?NTVzamUvRitwNDNCVjBkYW01NENWYlR4cDJ4c3NVNlVzQWdZZGJLNEhDRmdU?=
- =?utf-8?B?T2hITXc3dW9YaXFpNHZlUDBiWjVVV2FpVDRkRlUzenpBQkVRK1Q4bFRqQ0Vj?=
- =?utf-8?B?bS93Qk5pV0dJQ2dBSkcwTGJMbkpUeTAwOUxRdExoRjNRQ2xZSWw1L0R0bWph?=
- =?utf-8?B?ZnRFNjJ5R042aHpIczJ1dVRMSFZLcVZMeUNnb0RWZnNRNnpNY0pZZVhGNWpm?=
- =?utf-8?B?Y08vYmQyamVjRmJiQk9MT1lobmNWeitCemZDb20zbkZHNFJQak52ZUkzWWZR?=
- =?utf-8?B?UnNUZjU4MEMvSXk5VTJkYVpkY1I4c1VPUlhLK2daNWpoRmRzVHIyQXdVMklR?=
- =?utf-8?B?NkJlWGpYRHB0dVBOSjk4Y2pzWDZ6RkJ0WnVWeVI0YmQyWEJSYjZpWTBGb1dP?=
- =?utf-8?B?Nk1Za01pV1o1Q3phV3VLbnorQ2phL00vVWpjWkMxYmcwQmtQY0Zwb3A2VE9r?=
- =?utf-8?B?WlZocjFTbDJUTE1yS25DREU1UjZOMlliT2psbjF0UmpYWGRMYXFBN29Lbmxn?=
- =?utf-8?B?M2FiK3BaSFJXRldlZk8wc29OWkphUG02cFRScnd5WmZGYVFRZWlQWEVrdTdT?=
- =?utf-8?B?YzlsWkZKUFJzVmJDTWhGOUdzTHBrNXM2cXZTMDFEczhwTkVvYTZPbWw0V0FP?=
- =?utf-8?B?ZjNqbmllS3gzMWg5OXV5SElOZ1QwRkN1MU9ZSHl3bjR2blVtN1FqTHpvVks0?=
- =?utf-8?B?OWx4RjJ6UTNIeEF0M0UzTFdvRTVZVkFpbU5EcTRxMlFrck83SnY0cWs5WU1D?=
- =?utf-8?B?OWt3dEc1eDRUN015bTNnWERIcnhsQ0ZSbzhQbnJ6MWJ1c2xNYTNlR0pMM1Vk?=
- =?utf-8?B?ZDJpZ2cxeXcweXBYYURNcW16NGg3ekxRRDJoUjkxSDJ0azZqSlgrSENhNHVM?=
- =?utf-8?B?M1JMcDc3MW5BSzRYdjZlVG9NUXc3WW1vSGw2UDdvSUF0OE1BZ29FbTRSZkY4?=
- =?utf-8?B?TThadjlYbmhZYWlNWFBvV1NHNnhiOVVkUnViTU15eFF4T2ZMdVJvTW5zaWRt?=
- =?utf-8?B?c0gydkpOY1QwcDFzekxBdTVySWk2ZXRCZjlsNE9NclNVK3Q5U2ZQcWs4OWZH?=
- =?utf-8?B?Si8rYnZMQlhpa05rcmsyeVpVa25vTEVzem9YQ0dnY3FGQVlYMHNzclB3Mnhu?=
- =?utf-8?B?bmUyQ0JTUEVrWHhST2NMZkJhb1prZHp2d3hMcEhWa2g0L2l6WEo0Q0ZhTEht?=
- =?utf-8?B?MnFpN0JkOGRXME5IdzFueXdHM0t3ZEU2dW1FUmZsSzhjd0pKc0E3N3krd09t?=
- =?utf-8?B?NHA0R0NjS0FiK3d3dHViaDRJUFdIY0pqaE42MXVGeWYyWFFCMnlxektHNWhV?=
- =?utf-8?B?UXhrWmNWT0Fram5sMklqNU1rZ3p4TkFMWFp4L2xERUlPVTYyLytlaytPMVBJ?=
- =?utf-8?B?UHd0Y1lXMTJuaFRwdWkwSjlkcFpnYy93bjg3b3NScTlqV2p3d1hzeGttMUQv?=
- =?utf-8?Q?jdnIXN8lqfwItf8Wf8g9Iklz7lSYP/V7Pe838F3?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR12MB9049.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?VFFkeWkxdHBuZm0rKzZHRFp2SGZQZno0WFhUTXZxekp1K0ZsQ3VNMTlkQVNT?=
- =?utf-8?B?aUprT2pPZ1M5TnBQK2VqMW9qa0l6YWhrTmhFWFdEVnc1OU9QRHp0VldQN3l0?=
- =?utf-8?B?NnNiNEZyNy9mMzlqTUZuOWp2eXBGbCs4dDJlTVEwaTE1T1krMERNSFRhZU03?=
- =?utf-8?B?WE5BaXZXMnpoTUlVZ01nb1hRTFZyL2hVQ2Irc0tZbm1LZklqeDMwVXQvMTZC?=
- =?utf-8?B?ZWZtUFZhVVhoQ3pRZDQ2dVdjNXBLeXpaL0ttekU2K213RFFNTnZFYThVc0FK?=
- =?utf-8?B?Nmk2STQ4M3cvNGZIWGtTQzJBc2J6QjUxOVhMQ1pQT0pTTDhKbFlVZThXRjdG?=
- =?utf-8?B?bFNKSktGbWhndVNiUDJxb1dtNjVPbUQ3blNjRjBxNzMzNmxMeGZaaFRmT2VM?=
- =?utf-8?B?em1sNEtVbnNNQlQ2ZVVZMHpaMkU2S1lXOUpsNEdlUGpPbVZSRE9nL1Z1aktR?=
- =?utf-8?B?amJEeFhUOHdyQzNDV0Z2MFc1ZG9JUGEzem9LNzJFK3NBNU5samt1T1RaN1lv?=
- =?utf-8?B?Mjc0aGVoSTJKRVNWaXF1WGtGUEY0RzBwVVJqREJXRkg3WU5OampjczczamZN?=
- =?utf-8?B?V0ZlN3R3aUpDejFuTjBvUWF4dTVBVHk2bS9qdWw1YTZRd1NJYW9udFNCeUFr?=
- =?utf-8?B?eFBuZEdjMmQ2eGIwU3UvK1VKc0krNkNWRXl5dUZZSnU1NlNKNTRSMUVwbXpx?=
- =?utf-8?B?MDhQTUdYNGVMbVNJWW5EVytNeWFGdFJOdVIzeUlRTFY4SU54SHlYY3pBOVM4?=
- =?utf-8?B?VWc0QUdTb0hTLzVOcWpUak1weXNxSWlnMnNkcmlMSWs4VTNkNFdCSnE2L3l5?=
- =?utf-8?B?bDg5S09mWE9rOGNONUVkbTVXclFoVkF0RG5rK0JIQi9MdmhDZXN1bENwUERC?=
- =?utf-8?B?a0RLeE1sbE5TaFRCbnB5cjhyeDVsNGE5aDl0VVdwNnNyTTZiRmVsSkR2aWYx?=
- =?utf-8?B?N1ZBZjR3c2FNSy93SHZsdmd1dyt6bXV4WFcrcDVmdkY4WDFNa1JkOWJqNmhs?=
- =?utf-8?B?K25MVUxBcEM5Y09DR0ZNSnpCcHltTU9TZzFoRWpMQWpjQTVablpCL05WdHlM?=
- =?utf-8?B?azc5S3o5NXlxcWQzcmNBVzRIMjFDaW9KenkydVk0b2tqZTdwbkhPL2djY0J2?=
- =?utf-8?B?WElia0F6MUlScVRIVGFZeWgwVjZMK2RHUUFhejhHVE9aM0Eza2Q5TUl1Nlpy?=
- =?utf-8?B?TzhMbUhYUUh3VFo1QjhJNlJTdHVxeXNSRzNnais2MkcyS2xicThKVnoxeFc3?=
- =?utf-8?B?alY5NWdkcFhrSk5IY1d4dTBqT0RKTVhRRXNzYnBCTk42M0tCRTh4dVJWWWdU?=
- =?utf-8?B?d3UyQlZoTDIxNUFNN2xQcHdqUXg1Qk5pSnRlZHFiY1BZYTN0ZCt3dGx2a2U2?=
- =?utf-8?B?U2NVMmlEdmoyckxXTFlFQXlGK0NQazNXK0w5MHZucWZkNkx0Snl0bEhXZjF3?=
- =?utf-8?B?YVd3VFlNSnJWWTdIMUtNK3A3b2ZtUDRtMUtFVURuS1lpbFhxMnJDMW0vZXB6?=
- =?utf-8?B?Qk9iRHBLSUIzNzVrZ2Z5VWl0VFlNYVJ1Uks3cnIydFp2L2RuWnF0MTNreFda?=
- =?utf-8?B?dm4xWnFIK0YrSGNXS2VQMHBla0dESUUzL3A5bHJydy9KL3RlMVY1RXN1U0lw?=
- =?utf-8?B?Nzh2MUxxN2JDQTlCSmtjdWlqVFhpaGVKNjlGQUFtZkpzbW9TVnpaL3N0aEZC?=
- =?utf-8?B?VmJQU1lZMUkvV2ZpWlB6Zk5QbEVnWmVJQXpFcHdBQUhFT0tYSTVmRTVpSitl?=
- =?utf-8?B?Z2JuMmp2OEhJZDVUNm9zQjJ0MEp1K2ROV3YxY2ZFSzJSNEp3UThlUktSNW1n?=
- =?utf-8?B?MFJ6SHhBeTNQekZGaDMvZTNTWkRoTDh1NDFleWNZNHNnem9DczgzNStkeFR0?=
- =?utf-8?B?QkNZZTMwN0RoNWVzbm9ZRkxNQlhaSVBUMlRXZDhLajMvWGpBUkdUYXJHeVdZ?=
- =?utf-8?B?TmhqbWI2Q0pma2xmTWI2cm4vVlZIYjBhMTBqQmZZZlJZc0luSm54T2JJVCsz?=
- =?utf-8?B?OVRYTXFYNXhXS21NZ2tvSlJGOWxZL2l5V1ljT2ZWZzA5dnhFaEFUSjJRbHFm?=
- =?utf-8?B?N1pSQUFUOUNhOFp0K3lHbk1zdHZXS3laTmV3dGk1TWYraG90VHFkYWNVT05a?=
- =?utf-8?Q?fMa+L361gkSZok+1pcFjvxNz/?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2f721bf3-32d7-415a-7688-08dd09bd2e84
-X-MS-Exchange-CrossTenant-AuthSource: BL3PR12MB9049.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Nov 2024 23:43:49.2236
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: akNOoghaKjTuWxWB7esTaj3bUKVGzNCH/BRFrd51+JF1i8Tchj3O0G+4n5s20DHL6UK8d3N+FfZRbAVet/wpQg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6185
+User-Agent: Mozilla Thunderbird
+Subject: Re: [EXT] Re: [PATCH] crypto: caam - use JobR's space to access page
+ 0 regs
+To: Gaurav Jain <gaurav.jain@nxp.com>, Horia Geanta <horia.geanta@nxp.com>,
+ Pankaj Gupta <pankaj.gupta@nxp.com>, Herbert Xu
+ <herbert@gondor.apana.org.au>, "David S . Miller" <davem@davemloft.net>,
+ Silvano Di Ninno <silvano.dininno@nxp.com>, Varun Sethi <V.Sethi@nxp.com>,
+ Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>,
+ Sahil Malhotra <sahil.malhotra@nxp.com>,
+ Nikolaus Voss <nikolaus.voss@haag-streit.com>
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>
+References: <20241111121020.4013077-1-gaurav.jain@nxp.com>
+ <93e915b3-ef8e-4b98-aa7f-7759ae0b3091@pengutronix.de>
+ <DB9PR04MB8409AC6672B7A209ABC8F9DAE7272@DB9PR04MB8409.eurprd04.prod.outlook.com>
+Content-Language: en-US
+From: Ahmad Fatoum <a.fatoum@pengutronix.de>
+In-Reply-To: <DB9PR04MB8409AC6672B7A209ABC8F9DAE7272@DB9PR04MB8409.eurprd04.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
+X-SA-Exim-Mail-From: a.fatoum@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 
+Hello Gaurav,
 
-On 11/20/2024 3:53 PM, Sean Christopherson wrote:
-> On Tue, Nov 19, 2024, Ashish Kalra wrote:
->> On 10/11/2024 11:04 AM, Sean Christopherson wrote:
->>> On Wed, Oct 02, 2024, Ashish Kalra wrote:
->>>> Yes, but there is going to be a separate set of patches to move all ASID
->>>> handling code to CCP module.
->>>>
->>>> This refactoring won't be part of the SNP ciphertext hiding support patches.
+On 18.11.24 10:31, Gaurav Jain wrote:
+>> -----Original Message-----
+>> From: Ahmad Fatoum <a.fatoum@pengutronix.de>
+>> Sent: Monday, November 11, 2024 5:52 PM
+>> To: Gaurav Jain <gaurav.jain@nxp.com>; Horia Geanta
+>> <horia.geanta@nxp.com>; Pankaj Gupta <pankaj.gupta@nxp.com>; Herbert
+>> Xu <herbert@gondor.apana.org.au>; David S . Miller
+>> <davem@davemloft.net>; Silvano Di Ninno <silvano.dininno@nxp.com>;
+>> Varun Sethi <V.Sethi@nxp.com>; Meenakshi Aggarwal
+>> <meenakshi.aggarwal@nxp.com>; Sahil Malhotra
+>> <sahil.malhotra@nxp.com>; Nikolaus Voss <nikolaus.voss@haag-streit.com>
+>> Cc: linux-crypto@vger.kernel.org; linux-kernel@vger.kernel.org; Pengutronix
+>> Kernel Team <kernel@pengutronix.de>
+>> Subject: [EXT] Re: [PATCH] crypto: caam - use JobR's space to access page 0
+>> regs
+>>
+>> Caution: This is an external email. Please take care when clicking links or
+>> opening attachments. When in doubt, report the message using the 'Report
+>> this email' button
+>>
+>>
+>> Hello Guarav,
+>>
+>> Thanks for your patch.
+>>
+>> On 11.11.24 13:10, Gaurav Jain wrote:
+>>> Access to controller region is not permitted.
+>>
+>> It's permitted on most of the older SoCs. Please mention on which SoCs this
+>> is no longer true and which SoCs you tested your change on.
+> Yes, it is permitted on iMX6/7/8M SoCs but not on iMX8DXL/QM/QXP/8ULP.
+
+Ok, please add this to the commit message.
+
+>>
+>>> use JobR's register space to access page 0 registers.
 >>>
->>> It should, because that's not a "refactoring", that's a change of roles and
->>> responsibilities.  And this series does the same; even worse, this series leaves
->>> things in a half-baked state, where the CCP and KVM have a weird shared ownership
->>> of ASID management.
+>>> Fixes: 6a83830f649a ("crypto: caam - warn if blob_gen key is
+>>> insecure")
 >>
->> Sorry for the delayed reply to your response, the SNP DOWNLOAD_FIRMWARE_EX
->> patches got posted in the meanwhile and that had additional considerations of
->> moving SNP GCTX pages stuff into the PSP driver from KVM and that again got
->> into this discussion about splitting ASID management across KVM and PSP
->> driver and as you pointed out on those patches that there is zero reason that
->> the PSP driver needs to care about ASIDs. 
+>> Did the CAAM even support any of the SoCs, where this doesn't work
+>> anymore back when the code was mainlined?
+> Yes, for all SECO/ELE based SoCs, CAAM page 0 is not accessible from Non secure world.
+
+Same, this information needs to be in the commit message.
+
 >>
->> Well, CipherText Hiding (CTH) support is one reason where the PSP driver gets
->> involved with ASIDs as CTH feature has to be enabled as part of SNP_INIT_EX
->> and once CTH feature is enabled, the SEV-ES ASID space is split across
->> SEV-SNP and SEV-ES VMs. 
-> 
-> Right, but that's just a case where KVM needs to react to the setup done by the
-> PSP, correct?  E.g. it's similar to SEV-ES being enabled/disabled in firmware,
-> only that "firmware" happens to be a kernel driver.
-
-Yes that is true.
-
-> 
->> With reference to SNP GCTX pages, we are looking at some possibilities to
->> push the requirement to update SNP GCTX pages to SNP firmware and remove that
->> requirement from the kernel/KVM side.
-> 
-> Heh, that'd work too.
-> 
->> Considering that, I will still like to keep ASID management in KVM, there are
->> issues with locking, for example, sev_deactivate_lock is used to protect SNP
->> ASID allocations (or actually for protecting ASID reuse/lazy-allocation
->> requiring WBINVD/DF_FLUSH) and guarding this DF_FLUSH from VM destruction
->> (DEACTIVATE). Moving ASID management stuff into PSP driver will then add
->> complexity of adding this synchronization between different kernel modules or
->> handling locking in two different kernel modules, to guard ASID allocation in
->> PSP driver with VM destruction in KVM module.
+>>> Signed-off-by: Gaurav Jain <gaurav.jain@nxp.com>
+>>> ---
+>>>  drivers/crypto/caam/blob_gen.c | 3 ++-
+>>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/drivers/crypto/caam/blob_gen.c
+>>> b/drivers/crypto/caam/blob_gen.c index 87781c1534ee..079a22cc9f02
+>>> 100644
+>>> --- a/drivers/crypto/caam/blob_gen.c
+>>> +++ b/drivers/crypto/caam/blob_gen.c
+>>> @@ -2,6 +2,7 @@
+>>>  /*
+>>>   * Copyright (C) 2015 Pengutronix, Steffen Trumtrar
+>> <kernel@pengutronix.de>
+>>>   * Copyright (C) 2021 Pengutronix, Ahmad Fatoum
+>>> <kernel@pengutronix.de>
+>>> + * Copyright 2024 NXP
+>>>   */
+>>>
+>>>  #define pr_fmt(fmt) "caam blob_gen: " fmt @@ -104,7 +105,7 @@ int
+>>> caam_process_blob(struct caam_blob_priv *priv,
+>>>       }
+>>>
+>>>       ctrlpriv = dev_get_drvdata(jrdev->parent);
+>>> -     moo = FIELD_GET(CSTA_MOO, rd_reg32(&ctrlpriv->ctrl-
+>>> perfmon.status));
+>>> +     moo = FIELD_GET(CSTA_MOO,
+>>> + rd_reg32(&ctrlpriv->jr[0]->perfmon.status));
 >>
->> There is also this sev_vmcbs[] array indexed by ASID (part of svm_cpu_data)
->> which gets referenced during the ASID free code path in KVM. It just makes it
->> simpler to keep ASID management stuff in KVM. 
+>> I believe your change is correct, but I would prefer that ctrlpriv gets a
+>> perfmon member that is initialized in caam_probe to either &ctrlpriv->ctrl-
+>>> perfmon.status or &ctrlpriv->jr[0]->perfmon.status and then the code here
+>> would just use &ctrlpriv->perfmon->status.
 >>
->> So probably we can add an API interface exported by the PSP driver something
->> like is_sev_ciphertext_hiding_enabled() or sev_override_max_snp_asid()
+>> This would simplify code not only here, but also in caam_ctrl_rng_init.
+> As already communicated by Horia, a separate patch is good to cover this.
+
+Are you interested in writing that separate patch?
+
+Cheers,
+Ahmad
+
 > 
-> What about adding a cc_attr_flags entry?
+> Thanks
+> Gaurav
+>>
+>> Thanks,
+>> Ahmad
+>>
+>>
+>>>       if (moo != CSTA_MOO_SECURE && moo != CSTA_MOO_TRUSTED)
+>>>               dev_warn(jrdev,
+>>>                        "using insecure test key, enable HAB to use
+>>> unique device key!\n");
+>>
+>>
+>> --
+>> Pengutronix e.K.                           |                             |
+>> Steuerwalder Str. 21                       |
+>> https://eur01.safelinks.protection.outlook.com/?url=http%3A%2F%2Fwww.
+>> pengutronix.de%2F&data=05%7C02%7Cgaurav.jain%40nxp.com%7C758768
+>> 98a8044b366f4808dd024b7740%7C686ea1d3bc2b4c6fa92cd99c5c30163
+>> 5%7C0%7C0%7C638669245367988594%7CUnknown%7CTWFpbGZsb3d8e
+>> yJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIj
+>> oiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=aaQ65iMsvuHn3q
+>> 0bo5UU%2FYU7Fpyw3El7wNVHd%2BMNee0%3D&reserved=0  |
+>> 31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+>> Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+> 
 
-Yes, that is a possibility i will look into. 
 
-But, along with an additional cc_attr_flags entry, max_snp_asid (which is a PSP driver module parameter) also needs to be propagated to KVM, 
-that's what i was considering passing as parameter to the above API interface.
-
-Thanks,
-Ashish
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
