@@ -1,110 +1,113 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE6BA69959;
-	Fri, 22 Nov 2024 15:00:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3BD61DF98E
+	for <linux-crypto@vger.kernel.org>; Fri, 22 Nov 2024 19:28:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732287643; cv=none; b=DsO4D34SndP/y4uNOYm16QHv2ualF6gL46BimWQbigwpD7bucooxjB/XRMUcKkhjxeWiO7k7dg31c3tMGN2atxFEMKETEKau4gU6sWVLbjohbCdqo911e935qow7hOzCkbMGp9+dhRp2fF2IcwBr+P+NgldrZviv8oM6My8XXMw=
+	t=1732303728; cv=none; b=Q/IIwsZ3jTtL5qyfMd8k7LEZoyS06Lp5zHVp+G//SYk8WNX4Nqd+SpEWtkaNqerpuup5Ayx+lQoTjuY56p1mPAlSOq85oW+IrU+chlXNKcNNAVgkjE94XM8e14FdmuhgOetT6O8JAYY5YEg5g5VVSUcGjsB7YI3iUIrAuOfyEjU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732287643; c=relaxed/simple;
-	bh=HM6inbvYL1/lEyw6iiqAwcJHl2HKnfkTeVOblQ8aKMA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ASn5ZsVHieMzCSFM9t29KYfpVfpJn3H5OdGOkJGAqrD34lv9QaIyDGsODP86sp1Rk0g1CPK/7VSqg6D39ywf2Ya+Ah3rz4vDq1KAV+C09GKwcFi4s48319uNBt2pGdaXe4omhY2Jb6XdsgkVuGG0a+NhOBp/EuLyABZzJf498yQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N8IGQHgS; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1732303728; c=relaxed/simple;
+	bh=CIirRwIqXxswoKYw/C0vt7jhR+LbI6hwoJRM9Kmjx0w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oa/rXdagsT6SlRUHvpuUQYIhwdElmB8CweTX43JEh1CLdqPuNDl43e1t/ADlXkcqkE38W6SOmjet5tPDxI6v+SwQqn3DtkUNQdg35BCh0aXw6EGX6YA9iwr8HENEs2lhOhhJHv/ME/0yfH8fZGSNWz3/KBVp4/mIJ5DjgLwrqj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OIM1pZ7n; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N8IGQHgS"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90827C4CED0;
-	Fri, 22 Nov 2024 15:00:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732287643;
-	bh=HM6inbvYL1/lEyw6iiqAwcJHl2HKnfkTeVOblQ8aKMA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=N8IGQHgSSxYUy/S6vs4nRmN3DFl/jgwYjpL19yEi5VERuUAZLRj4RDWi/MFFm9iRY
-	 lmnSoM3/ycO0v2IbUf1sR8JufxC7BQS53gY6vJXlneVFuTDz1ndYN6BYpO/LYjeE4k
-	 7gb1VHGyH7ayEEDLHJZYlcYPT4q7CWOlfAFJyrrC1BlphhfihDJYDrJj0C3PM1AkkS
-	 KyKzALsggaVlOetvr18jrkx34kqnoIseZ5Le/YSPN2ncUCUHddXnRwgJ7w1tGTLOJw
-	 c0A3Y0rIdg9CbPeh+BxvS9DyiKDctSKWutOZSHcIuIyDPttaFM8ApNGy4t9PQr52kR
-	 edhUCHiMbsI+A==
-Message-ID: <40c49e6d-dbbd-49cf-b59b-10e10b24da22@kernel.org>
-Date: Fri, 22 Nov 2024 16:00:36 +0100
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OIM1pZ7n"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1732303724;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FcvGsCpkjrQ7syvCrJLvbT9jNNGJMzuDnZMicFV+YWE=;
+	b=OIM1pZ7n6qM1I8n8w2XJ68TKo38u8k6Q1RRPbKSwolwLjpcMOCDPd5c3LwP2dhMxFHONLb
+	i3hBT1ibE/BPs7OkfL8BNEu5MVCrzqM15hEnOYoxpiPGI9uXcocfcuvI2n+7xcnjCliITa
+	NRS59KwX6Myx1iHZ0rQpLFclv+eY4B0=
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
+ [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-562-wTEpOOJuNdC3c2nSGnGhkA-1; Fri, 22 Nov 2024 14:28:41 -0500
+X-MC-Unique: wTEpOOJuNdC3c2nSGnGhkA-1
+X-Mimecast-MFC-AGG-ID: wTEpOOJuNdC3c2nSGnGhkA
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-211fcbd2325so29529395ad.1
+        for <linux-crypto@vger.kernel.org>; Fri, 22 Nov 2024 11:28:41 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732303720; x=1732908520;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FcvGsCpkjrQ7syvCrJLvbT9jNNGJMzuDnZMicFV+YWE=;
+        b=cBLpzoFU5MPMP/Y0w1A5AXQwNUqmlFnqP1EvT2x5fc1iK7VrHMCLDRo2fB91qjGtMw
+         8KdM7R6Rb2yyfkFSaHreoPE40d8zH6M4B8xaUPKZW/zfVuepqx/4R0XiAa4Ht8LuecZQ
+         sMDzhCVAJ76nUTvR7Xm5FmORABlhZzccGkb+WUKwZkbaxkMmXloz7/Qf616Tqlbw2Coj
+         UrsUV4Q3EsEM/Qx4M1Uq6R/9GatBUu/4BmnO8ekowh2x9ecUQTfUfpqYcWtJOFwEbV5T
+         NQZGrWV+GIVuULROLZimheJH1thgm4w97mHMWUCLK6SV/jgckXe6Ew53wqvC8MAB5zI3
+         oi+w==
+X-Gm-Message-State: AOJu0YwEEMxuEjgwNGwXPz7CQRMnS/kYMt/IDRK8nvMFdyh4t15AzvVl
+	vPItQ2EV195hmVd5X09FYwDYvr2K5fMRGjsnPnRq4zDmR0mBg+YqL/RpvEGqjd45kytU+uGIXwP
+	3R4Y+gXIX6Yaa6YOA1UM35WT+zyH7TiTdx7tpb7hhWFlV6HbHPRKf/JHBrJcGEQ==
+X-Gm-Gg: ASbGnct6IS8186ZpImsnI+6b5LnyDVFd8xqlhvXyeLCXU1g4Vm/Y62J6J8aIcbPV+ur
+	eyi6fcWPufN04B9IwwTZLm7ef6EEjdwRPQdvKDEfOS95ey1W/Dmhf3Vz835wxXzXk/ONxuMI6i4
+	ZxqbloW69SivrZaIIQnUbBnIQYW46mzz/uhGVGzF/3jVKGWZbn3InD8LAfQXVfE5O7Lo79piV7X
+	14EmsPHc0xXUQgAplpoEwwLbaXrMLpIkwWJHol33G9fXBagAj0JVK0qu0wYYF8GAzgHq/nQ7x0G
+	XuQ/62krAc0XxeQ=
+X-Received: by 2002:a17:902:d2c2:b0:20c:a0a5:a181 with SMTP id d9443c01a7336-2129f22647dmr50381765ad.19.1732303719888;
+        Fri, 22 Nov 2024 11:28:39 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEiZUUX5sdsIBj7jPZBEqjq3sJYV/CnWD950OlpmmREi6SjKqkBB0USD/fBz0GQhMfKIDS+Vw==
+X-Received: by 2002:a17:902:d2c2:b0:20c:a0a5:a181 with SMTP id d9443c01a7336-2129f22647dmr50381615ad.19.1732303719599;
+        Fri, 22 Nov 2024 11:28:39 -0800 (PST)
+Received: from dell-per750-06-vm-08.rhts.eng.pek2.redhat.com ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2129db8f7c5sm19899885ad.44.2024.11.22.11.28.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Nov 2024 11:28:39 -0800 (PST)
+Date: Sat, 23 Nov 2024 03:28:35 +0800
+From: Zorro Lang <zlang@redhat.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Ard Biesheuvel <ardb@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [Bug report] kernel BUG at include/linux/scatterlist.h
+Message-ID: <20241122192835.rsryoifhczqgmjf7@dell-per750-06-vm-08.rhts.eng.pek2.redhat.com>
+References: <20241122045106.tzhvm2wrqvttub6k@dell-per750-06-vm-08.rhts.eng.pek2.redhat.com>
+ <CAMj1kXGAuJSdDWvu7D5-PT6mSbNG9FeLObnYmpHeT08eNxaJWQ@mail.gmail.com>
+ <Z0A2W1FTTPt9PeI5@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V4 2/2] arm64: dts: qcom: qcs8300: add TRNG node
-To: Yuvaraj Ranganathan <quic_yrangana@quicinc.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konradybcio@kernel.org>, Vinod Koul <vkoul@kernel.org>
-Cc: linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-References: <20241122074346.4084606-1-quic_yrangana@quicinc.com>
- <20241122074346.4084606-3-quic_yrangana@quicinc.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20241122074346.4084606-3-quic_yrangana@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z0A2W1FTTPt9PeI5@gondor.apana.org.au>
 
-On 22/11/2024 08:43, Yuvaraj Ranganathan wrote:
-> The qcs8300 SoC has a True Random Number Generator, add the node with
-> the correct compatible set.
+On Fri, Nov 22, 2024 at 03:44:27PM +0800, Herbert Xu wrote:
+> On Fri, Nov 22, 2024 at 07:42:54AM +0100, Ard Biesheuvel wrote:
+> >
+> > Does this help?
+
+Hi Ard, thanks for your quick response, do you still hope to test
+your patch?
+
 > 
-> Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-> Reviewed-by: Krzysztof Kozlowski <krzk+dt@kernel.org>
+> This is a bug in the API/driver.  Users should not be expected to know
+> what kind of a virtual pointer is acceptable.
+> 
+> In this particular case, rsassa-pkcs1.c should be fixed to use the
+> crypto_akcipher_sync_encrypt interface.
 
-NAK, stop adding fake tags. It is impossible to receive above tag from
-me written that way.
+Thanks Herbert, feel free to CC me after you have a patch, I'm glad to
+give it a test.
 
-Best regards,
-Krzysztof
+Thanks,
+Zorro
+
+> 
+> Thanks,
+> -- 
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> 
+
