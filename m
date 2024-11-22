@@ -1,70 +1,108 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4315316BE0D;
-	Fri, 22 Nov 2024 08:37:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F5D1EB39;
+	Fri, 22 Nov 2024 13:21:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732264646; cv=none; b=Hh0AhkSk5BV42/MDSJg1F0kvTW0nEz0t5kDcZD49YbKEAlijHr/bOPNmqIH6+S+t65Fh1EIFrVEpw2ZsT3EfonVKOXdVxnE68yVhwxqmpNJ+GgwOUWjH/V31fEEXj7oo4vjG2Ke6KF24T3DyYUdQFykjrNG5wyGbuNCPfKSR4/g=
+	t=1732281672; cv=none; b=cE0mmqmaWk/uJIBxVsJka3M128XXMdfOIEeWG665jDjLmdaOTeNJ1YQj0Z7iReCOCW3jKNg7ssmXJ0VrCfdcu3IgO7gQdKMeyrdbYDKUDCMEsLnVu+Gt4HTgnz85t4zyJiRQu6UwnDnw23vfKgwSSX3GlAjAySHOO8KoOaCgImY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732264646; c=relaxed/simple;
-	bh=eJwBFSc+VSGtSBmQX5zNF6jaB3qJEZjYwnCtPHAcxhw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T7V/AxULC/4azPnkR8BVOhGOHprhCF9kJkO0jPv/+gNxeOlK4mBRpTd7A6w0+atSNi8Q/vHkFQhKOBwOUTDAFjy4lg49mrPYGdt8CPY9eYmikx+4Cu3coDL7xqy4vqR/QHy9jAnj68ncMdiu4INCMyaRUK1ansn2xgtxtoaSNBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=RG2bKg7U; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1732281672; c=relaxed/simple;
+	bh=CGjYYuV2s8sSIKMGfBw//FLhJifkTYPh4ZjMvvTbehM=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SMTMN28ghJXilYU8Mi93lqU2oz+5GinNogV2uXp8frEiIYIfMqL7Q3VIm3eNrdFc6UA2GciVl+MAN1UHhVRY5zlkAgzsP1TZumtP7DYqSTf7IYA+QJxM1zTpGzfMpVvSwUBGkRDjjDRFTlpotbV4tlYckZ/j705Rqg86kUB9A/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=f/a64b8N; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="RG2bKg7U"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=hQFyjGxVbbAJxhO1KpGCzDqp5uIWXAEAvmxs7zwQrB4=; b=RG2bKg7UlG0LXZJQgpPplNHqfD
-	ZCKWATmPN9fD8sFoQf7I+AcmQTKKiacuKtdw9UEsTZXNar6IildtQC71ce4E3quBPHecJf/D1YmCM
-	aP1hv+cqc5VT5qQGQxpq0Hn+atwdXlceS5LBEZVKtWusq8lW6cfBOabzG46bkcNAwDt2tEAbD4/+e
-	fvxL//1AdXePc+2zL24Nabs58uhMeyZeyd3G5aXBYhAjzfLLhSqcPESd+meOsAV7zRloPORSklO3s
-	TAyliwoqRSzHcwWQCxtZeMitiZNxw+O5fgF2lUM2uE2T6jdXS5ccyYQtSXLjfWladSBskUB3Pi6H9
-	NisS762Q==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tEPA5-000vGI-2t;
-	Fri, 22 Nov 2024 16:37:10 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 22 Nov 2024 16:37:09 +0800
-Date: Fri, 22 Nov 2024 16:37:09 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Ard Biesheuvel <ardb@kernel.org>, Lukas Wunner <lukas@wunner.de>
-Cc: Zorro Lang <zlang@redhat.com>, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [Bug report] kernel BUG at include/linux/scatterlist.h
-Message-ID: <Z0BCtZi2YJywGJAk@gondor.apana.org.au>
-References: <20241122045106.tzhvm2wrqvttub6k@dell-per750-06-vm-08.rhts.eng.pek2.redhat.com>
- <CAMj1kXGAuJSdDWvu7D5-PT6mSbNG9FeLObnYmpHeT08eNxaJWQ@mail.gmail.com>
- <Z0A2W1FTTPt9PeI5@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="f/a64b8N"
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AMAE8lC027544;
+	Fri, 22 Nov 2024 13:21:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	8UBwGI14pF4Lr0wGBdlEEGI7R4ni4Zwzi4ps0rdAWK0=; b=f/a64b8N+72sn1RB
+	o5x5/IG9keWb1SnGR8ba8ytESwMxzwSZFN6PcWOooe9GFSW4moiWjwtMIYi3KyRa
+	Bi2YgnKFFoLs7+CyJWtJHb0NHpnLFg/yv5lM5qW5NyALaDpjUrESwla0iLB1W3Pl
+	bOP9ieC5RSHodr7rR5CnAPRib4PuzOGXOdWY0WNKpDnocRsQiqB+yZ58aAjnV1dw
+	qmvHVIsMrABAGyfKx2NAagGvyv8upkAIQf344zidfg334CM6Tr/s2iV1g4G0PU/+
+	bFi+3V/IIZzt5nIFhUL6t854O9qgZj2s408hDTfzZ0l6Sv1P/bnUrvETAoK+EWle
+	yIweVQ==
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 432d5b21ce-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 22 Nov 2024 13:21:05 +0000 (GMT)
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+	by NALASPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4AMDL4MO024935
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 22 Nov 2024 13:21:04 GMT
+Received: from hu-yrangana-hyd.qualcomm.com (10.80.80.8) by
+ nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Fri, 22 Nov 2024 05:21:00 -0800
+From: Yuvaraj Ranganathan <quic_yrangana@quicinc.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bjorn Andersson
+	<andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>
+CC: <linux-arm-msm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <quic_yrangana@quicinc.com>
+Subject: [PATCH V2 1/2] dt-bindings: crypto: ice: document the qcs8300 inline crypto engine
+Date: Fri, 22 Nov 2024 18:50:43 +0530
+Message-ID: <20241122132044.30024-2-quic_yrangana@quicinc.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20241122132044.30024-1-quic_yrangana@quicinc.com>
+References: <20241122132044.30024-1-quic_yrangana@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z0A2W1FTTPt9PeI5@gondor.apana.org.au>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: V3wr7n9JT0ZBKxp6D2ZwQDvJgRciXmBV
+X-Proofpoint-ORIG-GUID: V3wr7n9JT0ZBKxp6D2ZwQDvJgRciXmBV
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ phishscore=0 adultscore=0 clxscore=1015 impostorscore=0 suspectscore=0
+ spamscore=0 bulkscore=0 lowpriorityscore=0 mlxlogscore=999 mlxscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411220112
 
-On Fri, Nov 22, 2024 at 03:44:27PM +0800, Herbert Xu wrote:
-> 
-> This is a bug in the API/driver.  Users should not be expected to know
-> what kind of a virtual pointer is acceptable.
-> 
-> In this particular case, rsassa-pkcs1.c should be fixed to use the
-> crypto_akcipher_sync_encrypt interface.
+Add the compatible string for QCom ICE on qcs8300 SoCs.
 
-Lukas, could you please take a look at this regression?
+Signed-off-by: Yuvaraj Ranganathan <quic_yrangana@quicinc.com>
+---
+ .../devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml    | 1 +
+ 1 file changed, 1 insertion(+)
 
-Thanks,
+diff --git a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
+index 0304f074cf08..657693867ddf 100644
+--- a/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
++++ b/Documentation/devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml
+@@ -13,6 +13,7 @@ properties:
+   compatible:
+     items:
+       - enum:
++          - qcom,qcs8300-inline-crypto-engine
+           - qcom,sa8775p-inline-crypto-engine
+           - qcom,sc7180-inline-crypto-engine
+           - qcom,sc7280-inline-crypto-engine
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.34.1
+
