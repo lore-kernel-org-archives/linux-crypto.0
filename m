@@ -1,320 +1,451 @@
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C231518CC01;
-	Fri, 22 Nov 2024 23:43:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732319034; cv=fail; b=sEBxbfcUwGJ/SQcjaO0rz+PLCcqMMphKUqu34r0qFi6wiqV6csO7jVlhG4sA+SSRB5lcMwT6IrqsbEIWlp7AmjAS2ZfUK73YFHTqcfadZi/phW/3CmrmGW1DwNJXsM8kip+TGEOK063jHId4Qo1dJ4/nKERVemDEFJVwNnfh+vM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732319034; c=relaxed/simple;
-	bh=QgvXVjupNvlUM0M4FwQ3mKY/EYqirK4Y/+1C1bCjTcM=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=iF5SjSrepYL47GJW8+JLz1P25lGiOu9tH1XiowzQSXpXzE18mKKngIHFH913lOs7kCJ8ACHeVECAGLPpFu+QTzbxEIpKrWQoCNIc2gD/iVJXalpfP2zsRuL0yg05W3zqUoJ1cy/Yqx0Tmxd/pReRGbhMmE70dHMpWOGshT+KodY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=osLtC6h5; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=q6avcAvj; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7AEE20E3;
+	Sat, 23 Nov 2024 07:01:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732345290; cv=none; b=W2uVODjF7G6T3OENqaVYpwu/UPVW6vOR0xS1HsCzrQjH4HiXEl3zsOH0sqA06pCpGs7X+lQJ8QZoTLqWGTEURQPdxGQadJJg39pefj5oiQWIHhJZdWAEjHvZHGp9UkHnCxZkDEWWD6N5QTqiTmgrh/q6iylsb1iJ+jNoLi9JQz0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732345290; c=relaxed/simple;
+	bh=WPwn+QO9B0crb+USoWTLBajAJxXiILJM23nJr3h6x58=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Atpwz7ueqIrwctrf8e8dcRFDrIuRhLq+DxaZKafkqsLb02lOzaH+3mHl9tIsN52Gx/gag7LbcWTimcVViRIIy2ZhcJ+ck/JB2IJpwNgR3g69EcR+j/9l55IrnPZPgBSzIAN9hxigZ0m4fv2Vs7/jGFpufBJOFI74SSRGsrohIxo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VPbhLrGg; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="osLtC6h5";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="q6avcAvj"
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AMLfOff011148;
-	Fri, 22 Nov 2024 23:37:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	corp-2023-11-20; bh=+5bYl7HmFPqRJD29pVzKNiRfRWptOjb4lKOykaGHVy4=; b=
-	osLtC6h56fX9kCRWhYM9prKmys+dfWa0wA6WKrozizJqWbSkdMBHRFX5qRdo5K7R
-	XsjZwFt7yDFrxGLp6FWGmOWC7i/CAfcrC8l8yZ7h86nzcVBbFCeGpO5yrow9CiaZ
-	ZGIai152eYKoDsPVGkGmx96/08qmMAsX1oe+DG/WFlM03/mu+C7+sUo+HMqiff6c
-	NrIEnmfs0cTushcLex5vnTJuSwYyKvFFamw/ZJgtcpUnXjcBE/wh1VuHArgXoDQb
-	TvzLeDNKQ8rkraB5gX9U36KMkuTY+w/GK/6oMnIowf2W5muEiVSuBwe5/5NKyvu6
-	eY8mr/pIG5/jJnkePgQ2og==
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4331vpr58w-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 22 Nov 2024 23:37:48 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 4AMMhSLw039850;
-	Fri, 22 Nov 2024 23:37:47 GMT
-Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2172.outbound.protection.outlook.com [104.47.57.172])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 42xhudsb77-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 22 Nov 2024 23:37:47 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=d5q3Um9yBXo5rOfUSpl/AU8OU8QrWYcEpO5ziieWsPanxAAcM3NYEhsl5Mv8W2tZQkVRiOTp+4b4ZylSZR/kCJgAnCYYKz9WEmPUjXkPhgX/fr+LIKMJg+IAMmmCrSJtnloOWj0mN8bh33nVORxo1/5EuqOXxA95odpUrfpAwwnisvc2SM84ug5RAJwMFCksRZZcFDBMj8KX6bBuh6w1xgdJWZztgRuFuDROivYefxZJ2/9rz+7egMUi2+RIT1XOpyd3KA+gGFjI96KSSkge9bLZWlmM5mmprripnecxksDb2ygkRQsHyU+0irDfHQCqht6CBMp6LeWWEMfRkQ5vxg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+5bYl7HmFPqRJD29pVzKNiRfRWptOjb4lKOykaGHVy4=;
- b=gR1cC/vjeDtugkR+nWU90xHBKzDxOU37zQs0whVvDqPFUymvwbClKNojkl3u++BF0oFPuaToKpVUsZbpj9S71PzlMRzM1yoTijlbBKF6AGWEWVrlRdzvjcGUqsAWiep1GExDYZeNT3hR/zfVFHKnctmH7aeP3vBw8o90aVq6W+mY2E+Oen8TluDnikCQFIPVC7zcgIK5/a/R10hjAyN2rSI/e51xUiUfxHmQh3r8MJ2DSUJdcvHgzvh5S3rpIT0idIhhOmiPpeaUzJpeQpanc7ucAh6CYbFsibQ47q0HAq6NiFj1K4mXlhz++nV8oJrzJZRxpUixCBwpHB0CkwEzjA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+5bYl7HmFPqRJD29pVzKNiRfRWptOjb4lKOykaGHVy4=;
- b=q6avcAvjlmWGufxf1UcWA0GfE3UOiDe0EtXIFNFcqjzeHhYMi9R8JwThOs8Qky03bNqdW/v0YxdlRXRJ5gYOFWjxZAZYtj5i8uXdy2BJkLQATzwFHIgs1d+IcbCRAC173gHqCQuKt8mP3uhDMsSZgmayBSSOFv36+mLYpRf0y1w=
-Received: from DS0PR10MB7224.namprd10.prod.outlook.com (2603:10b6:8:f5::14) by
- SJ2PR10MB6961.namprd10.prod.outlook.com (2603:10b6:a03:4d1::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8158.23; Fri, 22 Nov
- 2024 23:37:44 +0000
-Received: from DS0PR10MB7224.namprd10.prod.outlook.com
- ([fe80::c57:383f:cfb2:47f8]) by DS0PR10MB7224.namprd10.prod.outlook.com
- ([fe80::c57:383f:cfb2:47f8%4]) with mapi id 15.20.8158.019; Fri, 22 Nov 2024
- 23:37:44 +0000
-Message-ID: <2a243379-f18e-4461-95ad-c17ce49e6641@oracle.com>
-Date: Fri, 22 Nov 2024 15:37:36 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 06/19] x86: Add early SHA-1 support for Secure Launch
- early measurements
-To: Andy Lutomirski <luto@amacapital.net>
-Cc: James Bottomley <James.Bottomley@hansenpartnership.com>,
-        "Daniel P. Smith" <dpsmith@apertussolutions.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        Eric Biggers <ebiggers@kernel.org>, linux-kernel@vger.kernel.org,
-        x86@kernel.org, linux-integrity@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org,
-        kexec@lists.infradead.org, linux-efi@vger.kernel.org,
-        iommu@lists.linux-foundation.org, mingo@redhat.com, bp@alien8.de,
-        hpa@zytor.com, dave.hansen@linux.intel.com, ardb@kernel.org,
-        mjg59@srcf.ucam.org, peterhuewe@gmx.de, jarkko@kernel.org,
-        jgg@ziepe.ca, nivedita@alum.mit.edu, herbert@gondor.apana.org.au,
-        davem@davemloft.net, corbet@lwn.net, dwmw2@infradead.org,
-        baolu.lu@linux.intel.com, kanth.ghatraju@oracle.com,
-        andrew.cooper3@citrix.com, trenchboot-devel@googlegroups.com
-References: <20240531010331.134441-1-ross.philipson@oracle.com>
- <1a1f0c41-70de-4f46-b91d-6dc7176893ee@apertussolutions.com>
- <8a0b59a4-a5a2-42ae-bc1c-1ddc8f2aad16@apertussolutions.com>
- <CALCETrX8caT5qvCUu24hQfxUF_wUC2XdGpS2YFP6SR++7FiM3Q@mail.gmail.com>
- <c466ed57-35a8-41c0-9647-c70e588ad1d3@apertussolutions.com>
- <CALCETrW9WNNGh1dEPKfQoeU+m5q6_m97d0_bzRkZsv2LxqB_ew@mail.gmail.com>
- <ff0c8eed-8981-48c4-81d9-56b040ef1c7b@apertussolutions.com>
- <446cf9c70184885e4cec6dd4514ae8daf7accdcb.camel@HansenPartnership.com>
- <5d1e41d6-b467-4013-a0d0-45f9511c15c6@apertussolutions.com>
- <CALCETrW6vMYZo-b7N9ojVSeZLVxhZjLBjnMHsULMGP6TaVYRHA@mail.gmail.com>
- <9c80e779b6268fde33c93ed3765ff93b1d6d007b.camel@HansenPartnership.com>
- <CALCETrX4vHnVorqWjPEOP0XLaA0uUWkKikDcCXWtbs2a7EBuiA@mail.gmail.com>
- <66fabe21-7d0d-4978-806e-9a4af3e9257a@oracle.com>
- <CALCETrXXsta0OdgXb5Ti87psaty7gp5WRr-w8vTuEhOLuoGyXg@mail.gmail.com>
- <CALCETrV=PSLvDn4K6o1qoQLwTQtaPU6ESVPZTwRBJF5Pj_XJwg@mail.gmail.com>
-Content-Language: en-US
-From: ross.philipson@oracle.com
-In-Reply-To: <CALCETrV=PSLvDn4K6o1qoQLwTQtaPU6ESVPZTwRBJF5Pj_XJwg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: BN0PR03CA0009.namprd03.prod.outlook.com
- (2603:10b6:408:e6::14) To DS0PR10MB7224.namprd10.prod.outlook.com
- (2603:10b6:8:f5::14)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VPbhLrGg"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1732345289; x=1763881289;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=WPwn+QO9B0crb+USoWTLBajAJxXiILJM23nJr3h6x58=;
+  b=VPbhLrGgO1YsHdHA9pckPQSS5ZptrZq7B7m+F6ZiU25ZuvhiWW7CCO+R
+   RSwXVkckCkPZ9RbMIu/sjLmFQKUUNFH7BstlQj7P8lf9cFznrnOuKvn/1
+   jIFG2qPlqYO3zofNOsBDated86168VzxuwBi+AvxDJkkIm0XR4wZtc7lg
+   u0H1jneOJdz8Qy9f9OIOVHZjLMRQsf3ZdzEeDcIA+x8yYd9JqQkF861KO
+   g3sR4r2k7YreEQdzb1YudqxkQWFtZNPmaVei9yyF2abgty0jT9e2a28Jz
+   7TF3vx1T0rH7ljMX/KyGXTi4r1gaLlRTgCdrwfhWQawWIxKx8lBwtsatM
+   w==;
+X-CSE-ConnectionGUID: ZwDWdPpgQyOtZQoPnMRTkw==
+X-CSE-MsgGUID: HY4DPtWITKuA1O7LMeJ9ew==
+X-IronPort-AV: E=McAfee;i="6700,10204,11264"; a="32435447"
+X-IronPort-AV: E=Sophos;i="6.12,178,1728975600"; 
+   d="scan'208";a="32435447"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2024 23:01:28 -0800
+X-CSE-ConnectionGUID: aP4DvTwNRtedGzYTnPtzYg==
+X-CSE-MsgGUID: LeBvrpBnSOa1+uX44ZpT9Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,178,1728975600"; 
+   d="scan'208";a="91573545"
+Received: from unknown (HELO JF5300-B11A338T.jf.intel.com) ([10.242.51.115])
+  by orviesa008.jf.intel.com with ESMTP; 22 Nov 2024 23:01:27 -0800
+From: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
+To: linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	hannes@cmpxchg.org,
+	yosryahmed@google.com,
+	nphamcs@gmail.com,
+	chengming.zhou@linux.dev,
+	usamaarif642@gmail.com,
+	ryan.roberts@arm.com,
+	ying.huang@intel.com,
+	21cnbao@gmail.com,
+	akpm@linux-foundation.org,
+	linux-crypto@vger.kernel.org,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	clabbe@baylibre.com,
+	ardb@kernel.org,
+	ebiggers@google.com,
+	surenb@google.com,
+	kristen.c.accardi@intel.com
+Cc: wajdi.k.feghali@intel.com,
+	vinodh.gopal@intel.com,
+	kanchana.p.sridhar@intel.com
+Subject: [PATCH v4 00/10] zswap IAA compress batching
+Date: Fri, 22 Nov 2024 23:01:17 -0800
+Message-Id: <20241123070127.332773-1-kanchana.p.sridhar@intel.com>
+X-Mailer: git-send-email 2.27.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR10MB7224:EE_|SJ2PR10MB6961:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6046a0d8-3124-4974-897e-08dd0b4ea9ab
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|366016|1800799024|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Zm9hUm9rcWEyQ0VBMFpGeE0rdFB1ejQzemkyZXNXS2tmMW50bHJjaklVa2Y3?=
- =?utf-8?B?V0U5cTkxZVBPLzVob2dNMmxOcHoyQ1NOdDFvN1hIRng5Ui9PcHFIRGlpS1M1?=
- =?utf-8?B?QkZpVkFtVnV4Y3lmVDVuSnNFcWpMYnFvMk9ZeUxYMWR4NHc0Zk8yWlBuSFRQ?=
- =?utf-8?B?NHZFNzVZdEppUWxiU2JWaXE5VmY2dzJaV2pYRE9xeUE0T1dXcThwRUhlYkhT?=
- =?utf-8?B?UU5tdDNSTEdHTkpIcU1UYTlheFBXOWpZNkJxL241M2NLVUEzdU1IOWlZM3pK?=
- =?utf-8?B?dFFoT3RGVE9tYUxwTlF1UlZsNUNOL25YVWsycXdyenBjWFpuUHlQODVhU1hs?=
- =?utf-8?B?aFdsSWZpVmQ4MjgwaEJLdmd0aGppcWlTTXNyeno4R2JoOHJxMDh4dGhocm8y?=
- =?utf-8?B?R1RiRVBkQ2RjaUhSN0pVcGRJL21pMVVhNHdtM0RFR0lnR1B0Z1hGUVZWbnUw?=
- =?utf-8?B?MXlvOTBnbzZWY3RZNmhlTjUyQTh2dUdZaEZYWlRmd0JKZW5pWDc4Nk5kdXMy?=
- =?utf-8?B?NWR6QkdDRFlpc3lCeWxsdmczUWpWc3Y3QUU3aWpzcTR5a1FhU0xHVUw0c2Nj?=
- =?utf-8?B?eDhpUWxvU1AvMThKRW1sb0xPR2ZmWWcvWVExbU5KU2pxYUNpOVNXR3JVT1Rw?=
- =?utf-8?B?V1VFUWdhMG9nUlZ4dHZQcmtIRU5mQmVSNnVLZHZyMHQvanV3SDBIZEp6amJx?=
- =?utf-8?B?eExmY2MzYm4waGZnREtMcktyRE44eFNvNGNlS2hTVHV3TmZWOHFoNnhlamNJ?=
- =?utf-8?B?MWV5NWtBK1pIdWV5WTRNWlVWMzltUy9QTS96cUV0V2hBbGxnTXpqSWdza0Zj?=
- =?utf-8?B?WVBLeHVIWlc4bVpJSU5kblBvZFZBWllzVU5jbWN4UUFLUUtzV0grRk1FSnU3?=
- =?utf-8?B?RXN5bmVubmpla0ZZMllHR2taT0hYNXkzTWxuZlBHU0k5Q2FiaHc0c1ZsRXB4?=
- =?utf-8?B?R01wM3BSZjZqZmZDV1N1dEVVWTk0TDhTMVErNEFtZWVva1ZJajZOdjFrR2Zp?=
- =?utf-8?B?NHBBNW1XOUR1YUtNQXlpbHhTbTdzcFdVU1JOc2J5QzhJVmtETERKdUczbEpT?=
- =?utf-8?B?OG5RNVVyTCsvQjVGT2hkUGVkekhONTJFZFlja0orcGdWQnp6dVR1bTBhZUpE?=
- =?utf-8?B?TDk5OUxnalRscWtQMm1xMlZWZHBWcG5iYlU4VnVLRENqZ2dDTytHWndMMVJN?=
- =?utf-8?B?VDhNRWxmZDU4R29zMUJNeE5TT1o3MXNNamZtblozRlFvUDI2TWFXTTRFRE9L?=
- =?utf-8?B?T0FRVHNVSFIvQmhUclBGaVp2Nk1VNDBHZ3lSeUx6THg5NW5SOW9CNGJabHcy?=
- =?utf-8?B?Y2wwNGVxQ0NHOSt2M0VnWUdZNVR4dlJHd0pUV2xwM3JKaFl1UU05bWhoYmxN?=
- =?utf-8?B?akM3V2IvZ2phaGt6Q09iOXNheTk2UDhlcEZIdGpCUVl2ejB5UVEyQU94VnNT?=
- =?utf-8?B?Vnhqbk9xTklQbzVGVW1vTVphbEVlc1c5Q0I4WFkzc2VhbnJlcENwNDRSdkM1?=
- =?utf-8?B?UkIxZGViek5iWitkRFRmM0UvM0themtndW0yVlFrNXhpSjdadmEySjZVZTdF?=
- =?utf-8?B?ZXcrbWhJNllDdUFWM0dOVWVaYmFsQ0x1YWpiWDg4UFd5Rk5reHdTZXpYdEhk?=
- =?utf-8?B?WS8ydmI4Q1lyaDlkWnNVWW5HRkRUZWRvQ25RVEV0RTQ4WkpCZVplMlBvdS83?=
- =?utf-8?B?YTR5L1RGbjBRS1JJdGRhREVGa0RtWlFGV1hJT05mREZCZ3QyVzVLTW9jSEpN?=
- =?utf-8?B?cjlERmNSR1pBL3BIM2FnWmlSWnZ0djRpTWZwd0ZaT0JPWFFtSEJNK1c1QWo0?=
- =?utf-8?B?YWQ0ZWpjOWdoZnpJamV0dz09?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR10MB7224.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?clRGUFc3VlBsdE1rWFNRaUZESlIxNVY1Z1hlaHJBSzY2aGRjdDYrRmxNZEhE?=
- =?utf-8?B?RU1rMkxUYjJoeHNpVWlOeWdpU05nY0FGcWx0Ry9oMlE0a1hjU0VKaXdYb21y?=
- =?utf-8?B?RlpieE5KUkRFakRrVGxCQm9HUnZEY3liZDdwendxWERBQmhrZXYwY3lEenlC?=
- =?utf-8?B?dzVLak9aMlpWQ2plYVR5eno1d2xPYzdmRkxBZWhHNzJSVlVNRzhCTnpOWi9h?=
- =?utf-8?B?eU9CcEVTMHJXQWY4cVNuL052YlRJdG9PTWppY1dRNm5VWjJ2SkkyRFllRGpm?=
- =?utf-8?B?N1VwOUJZcWZRNXFaT1NWVHdtSWM3ek5ZQ2tTWUhuKzFMNVUvZXIybHVGMTVy?=
- =?utf-8?B?YkhZRGhBR0FkUDl4R1hHZk41ZUI4OFFUWjFOdHVvckE0Y3ZWeFNPR2hSQURl?=
- =?utf-8?B?bnd6d3Q1VmNDbXNsUXdvVmpGTlAyRFpXS3l5VUlTZUdURk5rY2hXb2hPSkhP?=
- =?utf-8?B?NlJOZFl4UDUybXVIT1ZaL3JvNFU0Q3JrOEFyZjdUQ0ZLNklCNUJCczhDUW5o?=
- =?utf-8?B?cnJUZGdhM3puOVcvaDM0WXVSS3ltcHlUT2l6WWlDT2RjTWtzdWRyUEY5OUZQ?=
- =?utf-8?B?eE1ET3c0czJCRlFxdjFuOENnNzEyYW1vNG5PMmY1dXpYL1QzVXRteHhJMm9v?=
- =?utf-8?B?OFAvNWxibUpIV21adGo5Zm9CWjd0NFBkNHZyR0tiK1lCakk5TlZ0VUliSmhy?=
- =?utf-8?B?TkZFQXQvWWUwNEpZdnFHR2RDbEhGekpIcFpUNVB4TVhJVEY4TThxQ24yRG5B?=
- =?utf-8?B?VjJjSk5XQVFueU9hTWZnRU1XcDZsOVMzMmc4bnFFTGdkUy9PY0NMa1RvTzlr?=
- =?utf-8?B?S3pKbVZnS1NudDdHTHplQW9Lb052dzlkL0Nqd25NUW9nMy9Ba1RPWDBTMUV5?=
- =?utf-8?B?aTVDelgvNEJlTFdLQTFIYXdEOU12Yll4TlJWOWtxR0RsQzZzbGxCYlpia0Nl?=
- =?utf-8?B?TjQweU5wU0w5VThxTTF2VUNQSHo5dEhJVGFqYWJDL2tOUVZFTFNobFVQZXlU?=
- =?utf-8?B?NkJERE9XNGZHWVkzRS9QSTVyWnNUTVZ3SVV1bHV6Tk9uNFBKMmxtcnE2aEpj?=
- =?utf-8?B?aE5UVXMxZUZtd3FmbzU5N1hHeXJVUWlwMGpZQW1BZG9Ld05paWhYNFdGdUZq?=
- =?utf-8?B?TktwYmdVNTVoWW1IeG1LN1ZmcGtmOFdTNjhBQTlSM1lnMVg0M2t5aFFybzFk?=
- =?utf-8?B?enVLZDlBd21XWjFDT1ZyNVM2dkZQL0hYbzYrQTIrdHFpZFBnbEdMNlc2a2ZW?=
- =?utf-8?B?dFJkUGFvTVFvQU94Yi9wR3UrcmVPeDhCOER2bVgvTElWYnprQWh0b2FDbXpO?=
- =?utf-8?B?OGdDMkFVR3lYNW1CMXU2LzYrVldNZXN1aThSM2RueS95QVloWGVpVlZaZ0hj?=
- =?utf-8?B?TmZPTVVaMlMvdHVqMXFyekc0YjVLSE5tZTgwNGxtZ1Bud2pWb2ZkSGVjdlQ5?=
- =?utf-8?B?eExCRVp2MGRyRlN5VFZFN255eUhCeHBVNTZRNVFTdllWMGVUY1NVZjQ3ZFRU?=
- =?utf-8?B?S3M2R2xHUEVXZGhvN1QxaHdiTGJyUml6MXpnSmxaVkF5RWdrNWw2OG1abHBw?=
- =?utf-8?B?ZUQzdHlKb0lzTDdxU1I0a3FJVGs4QkdoWldNWmZnUlZNdXYzajE2Wi9sZkJu?=
- =?utf-8?B?NFVlZ3ZhOE1GN2NoSHg2bE1XSnFwdXFudzQ0Z3VuemZnR1c3dzZ5T01YdGxK?=
- =?utf-8?B?dmdPNFVLUUdNRmI1a3ZTOENDOWRoZ0RkNlBtbDcyTGw4eEpRbmxMNHNNK3VI?=
- =?utf-8?B?R3J5LzZNZFdnalhibVgzZzg2cnkzMWpQYitYbDZzM2NWempQTGloNEx0d1dK?=
- =?utf-8?B?MmprbnpwNWdJS1FTbllkcWNQR3pDQVJiaUhUMHl6bkNEYU9URjg1a0lpNGtI?=
- =?utf-8?B?QkNhSGhIN1ZMdVh4V05PcHNTaUFadzA4UU1tZlhCZGJGZWd1VVNycmFsbFRT?=
- =?utf-8?B?VC9JQ2RSa29WWUFVM2U0SmVlazMwRUZnV0E3c3FNRllOZ0YraXJLNzdWNVFx?=
- =?utf-8?B?bEdiS0VIMlFidWx2Y3Q2YXN2NFdkaWFkMmxEQllEem1XWTl3QUswZzRRbktX?=
- =?utf-8?B?cUxGRitsSDhNL0x5WFRoT3JaRzdNY0hXSTBac1BES0RCZ0ppQTBVNDk2VnRV?=
- =?utf-8?B?RFAvdm5hQkc2c1pjU29reW9mdnU4ejZaU2hXL1Z0WncxK1BVM3VHeStTV0pl?=
- =?utf-8?B?VlE9PQ==?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	hnWaGg36MvqtEy1dGJfX0M97YMdRomazryiFpekyYyh/9eSJjF+WdN+w9CnxwfWMXOKK5mZz57XE2VhoYNQwe+eWGyBZ5Av/Tqg6YiR9vxUTiuGLta5Yn5X1IeGRtTL0uS1yNgSONu0KhQD3vsW4XI8Zi3DmI1kK9prOMFSJf/ibMEQE5ms2eXv+1uO6syr03catY0owGvMNn4ogr0LeGZBa2FG/GIQY9Y1Bnbkw5fSG7S2TerYYpwon97RLxSbdXJyCcZzq2agudng0gFs8J5EG5QnRC8rSV2x/6m2On1OJsf0o9xDQU3ml7IVulrb5ycN4/lVv58oIsCff5Sjx+MSEk+39hnIOp5ieE8oUdcPzmYu7r/Udm4pnu94cH7C3Oh0lKsSxQ82nDAFfNwhUdfT4hu6oVazOmmv+3MSCBn6DN0BDKD4nludQ1MypU3lhXf9AIr3zNjm4G1llSDv1kxmj3KnjGjpFRfstTNPzH0jwlA6dTj++vv+aE2onNE7HpRbbw6LutDu93/E9eo0Xk+8p25XAZdNc2DQpg8rRv33BcH8HmUAP5U7UyhPvFVx2pD6Tz92XIArit6dwJo7MnR7LZfCuEtWCxgEnRiKFn4g=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6046a0d8-3124-4974-897e-08dd0b4ea9ab
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR10MB7224.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Nov 2024 23:37:44.1009
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ZuiuXy3ljK05s++QNFIQcI8kuFwbquUuYXYKvorZ54nwNVCoZkMCzX2b5+NP1RFhU4TD2DxQj+vC/2w1xFrAdSLWSjfMQnkvhMIREvSb/MI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR10MB6961
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-11-22_14,2024-11-21_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 spamscore=0 phishscore=0
- adultscore=0 mlxlogscore=999 bulkscore=0 suspectscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2409260000
- definitions=main-2411220200
-X-Proofpoint-GUID: PzaCDD31pGccq9jg04vLpmwyAU09S2qv
-X-Proofpoint-ORIG-GUID: PzaCDD31pGccq9jg04vLpmwyAU09S2qv
+Content-Transfer-Encoding: 8bit
 
-On 11/21/24 2:42 PM, Andy Lutomirski wrote:
-> On Thu, Nov 21, 2024 at 12:54 PM Andy Lutomirski <luto@amacapital.net> wrote:
->>
->> On Thu, Nov 21, 2024 at 12:11 PM <ross.philipson@oracle.com> wrote:
->>>
->>> On 11/18/24 12:02 PM, Andy Lutomirski wrote:
->>
->>>> If the vendor of an attestation-dependent thing trusts SM3 but *Linux*
->>>> does not like SM3, then the vendor's software should not become wildly
->>>> insecure because Linux does not like SM3.  And, as that 2004 CVE
->>>> shows, even two groups that are nominally associated with Microsoft
->>>> can disagree on which banks they like, causing a vulnerability.
->>>
->>> Thanks everyone for all the feedback and discussions on this. I
->>> understand it is important and perhaps the Linux TPM code should be
->>> modified to do the extend operations differently but this seems like it
->>> is outside the scope of our Secure Launch feature patch set.
->>
->> It's absolutely not outside the scope.  Look, this is quoted verbatim
->> from your patchset (v11, but I don't think this has materially
->> changed):
-> 
 
-Concerning my previous response, I realized that I did not fully 
-understand what you were suggesting/proposing so I am sorry about that. 
-You are correct that addressing this is within the scope of what we are 
-doing. I have reread all the emails again and I/we now understand what 
-you are saying.
+IAA Compression Batching:
+=========================
 
-We are now exploring how we might use TPM2_PCR_Event, whether it 
-introduces other issues with respect to how TXT/ACM might behave and 
-what would be needed to adopt this approach. More to come on that front. 
-I will mention that the TPM code in the Linux kernel does not currently 
-support the TPM2_PCR_Event command. The functionality needs to be added 
-and that needs buy in from the TPM maintainers (probably guidance too).
+This patch-series introduces the use of the Intel Analytics Accelerator
+(IAA) for parallel batch compression of pages in large folios to improve
+zswap swapout latency, resulting in sys time reduction by 41% (usemem 30
+processes) and by 24% (kernel compilation); as well as a 39% increase in
+usemem30 throughput with IAA batching as compared to zstd.
 
-A bit more below to clarify a few things...
+The patch-series is organized as follows:
 
-> 
-> ... I apologize -- I've misread the code.  That code is still wrong, I
-> think, but for an entirely different reason:
-> 
->>
->> +       /* Early SL code ensured there was a max count of 2 digests */
->> +       for (i = 0; i < event->count; i++) {
->> +               dptr = (u8 *)alg_id_field + sizeof(u16);
->> +
->> +               for (j = 0; j < tpm->nr_allocated_banks; j++) {
->> +                       if (digests[j].alg_id != *alg_id_field)
->> +                               continue;
->>
->> ^^^^^^^^^^^^^^^^^^^^^ excuse me?
->>
->> +
->> +                       switch (digests[j].alg_id) {
->> +                       case TPM_ALG_SHA256:
->> +                               memcpy(&digests[j].digest[0], dptr,
->> +                                      SHA256_DIGEST_SIZE);
->> +                               alg_id_field = (u16 *)((u8 *)alg_id_field +
->> +                                       SHA256_DIGEST_SIZE + sizeof(u16));
->> +                               break;
->> +                       case TPM_ALG_SHA1:
->> +                               memcpy(&digests[j].digest[0], dptr,
->> +                                      SHA1_DIGEST_SIZE);
->> +                               alg_id_field = (u16 *)((u8 *)alg_id_field +
->> +                                       SHA1_DIGEST_SIZE + sizeof(u16));
->> +                               break;
->> +                       default:
->> +                               break;
->> +                       }
->> +               }
->> +       }
-> 
-> If we fall off the end of the loop, we never increase alg_id_field,
-> and subsequent iterations will malfunction.  But we apparently will
-> write zeros (or fail?) if we have an unsupported algorithm, because we
-> are asking to extend all allocated banks.  I think.  This code is
-> gross.  It's plausible that this whole sequence is impossible unless
-> something malicious is going on.
+ 1) crypto acomp & iaa_crypto driver enablers for batching: Relevant
+    patches are tagged with "crypto:" in the subject:
 
-Noted, there does look like there is an issue there. Thank you for the 
-analysis.
+    Patch 1) Adds acomp_alg/crypto_acomp batch_compress() and
+             batch_decompress() interfaces, that swap modules can invoke
+             using the new batching API crypto_acomp_batch_compress() and
+             crypto_acomp_batch_decompress(). Additionally, crypto acomp
+             provides a new acomp_has_async_batching() interface to query
+             for these API before allocating batching resources for a given
+             compressor in zswap/zram.
+    Patch 2) New CRYPTO_ACOMP_REQ_POLL acomp_req flag to act as a gate for
+             async poll mode in iaa_crypto.
+    Patch 3) iaa-crypto driver implementations for async polling,
+             crypto_acomp_batch_compress() and crypto_acomp_batch_decompress().
+             The "iaa_acomp_fixed_deflate" algorithm registers these
+             implementations for its batch_compress and batch_decompress
+             interfaces respectively.
+    Patch 4) Modifies the default iaa_crypto driver mode to async.
+    Patch 5) Disables verify_compress by default, to facilitate users to
+             run IAA easily for comparison with software compressors.
+    Patch 6) Reorganizes the iaa_crypto driver code into logically related
+             sections and avoids forward declarations, in order to facilitate
+             Patch 7. This patch makes no functional changes.
+    Patch 7) Makes a major infrastructure change in the iaa_crypto driver,
+             to map IAA devices/work-queues to cores based on packages
+             instead of NUMA nodes. This doesn't impact performance on
+             the Sapphire Rapids system used for performance
+             testing. However, this change fixes problems found on Granite
+             Rapids in internal validation, where the number of NUMA nodes
+             is greater than the number of packages, which was resulting in
+             over-utilization of some IAA devices and non-usage of other
+             IAA devices as per the current NUMA based mapping
+             infrastructure. This patch also eliminates duplication of device
+             wqs in per-cpu wq_tables, thereby saving 140MiB on a 384 cores
+             Granite Rapids server with 8 IAAs. Submitting this change now
+             so that it can go through code reviews before it can be merged.
+    Patch 8) Builds upon the new infrastructure for mapping IAAs to cores
+             based on packages, and enables configuring a "global_wq" per
+             IAA, which can be used as a global resource for compress jobs
+             for the package. If the user configures 2WQs per IAA device,
+             the driver will distribute compress jobs from all cores on the
+             package to the "global_wqs" of all the IAA devices on that
+             package, in a round-robin manner. This can be used to improve
+             compression throughput for workloads that see a lot of swapout
+             activity.
 
-> 
-> Also, and I'm sort of replying to the wrong patch here, how
-> trustworthy is the data that's used to populate tpm_algs in the stub?
-> I don't think the results will be very pretty if tpm_algs ends up
-> being incorrect.
+ 2) zswap modifications to enable compress batching in zswap_batch_store()
+    of large folios (including pmd-mappable folios):
 
-We gather the list of algorithms used from the DRTM event log which the 
-TXT/ACM phase initializes and begins populating. One thing to note here 
-is that in the early setup kernel stub code, we would fail to boot if we 
-saw an algorithm we did not support so we would not reach a state where 
-we were simply ignoring an active bank as you mentioned in an earlier 
-reply. But I also understand your point about limiting the functionality 
-to just a subset of algorithms.
+    Patch 9) Changes the "struct crypto_acomp_ctx" to contain a configurable
+             number of acomp_reqs and buffers. Subsequently, the cpu
+             hotplug onlining code will query acomp_has_async_batching() to
+             allocate up to SWAP_CRYPTO_BATCH_SIZE (i.e. 8)
+             acomp_reqs/buffers if the acomp supports batching, and 1
+             acomp_req/buffer if not.
+    Patch 10) zswap_batch_store() IAA compress batching implementation
+              using the new crypto_acomp_batch_compress() iaa_crypto driver
+              API. swap_writepage() will call zswap_batch_store() for large
+              folios if zswap_can_batch().
 
-Thank you for your feedback,
-Ross
+With v4 of this patch series, the IAA compress batching feature will be
+enabled seamlessly on Intel platforms that have IAA by selecting
+'deflate-iaa' as the zswap compressor.
+ 
+
+System setup for testing:
+=========================
+Testing of this patch-series was done with mm-unstable as of 11-18-2024,
+commit 5a7056135bb6, without and with this patch-series.
+Data was gathered on an Intel Sapphire Rapids server, dual-socket 56 cores
+per socket, 4 IAA devices per socket, 503 GiB RAM and 525G SSD disk
+partition swap. Core frequency was fixed at 2500MHz.
+
+Other kernel configuration parameters:
+
+    zswap compressor  : zstd, deflate-iaa
+    zswap allocator   : zsmalloc
+    vm.page-cluster   : 0, 2
+
+IAA "compression verification" is disabled and IAA is run in the async
+poll mode (the defaults with this series). 2WQs are configured per IAA
+device. Compress jobs from all cores on a socket are distributed among all
+4 IAA devices on the same socket.
+
+I ran experiments with these workloads:
+
+1) usemem 30 processes with these large folios enabled to "always":
+   - 16k/32k/64k
+   - 2048k
+
+2) Kernel compilation allmodconfig with 2G max memory, 32 threads, run in
+   tmpfs with these large folios enabled to "always":
+   - 16k/32k/64k
+
+
+Performance testing (usemem30):
+===============================
+The vm-scalability "usemem" test was run in a cgroup whose memory.high
+was fixed at 150G. The is no swap limit set for the cgroup. 30 usemem
+processes were run, each allocating and writing 10G of memory, and sleeping
+for 10 sec before exiting:
+
+usemem --init-time -w -O -s 10 -n 30 10g
+
+
+ 16k/32/64k folios: usemem30:
+ ============================
+
+ -------------------------------------------------------------------------------
+                            mm-unstable-11-18-2024   v4 of this patch-series
+ -------------------------------------------------------------------------------
+ zswap compressor               zstd   deflate-iaa   deflate-iaa   IAA Batching          
+ vm.page-cluster                   2             2             2    vs.     vs.
+                                                                    Seq    zstd
+ -------------------------------------------------------------------------------
+ Total throughput (KB/s)   6,284,634     7,149,906     8,392,830    17%     39%
+ Avg throughput (KB/s)       209,487       238,330       279,761    17%     39%
+ elapsed time (sec)           107.64         84.38         79.88    -5%    -29%
+ sys time (sec)             2,566.69      1,844.32      1,592.02   -14%    -41%
+                                                                      
+ -------------------------------------------------------------------------------
+ memcg_high                  477,219       616,897       683,170      
+ memcg_swap_fail               1,040         2,734         2,330      
+ zswpout                  48,931,670    55,520,017    57,467,487      
+ zswpin                          384           491           415      
+ pswpout                           0             0             0      
+ pswpin                            0             0             0      
+ thp_swpout                        0             0             0      
+ thp_swpout_fallback               0             0             0      
+ 16kB-swpout_fallback              0             0             0                                                
+ 32kB_swpout_fallback              0             0             0      
+ 64kB_swpout_fallback          1,040         2,734         2,330      
+ pgmajfault                    3,258         3,314         3,251      
+ swap_ra                          95           128           112      
+ swap_ra_hit                      46            49            61      
+ ZSWPOUT-16kB                      2             4             3      
+ ZSWPOUT-32kB                      0             2             0      
+ ZSWPOUT-64kB              3,057,203     3,467,400     3,589,487      
+ SWPOUT-16kB                       0             0             0      
+ SWPOUT-32kB                       0             0             0      
+ SWPOUT-64kB                       0             0             0      
+ -------------------------------------------------------------------------------
+
+
+ 2M folios: usemem30:
+ ====================
+
+ -------------------------------------------------------------------------------
+                            mm-unstable-11-18-2024   v4 of this patch-series
+ -------------------------------------------------------------------------------
+ zswap compressor               zstd   deflate-iaa   deflate-iaa   IAA Batching          
+ vm.page-cluster                   2             2             2     vs.     vs.
+                                                                     Seq    zstd
+ -------------------------------------------------------------------------------
+ Total throughput (KB/s)   6,466,700     7,245,936     9,107,731     26%     39%     
+ Avg throughput (KB/s)       215,556       241,531       303,591     26%     39%     
+ elapsed time (sec)           106.80         84.44         74.37    -12%    -30%     
+ sys time (sec)             2,420.88      1,753.41      1,450.21    -17%    -41%     
+                                                                        
+ -------------------------------------------------------------------------------
+ memcg_high                   60,926        79,259        90,314        
+ memcg_swap_fail                  44           139           182        
+ zswpout                  48,892,828    57,701,156    59,051,023        
+ zswpin                          391           419           411        
+ pswpout                           0             0             0        
+ pswpin                            0             0             0        
+ thp_swpout                        0             0             0        
+ thp_swpout_fallback              44           139           182        
+ pgmajfault                    4,907        11,542        30,492        
+ swap_ra                       5,070        24,613        80,933        
+ swap_ra_hit                   5,024        24,555        80,856        
+ ZSWPOUT-2048kB               95,442       112,515       114,996        
+ SWPOUT-2048kB                     0             0             0        
+ -------------------------------------------------------------------------------
+
+
+Performance testing (Kernel compilation, allmodconfig):
+=======================================================
+
+The experiments with kernel compilation test, 32 threads, in tmpfs use the
+"allmodconfig" that takes ~12 minutes, and has considerable swapout
+activity. The cgroup's memory.max is set to 2G.
+
+
+ 16k/32k/64k folios: Kernel compilation/allmodconfig:
+ ====================================================
+
+ -------------------------------------------------------------------------------
+                           mm-unstable-11-18-2024    v4 of this patch-series
+ -------------------------------------------------------------------------------
+ zswap compressor             zstd    deflate-iaa    deflate-iaa   IAA Batching          
+ vm.page-cluster                 0              0              0     vs.     vs.
+                                                                    Seq    zstd
+ -------------------------------------------------------------------------------
+ real_sec                   783.15         792.78         789.65
+ user_sec                15,763.86      15,779.60      15,775.48
+ sys_sec                  5,198.29       4,215.74       3,930.92    -7%    -24%
+ -------------------------------------------------------------------------------
+ Max_Res_Set_Size_KB     1,872,932      1,873,444      1,872,896
+ -------------------------------------------------------------------------------
+ memcg_high                      0              0              0
+ memcg_swap_fail                 0              0              0
+ zswpout                88,824,270    109,828,718    109,402,157
+ zswpin                 25,371,781     32,647,096     32,174,520
+ pswpout                       121            360            297
+ pswpin                        122            337            288
+ thp_swpout                      0              0              0
+ thp_swpout_fallback             0              0              0
+ 16kB_swpout_fallback            0              0              0                         
+ 32kB_swpout_fallback            0              0              0
+ 64kB_swpout_fallback          924         19,203          5,206
+ pgmajfault             27,124,258     35,120,147     34,545,319
+ swap_ra                         0              0              0
+ swap_ra_hit                 2,561          3,131          2,380
+ ZSWPOUT-16kB            1,246,641      1,499,293      1,469,160
+ ZSWPOUT-32kB              675,242        865,310        827,968
+ ZSWPOUT-64kB            2,886,860      3,596,899      3,638,188
+ SWPOUT-16kB                     0              0              0
+ SWPOUT-32kB                     1              0              0
+ SWPOUT-64kB                     7             19             18
+ -------------------------------------------------------------------------------
+
+
+Summary:
+========
+The performance testing data with usemem 30 processes and kernel
+compilation test show 39% throughput gains and 41% sys time reduction
+(usemem30) and 24% sys time reduction (kernel compilation) with
+zswap_batch_store() large folios using IAA compress batching as compared to
+zstd.
+
+The iaa_crypto wq stats will show almost the same number of compress calls
+for wq.1 of all IAA devices. wq.0 will handle decompress calls exclusively.
+We see a latency reduction of 2.5% by distributing compress jobs among all
+IAA devices on the socket (based on v1 data).
+
+We can expect to see even more significant performance and throughput
+improvements if we use the parallelism offered by IAA to do reclaim
+batching of 4K/large folios (really any-order folios), and using the
+zswap_batch_store() high throughput compression to batch-compress pages
+comprising these folios, not just batching within large folios. This is the
+reclaim batching patch 13 in v1, which will be submitted in a separate
+patch-series.
+
+Our internal validation of IAA compress/decompress batching in highly
+contended Sapphire Rapids server setups with workloads running on 72 cores
+for ~25 minutes under stringent memory limit constraints have shown up to
+50% reduction in sys time and 3.5% reduction in workload run time as
+compared to software compressors.
+
+
+Changes since v3:
+=================
+1) Rebased to mm-unstable as of 11-18-2024, commit 5a7056135bb6.
+2) Major re-write of iaa_crypto driver's mapping of IAA devices to cores,
+   based on packages instead of NUMA nodes.
+3) Added acomp_has_async_batching() API to crypto acomp, that allows
+   zswap/zram to query if a crypto_acomp has registered batch_compress and
+   batch_decompress interfaces.
+4) Clear the poll bits on the acomp_reqs passed to
+   iaa_comp_a[de]compress_batch() so that a module like zswap can be
+   confident about the acomp_reqs[0] not having the poll bit set before
+   calling the fully synchronous API crypto_acomp_[de]compress().
+   Herbert, I would appreciate it if you can review changes 2-4; in patches
+   1-8 in v4. I did not want to introduce too many iaa_crypto changes in
+   v4, given that patch 7 is already making a major change. I plan to work
+   on incorporating the request chaining using the ahash interface in v5
+   (I need to understand the basic crypto ahash better). Thanks Herbert!
+5) Incorporated Johannes' suggestion to not have a sysctl to enable
+   compress batching.
+6) Incorporated Yosry's suggestion to allocate batching resources in the
+   cpu hotplug onlining code, since there is no longer a sysctl to control
+   batching. Thanks Yosry!
+7) Incorporated Johannes' suggestions related to making the overall
+   sequence of events between zswap_store() and zswap_batch_store() similar
+   as much as possible for readability and control flow, better naming of
+   procedures, avoiding forward declarations, not inlining error path
+   procedures, deleting zswap internal details from zswap.h, etc. Thanks
+   Johannes, really appreciate the direction!
+   I have tried to explain the minimal future-proofing in terms of the
+   zswap_batch_store() signature and the definition of "struct
+   zswap_batch_store_sub_batch" in the comments for this struct. I hope the
+   new code explains the control flow a bit better.
+
+
+Changes since v2:
+=================
+1) Rebased to mm-unstable as of 11-5-2024, commit 7994b7ea6ac8.
+2) Fixed an issue in zswap_create_acomp_ctx() with checking for NULL
+   returned by kmalloc_node() for acomp_ctx->buffers and for
+   acomp_ctx->reqs.
+3) Fixed a bug in zswap_pool_can_batch() for returning true if
+   pool->can_batch_comp is found to be equal to BATCH_COMP_ENABLED, and if
+   the per-cpu acomp_batch_ctx tests true for batching resources having
+   been allocated on this cpu. Also, changed from per_cpu_ptr() to
+   raw_cpu_ptr().
+4) Incorporated the zswap_store_propagate_errors() compilation warning fix
+   suggested by Dan Carpenter. Thanks Dan!
+5) Replaced the references to SWAP_CRYPTO_SUB_BATCH_SIZE in comments in
+   zswap.h, with SWAP_CRYPTO_BATCH_SIZE.
+
+Changes since v1:
+=================
+1) Rebased to mm-unstable as of 11-1-2024, commit 5c4cf96cd702.
+2) Incorporated Herbert's suggestions to use an acomp_req flag to indicate
+   async/poll mode, and to encapsulate the polling functionality in the
+   iaa_crypto driver. Thanks Herbert!
+3) Incorporated Herbert's and Yosry's suggestions to implement the batching
+   API in iaa_crypto and to make its use seamless from zswap's
+   perspective. Thanks Herbert and Yosry!
+4) Incorporated Yosry's suggestion to make it more convenient for the user
+   to enable compress batching, while minimizing the memory footprint
+   cost. Thanks Yosry!
+5) Incorporated Yosry's suggestion to de-couple the shrink_folio_list()
+   reclaim batching patch from this series, since it requires a broader
+   discussion.
+
+
+I would greatly appreciate code review comments for the iaa_crypto driver
+and mm patches included in this series!
+
+Thanks,
+Kanchana
+
+
+
+Kanchana P Sridhar (10):
+  crypto: acomp - Define two new interfaces for compress/decompress
+    batching.
+  crypto: iaa - Add an acomp_req flag CRYPTO_ACOMP_REQ_POLL to enable
+    async mode.
+  crypto: iaa - Implement batch_compress(), batch_decompress() API in
+    iaa_crypto.
+  crypto: iaa - Make async mode the default.
+  crypto: iaa - Disable iaa_verify_compress by default.
+  crypto: iaa - Re-organize the iaa_crypto driver code.
+  crypto: iaa - Map IAA devices/wqs to cores based on packages instead
+    of NUMA.
+  crypto: iaa - Distribute compress jobs from all cores to all IAAs on a
+    package.
+  mm: zswap: Allocate pool batching resources if the crypto_alg supports
+    batching.
+  mm: zswap: Compress batching with Intel IAA in zswap_batch_store() of
+    large folios.
+
+ crypto/acompress.c                         |    2 +
+ drivers/crypto/intel/iaa/iaa_crypto.h      |   18 +-
+ drivers/crypto/intel/iaa/iaa_crypto_main.c | 1637 ++++++++++++++------
+ include/crypto/acompress.h                 |   96 ++
+ include/crypto/internal/acompress.h        |   16 +
+ include/linux/zswap.h                      |   19 +
+ mm/page_io.c                               |   16 +-
+ mm/zswap.c                                 |  759 ++++++++-
+ 8 files changed, 2090 insertions(+), 473 deletions(-)
+
+
+base-commit: 5a7056135bb69da2ce0a42eb8c07968c1331777b
+-- 
+2.27.0
+
