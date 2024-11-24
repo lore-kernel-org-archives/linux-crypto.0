@@ -1,147 +1,115 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C49E16EB42;
-	Sat, 23 Nov 2024 08:14:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30F3910E3;
+	Sun, 24 Nov 2024 03:47:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732349697; cv=none; b=O/cpf4fjflVjOVD9VxJFUEZ+m8LrvkLtWtuzj6DxbbYma0Z0TeP7Z18nBgUoLXi1a5uaMsGSelwR5oKfwiMMDIFQ5P3xv+/zaRdC8/RpZyMmpP/s6lTG2BhLeaydBOXSWDpRKHjexO0iUmyv9qM48GMRPWnOj9VgdC1BfDPXYgs=
+	t=1732420079; cv=none; b=UrZrLF8GsjaqthTT2GLe6etEXfj+gucR8wB2D9yWFFeLVymlQIWlWLZKf2lXhT7P380203JIgcbu8WPpF12xzNnXwhvLxE5X8l6pWDKZTL5ZWIeQONYH0dkCM5NXrj3WZx9TwYihqoUvNVZCl5+orCcSDpsV+43rFkQYrVteuW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732349697; c=relaxed/simple;
-	bh=7tlLamZPrg2kK7rmzmbcfOuSyKFaE8jLagXf2MwKjPY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=g4GI7Vv2Xb4exLynb4hdjk+lbSDORqCSI1mmEedHN52pnobttP4MBv7bg2EYauvQ+hl7pdhAEPEK9PcXAyAooLPsh6hR4K5MsmJgc4gAg+Nvm7E3F6KY6lJMSlN6HscErhOeNSkNAC4xujFDEsPX8AWCGo+73UGG3OnbUMk7lWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4XwPrk4kGCz4f3kK2;
-	Sat, 23 Nov 2024 16:14:30 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 3B1EB1A018C;
-	Sat, 23 Nov 2024 16:14:44 +0800 (CST)
-Received: from hulk-vt.huawei.com (unknown [10.67.174.121])
-	by APP4 (Coremail) with SMTP id gCh0CgAH44bcjkFnuN1dCg--.14086S4;
-	Sat, 23 Nov 2024 16:14:44 +0800 (CST)
-From: Chen Ridong <chenridong@huaweicloud.com>
-To: steffen.klassert@secunet.com,
-	daniel.m.jordan@oracle.com,
-	herbert@gondor.apana.org.au
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	chenridong@huawei.com,
-	wangweiyang2@huawei.com
-Subject: [PATCH 2/2] padata: fix UAF in padata_reorder
-Date: Sat, 23 Nov 2024 08:05:09 +0000
-Message-Id: <20241123080509.2573987-3-chenridong@huaweicloud.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241123080509.2573987-1-chenridong@huaweicloud.com>
-References: <20241123080509.2573987-1-chenridong@huaweicloud.com>
+	s=arc-20240116; t=1732420079; c=relaxed/simple;
+	bh=8cPMfw6PoNjW6ddBq16fmKOWIEvysHhn0isqtuVUBmk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=LUmaNGNvF3ML7FRILMFwRmUVkctMD7YZjis/1Yx9zDvK28UmkMDoiXw7NTPJCOfnj157snt/fSUe3V4NqDjpL0W6MSZ26m1b0+2H0frecLk9BM8xs4+Lobz4OfD4Aplb36T9ggFHorMYrb8Ns3tk8E/13ZHPsHRQT1kx/D9m7yo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=PMC6lhnV; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="PMC6lhnV"
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AO2Pfip030064;
+	Sun, 24 Nov 2024 03:47:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	ebVIz2B0tpcSE0N9hw3kbmVkL1bXOlcrVMgCsiihGfY=; b=PMC6lhnV3cln0c8A
+	c/22MsyqvyYVv7rDfwCfTK2cIiKqZLSd6JpFMPmr4zexAr6TPUCBP5RcWU/tMxF3
+	vItf716UH+mDHeXsNf7vRskfkJbMcN72fxqZwzHiLXo1KDpeNeiPSNczfmeLuL6k
+	Qu46ChBmE9e2M9rlKgviD8USHhpepnbd7bj74gKlSj+lyvy7gzanyWmYpd39f/D4
+	awNrq0b8JtNQockh1lX7nf7GPif++zoTOsDrmO0fYEjUJ/oMAw+F/+2WVEdzZxRZ
+	3WT4VeiQYo4Oc84lKVNOtnAWJJrL41aHBPpc7Ypj3GiGnZ56O4Fijcr6WT9kHZrN
+	AyFWnQ==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4336mx9nnh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 24 Nov 2024 03:47:49 +0000 (GMT)
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4AO3lm2F024490
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sun, 24 Nov 2024 03:47:48 GMT
+Received: from [10.216.25.141] (10.80.80.8) by nalasex01b.na.qualcomm.com
+ (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Sat, 23 Nov
+ 2024 19:47:43 -0800
+Message-ID: <0bdaa2ef-3979-4963-be75-0a5a89728f44@quicinc.com>
+Date: Sun, 24 Nov 2024 09:17:40 +0530
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgAH44bcjkFnuN1dCg--.14086S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7CFWxXw48KFyfCFy7ur4DJwb_yoW5Jry5pF
-	W5CrW7JrW8Gr18Jw13ZFyxZryrWF1DuF13KFWrCFn3CrW3Jr18Arn7tw1FgryFgryvyw1D
-	Zayqqa4xtwsFqFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUPab4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUXw
-	A2048vs2IY020Ec7CjxVAFwI0_Gr0_Xr1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
-	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
-	W8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMc
-	Ij6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_
-	Jr0_Gr1lF7xvr2IYc2Ij64vIr41lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr4
-	1l4c8EcI0Ec7CjxVAaw2AFwI0_JF0_Jw1l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAq
-	x4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r
-	1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF
-	7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxV
-	WUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU
-	cBT5DUUUU
-X-CM-SenderInfo: hfkh02xlgr0w46kxt4xhlfz01xgou0bp/
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V4 2/2] arm64: dts: qcom: qcs8300: add TRNG node
+To: Krzysztof Kozlowski <krzk@kernel.org>,
+        Herbert Xu
+	<herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Rob
+ Herring" <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        "Conor
+ Dooley" <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        "Konrad Dybcio" <konradybcio@kernel.org>,
+        Vinod Koul <vkoul@kernel.org>
+CC: <linux-arm-msm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Konrad Dybcio
+	<konrad.dybcio@oss.qualcomm.com>
+References: <20241122074346.4084606-1-quic_yrangana@quicinc.com>
+ <20241122074346.4084606-3-quic_yrangana@quicinc.com>
+ <40c49e6d-dbbd-49cf-b59b-10e10b24da22@kernel.org>
+Content-Language: en-US
+From: Yuvaraj Ranganathan <quic_yrangana@quicinc.com>
+In-Reply-To: <40c49e6d-dbbd-49cf-b59b-10e10b24da22@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: efob-2Xpg7uH5oB6b4LcLQTXO0nCv3wd
+X-Proofpoint-GUID: efob-2Xpg7uH5oB6b4LcLQTXO0nCv3wd
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 mlxscore=0
+ adultscore=0 impostorscore=0 phishscore=0 spamscore=0 lowpriorityscore=0
+ clxscore=1015 suspectscore=0 bulkscore=0 priorityscore=1501
+ mlxlogscore=687 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411240029
 
-From: Chen Ridong <chenridong@huawei.com>
+Hi Krzysztof,
 
-A bug was found when run ltp test:
+I sincerely apologize for the inconvenience. I added the "Reviewed-by"
+tag without fully understanding its implications. I will remove the tag
+in the next patch series.
 
-BUG: KASAN: slab-use-after-free in padata_find_next+0x29/0x1a0
-Read of size 4 at addr ffff88bbfe003524 by task kworker/u113:2/3039206
+Thanks,
+Yuvaraj.
 
-CPU: 0 PID: 3039206 Comm: kworker/u113:2 Kdump: loaded Not tainted 6.6.0+
-Workqueue: pdecrypt_parallel padata_parallel_worker
-Call Trace:
-<TASK>
-dump_stack_lvl+0x32/0x50
-print_address_description.constprop.0+0x6b/0x3d0
-print_report+0xdd/0x2c0
-kasan_report+0xa5/0xd0
-padata_find_next+0x29/0x1a0
-padata_reorder+0x131/0x220
-padata_parallel_worker+0x3d/0xc0
-process_one_work+0x2ec/0x5a0
-
-If 'mdelay(10)' is added before calling 'padata_find_next' in the
-'padata_reorder' function, this issue could be reproduced easily with
-ltp test (pcrypt_aead01).
-
-This can be explained as bellow:
-
-pcrypt_aead_encrypt
-...
-padata_do_parallel
-refcount_inc(&pd->refcnt); // add refcnt
-...
-padata_do_serial
-padata_reorder // pd
-while (1) {
-padata_find_next(pd, true); // using pd
-queue_work_on
-...
-padata_serial_worker				crypto_del_alg
-padata_put_pd_cnt // sub refcnt
-						padata_free_shell
-						padata_put_pd(ps->pd);
-						// pd is freed
-// loop again, but pd is freed
-// call padata_find_next, UAF
-}
-
-In the padata_reorder function, when it loops in 'while', if the alg is
-deleted, the refcnt may be decreased to 0 before entering
-'padata_find_next', which leads to UAF, To fix this issue, add refcnt in
-the padata_reorder to avoid UAF.
-
-Fixes: b128a3040935 ("padata: allocate workqueue internally")
-Signed-off-by: Chen Ridong <chenridong@huawei.com>
-Signed-off-by: Qu Zicheng <quzicheng@huawei.com>
----
- kernel/padata.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/kernel/padata.c b/kernel/padata.c
-index 5d8e18cdcb25..627014825266 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -319,6 +319,7 @@ static void padata_reorder(struct parallel_data *pd)
- 	if (!spin_trylock_bh(&pd->lock))
- 		return;
- 
-+	padata_get_pd(pd);
- 	while (1) {
- 		padata = padata_find_next(pd, true);
- 
-@@ -355,6 +356,7 @@ static void padata_reorder(struct parallel_data *pd)
- 	reorder = per_cpu_ptr(pd->reorder_list, pd->cpu);
- 	if (!list_empty(&reorder->list) && padata_find_next(pd, false))
- 		queue_work(pinst->serial_wq, &pd->reorder_work);
-+	padata_put_pd(pd);
- }
- 
- static void invoke_padata_reorder(struct work_struct *work)
--- 
-2.34.1
+On 11/22/2024 8:30 PM, Krzysztof Kozlowski wrote:
+> On 22/11/2024 08:43, Yuvaraj Ranganathan wrote:
+>> The qcs8300 SoC has a True Random Number Generator, add the node with
+>> the correct compatible set.
+>>
+>> Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+>> Reviewed-by: Krzysztof Kozlowski <krzk+dt@kernel.org>
+> 
+> NAK, stop adding fake tags. It is impossible to receive above tag from
+> me written that way.
+> 
+> Best regards,
+> Krzysztof
 
