@@ -1,201 +1,115 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A465F156F5D;
-	Mon, 25 Nov 2024 04:12:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7928A2500AC;
+	Mon, 25 Nov 2024 06:05:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732507970; cv=none; b=l13x/AILC1+/MEFK3Ike5t/W8JlxbcWC+Ak8cJTrHYy1WoDPip522Z6PK75GpjgMCo9AmBUamQzYN3QA+2cL0D3w0QnKhkVkQoTU+RcDv+DUAljOJ/9bkRiK6qNRMLvOaqOlOEljd6cVgbYxy/jn+/mVaMtdqwUrAgjC/4FK7x0=
+	t=1732514738; cv=none; b=S0iDLGHW9xmiTh8MY/a9JFSG8Q9DCelVsz+88YtzDZM9xMZObf4hfpPSC3aOkw3mVINt2qoOCmrbJxuucNbgoErsxmJUsJuHmr9QvBuLvVWAFhmSB9+4mbIgwLCkhmRIE6soG6yNpokqUgYE7CmpGSCWn+t2RSbrSvPSz4LaUFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732507970; c=relaxed/simple;
-	bh=Im0exUZQfnAWeYCHy4KFp6kY8DqEkpJ4gHD7VgIxHhk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FcbgEZfMz1KK4b/sScuhNltsAInyB0/5WI0qpaA3W60q6KyWiwwUCUfPxc4MKOmO52n2oHM4QUNZ5L+YaK8bRhb6YRcVbXB4I61zP9Y49m8TlJC1aOrKStsZKiGQQhHayL8+UG7wnaldEnELfSrJfke+LSStaM2qgvdnRZGSZjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RnFtx5tz; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1732514738; c=relaxed/simple;
+	bh=an8rWgreDm74MFOtPYXXmdZtuxQirXtzQLDHzx7rjA8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=IfPd06HlQ8ZWpyV/hSn5ldsFJvXkHrQwwjJYe+E3JfRgMsjODXteLBmTBLSYduTnZo+zYK3CdWjD724GdkJU1E6a2oSNyW4q5K3U7QUPoKuRmSOp9H+7INbaq19pSLR2SEjn6+qX1ZxVzTPwm9k04rCetXjQXh1DeYg+apsW0jE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=RNWBb/gi; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RnFtx5tz"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11E19C4CEE4;
-	Mon, 25 Nov 2024 04:12:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732507970;
-	bh=Im0exUZQfnAWeYCHy4KFp6kY8DqEkpJ4gHD7VgIxHhk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=RnFtx5tzOnJoFKt8Ii9puP18+iDvpDwwprL0cSNvV6GQIdJOsytF1Vz1mzFjZDKcN
-	 zZMyV7oDL6qfSk+I1yNiGycUnLRkAaxSC0rOx3mf6sBT0ylcW21i7vydL62tPZ7r9v
-	 22F5Wi+E93hV87ew4cS4qg6Uux8RNuj/Fbl4cdoy5zBNHfrGnQBJRz17h34nvd3n4k
-	 uTgwDoctpuEcgwfv8iaR+ycQZKu8UD/I/WSAgJaRmHT4/n7/2IZza8Ui87WKV3e13A
-	 +rzpwjoAC6kkSvmAG+v2Vd+n46Q4PUxo4ilyaoyva5NfFNMeu5Kn068Er68mSfDdWb
-	 DrCKGmWI6/M1g==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org,
-	x86@kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>
-Subject: [PATCH 6/6] x86/crc32: implement crc32_be using new template
-Date: Sun, 24 Nov 2024 20:11:29 -0800
-Message-ID: <20241125041129.192999-7-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241125041129.192999-1-ebiggers@kernel.org>
-References: <20241125041129.192999-1-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="RNWBb/gi"
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AP0K1bn027857;
+	Mon, 25 Nov 2024 06:00:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	Lnh/3KAUnuT2JLXbUybTyaOGYoch3HRaIrGB4ANrgSE=; b=RNWBb/gikWhN9mSV
+	lsdWKiPC1j3km7+m4Y1Z43eXT5mrd+stk4o+brv+QgK9qwoBwqXmrFPTP1Wjo4mA
+	TG5kix/BsVg+U2FqU30Jd0NuPkL9PzcqfhWgsnO4QpgGiVa7UmYvJdwewuT87oq1
+	nUOMDE0o9IF5syJFpuBMAVN0QZc832a4er/UTj0EJWp7B3EqvSPP1v2a9XT8TZ4S
+	A5QSTmiliwJRRQhYtvbPYlTxKLQbpIWglcdJwdoCtWy0R6kkwZEj2FkgCQprzHVv
+	nVRPp18kqGket4s7J2QUzxsWIHqSCe09CVxy2tmX6lkLGtZKJDe1i5h+gQCKz4hU
+	ElQUNA==
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 433792bgpw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 25 Nov 2024 06:00:28 +0000 (GMT)
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+	by NALASPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4AP60RaQ020971
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 25 Nov 2024 06:00:28 GMT
+Received: from [10.217.238.57] (10.80.80.8) by nalasex01b.na.qualcomm.com
+ (10.47.209.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Sun, 24 Nov
+ 2024 22:00:23 -0800
+Message-ID: <214a7342-cf0e-4ef0-a555-d09bb3ea6301@quicinc.com>
+Date: Mon, 25 Nov 2024 11:30:20 +0530
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V2 2/2] arm64: dts: qcom: qcs8300: enable the inline
+ crypto engine
+To: Krzysztof Kozlowski <krzk@kernel.org>,
+        Herbert Xu
+	<herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Rob
+ Herring" <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        "Conor
+ Dooley" <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        "Konrad Dybcio" <konradybcio@kernel.org>
+CC: <linux-arm-msm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Konrad Dybcio
+	<konrad.dybcio@oss.qualcomm.com>
+References: <20241122132044.30024-1-quic_yrangana@quicinc.com>
+ <20241122132044.30024-3-quic_yrangana@quicinc.com>
+ <bb2da224-2c0a-41de-b458-0c5314ecd90b@kernel.org>
+Content-Language: en-US
+From: Yuvaraj Ranganathan <quic_yrangana@quicinc.com>
+In-Reply-To: <bb2da224-2c0a-41de-b458-0c5314ecd90b@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: H0Eo19SySGUSQeH9okahagMboPhGsGew
+X-Proofpoint-GUID: H0Eo19SySGUSQeH9okahagMboPhGsGew
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ mlxlogscore=724 clxscore=1015 impostorscore=0 mlxscore=0 phishscore=0
+ priorityscore=1501 lowpriorityscore=0 bulkscore=0 suspectscore=0
+ adultscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411250049
 
-From: Eric Biggers <ebiggers@google.com>
+Hi Krzysztof,
 
-crc32_be was previously unoptimized on x86.  Optimize it using the new
-template.  This improves performance by over 25x in some cases.
+Same mistake is done for this patch series as well.
 
-Benchmark results on AMD Ryzen 9 9950X (Zen 5) using crc_kunit:
+I sincerely apologize for the inconvenience. I will remove the tag
+in the next patch series.
 
-	Length     Before        After
-	------     ------        -----
-	     1     389 MB/s      325 MB/s
-	    16    2845 MB/s     2911 MB/s
-	    64    3012 MB/s     6513 MB/s
-	   127    2567 MB/s     9057 MB/s
-	   128    3048 MB/s    11589 MB/s
-	   200    3070 MB/s    14042 MB/s
-	   256    3067 MB/s    20454 MB/s
-	   511    2938 MB/s    26245 MB/s
-	   512    3081 MB/s    36926 MB/s
-	  1024    3090 MB/s    61914 MB/s
-	  3173    3065 MB/s    76201 MB/s
-	  4096    3084 MB/s    82547 MB/s
-	 16384    3084 MB/s    89333 MB/s
+Thanks,
+Yuvaraj.
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- arch/x86/lib/crc-pclmul-consts.h | 49 +++++++++++++++++++++++++++++++-
- arch/x86/lib/crc32-glue.c        |  4 +++
- arch/x86/lib/crc32-pclmul.S      |  1 +
- 3 files changed, 53 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/lib/crc-pclmul-consts.h b/arch/x86/lib/crc-pclmul-consts.h
-index c3ca689eae3b8..f8af6e9278c83 100644
---- a/arch/x86/lib/crc-pclmul-consts.h
-+++ b/arch/x86/lib/crc-pclmul-consts.h
-@@ -1,10 +1,10 @@
- /* SPDX-License-Identifier: GPL-2.0-or-later */
- /*
-  * CRC constants generated by:
-  *
-- *	./scripts/crc/gen-crc-consts.py x86_pclmul crc16_msb_0x8bb7,crc32_lsb_0xedb88320
-+ *	./scripts/crc/gen-crc-consts.py x86_pclmul crc16_msb_0x8bb7,crc32_lsb_0xedb88320,crc32_msb_0x04c11db7
-  *
-  * Do not edit manually.
-  */
- 
- /*
-@@ -97,5 +97,52 @@ static const struct {
- 		0xb4e5b025f7011641,	/* floor(x^95 / G(x)) */
- 		0x1db710641,	/* G(x) */
- 	},
- 	.extract_crc_mask = {0, 0xffffffff},
- };
-+
-+/*
-+ * CRC folding constants generated for most-significant-bit-first CRC-32 using
-+ * G(x) = x^32 + x^26 + x^23 + x^22 + x^16 + x^12 + x^11 + x^10 + x^8 + x^7 +
-+ *        x^5 + x^4 + x^2 + x + 1
-+ */
-+static const struct {
-+	u8 bswap_mask[16];
-+	u64 fold_across_2048_bits_consts[2];
-+	u64 fold_across_1024_bits_consts[2];
-+	u64 fold_across_512_bits_consts[2];
-+	u64 fold_across_256_bits_consts[2];
-+	u64 fold_across_128_bits_consts[2];
-+	u8 shuf_table[48];
-+	u64 barrett_reduction_consts[2];
-+} crc32_msb_0x04c11db7_consts __cacheline_aligned __maybe_unused = {
-+	.bswap_mask = {15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0},
-+	.fold_across_2048_bits_consts = {
-+		0x88fe2237,	/* x^(2048+0) mod G(x) */
-+		0xcbcf3bcb,	/* x^(2048+64) mod G(x) */
-+	},
-+	.fold_across_1024_bits_consts = {
-+		0x567fddeb,	/* x^(1024+0) mod G(x) */
-+		0x10bd4d7c,	/* x^(1024+64) mod G(x) */
-+	},
-+	.fold_across_512_bits_consts = {
-+		0xe6228b11,	/* x^(512+0) mod G(x) */
-+		0x8833794c,	/* x^(512+64) mod G(x) */
-+	},
-+	.fold_across_256_bits_consts = {
-+		0x75be46b7,	/* x^(256+0) mod G(x) */
-+		0x569700e5,	/* x^(256+64) mod G(x) */
-+	},
-+	.fold_across_128_bits_consts = {
-+		0xe8a45605,	/* x^(128+0) mod G(x) */
-+		0xc5b9cd4c,	/* x^(128+64) mod G(x) */
-+	},
-+	.shuf_table = {
-+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-+		 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
-+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-+	},
-+	.barrett_reduction_consts = {
-+		0x04d101df481b4e5a,	/* floor(x^96 / G(x)) - x^64 */
-+		0x104c11db7,	/* G(x) */
-+	},
-+};
-diff --git a/arch/x86/lib/crc32-glue.c b/arch/x86/lib/crc32-glue.c
-index afcdeee429664..326261e503b42 100644
---- a/arch/x86/lib/crc32-glue.c
-+++ b/arch/x86/lib/crc32-glue.c
-@@ -18,10 +18,11 @@
- 
- static DEFINE_STATIC_KEY_FALSE(have_crc32);
- static DEFINE_STATIC_KEY_FALSE(have_pclmulqdq);
- 
- DECLARE_CRC_PCLMUL_FUNCS(crc32_lsb, u32);
-+DECLARE_CRC_PCLMUL_FUNCS(crc32_msb, u32);
- 
- u32 crc32_le_arch(u32 crc, const u8 *p, size_t len)
- {
- 	CRC_PCLMUL(crc, p, len, crc32_lsb, crc32_lsb_0xedb88320_consts,
- 		   have_pclmulqdq, IS_ENABLED(CONFIG_CRC32_SLICEBY8));
-@@ -69,10 +70,12 @@ u32 crc32c_le_arch(u32 crc, const u8 *p, size_t len)
- }
- EXPORT_SYMBOL(crc32c_le_arch);
- 
- u32 crc32_be_arch(u32 crc, const u8 *p, size_t len)
- {
-+	CRC_PCLMUL(crc, p, len, crc32_msb, crc32_msb_0x04c11db7_consts,
-+		   have_pclmulqdq, IS_ENABLED(CONFIG_CRC32_SLICEBY8));
- 	return crc32_be_base(crc, p, len);
- }
- EXPORT_SYMBOL(crc32_be_arch);
- 
- static int __init crc32_x86_init(void)
-@@ -80,10 +83,11 @@ static int __init crc32_x86_init(void)
- 	if (boot_cpu_has(X86_FEATURE_XMM4_2))
- 		static_branch_enable(&have_crc32);
- 	if (boot_cpu_has(X86_FEATURE_PCLMULQDQ)) {
- 		static_branch_enable(&have_pclmulqdq);
- 		INIT_CRC_PCLMUL(crc32_lsb);
-+		INIT_CRC_PCLMUL(crc32_msb);
- 	}
- 	return 0;
- }
- arch_initcall(crc32_x86_init);
- 
-diff --git a/arch/x86/lib/crc32-pclmul.S b/arch/x86/lib/crc32-pclmul.S
-index cf07d571ae864..d562944211d4d 100644
---- a/arch/x86/lib/crc32-pclmul.S
-+++ b/arch/x86/lib/crc32-pclmul.S
-@@ -2,5 +2,6 @@
- // Copyright 2024 Google LLC
- 
- #include "crc-pclmul-template.S"
- 
- DEFINE_CRC_PCLMUL_FUNCS(crc32_lsb, /* bits= */ 32, /* lsb= */ 1)
-+DEFINE_CRC_PCLMUL_FUNCS(crc32_msb, /* bits= */ 32, /* lsb= */ 0)
--- 
-2.47.0
+On 11/22/2024 8:25 PM, Krzysztof Kozlowski wrote:
+> On 22/11/2024 14:20, Yuvaraj Ranganathan wrote:
+>> Add an ICE node to qcs8300 SoC description and enable it by adding a
+>> phandle to the UFS node.
+>>
+>> Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+> 
+> This did not happen. Provide a proof (lore link).
+> 
+> Best regards,
+> Krzysztof
 
