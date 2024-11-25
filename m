@@ -1,131 +1,129 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F842944F;
-	Mon, 25 Nov 2024 13:01:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 870C218A922;
+	Mon, 25 Nov 2024 13:18:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732539668; cv=none; b=A4zT/YMwA52KqOrKxcu9st2QVgUxQ63wSgxMWd79AdUZJACzvhJUE6tJhdR5uC7gQL1tDujUK06osujK3Hs76KLuQp3lQAgqV+PnOYbFMI6nwHrKXINrmvXCmRTDAtIGe6QlSGfQcF+kneLwXOvNgcnhadQKC2pYw9+0NuUpjUg=
+	t=1732540686; cv=none; b=b+Ogm9Thk2SRR29OxRnoEj1D1zNuVuew4DdW0NLN72NU3d5WkiGXcuBjHvHKhhiwTa8RoV6QK5twlpq9jJxmrD28vp1PxA4SMG3/tzRARNr3nrBhSQ1ZhlDUqlZYB+q7dg4TIa5CpjAzcZ9flfmzpbVMvaFAXq7j5ATesYMGz1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732539668; c=relaxed/simple;
-	bh=gDJf6rHg+Qb5l0FZNv7g1GARXrlNNMdpltVEwlOij2g=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=PkTDNtyrdeXm2lwDICiGXCuWaj6/Huf287zL1fMv9gEXJmKxKOj7n+k3/GUV/vVNMF3OcBozQbfzgE99PA97g9rsfQp8CfiyCxgjYx4h/UeI+m7P1grmdIlfOOgeWti6UNmytFCUVWKZhPKE4aE6mzLUUf9EMn+0TbeoqC95IQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=SUlqIfw5; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1732540686; c=relaxed/simple;
+	bh=90GdErDfqH3TbSI8xoxeF3mLsBpbfOPnjyRbEkwAr8I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=vFnPDel4sf/IE0ClfC6wN52IRXdrorR4QgOhgp2gwG7lpPX6GfpBGvc5UmBU1M/sNUK4orLvjcFz3GkgtPT8n+8Ijc2yzlvuBBgPC1yQJSucHT/v1Mu1yBRVxOAbRGDQBRz4yHtB1U1UgzeEqmWrMNcLadTCkI2VZMQWAZhbxHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=M3JQE0o0; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="SUlqIfw5"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AP2EEmE012686;
-	Mon, 25 Nov 2024 13:00:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:to; s=pp1;
-	 bh=5xXhWntJHkm/g/4ib3EBGI1It7tyI4R6QaD/g1HIGXY=; b=SUlqIfw5OVnV
-	2ILKDxfbl9Lo4oWhfdt+lmUh9HB2OOOJJXqRSCaLuGzVjhbEX6XLr0CcVYsc1/wn
-	AhKMFMve4ybpTtY3pFf38QKaiNUGYZdT5iyfhaQjmSrSbokLdjaXJN0QPF/d4btC
-	bemFev+sftLRt/KGgpr8SM9C3omZkObisNhl9siBsUR56HAQVz6B3nQuhYVdIPUG
-	U4sEUSN4wYQX3knlPk0+bACTwnh42E0PYjV5+VKdKAJseP+oqgYj3m5svaPmYI8c
-	D4ZA22Acj6j8oPmCG7AyLnsGGZ4E2tyoC9OUIjdCgL1wWRXJ4a9u6jOK79MVVzw5
-	WeoBcya9TA==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43389c8fdj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 25 Nov 2024 13:00:54 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4APC2752024887;
-	Mon, 25 Nov 2024 13:00:53 GMT
-Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 433tvjxjd6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 25 Nov 2024 13:00:53 +0000
-Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4APD0qIv52429302
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 25 Nov 2024 13:00:53 GMT
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CD1635805C;
-	Mon, 25 Nov 2024 13:00:52 +0000 (GMT)
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8D1F25805F;
-	Mon, 25 Nov 2024 13:00:52 +0000 (GMT)
-Received: from ltc.linux.ibm.com (unknown [9.5.196.140])
-	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 25 Nov 2024 13:00:52 +0000 (GMT)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="M3JQE0o0"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1732540685; x=1764076685;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=90GdErDfqH3TbSI8xoxeF3mLsBpbfOPnjyRbEkwAr8I=;
+  b=M3JQE0o010b0uL5uFgoEa2sCDXScG8IiKTbVmKmpcxusWMq8DGjjX0wK
+   iZKzykWmPZ1UHEfU2CUY5syic47LDe+x3zUVWgeklscXMF7OfHZmYkqpG
+   XPcYTnMoUQ2u2TCG6PtqBeDBRoXSqP1B+rLOKt4wIPwftZlRH+HDaKsXz
+   /QQ3DZDNedZkL6NXjsLVJGXg7u/e4gZUlddWOKgYL8Aa9WRCq1R3QyDUz
+   v399e4ld3CwNO+AUCe8gS2pH8A3LTav8QRNLVixrZAflTQdi2SrowILzO
+   T1NX1XVHZKVPIKAiCRXT9WdGhkyR5TJ8aD1gHy+bPcfKB34rbNuFssMpO
+   g==;
+X-CSE-ConnectionGUID: OjgxB8pQRZWI3YaLrW1jWA==
+X-CSE-MsgGUID: y0u1KQpLRN+gXthM66YtyA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11267"; a="43145213"
+X-IronPort-AV: E=Sophos;i="6.12,182,1728975600"; 
+   d="scan'208";a="43145213"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2024 05:18:04 -0800
+X-CSE-ConnectionGUID: Qv+DsYSFQWqk/plthBEMMQ==
+X-CSE-MsgGUID: wsOnNtBsT8m5Z3MeEKLcwQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,182,1728975600"; 
+   d="scan'208";a="91161329"
+Received: from lkp-server01.sh.intel.com (HELO 8122d2fc1967) ([10.239.97.150])
+  by orviesa010.jf.intel.com with ESMTP; 25 Nov 2024 05:18:02 -0800
+Received: from kbuild by 8122d2fc1967 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tFYyV-0006QD-1E;
+	Mon, 25 Nov 2024 13:17:59 +0000
+Date: Mon, 25 Nov 2024 21:17:12 +0800
+From: kernel test robot <lkp@intel.com>
+To: Chen Ridong <chenridong@huaweicloud.com>, steffen.klassert@secunet.com,
+	daniel.m.jordan@oracle.com, herbert@gondor.apana.org.au
+Cc: oe-kbuild-all@lists.linux.dev, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, chenridong@huawei.com,
+	wangweiyang2@huawei.com
+Subject: Re: [PATCH 1/2] padata: add pd get/put refcnt helper
+Message-ID: <202411252108.XGoGQSTI-lkp@intel.com>
+References: <20241123080509.2573987-2-chenridong@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Mon, 25 Nov 2024 14:00:52 +0100
-From: Harald Freudenberger <freude@linux.ibm.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Eric Biggers <ebiggers@kernel.org>, davem@davemloft.net,
-        dengler@linux.ibm.com, linux-s390@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v5 3/3] s390/crypto: New s390 specific protected key hash
- phmac
-Reply-To: freude@linux.ibm.com
-Mail-Reply-To: freude@linux.ibm.com
-In-Reply-To: <Z0QUl_eSUwEANb4s@gondor.apana.org.au>
-References: <20241122143427.135682-1-freude@linux.ibm.com>
- <20241122143427.135682-4-freude@linux.ibm.com>
- <Z0QUl_eSUwEANb4s@gondor.apana.org.au>
-Message-ID: <079dc622ca9f4b6883c62025adb336b9@linux.ibm.com>
-X-Sender: freude@linux.ibm.com
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 80-1bIJQS_nHMMkwAm6lSGPJcKZXpzuT
-X-Proofpoint-ORIG-GUID: 80-1bIJQS_nHMMkwAm6lSGPJcKZXpzuT
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=650
- adultscore=0 lowpriorityscore=0 impostorscore=0 spamscore=0 clxscore=1011
- suspectscore=0 bulkscore=0 priorityscore=1501 phishscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
- definitions=main-2411250111
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241123080509.2573987-2-chenridong@huaweicloud.com>
 
-On 2024-11-25 07:09, Herbert Xu wrote:
-> On Fri, Nov 22, 2024 at 03:34:27PM +0100, Harald Freudenberger wrote:
->> 
->> +static inline int phmac_keyblob2pkey(const u8 *key, unsigned int 
->> keylen,
->> +				     struct phmac_protkey *pk)
->> +{
->> +	int i, rc = -EIO;
->> +
->> +	/* try three times in case of busy card */
->> +	for (i = 0; rc && i < 3; i++) {
->> +		if (rc == -EBUSY && msleep_interruptible(1000))
->> +			return -EINTR;
-> 
-> You can't sleep in crypto calls in general.
-> 
-> Now there are specific circumstances where sleeping is allowed,
-> e.g., when the MAY_SLEEP flag is set, but I don't think this will
-> be acceptable for your purpose.
-> 
-> I see the same problem exists in paes_s390, which was not reviewed
-> on linux-crypto.
-> 
-> So what exactly causes the EBUSY? The 3 retries followed by failure
-> seem rather dangerous too given that this could be used by the block
-> layer for critical data that cannot fail.
-> 
-> Cheers,
+Hi Chen,
 
-Well, I fear the paes implementation is similar broken. The EBUSY
-is a reaction of the zcrpyt/AP bus when no eligible crypto card has
-been found and a ansynchronous bus scan is running. In that case the
-caller should retry in the hope that the bus scan detects a eligible 
-card.
-Please note that the sleep only happens in in_task() context for the
-paes implementation.
-For the phmac implementation - didn't you suggest to wrap this with
-an asynchronous hmac to be able to sleep in the wrapped synchronous 
-hmac?
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on linus/master]
+[also build test WARNING on v6.12 next-20241125]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Chen-Ridong/padata-add-pd-get-put-refcnt-helper/20241125-111043
+base:   linus/master
+patch link:    https://lore.kernel.org/r/20241123080509.2573987-2-chenridong%40huaweicloud.com
+patch subject: [PATCH 1/2] padata: add pd get/put refcnt helper
+config: x86_64-randconfig-161-20241125 (https://download.01.org/0day-ci/archive/20241125/202411252108.XGoGQSTI-lkp@intel.com/config)
+compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241125/202411252108.XGoGQSTI-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202411252108.XGoGQSTI-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> kernel/padata.c:1134:24: warning: variable 'pd' set but not used [-Wunused-but-set-variable]
+    1134 |         struct parallel_data *pd;
+         |                               ^
+   1 warning generated.
+
+
+vim +/pd +1134 kernel/padata.c
+
+bbefa1dd6a6d53 Herbert Xu   2019-11-26  1126  
+bbefa1dd6a6d53 Herbert Xu   2019-11-26  1127  /**
+bbefa1dd6a6d53 Herbert Xu   2019-11-26  1128   * padata_free_shell - free a padata shell
+bbefa1dd6a6d53 Herbert Xu   2019-11-26  1129   *
+bbefa1dd6a6d53 Herbert Xu   2019-11-26  1130   * @ps: padata shell to free
+bbefa1dd6a6d53 Herbert Xu   2019-11-26  1131   */
+bbefa1dd6a6d53 Herbert Xu   2019-11-26  1132  void padata_free_shell(struct padata_shell *ps)
+bbefa1dd6a6d53 Herbert Xu   2019-11-26  1133  {
+7ddc21e317b360 WangJinchao  2023-10-16 @1134  	struct parallel_data *pd;
+7ddc21e317b360 WangJinchao  2023-10-16  1135  
+07b24c7c08bdc2 Eric Biggers 2020-02-25  1136  	if (!ps)
+07b24c7c08bdc2 Eric Biggers 2020-02-25  1137  		return;
+bbefa1dd6a6d53 Herbert Xu   2019-11-26  1138  
+07b24c7c08bdc2 Eric Biggers 2020-02-25  1139  	mutex_lock(&ps->pinst->lock);
+bbefa1dd6a6d53 Herbert Xu   2019-11-26  1140  	list_del(&ps->list);
+7ddc21e317b360 WangJinchao  2023-10-16  1141  	pd = rcu_dereference_protected(ps->pd, 1);
+31df8a12c672a5 Chen Ridong  2024-11-23  1142  	padata_put_pd(ps->pd);
+07b24c7c08bdc2 Eric Biggers 2020-02-25  1143  	mutex_unlock(&ps->pinst->lock);
+bbefa1dd6a6d53 Herbert Xu   2019-11-26  1144  
+bbefa1dd6a6d53 Herbert Xu   2019-11-26  1145  	kfree(ps);
+bbefa1dd6a6d53 Herbert Xu   2019-11-26  1146  }
+bbefa1dd6a6d53 Herbert Xu   2019-11-26  1147  EXPORT_SYMBOL(padata_free_shell);
+bbefa1dd6a6d53 Herbert Xu   2019-11-26  1148  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
