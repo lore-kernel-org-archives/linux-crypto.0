@@ -1,62 +1,48 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from bmailout1.hostsharing.net (bmailout1.hostsharing.net [83.223.95.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 870C218A922;
-	Mon, 25 Nov 2024 13:18:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A628189902;
+	Mon, 25 Nov 2024 14:49:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732540686; cv=none; b=b+Ogm9Thk2SRR29OxRnoEj1D1zNuVuew4DdW0NLN72NU3d5WkiGXcuBjHvHKhhiwTa8RoV6QK5twlpq9jJxmrD28vp1PxA4SMG3/tzRARNr3nrBhSQ1ZhlDUqlZYB+q7dg4TIa5CpjAzcZ9flfmzpbVMvaFAXq7j5ATesYMGz1I=
+	t=1732546159; cv=none; b=Y3Eg3YSy9vjjFVvxXCygp3TiLGKpEdjzmFd9SUhadGAf8XnEaSRqH3bDRngNh4kOcjR7lq7ZtQcTkDbMQFkSU2mpDCBQZlFuFJccvX1QmTz4rpn3oK6UgyBjTKJKtlaqsAmY6zpYg4okU6hiz7deW4KkRrHjSgqp48UizbTEuEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732540686; c=relaxed/simple;
-	bh=90GdErDfqH3TbSI8xoxeF3mLsBpbfOPnjyRbEkwAr8I=;
+	s=arc-20240116; t=1732546159; c=relaxed/simple;
+	bh=qHRw4mJYZ51r7U3KQtuYVZftXv8lMYjCUNP70Rurk4U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=vFnPDel4sf/IE0ClfC6wN52IRXdrorR4QgOhgp2gwG7lpPX6GfpBGvc5UmBU1M/sNUK4orLvjcFz3GkgtPT8n+8Ijc2yzlvuBBgPC1yQJSucHT/v1Mu1yBRVxOAbRGDQBRz4yHtB1U1UgzeEqmWrMNcLadTCkI2VZMQWAZhbxHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=M3JQE0o0; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="M3JQE0o0"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1732540685; x=1764076685;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=90GdErDfqH3TbSI8xoxeF3mLsBpbfOPnjyRbEkwAr8I=;
-  b=M3JQE0o010b0uL5uFgoEa2sCDXScG8IiKTbVmKmpcxusWMq8DGjjX0wK
-   iZKzykWmPZ1UHEfU2CUY5syic47LDe+x3zUVWgeklscXMF7OfHZmYkqpG
-   XPcYTnMoUQ2u2TCG6PtqBeDBRoXSqP1B+rLOKt4wIPwftZlRH+HDaKsXz
-   /QQ3DZDNedZkL6NXjsLVJGXg7u/e4gZUlddWOKgYL8Aa9WRCq1R3QyDUz
-   v399e4ld3CwNO+AUCe8gS2pH8A3LTav8QRNLVixrZAflTQdi2SrowILzO
-   T1NX1XVHZKVPIKAiCRXT9WdGhkyR5TJ8aD1gHy+bPcfKB34rbNuFssMpO
-   g==;
-X-CSE-ConnectionGUID: OjgxB8pQRZWI3YaLrW1jWA==
-X-CSE-MsgGUID: y0u1KQpLRN+gXthM66YtyA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11267"; a="43145213"
-X-IronPort-AV: E=Sophos;i="6.12,182,1728975600"; 
-   d="scan'208";a="43145213"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2024 05:18:04 -0800
-X-CSE-ConnectionGUID: Qv+DsYSFQWqk/plthBEMMQ==
-X-CSE-MsgGUID: wsOnNtBsT8m5Z3MeEKLcwQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,182,1728975600"; 
-   d="scan'208";a="91161329"
-Received: from lkp-server01.sh.intel.com (HELO 8122d2fc1967) ([10.239.97.150])
-  by orviesa010.jf.intel.com with ESMTP; 25 Nov 2024 05:18:02 -0800
-Received: from kbuild by 8122d2fc1967 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tFYyV-0006QD-1E;
-	Mon, 25 Nov 2024 13:17:59 +0000
-Date: Mon, 25 Nov 2024 21:17:12 +0800
-From: kernel test robot <lkp@intel.com>
-To: Chen Ridong <chenridong@huaweicloud.com>, steffen.klassert@secunet.com,
-	daniel.m.jordan@oracle.com, herbert@gondor.apana.org.au
-Cc: oe-kbuild-all@lists.linux.dev, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, chenridong@huawei.com,
-	wangweiyang2@huawei.com
-Subject: Re: [PATCH 1/2] padata: add pd get/put refcnt helper
-Message-ID: <202411252108.XGoGQSTI-lkp@intel.com>
-References: <20241123080509.2573987-2-chenridong@huaweicloud.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=qAg7msve0fatkxVpVhr1Myl0HqOv5Ab2dBWBKLLLXTqMqQNxdcMk4o8SpvlaE+sLnFKWK1IZoN5acwT3i8tWXAgvpWv5TfmMN2cSX98K39NVJhGIQBHr4fIuPFo1/If2qkfdfiH5i3R0lYrNzjq+QZkeYhsPw5xsxgtH4OmfcZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.95.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
+Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by bmailout1.hostsharing.net (Postfix) with ESMTPS id 0631B30008CA3;
+	Mon, 25 Nov 2024 15:49:11 +0100 (CET)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id E2FC24E9249; Mon, 25 Nov 2024 15:49:10 +0100 (CET)
+Date: Mon, 25 Nov 2024 15:49:10 +0100
+From: Lukas Wunner <lukas@wunner.de>
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: Ard Biesheuvel <ardb@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Zorro Lang <zlang@redhat.com>,
+	Vegard Nossum <vegard.nossum@oracle.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH for-next/fixes] arm64/mm: Fix false-positive
+ !virt_addr_valid() for kernel image
+Message-ID: <Z0SOZhtJohCNxX6_@wunner.de>
+References: <90667b2b7f773308318261f96ebefd1a67133c4c.1732464395.git.lukas@wunner.de>
+ <CAMj1kXFvJGHr_iv6bFQfb89XqPFrNWH7-rV7SFy4QBSWXYC4RA@mail.gmail.com>
+ <CAMj1kXER7AbNyUDjtij6Ni0jVRMg11xvyhkCMKAxaKbx=dsgcQ@mail.gmail.com>
+ <Z0RJaU4wjU5WeQb4@wunner.de>
+ <Z0RWcgrQASMIleRn@J2N7QTR9R3>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -65,65 +51,39 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241123080509.2573987-2-chenridong@huaweicloud.com>
+In-Reply-To: <Z0RWcgrQASMIleRn@J2N7QTR9R3>
 
-Hi Chen,
+On Mon, Nov 25, 2024 at 10:50:48AM +0000, Mark Rutland wrote:
+> On Mon, Nov 25, 2024 at 10:54:49AM +0100, Lukas Wunner wrote:
+> > Other arches do not seem to be concerned about this and
+> > let virt_addr_valid() return true for the kernel image.
+> > It's not clear why arm64 is special and needs to return false.
+> > 
+> > However, I agree there's hardly ever a reason to DMA from/to the
+> > .text section.  From a security perspective, constraining this to
+> > .rodata seems reasonable to me and I'll be happy to amend the patch
+> > to that effect if that's the consensus.
+> 
+> Instead, can we update the test to use lm_alias() on the symbols in
+> question? That'll convert a kernel image address to its linear map
+> alias, and then that'll work with virt_addr_valid(), virt_to_phys(),
+> etc.
 
-kernel test robot noticed the following build warnings:
+Do you mean that sg_set_buf() should pass the address to lm_alias()
+if it points into the kernel image?
 
-[auto build test WARNING on linus/master]
-[also build test WARNING on v6.12 next-20241125]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+That would require a helper to determine whether it's a kernel image
+address or not.  It seems we do not have such a cross-architecture
+helper (but maybe I'm missing something).  (I am adding an arm64-specific
+one in the proposed patch.)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Chen-Ridong/padata-add-pd-get-put-refcnt-helper/20241125-111043
-base:   linus/master
-patch link:    https://lore.kernel.org/r/20241123080509.2573987-2-chenridong%40huaweicloud.com
-patch subject: [PATCH 1/2] padata: add pd get/put refcnt helper
-config: x86_64-randconfig-161-20241125 (https://download.01.org/0day-ci/archive/20241125/202411252108.XGoGQSTI-lkp@intel.com/config)
-compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241125/202411252108.XGoGQSTI-lkp@intel.com/reproduce)
+So this doesn't look like a viable approach.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202411252108.XGoGQSTI-lkp@intel.com/
+Also, I'd expect pushback against an sg_set_buf() change which is
+only necessary to accommodate arm64.  I'd expect the obvious question
+to be asked, which is why arm64's virt_addr_valid() can't behave like
+any other architecture's.  And honestly I wouldn't know what to answer.
 
-All warnings (new ones prefixed by >>):
+Thanks,
 
->> kernel/padata.c:1134:24: warning: variable 'pd' set but not used [-Wunused-but-set-variable]
-    1134 |         struct parallel_data *pd;
-         |                               ^
-   1 warning generated.
-
-
-vim +/pd +1134 kernel/padata.c
-
-bbefa1dd6a6d53 Herbert Xu   2019-11-26  1126  
-bbefa1dd6a6d53 Herbert Xu   2019-11-26  1127  /**
-bbefa1dd6a6d53 Herbert Xu   2019-11-26  1128   * padata_free_shell - free a padata shell
-bbefa1dd6a6d53 Herbert Xu   2019-11-26  1129   *
-bbefa1dd6a6d53 Herbert Xu   2019-11-26  1130   * @ps: padata shell to free
-bbefa1dd6a6d53 Herbert Xu   2019-11-26  1131   */
-bbefa1dd6a6d53 Herbert Xu   2019-11-26  1132  void padata_free_shell(struct padata_shell *ps)
-bbefa1dd6a6d53 Herbert Xu   2019-11-26  1133  {
-7ddc21e317b360 WangJinchao  2023-10-16 @1134  	struct parallel_data *pd;
-7ddc21e317b360 WangJinchao  2023-10-16  1135  
-07b24c7c08bdc2 Eric Biggers 2020-02-25  1136  	if (!ps)
-07b24c7c08bdc2 Eric Biggers 2020-02-25  1137  		return;
-bbefa1dd6a6d53 Herbert Xu   2019-11-26  1138  
-07b24c7c08bdc2 Eric Biggers 2020-02-25  1139  	mutex_lock(&ps->pinst->lock);
-bbefa1dd6a6d53 Herbert Xu   2019-11-26  1140  	list_del(&ps->list);
-7ddc21e317b360 WangJinchao  2023-10-16  1141  	pd = rcu_dereference_protected(ps->pd, 1);
-31df8a12c672a5 Chen Ridong  2024-11-23  1142  	padata_put_pd(ps->pd);
-07b24c7c08bdc2 Eric Biggers 2020-02-25  1143  	mutex_unlock(&ps->pinst->lock);
-bbefa1dd6a6d53 Herbert Xu   2019-11-26  1144  
-bbefa1dd6a6d53 Herbert Xu   2019-11-26  1145  	kfree(ps);
-bbefa1dd6a6d53 Herbert Xu   2019-11-26  1146  }
-bbefa1dd6a6d53 Herbert Xu   2019-11-26  1147  EXPORT_SYMBOL(padata_free_shell);
-bbefa1dd6a6d53 Herbert Xu   2019-11-26  1148  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Lukas
