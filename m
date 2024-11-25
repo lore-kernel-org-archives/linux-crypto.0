@@ -1,54 +1,45 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from bmailout3.hostsharing.net (bmailout3.hostsharing.net [176.9.242.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B54917E00B;
-	Mon, 25 Nov 2024 09:35:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FA2C190662;
+	Mon, 25 Nov 2024 09:54:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.9.242.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732527351; cv=none; b=H0qQ9Xi+9k/f3AHDB6o725bhaR2zy4Wpt7eJdpSKsQJUwn/+SJ2ZxurD87YEf0iTiLWrJsX/2lx53OnntqQqztbqbRRqLBX1nhuKw9E1JxO2VC1WDtY2pmzMUAIDJTGhMr8L8NpOtbcBaeRZLbf/xwc94ZSlAwYh5/PTBaWGXeE=
+	t=1732528495; cv=none; b=PUm+aZVEgMy/kK3NUUDUWzIXmIhxpyl6GF4g0fzUPoIyCYnyHxs0xwvPlwnGIG5K4xfQhZB2qh/RLT+2oN99REJzlY7BdA0yPbKU0brFBRgoTyltOLJHidlE1Vd7ImEaTlwI84eopGu9QbXSCDwgTZHCRXPXMXXs/mjBIAT2jw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732527351; c=relaxed/simple;
-	bh=47pj93BkvbbtlxDpOOOfDW6m/GciuSYLivd4omBASGY=;
+	s=arc-20240116; t=1732528495; c=relaxed/simple;
+	bh=/CLrHMVNx/mePjLWbFiXP/cRihUPLTLPw2Tf94Tmr0w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=alsUL4/eGWsuGBAqYiui7Nilma7OHs97BuWH8nekLTT3mgdStFKn6oiWM664TTN98pD8tO5r4KHD9bhLiXnVwjKBtqkESrPU6SG5jY7NAA/ZOeJ2eGs+xQQwYYwy1/3IqXZ7h6QCl9/INfjelef96QdRkcP+ttYBWjuvmrBFEas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=CAuWej14; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="CAuWej14"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=HXQYfqFbYHuEpAtKnrN5Ri66cSthdBXyLJzdbLH+Tyg=; b=CAuWej143vcmdFoP8d0LRNICnr
-	AaeRfPRREgp6c31jomIXPxipY8NQEhbpj4pW5AeVB44tu5o0ncz7zioS/dUqQnueJgK9NM8OvKemg
-	BW0w3+JkAv36WqcqYCjvR0neQvL89o8ejpmiTHegfdhaizZ0a08XcOUYa0FSXH3G6e8P2HtYfWkHf
-	2ujgEhm2Y55lJzmMX3sgRDpRgLB7Ra2cBDCGApWRxO3zNZtpoZvSQKlRztmL92QEqkOyF2aoHctR0
-	4eDkTVE91+u4GOLgKWgp9hm9zPIbjdFYmSEQ9CQhMTY7liFcCohuPTZurw62Pkr+aVGaMuMjXF4eO
-	fID/9WNw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tFVV6-001VRG-1K;
-	Mon, 25 Nov 2024 17:35:25 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 25 Nov 2024 17:35:24 +0800
-Date: Mon, 25 Nov 2024 17:35:24 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, hannes@cmpxchg.org,
-	yosryahmed@google.com, nphamcs@gmail.com, chengming.zhou@linux.dev,
-	usamaarif642@gmail.com, ryan.roberts@arm.com, ying.huang@intel.com,
-	21cnbao@gmail.com, akpm@linux-foundation.org,
-	linux-crypto@vger.kernel.org, davem@davemloft.net,
-	clabbe@baylibre.com, ardb@kernel.org, ebiggers@google.com,
-	surenb@google.com, kristen.c.accardi@intel.com,
-	wajdi.k.feghali@intel.com, vinodh.gopal@intel.com
-Subject: Re: [PATCH v4 01/10] crypto: acomp - Define two new interfaces for
- compress/decompress batching.
-Message-ID: <Z0RE3Bn1WWANGsvK@gondor.apana.org.au>
-References: <20241123070127.332773-1-kanchana.p.sridhar@intel.com>
- <20241123070127.332773-2-kanchana.p.sridhar@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Gu63QYlwP79ZmPKbrsseX9FNcJMSae1qElwOyqaW/Rsn/oxiGI8N1sON0RgO8kGJ0QgVAsOcZesk2XG66IhO7KGqAS0LFQ+yc6qk/tiObwP60FzrMS0zgdLV2U4AvmcLzUgMwS9CUBGxbjKL9sfUP7R+2G/xrEaRLY1qRxamAqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=176.9.242.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
+Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by bmailout3.hostsharing.net (Postfix) with ESMTPS id C845B100D5868;
+	Mon, 25 Nov 2024 10:54:49 +0100 (CET)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id 84C5020B94A; Mon, 25 Nov 2024 10:54:49 +0100 (CET)
+Date: Mon, 25 Nov 2024 10:54:49 +0100
+From: Lukas Wunner <lukas@wunner.de>
+To: Ard Biesheuvel <ardb@kernel.org>
+Cc: Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Zorro Lang <zlang@redhat.com>,
+	Vegard Nossum <vegard.nossum@oracle.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH for-next/fixes] arm64/mm: Fix false-positive
+ !virt_addr_valid() for kernel image
+Message-ID: <Z0RJaU4wjU5WeQb4@wunner.de>
+References: <90667b2b7f773308318261f96ebefd1a67133c4c.1732464395.git.lukas@wunner.de>
+ <CAMj1kXFvJGHr_iv6bFQfb89XqPFrNWH7-rV7SFy4QBSWXYC4RA@mail.gmail.com>
+ <CAMj1kXER7AbNyUDjtij6Ni0jVRMg11xvyhkCMKAxaKbx=dsgcQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -57,39 +48,46 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241123070127.332773-2-kanchana.p.sridhar@intel.com>
+In-Reply-To: <CAMj1kXER7AbNyUDjtij6Ni0jVRMg11xvyhkCMKAxaKbx=dsgcQ@mail.gmail.com>
 
-On Fri, Nov 22, 2024 at 11:01:18PM -0800, Kanchana P Sridhar wrote:
-> This commit adds batch_compress() and batch_decompress() interfaces to:
-> 
->   struct acomp_alg
->   struct crypto_acomp
-> 
-> This allows the iaa_crypto Intel IAA driver to register implementations for
-> the batch_compress() and batch_decompress() API, that can subsequently be
-> invoked from the kernel zswap/zram swap modules to compress/decompress
-> up to CRYPTO_BATCH_SIZE (i.e. 8) pages in parallel in the IAA hardware
-> accelerator to improve swapout/swapin performance.
-> 
-> A new helper function acomp_has_async_batching() can be invoked to query
-> if a crypto_acomp has registered these batch_compress and batch_decompress
-> interfaces.
-> 
-> Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
-> ---
->  crypto/acompress.c                  |  2 +
->  include/crypto/acompress.h          | 91 +++++++++++++++++++++++++++++
->  include/crypto/internal/acompress.h | 16 +++++
->  3 files changed, 109 insertions(+)
+On Sun, Nov 24, 2024 at 06:13:26PM +0100, Ard Biesheuvel wrote:
+> > On Sun, 24 Nov 2024 at 17:16, Lukas Wunner <lukas@wunner.de> wrote:
+> > > Zorro reports a false-positive BUG_ON() when running crypto selftests on
+> > > boot:  Since commit 1e562deacecc ("crypto: rsassa-pkcs1 - Migrate to
+> > > sig_alg backend"), test_sig_one() invokes an RSA verify operation with a
+> > > test vector in the kernel's .rodata section.  The test vector is passed
+> > > to sg_set_buf(), which performs a virt_addr_valid() check.
+> > >
+> > > On arm64, virt_addr_valid() returns false for kernel image addresses
+> > > such as this one, even though they're valid virtual addresses.
+> > > x86 returns true for kernel image addresses, so the BUG_ON() does not
+> > > occur there.  In fact, x86 has been doing so for 16 years, i.e. since
+> > > commit af5c2bd16ac2 ("x86: fix virt_addr_valid() with
+> > > CONFIG_DEBUG_VIRTUAL=y, v2").
+> > >
+> > > Do the same on arm64 to avoid the false-positive BUG_ON() and to achieve
+> > > consistent virt_addr_valid() behavior across arches.
+[...]
+> that doesn't mean doing DMA from the kernel image is a great
+> idea. Allocations in the linear map are rounded up to cacheline size
+> to ensure that they are safe for non-coherent DMA, but this does not
+> apply to the kernel image. .rodata should still be safe in this
+> regard, but the general idea of allowing kernel image addresses in
+> places where DMA'able virtual addresses are expected is something we
+> should consider with care.
 
-This should be rebased on top of my request chaining patch:
+Other arches do not seem to be concerned about this and
+let virt_addr_valid() return true for the kernel image.
+It's not clear why arm64 is special and needs to return false.
 
-https://lore.kernel.org/linux-crypto/677614fbdc70b31df2e26483c8d2cd1510c8af91.1730021644.git.herbert@gondor.apana.org.au/
+However, I agree there's hardly ever a reason to DMA from/to the
+.text section.  From a security perspective, constraining this to
+.rodata seems reasonable to me and I'll be happy to amend the patch
+to that effect if that's the consensus.
 
-Request chaining provides a perfect fit for batching.
+I'll wait for guidance from arm64 maintainers what the preferred
+approach is.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thanks,
+
+Lukas
