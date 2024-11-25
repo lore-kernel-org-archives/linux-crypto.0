@@ -1,42 +1,39 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F29B828684;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04E302500DE;
 	Mon, 25 Nov 2024 04:12:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732507969; cv=none; b=mbKvgDIJaSLT0TEo0UTQil9IMX2/YV4pfHJMbEzc73kw6lCPOXJoFbKXVKYjOyCOQG+6hpiZzS4UUZc9sbs1PCJJaWTsljYn6g4OVardZLM2RMVOPzESlk6JVuzf5Y5vNvScuA2lK2Bn9QgYt7x/UkhfzyZPnPQ/0sn2PRcsAGg=
+	t=1732507969; cv=none; b=PzaWW3gKIUiX2YdTJvaQC7OZnxnyVaGPQf3PWbrUwMt+Op3G8+IKZUWUO0Y5GkV1MFgnNSot851MM0Jn5dMJsj/TqsTTwyhaxXsGYgY+4tgNy2kB7iPuhmeQVBe8s3KXVitH/x5cXAejgfVY+VOfDbObPB3bLbgmuEgnO8MEqJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1732507969; c=relaxed/simple;
-	bh=K2z+bqdPllLXnkXaOgcFZIyBICogbckaPeIOPNK1P4w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HObIuld3kjFxZMq2aIQpaZX0RXPBYr6FHcBcoMwKfQgEbFLEQpzVAP8Hzx484kZRlpxmarpC3qdwjx8Td0fENnjSxz4E9eqUjHWQpzAu8YqUG/X1b2I+a7ZXaHtoZ5Kb1ihNI+LOtz5GFRiJWbGWA32gP/qvf4AEC8uxGlkeoAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hX0TcKRW; arc=none smtp.client-ip=10.30.226.201
+	bh=UUUA1ZgwPqZlO0/3ylK8xMN9W4suSmmy4ypAl0Eeb5s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TzXy6z5/s/8fruWoGYxyCbl5iH/wHc9zG/BcwzU37LJu7ndLmFKqzF0JWhLki1cZL8CfPA/vBcL4ppMplCwUspXPDmPi90u40fEFfVc69S05GmCw9I5ERRikHYh5fwAJ4XwvYx2l7ztgqh3i8ZpegTKQS1anV0h2rOKD1TnwITI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eV592IhP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hX0TcKRW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A22FBC4CED6;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eV592IhP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 599AAC4CED1;
 	Mon, 25 Nov 2024 04:12:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1732507968;
-	bh=K2z+bqdPllLXnkXaOgcFZIyBICogbckaPeIOPNK1P4w=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hX0TcKRWcodt4aHwM471fRVvfx2Jjr8M2xDXz3mc1WycQQ7Z6qO6siklsvHz9fCiz
-	 VoS1nlMrDbi15r33GjKNJEVBejmIiBjYXEXjG/98SXFF+CXsW+furyoFrM16teclqs
-	 vGbhsMsAEwwXJHzsJjNMfJ+Fcmx0qjP9XBZlYxmT88CqklIFZord4F66xv0H2pG6RI
-	 JLHTsgJmLayr/KscDfwAl1IlQvtvoHjeavhDCkFal8p1xsgA5Uut49iDbpu7uaP88a
-	 lB7D6vWZnJyDYPXwJeaAnqWK1o9hS8sIK7b/EkEyD9ylgqeRTTXbmXy+u0LdlCFtg0
-	 /bv2a+bxak57w==
+	bh=UUUA1ZgwPqZlO0/3ylK8xMN9W4suSmmy4ypAl0Eeb5s=;
+	h=From:To:Cc:Subject:Date:From;
+	b=eV592IhPDawLL+68tcYtw9FXThWgbpRzvTOqtOMDeDKOFSzKYf9xIgSvIV0MLIeBy
+	 k0XyZOrx/sGYYZMuvscXowtVT9XQQBpfpXvEOqVd5klqE5uCWYRZZvJ9//wUGKhh0Y
+	 ILT09ftkrkEhX6OyxmEquzASukyhiINi3QnowQCTGXehFl0ADAYfkIgetEjCTFuWMV
+	 j1fnIVfHaxnJjaiDDLCz5naTURuWM3bWiegbOtM+h9gKk0agYh9Tgw9cjSQQZg9r6H
+	 Hl9w6Cmq+82pqYkzV+9UaRiBkbQbMpxIZFrpLtxA5VxIUVpOPUM9hzLq+JJL0suahW
+	 2oVYvH4vfxUEA==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: linux-crypto@vger.kernel.org,
 	x86@kernel.org,
 	Ard Biesheuvel <ardb@kernel.org>
-Subject: [PATCH 1/6] x86: move zmm exclusion list into CPU feature flag
-Date: Sun, 24 Nov 2024 20:11:24 -0800
-Message-ID: <20241125041129.192999-2-ebiggers@kernel.org>
+Subject: [PATCH 0/6] x86: new optimized CRC functions, with VPCLMULQDQ support
+Date: Sun, 24 Nov 2024 20:11:23 -0800
+Message-ID: <20241125041129.192999-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241125041129.192999-1-ebiggers@kernel.org>
-References: <20241125041129.192999-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -45,139 +42,66 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Eric Biggers <ebiggers@google.com>
+This patchset is also available in git via:
 
-Lift zmm_exclusion_list in aesni-intel_glue.c into the x86 CPU setup
-code, and add a new x86 CPU feature flag X86_FEATURE_PREFER_YMM that is
-set when the CPU is on this list.
+    git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git crc-x86-v1
 
-This allows other code in arch/x86/, such as the CRC library code, to
-apply the same exclusion list when deciding whether to execute 256-bit
-or 512-bit optimized functions.
+This patchset applies on top of my other recent CRC patchsets
+https://lore.kernel.org/r/20241103223154.136127-1-ebiggers@kernel.org/ and
+https://lore.kernel.org/r/20241117002244.105200-1-ebiggers@kernel.org/ .
+Consider it a preview for what may be coming next, as my priority is
+getting those two other patchsets merged first.
 
-Note that full AVX512 support including zmm registers is still exposed
-to userspace and is still supported for in-kernel use.  This flag just
-indicates whether in-kernel code should prefer to use ymm registers.
+This patchset adds a new assembly macro that expands into the body of a
+CRC function for x86 for the specified number of bits, bit order, vector
+length, and AVX level.  There's also a new script that generates the
+constants needed by this function, given a CRC generator polynomial.
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- arch/x86/crypto/aesni-intel_glue.c | 22 +---------------------
- arch/x86/include/asm/cpufeatures.h |  1 +
- arch/x86/kernel/cpu/intel.c        | 22 ++++++++++++++++++++++
- 3 files changed, 24 insertions(+), 21 deletions(-)
+This approach allows easily wiring up an x86-optimized implementation of
+any variant of CRC-8, CRC-16, CRC-32, or CRC-64, including full support
+for VPCLMULQDQ.  On long messages the resulting functions are up to 4x
+faster than the existing PCLMULQDQ optimized functions when they exist,
+or up to 29x faster than the existing table-based functions.
 
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index fbf43482e1f5e..8e648abfb5ab8 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -1534,30 +1534,10 @@ DEFINE_GCM_ALGS(vaes_avx10_256, FLAG_AVX10_256,
- DEFINE_GCM_ALGS(vaes_avx10_512, FLAG_AVX10_512,
- 		"generic-gcm-vaes-avx10_512", "rfc4106-gcm-vaes-avx10_512",
- 		AES_GCM_KEY_AVX10_SIZE, 800);
- #endif /* CONFIG_AS_VAES && CONFIG_AS_VPCLMULQDQ */
- 
--/*
-- * This is a list of CPU models that are known to suffer from downclocking when
-- * zmm registers (512-bit vectors) are used.  On these CPUs, the AES mode
-- * implementations with zmm registers won't be used by default.  Implementations
-- * with ymm registers (256-bit vectors) will be used by default instead.
-- */
--static const struct x86_cpu_id zmm_exclusion_list[] = {
--	X86_MATCH_VFM(INTEL_SKYLAKE_X,		0),
--	X86_MATCH_VFM(INTEL_ICELAKE_X,		0),
--	X86_MATCH_VFM(INTEL_ICELAKE_D,		0),
--	X86_MATCH_VFM(INTEL_ICELAKE,		0),
--	X86_MATCH_VFM(INTEL_ICELAKE_L,		0),
--	X86_MATCH_VFM(INTEL_ICELAKE_NNPI,	0),
--	X86_MATCH_VFM(INTEL_TIGERLAKE_L,	0),
--	X86_MATCH_VFM(INTEL_TIGERLAKE,		0),
--	/* Allow Rocket Lake and later, and Sapphire Rapids and later. */
--	/* Also allow AMD CPUs (starting with Zen 4, the first with AVX-512). */
--	{},
--};
--
- static int __init register_avx_algs(void)
- {
- 	int err;
- 
- 	if (!boot_cpu_has(X86_FEATURE_AVX))
-@@ -1598,11 +1578,11 @@ static int __init register_avx_algs(void)
- 					 ARRAY_SIZE(aes_gcm_algs_vaes_avx10_256),
- 					 aes_gcm_simdalgs_vaes_avx10_256);
- 	if (err)
- 		return err;
- 
--	if (x86_match_cpu(zmm_exclusion_list)) {
-+	if (boot_cpu_has(X86_FEATURE_PREFER_YMM)) {
- 		int i;
- 
- 		aes_xts_alg_vaes_avx10_512.base.cra_priority = 1;
- 		for (i = 0; i < ARRAY_SIZE(aes_gcm_algs_vaes_avx10_512); i++)
- 			aes_gcm_algs_vaes_avx10_512[i].base.cra_priority = 1;
-diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-index 17b6590748c00..948bfa25ccc7b 100644
---- a/arch/x86/include/asm/cpufeatures.h
-+++ b/arch/x86/include/asm/cpufeatures.h
-@@ -477,10 +477,11 @@
- #define X86_FEATURE_CLEAR_BHB_HW	(21*32+ 3) /* BHI_DIS_S HW control enabled */
- #define X86_FEATURE_CLEAR_BHB_LOOP_ON_VMEXIT (21*32+ 4) /* Clear branch history at vmexit using SW loop */
- #define X86_FEATURE_AMD_FAST_CPPC	(21*32 + 5) /* Fast CPPC */
- #define X86_FEATURE_AMD_HETEROGENEOUS_CORES (21*32 + 6) /* Heterogeneous Core Topology */
- #define X86_FEATURE_AMD_WORKLOAD_CLASS	(21*32 + 7) /* Workload Classification */
-+#define X86_FEATURE_PREFER_YMM		(21*32 + 8) /* Avoid zmm registers due to downclocking */
- 
- /*
-  * BUG word(s)
-  */
- #define X86_BUG(x)			(NCAPINTS*32 + (x))
-diff --git a/arch/x86/kernel/cpu/intel.c b/arch/x86/kernel/cpu/intel.c
-index d1de300af1737..0beb44c4ac026 100644
---- a/arch/x86/kernel/cpu/intel.c
-+++ b/arch/x86/kernel/cpu/intel.c
-@@ -519,10 +519,29 @@ static void init_intel_misc_features(struct cpuinfo_x86 *c)
- 
- 	msr = this_cpu_read(msr_misc_features_shadow);
- 	wrmsrl(MSR_MISC_FEATURES_ENABLES, msr);
- }
- 
-+/*
-+ * This is a list of Intel CPUs that are known to suffer from downclocking when
-+ * zmm registers (512-bit vectors) are used.  On these CPUs, when the kernel
-+ * executes SIMD-optimized code such as cryptography functions or CRCs, it
-+ * should prefer 256-bit (ymm) code to 512-bit (zmm) code.
-+ */
-+static const struct x86_cpu_id zmm_exclusion_list[] = {
-+	X86_MATCH_VFM(INTEL_SKYLAKE_X,		0),
-+	X86_MATCH_VFM(INTEL_ICELAKE_X,		0),
-+	X86_MATCH_VFM(INTEL_ICELAKE_D,		0),
-+	X86_MATCH_VFM(INTEL_ICELAKE,		0),
-+	X86_MATCH_VFM(INTEL_ICELAKE_L,		0),
-+	X86_MATCH_VFM(INTEL_ICELAKE_NNPI,	0),
-+	X86_MATCH_VFM(INTEL_TIGERLAKE_L,	0),
-+	X86_MATCH_VFM(INTEL_TIGERLAKE,		0),
-+	/* Allow Rocket Lake and later, and Sapphire Rapids and later. */
-+	{},
-+};
-+
- static void init_intel(struct cpuinfo_x86 *c)
- {
- 	early_init_intel(c);
- 
- 	intel_workarounds(c);
-@@ -602,10 +621,13 @@ static void init_intel(struct cpuinfo_x86 *c)
- 		set_cpu_cap(c, X86_FEATURE_P4);
- 	if (c->x86 == 6)
- 		set_cpu_cap(c, X86_FEATURE_P3);
- #endif
- 
-+	if (x86_match_cpu(zmm_exclusion_list))
-+		set_cpu_cap(c, X86_FEATURE_PREFER_YMM);
-+
- 	/* Work around errata */
- 	srat_detect_node(c);
- 
- 	init_ia32_feat_ctl(c);
- 
+This patchset starts by wiring up the new macro for crc32_le,
+crc_t10dif, and crc32_be.  Later I'd also like to wire up crc64_be and
+crc64_rocksoft, once the design of the library functions for those has
+been fixed to be like what I'm doing for crc32* and crc_t10dif.
+
+A similar approach of sharing code between CRC variants, and vector
+lengths when applicable, should work for other architectures.  The CRC
+constant generation script should be mostly reusable.
+
+Eric Biggers (6):
+  x86: move zmm exclusion list into CPU feature flag
+  scripts/crc: add gen-crc-consts.py
+  x86/crc: add "template" for [V]PCLMULQDQ based CRC functions
+  x86/crc32: implement crc32_le using new template
+  x86/crc-t10dif: implement crc_t10dif using new template
+  x86/crc32: implement crc32_be using new template
+
+ arch/x86/Kconfig                        |   2 +-
+ arch/x86/crypto/aesni-intel_glue.c      |  22 +-
+ arch/x86/include/asm/cpufeatures.h      |   1 +
+ arch/x86/kernel/cpu/intel.c             |  22 +
+ arch/x86/lib/Makefile                   |   2 +-
+ arch/x86/lib/crc-pclmul-consts.h        | 148 ++++++
+ arch/x86/lib/crc-pclmul-template-glue.h |  84 ++++
+ arch/x86/lib/crc-pclmul-template.S      | 588 ++++++++++++++++++++++++
+ arch/x86/lib/crc-t10dif-glue.c          |  22 +-
+ arch/x86/lib/crc16-msb-pclmul.S         |   6 +
+ arch/x86/lib/crc32-glue.c               |  38 +-
+ arch/x86/lib/crc32-pclmul.S             | 220 +--------
+ arch/x86/lib/crct10dif-pcl-asm_64.S     | 332 -------------
+ scripts/crc/gen-crc-consts.py           | 207 +++++++++
+ 14 files changed, 1087 insertions(+), 607 deletions(-)
+ create mode 100644 arch/x86/lib/crc-pclmul-consts.h
+ create mode 100644 arch/x86/lib/crc-pclmul-template-glue.h
+ create mode 100644 arch/x86/lib/crc-pclmul-template.S
+ create mode 100644 arch/x86/lib/crc16-msb-pclmul.S
+ delete mode 100644 arch/x86/lib/crct10dif-pcl-asm_64.S
+ create mode 100755 scripts/crc/gen-crc-consts.py
+
 -- 
 2.47.0
 
