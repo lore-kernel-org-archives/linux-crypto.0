@@ -1,39 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04E302500DE;
-	Mon, 25 Nov 2024 04:12:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7999054765;
+	Mon, 25 Nov 2024 04:12:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732507969; cv=none; b=PzaWW3gKIUiX2YdTJvaQC7OZnxnyVaGPQf3PWbrUwMt+Op3G8+IKZUWUO0Y5GkV1MFgnNSot851MM0Jn5dMJsj/TqsTTwyhaxXsGYgY+4tgNy2kB7iPuhmeQVBe8s3KXVitH/x5cXAejgfVY+VOfDbObPB3bLbgmuEgnO8MEqJI=
+	t=1732507969; cv=none; b=c5XvCRG++DGFjGXvQ73jjepvK/9zh9CZUsF5sSV0XHFKazVW0V+TFkaO866JZtexfuQr8cCJp5vbxh6uDzHaQZLUCe8DRODDF7BUCCntf2wLsl9N3Pr+fNOomDYWmU9Uheslp1u9U5GbiWO2t+ct7sAw2vKhT8mfd1JLYYp+tkw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1732507969; c=relaxed/simple;
-	bh=UUUA1ZgwPqZlO0/3ylK8xMN9W4suSmmy4ypAl0Eeb5s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TzXy6z5/s/8fruWoGYxyCbl5iH/wHc9zG/BcwzU37LJu7ndLmFKqzF0JWhLki1cZL8CfPA/vBcL4ppMplCwUspXPDmPi90u40fEFfVc69S05GmCw9I5ERRikHYh5fwAJ4XwvYx2l7ztgqh3i8ZpegTKQS1anV0h2rOKD1TnwITI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eV592IhP; arc=none smtp.client-ip=10.30.226.201
+	bh=EKZoO79T9Nc9IFQIIGzuuvtCJUtnaaR0gNdJqjM6Yck=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=SNo+G25luzZlAyfFzfniOpREbxEk6kgwPbKedchCvvpBuWbrdteNTSaHfMIdZpeZASuwyFsolWAWESNNYgDt8vvsQpnCrY37TescayZ2VZxL9xSuToF12ncact3xsVH/sEwKkV3RjG2xjI9TMETNBgEfHpZyKWfYnO2WnPGeU3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tM9T2hcG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eV592IhP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 599AAC4CED1;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tM9T2hcG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA115C4CED9;
 	Mon, 25 Nov 2024 04:12:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1732507968;
-	bh=UUUA1ZgwPqZlO0/3ylK8xMN9W4suSmmy4ypAl0Eeb5s=;
-	h=From:To:Cc:Subject:Date:From;
-	b=eV592IhPDawLL+68tcYtw9FXThWgbpRzvTOqtOMDeDKOFSzKYf9xIgSvIV0MLIeBy
-	 k0XyZOrx/sGYYZMuvscXowtVT9XQQBpfpXvEOqVd5klqE5uCWYRZZvJ9//wUGKhh0Y
-	 ILT09ftkrkEhX6OyxmEquzASukyhiINi3QnowQCTGXehFl0ADAYfkIgetEjCTFuWMV
-	 j1fnIVfHaxnJjaiDDLCz5naTURuWM3bWiegbOtM+h9gKk0agYh9Tgw9cjSQQZg9r6H
-	 Hl9w6Cmq+82pqYkzV+9UaRiBkbQbMpxIZFrpLtxA5VxIUVpOPUM9hzLq+JJL0suahW
-	 2oVYvH4vfxUEA==
+	s=k20201202; t=1732507969;
+	bh=EKZoO79T9Nc9IFQIIGzuuvtCJUtnaaR0gNdJqjM6Yck=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=tM9T2hcGWIv1uzdjdgIFNDkTDoY/THlYhRbw1MFCv5O/nPJKk8EUgloSXCtIx+aHv
+	 Unkg1xOLgHJ5dW+ghVqXo4Z2zqK/42vX75dOCa8mlnRyosakL9z2Bl0q+34kx6AN/3
+	 h4LO1oCsM6LoM6mmY5HP8pRwBRiU6kTfeUvjooxh3JR3haXfEHKMNw2jPcpMf2SmRY
+	 29oukIJW1b1TEACWzBal/ciTeOJryJ/e7ZsoJ0UfzvvPHbxDAOWFLLJoCJn8DPTfeJ
+	 P3YoPU9hgYkUiRrsMd9c7PEp1R7g8LgFUO0iVcnKoICxElMepTHOZbcFcvsV3SoVZ/
+	 hQInkhAY5v4Qg==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: linux-crypto@vger.kernel.org,
 	x86@kernel.org,
 	Ard Biesheuvel <ardb@kernel.org>
-Subject: [PATCH 0/6] x86: new optimized CRC functions, with VPCLMULQDQ support
-Date: Sun, 24 Nov 2024 20:11:23 -0800
-Message-ID: <20241125041129.192999-1-ebiggers@kernel.org>
+Subject: [PATCH 2/6] scripts/crc: add gen-crc-consts.py
+Date: Sun, 24 Nov 2024 20:11:25 -0800
+Message-ID: <20241125041129.192999-3-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.47.0
+In-Reply-To: <20241125041129.192999-1-ebiggers@kernel.org>
+References: <20241125041129.192999-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -42,66 +45,236 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patchset is also available in git via:
+From: Eric Biggers <ebiggers@google.com>
 
-    git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git crc-x86-v1
+Add a Python script that generates constants for computing the given CRC
+variant(s) using x86's pclmulqdq or vpclmulqdq instructions.
 
-This patchset applies on top of my other recent CRC patchsets
-https://lore.kernel.org/r/20241103223154.136127-1-ebiggers@kernel.org/ and
-https://lore.kernel.org/r/20241117002244.105200-1-ebiggers@kernel.org/ .
-Consider it a preview for what may be coming next, as my priority is
-getting those two other patchsets merged first.
+It can also generate the traditional byte-at-a-time tables.
 
-This patchset adds a new assembly macro that expands into the body of a
-CRC function for x86 for the specified number of bits, bit order, vector
-length, and AVX level.  There's also a new script that generates the
-constants needed by this function, given a CRC generator polynomial.
+Only small changes should be needed for this script to also work to
+generate the constants needed for CRC computation on other architectures
+with a carryless multiplication instruction, such as arm64.
 
-This approach allows easily wiring up an x86-optimized implementation of
-any variant of CRC-8, CRC-16, CRC-32, or CRC-64, including full support
-for VPCLMULQDQ.  On long messages the resulting functions are up to 4x
-faster than the existing PCLMULQDQ optimized functions when they exist,
-or up to 29x faster than the existing table-based functions.
-
-This patchset starts by wiring up the new macro for crc32_le,
-crc_t10dif, and crc32_be.  Later I'd also like to wire up crc64_be and
-crc64_rocksoft, once the design of the library functions for those has
-been fixed to be like what I'm doing for crc32* and crc_t10dif.
-
-A similar approach of sharing code between CRC variants, and vector
-lengths when applicable, should work for other architectures.  The CRC
-constant generation script should be mostly reusable.
-
-Eric Biggers (6):
-  x86: move zmm exclusion list into CPU feature flag
-  scripts/crc: add gen-crc-consts.py
-  x86/crc: add "template" for [V]PCLMULQDQ based CRC functions
-  x86/crc32: implement crc32_le using new template
-  x86/crc-t10dif: implement crc_t10dif using new template
-  x86/crc32: implement crc32_be using new template
-
- arch/x86/Kconfig                        |   2 +-
- arch/x86/crypto/aesni-intel_glue.c      |  22 +-
- arch/x86/include/asm/cpufeatures.h      |   1 +
- arch/x86/kernel/cpu/intel.c             |  22 +
- arch/x86/lib/Makefile                   |   2 +-
- arch/x86/lib/crc-pclmul-consts.h        | 148 ++++++
- arch/x86/lib/crc-pclmul-template-glue.h |  84 ++++
- arch/x86/lib/crc-pclmul-template.S      | 588 ++++++++++++++++++++++++
- arch/x86/lib/crc-t10dif-glue.c          |  22 +-
- arch/x86/lib/crc16-msb-pclmul.S         |   6 +
- arch/x86/lib/crc32-glue.c               |  38 +-
- arch/x86/lib/crc32-pclmul.S             | 220 +--------
- arch/x86/lib/crct10dif-pcl-asm_64.S     | 332 -------------
- scripts/crc/gen-crc-consts.py           | 207 +++++++++
- 14 files changed, 1087 insertions(+), 607 deletions(-)
- create mode 100644 arch/x86/lib/crc-pclmul-consts.h
- create mode 100644 arch/x86/lib/crc-pclmul-template-glue.h
- create mode 100644 arch/x86/lib/crc-pclmul-template.S
- create mode 100644 arch/x86/lib/crc16-msb-pclmul.S
- delete mode 100644 arch/x86/lib/crct10dif-pcl-asm_64.S
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ scripts/crc/gen-crc-consts.py | 207 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 207 insertions(+)
  create mode 100755 scripts/crc/gen-crc-consts.py
 
+diff --git a/scripts/crc/gen-crc-consts.py b/scripts/crc/gen-crc-consts.py
+new file mode 100755
+index 0000000000000..84f0902e1cd7b
+--- /dev/null
++++ b/scripts/crc/gen-crc-consts.py
+@@ -0,0 +1,207 @@
++#!/usr/bin/env python3
++# SPDX-License-Identifier: GPL-2.0-or-later
++#
++# Script that generates constants for computing the given CRC variant(s).
++#
++# Copyright 2024 Google LLC
++#
++# Author: Eric Biggers <ebiggers@google.com>
++
++import sys
++
++# XOR (add) an iterable of polynomials.
++def xor(iterable):
++    res = 0
++    for val in iterable:
++        res ^= val
++    return res
++
++# Multiply two polynomials.
++def clmul(a, b):
++    return xor(a << i for i in range(b.bit_length()) if (b & (1 << i)) != 0)
++
++# Polynomial division floor(a / b).
++def div(a, b):
++    q = 0
++    while a.bit_length() >= b.bit_length():
++        q ^= 1 << (a.bit_length() - b.bit_length())
++        a ^= b << (a.bit_length() - b.bit_length())
++    return q
++
++# Reduce the polynomial 'a' modulo the polynomial 'b'.
++def reduce(a, b):
++    return a ^ clmul(div(a, b), b)
++
++# Pretty-print a polynomial.
++def pprint_poly(prefix, poly):
++    terms = ['1' if i == 0 else 'x' if i == 1 else f'x^{i}'
++             for i in reversed(range(poly.bit_length()))
++             if (poly & (1 << i)) != 0]
++    j = 0
++    while j < len(terms):
++        s = prefix + terms[j] + (' +' if j < len(terms) - 1 else '')
++        j += 1
++        while j < len(terms) and len(s) < 72:
++            s += ' ' + terms[j] + (' +' if j < len(terms) - 1 else '')
++            j += 1
++        print(s)
++        prefix = ' * ' + (' ' * (len(prefix) - 3))
++
++# Reverse the bits of a polynomial.
++def bitreverse(poly, num_bits):
++    return xor(1 << (num_bits - 1 - i) for i in range(num_bits)
++               if (poly & (1 << i)) != 0)
++
++# Format a polynomial as hex.  Bit-reflect it if the CRC is LSB-first.
++def fmt_poly(variant, poly, num_bits):
++    if variant.lsb:
++        poly = bitreverse(poly, num_bits)
++    return f'0x{poly:0{2*num_bits//8}x}'
++
++# Print a comment describing constants generated for the given CRC variant.
++def print_header(variant, what):
++    print('/*')
++    s = f'{"least" if variant.lsb else "most"}-significant-bit-first CRC-{variant.bits}'
++    print(f' * {what} generated for {s} using')
++    pprint_poly(' * G(x) = ', variant.G)
++    print(' */')
++
++# Print a polynomial as hex, but drop a term if needed to keep it in 64 bits.
++def print_poly_truncate65thbit(variant, poly, num_bits, desc):
++    if num_bits > 64:
++        assert num_bits == 65
++        if variant.lsb:
++            assert (poly & 1) != 0
++            poly >>= 1
++            desc += ' - 1'
++        else:
++            poly ^= 1 << 64
++            desc += ' - x^64'
++        num_bits = 64
++    print(f'\t\t{fmt_poly(variant, poly, num_bits)},\t/* {desc} */')
++
++class CrcVariant:
++    def __init__(self, bits, generator_poly, bit_order):
++        self.bits = bits
++        if bit_order not in ['lsb', 'msb']:
++            raise ValueError('Invalid value for bit_order')
++        self.lsb = bit_order == 'lsb'
++        self.name = f'crc{bits}_{bit_order}_0x{generator_poly:0{(2*bits+7)//8}x}'
++        if self.lsb:
++            generator_poly = bitreverse(generator_poly, bits)
++        self.G = generator_poly ^ (1 << bits)
++
++# Generate tables for byte-at-a-time CRC computation.
++def gen_sliceby1_tables(variants):
++    for v in variants:
++        print('')
++        print_header(v, 'CRC table')
++        print(f'static const u{v.bits} __maybe_unused {v.name}_table[256] = {{')
++        s = ''
++        for i in range(256):
++            remainder = (bitreverse(i, 8) if v.lsb else i) << (v.bits - 8)
++            for _ in range(8):
++                remainder <<= 1
++                if (remainder & (1 << v.bits)) != 0:
++                    remainder ^= v.G
++            next_entry = fmt_poly(v, remainder, v.bits) + ','
++            if len(s + next_entry) > 71:
++                print(f'\t{s}')
++                s = ''
++            s += (' ' if s else '') + next_entry
++        if s:
++            print(f'\t{s}')
++        print('};')
++
++# Generate constants for carryless multiplication based CRC computation.
++def gen_x86_pclmul_consts(variants):
++    # These are the distances, in bits, to generate folding constants for.
++    FOLD_DISTANCES = [2048, 1024, 512, 256, 128]
++
++    for v in variants:
++        print('')
++        print_header(v, 'CRC folding constants')
++        print('static const struct {')
++        if not v.lsb:
++            print('\tu8 bswap_mask[16];')
++        for i in FOLD_DISTANCES:
++            print(f'\tu64 fold_across_{i}_bits_consts[2];')
++        print('\tu8 shuf_table[48];')
++        print('\tu64 barrett_reduction_consts[2];')
++        if v.lsb and v.bits < 64:
++            print('\tu64 extract_crc_mask[2];')
++        print(f'}} {v.name}_consts __cacheline_aligned __maybe_unused = {{')
++
++        # Byte-reflection mask, needed for MSB CRCs
++        if not v.lsb:
++            print('\t.bswap_mask = {' + ', '.join(str(i) for i in reversed(range(16))) + '},')
++
++        # Fold constants for all distances down to 128 bits
++        k = v.bits - 65 if v.lsb else 0
++        for i in FOLD_DISTANCES:
++            print(f'\t.fold_across_{i}_bits_consts = {{')
++            for j in [64, 0] if v.lsb else [0, 64]:
++                const = reduce(1<<(i+j+k), v.G)
++                pow_desc = f'{i}{"+" if j >= 0 else "-"}{abs(j)}'
++                if k != 0:
++                    pow_desc += f'{"+" if k >= 0 else "-"}{abs(k)}'
++                print(f'\t\t{fmt_poly(v, const, v.bits)},\t/* x^({pow_desc}) mod G(x) */')
++            print('\t},')
++
++        # Shuffle table for handling 1..15 bytes at end
++        print('\t.shuf_table = {')
++        print('\t\t' + (16*'-1, ').rstrip())
++        print('\t\t' + ''.join(f'{i:2}, ' for i in range(16)).rstrip())
++        print('\t\t' + (16*'-1, ').rstrip())
++        print('\t},')
++
++        # Barrett reduction constants for reducing 128 bits to the final CRC
++        m = 63 if v.lsb else 64
++        print('\t.barrett_reduction_consts = {')
++        print_poly_truncate65thbit(v, div(1<<(m+v.bits), v.G), m+1,
++                                   f'floor(x^{m+v.bits} / G(x))')
++        print_poly_truncate65thbit(v, v.G, v.bits+1, 'G(x)')
++        print('\t},')
++        if v.lsb and v.bits < 64:
++            print(f'\t.extract_crc_mask = {{0, 0x{(1<<(v.bits))-1:x}}},')
++
++        print('};')
++
++def parse_crc_variants(vars_string):
++    variants = []
++    for var_string in vars_string.split(','):
++        bits, bit_order, generator_poly = var_string.split('_')
++        assert bits.startswith('crc')
++        bits = int(bits.removeprefix('crc'))
++        assert generator_poly.startswith('0x')
++        generator_poly = generator_poly.removeprefix('0x')
++        assert len(generator_poly) % 2 == 0
++        generator_poly = int(generator_poly, 16)
++        variants.append(CrcVariant(bits, generator_poly, bit_order))
++    return variants
++
++if len(sys.argv) != 3:
++    sys.stderr.write(f'Usage: {sys.argv[0]} CONSTS_TYPE[,CONSTS_TYPE]... CRC_VARIANT[,CRC_VARIANT]...\n')
++    sys.stderr.write('  CONSTS_TYPE can be sliceby1 or x86_pclmul\n')
++    sys.stderr.write('  CRC_VARIANT is crc${num_bits}_${bit_order}_${generator_poly_as_hex}\n')
++    sys.stderr.write('     E.g. crc16_msb_0x8bb7 or crc32_lsb_0xedb88320\n')
++    sys.stderr.write('     Polynomial must use the given bit_order and exclude x^{num_bits}\n')
++    sys.exit(1)
++
++print('/* SPDX-License-Identifier: GPL-2.0-or-later */')
++print('/*')
++print(' * CRC constants generated by:')
++print(' *')
++print(f' *\t{sys.argv[0]} {" ".join(sys.argv[1:])}')
++print(' *')
++print(' * Do not edit manually.')
++print(' */')
++consts_types = sys.argv[1].split(',')
++variants = parse_crc_variants(sys.argv[2])
++for consts_type in consts_types:
++    if consts_type == 'sliceby1':
++        gen_sliceby1_tables(variants)
++    elif consts_type == 'x86_pclmul':
++        gen_x86_pclmul_consts(variants)
++    else:
++        raise ValueError(f'Unknown consts_type: {consts_type}')
 -- 
 2.47.0
 
