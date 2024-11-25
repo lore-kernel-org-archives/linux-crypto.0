@@ -1,86 +1,118 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EE92364D6;
-	Mon, 25 Nov 2024 06:09:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7AE216FF37;
+	Mon, 25 Nov 2024 06:43:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732514983; cv=none; b=tJSUyw9yow2g3hyOp51lDWTKydtCwDKeO43YE4pqNY4i/6XZi4+2Jub6F+Ow+t+GpPf6Y5OjiYVG/7QFKZ9JntoE2CSvhZUSqqqlgWZ4vn5INRRrdiZ4heq0nwkNzz8Mn8QcC2vlpu2JUdfKVoq5E82IPNVs6UZMHUPLlTjOuUU=
+	t=1732517034; cv=none; b=fE7kZ/eQmAK9rUCtcUEXg88L8vQfHxQBkTr6z4C8wq2b8PYL9meLoKXuO68+ElivxMv1DWC68sXDmuYbJwoH0hgtbBsBzorQmYsTT82373+lCc1xKCLtW+0fZHvg6HWayEtI1LWrWS74EktBPwtGMtrVaUogwSiKv2TuQ7/EOiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732514983; c=relaxed/simple;
-	bh=MRQeRVTaqmoNfnsHa+uLbRfTdnGwyDlPAHWuiTkbs54=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X2JymjsKK6wxZfA9RKqH2erkOPu+S/ky/upz68FUlAQPFGXHZ5fSLQb1fNUt0msiMStDKQVfGweKXpCGYewZMYZEfHgc9f9iVqx/CNU7mxRMU2i0aJwuxgHhaDU/kFTgC2DHxsSnBrIASiWd7bjNqIUzd+I1zgC9Ptn9mJuaXJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=I393jQfM; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1732517034; c=relaxed/simple;
+	bh=dWyWToLbYLFj6bARx0JGVSujunpFShjO9Au0BNa6nI0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=B9C5Y6b71R7CR5X36vWx+5bP5iKXwF/4zN3IdxfJcAUeVWNvFL7CzYYfqU7r850hK3RzR7mQTTmHpJPcp4AEj45LLReRASv4Na/FKg2bsgtj3Wx4PrlGNGdDwiaF8kO2uA9W6Rns0D5N36omycv0aHcD1TBpdyiD3e+6x3O/1Ks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=LuLDsLlQ; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="I393jQfM"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=B7r4LINbl9oYYjpznVoVNyIXz5UKh/UFGV/wN7Hu1ck=; b=I393jQfMoxwoj8oWWYqCLPTmh6
-	EhHGtdAI6ngONbbMHcan8KcJA+UyzvzW9ow8F1Hivx+Z38DBD5Z0v8iNF93v+BcqSxIK4zFvbY2oI
-	evc8MoIa4sPc/F8+Yxa+nliqBZnvzT81nQvfRxc4dym9XY2yV/8kPXZkB/RM6SGKpXJhtyQHlHyKu
-	Cx6eUv/QK7i0GJKF/DRQBpNbc3HAMV6ORv71nitk8AuALWOuJ9WC0mXjTatWjp0FUBwSiAAfnY2Dr
-	f4hwlmXwIG+gBhrDhhaYqmBfPGwb/r6sfXxTg36BugjlhnCfwxFzP6/J+Ly/urJQDl8tHjLbwawwf
-	7KkU9j0w==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tFSHn-001TMd-36;
-	Mon, 25 Nov 2024 14:09:29 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 25 Nov 2024 14:09:27 +0800
-Date: Mon, 25 Nov 2024 14:09:27 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Harald Freudenberger <freude@linux.ibm.com>,
-	Eric Biggers <ebiggers@kernel.org>
-Cc: davem@davemloft.net, dengler@linux.ibm.com, linux-s390@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v5 3/3] s390/crypto: New s390 specific protected key hash
- phmac
-Message-ID: <Z0QUl_eSUwEANb4s@gondor.apana.org.au>
-References: <20241122143427.135682-1-freude@linux.ibm.com>
- <20241122143427.135682-4-freude@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="LuLDsLlQ"
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AONji9w019665;
+	Mon, 25 Nov 2024 06:43:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=d23LlqCY+leeCGC3PRJArL
+	py8cEgDgIjY+mThSlf8us=; b=LuLDsLlQERrXGSJSVfp0e93/eWo4XUDl0yqc1c
+	X6mrAGrLpDfVnpLTez2EEJDrxFvtH4zEKYNo0/VouP4/98lCMwPoMR+IqiHdw2V7
+	EdRxaor+KRByl6Kgw3zNQqsztFXHgm+XqLrA7nMIU7yXjdNvMsQRBsW2DT4PP1uY
+	62flCMPwH8EhQFHNkesdIyv4cryZ7M4dyoxl3zY4gUtiWe2/WXQPzWY3EVV4R6EP
+	Zrkes7DVKWQXh4AiIGwCcWYmUQZWJzExhKHoyXmaSgpCJKS6UEzS3WqhQJ4Bdf0m
+	jCWSup6TKYOs6SvHzOwUZAUGvid4gtaNQrXTRGnhh876o2nw==
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 433626bq0n-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 25 Nov 2024 06:43:43 +0000 (GMT)
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+	by NALASPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4AP6hg9m001165
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 25 Nov 2024 06:43:42 GMT
+Received: from hu-yrangana-hyd.qualcomm.com (10.80.80.8) by
+ nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Sun, 24 Nov 2024 22:43:38 -0800
+From: Yuvaraj Ranganathan <quic_yrangana@quicinc.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Bjorn Andersson
+	<andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>, Vinod Koul
+	<vkoul@kernel.org>
+CC: <linux-arm-msm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <quic_yrangana@quicinc.com>
+Subject: [PATCH V5 0/2] Enable TRNG for QCS8300
+Date: Mon, 25 Nov 2024 12:13:15 +0530
+Message-ID: <20241125064317.1748451-1-quic_yrangana@quicinc.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241122143427.135682-4-freude@linux.ibm.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: zpGUDJDXdu8tKhFQhyT62TG0z8FiKVzJ
+X-Proofpoint-ORIG-GUID: zpGUDJDXdu8tKhFQhyT62TG0z8FiKVzJ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ priorityscore=1501 clxscore=1015 phishscore=0 spamscore=0 adultscore=0
+ impostorscore=0 mlxscore=0 malwarescore=0 suspectscore=0 mlxlogscore=557
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411250055
 
-On Fri, Nov 22, 2024 at 03:34:27PM +0100, Harald Freudenberger wrote:
->
-> +static inline int phmac_keyblob2pkey(const u8 *key, unsigned int keylen,
-> +				     struct phmac_protkey *pk)
-> +{
-> +	int i, rc = -EIO;
-> +
-> +	/* try three times in case of busy card */
-> +	for (i = 0; rc && i < 3; i++) {
-> +		if (rc == -EBUSY && msleep_interruptible(1000))
-> +			return -EINTR;
+Add device-tree nodes to enable TRNG for QCS8300
 
-You can't sleep in crypto calls in general.
+This series depends on below patch series:
+https://lore.kernel.org/all/20240925-qcs8300_initial_dtsi-v2-0-494c40fa2a42@quicinc.com/ - Reviewed
 
-Now there are specific circumstances where sleeping is allowed,
-e.g., when the MAY_SLEEP flag is set, but I don't think this will
-be acceptable for your purpose.
+Signed-off-by: Yuvaraj Ranganathan <quic_yrangana@quicinc.com>
+---
+Changes in v5:
+ - Remove "Reviewed-by" tag added incorrectly
+ - Link to v4: https://lore.kernel.org/all/20241122074346.4084606-1-quic_yrangana@quicinc.com/
 
-I see the same problem exists in paes_s390, which was not reviewed
-on linux-crypto.
+Changes in v4:
+ - Address the reg entry style
+ - Link to v3: https://lore.kernel.org/all/20241113021819.2616961-1-quic_yrangana@quicinc.com/
 
-So what exactly causes the EBUSY? The 3 retries followed by failure
-seem rather dangerous too given that this could be used by the block
-layer for critical data that cannot fail.
+Changes in v3:
+ - Drop DT label as per review comments
+ - Link to v2: https://lore.kernel.org/all/20241107121513.641281-1-quic_yrangana@quicinc.com/
 
-Cheers,
+Changes in v2:
+ - Mistakenly uploaded the base dtsi change instead of marking dependency
+ - Link to v1: https://lore.kernel.org/all/20241106110002.3054839-1-quic_yrangana@quicinc.com/
+
+---
+Yuvaraj Ranganathan (2):
+  dt-bindings: crypto: qcom,prng: document QCS8300
+  arm64: dts: qcom: qcs8300: add TRNG node
+
+ Documentation/devicetree/bindings/crypto/qcom,prng.yaml | 1 +
+ arch/arm64/boot/dts/qcom/qcs8300.dtsi                   | 5 +++++
+ 2 files changed, 6 insertions(+)
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.34.1
+
