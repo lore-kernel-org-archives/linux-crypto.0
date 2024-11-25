@@ -1,123 +1,65 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B14F18B47D;
-	Mon, 25 Nov 2024 06:58:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79B1918622;
+	Mon, 25 Nov 2024 07:57:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732517916; cv=none; b=NgTp0g2MDlQDYFgU9HnwJ8NTSb2wBMhbEDrHNgOAIW6fNMoHXi27G3BgEL0qPqf9hSkKenVd3IaH+r+c/Ot+ZTy8lY0jGW4hhduQv9enH1ivCMf3h+5Zyh47U/X3+MrpJq+qKvmbSp6ZaDxh/r/Dmz/IED3tEM9d4cgryFRJ9nE=
+	t=1732521435; cv=none; b=lAU30q/npb2+JwtaN7IiHsowdFBAHmeJWgBNxBUGnW+2q9ovU/llCB/cgd8abVtrPNRRnZZRykx3GK/j2Tc9wNAiCg310Z68Sm1hITNCZ+6xH7zaW72+QnrJLj0ho3yKEqbwcuPQL+XZI8UYgNpokXpuCxSuK/svTg0ebg5ppbo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732517916; c=relaxed/simple;
-	bh=apq/X7r2F3LnEvVDMeD7rmTRYzriPGwc0Y9F7UvztHI=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OFpVpVzqW+KZD9BanT/t7c7GGfySL3T+uNCwfoCb3mdeilnIpk4VcwRPAxD4ZE2W9w21hp1a4EAnks8FeZ2mKowh471A4JupcWGe6yH3JkLKEI9XA8XNOOmEvhDDolUDBai2hFH4+L4OqvvRwRuub5nPjohz2GHmuX6Ldzlul7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=WG/hJD9y; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1732521435; c=relaxed/simple;
+	bh=Dm+ClvaQVu+hkU6CeDCUzpd3SviEzOUaEItzvlR9PtM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nN4+9t/+FLiGhbd+su4C7dVyzHLx2Oj7MqEuFQcFDpiHRzdUsc0uhilFh/xUqAjRooYUpQSCzWUYv2JWX9scQ/gWZqzbF15GOW7/DL1s1Trk/KBD5lL9OnxvHzkOKY/VlFjw4LcP735d5NbQGGFxTf+u2Fr/FeWWKL4sU9ll3Qw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ChKRi9Yp; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="WG/hJD9y"
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4AOMe1Pl007724;
-	Mon, 25 Nov 2024 06:58:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	wVwGwMlLvIqopuI0FpgnqxMk6wV5WY3tE9Fg8opYXAs=; b=WG/hJD9yUg1sJ6py
-	GQFX+SSqLtxS8sZ4HkFa/gVF1Or3q+Q0n+8FKG4019HpkbD8oaxkgeE99xr53vyV
-	q3nIn7KtHXdLTYmzOmF3K8SEBnr/ZY53cLDBUd4Nds2zsUcaTHnVZra60vKCsSmG
-	svsVB+YvJKCF4fq7/9fcVqfbP/oXMZn89+g0PWoChlFpsnP3RVRa1CCAZJrT4k7A
-	/Us07elzvvKeElrGh/Vm7RrZmpIbl9fvwi+iY+ApPJc2U5qoQAebbexOjnfrg0mO
-	NDPNJyJkGV83ES8hhHrP8UIYF9+on2vYfNHe8XjTwLt9h5rFjz0sHhrCLOSwCeS1
-	sw8KKA==
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 433626br91-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 25 Nov 2024 06:58:27 +0000 (GMT)
-Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
-	by NALASPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4AP6wQrV028446
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 25 Nov 2024 06:58:26 GMT
-Received: from hu-yrangana-hyd.qualcomm.com (10.80.80.8) by
- nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Sun, 24 Nov 2024 22:58:23 -0800
-From: Yuvaraj Ranganathan <quic_yrangana@quicinc.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski
-	<krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Bjorn Andersson
-	<andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>
-CC: <linux-arm-msm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <quic_yrangana@quicinc.com>
-Subject: [PATCH V3 2/2] arm64: dts: qcom: qcs8300: enable the inline crypto engine
-Date: Mon, 25 Nov 2024 12:28:01 +0530
-Message-ID: <20241125065801.1751256-3-quic_yrangana@quicinc.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241125065801.1751256-1-quic_yrangana@quicinc.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ChKRi9Yp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DAA3C4CECE;
+	Mon, 25 Nov 2024 07:57:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1732521435;
+	bh=Dm+ClvaQVu+hkU6CeDCUzpd3SviEzOUaEItzvlR9PtM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ChKRi9YpRLTZm0BU31pCn7AGpfI0Tr9599F5uPAPf0ltxUJr1TAeFPfIx/t5b0T5f
+	 FjWH8aluGpjTBNherwTUoMcqGoM8XQUdL0OZBpHJofT8D7d75YF9MDuLWH53DcdtaB
+	 3IATtoowK5Hgx765CpbVWNxc9FP+nqm4jOMw7TgEDo01JxQYyT756m3/1HUWmUww/6
+	 RMaSHU1ZP8puFvjwR2fA3K5puiVFw/sjMscLnEAhPz/QmHUd99EDpRtlMi6NWS3hCu
+	 O0ylrDyCmtMdZLpL0CJKEao0vrvggZ/gE2JGs+6PlcfdowF1mg1nqGtNnhFesCfhqP
+	 UkcaQnwWWRZug==
+Date: Mon, 25 Nov 2024 08:57:11 +0100
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Yuvaraj Ranganathan <quic_yrangana@quicinc.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konradybcio@kernel.org>, 
+	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V3 1/2] dt-bindings: crypto: ice: document the qcs8300
+ inline crypto engine
+Message-ID: <klb5rtv6kddqi6ontuvr7mpi5fj5nispppttsvj4hf6mlmztfe@xji7tzdgdh4g>
 References: <20241125065801.1751256-1-quic_yrangana@quicinc.com>
+ <20241125065801.1751256-2-quic_yrangana@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01b.na.qualcomm.com (10.47.209.197)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: cu4SDPBYTQpb2IzWrAXOvf17JuyiWRTB
-X-Proofpoint-ORIG-GUID: cu4SDPBYTQpb2IzWrAXOvf17JuyiWRTB
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- priorityscore=1501 clxscore=1015 phishscore=0 spamscore=0 adultscore=0
- impostorscore=0 mlxscore=0 malwarescore=0 suspectscore=0 mlxlogscore=897
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2411250058
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241125065801.1751256-2-quic_yrangana@quicinc.com>
 
-Add an ICE node to qcs8300 SoC description and enable it by adding a
-phandle to the UFS node.
+On Mon, Nov 25, 2024 at 12:28:00PM +0530, Yuvaraj Ranganathan wrote:
+> Add the compatible string for QCom ICE on qcs8300 SoCs.
+> 
+> Signed-off-by: Yuvaraj Ranganathan <quic_yrangana@quicinc.com>
+> ---
+>  .../devicetree/bindings/crypto/qcom,inline-crypto-engine.yaml    | 1 +
+>  1 file changed, 1 insertion(+)
 
-Signed-off-by: Yuvaraj Ranganathan <quic_yrangana@quicinc.com>
----
- arch/arm64/boot/dts/qcom/qcs8300.dtsi | 8 ++++++++
- 1 file changed, 8 insertions(+)
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-diff --git a/arch/arm64/boot/dts/qcom/qcs8300.dtsi b/arch/arm64/boot/dts/qcom/qcs8300.dtsi
-index 2c35f96c3f28..ab91c3b7bba6 100644
---- a/arch/arm64/boot/dts/qcom/qcs8300.dtsi
-+++ b/arch/arm64/boot/dts/qcom/qcs8300.dtsi
-@@ -685,6 +685,7 @@ &mc_virt SLAVE_EBI1 0>,
- 					<0 0>,
- 					<0 0>,
- 					<0 0>;
-+			qcom,ice = <&ice>;
- 			status = "disabled";
- 		};
- 
-@@ -710,6 +711,13 @@ ufs_mem_phy: phy@1d87000 {
- 			status = "disabled";
- 		};
- 
-+		ice: crypto@1d88000 {
-+			compatible = "qcom,qcs8300-inline-crypto-engine",
-+				     "qcom,inline-crypto-engine";
-+			reg = <0x0 0x01d88000 0x0 0x18000>;
-+			clocks = <&gcc GCC_UFS_PHY_ICE_CORE_CLK>;
-+		};
-+
- 		tcsr_mutex: hwlock@1f40000 {
- 			compatible = "qcom,tcsr-mutex";
- 			reg = <0x0 0x01f40000 0x0 0x20000>;
--- 
-2.34.1
+Best regards,
+Krzysztof
 
