@@ -1,255 +1,126 @@
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEE95188724
-	for <linux-crypto@vger.kernel.org>; Mon, 25 Nov 2024 22:09:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86B8B1CB31D
+	for <linux-crypto@vger.kernel.org>; Mon, 25 Nov 2024 22:35:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732572569; cv=none; b=MgH+tqtRrZMPs8tBGApIXJ3tn1K0D+6Aqcci4Zn9JGWSwvy1PZ+WYNd9kXjVHj9nixAjzwSWUWTk4lh7lDZ8klm/PEj8wqJUxMMAKqrPadJ4DhA7ajTCy2iR5rCYgRJGC+WHAbRD/d7XHURpPEtzyBg8Oh9ZDE3Af+jLkTxF+aA=
+	t=1732574127; cv=none; b=sH62Jq7SfRDomYvFKGeL1es5N0k0ynCyqeI/9Q//T5/nD96+Cfxh1yhrR3vWdBkUfcQyVjydMQrGlhgQYJLB27FnK8F+zSCuDR1lah7uDk/DrkrxrVPemGPU3wQWaRUaM7HjX9O/WwoWWXbpIN1FoWlw4ZAKe0zyjA9Lx06Kexo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732572569; c=relaxed/simple;
-	bh=lUmPdpv3cWFE01UvO9BTTTKy/U67ChqHO/ofw2Pa6+g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZMySd6uKnhTwTCEtvAqo82KrgdY09AMUBR+pMAh27vyFdVlopqRoFqWCIkb479kdsPumcsBiLmP7i0Mby1zfS6rtMNlg9ZEyT/peofAFrcbLEXgwDJpniTGVqrw/q+pUrMzlgbLzoLimINGw10TTdMhNG1wjz6HyRIW63vHq9zo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=W+FEHLr7; arc=none smtp.client-ip=209.85.219.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1732574127; c=relaxed/simple;
+	bh=JUkdG3WwcK0sH53fkuhlZtdKYI9+pTrmnN1dDYT+QqA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=T4lpYommBY9Yxc7ovoO1qB+jRMsiYVTSg5bmiX8vr9sEX/jLnh4uBQexxjSwhhvS6i7mUj4APp12q5C0HdQj+95BvDw+I3AEl24b6VdlGVkUnlPaE9E2Gn8MAE9zfyDeOAZIZoFo9IvKKRTaArl9Y/DbmnQwe02LiLJwxnWSDBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=aVaqb8D6; arc=none smtp.client-ip=209.85.208.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="W+FEHLr7"
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-6d846307673so15968676d6.3
-        for <linux-crypto@vger.kernel.org>; Mon, 25 Nov 2024 14:09:26 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aVaqb8D6"
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2ff550d37a6so55028201fa.0
+        for <linux-crypto@vger.kernel.org>; Mon, 25 Nov 2024 14:35:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1732572565; x=1733177365; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=hkPFNXiSO82mQaladEsQkAF2R6GvjjxU5ay6NuI1SY0=;
-        b=W+FEHLr7OflDaQCK2Xdh5fnunuAdVBjHfXzw5fQP1KRPCG8s0TMLeR1fKfoKAmohEO
-         bTz3wsyuBypxwcQNApcrNK8fPI4XR6qNXJjCT2NOqecjNe8EGPjyx2XT7q3hqvlKKKuj
-         zS2kE1ZFbeW6GZARwVpVUJLAkg8SGNBHI+lCBhrXBHNRV+j/Vzs14pgNtYOPqHgAn6f8
-         +aEC70dxLiWlI3jckQmfuhjWZnOH8a18lBSxMZV36U4Cytvwlj9G+BdAMfPXSTyn+miv
-         GtFoiNEOtxxxAESAtDjALa1990YKF1yL8Z1ZL7lcLuy157IkUDo7dftbovn+aEVDKySp
-         vM8g==
+        d=linaro.org; s=google; t=1732574124; x=1733178924; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=mK6iFRY7R3ULg/N72ZgFYW9FiXYFDV4de5/GQKQ+Iyk=;
+        b=aVaqb8D6prIgG5MEdXWkfzc43qtRdoHDa6Ls6W37MpePuEWCo+myZ+XL11wIC78VgL
+         vfaUtC/VuoNuJCbgmhMNW0Lf48LHnMQauOKEW0lKFfZ/+AePFGdJ7Suy9B2YtLkoKXTb
+         qvonPL1gR0oeVh5GKgEoZ8/cThyTBdmWwsMNq9KaAgmHPfPXaYNin3Dc2/TyA5xX1TMw
+         AY81k/QmFZlYmnulCkrppDbWRby7kaCo5nAjV/57YD7c1RE59z2qVa+O9Z4vZZKo8Gaw
+         oBTV2SwpN951ndLFGBpqW7QqtfZpOc2kklU8uTTSSMcylORZYAny+1EAiyPY7txCTW1h
+         OmLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732572565; x=1733177365;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hkPFNXiSO82mQaladEsQkAF2R6GvjjxU5ay6NuI1SY0=;
-        b=QLTqtktYHOqaCw8JIQIBgVyOnsYs1NGnLVu1C66mGfIGoDYR12cmjhvG8zUAtBzsnB
-         5Gwv9vAd81PwzWk9OrqfTLM5NiYpiNrHx3HQTRiLLysY/jNZArbIr1w8EmtjtiX/fZux
-         3rdx62t6UfL77S3Zid2o000XdrGJk80s/trJV8OQvCLyWWIKCqgSpHWDGGVF3kgfMBLT
-         1qcQ/ii5DJHvHZbit1tRbdRA9gRpU0BapT2FgMKtaWvNn2aTIzbSruA/qjUoNKibUMQj
-         FOuWqhT36Wz9VB4bZmebnIKc+70nMe7MspJqcrWcvnVFpq0Tiqb0bQhyltPeq+clUNMn
-         XC+A==
-X-Forwarded-Encrypted: i=1; AJvYcCXs1ToB43YVIRXI3tp8MWjUoc2ybtNoLKINK6BWPlgX53w7t3IZucc0Z6XLUS6ew31GysmvSitG9wgpaBc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyRvigIJvNiEFUmnLx92ZH78ouFn9jn9zdx9nk8vkYz7Y6mla2T
-	yPgM8CHHdoEgnK7SuO1FhsyjBa5IPzCfpwn+HiyqNe0tF850O4CuY6RzBtq7erdORUCASqFGSad
-	UttvNDhA2g2RIxLnEDhTdsnMkhDSnsYsZaEjz
-X-Gm-Gg: ASbGncvwmqLhVAIvkaqvK2oWptfscWXQARjOFTORA4cCGbK1HmS5Au0BoNGweYb5WZa
-	tStM8qNeTtJj5Vi/cdcm7Y+PxQAPbQe6s/KVO1iUGt73Vc3HB3u0TWX2IWkFpjw==
-X-Google-Smtp-Source: AGHT+IGVQmYoBVpN5RvRdxpCzs9ETs2LPxJY2hxoPO9iI/z2/AoWXumN7ElMl7egPxBfuWUYtgJnTK4SOW0j/TC3aTc=
-X-Received: by 2002:ad4:5d6c:0:b0:6d4:238e:35ba with SMTP id
- 6a1803df08f44-6d450e87024mr275882526d6.21.1732572565331; Mon, 25 Nov 2024
- 14:09:25 -0800 (PST)
+        d=1e100.net; s=20230601; t=1732574124; x=1733178924;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mK6iFRY7R3ULg/N72ZgFYW9FiXYFDV4de5/GQKQ+Iyk=;
+        b=qYow0ctFZHl0HpF8m7Nrnx22FPSRDhjxXUtjiFIZIa5ZIy2bZS4TajSt6Eke/VEtZr
+         5RsOxaraxNr0ZlHpgQF2MYlr7ybhi2DLIpyv8aVCxClONAKlvTbJJrlDJG88DnTq2sjJ
+         i0JXhmHXqb9EOpUJCU9qRxMPUj3px8MAerIRk40Ve5Mlc25WOwetJsPFFQnHjWiguHMd
+         QZGAbJmH22CxTXfzs2C0rfsnv9M+/67wVMbpZeoUSMMELavw+TWoUHExASgecTRY/Zqm
+         1PwsFecJVDB7z7Kuq69suaG0YWLz2wkDarDhq9H/jjRRTqpCK2kypm/nRi/O1/c8LWvq
+         p3Ww==
+X-Forwarded-Encrypted: i=1; AJvYcCUprR5Z1lXOEnfxugSkhVH9j/nKO5g9pJUxLvZ+bb/JzmIjJ41xvz5zLlTfhOMPIwcvH+6NMNPjaz+p3yM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrVMWXaLnBIAPZ4WIayPsjoo1p1X2CpCvi5F03ECaP+u2/9WyS
+	ooz6oyOBa65uSYvGz7ngzFQW3HiAbQYXgLL0aSNaakvH1T7PMhshCVFfurhr7AY=
+X-Gm-Gg: ASbGncu0yM5uWPmH62mgz2L+XMCBtDK8IOaaXKz96wgEdF87r1YELzqKlF8sKCHkVn/
+	5S36CxWrGpzz2AIUM2v60nBIRbPUN2HDIZTzvTQ5q/VjsvOterb8MTnOoKYv5lQLGa1TxtEk02P
+	ReinMteWEn33H8/7F5d56PjiJ6IJaonMSkg1AuhxzyEOsRCcdtotF8eOU2Jfbgph3bz0HStHDtL
+	OyjoF5YIdyw9l+eLdoVhFBHqAruHXXvbPtE7Y5M+Lr7afeiQmGwAisMy1S/X8+ofnuprsXyUCVu
+	ddbZsZ0iAJN1dUTLs7USTBOtlupIKQ==
+X-Google-Smtp-Source: AGHT+IFp5gx7OJlQrJ9dEw/b8xMYu3nZ67KYGmj3q6WZjvpLkJCPY9W/kriDd8ENfUXUXNo2Yfcwvg==
+X-Received: by 2002:a05:651c:553:b0:2ff:991a:fb96 with SMTP id 38308e7fff4ca-2ffa716d0b6mr68581421fa.12.1732574123695;
+        Mon, 25 Nov 2024 14:35:23 -0800 (PST)
+Received: from eriador.lumag.spb.ru (2001-14ba-a0c3-3a00--b8c.rev.dnainternet.fi. [2001:14ba:a0c3:3a00::b8c])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2ffa53760cbsm16580381fa.82.2024.11.25.14.35.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Nov 2024 14:35:22 -0800 (PST)
+Date: Tue, 26 Nov 2024 00:35:20 +0200
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+To: Yuvaraj Ranganathan <quic_yrangana@quicinc.com>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konradybcio@kernel.org>, Vinod Koul <vkoul@kernel.org>, linux-arm-msm@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+Subject: Re: [PATCH V4 2/2] arm64: dts: qcom: qcs8300: add TRNG node
+Message-ID: <2vc6tg77qpi5vz7tmmlwgnlxjg62l6vsipjivygiapl4dhqupv@vrpbk3kcdrd3>
+References: <20241122074346.4084606-1-quic_yrangana@quicinc.com>
+ <20241122074346.4084606-3-quic_yrangana@quicinc.com>
+ <40c49e6d-dbbd-49cf-b59b-10e10b24da22@kernel.org>
+ <0bdaa2ef-3979-4963-be75-0a5a89728f44@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241123070127.332773-1-kanchana.p.sridhar@intel.com>
- <20241123070127.332773-11-kanchana.p.sridhar@intel.com> <CAJD7tkb0WyLD3hxQ5fHWHogyW5g+eF+GrR15r0PjK9YbFO3szg@mail.gmail.com>
- <SJ0PR11MB56782CF74C6D6904DDDDAB95C92E2@SJ0PR11MB5678.namprd11.prod.outlook.com>
-In-Reply-To: <SJ0PR11MB56782CF74C6D6904DDDDAB95C92E2@SJ0PR11MB5678.namprd11.prod.outlook.com>
-From: Yosry Ahmed <yosryahmed@google.com>
-Date: Mon, 25 Nov 2024 14:08:48 -0800
-Message-ID: <CAJD7tkY3_pCBsFJ2-+NC5JrYnSGCxsusH81bdLL-fz=G3MwibQ@mail.gmail.com>
-Subject: Re: [PATCH v4 10/10] mm: zswap: Compress batching with Intel IAA in
- zswap_batch_store() of large folios.
-To: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
-	"hannes@cmpxchg.org" <hannes@cmpxchg.org>, "nphamcs@gmail.com" <nphamcs@gmail.com>, 
-	"chengming.zhou@linux.dev" <chengming.zhou@linux.dev>, 
-	"usamaarif642@gmail.com" <usamaarif642@gmail.com>, "ryan.roberts@arm.com" <ryan.roberts@arm.com>, 
-	"21cnbao@gmail.com" <21cnbao@gmail.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, 
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, 
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>, "davem@davemloft.net" <davem@davemloft.net>, 
-	"clabbe@baylibre.com" <clabbe@baylibre.com>, "ardb@kernel.org" <ardb@kernel.org>, 
-	"ebiggers@google.com" <ebiggers@google.com>, "surenb@google.com" <surenb@google.com>, 
-	"Accardi, Kristen C" <kristen.c.accardi@intel.com>, 
-	"Feghali, Wajdi K" <wajdi.k.feghali@intel.com>, "Gopal, Vinodh" <vinodh.gopal@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0bdaa2ef-3979-4963-be75-0a5a89728f44@quicinc.com>
 
-[..]
-> > > Suggested-by: Johannes Weiner <hannes@cmpxchg.org>
-> > > Suggested-by: Yosry Ahmed <yosryahmed@google.com>
-> >
-> > This is definitely not what I suggested :)
-> >
-> > I won't speak for Johannes here but I suspect it's not quite what he
-> > wanted either.
->
-> Thanks for the comments Yosry. I was attributing these suggestions noted
-> in the change log:
->
-> 5) Incorporated Johannes' suggestion to not have a sysctl to enable
->    compress batching.
-> 6) Incorporated Yosry's suggestion to allocate batching resources in the
->    cpu hotplug onlining code, since there is no longer a sysctl to control
->    batching. Thanks Yosry!
-> 7) Incorporated Johannes' suggestions related to making the overall
->    sequence of events between zswap_store() and zswap_batch_store() similar
->    as much as possible for readability and control flow, better naming of
->    procedures, avoiding forward declarations, not inlining error path
->    procedures, deleting zswap internal details from zswap.h, etc. Thanks
->    Johannes, really appreciate the direction!
->    I have tried to explain the minimal future-proofing in terms of the
->    zswap_batch_store() signature and the definition of "struct
->    zswap_batch_store_sub_batch" in the comments for this struct. I hope the
->    new code explains the control flow a bit better.
->
-> I will delete the "Suggested-by" in subsequent revs, not a problem.
+On Sun, Nov 24, 2024 at 09:17:40AM +0530, Yuvaraj Ranganathan wrote:
+> Hi Krzysztof,
+> 
+> I sincerely apologize for the inconvenience. I added the "Reviewed-by"
+> tag without fully understanding its implications. I will remove the tag
+> in the next patch series.
 
-I wasn't really arguing about the tag, but rather that this
-implementation is not in the direction that we suggested.
+First of all, please don't top-post. Put your text under the phrases
+that you are responding to, not at the top of the message. Otherwise the
+logic is a bit broken.
 
-FWIW, the way I usually handle "Suggested-by" is if the core idea of a
-patch was suggested by someone. In this case, these are normal review
-comments that you addressed, so I wouldn't add the tag. The only case
-in which I add the tag in response to review comments is if they
-resulted in a new patch that was the reviewer's idea.
+Second, may I ask, what made you add that tag at all? I went on and
+checked. Krzysztof didn't repond at all to v3 and didn't respond to v2
+of this patch. So why?
 
-Just my 2c, perhaps others do it differently.
+Third, if you are unsure about what you are doing and as you seem to be
+using b4 tool, please just use `b4 trailers -u`. It has its own
+drawbacks so in some cases one should be careful, but at least it
+doesn't invent tags on its own.
 
-[..]
-> > > @@ -276,7 +276,21 @@ int swap_writepage(struct page *page, struct
-> > writeback_control *wbc)
-> > >                  */
-> > >                 swap_zeromap_folio_clear(folio);
-> > >         }
-> > > -       if (zswap_store(folio)) {
-> > > +
-> > > +       if (folio_test_large(folio) && zswap_can_batch()) {
-> > > +               struct folio_batch batch;
-> > > +               int error = -1;
-> > > +
-> > > +               folio_batch_init(&batch);
-> > > +               folio_batch_add(&batch, folio);
-> > > +               zswap_batch_store(&batch, &error);
-> > > +
-> > > +               if (!error) {
-> > > +                       count_mthp_stat(folio_order(folio), MTHP_STAT_ZSWPOUT);
-> > > +                       folio_unlock(folio);
-> > > +                       return 0;
-> > > +               }
-> >
-> > First of all, why does the code outside of zswap has to care or be changed?
-> >
-> > We should still call zswap_store() here, and within that figure out if
-> > we can do batching or not. I am not sure what we gain by adding a
-> > separate interface here, especially that we are creating a batch of a
-> > single folio and passing it in anyway. I suspect that this leaked here
-> > from the patch that batches unrelated folios swapout, but please don't
-> > do that. This patch is about batching compression of pages in the same
-> > folio, and for that, there is no need for the code here to do anything
-> > differently or pass in a folio batch.
->
-> This was the "minimal future proofing" and "error handling simplification/
-> avoiding adding latency due to rewinds" rationale I alluded to in the
-> change log and in the comments for "struct zswap_batch_store_sub_batch"
-> respectively. This is what I was trying to articulate in terms of the benefits
-> of the new signature of zswap_batch_store().
->
-> The change in swap_writepage() was simply an illustration to show-case
-> how the reclaim batching would work, to try and explain how IAA can
-> significantly improve reclaim latency, not just zswap latency (and get
-> suggestions early-on).
->
-> I don't mind keeping swap_writepage() unchanged if the maintainers
-> feel strongly about this. I guess I am eager to demonstrate the full potential
-> of IAA, hence guilty of the minimal future-proofing.
+> 
+> Thanks,
+> Yuvaraj.
+> 
+> On 11/22/2024 8:30 PM, Krzysztof Kozlowski wrote:
+> > On 22/11/2024 08:43, Yuvaraj Ranganathan wrote:
+> >> The qcs8300 SoC has a True Random Number Generator, add the node with
+> >> the correct compatible set.
+> >>
+> >> Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+> >> Reviewed-by: Krzysztof Kozlowski <krzk+dt@kernel.org>
+> > 
+> > NAK, stop adding fake tags. It is impossible to receive above tag from
+> > me written that way.
+> > 
+> > Best regards,
+> > Krzysztof
+> 
 
-While I do appreciate your eagerness, I will be completely honest
-here. The change to batch reclaim of unrelated folios, while can be
-reasonable, is an order of magnitude more controversial imo. By
-tightly coupling this to this series, you are doing yourself a
-disservice tbh. I would say drop any changes specific to that for now.
-Leave that to a completely separate discussion. This is the easiest
-way to make forward progress on this series, which I am sure is what
-we all want here (and I do very much appreciate your work!).
-
-[..]
-> > I didn't look too closely at the code, but you are essentially
-> > replicating the entire  zswap store code path and making it work with
-> > batches. This is a maintenance nightmare, and the code could very
-> > easily go out-of-sync.
-> >
-> > What we really need to do (and I suppose what Johannes meant, but
-> > please correct me if I am wrong), is to make the existing flow work
-> > with batches.
-> >
-> > For example, most of zswap_store() should remain the same. It is still
-> > getting a folio to compress, the only difference is that we will
-> > parallelize the page compressions. zswap_store_page() is where some
-> > changes need to be made. Instead of a single function that handles the
-> > storage of each page, we need a vectorized function that handles the
-> > storage of N pages in a folio (allocate zswap_entry's, do xarray
-> > insertions, etc). This should be refactoring in a separate patch.
-> >
-> > Once we have that, the logic introduced by this patch should really be
-> > mostly limited to zswap_compress(), where the acomp interfacing would
-> > be different based on whether batching is supported or not. This could
-> > be changes in zswap_compress() itself, or maybe at this point we can
-> > have a completely different path (e.g. zswap_compress_batch()). But
-> > outside of that, I don't see why we should have a completely different
-> > store path for the batching.
->
-> You are absolutely right, and that is my eventual goal. I see no reason
-> why zswap_batch_store() cannot morph into a vectorized implementation
-> of zswap_store()/zswap_store_batch(). I just did not want to make a
-> drastic change in v4.
-
-I wouldn't send intermediate versions that are not the code you want
-to be merged. It's not the best use of anyone's time to send code that
-both of us agree is not what we want to merge anyway. Even if that
-means a rewrite between versions, that's not uncommon as long as you
-describe the changes in the changelog.
-
->
-> As per earlier suggestions, I have tried to derive the same structure
-> for zswap_batch_store() as is in place for zswap_store(), plus made some
-> optimizations that can only benefit the current zswap_store(), such as
-> minimizing the rewinding of state from must-have computes for a large
-> folio such as allocating zswap_entries upfront. If zswap_batch_store()
-> replaces zswap_store(), this would be an optimization over-and-above
-> the existing zswap_store().
->
-> For sure, it wouldn't make sense to maintain both versions.
->
-> There are some minimal "future-proofing" details such as:
->
-> 1) The folio_batch: This is the most contentious, I believe, because it
->      is aimed toward evolving the zswap_batch_store() interface for
->      reclaim batching, while allowing the folio-error association for the
->      partial benefits provided by (2). As mentioned earlier, I can delete this
->      in the next rev if the maintainers feel strongly about this.
-
-Yeah I would drop this for now as I mentioned earlier.
-
-> 2) int* error signature: benefit can be realized today due to the latency
->     optimization it enables from detecting errors early, localized cleanup,
->     preventing unwinding state. That said, the same benefits can be realized
->     without making it a part of the interface.
-
-If this is a pure optimization that is not needed initially, I would
-do it in a separate patch after this one. Even better if it's a follow
-up patch, this is already dense enough :)
-
-To summarize, I understand your eagerness to present all the work you
-have in mind, and I appreciate it. But it's most effective to have
-changes in independent digestible chunks wherever possible. For next
-versions, I would only include the bare minimum to support the
-compression batching and showcase its performance benefits. Extensions
-and optimizations can be added on top once this lands. This makes both
-your life and the reviewers' lives a lot easier, and ultimately gets
-things merged faster.
+-- 
+With best wishes
+Dmitry
