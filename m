@@ -1,126 +1,299 @@
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86B8B1CB31D
-	for <linux-crypto@vger.kernel.org>; Mon, 25 Nov 2024 22:35:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732574127; cv=none; b=sH62Jq7SfRDomYvFKGeL1es5N0k0ynCyqeI/9Q//T5/nD96+Cfxh1yhrR3vWdBkUfcQyVjydMQrGlhgQYJLB27FnK8F+zSCuDR1lah7uDk/DrkrxrVPemGPU3wQWaRUaM7HjX9O/WwoWWXbpIN1FoWlw4ZAKe0zyjA9Lx06Kexo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732574127; c=relaxed/simple;
-	bh=JUkdG3WwcK0sH53fkuhlZtdKYI9+pTrmnN1dDYT+QqA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T4lpYommBY9Yxc7ovoO1qB+jRMsiYVTSg5bmiX8vr9sEX/jLnh4uBQexxjSwhhvS6i7mUj4APp12q5C0HdQj+95BvDw+I3AEl24b6VdlGVkUnlPaE9E2Gn8MAE9zfyDeOAZIZoFo9IvKKRTaArl9Y/DbmnQwe02LiLJwxnWSDBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=aVaqb8D6; arc=none smtp.client-ip=209.85.208.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09EBFDF51;
+	Tue, 26 Nov 2024 02:13:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1732587186; cv=fail; b=oxJdYgLnusuDTiMPDALWd1Exe+kL0ntAlPWW83ZjIvT5wCD+srVK+y5M9RikzqN+LBa7rLgiJQY4ouctDAh6RGt/M511LziWZVlSkFOCekvpMsdudgLiWNOuES34I0rYt2DC5elbAVaEuuy4j+fdMo9oaXk1haOQuPwgrdQFhAs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1732587186; c=relaxed/simple;
+	bh=aMkLTSkpey5V2vUfQE/fTlIpqAwjEESRBzZBW0XPcM8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=aboi4WUwcfUqLAT9kSmAlRESFg9xNXcpokagYHHdd82KYKVUgkgJY/cnZtwErab1MwD+MA3F5/s1NQaY02JJ1pLBtpWtj6Gfl1PCPS6E2ns2lEd4IvpqCO1PLhGbbBExhmR+NbCb4Z+XFtto7JwfMDKfZPqXtkZxv1bZxBFxBUU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=F4LKDKkh; arc=fail smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aVaqb8D6"
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2ff550d37a6so55028201fa.0
-        for <linux-crypto@vger.kernel.org>; Mon, 25 Nov 2024 14:35:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1732574124; x=1733178924; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mK6iFRY7R3ULg/N72ZgFYW9FiXYFDV4de5/GQKQ+Iyk=;
-        b=aVaqb8D6prIgG5MEdXWkfzc43qtRdoHDa6Ls6W37MpePuEWCo+myZ+XL11wIC78VgL
-         vfaUtC/VuoNuJCbgmhMNW0Lf48LHnMQauOKEW0lKFfZ/+AePFGdJ7Suy9B2YtLkoKXTb
-         qvonPL1gR0oeVh5GKgEoZ8/cThyTBdmWwsMNq9KaAgmHPfPXaYNin3Dc2/TyA5xX1TMw
-         AY81k/QmFZlYmnulCkrppDbWRby7kaCo5nAjV/57YD7c1RE59z2qVa+O9Z4vZZKo8Gaw
-         oBTV2SwpN951ndLFGBpqW7QqtfZpOc2kklU8uTTSSMcylORZYAny+1EAiyPY7txCTW1h
-         OmLw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1732574124; x=1733178924;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mK6iFRY7R3ULg/N72ZgFYW9FiXYFDV4de5/GQKQ+Iyk=;
-        b=qYow0ctFZHl0HpF8m7Nrnx22FPSRDhjxXUtjiFIZIa5ZIy2bZS4TajSt6Eke/VEtZr
-         5RsOxaraxNr0ZlHpgQF2MYlr7ybhi2DLIpyv8aVCxClONAKlvTbJJrlDJG88DnTq2sjJ
-         i0JXhmHXqb9EOpUJCU9qRxMPUj3px8MAerIRk40Ve5Mlc25WOwetJsPFFQnHjWiguHMd
-         QZGAbJmH22CxTXfzs2C0rfsnv9M+/67wVMbpZeoUSMMELavw+TWoUHExASgecTRY/Zqm
-         1PwsFecJVDB7z7Kuq69suaG0YWLz2wkDarDhq9H/jjRRTqpCK2kypm/nRi/O1/c8LWvq
-         p3Ww==
-X-Forwarded-Encrypted: i=1; AJvYcCUprR5Z1lXOEnfxugSkhVH9j/nKO5g9pJUxLvZ+bb/JzmIjJ41xvz5zLlTfhOMPIwcvH+6NMNPjaz+p3yM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxrVMWXaLnBIAPZ4WIayPsjoo1p1X2CpCvi5F03ECaP+u2/9WyS
-	ooz6oyOBa65uSYvGz7ngzFQW3HiAbQYXgLL0aSNaakvH1T7PMhshCVFfurhr7AY=
-X-Gm-Gg: ASbGncu0yM5uWPmH62mgz2L+XMCBtDK8IOaaXKz96wgEdF87r1YELzqKlF8sKCHkVn/
-	5S36CxWrGpzz2AIUM2v60nBIRbPUN2HDIZTzvTQ5q/VjsvOterb8MTnOoKYv5lQLGa1TxtEk02P
-	ReinMteWEn33H8/7F5d56PjiJ6IJaonMSkg1AuhxzyEOsRCcdtotF8eOU2Jfbgph3bz0HStHDtL
-	OyjoF5YIdyw9l+eLdoVhFBHqAruHXXvbPtE7Y5M+Lr7afeiQmGwAisMy1S/X8+ofnuprsXyUCVu
-	ddbZsZ0iAJN1dUTLs7USTBOtlupIKQ==
-X-Google-Smtp-Source: AGHT+IFp5gx7OJlQrJ9dEw/b8xMYu3nZ67KYGmj3q6WZjvpLkJCPY9W/kriDd8ENfUXUXNo2Yfcwvg==
-X-Received: by 2002:a05:651c:553:b0:2ff:991a:fb96 with SMTP id 38308e7fff4ca-2ffa716d0b6mr68581421fa.12.1732574123695;
-        Mon, 25 Nov 2024 14:35:23 -0800 (PST)
-Received: from eriador.lumag.spb.ru (2001-14ba-a0c3-3a00--b8c.rev.dnainternet.fi. [2001:14ba:a0c3:3a00::b8c])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2ffa53760cbsm16580381fa.82.2024.11.25.14.35.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Nov 2024 14:35:22 -0800 (PST)
-Date: Tue, 26 Nov 2024 00:35:20 +0200
-From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-To: Yuvaraj Ranganathan <quic_yrangana@quicinc.com>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-	Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konradybcio@kernel.org>, Vinod Koul <vkoul@kernel.org>, linux-arm-msm@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-Subject: Re: [PATCH V4 2/2] arm64: dts: qcom: qcs8300: add TRNG node
-Message-ID: <2vc6tg77qpi5vz7tmmlwgnlxjg62l6vsipjivygiapl4dhqupv@vrpbk3kcdrd3>
-References: <20241122074346.4084606-1-quic_yrangana@quicinc.com>
- <20241122074346.4084606-3-quic_yrangana@quicinc.com>
- <40c49e6d-dbbd-49cf-b59b-10e10b24da22@kernel.org>
- <0bdaa2ef-3979-4963-be75-0a5a89728f44@quicinc.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="F4LKDKkh"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1732587185; x=1764123185;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=aMkLTSkpey5V2vUfQE/fTlIpqAwjEESRBzZBW0XPcM8=;
+  b=F4LKDKkhJAkJX2AKJlvdTXOZ+Wg8YHkG0l8Zw80vcmheTJIbt0sa/6cC
+   WvdHOXdOlQAaYgr2z3MO2+quOHAqqyuTaV5dIJqIxAUxu/wZdALJVhplK
+   tTrmhIRRYEA1jYGXWRc6F/BQDuOmCZ6TJYDV3L+3NgX0Z7r/VPYXltc8G
+   rqyDrtCUAjs66Ivlsj3GY0y3aTNvIb3JwJ2jZhZXgCPFnLf1bDYoSTxai
+   Fy7+rcki3c4fFWh2ubwfoAag/1GzkScwM6mtsTjar9r2UJ+t2LBEy/FAc
+   k4ynQNzvnjlolWulrIolhqKCMpiEAc/Ouzt+XumcojY3nj8P2fyDV/oBW
+   Q==;
+X-CSE-ConnectionGUID: GdC5DHuGSJGANk9JSvBk4Q==
+X-CSE-MsgGUID: BcdPN+sVSj2k+VVroSH43Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11267"; a="44105724"
+X-IronPort-AV: E=Sophos;i="6.12,184,1728975600"; 
+   d="scan'208";a="44105724"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Nov 2024 18:13:04 -0800
+X-CSE-ConnectionGUID: yU5wcy27SDWY7r+bZ4TxtA==
+X-CSE-MsgGUID: 7Jq4C26bTpO7yTmYO2pffw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,184,1728975600"; 
+   d="scan'208";a="91355041"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orviesa010.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 25 Nov 2024 18:13:04 -0800
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 25 Nov 2024 18:13:03 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Mon, 25 Nov 2024 18:13:03 -0800
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.174)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 25 Nov 2024 18:13:03 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=o3rzp/2giliRqpd6H83ub+a/HcJzbXg9/CmdJHnHnhqA69NbmK9Mv62z5TMMsZ5UZ9dZU8oE9cWa2hc3JYivX5+grdTXra8Q6d2E2imEZ+uRdxTGmjmyKMs6v/vLIcCvkN3j8XYsm9Nv33+EgJUcWaP7/p3havEeLcOEVrsSvzo3qO7jZitn8+RbXDi4WvfwhZ6pB11wFfLcbIw69lqdkPqiqapGmcANl8eAafbdjNjsXBsCAjsvdh7tpjwpD/R5iVOYwqriRQRg+x5AhNSaREFDBgNsZt7Jgyy4iM+Kq2oaT+lHOrqVEilSGMXCDqnv6KG3cEfZwhCBpsA0tDfYvA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XP807OClU9ArOqB3h8gjUWV8Qk/UN0Y3IHUOymLPP9I=;
+ b=A4J1SFal/gtDs36LAxpUHXWfXkqk+TasSYS6INrKEgcaxQaD0hvZHFwEmH/48XN1Jm6trQ4Tb1vfX9RvMkskUlA2Z3ky43jHC+giGbEJnBiG/BXhGyO+uk3F4DonOX5t8xmajJKBiaDjzg4VmSIUgYTapLqvpcB+fCFx525dYeQB+7kvWANiTw4S7ndEVGQs5mOHbLA5ETHALcbTLYwqglw8FOuxyBSiwN1f+amT6W4fx6itFJEHkIQVHcE/m2bszQPi+dWImvssTqRhvSKo5Kdmdb2pV989OX+tooTD88XKyYVpGuokBq66BsmVBgeA0Q3jFb34eI+Ys4NI5jUovA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from SJ0PR11MB5678.namprd11.prod.outlook.com (2603:10b6:a03:3b8::22)
+ by CH3PR11MB7675.namprd11.prod.outlook.com (2603:10b6:610:122::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8182.19; Tue, 26 Nov
+ 2024 02:13:00 +0000
+Received: from SJ0PR11MB5678.namprd11.prod.outlook.com
+ ([fe80::812:6f53:13d:609c]) by SJ0PR11MB5678.namprd11.prod.outlook.com
+ ([fe80::812:6f53:13d:609c%4]) with mapi id 15.20.8182.019; Tue, 26 Nov 2024
+ 02:13:00 +0000
+From: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>, "hannes@cmpxchg.org"
+	<hannes@cmpxchg.org>, "yosryahmed@google.com" <yosryahmed@google.com>,
+	"nphamcs@gmail.com" <nphamcs@gmail.com>, "chengming.zhou@linux.dev"
+	<chengming.zhou@linux.dev>, "usamaarif642@gmail.com"
+	<usamaarif642@gmail.com>, "ryan.roberts@arm.com" <ryan.roberts@arm.com>,
+	"21cnbao@gmail.com" <21cnbao@gmail.com>, "akpm@linux-foundation.org"
+	<akpm@linux-foundation.org>, "linux-crypto@vger.kernel.org"
+	<linux-crypto@vger.kernel.org>, "davem@davemloft.net" <davem@davemloft.net>,
+	"clabbe@baylibre.com" <clabbe@baylibre.com>, "ardb@kernel.org"
+	<ardb@kernel.org>, "ebiggers@google.com" <ebiggers@google.com>,
+	"surenb@google.com" <surenb@google.com>, "Accardi, Kristen C"
+	<kristen.c.accardi@intel.com>, "Feghali, Wajdi K"
+	<wajdi.k.feghali@intel.com>, "Gopal, Vinodh" <vinodh.gopal@intel.com>,
+	"Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
+Subject: RE: [PATCH v4 01/10] crypto: acomp - Define two new interfaces for
+ compress/decompress batching.
+Thread-Topic: [PATCH v4 01/10] crypto: acomp - Define two new interfaces for
+ compress/decompress batching.
+Thread-Index: AQHbPXWM22jcCkeyAE6LgM2tVAM8N7LHv8kAgACul1CAAGZgQA==
+Date: Tue, 26 Nov 2024 02:13:00 +0000
+Message-ID: <SJ0PR11MB56786BA58DA2E5C83824CBDAC92F2@SJ0PR11MB5678.namprd11.prod.outlook.com>
+References: <20241123070127.332773-1-kanchana.p.sridhar@intel.com>
+ <20241123070127.332773-2-kanchana.p.sridhar@intel.com>
+ <Z0RE3Bn1WWANGsvK@gondor.apana.org.au>
+ <SJ0PR11MB5678CAD2BB752D97C770031EC92E2@SJ0PR11MB5678.namprd11.prod.outlook.com>
+In-Reply-To: <SJ0PR11MB5678CAD2BB752D97C770031EC92E2@SJ0PR11MB5678.namprd11.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SJ0PR11MB5678:EE_|CH3PR11MB7675:EE_
+x-ms-office365-filtering-correlation-id: 6ed1365d-77c1-4159-247d-08dd0dbfd9df
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|7416014|10070799003|1800799024|366016|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?dtgBvaqHxUCxM4NID0193JqzkOctcGOMfMMf2EhhC4xlDbY27SaPsyQTmqqF?=
+ =?us-ascii?Q?tpnJSgNSNHyTHfJYwp9DNHx0yzbsAIbsBTN0wa0YsnLfCfNOBAxWDKcSFIdk?=
+ =?us-ascii?Q?dE8iJno9AlHGiXvLgxl0Wr2i37pr2PutwMB1Z2GmEwAqonmidhIDxC1+qB1E?=
+ =?us-ascii?Q?uw90TzK8oib1s3SfWLC4tbuAdU1M9HsE/AGKoLCrAsGwbowfWvy0vhABBiLB?=
+ =?us-ascii?Q?gWVC8w/e8l48XIjdADZUzgHMUvkP6qcIGeg0cxeNamrGneubvHwCEeTJd8S7?=
+ =?us-ascii?Q?pliMNl5MxwbjTepTdPfubN9kZb6x9Rndd4HBPn3BzGVHaf2tRiKLpqEubcS1?=
+ =?us-ascii?Q?/bGwFFdNNWJIHzrqpKiIGGc25ZJv9SB+48D3XHcD49fsWGPPNUH0HcqRDeTT?=
+ =?us-ascii?Q?7UQPddu//QWG2DbW9zWCvKliMXlprNg3P2NnVLjvL0BVzzJDa+3+vd4WUgP0?=
+ =?us-ascii?Q?5cAB4cSb3w3NBuWIGw6mPS4N7Tw8blWatEZT69sPXNYUgvwg/9FCfWNYPQ7n?=
+ =?us-ascii?Q?Rni8goskLmTEcYo3wXi7Nzb1VywFtlcDQXtzXkDZH7z2933umKK6pg7BS6p9?=
+ =?us-ascii?Q?vQYZDOA5jZSWFc8PupQGYzPhzSA7T+PZZzkLrOCwFaf1oNAQBToaeafo034R?=
+ =?us-ascii?Q?v8yE+j8Q4GQUYWQZXYZdBdPU5njDnS7qd64LOZS0t1WNuBSqDd9/IMsPsNjF?=
+ =?us-ascii?Q?ySHiFi7TI7sQzunp5dNcJOpPCL3hWNmfZs0AaIl8eymhEE/bzWSS4yOPSfZy?=
+ =?us-ascii?Q?ko7idVFH0RW97WuT+GlG17sYvBTylm4+QHquHE5lzY/u5tUr/cre2JXD0Jk5?=
+ =?us-ascii?Q?rK+NdQrdhU0/AoJ4zuvWE/UJOSFn1z9J0KPWjFm4WQHXimNKVyOdkM2X+6PT?=
+ =?us-ascii?Q?hGQFRlXwdgJppx4Yf3S+LudMSj+xf4bQMYBjqUP9wVyJtzqxE0Zn+54ZjMYb?=
+ =?us-ascii?Q?V9AFUbvZ122A4oIRnkt6qOSU0al58/ah86D5N8lhfVxwKCGTuHMlyWsTPUHJ?=
+ =?us-ascii?Q?jWqj0HalTiw84Gnaylo5Va722PXVtD/T3pijP4TzMe0wpbb9fJU8ardAN8Jj?=
+ =?us-ascii?Q?MN9XPeOSLV2lFsdrL9B1BiEypxMwmYUQdytR26Q0j6mOH7HrIRbFUOGUgiPO?=
+ =?us-ascii?Q?liGPKGZaRBtXC2e6X+t/8nrjMSY8jANYLoJFZ8HvG22YiMCdskJkwU7NEHR8?=
+ =?us-ascii?Q?MQSHMt6voNMVpF0fW2ANjiFPtCkY5bk99/zzcyrOA0EbXbi2CCj9wrQiIeIy?=
+ =?us-ascii?Q?6GHDGt1s7Q5sYRDNLECju/nLZFOsxkfp1y47gNLp861PCqCz/fnSioeCNm65?=
+ =?us-ascii?Q?Kw+z6sYKnEAAXYkCPs6PLvdNoOdeURJrSFQPpkshQAi2KZk62ahR/3SuPwhc?=
+ =?us-ascii?Q?igJQna0=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR11MB5678.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(10070799003)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?up0R732uHZN/uZoQwybi5RV6zYe8oj5xOpYTEDGtqB72+fPnWxcQQv4J1OVe?=
+ =?us-ascii?Q?s69OIXt2grVq7h3gUfrKXRartr4Awd6KQQl0e0cvhfToHF/IvdH69Z11QnpI?=
+ =?us-ascii?Q?26QAx4/fv8yvKT0Df7VDCRmcbdAAralLdq4yy+LGwUw/EIEmmWiCVy7EV4kR?=
+ =?us-ascii?Q?5YgU010fu7r1bgh95aSA2gX1FFT21PmnuP4EN8xIL5uSMV/ryloR8ZSQhmRr?=
+ =?us-ascii?Q?y5dLc0lAgR9KcnW4/kAtno81u30gbE+XzoMsz/oVM8z57rc0sRszC+WgaVG0?=
+ =?us-ascii?Q?XeUuKVstLKg4XL+fpd+z/wjH2akkZGr5RdDS5PqCEqiCLIkLeHBar26/seW8?=
+ =?us-ascii?Q?t7bYIpWkkgcigfTyTCnkawDrnDjQfUEtO5dbsjUr95iZCoF+sYtXnC7xn2cY?=
+ =?us-ascii?Q?6tbs2sSXFhFgfpO2e/XUMarthRIiuFpGMqX8pJonbRiGMqnTREzo4aWnR3cR?=
+ =?us-ascii?Q?EWD5z/RiD/l70gZ39MJCiTyrJvo0QZHVTZ7Y8edc2zS6HrAxWguqRz/d7iua?=
+ =?us-ascii?Q?PrlBXzAtC3lPHlsYyQMU5txDfSnv4kA7tCOT/6AdItXLge/ZNv1t52+YMU1d?=
+ =?us-ascii?Q?ExBkjnA54IDfdpsG4GJwrsllvQ/jW9HgxIzjgSo3vGsQBL1Iwolxfw21kVLj?=
+ =?us-ascii?Q?NpfprlnYf05Lb7HbWmeT6N14lkGdME47DjTMLzM4drGiFOVvgxo8OJO6rrTZ?=
+ =?us-ascii?Q?JMvvDpfKeoLYN2/G5NEdiV2M0h9V/sj7MYpENLvsolR5zHdjNV3B3RmJuoke?=
+ =?us-ascii?Q?KCAknI8ZtUlr4F11X7Mjpb4Jo2GO3nB7SwsU9K87S+AlY65vVeQB8FmbStcr?=
+ =?us-ascii?Q?48yPXDBNCupbtkwmQCHTEI5Ha7Pu2Pq4hznUo4fABYns6L5OSWSbKs3nxUEg?=
+ =?us-ascii?Q?xtVnsjZAh669Ng/hKvYMpZIEVsU/fJTD1xnT1LlmupQ/G3DRlqoIHHN27RoB?=
+ =?us-ascii?Q?OJ4jRTNHj7ZYl51Pwq5LxRVA93EjV4LEAkOTuB95LOFArOlrlAeusdfIiD+H?=
+ =?us-ascii?Q?weovPDV1//f5LH8xrbeN6/Hb7BeA68TqXW1aNxfKN6Rt154hNGE4JTDYViCt?=
+ =?us-ascii?Q?itdkljdquy3g70w7elbLUfvH256t8tHcustuySDV4se+M59oX3bFvWl7m28S?=
+ =?us-ascii?Q?8uMYfiXVVpe66puVYfyQL8p5NNunotYd7JQjwtzdLNhjoZ2v7r4pUWRd9ZYK?=
+ =?us-ascii?Q?96E6iPddOApgB64Z7oMfqCcCQXTzXVvv0KVcX/26JHwTF2SJjZGKrm2I/wkR?=
+ =?us-ascii?Q?dtfO+jkqLFKKz32ZtcOUozSR2+8wgUHsNTdkA8mQsODx3kDXwN7MbVjTN4wP?=
+ =?us-ascii?Q?3+dcQUI2gk6mU0TbvvkcaKVl9x9xdPHsTo9KMwa19MPL60Zu1EsP9iAPyYQt?=
+ =?us-ascii?Q?PhOEAu3wRinnK0E3eioacUJjQoaKHEsRiPo5wHHr/sFVX423ztWGoyOuiAbj?=
+ =?us-ascii?Q?Y4+qLfDKNhoafp+w27NT7C23txFKfMLNeZmLlB4lETxLJskLsOZxdcHvABHR?=
+ =?us-ascii?Q?fCDsqqKpIYIzgd+kbjzOk774PtegxIqTW3NCk2kVi71SXCdvvMIszEuoAiNy?=
+ =?us-ascii?Q?BcIITVPS/OmEccimhjuMM+21KQMpkaiG2XiEcRmCR/6/i3e+JLvn/ptLQZpW?=
+ =?us-ascii?Q?kb4bNr7osSp2kkwnc/C7UTrYm2HXAlvPnRMly7oqzEscv0fw0R/IcTRvnoGS?=
+ =?us-ascii?Q?CjEpwg=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0bdaa2ef-3979-4963-be75-0a5a89728f44@quicinc.com>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ0PR11MB5678.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6ed1365d-77c1-4159-247d-08dd0dbfd9df
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Nov 2024 02:13:00.1465
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: egHpwDVq2yppFYTkdGBadl5nXaatza7PicBioOqo6cZANqBoxYwzEy7r3Szs5OlZCWHiyRwlFWLqOPX2Et05udlmAqIts5mbYAVPC9GZxHo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7675
+X-OriginatorOrg: intel.com
 
-On Sun, Nov 24, 2024 at 09:17:40AM +0530, Yuvaraj Ranganathan wrote:
-> Hi Krzysztof,
-> 
-> I sincerely apologize for the inconvenience. I added the "Reviewed-by"
-> tag without fully understanding its implications. I will remove the tag
-> in the next patch series.
+Hi Herbert,
 
-First of all, please don't top-post. Put your text under the phrases
-that you are responding to, not at the top of the message. Otherwise the
-logic is a bit broken.
+> -----Original Message-----
+> From: Sridhar, Kanchana P <kanchana.p.sridhar@intel.com>
+> Sent: Monday, November 25, 2024 12:03 PM
+> To: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: linux-kernel@vger.kernel.org; linux-mm@kvack.org;
+> hannes@cmpxchg.org; yosryahmed@google.com; nphamcs@gmail.com;
+> chengming.zhou@linux.dev; usamaarif642@gmail.com;
+> ryan.roberts@arm.com; ying.huang@intel.com; 21cnbao@gmail.com;
+> akpm@linux-foundation.org; linux-crypto@vger.kernel.org;
+> davem@davemloft.net; clabbe@baylibre.com; ardb@kernel.org;
+> ebiggers@google.com; surenb@google.com; Accardi, Kristen C
+> <kristen.c.accardi@intel.com>; Feghali, Wajdi K <wajdi.k.feghali@intel.co=
+m>;
+> Gopal, Vinodh <vinodh.gopal@intel.com>; Sridhar, Kanchana P
+> <kanchana.p.sridhar@intel.com>
+> Subject: RE: [PATCH v4 01/10] crypto: acomp - Define two new interfaces f=
+or
+> compress/decompress batching.
+>=20
+>=20
+> > -----Original Message-----
+> > From: Herbert Xu <herbert@gondor.apana.org.au>
+> > Sent: Monday, November 25, 2024 1:35 AM
+> > To: Sridhar, Kanchana P <kanchana.p.sridhar@intel.com>
+> > Cc: linux-kernel@vger.kernel.org; linux-mm@kvack.org;
+> > hannes@cmpxchg.org; yosryahmed@google.com; nphamcs@gmail.com;
+> > chengming.zhou@linux.dev; usamaarif642@gmail.com;
+> > ryan.roberts@arm.com; ying.huang@intel.com; 21cnbao@gmail.com;
+> > akpm@linux-foundation.org; linux-crypto@vger.kernel.org;
+> > davem@davemloft.net; clabbe@baylibre.com; ardb@kernel.org;
+> > ebiggers@google.com; surenb@google.com; Accardi, Kristen C
+> > <kristen.c.accardi@intel.com>; Feghali, Wajdi K
+> <wajdi.k.feghali@intel.com>;
+> > Gopal, Vinodh <vinodh.gopal@intel.com>
+> > Subject: Re: [PATCH v4 01/10] crypto: acomp - Define two new interfaces
+> for
+> > compress/decompress batching.
+> >
+> > On Fri, Nov 22, 2024 at 11:01:18PM -0800, Kanchana P Sridhar wrote:
+> > > This commit adds batch_compress() and batch_decompress() interfaces
+> to:
+> > >
+> > >   struct acomp_alg
+> > >   struct crypto_acomp
+> > >
+> > > This allows the iaa_crypto Intel IAA driver to register implementatio=
+ns for
+> > > the batch_compress() and batch_decompress() API, that can subsequentl=
+y
+> > be
+> > > invoked from the kernel zswap/zram swap modules to
+> > compress/decompress
+> > > up to CRYPTO_BATCH_SIZE (i.e. 8) pages in parallel in the IAA hardwar=
+e
+> > > accelerator to improve swapout/swapin performance.
+> > >
+> > > A new helper function acomp_has_async_batching() can be invoked to
+> > query
+> > > if a crypto_acomp has registered these batch_compress and
+> > batch_decompress
+> > > interfaces.
+> > >
+> > > Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
+> > > ---
+> > >  crypto/acompress.c                  |  2 +
+> > >  include/crypto/acompress.h          | 91
+> +++++++++++++++++++++++++++++
+> > >  include/crypto/internal/acompress.h | 16 +++++
+> > >  3 files changed, 109 insertions(+)
+> >
+> > This should be rebased on top of my request chaining patch:
+> >
+> > https://lore.kernel.org/linux-
+> >
+> crypto/677614fbdc70b31df2e26483c8d2cd1510c8af91.1730021644.git.herb
+> > ert@gondor.apana.org.au/
+> >
+> > Request chaining provides a perfect fit for batching.
 
-Second, may I ask, what made you add that tag at all? I went on and
-checked. Krzysztof didn't repond at all to v3 and didn't respond to v2
-of this patch. So why?
+I wanted to make sure I understand your suggestion: Are you suggesting we
+implement request chaining for "struct acomp_req" similar to how this is be=
+ing
+done for "struct ahash_request" in your patch?
 
-Third, if you are unsure about what you are doing and as you seem to be
-using b4 tool, please just use `b4 trailers -u`. It has its own
-drawbacks so in some cases one should be careful, but at least it
-doesn't invent tags on its own.
+I guess I was a bit confused by your comment about rebasing, which would
+imply a direct use of the request chaining API you've provided for "crypto =
+hash".
+I would appreciate it if you could clarify.
 
-> 
+Thanks,
+Kanchana
+
+>=20
+> Thanks Herbert. I am working on integrating the request chaining with
+> the iaa_crypto driver, expecting to have this ready for v5.
+>=20
 > Thanks,
-> Yuvaraj.
-> 
-> On 11/22/2024 8:30 PM, Krzysztof Kozlowski wrote:
-> > On 22/11/2024 08:43, Yuvaraj Ranganathan wrote:
-> >> The qcs8300 SoC has a True Random Number Generator, add the node with
-> >> the correct compatible set.
-> >>
-> >> Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-> >> Reviewed-by: Krzysztof Kozlowski <krzk+dt@kernel.org>
-> > 
-> > NAK, stop adding fake tags. It is impossible to receive above tag from
-> > me written that way.
-> > 
-> > Best regards,
-> > Krzysztof
-> 
-
--- 
-With best wishes
-Dmitry
+> Kanchana
+>=20
+> >
+> > Cheers,
+> > --
+> > Email: Herbert Xu <herbert@gondor.apana.org.au>
+> > Home Page: http://gondor.apana.org.au/~herbert/
+> > PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
