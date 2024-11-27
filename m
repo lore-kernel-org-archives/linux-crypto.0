@@ -1,117 +1,139 @@
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53276201279
-	for <linux-crypto@vger.kernel.org>; Wed, 27 Nov 2024 18:59:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FFC9191F8E;
+	Wed, 27 Nov 2024 23:44:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732733970; cv=none; b=HiUe4L33XWwY9fBMdQmLrAA+9YlMZzR5soIYulUbkrjeV3y8Vh0s5aYhBMRiVVlncdu4mCD5cFVQiOaD9rPbg/WEhmu8XIt34pcJpTn5n2sEIVo7IRJzijxI/YKyahOvz13TqrPBQsS/TOdtO+jFUPAMR2povZKtf+Ul2naEDww=
+	t=1732751059; cv=none; b=AJbJ3eAlBiaQiVr/IR0bfrlPP9Ba/OC3LMpvYGT0oQHr5nsqmgJxPChS6H7ifjcln4UNMUI9/MYogS4vTLScvedthpFCaAESP+vEyyyKk/ETTtCldsYJFKP9W6B/yTXZxAO2RTlKDjCagkS/7v4TPsvKl1ImZCUIxlUeJHe6FrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732733970; c=relaxed/simple;
-	bh=/imuxOh1Hqf011Yk1bMnQgHUMasJHcgBVT1sZLWpzZM=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=dnlJ5SnrfnsSUZxmBIMXXyVURlGWYhVLr6+92yO445bMYalVp/91VwS4201sbvYpsickyvB1teUZMOKoS2rP2cKTLPXMc8Dtee+WgiIe6zVdjzSb8+etCWGEsC2sB0zQeAaTx9jpOPv689F3ddlklVNG1wYD2agVXLI6O37RUzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=YTOPibfj; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+	s=arc-20240116; t=1732751059; c=relaxed/simple;
+	bh=SJgQfHOSQEkKrprgq2qm57fqyeX+64ivBUN9XHKz728=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Hs/FWwJb+ICh2G/Ug5Yxxh7Awv2mF6h02xUKUmRbPpG3j+SnOPLk59UyYnrJwg7sX15S/CPte4q/6w2fAKJoYXNbVvdGGnYJQijQW7YPgi1pmRFbgGwLxZsw7uJwRXKfq+ecc2xAgubz9P1OJDXmaAMeSs6JeQnJig9BG0yh8ck=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z9OPHKBB; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="YTOPibfj"
-Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 0EB78897FB;
-	Wed, 27 Nov 2024 19:59:18 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1732733960;
-	bh=Z/HrkJo0/BODnVSbshEJQ2R7ff0HmfNC99GX46QxJ+0=;
-	h=Date:From:Subject:To:Cc:References:In-Reply-To:From;
-	b=YTOPibfjQdnukDuVfAtWkczch+kwZFRrfE9REyESg634zR/akAye7ITcql/ntvLj5
-	 lKweL2E0GC/XtuCreKN70CxH8u2mXxPb64h3H67e6xz+f5Hl8m+kkooZaNK/ZYEKeI
-	 hyikIMb2i3MFYbQmy21D7qEWPBWGl74LBtdPVihPNXYKgvgUx3wWhI3Pa9IPG/l/Gp
-	 vb/56vJy0A6xsGqa+rd1rX08jwZ1xoW/jjbxYuGssA97OFOBztT5ZcXBbmbczoUemZ
-	 lmjtEwIpAFDeELVgm97v57r7va2EUx+oofp26wVrnPkakZ2TmlNeB8f1gcgJv2kxrs
-	 38VUOyqE7ljDQ==
-Message-ID: <76ffb184-5047-4446-879e-2b42a7191b42@denx.de>
-Date: Wed, 27 Nov 2024 19:59:00 +0100
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z9OPHKBB"
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7251731d2b9so1014292b3a.1;
+        Wed, 27 Nov 2024 15:44:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1732751057; x=1733355857; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=j+MIlH5caWtN86lAoqIcyCI0PAwLZbimudGFiQD/0o8=;
+        b=Z9OPHKBBcq6bDwqay69gYq9JxIMlYWyJ66uP4944wDwIAB5McGdmvVqm9DRBDAXaDJ
+         6EFL4/LQJwGUla8bO15gGVQrYZgBBqe6xP8EAETJMhul0x1ikLhrRIbvCDlfcJ8mH1Mz
+         ZcJwtLf2lshXJ2mWPriu89H6udCwyZMkLMP01Q0UE2fqEioi3Fak3ghH+0+qFB+0On3o
+         E03iTUqjpHeMd81bX/zBQSzEL3y0qE4wVxLg409yUbucWFjjjmwNUtscILFHz1KxLCE/
+         Yu09hRoZBYwUGbyHTQvc1XgrtVIrx0HZvWKXSbOJgH2mxGLGhaXBGoo1Wl7YRoaTbnQK
+         wWaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1732751057; x=1733355857;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=j+MIlH5caWtN86lAoqIcyCI0PAwLZbimudGFiQD/0o8=;
+        b=WJexTVjd4TyHWVlMd05T1OVPd9cuiG8OlPEmG3dNFDb6aD81+bi6Nq4+iZ3IWRQRZP
+         BAT4+6Pe1qX68OykOot9HZVroZ4iqS032RwnsbfZbRk2jqaFqZ5qf5+zaoabDLpZcms6
+         bd5XmeH7PDTmv4HwiZG34XtvTQLl9ibybTGMMBxASjCv0X+V2sut5mgzaSEbGA0jm7Rw
+         VOkmdzB6JdSDaEiG9/zioeY4z8CkzV6+Nx8+kBEdysJmnwOUAy8aBDyqER3E8zcQnsnn
+         L1FrZDfBUZ9Eu0KlJrfv5vwpX733rU/fefdSn1jpEcgT/fwmmUEMafLRJ1kI0WHO6WCb
+         +mIw==
+X-Forwarded-Encrypted: i=1; AJvYcCUAuGBe9w5Hwkk89ace5Vsf4Cfwpr7tSBkDx2gr8f84YPlFLEJ7VMbpIZLWfVw/wz7/uqAqQqNuWC9sIBw=@vger.kernel.org, AJvYcCUmSaggSJZuNEONfhbdCK1wPQjG88MgFGBNn9MGpyDdxh7sMooB/tY4vQK0CwZCuVfQ3Fb40upDDvKBXmXs@vger.kernel.org
+X-Gm-Message-State: AOJu0YxmRHcKk67e1U1pxu9FwZk70Cisovsy0rwjrwPwVl/FQ/9e0nss
+	n71DTVZxUX4omtKfBC9sMP2fPaX9g1uPseUVa5aXynegF4jruEfG
+X-Gm-Gg: ASbGncuwdy4GYIZ3VKYd0I9EOIxeEUCOyj2AY4OGdxh6tfnRLtILmjsuUvahhm9VVHR
+	q4cbsSu9jr8zjV4pZ5uv2SOuJwwjc6FnQxZgC6rwIJscMJaEV9jCz52S14GRRwGz6rrKMVDn1Ww
+	Bq89w9oF34FnaXNSARCuV7tj0bIEP+VW3SFnUmybPp8MB/p+saxOpiJ6rtorKmusV0t/TnoI2VX
+	CGgPXCjeHgzNmt51ZsvxTkm/CcILNNuK92XoSvmWB7WdxHQW60A
+X-Google-Smtp-Source: AGHT+IGZJyMglYCdFWYJvTUolybseLph5KHalgMYhe6FouC4A/B7u1APP2l2Yk+cRmbxW/j7oEFFdA==
+X-Received: by 2002:a17:902:f541:b0:20c:f6c5:7f6c with SMTP id d9443c01a7336-2151d33e1e0mr20148275ad.16.1732751057389;
+        Wed, 27 Nov 2024 15:44:17 -0800 (PST)
+Received: from localhost ([38.141.211.103])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-725417fbffasm141807b3a.103.2024.11.27.15.44.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Nov 2024 15:44:16 -0800 (PST)
+From: Ragavendra <ragavendra.bn@gmail.com>
+To: herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	tglx@linutronix.de,
+	mingo@redhat.com,
+	bp@alien8.de,
+	dave.hansen@linux.intel.com,
+	hpa@zytor.com
+Cc: x86@kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ragavendra <ragavendra.bn@gmail.com>
+Subject: [PATCH] x86/aesni: fix uninit value for skcipher_walk
+Date: Wed, 27 Nov 2024 15:43:47 -0800
+Message-ID: <20241127234347.1739754-1-ragavendra.bn@gmail.com>
+X-Mailer: git-send-email 2.46.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Marek Vasut <marex@denx.de>
-Subject: Re: [PATCH 1/2] [RFC] hwrng: fix khwrng lifecycle
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org,
- Dominik Brodowski <linux@dominikbrodowski.net>,
- Harald Freudenberger <freude@linux.ibm.com>,
- Li Zhijian <lizhijian@fujitsu.com>, Masahiro Yamada <masahiroy@kernel.org>,
- Olivia Mackall <olivia@selenic.com>
-References: <20241024163121.246420-1-marex@denx.de>
- <ZyX7ind-SnHoDt7E@gondor.apana.org.au>
-Content-Language: en-US
-In-Reply-To: <ZyX7ind-SnHoDt7E@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Transfer-Encoding: 8bit
 
-On 11/2/24 11:14 AM, Herbert Xu wrote:
-> On Thu, Oct 24, 2024 at 06:30:15PM +0200, Marek Vasut wrote:
->>
->> @@ -582,15 +585,12 @@ void hwrng_unregister(struct hwrng *rng)
->>   	}
->>   
->>   	new_rng = get_current_rng_nolock();
->> -	if (list_empty(&rng_list)) {
->> -		mutex_unlock(&rng_mutex);
->> -		if (hwrng_fill)
->> -			kthread_stop(hwrng_fill);
->> -	} else
->> -		mutex_unlock(&rng_mutex);
->> +	mutex_unlock(&rng_mutex);
->>   
->>   	if (new_rng)
->>   		put_rng(new_rng);
->> +	else
->> +		kthread_park(hwrng_fill);
-> 
-> The kthread_park should be moved back into the locked region
-> of rng_mute).  The kthread_stop was moved out because it could
-> dead-lock waiting on the kthread that's also taking the same
-> lock.  This is no longer an issue with kthread_park since it
-> simply sets a flag.
-> 
-> Having it outside of the locked region is potentially dangerous
-> since a pair of hwrng_unregister and hwrng_register could be
-> re-ordered resulting in the kthread being parked forever.
+In crypto/aesni-intel_glue.c most declarations of struct
+skcipher_walk are unitialized. This causes one of the values
+in the struct to be left uninitialized in the later usages.
 
-Sorry for the late reply.
+This patch fixes it by adding initializations to the struct
+skcipher_walk walk variable.
 
-I'm afraid this problem is still present, since kthread_park() 
-synchronously waits for the kthread to call kthread_parkme(), see 
-kernel/kthread.c :
+Fixes bugs reported in the Coverity scan with CID 139545,
+1518179, 1585019 and 1598915.
 
-  655 int kthread_park(struct task_struct *k)
-  656 {
-...
-  665         set_bit(KTHREAD_SHOULD_PARK, &kthread->flags);
-  666         if (k != current) {
-  667                 wake_up_process(k);
-  668                 /*
-  669                  * Wait for __kthread_parkme() to complete(), this 
-means we
-  670                  * _will_ have TASK_PARKED and are about to call 
-schedule().
-  671                  */
-  672                 wait_for_completion(&kthread->parked);
-                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-                      This part .
+Signed-off-by: Ragavendra Nagraj <ragavendra.bn@gmail.com>
+---
+---
+ arch/x86/crypto/aesni-intel_glue.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-The hwrng_fillfn() may call put_rng() which locks rng_mutex() for a 
-short time, and if kthread_park() is called before hwrng_fillfn() calls 
-put_rng() within a section protected by rng_mutex too, put_rng() could 
-never claim rng_mutex and hwrng_fillfn() can never reach 
-kthread_parkme() call, causing a deadlock.
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index b0dd83555499..168edb21a6c4 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -398,7 +398,7 @@ static int ctr_crypt(struct skcipher_request *req)
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct crypto_aes_ctx *ctx = aes_ctx(crypto_skcipher_ctx(tfm));
+ 	u8 keystream[AES_BLOCK_SIZE];
+-	struct skcipher_walk walk;
++	struct skcipher_walk walk = {};
+ 	unsigned int nbytes;
+ 	int err;
+ 
+@@ -447,7 +447,7 @@ static int xctr_crypt(struct skcipher_request *req)
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct crypto_aes_ctx *ctx = aes_ctx(crypto_skcipher_ctx(tfm));
+ 	u8 keystream[AES_BLOCK_SIZE];
+-	struct skcipher_walk walk;
++	struct skcipher_walk walk = {};
+ 	unsigned int nbytes;
+ 	unsigned int byte_ctr = 0;
+ 	int err;
+@@ -517,7 +517,7 @@ xts_crypt_slowpath(struct skcipher_request *req, xts_crypt_func crypt_func)
+ 	int tail = req->cryptlen % AES_BLOCK_SIZE;
+ 	struct scatterlist sg_src[2], sg_dst[2];
+ 	struct skcipher_request subreq;
+-	struct skcipher_walk walk;
++	struct skcipher_walk walk = {};
+ 	struct scatterlist *src, *dst;
+ 	int err;
+ 
+@@ -1339,7 +1339,7 @@ gcm_crypt(struct aead_request *req, int flags)
+ 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
+ 	const struct aes_gcm_key *key = aes_gcm_key_get(tfm, flags);
+ 	unsigned int assoclen = req->assoclen;
+-	struct skcipher_walk walk;
++	struct skcipher_walk walk = {};
+ 	unsigned int nbytes;
+ 	u8 ghash_acc[16]; /* GHASH accumulator */
+ 	u32 le_ctr[4]; /* Counter in little-endian format */
+-- 
+2.46.1
+
