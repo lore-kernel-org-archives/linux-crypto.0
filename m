@@ -1,48 +1,43 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from bmailout1.hostsharing.net (bmailout1.hostsharing.net [83.223.95.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 627431386DA
-	for <linux-crypto@vger.kernel.org>; Fri, 29 Nov 2024 07:53:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7EAA158208;
+	Fri, 29 Nov 2024 07:54:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732866830; cv=none; b=eVHH3k3QiVBOfKzEHvS4/stSzFg5GpQPljOOFqPB8xFaC38W97AZNfrMb/4JfqEjvzrN+m/MdPsVA5SwaNUKbj1ZKq+i2+6bTqXliQtLycARMYpY31vJtO7y0esb2nomBbsU+S4+CdbtxFW3rG9aMaFHGE0DQYYhccTxadj5Qmw=
+	t=1732866881; cv=none; b=lOyWYjgoCCCONy6DJp11gIo39XgDOzDY8lh5OrCqhx+eC896Ifzbl/q2op4x+GH1gtGbkoI72u0ArVOrXClAdAw3W6toJGLRhWYiRa/6DRWeSVj/CRE2XsY31+p83UsdGJSJfPHwY9npQ0NeEV6f7Z34ylwmP8vycmylmMMT/iI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732866830; c=relaxed/simple;
-	bh=iHexB0u3SJMC/O+J5kuBVL9M813nkNFaiSxgNonF9dc=;
+	s=arc-20240116; t=1732866881; c=relaxed/simple;
+	bh=JaJRL2qlucYu7qlJeg/jT+yPWuSXG8UIn6zT19ZHliU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KGxxnE+r+RpUOW9BgxHZmA990OU/j9TBvinGBjbi5kKCu3W13sdJp06Qx3saaQTgEOqvrthg/vP6TwNZ6XI/s1fcOHvckt5qvZ7A8ZjLDTJE5nygxv/gbNyNaNAdqQzWcigqagV8iE4bcfbYaWNe7Zg9mE7h3Y01OifrNUNohiA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=MYbyHZbZ; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="MYbyHZbZ"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=kBU90g0zbJJQ4NqQPadVmh0gJRiHB7AzAcAaoVrZqKs=; b=MYbyHZbZPBLzViDU9DJhVbTfeR
-	vN/ILl22qF3OiknGBvGTrh6iiDYkx3f2jMs0bTLLJBSJecIMq1e0JLlV3otZLJGPkAZBhFSCfo/Oc
-	A2lF6/I6PK7gjF+LCd3B2gdTbcVvInGTCjxGJX/7JymuZJHRRbJShHr5PrEYJgW4U7bHnGOa3Rwrq
-	pvIEO4U4lLn93yNUD4pOy+LW+5fZmqhuWrtlx/CXPJ+SDq9qkrBEMMlPwQ9mShDHSSWfpKX7oMiul
-	0hKcO+gzzmi8TAgiG5gE8ysC2AvB8P3CTShWANqMj+ZZ8OtkPAerKQO2uNspXBsPp1ipKB4dRA5l6
-	5FBUzelA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tGvof-002LPV-1L;
-	Fri, 29 Nov 2024 15:53:30 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 29 Nov 2024 15:53:29 +0800
-Date: Fri, 29 Nov 2024 15:53:29 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Lukas Wunner <lukas@wunner.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Zorro Lang <zlang@redhat.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH crypto-2.6] crypto: rsassa-pkcs1 - Avoid pointing to
- rodata in scatterlists
-Message-ID: <Z0ly-QVERkD5Wtfu@gondor.apana.org.au>
-References: <3de5d373c86dcaa5abc36f501c1398c4fbf05f2f.1732865109.git.lukas@wunner.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=kUIN0LNdshJ3+1SWQkkI0BsCj4gpP+h3jnRtJm66tyn2YF8MP0tE1j22QJ5eNRd7sVAg98mkLNKvsYoIWctLaQ0WXbuL6Ud4x3NYq4mfJYpZQKz3EqG7kJrx3Xq495KrHZ5gcaHGVPczkm87YP+uwzkPsmttAO4nDtdqBpSx7d8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.95.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
+Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by bmailout1.hostsharing.net (Postfix) with ESMTPS id C383E30002AC2;
+	Fri, 29 Nov 2024 08:54:35 +0100 (CET)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id A00D0331C41; Fri, 29 Nov 2024 08:54:35 +0100 (CET)
+Date: Fri, 29 Nov 2024 08:54:35 +0100
+From: Lukas Wunner <lukas@wunner.de>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Ard Biesheuvel <ardb@kernel.org>, Zorro Lang <zlang@redhat.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [Bug report] kernel BUG at include/linux/scatterlist.h
+Message-ID: <Z0lzOw7mQGuPrXlD@wunner.de>
+References: <20241122045106.tzhvm2wrqvttub6k@dell-per750-06-vm-08.rhts.eng.pek2.redhat.com>
+ <CAMj1kXGAuJSdDWvu7D5-PT6mSbNG9FeLObnYmpHeT08eNxaJWQ@mail.gmail.com>
+ <Z0A2W1FTTPt9PeI5@gondor.apana.org.au>
+ <Z0BCtZi2YJywGJAk@gondor.apana.org.au>
+ <Z0NTLDYJQC242GMB@wunner.de>
+ <Z0OzDle-VrrXf8rW@gondor.apana.org.au>
+ <Z0RRiq-BJp8CYdNk@wunner.de>
+ <Z0RTgsb5Va9psaIs@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -51,31 +46,37 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3de5d373c86dcaa5abc36f501c1398c4fbf05f2f.1732865109.git.lukas@wunner.de>
+In-Reply-To: <Z0RTgsb5Va9psaIs@gondor.apana.org.au>
 
-On Fri, Nov 29, 2024 at 08:46:58AM +0100, Lukas Wunner wrote:
->
-> @@ -185,6 +187,16 @@ static int rsassa_pkcs1_sign(struct crypto_sig *tfm,
->  	if (slen + hash_prefix->size > ctx->key_size - 11)
->  		return -EOVERFLOW;
->  
-> +	/*
-> +	 * Only kmalloc virtual addresses shall be used in a scatterlist,
-> +	 * so duplicate src if it points e.g. into kernel or module rodata.
-> +	 */
-> +	if (!virt_addr_valid(src)) {
+On Mon, Nov 25, 2024 at 06:37:54PM +0800, Herbert Xu wrote:
+> On Mon, Nov 25, 2024 at 11:29:30AM +0100, Lukas Wunner wrote:
+> > I deliberately avoided the crypto_akcipher_sync_encrypt() API
+> > in rsassa-pkcs1.c because the extra buffer allocation plus copying
+> > data around impacts performance for no benefit.
+> 
+> This is temporary.  The idea is to convert the akcipher software
+> implementations over to use virtual addresses directly so that no
+> unnecessary copy occurs.  Have a look at what I did with ahash:
+> 
+> https://lore.kernel.org/linux-crypto/bffef4bab1bf250bd64a3d02de53eb1fd047a96e.1730021644.git.herbert@gondor.apana.org.au/
+> 
+> This is what I'd like to do with akcipher as well.
+> 
+> Longer term there is potentially another unnecessary copy if you
+> go from a kmalloced virtual address to an akcipher hardware driver,
+> but we could eliminate that by adding a flag to indicate that the
+> virtual address is safe for use within an SG list.
 
-Please don't do this.  You cannot turn a virtual address into
-an SG list in general.  This is just one of the many failure
-scenarios.
+I'm proposing an optimized approach which auto-detects whether
+duplicating into the linear map is actually necessary:
 
-The only safe way to do this is for the user to tell us that it's
-OK.
+https://lore.kernel.org/r/3de5d373c86dcaa5abc36f501c1398c4fbf05f2f.1732865109.git.lukas@wunner.de/
 
-So please switch over to the sync interface.
+I reckon that aside of selftests, duplicating is almost never needed.
+
+Let me know if you have any objections.  My apologies for being
+stubborn and rebellious and not always following what I'm told.
 
 Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+Lukas
