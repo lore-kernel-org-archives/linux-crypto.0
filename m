@@ -1,54 +1,43 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 114EF1386DA;
-	Fri, 29 Nov 2024 08:03:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6ABC1598EE
+	for <linux-crypto@vger.kernel.org>; Fri, 29 Nov 2024 09:11:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732867406; cv=none; b=mEKKcjZhDzwsH0KwOoTDFrmXgPMmIBPqn0ZDhA3aJ5TzA8EfeQN99pk8ZvAQMwv0dv17sLVzvhexEkxzE795tjkwVAzSYObi64ZI4LkFXGBDNxCIZjUCgK9Ot18Ai2bNN+LK1uEZwo0cQSh4plCQZ3FG00e0TDZYCIV/c67JECY=
+	t=1732871500; cv=none; b=copwqZ6+rdFhA6I11nTui5/SfQevNpB5LDBqYDRlFs2PMZ6qJ4lzC9iDO7uxjYFwk8tGtUl2bxOHTk1+zw/HK7LTkwQ5IlE40QUsB2iHluQvcO1eso10jnOc+YpT411c3M32eRNuFjnG3ySYdnrxt0JwvDLtfGUZL25OcZF0dB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732867406; c=relaxed/simple;
-	bh=kGri16/ImZOKDGaiLaic3Uv52gfxoK3N4CEXKjQlzD0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F/K4z+j8Og9bPZJg58biv8aW+eKA21zPvPyo7LP6bRREKRXjX0eMrLDWn+YMJT4gyQWQWM0myPDipTPyiYhZaifvC+kwpr5kdlCpCHwBYueoJfFB+ajX3HQoZDUU47kF//lyaLv741FeuGkiNAnfvTnbuPzC9UdvlJBI5DJec7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=ZoWIEVu8; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1732871500; c=relaxed/simple;
+	bh=5TupBwc0KrPgHFEPcYxK6HempSLu7zgHhlYAhk1M02k=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=DA6Xzd/zPU90nQJ7K9cXnnNHnpPZs3EOTnNKTwg8YXrZigd9/mBbCaogO5d44UrOJ2CCGs2HOITO86zV+8I9y70khEbicJqeLqk0AP3cXPz3dueHRW++P+DcIRODgu+s9wP6rsBEDJmqq0vo0JWbxiqzdbL5RSR9EoL5L/w4JQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=mm30Lx40; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="ZoWIEVu8"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="mm30Lx40"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	s=formenos; h=Content-Type:MIME-Version:Message-ID:Subject:To:From:Date:
+	Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=5/BSC2qpFBtcihW54L9NVV8nUFlWPNDr07rwh6J6P+o=; b=ZoWIEVu8alMzYOmGZlTjmTDgUU
-	N1ndBYJhEbat49Os/jX5cL5Lqoh27bLe3WMeUrCjolouW4YJywXjSav5PO/8yEFuLWxWpOiBGHJhO
-	uds/5VuxPoUS0Mst0Vo60kjGhZrv5mnn0xnpMFKGMRiOhMdK2mjy6mmOxvtN8WMxSGixFr4XuJf5M
-	RPFMJx8OWs/OfedoKc+Bv7SW6ilHz1BVJSlRiwkbrmy/UfI/RjiT5kP98YoCQbD/xHM3zbZY1cgak
-	FWqpxnfzsGt166OCjWGv4CdoK+kqFUUe28U+G8/7mLJMOQUEj+3gez3RrITVTptzLQr4G2ik4x0Jy
-	vpZ8sMiA==;
+	bh=Wzh3FPL1Enqe7ci06Ju+4uei0zfN1sdgF2VSuGFZ3ak=; b=mm30Lx40ZPFYEXs2S0y+Lzf6Q7
+	zKFMU00TRw8FdJGhwHJzwsK9fvex2rYsLu9ygMCXKbqT73elsjX/83zfDH6zGZc1HeiLUZxrOigim
+	qI3cP6JLwn3SaAtieQvHzBBPuD4ytYG/vpYZ7ZC7cXx2so158U5hOnFyrPz28eKY87ijlSLwf2Jcr
+	/SOgsK0bWdZ7bG8RW6huNAJoXesAUD8wDscoIzGU3jiLLPgDj70Ko7+niwXgTSF9g1UgnHzD+/O7p
+	LEfgawwr8IH7Xth5Yx9I/Yt4ANAh/07Q1Rh/8jPx7Qixi3BXlJ8wUs42nsyDUX9egSEpibJqW7/fT
+	xMb6F1UA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tGvy5-002LZn-00;
-	Fri, 29 Nov 2024 16:03:14 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 29 Nov 2024 16:03:12 +0800
-Date: Fri, 29 Nov 2024 16:03:12 +0800
+	id 1tGx2D-002MLl-2z;
+	Fri, 29 Nov 2024 17:11:35 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 29 Nov 2024 17:11:33 +0800
+Date: Fri, 29 Nov 2024 17:11:33 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Lukas Wunner <lukas@wunner.de>
-Cc: Ard Biesheuvel <ardb@kernel.org>, Zorro Lang <zlang@redhat.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [Bug report] kernel BUG at include/linux/scatterlist.h
-Message-ID: <Z0l1QI4-zK9EVNnJ@gondor.apana.org.au>
-References: <20241122045106.tzhvm2wrqvttub6k@dell-per750-06-vm-08.rhts.eng.pek2.redhat.com>
- <CAMj1kXGAuJSdDWvu7D5-PT6mSbNG9FeLObnYmpHeT08eNxaJWQ@mail.gmail.com>
- <Z0A2W1FTTPt9PeI5@gondor.apana.org.au>
- <Z0BCtZi2YJywGJAk@gondor.apana.org.au>
- <Z0NTLDYJQC242GMB@wunner.de>
- <Z0OzDle-VrrXf8rW@gondor.apana.org.au>
- <Z0RRiq-BJp8CYdNk@wunner.de>
- <Z0RTgsb5Va9psaIs@gondor.apana.org.au>
- <Z0lzOw7mQGuPrXlD@wunner.de>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [PATCH] crypto: sig - Set maskset to CRYPTO_ALG_TYPE_MASK
+Message-ID: <Z0mFRROEHOpnOvCZ@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -57,25 +46,34 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z0lzOw7mQGuPrXlD@wunner.de>
 
-On Fri, Nov 29, 2024 at 08:54:35AM +0100, Lukas Wunner wrote:
->
-> I'm proposing an optimized approach which auto-detects whether
-> duplicating into the linear map is actually necessary:
-> 
-> https://lore.kernel.org/r/3de5d373c86dcaa5abc36f501c1398c4fbf05f2f.1732865109.git.lukas@wunner.de/
+As sig is now a standalone type, it no longer needs to have a wide
+mask that includes akcipher.
 
-No this is not going to work.  Linux runs on many platforms,
-there is no portable way of doing DMA over arbitrary kernel
-memory.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Only memory specifically allocated for DMA is safe to use in
-an SG list.
-
-Since you're refusing to fix this I'll take care of it.
-
-Cheers,
+diff --git a/crypto/sig.c b/crypto/sig.c
+index 5e1f1f739da2..dfc7cae90802 100644
+--- a/crypto/sig.c
++++ b/crypto/sig.c
+@@ -15,8 +15,6 @@
+ 
+ #include "internal.h"
+ 
+-#define CRYPTO_ALG_TYPE_SIG_MASK	0x0000000e
+-
+ static void crypto_sig_exit_tfm(struct crypto_tfm *tfm)
+ {
+ 	struct crypto_sig *sig = __crypto_sig_tfm(tfm);
+@@ -73,7 +71,7 @@ static const struct crypto_type crypto_sig_type = {
+ 	.report = crypto_sig_report,
+ #endif
+ 	.maskclear = ~CRYPTO_ALG_TYPE_MASK,
+-	.maskset = CRYPTO_ALG_TYPE_SIG_MASK,
++	.maskset = CRYPTO_ALG_TYPE_MASK,
+ 	.type = CRYPTO_ALG_TYPE_SIG,
+ 	.tfmsize = offsetof(struct crypto_sig, base),
+ };
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
