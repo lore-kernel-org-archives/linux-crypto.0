@@ -1,50 +1,54 @@
-Received: from bmailout2.hostsharing.net (bmailout2.hostsharing.net [83.223.78.240])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED20315F330;
-	Fri, 29 Nov 2024 08:00:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.78.240
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 114EF1386DA;
+	Fri, 29 Nov 2024 08:03:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1732867258; cv=none; b=k9fSVN/coiMlmmdJREQd7ycGLSPVr2sKm2nAOAN1iVKcNchbKON6qyAhnFTDO9bblz89Lj4oTVlYua28NUfE5a+3iMeFEPcOXflXoeE+9oUW3fHTPIXgcf8fdSieej7TQIE26GMWaQjZS62FmRE5l0879fBjEHaMEaupZBfUBlA=
+	t=1732867406; cv=none; b=mEKKcjZhDzwsH0KwOoTDFrmXgPMmIBPqn0ZDhA3aJ5TzA8EfeQN99pk8ZvAQMwv0dv17sLVzvhexEkxzE795tjkwVAzSYObi64ZI4LkFXGBDNxCIZjUCgK9Ot18Ai2bNN+LK1uEZwo0cQSh4plCQZ3FG00e0TDZYCIV/c67JECY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1732867258; c=relaxed/simple;
-	bh=c27EDe/Ch3F83JtNc0h/e8gRo94TJxOj9812ouwJRHs=;
+	s=arc-20240116; t=1732867406; c=relaxed/simple;
+	bh=kGri16/ImZOKDGaiLaic3Uv52gfxoK3N4CEXKjQlzD0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KXe8iCe++aP2wfQa2G7uga85PEFdbO4mCNHctvw5PTQngKFQaWtWBf8sU4UmaFG6qd4h5bofLidkllpVWG1/CPN8Qqjfb4clZvy4MziI00JjaFmdasB3SZCP5ab8hd8Lf7sD5u9SdvBxctczbOFQ6Tgg/xEqizGcHD7Hmoc1M0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.78.240
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout2.hostsharing.net (Postfix) with ESMTPS id 491C02800BB9A;
-	Fri, 29 Nov 2024 09:00:48 +0100 (CET)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id 29B0F31EAD5; Fri, 29 Nov 2024 09:00:48 +0100 (CET)
-Date: Fri, 29 Nov 2024 09:00:48 +0100
-From: Lukas Wunner <lukas@wunner.de>
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: Ard Biesheuvel <ardb@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Zorro Lang <zlang@redhat.com>,
-	Vegard Nossum <vegard.nossum@oracle.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH for-next/fixes] arm64/mm: Fix false-positive
- !virt_addr_valid() for kernel image
-Message-ID: <Z0l0sMgZPWpMlBXn@wunner.de>
-References: <90667b2b7f773308318261f96ebefd1a67133c4c.1732464395.git.lukas@wunner.de>
- <CAMj1kXFvJGHr_iv6bFQfb89XqPFrNWH7-rV7SFy4QBSWXYC4RA@mail.gmail.com>
- <CAMj1kXER7AbNyUDjtij6Ni0jVRMg11xvyhkCMKAxaKbx=dsgcQ@mail.gmail.com>
- <Z0RJaU4wjU5WeQb4@wunner.de>
- <Z0RWcgrQASMIleRn@J2N7QTR9R3>
- <Z0SOZhtJohCNxX6_@wunner.de>
- <Z0SVYSew0gIgSdAe@J2N7QTR9R3>
+	 Content-Type:Content-Disposition:In-Reply-To; b=F/K4z+j8Og9bPZJg58biv8aW+eKA21zPvPyo7LP6bRREKRXjX0eMrLDWn+YMJT4gyQWQWM0myPDipTPyiYhZaifvC+kwpr5kdlCpCHwBYueoJfFB+ajX3HQoZDUU47kF//lyaLv741FeuGkiNAnfvTnbuPzC9UdvlJBI5DJec7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=ZoWIEVu8; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="ZoWIEVu8"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=5/BSC2qpFBtcihW54L9NVV8nUFlWPNDr07rwh6J6P+o=; b=ZoWIEVu8alMzYOmGZlTjmTDgUU
+	N1ndBYJhEbat49Os/jX5cL5Lqoh27bLe3WMeUrCjolouW4YJywXjSav5PO/8yEFuLWxWpOiBGHJhO
+	uds/5VuxPoUS0Mst0Vo60kjGhZrv5mnn0xnpMFKGMRiOhMdK2mjy6mmOxvtN8WMxSGixFr4XuJf5M
+	RPFMJx8OWs/OfedoKc+Bv7SW6ilHz1BVJSlRiwkbrmy/UfI/RjiT5kP98YoCQbD/xHM3zbZY1cgak
+	FWqpxnfzsGt166OCjWGv4CdoK+kqFUUe28U+G8/7mLJMOQUEj+3gez3RrITVTptzLQr4G2ik4x0Jy
+	vpZ8sMiA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tGvy5-002LZn-00;
+	Fri, 29 Nov 2024 16:03:14 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 29 Nov 2024 16:03:12 +0800
+Date: Fri, 29 Nov 2024 16:03:12 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Lukas Wunner <lukas@wunner.de>
+Cc: Ard Biesheuvel <ardb@kernel.org>, Zorro Lang <zlang@redhat.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [Bug report] kernel BUG at include/linux/scatterlist.h
+Message-ID: <Z0l1QI4-zK9EVNnJ@gondor.apana.org.au>
+References: <20241122045106.tzhvm2wrqvttub6k@dell-per750-06-vm-08.rhts.eng.pek2.redhat.com>
+ <CAMj1kXGAuJSdDWvu7D5-PT6mSbNG9FeLObnYmpHeT08eNxaJWQ@mail.gmail.com>
+ <Z0A2W1FTTPt9PeI5@gondor.apana.org.au>
+ <Z0BCtZi2YJywGJAk@gondor.apana.org.au>
+ <Z0NTLDYJQC242GMB@wunner.de>
+ <Z0OzDle-VrrXf8rW@gondor.apana.org.au>
+ <Z0RRiq-BJp8CYdNk@wunner.de>
+ <Z0RTgsb5Va9psaIs@gondor.apana.org.au>
+ <Z0lzOw7mQGuPrXlD@wunner.de>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -53,27 +57,26 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z0SVYSew0gIgSdAe@J2N7QTR9R3>
+In-Reply-To: <Z0lzOw7mQGuPrXlD@wunner.de>
 
-On Mon, Nov 25, 2024 at 03:18:57PM +0000, Mark Rutland wrote:
-> No; I meant that the test could use lm_alias() on the test vectors
-> before passing those to sg_set_buf(), when the test code knows by
-> construction that those vectors happen to be part of the kernel image.
-> That'll work on all architectures.
+On Fri, Nov 29, 2024 at 08:54:35AM +0100, Lukas Wunner wrote:
+>
+> I'm proposing an optimized approach which auto-detects whether
+> duplicating into the linear map is actually necessary:
+> 
+> https://lore.kernel.org/r/3de5d373c86dcaa5abc36f501c1398c4fbf05f2f.1732865109.git.lukas@wunner.de/
 
-Herbert doesn't want callers of the sign/verify API to do the mapping:
+No this is not going to work.  Linux runs on many platforms,
+there is no portable way of doing DMA over arbitrary kernel
+memory.
 
-https://lore.kernel.org/linux-crypto/Z0A2W1FTTPt9PeI5@gondor.apana.org.au/
+Only memory specifically allocated for DMA is safe to use in
+an SG list.
 
+Since you're refusing to fix this I'll take care of it.
 
-> That said, looking at the code it appears that testmgr.c can be built as
-> a module, so the test vectors could be module/vmalloc addresses rather
-> than virt/linear or image addresses. Given that, I don't think the
-> changes suggested here are sufficient, as module addresses should still
-> be rejected.
-
-Ah, I hadn't considered the modular case.  Good point!
-
-Thanks for the explanation and for taking a look!
-
-Lukas
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
