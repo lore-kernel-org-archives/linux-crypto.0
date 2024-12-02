@@ -1,160 +1,95 @@
-Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A17A420A5E1
-	for <linux-crypto@vger.kernel.org>; Mon,  2 Dec 2024 15:24:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 581541D9A41
+	for <linux-crypto@vger.kernel.org>; Mon,  2 Dec 2024 17:05:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733153089; cv=none; b=ravQiM00Jj13qFktWoZ2/nzEer/PQ0zcWVC5uHWIsG1pSc7wY9bUARnFhmKC5p/FRK0pDpbwwFlTB5oZrCqieIdBd6O2a9xX2XghZLSoVdUrcq+xquuZ804Mh3Whhc1WEqtbkauFAZXqnn4jKZsjmkFwo3Y9AAqjGeyIzjV4Hrc=
+	t=1733159115; cv=none; b=QNlnmLLPRiTVMMRWaC/r5eiDInoAAhYCptinXbcC63+gl8QUsAvKbXyVFSPs49lVBitMr0qMzpvM6qiRMx6lywPyPj9d+aGgD7oBje58zxkIXhbdfq/zDvvLOVwvNvX2j2FRZNeaPCFJ0solylsddb68/edOWvNaoOy0UmzXdvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733153089; c=relaxed/simple;
-	bh=goFeMCUVRbDjipThdghVVJLskLf8H473+GNXYnXXrDw=;
+	s=arc-20240116; t=1733159115; c=relaxed/simple;
+	bh=wuz6sBOCJh6l/J4xQGflDkPUAezYKlbVOC3pExLDdn4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ABVj9opwdjRV2wTmutdVNXxWRuLGMtaWicfZr+QUuiACI3aDInSJ0IxHwvVtQJuHIaMUnuqjS9SYUrlUTny/seJeZ77IG3+h9iQZQ+5nS7AbBTLDlHGuTdu2O6WrZBgKkIsOP4swN39e9ToDsr2mxcgmzdNSCOFY3S5r2C8o6eo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=uRx6VuxM; arc=none smtp.client-ip=209.85.219.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	 To:Cc:Content-Type; b=q3zayUolzRWFP/C27vTSBVnqjZduXtkVaLQxjIQSVVbiytWlrSZVAOzfzaaV3KFBFEXwq7+Dz0ZNS9kqIdcxuezzUJxjeR/X+lRD8ovT9s9sKRcprTGZhQWwn7HBtivD6VzphGHe7IfNXIQQo6Z/XE7qucgTys8+cZCA3V1zhEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F9wxpvj9; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uRx6VuxM"
-Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-e3970ac2dddso3383890276.2
-        for <linux-crypto@vger.kernel.org>; Mon, 02 Dec 2024 07:24:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1733153086; x=1733757886; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=05ZXtxtYDYApb+lIzc95yV2LA74LDricN9fUjzTVsRg=;
-        b=uRx6VuxMhqjU5kzREUBVrmyWJSJ7t6VMUn63IrxrbKfo9zn62de77W8cHQYI1pZNTb
-         +Zf2y+HArTa8UNB7E0w4Sv93LqC/jOfvYSZvfhPTmZs1Hm/pEXeobFAd+FCNtGULtsCC
-         vRGSH43uofb1IDl+y0iRlmNSWBsOSa+b10ouag4h2ikswTJEuh+DIixdHGtOUEwl7JCn
-         a9t7QKqJ+YDq1wEn2s9ViNVOGoA5L1waoMBg5zdknUGpgn4AyuH3L5gxmTChIvDQNjX9
-         npjRvDIQcRyjJ88CRS9jyg/86RMeV+KQzJCzexa74VLy3Xq2ye1HPCUwi16MzhDQ6Gqd
-         Uflw==
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F9wxpvj9"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1733159113;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TY2RNkMXPJD8Avo9kD2pk70Q+ZVywmDDBAMrAw6djsQ=;
+	b=F9wxpvj9Zl5mHDoIDZWEyBLqtiF+3WhFngGnw8BUiEJmX2D+b3yh45OQfdfLZBfbG5Yp29
+	VCJ2ZhIAI2jYMvdcm59T/yphqz59goCBxjfpl2WIXimk4h9S+S35T41n4aE8vwKaaoAL8Q
+	l1W3jcXdsN9x2g1QPJSQlTHjI0PANts=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-211-EZQl8nwWOZuTNVqi0w8rzA-1; Mon, 02 Dec 2024 12:05:11 -0500
+X-MC-Unique: EZQl8nwWOZuTNVqi0w8rzA-1
+X-Mimecast-MFC-AGG-ID: EZQl8nwWOZuTNVqi0w8rzA
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6d3a07b63e6so75947716d6.3
+        for <linux-crypto@vger.kernel.org>; Mon, 02 Dec 2024 09:05:11 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733153086; x=1733757886;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=05ZXtxtYDYApb+lIzc95yV2LA74LDricN9fUjzTVsRg=;
-        b=FhmZ4h2XrDTuFzWlkEhTcU4tjiecB65ENha/waq8RDv5rmoOWpE7Ky6cSaCoG9M3Rt
-         uXGvt9ya9haGiGkjef8g6FDaCkNTYdBfLVepAIcssJZJoc3aUGzP6xAzES7VXQxr0EH3
-         w2b+zjEf6yxaHk+5SQoOMXQWs1E+E7i17CsVqesrnvxgkOjXTpEs3DIvw+s73gW9FDUr
-         nSZYubC4Sc3PkUkFFtjYh6/gCnBUJAhatIlV5vLbXtkfEt4ElzC9y4HW7D3UyXNiHYik
-         2mnI1w+SLQG5BhUS2UE0YUpnHmKVCPALGWVJklhTtN7b+n2a/ttcV7MFxif1cbSA84sR
-         NtWg==
-X-Forwarded-Encrypted: i=1; AJvYcCUU7Zfd4YUfmcqNzsQaxhpxzYMjBSo5MNPNEpd/EmgvIY0+ll3bmQ5P1GpQedQPBhc58WdpCDoCOH2HUmg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz5NhqNx44qTHj03vcFv4Kkeso3jLoeqofsh4D1nSJ3HC6/Xl0f
-	YqZzn6S9v0GHfY/QQ4qSuEtsXKDx4smH6gli2LkShAKz3QmS4b7/OE4Jfrsp00e3F6Ksw9qnUyr
-	DHfv7z00MEBo1R+qTpb6vnKeWm/ynllGKfKVYXg==
-X-Gm-Gg: ASbGncsei39GKg4sxBO5xKxpmZ+JMy6xJs1iDvpC2R5cMpusRIwntjue6vD8tN9Lt3h
-	Fb7MvDrqL9NJgHkOowzDc8JnV4QyrAXDI
-X-Google-Smtp-Source: AGHT+IG1/7GNikn+o7qWaeU6OlA3SHIeQqG6VzX6iFXwmrBOhF0bD/LXd61skcVAWua1i/pv/Z75jusfAxofKt3ImP8=
-X-Received: by 2002:a05:6902:2e0e:b0:e39:9b9f:7f87 with SMTP id
- 3f1490d57ef6-e399b9f830cmr6954354276.29.1733153086437; Mon, 02 Dec 2024
- 07:24:46 -0800 (PST)
+        d=1e100.net; s=20230601; t=1733159111; x=1733763911;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TY2RNkMXPJD8Avo9kD2pk70Q+ZVywmDDBAMrAw6djsQ=;
+        b=iHX1bxt0szkm7tHALnYg34H4HkqPqu+Hf5LViRPrt2l6zCzApVC+YPQDWTye85VGM8
+         9q6rwjl9LMEArClMVjhbem/U/HxRX2xqTFORmaFnYM0hpSZazVhKXmN9SvJQfSs4UUTi
+         0oPGLnv+3vCKy8ak3DNuP5wtFyjkpIZu66Wa78iDxRkMWpjKezf8lQldVif+TzFiFEo5
+         n6b9JhJsUvbpWE4Eq2BEdZlt1ILMMCpQwiVISDYTEKydt8SFUCgpkJE05iEkXXTw4FYt
+         aPurF84yA/+TqVoV4EY5UcrVjGm9zm+lz4BPS8q68M4FeYVxOPCuqAd90RcXeRirdUGK
+         Kjvg==
+X-Forwarded-Encrypted: i=1; AJvYcCXJW/hxIB/B1jGby6d/Zb3H0tQh1U668KZ4dUBPQFqh5ZqGvpa+3DmTHJyLkg5mn0NqHZGwWOa/UBMF+Rw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6TEz/y8cdw7L6m9+Kc59Ozc1ujCw3/Qe5nIirsPFuFMpFPP/C
+	VL07SCjfQbedg4HoJQF2ge/2kS3cyRrbg51OMNRHQcyT4C0QGfhnt4YCChxkn42NQlgIg/KHeem
+	7+aOxg1IlKZYkTISzNUkLdnZcjr9YMmx2IkaQO7qz2CSawOoQ0eb0kpU3irfLVyWRB3v/qKNyG/
+	MRzPmTBvzE7D8cAYePnMTdp2nvoMul/YZNNHsKjXfVI16LJJA=
+X-Gm-Gg: ASbGncvnePWmOD4nj7ivPNNi14e1XkgBswSlHxk9Fjq5mssdpwUC24Zt2Rb2tMDGKu1
+	PQoe7EMpxm6KfOKgo5OM4fz3+3dFCLeI=
+X-Received: by 2002:a05:6214:48c:b0:6d4:c6d:17fe with SMTP id 6a1803df08f44-6d864d791a2mr339245066d6.25.1733159111093;
+        Mon, 02 Dec 2024 09:05:11 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFPsLMeCA7wiyfC7KaB7AfgDMZdSETIQyMQz+hhgRNHzWR9AcawpYFXQ4wUarhrKHF5GO3vDo5BqhO6R6YoSv8=
+X-Received: by 2002:a05:6214:48c:b0:6d4:c6d:17fe with SMTP id
+ 6a1803df08f44-6d864d791a2mr339244526d6.25.1733159110703; Mon, 02 Dec 2024
+ 09:05:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241130094758.15553-1-krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20241130094758.15553-1-krzysztof.kozlowski@linaro.org>
-From: Ulf Hansson <ulf.hansson@linaro.org>
-Date: Mon, 2 Dec 2024 16:24:10 +0100
-Message-ID: <CAPDyKFqiar=EKBHG=PHimjNcdLKsVdx+BRZReEJzHr8_qoayeg@mail.gmail.com>
-Subject: Re: [PATCH] dt-bindings: Drop Bhupesh Sharma from maintainers
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-	Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konradybcio@kernel.org>, linux-arm-msm@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mmc@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org, 
-	Bhupesh Sharma <bhupesh.linux@gmail.com>
+References: <20241202142959.81321-1-hare@kernel.org> <20241202142959.81321-5-hare@kernel.org>
+In-Reply-To: <20241202142959.81321-5-hare@kernel.org>
+From: Maurizio Lombardi <mlombard@redhat.com>
+Date: Mon, 2 Dec 2024 18:04:59 +0100
+Message-ID: <CAFL455kHV2ADBs2wUe3i0j00c1SHyKdjs=OeGj4uTZyCDdP6iQ@mail.gmail.com>
+Subject: Re: [PATCH 04/10] nvme: add nvme_auth_derive_tls_psk()
+To: Hannes Reinecke <hare@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>, Sagi Grimberg <sagi@grimberg.me>, 
+	linux-nvme@lists.infradead.org, Eric Biggers <ebiggers@kernel.org>, 
+	linux-crypto@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, 30 Nov 2024 at 10:48, Krzysztof Kozlowski
-<krzysztof.kozlowski@linaro.org> wrote:
->
-> For more than a year all emails to Bhupesh Sharma's Linaro emails bounce
-> and there were no updates to mailmap.  No reviews from Bhupesh, either,
-> so change the maintainer to Bjorn and Konrad (Qualcomm SoC maintainers).
->
-> Cc: Bhupesh Sharma <bhupesh.linux@gmail.com>
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+po 2. 12. 2024 v 15:32 odes=C3=ADlatel Hannes Reinecke <hare@kernel.org> na=
+psal:
+> +       ret =3D crypto_shash_setkey(hmac_tfm, prk, prk_len);
+> +       if (ret)
+> +               goto out_free_prk;
+> +
+> +       info_len =3D strlen(psk_digest) + strlen(psk_prefix) + 5;
+> +       info =3D kzalloc(info_len, GFP_KERNEL);
+> +       if (!info)
+> +               goto out_free_prk;
 
-I have queued this up via my mmc tree for next. If anyone has
-objections to that and wants to funnel this via another tree, please
-let me know!
+ret should be set to ENOMEM here
 
-Kind regards
-Uffe
+Maurizio
 
-
-> ---
->  Documentation/devicetree/bindings/crypto/qcom-qce.yaml         | 3 ++-
->  Documentation/devicetree/bindings/mmc/sdhci-msm.yaml           | 3 ++-
->  Documentation/devicetree/bindings/net/qcom,ethqos.yaml         | 3 ++-
->  .../devicetree/bindings/remoteproc/qcom,sm6115-pas.yaml        | 3 ++-
->  4 files changed, 8 insertions(+), 4 deletions(-)
->
-> diff --git a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
-> index c09be97434ac..62310add2e44 100644
-> --- a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
-> +++ b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
-> @@ -7,7 +7,8 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
->  title: Qualcomm crypto engine driver
->
->  maintainers:
-> -  - Bhupesh Sharma <bhupesh.sharma@linaro.org>
-> +  - Bjorn Andersson <andersson@kernel.org>
-> +  - Konrad Dybcio <konradybcio@kernel.org>
->
->  description:
->    This document defines the binding for the QCE crypto
-> diff --git a/Documentation/devicetree/bindings/mmc/sdhci-msm.yaml b/Documentation/devicetree/bindings/mmc/sdhci-msm.yaml
-> index 8b393e26e025..eed9063e9bb3 100644
-> --- a/Documentation/devicetree/bindings/mmc/sdhci-msm.yaml
-> +++ b/Documentation/devicetree/bindings/mmc/sdhci-msm.yaml
-> @@ -7,7 +7,8 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
->  title: Qualcomm SDHCI controller (sdhci-msm)
->
->  maintainers:
-> -  - Bhupesh Sharma <bhupesh.sharma@linaro.org>
-> +  - Bjorn Andersson <andersson@kernel.org>
-> +  - Konrad Dybcio <konradybcio@kernel.org>
->
->  description:
->    Secure Digital Host Controller Interface (SDHCI) present on
-> diff --git a/Documentation/devicetree/bindings/net/qcom,ethqos.yaml b/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
-> index 0bcd593a7bd0..f117471fb06f 100644
-> --- a/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
-> +++ b/Documentation/devicetree/bindings/net/qcom,ethqos.yaml
-> @@ -7,7 +7,8 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
->  title: Qualcomm Ethernet ETHQOS device
->
->  maintainers:
-> -  - Bhupesh Sharma <bhupesh.sharma@linaro.org>
-> +  - Bjorn Andersson <andersson@kernel.org>
-> +  - Konrad Dybcio <konradybcio@kernel.org>
->
->  description:
->    dwmmac based Qualcomm ethernet devices which support Gigabit
-> diff --git a/Documentation/devicetree/bindings/remoteproc/qcom,sm6115-pas.yaml b/Documentation/devicetree/bindings/remoteproc/qcom,sm6115-pas.yaml
-> index 758adb06c8dd..059cb87b4d6c 100644
-> --- a/Documentation/devicetree/bindings/remoteproc/qcom,sm6115-pas.yaml
-> +++ b/Documentation/devicetree/bindings/remoteproc/qcom,sm6115-pas.yaml
-> @@ -7,7 +7,8 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
->  title: Qualcomm SM6115 Peripheral Authentication Service
->
->  maintainers:
-> -  - Bhupesh Sharma <bhupesh.sharma@linaro.org>
-> +  - Bjorn Andersson <andersson@kernel.org>
-> +  - Konrad Dybcio <konradybcio@kernel.org>
->
->  description:
->    Qualcomm SM6115 SoC Peripheral Authentication Service loads and boots
-> --
-> 2.43.0
->
->
