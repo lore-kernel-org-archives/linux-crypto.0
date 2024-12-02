@@ -1,111 +1,95 @@
-Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bedivere.hansenpartnership.com (bedivere.hansenpartnership.com [96.44.175.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B1452AD21;
-	Mon,  2 Dec 2024 19:27:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B83436AAD;
+	Mon,  2 Dec 2024 20:27:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=96.44.175.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733167627; cv=none; b=nB468ogS0gbfSluasROcTIBPmXJI993HnmVgl5rw/gkC3XuQjTI05BW8fwwSfBmwT8yE4EJY8t0LC5rEBBrpa4zATNFrSH5DpR9f8pTM2sZVjqkztd6tUUOvNkbmnFvo7kgVSTr5oHFYYfZM50RxlRlD+lfz6yjDAec64rxfo2c=
+	t=1733171261; cv=none; b=RfkFUrdeSBqIqa8viD9nUzfDHiFUg3ZRFUwx92xU2+nobzKre8QdXY5H+OsRTd7L0jzo3AHsS2RzrIO4ylmouXuQtEGAIliOPkCaxukpxs1AN8nCFqjodiCOVI27f/177XH6DmrAfGWzw6bRAtLCQxA92muIkkEy2LlaTNOFsok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733167627; c=relaxed/simple;
-	bh=XAPwpQqQiwcnoaUB40hRLc5pzo+e8dWNlOB+nAY8aRc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ipZzVf0v02oKpgCXtcNuFbr79Vhm57ddVnQKem8jPgWUBoH4Z4qPRcfnW/muOfovh+E4nneHB+4p2fbJei4UqBLG8R0C5kh0Bdbt8TVTKU6I/kHE/Pf0iJiAWYoc3oHU0IXsnOECKphfBS14hsy85T685+zcrbaI1BiA6kzBoWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H3Pe6LRr; arc=none smtp.client-ip=209.85.167.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1733171261; c=relaxed/simple;
+	bh=LAsH30HjyJQrUzkQ1khwv/whmLNUuQEjnxMaRCEjDII=;
+	h=Message-ID:Subject:From:To:Cc:Date:Content-Type:MIME-Version; b=Fw8/eSuEmGZNmNgcqpDrKmcNEBTHvRQCUpqON5rTJ2UU65lbWdLRpD/Y0ALrAqWjHnZ76hby0sjsb1XRTZU3aMXw03TdH/vtbjtbMUFTF/gae6FTomHaJq3pd2rcEltCfL/bKp3wSOMR31WUyLS4ARFjz/D4r/x/G3a+trEhBrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=dqAPfq5D; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=dqAPfq5D; arc=none smtp.client-ip=96.44.175.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=HansenPartnership.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H3Pe6LRr"
-Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-3e916196023so2570189b6e.3;
-        Mon, 02 Dec 2024 11:27:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733167625; x=1733772425; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=y82eOTEhwmMyYbOhVYXDIlIEQdK/qSD3OtDPE8tkSD0=;
-        b=H3Pe6LRryALFjzy9PpJJsXXyaJc3T2e/wAuu02RyBHCc0gRptYFZAymlt61DJPN9YL
-         nbPSZt2lpQh3YHTvXGkeA/aDqg1b+F0swg589Br7rBpmF8Qqk8LJS97eAeY1ad2XCVcS
-         7SmFaLI8n7IAEVETcR/+xG8yd//lGZCS4tJLrk9x/fZKNBc8gYoLzVZsadFK5yT/s/Qw
-         VQ1uD74eaWuRFhw7kMSMHMi5kMDPMQQCe4hTwVO73I/SLWUmPIp/2HvfsFXeY50t6re/
-         dz+fPjdyXwQJXMvCtHgqnTBrAIswTSTXv5uyDgtBqDWDeCL1UHusEnIAaDWVbXWF8+J+
-         YFdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733167625; x=1733772425;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=y82eOTEhwmMyYbOhVYXDIlIEQdK/qSD3OtDPE8tkSD0=;
-        b=akyDOaSWqMvngxRlviCkbuZBBwKR9LNa83v3gX+mMSWFMhCAAR9gMCvH+mELVZRnKO
-         ZTyzjOh/i/PUkHkI/1ZlhJioeW0MH3PbYhqWxpSmYuqcf9K6N1aMr3IFBc59JPssXRMZ
-         m2hMwx95n2uqT1YrCAHj0FkKeAM+2+rO3CD4mxJHea66EPV3v95+YExK+f1ZLr3jXFYv
-         9EEs9DLqrVJEyssJGZHYL24ZCTYUVehj0oJwn8ytHieUYCPdCkywLXLcBz56zS1M7yl+
-         5w5csZII4nq/bXrUfFAfq7wxNnJEbvkUlJcNgy4Y3GvIJv76t8C0n3IFI+AG0lzbXtzy
-         NdSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUHTvg/d5G4vrhcW5RvxZE5ks7MUn83j16FLretUv8cri8/tmFUo1Dtf2f4VAQt/v61md6JiXYoGqBfV2Q=@vger.kernel.org, AJvYcCVnLZhllueBK4mrC/Fc8UZpgkS4HJ/7Ql202ehKUl3+lugh8dnm7Nat9Yrm1k285nOjBCkHu4YLvmvFPOwA@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7uKwtIipChbMQb5nruhIPjVEHd+qXcB4UbmqgTNWZXV79EaaK
-	k+hDi0rnnAGPlZkzYJfuRrAVrBuALt66lssGWZHGBHTm3LfK8MGW6es6L21r00r2z+21ZJF+/RS
-	sB+MbiPPJEjtaxpYb/tioyx1FjXo=
-X-Gm-Gg: ASbGncsYGIGHh+sSxmMffhhQC91x+TTxk6eyWaR8aCi6/Hu4hZXRKHBoJhkBUVo9NUW
-	hvFycJigpj6Ia5K0Jfuiee1ypuEjPN7h8bhuMwxSQfkKYT94=
-X-Google-Smtp-Source: AGHT+IEb0q1YzKrjqBN/l+hzvKaqv8aySTKWK83ko71V+ahoVrlVcAzoq3EPKEzVSgFNb+PZs+zg/F0X2N6fm47Wu4o=
-X-Received: by 2002:a05:6808:14c7:b0:3e6:5792:2fb1 with SMTP id
- 5614622812f47-3ea6dbb4b11mr19902682b6e.10.1733167625419; Mon, 02 Dec 2024
- 11:27:05 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="dqAPfq5D";
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="dqAPfq5D"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=hansenpartnership.com; s=20151216; t=1733171258;
+	bh=LAsH30HjyJQrUzkQ1khwv/whmLNUuQEjnxMaRCEjDII=;
+	h=Message-ID:Subject:From:To:Date:From;
+	b=dqAPfq5DMDW7PHVkwu9KK/EOOQOKAvSRBvFgC8NlCmYMNVWY/+SKSaW046r87+aIP
+	 A4dEd/0hQski10NKcP2LlcLqJOdf4fanDO2etcukfJZUle2qGtP8k68Y9wFK0zFhaI
+	 edMQenp45qGd81Z2qUsFe/hvV/G0J0B/lWRNJuLk=
+Received: from localhost (localhost [127.0.0.1])
+	by bedivere.hansenpartnership.com (Postfix) with ESMTP id A4CBF1286901;
+	Mon, 02 Dec 2024 15:27:38 -0500 (EST)
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+ by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavis, port 10024)
+ with ESMTP id FcXxQgDL0rRV; Mon,  2 Dec 2024 15:27:38 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=hansenpartnership.com; s=20151216; t=1733171258;
+	bh=LAsH30HjyJQrUzkQ1khwv/whmLNUuQEjnxMaRCEjDII=;
+	h=Message-ID:Subject:From:To:Date:From;
+	b=dqAPfq5DMDW7PHVkwu9KK/EOOQOKAvSRBvFgC8NlCmYMNVWY/+SKSaW046r87+aIP
+	 A4dEd/0hQski10NKcP2LlcLqJOdf4fanDO2etcukfJZUle2qGtP8k68Y9wFK0zFhaI
+	 edMQenp45qGd81Z2qUsFe/hvV/G0J0B/lWRNJuLk=
+Received: from lingrow.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4302:c21::a774])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 080991286824;
+	Mon, 02 Dec 2024 15:27:37 -0500 (EST)
+Message-ID: <81560af7526138aa5221e5900ee7462f55bb090d.camel@HansenPartnership.com>
+Subject: section mismatch error in aesgcm causing a build failure
+From: James Bottomley <James.Bottomley@HansenPartnership.com>
+To: linux-crypto@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: Ard Biesheuvel <ardb@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>
+Date: Mon, 02 Dec 2024 15:27:36 -0500
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241123070127.332773-1-kanchana.p.sridhar@intel.com>
- <20241123070127.332773-11-kanchana.p.sridhar@intel.com> <CAJD7tkb0WyLD3hxQ5fHWHogyW5g+eF+GrR15r0PjK9YbFO3szg@mail.gmail.com>
- <SJ0PR11MB56782CF74C6D6904DDDDAB95C92E2@SJ0PR11MB5678.namprd11.prod.outlook.com>
-In-Reply-To: <SJ0PR11MB56782CF74C6D6904DDDDAB95C92E2@SJ0PR11MB5678.namprd11.prod.outlook.com>
-From: Nhat Pham <nphamcs@gmail.com>
-Date: Mon, 2 Dec 2024 11:26:54 -0800
-Message-ID: <CAKEwX=Ppn-CKPNUJUMc48sU5uxkB6KS1HwFpvpty0nj+wL6rHg@mail.gmail.com>
-Subject: Re: [PATCH v4 10/10] mm: zswap: Compress batching with Intel IAA in
- zswap_batch_store() of large folios.
-To: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
-Cc: Yosry Ahmed <yosryahmed@google.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
-	"hannes@cmpxchg.org" <hannes@cmpxchg.org>, "chengming.zhou@linux.dev" <chengming.zhou@linux.dev>, 
-	"usamaarif642@gmail.com" <usamaarif642@gmail.com>, "ryan.roberts@arm.com" <ryan.roberts@arm.com>, 
-	"21cnbao@gmail.com" <21cnbao@gmail.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, 
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, 
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>, "davem@davemloft.net" <davem@davemloft.net>, 
-	"clabbe@baylibre.com" <clabbe@baylibre.com>, "ardb@kernel.org" <ardb@kernel.org>, 
-	"ebiggers@google.com" <ebiggers@google.com>, "surenb@google.com" <surenb@google.com>, 
-	"Accardi, Kristen C" <kristen.c.accardi@intel.com>, 
-	"Feghali, Wajdi K" <wajdi.k.feghali@intel.com>, "Gopal, Vinodh" <vinodh.gopal@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Nov 25, 2024 at 1:54=E2=80=AFPM Sridhar, Kanchana P
-<kanchana.p.sridhar@intel.com> wrote:
->
-> There are some minimal "future-proofing" details such as:
+I'm getting this in 6.13-rc1:
 
-I don't think they're minimal :)
+/home/jejb/git/linux-tpm/lib/crypto/aesgcm.c:212:29: error: ptext1
+causes a section type conflict with aesgcm_tv
+ static const u8 __initconst ptext1[16];
+                             ^~~~~~
+/home/jejb/git/linux-tpm/lib/crypto/aesgcm.c:570:9: note: ‘aesgcm_tv’ was declared here
+ } const aesgcm_tv[] __initconst = {
+         ^~~~~~~~~
+make[5]: *** [/home/jejb/git/linux-tpm/scripts/Makefile.build:194: lib/crypto/aesgcm.o] Error 1
+/home/jejb/git/linux-tpm/lib/crypto/aesgcm.c:212:29: error: ptext1 causes a section type conflict with aesgcm_tv
+ static const u8 __initconst ptext1[16];
+                             ^~~~~~
+/home/jejb/git/linux-tpm/lib/crypto/aesgcm.c:570:9: note: ‘aesgcm_tv’ was declared here
+ } const aesgcm_tv[] __initconst = {
+         ^~~~~~~~~
+make[5]: *** [/home/jejb/git/linux-tpm/scripts/Makefile.build:194: lib/crypto/aesgcm.o] Error 1
 
->
-> 1) The folio_batch: This is the most contentious, I believe, because it
->      is aimed toward evolving the zswap_batch_store() interface for
->      reclaim batching, while allowing the folio-error association for the
->      partial benefits provided by (2). As mentioned earlier, I can delete=
- this
->      in the next rev if the maintainers feel strongly about this.
+I think it's way older than 6.13-rc1, but the inclusion of the sevguest
+driver in the merge window now means that something actually selects
+it.  I can fix it simply by adding a zero initialization to the file:
 
-Let's delete it, and focus on the low hanging fruit (large folio zswap stor=
-ing).
+-static const u8 __initconst ptext1[16];
++static const u8 __initconst ptext1[16] = { 0 };
 
-> 2) int* error signature: benefit can be realized today due to the latency
->     optimization it enables from detecting errors early, localized cleanu=
-p,
->     preventing unwinding state. That said, the same benefits can be reali=
-zed
->     without making it a part of the interface.
+Which I think means that by default the traditional zero initialization
+of a static variable is in the wrong section (and actually likely is
+wrong for all our __initX variables as well).
 
-This can be done in a separate patch/follow up. It's not related to this wo=
-rk :)
+In case it matters, this is with gcc-7
+
+Regards,
+
+James
+
