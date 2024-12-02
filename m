@@ -1,112 +1,174 @@
-Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A912513635B;
-	Mon,  2 Dec 2024 08:33:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3D17204F6B
+	for <linux-crypto@vger.kernel.org>; Mon,  2 Dec 2024 14:30:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733128416; cv=none; b=ta5kqXKZeA1yxXGaYCGxa9Nn4dMQjws6umHKbgnKGu3qOA93a/qni0T5/xxhTFZbSIRX1gJ6Dc+2lyAMyzFiRmCqz7zyy8hzMnpeFL3VLULjJdPlOl3zoHwKu96m8yk7liE/XBK8qyPnTpAjCcTFzc0eTpi3WpXu1D8RujfeDr4=
+	t=1733149811; cv=none; b=HoI9KfbPqyk5W9UmmZ13yPRTXr/1F+08eLpCJCB11jBHEc58laagjJIkE5y4IdkH7x+/kid2yH3TY7GNSAVC2qI7hJZ/w3sluINifpVsY8LCDzbp3sUOFzCuyiEnJWFZvePHLFQXJKH6qheRzjcQYQOMu/1ufDXHPo+7i9XPcak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733128416; c=relaxed/simple;
-	bh=C/1t7RAVxcu8cEx5/wcDw0LInPkx6rt1MttP1kJMsi0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ooFaCjOg3SHCW8Ym1yKbgp3ikRx6Bh7C2Drydqm0pzX20IqotFL79d324M0RuMnxIsGNyDvyOBPSN1bK1uaVqVl2UInSlhJLBh1i2dKgvNPkvzdbjoF4rpYX3OA9BAcDCLyH1UR4vqu2wRBWj7y+IKwsgiPpeZg4o74e3Wi6284=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-51511a1bd53so867951e0c.1;
-        Mon, 02 Dec 2024 00:33:33 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733128412; x=1733733212;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=u56ZXLj3zoJcwhJCVeWsy3FmczwJw23Uyl3fWwY/H5U=;
-        b=AxJ/glDUlfm0uTaBSuBtLLD4DdYRbzJOQC6plPp5s/UPn87PazKgWOJ/xV7nvSJVI2
-         r6eu1KRsz2O2khU4pig+XO/g/XLxbIjprTBrtS6Nmiq31Yo9coTcOVHo6jDn+r/JhsFf
-         2tTtlI1u8wkK2UZV0wrZNSQBFtzcCocui0XHbg+H54aE4CICKzy/vnv7u1HTa+M247Lq
-         7Ut2X/j/1TIjiZOIWEUP4/mrBOAfkdEpFnbwK2a4ToVRXSV8v/BZhF+2kfl6M5lJV2em
-         NOl2PwOnFli5fpjSmp79ePo8yprumLB6LEHTq41OvcmhKY/YpNKE6ivB/depS+dQT4xV
-         6CtA==
-X-Forwarded-Encrypted: i=1; AJvYcCVwNi83qnoZw2j66srwZ62UPfGc4i3j/o+K5aAj3HLMhV4d4ah8+um9kLI+Seezia911KCZ1FijT3IJmvak@vger.kernel.org, AJvYcCWCijRn6faq/p9X/cbM2xfU2fr3W+qta8AKoqF9YfsEY5Pzo1Ci3voSszdq5IPFZB1p005mFKLMJYoE@vger.kernel.org
-X-Gm-Message-State: AOJu0YzSI66Ig5SyY2POrh+sbh/81i4HqBJNihxHqaeYwDsTNCTz/yoa
-	IF4LDOkECyDPmKCbPPZXd/LIgnX2bISrddiGBEUrSk3uO7ijfNpXh9ci4f9K
-X-Gm-Gg: ASbGnctBpwYAzQ4BnBUgoT9ByW/VOYmwAkCulZ7bZHPxvcoEn71haabl64Mrr+TJTAy
-	EJW9L/p1V6dkdflaCcqzGpHcUlYiARtzkiArfQF0fxBR+U2QOGZMPeP1pcbiqaItBb6XlNz9p7f
-	9nWTTP4MCfAHCQmxMkf/CRwUM34B8op7023TYYCalYv2cnVa8y6fy2glKcXceHTM6nyKjNXIgZf
-	PCwUF3gq0iGShmlYkr7rUrOm/vl9DNV+L+e/Cww3D3+L+I5mSBdAjXSpnaBx3T7lhG/neKx6f6T
-	N4bQYyUuCZp1
-X-Google-Smtp-Source: AGHT+IG63Qbab/vg2aOfnfSvWOOBYi+Yu5tWITzEQ4bH4MB0xCs8UWR1H6DBzlHoeHvGdys5PiauLg==
-X-Received: by 2002:a05:6122:82a4:b0:50d:4cb8:5aef with SMTP id 71dfb90a1353d-515569cc723mr21531570e0c.6.1733128412070;
-        Mon, 02 Dec 2024 00:33:32 -0800 (PST)
-Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com. [209.85.217.46])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-5156d0f6ad8sm1077681e0c.51.2024.12.02.00.33.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 02 Dec 2024 00:33:31 -0800 (PST)
-Received: by mail-vs1-f46.google.com with SMTP id ada2fe7eead31-4af638e3e66so700426137.0;
-        Mon, 02 Dec 2024 00:33:30 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVadXCQImLwKV3R64uxXDtF2wh2X5KDjG+Bb1WhxHPVUvOzod3b0DJgvTQORpz5AEzXVlG0I3wo32d9@vger.kernel.org, AJvYcCXMlwcLlRUSTnIxeG3LvW8x9i+WYWWqrU01JupOLIQJ0EH9V+DUWqe3YGGs9GN2qAFCxcweoawB+sNk3KF3@vger.kernel.org
-X-Received: by 2002:a05:6102:954:b0:4a9:5d98:6c5f with SMTP id
- ada2fe7eead31-4af448f6d7dmr26891641137.5.1733128410739; Mon, 02 Dec 2024
- 00:33:30 -0800 (PST)
+	s=arc-20240116; t=1733149811; c=relaxed/simple;
+	bh=dPQQiFg6E3MYIWuowOkKPwCdJodOw4dHVqO+lw/k2I8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=D96oBInHovtsvcOnoF9BQcd3zy4M+ANwZEhbeVFF+p96v/fZ5hSoIKDSzhfaphLASn7uTwBebvwwojWx3NrrcgFOrF+dMipS+8y8OJob+7Q/i6oc7tpwJcPse0kkqYYYGU+eDRYkEIWR9+tWcw9qF3qsSxYhnczFFlEjh0YGZsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SD8HrFz7; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SD8HrFz7"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 215F9C4CED1;
+	Mon,  2 Dec 2024 14:30:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733149810;
+	bh=dPQQiFg6E3MYIWuowOkKPwCdJodOw4dHVqO+lw/k2I8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=SD8HrFz7/BsGeyolj5W9gxmlwPtnVFXsVFro601aPZzzyhHk0/9uGXQvOVJQqHt3/
+	 LQd5npX14atl4Y7q4jnBqk6UIWiCQYzIYl3BDZOPx/jBQfAOVdi49q5lRlWEMt/IVh
+	 4gvcvs5bkZkUDajtl3pDMHQ7G9t1ZVIh4Dlry0CnzCGq/+Q6ody1AcmqWNFFMieEJs
+	 H/iYQwLyiRX5YojsFTsFYSCzGfmsL/h4STt3R+MLyr0Fc7c1Dtt6lImcPRKWaiJlOO
+	 OVFhd/e1qqtBtHz9tN5Xvs9zdB3XkrYOH+L7Xdvh3yIMnDKp/CnwwDRLVFUvj+eM6j
+	 DL36StxzHgBMQ==
+From: Hannes Reinecke <hare@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Keith Busch <kbusch@kernel.org>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	linux-nvme@lists.infradead.org,
+	Eric Biggers <ebiggers@kernel.org>,
+	linux-crypto@vger.kernel.org,
+	Hannes Reinecke <hare@kernel.org>
+Subject: [PATCHv12 00/10] nvme: implement secure concatenation
+Date: Mon,  2 Dec 2024 15:29:49 +0100
+Message-Id: <20241202142959.81321-1-hare@kernel.org>
+X-Mailer: git-send-email 2.35.3
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241202012056.209768-1-ebiggers@kernel.org> <20241202012056.209768-11-ebiggers@kernel.org>
-In-Reply-To: <20241202012056.209768-11-ebiggers@kernel.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Mon, 2 Dec 2024 09:33:18 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdV5rQggS9YHMJfU0gdhg6oFENTnPKp9Tbp3sJKgQdnMTA@mail.gmail.com>
-Message-ID: <CAMuHMdV5rQggS9YHMJfU0gdhg6oFENTnPKp9Tbp3sJKgQdnMTA@mail.gmail.com>
-Subject: Re: [PATCH v2 10/12] lib/crc32test: delete obsolete crc32test.c
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, x86@kernel.org, 
-	Zhihang Shao <zhihang.shao.iscas@gmail.com>, Ard Biesheuvel <ardb@kernel.org>, 
-	Vinicius Peixoto <vpeixoto@lkcamp.dev>, "Martin K. Petersen" <martin.petersen@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Dec 2, 2024 at 2:24=E2=80=AFAM Eric Biggers <ebiggers@kernel.org> w=
-rote:
-> From: Eric Biggers <ebiggers@google.com>
->
-> Delete crc32test.c, since it has been superseded by crc_kunit.c.
->
-> Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
-> Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-> Cc: Vinicius Peixoto <vpeixoto@lkcamp.dev>
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
->  arch/m68k/configs/amiga_defconfig    |   1 -
->  arch/m68k/configs/apollo_defconfig   |   1 -
->  arch/m68k/configs/atari_defconfig    |   1 -
->  arch/m68k/configs/bvme6000_defconfig |   1 -
->  arch/m68k/configs/hp300_defconfig    |   1 -
->  arch/m68k/configs/mac_defconfig      |   1 -
->  arch/m68k/configs/multi_defconfig    |   1 -
->  arch/m68k/configs/mvme147_defconfig  |   1 -
->  arch/m68k/configs/mvme16x_defconfig  |   1 -
->  arch/m68k/configs/q40_defconfig      |   1 -
->  arch/m68k/configs/sun3_defconfig     |   1 -
->  arch/m68k/configs/sun3x_defconfig    |   1 -
+Hi all,
 
-Acked-by: Geert Uytterhoeven <geert@linux-m68k.org> # m68k
+here's my attempt to implement secure concatenation for NVMe-of TCP
+as outlined in TP8018.
+The original (v5) patchset had been split in two, the first part of
+which has already been merged with nvme-6.11, and this is the second part
+which actually implements secure concatenation.
 
-Gr{oetje,eeting}s,
+Secure concatenation means that a TLS PSK is generated from the key
+material negotiated by the DH-HMAC-CHAP protocol, and the TLS PSK
+is then used for a subsequent TLS connection.
+The difference between the original definition of secure concatenation
+and the method outlined in TP8018 is that with TP8018 the connection
+is reset after DH-HMAC-CHAP negotiation, and a new connection is setup
+with the generated TLS PSK.
 
-                        Geert
+To implement that Sagi came up with the idea to directly reset the
+admin queue once the DH-CHAP negotiation has completed; that way
+it will be transparent to the upper layers and we don't have to
+worry about exposing queues which should not be used.
 
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
+A blktest submission is in
+https://github.com/osandov/blktests/pull/147
+in case anyone want to run their own tests.
 
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+As usual, comments and reviews are welcome.
+
+Patchset can be found at
+git.kernel.org:/pub/scm/linux/kernel/git/hare/nvme.git
+branch secure-concat.v12
+
+Changes to v11:
+- Include reviews from Sagi
+
+Changes to v10:
+- Include reviews from Eric Biggers
+- Drop test vectors for SHA1
+- Add test vectors for SHA384 and SHA512
+- Include reviews from Mark O'Donovan
+
+Changes to v9:
+- Include reviews from Eric Biggers
+- Fixup secure concatenation after reset
+- Rebased to nvme-6.12
+
+Changes to v8:
+- Include reviews from Eric Biggers
+- Make hkdf a proper module
+- Add testcases for hkdf
+
+Changes to v7:
+- Add patch to display nvme target TLS status in debugfs
+- Include reviews from Sagi
+
+Changes to v6:
+- Rebase to nvme-6.11
+
+Changes to v5:
+- Include reviews from Sagi
+- Split patchset in two parts
+
+Changes to v4:
+- Rework reset admin queue functionality based on an idea
+  from Sagi (thanks!)
+  - kbuild robot fixes
+  - Fixup dhchap negotiation with non-empty C2 value
+
+Changes to v3:
+- Include reviews from Sagi
+- Do not start I/O queues after DH-HMAC-CHAP negotiation
+- Use bool to indicate TLS has been enabled on a queue
+- Add 'tls_keyring' sysfs attribute
+- Add 'tls_configured_key' sysfs attribute
+
+Changes to v2:
+- Fixup reset after dhchap negotiation
+- Disable namespace scanning on I/O queues after
+  dhchap negotiation
+  - Reworked TLS key handling (again)
+
+Changes to the original submission:
+- Sanitize TLS key handling
+- Fixup modconfig compilation
+
+Hannes Reinecke (10):
+  crypto,fs: Separate out hkdf_extract() and hkdf_expand()
+  nvme: add nvme_auth_generate_psk()
+  nvme: add nvme_auth_generate_digest()
+  nvme: add nvme_auth_derive_tls_psk()
+  nvme-keyring: add nvme_tls_psk_refresh()
+  nvme: always include <linux/key.h>
+  nvme-tcp: request secure channel concatenation
+  nvme-fabrics: reset admin connection for secure concatenation
+  nvmet-tcp: support secure channel concatenation
+  nvmet: add tls_concat and tls_key debugfs entries
+
+ crypto/Kconfig                         |   6 +
+ crypto/Makefile                        |   1 +
+ crypto/hkdf.c                          | 573 +++++++++++++++++++++++++
+ drivers/nvme/common/Kconfig            |   1 +
+ drivers/nvme/common/auth.c             | 346 +++++++++++++++
+ drivers/nvme/common/keyring.c          |  65 ++-
+ drivers/nvme/host/auth.c               | 113 ++++-
+ drivers/nvme/host/fabrics.c            |  34 +-
+ drivers/nvme/host/fabrics.h            |   3 +
+ drivers/nvme/host/nvme.h               |   2 +
+ drivers/nvme/host/sysfs.c              |   4 +-
+ drivers/nvme/host/tcp.c                |  68 ++-
+ drivers/nvme/target/auth.c             |  72 +++-
+ drivers/nvme/target/debugfs.c          |  27 ++
+ drivers/nvme/target/fabrics-cmd-auth.c |  49 ++-
+ drivers/nvme/target/fabrics-cmd.c      |  33 +-
+ drivers/nvme/target/nvmet.h            |  38 +-
+ drivers/nvme/target/tcp.c              |  24 +-
+ fs/crypto/Kconfig                      |   1 +
+ fs/crypto/hkdf.c                       |  85 +---
+ include/crypto/hkdf.h                  |  20 +
+ include/linux/nvme-auth.h              |   7 +
+ include/linux/nvme-keyring.h           |  11 +
+ include/linux/nvme.h                   |   7 +
+ 24 files changed, 1480 insertions(+), 110 deletions(-)
+ create mode 100644 crypto/hkdf.c
+ create mode 100644 include/crypto/hkdf.h
+
+-- 
+2.35.3
+
