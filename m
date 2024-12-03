@@ -1,110 +1,116 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AA4F2500C5;
-	Tue,  3 Dec 2024 08:00:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3514F1D7989;
+	Tue,  3 Dec 2024 08:35:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733212861; cv=none; b=tuSIMWuJvSAQUlDz7LfSzOPc4KFNypOpmdfkmDYixZKp0cNfVM4HNEzsFKvbamIIakZ8pBPReKkgyxchEsXh0PJUKlNgIJZr1zRYn87b9Jl1R83jnJLQBCV5gLWK0JmCVT+Ob2ncCG09zNUiLf1zhn+mjJTIqoioV/7ii6Ciav0=
+	t=1733214945; cv=none; b=sHaMv9NMMrEBqdk2ptDGQQVTGgaNi347ws48eNJ27aCT+sWfleWgjzAAMJj/sJhj2hP7P4jqvZmHF08lqnljbeBlwKzxBMcUxxiWhLAgRM4oZ24CI9BeDEGJYRk2PXGsAR4h3BX5JLii6DymVT2FWVO0CVPhliXp0MJ40v4jEXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733212861; c=relaxed/simple;
-	bh=DxK2elVr2TglOMSfmiZzWk+c4ZqpAytERfWqpaeH6M8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AXsGnwyl+/xXhRb01L+xpckQ49biwqAEWU3VoeuUIVr7R0ecGrTle6nyGzaVAxXqp+JgYTz10N08oP8v9tEzZUxZiXg6FcDNWexcOhrE6wgjoZhVcVzZcpdhYmIOr305jvbnlkPSY4SsnEKmVpMOJ5+XXQOunqjPe9czwXr9/24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=OjrM7Fi/; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1733214945; c=relaxed/simple;
+	bh=t/s6+RptaQ2/EAd4is8JzSOuPRfpzQezj0/HRnq1RbQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NDVxpfo2ePXxhiZEKGpGNGQORsAhAcrFn3Ei36iowndR1PuDh5fGHBzsDBPlxcq6CChKi/Ns/GQ2/p7wJerX5cq8vUIzusZwTLL6sa608fuzgm7GOaql2/UVg11NWmAnbGW0rY+uWEZEq/wNgY9pmBW2QLdTLnay1qld1tGk5YA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qN2Ru9eE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="OjrM7Fi/"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=Z5W6TzUmpOT8OeMseNLRswu8nLNRFfWLwSH5h9kFvf8=; b=OjrM7Fi/UEJfixgHY/bJ7qvuaS
-	uRZMYNuC7UUE8nRW/QDiIfMPSbGVy5KTBnWolMExU1WQkVIfRMHIB3qbwfqMoiPBkqgivlMjeihti
-	EFn0epR7oq9NhGUDRyxUKIEI6VL5VXd5Ujun8GjfO1rH0SFybeM/cWhgh6ZL4D6E1l5oRkKdqG724
-	gmoF/8tFpUmsHcQ4Fh940aCHfIlemY4UhyuY6eB3KfUEM8j5g+2qDSDhN599sY6WsmFw3TSMpaTV8
-	sfdZhfv1hRJYVWyV1T1at8kFyzpbeVsMUnVGQ+J32X6m9HsxTzF0hm8rVSHmPtg80pUiN7svPZ6Qx
-	070tpn8g==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tINpn-0037jd-0I;
-	Tue, 03 Dec 2024 16:00:40 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 03 Dec 2024 16:00:39 +0800
-Date: Tue, 3 Dec 2024 16:00:39 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
-Cc: Nhat Pham <nphamcs@gmail.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"hannes@cmpxchg.org" <hannes@cmpxchg.org>,
-	"yosryahmed@google.com" <yosryahmed@google.com>,
-	"chengming.zhou@linux.dev" <chengming.zhou@linux.dev>,
-	"usamaarif642@gmail.com" <usamaarif642@gmail.com>,
-	"ryan.roberts@arm.com" <ryan.roberts@arm.com>,
-	"ying.huang@intel.com" <ying.huang@intel.com>,
-	"21cnbao@gmail.com" <21cnbao@gmail.com>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"clabbe@baylibre.com" <clabbe@baylibre.com>,
-	"ardb@kernel.org" <ardb@kernel.org>,
-	"ebiggers@google.com" <ebiggers@google.com>,
-	"surenb@google.com" <surenb@google.com>,
-	"Accardi, Kristen C" <kristen.c.accardi@intel.com>,
-	"Feghali, Wajdi K" <wajdi.k.feghali@intel.com>,
-	"Gopal, Vinodh" <vinodh.gopal@intel.com>
-Subject: Re: [PATCH v4 09/10] mm: zswap: Allocate pool batching resources if
- the crypto_alg supports batching.
-Message-ID: <Z066p53LoISwqkmX@gondor.apana.org.au>
-References: <20241123070127.332773-1-kanchana.p.sridhar@intel.com>
- <20241123070127.332773-10-kanchana.p.sridhar@intel.com>
- <CAKEwX=PmKWH4Z4Py9Jti9fcD6qCYJBBRrDF48qdmo8-i+LzzfA@mail.gmail.com>
- <SJ0PR11MB56783454B5985ACD48744772C9362@SJ0PR11MB5678.namprd11.prod.outlook.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qN2Ru9eE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4578C4CECF;
+	Tue,  3 Dec 2024 08:35:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733214944;
+	bh=t/s6+RptaQ2/EAd4is8JzSOuPRfpzQezj0/HRnq1RbQ=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=qN2Ru9eEUmrb6wOC+QtBegAL6W3N25eHuDQvcm4wPYF8aK+4PhXUweF8e5UMeTM/X
+	 h1EcS8rKw9BhUKg+HgxJW576JbNAkYdWEaHNDmuyL/3bzvKLJPT1qhcE2NRwTwRi+U
+	 +Nd4aPSmy8QUpvAb3n8rmULzT/wQKDDonXUNrB9yyxkafkOqL0cxXm1K0ft3WFkH/M
+	 jyPCRHEbT21XWXNl08C4/MIbxv++NvCFnFWlR0QBxAKs/NdRoz83XicirueLv4DPHa
+	 wwfgGq8mu4s58RoxfRDW7kFu6H6Rixoe6xKYr9lntcJRuo2r8y+UyYIgT1iY2/4weN
+	 uqTCGnY9iU/WA==
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2ffe28c12bdso47791721fa.1;
+        Tue, 03 Dec 2024 00:35:44 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUb79SeWXPv3CFegCS5IbH4BUKe3+s9k4sjmU/Uqmna79xjU3t6f8LQEiCjAuexwenFcqxtc7KHrMWp4og=@vger.kernel.org
+X-Gm-Message-State: AOJu0YymPMjxRoZxjxg3eJkIcf+38f7OsOeWscjJDSlkEgBCZaOFlwZn
+	oMJz1AvXFdhty9hxtz3qtjSY6hFGigvygVu6QxW0hiBy1pO24Y1m0dyIRIe+IbkQarBDSD/84DR
+	rHinZ6A21waKz0w0rh0TeA8bKud0=
+X-Google-Smtp-Source: AGHT+IE2WroKvxHEqwKcEheMFZ+Hly1IRO+7RAkqN8BvDNz/yj5RAt6vtj8HBui7JQvJL41EPYz/nQbZYYnkgyS5cLg=
+X-Received: by 2002:a2e:a906:0:b0:2fb:4982:daea with SMTP id
+ 38308e7fff4ca-30009cb321fmr10338411fa.32.1733214943023; Tue, 03 Dec 2024
+ 00:35:43 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SJ0PR11MB56783454B5985ACD48744772C9362@SJ0PR11MB5678.namprd11.prod.outlook.com>
+References: <81560af7526138aa5221e5900ee7462f55bb090d.camel@HansenPartnership.com>
+In-Reply-To: <81560af7526138aa5221e5900ee7462f55bb090d.camel@HansenPartnership.com>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Tue, 3 Dec 2024 09:35:32 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXFGEeAkxpqsfp0G3VqTRs+Sve-pULDXBKvzSqAc_AVFMA@mail.gmail.com>
+Message-ID: <CAMj1kXFGEeAkxpqsfp0G3VqTRs+Sve-pULDXBKvzSqAc_AVFMA@mail.gmail.com>
+Subject: Re: section mismatch error in aesgcm causing a build failure
+To: James Bottomley <James.Bottomley@hansenpartnership.com>
+Cc: linux-crypto@vger.kernel.org, linux-kbuild@vger.kernel.org, 
+	Masahiro Yamada <masahiroy@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 03, 2024 at 12:30:30AM +0000, Sridhar, Kanchana P wrote:
+On Mon, 2 Dec 2024 at 21:27, James Bottomley
+<James.Bottomley@hansenpartnership.com> wrote:
 >
-> > Why do we need this "can_batch" field? IIUC, this can be determined
-> > from the compressor internal fields itself, no?
-> > 
-> > acomp_has_async_batching(acomp);
-> > 
-> > Is this just for convenience, or is this actually an expensive thing to compute?
-> 
-> Thanks for your comments. This is a good question. I tried not to imply that
-> batching resources have been allocated for the cpu based only on what
-> acomp_has_async_batching() returns. It is possible that the cpu onlining
-> code ran into an -ENOMEM error on any particular cpu. In this case, I set
-> the pool->can_batch to "false", mainly for convenience, so that zswap
-> can be somewhat insulated from migration. I agree that this may not be
-> the best solution; and whether or not batching is enabled can be directly
-> determined just before the call to crypto_acomp_batch_compress()
-> based on:
-> 
-> acomp_ctx->nr_reqs == SWAP_CRYPTO_BATCH_SIZE;
+> I'm getting this in 6.13-rc1:
+>
+> /home/jejb/git/linux-tpm/lib/crypto/aesgcm.c:212:29: error: ptext1
+> causes a section type conflict with aesgcm_tv
+>  static const u8 __initconst ptext1[16];
+>                              ^~~~~~
+> /home/jejb/git/linux-tpm/lib/crypto/aesgcm.c:570:9: note: =E2=80=98aesgcm=
+_tv=E2=80=99 was declared here
+>  } const aesgcm_tv[] __initconst =3D {
+>          ^~~~~~~~~
+> make[5]: *** [/home/jejb/git/linux-tpm/scripts/Makefile.build:194: lib/cr=
+ypto/aesgcm.o] Error 1
+> /home/jejb/git/linux-tpm/lib/crypto/aesgcm.c:212:29: error: ptext1 causes=
+ a section type conflict with aesgcm_tv
+>  static const u8 __initconst ptext1[16];
+>                              ^~~~~~
+> /home/jejb/git/linux-tpm/lib/crypto/aesgcm.c:570:9: note: =E2=80=98aesgcm=
+_tv=E2=80=99 was declared here
+>  } const aesgcm_tv[] __initconst =3D {
+>          ^~~~~~~~~
+> make[5]: *** [/home/jejb/git/linux-tpm/scripts/Makefile.build:194: lib/cr=
+ypto/aesgcm.o] Error 1
+>
+> I think it's way older than 6.13-rc1, but the inclusion of the sevguest
+> driver in the merge window now means that something actually selects
+> it.  I can fix it simply by adding a zero initialization to the file:
+>
+> -static const u8 __initconst ptext1[16];
+> +static const u8 __initconst ptext1[16] =3D { 0 };
+>
+> Which I think means that by default the traditional zero initialization
+> of a static variable is in the wrong section (and actually likely is
+> wrong for all our __initX variables as well).
+>
+> In case it matters, this is with gcc-7
+>
 
-With ahash request chaining, the idea is to accumulate as much
-data as you can before you provide it to the Crypto API.  The
-API is responsible for dividing it up if the underlying driver
-is only able to handle one request at a time.
+This also works
 
-So that would be the ideal model to use for compression as well.
-Provide as much data as you can and let the API handle the case
-where the data needs to be divided up.
+static const u8 __section(".init.rodata,\"a\",@progbits #") ptext1[16];
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+and so this suggests that without the @progbits annotations, the
+compiler is placing ptext1 into a SHT_NOBITS section, causing a
+conflict with the SHT_PROGBITS annotation of aesgcm_tv.
+
+Given how unusual it is to have a static const variable without an
+initializer, I don't think this suggests that there is a wider issue
+with __initconst/__initdata.
+
+We're about to bump the minimum GCC version to 8 for other reasons,
+and I couldn't reproduce it with GCC 8.5.0. But the fix is
+straight-forward and actually clarifies this rather odd occurrence, so
+I think we should apply it nonetheless.
+
+--=20
+Ard.
