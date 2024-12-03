@@ -1,163 +1,150 @@
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bedivere.hansenpartnership.com (bedivere.hansenpartnership.com [96.44.175.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5C9E1EE006
-	for <linux-crypto@vger.kernel.org>; Tue,  3 Dec 2024 13:55:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8B6213B5B6;
+	Tue,  3 Dec 2024 14:56:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=96.44.175.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733234117; cv=none; b=VrrIxzNx9xAoyiC41S5blV+5u7+EK9ko927SfVxyozlP20Ofg/ve8+wjYaN7oR32cisHSsXe4DSdVMOrdN8LklDu1z5vVFVQ8lH/oHBDBfn8cci9ADG0Vp8o8XtdYpcUVWM4mSDIenbxeLmZRkBnsxs+e3qFN8P8vOnCBN29Lds=
+	t=1733237789; cv=none; b=HxLgxjSoYxATO9OZ0UurC6lY4tJIDJPQTucW9wRDOp28STAy16Y2qyB1lhryRBDps9FaL+fL4uauTidRSf3tpKoJPDiFcyq8B15wyzs6UrwwnN+FBDiknbf7o9mRBk2H0Mrqh4t7hFV+aBlr0RTLenCt7l/qb0I5r1oTajQZxuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733234117; c=relaxed/simple;
-	bh=mle9UUb7dDskLtd9jCH9QqWnYl8wSrz63i6CvmV7vXA=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=RH8Zklfx+uKH/5v4qHAP+EX/lYFRYvxuwFnDe6UDGC2CJbJfIE1T+M0Ag4pvj1LOABCldnQnpmED5n4X9TBYQ6Ql+hOZ3nuL61CX5upkzx2Q+v5+gOEOAmg1ZH1UxrHy8t/9rRkhBPsmmnSCgcKZUpwW9k4bHSx5NGAXqdQZMwk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=dqnCpyNj; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1733237789; c=relaxed/simple;
+	bh=FJKpHkNUIEy8qBiV6qVOAnWInSJ7UZV2AuQMwcgogQU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=JeT45Pzw9DyF+4XmPKt1OttpOfUAh2Jb7aN7VfT2x5lkWfnazs4gtJUVnlWzULro6NmmuK8TUSQ+2kycVeaUcWE6FmEy6lj+DwUMIC2PTpLwaN0yk78UgjzWMJrzpDabzZSECCKKcanr50ZpMeF3YbTDdsYO/au21Op+kYf0jPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=XYTDcMQ8; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=XYTDcMQ8; arc=none smtp.client-ip=96.44.175.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=HansenPartnership.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dqnCpyNj"
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-434a45f05feso68675505e9.3
-        for <linux-crypto@vger.kernel.org>; Tue, 03 Dec 2024 05:55:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1733234114; x=1733838914; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:references:cc:to:subject:reply-to:from:user-agent
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gz+l3KqObW/HJFvDTOv2iIjYIEIUxrukQz2sYdYBT8s=;
-        b=dqnCpyNjGijGuEX4/HQfs0ORJbyiO2qrZUfkpvhuJBMOAAs3fj+kRSrNPS9+qA6p0X
-         aqFOMLenlOaGS6gsxD8DgXpo4VM103k0d9wfvBE4a7g41PZLb6IJeuCf+9zkXOv9JS/9
-         wkmXuCnzzVkyQdW/km5AyhUSzOjz/dBfCj+pgU7hZ7tq0FkCZZO2dPQ4ojBWYJM/bGsd
-         mMvzkxOmrioMP7zd85+FODqysa4P/2awx96fJyhA13nLawuywC7j3CeyW/+pqc0lGLyq
-         +7UrbkalMXACAwftQhn+mcL+pW7VqwNQQVnoCcdRAXCz9hj3fRFw7hmR2eaPbpa5yA5F
-         aW8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733234114; x=1733838914;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:references:cc:to:subject:reply-to:from:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=gz+l3KqObW/HJFvDTOv2iIjYIEIUxrukQz2sYdYBT8s=;
-        b=qYs4O2YNhwP28l+wucuPzdI1H7QWB4ksR008zgdaSBYxFQ9MthKEi8+uDwbbx/SNBI
-         gkQHt4ETx3KkMiQ/MXmgueY83jAbr5y9f1PDEzoLkQg2fh5/S1BM5XOFbVMVPzknuCJP
-         bt5iGrTZxMkNeyYCRRmYXfrsvLTgdwcuWO2fTO6JNq/YF5IpHP9J8p7xpcYbVJp6NBOM
-         17+3SD/aszqEKS1NUmNN+QAC88tg0BTGiOi66caCXpwZdmIxwGy048Ep0xzgEYk7qJj+
-         7a55C9+XwND3Ua4RuXHdClfjc4AGamZS/s6qsuu9o87DyXbH7HtUZ2c+ZzUTU3hdPZjo
-         6UJg==
-X-Gm-Message-State: AOJu0YwHXFIIUl+Wqs/I6MLeNipZ61Uwb6ENt5XiEGXKGY6+ztJdDwQX
-	+20Jn+DmVgDDYfMqt+EiGUdJc6fCrzMANEYSQFPYEEdUqniIZvwrGgNZC2r7BtA=
-X-Gm-Gg: ASbGncs4qMJkCg8kIXDs59i1rVBRVZz6CvFpxsaozCS7Dzs6NHBcQngiKsrhhHpqSNm
-	AbMNIXv9gMGz2axdEw4nmB6xED4ARCHRWCmsL/jQ1uiz2eb4JY0zpdnkTzjSWwC6AHDpBGs6/Km
-	/sraJu26MgKlpe8zR1sEGyl8aNA8e1CUlOGicUjQ9QcGcAl5ZQZusK0YLoK3U3jZQLlyov2CwDI
-	/4bbkhkrTh5Gh3b5m1vTjfx8tO2A7Cc3EBeGG2dfIQ6Txa11in+nImuN5XVRzZ0R0+gg109kp6p
-	gZSWCobM94gwGOrVZM9k9UGi
-X-Google-Smtp-Source: AGHT+IHO5v4mBO5cO68x6c9dihydjdMPOihkNn60wLtRB6InkOSEoDsCz6rUvo0qtKSH5DZhekNFlg==
-X-Received: by 2002:a05:600c:3502:b0:431:24c3:dbaa with SMTP id 5b1f17b1804b1-434d09b2e2cmr24599645e9.2.1733234114210;
-        Tue, 03 Dec 2024 05:55:14 -0800 (PST)
-Received: from ?IPV6:2a01:e0a:982:cbb0:b668:b88:4ecf:c065? ([2a01:e0a:982:cbb0:b668:b88:4ecf:c065])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434b0f32594sm193399585e9.32.2024.12.03.05.55.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Dec 2024 05:55:13 -0800 (PST)
-Message-ID: <b3e5184d-19bc-45ed-92e3-a751842839b3@linaro.org>
-Date: Tue, 3 Dec 2024 14:55:12 +0100
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="XYTDcMQ8";
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="XYTDcMQ8"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=hansenpartnership.com; s=20151216; t=1733237785;
+	bh=FJKpHkNUIEy8qBiV6qVOAnWInSJ7UZV2AuQMwcgogQU=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+	b=XYTDcMQ8jzSMHl2IMuMiilPsER1rY2cGziCdLbA5pIvglb7WxPHuSSrJaQsSrtQhn
+	 hK3W+tL72RQzOXXGjg4Qp6NWZsLvapPmBnoGY6lzxAcMQOGU5G8Aa5h/P0d2YXm9tH
+	 KRjguKM72Mh+nJJwBArcqcPoOxbECMfuMlJavGY4=
+Received: from localhost (localhost [127.0.0.1])
+	by bedivere.hansenpartnership.com (Postfix) with ESMTP id C3E74128793E;
+	Tue, 03 Dec 2024 09:56:25 -0500 (EST)
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+ by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavis, port 10024)
+ with ESMTP id ZwVRGJ733QGk; Tue,  3 Dec 2024 09:56:25 -0500 (EST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=hansenpartnership.com; s=20151216; t=1733237785;
+	bh=FJKpHkNUIEy8qBiV6qVOAnWInSJ7UZV2AuQMwcgogQU=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+	b=XYTDcMQ8jzSMHl2IMuMiilPsER1rY2cGziCdLbA5pIvglb7WxPHuSSrJaQsSrtQhn
+	 hK3W+tL72RQzOXXGjg4Qp6NWZsLvapPmBnoGY6lzxAcMQOGU5G8Aa5h/P0d2YXm9tH
+	 KRjguKM72Mh+nJJwBArcqcPoOxbECMfuMlJavGY4=
+Received: from lingrow.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4302:c21::a774])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 19E4512871C9;
+	Tue, 03 Dec 2024 09:56:25 -0500 (EST)
+Message-ID: <6d21ce25bab39922c5c8b9f9433267e9d3e40d52.camel@HansenPartnership.com>
+Subject: Re: section mismatch error in aesgcm causing a build failure
+From: James Bottomley <James.Bottomley@HansenPartnership.com>
+To: Ard Biesheuvel <ardb@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-kbuild@vger.kernel.org, Masahiro
+ Yamada <masahiroy@kernel.org>
+Date: Tue, 03 Dec 2024 09:56:22 -0500
+In-Reply-To: <CAMj1kXFGEeAkxpqsfp0G3VqTRs+Sve-pULDXBKvzSqAc_AVFMA@mail.gmail.com>
+References: 
+	<81560af7526138aa5221e5900ee7462f55bb090d.camel@HansenPartnership.com>
+	 <CAMj1kXFGEeAkxpqsfp0G3VqTRs+Sve-pULDXBKvzSqAc_AVFMA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.42.4 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: neil.armstrong@linaro.org
-Reply-To: neil.armstrong@linaro.org
-Subject: Re: [PATCH 2/9] crypto: qce - unregister previously registered algos
- in error path
-To: Bartosz Golaszewski <brgl@bgdev.pl>,
- Thara Gopinath <thara.gopinath@gmail.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>,
- Stanimir Varbanov <svarbanov@mm-sol.com>
-Cc: linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, stable@vger.kernel.org
-References: <20241203-crypto-qce-refactor-v1-0-c5901d2dd45c@linaro.org>
- <20241203-crypto-qce-refactor-v1-2-c5901d2dd45c@linaro.org>
-Content-Language: en-US, fr
-Autocrypt: addr=neil.armstrong@linaro.org; keydata=
- xsBNBE1ZBs8BCAD78xVLsXPwV/2qQx2FaO/7mhWL0Qodw8UcQJnkrWmgTFRobtTWxuRx8WWP
- GTjuhvbleoQ5Cxjr+v+1ARGCH46MxFP5DwauzPekwJUD5QKZlaw/bURTLmS2id5wWi3lqVH4
- BVF2WzvGyyeV1o4RTCYDnZ9VLLylJ9bneEaIs/7cjCEbipGGFlfIML3sfqnIvMAxIMZrvcl9
- qPV2k+KQ7q+aXavU5W+yLNn7QtXUB530Zlk/d2ETgzQ5FLYYnUDAaRl+8JUTjc0CNOTpCeik
- 80TZcE6f8M76Xa6yU8VcNko94Ck7iB4vj70q76P/J7kt98hklrr85/3NU3oti3nrIHmHABEB
- AAHNKk5laWwgQXJtc3Ryb25nIDxuZWlsLmFybXN0cm9uZ0BsaW5hcm8ub3JnPsLAkQQTAQoA
- OwIbIwULCQgHAwUVCgkICwUWAgMBAAIeAQIXgBYhBInsPQWERiF0UPIoSBaat7Gkz/iuBQJk
- Q5wSAhkBAAoJEBaat7Gkz/iuyhMIANiD94qDtUTJRfEW6GwXmtKWwl/mvqQtaTtZID2dos04
- YqBbshiJbejgVJjy+HODcNUIKBB3PSLaln4ltdsV73SBcwUNdzebfKspAQunCM22Mn6FBIxQ
- GizsMLcP/0FX4en9NaKGfK6ZdKK6kN1GR9YffMJd2P08EO8mHowmSRe/ExAODhAs9W7XXExw
- UNCY4pVJyRPpEhv373vvff60bHxc1k/FF9WaPscMt7hlkbFLUs85kHtQAmr8pV5Hy9ezsSRa
- GzJmiVclkPc2BY592IGBXRDQ38urXeM4nfhhvqA50b/nAEXc6FzqgXqDkEIwR66/Gbp0t3+r
- yQzpKRyQif3OwE0ETVkGzwEIALyKDN/OGURaHBVzwjgYq+ZtifvekdrSNl8TIDH8g1xicBYp
- QTbPn6bbSZbdvfeQPNCcD4/EhXZuhQXMcoJsQQQnO4vwVULmPGgtGf8PVc7dxKOeta+qUh6+
- SRh3vIcAUFHDT3f/Zdspz+e2E0hPV2hiSvICLk11qO6cyJE13zeNFoeY3ggrKY+IzbFomIZY
- 4yG6xI99NIPEVE9lNBXBKIlewIyVlkOaYvJWSV+p5gdJXOvScNN1epm5YHmf9aE2ZjnqZGoM
- Mtsyw18YoX9BqMFInxqYQQ3j/HpVgTSvmo5ea5qQDDUaCsaTf8UeDcwYOtgI8iL4oHcsGtUX
- oUk33HEAEQEAAcLAXwQYAQIACQUCTVkGzwIbDAAKCRAWmrexpM/4rrXiB/sGbkQ6itMrAIfn
- M7IbRuiSZS1unlySUVYu3SD6YBYnNi3G5EpbwfBNuT3H8//rVvtOFK4OD8cRYkxXRQmTvqa3
- 3eDIHu/zr1HMKErm+2SD6PO9umRef8V82o2oaCLvf4WeIssFjwB0b6a12opuRP7yo3E3gTCS
- KmbUuLv1CtxKQF+fUV1cVaTPMyT25Od+RC1K+iOR0F54oUJvJeq7fUzbn/KdlhA8XPGzwGRy
- 4zcsPWvwnXgfe5tk680fEKZVwOZKIEuJC3v+/yZpQzDvGYJvbyix0lHnrCzq43WefRHI5XTT
- QbM0WUIBIcGmq38+OgUsMYu4NzLu7uZFAcmp6h8g
-Organization: Linaro
-In-Reply-To: <20241203-crypto-qce-refactor-v1-2-c5901d2dd45c@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 03/12/2024 10:19, Bartosz Golaszewski wrote:
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+On Tue, 2024-12-03 at 09:35 +0100, Ard Biesheuvel wrote:
+> On Mon, 2 Dec 2024 at 21:27, James Bottomley
+> <James.Bottomley@hansenpartnership.com> wrote:
+> > 
+> > I'm getting this in 6.13-rc1:
+> > 
+> > /home/jejb/git/linux-tpm/lib/crypto/aesgcm.c:212:29: error: ptext1
+> > causes a section type conflict with aesgcm_tv
+> >  static const u8 __initconst ptext1[16];
+> >                              ^~~~~~
+> > /home/jejb/git/linux-tpm/lib/crypto/aesgcm.c:570:9: note:
+> > ‘aesgcm_tv’ was declared here
+> >  } const aesgcm_tv[] __initconst = {
+> >          ^~~~~~~~~
+> > make[5]: *** [/home/jejb/git/linux-tpm/scripts/Makefile.build:194:
+> > lib/crypto/aesgcm.o] Error 1
+> > /home/jejb/git/linux-tpm/lib/crypto/aesgcm.c:212:29: error: ptext1
+> > causes a section type conflict with aesgcm_tv
+> >  static const u8 __initconst ptext1[16];
+> >                              ^~~~~~
+> > /home/jejb/git/linux-tpm/lib/crypto/aesgcm.c:570:9: note:
+> > ‘aesgcm_tv’ was declared here
+> >  } const aesgcm_tv[] __initconst = {
+> >          ^~~~~~~~~
+> > make[5]: *** [/home/jejb/git/linux-tpm/scripts/Makefile.build:194:
+> > lib/crypto/aesgcm.o] Error 1
+> > 
+> > I think it's way older than 6.13-rc1, but the inclusion of the
+> > sevguest
+> > driver in the merge window now means that something actually
+> > selects
+> > it.  I can fix it simply by adding a zero initialization to the
+> > file:
+> > 
+> > -static const u8 __initconst ptext1[16];
+> > +static const u8 __initconst ptext1[16] = { 0 };
+> > 
+> > Which I think means that by default the traditional zero
+> > initialization
+> > of a static variable is in the wrong section (and actually likely
+> > is
+> > wrong for all our __initX variables as well).
+> > 
+> > In case it matters, this is with gcc-7
+> > 
 > 
-> If we encounter an error when registering alorithms with the crypto
-> framework, we just bail out and don't unregister the ones we
-> successfully registered in prior iterations of the loop.
+> This also works
 > 
-> Add code that goes back over the algos and unregisters them before
-> returning an error from qce_register_algs().
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: ec8f5d8f6f76 ("crypto: qce - Qualcomm crypto engine driver")
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> ---
->   drivers/crypto/qce/core.c | 11 +++++++----
->   1 file changed, 7 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
-> index 58ea93220f015..848e5e802b92b 100644
-> --- a/drivers/crypto/qce/core.c
-> +++ b/drivers/crypto/qce/core.c
-> @@ -51,16 +51,19 @@ static void qce_unregister_algs(struct qce_device *qce)
->   static int qce_register_algs(struct qce_device *qce)
->   {
->   	const struct qce_algo_ops *ops;
-> -	int i, ret = -ENODEV;
-> +	int i, j, ret = -ENODEV;
->   
->   	for (i = 0; i < ARRAY_SIZE(qce_ops); i++) {
->   		ops = qce_ops[i];
->   		ret = ops->register_algs(qce);
-> -		if (ret)
-> -			break;
-> +		if (ret) {
-> +			for (j = i - 1; j >= 0; j--)
-> +				ops->unregister_algs(qce);
-> +			return ret;
-> +		}
->   	}
->   
-> -	return ret;
-> +	return 0;
->   }
->   
->   static int qce_handle_request(struct crypto_async_request *async_req)
-> 
+> static const u8 __section(".init.rodata,\"a\",@progbits #")
+> ptext1[16];
 
-Perhaps you can also use the devm trick here aswell ?
+That also works for me.
 
-Neil
+> and so this suggests that without the @progbits annotations, the
+> compiler is placing ptext1 into a SHT_NOBITS section, causing a
+> conflict with the SHT_PROGBITS annotation of aesgcm_tv.
+
+I'm not so sure about that:
+
+static const u8 __section(".bss.init,\"a\",@nobits #") ptext1[16];
+
+Also works for me.
+
+> Given how unusual it is to have a static const variable without an
+> initializer, I don't think this suggests that there is a wider issue
+> with __initconst/__initdata.
+
+What I meant was that uninitialized static __initX variables point to
+the bss section.  We don't seem to have a discardable init bss section,
+so they remain allocated for the life of the kernel.
+
+> We're about to bump the minimum GCC version to 8 for other reasons,
+> and I couldn't reproduce it with GCC 8.5.0. But the fix is
+> straight-forward and actually clarifies this rather odd occurrence,
+> so I think we should apply it nonetheless.
+
+Hm, that's going to cause some problems: I'm on openSUSE Leap. 
+Although all gcc's up to gcc-13 can be installed, the default compiler
+is still gcc-7
+
+Regards,
+
+James
+
