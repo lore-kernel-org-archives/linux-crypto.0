@@ -1,116 +1,101 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3514F1D7989;
-	Tue,  3 Dec 2024 08:35:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2D2D192D64;
+	Tue,  3 Dec 2024 08:50:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733214945; cv=none; b=sHaMv9NMMrEBqdk2ptDGQQVTGgaNi347ws48eNJ27aCT+sWfleWgjzAAMJj/sJhj2hP7P4jqvZmHF08lqnljbeBlwKzxBMcUxxiWhLAgRM4oZ24CI9BeDEGJYRk2PXGsAR4h3BX5JLii6DymVT2FWVO0CVPhliXp0MJ40v4jEXY=
+	t=1733215853; cv=none; b=Q21AAfqwwWHSwYXqOUdZyYZn/IP1WifO1ngO6vUd4XuwoPco1ybu1p9nWdUsKZrysVu4Jqi8C4+eL1FEKQ6lIAdj5CTrAf0U9m6ABkDv8slZW6zMtFqgtSloFEtyGrSPDHeqoxT5XS31NLK1/81SoWgdlCSrXW0zHcoIQfADzXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733214945; c=relaxed/simple;
-	bh=t/s6+RptaQ2/EAd4is8JzSOuPRfpzQezj0/HRnq1RbQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NDVxpfo2ePXxhiZEKGpGNGQORsAhAcrFn3Ei36iowndR1PuDh5fGHBzsDBPlxcq6CChKi/Ns/GQ2/p7wJerX5cq8vUIzusZwTLL6sa608fuzgm7GOaql2/UVg11NWmAnbGW0rY+uWEZEq/wNgY9pmBW2QLdTLnay1qld1tGk5YA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qN2Ru9eE; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1733215853; c=relaxed/simple;
+	bh=V9mE91uJU38RWrFIrEtW2u16C+OaUZHHwy6JCoVZGP0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=O0C2JX6vxS0ATRr3YAbu045OZGyXUhBxliHa5rzKj2ZisdsINLJoD3WJTsry9zzsnYiY8feoQbsXSQRUHuGEV6RDIUERO9bM56UIUbBm+pirYlMl5WWkmsuOzqZo187lNz5HW2K0GHxKfmT/AGYrap8tkuFyFUOxeJTQg03PI0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=BhgBw16W; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qN2Ru9eE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4578C4CECF;
-	Tue,  3 Dec 2024 08:35:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733214944;
-	bh=t/s6+RptaQ2/EAd4is8JzSOuPRfpzQezj0/HRnq1RbQ=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=qN2Ru9eEUmrb6wOC+QtBegAL6W3N25eHuDQvcm4wPYF8aK+4PhXUweF8e5UMeTM/X
-	 h1EcS8rKw9BhUKg+HgxJW576JbNAkYdWEaHNDmuyL/3bzvKLJPT1qhcE2NRwTwRi+U
-	 +Nd4aPSmy8QUpvAb3n8rmULzT/wQKDDonXUNrB9yyxkafkOqL0cxXm1K0ft3WFkH/M
-	 jyPCRHEbT21XWXNl08C4/MIbxv++NvCFnFWlR0QBxAKs/NdRoz83XicirueLv4DPHa
-	 wwfgGq8mu4s58RoxfRDW7kFu6H6Rixoe6xKYr9lntcJRuo2r8y+UyYIgT1iY2/4weN
-	 uqTCGnY9iU/WA==
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2ffe28c12bdso47791721fa.1;
-        Tue, 03 Dec 2024 00:35:44 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUb79SeWXPv3CFegCS5IbH4BUKe3+s9k4sjmU/Uqmna79xjU3t6f8LQEiCjAuexwenFcqxtc7KHrMWp4og=@vger.kernel.org
-X-Gm-Message-State: AOJu0YymPMjxRoZxjxg3eJkIcf+38f7OsOeWscjJDSlkEgBCZaOFlwZn
-	oMJz1AvXFdhty9hxtz3qtjSY6hFGigvygVu6QxW0hiBy1pO24Y1m0dyIRIe+IbkQarBDSD/84DR
-	rHinZ6A21waKz0w0rh0TeA8bKud0=
-X-Google-Smtp-Source: AGHT+IE2WroKvxHEqwKcEheMFZ+Hly1IRO+7RAkqN8BvDNz/yj5RAt6vtj8HBui7JQvJL41EPYz/nQbZYYnkgyS5cLg=
-X-Received: by 2002:a2e:a906:0:b0:2fb:4982:daea with SMTP id
- 38308e7fff4ca-30009cb321fmr10338411fa.32.1733214943023; Tue, 03 Dec 2024
- 00:35:43 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="BhgBw16W"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=jJYA7Tj+Zo3Z3yF+IwYyaS7Puyr19q55Ek5JTHaOGp0=; b=BhgBw16Wy52oNykb/IRpz0izPA
+	UCV4vvucnJPrqSe6VYmcV3f/Nh3MruSDFwNP9KqfsjWD4DkXPzzHQKuXHeLF2v1DmDfOVauX2tC+t
+	fKuYMr0hRZG5R2Yr7dOQVvV9rSprqgUw7R3fHZ3I3Zj/Ot8RK9ZqWQvf/PK7BcIo0FdsHvdTJE9v2
+	7bsyTQclErrzwQCFxWe3Up4leN5G7+xpcm7ZnGQQg++H+RX5Jufjqg3L+8/34DfA3WYWRK9waQaws
+	/Ax86fACCYe/w1zzDsZRbf5euX/lUXIt8+YKac4jWempX5GFBtZqjrUlMMp0D+8Fc9vNSbaBPq/wD
+	t8CAIlaQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tIOcE-0038VG-3B;
+	Tue, 03 Dec 2024 16:50:44 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 03 Dec 2024 16:50:42 +0800
+Date: Tue, 3 Dec 2024 16:50:42 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Harald Freudenberger <freude@linux.ibm.com>
+Cc: davem@davemloft.net, dengler@linux.ibm.com, linux-s390@vger.kernel.org,
+	linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>
+Subject: Re: [PATCH v6 2/2] s390/crypto: New s390 specific protected key hash
+ phmac
+Message-ID: <Z07GYlVeohJJyLNE@gondor.apana.org.au>
+References: <20241129111059.303905-1-freude@linux.ibm.com>
+ <20241129111059.303905-3-freude@linux.ibm.com>
+ <Z0nUQQ9E32xq0SY4@gondor.apana.org.au>
+ <c86548e680a151394fa814f543103481@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <81560af7526138aa5221e5900ee7462f55bb090d.camel@HansenPartnership.com>
-In-Reply-To: <81560af7526138aa5221e5900ee7462f55bb090d.camel@HansenPartnership.com>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Tue, 3 Dec 2024 09:35:32 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXFGEeAkxpqsfp0G3VqTRs+Sve-pULDXBKvzSqAc_AVFMA@mail.gmail.com>
-Message-ID: <CAMj1kXFGEeAkxpqsfp0G3VqTRs+Sve-pULDXBKvzSqAc_AVFMA@mail.gmail.com>
-Subject: Re: section mismatch error in aesgcm causing a build failure
-To: James Bottomley <James.Bottomley@hansenpartnership.com>
-Cc: linux-crypto@vger.kernel.org, linux-kbuild@vger.kernel.org, 
-	Masahiro Yamada <masahiroy@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c86548e680a151394fa814f543103481@linux.ibm.com>
 
-On Mon, 2 Dec 2024 at 21:27, James Bottomley
-<James.Bottomley@hansenpartnership.com> wrote:
+On Mon, Dec 02, 2024 at 06:25:22PM +0100, Harald Freudenberger wrote:
 >
-> I'm getting this in 6.13-rc1:
->
-> /home/jejb/git/linux-tpm/lib/crypto/aesgcm.c:212:29: error: ptext1
-> causes a section type conflict with aesgcm_tv
->  static const u8 __initconst ptext1[16];
->                              ^~~~~~
-> /home/jejb/git/linux-tpm/lib/crypto/aesgcm.c:570:9: note: =E2=80=98aesgcm=
-_tv=E2=80=99 was declared here
->  } const aesgcm_tv[] __initconst =3D {
->          ^~~~~~~~~
-> make[5]: *** [/home/jejb/git/linux-tpm/scripts/Makefile.build:194: lib/cr=
-ypto/aesgcm.o] Error 1
-> /home/jejb/git/linux-tpm/lib/crypto/aesgcm.c:212:29: error: ptext1 causes=
- a section type conflict with aesgcm_tv
->  static const u8 __initconst ptext1[16];
->                              ^~~~~~
-> /home/jejb/git/linux-tpm/lib/crypto/aesgcm.c:570:9: note: =E2=80=98aesgcm=
-_tv=E2=80=99 was declared here
->  } const aesgcm_tv[] __initconst =3D {
->          ^~~~~~~~~
-> make[5]: *** [/home/jejb/git/linux-tpm/scripts/Makefile.build:194: lib/cr=
-ypto/aesgcm.o] Error 1
->
-> I think it's way older than 6.13-rc1, but the inclusion of the sevguest
-> driver in the merge window now means that something actually selects
-> it.  I can fix it simply by adding a zero initialization to the file:
->
-> -static const u8 __initconst ptext1[16];
-> +static const u8 __initconst ptext1[16] =3D { 0 };
->
-> Which I think means that by default the traditional zero initialization
-> of a static variable is in the wrong section (and actually likely is
-> wrong for all our __initX variables as well).
->
-> In case it matters, this is with gcc-7
->
+> - The attempt to derive a protected key usable by the cpacf instructions
+>   depends of the raw key material used. For 'clear key' material the
+>   derivation process is a simple instruction which can't fail.
+>   A more preferred way however is to use 'secure key' material which
+>   is transferred to a crypto card and then re-wrapped to be usable
+>   with cpacf instructions. This requires communication with a crypto
+>   card and thus may fail - because there is no card at all or there
+>   is temporarily no card available or the card is in bad state. If there
+>   is no usable card the AP bus returns -EBUSY at the pkey_key2protkey()
+>   function and triggers an asynchronous bus scan. As long as this scan
+>   is running (usually about 100ms or so) the -EBUSY is returned to indicate
+>   that the caller should retry "later". Other states are covered with
+>   other return codes like ENODEV or EIO and the caller is not supposed
+>   to loop but should fail. When there is no accessible hardware available
+>   to derive a protected key either the user or the admin broke something
+>   or something went really the bad way and then there is no help but the
+>   storage device must fail.
 
-This also works
+Thanks for the explanation.  I think it's fair enough to fail an
+op if the hardware is absent or broken.
 
-static const u8 __section(".init.rodata,\"a\",@progbits #") ptext1[16];
+So all I need is for you to turn the BUSY case into a delayed retry
+and I think that should be good enough.
 
-and so this suggests that without the @progbits annotations, the
-compiler is placing ptext1 into a SHT_NOBITS section, causing a
-conflict with the SHT_PROGBITS annotation of aesgcm_tv.
+> - Do I get you right, that a completion is ok? I always had the impression
+>   that waiting on a completion is also a sleeping act and thus not allowed?
 
-Given how unusual it is to have a static const variable without an
-initializer, I don't think this suggests that there is a wider issue
-with __initconst/__initdata.
+No, what I mean is that if you get an EBUSY, you should return
+-EINPROGRESS to indicate that the operation is pending, and then
+schedule a delayed work to retry the operation.  When the retry
+fails or succeeds, it should invoke the callback with the correct
+error status.
 
-We're about to bump the minimum GCC version to 8 for other reasons,
-and I couldn't reproduce it with GCC 8.5.0. But the fix is
-straight-forward and actually clarifies this rather odd occurrence, so
-I think we should apply it nonetheless.
+If the retry gets EBUSY again, then schedule another delayed
+work, or fail permanently by invoking the callback if you hit
+some sort of threshold like your existing limit of 3.
 
---=20
-Ard.
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
