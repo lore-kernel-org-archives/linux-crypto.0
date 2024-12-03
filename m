@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A34DC1E283E
-	for <linux-crypto@vger.kernel.org>; Tue,  3 Dec 2024 11:02:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0EF61E283E
+	for <linux-crypto@vger.kernel.org>; Tue,  3 Dec 2024 11:03:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733223778; cv=none; b=ms6ovJSB3dz0ldDxYI0LpwIhSkkBh3syTWDR9NiTdZc5785mtu+d8d3bwejR9Go0hSbnFBsiWph1d7mV3e6cnXVtil/sVQ3tXTGQaBfVnikGlcs38Lr3jblK+ZoBRzigXsgb7dPkl9eixf7WlvfAsvURw70fwGdkmNiRQgBTMPY=
+	t=1733223780; cv=none; b=ZWW9jfCm6k7/ZMYQGgm1xFyk4Agta9s+RvMjdU8oFQbmFvbtDWMnzHLpZwBE8lICN9gWbiAiLjFpEusK/oTBNYyg0vn4xVCorvrjLjiJLbx/IPgowWtHTqhxZHQejjlLzUODXqozBF8B43yTD8VPXBdesQCbDCSEiXRSgm/dfJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733223778; c=relaxed/simple;
-	bh=uNTM3mfcC8n8xFcKb0O6XGynrlWkv7SXX3XHz7IPLRY=;
+	s=arc-20240116; t=1733223780; c=relaxed/simple;
+	bh=NQ/FL8/1bPXTvZi+dECQ5MFtHxFkdmLqMD736guOG64=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=pI6l0t747SPY6ynsLf9otfgV9Y34goq7MCvLHDrk8dOtNFAtEe7yj3FVk0EUVtIYISG99neHmcoU7i7qKNigu40UgCe5J/OHA2XC5yNfcQX+5UHMnwqINl9hOOpd8oqdnhvCbzPZAKq0pIbhDI34t34vdEIg2b/JXWsZv87wU20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MSV2LrNT; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=sBhiqO69rJuucxVHBnwcYYjpNA6RqkCu1dcxZM67lcami+ymaR8JGQsJf5YM7gG1t4bgTuxRXC6gozh9CMKwwR9NDUyxc5iL65pKRY+kJrZZ82va8jpQImR1DsvaNP+vPDtdcOQmhdd+6dUnW/MvCpnS94marlTvchTgG+EvHgw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LPHFfIPy; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MSV2LrNT"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCD82C4CED9;
-	Tue,  3 Dec 2024 11:02:56 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LPHFfIPy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F00B2C4CED8;
+	Tue,  3 Dec 2024 11:02:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733223778;
-	bh=uNTM3mfcC8n8xFcKb0O6XGynrlWkv7SXX3XHz7IPLRY=;
+	s=k20201202; t=1733223780;
+	bh=NQ/FL8/1bPXTvZi+dECQ5MFtHxFkdmLqMD736guOG64=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=MSV2LrNTnqrWMIM416VjBCR85vDuMN39wXxXq1ZcjufjbPwerPrjJeSSDNhjBiJJ7
-	 +PUizp1bAm6zA2AbqbxzEo3uT8UbEupraYZeKka4ne5xmNY+BOutK+u4H27hzlPTTy
-	 Q4rW/ZE46Jch9znhz1PpuZ9cSnWS0vUt5lxEFHlJ6ZrvAtrYW8q5AGoBo5wzXv5qJG
-	 ggRqebQXxN1uAMBeZ3XMWOjUBlXQ7JjRS/nhB3Hat9wDzQ4qPsShTawL7Xc2wW2eZ4
-	 Jqk/7LrxjBkPfIFHEbU6oFWIE35LSyvs/+Y3yStQsEUXukeUfrw1S7lgWow2e1Apcu
-	 +p10EIKtYAnJQ==
+	b=LPHFfIPyqcLjIpinXrNo8Dg5rX+ZUuiprHCwwVeW6+eJ6dK1+2UCO/EE/WBlIfM4M
+	 NiCw83OKqYDppoeAeFo4fLZ66OLu4uU121zVPDRi+FyNqPdxXdfS+YWikjVW5tiSrH
+	 CGPca2HnC/zYlzC9DWMwrcekqNJzkydzEiph5FisHdlPlCoHuKixan+oqGOxOsDOHw
+	 S0R72L+FbFMLaHOvosu7kgUh5XLI4EdEC8Ug1BgY9KEO/mItqO8hjTjQ0gQrWuqpQ2
+	 oEqMwFEmwIfi81gKgPLe1JkaSEfh/lruOiwk6GqwWjOyjZ19SSFylpAnZik6EiZdqw
+	 J9a66o9//k0hA==
 From: Hannes Reinecke <hare@kernel.org>
 To: Christoph Hellwig <hch@lst.de>
 Cc: Keith Busch <kbusch@kernel.org>,
@@ -34,9 +34,9 @@ Cc: Keith Busch <kbusch@kernel.org>,
 	Eric Biggers <ebiggers@kernel.org>,
 	linux-crypto@vger.kernel.org,
 	Hannes Reinecke <hare@kernel.org>
-Subject: [PATCH 1/6] nvme-keyring: add nvme_tls_psk_refresh()
-Date: Tue,  3 Dec 2024 12:02:29 +0100
-Message-Id: <20241203110238.128630-3-hare@kernel.org>
+Subject: [PATCH 02/10] nvme: add nvme_auth_generate_psk()
+Date: Tue,  3 Dec 2024 12:02:30 +0100
+Message-Id: <20241203110238.128630-4-hare@kernel.org>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20241203110238.128630-1-hare@kernel.org>
 References: <20241203110238.128630-1-hare@kernel.org>
@@ -48,117 +48,144 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a function to refresh a generated PSK in the specified keyring.
+Add a function to generate a NVMe PSK from the shared credentials
+negotiated by DH-HMAC-CHAP.
 
 Signed-off-by: Hannes Reinecke <hare@kernel.org>
 Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
 ---
- drivers/nvme/common/keyring.c | 64 +++++++++++++++++++++++++++++++++++
- include/linux/nvme-keyring.h  | 10 +++++-
- 2 files changed, 73 insertions(+), 1 deletion(-)
+ drivers/nvme/common/auth.c | 98 ++++++++++++++++++++++++++++++++++++++
+ include/linux/nvme-auth.h  |  3 ++
+ 2 files changed, 101 insertions(+)
 
-diff --git a/drivers/nvme/common/keyring.c b/drivers/nvme/common/keyring.c
-index ed5167f942d8..8cb253fcd586 100644
---- a/drivers/nvme/common/keyring.c
-+++ b/drivers/nvme/common/keyring.c
-@@ -124,6 +124,70 @@ static struct key *nvme_tls_psk_lookup(struct key *keyring,
- 	return key_ref_to_ptr(keyref);
+diff --git a/drivers/nvme/common/auth.c b/drivers/nvme/common/auth.c
+index a3455f1d67fa..32a12899d0ce 100644
+--- a/drivers/nvme/common/auth.c
++++ b/drivers/nvme/common/auth.c
+@@ -11,6 +11,7 @@
+ #include <asm/unaligned.h>
+ #include <crypto/hash.h>
+ #include <crypto/dh.h>
++#include <crypto/hkdf.h>
+ #include <linux/nvme.h>
+ #include <linux/nvme-auth.h>
+ 
+@@ -471,5 +472,102 @@ int nvme_auth_generate_key(u8 *secret, struct nvme_dhchap_key **ret_key)
  }
+ EXPORT_SYMBOL_GPL(nvme_auth_generate_key);
  
 +/**
-+ * nvme_tls_psk_refresh - Refresh TLS PSK
-+ * @keyring: Keyring holding the TLS PSK
-+ * @hostnqn: Host NQN to use
-+ * @subnqn: Subsystem NQN to use
++ * nvme_auth_generate_psk - Generate a PSK for TLS
 + * @hmac_id: Hash function identifier
-+ * @data: TLS PSK key material
-+ * @data_len: Length of @data
-+ * @digest: TLS PSK digest
++ * @skey: Session key
++ * @skey_len: Length of @skey
++ * @c1: Value of challenge C1
++ * @c2: Value of challenge C2
++ * @hash_len: Hash length of the hash algorithm
++ * @ret_psk: Pointer too the resulting generated PSK
++ * @ret_len: length of @ret_psk
 + *
-+ * Refresh a generated version 1 TLS PSK with the identity generated
-+ * from @hmac_id, @hostnqn, @subnqn, and @digest in the keyring given
-+ * by @keyring.
++ * Generate a PSK for TLS as specified in NVMe base specification, section 8.13.5.9:
++ *    Generated PSK for TLS
 + *
-+ * Returns the updated key success or an error pointer otherwise.
++ * The generated PSK for TLS shall be computed applying the HMAC function using the
++ * hash function H( ) selected by the HashID parameter in the DH-HMAC-CHAP_Challenge
++ * message with the session key KS as key to the concatenation of the two challenges
++ * C1 and C2 (i.e., generated PSK = HMAC(KS, C1 || C2)).
++ *
++ * Returns 0 on success with a valid generated PSK pointer in @ret_psk and the length
++ * of @ret_psk in @ret_len, or a negative error number otherwise.
 + */
-+struct key *nvme_tls_psk_refresh(struct key *keyring,
-+		const char *hostnqn, const char *subnqn, u8 hmac_id,
-+		u8 *data, size_t data_len, const char *digest)
++int nvme_auth_generate_psk(u8 hmac_id, u8 *skey, size_t skey_len,
++		u8 *c1, u8 *c2, size_t hash_len, u8 **ret_psk,size_t *ret_len)
 +{
-+	key_perm_t keyperm =
-+		KEY_POS_SEARCH | KEY_POS_VIEW | KEY_POS_READ |
-+		KEY_POS_WRITE | KEY_POS_LINK | KEY_POS_SETATTR |
-+		KEY_USR_SEARCH | KEY_USR_VIEW | KEY_USR_READ;
-+	char *identity;
-+	key_ref_t keyref;
-+	key_serial_t keyring_id;
-+	struct key *key;
++	struct crypto_shash *tfm;
++	struct shash_desc *shash;
++	u8 *psk;
++	const char *hmac_name;
++	int ret, psk_len;
 +
-+	if (!hostnqn || !subnqn || !data || !data_len)
-+		return ERR_PTR(-EINVAL);
-+
-+	identity = kasprintf(GFP_KERNEL, "NVMe1G%02d %s %s %s",
-+		 hmac_id, hostnqn, subnqn, digest);
-+	if (!identity)
-+		return ERR_PTR(-ENOMEM);
-+
-+	if (!keyring)
-+		keyring = nvme_keyring;
-+	keyring_id = key_serial(keyring);
-+	pr_debug("keyring %x refresh tls psk '%s'\n",
-+		 keyring_id, identity);
-+	keyref = key_create_or_update(make_key_ref(keyring, true),
-+				"psk", identity, data, data_len,
-+				keyperm, KEY_ALLOC_NOT_IN_QUOTA |
-+				      KEY_ALLOC_BUILT_IN |
-+				      KEY_ALLOC_BYPASS_RESTRICTION);
-+	if (IS_ERR(keyref)) {
-+		pr_debug("refresh tls psk '%s' failed, error %ld\n",
-+			 identity, PTR_ERR(keyref));
-+		kfree(identity);
-+		return ERR_PTR(-ENOKEY);
++	if (!c1 || !c2) {
++		pr_warn("%s: invalid parameter\n", __func__);
++		return -EINVAL;
 +	}
-+	kfree(identity);
-+	/*
-+	 * Set the default timeout to 1 hour
-+	 * as suggested in TP8018.
-+	 */
-+	key = key_ref_to_ptr(keyref);
-+	key_set_timeout(key, 3600);
-+	return key;
-+}
-+EXPORT_SYMBOL_GPL(nvme_tls_psk_refresh);
 +
- /*
-  * NVMe PSK priority list
-  *
-diff --git a/include/linux/nvme-keyring.h b/include/linux/nvme-keyring.h
-index 19d2b256180f..f7bbcbeb4b13 100644
---- a/include/linux/nvme-keyring.h
-+++ b/include/linux/nvme-keyring.h
-@@ -8,13 +8,21 @@
- 
- #if IS_ENABLED(CONFIG_NVME_KEYRING)
- 
-+struct key *nvme_tls_psk_refresh(struct key *keyring,
-+		const char *hostnqn, const char *subnqn, u8 hmac_id,
-+		u8 *data, size_t data_len, const char *digest);
- key_serial_t nvme_tls_psk_default(struct key *keyring,
- 		const char *hostnqn, const char *subnqn);
- 
- key_serial_t nvme_keyring_id(void);
- struct key *nvme_tls_key_lookup(key_serial_t key_id);
- #else
--
-+static inline struct key *nvme_tls_psk_refresh(struct key *keyring,
-+		const char *hostnqn, char *subnqn, u8 hmac_id,
-+		u8 *data, size_t data_len, const char *digest)
-+{
-+	return ERR_PTR(-ENOTSUPP);
++	hmac_name = nvme_auth_hmac_name(hmac_id);
++	if (!hmac_name) {
++		pr_warn("%s: invalid hash algorithm %d\n",
++			__func__, hmac_id);
++		return -EINVAL;
++	}
++
++	tfm = crypto_alloc_shash(hmac_name, 0, 0);
++	if (IS_ERR(tfm))
++		return PTR_ERR(tfm);
++
++	psk_len = crypto_shash_digestsize(tfm);
++	psk = kzalloc(psk_len, GFP_KERNEL);
++	if (!psk) {
++		ret = -ENOMEM;
++		goto out_free_tfm;
++	}
++
++	shash = kmalloc(sizeof(struct shash_desc) +
++			crypto_shash_descsize(tfm),
++			GFP_KERNEL);
++	if (!shash) {
++		ret = -ENOMEM;
++		goto out_free_psk;
++	}
++
++	shash->tfm = tfm;
++	ret = crypto_shash_setkey(tfm, skey, skey_len);
++	if (ret)
++		goto out_free_shash;
++
++	ret = crypto_shash_init(shash);
++	if (ret)
++		goto out_free_shash;
++
++	ret = crypto_shash_update(shash, c1, hash_len);
++	if (ret)
++		goto out_free_shash;
++
++	ret = crypto_shash_update(shash, c2, hash_len);
++	if (ret)
++		goto out_free_shash;
++
++	ret = crypto_shash_final(shash, psk);
++	if (!ret) {
++		*ret_psk = psk;
++		*ret_len = psk_len;
++	}
++
++out_free_shash:
++	kfree_sensitive(shash);
++out_free_psk:
++	if (ret)
++		kfree_sensitive(psk);
++out_free_tfm:
++	crypto_free_shash(tfm);
++
++	return ret;
 +}
- static inline key_serial_t nvme_tls_psk_default(struct key *keyring,
- 		const char *hostnqn, const char *subnqn)
- {
++EXPORT_SYMBOL_GPL(nvme_auth_generate_psk);
++
+ MODULE_DESCRIPTION("NVMe Authentication framework");
+ MODULE_LICENSE("GPL v2");
+diff --git a/include/linux/nvme-auth.h b/include/linux/nvme-auth.h
+index c1d0bc5d9624..b13884b04dfd 100644
+--- a/include/linux/nvme-auth.h
++++ b/include/linux/nvme-auth.h
+@@ -40,5 +40,8 @@ int nvme_auth_gen_pubkey(struct crypto_kpp *dh_tfm,
+ int nvme_auth_gen_shared_secret(struct crypto_kpp *dh_tfm,
+ 				u8 *ctrl_key, size_t ctrl_key_len,
+ 				u8 *sess_key, size_t sess_key_len);
++int nvme_auth_generate_psk(u8 hmac_id, u8 *skey, size_t skey_len,
++			   u8 *c1, u8 *c2, size_t hash_len,
++			   u8 **ret_psk, size_t *ret_len);
+ 
+ #endif /* _NVME_AUTH_H */
 -- 
 2.35.3
 
