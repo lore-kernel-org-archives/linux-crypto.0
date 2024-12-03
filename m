@@ -1,101 +1,136 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2D2D192D64;
-	Tue,  3 Dec 2024 08:50:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9522D1DED75;
+	Tue,  3 Dec 2024 09:01:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733215853; cv=none; b=Q21AAfqwwWHSwYXqOUdZyYZn/IP1WifO1ngO6vUd4XuwoPco1ybu1p9nWdUsKZrysVu4Jqi8C4+eL1FEKQ6lIAdj5CTrAf0U9m6ABkDv8slZW6zMtFqgtSloFEtyGrSPDHeqoxT5XS31NLK1/81SoWgdlCSrXW0zHcoIQfADzXw=
+	t=1733216485; cv=none; b=cQ0uxjQV3Zqb1oj511PlmX7Fed16HAg90aQZGrAUTQEU4HTUKEZEJ9B2aQTnfjrF4dZfKaTJDiPGbXPltTreJT571II2ZYGF7QnKZilUJMNf/ESPVksbbZQFfJqvvrDzQO+KCCeog67ksKOYotBP/cdYJJdhoUakjUsNRYgPTsU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733215853; c=relaxed/simple;
-	bh=V9mE91uJU38RWrFIrEtW2u16C+OaUZHHwy6JCoVZGP0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O0C2JX6vxS0ATRr3YAbu045OZGyXUhBxliHa5rzKj2ZisdsINLJoD3WJTsry9zzsnYiY8feoQbsXSQRUHuGEV6RDIUERO9bM56UIUbBm+pirYlMl5WWkmsuOzqZo187lNz5HW2K0GHxKfmT/AGYrap8tkuFyFUOxeJTQg03PI0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=BhgBw16W; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1733216485; c=relaxed/simple;
+	bh=jrbYi65ApxHKC8+pjbJl/N9HlwU4KbfFDpjeUSNyUVI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=T4JI/R+i8r6f78TClicYwvTrwOSTWmbzLz6CZs/wZ+uIn3TfEZ10Q1iMhHJwp6MrywTgbXPWOQvolApBwbmzevN/OVA4E25VJICP6hJCQGMc1xrSqlT+7o+tOewJW3HAvgXh/uFbGr/APTgBlA6dSFOfIwKAAfPcQN/EQ5suSk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qN75zcUC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="BhgBw16W"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=jJYA7Tj+Zo3Z3yF+IwYyaS7Puyr19q55Ek5JTHaOGp0=; b=BhgBw16Wy52oNykb/IRpz0izPA
-	UCV4vvucnJPrqSe6VYmcV3f/Nh3MruSDFwNP9KqfsjWD4DkXPzzHQKuXHeLF2v1DmDfOVauX2tC+t
-	fKuYMr0hRZG5R2Yr7dOQVvV9rSprqgUw7R3fHZ3I3Zj/Ot8RK9ZqWQvf/PK7BcIo0FdsHvdTJE9v2
-	7bsyTQclErrzwQCFxWe3Up4leN5G7+xpcm7ZnGQQg++H+RX5Jufjqg3L+8/34DfA3WYWRK9waQaws
-	/Ax86fACCYe/w1zzDsZRbf5euX/lUXIt8+YKac4jWempX5GFBtZqjrUlMMp0D+8Fc9vNSbaBPq/wD
-	t8CAIlaQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tIOcE-0038VG-3B;
-	Tue, 03 Dec 2024 16:50:44 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 03 Dec 2024 16:50:42 +0800
-Date: Tue, 3 Dec 2024 16:50:42 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Harald Freudenberger <freude@linux.ibm.com>
-Cc: davem@davemloft.net, dengler@linux.ibm.com, linux-s390@vger.kernel.org,
-	linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>
-Subject: Re: [PATCH v6 2/2] s390/crypto: New s390 specific protected key hash
- phmac
-Message-ID: <Z07GYlVeohJJyLNE@gondor.apana.org.au>
-References: <20241129111059.303905-1-freude@linux.ibm.com>
- <20241129111059.303905-3-freude@linux.ibm.com>
- <Z0nUQQ9E32xq0SY4@gondor.apana.org.au>
- <c86548e680a151394fa814f543103481@linux.ibm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qN75zcUC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 149F9C4CED6;
+	Tue,  3 Dec 2024 09:01:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733216485;
+	bh=jrbYi65ApxHKC8+pjbJl/N9HlwU4KbfFDpjeUSNyUVI=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=qN75zcUCwk1oYfRLKujuanjs+VIRNB8VepjbR/LTJ3XzNitIhY/1RHAXmV5VzYKIE
+	 7+7cI5HBoZlT7e4kPXQG0YYTOZb5KDOhWt+Wv2aCUojm7csw36RHmi+ilwXBor102L
+	 gTyaqie5Gx7QygC8Aez4luXGjotJNkzIRG6yN2wFk+4nMo5jjf+/ermSXGy0bZQfoh
+	 zIVtdr9dbczi9szCNRUAnFsOg4HfRi5HkjJagmLgWSrUJmAVeiOXIei2tVsQPUoR7y
+	 aXVluK+gPJUMBCbRdke7RkJF6sO62COdifE/Oc0AOecszBIBFX6k3vlfr0yv829Ycd
+	 igDVdgZaihCgA==
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-53de8ecb39bso6125387e87.2;
+        Tue, 03 Dec 2024 01:01:24 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWY1vknapBEzJplMVt/B5jLShwS2oK1QwZsZJRFG3NaixaQn9zAQYgqzK/4MAqb7hHryioRYJpdUBJZd+I=@vger.kernel.org, AJvYcCXJi/PcdipeCmihhdpmim1iriB+n0JClVQv5EYiXsAKlkFWRxnbYDeF/ANSoAiAHB1cl/DZtgLY+9hxnzbU@vger.kernel.org
+X-Gm-Message-State: AOJu0YzURjo0yewgrtSILTmxn3jM4RhxPNAFLVRJNT/zybia1Eq2ObnW
+	njajHAhlf7rO5/hXS0fNeKbofe2DNXiTduJbgPwSOPiCLeoAfIoOfoG9K3svhPvpk8a7scbQqIa
+	r5pcD6hSNnntC6Y7YCAF8gvc+ESg=
+X-Google-Smtp-Source: AGHT+IE53UOWx86TF5Ktbvamul0qTjoaDWhGc52xK+zs1MsYWDe+raaJrd2aCocOr62XBgjMaSgtsG3g++T7vvKy+vg=
+X-Received: by 2002:a05:6512:3c8c:b0:53d:d137:d7a4 with SMTP id
+ 2adb3069b0e04-53e12a3896bmr828741e87.53.1733216483720; Tue, 03 Dec 2024
+ 01:01:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c86548e680a151394fa814f543103481@linux.ibm.com>
+References: <81560af7526138aa5221e5900ee7462f55bb090d.camel@HansenPartnership.com>
+ <CAMj1kXFGEeAkxpqsfp0G3VqTRs+Sve-pULDXBKvzSqAc_AVFMA@mail.gmail.com>
+In-Reply-To: <CAMj1kXFGEeAkxpqsfp0G3VqTRs+Sve-pULDXBKvzSqAc_AVFMA@mail.gmail.com>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Tue, 3 Dec 2024 18:00:47 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAT4YibckTwYRCzUv0dZs4qX4BFzh0uc=bvTuaZM12nrvw@mail.gmail.com>
+Message-ID: <CAK7LNAT4YibckTwYRCzUv0dZs4qX4BFzh0uc=bvTuaZM12nrvw@mail.gmail.com>
+Subject: Re: section mismatch error in aesgcm causing a build failure
+To: Ard Biesheuvel <ardb@kernel.org>
+Cc: James Bottomley <James.Bottomley@hansenpartnership.com>, linux-crypto@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Dec 02, 2024 at 06:25:22PM +0100, Harald Freudenberger wrote:
+On Tue, Dec 3, 2024 at 5:35=E2=80=AFPM Ard Biesheuvel <ardb@kernel.org> wro=
+te:
 >
-> - The attempt to derive a protected key usable by the cpacf instructions
->   depends of the raw key material used. For 'clear key' material the
->   derivation process is a simple instruction which can't fail.
->   A more preferred way however is to use 'secure key' material which
->   is transferred to a crypto card and then re-wrapped to be usable
->   with cpacf instructions. This requires communication with a crypto
->   card and thus may fail - because there is no card at all or there
->   is temporarily no card available or the card is in bad state. If there
->   is no usable card the AP bus returns -EBUSY at the pkey_key2protkey()
->   function and triggers an asynchronous bus scan. As long as this scan
->   is running (usually about 100ms or so) the -EBUSY is returned to indicate
->   that the caller should retry "later". Other states are covered with
->   other return codes like ENODEV or EIO and the caller is not supposed
->   to loop but should fail. When there is no accessible hardware available
->   to derive a protected key either the user or the admin broke something
->   or something went really the bad way and then there is no help but the
->   storage device must fail.
+> On Mon, 2 Dec 2024 at 21:27, James Bottomley
+> <James.Bottomley@hansenpartnership.com> wrote:
+> >
+> > I'm getting this in 6.13-rc1:
+> >
+> > /home/jejb/git/linux-tpm/lib/crypto/aesgcm.c:212:29: error: ptext1
+> > causes a section type conflict with aesgcm_tv
+> >  static const u8 __initconst ptext1[16];
+> >                              ^~~~~~
+> > /home/jejb/git/linux-tpm/lib/crypto/aesgcm.c:570:9: note: =E2=80=98aesg=
+cm_tv=E2=80=99 was declared here
+> >  } const aesgcm_tv[] __initconst =3D {
+> >          ^~~~~~~~~
+> > make[5]: *** [/home/jejb/git/linux-tpm/scripts/Makefile.build:194: lib/=
+crypto/aesgcm.o] Error 1
+> > /home/jejb/git/linux-tpm/lib/crypto/aesgcm.c:212:29: error: ptext1 caus=
+es a section type conflict with aesgcm_tv
+> >  static const u8 __initconst ptext1[16];
+> >                              ^~~~~~
+> > /home/jejb/git/linux-tpm/lib/crypto/aesgcm.c:570:9: note: =E2=80=98aesg=
+cm_tv=E2=80=99 was declared here
+> >  } const aesgcm_tv[] __initconst =3D {
+> >          ^~~~~~~~~
+> > make[5]: *** [/home/jejb/git/linux-tpm/scripts/Makefile.build:194: lib/=
+crypto/aesgcm.o] Error 1
+> >
+> > I think it's way older than 6.13-rc1, but the inclusion of the sevguest
+> > driver in the merge window now means that something actually selects
+> > it.  I can fix it simply by adding a zero initialization to the file:
+> >
+> > -static const u8 __initconst ptext1[16];
+> > +static const u8 __initconst ptext1[16] =3D { 0 };
+> >
+> > Which I think means that by default the traditional zero initialization
+> > of a static variable is in the wrong section (and actually likely is
+> > wrong for all our __initX variables as well).
+> >
+> > In case it matters, this is with gcc-7
+> >
+>
+> This also works
+>
+> static const u8 __section(".init.rodata,\"a\",@progbits #") ptext1[16];
+>
+> and so this suggests that without the @progbits annotations, the
+> compiler is placing ptext1 into a SHT_NOBITS section, causing a
+> conflict with the SHT_PROGBITS annotation of aesgcm_tv.
+>
+> Given how unusual it is to have a static const variable without an
+> initializer, I don't think this suggests that there is a wider issue
+> with __initconst/__initdata.
+>
+> We're about to bump the minimum GCC version to 8 for other reasons,
+> and I couldn't reproduce it with GCC 8.5.0. But the fix is
+> straight-forward and actually clarifies this rather odd occurrence, so
+> I think we should apply it nonetheless.
+>
+> --
+> Ard.
 
-Thanks for the explanation.  I think it's fair enough to fail an
-op if the hardware is absent or broken.
 
-So all I need is for you to turn the BUSY case into a delayed retry
-and I think that should be good enough.
+So, this 16-byte zero data is stored in the kernel image due to
+the __initconst section?
 
-> - Do I get you right, that a completion is ok? I always had the impression
->   that waiting on a completion is also a sleeping act and thus not allowed?
+Without the __initconst annotation, it would go to the BSS section,
+saving the kernel image size?
 
-No, what I mean is that if you get an EBUSY, you should return
--EINPROGRESS to indicate that the operation is pending, and then
-schedule a delayed work to retry the operation.  When the retry
-fails or succeeds, it should invoke the callback with the correct
-error status.
+Anyway, up to the crypt maintainer.
+Personally, I do not have much interest in an old compiler issue.
 
-If the retry gets EBUSY again, then schedule another delayed
-work, or fail permanently by invoking the callback if you hit
-some sort of threshold like your existing limit of 3.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+--=20
+Best Regards
+Masahiro Yamada
