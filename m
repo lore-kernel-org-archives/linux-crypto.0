@@ -1,65 +1,65 @@
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF74B1F12FB
-	for <linux-crypto@vger.kernel.org>; Tue,  3 Dec 2024 13:52:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDBCF1F1308
+	for <linux-crypto@vger.kernel.org>; Tue,  3 Dec 2024 13:52:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733233954; cv=none; b=D2UUavvfNQfyhwjS9/SZ4nA8WhaADc5MJzEPrALJ7NG1y/la3SYlukxRRy430SQO8IQ1jgcj+KQFQNWFC8i1lNtQNqWaylQS0YP8iqZOZ8ltFsrP7H7S63FIQYAELQyvH4xsDawz+lK/Vse2fWtUnAoKFzOWRvH/lHu3ntto44Q=
+	t=1733233966; cv=none; b=SuDlTz/YcRDtQm3lVnJN1NmDVk5QR4rkH8M7HuMPiey7ED+LUGpeqc/Rr/3Q75isjzskp+HdIIF/8KFHJQtEXRPpEXSxUT7oZr7ZmdsBMv+USwdlqYayLr725Xig+VAGfJFsFilxZSRsAPFZ5cqqBx7m4hS8UUeeberFUpzuv6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733233954; c=relaxed/simple;
-	bh=vQyNRZyfktd4dZ/VfxPnrD450fKtsTU4U0K5AmvMOA4=;
+	s=arc-20240116; t=1733233966; c=relaxed/simple;
+	bh=v/0nQpVev2ndP6RZXzkRsx1U8+dnE+fNmJFvOBbxGOQ=;
 	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=fOAxOq0Uj6VWiHLm35IHph4fLv5FBtS7Q5GdpzNLb4KLushuoAz1O4CHNI5c7qTq9FBOy1eOXO+YVpkwMn0PFrsDGhskThf+9YH1OjlFzD3QrDGB5Nayv48vI5McKOHa4KY58HSKk5eo3f29c+d/5QKr6bwBZx0rHjKLRPhiSeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=qZg3N+y+; arc=none smtp.client-ip=209.85.221.44
+	 In-Reply-To:Content-Type; b=PvakX56OKfezEW38ckqdNc6utV5JIDmy4UeS8Mv6Lf3nQNoNtQECYdWRc72/i+B7pF66m7R35PYDUmL757QB4M/pPFouBf6ZPLtf5Dc005ANgM4SGh1Dn6ANCbL133sLNN7fvTWSGNg9I9Dw+yFsLhhMY/yGb68uQwxC4/AX188=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=r3ZP0YVZ; arc=none smtp.client-ip=209.85.128.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qZg3N+y+"
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-385e0e224cbso2603456f8f.2
-        for <linux-crypto@vger.kernel.org>; Tue, 03 Dec 2024 05:52:31 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="r3ZP0YVZ"
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-434ab114753so46836995e9.0
+        for <linux-crypto@vger.kernel.org>; Tue, 03 Dec 2024 05:52:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1733233950; x=1733838750; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1733233963; x=1733838763; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:references:cc:to:subject:reply-to:from:user-agent
          :mime-version:date:message-id:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ABkNR+66cga4jI8z0RZ2Hsh7LoVsEWiOT9UTom3Spu8=;
-        b=qZg3N+y+GRR/kFH8MEewLuHAVvQpTuAxENwx9L+wxRu2/O2zN6+SvstcTF8fM0QETO
-         0HK/6unrkmCwx4xq7HJgig8weVC91HzrRAsc8vJ1IcHD+LgYNZDdk+SQj5dI61XAmqp3
-         I8ALwMzlwvImrR5RWd/nVBFTJF7USfYMGm49s4nfhHXk2CdwOaMKIHvEq5F7ViY56Eg4
-         xe00RVnvLV/dG7g8xw32Z2uawtn6USxyP9Jw1guHMVLuqrbsXpeFvukB83ZjVwZ+5VyV
-         bEaC0Xhe3F1qVbuWIo7KlDNWt2x94r9PxMgkouLgVA9WfE/sSV3grz+fFYyY1T7ZrRmq
-         TgGQ==
+        bh=2t8JJMG5582Bls/PacyhFYC1KHsJGdf+sWNf8uRQtgs=;
+        b=r3ZP0YVZKBiOghszMLgbEv9Gejx2Zar/lHP4iJutUEOpqCV3OYHx4IZXY67QPU0Pi9
+         yM5osPykjyTk4Ld7Wpksif8W74rB0fIR0KStI/LKLBYQs/NQMkCZmnOZdCx5dzeJBJsz
+         hXk/Tl4iVgNxMNl4pZKvWfD8shKdv0Yb8xONm8ByvtBw7xGoPnlbqwyOOlM5rqhX0O8x
+         GW8OwpofMKM3KNrznzLJn559NUoUvyV6KNVPtMiLh47sN5Ss/L4LMjoYqAalBoHVfxsf
+         +G4X711aWkfRdJFh67WohMxmDSh9XfzhSU/di2MiG0ZqhUEydmKh/PnS9facs2Lx3Q2u
+         1zFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733233950; x=1733838750;
+        d=1e100.net; s=20230601; t=1733233963; x=1733838763;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:references:cc:to:subject:reply-to:from:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=ABkNR+66cga4jI8z0RZ2Hsh7LoVsEWiOT9UTom3Spu8=;
-        b=btF5Hs/dK7r+KIfWtpkZP9YqZ4Z0BIkW0N69YTNPejrn8MXvBQrP0tobojmoYCALQe
-         Dlgy54KIjz70eHcd/APgUvEAlEH4OQyw6O0O12zBNHO1dpCFG4Gy8Vk4OxwPpO1QPrGo
-         5w9h6SxHsBqcn3YDMPS9Ksn8O8uUTG1A5dPCwExCB3pe6v84sDTEYDo+7jJZXvCUO54V
-         0VuVd4VRA6NARz18snujjA94aLuxDMOyW+63FRtIxLscgbDFQT6rsFxXQafGilnNVgqA
-         8khx/xd0iHMLBU18u3fSS7rJu3BUQjTKUAzFiWwKh67Gt6Zt6UNu0kMzZZGSVm6PnCrs
-         kxCw==
-X-Gm-Message-State: AOJu0YzW6rMYvjhcP/+RAMw9ZdfCYo2lK8GQysrSlNa8Zu6vxSHfsPlQ
-	OiBS7NnsZawnIs2OMGpSjYbh0QcNJHInP5MlirY5yObUu1U9VUqjexTQeA0OC4c=
-X-Gm-Gg: ASbGncvH1u2qBAP7M/4drvBXI+j2/MDxKcj/TYYqh+14b5x4iUW40a5FgtT3+86OTz+
-	rcDwe4Pd7Ik7L9AH+IPIRVWP3MtWQQVZv7rUSyD2G0OI3pzSgZ2iTeLYQMOHILNvvYumSqzRpec
-	VZxX/jVDdTpAo8nDSreMprBAHmEVVQo7XVplkOqA8ECwFKkY7ZdDpNNuWZUxO12O22yRGuTVvUu
-	SB6qh4f3Mu661xZMaGc4kJHnxSATXZQ3mhT4HUvpCQmS5Hc3Sfm3jxQqGPMivmwe1w9Z8qjuNXd
-	2tMmIRSRBwZpwsK/p4dyN4DZ
-X-Google-Smtp-Source: AGHT+IFkJh1EUhfAJne4bE1d9lfMNE+K3tGMuLLZgbRBdMCN+TtCafvJ11ltFQ+c8Zv8qJ9vt2sg9Q==
-X-Received: by 2002:a5d:47cb:0:b0:385:e8b0:df13 with SMTP id ffacd0b85a97d-385fd437301mr2434207f8f.40.1733233949965;
-        Tue, 03 Dec 2024 05:52:29 -0800 (PST)
+        bh=2t8JJMG5582Bls/PacyhFYC1KHsJGdf+sWNf8uRQtgs=;
+        b=lNaNncNn/bMSfLgcKy5OJ/6mjYJ3oTuYwpiDBCo+eSOajAjTxVmkXpOufn/GZlR/KQ
+         yAWVkzqJE4TnctBU9llKJCkbQ/3DNRkSTGYG2KXS0XRpDMg8z1ximET8WcTYtwnnSx5L
+         BqlzSGHrPpfCFh/fh8nQUKnKgNOg0sVKwMRjKBMecnaoEJj9fNRWRz3Gjknb8fDKNtf7
+         PeQ9pbuLjKotnlc9Uc6tS9q96+y7hucN6PmOH5/7qyqNCe3/1GqJk8CQCQ/jTCSTTkjV
+         wtr2UXdeGwzrzpWc1yvbiQIxeh4qgUXJBXvz6B1dJ/qeZFbjNLPEVfUz1dS34eS2J2/d
+         tXAA==
+X-Gm-Message-State: AOJu0Yxtq79S1iYJpWMAiixTqSLvm1ICVfd6ahludWP5bnTG7vgP/id0
+	kM5wQyD86rnGEuahA68QXJvKBJlYf1lwAnKlDFQv8T7hx4eDpJVv+t4jhtEQ1rg=
+X-Gm-Gg: ASbGncv7QUGY6OkSpTdO3ODzeDMEpNS7M+Noi3O9AO+aAUmtUGhbiTDckmAjN8/FxZE
+	qSWwh7vqHtAijX0Tg/kXITT/SDPXDZvxZ9idj1OKtTCVKsdULfA19EJKbR1KFh9BijJKoEkMeWO
+	1J+OePg8FGwekMNPuT6TTGceU6IHZ3xHmeKttakZcjn/KNcsqZCfkZ6tv+DCKKmw0/m1NTVofQ5
+	0IB6EFa5BD7dxH7XnzPZ4sPePz7HO0N/WffKgj8YMGn7ZDaOB51J3lTUlGlwROfMTbq295a7hH9
+	CHbkZBBaLjNtX8uFTL1BqL8U
+X-Google-Smtp-Source: AGHT+IHPK/4xK3/T2ubzZ93yNqLxLU2FcxdhQ8xEBhXPCV5/YaFdHDWHRsRFdrg7uI4TyyxceFGmlg==
+X-Received: by 2002:a05:600c:3c9b:b0:434:a9a8:ad1d with SMTP id 5b1f17b1804b1-434d09b0013mr20951775e9.7.1733233963271;
+        Tue, 03 Dec 2024 05:52:43 -0800 (PST)
 Received: from ?IPV6:2a01:e0a:982:cbb0:b668:b88:4ecf:c065? ([2a01:e0a:982:cbb0:b668:b88:4ecf:c065])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-385ccd3a710sm15397849f8f.57.2024.12.03.05.52.29
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434b0f70d9csm195101175e9.38.2024.12.03.05.52.42
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Dec 2024 05:52:29 -0800 (PST)
-Message-ID: <d0d4ce7a-033a-4a5f-8952-1cb46b24b8ce@linaro.org>
-Date: Tue, 3 Dec 2024 14:52:28 +0100
+        Tue, 03 Dec 2024 05:52:42 -0800 (PST)
+Message-ID: <dd630922-b317-4a57-8bf7-a0bb376f794e@linaro.org>
+Date: Tue, 3 Dec 2024 14:52:42 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -69,8 +69,7 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 From: neil.armstrong@linaro.org
 Reply-To: neil.armstrong@linaro.org
-Subject: Re: [PATCH 7/9] crypto: qce - use __free() for a buffer that's always
- freed
+Subject: Re: [PATCH 8/9] crypto: qce - convert tasklet to workqueue
 To: Bartosz Golaszewski <brgl@bgdev.pl>,
  Thara Gopinath <thara.gopinath@gmail.com>,
  Herbert Xu <herbert@gondor.apana.org.au>,
@@ -80,7 +79,7 @@ Cc: linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
  linux-kernel@vger.kernel.org,
  Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 References: <20241203-crypto-qce-refactor-v1-0-c5901d2dd45c@linaro.org>
- <20241203-crypto-qce-refactor-v1-7-c5901d2dd45c@linaro.org>
+ <20241203-crypto-qce-refactor-v1-8-c5901d2dd45c@linaro.org>
 Content-Language: en-US, fr
 Autocrypt: addr=neil.armstrong@linaro.org; keydata=
  xsBNBE1ZBs8BCAD78xVLsXPwV/2qQx2FaO/7mhWL0Qodw8UcQJnkrWmgTFRobtTWxuRx8WWP
@@ -107,65 +106,117 @@ Autocrypt: addr=neil.armstrong@linaro.org; keydata=
  4zcsPWvwnXgfe5tk680fEKZVwOZKIEuJC3v+/yZpQzDvGYJvbyix0lHnrCzq43WefRHI5XTT
  QbM0WUIBIcGmq38+OgUsMYu4NzLu7uZFAcmp6h8g
 Organization: Linaro
-In-Reply-To: <20241203-crypto-qce-refactor-v1-7-c5901d2dd45c@linaro.org>
+In-Reply-To: <20241203-crypto-qce-refactor-v1-8-c5901d2dd45c@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 03/12/2024 10:19, Bartosz Golaszewski wrote:
 > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 > 
-> The buffer allocated in qce_ahash_hmac_setkey is always freed before
-> returning to use __free() to automate it.
-
-I think you wanted to use "so" instead of "to", otherwise it means nothing ^^
-
+> There's nothing about the qce driver that requires running from a
+> tasklet. Switch to using the system workqueue.
 > 
 > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 > ---
->   drivers/crypto/qce/sha.c | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
+>   drivers/crypto/qce/core.c | 20 ++++++--------------
+>   drivers/crypto/qce/core.h |  6 ++++--
+>   2 files changed, 10 insertions(+), 16 deletions(-)
 > 
-> diff --git a/drivers/crypto/qce/sha.c b/drivers/crypto/qce/sha.c
-> index fc72af8aa9a72..916908c04b635 100644
-> --- a/drivers/crypto/qce/sha.c
-> +++ b/drivers/crypto/qce/sha.c
-> @@ -3,6 +3,7 @@
->    * Copyright (c) 2010-2014, The Linux Foundation. All rights reserved.
->    */
+> diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
+> index 5e21754c7f822..6de9f1e23e282 100644
+> --- a/drivers/crypto/qce/core.c
+> +++ b/drivers/crypto/qce/core.c
+> @@ -122,15 +122,16 @@ static int qce_handle_queue(struct qce_device *qce,
+>   	err = qce_handle_request(async_req);
+>   	if (err) {
+>   		qce->result = err;
+> -		tasklet_schedule(&qce->done_tasklet);
+> +		schedule_work(&qce->done_work);
+>   	}
 >   
-> +#include <linux/cleanup.h>
->   #include <linux/device.h>
->   #include <linux/dma-mapping.h>
->   #include <linux/interrupt.h>
-> @@ -336,7 +337,6 @@ static int qce_ahash_hmac_setkey(struct crypto_ahash *tfm, const u8 *key,
->   	struct scatterlist sg;
->   	unsigned int blocksize;
->   	struct crypto_ahash *ahash_tfm;
-> -	u8 *buf;
->   	int ret;
->   	const char *alg_name;
+>   	return ret;
+>   }
 >   
-> @@ -370,7 +370,8 @@ static int qce_ahash_hmac_setkey(struct crypto_ahash *tfm, const u8 *key,
->   				   crypto_req_done, &wait);
->   	crypto_ahash_clear_flags(ahash_tfm, ~0);
+> -static void qce_tasklet_req_done(unsigned long data)
+> +static void qce_req_done_work(struct work_struct *work)
+>   {
+> -	struct qce_device *qce = (struct qce_device *)data;
+> +	struct qce_device *qce = container_of(work, struct qce_device,
+> +					      done_work);
+>   	struct crypto_async_request *req;
+>   	unsigned long flags;
 >   
-> -	buf = kzalloc(keylen + QCE_MAX_ALIGN_SIZE, GFP_KERNEL);
-> +	u8 *buf __free(kfree) = kzalloc(keylen + QCE_MAX_ALIGN_SIZE,
-> +					GFP_KERNEL);
->   	if (!buf) {
->   		ret = -ENOMEM;
->   		goto err_free_req;
-> @@ -382,7 +383,6 @@ static int qce_ahash_hmac_setkey(struct crypto_ahash *tfm, const u8 *key,
+> @@ -154,7 +155,7 @@ static int qce_async_request_enqueue(struct qce_device *qce,
+>   static void qce_async_request_done(struct qce_device *qce, int ret)
+>   {
+>   	qce->result = ret;
+> -	tasklet_schedule(&qce->done_tasklet);
+> +	schedule_work(&qce->done_work);
+>   }
 >   
->   	ret = crypto_wait_req(crypto_ahash_digest(req), &wait);
+>   static int qce_check_version(struct qce_device *qce)
+> @@ -243,8 +244,7 @@ static int qce_crypto_probe(struct platform_device *pdev)
+>   		return ret;
 >   
-> -	kfree(buf);
->   err_free_req:
->   	ahash_request_free(req);
->   err_free_ahash:
+>   	spin_lock_init(&qce->lock);
+> -	tasklet_init(&qce->done_tasklet, qce_tasklet_req_done,
+> -		     (unsigned long)qce);
+> +	INIT_WORK(&qce->done_work, qce_req_done_work);
+>   	crypto_init_queue(&qce->queue, QCE_QUEUE_LENGTH);
+>   
+>   	qce->async_req_enqueue = qce_async_request_enqueue;
+> @@ -253,13 +253,6 @@ static int qce_crypto_probe(struct platform_device *pdev)
+>   	return devm_qce_register_algs(qce);
+>   }
+>   
+> -static void qce_crypto_remove(struct platform_device *pdev)
+> -{
+> -	struct qce_device *qce = platform_get_drvdata(pdev);
+> -
+> -	tasklet_kill(&qce->done_tasklet);
+> -}
+> -
+>   static const struct of_device_id qce_crypto_of_match[] = {
+>   	{ .compatible = "qcom,crypto-v5.1", },
+>   	{ .compatible = "qcom,crypto-v5.4", },
+> @@ -270,7 +263,6 @@ MODULE_DEVICE_TABLE(of, qce_crypto_of_match);
+>   
+>   static struct platform_driver qce_crypto_driver = {
+>   	.probe = qce_crypto_probe,
+> -	.remove = qce_crypto_remove,
+>   	.driver = {
+>   		.name = KBUILD_MODNAME,
+>   		.of_match_table = qce_crypto_of_match,
+> diff --git a/drivers/crypto/qce/core.h b/drivers/crypto/qce/core.h
+> index 228fcd69ec511..39e75a75a4293 100644
+> --- a/drivers/crypto/qce/core.h
+> +++ b/drivers/crypto/qce/core.h
+> @@ -6,13 +6,15 @@
+>   #ifndef _CORE_H_
+>   #define _CORE_H_
+>   
+> +#include <linux/workqueue.h>
+> +
+>   #include "dma.h"
+>   
+>   /**
+>    * struct qce_device - crypto engine device structure
+>    * @queue: crypto request queue
+>    * @lock: the lock protects queue and req
+> - * @done_tasklet: done tasklet object
+> + * @done_work: workqueue context
+>    * @req: current active request
+>    * @result: result of current transform
+>    * @base: virtual IO base
+> @@ -29,7 +31,7 @@
+>   struct qce_device {
+>   	struct crypto_queue queue;
+>   	spinlock_t lock;
+> -	struct tasklet_struct done_tasklet;
+> +	struct work_struct done_work;
+>   	struct crypto_async_request *req;
+>   	int result;
+>   	void __iomem *base;
 > 
-
-With the typo fixes:
 
 Reviewed-by: Neil Armstrong <neil.armstrong@linaro.org>
-
