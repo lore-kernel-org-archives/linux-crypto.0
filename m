@@ -1,74 +1,69 @@
-Received: from mail-pl1-f193.google.com (mail-pl1-f193.google.com [209.85.214.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2043.outbound.protection.outlook.com [40.107.100.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6DCE1F9EAC;
-	Tue,  3 Dec 2024 15:34:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.193
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733240093; cv=none; b=fVsd3scDucZUhBa0AKKGjggMzce3ljPrWXPQ3R8SCfiH+tEUU7ABhKr2Mx1crpJwIW0d0lCnSC17QIlFdfRm0QMjhM4ilr7hjRkz0GdbM41iEy06rTTZwOQYhQ9GtwjfQOpExSM5JixFq9//d+rjQausf5a73YXcXLB/2lJ6HrA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733240093; c=relaxed/simple;
-	bh=7RdZ/c6LtqIwtQidEPgp/g2EsiXbW+42XlXhJHw90ZM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TLkZACpvdgGBy5ZmzIYyn4hVR2uqS5seQ099nvB1kAl+4DcuSjsvlzqfjcghU6aN9KU8S4E9dRPHUQzinyThi7qaBEhu82h/a57tERLt06qf6BlZL6rXspsdXTpHf5lQ0T6SJNf7al75LtC4TiHjM6BT1hpFEy8XSNa54KaffSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IBKHnfVG; arc=none smtp.client-ip=209.85.214.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 735BF1F7567;
+	Tue,  3 Dec 2024 16:23:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.100.43
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733242997; cv=fail; b=RzBLiyIy5g+DNsdxYsVNRNYEnm0xxREp8WRoKG9CJr4dTcdcK28u6nXN+VOWvtLIHQMfY1I1mOzBBBRL5Qn25M4NVi3FHEcvv2VihEyd9C35DvISaNwGVH9cYaBS09ui6xU8+PSm+75JcEIfBnu6KwGE6IRfttNnjZC1qLZTLaI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733242997; c=relaxed/simple;
+	bh=X4YF9qQY7FPHjvlz2AOp+f2HLBd9zAAp5nA16Z21BIs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OyiMUxNXWJ/nRYkhTBzoEywYKBpootGSzBioa7tvTta0NxaccObC2RMMofZ+CnAIFhmcEhcvFo/VHki+MysqXwyV837SThnz+/hk2g3nDpdxj49PXHY7LvPcA2lwCRHUkE91NnAEjfZHRX/qpuKwy+LFuQrTK1O0U2XTrkAgYJI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=pj0q0gnU; arc=fail smtp.client-ip=40.107.100.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IBKHnfVG"
-Received: by mail-pl1-f193.google.com with SMTP id d9443c01a7336-21577f65bdeso20414385ad.0;
-        Tue, 03 Dec 2024 07:34:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733240091; x=1733844891; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6n8xLa3bFG6KMlrCFd/orG3iRc5rITWuVB3hCMj+sL0=;
-        b=IBKHnfVGw2zwvQ1N+WRtaAUiccee4zOTzWJpsPMsfOOjNRAw6zWUkj4yMt5M+BHKlE
-         jnfSQeFBurikTVTHUL92LTHDb5PrpOpbtqyvSUzTpl4GYTfj69y10WBvrGLxEEaoWkzM
-         V7fExhMJFIsFGsu91fbiOZIZEzpSxdbZf6pnfQKwiyJk1kjd+0V9n5rVTdfEzcun5O5S
-         Ks3vpf8jco03oTap/75uSVSmI1T99s/3S5W8HjfjNNCMY7Bm1yh3fWsw8aTrhF8cOKZT
-         ufM9vWx4HzdCOzKDz+FCblIRH5iEhr1A3kJ5qguq2bRAMHHTJ4gWgVSdeCe0lFFIa4E9
-         t9Tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733240091; x=1733844891;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6n8xLa3bFG6KMlrCFd/orG3iRc5rITWuVB3hCMj+sL0=;
-        b=I+mQcvtM1wOGnnlmaY0uniLD99Ele5voVXdWDSNw/UT7k0pUWlxtequpi+PT+vslbY
-         nGwiQsiNf9qmOUuz7zN17Yr6Gwg8ukC3yUiRj8jMgLoXlCsab6YP7DBBIz72i7Rtctje
-         IIvNYY7QVHLxv20ZKsp9LhyFVMJSdm5aOaYztq8KVSg2MDOXiTsfR+7FcZhlajjI5t7+
-         pY74mIHDgnveENGPvvahEa+p4GvYKVn5UJPezneZX6ErQtfzvPZBe675IWXVFj3uuqOj
-         wK/MOMGXBaoTpHofQ7iQOIZZ+pSPrpCzN2ygaywXvhvLdLtBB9HYJze2D/npZm6URH+x
-         H6Ew==
-X-Forwarded-Encrypted: i=1; AJvYcCUdlDNrHNSfjQXqZ0E5ew8xRLYKwtZKx/x0JPNT3FRr8khrr+rOZ4ScOugjw3A4x42tpN4R/stH@vger.kernel.org, AJvYcCWdL6AiCOCyUkR0FMepe28cAHWFGY6V48jcp6BWIk9BJGOVMBNzAS1zIGFv0aUHImrDEAjgrPxs9s88aWI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxam7KW8vChMPSidrKcnlcNB0FeUfTQ92E78L4LrhjqKfkPXMz3
-	YLLk5W/Z0oTqlYmQeNKB9K+6B+nkNIV9JdbS3qhnmi6sd6/c5aMX
-X-Gm-Gg: ASbGncv/QZ5+m2EJKxHVLR6TuBgHY8/g/22138vPTRIHEOrL9iIh/5cGaShSjUYmzzi
-	+JvBEa8bHOPNmIkdVRoqW5MfOeGbJSjHvemqhow/vHZl4iXnTbwMFqNDnUD1XSIW2PZ9lbwPWJl
-	nTChSthtmiD1JBpaYqIFBjLJV7FysFXi7YzWhCztJMZOdn189KkQtokqSpYSmHCZrdTHAilXdJy
-	EQmyOA7AHmaMEXKUxzVxUbNru4GgUtb5kuaVSqG6rWENfT3lMq3Ci5kMn+vxJT6pun+kWQgWhs9
-	2CWkH+kfJdhW3qN93A5dexi9jyiIlW/00uXcmvtDkjCXVaC7Ys8X1aNh5n3Kq2fwQUFhus96Ssh
-	s
-X-Google-Smtp-Source: AGHT+IH/KICx3rlwNY8aT9zlD4cMbpz9OhF6d9fOSNbxAJHun6FjDj1GaQo4A0Lx1jE3TYiafp4s6w==
-X-Received: by 2002:a17:902:e743:b0:215:6c5f:d142 with SMTP id d9443c01a7336-215be5fd2f8mr39362705ad.20.1733240090824;
-        Tue, 03 Dec 2024 07:34:50 -0800 (PST)
-Received: from localhost.localdomain.localdomain (n220246094186.netvigator.com. [220.246.94.186])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-215c1322696sm12625335ad.155.2024.12.03.07.34.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Dec 2024 07:34:50 -0800 (PST)
-From: Zach Wade <zachwade.k@gmail.com>
-To: steffen.klassert@secunet.com,
-	daniel.m.jordan@oracle.com,
-	herbert@gondor.apana.org.au
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org,
-	Zach Wade <zachwade.k@gmail.com>,
-	Ding Hui <dinghui@sangfor.com.cn>
-Subject: [PATCH] padata: Fix refcnt handling in padata_free_shell() again
-Date: Tue,  3 Dec 2024 23:34:26 +0800
-Message-ID: <20241203153426.62794-1-zachwade.k@gmail.com>
-X-Mailer: git-send-email 2.46.0
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="pj0q0gnU"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=rYyvaewk856JuUGISmUIM7ObWdZ27o6pq9XHsI0K/RF9PErMDHLR/n1lrWIzdnyn3jf8r1J+m7ZD0eYPqsGwW2Pb38yG/86tRMRayHEo0626tF9kZmFxLA1hFUs0/6NbRPiEt08mewQtwuN/RXQixzbtPPqYzQEf0E1g4JfwglJ+CYlw4tvwjAyfgdGiR0eKTAg5v2fJpb+0UJ+D0Ot+wul4fU+zPxrdA0tdlp4IhIH7m7eBj+5HfdMlHdUxusxqGhj2fDOCeX844grfjLY2gsJEphF/o+K6IbHmbU2vlec6Yx6LnCsIN7w4DFWPsAzxsaU7kXxImVHn9+Ir9yQeWQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=MJKTw8DoswAXgJL2hdvjZ0V+i0zVWtkZBwtbDqi4nVQ=;
+ b=voAC2/mHEO1Yq7e2NKTEjtW+DGrB5Ab0TcsW2dyXWWDQ/tzWqgxAVdMKb4RHSN9evAlu27Oi5tBDd+0IXGmcWHiipLuyjhtUQtcU7ASGUIj5aq1xh+NA5wCzT77oEUQjPeIAWSxCrMXnWeVpp4aJ4Ok93J0kZOtVwOgKWDFl2qy8+UT7GHXuzQrVSh757UApJUuY5tS+/U6PaCTFA5WPlUg0ZX2puNSG2wfA3N59wVXX4lI48psME/vRBLMpb4jy38qzp5ORgbMD6OdTe46AcuehSb1SU4xWzyxsszkHwZ1bXf2bNhHptpIovaKzlsXUJ+DxHqO911O241RL1L4cAQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MJKTw8DoswAXgJL2hdvjZ0V+i0zVWtkZBwtbDqi4nVQ=;
+ b=pj0q0gnU3tb+I34TbYKlOEGQZXUuNBylJo8/hRYeZAoTJHuDkBMGpU7gy1pWfVL0w9tBdbJZ2bwxVDnvlEpA2f3lSJbT9vnomHUtwSM8RRdQsfXXPPQVlj9bzMHbYtdUY6N3mkeX4VBeQgvn73sRXK/FnmIbpffufiBmpQviIPs=
+Received: from SA9PR13CA0063.namprd13.prod.outlook.com (2603:10b6:806:23::8)
+ by SA1PR12MB8118.namprd12.prod.outlook.com (2603:10b6:806:333::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.18; Tue, 3 Dec
+ 2024 16:23:09 +0000
+Received: from SA2PEPF00001509.namprd04.prod.outlook.com
+ (2603:10b6:806:23:cafe::89) by SA9PR13CA0063.outlook.office365.com
+ (2603:10b6:806:23::8) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8230.7 via Frontend Transport; Tue, 3
+ Dec 2024 16:23:09 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ SA2PEPF00001509.mail.protection.outlook.com (10.167.242.41) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8230.7 via Frontend Transport; Tue, 3 Dec 2024 16:23:08 +0000
+Received: from AUS-P9-MLIMONCI.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 3 Dec
+ 2024 10:23:07 -0600
+From: Mario Limonciello <mario.limonciello@amd.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+CC: Mario Limonciello <mario.limonciello@amd.com>, Tom Lendacky
+	<thomas.lendacky@amd.com>, John Allen <john.allen@amd.com>, "open list:AMD
+ CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER - DB..."
+	<linux-crypto@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+Subject: [PATCH v3] crypto: ccp: Use scoped guard for mutex
+Date: Tue, 3 Dec 2024 10:22:57 -0600
+Message-ID: <20241203162257.6566-1-mario.limonciello@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -76,157 +71,165 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA2PEPF00001509:EE_|SA1PR12MB8118:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1c8966a8-83e1-4a44-cc76-08dd13b6c647
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?USofDU3Bx7+wia5BoT5+UsXRlxmmUknqSnfSbGCAqgimQuRIqgn0YE8P3Mo9?=
+ =?us-ascii?Q?CdDWpELbhOl/eGlJxETNglyuRaU94zorWVYsSLfkw3f8WNVCq0RSzSF6xEWK?=
+ =?us-ascii?Q?+/1KK9kRZzD2YPRkGNcwiusC1ZFAM7dO30VxcEPT3dxs/BpkITR4eNn205qs?=
+ =?us-ascii?Q?nsbMYwFoV4njxK/bbn6VUphYTjRbH94uVOrtOdjeFkl21FmP52kl6oM6jaSL?=
+ =?us-ascii?Q?KzkjxyOetkm1bDmFVHK/FDoBbhpxqtROI5rRvxl8onUrTTsTIrd6lqxjFtzy?=
+ =?us-ascii?Q?HA3vwtiBBTqwlw1cRyuUWfpPOOqhJ1bSLFqQbL1QhJuhNRjhU5adGM4jI3SS?=
+ =?us-ascii?Q?Dx6e3GKPSyV/Nr8ZIRgimzA4JtGprUHsbyQCLk1Io4HA+AL+1YnuVMHIu7vm?=
+ =?us-ascii?Q?tG9zsDLNszpF+lQCMqPWsshcy3YiSXj+U+iOuKAfbJt6bmtTd/77bkd4hgQN?=
+ =?us-ascii?Q?jUZdvxlVZPXssrzALRk/QTfxAmV2Ap0e79kilz9c4onUkj+7hp4YaJjdYc3t?=
+ =?us-ascii?Q?pYM87ouPsH5fdExdbUvg7uzVZm8A8iZJDE5m9zltHgcGDIgqi9GrUe85Dg51?=
+ =?us-ascii?Q?BiZTv4GHKPbVDq66o1DIN5QU+ppSXmPo3TOcxdtSbhYpsrMKHsvTkvoqPP0i?=
+ =?us-ascii?Q?H1vt2ztWviwfI6FNG+swgcSNN6riH924vPCsQ5EABuKOSCzrSXJ1xZCaz0wD?=
+ =?us-ascii?Q?0gVo2B9R5C6OZOdVOlTA79gsssnURVCkPDT1xp83ZMKl+YnjqUxHwlcqbstn?=
+ =?us-ascii?Q?J4tNnsT+YrZCcitegItxOJR6Nmnynv3tf3Rlw4M/draDVpMXjNly77zwn8Ut?=
+ =?us-ascii?Q?4ldVlnUp3lwDoP0XCFxQDX4bcK1M005hPZBH9Kb1hfV0hBz2BWYPkmMPmv0J?=
+ =?us-ascii?Q?kxipaWqoSbQj3NDFpwFcesnr5BrXNnW/ldVx4QM4p565VbabghfSAw8iiisA?=
+ =?us-ascii?Q?CrK3x57xY2I9idx4clnO7fL/oPyl1+TZ48JUoj4ljeeR1H3cCDS1N4/81Lx3?=
+ =?us-ascii?Q?eFnuHfajCAjNfLuWK4RdMF5WKwyfgtcXxdfNp0Yt6jGZKBOkZ2bEGi7RINMw?=
+ =?us-ascii?Q?LEN8AwZSA6x3YWmZZ7NVKZflMq3ix1g8zSM2bXlZG4F5Ppp5J9A6ngkh9C5U?=
+ =?us-ascii?Q?annc2TS9m5/dWJNstjJyCTzG/Oy8lN1mb26wAVy9pXcPTJowtJicevEh2RXg?=
+ =?us-ascii?Q?qDSZC2TB4rzkEbMHS4P4I5+7Q8c2woXNNsLLBrzlbdgcl46yf6Wrr5xOOuBD?=
+ =?us-ascii?Q?rgTRs/hL/5StoPne/0etP24NktVgIqofMUyD28fzPJvsiSL9I89UoBXj1hQ6?=
+ =?us-ascii?Q?VOtlMzUBqk+phq1Jf+GwRjoIe4GVC6uB31SZandWpgw/5+KBY0XItjdzmYLV?=
+ =?us-ascii?Q?P0KxsoHgBrcAxd3h0uSObsh9n3f6uHPjTjaThHhlYPICgbgAoewlscvcNW/B?=
+ =?us-ascii?Q?4mlbraTwH5IJlqKqw6FKj2WF+ANvHsI7?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Dec 2024 16:23:08.7266
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1c8966a8-83e1-4a44-cc76-08dd13b6c647
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SA2PEPF00001509.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8118
 
-testcases/kernel/crypto/pcrypt_aead01.c of LTP project has UAF.
+Use a scoped guard to simplify the cleanup handling.
 
-Steps to reproduce:
-1. /sys/module/cryptomgr/parameters/notests is N
-2. run LTP ./testcases/bin/pcrypt_aead01
-
-There is a race condition when padata_free_shell is released, which
-causes it to be accessed after being released. We should use the rcu
-mechanism to protect it.
-            cpu0                |               cpu1
-================================================================
-padata_do_parallel              |   padata_free_shell
-    rcu_read_lock_bh            |       refcount_dec_and_test
-    # run to here <- 1          |       # run to here <- 2
-    refcount_inc(&pd->refcnt);  |           padata_free_pd <- 3
-    padata_work_alloc		|	...
-    rcu_read_unlock_bh          |
-				|
-There is a possibility of UAF after refcount_inc(&pd->refcnt).
-
-kasan report:
-[158753.658839] ==================================================================
-[158753.658851] BUG: KASAN: slab-use-after-free in padata_find_next+0x2d6/0x3f0
-[158753.658868] Read of size 4 at addr ffff88812f8b8524 by task kworker/u158:0/988818
-[158753.658878]
-[158753.658885] CPU: 23 UID: 0 PID: 988818 Comm: kworker/u158:0 Kdump: loaded Tainted: G        W   E      6.12.0-dirty #33
-[158753.658902] Tainted: [W]=WARN, [E]=UNSIGNED_MODULE
-[158753.658907] Hardware name: VMware, Inc. VMware20,1/440BX Desktop Reference Platform, BIOS VMW201.00V.20192059.B64.2207280713 07/28/2022
-[158753.658914] Workqueue: pdecrypt_parallel padata_parallel_worker
-[158753.658927] Call Trace:
-[158753.658932]  <TASK>
-[158753.658938]  dump_stack_lvl+0x5d/0x80
-[158753.658960]  print_report+0x174/0x505
-[158753.658992]  kasan_report+0xe0/0x160
-[158753.659013]  padata_find_next+0x2d6/0x3f0
-[158753.659035]  padata_reorder+0x1cc/0x400
-[158753.659043]  padata_parallel_worker+0x70/0x160
-[158753.659051]  process_one_work+0x646/0xeb0
-[158753.659061]  worker_thread+0x619/0x10e0
-[158753.659092]  kthread+0x28d/0x350
-[158753.659102]  ret_from_fork+0x31/0x70
-[158753.659111]  ret_from_fork_asm+0x1a/0x30
-[158753.659117]  </TASK>
-[158753.659119]
-[158753.659120] Allocated by task 1027931:
-[158753.659123]  kasan_save_stack+0x30/0x50
-[158753.659126]  kasan_save_track+0x14/0x30
-[158753.659128]  __kasan_kmalloc+0xaa/0xb0
-[158753.659130]  padata_alloc_pd+0x69/0x9f0
-[158753.659132]  padata_alloc_shell+0x82/0x210
-[158753.659134]  pcrypt_create+0x13b/0x7a0 [pcrypt]
-[158753.659139]  cryptomgr_probe+0x8d/0x230
-[158753.659144]  kthread+0x28d/0x350
-[158753.659147]  ret_from_fork+0x31/0x70
-[158753.659150]  ret_from_fork_asm+0x1a/0x30
-[158753.659152]
-[158753.659153] Freed by task 1024357:
-[158753.659155]  kasan_save_stack+0x30/0x50
-[158753.659158]  kasan_save_track+0x14/0x30
-[158753.659160]  kasan_save_free_info+0x3b/0x70
-[158753.659164]  __kasan_slab_free+0x4f/0x70
-[158753.659167]  kfree+0x119/0x440
-[158753.659172]  padata_free_shell+0x262/0x320
-[158753.659174]  pcrypt_free+0x43/0x90 [pcrypt]
-[158753.659177]  crypto_destroy_instance_workfn+0x79/0xc0
-[158753.659182]  process_one_work+0x646/0xeb0
-[158753.659184]  worker_thread+0x619/0x10e0
-[158753.659186]  kthread+0x28d/0x350
-[158753.659188]  ret_from_fork+0x31/0x70
-[158753.659191]  ret_from_fork_asm+0x1a/0x30
-[158753.659194]
-[158753.659195] The buggy address belongs to the object at ffff88812f8b8500
- which belongs to the cache kmalloc-192 of size 192
-[158753.659198] The buggy address is located 36 bytes inside of
- freed 192-byte region [ffff88812f8b8500, ffff88812f8b85c0)
-[158753.659202]
-[158753.659203] The buggy address belongs to the physical page:
-[158753.659205] page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x12f8b8
-[158753.659209] head: order:1 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-[158753.659212] anon flags: 0x10000000000040(head|node=0|zone=2)
-[158753.659216] page_type: f5(slab)
-[158753.659220] raw: 0010000000000040 ffff88810004c3c0 0000000000000000 dead000000000001
-[158753.659223] raw: 0000000000000000 0000000080200020 00000001f5000000 0000000000000000
-[158753.659225] head: 0010000000000040 ffff88810004c3c0 0000000000000000 dead000000000001
-[158753.659228] head: 0000000000000000 0000000080200020 00000001f5000000 0000000000000000
-[158753.659230] head: 0010000000000001 ffffea0004be2e01 ffffffffffffffff 0000000000000000
-[158753.659232] head: ffff888100000002 0000000000000000 00000000ffffffff 0000000000000000
-[158753.659234] page dumped because: kasan: bad access detected
-[158753.659235]
-[158753.659236] Memory state around the buggy address:
-[158753.659238]  ffff88812f8b8400: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-[158753.659240]  ffff88812f8b8480: fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
-[158753.659242] >ffff88812f8b8500: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-[158753.659243]                                ^
-[158753.659245]  ffff88812f8b8580: fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
-[158753.659247]  ffff88812f8b8600: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-[158753.659248] ==================================================================
-
-Fixes: 07928d9bfc81 ("padata: Remove broken queue flushing")
-
-Co-developed-by: Ding Hui <dinghui@sangfor.com.cn>
-Signed-off-by: Ding Hui <dinghui@sangfor.com.cn>
-Signed-off-by: Zach Wade <zachwade.k@gmail.com>
+Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
 ---
- include/linux/padata.h |  1 +
- kernel/padata.c        | 11 +++++++++--
- 2 files changed, 10 insertions(+), 2 deletions(-)
+v3:
+ * Fix logic error
+---
+ drivers/crypto/ccp/dbc.c | 53 +++++++++++++++-------------------------
+ 1 file changed, 20 insertions(+), 33 deletions(-)
 
-diff --git a/include/linux/padata.h b/include/linux/padata.h
-index 0146daf34430..ee6155689e47 100644
---- a/include/linux/padata.h
-+++ b/include/linux/padata.h
-@@ -103,6 +103,7 @@ struct parallel_data {
- 	int				cpu;
- 	struct padata_cpumask		cpumask;
- 	struct work_struct		reorder_work;
-+	struct rcu_head			rcu;
- 	spinlock_t                      ____cacheline_aligned lock;
- };
+diff --git a/drivers/crypto/ccp/dbc.c b/drivers/crypto/ccp/dbc.c
+index 5b105a23f6997..410084a9039c9 100644
+--- a/drivers/crypto/ccp/dbc.c
++++ b/drivers/crypto/ccp/dbc.c
+@@ -7,6 +7,8 @@
+  * Author: Mario Limonciello <mario.limonciello@amd.com>
+  */
  
-diff --git a/kernel/padata.c b/kernel/padata.c
-index d51bbc76b227..3afdccc7e20e 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -1109,6 +1109,14 @@ struct padata_shell *padata_alloc_shell(struct padata_instance *pinst)
- }
- EXPORT_SYMBOL(padata_alloc_shell);
- 
-+static void __padata_put_pd(struct rcu_head *head)
-+{
-+	struct parallel_data *pd = container_of(head, struct parallel_data, rcu);
++#include <linux/mutex.h>
 +
-+	if (refcount_dec_and_test(&pd->refcnt))
-+		padata_free_pd(pd);
-+}
-+
- /**
-  * padata_free_shell - free a padata shell
-  *
-@@ -1124,9 +1132,8 @@ void padata_free_shell(struct padata_shell *ps)
- 	mutex_lock(&ps->pinst->lock);
- 	list_del(&ps->list);
- 	pd = rcu_dereference_protected(ps->pd, 1);
--	if (refcount_dec_and_test(&pd->refcnt))
--		padata_free_pd(pd);
- 	mutex_unlock(&ps->pinst->lock);
-+	call_rcu(&pd->rcu, __padata_put_pd);
+ #include "dbc.h"
  
- 	kfree(ps);
+ #define DBC_DEFAULT_TIMEOUT		(10 * MSEC_PER_SEC)
+@@ -137,64 +139,49 @@ static long dbc_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
+ 		return -ENODEV;
+ 	dbc_dev = psp_master->dbc_data;
+ 
+-	mutex_lock(&dbc_dev->ioctl_mutex);
++	guard(mutex)(&dbc_dev->ioctl_mutex);
+ 
+ 	switch (cmd) {
+ 	case DBCIOCNONCE:
+-		if (copy_from_user(dbc_dev->payload, argp, sizeof(struct dbc_user_nonce))) {
+-			ret = -EFAULT;
+-			goto unlock;
+-		}
++		if (copy_from_user(dbc_dev->payload, argp, sizeof(struct dbc_user_nonce)))
++			return -EFAULT;
+ 
+ 		ret = send_dbc_nonce(dbc_dev);
+ 		if (ret)
+-			goto unlock;
++			return ret;
+ 
+-		if (copy_to_user(argp, dbc_dev->payload, sizeof(struct dbc_user_nonce))) {
+-			ret = -EFAULT;
+-			goto unlock;
+-		}
++		if (copy_to_user(argp, dbc_dev->payload, sizeof(struct dbc_user_nonce)))
++			return -EFAULT;
+ 		break;
+ 	case DBCIOCUID:
+-		if (copy_from_user(dbc_dev->payload, argp, sizeof(struct dbc_user_setuid))) {
+-			ret = -EFAULT;
+-			goto unlock;
+-		}
++		if (copy_from_user(dbc_dev->payload, argp, sizeof(struct dbc_user_setuid)))
++			return -EFAULT;
+ 
+ 		*dbc_dev->payload_size = dbc_dev->header_size + sizeof(struct dbc_user_setuid);
+ 		ret = send_dbc_cmd(dbc_dev, PSP_DYNAMIC_BOOST_SET_UID);
+ 		if (ret)
+-			goto unlock;
++			return ret;
+ 
+-		if (copy_to_user(argp, dbc_dev->payload, sizeof(struct dbc_user_setuid))) {
+-			ret = -EFAULT;
+-			goto unlock;
+-		}
++		if (copy_to_user(argp, dbc_dev->payload, sizeof(struct dbc_user_setuid)))
++			return -EFAULT;
+ 		break;
+ 	case DBCIOCPARAM:
+-		if (copy_from_user(dbc_dev->payload, argp, sizeof(struct dbc_user_param))) {
+-			ret = -EFAULT;
+-			goto unlock;
+-		}
++		if (copy_from_user(dbc_dev->payload, argp, sizeof(struct dbc_user_param)))
++			return -EFAULT;
+ 
+ 		*dbc_dev->payload_size = dbc_dev->header_size + sizeof(struct dbc_user_param);
+ 		ret = send_dbc_parameter(dbc_dev);
+ 		if (ret)
+-			goto unlock;
++			return ret;
+ 
+-		if (copy_to_user(argp, dbc_dev->payload, sizeof(struct dbc_user_param)))  {
+-			ret = -EFAULT;
+-			goto unlock;
+-		}
++		if (copy_to_user(argp, dbc_dev->payload, sizeof(struct dbc_user_param)))
++			return -EFAULT;
+ 		break;
+ 	default:
+-		ret = -EINVAL;
+-
++		return -EINVAL;
+ 	}
+-unlock:
+-	mutex_unlock(&dbc_dev->ioctl_mutex);
+ 
+-	return ret;
++	return 0;
  }
+ 
+ static const struct file_operations dbc_fops = {
+
+base-commit: 40384c840ea1944d7c5a392e8975ed088ecf0b37
 -- 
-2.46.0
+2.43.0
 
