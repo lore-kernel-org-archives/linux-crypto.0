@@ -1,65 +1,65 @@
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDBCF1F1308
-	for <linux-crypto@vger.kernel.org>; Tue,  3 Dec 2024 13:52:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D9CC1F12F8
+	for <linux-crypto@vger.kernel.org>; Tue,  3 Dec 2024 13:53:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733233966; cv=none; b=SuDlTz/YcRDtQm3lVnJN1NmDVk5QR4rkH8M7HuMPiey7ED+LUGpeqc/Rr/3Q75isjzskp+HdIIF/8KFHJQtEXRPpEXSxUT7oZr7ZmdsBMv+USwdlqYayLr725Xig+VAGfJFsFilxZSRsAPFZ5cqqBx7m4hS8UUeeberFUpzuv6w=
+	t=1733234006; cv=none; b=RrvnrPXdue4xbWUGRcLzB8zU2BYC4xkWWt5ml2zK8aPwDkiJaL0Lvymb0Lu+Lpc20Ean5rzznlJ8VMfQ6oMlGZlXWWzks24hk9tzWv9nv/NbrQBSjHhKM5oeAAVM5T5vj+OMm9HwhDMLau4xf49WlBWA/Fit8r6Ysb7HG2r0uCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733233966; c=relaxed/simple;
-	bh=v/0nQpVev2ndP6RZXzkRsx1U8+dnE+fNmJFvOBbxGOQ=;
+	s=arc-20240116; t=1733234006; c=relaxed/simple;
+	bh=MfM0drVwbDYoPluV0REjpJpK0fyBprYzaokHgqmg1QA=;
 	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=PvakX56OKfezEW38ckqdNc6utV5JIDmy4UeS8Mv6Lf3nQNoNtQECYdWRc72/i+B7pF66m7R35PYDUmL757QB4M/pPFouBf6ZPLtf5Dc005ANgM4SGh1Dn6ANCbL133sLNN7fvTWSGNg9I9Dw+yFsLhhMY/yGb68uQwxC4/AX188=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=r3ZP0YVZ; arc=none smtp.client-ip=209.85.128.53
+	 In-Reply-To:Content-Type; b=IKpLQjLncSp3Fy+WFbM4c5LA5E5YBgyqg2uQnPQ0b/cCsoP1iyh/PPvJyiGUFFDuBW86zelqu5QDMM09cyhTkuuc0aFuf2mkWdkHas5U/lCVWFHjBL5UYYqi4TiQFJlOBnpadow6E3b2iULmnhKmNW3zTzdHderNBK6/iXts8Ww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=OS2Rhfn1; arc=none smtp.client-ip=209.85.221.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="r3ZP0YVZ"
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-434ab114753so46836995e9.0
-        for <linux-crypto@vger.kernel.org>; Tue, 03 Dec 2024 05:52:44 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OS2Rhfn1"
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-385e075255fso2685247f8f.0
+        for <linux-crypto@vger.kernel.org>; Tue, 03 Dec 2024 05:53:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1733233963; x=1733838763; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1733234003; x=1733838803; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:references:cc:to:subject:reply-to:from:user-agent
          :mime-version:date:message-id:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=2t8JJMG5582Bls/PacyhFYC1KHsJGdf+sWNf8uRQtgs=;
-        b=r3ZP0YVZKBiOghszMLgbEv9Gejx2Zar/lHP4iJutUEOpqCV3OYHx4IZXY67QPU0Pi9
-         yM5osPykjyTk4Ld7Wpksif8W74rB0fIR0KStI/LKLBYQs/NQMkCZmnOZdCx5dzeJBJsz
-         hXk/Tl4iVgNxMNl4pZKvWfD8shKdv0Yb8xONm8ByvtBw7xGoPnlbqwyOOlM5rqhX0O8x
-         GW8OwpofMKM3KNrznzLJn559NUoUvyV6KNVPtMiLh47sN5Ss/L4LMjoYqAalBoHVfxsf
-         +G4X711aWkfRdJFh67WohMxmDSh9XfzhSU/di2MiG0ZqhUEydmKh/PnS9facs2Lx3Q2u
-         1zFA==
+        bh=wDNjqsNTvkXwslsyJDHeLHfffqCQZCYq3Xs1+G1L73g=;
+        b=OS2Rhfn16X2DnccQyEsDMeN2i08kkIRnYum6HsZOYsDTqD46DayBumhkMttelvwZTl
+         aiTNoorgZ0JsswbYJHPvWCDPqtQvo/bXr/Uy5BVh5Q5qFsCjH0kur7oOeLN8YI5DaAhJ
+         KtItMQGYX4WlnERP2nNIY+gazW0QsPn1aF+KgpIfoGsRKBxIIbiCcxgkQ4lGAG8wzJwu
+         HY7vOIgH/sj0IkU1Ti+o/ihy+cNpoNxfIPz/AYYcr/CSjWPAjGuZ9KqmgokrnmJM5QsP
+         7VCzV3CYhQmOV3OIpBE3t6q1dEBrlSOa4VlQnRmbEfrdTdErt25A2xdWcmQw13oDjPCv
+         cD2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733233963; x=1733838763;
+        d=1e100.net; s=20230601; t=1733234003; x=1733838803;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:references:cc:to:subject:reply-to:from:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=2t8JJMG5582Bls/PacyhFYC1KHsJGdf+sWNf8uRQtgs=;
-        b=lNaNncNn/bMSfLgcKy5OJ/6mjYJ3oTuYwpiDBCo+eSOajAjTxVmkXpOufn/GZlR/KQ
-         yAWVkzqJE4TnctBU9llKJCkbQ/3DNRkSTGYG2KXS0XRpDMg8z1ximET8WcTYtwnnSx5L
-         BqlzSGHrPpfCFh/fh8nQUKnKgNOg0sVKwMRjKBMecnaoEJj9fNRWRz3Gjknb8fDKNtf7
-         PeQ9pbuLjKotnlc9Uc6tS9q96+y7hucN6PmOH5/7qyqNCe3/1GqJk8CQCQ/jTCSTTkjV
-         wtr2UXdeGwzrzpWc1yvbiQIxeh4qgUXJBXvz6B1dJ/qeZFbjNLPEVfUz1dS34eS2J2/d
-         tXAA==
-X-Gm-Message-State: AOJu0Yxtq79S1iYJpWMAiixTqSLvm1ICVfd6ahludWP5bnTG7vgP/id0
-	kM5wQyD86rnGEuahA68QXJvKBJlYf1lwAnKlDFQv8T7hx4eDpJVv+t4jhtEQ1rg=
-X-Gm-Gg: ASbGncv7QUGY6OkSpTdO3ODzeDMEpNS7M+Noi3O9AO+aAUmtUGhbiTDckmAjN8/FxZE
-	qSWwh7vqHtAijX0Tg/kXITT/SDPXDZvxZ9idj1OKtTCVKsdULfA19EJKbR1KFh9BijJKoEkMeWO
-	1J+OePg8FGwekMNPuT6TTGceU6IHZ3xHmeKttakZcjn/KNcsqZCfkZ6tv+DCKKmw0/m1NTVofQ5
-	0IB6EFa5BD7dxH7XnzPZ4sPePz7HO0N/WffKgj8YMGn7ZDaOB51J3lTUlGlwROfMTbq295a7hH9
-	CHbkZBBaLjNtX8uFTL1BqL8U
-X-Google-Smtp-Source: AGHT+IHPK/4xK3/T2ubzZ93yNqLxLU2FcxdhQ8xEBhXPCV5/YaFdHDWHRsRFdrg7uI4TyyxceFGmlg==
-X-Received: by 2002:a05:600c:3c9b:b0:434:a9a8:ad1d with SMTP id 5b1f17b1804b1-434d09b0013mr20951775e9.7.1733233963271;
-        Tue, 03 Dec 2024 05:52:43 -0800 (PST)
+        bh=wDNjqsNTvkXwslsyJDHeLHfffqCQZCYq3Xs1+G1L73g=;
+        b=vf5R7ZAF0+S38ZiJQf8nqZ8jARllpLynheF8srzcI8ODF5J+iFEUUhqmx/v7/xIZGB
+         B57jiJTRt5m+m1Yt452f3iJKiib4Y99N51TUDNmIH44Y962MNOjYlM4orBw8Br8JcIxf
+         pDELCtGAPBruroNCZpgxbewgpVxo7OK7zOfoyF4oecT+Yr7wIeROMMgYacDUcGTJDn5s
+         kdrzoG3fqtQ/vwYpeRG32PoNx39qM40J8EUT7+GdoiI4GEpvDhYKIY6gSnRaqyG8soI5
+         nFUCLmslbiljxqIO8XXGxKDrBrnKqj4TxqNC3/JeOfT3dBSvUpSsqPyd5xh+TcR6RoKu
+         +Q6w==
+X-Gm-Message-State: AOJu0Yx3fAgnozvjYkOdBpeam+CEQFyHHmJjx/6X8AeLHSVRrg1YApVd
+	kL0OegDVHqQ7cYWMOuOtGBmWDNKL/d4zyB9t++BeAqDqgoH+bOxKlbRruPWbEEk=
+X-Gm-Gg: ASbGncuvrkGNXi6CYWYaVtSB8AnTrrlGsb2ot/1xCQSL1x1uAcmkQOFWbaYcKPxXADN
+	jlyRXeoELC7iWPb08Ye4mK+GqcsNoiaMm3vhY2Hh6U+6PpX0EAZ9G1ZqJ9kVoG8tac7/1EWO1PN
+	ue+zCEOa7lHPwP6N7qey071LTQm7FYREe0kOpT1A0zg2Gp1X0xsajehB8p4tQe9qWjr0/bo+XX4
+	iqekcdcaUqRYdBSg3wYHerTRT7UoCZbVxZfYMYknaWIvC19hG8RaVpFwDjUHg6vR2sTKcs7woSx
+	rCQXh4xrBI/TF1dJkk+jvi4l
+X-Google-Smtp-Source: AGHT+IGh+XS+vM0CbuRcrxDNTg3Y8TKQ9gEnvK0wrtUF8j62EtQ0gbCJvdajb5h8bz5IO1GMuUl3LQ==
+X-Received: by 2002:a5d:648f:0:b0:385:e13c:5409 with SMTP id ffacd0b85a97d-385fd3c68d2mr2122986f8f.5.1733234002695;
+        Tue, 03 Dec 2024 05:53:22 -0800 (PST)
 Received: from ?IPV6:2a01:e0a:982:cbb0:b668:b88:4ecf:c065? ([2a01:e0a:982:cbb0:b668:b88:4ecf:c065])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434b0f70d9csm195101175e9.38.2024.12.03.05.52.42
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-434b0d9bef8sm189836875e9.7.2024.12.03.05.53.21
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 Dec 2024 05:52:42 -0800 (PST)
-Message-ID: <dd630922-b317-4a57-8bf7-a0bb376f794e@linaro.org>
-Date: Tue, 3 Dec 2024 14:52:42 +0100
+        Tue, 03 Dec 2024 05:53:22 -0800 (PST)
+Message-ID: <d6220576-eaf5-4415-b25f-b5984255ab78@linaro.org>
+Date: Tue, 3 Dec 2024 14:53:21 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -69,7 +69,7 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 From: neil.armstrong@linaro.org
 Reply-To: neil.armstrong@linaro.org
-Subject: Re: [PATCH 8/9] crypto: qce - convert tasklet to workqueue
+Subject: Re: [PATCH 9/9] crypto: qce - switch to using a mutex
 To: Bartosz Golaszewski <brgl@bgdev.pl>,
  Thara Gopinath <thara.gopinath@gmail.com>,
  Herbert Xu <herbert@gondor.apana.org.au>,
@@ -79,7 +79,7 @@ Cc: linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
  linux-kernel@vger.kernel.org,
  Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 References: <20241203-crypto-qce-refactor-v1-0-c5901d2dd45c@linaro.org>
- <20241203-crypto-qce-refactor-v1-8-c5901d2dd45c@linaro.org>
+ <20241203-crypto-qce-refactor-v1-9-c5901d2dd45c@linaro.org>
 Content-Language: en-US, fr
 Autocrypt: addr=neil.armstrong@linaro.org; keydata=
  xsBNBE1ZBs8BCAD78xVLsXPwV/2qQx2FaO/7mhWL0Qodw8UcQJnkrWmgTFRobtTWxuRx8WWP
@@ -106,117 +106,146 @@ Autocrypt: addr=neil.armstrong@linaro.org; keydata=
  4zcsPWvwnXgfe5tk680fEKZVwOZKIEuJC3v+/yZpQzDvGYJvbyix0lHnrCzq43WefRHI5XTT
  QbM0WUIBIcGmq38+OgUsMYu4NzLu7uZFAcmp6h8g
 Organization: Linaro
-In-Reply-To: <20241203-crypto-qce-refactor-v1-8-c5901d2dd45c@linaro.org>
+In-Reply-To: <20241203-crypto-qce-refactor-v1-9-c5901d2dd45c@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 03/12/2024 10:19, Bartosz Golaszewski wrote:
 > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 > 
-> There's nothing about the qce driver that requires running from a
-> tasklet. Switch to using the system workqueue.
+> Having switched to workqueue from tasklet, we are no longer limited to
+> atomic APIs and can now convert the spinlock to a mutex. This, along
+> with the conversion from tasklet to workqueue grants us ~15% improvement
+> in cryptsetup benchmarks for AES encryption.
+
+Can you share on which platforms you did the tests and the results you got ?
+
+> 
+> While at it: use guards to simplify locking code.
 > 
 > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 > ---
->   drivers/crypto/qce/core.c | 20 ++++++--------------
->   drivers/crypto/qce/core.h |  6 ++++--
->   2 files changed, 10 insertions(+), 16 deletions(-)
+>   drivers/crypto/qce/core.c | 46 +++++++++++++++++++++-------------------------
+>   drivers/crypto/qce/core.h |  3 ++-
+>   2 files changed, 23 insertions(+), 26 deletions(-)
 > 
 > diff --git a/drivers/crypto/qce/core.c b/drivers/crypto/qce/core.c
-> index 5e21754c7f822..6de9f1e23e282 100644
+> index 6de9f1e23e282..e95e84486d9ae 100644
 > --- a/drivers/crypto/qce/core.c
 > +++ b/drivers/crypto/qce/core.c
-> @@ -122,15 +122,16 @@ static int qce_handle_queue(struct qce_device *qce,
->   	err = qce_handle_request(async_req);
->   	if (err) {
->   		qce->result = err;
-> -		tasklet_schedule(&qce->done_tasklet);
-> +		schedule_work(&qce->done_work);
+> @@ -3,6 +3,7 @@
+>    * Copyright (c) 2010-2014, The Linux Foundation. All rights reserved.
+>    */
+>   
+> +#include <linux/cleanup.h>
+>   #include <linux/clk.h>
+>   #include <linux/device.h>
+>   #include <linux/dma-mapping.h>
+> @@ -11,7 +12,6 @@
+>   #include <linux/module.h>
+>   #include <linux/mod_devicetable.h>
+>   #include <linux/platform_device.h>
+> -#include <linux/spinlock.h>
+>   #include <linux/types.h>
+>   #include <crypto/algapi.h>
+>   #include <crypto/internal/hash.h>
+> @@ -89,34 +89,28 @@ static int qce_handle_queue(struct qce_device *qce,
+>   			    struct crypto_async_request *req)
+>   {
+>   	struct crypto_async_request *async_req, *backlog;
+> -	unsigned long flags;
+>   	int ret = 0, err;
+>   
+> -	spin_lock_irqsave(&qce->lock, flags);
+> +	scoped_guard(mutex, &qce->lock) {
+> +		if (req)
+> +			ret = crypto_enqueue_request(&qce->queue, req);
+>   
+> -	if (req)
+> -		ret = crypto_enqueue_request(&qce->queue, req);
+> +		/* busy, do not dequeue request */
+> +		if (qce->req)
+> +			return ret;
+>   
+> -	/* busy, do not dequeue request */
+> -	if (qce->req) {
+> -		spin_unlock_irqrestore(&qce->lock, flags);
+> -		return ret;
+> +		backlog = crypto_get_backlog(&qce->queue);
+> +		async_req = crypto_dequeue_request(&qce->queue);
+> +		if (async_req)
+> +			qce->req = async_req;
 >   	}
 >   
->   	return ret;
->   }
->   
-> -static void qce_tasklet_req_done(unsigned long data)
-> +static void qce_req_done_work(struct work_struct *work)
->   {
-> -	struct qce_device *qce = (struct qce_device *)data;
-> +	struct qce_device *qce = container_of(work, struct qce_device,
-> +					      done_work);
->   	struct crypto_async_request *req;
->   	unsigned long flags;
->   
-> @@ -154,7 +155,7 @@ static int qce_async_request_enqueue(struct qce_device *qce,
->   static void qce_async_request_done(struct qce_device *qce, int ret)
->   {
->   	qce->result = ret;
-> -	tasklet_schedule(&qce->done_tasklet);
-> +	schedule_work(&qce->done_work);
->   }
->   
->   static int qce_check_version(struct qce_device *qce)
-> @@ -243,8 +244,7 @@ static int qce_crypto_probe(struct platform_device *pdev)
+> -	backlog = crypto_get_backlog(&qce->queue);
+> -	async_req = crypto_dequeue_request(&qce->queue);
+> -	if (async_req)
+> -		qce->req = async_req;
+> -
+> -	spin_unlock_irqrestore(&qce->lock, flags);
+> -
+>   	if (!async_req)
 >   		return ret;
 >   
->   	spin_lock_init(&qce->lock);
-> -	tasklet_init(&qce->done_tasklet, qce_tasklet_req_done,
-> -		     (unsigned long)qce);
-> +	INIT_WORK(&qce->done_work, qce_req_done_work);
+>   	if (backlog) {
+> -		spin_lock_bh(&qce->lock);
+> -		crypto_request_complete(backlog, -EINPROGRESS);
+> -		spin_unlock_bh(&qce->lock);
+> +		scoped_guard(mutex, &qce->lock)
+> +			crypto_request_complete(backlog, -EINPROGRESS);
+>   	}
+>   
+>   	err = qce_handle_request(async_req);
+> @@ -133,12 +127,11 @@ static void qce_req_done_work(struct work_struct *work)
+>   	struct qce_device *qce = container_of(work, struct qce_device,
+>   					      done_work);
+>   	struct crypto_async_request *req;
+> -	unsigned long flags;
+>   
+> -	spin_lock_irqsave(&qce->lock, flags);
+> -	req = qce->req;
+> -	qce->req = NULL;
+> -	spin_unlock_irqrestore(&qce->lock, flags);
+> +	scoped_guard(mutex, &qce->lock) {
+> +		req = qce->req;
+> +		qce->req = NULL;
+> +	}
+>   
+>   	if (req)
+>   		crypto_request_complete(req, qce->result);
+> @@ -243,7 +236,10 @@ static int qce_crypto_probe(struct platform_device *pdev)
+>   	if (ret)
+>   		return ret;
+>   
+> -	spin_lock_init(&qce->lock);
+> +	ret = devm_mutex_init(qce->dev, &qce->lock);
+> +	if (ret)
+> +		return ret;
+> +
+>   	INIT_WORK(&qce->done_work, qce_req_done_work);
 >   	crypto_init_queue(&qce->queue, QCE_QUEUE_LENGTH);
 >   
->   	qce->async_req_enqueue = qce_async_request_enqueue;
-> @@ -253,13 +253,6 @@ static int qce_crypto_probe(struct platform_device *pdev)
->   	return devm_qce_register_algs(qce);
->   }
->   
-> -static void qce_crypto_remove(struct platform_device *pdev)
-> -{
-> -	struct qce_device *qce = platform_get_drvdata(pdev);
-> -
-> -	tasklet_kill(&qce->done_tasklet);
-> -}
-> -
->   static const struct of_device_id qce_crypto_of_match[] = {
->   	{ .compatible = "qcom,crypto-v5.1", },
->   	{ .compatible = "qcom,crypto-v5.4", },
-> @@ -270,7 +263,6 @@ MODULE_DEVICE_TABLE(of, qce_crypto_of_match);
->   
->   static struct platform_driver qce_crypto_driver = {
->   	.probe = qce_crypto_probe,
-> -	.remove = qce_crypto_remove,
->   	.driver = {
->   		.name = KBUILD_MODNAME,
->   		.of_match_table = qce_crypto_of_match,
 > diff --git a/drivers/crypto/qce/core.h b/drivers/crypto/qce/core.h
-> index 228fcd69ec511..39e75a75a4293 100644
+> index 39e75a75a4293..eb6fa7a8b64a8 100644
 > --- a/drivers/crypto/qce/core.h
 > +++ b/drivers/crypto/qce/core.h
-> @@ -6,13 +6,15 @@
+> @@ -6,6 +6,7 @@
 >   #ifndef _CORE_H_
 >   #define _CORE_H_
 >   
-> +#include <linux/workqueue.h>
-> +
->   #include "dma.h"
+> +#include <linux/mutex.h>
+>   #include <linux/workqueue.h>
 >   
->   /**
->    * struct qce_device - crypto engine device structure
->    * @queue: crypto request queue
->    * @lock: the lock protects queue and req
-> - * @done_tasklet: done tasklet object
-> + * @done_work: workqueue context
->    * @req: current active request
->    * @result: result of current transform
->    * @base: virtual IO base
-> @@ -29,7 +31,7 @@
+>   #include "dma.h"
+> @@ -30,7 +31,7 @@
+>    */
 >   struct qce_device {
 >   	struct crypto_queue queue;
->   	spinlock_t lock;
-> -	struct tasklet_struct done_tasklet;
-> +	struct work_struct done_work;
+> -	spinlock_t lock;
+> +	struct mutex lock;
+>   	struct work_struct done_work;
 >   	struct crypto_async_request *req;
 >   	int result;
->   	void __iomem *base;
 > 
 
 Reviewed-by: Neil Armstrong <neil.armstrong@linaro.org>
