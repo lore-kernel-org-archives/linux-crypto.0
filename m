@@ -1,93 +1,139 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3120BEADA;
-	Wed,  4 Dec 2024 01:42:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF7F219F40E;
+	Wed,  4 Dec 2024 10:07:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733276547; cv=none; b=D597WxJYPS1BbgzvIjgRKO9NxrsLjCzex3lOo2GZwucrHYI2WFNTp6s5ZOX0aiYb7JWTwgszoESPxlEzxxjiOf0YfF8paYetVyAsFUQ0rOU9x2uf4KrnHpUQuZeDTpeZlCUNtulSA7ls1g9iCqx/b1HkpQhAI8gAeWeVhualVg0=
+	t=1733306860; cv=none; b=AUa5y5LN8mTq01CFkCJe8N0P6Xsnp9ozAO1Nu8QD/VoSIDfxbYLIzyyg4IDaG36+pqjqopStDtHmLxCfEveKtQaKo3UWP/ut+8dtlgUeLcdcXnCm+zksBWAlhSr7dhnkIlstJe04EtUGDR6uwmrYzDIlZ2vKz4LUCeERDY6LcRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733276547; c=relaxed/simple;
-	bh=i515qrN+o0Y2z+dHBSVxbSEQvqfs+eKhveR5GlSIk+c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fY2eRr0H8c+Smp225OUC9UxCAOVB7aFX4M0tQ2dL1uOyUMVz71VtyI0gcdWq66ARV13IeeDDteomcV0fz1pnh8TJXW7Vg+4kZbNBLeZmBCNqSJxEVSs6iw2rJeDJ7mNAPI3AFCPOGdSBQdNp08kcMvJy7n/BuJ0C2f9W+jIO+og=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=gaOrulX2; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1733306860; c=relaxed/simple;
+	bh=OUTf5c0z1+SrUX7KnHGxI7CCBH1X18kmqd5sXJWZJTQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=P3+NPn/HxprfjeegtxbOKqMVTqAT4n3WbZfUGF1SB1UBreBkjOyB6MFAT5twWgdmixATCbwOBhGyALNznhUe6RY4YarJZwYseCoFwZlT1HEnbfazTEPlEPGo1N9AVx4WWNpeefoiAm2QbmIoAzSXzxBoThTxqA7QMs6PqCq1+BE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i9JuDOfx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="gaOrulX2"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=3xrjkPPSEAkSa3WwcdPGjAiriHQqDB0jIWGmrmCx1tU=; b=gaOrulX2iAl1bw+sotyIbP4wCO
-	K2GXLH7VGD+kH8eVws+7zsX+f8RiiRcutQYuFxNtEvAV9qY8enCbNUXyGuspGSDCimja29Q3x+7jI
-	QX6Aj+Uhp79DM01JTEzbLed2jkTzRywQ7hQF7gHpif6Kuo9hNehIPV5jRchasS9UPa7391HkTXf+W
-	bTvfJENlP2yOlcqCClOCrRMKwjzid+hUlHczhyswdOXR6AQEYgGsldJqjLUcoYYUbfTd8AjiZMHei
-	5ZSb9KZATf2oqwyOycMUFoy4/WLFyWxHzu6eFJ90AM68bwq03qx1R7uEE41Vitw7p5mH+xEZYZ0V5
-	MD2BST/g==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tIeP0-003Lnb-2j;
-	Wed, 04 Dec 2024 09:42:07 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 04 Dec 2024 09:42:06 +0800
-Date: Wed, 4 Dec 2024 09:42:06 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Yosry Ahmed <yosryahmed@google.com>
-Cc: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>,
-	Nhat Pham <nphamcs@gmail.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"hannes@cmpxchg.org" <hannes@cmpxchg.org>,
-	"chengming.zhou@linux.dev" <chengming.zhou@linux.dev>,
-	"usamaarif642@gmail.com" <usamaarif642@gmail.com>,
-	"ryan.roberts@arm.com" <ryan.roberts@arm.com>,
-	"ying.huang@intel.com" <ying.huang@intel.com>,
-	"21cnbao@gmail.com" <21cnbao@gmail.com>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"clabbe@baylibre.com" <clabbe@baylibre.com>,
-	"ardb@kernel.org" <ardb@kernel.org>,
-	"ebiggers@google.com" <ebiggers@google.com>,
-	"surenb@google.com" <surenb@google.com>,
-	"Accardi, Kristen C" <kristen.c.accardi@intel.com>,
-	"Feghali, Wajdi K" <wajdi.k.feghali@intel.com>,
-	"Gopal, Vinodh" <vinodh.gopal@intel.com>
-Subject: Re: [PATCH v4 09/10] mm: zswap: Allocate pool batching resources if
- the crypto_alg supports batching.
-Message-ID: <Z0-zboLmrybOt8pv@gondor.apana.org.au>
-References: <20241123070127.332773-1-kanchana.p.sridhar@intel.com>
- <20241123070127.332773-10-kanchana.p.sridhar@intel.com>
- <CAKEwX=PmKWH4Z4Py9Jti9fcD6qCYJBBRrDF48qdmo8-i+LzzfA@mail.gmail.com>
- <SJ0PR11MB56783454B5985ACD48744772C9362@SJ0PR11MB5678.namprd11.prod.outlook.com>
- <Z066p53LoISwqkmX@gondor.apana.org.au>
- <SJ0PR11MB5678AAEF4F62773847E6307FC9362@SJ0PR11MB5678.namprd11.prod.outlook.com>
- <CAJD7tkbui2MTkkGA6_+RDA0oZW2m3rMnUTKp1Fp6tPqp2QLgKw@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i9JuDOfx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DABBC4CED6;
+	Wed,  4 Dec 2024 10:07:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733306860;
+	bh=OUTf5c0z1+SrUX7KnHGxI7CCBH1X18kmqd5sXJWZJTQ=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=i9JuDOfx903Z+A69s+Vnn4GL3fBfNq1qimgQaKq/fZbOV+WvZcH2i2BqXcxgd3TxH
+	 Z+ggupU9FFwn6BnHTp/cRuU1YcWy/J1xhBoiuop2ousV/QGswldCK18pmPnrMnG9p5
+	 lG8NK+MgyI1IOcTSKB19ln9Lj8XIi5iCsBfoCeuHVa0Rkwqp4/ckVs5vvO/WktrcSK
+	 GwatqcmLX89dWv7aLTrSpy5P0JSVnfxTIXhAGkQyJZ0xK7CNGxacVWyTrSw3eKOv7K
+	 buB/dH5xeQAtogdLdEKyX3T/SK9Xt7U645Etj0VKdJvb3hwswrp8i1yjXAgWmIA4dY
+	 Ii+PAqhMDp9sw==
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-53de8ecafeeso6995848e87.1;
+        Wed, 04 Dec 2024 02:07:40 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUHqMfDM1Rs+tYuwGUDTUk8mZGSXPHkv7eRr2gS+uMPta2+O81t+l8w9w5GRf9me0xacBXVOamGCWlvJyX9@vger.kernel.org, AJvYcCWnJ4cbPhJYQ+upzpCwfGKfA5/UTTTrln/F4EkCTFPMWe9DpGaWufjrUPAE5aHEmAPr27JRQNcF@vger.kernel.org, AJvYcCXkWGAAkVvlJGunSm46SMs/HvAO/zlpizXVtblbfDhmcRQt2mbX8RmKVteUzqIu5Q/E4jXSIT/UR9O6qzWm@vger.kernel.org
+X-Gm-Message-State: AOJu0YxAUKSeiDzKxuVrzqjdVccyqjRp4IBQ6edMP4j8ttd+MP6Y8N41
+	dQ8cSPDBSjwefPnqP8m+Uwm+YJpKl42XfCWgM0bPxJvkPyBB07JWAUqM0OmALOmew5BueDFgbJH
+	IdR8Y/ab9YQrDUZYXw0Fn0m0nu9M=
+X-Google-Smtp-Source: AGHT+IHWU+a7+eCom7OBfN7Jt2k2ech+5Jy8Q5QnscsoGZ+UCLjTOgPkoCZjR0oroWTIWLIXcb7v/jr+uOwaJTgZc7s=
+X-Received: by 2002:ac2:4f01:0:b0:53e:1c47:f2c2 with SMTP id
+ 2adb3069b0e04-53e1c47f2fdmr737022e87.37.1733306858565; Wed, 04 Dec 2024
+ 02:07:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJD7tkbui2MTkkGA6_+RDA0oZW2m3rMnUTKp1Fp6tPqp2QLgKw@mail.gmail.com>
+References: <20241203180553.16893-1-ebiggers@kernel.org>
+In-Reply-To: <20241203180553.16893-1-ebiggers@kernel.org>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Wed, 4 Dec 2024 11:07:26 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXFg0mapBt9=EJ+dMcYfeYcnHy0PjTpwfi2JNYTu2UAZVQ@mail.gmail.com>
+Message-ID: <CAMj1kXFg0mapBt9=EJ+dMcYfeYcnHy0PjTpwfi2JNYTu2UAZVQ@mail.gmail.com>
+Subject: Re: [PATCH] crypto: qce - fix priority to be less than ARMv8 CE
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
+	Bartosz Golaszewski <brgl@bgdev.pl>, Neil Armstrong <neil.armstrong@linaro.org>, 
+	Thara Gopinath <thara.gopinath@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Dec 03, 2024 at 01:44:00PM -0800, Yosry Ahmed wrote:
+On Tue, 3 Dec 2024 at 19:06, Eric Biggers <ebiggers@kernel.org> wrote:
 >
-> Does this mean that instead of zswap breaking down the folio into
-> SWAP_CRYPTO_BATCH_SIZE -sized batches, we pass all the pages to the
-> crypto layer and let it do the batching as it pleases?
+> From: Eric Biggers <ebiggers@google.com>
+>
+> As QCE is an order of magnitude slower than the ARMv8 Crypto Extensions
+> on the CPU, and is also less well tested, give it a lower priority.
+> Previously the QCE SHA algorithms had higher priority than the ARMv8 CE
+> equivalents, and the ciphers such as AES-XTS had the same priority which
+> meant the QCE versions were chosen if they happened to be loaded later.
+>
+> Fixes: ec8f5d8f6f76 ("crypto: qce - Qualcomm crypto engine driver")
+> Cc: stable@vger.kernel.org
+> Cc: Bartosz Golaszewski <brgl@bgdev.pl>
+> Cc: Neil Armstrong <neil.armstrong@linaro.org>
+> Cc: Thara Gopinath <thara.gopinath@gmail.com>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-You provide as much (or little) as you're comfortable with.  Just
-treat the acomp API as one that can take as much as you want to
-give it.
+Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> ---
+>  drivers/crypto/qce/aead.c     | 2 +-
+>  drivers/crypto/qce/sha.c      | 2 +-
+>  drivers/crypto/qce/skcipher.c | 2 +-
+>  3 files changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/crypto/qce/aead.c b/drivers/crypto/qce/aead.c
+> index 7d811728f047..97b56e92ea33 100644
+> --- a/drivers/crypto/qce/aead.c
+> +++ b/drivers/crypto/qce/aead.c
+> @@ -784,11 +784,11 @@ static int qce_aead_register_one(const struct qce_aead_def *def, struct qce_devi
+>         alg->encrypt                    = qce_aead_encrypt;
+>         alg->decrypt                    = qce_aead_decrypt;
+>         alg->init                       = qce_aead_init;
+>         alg->exit                       = qce_aead_exit;
+>
+> -       alg->base.cra_priority          = 300;
+> +       alg->base.cra_priority          = 275;
+>         alg->base.cra_flags             = CRYPTO_ALG_ASYNC |
+>                                           CRYPTO_ALG_ALLOCATES_MEMORY |
+>                                           CRYPTO_ALG_KERN_DRIVER_ONLY |
+>                                           CRYPTO_ALG_NEED_FALLBACK;
+>         alg->base.cra_ctxsize           = sizeof(struct qce_aead_ctx);
+> diff --git a/drivers/crypto/qce/sha.c b/drivers/crypto/qce/sha.c
+> index fc72af8aa9a7..71b748183cfa 100644
+> --- a/drivers/crypto/qce/sha.c
+> +++ b/drivers/crypto/qce/sha.c
+> @@ -480,11 +480,11 @@ static int qce_ahash_register_one(const struct qce_ahash_def *def,
+>         else if (IS_SHA256(def->flags))
+>                 tmpl->hash_zero = sha256_zero_message_hash;
+>
+>         base = &alg->halg.base;
+>         base->cra_blocksize = def->blocksize;
+> -       base->cra_priority = 300;
+> +       base->cra_priority = 175;
+>         base->cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_KERN_DRIVER_ONLY;
+>         base->cra_ctxsize = sizeof(struct qce_sha_ctx);
+>         base->cra_alignmask = 0;
+>         base->cra_module = THIS_MODULE;
+>         base->cra_init = qce_ahash_cra_init;
+> diff --git a/drivers/crypto/qce/skcipher.c b/drivers/crypto/qce/skcipher.c
+> index 5b493fdc1e74..ffb334eb5b34 100644
+> --- a/drivers/crypto/qce/skcipher.c
+> +++ b/drivers/crypto/qce/skcipher.c
+> @@ -459,11 +459,11 @@ static int qce_skcipher_register_one(const struct qce_skcipher_def *def,
+>                                           IS_DES(def->flags) ? qce_des_setkey :
+>                                           qce_skcipher_setkey;
+>         alg->encrypt                    = qce_skcipher_encrypt;
+>         alg->decrypt                    = qce_skcipher_decrypt;
+>
+> -       alg->base.cra_priority          = 300;
+> +       alg->base.cra_priority          = 275;
+>         alg->base.cra_flags             = CRYPTO_ALG_ASYNC |
+>                                           CRYPTO_ALG_ALLOCATES_MEMORY |
+>                                           CRYPTO_ALG_KERN_DRIVER_ONLY;
+>         alg->base.cra_ctxsize           = sizeof(struct qce_cipher_ctx);
+>         alg->base.cra_alignmask         = 0;
+>
+> base-commit: ceb8bf2ceaa77fe222fe8fe32cb7789c9099ddf1
+> --
+> 2.47.1
+>
