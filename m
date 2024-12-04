@@ -1,212 +1,126 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 715381AF0AA;
-	Wed,  4 Dec 2024 12:45:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09B8D20ADCB;
+	Wed,  4 Dec 2024 16:26:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733316358; cv=none; b=jsfYxxwMCEl++2tHfVpGga9b2ICnp00ugcvAJ46SGaxzloF5G9Rd08SoWtERk49ZilGWvB0zRDoKKp65DFNd1aLIUrB/ji9OxCFC/k/GcaNjAAKQFtsEy2ETuQdaYe85R8bynbe3NPAwuHWd7yRfaryGLSGky/U6qRW6NMs3kBY=
+	t=1733329566; cv=none; b=mo2HJcd9IMZPA6gZuqihvDwYV4f4nCChxlgwgBBb2iDtZVm+AI/U27uT70sjacGdt6Iv6FjdabpulffoHKiaiLjboC11GfA9pYwpFdvjn3UIWFisBULcSqvM6elCYivnBDp+qjsbQVdSxHwlkY6LSVd6PvGl6lSEr7KYPjYmjWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733316358; c=relaxed/simple;
-	bh=2QDSecObE6wwLJzkdSzKWQZqdDB/m3+uI1Nge5/iGTg=;
+	s=arc-20240116; t=1733329566; c=relaxed/simple;
+	bh=s59cjSI41ouAVWN5gqdjx84pbl6lMV5yXuNB7fDXpqs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KBVR0ktdEyOHcwRfPLhCKqoQTKn2BeV4r5jbBmVQr2KG0NoGRMSdhm7Dq+6be4VOL+fhQdW3Sm1V+czmr5A7JY4sIweyC6tuxOx4ezTMtHLp8G/1najC0pB3nkwt8kNkDOrQJBTKE/YdSUpchMc4+R+BrWEsOiY6WqiS1zl2bzU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ev1ho5M6; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=unW2JJ4NFREK1zDV+laPRY+IKdTSZBl9psL1WBLz+1LypdZUvx8vSM4tWRFkf1oasBcP+5FA/3HXLG2NbAj/pN74judqRkzULQmCRGdAD6sc992UlwlLRnSE6DPRaqnoRM2LTpWcJWQAPteoemTZ/pgn5btISczMrP6yYmTmsG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WYbbiUlA; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ev1ho5M6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 768F7C4CED1;
-	Wed,  4 Dec 2024 12:45:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733316358;
-	bh=2QDSecObE6wwLJzkdSzKWQZqdDB/m3+uI1Nge5/iGTg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ev1ho5M6lAHwSLKXZG9JKWEIYTfGOXSGYuqsck413CBkUqkmTAIsbHyhybpRfTHxT
-	 Y5tANApUnQCtCeGxHzgfyVfe/y4UQv6cV2R1P4SFudt5zFvsOqpHvNiGtHyh7KV7Li
-	 pavqLH/GzZnJwm+eTk/BAL/HTT1VRo3je8GoAqxlzJtnPEm83wHpfnjwvlq73C3lMV
-	 w/zjgv1cREfq0KeUiLFyPymeNzN7C/5UXIyh3CFwSHdpE5ZBh4ryEkK6nezJ66mYic
-	 8qC6keGoZLt+8o51A2p47xtsVZV9//MihEXZw6rRyPeeyv6COXesdk9LPmYJC0m/7d
-	 y9tKzAOLVcGCw==
-Date: Wed, 4 Dec 2024 18:15:54 +0530
-From: Vinod Koul <vkoul@kernel.org>
-To: Md Sadre Alam <quic_mdalam@quicinc.com>
-Cc: thara.gopinath@gmail.com, herbert@gondor.apana.org.au,
-	davem@davemloft.net, kees@kernel.org, robin.murphy@arm.com,
-	fenghua.yu@intel.com, av2082000@gmail.com,
-	u.kleine-koenig@pengutronix.d, linux-crypto@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	dmaengine@vger.kernel.org, quic_varada@quicinc.com,
-	quic_srichara@quicinc.com
-Subject: Re: [PATCH v4 02/11] dmaengine: qcom: bam_dma: add LOCK & UNLOCK
- flag support
-Message-ID: <Z1BPApOvYoDaTR57@vaman>
-References: <20240909092632.2776160-1-quic_mdalam@quicinc.com>
- <20240909092632.2776160-3-quic_mdalam@quicinc.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WYbbiUlA"
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-385e2880606so4875768f8f.3;
+        Wed, 04 Dec 2024 08:26:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733329563; x=1733934363; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=KDfuCQe9icjSg3X2+FF0W1suXmAl6dQpcF+jtr4B0rc=;
+        b=WYbbiUlA60s2C+mKVRzKEXRCLEybDyRLP20rVT+RKTl4xHBS8sjY2BdRRMjjut+JRl
+         YaARLcTg1Vkkt25yXf8oHkBCXEgLl+nn+vKNy5KVUdw6Ra6ytL+nPxifzPWzZTVE8svI
+         C3GFo63wuMc36VKNguF6SNYoG0DoOmbsxJyMEpR2EVeI7ZU322vG4+zrm6V3wcJuzFtB
+         vcKmHpFAyaNYgTXLBwusNQALLt2Y24Nq1annUAwIAqN7HtsvlAnzKRYjL0VL0pGhle42
+         ZltZ9rtbbDQlt2tTVnOImj+Jz48+Chz4103VyUKE9aqI6GDiMwMEaJmMoxUDndzy9oCW
+         IsBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733329563; x=1733934363;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KDfuCQe9icjSg3X2+FF0W1suXmAl6dQpcF+jtr4B0rc=;
+        b=f9DYRkTtrbEgbjboTTpEGKlAkcZ0N6SpHqQYel7pMmZp2lbAF5PHAtDNyrzidAHSWQ
+         kE9zxJSKF36LCH+vGzLrUzPWiHua5z/WXbeHJzyLb/c3ORIBwtnDTaZsgP3UqJgAgLWA
+         hinJXlOe6YlFiqbrsetk6p4Q0rjclwDrrtei+fShD37298mc+qnI+qyi+L+CumTvbrYN
+         lZBDJ+Qam2FFT8fUfhwo0t90bMdpChwzqfxo0rysdWg2ouvHwfah7DrpYtYEEVHiKMX8
+         taCVNa2A5F8MFqXZnODmd3GFV2kVrnMdzTjJXvwcgI3imze5pjhWxyeCC8JzLSPW4RMz
+         h40w==
+X-Forwarded-Encrypted: i=1; AJvYcCVLU2nNEp4lLVRwC5b9BpdAwp3GbTGrxBWT1mBIakD64zWtvKWLTnB6pDUhlub2h6hdU3EBVdp9bG7bMys=@vger.kernel.org, AJvYcCW6jG1w9dhlCYB6qh07v3KXV1Gdw4E6xkR7G22OSnMaXOHvAfxRZbz7pvUVIQo0nt1n1mOXLY6QzKKC/do=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywh3N0RwWsMVKPSxVPIeGIjV5yb4WkQ7YRua16oC3EmkXxnzEtj
+	B7KmdsS7igQXtV0iqKiGfDta4Xiu+tW2fWcoNmkJ6T7P9aa3bwn9Wzc6Bg==
+X-Gm-Gg: ASbGncuGtLoGAFr3uj7Yy7wW7zli5U0ZpmG8EJE9tBa7fPS2idiCi0Dszzx/A/8cIba
+	N9b+AMChg1xz/ifVIki1mh94+NcIN8chxC8EqrO44aBmQuKGUG+qB5lg1hcyHqnpCvzahi+hvkh
+	ElDrZ3ZQbrHTsx7qkQLSCQ55QfNg1uoYKOzD4oWld7nWuQCbLqOSzgyUffm+9RFP03zwkYV3kuB
+	+u/YFWEb6VTON6iB30pzl26lbcTRQz0KkeTdABvpSRtKsCdaRN6rRifzUhgrUdevWe6xAVNQJZp
+	C8gZovBxyDPamWTdBpfpn83fzVBk6jDwYVT7
+X-Google-Smtp-Source: AGHT+IEn5vWUfD1edchw71iKaQWPJ5zrPY/RlGyVC53tCnJMzCLUo9wCZmfXhp3ZVBQC2zZ3MzIvEg==
+X-Received: by 2002:a05:6000:1a86:b0:385:ef8e:a652 with SMTP id ffacd0b85a97d-385fd43c331mr7817874f8f.56.1733329563235;
+        Wed, 04 Dec 2024 08:26:03 -0800 (PST)
+Received: from orome (p200300e41f281900f22f74fffe1f3a53.dip0.t-ipconnect.de. [2003:e4:1f28:1900:f22f:74ff:fe1f:3a53])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-385ccd3a5f7sm18703181f8f.54.2024.12.04.08.26.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Dec 2024 08:26:02 -0800 (PST)
+Date: Wed, 4 Dec 2024 17:26:01 +0100
+From: Thierry Reding <thierry.reding@gmail.com>
+To: Chen Ridong <chenridong@huaweicloud.com>
+Cc: akhilrajeev@nvidia.com, herbert@gondor.apana.org.au, 
+	davem@davemloft.net, jonathanh@nvidia.com, linux-crypto@vger.kernel.org, 
+	linux-tegra@vger.kernel.org, chenridong@huawei.com, wangweiyang2@huawei.com
+Subject: Re: [PATCH v2] crypto: tegra - do not transfer req when tegra init
+ fails
+Message-ID: <lpmdwlmokmxhtd2nuwbhtqkowgih7ytwgkbehd4ht43hwet52a@uwdufvfwotfe>
+References: <20241111012827.1788341-1-chenridong@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="dkyalcrzdvdlsjuv"
 Content-Disposition: inline
-In-Reply-To: <20240909092632.2776160-3-quic_mdalam@quicinc.com>
+In-Reply-To: <20241111012827.1788341-1-chenridong@huaweicloud.com>
 
-On 09-09-24, 14:56, Md Sadre Alam wrote:
-> Add lock and unlock flag support on command descriptor.
-> Once lock set in requester pipe, then the bam controller
-> will lock all others pipe and process the request only
-> from requester pipe. Unlocking only can be performed from
-> the same pipe.
-> 
-> If DMA_PREP_LOCK flag passed in command descriptor then requester
-> of this transaction wanted to lock the BAM controller for this
-> transaction so BAM driver should set LOCK bit for the HW descriptor.
-> 
-> If DMA_PREP_UNLOCK flag passed in command descriptor then requester
-> of this transaction wanted to unlock the BAM controller.so BAM driver
-> should set UNLOCK bit for the HW descriptor.
-> 
-> BAM IP version 1.4.0 and above only supports this LOCK/UNLOCK
-> feature. So adding check for the same and setting bam_pipe_lock
-> based on BAM SW Version.
-> 
-> Signed-off-by: Md Sadre Alam <quic_mdalam@quicinc.com>
+
+--dkyalcrzdvdlsjuv
+Content-Type: text/plain; protected-headers=v1; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v2] crypto: tegra - do not transfer req when tegra init
+ fails
+MIME-Version: 1.0
+
+On Mon, Nov 11, 2024 at 01:28:27AM +0000, Chen Ridong wrote:
+> From: Chen Ridong <chenridong@huawei.com>
+>=20
+> The tegra_cmac_init or tegra_sha_init function may return an error when
+> memory is exhausted. It should not transfer the request when they return
+> an error.
+>=20
+> Fixes: 0880bb3b00c8 ("crypto: tegra - Add Tegra Security Engine driver")
+> Signed-off-by: Chen Ridong <chenridong@huawei.com>
+> Acked-by: Akhil R <akhilrajeev@nvidia.com>
 > ---
-> 
-> Change in [v4]
-> 
-> * Added BAM_SW_VERSION read for major & minor
->   version
-> 
-> * Added bam_pipe_lock flag 
-> 
-> Change in [v3]
-> 
-> * Moved lock/unlock bit set inside loop
-> 
-> Change in [v2]
-> 
-> * No change
->  
-> Change in [v1]
-> 
-> * Added initial support for BAM pipe lock/unlock
-> 
->  drivers/dma/qcom/bam_dma.c | 25 ++++++++++++++++++++++++-
->  include/linux/dmaengine.h  |  6 ++++++
->  2 files changed, 30 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/dma/qcom/bam_dma.c b/drivers/dma/qcom/bam_dma.c
-> index 3a2965939531..d30416a26d8e 100644
-> --- a/drivers/dma/qcom/bam_dma.c
-> +++ b/drivers/dma/qcom/bam_dma.c
-> @@ -53,11 +53,20 @@ struct bam_desc_hw {
->  
->  #define BAM_DMA_AUTOSUSPEND_DELAY 100
->  
-> +#define SW_VERSION_MAJOR_SHIFT	28
-> +#define SW_VERSION_MINOR_SHIFT	16
-> +#define SW_VERSION_MAJOR_MASK	(0xf << SW_VERSION_MAJOR_SHIFT)
+>  drivers/crypto/tegra/tegra-se-aes.c  | 7 +++++--
+>  drivers/crypto/tegra/tegra-se-hash.c | 7 +++++--
+>  2 files changed, 10 insertions(+), 4 deletions(-)
 
-Use GENMASK for this
+Acked-by: Thierry Reding <treding@nvidia.com>
 
-> +#define SW_VERSION_MINOR_MASK	0xf
+--dkyalcrzdvdlsjuv
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Can you define only masks and use FIELD_PREP etc to handle this
+-----BEGIN PGP SIGNATURE-----
 
-> +#define SW_MAJOR_1	0x1
-> +#define SW_VERSION_4	0x4
-> +
->  #define DESC_FLAG_INT BIT(15)
->  #define DESC_FLAG_EOT BIT(14)
->  #define DESC_FLAG_EOB BIT(13)
->  #define DESC_FLAG_NWD BIT(12)
->  #define DESC_FLAG_CMD BIT(11)
-> +#define DESC_FLAG_LOCK BIT(10)
-> +#define DESC_FLAG_UNLOCK BIT(9)
->  
->  struct bam_async_desc {
->  	struct virt_dma_desc vd;
-> @@ -393,6 +402,7 @@ struct bam_device {
->  	u32 ee;
->  	bool controlled_remotely;
->  	bool powered_remotely;
-> +	bool bam_pipe_lock;
->  	u32 active_channels;
->  	u32 bam_sw_version;
->  
-> @@ -696,9 +706,15 @@ static struct dma_async_tx_descriptor *bam_prep_slave_sg(struct dma_chan *chan,
->  		unsigned int curr_offset = 0;
->  
->  		do {
-> -			if (flags & DMA_PREP_CMD)
-> +			if (flags & DMA_PREP_CMD) {
->  				desc->flags |= cpu_to_le16(DESC_FLAG_CMD);
->  
-> +				if (bdev->bam_pipe_lock && flags & DMA_PREP_LOCK)
-> +					desc->flags |= cpu_to_le16(DESC_FLAG_LOCK);
-> +				else if (bdev->bam_pipe_lock && flags & DMA_PREP_UNLOCK)
-> +					desc->flags |= cpu_to_le16(DESC_FLAG_UNLOCK);
-> +			}
-> +
->  			desc->addr = cpu_to_le32(sg_dma_address(sg) +
->  						 curr_offset);
->  
-> @@ -1242,6 +1258,7 @@ static int bam_dma_probe(struct platform_device *pdev)
->  {
->  	struct bam_device *bdev;
->  	const struct of_device_id *match;
-> +	u32 sw_major, sw_minor;
->  	int ret, i;
->  
->  	bdev = devm_kzalloc(&pdev->dev, sizeof(*bdev), GFP_KERNEL);
-> @@ -1305,6 +1322,12 @@ static int bam_dma_probe(struct platform_device *pdev)
->  
->  	bdev->bam_sw_version = readl_relaxed(bam_addr(bdev, 0, BAM_SW_VERSION));
->  	dev_info(bdev->dev, "BAM software version:0x%08x\n", bdev->bam_sw_version);
-> +	sw_major = (bdev->bam_sw_version & SW_VERSION_MAJOR_MASK) >> SW_VERSION_MAJOR_SHIFT;
-> +	sw_minor = (bdev->bam_sw_version >> SW_VERSION_MINOR_SHIFT) & SW_VERSION_MINOR_MASK;
+iQIzBAABCAAdFiEEiOrDCAFJzPfAjcif3SOs138+s6EFAmdQgpgACgkQ3SOs138+
+s6F+VA//XsmF/86dhPIvYT8EDkVqmnc65aEE8+toNiwurcNTS9f+FwkEijK7aifU
+DnPlknSEymzj2hAzKlY6n5ORz+Fp9XXKraLsxUYyHNNeE4hq2bIRU5AmW+SbJaNy
+KjYfw48SqQ3zViExjWRHrVBA+xN4XojBMtDT2XOQ2s5d6ujVSAgCkbdf9IX1YNbL
+7gF5H10nXYhQZsEmU75spNN4ra2K8kk49+kOpSZkJiOkOmYcdS+4lYg0SorvKqOF
+JQ74XKfDNtauIaKC1FPJ6y55ee+rR5W/Fae5BzgHJeAn3xiq63bZy2zpPskEN7iv
+mA3eNkG9Qf1EzvjtzFA7hSCuYa1yf+f6OelspzjhHD5+0jbEs2zUJNRi3b8/7G3g
+KSjeNsECzN59UmW3XN1tkpMud39lSaut/2hhF7JCQ82TO+9iucXNBJRyE1MXYbLN
++eVhm4zQYDnBSGKFIF+wkjcmxT7dhLp9g5x71f9Ey9m/4f1xQYqSmLtBChw44Uzx
++gxrDql697GOcoprI1yIJyWgj6LnK9c8jXAmIBjzrm4fP9UN4QJi71hmc6SDlCO8
+pwM8e6jJ2fevn+ZBYeLZMu73QkiwIxdmPd0KE6A95ukLPdrnxsJM0BJLaHtcdggb
+5fMQublciBZ79W1649/Y/yuIpIeSnJNuI9gksnAANc5rOR83jLo=
+=eI0r
+-----END PGP SIGNATURE-----
 
-FIELD_GET
-
-> +
-> +	if (sw_major == SW_MAJOR_1 && sw_minor >= SW_VERSION_4)
-> +		bdev->bam_pipe_lock = true;
-> +
->  
->  	ret = bam_init(bdev);
->  	if (ret)
-> diff --git a/include/linux/dmaengine.h b/include/linux/dmaengine.h
-> index b137fdb56093..70f23068bfdc 100644
-> --- a/include/linux/dmaengine.h
-> +++ b/include/linux/dmaengine.h
-> @@ -200,6 +200,10 @@ struct dma_vec {
->   *  transaction is marked with DMA_PREP_REPEAT will cause the new transaction
->   *  to never be processed and stay in the issued queue forever. The flag is
->   *  ignored if the previous transaction is not a repeated transaction.
-> + *  @DMA_PREP_LOCK: tell the driver that there is a lock bit set on command
-> + *  descriptor.
-> + *  @DMA_PREP_UNLOCK: tell the driver that there is a un-lock bit set on command
-> + *  descriptor.
->   */
->  enum dma_ctrl_flags {
->  	DMA_PREP_INTERRUPT = (1 << 0),
-> @@ -212,6 +216,8 @@ enum dma_ctrl_flags {
->  	DMA_PREP_CMD = (1 << 7),
->  	DMA_PREP_REPEAT = (1 << 8),
->  	DMA_PREP_LOAD_EOT = (1 << 9),
-> +	DMA_PREP_LOCK = (1 << 10),
-> +	DMA_PREP_UNLOCK = (1 << 11),
-
-this should be a separate patch to define how to use these new flags,
-what it means etc...
-
-
->  };
->  
->  /**
-> -- 
-> 2.34.1
-
--- 
-~Vinod
+--dkyalcrzdvdlsjuv--
