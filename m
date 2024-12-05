@@ -1,212 +1,147 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83BA12F29;
-	Thu,  5 Dec 2024 16:23:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F253619ABC6
+	for <linux-crypto@vger.kernel.org>; Thu,  5 Dec 2024 19:51:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733415804; cv=none; b=mQg7gZW6aKL3OKiaocXmvdWHyTKYLOgylkULYWI1AqUe8GguuTo73hF+Qrw3xQu3pZ5PrTk3ibfpIoe2+xoeasbgZmHGN6KTZgpDDin+nnv/xM9v+FhFxixpEahBJdBf8PJcVa6siiSSRdycFaMwmsNj6I/jDDiojDpL94A1gMk=
+	t=1733428283; cv=none; b=CyGJG5QQ59q46ouVMHGY+ioT/u0jgP01oBsa4gfkRTsaWFMFP/fKAUwo5kTN5TaI3dh9L/+mvLz6Rl+P9jU81MBeQQWi4PKqIQLY7ip/XM+2hHZaEbf3LR2BQalLlC1l5YYYizFOA6QTcoq90SIOROSbfFcQ8IpXSqsqiiTasYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733415804; c=relaxed/simple;
-	bh=c0+yBONoIqUcd1CMVy7zpCy2ByCUVvJhbZ25BcKGAu8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XMKvj3FEuQ7rgQZipzJgT8n/EwYxGT1JS4IGfgvCyoBqWaVMmjcBjtySwsPBpJDxW089ckbk4Eu2cNMII4kL3qHn/6imfLayFxBDWkEe7It23MRFv4XFBW1fBhjbHeTVfGWKuTmbHHNdtUxqtj/gs1M57qOUaAbAoemIBB0iCgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F7ZlClNy; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1733428283; c=relaxed/simple;
+	bh=bd/rcxhI8GJ+7LgB3usB5IRB7XaD8/+ZWzOUld/X5OI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eJ1QT+QzG4qxa73mmasLpagfNO4oqyB0WWMyA+KglSb1bNZ3yq2uTVA5OoUmrvW+iZLyRpNl5sLOIFEuI/WPrHJ/pAg6F/59HxDfxfWll/q/3iLxi9U974WPBLz97FH8b2giAFAPyYfkPzUgH7aiZ0YvueH5S98Ifbbh0GWnlBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=f1fpSzAP; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F7ZlClNy"
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2155e9dcbe7so10346815ad.3;
-        Thu, 05 Dec 2024 08:23:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733415802; x=1734020602; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=PAqfpGa9rVOqgLB6DL6o2jdrTjQxsGiNSTytBROs0Ek=;
-        b=F7ZlClNywZuKRVARMjIZtn5md0uKdveLla1rXdFdUQVlnQt+HwFJfjq6qFxUeNCsFV
-         Zz9y7puWDQ7Hy+L9Zcj7QOkQeTXK7TH/jeQBQlkSuL6b9JguTy5Ak5Gy8pFXDpN9BAn0
-         BCJeJT2/wmYlgeaeQxMbMucipQgoDKFGmgXDFCoGKuocxLVGaXfcm0J2yYHMsFUMsJSb
-         zil4CaEwxNTbSX1dxALFurcey58JIlcpzXONHKgdWzSfz4G5eh84rshgK6NV4OdoKjFT
-         g3913LYzrKnvTj3dGnpyRJSpNT42gW0LQIYSi2ysslcAKAWSiyXjGY1mrj+2t0jrzIfn
-         2Gqg==
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="f1fpSzAP"
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B5HaNa5003813
+	for <linux-crypto@vger.kernel.org>; Thu, 5 Dec 2024 19:51:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	k9cm5lSjldF/HZCvqlWFShBMiLrsI/ByFg9XQ1zht7w=; b=f1fpSzAPgsGrn+65
+	Fqck3DGaTXKHhR0DbhhMX6VagqXNFSTxVwS0RFuN3i5Cyoc9oE+f+9zZ1iwS6trr
+	N3bbuVhVIxLcj9IskKLtOHaEBfzAWeRb2vq2f8RJGZ7PS4R/zX+Vwp3uJFg33evJ
+	7eJplLoaG/BGT3WDnkAx6nZcCdbyrYSdIPQJkoWggaGGuMlyL7cCKnrZIjrLoVJs
+	VkgVNx3trR6/0S2KRIsMGss+yiTh9eTHA7iQEeaGNhtK6IJKsO7SJn+jzupxkkUh
+	SkgyoadvVfxRG6Etus1iEDP4KlYZn105RUjlkN2eFyQKHewfnIS5hiMa11bljXPS
+	7AHLCA==
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com [209.85.160.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43bbqm18t5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Thu, 05 Dec 2024 19:51:21 +0000 (GMT)
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-4668cee0202so2262281cf.1
+        for <linux-crypto@vger.kernel.org>; Thu, 05 Dec 2024 11:51:20 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733415802; x=1734020602;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1733428264; x=1734033064;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PAqfpGa9rVOqgLB6DL6o2jdrTjQxsGiNSTytBROs0Ek=;
-        b=bYJHcN4Dh0e3GwjGQyvSlCNYwycxyDJYm/h5rKYM4HRB9j9yp/EE/QW4OWlCg3eKys
-         02mz6Q5TnMOHaJ9OZULt/6ShDVG7YP1qr0cPOvd7vt5wEwC/QSMTryHvN1F4ip1rRjgw
-         ETblQYupR0HjTBJzCZlKsT8czg+GzZhRsbmfoRoqKLYWKcNDJDd0SkvjglSy9JR6wbod
-         w+0G9UuYVvJ4oL8sYHKcxsaOLssxYIV7wnzIA/eM+k4edACHIcaj2uzdgwMJfcKvHvPo
-         Xz+LD5Utk557n097H8It4WsRXFUliTnmgeX5hE3DjDAkEOh3Pp9EbFBOFACNXhk3fv6G
-         wgmA==
-X-Forwarded-Encrypted: i=1; AJvYcCWsfdmk0UtPPH6CxrHUxzEtXr+eYDgp0rAL12kAPr4BE55oKaF3UodbF03gRyYws9KP0JAXcGVs9squHeM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YziypD8gEqjA/k5698KDOFKsfETpeA9AZK7JGIlNDw7xrFEIVjO
-	khu7XAwHkAfdfvqZfHw2mTs3DA/kiaFCy8TGxEw+o2YSNVlkzK7R
-X-Gm-Gg: ASbGnctd0CljZBzF0kLN6EJph6iZPGtCMVZhKf/GOvgRw1mo1O2GyEm0Ij6FUIllCme
-	vjryexepsW4amEdT39jsNe9O/0zRYMSU6gM/lTBfB63HSZul4+ifJtItPUzMGd7x9f26f20ZHMh
-	HEP0JlNBpMGtZ4Bu3od3O4QLiBgkZLfUk9bVOgtmZX+M1usmJqXHZVbUvulgdG980r00XCb+TUz
-	unwxWkn29OLxfzSGKjuHxx3Pa+wxl7HE56CTjuLR/5WhTwDNA==
-X-Google-Smtp-Source: AGHT+IEroO5R0U2TcdcxwUI+rtXUxD/qbjXmc8dcTia4MvdthH0zGd87/f4NmgvSjATGAbNFefomeA==
-X-Received: by 2002:a17:902:cf06:b0:215:352c:af5d with SMTP id d9443c01a7336-215bd11013emr135284125ad.25.1733415801562;
-        Thu, 05 Dec 2024 08:23:21 -0800 (PST)
-Received: from localhost ([216.228.125.130])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-215f8ef9fcdsm14396135ad.146.2024.12.05.08.23.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Dec 2024 08:23:21 -0800 (PST)
-Date: Thu, 5 Dec 2024 08:23:18 -0800
-From: Yury Norov <yury.norov@gmail.com>
-To: Nilay Shroff <nilay@linux.ibm.com>
-Cc: linux-kernel@vger.kernel.org, briannorris@chromium.org, kees@kernel.org,
-	nathan@kernel.org, steffen.klassert@secunet.com,
-	daniel.m.jordan@oracle.com, linux-crypto@vger.kernel.org,
-	linux@weissschuh.net, gjoyce@ibm.com
-Subject: Re: [PATCHv2] cpumask: work around false-postive stringop-overread
- errors
-Message-ID: <Z1HTdtvNjm-nZSvJ@yury-ThinkPad>
-References: <20241205123413.309388-1-nilay@linux.ibm.com>
+        bh=k9cm5lSjldF/HZCvqlWFShBMiLrsI/ByFg9XQ1zht7w=;
+        b=s4BHFca05o7CMJa0gKlI/QwxlTq/yFlfcGGmmgFsNqJhoStRPDq0ok31o4u02710s4
+         ugKtTWFIkNdCkJuhOjvbXhQy9mgqLm7V0++WT1ozmogoyy7ZtgehBH4QxiuTn72wC7ol
+         iRkrWa/t5aqS45WB77Wzc17ekfd6SdJBq2vWNSONpLUYUQEJGGtKT3h3CbfMbMIZ21WZ
+         dKqZpW+IpO+p3Xcm9l7etFrNwfpqnGpN/OuQQHRn0K3MNJpwq4vUqoJBQslLbMjD3FNd
+         UWQ9OWg7JNSdywPH/+Ero3XyGfISc5m6KvatVjXZPRS8AGsTgGCUu8u5G7vFGxo9oZpH
+         UePw==
+X-Gm-Message-State: AOJu0YxkvbaLTvMCmqonniq9iH/KAye6URDMWz3JeXFZutzVhV1pqJKG
+	AzuXqOgnImEDzXCi1WgB6XdelB/fQ2bi1TtsUgm3h9npgO3Xx+5VSe8KMXT0AgLPUqw6omQq0cA
+	cIahBX9Ih89vIHH6vhhhMXfv8L1vVRCXhVAAdSi+o1gtP5PzsxSqh2x7WjGMlE9A=
+X-Gm-Gg: ASbGncu6mFSOM0Z4rva882m/v+kHu7rKeC5fBckJU7kpFnXA5ohJOGUffryHbw/5gFt
+	WjG8vr2QxPwfXWlY3EeIrIMkUpXSO5GVKmjHTUe+SMfZmg+OdzVtS4z3StesIA/GMelzcpzEDfq
+	fo4Sk8mbNgIvzb3S3TlvJiPpXwVqEuh+MGc6a2qIfvFrjUztTSZVgU+gVq03XNbIJ3aqA+xZj4e
+	Ya9eKGl2FeDtYegNMGfZh7O+4A5x9p7ytaRRg+1+Qw9MHgRec/GPTBB0tGnohITpMkBIJt5bRfa
+	WyADvLlwZ2jUDecJM8LU//boD/sF3h0=
+X-Received: by 2002:ac8:5e46:0:b0:461:2137:ba4d with SMTP id d75a77b69052e-46734e0d25dmr3117631cf.15.1733428264015;
+        Thu, 05 Dec 2024 11:51:04 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEusIBLnVRK9pVERR8e39tkzndxRKaWZWLYk0nIvVVQfvn8maq9fL9bdBqs21dRJYgjAMhZBg==
+X-Received: by 2002:ac8:5e46:0:b0:461:2137:ba4d with SMTP id d75a77b69052e-46734e0d25dmr3117311cf.15.1733428263567;
+        Thu, 05 Dec 2024 11:51:03 -0800 (PST)
+Received: from [192.168.212.120] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aa62601b5ddsm133485666b.118.2024.12.05.11.51.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 05 Dec 2024 11:51:03 -0800 (PST)
+Message-ID: <de2ea78e-7887-43f7-a478-52e050079992@oss.qualcomm.com>
+Date: Thu, 5 Dec 2024 20:51:01 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241205123413.309388-1-nilay@linux.ibm.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH V2 2/2] arm64: dts: qcom: qcs8300: add QCrypto nodes
+To: Yuvaraj Ranganathan <quic_yrangana@quicinc.com>,
+        Thara Gopinath <thara.gopinath@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+ <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>,
+        Bhupesh Sharma <bhupesh.sharma@linaro.org>
+Cc: linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20241125111923.2218374-1-quic_yrangana@quicinc.com>
+ <20241125111923.2218374-3-quic_yrangana@quicinc.com>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <20241125111923.2218374-3-quic_yrangana@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-GUID: BcPaN-VcILCnkrG7ei-zBJZ9VLdteaXk
+X-Proofpoint-ORIG-GUID: BcPaN-VcILCnkrG7ei-zBJZ9VLdteaXk
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ lowpriorityscore=0 mlxlogscore=924 spamscore=0 adultscore=0 suspectscore=0
+ malwarescore=0 mlxscore=0 impostorscore=0 bulkscore=0 phishscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2412050148
 
-On Thu, Dec 05, 2024 at 06:04:09PM +0530, Nilay Shroff wrote:
-> While building the powerpc code using gcc 13, I came across following
-> errors generated for kernel/padata.c file:
+On 25.11.2024 12:19 PM, Yuvaraj Ranganathan wrote:
+> Add the QCE and Crypto BAM DMA nodes.
 > 
->   CC      kernel/padata.o
-> In file included from ./include/linux/string.h:390,
->                  from ./arch/powerpc/include/asm/paca.h:16,
->                  from ./arch/powerpc/include/asm/current.h:13,
->                  from ./include/linux/thread_info.h:23,
->                  from ./include/asm-generic/preempt.h:5,
->                  from ./arch/powerpc/include/generated/asm/preempt.h:1,
->                  from ./include/linux/preempt.h:79,
->                  from ./include/linux/spinlock.h:56,
->                  from ./include/linux/swait.h:7,
->                  from ./include/linux/completion.h:12,
->                  from kernel/padata.c:14:
-> In function ‘bitmap_copy’,
->     inlined from ‘cpumask_copy’ at ./include/linux/cpumask.h:839:2,
->     inlined from ‘__padata_set_cpumasks’ at kernel/padata.c:730:2:
-> ./include/linux/fortify-string.h:114:33: error: ‘__builtin_memcpy’ reading between 257 and 536870904 bytes from a region of size 256 [-Werror=stringop-overread]
->   114 | #define __underlying_memcpy     __builtin_memcpy
->       |                                 ^
-> ./include/linux/fortify-string.h:633:9: note: in expansion of macro ‘__underlying_memcpy’
->   633 |         __underlying_##op(p, q, __fortify_size);                        \
->       |         ^~~~~~~~~~~~~
-> ./include/linux/fortify-string.h:678:26: note: in expansion of macro ‘__fortify_memcpy_chk’
->   678 | #define memcpy(p, q, s)  __fortify_memcpy_chk(p, q, s,                  \
->       |                          ^~~~~~~~~~~~~~~~~~~~
-> ./include/linux/bitmap.h:259:17: note: in expansion of macro ‘memcpy’
->   259 |                 memcpy(dst, src, len);
->       |                 ^~~~~~
-> kernel/padata.c: In function ‘__padata_set_cpumasks’:
-> kernel/padata.c:713:48: note: source object ‘pcpumask’ of size [0, 256]
->   713 |                                  cpumask_var_t pcpumask,
->       |                                  ~~~~~~~~~~~~~~^~~~~~~~
-> In function ‘bitmap_copy’,
->     inlined from ‘cpumask_copy’ at ./include/linux/cpumask.h:839:2,
->     inlined from ‘__padata_set_cpumasks’ at kernel/padata.c:730:2:
-> ./include/linux/fortify-string.h:114:33: error: ‘__builtin_memcpy’ reading between 257 and 536870904 bytes from a region of size 256 [-Werror=stringop-overread]
->   114 | #define __underlying_memcpy     __builtin_memcpy
->       |                                 ^
-> ./include/linux/fortify-string.h:633:9: note: in expansion of macro ‘__underlying_memcpy’
->   633 |         __underlying_##op(p, q, __fortify_size);                        \
->       |         ^~~~~~~~~~~~~
-> ./include/linux/fortify-string.h:678:26: note: in expansion of macro ‘__fortify_memcpy_chk’
->   678 | #define memcpy(p, q, s)  __fortify_memcpy_chk(p, q, s,                  \
->       |                          ^~~~~~~~~~~~~~~~~~~~
-> ./include/linux/bitmap.h:259:17: note: in expansion of macro ‘memcpy’
->   259 |                 memcpy(dst, src, len);
->       |                 ^~~~~~
-> kernel/padata.c: In function ‘__padata_set_cpumasks’:
-> kernel/padata.c:713:48: note: source object ‘pcpumask’ of size [0, 256]
->   713 |                                  cpumask_var_t pcpumask,
->       |                                  ~~~~~~~~~~~~~~^~~~~~~~
-> 
-> Apparently, above errors only manifests with GCC 13.x and config option
-> CONFIG_FORTIFY_SOURCE. Furthermore, if I use gcc 11.x or gcc 12.x then I
-> don't encounter above errors. Prima facie, these errors appear to be false-
-
-If it works for pre-GCC13, and likely for clang, you shouldn't disable it
-for them. It should be enabled for CONFIG_FORTIFY_SOURCE=n, as well.
-
-Check config CC_NO_ARRAY_BOUNDS for an example of how versioned flags
-are implemented.
-
-> positive. Brian informed me that currently some efforts are underway by
-> GCC developers to emit more verbose information when GCC detects string
-> overflow errors and that might help to further narrow down the root cause
-> of this error.
-
-I'm 100% sure that Brian is a great person and his information is
-absolutely correct and complete. But this is just not how we write
-commit messages.
-
-Please avoid personal references, vague statements and news from
-the future.
-
-> So for now, silence these errors using -Wno-stringop-
-> overread gcc option while building kernel/padata.c file until we find the
-> root cause.
-
-You didn't provide any evidence that this warning is specific for padata.
-
-And indeed the subject states that this is a cpumasks-related warninig.
-Cpumask is a global subsystem. If you believe that this warning is
-false-positive, it may show up for any other random victim. Please
-suppress it globally.
-
-Thanks,
-Yury
-
-> 
-> Link: https://lore.kernel.org/all/7cbbd751-8332-4ab2-afa7-8c353834772a@linux.ibm.com/
-> Cc: briannorris@chromium.org
-> Cc: kees@kernel.org
-> Cc: nathan@kernel.org
-> Cc: yury.norov@gmail.com
-> Cc: steffen.klassert@secunet.com
-> Cc: daniel.m.jordan@oracle.com
-> Cc: linux-crypto@vger.kernel.org
-> Cc: linux@weissschuh.net
-> Cc: gjoyce@ibm.com
-> Reviewed-by: Brian Norris <briannorris@chromium.org>
-> Signed-off-by: Nilay Shroff <nilay@linux.ibm.com>
+> Signed-off-by: Yuvaraj Ranganathan <quic_yrangana@quicinc.com>
 > ---
-> Changes from v1:
->     - Fix spell error in the commit message (Brian Norris)
->     - Add commentary around change to note that changes are needed to
->       avoid false positive on gcc 13+ (Brian Norris)
->     - Add the kerenl/padata.c file maintainers (Brian Norris)     
-> ---
+>  arch/arm64/boot/dts/qcom/qcs8300.dtsi | 24 ++++++++++++++++++++++++
+>  1 file changed, 24 insertions(+)
 > 
->  kernel/Makefile | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/kernel/Makefile b/kernel/Makefile
-> index 87866b037fbe..03242d8870c7 100644
-> --- a/kernel/Makefile
-> +++ b/kernel/Makefile
-> @@ -120,6 +120,10 @@ obj-$(CONFIG_CFI_CLANG) += cfi.o
->  obj-$(CONFIG_PERF_EVENTS) += events/
+> diff --git a/arch/arm64/boot/dts/qcom/qcs8300.dtsi b/arch/arm64/boot/dts/qcom/qcs8300.dtsi
+> index 2c35f96c3f28..d699706638f0 100644
+> --- a/arch/arm64/boot/dts/qcom/qcs8300.dtsi
+> +++ b/arch/arm64/boot/dts/qcom/qcs8300.dtsi
+> @@ -710,6 +710,30 @@ ufs_mem_phy: phy@1d87000 {
+>  			status = "disabled";
+>  		};
 >  
->  obj-$(CONFIG_USER_RETURN_NOTIFIER) += user-return-notifier.o
+> +		cryptobam: dma-controller@1dc4000 {
+> +			compatible = "qcom,bam-v1.7.4", "qcom,bam-v1.7.0";
+> +			reg = <0x0 0x01dc4000 0x0 0x28000>;
+> +			interrupts = <GIC_SPI 272 IRQ_TYPE_LEVEL_HIGH>;
+> +			#dma-cells = <1>;
+> +			qcom,ee = <0>;
+> +			qcom,controlled-remotely;
+> +			num-channels = <20>;
+> +			qcom,num-ees = <4>;
+> +			iommus = <&apps_smmu 0x480 0x00>,
+> +				 <&apps_smmu 0x481 0x00>;
+> +		};
 > +
-> +# Silence the false positive stringop-overread errors on GCC 13+
-> +CFLAGS_padata.o += $(call cc-disable-warning, stringop-overread)
-> +
->  obj-$(CONFIG_PADATA) += padata.o
->  obj-$(CONFIG_JUMP_LABEL) += jump_label.o
->  obj-$(CONFIG_CONTEXT_TRACKING) += context_tracking.o
-> -- 
-> 2.45.2
+> +		crypto: crypto@1dfa000 {
+> +			compatible = "qcom,qcs8300-qce", "qcom,qce";
+> +			reg = <0x0 0x01dfa000 0x0 0x6000>;
+> +			dmas = <&cryptobam 4>, <&cryptobam 5>;
+> +			dma-names = "rx", "tx";
+> +			iommus = <&apps_smmu 0x480 0x00>,
+> +				 <&apps_smmu 0x481 0x00>;
+> +			interconnects = <&aggre2_noc MASTER_CRYPTO_CORE0 QCOM_ICC_TAG_ALWAYS &mc_virt SLAVE_EBI1 QCOM_ICC_TAG_ALWAYS>;
+
+Please wrap this line, see other files for an example
+
+Konrad
