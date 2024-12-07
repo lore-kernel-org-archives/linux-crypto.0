@@ -1,129 +1,70 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20F82140E30;
-	Sat,  7 Dec 2024 11:44:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ACC11DFE1;
+	Sat,  7 Dec 2024 19:05:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733571887; cv=none; b=etQLru+LEwbEA8uROfPoHZx+7jnrgNQm8QsrPUKkMzqYbh5EoC1DRJx+0Vsb8Nm2BtHKJTxmMweGX1XIwIkgPcNy9fMOfOKLLFHLe8NCAXT05CWIkTSFSUNL7vzlMoyoipl8547chIjkEqyF4GisxVjOEvdEgx3941cgV3J1pRA=
+	t=1733598327; cv=none; b=Msxj9YXbR/+ScK6CEo181akwN4o0dPp4dfp/vo5grTeg4Ltf0qgiLwKSGMv+nFU64SUPKmRvRcV2wlOBXAgWmTb0usHlrMLfofzY6XgM3L09ThOqB6dj3mFyXWc1P3Ha8iEoC5hffFfkJ/+ocXuJ1/8HBbW7hM0ZN/x5jTQK7lo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733571887; c=relaxed/simple;
-	bh=pzD+GEhU2+NKjNhpQTajOEjiaseCjjcyjSgJTaWgVDo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FiAV6H7FULmRW2/eqIeNquQeLMn5IOnGWii1eHx7ynXvNdnZvaCcySWTEhMhXvJvG47PQBaKxcSL66IMXg91lEpvV3yxu+wjVd38Jg3EgiNer/fnlh6v/qp653CoyfVVafcR3+4JKHTpZhdL9zId1/D/s4405tk95jvxrll0Nq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=EN6HytxB; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1733598327; c=relaxed/simple;
+	bh=CoXQkqHdNRrmU3BZeAsQAt3Z9wYBXxXc65c8Jvvg8fE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PRMzqj74mt0sZs2UbC4hkelaUACC8CWFf7tHfc+TxuV7DsNo6/zz8DClfjblWxaOTOjEp02rak1NfBjIQGkxkcQxPRtZObXymfdsNuTtmW9r9PusEzAWn+sF1rpkb2TMuZwmf2Wh8upzlTw2ohQMhn//snlNUdJBdblavRA7bvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IrxGrJ5r; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="EN6HytxB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D98DFC4CECD;
-	Sat,  7 Dec 2024 11:44:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1733571886;
-	bh=pzD+GEhU2+NKjNhpQTajOEjiaseCjjcyjSgJTaWgVDo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EN6HytxB0EzyLdYK23OItkSn6/KjG+eLry+YakVtLSYXnMxqdVyn1xCncctYbujR0
-	 ZncaVPqEzEMDonk3EQ6rNoHRSADO2bnEIu8/Pnt4mx+h0dyR+eCdik4kqhs4/mMkEN
-	 frSxC6Jq4EEHyAC0X0bNDQ11ZNq7/lQ+2hNdCW0A=
-Date: Sat, 7 Dec 2024 12:44:42 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Nilay Shroff <nilay@linux.ibm.com>
-Cc: linux-kernel@vger.kernel.org, briannorris@chromium.org, kees@kernel.org,
-	nathan@kernel.org, yury.norov@gmail.com,
-	steffen.klassert@secunet.com, daniel.m.jordan@oracle.com,
-	linux-crypto@vger.kernel.org, linux@weissschuh.net, gjoyce@ibm.com
-Subject: Re: [PATCHv2] cpumask: work around false-postive stringop-overread
- errors
-Message-ID: <2024120710-cahoots-obituary-d32d@gregkh>
-References: <20241205123413.309388-1-nilay@linux.ibm.com>
- <2024120757-lustrous-equinox-77f0@gregkh>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IrxGrJ5r"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6A44C4CECD;
+	Sat,  7 Dec 2024 19:05:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733598327;
+	bh=CoXQkqHdNRrmU3BZeAsQAt3Z9wYBXxXc65c8Jvvg8fE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=IrxGrJ5rslsOE4T1+rvn6dtdxRYPAn0ubJ79VVffTQsMRw6x8DG+zXgXJyPWvU8Q3
+	 hA5uBQYy0zlAXN/XeV3pJKwS0c2C9rX0z0je0299GFUHeMZmKcPVZHKYpFr6oMQeGA
+	 rPsDL9pQvu/NETU9xDnLgGNTi9cVxDeNS5S/FGx7B9NhNmqMcttBv5m2+OVYPflHUs
+	 EsvI1PEDxVYIZ3T8/4hfWh6Rw3Iux9lBQthk9IY5WB5j7MVq3wnCQYyd4TaqoH01xa
+	 Kb0BoqVqYs8VZYPg5Lm5QQTb7RCMWSHkaC1VlR0pe0Ykxmsf5QZnpLvxA61rEjXBTV
+	 A2GTVjq6sRhGw==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Andreas Larsson <andreas@gaisler.com>,
+	sparclinux@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 0/2] crypto: remove physical address support in skcipher_walk
+Date: Sat,  7 Dec 2024 11:05:01 -0800
+Message-ID: <20241207190503.53440-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <2024120757-lustrous-equinox-77f0@gregkh>
 
-On Sat, Dec 07, 2024 at 12:43:19PM +0100, Greg KH wrote:
-> On Thu, Dec 05, 2024 at 06:04:09PM +0530, Nilay Shroff wrote:
-> > While building the powerpc code using gcc 13, I came across following
-> > errors generated for kernel/padata.c file:
-> > 
-> >   CC      kernel/padata.o
-> > In file included from ./include/linux/string.h:390,
-> >                  from ./arch/powerpc/include/asm/paca.h:16,
-> >                  from ./arch/powerpc/include/asm/current.h:13,
-> >                  from ./include/linux/thread_info.h:23,
-> >                  from ./include/asm-generic/preempt.h:5,
-> >                  from ./arch/powerpc/include/generated/asm/preempt.h:1,
-> >                  from ./include/linux/preempt.h:79,
-> >                  from ./include/linux/spinlock.h:56,
-> >                  from ./include/linux/swait.h:7,
-> >                  from ./include/linux/completion.h:12,
-> >                  from kernel/padata.c:14:
-> > In function ‘bitmap_copy’,
-> >     inlined from ‘cpumask_copy’ at ./include/linux/cpumask.h:839:2,
-> >     inlined from ‘__padata_set_cpumasks’ at kernel/padata.c:730:2:
-> > ./include/linux/fortify-string.h:114:33: error: ‘__builtin_memcpy’ reading between 257 and 536870904 bytes from a region of size 256 [-Werror=stringop-overread]
-> >   114 | #define __underlying_memcpy     __builtin_memcpy
-> >       |                                 ^
-> > ./include/linux/fortify-string.h:633:9: note: in expansion of macro ‘__underlying_memcpy’
-> >   633 |         __underlying_##op(p, q, __fortify_size);                        \
-> >       |         ^~~~~~~~~~~~~
-> > ./include/linux/fortify-string.h:678:26: note: in expansion of macro ‘__fortify_memcpy_chk’
-> >   678 | #define memcpy(p, q, s)  __fortify_memcpy_chk(p, q, s,                  \
-> >       |                          ^~~~~~~~~~~~~~~~~~~~
-> > ./include/linux/bitmap.h:259:17: note: in expansion of macro ‘memcpy’
-> >   259 |                 memcpy(dst, src, len);
-> >       |                 ^~~~~~
-> > kernel/padata.c: In function ‘__padata_set_cpumasks’:
-> > kernel/padata.c:713:48: note: source object ‘pcpumask’ of size [0, 256]
-> >   713 |                                  cpumask_var_t pcpumask,
-> >       |                                  ~~~~~~~~~~~~~~^~~~~~~~
-> > In function ‘bitmap_copy’,
-> >     inlined from ‘cpumask_copy’ at ./include/linux/cpumask.h:839:2,
-> >     inlined from ‘__padata_set_cpumasks’ at kernel/padata.c:730:2:
-> > ./include/linux/fortify-string.h:114:33: error: ‘__builtin_memcpy’ reading between 257 and 536870904 bytes from a region of size 256 [-Werror=stringop-overread]
-> >   114 | #define __underlying_memcpy     __builtin_memcpy
-> >       |                                 ^
-> > ./include/linux/fortify-string.h:633:9: note: in expansion of macro ‘__underlying_memcpy’
-> >   633 |         __underlying_##op(p, q, __fortify_size);                        \
-> >       |         ^~~~~~~~~~~~~
-> > ./include/linux/fortify-string.h:678:26: note: in expansion of macro ‘__fortify_memcpy_chk’
-> >   678 | #define memcpy(p, q, s)  __fortify_memcpy_chk(p, q, s,                  \
-> >       |                          ^~~~~~~~~~~~~~~~~~~~
-> > ./include/linux/bitmap.h:259:17: note: in expansion of macro ‘memcpy’
-> >   259 |                 memcpy(dst, src, len);
-> >       |                 ^~~~~~
-> > kernel/padata.c: In function ‘__padata_set_cpumasks’:
-> > kernel/padata.c:713:48: note: source object ‘pcpumask’ of size [0, 256]
-> >   713 |                                  cpumask_var_t pcpumask,
-> >       |                                  ~~~~~~~~~~~~~~^~~~~~~~
-> > 
-> > Apparently, above errors only manifests with GCC 13.x and config option
-> > CONFIG_FORTIFY_SOURCE. Furthermore, if I use gcc 11.x or gcc 12.x then I
-> > don't encounter above errors. Prima facie, these errors appear to be false-
-> > positive. Brian informed me that currently some efforts are underway by
-> > GCC developers to emit more verbose information when GCC detects string
-> > overflow errors and that might help to further narrow down the root cause
-> > of this error. So for now, silence these errors using -Wno-stringop-
-> > overread gcc option while building kernel/padata.c file until we find the
-> > root cause.
-> 
-> I'm hitting this now on Linus's tree using gcc14 on x86-64 so this isn't
-> just a problem with your arch.
-> 
-> Let me try this patch locally and see if it helps...
+This series removes the unnecessary physical address support in
+skcipher_walk and the single obsolete driver that was using it.
 
-Yes, fixes the build for me, so either this is a real fix, or something
-else needs to be done for it, so I'll give a:
+Eric Biggers (2):
+  crypto: drivers - remove Niagara2 SPU driver
+  crypto: skcipher - remove support for physical address walks
 
-Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+ crypto/skcipher.c                  |  187 +--
+ drivers/crypto/Kconfig             |   17 -
+ drivers/crypto/Makefile            |    2 -
+ drivers/crypto/n2_asm.S            |   96 --
+ drivers/crypto/n2_core.c           | 2168 ----------------------------
+ drivers/crypto/n2_core.h           |  232 ---
+ include/crypto/internal/skcipher.h |   12 -
+ 7 files changed, 26 insertions(+), 2688 deletions(-)
+ delete mode 100644 drivers/crypto/n2_asm.S
+ delete mode 100644 drivers/crypto/n2_core.c
+ delete mode 100644 drivers/crypto/n2_core.h
 
-for now.
 
-thanks,
+base-commit: b5f217084ab3ddd4bdd03cd437f8e3b7e2d1f5b6
+-- 
+2.47.1
 
-greg k-h
