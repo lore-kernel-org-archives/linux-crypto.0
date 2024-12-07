@@ -1,30 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ACC11DFE1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD54314AD1A;
 	Sat,  7 Dec 2024 19:05:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733598327; cv=none; b=Msxj9YXbR/+ScK6CEo181akwN4o0dPp4dfp/vo5grTeg4Ltf0qgiLwKSGMv+nFU64SUPKmRvRcV2wlOBXAgWmTb0usHlrMLfofzY6XgM3L09ThOqB6dj3mFyXWc1P3Ha8iEoC5hffFfkJ/+ocXuJ1/8HBbW7hM0ZN/x5jTQK7lo=
+	t=1733598327; cv=none; b=mW/UPf7RQQRpySzI4ka82jAY2WCpPfhisC65A6QpokT595w6+NZ083oGS8SpWp6jIIzSEvtx91hKrQYiH0tre5c02PUyf6aqbIDxzErQH+qk5hM53Ki348Xs4mrcirAZrehRzlolVmY9XNlCRSOFqIHHnlZV5nwfCKRrvPVKUSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1733598327; c=relaxed/simple;
-	bh=CoXQkqHdNRrmU3BZeAsQAt3Z9wYBXxXc65c8Jvvg8fE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PRMzqj74mt0sZs2UbC4hkelaUACC8CWFf7tHfc+TxuV7DsNo6/zz8DClfjblWxaOTOjEp02rak1NfBjIQGkxkcQxPRtZObXymfdsNuTtmW9r9PusEzAWn+sF1rpkb2TMuZwmf2Wh8upzlTw2ohQMhn//snlNUdJBdblavRA7bvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IrxGrJ5r; arc=none smtp.client-ip=10.30.226.201
+	bh=ZYRtLVY9zynhqrTR34B0KoqNcj2VqghJaNI/amXYGys=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=e0hKMEsl7Qn2w1H2QH5F0P+MHqY98tWHS5HhI/vGp4L7XcDEScn2RM5PEtIiruH1jEdZgz5fv+VV/9y9GrlpNXFSF2hPHsD6aoQ4KOOqFkEVTtAEp/e2xnxOWT5T7lEg85+w73mqbb5VLuBS1Xm/g5299GQB9kRtjA6GNLsz2Nw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eltIxPT3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IrxGrJ5r"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6A44C4CECD;
-	Sat,  7 Dec 2024 19:05:26 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eltIxPT3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AFA3C4CEDC;
+	Sat,  7 Dec 2024 19:05:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1733598327;
-	bh=CoXQkqHdNRrmU3BZeAsQAt3Z9wYBXxXc65c8Jvvg8fE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=IrxGrJ5rslsOE4T1+rvn6dtdxRYPAn0ubJ79VVffTQsMRw6x8DG+zXgXJyPWvU8Q3
-	 hA5uBQYy0zlAXN/XeV3pJKwS0c2C9rX0z0je0299GFUHeMZmKcPVZHKYpFr6oMQeGA
-	 rPsDL9pQvu/NETU9xDnLgGNTi9cVxDeNS5S/FGx7B9NhNmqMcttBv5m2+OVYPflHUs
-	 EsvI1PEDxVYIZ3T8/4hfWh6Rw3Iux9lBQthk9IY5WB5j7MVq3wnCQYyd4TaqoH01xa
-	 Kb0BoqVqYs8VZYPg5Lm5QQTb7RCMWSHkaC1VlR0pe0Ykxmsf5QZnpLvxA61rEjXBTV
-	 A2GTVjq6sRhGw==
+	bh=ZYRtLVY9zynhqrTR34B0KoqNcj2VqghJaNI/amXYGys=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=eltIxPT3i62s0P0VmrynMaxXoH+DTnbMSiwlhXH6UIikCI9mdFdskfYMHVRPZdAzg
+	 +bPy6PTrE2fBFevi70zhBhcyzkMO/zsV83F2TvFpyvOvCQoRFWvgWZZS45Ss63vL16
+	 7HeVktQNMP1Hxj5EJhqBDlxNoKBGNo0edXP/O2XiCJRRKwNkFUaTDf5P3bP3nRft7V
+	 tLv5KufK9fgSLmH72XlOFytrAN6q9GqR9qk5LiMGwO6t4kN2kxV55DNip4NtFI2pV4
+	 i/oTMt19pURcQrlZdwxFKA8R82bMf3VZhI2kMjxfn9fW/WasQyEVkt7pp3Z6Y28aj+
+	 OkK4ixWg4J1dQ==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>
@@ -32,10 +33,12 @@ Cc: "David S . Miller" <davem@davemloft.net>,
 	Andreas Larsson <andreas@gaisler.com>,
 	sparclinux@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 0/2] crypto: remove physical address support in skcipher_walk
-Date: Sat,  7 Dec 2024 11:05:01 -0800
-Message-ID: <20241207190503.53440-1-ebiggers@kernel.org>
+Subject: [PATCH 1/2] crypto: drivers - remove Niagara2 SPU driver
+Date: Sat,  7 Dec 2024 11:05:02 -0800
+Message-ID: <20241207190503.53440-2-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.47.1
+In-Reply-To: <20241207190503.53440-1-ebiggers@kernel.org>
+References: <20241207190503.53440-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -44,27 +47,2617 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series removes the unnecessary physical address support in
-skcipher_walk and the single obsolete driver that was using it.
+From: Eric Biggers <ebiggers@google.com>
 
-Eric Biggers (2):
-  crypto: drivers - remove Niagara2 SPU driver
-  crypto: skcipher - remove support for physical address walks
+Remove the driver for the Stream Processing Unit (SPU) on the Niagara 2.
 
- crypto/skcipher.c                  |  187 +--
- drivers/crypto/Kconfig             |   17 -
- drivers/crypto/Makefile            |    2 -
- drivers/crypto/n2_asm.S            |   96 --
- drivers/crypto/n2_core.c           | 2168 ----------------------------
- drivers/crypto/n2_core.h           |  232 ---
- include/crypto/internal/skcipher.h |   12 -
- 7 files changed, 26 insertions(+), 2688 deletions(-)
+Removing this driver allows removing the support for physical address
+walks in skcipher_walk.  That is a misfeature that is used only by this
+driver and increases the overhead of the crypto API for everyone else.
+
+There is little evidence that anyone cares about this driver.  The
+Niagara 2, a.k.a. the UltraSPARC T2, is a server CPU released in
+2007.  The SPU is also present on the SPARC T3, released in 2010.
+However, the SPU went away in SPARC T4, released in 2012, which replaced
+it with proper cryptographic instructions instead.  These newer
+instructions are supported by the kernel in arch/sparc/crypto/.
+
+This driver was completely broken from (at least) 2015 to 2022, from
+commit 8996eafdcbad ("crypto: ahash - ensure statesize is non-zero") to
+commit 76a4e8745935 ("crypto: n2 - add missing hash statesize"), since
+its probe function always returned an error before registering any
+algorithms.  Though, even with that obvious issue fixed, it is unclear
+whether the driver now works correctly.  E.g., there are no indications
+that anyone has run the self-tests recently.
+
+One bug report for this driver in 2017
+(https://lore.kernel.org/r/nycvar.YFH.7.76.1712110214220.28416@n3.vanv.qr)
+complained that it crashed the kernel while being loaded.  The reporter
+didn't seem to care about the functionality of the driver, but rather
+just the fact that loading it crashed the kernel.  In fact not until
+2022 was the driver fixed to maybe actually register its algorithms with
+the crypto API.  The 2022 fix does have a Reported-by and Tested-by, but
+that may similarly have been just about making the error messages go
+away as opposed to someone actually wanting to use the driver.
+
+As such, it seems appropriate to retire this driver in mainline.
+
+Cc: David S. Miller <davem@davemloft.net>
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ drivers/crypto/Kconfig   |   17 -
+ drivers/crypto/Makefile  |    2 -
+ drivers/crypto/n2_asm.S  |   96 --
+ drivers/crypto/n2_core.c | 2168 --------------------------------------
+ drivers/crypto/n2_core.h |  232 ----
+ 5 files changed, 2515 deletions(-)
  delete mode 100644 drivers/crypto/n2_asm.S
  delete mode 100644 drivers/crypto/n2_core.c
  delete mode 100644 drivers/crypto/n2_core.h
 
-
-base-commit: b5f217084ab3ddd4bdd03cd437f8e3b7e2d1f5b6
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index 0a9cdd31cbd9f..19ab145f912ed 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -198,27 +198,10 @@ config S390_PRNG
+ 	  ANSI X9.17 standard. User-space programs access the
+ 	  pseudo-random-number device through the char device /dev/prandom.
+ 
+ 	  It is available as of z9.
+ 
+-config CRYPTO_DEV_NIAGARA2
+-	tristate "Niagara2 Stream Processing Unit driver"
+-	select CRYPTO_LIB_DES
+-	select CRYPTO_SKCIPHER
+-	select CRYPTO_HASH
+-	select CRYPTO_MD5
+-	select CRYPTO_SHA1
+-	select CRYPTO_SHA256
+-	depends on SPARC64
+-	help
+-	  Each core of a Niagara2 processor contains a Stream
+-	  Processing Unit, which itself contains several cryptographic
+-	  sub-units.  One set provides the Modular Arithmetic Unit,
+-	  used for SSL offload.  The other set provides the Cipher
+-	  Group, which can perform encryption, decryption, hashing,
+-	  checksumming, and raw copies.
+-
+ config CRYPTO_DEV_SL3516
+ 	tristate "Storlink SL3516 crypto offloader"
+ 	depends on ARCH_GEMINI || COMPILE_TEST
+ 	depends on HAS_IOMEM && PM
+ 	select CRYPTO_SKCIPHER
+diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
+index ad4ccef67d124..fef18ffdb1284 100644
+--- a/drivers/crypto/Makefile
++++ b/drivers/crypto/Makefile
+@@ -19,12 +19,10 @@ obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_COMMON) += caam/
+ obj-$(CONFIG_CRYPTO_DEV_GEODE) += geode-aes.o
+ obj-$(CONFIG_CRYPTO_DEV_HIFN_795X) += hifn_795x.o
+ obj-$(CONFIG_CRYPTO_DEV_IMGTEC_HASH) += img-hash.o
+ obj-$(CONFIG_CRYPTO_DEV_MARVELL) += marvell/
+ obj-$(CONFIG_CRYPTO_DEV_MXS_DCP) += mxs-dcp.o
+-obj-$(CONFIG_CRYPTO_DEV_NIAGARA2) += n2_crypto.o
+-n2_crypto-y := n2_core.o n2_asm.o
+ obj-$(CONFIG_CRYPTO_DEV_NX) += nx/
+ obj-$(CONFIG_CRYPTO_DEV_OMAP) += omap-crypto.o
+ obj-$(CONFIG_CRYPTO_DEV_OMAP_AES) += omap-aes-driver.o
+ omap-aes-driver-objs := omap-aes.o omap-aes-gcm.o
+ obj-$(CONFIG_CRYPTO_DEV_OMAP_DES) += omap-des.o
+diff --git a/drivers/crypto/n2_asm.S b/drivers/crypto/n2_asm.S
+deleted file mode 100644
+index 9a67dbf340f45..0000000000000
+--- a/drivers/crypto/n2_asm.S
++++ /dev/null
+@@ -1,96 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-/* n2_asm.S: Hypervisor calls for NCS support.
+- *
+- * Copyright (C) 2009 David S. Miller <davem@davemloft.net>
+- */
+-
+-#include <linux/linkage.h>
+-#include <asm/hypervisor.h>
+-#include "n2_core.h"
+-
+-	/* o0: queue type
+-	 * o1: RA of queue
+-	 * o2: num entries in queue
+-	 * o3: address of queue handle return
+-	 */
+-ENTRY(sun4v_ncs_qconf)
+-	mov	HV_FAST_NCS_QCONF, %o5
+-	ta	HV_FAST_TRAP
+-	stx	%o1, [%o3]
+-	retl
+-	 nop
+-ENDPROC(sun4v_ncs_qconf)
+-
+-	/* %o0: queue handle
+-	 * %o1: address of queue type return
+-	 * %o2: address of queue base address return
+-	 * %o3: address of queue num entries return
+-	 */
+-ENTRY(sun4v_ncs_qinfo)
+-	mov	%o1, %g1
+-	mov	%o2, %g2
+-	mov	%o3, %g3
+-	mov	HV_FAST_NCS_QINFO, %o5
+-	ta	HV_FAST_TRAP
+-	stx	%o1, [%g1]
+-	stx	%o2, [%g2]
+-	stx	%o3, [%g3]
+-	retl
+-	 nop
+-ENDPROC(sun4v_ncs_qinfo)
+-
+-	/* %o0: queue handle
+-	 * %o1: address of head offset return
+-	 */
+-ENTRY(sun4v_ncs_gethead)
+-	mov	%o1, %o2
+-	mov	HV_FAST_NCS_GETHEAD, %o5
+-	ta	HV_FAST_TRAP
+-	stx	%o1, [%o2]
+-	retl
+-	 nop
+-ENDPROC(sun4v_ncs_gethead)
+-
+-	/* %o0: queue handle
+-	 * %o1: address of tail offset return
+-	 */
+-ENTRY(sun4v_ncs_gettail)
+-	mov	%o1, %o2
+-	mov	HV_FAST_NCS_GETTAIL, %o5
+-	ta	HV_FAST_TRAP
+-	stx	%o1, [%o2]
+-	retl
+-	 nop
+-ENDPROC(sun4v_ncs_gettail)
+-
+-	/* %o0: queue handle
+-	 * %o1: new tail offset
+-	 */
+-ENTRY(sun4v_ncs_settail)
+-	mov	HV_FAST_NCS_SETTAIL, %o5
+-	ta	HV_FAST_TRAP
+-	retl
+-	 nop
+-ENDPROC(sun4v_ncs_settail)
+-
+-	/* %o0: queue handle
+-	 * %o1: address of devino return
+-	 */
+-ENTRY(sun4v_ncs_qhandle_to_devino)
+-	mov	%o1, %o2
+-	mov	HV_FAST_NCS_QHANDLE_TO_DEVINO, %o5
+-	ta	HV_FAST_TRAP
+-	stx	%o1, [%o2]
+-	retl
+-	 nop
+-ENDPROC(sun4v_ncs_qhandle_to_devino)
+-
+-	/* %o0: queue handle
+-	 * %o1: new head offset
+-	 */
+-ENTRY(sun4v_ncs_sethead_marker)
+-	mov	HV_FAST_NCS_SETHEAD_MARKER, %o5
+-	ta	HV_FAST_TRAP
+-	retl
+-	 nop
+-ENDPROC(sun4v_ncs_sethead_marker)
+diff --git a/drivers/crypto/n2_core.c b/drivers/crypto/n2_core.c
+deleted file mode 100644
+index 14c302d2db79b..0000000000000
+--- a/drivers/crypto/n2_core.c
++++ /dev/null
+@@ -1,2168 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-only
+-/* n2_core.c: Niagara2 Stream Processing Unit (SPU) crypto support.
+- *
+- * Copyright (C) 2010, 2011 David S. Miller <davem@davemloft.net>
+- */
+-
+-#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+-
+-#include <linux/kernel.h>
+-#include <linux/module.h>
+-#include <linux/of.h>
+-#include <linux/of_address.h>
+-#include <linux/platform_device.h>
+-#include <linux/cpumask.h>
+-#include <linux/slab.h>
+-#include <linux/interrupt.h>
+-#include <linux/crypto.h>
+-#include <crypto/md5.h>
+-#include <crypto/sha1.h>
+-#include <crypto/sha2.h>
+-#include <crypto/aes.h>
+-#include <crypto/internal/des.h>
+-#include <linux/mutex.h>
+-#include <linux/delay.h>
+-#include <linux/sched.h>
+-
+-#include <crypto/internal/hash.h>
+-#include <crypto/internal/skcipher.h>
+-#include <crypto/scatterwalk.h>
+-#include <crypto/algapi.h>
+-
+-#include <asm/hypervisor.h>
+-#include <asm/mdesc.h>
+-
+-#include "n2_core.h"
+-
+-#define DRV_MODULE_NAME		"n2_crypto"
+-#define DRV_MODULE_VERSION	"0.2"
+-#define DRV_MODULE_RELDATE	"July 28, 2011"
+-
+-static const char version[] =
+-	DRV_MODULE_NAME ".c:v" DRV_MODULE_VERSION " (" DRV_MODULE_RELDATE ")\n";
+-
+-MODULE_AUTHOR("David S. Miller <davem@davemloft.net>");
+-MODULE_DESCRIPTION("Niagara2 Crypto driver");
+-MODULE_LICENSE("GPL");
+-MODULE_VERSION(DRV_MODULE_VERSION);
+-
+-#define N2_CRA_PRIORITY		200
+-
+-static DEFINE_MUTEX(spu_lock);
+-
+-struct spu_queue {
+-	cpumask_t		sharing;
+-	unsigned long		qhandle;
+-
+-	spinlock_t		lock;
+-	u8			q_type;
+-	void			*q;
+-	unsigned long		head;
+-	unsigned long		tail;
+-	struct list_head	jobs;
+-
+-	unsigned long		devino;
+-
+-	char			irq_name[32];
+-	unsigned int		irq;
+-
+-	struct list_head	list;
+-};
+-
+-struct spu_qreg {
+-	struct spu_queue	*queue;
+-	unsigned long		type;
+-};
+-
+-static struct spu_queue **cpu_to_cwq;
+-static struct spu_queue **cpu_to_mau;
+-
+-static unsigned long spu_next_offset(struct spu_queue *q, unsigned long off)
+-{
+-	if (q->q_type == HV_NCS_QTYPE_MAU) {
+-		off += MAU_ENTRY_SIZE;
+-		if (off == (MAU_ENTRY_SIZE * MAU_NUM_ENTRIES))
+-			off = 0;
+-	} else {
+-		off += CWQ_ENTRY_SIZE;
+-		if (off == (CWQ_ENTRY_SIZE * CWQ_NUM_ENTRIES))
+-			off = 0;
+-	}
+-	return off;
+-}
+-
+-struct n2_request_common {
+-	struct list_head	entry;
+-	unsigned int		offset;
+-};
+-#define OFFSET_NOT_RUNNING	(~(unsigned int)0)
+-
+-/* An async job request records the final tail value it used in
+- * n2_request_common->offset, test to see if that offset is in
+- * the range old_head, new_head, inclusive.
+- */
+-static inline bool job_finished(struct spu_queue *q, unsigned int offset,
+-				unsigned long old_head, unsigned long new_head)
+-{
+-	if (old_head <= new_head) {
+-		if (offset > old_head && offset <= new_head)
+-			return true;
+-	} else {
+-		if (offset > old_head || offset <= new_head)
+-			return true;
+-	}
+-	return false;
+-}
+-
+-/* When the HEAD marker is unequal to the actual HEAD, we get
+- * a virtual device INO interrupt.  We should process the
+- * completed CWQ entries and adjust the HEAD marker to clear
+- * the IRQ.
+- */
+-static irqreturn_t cwq_intr(int irq, void *dev_id)
+-{
+-	unsigned long off, new_head, hv_ret;
+-	struct spu_queue *q = dev_id;
+-
+-	pr_err("CPU[%d]: Got CWQ interrupt for qhdl[%lx]\n",
+-	       smp_processor_id(), q->qhandle);
+-
+-	spin_lock(&q->lock);
+-
+-	hv_ret = sun4v_ncs_gethead(q->qhandle, &new_head);
+-
+-	pr_err("CPU[%d]: CWQ gethead[%lx] hv_ret[%lu]\n",
+-	       smp_processor_id(), new_head, hv_ret);
+-
+-	for (off = q->head; off != new_head; off = spu_next_offset(q, off)) {
+-		/* XXX ... XXX */
+-	}
+-
+-	hv_ret = sun4v_ncs_sethead_marker(q->qhandle, new_head);
+-	if (hv_ret == HV_EOK)
+-		q->head = new_head;
+-
+-	spin_unlock(&q->lock);
+-
+-	return IRQ_HANDLED;
+-}
+-
+-static irqreturn_t mau_intr(int irq, void *dev_id)
+-{
+-	struct spu_queue *q = dev_id;
+-	unsigned long head, hv_ret;
+-
+-	spin_lock(&q->lock);
+-
+-	pr_err("CPU[%d]: Got MAU interrupt for qhdl[%lx]\n",
+-	       smp_processor_id(), q->qhandle);
+-
+-	hv_ret = sun4v_ncs_gethead(q->qhandle, &head);
+-
+-	pr_err("CPU[%d]: MAU gethead[%lx] hv_ret[%lu]\n",
+-	       smp_processor_id(), head, hv_ret);
+-
+-	sun4v_ncs_sethead_marker(q->qhandle, head);
+-
+-	spin_unlock(&q->lock);
+-
+-	return IRQ_HANDLED;
+-}
+-
+-static void *spu_queue_next(struct spu_queue *q, void *cur)
+-{
+-	return q->q + spu_next_offset(q, cur - q->q);
+-}
+-
+-static int spu_queue_num_free(struct spu_queue *q)
+-{
+-	unsigned long head = q->head;
+-	unsigned long tail = q->tail;
+-	unsigned long end = (CWQ_ENTRY_SIZE * CWQ_NUM_ENTRIES);
+-	unsigned long diff;
+-
+-	if (head > tail)
+-		diff = head - tail;
+-	else
+-		diff = (end - tail) + head;
+-
+-	return (diff / CWQ_ENTRY_SIZE) - 1;
+-}
+-
+-static void *spu_queue_alloc(struct spu_queue *q, int num_entries)
+-{
+-	int avail = spu_queue_num_free(q);
+-
+-	if (avail >= num_entries)
+-		return q->q + q->tail;
+-
+-	return NULL;
+-}
+-
+-static unsigned long spu_queue_submit(struct spu_queue *q, void *last)
+-{
+-	unsigned long hv_ret, new_tail;
+-
+-	new_tail = spu_next_offset(q, last - q->q);
+-
+-	hv_ret = sun4v_ncs_settail(q->qhandle, new_tail);
+-	if (hv_ret == HV_EOK)
+-		q->tail = new_tail;
+-	return hv_ret;
+-}
+-
+-static u64 control_word_base(unsigned int len, unsigned int hmac_key_len,
+-			     int enc_type, int auth_type,
+-			     unsigned int hash_len,
+-			     bool sfas, bool sob, bool eob, bool encrypt,
+-			     int opcode)
+-{
+-	u64 word = (len - 1) & CONTROL_LEN;
+-
+-	word |= ((u64) opcode << CONTROL_OPCODE_SHIFT);
+-	word |= ((u64) enc_type << CONTROL_ENC_TYPE_SHIFT);
+-	word |= ((u64) auth_type << CONTROL_AUTH_TYPE_SHIFT);
+-	if (sfas)
+-		word |= CONTROL_STORE_FINAL_AUTH_STATE;
+-	if (sob)
+-		word |= CONTROL_START_OF_BLOCK;
+-	if (eob)
+-		word |= CONTROL_END_OF_BLOCK;
+-	if (encrypt)
+-		word |= CONTROL_ENCRYPT;
+-	if (hmac_key_len)
+-		word |= ((u64) (hmac_key_len - 1)) << CONTROL_HMAC_KEY_LEN_SHIFT;
+-	if (hash_len)
+-		word |= ((u64) (hash_len - 1)) << CONTROL_HASH_LEN_SHIFT;
+-
+-	return word;
+-}
+-
+-#if 0
+-static inline bool n2_should_run_async(struct spu_queue *qp, int this_len)
+-{
+-	if (this_len >= 64 ||
+-	    qp->head != qp->tail)
+-		return true;
+-	return false;
+-}
+-#endif
+-
+-struct n2_ahash_alg {
+-	struct list_head	entry;
+-	const u8		*hash_zero;
+-	const u8		*hash_init;
+-	u8			hw_op_hashsz;
+-	u8			digest_size;
+-	u8			auth_type;
+-	u8			hmac_type;
+-	struct ahash_alg	alg;
+-};
+-
+-static inline struct n2_ahash_alg *n2_ahash_alg(struct crypto_tfm *tfm)
+-{
+-	struct crypto_alg *alg = tfm->__crt_alg;
+-	struct ahash_alg *ahash_alg;
+-
+-	ahash_alg = container_of(alg, struct ahash_alg, halg.base);
+-
+-	return container_of(ahash_alg, struct n2_ahash_alg, alg);
+-}
+-
+-struct n2_hmac_alg {
+-	const char		*child_alg;
+-	struct n2_ahash_alg	derived;
+-};
+-
+-static inline struct n2_hmac_alg *n2_hmac_alg(struct crypto_tfm *tfm)
+-{
+-	struct crypto_alg *alg = tfm->__crt_alg;
+-	struct ahash_alg *ahash_alg;
+-
+-	ahash_alg = container_of(alg, struct ahash_alg, halg.base);
+-
+-	return container_of(ahash_alg, struct n2_hmac_alg, derived.alg);
+-}
+-
+-struct n2_hash_ctx {
+-	struct crypto_ahash		*fallback_tfm;
+-};
+-
+-#define N2_HASH_KEY_MAX			32 /* HW limit for all HMAC requests */
+-
+-struct n2_hmac_ctx {
+-	struct n2_hash_ctx		base;
+-
+-	struct crypto_shash		*child_shash;
+-
+-	int				hash_key_len;
+-	unsigned char			hash_key[N2_HASH_KEY_MAX];
+-};
+-
+-struct n2_hash_req_ctx {
+-	union {
+-		struct md5_state	md5;
+-		struct sha1_state	sha1;
+-		struct sha256_state	sha256;
+-	} u;
+-
+-	struct ahash_request		fallback_req;
+-};
+-
+-static int n2_hash_async_init(struct ahash_request *req)
+-{
+-	struct n2_hash_req_ctx *rctx = ahash_request_ctx(req);
+-	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+-	struct n2_hash_ctx *ctx = crypto_ahash_ctx(tfm);
+-
+-	ahash_request_set_tfm(&rctx->fallback_req, ctx->fallback_tfm);
+-	rctx->fallback_req.base.flags = req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP;
+-
+-	return crypto_ahash_init(&rctx->fallback_req);
+-}
+-
+-static int n2_hash_async_update(struct ahash_request *req)
+-{
+-	struct n2_hash_req_ctx *rctx = ahash_request_ctx(req);
+-	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+-	struct n2_hash_ctx *ctx = crypto_ahash_ctx(tfm);
+-
+-	ahash_request_set_tfm(&rctx->fallback_req, ctx->fallback_tfm);
+-	rctx->fallback_req.base.flags = req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP;
+-	rctx->fallback_req.nbytes = req->nbytes;
+-	rctx->fallback_req.src = req->src;
+-
+-	return crypto_ahash_update(&rctx->fallback_req);
+-}
+-
+-static int n2_hash_async_final(struct ahash_request *req)
+-{
+-	struct n2_hash_req_ctx *rctx = ahash_request_ctx(req);
+-	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+-	struct n2_hash_ctx *ctx = crypto_ahash_ctx(tfm);
+-
+-	ahash_request_set_tfm(&rctx->fallback_req, ctx->fallback_tfm);
+-	rctx->fallback_req.base.flags = req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP;
+-	rctx->fallback_req.result = req->result;
+-
+-	return crypto_ahash_final(&rctx->fallback_req);
+-}
+-
+-static int n2_hash_async_finup(struct ahash_request *req)
+-{
+-	struct n2_hash_req_ctx *rctx = ahash_request_ctx(req);
+-	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+-	struct n2_hash_ctx *ctx = crypto_ahash_ctx(tfm);
+-
+-	ahash_request_set_tfm(&rctx->fallback_req, ctx->fallback_tfm);
+-	rctx->fallback_req.base.flags = req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP;
+-	rctx->fallback_req.nbytes = req->nbytes;
+-	rctx->fallback_req.src = req->src;
+-	rctx->fallback_req.result = req->result;
+-
+-	return crypto_ahash_finup(&rctx->fallback_req);
+-}
+-
+-static int n2_hash_async_noimport(struct ahash_request *req, const void *in)
+-{
+-	return -ENOSYS;
+-}
+-
+-static int n2_hash_async_noexport(struct ahash_request *req, void *out)
+-{
+-	return -ENOSYS;
+-}
+-
+-static int n2_hash_cra_init(struct crypto_tfm *tfm)
+-{
+-	const char *fallback_driver_name = crypto_tfm_alg_name(tfm);
+-	struct crypto_ahash *ahash = __crypto_ahash_cast(tfm);
+-	struct n2_hash_ctx *ctx = crypto_ahash_ctx(ahash);
+-	struct crypto_ahash *fallback_tfm;
+-	int err;
+-
+-	fallback_tfm = crypto_alloc_ahash(fallback_driver_name, 0,
+-					  CRYPTO_ALG_NEED_FALLBACK);
+-	if (IS_ERR(fallback_tfm)) {
+-		pr_warn("Fallback driver '%s' could not be loaded!\n",
+-			fallback_driver_name);
+-		err = PTR_ERR(fallback_tfm);
+-		goto out;
+-	}
+-
+-	crypto_ahash_set_reqsize(ahash, (sizeof(struct n2_hash_req_ctx) +
+-					 crypto_ahash_reqsize(fallback_tfm)));
+-
+-	ctx->fallback_tfm = fallback_tfm;
+-	return 0;
+-
+-out:
+-	return err;
+-}
+-
+-static void n2_hash_cra_exit(struct crypto_tfm *tfm)
+-{
+-	struct crypto_ahash *ahash = __crypto_ahash_cast(tfm);
+-	struct n2_hash_ctx *ctx = crypto_ahash_ctx(ahash);
+-
+-	crypto_free_ahash(ctx->fallback_tfm);
+-}
+-
+-static int n2_hmac_cra_init(struct crypto_tfm *tfm)
+-{
+-	const char *fallback_driver_name = crypto_tfm_alg_name(tfm);
+-	struct crypto_ahash *ahash = __crypto_ahash_cast(tfm);
+-	struct n2_hmac_ctx *ctx = crypto_ahash_ctx(ahash);
+-	struct n2_hmac_alg *n2alg = n2_hmac_alg(tfm);
+-	struct crypto_ahash *fallback_tfm;
+-	struct crypto_shash *child_shash;
+-	int err;
+-
+-	fallback_tfm = crypto_alloc_ahash(fallback_driver_name, 0,
+-					  CRYPTO_ALG_NEED_FALLBACK);
+-	if (IS_ERR(fallback_tfm)) {
+-		pr_warn("Fallback driver '%s' could not be loaded!\n",
+-			fallback_driver_name);
+-		err = PTR_ERR(fallback_tfm);
+-		goto out;
+-	}
+-
+-	child_shash = crypto_alloc_shash(n2alg->child_alg, 0, 0);
+-	if (IS_ERR(child_shash)) {
+-		pr_warn("Child shash '%s' could not be loaded!\n",
+-			n2alg->child_alg);
+-		err = PTR_ERR(child_shash);
+-		goto out_free_fallback;
+-	}
+-
+-	crypto_ahash_set_reqsize(ahash, (sizeof(struct n2_hash_req_ctx) +
+-					 crypto_ahash_reqsize(fallback_tfm)));
+-
+-	ctx->child_shash = child_shash;
+-	ctx->base.fallback_tfm = fallback_tfm;
+-	return 0;
+-
+-out_free_fallback:
+-	crypto_free_ahash(fallback_tfm);
+-
+-out:
+-	return err;
+-}
+-
+-static void n2_hmac_cra_exit(struct crypto_tfm *tfm)
+-{
+-	struct crypto_ahash *ahash = __crypto_ahash_cast(tfm);
+-	struct n2_hmac_ctx *ctx = crypto_ahash_ctx(ahash);
+-
+-	crypto_free_ahash(ctx->base.fallback_tfm);
+-	crypto_free_shash(ctx->child_shash);
+-}
+-
+-static int n2_hmac_async_setkey(struct crypto_ahash *tfm, const u8 *key,
+-				unsigned int keylen)
+-{
+-	struct n2_hmac_ctx *ctx = crypto_ahash_ctx(tfm);
+-	struct crypto_shash *child_shash = ctx->child_shash;
+-	struct crypto_ahash *fallback_tfm;
+-	int err, bs, ds;
+-
+-	fallback_tfm = ctx->base.fallback_tfm;
+-	err = crypto_ahash_setkey(fallback_tfm, key, keylen);
+-	if (err)
+-		return err;
+-
+-	bs = crypto_shash_blocksize(child_shash);
+-	ds = crypto_shash_digestsize(child_shash);
+-	BUG_ON(ds > N2_HASH_KEY_MAX);
+-	if (keylen > bs) {
+-		err = crypto_shash_tfm_digest(child_shash, key, keylen,
+-					      ctx->hash_key);
+-		if (err)
+-			return err;
+-		keylen = ds;
+-	} else if (keylen <= N2_HASH_KEY_MAX)
+-		memcpy(ctx->hash_key, key, keylen);
+-
+-	ctx->hash_key_len = keylen;
+-
+-	return err;
+-}
+-
+-static unsigned long wait_for_tail(struct spu_queue *qp)
+-{
+-	unsigned long head, hv_ret;
+-
+-	do {
+-		hv_ret = sun4v_ncs_gethead(qp->qhandle, &head);
+-		if (hv_ret != HV_EOK) {
+-			pr_err("Hypervisor error on gethead\n");
+-			break;
+-		}
+-		if (head == qp->tail) {
+-			qp->head = head;
+-			break;
+-		}
+-	} while (1);
+-	return hv_ret;
+-}
+-
+-static unsigned long submit_and_wait_for_tail(struct spu_queue *qp,
+-					      struct cwq_initial_entry *ent)
+-{
+-	unsigned long hv_ret = spu_queue_submit(qp, ent);
+-
+-	if (hv_ret == HV_EOK)
+-		hv_ret = wait_for_tail(qp);
+-
+-	return hv_ret;
+-}
+-
+-static int n2_do_async_digest(struct ahash_request *req,
+-			      unsigned int auth_type, unsigned int digest_size,
+-			      unsigned int result_size, void *hash_loc,
+-			      unsigned long auth_key, unsigned int auth_key_len)
+-{
+-	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+-	struct cwq_initial_entry *ent;
+-	struct crypto_hash_walk walk;
+-	struct spu_queue *qp;
+-	unsigned long flags;
+-	int err = -ENODEV;
+-	int nbytes, cpu;
+-
+-	/* The total effective length of the operation may not
+-	 * exceed 2^16.
+-	 */
+-	if (unlikely(req->nbytes > (1 << 16))) {
+-		struct n2_hash_req_ctx *rctx = ahash_request_ctx(req);
+-		struct n2_hash_ctx *ctx = crypto_ahash_ctx(tfm);
+-
+-		ahash_request_set_tfm(&rctx->fallback_req, ctx->fallback_tfm);
+-		rctx->fallback_req.base.flags =
+-			req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP;
+-		rctx->fallback_req.nbytes = req->nbytes;
+-		rctx->fallback_req.src = req->src;
+-		rctx->fallback_req.result = req->result;
+-
+-		return crypto_ahash_digest(&rctx->fallback_req);
+-	}
+-
+-	nbytes = crypto_hash_walk_first(req, &walk);
+-
+-	cpu = get_cpu();
+-	qp = cpu_to_cwq[cpu];
+-	if (!qp)
+-		goto out;
+-
+-	spin_lock_irqsave(&qp->lock, flags);
+-
+-	/* XXX can do better, improve this later by doing a by-hand scatterlist
+-	 * XXX walk, etc.
+-	 */
+-	ent = qp->q + qp->tail;
+-
+-	ent->control = control_word_base(nbytes, auth_key_len, 0,
+-					 auth_type, digest_size,
+-					 false, true, false, false,
+-					 OPCODE_INPLACE_BIT |
+-					 OPCODE_AUTH_MAC);
+-	ent->src_addr = __pa(walk.data);
+-	ent->auth_key_addr = auth_key;
+-	ent->auth_iv_addr = __pa(hash_loc);
+-	ent->final_auth_state_addr = 0UL;
+-	ent->enc_key_addr = 0UL;
+-	ent->enc_iv_addr = 0UL;
+-	ent->dest_addr = __pa(hash_loc);
+-
+-	nbytes = crypto_hash_walk_done(&walk, 0);
+-	while (nbytes > 0) {
+-		ent = spu_queue_next(qp, ent);
+-
+-		ent->control = (nbytes - 1);
+-		ent->src_addr = __pa(walk.data);
+-		ent->auth_key_addr = 0UL;
+-		ent->auth_iv_addr = 0UL;
+-		ent->final_auth_state_addr = 0UL;
+-		ent->enc_key_addr = 0UL;
+-		ent->enc_iv_addr = 0UL;
+-		ent->dest_addr = 0UL;
+-
+-		nbytes = crypto_hash_walk_done(&walk, 0);
+-	}
+-	ent->control |= CONTROL_END_OF_BLOCK;
+-
+-	if (submit_and_wait_for_tail(qp, ent) != HV_EOK)
+-		err = -EINVAL;
+-	else
+-		err = 0;
+-
+-	spin_unlock_irqrestore(&qp->lock, flags);
+-
+-	if (!err)
+-		memcpy(req->result, hash_loc, result_size);
+-out:
+-	put_cpu();
+-
+-	return err;
+-}
+-
+-static int n2_hash_async_digest(struct ahash_request *req)
+-{
+-	struct n2_ahash_alg *n2alg = n2_ahash_alg(req->base.tfm);
+-	struct n2_hash_req_ctx *rctx = ahash_request_ctx(req);
+-	int ds;
+-
+-	ds = n2alg->digest_size;
+-	if (unlikely(req->nbytes == 0)) {
+-		memcpy(req->result, n2alg->hash_zero, ds);
+-		return 0;
+-	}
+-	memcpy(&rctx->u, n2alg->hash_init, n2alg->hw_op_hashsz);
+-
+-	return n2_do_async_digest(req, n2alg->auth_type,
+-				  n2alg->hw_op_hashsz, ds,
+-				  &rctx->u, 0UL, 0);
+-}
+-
+-static int n2_hmac_async_digest(struct ahash_request *req)
+-{
+-	struct n2_hmac_alg *n2alg = n2_hmac_alg(req->base.tfm);
+-	struct n2_hash_req_ctx *rctx = ahash_request_ctx(req);
+-	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+-	struct n2_hmac_ctx *ctx = crypto_ahash_ctx(tfm);
+-	int ds;
+-
+-	ds = n2alg->derived.digest_size;
+-	if (unlikely(req->nbytes == 0) ||
+-	    unlikely(ctx->hash_key_len > N2_HASH_KEY_MAX)) {
+-		struct n2_hash_req_ctx *rctx = ahash_request_ctx(req);
+-		struct n2_hash_ctx *ctx = crypto_ahash_ctx(tfm);
+-
+-		ahash_request_set_tfm(&rctx->fallback_req, ctx->fallback_tfm);
+-		rctx->fallback_req.base.flags =
+-			req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP;
+-		rctx->fallback_req.nbytes = req->nbytes;
+-		rctx->fallback_req.src = req->src;
+-		rctx->fallback_req.result = req->result;
+-
+-		return crypto_ahash_digest(&rctx->fallback_req);
+-	}
+-	memcpy(&rctx->u, n2alg->derived.hash_init,
+-	       n2alg->derived.hw_op_hashsz);
+-
+-	return n2_do_async_digest(req, n2alg->derived.hmac_type,
+-				  n2alg->derived.hw_op_hashsz, ds,
+-				  &rctx->u,
+-				  __pa(&ctx->hash_key),
+-				  ctx->hash_key_len);
+-}
+-
+-struct n2_skcipher_context {
+-	int			key_len;
+-	int			enc_type;
+-	union {
+-		u8		aes[AES_MAX_KEY_SIZE];
+-		u8		des[DES_KEY_SIZE];
+-		u8		des3[3 * DES_KEY_SIZE];
+-	} key;
+-};
+-
+-#define N2_CHUNK_ARR_LEN	16
+-
+-struct n2_crypto_chunk {
+-	struct list_head	entry;
+-	unsigned long		iv_paddr : 44;
+-	unsigned long		arr_len : 20;
+-	unsigned long		dest_paddr;
+-	unsigned long		dest_final;
+-	struct {
+-		unsigned long	src_paddr : 44;
+-		unsigned long	src_len : 20;
+-	} arr[N2_CHUNK_ARR_LEN];
+-};
+-
+-struct n2_request_context {
+-	struct skcipher_walk	walk;
+-	struct list_head	chunk_list;
+-	struct n2_crypto_chunk	chunk;
+-	u8			temp_iv[16];
+-};
+-
+-/* The SPU allows some level of flexibility for partial cipher blocks
+- * being specified in a descriptor.
+- *
+- * It merely requires that every descriptor's length field is at least
+- * as large as the cipher block size.  This means that a cipher block
+- * can span at most 2 descriptors.  However, this does not allow a
+- * partial block to span into the final descriptor as that would
+- * violate the rule (since every descriptor's length must be at lest
+- * the block size).  So, for example, assuming an 8 byte block size:
+- *
+- *	0xe --> 0xa --> 0x8
+- *
+- * is a valid length sequence, whereas:
+- *
+- *	0xe --> 0xb --> 0x7
+- *
+- * is not a valid sequence.
+- */
+-
+-struct n2_skcipher_alg {
+-	struct list_head	entry;
+-	u8			enc_type;
+-	struct skcipher_alg	skcipher;
+-};
+-
+-static inline struct n2_skcipher_alg *n2_skcipher_alg(struct crypto_skcipher *tfm)
+-{
+-	struct skcipher_alg *alg = crypto_skcipher_alg(tfm);
+-
+-	return container_of(alg, struct n2_skcipher_alg, skcipher);
+-}
+-
+-static int n2_aes_setkey(struct crypto_skcipher *skcipher, const u8 *key,
+-			 unsigned int keylen)
+-{
+-	struct crypto_tfm *tfm = crypto_skcipher_tfm(skcipher);
+-	struct n2_skcipher_context *ctx = crypto_tfm_ctx(tfm);
+-	struct n2_skcipher_alg *n2alg = n2_skcipher_alg(skcipher);
+-
+-	ctx->enc_type = (n2alg->enc_type & ENC_TYPE_CHAINING_MASK);
+-
+-	switch (keylen) {
+-	case AES_KEYSIZE_128:
+-		ctx->enc_type |= ENC_TYPE_ALG_AES128;
+-		break;
+-	case AES_KEYSIZE_192:
+-		ctx->enc_type |= ENC_TYPE_ALG_AES192;
+-		break;
+-	case AES_KEYSIZE_256:
+-		ctx->enc_type |= ENC_TYPE_ALG_AES256;
+-		break;
+-	default:
+-		return -EINVAL;
+-	}
+-
+-	ctx->key_len = keylen;
+-	memcpy(ctx->key.aes, key, keylen);
+-	return 0;
+-}
+-
+-static int n2_des_setkey(struct crypto_skcipher *skcipher, const u8 *key,
+-			 unsigned int keylen)
+-{
+-	struct crypto_tfm *tfm = crypto_skcipher_tfm(skcipher);
+-	struct n2_skcipher_context *ctx = crypto_tfm_ctx(tfm);
+-	struct n2_skcipher_alg *n2alg = n2_skcipher_alg(skcipher);
+-	int err;
+-
+-	err = verify_skcipher_des_key(skcipher, key);
+-	if (err)
+-		return err;
+-
+-	ctx->enc_type = n2alg->enc_type;
+-
+-	ctx->key_len = keylen;
+-	memcpy(ctx->key.des, key, keylen);
+-	return 0;
+-}
+-
+-static int n2_3des_setkey(struct crypto_skcipher *skcipher, const u8 *key,
+-			  unsigned int keylen)
+-{
+-	struct crypto_tfm *tfm = crypto_skcipher_tfm(skcipher);
+-	struct n2_skcipher_context *ctx = crypto_tfm_ctx(tfm);
+-	struct n2_skcipher_alg *n2alg = n2_skcipher_alg(skcipher);
+-	int err;
+-
+-	err = verify_skcipher_des3_key(skcipher, key);
+-	if (err)
+-		return err;
+-
+-	ctx->enc_type = n2alg->enc_type;
+-
+-	ctx->key_len = keylen;
+-	memcpy(ctx->key.des3, key, keylen);
+-	return 0;
+-}
+-
+-static inline int skcipher_descriptor_len(int nbytes, unsigned int block_size)
+-{
+-	int this_len = nbytes;
+-
+-	this_len -= (nbytes & (block_size - 1));
+-	return this_len > (1 << 16) ? (1 << 16) : this_len;
+-}
+-
+-static int __n2_crypt_chunk(struct crypto_skcipher *skcipher,
+-			    struct n2_crypto_chunk *cp,
+-			    struct spu_queue *qp, bool encrypt)
+-{
+-	struct n2_skcipher_context *ctx = crypto_skcipher_ctx(skcipher);
+-	struct cwq_initial_entry *ent;
+-	bool in_place;
+-	int i;
+-
+-	ent = spu_queue_alloc(qp, cp->arr_len);
+-	if (!ent) {
+-		pr_info("queue_alloc() of %d fails\n",
+-			cp->arr_len);
+-		return -EBUSY;
+-	}
+-
+-	in_place = (cp->dest_paddr == cp->arr[0].src_paddr);
+-
+-	ent->control = control_word_base(cp->arr[0].src_len,
+-					 0, ctx->enc_type, 0, 0,
+-					 false, true, false, encrypt,
+-					 OPCODE_ENCRYPT |
+-					 (in_place ? OPCODE_INPLACE_BIT : 0));
+-	ent->src_addr = cp->arr[0].src_paddr;
+-	ent->auth_key_addr = 0UL;
+-	ent->auth_iv_addr = 0UL;
+-	ent->final_auth_state_addr = 0UL;
+-	ent->enc_key_addr = __pa(&ctx->key);
+-	ent->enc_iv_addr = cp->iv_paddr;
+-	ent->dest_addr = (in_place ? 0UL : cp->dest_paddr);
+-
+-	for (i = 1; i < cp->arr_len; i++) {
+-		ent = spu_queue_next(qp, ent);
+-
+-		ent->control = cp->arr[i].src_len - 1;
+-		ent->src_addr = cp->arr[i].src_paddr;
+-		ent->auth_key_addr = 0UL;
+-		ent->auth_iv_addr = 0UL;
+-		ent->final_auth_state_addr = 0UL;
+-		ent->enc_key_addr = 0UL;
+-		ent->enc_iv_addr = 0UL;
+-		ent->dest_addr = 0UL;
+-	}
+-	ent->control |= CONTROL_END_OF_BLOCK;
+-
+-	return (spu_queue_submit(qp, ent) != HV_EOK) ? -EINVAL : 0;
+-}
+-
+-static int n2_compute_chunks(struct skcipher_request *req)
+-{
+-	struct n2_request_context *rctx = skcipher_request_ctx(req);
+-	struct skcipher_walk *walk = &rctx->walk;
+-	struct n2_crypto_chunk *chunk;
+-	unsigned long dest_prev;
+-	unsigned int tot_len;
+-	bool prev_in_place;
+-	int err, nbytes;
+-
+-	err = skcipher_walk_async(walk, req);
+-	if (err)
+-		return err;
+-
+-	INIT_LIST_HEAD(&rctx->chunk_list);
+-
+-	chunk = &rctx->chunk;
+-	INIT_LIST_HEAD(&chunk->entry);
+-
+-	chunk->iv_paddr = 0UL;
+-	chunk->arr_len = 0;
+-	chunk->dest_paddr = 0UL;
+-
+-	prev_in_place = false;
+-	dest_prev = ~0UL;
+-	tot_len = 0;
+-
+-	while ((nbytes = walk->nbytes) != 0) {
+-		unsigned long dest_paddr, src_paddr;
+-		bool in_place;
+-		int this_len;
+-
+-		src_paddr = (page_to_phys(walk->src.phys.page) +
+-			     walk->src.phys.offset);
+-		dest_paddr = (page_to_phys(walk->dst.phys.page) +
+-			      walk->dst.phys.offset);
+-		in_place = (src_paddr == dest_paddr);
+-		this_len = skcipher_descriptor_len(nbytes, walk->blocksize);
+-
+-		if (chunk->arr_len != 0) {
+-			if (in_place != prev_in_place ||
+-			    (!prev_in_place &&
+-			     dest_paddr != dest_prev) ||
+-			    chunk->arr_len == N2_CHUNK_ARR_LEN ||
+-			    tot_len + this_len > (1 << 16)) {
+-				chunk->dest_final = dest_prev;
+-				list_add_tail(&chunk->entry,
+-					      &rctx->chunk_list);
+-				chunk = kzalloc(sizeof(*chunk), GFP_ATOMIC);
+-				if (!chunk) {
+-					err = -ENOMEM;
+-					break;
+-				}
+-				INIT_LIST_HEAD(&chunk->entry);
+-			}
+-		}
+-		if (chunk->arr_len == 0) {
+-			chunk->dest_paddr = dest_paddr;
+-			tot_len = 0;
+-		}
+-		chunk->arr[chunk->arr_len].src_paddr = src_paddr;
+-		chunk->arr[chunk->arr_len].src_len = this_len;
+-		chunk->arr_len++;
+-
+-		dest_prev = dest_paddr + this_len;
+-		prev_in_place = in_place;
+-		tot_len += this_len;
+-
+-		err = skcipher_walk_done(walk, nbytes - this_len);
+-		if (err)
+-			break;
+-	}
+-	if (!err && chunk->arr_len != 0) {
+-		chunk->dest_final = dest_prev;
+-		list_add_tail(&chunk->entry, &rctx->chunk_list);
+-	}
+-
+-	return err;
+-}
+-
+-static void n2_chunk_complete(struct skcipher_request *req, void *final_iv)
+-{
+-	struct n2_request_context *rctx = skcipher_request_ctx(req);
+-	struct n2_crypto_chunk *c, *tmp;
+-
+-	if (final_iv)
+-		memcpy(rctx->walk.iv, final_iv, rctx->walk.blocksize);
+-
+-	list_for_each_entry_safe(c, tmp, &rctx->chunk_list, entry) {
+-		list_del(&c->entry);
+-		if (unlikely(c != &rctx->chunk))
+-			kfree(c);
+-	}
+-
+-}
+-
+-static int n2_do_ecb(struct skcipher_request *req, bool encrypt)
+-{
+-	struct n2_request_context *rctx = skcipher_request_ctx(req);
+-	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+-	int err = n2_compute_chunks(req);
+-	struct n2_crypto_chunk *c, *tmp;
+-	unsigned long flags, hv_ret;
+-	struct spu_queue *qp;
+-
+-	if (err)
+-		return err;
+-
+-	qp = cpu_to_cwq[get_cpu()];
+-	err = -ENODEV;
+-	if (!qp)
+-		goto out;
+-
+-	spin_lock_irqsave(&qp->lock, flags);
+-
+-	list_for_each_entry_safe(c, tmp, &rctx->chunk_list, entry) {
+-		err = __n2_crypt_chunk(tfm, c, qp, encrypt);
+-		if (err)
+-			break;
+-		list_del(&c->entry);
+-		if (unlikely(c != &rctx->chunk))
+-			kfree(c);
+-	}
+-	if (!err) {
+-		hv_ret = wait_for_tail(qp);
+-		if (hv_ret != HV_EOK)
+-			err = -EINVAL;
+-	}
+-
+-	spin_unlock_irqrestore(&qp->lock, flags);
+-
+-out:
+-	put_cpu();
+-
+-	n2_chunk_complete(req, NULL);
+-	return err;
+-}
+-
+-static int n2_encrypt_ecb(struct skcipher_request *req)
+-{
+-	return n2_do_ecb(req, true);
+-}
+-
+-static int n2_decrypt_ecb(struct skcipher_request *req)
+-{
+-	return n2_do_ecb(req, false);
+-}
+-
+-static int n2_do_chaining(struct skcipher_request *req, bool encrypt)
+-{
+-	struct n2_request_context *rctx = skcipher_request_ctx(req);
+-	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+-	unsigned long flags, hv_ret, iv_paddr;
+-	int err = n2_compute_chunks(req);
+-	struct n2_crypto_chunk *c, *tmp;
+-	struct spu_queue *qp;
+-	void *final_iv_addr;
+-
+-	final_iv_addr = NULL;
+-
+-	if (err)
+-		return err;
+-
+-	qp = cpu_to_cwq[get_cpu()];
+-	err = -ENODEV;
+-	if (!qp)
+-		goto out;
+-
+-	spin_lock_irqsave(&qp->lock, flags);
+-
+-	if (encrypt) {
+-		iv_paddr = __pa(rctx->walk.iv);
+-		list_for_each_entry_safe(c, tmp, &rctx->chunk_list,
+-					 entry) {
+-			c->iv_paddr = iv_paddr;
+-			err = __n2_crypt_chunk(tfm, c, qp, true);
+-			if (err)
+-				break;
+-			iv_paddr = c->dest_final - rctx->walk.blocksize;
+-			list_del(&c->entry);
+-			if (unlikely(c != &rctx->chunk))
+-				kfree(c);
+-		}
+-		final_iv_addr = __va(iv_paddr);
+-	} else {
+-		list_for_each_entry_safe_reverse(c, tmp, &rctx->chunk_list,
+-						 entry) {
+-			if (c == &rctx->chunk) {
+-				iv_paddr = __pa(rctx->walk.iv);
+-			} else {
+-				iv_paddr = (tmp->arr[tmp->arr_len-1].src_paddr +
+-					    tmp->arr[tmp->arr_len-1].src_len -
+-					    rctx->walk.blocksize);
+-			}
+-			if (!final_iv_addr) {
+-				unsigned long pa;
+-
+-				pa = (c->arr[c->arr_len-1].src_paddr +
+-				      c->arr[c->arr_len-1].src_len -
+-				      rctx->walk.blocksize);
+-				final_iv_addr = rctx->temp_iv;
+-				memcpy(rctx->temp_iv, __va(pa),
+-				       rctx->walk.blocksize);
+-			}
+-			c->iv_paddr = iv_paddr;
+-			err = __n2_crypt_chunk(tfm, c, qp, false);
+-			if (err)
+-				break;
+-			list_del(&c->entry);
+-			if (unlikely(c != &rctx->chunk))
+-				kfree(c);
+-		}
+-	}
+-	if (!err) {
+-		hv_ret = wait_for_tail(qp);
+-		if (hv_ret != HV_EOK)
+-			err = -EINVAL;
+-	}
+-
+-	spin_unlock_irqrestore(&qp->lock, flags);
+-
+-out:
+-	put_cpu();
+-
+-	n2_chunk_complete(req, err ? NULL : final_iv_addr);
+-	return err;
+-}
+-
+-static int n2_encrypt_chaining(struct skcipher_request *req)
+-{
+-	return n2_do_chaining(req, true);
+-}
+-
+-static int n2_decrypt_chaining(struct skcipher_request *req)
+-{
+-	return n2_do_chaining(req, false);
+-}
+-
+-struct n2_skcipher_tmpl {
+-	const char		*name;
+-	const char		*drv_name;
+-	u8			block_size;
+-	u8			enc_type;
+-	struct skcipher_alg	skcipher;
+-};
+-
+-static const struct n2_skcipher_tmpl skcipher_tmpls[] = {
+-	/* DES: ECB CBC and CFB are supported */
+-	{	.name		= "ecb(des)",
+-		.drv_name	= "ecb-des",
+-		.block_size	= DES_BLOCK_SIZE,
+-		.enc_type	= (ENC_TYPE_ALG_DES |
+-				   ENC_TYPE_CHAINING_ECB),
+-		.skcipher	= {
+-			.min_keysize	= DES_KEY_SIZE,
+-			.max_keysize	= DES_KEY_SIZE,
+-			.setkey		= n2_des_setkey,
+-			.encrypt	= n2_encrypt_ecb,
+-			.decrypt	= n2_decrypt_ecb,
+-		},
+-	},
+-	{	.name		= "cbc(des)",
+-		.drv_name	= "cbc-des",
+-		.block_size	= DES_BLOCK_SIZE,
+-		.enc_type	= (ENC_TYPE_ALG_DES |
+-				   ENC_TYPE_CHAINING_CBC),
+-		.skcipher	= {
+-			.ivsize		= DES_BLOCK_SIZE,
+-			.min_keysize	= DES_KEY_SIZE,
+-			.max_keysize	= DES_KEY_SIZE,
+-			.setkey		= n2_des_setkey,
+-			.encrypt	= n2_encrypt_chaining,
+-			.decrypt	= n2_decrypt_chaining,
+-		},
+-	},
+-
+-	/* 3DES: ECB CBC and CFB are supported */
+-	{	.name		= "ecb(des3_ede)",
+-		.drv_name	= "ecb-3des",
+-		.block_size	= DES_BLOCK_SIZE,
+-		.enc_type	= (ENC_TYPE_ALG_3DES |
+-				   ENC_TYPE_CHAINING_ECB),
+-		.skcipher	= {
+-			.min_keysize	= 3 * DES_KEY_SIZE,
+-			.max_keysize	= 3 * DES_KEY_SIZE,
+-			.setkey		= n2_3des_setkey,
+-			.encrypt	= n2_encrypt_ecb,
+-			.decrypt	= n2_decrypt_ecb,
+-		},
+-	},
+-	{	.name		= "cbc(des3_ede)",
+-		.drv_name	= "cbc-3des",
+-		.block_size	= DES_BLOCK_SIZE,
+-		.enc_type	= (ENC_TYPE_ALG_3DES |
+-				   ENC_TYPE_CHAINING_CBC),
+-		.skcipher	= {
+-			.ivsize		= DES_BLOCK_SIZE,
+-			.min_keysize	= 3 * DES_KEY_SIZE,
+-			.max_keysize	= 3 * DES_KEY_SIZE,
+-			.setkey		= n2_3des_setkey,
+-			.encrypt	= n2_encrypt_chaining,
+-			.decrypt	= n2_decrypt_chaining,
+-		},
+-	},
+-
+-	/* AES: ECB CBC and CTR are supported */
+-	{	.name		= "ecb(aes)",
+-		.drv_name	= "ecb-aes",
+-		.block_size	= AES_BLOCK_SIZE,
+-		.enc_type	= (ENC_TYPE_ALG_AES128 |
+-				   ENC_TYPE_CHAINING_ECB),
+-		.skcipher	= {
+-			.min_keysize	= AES_MIN_KEY_SIZE,
+-			.max_keysize	= AES_MAX_KEY_SIZE,
+-			.setkey		= n2_aes_setkey,
+-			.encrypt	= n2_encrypt_ecb,
+-			.decrypt	= n2_decrypt_ecb,
+-		},
+-	},
+-	{	.name		= "cbc(aes)",
+-		.drv_name	= "cbc-aes",
+-		.block_size	= AES_BLOCK_SIZE,
+-		.enc_type	= (ENC_TYPE_ALG_AES128 |
+-				   ENC_TYPE_CHAINING_CBC),
+-		.skcipher	= {
+-			.ivsize		= AES_BLOCK_SIZE,
+-			.min_keysize	= AES_MIN_KEY_SIZE,
+-			.max_keysize	= AES_MAX_KEY_SIZE,
+-			.setkey		= n2_aes_setkey,
+-			.encrypt	= n2_encrypt_chaining,
+-			.decrypt	= n2_decrypt_chaining,
+-		},
+-	},
+-	{	.name		= "ctr(aes)",
+-		.drv_name	= "ctr-aes",
+-		.block_size	= AES_BLOCK_SIZE,
+-		.enc_type	= (ENC_TYPE_ALG_AES128 |
+-				   ENC_TYPE_CHAINING_COUNTER),
+-		.skcipher	= {
+-			.ivsize		= AES_BLOCK_SIZE,
+-			.min_keysize	= AES_MIN_KEY_SIZE,
+-			.max_keysize	= AES_MAX_KEY_SIZE,
+-			.setkey		= n2_aes_setkey,
+-			.encrypt	= n2_encrypt_chaining,
+-			.decrypt	= n2_encrypt_chaining,
+-		},
+-	},
+-
+-};
+-#define NUM_CIPHER_TMPLS ARRAY_SIZE(skcipher_tmpls)
+-
+-static LIST_HEAD(skcipher_algs);
+-
+-struct n2_hash_tmpl {
+-	const char	*name;
+-	const u8	*hash_zero;
+-	const u8	*hash_init;
+-	u8		hw_op_hashsz;
+-	u8		digest_size;
+-	u8		statesize;
+-	u8		block_size;
+-	u8		auth_type;
+-	u8		hmac_type;
+-};
+-
+-static const __le32 n2_md5_init[MD5_HASH_WORDS] = {
+-	cpu_to_le32(MD5_H0),
+-	cpu_to_le32(MD5_H1),
+-	cpu_to_le32(MD5_H2),
+-	cpu_to_le32(MD5_H3),
+-};
+-static const u32 n2_sha1_init[SHA1_DIGEST_SIZE / 4] = {
+-	SHA1_H0, SHA1_H1, SHA1_H2, SHA1_H3, SHA1_H4,
+-};
+-static const u32 n2_sha256_init[SHA256_DIGEST_SIZE / 4] = {
+-	SHA256_H0, SHA256_H1, SHA256_H2, SHA256_H3,
+-	SHA256_H4, SHA256_H5, SHA256_H6, SHA256_H7,
+-};
+-static const u32 n2_sha224_init[SHA256_DIGEST_SIZE / 4] = {
+-	SHA224_H0, SHA224_H1, SHA224_H2, SHA224_H3,
+-	SHA224_H4, SHA224_H5, SHA224_H6, SHA224_H7,
+-};
+-
+-static const struct n2_hash_tmpl hash_tmpls[] = {
+-	{ .name		= "md5",
+-	  .hash_zero	= md5_zero_message_hash,
+-	  .hash_init	= (u8 *)n2_md5_init,
+-	  .auth_type	= AUTH_TYPE_MD5,
+-	  .hmac_type	= AUTH_TYPE_HMAC_MD5,
+-	  .hw_op_hashsz	= MD5_DIGEST_SIZE,
+-	  .digest_size	= MD5_DIGEST_SIZE,
+-	  .statesize	= sizeof(struct md5_state),
+-	  .block_size	= MD5_HMAC_BLOCK_SIZE },
+-	{ .name		= "sha1",
+-	  .hash_zero	= sha1_zero_message_hash,
+-	  .hash_init	= (u8 *)n2_sha1_init,
+-	  .auth_type	= AUTH_TYPE_SHA1,
+-	  .hmac_type	= AUTH_TYPE_HMAC_SHA1,
+-	  .hw_op_hashsz	= SHA1_DIGEST_SIZE,
+-	  .digest_size	= SHA1_DIGEST_SIZE,
+-	  .statesize	= sizeof(struct sha1_state),
+-	  .block_size	= SHA1_BLOCK_SIZE },
+-	{ .name		= "sha256",
+-	  .hash_zero	= sha256_zero_message_hash,
+-	  .hash_init	= (u8 *)n2_sha256_init,
+-	  .auth_type	= AUTH_TYPE_SHA256,
+-	  .hmac_type	= AUTH_TYPE_HMAC_SHA256,
+-	  .hw_op_hashsz	= SHA256_DIGEST_SIZE,
+-	  .digest_size	= SHA256_DIGEST_SIZE,
+-	  .statesize	= sizeof(struct sha256_state),
+-	  .block_size	= SHA256_BLOCK_SIZE },
+-	{ .name		= "sha224",
+-	  .hash_zero	= sha224_zero_message_hash,
+-	  .hash_init	= (u8 *)n2_sha224_init,
+-	  .auth_type	= AUTH_TYPE_SHA256,
+-	  .hmac_type	= AUTH_TYPE_RESERVED,
+-	  .hw_op_hashsz	= SHA256_DIGEST_SIZE,
+-	  .digest_size	= SHA224_DIGEST_SIZE,
+-	  .statesize	= sizeof(struct sha256_state),
+-	  .block_size	= SHA224_BLOCK_SIZE },
+-};
+-#define NUM_HASH_TMPLS ARRAY_SIZE(hash_tmpls)
+-
+-static LIST_HEAD(ahash_algs);
+-static LIST_HEAD(hmac_algs);
+-
+-static int algs_registered;
+-
+-static void __n2_unregister_algs(void)
+-{
+-	struct n2_skcipher_alg *skcipher, *skcipher_tmp;
+-	struct n2_ahash_alg *alg, *alg_tmp;
+-	struct n2_hmac_alg *hmac, *hmac_tmp;
+-
+-	list_for_each_entry_safe(skcipher, skcipher_tmp, &skcipher_algs, entry) {
+-		crypto_unregister_skcipher(&skcipher->skcipher);
+-		list_del(&skcipher->entry);
+-		kfree(skcipher);
+-	}
+-	list_for_each_entry_safe(hmac, hmac_tmp, &hmac_algs, derived.entry) {
+-		crypto_unregister_ahash(&hmac->derived.alg);
+-		list_del(&hmac->derived.entry);
+-		kfree(hmac);
+-	}
+-	list_for_each_entry_safe(alg, alg_tmp, &ahash_algs, entry) {
+-		crypto_unregister_ahash(&alg->alg);
+-		list_del(&alg->entry);
+-		kfree(alg);
+-	}
+-}
+-
+-static int n2_skcipher_init_tfm(struct crypto_skcipher *tfm)
+-{
+-	crypto_skcipher_set_reqsize(tfm, sizeof(struct n2_request_context));
+-	return 0;
+-}
+-
+-static int __n2_register_one_skcipher(const struct n2_skcipher_tmpl *tmpl)
+-{
+-	struct n2_skcipher_alg *p = kzalloc(sizeof(*p), GFP_KERNEL);
+-	struct skcipher_alg *alg;
+-	int err;
+-
+-	if (!p)
+-		return -ENOMEM;
+-
+-	alg = &p->skcipher;
+-	*alg = tmpl->skcipher;
+-
+-	snprintf(alg->base.cra_name, CRYPTO_MAX_ALG_NAME, "%s", tmpl->name);
+-	snprintf(alg->base.cra_driver_name, CRYPTO_MAX_ALG_NAME, "%s-n2", tmpl->drv_name);
+-	alg->base.cra_priority = N2_CRA_PRIORITY;
+-	alg->base.cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC |
+-			      CRYPTO_ALG_ALLOCATES_MEMORY;
+-	alg->base.cra_blocksize = tmpl->block_size;
+-	p->enc_type = tmpl->enc_type;
+-	alg->base.cra_ctxsize = sizeof(struct n2_skcipher_context);
+-	alg->base.cra_module = THIS_MODULE;
+-	alg->init = n2_skcipher_init_tfm;
+-
+-	list_add(&p->entry, &skcipher_algs);
+-	err = crypto_register_skcipher(alg);
+-	if (err) {
+-		pr_err("%s alg registration failed\n", alg->base.cra_name);
+-		list_del(&p->entry);
+-		kfree(p);
+-	} else {
+-		pr_info("%s alg registered\n", alg->base.cra_name);
+-	}
+-	return err;
+-}
+-
+-static int __n2_register_one_hmac(struct n2_ahash_alg *n2ahash)
+-{
+-	struct n2_hmac_alg *p = kzalloc(sizeof(*p), GFP_KERNEL);
+-	struct ahash_alg *ahash;
+-	struct crypto_alg *base;
+-	int err;
+-
+-	if (!p)
+-		return -ENOMEM;
+-
+-	p->child_alg = n2ahash->alg.halg.base.cra_name;
+-	memcpy(&p->derived, n2ahash, sizeof(struct n2_ahash_alg));
+-	INIT_LIST_HEAD(&p->derived.entry);
+-
+-	ahash = &p->derived.alg;
+-	ahash->digest = n2_hmac_async_digest;
+-	ahash->setkey = n2_hmac_async_setkey;
+-
+-	base = &ahash->halg.base;
+-	err = -EINVAL;
+-	if (snprintf(base->cra_name, CRYPTO_MAX_ALG_NAME, "hmac(%s)",
+-		     p->child_alg) >= CRYPTO_MAX_ALG_NAME)
+-		goto out_free_p;
+-	if (snprintf(base->cra_driver_name, CRYPTO_MAX_ALG_NAME, "hmac-%s-n2",
+-		     p->child_alg) >= CRYPTO_MAX_ALG_NAME)
+-		goto out_free_p;
+-
+-	base->cra_ctxsize = sizeof(struct n2_hmac_ctx);
+-	base->cra_init = n2_hmac_cra_init;
+-	base->cra_exit = n2_hmac_cra_exit;
+-
+-	list_add(&p->derived.entry, &hmac_algs);
+-	err = crypto_register_ahash(ahash);
+-	if (err) {
+-		pr_err("%s alg registration failed\n", base->cra_name);
+-		list_del(&p->derived.entry);
+-out_free_p:
+-		kfree(p);
+-	} else {
+-		pr_info("%s alg registered\n", base->cra_name);
+-	}
+-	return err;
+-}
+-
+-static int __n2_register_one_ahash(const struct n2_hash_tmpl *tmpl)
+-{
+-	struct n2_ahash_alg *p = kzalloc(sizeof(*p), GFP_KERNEL);
+-	struct hash_alg_common *halg;
+-	struct crypto_alg *base;
+-	struct ahash_alg *ahash;
+-	int err;
+-
+-	if (!p)
+-		return -ENOMEM;
+-
+-	p->hash_zero = tmpl->hash_zero;
+-	p->hash_init = tmpl->hash_init;
+-	p->auth_type = tmpl->auth_type;
+-	p->hmac_type = tmpl->hmac_type;
+-	p->hw_op_hashsz = tmpl->hw_op_hashsz;
+-	p->digest_size = tmpl->digest_size;
+-
+-	ahash = &p->alg;
+-	ahash->init = n2_hash_async_init;
+-	ahash->update = n2_hash_async_update;
+-	ahash->final = n2_hash_async_final;
+-	ahash->finup = n2_hash_async_finup;
+-	ahash->digest = n2_hash_async_digest;
+-	ahash->export = n2_hash_async_noexport;
+-	ahash->import = n2_hash_async_noimport;
+-
+-	halg = &ahash->halg;
+-	halg->digestsize = tmpl->digest_size;
+-	halg->statesize = tmpl->statesize;
+-
+-	base = &halg->base;
+-	snprintf(base->cra_name, CRYPTO_MAX_ALG_NAME, "%s", tmpl->name);
+-	snprintf(base->cra_driver_name, CRYPTO_MAX_ALG_NAME, "%s-n2", tmpl->name);
+-	base->cra_priority = N2_CRA_PRIORITY;
+-	base->cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY |
+-			  CRYPTO_ALG_NEED_FALLBACK;
+-	base->cra_blocksize = tmpl->block_size;
+-	base->cra_ctxsize = sizeof(struct n2_hash_ctx);
+-	base->cra_module = THIS_MODULE;
+-	base->cra_init = n2_hash_cra_init;
+-	base->cra_exit = n2_hash_cra_exit;
+-
+-	list_add(&p->entry, &ahash_algs);
+-	err = crypto_register_ahash(ahash);
+-	if (err) {
+-		pr_err("%s alg registration failed\n", base->cra_name);
+-		list_del(&p->entry);
+-		kfree(p);
+-	} else {
+-		pr_info("%s alg registered\n", base->cra_name);
+-	}
+-	if (!err && p->hmac_type != AUTH_TYPE_RESERVED)
+-		err = __n2_register_one_hmac(p);
+-	return err;
+-}
+-
+-static int n2_register_algs(void)
+-{
+-	int i, err = 0;
+-
+-	mutex_lock(&spu_lock);
+-	if (algs_registered++)
+-		goto out;
+-
+-	for (i = 0; i < NUM_HASH_TMPLS; i++) {
+-		err = __n2_register_one_ahash(&hash_tmpls[i]);
+-		if (err) {
+-			__n2_unregister_algs();
+-			goto out;
+-		}
+-	}
+-	for (i = 0; i < NUM_CIPHER_TMPLS; i++) {
+-		err = __n2_register_one_skcipher(&skcipher_tmpls[i]);
+-		if (err) {
+-			__n2_unregister_algs();
+-			goto out;
+-		}
+-	}
+-
+-out:
+-	mutex_unlock(&spu_lock);
+-	return err;
+-}
+-
+-static void n2_unregister_algs(void)
+-{
+-	mutex_lock(&spu_lock);
+-	if (!--algs_registered)
+-		__n2_unregister_algs();
+-	mutex_unlock(&spu_lock);
+-}
+-
+-/* To map CWQ queues to interrupt sources, the hypervisor API provides
+- * a devino.  This isn't very useful to us because all of the
+- * interrupts listed in the device_node have been translated to
+- * Linux virtual IRQ cookie numbers.
+- *
+- * So we have to back-translate, going through the 'intr' and 'ino'
+- * property tables of the n2cp MDESC node, matching it with the OF
+- * 'interrupts' property entries, in order to figure out which
+- * devino goes to which already-translated IRQ.
+- */
+-static int find_devino_index(struct platform_device *dev, struct spu_mdesc_info *ip,
+-			     unsigned long dev_ino)
+-{
+-	const unsigned int *dev_intrs;
+-	unsigned int intr;
+-	int i;
+-
+-	for (i = 0; i < ip->num_intrs; i++) {
+-		if (ip->ino_table[i].ino == dev_ino)
+-			break;
+-	}
+-	if (i == ip->num_intrs)
+-		return -ENODEV;
+-
+-	intr = ip->ino_table[i].intr;
+-
+-	dev_intrs = of_get_property(dev->dev.of_node, "interrupts", NULL);
+-	if (!dev_intrs)
+-		return -ENODEV;
+-
+-	for (i = 0; i < dev->archdata.num_irqs; i++) {
+-		if (dev_intrs[i] == intr)
+-			return i;
+-	}
+-
+-	return -ENODEV;
+-}
+-
+-static int spu_map_ino(struct platform_device *dev, struct spu_mdesc_info *ip,
+-		       const char *irq_name, struct spu_queue *p,
+-		       irq_handler_t handler)
+-{
+-	unsigned long herr;
+-	int index;
+-
+-	herr = sun4v_ncs_qhandle_to_devino(p->qhandle, &p->devino);
+-	if (herr)
+-		return -EINVAL;
+-
+-	index = find_devino_index(dev, ip, p->devino);
+-	if (index < 0)
+-		return index;
+-
+-	p->irq = dev->archdata.irqs[index];
+-
+-	sprintf(p->irq_name, "%s-%d", irq_name, index);
+-
+-	return request_irq(p->irq, handler, 0, p->irq_name, p);
+-}
+-
+-static struct kmem_cache *queue_cache[2];
+-
+-static void *new_queue(unsigned long q_type)
+-{
+-	return kmem_cache_zalloc(queue_cache[q_type - 1], GFP_KERNEL);
+-}
+-
+-static void free_queue(void *p, unsigned long q_type)
+-{
+-	kmem_cache_free(queue_cache[q_type - 1], p);
+-}
+-
+-static int queue_cache_init(void)
+-{
+-	if (!queue_cache[HV_NCS_QTYPE_MAU - 1])
+-		queue_cache[HV_NCS_QTYPE_MAU - 1] =
+-			kmem_cache_create("mau_queue",
+-					  (MAU_NUM_ENTRIES *
+-					   MAU_ENTRY_SIZE),
+-					  MAU_ENTRY_SIZE, 0, NULL);
+-	if (!queue_cache[HV_NCS_QTYPE_MAU - 1])
+-		return -ENOMEM;
+-
+-	if (!queue_cache[HV_NCS_QTYPE_CWQ - 1])
+-		queue_cache[HV_NCS_QTYPE_CWQ - 1] =
+-			kmem_cache_create("cwq_queue",
+-					  (CWQ_NUM_ENTRIES *
+-					   CWQ_ENTRY_SIZE),
+-					  CWQ_ENTRY_SIZE, 0, NULL);
+-	if (!queue_cache[HV_NCS_QTYPE_CWQ - 1]) {
+-		kmem_cache_destroy(queue_cache[HV_NCS_QTYPE_MAU - 1]);
+-		queue_cache[HV_NCS_QTYPE_MAU - 1] = NULL;
+-		return -ENOMEM;
+-	}
+-	return 0;
+-}
+-
+-static void queue_cache_destroy(void)
+-{
+-	kmem_cache_destroy(queue_cache[HV_NCS_QTYPE_MAU - 1]);
+-	kmem_cache_destroy(queue_cache[HV_NCS_QTYPE_CWQ - 1]);
+-	queue_cache[HV_NCS_QTYPE_MAU - 1] = NULL;
+-	queue_cache[HV_NCS_QTYPE_CWQ - 1] = NULL;
+-}
+-
+-static long spu_queue_register_workfn(void *arg)
+-{
+-	struct spu_qreg *qr = arg;
+-	struct spu_queue *p = qr->queue;
+-	unsigned long q_type = qr->type;
+-	unsigned long hv_ret;
+-
+-	hv_ret = sun4v_ncs_qconf(q_type, __pa(p->q),
+-				 CWQ_NUM_ENTRIES, &p->qhandle);
+-	if (!hv_ret)
+-		sun4v_ncs_sethead_marker(p->qhandle, 0);
+-
+-	return hv_ret ? -EINVAL : 0;
+-}
+-
+-static int spu_queue_register(struct spu_queue *p, unsigned long q_type)
+-{
+-	int cpu = cpumask_any_and(&p->sharing, cpu_online_mask);
+-	struct spu_qreg qr = { .queue = p, .type = q_type };
+-
+-	return work_on_cpu_safe(cpu, spu_queue_register_workfn, &qr);
+-}
+-
+-static int spu_queue_setup(struct spu_queue *p)
+-{
+-	int err;
+-
+-	p->q = new_queue(p->q_type);
+-	if (!p->q)
+-		return -ENOMEM;
+-
+-	err = spu_queue_register(p, p->q_type);
+-	if (err) {
+-		free_queue(p->q, p->q_type);
+-		p->q = NULL;
+-	}
+-
+-	return err;
+-}
+-
+-static void spu_queue_destroy(struct spu_queue *p)
+-{
+-	unsigned long hv_ret;
+-
+-	if (!p->q)
+-		return;
+-
+-	hv_ret = sun4v_ncs_qconf(p->q_type, p->qhandle, 0, &p->qhandle);
+-
+-	if (!hv_ret)
+-		free_queue(p->q, p->q_type);
+-}
+-
+-static void spu_list_destroy(struct list_head *list)
+-{
+-	struct spu_queue *p, *n;
+-
+-	list_for_each_entry_safe(p, n, list, list) {
+-		int i;
+-
+-		for (i = 0; i < NR_CPUS; i++) {
+-			if (cpu_to_cwq[i] == p)
+-				cpu_to_cwq[i] = NULL;
+-		}
+-
+-		if (p->irq) {
+-			free_irq(p->irq, p);
+-			p->irq = 0;
+-		}
+-		spu_queue_destroy(p);
+-		list_del(&p->list);
+-		kfree(p);
+-	}
+-}
+-
+-/* Walk the backward arcs of a CWQ 'exec-unit' node,
+- * gathering cpu membership information.
+- */
+-static int spu_mdesc_walk_arcs(struct mdesc_handle *mdesc,
+-			       struct platform_device *dev,
+-			       u64 node, struct spu_queue *p,
+-			       struct spu_queue **table)
+-{
+-	u64 arc;
+-
+-	mdesc_for_each_arc(arc, mdesc, node, MDESC_ARC_TYPE_BACK) {
+-		u64 tgt = mdesc_arc_target(mdesc, arc);
+-		const char *name = mdesc_node_name(mdesc, tgt);
+-		const u64 *id;
+-
+-		if (strcmp(name, "cpu"))
+-			continue;
+-		id = mdesc_get_property(mdesc, tgt, "id", NULL);
+-		if (table[*id] != NULL) {
+-			dev_err(&dev->dev, "%pOF: SPU cpu slot already set.\n",
+-				dev->dev.of_node);
+-			return -EINVAL;
+-		}
+-		cpumask_set_cpu(*id, &p->sharing);
+-		table[*id] = p;
+-	}
+-	return 0;
+-}
+-
+-/* Process an 'exec-unit' MDESC node of type 'cwq'.  */
+-static int handle_exec_unit(struct spu_mdesc_info *ip, struct list_head *list,
+-			    struct platform_device *dev, struct mdesc_handle *mdesc,
+-			    u64 node, const char *iname, unsigned long q_type,
+-			    irq_handler_t handler, struct spu_queue **table)
+-{
+-	struct spu_queue *p;
+-	int err;
+-
+-	p = kzalloc(sizeof(struct spu_queue), GFP_KERNEL);
+-	if (!p) {
+-		dev_err(&dev->dev, "%pOF: Could not allocate SPU queue.\n",
+-			dev->dev.of_node);
+-		return -ENOMEM;
+-	}
+-
+-	cpumask_clear(&p->sharing);
+-	spin_lock_init(&p->lock);
+-	p->q_type = q_type;
+-	INIT_LIST_HEAD(&p->jobs);
+-	list_add(&p->list, list);
+-
+-	err = spu_mdesc_walk_arcs(mdesc, dev, node, p, table);
+-	if (err)
+-		return err;
+-
+-	err = spu_queue_setup(p);
+-	if (err)
+-		return err;
+-
+-	return spu_map_ino(dev, ip, iname, p, handler);
+-}
+-
+-static int spu_mdesc_scan(struct mdesc_handle *mdesc, struct platform_device *dev,
+-			  struct spu_mdesc_info *ip, struct list_head *list,
+-			  const char *exec_name, unsigned long q_type,
+-			  irq_handler_t handler, struct spu_queue **table)
+-{
+-	int err = 0;
+-	u64 node;
+-
+-	mdesc_for_each_node_by_name(mdesc, node, "exec-unit") {
+-		const char *type;
+-
+-		type = mdesc_get_property(mdesc, node, "type", NULL);
+-		if (!type || strcmp(type, exec_name))
+-			continue;
+-
+-		err = handle_exec_unit(ip, list, dev, mdesc, node,
+-				       exec_name, q_type, handler, table);
+-		if (err) {
+-			spu_list_destroy(list);
+-			break;
+-		}
+-	}
+-
+-	return err;
+-}
+-
+-static int get_irq_props(struct mdesc_handle *mdesc, u64 node,
+-			 struct spu_mdesc_info *ip)
+-{
+-	const u64 *ino;
+-	int ino_len;
+-	int i;
+-
+-	ino = mdesc_get_property(mdesc, node, "ino", &ino_len);
+-	if (!ino) {
+-		printk("NO 'ino'\n");
+-		return -ENODEV;
+-	}
+-
+-	ip->num_intrs = ino_len / sizeof(u64);
+-	ip->ino_table = kzalloc((sizeof(struct ino_blob) *
+-				 ip->num_intrs),
+-				GFP_KERNEL);
+-	if (!ip->ino_table)
+-		return -ENOMEM;
+-
+-	for (i = 0; i < ip->num_intrs; i++) {
+-		struct ino_blob *b = &ip->ino_table[i];
+-		b->intr = i + 1;
+-		b->ino = ino[i];
+-	}
+-
+-	return 0;
+-}
+-
+-static int grab_mdesc_irq_props(struct mdesc_handle *mdesc,
+-				struct platform_device *dev,
+-				struct spu_mdesc_info *ip,
+-				const char *node_name)
+-{
+-	u64 node, reg;
+-
+-	if (of_property_read_reg(dev->dev.of_node, 0, &reg, NULL) < 0)
+-		return -ENODEV;
+-
+-	mdesc_for_each_node_by_name(mdesc, node, "virtual-device") {
+-		const char *name;
+-		const u64 *chdl;
+-
+-		name = mdesc_get_property(mdesc, node, "name", NULL);
+-		if (!name || strcmp(name, node_name))
+-			continue;
+-		chdl = mdesc_get_property(mdesc, node, "cfg-handle", NULL);
+-		if (!chdl || (*chdl != reg))
+-			continue;
+-		ip->cfg_handle = *chdl;
+-		return get_irq_props(mdesc, node, ip);
+-	}
+-
+-	return -ENODEV;
+-}
+-
+-static unsigned long n2_spu_hvapi_major;
+-static unsigned long n2_spu_hvapi_minor;
+-
+-static int n2_spu_hvapi_register(void)
+-{
+-	int err;
+-
+-	n2_spu_hvapi_major = 2;
+-	n2_spu_hvapi_minor = 0;
+-
+-	err = sun4v_hvapi_register(HV_GRP_NCS,
+-				   n2_spu_hvapi_major,
+-				   &n2_spu_hvapi_minor);
+-
+-	if (!err)
+-		pr_info("Registered NCS HVAPI version %lu.%lu\n",
+-			n2_spu_hvapi_major,
+-			n2_spu_hvapi_minor);
+-
+-	return err;
+-}
+-
+-static void n2_spu_hvapi_unregister(void)
+-{
+-	sun4v_hvapi_unregister(HV_GRP_NCS);
+-}
+-
+-static int global_ref;
+-
+-static int grab_global_resources(void)
+-{
+-	int err = 0;
+-
+-	mutex_lock(&spu_lock);
+-
+-	if (global_ref++)
+-		goto out;
+-
+-	err = n2_spu_hvapi_register();
+-	if (err)
+-		goto out;
+-
+-	err = queue_cache_init();
+-	if (err)
+-		goto out_hvapi_release;
+-
+-	err = -ENOMEM;
+-	cpu_to_cwq = kcalloc(NR_CPUS, sizeof(struct spu_queue *),
+-			     GFP_KERNEL);
+-	if (!cpu_to_cwq)
+-		goto out_queue_cache_destroy;
+-
+-	cpu_to_mau = kcalloc(NR_CPUS, sizeof(struct spu_queue *),
+-			     GFP_KERNEL);
+-	if (!cpu_to_mau)
+-		goto out_free_cwq_table;
+-
+-	err = 0;
+-
+-out:
+-	if (err)
+-		global_ref--;
+-	mutex_unlock(&spu_lock);
+-	return err;
+-
+-out_free_cwq_table:
+-	kfree(cpu_to_cwq);
+-	cpu_to_cwq = NULL;
+-
+-out_queue_cache_destroy:
+-	queue_cache_destroy();
+-
+-out_hvapi_release:
+-	n2_spu_hvapi_unregister();
+-	goto out;
+-}
+-
+-static void release_global_resources(void)
+-{
+-	mutex_lock(&spu_lock);
+-	if (!--global_ref) {
+-		kfree(cpu_to_cwq);
+-		cpu_to_cwq = NULL;
+-
+-		kfree(cpu_to_mau);
+-		cpu_to_mau = NULL;
+-
+-		queue_cache_destroy();
+-		n2_spu_hvapi_unregister();
+-	}
+-	mutex_unlock(&spu_lock);
+-}
+-
+-static struct n2_crypto *alloc_n2cp(void)
+-{
+-	struct n2_crypto *np = kzalloc(sizeof(struct n2_crypto), GFP_KERNEL);
+-
+-	if (np)
+-		INIT_LIST_HEAD(&np->cwq_list);
+-
+-	return np;
+-}
+-
+-static void free_n2cp(struct n2_crypto *np)
+-{
+-	kfree(np->cwq_info.ino_table);
+-	np->cwq_info.ino_table = NULL;
+-
+-	kfree(np);
+-}
+-
+-static void n2_spu_driver_version(void)
+-{
+-	static int n2_spu_version_printed;
+-
+-	if (n2_spu_version_printed++ == 0)
+-		pr_info("%s", version);
+-}
+-
+-static int n2_crypto_probe(struct platform_device *dev)
+-{
+-	struct mdesc_handle *mdesc;
+-	struct n2_crypto *np;
+-	int err;
+-
+-	n2_spu_driver_version();
+-
+-	pr_info("Found N2CP at %pOF\n", dev->dev.of_node);
+-
+-	np = alloc_n2cp();
+-	if (!np) {
+-		dev_err(&dev->dev, "%pOF: Unable to allocate n2cp.\n",
+-			dev->dev.of_node);
+-		return -ENOMEM;
+-	}
+-
+-	err = grab_global_resources();
+-	if (err) {
+-		dev_err(&dev->dev, "%pOF: Unable to grab global resources.\n",
+-			dev->dev.of_node);
+-		goto out_free_n2cp;
+-	}
+-
+-	mdesc = mdesc_grab();
+-
+-	if (!mdesc) {
+-		dev_err(&dev->dev, "%pOF: Unable to grab MDESC.\n",
+-			dev->dev.of_node);
+-		err = -ENODEV;
+-		goto out_free_global;
+-	}
+-	err = grab_mdesc_irq_props(mdesc, dev, &np->cwq_info, "n2cp");
+-	if (err) {
+-		dev_err(&dev->dev, "%pOF: Unable to grab IRQ props.\n",
+-			dev->dev.of_node);
+-		mdesc_release(mdesc);
+-		goto out_free_global;
+-	}
+-
+-	err = spu_mdesc_scan(mdesc, dev, &np->cwq_info, &np->cwq_list,
+-			     "cwq", HV_NCS_QTYPE_CWQ, cwq_intr,
+-			     cpu_to_cwq);
+-	mdesc_release(mdesc);
+-
+-	if (err) {
+-		dev_err(&dev->dev, "%pOF: CWQ MDESC scan failed.\n",
+-			dev->dev.of_node);
+-		goto out_free_global;
+-	}
+-
+-	err = n2_register_algs();
+-	if (err) {
+-		dev_err(&dev->dev, "%pOF: Unable to register algorithms.\n",
+-			dev->dev.of_node);
+-		goto out_free_spu_list;
+-	}
+-
+-	dev_set_drvdata(&dev->dev, np);
+-
+-	return 0;
+-
+-out_free_spu_list:
+-	spu_list_destroy(&np->cwq_list);
+-
+-out_free_global:
+-	release_global_resources();
+-
+-out_free_n2cp:
+-	free_n2cp(np);
+-
+-	return err;
+-}
+-
+-static void n2_crypto_remove(struct platform_device *dev)
+-{
+-	struct n2_crypto *np = dev_get_drvdata(&dev->dev);
+-
+-	n2_unregister_algs();
+-
+-	spu_list_destroy(&np->cwq_list);
+-
+-	release_global_resources();
+-
+-	free_n2cp(np);
+-}
+-
+-static struct n2_mau *alloc_ncp(void)
+-{
+-	struct n2_mau *mp = kzalloc(sizeof(struct n2_mau), GFP_KERNEL);
+-
+-	if (mp)
+-		INIT_LIST_HEAD(&mp->mau_list);
+-
+-	return mp;
+-}
+-
+-static void free_ncp(struct n2_mau *mp)
+-{
+-	kfree(mp->mau_info.ino_table);
+-	mp->mau_info.ino_table = NULL;
+-
+-	kfree(mp);
+-}
+-
+-static int n2_mau_probe(struct platform_device *dev)
+-{
+-	struct mdesc_handle *mdesc;
+-	struct n2_mau *mp;
+-	int err;
+-
+-	n2_spu_driver_version();
+-
+-	pr_info("Found NCP at %pOF\n", dev->dev.of_node);
+-
+-	mp = alloc_ncp();
+-	if (!mp) {
+-		dev_err(&dev->dev, "%pOF: Unable to allocate ncp.\n",
+-			dev->dev.of_node);
+-		return -ENOMEM;
+-	}
+-
+-	err = grab_global_resources();
+-	if (err) {
+-		dev_err(&dev->dev, "%pOF: Unable to grab global resources.\n",
+-			dev->dev.of_node);
+-		goto out_free_ncp;
+-	}
+-
+-	mdesc = mdesc_grab();
+-
+-	if (!mdesc) {
+-		dev_err(&dev->dev, "%pOF: Unable to grab MDESC.\n",
+-			dev->dev.of_node);
+-		err = -ENODEV;
+-		goto out_free_global;
+-	}
+-
+-	err = grab_mdesc_irq_props(mdesc, dev, &mp->mau_info, "ncp");
+-	if (err) {
+-		dev_err(&dev->dev, "%pOF: Unable to grab IRQ props.\n",
+-			dev->dev.of_node);
+-		mdesc_release(mdesc);
+-		goto out_free_global;
+-	}
+-
+-	err = spu_mdesc_scan(mdesc, dev, &mp->mau_info, &mp->mau_list,
+-			     "mau", HV_NCS_QTYPE_MAU, mau_intr,
+-			     cpu_to_mau);
+-	mdesc_release(mdesc);
+-
+-	if (err) {
+-		dev_err(&dev->dev, "%pOF: MAU MDESC scan failed.\n",
+-			dev->dev.of_node);
+-		goto out_free_global;
+-	}
+-
+-	dev_set_drvdata(&dev->dev, mp);
+-
+-	return 0;
+-
+-out_free_global:
+-	release_global_resources();
+-
+-out_free_ncp:
+-	free_ncp(mp);
+-
+-	return err;
+-}
+-
+-static void n2_mau_remove(struct platform_device *dev)
+-{
+-	struct n2_mau *mp = dev_get_drvdata(&dev->dev);
+-
+-	spu_list_destroy(&mp->mau_list);
+-
+-	release_global_resources();
+-
+-	free_ncp(mp);
+-}
+-
+-static const struct of_device_id n2_crypto_match[] = {
+-	{
+-		.name = "n2cp",
+-		.compatible = "SUNW,n2-cwq",
+-	},
+-	{
+-		.name = "n2cp",
+-		.compatible = "SUNW,vf-cwq",
+-	},
+-	{
+-		.name = "n2cp",
+-		.compatible = "SUNW,kt-cwq",
+-	},
+-	{},
+-};
+-
+-MODULE_DEVICE_TABLE(of, n2_crypto_match);
+-
+-static struct platform_driver n2_crypto_driver = {
+-	.driver = {
+-		.name		=	"n2cp",
+-		.of_match_table	=	n2_crypto_match,
+-	},
+-	.probe		=	n2_crypto_probe,
+-	.remove		=	n2_crypto_remove,
+-};
+-
+-static const struct of_device_id n2_mau_match[] = {
+-	{
+-		.name = "ncp",
+-		.compatible = "SUNW,n2-mau",
+-	},
+-	{
+-		.name = "ncp",
+-		.compatible = "SUNW,vf-mau",
+-	},
+-	{
+-		.name = "ncp",
+-		.compatible = "SUNW,kt-mau",
+-	},
+-	{},
+-};
+-
+-MODULE_DEVICE_TABLE(of, n2_mau_match);
+-
+-static struct platform_driver n2_mau_driver = {
+-	.driver = {
+-		.name		=	"ncp",
+-		.of_match_table	=	n2_mau_match,
+-	},
+-	.probe		=	n2_mau_probe,
+-	.remove		=	n2_mau_remove,
+-};
+-
+-static struct platform_driver * const drivers[] = {
+-	&n2_crypto_driver,
+-	&n2_mau_driver,
+-};
+-
+-static int __init n2_init(void)
+-{
+-	return platform_register_drivers(drivers, ARRAY_SIZE(drivers));
+-}
+-
+-static void __exit n2_exit(void)
+-{
+-	platform_unregister_drivers(drivers, ARRAY_SIZE(drivers));
+-}
+-
+-module_init(n2_init);
+-module_exit(n2_exit);
+diff --git a/drivers/crypto/n2_core.h b/drivers/crypto/n2_core.h
+deleted file mode 100644
+index 2406763b03062..0000000000000
+--- a/drivers/crypto/n2_core.h
++++ /dev/null
+@@ -1,232 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-#ifndef _N2_CORE_H
+-#define _N2_CORE_H
+-
+-#ifndef __ASSEMBLY__
+-
+-struct ino_blob {
+-	u64			intr;
+-	u64			ino;
+-};
+-
+-struct spu_mdesc_info {
+-	u64			cfg_handle;
+-	struct ino_blob		*ino_table;
+-	int			num_intrs;
+-};
+-
+-struct n2_crypto {
+-	struct spu_mdesc_info	cwq_info;
+-	struct list_head	cwq_list;
+-};
+-
+-struct n2_mau {
+-	struct spu_mdesc_info	mau_info;
+-	struct list_head	mau_list;
+-};
+-
+-#define CWQ_ENTRY_SIZE		64
+-#define CWQ_NUM_ENTRIES		64
+-
+-#define MAU_ENTRY_SIZE		64
+-#define MAU_NUM_ENTRIES		64
+-
+-struct cwq_initial_entry {
+-	u64			control;
+-	u64			src_addr;
+-	u64			auth_key_addr;
+-	u64			auth_iv_addr;
+-	u64			final_auth_state_addr;
+-	u64			enc_key_addr;
+-	u64			enc_iv_addr;
+-	u64			dest_addr;
+-};
+-
+-struct cwq_ext_entry {
+-	u64			len;
+-	u64			src_addr;
+-	u64			resv1;
+-	u64			resv2;
+-	u64			resv3;
+-	u64			resv4;
+-	u64			resv5;
+-	u64			resv6;
+-};
+-
+-struct cwq_final_entry {
+-	u64			control;
+-	u64			src_addr;
+-	u64			resv1;
+-	u64			resv2;
+-	u64			resv3;
+-	u64			resv4;
+-	u64			resv5;
+-	u64			resv6;
+-};
+-
+-#define CONTROL_LEN			0x000000000000ffffULL
+-#define CONTROL_LEN_SHIFT		0
+-#define CONTROL_HMAC_KEY_LEN		0x0000000000ff0000ULL
+-#define CONTROL_HMAC_KEY_LEN_SHIFT	16
+-#define CONTROL_ENC_TYPE		0x00000000ff000000ULL
+-#define CONTROL_ENC_TYPE_SHIFT		24
+-#define  ENC_TYPE_ALG_RC4_STREAM	0x00ULL
+-#define  ENC_TYPE_ALG_RC4_NOSTREAM	0x04ULL
+-#define  ENC_TYPE_ALG_DES		0x08ULL
+-#define  ENC_TYPE_ALG_3DES		0x0cULL
+-#define  ENC_TYPE_ALG_AES128		0x10ULL
+-#define  ENC_TYPE_ALG_AES192		0x14ULL
+-#define  ENC_TYPE_ALG_AES256		0x18ULL
+-#define  ENC_TYPE_ALG_RESERVED		0x1cULL
+-#define  ENC_TYPE_ALG_MASK		0x1cULL
+-#define  ENC_TYPE_CHAINING_ECB		0x00ULL
+-#define  ENC_TYPE_CHAINING_CBC		0x01ULL
+-#define  ENC_TYPE_CHAINING_CFB		0x02ULL
+-#define  ENC_TYPE_CHAINING_COUNTER	0x03ULL
+-#define  ENC_TYPE_CHAINING_MASK		0x03ULL
+-#define CONTROL_AUTH_TYPE		0x0000001f00000000ULL
+-#define CONTROL_AUTH_TYPE_SHIFT		32
+-#define  AUTH_TYPE_RESERVED		0x00ULL
+-#define  AUTH_TYPE_MD5			0x01ULL
+-#define  AUTH_TYPE_SHA1			0x02ULL
+-#define  AUTH_TYPE_SHA256		0x03ULL
+-#define  AUTH_TYPE_CRC32		0x04ULL
+-#define  AUTH_TYPE_HMAC_MD5		0x05ULL
+-#define  AUTH_TYPE_HMAC_SHA1		0x06ULL
+-#define  AUTH_TYPE_HMAC_SHA256		0x07ULL
+-#define  AUTH_TYPE_TCP_CHECKSUM		0x08ULL
+-#define  AUTH_TYPE_SSL_HMAC_MD5		0x09ULL
+-#define  AUTH_TYPE_SSL_HMAC_SHA1	0x0aULL
+-#define  AUTH_TYPE_SSL_HMAC_SHA256	0x0bULL
+-#define CONTROL_STRAND			0x000000e000000000ULL
+-#define CONTROL_STRAND_SHIFT		37
+-#define CONTROL_HASH_LEN		0x0000ff0000000000ULL
+-#define CONTROL_HASH_LEN_SHIFT		40
+-#define CONTROL_INTERRUPT		0x0001000000000000ULL
+-#define CONTROL_STORE_FINAL_AUTH_STATE	0x0002000000000000ULL
+-#define CONTROL_RESERVED		0x001c000000000000ULL
+-#define CONTROL_HV_DONE			0x0004000000000000ULL
+-#define CONTROL_HV_PROTOCOL_ERROR	0x0008000000000000ULL
+-#define CONTROL_HV_HARDWARE_ERROR	0x0010000000000000ULL
+-#define CONTROL_END_OF_BLOCK		0x0020000000000000ULL
+-#define CONTROL_START_OF_BLOCK		0x0040000000000000ULL
+-#define CONTROL_ENCRYPT			0x0080000000000000ULL
+-#define CONTROL_OPCODE			0xff00000000000000ULL
+-#define CONTROL_OPCODE_SHIFT		56
+-#define  OPCODE_INPLACE_BIT		0x80ULL
+-#define  OPCODE_SSL_KEYBLOCK		0x10ULL
+-#define  OPCODE_COPY			0x20ULL
+-#define  OPCODE_ENCRYPT			0x40ULL
+-#define  OPCODE_AUTH_MAC		0x41ULL
+-
+-#endif /* !(__ASSEMBLY__) */
+-
+-/* NCS v2.0 hypervisor interfaces */
+-#define HV_NCS_QTYPE_MAU		0x01
+-#define HV_NCS_QTYPE_CWQ		0x02
+-
+-/* ncs_qconf()
+- * TRAP:	HV_FAST_TRAP
+- * FUNCTION:	HV_FAST_NCS_QCONF
+- * ARG0:	Queue type (HV_NCS_QTYPE_{MAU,CWQ})
+- * ARG1:	Real address of queue, or handle for unconfigure
+- * ARG2:	Number of entries in queue, zero for unconfigure
+- * RET0:	status
+- * RET1:	queue handle
+- *
+- * Configure a queue in the stream processing unit.
+- *
+- * The real address given as the base must be 64-byte
+- * aligned.
+- *
+- * The queue size can range from a minimum of 2 to a maximum
+- * of 64.  The queue size must be a power of two.
+- *
+- * To unconfigure a queue, specify a length of zero and place
+- * the queue handle into ARG1.
+- *
+- * On configure success the hypervisor will set the FIRST, HEAD,
+- * and TAIL registers to the address of the first entry in the
+- * queue.  The LAST register will be set to point to the last
+- * entry in the queue.
+- */
+-#define HV_FAST_NCS_QCONF		0x111
+-
+-/* ncs_qinfo()
+- * TRAP:	HV_FAST_TRAP
+- * FUNCTION:	HV_FAST_NCS_QINFO
+- * ARG0:	Queue handle
+- * RET0:	status
+- * RET1:	Queue type (HV_NCS_QTYPE_{MAU,CWQ})
+- * RET2:	Queue base address
+- * RET3:	Number of entries
+- */
+-#define HV_FAST_NCS_QINFO		0x112
+-
+-/* ncs_gethead()
+- * TRAP:	HV_FAST_TRAP
+- * FUNCTION:	HV_FAST_NCS_GETHEAD
+- * ARG0:	Queue handle
+- * RET0:	status
+- * RET1:	queue head offset
+- */
+-#define HV_FAST_NCS_GETHEAD		0x113
+-
+-/* ncs_gettail()
+- * TRAP:	HV_FAST_TRAP
+- * FUNCTION:	HV_FAST_NCS_GETTAIL
+- * ARG0:	Queue handle
+- * RET0:	status
+- * RET1:	queue tail offset
+- */
+-#define HV_FAST_NCS_GETTAIL		0x114
+-
+-/* ncs_settail()
+- * TRAP:	HV_FAST_TRAP
+- * FUNCTION:	HV_FAST_NCS_SETTAIL
+- * ARG0:	Queue handle
+- * ARG1:	New tail offset
+- * RET0:	status
+- */
+-#define HV_FAST_NCS_SETTAIL		0x115
+-
+-/* ncs_qhandle_to_devino()
+- * TRAP:	HV_FAST_TRAP
+- * FUNCTION:	HV_FAST_NCS_QHANDLE_TO_DEVINO
+- * ARG0:	Queue handle
+- * RET0:	status
+- * RET1:	devino
+- */
+-#define HV_FAST_NCS_QHANDLE_TO_DEVINO	0x116
+-
+-/* ncs_sethead_marker()
+- * TRAP:	HV_FAST_TRAP
+- * FUNCTION:	HV_FAST_NCS_SETHEAD_MARKER
+- * ARG0:	Queue handle
+- * ARG1:	New head offset
+- * RET0:	status
+- */
+-#define HV_FAST_NCS_SETHEAD_MARKER	0x117
+-
+-#ifndef __ASSEMBLY__
+-extern unsigned long sun4v_ncs_qconf(unsigned long queue_type,
+-				     unsigned long queue_ra,
+-				     unsigned long num_entries,
+-				     unsigned long *qhandle);
+-extern unsigned long sun4v_ncs_qinfo(unsigned long qhandle,
+-				     unsigned long *queue_type,
+-				     unsigned long *queue_ra,
+-				     unsigned long *num_entries);
+-extern unsigned long sun4v_ncs_gethead(unsigned long qhandle,
+-				       unsigned long *head);
+-extern unsigned long sun4v_ncs_gettail(unsigned long qhandle,
+-				       unsigned long *tail);
+-extern unsigned long sun4v_ncs_settail(unsigned long qhandle,
+-				       unsigned long tail);
+-extern unsigned long sun4v_ncs_qhandle_to_devino(unsigned long qhandle,
+-						 unsigned long *devino);
+-extern unsigned long sun4v_ncs_sethead_marker(unsigned long qhandle,
+-					      unsigned long head);
+-#endif /* !(__ASSEMBLY__) */
+-
+-#endif /* _N2_CORE_H */
 -- 
 2.47.1
 
