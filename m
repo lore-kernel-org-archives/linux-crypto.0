@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D9471509A0
-	for <linux-crypto@vger.kernel.org>; Sat,  7 Dec 2024 19:58:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7565F154BE2
+	for <linux-crypto@vger.kernel.org>; Sat,  7 Dec 2024 19:58:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733601513; cv=none; b=UWgVkW38HaH2ifIWW+sj8eEBO3irq/ewa/adnQ3btw65c4iYtjzxGejZwJ6guHWeObwzWD3CB7StCtedao2Bh5gBPqR92e09EXAVhnN7+zC+0mn8dosH2d6ijQrXQgWiggx96a1bQmkxqVyKY1hxn3AAXlk/v5ZUTJcJI7HdAwA=
+	t=1733601513; cv=none; b=rVh2DvFfC6vbAmlabalmc4WfYADOH+oRHDnuCHhdBCQg4YpW54jPoZKsJhMqpcvdDFDhWJhJRoDnM2C/iaP5iof77XIKt/xqpN5+2KSgQsS173256zZCVOW9K1XEoWgpj3YorGYzV3c6DpdZ8+LUTZOqTm+4c6VD9ww5FzFLvpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1733601513; c=relaxed/simple;
-	bh=8lhj+o/gRgPEL5z+pB6QVmjTpedeQAH8kI7iIivYnJc=;
+	bh=n9ioLaUCO2ycI9rs6WceJ1E88jmO8gnY6BMnmtBj3yE=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HTTJElFoDNtHqYQ2JeCbXwzwde/rFq5yB0NCI6qD9e9qW7UDKcc+qAXGtxmVh8GcWyk0ulxNySDOsgIyDnUBnNWHxVtRlzvCP94JtJ1yI/vyrsyKyq0zCkAsL7gDFIRr+eJ+7epD6GNhm5lXqRrz1hzVb0bsERm6yvaxuc+GXlY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QHjrRXdh; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=g7qHbr3RVFxrj6xcnWAyY6tWvSmWG8pv0xGlvEKhgoys/gpFb/m655yPvhvLukf2SZhLFQy2CXOQMQYZ/rsaNZnPJ0yq66TZXCaVVBHz4LZsy5cQs+TikPK4vwhniRC6jowlC02QdjJKe6yH7xDtaAeMvJc51z8zwFHZzA2o6Gc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c1wuKhbA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QHjrRXdh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6E6BC4CEDC
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c1wuKhbA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F36AAC4CEE0
 	for <linux-crypto@vger.kernel.org>; Sat,  7 Dec 2024 19:58:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733601512;
-	bh=8lhj+o/gRgPEL5z+pB6QVmjTpedeQAH8kI7iIivYnJc=;
+	s=k20201202; t=1733601513;
+	bh=n9ioLaUCO2ycI9rs6WceJ1E88jmO8gnY6BMnmtBj3yE=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=QHjrRXdhqUgHEdj+uApzfz7gUZF/FItgGiMpe5UER3OQo53tDh66aLAB7/nP6Yzk8
-	 mCu9rv2cGe4ko1vJ7eiZERIo+whRM07z3Kd1bnsDxRYhQE22npM34wF3YJR4Co+06K
-	 VkwxT8cJB4EOmdvLR9YNupzKqcMMtSeTssU/qOclIT0zcbzks2CXN1MzJdZBI9Oa68
-	 9975KQtU9M1U9SMvWbdm0PckeDzKDdxdUTxpG5EkOTS1+o2ie90neFWWwEZK52cP/p
-	 h0IZHQHMrufNQ/Fh1fC6PfbuG+p+fDOpO4N3YT4Vwo0hlcn58ySvS4lg/cJ2mPRSJF
-	 XwLvZkONd4O4g==
+	b=c1wuKhbAru/HdlRvmZN8oqfSEYy+7GedF4wPRQ/5iQc6ZGBu+82D5C2a3P6Yc+hHm
+	 keqVRoH2IJ29MRRw5nak4v0AgreCH7pGxLciGo2yy9SqRRDz0xzV7QwmjT6hajFMra
+	 rSKWJLCvGrUW1UtHsh0ZeTecguyGQVrrzZx2Hjqj83/d3dI7oQwbYW1oYq3goW2Ryn
+	 0+cZ5RQUXFCGoWtteUcN+A42ORxSyR9sdEyuCRM3aFJgmk2ghPrxSSEaZrzRu9LPHz
+	 Zoa/f1bOcCHPnoEwgzz/nlhLJ5vEb+M/wXTiLDyQ0avY1IovZ9ArBDoiLg3cdC0EHM
+	 RyDggBslbg9Fg==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
-Subject: [PATCH 2/8] crypto: aria - stop using cra_alignmask
-Date: Sat,  7 Dec 2024 11:57:46 -0800
-Message-ID: <20241207195752.87654-3-ebiggers@kernel.org>
+Subject: [PATCH 3/8] crypto: tea - stop using cra_alignmask
+Date: Sat,  7 Dec 2024 11:57:47 -0800
+Message-ID: <20241207195752.87654-4-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20241207195752.87654-1-ebiggers@kernel.org>
 References: <20241207195752.87654-1-ebiggers@kernel.org>
@@ -51,127 +51,263 @@ closer to eventually removing support for the alignmask field.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/aria_generic.c | 37 +++++++++++++++++--------------------
- 1 file changed, 17 insertions(+), 20 deletions(-)
+ crypto/tea.c | 83 +++++++++++++++++++++-------------------------------
+ 1 file changed, 33 insertions(+), 50 deletions(-)
 
-diff --git a/crypto/aria_generic.c b/crypto/aria_generic.c
-index d96dfc4fdde67..bd359d3313c22 100644
---- a/crypto/aria_generic.c
-+++ b/crypto/aria_generic.c
-@@ -13,10 +13,11 @@
-  *
-  * Public domain version is distributed above.
-  */
+diff --git a/crypto/tea.c b/crypto/tea.c
+index 896f863f3067c..b315da8c89ebc 100644
+--- a/crypto/tea.c
++++ b/crypto/tea.c
+@@ -16,11 +16,11 @@
  
- #include <crypto/aria.h>
+ #include <crypto/algapi.h>
+ #include <linux/init.h>
+ #include <linux/module.h>
+ #include <linux/mm.h>
+-#include <asm/byteorder.h>
 +#include <linux/unaligned.h>
+ #include <linux/types.h>
  
- static const u32 key_rc[20] = {
- 	0x517cc1b7, 0x27220a94, 0xfe13abe8, 0xfa9a6ee0,
- 	0x6db14acc, 0x9e21c820, 0xff28b1d5, 0xef5de2b0,
- 	0xdb92371d, 0x2126e970, 0x03249775, 0x04e8c90e,
-@@ -25,36 +26,35 @@ static const u32 key_rc[20] = {
- };
+ #define TEA_KEY_SIZE		16
+ #define TEA_BLOCK_SIZE		8
+ #define TEA_ROUNDS		32
+@@ -41,31 +41,28 @@ struct xtea_ctx {
  
- static void aria_set_encrypt_key(struct aria_ctx *ctx, const u8 *in_key,
- 				 unsigned int key_len)
+ static int tea_setkey(struct crypto_tfm *tfm, const u8 *in_key,
+ 		      unsigned int key_len)
  {
--	const __be32 *key = (const __be32 *)in_key;
- 	u32 w0[4], w1[4], w2[4], w3[4];
- 	u32 reg0, reg1, reg2, reg3;
- 	const u32 *ck;
- 	int rkidx = 0;
+ 	struct tea_ctx *ctx = crypto_tfm_ctx(tfm);
+-	const __le32 *key = (const __le32 *)in_key;
  
- 	ck = &key_rc[(key_len - 16) / 2];
+-	ctx->KEY[0] = le32_to_cpu(key[0]);
+-	ctx->KEY[1] = le32_to_cpu(key[1]);
+-	ctx->KEY[2] = le32_to_cpu(key[2]);
+-	ctx->KEY[3] = le32_to_cpu(key[3]);
++	ctx->KEY[0] = get_unaligned_le32(&in_key[0]);
++	ctx->KEY[1] = get_unaligned_le32(&in_key[4]);
++	ctx->KEY[2] = get_unaligned_le32(&in_key[8]);
++	ctx->KEY[3] = get_unaligned_le32(&in_key[12]);
  
--	w0[0] = be32_to_cpu(key[0]);
--	w0[1] = be32_to_cpu(key[1]);
--	w0[2] = be32_to_cpu(key[2]);
--	w0[3] = be32_to_cpu(key[3]);
-+	w0[0] = get_unaligned_be32(&in_key[0]);
-+	w0[1] = get_unaligned_be32(&in_key[4]);
-+	w0[2] = get_unaligned_be32(&in_key[8]);
-+	w0[3] = get_unaligned_be32(&in_key[12]);
+ 	return 0; 
  
- 	reg0 = w0[0] ^ ck[0];
- 	reg1 = w0[1] ^ ck[1];
- 	reg2 = w0[2] ^ ck[2];
- 	reg3 = w0[3] ^ ck[3];
- 
- 	aria_subst_diff_odd(&reg0, &reg1, &reg2, &reg3);
- 
- 	if (key_len > 16) {
--		w1[0] = be32_to_cpu(key[4]);
--		w1[1] = be32_to_cpu(key[5]);
-+		w1[0] = get_unaligned_be32(&in_key[16]);
-+		w1[1] = get_unaligned_be32(&in_key[20]);
- 		if (key_len > 24) {
--			w1[2] = be32_to_cpu(key[6]);
--			w1[3] = be32_to_cpu(key[7]);
-+			w1[2] = get_unaligned_be32(&in_key[24]);
-+			w1[3] = get_unaligned_be32(&in_key[28]);
- 		} else {
- 			w1[2] = 0;
- 			w1[3] = 0;
- 		}
- 	} else {
-@@ -193,21 +193,19 @@ int aria_set_key(struct crypto_tfm *tfm, const u8 *in_key, unsigned int key_len)
- EXPORT_SYMBOL_GPL(aria_set_key);
- 
- static void __aria_crypt(struct aria_ctx *ctx, u8 *out, const u8 *in,
- 			 u32 key[][ARIA_RD_KEY_WORDS])
- {
--	const __be32 *src = (const __be32 *)in;
--	__be32 *dst = (__be32 *)out;
- 	u32 reg0, reg1, reg2, reg3;
- 	int rounds, rkidx = 0;
- 
- 	rounds = ctx->rounds;
- 
--	reg0 = be32_to_cpu(src[0]);
--	reg1 = be32_to_cpu(src[1]);
--	reg2 = be32_to_cpu(src[2]);
--	reg3 = be32_to_cpu(src[3]);
-+	reg0 = get_unaligned_be32(&in[0]);
-+	reg1 = get_unaligned_be32(&in[4]);
-+	reg2 = get_unaligned_be32(&in[8]);
-+	reg3 = get_unaligned_be32(&in[12]);
- 
- 	aria_add_round_key(key[rkidx], &reg0, &reg1, &reg2, &reg3);
- 	rkidx++;
- 
- 	aria_subst_diff_odd(&reg0, &reg1, &reg2, &reg3);
-@@ -239,14 +237,14 @@ static void __aria_crypt(struct aria_ctx *ctx, u8 *out, const u8 *in,
- 	reg3 = key[rkidx][3] ^ make_u32((u8)(x1[get_u8(reg3, 0)]),
- 					(u8)(x2[get_u8(reg3, 1)] >> 8),
- 					(u8)(s1[get_u8(reg3, 2)]),
- 					(u8)(s2[get_u8(reg3, 3)]));
- 
--	dst[0] = cpu_to_be32(reg0);
--	dst[1] = cpu_to_be32(reg1);
--	dst[2] = cpu_to_be32(reg2);
--	dst[3] = cpu_to_be32(reg3);
-+	put_unaligned_be32(reg0, &out[0]);
-+	put_unaligned_be32(reg1, &out[4]);
-+	put_unaligned_be32(reg2, &out[8]);
-+	put_unaligned_be32(reg3, &out[12]);
  }
  
- void aria_encrypt(void *_ctx, u8 *out, const u8 *in)
+ static void tea_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
  {
- 	struct aria_ctx *ctx = (struct aria_ctx *)_ctx;
-@@ -282,11 +280,10 @@ static struct crypto_alg aria_alg = {
- 	.cra_driver_name	=	"aria-generic",
- 	.cra_priority		=	100,
+ 	u32 y, z, n, sum = 0;
+ 	u32 k0, k1, k2, k3;
+ 	struct tea_ctx *ctx = crypto_tfm_ctx(tfm);
+-	const __le32 *in = (const __le32 *)src;
+-	__le32 *out = (__le32 *)dst;
+ 
+-	y = le32_to_cpu(in[0]);
+-	z = le32_to_cpu(in[1]);
++	y = get_unaligned_le32(&src[0]);
++	z = get_unaligned_le32(&src[4]);
+ 
+ 	k0 = ctx->KEY[0];
+ 	k1 = ctx->KEY[1];
+ 	k2 = ctx->KEY[2];
+ 	k3 = ctx->KEY[3];
+@@ -76,24 +73,22 @@ static void tea_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
+ 		sum += TEA_DELTA;
+ 		y += ((z << 4) + k0) ^ (z + sum) ^ ((z >> 5) + k1);
+ 		z += ((y << 4) + k2) ^ (y + sum) ^ ((y >> 5) + k3);
+ 	}
+ 	
+-	out[0] = cpu_to_le32(y);
+-	out[1] = cpu_to_le32(z);
++	put_unaligned_le32(y, &dst[0]);
++	put_unaligned_le32(z, &dst[4]);
+ }
+ 
+ static void tea_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
+ {
+ 	u32 y, z, n, sum;
+ 	u32 k0, k1, k2, k3;
+ 	struct tea_ctx *ctx = crypto_tfm_ctx(tfm);
+-	const __le32 *in = (const __le32 *)src;
+-	__le32 *out = (__le32 *)dst;
+ 
+-	y = le32_to_cpu(in[0]);
+-	z = le32_to_cpu(in[1]);
++	y = get_unaligned_le32(&src[0]);
++	z = get_unaligned_le32(&src[4]);
+ 
+ 	k0 = ctx->KEY[0];
+ 	k1 = ctx->KEY[1];
+ 	k2 = ctx->KEY[2];
+ 	k3 = ctx->KEY[3];
+@@ -106,123 +101,113 @@ static void tea_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
+ 		z -= ((y << 4) + k2) ^ (y + sum) ^ ((y >> 5) + k3);
+ 		y -= ((z << 4) + k0) ^ (z + sum) ^ ((z >> 5) + k1);
+ 		sum -= TEA_DELTA;
+ 	}
+ 	
+-	out[0] = cpu_to_le32(y);
+-	out[1] = cpu_to_le32(z);
++	put_unaligned_le32(y, &dst[0]);
++	put_unaligned_le32(z, &dst[4]);
+ }
+ 
+ static int xtea_setkey(struct crypto_tfm *tfm, const u8 *in_key,
+ 		       unsigned int key_len)
+ {
+ 	struct xtea_ctx *ctx = crypto_tfm_ctx(tfm);
+-	const __le32 *key = (const __le32 *)in_key;
+ 
+-	ctx->KEY[0] = le32_to_cpu(key[0]);
+-	ctx->KEY[1] = le32_to_cpu(key[1]);
+-	ctx->KEY[2] = le32_to_cpu(key[2]);
+-	ctx->KEY[3] = le32_to_cpu(key[3]);
++	ctx->KEY[0] = get_unaligned_le32(&in_key[0]);
++	ctx->KEY[1] = get_unaligned_le32(&in_key[4]);
++	ctx->KEY[2] = get_unaligned_le32(&in_key[8]);
++	ctx->KEY[3] = get_unaligned_le32(&in_key[12]);
+ 
+ 	return 0; 
+ 
+ }
+ 
+ static void xtea_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
+ {
+ 	u32 y, z, sum = 0;
+ 	u32 limit = XTEA_DELTA * XTEA_ROUNDS;
+ 	struct xtea_ctx *ctx = crypto_tfm_ctx(tfm);
+-	const __le32 *in = (const __le32 *)src;
+-	__le32 *out = (__le32 *)dst;
+ 
+-	y = le32_to_cpu(in[0]);
+-	z = le32_to_cpu(in[1]);
++	y = get_unaligned_le32(&src[0]);
++	z = get_unaligned_le32(&src[4]);
+ 
+ 	while (sum != limit) {
+ 		y += ((z << 4 ^ z >> 5) + z) ^ (sum + ctx->KEY[sum&3]); 
+ 		sum += XTEA_DELTA;
+ 		z += ((y << 4 ^ y >> 5) + y) ^ (sum + ctx->KEY[sum>>11 &3]); 
+ 	}
+ 	
+-	out[0] = cpu_to_le32(y);
+-	out[1] = cpu_to_le32(z);
++	put_unaligned_le32(y, &dst[0]);
++	put_unaligned_le32(z, &dst[4]);
+ }
+ 
+ static void xtea_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
+ {
+ 	u32 y, z, sum;
+ 	struct tea_ctx *ctx = crypto_tfm_ctx(tfm);
+-	const __le32 *in = (const __le32 *)src;
+-	__le32 *out = (__le32 *)dst;
+ 
+-	y = le32_to_cpu(in[0]);
+-	z = le32_to_cpu(in[1]);
++	y = get_unaligned_le32(&src[0]);
++	z = get_unaligned_le32(&src[4]);
+ 
+ 	sum = XTEA_DELTA * XTEA_ROUNDS;
+ 
+ 	while (sum) {
+ 		z -= ((y << 4 ^ y >> 5) + y) ^ (sum + ctx->KEY[sum>>11 & 3]);
+ 		sum -= XTEA_DELTA;
+ 		y -= ((z << 4 ^ z >> 5) + z) ^ (sum + ctx->KEY[sum & 3]);
+ 	}
+ 	
+-	out[0] = cpu_to_le32(y);
+-	out[1] = cpu_to_le32(z);
++	put_unaligned_le32(y, &dst[0]);
++	put_unaligned_le32(z, &dst[4]);
+ }
+ 
+ 
+ static void xeta_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
+ {
+ 	u32 y, z, sum = 0;
+ 	u32 limit = XTEA_DELTA * XTEA_ROUNDS;
+ 	struct xtea_ctx *ctx = crypto_tfm_ctx(tfm);
+-	const __le32 *in = (const __le32 *)src;
+-	__le32 *out = (__le32 *)dst;
+ 
+-	y = le32_to_cpu(in[0]);
+-	z = le32_to_cpu(in[1]);
++	y = get_unaligned_le32(&src[0]);
++	z = get_unaligned_le32(&src[4]);
+ 
+ 	while (sum != limit) {
+ 		y += (z << 4 ^ z >> 5) + (z ^ sum) + ctx->KEY[sum&3];
+ 		sum += XTEA_DELTA;
+ 		z += (y << 4 ^ y >> 5) + (y ^ sum) + ctx->KEY[sum>>11 &3];
+ 	}
+ 	
+-	out[0] = cpu_to_le32(y);
+-	out[1] = cpu_to_le32(z);
++	put_unaligned_le32(y, &dst[0]);
++	put_unaligned_le32(z, &dst[4]);
+ }
+ 
+ static void xeta_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
+ {
+ 	u32 y, z, sum;
+ 	struct tea_ctx *ctx = crypto_tfm_ctx(tfm);
+-	const __le32 *in = (const __le32 *)src;
+-	__le32 *out = (__le32 *)dst;
+ 
+-	y = le32_to_cpu(in[0]);
+-	z = le32_to_cpu(in[1]);
++	y = get_unaligned_le32(&src[0]);
++	z = get_unaligned_le32(&src[4]);
+ 
+ 	sum = XTEA_DELTA * XTEA_ROUNDS;
+ 
+ 	while (sum) {
+ 		z -= (y << 4 ^ y >> 5) + (y ^ sum) + ctx->KEY[sum>>11 & 3];
+ 		sum -= XTEA_DELTA;
+ 		y -= (z << 4 ^ z >> 5) + (z ^ sum) + ctx->KEY[sum & 3];
+ 	}
+ 	
+-	out[0] = cpu_to_le32(y);
+-	out[1] = cpu_to_le32(z);
++	put_unaligned_le32(y, &dst[0]);
++	put_unaligned_le32(z, &dst[4]);
+ }
+ 
+ static struct crypto_alg tea_algs[3] = { {
+ 	.cra_name		=	"tea",
+ 	.cra_driver_name	=	"tea-generic",
  	.cra_flags		=	CRYPTO_ALG_TYPE_CIPHER,
- 	.cra_blocksize		=	ARIA_BLOCK_SIZE,
- 	.cra_ctxsize		=	sizeof(struct aria_ctx),
+ 	.cra_blocksize		=	TEA_BLOCK_SIZE,
+ 	.cra_ctxsize		=	sizeof (struct tea_ctx),
 -	.cra_alignmask		=	3,
  	.cra_module		=	THIS_MODULE,
- 	.cra_u			=	{
- 		.cipher = {
- 			.cia_min_keysize	=	ARIA_MIN_KEY_SIZE,
- 			.cia_max_keysize	=	ARIA_MAX_KEY_SIZE,
+ 	.cra_u			=	{ .cipher = {
+ 	.cia_min_keysize	=	TEA_KEY_SIZE,
+ 	.cia_max_keysize	=	TEA_KEY_SIZE,
+ 	.cia_setkey		= 	tea_setkey,
+@@ -232,11 +217,10 @@ static struct crypto_alg tea_algs[3] = { {
+ 	.cra_name		=	"xtea",
+ 	.cra_driver_name	=	"xtea-generic",
+ 	.cra_flags		=	CRYPTO_ALG_TYPE_CIPHER,
+ 	.cra_blocksize		=	XTEA_BLOCK_SIZE,
+ 	.cra_ctxsize		=	sizeof (struct xtea_ctx),
+-	.cra_alignmask		=	3,
+ 	.cra_module		=	THIS_MODULE,
+ 	.cra_u			=	{ .cipher = {
+ 	.cia_min_keysize	=	XTEA_KEY_SIZE,
+ 	.cia_max_keysize	=	XTEA_KEY_SIZE,
+ 	.cia_setkey		= 	xtea_setkey,
+@@ -246,11 +230,10 @@ static struct crypto_alg tea_algs[3] = { {
+ 	.cra_name		=	"xeta",
+ 	.cra_driver_name	=	"xeta-generic",
+ 	.cra_flags		=	CRYPTO_ALG_TYPE_CIPHER,
+ 	.cra_blocksize		=	XTEA_BLOCK_SIZE,
+ 	.cra_ctxsize		=	sizeof (struct xtea_ctx),
+-	.cra_alignmask		=	3,
+ 	.cra_module		=	THIS_MODULE,
+ 	.cra_u			=	{ .cipher = {
+ 	.cia_min_keysize	=	XTEA_KEY_SIZE,
+ 	.cia_max_keysize	=	XTEA_KEY_SIZE,
+ 	.cia_setkey		= 	xtea_setkey,
 -- 
 2.47.1
 
