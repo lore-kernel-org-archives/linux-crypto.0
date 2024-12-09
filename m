@@ -1,150 +1,132 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D54F7153824;
-	Mon,  9 Dec 2024 17:09:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3BC914E2CC;
+	Mon,  9 Dec 2024 19:36:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733764189; cv=none; b=HAoJcLqgpeibif2T6LvuVC3BLKfx6DLMiLOleN/SUhP3p4U/mGGoi7fBoOcVc8vXMca67XZw0BGfvBj8LGQbu5DjiT8fgqJOipVqGyhOm2oSETrZ1Gow75AZGfvnLus1fXmrt/kd8uoc4jmJuP/nWtg+rKDO9Tp2S0U/DsrH318=
+	t=1733772963; cv=none; b=nRNIoFp2L/P0rSYUD5RD2/w/gIy34oMQX6RPQUDu74P9E7dZknWre+ku80GNEIGU8oEoDUEEmn5O3F9WJA2uyRO7Ea+Y9+3EwQ1pC7ld0HuAG6WBBAvR4bQ6JOfbqSrka0v9zBwybOxWY3h7nTSiJAMf9U00QVrDoWefO0fUItM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733764189; c=relaxed/simple;
-	bh=8iquvnUkd9mP4mKjGeYUDFGaekxyJt58LmMb3jCLRVQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PshNiuXH19F7ey7dRsEoyPD4gyMZL5STlxKrDVJLXTkkVKjIreOR7zuEIDQ+TP8BA1YgMB9q9EO7ndFezyAWAjyrcObw+60IPlwxEQeikRW8TQoQEKrg7vQMXlsp7kXI8jCCalohqvmAt3dke2qUf08G5NUcfc8JWrTVQ4zYRZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=c8tcSSnb; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1733772963; c=relaxed/simple;
+	bh=Q5rZxy0kJibOV6Sj3CPasPQPWuPDGx1ot+UAxBTJ2cA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JKLDqwp0FfEoSS4x2jm7tXlFa/VYx/NMSXnBzdG4uJFwjILW2IEBJvF2DGOmVVifJWG2AGteFVDfDWRG78g7zWcg1F4UUDO5UPlDxvoqe5HHBu22MKsP8vueIN0EvzNLCHy3w9EopDEjQbm2ZHY+DR95izZhf25Gg1YzRFJzW14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZVp4UZ9G; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="c8tcSSnb"
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4B979qZ4010147;
-	Mon, 9 Dec 2024 17:09:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=rMahfs
-	J3Td/fA/su6e+zy+RqUg85gmTe63WrocDNYQA=; b=c8tcSSnbC4oixmLo3beeTC
-	5WdeCy+2nFSesl7zrq1+HnYexo7xVD7/PLN9RMGsGf+r+jxHZtQFiEczDqYeQkEC
-	VKX9izErbxQteIAIjSVYheb00T1Ph7w+cfcjnmqgg3LEFDZMipcRH+H0rkBAOqeV
-	rMpI28w0W+kpRbyfvDBWh6yp6NixSB/Qy8K0xtPu10R1P7f6ZyW7ZDl2bk1f5bhn
-	FlXQ6O5qhLfHSWmiZGrj5/BQpWtJmnWlviNbJ/NA4dTUsAw3hTwA8VaQWJqdPTQR
-	EkB3nzDOVaDp8h3rjrURaTPQtYzOvJ+clV79vOSSby3LG2pAoRBW/cgmaJK8D8yg
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43cbsq201p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 09 Dec 2024 17:09:38 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4B9H9c6H020243;
-	Mon, 9 Dec 2024 17:09:38 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43cbsq201k-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 09 Dec 2024 17:09:38 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4B9DMeGV017052;
-	Mon, 9 Dec 2024 17:09:37 GMT
-Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 43d12xysbd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 09 Dec 2024 17:09:37 +0000
-Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
-	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4B9H9aaJ15729334
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 9 Dec 2024 17:09:36 GMT
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 60C4C58050;
-	Mon,  9 Dec 2024 17:09:36 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0397658045;
-	Mon,  9 Dec 2024 17:09:32 +0000 (GMT)
-Received: from [9.171.71.154] (unknown [9.171.71.154])
-	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  9 Dec 2024 17:09:31 +0000 (GMT)
-Message-ID: <9ff492c6-3824-475b-a9f6-415205920e56@linux.ibm.com>
-Date: Mon, 9 Dec 2024 22:39:30 +0530
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZVp4UZ9G"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A52CEC4CED1;
+	Mon,  9 Dec 2024 19:36:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1733772963;
+	bh=Q5rZxy0kJibOV6Sj3CPasPQPWuPDGx1ot+UAxBTJ2cA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZVp4UZ9GtGupfceM2V8krYGkLZAydHOXQ2ixoOngZxD0qm9p2TBcINe5h43dUlDj4
+	 zwwGVhl6CIsMG8klnNtAhgKgonm/Hkhoa59yZtnAVs0k8WiCu/kyQkSqmyLD2oKtbB
+	 jGfWZF1V6x8tb9j2QS41xi8cZZDb3BZL/9THlbDQf6n1uoDALOLdeddHOFb6xOQO4I
+	 48SVDH7CXRkIEbaB6w34xUVfGMfH8hJe3tV/1M6l/yExYF/I9PLhjnkHDmSB/1U2A5
+	 XAbAMd1v+fBUWhgnzAhj1SEFPknHLmHx+Yc67HZ3nGgvg0E8jApEvfehIEKVnAhCbA
+	 +0cR9A69HHThw==
+Date: Mon, 9 Dec 2024 12:35:58 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Yury Norov <yury.norov@gmail.com>
+Cc: Nilay Shroff <nilay@linux.ibm.com>, linux-kernel@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	briannorris@chromium.org, kees@kernel.org, gustavoars@kernel.org,
+	steffen.klassert@secunet.com, daniel.m.jordan@oracle.com,
+	gjoyce@ibm.com, linux-crypto@vger.kernel.org, linux@weissschuh.net
+Subject: Re: [PATCHv3] gcc: disable '-Wstrignop-overread' universally for
+ gcc-13+ and FORTIFY_SOURCE
+Message-ID: <20241209193558.GA1597021@ax162>
+References: <20241208161315.730138-1-nilay@linux.ibm.com>
+ <Z1XkhhBqFYtbvQYp@yury-ThinkPad>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv3] gcc: disable '-Wstrignop-overread' universally for
- gcc-13+ and FORTIFY_SOURCE
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: linux-kernel@vger.kernel.org, briannorris@chromium.org,
-        yury.norov@gmail.com, kees@kernel.org, gustavoars@kernel.org,
-        nathan@kernel.org, steffen.klassert@secunet.com,
-        daniel.m.jordan@oracle.com, gjoyce@ibm.com,
-        linux-crypto@vger.kernel.org, linux@weissschuh.net
-References: <20241208161315.730138-1-nilay@linux.ibm.com>
- <2024120938-kilogram-granite-9a53@gregkh>
-Content-Language: en-US
-From: Nilay Shroff <nilay@linux.ibm.com>
-In-Reply-To: <2024120938-kilogram-granite-9a53@gregkh>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: TYWUT8BCbKkWFLaib6iQnNNPXRiI7WoG
-X-Proofpoint-GUID: OKI2mjy4yZ_rEQP27m87msTHWMF76Mkr
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 adultscore=0
- lowpriorityscore=0 clxscore=1015 phishscore=0 impostorscore=0
- suspectscore=0 spamscore=0 mlxscore=0 priorityscore=1501 malwarescore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2412090132
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Z1XkhhBqFYtbvQYp@yury-ThinkPad>
 
-
-
-On 12/9/24 12:15, Greg Kroah-Hartman wrote:
+On Sun, Dec 08, 2024 at 10:25:21AM -0800, Yury Norov wrote:
 > On Sun, Dec 08, 2024 at 09:42:28PM +0530, Nilay Shroff wrote:
->> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> > So the above statements expands to:
+> > memcpy(pinst->cpumask.pcpu->bits, pcpumask->bits, nr_cpu_ids)
+> > memcpy(pinst->cpumask.cbcpu->bits, cbcpumask->bits, nr_cpu_ids)
+> > 
+> > Now the compiler complains about "error: ‘__builtin_memcpy’ reading
+> > between 257 and 536870904 bytes from a region of size 256". So the
+> > value of nr_cpu_ids which gcc calculated is between 257 and 536870904.
+> > This looks strange and incorrect.
 > 
-> As this is different, my Ack does not still stand, sorry :(
+> Thanks for the detour into internals. I did the same by myself, and
+> spent quite a lot of my time trying to understand why GCC believes
+> that here we're trying to access memory beyond idx == 256 and up to
+> a pretty random 536870904.
 > 
->> +# Currently, disable -Wstringop-overread for gcc-13+ and FORTIFY_SOURCE globally.
->> +config GCC13_NO_STRINGOP_OVERREAD
->> +	def_bool y
-> 
-> I hit this with gcc 14, it's not just a gcc 13 issue.
-> 
->> +config CC_NO_STRINGOP_OVERREAD
->> +	bool
->> +	default y if CC_IS_GCC && GCC_VERSION >= 130000 && GCC13_NO_STRINGOP_OVERREAD && FORTIFY_SOURCE
-> 
-> Ok, I see you enabled this for more than 13, but why call it "13"?
-Yeah I'd change it to GCC_NO_STRINGOP_OVERREAD.
-> 
->> +
->>  #
->>  # For architectures that know their GCC __int128 support is sound
->>  #
->> diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
->> index 1d13cecc7cc7..1abd41269fd0 100644
->> --- a/scripts/Makefile.extrawarn
->> +++ b/scripts/Makefile.extrawarn
->> @@ -27,6 +27,7 @@ endif
->>  KBUILD_CPPFLAGS-$(CONFIG_WERROR) += -Werror
->>  KBUILD_CPPFLAGS += $(KBUILD_CPPFLAGS-y)
->>  KBUILD_CFLAGS-$(CONFIG_CC_NO_ARRAY_BOUNDS) += -Wno-array-bounds
->> +KBUILD_CFLAGS-$(CONFIG_CC_NO_STRINGOP_OVERREAD) += -Wno-stringop-overread
-> 
-> I don't want this disabled for all files in the kernel, we only have one
-> that this is a problem for.  I think you disable this, the whole fortify
-> logic is disabled which is not the goal, why not just force the fortify
-> feature OFF if we have a "bad compiler" that can not support it?
-> 
-okay so that means you recommend to disable FORTIFY_SOURCE for gcc-13+ instead 
-of disabling -Wstringop-overread globally?
+> 256 is most likely NR_CPUS/8, and that makes sense. But I have no ideas
+> what does this 536870904 mean. OK, it's ((u32)-64)>>3, but to me it's a
+> random number. I'm quite sure cpumasks machinery can't be involved in
+> generating it.
 
-> So no, I don't think this is the correct solution here, sorry.
-> 
-> And it's odd that we are the only 2 people hitting it, has everyone else
-> just given up on gcc and moved on to using clang?
-I guess that developers are either using Clang or they haven't enabled CONFIG_FORTIFY_SOURCE 
-if they're using gcc-13+.
+That can also be written as (UINT_MAX - 63) / 8, which I believe matches
+the ultimate math of bitmap_size() if nbits is UINT_MAX (but I did not
+fully verify) in bitmap_copy(). I tried building this code with the
+in-review -fdiagnostics-details option from GCC [1] but it does not
+really provide any other insight here. UINT_MAX probably comes from the
+fact that for this configuration, large_cpumask_bits is an indeterminate
+value for the compiler without link time optimization because it is an
+extern in kernel/padata.c:
 
-Thanks,
---Nilay
+| #if (NR_CPUS == 1) || defined(CONFIG_FORCE_NR_CPUS)
+| #define nr_cpu_ids ((unsigned int)NR_CPUS)
+| #else
+| extern unsigned int nr_cpu_ids;
+| #endif
+| ...
+| #if NR_CPUS <= BITS_PER_LONG
+|   #define small_cpumask_bits ((unsigned int)NR_CPUS)
+|   #define large_cpumask_bits ((unsigned int)NR_CPUS)
+| #elif NR_CPUS <= 4*BITS_PER_LONG
+|   #define small_cpumask_bits nr_cpu_ids
+|   #define large_cpumask_bits ((unsigned int)NR_CPUS)
+| #else
+|   #define small_cpumask_bits nr_cpu_ids
+|   #define large_cpumask_bits nr_cpu_ids
+| #endif
+
+From what I can tell, nothing in this callchain asserts to the compiler
+that nr_cpu_ids cannot be larger than the compile time value of NR_CPUS
+(I assume there is a check for this somewhere?), so it assumes that this
+memcpy() can overflow if nr_cpu_ids is larger than NR_CPUS, which is
+where that range appears to come from. I am able to kill this warning
+with
+
+diff --git a/include/linux/cpumask.h b/include/linux/cpumask.h
+index 9278a50d514f..a1b0e213c638 100644
+--- a/include/linux/cpumask.h
++++ b/include/linux/cpumask.h
+@@ -836,6 +836,7 @@ void cpumask_shift_left(struct cpumask *dstp, const struct cpumask *srcp, int n)
+ static __always_inline
+ void cpumask_copy(struct cpumask *dstp, const struct cpumask *srcp)
+ {
++	BUG_ON(large_cpumask_bits > NR_CPUS);
+ 	bitmap_copy(cpumask_bits(dstp), cpumask_bits(srcp), large_cpumask_bits);
+ }
+ 
+
+although I am sure that is not going to be acceptable but it might give
+a hint about what could be done to deal with this.
+
+Another option would be taking advantage of the __diag infrastructure to
+silence this warning around the bitmap_copy() in cpumask_copy(), stating
+that we know this can never overflow because of <reason>. I think that
+would be much more palpable than disabling the warning globally for the
+kernel, much like Greg said.
+
+[1]: https://inbox.sourceware.org/gcc-patches/20241105163132.1922052-1-qing.zhao@oracle.com/
+
+Cheers,
+Nathan
