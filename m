@@ -1,188 +1,109 @@
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2059.outbound.protection.outlook.com [40.107.92.59])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23B861F63ED;
-	Mon,  9 Dec 2024 23:26:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.59
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733786813; cv=fail; b=hHfwgvSaEdMOsBmOO1I6NxRTlfX+PmQnCBX7DjaQ1j+3JfkR8xqRROnMVm8QTTZrULQXTPskMHXq1XSaGQma9BI3D6xsB/uoPn025UdwCR/ejukmpwqyu6MZlMqf2HrJzG9iQ04AGZQb7atCBEHX7JOK/GumW6ieR9K/rPwWvps=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733786813; c=relaxed/simple;
-	bh=+K/vxkwEDi5ITWxFyyh9ydzrNB1ByGyVWGA+yYpUH0I=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OV7abQcQqclDTA/06pU0JN+M0NKQXXOUXUgwB/3I1fCxWb4GxQmoyg43ucSFzaJNCXq/NBY3YT5TVd5KBjfAbK0nv1kivL7iVKuVh/slXmIVXrL5pW0bh5G+CVnD4P/VBK7wBqLt0/cNVRAnbNOacbqwrPbrTHcgHT+47TRi8Dc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=iodtDyV5; arc=fail smtp.client-ip=40.107.92.59
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C7EE1F63FE;
+	Mon,  9 Dec 2024 23:27:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1733786851; cv=none; b=UFelkxWlI6bGoiV1oiMeY80/rHKLZar8tL0EhXImtmPOlQr0yE8V8p9RpNWAkKxOZ7VMxHrLjoAWVONCD0c0ALgyzGpe03FmbGACG+cF1uxcLwOKZ8loortnzc2UwSRzxP2VBBJDKO8G0yZPL6rjWnt4qr7s4VD8j1gPwGJ52uI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1733786851; c=relaxed/simple;
+	bh=sib2JIsnpaJ4xFop5I9w3oSpRI1Wmim0nseZDPgA/uQ=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rSHYC0zdoMdu14F62rtIc07rzeGAofMyJOnsCP579kX8pT/YfKAhCx99s89YOxR/l8n8Uc9GHGQsZVJ43lRFi6FL+6thCYnJa+O/OdHnsNT5+QEtzuTZf5k2c9hBvnDf0yNzwbO6xFQ/sHuHo6E8dXI4u5oPHvv1/1EqZqOFjks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kLSXNKtK; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="iodtDyV5"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ePZzRSgWlDgyhAUtDdPtdlUqvR5BGCBOZqPgsh+6K7j9eyISykrT+sCj6Ymw+anYshDdmLLHBxu/D+BoW13RDDDyV9E+FBb2G2UrQqmiatFnObkXNiMcwlxZorsiX1wuXx17AJ9k/QKuBEkoEXLvUMC+D0KPY2gjHs+Ka42xSP98s0ceJnuorl5nMfZdliLW6aQk/lcCfc7gIT3DefZX3IB49Yc7mrzHJNNNP3sxxMcAv4twHwG8HnaB8r6SnSM8ImSu2FSUI/oICKjODx52tb7O6vb7WL2jY11UBtdlCEoLuAIQrkSI4Y6S1U//ee4MCuFK4QqxprBBjrAHzUMfrw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TrAwe1BAilVXJlrfkQ47r9N2MLlEwHGTplDZfKUWkbM=;
- b=vVwVJrlDQwieE6g3tpwU85fmwzyZORzI3itMqEWTTUG5kJb3kuVhKuMYbPSNJgjUAxbReedJLUQByBYiqXqjv6VwPbG3b1OMWwJjLs2Swo049T5ucaNFCwKP9vXSBBVyGmsuoSCe74ynJO/ZHDXvYLddbIZ7kkYdz+Yr5pjPz3F2O89EIa9lRBS5bgsw1h3jwTKLlKehvfqOt98NbcN27hAEq+7XrPOm9ifdIorSujzavAGidZ26wiqFZ1y2ACqU07cypEIFYxahJXmYQUQlA9RkClJVpAhHQOjEI14uHxOytVE1A/KaeEr8e8uTMbcBYGQCMPNn1p5IOuhnc2VZ+A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TrAwe1BAilVXJlrfkQ47r9N2MLlEwHGTplDZfKUWkbM=;
- b=iodtDyV5A44rGP9tJRITHVYaJf2px8IiHkBjpvuSj3xUNyZ4lOOxpPi03nJ9g/CYQC5MNcpOKar63YlmfCvyb6iLXjlqVmbeFGVI8CsS6v9IydX9hrJUK0pyfFuaoZ7qFEACU0Ti0UOjDfje1j//94Prn/gsoWBeP3kHGUkZZ3U=
-Received: from SA0PR11CA0179.namprd11.prod.outlook.com (2603:10b6:806:1bb::34)
- by SN7PR12MB7249.namprd12.prod.outlook.com (2603:10b6:806:2a9::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8207.24; Mon, 9 Dec
- 2024 23:26:48 +0000
-Received: from SA2PEPF00003F63.namprd04.prod.outlook.com
- (2603:10b6:806:1bb:cafe::5e) by SA0PR11CA0179.outlook.office365.com
- (2603:10b6:806:1bb::34) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8230.12 via Frontend Transport; Mon,
- 9 Dec 2024 23:26:48 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SA2PEPF00003F63.mail.protection.outlook.com (10.167.248.38) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8230.7 via Frontend Transport; Mon, 9 Dec 2024 23:26:47 +0000
-Received: from ethanolx7e2ehost.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 9 Dec
- 2024 17:26:46 -0600
-From: Ashish Kalra <Ashish.Kalra@amd.com>
-To: <seanjc@google.com>, <pbonzini@redhat.com>, <tglx@linutronix.de>,
-	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
-	<x86@kernel.org>, <hpa@zytor.com>, <thomas.lendacky@amd.com>,
-	<john.allen@amd.com>, <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC: <michael.roth@amd.com>, <dionnaglaze@google.com>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<linux-coco@lists.linux.dev>
-Subject: [PATCH 7/7] crypto: ccp: Move SEV/SNP Platform initialization to KVM
-Date: Mon, 9 Dec 2024 23:26:37 +0000
-Message-ID: <9ab04dfe22c067eb412ed4198b26c5d1482c6c22.1733785468.git.ashish.kalra@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <cover.1733785468.git.ashish.kalra@amd.com>
-References: <cover.1733785468.git.ashish.kalra@amd.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kLSXNKtK"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-434f30ba149so12491965e9.0;
+        Mon, 09 Dec 2024 15:27:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733786848; x=1734391648; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=YUkySfBwBkhhjkuJlpR0sFTlCT96jZzoa4DO4d+b/nA=;
+        b=kLSXNKtK2q+jw0s3rWD+pkirSnkLSlmwP2GpmN644Q++gq+5fbK4qJEecsW54iG3Zk
+         HP43JKnahMn5vJN5ZRpbFQb995RWHlnv1KDuSil7zZFmHNY+RmO5yP1bA/y3Y/9z5nbJ
+         EyR/mADCFHNMk02Aj26oT2o8VRfEhQg+Eh8418cfRA+Vr6iSYSh+wUiQrMrOuQCIeHLx
+         YFe8/J51H0WtII4UMoTn8xQQzGp0eXFR7AfrVJ5eEtOQ1T6WYw5ot14DsG8/r+0RvElf
+         F73PyotwUce3NY7akcxnLXHDeHVWsRR7JRBJBB453taNQT1r0qD3J1kMgRuogXJr8Vqq
+         afwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733786848; x=1734391648;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YUkySfBwBkhhjkuJlpR0sFTlCT96jZzoa4DO4d+b/nA=;
+        b=aFPoQIXh3L3lEuSwcLhxqvYzlRdr8d6JSU7fWAU7Hb8Dn723PajE3hug/GHEgxM6ST
+         EXwSogTFIuLvbOCziWjf4S83LrQ3QiL8NJMam0HYVWSnI+Snm07CKbrlSngOxYrA5J7R
+         CpM2N4ny6BZ5Q+QD8rc7ydrSZEH7lFVhevX5wNjA3igc1sdRWvRyLVsSJp8lzQOYaxU7
+         E+mn411ZH1y8aX9ZPD3YbOe/MgWtpBov+NGsAEhpexjT31vtj31nMVCNKciVF3tV0VK3
+         GajbuDbU5H0RvqhBo+CJGiC/NlSmmpU6Lc+wHs56uXXkVY/z++ys1GPEpcpzhnlyNjsf
+         r/wQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUsaJ4Ugaddf0zNpaghCC+wvXRBu+Jknri+87vHgHPWUeThSPnTEys+0yLnwxvfGliOf05+qknkziup@vger.kernel.org, AJvYcCWQB9tR3Xzen7HWuL0pS1zrmRP8uk1jrCxAfP8at7lmwm6KjcFa1T11RDZS8r6E7r6gblcWVkmJODkWxihy@vger.kernel.org, AJvYcCWze0VLOfR6sZ8y9Q2Ta4w7LX41TnSsowZfCcoxA+ODUMb8dNbHGFrFsBblrmTDmb1AL8hRdk6Nq7DpzCDh@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy+x3A1Lp6n8mbGcl+agLweTuGhS9g+Gh58vbcyGBhPCIS3qirL
+	yEobLkcXikCvC8X77oDyR0bouZoIHvN2yBO1wV00ZAHwbs/S5bF+
+X-Gm-Gg: ASbGncsnHiwJ7uUghdAsGWsW9BXxkENDeQbWiDNGYUb2sOHS2Tj+3rjH9PnkMBBM4HS
+	afuB4IqF79FzGtRL8QjZxF/jYq84PfParSgy5tqtk2+vGKfpJaRrsBkApzAJL/d7MRS4yeqq1a8
+	tI/NB0Zh48S6D68CcEn4x4uYQJ6jwBa5hgKUKEABeg8hSLmtS7iwG4GzqsNjrpmRHvgnp0OscS6
+	i9iGu5/1eOA1WuxgmKINJxo1edxHmsddAS8MWa1Y4Wq7+IJ+Pf7tlZfqJyXX+aHYB+OKXdKR4ar
+	WosCkJ1XQg==
+X-Google-Smtp-Source: AGHT+IG+AB1Ph1Dj5geXxUnKA8iVEw8ecVqYIcxVzRThCcrVKOuP+9lqU9OBDnF6U9HvS4qSlC1FZg==
+X-Received: by 2002:a05:6000:1f8c:b0:385:f280:d55 with SMTP id ffacd0b85a97d-386453fe853mr1676974f8f.37.1733786847561;
+        Mon, 09 Dec 2024 15:27:27 -0800 (PST)
+Received: from Ansuel-XPS. (93-34-91-161.ip49.fastwebnet.it. [93.34.91.161])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-386219096adsm14666431f8f.85.2024.12.09.15.27.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Dec 2024 15:27:26 -0800 (PST)
+Message-ID: <67577cde.df0a0220.128dd3.75a0@mx.google.com>
+X-Google-Original-Message-ID: <Z1d82uNcCx7EcU0n@Ansuel-XPS.>
+Date: Tue, 10 Dec 2024 00:27:22 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Antoine Tenart <atenart@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+	Waiman Long <longman@redhat.com>, Boqun Feng <boqun.feng@gmail.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>, linux-crypto@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev, upstream@airoha.com
+Cc: Richard van Schagen <vschagen@icloud.com>
+Subject: Re: [PATCH v7 3/3] crypto: Add Inside Secure SafeXcel EIP-93 crypto
+ engine support
+References: <20241112015920.22564-1-ansuelsmth@gmail.com>
+ <20241112015920.22564-4-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF00003F63:EE_|SN7PR12MB7249:EE_
-X-MS-Office365-Filtering-Correlation-Id: ee84bfba-3cb7-48f0-a7e4-08dd18a8f379
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|82310400026|7416014|1800799024|36860700013|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?iycZSwUYS7G6kQOb+1ckHthZaIrn88c7uHohfwHUQsMz3SMyfec74RRGsOoR?=
- =?us-ascii?Q?ND2VqVvLNP+1fSWzqHzW9ceMKiCtRCd2HzeW80xJfrNRGJ9mbceuBhv+mFEW?=
- =?us-ascii?Q?t8nafgre/hcSleAhldBXqz4ZPnbFGwJI44QFmnGEkvxP02jdAMlRpJynuJ/F?=
- =?us-ascii?Q?Sg21iPI7E/OivWFUUxJqCRC8E4zEvPQL25b7whhcpG8dD734j5S52RhFsX6a?=
- =?us-ascii?Q?bJN+IZqMxAULZNKrywsA/gzVf6Pw8vvqRCe7wwjsrA9JSxyi+o59kWlJj0Sh?=
- =?us-ascii?Q?AgRRI2JBybrAmUIC0w/h5kAfD7oM8eK/vxZXsQzkhwnej6Gb91JEBkRD8co4?=
- =?us-ascii?Q?nIj7zYtI6oPtFhfl08APTo4uefwF88SnvnEqfGS9bCywP9xefMq53/3qop2W?=
- =?us-ascii?Q?eWiJaABavbGqW5KKJpVvFlsN0QZqfL+/iEplrR5PruEyOTEV3P9RtlfzYAI8?=
- =?us-ascii?Q?fejLWlWUGg3ABzC/EoStI3onLdTPAchFTi4lXwCioaMuJakgDLikYrs0MctC?=
- =?us-ascii?Q?x34dAmSixHUz+isEVYXT22rAJJKogSOAFvOE8EdyTcHOXgEQhFlw6qycJooa?=
- =?us-ascii?Q?NnaC85NsIvH5BgtOIL7OFte3GPO0BdbAWbqFPayPN5krvOOYJiymox4yK1CG?=
- =?us-ascii?Q?hHF/8oNZXWq2AFOOANRTsuD5L7r2tSIuUdkFAiX0VwoCnKGoNiHhRZO90oj/?=
- =?us-ascii?Q?vEuD5vGxGjKZLrHPRQfpw1tvzdQGCi+cTT4ChOucwbEEDL7aiIqR8wJEhoMm?=
- =?us-ascii?Q?lxnu4gih6kFHwGFYHjWkP89mxpc6gUsqtnKjx5yc8H0AvxkRnULIqPHPohjC?=
- =?us-ascii?Q?HFoCoB60QpqFutnAc5QZJM658Ov1gP/3EQaQ4oerwak8U6yw7HRt586H3DRD?=
- =?us-ascii?Q?UKEYugiy9vcBIgPX62D8SLc/ccKYeKIhdmpiXkT+lLpzWU9ScYkyKasjplBd?=
- =?us-ascii?Q?QZcQsiCa9938oZpNxxyZj8rd8LWlBJ00VBybbyGKRTd+39EME4lPsF4geuPo?=
- =?us-ascii?Q?2vZOgKtOvhTpZAVOx3Y3cUFqGX8+wNLsZLZTTU3eexU8meHgglI4cBMo1q12?=
- =?us-ascii?Q?SrAXUiADai5aGdPjXkVfY5zZ4i/MmpGDS0Ab7ukkziy+TWziVfP7tles3s7p?=
- =?us-ascii?Q?zW+N1m37C7Qa6Rd9AdXCq2hHm5vR3RhqmBg4es47s70oQFrOd6+yVLBORmQl?=
- =?us-ascii?Q?qbeeL3Jn3322rKLSdHmOp3WfNzSlGNfY3RrYdnZD6ZpUpWC022fqgCH01NBf?=
- =?us-ascii?Q?t9EBmDnPcxTUGyBpjh5r0xMYURogXq+FgpJ1IMUN2ZRm9iQbKt/hvnGdm9ka?=
- =?us-ascii?Q?WYqmvZ88q2tCqZry70HyqHmGE+JQ6kpK86lAGy4av2DC8kQtBMnLGS3+E9P1?=
- =?us-ascii?Q?nOndgfRulzc7l624D1Wwb2VvP40aiO74fD0w1m66BLqm/EEZiKtf+srJTYD+?=
- =?us-ascii?Q?SPgrbaVX1q3zFKLr5Rm7GmmfYgfev5ptH1a2XMSuOcA9fnVv/VGW7A=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(7416014)(1800799024)(36860700013)(921020);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Dec 2024 23:26:47.4105
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ee84bfba-3cb7-48f0-a7e4-08dd18a8f379
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF00003F63.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7249
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241112015920.22564-4-ansuelsmth@gmail.com>
 
-From: Ashish Kalra <ashish.kalra@amd.com>
+On Tue, Nov 12, 2024 at 02:59:00AM +0100, Christian Marangi wrote:
+> Add support for the Inside Secure SafeXcel EIP-93 Crypto Engine used on
+> Mediatek MT7621 SoC and new Airoha SoC.
+> 
+> EIP-93 IP supports AES/DES/3DES ciphers in ECB/CBC and CTR modes as well as
+> authenc(HMAC(x), cipher(y)) using HMAC MD5, SHA1, SHA224 and SHA256.
+> 
+> EIP-93 provide regs to signal support for specific chipers and the
+> driver dynamically register only the supported one by the chip.
+> 
+> Signed-off-by: Richard van Schagen <vschagen@icloud.com>
+> Co-developed-by: Christian Marangi <ansuelsmth@gmail.com>
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 
-SNP initialization is forced during PSP driver probe purely because SNP
-can't be initialized if VMs are running.  But the only in-tree user of
-SEV/SNP functionality is KVM, and KVM depends on PSP driver for the same.
-Forcing SEV/SNP initialization because a hypervisor could be running
-legacy non-confidential VMs make no sense.
+Any news with this?
 
-This patch removes SEV/SNP initialization from the PSP driver probe
-time and moves the requirement to initialize SEV/SNP functionality
-to KVM if it wants to use SEV/SNP.
-
-Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
----
- drivers/crypto/ccp/sev-dev.c | 15 ---------------
- 1 file changed, 15 deletions(-)
-
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index b8938c96915b..52dce46745ba 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -2528,9 +2528,7 @@ EXPORT_SYMBOL_GPL(sev_issue_cmd_external_user);
- void sev_pci_init(void)
- {
- 	struct sev_device *sev = psp_master->sev_data;
--	struct sev_platform_init_args args = {0};
- 	u8 api_major, api_minor, build;
--	int rc;
- 
- 	if (!sev)
- 		return;
-@@ -2553,16 +2551,6 @@ void sev_pci_init(void)
- 			 api_major, api_minor, build,
- 			 sev->api_major, sev->api_minor, sev->build);
- 
--	/* Initialize the platform */
--	args.probe = true;
--	rc = sev_platform_init(&args);
--	if (rc)
--		dev_err(sev->dev, "SEV: failed to INIT error %#x, rc %d\n",
--			args.error, rc);
--
--	dev_info(sev->dev, "SEV%s API:%d.%d build:%d\n", sev->snp_initialized ?
--		"-SNP" : "", sev->api_major, sev->api_minor, sev->build);
--
- 	return;
- 
- err:
-@@ -2577,7 +2565,4 @@ void sev_pci_exit(void)
- 
- 	if (!sev)
- 		return;
--
--	sev_firmware_shutdown(sev);
--
- }
--- 
-2.34.1
 
