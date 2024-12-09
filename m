@@ -1,132 +1,109 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3BC914E2CC;
-	Mon,  9 Dec 2024 19:36:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E4B5199E84;
+	Mon,  9 Dec 2024 20:03:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733772963; cv=none; b=nRNIoFp2L/P0rSYUD5RD2/w/gIy34oMQX6RPQUDu74P9E7dZknWre+ku80GNEIGU8oEoDUEEmn5O3F9WJA2uyRO7Ea+Y9+3EwQ1pC7ld0HuAG6WBBAvR4bQ6JOfbqSrka0v9zBwybOxWY3h7nTSiJAMf9U00QVrDoWefO0fUItM=
+	t=1733774586; cv=none; b=VHjUQT/kC+cVEx+LHfqZkDbGyTPMxTA75dwGL+yBS0kKAVNRetdTGC//8Ejo1xlvRYY2qz8F2Lj09rUdTG+KdQzFVytC8iezMxlltsNV6qa5blFvLKJyA5eYIC43wzyF3gD56yfZVpKF3UcbW0AKqzrqLbbriPSMtwwRw7dfsRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733772963; c=relaxed/simple;
-	bh=Q5rZxy0kJibOV6Sj3CPasPQPWuPDGx1ot+UAxBTJ2cA=;
+	s=arc-20240116; t=1733774586; c=relaxed/simple;
+	bh=9u8xk4MVZjE+I/KmhhxlHUJLDsygTkdptb4/MiVBuxo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JKLDqwp0FfEoSS4x2jm7tXlFa/VYx/NMSXnBzdG4uJFwjILW2IEBJvF2DGOmVVifJWG2AGteFVDfDWRG78g7zWcg1F4UUDO5UPlDxvoqe5HHBu22MKsP8vueIN0EvzNLCHy3w9EopDEjQbm2ZHY+DR95izZhf25Gg1YzRFJzW14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZVp4UZ9G; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=Gg9SPyBH6EHgS0I1bHrMkLaPlvNHUXsxYY4rL7jlYDfBD9E05KfJ8waH8bIy+tj6LQAv5gC3T1W4irMmerfJyZLnrfqCn3xz81hMSsjOipr+4nFtNtMfTSAGsA7A+F2Jl0Yu5Rwtfc3Ds918cxzA51LEkJnQdJHn5asrQgOGj78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jHOd5B1I; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZVp4UZ9G"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A52CEC4CED1;
-	Mon,  9 Dec 2024 19:36:00 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jHOd5B1I"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A131C4CEDF;
+	Mon,  9 Dec 2024 20:03:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1733772963;
-	bh=Q5rZxy0kJibOV6Sj3CPasPQPWuPDGx1ot+UAxBTJ2cA=;
+	s=k20201202; t=1733774585;
+	bh=9u8xk4MVZjE+I/KmhhxlHUJLDsygTkdptb4/MiVBuxo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZVp4UZ9GtGupfceM2V8krYGkLZAydHOXQ2ixoOngZxD0qm9p2TBcINe5h43dUlDj4
-	 zwwGVhl6CIsMG8klnNtAhgKgonm/Hkhoa59yZtnAVs0k8WiCu/kyQkSqmyLD2oKtbB
-	 jGfWZF1V6x8tb9j2QS41xi8cZZDb3BZL/9THlbDQf6n1uoDALOLdeddHOFb6xOQO4I
-	 48SVDH7CXRkIEbaB6w34xUVfGMfH8hJe3tV/1M6l/yExYF/I9PLhjnkHDmSB/1U2A5
-	 XAbAMd1v+fBUWhgnzAhj1SEFPknHLmHx+Yc67HZ3nGgvg0E8jApEvfehIEKVnAhCbA
-	 +0cR9A69HHThw==
-Date: Mon, 9 Dec 2024 12:35:58 -0700
+	b=jHOd5B1IEei7aAFajLNzTzLacvccQX4fmtk8G541ZumOpJx031vdP3BPgRurQYR+0
+	 uJhhZBZg2+Ioy/ImLgu/+aqZoeuNXLFCrc/cy9Cx26GslAG13o/GFTLsZTdqEjl76t
+	 4kh+a3Pxzt+yeHcQvZDfg4+LXSjLUs+WrbYoGo1tEM3Epho5quFRPDdk2rTXyld7tP
+	 Ry4N5juOeUIYLmSMlIia0qx4YYcxvKuOk24XTIfNebfSHPdHLLpWJnLgTIeSjHzWxy
+	 Zjof6Esy6fBVfKcF19IYdyAzJ1U6teIIODq9ILepW+8Q2tJ2HUjav6g2ML3H0SVGcf
+	 ey5n2L1ekaEKw==
+Date: Mon, 9 Dec 2024 13:03:00 -0700
 From: Nathan Chancellor <nathan@kernel.org>
-To: Yury Norov <yury.norov@gmail.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Cc: Nilay Shroff <nilay@linux.ibm.com>, linux-kernel@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	briannorris@chromium.org, kees@kernel.org, gustavoars@kernel.org,
-	steffen.klassert@secunet.com, daniel.m.jordan@oracle.com,
-	gjoyce@ibm.com, linux-crypto@vger.kernel.org, linux@weissschuh.net
+	briannorris@chromium.org, yury.norov@gmail.com, kees@kernel.org,
+	gustavoars@kernel.org, steffen.klassert@secunet.com,
+	daniel.m.jordan@oracle.com, gjoyce@ibm.com,
+	linux-crypto@vger.kernel.org, linux@weissschuh.net
 Subject: Re: [PATCHv3] gcc: disable '-Wstrignop-overread' universally for
  gcc-13+ and FORTIFY_SOURCE
-Message-ID: <20241209193558.GA1597021@ax162>
+Message-ID: <20241209200300.GB1597021@ax162>
 References: <20241208161315.730138-1-nilay@linux.ibm.com>
- <Z1XkhhBqFYtbvQYp@yury-ThinkPad>
+ <2024120938-kilogram-granite-9a53@gregkh>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Z1XkhhBqFYtbvQYp@yury-ThinkPad>
+In-Reply-To: <2024120938-kilogram-granite-9a53@gregkh>
 
-On Sun, Dec 08, 2024 at 10:25:21AM -0800, Yury Norov wrote:
-> On Sun, Dec 08, 2024 at 09:42:28PM +0530, Nilay Shroff wrote:
-> > So the above statements expands to:
-> > memcpy(pinst->cpumask.pcpu->bits, pcpumask->bits, nr_cpu_ids)
-> > memcpy(pinst->cpumask.cbcpu->bits, cbcpumask->bits, nr_cpu_ids)
-> > 
-> > Now the compiler complains about "error: ‘__builtin_memcpy’ reading
-> > between 257 and 536870904 bytes from a region of size 256". So the
-> > value of nr_cpu_ids which gcc calculated is between 257 and 536870904.
-> > This looks strange and incorrect.
+On Mon, Dec 09, 2024 at 07:45:51AM +0100, Greg Kroah-Hartman wrote:
+> > diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
+> > index 1d13cecc7cc7..1abd41269fd0 100644
+> > --- a/scripts/Makefile.extrawarn
+> > +++ b/scripts/Makefile.extrawarn
+> > @@ -27,6 +27,7 @@ endif
+> >  KBUILD_CPPFLAGS-$(CONFIG_WERROR) += -Werror
+> >  KBUILD_CPPFLAGS += $(KBUILD_CPPFLAGS-y)
+> >  KBUILD_CFLAGS-$(CONFIG_CC_NO_ARRAY_BOUNDS) += -Wno-array-bounds
+> > +KBUILD_CFLAGS-$(CONFIG_CC_NO_STRINGOP_OVERREAD) += -Wno-stringop-overread
 > 
-> Thanks for the detour into internals. I did the same by myself, and
-> spent quite a lot of my time trying to understand why GCC believes
-> that here we're trying to access memory beyond idx == 256 and up to
-> a pretty random 536870904.
-> 
-> 256 is most likely NR_CPUS/8, and that makes sense. But I have no ideas
-> what does this 536870904 mean. OK, it's ((u32)-64)>>3, but to me it's a
-> random number. I'm quite sure cpumasks machinery can't be involved in
-> generating it.
+> I don't want this disabled for all files in the kernel, we only have one
+> that this is a problem for.  I think you disable this, the whole fortify
+> logic is disabled which is not the goal, why not just force the fortify
+> feature OFF if we have a "bad compiler" that can not support it?
 
-That can also be written as (UINT_MAX - 63) / 8, which I believe matches
-the ultimate math of bitmap_size() if nbits is UINT_MAX (but I did not
-fully verify) in bitmap_copy(). I tried building this code with the
-in-review -fdiagnostics-details option from GCC [1] but it does not
-really provide any other insight here. UINT_MAX probably comes from the
-fact that for this configuration, large_cpumask_bits is an indeterminate
-value for the compiler without link time optimization because it is an
-extern in kernel/padata.c:
+I am glad we agree that disabling -Wstringop-overread for the kernel
+entirely is the wrong way to approach this but I think that turning off
+ALL of FORTIFY_SOURCE for these compiler versions (which are some of the
+latest available) is also the wrong approach, especially in this current
+situation where it seems like it is unreasonable to expect the compiler
+not to warn about a potential overread here with the amount of
+information available to it but maybe I am misunderstanding something
+here:
 
-| #if (NR_CPUS == 1) || defined(CONFIG_FORCE_NR_CPUS)
-| #define nr_cpu_ids ((unsigned int)NR_CPUS)
-| #else
-| extern unsigned int nr_cpu_ids;
-| #endif
-| ...
-| #if NR_CPUS <= BITS_PER_LONG
-|   #define small_cpumask_bits ((unsigned int)NR_CPUS)
-|   #define large_cpumask_bits ((unsigned int)NR_CPUS)
-| #elif NR_CPUS <= 4*BITS_PER_LONG
-|   #define small_cpumask_bits nr_cpu_ids
-|   #define large_cpumask_bits ((unsigned int)NR_CPUS)
-| #else
-|   #define small_cpumask_bits nr_cpu_ids
-|   #define large_cpumask_bits nr_cpu_ids
-| #endif
+https://lore.kernel.org/20241209193558.GA1597021@ax162/
 
-From what I can tell, nothing in this callchain asserts to the compiler
-that nr_cpu_ids cannot be larger than the compile time value of NR_CPUS
-(I assume there is a check for this somewhere?), so it assumes that this
-memcpy() can overflow if nr_cpu_ids is larger than NR_CPUS, which is
-where that range appears to come from. I am able to kill this warning
-with
+If it is not possible to shut the compiler up by changing the source to
+be more robust, I think we should strongly consider disabling it in
+directly in cpumask_copy() using the __diag infrastructure. I think it
+is underutilized as a solution to warnings like this.
 
-diff --git a/include/linux/cpumask.h b/include/linux/cpumask.h
-index 9278a50d514f..a1b0e213c638 100644
---- a/include/linux/cpumask.h
-+++ b/include/linux/cpumask.h
-@@ -836,6 +836,7 @@ void cpumask_shift_left(struct cpumask *dstp, const struct cpumask *srcp, int n)
- static __always_inline
- void cpumask_copy(struct cpumask *dstp, const struct cpumask *srcp)
- {
-+	BUG_ON(large_cpumask_bits > NR_CPUS);
- 	bitmap_copy(cpumask_bits(dstp), cpumask_bits(srcp), large_cpumask_bits);
- }
- 
+> And it's odd that we are the only 2 people hitting it, has everyone else
+> just given up on gcc and moved on to using clang?
 
-although I am sure that is not going to be acceptable but it might give
-a hint about what could be done to deal with this.
+Maybe people are not using CONFIG_WERROR=y and W=e when hitting this so
+they do not notice? It also only became visible in 6.12 because of the
+'inline' -> '__always_inline' changes in bitmap.h and cpumask.h, since
+prior to that, the size of the objects being passed to memcpy() were not
+known, so FORTIFY could not catch them (another +1 for that change).
+From what I can tell, it also requires a CONFIG_NR_CPUS value of 256 or
+greater, otherwise large_cpumask_bits is NR_CPUS, a compile time
+constant.
 
-Another option would be taking advantage of the __diag infrastructure to
-silence this warning around the bitmap_copy() in cpumask_copy(), stating
-that we know this can never overflow because of <reason>. I think that
-would be much more palpable than disabling the warning globally for the
-kernel, much like Greg said.
+Fedora clearly sees this though but it does not break their builds so I
+am guessing they have not reported it upstream yet?
 
-[1]: https://inbox.sourceware.org/gcc-patches/20241105163132.1922052-1-qing.zhao@oracle.com/
+https://koji.fedoraproject.org/koji/taskinfo?taskID=126644404
+https://kojipkgs.fedoraproject.org//work/tasks/4404/126644404/build.log
+
+For the record, clang has no warning like this because with how clang is
+currently architectured, the vast majority of warnings happen in the
+front end, where there is usually not enough reliable information
+available to make these kind of warnings be accurate, at least from my
+understanding.
 
 Cheers,
 Nathan
