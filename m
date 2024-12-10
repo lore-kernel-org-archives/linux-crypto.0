@@ -1,88 +1,98 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1594278F5D;
-	Tue, 10 Dec 2024 13:28:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 916E722FDFA
+	for <linux-crypto@vger.kernel.org>; Tue, 10 Dec 2024 15:51:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733837298; cv=none; b=P13pn87dhXfhtmyCLThEulQWOgZZKajVl05SJIldnxVgXTb12dmM0PM0EVu5eBTKgOdR/2OX+niMTLdBUXhHZXT4C9D6+VS7hSRUOZAwEXJsY43+sDcfj7uDM2d6klLy+U8mRh/TqzADavTnrbmrRDtDv0mD+bjkMOyHN2FzLig=
+	t=1733845894; cv=none; b=VbtKv70iKkrz7d0yE2yYDMHDnqaqsPvksCODXK2AFJjVL+yGA4Zu9snwsWcSs2NSSv/P5CJLPhc64Tkfc4HXhNHLR+OwUIBAif4Pnz/OJMCtI7t6vwYRvBpNJuanR2Wu9a4TtVHnx5piDucKd6mshFqriAciSwkUELteqpdGbco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733837298; c=relaxed/simple;
-	bh=ccNvQpqjr+JUyfSrXZAo24D/1j0K9F9qxyXslbViEUk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PBzx4cje2ZdoPi3cbHsH6tolxe40YHtTDXx5EAbWSYJExtLucBmsB4V8xgRe6SG7dMaEp56giBTe2vSDIBb8zZCtr7AQ0k87jKEt12rMvQVZoMpGjddqB9Ro1i7pPHsCVLUJRInOkbX3HTVFb6psPY2iFALAl9+jaEWwLFiBXuA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=gqg5lyC4; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1733845894; c=relaxed/simple;
+	bh=6OaTMfkTA/OmgikKXTbbHwl/a5xyjcE8zGh1IgbdmZs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ge3Kvhg8a4qrde9po3MhFH5at8kq//gl9ZjqNKG2+vQ4q1wC3wJihQa1Itn2FHpHiZAYq7w0lqdCdfwAUETg7PN6nS/FIGoQDpkdKK+sa5ANhAUyxjj3brKxHczG9MGXlLRw85reqUUwiIQvC1fqjvjZpo7DQ4jzQ9Uw1qvKr88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fN/9fqdO; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="gqg5lyC4"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=J4SZIWtWFvdEBBxd7ahrqofkskwaW/nYB7tGpgucLH0=; b=gqg5lyC46/+OCgH1rgdFL1T8DF
-	PveoXZ+zpRnN8xUoEDGHbmb1TIqhUS4jyeSsmdvJZP+5dSp988XW2FpPOmXUR2IV1DECQuUFZ5Lcx
-	fpup43NxrOmKbnPf7l/22nAl+WTkAS6AEIJ/2sOpPY2aBH7HuMlecrXogFbhUdkinRM6FWb+hThcf
-	jwJ6zVD/rWN+kf1fSkgV/TlGkShpCBibAdf9MZUnlyBZi46uMx0zzL7mJRODcYazyKxDKzesWlbPW
-	0bRoeKGz8ojqo0N215dkUAehNDWtk2bZEqO2pJ3wZ9CpjoJipN/AdggfmKrfSrWHkUAQXQfuWHWco
-	tR+Ulh7w==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tL04O-000U78-2l;
-	Tue, 10 Dec 2024 21:27:54 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 10 Dec 2024 21:27:53 +0800
-Date: Tue, 10 Dec 2024 21:27:53 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Antoine Tenart <atenart@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
-	Waiman Long <longman@redhat.com>, Boqun Feng <boqun.feng@gmail.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>, linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev, upstream@airoha.com,
-	Richard van Schagen <vschagen@icloud.com>
-Subject: Re: [PATCH v7 3/3] crypto: Add Inside Secure SafeXcel EIP-93 crypto
- engine support
-Message-ID: <Z1hB2WftNhyGt9oj@gondor.apana.org.au>
-References: <20241112015920.22564-1-ansuelsmth@gmail.com>
- <20241112015920.22564-4-ansuelsmth@gmail.com>
- <Z1e0LHycNGcWqd2q@gondor.apana.org.au>
- <67582c1b.050a0220.83ef5.c8df@mx.google.com>
- <Z1guyCJy-Cpo7U11@gondor.apana.org.au>
- <6758312f.df0a0220.100594.1c3a@mx.google.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fN/9fqdO"
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5d3e6f6cf69so4828082a12.1
+        for <linux-crypto@vger.kernel.org>; Tue, 10 Dec 2024 07:51:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1733845891; x=1734450691; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=zGEWpmLWCQTndHxT5IXaD/UcEthKFp24ucI3TjyxNCE=;
+        b=fN/9fqdOx11sFOJvCKTNttW74qrYlrwD/gvzbQx3wFhncOcoiUNgeytvIqGsHbiIlK
+         ossHvH4lZhZkXQUoStndPpuX93lfl/d6IbiymJ2NwtLnlDRRCCnCdICpLG3TJaeSJ1JV
+         VTHC0KtAYjDIU62VMUed8nXRhqBgjeeUBrhb4d9bDY9BWaHtidhL8mSidXE4eg7QkWW5
+         SOg0bo71U7PgzFGdCeWacVKo+qx6GZvOJ8H06I2KpyQojFXC9V/lJKPzpyXo3UYsf189
+         oTZNG/960+N4NWDoXvkp38rfuzQAjt+T+0gBIdZ9FNXV9W7eB2XAXSSN7TFUCwFjIdZP
+         u5xQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733845891; x=1734450691;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zGEWpmLWCQTndHxT5IXaD/UcEthKFp24ucI3TjyxNCE=;
+        b=qJhYqUElNOXhM+Wh9i3H/7ni/eVNocbIZbtcAn30t8g1Y6KB8f8qze8Ppf0UB31K1m
+         na0MESwwQLgOHpdvdjTJtsX0LTxID6hiHJjL0USar4tY2bEkExXwkJhzQQQGz1SIBR6J
+         OVdmATJ2xqyAtLW7v39OUAYRa2FrhwsdzVDjCOSAUHVEPRvQEHbfsoV3e6WUfprCj+s7
+         HchqapeYjf8EJ64/5W//3eN6TE9U9GLp0TJPRoYa9HRoTDpdn9RK0rKFiTFh7lKGcv1e
+         s36E1O0Jp5VWWdjNYK7/UDn2SO3qv52dLVJUOVJQzZb2ZkCW33xtn8bVyWFHfhU2wi/a
+         mGFA==
+X-Forwarded-Encrypted: i=1; AJvYcCXKbj5PIutX9mO599kHAKl3WQf+upfjsfVmMB0wcN7Ce9BMGXiSHhNIcGNAb5Dau5i91Jbi8pcStBEjF+Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyM2JmmNhlbmFPQbe/zzQFxGvQv812AZhkRgaw3Ghk+YwKE/0mH
+	CLGCu0DYauc/VcGvse3Q+b42zEVx7q0Gj4fwv5Rg847WS382p+TN2dxIqKe//psP8v2BYlVYvqQ
+	fVlaWayzBvviRNYAg58rfwt4Xf1ar2slLlXCM
+X-Gm-Gg: ASbGncsb7kbzFxaxkpG04PslKTQrrSkDFugUWN1NQcDVbwVa+r70jhhldKSMW4aE4LG
+	X8wfGESHyVQ3mUnDfhuiKdLnxJk5aDopQyDs=
+X-Google-Smtp-Source: AGHT+IFF1pHN9/6GA3MG/iAI7uuToN+v40kN7CYPXNMCf19FEEnJNP06BgAyjhrlHXP7Ud+BFaLU9/3DxddZc+NTX3w=
+X-Received: by 2002:a17:906:3118:b0:aa6:6e41:ea55 with SMTP id
+ a640c23a62f3a-aa66e41ede5mr1256721466b.7.1733845890857; Tue, 10 Dec 2024
+ 07:51:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6758312f.df0a0220.100594.1c3a@mx.google.com>
+References: <cover.1733785468.git.ashish.kalra@amd.com> <d1658358fa8c55dca2f1869ef8a8475fc303e9c8.1733785468.git.ashish.kalra@amd.com>
+In-Reply-To: <d1658358fa8c55dca2f1869ef8a8475fc303e9c8.1733785468.git.ashish.kalra@amd.com>
+From: Dionna Amalie Glaze <dionnaglaze@google.com>
+Date: Tue, 10 Dec 2024 07:51:19 -0800
+X-Gm-Features: AZHOrDm8zaFskRC34t7dTi25zxHQFgRiXcLbUT8F8VLJriuZ2gw6c8XA36wtfvo
+Message-ID: <CAAH4kHZCowU0FV4568P5C+pyv6T-9kL92qnMd2RTq+Sf-9j7Bg@mail.gmail.com>
+Subject: Re: [PATCH 1/7] crypto: ccp: Move dev_info/err messages for SEV/SNP initialization
+To: Ashish Kalra <Ashish.Kalra@amd.com>
+Cc: seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de, 
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
+	hpa@zytor.com, thomas.lendacky@amd.com, john.allen@amd.com, 
+	herbert@gondor.apana.org.au, davem@davemloft.net, michael.roth@amd.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-coco@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Dec 10, 2024 at 01:16:42PM +0100, Christian Marangi wrote:
 >
-> Oh! Ok, that is neat. Just to make sure everything is clear,
-> to complete the request it's the same used for final, the
-> ahash_request_complete(). I tought the -EINPROGRESS,
-> ahash_request_complete() pattern was only for final.
+>  static int _sev_platform_init_locked(struct sev_platform_init_args *args)
+> @@ -1329,8 +1342,7 @@ static int _sev_platform_init_locked(struct sev_platform_init_args *args)
+>                  * Don't abort the probe if SNP INIT failed,
+>                  * continue to initialize the legacy SEV firmware.
+>                  */
+> -               dev_err(sev->dev, "SEV-SNP: failed to INIT rc %d, error %#x\n",
+> -                       rc, args->error);
+> +               dev_info(sev->dev, "SEV-SNP: failed, continue to INIT SEV firmware\n");
 
-Correct, the same calling convention applies whether you're doing
-update or finup/final.  One difference is that after final/finup
-you don't have to export the hash state because it's no longer
-defined.
+You don't necessarily continue to INIT SEV if args->probe &&
+!psp_init_on_probe, so this may be misleading.
 
-Cheers,
+>         }
+>
+>         /* Defer legacy SEV/SEV-ES support if allowed by caller/module. */
+> --
+> 2.34.1
+>
+
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+-Dionna Glaze, PhD, CISSP, CCSP (she/her)
