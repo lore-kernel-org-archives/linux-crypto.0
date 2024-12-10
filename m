@@ -1,109 +1,123 @@
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C7EE1F63FE;
-	Mon,  9 Dec 2024 23:27:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 348457081E
+	for <linux-crypto@vger.kernel.org>; Tue, 10 Dec 2024 01:30:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733786851; cv=none; b=UFelkxWlI6bGoiV1oiMeY80/rHKLZar8tL0EhXImtmPOlQr0yE8V8p9RpNWAkKxOZ7VMxHrLjoAWVONCD0c0ALgyzGpe03FmbGACG+cF1uxcLwOKZ8loortnzc2UwSRzxP2VBBJDKO8G0yZPL6rjWnt4qr7s4VD8j1gPwGJ52uI=
+	t=1733794205; cv=none; b=MYs2U3uKg5gNlQ57LIX7lJmKDn9lk1VD0fNmVhzDwXIoSbf1spwXpJTc2QAGNrnyHRKmI+gVqdNO1NtHRWGEIQiWGbnG9DMaBIfDskVrCfTu9Hp2yBvAeKjK0sgxhaPIOBkKutgOx5YXAKL47/EOAoy109raBdUh2GFmXU6w44g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733786851; c=relaxed/simple;
-	bh=sib2JIsnpaJ4xFop5I9w3oSpRI1Wmim0nseZDPgA/uQ=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rSHYC0zdoMdu14F62rtIc07rzeGAofMyJOnsCP579kX8pT/YfKAhCx99s89YOxR/l8n8Uc9GHGQsZVJ43lRFi6FL+6thCYnJa+O/OdHnsNT5+QEtzuTZf5k2c9hBvnDf0yNzwbO6xFQ/sHuHo6E8dXI4u5oPHvv1/1EqZqOFjks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kLSXNKtK; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1733794205; c=relaxed/simple;
+	bh=BcPfmEiRmgV4VZjZpxIpRvHfIid9sYFc+NJp3Wm6m0w=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=q780fvw61qT4rIX+2T0uOcxzDMq6Z1wzzcmRapMJcj08NLXTO2J0G8vT5Aj0Zgtj1E0lkcI+06SobIEaA2pmfngRj4PlYoeig3d9LtJTRu/8DPdyrh0nJBltO2D/LIS9K9ip2wfJP54IYcwYYv5XU+ZLWEnI0GZ9Laeh61yTmEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IIibbfwC; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kLSXNKtK"
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-434f30ba149so12491965e9.0;
-        Mon, 09 Dec 2024 15:27:29 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IIibbfwC"
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7259416fcafso4943352b3a.0
+        for <linux-crypto@vger.kernel.org>; Mon, 09 Dec 2024 17:30:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1733786848; x=1734391648; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=YUkySfBwBkhhjkuJlpR0sFTlCT96jZzoa4DO4d+b/nA=;
-        b=kLSXNKtK2q+jw0s3rWD+pkirSnkLSlmwP2GpmN644Q++gq+5fbK4qJEecsW54iG3Zk
-         HP43JKnahMn5vJN5ZRpbFQb995RWHlnv1KDuSil7zZFmHNY+RmO5yP1bA/y3Y/9z5nbJ
-         EyR/mADCFHNMk02Aj26oT2o8VRfEhQg+Eh8418cfRA+Vr6iSYSh+wUiQrMrOuQCIeHLx
-         YFe8/J51H0WtII4UMoTn8xQQzGp0eXFR7AfrVJ5eEtOQ1T6WYw5ot14DsG8/r+0RvElf
-         F73PyotwUce3NY7akcxnLXHDeHVWsRR7JRBJBB453taNQT1r0qD3J1kMgRuogXJr8Vqq
-         afwA==
+        d=google.com; s=20230601; t=1733794203; x=1734399003; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=IawN1h9tDZZl4sXjqWOYnHPtIN4c66MBp2zlZKr/isY=;
+        b=IIibbfwCJYl4LumTvwxrV2K6LIJhrG1vyseTBadHNQG6KgrDVoO4FLcCCTzDXpQOpf
+         6e4DyKQX4Un8/6cPQ+MrrePWRMAOFFqciJW6RF4ReOtPIMil1K+XuGVEycF+1sLW8Pib
+         2AGqg+1cNLSXGqGV1YjR0vMMrIAJQNHfXFUC7TkDm0DVZw4hx87/WU5uxEnIV2NtMkOS
+         z6/dNcXFU317VPFuoVqgE4cnMmRK2RnOTRMbHqP+z1DiPNfCvEekElIVrpU0Rwu8hyFM
+         0FeWLA+GgukEFODoy2DcGWVqavsCB4p3zsPy3PLegGfQ5zm/2wabtpAfwydQPCFtxpPB
+         eWKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1733786848; x=1734391648;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YUkySfBwBkhhjkuJlpR0sFTlCT96jZzoa4DO4d+b/nA=;
-        b=aFPoQIXh3L3lEuSwcLhxqvYzlRdr8d6JSU7fWAU7Hb8Dn723PajE3hug/GHEgxM6ST
-         EXwSogTFIuLvbOCziWjf4S83LrQ3QiL8NJMam0HYVWSnI+Snm07CKbrlSngOxYrA5J7R
-         CpM2N4ny6BZ5Q+QD8rc7ydrSZEH7lFVhevX5wNjA3igc1sdRWvRyLVsSJp8lzQOYaxU7
-         E+mn411ZH1y8aX9ZPD3YbOe/MgWtpBov+NGsAEhpexjT31vtj31nMVCNKciVF3tV0VK3
-         GajbuDbU5H0RvqhBo+CJGiC/NlSmmpU6Lc+wHs56uXXkVY/z++ys1GPEpcpzhnlyNjsf
-         r/wQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUsaJ4Ugaddf0zNpaghCC+wvXRBu+Jknri+87vHgHPWUeThSPnTEys+0yLnwxvfGliOf05+qknkziup@vger.kernel.org, AJvYcCWQB9tR3Xzen7HWuL0pS1zrmRP8uk1jrCxAfP8at7lmwm6KjcFa1T11RDZS8r6E7r6gblcWVkmJODkWxihy@vger.kernel.org, AJvYcCWze0VLOfR6sZ8y9Q2Ta4w7LX41TnSsowZfCcoxA+ODUMb8dNbHGFrFsBblrmTDmb1AL8hRdk6Nq7DpzCDh@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+x3A1Lp6n8mbGcl+agLweTuGhS9g+Gh58vbcyGBhPCIS3qirL
-	yEobLkcXikCvC8X77oDyR0bouZoIHvN2yBO1wV00ZAHwbs/S5bF+
-X-Gm-Gg: ASbGncsnHiwJ7uUghdAsGWsW9BXxkENDeQbWiDNGYUb2sOHS2Tj+3rjH9PnkMBBM4HS
-	afuB4IqF79FzGtRL8QjZxF/jYq84PfParSgy5tqtk2+vGKfpJaRrsBkApzAJL/d7MRS4yeqq1a8
-	tI/NB0Zh48S6D68CcEn4x4uYQJ6jwBa5hgKUKEABeg8hSLmtS7iwG4GzqsNjrpmRHvgnp0OscS6
-	i9iGu5/1eOA1WuxgmKINJxo1edxHmsddAS8MWa1Y4Wq7+IJ+Pf7tlZfqJyXX+aHYB+OKXdKR4ar
-	WosCkJ1XQg==
-X-Google-Smtp-Source: AGHT+IG+AB1Ph1Dj5geXxUnKA8iVEw8ecVqYIcxVzRThCcrVKOuP+9lqU9OBDnF6U9HvS4qSlC1FZg==
-X-Received: by 2002:a05:6000:1f8c:b0:385:f280:d55 with SMTP id ffacd0b85a97d-386453fe853mr1676974f8f.37.1733786847561;
-        Mon, 09 Dec 2024 15:27:27 -0800 (PST)
-Received: from Ansuel-XPS. (93-34-91-161.ip49.fastwebnet.it. [93.34.91.161])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-386219096adsm14666431f8f.85.2024.12.09.15.27.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Dec 2024 15:27:26 -0800 (PST)
-Message-ID: <67577cde.df0a0220.128dd3.75a0@mx.google.com>
-X-Google-Original-Message-ID: <Z1d82uNcCx7EcU0n@Ansuel-XPS.>
-Date: Tue, 10 Dec 2024 00:27:22 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Antoine Tenart <atenart@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
-	Waiman Long <longman@redhat.com>, Boqun Feng <boqun.feng@gmail.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>, linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev, upstream@airoha.com
-Cc: Richard van Schagen <vschagen@icloud.com>
-Subject: Re: [PATCH v7 3/3] crypto: Add Inside Secure SafeXcel EIP-93 crypto
- engine support
-References: <20241112015920.22564-1-ansuelsmth@gmail.com>
- <20241112015920.22564-4-ansuelsmth@gmail.com>
+        d=1e100.net; s=20230601; t=1733794203; x=1734399003;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IawN1h9tDZZl4sXjqWOYnHPtIN4c66MBp2zlZKr/isY=;
+        b=IUedpP95XQKB9i7g5MVLFmZZxyhl1uOHRnwlpNQ+GMZzH/L47DixsUCsDlYFLAWkaB
+         45aE8AU446+39cWNW7k96m2wrSejhQK4j2FBWei4YpVYX6T4uOQJEg2Efor20wqjORQ8
+         cwcdxGwphdXpTSIp3BTSkTpBnnz4Hj4ky5lTlEvUZHdOLFHhH02F850TotYPAPS9OwUk
+         QyFCwgd2KVuZq2rh/JxPOLLxZ8yy4xw0+Skr3Y8Ogf5QgUNJxAJ9sLmod2k2uYg2gOhC
+         YCZ+AZqiDIbgi+FMz0MIZUnnuLJ1HfC2lc/AVEreS+4LQOja5AO8fiI4x7MD+1Dffi1O
+         tZQA==
+X-Forwarded-Encrypted: i=1; AJvYcCXm1XVPo9fbKhSZaYR/5+vdEdPh3Y8PpW1M6SdDMh3CnxLdNoyJx9wgO1tJ8FmhlkxKo+L+4qdOBm5Ebkk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzVTEVnymRwwS6+/DwcEAohRUmu/Ta1VFVXc8gge+8B5o0m48FJ
+	Zw/FfFm2wWc0caU+61AkRJjatFigGgrrkXaPu+q9m8omSgGh8GTE9buwVbdH98Ym/inTfjGDPjW
+	EXw==
+X-Google-Smtp-Source: AGHT+IHrSogYHesN3H8W1zIQjGJoAsi0hhsHSh2qT+6NWuzVY/4G3SpHRO/jrFrF7Soqzrl/xjYmjctZg7U=
+X-Received: from pfbeg18.prod.google.com ([2002:a05:6a00:8012:b0:728:9b0a:2ddf])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a21:7895:b0:1e1:ab63:c5ed
+ with SMTP id adf61e73a8af0-1e1ab63c75cmr7275418637.23.1733794202997; Mon, 09
+ Dec 2024 17:30:02 -0800 (PST)
+Date: Mon, 9 Dec 2024 17:30:01 -0800
+In-Reply-To: <5b77d19d-3f34-46d7-b307-738643504cd5@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241112015920.22564-4-ansuelsmth@gmail.com>
+Mime-Version: 1.0
+References: <1e43dade-3fa7-4668-8fd8-01875ef91c2b@amd.com> <Zz5aZlDbKBr6oTMY@google.com>
+ <d3e78d92-29f0-4f56-a1fe-f8131cbc2555@amd.com> <d3de477d-c9bc-40b9-b7db-d155e492981a@amd.com>
+ <Zz9mIBdNpJUFpkXv@google.com> <cb62940c-b2f7-0f3e-1710-61b92cc375e5@amd.com>
+ <Zz9w67Ajxb-KQFZZ@google.com> <7ea2b3e8-56b7-418f-8551-b905bf10fecb@amd.com>
+ <Z1N7ELGfR6eTuO6D@google.com> <5b77d19d-3f34-46d7-b307-738643504cd5@amd.com>
+Message-ID: <Z1eZmXmC9oZ5RyPc@google.com>
+Subject: Re: [PATCH v2 3/3] x86/sev: Add SEV-SNP CipherTextHiding support
+From: Sean Christopherson <seanjc@google.com>
+To: Ashish Kalra <ashish.kalra@amd.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>, Peter Gonda <pgonda@google.com>, pbonzini@redhat.com, 
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, hpa@zytor.com, herbert@gondor.apana.org.au, 
+	x86@kernel.org, john.allen@amd.com, davem@davemloft.net, michael.roth@amd.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Nov 12, 2024 at 02:59:00AM +0100, Christian Marangi wrote:
-> Add support for the Inside Secure SafeXcel EIP-93 Crypto Engine used on
-> Mediatek MT7621 SoC and new Airoha SoC.
+On Fri, Dec 06, 2024, Ashish Kalra wrote:
+> On 12/6/2024 4:30 PM, Sean Christopherson wrote:
+> >> This can reuse the current support (in KVM) to do SEV INIT implicitly when
+> >> the first SEV VM is run: sev_guest_init() -> sev_platform_init() 
+> > 
+> > I don't love the implicit behavior, but assuming hotloading firmware can't be done
+> > after SEV_CMD_INIT{_EX}, that does seem like the least awful solution.
+> > 
+> > To summarize, if the above assumptions hold:
+> > 
+> >  1. Initialize SNP when kvm-amd.ko is loaded.
+> >  2. Define CipherTextHiding and ASID params kvm-amd.ko.
+> >  3. Initialize SEV+ at first use.
 > 
-> EIP-93 IP supports AES/DES/3DES ciphers in ECB/CBC and CTR modes as well as
-> authenc(HMAC(x), cipher(y)) using HMAC MD5, SHA1, SHA224 and SHA256.
+> Yes, the above summary is correct except for (3).
+
+Heh, that wasn't a statement of fast, it was a suggestion for a possible
+implementation.
+
+> The initial set of patches will initialize SNP and SEV both at kvm-amd.ko module load,
+> similar to PSP module load/probe time.
+
+Why?  If SEV+ is initialized at kvm-amd.ko load, doesn't that prevent firmware
+hotloading?
+
+> For backward compatibility, the PSP module parameter psp_init_on_probe will still be
+> supported, i believe it is used for INIT_EX support.
+
+Again, why?  If the only use of psp_init_on_probe is to _disable_ that behavior,
+and we make the code never init-on-probe, then the param is unnecessary, no?
+
+> > Just to triple check: that will allow firmware hotloading even if kvm-amd.ko is
+> > built-in, correct?  I.e. doesn't requires deferring kvm-amd.ko load until after
+> > firmware hotloading.
 > 
-> EIP-93 provide regs to signal support for specific chipers and the
-> driver dynamically register only the supported one by the chip.
-> 
-> Signed-off-by: Richard van Schagen <vschagen@icloud.com>
-> Co-developed-by: Christian Marangi <ansuelsmth@gmail.com>
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> Yes, this should work, for supporting firmware hotloading, the PSP driver's
+> psp_init_on_probe parameter will need to be set to false, which will ensure
+> that SEV INIT is not done during SEV/SNP platform initialization at KVM module
+> probe time and instead it will be done implicitly at first SEV/SEV-ES VM launch.
 
-Any news with this?
+Please no.  I really, really don't want gunk like this in KVM:
 
+	init_args.probe = false;
+	ret = sev_platform_init(&init_args);
 
+That's inscrutable without a verbose comment, and all kinds of ugly.  Why can't
+we simply separate SNP initialization from SEV+ initialization?
