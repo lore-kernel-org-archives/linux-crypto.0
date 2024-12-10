@@ -1,70 +1,93 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6248AA94D;
-	Tue, 10 Dec 2024 05:49:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DB0522B5BE;
+	Tue, 10 Dec 2024 06:22:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733809761; cv=none; b=NipMYE3Z5zsa7q2Q5d0FwB/BZeutHG8+o4Hn2Ugs4i1Ui10+276W90rrath3BbLVsSf2WYSHUwrrgfk8wE8ijrsUgcyPePHBXNrNxyBx8ChzeRlSMInuK7mMSJUTrJPe7l/6W5o1L++XYqUgrJAKMYpRedJIEmnFY/zU3wbJK9A=
+	t=1733811778; cv=none; b=XYUTmGQY0ZITNb5mKXuWKiZ+T9bNtVtvV+wEeDePQVXOB5u150M1YHl/RJUryvJ11V993/vz2zzUBzOCqVYE7PVl2PWE2da/Xq167cLtMwp/NRRx4FY/Y9hNVugJAdLNlmaCpt/qOWcoBdt+vWFummhOdVWF4ovlUfpTp7eKyb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733809761; c=relaxed/simple;
-	bh=UMhfSGvDAo2n3fT6khkxZqhHqGzwcOztP3JLwFstvGk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QRrpl6Uk1cXiTncSo8XddAT9Fyh/Svjvf5a+I1aLUk9fZe3EJKziZicFYs6fRyXfvVkzJ9IMGVj+c2Jxv0r5CCFpAZaqNc2yVHFzT4A9kflZPXrl1S1Np9G3vW1cny7hj8sSH3/xg7MOfLCvAdmqYpRuRH4DokxCkwzIE/JCluQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=T5d0IlT8; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1733811778; c=relaxed/simple;
+	bh=A2JGInYK6VoTSod8bXikhS00VQVpg9qqwRSBD0DrY8Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FSpAFo8IlATRuurX9OM9J1jWXTitA/EYYTAthhcdDX/ACxL6kGWaTJPCUl3uam229WfNI2KMj/gyXV7H4ZPW7RS5d+Q5rXmmI7SjfynMh9kBYb3Kb8zhsuuDWHq0mJABP3UEi7CcfzJnA2BmdNrdE/kTAqfgL79FA99x22Ze0J0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b5zfzZka; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="T5d0IlT8"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=nGSMm76vfOUFKovXKofALU2UQdEMkJR9usNJFgfsWtY=; b=T5d0IlT8mdglKRjur8L54NdmvR
-	gliZRn0VskMByB4804oVHyx8yaUWIpCoPtd86H6jRR84EVeBzZc8Vme6xIs/88GjsDkW/SLZ/E8y9
-	oHRDfGjhvAgT4HdHtCXclOnfl9pZVB5ZJdwHS40vgMzvUX5WnEnzh478Vu475wbqY8aHxnhqHRIgf
-	aFXiOE3XPjQ6P82j+1q6ysjxxXFq5/fWWNSat+xn362vTCNlJWAzKhlNbhFd2NKEkUWEOxuR+TYZ3
-	3ryT/VhDD7tdanKXn1HllXkASMuyCDGzpEMfOivBbp+G/J5chrdiZKP2vPsA7/qi6jHB+bUFwgoLi
-	BnSJyeLA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tKsuZ-000OE2-0W;
-	Tue, 10 Dec 2024 13:49:16 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 10 Dec 2024 13:49:15 +0800
-Date: Tue, 10 Dec 2024 13:49:15 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Chenghai Huang <huangchenghai2@huawei.com>
-Cc: davem@davemloft.net, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org, qianweili@huawei.com,
-	wangzhou1@hisilicon.com
-Subject: Re: [PATCH] crypto: hisilicon/debugfs - fix the struct pointer
- incorrectly offset problem
-Message-ID: <Z1fWWw7RuyyADQU3@gondor.apana.org.au>
-References: <20241130080131.906598-1-huangchenghai2@huawei.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b5zfzZka"
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2163bd70069so21041795ad.0;
+        Mon, 09 Dec 2024 22:22:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733811776; x=1734416576; darn=vger.kernel.org;
+        h=content-transfer-encoding:signed-off-by:mime-version:message-id
+         :date:subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ktpI8nQhkljY3um5OXLz3jmJOJS/HUeI5zH/9t+BjHA=;
+        b=b5zfzZka5+j0kL82Rq1HkvtGWOPi2otA5jy5xBsf5xnZUsEVyXsjX04e3IgE56sKR6
+         pyyg5Fp0pAYhKLWlPCbpW/pM70shBK+Ieso1uI37taGgJSlV0VBa4alniYdegmzGpdDp
+         WMF1x+ZLsvZBIbNFpnV2ZbtlOmnN6UT1Yi8F1IyFL6M6ggDSQ2GhFXUQWq8uunGFNFCo
+         VLQxsK3fj+KjqFKjc6dev7/t8x0LC3DvmpllBOJpb3MHEdrTtYA0rft6aXoVW5kOumvw
+         mDe2Ca8DgVIwwuRQKMUcJuErg3hQfiXXo5DN1cE56ufXI+BVz+HrvPAEExRjmuy8Dko2
+         J1tw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733811776; x=1734416576;
+        h=content-transfer-encoding:signed-off-by:mime-version:message-id
+         :date:subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ktpI8nQhkljY3um5OXLz3jmJOJS/HUeI5zH/9t+BjHA=;
+        b=pcwPFEBz2unfgS9Xf7ZAhXt+diYDAtJSGmMNGma1KsR84qbxSuWsO2VWH0XCQXjgdd
+         DIapHVqe7SZqjalzZljZBCx09rx85VihgLDXVaLNDaRdxrA5Wk7/3/SIQ6FCp87zmUmY
+         8/8TExjxyzfTOQZoCNi0BErk9MY85KBqb+ehAM36nvXMDyU2wSPqOZwFtzyBK4LPir32
+         fAOtbZLD+oK2GJ2Q74PZiPwM7VGUNRqHL9DqYekWi+0/3940XidEKfJpddOwFvI4gek4
+         nmuBBpbV9Rkccy38L7MGLofSMsBnFxUXYXRgAMqgfEc8GFtHwEB0DFXVEYLOwkEfL6UE
+         e9OA==
+X-Forwarded-Encrypted: i=1; AJvYcCVJj/4kThPvX4cCRSOrCJ3pzywAuWf9UAiK6WJ/uvelrGuPa0yaRQ+jMi9nmAmBm4U20x+ry1OFil4k47bb@vger.kernel.org, AJvYcCWYZutgQNoKhYAM8GqmiMEDh/7cEOfOY3gIvPBBN6IyO8QB9ny1HLPyMZuHqXa1rEF3e6JIqwkHz+yN/10=@vger.kernel.org
+X-Gm-Message-State: AOJu0YynC1X50EeECIuenWOMgFHympzjfmeJqcGCnoDJrY2Q761yJ9L0
+	r8nVeLXRp7y7QW5RTD9BCQpW9tCHzbrRfL+3uS2Z27PuxVCa2H2zTSeqhA==
+X-Gm-Gg: ASbGncvYtUAPrC8k/KRnPqX0EZxAJbIbP95xqtxBf+LC0oxiOk4LwnjguMyuSCHgESW
+	iP6CizRGiqbnN04JVYbvS0QrqyPvFdtu/WozH08seNBH+MahUxMu6YtnnTX/x3Ovap1hpmHoGXJ
+	t8IB64fdqYskqBQuQAOWL2uxKpMbvCdIegGAqqLNoEdDDaVTwyuXY0JOtRk0ihKodpkx7cKi8Jf
+	XJp15ghgprJm3igBNSAVkk1E3/T+BUkG51Ry0KAePrGBcaJHnZa7fT7D50WaaMW4cHexQ==
+X-Google-Smtp-Source: AGHT+IGBzXN4c5J6Rxn5zfv9OU5nTYNomwk+ZGkvm6OKz8lD9trxo4nF5I41ffpNVlMQs+jxqCx3Ng==
+X-Received: by 2002:a17:903:2445:b0:216:4e9f:4ed4 with SMTP id d9443c01a7336-2166a0777dfmr56056425ad.36.1733811776240;
+        Mon, 09 Dec 2024 22:22:56 -0800 (PST)
+Received: from kernel-VirtualBox.. ([2401:4900:8899:46e4:646:c8ea:ef7d:d291])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2163d9f8fdasm36506595ad.186.2024.12.09.22.22.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Dec 2024 22:22:55 -0800 (PST)
+From: Atharva Tiwari <evepolonium@gmail.com>
+To: 
+Cc: evepolonium@gmail.com,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] FIPS kernels should default to fips mode
+Date: Tue, 10 Dec 2024 11:52:40 +0530
+Message-ID: <20241210062244.2357-1-evepolonium@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241130080131.906598-1-huangchenghai2@huawei.com>
+Signed-off-by: Atharva Tiwari <evepolonium@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Sat, Nov 30, 2024 at 04:01:31PM +0800, Chenghai Huang wrote:
-> Offset based on (id * size) is wrong for sqc and cqc.
-> (*sqc/*cqc + 1) can already offset sizeof(struct(Xqc)) length.
-> 
-> Fixes: 15f112f9cef5 ("crypto: hisilicon/debugfs - mask the unnecessary info from the dump")
-> Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
-> ---
->  drivers/crypto/hisilicon/debugfs.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-
-Patch applied.  Thanks.
+diff --git a/crypto/fips.c b/crypto/fips.c
+index 8a784018ebfc..d7bd7e0ac2cb 100644
+--- a/crypto/fips.c
++++ b/crypto/fips.c
+@@ -14,7 +14,8 @@
+ #include <linux/notifier.h>
+ #include <generated/utsrelease.h>
+ 
+-int fips_enabled;
++int fips_enabled = 1;
++/* LP: #2049082 UBUNTU: SAUCE: FIPS kernels default to FIPS mode */
+ EXPORT_SYMBOL_GPL(fips_enabled);
+ 
+ ATOMIC_NOTIFIER_HEAD(fips_fail_notif_chain);
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.43.0
+
