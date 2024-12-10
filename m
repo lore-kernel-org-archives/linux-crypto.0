@@ -1,189 +1,156 @@
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E37078F2D;
-	Tue, 10 Dec 2024 09:39:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 194C319E966;
+	Tue, 10 Dec 2024 11:55:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733823546; cv=none; b=E4eEEHKcCjLi3L6g4nGiKngDPveBZmxmP9SfN54vLMFUtTAmHdK9ZntJAvdqrcCJBI3u+p51HgjgjpDBfg/h3PiNXjUtq7IjS1vnJZFwwP3mi6tFwvo4wSZ6F/hfGdx5X8KfHM2UT4ljGCmmGFQ14b8bMKPVee7VEm29a9Yg0Nw=
+	t=1733831711; cv=none; b=ObdqGXr0W1f4Yw5yj4eHc3MIkD35/uJMl93UWkEunO20bXJlMIIcGdyn7hNI4C65YzqVbCpizYN5yivIU1bUAtRMPTz2KFV39sPrTCKAh/g08CdyWKJnp/qIAQSiPKD8NGVaN/DtCeWUThoNQKr88X4Z9i2RAi7negq/luUscqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733823546; c=relaxed/simple;
-	bh=HE6bPAhwg6wpoW3wRylD4+eYXegxdPr468veA/EXiHk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MaApuIAJJKDvqP2hM0RoKVtX1WmFm/gln/3G6OZxiaJ4/o2b4K0RB99t4ogmPZM6czqmF6b4mcNqw7oJucqoC2uJ5r6TFniay5w5JGghDoh22SxtvFq4A3mrHPUvRCfi+7jczrDoRm6vPbApw73nMfLfz+ycFOgmfJDx5xkkM+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Y6tvv1Sf6z4f3jXh;
-	Tue, 10 Dec 2024 17:38:35 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.75])
-	by mail.maildlp.com (Postfix) with ESMTP id 694261A058E;
-	Tue, 10 Dec 2024 17:38:54 +0800 (CST)
-Received: from [10.67.109.79] (unknown [10.67.109.79])
-	by APP2 (Coremail) with SMTP id Syh0CgBH9OArDFhnYnWmEA--.7276S2;
-	Tue, 10 Dec 2024 17:38:53 +0800 (CST)
-Message-ID: <dc4a4fc1-2628-4e0c-8b8e-1e44193c440e@huaweicloud.com>
-Date: Tue, 10 Dec 2024 17:38:51 +0800
+	s=arc-20240116; t=1733831711; c=relaxed/simple;
+	bh=FFYRaVt398kWlY3AcePts9f2SooVUww1t10zGlceo8M=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=K/CKsc0itaT5uHK0duc/ma4vLDDgCyM6mg4dtEhvgWpB5trkjz9zyUQSEQzP7ail3sxCIFTT1ojXuRXRbJeUugpxbCyClhri4XoSbTtI5QZo2ah4AIGhKcTwZaAt86C5POF5KX4pTYwdVTewl31ZuSQeNgm4XlCMa8LLLW9jx/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K2to5tnk; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K2to5tnk"
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-385d7f19f20so2496251f8f.1;
+        Tue, 10 Dec 2024 03:55:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1733831708; x=1734436508; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=GxtTqQBTIL8qkdLSUdzE6PIJ9G6FWWi9p3lyqXCUMq0=;
+        b=K2to5tnkPpV8JIeCEqkwkLfSeazKcfPnphGNJayvq2m2cHB0/xA1gndJm+DQVOljlW
+         aDIK8qUD2aAMURuj2Jfs0PiA+T2wH15NPotA8Yn1AUZDF1YN2Xw54m93vHWEWPUvv90w
+         KWyumzEbbPKjFW4mdpxUWGQQFubjmMZuGaV7YiRR75F3v7MhtoJXkx9CTWqpBBvcL9nU
+         B/EWwZ1MWzemyqcWZ9TNS6rpF4m0LmXoEtm1PfxUKTHT6y/7AJ1fANfuKgCYrwgQhgGo
+         9+p2DBqFOfqjfMQdW2sk0Iv0mMeOKfiCxVeSKsuvTN+cySQvf7l/nWnW0CnxHukd+OfI
+         EAmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1733831708; x=1734436508;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GxtTqQBTIL8qkdLSUdzE6PIJ9G6FWWi9p3lyqXCUMq0=;
+        b=l8QWKFBDOGjpC0oQOiRzojIYCWlTQ5KJonl6H4QCz6CmNbXpNFmjLCrmtUb5jDAnAM
+         eQapDYtaEU7499Qalbj17jO2S/eFrKsB+Pq3zccJRzPi9nUImYbgoJp9LVtA9oTuKK2E
+         BTKK4R/btJZiazhNZj54Wv8uoWi/cBJVcSCbfVYbtFshjUtQ3JS/CfgKTEJiN8GeoGYd
+         qS94g/XxLR5lFvbO1ieoS9OPWzSl15VrcuJZwq+MNSOKKvmR580hwRvL3sqkKx6Apa7h
+         fMVqABSQcpmkG0S7fAMFayxneZXvZpjjgXLwREruP8vFC70MS66FItii9+BJz53jiT/y
+         ftfA==
+X-Forwarded-Encrypted: i=1; AJvYcCWPk/VOBYmso5/9M/9Z/K3ZlbIFxsZPivYpBN12wJ+LNY8N0jB5AePFpyEjI5EguG3lENeJkW5ckLeK4nlg@vger.kernel.org, AJvYcCWazWk7Fbb6fRXcepRhQnLlLkbT83vzuw28iodi0NX0F0f1fKakf8lOs23Bd1rSTHcnBTJm+VFzjXTQYt1b@vger.kernel.org, AJvYcCXdvEX8cGIEX3CKjO+sLNpILVj8INwla9PvMzHsZNyNgG9Hvz29LemhB2suyHJH1SL7PAQvuEvESIPL@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0MANT6sSNShdqwIikGWZRvnFH05VM8OGsl+/WQa/P1zmxk70W
+	v9OXkFRdvB+2rcGo1URyEHTm8qSgR617uWH/F7xDqlCvnSqyg3ws
+X-Gm-Gg: ASbGnctK/ch31OUMK9DnOwpVMnXyKZm1mA8f590+VHrQe6oqPV9F3VZWBUcmt1kxbhG
+	8XJr+Y/BeJPg1PCZz9uGZRvY2rWrr+39V6O6NKn2mGWgyccNSwOdgHlvNeHHo2ZogcCvsF97+NS
+	K5Z0lzb+338SYsjUS3uFt5aTvP101gP22dqGZurpibR8oWjX9D+0vgDbZLeA1JaqKg+jH3OokEp
+	C02F3X5X6mVNpnxUJrmyejcAyMYEAMyc1HSOUPGOE2ivwi6l43l9rrYwlNbp6nkxYV6DHIe/1G5
+	+NKhq4NyyQ==
+X-Google-Smtp-Source: AGHT+IEqPyQZxvaTdaCGPBbnnyYvA3iFt3x9GqsjfxRLDxoVwreBtdhs6qFT0if4l4gCopK2n/CUaQ==
+X-Received: by 2002:a5d:6d86:0:b0:386:378c:b7ec with SMTP id ffacd0b85a97d-386378cb923mr8329503f8f.58.1733831708190;
+        Tue, 10 Dec 2024 03:55:08 -0800 (PST)
+Received: from Ansuel-XPS. (93-34-91-161.ip49.fastwebnet.it. [93.34.91.161])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-386329a15b0sm11246137f8f.45.2024.12.10.03.55.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Dec 2024 03:55:07 -0800 (PST)
+Message-ID: <67582c1b.050a0220.83ef5.c8df@mx.google.com>
+X-Google-Original-Message-ID: <Z1gsFv24WRhhdqlb@Ansuel-XPS.>
+Date: Tue, 10 Dec 2024 12:55:02 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Antoine Tenart <atenart@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+	Waiman Long <longman@redhat.com>, Boqun Feng <boqun.feng@gmail.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>, linux-crypto@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev, upstream@airoha.com,
+	Richard van Schagen <vschagen@icloud.com>
+Subject: Re: [PATCH v7 3/3] crypto: Add Inside Secure SafeXcel EIP-93 crypto
+ engine support
+References: <20241112015920.22564-1-ansuelsmth@gmail.com>
+ <20241112015920.22564-4-ansuelsmth@gmail.com>
+ <Z1e0LHycNGcWqd2q@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] padata: fix UAF in padata_reorder
-To: chenridong <chenridong@huawei.com>,
- Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc: steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
- wangweiyang2@huawei.com
-References: <20241123080509.2573987-1-chenridong@huaweicloud.com>
- <20241123080509.2573987-3-chenridong@huaweicloud.com>
- <nihv732hsimy4lfnzspjur4ndal7n3nngrukvr5fx7emgp2jzl@mjz6q5zsswds>
- <2ba08cbe-ce27-4b83-acad-3845421c9bf6@huawei.com>
-Content-Language: en-US
-From: Chen Ridong <chenridong@huaweicloud.com>
-In-Reply-To: <2ba08cbe-ce27-4b83-acad-3845421c9bf6@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:Syh0CgBH9OArDFhnYnWmEA--.7276S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxGrW8CrWkZF4xKrWDCrW3KFg_yoWrJryfpF
-	WakayayFW8Jr97Jw1IvrsrXry0gr4j9r13KF45Grn5C34ayryIvr12yr4F9a4F9r1vkw1q
-	vF4UX3WavwnrAFDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUymb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vI
-	r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8Gjc
-	xK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0
-	cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8V
-	AvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E
-	14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07UK2NtUUUUU=
-X-CM-SenderInfo: hfkh02xlgr0w46kxt4xhlfz01xgou0bp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z1e0LHycNGcWqd2q@gondor.apana.org.au>
 
+On Tue, Dec 10, 2024 at 11:23:24AM +0800, Herbert Xu wrote:
+> On Tue, Nov 12, 2024 at 02:59:00AM +0100, Christian Marangi wrote:
+> >
+> > +static int eip93_hash_export(struct ahash_request *req, void *out)
+> > +{
+> > +	struct eip93_hash_reqctx *rctx = ahash_request_ctx(req);
+> > +	struct eip93_hash_export_state *state = out;
+> > +	DECLARE_CRYPTO_WAIT(wait);
+> > +	int ret;
+> > +
+> > +	crypto_init_wait(&wait);
+> > +	/* Set the req callback for hash_partial_final wait */
+> > +	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+> > +				   crypto_req_done, &wait);
+> > +
+> > +	/* Set for partial hash generation */
+> > +	rctx->partial_hash = true;
+> > +	rctx->export_state = true;
+> > +	rctx->state = state;
+> > +
+> > +	/* Save the first block in state data */
+> > +	if (rctx->left_last || rctx->len) {
+> > +		struct mkt_hash_block *block;
+> > +
+> > +		block = list_first_entry(&rctx->blocks,
+> > +					 struct mkt_hash_block,
+> > +					 list);
+> > +
+> > +		memcpy(state->data, block->data,
+> > +		       SHA256_BLOCK_SIZE - rctx->left_last);
+> > +	}
+> > +
+> > +	/* Call hash_partial_final.
+> > +	 * This will send a dummpy 0 length packet. This is done to
+> > +	 * wait for every descriptor to being handled and sync the sa_state
+> > +	 * from the host. Partial hash and any other data will be copied in
+> > +	 * eip93_hash_handle_result()
+> > +	 */
+> > +	ret = crypto_wait_req(eip93_hash_partial_final(req), &wait);
+> 
+> Sorry, you can't do that here.  Your hash state should have been
+> exported when the request previously completed.  The export function
+> must not sleep.
+>
 
+Ah that unfortunate but doesn't that goes against the async idea of ahash
+OPs? Anyway is busy loop acceptable here?
 
-On 2024/12/6 11:48, chenridong wrote:
-> 
-> 
-> On 2024/12/6 7:01, Daniel Jordan wrote:
->> Hello Ridong,
->>
->> On Sat, Nov 23, 2024 at 08:05:09AM +0000, Chen Ridong wrote:
->>> From: Chen Ridong <chenridong@huawei.com>
->>>
->>> A bug was found when run ltp test:
->> ...snip...
->>> This can be explained as bellow:
->>>
->>> pcrypt_aead_encrypt
->>> ...
->>> padata_do_parallel
->>> refcount_inc(&pd->refcnt); // add refcnt
->>> ...
->>> padata_do_serial
->>> padata_reorder // pd
->>> while (1) {
->>> padata_find_next(pd, true); // using pd
->>> queue_work_on
->>> ...
->>> padata_serial_worker				crypto_del_alg
->>> padata_put_pd_cnt // sub refcnt
->>> 						padata_free_shell
->>> 						padata_put_pd(ps->pd);
->>> 						// pd is freed
->>> // loop again, but pd is freed
->>> // call padata_find_next, UAF
->>> }
->>
->> Thanks for the fix and clear explanation.
->>
->>> diff --git a/kernel/padata.c b/kernel/padata.c
->>> index 5d8e18cdcb25..627014825266 100644
->>> --- a/kernel/padata.c
->>> +++ b/kernel/padata.c
->>> @@ -319,6 +319,7 @@ static void padata_reorder(struct parallel_data *pd)
->>>  	if (!spin_trylock_bh(&pd->lock))
->>>  		return;
->>>  
->>> +	padata_get_pd(pd);
->>>  	while (1) {
->>>  		padata = padata_find_next(pd, true);
->>>  
->>> @@ -355,6 +356,7 @@ static void padata_reorder(struct parallel_data *pd)
->>>  	reorder = per_cpu_ptr(pd->reorder_list, pd->cpu);
->>>  	if (!list_empty(&reorder->list) && padata_find_next(pd, false))
->>>  		queue_work(pinst->serial_wq, &pd->reorder_work);
->>> +	padata_put_pd(pd);
->>
->> Putting the ref unconditionally here doesn't cover the case where reorder_work
->> is queued and accesses the freed pd.
->>
->> The review of patches 3-5 from this series has a potential solution for
->> this that also keeps some of these refcount operations out of the fast
->> path:
->>
->>     https://lore.kernel.org/all/20221019083708.27138-1-nstange@suse.de/
->>
-> 
-> Thank you for your review.
-> 
-> IIUC, patches 3-5 from this series aim to fix two issue.
-> 1. Avoid UAF for pd(the patch 3).
-> 2. Avoid UAF for ps(the patch 4-5).
-> What my patch 2 intends to fix is the issue 1.
-> 
-> Let's focus on issue 1.
-> As shown bellow, if reorder_work is queued, the refcnt must greater than
-> 0, since its serial work have not be finished yet. Do your agree with that?
-> 
-> pcrypt_aead_encrypt/pcrypt_aead_decrypt
-> padata_do_parallel 			// refcount_inc(&pd->refcnt);
-> padata_parallel_worker	
-> padata->parallel(padata);
-> padata_do_serial(padata);		
-> // pd->reorder_list 			// enque reorder_list
-> padata_reorder
->  - case1:squeue->work
-> 	padata_serial_worker		// sub refcnt cnt
->  - case2:pd->reorder_work		// reorder->list is not empty
-> 	invoke_padata_reorder 		// this means refcnt > 0
-> 	...
-> 	padata_serial_worker
-> 
-> I think the patch 3(from Nicolai Stange) can also avoid UAF for pd, but
-> it's complicated. IIUC, the issue 1 can only occur in the scenario what
-> I mentioned is my commit message. How I fix issue 1 is by adding and
-> putting the refcnt in the padata_reorder function, which is simple and
-> clear.
-> 
-> If understand something uncorrectly, please let me know.
-> 
-> As the issue 2, I have not encountered it, but it exists in theory.
-> 
-> Thanks,
-> Ridong
+The main problem here is that .update only enqueue packet to be
+processed and we don't wait for it to finish as that would result in
+really bad performance.
 
-Hi, Daniel, I am trying to produce the issue 2. However，I failed.
-I added 'mdelay' as helper.
+To export the state with the previous request (.update) we would have to
+wait for each packet to complete or we would export the wrong partial
+hash.
 
- static void padata_reorder(struct parallel_data *pd)
- {
-+       mdelay(10);
-        struct padata_instance *pinst = pd->ps->pinst;
-        int cb_cpu;
-        struct padata_priv *padata;
+The process is fast enough so busy loop here should not be problematic
+but waiting for every packet sent to .update on being processed might
+introduce big performance regression.
 
-I believe this can increase the probability of issue 2. But after
-testing with pcrypt_aead01, issue 2 cannot be reproduced.
-And I don't know whether it exists now.
+Thanks for checking this hope you can help me understand this.
 
-Looking forward your reply.
-
-Best regards,
-Ridong
-
+-- 
+	Ansuel
