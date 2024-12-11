@@ -1,197 +1,86 @@
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAEA41F0E5A;
-	Wed, 11 Dec 2024 22:02:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9E6D17838C;
+	Wed, 11 Dec 2024 23:19:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733954551; cv=none; b=K89GUlOseJZRowK2RJ3CwqvF3dqdxCekzfjHhkmhKZzcB0eN1qTNLcQp+d2vzZ7lPGeyTMi5qV5Puf6HRt6Z70huKZ4NtI1lYV196I3W1r4oJABKOcIMGLBnQ41U+dovNm9KXkFcUWN3hGfUfbBBaK41EwLkfyrnUFcTkxssC9M=
+	t=1733959158; cv=none; b=efxrWlOVk1e/1qyoDEFj2APHKqGNB9h6S9QV2zb1u3+OE76i+jU+c18F3n3WhlXNfPYGnYGGqb8aB/i5Pn8qGNOM9RgSYM6BbkrStCkmnbAnCDZ5J7AK60d1Yxv789HOuPG3+sVdHbbw8SBFveMudiN+Nx/R6V/dvVj54Sg3ffs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733954551; c=relaxed/simple;
-	bh=HlCKWLdI+GU05LKzYNwgUMS4EpX5rXj3VH4NpDOQ5VY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bjTwEMPeKvhR3ZlLzHFu/cE063rAmGfy2HZu7g6bdfLq5TNWPe8rrD4wtq3D2WZisrs2DeN0+TwI9sUU2iIS7riLffghr/Vz7XThrD0NiY5Zr4m+CjyXEmjLSG6Z6Yy48NXCtIHg8C1F69ox2yDBiBm60l7xSzdodXokxgo1TYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=QPRNj1Je; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+	s=arc-20240116; t=1733959158; c=relaxed/simple;
+	bh=3mQol+kxBBEzejx272hcO9JZECRCz4n4isvDE0UXZKc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tepODfE9kwlMAdGOY8eF6q57IO44eJKTL7/khJVIzT9wqcUrTgvwYDb3esdGa+0YnmxsnTBUyyxjboLj4U+1BWBf5GeAzBLQFTJIHe9A5pFjvEtUOUWia0opGHH41ZMa2PiJNaFMRx+tdG9UP289VGwunr595S4J1YGodMaeM/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=kDuSRDFj; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="QPRNj1Je"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=HxEgA1qhpnM+73w6gjo0cgwAWhBtqqCkg0uUG05ThNA=; b=QPRNj1Je+MKDa6Yv
-	RtD5RZi+ENXM237GR5+27bSs7dlNFZ0mq41AZ1K3zgxy8Ilcgjgw7l73ORVwnNiunm/6E6fCzFiDV
-	QLKEj5FJ5u/f1d5NFD4LrLlakjEu/wvttqEYXO4pXln7HCxNSw+z0FncYi+/kQYD9/6ZdmtXzJyGI
-	MzgAY90YegqXBUcxPGAddIRuoiO7WafPqR97IBLuNo7Nz+mJyJv1cvMaGC1iPApk/RBLdo3VnAeqI
-	9acfZN1v3pejCZHD7C2EzF2EuKNgc/JST7A3pSKHCc9mbEnt4yApbdSgFKY/oRhn34uuTt2a54jmO
-	VPkidH2ZjOqwUzSYiw==;
-Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
-	by mx.treblig.org with esmtp (Exim 4.96)
-	(envelope-from <linux@treblig.org>)
-	id 1tLUmk-004rlK-0Z;
-	Wed, 11 Dec 2024 22:02:22 +0000
-From: linux@treblig.org
-To: herbert@gondor.apana.org.au,
-	davem@davemloft.net
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH] crypto: lib/gf128mul - Remove some bbe deadcode
-Date: Wed, 11 Dec 2024 22:02:18 +0000
-Message-ID: <20241211220218.129099-1-linux@treblig.org>
-X-Mailer: git-send-email 2.47.1
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="kDuSRDFj"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=qAOjMl/GqayOOrw6nEASh0nWNB4CfhlTcekM7AL4b1E=; b=kDuSRDFj2NoOaaycBqDWElWR9C
+	SsLMhRE1ixtf6gYbtYBkCwNZN0I77Qes6BbIpolr7GGq2DbwMEj7huyimTxNVkkX65Rf7WS9iPMpa
+	Mn7xahf9MF4j+DTKGGIHTfOC5cJz6CHM/tyfBNZvtMPtuIfon99F2XMoJ9L5E/pjOmaOp6X1A5BfU
+	kE0m7kvkYiyvG8lf3qDw4DepkN3v+wJ+4EIa/FMU11C1eVJ6t4Qwv3fl2ae7a5OVfhxNZB99Ztbmt
+	3zMSpshe/7S4yxW3wmD1MobqMkObMHWZd9ga3uApG1LmfcLtlP+ezmuAGg8pqE/CjarvWeEs10+gS
+	1oHkhTlA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tLVls-000tOn-1I;
+	Thu, 12 Dec 2024 07:18:54 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 12 Dec 2024 07:18:53 +0800
+Date: Thu, 12 Dec 2024 07:18:53 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Antoine Tenart <atenart@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+	Waiman Long <longman@redhat.com>, Boqun Feng <boqun.feng@gmail.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>, linux-crypto@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev, upstream@airoha.com,
+	Richard van Schagen <vschagen@icloud.com>
+Subject: Re: [PATCH v8 3/3] crypto: Add Inside Secure SafeXcel EIP-93 crypto
+ engine support
+Message-ID: <Z1od3fgP02ay88Wy@gondor.apana.org.au>
+References: <20241210204853.18765-1-ansuelsmth@gmail.com>
+ <20241210204853.18765-4-ansuelsmth@gmail.com>
+ <Z1ldzyPKgoD8GZfx@gondor.apana.org.au>
+ <67597a1e.5d0a0220.9b04.2bef@mx.google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <67597a1e.5d0a0220.9b04.2bef@mx.google.com>
 
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
+On Wed, Dec 11, 2024 at 12:40:09PM +0100, Christian Marangi wrote:
+>
+> Just to make sure, this is only limited to DMA or it's also problematic
+> to the block list? Aka NO FREE should be done in export or NO DMA FREE
+> should be done in export?
 
-gf128mul_4k_bbe(), gf128mul_bbe() and gf128mul_init_4k_bbe()
-are part of the library originally added in 2006 by
-commit c494e0705d67 ("[CRYPTO] lib: table driven multiplications in
-GF(2^128)")
+It's all resources.
 
-but have never been used.
+The user does not have to call export, final or finup.  The request
+object can be freed directly at any time after a call.  So you can
+never hold any resources in the request object between calls.
 
-Remove them.
-(BBE is Big endian Byte/Big endian bits
-Note the 64k table version is used and I've left that in)
-
-Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
----
- include/crypto/gf128mul.h |  6 +---
- lib/crypto/gf128mul.c     | 75 ---------------------------------------
- 2 files changed, 1 insertion(+), 80 deletions(-)
-
-diff --git a/include/crypto/gf128mul.h b/include/crypto/gf128mul.h
-index 81330c6446f6..b0853f7cada0 100644
---- a/include/crypto/gf128mul.h
-+++ b/include/crypto/gf128mul.h
-@@ -158,12 +158,10 @@
-     64...71 72...79 80...87 88...95  96..103 104.111 112.119 120.127
- */
- 
--/*	A slow generic version of gf_mul, implemented for lle and bbe
-+/*	A slow generic version of gf_mul, implemented for lle
-  * 	It multiplies a and b and puts the result in a */
- void gf128mul_lle(be128 *a, const be128 *b);
- 
--void gf128mul_bbe(be128 *a, const be128 *b);
--
- /*
-  * The following functions multiply a field element by x in
-  * the polynomial field representation.  They use 64-bit word operations
-@@ -224,9 +222,7 @@ struct gf128mul_4k {
- };
- 
- struct gf128mul_4k *gf128mul_init_4k_lle(const be128 *g);
--struct gf128mul_4k *gf128mul_init_4k_bbe(const be128 *g);
- void gf128mul_4k_lle(be128 *a, const struct gf128mul_4k *t);
--void gf128mul_4k_bbe(be128 *a, const struct gf128mul_4k *t);
- void gf128mul_x8_ble(le128 *r, const le128 *x);
- static inline void gf128mul_free_4k(struct gf128mul_4k *t)
- {
-diff --git a/lib/crypto/gf128mul.c b/lib/crypto/gf128mul.c
-index 8f8c45e0cdcf..fbe72cb3453a 100644
---- a/lib/crypto/gf128mul.c
-+++ b/lib/crypto/gf128mul.c
-@@ -225,44 +225,6 @@ void gf128mul_lle(be128 *r, const be128 *b)
- }
- EXPORT_SYMBOL(gf128mul_lle);
- 
--void gf128mul_bbe(be128 *r, const be128 *b)
--{
--	be128 p[8];
--	int i;
--
--	p[0] = *r;
--	for (i = 0; i < 7; ++i)
--		gf128mul_x_bbe(&p[i + 1], &p[i]);
--
--	memset(r, 0, sizeof(*r));
--	for (i = 0;;) {
--		u8 ch = ((u8 *)b)[i];
--
--		if (ch & 0x80)
--			be128_xor(r, r, &p[7]);
--		if (ch & 0x40)
--			be128_xor(r, r, &p[6]);
--		if (ch & 0x20)
--			be128_xor(r, r, &p[5]);
--		if (ch & 0x10)
--			be128_xor(r, r, &p[4]);
--		if (ch & 0x08)
--			be128_xor(r, r, &p[3]);
--		if (ch & 0x04)
--			be128_xor(r, r, &p[2]);
--		if (ch & 0x02)
--			be128_xor(r, r, &p[1]);
--		if (ch & 0x01)
--			be128_xor(r, r, &p[0]);
--
--		if (++i >= 16)
--			break;
--
--		gf128mul_x8_bbe(r);
--	}
--}
--EXPORT_SYMBOL(gf128mul_bbe);
--
- /*      This version uses 64k bytes of table space.
-     A 16 byte buffer has to be multiplied by a 16 byte key
-     value in GF(2^128).  If we consider a GF(2^128) value in
-@@ -380,28 +342,6 @@ struct gf128mul_4k *gf128mul_init_4k_lle(const be128 *g)
- }
- EXPORT_SYMBOL(gf128mul_init_4k_lle);
- 
--struct gf128mul_4k *gf128mul_init_4k_bbe(const be128 *g)
--{
--	struct gf128mul_4k *t;
--	int j, k;
--
--	t = kzalloc(sizeof(*t), GFP_KERNEL);
--	if (!t)
--		goto out;
--
--	t->t[1] = *g;
--	for (j = 1; j <= 64; j <<= 1)
--		gf128mul_x_bbe(&t->t[j + j], &t->t[j]);
--
--	for (j = 2; j < 256; j += j)
--		for (k = 1; k < j; ++k)
--			be128_xor(&t->t[j + k], &t->t[j], &t->t[k]);
--
--out:
--	return t;
--}
--EXPORT_SYMBOL(gf128mul_init_4k_bbe);
--
- void gf128mul_4k_lle(be128 *a, const struct gf128mul_4k *t)
- {
- 	u8 *ap = (u8 *)a;
-@@ -417,20 +357,5 @@ void gf128mul_4k_lle(be128 *a, const struct gf128mul_4k *t)
- }
- EXPORT_SYMBOL(gf128mul_4k_lle);
- 
--void gf128mul_4k_bbe(be128 *a, const struct gf128mul_4k *t)
--{
--	u8 *ap = (u8 *)a;
--	be128 r[1];
--	int i = 0;
--
--	*r = t->t[ap[0]];
--	while (++i < 16) {
--		gf128mul_x8_bbe(r);
--		be128_xor(r, r, &t->t[ap[i]]);
--	}
--	*a = *r;
--}
--EXPORT_SYMBOL(gf128mul_4k_bbe);
--
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Functions for multiplying elements of GF(2^128)");
+Cheers,
 -- 
-2.47.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
