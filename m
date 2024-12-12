@@ -1,117 +1,224 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA6D82253FC;
-	Thu, 12 Dec 2024 18:08:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F5BB223C55;
+	Thu, 12 Dec 2024 18:24:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734026938; cv=none; b=B27CvdJZ2g5q79Pl97S9f2MX5HSr80sWoJLZHY369Hh69Gh/dTWX608V8o5JPxuWab0wCNIZs8bp8JyC+QLsdHCrNaoL+NxVoQX+x2UskcFlwwjNuFEAGI6YD4NQgkQNwYqTL9AO0QKs1fDhech822KTmQwNYszRZ/U/KdyC3j8=
+	t=1734027880; cv=none; b=d5xhF/dlhv1KqBMhzduXuby5Bi0svbEyMaLjumIZdTaqeC8z3rDpCHJk5je2mpIciaqKZMx2rI0jWOeQ28ktEJvDXT62bUKae6Q3a/zU0+RYS107H2P78zHGgnaUZiQ1oQQEsAk1zA0Do4w7ZBo0yvXTyH4yRGlk48LbMfdOmQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734026938; c=relaxed/simple;
-	bh=8NrVgyvw6gNljikFdLNfOJ2Px+yIA4Ixm4ziCPFuyqI=;
+	s=arc-20240116; t=1734027880; c=relaxed/simple;
+	bh=ABmVqV7Sr6ju3vzD1TlCStS/iRAA5BYzZFgN0WSIZdI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=azMNTNF4Hyc/Y4tgUK4TCAc1XB6kXn5B2ywYcuublmgWXxWOuEVEOGgwVr6ivnoE4qx3ddZta1+qs1yM8kyogmgq4WoizlMgWzkFdpFr1gwjidRMXxz6KE17HISdZgL20NdnveNNp29XdDCaRV3JcPoT81F94OV7JdFulNVmSBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nldMsqM9; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=SLn6ji2IZOkj1V48sGm2n2lZ547tpunzX6gTyGyp6efQVJ4sKoqRKVYj/fOr2ZDC+Z6lILjf0rwcyaBraC/4xMZ4KA841zMRtNL0Qqkul1hxf8ahXptKK5M7mEa18r7iHiwacgKLNJW/P25y64P1ZLb3oiUYeBfmBh35JJso47I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mTIFBcup; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nldMsqM9"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07FA0C4CECE;
-	Thu, 12 Dec 2024 18:08:58 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mTIFBcup"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C633AC4CED3;
+	Thu, 12 Dec 2024 18:24:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734026938;
-	bh=8NrVgyvw6gNljikFdLNfOJ2Px+yIA4Ixm4ziCPFuyqI=;
+	s=k20201202; t=1734027879;
+	bh=ABmVqV7Sr6ju3vzD1TlCStS/iRAA5BYzZFgN0WSIZdI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nldMsqM9LMd4Ih2dMDG99LlbVakVaNlz/D03looKnbC95VyvgT7bv+BGH6azjgWDJ
-	 aTNF8TrKq2WMRAzlfS4oDTbQGxi7JMix/lX5kLLxJeISJsl9xebHrFnYwkkwK3Vkso
-	 Xn8GErSlebSMGg2RvZKl2xL2A8dC7sGAPYwQXOiWfYAJK1cjLx8GCkB6n37nT+VU87
-	 zluiVt8L5ZMwm63WBBJYgXPNaIaD7Prnv0LSFXwMZMvuLgt0Gtam2wil2++7G8gKL1
-	 uODVwQAD/IEGq1G4x0mBDqbvrujQI0NsdJlk8QTBHABGLUBu5nlyb2LxLU2OHyoECP
-	 otu4tF+HFr88g==
-Date: Thu, 12 Dec 2024 18:08:56 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: stable@vger.kernel.org, patches@lists.linux.dev,
-	Jiri Slaby <jslaby@suse.cz>, Borislav Petkov <bp@suse.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-	linux-arch@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Thomas Gleixner <tglx@linutronix.de>, x86-ml <x86@kernel.org>,
-	Sasha Levin <sashal@kernel.org>
-Subject: Re: [PATCH 5.4 243/321] x86/asm/crypto: Annotate local functions
-Message-ID: <20241212180856.GB112010@google.com>
-References: <20241212144229.291682835@linuxfoundation.org>
- <20241212144239.574474355@linuxfoundation.org>
- <20241212180023.GA112010@google.com>
- <2024121201-recoup-gumming-92ce@gregkh>
+	b=mTIFBcup6VhyOT8Fwf9cjPQuLaGRzKzQBtEOcJycY7sFCtRkIYozgQ2+c8VtygwK3
+	 eU4zObSiyquQo8QlHU8V+ZF+JS0MezqeNiY0mWoBXeA0ulreMBX7kyvloc38T8s3Io
+	 y8e5T6UXcinVj/S+IkD8O9x8PEQ8E0qErbVqHKVGrx3t3P5NHWskZ2gxVB+AhR6c3K
+	 P9s8WwHfUjRb514O5ew5G/YDLnFqrZ3ebVaYKXkFjY9XXJtA+eSoFnIs6WkBOKwpnQ
+	 P52P2Je13Ukhno7VG0chD4uWscZtg7QNNEojQCex05+GCW2L/q3bgxP3rKMo1wsNyN
+	 IARUxIsXC5Onw==
+Date: Thu, 12 Dec 2024 10:24:36 -0800
+From: Kees Cook <kees@kernel.org>
+To: Nilay Shroff <nilay@linux.ibm.com>
+Cc: linux-kernel@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	briannorris@chromium.org, yury.norov@gmail.com,
+	gustavoars@kernel.org, nathan@kernel.org,
+	steffen.klassert@secunet.com, daniel.m.jordan@oracle.com,
+	gjoyce@ibm.com, linux-crypto@vger.kernel.org, linux@weissschuh.net
+Subject: Re: [PATCHv3] gcc: disable '-Wstrignop-overread' universally for
+ gcc-13+ and FORTIFY_SOURCE
+Message-ID: <202412120953.87F2827497@keescook>
+References: <20241208161315.730138-1-nilay@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <2024121201-recoup-gumming-92ce@gregkh>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20241208161315.730138-1-nilay@linux.ibm.com>
 
-On Thu, Dec 12, 2024 at 07:05:24PM +0100, Greg Kroah-Hartman wrote:
-> On Thu, Dec 12, 2024 at 06:00:23PM +0000, Eric Biggers wrote:
-> > On Thu, Dec 12, 2024 at 04:02:41PM +0100, Greg Kroah-Hartman wrote:
-> > > 5.4-stable review patch.  If anyone has any objections, please let me know.
-> > > 
-> > > ------------------
-> > > 
-> > > From: Jiri Slaby <jslaby@suse.cz>
-> > > 
-> > > [ Upstream commit 74d8b90a889022e306b543ff2147a6941c99b354 ]
-> > > 
-> > > Use the newly added SYM_FUNC_START_LOCAL to annotate beginnings of all
-> > > functions which do not have ".globl" annotation, but their endings are
-> > > annotated by ENDPROC. This is needed to balance ENDPROC for tools that
-> > > generate debuginfo.
-> > > 
-> > > These function names are not prepended with ".L" as they might appear in
-> > > call traces and they wouldn't be visible after such change.
-> > > 
-> > > To be symmetric, the functions' ENDPROCs are converted to the new
-> > > SYM_FUNC_END.
-> > > 
-> > > Signed-off-by: Jiri Slaby <jslaby@suse.cz>
-> > > Signed-off-by: Borislav Petkov <bp@suse.de>
-> > > Cc: "David S. Miller" <davem@davemloft.net>
-> > > Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> > > Cc: "H. Peter Anvin" <hpa@zytor.com>
-> > > Cc: Ingo Molnar <mingo@redhat.com>
-> > > Cc: linux-arch@vger.kernel.org
-> > > Cc: linux-crypto@vger.kernel.org
-> > > Cc: Thomas Gleixner <tglx@linutronix.de>
-> > > Cc: x86-ml <x86@kernel.org>
-> > > Link: https://lkml.kernel.org/r/20191011115108.12392-7-jslaby@suse.cz
-> > > Stable-dep-of: 3b2f2d22fb42 ("crypto: x86/aegis128 - access 32-bit arguments as 32-bit")
-> > > Signed-off-by: Sasha Levin <sashal@kernel.org>
-> > > ---
-> > >  arch/x86/crypto/aegis128-aesni-asm.S         |  8 ++--
-> > >  arch/x86/crypto/aesni-intel_asm.S            | 49 ++++++++------------
-> > >  arch/x86/crypto/camellia-aesni-avx-asm_64.S  | 20 ++++----
-> > >  arch/x86/crypto/camellia-aesni-avx2-asm_64.S | 20 ++++----
-> > >  arch/x86/crypto/cast5-avx-x86_64-asm_64.S    |  8 ++--
-> > >  arch/x86/crypto/cast6-avx-x86_64-asm_64.S    |  8 ++--
-> > >  arch/x86/crypto/chacha-ssse3-x86_64.S        |  4 +-
-> > >  arch/x86/crypto/ghash-clmulni-intel_asm.S    |  4 +-
-> > >  arch/x86/crypto/serpent-avx-x86_64-asm_64.S  |  8 ++--
-> > >  arch/x86/crypto/serpent-avx2-asm_64.S        |  8 ++--
-> > >  arch/x86/crypto/twofish-avx-x86_64-asm_64.S  |  8 ++--
-> > >  11 files changed, 68 insertions(+), 77 deletions(-)
-> > 
-> > Unless the author of this patch acks this I'd rather you skipped this.  It's not
-> > worth the risk of regressions in the crypto code.
+On Sun, Dec 08, 2024 at 09:42:28PM +0530, Nilay Shroff wrote:
+> While building the powerpc code using gcc 13.x, I came across following
+> errors generated for kernel/padata.c file:
 > 
-> It's a dependancy of commit 3b2f2d22fb42 ("crypto: x86/aegis128 - access
-> 32-bit arguments as 32-bit"), so should we drop that one also?
-> 
+>   CC      kernel/padata.o
+> In file included from ./include/linux/string.h:390,
+>                  from ./arch/powerpc/include/asm/paca.h:16,
+>                  from ./arch/powerpc/include/asm/current.h:13,
+>                  from ./include/linux/thread_info.h:23,
+>                  from ./include/asm-generic/preempt.h:5,
+>                  from ./arch/powerpc/include/generated/asm/preempt.h:1,
+>                  from ./include/linux/preempt.h:79,
+>                  from ./include/linux/spinlock.h:56,
+>                  from ./include/linux/swait.h:7,
+>                  from ./include/linux/completion.h:12,
+>                  from kernel/padata.c:14:
+> In function ‘bitmap_copy’,
+>     inlined from ‘cpumask_copy’ at ./include/linux/cpumask.h:839:2,
+>     inlined from ‘__padata_set_cpumasks’ at kernel/padata.c:730:2:
+> ./include/linux/fortify-string.h:114:33: error: ‘__builtin_memcpy’ reading between 257 and 536870904 bytes from a region of size 256 [-Werror=stringop-overread]
+>   114 | #define __underlying_memcpy     __builtin_memcpy
+>       |                                 ^
+> ./include/linux/fortify-string.h:633:9: note: in expansion of macro ‘__underlying_memcpy’
+>   633 |         __underlying_##op(p, q, __fortify_size);                        \
+>       |         ^~~~~~~~~~~~~
+> ./include/linux/fortify-string.h:678:26: note: in expansion of macro ‘__fortify_memcpy_chk’
+>   678 | #define memcpy(p, q, s)  __fortify_memcpy_chk(p, q, s,                  \
+>       |                          ^~~~~~~~~~~~~~~~~~~~
+> ./include/linux/bitmap.h:259:17: note: in expansion of macro ‘memcpy’
+>   259 |                 memcpy(dst, src, len);
+>       |                 ^~~~~~
+> kernel/padata.c: In function ‘__padata_set_cpumasks’:
+> kernel/padata.c:713:48: note: source object ‘pcpumask’ of size [0, 256]
+>   713 |                                  cpumask_var_t pcpumask,
+>       |                                  ~~~~~~~~~~~~~~^~~~~~~~
 
-Well it is not a dependency if the conflict is properly resolved, but I would
-just drop it too.  In theory it fixes a bug, but we haven't seen gcc or clang
-generating code that makes it matter.  Also I've noticed that some other asm
-files have the same issue...
+We've seen this also on x86 with 320 CPUs[1] (which perhaps was already
+known since I see Thomas Weißschuh in CC already.
 
-- Eric
+Building with -fdiagnostics-details we see:
+
+In function 'bitmap_copy',
+    inlined from 'cpumask_copy' at ../include/linux/cpumask.h:839:2,
+    inlined from '__padata_set_cpumasks' at ../kernel/padata.c:723:2:
+../include/linux/fortify-string.h:114:33: error: '__builtin_memcpy' reading between 41 and 536870904 bytes from a region of size 40 [-Werror=stringop-overread]
+  114 | #define __underlying_memcpy     __builtin_memcpy
+      |                                 ^
+../include/linux/fortify-string.h:633:9: note: in expansion of macro '__underlying_memcpy'
+  633 |         __underlying_##op(p, q, __fortify_size);                        \
+      |         ^~~~~~~~~~~~~
+../include/linux/fortify-string.h:678:26: note: in expansion of macro '__fortify_memcpy_chk'
+  678 | #define memcpy(p, q, s)  __fortify_memcpy_chk(p, q, s,                  \
+      |                          ^~~~~~~~~~~~~~~~~~~~
+../include/linux/bitmap.h:259:17: note: in expansion of macro 'memcpy'
+  259 |                 memcpy(dst, src, len);
+      |                 ^~~~~~
+  '__padata_set_cpumasks': events 1-2
+../include/linux/fortify-string.h:613:36:
+  612 |         if (p_size_field != SIZE_MAX &&
+      |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  613 |             p_size != p_size_field && p_size_field < size)
+      |             ~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~
+      |                                    |
+      |                                    (1) when the condition is evaluated to false
+      |                                    (2) when the condition is evaluated to true
+  '__padata_set_cpumasks': event 3
+  114 | #define __underlying_memcpy     __builtin_memcpy
+      |                                 ^
+      |                                 |
+      |                                 (3) out of array bounds here
+
+What's happening is that GCC is seeing that the run-time checks of
+FORTIFY_SOURCE is checking for this condition (i.e. there is a path
+through the code where the bounds could be too large and it still calls
+memcpy) -- which is the point of this runtime check -- but that GCC has
+found a compile-time path where this can be true.
+
+Built without CONFIG_WERROR, we can examine the padata.o file for the
+FORTIFY_SOURCE warning string to find the field:
+
+$ strings gcc-diag/kernel/padata.o | grep ^field
+field "dst" at include/linux/bitmap.h:259
+
+which confirms it is this, which has already been seen in the thread:
+
+static __always_inline
+void bitmap_copy(unsigned long *dst, const unsigned long *src, unsigned
+int nbits)
+{
+        unsigned int len = bitmap_size(nbits);
+
+        if (small_const_nbits(nbits))
+                *dst = *src;
+        else
+                memcpy(dst, src, len);
+}
+
+and I think what Nathan already discussed[2] is all true (i.e. that
+nr_cpu_ids is unknown -- but bounded to a smaller range than [0..UINT_MAX]
+due to the calculation in bitmap_size()). Nathan's fix silences the
+warning. We could narrow the scope to only run-time-specified nr_cpus:
+
+
+diff --git a/include/linux/cpumask.h b/include/linux/cpumask.h
+index 9278a50d514f..8f1a694109e9 100644
+--- a/include/linux/cpumask.h
++++ b/include/linux/cpumask.h
+@@ -836,6 +836,8 @@ void cpumask_shift_left(struct cpumask *dstp, const struct cpumask *srcp, int n)
+ static __always_inline
+ void cpumask_copy(struct cpumask *dstp, const struct cpumask *srcp)
+ {
++	if (!__builtin_constant_p(large_cpumask_bits))
++		BUG_ON(large_cpumask_bits > NR_CPUS);
+ 	bitmap_copy(cpumask_bits(dstp), cpumask_bits(srcp), large_cpumask_bits);
+ }
+ 
+
+Or we could avoid the BUG_ON check and simply silence the warning
+explicitly:
+
+
+diff --git a/include/linux/cpumask.h b/include/linux/cpumask.h
+index 9278a50d514f..0725b26f21b8 100644
+--- a/include/linux/cpumask.h
++++ b/include/linux/cpumask.h
+@@ -836,6 +836,8 @@ void cpumask_shift_left(struct cpumask *dstp, const struct cpumask *srcp, int n)
+ static __always_inline
+ void cpumask_copy(struct cpumask *dstp, const struct cpumask *srcp)
+ {
++	if (!__builtin_constant_p(large_cpumask_bits))
++		OPTIMIZER_HIDE_VAR(large_cpumask_bits);
+ 	bitmap_copy(cpumask_bits(dstp), cpumask_bits(srcp), large_cpumask_bits);
+ }
+ 
+Or we could unconditionally put the OPTIMIZER_HIDE_VAR() inside
+bitmap_copy() itself:
+
+
+diff --git a/include/linux/bitmap.h b/include/linux/bitmap.h
+index 262b6596eca5..5503ccabe05a 100644
+--- a/include/linux/bitmap.h
++++ b/include/linux/bitmap.h
+@@ -251,12 +251,14 @@ static __always_inline void bitmap_fill(unsigned long *dst, unsigned int nbits)
+ static __always_inline
+ void bitmap_copy(unsigned long *dst, const unsigned long *src, unsigned int nbits)
+ {
+-	unsigned int len = bitmap_size(nbits);
+-
+-	if (small_const_nbits(nbits))
++	if (small_const_nbits(nbits)) {
+ 		*dst = *src;
+-	else
++	} else {
++		unsigned int len = bitmap_size(nbits);
++
++		OPTIMIZER_HIDE_VAR(len);
+ 		memcpy(dst, src, len);
++	}
+ }
+ 
+ /*
+
+I prefer any of these to doing the build-system disabling of the
+warning.
+
+-Kees
+
+[1] https://lore.kernel.org/all/202411021337.85E9BB06@keescook/
+[2] https://lore.kernel.org/all/20241209193558.GA1597021@ax162/
+
+-- 
+Kees Cook
