@@ -1,60 +1,52 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DECAC14EC7E;
-	Thu, 12 Dec 2024 04:22:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8829F209695;
+	Thu, 12 Dec 2024 17:49:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1733977362; cv=none; b=gse153bIhgV8kPV22JD20PviBKZi5WpADHIZiaoKBeMjgVhQ92MUnVSYqNtPrjQtKzdPXguduoYUuG2euDIzddagKniZavMO69R64y776JjynWFaoMDOqCRacU06uQHvd6kagQU9crlbCByxRaSIgAF+88I1TUqqHZPWQSHy6sI=
+	t=1734025745; cv=none; b=kgqUr1xSBdugpAxwBN/IN0ACBWZjWb4ElOONOe34fk6zI1uuIGvEG4Xmrb9/9EMrJvbTx8BA/4XiT8qgsv2tYLXPpoVamoa/Wl0TJTECp0gJGZxpE81q/Oq6pm29ED6wY0YD1lXvS3IlaDkdymF+WhcxiHH6VhvPLrEdZby2p9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1733977362; c=relaxed/simple;
-	bh=JkMtpFzqF4zidLZ24qjhE2vsydxW4L/IfB3tUY4/674=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ipS4KuUtGVIsq82W4iLDHIDqabbDEq4q69ZBPh40TWIjCJdh0HndiI6ZNl7YPv4zQG3gj00bBYiRbYeRlYMww7m0YS9h19rNfdsC7SGxwOWikH3wQypwoVCOmUf3o+iWvNxeN4uq7XdPagaih+8ChhDKIfkN7T38QfaqEAAGT/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=U2BEkK0W; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1734025745; c=relaxed/simple;
+	bh=owPE42zZaxSsGoAJPnNUzD6R5EIfiYpT8WHeWp2pkhE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ev67niPZ6OgLHfUStWwh7e+wPxCPT7h+/VDwFm4rArN24yKgUFp3DP8Gul5QspQ4B52MXtX0vtDaJQNBSOM2NMnFahd6MfnVwklBNiWsrQCvdJDHmf5NSe1z8G2b13ImpltoTa4+A25JeUWnfsCTxveqLY69pHkFsd5nev6Nv0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=s1ETimUa; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="U2BEkK0W"
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BBHDGP4002304;
-	Thu, 12 Dec 2024 04:17:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	VYMkhxhQdgI3UK6GhEAmMzJHmo36esqvhXDY//UFXMU=; b=U2BEkK0WZFYqZu9Q
-	e1OuL3gIs881Lab04RtYXrv2uHPwf8JPQ6QAxwPhWl5N9o50Qv1SEtRzCOiq+8Q+
-	XANpAOjiTS8GQuimaLrgt6HHDN5D45zfd4nsCU7gfCJAF2taFxi015IwbFraG1gv
-	Vh4RPj/BV9m3DTNNfOc8UU1eeV1b//sCkhFxqkenr8QqXHiSxrs202NL0+iXmLnZ
-	wd8niC8gd95/5RaYmColUQDshi9vl8UQCzky55q+YyXwPyNE8OBirCuVfCcpQxRA
-	pU1rt9SjMzmDr04kwZZ8R3+dkqduHQ8vP65P7Mez879urDevb6vlRwu+NjiHnJny
-	NhEyAw==
-Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43eyg646gf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Dec 2024 04:17:29 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4BC4HSlY011795
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 12 Dec 2024 04:17:28 GMT
-Received: from hu-mdalam-blr.qualcomm.com (10.80.80.8) by
- nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Wed, 11 Dec 2024 20:17:23 -0800
-From: Md Sadre Alam <quic_mdalam@quicinc.com>
-To: <vkoul@kernel.org>, <corbet@lwn.net>, <thara.gopinath@gmail.com>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <kees@kernel.org>, <dave.jiang@intel.com>, <dmaengine@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>
-CC: <quic_srichara@quicinc.com>, <quic_varada@quicinc.com>,
-        <quic_mdalam@quicinc.com>, <quic_utiwari@quicinc.com>
-Subject: [PATCH v5 06/12] crypto: qce - Convert register r/w for skcipher via BAM/DMA
-Date: Thu, 12 Dec 2024 09:46:33 +0530
-Message-ID: <20241212041639.4109039-7-quic_mdalam@quicinc.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241212041639.4109039-1-quic_mdalam@quicinc.com>
-References: <20241212041639.4109039-1-quic_mdalam@quicinc.com>
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="s1ETimUa"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4169C4CECE;
+	Thu, 12 Dec 2024 17:49:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1734025745;
+	bh=owPE42zZaxSsGoAJPnNUzD6R5EIfiYpT8WHeWp2pkhE=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=s1ETimUaLWN+FW+Vfi3Y0zvCPv84uZGqDCYzJ/c9Dn2+AbCc8VCkg5o7WLhSEPCej
+	 QBorxPr2tBRG5XbVL8ADRAIiZuz5Tto6P37LZcGO1tojVmAZYjR2vyWnH5Amr4X0+k
+	 GKVy3oaocrcxt+CLdiaRkwz9KIkJyX0tUoPyJz8Q=
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: stable@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	patches@lists.linux.dev,
+	Jiri Slaby <jslaby@suse.cz>,
+	Borislav Petkov <bp@suse.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	linux-arch@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	Thomas Gleixner <tglx@linutronix.de>,
+	x86-ml <x86@kernel.org>,
+	Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 5.4 243/321] x86/asm/crypto: Annotate local functions
+Date: Thu, 12 Dec 2024 16:02:41 +0100
+Message-ID: <20241212144239.574474355@linuxfoundation.org>
+X-Mailer: git-send-email 2.47.1
+In-Reply-To: <20241212144229.291682835@linuxfoundation.org>
+References: <20241212144229.291682835@linuxfoundation.org>
+User-Agent: quilt/0.67
+X-stable: review
+X-Patchwork-Hint: ignore
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -62,166 +54,645 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: z-wnswFRrxE_CVkVJ_nQmqewyuO2HSLN
-X-Proofpoint-ORIG-GUID: z-wnswFRrxE_CVkVJ_nQmqewyuO2HSLN
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 bulkscore=0
- lowpriorityscore=0 priorityscore=1501 adultscore=0 impostorscore=0
- mlxlogscore=999 phishscore=0 suspectscore=0 mlxscore=0 clxscore=1011
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2412120028
 
-Convert register read/write for skcipher via BAM/DMA.
-with this change all the crypto register configuration
-will be done via BAM/DMA. This change will prepare command
-descriptor for all register and write it once.
+5.4-stable review patch.  If anyone has any objections, please let me know.
 
-Signed-off-by: Md Sadre Alam <quic_mdalam@quicinc.com>
+------------------
+
+From: Jiri Slaby <jslaby@suse.cz>
+
+[ Upstream commit 74d8b90a889022e306b543ff2147a6941c99b354 ]
+
+Use the newly added SYM_FUNC_START_LOCAL to annotate beginnings of all
+functions which do not have ".globl" annotation, but their endings are
+annotated by ENDPROC. This is needed to balance ENDPROC for tools that
+generate debuginfo.
+
+These function names are not prepended with ".L" as they might appear in
+call traces and they wouldn't be visible after such change.
+
+To be symmetric, the functions' ENDPROCs are converted to the new
+SYM_FUNC_END.
+
+Signed-off-by: Jiri Slaby <jslaby@suse.cz>
+Signed-off-by: Borislav Petkov <bp@suse.de>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: linux-arch@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: x86-ml <x86@kernel.org>
+Link: https://lkml.kernel.org/r/20191011115108.12392-7-jslaby@suse.cz
+Stable-dep-of: 3b2f2d22fb42 ("crypto: x86/aegis128 - access 32-bit arguments as 32-bit")
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
+ arch/x86/crypto/aegis128-aesni-asm.S         |  8 ++--
+ arch/x86/crypto/aesni-intel_asm.S            | 49 ++++++++------------
+ arch/x86/crypto/camellia-aesni-avx-asm_64.S  | 20 ++++----
+ arch/x86/crypto/camellia-aesni-avx2-asm_64.S | 20 ++++----
+ arch/x86/crypto/cast5-avx-x86_64-asm_64.S    |  8 ++--
+ arch/x86/crypto/cast6-avx-x86_64-asm_64.S    |  8 ++--
+ arch/x86/crypto/chacha-ssse3-x86_64.S        |  4 +-
+ arch/x86/crypto/ghash-clmulni-intel_asm.S    |  4 +-
+ arch/x86/crypto/serpent-avx-x86_64-asm_64.S  |  8 ++--
+ arch/x86/crypto/serpent-avx2-asm_64.S        |  8 ++--
+ arch/x86/crypto/twofish-avx-x86_64-asm_64.S  |  8 ++--
+ 11 files changed, 68 insertions(+), 77 deletions(-)
 
-Change in [v5]
-
-* No change
-
-Change in [v4]
-
-* No change 
+diff --git a/arch/x86/crypto/aegis128-aesni-asm.S b/arch/x86/crypto/aegis128-aesni-asm.S
+index 4434607e366dc..b7026fdef4ff2 100644
+--- a/arch/x86/crypto/aegis128-aesni-asm.S
++++ b/arch/x86/crypto/aegis128-aesni-asm.S
+@@ -71,7 +71,7 @@
+  *   %r8
+  *   %r9
+  */
+-__load_partial:
++SYM_FUNC_START_LOCAL(__load_partial)
+ 	xor %r9d, %r9d
+ 	pxor MSG, MSG
  
-Change in [v3]
-
-* No change
-
-Change in [v2]
-
-* Added initial support to read/write crypto
-  register via BAM for skcipher
-
-Change in [v1]
-
-* This patch was not included in [v1]
-
- drivers/crypto/qce/common.c | 42 ++++++++++++++++++++++---------------
- 1 file changed, 25 insertions(+), 17 deletions(-)
-
-diff --git a/drivers/crypto/qce/common.c b/drivers/crypto/qce/common.c
-index 04253a8d3340..d1da6b1938f3 100644
---- a/drivers/crypto/qce/common.c
-+++ b/drivers/crypto/qce/common.c
-@@ -34,7 +34,7 @@ static inline void qce_write_array(struct qce_device *qce, u32 offset,
- 	int i;
+@@ -123,7 +123,7 @@ __load_partial:
  
- 	for (i = 0; i < len; i++)
--		qce_write(qce, offset + i * sizeof(u32), val[i]);
-+		qce_write_reg_dma(qce, offset + i * sizeof(u32), val[i], 1);
- }
+ .Lld_partial_8:
+ 	ret
+-ENDPROC(__load_partial)
++SYM_FUNC_END(__load_partial)
  
- static inline void
-@@ -43,7 +43,7 @@ qce_clear_array(struct qce_device *qce, u32 offset, unsigned int len)
- 	int i;
+ /*
+  * __store_partial: internal ABI
+@@ -137,7 +137,7 @@ ENDPROC(__load_partial)
+  *   %r9
+  *   %r10
+  */
+-__store_partial:
++SYM_FUNC_START_LOCAL(__store_partial)
+ 	mov LEN, %r8
+ 	mov DST, %r9
  
- 	for (i = 0; i < len; i++)
--		qce_write(qce, offset + i * sizeof(u32), 0);
-+		qce_write_reg_dma(qce, offset + i * sizeof(u32), 0, 1);
- }
+@@ -181,7 +181,7 @@ __store_partial:
  
- static u32 qce_config_reg(struct qce_device *qce, int little)
-@@ -86,16 +86,16 @@ static void qce_setup_config(struct qce_device *qce)
- 	config = qce_config_reg(qce, 0);
+ .Lst_partial_1:
+ 	ret
+-ENDPROC(__store_partial)
++SYM_FUNC_END(__store_partial)
  
- 	/* clear status */
--	qce_write(qce, REG_STATUS, 0);
--	qce_write(qce, REG_CONFIG, config);
-+	qce_write_reg_dma(qce, REG_STATUS, 0, 1);
-+	qce_write_reg_dma(qce, REG_CONFIG, config, 1);
- }
+ /*
+  * void crypto_aegis128_aesni_init(void *state, const void *key, const void *iv);
+diff --git a/arch/x86/crypto/aesni-intel_asm.S b/arch/x86/crypto/aesni-intel_asm.S
+index dd954d8db629b..ef62383c6bd8f 100644
+--- a/arch/x86/crypto/aesni-intel_asm.S
++++ b/arch/x86/crypto/aesni-intel_asm.S
+@@ -1759,7 +1759,7 @@ ENDPROC(aesni_gcm_finalize)
  
- static inline void qce_crypto_go(struct qce_device *qce, bool result_dump)
- {
- 	if (result_dump)
--		qce_write(qce, REG_GOPROC, BIT(GO_SHIFT) | BIT(RESULTS_DUMP_SHIFT));
-+		qce_write_reg_dma(qce, REG_GOPROC, BIT(GO_SHIFT) | BIT(RESULTS_DUMP_SHIFT), 1);
- 	else
--		qce_write(qce, REG_GOPROC, BIT(GO_SHIFT));
-+		qce_write_reg_dma(qce, REG_GOPROC, BIT(GO_SHIFT), 1);
- }
+ .align 4
+ _key_expansion_128:
+-_key_expansion_256a:
++SYM_FUNC_START_LOCAL(_key_expansion_256a)
+ 	pshufd $0b11111111, %xmm1, %xmm1
+ 	shufps $0b00010000, %xmm0, %xmm4
+ 	pxor %xmm4, %xmm0
+@@ -1770,10 +1770,9 @@ _key_expansion_256a:
+ 	add $0x10, TKEYP
+ 	ret
+ ENDPROC(_key_expansion_128)
+-ENDPROC(_key_expansion_256a)
++SYM_FUNC_END(_key_expansion_256a)
  
- #if defined(CONFIG_CRYPTO_DEV_QCE_SHA) || defined(CONFIG_CRYPTO_DEV_QCE_AEAD)
-@@ -308,7 +308,7 @@ static void qce_xtskey(struct qce_device *qce, const u8 *enckey,
- 	/* Set data unit size to cryptlen. Anything else causes
- 	 * crypto engine to return back incorrect results.
- 	 */
--	qce_write(qce, REG_ENCR_XTS_DU_SIZE, cryptlen);
-+	qce_write_reg_dma(qce, REG_ENCR_XTS_DU_SIZE, cryptlen, 1);
- }
+-.align 4
+-_key_expansion_192a:
++SYM_FUNC_START_LOCAL(_key_expansion_192a)
+ 	pshufd $0b01010101, %xmm1, %xmm1
+ 	shufps $0b00010000, %xmm0, %xmm4
+ 	pxor %xmm4, %xmm0
+@@ -1795,10 +1794,9 @@ _key_expansion_192a:
+ 	movaps %xmm1, 0x10(TKEYP)
+ 	add $0x20, TKEYP
+ 	ret
+-ENDPROC(_key_expansion_192a)
++SYM_FUNC_END(_key_expansion_192a)
  
- static int qce_setup_regs_skcipher(struct crypto_async_request *async_req)
-@@ -325,7 +325,9 @@ static int qce_setup_regs_skcipher(struct crypto_async_request *async_req)
- 	u32 encr_cfg = 0, auth_cfg = 0, config;
- 	unsigned int ivsize = rctx->ivsize;
- 	unsigned long flags = rctx->flags;
-+	int ret;
+-.align 4
+-_key_expansion_192b:
++SYM_FUNC_START_LOCAL(_key_expansion_192b)
+ 	pshufd $0b01010101, %xmm1, %xmm1
+ 	shufps $0b00010000, %xmm0, %xmm4
+ 	pxor %xmm4, %xmm0
+@@ -1815,10 +1813,9 @@ _key_expansion_192b:
+ 	movaps %xmm0, (TKEYP)
+ 	add $0x10, TKEYP
+ 	ret
+-ENDPROC(_key_expansion_192b)
++SYM_FUNC_END(_key_expansion_192b)
  
-+	qce_clear_bam_transaction(qce);
- 	qce_setup_config(qce);
+-.align 4
+-_key_expansion_256b:
++SYM_FUNC_START_LOCAL(_key_expansion_256b)
+ 	pshufd $0b10101010, %xmm1, %xmm1
+ 	shufps $0b00010000, %xmm2, %xmm4
+ 	pxor %xmm4, %xmm2
+@@ -1828,7 +1825,7 @@ _key_expansion_256b:
+ 	movaps %xmm2, (TKEYP)
+ 	add $0x10, TKEYP
+ 	ret
+-ENDPROC(_key_expansion_256b)
++SYM_FUNC_END(_key_expansion_256b)
  
- 	if (IS_XTS(flags))
-@@ -336,7 +338,7 @@ static int qce_setup_regs_skcipher(struct crypto_async_request *async_req)
- 	qce_cpu_to_be32p_array(enckey, ctx->enc_key, keylen);
- 	enckey_words = keylen / sizeof(u32);
+ /*
+  * int aesni_set_key(struct crypto_aes_ctx *ctx, const u8 *in_key,
+@@ -1981,8 +1978,7 @@ ENDPROC(aesni_enc)
+  *	KEY
+  *	TKEYP (T1)
+  */
+-.align 4
+-_aesni_enc1:
++SYM_FUNC_START_LOCAL(_aesni_enc1)
+ 	movaps (KEYP), KEY		# key
+ 	mov KEYP, TKEYP
+ 	pxor KEY, STATE		# round 0
+@@ -2025,7 +2021,7 @@ _aesni_enc1:
+ 	movaps 0x70(TKEYP), KEY
+ 	AESENCLAST KEY STATE
+ 	ret
+-ENDPROC(_aesni_enc1)
++SYM_FUNC_END(_aesni_enc1)
  
--	qce_write(qce, REG_AUTH_SEG_CFG, auth_cfg);
-+	qce_write_reg_dma(qce, REG_AUTH_SEG_CFG, auth_cfg, 1);
+ /*
+  * _aesni_enc4:	internal ABI
+@@ -2045,8 +2041,7 @@ ENDPROC(_aesni_enc1)
+  *	KEY
+  *	TKEYP (T1)
+  */
+-.align 4
+-_aesni_enc4:
++SYM_FUNC_START_LOCAL(_aesni_enc4)
+ 	movaps (KEYP), KEY		# key
+ 	mov KEYP, TKEYP
+ 	pxor KEY, STATE1		# round 0
+@@ -2134,7 +2129,7 @@ _aesni_enc4:
+ 	AESENCLAST KEY STATE3
+ 	AESENCLAST KEY STATE4
+ 	ret
+-ENDPROC(_aesni_enc4)
++SYM_FUNC_END(_aesni_enc4)
  
- 	encr_cfg = qce_encr_cfg(flags, keylen);
+ /*
+  * void aesni_dec (const void *ctx, u8 *dst, const u8 *src)
+@@ -2173,8 +2168,7 @@ ENDPROC(aesni_dec)
+  *	KEY
+  *	TKEYP (T1)
+  */
+-.align 4
+-_aesni_dec1:
++SYM_FUNC_START_LOCAL(_aesni_dec1)
+ 	movaps (KEYP), KEY		# key
+ 	mov KEYP, TKEYP
+ 	pxor KEY, STATE		# round 0
+@@ -2217,7 +2211,7 @@ _aesni_dec1:
+ 	movaps 0x70(TKEYP), KEY
+ 	AESDECLAST KEY STATE
+ 	ret
+-ENDPROC(_aesni_dec1)
++SYM_FUNC_END(_aesni_dec1)
  
-@@ -369,25 +371,31 @@ static int qce_setup_regs_skcipher(struct crypto_async_request *async_req)
- 	if (IS_ENCRYPT(flags))
- 		encr_cfg |= BIT(ENCODE_SHIFT);
+ /*
+  * _aesni_dec4:	internal ABI
+@@ -2237,8 +2231,7 @@ ENDPROC(_aesni_dec1)
+  *	KEY
+  *	TKEYP (T1)
+  */
+-.align 4
+-_aesni_dec4:
++SYM_FUNC_START_LOCAL(_aesni_dec4)
+ 	movaps (KEYP), KEY		# key
+ 	mov KEYP, TKEYP
+ 	pxor KEY, STATE1		# round 0
+@@ -2326,7 +2319,7 @@ _aesni_dec4:
+ 	AESDECLAST KEY STATE3
+ 	AESDECLAST KEY STATE4
+ 	ret
+-ENDPROC(_aesni_dec4)
++SYM_FUNC_END(_aesni_dec4)
  
--	qce_write(qce, REG_ENCR_SEG_CFG, encr_cfg);
--	qce_write(qce, REG_ENCR_SEG_SIZE, rctx->cryptlen);
--	qce_write(qce, REG_ENCR_SEG_START, 0);
-+	qce_write_reg_dma(qce, REG_ENCR_SEG_CFG, encr_cfg, 1);
-+	qce_write_reg_dma(qce, REG_ENCR_SEG_SIZE, rctx->cryptlen, 1);
-+	qce_write_reg_dma(qce, REG_ENCR_SEG_START, 0, 1);
+ /*
+  * void aesni_ecb_enc(struct crypto_aes_ctx *ctx, const u8 *dst, u8 *src,
+@@ -2604,8 +2597,7 @@ ENDPROC(aesni_cbc_dec)
+  *	INC:	== 1, in little endian
+  *	BSWAP_MASK == endian swapping mask
+  */
+-.align 4
+-_aesni_inc_init:
++SYM_FUNC_START_LOCAL(_aesni_inc_init)
+ 	movaps .Lbswap_mask, BSWAP_MASK
+ 	movaps IV, CTR
+ 	PSHUFB_XMM BSWAP_MASK CTR
+@@ -2613,7 +2605,7 @@ _aesni_inc_init:
+ 	MOVQ_R64_XMM TCTR_LOW INC
+ 	MOVQ_R64_XMM CTR TCTR_LOW
+ 	ret
+-ENDPROC(_aesni_inc_init)
++SYM_FUNC_END(_aesni_inc_init)
  
- 	if (IS_CTR(flags)) {
--		qce_write(qce, REG_CNTR_MASK, ~0);
--		qce_write(qce, REG_CNTR_MASK0, ~0);
--		qce_write(qce, REG_CNTR_MASK1, ~0);
--		qce_write(qce, REG_CNTR_MASK2, ~0);
-+		qce_write_reg_dma(qce, REG_CNTR_MASK, ~0, 1);
-+		qce_write_reg_dma(qce, REG_CNTR_MASK0, ~0, 1);
-+		qce_write_reg_dma(qce, REG_CNTR_MASK1, ~0, 1);
-+		qce_write_reg_dma(qce, REG_CNTR_MASK2, ~0, 1);
- 	}
+ /*
+  * _aesni_inc:		internal ABI
+@@ -2630,8 +2622,7 @@ ENDPROC(_aesni_inc_init)
+  *	CTR:	== output IV, in little endian
+  *	TCTR_LOW: == lower qword of CTR
+  */
+-.align 4
+-_aesni_inc:
++SYM_FUNC_START_LOCAL(_aesni_inc)
+ 	paddq INC, CTR
+ 	add $1, TCTR_LOW
+ 	jnc .Linc_low
+@@ -2642,7 +2633,7 @@ _aesni_inc:
+ 	movaps CTR, IV
+ 	PSHUFB_XMM BSWAP_MASK IV
+ 	ret
+-ENDPROC(_aesni_inc)
++SYM_FUNC_END(_aesni_inc)
  
--	qce_write(qce, REG_SEG_SIZE, rctx->cryptlen);
-+	qce_write_reg_dma(qce, REG_SEG_SIZE, rctx->cryptlen, 1);
+ /*
+  * void aesni_ctr_enc(struct crypto_aes_ctx *ctx, const u8 *dst, u8 *src,
+diff --git a/arch/x86/crypto/camellia-aesni-avx-asm_64.S b/arch/x86/crypto/camellia-aesni-avx-asm_64.S
+index a14af6eb09cb0..f4408ca55fdb3 100644
+--- a/arch/x86/crypto/camellia-aesni-avx-asm_64.S
++++ b/arch/x86/crypto/camellia-aesni-avx-asm_64.S
+@@ -189,20 +189,20 @@
+  * larger and would only be 0.5% faster (on sandy-bridge).
+  */
+ .align 8
+-roundsm16_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd:
++SYM_FUNC_START_LOCAL(roundsm16_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd)
+ 	roundsm16(%xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
+ 		  %xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14, %xmm15,
+ 		  %rcx, (%r9));
+ 	ret;
+-ENDPROC(roundsm16_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd)
++SYM_FUNC_END(roundsm16_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd)
  
- 	/* get little endianness */
- 	config = qce_config_reg(qce, 1);
--	qce_write(qce, REG_CONFIG, config);
-+	qce_write_reg_dma(qce, REG_CONFIG, config, 1);
+ .align 8
+-roundsm16_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab:
++SYM_FUNC_START_LOCAL(roundsm16_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab)
+ 	roundsm16(%xmm4, %xmm5, %xmm6, %xmm7, %xmm0, %xmm1, %xmm2, %xmm3,
+ 		  %xmm12, %xmm13, %xmm14, %xmm15, %xmm8, %xmm9, %xmm10, %xmm11,
+ 		  %rax, (%r9));
+ 	ret;
+-ENDPROC(roundsm16_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab)
++SYM_FUNC_END(roundsm16_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab)
  
- 	qce_crypto_go(qce, true);
+ /*
+  * IN/OUT:
+@@ -722,7 +722,7 @@ ENDPROC(roundsm16_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab)
+ .text
  
-+	ret = qce_submit_cmd_desc(qce, 0);
-+	if (ret) {
-+		dev_err(qce->dev, "Error in skcipher cmd descriptor\n");
-+		return ret;
-+	}
-+
- 	return 0;
- }
- #endif
+ .align 8
+-__camellia_enc_blk16:
++SYM_FUNC_START_LOCAL(__camellia_enc_blk16)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rax: temporary storage, 256 bytes
+@@ -806,10 +806,10 @@ __camellia_enc_blk16:
+ 		     %xmm15, %rax, %rcx, 24);
+ 
+ 	jmp .Lenc_done;
+-ENDPROC(__camellia_enc_blk16)
++SYM_FUNC_END(__camellia_enc_blk16)
+ 
+ .align 8
+-__camellia_dec_blk16:
++SYM_FUNC_START_LOCAL(__camellia_dec_blk16)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rax: temporary storage, 256 bytes
+@@ -891,7 +891,7 @@ __camellia_dec_blk16:
+ 	      ((key_table + (24) * 8) + 4)(CTX));
+ 
+ 	jmp .Ldec_max24;
+-ENDPROC(__camellia_dec_blk16)
++SYM_FUNC_END(__camellia_dec_blk16)
+ 
+ ENTRY(camellia_ecb_enc_16way)
+ 	/* input:
+@@ -1120,7 +1120,7 @@ ENDPROC(camellia_ctr_16way)
+ 	vpxor tmp, iv, iv;
+ 
+ .align 8
+-camellia_xts_crypt_16way:
++SYM_FUNC_START_LOCAL(camellia_xts_crypt_16way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst (16 blocks)
+@@ -1254,7 +1254,7 @@ camellia_xts_crypt_16way:
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(camellia_xts_crypt_16way)
++SYM_FUNC_END(camellia_xts_crypt_16way)
+ 
+ ENTRY(camellia_xts_enc_16way)
+ 	/* input:
+diff --git a/arch/x86/crypto/camellia-aesni-avx2-asm_64.S b/arch/x86/crypto/camellia-aesni-avx2-asm_64.S
+index 4be4c7c3ba273..72ae3edd09979 100644
+--- a/arch/x86/crypto/camellia-aesni-avx2-asm_64.S
++++ b/arch/x86/crypto/camellia-aesni-avx2-asm_64.S
+@@ -223,20 +223,20 @@
+  * larger and would only marginally faster.
+  */
+ .align 8
+-roundsm32_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd:
++SYM_FUNC_START_LOCAL(roundsm32_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd)
+ 	roundsm32(%ymm0, %ymm1, %ymm2, %ymm3, %ymm4, %ymm5, %ymm6, %ymm7,
+ 		  %ymm8, %ymm9, %ymm10, %ymm11, %ymm12, %ymm13, %ymm14, %ymm15,
+ 		  %rcx, (%r9));
+ 	ret;
+-ENDPROC(roundsm32_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd)
++SYM_FUNC_END(roundsm32_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd)
+ 
+ .align 8
+-roundsm32_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab:
++SYM_FUNC_START_LOCAL(roundsm32_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab)
+ 	roundsm32(%ymm4, %ymm5, %ymm6, %ymm7, %ymm0, %ymm1, %ymm2, %ymm3,
+ 		  %ymm12, %ymm13, %ymm14, %ymm15, %ymm8, %ymm9, %ymm10, %ymm11,
+ 		  %rax, (%r9));
+ 	ret;
+-ENDPROC(roundsm32_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab)
++SYM_FUNC_END(roundsm32_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab)
+ 
+ /*
+  * IN/OUT:
+@@ -760,7 +760,7 @@ ENDPROC(roundsm32_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab)
+ .text
+ 
+ .align 8
+-__camellia_enc_blk32:
++SYM_FUNC_START_LOCAL(__camellia_enc_blk32)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rax: temporary storage, 512 bytes
+@@ -844,10 +844,10 @@ __camellia_enc_blk32:
+ 		     %ymm15, %rax, %rcx, 24);
+ 
+ 	jmp .Lenc_done;
+-ENDPROC(__camellia_enc_blk32)
++SYM_FUNC_END(__camellia_enc_blk32)
+ 
+ .align 8
+-__camellia_dec_blk32:
++SYM_FUNC_START_LOCAL(__camellia_dec_blk32)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rax: temporary storage, 512 bytes
+@@ -929,7 +929,7 @@ __camellia_dec_blk32:
+ 	      ((key_table + (24) * 8) + 4)(CTX));
+ 
+ 	jmp .Ldec_max24;
+-ENDPROC(__camellia_dec_blk32)
++SYM_FUNC_END(__camellia_dec_blk32)
+ 
+ ENTRY(camellia_ecb_enc_32way)
+ 	/* input:
+@@ -1222,7 +1222,7 @@ ENDPROC(camellia_ctr_32way)
+ 	vpxor tmp1, iv, iv;
+ 
+ .align 8
+-camellia_xts_crypt_32way:
++SYM_FUNC_START_LOCAL(camellia_xts_crypt_32way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst (32 blocks)
+@@ -1367,7 +1367,7 @@ camellia_xts_crypt_32way:
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(camellia_xts_crypt_32way)
++SYM_FUNC_END(camellia_xts_crypt_32way)
+ 
+ ENTRY(camellia_xts_enc_32way)
+ 	/* input:
+diff --git a/arch/x86/crypto/cast5-avx-x86_64-asm_64.S b/arch/x86/crypto/cast5-avx-x86_64-asm_64.S
+index dc55c3332fcc4..ef86c6a966de1 100644
+--- a/arch/x86/crypto/cast5-avx-x86_64-asm_64.S
++++ b/arch/x86/crypto/cast5-avx-x86_64-asm_64.S
+@@ -209,7 +209,7 @@
+ .text
+ 
+ .align 16
+-__cast5_enc_blk16:
++SYM_FUNC_START_LOCAL(__cast5_enc_blk16)
+ 	/* input:
+ 	 *	%rdi: ctx
+ 	 *	RL1: blocks 1 and 2
+@@ -280,10 +280,10 @@ __cast5_enc_blk16:
+ 	outunpack_blocks(RR4, RL4, RTMP, RX, RKM);
+ 
+ 	ret;
+-ENDPROC(__cast5_enc_blk16)
++SYM_FUNC_END(__cast5_enc_blk16)
+ 
+ .align 16
+-__cast5_dec_blk16:
++SYM_FUNC_START_LOCAL(__cast5_dec_blk16)
+ 	/* input:
+ 	 *	%rdi: ctx
+ 	 *	RL1: encrypted blocks 1 and 2
+@@ -357,7 +357,7 @@ __cast5_dec_blk16:
+ .L__skip_dec:
+ 	vpsrldq $4, RKR, RKR;
+ 	jmp .L__dec_tail;
+-ENDPROC(__cast5_dec_blk16)
++SYM_FUNC_END(__cast5_dec_blk16)
+ 
+ ENTRY(cast5_ecb_enc_16way)
+ 	/* input:
+diff --git a/arch/x86/crypto/cast6-avx-x86_64-asm_64.S b/arch/x86/crypto/cast6-avx-x86_64-asm_64.S
+index 4f0a7cdb94d9d..b080a7454e70e 100644
+--- a/arch/x86/crypto/cast6-avx-x86_64-asm_64.S
++++ b/arch/x86/crypto/cast6-avx-x86_64-asm_64.S
+@@ -247,7 +247,7 @@
+ .text
+ 
+ .align 8
+-__cast6_enc_blk8:
++SYM_FUNC_START_LOCAL(__cast6_enc_blk8)
+ 	/* input:
+ 	 *	%rdi: ctx
+ 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: blocks
+@@ -292,10 +292,10 @@ __cast6_enc_blk8:
+ 	outunpack_blocks(RA2, RB2, RC2, RD2, RTMP, RX, RKRF, RKM);
+ 
+ 	ret;
+-ENDPROC(__cast6_enc_blk8)
++SYM_FUNC_END(__cast6_enc_blk8)
+ 
+ .align 8
+-__cast6_dec_blk8:
++SYM_FUNC_START_LOCAL(__cast6_dec_blk8)
+ 	/* input:
+ 	 *	%rdi: ctx
+ 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: encrypted blocks
+@@ -339,7 +339,7 @@ __cast6_dec_blk8:
+ 	outunpack_blocks(RA2, RB2, RC2, RD2, RTMP, RX, RKRF, RKM);
+ 
+ 	ret;
+-ENDPROC(__cast6_dec_blk8)
++SYM_FUNC_END(__cast6_dec_blk8)
+ 
+ ENTRY(cast6_ecb_enc_8way)
+ 	/* input:
+diff --git a/arch/x86/crypto/chacha-ssse3-x86_64.S b/arch/x86/crypto/chacha-ssse3-x86_64.S
+index 2d86c7d6dc88c..361d2bfc253cb 100644
+--- a/arch/x86/crypto/chacha-ssse3-x86_64.S
++++ b/arch/x86/crypto/chacha-ssse3-x86_64.S
+@@ -33,7 +33,7 @@ CTRINC:	.octa 0x00000003000000020000000100000000
+  *
+  * Clobbers: %r8d, %xmm4-%xmm7
+  */
+-chacha_permute:
++SYM_FUNC_START_LOCAL(chacha_permute)
+ 
+ 	movdqa		ROT8(%rip),%xmm4
+ 	movdqa		ROT16(%rip),%xmm5
+@@ -109,7 +109,7 @@ chacha_permute:
+ 	jnz		.Ldoubleround
+ 
+ 	ret
+-ENDPROC(chacha_permute)
++SYM_FUNC_END(chacha_permute)
+ 
+ ENTRY(chacha_block_xor_ssse3)
+ 	# %rdi: Input state matrix, s
+diff --git a/arch/x86/crypto/ghash-clmulni-intel_asm.S b/arch/x86/crypto/ghash-clmulni-intel_asm.S
+index 5d53effe8abee..e81da25a33caf 100644
+--- a/arch/x86/crypto/ghash-clmulni-intel_asm.S
++++ b/arch/x86/crypto/ghash-clmulni-intel_asm.S
+@@ -44,7 +44,7 @@
+  *	T2
+  *	T3
+  */
+-__clmul_gf128mul_ble:
++SYM_FUNC_START_LOCAL(__clmul_gf128mul_ble)
+ 	movaps DATA, T1
+ 	pshufd $0b01001110, DATA, T2
+ 	pshufd $0b01001110, SHASH, T3
+@@ -87,7 +87,7 @@ __clmul_gf128mul_ble:
+ 	pxor T2, T1
+ 	pxor T1, DATA
+ 	ret
+-ENDPROC(__clmul_gf128mul_ble)
++SYM_FUNC_END(__clmul_gf128mul_ble)
+ 
+ /* void clmul_ghash_mul(char *dst, const u128 *shash) */
+ ENTRY(clmul_ghash_mul)
+diff --git a/arch/x86/crypto/serpent-avx-x86_64-asm_64.S b/arch/x86/crypto/serpent-avx-x86_64-asm_64.S
+index ddc51dbba3af9..a098aa0157840 100644
+--- a/arch/x86/crypto/serpent-avx-x86_64-asm_64.S
++++ b/arch/x86/crypto/serpent-avx-x86_64-asm_64.S
+@@ -555,7 +555,7 @@
+ 	transpose_4x4(x0, x1, x2, x3, t0, t1, t2)
+ 
+ .align 8
+-__serpent_enc_blk8_avx:
++SYM_FUNC_START_LOCAL(__serpent_enc_blk8_avx)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: blocks
+@@ -606,10 +606,10 @@ __serpent_enc_blk8_avx:
+ 	write_blocks(RA2, RB2, RC2, RD2, RK0, RK1, RK2);
+ 
+ 	ret;
+-ENDPROC(__serpent_enc_blk8_avx)
++SYM_FUNC_END(__serpent_enc_blk8_avx)
+ 
+ .align 8
+-__serpent_dec_blk8_avx:
++SYM_FUNC_START_LOCAL(__serpent_dec_blk8_avx)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: encrypted blocks
+@@ -660,7 +660,7 @@ __serpent_dec_blk8_avx:
+ 	write_blocks(RC2, RD2, RB2, RE2, RK0, RK1, RK2);
+ 
+ 	ret;
+-ENDPROC(__serpent_dec_blk8_avx)
++SYM_FUNC_END(__serpent_dec_blk8_avx)
+ 
+ ENTRY(serpent_ecb_enc_8way_avx)
+ 	/* input:
+diff --git a/arch/x86/crypto/serpent-avx2-asm_64.S b/arch/x86/crypto/serpent-avx2-asm_64.S
+index 37bc1d48106c4..6149ba80b4d16 100644
+--- a/arch/x86/crypto/serpent-avx2-asm_64.S
++++ b/arch/x86/crypto/serpent-avx2-asm_64.S
+@@ -561,7 +561,7 @@
+ 	transpose_4x4(x0, x1, x2, x3, t0, t1, t2)
+ 
+ .align 8
+-__serpent_enc_blk16:
++SYM_FUNC_START_LOCAL(__serpent_enc_blk16)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: plaintext
+@@ -612,10 +612,10 @@ __serpent_enc_blk16:
+ 	write_blocks(RA2, RB2, RC2, RD2, RK0, RK1, RK2);
+ 
+ 	ret;
+-ENDPROC(__serpent_enc_blk16)
++SYM_FUNC_END(__serpent_enc_blk16)
+ 
+ .align 8
+-__serpent_dec_blk16:
++SYM_FUNC_START_LOCAL(__serpent_dec_blk16)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: ciphertext
+@@ -666,7 +666,7 @@ __serpent_dec_blk16:
+ 	write_blocks(RC2, RD2, RB2, RE2, RK0, RK1, RK2);
+ 
+ 	ret;
+-ENDPROC(__serpent_dec_blk16)
++SYM_FUNC_END(__serpent_dec_blk16)
+ 
+ ENTRY(serpent_ecb_enc_16way)
+ 	/* input:
+diff --git a/arch/x86/crypto/twofish-avx-x86_64-asm_64.S b/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
+index 698b8f2a56e28..588f0a2f63ab2 100644
+--- a/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
++++ b/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
+@@ -234,7 +234,7 @@
+ 	vpxor		x3, wkey, x3;
+ 
+ .align 8
+-__twofish_enc_blk8:
++SYM_FUNC_START_LOCAL(__twofish_enc_blk8)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: blocks
+@@ -273,10 +273,10 @@ __twofish_enc_blk8:
+ 	outunpack_blocks(RC2, RD2, RA2, RB2, RK1, RX0, RY0, RK2);
+ 
+ 	ret;
+-ENDPROC(__twofish_enc_blk8)
++SYM_FUNC_END(__twofish_enc_blk8)
+ 
+ .align 8
+-__twofish_dec_blk8:
++SYM_FUNC_START_LOCAL(__twofish_dec_blk8)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	RC1, RD1, RA1, RB1, RC2, RD2, RA2, RB2: encrypted blocks
+@@ -313,7 +313,7 @@ __twofish_dec_blk8:
+ 	outunpack_blocks(RA2, RB2, RC2, RD2, RK1, RX0, RY0, RK2);
+ 
+ 	ret;
+-ENDPROC(__twofish_dec_blk8)
++SYM_FUNC_END(__twofish_dec_blk8)
+ 
+ ENTRY(twofish_ecb_enc_8way)
+ 	/* input:
 -- 
-2.34.1
+2.43.0
+
+
 
