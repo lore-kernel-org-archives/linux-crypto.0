@@ -1,233 +1,349 @@
-Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
+Received: from sender4-of-o51.zoho.com (sender4-of-o51.zoho.com [136.143.188.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B73401E200F;
-	Fri, 13 Dec 2024 14:15:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.89.224.132
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734099361; cv=none; b=tzXqOgQRz2SmL8DJqETH/JCDClmfL/7fl3q+n2kbdeaiPxInaT0+hEeGyin7ZPyMDz8RxSOUISSNeO5rToHtE+VOiA5GJgwvJP/FZPkstIhrwNKPOcXCO1EflEI/9+0nLjkHEh41qBZV8/Qt3T1e0VfNfwmN/AY4P6XdpqioOa4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734099361; c=relaxed/simple;
-	bh=yOnIN8sJrVLgsCIF4rCegM9jx4IYA0YpgtIAY9J11tk=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=bvl39ZljD3MhQANePpR2JvngCSdpp2A/7ajUJuF26Yo7YrOVXj/Jp/6WO95swW7iFheI+bh/gWJTI6hGyBmzNDkV1bU7rvGvmLFUHyn3ShAocTnNVLwmD0ArW+cJlQBMckSs9RJVloN5wHNWjSt8tPjEDq4TXnHrV+JTGGBl1c4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=tRGAo5NB; arc=none smtp.client-ip=45.89.224.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9654B10940;
+	Sat, 14 Dec 2024 02:58:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734145094; cv=pass; b=AkZSUOvCMXBP0B2rLeSAOeEIErCFclyww96sEbihTCnmCJ4LVt+M467QHlioz7WCHXXoRGx+DvYRypOGx50OeMjQirpd2Nq6K4lId2fYg79sV6AvMLxoAUzJ/BGRbCK1xi0PSo8jtahzO85mTHIvxPChRD3l1cXxDEOAJJawPyk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734145094; c=relaxed/simple;
+	bh=o4mGcJVgmz+f6KDgXPTOaRjH//QGgbtIH9gxPhWSFpg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EVjiyP243Utcy1gu3zt11PFNm9A1Iq0uk90etTTdP6qPoT0WbMr5WquQUMkrbSmNxAmJa25uh2fVnW/S+Oq9VbIpFgPDDlBDtsHbci0Mx1Ini33FW8hJDPabUFJDEWeeB626U9H+2eJopba9yyQ5fGa80r2Z9vDE+icuAUbmdZk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=apertussolutions.com; spf=pass smtp.mailfrom=apertussolutions.com; dkim=pass (1024-bit key) header.d=apertussolutions.com header.i=dpsmith@apertussolutions.com header.b=i9wFs1ix; arc=pass smtp.client-ip=136.143.188.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=apertussolutions.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=apertussolutions.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="tRGAo5NB"
-Received: from p-infra-ksmg-sc-msk02.sberdevices.ru (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 1D528120003;
-	Fri, 13 Dec 2024 17:08:07 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 1D528120003
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1734098887;
-	bh=E0BGDFTc+JGZJZLUlALmvZ1g3F4McC4LXTxGMdBFhGw=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=tRGAo5NB46IJ1UFTE044zMzzQ6/OUGn94B21K9eCDeesO0+S5PwwpnA+oElE5W+aX
-	 939OY+GE6HZELkAPS2sRT3qr6kyvgCOrTqAHLpkj1t3fsZWZ03MqHrN3Ola7io8Qpg
-	 egbMRe+OND7Rcx6TjW6ZGTb6n4MPMYGCpIN7pXZQlNGCFlxv2kC+QjjNXroqQ3xuSK
-	 BrOqmoE9zI0FXmHYvWj7MyfkH9Dr4fGCWbBu4B/uAWCkaBTc9D5dJR76Wc2bGtCVqT
-	 xA3ebsAyVdF0cwe1tQI1CpU4WhdsytmaTpn51NlyaZ+hrRCX65LD1HFmhp+/e8Jg2/
-	 yMgRnuShtA0qQ==
-Received: from smtp.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Fri, 13 Dec 2024 17:08:06 +0300 (MSK)
-From: Alexey Romanov <avromanov@salutedevices.com>
-To: <neil.armstrong@linaro.org>, <clabbe@baylibre.com>,
-	<herbert@gondor.apana.org.au>, <davem@davemloft.net>, <robh+dt@kernel.org>,
-	<krzysztof.kozlowski+dt@linaro.org>, <krzk+dt@kernel.org>,
-	<conor+dt@kernel.org>, <khilman@baylibre.com>, <jbrunet@baylibre.com>,
-	<martin.blumenstingl@googlemail.com>, <vadim.fedorenko@linux.dev>
-CC: <linux-crypto@vger.kernel.org>, <linux-amlogic@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>, <devicetree@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <kernel@salutedevices.com>, "Alexey
- Romanov" <avromanov@salutedevices.com>
-Subject: [PATCH v11 00/22] Support more Amlogic SoC families in crypto driver
-Date: Fri, 13 Dec 2024 17:07:33 +0300
-Message-ID: <20241213140755.1298323-1-avromanov@salutedevices.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (1024-bit key) header.d=apertussolutions.com header.i=dpsmith@apertussolutions.com header.b="i9wFs1ix"
+ARC-Seal: i=1; a=rsa-sha256; t=1734145007; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=awW+SO0XKfy+0Pyi8ms7Cp4QZGyd4GSS0XoyLpNZ+3KR4GlJldIQRAYxtIalKXFl1fEFdisd8D97ja3DjnohuFmSB1Ygw5D97ISKbidoeX6+AmF/APCcCTG6/UzKbjkkVGRJltHvAGPonTQcTNtVyPFrWKySiBL0GqrcmhJfNI8=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1734145007; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=yTLX58/fR9Jhi/uY5ah/JDfKClGzaUuJTL0r4DQjPxQ=; 
+	b=CTuxE1O+s21+0aPjUFyTrerXIgUIiKt7ah+lthtZoumZR7nSTL+zGSTvt0agOuXHkLAZwmrXfxt9KSW6rov1a3dd0kiE6Lrx/J+N6JZhojMxpKYXJdxZsBV0meQ/Qe9rtKgaITO2lYGRd/aFOiTiOv1hcO2+hRl4Dr15RIQxM0Q=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=apertussolutions.com;
+	spf=pass  smtp.mailfrom=dpsmith@apertussolutions.com;
+	dmarc=pass header.from=<dpsmith@apertussolutions.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1734145007;
+	s=zoho; d=apertussolutions.com; i=dpsmith@apertussolutions.com;
+	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=yTLX58/fR9Jhi/uY5ah/JDfKClGzaUuJTL0r4DQjPxQ=;
+	b=i9wFs1ixxA7BrvBE2uuw9mPD8rk4qfbIvREXIubQVyrEXf50FdudxBFP+JxaW0WL
+	y6u4NCewpCrGXiCsxMoLM/jx4cb/Q4o4cC7QCD280PX7naa1cQZzP0vJTG1RBD8eaSd
+	9JNjKqNoAj2jHCMwpd0BeiVFz1ALbpPTUONd/Eq0=
+Received: by mx.zohomail.com with SMTPS id 1734145005147748.7051374178144;
+	Fri, 13 Dec 2024 18:56:45 -0800 (PST)
+Message-ID: <5330397a-e74a-4061-ba6d-fa522877f237@apertussolutions.com>
+Date: Fri, 13 Dec 2024 21:56:40 -0500
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v9 06/19] x86: Add early SHA-1 support for Secure Launch
+ early measurements
+To: Andy Lutomirski <luto@amacapital.net>
+Cc: James Bottomley <James.Bottomley@hansenpartnership.com>,
+ Thomas Gleixner <tglx@linutronix.de>,
+ "Eric W. Biederman" <ebiederm@xmission.com>,
+ Eric Biggers <ebiggers@kernel.org>,
+ Ross Philipson <ross.philipson@oracle.com>, linux-kernel@vger.kernel.org,
+ x86@kernel.org, linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
+ linux-efi@vger.kernel.org, iommu@lists.linux-foundation.org,
+ mingo@redhat.com, bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com,
+ ardb@kernel.org, mjg59@srcf.ucam.org, peterhuewe@gmx.de, jarkko@kernel.org,
+ jgg@ziepe.ca, nivedita@alum.mit.edu, herbert@gondor.apana.org.au,
+ davem@davemloft.net, corbet@lwn.net, dwmw2@infradead.org,
+ baolu.lu@linux.intel.com, kanth.ghatraju@oracle.com,
+ andrew.cooper3@citrix.com, trenchboot-devel@googlegroups.com
+References: <20240531010331.134441-1-ross.philipson@oracle.com>
+ <CALCETrXQ7rChWLDqTG0+KY7rsfajSPguMnHO1G4VJi_mgwN9Zw@mail.gmail.com>
+ <1a1f0c41-70de-4f46-b91d-6dc7176893ee@apertussolutions.com>
+ <8a0b59a4-a5a2-42ae-bc1c-1ddc8f2aad16@apertussolutions.com>
+ <CALCETrX8caT5qvCUu24hQfxUF_wUC2XdGpS2YFP6SR++7FiM3Q@mail.gmail.com>
+ <c466ed57-35a8-41c0-9647-c70e588ad1d3@apertussolutions.com>
+ <CALCETrW9WNNGh1dEPKfQoeU+m5q6_m97d0_bzRkZsv2LxqB_ew@mail.gmail.com>
+ <ff0c8eed-8981-48c4-81d9-56b040ef1c7b@apertussolutions.com>
+ <446cf9c70184885e4cec6dd4514ae8daf7accdcb.camel@HansenPartnership.com>
+ <5d1e41d6-b467-4013-a0d0-45f9511c15c6@apertussolutions.com>
+ <CALCETrW6vMYZo-b7N9ojVSeZLVxhZjLBjnMHsULMGP6TaVYRHA@mail.gmail.com>
+ <9c80e779b6268fde33c93ed3765ff93b1d6d007b.camel@HansenPartnership.com>
+ <CALCETrX4vHnVorqWjPEOP0XLaA0uUWkKikDcCXWtbs2a7EBuiA@mail.gmail.com>
+ <61a4e812-9514-41a6-a000-e6c026a4ec45@apertussolutions.com>
+ <CALCETrXQqR6Az7puNXLfhoL37iLHtG1qOyqC_K301TGmMOQvvA@mail.gmail.com>
+Content-Language: en-US
+From: "Daniel P. Smith" <dpsmith@apertussolutions.com>
+In-Reply-To: <CALCETrXQqR6Az7puNXLfhoL37iLHtG1qOyqC_K301TGmMOQvvA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: p-i-exch-a-m1.sberdevices.ru (172.24.196.116) To
- p-i-exch-a-m1.sberdevices.ru (172.24.196.116)
-X-KSMG-Rule-ID: 10
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 189823 [Dec 13 2024]
-X-KSMG-AntiSpam-Version: 6.1.1.7
-X-KSMG-AntiSpam-Envelope-From: avromanov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 47 0.3.47 57010b355d009055a5b6c34e0385c69b21a4e07f, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, salutedevices.com:7.1.1;lore.kernel.org:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;smtp.sberdevices.ru:7.1.1,5.0.1;127.0.0.199:7.1.2;gist.github.com:7.1.1, FromAlignment: s
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean, bases: 2024/12/13 13:13:00
-X-KSMG-LinksScanning: Clean, bases: 2024/12/13 13:10:00
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/12/13 12:33:00 #26873825
-X-KSMG-AntiVirus-Status: Clean, skipped
+X-ZohoMailClient: External
 
-Hello!
+On 12/12/24 17:30, Andy Lutomirski wrote:
+> On Thu, Dec 12, 2024 at 11:56 AM Daniel P. Smith
+> <dpsmith@apertussolutions.com> wrote:
+>>
+>> Hey Luto!
+>>
+>> Let me try to address your concerns below.
+>>
+>> On 11/18/24 15:02, Andy Lutomirski wrote:
+>>> On Mon, Nov 18, 2024 at 11:12 AM James Bottomley
+>>> <James.Bottomley@hansenpartnership.com> wrote:
+>>>>
+>>>> On Mon, 2024-11-18 at 10:43 -0800, Andy Lutomirski wrote:
+>>>>> Linux should not use TPM2_PCR_Extend *at all*.  Instead, Linux should
+>>>>> exclusively use TPM2_PCR_Event.  I would expect that passing, say,
+>>>>> the entire kernel image to TPM2_PCR_Event would be a big mistake, so
+>>>>> instead Linux should hash the relevant data with a reasonable
+>>>>> suggestion of hashes (which includes, mandatorily, SHA-384 and *does
+>>>>> not* include SHA-1, and may or may not be configurable at build time
+>>>>> to include things like SM3), concatenate them, and pass that to
+>>>>> TPM2_PCR_Event.  And Linux should make the value that it passed to
+>>>>> TPM2_PCR_Event readily accessible to software using it, and should
+>>>>> also include some straightforward tooling to calculate it from a
+>>>>> given input so that software that wants to figure out what value to
+>>>>> expect in a PCR can easily do so.
+>>>>
+>>>> Just for clarity, this is about how the agile log format works.  Each
+>>>> event entry in the log contains a list of bank hashes and the extends
+>>>> occur in log event order, so replaying a log should get you to exactly
+>>>> the head PCR value of each bank.  If a log doesn't understand a format,
+>>>> like SM3, then an entry for it doesn't appear in the log and a replay
+>>>> says nothing about the PCR value.
+>>>
+>>> I have no idea what the "agile log format" is or what all the formats
+>>> in existence are.  I found section 4.2.4 here:
+>>>
+>>> https://trustedcomputinggroup.org/wp-content/uploads/TCG_IWG_CEL_v1_r0p41_pub.pdf
+>>>
+>>> It says:
+>>>
+>>> This field contains the list of the digest values Extended. The Extend
+>>> method varies with TPM command, so there is
+>>> no uniform meaning of TPM Extend in this instance, and separate
+>>> descriptions are unavoidable. If using the
+>>> TPM2_PCR_Extend command, this field is the data sent to the TPM (i.e.,
+>>> not the resulting value of the PCR after the
+>>> TPM2_PCR_Extend command completes). If using the TPM2_PCR_Event
+>>> command, this field contains the digest
+>>> structure returned by the TPM2_PCR_Event command (that contains the
+>>> digest(s) submitted to each PCR bank as
+>>> the internal Extend operation). This field SHALL contain the
+>>> information from the TPML_DIGEST_VALUES used in
+>>> the Extend operation.
+>>
+>>
+>> Let me start with providing background on the two measurement policies
+>> that is implemented by Intel TXT (from Intel TXT Developers Guide):
+>>
+>>    - Maximum Agility PCR Extend Policy: ACM can support algorithm agile
+>> commands TPM2_PCR_Event; TPM2_HashSequenceStart; TPM2_HashUpdate;
+>> TPM2_EventSequenceComplete. When this policy is selected, ACM will use
+>> the commands above if not all PCR algorithms are covered by embedded set
+>> of algorithms and will extend all existing PCR banks. Side effect of
+>> this policy is possible performance loss.
+>>
+>> ‒ Maximum Performance PCR Extend Policy: ACM can support several hash
+>> algorithms via embedded SW. When this policy is selected, ACM will use
+>> embedded SW to compute hashes and then will use TPM2_PCR_Extend commands
+>> to extend them into PCRs. If PCRs utilizing hash algorithms not
+>> supported by SW are discovered, they will be capped with “1” value. This
+>> policy, when selected, will ensure maximum possible performance but has
+>> side effect of possible capping of some of the PCRs.
+>>
+> 
+> What is responsible for choosing which of these policies to use?
 
-This patchset expand the funcionality of the Amlogic
-crypto driver by adding support for more SoC families:
-AXG, G12A, G12B, SM1, A1, S4.
 
-Also specify and enable crypto node in device tree
-for reference Amlogic devices.
+It is setup by the Dynamic Launch Preamble (GRUB) that will invoke the 
+Dynamic Launch Event (GETSEC[SENTER]).
 
-Tested on GXL, AXG, G12A/B, SM1, A1 and S4 devices via
-custom tests [1] and tcrypt module.
 
----
+>> Allow me to clarify/expand on the last statement in Maximum Agility.
+>> There is almost certainly a performance loss as anything larger than
+>> 1024 bytes, for example the Linux kernel, the ACM will bit-banging the
+>> bytes to the TPM using the TPM2_Hash* functions.
+> 
+> Surely, if Linux's stub started using TPM2_PCR_Event, it would first
+> hash any large inputs and then send the _hash_ to TPM2_PCR_Event
+> instead of, say, bit-banging the entire initramfs to the TPM.  But
+> you're talking about the ACM and I'm talking about the Linux stub code
+> in this patchset.
 
-Changes V1 -> V2 [2]:
 
-- Rebased over linux-next.
-- Adjusted device tree bindings description.
-- A1 and S4 dts use their own compatible, which is a G12 fallback.
+I think there might be some confusion on how this starts, let me provide 
+a quick, enumerated flow:
 
-Changes V2 -> V3 [3]:
+1. GRUB prepares launch environment (Linux kernel, SINIT ACM, 
+OsSinitData) and calls GETSEC[SENTER] instruction
+2. The CPU signals PCH that DRTM has started, unlocking Locality 4
+3. The CPU loads the SINIT ACM into CRAM, measures it with SHA256 and 
+uses _TPM_HASH_START /_TPM_HASH_DATA / _TPM_HASH / _TPM_HASH_END to 
+extend SHA256(ACM) | EDX into PCR17 for all PCR banks
+4. The CPU then jumps into the ACM
+5. The ACM does a series of actions and measurements of the system into 
+PCRs 17 and 18 for SHA1, SHA256, SHA384, and SM3_256 (PCR Performance 
+Policy)
+6. The ACM then measures the "MLE", the Linux kernel in this case, using 
+the same algorithms
+7. The ACM then caps PCRs 17 and 18 by extending 0x01 for any 
+unsupported algorithm the TPM supports.
+8. The ACM then jumps to the Secure Launch entry point in the setup kernel
 
-- Fix errors in dt-bindings and device tree.
-- Add new field in platform data, which determines
-whether clock controller should be used for crypto IP.
-- Place back MODULE_DEVICE_TABLE.
-- Correct commit messages.
+If the initramfs is external, then yes, the setup kernel would get to do 
+the measurement. If it is a unified kernel image, well, that whole thing 
+will be bit banged to the TPM by the ACM if the PCR Agile Policy is used.
 
-Changes V3 -> V4 [4]:
+> But the capping-with-"1" does suggest that maybe one can actually cap
+> with "1" without preventing downstream software from consuming the
+> event log.
 
-- Update dt-bindings as per Krzysztof Kozlowski comments.
-- Fix bisection: get rid of compiler errors in some patches.
+Correct, capping the PCR should never block downstream software from 
+consuming the event log.
 
-Changes V4 -> V5 [5]:
+>>
+>> Before addressing the next point, I would also clarify how the D-CRTM
+>> measurement taken by the CPU is done. It uses the _TPM_HASH_* functions,
+>> Section 22.9 of TPM2 Commands specification, to store SHA256(SINIT ACM)
+>> | EDX into all active PCR banks. For clarity, when this done, EDX holds
+>> the 4-byte value of the SENTER parameters for which 0 is the only valid
+>> value currently.
+>>
+>>
+>>> So we're logging the values with which we extend the PCRs.  Once upon
+>>> a time, someone decided it was okay to skip extending a PCR bank:
+>>>
+>>> https://google.github.io/security-research/pocs/bios/tpm-carte-blanche/writeup.html
+>>>
+>>> and it was not a great idea.
+>>
+>>
+>> Let's begin by why/how that attack occurs. The TPM Carte Blanche attack
+>> took advantage of the fact that without BootGuard in place, the SRTM
+>> measurements are done by the software/firmware, to include the
+>> self-referential S-CRTM measurement. In particular, for the target
+>> platform, it just so happens that it was possible to construct a
+>> configuration where not a single hash would be sent to the SHA256 bank.
+>> This allowed the attacker the ability to replay any set of measurements,
+>> i.e. carte blanche control, into a completely empty PCR bank for which
+>> the attestation service would accept quotes. The key to this attack
+>> requires both, access to an empty PCR bank, and an attestation service
+>> that will accept a quote with only the exploited bank present.
+>>
+>> Let us return to my statements above, which will demonstrate why
+>> TXT/DRTM completely invalidates the attack. First, as noted above, when
+>> the CPU is processing the GETSEC[SENTER] instruction, it (the CPU) will
+>> compute the D-CRTM as SHA256(SINIT ACM) | EDX, sending it to the TPM
+>> using _TPM_HASH_* functions. The _TPM_HASH_* functions result in all PCR
+>> banks to be extended with the D-CRTM value. If Maximum Performance PCR
+>> Extend policy is in use, which is the default policy used by TrenchBoot,
+>> any algorithm not supported by the ACM is capped by sending the value
+>> "1" as the digest value for the extend. Therefore, after the TXT
+>> sequence has completed and before control is given to the Linux kernel
+>> by the ACM, all PCR banks will consist of either, the D-CRTM + all ACM
+>> measurements, or the D-CRTM + TPM2_PCR_Extend(0x1). There will be no PCR
+>> banks with empty DRTM PCRs, thus none of the banks would be usable for a
+>> TPM Carte Blanche-style attack.
+> 
+> Sure, a "carte blanche" attack in the sense that the PCRs are entirely
+> blank won't happen, but if any component in the chain does not extend
+> a bank, then an attacker can replace the code _after_ that component
+> without being noticed.
 
-- Tested on GXL board:
-  1. Fix panic detected by Corentin Labbe [6].
-  2. Disable hasher backend for GXL: in its current realization
-     is doesn't work. And there are no examples or docs in the
-     vendor SDK.
-- Fix AES-CTR realization: legacy boards (gxl, g12, axg) requires
-  inversion of the keyiv at keys setup stage.
-- A1 now uses its own compatible string.
-- S4 uses A1 compatible as fallback.
-- Code fixes based on comments Neil Atrmstrong and Rob Herring.
-- Style fixes (set correct indentations)
 
-Changes V5 -> V6 [7]:
+There are two scenarios that could be considered here. The first is if 
+an algorithm is added to the TPM that neither the ACM nor the TPM driver 
+supports. The second is if an algorithm supported by the ACM and the TPM 
+driver is added, but not supported by Secure Launch.
 
-- Fix DMA sync warning reported by Corentin Labbe [8].
-- Remove CLK input from driver. Remove clk definition
-  and second interrput line from crypto node inside GXL dtsi.
+In the first case, the PCR and corresponding log entries for the new 
+algorithm will have the D-CRTM event and Cap (0x01) event. Rendering the 
+bank unusable for the attacker.
 
-Changes V6 -> V7 [9]:
+For the second case, this is a "it all depends on the usage". First and 
+foremost, I would say it is ultimately a failure of the Attestation 
+Service if it evaluated algorithms that Secure Launch is not advertised 
+to support.
 
-- Fix dt-schema: power domain now required only for A1.
-- Use crypto_skcipher_ctx_dma() helper for cipher instead of
-  ____cacheline_aligned.
-- Add import/export functions for hasher.
-- Fix commit message for patch 17, acorrding to discussion [10].
+With that, let's consider the options for bad components under the 
+second case:
+- A bad kernel image will be detected since the ACM is what measures it.
+- A bad initramfs, assuming that (c) below was not implemented, then the 
+initramfs could add a fake entry for itself into the bank in question.
+- Any component after this depends on the use case. The primary use case 
+currently is to combine Secure Launch with TrenchBoot additions to 
+u-root making it an intermediate bootloader that kexec's into the target 
+kernel. I bring this up because when the kexec is done, Secure Launch 
+does GETSEC[SEXIT]. The result being that it closes all localities 
+except Locality 0. They cannot be re-opened without doing a new Dynamic 
+Launch, which will reset them all back to 0.
 
-Changes V7 -> V8 [11]:
+I would also like to note that Secure Launch would not be the only 
+in-kernel capability that would have to scramble to add support for the 
+additional algorithm if it suddenly became available to block a Carte 
+Blanche attack.
 
-- Test patchset with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS: fix some bugs
-  in hasher logic.
-- Use crypto crypto_ahash_ctx_dma in hasher code.
-- Correct clock definition: clk81 is required for all SoC's.
-- Add fixed-clock (clk81) definition for A1/S4.
-- Add information (in commit messages) why different compatibles are used.
 
-Changes V8 -> V9 [12]:
+>> (c) Upon initialization, cap the PCR banks with unsupported algorithms
+>> using a well-known value.
+>>
+>> A problem with (a) is that the result will be an unorthodox event,
+>> PCR_EXTEND(H(H'(data))). An attestation verifier will have to be aware
+>> of that this is being done, and have a way to determine which method was
+>> used for each event. This creates a potentially expensive cost for any
+>> existing attestation solutions to incorporate support for the unorthodox
+>> event. At least for DRTM solutions, it seeks to solve a problem that TXT
+>> does not experience.
+>>
+>> For Linux Secure Launch, I would like to propose an alternative to what
+>> the current logic does in the setup kernel. Specifically, Secure Launch
+>> will trigger a TXT reset when an unsupported algorithm is encountered.
+>> Instead, I would like to propose the adoption of (c), and have it
+>> extends a well-known, fixed value for unsupported algorithms. Secure
+>> Launch can leverage the fact that the TPM driver's extend function
+>> already expects to be given digests for all active algorithms.
+>> Therefore, it will record the well-known value, 0x01 to follow the ACM,
+>> into the digest buffers of any algorithms that Secure Launch does not
+>> support. This will result in the well-known value being extended each
+>> time a measurement is recorded. This will not be a problem as no one
+>> should be using those banks for attestation and can ignore those digests
+>> in the event log.
+> 
+> This seems to be at least not terrible.
 
-- Remove required field clk-names from dt-schema according to Rob Herring
-recommendation [13].
-- Fix commit order: all dt-bindings schema commits now located earlier
-than any changes in device tree.
-- Fix typos and add more clarifications in dt-schema patches.
 
-Changes V9 -> V10 [14]:
+With (c) in place, it would completely close off the second case for the 
+case when the initramfs is not part of the kernel image.
 
-- Rebased over linux-next (20241106).
-- Remove patches with AES-CTR support. This was a dishonest implementation of CTR algo.
-- Update commit headers in accordance with the accepted rules in each
-  of the subsystems.
-- Moved adding power-domains (dt-bindings) in desired commit.
 
-Changes V10 -> V11 [15]:
+> Or I suppose one could use TPM_HASH_ functions? The spec for them is
+> somewhat impenetrable to me.
 
-- Rebased over linux-next (20241213).
-- Fix unused variable warnings reported by kernel test robot [16].
-- Fix dts warnings reported by kernel test robot [17].
-- Add Rob Herring RvB tags for dt-bindings patches.
-- Remove ____cacheline_aligned macro. Use crypto_ahash/tfm_ctx_dma(),
-  crypto_ahash_set_reqsize_dma() and crypto_dma_align() instead.
 
-Links:
-  - [1] https://gist.github.com/mRrvz/3fb8943a7487ab7b943ec140706995e7
-  - [2] https://lore.kernel.org/all/20240110201216.18016-1-avromanov@salutedevices.com/
-  - [3] https://lore.kernel.org/all/20240123165831.970023-1-avromanov@salutedevices.com/
-  - [4] https://lore.kernel.org/all/20240205155521.1795552-1-avromanov@salutedevices.com/
-  - [5] https://lore.kernel.org/all/20240212135108.549755-1-avromanov@salutedevices.com/
-  - [6] https://lore.kernel.org/all/ZcsYaPIUrBSg8iXu@Red/
-  - [7] https://lore.kernel.org/all/20240301132936.621238-1-avromanov@salutedevices.com/
-  - [8] https://lore.kernel.org/all/Zf1BAlYtiwPOG-Os@Red/
-  - [9] https://lore.kernel.org/all/20240326153219.2915080-1-avromanov@salutedevices.com/
-  - [10] https://lore.kernel.org/all/20240329-dotted-illusive-9f0593805a05@wendy/
-  - [11] https://lore.kernel.org/all/20240411133832.2896463-1-avromanov@salutedevices.com/
-  - [12] https://lore.kernel.org/all/20240607141242.2616580-1-avromanov@salutedevices.com/
-  - [13] https://lore.kernel.org/all/20240610222827.GA3166929-robh@kernel.org/
-  - [14] https://lore.kernel.org/all/20240820145623.3500864-1-avromanov@salutedevices.com/
-  - [15] https://lore.kernel.org/all/20241108102907.1788584-1-avromanov@salutedevices.com/
-  - [16] https://lore.kernel.org/all/202411090235.a7vEgZQo-lkp@intel.com/
-  - [17] https://lore.kernel.org/all/202411090619.fQTDHg7w-lkp@intel.com/
+Do you mean TPM2_HashSequenceStart / TPM2_SequenceUpdate / 
+TPM2_EventSequenceComplete? If you really meant _TPM_Hash_Start / 
+_TPM_Hash_Data / _TPM_Hash_End, then no, you cannot call these. They are 
+not sent via the Command Buffer but directly through the TPM interface. 
+Have a look at Section 34 of the TPM Architecture[1]. While the spec 
+authors wrote it generically, as if there is more than one way for an 
+H-CRTM to be established, the only way available for x86 is DRTM.
 
-Alexey Romanov (22):
-  crypto: amlogic - Don't hardcode IRQ count
-  crypto: amlogic - Add platform data
-  crypto: amlogic - Remove clock input
-  crypto: amlogic - Add MMIO helpers
-  crypto: amlogic - Move get_engine_number()
-  crypto: amlogic - Drop status field from meson_flow
-  crypto: amlogic - Move algs definition and cipher API to cipher.c
-  crypto: amlogic - Cleanup defines
-  crypto: amlogic - Process more than MAXDESCS descriptors
-  crypto: amlogic - Avoid kzalloc in engine thread
-  crypto: amlogic - Introduce hasher
-  crypto: amlogic - Use fallback for 192-bit keys
-  crypto: amlogic - Add support for G12-series
-  crypto: amlogic - Add support for AXG-series
-  crypto: amlogic - Add support for A1-series
-  dt-bindings: crypto: amlogic,gxl-crypto: correct clk and interrupt
-    lines
-  dt-bindings: crypto: amlogic,gxl-crypto: support new SoC's
-  arm64: dts: amlogic: gxl: correct crypto node definition
-  arm64: dts: amlogic: a1: add crypto node
-  arm64: dts: amlogic: s4: add crypto node
-  arm64: dts: amlogic: g12: add crypto node
-  arm64: dts: amlogic: axg: add crypto node
+[1] 
+https://trustedcomputinggroup.org/wp-content/uploads/TPM-2.0-1.83-Part-1-Architecture.pdf
 
- .../bindings/crypto/amlogic,gxl-crypto.yaml   |  32 +-
- arch/arm64/boot/dts/amlogic/meson-a1.dtsi     |  14 +
- arch/arm64/boot/dts/amlogic/meson-axg.dtsi    |   7 +
- .../boot/dts/amlogic/meson-g12-common.dtsi    |   7 +
- arch/arm64/boot/dts/amlogic/meson-gxl.dtsi    |   6 +-
- arch/arm64/boot/dts/amlogic/meson-s4.dtsi     |  13 +
- drivers/crypto/amlogic/Makefile               |   2 +-
- drivers/crypto/amlogic/amlogic-gxl-cipher.c   | 587 ++++++++++++------
- drivers/crypto/amlogic/amlogic-gxl-core.c     | 289 +++++----
- drivers/crypto/amlogic/amlogic-gxl-hasher.c   | 509 +++++++++++++++
- drivers/crypto/amlogic/amlogic-gxl.h          | 111 +++-
- 11 files changed, 1215 insertions(+), 362 deletions(-)
- create mode 100644 drivers/crypto/amlogic/amlogic-gxl-hasher.c
+Ross has prepared a new version of the series using (c), which actually 
+reduces the size and complexity of the SL setup code. Once it has been 
+tested, Ross will post it so you can have some concrete code to look at 
+and consider the proposal.
 
--- 
-2.34.1
+V/r,
+Daniel P. Smith
+
+
 
