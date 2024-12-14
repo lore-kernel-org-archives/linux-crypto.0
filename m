@@ -1,48 +1,44 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E0B517BA0;
-	Sat, 14 Dec 2024 09:29:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03C2E15383B
+	for <linux-crypto@vger.kernel.org>; Sat, 14 Dec 2024 09:29:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734168565; cv=none; b=HKWRCxi1sZRInmKmCa+MB/ZayrVHfVWAdft9NPgrbwh9LLXFM+BeolctHYvuvg29v5xUli2fSEr3pY6WbpPSAFYtL2mnEWP4Sze49sO3Ia7KCsof+9UuYOQJHVqlQDmICG+QpzgdrY2KiQUinSzgWDJCyLfClcdMLUHTf3PZZ00=
+	t=1734168595; cv=none; b=lld4gkZ12PsFkt9CqGunOgYk3bESIYFAX1IpKe3QHzjXXnGeHUXVSKmDJqvhadVHnJtxwTSK2xVjp37zH8XPOANVc6wgTdhMGN5iHdSaEbHKrcW3lq9Q9mC9Gsfpmp3D90CddQCoiMg4BrTD9g3FqcW5oFBTVat+PCDY15Dz1BM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734168565; c=relaxed/simple;
-	bh=pJJFw73Ty/uYmaje8F31mJHj+QiTD+9ZKhFX156F7u8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B4qJqe4keGKMlYw1Fd+887OEeUmiahux6UmMs14g2a+2lHhSYXrQL4qnjr9zwHTWSJPt0qtuuyvxXBDr9lEQXRcPb4yDj/FVNOCGl0rXTiXjf4U05TXhYWX6uQ0XNw/hARqmWVw8wVIuYYWhviq8aykxvhI/u7QqQ1f2Gu5Pt4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=EwyCLv61; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1734168595; c=relaxed/simple;
+	bh=XqN4ak1lDqWLbZdN1INbnQaM+LRAt5TMRoIV0Zs4BI8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=U208iXtXs3bWP+zXLZEGckln/hGdoT3MqUQOUBSG+HdD6Xn2SzlZ5GZBWpqED4YW7GPReaI2YcydxI916Z2DFEaZcUBpA29QdkKhWoSxMDPeJPlXQhi7dh6QiYKdEtFmkiOQtef0h0DK+80Wee0vm4mPNC3Ej9l4Un0PYu2AtQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=OOqbB58Z; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="EwyCLv61"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="OOqbB58Z"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:Message-ID:Subject:Cc:To:
+	From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=NBsDreyWHMPzFjMAFMlgAuYzpHlG/OUvmaxFBEDFJHA=; b=EwyCLv614SX/15B6pvwoIfFnwX
-	iTrIUwgY98MOj/EB3X4Jeyy3x2j8MoZtGo4Ow/A7WmIXxeyk7UmNe20t5DMKCGZs+JpX53YMXq7wL
-	H/ZBztuueKmrMxbCQcwVnuppnBcdj7LaKfdr3Joh1MfIeKhzCLkan5vqhoRWVB70e03/Oef5E9U1I
-	4tSDyW0IA7Im1D0TG+FEVmsrJnf2kSYXZoc8xhGfZaMDNcHiIVQUI1/pgueHcJkO4+pvCNItgYSLe
-	jgACnF8bc/mqgmywYPi2PSSs/5kxIqHH3SeDzy+wwE1FRbz7gGEOdEgp49HesNNTfsfkzb+F1CU7x
-	rs0Kd78w==;
+	:Resent-Message-ID:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=c5BF1TZo9i4YHmcDo637pboH2y2dtyam9rT8VnpwQl0=; b=OOqbB58ZpzH4D905gLAFTgjIOL
+	Xn8zX6ZcTQgLtF06R/9/6sq0LaFb1tBWCRThPXG9/I7YCBrHXPS+vbbHad2p1IhxxBmX0Qh4MNi1/
+	n7zu8ed5TH+DeeAnbzikxt5HADG/gA7E/3ngtvBvB1++6dUy8jqahGWjs15gNkPy2VuKmcPLIssWO
+	v8oqIIOb9RLXBFF9RimXD0ihNRtXYCmFwOaoml4R/QbS4gT6p6juv77N5HJTVdzNxtcnYIarcP1I4
+	uKo61JLncLFBT8Wyriz3/MThY2kE5FiMdMacQFpBw/xsHFK1U+wZr6BAArTgPx3z+BU9g85HzTFJb
+	kCqa9E9w==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tMOFd-001TLb-02;
-	Sat, 14 Dec 2024 17:29:14 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 14 Dec 2024 17:29:13 +0800
-Date: Sat, 14 Dec 2024 17:29:13 +0800
+	id 1tMOGC-001TMB-29;
+	Sat, 14 Dec 2024 17:29:50 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 14 Dec 2024 17:29:49 +0800
+Date: Sat, 14 Dec 2024 17:29:49 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
 To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
-	Andreas Larsson <andreas@gaisler.com>, sparclinux@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/2] crypto: remove physical address support in
- skcipher_walk
-Message-ID: <Z11P6Z6wolDJQxAS@gondor.apana.org.au>
-References: <20241207190503.53440-1-ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 0/8] crypto: more alignmask cleanups
+Message-ID: <Z11QDVThxa02yQk0@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -51,32 +47,38 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241207190503.53440-1-ebiggers@kernel.org>
+In-Reply-To: <20241207195752.87654-1-ebiggers@kernel.org>
+X-Newsgroups: apana.lists.os.linux.cryptoapi
 
-On Sat, Dec 07, 2024 at 11:05:01AM -0800, Eric Biggers wrote:
-> This series removes the unnecessary physical address support in
-> skcipher_walk and the single obsolete driver that was using it.
+Eric Biggers <ebiggers@kernel.org> wrote:
+> Remove some of the remaining uses of cra_alignmask.
 > 
-> Eric Biggers (2):
->   crypto: drivers - remove Niagara2 SPU driver
->   crypto: skcipher - remove support for physical address walks
+> Eric Biggers (8):
+>  crypto: anubis - stop using cra_alignmask
+>  crypto: aria - stop using cra_alignmask
+>  crypto: tea - stop using cra_alignmask
+>  crypto: khazad - stop using cra_alignmask
+>  crypto: seed - stop using cra_alignmask
+>  crypto: x86 - remove assignments of 0 to cra_alignmask
+>  crypto: aegis - remove assignments of 0 to cra_alignmask
+>  crypto: keywrap - remove assignment of 0 to cra_alignmask
 > 
->  crypto/skcipher.c                  |  187 +--
->  drivers/crypto/Kconfig             |   17 -
->  drivers/crypto/Makefile            |    2 -
->  drivers/crypto/n2_asm.S            |   96 --
->  drivers/crypto/n2_core.c           | 2168 ----------------------------
->  drivers/crypto/n2_core.h           |  232 ---
->  include/crypto/internal/skcipher.h |   12 -
->  7 files changed, 26 insertions(+), 2688 deletions(-)
->  delete mode 100644 drivers/crypto/n2_asm.S
->  delete mode 100644 drivers/crypto/n2_core.c
->  delete mode 100644 drivers/crypto/n2_core.h
+> arch/x86/crypto/aegis128-aesni-glue.c |  1 -
+> arch/x86/crypto/blowfish_glue.c       |  1 -
+> arch/x86/crypto/camellia_glue.c       |  1 -
+> arch/x86/crypto/des3_ede_glue.c       |  1 -
+> arch/x86/crypto/twofish_glue.c        |  1 -
+> crypto/aegis128-core.c                |  2 -
+> crypto/anubis.c                       | 14 ++---
+> crypto/aria_generic.c                 | 37 ++++++------
+> crypto/keywrap.c                      |  1 -
+> crypto/khazad.c                       | 17 ++----
+> crypto/seed.c                         | 48 +++++++---------
+> crypto/tea.c                          | 83 +++++++++++----------------
+> 12 files changed, 82 insertions(+), 125 deletions(-)
 > 
 > 
 > base-commit: b5f217084ab3ddd4bdd03cd437f8e3b7e2d1f5b6
-> -- 
-> 2.47.1
 
 All applied.  Thanks.
 -- 
