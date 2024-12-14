@@ -1,62 +1,47 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72879EBE;
-	Sat, 14 Dec 2024 04:37:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52AA3EBE
+	for <linux-crypto@vger.kernel.org>; Sat, 14 Dec 2024 04:39:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734151074; cv=none; b=J6y+ExWn6bqYFHcgIgqgboUF/QiEyZ79hSZt6nJy3HR8OCjb/mUyWPJkWXY0NMUy0AEvPwLpocYBlomKB+tH21+jI+AhmB6BfEt+B5PbUYHB0nbz4viXTEA/fpHCdJrMjTuGLvqyk780jFyoNbhTcQmbI7qzi+OOxB9dQFjef2g=
+	t=1734151198; cv=none; b=RxoY+XEbFMNqAjisAAFoisQ//g89p4ZE5RQl70q4VXsnyJgWOgV8b4rDWRzdW5+WP4Pt9SRMvZTpnKm8zNlwEZvcNijep9s0kHFC7BtJG0liNbWHw3Q3aUgpkZHgqwioNPXIm1wHypP3GmgMXvIUJhG2EjXx/vRziNL07alo1UY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734151074; c=relaxed/simple;
-	bh=0+CszUVADNAsoOvEKPdSsfEkhgw1MIeDvHs1+CbUzd0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mkedKtoxgE5W+O1rU+r+3hb9VkO/VGGNEdoJeHZtgiJRw4hh2FMwjmuwUZ6qquak7GKAEBSLaT+4wweh29OhbHpd7KazaEklHTNb+cQhVVZIt6Uk4xV1jedm7cyyBr6scKkPsfx94nACUJJsr9CbcT6VChi32SsJ3O0a2WAqRB8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=rt1x09z8; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1734151198; c=relaxed/simple;
+	bh=/IUVA0fevxMD+qdenfLjtlNeDnDXXK9XqN9X6CqTCLE=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=Tc1ZOYUf4EDP8NRIZIsQcRP0EPBEZcKOcXWlgT5yGXrMZbJBUJVC3Uy4/l87esvhja7m3mrR96cRhmCcw21e9r6zISJninDg9D4ATUI3bhSUC1qrt/H2Aseynm7P4AUSoqJtpEThcsx75jg2iIicLuCCS/vnXiceNSdVkINsRzk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=YlJN4FEP; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="rt1x09z8"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="YlJN4FEP"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:Message-ID:Subject:Cc:To:
+	From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=6m5em2Z9V8ppDHMu5bgEkM80Ya1xpLt2NaP6Fd/8cn0=; b=rt1x09z8MKXqBmEEb07A/tn2we
-	pCn7KOkUHUaNrI3L8bn0QuS/ksCWMDqtnUJWSFTNpDP8S78EL9WtDoQtwbUiFlO2/cAQdnicW2BMu
-	pPwQOLqmMUe6kGPNyYcGTfGVXBtftA7sejIMO9gOslwZ8lk0YY9DA7Jx1e47fe/PHCcQA/90TDbDc
-	zXIj/DGFER8fPXl+g1N7o9bMZLz+/LTlTYrVYo2g33/DyOG6vXVxYLlsYuZ1SVWYA58vSBE7JUfh7
-	y3LaB3yk0fPfcGXBptwf9gLwbVHKLaArhV0EhG0s7tEQj6ksh41aGS5ZcIOlfZdsRGtl2gvG1mhdg
-	X3I8iRcA==;
+	:Resent-Message-ID:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=r/HpSQZwmseo9rDVHNNPLSwfRN+z5edQANw0G1dEzAc=; b=YlJN4FEPOoxStEHXvAGrVTJzda
+	ZEGAqhEa4S4tPopJz4twfi2+MOogH5SRtDML1p0xqpg1k+0420a3dXmM7CEV7o8Lrdgw2jZjZRcpE
+	0CiOZ0OAGlJurncucn0GplEj20u2z4YeCNTDc4K1KLmpKTXasuJA7f1WYdc+00od6iFEWSrbvf2+v
+	gsXsUXzdLn+OgZoJmPHQehzyvC9keVzMgjFZjj9E2/gSRxE0hzfV1q9BmWBiQ0ZkfTosIXjKpHa7K
+	Ng2twiehu3O+iKzV+0kR4D3YlE24G58ovrf7udSKxVIlE+yDBPFAYa162+g4g1bol0ULBIwWy3bw7
+	Ude6tmbA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tMJhB-001RQ6-1k;
-	Sat, 14 Dec 2024 12:37:23 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 14 Dec 2024 12:37:22 +0800
-Date: Sat, 14 Dec 2024 12:37:22 +0800
+	id 1tMJjP-001RRD-2M;
+	Sat, 14 Dec 2024 12:39:41 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 14 Dec 2024 12:39:40 +0800
+Date: Sat, 14 Dec 2024 12:39:40 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Antoine Tenart <atenart@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
-	Waiman Long <longman@redhat.com>, Boqun Feng <boqun.feng@gmail.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>, linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev, upstream@airoha.com,
-	Richard van Schagen <vschagen@icloud.com>
-Subject: Re: [PATCH v8 3/3] crypto: Add Inside Secure SafeXcel EIP-93 crypto
- engine support
-Message-ID: <Z10LgtZm4-qCB2aL@gondor.apana.org.au>
-References: <20241210204853.18765-1-ansuelsmth@gmail.com>
- <20241210204853.18765-4-ansuelsmth@gmail.com>
- <Z1lb0ImxhhFs4Kuz@gondor.apana.org.au>
- <675979e5.5d0a0220.207826.2bf1@mx.google.com>
+To: Hannes Reinecke <hare@kernel.org>
+Cc: hch@lst.de, kbusch@kernel.org, sagi@grimberg.me,
+	linux-nvme@lists.infradead.org, ebiggers@kernel.org,
+	linux-crypto@vger.kernel.org, hare@kernel.org
+Subject: Re: [PATCH 01/10] crypto,fs: Separate out hkdf_extract() and
+ hkdf_expand()
+Message-ID: <Z10MDHc8fYhLyfbw@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -65,20 +50,30 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <675979e5.5d0a0220.207826.2bf1@mx.google.com>
+In-Reply-To: <20241203110238.128630-2-hare@kernel.org>
+X-Newsgroups: apana.lists.os.linux.cryptoapi
 
-On Wed, Dec 11, 2024 at 12:39:13PM +0100, Christian Marangi wrote:
->
-> Do you have quick example for this?
+Hannes Reinecke <hare@kernel.org> wrote:
+> Separate out the HKDF functions into a separate module to
+> to make them available to other callers.
+> And add a testsuite to the module with test vectors
+> from RFC 5869 (and additional vectors for SHA384 and SHA512)
+> to ensure the integrity of the algorithm.
+> 
+> Signed-off-by: Hannes Reinecke <hare@kernel.org>
+> Acked-by: Eric Biggers <ebiggers@kernel.org>
+> ---
+> crypto/Kconfig        |   6 +
+> crypto/Makefile       |   1 +
+> crypto/hkdf.c         | 573 ++++++++++++++++++++++++++++++++++++++++++
+> fs/crypto/Kconfig     |   1 +
+> fs/crypto/hkdf.c      |  85 ++-----
+> include/crypto/hkdf.h |  20 ++
+> 6 files changed, 616 insertions(+), 70 deletions(-)
+> create mode 100644 crypto/hkdf.c
+> create mode 100644 include/crypto/hkdf.h
 
-Just search for crypto_ahash_set_reqsize in drivers/crypto and see
-how they use the reqctx to store temporary data.  For each request,
-you're guaranteed to have exclusive ownership of the reqctx.
-
-If you wish to DMA into the reqctx, search for ahash_request_ctx_dma
-to see how you should set it up.
-
-Cheers,
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
