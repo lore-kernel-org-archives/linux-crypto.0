@@ -1,51 +1,47 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD73A15383B;
-	Sat, 14 Dec 2024 09:28:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B45BC15383B;
+	Sat, 14 Dec 2024 09:28:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734168485; cv=none; b=mMLvLgwcXb8L+EZCb5a8d6Wdj6CJZRIGn9VcPFI57xOp0bwXxWPmG9CZ001WGK6jHkm4Pz4OdGoG8SQl7Oa3dJQpjSQ5jtCuHfnXYxtyq/PZJGrxH67JmCvd0Loplu206aZl3AcL4rTnd50Et4A5j8OmbfsrWeXCUGUgfmqZ3is=
+	t=1734168498; cv=none; b=tuuGDMFuQH7qoIFKMlHOzfytpf/u2zx4+RGCvDCAHV5iKnLBB4NHtPNYssas1LD1QQ+mEeq+22KiDSR6ufoyxuoh9vOzXSRHS2c2guBij5rgklbFbxHuSNnHuvUZduGckuCb8FJct8fPtjKLRI5VJtL/o69E0hpeW3OCXrVLK0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734168485; c=relaxed/simple;
-	bh=mh+BIbqYBJMiK8OqQSuZPMPQqV0f0lR/gPwFn6N2M1E=;
+	s=arc-20240116; t=1734168498; c=relaxed/simple;
+	bh=QdhHa7iMZbjkQnT7T+8JCTD6tyAI9zlhwdDIMFKInOk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=COEhNuswZaFH9fhUfp+YMoDsPJxYkRKhqCsCP9zZCga6ydRtlqbt1Dj+7QM+Ong+m4dqlyHGNA8x7cGyh9CsTtIS2nIMSNa8b+cXnj8dxSmBVUfImnwMAGu3GrePaye8mkc8DF+chqJniLK7rGb2YoKg0FOF5lroyjr8xTzz6LM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=h6esVUWt; arc=none smtp.client-ip=144.6.53.87
+	 Content-Type:Content-Disposition:In-Reply-To; b=JykaDeEsa9yYv2ZqH/w7RsijD2zCtRJVVP8RSzupwBegw2FlaKFBfSoeOdzRvk8oZrLqGyKBcxb7B79kSSNAI9hx7h1L+9+WakEBz/KIp04NCwn5mMM9yKINbHAfHA8Buybv+l5PQv78OUAs/AX3vLcGX4RgAT5Q02Jhgj+ztSE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=dTSsXmD0; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="h6esVUWt"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="dTSsXmD0"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
 	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=jSrh8S/vrTiZu29RpJyXI7IV5JHm4F+0sjUohrNbfB8=; b=h6esVUWtKyXiNBDhh6atOa5lyS
-	Ltg1tg48P7P+vLY3a2kGclExV986m/fvdnzPciLgdE2zbilmN+RqA7sv5MXCYQnNMphGUwLaL23An
-	MjI3uKkHy5HAeF3ytkrcMc9YvGQJTxJhpALcQyz6PX1YNiN8uWwd9nGiLfLSX8bM1GuFoZJ1k/Asg
-	THHc9ugVFoYxh2vueH12RXdGNGjTTQvap7NlOsYeTJsTInFZ7pRBZoEaqKOJAbL6SdpkVIWkIHVCu
-	hxCIy8HTaH1PpvSzjZVuGFfPZ13CEnG0WCjCPaWxd73KxYdxyNz0FWqXjBtMinj3p33gp5URavXVd
-	l+Lu5sVg==;
+	bh=QOHkSD4VtoqFlcrsRN8IrmkfP7RII27E0GitD3i+GcY=; b=dTSsXmD0Kxg/XTDhb0+XSZ6oW6
+	YzxM+sLpODyosfhKgRE14COBgKPjU7vXtEIKbd8MceImqQNem2FYwvjVFbkMUPLeHuRH4SJEfDZ37
+	+q6462KFoy78IsJZqzQMQ8K1BzblwRQAw8UuDBoQFtNyaT1eaPPbXynq7WbsdELkglm8o9Q67xFJf
+	8ZVfd+rH9KbKtUBX3XXnKuWUQn1mHJIqthF1G7LxikbiGWZO37QEzcVtnqhZ+h2BKERhILZ+3jFR2
+	uq4D8G3netonbx1l071T+j2UkC/bEurQoPe9txSENqn095xWV4TQDa7ffI+izz4EgD9AG7ayDIe2h
+	N1jl5TqQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tMOEJ-001TK9-1r;
-	Sat, 14 Dec 2024 17:27:53 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 14 Dec 2024 17:27:52 +0800
-Date: Sat, 14 Dec 2024 17:27:52 +0800
+	id 1tMOEc-001TKJ-36;
+	Sat, 14 Dec 2024 17:28:12 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 14 Dec 2024 17:28:11 +0800
+Date: Sat, 14 Dec 2024 17:28:11 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Thara Gopinath <thara.gopinath@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Stanimir Varbanov <svarbanov@mm-sol.com>,
-	linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH 0/9] crypto: qce - refactor the driver
-Message-ID: <Z11PmHSJFFbJ9DtE@gondor.apana.org.au>
-References: <20241203-crypto-qce-refactor-v1-0-c5901d2dd45c@linaro.org>
+To: Mario Limonciello <mario.limonciello@amd.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>, John Allen <john.allen@amd.com>,
+	"open list:AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER - DB..." <linux-crypto@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3] crypto: ccp: Use scoped guard for mutex
+Message-ID: <Z11Pq_NDNLN_oe7o@gondor.apana.org.au>
+References: <20241203162257.6566-1-mario.limonciello@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -54,37 +50,20 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241203-crypto-qce-refactor-v1-0-c5901d2dd45c@linaro.org>
+In-Reply-To: <20241203162257.6566-1-mario.limonciello@amd.com>
 
-On Tue, Dec 03, 2024 at 10:19:28AM +0100, Bartosz Golaszewski wrote:
-> This driver will soon be getting more features so show it some 
-> refactoring love in the meantime. Switching to using a workqueue and 
-> sleeping locks improves cryptsetup benchmark results for AES encryption.
+On Tue, Dec 03, 2024 at 10:22:57AM -0600, Mario Limonciello wrote:
+> Use a scoped guard to simplify the cleanup handling.
 > 
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
 > ---
-> Bartosz Golaszewski (9):
->       crypto: qce - fix goto jump in error path
->       crypto: qce - unregister previously registered algos in error path
->       crypto: qce - remove unneeded call to icc_set_bw() in error path
->       crypto: qce - shrink code with devres clk helpers
->       crypto: qce - convert qce_dma_request() to use devres
->       crypto: qce - make qce_register_algs() a managed interface
->       crypto: qce - use __free() for a buffer that's always freed
->       crypto: qce - convert tasklet to workqueue
->       crypto: qce - switch to using a mutex
-> 
->  drivers/crypto/qce/core.c | 131 ++++++++++++++++------------------------------
->  drivers/crypto/qce/core.h |   9 ++--
->  drivers/crypto/qce/dma.c  |  22 ++++----
->  drivers/crypto/qce/dma.h  |   3 +-
->  drivers/crypto/qce/sha.c  |   6 +--
->  5 files changed, 68 insertions(+), 103 deletions(-)
+> v3:
+>  * Fix logic error
 > ---
-> base-commit: f486c8aa16b8172f63bddc70116a0c897a7f3f02
-> change-id: 20241128-crypto-qce-refactor-ab58869eec34
+>  drivers/crypto/ccp/dbc.c | 53 +++++++++++++++-------------------------
+>  1 file changed, 20 insertions(+), 33 deletions(-)
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
