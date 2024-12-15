@@ -1,72 +1,121 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A9052033A;
-	Sat, 14 Dec 2024 17:17:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7827D14A90
+	for <linux-crypto@vger.kernel.org>; Sun, 15 Dec 2024 07:27:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734196678; cv=none; b=V3ILPjCnFQ+/FIDIy7NEQyVbM61aVaSqjzPR2xwpOHPUxUBdkaBWXfxiOG10J57Zs05TIjSnZmtDt4LSTFOBzfwTthofCuLbfPcnvb5D9vyjYGLr08pmWkH5aKLCpVs/MXUlx92u6R9ptUNbJvld31I5iSFgp386gMXEc+Fi0/w=
+	t=1734247650; cv=none; b=fO3MNm10aapRBXKkRitgvDeeDKavJaibFM0F/CtCneiu3oPxuXWmHTNJHCCkS6UkOgVKJAZ0V6T4Fkw6NL75gYVPJAp0aZ2BeSpBFF2YUI+q4FZXeWlHpA1wr9OtYHh+dUollNEoL8gQzMfkWcVpklSYPI4flG8cPOEptjnym20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734196678; c=relaxed/simple;
-	bh=SrYSqTYhMAMdYpLDzifSCyAbgsJ3gl3o3iYk0OX5FQE=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=E3ZCI9TO98dBKSl3pRV9AVKpE1tCuASaXr1kmMRH92VgVoO1a5zaW+lyuijs43j/8RUkhQKxotzcZvRMP73tdHFyLBFFQHm4m7JxiwW8AndUkIQ+RCRN7jCCoE6jI51aNQ0A7D0M/KzZugpJ5JKnD1dQDk6WmyH1OlHOmBwXq/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rSzGYLBW; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734247650; c=relaxed/simple;
+	bh=tHh2vbdQGSGDAh7ORzXWOKIeAcntQYuHDwTJ5ECZTjg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GZiBczIF7x2JROM9Vm7PW7rO9hvMUq02Y7iv4eOfSfL/6RMyJQ0o2IDk3WrG4ftfhvXUu0wzs9JGcsqouFQKGjQioeCqIQIUtNgDIN02v70tS8g60dn1hgdI5LvLp55YbGURA6qNtf6SNrK8P7Joy1scUyyLwUhdAPTRuL66LjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=pf.is.s.u-tokyo.ac.jp; spf=none smtp.mailfrom=pf.is.s.u-tokyo.ac.jp; dkim=pass (2048-bit key) header.d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.i=@pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.b=pY8ad9XZ; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=pf.is.s.u-tokyo.ac.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=pf.is.s.u-tokyo.ac.jp
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rSzGYLBW"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CE21C4CED1;
-	Sat, 14 Dec 2024 17:17:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734196678;
-	bh=SrYSqTYhMAMdYpLDzifSCyAbgsJ3gl3o3iYk0OX5FQE=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=rSzGYLBWIKMn73LLVJ/eDK115BLTlqZ5NbZBq9lfAtmRIpeyHcLaMB1II9i3+yySU
-	 yEIqTMv3pa9ct891fohK/JkbUbqquWBgzzZnh9pUiRp+HVjwUr+AqPhYED2Q0qQKSN
-	 KqshyxTWifusjHss9+Ba0LHo9TW/wPFIGL2j4KhF+AG57y+4uzf3vFYqDosppf/Wcv
-	 tEXH9x4nFSsgufpUqHOIrRGOvrSYtRd0xMMKv62QCYjA5Herkpks4N9l3JWGSPeYdb
-	 4XQ1YlFDCjalyh3ojVJOvO5Dm5pA5gHOz4mR4UBhMShLMAac75k60zlRZpvL1YP1vj
-	 9z5NZl9WWCHUg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB363380A959;
-	Sat, 14 Dec 2024 17:18:15 +0000 (UTC)
-Subject: Re: [GIT PULL] Crypto Fixes for 6.13
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <Z11ODNgZwlA9vhfx@gondor.apana.org.au>
-References: <Y/MDmL02XYfSz8XX@gondor.apana.org.au>
- <ZEYLC6QsKnqlEQzW@gondor.apana.org.au>
- <ZJ0RSuWLwzikFr9r@gondor.apana.org.au>
- <ZOxnTFhchkTvKpZV@gondor.apana.org.au>
- <ZUNIBcBJ0VeZRmT9@gondor.apana.org.au>
- <ZZ3F/Pp1pxkdqfiD@gondor.apana.org.au>
- <ZbstBewmaIfrFocE@gondor.apana.org.au>
- <ZgFIP3x1w294DIxQ@gondor.apana.org.au>
- <ZkrC8u1NmwpldTOH@gondor.apana.org.au>
- <ZvDbn6lSNdWG9P6f@gondor.apana.org.au> <Z11ODNgZwlA9vhfx@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <Z11ODNgZwlA9vhfx@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.13-p2
-X-PR-Tracked-Commit-Id: cd26cd65476711e2c69e0a049c0eeef4b743f5ac
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: ec2092915d60df2700f7062f171a7fbbad93166b
-Message-Id: <173419669454.3361629.5467310783517180575.pr-tracker-bot@kernel.org>
-Date: Sat, 14 Dec 2024 17:18:14 +0000
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+	dkim=pass (2048-bit key) header.d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.i=@pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.b="pY8ad9XZ"
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-21675fd60feso33057295ad.2
+        for <linux-crypto@vger.kernel.org>; Sat, 14 Dec 2024 23:27:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com; s=20230601; t=1734247645; x=1734852445; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=zeNNxWMGeOZVK9C8bhmq7eNlUoSgikSfdTQc8osMwTs=;
+        b=pY8ad9XZ1LOOPXE79XQiv1G4XVL/u5OsrrY+j3ObEcFnd6N2LQ+eQSrc4pp9wiJetl
+         syOhZI+6uLYZ9z8gBUjMh7XoZvBYXjoCG342BzEBZNQvs/4pToNtG3+KzUkJSOT8PKjO
+         3OOQl1yE9msopRR0D1fYjsmV0nbV3kxSoxJukzapuTbnB2Y5Co/lbmVbVdJul3w1r1w+
+         yGel9XQkde51xc8u+iB8Bejeju1AKndzxJoNADWfIdoWuTMaHrHnnc4cSTmdU1yNy28o
+         DB3VSRzOvH6uwnGCf1ThEOiGuImU5jyJyV6GgtXcQF83xqqnzI0BrEsWAPSHskfGCNu3
+         WOpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734247645; x=1734852445;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zeNNxWMGeOZVK9C8bhmq7eNlUoSgikSfdTQc8osMwTs=;
+        b=Gepft9iV1qZtSkHluj0vp8A0Aml3Wp0dSO/in0H+gXpXbCHeKVfyUVzRRkvD6vuLcp
+         ZVim6FDmnX+M9/ceSUnKb3+uUMI9NGi42SbITmZl+TxDWcYaovKKKG1Wl/xIRE7vZkr4
+         pn60VfI4SyU+eyAdyrxN3eqHEmg8iaPvz7M/tKVfH6q3ujw8eZSqERUYQqtuZ4GepaR2
+         +wvuKDNs++lHUpqeaLDP9O4+6yRsWbeYTVdYr+zFmSvfuo8FOrbmP6tj9aJRRFyvFbYg
+         s1Rs/yAbmGNQjlwWKT2KXEwkY8+VomID/ewccBIyRzcesdEtb+JfUANOCqgEA+bJOdbF
+         fkAQ==
+X-Gm-Message-State: AOJu0YxitGEbvrnzlNobp1895GW8dfWhCHCw7ptwUpbFB1KVaL1mHswn
+	nsRe1K6W6hf7t/5z1LP5xwMJVZKQbfdwg0RgcpJw/QDSFxAcM3K7ystcLVNGGawEIDMk/q47ECb
+	UFxLOxg==
+X-Gm-Gg: ASbGnctMD+5llPzUGESKHEEaij5CR5NfbuphJ4tYllZfOgEjPtC4nVdVTfMTMXVI/Vp
+	q0HJhnNwdJ8NWFhku+MPWXO22XFYJzHcCYKS1m+0GdYFtAEubiut9RokfwOKN65o5Mjt0AccUlz
+	+/OF6CMFL3mZn3GnKH4Msp7B6iKd02txpMIWL/urV8hkMG2jkoZvSWNL2tqc4ZbV0fEfRBOa+ZP
+	5OKLQtYIiynprE3JfapDbV3D4Ne6cbNox4+qniD+4sXoQiS9b7LT5h0TmrJ5tgcVj1LUoc/H6qZ
+	XeCw
+X-Google-Smtp-Source: AGHT+IHBO2Bz1jf36z1IobMzA/6bUz1v4+Eos/4ZuJ0hfFHWTlu6KLhgaIAy42bM0hPJhdux1GyCNQ==
+X-Received: by 2002:a17:902:db09:b0:216:48f4:4f3d with SMTP id d9443c01a7336-218929bdb34mr116890005ad.13.1734247645176;
+        Sat, 14 Dec 2024 23:27:25 -0800 (PST)
+Received: from localhost.localdomain ([2001:f70:39c0:3a00:39e1:57de:eaa2:a1ed])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-218a1db755dsm22400555ad.42.2024.12.14.23.27.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 14 Dec 2024 23:27:24 -0800 (PST)
+From: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
+To: clabbe@baylibre.com,
+	linusw@kernel.org,
+	kaloz@openwrt.org,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net
+Cc: linux-crypto@vger.kernel.org,
+	Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
+Subject: [PATCH] crypto: ixp4xx: fix OF node reference leaks in init_ixp_crypto()
+Date: Sun, 15 Dec 2024 16:27:20 +0900
+Message-Id: <20241215072720.932915-1-joe@pf.is.s.u-tokyo.ac.jp>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-The pull request you sent on Sat, 14 Dec 2024 17:21:16 +0800:
+init_ixp_crypto() calls of_parse_phandle_with_fixed_args() multiple
+times, but does not release all the obtained refcounts. Fix it by adding
+of_node_put() calls.
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git v6.13-p2
+This bug was found by an experimental static analysis tool that I am
+developing.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/ec2092915d60df2700f7062f171a7fbbad93166b
+Fixes: 76f24b4f46b8 ("crypto: ixp4xx - Add device tree support")
+Signed-off-by: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
+---
+ drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Thank you!
-
+diff --git a/drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c b/drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c
+index 449c6d3ab2db..fcc0cf4df637 100644
+--- a/drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c
++++ b/drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c
+@@ -471,6 +471,7 @@ static int init_ixp_crypto(struct device *dev)
+ 			return -ENODEV;
+ 		}
+ 		npe_id = npe_spec.args[0];
++		of_node_put(npe_spec.np);
+ 
+ 		ret = of_parse_phandle_with_fixed_args(np, "queue-rx", 1, 0,
+ 						       &queue_spec);
+@@ -479,6 +480,7 @@ static int init_ixp_crypto(struct device *dev)
+ 			return -ENODEV;
+ 		}
+ 		recv_qid = queue_spec.args[0];
++		of_node_put(queue_spec.np);
+ 
+ 		ret = of_parse_phandle_with_fixed_args(np, "queue-txready", 1, 0,
+ 						       &queue_spec);
+@@ -487,6 +489,7 @@ static int init_ixp_crypto(struct device *dev)
+ 			return -ENODEV;
+ 		}
+ 		send_qid = queue_spec.args[0];
++		of_node_put(queue_spec.np);
+ 	} else {
+ 		/*
+ 		 * Hardcoded engine when using platform data, this goes away
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.34.1
+
