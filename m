@@ -1,121 +1,132 @@
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-vs1-f52.google.com (mail-vs1-f52.google.com [209.85.217.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7827D14A90
-	for <linux-crypto@vger.kernel.org>; Sun, 15 Dec 2024 07:27:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A76341531C2
+	for <linux-crypto@vger.kernel.org>; Mon, 16 Dec 2024 16:34:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734247650; cv=none; b=fO3MNm10aapRBXKkRitgvDeeDKavJaibFM0F/CtCneiu3oPxuXWmHTNJHCCkS6UkOgVKJAZ0V6T4Fkw6NL75gYVPJAp0aZ2BeSpBFF2YUI+q4FZXeWlHpA1wr9OtYHh+dUollNEoL8gQzMfkWcVpklSYPI4flG8cPOEptjnym20=
+	t=1734366859; cv=none; b=ftn9oom+/+KotN5M70exqpyzOfS8ZVlxgmH9dZ5EEIKfPvQb+4q3aGu1rl1cuAHbJmUKs+psk4K32saYTXOuyGvjevtjY6P2yY+aFryFmz9CQviCok8pAjUCYgTcC8jjF+QWGpFsrySO/ivRC+iM1dilkNmEw8R86oLVgNm3KNo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734247650; c=relaxed/simple;
-	bh=tHh2vbdQGSGDAh7ORzXWOKIeAcntQYuHDwTJ5ECZTjg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GZiBczIF7x2JROM9Vm7PW7rO9hvMUq02Y7iv4eOfSfL/6RMyJQ0o2IDk3WrG4ftfhvXUu0wzs9JGcsqouFQKGjQioeCqIQIUtNgDIN02v70tS8g60dn1hgdI5LvLp55YbGURA6qNtf6SNrK8P7Joy1scUyyLwUhdAPTRuL66LjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=pf.is.s.u-tokyo.ac.jp; spf=none smtp.mailfrom=pf.is.s.u-tokyo.ac.jp; dkim=pass (2048-bit key) header.d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.i=@pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.b=pY8ad9XZ; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=pf.is.s.u-tokyo.ac.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=pf.is.s.u-tokyo.ac.jp
+	s=arc-20240116; t=1734366859; c=relaxed/simple;
+	bh=J4P8Yn+HmBStOiyf7871d8RgqIDPsmAX5U/1I64nh6s=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=bV6sPy1D6q/9vue8NjBKHQKvlV2gCbZ6JXlSEPA2oe7mCYV3+SbM+98YCU2B3SB3queYUebpO1wbmsB6anhHp5gXdBdLXDcqlONGJSx3L0BhbFuGm/TyEnd+flLsfAnh+hLd6bbB1eGp6G6h0EUr0pO0DU+dJVFVJZRdd6RdIPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=zfvVBaRJ; arc=none smtp.client-ip=209.85.217.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.i=@pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com header.b="pY8ad9XZ"
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-21675fd60feso33057295ad.2
-        for <linux-crypto@vger.kernel.org>; Sat, 14 Dec 2024 23:27:25 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zfvVBaRJ"
+Received: by mail-vs1-f52.google.com with SMTP id ada2fe7eead31-4afd56903b7so1065833137.1
+        for <linux-crypto@vger.kernel.org>; Mon, 16 Dec 2024 08:34:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=pf-is-s-u-tokyo-ac-jp.20230601.gappssmtp.com; s=20230601; t=1734247645; x=1734852445; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=zeNNxWMGeOZVK9C8bhmq7eNlUoSgikSfdTQc8osMwTs=;
-        b=pY8ad9XZ1LOOPXE79XQiv1G4XVL/u5OsrrY+j3ObEcFnd6N2LQ+eQSrc4pp9wiJetl
-         syOhZI+6uLYZ9z8gBUjMh7XoZvBYXjoCG342BzEBZNQvs/4pToNtG3+KzUkJSOT8PKjO
-         3OOQl1yE9msopRR0D1fYjsmV0nbV3kxSoxJukzapuTbnB2Y5Co/lbmVbVdJul3w1r1w+
-         yGel9XQkde51xc8u+iB8Bejeju1AKndzxJoNADWfIdoWuTMaHrHnnc4cSTmdU1yNy28o
-         DB3VSRzOvH6uwnGCf1ThEOiGuImU5jyJyV6GgtXcQF83xqqnzI0BrEsWAPSHskfGCNu3
-         WOpA==
+        d=linaro.org; s=google; t=1734366856; x=1734971656; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=voYB97BSoIttk6TNFpCBTpCkCub3HvTPki1P0fPd0XM=;
+        b=zfvVBaRJstSDeEl6+GGDGWKT7hTJEbATEo/tkaPmkiCLuPcOzAbSbwcOOQzU1uzDiD
+         LfM1dOCRdZqxTEarx4oY6QcHoy0uEjaehokOpQ3zKkftBAZqbEWPF+DB0VGyzq1q/gQi
+         ym+sONUkGeV3dg2LmeAdjHRwcJ0WKg5IeO4NhL6JsbVvD8CBPLAwI1QMFazzcUHHdCnh
+         BnUF5L1SLxlRuUhM8n+LcVS5yrjBhmNRUYgdsd+1RRFj5I/FcGFgesLwZHbCxaxa+HzD
+         Ykp3r5eqQBs0BQ6sYqRe6Mc3QCXN3D81WsPVp3cMztd1ysLBbxz1KN4qifypofSFEOx4
+         Uzdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734247645; x=1734852445;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zeNNxWMGeOZVK9C8bhmq7eNlUoSgikSfdTQc8osMwTs=;
-        b=Gepft9iV1qZtSkHluj0vp8A0Aml3Wp0dSO/in0H+gXpXbCHeKVfyUVzRRkvD6vuLcp
-         ZVim6FDmnX+M9/ceSUnKb3+uUMI9NGi42SbITmZl+TxDWcYaovKKKG1Wl/xIRE7vZkr4
-         pn60VfI4SyU+eyAdyrxN3eqHEmg8iaPvz7M/tKVfH6q3ujw8eZSqERUYQqtuZ4GepaR2
-         +wvuKDNs++lHUpqeaLDP9O4+6yRsWbeYTVdYr+zFmSvfuo8FOrbmP6tj9aJRRFyvFbYg
-         s1Rs/yAbmGNQjlwWKT2KXEwkY8+VomID/ewccBIyRzcesdEtb+JfUANOCqgEA+bJOdbF
-         fkAQ==
-X-Gm-Message-State: AOJu0YxitGEbvrnzlNobp1895GW8dfWhCHCw7ptwUpbFB1KVaL1mHswn
-	nsRe1K6W6hf7t/5z1LP5xwMJVZKQbfdwg0RgcpJw/QDSFxAcM3K7ystcLVNGGawEIDMk/q47ECb
-	UFxLOxg==
-X-Gm-Gg: ASbGnctMD+5llPzUGESKHEEaij5CR5NfbuphJ4tYllZfOgEjPtC4nVdVTfMTMXVI/Vp
-	q0HJhnNwdJ8NWFhku+MPWXO22XFYJzHcCYKS1m+0GdYFtAEubiut9RokfwOKN65o5Mjt0AccUlz
-	+/OF6CMFL3mZn3GnKH4Msp7B6iKd02txpMIWL/urV8hkMG2jkoZvSWNL2tqc4ZbV0fEfRBOa+ZP
-	5OKLQtYIiynprE3JfapDbV3D4Ne6cbNox4+qniD+4sXoQiS9b7LT5h0TmrJ5tgcVj1LUoc/H6qZ
-	XeCw
-X-Google-Smtp-Source: AGHT+IHBO2Bz1jf36z1IobMzA/6bUz1v4+Eos/4ZuJ0hfFHWTlu6KLhgaIAy42bM0hPJhdux1GyCNQ==
-X-Received: by 2002:a17:902:db09:b0:216:48f4:4f3d with SMTP id d9443c01a7336-218929bdb34mr116890005ad.13.1734247645176;
-        Sat, 14 Dec 2024 23:27:25 -0800 (PST)
-Received: from localhost.localdomain ([2001:f70:39c0:3a00:39e1:57de:eaa2:a1ed])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-218a1db755dsm22400555ad.42.2024.12.14.23.27.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 14 Dec 2024 23:27:24 -0800 (PST)
-From: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
-To: clabbe@baylibre.com,
-	linusw@kernel.org,
-	kaloz@openwrt.org,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net
-Cc: linux-crypto@vger.kernel.org,
-	Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
-Subject: [PATCH] crypto: ixp4xx: fix OF node reference leaks in init_ixp_crypto()
-Date: Sun, 15 Dec 2024 16:27:20 +0900
-Message-Id: <20241215072720.932915-1-joe@pf.is.s.u-tokyo.ac.jp>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1734366856; x=1734971656;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=voYB97BSoIttk6TNFpCBTpCkCub3HvTPki1P0fPd0XM=;
+        b=h7tNO9jkzsHIDtAKHKwmRZjPUkf+RL+azpfjSoQPzBM+plhaLuVMOC8kiktt7QKQsc
+         pqDqX9h0Xny66JHYsr1z7dyUjMYY8MmzTtKukf5tBPUERzSDOn+OqZ4K5D++PAgLbnmb
+         6xjif6fkg/CWXNWUYtN8RhH+NCVnvviZWfhibiOqOj/faiVLqhU/Mm2O3jmGo52Kw8uQ
+         xDQqEM+q7AUvTyRWQbSQsL5xwwGvQRf7LMsthzbADM+Re2You8NR8JrzVe6DzTV4lMN5
+         MpkdP8M2yon9+Dmsggwy7WZTpAkrWN/mNHWFRd4iwD8dhDQGGR45e3eUlRK84wrWm9z3
+         SVcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV8d3csISsJebloIB2LZdhaM8JHlfnWx+Rdsz3gsC0NGJ8WdaJuUfXNhttCxRL7+QDhQFEBZxQLp1Jsb5o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxwLOs6UzUZc+YcNqsoqSpllxnn5V4gan/5WN6AYiqBRQrecoTK
+	Ngp/HpJCtRvvWs61n15jFUugQynqPhbAprenNa04Q0zaCOsVK0AVBa0Ykzc5ndgT8ZXRZt0IA7O
+	cbHChWrUZNX+w3NPELhezzaQS9u2mprJvGHTv+A==
+X-Gm-Gg: ASbGncvqT+muU3x2qXZ4Vpubq3LKFhfjN6kA7nC0IcOoIGtPKTRtX/DsEFH6Rrr/yAc
+	H6HhHq56RgZUeKKClyWy5eDCjYQDhYHcDW+QOpiDbAzp7n2ek/PyY2gIwFQ1p3OpJ5e9B7eo=
+X-Google-Smtp-Source: AGHT+IHwcIqoyILkP+1sx25KZjFSaAGwKZBXcw1KXTOsA6DOwlBCczCOTJUK1dfVqLl4hiOpY/+Ngz4hZael7fpPyHY=
+X-Received: by 2002:a05:6122:1e01:b0:516:18cd:c1fc with SMTP id
+ 71dfb90a1353d-518ca30617amr12733009e0c.8.1734366856629; Mon, 16 Dec 2024
+ 08:34:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: Naresh Kamboju <naresh.kamboju@linaro.org>
+Date: Mon, 16 Dec 2024 22:04:05 +0530
+Message-ID: <CA+G9fYtpAwXa5mUQ5O7vDLK2xN4t-kJoxgUe1ZFRT=AGqmLSRA@mail.gmail.com>
+Subject: next-20241216: drivers/crypto/qce/sha.c:365:3: error: cannot jump
+ from this goto statement to its label
+To: open list <linux-kernel@vger.kernel.org>, 
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, lkft-triage@lists.linaro.org, 
+	Linux Regressions <regressions@lists.linux.dev>, clang-built-linux <llvm@lists.linux.dev>
+Cc: thara gopinath <thara.gopinath@gmail.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, Neil Armstrong <neil.armstrong@linaro.org>, 
+	Anders Roxell <anders.roxell@linaro.org>, Dan Carpenter <dan.carpenter@linaro.org>, 
+	Arnd Bergmann <arnd@arndb.de>
+Content-Type: text/plain; charset="UTF-8"
 
-init_ixp_crypto() calls of_parse_phandle_with_fixed_args() multiple
-times, but does not release all the obtained refcounts. Fix it by adding
-of_node_put() calls.
+The arm and arm64 builds failed on Linux next-20241216 due to following
+build warnings / errors with clang-19 and clang-nightly toolchain.
+Whereas the gcc-13 builds pass.
 
-This bug was found by an experimental static analysis tool that I am
-developing.
+arm, arm64:
+  * build/clang-19-defconfig
+  * build/clang-nightly-defconfig
 
-Fixes: 76f24b4f46b8 ("crypto: ixp4xx - Add device tree support")
-Signed-off-by: Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>
----
- drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c | 3 +++
- 1 file changed, 3 insertions(+)
+First seen on Linux next-20241216.
+  Good: next-20241216
+  Bad:  next-20241213
 
-diff --git a/drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c b/drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c
-index 449c6d3ab2db..fcc0cf4df637 100644
---- a/drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c
-+++ b/drivers/crypto/intel/ixp4xx/ixp4xx_crypto.c
-@@ -471,6 +471,7 @@ static int init_ixp_crypto(struct device *dev)
- 			return -ENODEV;
- 		}
- 		npe_id = npe_spec.args[0];
-+		of_node_put(npe_spec.np);
- 
- 		ret = of_parse_phandle_with_fixed_args(np, "queue-rx", 1, 0,
- 						       &queue_spec);
-@@ -479,6 +480,7 @@ static int init_ixp_crypto(struct device *dev)
- 			return -ENODEV;
- 		}
- 		recv_qid = queue_spec.args[0];
-+		of_node_put(queue_spec.np);
- 
- 		ret = of_parse_phandle_with_fixed_args(np, "queue-txready", 1, 0,
- 						       &queue_spec);
-@@ -487,6 +489,7 @@ static int init_ixp_crypto(struct device *dev)
- 			return -ENODEV;
- 		}
- 		send_qid = queue_spec.args[0];
-+		of_node_put(queue_spec.np);
- 	} else {
- 		/*
- 		 * Hardcoded engine when using platform data, this goes away
--- 
-2.34.1
+Build log:
+-----------
+fs/netfs/read_retry.c:235:20: warning: variable 'subreq' is
+uninitialized when used here [-Wuninitialized]
+  235 |         if (list_is_last(&subreq->rreq_link, &stream->subrequests))
+      |                           ^~~~~~
+fs/netfs/read_retry.c:28:36: note: initialize the variable 'subreq' to
+silence this warning
+   28 |         struct netfs_io_subrequest *subreq;
+      |                                           ^
+      |                                            = NULL
+1 warning generated.
+drivers/crypto/qce/sha.c:365:3: error: cannot jump from this goto
+statement to its label
+  365 |                 goto err_free_ahash;
+      |                 ^
+drivers/crypto/qce/sha.c:373:6: note: jump bypasses initialization of
+variable with __attribute__((cleanup))
+  373 |         u8 *buf __free(kfree) = kzalloc(keylen + QCE_MAX_ALIGN_SIZE,
+      |             ^
+1 error generated.
 
+Links:
+-------
+ - https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20241216/testrun/26350650/suite/build/test/clang-19-defconfig/log
+ - https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20241216/testrun/26350650/suite/build/test/clang-19-defconfig/history/
+ - https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20241216/testrun/26351207/suite/build/test/clang-19-defconfig/details/
+ - https://storage.tuxsuite.com/public/linaro/lkft/builds/2qHsa6j5c1HY3GRZFGrxu2ELo3f/
+
+Steps to reproduce:
+------------
+# tuxmake --runtime podman --target-arch arm64 --toolchain clang-19
+--kconfig defconfig LLVM=1 LLVM_IAS=1
+
+metadata:
+----
+  git describe: next-20241216
+  git repo: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git
+  git sha: e25c8d66f6786300b680866c0e0139981273feba
+  kernel config:
+https://storage.tuxsuite.com/public/linaro/lkft/builds/2qHsa8wFmfrlj0VdDqAG408o3l2/config
+  build url: https://storage.tuxsuite.com/public/linaro/lkft/builds/2qHsa8wFmfrlj0VdDqAG408o3l2/
+  toolchain: clang-19
+  config: clang-19-defconfig
+  arch: arm64, arm
+
+ --
+Linaro LKFT
+https://lkft.linaro.org
