@@ -1,174 +1,220 @@
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2050.outbound.protection.outlook.com [40.107.243.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 721631DFD91
-	for <linux-crypto@vger.kernel.org>; Tue, 17 Dec 2024 22:52:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734475922; cv=none; b=CExUH+lTW3xfcTO/iI+DLzK3ePcPOUM/wzVWodVv1ZRcUeiG576W3N4xIzW2L0e4uYWoh9FLTjCUMbVfefFNTz3+USHRWo1munl3LiEMF7IW5EUSUd5iC+kLOuzu0rIoJi1XRkjXm1gR+DCxNeKrCcSxY8NKPE+N5XtZM3HciE8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734475922; c=relaxed/simple;
-	bh=+eyhKNJumZs6/FTEwOn6NrjFWtzki3e9oRxmhRQgX1g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=u2p9/L/rklcG3QxjSPJxhehVqaUXYQBHvLLSi/s6c+PbMUwaxa9GUUVZ+0qE2shPzNycb5lchEwtUe8usPezJjtEsTMiz8wiK8HW/Q6R7RCYLhK37qHfSjQw1/z2zPqcnYvT6JaYrWtGFV8R/WV9T0n0FSlk3uvGSx5kcPXt8u4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xL2+mjJi; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD7571E009A;
+	Tue, 17 Dec 2024 23:16:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1734477371; cv=fail; b=HZZ107sPI0Fj86yKk0JssHelRRNF3uxgCqbAMAyT6JFGs+QQDYGaDtcdKnH0/bSU99yewpFWCXfp71kXL7ud4mda4PicTboRh0KGasrcHWcRrUMFO/Q221UYKEEIBwueqZLrL6Buy7bE5SalO6UGJeU31Q+64tIv+WtBMEM2F5s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1734477371; c=relaxed/simple;
+	bh=mA5Yi0gojElGUiHLLW292MNuBV2BoGIYQ7Sem9ARXLs=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=UoYZxofcwWWyekOOmJEGq8VPEZ/wBQqXTMR3Ueji+t85aUOMfatrSPnZz+mCrNhtJPDMsIRyjP0M5DnhRCsdU9iheEWtGjYpH+KBEqlBs5hE2/4r8K4jdlt7+u8pz4ZtEu8I+9PfCCJeNGFILVMQkBRb38Bv0o+QPgJAop7Sw6Q=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=MlcMqVQT; arc=fail smtp.client-ip=40.107.243.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xL2+mjJi"
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a9f1d76dab1so1175367866b.0
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Dec 2024 14:52:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734475919; x=1735080719; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IVYL3s9CILTnwogTJZ1OTIZuv0ARpRPo5KpbFGa6KD8=;
-        b=xL2+mjJi2YQwtSt4Yapr/JgbFLX9aECv5HMoMBmOG3xvVfDIIG2n1gK9XrKlBpxpwH
-         90qjWwizqyRFAJt7176MCmN+5YBUGI9TshVBz5kTtoE4n+SlB2UMYosMkaGt4FWl4Nvi
-         eh3eZ5nJxmuiIHN5QUW/zxuZNq+YmuWuZ8OSYMZbZIez3nFgs0cL2hbBHcyBs2MV9XEf
-         HL/+vJmEYft9P0hCn2BiLUOgWTgQygby9ZeOuB9W4/Xtmx6a9aFMTWOVXYN9caaPcdy0
-         JaXuEZsKQbHPykEDA3JPV/snigAlHVRryUzMOaOWqzd4OOeAOIGB9ZobUFgKJDHLrkLG
-         iW4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734475919; x=1735080719;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IVYL3s9CILTnwogTJZ1OTIZuv0ARpRPo5KpbFGa6KD8=;
-        b=ox97NJwghsiB+iT7t3gsDiRB7AUp+biQZXEJGoc74vcRiO4fn33s865e2S1TqaHIGe
-         t7A9Mi4fzofWdjpq6GHVvda5w6Boe1MB6W9J9NIfM+TZfldHYxM43NGSLZQBJFSEjYeU
-         3nJlH85CUKj3ZOL4YpAt48jl3WKAG82AdHKghlSVHLZE5RYGVZWbXRE7YWi7iktL9MVu
-         pQSRLQ4i+OLND4oK2xsEzaxjud/nzmxajtxX6HjcKURAT0ohCjsaLee1cUSH/YsfL+kq
-         QK1b3xdiq5eY2XHMEUEtVmVWVUIRiYQ8zUFLOn6vyCmtSQiAtnuwr7mgU0HWtNnusRA1
-         uaHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWDiH80JnCtJTadfBSEtOZibTwx2gpTkjl4TOwl28vYGftrvxdYRek2eJIhYUCv+YqqjQT32HCwAmvp0xQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyT6NhK5i5TLMzRhLrS+A6scX6MUyAFC5cWdiCHxo4iepTix2dA
-	8dMocOkqGu1I/QLoq91RaUbe1g/Fz0mbNfrD2kJDsOmbnyEqpC0YkhmsCilDLodwtGIb+PBe1G3
-	8LJdulYg9zNZI3vupNPqz1w9HmeGc+e4tCVBe
-X-Gm-Gg: ASbGncvR6hW1l6n6mabxgk1DoRqHU2Y+lj5+6tbVpRRZO+OkvsqDW9eBo6gMYhgR9qG
-	OVINu7CIOKnIrZn7HO3AAncDM5HuY76bHJSZWkQ==
-X-Google-Smtp-Source: AGHT+IH1GTjImrAaApRrEGDhHMKaiEFNxqjHCuhUD4o38YaFXBS8IA8KoPJRL636fi9mhowUw350/nmafoSV7nTEPLA=
-X-Received: by 2002:a17:907:72cb:b0:aa6:8a1b:8b74 with SMTP id
- a640c23a62f3a-aabf4920960mr39223766b.53.1734475918650; Tue, 17 Dec 2024
- 14:51:58 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="MlcMqVQT"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=BkJltzd+h/y+NYsyHn/KFD6ErykQLbo1RumXjDbxPI/e3DTuXuX9r6R/WWpis4F69zZcNMwLdixzcD3jE5XE4q/iwPUSuqj3Udj5BmxlnaUE6VpW+FEYHjZt/V5ZWVsiDRAk1t0k2nIqMQu1stlBWKrVMZA4XLhf1yitatQp6vC4cpM567uO/ujWjt2RR/goah44IQxIdL1SNq/HtSDphsdRql4F39GKe5HRW0pynZwFBeXnvLU1KXkLsKqpsDqCODpC4sUp1kvBxIUvQpylZN9jAjGJbtU0gmaAIAhtSExGT4QlH89r2u0A5EQ7uGI3yZyQFD6SCZM4hrTZsj/kng==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=DadkDfnMXF+IkCyrAsJXcY75YCzdTfcl9imh7c8bN5c=;
+ b=XJ9C04Gmezm02Y6//KxgD0Y6Z6DyK51R9Wnc29XZcXB9AmIS6IDCqMIvOINuEgrSPclowN5/PyST6ASUuwvOW4r/g0M5ZIVDod5THAMCsv0unGSbsiWboUKNq4lCAG2Q4/UoC7upoiq3+1UOcgDNZB0FNbqC8Tm7++di1SQzuuyyDKRJbLr0grrm0Q7c96W3tbUTYNTxH4Gw7bsOxT3GtqVGU2NRhVlKLcrDQsf/dKVRf5oDNMTRBRzSI32p3wBR1SItO6XRKfdNU3z5od6uQgUi6t9MXctC3QSCXq1WdoeErI2tsm80qZPS3f4RWD8s+vGtF8w6kBZ+rVLUOceeLg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=DadkDfnMXF+IkCyrAsJXcY75YCzdTfcl9imh7c8bN5c=;
+ b=MlcMqVQTUAb8ZMfnvN4VI12oPU2ybRcgZPzKW7TEtpY279m0RMxzwUKNefZnngZbheGNtKX5Lm6YkPttCwNqjptQE7UWhhUqPvQH53uJrftl38KfGoQubHeZ0TuaxEf48KuQ9biapRp2cFpL1/71FRFVfVh3BU8zUFgHa97TR/I=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BL3PR12MB9049.namprd12.prod.outlook.com (2603:10b6:208:3b8::21)
+ by LV8PR12MB9357.namprd12.prod.outlook.com (2603:10b6:408:1ff::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8251.22; Tue, 17 Dec
+ 2024 23:16:05 +0000
+Received: from BL3PR12MB9049.namprd12.prod.outlook.com
+ ([fe80::c170:6906:9ef3:ecef]) by BL3PR12MB9049.namprd12.prod.outlook.com
+ ([fe80::c170:6906:9ef3:ecef%7]) with mapi id 15.20.8251.015; Tue, 17 Dec 2024
+ 23:16:05 +0000
+Message-ID: <57d43fae-ab5e-4686-9fed-82cd3c0e0a3c@amd.com>
+Date: Tue, 17 Dec 2024 17:16:01 -0600
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 0/9] Move initializing SEV/SNP functionality to KVM
+To: Sean Christopherson <seanjc@google.com>
+Cc: Dionna Amalie Glaze <dionnaglaze@google.com>, pbonzini@redhat.com,
+ tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ thomas.lendacky@amd.com, john.allen@amd.com, herbert@gondor.apana.org.au,
+ davem@davemloft.net, michael.roth@amd.com, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+ linux-coco@lists.linux.dev
+References: <cover.1734392473.git.ashish.kalra@amd.com>
+ <CAAH4kHa2msL_gvk12h_qv9h2M43hVKQQaaYeEXV14=R3VtqsPg@mail.gmail.com>
+ <cc27bfe2-de7c-4038-86e3-58da65f84e50@amd.com> <Z2HvJESqpc7Gd-dG@google.com>
+Content-Language: en-US
+From: "Kalra, Ashish" <ashish.kalra@amd.com>
+In-Reply-To: <Z2HvJESqpc7Gd-dG@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SA1P222CA0152.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:806:3c3::20) To BL3PR12MB9049.namprd12.prod.outlook.com
+ (2603:10b6:208:3b8::21)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1734392473.git.ashish.kalra@amd.com> <a148a9d450b3c1dfd4e171d2c1d326381f11b504.1734392473.git.ashish.kalra@amd.com>
-In-Reply-To: <a148a9d450b3c1dfd4e171d2c1d326381f11b504.1734392473.git.ashish.kalra@amd.com>
-From: Dionna Amalie Glaze <dionnaglaze@google.com>
-Date: Tue, 17 Dec 2024 14:51:47 -0800
-X-Gm-Features: AbW1kvaHDgTDS8JrAFaBs3expr5K210DWpQNsbnGYLLnTtGnZ9fPc2iUNyA1dYg
-Message-ID: <CAAH4kHai4mqmY6CB3Ybk6JxD7M=OX44k0S=2n_h_F4mVSVco6w@mail.gmail.com>
-Subject: Re: [PATCH v2 4/9] crypto: ccp: Register SNP panic notifier only if
- SNP is enabled
-To: Ashish Kalra <Ashish.Kalra@amd.com>
-Cc: seanjc@google.com, pbonzini@redhat.com, tglx@linutronix.de, 
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
-	hpa@zytor.com, thomas.lendacky@amd.com, john.allen@amd.com, 
-	herbert@gondor.apana.org.au, davem@davemloft.net, michael.roth@amd.com, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, linux-coco@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL3PR12MB9049:EE_|LV8PR12MB9357:EE_
+X-MS-Office365-Filtering-Correlation-Id: e08408b6-7b3d-4871-41c0-08dd1ef0c7d5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?S3dqdUsyU1dLdzRvUlhSUWZkMW1jbVVhQVhxSFFSa2hORTJjNU9RL3lHU3N2?=
+ =?utf-8?B?cUwyTjkzQXFZaStTa05KOFRtVExQczUzWWw1OTdKWUZHeHB4WUFYdEtIYkh5?=
+ =?utf-8?B?QUFMWEhZWDVRMEVuazZ4RW9MT0w3d2FScVJrUlRvdExmVjJuQWI2L09ZUGlK?=
+ =?utf-8?B?MXFLQzh6azhxOW5oMzlzNkl4VEpKdUNOQ0daMnpSYzlzK29nWXA2REQxUXBX?=
+ =?utf-8?B?eXJTeUlZa3N6dThnZ2F4RnVyR1VMZHFSQXhKODlzcDdhdGtYcm14bXZuTjR0?=
+ =?utf-8?B?cFFjN1Q0ZG1YYmlzT3VJVVRFcno0UEh3WnA1L210ZlNHRGd0Mk4xanpsbXR6?=
+ =?utf-8?B?NlM0VEhxL0oyc1hpeFdkVThVQkRRZzkvSXkrR0psK3RxQnRrcDE0eWNmSDF6?=
+ =?utf-8?B?MXZmMitCdFNUYmJFWThBNmp0amc1UkpxczZlcVc3YWlYZWtMVzZmcXlsTVNw?=
+ =?utf-8?B?b2JnQXByaGQ1eEtsbnR3Ti90cURnWjR1aXNtWTI0dnV2d1V4amdvNXRWU2ZU?=
+ =?utf-8?B?YXE5b00wSnQwOVhHbGpBKzlFbEdlc2ZHTTBRMzFyUW85QzZlOFdnbkxuSkQ0?=
+ =?utf-8?B?N3Y1dTIyRDVkV05QWHJSS0pNY0pIZllxS0MxWW1TTlB1RzFIWStFME5qTWRI?=
+ =?utf-8?B?SHRZVUtqTy9GNGJjVk14ekpmcnJHcnp3VEMzeXpVMk9taVZUNGptWTI3Rjda?=
+ =?utf-8?B?emZpQW5jazNyZWFPTlhmOXpiYnViSzNxUjZFZHBvZ3ZiVkdma2J4QTVUM25Y?=
+ =?utf-8?B?L1BqSytQYmEvTStKOEpFYjNjSjBnSGkxTzBOWVIyRDM1U2t5aVNMd0FlQnJs?=
+ =?utf-8?B?NkZwWmZHamsxZGlTTlM2ZEgzNnVNSVZzZ2htS2p4ZXF5eThvdXpMWEQxa3Fx?=
+ =?utf-8?B?NkJNMlVOVTJ4UjZwQytEZnR0V21WSU5xNzdMeitvRWZhTTRjM3NySnlwYnlB?=
+ =?utf-8?B?ckxNQzlzUUo4MHRPMW1PaGF3bnJWUTJyWWxWVnN1MUx5ajdrK1cvbXduNzFj?=
+ =?utf-8?B?RDRmS0lDR2NnUmlQMFZMTWNvdWF5U3VHZmFqTXpwWkt6b1lXclVEYTFZZUNS?=
+ =?utf-8?B?bzNRbTBPREFvQUN3Z1R2a0prK3JCSFBxaXFKL0xtMmZxb0pxTTNETmN5VDBt?=
+ =?utf-8?B?bUdJUTNHMS91eld5OENHYWpOMVp6OHlUMzFjbHN4d283U3RYOHFQRVo1eWx6?=
+ =?utf-8?B?dFhTYW4xTytObTFYQko5N2FXTUZZUjZlOE9LN0wvcUJxSTl4S0wxdU91Zmx0?=
+ =?utf-8?B?enk5R3dXZEY4cXhyT0Yyc1UrZGY1clVRZUJueGlIVDVMallDQkpGQjBYckYx?=
+ =?utf-8?B?Vm9QWG5mQUo0UzJSRGd2L2NuVjBQT1NVRzgvT0w4bWFHR1hqMis4RzFYcVdm?=
+ =?utf-8?B?ZFdRQlJIMFREWUJBMEh1NnEwVG40c3ROYU5LTEFlVkRmOXNVV3YxTDcySGZN?=
+ =?utf-8?B?V2VSdEp0MFhnQ1luZVROZTRocVZWY0ZlYjVnd1JybjlIV3g2VDdRNkluSFBn?=
+ =?utf-8?B?UTlBWnkwWlMvRnpaZ1ZBSHBHeXYrd1FxeE42Y2Nydkc5ZThmUWVCSEJuMWlm?=
+ =?utf-8?B?VmZFN0dhWDFRV0wvNG5DWWRGRTFucVNQd3V0UlhKMlZIMWlxOUtXTUFubDU3?=
+ =?utf-8?B?bEliSEpVZzZ0T1J6U21ldUVBdmtzZmxyUGFQMGJjUHNKWWpyWHk1cDJtc013?=
+ =?utf-8?B?S0NWN3pqbThzbTFNSFFKSExUWFVSaFRGQVZpbGZGZENYaVBWYngrY3Z6a3la?=
+ =?utf-8?B?T0lBLy9BMFRrRkMyS2MyMlZzbmJZVHpFTWlqVXZqK3VYWUI5c2k5RXd4NGgw?=
+ =?utf-8?B?L1FsSFg3a01vVkh1RGpUSDJtcWw0Snl4emxQNHUwR3kweC8yU1V4NzBDVHJK?=
+ =?utf-8?Q?dCj4PoJQAIXWl?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR12MB9049.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?cStud09ZZ254cTJEaWJ2TDFIOGRnT0twNk9Oak42TncrdzMyNHhBekZFM1R0?=
+ =?utf-8?B?OFN4ZzNDTnk0eE5GanlYbUJNczdtSy9jQndCc01uZ1JpMnBnVTB3MzRoTER6?=
+ =?utf-8?B?OVpHdGc1YmZvbm9oS3Q4VkcxMnlKOEZ0RHFUVEVIcldLcjFkQVBLU0pmd091?=
+ =?utf-8?B?TWRraDZWSk5VWmZGTGk1M0wvRWVkVnk0M1p6STBkbTMvU0lhSUNrL0lHcTZy?=
+ =?utf-8?B?cHU4aWhnWFcvN0FiRHp5bGhvSEVoV1NxbS9JdnBPM2hmeEgzaTZYa0VtVXBx?=
+ =?utf-8?B?MEFLWG5Bdlhtd2ZpenZBUTFyd2R0eTlYRkJCTDVZcUF0Mk1PRktFdm5JMXdU?=
+ =?utf-8?B?ZXM5RTRYTTFtTHFNWDV1SmU3dmRkeUZKR3Z4UmFaZnVOZ1VkRWozQlhxZEFJ?=
+ =?utf-8?B?a3lzMXh3YnZYRkJ3Tzc0Vm9nNkpGMXY2R2hhOHNOK0laMW45ek9TUjNZUlRX?=
+ =?utf-8?B?dkxnRDA2MFRMdmdmOTY4YjJKWDk3VC83WExEYTQ3TzU5bEJWcjI0Snd0bUpz?=
+ =?utf-8?B?MGRJa3owWHZMUXY4YW40RzFJcWxIbEsvUHU4T1VwSXdZZGVKUlI3RmxLWG5G?=
+ =?utf-8?B?MkJqRFRFck5WWGZjMllkcXlsUVRlTnVuVzRmZklVS2FValpVVUUxamhDbGRo?=
+ =?utf-8?B?VHN1SGZ5NWdGWC9lSVdFQVpkQlUzUTcyVFN6Ly8xV2ZSVUdtc29NZDdNQkI5?=
+ =?utf-8?B?TXNXbm9NUEMrdU1TNTd3ZDdkMTF6VEtVMXMyem9ibjdFSmFjeXp6N1l3SzhI?=
+ =?utf-8?B?YTBwclU3ek9Ba3NJSmo2MXNrZFV5TUQyVXVteVFXTG5NdDZubTZPSzJSTTFR?=
+ =?utf-8?B?Y21USjJOWldsZzIwZWRjanZqa0g4R1F3ZmpSOHpFbk00OG5TU3REeWNhWDVr?=
+ =?utf-8?B?NUNMcTdQT3JLaENEd0Q5U0U1aDhlVjJ6a2dlcjNLcG8vSm5FL3RxWjZDSjhZ?=
+ =?utf-8?B?dDJmVWpyZ0FWeGwvUDN1bWpLY1p1M0FiWnRISW5DVWF2U01LRCt6aWZBT2p5?=
+ =?utf-8?B?ZlN5NlpxTlgvd3FnWStoRXl2RExVVUJnMlduQ2ptbDQ0ck4wQUdRQm51UzJt?=
+ =?utf-8?B?N0NKRklDQ3oyVm5zS3hCYWk4WGVCWWVGanRhVUdLemJoajRyeTdYV0Raa3J4?=
+ =?utf-8?B?T2daYi9TZUZXWXlxbHBwMWVVK2tiTER2bkhIbmhaa2xPUWlyWnQyaE8xbzBr?=
+ =?utf-8?B?RnBONHh4QWo4UlIwbG93UldTU2YwcTdQbEtuLzFWc1R1YmRXL2VaM09hWTV0?=
+ =?utf-8?B?MGc4SGZDVml0WHFtczNtQmdxMkNFb084TEZ1dWhnTXYycnc2K0NabjkxWXM3?=
+ =?utf-8?B?UUdhRmJLcDF3QVNkcWlkTFlNdGpSWE1DcC8xcnlzZW9YYkEzYXlGQ2l3NXQ4?=
+ =?utf-8?B?SXlRbWFKR1ljcFB3MlQ0VzljQ2wrUTNET0pQeXFtK2QzSmRWOFNZUHpMTVpu?=
+ =?utf-8?B?dEVoQ2l0WHBvOXJMSmRyMEpLQkhldUlzSUplVUZDNXozUFk2SFZWZXFqamYy?=
+ =?utf-8?B?bWg2bzc0R2hkb0xiUE1LVlBETFY3MGQ3TFlYd2pTbnFCZHNWNUJkdDVwa3JG?=
+ =?utf-8?B?UHczR3BUcHpWNjN5T3cxeG1Pa01wR2ZhZ3JmT1ZiakdiMnk1ZEpVWFB2b3ov?=
+ =?utf-8?B?Y2puSGRDTFBQTVUvTUE3K3VEUnRKTXlyK1krb2dWT2xUSExxcDROUTdpOXFn?=
+ =?utf-8?B?eDVVYlFCdjlYdWZyck1WeEllVUZiYWZYUWxrQUZWL1czQThCR29LM29NaXdT?=
+ =?utf-8?B?SmdVemt0ejJvcm5oRi9RUUtGdUJXWlVFNmpRYnU0SHBYeVNXd0FpRGU3a0tp?=
+ =?utf-8?B?T1VvaXdHcTQyRjUrV1hkNjIvUCtTRHAybm1yOUp3TXRoR0xnMGtYQXVicm9k?=
+ =?utf-8?B?bWhkWlZOOVRralI3c1VWSzlFbTdPZUVUTVpvejBtTW5UK0dKQ3NkODFET0Jq?=
+ =?utf-8?B?UVFLK2pVaVhreEtVNy9vSUhEUmtvN2h4TkZpVTFQbjZLc3pPbzI3WjlSQ3BF?=
+ =?utf-8?B?clpEMmtaMVRGUW44Y3o2azF0QTAzSHBPNXJjU0g4QkFiTnVCZVBUaG1Ha2hM?=
+ =?utf-8?B?ekV5RjBEZG5TWEhPZ3ZHMTFVSXlhYjlqcldLQ0xjQThaa0FOKysxMHBxcjVK?=
+ =?utf-8?Q?0Em4Ohwd7p7HFGIuJN4GYWh7m?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e08408b6-7b3d-4871-41c0-08dd1ef0c7d5
+X-MS-Exchange-CrossTenant-AuthSource: BL3PR12MB9049.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Dec 2024 23:16:05.2234
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: vr+6fPaXlnIfX/7gy1lrVFcOB7PDG7oEKtWowz+N72Cu19zCP+3Z9avZ2vgQAH54+/vAOR6g0PIzQugQh+KKiw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9357
 
-On Mon, Dec 16, 2024 at 3:58=E2=80=AFPM Ashish Kalra <Ashish.Kalra@amd.com>=
- wrote:
->
-> From: Ashish Kalra <ashish.kalra@amd.com>
->
-> Register the SNP panic notifier if and only if SNP is actually
-> initialized and deregistering the notifier when shutting down
-> SNP in PSP driver when KVM module is unloaded.
->
-> Currently the SNP panic notifier is being registered
-> irrespective of SNP being enabled/initialized and with this
-> change the SNP panic notifier is registered only if SNP
-> support is enabled and initialized.
->
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> ---
->  drivers/crypto/ccp/sev-dev.c | 21 +++++++++++++--------
->  1 file changed, 13 insertions(+), 8 deletions(-)
->
-> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> index 9632a9a5c92e..7c15dec55f58 100644
-> --- a/drivers/crypto/ccp/sev-dev.c
-> +++ b/drivers/crypto/ccp/sev-dev.c
-> @@ -109,6 +109,13 @@ static void *sev_init_ex_buffer;
->   */
->  static struct sev_data_range_list *snp_range_list;
->
-> +static int snp_shutdown_on_panic(struct notifier_block *nb,
-> +                                unsigned long reason, void *arg);
-> +
-> +static struct notifier_block snp_panic_notifier =3D {
-> +       .notifier_call =3D snp_shutdown_on_panic,
-> +};
-> +
->  static inline bool sev_version_greater_or_equal(u8 maj, u8 min)
->  {
->         struct sev_device *sev =3D psp_master->sev_data;
-> @@ -1191,6 +1198,9 @@ static int __sev_snp_init_locked(int *error)
->         dev_info(sev->dev, "SEV-SNP API:%d.%d build:%d\n", sev->api_major=
-,
->                  sev->api_minor, sev->build);
->
-> +       atomic_notifier_chain_register(&panic_notifier_list,
-> +                                      &snp_panic_notifier);
-> +
->         sev_es_tmr_size =3D SNP_TMR_SIZE;
->
->         return 0;
-> @@ -1751,6 +1761,9 @@ static int __sev_snp_shutdown_locked(int *error, bo=
-ol panic)
->         sev->snp_initialized =3D false;
->         dev_dbg(sev->dev, "SEV-SNP firmware shutdown\n");
->
-> +       atomic_notifier_chain_unregister(&panic_notifier_list,
-> +                                        &snp_panic_notifier);
-> +
->         /* Reset TMR size back to default */
->         sev_es_tmr_size =3D SEV_TMR_SIZE;
->
-> @@ -2490,10 +2503,6 @@ static int snp_shutdown_on_panic(struct notifier_b=
-lock *nb,
->         return NOTIFY_DONE;
->  }
->
-> -static struct notifier_block snp_panic_notifier =3D {
-> -       .notifier_call =3D snp_shutdown_on_panic,
-> -};
-> -
->  int sev_issue_cmd_external_user(struct file *filep, unsigned int cmd,
->                                 void *data, int *error)
->  {
-> @@ -2542,8 +2551,6 @@ void sev_pci_init(void)
->         dev_info(sev->dev, "SEV%s API:%d.%d build:%d\n", sev->snp_initial=
-ized ?
->                 "-SNP" : "", sev->api_major, sev->api_minor, sev->build);
->
-> -       atomic_notifier_chain_register(&panic_notifier_list,
-> -                                      &snp_panic_notifier);
->         return;
->
->  err:
-> @@ -2561,6 +2568,4 @@ void sev_pci_exit(void)
->
->         sev_firmware_shutdown(sev);
->
-> -       atomic_notifier_chain_unregister(&panic_notifier_list,
-> -                                        &snp_panic_notifier);
->  }
-> --
-> 2.34.1
->
 
-Reviewed-by: Dionna Glaze <dionnaglaze@google.com>
 
---=20
--Dionna Glaze, PhD, CISSP, CCSP (she/her)
+On 12/17/2024 3:37 PM, Sean Christopherson wrote:
+> On Tue, Dec 17, 2024, Ashish Kalra wrote:
+>>
+>>
+>> On 12/17/2024 10:00 AM, Dionna Amalie Glaze wrote:
+>>> On Mon, Dec 16, 2024 at 3:57 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
+>>>>
+>>>> From: Ashish Kalra <ashish.kalra@amd.com>
+>>>
+>>>> The on-demand SEV initialization support requires a fix in QEMU to
+>>>> remove check for SEV initialization to be done prior to launching
+>>>> SEV/SEV-ES VMs.
+>>>> NOTE: With the above fix for QEMU, older QEMU versions will be broken
+>>>> with respect to launching SEV/SEV-ES VMs with the newer kernel/KVM as
+>>>> older QEMU versions require SEV initialization to be done before
+>>>> launching SEV/SEV-ES VMs.
+>>>>
+>>>
+>>> I don't think this is okay. I think you need to introduce a KVM
+>>> capability to switch over to the new way of initializing SEV VMs and
+>>> deprecate the old way so it doesn't need to be supported for any new
+>>> additions to the interface.
+>>>
+>>
+>> But that means KVM will need to support both mechanisms of doing SEV
+>> initialization - during KVM module load time and the deferred/lazy
+>> (on-demand) SEV INIT during VM launch.
+> 
+> What's the QEMU change?  Dionna is right, we can't break userspace, but maybe
+> there's an alternative to supporting both models.
+
+Here is the QEMU fix : (makes a SEV PLATFORM STATUS firmware call via PSP driver ioctl
+to check if SEV is in INIT state)
+ 
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index 1a4eb1ada6..4fa8665395 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -1503,15 +1503,6 @@ static int sev_common_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
+         }
+     }
+
+-    if (sev_es_enabled() && !sev_snp_enabled()) {
+-        if (!(status.flags & SEV_STATUS_FLAGS_CONFIG_ES)) {
+-            error_setg(errp, "%s: guest policy requires SEV-ES, but "
+-                         "host SEV-ES support unavailable",
+-                         __func__);
+-            return -1;
+-        }
+-    }
+-
+     trace_kvm_sev_init();
+     switch (x86_klass->kvm_type(X86_CONFIDENTIAL_GUEST(sev_common))) {
+     case KVM_X86_DEFAULT_VM:
+
