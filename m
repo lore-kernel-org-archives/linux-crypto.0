@@ -1,98 +1,95 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEDB41FA8C0
-	for <linux-crypto@vger.kernel.org>; Wed, 18 Dec 2024 18:11:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E01FC1FBEA0
+	for <linux-crypto@vger.kernel.org>; Wed, 18 Dec 2024 19:10:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734545512; cv=none; b=WOyoA7cNoTQhicJQdE3WwcJnMr9lWWQcfwstPw4Nq59aRnXU9fNyL8DU0sBWMA/xTYKfKoVXJdrw5FO/cpaUtZsTcdgIhHrfpLh/KCSyNZeLHbm6pky30EazX/Aqt7PQXIAUJgn/2o1imlJ+3ZGlWj5Z624gRl7FSfSIyGco+ds=
+	t=1734549052; cv=none; b=mQx4FRS0kDqx631kwNvxY24BvuG3ydqRqHUGnribugwSqxW63oFuiq3JZbxdRva9hB37G/dzrftew+Hay4c/nR4aFbZlAQqs/ljQIbUyTcpAArk6iuChDw5zOzr/r9Ef1MGV1iwFL2ef/42EklX4esFszQviKGkcud0EbCbcLYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734545512; c=relaxed/simple;
-	bh=MbGPsRddoKT2xegMgVoc5THA4ay7NQie7gRhxqy9mNM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Lz4Tv6cW3E9Pf37d0nqTa5c0jnv0mnQS8uVFiu2Ee5/g2v0BQw2IwHczKMXi6Hleiy5onlL78iBmUdgaEBjnh2C6RgmBNbI5VmGsuaSrdScLcX1L7+zGHZZ+GYpzffTDYU+qx5SeYIAtxLMizcx4I4SHcGN+9Jce2X7NmgzSB6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N2Ftb8LV; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1734549052; c=relaxed/simple;
+	bh=jMj1OzrDjIrxeMoYOsAPw/b7S6pBg2XX6eTDS2vTCUk=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=h47WbF41dJPWhnbxC5Mg+MCh+nVM09SaQHBPeneWMyplZCoMcYSUnbiFEpslzuhAO2+x7/JdECk4iLLmiRywZZdfhE9gO9rLAsviwWRF4S2WW8EXiMrlo95DkI+TlovEeUHw68xu2np8nzcEjc1XKSHeYd0HsKBmb/T+FdlyyOs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=i6cbz8jy; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N2Ftb8LV"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1734545508;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5hJ2SHXu1pOna/DnfUkw5UMrkPPje5xxmW8kJSQbRmo=;
-	b=N2Ftb8LVzna/wrv/zc6LhlGgDS5TOXV3J+mSI3knUnQaYeWzhYOMTEWO3pq8GTYKMxwhIn
-	un9jGnFFBywiHYXYesyoYQukkolgkZy2B4MerewzfWTkQn8vo9RhRdpidU8EZcX8kUgEXp
-	BoQBZULb9VsSE1DzBQIR2+tWiEkvLIY=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-63-cO5fZVSEOy2f-r4Ot-m8kA-1; Wed,
- 18 Dec 2024 13:11:44 -0500
-X-MC-Unique: cO5fZVSEOy2f-r4Ot-m8kA-1
-X-Mimecast-MFC-AGG-ID: cO5fZVSEOy2f-r4Ot-m8kA
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3AD851956096;
-	Wed, 18 Dec 2024 18:11:38 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.28.61])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D3ACE30044C1;
-	Wed, 18 Dec 2024 18:11:31 +0000 (UTC)
-Date: Wed, 18 Dec 2024 18:11:28 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: "Kalra, Ashish" <ashish.kalra@amd.com>
-Cc: Sean Christopherson <seanjc@google.com>,
-	Dionna Amalie Glaze <dionnaglaze@google.com>, pbonzini@redhat.com,
-	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-	thomas.lendacky@amd.com, john.allen@amd.com,
-	herbert@gondor.apana.org.au, davem@davemloft.net,
-	michael.roth@amd.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-coco@lists.linux.dev
-Subject: Re: [PATCH v2 0/9] Move initializing SEV/SNP functionality to KVM
-Message-ID: <Z2MQUKknmqIwLSKk@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <cover.1734392473.git.ashish.kalra@amd.com>
- <CAAH4kHa2msL_gvk12h_qv9h2M43hVKQQaaYeEXV14=R3VtqsPg@mail.gmail.com>
- <cc27bfe2-de7c-4038-86e3-58da65f84e50@amd.com>
- <Z2HvJESqpc7Gd-dG@google.com>
- <57d43fae-ab5e-4686-9fed-82cd3c0e0a3c@amd.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="i6cbz8jy"
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-725e8775611so33662b3a.1
+        for <linux-crypto@vger.kernel.org>; Wed, 18 Dec 2024 11:10:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1734549049; x=1735153849; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YClUdPoywXVSqRLvOMBrpQD/YaQSG0s79CHQrCDEw+U=;
+        b=i6cbz8jyMqb2VdeZyEovdZzi5pM+Rs5D/WSs9i3tQmh6UMfUTPdTgNtV4e4UARhmWk
+         9cEtf4hNwByGUaUzv2CCXvcn3gORXmn8bVVJ+1NmskffzmbrFnFLHZRyKCyms+2XckbV
+         APnwB1Rda19/wgFQ/G6NuDQY8+gav4ruFaTyrFa1UyPip1WfyaC53ZRxP2lS8GZBLYiK
+         aCkgAq2t4tIpG2FwbIQferNWkQudyd/NFp+rBwNb/QSLu2trX5OlM1k9KlY+oIKj/HUz
+         uOAdBAqDCfZsP9gRFWW0OEi+GmWsBZH56XOTOnT1tkHkfLmRhzej/C9GxsTIMKF5fG9/
+         C99g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1734549049; x=1735153849;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=YClUdPoywXVSqRLvOMBrpQD/YaQSG0s79CHQrCDEw+U=;
+        b=iGz1LVv3yl7Fh1v5/bBBM/aHtsFUj3S9oBb+gUcGUR93v+C9K7Xw5ICdEqmsgg2ZTJ
+         b76pr3JvcwZAokrEdHjq1kjigsZKLXT3O9Hkk/xPl8oCfRXm57jhX1mYX5EIIP5PwE7t
+         930efmXtt5T2uYhaEsCr8M1Ivr+eUUwMIvPYH8nSQqnKCAtEGcvvdXydtfBxMYY2dSw3
+         G7Rl+8VmglKNYfnK6br2zcQNFns2HnnFHguylYfnD1hq094R1wYpf96oLQvp9rrp6eRg
+         +Gv6hknRE5oHhmkOeUgY3QoG7Hlw9lkx7340tDFNkVyftaLL/s3NlVDyO4T2fnSv58JQ
+         +vlQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXeTWnjnN1xr0GHg8tExXnM0pfEXNP/zDk5CHW8iJr5VxNF2R1lP0FMucQZ/AsuqmklVO4HWroSNW0aGYk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxakV8LkmOTb/bdGZCppYLWjgT/SUmwMWfNi3VgWQnrZguM2+2h
+	1hqUsuh8NhHLcMdoeIWQsxGT4F3uPCFz2unx+x16JkekaY0XIuip0E21Kur3Ln1s15r4GpuGZfc
+	Uog==
+X-Google-Smtp-Source: AGHT+IH1B/bbkp0G6ABRo9fqVZ6adP+tKt8f/j21FuyOVEbiorHToFEL5buQ5JKv3Q2UPzxlMkYtWT3lSj0=
+X-Received: from pgda26.prod.google.com ([2002:a63:7f1a:0:b0:7fd:561e:62dd])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:e68f:b0:1e1:aa24:2e56
+ with SMTP id adf61e73a8af0-1e5c76afd3emr528641637.30.1734549049187; Wed, 18
+ Dec 2024 11:10:49 -0800 (PST)
+Date: Wed, 18 Dec 2024 11:10:47 -0800
+In-Reply-To: <57d43fae-ab5e-4686-9fed-82cd3c0e0a3c@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <57d43fae-ab5e-4686-9fed-82cd3c0e0a3c@amd.com>
-User-Agent: Mutt/2.2.13 (2024-03-09)
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Mime-Version: 1.0
+References: <cover.1734392473.git.ashish.kalra@amd.com> <CAAH4kHa2msL_gvk12h_qv9h2M43hVKQQaaYeEXV14=R3VtqsPg@mail.gmail.com>
+ <cc27bfe2-de7c-4038-86e3-58da65f84e50@amd.com> <Z2HvJESqpc7Gd-dG@google.com> <57d43fae-ab5e-4686-9fed-82cd3c0e0a3c@amd.com>
+Message-ID: <Z2MeN9z69ul3oGiN@google.com>
+Subject: Re: [PATCH v2 0/9] Move initializing SEV/SNP functionality to KVM
+From: Sean Christopherson <seanjc@google.com>
+To: Ashish Kalra <ashish.kalra@amd.com>
+Cc: Dionna Amalie Glaze <dionnaglaze@google.com>, pbonzini@redhat.com, tglx@linutronix.de, 
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
+	hpa@zytor.com, thomas.lendacky@amd.com, john.allen@amd.com, 
+	herbert@gondor.apana.org.au, davem@davemloft.net, michael.roth@amd.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-coco@lists.linux.dev
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 17, 2024 at 05:16:01PM -0600, Kalra, Ashish wrote:
-> 
-> 
+On Tue, Dec 17, 2024, Ashish Kalra wrote:
 > On 12/17/2024 3:37 PM, Sean Christopherson wrote:
 > > On Tue, Dec 17, 2024, Ashish Kalra wrote:
-> >>
-> >>
 > >> On 12/17/2024 10:00 AM, Dionna Amalie Glaze wrote:
-> >>> On Mon, Dec 16, 2024 at 3:57 PM Ashish Kalra <Ashish.Kalra@amd.com> wrote:
+> >>> On Mon, Dec 16, 2024 at 3:57=E2=80=AFPM Ashish Kalra <Ashish.Kalra@am=
+d.com> wrote:
 > >>>>
 > >>>> From: Ashish Kalra <ashish.kalra@amd.com>
 > >>>
 > >>>> The on-demand SEV initialization support requires a fix in QEMU to
 > >>>> remove check for SEV initialization to be done prior to launching
 > >>>> SEV/SEV-ES VMs.
-> >>>> NOTE: With the above fix for QEMU, older QEMU versions will be broken
-> >>>> with respect to launching SEV/SEV-ES VMs with the newer kernel/KVM as
+> >>>> NOTE: With the above fix for QEMU, older QEMU versions will be broke=
+n
+> >>>> with respect to launching SEV/SEV-ES VMs with the newer kernel/KVM a=
+s
 > >>>> older QEMU versions require SEV initialization to be done before
 > >>>> launching SEV/SEV-ES VMs.
 > >>>>
@@ -106,21 +103,23 @@ On Tue, Dec 17, 2024 at 05:16:01PM -0600, Kalra, Ashish wrote:
 > >> But that means KVM will need to support both mechanisms of doing SEV
 > >> initialization - during KVM module load time and the deferred/lazy
 > >> (on-demand) SEV INIT during VM launch.
-> > 
-> > What's the QEMU change?  Dionna is right, we can't break userspace, but maybe
+> >=20
+> > What's the QEMU change?  Dionna is right, we can't break userspace, but=
+ maybe
 > > there's an alternative to supporting both models.
-> 
-> Here is the QEMU fix : (makes a SEV PLATFORM STATUS firmware call via PSP driver ioctl
-> to check if SEV is in INIT state)
->  
+>=20
+> Here is the QEMU fix : (makes a SEV PLATFORM STATUS firmware call via PSP
+> driver ioctl to check if SEV is in INIT state)
+> =20
 > diff --git a/target/i386/sev.c b/target/i386/sev.c
 > index 1a4eb1ada6..4fa8665395 100644
 > --- a/target/i386/sev.c
 > +++ b/target/i386/sev.c
-> @@ -1503,15 +1503,6 @@ static int sev_common_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
+> @@ -1503,15 +1503,6 @@ static int sev_common_kvm_init(ConfidentialGuestSu=
+pport *cgs, Error **errp)
 >          }
 >      }
-> 
+>=20
 > -    if (sev_es_enabled() && !sev_snp_enabled()) {
 > -        if (!(status.flags & SEV_STATUS_FLAGS_CONFIG_ES)) {
 > -            error_setg(errp, "%s: guest policy requires SEV-ES, but "
@@ -130,19 +129,12 @@ On Tue, Dec 17, 2024 at 05:16:01PM -0600, Kalra, Ashish wrote:
 > -        }
 > -    }
 
-Sigh, that code exists in all versions of QEMU that shipped with SEV-ES
-support. IOW the proposed kernel change is not limited to breaking
-"older QEMU versions". Every QEMU for the last 3 years will break,
-including the newest version released last week. Please don't do that.
+Aside from breaking userspace, removing a sanity check is not a "fix".
 
-If the kvm-svm  kmod supports both load time init and lazy init, then
-the QEMU incompatibility still exists, and will likely get pushed on
-users by the OS distro forcing use of the lazy-load option :-(
-
-With regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+Can't we simply have the kernel do __sev_platform_init_locked() on-demand f=
+or
+SEV_PLATFORM_STATUS?  The goal with lazy initialization is defer initializa=
+tion
+until it's necessary so that userspace can do firmware updates.  And it's q=
+uite
+clearly necessary in this case, so...
