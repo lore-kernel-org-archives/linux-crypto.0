@@ -1,140 +1,138 @@
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E01FC1FBEA0
-	for <linux-crypto@vger.kernel.org>; Wed, 18 Dec 2024 19:10:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E8D71F7096;
+	Wed, 18 Dec 2024 20:13:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734549052; cv=none; b=mQx4FRS0kDqx631kwNvxY24BvuG3ydqRqHUGnribugwSqxW63oFuiq3JZbxdRva9hB37G/dzrftew+Hay4c/nR4aFbZlAQqs/ljQIbUyTcpAArk6iuChDw5zOzr/r9Ef1MGV1iwFL2ef/42EklX4esFszQviKGkcud0EbCbcLYg=
+	t=1734552791; cv=none; b=Hqzokc9bw6tnYA3KCcKz2WrPVlv4C1cTxVtshOEp5IML1NnTq8VImD1JAnrrSYeKIZY/2GA7Tu8NaVptoJa/08q5ASlmZ+yaNtozef+HfachyeiRBsqNp+uBkMrRIYpoSFD23gpUTZ1BFk752s1jBGOEi4PeL8bW/khIyXfEvZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734549052; c=relaxed/simple;
-	bh=jMj1OzrDjIrxeMoYOsAPw/b7S6pBg2XX6eTDS2vTCUk=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=h47WbF41dJPWhnbxC5Mg+MCh+nVM09SaQHBPeneWMyplZCoMcYSUnbiFEpslzuhAO2+x7/JdECk4iLLmiRywZZdfhE9gO9rLAsviwWRF4S2WW8EXiMrlo95DkI+TlovEeUHw68xu2np8nzcEjc1XKSHeYd0HsKBmb/T+FdlyyOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=i6cbz8jy; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+	s=arc-20240116; t=1734552791; c=relaxed/simple;
+	bh=Zu1wkLlLpFxiSSSSnwPt2KRCeanwRhzomPiVjRGTZdo=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=vA8Rx2NAauFDGjSmMLis/i+qJClgu6zASjxUjar4opKJrWAV+Xxv8SjT1qZuK8Y4bP602TRs/yG4jdHTQNg3XHyHkrgR0kt2HISAJVDqw5O0hbtR9T4MJJ3HBnRjTXcObZeVxsldENU0AdW6VyQv+75JvFx1pNMBD30qTkPIm3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l0Yw0bHl; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="i6cbz8jy"
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-725e8775611so33662b3a.1
-        for <linux-crypto@vger.kernel.org>; Wed, 18 Dec 2024 11:10:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1734549049; x=1735153849; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YClUdPoywXVSqRLvOMBrpQD/YaQSG0s79CHQrCDEw+U=;
-        b=i6cbz8jyMqb2VdeZyEovdZzi5pM+Rs5D/WSs9i3tQmh6UMfUTPdTgNtV4e4UARhmWk
-         9cEtf4hNwByGUaUzv2CCXvcn3gORXmn8bVVJ+1NmskffzmbrFnFLHZRyKCyms+2XckbV
-         APnwB1Rda19/wgFQ/G6NuDQY8+gav4ruFaTyrFa1UyPip1WfyaC53ZRxP2lS8GZBLYiK
-         aCkgAq2t4tIpG2FwbIQferNWkQudyd/NFp+rBwNb/QSLu2trX5OlM1k9KlY+oIKj/HUz
-         uOAdBAqDCfZsP9gRFWW0OEi+GmWsBZH56XOTOnT1tkHkfLmRhzej/C9GxsTIMKF5fG9/
-         C99g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1734549049; x=1735153849;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=YClUdPoywXVSqRLvOMBrpQD/YaQSG0s79CHQrCDEw+U=;
-        b=iGz1LVv3yl7Fh1v5/bBBM/aHtsFUj3S9oBb+gUcGUR93v+C9K7Xw5ICdEqmsgg2ZTJ
-         b76pr3JvcwZAokrEdHjq1kjigsZKLXT3O9Hkk/xPl8oCfRXm57jhX1mYX5EIIP5PwE7t
-         930efmXtt5T2uYhaEsCr8M1Ivr+eUUwMIvPYH8nSQqnKCAtEGcvvdXydtfBxMYY2dSw3
-         G7Rl+8VmglKNYfnK6br2zcQNFns2HnnFHguylYfnD1hq094R1wYpf96oLQvp9rrp6eRg
-         +Gv6hknRE5oHhmkOeUgY3QoG7Hlw9lkx7340tDFNkVyftaLL/s3NlVDyO4T2fnSv58JQ
-         +vlQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXeTWnjnN1xr0GHg8tExXnM0pfEXNP/zDk5CHW8iJr5VxNF2R1lP0FMucQZ/AsuqmklVO4HWroSNW0aGYk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxakV8LkmOTb/bdGZCppYLWjgT/SUmwMWfNi3VgWQnrZguM2+2h
-	1hqUsuh8NhHLcMdoeIWQsxGT4F3uPCFz2unx+x16JkekaY0XIuip0E21Kur3Ln1s15r4GpuGZfc
-	Uog==
-X-Google-Smtp-Source: AGHT+IH1B/bbkp0G6ABRo9fqVZ6adP+tKt8f/j21FuyOVEbiorHToFEL5buQ5JKv3Q2UPzxlMkYtWT3lSj0=
-X-Received: from pgda26.prod.google.com ([2002:a63:7f1a:0:b0:7fd:561e:62dd])
- (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:e68f:b0:1e1:aa24:2e56
- with SMTP id adf61e73a8af0-1e5c76afd3emr528641637.30.1734549049187; Wed, 18
- Dec 2024 11:10:49 -0800 (PST)
-Date: Wed, 18 Dec 2024 11:10:47 -0800
-In-Reply-To: <57d43fae-ab5e-4686-9fed-82cd3c0e0a3c@amd.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l0Yw0bHl"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58E6BC4CECD;
+	Wed, 18 Dec 2024 20:13:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1734552791;
+	bh=Zu1wkLlLpFxiSSSSnwPt2KRCeanwRhzomPiVjRGTZdo=;
+	h=From:Date:Subject:To:Cc:From;
+	b=l0Yw0bHlNyBpXe+Bbr+Hc4t2LVQHXYOLBLhfiwDcMOPA3iTXKQc6gb4eHdyM+1tNm
+	 7cohx3wtAe9LKNXTOjxUhg7Oc+IV8hImwHt7cJ8j4B+hjEe9gE92UNXA+iA4xZ2Hqi
+	 cBJrOFoOyYN9pCTpMhsQJXb5dX4rXzG4H7Jxkctox2h2cg/+yx71yAYHEDwFSgjcbI
+	 Nv63qs3A0UrfC1PVvmcqzoNaEd/fGq+urlpCrL2G08211YXllfMegfesSuY9qBDveI
+	 2yCmxRNwNEQ03Cfo+WDSXqscec88EnaxgAV5mu8Fx/iH0+OgpZcUY6+snosYC5nDHP
+	 0iRloX47FCUEw==
+From: Nathan Chancellor <nathan@kernel.org>
+Date: Wed, 18 Dec 2024 13:11:17 -0700
+Subject: [PATCH] crypto: qce - revert "use __free() for a buffer that's
+ always freed"
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <cover.1734392473.git.ashish.kalra@amd.com> <CAAH4kHa2msL_gvk12h_qv9h2M43hVKQQaaYeEXV14=R3VtqsPg@mail.gmail.com>
- <cc27bfe2-de7c-4038-86e3-58da65f84e50@amd.com> <Z2HvJESqpc7Gd-dG@google.com> <57d43fae-ab5e-4686-9fed-82cd3c0e0a3c@amd.com>
-Message-ID: <Z2MeN9z69ul3oGiN@google.com>
-Subject: Re: [PATCH v2 0/9] Move initializing SEV/SNP functionality to KVM
-From: Sean Christopherson <seanjc@google.com>
-To: Ashish Kalra <ashish.kalra@amd.com>
-Cc: Dionna Amalie Glaze <dionnaglaze@google.com>, pbonzini@redhat.com, tglx@linutronix.de, 
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
-	hpa@zytor.com, thomas.lendacky@amd.com, john.allen@amd.com, 
-	herbert@gondor.apana.org.au, davem@davemloft.net, michael.roth@amd.com, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, linux-coco@lists.linux.dev
+MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+Message-Id: <20241218-crypto-qce-sha-fix-clang-cleanup-error-v1-1-7e6c6dcca345@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAGQsY2cC/x2N0QrCMBAEf6XcswdJWqL4K+JDSFd7IEm8WFFK/
+ 93Dl4WBYXajDhV0Og8bKd7SpRYDfxgoL6ncwTIbU3Bh8sGfOOu3vSo/M7gviW/y4fww0RaprI2
+ hWpUdJneMMY7jHMhiTWHq/+hy3fcfqCGl+3gAAAA=
+X-Change-ID: 20241218-crypto-qce-sha-fix-clang-cleanup-error-0e40766633d2
+To: Thara Gopinath <thara.gopinath@gmail.com>, 
+ Herbert Xu <herbert@gondor.apana.org.au>, 
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Cc: Neil Armstrong <neil.armstrong@linaro.org>, 
+ linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, llvm@lists.linux.dev, patches@lists.linux.dev, 
+ Linux Kernel Functional Testing <lkft@linaro.org>, 
+ Nathan Chancellor <nathan@kernel.org>
+X-Mailer: b4 0.15-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2945; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=Zu1wkLlLpFxiSSSSnwPt2KRCeanwRhzomPiVjRGTZdo=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDOnJOldScnuvagWpbr02rd7DkXciq1+G75PimRHVReyhi
+ 6xYH97rKGVhEONikBVTZKl+rHrc0HDOWcYbpybBzGFlAhnCwMUpABNpOcrIsKDwWaTPjD7bdmGb
+ qsWLDG7tsnbcP3d/kM5tE30J0/S2HIZ/CoJO++Lv+nxj71/7wuxTmGrGhv4JJ2ouMrFcfSbHfD+
+ bDwA=
+X-Developer-Key: i=nathan@kernel.org; a=openpgp;
+ fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-On Tue, Dec 17, 2024, Ashish Kalra wrote:
-> On 12/17/2024 3:37 PM, Sean Christopherson wrote:
-> > On Tue, Dec 17, 2024, Ashish Kalra wrote:
-> >> On 12/17/2024 10:00 AM, Dionna Amalie Glaze wrote:
-> >>> On Mon, Dec 16, 2024 at 3:57=E2=80=AFPM Ashish Kalra <Ashish.Kalra@am=
-d.com> wrote:
-> >>>>
-> >>>> From: Ashish Kalra <ashish.kalra@amd.com>
-> >>>
-> >>>> The on-demand SEV initialization support requires a fix in QEMU to
-> >>>> remove check for SEV initialization to be done prior to launching
-> >>>> SEV/SEV-ES VMs.
-> >>>> NOTE: With the above fix for QEMU, older QEMU versions will be broke=
-n
-> >>>> with respect to launching SEV/SEV-ES VMs with the newer kernel/KVM a=
-s
-> >>>> older QEMU versions require SEV initialization to be done before
-> >>>> launching SEV/SEV-ES VMs.
-> >>>>
-> >>>
-> >>> I don't think this is okay. I think you need to introduce a KVM
-> >>> capability to switch over to the new way of initializing SEV VMs and
-> >>> deprecate the old way so it doesn't need to be supported for any new
-> >>> additions to the interface.
-> >>>
-> >>
-> >> But that means KVM will need to support both mechanisms of doing SEV
-> >> initialization - during KVM module load time and the deferred/lazy
-> >> (on-demand) SEV INIT during VM launch.
-> >=20
-> > What's the QEMU change?  Dionna is right, we can't break userspace, but=
- maybe
-> > there's an alternative to supporting both models.
->=20
-> Here is the QEMU fix : (makes a SEV PLATFORM STATUS firmware call via PSP
-> driver ioctl to check if SEV is in INIT state)
-> =20
-> diff --git a/target/i386/sev.c b/target/i386/sev.c
-> index 1a4eb1ada6..4fa8665395 100644
-> --- a/target/i386/sev.c
-> +++ b/target/i386/sev.c
-> @@ -1503,15 +1503,6 @@ static int sev_common_kvm_init(ConfidentialGuestSu=
-pport *cgs, Error **errp)
->          }
->      }
->=20
-> -    if (sev_es_enabled() && !sev_snp_enabled()) {
-> -        if (!(status.flags & SEV_STATUS_FLAGS_CONFIG_ES)) {
-> -            error_setg(errp, "%s: guest policy requires SEV-ES, but "
-> -                         "host SEV-ES support unavailable",
-> -                         __func__);
-> -            return -1;
-> -        }
-> -    }
+Commit ce8fd0500b74 ("crypto: qce - use __free() for a buffer that's
+always freed") introduced a buggy use of __free(), which clang
+rightfully points out:
 
-Aside from breaking userspace, removing a sanity check is not a "fix".
+  drivers/crypto/qce/sha.c:365:3: error: cannot jump from this goto statement to its label
+    365 |                 goto err_free_ahash;
+        |                 ^
+  drivers/crypto/qce/sha.c:373:6: note: jump bypasses initialization of variable with __attribute__((cleanup))
+    373 |         u8 *buf __free(kfree) = kzalloc(keylen + QCE_MAX_ALIGN_SIZE,
+        |             ^
 
-Can't we simply have the kernel do __sev_platform_init_locked() on-demand f=
-or
-SEV_PLATFORM_STATUS?  The goal with lazy initialization is defer initializa=
-tion
-until it's necessary so that userspace can do firmware updates.  And it's q=
-uite
-clearly necessary in this case, so...
+Jumping over a variable declared with the cleanup attribute does not
+prevent the cleanup function from running; instead, the cleanup function
+is called with an uninitialized value.
+
+Moving the declaration back to the top function with __free() and a NULL
+initialization would resolve the bug but that is really not much
+different from the original code. Since the function is so simple and
+there is no functional reason to use __free() here, just revert the
+original change to resolve the issue.
+
+Fixes: ce8fd0500b74 ("crypto: qce - use __free() for a buffer that's always freed")
+Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+Closes: https://lore.kernel.org/CA+G9fYtpAwXa5mUQ5O7vDLK2xN4t-kJoxgUe1ZFRT=AGqmLSRA@mail.gmail.com/
+Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+---
+ drivers/crypto/qce/sha.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/crypto/qce/sha.c b/drivers/crypto/qce/sha.c
+index c4ddc3b265eedecfd048662dc8935aa3e20fc646..71b748183cfa86fb850487374dcc24c4b0b8143f 100644
+--- a/drivers/crypto/qce/sha.c
++++ b/drivers/crypto/qce/sha.c
+@@ -3,7 +3,6 @@
+  * Copyright (c) 2010-2014, The Linux Foundation. All rights reserved.
+  */
+ 
+-#include <linux/cleanup.h>
+ #include <linux/device.h>
+ #include <linux/dma-mapping.h>
+ #include <linux/interrupt.h>
+@@ -337,6 +336,7 @@ static int qce_ahash_hmac_setkey(struct crypto_ahash *tfm, const u8 *key,
+ 	struct scatterlist sg;
+ 	unsigned int blocksize;
+ 	struct crypto_ahash *ahash_tfm;
++	u8 *buf;
+ 	int ret;
+ 	const char *alg_name;
+ 
+@@ -370,8 +370,7 @@ static int qce_ahash_hmac_setkey(struct crypto_ahash *tfm, const u8 *key,
+ 				   crypto_req_done, &wait);
+ 	crypto_ahash_clear_flags(ahash_tfm, ~0);
+ 
+-	u8 *buf __free(kfree) = kzalloc(keylen + QCE_MAX_ALIGN_SIZE,
+-					GFP_KERNEL);
++	buf = kzalloc(keylen + QCE_MAX_ALIGN_SIZE, GFP_KERNEL);
+ 	if (!buf) {
+ 		ret = -ENOMEM;
+ 		goto err_free_req;
+@@ -383,6 +382,7 @@ static int qce_ahash_hmac_setkey(struct crypto_ahash *tfm, const u8 *key,
+ 
+ 	ret = crypto_wait_req(crypto_ahash_digest(req), &wait);
+ 
++	kfree(buf);
+ err_free_req:
+ 	ahash_request_free(req);
+ err_free_ahash:
+
+---
+base-commit: f916e44487f56df4827069ff3a2070c0746dc511
+change-id: 20241218-crypto-qce-sha-fix-clang-cleanup-error-0e40766633d2
+
+Best regards,
+-- 
+Nathan Chancellor <nathan@kernel.org>
+
