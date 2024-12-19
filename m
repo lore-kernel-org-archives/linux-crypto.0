@@ -1,44 +1,73 @@
-Received: from forwardcorp1d.mail.yandex.net (forwardcorp1d.mail.yandex.net [178.154.239.200])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 245AA1E47B6;
-	Thu, 19 Dec 2024 08:14:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 711EA1BBBC6;
+	Thu, 19 Dec 2024 19:55:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734596089; cv=none; b=sg0MWSuiAjmho7umPXX6u2vKpxr/emv713YdfnzBND0BDo8p0CumF+pvuxbDeqdyx1n1dXzTW3+9M9fx/YSev2E/uaVbLvyCWvMt7Ao1PkO8a1JejqiR4/mENHxiPFGePpGAuO+JesbcoUqiAG8XhAHwUyqgy/Dz29WGA4hPzjk=
+	t=1734638127; cv=none; b=lPRe6XrQ6IcDyG8TwFlotn/nY5EFZvuO/xugefUJABIdfcs+ifEPrVS/LlCfcUEoks0n0ET0dcwtcvfyTI3xhzj8YqAPG34zeYnodk//DfSJFGwGSXVFA5aM8ErRchX4MK8mUPER16Q+jYGTvt1SLSrnIHhcGubGxYXxoWXkpK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734596089; c=relaxed/simple;
-	bh=0kvCy8gOMJvihmCmWwF/KYzUPSpz8HWf1k4W/UIl7PM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TAKRUEtaxGzJl1KsY9KsABG0qbInhpqQXkK84/CxvYOLb5aWrR3b+aH9HlbkAmVzqfW0/FJO4UIhOVf6YLc4MqojJdBq8hc7irSG7ORWdqdCz3oous8VXSCfaQAyfRqXbs1ukA3xfxA+bGhCqNOvZBSfzFZjHfNwP9EeE36fc00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru; spf=pass smtp.mailfrom=yandex-team.ru; dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b=hGRjpzbV; arc=none smtp.client-ip=178.154.239.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex-team.ru
+	s=arc-20240116; t=1734638127; c=relaxed/simple;
+	bh=O3c0W48e8LTTk2DtPzv+5mdmsAjvf17sagWcMrFvpAg=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=q5hlUrvxblqJLRohESQWgRjdmR5gzsA0nngGd4N4CPxBlgnZvwNnHGPDjvHTfGBoQrBBqi8nwkSzFQTWcIjmy0JuCmw7r/lx6S0CQyk7hMSkWybQSAZblI/nV3fCtwnNUwZOl/LJC4Z7HxyNJP3i824B4Y29TH832ZVTcstTxPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=O6TVdrc2; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="hGRjpzbV"
-Received: from mail-nwsmtp-smtp-corp-main-56.klg.yp-c.yandex.net (mail-nwsmtp-smtp-corp-main-56.klg.yp-c.yandex.net [IPv6:2a02:6b8:c42:b1cb:0:640:2a1e:0])
-	by forwardcorp1d.mail.yandex.net (Yandex) with ESMTPS id 1B3A560A89;
-	Thu, 19 Dec 2024 11:12:52 +0300 (MSK)
-Received: from den-plotnikov-n.yandex-team.ru (unknown [2a02:6b8:b081:7212::1:2c])
-	by mail-nwsmtp-smtp-corp-main-56.klg.yp-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id LCNib32IeqM0-YwyFNNEa;
-	Thu, 19 Dec 2024 11:12:51 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
-	s=default; t=1734595971;
-	bh=cCjJK/VDvZMVPLkNJF5eVbXTCNBDUUBmZ7KoutTR+vA=;
-	h=Message-Id:Date:Cc:Subject:To:From;
-	b=hGRjpzbV31CufaIQys7SQ2RoLjIVgKPugwlwUHjqPs5rw62BYZkI1Ntlwepe16o3S
-	 1BCkl7YKL2j/nEgJZxZJnTOYMugO1YU3OtnIVMEG+4e6uFzDtBS2vnOgNL/K8HSeNE
-	 O19DiJ2OYM9X44kW5sGwrpbusDWnyH/BJnVTPXF8=
-Authentication-Results: mail-nwsmtp-smtp-corp-main-56.klg.yp-c.yandex.net; dkim=pass header.i=@yandex-team.ru
-From: Denis Plotnikov <den-plotnikov@yandex-team.ru>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	john.allen@amd.com,
-	thomas.lendacky@amd.com
-Subject: [PATCH v1] drivers/crypto/ccp: change signature of sp_init()
-Date: Thu, 19 Dec 2024 11:12:21 +0300
-Message-Id: <20241219081221.702806-1-den-plotnikov@yandex-team.ru>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="O6TVdrc2"
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BJIMglH005093;
+	Thu, 19 Dec 2024 19:54:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=corp-2023-11-20; bh=vr2ns
+	18yTEELZ4QHgKstSA61qLwA6Ph8/LFZIUzTaG8=; b=O6TVdrc2ZaZhBBFve0H/N
+	mhrhteh0/ZijGaNp+SNyXPqnuIxFCXuBjeVBRlG3Xw7ynEy8Xb2p+qVrMgLXFKNz
+	lMyz90o7epfAT83bAYnU1Uh2Hhj+Wpo9Za4/5epMSBRhbqODFNudVQKVN4tHa8al
+	/ugA7BFlHqeybJf/inc9o+2rNjCznxD82/h0b8isH6gnXs8jpibe3NXO4WzK+MX5
+	0OvNyrByZqa7vGGHiCVKTwZPdq2BRgTpDSCLmzRUThKJCIAXm8ci9QuJ/dmDSzf6
+	q/cKmHbmLz2OgcTTeEIh85LmEuL2CflBoEe3Mdcx8fG+1aDPawCjVdXSh69mfhgJ
+	A==
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 43h0t2ksdf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 19 Dec 2024 19:54:58 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 4BJIq0fo006392;
+	Thu, 19 Dec 2024 19:54:57 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 43h0fcgmau-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Thu, 19 Dec 2024 19:54:57 +0000
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 4BJJsuiW018395;
+	Thu, 19 Dec 2024 19:54:56 GMT
+Received: from bur-virt-x6-2-100.us.oracle.com (bur-virt-x6-2-100.us.oracle.com [10.153.92.40])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 43h0fcgm8y-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Thu, 19 Dec 2024 19:54:56 +0000
+From: Ross Philipson <ross.philipson@oracle.com>
+To: linux-kernel@vger.kernel.org, x86@kernel.org,
+        linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
+        linux-efi@vger.kernel.org, iommu@lists.linux-foundation.org
+Cc: ross.philipson@oracle.com, dpsmith@apertussolutions.com,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, hpa@zytor.com,
+        dave.hansen@linux.intel.com, ardb@kernel.org, mjg59@srcf.ucam.org,
+        James.Bottomley@hansenpartnership.com, peterhuewe@gmx.de,
+        jarkko@kernel.org, jgg@ziepe.ca, luto@amacapital.net,
+        nivedita@alum.mit.edu, herbert@gondor.apana.org.au,
+        davem@davemloft.net, corbet@lwn.net, ebiederm@xmission.com,
+        dwmw2@infradead.org, baolu.lu@linux.intel.com,
+        kanth.ghatraju@oracle.com, andrew.cooper3@citrix.com,
+        trenchboot-devel@googlegroups.com
+Subject: [PATCH v12 06/19] x86: Add early SHA-256 support for Secure Launch early measurements
+Date: Thu, 19 Dec 2024 11:42:03 -0800
+Message-Id: <20241219194216.152839-7-ross.philipson@oracle.com>
+X-Mailer: git-send-email 2.39.3
+In-Reply-To: <20241219194216.152839-1-ross.philipson@oracle.com>
+References: <20241219194216.152839-1-ross.philipson@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -46,81 +75,56 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2024-12-19_09,2024-12-19_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 phishscore=0
+ malwarescore=0 bulkscore=0 spamscore=0 mlxlogscore=999 suspectscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2411120000 definitions=main-2412190158
+X-Proofpoint-ORIG-GUID: rhQBxxrY5nDqOJ8qrEudA2D0Iox89ncq
+X-Proofpoint-GUID: rhQBxxrY5nDqOJ8qrEudA2D0Iox89ncq
 
-It always returns 0 so make it void instead of int.
+From: "Daniel P. Smith" <dpsmith@apertussolutions.com>
 
-Signed-off-by: Denis Plotnikov <den-plotnikov@yandex-team.ru>
+The SHA-256 algorithm is necessary to measure configuration information into
+the TPM as early as possible before using the values. This implementation
+uses the established approach of #including the SHA-256 libraries directly in
+the code since the compressed kernel is not uncompressed at this point.
+
+Signed-off-by: Daniel P. Smith <dpsmith@apertussolutions.com>
+Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
 ---
- drivers/crypto/ccp/sp-dev.c      | 3 +--
- drivers/crypto/ccp/sp-dev.h      | 2 +-
- drivers/crypto/ccp/sp-pci.c      | 4 +---
- drivers/crypto/ccp/sp-platform.c | 4 +---
- 4 files changed, 4 insertions(+), 9 deletions(-)
+ arch/x86/boot/compressed/Makefile | 2 +-
+ arch/x86/boot/compressed/sha256.c | 6 ++++++
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+ create mode 100644 arch/x86/boot/compressed/sha256.c
 
-diff --git a/drivers/crypto/ccp/sp-dev.c b/drivers/crypto/ccp/sp-dev.c
-index 7eb3e46682860..bd6800dc190ca 100644
---- a/drivers/crypto/ccp/sp-dev.c
-+++ b/drivers/crypto/ccp/sp-dev.c
-@@ -188,7 +188,7 @@ struct sp_device *sp_alloc_struct(struct device *dev)
- 	return sp;
- }
+diff --git a/arch/x86/boot/compressed/Makefile b/arch/x86/boot/compressed/Makefile
+index 7eb03afb841b..40dc0b9babd5 100644
+--- a/arch/x86/boot/compressed/Makefile
++++ b/arch/x86/boot/compressed/Makefile
+@@ -107,7 +107,7 @@ vmlinux-objs-$(CONFIG_EFI) += $(obj)/efi.o
+ vmlinux-objs-$(CONFIG_EFI_MIXED) += $(obj)/efi_mixed.o
+ vmlinux-libs-$(CONFIG_EFI_STUB) += $(objtree)/drivers/firmware/efi/libstub/lib.a
  
--int sp_init(struct sp_device *sp)
-+void sp_init(struct sp_device *sp)
- {
- 	sp_add_device(sp);
+-vmlinux-objs-$(CONFIG_SECURE_LAUNCH) += $(obj)/sha1.o
++vmlinux-objs-$(CONFIG_SECURE_LAUNCH) += $(obj)/sha1.o $(obj)/sha256.o
  
-@@ -197,7 +197,6 @@ int sp_init(struct sp_device *sp)
- 
- 	if (sp->dev_vdata->psp_vdata)
- 		psp_dev_init(sp);
--	return 0;
- }
- 
- void sp_destroy(struct sp_device *sp)
-diff --git a/drivers/crypto/ccp/sp-dev.h b/drivers/crypto/ccp/sp-dev.h
-index 6f9d7063257d7..89146a41a228d 100644
---- a/drivers/crypto/ccp/sp-dev.h
-+++ b/drivers/crypto/ccp/sp-dev.h
-@@ -136,7 +136,7 @@ void sp_platform_exit(void);
- 
- struct sp_device *sp_alloc_struct(struct device *dev);
- 
--int sp_init(struct sp_device *sp);
-+void sp_init(struct sp_device *sp);
- void sp_destroy(struct sp_device *sp);
- 
- int sp_suspend(struct sp_device *sp);
-diff --git a/drivers/crypto/ccp/sp-pci.c b/drivers/crypto/ccp/sp-pci.c
-index 248d98fd8c48d..60ae129997481 100644
---- a/drivers/crypto/ccp/sp-pci.c
-+++ b/drivers/crypto/ccp/sp-pci.c
-@@ -299,9 +299,7 @@ static int sp_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 
- 	dev_set_drvdata(dev, sp);
- 
--	ret = sp_init(sp);
--	if (ret)
--		goto free_irqs;
-+	sp_init(sp);
- 
- 	return 0;
- 
-diff --git a/drivers/crypto/ccp/sp-platform.c b/drivers/crypto/ccp/sp-platform.c
-index 3933cac1694d4..5abe531edb48c 100644
---- a/drivers/crypto/ccp/sp-platform.c
-+++ b/drivers/crypto/ccp/sp-platform.c
-@@ -161,9 +161,7 @@ static int sp_platform_probe(struct platform_device *pdev)
- 
- 	dev_set_drvdata(dev, sp);
- 
--	ret = sp_init(sp);
--	if (ret)
--		goto e_err;
-+	sp_init(sp);
- 
- 	dev_notice(dev, "enabled\n");
- 
+ $(obj)/vmlinux: $(vmlinux-objs-y) $(vmlinux-libs-y) FORCE
+ 	$(call if_changed,ld)
+diff --git a/arch/x86/boot/compressed/sha256.c b/arch/x86/boot/compressed/sha256.c
+new file mode 100644
+index 000000000000..293742a90ddc
+--- /dev/null
++++ b/arch/x86/boot/compressed/sha256.c
+@@ -0,0 +1,6 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (c) 2024 Apertus Solutions, LLC
++ */
++
++#include "../../../../lib/crypto/sha256.c"
 -- 
-2.34.1
+2.39.3
 
