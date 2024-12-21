@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EBE51F2379
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE25D1F237C
 	for <linux-crypto@vger.kernel.org>; Sat, 21 Dec 2024 09:11:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734772294; cv=none; b=X/4LSy++BGesHsgAfJx0RrQWHkpmnecsS0VI9EmRMS8MfKH5z/8xDifv2/Zo2H6Apo9JIzzdRhC1l1d0b3XdwsWJqUG5iCtKQWVBXP4u3uCPankSHi7CvwQ5r++84MgHf6sKKUviO58Ct8rV7/1HC34DQq7mYfH5TjUNYJ3zohE=
+	t=1734772294; cv=none; b=SAzqcCrKjdIKFwMN0bG5PHnihIUUjFsPu1KnkoeBdH7gaJ6+vd2HAYRqIKbv+zYV0kei3tp5hekmJ+IfB8P6A6RRNss/t0ijL2pQZqDkfx8oZo2tmLErRdDyS3TD7gdfDXomySYJrcjUsNEbDT/XQH7NbT8x5oY7mlwp4FvlrpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1734772294; c=relaxed/simple;
-	bh=mSW8mWLKgO+z9pqafkyRDJs4ecTLipklsIRH/V4AmPg=;
+	bh=Tid3uWR33zstKwWKrQjCdNjEr2JkFhqZE4IB1spq8hc=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=doLJgFhTqSieiMVIeC6GEB9PNZKF7+zomUprUufXZ+YPvbKPEa0B1cW4dgl7W2MdJ4MWyg4n+WPsKoucIs78bN+FfYl+DDpYEh3HMwI8j4091vT8arc/RLitU8mGjRCNaxPxsp3cr52fshfA1Qone6G94QyDlW5bqtUME0iUH6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FqIHPQpO; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=dNK+t+3UMxo6nk4yiyYusprK/6vgaMouOge8CYE0KMaq7Dhab74n/xOSacmqoi7ea7nzKCaWL0Nxj11fizIlNgcBmtIadhcPOiCLW2b2KmMymuv1HFZJZ8RxSd6k2SFw+PfSYeuVfocsAk0M0NkIryVKho1OdbTxMJfLTko1UW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FkzPDXJx; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FqIHPQpO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59390C4CED7
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FkzPDXJx"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85D8BC4CEDD
 	for <linux-crypto@vger.kernel.org>; Sat, 21 Dec 2024 09:11:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1734772294;
-	bh=mSW8mWLKgO+z9pqafkyRDJs4ecTLipklsIRH/V4AmPg=;
+	bh=Tid3uWR33zstKwWKrQjCdNjEr2JkFhqZE4IB1spq8hc=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=FqIHPQpOXLPHJLxvBjN1aw3o4x+3607L406ANER6Rb1YI3jotUQBzQ1i3YWpJ0Zk0
-	 gqhCdEET+cM+WL2HcxiZvu2+Y1UDxF141qAJMCEfhOlXJJ7kqnoNCz2C3hZQ3Fp5Ax
-	 G8B+uvtvUMVqu6itRVEzLrQHg0C/IqoJKoCRPc8XbcmhHW2w33NQg853MvysydSIfz
-	 BhMimxGfYhwlbg4wzqAHyl68VaUEHgo2X/nJ00yEDVqAxtGHZLarmdh0nGlNmulIGY
-	 Om90T8Lb/jpjQEPIDzIdj7CiJna6vGTmG3OAbzhNajCL+Pj/NVeePk5Bly6qmdEOGW
-	 37yK++XQJEO/g==
+	b=FkzPDXJxo7GeSpcDcuxd3ohOIMj/pMgsrmdXVXtXXB9wP1P/bnA7sltQHWGUNJ+Ov
+	 lJBXL83cSvLa3P9L9CtLwPWv00Mj4s8e6ldBG3LgIzNbQnQMxU1qmk+gc38W3xpnYP
+	 8eNbR8FTVZ4ZKGVeoHYWD0hx8lM1YmlIuVYus/FbQkenhUdNl68RNd/L1IJg6aU36s
+	 YfQtzT1HfG0KSFmcKIW08tE5PXumDaeGeZf9AnpeRjuWyIheAFIeSFAQvPqF9hsaB+
+	 yUZD9M/1lQCyD5SS6/jD3y8dvWXmYBl0+9WxAaD7azqhxcTrnJwaL+0IJlR4p3OxxD
+	 w2QQYZXHFdF4A==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
-Subject: [PATCH 18/29] crypto: arm64 - use the new scatterwalk functions
-Date: Sat, 21 Dec 2024 01:10:45 -0800
-Message-ID: <20241221091056.282098-19-ebiggers@kernel.org>
+Subject: [PATCH 19/29] crypto: keywrap - use the new scatterwalk functions
+Date: Sat, 21 Dec 2024 01:10:46 -0800
+Message-ID: <20241221091056.282098-20-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20241221091056.282098-1-ebiggers@kernel.org>
 References: <20241221091056.282098-1-ebiggers@kernel.org>
@@ -44,230 +44,126 @@ Content-Transfer-Encoding: 8bit
 
 From: Eric Biggers <ebiggers@google.com>
 
-Use scatterwalk_next() which consolidates scatterwalk_clamp() and
-scatterwalk_map(), and use scatterwalk_done_src() which consolidates
-scatterwalk_unmap(), scatterwalk_advance(), and scatterwalk_done().
-Remove unnecessary code that seemed to be intended to advance to the
-next sg entry, which is already handled by the scatterwalk functions.
-Adjust variable naming slightly to keep things consistent.
+Replace calls to the deprecated function scatterwalk_copychunks() with
+memcpy_{from,to}_scatterwalk(), or just memcpy_{from,to}_sglist().
+
+Since scatterwalk_copychunks() was incorrectly being called without
+being followed by scatterwalk_done(), this also fixes a bug where the
+dcache of the destination page(s) was not being flushed on architectures
+that need that.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- arch/arm64/crypto/aes-ce-ccm-glue.c | 17 ++++------------
- arch/arm64/crypto/ghash-ce-glue.c   | 16 ++++-----------
- arch/arm64/crypto/sm4-ce-ccm-glue.c | 27 ++++++++++---------------
- arch/arm64/crypto/sm4-ce-gcm-glue.c | 31 ++++++++++++-----------------
- 4 files changed, 32 insertions(+), 59 deletions(-)
+ crypto/keywrap.c | 48 ++++++------------------------------------------
+ 1 file changed, 6 insertions(+), 42 deletions(-)
 
-diff --git a/arch/arm64/crypto/aes-ce-ccm-glue.c b/arch/arm64/crypto/aes-ce-ccm-glue.c
-index a2b5d6f20f4d..1c29546983bf 100644
---- a/arch/arm64/crypto/aes-ce-ccm-glue.c
-+++ b/arch/arm64/crypto/aes-ce-ccm-glue.c
-@@ -154,27 +154,18 @@ static void ccm_calculate_auth_mac(struct aead_request *req, u8 mac[])
- 	macp = ce_aes_ccm_auth_data(mac, (u8 *)&ltag, ltag.len, macp,
- 				    ctx->key_enc, num_rounds(ctx));
- 	scatterwalk_start(&walk, req->src);
+diff --git a/crypto/keywrap.c b/crypto/keywrap.c
+index 5ec4f94d46bd..700b7b79a93d 100644
+--- a/crypto/keywrap.c
++++ b/crypto/keywrap.c
+@@ -92,37 +92,10 @@ struct crypto_kw_block {
+ #define SEMIBSIZE 8
+ 	__be64 A;
+ 	__be64 R;
+ };
  
- 	do {
--		u32 n = scatterwalk_clamp(&walk, len);
--		u8 *p;
+-/*
+- * Fast forward the SGL to the "end" length minus SEMIBSIZE.
+- * The start in the SGL defined by the fast-forward is returned with
+- * the walk variable
+- */
+-static void crypto_kw_scatterlist_ff(struct scatter_walk *walk,
+-				     struct scatterlist *sg,
+-				     unsigned int end)
+-{
+-	unsigned int skip = 0;
 -
--		if (!n) {
--			scatterwalk_start(&walk, sg_next(walk.sg));
--			n = scatterwalk_clamp(&walk, len);
+-	/* The caller should only operate on full SEMIBLOCKs. */
+-	BUG_ON(end < SEMIBSIZE);
+-
+-	skip = end - SEMIBSIZE;
+-	while (sg) {
+-		if (sg->length > skip) {
+-			scatterwalk_start(walk, sg);
+-			scatterwalk_advance(walk, skip);
+-			break;
 -		}
--		p = scatterwalk_map(&walk);
-+		unsigned int n;
-+		const u8 *p;
- 
-+		p = scatterwalk_next(&walk, len, &n);
- 		macp = ce_aes_ccm_auth_data(mac, p, n, macp, ctx->key_enc,
- 					    num_rounds(ctx));
 -
-+		scatterwalk_done_src(&walk, p, n);
- 		len -= n;
+-		skip -= sg->length;
+-		sg = sg_next(sg);
+-	}
+-}
 -
--		scatterwalk_unmap(p);
--		scatterwalk_advance(&walk, n);
--		scatterwalk_done(&walk, 0, len);
- 	} while (len);
- }
- 
- static int ccm_encrypt(struct aead_request *req)
+ static int crypto_kw_decrypt(struct skcipher_request *req)
  {
-diff --git a/arch/arm64/crypto/ghash-ce-glue.c b/arch/arm64/crypto/ghash-ce-glue.c
-index da7b7ec1a664..69d4fb78c30d 100644
---- a/arch/arm64/crypto/ghash-ce-glue.c
-+++ b/arch/arm64/crypto/ghash-ce-glue.c
-@@ -306,25 +306,17 @@ static void gcm_calculate_auth_mac(struct aead_request *req, u64 dg[], u32 len)
- 	int buf_count = 0;
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct crypto_cipher *cipher = skcipher_cipher_simple(tfm);
+ 	struct crypto_kw_block block;
+@@ -148,34 +121,27 @@ static int crypto_kw_decrypt(struct skcipher_request *req)
+ 	 */
+ 	src = req->src;
+ 	dst = req->dst;
  
- 	scatterwalk_start(&walk, req->src);
+ 	for (i = 0; i < 6; i++) {
+-		struct scatter_walk src_walk, dst_walk;
+ 		unsigned int nbytes = req->cryptlen;
  
- 	do {
--		u32 n = scatterwalk_clamp(&walk, len);
--		u8 *p;
+ 		while (nbytes) {
+-			/* move pointer by nbytes in the SGL */
+-			crypto_kw_scatterlist_ff(&src_walk, src, nbytes);
++			nbytes -= SEMIBSIZE;
++
+ 			/* get the source block */
+-			scatterwalk_copychunks(&block.R, &src_walk, SEMIBSIZE,
+-					       false);
++			memcpy_from_sglist(&block.R, src, nbytes, SEMIBSIZE);
+ 
+ 			/* perform KW operation: modify IV with counter */
+ 			block.A ^= cpu_to_be64(t);
+ 			t--;
+ 			/* perform KW operation: decrypt block */
+ 			crypto_cipher_decrypt_one(cipher, (u8 *)&block,
+ 						  (u8 *)&block);
+ 
+-			/* move pointer by nbytes in the SGL */
+-			crypto_kw_scatterlist_ff(&dst_walk, dst, nbytes);
+ 			/* Copy block->R into place */
+-			scatterwalk_copychunks(&block.R, &dst_walk, SEMIBSIZE,
+-					       true);
 -
--		if (!n) {
--			scatterwalk_start(&walk, sg_next(walk.sg));
--			n = scatterwalk_clamp(&walk, len);
--		}
--		p = scatterwalk_map(&walk);
-+		unsigned int n;
-+		const u8 *p;
- 
-+		p = scatterwalk_next(&walk, len, &n);
- 		gcm_update_mac(dg, p, n, buf, &buf_count, ctx);
-+		scatterwalk_done_src(&walk, p, n);
- 		len -= n;
--
--		scatterwalk_unmap(p);
--		scatterwalk_advance(&walk, n);
--		scatterwalk_done(&walk, 0, len);
- 	} while (len);
- 
- 	if (buf_count) {
- 		memset(&buf[buf_count], 0, GHASH_BLOCK_SIZE - buf_count);
- 		ghash_do_simd_update(1, dg, buf, &ctx->ghash_key, NULL,
-diff --git a/arch/arm64/crypto/sm4-ce-ccm-glue.c b/arch/arm64/crypto/sm4-ce-ccm-glue.c
-index 5e7e17bbec81..119f86eb7cc9 100644
---- a/arch/arm64/crypto/sm4-ce-ccm-glue.c
-+++ b/arch/arm64/crypto/sm4-ce-ccm-glue.c
-@@ -110,21 +110,16 @@ static void ccm_calculate_auth_mac(struct aead_request *req, u8 mac[])
- 	crypto_xor(mac, (const u8 *)&aadlen, len);
- 
- 	scatterwalk_start(&walk, req->src);
- 
- 	do {
--		u32 n = scatterwalk_clamp(&walk, assoclen);
--		u8 *p, *ptr;
-+		unsigned int n, orig_n;
-+		const u8 *p, *orig_p;
- 
--		if (!n) {
--			scatterwalk_start(&walk, sg_next(walk.sg));
--			n = scatterwalk_clamp(&walk, assoclen);
--		}
--
--		p = ptr = scatterwalk_map(&walk);
--		assoclen -= n;
--		scatterwalk_advance(&walk, n);
-+		orig_p = scatterwalk_next(&walk, assoclen, &orig_n);
-+		p = orig_p;
-+		n = orig_n;
- 
- 		while (n > 0) {
- 			unsigned int l, nblocks;
- 
- 			if (len == SM4_BLOCK_SIZE) {
-@@ -134,30 +129,30 @@ static void ccm_calculate_auth_mac(struct aead_request *req, u8 mac[])
- 
- 					len = 0;
- 				} else {
- 					nblocks = n / SM4_BLOCK_SIZE;
- 					sm4_ce_cbcmac_update(ctx->rkey_enc,
--							     mac, ptr, nblocks);
-+							     mac, p, nblocks);
- 
--					ptr += nblocks * SM4_BLOCK_SIZE;
-+					p += nblocks * SM4_BLOCK_SIZE;
- 					n %= SM4_BLOCK_SIZE;
- 
- 					continue;
- 				}
- 			}
- 
- 			l = min(n, SM4_BLOCK_SIZE - len);
- 			if (l) {
--				crypto_xor(mac + len, ptr, l);
-+				crypto_xor(mac + len, p, l);
- 				len += l;
--				ptr += l;
-+				p += l;
- 				n -= l;
- 			}
+-			nbytes -= SEMIBSIZE;
++			memcpy_to_sglist(dst, nbytes, &block.R, SEMIBSIZE);
  		}
  
--		scatterwalk_unmap(p);
--		scatterwalk_done(&walk, 0, assoclen);
-+		scatterwalk_done_src(&walk, orig_p, orig_n);
-+		assoclen -= orig_n;
- 	} while (assoclen);
- }
+ 		/* we now start to operate on the dst SGL only */
+ 		src = req->dst;
+ 		dst = req->dst;
+@@ -229,23 +195,21 @@ static int crypto_kw_encrypt(struct skcipher_request *req)
+ 		scatterwalk_start(&src_walk, src);
+ 		scatterwalk_start(&dst_walk, dst);
  
- static int ccm_crypt(struct aead_request *req, struct skcipher_walk *walk,
- 		     u32 *rkey_enc, u8 mac[],
-diff --git a/arch/arm64/crypto/sm4-ce-gcm-glue.c b/arch/arm64/crypto/sm4-ce-gcm-glue.c
-index 73bfb6972d3a..2e27d7752d4f 100644
---- a/arch/arm64/crypto/sm4-ce-gcm-glue.c
-+++ b/arch/arm64/crypto/sm4-ce-gcm-glue.c
-@@ -80,53 +80,48 @@ static void gcm_calculate_auth_mac(struct aead_request *req, u8 ghash[])
- 	unsigned int buflen = 0;
+ 		while (nbytes) {
+ 			/* get the source block */
+-			scatterwalk_copychunks(&block.R, &src_walk, SEMIBSIZE,
+-					       false);
++			memcpy_from_scatterwalk(&block.R, &src_walk, SEMIBSIZE);
  
- 	scatterwalk_start(&walk, req->src);
+ 			/* perform KW operation: encrypt block */
+ 			crypto_cipher_encrypt_one(cipher, (u8 *)&block,
+ 						  (u8 *)&block);
+ 			/* perform KW operation: modify IV with counter */
+ 			block.A ^= cpu_to_be64(t);
+ 			t++;
  
- 	do {
--		u32 n = scatterwalk_clamp(&walk, assoclen);
--		u8 *p, *ptr;
-+		unsigned int n, orig_n;
-+		const u8 *p, *orig_p;
+ 			/* Copy block->R into place */
+-			scatterwalk_copychunks(&block.R, &dst_walk, SEMIBSIZE,
+-					       true);
++			memcpy_to_scatterwalk(&dst_walk, &block.R, SEMIBSIZE);
  
--		if (!n) {
--			scatterwalk_start(&walk, sg_next(walk.sg));
--			n = scatterwalk_clamp(&walk, assoclen);
--		}
--
--		p = ptr = scatterwalk_map(&walk);
--		assoclen -= n;
--		scatterwalk_advance(&walk, n);
-+		orig_p = scatterwalk_next(&walk, assoclen, &orig_n);
-+		p = orig_p;
-+		n = orig_n;
- 
- 		if (n + buflen < GHASH_BLOCK_SIZE) {
--			memcpy(&buffer[buflen], ptr, n);
-+			memcpy(&buffer[buflen], p, n);
- 			buflen += n;
- 		} else {
- 			unsigned int nblocks;
- 
- 			if (buflen) {
- 				unsigned int l = GHASH_BLOCK_SIZE - buflen;
- 
--				memcpy(&buffer[buflen], ptr, l);
--				ptr += l;
-+				memcpy(&buffer[buflen], p, l);
-+				p += l;
- 				n -= l;
- 
- 				pmull_ghash_update(ctx->ghash_table, ghash,
- 						   buffer, 1);
- 			}
- 
- 			nblocks = n / GHASH_BLOCK_SIZE;
- 			if (nblocks) {
- 				pmull_ghash_update(ctx->ghash_table, ghash,
--						   ptr, nblocks);
--				ptr += nblocks * GHASH_BLOCK_SIZE;
-+						   p, nblocks);
-+				p += nblocks * GHASH_BLOCK_SIZE;
- 			}
- 
- 			buflen = n % GHASH_BLOCK_SIZE;
- 			if (buflen)
--				memcpy(&buffer[0], ptr, buflen);
-+				memcpy(&buffer[0], p, buflen);
+ 			nbytes -= SEMIBSIZE;
  		}
  
--		scatterwalk_unmap(p);
--		scatterwalk_done(&walk, 0, assoclen);
-+		scatterwalk_done_src(&walk, orig_p, orig_n);
-+		assoclen -= orig_n;
- 	} while (assoclen);
- 
- 	/* padding with '0' */
- 	if (buflen) {
- 		memset(&buffer[buflen], 0, GHASH_BLOCK_SIZE - buflen);
+ 		/* we now start to operate on the dst SGL only */
 -- 
 2.47.1
 
