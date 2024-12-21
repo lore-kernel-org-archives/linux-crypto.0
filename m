@@ -1,39 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 987911F2399;
-	Sat, 21 Dec 2024 09:11:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBDCC1F2C20
+	for <linux-crypto@vger.kernel.org>; Sat, 21 Dec 2024 09:11:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734772295; cv=none; b=lMyWwdDmrCBmAqHZiFBYFGrd/6yaRwXpRjsVYrWo90VQKce/dnXDJ8OjrHaeGYRjYNiQP96u5L/nXT0TVHdiZCIQ5UJqaPG+um1Aqnno98B8B3gsSNFFZJdS7Q29wJN1tKkO6tGLPo8jloLGDvAjHWjvm00pZE10IPteil+Swzw=
+	t=1734772295; cv=none; b=VuVW9xJDRYHF7wMbWNGtVtg45RPymZqgd9zg/kH4kSKWzBcG0uyNtHm816Gsh1uR+yDRkcH1ckEEseiGXX3CeirBUlZFGqLZDwlhnhG7XOJ/HUR/i7RFdvj5PpDWd9PGifFJz/eQw89tn2RG72b0lO312MUOJgG7LiSdLVnkNw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1734772295; c=relaxed/simple;
-	bh=dJNf7Ef27a6NAHmh6+QRwRI/qSPxeV2L1TYNFHLLkzw=;
+	bh=Zhg/KDiZCPgy+MF6pUjpqhVE/E/er2PToHEWYDXwwVE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UGcBYZWC1RPNdqgngbPpGViNueYqk05vJjc3LQNVd6aIsECoGAL+kmYtoL9b/70RZJrb7vB1A3Vvk2T3r6MWh7NjQidwnGf3AWSZKCAlFb2YuRb+F96O+L+4tiGquqV0ckJ1Sb4cA+7zjHdaicO0F51hk4rc3rf9szAdu12V2gs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rOByZ+Mm; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=PQdJXHyR3GQL4UmL7GtZ6itNIulMbQAjjM4gxUnKugMb3tIMvxA6uByhsKln0YquUuwA1Xhs+gvXkFXyTcUPPzwbLTUniui5hR9P1t11DukioVwp7CiSIkk5vjxZyFnx8svCuajPXyg74NuSSs+msFTZZH9YF2wM7gI3rVWdA/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g+kScLD9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rOByZ+Mm"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53BFEC4CECE;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g+kScLD9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94532C4CED6;
 	Sat, 21 Dec 2024 09:11:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1734772295;
-	bh=dJNf7Ef27a6NAHmh6+QRwRI/qSPxeV2L1TYNFHLLkzw=;
+	bh=Zhg/KDiZCPgy+MF6pUjpqhVE/E/er2PToHEWYDXwwVE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rOByZ+MmldENSL1r5dbGRpI8uFki0fQoDB9a+fNNVU/IrJANVztXQKsaGmTYReMCp
-	 nEfFDhX8gitMArDdEGE2TfTZJANLGAf8WztBbVQ3gOCS5FZ5dhK/Jm16SACnarcw4Q
-	 uqJGENwFJsn95GhUIJ0JLdYMgyaMemPXlLB6KhDAqa/FPq62XrBcBYH3IMzBdznaEZ
-	 D+TvpP0yfvtRP6YSLPR3xc8Yz85uvwdcr/4Q9EKPnK2Nfs1CEW4Lehx+8CWimu/Gni
-	 3IN4cTsSpbR4jl7RlIS7NJ22DAyXY1FhphTx9siZur/Wuz4lRJxpdgCXo606XlABuQ
-	 mBlPcX2seKpXg==
+	b=g+kScLD9dkCdQQjdAXzak26Iro/ycGzhYTF2hfYDnAiuXENXVXBroulQKZQ0RdgPi
+	 gleM0ReXaWZQH5XqsN/0mwjLfF71TCANHGBUTpfAg3Qe4GvGOgUAs19uSyZmySXE0U
+	 DzwjrGQGsSWNNhTOUPwaVp7NEoelM13DrCxyUFGd1celhiKu/kDonwRQlXzYPxh1rW
+	 Y0BpsoeG4ncJAufi20b6iJwzE2pe72iRi/JPHEjFrKdNvCO7RkUsR/8pFiSMe5JI+G
+	 mfFYlkzlXsTp1hWbCPZI5ASfDdstR5JzOTkEZzMUpCYcteS++a2SM7oOmSnE96LqDt
+	 6MsbvBtiSldeg==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
-Cc: Krzysztof Kozlowski <krzk@kernel.org>,
-	Vladimir Zapolskiy <vz@mleia.com>,
-	linux-samsung-soc@vger.kernel.org
-Subject: [PATCH 22/29] crypto: s5p-sss - use the new scatterwalk functions
-Date: Sat, 21 Dec 2024 01:10:49 -0800
-Message-ID: <20241221091056.282098-23-ebiggers@kernel.org>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	=?UTF-8?q?Maxime=20M=C3=A9r=C3=A9?= <maxime.mere@foss.st.com>,
+	Thomas Bourgoin <thomas.bourgoin@foss.st.com>,
+	linux-stm32@st-md-mailman.stormreply.com
+Subject: [PATCH 23/29] crypto: stm32 - use the new scatterwalk functions
+Date: Sat, 21 Dec 2024 01:10:50 -0800
+Message-ID: <20241221091056.282098-24-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20241221091056.282098-1-ebiggers@kernel.org>
 References: <20241221091056.282098-1-ebiggers@kernel.org>
@@ -43,19 +45,20 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
 From: Eric Biggers <ebiggers@google.com>
 
-s5p_sg_copy_buf() open-coded a copy from/to a scatterlist using
-scatterwalk_* functions that are planned for removal.  Replace it with
-the new functions memcpy_from_sglist() and memcpy_to_sglist() instead.
-Also take the opportunity to replace calls to scatterwalk_map_and_copy()
-in the same file; this eliminates the confusing 'out' argument.
+Replace calls to the deprecated function scatterwalk_copychunks() with
+memcpy_from_scatterwalk(), memcpy_to_scatterwalk(), scatterwalk_skip(),
+or scatterwalk_start_at_pos() as appropriate.
 
-Cc: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Vladimir Zapolskiy <vz@mleia.com>
-Cc: linux-samsung-soc@vger.kernel.org
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>
+Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>
+Cc: Maxime Méré <maxime.mere@foss.st.com>
+Cc: Thomas Bourgoin <thomas.bourgoin@foss.st.com>
+Cc: linux-stm32@st-md-mailman.stormreply.com
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
 
@@ -63,137 +66,169 @@ This patch is part of a long series touching many files, so I have
 limited the Cc list on the full series.  If you want the full series and
 did not receive it, please retrieve it from lore.kernel.org.
 
- drivers/crypto/s5p-sss.c | 38 +++++++++++---------------------------
- 1 file changed, 11 insertions(+), 27 deletions(-)
+ drivers/crypto/stm32/stm32-cryp.c | 34 +++++++++++++++----------------
+ 1 file changed, 17 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
-index 57ab237e899e..b4c3c14dafd5 100644
---- a/drivers/crypto/s5p-sss.c
-+++ b/drivers/crypto/s5p-sss.c
-@@ -456,34 +456,21 @@ static void s5p_free_sg_cpy(struct s5p_aes_dev *dev, struct scatterlist **sg)
+diff --git a/drivers/crypto/stm32/stm32-cryp.c b/drivers/crypto/stm32/stm32-cryp.c
+index 14c6339c2e43..5ce88e7a8f65 100644
+--- a/drivers/crypto/stm32/stm32-cryp.c
++++ b/drivers/crypto/stm32/stm32-cryp.c
+@@ -664,11 +664,11 @@ static void stm32_cryp_write_ccm_first_header(struct stm32_cryp *cryp)
+ 		len = 6;
+ 	}
  
- 	kfree(*sg);
- 	*sg = NULL;
+ 	written = min_t(size_t, AES_BLOCK_SIZE - len, alen);
+ 
+-	scatterwalk_copychunks((char *)block + len, &cryp->in_walk, written, 0);
++	memcpy_from_scatterwalk((char *)block + len, &cryp->in_walk, written);
+ 
+ 	writesl(cryp->regs + cryp->caps->din, block, AES_BLOCK_32);
+ 
+ 	cryp->header_in -= written;
+ 
+@@ -991,11 +991,11 @@ static int stm32_cryp_header_dma_start(struct stm32_cryp *cryp)
+ 	tx_in->callback_param = cryp;
+ 	tx_in->callback = stm32_cryp_header_dma_callback;
+ 
+ 	/* Advance scatterwalk to not DMA'ed data */
+ 	align_size = ALIGN_DOWN(cryp->header_in, cryp->hw_blocksize);
+-	scatterwalk_copychunks(NULL, &cryp->in_walk, align_size, 2);
++	scatterwalk_skip(&cryp->in_walk, align_size);
+ 	cryp->header_in -= align_size;
+ 
+ 	ret = dma_submit_error(dmaengine_submit(tx_in));
+ 	if (ret < 0) {
+ 		dev_err(cryp->dev, "DMA in submit failed\n");
+@@ -1054,22 +1054,22 @@ static int stm32_cryp_dma_start(struct stm32_cryp *cryp)
+ 	tx_out->callback = stm32_cryp_dma_callback;
+ 	tx_out->callback_param = cryp;
+ 
+ 	/* Advance scatterwalk to not DMA'ed data */
+ 	align_size = ALIGN_DOWN(cryp->payload_in, cryp->hw_blocksize);
+-	scatterwalk_copychunks(NULL, &cryp->in_walk, align_size, 2);
++	scatterwalk_skip(&cryp->in_walk, align_size);
+ 	cryp->payload_in -= align_size;
+ 
+ 	ret = dma_submit_error(dmaengine_submit(tx_in));
+ 	if (ret < 0) {
+ 		dev_err(cryp->dev, "DMA in submit failed\n");
+ 		return ret;
+ 	}
+ 	dma_async_issue_pending(cryp->dma_lch_in);
+ 
+ 	/* Advance scatterwalk to not DMA'ed data */
+-	scatterwalk_copychunks(NULL, &cryp->out_walk, align_size, 2);
++	scatterwalk_skip(&cryp->out_walk, align_size);
+ 	cryp->payload_out -= align_size;
+ 	ret = dma_submit_error(dmaengine_submit(tx_out));
+ 	if (ret < 0) {
+ 		dev_err(cryp->dev, "DMA out submit failed\n");
+ 		return ret;
+@@ -1735,13 +1735,13 @@ static int stm32_cryp_prepare_req(struct skcipher_request *req,
+ 
+ 		in_sg = areq->src;
+ 		out_sg = areq->dst;
+ 
+ 		scatterwalk_start(&cryp->in_walk, in_sg);
+-		scatterwalk_start(&cryp->out_walk, out_sg);
+ 		/* In output, jump after assoc data */
+-		scatterwalk_copychunks(NULL, &cryp->out_walk, cryp->areq->assoclen, 2);
++		scatterwalk_start_at_pos(&cryp->out_walk, out_sg,
++					 areq->assoclen);
+ 
+ 		ret = stm32_cryp_hw_init(cryp);
+ 		if (ret)
+ 			return ret;
+ 
+@@ -1871,16 +1871,16 @@ static int stm32_cryp_read_auth_tag(struct stm32_cryp *cryp)
+ 	if (is_encrypt(cryp)) {
+ 		u32 out_tag[AES_BLOCK_32];
+ 
+ 		/* Get and write tag */
+ 		readsl(cryp->regs + cryp->caps->dout, out_tag, AES_BLOCK_32);
+-		scatterwalk_copychunks(out_tag, &cryp->out_walk, cryp->authsize, 1);
++		memcpy_to_scatterwalk(&cryp->out_walk, out_tag, cryp->authsize);
+ 	} else {
+ 		/* Get and check tag */
+ 		u32 in_tag[AES_BLOCK_32], out_tag[AES_BLOCK_32];
+ 
+-		scatterwalk_copychunks(in_tag, &cryp->in_walk, cryp->authsize, 0);
++		memcpy_from_scatterwalk(in_tag, &cryp->in_walk, cryp->authsize);
+ 		readsl(cryp->regs + cryp->caps->dout, out_tag, AES_BLOCK_32);
+ 
+ 		if (crypto_memneq(in_tag, out_tag, cryp->authsize))
+ 			ret = -EBADMSG;
+ 	}
+@@ -1921,22 +1921,22 @@ static void stm32_cryp_check_ctr_counter(struct stm32_cryp *cryp)
+ static void stm32_cryp_irq_read_data(struct stm32_cryp *cryp)
+ {
+ 	u32 block[AES_BLOCK_32];
+ 
+ 	readsl(cryp->regs + cryp->caps->dout, block, cryp->hw_blocksize / sizeof(u32));
+-	scatterwalk_copychunks(block, &cryp->out_walk, min_t(size_t, cryp->hw_blocksize,
+-							     cryp->payload_out), 1);
++	memcpy_to_scatterwalk(&cryp->out_walk, block, min_t(size_t, cryp->hw_blocksize,
++							    cryp->payload_out));
+ 	cryp->payload_out -= min_t(size_t, cryp->hw_blocksize,
+ 				   cryp->payload_out);
  }
  
--static void s5p_sg_copy_buf(void *buf, struct scatterlist *sg,
--			    unsigned int nbytes, int out)
--{
--	struct scatter_walk walk;
--
--	if (!nbytes)
--		return;
--
--	scatterwalk_start(&walk, sg);
--	scatterwalk_copychunks(buf, &walk, nbytes, out);
--	scatterwalk_done(&walk, out, 0);
--}
--
- static void s5p_sg_done(struct s5p_aes_dev *dev)
+ static void stm32_cryp_irq_write_block(struct stm32_cryp *cryp)
  {
- 	struct skcipher_request *req = dev->req;
- 	struct s5p_aes_reqctx *reqctx = skcipher_request_ctx(req);
+ 	u32 block[AES_BLOCK_32] = {0};
  
- 	if (dev->sg_dst_cpy) {
- 		dev_dbg(dev->dev,
- 			"Copying %d bytes of output data back to original place\n",
- 			dev->req->cryptlen);
--		s5p_sg_copy_buf(sg_virt(dev->sg_dst_cpy), dev->req->dst,
--				dev->req->cryptlen, 1);
-+		memcpy_to_sglist(dev->req->dst, 0, sg_virt(dev->sg_dst_cpy),
-+				 dev->req->cryptlen);
- 	}
- 	s5p_free_sg_cpy(dev, &dev->sg_src_cpy);
- 	s5p_free_sg_cpy(dev, &dev->sg_dst_cpy);
- 	if (reqctx->mode & FLAGS_AES_CBC)
- 		memcpy_fromio(req->iv, dev->aes_ioaddr + SSS_REG_AES_IV_DATA(0), AES_BLOCK_SIZE);
-@@ -524,11 +511,11 @@ static int s5p_make_sg_cpy(struct s5p_aes_dev *dev, struct scatterlist *src,
- 		kfree(*dst);
- 		*dst = NULL;
- 		return -ENOMEM;
- 	}
+-	scatterwalk_copychunks(block, &cryp->in_walk, min_t(size_t, cryp->hw_blocksize,
+-							    cryp->payload_in), 0);
++	memcpy_from_scatterwalk(block, &cryp->in_walk, min_t(size_t, cryp->hw_blocksize,
++							     cryp->payload_in));
+ 	writesl(cryp->regs + cryp->caps->din, block, cryp->hw_blocksize / sizeof(u32));
+ 	cryp->payload_in -= min_t(size_t, cryp->hw_blocksize, cryp->payload_in);
+ }
  
--	s5p_sg_copy_buf(pages, src, dev->req->cryptlen, 0);
-+	memcpy_from_sglist(pages, src, 0, dev->req->cryptlen);
+ static void stm32_cryp_irq_write_gcm_padded_data(struct stm32_cryp *cryp)
+@@ -1979,12 +1979,12 @@ static void stm32_cryp_irq_write_gcm_padded_data(struct stm32_cryp *cryp)
+ 	 * Same code as stm32_cryp_irq_read_data(), but we want to store
+ 	 * block value
+ 	 */
+ 	readsl(cryp->regs + cryp->caps->dout, block, cryp->hw_blocksize / sizeof(u32));
  
- 	sg_init_table(*dst, 1);
- 	sg_set_buf(*dst, pages, len);
+-	scatterwalk_copychunks(block, &cryp->out_walk, min_t(size_t, cryp->hw_blocksize,
+-							     cryp->payload_out), 1);
++	memcpy_to_scatterwalk(&cryp->out_walk, block, min_t(size_t, cryp->hw_blocksize,
++							    cryp->payload_out));
+ 	cryp->payload_out -= min_t(size_t, cryp->hw_blocksize,
+ 				   cryp->payload_out);
  
- 	return 0;
-@@ -1033,12 +1020,11 @@ static int s5p_hash_copy_sgs(struct s5p_hash_reqctx *ctx,
- 	}
+ 	/* d) change mode back to AES GCM */
+ 	cfg &= ~CR_ALGO_MASK;
+@@ -2077,12 +2077,12 @@ static void stm32_cryp_irq_write_ccm_padded_data(struct stm32_cryp *cryp)
+ 	 * Same code as stm32_cryp_irq_read_data(), but we want to store
+ 	 * block value
+ 	 */
+ 	readsl(cryp->regs + cryp->caps->dout, block, cryp->hw_blocksize / sizeof(u32));
  
- 	if (ctx->bufcnt)
- 		memcpy(buf, ctx->dd->xmit_buf, ctx->bufcnt);
+-	scatterwalk_copychunks(block, &cryp->out_walk, min_t(size_t, cryp->hw_blocksize,
+-							     cryp->payload_out), 1);
++	memcpy_to_scatterwalk(&cryp->out_walk, block, min_t(size_t, cryp->hw_blocksize,
++							    cryp->payload_out));
+ 	cryp->payload_out -= min_t(size_t, cryp->hw_blocksize, cryp->payload_out);
  
--	scatterwalk_map_and_copy(buf + ctx->bufcnt, sg, ctx->skip,
--				 new_len, 0);
-+	memcpy_from_sglist(buf + ctx->bufcnt, sg, ctx->skip, new_len);
- 	sg_init_table(ctx->sgl, 1);
- 	sg_set_buf(ctx->sgl, buf, len);
- 	ctx->sg = ctx->sgl;
- 	ctx->sg_len = 1;
- 	ctx->bufcnt = 0;
-@@ -1227,12 +1213,11 @@ static int s5p_hash_prepare_request(struct ahash_request *req, bool update)
- 		int len = BUFLEN - ctx->bufcnt % BUFLEN;
+ 	/* d) Load again CRYP_CSGCMCCMxR */
+ 	for (i = 0; i < ARRAY_SIZE(cstmp2); i++)
+ 		cstmp2[i] = stm32_cryp_read(cryp, CRYP_CSGCMCCM0R + i * 4);
+@@ -2159,11 +2159,11 @@ static void stm32_cryp_irq_write_gcmccm_header(struct stm32_cryp *cryp)
+ 	u32 block[AES_BLOCK_32] = {0};
+ 	size_t written;
  
- 		if (len > nbytes)
- 			len = nbytes;
+ 	written = min_t(size_t, AES_BLOCK_SIZE, cryp->header_in);
  
--		scatterwalk_map_and_copy(ctx->buffer + ctx->bufcnt, req->src,
--					 0, len, 0);
-+		memcpy_from_sglist(ctx->buffer + ctx->bufcnt, req->src, 0, len);
- 		ctx->bufcnt += len;
- 		nbytes -= len;
- 		ctx->skip = len;
- 	} else {
- 		ctx->skip = 0;
-@@ -1251,13 +1236,12 @@ static int s5p_hash_prepare_request(struct ahash_request *req, bool update)
- 			xmit_len -= xmit_len & (BUFLEN - 1);
+-	scatterwalk_copychunks(block, &cryp->in_walk, written, 0);
++	memcpy_from_scatterwalk(block, &cryp->in_walk, written);
  
- 		hash_later = ctx->total - xmit_len;
- 		/* copy hash_later bytes from end of req->src */
- 		/* previous bytes are in xmit_buf, so no overwrite */
--		scatterwalk_map_and_copy(ctx->buffer, req->src,
--					 req->nbytes - hash_later,
--					 hash_later, 0);
-+		memcpy_from_sglist(ctx->buffer, req->src,
-+				   req->nbytes - hash_later, hash_later);
- 	}
+ 	writesl(cryp->regs + cryp->caps->din, block, AES_BLOCK_32);
  
- 	if (xmit_len > BUFLEN) {
- 		ret = s5p_hash_prepare_sgs(ctx, req->src, nbytes - hash_later,
- 					   final);
-@@ -1265,12 +1249,12 @@ static int s5p_hash_prepare_request(struct ahash_request *req, bool update)
- 			return ret;
- 	} else {
- 		/* have buffered data only */
- 		if (unlikely(!ctx->bufcnt)) {
- 			/* first update didn't fill up buffer */
--			scatterwalk_map_and_copy(ctx->dd->xmit_buf, req->src,
--						 0, xmit_len, 0);
-+			memcpy_from_sglist(ctx->dd->xmit_buf, req->src,
-+					   0, xmit_len);
- 		}
+ 	cryp->header_in -= written;
  
- 		sg_init_table(ctx->sgl, 1);
- 		sg_set_buf(ctx->sgl, ctx->dd->xmit_buf, xmit_len);
- 
-@@ -1504,12 +1488,12 @@ static int s5p_hash_update(struct ahash_request *req)
- 
- 	if (!req->nbytes)
- 		return 0;
- 
- 	if (ctx->bufcnt + req->nbytes <= BUFLEN) {
--		scatterwalk_map_and_copy(ctx->buffer + ctx->bufcnt, req->src,
--					 0, req->nbytes, 0);
-+		memcpy_from_sglist(ctx->buffer + ctx->bufcnt, req->src,
-+				   0, req->nbytes);
- 		ctx->bufcnt += req->nbytes;
- 		return 0;
- 	}
- 
- 	return s5p_hash_enqueue(req, true); /* HASH_OP_UPDATE */
 -- 
 2.47.1
 
