@@ -1,46 +1,46 @@
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DC841F2377;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 618001F2384;
 	Sat, 21 Dec 2024 06:31:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734762691; cv=none; b=eXDbnYhw3w2BwIvVNJlX5xDrlXuz5HBZbRM8xtQmsyQgBrkxJn8fkvZM647pCWq6dKQhDzPpZmYQiLrcoy/ot0UUru/XCq8yMP/axDKgoF8sxFdtToM254SnTDN1tYL/MwtqB5f/aCPr5JgLwTlU/ffkuJnMrVBZHYXr12wzNAo=
+	t=1734762691; cv=none; b=Ba6IaZvhCQal8sqOPv52/h0Fk9qoBBa/vuaUfEH8sK0n2ejimelwg2miGfb0gQZoAGMxufeuJK9pHPTjfIFk61lzKMoF3G5dNfnk8to8Q5F5yK7LRTzSL1v9NvmgJiz6r/TrmkoJ3HWw9lwa4YPaRSdOMQBczpjsNrG46ZeUwJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1734762691; c=relaxed/simple;
-	bh=KPv/lIOr9UJuu1TDwAGjapkWxba0uS6X9GnVkLeTgfc=;
+	bh=3T5mE0tmACfbWWCJAYrQoPctDfhArcrXCQeauBvfdDw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=WCdWCwAemrGDSqUxnzRb7De1hgnvS6LmgcU1JGVFMveSkpwd38yiDyG4D6QZPXbEA5DHmYOpyanifalHR+E8sl/5bWY0GcOpS3MetWQeO6QZUSqIDRD254vUblMOg2eS/ZksxXEcE+a4+vcriagnWB2F9ppxRBhvFSPyrWeVy4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TlnmFjtn; arc=none smtp.client-ip=198.175.65.20
+	 MIME-Version; b=TbeeVvQLqSP7KXJaxmVLetmMgSI/UGeEW/CtgygM2Cx2AUJGuImOD33+kYn3R1zzO41DcxVOej5HyNZsvOF7QMnrCFwnpbT1VkCewephj7oDR0L8bm4cdDgut2Y7yrStOZlQvA/E60GpD7fzzYRncYYj3OgmdZF3o5QAKpGv8AY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=D5qTbx52; arc=none smtp.client-ip=198.175.65.20
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TlnmFjtn"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="D5qTbx52"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1734762689; x=1766298689;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=KPv/lIOr9UJuu1TDwAGjapkWxba0uS6X9GnVkLeTgfc=;
-  b=TlnmFjtn8LsdEnX4WjcjjREbR4uvbd7UOp9bosxA/YpbJLz/llgpJVF/
-   h98TnDv5MPouF48G8o9/PUuVW3lLq3Pzkf3pU5/Pswjt25VsJG1eVHhhb
-   QlLjqHtS3KdVwMnHjoMTw7Uqd59VLvcFTJU2IVsEYf5Mu6F2kC1AN/9Yv
-   jrQYNiuHEkyFteADCPNT5I8P2kGHsquiQfx8dALIYJEbDyV9DcCv1m6sy
-   UDolzYlr8OtIwTowbu7sH8ToMIvoI4Y25sQKyLJPxdmKtlljJGKJekOm5
-   TrIVZOaT9rpwupf5yFJSQRlARQDeteGYNNJwlxpjhmtVR0x1tL1ke7Z4l
-   A==;
-X-CSE-ConnectionGUID: NrgutftuTUS3Fyy/QVOZow==
-X-CSE-MsgGUID: vAdh1tWIQPKAdPiI7pgDOg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11292"; a="35021719"
+  bh=3T5mE0tmACfbWWCJAYrQoPctDfhArcrXCQeauBvfdDw=;
+  b=D5qTbx52gHZ024DmSULvHWzbQGk66BxHS1dBSco2hGIHBkjON4F4k5iS
+   IZFnE38aaHkZ5iFqJdSBGX9kHNyAZ7moF8j95lJGnUyR6ykrRjUywOay9
+   37Lrg0+XdYI2upVmb6nEHCoHCsTYF4cyPk7uWJxloLdHQOSCHl6WhXHlE
+   vJiIDv7om9Ax314y8KyOhmBfsq5Xtg7YE4SuN89gH5Bk17BrjOf0oe+Dm
+   IpAd+GAR4lDXZPhYtcBtxSGP6bzaPOlJJYQQdesMNQyde3mNrBfb8MaA5
+   r4pK7c2fNeQE/ptAUFl56oF6IpVV9+XRuZdD3X34Q44xhaMGxFSpUnkWC
+   Q==;
+X-CSE-ConnectionGUID: UMPZT9TuRrq486ug5ZJznQ==
+X-CSE-MsgGUID: CAZJmblNTZ2ioOvkVcOhHA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11292"; a="35021731"
 X-IronPort-AV: E=Sophos;i="6.12,253,1728975600"; 
-   d="scan'208";a="35021719"
+   d="scan'208";a="35021731"
 Received: from orviesa007.jf.intel.com ([10.64.159.147])
   by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2024 22:31:21 -0800
-X-CSE-ConnectionGUID: 7G/EcktGThmli+QGpElkYQ==
-X-CSE-MsgGUID: M7yZhvoTT6i5+xSQGaVIsA==
+X-CSE-ConnectionGUID: 8ICHdYlyQDKSYSh1fVmI1Q==
+X-CSE-MsgGUID: AiI31hJNT9G273n9bOuR5g==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="99184607"
+   d="scan'208";a="99184610"
 Received: from jf5300-b11a338t.jf.intel.com ([10.242.51.115])
   by orviesa007.jf.intel.com with ESMTP; 20 Dec 2024 22:31:21 -0800
 From: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
@@ -65,9 +65,9 @@ To: linux-kernel@vger.kernel.org,
 Cc: wajdi.k.feghali@intel.com,
 	vinodh.gopal@intel.com,
 	kanchana.p.sridhar@intel.com
-Subject: [PATCH v5 10/12] mm: zswap: Allocate pool batching resources if the crypto_alg supports batching.
-Date: Fri, 20 Dec 2024 22:31:17 -0800
-Message-Id: <20241221063119.29140-11-kanchana.p.sridhar@intel.com>
+Subject: [PATCH v5 11/12] mm: zswap: Restructure & simplify zswap_store() to make it amenable for batching.
+Date: Fri, 20 Dec 2024 22:31:18 -0800
+Message-Id: <20241221063119.29140-12-kanchana.p.sridhar@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20241221063119.29140-1-kanchana.p.sridhar@intel.com>
 References: <20241221063119.29140-1-kanchana.p.sridhar@intel.com>
@@ -79,253 +79,260 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch does the following:
+This patch introduces zswap_store_folio() that implements all the computes
+done earlier in zswap_store_page() for a single-page, for all the pages in
+a folio. This allows us to move the loop over the folio's pages from
+zswap_store() to zswap_store_folio().
 
-1) Defines ZSWAP_MAX_BATCH_SIZE to denote the maximum number of acomp_ctx
-   batching resources (acomp_reqs and buffers) to allocate if the zswap
-   compressor supports batching. Currently, ZSWAP_MAX_BATCH_SIZE is set to
-   8U.
+A distinct zswap_compress_folio() is also added, that simply calls
+zswap_compress() for each page in the folio it is called with.
 
-2) Modifies the definition of "struct crypto_acomp_ctx" to represent a
-   configurable number of acomp_reqs and buffers. Adds a "nr_reqs" to
-   "struct crypto_acomp_ctx" to contain the number of resources that will
-   be allocated in the cpu hotplug onlining code.
+zswap_store_folio() starts by allocating all zswap entries required to
+store the folio. Next, it calls zswap_compress_folio() and finally, adds
+the entries to the xarray and LRU.
 
-3) The zswap_cpu_comp_prepare() cpu onlining code will detect if the
-   crypto_acomp created for the zswap pool (in other words, the zswap
-   compression algorithm) has registered implementations for
-   batch_compress() and batch_decompress(). If so, it will query the
-   crypto_acomp for the maximum batch size supported by the compressor, and
-   set "nr_reqs" to the minimum of this compressor-specific max batch size
-   and ZSWAP_MAX_BATCH_SIZE. Finally, it will allocate "nr_reqs"
-   reqs/buffers, and set the acomp_ctx->nr_reqs accordingly.
+The error handling and cleanup required for all failure scenarios that can
+occur while storing a folio in zswap is now consolidated to a
+"store_folio_failed" label in zswap_store_folio().
 
-4) If the crypto_acomp does not support batching, "nr_reqs" defaults to 1.
+These changes facilitate developing support for compress batching in
+zswap_store_folio().
 
 Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
 ---
- mm/zswap.c | 122 +++++++++++++++++++++++++++++++++++++++--------------
- 1 file changed, 90 insertions(+), 32 deletions(-)
+ mm/zswap.c | 183 +++++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 116 insertions(+), 67 deletions(-)
 
 diff --git a/mm/zswap.c b/mm/zswap.c
-index 9718c33f8192..99cd78891fd0 100644
+index 99cd78891fd0..1be0f1807bfc 100644
 --- a/mm/zswap.c
 +++ b/mm/zswap.c
-@@ -78,6 +78,13 @@ static bool zswap_pool_reached_full;
+@@ -1467,77 +1467,129 @@ static void shrink_worker(struct work_struct *w)
+ * main API
+ **********************************/
  
- #define ZSWAP_PARAM_UNSET ""
+-static ssize_t zswap_store_page(struct page *page,
+-				struct obj_cgroup *objcg,
+-				struct zswap_pool *pool)
++static bool zswap_compress_folio(struct folio *folio,
++				 struct zswap_entry *entries[],
++				 struct zswap_pool *pool)
+ {
+-	swp_entry_t page_swpentry = page_swap_entry(page);
+-	struct zswap_entry *entry, *old;
++	long index, nr_pages = folio_nr_pages(folio);
  
+-	/* allocate entry */
+-	entry = zswap_entry_cache_alloc(GFP_KERNEL, page_to_nid(page));
+-	if (!entry) {
+-		zswap_reject_kmemcache_fail++;
+-		return -EINVAL;
++	for (index = 0; index < nr_pages; ++index) {
++		struct page *page = folio_page(folio, index);
++
++		if (!zswap_compress(page, entries[index], pool))
++			return false;
+ 	}
+ 
+-	if (!zswap_compress(page, entry, pool))
+-		goto compress_failed;
++	return true;
++}
+ 
+-	old = xa_store(swap_zswap_tree(page_swpentry),
+-		       swp_offset(page_swpentry),
+-		       entry, GFP_KERNEL);
+-	if (xa_is_err(old)) {
+-		int err = xa_err(old);
 +/*
-+ * For compression batching of large folios:
-+ * Maximum number of acomp compress requests that will be processed
-+ * in a batch, iff the zswap compressor supports batching.
++ * Store all pages in a folio.
++ *
++ * The error handling from all failure points is consolidated to the
++ * "store_folio_failed" label, based on the initialization of the zswap entries'
++ * handles to ERR_PTR(-EINVAL) at allocation time, and the fact that the
++ * entry's handle is subsequently modified only upon a successful zpool_malloc()
++ * after the page is compressed.
 + */
-+#define ZSWAP_MAX_BATCH_SIZE 8U
++static ssize_t zswap_store_folio(struct folio *folio,
++				 struct obj_cgroup *objcg,
++				 struct zswap_pool *pool)
++{
++	long index, nr_pages = folio_nr_pages(folio);
++	struct zswap_entry **entries = NULL;
++	int node_id = folio_nid(folio);
++	size_t compressed_bytes = 0;
+ 
+-		WARN_ONCE(err != -ENOMEM, "unexpected xarray error: %d\n", err);
+-		zswap_reject_alloc_fail++;
+-		goto store_failed;
++	entries = kmalloc(nr_pages * sizeof(*entries), GFP_KERNEL);
++	if (!entries)
++		return -ENOMEM;
 +
- static int zswap_setup(void);
- 
- /* Enable/disable zswap */
-@@ -143,9 +150,10 @@ bool zswap_never_enabled(void)
- 
- struct crypto_acomp_ctx {
- 	struct crypto_acomp *acomp;
--	struct acomp_req *req;
-+	struct acomp_req **reqs;
-+	u8 **buffers;
-+	unsigned int nr_reqs;
- 	struct crypto_wait wait;
--	u8 *buffer;
- 	struct mutex mutex;
- 	bool is_sleepable;
- };
-@@ -818,49 +826,88 @@ static int zswap_cpu_comp_prepare(unsigned int cpu, struct hlist_node *node)
- 	struct zswap_pool *pool = hlist_entry(node, struct zswap_pool, node);
- 	struct crypto_acomp_ctx *acomp_ctx = per_cpu_ptr(pool->acomp_ctx, cpu);
- 	struct crypto_acomp *acomp;
--	struct acomp_req *req;
--	int ret;
-+	unsigned int nr_reqs = 1;
-+	int ret = -ENOMEM;
-+	int i, j;
- 
- 	mutex_init(&acomp_ctx->mutex);
--
--	acomp_ctx->buffer = kmalloc_node(PAGE_SIZE * 2, GFP_KERNEL, cpu_to_node(cpu));
--	if (!acomp_ctx->buffer)
--		return -ENOMEM;
-+	acomp_ctx->nr_reqs = 0;
- 
- 	acomp = crypto_alloc_acomp_node(pool->tfm_name, 0, 0, cpu_to_node(cpu));
- 	if (IS_ERR(acomp)) {
- 		pr_err("could not alloc crypto acomp %s : %ld\n",
- 				pool->tfm_name, PTR_ERR(acomp));
--		ret = PTR_ERR(acomp);
--		goto acomp_fail;
-+		return PTR_ERR(acomp);
++	/* allocate entries */
++	for (index = 0; index < nr_pages; ++index) {
++		entries[index] = zswap_entry_cache_alloc(GFP_KERNEL, node_id);
++
++		if (!entries[index]) {
++			zswap_reject_kmemcache_fail++;
++			nr_pages = index;
++			goto store_folio_failed;
++		}
++
++		entries[index]->handle = (unsigned long)ERR_PTR(-EINVAL);
  	}
- 	acomp_ctx->acomp = acomp;
- 	acomp_ctx->is_sleepable = acomp_is_async(acomp);
  
--	req = acomp_request_alloc(acomp_ctx->acomp);
--	if (!req) {
--		pr_err("could not alloc crypto acomp_request %s\n",
--		       pool->tfm_name);
--		ret = -ENOMEM;
-+	/*
-+	 * Create the necessary batching resources if the crypto acomp alg
-+	 * implements the batch_compress and batch_decompress API.
-+	 */
-+	if (acomp_has_async_batching(acomp)) {
-+		nr_reqs = min(ZSWAP_MAX_BATCH_SIZE, crypto_acomp_batch_size(acomp));
-+		pr_info_once("Creating acomp_ctx with %d reqs/buffers for batching since crypto acomp\n%s has registered batch_compress() and batch_decompress().\n",
-+			nr_reqs, pool->tfm_name);
+-	/*
+-	 * We may have had an existing entry that became stale when
+-	 * the folio was redirtied and now the new version is being
+-	 * swapped out. Get rid of the old.
+-	 */
+-	if (old)
+-		zswap_entry_free(old);
++	if (!zswap_compress_folio(folio, entries, pool))
++		goto store_folio_failed;
+ 
+-	/*
+-	 * The entry is successfully compressed and stored in the tree, there is
+-	 * no further possibility of failure. Grab refs to the pool and objcg.
+-	 * These refs will be dropped by zswap_entry_free() when the entry is
+-	 * removed from the tree.
+-	 */
+-	zswap_pool_get(pool);
+-	if (objcg)
+-		obj_cgroup_get(objcg);
++	for (index = 0; index < nr_pages; ++index) {
++		swp_entry_t page_swpentry = page_swap_entry(folio_page(folio, index));
++		struct zswap_entry *old, *entry = entries[index];
++
++		old = xa_store(swap_zswap_tree(page_swpentry),
++			       swp_offset(page_swpentry),
++			       entry, GFP_KERNEL);
++		if (xa_is_err(old)) {
++			int err = xa_err(old);
++
++			WARN_ONCE(err != -ENOMEM, "unexpected xarray error: %d\n", err);
++			zswap_reject_alloc_fail++;
++			goto store_folio_failed;
++		}
+ 
+-	/*
+-	 * We finish initializing the entry while it's already in xarray.
+-	 * This is safe because:
+-	 *
+-	 * 1. Concurrent stores and invalidations are excluded by folio lock.
+-	 *
+-	 * 2. Writeback is excluded by the entry not being on the LRU yet.
+-	 *    The publishing order matters to prevent writeback from seeing
+-	 *    an incoherent entry.
+-	 */
+-	entry->pool = pool;
+-	entry->swpentry = page_swpentry;
+-	entry->objcg = objcg;
+-	entry->referenced = true;
+-	if (entry->length) {
+-		INIT_LIST_HEAD(&entry->lru);
+-		zswap_lru_add(&zswap_list_lru, entry);
++		/*
++		 * We may have had an existing entry that became stale when
++		 * the folio was redirtied and now the new version is being
++		 * swapped out. Get rid of the old.
++		 */
++		if (old)
++			zswap_entry_free(old);
++
++		/*
++		 * The entry is successfully compressed and stored in the tree, there is
++		 * no further possibility of failure. Grab refs to the pool and objcg.
++		 * These refs will be dropped by zswap_entry_free() when the entry is
++		 * removed from the tree.
++		 */
++		zswap_pool_get(pool);
++		if (objcg)
++			obj_cgroup_get(objcg);
++
++		/*
++		 * We finish initializing the entry while it's already in xarray.
++		 * This is safe because:
++		 *
++		 * 1. Concurrent stores and invalidations are excluded by folio lock.
++		 *
++		 * 2. Writeback is excluded by the entry not being on the LRU yet.
++		 *    The publishing order matters to prevent writeback from seeing
++		 *    an incoherent entry.
++		 */
++		entry->pool = pool;
++		entry->swpentry = page_swpentry;
++		entry->objcg = objcg;
++		entry->referenced = true;
++		if (entry->length) {
++			INIT_LIST_HEAD(&entry->lru);
++			zswap_lru_add(&zswap_list_lru, entry);
++		}
++
++		compressed_bytes += entry->length;
+ 	}
+ 
+-	return entry->length;
++	kfree(entries);
++
++	return compressed_bytes;
++
++store_folio_failed:
++	for (index = 0; index < nr_pages; ++index) {
++		if (!IS_ERR_VALUE(entries[index]->handle))
++			zpool_free(pool->zpool, entries[index]->handle);
++
++		zswap_entry_cache_free(entries[index]);
 +	}
 +
-+	acomp_ctx->buffers = kmalloc_node(nr_reqs * sizeof(u8 *), GFP_KERNEL, cpu_to_node(cpu));
-+	if (!acomp_ctx->buffers)
-+		goto buf_fail;
-+
-+	for (i = 0; i < nr_reqs; ++i) {
-+		acomp_ctx->buffers[i] = kmalloc_node(PAGE_SIZE * 2, GFP_KERNEL, cpu_to_node(cpu));
-+		if (!acomp_ctx->buffers[i]) {
-+			for (j = 0; j < i; ++j)
-+				kfree(acomp_ctx->buffers[j]);
-+			kfree(acomp_ctx->buffers);
-+			ret = -ENOMEM;
-+			goto buf_fail;
-+		}
-+	}
-+
-+	acomp_ctx->reqs = kmalloc_node(nr_reqs * sizeof(struct acomp_req *), GFP_KERNEL, cpu_to_node(cpu));
-+	if (!acomp_ctx->reqs)
- 		goto req_fail;
-+
-+	for (i = 0; i < nr_reqs; ++i) {
-+		acomp_ctx->reqs[i] = acomp_request_alloc(acomp_ctx->acomp);
-+		if (!acomp_ctx->reqs[i]) {
-+			pr_err("could not alloc crypto acomp_request reqs[%d] %s\n",
-+			       i, pool->tfm_name);
-+			for (j = 0; j < i; ++j)
-+				acomp_request_free(acomp_ctx->reqs[j]);
-+			kfree(acomp_ctx->reqs);
-+			ret = -ENOMEM;
-+			goto req_fail;
-+		}
- 	}
--	acomp_ctx->req = req;
++	kfree(entries);
  
-+	/*
-+	 * The crypto_wait is used only in fully synchronous, i.e., with scomp
-+	 * or non-poll mode of acomp, hence there is only one "wait" per
-+	 * acomp_ctx, with callback set to reqs[0], under the assumption that
-+	 * there is at least 1 request per acomp_ctx.
-+	 */
- 	crypto_init_wait(&acomp_ctx->wait);
- 	/*
- 	 * if the backend of acomp is async zip, crypto_req_done() will wakeup
- 	 * crypto_wait_req(); if the backend of acomp is scomp, the callback
- 	 * won't be called, crypto_wait_req() will return without blocking.
- 	 */
--	acomp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-+	acomp_request_set_callback(acomp_ctx->reqs[0], CRYPTO_TFM_REQ_MAY_BACKLOG,
- 				   crypto_req_done, &acomp_ctx->wait);
- 
-+	acomp_ctx->nr_reqs = nr_reqs;
- 	return 0;
- 
- req_fail:
-+	for (i = 0; i < nr_reqs; ++i)
-+		kfree(acomp_ctx->buffers[i]);
-+	kfree(acomp_ctx->buffers);
-+buf_fail:
- 	crypto_free_acomp(acomp_ctx->acomp);
--acomp_fail:
--	kfree(acomp_ctx->buffer);
- 	return ret;
+-store_failed:
+-	zpool_free(pool->zpool, entry->handle);
+-compress_failed:
+-	zswap_entry_cache_free(entry);
+ 	return -EINVAL;
  }
  
-@@ -870,11 +917,22 @@ static int zswap_cpu_comp_dead(unsigned int cpu, struct hlist_node *node)
- 	struct crypto_acomp_ctx *acomp_ctx = per_cpu_ptr(pool->acomp_ctx, cpu);
+@@ -1549,8 +1601,8 @@ bool zswap_store(struct folio *folio)
+ 	struct mem_cgroup *memcg = NULL;
+ 	struct zswap_pool *pool;
+ 	size_t compressed_bytes = 0;
++	ssize_t bytes;
+ 	bool ret = false;
+-	long index;
  
- 	if (!IS_ERR_OR_NULL(acomp_ctx)) {
--		if (!IS_ERR_OR_NULL(acomp_ctx->req))
--			acomp_request_free(acomp_ctx->req);
-+		int i;
-+
-+		for (i = 0; i < acomp_ctx->nr_reqs; ++i)
-+			if (!IS_ERR_OR_NULL(acomp_ctx->reqs[i]))
-+				acomp_request_free(acomp_ctx->reqs[i]);
-+		kfree(acomp_ctx->reqs);
-+
-+		for (i = 0; i < acomp_ctx->nr_reqs; ++i)
-+			kfree(acomp_ctx->buffers[i]);
-+		kfree(acomp_ctx->buffers);
-+
- 		if (!IS_ERR_OR_NULL(acomp_ctx->acomp))
- 			crypto_free_acomp(acomp_ctx->acomp);
--		kfree(acomp_ctx->buffer);
-+
-+		acomp_ctx->nr_reqs = 0;
-+		acomp_ctx = NULL;
+ 	VM_WARN_ON_ONCE(!folio_test_locked(folio));
+ 	VM_WARN_ON_ONCE(!folio_test_swapcache(folio));
+@@ -1584,15 +1636,11 @@ bool zswap_store(struct folio *folio)
+ 		mem_cgroup_put(memcg);
  	}
  
- 	return 0;
-@@ -897,7 +955,7 @@ static bool zswap_compress(struct page *page, struct zswap_entry *entry,
+-	for (index = 0; index < nr_pages; ++index) {
+-		struct page *page = folio_page(folio, index);
+-		ssize_t bytes;
++	bytes = zswap_store_folio(folio, objcg, pool);
++	if (bytes < 0)
++		goto put_pool;
  
- 	mutex_lock(&acomp_ctx->mutex);
+-		bytes = zswap_store_page(page, objcg, pool);
+-		if (bytes < 0)
+-			goto put_pool;
+-		compressed_bytes += bytes;
+-	}
++	compressed_bytes = bytes;
  
--	dst = acomp_ctx->buffer;
-+	dst = acomp_ctx->buffers[0];
- 	sg_init_table(&input, 1);
- 	sg_set_page(&input, page, PAGE_SIZE, 0);
+ 	if (objcg) {
+ 		obj_cgroup_charge_zswap(objcg, compressed_bytes);
+@@ -1622,6 +1670,7 @@ bool zswap_store(struct folio *folio)
+ 		pgoff_t offset = swp_offset(swp);
+ 		struct zswap_entry *entry;
+ 		struct xarray *tree;
++		long index;
  
-@@ -907,7 +965,7 @@ static bool zswap_compress(struct page *page, struct zswap_entry *entry,
- 	 * giving the dst buffer with enough length to avoid buffer overflow.
- 	 */
- 	sg_init_one(&output, dst, PAGE_SIZE * 2);
--	acomp_request_set_params(acomp_ctx->req, &input, &output, PAGE_SIZE, dlen);
-+	acomp_request_set_params(acomp_ctx->reqs[0], &input, &output, PAGE_SIZE, dlen);
- 
- 	/*
- 	 * it maybe looks a little bit silly that we send an asynchronous request,
-@@ -921,8 +979,8 @@ static bool zswap_compress(struct page *page, struct zswap_entry *entry,
- 	 * but in different threads running on different cpu, we have different
- 	 * acomp instance, so multiple threads can do (de)compression in parallel.
- 	 */
--	comp_ret = crypto_wait_req(crypto_acomp_compress(acomp_ctx->req), &acomp_ctx->wait);
--	dlen = acomp_ctx->req->dlen;
-+	comp_ret = crypto_wait_req(crypto_acomp_compress(acomp_ctx->reqs[0]), &acomp_ctx->wait);
-+	dlen = acomp_ctx->reqs[0]->dlen;
- 	if (comp_ret)
- 		goto unlock;
- 
-@@ -975,20 +1033,20 @@ static void zswap_decompress(struct zswap_entry *entry, struct folio *folio)
- 	 */
- 	if ((acomp_ctx->is_sleepable && !zpool_can_sleep_mapped(zpool)) ||
- 	    !virt_addr_valid(src)) {
--		memcpy(acomp_ctx->buffer, src, entry->length);
--		src = acomp_ctx->buffer;
-+		memcpy(acomp_ctx->buffers[0], src, entry->length);
-+		src = acomp_ctx->buffers[0];
- 		zpool_unmap_handle(zpool, entry->handle);
- 	}
- 
- 	sg_init_one(&input, src, entry->length);
- 	sg_init_table(&output, 1);
- 	sg_set_folio(&output, folio, PAGE_SIZE, 0);
--	acomp_request_set_params(acomp_ctx->req, &input, &output, entry->length, PAGE_SIZE);
--	BUG_ON(crypto_wait_req(crypto_acomp_decompress(acomp_ctx->req), &acomp_ctx->wait));
--	BUG_ON(acomp_ctx->req->dlen != PAGE_SIZE);
-+	acomp_request_set_params(acomp_ctx->reqs[0], &input, &output, entry->length, PAGE_SIZE);
-+	BUG_ON(crypto_wait_req(crypto_acomp_decompress(acomp_ctx->reqs[0]), &acomp_ctx->wait));
-+	BUG_ON(acomp_ctx->reqs[0]->dlen != PAGE_SIZE);
- 	mutex_unlock(&acomp_ctx->mutex);
- 
--	if (src != acomp_ctx->buffer)
-+	if (src != acomp_ctx->buffers[0])
- 		zpool_unmap_handle(zpool, entry->handle);
- }
- 
+ 		for (index = 0; index < nr_pages; ++index) {
+ 			tree = swap_zswap_tree(swp_entry(type, offset + index));
 -- 
 2.27.0
 
