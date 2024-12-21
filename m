@@ -1,60 +1,44 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79B541F37BA;
-	Sat, 21 Dec 2024 11:44:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FAAB44C76
+	for <linux-crypto@vger.kernel.org>; Sat, 21 Dec 2024 14:52:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734781489; cv=none; b=VFnOlvWJ3sfmPE95yxMX9tZi4VNXY+mKWPyB/fWoHRiKw02opG3ota3l387LNf5pNLj2Yx2j3yzdW1bUVnpXq082UoKIulauXTTQhDoCUaJRVcF+x3mVFpjz30W7kOQL43cgek2zUMaNnYojmXH6dgfFXirUJjdk5JKxSGcHluI=
+	t=1734792754; cv=none; b=NGlw25XOSlLGh15PUmD6csTq5dU8w5phVM8QwgxqfwUCUVkoW2qfLF6fYQaU4u6w7yC89XFK6EmRrPJub2lPIwPdW48WVsUzV0mwSq/YMsogMnxoBLuAGmLHXAQnC3B0cu3+06UVanQMZ92MtJgh40NBehjwnDxGUwvvmKUgRX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734781489; c=relaxed/simple;
-	bh=R7FCkY8zEpmlZAj2CWJmeEAToi5k5RHpTuix11/39P0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HG5kuCLFgSCSwHqTExPSgMj/+dwgoalKafYFM/OjwNl+2vyf3wdkPqzI0BKVqrOVg8wg8H84LiCS+7KwoGa4O708h66qE+gnAjJbIMPIjDwWvG1En0czWFvrGqOzNAQdF272tppUk2tsnXhSWQ9NwtiIgdO41d/FJ9H7DeqUsas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=VnF7EWmP; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1734792754; c=relaxed/simple;
+	bh=gHdJ1xWf7CyoxMCesqZJNG6kmBxDHFGokr4Ks915W9I=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=lWihdQGcEvQZ7+j5FS3T2MhLswEIshJFmrILkCIEisJsXgHTxptEdHQuL1XtwfFxylrSULg4uUN+gfrofP4qhlVpbnfw4UIzGTzF0XDb+1ZsiucLb5+t5yO5TGcV0NgDswZQHjJvSHaKGglpV0VjrL4G5nAZgOmlhkGhVF48iGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=cHojJd7e; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="VnF7EWmP"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="cHojJd7e"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	s=formenos; h=Content-Type:MIME-Version:Message-ID:Subject:To:From:Date:
+	Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=fN6Rx54yRPxE2G3ZsB46AH54lVE8HoSDT2so6fXpjXU=; b=VnF7EWmPljHM2HV4Y88liP28v7
-	ny6VH++PizzB1H2eiFSneQeyzBPsAGUhqmyfU+hYenzGLwzneb2Zz/UM/lFtFVsGlVsIT311CnO3e
-	SEwYmXUoznFDU93xAaHbkRCCtvdFhti9UEK5kJi5pLlat3H6Qm3mT7gfp9QcySynDM3pE+jIuU10e
-	Qs+BkE/MFhLT6Pea106YHpTDVqwEdn2r28PZwSGCqe8TR4mbSvmGwGLhCN7B+KFi7jcsRuHmmEPhu
-	Y+URbgMKpO/SXOqIIj+3s+VCk0zOY+q6gt5SEVI7DYnGXSlnnrfirPnW5f7vwC59rfdJhI7dr/AjR
-	CruSTuNw==;
+	bh=sZ0/P7zPTiKPipgxg3S5MebDjclY7rtJBOThuVQYVEc=; b=cHojJd7eBigCeDoKE93aEtQvrP
+	Gdhyk/qOUTy6z9kvXC2hwdPIS2w2Mgb2IQA+HOzoUcRCGReV2LBzCBejtEVAa+DKG08KJp7QPbiLt
+	lPOwzQTwe3ceewfyiaLKsKzqi7/HaY+4fotsVju1ULGRutpz+flzpUXn00EGsG1cvGoL0GBUh2ECQ
+	TSrOLNcf3p6cMWKPo1LkhdXx6IKvfpkDSllmv9oSEb+zdKck3n2c7DAbY8vvgwA/mf1js8y4oQHLe
+	tfK3X9H1iNISdMJPGVZvBeuvO/aenohvEeJvMyGy224J9Hrlgmise/huuHoEGoEfpT191TDsH/RpQ
+	0kHzqDEw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tOxhN-002Qdw-10;
-	Sat, 21 Dec 2024 19:44:31 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 21 Dec 2024 19:44:30 +0800
-Date: Sat, 21 Dec 2024 19:44:30 +0800
+	id 1tP0dG-002RMZ-2N;
+	Sat, 21 Dec 2024 22:52:28 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 21 Dec 2024 22:52:27 +0800
+Date: Sat, 21 Dec 2024 22:52:27 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Antoine Tenart <atenart@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
-	Waiman Long <longman@redhat.com>, Boqun Feng <boqun.feng@gmail.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>, linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev, upstream@airoha.com,
-	Richard van Schagen <vschagen@icloud.com>
-Subject: Re: [PATCH v9 3/3] crypto: Add Inside Secure SafeXcel EIP-93 crypto
- engine support
-Message-ID: <Z2aqHmrVAm3adVG6@gondor.apana.org.au>
-References: <20241214132808.19449-1-ansuelsmth@gmail.com>
- <20241214132808.19449-4-ansuelsmth@gmail.com>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Ard Biesheuvel <ardb@kernel.org>
+Subject: [PATCH] crypto: lib/aesgcm - Reduce stack usage in libaesgcm_init
+Message-ID: <Z2bWK_JKxKvwOpTM@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -63,42 +47,25 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241214132808.19449-4-ansuelsmth@gmail.com>
 
-On Sat, Dec 14, 2024 at 02:27:54PM +0100, Christian Marangi wrote:
->
-> +	ahash_tfm = crypto_alloc_ahash(alg_name, 0, 0);
-> +	if (IS_ERR(ahash_tfm))
-> +		return PTR_ERR(ahash_tfm);
-> +
-> +	req = ahash_request_alloc(ahash_tfm, GFP_ATOMIC);
-> +	if (!req) {
-> +		ret = -ENOMEM;
-> +		goto err_ahash;
-> +	}
-> +
-> +	rctx = ahash_request_ctx_dma(req);
-> +	crypto_init_wait(&wait);
-> +	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-> +				   crypto_req_done, &wait);
-> +
-> +	/* Hash the key if > SHA256_BLOCK_SIZE */
-> +	if (keylen > SHA256_BLOCK_SIZE) {
-> +		sg_init_one(&sg[0], key, keylen);
-> +
-> +		ahash_request_set_crypt(req, sg, ipad, keylen);
-> +		ret = crypto_wait_req(crypto_ahash_digest(req), &wait);
+The stack frame in libaesgcm_init triggers a size warning on x86-64.
+Reduce it by making buf static.
 
-Sleeping in setkey is no longer allowed.  I don't think it's
-fatal yet because the main user driving this currently uses
-sync ahashes only.  But we should avoid this in all new driver
-code.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Easiest fix would be to allocate a sync ahash:
-
-	ahash_tfm = crypto_alloc_ahash(alg_name, 0, CRYPTO_ALG_SYNC);
-
-Thanks,
+diff --git a/lib/crypto/aesgcm.c b/lib/crypto/aesgcm.c
+index 6bba6473fdf3..902e49410aaf 100644
+--- a/lib/crypto/aesgcm.c
++++ b/lib/crypto/aesgcm.c
+@@ -697,7 +697,7 @@ static int __init libaesgcm_init(void)
+ 		u8 tagbuf[AES_BLOCK_SIZE];
+ 		int plen = aesgcm_tv[i].plen;
+ 		struct aesgcm_ctx ctx;
+-		u8 buf[sizeof(ptext12)];
++		static u8 buf[sizeof(ptext12)];
+ 
+ 		if (aesgcm_expandkey(&ctx, aesgcm_tv[i].key, aesgcm_tv[i].klen,
+ 				     aesgcm_tv[i].clen - plen)) {
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
