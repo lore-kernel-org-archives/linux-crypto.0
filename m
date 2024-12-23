@@ -1,216 +1,379 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35CF38624B;
-	Mon, 23 Dec 2024 09:00:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06433166307;
+	Mon, 23 Dec 2024 12:11:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734944428; cv=none; b=cMQVoMJVxobKmNpKv5FFQyI3dqPgWKhEPK5+mibmEEoPFc/QXB94R5UjJtPr9dPbV85Njqbf0U69gPrkI9tgRTvrsfvSxXmarJtpxALbGqLoJXeqJeiH6t2bCHlOVuC79ktpe2Dw8+3MhufPqnKcW0XvLTVcOPffdcbG5vC0lHw=
+	t=1734955899; cv=none; b=Bw3sbPJhgDW8ALKYPWbuW4vL7FxwoetsqENeemWmWNAg0z1ewP94l2hGWKmdqgEhHc/c6fNMzJK0kFx917ZSbJEKEQ/t0oVTR6bhj+wkGybwpsQBDc7ixRc1mcT/bH7kBXDLShcT75yp7RMocIWw9wVxu0Mg4LPKkkEiHo5vzB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734944428; c=relaxed/simple;
-	bh=Ic8bhXZ6FR1zAG0CeqwB/yqzja0d35YeRUDtq1AKVXA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pvy4a9LfccmZDYyft7KQsf0YDJv9cZfTsFo8xDJsg3nR9XkVdjlsUSywrFTMuG/YXAiHYzt8T6fHZpndipxmyXOqEze4Y1NVh3+FQOWJMD5Db+5z8NF26xQj3/TDZjdQEvGnScsBl6zHnYqNwIx+B86k8WGpuaI9HzXb4gvtrS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4YGsRM4Myyz4f3lVg;
-	Mon, 23 Dec 2024 16:59:59 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.252])
-	by mail.maildlp.com (Postfix) with ESMTP id 4DC3A1A0196;
-	Mon, 23 Dec 2024 17:00:20 +0800 (CST)
-Received: from [10.67.109.79] (unknown [10.67.109.79])
-	by APP3 (Coremail) with SMTP id _Ch0CgAXqcWgJmlnGeT9FA--.5190S2;
-	Mon, 23 Dec 2024 17:00:18 +0800 (CST)
-Message-ID: <27690711-20f5-4e2c-8f43-17b7d3f10f86@huaweicloud.com>
-Date: Mon, 23 Dec 2024 17:00:16 +0800
+	s=arc-20240116; t=1734955899; c=relaxed/simple;
+	bh=T4q8TAqtW9ewJad2LRn3NEdOLjHX9vlVdu4sLUiB6A0=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=uG659ME1ylXLHjGJybe2YFZrw5oc7pTdNanlCbWipbqHFQRTeTIzm+2SOHXZD1bupfQxWan9/SrV0x5MhALcDSQ3W7aSgAkuozBw/GdaXFQOQDQGi+NXbDL03DplXwnHto7CmKMh8eDVnwhyJhhRkWZGGGKhpUZBSVBdIpRMUjs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=mPQhbYTR; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="mPQhbYTR"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BN9dTft008340;
+	Mon, 23 Dec 2024 12:10:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=X/HYWJ
+	4KKBSZHIvaAsJTgofYfg4xLMIh7+ZZdByQCK4=; b=mPQhbYTRlVTgR3yAf4FRQC
+	yHrW7xtdEfL4v0ldQpY6MwD03z0tp+sF+TJXDHeBpqgxWnBQPJLFi6TXJfhupHYC
+	DGrrSURKRpjTXHdHm0fH9sdhyf6AUwpKCD3uvk3AARb/BnGNX5DEGFWhNr2yWmg3
+	Lj98WOjFE37cQfin5xiTUO+b89VEV8egLR8+cmBzXEHM6LWmxTTFX08PWQBxM0wt
+	4tzrpiTY1BWZ4UhaaREuzGCu4Hwf6r0mleZxzRA5ZmYG34wf4h/z+O6O3DoV7hiP
+	JJF8c1oJI2TYugSs2T6vP+ydhTXw21H3dZVWwFSu156T3VT4zIGLOMH7fT1WTw5w
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43pm84kmd2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 23 Dec 2024 12:10:01 +0000 (GMT)
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4BNBvQ6c021056;
+	Mon, 23 Dec 2024 12:10:00 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43pm84kmcx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 23 Dec 2024 12:10:00 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4BNA4hH7020548;
+	Mon, 23 Dec 2024 12:10:00 GMT
+Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 43p8cy5nd4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 23 Dec 2024 12:10:00 +0000
+Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
+	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4BNC9xYp29229688
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 23 Dec 2024 12:09:59 GMT
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 902035805C;
+	Mon, 23 Dec 2024 12:09:59 +0000 (GMT)
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 65FA65805A;
+	Mon, 23 Dec 2024 12:09:57 +0000 (GMT)
+Received: from li-43857255-d5e6-4659-90f1-fc5cee4750ad.ibm.com (unknown [9.61.115.247])
+	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 23 Dec 2024 12:09:57 +0000 (GMT)
+Message-ID: <c490397315c2704e9ef65c8ad3fefedb239f1997.camel@linux.ibm.com>
+Subject: Re: [RFC PATCH v3 00/13] Clavis LSM
+From: Mimi Zohar <zohar@linux.ibm.com>
+To: Eric Snowberg <eric.snowberg@oracle.com>,
+        linux-security-module@vger.kernel.org
+Cc: dhowells@redhat.com, dwmw2@infradead.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net, ardb@kernel.org, jarkko@kernel.org,
+        paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
+        roberto.sassu@huawei.com, dmitry.kasatkin@gmail.com, mic@digikod.net,
+        casey@schaufler-ca.com, stefanb@linux.ibm.com, ebiggers@kernel.org,
+        rdunlap@infradead.org, linux-kernel@vger.kernel.org,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-efi@vger.kernel.org, linux-integrity@vger.kernel.org
+Date: Mon, 23 Dec 2024 07:09:56 -0500
+In-Reply-To: <20241017155516.2582369-1-eric.snowberg@oracle.com>
+References: <20241017155516.2582369-1-eric.snowberg@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-2.fc40) 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] padata: fix UAF in padata_reorder
-To: Daniel Jordan <daniel.m.jordan@oracle.com>,
- chenridong <chenridong@huawei.com>, nstange@suse.de
-Cc: steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
- wangweiyang2@huawei.com
-References: <20241123080509.2573987-1-chenridong@huaweicloud.com>
- <20241123080509.2573987-3-chenridong@huaweicloud.com>
- <nihv732hsimy4lfnzspjur4ndal7n3nngrukvr5fx7emgp2jzl@mjz6q5zsswds>
- <2ba08cbe-ce27-4b83-acad-3845421c9bf6@huawei.com>
- <mffodsysfv4qakpyv6qbuqxzfpmt54q7cbpgne6paykzjx626y@f3ze6ti7cshp>
-Content-Language: en-US
-From: Chen Ridong <chenridong@huaweicloud.com>
-In-Reply-To: <mffodsysfv4qakpyv6qbuqxzfpmt54q7cbpgne6paykzjx626y@f3ze6ti7cshp>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:_Ch0CgAXqcWgJmlnGeT9FA--.5190S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxGFWrWFy7Wryxur1xGw4DJwb_yoWrtFW5pF
-	WYkFW2yF4ktr48J3s2vw1UZryIgr1j9F13KF1rKr15C398tryIvw12yF4F9Fyj9r1kKw1q
-	vr4DXasavws7Za7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUylb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vI
-	r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8Gjc
-	xK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0
-	cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8V
-	AvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E
-	14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUwxhLUUUUU
-X-CM-SenderInfo: hfkh02xlgr0w46kxt4xhlfz01xgou0bp/
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: pNfshmhnmaLmmrW9oMqIUfmRpie1-RxX
+X-Proofpoint-ORIG-GUID: MW2ztICRoZTIHPLuL0dlKJnx9MYqPDCK
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 phishscore=0
+ impostorscore=0 malwarescore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 suspectscore=0 bulkscore=0 adultscore=0
+ priorityscore=1501 mlxscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2411120000 definitions=main-2412230108
 
+On Thu, 2024-10-17 at 09:55 -0600, Eric Snowberg wrote:
+> Motivation:
+>=20
+> Each end-user has their own security threat model. What is important to o=
+ne
+> end-user may not be important to another. There is not a right or wrong t=
+hreat
+> model.
+>=20
+> A common request made when adding new kernel changes that could impact th=
+e
+> threat model around system kernel keys is to add additional Kconfig optio=
+ns.
+> As kernel developers, it is challenging to both add and keep track of all=
+ the
+> Kconfig options around security features that may limit or restrict
+> system key usage.  It is also difficult for a general purpose distro to t=
+ake
+> advantage of some of these features, since it may prevent some users from
+> executing their workload.
+>=20
+> It is the author's belief that it is better left up to the end-user on ho=
+w
+> kernel keys should be used within their system.
+>=20
+> Throughout the Linux kernel, key usage is tracked when doing signature
+> verification with keys contained within one of the system keyrings;  howe=
+ver,
+> there isn't a way for the end-user to enforce this usage.  This series gi=
+ves the
+> end-user the ability to configure key usage based on their threat model.
+> Having the ability to enforce key usage also improves security by reducin=
+g the
+> attack surface should a system key be compromised. It allows new features=
+ to be
+> added without the need for additional Kconfig options for fear of changin=
+g the
+> end-user's threat model. It also allows a distro to build a kernel that s=
+uits
+> various end-user's needs without resorting to selecting Kconfig options w=
+ith
+> the least restrictive security options.
 
+The motivation for this patch set is convincing and addresses limiting the =
+usage
+of keys loaded directly or indirectly onto the system trusted keyrings -=
+=20
+.builtin, .machine, and .secondary_trusted_keys keyrings.  Pre-loading the =
+build
+time ephemeral kernel module signing key is a nice improvement from the pre=
+vious
+versions.  My main concern is not with Clavis per-se, but that the LSM
+infrastructure allows configuring all the LSMs, but enabling at build time =
+and
+modifying at runtime a subset of them.  Without Clavis enabled, nothing cha=
+nges
+- any key on the system trusted keyrings remains usable for any purpose.  W=
+ith
+the current LSM design, the end user security threat model cannot be guaran=
+teed.
 
-On 2024/12/11 3:12, Daniel Jordan wrote:
-> Hi Ridong,
-> 
-> On Fri, Dec 06, 2024 at 11:48:36AM +0800, chenridong wrote:
->> On 2024/12/6 7:01, Daniel Jordan wrote:
->>> On Sat, Nov 23, 2024 at 08:05:09AM +0000, Chen Ridong wrote:
->>>> diff --git a/kernel/padata.c b/kernel/padata.c
->>>> index 5d8e18cdcb25..627014825266 100644
->>>> --- a/kernel/padata.c
->>>> +++ b/kernel/padata.c
->>>> @@ -319,6 +319,7 @@ static void padata_reorder(struct parallel_data *pd)
->>>>  	if (!spin_trylock_bh(&pd->lock))
->>>>  		return;
->>>>  
->>>> +	padata_get_pd(pd);
->>>>  	while (1) {
->>>>  		padata = padata_find_next(pd, true);
->>>>  
->>>> @@ -355,6 +356,7 @@ static void padata_reorder(struct parallel_data *pd)
->>>>  	reorder = per_cpu_ptr(pd->reorder_list, pd->cpu);
->>>>  	if (!list_empty(&reorder->list) && padata_find_next(pd, false))
->>>>  		queue_work(pinst->serial_wq, &pd->reorder_work);
->>>> +	padata_put_pd(pd);
->>>
->>> Putting the ref unconditionally here doesn't cover the case where reorder_work
->>> is queued and accesses the freed pd.
->>>
->>> The review of patches 3-5 from this series has a potential solution for
->>> this that also keeps some of these refcount operations out of the fast
->>> path:
->>>
->>>     https://lore.kernel.org/all/20221019083708.27138-1-nstange@suse.de/
->>>
->>
->> Thank you for your review.
->>
->> IIUC, patches 3-5 from this series aim to fix two issue.
->> 1. Avoid UAF for pd(the patch 3).
->> 2. Avoid UAF for ps(the patch 4-5).
->> What my patch 2 intends to fix is the issue 1.
->>
->> Let's focus on issue 1.
->> As shown bellow, if reorder_work is queued, the refcnt must greater than
->> 0, since its serial work have not be finished yet. Do your agree with that?
-> 
-> I think it's possible for reorder_work to be queued even though all
-> serial works have finished:
-> 
->  - padata_reorder finds the reorder list nonempty and sees an object from
->    padata_find_next, then gets preempted
->  - the serial work finishes in another context
->  - back in padata_reorder, reorder_work is queued
-> 
-> Not sure this race could actually happen in practice though.
-> 
-> But, I also think reorder_work can be queued when there's an unfinished
-> serial work, as you say, but with UAF still happening:
-> 
-> padata_do_serial
->   ...
->   padata_reorder
->     // processes all remaining
->     // requests then breaks
->     while (1) {
->       if (!padata)
->         break;
->       ...
->     }
->   
->                                   padata_do_serial
->                                     // new request added
->                                     list_add
->     // sees the new request
->     queue_work(reorder_work)
->                                     padata_reorder
->                                       queue_work_on(squeue->work)
-> 
-> 
->    
->                                   <kworker context>
->                                   padata_serial_worker
->                                     // completes new request,
->                                     // no more outstanding
->                                     // requests
->                                                                       crypto_del_alg
->                                                                         // free pd
-> <kworker context>
-> invoke_padata_reorder
->   // UAF of pd
-> 
-
-Sorry for being busy with other work for a while.
-Thank you for your patience.
-In theory, it does exist. Although I was unable reproduce it(I added
-delay helper as below), I noticed that Herbert has reported a UAF issue
-occurred in the padata_parallel_worker function. Therefore, it would be
-better to fix it in Nicolai's approach.
-
-static void padata_parallel_worker(struct work_struct *parallel_work)
- {
-+       mdelay(10);
-+
-
-Hi, Nicolai, would you resend the patch 3 to fix this issue?
-I noticed you sent the patch 2 years ago, but this series has not been
-merged.
-
-Or may I send a patch that aligns with your approach to resolve it?
-Looking forward your feedback.
-
-
->> pcrypt_aead_encrypt/pcrypt_aead_decrypt
->> padata_do_parallel 			// refcount_inc(&pd->refcnt);
->> padata_parallel_worker	
->> padata->parallel(padata);
->> padata_do_serial(padata);		
->> // pd->reorder_list 			// enque reorder_list
->> padata_reorder
->>  - case1:squeue->work
->> 	padata_serial_worker		// sub refcnt cnt
->>  - case2:pd->reorder_work		// reorder->list is not empty
->> 	invoke_padata_reorder 		// this means refcnt > 0
->> 	...
->> 	padata_serial_worker
-> 
-> In other words, in case2 above, reorder_work could be queued, another
-> context could complete the request in padata_serial_worker, and then
-> invoke_padata_reorder could run and UAF when there aren't any remaining
-> serial works.
-> 
->> I think the patch 3(from Nicolai Stange) can also avoid UAF for pd, but
->> it's complicated.
-> 
-> For fixing the issue you describe, without regard for the reorder work,
-> I think the synchronize_rcu from near the end of the patch 3 thread is
-> enough.  A synchronize_rcu in the slow path seems better than two
-> atomics in the fast path.
-
-Thank you. I tested with 'synchronize_rcu', and it can fix the issue I
-encountered. As I mentioned, Herbert has provided another stack, which
-indicates that case 2 exists. I think it would be better to fix it as
-patch 3 did.
-
-Thanks,
-Ridong
+Mimi
+>=20
+> Solution:
+>=20
+> This series introduces a new LSM called Clavis (Latin word meaning key).
+> This LSM leaves it up to the end-user to determine what system keys they =
+want
+> to use and for what purpose.
+>=20
+> The Clavis LSM adds the ability to do access control for all system keys.=
+  When
+> enabled, until an ACL entry is added for a specific key, none of the syst=
+em keys
+> may be used for any type of verification purpose.  When the kernel is bui=
+lt,
+> typically kernel modules are signed with an ephemeral key, an ACL entry f=
+or the
+> ephemeral key is pre-loaded, allowing the kernel modules to load during b=
+oot. At
+> build time other ACL entries may also be included.
+>=20
+> The Clavis LSM requires the end-user to have their own public key infrast=
+ructure
+> (PKI).  In order for a Clavis ACL entry to be added, the ACL must be sign=
+ed by
+> what is being called the Clavis key.  The Clavis key is owned by the end-=
+user.
+> The Clavis public key can be contained within the machine keyring, or it =
+can be
+> added after the machine boots.
+>=20
+> Not only is there a new Clavis key being introduced, but there is also a =
+new
+> .clavis keyring.  The .clavis keyring contains a single Clavis key. It al=
+so
+> contains any number of ACL entries that are signed by the Clavis key.
+>=20
+> It is believed that the most common setup would be to have the Clavis key
+> contained within the machine keyring. Enabling the Clavis LSM during boot=
+ is
+> accomplished by passing in the asymmetric key id for the Clavis key withi=
+n a
+> new "clavis=3D" boot param.  The asymmetric key id must match one already
+> contained within any of the system keyrings.  If a match is found, a link=
+ is
+> created into the new .clavis keyring.  This Clavis key shall be used as t=
+he
+> root of trust for any keyring ACL updates afterwards.
+>=20
+> On UEFI systems the "clavis" boot param is mirrored into a new UEFI varia=
+ble
+> within the EFI stub code. This variable will persist until the next reboo=
+t.
+> This same type of functionality is done within shim. Since this variable =
+is
+> created before ExitBootServices (EBS) it will not have the NVRAM bit set,
+> signifying it was created during the Boot Services phase. This is being u=
+sed
+> so the "clavis" boot param can not be changed via kexec, thereby preventi=
+ng a
+> pivot of the root of trust.
+>=20
+> As mentioned earlier, this LSM introduces a new .clavis keyring.  Followi=
+ng
+> boot, no new keys can be added to this keyring and only the key designate=
+d via
+> the initial boot param may be used. If the clavis boot param was not used=
+, the
+> LSM can be enabled afterwards using the keyctl command.  The end-user may=
+ add
+> their Clavis key into the .clavis keyring and the Clavis LSM shall be ena=
+bled.
+>=20
+> The .clavis keyring also holds the access control list for system keys. A=
+ new
+> key type called clavis_key_acl is being introduced. This contains the usa=
+ge
+> followed by the asymmetric key id. To be added to the clavis keyring, the
+> clavis_key_acl must be S/MIME signed by the Clavis key. New ACL additions=
+ to
+> the .clavis keyring may be added at any time.
+>=20
+> Currently this LSM does not require new changes or modifications to any u=
+ser
+> space tools.  It also does not have a securityfs interface.  Everything i=
+s
+> done using the existing keyctl tool through the new .clavis keyring. The
+> S/MIME signing can be done with a simple OpenSSL command. If additions or
+> updates need to be added in the future, new ACL key types could be create=
+d.
+> With this approach, maintainability should not be an issue in the future
+> if missing items are identified.
+>=20
+> Clavis must be configured at build time with CONFIG_SECURITY_CLAVIS=3Dy. =
+The list
+> of security modules enabled by default is set with CONFIG_LSM.  The kerne=
+l
+> configuration must contain CONFIG_LSM=3D[...],clavis with [...] as the li=
+st of
+> other security modules for the running system.
+>=20
+> For setup and usage instructions, a clavis admin-guide has been included
+> in Documentation/admin-guide/LSM/clavis.rst.
+>=20
+> Future enhancements to this LSM could include:
+>=20
+> 1. Subsystems that currently use system keys with
+>    VERIFYING_UNSPECIFIED_SIGNATURE could be updated with their specific u=
+sage
+>    type.  For example, a usage type for IMA, BPF, etc could be added.
+>=20
+> 2. Having the ability to allow platform keys to be on par with all other
+>    system keys when using this LSM. This would be useful for a user that
+>    controls their entire UEFI SB DB key chain and doesn't want to use MOK=
+ keys.
+>    This could also potentially remove the need for the machine keyring al=
+l
+>    together.
+>=20
+> 3. Some of the Kconfig options around key usage and types could be deprec=
+ated.
+>=20
+> I would appreciate any feedback on this approach. Thanks.
+>=20
+> Changes in v3:
+>   Rebased to 6.12-rc3
+>   Added Kunit test code
+>   Preload an ACL in the clavis keyring with the ephemeral module signing =
+key
+>   Preload user defined ACL data into the clavis keyring with build time d=
+ata
+>   Changes to the second patch recommended by Jarkko
+>   Reordered patches recommended by Mimi
+>   Documentation improvements recommended by Randy
+>=20
+> Changes in v2:
+>   Rebased to 6.10-rc1
+>   Various cleanup in the first patch recommended by Jarkko
+>   Documentation improvements recommended by Randy
+>   Fixed lint warnings
+>   Other cleanup
+>=20
+> Eric Snowberg (13):
+>   certs: Remove CONFIG_INTEGRITY_PLATFORM_KEYRING check
+>   certs: Introduce ability to link to a system key
+>   clavis: Introduce a new system keyring called clavis
+>   keys: Add new verification type (VERIFYING_CLAVIS_SIGNATURE)
+>   clavis: Introduce a new key type called clavis_key_acl
+>   clavis: Populate clavis keyring acl with kernel module signature
+>   keys: Add ability to track intended usage of the public key
+>   clavis: Introduce new LSM called clavis
+>   clavis: Allow user to define acl at build time
+>   efi: Make clavis boot param persist across kexec
+>   clavis: Prevent boot param change during kexec
+>   clavis: Add function redirection for Kunit support
+>   clavis: Kunit support
+>=20
+>  Documentation/admin-guide/LSM/clavis.rst      | 191 ++++++
+>  .../admin-guide/kernel-parameters.txt         |   6 +
+>  MAINTAINERS                                   |   7 +
+>  certs/.gitignore                              |   1 +
+>  certs/Makefile                                |  20 +
+>  certs/blacklist.c                             |   3 +
+>  certs/clavis_module_acl.c                     |   7 +
+>  certs/system_keyring.c                        |  36 +-
+>  crypto/asymmetric_keys/asymmetric_type.c      |   1 +
+>  crypto/asymmetric_keys/pkcs7_trust.c          |  20 +
+>  crypto/asymmetric_keys/pkcs7_verify.c         |   5 +
+>  crypto/asymmetric_keys/signature.c            |   4 +
+>  drivers/firmware/efi/Kconfig                  |  12 +
+>  drivers/firmware/efi/libstub/Makefile         |   1 +
+>  drivers/firmware/efi/libstub/clavis.c         |  33 +
+>  .../firmware/efi/libstub/efi-stub-helper.c    |   2 +
+>  drivers/firmware/efi/libstub/efi-stub.c       |   2 +
+>  drivers/firmware/efi/libstub/efistub.h        |   8 +
+>  drivers/firmware/efi/libstub/x86-stub.c       |   2 +
+>  include/crypto/pkcs7.h                        |   3 +
+>  include/crypto/public_key.h                   |   4 +
+>  include/keys/system_keyring.h                 |   7 +-
+>  include/linux/efi.h                           |   1 +
+>  include/linux/integrity.h                     |   8 +
+>  include/linux/lsm_count.h                     |   8 +-
+>  include/linux/lsm_hook_defs.h                 |   2 +
+>  include/linux/security.h                      |   7 +
+>  include/linux/verification.h                  |   2 +
+>  include/uapi/linux/lsm.h                      |   1 +
+>  security/Kconfig                              |  11 +-
+>  security/Makefile                             |   1 +
+>  security/clavis/.gitignore                    |   2 +
+>  security/clavis/.kunitconfig                  |   4 +
+>  security/clavis/Kconfig                       |  37 ++
+>  security/clavis/Makefile                      | 156 +++++
+>  security/clavis/clavis.c                      |  26 +
+>  security/clavis/clavis.h                      |  62 ++
+>  security/clavis/clavis_builtin_acl.c          |   7 +
+>  security/clavis/clavis_efi.c                  |  50 ++
+>  security/clavis/clavis_keyring.c              | 426 +++++++++++++
+>  security/clavis/clavis_test.c                 | 566 ++++++++++++++++++
+>  security/integrity/iint.c                     |   2 +
+>  security/security.c                           |  13 +
+>  .../selftests/lsm/lsm_list_modules_test.c     |   3 +
+>  44 files changed, 1757 insertions(+), 13 deletions(-)
+>  create mode 100644 Documentation/admin-guide/LSM/clavis.rst
+>  create mode 100644 certs/clavis_module_acl.c
+>  create mode 100644 drivers/firmware/efi/libstub/clavis.c
+>  create mode 100644 security/clavis/.gitignore
+>  create mode 100644 security/clavis/.kunitconfig
+>  create mode 100644 security/clavis/Kconfig
+>  create mode 100644 security/clavis/Makefile
+>  create mode 100644 security/clavis/clavis.c
+>  create mode 100644 security/clavis/clavis.h
+>  create mode 100644 security/clavis/clavis_builtin_acl.c
+>  create mode 100644 security/clavis/clavis_efi.c
+>  create mode 100644 security/clavis/clavis_keyring.c
+>  create mode 100644 security/clavis/clavis_test.c
+>=20
+>=20
+> base-commit: 8e929cb546ee42c9a61d24fae60605e9e3192354
 
