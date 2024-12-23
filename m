@@ -1,67 +1,64 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 007531C3C12
-	for <linux-crypto@vger.kernel.org>; Mon, 23 Dec 2024 19:53:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73475188CDB;
+	Mon, 23 Dec 2024 20:44:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734983631; cv=none; b=gfp+lyKEox7SVTvhbEnuQSOM0fAIzl5nIFNtZAX/4hAyCx7cr/RAs5/r75E5jtE92MgIbRouXSn+hfFKKXymfJ1yq+jnlGzdzISChSGrO8XSSguyiLhAG0bsRRjcfUX61NbYxGcxsmfYooOevZxWAcXdLXKwubH9aAf63Men3Is=
+	t=1734986673; cv=none; b=W4la8w5NLBrZPRev1K/3Z2grsSSb7RPa/WXiVuxPGFuYlS3/lhkdajH6T40CyGGP8Pt6dOFlKxb2J8gevbdkLZCAT7z6JbbTB7PkNLykjem/9Udl9iB9Pou58MM5ckCGW95prcrVyx4DG0o2j4Dyx1srJhq+0Fq3ZCM9rb3827A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734983631; c=relaxed/simple;
-	bh=nVOJTIBxYPEDW+qkLFwr0O9e/nJUtN5GdDoRydx5h34=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OBoC7HWqbMnmp+fgH+ZPYQXhYhiNc7amuyn7sDPMhai/haqPVe98CJU11o6Ez09N9Z5fkwol9fapERk8sjnkyhffvDsaS5bgQDy2DQTx4xbCZJkqFAbvZNhDrAIT7NkWjJY/qo3s/d2rETiIEG7nr7nuT6tcvpqZwwuv8r2EjJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CZ78DogC; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1734986673; c=relaxed/simple;
+	bh=/IHoBxSjsaCAQlSKqA2pfkH1SPJIuYj9VLfq79j+GTk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=L7l7evnGRemejppKBcDQMCH8k3pjWLj2w4VhqDuBhfBWICwb+wwY/lYJ1pP2XP60calRs2Yec+aygUAiV6pBdINfmKLJ3ulV4Vtng9QC3O425OuThfMU8fgk9PldF9pjNre3ldTWBB/P+K3JEwC/MsERgBUuDKAkrrk2CqzCMt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fesnKRlD; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CZ78DogC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65D75C4CED3;
-	Mon, 23 Dec 2024 19:53:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fesnKRlD"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B56F4C4CED3;
+	Mon, 23 Dec 2024 20:44:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1734983630;
-	bh=nVOJTIBxYPEDW+qkLFwr0O9e/nJUtN5GdDoRydx5h34=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CZ78DogCRPILlxvvcYkQHM3tFHetouuK3b+gKCL33HHVoA5fkIuGncxdUpAMDZTAe
-	 Ph3HG6TDOwRdRDLxxMwW/ytrRFXtFZH0rlATD7DoSD5A2cQF7oHhGJPAe/zRDLeefs
-	 xDJEUTsrqMXSCYlZlNJmg58UGmK+jqHyRrQ+Y6k92uwLL9ZlZAPeUGK+GJ1ofMLtNb
-	 wMCuLBw5QaXli6hj42nafzvSYbOBPCLydx49zW6Bl6zYhPxtbuL1+6g5MMpttHR/sK
-	 6gWcneo0h7gxUX7cnhEknpA9wf4B/J4QE28tUe23MRgKaw05k6tnk/VCjKhSfj+jaJ
-	 RWGf3Sld9fxJA==
-Date: Mon, 23 Dec 2024 11:53:41 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 13/29] crypto: scatterwalk - add new functions for
- iterating through data
-Message-ID: <20241223195341.GC2032@quark.localdomain>
-References: <20241221091056.282098-14-ebiggers@kernel.org>
- <Z2amIuU1sLDWBsSh@gondor.apana.org.au>
+	s=k20201202; t=1734986673;
+	bh=/IHoBxSjsaCAQlSKqA2pfkH1SPJIuYj9VLfq79j+GTk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=fesnKRlDWGVm7gY8QaNyRCVlvf0xEvTe5uS3bn3ZcmIf5ie1mTLDAtQqM1w5Aqd3K
+	 T0+HSmzfGibuUZ4jjPC7SLwsbE3+Gw84Ca7VM8hfIwlCrDs/CpHBTFAp12AWq9Quq8
+	 fI14QyQHdz/mdlFM11aAZFD31L3CzwbPkpQy/UNmwG4Epy6VOQm99k8YrbwiZfjYAs
+	 mfR3U0g58zCdBH3QuPSM31fHPLtENxfO5wchKIbPiOtS1/E2iEBaTc3XMBMR90Wafp
+	 DcixWqZeA+8CyXdTizAAt0JQcy2S1Gd5rhfZXmfg2jbHi4oMOjogCPx5Rrn9h45aW6
+	 nun0BvnVt99FQ==
+Date: Mon, 23 Dec 2024 12:44:31 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, Boris Pismenny <borisp@nvidia.com>, John
+ Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH 26/29] net/tls: use the new scatterwalk functions
+Message-ID: <20241223124431.1d34888f@kernel.org>
+In-Reply-To: <20241223194249.GB2032@quark.localdomain>
+References: <20241221091056.282098-1-ebiggers@kernel.org>
+	<20241221091056.282098-27-ebiggers@kernel.org>
+	<20241223074825.7c4c74a0@kernel.org>
+	<20241223194249.GB2032@quark.localdomain>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z2amIuU1sLDWBsSh@gondor.apana.org.au>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Sat, Dec 21, 2024 at 07:27:30PM +0800, Herbert Xu wrote:
-> Eric Biggers <ebiggers@kernel.org> wrote:
-> >
-> > +       if (ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE)
-> > +               flush_dcache_page(scatterwalk_page(walk));
+On Mon, 23 Dec 2024 11:42:49 -0800 Eric Biggers wrote:
+> > Acked-by: Jakub Kicinski <kuba@kernel.org>  
 > 
-> Does the if statement do anything? If so please add a comment
-> about what it does because it's not obvious.
+> Thanks.  FYI I will need to update this patch in the next version, as I did not
+> take into consideration what chain_to_walk() is doing.  This code seems to be a
+> bit unique in how it is using the scatterwalk functions.
 > 
+> Also I think the second paragraph of my commit message is wrong, as the calls to
+> scatterwalk_done() in tls_enc_records() are the ones I thought were missing.
 
-Yes, since even though flush_dcache_page() is a no-op when
-!ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE, scatterwalk_page() still calls sg_page()
-which calls BUG_ON() when CONFIG_DEBUG_SG=y.  That can't be optimized out.  Note
-that despite ostensibly being a debug option, CONFIG_DEBUG_SG=y is often used in
-production kernels.  Also, in patch 29 this changes into a loop that may flush
-multiple pages, and which makes it harder to show that it would get optimized
-out even with CONFIG_DEBUG_SG=n; e.g., the compiler would have to prove that the
-loop is finite.  I will add a comment to this patch and update it in patch 29.
+netdev@ only got CCed on this one patch so TBH I have trusted 
+the conversion :(
 
-- Eric
+FWIW tls has a relatively solid selftest:
+tools/testing/selftests/net/tls.c
