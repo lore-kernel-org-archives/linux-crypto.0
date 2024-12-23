@@ -1,97 +1,78 @@
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 024F7A35;
-	Sun, 22 Dec 2024 11:54:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 936FA19BA6;
+	Mon, 23 Dec 2024 02:53:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734868498; cv=none; b=m2DePP8tnbnDZxJ2MU5svo5B7H5N+TgPbWtlpQkLZ9OBCr7u7qzL8thOQlyGeKWMH5HKZqdMoSTudpNfFtpHsX/pyRXhlQcClOW9Knxx2qsLQqtfACdxRDoKUU5gEdjB+wEApYRJNNRY5APXhamHvQ3x5pu1pg0nxTXzek3zIHY=
+	t=1734922436; cv=none; b=DbMaCqyiAIo/GcswPkuenlRlmPW0C8wBmYZpdhB5gbO9gm0cZX3mcwRJgJFif9z3POSnvdmHV1S39UjrwfjtNXAVALg7OSRyfE+VPzW5K217CsPFw2l/bmHsd7Jo82Ss0UVoU5v3Qs2M/DjBrb9Y8p1vpQmW8m5iIgdK2pEPSpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734868498; c=relaxed/simple;
-	bh=aCoYV99pE0D5Yw9axAGRa1j+CW6YXXVZzSiuO2y/FNY=;
+	s=arc-20240116; t=1734922436; c=relaxed/simple;
+	bh=kUUBGikdtXr9koloWcESuZHNZ+tKO485yigGPSw//PQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DudATxNkl3kV0YauPhC3RuR4uYeHHi4l+iOlum7a9vXVx5LrZcVv0gAGmHqKdVX+J5gOM2ipp3yxiZaSPjuo0PmVqRXoon4tM5MySY9bhNzuknuVd2bGakeDZVnfMdjZOANEgtJr0iyXclCUTN0H1bok4KDWOZHZTZQxFgOPmtw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=ng86LOI9; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=KIaeMFgHhm0Zm9qOrLT69XfMIyZMoMEP9FC6WKu9r+TotRxZEoUVr9RPTzd45KzYj4I3rjH546llAX6s96Nz3lR/sxtLv3IBixU5VWxNGgHBHovBbVCoE+se3w9Vgfmzg2ptF9spAktIR4uO3SHaCTfmVnqXqmBcY2AXBDSWeOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=HhQpa9nv; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="ng86LOI9"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
-	:Subject; bh=ZUjZGx9oXcpKGtsUtrPyuB4/soGn0+H0/gGEY2JZYk8=; b=ng86LOI9eVYWbWTw
-	WbU9ZQwr6I+Vdb30ghhQ5X/cE3JshUkmbBhd0GcJtpIBOGgRG0kUwS4n7Wkdtk28jPUSwDHbtowCW
-	sXt57B8nrkIhN3dMaLnKwL7ObxeAvs41rYyccvMHa6PzrS+WM3O4dTiIHY0BpM2uEgRL14X0yJWWX
-	dDbIEb1QqB5pVFRJXSvdjbOHQp8ynJG5b28FPbu4YBvympLGM9nGREpVjL1iZIFvsIWBoWLMuoh6P
-	IKsZUM38u3o0IEQHfx0RQb7ZUqQMOuHG9OXmzYUeMb4FwPTKqBgdEOUhbSxhPmdBDxqERHH3G4+WP
-	/bsjmcuBGfk9OHkscw==;
-Received: from dg by mx.treblig.org with local (Exim 4.96)
-	(envelope-from <dg@treblig.org>)
-	id 1tPKXp-006kVF-2m;
-	Sun, 22 Dec 2024 11:54:49 +0000
-Date: Sun, 22 Dec 2024 11:54:49 +0000
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="HhQpa9nv"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=k1RVVPOPWnrP3P+6X0EVuLTSytw/SUUS/gMS9H6c53g=; b=HhQpa9nvzBxLkNxfTJWJWiew5C
+	S3e5TQyChzFYZTkYS9lfmBgjHX5aqVLklF4I+d43FB0HHw3TOFRS4LYQGtwNdrV8xFNPYoOiQi3im
+	X10kg7bS1n57yvEiGjkJ5/ouYwL76RXBdlUlxM7Gx/6V9meCAqm1BkNm1ZFQ2+cRbd9NEbYcPvVOP
+	DCgj49YKxvkfu3PqRMs6AIuXiMv1M+BDrPfNyKUMSv0u9OSHL6UejGiEz9wntq8fSF5OIfl1wqhec
+	mbX2yIfPsP4htpTVWN4IM9l2DqV8PtfZKB4i/m85OJ0BZbnEueQNs38by9XNo+CqxK3wE8JgBktrk
+	z5Hvw9RQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tPYMi-002a3e-1r;
+	Mon, 23 Dec 2024 10:53:38 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 23 Dec 2024 10:53:37 +0800
+Date: Mon, 23 Dec 2024 10:53:37 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: "Dr. David Alan Gilbert" <linux@treblig.org>
 Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
+	linux-kernel@vger.kernel.org,
+	Dan Williams <dan.j.williams@intel.com>
 Subject: Re: [PATCH] crypto: lib/gf128mul - Remove some bbe deadcode
-Message-ID: <Z2f-CXgNGkstB4ds@gallifrey>
+Message-ID: <Z2jQsb6d2PCKyRZ1@gondor.apana.org.au>
 References: <20241211220218.129099-1-linux@treblig.org>
  <Z2eTGr3l-Zu_Tgi3@gondor.apana.org.au>
+ <Z2f-CXgNGkstB4ds@gallifrey>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <Z2eTGr3l-Zu_Tgi3@gondor.apana.org.au>
-X-Chocolate: 70 percent or better cocoa solids preferably
-X-Operating-System: Linux/6.1.0-21-amd64 (x86_64)
-X-Uptime: 11:54:06 up 227 days, 23:08,  1 user,  load average: 0.00, 0.00,
- 0.00
-User-Agent: Mutt/2.2.12 (2023-09-09)
+In-Reply-To: <Z2f-CXgNGkstB4ds@gallifrey>
 
-* Herbert Xu (herbert@gondor.apana.org.au) wrote:
-> On Wed, Dec 11, 2024 at 10:02:18PM +0000, linux@treblig.org wrote:
-> > From: "Dr. David Alan Gilbert" <linux@treblig.org>
-> >=20
-> > gf128mul_4k_bbe(), gf128mul_bbe() and gf128mul_init_4k_bbe()
-> > are part of the library originally added in 2006 by
-> > commit c494e0705d67 ("[CRYPTO] lib: table driven multiplications in
-> > GF(2^128)")
-> >=20
-> > but have never been used.
-> >=20
-> > Remove them.
-> > (BBE is Big endian Byte/Big endian bits
-> > Note the 64k table version is used and I've left that in)
-> >=20
-> > Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
-> > ---
-> >  include/crypto/gf128mul.h |  6 +---
-> >  lib/crypto/gf128mul.c     | 75 ---------------------------------------
-> >  2 files changed, 1 insertion(+), 80 deletions(-)
->=20
-> Patch applied.  Thanks.
+On Sun, Dec 22, 2024 at 11:54:49AM +0000, Dr. David Alan Gilbert wrote:
+>
+> Thanks!  I'd appreciate if you could also look back at one
+> from September:
+>   async_xor: Remove unused 'async_xor_val'
+>   Message ID: 20240929132148.44792-1-linux@treblig.org
 
-Thanks!  I'd appreciate if you could also look back at one
-=66rom September:
-  async_xor: Remove unused 'async_xor_val'
-  Message ID: 20240929132148.44792-1-linux@treblig.org
+The MAINTAINERS entry for that file is:
 
-Thanks again,
+ASYNCHRONOUS TRANSFERS/TRANSFORMS (IOAT) API
+R:      Dan Williams <dan.j.williams@intel.com>
+S:      Odd fixes
+W:      http://sourceforge.net/projects/xscaleiop
+F:      Documentation/crypto/async-tx-api.rst
+F:      crypto/async_tx/
+F:      include/linux/async_tx.h
 
-Dave
-
-> --=20
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
->=20
---=20
- -----Open up your eyes, open up your mind, open up your code -------  =20
-/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \=20
-\        dave @ treblig.org |                               | In Hex /
- \ _________________________|_____ http://www.treblig.org   |_______/
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
