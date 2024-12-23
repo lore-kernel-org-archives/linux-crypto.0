@@ -1,91 +1,152 @@
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE37B5473E;
-	Mon, 23 Dec 2024 12:21:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49F6F46B5;
+	Mon, 23 Dec 2024 13:22:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1734956495; cv=none; b=ZjiJVXWZAlHGu4JsSVTuJ1V3gJox1hEPJ10Swpxmtg8ADb6cxAAuyvewpCJQ00/vcrxQECLPLbJhmf+s0pA3qj85N9gBtoep7uvNgRf4DRoU4BVf/UBj4ixCPybVZEIHj7Ptq5pUXicvmiwwfhJISyLJmmwQc4CURdPuDJw/J0E=
+	t=1734960171; cv=none; b=A0IPawblX4DXgkxXi9TuHOka2WbfyXAoZt32PoGuxIQPS4dHyLXw+8bNZxKb3DBhWaqJlGw57Aunz1wC2obKDm6tP5L/C83CYm2rbQ9huexc6LZD2BJzOUoo7W1NdzyPOuZmGw2kUSMCAh2Kzvoy3iV8E8/QXAiY9ZMPBaPL2f4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1734956495; c=relaxed/simple;
-	bh=+Uh7GavcIz7YhZr5DUVmOs+Vyg41HksO8KtvD7505UY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cXfocQc9lY742vNvshjYMVLDd3356JLGddcwn7KVB2iR3Lh/WA2Nk+/X7/8iPeAN7mgFGRdRirUlvKdScizbY6zKFMEqPIg8NPUwL6rqlSQ7BPUpVuy/TBVHpRcemaqVOeo9F5/Tff1RTIKNWf+TtjWNwakDUrFfCqOnkuOFJ3o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=lgPuGWap; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+	s=arc-20240116; t=1734960171; c=relaxed/simple;
+	bh=CY7ULUEktcxb7bamYkQGXj29N7yWje9RXY2qaPrPHvo=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=O8FtQp7lGwvXMvHVVRaoS9f5uAxfK2WgV2xHBBHvX1QQQGrFpU8N9tRMpDJavKXXniL3mIBeH4nlb1eO23vGmA1W6ehN0P32GjbFNWdMFop6UPO0o8k2s8/kQFVRcW+C1LROI6btuMifJ0b/drOxV3HtSfP7gO4g+2SE1o3k4ro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=sDnmWTjU; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="lgPuGWap"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
-	:Subject; bh=auoxJUtXlCxFo04JJqoDs3pCgdoS1JhRfCkNTB8rgvo=; b=lgPuGWaphtY/N7zz
-	P+gtYjUy9+4zaJZ/J8uYagKEqZHg9I65Du3SBZ2n6EZBbHh+GC13Ggt44mg/aWY/KonbSfDhUXqsR
-	VpEPYKTazyh452CibX2y5xJRfrlL4nO/po66kr+n0hzYpx5LgD+ZuNFfYoGcudfBzsihqQP37iVsR
-	zqJd8JcYGV2U3j/UdX5hRNUI6JIYEONbWOtB6RxeoUkKKeBw0xMcBnz1M0DnULDfV+j+o/TebGVD2
-	znJbTvDosW/RpPjMd1ggTd2nu09dB+QfLVsxVV2CbnAYYkTbmetj/aqnD7GrSQqwq7/YS00JDcSMc
-	jeR1EzznCIjg8nstRA==;
-Received: from dg by mx.treblig.org with local (Exim 4.96)
-	(envelope-from <dg@treblig.org>)
-	id 1tPhR9-006rao-1S;
-	Mon, 23 Dec 2024 12:21:27 +0000
-Date: Mon, 23 Dec 2024 12:21:27 +0000
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Dan Williams <dan.j.williams@intel.com>
-Subject: Re: [PATCH] crypto: lib/gf128mul - Remove some bbe deadcode
-Message-ID: <Z2lVxyYtIROPAtHE@gallifrey>
-References: <20241211220218.129099-1-linux@treblig.org>
- <Z2eTGr3l-Zu_Tgi3@gondor.apana.org.au>
- <Z2f-CXgNGkstB4ds@gallifrey>
- <Z2jQsb6d2PCKyRZ1@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="sDnmWTjU"
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BN9dTmq008340;
+	Mon, 23 Dec 2024 13:21:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=/c4Nm7
+	sg2cVOF8w//xiKp7ZsdTuXYYOJCJo/aawRB6o=; b=sDnmWTjUJOzKddET5t4Doo
+	aFKpWtjTWktSrcRvWWiKE4CTGTRqGwZvQjPsIMZKXKscjhxyiZ97D7T9A0LUwQui
+	p+ZWaDP1S3qd3Lcuih3xQjpDcSvEsjeeXlF1JCvfqQGx4YS8sgYsebxJWnAZHgdv
+	gIbQZlmtgP+Qc2dPHQOJL5Vqw+m9n9urJrsecyZZiTdTqC2ZErcUOyEnrsZWVkNf
+	tYGZoNAft4YoJ86GFfp86zm9vOybK42CeOr5/+Lb07YnpNMX4oYCghoQrPRZcTfG
+	9ybC5qdfQU2Wx8imdPef7qwM9QsmHviY7wxbJ3kN8hKIYLH4sMfsONOimMdg+0Jg
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43pm84kwu8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 23 Dec 2024 13:21:23 +0000 (GMT)
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4BNDFIxj012699;
+	Mon, 23 Dec 2024 13:21:22 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43pm84kwu6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 23 Dec 2024 13:21:22 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4BN9H8ls002321;
+	Mon, 23 Dec 2024 13:21:21 GMT
+Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 43p80sdxwq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 23 Dec 2024 13:21:21 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4BNDLLoe30737034
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 23 Dec 2024 13:21:21 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E583358058;
+	Mon, 23 Dec 2024 13:21:20 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5CEB35805B;
+	Mon, 23 Dec 2024 13:21:18 +0000 (GMT)
+Received: from li-43857255-d5e6-4659-90f1-fc5cee4750ad.ibm.com (unknown [9.61.114.169])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 23 Dec 2024 13:21:18 +0000 (GMT)
+Message-ID: <2e413e587556199c7403ecedef2ed854cd3e6c39.camel@linux.ibm.com>
+Subject: Re: [RFC PATCH v3 01/13] certs: Remove
+ CONFIG_INTEGRITY_PLATFORM_KEYRING check
+From: Mimi Zohar <zohar@linux.ibm.com>
+To: Eric Snowberg <eric.snowberg@oracle.com>,
+        linux-security-module@vger.kernel.org
+Cc: dhowells@redhat.com, dwmw2@infradead.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net, ardb@kernel.org, jarkko@kernel.org,
+        paul@paul-moore.com, jmorris@namei.org, serge@hallyn.com,
+        roberto.sassu@huawei.com, dmitry.kasatkin@gmail.com, mic@digikod.net,
+        casey@schaufler-ca.com, stefanb@linux.ibm.com, ebiggers@kernel.org,
+        rdunlap@infradead.org, linux-kernel@vger.kernel.org,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-efi@vger.kernel.org, linux-integrity@vger.kernel.org
+Date: Mon, 23 Dec 2024 08:21:17 -0500
+In-Reply-To: <20241017155516.2582369-2-eric.snowberg@oracle.com>
+References: <20241017155516.2582369-1-eric.snowberg@oracle.com>
+	 <20241017155516.2582369-2-eric.snowberg@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-2.fc40) 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <Z2jQsb6d2PCKyRZ1@gondor.apana.org.au>
-X-Chocolate: 70 percent or better cocoa solids preferably
-X-Operating-System: Linux/6.1.0-21-amd64 (x86_64)
-X-Uptime: 12:20:26 up 228 days, 23:34,  1 user,  load average: 0.00, 0.00,
- 0.00
-User-Agent: Mutt/2.2.12 (2023-09-09)
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: sbOmppHa-sbKqs0AgnwwS539HRIC0BOV
+X-Proofpoint-ORIG-GUID: yVV2p4LF8p3a9CrduIMLzaI2EJWjuhss
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 phishscore=0
+ impostorscore=0 malwarescore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 suspectscore=0 bulkscore=0 adultscore=0
+ priorityscore=1501 mlxscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2411120000 definitions=main-2412230117
 
-* Herbert Xu (herbert@gondor.apana.org.au) wrote:
-> On Sun, Dec 22, 2024 at 11:54:49AM +0000, Dr. David Alan Gilbert wrote:
-> >
-> > Thanks!  I'd appreciate if you could also look back at one
-> > from September:
-> >   async_xor: Remove unused 'async_xor_val'
-> >   Message ID: 20240929132148.44792-1-linux@treblig.org
-> 
-> The MAINTAINERS entry for that file is:
-> 
-> ASYNCHRONOUS TRANSFERS/TRANSFORMS (IOAT) API
-> R:      Dan Williams <dan.j.williams@intel.com>
-> S:      Odd fixes
-> W:      http://sourceforge.net/projects/xscaleiop
-> F:      Documentation/crypto/async-tx-api.rst
-> F:      crypto/async_tx/
-> F:      include/linux/async_tx.h
+Hi Eric,
 
-That is who I mailed at the time but it didn't go anywhere.
+On Thu, 2024-10-17 at 09:55 -0600, Eric Snowberg wrote:
+> Remove the CONFIG_INTEGRITY_PLATFORM_KEYRING ifdef check so this
+> pattern does not need to be repeated with new code.
+>=20
+> Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
 
-Thanks again,
+Ok. The reason why testing the Kconfig is unnecessary should be included in=
+ the
+patch description.  For example,
 
-Dave
+Commit 219a3e8676f3 ("integrity, KEYS: add a reference to platform keyring"=
+)
+unnecessarily added the Kconfig test.  As platform_trusted_keys is already
+initialized, simply use it.
 
-> Cheers,
-> -- 
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
--- 
- -----Open up your eyes, open up your mind, open up your code -------   
-/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
-\        dave @ treblig.org |                               | In Hex /
- \ _________________________|_____ http://www.treblig.org   |_______/
+Reviewed-by: Mimi Zohar <zohar@linux.ibm.com>
+
+> ---
+>  certs/system_keyring.c | 6 ------
+>  1 file changed, 6 deletions(-)
+>=20
+> diff --git a/certs/system_keyring.c b/certs/system_keyring.c
+> index 9de610bf1f4b..e344cee10d28 100644
+> --- a/certs/system_keyring.c
+> +++ b/certs/system_keyring.c
+> @@ -24,9 +24,7 @@ static struct key *secondary_trusted_keys;
+>  #ifdef CONFIG_INTEGRITY_MACHINE_KEYRING
+>  static struct key *machine_trusted_keys;
+>  #endif
+> -#ifdef CONFIG_INTEGRITY_PLATFORM_KEYRING
+>  static struct key *platform_trusted_keys;
+> -#endif
+> =20
+>  extern __initconst const u8 system_certificate_list[];
+>  extern __initconst const unsigned long system_certificate_list_size;
+> @@ -345,11 +343,7 @@ int verify_pkcs7_message_sig(const void *data, size_=
+t len,
+>  		trusted_keys =3D builtin_trusted_keys;
+>  #endif
+>  	} else if (trusted_keys =3D=3D VERIFY_USE_PLATFORM_KEYRING) {
+> -#ifdef CONFIG_INTEGRITY_PLATFORM_KEYRING
+>  		trusted_keys =3D platform_trusted_keys;
+> -#else
+> -		trusted_keys =3D NULL;
+> -#endif
+>  		if (!trusted_keys) {
+>  			ret =3D -ENOKEY;
+>  			pr_devel("PKCS#7 platform keyring is not available\n");
+
