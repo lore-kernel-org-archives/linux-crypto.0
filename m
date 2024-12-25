@@ -1,69 +1,41 @@
-Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E881885AD;
-	Wed, 25 Dec 2024 13:48:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BCB412EBE9;
+	Wed, 25 Dec 2024 21:32:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735134518; cv=none; b=gwP5ylGDcz7m2qEe/4ouIYs6XkU5DVFbSp34LNJkz914e9q42EPb0swzF5k6maZEFrxU80Gbhn9PGoQ9KZwgS5nB5m0E3CDNHNBaJU9cb9GwFqXmRAvHYNREZ1lySb0gg4NayJLqWjVmjx3ajeQLOsrlImPdPGXSH1vrlqz8n7A=
+	t=1735162363; cv=none; b=IGy181iwaAUaK9z+tmx6cPvwaHbE3bPF62AOmOE1g074V0HuANbTfF2AI43tHhGTmVMbJfhIxVP3j7U5Latxo+BwaQr2cOCLhV059luHoQiSB5Rae6B+8hLePKT0iEYIr/9F6lypO2MALsLKtNDTUHlj4PvV+KazbXqA3rkvOzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735134518; c=relaxed/simple;
-	bh=1OWu3pqGKhAobUwMbP9TzU+i6GX3Y49KGAqFEqR6tn4=;
+	s=arc-20240116; t=1735162363; c=relaxed/simple;
+	bh=p6wU63mP0Ce8N4rkONd2c4KFHImfEcoVdP8CoL2gHvw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Wxu0fwH6WnM0E3cg/Fi/Ip+NaoOiyIbFzn0PVvhiNlQWN+7qZKV/2CIzUTQAtJHUp2s0zyr9/jwiT6jAmsE08qfOVYQnXmhrUwfNQWSf3hFPWGbj4+LStHetYa6+Cg+zkd6jR6j5WH8bkcFYEVhN2OSGVoY/p7a2QeyBc0WjZVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hrPTIDFi; arc=none smtp.client-ip=209.85.219.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=kiDVg79CSLeX/B+ZUe/0eq0YeMFx5S8alBn3CcjapTxVNyJUZN16ZF1KbbyGGtTpUhbMUUzUJxIu4D/wFsc64bwDi5CBLk2IiJnd063Bhzi8CEjWlA8A6paKPUMi5H+rabGuR648PzcrZismPVwalWsZcCMik7NDTCHiNVz+xtQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pbog0esV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hrPTIDFi"
-Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-e455bf1f4d3so4806503276.2;
-        Wed, 25 Dec 2024 05:48:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1735134515; x=1735739315; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2bjyxqSeQTYb8o5MoTj7YDQu9hyF+9bcGcLVbgmWZvk=;
-        b=hrPTIDFiVKRQz21NauM1EBGkr3d14h6HPcQFwR6udKdK5WiAkiFTREd/UHKUzBRgKe
-         x0iHJRLyVlr1ckJhE1vDWzeLuuHa/6M3qJGIrMBWnoPQQWEkKdJhl6IAcnDWElalo5II
-         pyijRTHv2vgIHC110H0zRvuIOldbK87xSMrAKKwfTCpQurDbpXB233Pyv3tAGZGgcOjK
-         vkWRXFPIRBZbcFqRy3wBq3asFohv8+JzqIzy6tSRSKUugz6akc0w846DjTsoUycZIkFM
-         Raf96Qj96fXQ9en33eZRe8Lmmgcb6M05yr8DuEZkOWDs484tthSAGMh1xJtfmUj5kxEa
-         KsTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735134515; x=1735739315;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2bjyxqSeQTYb8o5MoTj7YDQu9hyF+9bcGcLVbgmWZvk=;
-        b=nl1U2Tc32smmjAPHPPJ3HH9QB179u37VwqcEQlmaQArqPPY3Vx7EMgjx6qpT5b7XoR
-         sUKLv3uCWwsqS0wa48x84byjDW8QcEonSV2fNv2A8mkaKlfz2hG0fazs6pQQz0e4qFTi
-         BMZhto19nBnBUeY5tSPbLCW2iUsU0XzmMrL2/j94KH4cSYxBFadA1zey1sr4m86d/vi1
-         A6yUAMPGO3hanqtArFQWF054B3t5VYhj/vm2/j/1+NbQYOWz17jqFdSxERqp0vHdFt1t
-         qftq1tkW8qWsDPoobpdxo9WEasrFdB93ttbZy8qv7zD2fEB1quV3N4imyoV/mOj6a05D
-         gxNA==
-X-Forwarded-Encrypted: i=1; AJvYcCW26T5iyU/VwcTRovxCMJkXQFhnh6TO/jD0GunJ1o0hK+CtKCCbmiGmq0Jh7cHNfwpTOj9sOdBhpJfiZiY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFQOGlY6kRPJ0A5sA7/B2IjtuFj6kTuPC5MyeQyMbKyR2POAHd
-	TW18rtIz+wwNGBesLE2uvM4YZ2FBkTFED9QAdcdAcNfJXrCrgBthQYHdCA==
-X-Gm-Gg: ASbGncv5aOTaukQKAGpUJh8tL6ANuqnnFBxdqA+UTEGYaqow4Ed0SGBQmbRwuihNSre
-	ndQrGnKlEEx++ZiWI+HcGrFNUaC5QGOcLmndxI1UlBs9+zrtjedvdmKlgONr3Oby+Hpp9bzLvo/
-	ghDzsUS+25FvX+kWgobBfvf7E7hBeLXO+138T5KcRik1HA4xo8cIVubGo5mwgD9MX0zcwY1RptM
-	rO6tO9VUfbTPy5/aMcppmroL1acw8mW7qx0TMHF8MZc4YHx8qBS9g==
-X-Google-Smtp-Source: AGHT+IHxNSU8bO6UQceQb/LROz8OrFi+/N8VyBMyHqXQ3tM3brPrGZuBySBQJrmoFx4C2lppZH/EnA==
-X-Received: by 2002:a05:6902:1a48:b0:e38:b1d2:e784 with SMTP id 3f1490d57ef6-e538c26b081mr17208846276.22.1735134515418;
-        Wed, 25 Dec 2024 05:48:35 -0800 (PST)
-Received: from alphacentauri ([2800:bf0:82:1159:1ea9:11b1:7af9:1277])
-        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e537cbeb7f7sm3517260276.11.2024.12.25.05.48.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Dec 2024 05:48:35 -0800 (PST)
-Date: Wed, 25 Dec 2024 08:48:32 -0500
-From: Kurt Borja <kuurtb@gmail.com>
-To: Lukas Wunner <lukas@wunner.de>
-Cc: linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org
-Subject: Re: [REGRESSION][BISECTED] Double energy consumption on idle
-Message-ID: <75mv5mbkhuimqoof7xoolx5jdebaygiiy2yjgkod3wecbkt3g5@zl5ljugmb26u>
-References: <aqhq6okzqa56w3x6hb6xvhajs3ce6suxfrycjcmojpbrbosvzt@65sxbbnksphj>
- <Z2vmiUyIcvE8vV0b@wunner.de>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pbog0esV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED0EBC4CECD;
+	Wed, 25 Dec 2024 21:32:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1735162363;
+	bh=p6wU63mP0Ce8N4rkONd2c4KFHImfEcoVdP8CoL2gHvw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Pbog0esVgG4MLIIsuz+DLOg7BFsftY6T1NVyoVXQ4zt8MFdgWpBqHD0HW7GApuIwu
+	 V2j0RMFqlLafz3MrO9hjILQ5ZSsNLWGdfNoq5LEZQQLNuM6XInoZfwqwtI/moTt6HU
+	 YkOwI+6upGsbQU7N6Ejea/y9SvmRwqAp3tWeIUqcPVW0B09dLWF0qMAiTIiDd3TOsN
+	 2y42BhR9eUNnsY5mK5iBp5aXQwIxysnUkPXSky4AQORmMMXGF4oHveYZ9t/sKsXQmM
+	 qQLPm347F/BX1T0CiZQhZ06kECKngjCdEZekdfdO8kbdM23OeExE+VNOHKHgNBmoV4
+	 Hmzyn2Swd2jzA==
+Date: Wed, 25 Dec 2024 13:32:41 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: kernel test robot <oliver.sang@intel.com>
+Cc: oe-lkp@lists.linux.dev, lkp@intel.com, Ard Biesheuvel <ardb@kernel.org>,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-scsi@vger.kernel.org, target-devel@vger.kernel.org
+Subject: Re: [linux-next:master] [x86/crc32]  55d1ecceb8:
+ INFO:task_blocked_for_more_than#seconds
+Message-ID: <20241225213241.GA1939@sol.localdomain>
+References: <202412251418.8e78094d-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -72,47 +44,154 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z2vmiUyIcvE8vV0b@wunner.de>
+In-Reply-To: <202412251418.8e78094d-lkp@intel.com>
 
-On Wed, Dec 25, 2024 at 12:03:37PM +0100, Lukas Wunner wrote:
-> On Tue, Dec 24, 2024 at 07:42:49PM -0500, Kurt Borja wrote:
-> > When I first booted into v6.13 I noticed my laptop got instantly hotter
-> > and battery started draining fast. Today I bisected the kernel an ran
-> > powerstat [1]. It comes down to
-> > 
-> > Upstream commit: 6b34562f0cfe ("crypto: akcipher - Drop sign/verify operations")
-> [...]
-> > Graphics:
-> >   Device-1: Intel TigerLake-H GT1 [UHD Graphics] driver: i915 v: kernel
-> >   Device-2: NVIDIA GA104M [GeForce RTX 3070 Mobile / Max-Q] driver: nvidia
-> >     v: 565.77
+On Wed, Dec 25, 2024 at 02:50:22PM +0800, kernel test robot wrote:
 > 
-> I note that you're using the out-of-tree nvidia driver on v6.12.
+> Hello,
 > 
-> The driver may be using the portions of the akcipher API that were
-> removed by the commit you bisected to.  E.g. this source file calls
-> crypto_akcipher_verify():
 > 
-> https://github.com/NVIDIA/open-gpu-kernel-modules/blob/main/kernel-open/nvidia/libspdm_ecc.c
+> we don't have enough knowledge how to connect the changes in 55d1ecceb8 with
+> the random issue we found. we tried rebuild kernel and rerun more till to 200
+> times for both 55d1ecceb8 and its parent, still observed the issue on 55d1ecceb8
+> but clean on parent.
 > 
-> Are you seeing build or load errors for the nvidia module?
+> 1e6b72e60a5a16dd 55d1ecceb8d6a5c9ceff7c65280
+> ---------------- ---------------------------
+>        fail:runs  %reproduction    fail:runs
+>            |             |             |
+>            :200         29%          58:200   dmesg.INFO:task_blocked_for_more_than#seconds
 > 
-> If the module is not loaded, no voltage / frequency scaling happens,
-> which would indeed result in the dGPU consuming an awful lot of power.
+> the config diff is:
+> 
+> --- /pkg/linux/i386-randconfig-011-20241220/gcc-12/1e6b72e60a5a16ddda9c0669da7538f497838d0a/.config     2024-12-24 17:07:56.621157765 +0800
+> +++ /pkg/linux/i386-randconfig-011-20241220/gcc-12/55d1ecceb8d6a5c9ceff7c6528075bd0ce4e8366/.config     2024-12-24 15:40:46.814065639 +0800
+> @@ -5700,8 +5700,6 @@ CONFIG_CRYPTO_HASH_INFO=y
+>  CONFIG_CRYPTO_AES_NI_INTEL=y
+>  CONFIG_CRYPTO_SERPENT_SSE2_586=y
+>  CONFIG_CRYPTO_TWOFISH_586=y
+> -CONFIG_CRYPTO_CRC32C_INTEL=y
+> -# CONFIG_CRYPTO_CRC32_PCLMUL is not set
+>  # end of Accelerated Cryptographic Algorithms for CPU (x86)
+> 
+>  CONFIG_CRYPTO_HW=y
+> @@ -5798,7 +5796,10 @@ CONFIG_CRC_T10DIF=y
+>  CONFIG_CRC64_ROCKSOFT=y
+>  CONFIG_CRC_ITU_T=y
+>  CONFIG_CRC32=y
+> +CONFIG_ARCH_HAS_CRC32=y
+>  # CONFIG_CRC32_SELFTEST is not set
+> +# CONFIG_CRC32_IMPL_ARCH_PLUS_SLICEBY8 is not set
+> +# CONFIG_CRC32_IMPL_ARCH_PLUS_SLICEBY1 is not set
+>  # CONFIG_CRC32_IMPL_SLICEBY8 is not set
+>  CONFIG_CRC32_IMPL_SLICEBY4=y
+>  # CONFIG_CRC32_IMPL_SLICEBY1 is not set
+> 
+> 
+> so we still make out below report FYI.
+> 
+> 
+> kernel test robot noticed "INFO:task_blocked_for_more_than#seconds" on:
+> 
+> commit: 55d1ecceb8d6a5c9ceff7c6528075bd0ce4e8366 ("x86/crc32: expose CRC32 functions through lib")
+> https://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git master
+> 
+> [test failed on linux-next/master 8155b4ef3466f0e289e8fcc9e6e62f3f4dceeac2]
+> 
+> in testcase: trinity
+> version: 
+> with following parameters:
+> 
+> 	runtime: 300s
+> 	group: group-00
+> 	nr_groups: 5
+> 
+> 
+> 
+> config: i386-randconfig-011-20241220
+> compiler: gcc-12
+> test machine: qemu-system-i386 -enable-kvm -cpu SandyBridge -smp 2 -m 4G
+> 
+> (please refer to attached dmesg/kmsg for entire log/backtrace)
+> 
+> 
+> 
+> If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <oliver.sang@intel.com>
+> | Closes: https://lore.kernel.org/oe-lkp/202412251418.8e78094d-lkp@intel.com
+> 
+> 
+> [  996.907142][   T25] INFO: task swapper:1 blocked for more than 491 seconds.
+> [  996.911246][   T25]       Not tainted 6.13.0-rc1-00013-g55d1ecceb8d6 #1
+> [  996.940897][   T25] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> [  996.960487][   T25] task:swapper         state:D stack:0     pid:1     tgid:1     ppid:0      flags:0x00004000
+> [  997.029537][   T25] Call Trace:
+> [ 997.046615][ T25] __schedule (kernel/sched/core.c:5372 kernel/sched/core.c:6756)
+> [ 997.060058][ T25] ? async_synchronize_cookie_domain (kernel/async.c:317 (discriminator 9))
+> [ 997.070156][ T25] schedule (arch/x86/include/asm/preempt.h:26 kernel/sched/core.c:5865 kernel/sched/core.c:5885 kernel/sched/core.c:6834 kernel/sched/core.c:6848)
+> [ 997.079936][ T25] async_synchronize_cookie_domain (kernel/async.c:317 (discriminator 9))
+> [ 997.090893][ T25] ? do_wait_intr_irq (kernel/sched/wait.c:383)
+> [ 997.109522][ T25] wait_for_initramfs (init/initramfs.c:767)
+> [ 997.118460][ T25] populate_rootfs (init/initramfs.c:778)
+> [ 997.126493][ T25] do_one_initcall (init/main.c:1266)
+> [ 997.136390][ T25] ? do_header (init/initramfs.c:771)
+> [ 997.147147][ T25] ? rdinit_setup (init/main.c:1312)
+> [ 997.160654][ T25] ? rcu_is_watching (kernel/rcu/tree.c:738)
+> [ 997.178488][ T25] do_initcalls (init/main.c:1327 init/main.c:1344)
+> [ 997.195442][ T25] kernel_init_freeable (init/main.c:1579)
+> [ 997.199167][ T25] ? rest_init (init/main.c:1458)
+> [ 997.208072][ T25] kernel_init (init/main.c:1468)
+> [ 997.218814][ T25] ret_from_fork (arch/x86/kernel/process.c:153)
+> [ 997.225966][ T25] ? rest_init (init/main.c:1458)
+> [ 997.231504][ T25] ret_from_fork_asm (arch/x86/entry/entry_32.S:737)
+> [ 997.240527][ T25] entry_INT80_32 (arch/x86/entry/entry_32.S:942)
+> [  997.318483][   T25]
+> [  997.318483][   T25] Showing all locks held in the system:
+> [  997.346428][   T25] 1 lock held by kworker/0:0/6:
+> [  997.350161][   T25] 4 locks held by kworker/u4:0/9:
+> [  997.396160][   T25] 1 lock held by khungtaskd/25:
+> [ 997.399871][ T25] #0: 83f91ab0 (rcu_read_lock){....}-{1:3}, at: debug_show_all_locks (include/linux/rcupdate.h:337 include/linux/rcupdate.h:849 kernel/locking/lockdep.c:6744)
+> [  997.478673][   T25]
+> [  997.501376][   T25] =============================================
+> [  997.501376][   T25]
+> [ 1161.445030][    C0] workqueue: psi_avgs_work hogged CPU for >10000us 11 times, consider switching to WQ_UNBOUND
+> BUG: kernel hang in boot stage
+> 
+> 
+> 
+> The kernel config and materials to reproduce are available at:
+> https://download.01.org/0day-ci/archive/20241225/202412251418.8e78094d-lkp@intel.com
+> 
+> 
+> 
+> -- 
+> 0-DAY CI Kernel Test Service
+> https://github.com/intel/lkp-tests/wiki
+> 
+> 
 
-Hi Lukas,
+Thanks.  Unfortunately, the issue does not reproduce for me when following these
+commands.
 
-This is indeed the case, 6b34562f0cfe breaks my nvidia module. I didn't
-notice dkms was reporting errors when trying to install it. 
+The kernel does panic from not being able to find the rootfs, both before and
+after.  That seems to be caused by the rootfs from the job script not being
+available on the 01.org server, as indicated by the following output:
 
-I'll look into it and report it to NVIDIA or my distro maintainers if
-it's necessary.
+    /usr/bin/wget -q --timeout=3600 --tries=1 --local-encoding=UTF-8 https://download.01.org/0day-ci/lkp-qemu/osimage/pkg/quantal-i386-core.cgz/trinity-static-i386-x86_64-f93256fb_2019-08-28.cgz -N -P /home/e/.lkp/cache/osimage/pkg/quantal-i386-core.cgz
+    Failed to download osimage/pkg/quantal-i386-core.cgz/trinity-static-i386-x86_64-f93256fb_2019-08-28.cgz
+    cat: '': No such file or directory
 
-Thank you so much for your help!
+It doesn't print the error information from wget, but I checked and it is HTTP
+error 404 Not Found.  Thus, there seem to be bugs in lkp where (a) it links to a
+non-existent rootfs, and (b) errors downloading the rootfs are not fatal.
 
-~ Kurt
+Anyway, seeing as you disabled the x86 optimized CRC32 code:
 
-> 
-> Thanks,
-> 
-> Lukas
+> +# CONFIG_CRC32_IMPL_ARCH_PLUS_SLICEBY8 is not set
+> +# CONFIG_CRC32_IMPL_ARCH_PLUS_SLICEBY1 is not set
+
+... that code is not even running in the kernel.  So it is hard to see how this
+commit could plausibly have caused this issue.
+
+- Eric
