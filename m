@@ -1,194 +1,113 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7730F14D6E1;
-	Thu, 26 Dec 2024 12:09:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AEC818E1F;
+	Thu, 26 Dec 2024 13:48:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735214956; cv=none; b=BKEYzA0+b7WoMqJz3e3zDT7PSdRipL6Qbb79qpbY0fmzaIG5YoBL1HWQFx1RRCR5JZc/aEoxjh7CYucS0arf3du/T6OT86wM1E3BX5OwNfDK9Lnx31u3Gyt5Nrc1Y1bJG4/jr1G52bl8sb0fKArq6Rr0KGbiSdW+Nhvch/zqOvA=
+	t=1735220938; cv=none; b=s4J0Ldm9HgowtFQ4ioot91DJOJ/K/rzIoEII0KlKqIF6GVqJdZP9UhYtz28eDX1TPjuF0uDmydfe/ixJT8dJohE+I9X86/2xQN7lt+CpdWnXuX62kqFcU0XzA1/aQIzQOhDlL2LT2p30fnfVWN9vVBkvv6rTAZRzZPx535kahRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735214956; c=relaxed/simple;
-	bh=VP+LKszyHuqeOFVhE+sNqmJHnc/bVqk8JrwHcKe2mKk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=LWLhspljTSk4JpUsgmSy/e9VWJ/3N/RlefrxzSh5fpWKj1F7V8ElatOxGvySkVUGBVc96vGNFSUqemc0mbqPGQDUpRiQczlB0RmXqpIJu7dzbe8Fqg9EL2Mh8epkxC3tenJ5hR+0QEnr54DKMf95COV1sPFrxder8S7OqyStpmw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=NUqZRKcW; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1735220938; c=relaxed/simple;
+	bh=1wKchWw6LldoRjWm3Xdww5mRqo9p6HyDFwtJ4yR9CLA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=a/fLLKQ16N6Gea3lXOIG5wLsNGsOR9NBMfsMofgIFs57mxD8d1gkgiPCmHX+fLGf0y0MxWbiq4kP3pYm9RNA0Q59r8aSYHA+4SMmMOQ1KxotAYp9OXTv7QhrurBIzlwXvTHrI3rQ803/O50mdXm3ntaYFOkHJzf1oOMvYtDF748=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ewxTrnX1; arc=none smtp.client-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="NUqZRKcW"
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4BQ88e3i010707;
-	Thu, 26 Dec 2024 12:09:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	ecXAdKEmWV4vHjQwBIoWND+NxaUKVlnNIUvCnpHIA+E=; b=NUqZRKcWnCTWdEoq
-	EeZampBD3UOlMeJXJsUvZC914IW18tu0UO6NYzcnXhXysXRZEGdlCker0sVFn+uU
-	zI8NMIR0IrzXIBPI40FJUgkV348jqcCwadLyHvEG0r+CgPxFYuigmtOnuySmLsxr
-	RqMBCVgKF2M1bcNdiW5O7NmpsUqYF1LlJAldHcMatfudN8RLUl/1j/hBd9vx5+5D
-	/F9ttoVnrRsPE61zKWyD3AqRcvXoS9S+oZi/3rDASOFkczdUM2gESoHl1Qv7WN5g
-	viNmsLvZaj8Cpmo4ydUsL9u438dWwvhxNUAcyKsXCewrwdI3gpeqo4ChBPFOMWJn
-	Z6aJJg==
-Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 43s3cf9g8t-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 26 Dec 2024 12:09:07 +0000 (GMT)
-Received: from nasanex01c.na.qualcomm.com (nasanex01c.na.qualcomm.com [10.45.79.139])
-	by NASANPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4BQC96OB029057
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 26 Dec 2024 12:09:06 GMT
-Received: from [10.216.14.233] (10.80.80.8) by nasanex01c.na.qualcomm.com
- (10.45.79.139) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 26 Dec
- 2024 04:09:00 -0800
-Message-ID: <64dca613-5053-46d4-9910-7ac551fdde81@quicinc.com>
-Date: Thu, 26 Dec 2024 17:38:54 +0530
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ewxTrnX1"
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-2eec9b3a1bbso5853968a91.3;
+        Thu, 26 Dec 2024 05:48:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1735220936; x=1735825736; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=NOWT3xFqVkiMDk5iWxvQCmp0gp9TY2oUTa68nDDoZ9U=;
+        b=ewxTrnX1TbNd9Mcr/0ly0k8h6LTlGQl9tNjXUtaDyUQJb3Wvzmd2Z2SbSxV7/FKWTV
+         CWumOe1eUcfHoR1ubse1L4U79V+RBOCbZBXfBAkONVKnlen/r1z7SN2liuHb92Phyl4Y
+         9ZLGvKcqwEvIj9v0SPFkEwtT7KWRl0otiXd6p05lKS1Q7WM5CEbx2zu6EBADZo429up6
+         iF3kIc/1gezKBEGcJJzWOjOerOs5nY9Fj3L/lsSARDC8tkftwIxf/8QYS7NUK5xvMhSC
+         gVZcwI49IMLT5AGf8Ee4px+FZgLkrCaP+2QuQJh5vsMAKCdmW1Cfp54YKPE44UyCEUfK
+         IseQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1735220936; x=1735825736;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NOWT3xFqVkiMDk5iWxvQCmp0gp9TY2oUTa68nDDoZ9U=;
+        b=OceANnJ67iT5JRxsUVzmTm8aufoP9mQWTi6yrNSWB2GR9sqk6iTItILJie8lh2Ebzm
+         69CZOOeXXvG0Jnp0Lxw2hU1eDwHi0eZMSlsJZ6zLmg9dvwjLJSuxYSlgxg5d/J3+rVlH
+         9OrFVC1GzOS86847el5hPP/NCJk2s8zSGZuMtVwgr4yztlnaetmFargsfDXosQKTyqL/
+         mWmJ9H9oc0tfjZVr++wyPrxu/fKNA9dEdGQJ/WViJIjoXHZODCkjKgHT8O56igtvi2ry
+         awmOdDFpq5Wc3PoVPC7viwq8whEAytMVsiamesY1XvcOwXXJLoiCs/3X1VtT6N5oyzA2
+         s8+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWOGingTD97RIt37qXOliZxcEJK4P1m4Za0c4w59Kd94QoczOIwZcd5644bI+1jjJd6+0n3o1va+HuMZ5A1@vger.kernel.org, AJvYcCXx0QvbaKCyBv/QsgUUgdeTjo7pOxqP/PLhWcJ2XpxLrc69L0lo8RuWeLKE0xraleTFDpVskYLIE3Yu2g0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXO5+NxckkuyEDJ70hmM/L2cAxjhd2nVx6Z4r+qcTrrExrPLh9
+	MuUI1booLnHpKlOwoFxBTznJoc+aUwFLek9nlXYLQOi2uxfvjDdazvflPk4S
+X-Gm-Gg: ASbGnct2T5TBiTLe26Gv0+RpDHgYZLzkb9O98t15TN8ULSACYd1eK2JQp6/65SaGaVG
+	ZF1M/kaMQrybQ848CfDv56+kJOu3LfvMgw0QAK5G8duuyGbliBK8R7Jw+mZ1lAZuZq6bl2B1DJD
+	yTju04DoNomkv1dUf/8zOo15etNPkyFRp4yi9baaCPVyU4oDniSjQNNEnnW4ebvR0NoUOHm38mO
+	ofsYB0Smaj07hecxSOjT2dsnjDjPTJrsr3GdfZXCeAzm7oxad++BDv6G8t2MeJb/aQt9tHC
+X-Google-Smtp-Source: AGHT+IH5pgsm3LOLUwiX+FuunBWLtQu+y57Sq+wtmMHzeJlvGJTeOHs0aoWoJB1Na+9K4hvSOHS/rg==
+X-Received: by 2002:a17:90b:3a05:b0:2ef:e0bb:1ef2 with SMTP id 98e67ed59e1d1-2f452e3a8edmr35652647a91.19.1735220936347;
+        Thu, 26 Dec 2024 05:48:56 -0800 (PST)
+Received: from localhost.localdomain ([2401:4900:5ace:1ff:91c9:9eac:6745:3e6])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f46fabe958sm8059336a91.26.2024.12.26.05.48.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Dec 2024 05:48:55 -0800 (PST)
+From: Atharva Tiwari <evepolonium@gmail.com>
+To: 
+Cc: evepolonium@gmail.com,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: vmac: fix misaligned pointer handling in vmac_update
+Date: Thu, 26 Dec 2024 19:18:47 +0530
+Message-Id: <20241226134847.6690-1-evepolonium@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 02/12] dmaengine: add DMA_PREP_LOCK and DMA_PREP_UNLOCK
- flag
-To: Vinod Koul <vkoul@kernel.org>, Md Sadre Alam <quic_mdalam@quicinc.com>
-CC: <corbet@lwn.net>, <thara.gopinath@gmail.com>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <kees@kernel.org>, <dave.jiang@intel.com>, <dmaengine@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
-        <quic_srichara@quicinc.com>, <quic_varada@quicinc.com>,
-        <quic_utiwari@quicinc.com>
-References: <20241212041639.4109039-1-quic_mdalam@quicinc.com>
- <20241212041639.4109039-3-quic_mdalam@quicinc.com> <Z2qOKHsYpy8kcwlv@vaman>
-Content-Language: en-US
-From: Mukesh Kumar Savaliya <quic_msavaliy@quicinc.com>
-In-Reply-To: <Z2qOKHsYpy8kcwlv@vaman>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01c.na.qualcomm.com (10.45.79.139)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: fHDeyTMIbZvrE8sxHSBCb2kBjVrGhPE_
-X-Proofpoint-ORIG-GUID: fHDeyTMIbZvrE8sxHSBCb2kBjVrGhPE_
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
- clxscore=1011 bulkscore=0 adultscore=0 mlxlogscore=999 spamscore=0
- phishscore=0 lowpriorityscore=0 impostorscore=0 priorityscore=1501
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2412260108
+Content-Transfer-Encoding: 8bit
 
+Handle pontential misalignment of the input pointer(p) in vmac_update
+by copying the data to a temp buffer before processing.
 
+Signed-off-by: Atharva Tiwari <evepolonium@gmail.com>
+---
+ crypto/vmac.c | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
 
-On 12/24/2024 4:04 PM, Vinod Koul wrote:
-> On 12-12-24, 09:46, Md Sadre Alam wrote:
->> Add lock and unlock flag support on command descriptor.
->> Once lock set in requester pipe, then the bam controller
->> will lock all others pipe and process the request only
->> from requester pipe. Unlocking only can be performed from
->> the same pipe.
->>
->> If DMA_PREP_LOCK flag passed in command descriptor then requester
->> of this transaction wanted to lock the BAM controller for this
->> transaction so BAM driver should set LOCK bit for the HW descriptor.
->>
->> If DMA_PREP_UNLOCK flag passed in command descriptor then requester
->> of this transaction wanted to unlock the BAM controller.so BAM driver
->> should set UNLOCK bit for the HW descriptor.
->>
->> BAM IP version 1.4.0 and above only supports this LOCK/UNLOCK
->> feature.
->>
->> Signed-off-by: Md Sadre Alam <quic_mdalam@quicinc.com>
->> ---
->>
->> Change in [v5]
->>
->> * Added DMA_PREP_LOCK and DMA_PREP_UNLOCK flag support
->>
->> Change in [v4]
->>
->> * This patch was not included in v4
->>
->> Change in [v3]
->>
->> * This patch was not included in v3
->>
->> Change in [v2]
->>
->> * This patch was not included in v2
->>   
->> Change in [v1]
->>
->> * This patch was not included in v1
->>
->>   Documentation/driver-api/dmaengine/provider.rst | 15 +++++++++++++++
->>   include/linux/dmaengine.h                       |  6 ++++++
->>   2 files changed, 21 insertions(+)
->>
->> diff --git a/Documentation/driver-api/dmaengine/provider.rst b/Documentation/driver-api/dmaengine/provider.rst
->> index 3085f8b460fa..5f30c20f94f3 100644
->> --- a/Documentation/driver-api/dmaengine/provider.rst
->> +++ b/Documentation/driver-api/dmaengine/provider.rst
->> @@ -628,6 +628,21 @@ DMA_CTRL_REUSE
->>     - This flag is only supported if the channel reports the DMA_LOAD_EOT
->>       capability.
->>   
->> +- DMA_PREP_LOCK
->> +
->> +  - If set, the BAM will lock all other pipes not related to the current
-> 
-> Why BAM, the generic API _cannot_ be implementation specific, make this
-> as a generic one please
-> 
-Yes, should be DAM to be generic.
-> Anyone can use this new method and not just BAM...
-> 
-> 
->> +    pipe group, and keep handling the current pipe only.
->> +
->> +  - All pipes not within this group will be locked by this pipe upon lock
->> +    event.
->> +
->> +  - only pipes which are in the same group and relate to the same Environment
->> +    Execution(EE) will not be locked by a certain pipe.
->> +
->> +- DMA_PREP_UNLOCK
->> +
->> +  - If set, BAM will release all locked pipes
->> +
->>   General Design Notes
->>   ====================
->>   
->> diff --git a/include/linux/dmaengine.h b/include/linux/dmaengine.h
->> index 346251bf1026..8ebd43a998a7 100644
->> --- a/include/linux/dmaengine.h
->> +++ b/include/linux/dmaengine.h
->> @@ -200,6 +200,10 @@ struct dma_vec {
->>    *  transaction is marked with DMA_PREP_REPEAT will cause the new transaction
->>    *  to never be processed and stay in the issued queue forever. The flag is
->>    *  ignored if the previous transaction is not a repeated transaction.
->> + *  @DMA_PREP_LOCK: tell the driver that there is a lock bit set on command
->> + *  descriptor.
->> + *  @DMA_PREP_UNLOCK: tell the driver that there is a un-lock bit set on command
->> + *  descriptor.
->>    */
->>   enum dma_ctrl_flags {
->>   	DMA_PREP_INTERRUPT = (1 << 0),
->> @@ -212,6 +216,8 @@ enum dma_ctrl_flags {
->>   	DMA_PREP_CMD = (1 << 7),
->>   	DMA_PREP_REPEAT = (1 << 8),
->>   	DMA_PREP_LOAD_EOT = (1 << 9),
->> +	DMA_PREP_LOCK = (1 << 10),
->> +	DMA_PREP_UNLOCK = (1 << 11),
->>   };
->>   
->>   /**
->> -- 
->> 2.34.1
-> 
+diff --git a/crypto/vmac.c b/crypto/vmac.c
+index 2ea384645ecf..8383a98ad778 100644
+--- a/crypto/vmac.c
++++ b/crypto/vmac.c
+@@ -518,9 +518,19 @@ static int vmac_update(struct shash_desc *desc, const u8 *p, unsigned int len)
+ 
+ 	if (len >= VMAC_NHBYTES) {
+ 		n = round_down(len, VMAC_NHBYTES);
+-		/* TODO: 'p' may be misaligned here */
+-		vhash_blocks(tctx, dctx, (const __le64 *)p, n / VMAC_NHBYTES);
+-		p += n;
++		if (!IS_ALIGNED((unsigned long)p, sizeof(__le64))) {
++			/* handle misallignment by copying data to ta temporary buffer */
++			u8 temp_buf[VMAC_NHBYTES];
++			const u8 *end = p + n;
++			while (p < end) {
++				memcpy(temp_buf, p, VMAC_NHBYTES);
++				vhash_blocks(tctx, dctx, (const __le64 *)temp_buf, 1);
++				p += VMAC_NHBYTES;
++			}
++		} else {
++			vhash_blocks(tctx, dctx, (const __le64 *)p, n / VMAC_NHBYTES);
++			p += n;
++		}
+ 		len -= n;
+ 	}
+ 
+-- 
+2.39.5
 
