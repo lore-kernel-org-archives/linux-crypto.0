@@ -1,87 +1,295 @@
-Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5235611CA9;
-	Fri, 27 Dec 2024 22:32:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9FAD13F42F
+	for <linux-crypto@vger.kernel.org>; Fri, 27 Dec 2024 22:48:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735338735; cv=none; b=elZ/3YfFmvscYbyj95Z9mTv9eIIyX1B6klUibidrkqdSN41/67QO0G5dg1xcjO1aifl2bwVnA+j4ltREaz4h9H5d8zdI1s+R257bQvFmoKszISsBR27j+OQHljGSMHj8jt7xuYfd2ERkV/d7I+iLFDBnSVddVNc2yA1xjUhWD/c=
+	t=1735339722; cv=none; b=q/jYrA9XY2cWuqEjk957rK8na0nuMFLcU9snb95ZpJQ287T3IU+QzfEKuNC93J7xaDa/jsvtMy8FLb6MQmTAdTcSXakmhZKln6+DdFFNm735ClHo5E8aSG7om75dVv7QibYYy64G6DqpdJPZj/j0uKWC/Ytl1G8x1j34TIYw2Pc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735338735; c=relaxed/simple;
-	bh=45HpuVPoOV7QB6aIPf97YkSWOlVcos4dDxR3fj1IOLM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=daZ67hfb911zC5aykU50esXH6OYyGlZZ9bGV0+r3SDty8g2DhuFXSXoxh54sZBiTXEBykUOCYdgOzarMdk8LJq2kCkcSdSRC8o51DXohe/wJGpIqHBwzE2KSgFqn7T3uXEbtiEnnkUJhctAjN1sH4eOscOixS09uw28h2chsBR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=SAbBmIzW; arc=none smtp.client-ip=159.69.126.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
+	s=arc-20240116; t=1735339722; c=relaxed/simple;
+	bh=S7hYr2H5qYU64l1Vw36WVOz1rPSk96swssO6uSUB1C8=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=Qm0Zd92jbwDF6NzQc4JuDxGpK1OzWyfOLBZ2Od8cTFwUW6MCQCSMdQirs61D5XYm9cqSqgX9Gn/4ZpKmrJAcMhUvvAL/7buYWKb8rSL1VyJgX8SdB+aTRurB8wojMF/WbCi6EvFu6q6aT2e1Ftd7yHY0I4fP7L2Q8oThWRpO/P0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cEuarqWW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="SAbBmIzW"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
-	s=mail; t=1735338727;
-	bh=45HpuVPoOV7QB6aIPf97YkSWOlVcos4dDxR3fj1IOLM=;
-	h=From:Date:Subject:To:Cc:From;
-	b=SAbBmIzWwGxvU8VJHhhAeAf5sdJfiPpkCsJMcv7sAlNhMcsqTkjtAhseWGQ43Ex21
-	 fRebU2EBxKmLH/USwIK6+TQr211GY3vGx87xBFfe3jbUJJU8EkiGj6kSunaCN4qVCZ
-	 PYlH9jBiBT2eWhIo4FVnvcxCgNVCEGRQJ/o2C2Po=
-From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-Date: Fri, 27 Dec 2024 23:32:01 +0100
-Subject: [PATCH] padata: fix sysfs store callback check
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cEuarqWW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50ED4C4CED0
+	for <linux-crypto@vger.kernel.org>; Fri, 27 Dec 2024 22:48:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1735339722;
+	bh=S7hYr2H5qYU64l1Vw36WVOz1rPSk96swssO6uSUB1C8=;
+	h=From:To:Subject:Date:From;
+	b=cEuarqWWP2uHpaqPpaB7im1VUClLL4gic0IOLscs8Wc8TO7Nxw4hCR6Sacubt4AtV
+	 EMM0NDTFNpVUzGoGzJa/e7d404O6c1AFynO+vWG1wCltGS1rJUv/fkbxWqUYe2Qsbg
+	 RiJbljZWM0pKKNcB/YXcL5SXYucWvJHImqQ3nELFdjphHaLlLsPit0+q43KTTA+UPt
+	 UbTYp2WZo0JgzmomQsL42MVO/7xjkwD7UpN8bLbeeb5Go5h1uYItGUEjCoKYhpvE59
+	 gOSkJNXwvUMKJSj4+nOKUxd1+3PO25EGnnnJpZ32FWSYpMa9RBWROovjTXOj2PgqlF
+	 5YCPAhOdgZ3Tg==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Subject: [PATCH] crypto: ahash - make hash walk functions private to ahash.c
+Date: Fri, 27 Dec 2024 14:48:29 -0800
+Message-ID: <20241227224829.179554-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20241227-padata-store-v1-1-55713a18bced@weissschuh.net>
-X-B4-Tracking: v=1; b=H4sIAOAqb2cC/x3MQQqAIBBA0avIrBNSjLKrRIshp5qNikoE4t2Tl
- m/xf4VMiSnDKiokejhz8B1qEHDc6C+S7LpBj9oorWcZ0WFBmUtIJAkPS2gmtaCFnsREJ7//btt
- b+wDX3kXSXgAAAA==
-X-Change-ID: 20241227-padata-store-eac9ea4518a9
-To: Steffen Klassert <steffen.klassert@secunet.com>, 
- Daniel Jordan <daniel.m.jordan@oracle.com>, 
- Herbert Xu <herbert@gondor.apana.org.au>, 
- Dan Kruchinin <dkruchinin@acm.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
- =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1735338726; l=1048;
- i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
- bh=45HpuVPoOV7QB6aIPf97YkSWOlVcos4dDxR3fj1IOLM=;
- b=TNW/eEPs9M78qLB8wF+8ipth7wjjs2HR+hLLTpVrqSUhZvPOmwCKjoNIX0nAw0oC63WzjwYA9
- OJP/ALHlazICw8kbRnzIVDuyzon8rYBt6MdQ/BSB9I2Y0JSyopQvzZH
-X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
- pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
 
-padata_sysfs_store() was copied from padata_sysfs_show() but this check
-was not adapted. Today there is no attribute which can fail this
-check, but if there is one it may as well be correct.
+From: Eric Biggers <ebiggers@google.com>
 
-Fixes: 5e017dc3f8bc ("padata: Added sysfs primitives to padata subsystem")
-Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
+Due to the removal of the Niagara2 SPU driver, crypto_hash_walk_first(),
+crypto_hash_walk_done(), crypto_hash_walk_last(), and struct
+crypto_hash_walk are now only used in crypto/ahash.c.  Therefore, make
+them all private to crypto/ahash.c.  I.e. un-export the two functions
+that were exported, make the functions static, and move the struct
+definition to the .c file.  As part of this, move the functions to
+earlier in the file to avoid needing to add forward declarations.
+
+Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- kernel/padata.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ crypto/ahash.c                 | 158 ++++++++++++++++++---------------
+ include/crypto/internal/hash.h |  23 -----
+ 2 files changed, 87 insertions(+), 94 deletions(-)
 
-diff --git a/kernel/padata.c b/kernel/padata.c
-index d51bbc76b2279ca3ba51e5d0b0ea528bf0198374..cf63d9bcf4822ea3e8f923c0e11f49ac2197b706 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -970,7 +970,7 @@ static ssize_t padata_sysfs_store(struct kobject *kobj, struct attribute *attr,
+diff --git a/crypto/ahash.c b/crypto/ahash.c
+index bcd9de009a91..b08b89ec26ec 100644
+--- a/crypto/ahash.c
++++ b/crypto/ahash.c
+@@ -25,10 +25,97 @@
  
- 	pinst = kobj2pinst(kobj);
- 	pentry = attr2pentry(attr);
--	if (pentry->show)
-+	if (pentry->store)
- 		ret = pentry->store(pinst, attr, buf, count);
+ #include "hash.h"
  
- 	return ret;
+ #define CRYPTO_ALG_TYPE_AHASH_MASK	0x0000000e
+ 
++struct crypto_hash_walk {
++	char *data;
++
++	unsigned int offset;
++	unsigned int flags;
++
++	struct page *pg;
++	unsigned int entrylen;
++
++	unsigned int total;
++	struct scatterlist *sg;
++};
++
++static int hash_walk_next(struct crypto_hash_walk *walk)
++{
++	unsigned int offset = walk->offset;
++	unsigned int nbytes = min(walk->entrylen,
++				  ((unsigned int)(PAGE_SIZE)) - offset);
++
++	walk->data = kmap_local_page(walk->pg);
++	walk->data += offset;
++	walk->entrylen -= nbytes;
++	return nbytes;
++}
++
++static int hash_walk_new_entry(struct crypto_hash_walk *walk)
++{
++	struct scatterlist *sg;
++
++	sg = walk->sg;
++	walk->offset = sg->offset;
++	walk->pg = sg_page(walk->sg) + (walk->offset >> PAGE_SHIFT);
++	walk->offset = offset_in_page(walk->offset);
++	walk->entrylen = sg->length;
++
++	if (walk->entrylen > walk->total)
++		walk->entrylen = walk->total;
++	walk->total -= walk->entrylen;
++
++	return hash_walk_next(walk);
++}
++
++static int crypto_hash_walk_first(struct ahash_request *req,
++				  struct crypto_hash_walk *walk)
++{
++	walk->total = req->nbytes;
++
++	if (!walk->total) {
++		walk->entrylen = 0;
++		return 0;
++	}
++
++	walk->sg = req->src;
++	walk->flags = req->base.flags;
++
++	return hash_walk_new_entry(walk);
++}
++
++static int crypto_hash_walk_done(struct crypto_hash_walk *walk, int err)
++{
++	walk->data -= walk->offset;
++
++	kunmap_local(walk->data);
++	crypto_yield(walk->flags);
++
++	if (err)
++		return err;
++
++	if (walk->entrylen) {
++		walk->offset = 0;
++		walk->pg++;
++		return hash_walk_next(walk);
++	}
++
++	if (!walk->total)
++		return 0;
++
++	walk->sg = sg_next(walk->sg);
++
++	return hash_walk_new_entry(walk);
++}
++
++static inline int crypto_hash_walk_last(struct crypto_hash_walk *walk)
++{
++	return !(walk->entrylen | walk->total);
++}
++
+ /*
+  * For an ahash tfm that is using an shash algorithm (instead of an ahash
+  * algorithm), this returns the underlying shash tfm.
+  */
+ static inline struct crypto_shash *ahash_to_shash(struct crypto_ahash *tfm)
+@@ -135,81 +222,10 @@ static int crypto_init_ahash_using_shash(struct crypto_tfm *tfm)
+ 	crt->reqsize = sizeof(struct shash_desc) + crypto_shash_descsize(shash);
+ 
+ 	return 0;
+ }
+ 
+-static int hash_walk_next(struct crypto_hash_walk *walk)
+-{
+-	unsigned int offset = walk->offset;
+-	unsigned int nbytes = min(walk->entrylen,
+-				  ((unsigned int)(PAGE_SIZE)) - offset);
+-
+-	walk->data = kmap_local_page(walk->pg);
+-	walk->data += offset;
+-	walk->entrylen -= nbytes;
+-	return nbytes;
+-}
+-
+-static int hash_walk_new_entry(struct crypto_hash_walk *walk)
+-{
+-	struct scatterlist *sg;
+-
+-	sg = walk->sg;
+-	walk->offset = sg->offset;
+-	walk->pg = sg_page(walk->sg) + (walk->offset >> PAGE_SHIFT);
+-	walk->offset = offset_in_page(walk->offset);
+-	walk->entrylen = sg->length;
+-
+-	if (walk->entrylen > walk->total)
+-		walk->entrylen = walk->total;
+-	walk->total -= walk->entrylen;
+-
+-	return hash_walk_next(walk);
+-}
+-
+-int crypto_hash_walk_done(struct crypto_hash_walk *walk, int err)
+-{
+-	walk->data -= walk->offset;
+-
+-	kunmap_local(walk->data);
+-	crypto_yield(walk->flags);
+-
+-	if (err)
+-		return err;
+-
+-	if (walk->entrylen) {
+-		walk->offset = 0;
+-		walk->pg++;
+-		return hash_walk_next(walk);
+-	}
+-
+-	if (!walk->total)
+-		return 0;
+-
+-	walk->sg = sg_next(walk->sg);
+-
+-	return hash_walk_new_entry(walk);
+-}
+-EXPORT_SYMBOL_GPL(crypto_hash_walk_done);
+-
+-int crypto_hash_walk_first(struct ahash_request *req,
+-			   struct crypto_hash_walk *walk)
+-{
+-	walk->total = req->nbytes;
+-
+-	if (!walk->total) {
+-		walk->entrylen = 0;
+-		return 0;
+-	}
+-
+-	walk->sg = req->src;
+-	walk->flags = req->base.flags;
+-
+-	return hash_walk_new_entry(walk);
+-}
+-EXPORT_SYMBOL_GPL(crypto_hash_walk_first);
+-
+ static int ahash_nosetkey(struct crypto_ahash *tfm, const u8 *key,
+ 			  unsigned int keylen)
+ {
+ 	return -ENOSYS;
+ }
+diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
+index 58967593b6b4..84da3424decc 100644
+--- a/include/crypto/internal/hash.h
++++ b/include/crypto/internal/hash.h
+@@ -10,24 +10,10 @@
+ 
+ #include <crypto/algapi.h>
+ #include <crypto/hash.h>
+ 
+ struct ahash_request;
+-struct scatterlist;
+-
+-struct crypto_hash_walk {
+-	char *data;
+-
+-	unsigned int offset;
+-	unsigned int flags;
+-
+-	struct page *pg;
+-	unsigned int entrylen;
+-
+-	unsigned int total;
+-	struct scatterlist *sg;
+-};
+ 
+ struct ahash_instance {
+ 	void (*free)(struct ahash_instance *inst);
+ 	union {
+ 		struct {
+@@ -55,19 +41,10 @@ struct crypto_ahash_spawn {
+ 
+ struct crypto_shash_spawn {
+ 	struct crypto_spawn base;
+ };
+ 
+-int crypto_hash_walk_done(struct crypto_hash_walk *walk, int err);
+-int crypto_hash_walk_first(struct ahash_request *req,
+-			   struct crypto_hash_walk *walk);
+-
+-static inline int crypto_hash_walk_last(struct crypto_hash_walk *walk)
+-{
+-	return !(walk->entrylen | walk->total);
+-}
+-
+ int crypto_register_ahash(struct ahash_alg *alg);
+ void crypto_unregister_ahash(struct ahash_alg *alg);
+ int crypto_register_ahashes(struct ahash_alg *algs, int count);
+ void crypto_unregister_ahashes(struct ahash_alg *algs, int count);
+ int ahash_register_instance(struct crypto_template *tmpl,
 
----
-base-commit: 8379578b11d5e073792b5db2690faa12effce8e0
-change-id: 20241227-padata-store-eac9ea4518a9
-
-Best regards,
+base-commit: 7b6092ee7a4ce2d03dc65b87537889e8e1e0ab95
 -- 
-Thomas Weißschuh <linux@weissschuh.net>
+2.47.1
 
