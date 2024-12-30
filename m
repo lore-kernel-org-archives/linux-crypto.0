@@ -1,44 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C218A183CD9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 029AB18991E;
 	Mon, 30 Dec 2024 00:16:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735517762; cv=none; b=gLtSYpD3qoGi0F+FatoTIKfnYdR69gZFHPX9r/Yno0Un0mOevaeZtGUYSQ4uG5+aUPg5Ae2iJPRgZdrS32vprKlc+RdxxjGTNmsoHoJrjeiEGq0nZDF/ahtvnUHvEKQaq+ypbTl6AHMFWkrGA83NVvbKP9Zl42H6F6qaf+2phT4=
+	t=1735517763; cv=none; b=TEF1y2mDinncO7jr0ZUKGEKx4ilqMg56h0mSQBmBGMYEZXy7x52htaX1TpePqiwtQ6RgvHuM9Qlqyr7dGSaIzHV8ACb5SC2pybiYDvIR8R64JtybqnSWqGiR1yy7mBed08QVr0yQKbzTRYvpPPy7+lpzIFjm69Tu5kGcTbMOObo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735517762; c=relaxed/simple;
-	bh=l3mcIF8SEtYBua+ussMVqyNpUvcPBoNrQm89sO2KshY=;
+	s=arc-20240116; t=1735517763; c=relaxed/simple;
+	bh=IpLvn2XtgphqyEr3C9o4IvzLjuZxaBrxGrUoOcvifmA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BcXI3vFRhKAm25FoiZ1hUL6lkuDv8uEcJyQjXZrjJGazDqAdAUSDQVeSbMEms/LD4Bu58ocQkwt7CKSbLA2FU8TvyaMtQCHuE4PX/p/nVrXPKgsXWxqG/HLcWc/hnraW8AhZlwRdWPlF7eE9VGHj4AX+62suVojXtHE7X1FnBHI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O5il+uw4; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=YMgi4DYSRVbEM99G4gDt47BS5pKKeSqNnUajltlNo3yRiJM34AtvxaNmCi6FDtXEacUSQj6XsyY/Lvcf+yPw5M0RzjvFAvD74ykjtkoRRPo2LuNeW6hcy/LRrf9Ix3U2fO2/KdOL7LZabrY3n7ri+z0+yLlGH9JHSLh+IHv6PxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JGKclWey; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O5il+uw4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3560C4CEE1;
-	Mon, 30 Dec 2024 00:16:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JGKclWey"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72356C4CEE5;
+	Mon, 30 Dec 2024 00:16:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1735517762;
-	bh=l3mcIF8SEtYBua+ussMVqyNpUvcPBoNrQm89sO2KshY=;
+	bh=IpLvn2XtgphqyEr3C9o4IvzLjuZxaBrxGrUoOcvifmA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=O5il+uw47yUf4bNQKXq32psvRn/OjXkiWSchhO7EH6YLcHiQWhfzIVuy2natJvgp3
-	 coB7MaqzMUG6J7buiQVoj5N/OY8tkKYlmOXu5jF8SiHshrlMngtjET2Ep0xcwH4K+T
-	 hcsuUbcDsZHW43Rw7UlkwXRvKFsEQ44k/RMVggp8D42zCvK34maSXPPf+NnMdKQDE+
-	 f+61fYWvEW9BxwsGNqpK5feRzlwLXjtMFv7upZE5CIXw3nYJ0egqn+Zzl+pOmC28x6
-	 Urz2j59NsldJo5BjW3a94bf5OSSPryQ03rKqfh5pG4OxZdLUQE/tj7SQukbbY7vqIb
-	 vM4xU3YqhtSHQ==
+	b=JGKclWeygDuiTSJhXU6d/wBYsCbxpUiMSCrVqgigcPIyzmlqEImT78huP0qfJ6gWM
+	 aVlg2a/aqw/a8eqW5vkWod7VxLsN+GEGj+VQbK72d7Q7oqbNn6RaesM545RZDZK3Or
+	 T2dyyon1XLidW7e0VunKESBOePbl+Y2CI21uXkGT2r/UK5MlhIk0u/NzZ8HavvnSs5
+	 Ah2EwAJmmlDh4eibTzN9dqX2HKUegN/hHWBlpt1ygRbFv7RSdvfAMDi0Sv2E7P+SQ4
+	 EA0F/3vLftFgv0T6Q0gFjXTKOAIon3UmLEllJjpBtDRDTS0Af8MEOO5uK1YYkpXVrm
+	 UaevCQEGAcwtw==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Danny Tsen <dtsen@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Naveen N Rao <naveen@kernel.org>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH v2 10/29] crypto: powerpc/p10-aes-gcm - simplify handling of linear associated data
-Date: Sun, 29 Dec 2024 16:13:59 -0800
-Message-ID: <20241230001418.74739-11-ebiggers@kernel.org>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 11/29] crypto: scatterwalk - move to next sg entry just in time
+Date: Sun, 29 Dec 2024 16:14:00 -0800
+Message-ID: <20241230001418.74739-12-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20241230001418.74739-1-ebiggers@kernel.org>
 References: <20241230001418.74739-1-ebiggers@kernel.org>
@@ -52,74 +46,95 @@ Content-Transfer-Encoding: 8bit
 
 From: Eric Biggers <ebiggers@google.com>
 
-p10_aes_gcm_crypt() is abusing the scatter_walk API to get the virtual
-address for the first source scatterlist element.  But this code is only
-built for PPC64 which is a !HIGHMEM platform, and it can read past a
-page boundary from the address returned by scatterwalk_map() which means
-it already assumes the address is from the kernel's direct map.  Thus,
-just use sg_virt() instead to get the same result in a simpler way.
+The scatterwalk_* functions are designed to advance to the next sg entry
+only when there is more data from the request to process.  Compared to
+the alternative of advancing after each step if !sg_is_last(sg), this
+has the advantage that it doesn't cause problems if users accidentally
+don't terminate their scatterlist with the end marker (which is an easy
+mistake to make, and there are examples of this).
 
-Cc: Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: Danny Tsen <dtsen@linux.ibm.com>
-Cc: Michael Ellerman <mpe@ellerman.id.au>
-Cc: Naveen N Rao <naveen@kernel.org>
-Cc: Nicholas Piggin <npiggin@gmail.com>
-Cc: linuxppc-dev@lists.ozlabs.org
+Currently, the advance to the next sg entry happens in
+scatterwalk_done(), which is called after each "step" of the walk.  It
+requires the caller to pass in a boolean 'more' that indicates whether
+there is more data.  This works when the caller immediately knows
+whether there is more data, though it adds some complexity.  However in
+the case of scatterwalk_copychunks() it's not immediately known whether
+there is more data, so the call to scatterwalk_done() has to happen
+higher up the stack.  This is error-prone, and indeed the needed call to
+scatterwalk_done() is not always made, e.g. scatterwalk_copychunks() is
+sometimes called multiple times in a row.  This causes a zero-length
+step to get added in some cases, which is unexpected and seems to work
+only by accident.
+
+This patch begins the switch to a less error-prone approach where the
+advance to the next sg entry happens just in time instead.  For now,
+that means just doing the advance in scatterwalk_clamp() if it's needed
+there.  Initially this is redundant, but it's needed to keep the tree in
+a working state as later patches change things to the final state.
+
+Later patches will similarly move the dcache flushing logic out of
+scatterwalk_done() and then remove scatterwalk_done() entirely.
+
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
+ include/crypto/scatterwalk.h | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
-This patch is part of a long series touching many files, so I have
-limited the Cc list on the full series.  If you want the full series and
-did not receive it, please retrieve it from lore.kernel.org.
-
- arch/powerpc/crypto/aes-gcm-p10-glue.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
-
-diff --git a/arch/powerpc/crypto/aes-gcm-p10-glue.c b/arch/powerpc/crypto/aes-gcm-p10-glue.c
-index f37b3d13fc53..2862c3cf8e41 100644
---- a/arch/powerpc/crypto/aes-gcm-p10-glue.c
-+++ b/arch/powerpc/crypto/aes-gcm-p10-glue.c
-@@ -212,11 +212,10 @@ static int p10_aes_gcm_crypt(struct aead_request *req, u8 *riv,
- 	struct p10_aes_gcm_ctx *ctx = crypto_tfm_ctx(tfm);
- 	u8 databuf[sizeof(struct gcm_ctx) + PPC_ALIGN];
- 	struct gcm_ctx *gctx = PTR_ALIGN((void *)databuf, PPC_ALIGN);
- 	u8 hashbuf[sizeof(struct Hash_ctx) + PPC_ALIGN];
- 	struct Hash_ctx *hash = PTR_ALIGN((void *)hashbuf, PPC_ALIGN);
--	struct scatter_walk assoc_sg_walk;
- 	struct skcipher_walk walk;
- 	u8 *assocmem = NULL;
- 	u8 *assoc;
- 	unsigned int cryptlen = req->cryptlen;
- 	unsigned char ivbuf[AES_BLOCK_SIZE+PPC_ALIGN];
-@@ -232,12 +231,11 @@ static int p10_aes_gcm_crypt(struct aead_request *req, u8 *riv,
- 	memset(ivbuf, 0, sizeof(ivbuf));
- 	memcpy(iv, riv, GCM_IV_SIZE);
- 
- 	/* Linearize assoc, if not already linear */
- 	if (req->src->length >= assoclen && req->src->length) {
--		scatterwalk_start(&assoc_sg_walk, req->src);
--		assoc = scatterwalk_map(&assoc_sg_walk);
-+		assoc = sg_virt(req->src); /* ppc64 is !HIGHMEM */
- 	} else {
- 		gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
- 			      GFP_KERNEL : GFP_ATOMIC;
- 
- 		/* assoc can be any length, so must be on heap */
-@@ -251,13 +249,11 @@ static int p10_aes_gcm_crypt(struct aead_request *req, u8 *riv,
- 
- 	vsx_begin();
- 	gcmp10_init(gctx, iv, (unsigned char *) &ctx->enc_key, hash, assoc, assoclen);
- 	vsx_end();
- 
--	if (!assocmem)
--		scatterwalk_unmap(assoc);
--	else
-+	if (assocmem)
- 		kfree(assocmem);
- 
- 	if (enc)
- 		ret = skcipher_walk_aead_encrypt(&walk, req, false);
+diff --git a/include/crypto/scatterwalk.h b/include/crypto/scatterwalk.h
+index 32fc4473175b..924efbaefe67 100644
+--- a/include/crypto/scatterwalk.h
++++ b/include/crypto/scatterwalk.h
+@@ -24,22 +24,30 @@ static inline void scatterwalk_crypto_chain(struct scatterlist *head,
+ 		sg_chain(head, num, sg);
  	else
+ 		sg_mark_end(head);
+ }
+ 
++static inline void scatterwalk_start(struct scatter_walk *walk,
++				     struct scatterlist *sg)
++{
++	walk->sg = sg;
++	walk->offset = sg->offset;
++}
++
+ static inline unsigned int scatterwalk_pagelen(struct scatter_walk *walk)
+ {
+ 	unsigned int len = walk->sg->offset + walk->sg->length - walk->offset;
+ 	unsigned int len_this_page = offset_in_page(~walk->offset) + 1;
+ 	return len_this_page > len ? len : len_this_page;
+ }
+ 
+ static inline unsigned int scatterwalk_clamp(struct scatter_walk *walk,
+ 					     unsigned int nbytes)
+ {
+-	unsigned int len_this_page = scatterwalk_pagelen(walk);
+-	return nbytes > len_this_page ? len_this_page : nbytes;
++	if (walk->offset >= walk->sg->offset + walk->sg->length)
++		scatterwalk_start(walk, sg_next(walk->sg));
++	return min(nbytes, scatterwalk_pagelen(walk));
+ }
+ 
+ static inline void scatterwalk_advance(struct scatter_walk *walk,
+ 				       unsigned int nbytes)
+ {
+@@ -54,17 +62,10 @@ static inline struct page *scatterwalk_page(struct scatter_walk *walk)
+ static inline void scatterwalk_unmap(void *vaddr)
+ {
+ 	kunmap_local(vaddr);
+ }
+ 
+-static inline void scatterwalk_start(struct scatter_walk *walk,
+-				     struct scatterlist *sg)
+-{
+-	walk->sg = sg;
+-	walk->offset = sg->offset;
+-}
+-
+ static inline void *scatterwalk_map(struct scatter_walk *walk)
+ {
+ 	return kmap_local_page(scatterwalk_page(walk)) +
+ 	       offset_in_page(walk->offset);
+ }
 -- 
 2.47.1
 
