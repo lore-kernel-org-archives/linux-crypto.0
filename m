@@ -1,123 +1,98 @@
-Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
+Received: from mail-ua1-f51.google.com (mail-ua1-f51.google.com [209.85.222.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20F521A83EA;
-	Mon, 30 Dec 2024 11:05:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D24BF199938;
+	Mon, 30 Dec 2024 11:06:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735556720; cv=none; b=V8ygYP87Bxgw7R4XMxT9wYowDB+61oMMizqVSeFiHT/Tb1u1NOy3n47lDd+y+NH4212OtHBAk30JAZeBOtifC6giVkG94xaEAcUE3xfvRydOPx0mFpG1b//pnGwlRmYyqVaZ9SG2g0icqAwt+e7Rd/n3v04Kaw7eVnGIS/SxAy0=
+	t=1735556782; cv=none; b=NC95TqOk3NE95V9Rynz3zlAKqK7FudHoWSu/sjrAv+q0URP0bejttOOtwEYSvESabNHmrZiZB2Ljpi58WquepFs0UDZPBmFwq/bL6NXw5inOm9rqUt6wckzkczufB6gepYH4e6lYxX/qByV8ZyTU0GzbRnIYyTjOx36TYtXdTGg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735556720; c=relaxed/simple;
-	bh=qfb7DHzgExVzKgGWJHPlFxeVctNnqLg3iDSUuMPUUXc=;
+	s=arc-20240116; t=1735556782; c=relaxed/simple;
+	bh=2iYIv18ijKDUGv8uh1C/MZk9A091ijfJE+ocxhBXBQM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=P8gUFvViu9ZNd8czHLYexMimPFumiocK4nMqTK9C5P5wMdWvYiQPLL7/7Z9VqygnRVLfu0zG3SkplQC2lYZtd6vyy3QGKs8KObVX59yNhskkvGKS2PpYfB4t9idsqb6J5cjPNr3bTk/bFlfYnsWysOmNVwrGm+icRw2OKlA70ew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.169
+	 To:Cc:Content-Type; b=NbUkWQlvX0i6QQImNivG56C3TGEX6KMLiRZR0HXgb8/n2XOlLqX+4s0x9Eme3advpB17F11ffoKEhkMpMHFFrkHsg/iWGNOiit0FcoZezWllJYLSgIjmK+R8Xx/QwB1xP2y2Hm8ZQiVKqpYi/8T/TTRgSYmaaEMvVxARk3nEHSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-518808ef4a1so2842280e0c.3;
-        Mon, 30 Dec 2024 03:05:17 -0800 (PST)
+Received: by mail-ua1-f51.google.com with SMTP id a1e0cc1a2514c-85b83479f45so1351241241.0;
+        Mon, 30 Dec 2024 03:06:20 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735556716; x=1736161516;
+        d=1e100.net; s=20230601; t=1735556779; x=1736161579;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=id47K/4a6U+QFVGteH4iyr7Ptsppi8ire0OS89OefHg=;
-        b=UG39lFcqTTPOLaM+fcV+BsBXnhg8KZSzqQgJSODoplbyQdkSUfFwmrqSb5Z19b0Kza
-         KVG0sbpJ7D4uHSe0r3cO8aoyX0G3mIO2rp9sB/P4VBIfZ9UXAuJhft5Wnf4H9i/XDdC9
-         ZeFMkJFdZkhoQgxUBMOyKtmkkN04+wHb4IoqwhYbT7wtEwi8o7vqfTVl15GKTkF+uKMF
-         Np9GHu/1pR2y5JtIiBWHuw3N9LsKm+dWcdoQh+6V09maLykIQ1nl2SyfJJVoL9goGJM/
-         izEbsLyYtBgQHJRDVN/iPrnlicdtMXX8fHm6pryDUXUMrDamzrR2+YlolZZWEv4fxU3a
-         Cy5g==
-X-Forwarded-Encrypted: i=1; AJvYcCWGMX0NJXCB+LCFDir6lfRKSy1EZLKE4xN5X/ds2qNeXWbOvAL4q7ZONRZKoMAXkaLcPE4GaCSN5iguO/0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJwQnOohU4PXsDAGD73GseL4bgKh2VvqD3HYF1LEdSsGMgGcfy
-	e+VO0vzQDyr19fKfkZPOitt4Q9jl/nRHs4MceW7pViv/PFtRH0xkpwRxcso3
-X-Gm-Gg: ASbGncuHWYiZ64LE1IWwMKyrg74dimVC9ISRX25blGIe06JvTFS+usDGSBq79E/Pmpa
-	989sJ52EaJytszW6I/YNmslZ5U5+G6wkOrT4NoceQIpNndzb1igEt2PrlQavSOSiOA66TLQLd/G
-	f4TCmbNocHQ2rInMTC4pT03QhxqIQerRvb6fKqDJBirvLez20R5VA61xQ+J+imT7VkB9CU/hltq
-	/E+m3jVKm0/buntEBmG6bMFCq0kSkdCt483W/qQ4FeFEUM77i9w903/oNUzA+ZowFGVWr1ys8wr
-	sxRI0dqYgVssPFpGip4=
-X-Google-Smtp-Source: AGHT+IFDjw0OLR9fVsPQ9wafoY54jQMJNeo+tOFF/U07NbT4/mAvyfU9CzMHSWd3M1KvHpYwNKr4+A==
-X-Received: by 2002:a05:6122:2a44:b0:518:81aa:899b with SMTP id 71dfb90a1353d-51b75c6fb79mr23151745e0c.6.1735556716107;
-        Mon, 30 Dec 2024 03:05:16 -0800 (PST)
-Received: from mail-vs1-f52.google.com (mail-vs1-f52.google.com. [209.85.217.52])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-51b68bf014bsm2357800e0c.25.2024.12.30.03.05.15
+        bh=MhPIHJhGTX+chh8YZp28/f3C2Jc7bJFpH5IbxnbICL0=;
+        b=KkYXWZau0q2gV43YY2l40vp9k2Z/AmGZFwgoWY5TJ3WPKWzx43x7yOaR+C8H9LFahF
+         xi+RxpHzLttzn814JYf+/31ZoCpIhOT+cP/2KNqEJ29QLbePsAxeEZHdigN/yAOzZRnH
+         k9kgMF0wxAaW169wI+zSxRjo03Hltjwzv4msuf+tlqCvZRO+B2kOLfdJi0YErmGtV/X+
+         EpOjMePoga+xOg9EUMMte161XLxhh48o7lxqZQsQhahojhADHd3FPStvgYixkeWnmKbl
+         C8ll/VhJ0j++XJUrwrcSIWaLFh048G4k3/u8ICEwO2iOGBRuBXqa4mesJaVBlxbFvIZ2
+         DhPw==
+X-Forwarded-Encrypted: i=1; AJvYcCV/KB82YmR7F+wKKXj+sipBw+VF6IW0lLRw0rPSJ8efXlqPmK5bkgiEa0mrFrAQQwA9EOwQwgaYwhIdJJs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywu8FMBj/YhDLAqVqehJCeLzHa3sfGjS47Q2Sh/4mo80NFDg1JC
+	0wMUsDsg7IpqkZ++ZY/O2fc59tveoHx5N3uHKNZiplfnDpvX9gG6YAwUu13u
+X-Gm-Gg: ASbGncsKqYoPMHTtyL6RagesEmEBgOx7MSNVHCdRloBa8c1UOrPGX/DgcZy44TWsoxc
+	chkq+Ut6dssUVKDX6yAxIQmmCJ3o7iR5Kte2AlFocNRjatlDVk9UlDSm4R+hJbw7N+pBT78vvfU
+	kU2ZgfFjcI+hJjLGlgYs7TGDOOCx7cLusBxRffk+kQZ5auLssuTslyJyFZKnB7XPWi1rGyVX1Wt
+	kY3sOSX/NYwObwLscZylErJM7ad14npej7l53bEMWY3SXKQ1AdLU2v5DLr6/EJ/EWgwn8p0eXI3
+	WCAlf4t1LnyLYz/7Y8Q=
+X-Google-Smtp-Source: AGHT+IFhO8vfiesUaDYAA4tdrD9D2mMVEpj/DqKcTpAgz6xGSJ42px1nvh+ot/gzFcZ8mVNcOGA/Ow==
+X-Received: by 2002:a05:6102:3ed4:b0:4af:a98a:bd67 with SMTP id ada2fe7eead31-4b2cc313aaamr30271853137.3.1735556779116;
+        Mon, 30 Dec 2024 03:06:19 -0800 (PST)
+Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com. [209.85.222.41])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-8610ac6bfc9sm3983290241.16.2024.12.30.03.06.18
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Dec 2024 03:05:15 -0800 (PST)
-Received: by mail-vs1-f52.google.com with SMTP id ada2fe7eead31-4affd0fb6adso2461871137.1;
-        Mon, 30 Dec 2024 03:05:15 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVF8jIu7BbxBs5fVPTobo9bBE6Ag6VINgWiJtMRuu8o2srjVBVidHh3d3wxCIKFGOn8/u5tUF+b5uN2cJ8=@vger.kernel.org
-X-Received: by 2002:a05:6102:c02:b0:4b2:5c72:cd55 with SMTP id
- ada2fe7eead31-4b2cc31f256mr28218146137.5.1735556715611; Mon, 30 Dec 2024
- 03:05:15 -0800 (PST)
+        Mon, 30 Dec 2024 03:06:18 -0800 (PST)
+Received: by mail-ua1-f41.google.com with SMTP id a1e0cc1a2514c-85c48f5e2c1so1088023241.3;
+        Mon, 30 Dec 2024 03:06:18 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXokpkln/KMqF4GmjnbOMCZaACGSwHISaQQCTAxFeJLkXcU0aOU94lCNeORRYwOWh7hQBm3D2v5OmhFTCA=@vger.kernel.org
+X-Received: by 2002:a05:6102:3a0b:b0:4b1:2894:1048 with SMTP id
+ ada2fe7eead31-4b2cc351e2bmr28021284137.10.1735556778682; Mon, 30 Dec 2024
+ 03:06:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241226194309.27733-1-ebiggers@kernel.org>
-In-Reply-To: <20241226194309.27733-1-ebiggers@kernel.org>
+References: <20241227220802.92550-1-ebiggers@kernel.org>
+In-Reply-To: <20241227220802.92550-1-ebiggers@kernel.org>
 From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Mon, 30 Dec 2024 12:05:03 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdWRim0-vjzRSAhrSmukVxo_gzY_dDrtY_mYOPU2An9h+Q@mail.gmail.com>
-Message-ID: <CAMuHMdWRim0-vjzRSAhrSmukVxo_gzY_dDrtY_mYOPU2An9h+Q@mail.gmail.com>
-Subject: Re: [PATCH] crypto: vmac - remove unused VMAC algorithm
+Date: Mon, 30 Dec 2024 12:06:07 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdWMCqXzDOKfywKaYvsz60zsdt6OTeUJGZNLotDb017FXA@mail.gmail.com>
+Message-ID: <CAMuHMdWMCqXzDOKfywKaYvsz60zsdt6OTeUJGZNLotDb017FXA@mail.gmail.com>
+Subject: Re: [PATCH] crypto: keywrap - remove unused keywrap algorithm
 To: Eric Biggers <ebiggers@kernel.org>
 Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	dm-devel@lists.linux.dev, Atharva Tiwari <evepolonium@gmail.com>, 
-	Shane Wang <shane.wang@intel.com>
+	Stephan Mueller <smueller@chronox.de>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Dec 26, 2024 at 8:44=E2=80=AFPM Eric Biggers <ebiggers@kernel.org> =
-wrote:
+On Fri, Dec 27, 2024 at 11:10=E2=80=AFPM Eric Biggers <ebiggers@kernel.org>=
+ wrote:
 > From: Eric Biggers <ebiggers@google.com>
 >
-> Remove the vmac64 template, as it has no known users.  It also continues
-> to have longstanding bugs such as alignment violations (see
-> https://lore.kernel.org/r/20241226134847.6690-1-evepolonium@gmail.com/).
+> The keywrap (kw) algorithm has no in-tree user.  It has never had an
+> in-tree user, and the patch that added it provided no justification for
+> its inclusion.  Even use of it via AF_ALG is impossible, as it uses a
+> weird calling convention where part of the ciphertext is returned via
+> the IV buffer, which is not returned to userspace in AF_ALG.
 >
-> This code was added in 2009 by commit f1939f7c5645 ("crypto: vmac - New
-> hash algorithm for intel_txt support").  Based on the mention of
-> intel_txt support in the commit title, it seems it was added as a
-> prerequisite for the contemporaneous patch
-> "intel_txt: add s3 userspace memory integrity verification"
-> (https://lore.kernel.org/r/4ABF2B50.6070106@intel.com/).  In the design
-> proposed by that patch, when an Intel Trusted Execution Technology (TXT)
-> enabled system resumed from suspend, the "tboot" trusted executable
-> launched the Linux kernel without verifying userspace memory, and then
-> the Linux kernel used VMAC to verify userspace memory.
+> It's also unclear whether any new code in the kernel that does key
+> wrapping would actually use this algorithm.  It is controversial in the
+> cryptographic community due to having no clearly stated security goal,
+> no security proof, poor performance, and only a 64-bit auth tag.  Later
+> work (https://eprint.iacr.org/2006/221) suggested that the goal is
+> deterministic authenticated encryption.  But there are now more modern
+> algorithms for this, and this is not the same as key wrapping, for which
+> a regular AEAD such as AES-GCM usually can be (and is) used instead.
 >
-> However, that patch was never merged, as reviewers had objected to the
-> design.  It was later reworked into commit 4bd96a7a8185 ("x86, tboot:
-> Add support for S3 memory integrity protection") which made tboot verify
-> the memory instead.  Thus the VMAC support in Linux was never used.
+> Therefore, remove this unused code.
 >
-> No in-tree user has appeared since then, other than potentially the
-> usual components that allow specifying arbitrary hash algorithms by
-> name, namely AF_ALG and dm-integrity.  However there are no indications
-> that VMAC is being used with these components.  Debian Code Search and
-> web searches for "vmac64" (the actual algorithm name) do not return any
-> results other than the kernel itself, suggesting that it does not appear
-> in any other code or documentation.  Explicitly grepping the source code
-> of the usual suspects (libell, iwd, cryptsetup) finds no matches either.
+> There were several special cases for this algorithm in the self-tests,
+> due to its weird calling convention.  Remove those too.
 >
-> Before 2018, the vmac code was also completely broken due to using a
-> hardcoded nonce and the wrong endianness for the MAC.  It was then fixed
-> by commit ed331adab35b ("crypto: vmac - add nonced version with big
-> endian digest") and commit 0917b873127c ("crypto: vmac - remove insecure
-> version with hardcoded nonce").  These were intentionally breaking
-> changes that changed all the computed MAC values as well as the
-> algorithm name ("vmac" to "vmac64").  No complaints were ever received
-> about these breaking changes, strongly suggesting the absence of users.
->
-> The reason I had put some effort into fixing this code in 2018 is
-> because it was used by an out-of-tree driver.  But if it is still needed
-> in that particular out-of-tree driver, the code can be carried in that
-> driver instead.  There is no need to carry it upstream.
->
-> Cc: Atharva Tiwari <evepolonium@gmail.com>
-> Cc: Shane Wang <shane.wang@intel.com>
+> Cc: Stephan Mueller <smueller@chronox.de>
 > Signed-off-by: Eric Biggers <ebiggers@google.com>
 
 >  arch/m68k/configs/amiga_defconfig          |   1 -
