@@ -1,38 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4B7819AD93;
-	Mon, 30 Dec 2024 00:16:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EC0A19CC34;
+	Mon, 30 Dec 2024 00:16:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735517763; cv=none; b=a+4+y4vF5RLgkPdrl1vWzJmbQO2aU4fvyUnL8WhfIXmXlxZ0lPBqfGOTYm9K51uwnX5L7tBW3lXhMQ5znjOmd8xuBSgi0cdGtfgpHgE4Uzno4BYAxjhiMRzikCaUEfMiMsc3sdhZ7BlRc7tN8B7b2Kig7aLFfzxMYiqv2MYtaEE=
+	t=1735517764; cv=none; b=GQrncbUXID7CBrF1ZGVV8sqvYzsEFCRygHNbfhXVhrO7dhfYX03P8naLI4pM3Pn+mFlcY+xdiN0JuAX0bYiQG/EtXqfl2XLUifhFfXkEMYr2Uj/FGqYAQgT8f/Zd71CEB2VqHPGzINaN7fVoMlYHddxlBK4tqJGyXXUcjVuAj1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735517763; c=relaxed/simple;
-	bh=gxWz7ItVuXZh7ZMr8mOrMUU9vut7iYem6KQDBMBsI2Q=;
+	s=arc-20240116; t=1735517764; c=relaxed/simple;
+	bh=g1Sicjo3WPDOTEntvGipxb6vfLBqpP+1OtFMoBb3F/s=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=m3QT+BrGGPMwwfFV2xo9ea84kkFB7RzdR99OBHb3RbwtMMSV0mYIlcnzirCxxTiNfiV9mQMKKLXpUlItaMDmQRfAdwRN+w1kNvc0MefyFU/ABvc2Q+3y+tvNh+EYh6ZEInuLQdTdublOAFKSwSwEg86fSwCsxwJB392jjDjQn98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mqsgrDXN; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=Kf/IR9XyqMMA6PJf9fBrHsU/PLPmHDGxwBal1bkjd9kLOyjbtS9ekecB8eZVLGqPSh0yKAHpNHjuPju8TAp481GvdfBGDJFgK0ytYV/0tZiUrVOIqXFI0uUKBs/BGdQCWDs87OQ0J6WHaEFjbeq7SvGuHsynIROjOIl4WW+3I58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EE7ZUPdE; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mqsgrDXN"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F120EC4CED1;
-	Mon, 30 Dec 2024 00:16:02 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EE7ZUPdE"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07671C4CED7;
+	Mon, 30 Dec 2024 00:16:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735517763;
-	bh=gxWz7ItVuXZh7ZMr8mOrMUU9vut7iYem6KQDBMBsI2Q=;
+	s=k20201202; t=1735517764;
+	bh=g1Sicjo3WPDOTEntvGipxb6vfLBqpP+1OtFMoBb3F/s=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=mqsgrDXN20s8Fr17gpRjswtOcmwmPwp48qmCUjmftKxDXucDgA7zMbDojvTfGePJR
-	 2ulGDs/k/VXAZpxixAvCBo3i72LbT03V+pzzqSEylr5W4cypx9R1T+RcbRKVYN44oO
-	 mlKjj64YSrwJCZK0gwcnutdv3DmtOTSwrshOXupGc0IHxV4qjw3n10rYTVD8wlr+fO
-	 IZWkuCbfZR/fOIeUNZ/cTrqZ+Tqo0D+yNFtSJF3RvGCGwDKe+ENnM3KtnVqGNvZY8U
-	 H070vgD/IS6rJkxkWAWwSltDR9uiPMoN3xTTOE93BnDJ+/8kXhAOQR0tqsFEqMJKzU
-	 TKd/OwN29+92g==
+	b=EE7ZUPdEs6gq4ZJHyxBrpeS0Zbu0Fd/jruAryECxZgzOYDaBtapoVF25BOdhXwAMB
+	 TfZ4VjuSnswCJUYhKp1W700mb+gBZAnjn+8OeoTxueTyi8iRuOs/s46tXfKxu5vJq2
+	 c9Hlh0Dj9x4lEfpGYie0kV0Y/yNn0zQuCBOstT2Dt9Yw0Lt/SvR0KLc4D5PcGgXWf5
+	 9O5QEOS2DtiE5mU2z9UU5m1etRpbrDHhujFxwsymU4KjtSxSZBCTWFcvx9WGy2RTkJ
+	 dj7SFRZuZNRxINaIdpOWGNJBuzZesaa/1ru1tnAXj6J9AX7HNzvOi2pQxmEgQCJXyE
+	 6FSK0oxlRsaxQ==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 13/29] crypto: scatterwalk - add new functions for iterating through data
-Date: Sun, 29 Dec 2024 16:14:02 -0800
-Message-ID: <20241230001418.74739-14-ebiggers@kernel.org>
+	linux-kernel@vger.kernel.org,
+	Boris Pismenny <borisp@nvidia.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>
+Subject: [PATCH v2 15/29] crypto: scatterwalk - add scatterwalk_get_sglist()
+Date: Sun, 29 Dec 2024 16:14:04 -0800
+Message-ID: <20241230001418.74739-16-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20241230001418.74739-1-ebiggers@kernel.org>
 References: <20241230001418.74739-1-ebiggers@kernel.org>
@@ -46,142 +49,55 @@ Content-Transfer-Encoding: 8bit
 
 From: Eric Biggers <ebiggers@google.com>
 
-Add scatterwalk_next() which consolidates scatterwalk_clamp() and
-scatterwalk_map().  Also add scatterwalk_done_src() and
-scatterwalk_done_dst() which consolidate scatterwalk_unmap(),
-scatterwalk_advance(), and scatterwalk_done() or scatterwalk_pagedone().
-A later patch will remove scatterwalk_done() and scatterwalk_pagedone().
+Add a function that creates a scatterlist that represents the remaining
+data in a walk.  This will be used to replace chain_to_walk() in
+net/tls/tls_device_fallback.c so that it will no longer need to reach
+into the internals of struct scatter_walk.
 
-The new code eliminates the error-prone 'more' parameter.  Advancing to
-the next sg entry now only happens just-in-time in scatterwalk_next().
-
-The new code also pairs the dcache flush more closely with the actual
-write, similar to memcpy_to_page().  Previously it was paired with
-advancing to the next page.  This is currently causing bugs where the
-dcache flush is incorrectly being skipped, usually due to
-scatterwalk_copychunks() being called without a following
-scatterwalk_done().  The dcache flush may have been placed where it was
-in order to not call flush_dcache_page() redundantly when visiting a
-page more than once.  However, that case is rare in practice, and most
-architectures either do not implement flush_dcache_page() anyway or
-implement it lazily where it just clears a page flag.
-
-Another limitation of the old code was that by the time the flush
-happened, there was no way to tell if more than one page needed to be
-flushed.  That has been sufficient because the code goes page by page,
-but I would like to optimize that on !HIGHMEM platforms.  The new code
-makes this possible, and a later patch will implement this optimization.
-
+Cc: Boris Pismenny <borisp@nvidia.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: John Fastabend <john.fastabend@gmail.com>
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- include/crypto/scatterwalk.h | 69 ++++++++++++++++++++++++++++++++----
- 1 file changed, 63 insertions(+), 6 deletions(-)
+
+This patch is part of a long series touching many files, so I have
+limited the Cc list on the full series.  If you want the full series and
+did not receive it, please retrieve it from lore.kernel.org.
+
+ include/crypto/scatterwalk.h | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
 diff --git a/include/crypto/scatterwalk.h b/include/crypto/scatterwalk.h
-index 5c7765f601e0..8e83c43016c9 100644
+index 1689ecd7ddaf..f6262d05a3c7 100644
 --- a/include/crypto/scatterwalk.h
 +++ b/include/crypto/scatterwalk.h
-@@ -62,16 +62,10 @@ static inline unsigned int scatterwalk_clamp(struct scatter_walk *walk,
- 	if (walk->offset >= walk->sg->offset + walk->sg->length)
- 		scatterwalk_start(walk, sg_next(walk->sg));
- 	return min(nbytes, scatterwalk_pagelen(walk));
- }
- 
--static inline void scatterwalk_advance(struct scatter_walk *walk,
--				       unsigned int nbytes)
--{
--	walk->offset += nbytes;
--}
--
+@@ -67,10 +67,27 @@ static inline unsigned int scatterwalk_clamp(struct scatter_walk *walk,
  static inline struct page *scatterwalk_page(struct scatter_walk *walk)
  {
  	return sg_page(walk->sg) + (walk->offset >> PAGE_SHIFT);
  }
  
-@@ -84,10 +78,28 @@ static inline void *scatterwalk_map(struct scatter_walk *walk)
++/*
++ * Create a scatterlist that represents the remaining data in a walk.  Uses
++ * chaining to reference the original scatterlist, so this uses at most two
++ * entries in @sg_out regardless of the number of entries in the original list.
++ * Assumes that sg_init_table() was already done.
++ */
++static inline void scatterwalk_get_sglist(struct scatter_walk *walk,
++					  struct scatterlist sg_out[2])
++{
++	if (walk->offset >= walk->sg->offset + walk->sg->length)
++		scatterwalk_start(walk, sg_next(walk->sg));
++	sg_set_page(sg_out, sg_page(walk->sg),
++		    walk->sg->offset + walk->sg->length - walk->offset,
++		    walk->offset);
++	scatterwalk_crypto_chain(sg_out, sg_next(walk->sg), 2);
++}
++
+ static inline void scatterwalk_unmap(void *vaddr)
  {
- 	return kmap_local_page(scatterwalk_page(walk)) +
- 	       offset_in_page(walk->offset);
+ 	kunmap_local(vaddr);
  }
- 
-+/**
-+ * scatterwalk_next() - Get the next data buffer in a scatterlist walk
-+ * @walk: the scatter_walk
-+ * @total: the total number of bytes remaining, > 0
-+ * @nbytes_ret: (out) the next number of bytes available, <= @total
-+ *
-+ * Return: A virtual address for the next segment of data from the scatterlist.
-+ *	   The caller must call scatterwalk_done_src() or scatterwalk_done_dst()
-+ *	   when it is done using this virtual address.
-+ */
-+static inline void *scatterwalk_next(struct scatter_walk *walk,
-+				     unsigned int total,
-+				     unsigned int *nbytes_ret)
-+{
-+	*nbytes_ret = scatterwalk_clamp(walk, total);
-+	return scatterwalk_map(walk);
-+}
-+
- static inline void scatterwalk_pagedone(struct scatter_walk *walk, int out,
- 					unsigned int more)
- {
- 	if (out) {
- 		struct page *page;
-@@ -106,10 +118,55 @@ static inline void scatterwalk_done(struct scatter_walk *walk, int out,
- 	if (!more || walk->offset >= walk->sg->offset + walk->sg->length ||
- 	    !(walk->offset & (PAGE_SIZE - 1)))
- 		scatterwalk_pagedone(walk, out, more);
- }
- 
-+static inline void scatterwalk_advance(struct scatter_walk *walk,
-+				       unsigned int nbytes)
-+{
-+	walk->offset += nbytes;
-+}
-+
-+/**
-+ * scatterwalk_done_src() - Finish one step of a walk of source scatterlist
-+ * @walk: the scatter_walk
-+ * @vaddr: the address returned by scatterwalk_next()
-+ * @nbytes: the number of bytes processed this step, less than or equal to the
-+ *	    number of bytes that scatterwalk_next() returned.
-+ *
-+ * Use this if the @vaddr was not written to, i.e. it is source data.
-+ */
-+static inline void scatterwalk_done_src(struct scatter_walk *walk,
-+					const void *vaddr, unsigned int nbytes)
-+{
-+	scatterwalk_unmap((void *)vaddr);
-+	scatterwalk_advance(walk, nbytes);
-+}
-+
-+/**
-+ * scatterwalk_done_dst() - Finish one step of a walk of destination scatterlist
-+ * @walk: the scatter_walk
-+ * @vaddr: the address returned by scatterwalk_next()
-+ * @nbytes: the number of bytes processed this step, less than or equal to the
-+ *	    number of bytes that scatterwalk_next() returned.
-+ *
-+ * Use this if the @vaddr may have been written to, i.e. it is destination data.
-+ */
-+static inline void scatterwalk_done_dst(struct scatter_walk *walk,
-+					void *vaddr, unsigned int nbytes)
-+{
-+	scatterwalk_unmap(vaddr);
-+	/*
-+	 * Explicitly check ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE instead of just
-+	 * relying on flush_dcache_page() being a no-op when not implemented,
-+	 * since otherwise the BUG_ON in sg_page() does not get optimized out.
-+	 */
-+	if (ARCH_IMPLEMENTS_FLUSH_DCACHE_PAGE)
-+		flush_dcache_page(scatterwalk_page(walk));
-+	scatterwalk_advance(walk, nbytes);
-+}
-+
- void scatterwalk_skip(struct scatter_walk *walk, unsigned int nbytes);
- 
- void scatterwalk_copychunks(void *buf, struct scatter_walk *walk,
- 			    size_t nbytes, int out);
  
 -- 
 2.47.1
