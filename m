@@ -1,186 +1,138 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BAB125948E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BA42645;
 	Mon, 30 Dec 2024 00:15:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735517760; cv=none; b=KXju8bVI88dJlm7Z/R/vso5mMSs9ouQ3bViYfvtCRO29kD4QgN26eefl0nnCFwidbvbEy0W9O5x+h2cECNqBsQGLQPJylZQ84bPPA6n0vb5AvbQxKTruB1JoebSemX4O2l6X7upWu+RD7q60TTDQk7ihvytHzC2P/VKVRByXTZE=
+	t=1735517760; cv=none; b=endtq+RaanqR4jFfPY2tlH1Pf3qNtUDJ2BoHaxsFhLcpjzhAaU8UNHi65LWHMALIK8UsP6cKXHdtXn1u24gA4lyeWzu1kGqQonjzpoCWYs8wwZe2Pqzd2jlzEcpqvAzvIWrWWV4lPGJ9i9QwMHE7BmNNXwnmrq3opSXkbNa9sec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1735517760; c=relaxed/simple;
-	bh=5+ZF0ImlbQo//JHYBtR4hUhu8cd/k3zSglYQL5MyI1I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Y8objp7o1ZEbd95siolE0Lvl3TcdnOu08oINwSrlU9ARNvYogBJbs1ZCPDLs+v+vIgoLufaYTO3nk2sSscmURYjIYg1WdBg8pTbfqbtQTWLtm0UCRrHrYmaHnMv3FLBXUrqvKaHTj3ClhS4q/55vFFWAZgD3vObjnNX7qds87wc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CajwGQWs; arc=none smtp.client-ip=10.30.226.201
+	bh=B+ea5VZa9ni0fkXA4ElZFEdkMpMI5FHChY7YG1cUOFY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DGNeyLX6+CEyoW3vPPF3vLnp5wvQsm7PgvCfeN8qFWtpqsDDfKgbitRXG8bEZoSZNTsi8CbzbKL2lSw9r8no/qy8O9uDQx1lgfxJvBbYK5myXY8Z109jFHmTaIOu2ZFsOqzYWAJqlTQNEcsMy7Xa4KrGXQSarpSTvA0ifRoFdQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PDavyfp4; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CajwGQWs"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51452C4CED7;
-	Mon, 30 Dec 2024 00:15:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PDavyfp4"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05A6BC4CED1;
+	Mon, 30 Dec 2024 00:15:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1735517759;
-	bh=5+ZF0ImlbQo//JHYBtR4hUhu8cd/k3zSglYQL5MyI1I=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=CajwGQWsxx05ZrJZe2LCuWC1feYaE6hpCpmCosLC9+nd9cABcywaDkOtw+FfJFDKs
-	 EDUrpQO5btCgpYAo8cUbvLnpnqDK4JqDQgJ7hY3GDsMPTk5vxUihNLbrBCdyWDnwL4
-	 KO+BY2iZg0D47vV+bSog6PydDkilzlIgdam8Y5vXE89LEAWTVTX60CYCVa6pxl78n9
-	 eE/XkAI0rC8035n/rPCyKI+QP5mvI0p3H/O/TAWH2+4MXZ7itSFE863g2FHGVGjQVR
-	 xwQ4wzHr9WHwMfsG52Wbfm7b/HkqYS+aazwxFrXj4uI6STp5hPNRqxRZeLwtO6e4df
-	 HBEmF/JgoUpKQ==
+	bh=B+ea5VZa9ni0fkXA4ElZFEdkMpMI5FHChY7YG1cUOFY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=PDavyfp4nGwP5wE2qadoiyDh6nMzHjUBym+MKyaAFBX3MmUvReHVsqR/av8hs3uBl
+	 6PPDlT28nolMQVWNqnQfh/5nFZZCvI7StvKFAm4hl9LzhzEVszXfZMf1ECqhLGz1RG
+	 euYki8RI/K/F980PVP0DLVIAf4ztuUBeDxc55Zo/1caR5GNEnZax/Pw+pcaG+vttWz
+	 DwY8hrLiMRgOAbm+tU09KcCPHLsX8nxW0d/Tx1bBDrktVkueuA3pJbovEoGseV+adp
+	 v4uLr5JQ2aNiIjWdQf18WZKJXziNI2G+FICcH0ghcYRZw/Gu8M9dNC8v9CbLUN6yL0
+	 Hkl+j/8v7juzQ==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 01/29] crypto: skcipher - document skcipher_walk_done() and rename some vars
-Date: Sun, 29 Dec 2024 16:13:50 -0800
-Message-ID: <20241230001418.74739-2-ebiggers@kernel.org>
+Subject: [PATCH v2 00/29] crypto: scatterlist handling improvements
+Date: Sun, 29 Dec 2024 16:13:49 -0800
+Message-ID: <20241230001418.74739-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20241230001418.74739-1-ebiggers@kernel.org>
-References: <20241230001418.74739-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Eric Biggers <ebiggers@google.com>
+This series cleans up and optimizes the code that translates between
+scatterlists (the input to the API) and virtual addresses (what software
+implementations operate on) for skcipher and aead algorithms.
 
-skcipher_walk_done() has an unusual calling convention, and some of its
-local variables have unclear names.  Document it and rename variables to
-make it a bit clearer what is going on.  No change in behavior.
+This takes the form of cleanups and optimizations to the skcipher_walk
+functions and a rework of the underlying scatter_walk functions.
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- crypto/skcipher.c                  | 50 ++++++++++++++++++++----------
- include/crypto/internal/skcipher.h |  2 +-
- 2 files changed, 35 insertions(+), 17 deletions(-)
+This series is organized as follows:
 
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index d5fe0eca3826..8749c44f98a2 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -87,21 +87,39 @@ static int skcipher_done_slow(struct skcipher_walk *walk, unsigned int bsize)
- 	addr = skcipher_get_spot(addr, bsize);
- 	scatterwalk_copychunks(addr, &walk->out, bsize, 1);
- 	return 0;
- }
- 
--int skcipher_walk_done(struct skcipher_walk *walk, int err)
-+/**
-+ * skcipher_walk_done() - finish one step of a skcipher_walk
-+ * @walk: the skcipher_walk
-+ * @res: number of bytes *not* processed (>= 0) from walk->nbytes,
-+ *	 or a -errno value to terminate the walk due to an error
-+ *
-+ * This function cleans up after one step of walking through the source and
-+ * destination scatterlists, and advances to the next step if applicable.
-+ * walk->nbytes is set to the number of bytes available in the next step,
-+ * walk->total is set to the new total number of bytes remaining, and
-+ * walk->{src,dst}.virt.addr is set to the next pair of data pointers.  If there
-+ * is no more data, or if an error occurred (i.e. -errno return), then
-+ * walk->nbytes and walk->total are set to 0 and all resources owned by the
-+ * skcipher_walk are freed.
-+ *
-+ * Return: 0 or a -errno value.  If @res was a -errno value then it will be
-+ *	   returned, but other errors may occur too.
-+ */
-+int skcipher_walk_done(struct skcipher_walk *walk, int res)
- {
--	unsigned int n = walk->nbytes;
--	unsigned int nbytes = 0;
-+	unsigned int n = walk->nbytes; /* num bytes processed this step */
-+	unsigned int total = 0; /* new total remaining */
- 
- 	if (!n)
- 		goto finish;
- 
--	if (likely(err >= 0)) {
--		n -= err;
--		nbytes = walk->total - n;
-+	if (likely(res >= 0)) {
-+		n -= res; /* subtract num bytes *not* processed */
-+		total = walk->total - n;
- 	}
- 
- 	if (likely(!(walk->flags & (SKCIPHER_WALK_SLOW |
- 				    SKCIPHER_WALK_COPY |
- 				    SKCIPHER_WALK_DIFF)))) {
-@@ -113,35 +131,35 @@ int skcipher_walk_done(struct skcipher_walk *walk, int err)
- 	} else if (walk->flags & SKCIPHER_WALK_COPY) {
- 		skcipher_map_dst(walk);
- 		memcpy(walk->dst.virt.addr, walk->page, n);
- 		skcipher_unmap_dst(walk);
- 	} else if (unlikely(walk->flags & SKCIPHER_WALK_SLOW)) {
--		if (err > 0) {
-+		if (res > 0) {
- 			/*
- 			 * Didn't process all bytes.  Either the algorithm is
- 			 * broken, or this was the last step and it turned out
- 			 * the message wasn't evenly divisible into blocks but
- 			 * the algorithm requires it.
- 			 */
--			err = -EINVAL;
--			nbytes = 0;
-+			res = -EINVAL;
-+			total = 0;
- 		} else
- 			n = skcipher_done_slow(walk, n);
- 	}
- 
--	if (err > 0)
--		err = 0;
-+	if (res > 0)
-+		res = 0;
- 
--	walk->total = nbytes;
-+	walk->total = total;
- 	walk->nbytes = 0;
- 
- 	scatterwalk_advance(&walk->in, n);
- 	scatterwalk_advance(&walk->out, n);
--	scatterwalk_done(&walk->in, 0, nbytes);
--	scatterwalk_done(&walk->out, 1, nbytes);
-+	scatterwalk_done(&walk->in, 0, total);
-+	scatterwalk_done(&walk->out, 1, total);
- 
--	if (nbytes) {
-+	if (total) {
- 		crypto_yield(walk->flags & SKCIPHER_WALK_SLEEP ?
- 			     CRYPTO_TFM_REQ_MAY_SLEEP : 0);
- 		return skcipher_walk_next(walk);
- 	}
- 
-@@ -156,11 +174,11 @@ int skcipher_walk_done(struct skcipher_walk *walk, int err)
- 		kfree(walk->buffer);
- 	if (walk->page)
- 		free_page((unsigned long)walk->page);
- 
- out:
--	return err;
-+	return res;
- }
- EXPORT_SYMBOL_GPL(skcipher_walk_done);
- 
- static int skcipher_next_slow(struct skcipher_walk *walk, unsigned int bsize)
- {
-diff --git a/include/crypto/internal/skcipher.h b/include/crypto/internal/skcipher.h
-index 08d1e8c63afc..4f49621d3eb6 100644
---- a/include/crypto/internal/skcipher.h
-+++ b/include/crypto/internal/skcipher.h
-@@ -194,11 +194,11 @@ void crypto_unregister_lskcipher(struct lskcipher_alg *alg);
- int crypto_register_lskciphers(struct lskcipher_alg *algs, int count);
- void crypto_unregister_lskciphers(struct lskcipher_alg *algs, int count);
- int lskcipher_register_instance(struct crypto_template *tmpl,
- 				struct lskcipher_instance *inst);
- 
--int skcipher_walk_done(struct skcipher_walk *walk, int err);
-+int skcipher_walk_done(struct skcipher_walk *walk, int res);
- int skcipher_walk_virt(struct skcipher_walk *walk,
- 		       struct skcipher_request *req,
- 		       bool atomic);
- int skcipher_walk_aead_encrypt(struct skcipher_walk *walk,
- 			       struct aead_request *req, bool atomic);
+- Patch 1-8 are cleanups and optimizations for skcipher_walk.
+- Patch 9-10 are cleanups for drivers that were unnecessarily using
+  scatter_walk when simpler approaches existed.
+- Patch 11-15 improve scatter_walk, introducing easier-to-use functions
+  and optimizing performance in some cases.
+- Patch 16-27 convert users to use the new functions.
+- Patch 28 removes functions that are no longer needed.
+- Patch 29 optimizes the walker on !HIGHMEM platforms to start returning
+  data segments that can cross a page boundary.  This can significantly
+  improve performance in cases where messages can cross pages, such as
+  IPsec.  Previously there was a large overhead caused by packets being
+  unnecessarily divided into multiple parts by the walker, including
+  hitting skcipher_next_slow() which uses a single-block bounce buffer.
+
+Changed in v2:
+  - Added comment to scatterwalk_done_dst().
+  - Added scatterwalk_get_sglist() and use it in net/tls/.
+  - Dropped the keywrap patch, as keywrap is being removed by
+    https://lore.kernel.org/r/20241227220802.92550-1-ebiggers@kernel.org
+
+Eric Biggers (29):
+  crypto: skcipher - document skcipher_walk_done() and rename some vars
+  crypto: skcipher - remove unnecessary page alignment of bounce buffer
+  crypto: skcipher - remove redundant clamping to page size
+  crypto: skcipher - remove redundant check for SKCIPHER_WALK_SLOW
+  crypto: skcipher - fold skcipher_walk_skcipher() into
+    skcipher_walk_virt()
+  crypto: skcipher - clean up initialization of skcipher_walk::flags
+  crypto: skcipher - optimize initializing skcipher_walk fields
+  crypto: skcipher - call cond_resched() directly
+  crypto: omap - switch from scatter_walk to plain offset
+  crypto: powerpc/p10-aes-gcm - simplify handling of linear associated
+    data
+  crypto: scatterwalk - move to next sg entry just in time
+  crypto: scatterwalk - add new functions for skipping data
+  crypto: scatterwalk - add new functions for iterating through data
+  crypto: scatterwalk - add new functions for copying data
+  crypto: scatterwalk - add scatterwalk_get_sglist()
+  crypto: skcipher - use scatterwalk_start_at_pos()
+  crypto: aegis - use the new scatterwalk functions
+  crypto: arm/ghash - use the new scatterwalk functions
+  crypto: arm64 - use the new scatterwalk functions
+  crypto: nx - use the new scatterwalk functions
+  crypto: s390/aes-gcm - use the new scatterwalk functions
+  crypto: s5p-sss - use the new scatterwalk functions
+  crypto: stm32 - use the new scatterwalk functions
+  crypto: x86/aes-gcm - use the new scatterwalk functions
+  crypto: x86/aegis - use the new scatterwalk functions
+  net/tls: use the new scatterwalk functions
+  crypto: skcipher - use the new scatterwalk functions
+  crypto: scatterwalk - remove obsolete functions
+  crypto: scatterwalk - don't split at page boundaries when !HIGHMEM
+
+ arch/arm/crypto/ghash-ce-glue.c        |  15 +-
+ arch/arm64/crypto/aes-ce-ccm-glue.c    |  17 +-
+ arch/arm64/crypto/ghash-ce-glue.c      |  16 +-
+ arch/arm64/crypto/sm4-ce-ccm-glue.c    |  27 ++-
+ arch/arm64/crypto/sm4-ce-gcm-glue.c    |  31 ++-
+ arch/powerpc/crypto/aes-gcm-p10-glue.c |   8 +-
+ arch/s390/crypto/aes_s390.c            |  33 ++--
+ arch/x86/crypto/aegis128-aesni-glue.c  |  10 +-
+ arch/x86/crypto/aesni-intel_glue.c     |  28 +--
+ crypto/aegis128-core.c                 |  10 +-
+ crypto/scatterwalk.c                   |  91 +++++----
+ crypto/skcipher.c                      | 253 ++++++++++---------------
+ drivers/crypto/nx/nx-aes-ccm.c         |  16 +-
+ drivers/crypto/nx/nx-aes-gcm.c         |  17 +-
+ drivers/crypto/nx/nx.c                 |  31 +--
+ drivers/crypto/nx/nx.h                 |   3 -
+ drivers/crypto/omap-aes.c              |  34 ++--
+ drivers/crypto/omap-aes.h              |   6 +-
+ drivers/crypto/omap-des.c              |  40 ++--
+ drivers/crypto/s5p-sss.c               |  38 ++--
+ drivers/crypto/stm32/stm32-cryp.c      |  34 ++--
+ include/crypto/internal/skcipher.h     |   2 +-
+ include/crypto/scatterwalk.h           | 203 ++++++++++++++++----
+ net/tls/tls_device_fallback.c          |  31 +--
+ 24 files changed, 473 insertions(+), 521 deletions(-)
+
+
+base-commit: 7b6092ee7a4ce2d03dc65b87537889e8e1e0ab95
+prerequisite-patch-id: a0414cca60a72ee1056cce0a74175103b19e0e77
 -- 
 2.47.1
 
