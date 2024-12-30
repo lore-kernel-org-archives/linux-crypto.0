@@ -1,38 +1,38 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECC7F19D8A3;
-	Mon, 30 Dec 2024 00:16:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41C7A19DFAB;
+	Mon, 30 Dec 2024 00:16:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735517765; cv=none; b=n5GWdFZUxVjMMwKZHcdVDDqYn4czffmMuhQM+M7KgQtpIgGoRTlxeHIYx5iX9CW0rHLsciDjRgvQ3RxpAMF1aTv/D+Sb+l0cAlDnaEkuoRnsA0VBLnw4OZ129ArGh47wCZ8hTFo66YRkPOeqGSkpAL78OAP8pWxQ5m83hXuWNe4=
+	t=1735517765; cv=none; b=W3hAq6ejlKajX2+7pPZxRbbiB9YeFKIlzo+lR+4+hpPOwzQUHZtai1myXd1VuUZbgSAomV/PrYtDPLeWl7F0mbqYND9gDedwMLZdnQMbBxFT9IGRh9hHy4juP2hfEP4Ang8oHrWzddvfrnPOx24Cp9XcL2w8WJ+0yextXGPiEPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1735517765; c=relaxed/simple;
-	bh=lWRQiUFYe2vQoQj3axJpxeip5NuLznrPRnr+KRPRjGQ=;
+	bh=flgH9kGUEUUdU5GGIoLcecbOKpZ/9P71he8YGiVnKlw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YUpH7A264XNlR8MA7dDBLUyB1SXLBGowAQy+yP2fJWsOAtB7RzfyikagLk6p37NX4EZ53l7qOdPvymP82GuVBl2QUMQQi09BihSDi1r+PfiDhDgLCJQyz+N29d0HZQjmpIP/gxKOyGT99oxDdR7vOKvmfXx17FIYdDNAui/0JgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HN3jGOPl; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=MvHrZ9bDUyAYh74MWEuC2k9pd/vJm2Rl+7CWsDEWmXVP9yUVpiplzV2DFh/cpEl8Gx7xf7410LeBtP2bs3fdFknnQh0Mbbl7g3HlbDdyNHLJXMvOXZiYKIXug7G7LVLQSoTZ2o6p92Jh6qSXYG+1mqSnYEG4qH7wa/XGxKBaAiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JtFliWsz; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HN3jGOPl"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72157C4CED4;
-	Mon, 30 Dec 2024 00:16:03 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JtFliWsz"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA647C4AF0F;
+	Mon, 30 Dec 2024 00:16:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1735517763;
-	bh=lWRQiUFYe2vQoQj3axJpxeip5NuLznrPRnr+KRPRjGQ=;
+	s=k20201202; t=1735517765;
+	bh=flgH9kGUEUUdU5GGIoLcecbOKpZ/9P71he8YGiVnKlw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=HN3jGOPlJ/NCbL/SElFId+z7QwSQKWcfJvmSbQRczmZLUhAPg4lKgF6qs4ZfAchj+
-	 QxOXj/ptURI6s5xbNFI7P7Hmtx57C5wj0dgZOHRc3DOm2MCrcJht1TNqBHx00JNXct
-	 huT1kYYDIqQscFvgTvXp+pxJGytlFCsqiNJsfb3ZaLBYj6N/+BKo64aIjPYSIjf3x6
-	 eA//STf+IqeX7T4Qpb4su767HiP+ft/gHMb8oyb8yqP1qHwVM1M9Q5skgs479Cb+/R
-	 sfn0UmARj6Ukie9SWo7FFNWgP0OqZV6Cvzp44MAf4TxfNtmosthoiKs7I86wMc//dR
-	 nmz27sytmV0bA==
+	b=JtFliWsz1MQWt1rERIsI2ACTKt7OkpSZV/Ws3CTI/hJqzB5D+kTwjNVynffI78p3L
+	 mX2IDLsguSW5936FvY2DfgWFk8ehPLyx/UrUFmVm84FPMdFaRxLcqUgQzL0RvsW4YE
+	 SLfK1NxZgtKxTVFLNOmrcnDk20B3fhaa8wEPh+svrQSRFfSZMFA16cuRzDvgORuNji
+	 H1egmLKAUNtkE8V08WKXPqgzr8GNP0dNiqBN5ClYdolActcKsV0Oy7wUdwba+bvndg
+	 QNahR/v56j+mt67qLDUHeFxjTsHhfKpCaZQijTVdy9m6nyc4Coi7PrDG1gBo5N1nAJ
+	 oTtmS9pWaxRsA==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 14/29] crypto: scatterwalk - add new functions for copying data
-Date: Sun, 29 Dec 2024 16:14:03 -0800
-Message-ID: <20241230001418.74739-15-ebiggers@kernel.org>
+Subject: [PATCH v2 18/29] crypto: arm/ghash - use the new scatterwalk functions
+Date: Sun, 29 Dec 2024 16:14:07 -0800
+Message-ID: <20241230001418.74739-19-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20241230001418.74739-1-ebiggers@kernel.org>
 References: <20241230001418.74739-1-ebiggers@kernel.org>
@@ -46,158 +46,56 @@ Content-Transfer-Encoding: 8bit
 
 From: Eric Biggers <ebiggers@google.com>
 
-Add memcpy_from_sglist() and memcpy_to_sglist() which are more readable
-versions of scatterwalk_map_and_copy() with the 'out' argument 0 and 1
-respectively.  They follow the same argument order as memcpy_from_page()
-and memcpy_to_page() from <linux/highmem.h>.  Note that in the case of
-memcpy_from_sglist(), this also happens to be the same argument order
-that scatterwalk_map_and_copy() uses.
-
-The new code is also faster, mainly because it builds the scatter_walk
-directly without creating a temporary scatterlist.  E.g., a 20%
-performance improvement is seen for copying the AES-GCM auth tag.
-
-Make scatterwalk_map_and_copy() be a wrapper around memcpy_from_sglist()
-and memcpy_to_sglist().  Callers of scatterwalk_map_and_copy() should be
-updated to call memcpy_from_sglist() or memcpy_to_sglist() directly, but
-there are a lot of them so they aren't all being updated right away.
-
-Also add functions memcpy_from_scatterwalk() and memcpy_to_scatterwalk()
-which are similar but operate on a scatter_walk instead of a
-scatterlist.  These will replace scatterwalk_copychunks() with the 'out'
-argument 0 and 1 respectively.  Their behavior differs slightly from
-scatterwalk_copychunks() in that they automatically take care of
-flushing the dcache when needed, making them easier to use.
-
-scatterwalk_copychunks() itself is left unchanged for now.  It will be
-removed after its callers are updated to use other functions instead.
+Use scatterwalk_next() which consolidates scatterwalk_clamp() and
+scatterwalk_map(), and use scatterwalk_done_src() which consolidates
+scatterwalk_unmap(), scatterwalk_advance(), and scatterwalk_done().
+Remove unnecessary code that seemed to be intended to advance to the
+next sg entry, which is already handled by the scatterwalk functions.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/scatterwalk.c         | 59 ++++++++++++++++++++++++++++++------
- include/crypto/scatterwalk.h | 24 +++++++++++++--
- 2 files changed, 72 insertions(+), 11 deletions(-)
+ arch/arm/crypto/ghash-ce-glue.c | 15 ++++-----------
+ 1 file changed, 4 insertions(+), 11 deletions(-)
 
-diff --git a/crypto/scatterwalk.c b/crypto/scatterwalk.c
-index af436ad02e3f..2e7a532152d6 100644
---- a/crypto/scatterwalk.c
-+++ b/crypto/scatterwalk.c
-@@ -65,26 +65,67 @@ void scatterwalk_copychunks(void *buf, struct scatter_walk *walk,
- 		scatterwalk_pagedone(walk, out & 1, 1);
- 	}
- }
- EXPORT_SYMBOL_GPL(scatterwalk_copychunks);
+diff --git a/arch/arm/crypto/ghash-ce-glue.c b/arch/arm/crypto/ghash-ce-glue.c
+index 3af997082534..9613ffed84f9 100644
+--- a/arch/arm/crypto/ghash-ce-glue.c
++++ b/arch/arm/crypto/ghash-ce-glue.c
+@@ -457,30 +457,23 @@ static void gcm_calculate_auth_mac(struct aead_request *req, u64 dg[], u32 len)
+ 	int buf_count = 0;
  
--void scatterwalk_map_and_copy(void *buf, struct scatterlist *sg,
--			      unsigned int start, unsigned int nbytes, int out)
-+inline void memcpy_from_scatterwalk(void *buf, struct scatter_walk *walk,
-+				    unsigned int nbytes)
-+{
-+	do {
-+		const void *src_addr;
-+		unsigned int to_copy;
-+
-+		src_addr = scatterwalk_next(walk, nbytes, &to_copy);
-+		memcpy(buf, src_addr, to_copy);
-+		scatterwalk_done_src(walk, src_addr, to_copy);
-+		buf += to_copy;
-+		nbytes -= to_copy;
-+	} while (nbytes);
-+}
-+EXPORT_SYMBOL_GPL(memcpy_from_scatterwalk);
-+
-+inline void memcpy_to_scatterwalk(struct scatter_walk *walk, const void *buf,
-+				  unsigned int nbytes)
-+{
-+	do {
-+		void *dst_addr;
-+		unsigned int to_copy;
-+
-+		dst_addr = scatterwalk_next(walk, nbytes, &to_copy);
-+		memcpy(dst_addr, buf, to_copy);
-+		scatterwalk_done_dst(walk, dst_addr, to_copy);
-+		buf += to_copy;
-+		nbytes -= to_copy;
-+	} while (nbytes);
-+}
-+EXPORT_SYMBOL_GPL(memcpy_to_scatterwalk);
-+
-+void memcpy_from_sglist(void *buf, struct scatterlist *sg,
-+			unsigned int start, unsigned int nbytes)
- {
- 	struct scatter_walk walk;
--	struct scatterlist tmp[2];
+ 	scatterwalk_start(&walk, req->src);
  
--	if (!nbytes)
-+	if (unlikely(nbytes == 0)) /* in case sg == NULL */
- 		return;
+ 	do {
+-		u32 n = scatterwalk_clamp(&walk, len);
+-		u8 *p;
++		unsigned int n;
++		const u8 *p;
  
--	sg = scatterwalk_ffwd(tmp, sg, start);
-+	scatterwalk_start_at_pos(&walk, sg, start);
-+	memcpy_from_scatterwalk(buf, &walk, nbytes);
-+}
-+EXPORT_SYMBOL_GPL(memcpy_from_sglist);
-+
-+void memcpy_to_sglist(struct scatterlist *sg, unsigned int start,
-+		      const void *buf, unsigned int nbytes)
-+{
-+	struct scatter_walk walk;
-+
-+	if (unlikely(nbytes == 0)) /* in case sg == NULL */
-+		return;
+-		if (!n) {
+-			scatterwalk_start(&walk, sg_next(walk.sg));
+-			n = scatterwalk_clamp(&walk, len);
+-		}
+-
+-		p = scatterwalk_map(&walk);
++		p = scatterwalk_next(&walk, len, &n);
+ 		gcm_update_mac(dg, p, n, buf, &buf_count, ctx);
+-		scatterwalk_unmap(p);
++		scatterwalk_done_src(&walk, p, n);
  
--	scatterwalk_start(&walk, sg);
--	scatterwalk_copychunks(buf, &walk, nbytes, out);
--	scatterwalk_done(&walk, out, 0);
-+	scatterwalk_start_at_pos(&walk, sg, start);
-+	memcpy_to_scatterwalk(&walk, buf, nbytes);
- }
--EXPORT_SYMBOL_GPL(scatterwalk_map_and_copy);
-+EXPORT_SYMBOL_GPL(memcpy_to_sglist);
+ 		if (unlikely(len / SZ_4K > (len - n) / SZ_4K)) {
+ 			kernel_neon_end();
+ 			kernel_neon_begin();
+ 		}
  
- struct scatterlist *scatterwalk_ffwd(struct scatterlist dst[2],
- 				     struct scatterlist *src,
- 				     unsigned int len)
- {
-diff --git a/include/crypto/scatterwalk.h b/include/crypto/scatterwalk.h
-index 8e83c43016c9..1689ecd7ddaf 100644
---- a/include/crypto/scatterwalk.h
-+++ b/include/crypto/scatterwalk.h
-@@ -168,12 +168,32 @@ static inline void scatterwalk_done_dst(struct scatter_walk *walk,
- void scatterwalk_skip(struct scatter_walk *walk, unsigned int nbytes);
+ 		len -= n;
+-		scatterwalk_advance(&walk, n);
+-		scatterwalk_done(&walk, 0, len);
+ 	} while (len);
  
- void scatterwalk_copychunks(void *buf, struct scatter_walk *walk,
- 			    size_t nbytes, int out);
- 
--void scatterwalk_map_and_copy(void *buf, struct scatterlist *sg,
--			      unsigned int start, unsigned int nbytes, int out);
-+void memcpy_from_scatterwalk(void *buf, struct scatter_walk *walk,
-+			     unsigned int nbytes);
-+
-+void memcpy_to_scatterwalk(struct scatter_walk *walk, const void *buf,
-+			   unsigned int nbytes);
-+
-+void memcpy_from_sglist(void *buf, struct scatterlist *sg,
-+			unsigned int start, unsigned int nbytes);
-+
-+void memcpy_to_sglist(struct scatterlist *sg, unsigned int start,
-+		      const void *buf, unsigned int nbytes);
-+
-+/* In new code, please use memcpy_{from,to}_sglist() directly instead. */
-+static inline void scatterwalk_map_and_copy(void *buf, struct scatterlist *sg,
-+					    unsigned int start,
-+					    unsigned int nbytes, int out)
-+{
-+	if (out)
-+		memcpy_to_sglist(sg, start, buf, nbytes);
-+	else
-+		memcpy_from_sglist(buf, sg, start, nbytes);
-+}
- 
- struct scatterlist *scatterwalk_ffwd(struct scatterlist dst[2],
- 				     struct scatterlist *src,
- 				     unsigned int len);
- 
+ 	if (buf_count) {
+ 		memset(&buf[buf_count], 0, GHASH_BLOCK_SIZE - buf_count);
+ 		pmull_ghash_update_p64(1, dg, buf, ctx->h, NULL);
 -- 
 2.47.1
 
