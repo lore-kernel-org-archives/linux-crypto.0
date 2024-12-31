@@ -1,262 +1,197 @@
-Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2054.outbound.protection.outlook.com [40.107.220.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FA6E14B088
-	for <linux-crypto@vger.kernel.org>; Mon, 30 Dec 2024 19:22:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735586551; cv=none; b=qiJmAdLtyzxhY8T5wwPSys3o+kDbxtdqWRxMtxevIY4csPqD6p06DCg//Qs8S1lW8m4VILAzOrmISkvqA1v9aNoGFcNC0UdV6qMYGI1rOh0XF4wwDDofqFwOb/sKsc0FnlwyhvArlmm09xKkPd9nSSPAE6EKAd+n8tRkeyApacw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735586551; c=relaxed/simple;
-	bh=2sLMSxs07qoy5gkEOddmV8PJEfgSDW2cGiwUMFxnI9I=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=JeHIQJSJICOBsbbSXE+16vXAVihNOJQ2cApL6MYUBfRzRUGwYObuwTFmeMObqTXk4u/9bba6HPmbPpUNN7eUx/In/F+sZWIMjJidOo6XTwmn+gFXdLNsspsKGoGNyQjBH2RBWLyKM4W7oMuW3JzRqO54QtEo3idovWhok1pOskY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3a9d3e48637so93181795ab.1
-        for <linux-crypto@vger.kernel.org>; Mon, 30 Dec 2024 11:22:29 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735586548; x=1736191348;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XZbk8DAAKvdGDfTKY/w3xdcQsaMwtxLDdwTUaKLkUEU=;
-        b=ugRyIV6EBQ4+vH9rkm8jBRgMsMvIl+x+L/w2dOqJeCNuCJKkEdc/YXNt58Eek+W/8c
-         2hTQIncNqkPUYQt1iMcZCIJ8SoScUNmLrONSVJeWZx5uJfAYHaiwLMxsnKhkSkYfxoCq
-         qvDxf7YMEOiPzdgwtLqE8BFDI5NvHFVtKE28R6YZlKoR5h/n+PjVkOOP0zqQN75B3cu3
-         YXJwRxPNTCFHzkZl4vfo5whA1Q8UFWXR9RjlvzALL0N4nBv6EqcUn3Bhwj7wqY0XO/S7
-         MJa32TTBJJPe1X3UEc4UU7Xj6WP70p6PCQEaZK75uQVr3U0/B5kqp8D+Jk1QxT5c5eIf
-         oGIA==
-X-Forwarded-Encrypted: i=1; AJvYcCWo4emltNSkIJQ+wPFnjcT31QTMPkwYWgwLc1TE2UHs9FJoKQxvU4XZn+KVjJaqofE/wCRH67f/qzqjwUE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwwPjf5bu71FGen+VqkMrfRRhBWyTXeKoPCI5QywYBlejQtPnEP
-	mw+x6w2GS124zJ01a5TNsj9X3rptD8vvLRNjesvLkTTXJuld2H+wOrbd5y6HU/fiwWCTdLh99S/
-	v48+Bs9ey82wrQRhY/XPzEuVd4ltUuhlD9J4BhMQc2L/Er3pf/6suArw=
-X-Google-Smtp-Source: AGHT+IGIlbq6Ff2T6yYwCq+KHsjNUjnU0fHb+Oe6kaEC5noBFmwlNZepHSto0crBLqwJmWX+YEFYE1JF+8EfyVaBXnrmIo0RIN9k
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F5931422D4;
+	Tue, 31 Dec 2024 04:25:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1735619115; cv=fail; b=nK5CUgq2aj7U+lUdaM7CEpPkWRg6OmuVHes5R3dqOpOdD9KLEy02qdjLYa+vZKoR7cLQB7n9nhPRCuYQcoztZg3mNfs4YRpqE88x97L2/2eokxYHkLp0BlrphuFDxWdA/LmSITWiAoaaDsCNK/UStQ95a9yxZnz5LRfYYhW7pCo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1735619115; c=relaxed/simple;
+	bh=0nGqrFfNUfeYVta08Y8t72dGCGQummDMHsbMWt+mets=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=XPxdl6N1fOz5ar9jIbFNrM9UnOYNg8WX22guFnc/lhUBmEdEET+ioUaNO5M/0FNFBam0Uz0ee7N5AiERlgLbrwI8NzIMl1ji5BCG/XXVEB5SuN8I0Oxh1TooDm2C1yGfe71SNXqGfgD9Tmqm6ce6ZePvwLNoMVWIxXvfoFte/6A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=NDVEBrXX; arc=fail smtp.client-ip=40.107.220.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="NDVEBrXX"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ygX1EuUe7H9otgs9NVdiLUp+WVDB/hT6zAzC8k6cTVoIQsNxqN8FQnUOOECTZ2sjtfVBj1m+ZPxswkJC39opA9/opj01AzHPzvlHa879XylhQOPSsW9xxySAg8tEM/2sVSi8Y4l/xW7iWw/yBaFlHFREy/jpxwl2Zod6aPLft5o909ERSq1nlF7M5UYVBkYtfSYrVnDMhZLt3EUJ02mYmSsq9cnZgF5j42OtuP62WLZkgvW6RC7+Mdb97+khLpurmWPQ0lrwo8fLTUuCiJkfvD4GHjBtZa7+Ks/nBpkQAiac+2jCfaGkFHN29JGBRjnkxmozTxrG7F879Svzyx95FQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7gPM0XMM5+ZtnHJx2OoWiWcvoxAmC0794smF6Gu1Cp4=;
+ b=hItMuWzr9LNaPc5jQ0+e1bIA7DYWTYSN5t878RwPmtEBug5tu6bdXb5ZEdXCbU86daoHA1vUWStl/W3iImj26/1vnmS69aLO5jpvb/AFfQ539SVCNQ667sgh89VIifejvWsbMbCoJ2VKs6aopoS212EMYemIyyMKOb/Bq9Iap8I7jZYhKvJSbJfcJLwL9qh0/wl3keMKBSSX3LiaZTeEOSdhBMs5x3rM6syioAe2ZUOZ1bcTzouMiHCCC0ah1xGU7wGJG5tZZmfaC98yTHxpCjDhLG/zJsVZmyX2xD8f93UOjLTTvohpP6ogHBHth3SAlOZGIh7zaEZxdLZlSBGBGA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7gPM0XMM5+ZtnHJx2OoWiWcvoxAmC0794smF6Gu1Cp4=;
+ b=NDVEBrXXiPMpeYN+zwrlei4UkYo7//HzXvxBfiXSjYs6U0ooVvs+JcnjVLxkFc/bQjCRBS3raVdbN5epHZiYx7tgzTID323TTt9YLA2LH3L2mOLKF+30M3M6f0K0nQ8tr+D4XQvdoadvw25neIWNb4NF0Wc17eBqgQwIFEadOmYzd4ZNsDjiSX8S5IAjIszmd97Vqy4E0ceBHsQLCopNepQAaKD2k5Ucf/o9bqFHTxVy9YVmo+G1fSgCAZFRzDQN3vkl6dWnHnBQwrBRvt8HwGMloLp87MnQtXRoJ80S0jvXeOnZt5wi+HrTHjWt+1h3COWr/qfp7sv3zxqAhkWjVQ==
+Received: from PH7PR12MB8178.namprd12.prod.outlook.com (2603:10b6:510:2b3::19)
+ by CH3PR12MB9025.namprd12.prod.outlook.com (2603:10b6:610:129::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8293.20; Tue, 31 Dec
+ 2024 04:25:06 +0000
+Received: from PH7PR12MB8178.namprd12.prod.outlook.com
+ ([fe80::77bb:a9fb:c75b:f530]) by PH7PR12MB8178.namprd12.prod.outlook.com
+ ([fe80::77bb:a9fb:c75b:f530%6]) with mapi id 15.20.8293.000; Tue, 31 Dec 2024
+ 04:25:06 +0000
+From: Akhil R <akhilrajeev@nvidia.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+CC: "davem@davemloft.net" <davem@davemloft.net>, "thierry.reding@gmail.com"
+	<thierry.reding@gmail.com>, Jon Hunter <jonathanh@nvidia.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH 1/7] crypto: tegra: Use separate buffer for setkey
+Thread-Topic: [PATCH 1/7] crypto: tegra: Use separate buffer for setkey
+Thread-Index: AQHbUJ6Qxi+DINGM+kmXYyCUmKJwL7L7mCkAgALfjvA=
+Date: Tue, 31 Dec 2024 04:25:06 +0000
+Message-ID:
+ <PH7PR12MB8178F6A37DE6CD41850529BBC00A2@PH7PR12MB8178.namprd12.prod.outlook.com>
+References: <20241217161207.72921-1-akhilrajeev@nvidia.com>
+ <20241217161207.72921-2-akhilrajeev@nvidia.com>
+ <Z2_iroxlT3C1d1HQ@gondor.apana.org.au>
+In-Reply-To: <Z2_iroxlT3C1d1HQ@gondor.apana.org.au>
+Accept-Language: en-IN, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH7PR12MB8178:EE_|CH3PR12MB9025:EE_
+x-ms-office365-filtering-correlation-id: d197f8ec-670d-4f7b-cb1c-08dd29531ad0
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?8xWDY9mYgiT/GBZ5pLy/FUZLArDBw+F3X9JxCyg029VvXH+4ZT9RnZVbzp+h?=
+ =?us-ascii?Q?b2BrClbh1M/VUGE/QI7LfQ+wKWpxlq3j549vacOXOSXRM7Awu+Rhd5PjNLBI?=
+ =?us-ascii?Q?hNwBjXKGExl0jtNnyXAqZgBOiZQsb21dOUULZ4R5y0JjpYW+MQDrAgDSLMw1?=
+ =?us-ascii?Q?ez2X9OA0FIujo1L/uO3u4PDsCBfJOxcCYW0+uxEvcer/d/kPiNrG+0w2VmKu?=
+ =?us-ascii?Q?VWcaRcf+dzMGjwhIERNA7NLsyP0S/RHC14bG7L2ZwOh32oJOjrgMy4OUGAdx?=
+ =?us-ascii?Q?GRki3Vun0zze8mP8cTz+mqhIhaxusNeA8s+yT1DMfqQguFJPfWGBKqoCcjUF?=
+ =?us-ascii?Q?TIdmZ406f3Q9jtSAUamztztr82k7M2dC1FANkQZpbaVfZdVhYTcG40R1mlWx?=
+ =?us-ascii?Q?j5qoAgqRbpAfxwNkZD0W0t7cSnW7QB4pgYeDm8VG5AZyvooR6ZeTWwGuIwM/?=
+ =?us-ascii?Q?9arCjpoudnRdnax0jleyaDaXEB1IEsB/E2cRDi9LA/y86IOWma0krov/065W?=
+ =?us-ascii?Q?qPq1NECMYRe3ygifxAtbxKAygshEOhOEPcY6FQLFNM5Vry1g7XDuPEOdR8T6?=
+ =?us-ascii?Q?UqS9ibGprPYWNGtTGT0Y9Jmvq0Fhe3CxlFZ4+HqEBJvG+W45ItJPGdZ+bz3q?=
+ =?us-ascii?Q?URMXoi2Dg0ny9+O2OIY1kBJE3tm1flvHFxXTXUfqn5dSorEdeudhwUIeU9ax?=
+ =?us-ascii?Q?1MeJ2Q1bihwycbWPf7soZNLZJNFs/+BWN1wrsq8cvwfIsE47RXU0WcUfFo3T?=
+ =?us-ascii?Q?BETZE3/brer/uImGxlvV8zJ1NYNeCft0vTInvWDSgZAlYv7jpypwdePo0fNw?=
+ =?us-ascii?Q?2yUBYyvQqoYodrr5NRsIZAeHstsF/yFG0xDLy+mM8CpN8PmGNuGCyIBvf+nI?=
+ =?us-ascii?Q?czzyrOurEa+19OUhPmoBNM1qPG3WX9MUIye4i0fM1GYz3vlcPT5UNARZE71K?=
+ =?us-ascii?Q?H7jCauTj9G4ogWBBDqkZes4nZF/VARUu1/rJxOePWyBzGhX0csElFVJSG47w?=
+ =?us-ascii?Q?/1u1njfgz6MSzSAdH6phfR44uwS1i27iHYs/M71MKqZL+p6z9rTVfHgWxHRE?=
+ =?us-ascii?Q?vltkjZt8vNsAG/ZLWhSN24wVBUiZqw4FCh9yv1D7nQcUfk0JCL37f6EYUGEI?=
+ =?us-ascii?Q?3VTxc6EdAJhDOhlzkwjZaYHgtJeBP02miHTLQ38ARy6X/G5Re2Ap248JXdtz?=
+ =?us-ascii?Q?m2ohjNOqd5+FCM5Mev/mIX2BFSBrYmQeaKHXJYCyZ4WoNMkQBBKrzDtiI3KJ?=
+ =?us-ascii?Q?kEu6l2EwxPN0ENrf7M26IlCjcHCL5f17tF9J856NbvwIfvzbrU2j2La++LVe?=
+ =?us-ascii?Q?CD8NTqj/eiuFjSW7Lacxy8OYNAJ8pNyfKCVQKZ9JegtSLhkSRQsiMw3P30aE?=
+ =?us-ascii?Q?AamR+Qabamr3y3rjL1m4X+O3hbXp+4qRgZferysYjo9iBa+yYxPSOhzXxGWU?=
+ =?us-ascii?Q?mjImt0ZA2kxjCOI3J0q71o4kLZf+7nRF?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB8178.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?URGqDBn1oCLWxlXgQ6ebEZGbcGVwqPthn62lGg0zzUmmpZIckU+uln3gRyyx?=
+ =?us-ascii?Q?jBOh6cdK+W27ikN5eQBNmIXTod5s0WgB6YSHUU9nr2GNnb3UX7kv/y8QuRcp?=
+ =?us-ascii?Q?0++HRYtlc7z+fsljNzS6CeFBairTNaXusIfy5NDkQtz194beccU61VL6LyE4?=
+ =?us-ascii?Q?QSIGQSdSXe9MR+zb9J6tTGqlB2eS7h/rSF35LgGzT2K26fetHXQiTbckNPa5?=
+ =?us-ascii?Q?0t1gH/FQJNFvGSYsHorzb0P98esT4j+rRldBeR34+CV6CklFu0qUOaWGbbUi?=
+ =?us-ascii?Q?6OAuJA4hRmSZska35c9nE/64OHTcEsknL6vEiupct6L3WELR3qbWNLvjo0en?=
+ =?us-ascii?Q?OghU0WOZU26k98JgJo/sgKA7XuJWtCZOXr7LNfi+NRKGaSTAd97jP7ol/jFP?=
+ =?us-ascii?Q?zGWBbu9Zjw47fw8UFVMqdpikdc5vjpY9fMgApZrTXttXamtQ5AwmteODae9V?=
+ =?us-ascii?Q?qthCR6XO2wcPiCVUJNoXSCD+Z4rk281MrwVKgkwAZJ6hcKAHhMsML02mLNsX?=
+ =?us-ascii?Q?DtXyqr/amfxckvfwgQJjVkI8rKsLihdVhx7JCXrduRklDRLFURwjcN6AtIvG?=
+ =?us-ascii?Q?9L+0zfoA74L9+iKoxpqab5VPEv4waYWmHU/y2HrC6eyitrM6JaSuo7c6ksEt?=
+ =?us-ascii?Q?UchQy9sMPnw7nhhE6LLTUcYuwDB+HIDgFedZVS42Tux6iKXlSd8h2avzlDWY?=
+ =?us-ascii?Q?EdvFgNhCPGwFdrdmD+bJHcr7XFGQpuev0GP73lPwrdapAo+hiotDtcP3oNDt?=
+ =?us-ascii?Q?+1QS/G9Jdk5hc6CPbtxQw1BGfeLIniL/vQr25UpPJ7xeIKgKZufx94DGEqjT?=
+ =?us-ascii?Q?V9ym4QLM21hRz4R7bwfjJqTBYXPjFwke++oJcNX598wnUK6v6ge4karmK3e1?=
+ =?us-ascii?Q?0pDrcQ+nSYnH3JIeGGdjDQTtqOkVhoUJRCQHWMD/Aev3GnJxcLMti4cqqAnQ?=
+ =?us-ascii?Q?D4FYLIRy53LMHWYhevlszWt+/OXRSCVyslBMHFSEybtJ6gMI+4GhvwjeM4r6?=
+ =?us-ascii?Q?qzLN8fCC+ykXb0Z6+HnckY9R5adl494Oo4JN03hBoIwOW6xlPn/j2Qz1+tiD?=
+ =?us-ascii?Q?+izjqZC9vY7zOJ5thel1rHM45vjzTENZi5/9HEHOnbGbB1bniWqe9T5igDXu?=
+ =?us-ascii?Q?v/Bx16lodxkZQSNFx6V8koNIhK2QN+CKDgcwQIIO1VDM9E//5/hyrk+ZCyhx?=
+ =?us-ascii?Q?ujRHATSqyEZHTQiwxH0r05PL/62bWdX6vWh493QOAbw72VkpK0s7G4mgOjgu?=
+ =?us-ascii?Q?kwKdnbErMo4wTTvqkQ1yHDynM91WM5WlFIEz8LkBKhq6CvxMo8hAMhJEH8Q+?=
+ =?us-ascii?Q?JaZd0OBSmr76Eeu1qhXiRKb1o/jcGCXMe9OI40u8j/yAY+HL8/P4+kdp0ktw?=
+ =?us-ascii?Q?JotQ1fQgr6Rb9REVAJ7vJws3S+3i3/RhXrkkFvyUkeOxDTQpjHjgY/eBqEV5?=
+ =?us-ascii?Q?FP1YhhWypL1/P50KZrcCuNyZ+Vvs/M3WtcjbH7hqRjGCTg10rIB2igLUiRjK?=
+ =?us-ascii?Q?uObh1n1bsH+8Qtib+VWX8EKBqC2FsyhluHdWCRfyYMhIFdvRzXlnS10IjC9R?=
+ =?us-ascii?Q?63j8Ug8mjc41JQG7uHm30Z+vIh7HHdbblnamRS2Z?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d0d:b0:3a7:dec1:de40 with SMTP id
- e9e14a558f8ab-3c2d1b9ba3emr272435595ab.5.1735586548511; Mon, 30 Dec 2024
- 11:22:28 -0800 (PST)
-Date: Mon, 30 Dec 2024 11:22:28 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6772f2f4.050a0220.2f3838.04cb.GAE@google.com>
-Subject: [syzbot] [crypto?] BUG: sleeping function called from invalid context
- in crypto_put_default_null_skcipher
-From: syzbot <syzbot+b3e02953598f447d4d2a@syzkaller.appspotmail.com>
-To: davem@davemloft.net, herbert@gondor.apana.org.au, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB8178.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d197f8ec-670d-4f7b-cb1c-08dd29531ad0
+X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Dec 2024 04:25:06.5216
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: esb5xCWbtBhXpnbBY3dojasiaPkjQsPj4mMC/eZHE4kNHvwIoqdhUN/zXmM8RSdsfDYvL3vxnz97U8ehos3kMw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9025
 
-Hello,
+> On Tue, Dec 17, 2024 at 09:42:01PM +0530, Akhil R wrote:
+> > The buffer which sends the commands to host1x was shared for all tasks
+> > in the engine. This causes a problem with the setkey() function as it
+> > gets called asynchronous to the crypto engine queue. Modifying the
+> > same cmdbuf in setkey() will corrupt the ongoing host1x task and in
+> > turn break the encryption/decryption operation. Hence use a separate
+> > cmdbuf for setkey().
+> >
+> > Fixes:  0880bb3b00c8 ("crypto: tegra - Add Tegra Security Engine
+> > driver")
+> > Signed-off-by: Akhil R <akhilrajeev@nvidia.com>
+> > ---
+> >  drivers/crypto/tegra/tegra-se-aes.c  | 16 ++++++++--------
+> > drivers/crypto/tegra/tegra-se-hash.c | 13 +++++++------
+> > drivers/crypto/tegra/tegra-se-key.c  | 10 ++++++++--
+> > drivers/crypto/tegra/tegra-se-main.c | 16 ++++++++++++----
+> >  drivers/crypto/tegra/tegra-se.h      |  3 ++-
+> >  5 files changed, 37 insertions(+), 21 deletions(-)
+>=20
+> So there is a maximum of 15 key slots? In that case you should not be all=
+ocating
+> them in setkey because there can be a lot more than
+> 15 tfm's in the system.
+>=20
+> Since the limit is so low they should only be allocated during an
+> encryption/decryption operation.
 
-syzbot found the following issue on:
+Yes. That's right. The hardware has only 15 keyslots.
 
-HEAD commit:    a024e377efed net: llc: reset skb->transport_header
-git tree:       net
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=15c7f0b0580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6a2b862bf4a5409f
-dashboard link: https://syzkaller.appspot.com/bug?extid=b3e02953598f447d4d2a
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14bce818580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12bce818580000
+I am working on a patch which will reserve few keyslots and use them during
+encryption/decription operation in case the remaining keyslots get full. Me=
+ans,
+the setkey will try to get a keyslot, if it fails it will store the key in =
+a variable. Then
+during the encryption/decryption, it will use one of the reserved keyslot f=
+or the
+operation.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/f2ea524d69fe/disk-a024e377.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/b39d227b097d/vmlinux-a024e377.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/8ee66636253f/bzImage-a024e377.xz
+This will allow users to have the capability of hardware protected keys and=
+ faster
+operations if there are limited number of tfms. It also does not halt the o=
+peration
+when there are more tfms.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+b3e02953598f447d4d2a@syzkaller.appspotmail.com
+Does it sound good, or do you think it will make the code overly complicate=
+d?
 
-BUG: sleeping function called from invalid context at kernel/locking/mutex.c:562
-in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 0, name: swapper/0
-preempt_count: 101, expected: 0
-RCU nest depth: 0, expected: 0
-1 lock held by swapper/0/0:
- #0: ffffffff8e937ba0 (rcu_callback){....}-{0:0}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
- #0: ffffffff8e937ba0 (rcu_callback){....}-{0:0}, at: rcu_do_batch kernel/rcu/tree.c:2561 [inline]
- #0: ffffffff8e937ba0 (rcu_callback){....}-{0:0}, at: rcu_core+0xa37/0x17a0 kernel/rcu/tree.c:2823
-Preemption disabled at:
-[<ffffffff8bc9a85d>] schedule_preempt_disabled+0x1d/0x30 kernel/sched/core.c:6906
-CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 6.13.0-rc3-syzkaller-00174-ga024e377efed #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-Call Trace:
- <IRQ>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- __might_resched+0x5d4/0x780 kernel/sched/core.c:8758
- __mutex_lock_common kernel/locking/mutex.c:562 [inline]
- __mutex_lock+0x131/0xee0 kernel/locking/mutex.c:735
- crypto_put_default_null_skcipher+0x18/0x70 crypto/crypto_null.c:179
- aead_release+0x3d/0x50 crypto/algif_aead.c:489
- alg_do_release crypto/af_alg.c:118 [inline]
- alg_sock_destruct+0x86/0xc0 crypto/af_alg.c:502
- __sk_destruct+0x58/0x5f0 net/core/sock.c:2260
- rcu_do_batch kernel/rcu/tree.c:2567 [inline]
- rcu_core+0xaaa/0x17a0 kernel/rcu/tree.c:2823
- handle_softirqs+0x2d4/0x9b0 kernel/softirq.c:561
- __do_softirq kernel/softirq.c:595 [inline]
- invoke_softirq kernel/softirq.c:435 [inline]
- __irq_exit_rcu+0xf7/0x220 kernel/softirq.c:662
- irq_exit_rcu+0x9/0x30 kernel/softirq.c:678
- instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1049 [inline]
- sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1049
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-RIP: 0010:native_irq_disable arch/x86/include/asm/irqflags.h:37 [inline]
-RIP: 0010:arch_local_irq_disable arch/x86/include/asm/irqflags.h:92 [inline]
-RIP: 0010:acpi_safe_halt+0x21/0x30 drivers/acpi/processor_idle.c:112
-Code: 90 90 90 90 90 90 90 90 90 65 48 8b 04 25 00 d6 03 00 48 f7 00 08 00 00 00 75 10 66 90 0f 00 2d 15 c1 a0 00 f3 0f 1e fa fb f4 <fa> c3 cc cc cc cc 66 0f 1f 84 00 00 00 00 00 90 90 90 90 90 90 90
-RSP: 0018:ffffffff8e607ca8 EFLAGS: 00000246
-RAX: ffffffff8e6965c0 RBX: ffff888140ee4064 RCX: 000000000001ace9
-RDX: 0000000000000001 RSI: ffff888140ee4000 RDI: ffff888140ee4064
-RBP: 000000000003a9f8 R08: ffff8880b8637cdb R09: 1ffff110170c6f9b
-R10: dffffc0000000000 R11: ffffffff8bc8bc80 R12: ffff88814628d000
-R13: 0000000000000001 R14: 0000000000000001 R15: ffffffff8f1217a0
- acpi_idle_enter+0xe4/0x140 drivers/acpi/processor_idle.c:699
- cpuidle_enter_state+0x109/0x470 drivers/cpuidle/cpuidle.c:268
- cpuidle_enter+0x5d/0xa0 drivers/cpuidle/cpuidle.c:389
- call_cpuidle kernel/sched/idle.c:155 [inline]
- cpuidle_idle_call kernel/sched/idle.c:230 [inline]
- do_idle+0x372/0x5c0 kernel/sched/idle.c:325
- cpu_startup_entry+0x42/0x60 kernel/sched/idle.c:423
- rest_init+0x2dc/0x300 init/main.c:747
- start_kernel+0x47f/0x500 init/main.c:1102
- x86_64_start_reservations+0x2a/0x30 arch/x86/kernel/head64.c:507
- x86_64_start_kernel+0x9f/0xa0 arch/x86/kernel/head64.c:488
- common_startup_64+0x13e/0x147
- </TASK>
-
-=============================
-[ BUG: Invalid wait context ]
-6.13.0-rc3-syzkaller-00174-ga024e377efed #0 Tainted: G        W         
------------------------------
-swapper/0/0 is trying to lock:
-ffffffff8f035d88 (crypto_default_null_skcipher_lock){+.+.}-{4:4}, at: crypto_put_default_null_skcipher+0x18/0x70 crypto/crypto_null.c:179
-other info that might help us debug this:
-context-{3:3}
-1 lock held by swapper/0/0:
- #0: ffffffff8e937ba0 (rcu_callback){....}-{0:0}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
- #0: ffffffff8e937ba0 (rcu_callback){....}-{0:0}, at: rcu_do_batch kernel/rcu/tree.c:2561 [inline]
- #0: ffffffff8e937ba0 (rcu_callback){....}-{0:0}, at: rcu_core+0xa37/0x17a0 kernel/rcu/tree.c:2823
-stack backtrace:
-CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Tainted: G        W          6.13.0-rc3-syzkaller-00174-ga024e377efed #0
-Tainted: [W]=WARN
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-Call Trace:
- <IRQ>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- print_lock_invalid_wait_context kernel/locking/lockdep.c:4826 [inline]
- check_wait_context kernel/locking/lockdep.c:4898 [inline]
- __lock_acquire+0x15a8/0x2100 kernel/locking/lockdep.c:5176
- lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5849
- __mutex_lock_common kernel/locking/mutex.c:585 [inline]
- __mutex_lock+0x1ac/0xee0 kernel/locking/mutex.c:735
- crypto_put_default_null_skcipher+0x18/0x70 crypto/crypto_null.c:179
- aead_release+0x3d/0x50 crypto/algif_aead.c:489
- alg_do_release crypto/af_alg.c:118 [inline]
- alg_sock_destruct+0x86/0xc0 crypto/af_alg.c:502
- __sk_destruct+0x58/0x5f0 net/core/sock.c:2260
- rcu_do_batch kernel/rcu/tree.c:2567 [inline]
- rcu_core+0xaaa/0x17a0 kernel/rcu/tree.c:2823
- handle_softirqs+0x2d4/0x9b0 kernel/softirq.c:561
- __do_softirq kernel/softirq.c:595 [inline]
- invoke_softirq kernel/softirq.c:435 [inline]
- __irq_exit_rcu+0xf7/0x220 kernel/softirq.c:662
- irq_exit_rcu+0x9/0x30 kernel/softirq.c:678
- instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1049 [inline]
- sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1049
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-RIP: 0010:native_irq_disable arch/x86/include/asm/irqflags.h:37 [inline]
-RIP: 0010:arch_local_irq_disable arch/x86/include/asm/irqflags.h:92 [inline]
-RIP: 0010:acpi_safe_halt+0x21/0x30 drivers/acpi/processor_idle.c:112
-Code: 90 90 90 90 90 90 90 90 90 65 48 8b 04 25 00 d6 03 00 48 f7 00 08 00 00 00 75 10 66 90 0f 00 2d 15 c1 a0 00 f3 0f 1e fa fb f4 <fa> c3 cc cc cc cc 66 0f 1f 84 00 00 00 00 00 90 90 90 90 90 90 90
-RSP: 0018:ffffffff8e607ca8 EFLAGS: 00000246
-RAX: ffffffff8e6965c0 RBX: ffff888140ee4064 RCX: 000000000001ace9
-RDX: 0000000000000001 RSI: ffff888140ee4000 RDI: ffff888140ee4064
-RBP: 000000000003a9f8 R08: ffff8880b8637cdb R09: 1ffff110170c6f9b
-R10: dffffc0000000000 R11: ffffffff8bc8bc80 R12: ffff88814628d000
-R13: 0000000000000001 R14: 0000000000000001 R15: ffffffff8f1217a0
- acpi_idle_enter+0xe4/0x140 drivers/acpi/processor_idle.c:699
- cpuidle_enter_state+0x109/0x470 drivers/cpuidle/cpuidle.c:268
- cpuidle_enter+0x5d/0xa0 drivers/cpuidle/cpuidle.c:389
- call_cpuidle kernel/sched/idle.c:155 [inline]
- cpuidle_idle_call kernel/sched/idle.c:230 [inline]
- do_idle+0x372/0x5c0 kernel/sched/idle.c:325
- cpu_startup_entry+0x42/0x60 kernel/sched/idle.c:423
- rest_init+0x2dc/0x300 init/main.c:747
- start_kernel+0x47f/0x500 init/main.c:1102
- x86_64_start_reservations+0x2a/0x30 arch/x86/kernel/head64.c:507
- x86_64_start_kernel+0x9f/0xa0 arch/x86/kernel/head64.c:488
- common_startup_64+0x13e/0x147
- </TASK>
-----------------
-Code disassembly (best guess):
-   0:	90                   	nop
-   1:	90                   	nop
-   2:	90                   	nop
-   3:	90                   	nop
-   4:	90                   	nop
-   5:	90                   	nop
-   6:	90                   	nop
-   7:	90                   	nop
-   8:	90                   	nop
-   9:	65 48 8b 04 25 00 d6 	mov    %gs:0x3d600,%rax
-  10:	03 00
-  12:	48 f7 00 08 00 00 00 	testq  $0x8,(%rax)
-  19:	75 10                	jne    0x2b
-  1b:	66 90                	xchg   %ax,%ax
-  1d:	0f 00 2d 15 c1 a0 00 	verw   0xa0c115(%rip)        # 0xa0c139
-  24:	f3 0f 1e fa          	endbr64
-  28:	fb                   	sti
-  29:	f4                   	hlt
-* 2a:	fa                   	cli <-- trapping instruction
-  2b:	c3                   	ret
-  2c:	cc                   	int3
-  2d:	cc                   	int3
-  2e:	cc                   	int3
-  2f:	cc                   	int3
-  30:	66 0f 1f 84 00 00 00 	nopw   0x0(%rax,%rax,1)
-  37:	00 00
-  39:	90                   	nop
-  3a:	90                   	nop
-  3b:	90                   	nop
-  3c:	90                   	nop
-  3d:	90                   	nop
-  3e:	90                   	nop
-  3f:	90                   	nop
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Regards,
+Akhil
