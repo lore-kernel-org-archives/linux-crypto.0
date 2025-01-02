@@ -1,84 +1,126 @@
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B2061B3944;
-	Thu,  2 Jan 2025 15:45:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEDB51F16B;
+	Thu,  2 Jan 2025 17:24:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735832760; cv=none; b=d+BRTpQEe5gkR6MxdosVXdFnRwC/S5/jtaphxIeY1qiyVjEFdwOyoICvbdcI0oVv0tAKMahQkzhmlJj5Wncj/6HDSFvTIbDcIGDmlpbbLdnfHakSqzCHyhQ56cMtvi+eY3A8wrI9DC8p0+W3vWqtLd2hWj/oZ1cpqa9TC7YbCj8=
+	t=1735838687; cv=none; b=VsPcSxK9sD1nkwhuqO2fXkaVnWPku/6TnLHbNHaL4TL/YiBl8EQtVyTSvbS/0dVyJNh5IagFUc1mxH/zqDjVCVKfrr1SkJe5tof59qCtYiIMPHZ5n/6JstlpJJM6Y6syH8ooxLEriU+RGjQSldjpdNZ/zEcrI8lEU3ehA+cmOGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735832760; c=relaxed/simple;
-	bh=Gt9IgQcdS6zTtWyLM76yOke5d3ktR6jtS0PEnFYEGhk=;
+	s=arc-20240116; t=1735838687; c=relaxed/simple;
+	bh=dhAKobW2Sn3UJxdMEMFF+/VJXFN/vgYVY2Kdus9Irc8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IKYZZZiVDqtko/MdoHbouoM9Nh0U6Yn5Idzz1dyz8gf3tFFe14JGr2QzZv2hmzqVSnVKsXxBDaGwJcyxEx7mWTc8iOJqaGTAKxt6gca3gu8bwQgAJHVt5eJjC/hGe1UQ/0/toBYxjHHIjl38OEtJwzbQRsr227QeCIQONy5FT0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-aa6a92f863cso1936283366b.1;
-        Thu, 02 Jan 2025 07:45:57 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735832756; x=1736437556;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=h2g0ivZyP4Gq3elbBwKgtWXwEWLwxdsNB8Grs3eMANo=;
-        b=E/UmTHqmunWD5mgrCEqRL4Qo7UMv3IaAXGGMZHlXftcUfWo+J9XBZllAR0w0fI3EBI
-         2zmLsenR+PrFwdx8PoWNfNyWCkI+cdkvsEnWrRVu9XgZ5s2B8N23CWUpgKlz54QGlcGq
-         V7qg1qs4T/0t0BpKAQ3CCSPd6bbJghv6GfkvFNNOwI+RR9a/FV6DJ+7XX8rSoMtfoVoB
-         iOD6hWHrwTiDo16JZB9XhxjQOK3NSti7TToVO9Yj66pNErbBkdlFLGS0hI4CQX3R3XRl
-         fEBSpGaqovFdXyLGIthQND689rzPbk4ln854M8lUdWnOn8pilsv5hfPjMHfrfH6+ZsGe
-         FT/w==
-X-Forwarded-Encrypted: i=1; AJvYcCVcO7dSqGJfmS3VKiOf76lRC71IW63qt4PAEijjkAc57p+/nMLrR1WhTr5a13+xc3IvThXovOrcx22/OVM=@vger.kernel.org, AJvYcCXwCGIPj9bPfKl/b3Ih5QtscWkm/26LLqM4a20IWH+XUtyeIG8IO0KASC4LsPcIaRVVMb2OHoBQ@vger.kernel.org
-X-Gm-Message-State: AOJu0YwqX/+IdZOwRjWfBvMQzSs8amqDGeRSD5zBLV+Z4uSqeqJ05q1V
-	I3SNEt2HdfIEHAQ7+E5Ga41EGgsfGSP8nXu1RXquFB3n1Xsbx4yoiJz7AQ==
-X-Gm-Gg: ASbGncvs2Eff/HEnYK0v1eyEzCzr7CAKlbvB7591Hwe1tTsVjbeWFY3J8C1ItQC1Ifn
-	Jh7NUAE4gxD007nMNHIF/yvId+Hir6752qqcN8abfKX4NpUBk4BruU6rSE4+s26pFEUnL8cdIO7
-	wQVNlpv62RCXm5NTvWradCaIosZu2JFLnrEThxJshxrE54SxAZy6ywJJp2L+klCDpkz7kZXtUq2
-	O9N5MSkoIHgbHv7fOFG1+7rkZtm4BesgERPDINKxSEYT0EI
-X-Google-Smtp-Source: AGHT+IF9Opy0LyTeLf+WcovwqPhZVqY0yducz1jeXl63C6Qhux/jKU7KQXgPiT1DvlqzIjf2tKzdQQ==
-X-Received: by 2002:a17:907:961f:b0:aa6:abe2:5cba with SMTP id a640c23a62f3a-aac27026cfemr4744580766b.2.1735832755949;
-        Thu, 02 Jan 2025 07:45:55 -0800 (PST)
-Received: from gmail.com ([2a03:2880:30ff:70::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aac0f06629esm1800682366b.189.2025.01.02.07.45.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Jan 2025 07:45:55 -0800 (PST)
-Date: Thu, 2 Jan 2025 07:45:53 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Tejun Heo <tj@kernel.org>, kernel test robot <oliver.sang@intel.com>,
-	oe-lkp@lists.linux.dev, lkp@intel.com, linux-crypto@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [herbert-cryptodev-2.6:master] [rhashtable]  e1d3422c95:
- stress-ng.syscall.ops_per_sec 98.9% regression
-Message-ID: <20250102-bizarre-griffin-of-attraction-c1f728@leitao>
-References: <202412271017.cad7675-lkp@intel.com>
- <Z3HTN1gvVE9tfa4Y@slm.duckdns.org>
- <Z3XndzXUa9KYYz9f@gondor.apana.org.au>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y4taq6j8PSdGgb1DOuQfw41JzsiKEdtD2f0Ga35ep6ALDQ/BR5lzbOSnm1ZGPkknHQFnqtFfvU6R4z9jzEgPb5KSYgsGira/2qElLsueTt9zTcLnSDoCsRZH7GHmn3iciAtlG2odMekAcEgZGr7/zb1vU2X8lkCzeIgMcdyRRp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AjRfdJPc; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AjRfdJPc"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40F20C4CED0;
+	Thu,  2 Jan 2025 17:24:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1735838686;
+	bh=dhAKobW2Sn3UJxdMEMFF+/VJXFN/vgYVY2Kdus9Irc8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=AjRfdJPcjYi4nv0p4ONg/pmLvQ/6q9hbqdWm92KbRtJ9C0henHMq2lTFg21M9Gnj6
+	 ZfWQYaJb+Ay0/MZaZj92C1BZjLCJJJBLqIBPrljMgam2Kl/6ViYf1/FSbzyW/3gkMV
+	 H1wZBaskVXi2fJk+Cg8LoKdnuWwHsPN2Kl1oyhI14dKva46zqIFRLFHK6L2Vj7gTJE
+	 QIIbI4uMo7HX6jCu/Ml/LePfxEpEic9/8kIfjwHNgMPBvnKlpB6hdo8JQppL3VA0Hl
+	 A04pidWhCcnL3sMGhq0ThkAC5Y2Ksi62eqIo0dwKPxHqTNl1mHNPU82llGLsmFqg+x
+	 B+kCaSt9e2EnA==
+Date: Thu, 2 Jan 2025 17:24:44 +0000
+From: Eric Biggers <ebiggers@kernel.org>
+To: Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Danny Tsen <dtsen@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Naveen N Rao <naveen@kernel.org>,
+	Nicholas Piggin <npiggin@gmail.com>, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH v2 10/29] crypto: powerpc/p10-aes-gcm - simplify handling
+ of linear associated data
+Message-ID: <20250102172444.GB49952@google.com>
+References: <20241230001418.74739-1-ebiggers@kernel.org>
+ <20241230001418.74739-11-ebiggers@kernel.org>
+ <ec3515f1-f93a-4520-a9da-6ad14f9a6fe0@csgroup.eu>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <Z3XndzXUa9KYYz9f@gondor.apana.org.au>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ec3515f1-f93a-4520-a9da-6ad14f9a6fe0@csgroup.eu>
 
-On Thu, Jan 02, 2025 at 09:10:15AM +0800, Herbert Xu wrote:
-> On Sun, Dec 29, 2024 at 12:54:47PM -1000, Tejun Heo wrote:
-> >
-> > Hmm... the only meaningful behavior difference would be that after the
-> > patch, rht_grow_above_75() test is done regardless of the return value while
-> > before it was done only when the return value is zero. Breno, can you please
-> > look into whether this report is valid and whether restoring the NULL check
-> > makes it go away?
+On Thu, Jan 02, 2025 at 12:50:50PM +0100, Christophe Leroy wrote:
 > 
-> Actually I fixed that when committing the patch.  It should be
-> conditional on whether the insertion succeeds or not.
+> 
+> Le 30/12/2024 à 01:13, Eric Biggers a écrit :
+> > From: Eric Biggers <ebiggers@google.com>
+> > 
+> > p10_aes_gcm_crypt() is abusing the scatter_walk API to get the virtual
+> > address for the first source scatterlist element.  But this code is only
+> > built for PPC64 which is a !HIGHMEM platform, and it can read past a
+> > page boundary from the address returned by scatterwalk_map() which means
+> > it already assumes the address is from the kernel's direct map.  Thus,
+> > just use sg_virt() instead to get the same result in a simpler way.
+> > 
+> > Cc: Christophe Leroy <christophe.leroy@csgroup.eu>
+> > Cc: Danny Tsen <dtsen@linux.ibm.com>
+> > Cc: Michael Ellerman <mpe@ellerman.id.au>
+> > Cc: Naveen N Rao <naveen@kernel.org>
+> > Cc: Nicholas Piggin <npiggin@gmail.com>
+> > Cc: linuxppc-dev@lists.ozlabs.org
+> > Signed-off-by: Eric Biggers <ebiggers@google.com>
+> > ---
+> > 
+> > This patch is part of a long series touching many files, so I have
+> > limited the Cc list on the full series.  If you want the full series and
+> > did not receive it, please retrieve it from lore.kernel.org.
+> > 
+> >   arch/powerpc/crypto/aes-gcm-p10-glue.c | 8 ++------
+> >   1 file changed, 2 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/arch/powerpc/crypto/aes-gcm-p10-glue.c b/arch/powerpc/crypto/aes-gcm-p10-glue.c
+> > index f37b3d13fc53..2862c3cf8e41 100644
+> > --- a/arch/powerpc/crypto/aes-gcm-p10-glue.c
+> > +++ b/arch/powerpc/crypto/aes-gcm-p10-glue.c
+> > @@ -212,11 +212,10 @@ static int p10_aes_gcm_crypt(struct aead_request *req, u8 *riv,
+> >   	struct p10_aes_gcm_ctx *ctx = crypto_tfm_ctx(tfm);
+> >   	u8 databuf[sizeof(struct gcm_ctx) + PPC_ALIGN];
+> >   	struct gcm_ctx *gctx = PTR_ALIGN((void *)databuf, PPC_ALIGN);
+> >   	u8 hashbuf[sizeof(struct Hash_ctx) + PPC_ALIGN];
+> >   	struct Hash_ctx *hash = PTR_ALIGN((void *)hashbuf, PPC_ALIGN);
+> > -	struct scatter_walk assoc_sg_walk;
+> >   	struct skcipher_walk walk;
+> >   	u8 *assocmem = NULL;
+> >   	u8 *assoc;
+> >   	unsigned int cryptlen = req->cryptlen;
+> >   	unsigned char ivbuf[AES_BLOCK_SIZE+PPC_ALIGN];
+> > @@ -232,12 +231,11 @@ static int p10_aes_gcm_crypt(struct aead_request *req, u8 *riv,
+> >   	memset(ivbuf, 0, sizeof(ivbuf));
+> >   	memcpy(iv, riv, GCM_IV_SIZE);
+> >   	/* Linearize assoc, if not already linear */
+> >   	if (req->src->length >= assoclen && req->src->length) {
+> > -		scatterwalk_start(&assoc_sg_walk, req->src);
+> > -		assoc = scatterwalk_map(&assoc_sg_walk);
+> > +		assoc = sg_virt(req->src); /* ppc64 is !HIGHMEM */
+> >   	} else {
+> >   		gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
+> >   			      GFP_KERNEL : GFP_ATOMIC;
+> >   		/* assoc can be any length, so must be on heap */
+> > @@ -251,13 +249,11 @@ static int p10_aes_gcm_crypt(struct aead_request *req, u8 *riv,
+> >   	vsx_begin();
+> >   	gcmp10_init(gctx, iv, (unsigned char *) &ctx->enc_key, hash, assoc, assoclen);
+> >   	vsx_end();
+> > -	if (!assocmem)
+> > -		scatterwalk_unmap(assoc);
+> > -	else
+> > +	if (assocmem)
+> >   		kfree(assocmem);
+> 
+> kfree() accepts a NULL pointer, you can call kfree(assocmem) without 'if
+> (assocmem)'
 
-Thanks.
+The existing code did that too, but sure I'll change that in v3.
 
-I am finally back from vacation. I will try to reproduce the issue
-reported in this report, and double-check the regression.
-
---breno
+- Eric
