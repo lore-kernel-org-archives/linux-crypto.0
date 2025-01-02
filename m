@@ -1,72 +1,149 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 749195C96;
-	Thu,  2 Jan 2025 01:10:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A7C518C932;
+	Thu,  2 Jan 2025 08:49:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735780227; cv=none; b=itmbBRxTsVILCVtTLZo5pdrfN3Rdw6U7Hx2pogOr/F0UnVGK6KjRmuZYaWsvOzaFfo99XwfvZhHsaAIoRz0iA0/GaR6zeITLFBU3lH1r0RRB5UF2qL3Pp2xM7it18XZyZTRGylXIqG9+QH8I0vT5hzwgrL/SzpXoAP0dU0GfwxY=
+	t=1735807789; cv=none; b=BIT/v04Z6uTVbi16uj69anfWC8TDH7QVxL7JCzxOwb2sxA7m+FNVJZ6bs20NlYrxyRkwKDaOz4C8cglhosQS7nI/exd45hhitLuRt92PzozzUnzcMbUi/ezbPJR65hoEn5N3RM/3xjTvIgZe+iRCVPxTJKF7ngweNgCP5Ox//iM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735780227; c=relaxed/simple;
-	bh=SEQDhAowlXSMtpuIriBV2Gt8KoulPqZR/z2BFI+ezZQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i/AecI3b4ddIGttuaF+QzC5fWMctRrAcRiOHtK9hbg7JeBoKD4agrY4/nLJQnCNJq9FrQjaOMEO37j8WArokY6WtwDBlTBT3rmUJw50JbqX+Bzs288b/j8jfmciTPZyqJVXSAYtbIziUZ8qH7cT1wNvV6Wz1XmyqHrtKkXn1Rdk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=gVF50Kjp; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1735807789; c=relaxed/simple;
+	bh=WUK1SMs8GoW5u3MdAb41usLLlfEP0svpUzHtinjtVFs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QYu2r8hLUsG+BI5zsNUzRQewqLsI+Bg0U2WbzuEW5sTMm5Z264XCQ197rAJ7VNgi4ixk1iNCd7muUej8WVQBMGTRLzmtdPC2g1tPiWUSmXn9xZXWn0lp2UCsBTlnpgVl8Ey9g0y0TXTfn7aMgqSsOQHT6axCE5lSxH7gqIJK6Cw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aTpU5Zwf; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="gVF50Kjp"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=2Dxud7JxGUKcp46UURTaQMFNtA3oYK5oZlOaZTMVr0g=; b=gVF50KjpWNBE8hbUQ/GD0jsldj
-	G+7V8Ipq4jzpntlo60L84d23Kp5YZsuhrZDOhZ4jI9+mTu4fGgK7P0zCIK822kDppBK0AbeDoLqdy
-	Tl6br2+i9NskNNHoTWcXBz5E/Mxd30LEr9c1wNRVSPGLq1h0VgfmODbUxUqO9l3sFUuEi8GG8oIUZ
-	c+rnPjDF6rHiKD8v8lFx9oZRL2w2wyeyOkSbilwVNqROJOR0fTzgxKsiYE1nerO6GgKtg9vp3AZLB
-	sGulI2lTzyws4Ut5G9Shl1jCuu41+zrocBJ66UFqTFyQHMS1jvCi7MPbUDAWZ9f2CWBT29T13FoSF
-	mbOKX2Gg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tT9WA-004xZJ-2q;
-	Thu, 02 Jan 2025 09:10:16 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 02 Jan 2025 09:10:15 +0800
-Date: Thu, 2 Jan 2025 09:10:15 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Tejun Heo <tj@kernel.org>
-Cc: kernel test robot <oliver.sang@intel.com>,
-	Breno Leitao <leitao@debian.org>, oe-lkp@lists.linux.dev,
-	lkp@intel.com, linux-crypto@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [herbert-cryptodev-2.6:master] [rhashtable]  e1d3422c95:
- stress-ng.syscall.ops_per_sec 98.9% regression
-Message-ID: <Z3XndzXUa9KYYz9f@gondor.apana.org.au>
-References: <202412271017.cad7675-lkp@intel.com>
- <Z3HTN1gvVE9tfa4Y@slm.duckdns.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aTpU5Zwf"
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-aae81f4fdc4so1717343966b.0;
+        Thu, 02 Jan 2025 00:49:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1735807787; x=1736412587; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=VfGIzY3hMcgxJ/ViB/BOPn4C/1Cm0PNkLobtpeWUwuY=;
+        b=aTpU5ZwfagpMdwQCB19RNIPeCClWILy8Jy+U/6dN2OrR8IduN2PCIruWmnhdE8n4K6
+         uvhoDzLcx6KUvvP1YzVCNy+eDfUuHP5oq2eol9bD/XHB4MJiZC73a58Kq7nXhaQKJ233
+         VubZ/5+kOtaiqZzg6txMBtqNRH0cSaeMnTKL6v3NJYYFy/9+54WhKdj2yZavYHXKUX1X
+         +BnQ+NuRjoMSTtZjZvYi04dIj4M1l23WmLYKbmeZMdJvg2KW7UCHJGqeSh+scqo16Gnx
+         j+rudWQOieApuomo+rJ5Ql3Mnu8Lk5oAArAtEXrYlVdfVvs1valdYd9ZjJ/stkEQDrfs
+         shlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1735807787; x=1736412587;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VfGIzY3hMcgxJ/ViB/BOPn4C/1Cm0PNkLobtpeWUwuY=;
+        b=QJEHDK18QUkGqAVbrilpewsXZnr5wTicudzMLItrSr6t2Z6LxiIkKf5eWa/Kf1dn10
+         fZBi8HxslAiAw8iYk8gNPPrFwRtrn9aT8wgKGtc0BGRKiwrQELIsi0+g9dclEGfdj6Zt
+         ESHP3m0Psz4/hEMMWfGz9arRVDJkPkFklZYZ4rypoPJEhtBr9/Jd1iNfnbI1LVAKc7U3
+         Jq884pCtmw7plcBTcG9gEcekuV1feaarR9ySaMXKW9UZPX+bYDpQDD2Yj5dScHYqmfhk
+         kiyf8roo3V/yB29m4lXK8aoE7ueDXSijMJ3y4WDxq7g7RlFWrZ7mMuo7Dd0XmVxXEZBa
+         u/dg==
+X-Forwarded-Encrypted: i=1; AJvYcCWXZBkp2hWFMi+BcJ1SODIgr0wcRDZkTfB9ZC5kY5NZin5o/uIrGgmI49ULR8LSdUyBlDUw7VROH84BspM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxusbFrrdNEkQgA6Qshg4Gy7Dv/JpLUFSH0kGJj5UDCuu95DYv/
+	hoUeBDTZILmrslAoP/mEjIDj2NzMyeeDAwkW/N8tDTNf+I+cDucJ
+X-Gm-Gg: ASbGncunAsT1sUiv6bOrbI9swySINUvFG2u1mszKMtdQdkBHkIp7CSCwoR0yJ7k0h5J
+	eHFbIsjIzvmVQkf3HLZVR6eqQECwTBm+v4paEn7D731jKYS7plT9335xZyfWD+oLgr3GRXq5a31
+	RfYlGBWVcKgeMSi3tiLqnsHfMnOOYeFtimhVjw15wbV4UcnlLwcldbVpv2uenrQ1jygC9ywYRAC
+	xsvn4vKEWYx41LUOmf38HVUEa25lV8XIXSW+uJSUkteLiWlw51IceaWEKB0k1qpRoVkXkKfklAp
+	02vq
+X-Google-Smtp-Source: AGHT+IGR6w55Z2SZ3nZ3oj2p1eo1H7ALyhhR760ZcjCEU/ByjDQUNJ9BeQGetfSa6UDnitD3OWjP1Q==
+X-Received: by 2002:a17:907:7250:b0:aa6:7737:199c with SMTP id a640c23a62f3a-aac2b0a5b5cmr4943543566b.15.1735807786354;
+        Thu, 02 Jan 2025 00:49:46 -0800 (PST)
+Received: from [147.251.42.106] (fosforos.fi.muni.cz. [147.251.42.106])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aac0f0159b8sm1766632566b.157.2025.01.02.00.49.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Jan 2025 00:49:45 -0800 (PST)
+Message-ID: <86e3502f-5d24-4779-9d3b-3cd79288fa0d@gmail.com>
+Date: Thu, 2 Jan 2025 09:49:45 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z3HTN1gvVE9tfa4Y@slm.duckdns.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] crypto: vmac - remove unused VMAC algorithm
+To: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, dm-devel@lists.linux.dev,
+ Atharva Tiwari <evepolonium@gmail.com>, Shane Wang <shane.wang@intel.com>
+References: <20241226194309.27733-1-ebiggers@kernel.org>
+Content-Language: en-US
+From: Milan Broz <gmazyland@gmail.com>
+Autocrypt: addr=gmazyland@gmail.com; keydata=
+ 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
+In-Reply-To: <20241226194309.27733-1-ebiggers@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sun, Dec 29, 2024 at 12:54:47PM -1000, Tejun Heo wrote:
->
-> Hmm... the only meaningful behavior difference would be that after the
-> patch, rht_grow_above_75() test is done regardless of the return value while
-> before it was done only when the return value is zero. Breno, can you please
-> look into whether this report is valid and whether restoring the NULL check
-> makes it go away?
+On 12/26/24 8:43 PM, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> Remove the vmac64 template, as it has no known users.  It also continues
+> to have longstanding bugs such as alignment violations (see
+> https://lore.kernel.org/r/20241226134847.6690-1-evepolonium@gmail.com/).
 
-Actually I fixed that when committing the patch.  It should be
-conditional on whether the insertion succeeds or not.
+...
+
+> No in-tree user has appeared since then, other than potentially the
+> usual components that allow specifying arbitrary hash algorithms by
+> name, namely AF_ALG and dm-integrity.  However there are no indications
+> that VMAC is being used with these components.  Debian Code Search and
+> web searches for "vmac64" (the actual algorithm name) do not return any
+> results other than the kernel itself, suggesting that it does not appear
+> in any other code or documentation.  Explicitly grepping the source code
+> of the usual suspects (libell, iwd, cryptsetup) finds no matches either.
+
+AFAIK it was never used for dm-integrity / cryptsetup and I am not even able
+to make it work for test now (isn't the vmac64 alg module init even broken?).
+
+Just remove it...
 
 Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Milan
+
