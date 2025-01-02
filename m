@@ -1,39 +1,60 @@
-Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FF56199FBA;
-	Thu,  2 Jan 2025 12:50:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CE881B4153;
+	Thu,  2 Jan 2025 14:09:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735822205; cv=none; b=fpZo0CcDVRLahgxgPSXSjyxh4mvFqcvVVtKrHvYqznuMoNNPBJwdY4QAm1dmlqTHl6F89kTqOELh8eiTCac1z7fXSqOAIk7UGgDpcL44HDWi2SZkanvuGvppCBFte1G8Q0bPw1eXmA2dVLpsGcrjWSSRQmuMMzcAKiQM8G/KWUI=
+	t=1735826989; cv=none; b=nMZAycBDw98Xo/DkREXuzvyBAg+O3glzh3dW3UHyxvgI33D2xQ/d6pp8x+89a3nP0MT2fgCGSPwiTcn9cN1lfQqpR4ntRJ8xFwV5/UsTc3I00DP+X1K43EMoLTQ38kfcwpFHVXezfUae8J2nI9DN0b9uxfvOU2/5zbfnCOn8tDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735822205; c=relaxed/simple;
-	bh=6ZPOzpvYsAqlz7hdFo+/nt9VXVrrtsVFa6L3sxM17J0=;
+	s=arc-20240116; t=1735826989; c=relaxed/simple;
+	bh=wf/BXTqUwyks0L686WRhCdaGqZcMEo7BEfnvb0XG8Qo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ip8+vdNnBxBqUsnIWmP0r7wDM3HFcqX4Jr/3RgyW2ZAyOw7r4vPgAFNycdxbVMk/jqWNfZ0ZZ5ioVQf/fGNRR4LnDMVR1e+kuQ+B4AbBWwUgpJhoi/MVyno2oAxQ9ejk7KYTMV9esV1u7GzDG9zaEenymO6z5bP2qWv+/ZWUSKE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
-Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4YP4lv3gC6z9shx;
-	Thu,  2 Jan 2025 12:50:51 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id qCix7nZ6SYKj; Thu,  2 Jan 2025 12:50:51 +0100 (CET)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4YP4lv2m0zz9shw;
-	Thu,  2 Jan 2025 12:50:51 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 4E98E8B767;
-	Thu,  2 Jan 2025 12:50:51 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id Oius1QCwqKti; Thu,  2 Jan 2025 12:50:51 +0100 (CET)
-Received: from [192.168.232.97] (unknown [192.168.232.97])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id BDC3E8B763;
-	Thu,  2 Jan 2025 12:50:50 +0100 (CET)
-Message-ID: <ec3515f1-f93a-4520-a9da-6ad14f9a6fe0@csgroup.eu>
-Date: Thu, 2 Jan 2025 12:50:50 +0100
+	 In-Reply-To:Content-Type; b=aOfQ8YsN4QtKxk+OhezbF1V8YIOwfyirRsQKgJ1j+biPhLxkQtw5sohZDCRWta5tI7kc4F5UXLcR+MFEZkl91/Q2N9y43eZJHr9ta9PmMaGcKM1D/u4sA0y2SaEZ94U2iLxsXCIy4+4vCyYe7QpL64IVGB9K8MxGqwINb09tPdE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Vvt/uIVk; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Vvt/uIVk"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5020tWw8008721;
+	Thu, 2 Jan 2025 14:09:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=pQMZq6
+	I1aBXhJpThb5Lh40IO10ywPDLwljQqV+aBvls=; b=Vvt/uIVkHkwDXhEBjQ2eVg
+	VziGChpmRow7V25kfEPtkvUr2tthHWWNTSkwuHNIDMQ7XjRrnNmWBYI4q8RyFNUb
+	Vakr8HNoopd6v+qzk0tjIWcBZZTZvRdk0+01D6be4J+WFSR0982dWvNroPYbX6pI
+	D78361t5LewDl6I3zguMpzPFazGz7AwvVrCzn0YVKud596dsJIcG3xZIXeYM9blz
+	r/D8FD1V3bTj8DMKwA/1+Ae2j04rkDbYpV0racr8ZctPp5zY1e1p2fu/nEihp192
+	wrdjxzcrsoStRZ068LzSxOS7abSxP4TExIP+PTqyRflNXwHVtQibjFvpl8y/ngIQ
+	==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43wfhaaeq2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 02 Jan 2025 14:09:36 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5028ocW6014589;
+	Thu, 2 Jan 2025 14:09:35 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 43tunstf62-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 02 Jan 2025 14:09:35 +0000
+Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
+	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 502E9YLL21758500
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 2 Jan 2025 14:09:34 GMT
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A19A65805A;
+	Thu,  2 Jan 2025 14:09:34 +0000 (GMT)
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E063858054;
+	Thu,  2 Jan 2025 14:09:33 +0000 (GMT)
+Received: from [9.47.158.152] (unknown [9.47.158.152])
+	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  2 Jan 2025 14:09:33 +0000 (GMT)
+Message-ID: <8f46d1a5-8ac5-4e41-b73f-da56c765bca1@linux.ibm.com>
+Date: Thu, 2 Jan 2025 09:09:33 -0500
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -41,97 +62,92 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 10/29] crypto: powerpc/p10-aes-gcm - simplify handling
- of linear associated data
-To: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Danny Tsen <dtsen@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>,
- Naveen N Rao <naveen@kernel.org>, Nicholas Piggin <npiggin@gmail.com>,
- linuxppc-dev@lists.ozlabs.org
-References: <20241230001418.74739-1-ebiggers@kernel.org>
- <20241230001418.74739-11-ebiggers@kernel.org>
-Content-Language: fr-FR
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-In-Reply-To: <20241230001418.74739-11-ebiggers@kernel.org>
+Subject: Re: [PATCH 2/3] crypto: ecdsa - Fix enc/dec size reported by
+ KEYCTL_PKEY_QUERY
+To: Lukas Wunner <lukas@wunner.de>, Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Vitaly Chikunov <vt@altlinux.org>
+Cc: David Howells <dhowells@redhat.com>,
+        Ignat Korchagin <ignat@cloudflare.com>, linux-crypto@vger.kernel.org,
+        keyrings@vger.kernel.org
+References: <cover.1735236227.git.lukas@wunner.de>
+ <0de2a7e0c0f35e468486693a7db2f6e0b0092a64.1735236227.git.lukas@wunner.de>
+Content-Language: en-US
+From: Stefan Berger <stefanb@linux.ibm.com>
+In-Reply-To: <0de2a7e0c0f35e468486693a7db2f6e0b0092a64.1735236227.git.lukas@wunner.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: M2J3eLsfo3mChW26BG-v0_6L-YukTRA2
+X-Proofpoint-ORIG-GUID: M2J3eLsfo3mChW26BG-v0_6L-YukTRA2
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ impostorscore=0 mlxlogscore=999 suspectscore=0 phishscore=0
+ lowpriorityscore=0 clxscore=1011 adultscore=0 mlxscore=0 bulkscore=0
+ spamscore=0 priorityscore=1501 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2411120000 definitions=main-2501020123
 
 
 
-Le 30/12/2024 à 01:13, Eric Biggers a écrit :
-> From: Eric Biggers <ebiggers@google.com>
+On 12/26/24 1:08 PM, Lukas Wunner wrote:
+> KEYCTL_PKEY_QUERY system calls for ecdsa keys return the key size as
+> max_enc_size and max_dec_size, even though such keys cannot be used for
+> encryption/decryption.  They're exclusively for signature generation or
+> verification.
 > 
-> p10_aes_gcm_crypt() is abusing the scatter_walk API to get the virtual
-> address for the first source scatterlist element.  But this code is only
-> built for PPC64 which is a !HIGHMEM platform, and it can read past a
-> page boundary from the address returned by scatterwalk_map() which means
-> it already assumes the address is from the kernel's direct map.  Thus,
-> just use sg_virt() instead to get the same result in a simpler way.
+> Only rsa keys with pkcs1 encoding can also be used for encryption or
+> decryption.
 > 
-> Cc: Christophe Leroy <christophe.leroy@csgroup.eu>
-> Cc: Danny Tsen <dtsen@linux.ibm.com>
-> Cc: Michael Ellerman <mpe@ellerman.id.au>
-> Cc: Naveen N Rao <naveen@kernel.org>
-> Cc: Nicholas Piggin <npiggin@gmail.com>
-> Cc: linuxppc-dev@lists.ozlabs.org
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> Return 0 instead for ecdsa keys (as well as ecrdsa keys).
+> 
+> Signed-off-by: Lukas Wunner <lukas@wunner.de>
 > ---
+>   crypto/asymmetric_keys/public_key.c | 9 +++++++--
+>   1 file changed, 7 insertions(+), 2 deletions(-)
 > 
-> This patch is part of a long series touching many files, so I have
-> limited the Cc list on the full series.  If you want the full series and
-> did not receive it, please retrieve it from lore.kernel.org.
-> 
->   arch/powerpc/crypto/aes-gcm-p10-glue.c | 8 ++------
->   1 file changed, 2 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/powerpc/crypto/aes-gcm-p10-glue.c b/arch/powerpc/crypto/aes-gcm-p10-glue.c
-> index f37b3d13fc53..2862c3cf8e41 100644
-> --- a/arch/powerpc/crypto/aes-gcm-p10-glue.c
-> +++ b/arch/powerpc/crypto/aes-gcm-p10-glue.c
-> @@ -212,11 +212,10 @@ static int p10_aes_gcm_crypt(struct aead_request *req, u8 *riv,
->   	struct p10_aes_gcm_ctx *ctx = crypto_tfm_ctx(tfm);
->   	u8 databuf[sizeof(struct gcm_ctx) + PPC_ALIGN];
->   	struct gcm_ctx *gctx = PTR_ALIGN((void *)databuf, PPC_ALIGN);
->   	u8 hashbuf[sizeof(struct Hash_ctx) + PPC_ALIGN];
->   	struct Hash_ctx *hash = PTR_ALIGN((void *)hashbuf, PPC_ALIGN);
-> -	struct scatter_walk assoc_sg_walk;
->   	struct skcipher_walk walk;
->   	u8 *assocmem = NULL;
->   	u8 *assoc;
->   	unsigned int cryptlen = req->cryptlen;
->   	unsigned char ivbuf[AES_BLOCK_SIZE+PPC_ALIGN];
-> @@ -232,12 +231,11 @@ static int p10_aes_gcm_crypt(struct aead_request *req, u8 *riv,
->   	memset(ivbuf, 0, sizeof(ivbuf));
->   	memcpy(iv, riv, GCM_IV_SIZE);
+> diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+> index bf165d321440..dd44a966947f 100644
+> --- a/crypto/asymmetric_keys/public_key.c
+> +++ b/crypto/asymmetric_keys/public_key.c
+> @@ -188,6 +188,8 @@ static int software_key_query(const struct kernel_pkey_params *params,
+>   	ptr = pkey_pack_u32(ptr, pkey->paramlen);
+>   	memcpy(ptr, pkey->params, pkey->paramlen);
 >   
->   	/* Linearize assoc, if not already linear */
->   	if (req->src->length >= assoclen && req->src->length) {
-> -		scatterwalk_start(&assoc_sg_walk, req->src);
-> -		assoc = scatterwalk_map(&assoc_sg_walk);
-> +		assoc = sg_virt(req->src); /* ppc64 is !HIGHMEM */
->   	} else {
->   		gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
->   			      GFP_KERNEL : GFP_ATOMIC;
+> +	memset(info, 0, sizeof(*info));
+> +
+>   	if (issig) {
+>   		sig = crypto_alloc_sig(alg_name, 0, 0);
+>   		if (IS_ERR(sig)) {
+> @@ -211,6 +213,9 @@ static int software_key_query(const struct kernel_pkey_params *params,
+>   			info->supported_ops |= KEYCTL_SUPPORTS_SIGN;
 >   
->   		/* assoc can be any length, so must be on heap */
-> @@ -251,13 +249,11 @@ static int p10_aes_gcm_crypt(struct aead_request *req, u8 *riv,
+>   		if (strcmp(params->encoding, "pkcs1") == 0) {
+> +			info->max_enc_size = len;
+> +			info->max_dec_size = len;
+> +
+>   			info->supported_ops |= KEYCTL_SUPPORTS_ENCRYPT;
+>   			if (pkey->key_is_private)
+>   				info->supported_ops |= KEYCTL_SUPPORTS_DECRYPT;
+> @@ -232,6 +237,8 @@ static int software_key_query(const struct kernel_pkey_params *params,
+>   		len = crypto_akcipher_maxsize(tfm);
+>   		info->max_sig_size = len;
+>   		info->max_data_size = len;
+> +		info->max_enc_size = len;
+> +		info->max_dec_size = len;
 >   
->   	vsx_begin();
->   	gcmp10_init(gctx, iv, (unsigned char *) &ctx->enc_key, hash, assoc, assoclen);
->   	vsx_end();
+>   		info->supported_ops = KEYCTL_SUPPORTS_ENCRYPT;
+>   		if (pkey->key_is_private)
+> @@ -239,8 +246,6 @@ static int software_key_query(const struct kernel_pkey_params *params,
+>   	}
 >   
-> -	if (!assocmem)
-> -		scatterwalk_unmap(assoc);
-> -	else
-> +	if (assocmem)
->   		kfree(assocmem);
+>   	info->key_size = len * 8;
+> -	info->max_enc_size = len;
+> -	info->max_dec_size = len;
+>   
+>   	ret = 0;
+>   
 
-kfree() accepts a NULL pointer, you can call kfree(assocmem) without 'if 
-(assocmem)'
-
-
->   
->   	if (enc)
->   		ret = skcipher_walk_aead_encrypt(&walk, req, false);
->   	else
+Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
 
