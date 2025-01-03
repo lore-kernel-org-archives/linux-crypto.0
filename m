@@ -1,117 +1,61 @@
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC1D0190486;
-	Fri,  3 Jan 2025 15:21:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A36BA1A8F9A
+	for <linux-crypto@vger.kernel.org>; Fri,  3 Jan 2025 15:59:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735917694; cv=none; b=knznxfoK30YvjklBp+qFoih//BXPJ/Ceofo40QwPS4hrBRz5m7E7KzPrJhUQcAJdJ/vfzydqY0quw9YceVvi15ncNynySXsBKrJxRVcILgG8bJWZOKG/dxM8vDtbJJ4/UZEAnArQ9qsd27fveaqkkzIaul0r7k8mSnr/C7Q8OtM=
+	t=1735919974; cv=none; b=PuGZHbxmCHH4YQKewh5BqWnOV22Iu9ZC6CMp1qXInJS2ymZVyvOApiazhPpctIfBcoB0MJH5mhBgsz6ZEXBZI0oKtTVCVd8e4+8bXEmiMIb2TKlCsS3VheNMz1ql3A22pU05kIaBaHCVpdIJTeEXb0Xz9YA1FGHGDPwhNqBGNRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735917694; c=relaxed/simple;
-	bh=lf/9EHK0+H3LQnblB2A3eP443gcgVGZGGzaT7TX3muU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mAlz9B9QJdpEAxfoPQzylBbDankGGlaK2+PhrIhgNDN4dbONlv0lhFcoAjTuXWBydp0rje2C8qYeTfNJUgu6FXPnnCu/6TfbzIaURdGUIbtx5p43IrDr/jcnGVrlP/6gTgVF7GuCsBla3XHfRlZnhsa08GeYtZzwqLjNIfn4a3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K+HmOoAr; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1735919974; c=relaxed/simple;
+	bh=2I0Q6K5lDZZESuPiwTMID9AHjYtJUZRT/bWgEkKrBms=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=tsFCYgAK7rfqCDwAoyK++b9MJ0PNJl3CZU89+m8HsTB1ofJGq6KJufRY6CceYI6eL0ZX235plZnXKeflkCFZPWee8Uz2N4uj45tFQDJgiZnE9OJUowUjFfOKcKLjkfpLN7pV0B04+k2AikhZzxtJCO3B6m0HErGHkAcMxN1dF2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MCPR4U60; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K+HmOoAr"
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-21675fd60feso226964765ad.2;
-        Fri, 03 Jan 2025 07:21:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1735917691; x=1736522491; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lf/9EHK0+H3LQnblB2A3eP443gcgVGZGGzaT7TX3muU=;
-        b=K+HmOoArM1TD8sCJArTD8pfsWu8MpT7Hw0EFLdqqNgTdOPq8OyUBUjjYFl2sOF1os+
-         qPFuuNLzMJhplMNTQxxtN0lM76PDuh7fOjNTssNJB+VSXl6/Eh2yjvBLnQAg9FEcb5Un
-         wn7pu/FEufS0P4KIS3smKo1bdLSILahNXax8hPM3i48XQqchu3RKVKjAB+2k023lvN1J
-         Jp8OJsVd9onRuzpuIqx/Q6Ujfy8Fdyurn2F+mZXKBP9z4TUihM74bKutKfUOFnBSWrGS
-         Z/z+cXnJt6y1wFkmQCMg1ZIL6siv7lvRLz9UsJah7zkh0EKhx5lavPZ5WsY1/sswsdUa
-         IUWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1735917691; x=1736522491;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lf/9EHK0+H3LQnblB2A3eP443gcgVGZGGzaT7TX3muU=;
-        b=Qo/46+KbiYvFKEAX4+Sxz7kfZWhvsJhLGXeiScHSfAbClAfD+NCfFSpsrkdGiFfXqc
-         kMdPeBOfE8XmtnwdSThS2AluMXmcEYBDBxgiV0HQRBS+Blc8BNuuvV3NZsfO1RkloWxd
-         JRl2Fmybuo1emUC+BwVFvy7POO2qeutGuIGzmryYh7CbfjhLTYIL21S1e0IW4wvErb0L
-         qtVcaEd5oajlT9LHqZ+e1K329u6RKLvg8BmCdtP9UPz64WoDfmXy/v8HW30igPYEZUQG
-         8pq/F94o8+/jZDSijwsiX+/tr8uhJ+xYNyq+Vzv4UZFoD9ddbzovtHnIaxJkeSznjbkV
-         OW+g==
-X-Forwarded-Encrypted: i=1; AJvYcCUav9ASIUJZvG7k+Zd7vLcXj0D77i7FhNfSj6TxCRMxN6z96Q9W7zMKKnHMS0Is3ilKvdje+sXOVII/wA==@vger.kernel.org, AJvYcCVDswdH79c/07prrm4GGdoEu7IyZh0J/7v2tnQX5TPuJwB68dK8C8KUATgM1elUHgnY9ueHFfPtZDC0Pw==@vger.kernel.org, AJvYcCVikxCTVTXyRJPjXL7pHqP4upgoIWFuiSCafhc4CLR3WeLCKJiLbFd9UOu1ZW+pcwL/v6wybe08NMf2rAI=@vger.kernel.org, AJvYcCWFtytwM1/+jTv4sd8Zg3bZhYTQETwn88iXcfPg3LEAw73PDDt1exb68RBtDhTJd3G1jJQLJLiwrS/H@vger.kernel.org, AJvYcCWaLbtGZMqn77dltSvKCZilCuQ5MkQTYi2RBqhZC7S9WDr6Hf4TFN/rGTu5z10i5VPf3tVvDCGr@vger.kernel.org, AJvYcCWoWS7aO6JNuFCNnmzReyH2y6QxME3gj1Xqr5aeILm369QtyVlRuWhajJhFl5iGifv+/4ei5tMoLq3EVstd@vger.kernel.org
-X-Gm-Message-State: AOJu0YxeTTivV8GyEcsr/FCNXcx31Dr/OXBfFwRcuBh4ma8YcBmMx6qM
-	GvOSbtkhp4KiRlSgqNTBf22/IzqDOG5HkqlhpzGA88WsYXbQ/LSv
-X-Gm-Gg: ASbGncufP4Zk9743i+bLIoAnPWHrxCbJkk3ispJPCboouFZmuQt+zwlwIlWC0LUIbex
-	Fi5dECGH8tOAwHiv6kGF4opwqEhPw/Dfq+AyuHRCAA/fNf1OnSzenIoagDqDt0e9KvdSivd8T3d
-	6mf2ohNe+l52i4BeGC6c5/81m/0q3bUPCVCpDoCuGop0CDhC1X496GXy+0M859wpMwDTid+bjfe
-	KVB5hJG5kGiBzMYSEbkfCrISiPpX1aqXj/0aQ4ide1hf+NBUcG/RrPdOmWrjkrU03NsoL++N/j5
-	AMIZ
-X-Google-Smtp-Source: AGHT+IG5A276qFKzsq0vRtD6GevOEebgjRTwKom2lvuNWUTRxP4Uq5vYQN1tUnp8ZXMDpu322FblbQ==
-X-Received: by 2002:a05:6a21:3a85:b0:1e0:c77c:450d with SMTP id adf61e73a8af0-1e5e044ddfamr75802412637.1.1735917690845;
-        Fri, 03 Jan 2025 07:21:30 -0800 (PST)
-Received: from localhost (maglev-oncall.nvidia.com. [216.228.125.128])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-842b1ce01d3sm23948804a12.23.2025.01.03.07.21.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Jan 2025 07:21:30 -0800 (PST)
-Date: Fri, 3 Jan 2025 07:21:27 -0800
-From: Yury Norov <yury.norov@gmail.com>
-To: Christoph Hellwig <hch@lst.de>
-Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-	virtualization@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-hyperv@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Naveen N Rao <naveen@kernel.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Haren Myneni <haren@linux.ibm.com>,
-	Rick Lindsley <ricklind@linux.ibm.com>,
-	Nick Child <nnac123@linux.ibm.com>,
-	Thomas Falcon <tlfalcon@linux.ibm.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Rob Herring <robh@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
-	James Smart <james.smart@broadcom.com>,
-	Dick Kennedy <dick.kennedy@broadcom.com>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Matt Wu <wuqiang.matt@bytedance.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Daniel Jordan <daniel.m.jordan@oracle.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Greg Kurz <groug@kaod.org>, Peter Xu <peterx@redhat.com>,
-	Shrikanth Hegde <sshegde@linux.ibm.com>,
-	Hendrik Brueckner <brueckner@linux.ibm.com>
-Subject: Re: [PATCH 00/14] cpumask: cleanup cpumask_next_wrap()
- implementation and usage
-Message-ID: <Z3gAdy7nU_-DAxhq@yury-ThinkPad>
-References: <20241228184949.31582-1-yury.norov@gmail.com>
- <20250103070229.GC28303@lst.de>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MCPR4U60"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1735919973; x=1767455973;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=2I0Q6K5lDZZESuPiwTMID9AHjYtJUZRT/bWgEkKrBms=;
+  b=MCPR4U60y2+y0u4Xl2o1m/oNrB2a4SmTF1BSIAORwInY1jhQ5o94qxSA
+   gQjpYxNuKijfI0GeN0cMj2if66o5cXzFljxvEb1x5MnVtJeeOeyK4Q0eG
+   fhJ26aMG79XNnuwbW1KKiqpiK3Rr7id8hcgAc1+sUf6yRVJ38NUto0EQL
+   dSKKGsewHQEfoMa6sdsdKzA5YXKTr4uZl9pqThj++KKn0YJJC/Peqb5Yb
+   HgNxz79wvNBy50Hnbpz6Cn3pARpGX/y+seTQfyFdv0Gb36/OUHLwddLCT
+   QPJ1VxN9Go+ew7dFoefZ4kDb+TgOSpcqQZLWL8NkItqHrom81bItbvjf2
+   w==;
+X-CSE-ConnectionGUID: 5p3ZksbaStiLCZJunUA84w==
+X-CSE-MsgGUID: WNO3jGbbTXuFmzz1ifLgjQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11304"; a="36046442"
+X-IronPort-AV: E=Sophos;i="6.12,286,1728975600"; 
+   d="scan'208";a="36046442"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jan 2025 07:59:32 -0800
+X-CSE-ConnectionGUID: mhf/wNXiT7aaYRJNyC5anQ==
+X-CSE-MsgGUID: 0c+jaZhvSLWIlqBBO35wEA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,286,1728975600"; 
+   d="scan'208";a="101657025"
+Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
+  by orviesa009.jf.intel.com with ESMTP; 03 Jan 2025 07:59:30 -0800
+Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tTk5A-0009xj-0t;
+	Fri, 03 Jan 2025 15:59:28 +0000
+Date: Fri, 3 Jan 2025 23:59:08 +0800
+From: kernel test robot <lkp@intel.com>
+To: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	linux-crypto@vger.kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Neil Armstrong <neil.armstrong@linaro.org>
+Subject: [herbert-cryptodev-2.6:master 20/50] drivers/crypto/qce/sha.c:365:3:
+ error: cannot jump from this goto statement to its label
+Message-ID: <202501032355.vSmyIynw-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -120,25 +64,128 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250103070229.GC28303@lst.de>
 
-On Fri, Jan 03, 2025 at 08:02:29AM +0100, Christoph Hellwig wrote:
-> You've sent me less than a handfull of 14 patches, there's no way
-> to properly review this.
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+head:   4ebd9a5ca478673cfbb38795cc5b3adb4f35fe04
+commit: ce8fd0500b741b3669c246cc604f1f2343cdd6fd [20/50] crypto: qce - use __free() for a buffer that's always freed
+config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20250103/202501032355.vSmyIynw-lkp@intel.com/config)
+compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250103/202501032355.vSmyIynw-lkp@intel.com/reproduce)
 
-Hi Christoph,
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202501032355.vSmyIynw-lkp@intel.com/
 
-You can find the whole series here:
+Note: the herbert-cryptodev-2.6/master HEAD 4ebd9a5ca478673cfbb38795cc5b3adb4f35fe04 builds fine.
+      It only hurts bisectability.
 
-https://lore.kernel.org/linux-scsi/CABPRKS-uqfJmDp5pS+hSnvzggdMv0bNawpsVNpY4aU4V+UdR7Q@mail.gmail.com/T/
+All errors (new ones prefixed by >>):
 
-Or you can download it by message ID like this:
+   In file included from drivers/crypto/qce/sha.c:8:
+   In file included from include/linux/dma-mapping.h:8:
+   In file included from include/linux/scatterlist.h:8:
+   In file included from include/linux/mm.h:2223:
+   include/linux/vmstat.h:504:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     504 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     505 |                            item];
+         |                            ~~~~
+   include/linux/vmstat.h:511:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     511 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     512 |                            NR_VM_NUMA_EVENT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
+     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
+         |                               ~~~~~~~~~~~ ^ ~~~
+   include/linux/vmstat.h:524:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     524 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     525 |                            NR_VM_NUMA_EVENT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~~
+>> drivers/crypto/qce/sha.c:365:3: error: cannot jump from this goto statement to its label
+     365 |                 goto err_free_ahash;
+         |                 ^
+   drivers/crypto/qce/sha.c:373:6: note: jump bypasses initialization of variable with __attribute__((cleanup))
+     373 |         u8 *buf __free(kfree) = kzalloc(keylen + QCE_MAX_ALIGN_SIZE,
+         |             ^
+   4 warnings and 1 error generated.
 
-b4 mbox 20241228184949.31582-1-yury.norov@gmail.com
 
-Sorry for not CC-ing you to the whole series. Some people prefer to
-receive minimal noise, and you never know who is who. If it comes to
-v2, you'll be in CC for every patch.
+vim +365 drivers/crypto/qce/sha.c
 
-Thanks,
-Yury
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  329  
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  330  static int qce_ahash_hmac_setkey(struct crypto_ahash *tfm, const u8 *key,
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  331  				 unsigned int keylen)
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  332  {
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  333  	unsigned int digestsize = crypto_ahash_digestsize(tfm);
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  334  	struct qce_sha_ctx *ctx = crypto_tfm_ctx(&tfm->base);
+c70e5f9403103c Gilad Ben-Yossef    2017-10-18  335  	struct crypto_wait wait;
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  336  	struct ahash_request *req;
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  337  	struct scatterlist sg;
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  338  	unsigned int blocksize;
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  339  	struct crypto_ahash *ahash_tfm;
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  340  	int ret;
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  341  	const char *alg_name;
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  342  
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  343  	blocksize = crypto_tfm_alg_blocksize(crypto_ahash_tfm(tfm));
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  344  	memset(ctx->authkey, 0, sizeof(ctx->authkey));
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  345  
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  346  	if (keylen <= blocksize) {
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  347  		memcpy(ctx->authkey, key, keylen);
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  348  		return 0;
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  349  	}
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  350  
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  351  	if (digestsize == SHA1_DIGEST_SIZE)
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  352  		alg_name = "sha1-qce";
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  353  	else if (digestsize == SHA256_DIGEST_SIZE)
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  354  		alg_name = "sha256-qce";
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  355  	else
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  356  		return -EINVAL;
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  357  
+85d7311f1908b9 Eric Biggers        2018-06-30  358  	ahash_tfm = crypto_alloc_ahash(alg_name, 0, 0);
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  359  	if (IS_ERR(ahash_tfm))
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  360  		return PTR_ERR(ahash_tfm);
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  361  
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  362  	req = ahash_request_alloc(ahash_tfm, GFP_KERNEL);
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  363  	if (!req) {
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  364  		ret = -ENOMEM;
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25 @365  		goto err_free_ahash;
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  366  	}
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  367  
+c70e5f9403103c Gilad Ben-Yossef    2017-10-18  368  	crypto_init_wait(&wait);
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  369  	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+c70e5f9403103c Gilad Ben-Yossef    2017-10-18  370  				   crypto_req_done, &wait);
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  371  	crypto_ahash_clear_flags(ahash_tfm, ~0);
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  372  
+ce8fd0500b741b Bartosz Golaszewski 2024-12-03  373  	u8 *buf __free(kfree) = kzalloc(keylen + QCE_MAX_ALIGN_SIZE,
+ce8fd0500b741b Bartosz Golaszewski 2024-12-03  374  					GFP_KERNEL);
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  375  	if (!buf) {
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  376  		ret = -ENOMEM;
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  377  		goto err_free_req;
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  378  	}
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  379  
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  380  	memcpy(buf, key, keylen);
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  381  	sg_init_one(&sg, buf, keylen);
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  382  	ahash_request_set_crypt(req, &sg, ctx->authkey, keylen);
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  383  
+c70e5f9403103c Gilad Ben-Yossef    2017-10-18  384  	ret = crypto_wait_req(crypto_ahash_digest(req), &wait);
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  385  
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  386  err_free_req:
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  387  	ahash_request_free(req);
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  388  err_free_ahash:
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  389  	crypto_free_ahash(ahash_tfm);
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  390  	return ret;
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  391  }
+ec8f5d8f6f76b9 Stanimir Varbanov   2014-06-25  392  
+
+:::::: The code at line 365 was first introduced by commit
+:::::: ec8f5d8f6f76b939f662d6e83041abecabef0a34 crypto: qce - Qualcomm crypto engine driver
+
+:::::: TO: Stanimir Varbanov <svarbanov@mm-sol.com>
+:::::: CC: Herbert Xu <herbert@gondor.apana.org.au>
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
