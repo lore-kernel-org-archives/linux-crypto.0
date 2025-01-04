@@ -1,44 +1,85 @@
-Received: from bmailout3.hostsharing.net (bmailout3.hostsharing.net [176.9.242.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1CB01917ED;
-	Sat,  4 Jan 2025 11:31:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.9.242.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DED7A211C;
+	Sat,  4 Jan 2025 16:26:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1735990292; cv=none; b=PVe+5UO/0sOpQgJxH4RQJuGSqO0csWue2b0R2PCWeIRj0kb8SxwSDAHgfxhKgHM5o4ccwrYPFVv9behgEPMaQxv46bSRLINc1UyrcRfQ7/yMclJ2AFFKwtOjGNRPphMzmHF3xKwQ0mzkfoSGyyRalIz8oVGnWBJl12b1RDTt9AE=
+	t=1736007999; cv=none; b=Xn6RtFD+9MNmNE5oJqmdTOYwPoN0rAl3ZXLJTyy8PT2QNWNiFoGjxWnsTwPY4lOMq0UF7W02+cF4z9W/FEHY6cSgpAwcBohPhUVhKq6mCdfTP7tU5TiIWkx/rOey6bNmLZiYiMLO+j5USoQz1tgSq0wQhlAQaWlJFcIIzB/A2HY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1735990292; c=relaxed/simple;
-	bh=o29PTPzE685m3P5uDLzDbdJoc0zSugA1YPoIaIqc1dY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jPpJEloYuItTuSjDs5m/U9X3WGuTFlp6azr2BFPFLEQ84kciw6Q3hTLPpTboIr0Ho8V6uFzkkBiXHPX7wvO+tSn8sMBQb2X+lanmY9ReNt7u7pICKEZFHMXtTtAObWGIr2Opyagi6KB4TWlVHYORgCuBMk0Nqi0KWyzH2VteT24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=176.9.242.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout3.hostsharing.net (Postfix) with ESMTPS id AC7F2100DE9C3;
-	Sat,  4 Jan 2025 12:31:19 +0100 (CET)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id 8CD5A5A0CE7; Sat,  4 Jan 2025 12:31:19 +0100 (CET)
-Date: Sat, 4 Jan 2025 12:31:19 +0100
-From: Lukas Wunner <lukas@wunner.de>
+	s=arc-20240116; t=1736007999; c=relaxed/simple;
+	bh=+2hu2HBFZ3z098bnGj2w0wakHLQJ1X+CDDzNKkFvSo4=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Am0ZgM3GTCoXuMw6e4NULvFpKlDlIYuUGe4skoVrwZTgcxwywzmnBdOKKdzhC2tVAtj/CYjqlVzDM/3jru0227WqwVoJJogzXy8dkA+I7TUMPKZcEKr4ug15BnSgdTZf+6bYcxMxogcnraIe3pj1pSd3Q8uWOXXoNglIuIdMimg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MrZP4R5P; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MrZP4R5P"
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-436345cc17bso94927185e9.0;
+        Sat, 04 Jan 2025 08:26:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736007996; x=1736612796; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=nTlW5tpHNJbidyn2Hd1CGByd7XKtmPkVfZjZnPxhfiU=;
+        b=MrZP4R5PiDR2VD4LVtyzTyOapw0kz8tvjuY7HeG8Lkgu4wU7/huV8G6gTQmk7Y1gV8
+         /NX5+Nq/9W/TREPQDyKCqjDCfoVsepjgHxYWYaCihkKaw7R6WP+G35XeiQY1m+3hlbPg
+         ECGms9p8jhG1R6pIO5GELtbsV6yyxbCVfidBIUFoH/wIReqXmf7LSuTqxbV04zLudwuA
+         b+/hBz7vQY52+6qOKcDsPbnbNqnqsL6RRZZ+pT4Fuw3BA0YanG6yPW3wybswvKvUdNuk
+         xZvO6NUOIzbSKnAbvFQ/Ove6fJhnY/NKmQ4uRuIyaQ3HtRZyi189EqoHh6etAvr16aAb
+         3pHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736007996; x=1736612796;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nTlW5tpHNJbidyn2Hd1CGByd7XKtmPkVfZjZnPxhfiU=;
+        b=XWpL6hsp8iSq8Miwjw/tEcxtzRhQlCVG6zMIHd88RV9+e+v24/4HywTFOPgoF2Znt+
+         /E3fxIvHxZ3mT0uiPe3zSFsmgGYp7PoeUO0053xXd4eTJkLDvugyJml+AHMq2rZt1fi5
+         lmPLdnOSIwLlI+9PzCiOFpeOe9P5bnWZVHTx90yWwTDaDABr+UW7c6aA+TOGet8aTaDu
+         96FEaexzK51pXzBAcPLU/HlOLLE/OXMr9iCxThPcF4/ndxoJro5uu7WgLjsv9NrJgE3C
+         3G5Le7JoIuvq9lYzIuClWDd0KhC8mWYCNKmyK8TxnNBYDqcYIIFKg6A5aFtpbuNFKMeV
+         3uIg==
+X-Forwarded-Encrypted: i=1; AJvYcCUmsRy30dg0mQjFdalaI2uwOGO3RjHRx+raS4vbnwJF7b814GOcy1SA1ZmpvBv3ZjIFRK437PDUq8t7@vger.kernel.org, AJvYcCVBbY2ij3HV+sB6soYmEuSbyp5d0GttBxfZcFbgFHPGxErCspXbZ3e7YphgUC+mPaEtmbkQ/XtgyraWQrt0@vger.kernel.org, AJvYcCXLxQHaNZFl4QeJwYalzQ6lCFIodta1EP0YK3xWqTf2f9cgf7RANoSU86S5r8xJ78UH0GI9emWja4rp+kzQ@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywdmo9eiTfEhQPOLUYMaz4mtCpimcbRAgOS7Ce6SCMiunoZ89iE
+	U9MPMQ/hK6g6r5QOtW2PfwnxfpH9fYFyK9iKG/b9UboZnUyMORmp
+X-Gm-Gg: ASbGncuR55nNCsAftkif/l7ugm0pWJJBIFNX2tzKXpLSfeZ5CkrGDj+Ph5rPJ0d4og9
+	Zg6UAVqHDXMRPh88Si6wcyc02tIo0hIF1zzze/YlgsUE7gv6wCYeUIunvVeC1cKVl+1hsbo6RLc
+	noSKIZH7ub6GLgKsFikE1nSwW6bth65TmN93Q1pB7Jis1nfaIToSlWEd/kLqChdvyvvHLKPvzrW
+	k5gJwxdWMGVrXey/uleFwMaJU/Q/hKneYqnYyweifl0I7Q4DRlnR7E2YaObRzJKXGeRG1yQGpZS
+	LF6n3XY9z1SwjuFuXdM0Klto5kkx
+X-Google-Smtp-Source: AGHT+IEYyWCHbe8Xmh/2fe8JTYwqsP1+JeqaC3d0GDdR+GXkSctHI+hIK/4TMHem5BXiKUDqAK4wFA==
+X-Received: by 2002:a05:600c:470a:b0:434:f767:68ea with SMTP id 5b1f17b1804b1-43668548337mr441848705e9.5.1736007995848;
+        Sat, 04 Jan 2025 08:26:35 -0800 (PST)
+Received: from Ansuel-XPS. (host-95-246-253-26.retail.telecomitalia.it. [95.246.253.26])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4366127c488sm515449015e9.27.2025.01.04.08.26.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 04 Jan 2025 08:26:34 -0800 (PST)
+Message-ID: <6779613a.050a0220.184c1c.c90e@mx.google.com>
+X-Google-Original-Message-ID: <Z3lhNNTbHX6We7M8@Ansuel-XPS.>
+Date: Sat, 4 Jan 2025 17:26:28 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
 To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Stefan Berger <stefanb@linux.ibm.com>,
-	Vitaly Chikunov <vt@altlinux.org>,
-	David Howells <dhowells@redhat.com>,
-	Ignat Korchagin <ignat@cloudflare.com>,
-	linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
-	Dan Carpenter <dan.carpenter@linaro.org>
-Subject: Re: [PATCH 3/3] crypto: ecdsa - Fix NIST P521 key size reported by
- KEYCTL_PKEY_QUERY
-Message-ID: <Z3kcB6ouES8RzOwf@wunner.de>
-References: <cover.1735236227.git.lukas@wunner.de>
- <a0e1aa407de754e03a7012049e45e25d7af10e08.1735236227.git.lukas@wunner.de>
- <Z3iElsILmoSu6FuC@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Antoine Tenart <atenart@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+	Waiman Long <longman@redhat.com>, Boqun Feng <boqun.feng@gmail.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>, linux-crypto@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev, upstream@airoha.com,
+	Richard van Schagen <vschagen@icloud.com>
+Subject: Re: [PATCH v9 3/3] crypto: Add Inside Secure SafeXcel EIP-93 crypto
+ engine support
+References: <20241214132808.19449-1-ansuelsmth@gmail.com>
+ <20241214132808.19449-4-ansuelsmth@gmail.com>
+ <Z2aqHmrVAm3adVG6@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -47,33 +88,50 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z3iElsILmoSu6FuC@gondor.apana.org.au>
+In-Reply-To: <Z2aqHmrVAm3adVG6@gondor.apana.org.au>
 
-On Sat, Jan 04, 2025 at 08:45:10AM +0800, Herbert Xu wrote:
-> On Thu, Dec 26, 2024 at 07:08:03PM +0100, Lukas Wunner wrote:
+On Sat, Dec 21, 2024 at 07:44:30PM +0800, Herbert Xu wrote:
+> On Sat, Dec 14, 2024 at 02:27:54PM +0100, Christian Marangi wrote:
 > >
-> > diff --git a/crypto/ecdsa-p1363.c b/crypto/ecdsa-p1363.c
-> > index eaae7214d69b..c4f458df18ed 100644
-> > --- a/crypto/ecdsa-p1363.c
-> > +++ b/crypto/ecdsa-p1363.c
-> > @@ -21,7 +21,7 @@ static int ecdsa_p1363_verify(struct crypto_sig *tfm,
-> >  			      const void *digest, unsigned int dlen)
-> >  {
-> >  	struct ecdsa_p1363_ctx *ctx = crypto_sig_ctx(tfm);
-> > -	unsigned int keylen = crypto_sig_keysize(ctx->child);
-> > +	unsigned int keylen = DIV_ROUND_UP(crypto_sig_keysize(ctx->child), 8);
+> > +	ahash_tfm = crypto_alloc_ahash(alg_name, 0, 0);
+> > +	if (IS_ERR(ahash_tfm))
+> > +		return PTR_ERR(ahash_tfm);
+> > +
+> > +	req = ahash_request_alloc(ahash_tfm, GFP_ATOMIC);
+> > +	if (!req) {
+> > +		ret = -ENOMEM;
+> > +		goto err_ahash;
+> > +	}
+> > +
+> > +	rctx = ahash_request_ctx_dma(req);
+> > +	crypto_init_wait(&wait);
+> > +	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+> > +				   crypto_req_done, &wait);
+> > +
+> > +	/* Hash the key if > SHA256_BLOCK_SIZE */
+> > +	if (keylen > SHA256_BLOCK_SIZE) {
+> > +		sg_init_one(&sg[0], key, keylen);
+> > +
+> > +		ahash_request_set_crypt(req, sg, ipad, keylen);
+> > +		ret = crypto_wait_req(crypto_ahash_digest(req), &wait);
 > 
-> This may overflow unnecessarily, please rewrite these as:
+> Sleeping in setkey is no longer allowed.  I don't think it's
+> fatal yet because the main user driving this currently uses
+> sync ahashes only.  But we should avoid this in all new driver
+> code.
 > 
-> 	X / 8 + !!(X & 7)
+> Easiest fix would be to allocate a sync ahash:
+> 
+> 	ahash_tfm = crypto_alloc_ahash(alg_name, 0, CRYPTO_ALG_SYNC);
+>
 
-Interesting.  Wouldn't it make sense to have a DIV_ROUND_UP_SAFE() macro
-for cases like this?
+Hi Herbert,
 
-I'd expect this version to actually be faster than DIV_ROUND_UP():
-There's the extra logical AND, as well as the negation.
-But the "n / d" and "!!(n & (d - 1))" can be computed in parallel.
+I'm a bit confused by this... I can't find any reference of
+CRYPTO_ALG_SYNC, is this something new? Any hint on where to look for
+it? Can't find it in include/linux/crypto.h
 
-Thanks,
+Following the codeflow of crypto_alloc_ahash is a bit problematic.
 
-Lukas
+-- 
+	Ansuel
