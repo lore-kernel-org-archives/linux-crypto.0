@@ -1,137 +1,136 @@
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DED7A211C;
-	Sat,  4 Jan 2025 16:26:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47BC71D5CE3
+	for <linux-crypto@vger.kernel.org>; Sat,  4 Jan 2025 20:55:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736007999; cv=none; b=Xn6RtFD+9MNmNE5oJqmdTOYwPoN0rAl3ZXLJTyy8PT2QNWNiFoGjxWnsTwPY4lOMq0UF7W02+cF4z9W/FEHY6cSgpAwcBohPhUVhKq6mCdfTP7tU5TiIWkx/rOey6bNmLZiYiMLO+j5USoQz1tgSq0wQhlAQaWlJFcIIzB/A2HY=
+	t=1736024114; cv=none; b=CD5uEx9+vpwdVtGT8Trki4BvGo6S9qOviekjtznMEpghzsZnUNmCjPwqqzlVqBflAhQ7FaC6xFzDztKEBaPiC6Nm3zKBigG7jEhPAsLfjVT/u7Vcrh+GrgUqt6XuYDlYYBiukuQU3nDpxgbvjzBM4HvxNS73W9bt4gHBeCgRotY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736007999; c=relaxed/simple;
-	bh=+2hu2HBFZ3z098bnGj2w0wakHLQJ1X+CDDzNKkFvSo4=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Am0ZgM3GTCoXuMw6e4NULvFpKlDlIYuUGe4skoVrwZTgcxwywzmnBdOKKdzhC2tVAtj/CYjqlVzDM/3jru0227WqwVoJJogzXy8dkA+I7TUMPKZcEKr4ug15BnSgdTZf+6bYcxMxogcnraIe3pj1pSd3Q8uWOXXoNglIuIdMimg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MrZP4R5P; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1736024114; c=relaxed/simple;
+	bh=Xn/kRMOeY30BbZdhigNGOrSGfeTCnFdlp6m/DcAWf0s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=s34TxnQh5fuAp4G4fHpFEStWqp7dHujNzxBS2SHIz0t9HEHOY3x1PluEnSg5dM/YTrUwQNi/Cus0I3YJ9cp0y+o6mVEuwxi+Li/ahErgycjn2myjDYxHweiIAFO3eguePntb7qr+KXJTkmJw98rvhTIHGlLDdoLwlDLK5YZCKIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=mc/65IQt; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MrZP4R5P"
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-436345cc17bso94927185e9.0;
-        Sat, 04 Jan 2025 08:26:37 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mc/65IQt"
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5d3c0bd1cc4so2500912a12.0
+        for <linux-crypto@vger.kernel.org>; Sat, 04 Jan 2025 12:55:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736007996; x=1736612796; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=nTlW5tpHNJbidyn2Hd1CGByd7XKtmPkVfZjZnPxhfiU=;
-        b=MrZP4R5PiDR2VD4LVtyzTyOapw0kz8tvjuY7HeG8Lkgu4wU7/huV8G6gTQmk7Y1gV8
-         /NX5+Nq/9W/TREPQDyKCqjDCfoVsepjgHxYWYaCihkKaw7R6WP+G35XeiQY1m+3hlbPg
-         ECGms9p8jhG1R6pIO5GELtbsV6yyxbCVfidBIUFoH/wIReqXmf7LSuTqxbV04zLudwuA
-         b+/hBz7vQY52+6qOKcDsPbnbNqnqsL6RRZZ+pT4Fuw3BA0YanG6yPW3wybswvKvUdNuk
-         xZvO6NUOIzbSKnAbvFQ/Ove6fJhnY/NKmQ4uRuIyaQ3HtRZyi189EqoHh6etAvr16aAb
-         3pHQ==
+        d=linaro.org; s=google; t=1736024111; x=1736628911; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=WDsJNqlpSJNNawMf3Py4v8MhzkVez917T1reSgeDSXg=;
+        b=mc/65IQt+2MM5+Npo75wBtMSx6g+8NOZFzOlD+Dw7oTdp0pA7GpEGSXm2g4NkLTknf
+         F+PtkoINvl3oa1jPYy+Ukdso7u5+Xk9iurumY3BsUOlMxifPaBeJf9VGRtgMhW6PQbis
+         axV0Lf/OWMZQ4gIBpFfiKoZWevTaDUuihI2sh6fvgxqQjykh8ikUOu6vrbxKsz2ZkTnc
+         UYsPh9aaVUlpLF8uzky8frWKcmZNNj47DvcMYHmQlz/3i3usl+MinEfRZE0vD4UBMU7h
+         GccCKA0sCMna8eZ62S4Vb29y/cf1Bwo6/1re6nZ0OZLkn0eTaUUTtLVhJLpgCiFyIdab
+         LCDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736007996; x=1736612796;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nTlW5tpHNJbidyn2Hd1CGByd7XKtmPkVfZjZnPxhfiU=;
-        b=XWpL6hsp8iSq8Miwjw/tEcxtzRhQlCVG6zMIHd88RV9+e+v24/4HywTFOPgoF2Znt+
-         /E3fxIvHxZ3mT0uiPe3zSFsmgGYp7PoeUO0053xXd4eTJkLDvugyJml+AHMq2rZt1fi5
-         lmPLdnOSIwLlI+9PzCiOFpeOe9P5bnWZVHTx90yWwTDaDABr+UW7c6aA+TOGet8aTaDu
-         96FEaexzK51pXzBAcPLU/HlOLLE/OXMr9iCxThPcF4/ndxoJro5uu7WgLjsv9NrJgE3C
-         3G5Le7JoIuvq9lYzIuClWDd0KhC8mWYCNKmyK8TxnNBYDqcYIIFKg6A5aFtpbuNFKMeV
-         3uIg==
-X-Forwarded-Encrypted: i=1; AJvYcCUmsRy30dg0mQjFdalaI2uwOGO3RjHRx+raS4vbnwJF7b814GOcy1SA1ZmpvBv3ZjIFRK437PDUq8t7@vger.kernel.org, AJvYcCVBbY2ij3HV+sB6soYmEuSbyp5d0GttBxfZcFbgFHPGxErCspXbZ3e7YphgUC+mPaEtmbkQ/XtgyraWQrt0@vger.kernel.org, AJvYcCXLxQHaNZFl4QeJwYalzQ6lCFIodta1EP0YK3xWqTf2f9cgf7RANoSU86S5r8xJ78UH0GI9emWja4rp+kzQ@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywdmo9eiTfEhQPOLUYMaz4mtCpimcbRAgOS7Ce6SCMiunoZ89iE
-	U9MPMQ/hK6g6r5QOtW2PfwnxfpH9fYFyK9iKG/b9UboZnUyMORmp
-X-Gm-Gg: ASbGncuR55nNCsAftkif/l7ugm0pWJJBIFNX2tzKXpLSfeZ5CkrGDj+Ph5rPJ0d4og9
-	Zg6UAVqHDXMRPh88Si6wcyc02tIo0hIF1zzze/YlgsUE7gv6wCYeUIunvVeC1cKVl+1hsbo6RLc
-	noSKIZH7ub6GLgKsFikE1nSwW6bth65TmN93Q1pB7Jis1nfaIToSlWEd/kLqChdvyvvHLKPvzrW
-	k5gJwxdWMGVrXey/uleFwMaJU/Q/hKneYqnYyweifl0I7Q4DRlnR7E2YaObRzJKXGeRG1yQGpZS
-	LF6n3XY9z1SwjuFuXdM0Klto5kkx
-X-Google-Smtp-Source: AGHT+IEYyWCHbe8Xmh/2fe8JTYwqsP1+JeqaC3d0GDdR+GXkSctHI+hIK/4TMHem5BXiKUDqAK4wFA==
-X-Received: by 2002:a05:600c:470a:b0:434:f767:68ea with SMTP id 5b1f17b1804b1-43668548337mr441848705e9.5.1736007995848;
-        Sat, 04 Jan 2025 08:26:35 -0800 (PST)
-Received: from Ansuel-XPS. (host-95-246-253-26.retail.telecomitalia.it. [95.246.253.26])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4366127c488sm515449015e9.27.2025.01.04.08.26.32
+        d=1e100.net; s=20230601; t=1736024111; x=1736628911;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WDsJNqlpSJNNawMf3Py4v8MhzkVez917T1reSgeDSXg=;
+        b=eO2hsFd06oHTMwXYn6HEWAJbQvfb2EiByIclG5pvoDo+w5mBkcf9o6wDpPunLgMf1q
+         alXAHx7hVN+hoOrfkBATuOjiFAucmzxxrY5IMk1nfSD0q+cRIYVYjT8gUt+UowCWxfR9
+         8vb3bLckDaKDRotPLlbUo1vQDa3XoloFo1bYalfBeBa5ohiK8AtEfwXUjt1XOesZzJ3Y
+         VSyZMX4/xHDWAUH6Y4dOAsTTwVJ8rds5S0JTvNY1EuS5dvdGK6oWYYWe2XLIxnJ9F9l4
+         8IocnTBuSKMP0abHKFFL7pcWZoCa9h9h/VnaIIdySx9qJQnEEyZkCGuGQMP96taos1Fm
+         CDow==
+X-Forwarded-Encrypted: i=1; AJvYcCUVFbbrLjWNR/0nSxXrRm1yaoSmynJj0aV/5Hz5nRpNwc9JX0yOd2p1hIfl9P3soCau7hnDHSHxmm5WyYo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwYc0n59WZu+5efrUrRLj+KlS5tnBKWpnWU39X5aeEyQ4UwOsMu
+	OPsQu2B+Qbl/Fpc1zBJ2eFB9HkocVFCfamfyuSgiiLugEYXKWVJt5wPE6d1EOjw=
+X-Gm-Gg: ASbGnctGUagL7nY7yzXczAV8nycroErxVOyKqo/MBVJcGZcz8DXIyZhV/JfCMeWg8g1
+	brhf2yDBbzIsQl15fVcrWG8flnq1pB3DkaP51SAhwyN0e4UYK38awVFBPMkXvxQSIe/41cTkrsj
+	z0DfzH88f48n37tRxk8PUD5T8hjU0Texh51mNetbJMwgs9q0dC7lSp+ETjRcAiUMfMGrsR7Vmex
+	6h7i5izlHYFmqvzGRAl/olHyuNTrDGRPN1APzl5RsksXUKTVbTBx+DY10F4TXuBXQCcrSw=
+X-Google-Smtp-Source: AGHT+IHWTvEbFyBXzG9e8FsP0ij+GiuUSqKpGVu0O1LuszPhiJHSeY0kaqUmQ0J/IbFid0QVoi6aLA==
+X-Received: by 2002:a17:906:7951:b0:aa5:a36c:88f0 with SMTP id a640c23a62f3a-aac3378e312mr1546765566b.12.1736024109719;
+        Sat, 04 Jan 2025 12:55:09 -0800 (PST)
+Received: from krzk-bin.. ([178.197.223.165])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aac0eae3a7bsm2050315466b.83.2025.01.04.12.55.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 04 Jan 2025 08:26:34 -0800 (PST)
-Message-ID: <6779613a.050a0220.184c1c.c90e@mx.google.com>
-X-Google-Original-Message-ID: <Z3lhNNTbHX6We7M8@Ansuel-XPS.>
-Date: Sat, 4 Jan 2025 17:26:28 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Antoine Tenart <atenart@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
-	Waiman Long <longman@redhat.com>, Boqun Feng <boqun.feng@gmail.com>,
+        Sat, 04 Jan 2025 12:55:08 -0800 (PST)
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
 	Nathan Chancellor <nathan@kernel.org>,
 	Nick Desaulniers <ndesaulniers@google.com>,
 	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>, linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev, upstream@airoha.com,
-	Richard van Schagen <vschagen@icloud.com>
-Subject: Re: [PATCH v9 3/3] crypto: Add Inside Secure SafeXcel EIP-93 crypto
- engine support
-References: <20241214132808.19449-1-ansuelsmth@gmail.com>
- <20241214132808.19449-4-ansuelsmth@gmail.com>
- <Z2aqHmrVAm3adVG6@gondor.apana.org.au>
+	Justin Stitt <justinstitt@google.com>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: [PATCH] crypto: bcm - Drop unused setting of local 'ptr' variable
+Date: Sat,  4 Jan 2025 21:55:02 +0100
+Message-ID: <20250104205502.184869-1-krzysztof.kozlowski@linaro.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z2aqHmrVAm3adVG6@gondor.apana.org.au>
+Content-Transfer-Encoding: 8bit
 
-On Sat, Dec 21, 2024 at 07:44:30PM +0800, Herbert Xu wrote:
-> On Sat, Dec 14, 2024 at 02:27:54PM +0100, Christian Marangi wrote:
-> >
-> > +	ahash_tfm = crypto_alloc_ahash(alg_name, 0, 0);
-> > +	if (IS_ERR(ahash_tfm))
-> > +		return PTR_ERR(ahash_tfm);
-> > +
-> > +	req = ahash_request_alloc(ahash_tfm, GFP_ATOMIC);
-> > +	if (!req) {
-> > +		ret = -ENOMEM;
-> > +		goto err_ahash;
-> > +	}
-> > +
-> > +	rctx = ahash_request_ctx_dma(req);
-> > +	crypto_init_wait(&wait);
-> > +	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-> > +				   crypto_req_done, &wait);
-> > +
-> > +	/* Hash the key if > SHA256_BLOCK_SIZE */
-> > +	if (keylen > SHA256_BLOCK_SIZE) {
-> > +		sg_init_one(&sg[0], key, keylen);
-> > +
-> > +		ahash_request_set_crypt(req, sg, ipad, keylen);
-> > +		ret = crypto_wait_req(crypto_ahash_digest(req), &wait);
-> 
-> Sleeping in setkey is no longer allowed.  I don't think it's
-> fatal yet because the main user driving this currently uses
-> sync ahashes only.  But we should avoid this in all new driver
-> code.
-> 
-> Easiest fix would be to allocate a sync ahash:
-> 
-> 	ahash_tfm = crypto_alloc_ahash(alg_name, 0, CRYPTO_ALG_SYNC);
->
+spum_cipher_req_init() assigns 'spu_hdr' to local 'ptr' variable and
+later increments 'ptr' over specific fields like it was meant to point
+to pieces of message for some purpose.  However the code does not read
+'ptr' at all thus this entire iteration over 'spu_hdr' seams pointless.
 
-Hi Herbert,
+Reported by clang W=1 build:
 
-I'm a bit confused by this... I can't find any reference of
-CRYPTO_ALG_SYNC, is this something new? Any hint on where to look for
-it? Can't find it in include/linux/crypto.h
+  drivers/crypto/bcm/spu.c:839:6: error: variable 'ptr' set but not used [-Werror,-Wunused-but-set-variable]
 
-Following the codeflow of crypto_alloc_ahash is a bit problematic.
+Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+---
+ drivers/crypto/bcm/spu.c | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
 
+diff --git a/drivers/crypto/bcm/spu.c b/drivers/crypto/bcm/spu.c
+index 6283e8c6d51d..86c227caa722 100644
+--- a/drivers/crypto/bcm/spu.c
++++ b/drivers/crypto/bcm/spu.c
+@@ -836,7 +836,6 @@ u16 spum_cipher_req_init(u8 *spu_hdr, struct spu_cipher_parms *cipher_parms)
+ 	u32 cipher_bits = 0;
+ 	u32 ecf_bits = 0;
+ 	u8 sctx_words = 0;
+-	u8 *ptr = spu_hdr;
+ 
+ 	flow_log("%s()\n", __func__);
+ 	flow_log("  cipher alg:%u mode:%u type %u\n", cipher_parms->alg,
+@@ -847,7 +846,6 @@ u16 spum_cipher_req_init(u8 *spu_hdr, struct spu_cipher_parms *cipher_parms)
+ 
+ 	/* starting out: zero the header (plus some) */
+ 	memset(spu_hdr, 0, sizeof(struct SPUHEADER));
+-	ptr += sizeof(struct SPUHEADER);
+ 
+ 	/* format master header word */
+ 	/* Do not set the next bit even though the datasheet says to */
+@@ -861,10 +859,8 @@ u16 spum_cipher_req_init(u8 *spu_hdr, struct spu_cipher_parms *cipher_parms)
+ 
+ 	/* copy the encryption keys in the SAD entry */
+ 	if (cipher_parms->alg) {
+-		if (cipher_parms->key_len) {
+-			ptr += cipher_parms->key_len;
++		if (cipher_parms->key_len)
+ 			sctx_words += cipher_parms->key_len / 4;
+-		}
+ 
+ 		/*
+ 		 * if encrypting then set IV size, use SCTX IV unless no IV
+@@ -873,7 +869,6 @@ u16 spum_cipher_req_init(u8 *spu_hdr, struct spu_cipher_parms *cipher_parms)
+ 		if (cipher_parms->iv_len) {
+ 			/* Use SCTX IV */
+ 			ecf_bits |= SCTX_IV;
+-			ptr += cipher_parms->iv_len;
+ 			sctx_words += cipher_parms->iv_len / 4;
+ 		}
+ 	}
 -- 
-	Ansuel
+2.43.0
+
