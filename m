@@ -1,36 +1,36 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 612B91CDFAC
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96DEE1CDFAE
 	for <linux-crypto@vger.kernel.org>; Sun,  5 Jan 2025 19:34:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736105697; cv=none; b=N3eLtNh5FPf9GvZ4A7jDZhpMdeCe1C9z5IyU9/lcEpt+viLv08LxReMR73WNfPEb4fjjuPG5/pBC5AsUwmw8C+Wu2IUGMrCoFO7p6stDccY9aCLVNnaSr+65g3RSGKKpTEUHAgINdardVY+6/DlMbb0D8OFnOXq1mmBifIdLh7o=
+	t=1736105697; cv=none; b=ndq7OtU+SHYChPhRjOLLSlkAgpsApW1sVXC7NzSzTUpIBVlh7n/JnBacDM7K3NjqR/aTeHHim0675tZzI/S7mEHliXIMlV5mcIW61lZz336g8OmmW9aUWYAZrE82a/JTnyK8Blevzx7MD4QGXvKvrJfcPybnZrlB9wqxIIu4Wk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1736105697; c=relaxed/simple;
-	bh=8yRyZ1QAEdW46ahp8GvBm7MgvLA8k+bDmW4nCd3mjks=;
+	bh=gaMOcbKZNVJXlRF5msh3AmHXHZVVwOpWrFZVmfdFAG8=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=l+drioRNP7i4+Jsm6YpMzPsGjQ/8BLIHNmN88yeObChMlDlU84rlllH5NiNEazz11/Sz/6X+FqkcE/JAcomuEBVHfiQVsFPEcFf6+QAs/gb97EQj3VwbMpoSHA4xclikczr/c0OGNkur7F3pplnqOo26bV5QbPZf08VQQ+28pgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FzyD+Jq8; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=nW42hAM4GBII+HQ/sZlsE1ZuWSGNMU8cXSmwl7ThNnghMAszHFeTy9nVAZ8TMozW+cOIcAut5dFmJb4Cx3C7XebOypu7xxPagbNlU4mkYhE0DEjt3K9WDYaxtrrsWN9Qq6pULLIUG84cp0XE44KS/5qaWJYl82PWux7k0btSI1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nBTSjf9U; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FzyD+Jq8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBBA6C4CEE3
-	for <linux-crypto@vger.kernel.org>; Sun,  5 Jan 2025 19:34:56 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nBTSjf9U"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18DBFC4CEE0
+	for <linux-crypto@vger.kernel.org>; Sun,  5 Jan 2025 19:34:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736105696;
-	bh=8yRyZ1QAEdW46ahp8GvBm7MgvLA8k+bDmW4nCd3mjks=;
+	s=k20201202; t=1736105697;
+	bh=gaMOcbKZNVJXlRF5msh3AmHXHZVVwOpWrFZVmfdFAG8=;
 	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=FzyD+Jq8YC1G0UEFNZcWMZafBMEgVKGtLeN+EdPSuh3abriRbsDRWc6RB+d9qgj2/
-	 CpOSua1fyj1avfYrQvhTPVOGdubNnXTzypkB6pVMChAVn5nJXWclag/SycFUngzWcu
-	 UYqzjx5vNMe5AljaGqQzU+MQGBJLsYT4ofoAZPwd0kPUiU/6BWjlQF4vB+vcii+p+E
-	 +wa9oOxdhxUxIQxtZkeRC2ea2QQ6ZDfq5IaALMqdx8tCIx7FjvyCdsMyw3+YXdu1Ug
-	 8857GSbvann7ThXqGhEihnXVTudYYOmbDC/GO5eK5XH3oi0YP0UIo6s3Ma3YInaXWA
-	 weuuCb0Qx2YPQ==
+	b=nBTSjf9U67DTDQmSmBBpwT/XFsg3iUM/2c8L9E6HrhiE5m4UrJgSxLlRszb1xybmw
+	 b2lUV60s59rw4BgKWIYKoefj7Q0OQ2w6H/6fK6vtXbxVgYwRMcYlWocec3fwPXWirB
+	 0Q9EDKDfFUSlG7X0TBXITR4EwiAUX9HLa2aYs742WbyDnkqOrzx8+Rq4goTdKCUYxP
+	 tSK7QBE6fSdDDxkVtmgNJsy3J8uiHxClKhxJsICsrvTvfBQ05T7a1YcIkudf3Pf3jn
+	 zTPStg3nbh/K1VL2h8LGZsEdh2o1qKNhNeAh1jJ/tgMPnXvx/Hi82yNTMjFSyLTm5v
+	 gmHOnMMdrvC1A==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
-Subject: [PATCH v3 7/8] crypto: skcipher - optimize initializing skcipher_walk fields
-Date: Sun,  5 Jan 2025 11:34:15 -0800
-Message-ID: <20250105193416.36537-8-ebiggers@kernel.org>
+Subject: [PATCH v3 8/8] crypto: skcipher - call cond_resched() directly
+Date: Sun,  5 Jan 2025 11:34:16 -0800
+Message-ID: <20250105193416.36537-9-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250105193416.36537-1-ebiggers@kernel.org>
 References: <20250105193416.36537-1-ebiggers@kernel.org>
@@ -44,103 +44,34 @@ Content-Transfer-Encoding: 8bit
 
 From: Eric Biggers <ebiggers@google.com>
 
-The helper functions like crypto_skcipher_blocksize() take in a pointer
-to a tfm object, but they actually return properties of the algorithm.
-As the Linux kernel is compiled with -fno-strict-aliasing, the compiler
-has to assume that the writes to struct skcipher_walk could clobber the
-tfm's pointer to its algorithm.  Thus it gets repeatedly reloaded in the
-generated code.  Therefore, replace the use of these helper functions
-with staightforward accesses to the struct fields.
-
-Note that while *users* of the skcipher and aead APIs are supposed to
-use the helper functions, this particular code is part of the API
-*implementation* in crypto/skcipher.c, which already accesses the
-algorithm struct directly in many cases.  So there is no reason to
-prefer the helper functions here.
+In skcipher_walk_done(), instead of calling crypto_yield() which
+requires a translation between flags, just call cond_resched() directly.
+This has the same effect.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/skcipher.c | 30 ++++++++++++++++++++----------
- 1 file changed, 20 insertions(+), 10 deletions(-)
+ crypto/skcipher.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index e54d1ad46566..6b62d816f08d 100644
+index 6b62d816f08d..a9eb2dcf2898 100644
 --- a/crypto/skcipher.c
 +++ b/crypto/skcipher.c
-@@ -306,12 +306,12 @@ static int skcipher_walk_first(struct skcipher_walk *walk)
- }
+@@ -144,12 +144,12 @@ int skcipher_walk_done(struct skcipher_walk *walk, int res)
+ 	scatterwalk_advance(&walk->out, n);
+ 	scatterwalk_done(&walk->in, 0, total);
+ 	scatterwalk_done(&walk->out, 1, total);
  
- int skcipher_walk_virt(struct skcipher_walk *walk,
- 		       struct skcipher_request *req, bool atomic)
- {
--	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--	struct skcipher_alg *alg = crypto_skcipher_alg(tfm);
-+	const struct skcipher_alg *alg =
-+		crypto_skcipher_alg(crypto_skcipher_reqtfm(req));
+ 	if (total) {
+-		crypto_yield(walk->flags & SKCIPHER_WALK_SLEEP ?
+-			     CRYPTO_TFM_REQ_MAY_SLEEP : 0);
++		if (walk->flags & SKCIPHER_WALK_SLEEP)
++			cond_resched();
+ 		walk->flags &= ~(SKCIPHER_WALK_SLOW | SKCIPHER_WALK_COPY |
+ 				 SKCIPHER_WALK_DIFF);
+ 		return skcipher_walk_next(walk);
+ 	}
  
- 	might_sleep_if(req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP);
- 
- 	walk->total = req->cryptlen;
- 	walk->nbytes = 0;
-@@ -326,13 +326,18 @@ int skcipher_walk_virt(struct skcipher_walk *walk,
- 		return 0;
- 
- 	scatterwalk_start(&walk->in, req->src);
- 	scatterwalk_start(&walk->out, req->dst);
- 
--	walk->blocksize = crypto_skcipher_blocksize(tfm);
--	walk->ivsize = crypto_skcipher_ivsize(tfm);
--	walk->alignmask = crypto_skcipher_alignmask(tfm);
-+	/*
-+	 * Accessing 'alg' directly generates better code than using the
-+	 * crypto_skcipher_blocksize() and similar helper functions here, as it
-+	 * prevents the algorithm pointer from being repeatedly reloaded.
-+	 */
-+	walk->blocksize = alg->base.cra_blocksize;
-+	walk->ivsize = alg->co.ivsize;
-+	walk->alignmask = alg->base.cra_alignmask;
- 
- 	if (alg->co.base.cra_type != &crypto_skcipher_type)
- 		walk->stride = alg->co.chunksize;
- 	else
- 		walk->stride = alg->walksize;
-@@ -342,11 +347,11 @@ int skcipher_walk_virt(struct skcipher_walk *walk,
- EXPORT_SYMBOL_GPL(skcipher_walk_virt);
- 
- static int skcipher_walk_aead_common(struct skcipher_walk *walk,
- 				     struct aead_request *req, bool atomic)
- {
--	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
-+	const struct aead_alg *alg = crypto_aead_alg(crypto_aead_reqtfm(req));
- 
- 	walk->nbytes = 0;
- 	walk->iv = req->iv;
- 	walk->oiv = req->iv;
- 	if ((req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) && !atomic)
-@@ -364,14 +369,19 @@ static int skcipher_walk_aead_common(struct skcipher_walk *walk,
- 	scatterwalk_copychunks(NULL, &walk->out, req->assoclen, 2);
- 
- 	scatterwalk_done(&walk->in, 0, walk->total);
- 	scatterwalk_done(&walk->out, 0, walk->total);
- 
--	walk->blocksize = crypto_aead_blocksize(tfm);
--	walk->stride = crypto_aead_chunksize(tfm);
--	walk->ivsize = crypto_aead_ivsize(tfm);
--	walk->alignmask = crypto_aead_alignmask(tfm);
-+	/*
-+	 * Accessing 'alg' directly generates better code than using the
-+	 * crypto_aead_blocksize() and similar helper functions here, as it
-+	 * prevents the algorithm pointer from being repeatedly reloaded.
-+	 */
-+	walk->blocksize = alg->base.cra_blocksize;
-+	walk->stride = alg->chunksize;
-+	walk->ivsize = alg->ivsize;
-+	walk->alignmask = alg->base.cra_alignmask;
- 
- 	return skcipher_walk_first(walk);
- }
- 
- int skcipher_walk_aead_encrypt(struct skcipher_walk *walk,
 -- 
 2.47.1
 
