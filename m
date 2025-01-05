@@ -1,77 +1,95 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96DEE1CDFAE
-	for <linux-crypto@vger.kernel.org>; Sun,  5 Jan 2025 19:34:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B0181E487;
+	Sun,  5 Jan 2025 19:50:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736105697; cv=none; b=ndq7OtU+SHYChPhRjOLLSlkAgpsApW1sVXC7NzSzTUpIBVlh7n/JnBacDM7K3NjqR/aTeHHim0675tZzI/S7mEHliXIMlV5mcIW61lZz336g8OmmW9aUWYAZrE82a/JTnyK8Blevzx7MD4QGXvKvrJfcPybnZrlB9wqxIIu4Wk4=
+	t=1736106654; cv=none; b=CKpE8Hu13RJWOsTfkmcOCeUaNKQhkzdMvNIGV4cXNYJZK3s2ina8/HyzzWvDn9g06/IMtHQqjNH9SHpZ2ZNPTAQY32yAlRvRaK9PmGdjFwIDYfuuEVkW8K1eld/ia3Fp6YdJJBoF/WSYJPXzFa4BGYJFXz539h2wGU4Adu/SnDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736105697; c=relaxed/simple;
-	bh=gaMOcbKZNVJXlRF5msh3AmHXHZVVwOpWrFZVmfdFAG8=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nW42hAM4GBII+HQ/sZlsE1ZuWSGNMU8cXSmwl7ThNnghMAszHFeTy9nVAZ8TMozW+cOIcAut5dFmJb4Cx3C7XebOypu7xxPagbNlU4mkYhE0DEjt3K9WDYaxtrrsWN9Qq6pULLIUG84cp0XE44KS/5qaWJYl82PWux7k0btSI1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nBTSjf9U; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1736106654; c=relaxed/simple;
+	bh=H0ZeGG9PV73wo9OMpjrFAiK+VQBPtxslacSWLZhOyU8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=GBsSOLRZRRsP3O1obIWzk8LiXfqdpngEKCww1AKhOfa1n6R7Lwi+CynXQ9GcbRjp7hdUfV0S/6mDcZdBkDrtDBX8VZYb7HKMNg/G5RS2M8PUqRVdbjVY4021nu713FSJwJl6Cq2vr/BixfLOwJLxJQRtI+rxLjqQJRc6blHBAuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=T/o64Gfc; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nBTSjf9U"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18DBFC4CEE0
-	for <linux-crypto@vger.kernel.org>; Sun,  5 Jan 2025 19:34:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736105697;
-	bh=gaMOcbKZNVJXlRF5msh3AmHXHZVVwOpWrFZVmfdFAG8=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=nBTSjf9U67DTDQmSmBBpwT/XFsg3iUM/2c8L9E6HrhiE5m4UrJgSxLlRszb1xybmw
-	 b2lUV60s59rw4BgKWIYKoefj7Q0OQ2w6H/6fK6vtXbxVgYwRMcYlWocec3fwPXWirB
-	 0Q9EDKDfFUSlG7X0TBXITR4EwiAUX9HLa2aYs742WbyDnkqOrzx8+Rq4goTdKCUYxP
-	 tSK7QBE6fSdDDxkVtmgNJsy3J8uiHxClKhxJsICsrvTvfBQ05T7a1YcIkudf3Pf3jn
-	 zTPStg3nbh/K1VL2h8LGZsEdh2o1qKNhNeAh1jJ/tgMPnXvx/Hi82yNTMjFSyLTm5v
-	 gmHOnMMdrvC1A==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Subject: [PATCH v3 8/8] crypto: skcipher - call cond_resched() directly
-Date: Sun,  5 Jan 2025 11:34:16 -0800
-Message-ID: <20250105193416.36537-9-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250105193416.36537-1-ebiggers@kernel.org>
-References: <20250105193416.36537-1-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="T/o64Gfc"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1736106642;
+	bh=WPmJKjUzqxlg75YKdohmwdnGJB6F+VF1uNyPXJUy/eA=;
+	h=Date:From:To:Cc:Subject:From;
+	b=T/o64GfcZP8JYtbH5+xe+NDKL9MtxTc1/qS8n/4ZY972AhZSHd1K/NWtK7Cdii7Js
+	 4JmMOIv6+eBCmY4RHzufKLP/wXU3fUugei00TXJzDZhZn75BUXlaq2YtwTnPFeZSYH
+	 XedqX1bSYsicueyRBWJIAGnRa5REa5pNgn4idwZsQfnRXRuUgyKnxqq0InxD2CR/2/
+	 laV5SAekL/tJ+FljcAoprfbeaNX0ud7b0fJzz5VLnQrw2Q1pA+7Tp3+h/kW9mM6c88
+	 EHBKvMAOfqavmKO8BxhaQBaJQZvvZmzlY4K6Zdfl3A9vbn6bhNJ8yFkaEMPINMlYQl
+	 oq53/MgcWEhqA==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4YR7GB5CRWz4wvb;
+	Mon,  6 Jan 2025 06:50:42 +1100 (AEDT)
+Date: Mon, 6 Jan 2025 06:50:48 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Herbert Xu <herbert@gondor.apana.org.au>, Linux Crypto List
+ <linux-crypto@vger.kernel.org>
+Cc: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>, Linux Kernel Mailing
+ List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: Fixes tag needs some work in the crypto tree
+Message-ID: <20250106065048.3ce6090d@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="Sig_/tkaNrA1Tv4z91OhwbeANZBA";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-From: Eric Biggers <ebiggers@google.com>
+--Sig_/tkaNrA1Tv4z91OhwbeANZBA
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-In skcipher_walk_done(), instead of calling crypto_yield() which
-requires a translation between flags, just call cond_resched() directly.
-This has the same effect.
+Hi all,
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- crypto/skcipher.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+In commit
 
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index 6b62d816f08d..a9eb2dcf2898 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -144,12 +144,12 @@ int skcipher_walk_done(struct skcipher_walk *walk, int res)
- 	scatterwalk_advance(&walk->out, n);
- 	scatterwalk_done(&walk->in, 0, total);
- 	scatterwalk_done(&walk->out, 1, total);
- 
- 	if (total) {
--		crypto_yield(walk->flags & SKCIPHER_WALK_SLEEP ?
--			     CRYPTO_TFM_REQ_MAY_SLEEP : 0);
-+		if (walk->flags & SKCIPHER_WALK_SLEEP)
-+			cond_resched();
- 		walk->flags &= ~(SKCIPHER_WALK_SLOW | SKCIPHER_WALK_COPY |
- 				 SKCIPHER_WALK_DIFF);
- 		return skcipher_walk_next(walk);
- 	}
- 
--- 
-2.47.1
+  4ebd9a5ca478 ("crypto: iaa - Fix IAA disabling that occurs when sync_mode=
+ is set to 'async'")
 
+Fixes tag
+
+  Fixes: 09646c98d ("crypto: iaa - Add irq support for the crypto async int=
+erface")
+
+has these problem(s):
+
+  - SHA1 should be at least 12 digits long
+    This can be fixed for the future by setting core.abbrev to 12 (or
+    more) or (for git v2.11 or later) just making sure it is not set
+    (or set to "auto").
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/tkaNrA1Tv4z91OhwbeANZBA
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmd64pgACgkQAVBC80lX
+0Gw4rAgApBx3O822xML48Er1Oj0FP6/PrOu83MvjUPQPv/ZP38yfyIhyoxCknjLF
+2GxULYLfdrEkj0cGGwHNgkT/pjCl48XovxIaG9uyV646A1Q54cBelvSmC9PAR91b
+Qs3ShlFHlHR1dBRJ+72sgM5jABcgpVErnvpTU6ilkl9+N45SBsI/bnLNAvolz8dh
+xaTwqqUZ8eJcFvs4eniDqM7Lyih72K/wU2ODAKQTVxHPCnt/Gfu2dqIYsSiFJAR8
+erNn2rkifFwP0eZhdOyfON791TY1od2ZAJDdNo09Km90frP6N9/NGfiqBoyNIipf
+SFSLr1B3aKN3fawYhk6S+NAP0s5APA==
+=3mgj
+-----END PGP SIGNATURE-----
+
+--Sig_/tkaNrA1Tv4z91OhwbeANZBA--
