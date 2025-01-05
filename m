@@ -1,245 +1,194 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC13F150980;
-	Sun,  5 Jan 2025 13:00:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8433D10FD;
+	Sun,  5 Jan 2025 14:32:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736082017; cv=none; b=IDrQ3MGk1B0WX5pqsPfhxiU13LyZQTeVJxBUT6bch78O561044ehgQQfg6EW2GjjHY5h+Dor2gE1T4v1kyiX6xps8fqE4DTynH+VkuAGWv+XScGqw7sWMgza+O1j/5o9g6SxcFnOuJnrT09aSSbU3S2BBHXgRJJFMuQ1UQMYoP4=
+	t=1736087551; cv=none; b=bDacStKzE2kYu7s+kBkgYsPsze2ys5J+c0y3MBCAecYO+diafWq2lUchpZ02RrXw9IC1jOvgmnQtMIhsPngj5OmoI36ng/666Tr588UJnG3DFBKmo7aSzmZ8vKkCLdRhHx9mXKWLHte7u3/2l0+ikowSFMRBOKqxwpr7o5Pe+p8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736082017; c=relaxed/simple;
-	bh=gvis4SR/MbP0rEJuqQir65QphJBwsZNDw6ueWCgw5gE=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=r3WW/jYb/nomWtSo3NXob9EC6JDSiBE2YeykbfDDkrYwEo0g6ckR2TIFUJWjd87xlWGuZxdPh6CHMIA3vLLCy9cvgslY9uNyn1QIRH7wdu3v47gzIOsA2zEySjpvX6boTd8Ev5xiJTp/3NiOGIzEsOB+4+4SoCAd7r5XUBfWfcg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=AxUZnk5L; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1736087551; c=relaxed/simple;
+	bh=G14yom8Cu9mhma+1v4Us+/fG3RLzBMAvWG7oROWgTOA=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=YqvvKucDF3rWLM6lqBngPIGMI2TkOUEDNQu2HxoNbwTmcNXPdyVGOS1EiTaKqP5DyUtk/1zvQZQnL0tewPty1mCWzwf+y17mytKH6IXxwGHNxKdm4KWo8hq0+OV8WMxWctBhq5YjOfJ/9Krc1z+Zg9YNQfuYgFAsj3iNpjFRuZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P1l9HXw4; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="AxUZnk5L"
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 505BkLhn011998;
-	Sun, 5 Jan 2025 12:59:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=sXijJM
-	kyzCgi7iVH4zfN3oNlQTg/BGz4Ny95xTicY6o=; b=AxUZnk5LYvj61dQJDgiDZm
-	JHAf+y5VSL5pW5lkmRsvuzotCmW6d3eviKTIgaWUrbzbFB9KSZa5nLDlDkjApu4a
-	VpZHLV8SBpcTZcg/M7C8fcvUPBCAr50ykFVHYtl0Yty+YW3ViQ2gP/mODmNcK+i7
-	Snek47nN/PYO5GCispAbLUbDhNeNJbhXbzLFlKYH0HcSCt486SxHUjz6TCdfiYf+
-	jMNvlC7oG3Aeu8zFh/E/ZlUTnq3tClTH2RvcBatWbyYGcSjR29GhDY9vLp1wnRh5
-	J5tnV/rcoGwjs61ImOB0856JP55kubN0U0rS7efa12osu7xqvQfviv5A6M9pzwEg
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43yf4h1x63-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 05 Jan 2025 12:59:42 +0000 (GMT)
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 505Cxf7E011565;
-	Sun, 5 Jan 2025 12:59:41 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 43yf4h1x5x-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 05 Jan 2025 12:59:41 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 505Bue26008970;
-	Sun, 5 Jan 2025 12:59:40 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 43yfpyhvrs-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 05 Jan 2025 12:59:40 +0000
-Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 505CxdRp20447920
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 5 Jan 2025 12:59:39 GMT
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 462175805A;
-	Sun,  5 Jan 2025 12:59:39 +0000 (GMT)
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id CEF1458051;
-	Sun,  5 Jan 2025 12:59:37 +0000 (GMT)
-Received: from li-43857255-d5e6-4659-90f1-fc5cee4750ad.ibm.com (unknown [9.61.62.226])
-	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Sun,  5 Jan 2025 12:59:37 +0000 (GMT)
-Message-ID: <f7f82ef6ed63b91739e9c10cc34ea9931690aeff.camel@linux.ibm.com>
-Subject: Re: [RFC PATCH v3 08/13] clavis: Introduce new LSM called clavis
-From: Mimi Zohar <zohar@linux.ibm.com>
-To: Eric Snowberg <eric.snowberg@oracle.com>
-Cc: "open list:SECURITY SUBSYSTEM" <linux-security-module@vger.kernel.org>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "ardb@kernel.org"
- <ardb@kernel.org>,
-        "jarkko@kernel.org" <jarkko@kernel.org>,
-        "paul@paul-moore.com" <paul@paul-moore.com>,
-        "jmorris@namei.org"
- <jmorris@namei.org>,
-        "serge@hallyn.com" <serge@hallyn.com>,
-        "roberto.sassu@huawei.com" <roberto.sassu@huawei.com>,
-        "dmitry.kasatkin@gmail.com" <dmitry.kasatkin@gmail.com>,
-        "mic@digikod.net"
- <mic@digikod.net>,
-        "casey@schaufler-ca.com" <casey@schaufler-ca.com>,
-        "stefanb@linux.ibm.com" <stefanb@linux.ibm.com>,
-        "ebiggers@kernel.org"
- <ebiggers@kernel.org>,
-        "rdunlap@infradead.org" <rdunlap@infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-efi@vger.kernel.org" <linux-efi@vger.kernel.org>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>
-Date: Sun, 05 Jan 2025 07:59:37 -0500
-In-Reply-To: <6DDCFABC-8440-4316-98D4-E3F5C9532925@oracle.com>
-References: <20241017155516.2582369-1-eric.snowberg@oracle.com>
-	 <20241017155516.2582369-9-eric.snowberg@oracle.com>
-	 <0d71ffced35abf40bbfadb6e03b053c24757183d.camel@linux.ibm.com>
-	 <6DDCFABC-8440-4316-98D4-E3F5C9532925@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-2.fc40) 
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P1l9HXw4"
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-385ddcfc97bso11558447f8f.1;
+        Sun, 05 Jan 2025 06:32:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1736087548; x=1736692348; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=j7jtYVBmEwQu6L/gEGfLX0T0kQx+pmOUf5+fN+jViX8=;
+        b=P1l9HXw43M3/oJOw0a9udl4lpQoGCE2S4jiIjWlgt/sQZM+ne/vnM5mKTcUdGQXRU1
+         bGEd6JPNLqti17zoo9sOVsjTJOC5u/tqGHoHWEdMtVPeQADo0/yOw6Sz3n721qZfkaL9
+         U0KPsfwo5elv+rBVavMcZf3Z2vbnaak6TxIfoTb579JrM22BTigeL0zSL4MUvo8Lz9pS
+         wuq0F/BVPXS+EVqv/pXZZXITbLl6n+6wn4AjthDlcWIncHluUZNGS0C7Y+PXq/aijnNz
+         Xl7M9EWYFHESh0DvoFOnJXRrXAuBB6rZw06NvFZH7/V+UsYib4IauQ+JbCq0c830OsVO
+         2igQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736087548; x=1736692348;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=j7jtYVBmEwQu6L/gEGfLX0T0kQx+pmOUf5+fN+jViX8=;
+        b=E1JfDcE2tQ1mM63VTusZOmneq1sLOhUKHnLaM7OKMez6qjvxY4qPX5TGPJOnT9UXSC
+         9x8yc1xvhf76GeRFLO2X2QMwrdXeEl4d+/Bw4y20j+4HdJ4tKaQh+bLa6Wls2cVdaFCO
+         FyXePOnTTaSCnLaCD4DTo5NMvrm4L2UE5QPvg/l52Lif4uK24PZldCBuMa7NUAWegXRi
+         wJdBKV29wV8TQWUQyS/vPmAisG+pEFv3RJThBaytcZfO8yMYDMIQxQu3BDQ1fFEq8xFM
+         THJPOj4BOV7d0jMqfHSNDo9+siujMUu4lm+fcKuBQ5LV00QdOYkcZKgTO2R8zXjKdE5u
+         vqag==
+X-Forwarded-Encrypted: i=1; AJvYcCU6tSAub5logqBRhxdp0p6l4ZYNdFqeqdon5Zap7lmZKi7+pfnDARRzT5gw5p1zTmYbJSwNmWWFSY7i@vger.kernel.org, AJvYcCUxC0BvGPziILda3JOO0/zjmgLpXC24COrU/RyxoQsCmy1FDEWN7KbO7mmOvPBUrjQOFdCLhuaH9LhT6Cyv@vger.kernel.org, AJvYcCVVmQzYOmv3XDK+FSiypBFVlLyxMcmu2OlnHK+TCQdZ6zOr1RRleaRu/k2AhVAcIkdUg9wgkJyvHjiEFuxQ@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywqyzz6GKk7vQoP/DTGJkiusq9jhqZD1//Bu2DRHr3x230RNtFs
+	9a8UX8oBOdMm8pZkvwgb1jhwozDE9LJ8Ndh8yLEVp5BRCROjeUqjaHLwWQ==
+X-Gm-Gg: ASbGncsQmN7IlW8cxRSvmFwcBtB8qfz8mZxXPYLBlqAzgu7XPy37zzVfRtVgJxo8I9y
+	pVqgVXiyh28cq9fg9lqYCKmiphrACI9IaJzMCTxb4i+TqJ6uJEzXU6Z9T9Op2pPkC9LnMSbqEqA
+	ibJkD3CnbU49ikhvChozUC1Aytw9fMfAQS6puWwXmm0O2vdp0l6WB0BBZ1mYKaNr0dE3zvJZjo/
+	M277aqOtw5AzltlsImcXU33THwRGjMCJMAsP8fg5/RS1JNKLZX+AVotRdM0J0Up6I79zrCR5CDe
+	5Je/t9lXGm/r7t9AA75ENxGU8f1wTzzpzPF+ZfuWPQ==
+X-Google-Smtp-Source: AGHT+IF8tNz3GfY4u49mcFgAfGEi1eo1lKnxC2s/G4hUdUgJxBgrs22W3axBAOaS3XtaRFDnkbaEjQ==
+X-Received: by 2002:a5d:64cf:0:b0:385:e374:be1 with SMTP id ffacd0b85a97d-38a221f63abmr46951411f8f.13.1736087547734;
+        Sun, 05 Jan 2025 06:32:27 -0800 (PST)
+Received: from localhost.localdomain (host-95-246-253-26.retail.telecomitalia.it. [95.246.253.26])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-43656b013e1sm568189695e9.12.2025.01.05.06.32.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 05 Jan 2025 06:32:26 -0800 (PST)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Christian Marangi <ansuelsmth@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Antoine Tenart <atenart@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>,
+	Will Deacon <will@kernel.org>,
+	Waiman Long <longman@redhat.com>,
+	Boqun Feng <boqun.feng@gmail.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	linux-crypto@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev,
+	upstream@airoha.com
+Subject: [PATCH v10 0/3] crypto: Add EIP-93 crypto engine support
+Date: Sun,  5 Jan 2025 15:30:45 +0100
+Message-ID: <20250105143106.20989-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: sthn3heN-F8elAPpIVeydWkNYF6OSDI1
-X-Proofpoint-ORIG-GUID: sd254BjKuFHqdxrpjccUdOhjZwxzLQpb
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 mlxscore=0
- priorityscore=1501 suspectscore=0 phishscore=0 clxscore=1015 spamscore=0
- lowpriorityscore=0 malwarescore=0 adultscore=0 impostorscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
- definitions=main-2501050121
+Content-Transfer-Encoding: 8bit
 
-On Fri, 2025-01-03 at 23:32 +0000, Eric Snowberg wrote:
->=20
-> > On Dec 24, 2024, at 10:43=E2=80=AFAM, Mimi Zohar <zohar@linux.ibm.com> =
-wrote:
-> >=20
-> > On Thu, 2024-10-17 at 09:55 -0600, Eric Snowberg wrote:
-> > > Introduce a new LSM called clavis.  The motivation behind this LSM is=
- to
-> > > provide access control for system keys.  The access control list is
-> > > contained within a keyring call .clavis.  During boot if the clavis=
-=3D boot
-> > > arg is supplied with a key id contained within any of the current sys=
-tem
-> > > keyrings (builtin, secondary, machine, or platform) it shall be used =
-as
-> > > the root of trust for validating anything that is added to the ACL li=
-st.
-> > >=20
-> > > The first restriction introduced with this LSM is the ability to enfo=
-rce
-> > > key usage.  The kernel already has a notion of tracking key usage.  T=
-his
-> > > LSM adds the ability to enforce this usage based on the system owners
-> > > configuration.
-> > >=20
-> > > Each system key may have one or more uses defined within the ACL list=
-.
-> > > Until an entry is added to the .clavis keyring, no other system key m=
-ay
-> > > be used for any other purpose.
-> > >=20
-> > > Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
-> > > ---
-> > > Documentation/admin-guide/LSM/clavis.rst      | 191 +++++++++++++++++=
-+
-> > > MAINTAINERS                                   |   7 +
-> > > crypto/asymmetric_keys/signature.c            |   4 +
-> > > include/linux/lsm_count.h                     |   8 +-
-> > > include/linux/lsm_hook_defs.h                 |   2 +
-> > > include/linux/security.h                      |   7 +
-> > > include/uapi/linux/lsm.h                      |   1 +
-> > > security/Kconfig                              |  10 +-
-> > > security/clavis/Makefile                      |   1 +
-> > > security/clavis/clavis.c                      |  26 +++
-> > > security/clavis/clavis.h                      |   4 +
-> > > security/clavis/clavis_keyring.c              |  78 ++++++-
-> > > security/security.c                           |  13 ++
-> > > .../selftests/lsm/lsm_list_modules_test.c     |   3 +
-> > > 14 files changed, 346 insertions(+), 9 deletions(-)
-> > > create mode 100644 Documentation/admin-guide/LSM/clavis.rst
-> > > create mode 100644 security/clavis/clavis.c
-> > >=20
-> > > diff --git a/Documentation/admin-guide/LSM/clavis.rst b/Documentation=
-/admin-guide/LSM/clavis.rst
-> > > new file mode 100644
-> > > index 000000000000..0e924f638a86
-> > > --- /dev/null
-> > > +++ b/Documentation/admin-guide/LSM/clavis.rst
-> > > @@ -0,0 +1,191 @@
-> > > +.. SPDX-License-Identifier: GPL-2.0
-> > > +
-> > > +=3D=3D=3D=3D=3D=3D
-> > > +Clavis
-> > > +=3D=3D=3D=3D=3D=3D
-> > > +
-> > > +Clavis is a Linux Security Module that provides mandatory access con=
-trol to
-> > > +system kernel keys (i.e. builtin, secondary, machine and platform). =
-These
-> > > +restrictions will prohibit keys from being used for validation. Upon=
- boot, the
-> > > +Clavis LSM is provided a key id as a boot parameter.  This single ke=
-y is then
-> > > +used as the root of trust for any access control modifications made =
-going
-> > > +forward. Access control updates must be signed and validated by this=
- key.
-> > > +
-> > > +Clavis has its own keyring.  All ACL updates are applied through thi=
-s keyring.
-> > > +The update must be signed by the single root of trust key.
-> > > +
-> > > +When enabled, all system keys are prohibited from being used until a=
-n ACL is
-> > > +added for them.
-> >=20
-> > Until the single key has been loaded, Clavis is not enabled.  Any key o=
-n the
-> > system trusted keyrings remains usable for any purpose.
-> >=20
-> > -> When enabled, meaning the single key has been loaded onto the Clavis=
- keyring,
-> > all system keys are prohibited ...
-> >=20
-> > Until clavis is enabled, in my opinion the defaults should be restricti=
-ve (e.g.
-> > CONFIG_INTEGRITY_CA_MACHINE_KEYRING,
-> > CONFIG_SECONDARY_TRUSTED_KEYRING_SIGNED_BY_BUILTIN). Once Clavis is ena=
-bled,
-> > based on a new helper function is_clavis_enforced() we could consider r=
-elaxing
-> > some of the existing keyring requirements (e.g. kernel modules).
+This small series add support for the Inside Secure EIP-93.
+This is a predecessor of the current supported EIP197. It doesn't
+require a firmware but instead it's embedded in the SoC.
 
-For example, kernel/module/signing.c: mod_verify_sig() would be updated to =
-check
-whether Clavis is configured and enabled and then search/use keys on the ot=
-her
-system keyrings.
+First patch extend guard for spinlock_bh.
 
->=20
-> If I made this change, would it be acceptable to update the Kconfig=20
-> description for CONFIG_INTEGRITY_CA_MACHINE_KEYRING and CONFIG_SECONDARY_=
-TRUSTED_KEYRING_SIGNED_BY_BUILTIN=20
-> that the restriction only applies when Clavis is not enabled?  You don't=
-=20
-> think there would be push back that those restrictions are not always=20
-> being enforced?
+The other actually implement Documentation and Driver.
 
-Instead I would add a Kconfig "Note:" indicating that enabling Clavis relax=
-es
-the requirement that the key exists on the system trusted
-.secondary_trusted_keys keyring.
+The Driver pass all the normal selft test for the supported
+algo and also pass the EXTRA test with fuzz_iterations set to 10000.
 
-thanks,
+Changes v10:
+- Use CRYPTO_ALG_ASYNC for eip93_hmac_setkey
+Changes v9:
+- Rework hash code to alloc DMA only when needed
+- Rework hash code to only alloc needed blocks and use
+  local struct in req for everything else
+- Rework hash code to use GFP_ATOMIC
+- Simplify hash update function
+- Generalize hmac key set function
+Changes v8:
+- Rework export and update to not sleep on exporting state
+  (consume pending packet in update and return -EINPROGRESS)
+Changes v7:
+- Fix copypaste error in __eip93_hash_init
+- Rework import/export to actually export the partial hash
+  (we actually unmap DMA on export)
+- Rename no_finalize variable to better partial_hash
+- Rename 3rd commit title and drop Mediatek from title.
+- Add Cover Letter
+- Add Reviewed-by to DT commit
+(cumulative changes from old series that had changelog in each patch)
+Changes v6:
+- Add SoC specific compatible
+- Add now supported entry for compatible with no user
+Changes v5:
+- Add Ack tag to guard patch
+- Comment out compatible with no current user
+- Fix smatch warning (reported by Dan Carpenter)
+Changes v4:
+- Out of RFC
+- Add missing bitfield.h
+- Drop useless header
+Changes v3:
+- Mute warning from Clang about C23
+- Fix not inizialized err
+- Drop unused variable
+- Add SoC compatible with generic one
+Changes v2:
+- Rename all variables from mtk to eip93
+- Move to inside-secure directory
+- Check DMA map errors
+- Use guard API for spinlock
+- Minor improvements to code
+- Add guard patch
+- Change to better compatible
+- Add description for EIP93 models
 
-Mimi
+Christian Marangi (3):
+  spinlock: extend guard with spinlock_bh variants
+  dt-bindings: crypto: Add Inside Secure SafeXcel EIP-93 crypto engine
+  crypto: Add Inside Secure SafeXcel EIP-93 crypto engine support
+
+ .../crypto/inside-secure,safexcel-eip93.yaml  |  67 ++
+ MAINTAINERS                                   |   7 +
+ drivers/crypto/Kconfig                        |   1 +
+ drivers/crypto/Makefile                       |   1 +
+ drivers/crypto/inside-secure/eip93/Kconfig    |  20 +
+ drivers/crypto/inside-secure/eip93/Makefile   |   5 +
+ .../crypto/inside-secure/eip93/eip93-aead.c   | 711 ++++++++++++++
+ .../crypto/inside-secure/eip93/eip93-aead.h   |  38 +
+ .../crypto/inside-secure/eip93/eip93-aes.h    |  16 +
+ .../crypto/inside-secure/eip93/eip93-cipher.c | 413 +++++++++
+ .../crypto/inside-secure/eip93/eip93-cipher.h |  60 ++
+ .../crypto/inside-secure/eip93/eip93-common.c | 816 +++++++++++++++++
+ .../crypto/inside-secure/eip93/eip93-common.h |  24 +
+ .../crypto/inside-secure/eip93/eip93-des.h    |  16 +
+ .../crypto/inside-secure/eip93/eip93-hash.c   | 866 ++++++++++++++++++
+ .../crypto/inside-secure/eip93/eip93-hash.h   |  82 ++
+ .../crypto/inside-secure/eip93/eip93-main.c   | 502 ++++++++++
+ .../crypto/inside-secure/eip93/eip93-main.h   | 152 +++
+ .../crypto/inside-secure/eip93/eip93-regs.h   | 335 +++++++
+ include/linux/spinlock.h                      |  13 +
+ 20 files changed, 4145 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/inside-secure,safexcel-eip93.yaml
+ create mode 100644 drivers/crypto/inside-secure/eip93/Kconfig
+ create mode 100644 drivers/crypto/inside-secure/eip93/Makefile
+ create mode 100644 drivers/crypto/inside-secure/eip93/eip93-aead.c
+ create mode 100644 drivers/crypto/inside-secure/eip93/eip93-aead.h
+ create mode 100644 drivers/crypto/inside-secure/eip93/eip93-aes.h
+ create mode 100644 drivers/crypto/inside-secure/eip93/eip93-cipher.c
+ create mode 100644 drivers/crypto/inside-secure/eip93/eip93-cipher.h
+ create mode 100644 drivers/crypto/inside-secure/eip93/eip93-common.c
+ create mode 100644 drivers/crypto/inside-secure/eip93/eip93-common.h
+ create mode 100644 drivers/crypto/inside-secure/eip93/eip93-des.h
+ create mode 100644 drivers/crypto/inside-secure/eip93/eip93-hash.c
+ create mode 100644 drivers/crypto/inside-secure/eip93/eip93-hash.h
+ create mode 100644 drivers/crypto/inside-secure/eip93/eip93-main.c
+ create mode 100644 drivers/crypto/inside-secure/eip93/eip93-main.h
+ create mode 100644 drivers/crypto/inside-secure/eip93/eip93-regs.h
+
+-- 
+2.45.2
+
