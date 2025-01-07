@@ -1,86 +1,70 @@
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2088.outbound.protection.outlook.com [40.107.223.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98FD71F63C8;
-	Tue,  7 Jan 2025 18:45:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B79B71F190E;
+	Tue,  7 Jan 2025 18:53:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.88
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736275514; cv=fail; b=mc6HgXEj8BAMqjaYksDJDy36l3qa1/8fInRZnoVqtlozoFJFfIHq/an4YSmil2Ga+FUoQNK46k6hXZb8yRLc+7q0dadcGYsgVUXwsomIKL4RuVra0XnQ0G4TrP4GMXlCxkAkMzvZQTx63KKK57OCsekPav6tvssWb4hVQe5D2Sk=
+	t=1736276027; cv=fail; b=Qxht8pnH8lPd3OPmiO0sFTM7aLFbTCVxU4Uhh/bUJldY68tX86pUXOVMzE2Jup8ImCd55XD3wSTsgsxKPFBOBciaX54x7BAqT7X4Ebp94oN2dppoCg+qeTdifJIxSTN6JHCNujlysaqfudaJm0IGyFhIZJHI+ZKBaaRfnQy60Qo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736275514; c=relaxed/simple;
-	bh=XJeWGUPXMmzbBK6MmKpgasAiDA5zhM3FHOnnUwleMa0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=LPVsfrmcKJeJ+JMosq5FfZyb6SRIx9c/ziY8hb3CyUp0KDgT8uIj1LIhWpwLTadsy0hmm2ChRxMri7L1iRUFPIeSsNgkkhjvXN/pgOvc6Uqhk4rGoX/1hG9MBn/i/66Fy2aKt3VDS3Jinlcplotx6TFVfgrmEDMYi3AYV2E1MRU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=HedTvCQC; dkim=fail (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=ryOUJJ9D reason="signature verification failed"; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	s=arc-20240116; t=1736276027; c=relaxed/simple;
+	bh=uiMbTNNvmDygVMEEfy3N8sfOzxlBFoC5E978zwcCRnY=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=f7VL6/cU15+cUQk2XIb7C1+y5DfWRrd4bRIxqsAACQ1ohdPZrMP9DmID13NG+2Yb0P/aFes006A+4XtzFJ5/zXjMZ720Ehqm5EOFDWlATO22hVxpS232zWN07QAxEMuiM4vwkMuWm/x3OUmGAAQvHJLjrBgu8FzM8Bpuk6BMd/A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=F9g2blcy; arc=fail smtp.client-ip=40.107.223.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="HedTvCQC";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="ryOUJJ9D"
-Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 507HMqQJ012756;
-	Tue, 7 Jan 2025 18:44:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	corp-2023-11-20; bh=6hu9cuOZneVflH8Vl2xrCmOdHEJtjEtgeh/zE1BWDn4=; b=
-	HedTvCQCs8lLvX9EHkmu/Vz6wG2KtuV5Z+ZxOjlsyJi4+A+aiAfT5RLkMOh8Dtet
-	gQebhvU+vM4Ysk8STakwl4syhvBNjeAykaaG6sIZtomOWcQr0M0BkNTkEf8fO7mE
-	2rnBxGwtFaqDlPI8eSI/f80Qt4BWV3W98TCR+lBrgccIWHgt7LuuM1qjqOqjD4cl
-	3UtrR0+cyvTpoqnPP/BA/RQn+g6byU8JxrhR0jbqMxnLaxPEzsC8+hfuQNgWbT3r
-	pcwq1DCKqbXZQXpwHJyosACzoIEUQviFRjGwZIiHxdJdI7Brs4RewDa5iTf0Pe11
-	aZIZXyPKpTulpcLDfvytUA==
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 43xuk05p7m-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 07 Jan 2025 18:44:51 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 507HU6Ya008536;
-	Tue, 7 Jan 2025 18:44:50 GMT
-Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2042.outbound.protection.outlook.com [104.47.55.42])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 43xue8ngjs-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 07 Jan 2025 18:44:50 +0000
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="F9g2blcy"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=BLNFzp6UTk5IfyksMFOx0JFLjwxpEKMMprOWPCFZgwyT0upHROfI7DhFYKFrauuHFz/TS9tTu9XsrZRIVSMJHPd1P0RihMRwznWMmDcgbJZoXzDMombd91DDgfNnnoP9cdOMrwDwyFv3bcai7xChZoASqmBUsqNmjGDw4PW6vSYsOlEdrgIjopvHU0Fs3a/Inlc0F5uTDJB+uMBQUnqXp2eJ0lbgcUjPUhVi9efoQX+DtPoWAqaPvCR/doqBPrA+lqKl7f6/slbckwDT28jFnwGoEl9A2KaGKUn4gsCz07TRGPZCGVknUbSZCFz15Yx/V+T3R4Zc9hQy0L2Ts5Rsog==
+ b=IJGa2RS/PXueMfOxGJZ67ZVpnqF+tv6A1RXtyMFvb8miKG9uxDmUwJUWHUFmuhyhdjv4ayWHE5Fu/DHs72HApuvkN6VoBuM5JQy0UP2yAAJGmVUD4MS0ReGTDgrscIOn+59dKENx8hSHlAmvtat8dI10dkMM/odjq4Qc8o8FUQxY2jRsCM0vxBD3eLxpVDq072B5KZ7allfbFYy/LOiqwHATrFX1KwWIlYD7TV/g3TIO95tzKRB24h8I3pCXPHr1PiK+W7LgthTu/5jgXfzUUMrvc8w8YWeklvHPhDQivGkwUWEt77G5JWcoZZzM+VYQ6aQYqxYXaZOK2kShMzReRg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uw5deANRiiHE+6AQfM2cvoQgvG7a0PRNhB/3XaoWYfQ=;
- b=fg9H4v+JINsfe7RxEP8UdlPShXvdg3rAqi+3EBBV8UhfrHFxC8SjCYq716veOiv3V2Dv+d7IoNn6GAbkpdedAoFgWK8Ed/aMPbz83eGZUM/p1WbZW2omYjYAyC/bJqMB5dEekcGaCGhHKOmHsB/pt96fqo5EavAiuZ8aJWJNj09Lo0HlMk7vy4CSBraCPTMB3sHAPFUWMYtKoDRYUnaCZ1WsC0EdmmWWkgyzMtHrzqMf0ugrCn/uljiz+m1ENXixJfF2mCYjt8anZYvoJOF5hvaE/qpiRMHOZ5BH1zjSighNleRInRQP8Jh6nXG3KJIeaG3RPk2RE0+nSzSlXAgIEg==
+ bh=RFS0xdTUowo5Pxgw4YCvSHb5B0z5SY541PFH+typIIE=;
+ b=YkmpTIzWDabaworNGDFBH8RaSNfMrNC62t53apm9i1NKpEGSBBKCANYJrLXZCi1nfg7pbsAoZ6fTaawtwx/gD7jeb4x/R5dBIrLGNskJ1OBLKXM7psj2es0nBRJC/C63womls+wSMnriouD8dIkSRBVgRTd7/2Y4v/heaLbTWkqSIo3qvAUkALsKJa6dZwWp0juJxxIG6sMjkwWEWYGsQAnULypB1roRhCZaoTo/EFMzFhwRlLbFKLOrnzKMrik5HvAuLamrbPO8CBx5g+4jJbPN+GsnP03Xhm9p2Wx1iybqbK+iHXdXS4j3fbfga9xC+ZqmRSzPfrys5agJEVYKBA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uw5deANRiiHE+6AQfM2cvoQgvG7a0PRNhB/3XaoWYfQ=;
- b=ryOUJJ9DhTayT7C5TTH0is6ntKw6cBk5A6PQOxsAMN4aFATlTbMhHvRD4NLPc37MivpOLGQRVCqisL2TvqPOywkwpSNMVUfDbgbklAWveY1weMz58PNedRyk8sK0Njb0Gha4GHdLkd9WAp6sNQC42ZoQEng9m63xqgDQvpqFjdA=
-Received: from DS0PR10MB7270.namprd10.prod.outlook.com (2603:10b6:8:f4::13) by
- CH2PR10MB4213.namprd10.prod.outlook.com (2603:10b6:610:7f::24) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8314.18; Tue, 7 Jan 2025 18:44:48 +0000
-Received: from DS0PR10MB7270.namprd10.prod.outlook.com
- ([fe80::1858:f1f7:dcfc:a96b]) by DS0PR10MB7270.namprd10.prod.outlook.com
- ([fe80::1858:f1f7:dcfc:a96b%3]) with mapi id 15.20.8335.010; Tue, 7 Jan 2025
- 18:44:48 +0000
-Date: Tue, 7 Jan 2025 13:44:45 -0500
-From: Daniel Jordan <daniel.m.jordan@oracle.com>
-To: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Dan Kruchinin <dkruchinin@acm.org>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] padata: fix sysfs store callback check
-Message-ID: <glzyvnafetarrwewer2kfuhwnnxq2fjx4eqhgrwpovzueulv3x@4xymhc4znhfk>
-References: <20241227-padata-store-v1-1-55713a18bced@weissschuh.net>
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+ bh=RFS0xdTUowo5Pxgw4YCvSHb5B0z5SY541PFH+typIIE=;
+ b=F9g2blcy7sLL7W9VSd3oTge56M4sEVgE7d/tv5hKSBpaaQ/ytHA1l9fP0sCdizLGUej86Gcvz7eoW+E41KnYSrK9KF2PdWrg5iiE1dLoKNVrbx3nTEk4L0KBxv7p340qFBDQhvulwjgLrzkpsZxmTL3zWG5k+6/K+zWhBVnDICY=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH7PR12MB9066.namprd12.prod.outlook.com (2603:10b6:510:1f6::5)
+ by CH3PR12MB8305.namprd12.prod.outlook.com (2603:10b6:610:12e::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8335.10; Tue, 7 Jan
+ 2025 18:53:41 +0000
+Received: from PH7PR12MB9066.namprd12.prod.outlook.com
+ ([fe80::954d:ca3a:4eac:213f]) by PH7PR12MB9066.namprd12.prod.outlook.com
+ ([fe80::954d:ca3a:4eac:213f%5]) with mapi id 15.20.8314.015; Tue, 7 Jan 2025
+ 18:53:41 +0000
+Message-ID: <5391cdaa-ac29-4964-b2d6-59d2ba38d35d@amd.com>
+Date: Tue, 7 Jan 2025 12:53:38 -0600
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 2/7] crypto: ccp: Fix implicit SEV/SNP init and
+ shutdown in ioctls
+To: Alexey Kardashevskiy <aik@amd.com>, seanjc@google.com,
+ pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ thomas.lendacky@amd.com, john.allen@amd.com, herbert@gondor.apana.org.au,
+ davem@davemloft.net
+Cc: michael.roth@amd.com, dionnaglaze@google.com, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+ linux-coco@lists.linux.dev
+References: <cover.1735931639.git.ashish.kalra@amd.com>
+ <be4d4068477c374ca6aa5b173dc1ee46ca5af44d.1735931639.git.ashish.kalra@amd.com>
+ <a6cfdfe5-37b5-4d86-9a97-ac75720ad424@amd.com>
+Content-Language: en-US
+From: "Kalra, Ashish" <ashish.kalra@amd.com>
+In-Reply-To: <a6cfdfe5-37b5-4d86-9a97-ac75720ad424@amd.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241227-padata-store-v1-1-55713a18bced@weissschuh.net>
-X-ClientProxiedBy: BL1PR13CA0170.namprd13.prod.outlook.com
- (2603:10b6:208:2bd::25) To DS0PR10MB7270.namprd10.prod.outlook.com
- (2603:10b6:8:f4::13)
+X-ClientProxiedBy: SA1P222CA0125.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:806:3c5::19) To PH7PR12MB9066.namprd12.prod.outlook.com
+ (2603:10b6:510:1f6::5)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -88,100 +72,408 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR10MB7270:EE_|CH2PR10MB4213:EE_
-X-MS-Office365-Filtering-Correlation-Id: 551577c4-5396-4803-6c3a-08dd2f4b5c95
+X-MS-TrafficTypeDiagnostic: PH7PR12MB9066:EE_|CH3PR12MB8305:EE_
+X-MS-Office365-Filtering-Correlation-Id: 49309c75-eb6c-4ddc-5d83-08dd2f4c9a6f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7053199007;
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|7416014|376014|921020;
 X-Microsoft-Antispam-Message-Info:
-	=?iso-8859-1?Q?Oc5MR/QvbgjcSqW9/9sfUYTc8KqYrgaKehJE9HYoM+lf3sohI4hTZRpEo+?=
- =?iso-8859-1?Q?jOT3bxBP+3Yevx53jqNenQrA2wDK7YVHHPSq8nahjQVUv0+WtpMNTnw1Ol?=
- =?iso-8859-1?Q?8bdgj+5mFAVMtkB2W+TjPmPWkm6fVGqYgt0fQ5OHXl9Eg6wyo48qMf3lZf?=
- =?iso-8859-1?Q?YYM1TeQ7Oj+W3tHX6if8rr+mHo0jG0YwPHifrR4TyEehDiOB6yvg0qNlzg?=
- =?iso-8859-1?Q?C/TbRe6JbvLZY0Zb016BDkpPJ4jd7V+4IOg7bq6KG4mumB7xmx0c6CUgyL?=
- =?iso-8859-1?Q?M3cezCzVWEjgbQpVtofqotAQFX/Au/tYlqHi05T3SUOCZG7YAE4c2dFyez?=
- =?iso-8859-1?Q?fvn9xtzym/b5Q4bW2LdtiouV8yChBdcI65Vh94/65aBTyXuKvXaefQ/lm/?=
- =?iso-8859-1?Q?LJ46VTmG8WtIfhxJ/TMfsGAGA2DaP5ug3J6h0kYqqqMGK4tGW6YibN0WCY?=
- =?iso-8859-1?Q?4jvzZFFV4A4xA/1fG45C8rKEiKqT02+kDNlMzaLdWrgLDamHez1oCvSDlE?=
- =?iso-8859-1?Q?2j6//zuBqseOv8r0/LLsqjPdLF1D3+trG1G2PMnzz3N1l1O8zIre1pcvoU?=
- =?iso-8859-1?Q?L6Ekgx/vVaMXo21MR5uDqcgtoxV4Z6roHbAXYkuWfPqSpZAHqZyMbZCHw+?=
- =?iso-8859-1?Q?lwUtaOAnstqXFKpu1e48S36W+ZE9k81F+j2X0tzxbHWUce7hqLiaB24VRs?=
- =?iso-8859-1?Q?fCLf5EFOB4C7zriiitFI1cz9vbsh0e1zquk2YCxgpiiw6xxkUvugf8ARHk?=
- =?iso-8859-1?Q?i+iF8OfR9FmKC6ywSaIDIyO0zsMysNPi4eIBvyz9yUCXSwmBdU0SaWm0ZC?=
- =?iso-8859-1?Q?Qv67mr74YB8lSBEmJMgReyjNW3uCMy1ZH78cFHx2ZXRREB5LnGNGJKYonN?=
- =?iso-8859-1?Q?T7H5fYzTVVgJQlxAWIOKSfrLf/lVV6q7CqiGCjohCsW9ak/EXKLyQSM2ap?=
- =?iso-8859-1?Q?KuVyIUCK1Jnj2WtFYnIYsHGRJ+Dh0ZOziD4x1Jwy2oksfZGQN9nN9Hqgxe?=
- =?iso-8859-1?Q?HYmMscL4NPR9f262Iwd/4/2zhqnjb8QiOqqjqLXzsuZm9xCuqq6pwYNKTV?=
- =?iso-8859-1?Q?jCTOTXe7rL3llsbtNlDJ9qsFaXK/vr22jKcPWXHNKMN3ektKyb6b3IX974?=
- =?iso-8859-1?Q?M9I2TRYYu1bIO0aIf66JsOztUf1AEr26mBBdgAjDUxOGbHvB9GoAze+qqa?=
- =?iso-8859-1?Q?pehg4i/BGKRJ3Gi6JYFsULnF1RuIbMsqaEa6yn1XfiINFKrXWbt+wsKZ9c?=
- =?iso-8859-1?Q?JqvtTX2fufsCPAaLMW1L4YC3qFdrlXorCW532O/t0p9E8AthG4ZGyVsKIK?=
- =?iso-8859-1?Q?rkNoJdHQcVTDez9FD3Sf+jR69Y60Wv4k9JDrgPOlCeHwnEYmcIcbQj21gr?=
- =?iso-8859-1?Q?Pnb7cnRjgiHyBXsEqm5cQy03bmTP56sWHKcHgLL6HIy0jApbfZTt3+w+Ve?=
- =?iso-8859-1?Q?CFUzlmHIEb0bF2tP?=
+	=?utf-8?B?em1sKzU5RVFGRHI0cnJHY202cE1nL2tNakFFWlNvNi9kU1dESmc4TUJYS1ZX?=
+ =?utf-8?B?VUNJaEZSMFlGZHRvUUZIaWJuMmtQR3NuRGJmVzZmaEg3QUwwNmdVbUNJcTgr?=
+ =?utf-8?B?Vm0zdGJ5bDhZWm1kTnd3K1FLNC82cTBXQ21Lb1YvRFh3c0lHbzgyUml5dlV4?=
+ =?utf-8?B?U0lUTXNRVnNyS1VYc2ZTbnQwR0xwa3Z5WFE2YUN2MTJIa0tzWi9QQmZhV0Rz?=
+ =?utf-8?B?U0crQkQrbnVTcmVJanB6b2lJR24wNFlYNnZkM0pnbExFdnRLS20ycnJXYUUy?=
+ =?utf-8?B?cHhkOWFOUW5xWFZhL3lkMWJzYnowdDl2YmFkWTFTOENlZ2FxRnZIT3NXR1FX?=
+ =?utf-8?B?WncrdUlTVkVQN1JVZFRpZ2drbzRwV0RFTThIMHhsNWljWjN5WUNkUDh0SjJG?=
+ =?utf-8?B?UTVKUHFEZTQ1dUNmOUNtRGJVZjQram9qVFVsaW5kM1pWTVJVSXlGSy9PdWp4?=
+ =?utf-8?B?Zk0vMjRVOFpVUG5lSzEvMXRTRXFhS1BtY2FSdjU2czlhMnFnT1c4WkxuNXk4?=
+ =?utf-8?B?TGYwOG5uVmRRS1E5TDVzNVVVemlaVXFWZmhKZkxVWHQ5UlBjU1dXNDc0UEdl?=
+ =?utf-8?B?THh6S1BlbnVWTHhjTDVJT2N2WnRLdkRNTUVacHJjU0kxOUZsdkowOVNmaUty?=
+ =?utf-8?B?TVUxL0t2cWhiMitHa3kzOTA0azdSbzhubitYbmovWmVja1ZYL2FaZTQ4OG15?=
+ =?utf-8?B?V0JleXh5V201NzVkOHdTNUhrQ1U3ODJkaHh5ZmxNdzVKb1R5emxudVNRMVBI?=
+ =?utf-8?B?WS91ekFBaisvUmlLd08xUVovNnNHMkRWUWtBZE95bTRDVEg4OEpVRmRPUG96?=
+ =?utf-8?B?emkyQjhmU3VINEhaMktxenJUMkN0NkI2bXF5RUhnMERRMC9zZCtNcGhvcmZv?=
+ =?utf-8?B?VUV4L0tKL21ybkx0SUhZdHluYWlxYUFpbGtGUWx6RzJkMXlPSU12c0Q5UTBJ?=
+ =?utf-8?B?b0VXak1lM05oQU1IQXlFenR3ZkhPaDhWMFBPSkRQcXJUL01nb3RrTHN6UXFa?=
+ =?utf-8?B?RjlNVVFYVmVoMjdEWEFxRnN2YkdZd0JvRStISkdzWXVyMFRyZkdGUjRxQ2Nq?=
+ =?utf-8?B?TGQ4MThsRE9Kc0ZZbzJoMkg5N3diNVFNd3RiZkZOdFlDV2toaUxIRy83YmtP?=
+ =?utf-8?B?WG9zTHBHUDdQZWIrQk5mT2VJeGhURFdaV3hDeU9ia2NZNDNMWDQxbHpqbU8r?=
+ =?utf-8?B?U1ZCRFpUTC9HUktLNk5zUDZZQ2kvUWFlNUU2dUhXVWVCbzBUMmUraWZGSWYv?=
+ =?utf-8?B?ZkhGSGErbTVJdU1DMTNYbHRpRVYwZ0RlUDRTVnhLU0RvZTlsVnNhdkNmbXBi?=
+ =?utf-8?B?S2pJajBQc2VRNUNlenRuaFBHcVRsOWtJTE1sZTd6NWZSa1grM1lWSkIyL0ZZ?=
+ =?utf-8?B?eGlBL0podC9zak5FUWRFRzBmTERReVNkVzErNzEvdDNKNGxxRGJaOG0xcXJo?=
+ =?utf-8?B?OG02akhrZ2ZEcVNaRmhRM013S2xlUFNldWxYWkdFdGdsaEZhMnd6YzhmYUox?=
+ =?utf-8?B?ZmZtQzRuR0lBUDloK2loRzBCVlZENEoybm9ybi9hVGtmalRxVlpIemd3aGZT?=
+ =?utf-8?B?R3FTaUw2cndwNDh5YmlGV3IvS1BIN0M4WHhFNG1RSzdFei9NVWdEV3hOM2ht?=
+ =?utf-8?B?S3M0bHRSR01mRWhoOWd6SFJqL3ZpYnphbG1TWjdFQUN0ck5ZTVJMUDNjeEg2?=
+ =?utf-8?B?YzZKY1I2cTlCT1Jvd2p4RlBHWWJ3VzkrbEJlRkI3RlRsWEV4cjdTTklBZ0pa?=
+ =?utf-8?B?S0c4d0N2OXlxbGY0Sy9HQ1hTN0VLRFc0bVF1Mk50MVovSzFFWkxBdk5JcGpo?=
+ =?utf-8?B?cjZPSmlrUEh2WWhqeWZJbWxVSUFFNURyRnp6NUtnTHBFUDJxbTFjTkhpWGxq?=
+ =?utf-8?B?cXIyWXUwOHpzSTlaNjBWWXZRTnFzWFdJS3VtdHlDVk1BZzZhZzlxeU1QYlVH?=
+ =?utf-8?Q?t/maLZEUsPw=3D?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR10MB7270.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7053199007);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB9066.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(921020);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?iso-8859-1?Q?u69Gc6rayVMvgcE0Z9f5PQg9Drfq6eLYH8maZyawfpAzeNNozsyLW3guoJ?=
- =?iso-8859-1?Q?+P5Ygag/q9PPW8xenaaCbD/5j5zooB4MCGcrGViRcn3Ee2XWzrEzKlL0UV?=
- =?iso-8859-1?Q?bT9WIrVVZxl1dp1v0zTkIWwA2dPXtHQaNQ9t9aiI1z3VBdEN/QUB83NHS+?=
- =?iso-8859-1?Q?9NyHFYlFIQAbRkw4cm7Dakh7KKtK/mEd9NuMzVJROaXrblpN08DuZddt9o?=
- =?iso-8859-1?Q?N9XJPNYxrC5xtm0SzrhzYQ5fCumQMYmHirvdE016FNrHB3+yH38WHST0Py?=
- =?iso-8859-1?Q?PhEMZMMKjb6RaRh3rCJaVXrhymybvoiziMvkQkItDPnftsHeqRjBKJupYy?=
- =?iso-8859-1?Q?70QnPPicdmJawE1GN0F82d9Q7Qq5zzZla+Qa67srk/w3cm0CVDu2FKYG7X?=
- =?iso-8859-1?Q?rAutgc/A/4geVEfO+bVznonX+qk3ANROLNauFl6Lj7w9pr4aTka9kk5ubt?=
- =?iso-8859-1?Q?Jux2rbu5MdvAhEzqyQxEtz7l93V+bmY5rmmhEM1/NzuuxRFr/Lq9NtEvEn?=
- =?iso-8859-1?Q?3d6vRnu9x+VpaUU8ppEhK36iTnvptHReMOyE/1gsj1FifiDs19xRDvxN8T?=
- =?iso-8859-1?Q?P3spE2HjIcrGNXXFlmaS6+fvcQpJBZOLH9Fo5R/IIsksMB/uvsAJNbwHj5?=
- =?iso-8859-1?Q?cCcE/Y2yQthG90o/AbvQRqvZDkM6XtPmCbaRpO7EZx1deKDHv97eEODm6J?=
- =?iso-8859-1?Q?NoQ+7j7aGaU6Of6upKdw+Dt/2d293MTSe8mqW1LitlFJ6r4goaVz86ZlBy?=
- =?iso-8859-1?Q?VJ42C0ySVzGrpDI80ekafC8pezNO77RdJUKIxUELzMySYx8d362fos8N+W?=
- =?iso-8859-1?Q?HDkQcsQM5zO4ySqxmWokZuxz+YmjdcHP8AnH09XyMi9/xyqEXgoE8mrrkm?=
- =?iso-8859-1?Q?oLL2SUZdHUkOYb94tYW8HlokhtercSEizLD8+9BF+ai4miAW6H/tqxiCgw?=
- =?iso-8859-1?Q?H999lkZCpSmtTGey5Ws4sTtl2QVu0ctP+zePj1k25CVq3Sh4sXau/Xs6x4?=
- =?iso-8859-1?Q?vl3Gumnu5UtZqMGoTxyfwLtC7RKl0wt4dtP0xk4kat0OGzzYbWs9xeNHre?=
- =?iso-8859-1?Q?N9U7FmTkhUkfn3arCDZom6LjwwDPiwnj6mzaY1LTfD+WTyUPDoNl9OgJwG?=
- =?iso-8859-1?Q?8MBbz5kO2VMtBrMPejoG8cNa8T/mqPzjyYjGl0nC+4Tp8jEORsMh+bNPvQ?=
- =?iso-8859-1?Q?4YfWtiVRtDdyiQ/SUDRAkCLR4QemZzRVJPnn+4rDoKV2Vcetu0dEnxNMdk?=
- =?iso-8859-1?Q?IVh+MHpKK9FmVLmQfLoJjOyvQKd1NxV52kAF+cu++T+swl0nJB01ZrqFKp?=
- =?iso-8859-1?Q?X+/wawR+HtJSEBmCqEIAlg8teaKIdq1/HCNy8b9iHusxri17zrXZ9+Lhz+?=
- =?iso-8859-1?Q?dXFxIJe5qzYia05R78xIHwKZBu6aOFkNnSFWCkZN0HHianvy/5KM8fWsC3?=
- =?iso-8859-1?Q?lHucOI3ccCGT26Gg9k5+52o+VJeY5bLARFBbpCA+iAppV0xGM6j88lzAlL?=
- =?iso-8859-1?Q?IB80zmCtS0VPelMSdioFH9mp3L16ahfT8zmNoCutnMSUSYlP9eKDjY0p4a?=
- =?iso-8859-1?Q?FeDCJdn0Ay+FT99JshcW5+OStKi0bd6Jc3EY2pOV98oLHqHJo8vhyeqldR?=
- =?iso-8859-1?Q?KFKRs/1VzLEcEnkDwYOc/+UI5n48869PvkTp7umBeIaEh+DTrssFkTdg?=
- =?iso-8859-1?Q?=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	7+dQHaIBAvzhmy2vfgFlwlc3Q9I+L8Ublgn0TgG+WTQeMyGcVFloVN8idZzRzuYu3inpRzZUIPm7oD76oQ3rlCe1x8sW7hMnSKekcmQNv/1RTO//QP7bjvPfulbnPZ8LA4ucU057y74cmJZTBArwjlnTJaDdJmx4494orHY3BjbvdW/Fs3UzFk8G3N//X8LEuWlYjfsdHtC1XnV65biCEvmMcSMWHvpzd0lSVjk742o289HbNvpBQ+A5G0h8vxTvLW39CHVsLdmOhlCBLA1bLvX29i2y03mkZpxue4kOYU54MUpTkOWFTgfDKBU6jeZSxsMYcgZPlG4K8+qbD3RlEnMEDq8PKWZNaXXeSKvUKUE72268yu0yXq5LE8hymCcINsqsccqNRIXBYYzscKfcMfBXvSUcnzFEQ/sNsIbEHBXheDac0QwRiyut9yqcMHIztsJmhzzo9w5gJRzoVUNLWIilvgC2e1HcFEPGSo2yuKaZL42Efa8ISi/biOp1MmY9LI5K06L2RxlZQS0IQW+tzX+JbHBWFRgTMr7fJq0nBtqz6L/rJ5fhXGgvb01cSb5XnRIZ7TXPz9Vjfma4xjy9vnl0ZOnWdw9Nz6wzFvZcaYs=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 551577c4-5396-4803-6c3a-08dd2f4b5c95
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR10MB7270.namprd10.prod.outlook.com
+	=?utf-8?B?VG91WnkyQVJJcVlUVy8xK3k5Qjg1SWJVWkFSZzRWeHNUSURDdjhpcW16N1ZK?=
+ =?utf-8?B?M0tuaGJDbTljekRUSHBuUmpJZE9CWlhxYWJSOHFZRkFRYVpnRVFFR0NkYlpW?=
+ =?utf-8?B?TmlXZHdWVmRWM3lFaHhNL1dSWTZBL3NaQkNzUW1KaDRnU09RU3A0SjgvcWpp?=
+ =?utf-8?B?VEdMZi8vdVl2QUJZaWRrRzBqa3hIQWZ2bVhNQllIV0cyd2U4d0ZldDRJdjNL?=
+ =?utf-8?B?b2xudTBwaWZzRnJuKzR6a3pKcndqT1RCT0xyVmNObXJnbDk1WnJ2Q3RMKzU2?=
+ =?utf-8?B?UnUrZ051Ui9BNHFaU2RoM3FKMWVseFRzMmtHWWFuVENPVGVpVndTTGkxbmJu?=
+ =?utf-8?B?REM3SzkwK0xFRGF5R2d2cVEwaUZxZ3J4VnVBdncvNnZJdXR6RjJhbm01VkVx?=
+ =?utf-8?B?WGVuL0hmUXNxaGFWN0FqajNsQWE1ZmJPQVBxdWZvTEEwcVJsNmNLYW1pVTlo?=
+ =?utf-8?B?d0p0SjBzcEUxT0NzMm84QzVlbURNTDRhZnRPSzJPaHJZMGhzcldKdVBlbUxH?=
+ =?utf-8?B?N1ZjaXB3cWptRm1LZGVmQzBocFFQaVVrRVQwaTJzT2wvZW1vZk1mWGZVSnk5?=
+ =?utf-8?B?NXJBcXlqOXRDNlByWmxBaFBlci9QRWdOdkhnNjZnTWhuRUJFTDNnTEUrTGJR?=
+ =?utf-8?B?OG1ydW94ckJoR2wyaytSM3BoWTVCZGd2SzFIUU04TzY0MXo4MWJwdGsvbUU5?=
+ =?utf-8?B?NzlBQVcxblpxbS9IaU9qRldNdUowdmc0cEtTdy9zVTRRQjZ1ajNoUUlKSUNG?=
+ =?utf-8?B?aExLTW1VZVVaOW9jc1lOS2dmdlBScVlMZDVSSlUrcnZzU3hILzVpTWVIMi92?=
+ =?utf-8?B?WlhRbUZ3aVdQWUJpY3ZjalZHZEpTeTh3TUFmbExhSmxUaUViVHZPbmJDb1ZT?=
+ =?utf-8?B?Rll6aFlSOGRyWUVYeElMbXc4KzNtK284c1dUaVFkTHZFa2xuRWpudTllQWYv?=
+ =?utf-8?B?aEFWeVhzTWFnYWRObHpHcWpZR0Vzc2pQYXRHdVVTcEQ3a3hHRUJxWE9sOVFy?=
+ =?utf-8?B?czZNRkZvM29QaWpvQUNkUUR2TElMc1lxaHhZalVac1BadDdobWxIeFRNQ2d2?=
+ =?utf-8?B?emUwQlRCbWpKcExvZEwzT2RGcUNJcEJueGJxejdRYWZTZmpjcVU4WmdjTSts?=
+ =?utf-8?B?UGFPalpoSWZVZEVjcmtib0FsYmhKZXNlTTIxWnQyck9tNnM1R0MxNEN3dlFl?=
+ =?utf-8?B?WmNGaXczdmEvWEI4V0ZxSnplVWkvWlQ4MEhkK2J4eDdicnBHY3Fnc08relZn?=
+ =?utf-8?B?VEhHNTVNNXF5OFBvNkt6eGRUc3FtbzNjMHdET1hicEdiRHpHMGpNcTRUMkdP?=
+ =?utf-8?B?T09qK1pxUWhFeFJtMllGN0RoWW1ZSW51cDRQMEREU3ZwS2t1RDBETjRvUHRQ?=
+ =?utf-8?B?a0FaMkM4M0hYaUpDNXMxMEcyNllHSmZNNEhDekQyR09NNWhmcUpjV3UzZ2VB?=
+ =?utf-8?B?M2lyQWplR1dQZy9vMjVpSFlvcDloL1pMeUFyS1RzQm9mb0JJYUJEZjd2bHp2?=
+ =?utf-8?B?NXV3SWJxVWoyVmorRG1uTytzNndqZTZPbTVTK05udnhZMzhBV3RtQ1p6cVFZ?=
+ =?utf-8?B?eU1TVy83cm0rZEZaWjZrSFgwZCtMY1RlMzU4cTV0RWF6YXF5SzZKVHc1b1Fr?=
+ =?utf-8?B?bDE2MGVrcEx1WDlYdXZVMDRHejk0eUhyS3RQUmtFWHlZWUZBUC9tMlNKdGhM?=
+ =?utf-8?B?U25GQStuc2FxUGY2Q01jV1FNRUhvNlIzRmgxOXhvL0lUVWxyL1lGaWdwMjdY?=
+ =?utf-8?B?Q1JmVmdKRVFMYWd0cVdjZ3FnNUFWTm5xVThhalZQR2JpSm9ESmkrbUI1L1Zz?=
+ =?utf-8?B?dlY4UFhOOFRBRE1YWkIyTmJMWlQ4dWRXRlhVUEFmWGlwOWtVTnd5VmVGeEVa?=
+ =?utf-8?B?dTVzYXUyRnBUSnVJWmlyN2JwK28vT05PNmQ2ZWNyK3VmaWJMVjA3SlhCYXdR?=
+ =?utf-8?B?SFVvZGxvNkFDQk1WSUp4dTZDV0M3ZkU1UFZwTVhSZkVDWndJaW5PbGF0aGJT?=
+ =?utf-8?B?Ry8wODBvWThrSGJ4Wi9laWI1cnJvUGZObVo4dnplNzhNZ1ZOMzBYRHBoL2Rr?=
+ =?utf-8?B?ODByYVRkeGxjQmJYbytGaFBEc1FYNGorOS9lb056ZjZSNG1XMVl6bGVWamRB?=
+ =?utf-8?Q?z+VIF0JsIy57cSekt1/Bc6fDo?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 49309c75-eb6c-4ddc-5d83-08dd2f4c9a6f
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB9066.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jan 2025 18:44:48.0431
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jan 2025 18:53:41.2886
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 33es5txpk6S7WpfuAcLUbsaLvbzBIk+eUi64s6oohULNUE+2vMWP9l861j7pOqLIpDsWz6u1yJtTPI2cN4GjW6Dlod1qYuwe4NKOQiRmjF8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR10MB4213
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-07_05,2025-01-06_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 malwarescore=0
- adultscore=0 mlxlogscore=999 suspectscore=0 mlxscore=0 spamscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2411120000 definitions=main-2501070154
-X-Proofpoint-ORIG-GUID: io1Mu_IxFiIo8WzoSVGbvjL0J1Hprkw7
-X-Proofpoint-GUID: io1Mu_IxFiIo8WzoSVGbvjL0J1Hprkw7
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1d8mOL/vZgcmBp3eBV0EYDoGhiRrXOio4O02qFxEiyBIuJq+0D2SwEbH8mrLvqPfqvvm7RS9YgvQjt3d5EomdQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8305
 
-On Fri, Dec 27, 2024 at 11:32:01PM +0100, Thomas Wei�schuh wrote:
-> padata_sysfs_store() was copied from padata_sysfs_show() but this check
-> was not adapted. Today there is no attribute which can fail this
-> check, but if there is one it may as well be correct.
+
+
+On 1/6/2025 9:29 PM, Alexey Kardashevskiy wrote:
+> On 4/1/25 07:00, Ashish Kalra wrote:
+>> From: Ashish Kalra <ashish.kalra@amd.com>
+>>
+>> Modify the behavior of implicit SEV initialization in some of the
+>> SEV ioctls to do both SEV initialization and shutdown and adds
+>> implicit SNP initialization and shutdown to some of the SNP ioctls
+>> so that the change of SEV/SNP platform initialization not being
+>> done during PSP driver probe time does not break userspace tools
+>> such as sevtool, etc.
+>>
+>> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+>> ---
+>>   drivers/crypto/ccp/sev-dev.c | 149 +++++++++++++++++++++++++++++------
+>>   1 file changed, 125 insertions(+), 24 deletions(-)
+>>
+>> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+>> index 1c1c33d3ed9a..0ec2e8191583 100644
+>> --- a/drivers/crypto/ccp/sev-dev.c
+>> +++ b/drivers/crypto/ccp/sev-dev.c
+>> @@ -1454,7 +1454,8 @@ static int sev_ioctl_do_platform_status(struct sev_issue_cmd *argp)
+>>   static int sev_ioctl_do_pek_pdh_gen(int cmd, struct sev_issue_cmd *argp, bool writable)
+>>   {
+>>       struct sev_device *sev = psp_master->sev_data;
+>> -    int rc;
+>> +    bool shutdown_required = false;
+>> +    int rc, ret, error;
+>>         if (!writable)
+>>           return -EPERM;
+>> @@ -1463,19 +1464,30 @@ static int sev_ioctl_do_pek_pdh_gen(int cmd, struct sev_issue_cmd *argp, bool wr
+>>           rc = __sev_platform_init_locked(&argp->error);
+>>           if (rc)
+>>               return rc;
+>> +        shutdown_required = true;
+>> +    }
+>> +
+>> +    rc = __sev_do_cmd_locked(cmd, NULL, &argp->error);
+>> +
+>> +    if (shutdown_required) {
+>> +        ret = __sev_platform_shutdown_locked(&error);
+>> +        if (ret)
+>> +            dev_err(sev->dev, "SEV: failed to SHUTDOWN error %#x, rc %d\n",
+>> +                error, ret);
+>>       }
+>>   -    return __sev_do_cmd_locked(cmd, NULL, &argp->error);
+>> +    return rc;
+>>   }
+>>     static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
+>>   {
+>>       struct sev_device *sev = psp_master->sev_data;
+>>       struct sev_user_data_pek_csr input;
+>> +    bool shutdown_required = false;
+>>       struct sev_data_pek_csr data;
+>>       void __user *input_address;
+>> +    int ret, rc, error;
+>>       void *blob = NULL;
+>> -    int ret;
+>>         if (!writable)
+>>           return -EPERM;
+>> @@ -1506,6 +1518,7 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
+>>           ret = __sev_platform_init_locked(&argp->error);
+>>           if (ret)
+>>               goto e_free_blob;
+>> +        shutdown_required = true;
+>>       }
+>>         ret = __sev_do_cmd_locked(SEV_CMD_PEK_CSR, &data, &argp->error);
+>> @@ -1524,6 +1537,13 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
+>>       }
+>>     e_free_blob:
+>> +    if (shutdown_required) {
+>> +        rc = __sev_platform_shutdown_locked(&error);
+>> +        if (rc)
+>> +            dev_err(sev->dev, "SEV: failed to SHUTDOWN error %#x, rc %d\n",
+>> +                error, rc);
+>> +    }
+>> +
+>>       kfree(blob);
+>>       return ret;
+>>   }
+>> @@ -1739,8 +1759,9 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp, bool writable)
+>>       struct sev_device *sev = psp_master->sev_data;
+>>       struct sev_user_data_pek_cert_import input;
+>>       struct sev_data_pek_cert_import data;
+>> +    bool shutdown_required = false;
+>>       void *pek_blob, *oca_blob;
+>> -    int ret;
+>> +    int ret, rc, error;
+>>         if (!writable)
+>>           return -EPERM;
+>> @@ -1772,11 +1793,19 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp, bool writable)
+>>           ret = __sev_platform_init_locked(&argp->error);
+>>           if (ret)
+>>               goto e_free_oca;
+>> +        shutdown_required = true;
+>>       }
+>>         ret = __sev_do_cmd_locked(SEV_CMD_PEK_CERT_IMPORT, &data, &argp->error);
+>>     e_free_oca:
+>> +    if (shutdown_required) {
+>> +        rc = __sev_platform_shutdown_locked(&error);
+>> +        if (rc)
+>> +            dev_err(sev->dev, "SEV: failed to SHUTDOWN error %#x, rc %d\n",
+>> +                error, rc);
+>> +    }
+>> +
+>>       kfree(oca_blob);
+>>   e_free_pek:
+>>       kfree(pek_blob);
+>> @@ -1893,17 +1922,8 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
+>>       struct sev_data_pdh_cert_export data;
+>>       void __user *input_cert_chain_address;
+>>       void __user *input_pdh_cert_address;
+>> -    int ret;
+>> -
+>> -    /* If platform is not in INIT state then transition it to INIT. */
+>> -    if (sev->state != SEV_STATE_INIT) {
+>> -        if (!writable)
+>> -            return -EPERM;
+>> -
+>> -        ret = __sev_platform_init_locked(&argp->error);
+>> -        if (ret)
+>> -            return ret;
+>> -    }
+>> +    bool shutdown_required = false;
+>> +    int ret, rc, error;
+>>         if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
+>>           return -EFAULT;
+>> @@ -1944,6 +1964,16 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
+>>       data.cert_chain_len = input.cert_chain_len;
+>>     cmd:
+>> +    /* If platform is not in INIT state then transition it to INIT. */
+>> +    if (sev->state != SEV_STATE_INIT) {
+>> +        if (!writable)
+>> +            return -EPERM;
 > 
-> Fixes: 5e017dc3f8bc ("padata: Added sysfs primitives to padata subsystem")
-> Signed-off-by: Thomas Wei�schuh <linux@weissschuh.net>
+> same comment as in v2:
+> 
+> goto e_free_cert, not return, otherwise leaks memory.
+> 
+> 
+> 
+>> +        ret = __sev_platform_init_locked(&argp->error);
+>> +        if (ret)
+>> +            goto e_free_cert;
+>> +        shutdown_required = true;
+>> +    }
+>> +
+>>       ret = __sev_do_cmd_locked(SEV_CMD_PDH_CERT_EXPORT, &data, &argp->error);
+>>         /* If we query the length, FW responded with expected data. */
+>> @@ -1970,6 +2000,13 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
+>>       }
+>>     e_free_cert:
+>> +    if (shutdown_required) {
+>> +        rc = __sev_platform_shutdown_locked(&error);
+>> +        if (rc)
+>> +            dev_err(sev->dev, "SEV: failed to SHUTDOWN error %#x, rc %d\n",
+>> +                error, rc);
+>> +    }
+>> +
+>>       kfree(cert_blob);
+>>   e_free_pdh:
+>>       kfree(pdh_blob);
+>> @@ -1979,12 +2016,13 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
+>>   static int sev_ioctl_do_snp_platform_status(struct sev_issue_cmd *argp)
+>>   {
+>>       struct sev_device *sev = psp_master->sev_data;
+>> +    bool shutdown_required = false;
+>>       struct sev_data_snp_addr buf;
+>>       struct page *status_page;
+>> +    int ret, rc, error;
+>>       void *data;
+>> -    int ret;
+>>   -    if (!sev->snp_initialized || !argp->data)
+>> +    if (!argp->data)
+>>           return -EINVAL;
+>>         status_page = alloc_page(GFP_KERNEL_ACCOUNT);
+>> @@ -1993,6 +2031,13 @@ static int sev_ioctl_do_snp_platform_status(struct sev_issue_cmd *argp)
+>>         data = page_address(status_page);
+>>   +    if (!sev->snp_initialized) {
+>> +        ret = __sev_snp_init_locked(&argp->error);
+>> +        if (ret)
+>> +            goto cleanup;
+>> +        shutdown_required = true;
+>> +    }
+>> +
+>>       /*
+>>        * Firmware expects status page to be in firmware-owned state, otherwise
+>>        * it will report firmware error code INVALID_PAGE_STATE (0x1A).
+>> @@ -2021,6 +2066,13 @@ static int sev_ioctl_do_snp_platform_status(struct sev_issue_cmd *argp)
+>>           ret = -EFAULT;
+>>     cleanup:
+>> +    if (shutdown_required) {
+>> +        rc = __sev_snp_shutdown_locked(&error, false);
+>> +        if (rc)
+>> +            dev_err(sev->dev, "SEV-SNP: failed to SHUTDOWN error %#x, rc %d\n",
+>> +                error, rc);
+>> +    }
+>> +
+>>       __free_pages(status_page, 0);
+>>       return ret;
+>>   }
+>> @@ -2029,21 +2081,38 @@ static int sev_ioctl_do_snp_commit(struct sev_issue_cmd *argp)
+>>   {
+>>       struct sev_device *sev = psp_master->sev_data;
+>>       struct sev_data_snp_commit buf;
+>> +    bool shutdown_required = false;
+>> +    int ret, rc, error;
+>>   -    if (!sev->snp_initialized)
+>> -        return -EINVAL;
+>> +    if (!sev->snp_initialized) {
+>> +        ret = __sev_snp_init_locked(&argp->error);
+>> +        if (ret)
+>> +            return ret;
+>> +        shutdown_required = true;
+>> +    }
+>>         buf.len = sizeof(buf);
+>>   -    return __sev_do_cmd_locked(SEV_CMD_SNP_COMMIT, &buf, &argp->error);
+>> +    ret = __sev_do_cmd_locked(SEV_CMD_SNP_COMMIT, &buf, &argp->error);
+>> +
+>> +    if (shutdown_required) {
+>> +        rc = __sev_snp_shutdown_locked(&error, false);
+>> +        if (rc)
+>> +            dev_err(sev->dev, "SEV-SNP: failed to SHUTDOWN error %#x, rc %d\n",
+>> +                error, rc);
+>> +    }
+>> +
+>> +    return ret;
+>>   }
+>>     static int sev_ioctl_do_snp_set_config(struct sev_issue_cmd *argp, bool writable)
+>>   {
+>>       struct sev_device *sev = psp_master->sev_data;
+>>       struct sev_user_data_snp_config config;
+>> +    bool shutdown_required = false;
+>> +    int ret, rc, error;
+>>   -    if (!sev->snp_initialized || !argp->data)
+>> +    if (!argp->data)
+>>           return -EINVAL;
+>>         if (!writable)
+>> @@ -2052,17 +2121,34 @@ static int sev_ioctl_do_snp_set_config(struct sev_issue_cmd *argp, bool writable
+>>       if (copy_from_user(&config, (void __user *)argp->data, sizeof(config)))
+>>           return -EFAULT;
+>>   -    return __sev_do_cmd_locked(SEV_CMD_SNP_CONFIG, &config, &argp->error);
+>> +    if (!sev->snp_initialized) {
+>> +        ret = __sev_snp_init_locked(&argp->error);
+>> +        if (ret)
+>> +            return ret;
+>> +        shutdown_required = true;
+>> +    }
+>> +
+>> +    ret = __sev_do_cmd_locked(SEV_CMD_SNP_CONFIG, &config, &argp->error);
+>> +
+>> +    if (shutdown_required) {
+>> +        rc = __sev_snp_shutdown_locked(&error, false);
+>> +        if (rc)
+>> +            dev_err(sev->dev, "SEV-SNP: failed to SHUTDOWN error %#x, rc %d\n",
+>> +                error, rc);
+>> +    }
+>> +
+>> +    return ret;
+>>   }
+>>     static int sev_ioctl_do_snp_vlek_load(struct sev_issue_cmd *argp, bool writable)
+>>   {
+>>       struct sev_device *sev = psp_master->sev_data;
+>>       struct sev_user_data_snp_vlek_load input;
+>> +    bool shutdown_required = false;
+>> +    int ret, rc, error;
+>>       void *blob;
+>> -    int ret;
+>>   -    if (!sev->snp_initialized || !argp->data)
+>> +    if (!argp->data)
+>>           return -EINVAL;
+>>         if (!writable)
+>> @@ -2081,8 +2167,23 @@ static int sev_ioctl_do_snp_vlek_load(struct sev_issue_cmd *argp, bool writable)
+>>         input.vlek_wrapped_address = __psp_pa(blob);
+>>   +    if (!sev->snp_initialized) {
+>> +        ret = __sev_snp_init_locked(&argp->error);
+>> +        if (ret)
+>> +            goto cleanup;
+>> +        shutdown_required = true;
+>> +    }
+>> +
+>>       ret = __sev_do_cmd_locked(SEV_CMD_SNP_VLEK_LOAD, &input, &argp->error);
+>>   +    if (shutdown_required) {
+>> +        rc = __sev_snp_shutdown_locked(&error, false);
+>> +        if (rc)
+>> +            dev_err(sev->dev, "SEV-SNP: failed to SHUTDOWN error %#x, rc %d\n",
+>> +                error, rc);
+>> +    }
+>> +
+> 
+> same comment as in v2:
+> 
+> 
+> It is the same template 8 (?) times, I'd declare rc and error inside the "if (shutdown_required)" scope or even drop them and error messages as __sev_snp_shutdown_locked() prints dev_err() anyway.
+> 
+> if (shutdown_required)
+>     __sev_snp_shutdown_locked(&error, false);
+> 
+> and that's it. Thanks,
+ 
+Yes, makes sense to use the dev_err() in __sev_snp_shutdown_locked() as that is the whole purpose of the first patch in this series, but will
+still have to declare error as a local as we can't use argp->error here.
 
-Acked-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+Thanks, 
+Ashish
+
+> 
+>> +cleanup:
+>>       kfree(blob);
+>>         return ret;
+> 
+
