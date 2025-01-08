@@ -1,113 +1,215 @@
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 219C31FA15C;
-	Wed,  8 Jan 2025 12:20:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47E0415CD74;
+	Wed,  8 Jan 2025 15:06:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736338814; cv=none; b=FZeQ3wOevbu8qQNH3+sWz4Z7HVG7mgYAooQlSgjqTVwsVocekCu+lgtQU7sI3iWaDfccad+iSMNfBH7fU4Xp8LTbXiXAVh9SrHqPX6YezQ/4ZOUmMGsRJHaRfbm1p4fo9zixdTXjfuMmBGeZOiDSTnOFhdR27C25OLhiJrCFhS4=
+	t=1736348793; cv=none; b=TmhhF2qFdiX40zTHCU2BzbUY1fivNyjNfK45TZ2PIC7R/7dmZWacQ1jFrWidCqs1o2CExXJLN/B5mLGO3AmSb7h4qywAMN6dAOTt9WEG4VOa9+ZbrfR9gZmA7X7IqQQCIx/0QHSEAJGPeFW2LzFx0IOVfmThXLqqiOAYAMUXWzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736338814; c=relaxed/simple;
-	bh=psC96hGThSrXWDDpjppiOYa5dVQa1twKUb1zxXZvS2E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VS3R3vvxzBtkqbTY5GNKr6W0h+5tghyyB+6Ycm4h72/4Uj6AplpWk8IGJyMru6m6asSvN2rKPZveQPRoHLiV0fcpeheUxr4kgJCOcSivd091ldLNoL3WAsFycgNBZIrI+gBnKuklr8J4RKp+S4hW52Iuk226cRGVwj30oSnFueo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5d932eac638so7666662a12.1;
-        Wed, 08 Jan 2025 04:20:12 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736338811; x=1736943611;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gBFg4Bhi0ssoJ+zZkMYuUyTLeYoitBIeZtECwrD9GaU=;
-        b=BUgn0Qkn1OaksKH4S71k3YFy32e1vYCsXkSpCviCNZPfmyYK2WSPku+HfdXxJ0jp2k
-         cwK/sfQF7pGvHFlrXZS+Hdtr1M9kUAei6sZjeZhKybu4YgrjZ4nWvLCNmH0dTKIEDXC/
-         cpuSEA3wSvogz6z/JN1Mq46CnQoaBBffABhbpe6uzbmKetDjrcwtbbfAXeEdyukih2ZE
-         sYbmPdoOUFfRTnCICEz4RoFEAa6aKQpD+R7JZ6PAYjkCAbUjwAJeT4foFM+ySKI8fUIg
-         L+jgjHJ9aZm9enCseVbmOMWII9ZOVxl9AKMd0JDhJZ2LtqQ3vY2H5Ss/xC9pDG5Es3hp
-         mtEw==
-X-Forwarded-Encrypted: i=1; AJvYcCVAD0j29kZ8FOaKuefvGTj1mBrcobGTwYpayEJf1bZz/grMKuK1p230NJUTgYDpU90/AZzRRrCt@vger.kernel.org, AJvYcCXlR7Ai3ie5rYFYILCt1PhGDSbhqRKAV6jm/So0DJ8KbfAi2dQE5t7DGU/tkPxdUNtJAzjRpGEjYXTry+I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxdcfQZq7xd/iK4hzbpFH5ejm16AiC51sEMqt6P1Q6SjNxwX3Ru
-	BzVAJr/vKJ3oV2qHLUXyLjoCpY1t8YszwMrUkwgSKvKB4xBTpudR
-X-Gm-Gg: ASbGncvpayDqpp9/knvNSLirSbH1jRWUQxLDNBl6h/V+1kndxgXeomyGgVIOQMrZtON
-	/lKxtV2abOsiZ/d7uOkOhg6DRKvMLGOwHQ+N0s4+kSRg5Wb6vjVtxVgQair30McjA2QEUbQWjR2
-	SYsJnDdJAnlSG5xpMMVGXyq3zhZ3ZiEeZtbis3706NEFA7nc1nl0iXUgUSE/Hwr6OZLIK7CXam8
-	eBQ1ShCjgmBWQTSjBdZnSKp3Z2EvoRBARwiVEj7AR6Maco=
-X-Google-Smtp-Source: AGHT+IHWO5vLxafuUApNxdvwx8CDjd/fGi89O8UCOvaoBBxdvpAxSS1H9g4wPSpUBBSNnq/kZ3njlw==
-X-Received: by 2002:a17:906:f5a0:b0:aaf:87e6:8fe3 with SMTP id a640c23a62f3a-ab2ab6a75damr230027166b.6.1736338811256;
-        Wed, 08 Jan 2025 04:20:11 -0800 (PST)
-Received: from gmail.com ([2a03:2880:30ff:1::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-aac0e83017asm2483129966b.32.2025.01.08.04.20.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jan 2025 04:20:10 -0800 (PST)
-Date: Wed, 8 Jan 2025 04:20:08 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Oliver Sang <oliver.sang@intel.com>
-Cc: lkp@intel.com, oe-lkp@lists.linux.dev, linux-crypto@vger.kernel.org,
-	Herbert Xu <herbert@gondor.apana.org.au>, Tejun Heo <tj@kernel.org>,
-	netdev@vger.kernel.org
-Subject: Re: [herbert-cryptodev-2.6:master] [rhashtable]  e1d3422c95:
- stress-ng.syscall.ops_per_sec 98.9% regression
-Message-ID: <20250108-smiling-sensible-llama-d8b124@leitao>
-References: <202412271017.cad7675-lkp@intel.com>
- <20250103-singing-crow-of-fantasy-fd061f@leitao>
- <Z3zLQObsD42R6Nwz@xsang-OptiPlex-9020>
+	s=arc-20240116; t=1736348793; c=relaxed/simple;
+	bh=GtKrfmly8HIpzFeTR9Cb3QfKE0/JX9V1zAGx74FqQJk=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=EozTy5nRmuae0VvU8I3hK3hBZGhoepCdXnDCns4K/Ym7+x7Qc8A7zrTHK0TTyY2CaPb/hEFiPRcw/ADoewRgEKq0hxmVBnHXElps8KnN32erZR4HXBKhOxlqc6KSHMNLuQAmUfOri8p7Ae1DA94YitLg+zlqmX2ZzIS3jSuOb+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=fPW+UUnI; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fPW+UUnI"
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 508D6Ht3026793;
+	Wed, 8 Jan 2025 15:06:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:to; s=pp1;
+	 bh=AailQYGz8niMcO0+l3sgqJtd9jI7kG6enCwLr0ojggA=; b=fPW+UUnILC9E
+	iVzO0tviLHwew+3F+EyZ+XGLZjRqruaE6loVcg+19MQFRu37++mqKI2LmuqdmCxq
+	fxL/4W9S8V4QgiCoY0WTi01O3zRSnNvdDgzEIi3mhyeuTw5OFQPjNTHsJ7xryTrr
+	T9UxKfjjOM/3jMxlMqqdjqaaBUe9eVsK+ysGC77ZuE7Dw9l0771gFyW2qdDRrR0n
+	jEfa4kGNoy63311JMKscyrlwShu+b3oihRSSB8++i9Wkn/I9CdXDdVGdB7YZxo5T
+	D6YXxW99mkPsW5Tx4/m/g3d1jDobBimVPJSRheMo1+0EcAtYmrPh0Kt/KgzgB57g
+	cLf0rAbpjw==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 441e3b3hyy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 08 Jan 2025 15:06:22 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 508E3iGr028054;
+	Wed, 8 Jan 2025 15:06:21 GMT
+Received: from smtprelay01.wdc07v.mail.ibm.com ([172.16.1.68])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 43yhhk820n-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 08 Jan 2025 15:06:21 +0000
+Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
+	by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 508F6LUk17301854
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 8 Jan 2025 15:06:21 GMT
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E1AF15805C;
+	Wed,  8 Jan 2025 15:06:20 +0000 (GMT)
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 619A158054;
+	Wed,  8 Jan 2025 15:06:20 +0000 (GMT)
+Received: from ltc.linux.ibm.com (unknown [9.5.196.140])
+	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  8 Jan 2025 15:06:20 +0000 (GMT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z3zLQObsD42R6Nwz@xsang-OptiPlex-9020>
+Date: Wed, 08 Jan 2025 16:06:20 +0100
+From: Harald Freudenberger <freude@linux.ibm.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Holger Dengler <dengler@linux.ibm.com>,
+        linux-s390@vger.kernel.org
+Subject: Re: [PATCH v2 21/29] crypto: s390/aes-gcm - use the new scatterwalk
+ functions
+Reply-To: freude@linux.ibm.com
+Mail-Reply-To: freude@linux.ibm.com
+In-Reply-To: <20241230001418.74739-22-ebiggers@kernel.org>
+References: <20241230001418.74739-1-ebiggers@kernel.org>
+ <20241230001418.74739-22-ebiggers@kernel.org>
+Message-ID: <cdcf7da3766aa6f6336f590bd64c12cf@linux.ibm.com>
+X-Sender: freude@linux.ibm.com
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: AUii3IdAVIGaSKXZb90h53cdOhQMPtMU
+X-Proofpoint-GUID: AUii3IdAVIGaSKXZb90h53cdOhQMPtMU
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ priorityscore=1501 phishscore=0 impostorscore=0 clxscore=1011 bulkscore=0
+ lowpriorityscore=0 mlxlogscore=558 adultscore=0 suspectscore=0 spamscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2501080125
 
-Hello Oliver,
-
-On Tue, Jan 07, 2025 at 02:35:44PM +0800, Oliver Sang wrote:
-> hi, Breno Leitao,
+On 2024-12-30 01:14, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
 > 
-> > I am trying to reproduce this report, and I would appreciate some help
-> > to understand what is being measured, and try to reproduce the reported
-> > problem.
-> > 
-> > On Fri, Dec 27, 2024 at 11:10:11AM +0800, kernel test robot wrote:
-> > > kernel test robot noticed a 98.9% regression of stress-ng.syscall.ops_per_sec on:
-> > 
-> > Is this metric coming from `bogo ops/s` from stress-ng?
+> Use scatterwalk_next() which consolidates scatterwalk_clamp() and
+> scatterwalk_map().  Use scatterwalk_done_src() and
+> scatterwalk_done_dst() which consolidate scatterwalk_unmap(),
+> scatterwalk_advance(), and scatterwalk_done().
 > 
-> yes, it's from bogo ops/s (real time).
+> Besides the new functions being a bit easier to use, this is necessary
+> because scatterwalk_done() is planned to be removed.
 > 
-> one thing we want to mention is the test runs unstably upon e1d3422c95.
-> as below, %stddev for it reaches 67%.
+> Cc: Harald Freudenberger <freude@linux.ibm.com>
+> Cc: Holger Dengler <dengler@linux.ibm.com>
+> Cc: linux-s390@vger.kernel.org
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+> 
+> This patch is part of a long series touching many files, so I have
+> limited the Cc list on the full series.  If you want the full series 
+> and
+> did not receive it, please retrieve it from lore.kernel.org.
+> 
+>  arch/s390/crypto/aes_s390.c | 33 +++++++++++++--------------------
+>  1 file changed, 13 insertions(+), 20 deletions(-)
+> 
+> diff --git a/arch/s390/crypto/aes_s390.c b/arch/s390/crypto/aes_s390.c
+> index 9c46b1b630b1..7fd303df05ab 100644
+> --- a/arch/s390/crypto/aes_s390.c
+> +++ b/arch/s390/crypto/aes_s390.c
+> @@ -785,32 +785,25 @@ static void gcm_walk_start(struct gcm_sg_walk
+> *gw, struct scatterlist *sg,
+>  	scatterwalk_start(&gw->walk, sg);
+>  }
+> 
+>  static inline unsigned int _gcm_sg_clamp_and_map(struct gcm_sg_walk 
+> *gw)
+>  {
+> -	struct scatterlist *nextsg;
+> -
+> -	gw->walk_bytes = scatterwalk_clamp(&gw->walk, gw->walk_bytes_remain);
+> -	while (!gw->walk_bytes) {
+> -		nextsg = sg_next(gw->walk.sg);
+> -		if (!nextsg)
+> -			return 0;
+> -		scatterwalk_start(&gw->walk, nextsg);
+> -		gw->walk_bytes = scatterwalk_clamp(&gw->walk,
+> -						   gw->walk_bytes_remain);
+> -	}
+> -	gw->walk_ptr = scatterwalk_map(&gw->walk);
+> +	if (gw->walk_bytes_remain == 0)
+> +		return 0;
+> +	gw->walk_ptr = scatterwalk_next(&gw->walk, gw->walk_bytes_remain,
+> +					&gw->walk_bytes);
+>  	return gw->walk_bytes;
+>  }
+> 
+>  static inline void _gcm_sg_unmap_and_advance(struct gcm_sg_walk *gw,
+> -					     unsigned int nbytes)
+> +					     unsigned int nbytes, bool out)
+>  {
+>  	gw->walk_bytes_remain -= nbytes;
+> -	scatterwalk_unmap(gw->walk_ptr);
+> -	scatterwalk_advance(&gw->walk, nbytes);
+> -	scatterwalk_done(&gw->walk, 0, gw->walk_bytes_remain);
+> +	if (out)
+> +		scatterwalk_done_dst(&gw->walk, gw->walk_ptr, nbytes);
+> +	else
+> +		scatterwalk_done_src(&gw->walk, gw->walk_ptr, nbytes);
+>  	gw->walk_ptr = NULL;
+>  }
+> 
+>  static int gcm_in_walk_go(struct gcm_sg_walk *gw, unsigned int 
+> minbytesneeded)
+>  {
+> @@ -842,11 +835,11 @@ static int gcm_in_walk_go(struct gcm_sg_walk
+> *gw, unsigned int minbytesneeded)
+> 
+>  	while (1) {
+>  		n = min(gw->walk_bytes, AES_BLOCK_SIZE - gw->buf_bytes);
+>  		memcpy(gw->buf + gw->buf_bytes, gw->walk_ptr, n);
+>  		gw->buf_bytes += n;
+> -		_gcm_sg_unmap_and_advance(gw, n);
+> +		_gcm_sg_unmap_and_advance(gw, n, false);
+>  		if (gw->buf_bytes >= minbytesneeded) {
+>  			gw->ptr = gw->buf;
+>  			gw->nbytes = gw->buf_bytes;
+>  			goto out;
+>  		}
+> @@ -902,11 +895,11 @@ static int gcm_in_walk_done(struct gcm_sg_walk
+> *gw, unsigned int bytesdone)
+>  			memmove(gw->buf, gw->buf + bytesdone, n);
+>  			gw->buf_bytes = n;
+>  		} else
+>  			gw->buf_bytes = 0;
+>  	} else
+> -		_gcm_sg_unmap_and_advance(gw, bytesdone);
+> +		_gcm_sg_unmap_and_advance(gw, bytesdone, false);
+> 
+>  	return bytesdone;
+>  }
+> 
+>  static int gcm_out_walk_done(struct gcm_sg_walk *gw, unsigned int 
+> bytesdone)
+> @@ -920,14 +913,14 @@ static int gcm_out_walk_done(struct gcm_sg_walk
+> *gw, unsigned int bytesdone)
+>  		for (i = 0; i < bytesdone; i += n) {
+>  			if (!_gcm_sg_clamp_and_map(gw))
+>  				return i;
+>  			n = min(gw->walk_bytes, bytesdone - i);
+>  			memcpy(gw->walk_ptr, gw->buf + i, n);
+> -			_gcm_sg_unmap_and_advance(gw, n);
+> +			_gcm_sg_unmap_and_advance(gw, n, true);
+>  		}
+>  	} else
+> -		_gcm_sg_unmap_and_advance(gw, bytesdone);
+> +		_gcm_sg_unmap_and_advance(gw, bytesdone, true);
+> 
+>  	return bytesdone;
+>  }
+> 
+>  static int gcm_aes_crypt(struct aead_request *req, unsigned int flags)
 
-Thanks. From what I understand, this is clock time, which can vary a
-lot.
-
-I see a small variation, but, inside the standard deviation:
-
-Kernels I've tested:
-	Kernel A: 6.13-rc6 (9d89551994a43)
-	Kernel B: 9d89551994a43 + cherry pick of e1d3422c95f003e ("rhashtable: Fix potential deadlock by moving schedule_work outside lock")
-
-Average result: (Bogo op/s)
-	* kernel A:
-		* Average      : 2776.70
-		* Min value    : 1946.22
-		* Max value    : 3278.67 
-		* Standard dev :  387.01
-
-	* Kernel B:
-		* Average      : 3158.60
-		* Min value    : 1850.91
-		* Max value    : 4120.10
-		* Standard dev :  507.19
-
-Host: Intel(R) Xeon(R) D-2191A CPU with 64GB of RAM.
-
-I booted the machines 2 times, with A, B, kernel sequentially, and
-for each case I run the following command 10 times:
-
-	stress-ng --timeout 10 --times --verify --metrics --no-rand-seed --syscall 224
+Reviewed-by: Harald Freudenberger <freude@linux.ibm.com>
+Tested-by:  Harald Freudenberger <freude@linux.ibm.com>
