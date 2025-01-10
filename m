@@ -1,98 +1,95 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CCE8207656
-	for <linux-crypto@vger.kernel.org>; Fri, 10 Jan 2025 07:14:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AED7120A5DD;
+	Fri, 10 Jan 2025 09:48:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736493244; cv=none; b=bTSqFFpwwJwL8SlnW9sEhbg0MopgxvX9smDtCJljyu7ctWg64LmfIoPu5Y2Cb41ahMIyRKvq41ue/XbLk4ZM0okoDBjIc0xE4memdDQwRunnxXJXuXRlTdy8UxxX1bdmFbMd1VeuGhXERtQ5zbzS0hRZySiUluR3prE+IuuUViA=
+	t=1736502488; cv=none; b=jctq9F4wVtn2WV3qr3sPUnhKx7+oa3wLV4T4XrPnXJJbup4HnMIlnihGvvHpxewX3s2W7OkJxKefJzIw1jJYLY4O5dK2cVKaidYOejPW0sEQ2HITlGPBhgO7d8JqeTAm/IzDx+CUdQfeR5YM+G5XOuhMIco2TlDHrmsx7vYNSZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736493244; c=relaxed/simple;
-	bh=lprOQfulzu8v6KvGdaC/bIeIPCWpKvc6opCkgeRU8p8=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=uZxEleaEcGP5jNZnMF64wYGpuUR9oON6TScOh8jfKG0qfRxU0gnL8MPd67hmlhsn89UtugHKM6lR5s+b1wtiJwZnYewENXcJwtw4XX/v6sBLlfPdCtxALSyyzZkIOZhlVxrLQHLjnZpNO+Bp2goZLxiMaYZUkikyB+xQGc9eu2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V61kgX2s; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1736502488; c=relaxed/simple;
+	bh=mtBp3AyjCM/ZWQ3Dt+JtvHpf0ZzFbURIvx/WMvyfUuI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=n+RmW4IXMZ+itA7gZo4W3kWKR8QsxNMVLOkbTUgUPnxYL5Ep/Mdb1EMPFxThyOsF77cyNBXnbq3lyPjxUgU6plqWJeaZi0L/cMOAhiQJSjzDjt5KFFyF0ZJYQqsIXJsoZESxKop8JvnDQg3LiUCvrmyXTN+o+1zVY081o/68f+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KReXlo1E; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V61kgX2s"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736493242;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rQbXIksEk073+Fi/YrEVMIhtLpzXwHk7tiFH7RnZK5M=;
-	b=V61kgX2sg/pXaY2oCVnh2wd3bOTNJjRgac7L9uEh784T4E/UAwy/GPeLS+WOnXYHjSv8RY
-	smkWnaTEpd6PeXLlhQyZbwzYnh3tMTTkvTYT5vYdeeQ450st3uj43tkqP7OJmQa78vPNeZ
-	KzH4VUELI2kulMgtSPqcEyoYpnF/eNo=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-270-O0KBR35FP7uFyN5xYPBuug-1; Fri,
- 10 Jan 2025 02:13:56 -0500
-X-MC-Unique: O0KBR35FP7uFyN5xYPBuug-1
-X-Mimecast-MFC-AGG-ID: O0KBR35FP7uFyN5xYPBuug
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 511911955D64;
-	Fri, 10 Jan 2025 07:13:54 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.12])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4C52530001BE;
-	Fri, 10 Jan 2025 07:13:49 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20250110055058.GA63811@sol.localdomain>
-References: <20250110055058.GA63811@sol.localdomain> <20250110010313.1471063-1-dhowells@redhat.com> <20250110010313.1471063-3-dhowells@redhat.com>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: dhowells@redhat.com, Herbert Xu <herbert@gondor.apana.org.au>,
-    Chuck Lever <chuck.lever@oracle.com>,
-    Trond Myklebust <trond.myklebust@hammerspace.com>,
-    "David S. Miller" <davem@davemloft.net>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-    linux-crypto@vger.kernel.org, linux-afs@lists.infradead.org,
-    linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 2/8] crypto/krb5: Provide Kerberos 5 crypto through AEAD API
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KReXlo1E"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B09FC4CEE1;
+	Fri, 10 Jan 2025 09:48:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736502487;
+	bh=mtBp3AyjCM/ZWQ3Dt+JtvHpf0ZzFbURIvx/WMvyfUuI=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=KReXlo1El0w8Eap63jMfFIWC4zPSM2kfOrgoj3Jkx31AZjSNdG0fH3RYQ8OfbtH9o
+	 LlsKxxkkVgJ6xAWIWWnqvumXm0B1JceDx7P97H8XmNBwXQnQT5/bSt4N6rTltt/biM
+	 TiuvOPlYJEc0NxoetkPFTIhpKSAL4bCnD5BJc7jZWTXfM3GWJOmRUdFcsek3XU3RXH
+	 EZvpslsTygAb+pwz7iihaBmhmnvuC3dQbyV97ITCqBLLDYYoLsBgB4FH+UChAxiEZQ
+	 Sr7FC2Ky7vKsfHXieyhcF6+1u1fKDCnUFyGCg5Z4P8UNRaApimY4N37hm7UKa3N5Zy
+	 QqjhoEGN2AW1g==
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5401ab97206so1888363e87.3;
+        Fri, 10 Jan 2025 01:48:07 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUrSYfhjj4VD9dt4YQh7UK+E+7RL+/RYIEoN91zYO+OjTgov4MXX6tkefUzXo7uQEARkyaligjjrN22Yso=@vger.kernel.org, AJvYcCVEBDbvKsrw0A1THKNP8vCSMJyNvOrMkb2HfmtyVtWIvnzW4brnHwzcxYofeQwih4VY8fvVTxiH@vger.kernel.org, AJvYcCVr6ual1KIDaJYTVo4PM47iKIrosqlPqOiKIO0gDe3TnvnJFSvYmUALVJinopqSEcfxqhHVnHK2ppfs+1bvDw==@vger.kernel.org, AJvYcCVtwTUW1ldjezhq2gmdVHB2dlvdV3j8MVCj7vFLxQYx6hW/YoCQ0kQEeWK1mRdjrHNlAmMdCKvS5wzrkgbP@vger.kernel.org, AJvYcCXlc/0KlnIfPUndd8IZ1cfFNS31pN7zUFCmCdVkVpZDiczVpVS/L3t/w513sAGotK+ThbY0mJH8l6Rz@vger.kernel.org
+X-Gm-Message-State: AOJu0YzhBWpKGxbGR87sxMuIJ174bxayl77gnExTaOUmixJgdyvHTti6
+	fUkUnxSQh/l5w7ElJcSdVG7F2o2lLEQOehtKiXbrKWPyY24g+vpYjT1h6gSLb811jFbjqsv+2Vl
+	0xljRbI2rO6x15JynhGN/zTXKz6Q=
+X-Google-Smtp-Source: AGHT+IGw8EE7iwyfzN0h+0xxLtGtpQdXnmrLV+5rsgOpOep915zSvu0wEuCxYBjpYwWkvDsdG3N62lBbWn0iggorhOo=
+X-Received: by 2002:a05:6512:1196:b0:53f:231e:6f92 with SMTP id
+ 2adb3069b0e04-542845491ffmr3512417e87.34.1736502485591; Fri, 10 Jan 2025
+ 01:48:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1478992.1736493228.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 10 Jan 2025 07:13:48 +0000
-Message-ID: <1478993.1736493228@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+References: <20250110010313.1471063-1-dhowells@redhat.com> <20250110010313.1471063-3-dhowells@redhat.com>
+ <20250110055058.GA63811@sol.localdomain> <1478993.1736493228@warthog.procyon.org.uk>
+In-Reply-To: <1478993.1736493228@warthog.procyon.org.uk>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Fri, 10 Jan 2025 10:47:54 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXE2mhXJaa9uq==Xki3On9ZKYY+KV-oH0ednqWC6b9BTYw@mail.gmail.com>
+X-Gm-Features: AbW1kvZNBd0gTj-dTR8eQGzNskVAFPXnGvmvtM6UKqY4sqGaw8a7UTaWuNi-eRE
+Message-ID: <CAMj1kXE2mhXJaa9uq==Xki3On9ZKYY+KV-oH0ednqWC6b9BTYw@mail.gmail.com>
+Subject: Re: [RFC PATCH 2/8] crypto/krb5: Provide Kerberos 5 crypto through
+ AEAD API
+To: David Howells <dhowells@redhat.com>
+Cc: Eric Biggers <ebiggers@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	Chuck Lever <chuck.lever@oracle.com>, Trond Myklebust <trond.myklebust@hammerspace.com>, 
+	"David S. Miller" <davem@davemloft.net>, Marc Dionne <marc.dionne@auristor.com>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, linux-crypto@vger.kernel.org, 
+	linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Eric Biggers <ebiggers@kernel.org> wrote:
+On Fri, 10 Jan 2025 at 08:14, David Howells <dhowells@redhat.com> wrote:
+>
+> Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> > It sounds like a lot of workarounds had to be implemented to fit these
+> > protocols into the crypto_aead API.
+> >
+> > It also seems unlikely that there will be other implementations of these
+> > protocols added to the kernel, besides the one you're adding in crypto/krb5/.
+> >
+> > Given that, providing this functionality as library functions instead would be
+> > much simpler.  Take a look at how crypto/kdf_sp800108.c works, for example.
+>
+> Yes.  That's how I did my first implementation.  I basically took the code
+> from net/sunrpc/auth_gss/ and made it more generic.  Herbert wants it done
+> this way, however.  :-/
+>
 
-> It sounds like a lot of workarounds had to be implemented to fit these
-> protocols into the crypto_aead API.
-> =
+What is the reason for shoehorning any of this into the crypto API?
 
-> It also seems unlikely that there will be other implementations of these
-> protocols added to the kernel, besides the one you're adding in crypto/k=
-rb5/.
-> =
+I agree with Eric here: it seems both the user (Kerberos) and the
+crypto API are worse off here, due to mutual API incompatibilities
+that seem rather fundamental.
 
-> Given that, providing this functionality as library functions instead wo=
-uld be
-> much simpler.  Take a look at how crypto/kdf_sp800108.c works, for examp=
-le.
+Are you anticipating other, accelerated implementations of the
+combined algorithms? Isn't it enough to rely on the existing Camellia
+and AES code? Mentioning 'something like the Intel QAT' doesn't
+suggest you have something specific in mind.
 
-Yes.  That's how I did my first implementation.  I basically took the code
-from net/sunrpc/auth_gss/ and made it more generic.  Herbert wants it done
-this way, however.  :-/
-
-David
-
+Also, this patch is rather big and therefore hard to review.
