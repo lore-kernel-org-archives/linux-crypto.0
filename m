@@ -1,167 +1,112 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ABA8211286
-	for <linux-crypto@vger.kernel.org>; Fri, 10 Jan 2025 14:33:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 998202135CD;
+	Fri, 10 Jan 2025 17:13:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736519632; cv=none; b=Lf0m7UZIE0mUkZ/upN7vgu5fO0x4YtcQozA930S0mpOH1JiYYV3FEkaz6shXyzNgeprnh5Cbj0TqfQaa4cNfTQDEn8cHd0S6PR92d6ejY+PuUzNIDOoEChOWhGPJhzgWiYI6Xs+i+TcyZwHu4pcOCBYNB0C2dL+CuK6bCAoH3MY=
+	t=1736529242; cv=none; b=YHA6WPjai2AXfv8OxCgDNDW8FylN1NKdGUqRSC6O90OLumH01NHdj+tExkim4UrVuEpaBrxeWW0ai5/asBXa+KLeTLSlafDwEeWsl0l1YfvFTA4OtmWaTR8GkMDHj6MlmRNRch3FGSU6NMqpvnx9EzlQs2pxJYVBC7vEqR5Jwe8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736519632; c=relaxed/simple;
-	bh=sIPxDEapCmOFF0UUJ050CZ52VknWeMjqbJ4QpXvzgJU=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=kstXWmCBbTwuj//ih0NYf0ZdcUTJ4u9VE+GCgqb3OjdP/0WpNC3jzt/iSNigQUup7mSvAYT/svf4SLvIzruKhd7NubhSduCY6cHupYTuqMumuLQmwAfPGC3fT1ppOATUhtyu5oq7lte8xkLxc5n9dw4Xu+pbKCa7KxmQfPm1TA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WQ5/5lA1; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1736529242; c=relaxed/simple;
+	bh=zCD9wMt7oj+kJBhlIcsVVTGT43QE2wPIyfO0mHZuo3E=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AAjN4aD1+LG9tm4CDTT98hANfLwZOwpT1esfVG5PUP6rD7p7JWcTczqfDiExaoNz3ll+vgd7jPhqO5SOXaqsiL0jBTIJg7zQs17Fy/X+gzZ7qpj2jCYmpz0HK+OUtxEG5+vAlk3BL/j4o23sXW2dz9yvHfZw2tUEfPpwytLLdGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hWvPm9S9; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WQ5/5lA1"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1736519629;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=h+rt9KmUBZuQERAo92PycxKqQH9U6iO8IHFEaXObSX4=;
-	b=WQ5/5lA1aebvyGHe9PdW+8yKnobz/jwoXSNl2fu1X11S2PaMEkujVngYN3VeXnDzX6e+MZ
-	mZADpBhXWUTC6z/nVeimBCTw2QDa4EHVxQXE/Haah1v4h1QoRekOOMAYicoLh4KDeTrvFB
-	ge9YWQ0qrDnIVd35UKJHhotnh8XYkjc=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-486-Qi0gWsesM1K1XCb9hZkTEg-1; Fri,
- 10 Jan 2025 09:33:46 -0500
-X-MC-Unique: Qi0gWsesM1K1XCb9hZkTEg-1
-X-Mimecast-MFC-AGG-ID: Qi0gWsesM1K1XCb9hZkTEg
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AF5A51954194;
-	Fri, 10 Jan 2025 14:33:42 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.12])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 93BE71955BE3;
-	Fri, 10 Jan 2025 14:33:37 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <CAMj1kXE2mhXJaa9uq==Xki3On9ZKYY+KV-oH0ednqWC6b9BTYw@mail.gmail.com>
-References: <CAMj1kXE2mhXJaa9uq==Xki3On9ZKYY+KV-oH0ednqWC6b9BTYw@mail.gmail.com> <20250110010313.1471063-1-dhowells@redhat.com> <20250110010313.1471063-3-dhowells@redhat.com> <20250110055058.GA63811@sol.localdomain> <1478993.1736493228@warthog.procyon.org.uk>
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: dhowells@redhat.com, Eric Biggers <ebiggers@kernel.org>,
-    Herbert Xu <herbert@gondor.apana.org.au>,
-    Chuck Lever <chuck.lever@oracle.com>,
-    Trond Myklebust <trond.myklebust@hammerspace.com>,
-    "David S. Miller" <davem@davemloft.net>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-    linux-crypto@vger.kernel.org, qat-linux <qat-linux@intel.com>,
-    linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-    linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 2/8] crypto/krb5: Provide Kerberos 5 crypto through AEAD API
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hWvPm9S9"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1736529240; x=1768065240;
+  h=date:message-id:from:to:cc:subject:in-reply-to:
+   references:mime-version;
+  bh=zCD9wMt7oj+kJBhlIcsVVTGT43QE2wPIyfO0mHZuo3E=;
+  b=hWvPm9S9gyyWflhxezAJQ0/Zw5EZKsCuAkNL9pt9ibrxvKhfx8igBLau
+   BqAxt/w+4WkhB7JJeGhd2XKu7BTEUI/u+ZCjJZLax3klENzioM0Ogu8lV
+   PfZO/Ur9FgiISKQAktuwXDv+fKDWBBLhsHE3nTEvd7HEfk5ILPMEy+C+i
+   v7E/Bn3dcZExGuv+WXwcKSpdB8KGwD5qn3eKJp4zYHR+m82wlFlpFSVej
+   Zj+F+2HJbkF1YqnKygWuQDJ/VUu15h2UnCLWYzcjwzwNjZ/0bri7MxpqP
+   ws6x4YtpsaSIYSiiMKXJNlfXHbNtrSTP7okJPY7QFGY+mFzAY/yI1B5Pm
+   Q==;
+X-CSE-ConnectionGUID: eETlnapHTZaJYZoWsWncOQ==
+X-CSE-MsgGUID: kcx024AdTVSnnR8CHTt/pw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11311"; a="36712482"
+X-IronPort-AV: E=Sophos;i="6.12,303,1728975600"; 
+   d="scan'208";a="36712482"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2025 09:13:58 -0800
+X-CSE-ConnectionGUID: d+N1H3FPQryemumCSoERgQ==
+X-CSE-MsgGUID: skCK+1HISZSgobnkHZdoJg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="127073384"
+Received: from orsosgc001.jf.intel.com (HELO orsosgc001.intel.com) ([10.165.21.142])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2025 09:13:57 -0800
+Date: Fri, 10 Jan 2025 09:13:56 -0800
+Message-ID: <8534hqvbfv.wl-ashutosh.dixit@intel.com>
+From: "Dixit, Ashutosh" <ashutosh.dixit@intel.com>
+To: Joel Granados <joel.granados@kernel.org>
+Cc: Thomas =?ISO-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,	Kees Cook
+ <kees@kernel.org>,	Luis Chamberlain <mcgrof@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,	linux-kernel@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,	linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org,	linux-crypto@vger.kernel.org,
+	openipmi-developer@lists.sourceforge.net,	intel-gfx@lists.freedesktop.org,
+	dri-devel@lists.freedesktop.org,	intel-xe@lists.freedesktop.org,
+	linux-hyperv@vger.kernel.org,	linux-rdma@vger.kernel.org,
+	linux-raid@vger.kernel.org,	linux-scsi@vger.kernel.org,
+	linux-serial@vger.kernel.org,	xen-devel@lists.xenproject.org,
+	linux-aio@kvack.org,	linux-fsdevel@vger.kernel.org,	netfs@lists.linux.dev,
+	codalist@coda.cs.cmu.edu,	linux-mm@kvack.org,	linux-nfs@vger.kernel.org,
+	ocfs2-devel@lists.linux.dev,	fsverity@lists.linux.dev,
+	linux-xfs@vger.kernel.org,	io-uring@vger.kernel.org,	bpf@vger.kernel.org,
+	kexec@lists.infradead.org,	linux-trace-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org,	apparmor@lists.ubuntu.com,
+	linux-security-module@vger.kernel.org,	keyrings@vger.kernel.org
+Subject: Re: [PATCH] treewide: const qualify ctl_tables where applicable
+In-Reply-To: <20250109-jag-ctl_table_const-v1-1-622aea7230cf@kernel.org>
+References: <20250109-jag-ctl_table_const-v1-1-622aea7230cf@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?ISO-8859-4?Q?Goj=F2?=) APEL-LB/10.8 EasyPG/1.0.0
+ Emacs/28.2 (x86_64-redhat-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1494599.1736519616.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 10 Jan 2025 14:33:36 +0000
-Message-ID: <1494600.1736519616@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
 
-Ard Biesheuvel <ardb@kernel.org> wrote:
+On Thu, 09 Jan 2025 05:16:39 -0800, Joel Granados wrote:
+>
+> diff --git a/drivers/gpu/drm/i915/i915_perf.c b/drivers/gpu/drm/i915/i915_perf.c
+> index 2406cda75b7b..5384d1bb4923 100644
+> --- a/drivers/gpu/drm/i915/i915_perf.c
+> +++ b/drivers/gpu/drm/i915/i915_perf.c
+> @@ -4802,7 +4802,7 @@ int i915_perf_remove_config_ioctl(struct drm_device *dev, void *data,
+>	return ret;
+>  }
+>
+> -static struct ctl_table oa_table[] = {
+> +static const struct ctl_table oa_table[] = {
+>	{
+>	 .procname = "perf_stream_paranoid",
+>	 .data = &i915_perf_stream_paranoid,
+> diff --git a/drivers/gpu/drm/xe/xe_observation.c b/drivers/gpu/drm/xe/xe_observation.c
+> index 8ec1b84cbb9e..57cf01efc07f 100644
+> --- a/drivers/gpu/drm/xe/xe_observation.c
+> +++ b/drivers/gpu/drm/xe/xe_observation.c
+> @@ -56,7 +56,7 @@ int xe_observation_ioctl(struct drm_device *dev, void *data, struct drm_file *fi
+>	}
+>  }
+>
+> -static struct ctl_table observation_ctl_table[] = {
+> +static const struct ctl_table observation_ctl_table[] = {
+>	{
+>	 .procname = "observation_paranoid",
+>	 .data = &xe_observation_paranoid,
 
-> What is the reason for shoehorning any of this into the crypto API?
+For i915 and xe:
 
-I was under the impression that that was what Herbert wanted.
-
-> I agree with Eric here: it seems both the user (Kerberos) and the
-> crypto API are worse off here, due to mutual API incompatibilities
-> that seem rather fundamental.
-
-My original take on this was to take the sunrpc code and turn it into a
-library, placing that library in the crypto/ directory:
-
-	https://lore.kernel.org/linux-crypto/160518586534.2277919.144756386536802=
-31924.stgit@warthog.procyon.org.uk/
-
-The crypto/ dir seems the right home for it (and not net/ or lib/), but th=
-e
-way it's implemented here, it's a user of the crypto API, but does not its=
-elf
-implement it.
-
-That said, it would be convenient if if *could* be part of the crypto API =
-in
-some way.  As I outlined in one of my responses to Herbert, there are a nu=
-mber
-of advantages to doing that.
-
-> Are you anticipating other, accelerated implementations of the
-> combined algorithms?
-
-I think one can be done with x86 AES and SHA instructions provided there a=
-re
-sufficient registers.
-
-> Isn't it enough to rely on the existing Camellia and AES code?
-
-The problem is that you have to do *two* crypto operations - and that it m=
-ay
-not be possible to parallellise them.  With AES+SHA1 and Camellia, they ca=
-n be
-parallellised as both sides work on the plaintext; but with the AES+SHA2, =
-the
-encryption is done and then the *encrypted* output is checksummed.
-
-Note that "parallellising" might mean launching an async hash request and =
-an
-async skcipher request and then waiting for both to finish.  This can't,
-however, be done unless the output buffer is separate from the input buffe=
-r.
-
-> Mentioning 'something like the Intel QAT' doesn't suggest you have somet=
-hing
-> specific in mind.
-
-I have an Intel QAT card, and under some circumstances I could offload the
-crypto to it...  But the only operations the driver currently makes availa=
-ble
-are:
-
-	authenc(hmac(sha1),cbc(aes))
-	authenc(hmac(sha256),cbc(aes))
-	authenc(hmac(sha512),cbc(aes))
-
-The first one can't be used for kerberos's aes128-cts-hmac-sha1-96 as it
-hashes the ciphertext, not the plain text.  I don't have anything that use=
-s
-the third.  The second is a possibility.  I think that could probably do
-aes128-cts-hmac-sha256-128.
-
-Now, it's possible that the QAT device range can do more than the driver
-offers.  I'm presuming that the driver offers what IPsec wants to support.
-Also, waving these ideas in front of Intel devs might expand the range of =
-what
-future QATs can do ;-)
-
-Mostly, though, by "something like" I was just offering the possibility th=
-at
-other architectures or crypto cards may also offer usable services - but I
-haven't investigated.
-
-> Also, this patch is rather big and therefore hard to review.
-
-Yeah.  Mostly I wanted to wave it in front of Herbert before expending the
-effort to slice it up.  Sadly, it doesn't seem that what I came up with is
-what he wanted.
-
-David
-
+Acked-by: Ashutosh Dixit <ashutosh.dixit@intel.com>
