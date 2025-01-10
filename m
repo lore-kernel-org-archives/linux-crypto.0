@@ -1,145 +1,98 @@
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D73F3746E;
-	Fri, 10 Jan 2025 06:27:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CCE8207656
+	for <linux-crypto@vger.kernel.org>; Fri, 10 Jan 2025 07:14:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736490444; cv=none; b=S+ZOVR6DdUpmu4HCPuqfWySz0krZTK6y2GRhh87m5Wkgo4VYojxHxsahstJn2BgOmZV1Z/IVHeD/Amdc3mgGcaHamhfYdkkIF4L8nlwNhENKs46DbsE2QWxHbZrbmNw23MGn57pPaduOciPkVmkZ/ZVLdbdvnpL09EA+I99YiaQ=
+	t=1736493244; cv=none; b=bTSqFFpwwJwL8SlnW9sEhbg0MopgxvX9smDtCJljyu7ctWg64LmfIoPu5Y2Cb41ahMIyRKvq41ue/XbLk4ZM0okoDBjIc0xE4memdDQwRunnxXJXuXRlTdy8UxxX1bdmFbMd1VeuGhXERtQ5zbzS0hRZySiUluR3prE+IuuUViA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736490444; c=relaxed/simple;
-	bh=AanatjAqHa4eIFQjryvuF9jL9E7FlmJUzM4oozzxVr0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=spvL0EHlPZ0LkI3hJTSK48yEYd4JxXPojtH+52qePR/6Sv+JmR7ukjL24/WywMyKx/sQQZQKInZucbkib2dcZ2G50dfTa5IB1LZEr+xOXb7YWQFgxjKfPx5ss7Q5dn7TmmsjaLtze98jnJvET8vK2xp0L9cbZ3piSRVEMVo4ggI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4YTsBT3sq2z4f3jsv;
-	Fri, 10 Jan 2025 14:26:57 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.75])
-	by mail.maildlp.com (Postfix) with ESMTP id 919DA1A0FF6;
-	Fri, 10 Jan 2025 14:27:12 +0800 (CST)
-Received: from hulk-vt.huawei.com (unknown [10.67.174.121])
-	by APP2 (Coremail) with SMTP id Syh0CgCXoGOzvYBnLbQtAg--.33415S3;
-	Fri, 10 Jan 2025 14:27:12 +0800 (CST)
-From: Chen Ridong <chenridong@huaweicloud.com>
-To: steffen.klassert@secunet.com,
-	daniel.m.jordan@oracle.com,
-	herbert@gondor.apana.org.au,
-	nstange@suse.de
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	chenridong@huawei.com,
-	wangweiyang2@huawei.com
-Subject: [PATCH v2 1/3] padata: add pd get/put refcnt helper
-Date: Fri, 10 Jan 2025 06:16:37 +0000
-Message-Id: <20250110061639.1280907-2-chenridong@huaweicloud.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250110061639.1280907-1-chenridong@huaweicloud.com>
-References: <20250110061639.1280907-1-chenridong@huaweicloud.com>
+	s=arc-20240116; t=1736493244; c=relaxed/simple;
+	bh=lprOQfulzu8v6KvGdaC/bIeIPCWpKvc6opCkgeRU8p8=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=uZxEleaEcGP5jNZnMF64wYGpuUR9oON6TScOh8jfKG0qfRxU0gnL8MPd67hmlhsn89UtugHKM6lR5s+b1wtiJwZnYewENXcJwtw4XX/v6sBLlfPdCtxALSyyzZkIOZhlVxrLQHLjnZpNO+Bp2goZLxiMaYZUkikyB+xQGc9eu2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V61kgX2s; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V61kgX2s"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736493242;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rQbXIksEk073+Fi/YrEVMIhtLpzXwHk7tiFH7RnZK5M=;
+	b=V61kgX2sg/pXaY2oCVnh2wd3bOTNJjRgac7L9uEh784T4E/UAwy/GPeLS+WOnXYHjSv8RY
+	smkWnaTEpd6PeXLlhQyZbwzYnh3tMTTkvTYT5vYdeeQ450st3uj43tkqP7OJmQa78vPNeZ
+	KzH4VUELI2kulMgtSPqcEyoYpnF/eNo=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-270-O0KBR35FP7uFyN5xYPBuug-1; Fri,
+ 10 Jan 2025 02:13:56 -0500
+X-MC-Unique: O0KBR35FP7uFyN5xYPBuug-1
+X-Mimecast-MFC-AGG-ID: O0KBR35FP7uFyN5xYPBuug
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 511911955D64;
+	Fri, 10 Jan 2025 07:13:54 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.12])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4C52530001BE;
+	Fri, 10 Jan 2025 07:13:49 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20250110055058.GA63811@sol.localdomain>
+References: <20250110055058.GA63811@sol.localdomain> <20250110010313.1471063-1-dhowells@redhat.com> <20250110010313.1471063-3-dhowells@redhat.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: dhowells@redhat.com, Herbert Xu <herbert@gondor.apana.org.au>,
+    Chuck Lever <chuck.lever@oracle.com>,
+    Trond Myklebust <trond.myklebust@hammerspace.com>,
+    "David S. Miller" <davem@davemloft.net>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+    linux-crypto@vger.kernel.org, linux-afs@lists.infradead.org,
+    linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 2/8] crypto/krb5: Provide Kerberos 5 crypto through AEAD API
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:Syh0CgCXoGOzvYBnLbQtAg--.33415S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7ZFWfJFW7ur48ZrWrAw1kKrg_yoW8uw4rpF
-	y7Gry3XFW8JFWxuw45Jws7Zw1Fgw1kW347ta9xKa4furyayw1rtF1vv34xtryFqryvywn8
-	Za1Yg3W2kwsrJFUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUPIb4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUGw
-	A2048vs2IY020Ec7CjxVAFwI0_JFI_Gr1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
-	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
-	WxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx
-	0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWU
-	JVW8JwACjcxG0xvY0x0EwIxGrwCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrw
-	CF54CYxVCY1x0262kKe7AKxVWUAVWUtwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02
-	F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GF
-	ylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r
-	1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07jb
-	8n5UUUUU=
-X-CM-SenderInfo: hfkh02xlgr0w46kxt4xhlfz01xgou0bp/
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1478992.1736493228.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 10 Jan 2025 07:13:48 +0000
+Message-ID: <1478993.1736493228@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-From: Chen Ridong <chenridong@huawei.com>
+Eric Biggers <ebiggers@kernel.org> wrote:
 
-Add helpers for pd to get/put refcnt to make code consice.
+> It sounds like a lot of workarounds had to be implemented to fit these
+> protocols into the crypto_aead API.
+> =
 
-Signed-off-by: Chen Ridong <chenridong@huawei.com>
----
- kernel/padata.c | 27 ++++++++++++++++++++-------
- 1 file changed, 20 insertions(+), 7 deletions(-)
+> It also seems unlikely that there will be other implementations of these
+> protocols added to the kernel, besides the one you're adding in crypto/k=
+rb5/.
+> =
 
-diff --git a/kernel/padata.c b/kernel/padata.c
-index cf63d9bcf482..7d79df1e3b33 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -47,6 +47,22 @@ struct padata_mt_job_state {
- static void padata_free_pd(struct parallel_data *pd);
- static void __init padata_mt_helper(struct work_struct *work);
- 
-+static inline void padata_get_pd(struct parallel_data *pd)
-+{
-+	refcount_inc(&pd->refcnt);
-+}
-+
-+static inline void padata_put_pd_cnt(struct parallel_data *pd, int cnt)
-+{
-+	if (refcount_sub_and_test(cnt, &pd->refcnt))
-+		padata_free_pd(pd);
-+}
-+
-+static inline void padata_put_pd(struct parallel_data *pd)
-+{
-+	padata_put_pd_cnt(pd, 1);
-+}
-+
- static int padata_index_to_cpu(struct parallel_data *pd, int cpu_index)
- {
- 	int cpu, target_cpu;
-@@ -206,7 +222,7 @@ int padata_do_parallel(struct padata_shell *ps,
- 	if ((pinst->flags & PADATA_RESET))
- 		goto out;
- 
--	refcount_inc(&pd->refcnt);
-+	padata_get_pd(pd);
- 	padata->pd = pd;
- 	padata->cb_cpu = *cb_cpu;
- 
-@@ -380,8 +396,7 @@ static void padata_serial_worker(struct work_struct *serial_work)
- 	}
- 	local_bh_enable();
- 
--	if (refcount_sub_and_test(cnt, &pd->refcnt))
--		padata_free_pd(pd);
-+	padata_put_pd_cnt(pd, cnt);
- }
- 
- /**
-@@ -681,8 +696,7 @@ static int padata_replace(struct padata_instance *pinst)
- 	synchronize_rcu();
- 
- 	list_for_each_entry_continue_reverse(ps, &pinst->pslist, list)
--		if (refcount_dec_and_test(&ps->opd->refcnt))
--			padata_free_pd(ps->opd);
-+		padata_put_pd(ps->opd);
- 
- 	pinst->flags &= ~PADATA_RESET;
- 
-@@ -1124,8 +1138,7 @@ void padata_free_shell(struct padata_shell *ps)
- 	mutex_lock(&ps->pinst->lock);
- 	list_del(&ps->list);
- 	pd = rcu_dereference_protected(ps->pd, 1);
--	if (refcount_dec_and_test(&pd->refcnt))
--		padata_free_pd(pd);
-+	padata_put_pd(pd);
- 	mutex_unlock(&ps->pinst->lock);
- 
- 	kfree(ps);
--- 
-2.34.1
+> Given that, providing this functionality as library functions instead wo=
+uld be
+> much simpler.  Take a look at how crypto/kdf_sp800108.c works, for examp=
+le.
+
+Yes.  That's how I did my first implementation.  I basically took the code
+from net/sunrpc/auth_gss/ and made it more generic.  Herbert wants it done
+this way, however.  :-/
+
+David
 
