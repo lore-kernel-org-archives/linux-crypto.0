@@ -1,39 +1,39 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F90D20B21D;
-	Fri, 10 Jan 2025 09:49:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2BC320ADD7;
+	Fri, 10 Jan 2025 10:02:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736502564; cv=none; b=fGBWZ/XzsbpaISaEXClMNy5copvyd1eWSAQHK397xEdj4iiprQ5wwajV9dg438SM99k+iF2lAnziZNyQJJ426hQcr4SaI73xXOM9+RmBiChnndshMiVO5BUMGARJt8ZxC+43JasfohmRLuQeqZ2r/L81t6oqlCDaOB1SOhn+AlQ=
+	t=1736503378; cv=none; b=It8qc6hny1u4pdZIMXXoGkmj+8yEWES2WCHXOV83PgoQadMLu7NyckGABDG+5O0pDYeUe+fC1C1ZS89961FaDBE1sLEMRIOwUQKxZW0DO0ifMMNsyBNrThJe98vBTqcDaezSOAGk34hLpy4MoakVuDYFe1DSR6KUGOPBmnfrI2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736502564; c=relaxed/simple;
-	bh=MZm7JsfukNZTzizqFkl+4BmfBELHFIJk4hrjdZsbZcE=;
+	s=arc-20240116; t=1736503378; c=relaxed/simple;
+	bh=tqs0+paK0NvHbEBfE2HlZAXYGEfQUXwFsV6dBotUaxY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=plHAaMAmswBC8PpLTzi47FpTiooRPSgdNc6Tc00jV/Ta5J0Yk/UeiHwlqmgZi3HdoJ+dJUvvHDBOjUqqcLrq0VnAf8zp49eFI244Zg1ZL5vcF5z9DUJIS9QVzk6wzXJkuzTOlMUa2w7TRlW/i6KaWSZ4P0TT/sd/FXNJJY3nuL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=f4Xg4moZ; arc=none smtp.client-ip=144.6.53.87
+	 Content-Type:Content-Disposition:In-Reply-To; b=j1tv1//2YazckfsI5IzuYwhu6P0eV82fCcF7eXMtHY5Icvw44UqsPXVCa6hhUBXpogHdESddnEZJVyqCy59e8IlbIBztkBu1hI71eerPpMo85fQBpa5scsCWkGGAhZkJTaYzr0prsWFfOcTFqYbiyogwzLQ8b3vDX2N1IWMI1hI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=s1YN9F4J; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="f4Xg4moZ"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="s1YN9F4J"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
 	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=W6OrZGwU2ohzYLkVhoo1Up0mkLfx9Dld/9qt6ikIX3o=; b=f4Xg4moZcRCldbafjO7Jkm4mrf
-	4KQE46rcfqRf99aKwl7v10HhX+QhDSe3jyvbZmWLzSqLgpMDwb37pybH5ZUzl7KQE80ZV2UMdkybr
-	x3coHDNfty+DWCDt+hUTI+jLgMmxZSCDWmGFqBZv6+cwPsnoYmX7xmNQ94pOSIpTLJqUzWq8okynE
-	brQOpbAlt63JR2pIBOoSUXxUAZizGwvV4nWb4sSjZgqSvXFXRsSESCvWmoTE+84lI+4AGp1mRsDZM
-	yeISqT8W7Jjlu3GzqEiCK/NjjPe6PZEoS3uQKokJlTiZanuZnnyCWCbjVaswV/GMyzjHyD4YwdbXI
-	PgnuYX0A==;
+	bh=1m1KB9AdbQNDslVOCwIrJ7po0oY3YsOSAHFrY0T0XQ0=; b=s1YN9F4JvRrqu6FDvfABUotkXX
+	egyLmcrPJPZfrXr2UQ5Dyr8p7yDTwePCApUywf6STJ3MAex65qemnLMtVseIPKnMr4Ko5xlz/nQtE
+	OXW1tCi9yDOao/RKEZ3pychAw8U9DFkZ6h3aq6j7pBwRCIAvv3xCIhInMeav290M8K5t5tQJn3vG/
+	X8BKessJ7xqR/J+N03lVm9w8bXBeUoj/NNgqtVLSxJp2g0weFFsxJiMcMTen7RqGIENf1chB6SiO6
+	wxhgy2C8Gm/CoDUZ8rcIADN6yxNTll4YV5nw02Wg1xLyTP0z11hqKHS2nY4YQ5vlnCbRtNC65k3dG
+	1YuMv73Q==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tWBQB-007nZ7-23;
-	Fri, 10 Jan 2025 17:48:37 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 10 Jan 2025 17:48:36 +0800
-Date: Fri, 10 Jan 2025 17:48:36 +0800
+	id 1tWBdb-007npH-15;
+	Fri, 10 Jan 2025 18:02:29 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 10 Jan 2025 18:02:28 +0800
+Date: Fri, 10 Jan 2025 18:02:28 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
 To: David Howells <dhowells@redhat.com>
 Cc: Chuck Lever <chuck.lever@oracle.com>,
@@ -48,7 +48,7 @@ Cc: Chuck Lever <chuck.lever@oracle.com>,
 	linux-kernel@vger.kernel.org
 Subject: Re: [RFC PATCH 2/8] crypto/krb5: Provide Kerberos 5 crypto through
  AEAD API
-Message-ID: <Z4Ds9NBiXUti-idl@gondor.apana.org.au>
+Message-ID: <Z4DwNPgLFcfy6jdl@gondor.apana.org.au>
 References: <20250110010313.1471063-1-dhowells@redhat.com>
  <20250110010313.1471063-3-dhowells@redhat.com>
 Precedence: bulk
@@ -63,39 +63,24 @@ In-Reply-To: <20250110010313.1471063-3-dhowells@redhat.com>
 
 On Fri, Jan 10, 2025 at 01:03:04AM +0000, David Howells wrote:
 >
-> +		.etype			= KRB5_ENCTYPE_AES128_CTS_HMAC_SHA256_128,
-> +		.ctype			= KRB5_CKSUMTYPE_HMAC_SHA256_128_AES128,
-> +		.name			= "aes128-cts-hmac-sha256-128",
-> +		.encrypt_name		= "cts(cbc(aes))",
-> +		.cksum_name		= "hmac(sha256)",
-> +		.hash_name		= "sha256",
-> +		.key_bytes		= 16,
-> +		.key_len		= 16,
-> +		.Kc_len			= 16,
-> +		.Ke_len			= 16,
-> +		.Ki_len			= 16,
-> +		.block_len		= 16,
-> +		.conf_len		= 16,
-> +		.cksum_len		= 16,
-> +		.hash_len		= 20,
-> +		.prf_len		= 32,
-> +		.keyed_cksum		= true,
-> +		.random_to_key		= NULL, /* Identity */
-> +		.profile		= &rfc8009_crypto_profile,
-> +
-> +		.aead.setkey		= krb5_setkey,
-> +		.aead.setauthsize	= NULL,
-> +		.aead.encrypt		= rfc8009_aead_encrypt,
-> +		.aead.decrypt		= rfc8009_aead_decrypt,
+> Authentication tags are not used at all and should cause EINVAL if used (a
+> later patch does that).
 
-rfc8009 is basically the same as authenc.  So rather than being an
-AEAD algorithm it should really be an AEAD template which takes a
-cipher and and a hash as its parameters.
+What do you mean by this? The authentication tag is the checksum
+that you're referring to and you appear to be using it in the rfc8009
+encrypt/decrypt functions.
 
-In fact, you could probably use authenc directly.
+> For the moment, the kerberos encryption algorithms use separate hash and
+> cipher algorithms internally, but should really use dual hash+cipher and
+> cipher+hash algorithms if possible to avoid doing these in series.  Offload
+> off this may be possible through something like the Intel QAT.
 
-rfc3691 on the other hand is slightly different from authenc in that
-the integrity is computed on the plain text.
+Please elaborate on what you mean by this.  For IPsec, the main
+benefit with reframing cbc(aes)+hmac as aead is having a single
+code-path that supports both types of algorithms.
+
+So does your use-case support both standard AEAD algorithms such
+as GCM as well as these legacy algorithms?
 
 Cheers,
 -- 
