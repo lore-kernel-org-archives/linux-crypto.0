@@ -1,98 +1,182 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 353901891A8;
-	Thu,  9 Jan 2025 18:06:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EB851B59A
+	for <linux-crypto@vger.kernel.org>; Fri, 10 Jan 2025 01:03:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736445964; cv=none; b=VvHEyCfUg876uGgrEmYxXy8UlEdiwWGoaWWMkr5oFovrJb2FwTebjDin5EpnoVGYN28ukq2myVh045svMJRL8JsE63HRfqjdXQUl0H7gIUF9MzCVFKBKpnJjQbHKPxKz4Cwf4idIawEkLnve+ppo6OhZbiIIU0jjqIZfLC+2X38=
+	t=1736471010; cv=none; b=ZIBhbTsmZ4G6iSifV9GHrv/3HAGopRNNuKbastadG/XTUpnkyzPpo0UN6IsbEroM1l/9UF0erqqeCshWBHqK6mPPTGPmMXaWWsEa/UghS2Ir+PaFx+GtJJ/IV31aRJl7FeZ/kHEGpgWhz/7O9l6Y4ONejn4gqQRIY6XnFPoWVaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736445964; c=relaxed/simple;
-	bh=rp9xKD+8m1msQ0xxbCs9oZzFyU1GURrqUZhq3NbpvyQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VZDfMAbOVoBTLRuPumm/61F/h2i1GJZRnbEgzMhnss0baXDo1f0XYOpYBi4tzja4LFrqQzafYP5JJv1S7AdbWgoNz5EGEy4gUerg2ncDitCupUAfGFl3lErZBMARDgI5diRRJnipAROC50bHeFT1zHg9fSZZr/jK+qNPqzMkH2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hXJVC9TE; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1736471010; c=relaxed/simple;
+	bh=AnfAXcm3rwbFDVeskkWcz79cWy17z6ZuKaDRLJGOdU0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NYYPGzwg/TbLfUbiCJjVXDLUGboCHtD9OA5PmKodF8Q55gSw9xriwH9gNiNkBPbfUustMC4R0lQ8wa6iUIFFRuaceiVEzx0j9iQHdGFYE/19fHwVNrDDcE+EfSvj/Yo3Q4hTvAnQnSjOO4qkQw90JBJoRszNDSuWWwLXf40VUhk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D1BEcCPj; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hXJVC9TE"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C334DC4CEE4;
-	Thu,  9 Jan 2025 18:06:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736445963;
-	bh=rp9xKD+8m1msQ0xxbCs9oZzFyU1GURrqUZhq3NbpvyQ=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=hXJVC9TEna9TWYKbS9F02aIUvOHalq4E7m1+cvMk0ArDdbnyNkOQeESQ7Ur7QTEYq
-	 oV3fJnNHiU6ugTU9/tuOjHdJ9qaR831jsML8BcJ2B2+uzRQfA4kpmr3AmZ+XqRvw70
-	 BTN8HX8ggLtR2WOIhN2X2Ipa4OKa5qs1wwTNGfy1p+9su4jHqsiWIAwGFmgaxU7Nfw
-	 H9Abn1fQ/2SPP2QU6lVw0EYHITfjtwSWp9wIQJbaVZRVNv4TDYE1jWwRNuescPEqI8
-	 vYK392uOFALwuMqP1HoC1bERclFcBuYV7fmAeGJqkaXECHPwUoHQw9LVho0fFgK9tk
-	 fJ+fXn+JQWXLQ==
-Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-844e61f3902so84636339f.0;
-        Thu, 09 Jan 2025 10:06:03 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCU7vJw0Yhmq1HoAJE/OsvsfkQbIo3Qpr1D+sW06TxmQ5b/DqPayTYNKisT6YlckhoJ/IfnE5UGOvIbJrutD@vger.kernel.org, AJvYcCUKdmxyZjBp3BN7k7bDpN4N42WSL1faJzx46lngDyuVmFlNTI2wAZ/leYEmL86hu//fxZPWQhEABSYGBg==@vger.kernel.org, AJvYcCULY3K6q3eLHaJUinkOdCYzYWWRKDGEXIaMe8mEfRkN7N0K8Ln5LelCSICnWBP+PVw21khAYRY0I/yXGM34ex8875Lt@vger.kernel.org, AJvYcCVCk/MjPKokyvIFdvJp7RsCvf++XNAKuITebk7mFTLuT4l7VFi6vfvJas82zOGLosM7pdOUakoKNiRPAVV1L9BY@vger.kernel.org, AJvYcCVFFZUa45jD1kY7O9eFU5SsUOqiXanSiyk6iItfL/7JIGCYDwQAnECEOmbGSW/J+JeHcB6lQHM7lC43jd5b@vger.kernel.org, AJvYcCVKb72VeDQU6u4ACgTVz6YEQ9f7JtoFU9ctAvBDnt3aKvFaKQ54WshcK/7b9jpNv5D7FWre/NxGxAk=@vger.kernel.org, AJvYcCWSrc8M6fjpLnYyFHGOEb0RYL+mB/Fgxv1FV7zmoLzsAJ/Wtn0fIkCarRXTIngSvrano0x6/jdeyxsYuYEC@vger.kernel.org, AJvYcCWtgvWJyxsKGbn8X+vDuQqN1WrpeWmOWctnx7Ti3HzLu15h1v1usBlf1r3HeMsvDVagzn8TvL7uzPxfkw==@vger.kernel.org, AJvYcCX1Empd1OmdV4QaxGiw76Wp2zNEdc/H8iMRZeDlhlVKhz+vvxL6oJW0ZpjcVO3ki6VJyF8ALxZck6AoB/K1dw==@vger.kernel.org, AJvYcCXCdgnNYyUlkiKT78jlZjfznht9f2JVWR1FljjRzn/hSF7yDBGVSj/joJqZdFNNQVpgo7plN3gnyhdWbQ==@vger.kernel.org, AJvYcCXFAQPNv8JtV7Wufe/McLhaGMCOYYMEUuHAmDXIIawBAvL4rUEOqJWikiBGT1GQ0wOeS3/g9CdYIF2h@vger.kernel.org, AJvYcCXGtnrLPWgALgr4QfzQA/NmEN6VmXmCX3wvTuErCHMi7SS8EiHmFcpyctKEJjF0V//QHSPsdom+rrFL3VKS@vger.kernel.org, AJvYcCXIzeaTKwsRbHvTyT2sT4J+p6Lh7htnXdaRITEsFqjlkKr7xu+q6+m2LKFK5/i2uR/Qu6E=@vger.kernel.org, AJvYcCXTsx3jAkPtqX7iahsPp8jY9cpP/DM984HqW5e5UUcTmN4TWdk2KDFO+cbAx2jA6Ae3+lm91tc+D1yVGg==@vger.kernel.org, AJvYcCXZ70fEeI70dxqfxPZVy8gOKyomd4lrw3DiPAmwp8fv74mTYEvvhCkSKuLewpzIZgciA3MiXVGc2Ys=@vger.kernel.org, AJvYcCXkhvwjOgsaIzBVYWxnjX61N5K2at4QUYgwmwKHhktkaridkUeBV6OMnzfq0vd6TMRwa9M/P7iyAql4@vger.kernel.org, AJvYcCXrcdxhbTsLKpwI1RIN5zp6raljAefAN4PXOQoTv2fBw5HAHfCD7FvZy5vJWBmhGWDqwVNFKpR8Co/lYKYTnT8acJP5/X5U@vger.kernel.org
-X-Gm-Message-State: AOJu0YwAA8huuUN4T/BErSHEBklOz+LJ/qJkbUPu2hkdEypz5WdiISEO
-	+iw2r5548Ec7U0VJ51OVdV81QeQasNe8w7IkhP5T2gqDd/c925a0zD8/6rhvfa+CwPjO/nxhtxn
-	OkxDxrMGctxtZtN+RNCllTsC25ns=
-X-Google-Smtp-Source: AGHT+IHw82IqZn0L3vIWI2GRAE2/Fu1vkOzFuTOkK3ccul7HxPp7E2ac95iMCNTUN8mztI4YyZ2Kf9FZUsicSlonzfg=
-X-Received: by 2002:a05:6e02:3048:b0:3a7:6a98:3fdf with SMTP id
- e9e14a558f8ab-3ce3a9da817mr60484875ab.14.1736445963152; Thu, 09 Jan 2025
- 10:06:03 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D1BEcCPj"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1736471007;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=JQY/vqL94CZczS7Z4wdPci4XXmHLvDhOXXqWkw72nUA=;
+	b=D1BEcCPjS8paCYwg/70aaXzLmJrZOa/NCvMP2ix5VJqDtXYjQI0VfDcbVqgUHxIe/7kLIV
+	8FeibJYokPW3eGJWAQ2LjNZ9xC8NpvFTabxLm2v0lOg7EOqz+230vxYkCPUq51Z5fbNsHQ
+	YjlwR3JdrgifExrmmvpCpZ+n+y8WGlw=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-594-oVjMjzxjOwq07OTHH_oEmw-1; Thu,
+ 09 Jan 2025 20:03:24 -0500
+X-MC-Unique: oVjMjzxjOwq07OTHH_oEmw-1
+X-Mimecast-MFC-AGG-ID: oVjMjzxjOwq07OTHH_oEmw
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8481F1956055;
+	Fri, 10 Jan 2025 01:03:21 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.12])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B32011955BE3;
+	Fri, 10 Jan 2025 01:03:16 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Chuck Lever <chuck.lever@oracle.com>
+Cc: David Howells <dhowells@redhat.com>,
+	Trond Myklebust <trond.myklebust@hammerspace.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	linux-crypto@vger.kernel.org,
+	linux-afs@lists.infradead.org,
+	linux-nfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [RFC PATCH 0/8] crypto: Add generic Kerberos library with crypto as AEAD algorithms
+Date: Fri, 10 Jan 2025 01:03:02 +0000
+Message-ID: <20250110010313.1471063-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250109-jag-ctl_table_const-v1-1-622aea7230cf@kernel.org>
-In-Reply-To: <20250109-jag-ctl_table_const-v1-1-622aea7230cf@kernel.org>
-From: Song Liu <song@kernel.org>
-Date: Thu, 9 Jan 2025 10:05:51 -0800
-X-Gmail-Original-Message-ID: <CAPhsuW5zpA28gkBQYMMuYCUbnDzdeq4pHsd0Mx=PBnDPiHKqHw@mail.gmail.com>
-X-Gm-Features: AbW1kvZZD8oqcdTZ9DXv7tEUC7bpyqeBsuw6nnhXboAE2kNg_1eTiibnv93HXj8
-Message-ID: <CAPhsuW5zpA28gkBQYMMuYCUbnDzdeq4pHsd0Mx=PBnDPiHKqHw@mail.gmail.com>
-Subject: Re: [PATCH] treewide: const qualify ctl_tables where applicable
-To: Joel Granados <joel.granados@kernel.org>
-Cc: =?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>, 
-	Kees Cook <kees@kernel.org>, Luis Chamberlain <mcgrof@kernel.org>, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org, 
-	linux-s390@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	openipmi-developer@lists.sourceforge.net, intel-gfx@lists.freedesktop.org, 
-	dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org, 
-	linux-hyperv@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	linux-raid@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	linux-serial@vger.kernel.org, xen-devel@lists.xenproject.org, 
-	linux-aio@kvack.org, linux-fsdevel@vger.kernel.org, netfs@lists.linux.dev, 
-	codalist@coda.cs.cmu.edu, linux-mm@kvack.org, linux-nfs@vger.kernel.org, 
-	ocfs2-devel@lists.linux.dev, fsverity@lists.linux.dev, 
-	linux-xfs@vger.kernel.org, io-uring@vger.kernel.org, bpf@vger.kernel.org, 
-	kexec@lists.infradead.org, linux-trace-kernel@vger.kernel.org, 
-	linux-hardening@vger.kernel.org, apparmor@lists.ubuntu.com, 
-	linux-security-module@vger.kernel.org, keyrings@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Thu, Jan 9, 2025 at 5:16=E2=80=AFAM Joel Granados <joel.granados@kernel.=
-org> wrote:
->
-[...]
->  drivers/base/firmware_loader/fallback_table.c | 2 +-
->  drivers/cdrom/cdrom.c                         | 2 +-
->  drivers/char/hpet.c                           | 2 +-
->  drivers/char/ipmi/ipmi_poweroff.c             | 2 +-
->  drivers/char/random.c                         | 2 +-
->  drivers/gpu/drm/i915/i915_perf.c              | 2 +-
->  drivers/gpu/drm/xe/xe_observation.c           | 2 +-
->  drivers/hv/hv_common.c                        | 2 +-
->  drivers/infiniband/core/iwcm.c                | 2 +-
->  drivers/infiniband/core/ucma.c                | 2 +-
->  drivers/macintosh/mac_hid.c                   | 2 +-
->  drivers/md/md.c                               | 2 +-
+Hi Herbert, Chuck,
 
-For md bits:
+Here's my next go at a generic Kerberos crypto library in the kernel so
+that I can share code between rxrpc and sunrpc (and cifs?).
 
-Reviewed-by: Song Liu <song@kernel.org>
+I derived some of the parts from the sunrpc gss library and added more
+advanced AES and Camellia crypto.  The crypto bits are inside AEAD
+algorithms as Herbert required, but there's also a library of supplementary
+functions to aid in managing message layout.
 
-Thanks,
-Song
+You can use:
 
-[...]
+        const struct krb5_enctype *crypto_krb5_find_enctype(u32 enctype);
+
+to go and get an information table and this will also let you get at the
+name of the AEAD algorithm associated with that encoding type number.
+
+Each AEAD algorithm is defined for a particular Kerberos 5 type by name
+(not by enctype number) and supports both encryption and checksumming
+(MIC) through the AEAD encrypt/decrypt request API.
+
+Note that the plain text may be a different size to the cipher text and
+this causes the testmgr some issues as it thinks the extra data is an auth
+tag (but this doesn't want auth tags).
+
+A kerberos AEAD object is configured through its setkey method and this
+takes a compound structure that indicates the mode of operation (encrypt or
+checksum), the usage type and either the transport key or the subkeys.  The
+setkey method allocates and keys the constituent ciphers and hashes - but
+that's a detail hidden inside the object.
+
+This library has its own self-testing framework that checks more things
+than is possible with the testmgr, including subkey derivation.  It also
+checks things about the output of encrypt + decrypt that testmgr doesn't.
+That said, testmgr is also provisioned with some encryption and
+checksumming tests for Camilla and AES2.
+
+Note that, for purposes of illustration, I've included some rxrpc patches
+that use this interface to implement the rxgk Rx security class.  The
+branch also is based on net-next that carries some rxrpc patches that are a
+prerequisite for this, but the crypto patches don't need it.
+
+---
+The patches can be found here also:
+
+	http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=crypto-krb5
+
+David
+
+David Howells (8):
+  crypto/krb5: Add some constants out of sunrpc headers
+  crypto/krb5: Provide Kerberos 5 crypto through AEAD API
+  crypto/krb5: Test manager data
+  rxrpc: Add the security index for yfs-rxgk
+  rxrpc: Add YFS RxGK (GSSAPI) security class
+  rxrpc: rxgk: Provide infrastructure and key derivation
+  rxrpc: rxgk: Implement the yfs-rxgk security class (GSSAPI)
+  rxrpc: rxgk: Implement connection rekeying
+
+ crypto/Kconfig                   |    1 +
+ crypto/Makefile                  |    2 +
+ crypto/aead.c                    |    2 +
+ crypto/krb5/Kconfig              |   24 +
+ crypto/krb5/Makefile             |   17 +
+ crypto/krb5/internal.h           |  162 ++++
+ crypto/krb5/kdf.c                |  334 ++++++++
+ crypto/krb5/krb5_aead.c          |  462 +++++++++++
+ crypto/krb5/rfc3961_simplified.c |  815 +++++++++++++++++++
+ crypto/krb5/rfc6803_camellia.c   |  190 +++++
+ crypto/krb5/rfc8009_aes2.c       |  394 ++++++++++
+ crypto/krb5/selftest.c           |  533 +++++++++++++
+ crypto/krb5/selftest_data.c      |  370 +++++++++
+ crypto/testmgr.c                 |   24 +
+ crypto/testmgr.h                 |  456 +++++++++++
+ fs/afs/misc.c                    |   13 +
+ include/crypto/aead.h            |    2 +
+ include/crypto/krb5.h            |  147 ++++
+ include/keys/rxrpc-type.h        |   17 +
+ include/trace/events/rxrpc.h     |   36 +
+ include/uapi/linux/rxrpc.h       |   17 +
+ net/rxrpc/Kconfig                |   10 +
+ net/rxrpc/Makefile               |    5 +-
+ net/rxrpc/ar-internal.h          |   22 +
+ net/rxrpc/conn_event.c           |    2 +-
+ net/rxrpc/conn_object.c          |    1 +
+ net/rxrpc/key.c                  |  183 +++++
+ net/rxrpc/output.c               |    2 +-
+ net/rxrpc/protocol.h             |   20 +
+ net/rxrpc/rxgk.c                 | 1244 ++++++++++++++++++++++++++++++
+ net/rxrpc/rxgk_app.c             |  318 ++++++++
+ net/rxrpc/rxgk_common.h          |   58 ++
+ net/rxrpc/rxgk_kdf.c             |  260 +++++++
+ net/rxrpc/rxkad.c                |    6 +-
+ net/rxrpc/security.c             |    3 +
+ 35 files changed, 6147 insertions(+), 5 deletions(-)
+ create mode 100644 crypto/krb5/Kconfig
+ create mode 100644 crypto/krb5/Makefile
+ create mode 100644 crypto/krb5/internal.h
+ create mode 100644 crypto/krb5/kdf.c
+ create mode 100644 crypto/krb5/krb5_aead.c
+ create mode 100644 crypto/krb5/rfc3961_simplified.c
+ create mode 100644 crypto/krb5/rfc6803_camellia.c
+ create mode 100644 crypto/krb5/rfc8009_aes2.c
+ create mode 100644 crypto/krb5/selftest.c
+ create mode 100644 crypto/krb5/selftest_data.c
+ create mode 100644 include/crypto/krb5.h
+ create mode 100644 net/rxrpc/rxgk.c
+ create mode 100644 net/rxrpc/rxgk_app.c
+ create mode 100644 net/rxrpc/rxgk_common.h
+ create mode 100644 net/rxrpc/rxgk_kdf.c
+
