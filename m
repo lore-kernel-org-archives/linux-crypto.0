@@ -1,189 +1,327 @@
-Received: from sequoia-grove.ad.secure-endpoints.com (sequoia-grove.ad.secure-endpoints.com [208.125.0.235])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2070.outbound.protection.outlook.com [40.107.244.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D29F721578A
-	for <linux-crypto@vger.kernel.org>; Fri, 10 Jan 2025 18:30:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=208.125.0.235
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736533824; cv=none; b=scImPbYwGM8eM4lgkuOB6/uSwNPZ0kSXY6vTgrV/FhjL069lO0HvhF6JGGL9uAh4H9OlR8iHyC4Klqa33j6+mfJrR92hfrisRiJBzr5leZ/wD7hfQQ2bqwCoyrOJO2/F8XWYkKvX2ZAW9JF8Yctsv6Q2uEwVc57qQt46Sdtt2us=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736533824; c=relaxed/simple;
-	bh=0cJsxkolRPMPnIc+eB0pL/YA1nxHdX9ZHqrciYslF5c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cOEITgG5iNqJ4ImPS1QmPfRBAdYMncPzFoZApj7U7yekbOb/E3KOYyU8GJLF07qbZ6WZ+2NFunndJ8jLqS8Q874c4NNLT5Auvz+OAlydbLiECGU0IyYN6PBfC9h1kR3lTY/IYkcwtMQcbgl37V4OpfT1g7NwWmM8bmhYNggCK/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=auristor.com; spf=pass smtp.mailfrom=auristor.com; dkim=pass (1024-bit key) header.d=auristor.com header.i=jaltman@auristor.com header.b=T87Rjeva; arc=none smtp.client-ip=208.125.0.235
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=auristor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=auristor.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AC2D2144CF;
+	Fri, 10 Jan 2025 22:41:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.70
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1736548916; cv=fail; b=VFQkk+nteTtIDz4ETDWr5gEBCa0YoHL/VZFEID46eZ2nS4aFc8efMmAIMA2HSAEN7Arp3cnwoD78w+xxx8F/sdBdVdOX/FNisUnscXILn2ykiCRK1D1x13ORT1b0e2Vo8MEnA37o145a74N6Vq8zgq17L0f1Gei6fNeJM2MTjso=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1736548916; c=relaxed/simple;
+	bh=go3NET/+oo0fzOex02O9hBYz0T0XTcHvYYUzqN4yW+c=;
+	h=Message-ID:Date:Subject:From:To:Cc:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=LtsD9zyrSE9b+RahjrVbu5fvdlEphmL6TUy0kcYKHz9vahZHkhsEamE8gtHZauJa6cpSK3w7pwqNO3QYEHj3tTo5olUI7CPXLquSyYjPq8bEOxO4KgjmPKD4hqrfo2chVs2nmOnGie3X8z25sJQSmf8JMeAFxEKDt2XreA7gIgg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=DjNFB2Li; arc=fail smtp.client-ip=40.107.244.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=auristor.com header.i=jaltman@auristor.com header.b="T87Rjeva"
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/relaxed;
-	d=auristor.com; s=MDaemon; r=y; t=1736533351; x=1737138151;
-	i=jaltman@auristor.com; q=dns/txt; h=Message-ID:Date:
-	MIME-Version:User-Agent:Subject:To:Cc:References:
-	Content-Language:From:Organization:Disposition-Notification-To:
-	In-Reply-To:Content-Type; bh=0cJsxkolRPMPnIc+eB0pL/YA1nxHdX9ZHqr
-	ciYslF5c=; b=T87RjevaBSrpv5yD31Rx/rT3cFk5Q5CEwXMMQ5x8w8mKRllFijc
-	lQhFewA+xIL/A2VU9vx9bYu0LSFp2TxiNjhMN2b5P139Xrtx1dByfGQ5+o4azRRO
-	Uw/ajBRhjmKvfOn+j6tLL+qNh5PiBF8R5z08Ul/kgy5Ew+yYSIWRrDNc=
-X-MDAV-Result: clean
-X-MDAV-Processed: sequoia-grove.ad.secure-endpoints.com, Fri, 10 Jan 2025 13:22:31 -0500
-Received: from [IPV6:2603:7000:73c:bb00:409a:c0d5:d5cb:b115] by auristor.com (IPv6:2001:470:1f07:f77:28d9:68fb:855d:c2a5) (MDaemon PRO v25.0.0a) 
-	with ESMTPSA id md5001004415487.msg; Fri, 10 Jan 2025 13:22:30 -0500
-X-Spam-Processed: sequoia-grove.ad.secure-endpoints.com, Fri, 10 Jan 2025 13:22:30 -0500
-	(not processed: message from trusted or authenticated source)
-X-MDRemoteIP: 2603:7000:73c:bb00:409a:c0d5:d5cb:b115
-X-MDHelo: [IPV6:2603:7000:73c:bb00:409a:c0d5:d5cb:b115]
-X-MDArrival-Date: Fri, 10 Jan 2025 13:22:30 -0500
-X-MDOrigin-Country: US, NA
-X-Authenticated-Sender: jaltman@auristor.com
-X-Return-Path: prvs=11058a1cee=jaltman@auristor.com
-X-Envelope-From: jaltman@auristor.com
-X-MDaemon-Deliver-To: linux-crypto@vger.kernel.org
-Message-ID: <f506a4fa-ffa2-4258-ae3c-c3cf4568f9a4@auristor.com>
-Date: Fri, 10 Jan 2025 13:22:23 -0500
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="DjNFB2Li"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ZXZrOB/sCrg9zB/mkdRbBN1Q3uunavALWxw/J5PA1mcVFW3351hTHAy3C82RPtGR/T+rqYdqkWv9a+jw//mQiVcexIFb9eCqz/p8Xea9/6D4stlWZzVGymntyq2hpsj+/QY0ZVXfMBoQs27fEBGSANw5GERkRqBd2ngORYxaxhcjdADckaliTX+lEYa6/mrwuMhvs+WTUWTUQa33/SjLxibTts43vLZgR+kVMqrRbf9mG2NizzBdRZeLWALPztTEtSGcWdH36+n6oKo+udrxxa7TtZcp4Pr04QIaQ7SREciWIfLi+k0f7pUE2CM97+DtsKC9MIkG8AvH/OUQmQOKUQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2fKqHDFulIHL89+IxNZ20ddvhRDnsks3kKn193uzMpc=;
+ b=R3teysqD/Y5Zqnwjqiam8IFAgkpjLxJNpUJhtVLCoqS7e41rfuhTcB6ElZMFaAak2mjd6KjgVUsjmxPc4Zhnxm53oAwXBpDPdXDrypuI3topphTDKzOGW8oDfPzG3Ci5UMmtFuj1tVD2/LwFkYSxIMf8cn9gq9AgPe+YflDobkG+4BTM48cxUClCxb1WNS1HdHTQwOAJ1+eFiPyX4QrcpgFEfXb0B5TWeXv7N/ondulJSUNiGhpLFbye0WCXDVAq25j89xfmsVip1mimQkHKYBAZ/p6BCV4sq6nNYVhqobarI0a4BWoGXKHH8jg8aserFoQ+6Kc/KVkEtNCL8Xd1Cw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2fKqHDFulIHL89+IxNZ20ddvhRDnsks3kKn193uzMpc=;
+ b=DjNFB2Lia6iTCCtospChqcQ3WPKdRfbVQsiGeMKWstemdHL2kikx5qjmqD5sZFfT6gVLaoP0EWtHVZDbLCxTOZUW/pnY4Dr9dYefyhfP+qFQVg6VnvYdHdoD6ez9pxno4z/Q92Dfn2ynqWXobgrYfQK0jG+stgzQTqSx4P9oEio=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BL3PR12MB9049.namprd12.prod.outlook.com (2603:10b6:208:3b8::21)
+ by PH8PR12MB6820.namprd12.prod.outlook.com (2603:10b6:510:1cb::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8335.10; Fri, 10 Jan
+ 2025 22:41:50 +0000
+Received: from BL3PR12MB9049.namprd12.prod.outlook.com
+ ([fe80::c170:6906:9ef3:ecef]) by BL3PR12MB9049.namprd12.prod.outlook.com
+ ([fe80::c170:6906:9ef3:ecef%3]) with mapi id 15.20.8335.011; Fri, 10 Jan 2025
+ 22:41:49 +0000
+Message-ID: <d6d08c6b-9602-4f3d-92c2-8db6d50a1b92@amd.com>
+Date: Fri, 10 Jan 2025 16:41:45 -0600
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 6/7] KVM: SVM: Add support to initialize SEV/SNP
+ functionality in KVM
+From: "Kalra, Ashish" <ashish.kalra@amd.com>
+To: Tom Lendacky <thomas.lendacky@amd.com>, seanjc@google.com,
+ pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ john.allen@amd.com, herbert@gondor.apana.org.au, davem@davemloft.net
+Cc: michael.roth@amd.com, dionnaglaze@google.com, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+ linux-coco@lists.linux.dev
+References: <cover.1735931639.git.ashish.kalra@amd.com>
+ <14f97f58d6150c6784909261db7f9a05d8d32566.1735931639.git.ashish.kalra@amd.com>
+ <6241f868-98ee-592b-9475-7e6cec09d977@amd.com>
+ <8ae7718c-2321-4f3a-b5b7-7fb029d150cf@amd.com>
+ <8adf7f48-dab0-cbed-d920-e3b74d8411cf@amd.com>
+ <ee9d2956-fa55-4c83-b17d-055df7e1150c@amd.com>
+Content-Language: en-US
+In-Reply-To: <ee9d2956-fa55-4c83-b17d-055df7e1150c@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA9PR13CA0019.namprd13.prod.outlook.com
+ (2603:10b6:806:21::24) To BL3PR12MB9049.namprd12.prod.outlook.com
+ (2603:10b6:208:3b8::21)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 2/8] crypto/krb5: Provide Kerberos 5 crypto through
- AEAD API
-To: Herbert Xu <herbert@gondor.apana.org.au>,
- David Howells <dhowells@redhat.com>
-Cc: Chuck Lever <chuck.lever@oracle.com>,
- Trond Myklebust <trond.myklebust@hammerspace.com>,
- "David S. Miller" <davem@davemloft.net>,
- Marc Dionne <marc.dionne@auristor.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, linux-crypto@vger.kernel.org,
- linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250110010313.1471063-1-dhowells@redhat.com>
- <20250110010313.1471063-3-dhowells@redhat.com>
- <Z4DwNPgLFcfy6jdl@gondor.apana.org.au>
-Content-Language: en-US
-From: Jeffrey E Altman <jaltman@auristor.com>
-Organization: AuriStor, Inc.
-In-Reply-To: <Z4DwNPgLFcfy6jdl@gondor.apana.org.au>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256; boundary="------------ms080100020601020405080806"
-X-MDCFSigsAdded: auristor.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL3PR12MB9049:EE_|PH8PR12MB6820:EE_
+X-MS-Office365-Filtering-Correlation-Id: 40bdb66d-613c-449c-6ff4-08dd31c7f89b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|376014|7416014|1800799024|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?V0pKc1VuOWcwSW5wMzIvQnZqMkNYbWZIUmdsbmp0YmJjVEVTcnVSRVh4aTkr?=
+ =?utf-8?B?alBBUmFXc2V0MXpCanJVQjdleHovL0d6VTJLMVdnYjNjNjZxOW9tVEswSTd2?=
+ =?utf-8?B?KzliaTkxTmIzQVcvdWEya2FxK21NZHpKb2NiQ2RDN0xPZzdJODVuQStyeE9M?=
+ =?utf-8?B?L21zT0NVYzAxNGxTVWY5UkIxVHJzZjBLTDU4ZWMyUW1CZkduWHU3Ty9JQmQr?=
+ =?utf-8?B?MW84TldRS0x4ekRZVXRUZmc2ZXpoRldqaGNyRHdhZEdJSytFMTVVMnBtMVlt?=
+ =?utf-8?B?cjBaeWJlMkw0V3ArQVlTbW1OQXV6Nm9pVXFHVWJhZTdlSXFmZ09MWE1yV1BG?=
+ =?utf-8?B?SnFvS0RFTjh6YkVoRU5oMnV3RjR3ZW9VNWQ0SFlWTGhYY1ZmdTgvYUxYMi9S?=
+ =?utf-8?B?YVhDWXIrSmI2UUYyQzFOblZqbFpWejBObGgxOG0xNTJnbmdzelRKOEo2Q0JI?=
+ =?utf-8?B?eE9zUVptSVEwNWJmQUlETVFta051WkR2T2laV1lBai9UZWkxWHFpNEFsMGwz?=
+ =?utf-8?B?anVXYk11dGluSDBoWDJJMWxpcW8yZ0NrRXFqWmhIK0lkVXBCWXROaGZGM3JC?=
+ =?utf-8?B?dTJ3U0Q4YXBVVVNoU0xnK084bmZKU1BscEx1aCtieXZIdm1YeEwxMktwcHBs?=
+ =?utf-8?B?UDYxV3lvc2JFZitBdll2WkxxUE9YWmh4Q2crV1phVmNvWTZ4cGQ2bjJ0Umxo?=
+ =?utf-8?B?NnUrMTdrV3lJaUhkWmNtVDVLTTh5YTRHOERralQ2dy95M1lCV1QyR1AwMnNv?=
+ =?utf-8?B?bElKUWpPa3hEdU5DWlp3RUNSSTR2Sm1vOTYxVk9qS3QwV3FEcUtCWGh4ZVIw?=
+ =?utf-8?B?TU5OTVhYYTdFMDNoSzdjeEdBNS9xMU41bkVPTXFsUEtVUm9HMlZzZDIwL1ho?=
+ =?utf-8?B?S2FuT3F4WlF1dWJqZE9iWkJxS2JGc20wSUJMcU8relJJaFBabjV0SkQ0OHl0?=
+ =?utf-8?B?LzVSNTZsTVJEWFNVUjV0b1k4ZGQxMGQxREFDR0ZDU01CbW80QXZ6UWluZFd0?=
+ =?utf-8?B?VUE5ckJlSnI5K3RONnpvZGQ4Q04zRWJ5L0RJa2dPU0s5VVpjeEpOL0VRZys1?=
+ =?utf-8?B?ekNpTnhzaVNPaUsyMzVhVnJhd0xuZDNZU1RXYmlUdGh1TkxXbGVPVllhTWMr?=
+ =?utf-8?B?ZmlGTG5Yanl4RUNOcUszVExYQmNrWHA5MVY1TlBydENvNUo5eTIvYnkyY2hT?=
+ =?utf-8?B?UzFJQmJ0aURuK0l0MTlESWtlK2RKNnlMTVRLTVNpdVM5aXExM2M4b1hlTmpW?=
+ =?utf-8?B?R2hlQ09ld0hyandkaEp2MHdRamZyQ2plY2xsY2NjNjJoenZDNHhHVEpIclU3?=
+ =?utf-8?B?eDk0ODgrUmdXTGQzeVhrYStoSjE4MHJOVWxxbW44NGFUaWZaZUN2Zzdlejcy?=
+ =?utf-8?B?MFhVTXE2bS80RTE4R3h3eVhlYnIrNXhYMU92ZWRVSkJFVzcxbWJHWmQ3dEpv?=
+ =?utf-8?B?YTFFWEdkUWN5NzNKWFR5NGdabjdYRG1DS2l3ek1TTkFxS1piZTRaWFJHYUVr?=
+ =?utf-8?B?ZGxKSHNKclBzODB6dHZ1YnVUbTJwQmY4c09zUGFqcTFzcUp1cEJxQ0hUdFRX?=
+ =?utf-8?B?UlgrWThhQzhpVEVkL3hjYjY3T1k3NU5WYUR6YVFsR0ppQW9JQXovVWdadGov?=
+ =?utf-8?B?MjZzMWc5azhEYnZrTzVuL0JWZmYyRmV1UDQxYVc4ajUvd2I1ajY2MHE2bGhY?=
+ =?utf-8?B?UWtOU29ES1JOd2ZwbC80dTliVWg3eU5zTE1uRVBsUTdJd0RaVmtOVWt6S2Rn?=
+ =?utf-8?B?aUtjRHh5Yk0vVFVCVXNyaG9NWVJJSUdNRlRTMC9kTExFQzJpR3NWRXZRSzFv?=
+ =?utf-8?B?dHc0WCtYVTNzaE1tU2tUc1hGVFUrcHMwZUxXMjBrSUl6Q3pOd1FIY3pIeGFX?=
+ =?utf-8?B?VjdCdm9SV0JoNWVXSjlwSXFVUXhlZGo4dzFnSERHUjlaOFg1b1pDZDJQZm5X?=
+ =?utf-8?Q?TMw/f8Un4C8=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR12MB9049.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?aDRmM0QvYy8vN28zQkxzWUFHZXhjSTFVVWs0cUNqcWxBTlBUQWxRY2d0YWNQ?=
+ =?utf-8?B?eHR0Nzg2RWdSdHRQWHBOQUtoRjR3Y0MyMXF6NnQ2cEFqL3NzTHRGbjd1NnFX?=
+ =?utf-8?B?dU8rSjlBcVdCa0hNZ01sbzJnRzM0OHBJTFluemdsZlA4UkMwOU94eTdwb2JC?=
+ =?utf-8?B?M1h0dG9wU045L0cySkU5NW1rRXJhY0ZiUFRyOEp4NnM1eGxNNFRhMlU5SW9U?=
+ =?utf-8?B?Y3kyNnhmM1FlRGtKZm9YQy8zVVNad1hXZTNBUDN3b0tZM05sclc4bjRaTm4v?=
+ =?utf-8?B?RWFIZFBQa0x6aVVsazhnbWFaWncxajFxcy9sUDR6VkNaKytERUl1ZTdGSzhU?=
+ =?utf-8?B?bW5pVzJLZ3I2RzEvV0wxTXZIUkkrTGZjczhOZVhjNnhtZkhJNy9wbytRckJs?=
+ =?utf-8?B?UUgvMzdRT3ZRNDFGd1FoWnlLWGxMMHRPMHdPa01TY291b2RWS2gwd3NKVnhX?=
+ =?utf-8?B?ajZtOUMvZ05qUFl4eDI2eHlUeE5IN2d3YXo1eXNCRFBFeWE0NGNTMzhJd29l?=
+ =?utf-8?B?ZEd3dHdPSEpNQXQwUTRjU09NdWpaZXZIS2tMMHFZN2ZyR09SUXZRY0U0Ykhp?=
+ =?utf-8?B?SEZ3dHNxQytuemphL3VnYXA2WmFVWE1xODNqQnNnQkw1OVNNeGVUUUQrOVpW?=
+ =?utf-8?B?WFZYUkZQem1ibUYzUTArZkQ1ZGZwRlFYS2dvbERvRzdLREtnTk1sTDIyUzhW?=
+ =?utf-8?B?ODYvbm95S1J4OW9Jdk40VW82cUhGYVBZZ3hndFZuVW5uVG5Ba0dSWUhrcWxk?=
+ =?utf-8?B?Q2Uzd1EyaG92VmUyL3hJSVRLZ2FIVTVhM2ZOVWhFSituWjBoV1V2RnJXd2hF?=
+ =?utf-8?B?ZEdkbVBJbEpIaDJBWXQvYld3VENsOEEyZDFPdjZsT05jb09MOHdoK1NXeXZ5?=
+ =?utf-8?B?T1ozWkNXSlAwWW1YcWtyVnd6MEZzeFhWS0tCR1REcExmWlJRbnFVa0crZTFH?=
+ =?utf-8?B?WkxvNHMxUE9YeUlNRGpTcmx2NndlWW1FZjNOTnZCaThwOVlPdC9MaEhzcGpx?=
+ =?utf-8?B?VDJBRW9rMm1XZXU0cDRNNWRHclNKSTl1Um51aExQWDZEZExOUmZrTVU0Snkv?=
+ =?utf-8?B?UEdwcVlWL0xhUUo5Wmw2ZFRhV2N6c3ZIbnNiVldOR3pJN3Q2elFlRFl5bkV3?=
+ =?utf-8?B?T1VkUk5SeHpIRitjMFFSdjIyazNRc05wQzNmODhIN1BXbnpNU2trUWlrRWZ2?=
+ =?utf-8?B?ME9wSzFJN3dtV3hzaG44clc1MGcxangwSHNZZ0tXdWxVb1B6OVlCZFhlMCsr?=
+ =?utf-8?B?S2ZtMFIwMExtbjg4cHJidHJuSTI3WUJZQVNiVHVKNzUxeG5mbHJFamFBSzdS?=
+ =?utf-8?B?cmRhb21qK2dJUkZDTjA2SW4vbFl3OU04eGR3RmhzN1hPWUVHYkNCQUxWYStG?=
+ =?utf-8?B?WHNuQzZBcTVKdm9vOTFMcXliSW9hVWl4NFRsVGx1N0VNWWxHOGJIUWxKczIw?=
+ =?utf-8?B?T0szSXhOUHM2VE0vcldSOWN1bjh4YkM1NG9hRzM0SnRpTWlDekdNYzFzQWQ3?=
+ =?utf-8?B?alM2TVAzVjN0dHZpdUc0RjhTSzRwK1BpYklWcW9mQVc1RHF3TXhobDdiSVEz?=
+ =?utf-8?B?dCtyZWppek5OQzBzaElWNHc1ZUhFUUxJK1R0dnNnbUFLMStnQkc4V3o5WTB1?=
+ =?utf-8?B?MW9xUmU1dzB0OU5CQ04ybU5OQkhaN1hTd0NCTUpaT0pMWGNhcThSV281V2Ni?=
+ =?utf-8?B?SWY4N2FyNzlZZllwZHdUbXA4cWRnQno0Sm1LQWtVOTR4ODVnWGpQMzF5aHc2?=
+ =?utf-8?B?ZlZZdlRsN3ZHRUZFTm1EZ2VkSzA4M3JzV3hLeGdOTjNEU3M1ZnY0Q0R2M0sw?=
+ =?utf-8?B?VUwwTW1EMGZUUlIrd09yZWNEdU9ydFk0WmJJamZTTk1sbCtaZCtURDdrdCtO?=
+ =?utf-8?B?ZmxBL1FzVll3SndJMSt5b3hQcjBhSnc1di9sbFpKTHN1TXRsdWNMeDJyOXVV?=
+ =?utf-8?B?eXRUU05VSjFjYWt1d2M4T0plcFNWVnlxTTdYTnVTQktVUjViZ0RaM2FvSlA3?=
+ =?utf-8?B?VE5Ca3c5RGR3eGNFQk5aRXdzamxoSzJkcGhFbEZQcCtlaHBtSURTTzRteHB6?=
+ =?utf-8?B?Tks4aHFMWEtralhBQlF5R05KazBHT2hlZWRjZ0FIMWttZUxrUlJKWVpWdHRN?=
+ =?utf-8?Q?jekP4ItuAWsZWRAEQiVXmAb3t?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 40bdb66d-613c-449c-6ff4-08dd31c7f89b
+X-MS-Exchange-CrossTenant-AuthSource: BL3PR12MB9049.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jan 2025 22:41:49.7409
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2ulDcXwETIzb7n93IE6ZTvMviBtH6NINgfcvq9u6La4rjF0k9R278VlitH0pscmTiA1sgGtQ6yIEww3ZUsXukA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6820
 
-This is a cryptographically signed message in MIME format.
+Hello All,
 
---------------ms080100020601020405080806
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+On 1/8/2025 6:27 PM, Kalra, Ashish wrote:
+> 
+> 
+> On 1/8/2025 11:22 AM, Tom Lendacky wrote:
+>> On 1/7/25 12:34, Kalra, Ashish wrote:
+>>> On 1/7/2025 10:42 AM, Tom Lendacky wrote:
+>>>> On 1/3/25 14:01, Ashish Kalra wrote:
+>>>>> From: Ashish Kalra <ashish.kalra@amd.com>
+>>>>>
+>>>>> Remove platform initialization of SEV/SNP from PSP driver probe time and
+>>>>
+>>>> Actually, you're not removing it, yet...
+>>>>
+>>>>> move it to KVM module load time so that KVM can do SEV/SNP platform
+>>>>> initialization explicitly if it actually wants to use SEV/SNP
+>>>>> functionality.
+>>>>>
+>>>>> With this patch, KVM will explicitly call into the PSP driver at load time
+>>>>> to initialize SEV/SNP by default but this behavior can be altered with KVM
+>>>>> module parameters to not do SEV/SNP platform initialization at module load
+>>>>> time if required. Additionally SEV/SNP platform shutdown is invoked during
+>>>>> KVM module unload time.
+>>>>>
+>>>>> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+>>>>> ---
+>>>>>  arch/x86/kvm/svm/sev.c | 15 ++++++++++++++-
+>>>>>  1 file changed, 14 insertions(+), 1 deletion(-)
+>>>>>
+>>>>> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+>>>>> index 943bd074a5d3..0dc8294582c6 100644
+>>>>> --- a/arch/x86/kvm/svm/sev.c
+>>>>> +++ b/arch/x86/kvm/svm/sev.c
+>>>>> @@ -444,7 +444,6 @@ static int __sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp,
+>>>>>  	if (ret)
+>>>>>  		goto e_no_asid;
+>>>>>  
+>>>>> -	init_args.probe = false;
+>>>>>  	ret = sev_platform_init(&init_args);
+>>>>>  	if (ret)
+>>>>>  		goto e_free;
+>>>>> @@ -2953,6 +2952,7 @@ void __init sev_set_cpu_caps(void)
+>>>>>  void __init sev_hardware_setup(void)
+>>>>>  {
+>>>>>  	unsigned int eax, ebx, ecx, edx, sev_asid_count, sev_es_asid_count;
+>>>>> +	struct sev_platform_init_args init_args = {0};
+>>>>
+>>>> Will this cause issues if KVM is built-in and INIT_EX is being used
+>>>> (init_ex_path ccp parameter)? The probe parameter is used for
+>>>> initialization done before the filesystem is available.
+>>>>
+>>>
+>>> Yes, this will cause issues if KVM is builtin and INIT_EX is being used,
+>>> but my question is how will INIT_EX be used when we move SEV INIT
+>>> to KVM ?
+>>>
+>>> If we continue to use the probe field here and also continue to support
+>>> psp_init_on_probe module parameter for CCP, how will SEV INIT_EX be
+>>> invoked ? 
+>>>
+>>> How is SEV INIT_EX invoked in PSP driver currently if psp_init_on_probe
+>>> parameter is set to false ?
+>>>
+>>> The KVM path to invoke sev_platform_init() when a SEV VM is being launched 
+>>> cannot be used because QEMU checks for SEV to be initialized before
+>>> invoking this code path to launch the guest.
+>>
+>> Qemu only requires that for an SEV-ES guest. I was able to use the
+>> init_ex_path=/root/... and psp_init_on_probe=0 to successfully delay SEV
+>> INIT_EX and launch an SEV guest.
+>>
+> 
+> Thanks Tom, i will make sure that we continue to support both the probe
+> field and psp_init_on_probe module parameter for CCP modules as part of v4.
+> 
+>>>
 
-T24gMS8xMC8yMDI1IDU6MDIgQU0sIEhlcmJlcnQgWHUgd3JvdGU6DQo+IFNvIGRvZXMgeW91
-ciB1c2UtY2FzZSBzdXBwb3J0IGJvdGggc3RhbmRhcmQgQUVBRCBhbGdvcml0aG1zIHN1Y2gN
-Cj4gYXMgR0NNIGFzIHdlbGwgYXMgdGhlc2UgbGVnYWN5IGFsZ29yaXRobXM/DQoNClJYR0sg
-aXMgZGVzY3JpYmVkIGJ5IA0KaHR0cHM6Ly9kYXRhdHJhY2tlci5pZXRmLm9yZy9kb2MvZHJh
-ZnQtd2lsa2luc29uLWFmczMtcnhnay8uDQoNCkFueSBSRkMzOTYxICgiRW5jcnlwdGlvbiBh
-bmQgQ2hlY2tzdW0gU3BlY2lmaWNhdGlvbnMgZm9yIEtlcmJlcm9zIDUiKSANCmZyYW1ld29y
-ayBlbmNyeXB0aW9uIGFsZ29yaXRobSBjYW4gYmUgdXNlZCB3aXRoIGl0Lg0KDQpUaGVyZSBo
-YXZlIGJlZW4gcHJvcG9zYWxzIHRvIGFkZCBBRUFEIGVuY3J5cHRpb24gdHlwZXMgdG8gUkZD
-Mzk2MS4gRm9yIA0KZXhhbXBsZSwgTHVrZSBIb3dhcmQgcHJvcG9zZWQNCg0KaHR0cHM6Ly9k
-YXRhdHJhY2tlci5pZXRmLm9yZy9kb2MvZHJhZnQtaG93YXJkLWtyYi1hZWFkLw0KDQpUaGUg
-U2VjdXJpdHkgQ29uc2lkZXJhdGlvbnMgc2VjdGlvbiBkZXNjcmliZXMgdGhlIHJlYXNvbnMg
-dGhhdCBNSVQncyANCktlcmJlcm9zIHRlYW0gaXMgcmVsdWN0YW50IHRvIGFkZCBBRUFEIGFs
-Z29yaXRobXMgdG8gUkZDMzk2MS4gVGhlIA0KcHJpbWFyeSBvbmUgYmVpbmcgdGhhdCBBRUFE
-IGFsZ29yaXRobXMgYXJlIG5vdCBzYWZlIGZvciBhbGwgb2YgdGhlIA0KZXhpc3RpbmcgUkZD
-Mzk2MSB1c2UgY2FzZXMgYW5kIHRoZXJlIGlzIG5vIG1lYW5zIG9mIGVuc3VyaW5nIHRoYXQg
-QUVBRCANCmVuY3J5cHRpb24gdHlwZXMgd291bGQgbm90IGJlIG1pc3VzZWQuDQoNClJlcXVl
-c3RzIGZvciB0aGUgYWRkaXRpb24gb2YgQUVBRCB0byBSRkMzOTYxIGhhdmUgY29tZSBmcm9t
-IGJvdGggdGhlIA0KTkZTdjQgY29tbXVuaXR5IGFuZCB0aG9zZSBpbXBsZW1lbnRpbmcgUlhH
-Sy4gQWxhcywgdGhlcmUgaGFzIGJlZW4gbm8gDQpmb3J3YXJkIHByb2dyZXNzIHNpbmNlIHRo
-ZSBwdWJsaWNhdGlvbiBvZiBMdWtlJ3MgZHJhZnQuDQoNCkplZmZyZXkgQWx0bWFuDQoNCg==
+It looks like i have hit a serious blocker issue with this approach of moving
+SEV/SNP initialization to KVM module load time. 
 
+While testing with kvm_amd and PSP driver built-in, it looks like kvm_amd
+driver is being loaded/initialized before PSP driver is loaded, and that
+causes sev_platform_init() call from sev_hardware_setup(kvm_amd) to fail:
 
---------------ms080100020601020405080806
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+[   10.717898] kvm_amd: TSC scaling supported
+[   10.722470] kvm_amd: Nested Virtualization enabled
+[   10.727816] kvm_amd: Nested Paging enabled
+[   10.732388] kvm_amd: LBR virtualization supported
+[   10.737639] kvm_amd: SEV enabled (ASIDs 100 - 509)
+[   10.742985] kvm_amd: SEV-ES enabled (ASIDs 1 - 99)
+[   10.748333] kvm_amd: SEV-SNP enabled (ASIDs 1 - 99)
+[   10.753768] PSP driver not init                        <<<---- sev_platform_init() returns failure as PSP driver is still not initialized
+[   10.757563] kvm_amd: Virtual VMLOAD VMSAVE supported
+[   10.763124] kvm_amd: Virtual GIF supported
+...
+...
+[   12.514857] ccp 0000:23:00.1: enabling device (0000 -> 0002)
+[   12.521691] ccp 0000:23:00.1: no command queues available
+[   12.527991] ccp 0000:23:00.1: sev enabled
+[   12.532592] ccp 0000:23:00.1: psp enabled
+[   12.537382] ccp 0000:a2:00.1: enabling device (0000 -> 0002)
+[   12.544389] ccp 0000:a2:00.1: no command queues available
+[   12.550627] ccp 0000:a2:00.1: psp enabled
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCC
-DHEwggXSMIIEuqADAgECAhBAAYJpmi/rPn/F0fJyDlzMMA0GCSqGSIb3DQEBCwUAMDoxCzAJ
-BgNVBAYTAlVTMRIwEAYDVQQKEwlJZGVuVHJ1c3QxFzAVBgNVBAMTDlRydXN0SUQgQ0EgQTEz
-MB4XDTIyMDgwNDE2MDQ0OFoXDTI1MTAzMTE2MDM0OFowcDEvMC0GCgmSJomT8ixkAQETH0Ew
-MTQxMEQwMDAwMDE4MjY5OUEyRkQyMDAwMjMzQ0QxGTAXBgNVBAMTEEplZmZyZXkgRSBBbHRt
-YW4xFTATBgNVBAoTDEF1cmlTdG9yIEluYzELMAkGA1UEBhMCVVMwggEiMA0GCSqGSIb3DQEB
-AQUAA4IBDwAwggEKAoIBAQCkC7PKBBZnQqDKPtZPMLAy77zo2DPvwtGnd1hNjPvbXrpGxUb3
-xHZRtv179LHKAOcsY2jIctzieMxf82OMyhpBziMPsFAG/ukihBMFj3/xEeZVso3K27pSAyyN
-fO/wJ0rX7G+ges22Dd7goZul8rPaTJBIxbZDuaykJMGpNq4PQ8VPcnYZx+6b+nJwJJoJ46kI
-EEfNh3UKvB/vM0qtxS690iAdgmQIhTl+qfXq4IxWB6b+3NeQxgR6KLU4P7v88/tvJTpxIKkg
-9xj89ruzeThyRFd2DSe3vfdnq9+g4qJSHRXyTft6W3Lkp7UWTM4kMqOcc4VSRdufVKBQNXjG
-IcnhAgMBAAGjggKcMIICmDAOBgNVHQ8BAf8EBAMCBPAwgYQGCCsGAQUFBwEBBHgwdjAwBggr
-BgEFBQcwAYYkaHR0cDovL2NvbW1lcmNpYWwub2NzcC5pZGVudHJ1c3QuY29tMEIGCCsGAQUF
-BzAChjZodHRwOi8vdmFsaWRhdGlvbi5pZGVudHJ1c3QuY29tL2NlcnRzL3RydXN0aWRjYWEx
-My5wN2MwHwYDVR0jBBgwFoAULbfeG1l+KpguzeHUG+PFEBJe6RQwCQYDVR0TBAIwADCCASsG
-A1UdIASCASIwggEeMIIBGgYLYIZIAYb5LwAGAgEwggEJMEoGCCsGAQUFBwIBFj5odHRwczov
-L3NlY3VyZS5pZGVudHJ1c3QuY29tL2NlcnRpZmljYXRlcy9wb2xpY3kvdHMvaW5kZXguaHRt
-bDCBugYIKwYBBQUHAgIwga0MgapUaGlzIFRydXN0SUQgQ2VydGlmaWNhdGUgaGFzIGJlZW4g
-aXNzdWVkIGluIGFjY29yZGFuY2Ugd2l0aCBJZGVuVHJ1c3QncyBUcnVzdElEIENlcnRpZmlj
-YXRlIFBvbGljeSBmb3VuZCBhdCBodHRwczovL3NlY3VyZS5pZGVudHJ1c3QuY29tL2NlcnRp
-ZmljYXRlcy9wb2xpY3kvdHMvaW5kZXguaHRtbDBFBgNVHR8EPjA8MDqgOKA2hjRodHRwOi8v
-dmFsaWRhdGlvbi5pZGVudHJ1c3QuY29tL2NybC90cnVzdGlkY2FhMTMuY3JsMB8GA1UdEQQY
-MBaBFGphbHRtYW5AYXVyaXN0b3IuY29tMB0GA1UdDgQWBBQB+nzqgljLocLTsiUn2yWqEc2s
-gjAdBgNVHSUEFjAUBggrBgEFBQcDAgYIKwYBBQUHAwQwDQYJKoZIhvcNAQELBQADggEBAJwV
-eycprp8Ox1npiTyfwc5QaVaqtoe8Dcg2JXZc0h4DmYGW2rRLHp8YL43snEV93rPJVk6B2v4c
-WLeQfaMrnyNeEuvHx/2CT44cdLtaEk5zyqo3GYJYlLcRVz6EcSGHv1qPXgDT0xB/25etwGYq
-utYF4Chkxu4KzIpq90eDMw5ajkexw+8ARQz4N5+d6NRbmMCovd7wTGi8th/BZvz8hgKUiUJo
-Qle4wDxrdXdnIhCP7g87InXKefWgZBF4VX21t2+hkc04qrhIJlHrocPG9mRSnnk2WpsY0MXt
-a8ivbVKtfpY7uSNDZSKTDi1izEFH5oeQdYRkgIGb319a7FjslV8wggaXMIIEf6ADAgECAhBA
-AXA7OrqBjMk8rp4OuNQSMA0GCSqGSIb3DQEBCwUAMEoxCzAJBgNVBAYTAlVTMRIwEAYDVQQK
-EwlJZGVuVHJ1c3QxJzAlBgNVBAMTHklkZW5UcnVzdCBDb21tZXJjaWFsIFJvb3QgQ0EgMTAe
-Fw0yMDAyMTIyMTA3NDlaFw0zMDAyMTIyMTA3NDlaMDoxCzAJBgNVBAYTAlVTMRIwEAYDVQQK
-EwlJZGVuVHJ1c3QxFzAVBgNVBAMTDlRydXN0SUQgQ0EgQTEzMIIBIjANBgkqhkiG9w0BAQEF
-AAOCAQ8AMIIBCgKCAQEAu6sUO01SDD99PM+QdZkNxKxJNt0NgQE+Zt6ixaNP0JKSjTd+SG5L
-wqxBWjnOgI/3dlwgtSNeN77AgSs+rA4bK4GJ75cUZZANUXRKw/et8pf9Qn6iqgB63OdHxBN/
-15KbM3HR+PyiHXQoUVIevCKW8nnlWnnZabT1FejOhRRKVUg5HACGOTfnCOONrlxlg+m1Vjgn
-o1uNqNuLM/jkD1z6phNZ/G9IfZGI0ppHX5AA/bViWceX248VmefNhSR14ADZJtlAAWOi2un0
-3bqrBPHA9nDyXxI8rgWLfUP5rDy8jx2hEItg95+ORF5wfkGUq787HBjspE86CcaduLka/Bk2
-VwIDAQABo4IChzCCAoMwEgYDVR0TAQH/BAgwBgEB/wIBADAOBgNVHQ8BAf8EBAMCAYYwgYkG
-CCsGAQUFBwEBBH0wezAwBggrBgEFBQcwAYYkaHR0cDovL2NvbW1lcmNpYWwub2NzcC5pZGVu
-dHJ1c3QuY29tMEcGCCsGAQUFBzAChjtodHRwOi8vdmFsaWRhdGlvbi5pZGVudHJ1c3QuY29t
-L3Jvb3RzL2NvbW1lcmNpYWxyb290Y2ExLnA3YzAfBgNVHSMEGDAWgBTtRBnA0/AGi+6ke75C
-5yZUyI42djCCASQGA1UdIASCARswggEXMIIBEwYEVR0gADCCAQkwSgYIKwYBBQUHAgEWPmh0
-dHBzOi8vc2VjdXJlLmlkZW50cnVzdC5jb20vY2VydGlmaWNhdGVzL3BvbGljeS90cy9pbmRl
-eC5odG1sMIG6BggrBgEFBQcCAjCBrQyBqlRoaXMgVHJ1c3RJRCBDZXJ0aWZpY2F0ZSBoYXMg
-YmVlbiBpc3N1ZWQgaW4gYWNjb3JkYW5jZSB3aXRoIElkZW5UcnVzdCdzIFRydXN0SUQgQ2Vy
-dGlmaWNhdGUgUG9saWN5IGZvdW5kIGF0IGh0dHBzOi8vc2VjdXJlLmlkZW50cnVzdC5jb20v
-Y2VydGlmaWNhdGVzL3BvbGljeS90cy9pbmRleC5odG1sMEoGA1UdHwRDMEEwP6A9oDuGOWh0
-dHA6Ly92YWxpZGF0aW9uLmlkZW50cnVzdC5jb20vY3JsL2NvbW1lcmNpYWxyb290Y2ExLmNy
-bDAdBgNVHQ4EFgQULbfeG1l+KpguzeHUG+PFEBJe6RQwHQYDVR0lBBYwFAYIKwYBBQUHAwIG
-CCsGAQUFBwMEMA0GCSqGSIb3DQEBCwUAA4ICAQB/7BKcygLX6Nl4a03cDHt7TLdPxCzFvDF2
-bkVYCFTRX47UfeomF1gBPFDee3H/IPlLRmuTPoNt0qjdpfQzmDWN95jUXLdLPRToNxyaoB5s
-0hOhcV6H08u3FHACBif55i0DTDzVSaBv0AZ9h1XeuGx4Fih1Vm3Xxz24GBqqVudvPRLyMJ7u
-6hvBqTIKJ53uCs3dyQLZT9DXnp+kJv8y7ZSAY+QVrI/dysT8avtn8d7k7azNBkfnbRq+0e88
-QoBnel6u+fpwbd5NLRHywXeH+phbzULCa+bLPRMqJaW2lbhvSWrMHRDy3/d8HvgnLCBFK2s4
-Spns4YCN4xVcbqlGWzgolHCKUH39vpcsDo1ymZFrJ8QR6ihIn8FmJ5oKwAnnd/G6ADXFC9bu
-db9+532phSAXOZrrecIQn+vtP366PC+aClAPsIIDJDsotS5z4X2JUFsNIuEgXGqhiKE7SuZb
-rFG9sdcLprSlJN7TsRDc0W2b9nqwD+rj/5MN0C+eKwha+8ydv0+qzTyxPP90KRgaegGowC4d
-UsZyTk2n4Z3MuAHX5nAZL/Vh/SyDj/ajorV44yqZBzQ3ChKhXbfUSwe2xMmygA2Z5DRwMRJn
-p/BscizYdNk2WXJMTnH+wVLN8sLEwEtQR4eTLoFmQvrK2AMBS9kW5sBkMzINt/ZbbcZ3F+eA
-MDGCBAEwggP9AgEBME4wOjELMAkGA1UEBhMCVVMxEjAQBgNVBAoTCUlkZW5UcnVzdDEXMBUG
-A1UEAxMOVHJ1c3RJRCBDQSBBMTMCEEABgmmaL+s+f8XR8nIOXMwwDQYJYIZIAWUDBAIBBQCg
-ggKEMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDExMDE4
-MjIyM1owLwYJKoZIhvcNAQkEMSIEIJ4onI9Cpb8WG4HZjfKPQd4shgw/EDcHuFJasvx+W3bg
-MF0GCSsGAQQBgjcQBDFQME4wOjELMAkGA1UEBhMCVVMxEjAQBgNVBAoTCUlkZW5UcnVzdDEX
-MBUGA1UEAxMOVHJ1c3RJRCBDQSBBMTMCEEABgmmaL+s+f8XR8nIOXMwwXwYLKoZIhvcNAQkQ
-AgsxUKBOMDoxCzAJBgNVBAYTAlVTMRIwEAYDVQQKEwlJZGVuVHJ1c3QxFzAVBgNVBAMTDlRy
-dXN0SUQgQ0EgQTEzAhBAAYJpmi/rPn/F0fJyDlzMMIIBVwYJKoZIhvcNAQkPMYIBSDCCAUQw
-CwYJYIZIAWUDBAEqMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzANBggqhkiG9w0DAgIBBTAN
-BggqhkiG9w0DAgIBBTAHBgUrDgMCBzANBggqhkiG9w0DAgIBBTAHBgUrDgMCGjALBglghkgB
-ZQMEAgEwCwYJYIZIAWUDBAICMAsGCWCGSAFlAwQCAzALBglghkgBZQMEAgQwCwYJYIZIAWUD
-BAIHMAsGCWCGSAFlAwQCCDALBglghkgBZQMEAgkwCwYJYIZIAWUDBAIKMAsGCSqGSIb3DQEB
-ATALBgkrgQUQhkg/AAIwCAYGK4EEAQsAMAgGBiuBBAELATAIBgYrgQQBCwIwCAYGK4EEAQsD
-MAsGCSuBBRCGSD8AAzAIBgYrgQQBDgAwCAYGK4EEAQ4BMAgGBiuBBAEOAjAIBgYrgQQBDgMw
-DQYJKoZIhvcNAQEBBQAEggEAe8cQC577a4Iu62KiWasPuDMHAx7lgCwsGAiuaSN7muu8B2nO
-qzBRqWkOesgtFGUB7nUYNvpqqZoZ6A+pnn8yUF3WycQlxVO3JNz74buTvUbEI52BqtBpHaHA
-jbXBGIat3rvi3x791ty3GOff2/atrORgwEfepD2e578ap5QnAwjSAouA2lJOttJUtmMQx1WM
-edl+2tTucrLbi7lUBXl2YvADS0j4T2G3rmHS/8tI8T8D6xv8YQ8psT/kQbhmAcQGBCpESNP1
-fRMjGe/hATn+twVSNRpqlwdU9pXru7d+wEwN3Fk+F1263PYgjN1pDOWoePazET6z4g8dh9Fs
-5twEBwAAAAAAAA==
---------------ms080100020601020405080806--
+depmod -> modules.builtin show kernel/arch/x86/kvm/kvm_amd.ko higher on the list and before kernel/drivers/crypto/ccp/ccp.ko
+
+modules.builtin: 
+kernel/arch/x86/kvm/kvm.ko
+kernel/arch/x86/kvm/kvm-amd.ko
+...
+...
+kernel/drivers/crypto/ccp/ccp.ko
+
+I believe that the modules which are compiled first get called first and it looks like that the only way to change the order for
+builtin modules is by changing which makefiles get compiled first ?
+
+Is there a way to change the load order of built-in modules and/or change dependency of built-in modules ?
+
+As of now, this looks like to be a blocker for moving SEV/SNP init to KVM module load time as this approach will not
+work if kvm_amd is built-in. 
+
+Thanks,
+Ashish
+
+>>>>
+>>>>>  	bool sev_snp_supported = false;
+>>>>>  	bool sev_es_supported = false;
+>>>>>  	bool sev_supported = false;
+>>>>> @@ -3069,6 +3069,16 @@ void __init sev_hardware_setup(void)
+>>>>>  	sev_supported_vmsa_features = 0;
+>>>>>  	if (sev_es_debug_swap_enabled)
+>>>>>  		sev_supported_vmsa_features |= SVM_SEV_FEAT_DEBUG_SWAP;
+>>>>> +
+>>>>> +	if (!sev_enabled)
+>>>>> +		return;
+>>>>> +
+>>>>> +	/*
+>>>>> +	 * NOTE: Always do SNP INIT regardless of sev_snp_supported
+>>>>> +	 * as SNP INIT has to be done to launch legacy SEV/SEV-ES
+>>>>> +	 * VMs in case SNP is enabled system-wide.
+>>>>> +	 */
+>>>>> +	sev_platform_init(&init_args);
+>>>>>  }
+>>>>>  
+>>>>>  void sev_hardware_unsetup(void)
+>>>>> @@ -3084,6 +3094,9 @@ void sev_hardware_unsetup(void)
+>>>>>  
+>>>>>  	misc_cg_set_capacity(MISC_CG_RES_SEV, 0);
+>>>>>  	misc_cg_set_capacity(MISC_CG_RES_SEV_ES, 0);
+>>>>> +
+>>>>> +	/* Do SEV and SNP Shutdown */
+>>>>> +	sev_platform_shutdown();
+>>>>>  }
+>>>>>  
+>>>>>  int sev_cpu_init(struct svm_cpu_data *sd)
+>>>
+> 
 
