@@ -1,102 +1,99 @@
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11DB51E51D;
-	Sun, 12 Jan 2025 16:31:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CFAD1B87FA
+	for <linux-crypto@vger.kernel.org>; Sun, 12 Jan 2025 22:38:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736699470; cv=none; b=PlFYvHkwzrYiUOKEkGPH77Tdw5nPFv5JJNCFQ1zwIP57Z1uPD1MyGDgQQuZwEBDlROdjBNu5OL0j1Lomk+VASHbcLIq+KNI8q116t6ZTHKMtMcuR2H4B3g2kHYSrI3vdOQDshhv6jmpCO246/Lg99Hcuva5vKmgf0wUXf2WR18c=
+	t=1736721531; cv=none; b=t62zZF9zOycN2VNJ5j+ccm7+kfuYtGSOr4bvOZmhSEqVTK5Vgj47HsKdMid1w/mLxKl6NnpShz/Fj8hZR0nCu+Lm0aCR31Up+Ikbs35rOib09bOXOH1XKtx/T96G+29pzfYbjTjTVEfGrHewj9jD07DL2gQuIsf2V3xWg1J2LOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736699470; c=relaxed/simple;
-	bh=XXvAgfwcbB6cpPEytTAEUCvUaXhPZHGZldUGUkx6Uzg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CWMv7HxeGDoSxXNQ7xc5xWVXlsqcCh/63A/3ILGVFCQSJfQ0ox8nRG774gSKXhuFYBQNxCTGYKKIfoY9WxV6qrKNP3y+jTeAzY0pDYN1dQ+zcbLKfrDlLCxJUDyElJz8jaPX3DDb211mXjSB4LhBkGhoGHdVWdPmLn1bgWvgoG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=j71QrzZB; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+	s=arc-20240116; t=1736721531; c=relaxed/simple;
+	bh=L/WlMsAx9Yvm4+ufvt5prp58wny7PmlcIpSSmtlcHiY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aE34J3LVzKQZs4ar7zblWJonUmzzornZYyV5zTaEDBv6haucgHA3nSwTnxHoW7p/mazKQmXLZ27PxK754XRMODnCQ/d1UqHG6VeQnUcGeU8qyAVyfOI/fWd8+hgthGqpQjqBrFGS+23oOsSIU/Z0DolBzmAnx8t8sUx/4KdzZIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JWoc+oMi; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="j71QrzZB"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=+ym7V8wJzpOarwGUezYnKU26PffD1D4E/rFHgGxsB0o=; b=j71QrzZByc/Mdk+K
-	V0IxdBFEaH6hQ+jH/vMHxaCd+yIVNsa7udwPvVjgKIPokIcYzBPtrJajI+9DbuZ45DqNJwiSqlMRJ
-	1708nZk4xteaQfLckeX5gpjwUXsYkiFi1IHzJN2pSK29+3d7lGCbYlRtBs9xHT3Da8W7M7j4xAAeo
-	QA6c6AknLQAi1zcPcZrCP5bCMrXCtpX1nAuhyrU2YjYK04/QwQ31fCIP30dzhXFj4B9zLHHBhus9Y
-	Ib/o4nqPcktOY5V6z45htN+VJMvLRaagYVYDF4n3dImH6iCWEZqfaaOjai0NuoS72+nlIEd0Az0BY
-	zoTelZAXqzH/uTWdug==;
-Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
-	by mx.treblig.org with esmtp (Exim 4.96)
-	(envelope-from <linux@treblig.org>)
-	id 1tX0rb-009kUx-2r;
-	Sun, 12 Jan 2025 16:30:59 +0000
-From: linux@treblig.org
-To: dhowells@redhat.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net
-Cc: keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH] crypto: asymmetric_keys - Remove unused key_being_used_for[]
-Date: Sun, 12 Jan 2025 16:30:59 +0000
-Message-ID: <20250112163059.467573-1-linux@treblig.org>
-X-Mailer: git-send-email 2.47.1
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JWoc+oMi"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FAE4C4CEDF;
+	Sun, 12 Jan 2025 22:38:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1736721530;
+	bh=L/WlMsAx9Yvm4+ufvt5prp58wny7PmlcIpSSmtlcHiY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JWoc+oMiFNNlzDTb8qvgemE68/vrA8F6gHGghPvwTlCnWrc5+fP/4VHbwVcyl6NqN
+	 emjaXezJiekE3fiV1AJnzNfdNzw6rPa6yWtN0Z0BOlmJkRK/gil3hrgklXx1doTG3B
+	 FAA8ucwLbCjU6ZpN+sbAW7X303R1iT7BDGkJlbANJFo4oOVRdkbdLkbPFmgAUKeQ5k
+	 9jB77V9fB3+kIqOsdoKlXfUWP3Xd5rQ3NywrxHYDdPL5kzsqaGML31gKxZ9MI61SEM
+	 pJPs0/WRMTAAO9fFyEWwyTAl/rb2M19t2UlxR/+3XMbz4vBDP39ciiQ/yw1Ia88qDS
+	 Uerap0t/ypyiQ==
+Date: Sun, 12 Jan 2025 15:38:48 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: Hannes Reinecke <hare@suse.de>
+Cc: Hannes Reinecke <hare@kernel.org>, Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>, linux-nvme@lists.infradead.org,
+	Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 09/10] nvmet-tcp: support secure channel concatenation
+Message-ID: <Z4REeAUzXi3z2jeb@kbusch-mbp>
+References: <20241203110238.128630-1-hare@kernel.org>
+ <20241203110238.128630-11-hare@kernel.org>
+ <Z36o7IqZnwkuckwF@kbusch-mbp>
+ <69208b76-71ac-464f-bdb9-50c9c5558ac6@suse.de>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <69208b76-71ac-464f-bdb9-50c9c5558ac6@suse.de>
 
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
+On Thu, Jan 09, 2025 at 08:33:51AM +0100, Hannes Reinecke wrote:
+> On 1/8/25 17:33, Keith Busch wrote:
+> > On Tue, Dec 03, 2024 at 12:02:37PM +0100, Hannes Reinecke wrote:
+> > > Evaluate the SC_C flag during DH-CHAP-HMAC negotiation and insert
+> > > the generated PSK once negotiation has finished.
+> > 
+> > ...
+> > 
+> > > @@ -251,7 +267,7 @@ static void nvmet_execute_admin_connect(struct nvmet_req *req)
+> > >   	uuid_copy(&ctrl->hostid, &d->hostid);
+> > > -	dhchap_status = nvmet_setup_auth(ctrl);
+> > > +	dhchap_status = nvmet_setup_auth(ctrl, req);
+> > >   	if (dhchap_status) {
+> > >   		pr_err("Failed to setup authentication, dhchap status %u\n",
+> > >   		       dhchap_status);
+> > > @@ -269,12 +285,13 @@ static void nvmet_execute_admin_connect(struct nvmet_req *req)
+> > >   		goto out;
+> > >   	}
+> > 
+> > This one had some merge conflicts after applying the pci endpoint
+> > series from Damien. I tried to resolve it, the result is here:
+> > 
+> >    https://git.infradead.org/?p=nvme.git;a=commitdiff;h=11cb42c0f4f4450b325e38c8f0f7d77f5e1a0eb0
+> > 
+> > The main conflict was from moving the nvmet_setup_auth() call from
+> > nvmet_execute_admin_connect() to nvmet_alloc_ctrl().
+> 
+> I'll give it a spin and check how it holds up.
 
-key_being_used_for[] is an unused array of textual names for
-the elements of the enum key_being_used_for.  It was added in 2015 by
-commit 99db44350672 ("PKCS#7: Appropriately restrict authenticated
-attributes and content type")
+Sorry, I had to drop this from 6.14 for now. The build bot tagged us
+with the following error. It looks easy enough to fix but I can't do it
+over the weekened before the first merge window pull :)
 
-Remove it.
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+branch HEAD: f28201922a357663d4a2a258e024481e19269c2c  Merge branch 'for-6.14/block' into for-next
 
-Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
----
- crypto/asymmetric_keys/asymmetric_type.c | 10 ----------
- include/linux/verification.h             |  2 --
- 2 files changed, 12 deletions(-)
+Error/Warning (recently discovered and may have been fixed):
 
-diff --git a/crypto/asymmetric_keys/asymmetric_type.c b/crypto/asymmetric_keys/asymmetric_type.c
-index 43af5fa510c0..ba2d9d1ea235 100644
---- a/crypto/asymmetric_keys/asymmetric_type.c
-+++ b/crypto/asymmetric_keys/asymmetric_type.c
-@@ -18,16 +18,6 @@
- #include "asymmetric_keys.h"
- 
- 
--const char *const key_being_used_for[NR__KEY_BEING_USED_FOR] = {
--	[VERIFYING_MODULE_SIGNATURE]		= "mod sig",
--	[VERIFYING_FIRMWARE_SIGNATURE]		= "firmware sig",
--	[VERIFYING_KEXEC_PE_SIGNATURE]		= "kexec PE sig",
--	[VERIFYING_KEY_SIGNATURE]		= "key sig",
--	[VERIFYING_KEY_SELF_SIGNATURE]		= "key self sig",
--	[VERIFYING_UNSPECIFIED_SIGNATURE]	= "unspec sig",
--};
--EXPORT_SYMBOL_GPL(key_being_used_for);
--
- static LIST_HEAD(asymmetric_key_parsers);
- static DECLARE_RWSEM(asymmetric_key_parsers_sem);
- 
-diff --git a/include/linux/verification.h b/include/linux/verification.h
-index cb2d47f28091..4f3022d081c3 100644
---- a/include/linux/verification.h
-+++ b/include/linux/verification.h
-@@ -38,8 +38,6 @@ enum key_being_used_for {
- 	VERIFYING_UNSPECIFIED_SIGNATURE,
- 	NR__KEY_BEING_USED_FOR
- };
--extern const char *const key_being_used_for[NR__KEY_BEING_USED_FOR];
--
- #ifdef CONFIG_SYSTEM_DATA_VERIFICATION
- 
- struct key;
--- 
-2.47.1
+    https://lore.kernel.org/oe-kbuild-all/202501120730.Nix2qru3-lkp@intel.com
 
+    auth.c:(.text+0x986): undefined reference to `nvme_tls_psk_refresh'
+    csky-linux-ld: auth.c:(.text+0xa00): undefined reference to `nvme_tls_psk_refresh'
+
+Error/Warning ids grouped by kconfigs:
+
+recent_errors
+`-- csky-randconfig-001-20250112
+    |-- auth.c:(.text):undefined-reference-to-nvme_tls_psk_refresh
+    `-- csky-linux-ld:auth.c:(.text):undefined-reference-to-nvme_tls_psk_refresh
