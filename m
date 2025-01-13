@@ -1,50 +1,49 @@
 Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7CC51DE4D5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B97251E0087;
 	Mon, 13 Jan 2025 21:16:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736803003; cv=none; b=JmBoAfG1uhX8ioNrEkzetrYarNsDsC+RpPfuQKM8wadrEHg9rhk+GOyO6MI+aKI1+RqDYGhHYQUGJhlYkjorbbN7r9Pe1qAoJQqv4aY8oydjdv7+/15Pyfm2mPBMfKEYaeAVJ7+ArVYu5aMERhQR3Ne+dRTIxep0qMeW1EHVdws=
+	t=1736803003; cv=none; b=ceqO9EstAEQW5YCUNjEiwEs5eCLkBy8g4b5np9Viz8mUNOR5PUpfS/ANX46w0kPN7QxxFGktHTadP4/oCmeI5ao8tmo7Sm8USXA21+bIIBSXBPRMEzX4fkxo0lH0HlskRs1vo/i5SoBi3X7Uvqe9LPRkLGz5cMYaWDTa5wqK0Hk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1736803003; c=relaxed/simple;
-	bh=vwotZQuCp4XlEjPdjqTnW3gz6P5gi37hlCjCZ3PDUHI=;
+	bh=gS3HhlLDg2h+jEmFJcXx8eRwO7TS4hktSXo0dSoljtU=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=t6le1c5vgVBh7TuHje8DB5GAuqyPWcwJCmLEMN6AoNB2mgYICP+GjfwlHjsvA59SDSctaX8qs1f/zpnOETQZSp+RzD29nore7xaHMivp/gaphTRmGOFuf5qPK6vZJrzEog0w8kpGeQ98XMu6sv+PE+D57XTCwgrnDT8BhJaq5wQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=pg6bL3iB; arc=none smtp.client-ip=205.220.180.131
+	 In-Reply-To:To:CC; b=JoIlcB9SFHtntjVG5qzhicfezjFl7pq4UXzc5gJ21/eiwHufqKz+7xPQt/04rgf8xK/wt4knYOaLnEeZOPDhcZK0u3SS4Z/PhUBJX0qS+yB9CzzbuOaldJuQPuHYqvnCt0x8TBtLZWIMfrbgtZEpnpOVHkbbLEqzX7glff2zDfQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=f6iplkdT; arc=none smtp.client-ip=205.220.180.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="pg6bL3iB"
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50DIj2JL008164;
-	Mon, 13 Jan 2025 21:16:32 GMT
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="f6iplkdT"
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50DBm9CW007359;
+	Mon, 13 Jan 2025 21:16:33 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	yNZPIsMlhLLChw8yUxGZj9EplGxp8wAMzaZs77aeCOI=; b=pg6bL3iB28pgnW3B
-	C2f3pvOlTgAgLhzfNzAzFEwdRrTuPcIhm/fIepCRaeL+OAgbbaFi1drQALsD3df8
-	Mhhpn03NddiKGItzbA06ILw4IR3kEr0rqnDt+o679g6+//5CK6sTm081CkrBekIc
-	E5iNcovBX5khrvBkNHDZaz/91TWGcmpQRERPuVysYdvY5OtdjY8IF0gQwlHHfYr1
-	O4y4m+OZrMA03Y+/5aWCAMaIbrT03KyeWEfiaHsYKbczVUe40dL+hdvcaP7dSU4G
-	Q8lgDOkA3yfg98KWvTap5+9AKF+gZsG1jB7kxjar+QvrbJ/xiGYhTRw7JtvCNnJ8
-	x9WLZw==
-Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4458cn0ac4-1
+	FU50mI+jopQqUBsUxyWC+XRlzgPC0mvFI15LzCKpqc4=; b=f6iplkdTeRf7HT0R
+	pQVSMZPiSJ4DrzO5GggFq+kiVDPZ7U43fp1YL5dBBIQabJQgfzzdVqgsAagV3hCN
+	BNVm8gIa7EJWyrwU97iLbZSjVu/1ZrtiFbfdUbZpuDabSzN99YR5lQca/1PyL7BG
+	tqumLAW92WvjwHyqee3JlBGgkbspvXKj5uC93869gz8E+Mr3XvxfDicnjVFKSZjk
+	b0FZlf0myhZc2De2MrL5ZQsf3iqiJomjX3ipHQSR7yGRoP45J6ceNVMlNcLbpRZw
+	xnpYJAa7JgWJUDD3QvqGXyGgREUnCI4jaXaZq9HzQhevRB1VMuYg5HtOd+gj8I2T
+	ewP2bw==
+Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4452939hr6-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 13 Jan 2025 21:16:32 +0000 (GMT)
+	Mon, 13 Jan 2025 21:16:33 +0000 (GMT)
 Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 50DLGVcm000413
+	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 50DLGWIZ025949
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 13 Jan 2025 21:16:31 GMT
+	Mon, 13 Jan 2025 21:16:32 GMT
 Received: from hu-molvera-lv.qualcomm.com (10.49.16.6) by
  nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Mon, 13 Jan 2025 13:16:30 -0800
+ 15.2.1544.9; Mon, 13 Jan 2025 13:16:31 -0800
 From: Melody Olvera <quic_molvera@quicinc.com>
-Date: Mon, 13 Jan 2025 13:16:21 -0800
-Subject: [PATCH 1/6] dt-bindings: crypto: qcom-qce: Document the SM8750
- crypto engine
+Date: Mon, 13 Jan 2025 13:16:24 -0800
+Subject: [PATCH 4/6] arm64: dts: qcom: sm8750: Add TRNG nodes
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -53,7 +52,7 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-ID: <20250113-sm8750_crypto_master-v1-1-d8e265729848@quicinc.com>
+Message-ID: <20250113-sm8750_crypto_master-v1-4-d8e265729848@quicinc.com>
 References: <20250113-sm8750_crypto_master-v1-0-d8e265729848@quicinc.com>
 In-Reply-To: <20250113-sm8750_crypto_master-v1-0-d8e265729848@quicinc.com>
 To: Thara Gopinath <thara.gopinath@gmail.com>,
@@ -77,50 +76,54 @@ CC: <linux-crypto@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
 	<quic_molvera@quicinc.com>,
         Gaurav Kashyap <quic_gaurkash@quicinc.com>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1736802990; l=872;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1736802990; l=902;
  i=quic_molvera@quicinc.com; s=20241204; h=from:subject:message-id;
- bh=v9Nygg1WDPj+cjbz465lLusvYccztjG9b0eus+CYZWk=;
- b=MB8QZKGfKteRl6BMveSGEyL5cZvNRnUk+orArI+7wMdAp1FGogE7CaxmyttT+/p10yOxSY6ut
- 6d0esmHPJaUBb1LJAhnutGwlFDkB6HvP2/7O0Wsqtw8IzybixIQI4JF
+ bh=9HGSPyCdLJTFNynsf1No7ZWQHSGRzJNvn9eGwkO4pLg=;
+ b=gyxBCX/CCSY0EEy//IpXSKbGdhAh4I+V+Kp35bEG/5jlMtiEAh3Qt9vqbzMI0U/Y9bZo0k/8q
+ rEtUEgQG/PRC+xZE4tw7BSMxPf6y3HC2OdXK4qg9iw0WSIw4yh6QuhP
 X-Developer-Key: i=quic_molvera@quicinc.com; a=ed25519;
  pk=1DGLp3zVYsHAWipMaNZZTHR321e8xK52C9vuAoeca5c=
 X-ClientProxiedBy: nalasex01a.na.qualcomm.com (10.47.209.196) To
  nasanex01b.na.qualcomm.com (10.46.141.250)
 X-QCInternal: smtphost
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: zUbG9QEOf5W0Zr7zUJzAQQugOJyzgzBv
-X-Proofpoint-GUID: zUbG9QEOf5W0Zr7zUJzAQQugOJyzgzBv
+X-Proofpoint-GUID: PEb_KLrJT99j_kikO4x0VCTXZKSDqgKe
+X-Proofpoint-ORIG-GUID: PEb_KLrJT99j_kikO4x0VCTXZKSDqgKe
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
  definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- impostorscore=0 phishscore=0 clxscore=1011 mlxlogscore=975 mlxscore=0
- priorityscore=1501 malwarescore=0 suspectscore=0 spamscore=0 bulkscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2501130169
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
+ lowpriorityscore=0 bulkscore=0 spamscore=0 mlxscore=0 impostorscore=0
+ malwarescore=0 priorityscore=1501 mlxlogscore=783 adultscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2501130168
 
 From: Gaurav Kashyap <quic_gaurkash@quicinc.com>
 
-Document the crypto engine on the SM8750 Platform.
+Add the SM8750 nodes for the True Random Number Generator (TRNG).
 
 Signed-off-by: Gaurav Kashyap <quic_gaurkash@quicinc.com>
 Signed-off-by: Melody Olvera <quic_molvera@quicinc.com>
 ---
- Documentation/devicetree/bindings/crypto/qcom-qce.yaml | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm64/boot/dts/qcom/sm8750.dtsi | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
-index 7f8c0d55f6f5c300c5c5cbfefee03af628d49d7a..3ed56d9d378e38a7ed3f5cd606c4dc20955194f0 100644
---- a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
-+++ b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
-@@ -54,6 +54,7 @@ properties:
-               - qcom,sm8450-qce
-               - qcom,sm8550-qce
-               - qcom,sm8650-qce
-+              - qcom,sm8750-qce
-           - const: qcom,sm8150-qce
-           - const: qcom,qce
+diff --git a/arch/arm64/boot/dts/qcom/sm8750.dtsi b/arch/arm64/boot/dts/qcom/sm8750.dtsi
+index 1ddb33ea83885e73bf15244c9cbd7067ae28cded..9b2ac8c30013b02ca78140eb4144b4530aba5d6a 100644
+--- a/arch/arm64/boot/dts/qcom/sm8750.dtsi
++++ b/arch/arm64/boot/dts/qcom/sm8750.dtsi
+@@ -1883,6 +1883,11 @@ &clk_virt SLAVE_QUP_CORE_1 QCOM_ICC_TAG_ALWAYS>,
+ 			};
+ 		};
  
++		rng: rng@10c3000 {
++			compatible = "qcom,sm8750-trng", "qcom,trng";
++			reg = <0x0 0x010c3000 0x0 0x1000>;
++		};
++
+ 		cnoc_main: interconnect@1500000 {
+ 			compatible = "qcom,sm8750-cnoc-main";
+ 			reg = <0x0 0x01500000 0x0 0x16080>;
 
 -- 
 2.46.1
