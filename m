@@ -1,51 +1,50 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 183FB20F091;
-	Tue, 14 Jan 2025 21:58:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCA622135B8;
+	Tue, 14 Jan 2025 22:21:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736891885; cv=none; b=WZTO5U6AQkZG6shAMfgi8gaP7NSiAW82tRmOkAkKP1QFKcokJZ/K9CoQ3d7IsI4ypsKlwYOimkjHDFSAZyef0rJJ4rlnor8MiECRSsQ48DuKNSThNlsrXpeVpCgYtw+zjpFSluIsZc3FK03P1inny8DIIr+RW70t7+dX1/SpYsk=
+	t=1736893296; cv=none; b=ADABXZzW//6nvnWfhAiJ3zMZQVakSP/aKbtV4qJnWqc55cVMV1YGPY9m8JYO8KuUx+QO8m1nebE0jb7WqzSzQgM9cWlI6lv2fuKhbXio9PPTBrJLbc5EcfZ2Hkk89qks6GcYYZWa5h6aEOYnLba53da93GhCvciDlaUG7TSaCf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736891885; c=relaxed/simple;
-	bh=fIRjaf2CBR9Qy+fI83to34FCd1RO8+IPvgldD3ddWh0=;
+	s=arc-20240116; t=1736893296; c=relaxed/simple;
+	bh=PuUmuNai6cjQ737aOdSCDL04yveI96OOlq+nlDDv00I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dkr2yPFlX943rL8W53inlUpHMTnjocxZZOOXo4VHljGm0FwWkPX/3spNRwY6BtPgKWU9PjfSBMA1yzujngTaVXgkYxb5bO1unol483VJkLeRxZEISisWtHvl/hKJd/Lvng0bCg7WVBSI/PQQL+YCn1GtqU0xvbg/lUlgge60CVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=krqqAD/t; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=CGlEwxSzn8W85VAK03TlRxBYMvUiIBlzD7URySNniihdEZIhv/Yd8nU23HB8QUQQjV41qmE461cCxkc1fiZ2w603sui+60b8QJOFTfae5Aes2hSPUN9rr4EG9Rl2RQF7io7RzHpd5g7bgY8uFmQ16TTckvIlvslETVwxgtKIcTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W1g3TAM6; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="krqqAD/t"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CF61C4CEDD;
-	Tue, 14 Jan 2025 21:58:04 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W1g3TAM6"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D168C4CEE1;
+	Tue, 14 Jan 2025 22:21:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736891884;
-	bh=fIRjaf2CBR9Qy+fI83to34FCd1RO8+IPvgldD3ddWh0=;
+	s=k20201202; t=1736893295;
+	bh=PuUmuNai6cjQ737aOdSCDL04yveI96OOlq+nlDDv00I=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=krqqAD/tinsHRONkhI0CAN1VER5dNJQoyDRkkj5L3Fv3NE2bIkwbFlbgRQ9/KkAj/
-	 F8zeNWmDZP8L+Y3Yc5Tt3wp22Azhw4P0b7Dsj5EfMCra94eP2rmcsBxarrn7BMwgfG
-	 TexrpasEOfT4xLLd6qpX8ZUif1r4852u2MYAEFTL0LAi7fVlZ0S5c4aa1k15MpxF1O
-	 LzAkc1eB0u+7ngi0MEpqxDyblcL4W4c92Y8M4oo5IEoBu+YGtFqTULFyvtJpxsI2Gp
-	 MfAd7XdMBVVOjfcfSa7Ukrhx6y3a8gwpXZZVAlJtYl5ba+fXg01qbtja/K6rSH6Mg7
-	 soPWNoGBPU14A==
-Date: Tue, 14 Jan 2025 15:58:03 -0600
+	b=W1g3TAM68Y9R8pbzkyH3Mz7w3/s2714ukgDb5zxuX7oLGiJZkOntTMbOtPfwLU9j4
+	 rFZI9krTtiwz/9TNViyUYU2XQXNabstdVhN6OPQke1kPt6gojvEzvfBaLpXDU8Mn+Z
+	 9l8rFrHLs0FxfdR8vzjw1Ikcl81TQN9An2J06rGNvru/G5jO9p+drDvSU+eABB84D/
+	 IohtV+7NZEGp9WEClOEC8noZ6JBfqVgBbWIpYN0jiyRkqxvoUjjnAL/bIr18nUej12
+	 UUqlqaXyMzXmgmWosBu5UZha+p36zw/7vEWk+Ss155tKmgQ9jRax4S3KsaLtIP0/3b
+	 Vww61bPl+wLIg==
+Date: Tue, 14 Jan 2025 16:21:34 -0600
 From: "Rob Herring (Arm)" <robh@kernel.org>
 To: Melody Olvera <quic_molvera@quicinc.com>
-Cc: Satya Durga Srinivasu Prabhala <quic_satyap@quicinc.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+Cc: Konrad Dybcio <konradybcio@kernel.org>, linux-crypto@vger.kernel.org,
 	Conor Dooley <conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>,
+	Satya Durga Srinivasu Prabhala <quic_satyap@quicinc.com>,
+	linux-kernel@vger.kernel.org,
+	Bjorn Andersson <andersson@kernel.org>,
+	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
 	Trilok Soni <quic_tsoni@quicinc.com>,
-	Gaurav Kashyap <quic_gaurkash@quicinc.com>,
 	Thara Gopinath <thara.gopinath@gmail.com>,
-	Bjorn Andersson <andersson@kernel.org>, devicetree@vger.kernel.org,
-	Konrad Dybcio <konradybcio@kernel.org>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
-	linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH 1/6] dt-bindings: crypto: qcom-qce: Document the SM8750
- crypto engine
-Message-ID: <173689164413.1704764.8805395503286034717.robh@kernel.org>
+	Gaurav Kashyap <quic_gaurkash@quicinc.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>
+Subject: Re: [PATCH 3/6] dt-bindings: crypto: qcom,prng: Document SM8750 RNG
+Message-ID: <173689314919.1747667.12076698593104019076.robh@kernel.org>
 References: <20250113-sm8750_crypto_master-v1-0-d8e265729848@quicinc.com>
- <20250113-sm8750_crypto_master-v1-1-d8e265729848@quicinc.com>
+ <20250113-sm8750_crypto_master-v1-3-d8e265729848@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -54,18 +53,18 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250113-sm8750_crypto_master-v1-1-d8e265729848@quicinc.com>
+In-Reply-To: <20250113-sm8750_crypto_master-v1-3-d8e265729848@quicinc.com>
 
 
-On Mon, 13 Jan 2025 13:16:21 -0800, Melody Olvera wrote:
+On Mon, 13 Jan 2025 13:16:23 -0800, Melody Olvera wrote:
 > From: Gaurav Kashyap <quic_gaurkash@quicinc.com>
 > 
-> Document the crypto engine on the SM8750 Platform.
+> Document SM8750 compatible for the True Random Number Generator.
 > 
 > Signed-off-by: Gaurav Kashyap <quic_gaurkash@quicinc.com>
 > Signed-off-by: Melody Olvera <quic_molvera@quicinc.com>
 > ---
->  Documentation/devicetree/bindings/crypto/qcom-qce.yaml | 1 +
+>  Documentation/devicetree/bindings/crypto/qcom,prng.yaml | 1 +
 >  1 file changed, 1 insertion(+)
 > 
 
