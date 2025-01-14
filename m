@@ -1,333 +1,220 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazolkn19013065.outbound.protection.outlook.com [52.103.20.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF617234CE3;
-	Tue, 14 Jan 2025 11:51:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C6F92361D4;
+	Tue, 14 Jan 2025 11:58:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.103.20.65
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736855463; cv=fail; b=nLj9BgavbTp1dSqs4dxX3cU9aqhxlkyLfp+6RyGjwOd9zYj6akN6GcMdiK8xNQwCkaq/CR5ZFoR/V1RVldogOLpNPdBvLz3SmiquUYR5NabKkovGFLjzxi+u8VEfpsdQdv4W2cKp/W2UM7l/jFL+IDJgxI70/U+8f7L2ulA7HCI=
+	t=1736855938; cv=fail; b=CM6Q7CDXcMI3HUwE433eDh9sp7t2+ewqp9mpsiFR34kzqCOv4xPlmnPqx8THc0vjFDHUP8MMntBMTHhBIw86bC4ztf/c1yvtJdXNV9WcLbGUuJQC25XAOB7bf3vzyet1ckkfn+i6xl5YFdOEby/ORZvYEchYtR/vmlUXaiJ/RgU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736855463; c=relaxed/simple;
-	bh=QvRcGyZ4/4XcdmiGnGHXGbbUKrZQQl4e2C9By4Hx22s=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=o0nI2+afL5A3FJaht68XaYBdwmKsrZYwXiUnBS8vfss+/7xnRi/38Q5Zp6+F5BR6wXHRxw2B31ieYZzMlM2GVNTAC9ADmpqlLMmTDyO1MN+TCUxUHdcrcYtJWPT246WJlZqfHt2wufkF8vDQegbl//lf7tHrfTdIAv96qSp0N0s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hKJFySpU; arc=fail smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1736855938; c=relaxed/simple;
+	bh=cCBp+UPo9iVi+FO1kKhtCbwFDN+N+WJ5mUTcmhhay44=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Rmw2ndAsH0N8gn71MWDqrfwdpGEd/LYYnKPySaIr3mttqSxF4UaJW49w4XvJEXhT9l3DUn6Ye/voyQD52Dw7fOM7vUNKO0uj+HdDHT07JbqNFcVbg8rEu98SbU9Ku0qt0bD56D8xfjuv9/tm51WpCryIpjsSbDijR/vxbjSeUWo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=FQnzha7n; arc=fail smtp.client-ip=52.103.20.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hKJFySpU"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1736855461; x=1768391461;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=QvRcGyZ4/4XcdmiGnGHXGbbUKrZQQl4e2C9By4Hx22s=;
-  b=hKJFySpUsXc7y9RMfFQnAE2MdNOnJ4cl9m6TCe+8MFRNfdlVGdZRnUPx
-   y3JuhSVhcNsJck27rx8/b/QiWxzWdH0alhBkeI0nqy2Kths/wudTQiiVj
-   nJkS87WEdZrYdS6qsBCLZi+Nf3mhjOjbiYHiecLi+O8EhmvgJryDBYPlB
-   InYLFrRwlklhibp0uM+ijfv3uyDSMALCE9ATS2clrcYpDAuYBc6xNMH4a
-   n7sCd2oJusYKrxCOHyPDJoQg/afLWlbjaQN4Jh6zBtB48Me866NRBG/w7
-   uJ9eks0ZJvlDmYQH4Bn4DkRp23u+EM4vrsAIj1iJYMx48p+446VC83iPU
-   Q==;
-X-CSE-ConnectionGUID: fIfDGUeRRLuWzwYOXPibfg==
-X-CSE-MsgGUID: pfy+q5hUQRKBAJYpxfa6eQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="41084972"
-X-IronPort-AV: E=Sophos;i="6.12,314,1728975600"; 
-   d="scan'208";a="41084972"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jan 2025 03:51:00 -0800
-X-CSE-ConnectionGUID: guUFdftBQ8yLMX7KS+nILg==
-X-CSE-MsgGUID: nPxTfZtzSRGGBlrJmj3oCw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="135660312"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmviesa001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Jan 2025 03:50:59 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Tue, 14 Jan 2025 03:50:59 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Tue, 14 Jan 2025 03:50:59 -0800
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.172)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Tue, 14 Jan 2025 03:50:59 -0800
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="FQnzha7n"
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Dl3uILe5+D7L9eY0uwjoDmbX437l1bwYVWBxjTWLyUtD2Nax2mq1tnSYhb9U0XMC9Y7sEOlQuwvZ0dggH7crSZY1mVmKJp7WPUXG1I/BUGXV1Min3BXK+bUq4jecAZPz/iWezCTkjZXIP0BB6OQFdai9q3QCDB0wo/yFwvQrlyXEnOBGuIkSzCtp+/Vo0QGrMW/BmkoIwJ3Yz5tDxxuRIIK+BZRfwaG5O6tC11EJPQky2WPNqaiuBNulUgZbk2v1sqjZZo1etjDHwyVZ4PTJgNlvU9h26ALCqtAHlRDhdv87vGnp/9807zj9otGtm+3icg2CLI2nHasiY0L6lbEr5A==
+ b=bT9zTGZBmxiYz3g/0HqHYvz/XMcdvVD5SJinCN8XUsYstvxijxgO5pU1G5sCCobPC7RLCQVsS7ng1LtEREtSlSEbDkZQzSxR/iNxKYroCzwZRfcP/Aepxo36t5y6wsF11TBgAgubFgIE3+JSTlY6yp1Fx2Ks2WQSzZu9RlK1VjZ8BJCGJP/Dm2oeSlLuR+YMpDbjHr3nEaprZVQ7FxfGw+Jom+29Ka86YKyw0PG2iOG3paYRK1bv0r/2zhKcWCAZL8RyoA64NxuecdR8BaEvkFvQHCRVYA92u3m4Yuo4fViCliF2zdj4gjmy4Si1vSm5MFo64uEaf16Y1Tf25Vi69g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=E4yoDQ6FtGpIlD7ByPx1dDBZoLHXVmXJ905pS7BsgTQ=;
- b=YHIcF/nvxNjoUK0odW1YiUMmsneId5SMl1O4GEm+0gHIiZNlRbG6vAuWuC7l1Z8ofFI2rb/vTtTlFUzhvwMMisMDnTxyKG3jnnhlsbcM4N5iG37Ax9uR86ntHgEMCdMYP2ZepJXkTSNLKrWJexcKOVa+Tg5hBHy67z1H5QVXqus0K+IFFUf1BUs4tSDd/PwW8nyNugtNR7ektGMQY9BDIr5YrroFNuwseDSYxD+atygfiPVBjEXYKO5wNFiSJvxoj45ChdJ5h7cIbyD0xC55sF+g14yQ4RNuE++9zSrgREHLnwTrvK/CXlUm9iEi7r2HomFB9k8lQEu5o/HqFGoRhQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CY5PR11MB6366.namprd11.prod.outlook.com (2603:10b6:930:3a::8)
- by DS7PR11MB6062.namprd11.prod.outlook.com (2603:10b6:8:75::14) with
+ bh=SXFtxHpMk8Z6bftgzC9RUKsBGPeEdM8l0FZw0FjPyzw=;
+ b=l0zJDg0M5ickAdvtfkRnIM7oBGQRrZ6AEvgEdOT3BlrfO+H4+OEiFAKRH9BEVIqHh/URvAkaNtqRkcCVp/RhzQfXJq78+8BHbX08uK6mrsqGujWT7PVU63vWgHwHG2pred4Fit77waG60CpYClb3jbRjRtm1JlePsdSkwdOwnR7/fES1M4t2yAAol+Q4bA5wYr5A2UMRWaEmiD+rHfvJuUOVCLl+DrG0+tXpm8vE7LdxD4NgAU+aKumjr/M30aY8KDA3Xd8jtI9M37K5vbiR/umN+fdgQwM97g3uIkm4Yjrgy8+ymkJ+yHA8dKv5zN8p6D30MW9lU0DSxmkNCiKy1g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SXFtxHpMk8Z6bftgzC9RUKsBGPeEdM8l0FZw0FjPyzw=;
+ b=FQnzha7n4nulBiTRaAbQ7/mP2ZvqsLkRsrnnspyboeWXvul2CVm/7YHT70ktNLx4+3QCP9anQZQ5UJ8LWHSG3UrxNGxXzaCWGQobCJyIvZM5TaevGtMbWisHtJ7ZdQ3pvZgSlV8tT3nZGnDsfZEXrL+ISOwZrGVWKUG6bdxlijr2Ys4M42XX2eGRHghNeWGvD+3bhLsDVVKQ1+rxOZ+qucgts6veq6rr0XTEtGvFIt9KXjs90OQA+JBzvW9q8KTxYve+62Fp+ltH/66F7Qr39zox5YPUE8Ab4JMxIxM2HW0GacoDTvEMHt2KJ0Y16HH+LLwXLooPpmALrRD8lpsJlg==
+Received: from SN6PR02MB4157.namprd02.prod.outlook.com (2603:10b6:805:33::23)
+ by MWHPR02MB10473.namprd02.prod.outlook.com (2603:10b6:303:288::20) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8335.18; Tue, 14 Jan
- 2025 11:50:57 +0000
-Received: from CY5PR11MB6366.namprd11.prod.outlook.com
- ([fe80::6826:6928:9e6:d778]) by CY5PR11MB6366.namprd11.prod.outlook.com
- ([fe80::6826:6928:9e6:d778%3]) with mapi id 15.20.8356.010; Tue, 14 Jan 2025
- 11:50:57 +0000
-Date: Tue, 14 Jan 2025 11:50:46 +0000
-From: "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-CC: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller"
-	<davem@davemloft.net>, Boris Brezillon <bbrezillon@kernel.org>, "Arnaud
- Ebalard" <arno@natisbad.org>, Srujana Challa <schalla@marvell.com>,
-	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<qat-linux@intel.com>
-Subject: Re: [PATCH] crypto: Use str_enable_disable-like helpers
-Message-ID: <Z4ZPlu6iqCFWmWDm@gcabiddu-mobl.ger.corp.intel.com>
-References: <20250114105603.273161-1-krzysztof.kozlowski@linaro.org>
+ 2025 11:58:53 +0000
+Received: from SN6PR02MB4157.namprd02.prod.outlook.com
+ ([fe80::cedd:1e64:8f61:b9df]) by SN6PR02MB4157.namprd02.prod.outlook.com
+ ([fe80::cedd:1e64:8f61:b9df%4]) with mapi id 15.20.8335.017; Tue, 14 Jan 2025
+ 11:58:53 +0000
+From: Michael Kelley <mhklinux@outlook.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+CC: Breno Leitao <leitao@debian.org>, "saeedm@nvidia.com" <saeedm@nvidia.com>,
+	"tariqt@nvidia.com" <tariqt@nvidia.com>, "linux-hyperv@vger.kernel.org"
+	<linux-hyperv@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>,
+	Thomas Graf <tgraf@suug.ch>, Tejun Heo <tj@kernel.org>, Hao Luo
+	<haoluo@google.com>, Josh Don <joshdon@google.com>, Barret Rhoden
+	<brho@google.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Linux Crypto
+ Mailing List <linux-crypto@vger.kernel.org>
+Subject: RE: [v3 PATCH] rhashtable: Fix rhashtable_try_insert test
+Thread-Topic: [v3 PATCH] rhashtable: Fix rhashtable_try_insert test
+Thread-Index: AQHbZjKOzS8JRnQnb06t1/r8Yif4xbMWKXMw
+Date: Tue, 14 Jan 2025 11:58:53 +0000
+Message-ID:
+ <SN6PR02MB415708E60D4941374BAF2F28D4182@SN6PR02MB4157.namprd02.prod.outlook.com>
+References: <20241128-scx_lockdep-v1-1-2315b813b36b@debian.org>
+ <Z1rYGzEpMub4Fp6i@gondor.apana.org.au> <Z2aFL3dNLYOcmzH3@gondor.apana.org.au>
+ <20250102-daffy-vanilla-boar-6e1a61@leitao>
+ <SN6PR02MB41572415707F0FA6D9A61247D4132@SN6PR02MB4157.namprd02.prod.outlook.com>
+ <20250109-marigold-bandicoot-of-exercise-8ebede@leitao>
+ <Z4DoFYQ3ytB-wS3-@gondor.apana.org.au>
+ <SN6PR02MB41577C2C4EB260F3D2D4F85FD41C2@SN6PR02MB4157.namprd02.prod.outlook.com>
+ <Z4FXs8vAtitHIJyl@gondor.apana.org.au>
+ <SN6PR02MB41570F1F5F4F579B4E8F0CD3D41C2@SN6PR02MB4157.namprd02.prod.outlook.com>
+ <Z4XWx5X0doetOJni@gondor.apana.org.au>
+In-Reply-To: <Z4XWx5X0doetOJni@gondor.apana.org.au>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SN6PR02MB4157:EE_|MWHPR02MB10473:EE_
+x-ms-office365-filtering-correlation-id: 47f1a469-ec59-4db5-832e-08dd3492d10a
+x-microsoft-antispam:
+ BCL:0;ARA:14566002|8060799006|15080799006|19110799003|8062599003|461199028|440099028|3412199025|102099032;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?sO2FeNCV2UWf/3Spd8rI9pzg4XEyDMPmT1NV8qKYkIUSF9z2ux5oRHzhhWeB?=
+ =?us-ascii?Q?e6leZu1oeG98XDDsipvU5CUk62kPFVGaVvGLiwiUh3r+cHIly7uyPWBVAZZH?=
+ =?us-ascii?Q?ZhbBbAPKkmbxCHKgMeLiw82sJHZ2bzUa4TxmejwITfG4Dg2Z5+aNmKZD8+wD?=
+ =?us-ascii?Q?KxoskUQUVE9C4oFn7LlT5ALjcqI4sdXWnnIgQvV+KFtw5mq6kk4Uiv1p7kWb?=
+ =?us-ascii?Q?csWl5lYwh92BN9Uo87y+5UipBy40v2iXX6QBbRSKvet1mTyhmDWJmELK9tHX?=
+ =?us-ascii?Q?mawj1NtpwlZQcERvCkjZSKsE5c/BrrlKhftfNhnfaeUHpG/V8dJmBO66c1mq?=
+ =?us-ascii?Q?M9IEq/LFmQdBfLRiVevNEuNCkVlKJSnJPI5mKTcTwrdFavYEt/8OrrU+7NDB?=
+ =?us-ascii?Q?OTcxnf3KGWVH2Eyag/Ob4Kr8xax9TAapZRwSQE9iVSzXZNVyA26G0FZzCm/Z?=
+ =?us-ascii?Q?F98JseZaCcZAljWqx4JBfSCZ7jCagSuvjnDNBDY1h5t1QW4yJbyEo31XcYSa?=
+ =?us-ascii?Q?5NFgsHlOLzgFabpoPv9k30+FqPlvI6SkCG7w4Bm81phXcEs2eQiAgTWDSgWs?=
+ =?us-ascii?Q?i2LbPwheebbwsNn9IxFosen++WXa7LcrAPJMynq/4ThUEaMFBaCWYu7kwaRy?=
+ =?us-ascii?Q?9AzVLw0UeJo32fWd84Vtgo/yfDZpfaypmJB+kRUJjcoMEzzkQaZAv7MP5Z96?=
+ =?us-ascii?Q?X+4pI2CRMDnhmhWCqml7+KSHbQHwKTsY7JprFYQMjbkrF3w2BtFTBQagmnBu?=
+ =?us-ascii?Q?XZvwRO7ud78P1ckP81qI+R8vgYDWAYqSej9vLHJSpCc2CfGW4s5HdkniB8Ju?=
+ =?us-ascii?Q?U/YpEF5P/33HCQothg8fiY4iLQV1ZjQ+Op4IUjpCj07y3iDMbQcZlUjz4WQm?=
+ =?us-ascii?Q?hF4G8pN5BcojSpXMgBWZMDBPJSNyiK+srVaxGrIdcbkIPmDa8nJADs1D/he7?=
+ =?us-ascii?Q?OEaLkEOprxLNONsVZSuCazSJudxgL5Pl6nFCCk1BIVyBKIkebwcLSNhcop+Z?=
+ =?us-ascii?Q?oLRXXebNiq+oIEyUqHwJBFfvWW/nx9gatdnrtiViYzeB/To=3D?=
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?5G+rbTvRuPh+kwLSCFFTJn85aCxrk7OhEpEH0q/CFVD8nxEOw63+RphUnfzZ?=
+ =?us-ascii?Q?u6DmDjdLAmM949NgsiEupphB4K6J5FRJ/M4RVy+7X9bQRg/EvyqmJZSi4pEP?=
+ =?us-ascii?Q?sixvGCUo5NFUYfrWhw7JyheU2oL6+GM3SbNryKHZl+QnXbm0ZMbKbi9tybYP?=
+ =?us-ascii?Q?49lUBTqjCtSCAUEuSeI8J9Z1S9Ywh8nkbuUkmzLsk6aehSVp39pJ1YhyQd1Z?=
+ =?us-ascii?Q?OtqJ4R2YUP292KT3Pk7Uw/nlSLEtffXsOIcp1COMB9XSvFY9GKkWiDBmjFOF?=
+ =?us-ascii?Q?f6R1B6nHX6A/sacI71pOHmfceyojIcrXKq56ro6bXBGzcHh/cgyFlFoKdDIe?=
+ =?us-ascii?Q?CrU6GqnypMX4LNz+li2hm7cpMQgWs3oRfA0Ggr80yIZ6TT+oQyqVFlLqhJ9V?=
+ =?us-ascii?Q?MYxSKe0M3mBwc1P9qotegkJUgg8jgA5ihfQ7wvnCK1pceKjoTXtheXltGpFx?=
+ =?us-ascii?Q?0ZraI4KcCz7bQ9DNZc7wFsS4AnAZ2ARAyH43ijqAbspCamadeE1vZLtxAX7Q?=
+ =?us-ascii?Q?/zWKQW1eOK5dBTf3kmPl7tYKCi8HlCVAzjJ4zRbEADXprIjEV4kf84ENzlzt?=
+ =?us-ascii?Q?lQsm2lg+ZCdcm5HN9cXvt3herSLz0W6OMEbiJUSFJNKYZmarUSGgxnPDHxVv?=
+ =?us-ascii?Q?BdLZYQUd3PxRRUcmBxA1GtmOf5OH4c9gLnudT+beRMmmCX7Jg2AMhx7XtLW+?=
+ =?us-ascii?Q?s2mMofjiZY9AoQ1lW5HWmbZV+PlGLJpQaAQDjpLRcZSl64CZeUa0eV00HSYg?=
+ =?us-ascii?Q?GlnLnseHxHnH+QlFmFoZLlTKmVpwydjJidmDgD8EE06rD4XjGLj+5UjWo5h7?=
+ =?us-ascii?Q?dik4fTIdxG2jkDg1bM7g4GcZo6vsPIQF9yAF7LpSgSBRfh8OGEgW0gBdW5Iy?=
+ =?us-ascii?Q?MhADQpFR3i7S1wLCE6eA2ZHTg0M02GiSiystW9BuNZ8N3kN/E9F+Lxuw3/CC?=
+ =?us-ascii?Q?57h7RNDEinpAgtTtgIrHS2K632ScMKHf77/40viqp5EW0YbDtKC9iNI3F7F6?=
+ =?us-ascii?Q?uKQN5jMZIxSePZ/z0TvtduJz5u4xiG/W3Pm9dYok1BYcnVZNR3rCq+bqPlWB?=
+ =?us-ascii?Q?y7w47y0DblnfBytrn8OAWITJHH8GrPpwiV3CGoASGEE86dwiPJdZCHIK+tq6?=
+ =?us-ascii?Q?JRt8tZHRLC6mwIE/nLB7mVUo40XpAPLvdYWYqTKk38vnZ1cLb9w/B+4HOzrY?=
+ =?us-ascii?Q?DOdX0LUl6l42kMrW7n0I20rX81qIDF3YIVKHXSG7lR06p+2sQH9rHskRfQI?=
+ =?us-ascii?Q?=3D?=
 Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20250114105603.273161-1-krzysztof.kozlowski@linaro.org>
-Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 -
- Collinstown Industrial Park, Leixlip, County Kildare - Ireland
-X-ClientProxiedBy: ZR2P278CA0078.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:65::13) To CY5PR11MB6366.namprd11.prod.outlook.com
- (2603:10b6:930:3a::8)
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR11MB6366:EE_|DS7PR11MB6062:EE_
-X-MS-Office365-Filtering-Correlation-Id: 36f28922-a8c5-4ea2-14bf-08dd3491b512
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7053199007;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?9hrT4S6ld2zkQprmU6AWrV8okpwzfQPpNGuwQb3KfEzECthoHZfouXoWYC9i?=
- =?us-ascii?Q?XfrpDQ/zHpAoS3z0D5C7Axz32Jq2v+gMNknDCs6dUUTXe+Q6PbhmFOKjWHsF?=
- =?us-ascii?Q?fXh2WqpkFd1OGQKItCuCk2yZM8YWbKvrM9A4oPSKoeZ3Z3b4YuUHv3RIGBFx?=
- =?us-ascii?Q?/hu4P9Nit0+GcvQyGYiQ5Oh3H8Fm+vL7tq1tKW4/ch9e8i2un216dIq49dmt?=
- =?us-ascii?Q?+DpCc/QizsMY2p90C7tCKbkLX5TXCyrxnLAeN5RNk5Ao0xNgpPLsBLJmUenO?=
- =?us-ascii?Q?7mIhadsa3OWOxrXttR/r6MqvPQMbWkgDgtp/P7d4LP/qjlPMq+GWDkzpTzTR?=
- =?us-ascii?Q?P27YD7VuGOghIIrxLXNXw3LMOWG1xDuNiaVDLIWN2wX8LXAeIYr/BDJ3Vawq?=
- =?us-ascii?Q?230kr5Vwxk0w2cWdyV/zUk8TIi26lDVImPPqW/sTN+Xmq6j2oaHoFBszGblh?=
- =?us-ascii?Q?B2B2/M3pGtFp7Ot5Batm8/8hdrQU7kmsoSYp7sOjexhy6mpB88Mk+JyVGoyG?=
- =?us-ascii?Q?H8JBd38se1OtMUN3rsaeRL/dQsxXQhrIDBV3tR3SpS1+E4a5HmrGmHlirLtQ?=
- =?us-ascii?Q?h9JJgoNhz2eKZ8ap+k6HUEDpePz24xFpxOTOSGa740zVGr6/TvFA2aGN4OO7?=
- =?us-ascii?Q?zHEWf07oKouL6JBc6dFlPUMMSEtNvqP/IolDLkEIcLNFumjv32CRZBcQO8q3?=
- =?us-ascii?Q?FkQXlADu50U4HzIrtVO8waIMba5HWjjQZODXJUZIO+NTmdzFMxJ6kaXSD8lZ?=
- =?us-ascii?Q?+j9V8Jk2JMNQ62y078JZ52zg82MwZFg36rViNYeqHEnoOSqSJ+xQcJEFSFwZ?=
- =?us-ascii?Q?434hlAm2n2kwOif0mPrTSVotgKC3CHjbrnWe+ZePwrxlNjrLF4oJpJ4ttE2B?=
- =?us-ascii?Q?Wz4xWpytuTq00WV97AuMQzvLT/OO5bwZESvH7DZqWW8rt1a2iLGfTAGtcszV?=
- =?us-ascii?Q?OcFFEQS45Rfji24iOZtzZXny3Kq2z5F0Yh/Czo3EHxRO/Zerk9Z6ujumYLWP?=
- =?us-ascii?Q?cAYtbFzAD/R/duXWfWiBKkZGifdi3rjs61nve/CHLBUfd7a4zB7Lo40MbIZF?=
- =?us-ascii?Q?4ogcuTF8AyrTo5n9OQkSrb5MzH6WU6YUMesakkZcAh53RI3KvCX02BmRWCYx?=
- =?us-ascii?Q?8Eu1radC8AJuQ4sXkHkWE5DGE/vWainRDYT+CSIohNs1r14bw5jjbDOUWhFH?=
- =?us-ascii?Q?Z97BBytYhUtA0+cO6NMtVSkXIBty9h/lOYzkuOPm95k+rrvuBEOv81UhUkHj?=
- =?us-ascii?Q?CPdePD0bk+TuTiOdvqXOxbDMEdUiB/B3VqMssgfw1iZsAaR1aWa4Bdno0eV+?=
- =?us-ascii?Q?FXoKv13VEBce/AAFac1SZw6D7L+CqnlpSFSyalz8SQkf83CGrFIXYnBja6JT?=
- =?us-ascii?Q?funjIT87nxQzaXYRCBisXHwBXKHr?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6366.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?m12RltA1Hvb9R7DD6iLcuU5aEy8Go+djo6FF48LJvpXItM794l6ix7F5CadD?=
- =?us-ascii?Q?qJJhGuEIbbz0x4HUogdKS98M2SyaqOEaW39SqHFcfBMHADJo3QReyGYtcVaP?=
- =?us-ascii?Q?0wlvkSbNOuZk4kV5k4ylxHXUYeQIP5CspO+HIBwA15L9WE+Jrf5r76P3B+bK?=
- =?us-ascii?Q?FAnh15Q9yiJC7RmefaXxe5sibzJRIhq+OzdeUmn8XkPW7YZubd49YVAI3RfN?=
- =?us-ascii?Q?3mtMNEjedf+MiQtXkAXsCcZxZqqALk/iVY4+GKs4mrPGNohi/ghSFF32P+aZ?=
- =?us-ascii?Q?Pvg7zCSslHhSM1WXdaN6CJ2rg3Ol2j/sIb3Hu4O/MmNntbuVIvSaXudEGHC6?=
- =?us-ascii?Q?i37ElIbm+pfoPC1qTuFhziwMvYpZgoJSfuIWbM4Q22gTiIun2/DWByoW2sTN?=
- =?us-ascii?Q?V3LfNwp52PgIPnM2DXQnzUhAWwJjDL8YFOfrwyBDzMOeK9AN/eMs8AgAIoKf?=
- =?us-ascii?Q?9NNMdOFUokmSstp2GNaV3vKpWDPtNqqxhyll1GWcGOucA11S2dqAXwyK9apr?=
- =?us-ascii?Q?s1dopQoAZYnOLSfoLKFKPa19Bik4ZP2HCHntrsY1jt07tGJyc7AZlPisAifO?=
- =?us-ascii?Q?NR5JnnTnJ6K1tBENw+PX+u66xyma9LHPvVsuew3S5XxYOP9qhiw0zvl6MwNl?=
- =?us-ascii?Q?UapyfbjWlf2LEqlLifqUFQ7NB0LOD0XqJPqh89yCid1D4PBU7cdp1pLP4O7v?=
- =?us-ascii?Q?/aTuEeBCZdx/SLen7zytAbK1HErgol7Qja56JAn8gzQfsYtXn+btjiEk96Xd?=
- =?us-ascii?Q?JAZZTCBJqApt32soFdRZVdbt0V2wzNwi+dFuFPKvmBWOtDV+b7E4kRrAL+4/?=
- =?us-ascii?Q?t0DqhM0vNAvIJ+ec4m9w6CvW2gIC85CZ18dSEWyv3E2EfJtwQVzyY1OlUlvo?=
- =?us-ascii?Q?T8/CEaZ+RQd+0ELtqcczbjIOED4ViLQgXg0m2oRGI+Zt/rkmOxeGyg7RR7Ye?=
- =?us-ascii?Q?KOc/06wVYq9LnteNBFuxvV47RxbJ7S1UOf5w0sOJgepUEaIMIEOs5BSPkMzo?=
- =?us-ascii?Q?kVTvqQkKWlZSzR7HkuFu10rZ6lf3UqTC7NQBvlxfh+EBMNGG6K25QK63PF7/?=
- =?us-ascii?Q?adRNufHjz02j2U0jJP8GZ8L6o8gsq5+eEKYCJNkKpK+T72KnRhtIgGgjskzo?=
- =?us-ascii?Q?3Wy0Mf4hmd8h+8GbhIFCzZuhos/i32GAZSH2mGNEMrphln57UVfMSKjokX9A?=
- =?us-ascii?Q?qeuTYNq9O03oIfa2QjdkMJw/77PdsMPCAAtRLs4iQHOFml+yRZ2q1IxfOk01?=
- =?us-ascii?Q?9zClEVoCVkufE8AlzuwRzYaeU6iZTIjDaqvT+Cdref8gwNINaBXELSYRvciA?=
- =?us-ascii?Q?kM3ufSPSfgFsEe3QnpxQQyaJSDRfZZgrnLJ8+3TfQ+19kp4W/Gt8we0Qhllp?=
- =?us-ascii?Q?rUoxU7nIruCKHytrtfrudctmsIZAXDnch0mQiur0mjbfFmbTTxb9a3h/GMd2?=
- =?us-ascii?Q?8Yh5Ufjk6nCpP99VlC7dfugja8Dx2mfA1PhkNFAwQB8/3tIMzzWddsz1zna2?=
- =?us-ascii?Q?oZXOQ6T83wZPe89vQWmR6piCBhgPKAeT5Iv/47aiWaY5uYpkwLvlnFNGG+jd?=
- =?us-ascii?Q?Zesu8DVa25tdsyI7JUKSjclBEEb1gXM8k00AJJXVhr0agbQVpIkXP75uVxIk?=
- =?us-ascii?Q?Bw=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 36f28922-a8c5-4ea2-14bf-08dd3491b512
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6366.namprd11.prod.outlook.com
+X-OriginatorOrg: outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jan 2025 11:50:57.0103
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR02MB4157.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-Network-Message-Id: 47f1a469-ec59-4db5-832e-08dd3492d10a
+X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Jan 2025 11:58:53.3016
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: IHjqfSoqRoomT0hJEtanQIuj3JaKXAIkYCkE6Pn+XSGnhlWMGjNguoTGWUbzvQWGGy9C4ONbDvmfT1XyYaoEVGQk9Wall8IdvOT7ksYm/Sw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB6062
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR02MB10473
 
-On Tue, Jan 14, 2025 at 11:56:03AM +0100, Krzysztof Kozlowski wrote:
-> Replace ternary (condition ? "enable" : "disable") syntax with helpers
-> from string_choices.h because:
-> 1. Simple function call with one argument is easier to read.  Ternary
->    operator has three arguments and with wrapping might lead to quite
->    long code.
-> 2. Is slightly shorter thus also easier to read.
-> 3. It brings uniformity in the text - same string.
-> 4. Allows deduping by the linker, which results in a smaller binary
->    file.
-> 
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-For QAT:
-Acked-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+From: Herbert Xu <herbert@gondor.apana.org.au> Sent: Monday, January 13, 20=
+25 7:15 PM
+>=20
+> On Fri, Jan 10, 2025 at 06:22:40PM +0000, Michael Kelley wrote:
+> >
+> > This patch passes my tests. I'm doing a narrow test to verify that
+> > the boot failure when opening the Mellanox NIC is no longer occurring.
+> > I also unloaded/reloaded the mlx5 driver a couple of times. For good
+> > measure, I then did a full Linux kernel build, and all is good. My test=
+ing
+> > does not broadly verify correct operation of rhashtable except as it
+> > gets exercised implicitly by these basic tests.
+>=20
+> Thanks for testing! The patch needs one more change though as
+> moving the atomic_inc outside of the lock was a bad idea on my
+> part.  This could cause atomic_inc/atomic_dec to be reordered
+> thus resulting in an underflow.
+>=20
+> Thanks,
 
-> ---
->  drivers/crypto/bcm/cipher.c                         |  3 ++-
->  drivers/crypto/bcm/spu2.c                           |  3 ++-
->  drivers/crypto/intel/qat/qat_common/adf_sysfs.c     | 10 +++-------
->  drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c   |  5 +++--
->  drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c |  3 ++-
->  5 files changed, 12 insertions(+), 12 deletions(-)
-> 
-> diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
-> index 9e6798efbfb7..66accd8e08f6 100644
-> --- a/drivers/crypto/bcm/cipher.c
-> +++ b/drivers/crypto/bcm/cipher.c
-> @@ -15,6 +15,7 @@
->  #include <linux/kthread.h>
->  #include <linux/rtnetlink.h>
->  #include <linux/sched.h>
-> +#include <linux/string_choices.h>
->  #include <linux/of.h>
->  #include <linux/io.h>
->  #include <linux/bitops.h>
-> @@ -2687,7 +2688,7 @@ static int aead_enqueue(struct aead_request *req, bool is_encrypt)
->  	flow_log("  iv_ctr_len:%u\n", rctx->iv_ctr_len);
->  	flow_dump("  iv: ", req->iv, rctx->iv_ctr_len);
->  	flow_log("  authkeylen:%u\n", ctx->authkeylen);
-> -	flow_log("  is_esp: %s\n", ctx->is_esp ? "yes" : "no");
-> +	flow_log("  is_esp: %s\n", str_yes_no(ctx->is_esp));
->  
->  	if (ctx->max_payload == SPU_MAX_PAYLOAD_INF)
->  		flow_log("  max_payload infinite");
-> diff --git a/drivers/crypto/bcm/spu2.c b/drivers/crypto/bcm/spu2.c
-> index 3fdc64b5a65e..ce322cf1baa5 100644
-> --- a/drivers/crypto/bcm/spu2.c
-> +++ b/drivers/crypto/bcm/spu2.c
-> @@ -11,6 +11,7 @@
->  
->  #include <linux/kernel.h>
->  #include <linux/string.h>
-> +#include <linux/string_choices.h>
->  
->  #include "util.h"
->  #include "spu.h"
-> @@ -999,7 +1000,7 @@ u32 spu2_create_request(u8 *spu_hdr,
->  		 req_opts->is_inbound, req_opts->auth_first);
->  	flow_log("  cipher alg:%u mode:%u type %u\n", cipher_parms->alg,
->  		 cipher_parms->mode, cipher_parms->type);
-> -	flow_log("  is_esp: %s\n", req_opts->is_esp ? "yes" : "no");
-> +	flow_log("  is_esp: %s\n", str_yes_no(req_opts->is_esp));
->  	flow_log("    key: %d\n", cipher_parms->key_len);
->  	flow_dump("    key: ", cipher_parms->key_buf, cipher_parms->key_len);
->  	flow_log("    iv: %d\n", cipher_parms->iv_len);
-> diff --git a/drivers/crypto/intel/qat/qat_common/adf_sysfs.c b/drivers/crypto/intel/qat/qat_common/adf_sysfs.c
-> index 4fcd61ff70d1..84450bffacb6 100644
-> --- a/drivers/crypto/intel/qat/qat_common/adf_sysfs.c
-> +++ b/drivers/crypto/intel/qat/qat_common/adf_sysfs.c
-> @@ -3,6 +3,7 @@
->  #include <linux/device.h>
->  #include <linux/errno.h>
->  #include <linux/pci.h>
-> +#include <linux/string_choices.h>
->  #include "adf_accel_devices.h"
->  #include "adf_cfg.h"
->  #include "adf_cfg_services.h"
-> @@ -19,14 +20,12 @@ static ssize_t state_show(struct device *dev, struct device_attribute *attr,
->  			  char *buf)
->  {
->  	struct adf_accel_dev *accel_dev;
-> -	char *state;
->  
->  	accel_dev = adf_devmgr_pci_to_accel_dev(to_pci_dev(dev));
->  	if (!accel_dev)
->  		return -EINVAL;
->  
-> -	state = adf_dev_started(accel_dev) ? "up" : "down";
-> -	return sysfs_emit(buf, "%s\n", state);
-> +	return sysfs_emit(buf, "%s\n", str_up_down(adf_dev_started(accel_dev)));
->  }
->  
->  static ssize_t state_store(struct device *dev, struct device_attribute *attr,
-> @@ -207,16 +206,13 @@ static DEVICE_ATTR_RW(pm_idle_enabled);
->  static ssize_t auto_reset_show(struct device *dev, struct device_attribute *attr,
->  			       char *buf)
->  {
-> -	char *auto_reset;
->  	struct adf_accel_dev *accel_dev;
->  
->  	accel_dev = adf_devmgr_pci_to_accel_dev(to_pci_dev(dev));
->  	if (!accel_dev)
->  		return -EINVAL;
->  
-> -	auto_reset = accel_dev->autoreset_on_error ? "on" : "off";
-> -
-> -	return sysfs_emit(buf, "%s\n", auto_reset);
-> +	return sysfs_emit(buf, "%s\n", str_on_off(accel_dev->autoreset_on_error));
->  }
->  
->  static ssize_t auto_reset_store(struct device *dev, struct device_attribute *attr,
-> diff --git a/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c b/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c
-> index c4250e5fcf8f..2c08e928e44e 100644
-> --- a/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c
-> +++ b/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c
-> @@ -10,6 +10,7 @@
->  
->  #include <linux/ctype.h>
->  #include <linux/firmware.h>
-> +#include <linux/string_choices.h>
->  #include "otx_cpt_common.h"
->  #include "otx_cptpf_ucode.h"
->  #include "otx_cptpf.h"
-> @@ -614,8 +615,8 @@ static void print_dbg_info(struct device *dev,
->  
->  	for (i = 0; i < OTX_CPT_MAX_ENGINE_GROUPS; i++) {
->  		grp = &eng_grps->grp[i];
-> -		pr_debug("engine_group%d, state %s\n", i, grp->is_enabled ?
-> -			 "enabled" : "disabled");
-> +		pr_debug("engine_group%d, state %s\n", i,
-> +			 str_enabled_disabled(grp->is_enabled));
->  		if (grp->is_enabled) {
->  			mirrored_grp = &eng_grps->grp[grp->mirror.idx];
->  			pr_debug("Ucode0 filename %s, version %s\n",
-> diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
-> index 5c9484646172..881fce53e369 100644
-> --- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
-> +++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
-> @@ -3,6 +3,7 @@
->  
->  #include <linux/ctype.h>
->  #include <linux/firmware.h>
-> +#include <linux/string_choices.h>
->  #include "otx2_cptpf_ucode.h"
->  #include "otx2_cpt_common.h"
->  #include "otx2_cptpf.h"
-> @@ -1835,7 +1836,7 @@ void otx2_cpt_print_uc_dbg_info(struct otx2_cptpf_dev *cptpf)
->  	for (i = 0; i < OTX2_CPT_MAX_ENGINE_GROUPS; i++) {
->  		grp = &eng_grps->grp[i];
->  		pr_debug("engine_group%d, state %s", i,
-> -			 grp->is_enabled ? "enabled" : "disabled");
-> +			 str_enabled_disabled(grp->is_enabled));
->  		if (grp->is_enabled) {
->  			mirrored_grp = &eng_grps->grp[grp->mirror.idx];
->  			pr_debug("Ucode0 filename %s, version %s",
-> -- 
-> 2.43.0
-> 
+I've tested this version of the fix in the same limited way as
+before. All is good. I'm still testing against linux-next20250108
+from a few days ago, but that should not make any difference.
+I have *not* reviewed the code change itself.
+
+Tested-by: Michael Kelley <mhklinux@outlook.com>
+
+>=20
+> ---8<---
+> The test on whether rhashtable_insert_one did an insertion relies
+> on the value returned by rhashtable_lookup_one.  Unfortunately that
+> value is overwritten after rhashtable_insert_one returns.  Fix this
+> by moving the test before data gets overwritten.
+>=20
+> Simplify the test as only data =3D=3D NULL matters.
+>=20
+> Finally move atomic_inc back within the lock as otherwise it may
+> be reordered with the atomic_dec on the removal side, potentially
+> leading to an underflow.
+>=20
+> Reported-by: Michael Kelley <mhklinux@outlook.com>
+> Fixes: e1d3422c95f0 ("rhashtable: Fix potential deadlock by moving schedu=
+le_work outside lock")
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+>=20
+> diff --git a/lib/rhashtable.c b/lib/rhashtable.c
+> index bf956b85455a..0e9a1d4cf89b 100644
+> --- a/lib/rhashtable.c
+> +++ b/lib/rhashtable.c
+> @@ -611,21 +611,23 @@ static void *rhashtable_try_insert(struct rhashtabl=
+e *ht,
+> const void *key,
+>  			new_tbl =3D rht_dereference_rcu(tbl->future_tbl, ht);
+>  			data =3D ERR_PTR(-EAGAIN);
+>  		} else {
+> +			bool inserted;
+> +
+>  			flags =3D rht_lock(tbl, bkt);
+>  			data =3D rhashtable_lookup_one(ht, bkt, tbl,
+>  						     hash, key, obj);
+>  			new_tbl =3D rhashtable_insert_one(ht, bkt, tbl,
+>  							hash, obj, data);
+> +			inserted =3D data && !new_tbl;
+> +			if (inserted)
+> +				atomic_inc(&ht->nelems);
+>  			if (PTR_ERR(new_tbl) !=3D -EEXIST)
+>  				data =3D ERR_CAST(new_tbl);
+>=20
+>  			rht_unlock(tbl, bkt, flags);
+>=20
+> -			if (PTR_ERR(data) =3D=3D -ENOENT && !new_tbl) {
+> -				atomic_inc(&ht->nelems);
+> -				if (rht_grow_above_75(ht, tbl))
+> -					schedule_work(&ht->run_work);
+> -			}
+> +			if (inserted && rht_grow_above_75(ht, tbl))
+> +				schedule_work(&ht->run_work);
+>  		}
+>  	} while (!IS_ERR_OR_NULL(new_tbl));
+>=20
