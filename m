@@ -1,143 +1,147 @@
-Received: from mail-yb1-f173.google.com (mail-yb1-f173.google.com [209.85.219.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from zxbjcas.zhaoxin.com (zxbjcas.zhaoxin.com [124.127.214.139])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 869721DA21;
-	Wed, 15 Jan 2025 03:41:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FEBE15250F;
+	Wed, 15 Jan 2025 03:57:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.127.214.139
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736912467; cv=none; b=OZdchNCwkV9PCjfeON7eWUVU6IZX6xFW9Bwhr8iJte36j0eoz3rXqan0LDyGwf2yjGVBAFB/rmkqX9hFcew59gRx48CqnGNWKsmNbSlaFeP19RZ70NT7g+74rX9+4KaxzjvsOFRiqTTeDc9ByG6scHgQ1dQZV3+ttdSbgKdbqhQ=
+	t=1736913483; cv=none; b=esWHgjA7Vx0UbojAY4INXJSdUT7AQU+sZV6pyioNEg1ffOL95Z8PIU/JhM2rhIb0/sJQ/xjs6Hqd142bG+LdAx/SmrG4TF4NcaESkMmiRSXKQmqbohq4geDfL9egzgwvima0Iir8qTJmkVUeLXGTV2eQj5xpuQU9Gmjg+Urjj2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736912467; c=relaxed/simple;
-	bh=lx1JoZuyAOvH+tAWIwuUhi8eFxOhxcAC6JbtgL/RLvk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ksz+t/egkHB6w4nNVEKUh1mw7QiLcQGySaFfozjrnw7w5Cz6oBxahRdQvS3LlHLwOJsw51HJNigebXlwoNV3WqfYE76tx2wwYMqNO0CKl29hx02GwbzZc1FGe+F0n4QZvWOn8DflymYssOn7OnREUGz3Ua68jZQfMdRvAO9nZUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hfi1tIJz; arc=none smtp.client-ip=209.85.219.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hfi1tIJz"
-Received: by mail-yb1-f173.google.com with SMTP id 3f1490d57ef6-e455bf1f4d3so8887064276.2;
-        Tue, 14 Jan 2025 19:41:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1736912464; x=1737517264; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UmTK2k4vF2mqctoCssOfytU8KQ/2i1ya8c1dPxSZwZk=;
-        b=Hfi1tIJzaEvPFCF3le0hG16EY7Fxb+IXk/gRu+vZg4lY2/6XkXEUwOdf7EDudX9O5S
-         l3ZiMs/teaAUbwlHUqIgRLnsKrQlyGRjoZMNHcvHs39tF2qO9yaTvsNpa7pEG/7NbXZu
-         yHRw3ex0rW5dg7uiWnPYawBP6Z2aLBm0W7xeCNgfXrllv8GstTVQ61S1km2knGwH3pL+
-         P2xuL3xDj8rUT32jQIyPJEn8dAZKLF0LDLPDa5T9EwlG3ag9bRmkF/8qZshbPMnJbNiG
-         Yg+vt9KYRiQAOkkPpAiPEtpnxeC4zx9JRDqaM3E4IUPvSgqLZVOrNEd5X9ysJWeF1U4N
-         4D9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736912464; x=1737517264;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UmTK2k4vF2mqctoCssOfytU8KQ/2i1ya8c1dPxSZwZk=;
-        b=vKcg/R8sEpuiHKJNYCPAFgiginzJ3OmNrlVW33+LaF4TK0+ykHFKMDWHCQBdvoIDa4
-         4IQNET3FM9biKXtu70I7uCLevdR5RgXkgYLVQn/3fftMezX3W0MXKuReuCTOAzfGRXsU
-         rVDgtyaeZ0kbQjgGxWfzZhaPHzt8JNeBMzjk0gbW15YnisDUZFlAlR8JJrM3+2pimjMw
-         TGK7jFyW4rqq8Z+GmuWsNN8v+wPnTA2S3+NdEnJhLBRzrg5OpNSlU/zlSBufTWYs/vkk
-         V9+tm6wtBYt8j1Uh2yMM80NxaoI4WyKoPKF75UFPNaJfVOtLNcsbfC5Ua77YeaLVUXU2
-         /wCA==
-X-Forwarded-Encrypted: i=1; AJvYcCV8pAq8hhU4/KpZnBa9jssjz1OfsIENEpT4uGJixhiuWrgdbIxy8Q9YFATugmcDtMj9OODiAwfjm+YakDs=@vger.kernel.org, AJvYcCVE/cBO4NuCblNuIAp0te19QAVq2Mh3exPL1kxmDj4/gteUqVT1nzvIA43xhkjMuFnd2AITjIO3qkwcob11@vger.kernel.org, AJvYcCVhyiPIP3p5j2Q0ZrUf7XW66dJagBJs5QWtolJj3aVvoQYlJOcLNT7/JRMV2642GEJKgaNod9Ct@vger.kernel.org, AJvYcCVteOQXqbo5nrtqZKvsWurnqAlEWkNwDdpOAIuGa7zYbdsi5OVJ6kg4oI+iZheNbsxj5pNGqsLIT1w8dQ==@vger.kernel.org, AJvYcCWd9AiKX1Hfg817o4P+AIPGXczWQyGn77IZOEZbREv7iB9cWabU5PQRtD97e4JOqmZtz+Yh6iu/9KwnRg==@vger.kernel.org, AJvYcCXV+z7h/strYjt1ouDU01tF3sN4eh0U3Hime3YrIF8Sfky4EEaKVomWadIpL83CIJwzN3Av8/zEFx3V@vger.kernel.org
-X-Gm-Message-State: AOJu0YwbhxAL0+uFTeFvbJklRveEqLShOylFBsqfz2tf1ZMUuuLNsMNm
-	bv1XxrMLEfMXARXzgWR/7fL6GW5F5+oq4YP29kK1FHU4kbaPt4zA
-X-Gm-Gg: ASbGncvOtNq/6VbtG7ovVdBVU26FTa69d7MnAcWdUUqbJdmCY3ctNEbbo+ZXVggnsZH
-	mTV7eT52Pb1I0TznzBqtp+QnZ6yLbsWCcTAAFTMIt6BROTJGZg78MHaE6k7Yd6lYFXTtNC7DEZX
-	v0prpdhq1Z+8Ze5lka1uP6Lm40NtTxOjvKRsLZ85HrN+9W6+OVuP3yt/zYoO3oW6ttRB2RuwT6E
-	iDWTiqL+Q1gfJbdD2c5o7diouivUgz/0Jhs9kZqdUIp365cIuUd2V2Z
-X-Google-Smtp-Source: AGHT+IGlCnPNZfANCVJooif/vwR9Wcfdn14fNs9Squ/CXSzhwHBTvNfC1cp1ga3/es5eAiOB92QKfQ==
-X-Received: by 2002:a05:690c:45c9:b0:6f6:cad6:6b5a with SMTP id 00721157ae682-6f6cad66c84mr8171767b3.13.1736912464441;
-        Tue, 14 Jan 2025 19:41:04 -0800 (PST)
-Received: from localhost ([2601:347:100:5ea0:e12f:d330:c8d6:a6b7])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-6f6c93732c9sm1796417b3.103.2025.01.14.19.41.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jan 2025 19:41:03 -0800 (PST)
-Date: Tue, 14 Jan 2025 22:41:02 -0500
-From: Yury Norov <yury.norov@gmail.com>
-To: Bjorn Helgaas <helgaas@kernel.org>
-Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-	virtualization@lists.linux.dev, linux-nvme@lists.infradead.org,
-	linux-hyperv@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-crypto@vger.kernel.org,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Naveen N Rao <naveen@kernel.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Haren Myneni <haren@linux.ibm.com>,
-	Rick Lindsley <ricklind@linux.ibm.com>,
-	Nick Child <nnac123@linux.ibm.com>,
-	Thomas Falcon <tlfalcon@linux.ibm.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Rob Herring <robh@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
-	James Smart <james.smart@broadcom.com>,
-	Dick Kennedy <dick.kennedy@broadcom.com>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Matt Wu <wuqiang.matt@bytedance.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Daniel Jordan <daniel.m.jordan@oracle.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Greg Kurz <groug@kaod.org>, Peter Xu <peterx@redhat.com>,
-	Shrikanth Hegde <sshegde@linux.ibm.com>,
-	Hendrik Brueckner <brueckner@linux.ibm.com>
-Subject: Re: [PATCH 06/14] cpumask: re-introduce cpumask_next{,_and}_wrap()
-Message-ID: <Z4cuTsHbO6yiuFKA@thinkpad>
-References: <20241228184949.31582-7-yury.norov@gmail.com>
- <20250103174432.GA4182129@bhelgaas>
+	s=arc-20240116; t=1736913483; c=relaxed/simple;
+	bh=JI2tQDpge/uA7aClnvx9Zrq/4FFihdCyqzLYekxXXDQ=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GB9Qof2RL36KsKzItVRRYHPFhomBUyLR+F+uRlah7B4SrfSVt7jzH9sUpyyJ5Kiro9sNqH3TenvJEH3tT9sRCuMC4xvpUbPej5r1LSF7x/Ad8ilnERXXe7Kz2VSAhfUhdHdwbDfVtXg6VomrtMgrYPklBZO+M2DOcGBaxP1LhdY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com; spf=pass smtp.mailfrom=zhaoxin.com; arc=none smtp.client-ip=124.127.214.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zhaoxin.com
+Received: from zxbjcas.zhaoxin.com (localhost [127.0.0.2] (may be forged))
+	by zxbjcas.zhaoxin.com with ESMTP id 50F3VswZ014561;
+	Wed, 15 Jan 2025 11:31:54 +0800 (GMT-8)
+	(envelope-from TonyWWang-oc@zhaoxin.com)
+Received: from zxbjmbx1.zhaoxin.com (zxbjmbx1.zhaoxin.com [10.29.252.163])
+	by zxbjcas.zhaoxin.com with ESMTP id 50F3T9fi013878;
+	Wed, 15 Jan 2025 11:29:09 +0800 (GMT-8)
+	(envelope-from TonyWWang-oc@zhaoxin.com)
+Received: from ZXSHMBX1.zhaoxin.com (10.28.252.163) by zxbjmbx1.zhaoxin.com
+ (10.29.252.163) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 15 Jan
+ 2025 11:29:08 +0800
+Received: from ZXSHMBX1.zhaoxin.com ([fe80::1f6:1739:ec6a:3d64]) by
+ ZXSHMBX1.zhaoxin.com ([fe80::1f6:1739:ec6a:3d64%7]) with mapi id
+ 15.01.2507.039; Wed, 15 Jan 2025 11:29:08 +0800
+Received: from tony.zhaoxin.com (10.32.65.152) by ZXBJMBX03.zhaoxin.com
+ (10.29.252.7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 14 Jan
+ 2025 20:12:53 +0800
+From: Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>
+To: <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
+        <dave.hansen@linux.intel.com>, <x86@kernel.org>, <hpa@zytor.com>,
+        <pawan.kumar.gupta@linux.intel.com>, <jpoimboe@kernel.org>,
+        <daniel.sneddon@linux.intel.com>, <perry.yuan@amd.com>,
+        <thomas.lendacky@amd.com>, <sandipan.das@amd.com>,
+        <namhyung@kernel.org>, <acme@redhat.com>, <xin3.li@intel.com>,
+        <brijesh.singh@amd.com>, <TonyWWang-oc@zhaoxin.com>,
+        <linux-kernel@vger.kernel.org>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>, <linux-crypto@vger.kernel.org>
+CC: <CobeChen@zhaoxin.com>, <TimGuo@zhaoxin.com>, <LeoLiu-oc@zhaoxin.com>,
+        <GeorgeXue@zhaoxin.com>
+Subject: [PATCH 1/2] x86/cpufeatures: Add CPU feature flags for Zhaoxin Hash Engine v2
+Date: Tue, 14 Jan 2025 20:13:00 +0800
+Message-ID: <20250114121301.156359-2-TonyWWang-oc@zhaoxin.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20250114121301.156359-1-TonyWWang-oc@zhaoxin.com>
+References: <20250114121301.156359-1-TonyWWang-oc@zhaoxin.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250103174432.GA4182129@bhelgaas>
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-ClientProxiedBy: zxbjmbx1.zhaoxin.com (10.29.252.163) To
+ ZXBJMBX03.zhaoxin.com (10.29.252.7)
+X-Moderation-Data: 1/15/2025 11:29:07 AM
+X-DNSRBL: 
+X-SPAM-SOURCE-CHECK: pass
+X-MAIL:zxbjcas.zhaoxin.com 50F3VswZ014561
 
-On Fri, Jan 03, 2025 at 11:44:32AM -0600, Bjorn Helgaas wrote:
-> On Sat, Dec 28, 2024 at 10:49:38AM -0800, Yury Norov wrote:
-> > cpumask_next_wrap_old() has two additional parameters, comparing to it's
-> > analogue in linux/find.h find_next_bit_wrap(). The reason for that is
-> > historical.
-> 
-> s/it's/its/
-> 
-> Personally I think cscope/tags/git grep make "find_next_bit_wrap()"
-> enough even without mentioning "linux/find.h".
-> 
-> > + * cpumask_next_and_wrap - get the next cpu in *src1p & *src2p, starting from
-> > + *			   @n and wrapping around, if needed
-> > + * @n: the cpu prior to the place to search (i.e. return will be > @n)
-> 
-> Is the return really > @n if it wraps?
+Zhaoxin currently uses CPUID leaf 0xC0000001 instead of VIA/Cyrix/
+Centaur to represent the presence or absence of certain CPU features
+due to company changes. The previously occupied bits in CPUID leaf
+0xC0000001 remain functional, and the unoccupied bits are used by
+Zhaoxin to represent some new CPU features.
 
-No, this is a copy-paste error. Will fix in v2.
+Zhaoxin CPUs implements the PadLock Hash Engine v2 feature on the
+basis of features supported by CPUID leaf 0xC0000001, which indicates
+that Zhaoxin CPUs support SHA384/SHA512 algorithm hardware instructions.
 
-Thanks,
-Yury
+Add two Padlock Hash Engine v2 feature flags support in cpufeatures.h
+
+Signed-off-by: Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>
+---
+ arch/x86/include/asm/cpufeatures.h       | 4 +++-
+ tools/arch/x86/include/asm/cpufeatures.h | 4 +++-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpuf=
+eatures.h
+index 508c0dad116b..92d2a83499d0 100644
+--- a/arch/x86/include/asm/cpufeatures.h
++++ b/arch/x86/include/asm/cpufeatures.h
+@@ -143,7 +143,7 @@
+ #define X86_FEATURE_RDRAND		( 4*32+30) /* "rdrand" RDRAND instruction */
+ #define X86_FEATURE_HYPERVISOR		( 4*32+31) /* "hypervisor" Running on a hy=
+pervisor */
+=20
+-/* VIA/Cyrix/Centaur-defined CPU features, CPUID level 0xC0000001, word 5 =
+*/
++/* Zhaoxin/VIA/Cyrix/Centaur-defined CPU features, CPUID level 0xC0000001,=
+ word 5 */
+ #define X86_FEATURE_XSTORE		( 5*32+ 2) /* "rng" RNG present (xstore) */
+ #define X86_FEATURE_XSTORE_EN		( 5*32+ 3) /* "rng_en" RNG enabled */
+ #define X86_FEATURE_XCRYPT		( 5*32+ 6) /* "ace" on-CPU crypto (xcrypt) */
+@@ -154,6 +154,8 @@
+ #define X86_FEATURE_PHE_EN		( 5*32+11) /* "phe_en" PHE enabled */
+ #define X86_FEATURE_PMM			( 5*32+12) /* "pmm" PadLock Montgomery Multiplie=
+r */
+ #define X86_FEATURE_PMM_EN		( 5*32+13) /* "pmm_en" PMM enabled */
++#define X86_FEATURE_PHE2		( 5*32+25) /* "phe2" Zhaoxin PadLock Hash Engine=
+ v2 */
++#define X86_FEATURE_PHE2_EN		( 5*32+26) /* "phe2_en" PHE2 enabled */
+=20
+ /* More extended AMD flags: CPUID level 0x80000001, ECX, word 6 */
+ #define X86_FEATURE_LAHF_LM		( 6*32+ 0) /* "lahf_lm" LAHF/SAHF in long mod=
+e */
+diff --git a/tools/arch/x86/include/asm/cpufeatures.h b/tools/arch/x86/incl=
+ude/asm/cpufeatures.h
+index 17b6590748c0..2206fe3ce49e 100644
+--- a/tools/arch/x86/include/asm/cpufeatures.h
++++ b/tools/arch/x86/include/asm/cpufeatures.h
+@@ -143,7 +143,7 @@
+ #define X86_FEATURE_RDRAND		( 4*32+30) /* "rdrand" RDRAND instruction */
+ #define X86_FEATURE_HYPERVISOR		( 4*32+31) /* "hypervisor" Running on a hy=
+pervisor */
+=20
+-/* VIA/Cyrix/Centaur-defined CPU features, CPUID level 0xC0000001, word 5 =
+*/
++/* Zhaoxin/VIA/Cyrix/Centaur-defined CPU features, CPUID level 0xC0000001,=
+ word 5 */
+ #define X86_FEATURE_XSTORE		( 5*32+ 2) /* "rng" RNG present (xstore) */
+ #define X86_FEATURE_XSTORE_EN		( 5*32+ 3) /* "rng_en" RNG enabled */
+ #define X86_FEATURE_XCRYPT		( 5*32+ 6) /* "ace" on-CPU crypto (xcrypt) */
+@@ -154,6 +154,8 @@
+ #define X86_FEATURE_PHE_EN		( 5*32+11) /* "phe_en" PHE enabled */
+ #define X86_FEATURE_PMM			( 5*32+12) /* "pmm" PadLock Montgomery Multiplie=
+r */
+ #define X86_FEATURE_PMM_EN		( 5*32+13) /* "pmm_en" PMM enabled */
++#define X86_FEATURE_PHE2		( 5*32+25) /* "phe2" Zhaoxin Padlock Hash Engine=
+ v2 */
++#define X86_FEATURE_PHE2_EN		( 5*32+26) /* "phe2_en" PHE2 enabled */
+=20
+ /* More extended AMD flags: CPUID level 0x80000001, ECX, word 6 */
+ #define X86_FEATURE_LAHF_LM		( 6*32+ 0) /* "lahf_lm" LAHF/SAHF in long mod=
+e */
+--=20
+2.25.1
+
