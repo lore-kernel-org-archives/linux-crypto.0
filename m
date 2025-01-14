@@ -1,263 +1,146 @@
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53FCA1917ED
-	for <linux-crypto@vger.kernel.org>; Tue, 14 Jan 2025 19:05:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4444C1FC10E
+	for <linux-crypto@vger.kernel.org>; Tue, 14 Jan 2025 19:05:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736881510; cv=none; b=ILnc4s7gePqI8mGOrAa2wLRYnhBB1RSDp0B2qbk4/46VEA9C7KnHvMP6xcuDKhM30eqrrKgXzTNPWBpdnJbou9we6prTdawKYa2wROkWFKs+TE6hj/f8srMwvbai0sGr7z/qyFkyPymZsoXqadfL1vYN+w1igPhXxILxJOqVlAQ=
+	t=1736881556; cv=none; b=i3Kqk012eo2iMiP+IMkL7WXpBLSaSBoHRoJEnJF8nF+CDrEmKQJWLAZ2ZLQP4JdxPalAtmL8jRaz1k9Egt7s4wXw1MZnV0kVJnxPQ3o1VKtBsILKj703T1opjX8bsDRzRryo6SmFc9LUNTnKWnGN/8QRbozGQr1REjfPZTXTcD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736881510; c=relaxed/simple;
-	bh=HeRl+Mw7tceb/euVai+aqjx7K4xy6ikDU/7JeNoHNMw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pioGnxfl80sxz2nJjxqMQGtEbHsCHHLWE1Kb9ol25YU250UX24ASivT6PiCmq7xDb/NRou1/89oOX5+Fqu4SnGIv48CKJ+XI3zX2bDQ/xDor+AsNckE0B6Sol03Cy59iRn1uN1IuRjwaOfh6gbw4Msg0x79c+JhAGBjCyquWkVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=KXqLOjhX; arc=none smtp.client-ip=209.85.128.44
+	s=arc-20240116; t=1736881556; c=relaxed/simple;
+	bh=lW7QHrqzzg8jlFsfL+HoNF1gMyRBecgeJLWCUKHiZTE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=EcVNn56PdOumfKERNQcsQqQlYCZm0RUH7MyaCUugjPsTa2hg5/QoT4wPk9sxUvnz6o3awQDD14yomb2Tb1H0LUxZvYyj2xob2diq0YOuF842zRgpq/n4dAn5t/q23RPJpLtc29w2M4PCzIOr/j9nlL3gtgC3YdEaUd8RO350i/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=fhzh6XBo; arc=none smtp.client-ip=209.85.128.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KXqLOjhX"
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-43658c452f5so5222785e9.0
-        for <linux-crypto@vger.kernel.org>; Tue, 14 Jan 2025 11:05:07 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fhzh6XBo"
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4363298fff2so5197855e9.3
+        for <linux-crypto@vger.kernel.org>; Tue, 14 Jan 2025 11:05:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1736881506; x=1737486306; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=sMBMmWVpF9fptO6Lirx4P3O6/KKexb57HvZcegkfEso=;
-        b=KXqLOjhXLjrze2xjRDIf0jW0olm1sIzvXjYNTkTvcyEE2R+Kcr1BiKty4gHKAYZLzb
-         iV1twXmp4wwQsusxov9Xdttp8WZ5cKi4srGTm+kOS02r94KEGzh56PmeoG01kiW8TrWI
-         ybB5cN7520oyOdL8ji0ZdNaqBipll0wgydQogESJP8uRpZemy2QdLLd9VDmZmmanpVSj
-         zw72i7Nf3c3gFZODqmbfj5ZFe0TXuu5MYvXVjAuSPPXbNMFeZ7t4CFgS5g4tF5cYCti3
-         2AoCIXN2T/jBFu/EpxwbmSXJoPl7PcZiAJ9ziRJ5KwdEK2FL89sQ1mjshNGoI++BB3J2
-         0IPQ==
+        d=linaro.org; s=google; t=1736881552; x=1737486352; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+DfXWEXtvvASVkJwhSh6pd5L5pzdDyn7+i2QfVWpAdU=;
+        b=fhzh6XBogKjLt5N+JS8tryuP3UwRqxWPnwpDt/d03Ycu5pHevbyBJu83Qh7VM2wxRs
+         AoCaz0qI3Ga90nQB8HxF/uOMwve5Rfc93K/aFTsappTdubq0DXdF5+t8mBmUviNU2xE8
+         kVI1QYXtD/a9S2xAGcK5KsSvJQXFz93Aou7M9IzwkMLd5vNZWO0sIwhaF7szM8mlky5R
+         1Nb9TR+Tump1CKbb2KEjMR3NlrRKu7xHn0VmUJqOUdPnaWWT8UX2YmNKF7DEaQiX+vHY
+         juZXOgbSvD41GiivNxstdTszHk+TS5trZ64h8h0RV+v2gGq9+oWTjl8HcYPaY+wuRMxN
+         RKzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1736881506; x=1737486306;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sMBMmWVpF9fptO6Lirx4P3O6/KKexb57HvZcegkfEso=;
-        b=j9+Eh8vqrRcjPWn7IFDHWBllPx34mjB6Wuk9Fg68nDu4c+L7vidfJYskyLWl/g8a01
-         Ck26pUf8VgeMwpm/fFfsi0jA/kUcN6oeEG8TJUazFIagKDLY/qOHrzN7ci76Z4TaRUJo
-         27vIkiHx8EjaPX+xAsnZKsmnLGm+hq9MmKdGo7+kppuPb+OR/O7Kd1MVXkDXn7dsc7dW
-         Rx1RA5l78Mx/9iKAeerwpusWt0y0QjXnQEfYfmRlfgsWXEP7uq9fW2upkXi+zT5xROlI
-         ZrodcYLJhQUKEEbdheFz/uuV139RCqpK+uym9mFqTFOOogwEGFTtbvjOb6I0lsOzMaSj
-         tELA==
-X-Forwarded-Encrypted: i=1; AJvYcCWcxvZgwvsXgzMqDkVhBakp/HWhLhxarJtl/v2gM50Rgy6L4C4RL+8+AjBJTytWel6e0AuETJY7mZoMg5g=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4mMhi7NnO8f7xrwyKfO6ExkAayLKYqjt9zoHwvBcJSnIKeRhC
-	gRaCOCB/hOtdoLD3PUwkfmQuX6ExasXNn/hC69A9S+jqXhMPm/3mAo2ly7r9WwU=
-X-Gm-Gg: ASbGnctCmVNa+hL297VEFOedh4Kd4GjpDjsMuPYnSypyRTN6pfDEbKBzQ6kNCsqZ9QM
-	NUxwmZLQ1YLeuRTCV8J4NWyLO6rKOmJFm8lCGsqlUTPzWast8B1qLxPqC518hdTRzDESnu3WW68
-	sCdgxDngr0hmt+Hq/tdIiss4GgLiQhJwI86VQ3bFYA30v0FZ8/B8nTeDhlFsKM4e2X8vIgLkHVN
-	uihpz4JQTZdwp1oqrIFXzaKlmUjBjkaQODnv6/dOH3IFNQJUaGaNKEPcuqEVWLFkxI+z8w=
-X-Google-Smtp-Source: AGHT+IEzglACF4jdJRf0Vrfj22Sc58iI9Kip2UcDkOjqNM6+1R7TxSojD0BIZMpfvSAoDc8OhCwyzA==
-X-Received: by 2002:a05:600c:35c2:b0:434:941c:9df2 with SMTP id 5b1f17b1804b1-436e272c89cmr93763995e9.8.1736881506465;
-        Tue, 14 Jan 2025 11:05:06 -0800 (PST)
-Received: from krzk-bin.. ([178.197.223.165])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-436e2e89dfesm221252045e9.32.2025.01.14.11.05.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jan 2025 11:05:05 -0800 (PST)
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	=?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-	Pankaj Gupta <pankaj.gupta@nxp.com>,
-	Gaurav Jain <gaurav.jain@nxp.com>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Boris Brezillon <bbrezillon@kernel.org>,
-	Arnaud Ebalard <arno@natisbad.org>,
-	Srujana Challa <schalla@marvell.com>,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	qat-linux@intel.com
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: [PATCH v2] crypto: Use str_enable_disable-like helpers
-Date: Tue, 14 Jan 2025 20:05:01 +0100
-Message-ID: <20250114190501.846315-1-krzysztof.kozlowski@linaro.org>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1736881552; x=1737486352;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+DfXWEXtvvASVkJwhSh6pd5L5pzdDyn7+i2QfVWpAdU=;
+        b=c5xLCXao2WUH68W98P9jFmXHYPKcLolvlPyVe7URWkki0fDWGPLPBcIvlpSt1M6VD7
+         C+XsS+AVOjSc97m6TeFMioa8S9A4xa8rBM/kBY2zHtD7gpuMS1l6iBlx9QhH8bKqSVnk
+         h2Q788frLQTEFZWCW3WvveRDBFK0gTngKdu75cEzjOxXCPt7QMI72+uiq3hthGiGQsVQ
+         yzDzOLzcc+dIcOlfik1aIVR/Es1pq4mfOir7e8p2KzGMeM/VsoHp3znjGHcXu4sd7S+Y
+         RqD/t0y2OzgxDwNqgkhySmGwJAtCGLPswtaWKiR0uoxE+UGfSaTQ1Cs//bqPyntXxMka
+         B6jQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU86xR+ufhGclxHxcHx5KACaulZ/UmEPDYz9jQvzufLMbFYHcrKnEpSCotf5ZhQSCjCe+qHRSVuwuJC0hw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBNaLKhaDVEqL9RTLN1gRFg5mZr+3R+Wy3jt+XdKwssXheXLDP
+	xytho9eMugzjph0vO4muGu4WjPX51gIMkvfGeyN3HinsnfKIV1WseU1Olr97t1I=
+X-Gm-Gg: ASbGnctyXXpRgPJV7+St2F/8e4+DwNTeX3YQxvLCpKjEgJg+ilTEp9ngWWHdYGLhsfb
+	KDqCQMfUnX3UqrHjX+k9E3351xvUedHKAVlYgqIgdTXMxLRztXvgSM6hm449fpOucRpt8zXC4Xq
+	BxhIfCnikdl9jTJscmAgL6aIAzehllAbnQR3/bUWdQDz8+chlf8Nz5H5nPC7PR3yToJVmxDziKA
+	SC6LszU8ixQS5XPpzgEROw27VvbTsetlgAolLHnp6BKKjKxtZIgP0sITIqIk18RKSLwKv8zmRrv
+X-Google-Smtp-Source: AGHT+IFDLv2NINTRyzx7t9ysCH4kIutmWZ+d4iNDbpZ0ffaw3CUhcnSWtKVlBI8I3A9FwyI3SZ9gKA==
+X-Received: by 2002:adf:9ccd:0:b0:38a:5557:7677 with SMTP id ffacd0b85a97d-38a872e161dmr7560128f8f.5.1736881552507;
+        Tue, 14 Jan 2025 11:05:52 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.223.165])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38a8e4c1b2asm15196659f8f.89.2025.01.14.11.05.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Jan 2025 11:05:51 -0800 (PST)
+Message-ID: <3a50514d-2c28-4728-91d1-60ec91bcc2f9@linaro.org>
+Date: Tue, 14 Jan 2025 20:05:50 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] crypto: Use str_enable_disable-like helpers
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>, =?UTF-8?Q?Horia_Geant=C4=83?=
+ <horia.geanta@nxp.com>, Pankaj Gupta <pankaj.gupta@nxp.com>,
+ Gaurav Jain <gaurav.jain@nxp.com>,
+ Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+ Boris Brezillon <bbrezillon@kernel.org>, Arnaud Ebalard <arno@natisbad.org>,
+ Srujana Challa <schalla@marvell.com>, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org, qat-linux@intel.com
+References: <20250114190501.846315-1-krzysztof.kozlowski@linaro.org>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Content-Language: en-US
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <20250114190501.846315-1-krzysztof.kozlowski@linaro.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Replace ternary (condition ? "enable" : "disable") syntax with helpers
-from string_choices.h because:
-1. Simple function call with one argument is easier to read.  Ternary
-   operator has three arguments and with wrapping might lead to quite
-   long code.
-2. Is slightly shorter thus also easier to read.
-3. It brings uniformity in the text - same string.
-4. Allows deduping by the linker, which results in a smaller binary
-   file.
+On 14/01/2025 20:05, Krzysztof Kozlowski wrote:
+> Replace ternary (condition ? "enable" : "disable") syntax with helpers
+> from string_choices.h because:
+> 1. Simple function call with one argument is easier to read.  Ternary
+>    operator has three arguments and with wrapping might lead to quite
+>    long code.
+> 2. Is slightly shorter thus also easier to read.
+> 3. It brings uniformity in the text - same string.
+> 4. Allows deduping by the linker, which results in a smaller binary
+>    file.
+> 
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+And now I noted that should be here:
 
----
+Acked-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com> # QAT
 
-Changes in v2:
-1. Also: drivers/crypto/caam/caamalg_qi2.c
----
- drivers/crypto/bcm/cipher.c                         |  3 ++-
- drivers/crypto/bcm/spu2.c                           |  3 ++-
- drivers/crypto/caam/caamalg_qi2.c                   |  3 ++-
- drivers/crypto/intel/qat/qat_common/adf_sysfs.c     | 10 +++-------
- drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c   |  5 +++--
- drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c |  3 ++-
- 6 files changed, 14 insertions(+), 13 deletions(-)
-
-diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
-index 9e6798efbfb7..66accd8e08f6 100644
---- a/drivers/crypto/bcm/cipher.c
-+++ b/drivers/crypto/bcm/cipher.c
-@@ -15,6 +15,7 @@
- #include <linux/kthread.h>
- #include <linux/rtnetlink.h>
- #include <linux/sched.h>
-+#include <linux/string_choices.h>
- #include <linux/of.h>
- #include <linux/io.h>
- #include <linux/bitops.h>
-@@ -2687,7 +2688,7 @@ static int aead_enqueue(struct aead_request *req, bool is_encrypt)
- 	flow_log("  iv_ctr_len:%u\n", rctx->iv_ctr_len);
- 	flow_dump("  iv: ", req->iv, rctx->iv_ctr_len);
- 	flow_log("  authkeylen:%u\n", ctx->authkeylen);
--	flow_log("  is_esp: %s\n", ctx->is_esp ? "yes" : "no");
-+	flow_log("  is_esp: %s\n", str_yes_no(ctx->is_esp));
- 
- 	if (ctx->max_payload == SPU_MAX_PAYLOAD_INF)
- 		flow_log("  max_payload infinite");
-diff --git a/drivers/crypto/bcm/spu2.c b/drivers/crypto/bcm/spu2.c
-index 3fdc64b5a65e..ce322cf1baa5 100644
---- a/drivers/crypto/bcm/spu2.c
-+++ b/drivers/crypto/bcm/spu2.c
-@@ -11,6 +11,7 @@
- 
- #include <linux/kernel.h>
- #include <linux/string.h>
-+#include <linux/string_choices.h>
- 
- #include "util.h"
- #include "spu.h"
-@@ -999,7 +1000,7 @@ u32 spu2_create_request(u8 *spu_hdr,
- 		 req_opts->is_inbound, req_opts->auth_first);
- 	flow_log("  cipher alg:%u mode:%u type %u\n", cipher_parms->alg,
- 		 cipher_parms->mode, cipher_parms->type);
--	flow_log("  is_esp: %s\n", req_opts->is_esp ? "yes" : "no");
-+	flow_log("  is_esp: %s\n", str_yes_no(req_opts->is_esp));
- 	flow_log("    key: %d\n", cipher_parms->key_len);
- 	flow_dump("    key: ", cipher_parms->key_buf, cipher_parms->key_len);
- 	flow_log("    iv: %d\n", cipher_parms->iv_len);
-diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
-index e809d030ab11..107ccb2ade42 100644
---- a/drivers/crypto/caam/caamalg_qi2.c
-+++ b/drivers/crypto/caam/caamalg_qi2.c
-@@ -19,6 +19,7 @@
- #include <linux/dma-mapping.h>
- #include <linux/fsl/mc.h>
- #include <linux/kernel.h>
-+#include <linux/string_choices.h>
- #include <soc/fsl/dpaa2-io.h>
- #include <soc/fsl/dpaa2-fd.h>
- #include <crypto/xts.h>
-@@ -5175,7 +5176,7 @@ static int __cold dpaa2_dpseci_disable(struct dpaa2_caam_priv *priv)
- 		return err;
- 	}
- 
--	dev_dbg(dev, "disable: %s\n", enabled ? "false" : "true");
-+	dev_dbg(dev, "disable: %s\n", str_false_true(enabled));
- 
- 	for (i = 0; i < priv->num_pairs; i++) {
- 		ppriv = per_cpu_ptr(priv->ppriv, i);
-diff --git a/drivers/crypto/intel/qat/qat_common/adf_sysfs.c b/drivers/crypto/intel/qat/qat_common/adf_sysfs.c
-index 4fcd61ff70d1..84450bffacb6 100644
---- a/drivers/crypto/intel/qat/qat_common/adf_sysfs.c
-+++ b/drivers/crypto/intel/qat/qat_common/adf_sysfs.c
-@@ -3,6 +3,7 @@
- #include <linux/device.h>
- #include <linux/errno.h>
- #include <linux/pci.h>
-+#include <linux/string_choices.h>
- #include "adf_accel_devices.h"
- #include "adf_cfg.h"
- #include "adf_cfg_services.h"
-@@ -19,14 +20,12 @@ static ssize_t state_show(struct device *dev, struct device_attribute *attr,
- 			  char *buf)
- {
- 	struct adf_accel_dev *accel_dev;
--	char *state;
- 
- 	accel_dev = adf_devmgr_pci_to_accel_dev(to_pci_dev(dev));
- 	if (!accel_dev)
- 		return -EINVAL;
- 
--	state = adf_dev_started(accel_dev) ? "up" : "down";
--	return sysfs_emit(buf, "%s\n", state);
-+	return sysfs_emit(buf, "%s\n", str_up_down(adf_dev_started(accel_dev)));
- }
- 
- static ssize_t state_store(struct device *dev, struct device_attribute *attr,
-@@ -207,16 +206,13 @@ static DEVICE_ATTR_RW(pm_idle_enabled);
- static ssize_t auto_reset_show(struct device *dev, struct device_attribute *attr,
- 			       char *buf)
- {
--	char *auto_reset;
- 	struct adf_accel_dev *accel_dev;
- 
- 	accel_dev = adf_devmgr_pci_to_accel_dev(to_pci_dev(dev));
- 	if (!accel_dev)
- 		return -EINVAL;
- 
--	auto_reset = accel_dev->autoreset_on_error ? "on" : "off";
--
--	return sysfs_emit(buf, "%s\n", auto_reset);
-+	return sysfs_emit(buf, "%s\n", str_on_off(accel_dev->autoreset_on_error));
- }
- 
- static ssize_t auto_reset_store(struct device *dev, struct device_attribute *attr,
-diff --git a/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c b/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c
-index c4250e5fcf8f..2c08e928e44e 100644
---- a/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c
-+++ b/drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c
-@@ -10,6 +10,7 @@
- 
- #include <linux/ctype.h>
- #include <linux/firmware.h>
-+#include <linux/string_choices.h>
- #include "otx_cpt_common.h"
- #include "otx_cptpf_ucode.h"
- #include "otx_cptpf.h"
-@@ -614,8 +615,8 @@ static void print_dbg_info(struct device *dev,
- 
- 	for (i = 0; i < OTX_CPT_MAX_ENGINE_GROUPS; i++) {
- 		grp = &eng_grps->grp[i];
--		pr_debug("engine_group%d, state %s\n", i, grp->is_enabled ?
--			 "enabled" : "disabled");
-+		pr_debug("engine_group%d, state %s\n", i,
-+			 str_enabled_disabled(grp->is_enabled));
- 		if (grp->is_enabled) {
- 			mirrored_grp = &eng_grps->grp[grp->mirror.idx];
- 			pr_debug("Ucode0 filename %s, version %s\n",
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c b/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
-index 5c9484646172..881fce53e369 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptpf_ucode.c
-@@ -3,6 +3,7 @@
- 
- #include <linux/ctype.h>
- #include <linux/firmware.h>
-+#include <linux/string_choices.h>
- #include "otx2_cptpf_ucode.h"
- #include "otx2_cpt_common.h"
- #include "otx2_cptpf.h"
-@@ -1835,7 +1836,7 @@ void otx2_cpt_print_uc_dbg_info(struct otx2_cptpf_dev *cptpf)
- 	for (i = 0; i < OTX2_CPT_MAX_ENGINE_GROUPS; i++) {
- 		grp = &eng_grps->grp[i];
- 		pr_debug("engine_group%d, state %s", i,
--			 grp->is_enabled ? "enabled" : "disabled");
-+			 str_enabled_disabled(grp->is_enabled));
- 		if (grp->is_enabled) {
- 			mirrored_grp = &eng_grps->grp[grp->mirror.idx];
- 			pr_debug("Ucode0 filename %s, version %s",
--- 
-2.43.0
-
+Best regards,
+Krzysztof
