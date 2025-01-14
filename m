@@ -1,60 +1,46 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40FF42343C1;
-	Tue, 14 Jan 2025 03:36:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A24E424024E;
+	Tue, 14 Jan 2025 03:39:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736825819; cv=none; b=Vpw3CisF+3b86Jjy24yeTQ+rvi3fRoa4srLGL30xgCQnJhp/6KQGdSJxRCiaTL2Dhr/3VySUpvfHM+DFtxhIhxu+MflOcgcMayTPu905Lkxp+Z94UXjVY0HPnrafIOB6hyAaclp5aDVaCfRSChbmLDLiXwtPpCm+EXBM3qHDJVU=
+	t=1736826001; cv=none; b=SNjcUz01WCV/7Ntd1S+yjveTUOa78suNck7+TndmcNht3ApHkPyroH/wiHkIGUq6IZ0HCmFAUm1skmlmNXwyCTdBxSLqu+axtScpj2UxzyO/pBFTWFrE3WIhOS2r+1h68G7R/5AKZMls7VZrRVYQkdDQeHtZWxj8mEGyH2w4V8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736825819; c=relaxed/simple;
-	bh=XI58++6TtQ82xswAkhpDySdUrIiXLyvDpIPHGUoYIpI=;
+	s=arc-20240116; t=1736826001; c=relaxed/simple;
+	bh=Z0QQpwzGoRsS7WNBQWq5pMf2h73cVOST2hrMfvFIovY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jXs7SCHUCw7U7la3KS269OJASXPVkNDTnPf4uW5yTJSDIucRKDnzXJWSdVrrFoTsX7N7mvCr/VP9XLhc09b9IcDgVyTvvmQyYIG/E6Z7k6mgE+nnNzUs6mP+MojzhF6euAqQctkt2uFthA00lJbf5l+vqSgHifcwBVFgp3VKzJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=ZKQDh28N; arc=none smtp.client-ip=144.6.53.87
+	 Content-Type:Content-Disposition:In-Reply-To; b=WHuUVdWyVFxYwINRr98zsp9kekyauiz5mDmTAZpsrcRh9rtvEbRGR8m00VjPAKJ4eOoJ5hJsMUEnIqCdiYeiq270XQtGSqWkDlQv3bbGy3m1hKTP6yq17VYcVn6Kh29adMymOPPVS/eIEN/pWxC0vnUVoa0f7VUOT5HrkStSMaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=TUaY0XDe; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="ZKQDh28N"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="TUaY0XDe"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
 	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=70J6vzkPIXlCxUfJYdiD36nXRWaj4H0pYUMl2HSnMo0=; b=ZKQDh28NdkjbA8YTvkbWfA/s2N
-	YmuY1lg/8BNTOJementF8NzLJROljHdYN1ptGcFS/kMGXZ6AzIKEStAJ5SHwj0aYMxxHAMTUT1ZpH
-	xMAQWyeUxOcEMCNqBSd2csFFphcan8r/Jgb7fVIe3RTe0/wQHymi8ZPxFHcrLXV3WG5xIRIXM4z6/
-	Dgp9SriTVeS3oBJpWVSO9t23mvIhsDmUHf8me4sEk7fchVumSOGM57GOjwVs29udRJSMh64VrKUCq
-	6elmx6/GGydXsolOto0DQEPpI7vU/z84gIn0JRwjE92mAn8+A/JAqamgXPFTEW1VyqgxAP+3YQQxg
-	u37Mt5wQ==;
+	bh=nBMX/RwpVZLTrNmk+ewwXWbgiWs47A+kQ15hcZrKz0E=; b=TUaY0XDe+XiNnpwiTzBFn/qvk1
+	x+5GZkHoWemrbCdaafLISTLO2vsF1OllMqJBpjCUlYeHxzc2FHNJU1OjLMo/txuFbzUto+Z+2PJkN
+	MyOQD1xsmSlPo1hpB09OkBhl3kEifbcbl/XNXwbEL1vAGGSu9AzXknvvg4ixlUbzwmGpUVtoOANQv
+	bLfcLbQ8dPbOWzhfffM8pnxzCtgFXGy1BB9OzTuuUHgI/RDxqWiYsG25kU/RcipHpKvHvGt4sN/fX
+	EV2tLS97n5MhHjVOXBdFZJYeVIbJvfbElWwCzFQNgbaRIT/vrLB2dgMtzLs/+Bmd5vffU/nYG9G8R
+	6EmkUzwg==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tXXWN-008xTJ-0C;
-	Tue, 14 Jan 2025 11:36:36 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 14 Jan 2025 11:36:35 +0800
-Date: Tue, 14 Jan 2025 11:36:35 +0800
+	id 1tXXZX-008xVM-0j;
+	Tue, 14 Jan 2025 11:39:53 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 14 Jan 2025 11:39:51 +0800
+Date: Tue, 14 Jan 2025 11:39:51 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Antoine Tenart <atenart@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
-	Waiman Long <longman@redhat.com>, Boqun Feng <boqun.feng@gmail.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>, linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev, upstream@airoha.com,
-	Richard van Schagen <vschagen@icloud.com>
-Subject: Re: [PATCH v10 3/3] crypto: Add Inside Secure SafeXcel EIP-93 crypto
- engine support
-Message-ID: <Z4XbwyrBXXcQvqiO@gondor.apana.org.au>
-References: <20250105143106.20989-1-ansuelsmth@gmail.com>
- <20250105143106.20989-4-ansuelsmth@gmail.com>
+To: Thorsten Blum <thorsten.blum@linux.dev>
+Cc: "David S. Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: proc - Use str_yes_no() and str_no_yes() helpers
+Message-ID: <Z4Xch8hvC9yGTotS@gondor.apana.org.au>
+References: <20241230113654.862432-2-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -63,31 +49,18 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250105143106.20989-4-ansuelsmth@gmail.com>
+In-Reply-To: <20241230113654.862432-2-thorsten.blum@linux.dev>
 
-On Sun, Jan 05, 2025 at 03:30:48PM +0100, Christian Marangi wrote:
-> Add support for the Inside Secure SafeXcel EIP-93 Crypto Engine used on
-> Mediatek MT7621 SoC and new Airoha SoC.
+On Mon, Dec 30, 2024 at 12:36:54PM +0100, Thorsten Blum wrote:
+> Remove hard-coded strings by using the str_yes_no() and str_no_yes()
+> helpers. Remove unnecessary curly braces.
 > 
-> EIP-93 IP supports AES/DES/3DES ciphers in ECB/CBC and CTR modes as well as
-> authenc(HMAC(x), cipher(y)) using HMAC MD5, SHA1, SHA224 and SHA256.
-> 
-> EIP-93 provide regs to signal support for specific chipers and the
-> driver dynamically register only the supported one by the chip.
-> 
-> Signed-off-by: Richard van Schagen <vschagen@icloud.com>
-> Co-developed-by: Christian Marangi <ansuelsmth@gmail.com>
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+> ---
+>  crypto/proc.c | 9 +++------
+>  1 file changed, 3 insertions(+), 6 deletions(-)
 
-I get a compile-time warning with this patch (C=1 W=1):
-
-  CHECK   ../drivers/crypto/inside-secure/eip93/eip93-common.c
-  ../drivers/crypto/inside-secure/eip93/eip93-common.c:101:5: warning: context imbalance in 'eip93_put_descriptor' - wrong count at exit
-  ../drivers/crypto/inside-secure/eip93/eip93-common.c:126:6: warning: context imbalance in 'eip93_get_descriptor' - wrong count at exit
-
-Could you please take a look?
-
-Thanks,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
