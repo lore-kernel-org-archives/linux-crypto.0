@@ -1,72 +1,197 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCA622135B8;
-	Tue, 14 Jan 2025 22:21:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A7461D5142
+	for <linux-crypto@vger.kernel.org>; Tue, 14 Jan 2025 22:31:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736893296; cv=none; b=ADABXZzW//6nvnWfhAiJ3zMZQVakSP/aKbtV4qJnWqc55cVMV1YGPY9m8JYO8KuUx+QO8m1nebE0jb7WqzSzQgM9cWlI6lv2fuKhbXio9PPTBrJLbc5EcfZ2Hkk89qks6GcYYZWa5h6aEOYnLba53da93GhCvciDlaUG7TSaCf0=
+	t=1736893908; cv=none; b=Tx2N+vdMs8qJ0mQ92djiRVPLZu5uAK/xdqv29jzqMyZCBL0Z/D9MuVDcUNJUJ9dEeV8tnVgIvPvttOIR7MHqnA7PRxLXDMU7z4UkJcwUI7dEOpnj8qM38yidLN9g8C/UgO028d/shJm/MJa0uS+qkowjTXzlVukzwK4D7pOx2nI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736893296; c=relaxed/simple;
-	bh=PuUmuNai6cjQ737aOdSCDL04yveI96OOlq+nlDDv00I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CGlEwxSzn8W85VAK03TlRxBYMvUiIBlzD7URySNniihdEZIhv/Yd8nU23HB8QUQQjV41qmE461cCxkc1fiZ2w603sui+60b8QJOFTfae5Aes2hSPUN9rr4EG9Rl2RQF7io7RzHpd5g7bgY8uFmQ16TTckvIlvslETVwxgtKIcTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W1g3TAM6; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1736893908; c=relaxed/simple;
+	bh=cqx6DbIYkBoGBaiuAkwVPBay5SgCYs4xVZ1fLHBHb8k=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=EjRmuebabr5meb1GTgU66/DBoI9SenfytQ/5PFrTpRxnbWKJNgUeHNVKtAKa/ENbLT9T2e/6UKWN1Z9ktxP2zv+9N3Fs/4PIxL8oAEWAGY0IWVY5w6gwxHtNyOHisIpYBBOAOqCwFo/FLBcMTKwHmtMG8MIm+tAgzMz5w0uhWmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aU8L0npt; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W1g3TAM6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D168C4CEE1;
-	Tue, 14 Jan 2025 22:21:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736893295;
-	bh=PuUmuNai6cjQ737aOdSCDL04yveI96OOlq+nlDDv00I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=W1g3TAM68Y9R8pbzkyH3Mz7w3/s2714ukgDb5zxuX7oLGiJZkOntTMbOtPfwLU9j4
-	 rFZI9krTtiwz/9TNViyUYU2XQXNabstdVhN6OPQke1kPt6gojvEzvfBaLpXDU8Mn+Z
-	 9l8rFrHLs0FxfdR8vzjw1Ikcl81TQN9An2J06rGNvru/G5jO9p+drDvSU+eABB84D/
-	 IohtV+7NZEGp9WEClOEC8noZ6JBfqVgBbWIpYN0jiyRkqxvoUjjnAL/bIr18nUej12
-	 UUqlqaXyMzXmgmWosBu5UZha+p36zw/7vEWk+Ss155tKmgQ9jRax4S3KsaLtIP0/3b
-	 Vww61bPl+wLIg==
-Date: Tue, 14 Jan 2025 16:21:34 -0600
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Melody Olvera <quic_molvera@quicinc.com>
-Cc: Konrad Dybcio <konradybcio@kernel.org>, linux-crypto@vger.kernel.org,
-	Conor Dooley <conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>,
-	Satya Durga Srinivasu Prabhala <quic_satyap@quicinc.com>,
-	linux-kernel@vger.kernel.org,
-	Bjorn Andersson <andersson@kernel.org>,
-	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-	Trilok Soni <quic_tsoni@quicinc.com>,
-	Thara Gopinath <thara.gopinath@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Gaurav Kashyap <quic_gaurkash@quicinc.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>
-Subject: Re: [PATCH 3/6] dt-bindings: crypto: qcom,prng: Document SM8750 RNG
-Message-ID: <173689314919.1747667.12076698593104019076.robh@kernel.org>
-References: <20250113-sm8750_crypto_master-v1-0-d8e265729848@quicinc.com>
- <20250113-sm8750_crypto_master-v1-3-d8e265729848@quicinc.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aU8L0npt"
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-216430a88b0so116785695ad.0
+        for <linux-crypto@vger.kernel.org>; Tue, 14 Jan 2025 14:31:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1736893905; x=1737498705; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=q0ATR9Ks2Lk/Fr3H3v8Xg7bVUeMFdDfhM2C3ev16hPg=;
+        b=aU8L0nptD4s/sEsUI+GnbogTrHkv+WBh7uD+/CA5tOdX8V+/mlvJ7EjNNZ+EitvYpN
+         oh3pe+QjWNQo8ONyLMwIQfcotCkxZQ4EueR5UxbAyl4hJZFCPAbOrDnNuZEcxun7p0Mg
+         70+0Ud9pQCy/Z8mfLbVhJ7BiGx5tcRTmS1xQew3xIzzsR6dynf7tBeMp8qeae3Ci+oGV
+         /iL4bcZG2Iwr4eMSnezeXm/8Grc+DZGPQyEp9njjQL/lgwwpIvUQPy71UE58qi7ODoKB
+         jHmOvPa68idKvXbAIzClr/eZcM/EkBbPcmhrHvtP9/wqcpkjyWkv7eH/PSRoHf0mpZJW
+         Ge6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1736893905; x=1737498705;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=q0ATR9Ks2Lk/Fr3H3v8Xg7bVUeMFdDfhM2C3ev16hPg=;
+        b=RFehGD0RERkZP5Npc9nHnk1M/kSZJix0dWylBQhG89KK1x6oYd9oNf4/k7XGCNBy+Z
+         xJyYWBfvXaLMQYNOfROVYMetEv1iiH6qmb+wd68lTSw3gluLkuyNjmzJ/EryGJ6YjaW8
+         AG/LWkCG1SaPtecn1R165rLGwlcs9IQkdbhoc7Fqt8Fd098yJMc8nYUQU+2DR2jTpIet
+         a6ZcwwGMxmBVLMW2Lx7eKtwFz+4nI5z5dAynYXKz8/YwV/CdqGb8Twsx+PStH9XBoXuO
+         EUws8KdV9WYX1iOzeVGRQgPBW6PWZOJojczS67YbTM5ReVjNFnz+M7njmn0NKgYd10nq
+         pjNA==
+X-Forwarded-Encrypted: i=1; AJvYcCVbD1oJMd6dRUPkutOKVcAYrLixU/3Mjkya8iogJ7H8tgGmQm0Cw22pODiIzbywa5zl4JQsSOOw2B7Hjko=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzbZ6z6Kwq/SVdU4F1LEFxOZ0LJrYsLpKuzKoJ89d3z/6B57mXR
+	ukTUeK7TXXG/YwbJhEXZ3OM9FZn/1o9QDFkbX0bHUWXFUbNWH2t8MSnJhcY1O4K/bUsRDlIgIn8
+	sIQ==
+X-Google-Smtp-Source: AGHT+IH6y88q+TWhSZZp7tzO2YG9BcgQQjbOs0koRAZVE554McNiR1VCYsWrRPn0etG8CljUBjhc4EVbcoQ=
+X-Received: from pgba17.prod.google.com ([2002:a63:4d11:0:b0:802:81:dd47])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:7491:b0:1e0:d87a:f67
+ with SMTP id adf61e73a8af0-1e88cfa6a76mr42712779637.13.1736893905447; Tue, 14
+ Jan 2025 14:31:45 -0800 (PST)
+Date: Tue, 14 Jan 2025 14:31:44 -0800
+In-Reply-To: <f02fee7d-27e8-4ddc-b349-6d0f8c7919fa@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250113-sm8750_crypto_master-v1-3-d8e265729848@quicinc.com>
+Mime-Version: 1.0
+References: <cover.1735931639.git.ashish.kalra@amd.com> <14f97f58d6150c6784909261db7f9a05d8d32566.1735931639.git.ashish.kalra@amd.com>
+ <6241f868-98ee-592b-9475-7e6cec09d977@amd.com> <8ae7718c-2321-4f3a-b5b7-7fb029d150cf@amd.com>
+ <8adf7f48-dab0-cbed-d920-e3b74d8411cf@amd.com> <ee9d2956-fa55-4c83-b17d-055df7e1150c@amd.com>
+ <d6d08c6b-9602-4f3d-92c2-8db6d50a1b92@amd.com> <Z4G9--FpoeOlbEDz@google.com>
+ <5e3c0fe3-b220-404f-8ae0-f0790a7098b6@amd.com> <f02fee7d-27e8-4ddc-b349-6d0f8c7919fa@amd.com>
+Message-ID: <Z4bl0D4CbtHgwGGW@google.com>
+Subject: Re: [PATCH v3 6/7] KVM: SVM: Add support to initialize SEV/SNP
+ functionality in KVM
+From: Sean Christopherson <seanjc@google.com>
+To: Ashish Kalra <ashish.kalra@amd.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>, pbonzini@redhat.com, tglx@linutronix.de, 
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
+	hpa@zytor.com, john.allen@amd.com, herbert@gondor.apana.org.au, 
+	davem@davemloft.net, michael.roth@amd.com, dionnaglaze@google.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-coco@lists.linux.dev
+Content-Type: text/plain; charset="us-ascii"
 
+On Tue, Jan 14, 2025, Ashish Kalra wrote:
+> On 1/13/2025 9:03 AM, Kalra, Ashish wrote:
+> > SNP host support is enabled in snp_rmptable_init() in
+> > arch/x86/virt/svm/sev.c, which is invoked as a device_initcall().  Here
+> > device_initcall() is used as snp_rmptable_init() expects AMD IOMMU SNP
+> > support to be enabled prior to it and the AMD IOMMU driver is initialized
+> > after PCI bus enumeration. 
 
-On Mon, 13 Jan 2025 13:16:23 -0800, Melody Olvera wrote:
-> From: Gaurav Kashyap <quic_gaurkash@quicinc.com>
+Ugh.  So. Many. Dependencies.
+
+That's a kernel bug, full stop.  RMP initialization very obviously is not device
+initialization.
+
+Why isn't snp_rmptable_init() called from mem_encrypt_init()?  AFAICT,
+arch_cpu_finalize_init() is called after IOMMU initialziation.  And if that
+doesn't work, hack it into arch_post_acpi_subsys_init().  Using device_initcall()
+to initialization the RMP is insane, IMO.
+
+> > Additionally, the PSP driver probably needs to be initialized at
+> > device_initcall level if it is built-in, but that is much later than KVM
+> > module initialization, therefore, that is blocker for moving SEV/SNP
+> > initialization to KVM module load time instead of PSP module probe time.
+> > Do note that i have verified and tested that PSP module initialization
+> > works when invoked as a device_initcall(). 
 > 
-> Document SM8750 compatible for the True Random Number Generator.
+> As a follow-up to the above issues, i have an important question: 
 > 
-> Signed-off-by: Gaurav Kashyap <quic_gaurkash@quicinc.com>
-> Signed-off-by: Melody Olvera <quic_molvera@quicinc.com>
-> ---
->  Documentation/devicetree/bindings/crypto/qcom,prng.yaml | 1 +
->  1 file changed, 1 insertion(+)
-> 
+> Do we really need kvm_amd module to be built-in for SEV/SNP support ?
 
-Acked-by: Rob Herring (Arm) <robh@kernel.org>
+Yes.
 
+> Is there any usage case/scenario where the kvm_amd module needs to be
+> built-in for SEV/SNP support ?
+
+Don't care.  I am 100% against setting a precedent of tying features to KVM
+being a module or not, especially since this is a solvable problem.
+
+Ideally, the initcall infrastructure would let modules express dependencies, but
+I can appreciate that solving this generically would require a high amount of
+complexity.
+
+Having KVM explicitly call into the PSP driver as needed isn't difficult, just
+gross.  But for me, it's still far better giving up and requiring everything to
+be modules.
+
+E.g.
+
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 943bd074a5d3..a2ee12e998f0 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -2972,6 +2972,16 @@ void __init sev_hardware_setup(void)
+            WARN_ON_ONCE(!boot_cpu_has(X86_FEATURE_FLUSHBYASID)))
+                goto out;
+ 
++       /*
++        * The kernel's initcall infrastructure lacks the ability to express
++        * dependencies between initcalls, where as the modules infrastructure
++        * automatically handles dependencies via symbol loading.  Ensure the
++        * PSP SEV driver is initialized before proceeding if KVM is built-in,
++        * as the dependency isn't handled by the initcall infrastructure.
++        */
++       if (IS_BUILTIN(CONFIG_KVM_AMD) && sev_module_init())
++               goto out;
++
+        /* Retrieve SEV CPUID information */
+        cpuid(0x8000001f, &eax, &ebx, &ecx, &edx);
+ 
+diff --git a/drivers/crypto/ccp/sp-dev.c b/drivers/crypto/ccp/sp-dev.c
+index 7eb3e4668286..a0cdc03984cb 100644
+--- a/drivers/crypto/ccp/sp-dev.c
++++ b/drivers/crypto/ccp/sp-dev.c
+@@ -253,8 +253,12 @@ struct sp_device *sp_get_psp_master_device(void)
+ static int __init sp_mod_init(void)
+ {
+ #ifdef CONFIG_X86
++       static bool initialized;
+        int ret;
+ 
++       if (initialized)
++               return 0;
++
+        ret = sp_pci_init();
+        if (ret)
+                return ret;
+@@ -263,6 +267,7 @@ static int __init sp_mod_init(void)
+        psp_pci_init();
+ #endif
+ 
++       initialized = true;
+        return 0;
+ #endif
+ 
+@@ -279,6 +284,13 @@ static int __init sp_mod_init(void)
+        return -ENODEV;
+ }
+ 
++#if IS_BUILTIN(CONFIG_KVM_AMD) && IS_ENABLED(CONFIG_KVM_AMD_SEV)
++int __init sev_module_init(void)
++{
++       return sp_mod_init();
++}
++#endif
++
+ static void __exit sp_mod_exit(void)
+ {
+ #ifdef CONFIG_X86
+diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+index 903ddfea8585..0138d22b46ac 100644
+--- a/include/linux/psp-sev.h
++++ b/include/linux/psp-sev.h
+@@ -814,6 +814,8 @@ struct sev_data_snp_commit {
+ 
+ #ifdef CONFIG_CRYPTO_DEV_SP_PSP
+ 
++int __init sev_module_init(void);
++
+ /**
+  * sev_platform_init - perform SEV INIT command
+  *
