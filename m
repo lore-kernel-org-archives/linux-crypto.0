@@ -1,207 +1,105 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89AB5156F3B;
-	Wed, 15 Jan 2025 05:31:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8714C22E407;
+	Wed, 15 Jan 2025 07:58:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736919105; cv=none; b=irC+eGaIOCKmIn7mt1pZAThTFV5EoB2/eLRsYikHFhS92b2e8uw9eXqBwSOQ4zE9sXlH0EP/N5H0Y/yVNMcUTunvVp9g1RFv5tEkV0eA2MKivUIAEs6qby6V+qRrWTXVZZZ0AGlSGekdaWBy41atu9youCIls/LyZGcPhsFXOZ8=
+	t=1736927924; cv=none; b=PeAmyQkZOZM4WpoupcEwcyaQz6YxEIreABJjHc4tpRrlAIAokl0Z8ecXpW2e8oL3VkAZ3EPdBWjClnHa8IkgD5UR97Iq7lVSu+3rRvYZKwUg/5x9VskpqwLxMsY6n1d6l53ln5X1ulGnOuNkSIaAEw6E0kiI7vqEz4IVlIUNCB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736919105; c=relaxed/simple;
-	bh=GyEu2oqZvdBqms2Qa/WvMShjm8d4DSC4x/w9WPzFPQ8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Z32ToLLeSxNxhW+iprXSetUytAtfBnNUiqhLFCDtuLqfHuynC5qdA4okPXgoGfmLS/75LWjoQRbyAIoODXxUPDSj0iq/mH/WISTHJGquGYeKyHn4/bPhXjzD3pMO5Whr9uy4YSbIApbbIVJB8xXtswdkHQmoBEeSHv53Dl6OGUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=l0Ttouyz; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1736927924; c=relaxed/simple;
+	bh=amX4pkedsohY08I1v/l+6Iok3zn1JGPQRZL5AWH5uvU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jZPL2gXrCDH5zJPJIRpiXIa2O8zMZ1F4i1KQmT3siG1s4uyF6Ic98EtaA8HeAHlVuYBmBEmXF7H/86jjWFYDMvopUOABHm5HusZwjMjuC1EH1WAWtIz6yCDCi48L+gfpUpEiF8Ij3Rr49oNvgPhnlYTeEVp2UAenV3wLROOdSQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=ymKZN5Yw; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="l0Ttouyz"
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50ELbXMk011377;
-	Wed, 15 Jan 2025 05:31:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	B61jP3loVVZ7utWkkB9F9jw2gzA3+Gstc+30dnoSlXg=; b=l0TtouyzQ1ZrMKc/
-	QtYNO6hBWH9NVnyw4G4/KSIcCbDTwIebuWqxe0ZCcNk29zymiWka402fkeNnDoBB
-	55bjmkn/nz5E3Ws3N4NYvnyivXbDha5Yuk5nqIX8EIgXw6pGh/Q9t9DsY1bBoG/z
-	DP/QGWMAgK1qznFqQG6ua1NKF+zWbmdv83vr9wvNdD/V/4Ug4FMARpKnMK+qLTZY
-	MKNK+ErGxl/SNcMwa7tzTvagYiMwBlKeu4egA+5MFlFDvzIjunaRRrwyrZ4ONlgH
-	FiPADXWi9FkubPPiBm/toH/IdFoDTdGqDIvumCbcWBKay22r6TyrvL9LSJ78tF6R
-	gzvzxQ==
-Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44600p0vps-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 15 Jan 2025 05:31:35 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 50F5VYvm019530
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 15 Jan 2025 05:31:34 GMT
-Received: from [10.151.36.43] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 14 Jan
- 2025 21:31:29 -0800
-Message-ID: <872a4b2e-26e8-1c53-72aa-9fdd02069280@quicinc.com>
-Date: Wed, 15 Jan 2025 11:01:26 +0530
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="ymKZN5Yw"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5961CC4CEDF;
+	Wed, 15 Jan 2025 07:58:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1736927924;
+	bh=amX4pkedsohY08I1v/l+6Iok3zn1JGPQRZL5AWH5uvU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ymKZN5YwIQFqTmDqX5WbvifyxRmiW0WjIgiMgUuHYseeq9yY/mOKub8lB4IqzJhLn
+	 2Mpra6k/Ct6hhqCsRsd6Cg+902hzXHOLXJ4FVTcDys8G75U4+M2I/CEz7jARyx4jyt
+	 v0nk50DElCJLiAvCrTL8sZzpMzlLo1f/ThO7n57I=
+Date: Wed, 15 Jan 2025 08:58:40 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Qunqin Zhao <zhaoqunqin@loongson.cn>
+Cc: Xi Ruoyao <xry111@xry111.site>, Arnd Bergmann <arnd@arndb.de>,
+	Lee Jones <lee@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-kernel@vger.kernel.org, loongarch@lists.linux.dev,
+	"David S . Miller" <davem@davemloft.net>,
+	linux-crypto@vger.kernel.org,
+	"derek.kiernan@amd.com" <derek.kiernan@amd.com>,
+	"dragan.cvetic@amd.com" <dragan.cvetic@amd.com>,
+	Yinggang Gu <guyinggang@loongson.cn>
+Subject: Re: [PATCH v1 3/3] misc: ls6000se-sdf: Add driver for Loongson
+ 6000SE SDF
+Message-ID: <2025011527-antacid-spilt-cbef@gregkh>
+References: <20250114095527.23722-1-zhaoqunqin@loongson.cn>
+ <20250114095527.23722-4-zhaoqunqin@loongson.cn>
+ <ee65851c-4149-4927-a2e7-356cdce2ba25@app.fastmail.com>
+ <97000576d4ba6d94cea70363e321665476697052.camel@xry111.site>
+ <2025011407-muppet-hurricane-196f@gregkh>
+ <122aab11-f657-a48e-6b83-0e01ddd20ed3@loongson.cn>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH v5 02/12] dmaengine: add DMA_PREP_LOCK and DMA_PREP_UNLOCK
- flag
-To: Mukesh Kumar Savaliya <quic_msavaliy@quicinc.com>,
-        Vinod Koul
-	<vkoul@kernel.org>
-CC: <corbet@lwn.net>, <thara.gopinath@gmail.com>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <kees@kernel.org>, <dave.jiang@intel.com>, <dmaengine@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
-        <quic_srichara@quicinc.com>, <quic_varada@quicinc.com>,
-        <quic_utiwari@quicinc.com>
-References: <20241212041639.4109039-1-quic_mdalam@quicinc.com>
- <20241212041639.4109039-3-quic_mdalam@quicinc.com> <Z2qOKHsYpy8kcwlv@vaman>
- <64dca613-5053-46d4-9910-7ac551fdde81@quicinc.com>
-Content-Language: en-US
-From: Md Sadre Alam <quic_mdalam@quicinc.com>
-In-Reply-To: <64dca613-5053-46d4-9910-7ac551fdde81@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: G4AutCyT6UtTL1ue9XdR8rTcqNbMtxmi
-X-Proofpoint-GUID: G4AutCyT6UtTL1ue9XdR8rTcqNbMtxmi
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-15_02,2025-01-13_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- mlxlogscore=999 phishscore=0 spamscore=0 impostorscore=0 adultscore=0
- lowpriorityscore=0 bulkscore=0 mlxscore=0 clxscore=1015 priorityscore=1501
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2501150038
+In-Reply-To: <122aab11-f657-a48e-6b83-0e01ddd20ed3@loongson.cn>
 
+On Wed, Jan 15, 2025 at 10:58:52AM +0800, Qunqin Zhao wrote:
+> 
+> 在 2025/1/14 下午9:21, Greg Kroah-Hartman 写道:
+> > On Tue, Jan 14, 2025 at 06:43:24PM +0800, Xi Ruoyao wrote:
+> > > On Tue, 2025-01-14 at 11:17 +0100, Arnd Bergmann wrote:
+> > > > On Tue, Jan 14, 2025, at 10:55, Qunqin Zhao wrote:
+> > > > > Loongson Secure Device Function device supports the functions specified
+> > > > > in "GB/T 36322-2018". This driver is only responsible for sending user
+> > > > > data to SDF devices or returning SDF device data to users.
+> > > > I haven't been able to find a public version of the standard
+> > > A public copy is available at
+> > > https://openstd.samr.gov.cn/bzgk/gb/newGbInfo?hcno=69E793FE1769D120C82F78447802E14F,
+> > > pressing the blue "online preview" button, enter a captcha and you can
+> > > see it.  But the copy is in Chinese, and there's an explicit notice
+> > > saying translating this copy is forbidden, so I cannot translate it for
+> > > you either.
+> > > 
+> > > > but
+> > > > from the table of contents it sounds like this is a standard for
+> > > > cryptographic functions that would otherwise be implemented by a
+> > > > driver in drivers/crypto/ so it can use the normal abstractions
+> > > > for both userspace and in-kernel users.
+> > > > 
+> > > > Is there some reason this doesn't work?
+> > > I'm not an lawyer but I guess contributing code for that may have some
+> > > "cryptography code export rule compliance" issue.
+> > Issue with what?  And why?  It's enabling the functionality of the
+> > hardware either way, so the same rules should apply no matter where the
+> > driver ends up in or what apis it is written against, right?
+> 
+> SDF and tpm2.0 are both  "library specifications",  which means that
+> 
+> it supports a wide variety of functions not only cryptographic functions,
+> 
+> but unlike tpm2.0, SDF is only used in China.
+> 
+> You can refer to the tpm2.0 specification:
+> https://trustedcomputinggroup.org/resource/tpm-library-specification/
 
+So this is an accelerator device somehow?  If it provides crypto
+functions, it must follow the crypto api, you can't just provide a "raw"
+char device node for it as that's not going to be portable at all.
+Please fit it into the proper kernel subsystem for the proper
+user/kernel api needed to drive this hardware.
 
-On 12/26/2024 5:38 PM, Mukesh Kumar Savaliya wrote:
-> 
-> 
-> On 12/24/2024 4:04 PM, Vinod Koul wrote:
->> On 12-12-24, 09:46, Md Sadre Alam wrote:
->>> Add lock and unlock flag support on command descriptor.
->>> Once lock set in requester pipe, then the bam controller
->>> will lock all others pipe and process the request only
->>> from requester pipe. Unlocking only can be performed from
->>> the same pipe.
->>>
->>> If DMA_PREP_LOCK flag passed in command descriptor then requester
->>> of this transaction wanted to lock the BAM controller for this
->>> transaction so BAM driver should set LOCK bit for the HW descriptor.
->>>
->>> If DMA_PREP_UNLOCK flag passed in command descriptor then requester
->>> of this transaction wanted to unlock the BAM controller.so BAM driver
->>> should set UNLOCK bit for the HW descriptor.
->>>
->>> BAM IP version 1.4.0 and above only supports this LOCK/UNLOCK
->>> feature.
->>>
->>> Signed-off-by: Md Sadre Alam <quic_mdalam@quicinc.com>
->>> ---
->>>
->>> Change in [v5]
->>>
->>> * Added DMA_PREP_LOCK and DMA_PREP_UNLOCK flag support
->>>
->>> Change in [v4]
->>>
->>> * This patch was not included in v4
->>>
->>> Change in [v3]
->>>
->>> * This patch was not included in v3
->>>
->>> Change in [v2]
->>>
->>> * This patch was not included in v2
->>> Change in [v1]
->>>
->>> * This patch was not included in v1
->>>
->>>   Documentation/driver-api/dmaengine/provider.rst | 15 +++++++++++++++
->>>   include/linux/dmaengine.h                       |  6 ++++++
->>>   2 files changed, 21 insertions(+)
->>>
->>> diff --git a/Documentation/driver-api/dmaengine/provider.rst 
->>> b/Documentation/driver-api/dmaengine/provider.rst
->>> index 3085f8b460fa..5f30c20f94f3 100644
->>> --- a/Documentation/driver-api/dmaengine/provider.rst
->>> +++ b/Documentation/driver-api/dmaengine/provider.rst
->>> @@ -628,6 +628,21 @@ DMA_CTRL_REUSE
->>>     - This flag is only supported if the channel reports the 
->>> DMA_LOAD_EOT
->>>       capability.
->>> +- DMA_PREP_LOCK
->>> +
->>> +  - If set, the BAM will lock all other pipes not related to the 
->>> current
->>
->> Why BAM, the generic API _cannot_ be implementation specific, make this
->> as a generic one please
->>
-> Yes, should be DAM to be generic.
->> Anyone can use this new method and not just BAM...
-Will change this in next revision.
->>
->>
->>> +    pipe group, and keep handling the current pipe only.
->>> +
->>> +  - All pipes not within this group will be locked by this pipe upon 
->>> lock
->>> +    event.
->>> +
->>> +  - only pipes which are in the same group and relate to the same 
->>> Environment
->>> +    Execution(EE) will not be locked by a certain pipe.
->>> +
->>> +- DMA_PREP_UNLOCK
->>> +
->>> +  - If set, BAM will release all locked pipes
->>> +
->>>   General Design Notes
->>>   ====================
->>> diff --git a/include/linux/dmaengine.h b/include/linux/dmaengine.h
->>> index 346251bf1026..8ebd43a998a7 100644
->>> --- a/include/linux/dmaengine.h
->>> +++ b/include/linux/dmaengine.h
->>> @@ -200,6 +200,10 @@ struct dma_vec {
->>>    *  transaction is marked with DMA_PREP_REPEAT will cause the new 
->>> transaction
->>>    *  to never be processed and stay in the issued queue forever. The 
->>> flag is
->>>    *  ignored if the previous transaction is not a repeated transaction.
->>> + *  @DMA_PREP_LOCK: tell the driver that there is a lock bit set on 
->>> command
->>> + *  descriptor.
->>> + *  @DMA_PREP_UNLOCK: tell the driver that there is a un-lock bit 
->>> set on command
->>> + *  descriptor.
->>>    */
->>>   enum dma_ctrl_flags {
->>>       DMA_PREP_INTERRUPT = (1 << 0),
->>> @@ -212,6 +216,8 @@ enum dma_ctrl_flags {
->>>       DMA_PREP_CMD = (1 << 7),
->>>       DMA_PREP_REPEAT = (1 << 8),
->>>       DMA_PREP_LOAD_EOT = (1 << 9),
->>> +    DMA_PREP_LOCK = (1 << 10),
->>> +    DMA_PREP_UNLOCK = (1 << 11),
->>>   };
->>>   /**
->>> -- 
->>> 2.34.1
->>
-> 
+thanks,
+
+greg k-h
