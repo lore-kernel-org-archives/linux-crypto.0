@@ -1,86 +1,118 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53A3E4206B
-	for <linux-crypto@vger.kernel.org>; Wed, 15 Jan 2025 02:40:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 511CA22B8C2;
+	Wed, 15 Jan 2025 03:00:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736908822; cv=none; b=pk5DR9jK8sOQeEC8O4M88htuO5nUtW084NR6eeLgt2myqPzyBrkuQOBY9nAwf4MT0X1k4UjfZOhqa5IxWEMiUz2H6QYlq5DmerMLHr7iKlRgUyfb33UskhMmUDTPVbkUJQTSJvTuMbX0lNH7dHDuSLcMEExww5JVkLKbn3TYlVA=
+	t=1736910023; cv=none; b=AuDPACjSBmySZjkNQ/a8jCsOck60wkcm5YBLE5n3eIQDDelTxLThEJ7p24e64mjYVCuza7dfmgo0Ym7EuguNEtlHUd4QT5bsvTUw/spANCzhcTGPWEyJJicPg0SM/JvcTDVrsotW4ITiBDF3RJHvwvT8QQs+a3Ebhs2d+BjdoOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736908822; c=relaxed/simple;
-	bh=ETQvDhvHX0vLLdDC/Ke6Aw/EXZwrzC1/mBgIaQF1BUo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p8UFnvXhpNZdfIJQ4MA7ppU1BAXanVJTCJLzcwj69Y5HCfsHLBi++kUW0jRygz0d2ACSR1niJHwTBn+4k3Yqx1x33ZcS1E/2e+hLorE0h1s/G20o/V/XAAVOjBTa3oWdqlv0k51Vhd3k+bd8TZTzh5cxTAD/1g26WXWmT+yYbMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UkAbef8d; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UkAbef8d"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C309EC4CEDD;
-	Wed, 15 Jan 2025 02:40:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1736908821;
-	bh=ETQvDhvHX0vLLdDC/Ke6Aw/EXZwrzC1/mBgIaQF1BUo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UkAbef8dhPsw0Z43gZJzcu0SZlCh7SCq/X/MxIFmcn/GPSS5UebLosoF2X6uCB1NI
-	 T4VuXW0om8kypCC2nJHhNiLLQilPDhXcWgCWNU2i8jHZnjeFG7idYvsIL2fBJZA18x
-	 tmgB68P1Bugr3k9QJtrxZmW7hRBN+FzxUyey3zy/4rwt2cCefjovg6jMnf6H7JA7Kq
-	 IWV8iqyNUKMZAcEgVsFkU9aG1t1YP8RCbreo2hybq0s++fXMAceJfWme6Uj65Zz5H/
-	 Tweyra7KVsXv+LSKnH0uSa1syJnMWLkQW/7Tl9GP+Z8ztwWm9nt6/xLqfaWZGTqXMH
-	 BE2PIDkf1nAUQ==
-Date: Tue, 14 Jan 2025 18:40:20 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v3 0/8] crypto: skcipher_walk cleanups
-Message-ID: <20250115024020.GA60803@sol.localdomain>
-References: <20250105193416.36537-1-ebiggers@kernel.org>
- <Z4XeEiZtN7rLXCZV@gondor.apana.org.au>
+	s=arc-20240116; t=1736910023; c=relaxed/simple;
+	bh=0inU6x9OEOlhOKqEGeSMD92WMNoNKj52lO6z/J3YNOo=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=j92qo5EljGSIonrBqgjWCpZBtZ16k+DA0gVI7XUhdVXkQr2B8rV4zzZOqJh8LV7kzwJmoH6o5oiEQjYBcZyrP5bDqEM9B7ysbsLIjgKaPLn4iJJ2BGFQZVQee81Xagse6+qfvWQRWoJJas/+37H13v0/e+qB7fTSEht1rcnP1Po=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.164])
+	by gateway (Coremail) with SMTP id _____8BxPOLCJIdnGqpjAA--.3095S3;
+	Wed, 15 Jan 2025 11:00:18 +0800 (CST)
+Received: from [10.20.42.164] (unknown [10.20.42.164])
+	by front1 (Coremail) with SMTP id qMiowMAxz8e9JIdnxQwjAA--.18926S2;
+	Wed, 15 Jan 2025 11:00:15 +0800 (CST)
+Subject: Re: [PATCH v1 3/3] misc: ls6000se-sdf: Add driver for Loongson 6000SE
+ SDF
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Xi Ruoyao <xry111@xry111.site>, Arnd Bergmann <arnd@arndb.de>
+Cc: Lee Jones <lee@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>,
+ linux-kernel@vger.kernel.org, loongarch@lists.linux.dev,
+ "David S . Miller" <davem@davemloft.net>, linux-crypto@vger.kernel.org,
+ "derek.kiernan@amd.com" <derek.kiernan@amd.com>,
+ "dragan.cvetic@amd.com" <dragan.cvetic@amd.com>,
+ Yinggang Gu <guyinggang@loongson.cn>
+References: <20250114095527.23722-1-zhaoqunqin@loongson.cn>
+ <20250114095527.23722-4-zhaoqunqin@loongson.cn>
+ <ee65851c-4149-4927-a2e7-356cdce2ba25@app.fastmail.com>
+ <97000576d4ba6d94cea70363e321665476697052.camel@xry111.site>
+ <2025011407-muppet-hurricane-196f@gregkh>
+From: Qunqin Zhao <zhaoqunqin@loongson.cn>
+Message-ID: <122aab11-f657-a48e-6b83-0e01ddd20ed3@loongson.cn>
+Date: Wed, 15 Jan 2025 10:58:52 +0800
+User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z4XeEiZtN7rLXCZV@gondor.apana.org.au>
+In-Reply-To: <2025011407-muppet-hurricane-196f@gregkh>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-CM-TRANSID:qMiowMAxz8e9JIdnxQwjAA--.18926S2
+X-CM-SenderInfo: 52kd01pxqtx0o6or00hjvr0hdfq/
+X-Coremail-Antispam: 1Uk129KBj93XoW7Ww1fury7GF4DWr1UKF13KFX_yoW8CFy7pa
+	13GF1IkFyUtr43Cr4vvw4rAr1Ikws3tF9xt34rAwsrZ39Iyrn5KFWIkryYva17Zr10kwnF
+	vay0va47u3WDZagCm3ZEXasCq-sJn29KB7ZKAUJUUUUf529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUP0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	GcCE3s1ln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2
+	x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r126r1D
+	McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7
+	I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCF
+	x2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r
+	1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij
+	64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr
+	0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF
+	0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8Dl1DUUUUU==
 
-Hi Herbert,
 
-On Tue, Jan 14, 2025 at 11:46:26AM +0800, Herbert Xu wrote:
-> Eric Biggers <ebiggers@kernel.org> wrote:
-> > This series cleans up and optimizes some of the skcipher_walk code.
-> > 
-> > I've split this out from my original series
-> > "crypto: scatterlist handling improvements"
-> > (https://lore.kernel.org/linux-crypto/20241230001418.74739-1-ebiggers@kernel.org/).
-> > Please consider applying this smaller set for 6.14, and we can do
-> > patches 11-29 of the original series later.
-> > 
-> > Other changes in v3:
-> >   - Added comments in the patch
-> >     "crypto: skcipher - optimize initializing skcipher_walk fields"
-> > 
-> > Eric Biggers (8):
-> >  crypto: skcipher - document skcipher_walk_done() and rename some vars
-> >  crypto: skcipher - remove unnecessary page alignment of bounce buffer
-> >  crypto: skcipher - remove redundant clamping to page size
-> >  crypto: skcipher - remove redundant check for SKCIPHER_WALK_SLOW
-> >  crypto: skcipher - fold skcipher_walk_skcipher() into
-> >    skcipher_walk_virt()
-> >  crypto: skcipher - clean up initialization of skcipher_walk::flags
-> >  crypto: skcipher - optimize initializing skcipher_walk fields
-> >  crypto: skcipher - call cond_resched() directly
-> > 
-> > crypto/skcipher.c                  | 206 +++++++++++++----------------
-> > include/crypto/internal/skcipher.h |   2 +-
-> > 2 files changed, 90 insertions(+), 118 deletions(-)
-> > 
-> > 
-> > base-commit: 7fa4817340161a34d5b4ca39e96d6318d37c1d3a
-> 
-> All applied.  Thanks.
-> -- 
+在 2025/1/14 下午9:21, Greg Kroah-Hartman 写道:
+> On Tue, Jan 14, 2025 at 06:43:24PM +0800, Xi Ruoyao wrote:
+>> On Tue, 2025-01-14 at 11:17 +0100, Arnd Bergmann wrote:
+>>> On Tue, Jan 14, 2025, at 10:55, Qunqin Zhao wrote:
+>>>> Loongson Secure Device Function device supports the functions specified
+>>>> in "GB/T 36322-2018". This driver is only responsible for sending user
+>>>> data to SDF devices or returning SDF device data to users.
+>>> I haven't been able to find a public version of the standard
+>> A public copy is available at
+>> https://openstd.samr.gov.cn/bzgk/gb/newGbInfo?hcno=69E793FE1769D120C82F78447802E14F,
+>> pressing the blue "online preview" button, enter a captcha and you can
+>> see it.  But the copy is in Chinese, and there's an explicit notice
+>> saying translating this copy is forbidden, so I cannot translate it for
+>> you either.
+>>
+>>> but
+>>> from the table of contents it sounds like this is a standard for
+>>> cryptographic functions that would otherwise be implemented by a
+>>> driver in drivers/crypto/ so it can use the normal abstractions
+>>> for both userspace and in-kernel users.
+>>>
+>>> Is there some reason this doesn't work?
+>> I'm not an lawyer but I guess contributing code for that may have some
+>> "cryptography code export rule compliance" issue.
+> Issue with what?  And why?  It's enabling the functionality of the
+> hardware either way, so the same rules should apply no matter where the
+> driver ends up in or what apis it is written against, right?
 
-Did you forget to push this out?
+SDF and tpm2.0 are both  "library specifications",  which means that
 
-- Eric
+it supports a wide variety of functions not only cryptographic functions,
+
+but unlike tpm2.0, SDF is only used in China.
+
+You can refer to the tpm2.0 specification: 
+https://trustedcomputinggroup.org/resource/tpm-library-specification/
+
+
+Best regards,
+
+Qunqin.
+
+>
+> thanks,
+>
+> greg k-h
+
