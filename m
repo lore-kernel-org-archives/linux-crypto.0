@@ -1,34 +1,34 @@
 Received: from mail.manjaro.org (mail.manjaro.org [116.203.91.91])
 	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C359D241696;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DEF3241699;
 	Wed, 15 Jan 2025 13:07:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.91.91
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736946446; cv=none; b=r+9xsSTxqdtapuPqe5On1H65Fl8I/ZjRWwFW8EGS6YXxxIBqdtEqSuzaKX+4HUaU8qvJ6Vwvuevpf/vqR0eaKnoyU6Hp+LoeQW2KPUI/kUVAJO8CYUiIsoUrXT7RKNiNVEHYu83KcgD21Refy8ZQ7jEYg2ftzNg6a1PHamXte5o=
+	t=1736946446; cv=none; b=rGyvMwdyMLOX/kNCadp95icPDsZsozwyAncQONdAv0GOE3Vrj7mK5ZUoTN+fxVNFet0YBuu+wJvCeL6SPlEVarftDey9tFd2DoMCc5tDjqUM6/dDR6YnV8CkuM1ikVbmb7hL+wbw8GRDo2kx4ABInAyTZ+m7/nFcAOby7eqlTxs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1736946446; c=relaxed/simple;
-	bh=NJ+IK/V9xhosjbuIonSPKBSBom83qI2UMQnetlOXyyo=;
+	bh=ukzKgbsdkZXZRHmaAiUpzyJ0aw9IxcNOmeqo144mu6c=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Cvgghg+w6NEdSdv8cctw3xFxvKF0MaRoDQIXgoY9Aoe4ZnCDHGfYSEAWIRbeRYh/VCUny03LK4jSqYBTqXwkejnmpU3eEYYN/oDZ/tKOVX8nGnxDTx1DchLZtk0ubZ+d35IyuBDYrpjVY7E036X+Ul8CBtmT+2s7wAOU+IM0O+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org; spf=pass smtp.mailfrom=manjaro.org; dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b=UbrYQfv8; arc=none smtp.client-ip=116.203.91.91
+	 MIME-Version; b=Ku1LxsI+OzsmgUcRl0/rEz4kgcLa0TsGVE28mU1lNsLC2ya8u9mChm/EYCg3BjCrUftDExtinQX0m2JmzC3lPSjf9KUxwJWerjOOPY9X2gSGzA5ILA8DMHJix1HV5OjTVwPI0l1Vr/gDWY5eICriVG+DV0FgY8qDawuupBrfF3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org; spf=pass smtp.mailfrom=manjaro.org; dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b=gzRBe6fm; arc=none smtp.client-ip=116.203.91.91
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manjaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b="UbrYQfv8"
+	dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b="gzRBe6fm"
 From: Dragan Simic <dsimic@manjaro.org>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manjaro.org; s=2021;
-	t=1736946442;
+	t=1736946443;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=8z8/gRN7DC+4Mj+pO8dEfzBc5pYw3dZZmEI7IcFQziw=;
-	b=UbrYQfv8ruTOz+6irLtI2CDbKtav7lFqL/Cars1VvLDsLBSVmujqBzuUV1jFqaMwON8Vn8
-	sRpx6T5am4lhE6L2MbhSSA6twzIfuiQCpA8rhh5Ysci/Ar/EnUHnORpPeKHdhkxWct2GT3
-	tRwZKa32otaUFb3U/5QDCCtjOI+oKhnqarf3j+o98SlXEfi7GdE7J6WrwhiiYhmOgYmRgR
-	kRjrHfUm3qi+Ijed44RTZryJYEVLNaZxUOwF+W++GoOKXWaTGRd/HkU1rTZBTb3mGlNQHT
-	+w7ECw2DJxa6AtY3r87gBTGGDbNVyMz2g1MAuJt3yxTNTh0oMKGfFzyiDy/Rmw==
+	bh=rJo0rOx2QxWkj5/VaolJ2k0fcuLfsY4p05VifL9KrrM=;
+	b=gzRBe6fmeV8Ps4quPBtcKjaOhPNC5rbmCKT9J11SpgDe2HTotpH9atONESRIsddH7tCrXR
+	bLt+QhneabpeTGNPt8y66W7aoCS7UUhnqfDHpeoyVo+ryPF7jbSqj2J6TzoYKNq6SgDCP3
+	5P5poCa3jmH3xWBifWVs/ncZnXU8OMvaCbqu04TqD3xJ0gMlHpceuluVhl4Bs0KnHHykpJ
+	GNN8GlPwCLQTPJPwJr6RUSRFnCKgB33UScM/y8jOGBYZ9kExcxv8yYrcQwdPxDGMueMHjy
+	yAwuWwSnXiQMzmiTtuV1/mHpul4VNv6xMLQNq6DUkIyE5A1L4s7ZY0XbCBnDww==
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
 	olivia@selenic.com,
@@ -36,9 +36,9 @@ Cc: linux-kernel@vger.kernel.org,
 	didi.debian@cknow.org,
 	heiko@sntech.de,
 	dsimic@manjaro.org
-Subject: [PATCH 1/3] hwrng: Use tabs as leading whitespace consistently in Kconfig
-Date: Wed, 15 Jan 2025 14:07:00 +0100
-Message-Id: <7b83b40af74e5a7c5d3316d3c0f460370ea0313d.1736946020.git.dsimic@manjaro.org>
+Subject: [PATCH 2/3] hwrng: Move one "tristate" Kconfig description to the usual place
+Date: Wed, 15 Jan 2025 14:07:01 +0100
+Message-Id: <3c08ac4dc06212d7d0408e97b5f92ab8af0dd1a1.1736946020.git.dsimic@manjaro.org>
 In-Reply-To: <cover.1736946020.git.dsimic@manjaro.org>
 References: <cover.1736946020.git.dsimic@manjaro.org>
 Precedence: bulk
@@ -51,32 +51,30 @@ Content-Transfer-Encoding: 8bit
 Authentication-Results: ORIGINATING;
 	auth=pass smtp.auth=dsimic@manjaro.org smtp.mailfrom=dsimic@manjaro.org
 
-Replace instances of leading size-eight groups of space characters with
-the usual tab characters, as spotted in the hw_random Kconfig file.
+It's pretty usual to have "tristate" descriptions in Kconfig files placed
+immediately after the actual configuration options, so correct the position
+of one misplaced "tristate" spotted in the hw_random Kconfig file.
 
 No intended functional changes are introduced by this trivial cleanup.
 
 Signed-off-by: Dragan Simic <dsimic@manjaro.org>
 ---
- drivers/char/hw_random/Kconfig | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ drivers/char/hw_random/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-index 17854f052386..e0244a66366b 100644
+index e0244a66366b..e84c7f431840 100644
 --- a/drivers/char/hw_random/Kconfig
 +++ b/drivers/char/hw_random/Kconfig
-@@ -579,10 +579,10 @@ config HW_RANDOM_ARM_SMCCC_TRNG
- 	  module will be called arm_smccc_trng.
+@@ -534,10 +534,10 @@ config HW_RANDOM_NPCM
+ 	  If unsure, say Y.
  
- config HW_RANDOM_CN10K
--       tristate "Marvell CN10K Random Number Generator support"
--       depends on HW_RANDOM && PCI && (ARM64 || (64BIT && COMPILE_TEST))
--       default HW_RANDOM if ARCH_THUNDER
--       help
-+	tristate "Marvell CN10K Random Number Generator support"
-+	depends on HW_RANDOM && PCI && (ARM64 || (64BIT && COMPILE_TEST))
-+	default HW_RANDOM if ARCH_THUNDER
-+	help
- 	 This driver provides support for the True Random Number
- 	 generator available in Marvell CN10K SoCs.
+ config HW_RANDOM_KEYSTONE
++	tristate "TI Keystone NETCP SA Hardware random number generator"
+ 	depends on ARCH_KEYSTONE || COMPILE_TEST
+ 	depends on HAS_IOMEM && OF
+ 	default HW_RANDOM
+-	tristate "TI Keystone NETCP SA Hardware random number generator"
+ 	help
+ 	  This option enables Keystone's hardware random generator.
  
