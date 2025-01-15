@@ -1,146 +1,159 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from xry111.site (xry111.site [89.208.246.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2E38248BBD;
-	Wed, 15 Jan 2025 10:31:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79AE5248BAF;
+	Wed, 15 Jan 2025 11:13:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.208.246.23
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1736937106; cv=none; b=Xc9YE2ltUdUzGam0zw9SCB65LqxSYxl3fIHVOwVH6N/tXFSxumrHjGpjyNyxWI6cspM+1wCBdcaEPVZTxRD+aAuwGityGo/gM8BFWTBia6XcI+gZ4dhkglQgc/cQIal17bR/7G5ZzAMpWT0mJM7WIrd1qZJvIGd81c7DX8SasG0=
+	t=1736939605; cv=none; b=j+CX0NdH2ZLlYZhX92VT8ZE6L+8XvD59qJ6bZ0pSI3obb5PI68fTUxlA1Ij7HyBbRV/DBbFdTI6KxN6L8rdCeGJhoAj0MdYfneaqZY7ji9rOD8dSwd6D+SiFRMMRw5UZbLGNE9/eWY3B4mxf6/QeJEkfEqzcA4aEwAZc02WviyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1736937106; c=relaxed/simple;
-	bh=C4smU/ff3NTXmzkB5WHABlck1VJqaczPMgiNWVrzYBo=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=chTspndT3SWM72h33vo0zdKO+VXejiG1O7bXu7jtvGwsZUy4Cuf/cTwFsRiCl7cWC1ITW4TiQwdEHaPSaXsuU2lRqniiQ39ljm6dzD6BoAOfekew2cxGqUIJAdYUSzL0Du+bUW9iLjAT+tb+ythSOUrMx2CW2bP1rq1C7PIF0ws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=CMtKKeAO; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+	s=arc-20240116; t=1736939605; c=relaxed/simple;
+	bh=C3F4wzb8dl8a7vtcNnwZ0cLspCXDoL7lFlmpLnjVx+0=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=QT5PpCUbyntRY8gkqgo8EEXoUX7YaY/K2HqZRXBxxNFeM4FFrkqu19gEE6IsfiH/8Z0PrYg0Tq1PBmguwfmbvVgWK/BzbjbC4h10F2ncWwbO4C+1iF3VhaHqssKwESToUGqMmEpstz6jjSRvmHVGjB6+47Oj5SlLV952i9SXQ44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site; spf=pass smtp.mailfrom=xry111.site; dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b=CXjDm+17; arc=none smtp.client-ip=89.208.246.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xry111.site
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="CMtKKeAO"
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50F2s7LR022366;
-	Wed, 15 Jan 2025 10:31:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	hy/ib9Ox2rxOh/TA6zLxb8jMfLmoos1Ox3ytwvoQgQU=; b=CMtKKeAO9D0CkmfX
-	wGxlMry52bCEX+A7onF29W9OgU9q69GljqR2186RlCk3HZILZoShcs4IWPnxxmN3
-	z2//x3kXXomJtdKLgVlgCoWZ/WnB/dL5c4jYm8sgVS59pBgl0wZ1i204bEVrIaq5
-	HpPe0LY/dYcPecdHfOabV8eii+CcudLVy3m4eABjm8ZfuLZP1O/xlZIZySpuxkX+
-	ZAMQiyVw7BZ3GEkRM2wxuarzIxDvmtAfCOGpWf+m9fExhU/7Tl8POZTUy83Rtz1N
-	b0LjkWuUj7AyEQHpPHlZHlbXSLdNDx3bD5GQhhNyTKCaG4U6T3nvABjzP6W37K4J
-	15r8Ag==
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4464mts121-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 15 Jan 2025 10:31:33 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 50FAVWKt020634
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 15 Jan 2025 10:31:32 GMT
-Received: from hu-mdalam-blr.qualcomm.com (10.80.80.8) by
- nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Wed, 15 Jan 2025 02:31:27 -0800
-From: Md Sadre Alam <quic_mdalam@quicinc.com>
-To: <vkoul@kernel.org>, <corbet@lwn.net>, <thara.gopinath@gmail.com>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <martin.petersen@oracle.com>, <enghua.yu@intel.com>,
-        <u.kleine-koenig@baylibre.com>, <dmaengine@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-crypto@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>
-CC: <quic_mdalam@quicinc.com>, <quic_utiwari@quicinc.com>,
-        <quic_srichara@quicinc.com>, <quic_varada@quicinc.com>
-Subject: [PATCH v6 12/12] crypto: qce - Add support for lock/unlock in aead
-Date: Wed, 15 Jan 2025 16:00:04 +0530
-Message-ID: <20250115103004.3350561-13-quic_mdalam@quicinc.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250115103004.3350561-1-quic_mdalam@quicinc.com>
-References: <20250115103004.3350561-1-quic_mdalam@quicinc.com>
+	dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b="CXjDm+17"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=xry111.site;
+	s=default; t=1736939596;
+	bh=TIRWEc6iv4vNAwxX3OZhGuWgMguFtBQtmtfJppqdcpg=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=CXjDm+17Uj4g5U4ToE3QNhSLJC9mScGz4NO4j6J+LpaarhSwU1Ll+qwZlOWQmTHDz
+	 I9tH7++LKivPqJtRj4EILjeo4NWofvLTcnkMDEHKKDP6ZJxsUfSDyXFK5iVGbNXE1a
+	 9TGabWZZVxCi5phUbqOXjXveH4+v+FiJA7qiIBuA=
+Received: from [192.168.124.9] (unknown [113.200.174.11])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature ECDSA (secp384r1) server-digest SHA384)
+	(Client did not present a certificate)
+	(Authenticated sender: xry111@xry111.site)
+	by xry111.site (Postfix) with ESMTPSA id 4963E1A428C;
+	Wed, 15 Jan 2025 06:13:13 -0500 (EST)
+Message-ID: <d56121dc6c6953d4f052be5da5203a4e28676b4e.camel@xry111.site>
+Subject: Re: [PATCH v1 3/3] misc: ls6000se-sdf: Add driver for Loongson
+ 6000SE SDF
+From: Xi Ruoyao <xry111@xry111.site>
+To: "Zheng, Yaofei" <Yaofei.Zheng@dell.com>, Greg Kroah-Hartman
+	 <gregkh@linuxfoundation.org>, Qunqin Zhao <zhaoqunqin@loongson.cn>
+Cc: Arnd Bergmann <arnd@arndb.de>, Lee Jones <lee@kernel.org>, Herbert Xu	
+ <herbert@gondor.apana.org.au>, "linux-kernel@vger.kernel.org"	
+ <linux-kernel@vger.kernel.org>, "loongarch@lists.linux.dev"	
+ <loongarch@lists.linux.dev>, "David S . Miller" <davem@davemloft.net>, 
+ "linux-crypto@vger.kernel.org"	 <linux-crypto@vger.kernel.org>,
+ "derek.kiernan@amd.com" <derek.kiernan@amd.com>,  "dragan.cvetic@amd.com"	
+ <dragan.cvetic@amd.com>, Yinggang Gu <guyinggang@loongson.cn>
+Date: Wed, 15 Jan 2025 19:13:10 +0800
+In-Reply-To: <SA3PR19MB73993DCBDE9117AA1E77C127F9192@SA3PR19MB7399.namprd19.prod.outlook.com>
+References: <20250114095527.23722-1-zhaoqunqin@loongson.cn>
+	 <20250114095527.23722-4-zhaoqunqin@loongson.cn>
+	 <ee65851c-4149-4927-a2e7-356cdce2ba25@app.fastmail.com>
+	 <97000576d4ba6d94cea70363e321665476697052.camel@xry111.site>
+	 <2025011407-muppet-hurricane-196f@gregkh>
+	 <122aab11-f657-a48e-6b83-0e01ddd20ed3@loongson.cn>
+	 <2025011527-antacid-spilt-cbef@gregkh>
+	 <SA3PR19MB73993DCBDE9117AA1E77C127F9192@SA3PR19MB7399.namprd19.prod.outlook.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.3 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: iQZy2B3ZVOUUrTn2osWcfrmz5ZEwrRns
-X-Proofpoint-GUID: iQZy2B3ZVOUUrTn2osWcfrmz5ZEwrRns
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-15_04,2025-01-15_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 suspectscore=0
- spamscore=0 mlxscore=0 lowpriorityscore=0 malwarescore=0 adultscore=0
- clxscore=1015 priorityscore=1501 impostorscore=0 bulkscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2501150079
 
-Add support for lock/unlock on bam pipe in aead.
-If multiple EE's(Execution Environment) try to access
-the same crypto engine then before accessing the crypto
-engine EE's has to lock the bam pipe and then submit the
-request to crypto engine. Once request done then EE's has
-to unlock the bam pipe so that others EE's can access the
-crypto engine.
+On Wed, 2025-01-15 at 10:39 +0000, Zheng, Yaofei wrote:
+>=20
+> Internal Use - Confidential
+> > On Wed, Jan 15, 2025 at 10:58:52AM +0800, Qunqin Zhao wrote:
+> > >=20
+> > > =E5=9C=A8 2025/1/14 =E4=B8=8B=E5=8D=889:21, Greg Kroah-Hartman =E5=86=
+=99=E9=81=93:
+> > > > On Tue, Jan 14, 2025 at 06:43:24PM +0800, Xi Ruoyao wrote:
+> > > > > On Tue, 2025-01-14 at 11:17 +0100, Arnd Bergmann wrote:
+> > > > > > On Tue, Jan 14, 2025, at 10:55, Qunqin Zhao wrote:
+> > > > > > > Loongson Secure Device Function device supports the functions
+> > > > > > > specified in "GB/T 36322-2018". This driver is only
+> > > > > > > responsible for sending user data to SDF devices or returning=
+ SDF device data to users.
+> > > > > > I haven't been able to find a public version of the standard
+> > > > > A public copy is available at
+> > > > > https://openstd.samr.gov.cn/bzgk/gb/ne
+> > > > > wGbInfo?hcno=3D69E793FE1769D120C82F78447802E14F__;!!LpKI!g7kUt84v=
+Oxl
+> > > > > 65EbgAJzXoupsM5Bx3FjUDPnKHaEw5RUoyUouS6IwCerRSZ7MIWi0Bw5WHaM2YP7p=
+Z
+> > > > > IcYiDQOLf3F$ [openstd[.]samr[.]gov[.]cn], pressing the blue
+> > > > > "online preview" button, enter a captcha and you can see it.=C2=
+=A0 But the copy is in Chinese, and there's an explicit notice saying trans=
+lating this copy is forbidden, so I cannot translate it for you either.
+> > > > >=20
+> > > > > > but
+> > > > > > from the table of contents it sounds like this is a standard fo=
+r
+> > > > > > cryptographic functions that would otherwise be implemented by =
+a
+> > > > > > driver in drivers/crypto/ so it can use the normal abstractions
+> > > > > > for both userspace and in-kernel users.
+> > > > > >=20
+> > > > > > Is there some reason this doesn't work?
+> > > > > I'm not an lawyer but I guess contributing code for that may have
+> > > > > some "cryptography code export rule compliance" issue.
+> > > > Issue with what?=C2=A0 And why?=C2=A0 It's enabling the functionali=
+ty of the
+> > > > hardware either way, so the same rules should apply no matter where
+> > > > the driver ends up in or what apis it is written against, right?
+> > >=20
+> > > SDF and tpm2.0 are both=C2=A0 "library specifications",=C2=A0 which m=
+eans that
+> > >=20
+> > > it supports a wide variety of functions not only cryptographic
+> > > functions,
+> > >=20
+> > > but unlike tpm2.0, SDF is only used in China.
+> > >=20
+> > > You can refer to the tpm2.0 specification:
+> > > https://trustedcomputinggroup.org/resource
+> > > /tpm-library-specification/__;!!LpKI!g7kUt84vOxl65EbgAJzXoupsM5Bx3FjU=
+D
+> > > PnKHaEw5RUoyUouS6IwCerRSZ7MIWi0Bw5WHaM2YP7pZIcYiCFoP-hu$
+> > > [trustedcomputinggroup[.]org]
+> >=20
+> > So this is an accelerator device somehow?=C2=A0 If it provides crypto f=
+unctions, it must follow the crypto api, you can't just provide a "raw"
+> > char device node for it as that's not going to be portable at all.
+> > Please fit it into the proper kernel subsystem for the proper user/kern=
+el api needed to drive this hardware.
+> >=20
+> > thanks,
+> >=20
+> > greg k-h
+> >=20
+>=20
+> Hi Qunqin and Ruoyao,
+>=20
+> "GB/T 36322-2018" is just a chinese national standard, not ISO standard, =
+not an
+> enforced one, "T" repensts "=E6=8E=A8=E8=8D=90" which means "recommend". =
+From what I understand
+> =C2=A0it defined series of C API for cryptography devices after reading t=
+he standard.
+> Linux kernel have user space socket interface using type AF_ALG, and out =
+of tree
+> =C2=A0driver "Cryptodev". From my view: "GB/T 36322-2018" can be user spa=
+ce library
+> using socket interface, just like openssl, if must do it char dev way, do=
+ it out
+> =C2=A0of tree, and reuse kernel space crypto API.
 
-Signed-off-by: Md Sadre Alam <quic_mdalam@quicinc.com>
----
+Figure 1 of the section 6.1 says the GB/T 36322 interface is between
+"cryptography device" and "generic cryptography service and cryptography
+device management."  IMO in a Linux (or any monolithic-kernel) system at
+least "cryptography device management" is the job of the kernel, thus
+exposing the GB/T 36322 interface directly to the userspace seems not a
+good idea.
 
-Change in [v6]
-
-* No change
-
-Change in [v5]
-
-* No change
-
-Change in [v4]
-
-* No change
- 
-Change in [v3]
-
-* Move qce_bam_release_lock() after qca_dma_terminate_all()
-  api
-
-Change in [v2]
-
-* Added qce_bam_acquire_lock() and qce_bam_release_lock()
-  api for aead
-
-Change in [v1]
-
-* This patch was not included in [v1]
-
- drivers/crypto/qce/aead.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/drivers/crypto/qce/aead.c b/drivers/crypto/qce/aead.c
-index 97b56e92ea33..cbc2016a8ad0 100644
---- a/drivers/crypto/qce/aead.c
-+++ b/drivers/crypto/qce/aead.c
-@@ -63,6 +63,8 @@ static void qce_aead_done(void *data)
- 		sg_free_table(&rctx->dst_tbl);
- 	}
- 
-+	qce_bam_release_lock(qce);
-+
- 	error = qce_check_status(qce, &status);
- 	if (error < 0 && (error != -EBADMSG))
- 		dev_err(qce->dev, "aead operation error (%x)\n", status);
-@@ -433,6 +435,8 @@ qce_aead_async_req_handle(struct crypto_async_request *async_req)
- 	else
- 		rctx->assoclen = req->assoclen;
- 
-+	qce_bam_acquire_lock(qce);
-+
- 	diff_dst = (req->src != req->dst) ? true : false;
- 	dir_src = diff_dst ? DMA_TO_DEVICE : DMA_BIDIRECTIONAL;
- 	dir_dst = diff_dst ? DMA_FROM_DEVICE : DMA_BIDIRECTIONAL;
--- 
-2.34.1
-
+--=20
+Xi Ruoyao <xry111@xry111.site>
+School of Aerospace Science and Technology, Xidian University
