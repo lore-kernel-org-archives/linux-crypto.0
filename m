@@ -1,124 +1,98 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A11481DE2C6;
-	Thu, 16 Jan 2025 11:48:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC26A22A819;
+	Thu, 16 Jan 2025 14:36:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737028133; cv=none; b=Vi2QOeRV0zCjIKvLnm0DFWVv4/ysj1QYKbFzrMK9TiTBDF3DEUZb0rcp51XSckJKsVz7ivoSpXEElE3n22p+YfQvcw2rmFxfBPZiXmg9e8ZA9TZehUFH2SYvp1UY938VOOD1RyucrmC5VcH0XUGPaa4UiTI3nw91q9xlrf1wJHI=
+	t=1737038185; cv=none; b=EgLG/J3KOoibiMnok9lMROSg8zzOxouumiOvD53FyEgoZ5ilRsFQroA0OCKRbbrJwdJb6p4jcy7vwkwuFnlyyVeN64V4Cf8GkjSPgU8q2lEyEstSBwaFh2uY3FVeFsUi3LYeMC/yyvgkQXNfJ/ekLP6zprNCc7c5rqJZDYGZKOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737028133; c=relaxed/simple;
-	bh=Lw4wjAUigKzBAUDQnvuZb4RB/km3WbYe+PynVWIOnQE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UeDFC0fkWLsQpNvPsjd1P0EQdZI5u7ZwWyoUSXtE1aOhzv7zGk3cdFQP/9UyT5MGaVcP0KxC0NqC3SRr7Z7FaVwxXfoi/i0QU2sIblYpi9GUaJDLh7Bd1uEaufydzSoepA3w3ZWiSsuZJLvEf3w1hOartIot8oDAeNcqLImu5aU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=kLIWNy4z; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1737038185; c=relaxed/simple;
+	bh=FiiklmuVQ48wobf73XaFq2HgoMDJEKBkny1o2AN87mY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ttDqqY6VyOZeTsZZx7+SfUYqdtYahi9d1GUW9KCTrd2a5vLKK1eEim/xuflpqhnBj5Fe8es1DsG4dhGlv5YdNuvnSBlAbmkE6XR8Qr0HlcbZ/qd4kZzL0x8986y569tRvLP+aPyiZHVwC9g8E2Hlhm9pBmsXZsmQqW1svGi5KnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bh5Qpd/F; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="kLIWNy4z"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50G3qjc4005877;
-	Thu, 16 Jan 2025 11:48:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=+xgvNP4z2pVkcvpTDSHfoQCpM3nse3
-	2c8mpx7FXqAvg=; b=kLIWNy4zL5Y5d6PkjnnOJZWv2DFdqKHWq37n0sIxRIML4n
-	q95gw/kzWsc4kTMeY5TfTJqywVtaGJ0WaPQhGUNlKC58mN6lNcqatrjNy+MnVScQ
-	BdEJPadtwpEuh6Vj8GLUFj3bvNZYORcYxg8pTwUtDT9dIn6P7i11ad+/G/6VPRXI
-	pVqjkd5a/kY1JRBlmdDJMIl9WQJGXYLxCWj3uTIUo7BShXRsvQygLAtMVwg0tBhB
-	64w+njncburLeQg3iT/HGhZknNnw4gO2Gz0ZTX3aMYyRzCCm/u8FCRetFTXKqVjH
-	Btc8E4dsTEVzsKG1P24cqsHtWlal27/CjpBB+jQg==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 446tkcj2c0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 Jan 2025 11:48:31 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50GBia3N022145;
-	Thu, 16 Jan 2025 11:48:30 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 446tkcj2bv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 Jan 2025 11:48:30 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50GA62Qb007519;
-	Thu, 16 Jan 2025 11:48:29 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4443yndmvw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 16 Jan 2025 11:48:28 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50GBmRls58196414
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 16 Jan 2025 11:48:27 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id F0C2120049;
-	Thu, 16 Jan 2025 11:48:26 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id AE68F20040;
-	Thu, 16 Jan 2025 11:48:26 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Thu, 16 Jan 2025 11:48:26 +0000 (GMT)
-Date: Thu, 16 Jan 2025 12:48:25 +0100
-From: Alexander Gordeev <agordeev@linux.ibm.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Michael Kelley <mhklinux@outlook.com>, Breno Leitao <leitao@debian.org>,
-        "saeedm@nvidia.com" <saeedm@nvidia.com>,
-        "tariqt@nvidia.com" <tariqt@nvidia.com>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>, Thomas Graf <tgraf@suug.ch>,
-        Tejun Heo <tj@kernel.org>, Hao Luo <haoluo@google.com>,
-        Josh Don <joshdon@google.com>, Barret Rhoden <brho@google.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Zaslonko Mikhail <zaslonko@linux.ibm.com>
-Subject: Re: [v3 PATCH] rhashtable: Fix rhashtable_try_insert test
-Message-ID: <Z4jyCZQOy8JMVu3Q@tuxmaker.boeblingen.de.ibm.com>
-References: <Z1rYGzEpMub4Fp6i@gondor.apana.org.au>
- <Z2aFL3dNLYOcmzH3@gondor.apana.org.au>
- <20250102-daffy-vanilla-boar-6e1a61@leitao>
- <SN6PR02MB41572415707F0FA6D9A61247D4132@SN6PR02MB4157.namprd02.prod.outlook.com>
- <20250109-marigold-bandicoot-of-exercise-8ebede@leitao>
- <Z4DoFYQ3ytB-wS3-@gondor.apana.org.au>
- <SN6PR02MB41577C2C4EB260F3D2D4F85FD41C2@SN6PR02MB4157.namprd02.prod.outlook.com>
- <Z4FXs8vAtitHIJyl@gondor.apana.org.au>
- <SN6PR02MB41570F1F5F4F579B4E8F0CD3D41C2@SN6PR02MB4157.namprd02.prod.outlook.com>
- <Z4XWx5X0doetOJni@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bh5Qpd/F"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 857AAC4AF0B;
+	Thu, 16 Jan 2025 14:36:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737038185;
+	bh=FiiklmuVQ48wobf73XaFq2HgoMDJEKBkny1o2AN87mY=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=bh5Qpd/FO/trwLTppndIl0ClqLOZKDupI0HfQqr/N+58vQ9Sc+Zq9OKEz1+kjG+ND
+	 08BNvWhn6+QymLP7tgyGj5KlL9VOLB1ruyE1YEY19VC+fw+Ww7r99PTryI83DvFigc
+	 RCswhnZ3SbczwBNodZ8wPdLOUPjljVY8AgG5HFkN94W6m4vnXn/oOJTGHOKq8zYd38
+	 UkcVowwwVBSOsCq875wafqHbLeHVOCH6ETDDkLNviI2yyjxf1SLXKGgAXDtPDv7q2G
+	 1eridOKCDIDoePONQsHmC8quhVEGhPYklEBxOczc65TwoMFL4q2tyrj8brwPKvwbV8
+	 zpimYppYBtRRA==
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-54024aa9febso1134910e87.1;
+        Thu, 16 Jan 2025 06:36:25 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUaV10zX07ejzPUN6wgSsOQXbHF41s5TD7sIDCyGOPqDnJR54NKIg0QOSJ6bBvjb6MgMuECFr7IiP1ep5Ja@vger.kernel.org, AJvYcCUqZRxdOSxhWwRwZ6tuFAqvjQKZHIZaCtfevZFvhW+ZeF21sSi/rgMasH48Gm3lnOuLNTW/2+niAjzi9SoKJg==@vger.kernel.org, AJvYcCX/PB+7kyS1umR1/RKKKRw7vd5ECSlHQ125vkIdeOm6kyc0k7KVlxflgQCm6F7tfIgD1FjIPa4ZT0KK@vger.kernel.org, AJvYcCXPZECs2NR782MEyfRI3ZtMki3n4sfofGZ5C6TrOlBfuKfMd+rN20TuXM5vhR1Z+AjMgyN5JdT3zPFlKZ6Y@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxqb9DJG9YYHUjiIEGbcD8icquQwOG/XQaJ0YgfX4f4F3f5vHxc
+	Czx1iChM3yHZXp/tzpLuvw6OKkiKzGybQEgQmdgZ84OVi/pNbqYovU78yK3TLn/zigfeeYuqS8w
+	KzP11qjHvSrxSdn/3vfq16gfNgw==
+X-Google-Smtp-Source: AGHT+IEFzH2u5Nw9ZXYRK3qBr2cKgPlDigIbcDFb/MZh/WsuuT8v5gUM8CjDCoS/kXKFX5RJ7PzvY64JLC8o2O1CXCg=
+X-Received: by 2002:a05:6512:104f:b0:542:9636:297e with SMTP id
+ 2adb3069b0e04-54296362a66mr5750572e87.25.1737038183921; Thu, 16 Jan 2025
+ 06:36:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z4XWx5X0doetOJni@gondor.apana.org.au>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: hf-R3-h7RehK4HoSkpmbwde3SAJhOX-A
-X-Proofpoint-GUID: Ls7pGjaLPrYOTwLcB5MjMFoEaNuc74Jt
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-16_05,2025-01-16_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 malwarescore=0
- impostorscore=0 mlxscore=0 spamscore=0 priorityscore=1501
- lowpriorityscore=0 bulkscore=0 suspectscore=0 clxscore=1011
- mlxlogscore=686 phishscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2411120000 definitions=main-2501160086
+References: <20241017144500.3968797-1-quic_yrangana@quicinc.com> <20241017144500.3968797-3-quic_yrangana@quicinc.com>
+In-Reply-To: <20241017144500.3968797-3-quic_yrangana@quicinc.com>
+From: Rob Herring <robh@kernel.org>
+Date: Thu, 16 Jan 2025 08:36:11 -0600
+X-Gmail-Original-Message-ID: <CAL_JsqJG_w9jyWjVR=QnPuJganG4uj9+9cEXZ__UAiCw2ZYZZA@mail.gmail.com>
+X-Gm-Features: AbW1kvYzoDssOTmlGaP7OaxU7PUBm1fSMtQeaMIHjNtOTnwTDryLuMJ_SwVS4zw
+Message-ID: <CAL_JsqJG_w9jyWjVR=QnPuJganG4uj9+9cEXZ__UAiCw2ZYZZA@mail.gmail.com>
+Subject: Re: [PATCH V1 2/2] arm64: dts: qcom: sa8775p: add QCrypto nodes
+To: Yuvaraj Ranganathan <quic_yrangana@quicinc.com>
+Cc: Thara Gopinath <thara.gopinath@gmail.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+	Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konradybcio@kernel.org>, Bhupesh Sharma <bhupesh.sharma@linaro.org>, 
+	linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	quic_sravank@quicinc.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 14, 2025 at 11:15:19AM +0800, Herbert Xu wrote:
+On Thu, Oct 17, 2024 at 9:45=E2=80=AFAM Yuvaraj Ranganathan
+<quic_yrangana@quicinc.com> wrote:
+>
+> Add the QCE and Crypto BAM DMA nodes.
+>
+> Signed-off-by: Yuvaraj Ranganathan <quic_yrangana@quicinc.com>
+> ---
+>  arch/arm64/boot/dts/qcom/sa8775p.dtsi | 22 ++++++++++++++++++++++
+>  1 file changed, 22 insertions(+)
+>
+> diff --git a/arch/arm64/boot/dts/qcom/sa8775p.dtsi b/arch/arm64/boot/dts/=
+qcom/sa8775p.dtsi
+> index e8dbc8d820a6..c1c53f81a555 100644
+> --- a/arch/arm64/boot/dts/qcom/sa8775p.dtsi
+> +++ b/arch/arm64/boot/dts/qcom/sa8775p.dtsi
+> @@ -1912,6 +1912,28 @@ ice: crypto@1d88000 {
+>                         clocks =3D <&gcc GCC_UFS_PHY_ICE_CORE_CLK>;
+>                 };
+>
+> +               cryptobam: dma-controller@1dc4000 {
+> +                       compatible =3D "qcom,bam-v1.7.4", "qcom,bam-v1.7.=
+0";
+> +                       reg =3D <0x0 0x01dc4000 0x0 0x28000>;
+> +                       interrupts =3D <GIC_SPI 272 IRQ_TYPE_LEVEL_HIGH>;
+> +                       #dma-cells =3D <1>;
+> +                       qcom,ee =3D <0>;
+> +                       qcom,controlled-remotely;
+> +                       iommus =3D <&apps_smmu 0x480 0x00>,
+> +                                <&apps_smmu 0x481 0x00>;
+> +               };
+> +
+> +               crypto: crypto@1dfa000 {
+> +                       compatible =3D "qcom,sa8775p-qce", "qcom,qce";
 
-Hi Herbert,
-
-> Thanks for testing! The patch needs one more change though as
-> moving the atomic_inc outside of the lock was a bad idea on my
-> part.  This could cause atomic_inc/atomic_dec to be reordered
-> thus resulting in an underflow.
-
-I want to confirm that this patch fixes massive strangenesses and
-few crashes observed on s390 systems, in addition to OOMs reported
-by Mikhail Zaslonko earlier.
-
-> Thanks,
-
-Thanks!
+This one also doesn't match the schema...
