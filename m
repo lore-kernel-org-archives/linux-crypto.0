@@ -1,121 +1,174 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2051.outbound.protection.outlook.com [40.107.236.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E851149C55
-	for <linux-crypto@vger.kernel.org>; Fri, 17 Jan 2025 21:17:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737148625; cv=none; b=M6BaUgLQWb2nWqZq7LHVgzSoVT+Mb8XVbKxTIPK/zSoaze82QjuhcTsHl3vPMznfeYViwvRBfXtfHz9RRdtxDSQbScHgnESxbjzdGR+ddO1rIGG0y8DbvfVd0F/a2QQps+LQElDi51tUovHtDfMYuP+bC9VDJE4aLVsDG2S1xcc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737148625; c=relaxed/simple;
-	bh=CwBmFP/YMO6KqmY3VctOWXN30/ZzmGRzxM1I81yc9Po=;
-	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=oI+YGAcJuVE1/k1c9yViu8ypA3eKJF/69T31mCdG0g5+3Ijtg3UDqexVz6Pshp2y/hTy9VtrJOeDTmyrVZ/jgVZyG1JG7u3OwmaCMCfki/F3yqfyrU0GRk/OvJBNZgpYftC3QBEKwZhxnCGAmZCtXgGUWGPrI3OxmOv7Eo9aqM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FBnDzaCl; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7AC119CC27;
+	Fri, 17 Jan 2025 23:06:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737155170; cv=fail; b=dyBRgRxWeOqIPzUJwdPa1j56KW5BolsJIiduHGI06qIRtDufEXnJD1VtdZ4asork6WFmWGNL9xPVewCvAng63RqRsRZfXJrEBl6CzmwU7hCJMxdpM34AYlJSs3hc14MEtttfR3ONzWUmB2XSAki8B02NA2Q7kT+y2bBYCyqRwxE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737155170; c=relaxed/simple;
+	bh=OTR9h8QePVb5IZyKL8sdfIiNUaUsUbJbPVe+DTAgcSQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=meFN2ns5UiN2mer2hcpcYNg9zvGJVJmxPgItt3P96NGug5al+MyrktEa4vMvbjIOl502MGwotU1PjAbO/EPj92sdorpTWEItDws339n74XhVMf5fcd0JueYAGgD61spsQwjKMXVvBSmNC9HFNJjw7yhVYe6JVbIEj14MxXFf39k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=z52x9VYb; arc=fail smtp.client-ip=40.107.236.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FBnDzaCl"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737148622;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=Ua0SGNyvuT1kxIzy+RNpyrvAiXO1J40KcJJ7nVEy62M=;
-	b=FBnDzaCly7/qcepkXR+paditHrNO/rwuawypZ9hLfwGF8i0pRRvkRTTM7KltRMHOs//YfT
-	VLOFV2wP9/CfoFAbMI+33JxUlapshQT75ztExAN7OtpObzEboDrUd89DP0THL/FOhHsiAh
-	hGIfsMRCkijUhRLZvDyinFLRrtuu+No=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-660-qpBZ4n8tNsygLAgiGWDXSw-1; Fri,
- 17 Jan 2025 16:16:59 -0500
-X-MC-Unique: qpBZ4n8tNsygLAgiGWDXSw-1
-X-Mimecast-MFC-AGG-ID: qpBZ4n8tNsygLAgiGWDXSw
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 49CCA195608A;
-	Fri, 17 Jan 2025 21:16:57 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.5])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E786719560BF;
-	Fri, 17 Jan 2025 21:16:53 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: lsf-pc@lists.linux-foundation.org,
-    John Hubbard <jhubbard@nvidia.com>,
-    Matthew Wilcox <willy@infradead.org>
-cc: dhowells@redhat.com, brauner@kernel.org,
-    Herbert Xu <herbert@gondor.apana.org.au>,
-    linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org,
-    linux-mm@kvack.org, linux-block@vger.kernel.org
-Subject: [LSF/MM/BPF TOPIC] Improving iov_iter - and replacing scatterlists
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="z52x9VYb"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=WDTzUlS5Zf6F+7M0zf8oMT1bn2sffstDn92HwjJmY9SkMkLEh6yrxuO3Sym056qUH989tAMK5UYTLDgj1aurQkRV0iyWvyZe0p/xMZMqFy0vzyRDaezMwO0+SL/s9eUvUMD+qZZAWnvp7VSWtGk5NbDJWhhXMn54084KYND3ZLaDF1cpq1FY38s0Dq5GbOvgTurSbLBdzhJKvUAA8kgd9gdNF1N2398emLHM36es2k+X3C2P9er6o2ozFG49mgdCyEtf1+gssXi+hxdRAEjx+Xbfm5+oAaXP8dIIrhjA8ftK0zyFiaymDGhjrmg8IXwMGQF+aTeFNSk+z+vDCmwOKQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6ySIk3pBIjSKn4YITxkTGquDYfdPwbdRvOGnaUY9hSI=;
+ b=kZELUwuG0fAIBCAQS2J+Knd4ZHmsnWttGjBXcT3WmeuhSjHP78VQZV1JEphHQlbAwveqcE1pQmsM2Lh0IhTi5iv8LYfFfty5wFlgRKcStP783fkbP4GktSbx7XGC4wXEE2GAa1wyjrMAKKJ5mW1jm9Iz/f1S/1UgmljUcurcZOKirm89pwQdO7tDUzEBdl7Gz6db2QKDyPrew32rLQBsAtsKclNYOaUtjVtVryJUC6wKFxXO6Xn9Ych2v+2/PuL2vIKuYdrUwR6gLVQavrudlcebuykevG8dsYMlreNcYxU/RxGty8GlYxZuX4w0Cj1vgTX08N3EmgEkhx6u4znTIw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6ySIk3pBIjSKn4YITxkTGquDYfdPwbdRvOGnaUY9hSI=;
+ b=z52x9VYbxeaC7r8RoOFmPtZyBZ0GWq8iJgUTTN9CqYqR4MeFbwZ1TbIG4TznKmgzrUUFdp7+89mMrXp1spWgfo3rhhEi8O/4abhRzGcGhqPzlbsfy+HHgMi7TE/LR5pxNRNDxRtFA2S9mUKwBIYBTTUBqN5hvCFS1XgIFrmsRBw=
+Received: from PH8PR02CA0027.namprd02.prod.outlook.com (2603:10b6:510:2da::18)
+ by SJ2PR12MB9239.namprd12.prod.outlook.com (2603:10b6:a03:55e::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.14; Fri, 17 Jan
+ 2025 23:06:02 +0000
+Received: from SJ1PEPF000023D5.namprd21.prod.outlook.com
+ (2603:10b6:510:2da:cafe::3) by PH8PR02CA0027.outlook.office365.com
+ (2603:10b6:510:2da::18) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8356.16 via Frontend Transport; Fri,
+ 17 Jan 2025 23:06:01 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ SJ1PEPF000023D5.mail.protection.outlook.com (10.167.244.70) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8377.0 via Frontend Transport; Fri, 17 Jan 2025 23:06:01 +0000
+Received: from tlendack-t1.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 17 Jan
+ 2025 17:06:00 -0600
+From: Tom Lendacky <thomas.lendacky@amd.com>
+To: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: Herbert Xu <herbert@gondor.apana.org.au>, David Miller
+	<davem@davemloft.net>, John Allen <john.allen@amd.com>,
+	<stable@vger.kernel.org>
+Subject: [PATCH] crypto: ccp - Fix check for the primary ASP device
+Date: Fri, 17 Jan 2025 17:05:47 -0600
+Message-ID: <9cb3a054c95327fe26de41419dd23c914f141614.1737155147.git.thomas.lendacky@amd.com>
+X-Mailer: git-send-email 2.46.2
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <886958.1737148612.1@warthog.procyon.org.uk>
-Date: Fri, 17 Jan 2025 21:16:52 +0000
-Message-ID: <886959.1737148612@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF000023D5:EE_|SJ2PR12MB9239:EE_
+X-MS-Office365-Filtering-Correlation-Id: ecdd0a57-e4fd-4a76-58b0-08dd374b831a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|1800799024|36860700013|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?qxgldtWcx8aFQP2h3rVXh1ocb6e+F++yno9jD6WTPqvyDQBjQ9gue9vJKcxv?=
+ =?us-ascii?Q?rx6kVFpymyfCaKV3n/MDToRhEr+t01FwJUlEJfYtej3WnPsvFTsbwgYTvLeO?=
+ =?us-ascii?Q?goHNTRvIm/itsEwt6HxYvX3QmdVbLuMKmSr4R+TeA8udhRPwfPTvZt5IdvYT?=
+ =?us-ascii?Q?bbUuTR3xzBEU2hkfFrSCy/N9lcmGFSf6OOMqsT0qOWtsUVVZBEoDJ9VSyIGX?=
+ =?us-ascii?Q?PY5LkAktZJgi6+UOo/lMrHmi2JtOTnw6lV/wnF8pOthHvqS7XuXqfPxCPaUj?=
+ =?us-ascii?Q?DNiJuMNUQ5hfQafgS3//oiizgl/vom1PHfPbESZK7vPtUeuivClbahZsar7d?=
+ =?us-ascii?Q?xZd0onEWWBIrVBO2X4qNxcqVPxR4fK1nnGnfZRuhHyKXO3XAA7gocRPDR6s9?=
+ =?us-ascii?Q?nQX2hTvArGEOjeqTuRZIij5KS/TvWFFSbNd2vSNMc9vOFC4T2X9RNS98GLA7?=
+ =?us-ascii?Q?S/r0Dbf65FjlF5xm72wnxYXy/OdKgnvyK/NaGSYDMeLvPNZvaNsxq1/W75X0?=
+ =?us-ascii?Q?0nKlluDnTnuTu+yiAKOYJ3AztuctB+ZJk8mrpxy6iGbN2i3jyTnkGsUYqUDn?=
+ =?us-ascii?Q?zGe6kS1FembvyLwvSVDIVtOfQUassa+x2a8ScjNwHRqfuE7gW+jaRPZREmIP?=
+ =?us-ascii?Q?0vUk5r5Y3vERgFdQZD2cRZ9QSxUQHtQJ84ZMqQ9vTREzw02ZHsqfemmA/YJk?=
+ =?us-ascii?Q?6Rve66vVlzFVXWxKZYjG5oU1y/6yllxTrSrM1Pdq1gQxw45YbyAD8Cuk24Aj?=
+ =?us-ascii?Q?HzT0Q0n8dZT5u9SKd9nRhjKySKll9bAbm/MfDhp3xG6wfGLOlmhQuPiIdwKa?=
+ =?us-ascii?Q?w2AKNHzJPglOKSJD4lE29OFIN/Te0Zy8APwm63KRxTAfeGxyN5PJfxGrAABm?=
+ =?us-ascii?Q?EPwG5Yna84w1MauU4CfhaZ6EUYnBCZStgulRAXK/M0QAVWhFcyi5i3XWbjq7?=
+ =?us-ascii?Q?jfA2k/r/32hKMprld4xgK05aRpoBu9BXRBvzDDlGC9Ve9f7uxGC+TAxL8E27?=
+ =?us-ascii?Q?hz7EK2FEf/qEApslKDJjZIdlHWQhBvyR+pQuufuS3SVzsv/9a8d8vPV7NBMX?=
+ =?us-ascii?Q?NUsr5nlr7X8woz1lkf7yoCxskPMt80lSXV29B5W1L7cc/xKZW1jlJuIxzMBI?=
+ =?us-ascii?Q?BqCT1HmqSX01zcm4c6DEHiJj5gETGstMWgY+fkoz+nBO70YNZo42JJa+kvVx?=
+ =?us-ascii?Q?Sa8V8yNtQ8DxL3ce3k2E1OvgwtWw1wP6M7eZ96iN6TnIx5ALepHc8D4Ui7Ql?=
+ =?us-ascii?Q?2SiuFmMUCkCVKzns+4JBh23FpUPEt1sRiIQG3Vgx/aPVBAHADXZMO7zd6qMF?=
+ =?us-ascii?Q?TcJgebhpJx9bF0QNWi29gZEti5zfzWyaCxqDyPRqQrQBG6FxeBdclXBoAtyP?=
+ =?us-ascii?Q?DN1bYu61OU6hU92Y07G/urIvRGsl3xnqrN6dE2gELbGVeA9mX5W3DDfRFqsL?=
+ =?us-ascii?Q?qIkdncmxBWZxBYuFY5oEfTz6y08IWgjZFbLgSbQMjbE4i7BPP4d/Oaj2EDhA?=
+ =?us-ascii?Q?sQ8V6YKekFVlvec=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(1800799024)(36860700013)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jan 2025 23:06:01.6532
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: ecdd0a57-e4fd-4a76-58b0-08dd374b831a
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF000023D5.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB9239
 
-Hi,
+Currently, the ASP primary device check does not have support for PCI
+domains, and, as a result, when the system is configured with PCI domains
+(PCI segments) the wrong device can be selected as primary. This results
+in commands submitted to the device timing out and failing. The device
+check also relies on specific device and function assignments that may
+not hold in the future.
 
-I'd like to propose a discussion of two things: firstly, how might we improve
-iov_iter and, secondly, would it be possible to replace scatterlists.
+Fix the primary ASP device check to include support for PCI domains and
+to perform proper checking of the Bus/Device/Function positions.
 
-[*] First: Improvements to iov_iter.
+Fixes: 2a6170dfe755 ("crypto: ccp: Add Platform Security Processor (PSP) device support")
+Cc: stable@vger.kernel.org
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+---
+ drivers/crypto/ccp/sp-pci.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-I'm trying to get rid of ITER_XARRAY; xarrays are too unstable (in the sense
-that their contents can shift under you).
+diff --git a/drivers/crypto/ccp/sp-pci.c b/drivers/crypto/ccp/sp-pci.c
+index 248d98fd8c48..157f9a9ed636 100644
+--- a/drivers/crypto/ccp/sp-pci.c
++++ b/drivers/crypto/ccp/sp-pci.c
+@@ -189,14 +189,17 @@ static bool sp_pci_is_master(struct sp_device *sp)
+ 	pdev_new = to_pci_dev(dev_new);
+ 	pdev_cur = to_pci_dev(dev_cur);
+ 
+-	if (pdev_new->bus->number < pdev_cur->bus->number)
+-		return true;
++	if (pci_domain_nr(pdev_new->bus) != pci_domain_nr(pdev_cur->bus))
++		return pci_domain_nr(pdev_new->bus) < pci_domain_nr(pdev_cur->bus);
+ 
+-	if (PCI_SLOT(pdev_new->devfn) < PCI_SLOT(pdev_cur->devfn))
+-		return true;
++	if (pdev_new->bus->number != pdev_cur->bus->number)
++		return pdev_new->bus->number < pdev_cur->bus->number;
+ 
+-	if (PCI_FUNC(pdev_new->devfn) < PCI_FUNC(pdev_cur->devfn))
+-		return true;
++	if (PCI_SLOT(pdev_new->devfn) != PCI_SLOT(pdev_cur->devfn))
++		return PCI_SLOT(pdev_new->devfn) < PCI_SLOT(pdev_cur->devfn);
++
++	if (PCI_FUNC(pdev_new->devfn) != PCI_FUNC(pdev_cur->devfn))
++		return PCI_FUNC(pdev_new->devfn) < PCI_FUNC(pdev_cur->devfn);
+ 
+ 	return false;
+ }
 
-I'm trying to replace that with ITER_FOLIOQ instead.  This is a segmented list
-of folios - so it can only hold folios, but has infinite capacity.  How easy
-would it be to extend this to be able to handle some other types of page, such
-as anon pages or stuff that's been spliced out of network receive buffers?
-
-Would it make sense to be able to have a chain of disparate types of object?
-Say a couple of kmalloc'd buffers, followed by a number of folios, followed by
-another kmalloc'd buffer and mark them such we know which ones can be DMA'd
-and which ones must be copied.
-
-Currently, the core iteration functions in linux/iov_iter.h each handle a
-specific type of iterable.  I wonder how much performance difference it would
-make to have each item in a list have its own type.  Now, I know, "try it and
-see" is a valid suggestion here.
-
-Rumour has it that John Hubbard may be working along similar lines, possibly
-just in the area of bio_vecs and ITER_BVEC.
-
-
-[*] Second: Can we replace the uses of scatterlist with iov_iter and reduce
-the number of iterator classes we have?
-
-One reason I'd like to do this is we have iov_iter at user end of the I/O
-stack, and it percolates down to various depths.  For network filesystems, for
-example, the socket API takes iov_iters, so we want to plumb iov_iters all the
-way down if we can - and have the filesystem know at little as possible about
-folios and pages if we can manage it.
-
-However, one thing that particularly stands out for me is that network
-filesystems often want to use the crypto API - and that means allocating and
-constructing a scatterlist to talk to the crypto API.  Having spent some time
-looking at crypto API, in most places iteration functions are used that mean
-that changing to use an iov_iter might not be so hard.
-
-That said, one thing that is made use of occasionally with scatterlists is the
-ability to chain something on the front.  That's significantly harder to do
-with iov_iter.
-
-That that said, one reason it's hard to modify the list attached to an
-iterator is that we allow iterators to be rewound, using state stored in the
-list to go backwards.  I wonder if it might be possible to get rid of
-iov_iter_revert() and use iterator copying instead.
-
-David
+base-commit: cd26cd65476711e2c69e0a049c0eeef4b743f5ac
+-- 
+2.46.2
 
