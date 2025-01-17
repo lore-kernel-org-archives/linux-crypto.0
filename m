@@ -1,95 +1,181 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 302B31F91F1
-	for <linux-crypto@vger.kernel.org>; Fri, 17 Jan 2025 08:30:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18FA21FC0FE;
+	Fri, 17 Jan 2025 13:21:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737102631; cv=none; b=Mfb5+pdQ/3PVKoisDiooimRmArzA6lgUzV6Ml8XBcnW/HNObDH8bD/zj9/OJPHCzOweHvSY0T/but1CwzxdqxFaX5xwudzJn8kh+3JKMaX8pPUcGWReK7dMKT9UZV9x6Fjbiqp++Cx4DI9vPR+p/08douFLagO3/jXteN+V4wyo=
+	t=1737120069; cv=none; b=GLckw81SwUh9hdG4yke6sD8+yW+0cTgBkw5QE7foHhD7c9PdEKUl5hULqCmcBjzUXpoHrSVut6FUmGWM1n34KzpV7aLN3l6NLLth62Bh/s0PxJjUb4WDxnqcPdKFzM9+Gr5GLXQCDFLNiPtR+uxIyvY5TSAsKlWFoKaK1XersPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737102631; c=relaxed/simple;
-	bh=d/g53UtwtoeMdjaT+R1dbBcyNXXLezqX3/UcNtC6vm0=;
-	h=From:In-Reply-To:References:Cc:Subject:MIME-Version:Content-Type:
-	 Date:Message-ID; b=FbqLRmGUxxC7iL0kVwz0D0zXz/xsgeADUuYMEV3s7qQCUS60BGcMvV0n4/ZmdZi8KKDslQtDJGUztYOlezvTRPKJM7MZE3+DIoejMs8JIiyGmCcCAm33d3BRqzmcKq+M2X1Gmg67XoDHcNA1vBlbZ8dbkGS7y59jYLi9kY4/cjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MgQdy7mT; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1737120069; c=relaxed/simple;
+	bh=aiaLO7JOS/tiFH4bjxy1BXejLm8z/5d2sO9cWPTeqBc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oHrofFzSaZ6+opq3UuxE5VaZuzAPzqxMjdevH8s2oH6BaDYuvFskKfvpfh8T8Xg0vQeYsZ7EWc59QehHMJtxwmxB2QLcLgx1AErTmdOMg/xHdcmRsSiGB5Rnl526ZxS69uU120bo0yNAU4BaqIyguxUShIUhLlALDRmlJ93sDHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=nzhgJhl8; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MgQdy7mT"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737102629;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HDiFi/c6f0Cw5829523ALaPbNuqbpB2s/qFVysdO5PY=;
-	b=MgQdy7mTdJ1gX7UMrHv8q6FgSZt8x9Fe48pOasrd4BuLZkpQ8TXc4Rx67sHZ/FEvhAsUQM
-	QgzQjpyi5K27YeCPuOAROsfwEmb2hfAvsyaPcY3WBCxGkutBXz+zpUi5xPHi8Dc/1vn2et
-	MJC7pVnoU0/kfx2eKKTir/+Gva+kRbs=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-558-a2EhEHctOkyte2ur2SK5Cg-1; Fri,
- 17 Jan 2025 03:30:24 -0500
-X-MC-Unique: a2EhEHctOkyte2ur2SK5Cg-1
-X-Mimecast-MFC-AGG-ID: a2EhEHctOkyte2ur2SK5Cg
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2EFD51955D72;
-	Fri, 17 Jan 2025 08:30:22 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.5])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3B92C19560BF;
-	Fri, 17 Jan 2025 08:30:17 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <477969.1737101629@warthog.procyon.org.uk>
-References: <477969.1737101629@warthog.procyon.org.uk> <Z4Ds9NBiXUti-idl@gondor.apana.org.au> <20250110010313.1471063-1-dhowells@redhat.com> <20250110010313.1471063-3-dhowells@redhat.com>
-Cc: dhowells@redhat.com, Herbert Xu <herbert@gondor.apana.org.au>,
-    Chuck Lever <chuck.lever@oracle.com>,
-    Trond Myklebust <trond.myklebust@hammerspace.com>,
-    "David S. Miller" <davem@davemloft.net>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-    linux-crypto@vger.kernel.org, linux-afs@lists.infradead.org,
-    linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 2/8] crypto/krb5: Provide Kerberos 5 crypto through AEAD API
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="nzhgJhl8"
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50H3rR79014843;
+	Fri, 17 Jan 2025 13:20:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=pbus+S
+	7a/ttKEhJxvSdfKJlC6GWLE/WfDPSwSWIOm6A=; b=nzhgJhl8rBJynIUzc86dnP
+	KEMI+6PJ/6WlrxMduKu5lw9OTP8ewZCRq5ZrINyv2iIELDledWo/qWY7XGjhzazZ
+	s2wfQMPqOqdBM4SdeFRpqTzreo3MGu9OjS98uBzeDCOuH6I/iWllgBUlL6/mBH9b
+	E1RtQZN3RzqmOyeuyT/d6Gd3TqY787mq/nUbo+te9rnqyjneeW8gW5ivG4C2Jxq0
+	10k6rMn77E/w2KjF46avpxIMkeLkTQBHyb2M1wU/nG9h0u4npF650xYY3/BP9yPf
+	32L+9WIyWUBNs50Uc3KPRWDZLwWeE1t9VvfpvEFTNasQSrbNYZdBLNUeWfSMd6xA
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447fpuaba7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Jan 2025 13:20:53 +0000 (GMT)
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 50HDKq5d013294;
+	Fri, 17 Jan 2025 13:20:52 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 447fpuaba3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Jan 2025 13:20:52 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50H9h0PA002700;
+	Fri, 17 Jan 2025 13:20:51 GMT
+Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4443byk5nt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 17 Jan 2025 13:20:51 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50HDKokL30736906
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 17 Jan 2025 13:20:50 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7063558059;
+	Fri, 17 Jan 2025 13:20:50 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B4F0058058;
+	Fri, 17 Jan 2025 13:20:47 +0000 (GMT)
+Received: from [9.171.10.145] (unknown [9.171.10.145])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTPS;
+	Fri, 17 Jan 2025 13:20:47 +0000 (GMT)
+Message-ID: <0749cd68-c5ab-4ab6-9c48-6e445263333b@linux.ibm.com>
+Date: Fri, 17 Jan 2025 14:20:46 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <493306.1737102616.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 17 Jan 2025 08:30:16 +0000
-Message-ID: <493307.1737102616@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+User-Agent: Mozilla Thunderbird
+Subject: Re: [v3 PATCH] rhashtable: Fix rhashtable_try_insert test
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Michael Kelley <mhklinux@outlook.com>
+Cc: Breno Leitao <leitao@debian.org>, "saeedm@nvidia.com"
+ <saeedm@nvidia.com>,
+        "tariqt@nvidia.com" <tariqt@nvidia.com>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>, Thomas Graf <tgraf@suug.ch>,
+        Tejun Heo <tj@kernel.org>, Hao Luo <haoluo@google.com>,
+        Josh Don <joshdon@google.com>, Barret Rhoden <brho@google.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+References: <20241128-scx_lockdep-v1-1-2315b813b36b@debian.org>
+ <Z1rYGzEpMub4Fp6i@gondor.apana.org.au> <Z2aFL3dNLYOcmzH3@gondor.apana.org.au>
+ <20250102-daffy-vanilla-boar-6e1a61@leitao>
+ <SN6PR02MB41572415707F0FA6D9A61247D4132@SN6PR02MB4157.namprd02.prod.outlook.com>
+ <20250109-marigold-bandicoot-of-exercise-8ebede@leitao>
+ <Z4DoFYQ3ytB-wS3-@gondor.apana.org.au>
+ <SN6PR02MB41577C2C4EB260F3D2D4F85FD41C2@SN6PR02MB4157.namprd02.prod.outlook.com>
+ <Z4FXs8vAtitHIJyl@gondor.apana.org.au>
+ <SN6PR02MB41570F1F5F4F579B4E8F0CD3D41C2@SN6PR02MB4157.namprd02.prod.outlook.com>
+ <Z4XWx5X0doetOJni@gondor.apana.org.au>
+Content-Language: en-US
+From: Zaslonko Mikhail <zaslonko@linux.ibm.com>
+In-Reply-To: <Z4XWx5X0doetOJni@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: SfzBTF39apMgRV92JDaLcMDIDNyBIFLg
+X-Proofpoint-ORIG-GUID: rL4d-Rmr_WWKK3HQ6hGm2fGBG1kY_hF8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-17_05,2025-01-16_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 suspectscore=0
+ clxscore=1011 malwarescore=0 phishscore=0 lowpriorityscore=0 spamscore=0
+ impostorscore=0 mlxscore=0 priorityscore=1501 bulkscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
+ definitions=main-2501170105
 
-David Howells <dhowells@redhat.com> wrote:
+Hello,
 
-> > rfc8009 is basically the same as authenc.
-> =
+On 14.01.2025 04:15, Herbert Xu wrote:
+> On Fri, Jan 10, 2025 at 06:22:40PM +0000, Michael Kelley wrote:
+> 
+> Thanks for testing! The patch needs one more change though as
+> moving the atomic_inc outside of the lock was a bad idea on my
+> part.  This could cause atomic_inc/atomic_dec to be reordered
+> thus resulting in an underflow.
+> 
+> Thanks,
 
-> Actually, it's not quite the same :-/
-> =
+I've tested v3 patch on s390 for the boot OOM problem with 'mem=1G'
+kernel parameter we experience on current linux-next kernel and confirm
+that the issue is no longer present.
 
-> rfc8009 chucks the IV from the encryption into the hash first, but authe=
-nc()
-> does not.  It may be possible to arrange the buffer so that the assoc da=
-ta is
-> also the IV buffer.
+Tested-by: Mikhail Zaslonko <zaslonko@linux.ibm.com>
 
-Actually actually, it's the starting IV, so I just need to chuck in a bloc=
-k of
-zeroes.
+> 
+> ---8<---
+> The test on whether rhashtable_insert_one did an insertion relies
+> on the value returned by rhashtable_lookup_one.  Unfortunately that
+> value is overwritten after rhashtable_insert_one returns.  Fix this
+> by moving the test before data gets overwritten.
+> 
+> Simplify the test as only data == NULL matters.
+> 
+> Finally move atomic_inc back within the lock as otherwise it may
+> be reordered with the atomic_dec on the removal side, potentially
+> leading to an underflow.
+> 
+> Reported-by: Michael Kelley <mhklinux@outlook.com>
+> Fixes: e1d3422c95f0 ("rhashtable: Fix potential deadlock by moving schedule_work outside lock")
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> 
+> diff --git a/lib/rhashtable.c b/lib/rhashtable.c
+> index bf956b85455a..0e9a1d4cf89b 100644
+> --- a/lib/rhashtable.c
+> +++ b/lib/rhashtable.c
+> @@ -611,21 +611,23 @@ static void *rhashtable_try_insert(struct rhashtable *ht, const void *key,
+>  			new_tbl = rht_dereference_rcu(tbl->future_tbl, ht);
+>  			data = ERR_PTR(-EAGAIN);
+>  		} else {
+> +			bool inserted;
+> +
+>  			flags = rht_lock(tbl, bkt);
+>  			data = rhashtable_lookup_one(ht, bkt, tbl,
+>  						     hash, key, obj);
+>  			new_tbl = rhashtable_insert_one(ht, bkt, tbl,
+>  							hash, obj, data);
+> +			inserted = data && !new_tbl;
+> +			if (inserted)
+> +				atomic_inc(&ht->nelems);
+>  			if (PTR_ERR(new_tbl) != -EEXIST)
+>  				data = ERR_CAST(new_tbl);
+>  
+>  			rht_unlock(tbl, bkt, flags);
+>  
+> -			if (PTR_ERR(data) == -ENOENT && !new_tbl) {
+> -				atomic_inc(&ht->nelems);
+> -				if (rht_grow_above_75(ht, tbl))
+> -					schedule_work(&ht->run_work);
+> -			}
+> +			if (inserted && rht_grow_above_75(ht, tbl))
+> +				schedule_work(&ht->run_work);
+>  		}
+>  	} while (!IS_ERR_OR_NULL(new_tbl));
+>  
 
-David
-
+Thanks!
