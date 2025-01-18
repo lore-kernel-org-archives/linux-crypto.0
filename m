@@ -1,264 +1,248 @@
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from akranes.kaiser.cx (akranes.kaiser.cx [152.53.16.207])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96BFC17C9F1
-	for <linux-crypto@vger.kernel.org>; Sat, 18 Jan 2025 09:28:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86645190676;
+	Sat, 18 Jan 2025 16:35:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=152.53.16.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737192522; cv=none; b=EhDqB3P4LGe6q/uddY03AeWF+TN1yqpTObkO/DiyLYZ4F7LKzJlqaixPbOonzJ+W1Mc0csVuVm+oBBed0YUl5OvmWgwFFor2roNMSmC+w0N/3aixJW5nGwC9LTi4eNyDzeUTy0P4W/lcqYP2DWPwYDQt+3k9ngM+O5/JfU6htxA=
+	t=1737218144; cv=none; b=l/Hte1ZUWf+5rW4yfkSiYdfFtOzSdKZlM1JDZesAj7RXY3q2fBv1cLATeSk2q0hptQMYAR0AI+wmsfTmvI0WHhCjfQ6Uklg1F4UrycfRu7tTddPWB4EVetECVQ2GTFPHgBdpB//5bm6cwiovav/Bd6wteqzzla7mjHVLQK5HIyI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737192522; c=relaxed/simple;
-	bh=rturNvl80AUJHCDAYmjkvF6F8ZHEWla0MxyqsDZNS7Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jmLDrVzqGo7pj0rIT8NvgMr5NGxlWmAnRrssDMi+RgDpf8AsojLE65PuOAptuGtYibIBpg6DtseVm8eYYdVv/L0CLNZ/PC4Ne8+4v/BRnYxGI1AYZWhncKx6uizp5mhOzcyN4YIyTxdpKEOKDOGZeN7B+3chtxzjmW6TxG8iPUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=mYnnss2f; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="mYnnss2f"
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-540201cfedbso2528687e87.3
-        for <linux-crypto@vger.kernel.org>; Sat, 18 Jan 2025 01:28:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1737192517; x=1737797317; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=csgVZxqfohIyYdReDwtAW9Joq8w156+EEReipSS2JAI=;
-        b=mYnnss2fP9zlKm/wn+S/gLGGDyNv95utlyQw+JKx5M72T9u7ZEug196B8qbRMcQy98
-         AH93NnkyCv2BobKVOpneLQmm7uWy6vma2/xUtEJ5zMrsneNSQgXZc08Eq512eMjaRyc6
-         i9dMpU/xxYj+GTFNy3tTppxYqmQteddVquI2Sgu/Vw1w5sAB7eL2pJOM5GZZ47+njyTW
-         d1DspmtA9CXHuOvxq2Bl5QKgK2arJyfFrUNqFn/1VOyvN1LSOIpgMxl4/60uPH1WntQC
-         9WLFPvk/LIJzLbLiEO8KkXcoYWqYAIdi1cmNDPlaPw9hTglRqzh2HQvF6Fj3gI1tR5eD
-         kv6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737192517; x=1737797317;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=csgVZxqfohIyYdReDwtAW9Joq8w156+EEReipSS2JAI=;
-        b=N4od3dqN3naDZac7uevA8e2jG1av7VnCllMeVW0TRqz+0ttfOeWSiIsutYCFIpAT3y
-         lg3nrcEdp8aYBlNwauO+Ap3evpRwZPby/CIGG30kYckKaig3rKr1S1MEdWvvzMCvoNB/
-         Gz1U+6wyp2FgGSb5yfIZpcQFKbjwdpYJlskhu9P0ScG9ZryOezXi0uUP13ccXb1YJkbe
-         6EHAHPjTyDxqMqC+43thYWRdWNVJDsQaWaUa+VJPu5AZkwDnRnTPVQMEJ5yI47mt6N4d
-         tV3MliLemEi1m/92ETGkm//kMYfn/TOfC0kl5zfd64vh5WCqv85m18KAeRgSp4vkvEW3
-         kJrw==
-X-Forwarded-Encrypted: i=1; AJvYcCXw9BuiaCQ2ENDPAfvlwFYCiHE1q+w+wIaqDBme7HJCxQcpwfIvw8FtBdeuCI+HyK0ClrmuGtHXbiYsZp0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzvuAzHLdxEqupPjbaW3iLczbUkxgod9K5A4C2NJZOrH5VwhEhx
-	gBRnLP9b4ks6GunLRQxpGsBRjW7Tw86nWqQ09kalRP/I/iK0dfoC1SvEVJE/Vo21UqTg4fbkg3h
-	j1qogkIBpdbLDhQsQRsMt5r9xSoQM6j1GdPCATg==
-X-Gm-Gg: ASbGnctbZiIr29tGyPjykOP5c2Lk1M+GgmUTVviz14sofP9AAeVQRssbUE9Nv16aC1V
-	lhl0Mo4+hhdI+LkKpEWCPXLs07Q7d/MOFOkyjFdK6ZYN3lCIPEGhxJH8amkQUsCOIMq+ozsI7k1
-	fQY957cQU=
-X-Google-Smtp-Source: AGHT+IGLDxqLUJgeIkJ7U6biEHmAQuWJpjtyJYodsgwZVm2YSht1mS+nKDF60ru7FwvGKeElGW2X7wHTQUuGB0YyXOA=
-X-Received: by 2002:a05:6512:3b9d:b0:540:1be6:f15f with SMTP id
- 2adb3069b0e04-5439c1bfd49mr2117200e87.0.1737192517345; Sat, 18 Jan 2025
- 01:28:37 -0800 (PST)
+	s=arc-20240116; t=1737218144; c=relaxed/simple;
+	bh=PMLGcuTpDyyF5owTml4c6HyptkldtbNmW2UA0GwYgI0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nFvQeY378Q5q9eQyeL4spzuqkkyP2jpPj/Gm+6YtGQwu2GxCPJbugeZ6QHxjuJIEGd4PLoMemKSYhSNv1UkY3PG25rqKjiVgxPriUsMGZLGgdw59TIZuXFuFH1o3LVx2MN83JLI2rYaET8U+ALCbNgBEN4EApya7uDLsa5wX4Js=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kaiser.cx; spf=pass smtp.mailfrom=kaiser.cx; arc=none smtp.client-ip=152.53.16.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kaiser.cx
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kaiser.cx
+Received: from ip-176-199-252-214.um44.pools.vodafone-ip.de ([176.199.252.214] helo=martin-debian-3.kaiser.cx)
+	by akranes.kaiser.cx with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <martin@kaiser.cx>)
+	id 1tZBMK-000YLX-2e;
+	Sat, 18 Jan 2025 17:07:40 +0100
+From: Martin Kaiser <martin@kaiser.cx>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Martin Kaiser <martin@kaiser.cx>
+Subject: [PATCH] hwrng: imx-rngc - add runtime pm
+Date: Sat, 18 Jan 2025 17:07:02 +0100
+Message-Id: <20250118160701.32624-1-martin@kaiser.cx>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241203-crypto-qce-refactor-v1-0-c5901d2dd45c@linaro.org>
- <20241203-crypto-qce-refactor-v1-9-c5901d2dd45c@linaro.org>
- <d6220576-eaf5-4415-b25f-b5984255ab78@linaro.org> <CAMRc=MevaM4tUNQUs_LjFYaUtDH=YqE-t2gBponGqtK5xE9Gpw@mail.gmail.com>
- <20250118080604.GA721573@sol.localdomain>
-In-Reply-To: <20250118080604.GA721573@sol.localdomain>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Sat, 18 Jan 2025 10:28:26 +0100
-X-Gm-Features: AbW1kvaq5mXie-wkGH7lleBrCxfRjW7OBK2i53kmWCa9VCguJUG4c9Tz8dGbZpY
-Message-ID: <CAMRc=MeFMYzMY4pU9D6fEpg9bQuuzqg4rQhBU8=z_2eMU+Py-g@mail.gmail.com>
-Subject: Re: [PATCH 9/9] crypto: qce - switch to using a mutex
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: neil.armstrong@linaro.org, linux-crypto@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, Thara Gopinath <thara.gopinath@gmail.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Stanimir Varbanov <svarbanov@mm-sol.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Sat, Jan 18, 2025 at 9:06=E2=80=AFAM Eric Biggers <ebiggers@kernel.org> =
-wrote:
->
-> On Tue, Dec 03, 2024 at 10:10:13AM -0500, Bartosz Golaszewski wrote:
-> > On Tue, 3 Dec 2024 14:53:21 +0100, neil.armstrong@linaro.org said:
-> > > On 03/12/2024 10:19, Bartosz Golaszewski wrote:
-> > >> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> > >>
-> > >> Having switched to workqueue from tasklet, we are no longer limited =
-to
-> > >> atomic APIs and can now convert the spinlock to a mutex. This, along
-> > >> with the conversion from tasklet to workqueue grants us ~15% improve=
-ment
-> > >> in cryptsetup benchmarks for AES encryption.
-> > >
-> > > Can you share on which platforms you did the tests and the results yo=
-u got ?
-> > >
-> >
-> > Sure, I tested on sm8650 with the following results (they vary from
-> > one run to other but are more or less in this range):
->
-> FYI, when I test this driver on sm8650 with linux-next there are lots of =
-test
-> failures, including ones where the driver straight out returns wrong hash=
-es:
->
-> [    6.330656] alg: skcipher: xts-aes-qce setkey failed on test vector 0;=
- expected_error=3D0, actual_error=3D-126, flags=3D0x1
-> [    6.347196] alg: self-tests for xts(aes) using xts-aes-qce failed (rc=
-=3D-126)
-> [    6.347200] alg: self-tests for xts(aes) using xts-aes-qce failed (rc=
-=3D-126)
-> [    6.784951] alg: skcipher: ctr-aes-qce encryption test failed (wrong o=
-utput IV) on test vector 4, cfg=3D"in-place (one sglist)"
-> [    6.810709] alg: self-tests for ctr(aes) using ctr-aes-qce failed (rc=
-=3D-22)
-> [    6.941639] alg: skcipher: cbc-3des-qce setkey failed on test vector "=
-random: len=3D16 klen=3D24"; expected_error=3D0, actual_error=3D-126, flags=
-=3D0x1
-> [    6.947029] alg: self-tests for ctr(aes) using ctr-aes-qce failed (rc=
-=3D-22)
-> [    6.954394] alg: self-tests for cbc(des3_ede) using cbc-3des-qce faile=
-d (rc=3D-126)
-> [    6.975348] alg: self-tests for cbc(des3_ede) using cbc-3des-qce faile=
-d (rc=3D-126)
-> [    7.454433] alg: skcipher: ecb-3des-qce setkey failed on test vector "=
-random: len=3D32 klen=3D24"; expected_error=3D0, actual_error=3D-126, flags=
-=3D0x1
-> [    7.454482] alg: self-tests for ecb(des3_ede) using ecb-3des-qce faile=
-d (rc=3D-126)
-> [    7.454493] alg: self-tests for ecb(des3_ede) using ecb-3des-qce faile=
-d (rc=3D-126)
-> [    8.593828] alg: ahash: hmac-sha256-qce test failed (wrong result) on =
-test vector "random: psize=3D0 ksize=3D80", cfg=3D"random: may_sleep use_fi=
-nup src_divs=3D[<reimport>100.0%@+1800] key_offset=3D7"
-> [    8.627337] alg: self-tests for hmac(sha256) using hmac-sha256-qce fai=
-led (rc=3D-22)
-> [    8.639889] alg: self-tests for hmac(sha256) using hmac-sha256-qce fai=
-led (rc=3D-22)
-> [    8.933595] alg: ahash: hmac-sha1-qce test failed (wrong result) on te=
-st vector "random: psize=3D0 ksize=3D56", cfg=3D"random: inplace_one_sglist=
- use_finup nosimd_setkey src_divs=3D[100.0%@+3969] key_offset=3D71"
-> [    8.952885] alg: self-tests for hmac(sha1) using hmac-sha1-qce failed =
-(rc=3D-22)
-> [    8.965096] alg: self-tests for hmac(sha1) using hmac-sha1-qce failed =
-(rc=3D-22)
->
+Add runtime power management to the imx-rngc driver. Disable the
+peripheral clock when the rngc is idle.
 
-I was testing with kcapi-speed and cryptsetup benchmark. I've never
-seen any errors.
+The callback functions from struct hwrng wake the rngc up when they're
+called and set it to idle on exit. Helper functions which are invoked
+from the callbacks assume that the rngc is active.
 
-Is this after my changes only or did it exist before? You're testing
-with the tcrypt module? How are you inserting it exactly? What params?
+Device init and probe are done before runtime pm is enabled. The
+peripheral clock will be handled manually during these steps. Do not use
+devres any more to enable/disable the peripheral clock, this conflicts
+with runtime pm.
 
-> Also a KASAN error:
->
-> [    9.420862] CPU: 3 UID: 0 PID: 393 Comm: cryptomgr_test Tainted: G S  =
-    W          6.13.0-rc7-next-20250117-00007-g58182eb6d73d #12
-> [    9.420881] Tainted: [S]=3DCPU_OUT_OF_SPEC, [W]=3DWARN
-> [    9.420886] Hardware name: Qualcomm Technologies, Inc. SM8650 HDK (DT)
-> [    9.420891] Call trace:
-> [    9.420895]  show_stack+0x18/0x24 (C)
-> [    9.420918]  dump_stack_lvl+0x60/0x80
-> [    9.420937]  print_report+0x17c/0x4d0
-> [    9.420960]  kasan_report+0xb0/0xf8
-> [    9.420983]  kasan_check_range+0x100/0x1a8
-> [    9.421001]  __asan_memcpy+0x3c/0xa0
-> [    9.421020]  swiotlb_bounce+0x1b4/0x340
-> [    9.421034]  swiotlb_tbl_map_single+0x2ac/0x5a0
-> [    9.421050]  iommu_dma_map_page+0x2b8/0x4cc
-> [    9.421063]  iommu_dma_map_sg+0x2e8/0xb3c
-> [    9.421072]  __dma_map_sg_attrs+0x11c/0x1b0
-> [    9.421086]  dma_map_sg_attrs+0x10/0x20
-> [    9.421097]  qce_aead_async_req_handle+0x784/0x1aa0
-> [    9.421125]  qce_handle_queue+0x20c/0x3e8
-> [    9.421139]  qce_async_request_enqueue+0x10/0x1c
-> [    9.421153]  qce_aead_crypt+0x1f0/0x81c
-> [    9.421168]  qce_aead_encrypt+0x14/0x20
-> [    9.421182]  crypto_aead_encrypt+0xa0/0xe0
-> [    9.421194]  test_aead_vec_cfg+0x84c/0x1be8
-> [    9.421207]  test_aead_vs_generic_impl+0x530/0x850
-> [    9.421219]  alg_test_aead+0x7c8/0xe40
-> [    9.421230]  alg_test+0x1f4/0xb0c
-> [    9.421241]  cryptomgr_test+0x50/0x80
-> [    9.421251]  kthread+0x378/0x678
-> [    9.421272]  ret_from_fork+0x10/0x20
->
-> [    9.550765] Allocated by task 393:
-> [    9.554279]  kasan_save_stack+0x3c/0x64
-> [    9.558252]  kasan_save_track+0x20/0x40
-> [    9.562221]  kasan_save_alloc_info+0x40/0x54
-> [    9.566641]  __kasan_kmalloc+0xb8/0xbc
-> [    9.570515]  __kmalloc_noprof+0x188/0x410
-> [    9.574669]  qce_aead_async_req_handle+0xbd4/0x1aa0
-> [    9.579701]  qce_handle_queue+0x20c/0x3e8
-> [    9.583841]  qce_async_request_enqueue+0x10/0x1c
-> [    9.588607]  qce_aead_crypt+0x1f0/0x81c
-> [    9.592577]  qce_aead_encrypt+0x14/0x20
-> [    9.596547]  crypto_aead_encrypt+0xa0/0xe0
-> [    9.600776]  test_aead_vec_cfg+0x84c/0x1be8
-> [    9.605097]  test_aead_vs_generic_impl+0x530/0x850
-> [    9.610039]  alg_test_aead+0x7c8/0xe40
-> [    9.613911]  alg_test+0x1f4/0xb0c
-> [    9.617345]  cryptomgr_test+0x50/0x80
-> [    9.621124]  kthread+0x378/0x678
-> [    9.624473]  ret_from_fork+0x10/0x20
->
-> [    9.629738] The buggy address belongs to the object at ffff5c7440d1cc0=
-0
->                 which belongs to the cache kmalloc-32 of size 32
-> [    9.642426] The buggy address is located 0 bytes inside of
->                 allocated 22-byte region [ffff5c7440d1cc00, ffff5c7440d1c=
-c16)
->
-> [    9.656672] The buggy address belongs to the physical page:
-> [    9.662409] page: refcount:0 mapcount:0 mapping:0000000000000000 index=
-:0x0 pfn:0x880d1c
-> [    9.670646] flags: 0xbfffe0000000000(node=3D0|zone=3D2|lastcpupid=3D0x=
-1ffff)
-> [    9.677371] page_type: f5(slab)
-> [    9.680624] raw: 0bfffe0000000000 ffff5c7440002780 dead000000000100 de=
-ad000000000122
-> [    9.688595] raw: 0000000000000000 0000000080400040 00000000f5000000 00=
-00000000000000
-> [    9.696560] page dumped because: kasan: bad access detected
->
-> [    9.703854] Memory state around the buggy address:
-> [    9.708796]  ffff5c7440d1cb00: fa fb fb fb fc fc fc fc fa fb fb fb fc =
-fc fc fc
-> [    9.716227]  ffff5c7440d1cb80: fa fb fb fb fc fc fc fc fa fb fb fb fc =
-fc fc fc
-> [    9.723660] >ffff5c7440d1cc00: 00 00 06 fc fc fc fc fc fa fb fb fb fc =
-fc fc fc
-> [    9.731092]                          ^
-> [    9.734959]  ffff5c7440d1cc80: fa fb fb fb fc fc fc fc 00 00 06 fc fc =
-fc fc fc
-> [    9.742392]  ffff5c7440d1cd00: 00 00 06 fc fc fc fc fc fa fb fb fb fc =
-fc fc fc
-> [    9.749824] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->
+Signed-off-by: Martin Kaiser <martin@kaiser.cx>
+---
+ drivers/char/hw_random/imx-rngc.c | 70 +++++++++++++++++++++++--------
+ 1 file changed, 53 insertions(+), 17 deletions(-)
 
-Hmm, I am running with KASAN on, never seen this How would I run
-tcrypt to trigger it? By default the module doesn't load with no
-params and gives me:
+diff --git a/drivers/char/hw_random/imx-rngc.c b/drivers/char/hw_random/imx-rngc.c
+index 5adc4946d60f..726c6a058e3f 100644
+--- a/drivers/char/hw_random/imx-rngc.c
++++ b/drivers/char/hw_random/imx-rngc.c
+@@ -13,6 +13,8 @@
+ #include <linux/clk.h>
+ #include <linux/err.h>
+ #include <linux/platform_device.h>
++#include <linux/pm.h>
++#include <linux/pm_runtime.h>
+ #include <linux/interrupt.h>
+ #include <linux/hw_random.h>
+ #include <linux/completion.h>
+@@ -53,6 +55,7 @@
+ 
+ #define RNGC_SELFTEST_TIMEOUT 2500 /* us */
+ #define RNGC_SEED_TIMEOUT      200 /* ms */
++#define RNGC_PM_TIMEOUT        500 /* ms */
+ 
+ static bool self_test = true;
+ module_param(self_test, bool, 0);
+@@ -123,7 +126,11 @@ static int imx_rngc_read(struct hwrng *rng, void *data, size_t max, bool wait)
+ {
+ 	struct imx_rngc *rngc = container_of(rng, struct imx_rngc, rng);
+ 	unsigned int status;
+-	int retval = 0;
++	int err, retval = 0;
++
++	err = pm_runtime_resume_and_get(rngc->dev);
++	if (err)
++		return err;
+ 
+ 	while (max >= sizeof(u32)) {
+ 		status = readl(rngc->base + RNGC_STATUS);
+@@ -141,6 +148,8 @@ static int imx_rngc_read(struct hwrng *rng, void *data, size_t max, bool wait)
+ 			max -= sizeof(u32);
+ 		}
+ 	}
++	pm_runtime_mark_last_busy(rngc->dev);
++	pm_runtime_put(rngc->dev);
+ 
+ 	return retval ? retval : -EIO;
+ }
+@@ -169,7 +178,11 @@ static int imx_rngc_init(struct hwrng *rng)
+ {
+ 	struct imx_rngc *rngc = container_of(rng, struct imx_rngc, rng);
+ 	u32 cmd, ctrl;
+-	int ret;
++	int ret, err;
++
++	err = pm_runtime_resume_and_get(rngc->dev);
++	if (err)
++		return err;
+ 
+ 	/* clear error */
+ 	cmd = readl(rngc->base + RNGC_COMMAND);
+@@ -186,15 +199,15 @@ static int imx_rngc_init(struct hwrng *rng)
+ 		ret = wait_for_completion_timeout(&rngc->rng_op_done,
+ 						  msecs_to_jiffies(RNGC_SEED_TIMEOUT));
+ 		if (!ret) {
+-			ret = -ETIMEDOUT;
+-			goto err;
++			err = -ETIMEDOUT;
++			goto out;
+ 		}
+ 
+ 	} while (rngc->err_reg == RNGC_ERROR_STATUS_STAT_ERR);
+ 
+ 	if (rngc->err_reg) {
+-		ret = -EIO;
+-		goto err;
++		err = -EIO;
++		goto out;
+ 	}
+ 
+ 	/*
+@@ -205,23 +218,30 @@ static int imx_rngc_init(struct hwrng *rng)
+ 	ctrl |= RNGC_CTRL_AUTO_SEED;
+ 	writel(ctrl, rngc->base + RNGC_CONTROL);
+ 
++	err = 0;
++out:
+ 	/*
+ 	 * if initialisation was successful, we keep the interrupt
+ 	 * unmasked until imx_rngc_cleanup is called
+ 	 * we mask the interrupt ourselves if we return an error
+ 	 */
+-	return 0;
++	if (err)
++		imx_rngc_irq_mask_clear(rngc);
+ 
+-err:
+-	imx_rngc_irq_mask_clear(rngc);
+-	return ret;
++	pm_runtime_put(rngc->dev);
++	return err;
+ }
+ 
+ static void imx_rngc_cleanup(struct hwrng *rng)
+ {
+ 	struct imx_rngc *rngc = container_of(rng, struct imx_rngc, rng);
++	int err;
+ 
+-	imx_rngc_irq_mask_clear(rngc);
++	err = pm_runtime_resume_and_get(rngc->dev);
++	if (!err) {
++		imx_rngc_irq_mask_clear(rngc);
++		pm_runtime_put(rngc->dev);
++	}
+ }
+ 
+ static int __init imx_rngc_probe(struct platform_device *pdev)
+@@ -240,7 +260,7 @@ static int __init imx_rngc_probe(struct platform_device *pdev)
+ 	if (IS_ERR(rngc->base))
+ 		return PTR_ERR(rngc->base);
+ 
+-	rngc->clk = devm_clk_get_enabled(&pdev->dev, NULL);
++	rngc->clk = devm_clk_get(&pdev->dev, NULL);
+ 	if (IS_ERR(rngc->clk))
+ 		return dev_err_probe(&pdev->dev, PTR_ERR(rngc->clk), "Cannot get rng_clk\n");
+ 
+@@ -248,14 +268,18 @@ static int __init imx_rngc_probe(struct platform_device *pdev)
+ 	if (irq < 0)
+ 		return irq;
+ 
++	clk_prepare_enable(rngc->clk);
++
+ 	ver_id = readl(rngc->base + RNGC_VER_ID);
+ 	rng_type = FIELD_GET(RNG_TYPE, ver_id);
+ 	/*
+ 	 * This driver supports only RNGC and RNGB. (There's a different
+ 	 * driver for RNGA.)
+ 	 */
+-	if (rng_type != RNGC_TYPE_RNGC && rng_type != RNGC_TYPE_RNGB)
++	if (rng_type != RNGC_TYPE_RNGC && rng_type != RNGC_TYPE_RNGB) {
++		clk_disable_unprepare(rngc->clk);
+ 		return -ENODEV;
++	}
+ 
+ 	init_completion(&rngc->rng_op_done);
+ 
+@@ -271,15 +295,24 @@ static int __init imx_rngc_probe(struct platform_device *pdev)
+ 
+ 	ret = devm_request_irq(&pdev->dev,
+ 			irq, imx_rngc_irq, 0, pdev->name, (void *)rngc);
+-	if (ret)
++	if (ret) {
++		clk_disable_unprepare(rngc->clk);
+ 		return dev_err_probe(&pdev->dev, ret, "Can't get interrupt working.\n");
++	}
+ 
+ 	if (self_test) {
+ 		ret = imx_rngc_self_test(rngc);
+-		if (ret)
++		if (ret) {
++			clk_disable_unprepare(rngc->clk);
+ 			return dev_err_probe(&pdev->dev, ret, "self test failed\n");
++		}
+ 	}
+ 
++	pm_runtime_set_autosuspend_delay(&pdev->dev, RNGC_PM_TIMEOUT);
++	pm_runtime_use_autosuspend(&pdev->dev);
++	pm_runtime_set_active(&pdev->dev);
++	devm_pm_runtime_enable(&pdev->dev);
++
+ 	ret = devm_hwrng_register(&pdev->dev, &rngc->rng);
+ 	if (ret)
+ 		return dev_err_probe(&pdev->dev, ret, "hwrng registration failed\n");
+@@ -309,7 +342,10 @@ static int imx_rngc_resume(struct device *dev)
+ 	return 0;
+ }
+ 
+-static DEFINE_SIMPLE_DEV_PM_OPS(imx_rngc_pm_ops, imx_rngc_suspend, imx_rngc_resume);
++static const struct dev_pm_ops imx_rngc_pm_ops = {
++	SYSTEM_SLEEP_PM_OPS(pm_runtime_force_suspend, pm_runtime_force_resume)
++	RUNTIME_PM_OPS(imx_rngc_suspend, imx_rngc_resume, NULL)
++};
+ 
+ static const struct of_device_id imx_rngc_dt_ids[] = {
+ 	{ .compatible = "fsl,imx25-rngb" },
+@@ -320,7 +356,7 @@ MODULE_DEVICE_TABLE(of, imx_rngc_dt_ids);
+ static struct platform_driver imx_rngc_driver = {
+ 	.driver = {
+ 		.name = KBUILD_MODNAME,
+-		.pm = pm_sleep_ptr(&imx_rngc_pm_ops),
++		.pm = pm_ptr(&imx_rngc_pm_ops),
+ 		.of_match_table = imx_rngc_dt_ids,
+ 	},
+ };
+-- 
+2.39.5
 
-modprobe: ERROR: could not insert 'tcrypt': Resource temporarily unavailabl=
-e
-
->
-> I personally still struggle to understand how this driver could plausibly=
- be
-> useful when the software crypto has no issues, is much faster, and is muc=
-h
-> better tested.  What is motivating having this driver in the kernel?
-
-We want to use it in conjunction with the upcoming scminvoke (for
-loading TAs and invoking objects - used to program the keys into the
-QCE) to support the DRM use-case for decrypting streaming data inside
-secure buffers upstream.
-
-Bart
