@@ -1,172 +1,264 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C084136E;
-	Sat, 18 Jan 2025 08:06:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96BFC17C9F1
+	for <linux-crypto@vger.kernel.org>; Sat, 18 Jan 2025 09:28:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737187567; cv=none; b=VW3aG7Q2s/JreYN3+IxM8DQBh4ZunNJTllA5I/mKoW5+0ulE+sf1b+pBXkzCsQ1Qs/J8V+AT8Ms5vgjFb3qecK09ZGfj63H3ACcpdn/p8dRUL5oHrNk3yFiq9Z9cT1Of+V+8LJ+hKcghSporx3TXjdw5xCrdqBcxap91R3D3DCA=
+	t=1737192522; cv=none; b=EhDqB3P4LGe6q/uddY03AeWF+TN1yqpTObkO/DiyLYZ4F7LKzJlqaixPbOonzJ+W1Mc0csVuVm+oBBed0YUl5OvmWgwFFor2roNMSmC+w0N/3aixJW5nGwC9LTi4eNyDzeUTy0P4W/lcqYP2DWPwYDQt+3k9ngM+O5/JfU6htxA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737187567; c=relaxed/simple;
-	bh=gHlaMoqb6TODfh9fjSx5Da+VTfnJxIZohAUAWmv4Q4w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K2hAtIkrH3MR0mO5FKICM1tKesnAS6weV2tX9T54x8TVB7gzQticye1DI8oPf2Q2XpgG4xNo3FuBuCyvZNUrrR3DH1Gsks4SREfbudJHBfmym/ifTCZ/ZVTCrISCYKPRmitHheM/P3K2OEln/CoQ5ybfCwDu4kqnE0KT+pPOBZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l8u6KYPZ; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1737192522; c=relaxed/simple;
+	bh=rturNvl80AUJHCDAYmjkvF6F8ZHEWla0MxyqsDZNS7Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jmLDrVzqGo7pj0rIT8NvgMr5NGxlWmAnRrssDMi+RgDpf8AsojLE65PuOAptuGtYibIBpg6DtseVm8eYYdVv/L0CLNZ/PC4Ne8+4v/BRnYxGI1AYZWhncKx6uizp5mhOzcyN4YIyTxdpKEOKDOGZeN7B+3chtxzjmW6TxG8iPUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=mYnnss2f; arc=none smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l8u6KYPZ"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39D2CC4CED1;
-	Sat, 18 Jan 2025 08:06:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737187566;
-	bh=gHlaMoqb6TODfh9fjSx5Da+VTfnJxIZohAUAWmv4Q4w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=l8u6KYPZOWuRFRLIhKc1m8NEYDTcEmh0iyqp0jG3aFLJ2HbgOgmPtfnqqmvSy3b2t
-	 UHOAt7JWQR3v7z2Lnwxeq/ugAMNrtW8HX0AkbqeS5eF7fWRLuEdTCr/S63LW7o5uJb
-	 3/JrdcHu4bM/9w9rLKgAtMGgli4IeIbkRRx4Lg1cPRfp5eNb8g2SR+blQPzsXs9aSW
-	 9L/ETZh6UFGavmzsnuoVM+cMnAq8hoj+lc7PS3A8OupCNW9ToGnOWZbbp39hkajWFt
-	 kLXtHT9ug4jaQL8mbrXp1/FMRkHYruCdew0T/61L7D7UD+y38vu+9RXDLRIEERzskU
-	 THxxO171By7OQ==
-Date: Sat, 18 Jan 2025 00:06:04 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: neil.armstrong@linaro.org, linux-crypto@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	Thara Gopinath <thara.gopinath@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Stanimir Varbanov <svarbanov@mm-sol.com>
-Subject: Re: [PATCH 9/9] crypto: qce - switch to using a mutex
-Message-ID: <20250118080604.GA721573@sol.localdomain>
-References: <20241203-crypto-qce-refactor-v1-0-c5901d2dd45c@linaro.org>
- <20241203-crypto-qce-refactor-v1-9-c5901d2dd45c@linaro.org>
- <d6220576-eaf5-4415-b25f-b5984255ab78@linaro.org>
- <CAMRc=MevaM4tUNQUs_LjFYaUtDH=YqE-t2gBponGqtK5xE9Gpw@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="mYnnss2f"
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-540201cfedbso2528687e87.3
+        for <linux-crypto@vger.kernel.org>; Sat, 18 Jan 2025 01:28:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1737192517; x=1737797317; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=csgVZxqfohIyYdReDwtAW9Joq8w156+EEReipSS2JAI=;
+        b=mYnnss2fP9zlKm/wn+S/gLGGDyNv95utlyQw+JKx5M72T9u7ZEug196B8qbRMcQy98
+         AH93NnkyCv2BobKVOpneLQmm7uWy6vma2/xUtEJ5zMrsneNSQgXZc08Eq512eMjaRyc6
+         i9dMpU/xxYj+GTFNy3tTppxYqmQteddVquI2Sgu/Vw1w5sAB7eL2pJOM5GZZ47+njyTW
+         d1DspmtA9CXHuOvxq2Bl5QKgK2arJyfFrUNqFn/1VOyvN1LSOIpgMxl4/60uPH1WntQC
+         9WLFPvk/LIJzLbLiEO8KkXcoYWqYAIdi1cmNDPlaPw9hTglRqzh2HQvF6Fj3gI1tR5eD
+         kv6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737192517; x=1737797317;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=csgVZxqfohIyYdReDwtAW9Joq8w156+EEReipSS2JAI=;
+        b=N4od3dqN3naDZac7uevA8e2jG1av7VnCllMeVW0TRqz+0ttfOeWSiIsutYCFIpAT3y
+         lg3nrcEdp8aYBlNwauO+Ap3evpRwZPby/CIGG30kYckKaig3rKr1S1MEdWvvzMCvoNB/
+         Gz1U+6wyp2FgGSb5yfIZpcQFKbjwdpYJlskhu9P0ScG9ZryOezXi0uUP13ccXb1YJkbe
+         6EHAHPjTyDxqMqC+43thYWRdWNVJDsQaWaUa+VJPu5AZkwDnRnTPVQMEJ5yI47mt6N4d
+         tV3MliLemEi1m/92ETGkm//kMYfn/TOfC0kl5zfd64vh5WCqv85m18KAeRgSp4vkvEW3
+         kJrw==
+X-Forwarded-Encrypted: i=1; AJvYcCXw9BuiaCQ2ENDPAfvlwFYCiHE1q+w+wIaqDBme7HJCxQcpwfIvw8FtBdeuCI+HyK0ClrmuGtHXbiYsZp0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzvuAzHLdxEqupPjbaW3iLczbUkxgod9K5A4C2NJZOrH5VwhEhx
+	gBRnLP9b4ks6GunLRQxpGsBRjW7Tw86nWqQ09kalRP/I/iK0dfoC1SvEVJE/Vo21UqTg4fbkg3h
+	j1qogkIBpdbLDhQsQRsMt5r9xSoQM6j1GdPCATg==
+X-Gm-Gg: ASbGnctbZiIr29tGyPjykOP5c2Lk1M+GgmUTVviz14sofP9AAeVQRssbUE9Nv16aC1V
+	lhl0Mo4+hhdI+LkKpEWCPXLs07Q7d/MOFOkyjFdK6ZYN3lCIPEGhxJH8amkQUsCOIMq+ozsI7k1
+	fQY957cQU=
+X-Google-Smtp-Source: AGHT+IGLDxqLUJgeIkJ7U6biEHmAQuWJpjtyJYodsgwZVm2YSht1mS+nKDF60ru7FwvGKeElGW2X7wHTQUuGB0YyXOA=
+X-Received: by 2002:a05:6512:3b9d:b0:540:1be6:f15f with SMTP id
+ 2adb3069b0e04-5439c1bfd49mr2117200e87.0.1737192517345; Sat, 18 Jan 2025
+ 01:28:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMRc=MevaM4tUNQUs_LjFYaUtDH=YqE-t2gBponGqtK5xE9Gpw@mail.gmail.com>
+References: <20241203-crypto-qce-refactor-v1-0-c5901d2dd45c@linaro.org>
+ <20241203-crypto-qce-refactor-v1-9-c5901d2dd45c@linaro.org>
+ <d6220576-eaf5-4415-b25f-b5984255ab78@linaro.org> <CAMRc=MevaM4tUNQUs_LjFYaUtDH=YqE-t2gBponGqtK5xE9Gpw@mail.gmail.com>
+ <20250118080604.GA721573@sol.localdomain>
+In-Reply-To: <20250118080604.GA721573@sol.localdomain>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Sat, 18 Jan 2025 10:28:26 +0100
+X-Gm-Features: AbW1kvaq5mXie-wkGH7lleBrCxfRjW7OBK2i53kmWCa9VCguJUG4c9Tz8dGbZpY
+Message-ID: <CAMRc=MeFMYzMY4pU9D6fEpg9bQuuzqg4rQhBU8=z_2eMU+Py-g@mail.gmail.com>
+Subject: Re: [PATCH 9/9] crypto: qce - switch to using a mutex
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: neil.armstrong@linaro.org, linux-crypto@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, Thara Gopinath <thara.gopinath@gmail.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Stanimir Varbanov <svarbanov@mm-sol.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Dec 03, 2024 at 10:10:13AM -0500, Bartosz Golaszewski wrote:
-> On Tue, 3 Dec 2024 14:53:21 +0100, neil.armstrong@linaro.org said:
-> > On 03/12/2024 10:19, Bartosz Golaszewski wrote:
-> >> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> >>
-> >> Having switched to workqueue from tasklet, we are no longer limited to
-> >> atomic APIs and can now convert the spinlock to a mutex. This, along
-> >> with the conversion from tasklet to workqueue grants us ~15% improvement
-> >> in cryptsetup benchmarks for AES encryption.
+On Sat, Jan 18, 2025 at 9:06=E2=80=AFAM Eric Biggers <ebiggers@kernel.org> =
+wrote:
+>
+> On Tue, Dec 03, 2024 at 10:10:13AM -0500, Bartosz Golaszewski wrote:
+> > On Tue, 3 Dec 2024 14:53:21 +0100, neil.armstrong@linaro.org said:
+> > > On 03/12/2024 10:19, Bartosz Golaszewski wrote:
+> > >> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> > >>
+> > >> Having switched to workqueue from tasklet, we are no longer limited =
+to
+> > >> atomic APIs and can now convert the spinlock to a mutex. This, along
+> > >> with the conversion from tasklet to workqueue grants us ~15% improve=
+ment
+> > >> in cryptsetup benchmarks for AES encryption.
+> > >
+> > > Can you share on which platforms you did the tests and the results yo=
+u got ?
+> > >
 > >
-> > Can you share on which platforms you did the tests and the results you got ?
-> >
-> 
-> Sure, I tested on sm8650 with the following results (they vary from
-> one run to other but are more or less in this range):
+> > Sure, I tested on sm8650 with the following results (they vary from
+> > one run to other but are more or less in this range):
+>
+> FYI, when I test this driver on sm8650 with linux-next there are lots of =
+test
+> failures, including ones where the driver straight out returns wrong hash=
+es:
+>
+> [    6.330656] alg: skcipher: xts-aes-qce setkey failed on test vector 0;=
+ expected_error=3D0, actual_error=3D-126, flags=3D0x1
+> [    6.347196] alg: self-tests for xts(aes) using xts-aes-qce failed (rc=
+=3D-126)
+> [    6.347200] alg: self-tests for xts(aes) using xts-aes-qce failed (rc=
+=3D-126)
+> [    6.784951] alg: skcipher: ctr-aes-qce encryption test failed (wrong o=
+utput IV) on test vector 4, cfg=3D"in-place (one sglist)"
+> [    6.810709] alg: self-tests for ctr(aes) using ctr-aes-qce failed (rc=
+=3D-22)
+> [    6.941639] alg: skcipher: cbc-3des-qce setkey failed on test vector "=
+random: len=3D16 klen=3D24"; expected_error=3D0, actual_error=3D-126, flags=
+=3D0x1
+> [    6.947029] alg: self-tests for ctr(aes) using ctr-aes-qce failed (rc=
+=3D-22)
+> [    6.954394] alg: self-tests for cbc(des3_ede) using cbc-3des-qce faile=
+d (rc=3D-126)
+> [    6.975348] alg: self-tests for cbc(des3_ede) using cbc-3des-qce faile=
+d (rc=3D-126)
+> [    7.454433] alg: skcipher: ecb-3des-qce setkey failed on test vector "=
+random: len=3D32 klen=3D24"; expected_error=3D0, actual_error=3D-126, flags=
+=3D0x1
+> [    7.454482] alg: self-tests for ecb(des3_ede) using ecb-3des-qce faile=
+d (rc=3D-126)
+> [    7.454493] alg: self-tests for ecb(des3_ede) using ecb-3des-qce faile=
+d (rc=3D-126)
+> [    8.593828] alg: ahash: hmac-sha256-qce test failed (wrong result) on =
+test vector "random: psize=3D0 ksize=3D80", cfg=3D"random: may_sleep use_fi=
+nup src_divs=3D[<reimport>100.0%@+1800] key_offset=3D7"
+> [    8.627337] alg: self-tests for hmac(sha256) using hmac-sha256-qce fai=
+led (rc=3D-22)
+> [    8.639889] alg: self-tests for hmac(sha256) using hmac-sha256-qce fai=
+led (rc=3D-22)
+> [    8.933595] alg: ahash: hmac-sha1-qce test failed (wrong result) on te=
+st vector "random: psize=3D0 ksize=3D56", cfg=3D"random: inplace_one_sglist=
+ use_finup nosimd_setkey src_divs=3D[100.0%@+3969] key_offset=3D71"
+> [    8.952885] alg: self-tests for hmac(sha1) using hmac-sha1-qce failed =
+(rc=3D-22)
+> [    8.965096] alg: self-tests for hmac(sha1) using hmac-sha1-qce failed =
+(rc=3D-22)
+>
 
-FYI, when I test this driver on sm8650 with linux-next there are lots of test
-failures, including ones where the driver straight out returns wrong hashes:
+I was testing with kcapi-speed and cryptsetup benchmark. I've never
+seen any errors.
 
-[    6.330656] alg: skcipher: xts-aes-qce setkey failed on test vector 0; expected_error=0, actual_error=-126, flags=0x1
-[    6.347196] alg: self-tests for xts(aes) using xts-aes-qce failed (rc=-126)
-[    6.347200] alg: self-tests for xts(aes) using xts-aes-qce failed (rc=-126)
-[    6.784951] alg: skcipher: ctr-aes-qce encryption test failed (wrong output IV) on test vector 4, cfg="in-place (one sglist)"
-[    6.810709] alg: self-tests for ctr(aes) using ctr-aes-qce failed (rc=-22)
-[    6.941639] alg: skcipher: cbc-3des-qce setkey failed on test vector "random: len=16 klen=24"; expected_error=0, actual_error=-126, flags=0x1
-[    6.947029] alg: self-tests for ctr(aes) using ctr-aes-qce failed (rc=-22)
-[    6.954394] alg: self-tests for cbc(des3_ede) using cbc-3des-qce failed (rc=-126)
-[    6.975348] alg: self-tests for cbc(des3_ede) using cbc-3des-qce failed (rc=-126)
-[    7.454433] alg: skcipher: ecb-3des-qce setkey failed on test vector "random: len=32 klen=24"; expected_error=0, actual_error=-126, flags=0x1
-[    7.454482] alg: self-tests for ecb(des3_ede) using ecb-3des-qce failed (rc=-126)
-[    7.454493] alg: self-tests for ecb(des3_ede) using ecb-3des-qce failed (rc=-126)
-[    8.593828] alg: ahash: hmac-sha256-qce test failed (wrong result) on test vector "random: psize=0 ksize=80", cfg="random: may_sleep use_finup src_divs=[<reimport>100.0%@+1800] key_offset=7"
-[    8.627337] alg: self-tests for hmac(sha256) using hmac-sha256-qce failed (rc=-22)
-[    8.639889] alg: self-tests for hmac(sha256) using hmac-sha256-qce failed (rc=-22)
-[    8.933595] alg: ahash: hmac-sha1-qce test failed (wrong result) on test vector "random: psize=0 ksize=56", cfg="random: inplace_one_sglist use_finup nosimd_setkey src_divs=[100.0%@+3969] key_offset=71"
-[    8.952885] alg: self-tests for hmac(sha1) using hmac-sha1-qce failed (rc=-22)
-[    8.965096] alg: self-tests for hmac(sha1) using hmac-sha1-qce failed (rc=-22)
+Is this after my changes only or did it exist before? You're testing
+with the tcrypt module? How are you inserting it exactly? What params?
 
-Also a KASAN error:
+> Also a KASAN error:
+>
+> [    9.420862] CPU: 3 UID: 0 PID: 393 Comm: cryptomgr_test Tainted: G S  =
+    W          6.13.0-rc7-next-20250117-00007-g58182eb6d73d #12
+> [    9.420881] Tainted: [S]=3DCPU_OUT_OF_SPEC, [W]=3DWARN
+> [    9.420886] Hardware name: Qualcomm Technologies, Inc. SM8650 HDK (DT)
+> [    9.420891] Call trace:
+> [    9.420895]  show_stack+0x18/0x24 (C)
+> [    9.420918]  dump_stack_lvl+0x60/0x80
+> [    9.420937]  print_report+0x17c/0x4d0
+> [    9.420960]  kasan_report+0xb0/0xf8
+> [    9.420983]  kasan_check_range+0x100/0x1a8
+> [    9.421001]  __asan_memcpy+0x3c/0xa0
+> [    9.421020]  swiotlb_bounce+0x1b4/0x340
+> [    9.421034]  swiotlb_tbl_map_single+0x2ac/0x5a0
+> [    9.421050]  iommu_dma_map_page+0x2b8/0x4cc
+> [    9.421063]  iommu_dma_map_sg+0x2e8/0xb3c
+> [    9.421072]  __dma_map_sg_attrs+0x11c/0x1b0
+> [    9.421086]  dma_map_sg_attrs+0x10/0x20
+> [    9.421097]  qce_aead_async_req_handle+0x784/0x1aa0
+> [    9.421125]  qce_handle_queue+0x20c/0x3e8
+> [    9.421139]  qce_async_request_enqueue+0x10/0x1c
+> [    9.421153]  qce_aead_crypt+0x1f0/0x81c
+> [    9.421168]  qce_aead_encrypt+0x14/0x20
+> [    9.421182]  crypto_aead_encrypt+0xa0/0xe0
+> [    9.421194]  test_aead_vec_cfg+0x84c/0x1be8
+> [    9.421207]  test_aead_vs_generic_impl+0x530/0x850
+> [    9.421219]  alg_test_aead+0x7c8/0xe40
+> [    9.421230]  alg_test+0x1f4/0xb0c
+> [    9.421241]  cryptomgr_test+0x50/0x80
+> [    9.421251]  kthread+0x378/0x678
+> [    9.421272]  ret_from_fork+0x10/0x20
+>
+> [    9.550765] Allocated by task 393:
+> [    9.554279]  kasan_save_stack+0x3c/0x64
+> [    9.558252]  kasan_save_track+0x20/0x40
+> [    9.562221]  kasan_save_alloc_info+0x40/0x54
+> [    9.566641]  __kasan_kmalloc+0xb8/0xbc
+> [    9.570515]  __kmalloc_noprof+0x188/0x410
+> [    9.574669]  qce_aead_async_req_handle+0xbd4/0x1aa0
+> [    9.579701]  qce_handle_queue+0x20c/0x3e8
+> [    9.583841]  qce_async_request_enqueue+0x10/0x1c
+> [    9.588607]  qce_aead_crypt+0x1f0/0x81c
+> [    9.592577]  qce_aead_encrypt+0x14/0x20
+> [    9.596547]  crypto_aead_encrypt+0xa0/0xe0
+> [    9.600776]  test_aead_vec_cfg+0x84c/0x1be8
+> [    9.605097]  test_aead_vs_generic_impl+0x530/0x850
+> [    9.610039]  alg_test_aead+0x7c8/0xe40
+> [    9.613911]  alg_test+0x1f4/0xb0c
+> [    9.617345]  cryptomgr_test+0x50/0x80
+> [    9.621124]  kthread+0x378/0x678
+> [    9.624473]  ret_from_fork+0x10/0x20
+>
+> [    9.629738] The buggy address belongs to the object at ffff5c7440d1cc0=
+0
+>                 which belongs to the cache kmalloc-32 of size 32
+> [    9.642426] The buggy address is located 0 bytes inside of
+>                 allocated 22-byte region [ffff5c7440d1cc00, ffff5c7440d1c=
+c16)
+>
+> [    9.656672] The buggy address belongs to the physical page:
+> [    9.662409] page: refcount:0 mapcount:0 mapping:0000000000000000 index=
+:0x0 pfn:0x880d1c
+> [    9.670646] flags: 0xbfffe0000000000(node=3D0|zone=3D2|lastcpupid=3D0x=
+1ffff)
+> [    9.677371] page_type: f5(slab)
+> [    9.680624] raw: 0bfffe0000000000 ffff5c7440002780 dead000000000100 de=
+ad000000000122
+> [    9.688595] raw: 0000000000000000 0000000080400040 00000000f5000000 00=
+00000000000000
+> [    9.696560] page dumped because: kasan: bad access detected
+>
+> [    9.703854] Memory state around the buggy address:
+> [    9.708796]  ffff5c7440d1cb00: fa fb fb fb fc fc fc fc fa fb fb fb fc =
+fc fc fc
+> [    9.716227]  ffff5c7440d1cb80: fa fb fb fb fc fc fc fc fa fb fb fb fc =
+fc fc fc
+> [    9.723660] >ffff5c7440d1cc00: 00 00 06 fc fc fc fc fc fa fb fb fb fc =
+fc fc fc
+> [    9.731092]                          ^
+> [    9.734959]  ffff5c7440d1cc80: fa fb fb fb fc fc fc fc 00 00 06 fc fc =
+fc fc fc
+> [    9.742392]  ffff5c7440d1cd00: 00 00 06 fc fc fc fc fc fa fb fb fb fc =
+fc fc fc
+> [    9.749824] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
 
-[    9.420862] CPU: 3 UID: 0 PID: 393 Comm: cryptomgr_test Tainted: G S      W          6.13.0-rc7-next-20250117-00007-g58182eb6d73d #12
-[    9.420881] Tainted: [S]=CPU_OUT_OF_SPEC, [W]=WARN
-[    9.420886] Hardware name: Qualcomm Technologies, Inc. SM8650 HDK (DT)
-[    9.420891] Call trace:
-[    9.420895]  show_stack+0x18/0x24 (C)
-[    9.420918]  dump_stack_lvl+0x60/0x80
-[    9.420937]  print_report+0x17c/0x4d0
-[    9.420960]  kasan_report+0xb0/0xf8
-[    9.420983]  kasan_check_range+0x100/0x1a8
-[    9.421001]  __asan_memcpy+0x3c/0xa0
-[    9.421020]  swiotlb_bounce+0x1b4/0x340
-[    9.421034]  swiotlb_tbl_map_single+0x2ac/0x5a0
-[    9.421050]  iommu_dma_map_page+0x2b8/0x4cc
-[    9.421063]  iommu_dma_map_sg+0x2e8/0xb3c
-[    9.421072]  __dma_map_sg_attrs+0x11c/0x1b0
-[    9.421086]  dma_map_sg_attrs+0x10/0x20
-[    9.421097]  qce_aead_async_req_handle+0x784/0x1aa0
-[    9.421125]  qce_handle_queue+0x20c/0x3e8
-[    9.421139]  qce_async_request_enqueue+0x10/0x1c
-[    9.421153]  qce_aead_crypt+0x1f0/0x81c
-[    9.421168]  qce_aead_encrypt+0x14/0x20
-[    9.421182]  crypto_aead_encrypt+0xa0/0xe0
-[    9.421194]  test_aead_vec_cfg+0x84c/0x1be8
-[    9.421207]  test_aead_vs_generic_impl+0x530/0x850
-[    9.421219]  alg_test_aead+0x7c8/0xe40
-[    9.421230]  alg_test+0x1f4/0xb0c
-[    9.421241]  cryptomgr_test+0x50/0x80
-[    9.421251]  kthread+0x378/0x678
-[    9.421272]  ret_from_fork+0x10/0x20
+Hmm, I am running with KASAN on, never seen this How would I run
+tcrypt to trigger it? By default the module doesn't load with no
+params and gives me:
 
-[    9.550765] Allocated by task 393:
-[    9.554279]  kasan_save_stack+0x3c/0x64
-[    9.558252]  kasan_save_track+0x20/0x40
-[    9.562221]  kasan_save_alloc_info+0x40/0x54
-[    9.566641]  __kasan_kmalloc+0xb8/0xbc
-[    9.570515]  __kmalloc_noprof+0x188/0x410
-[    9.574669]  qce_aead_async_req_handle+0xbd4/0x1aa0
-[    9.579701]  qce_handle_queue+0x20c/0x3e8
-[    9.583841]  qce_async_request_enqueue+0x10/0x1c
-[    9.588607]  qce_aead_crypt+0x1f0/0x81c
-[    9.592577]  qce_aead_encrypt+0x14/0x20
-[    9.596547]  crypto_aead_encrypt+0xa0/0xe0
-[    9.600776]  test_aead_vec_cfg+0x84c/0x1be8
-[    9.605097]  test_aead_vs_generic_impl+0x530/0x850
-[    9.610039]  alg_test_aead+0x7c8/0xe40
-[    9.613911]  alg_test+0x1f4/0xb0c
-[    9.617345]  cryptomgr_test+0x50/0x80
-[    9.621124]  kthread+0x378/0x678
-[    9.624473]  ret_from_fork+0x10/0x20
+modprobe: ERROR: could not insert 'tcrypt': Resource temporarily unavailabl=
+e
 
-[    9.629738] The buggy address belongs to the object at ffff5c7440d1cc00
-                which belongs to the cache kmalloc-32 of size 32
-[    9.642426] The buggy address is located 0 bytes inside of
-                allocated 22-byte region [ffff5c7440d1cc00, ffff5c7440d1cc16)
+>
+> I personally still struggle to understand how this driver could plausibly=
+ be
+> useful when the software crypto has no issues, is much faster, and is muc=
+h
+> better tested.  What is motivating having this driver in the kernel?
 
-[    9.656672] The buggy address belongs to the physical page:
-[    9.662409] page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x880d1c
-[    9.670646] flags: 0xbfffe0000000000(node=0|zone=2|lastcpupid=0x1ffff)
-[    9.677371] page_type: f5(slab)
-[    9.680624] raw: 0bfffe0000000000 ffff5c7440002780 dead000000000100 dead000000000122
-[    9.688595] raw: 0000000000000000 0000000080400040 00000000f5000000 0000000000000000
-[    9.696560] page dumped because: kasan: bad access detected
+We want to use it in conjunction with the upcoming scminvoke (for
+loading TAs and invoking objects - used to program the keys into the
+QCE) to support the DRM use-case for decrypting streaming data inside
+secure buffers upstream.
 
-[    9.703854] Memory state around the buggy address:
-[    9.708796]  ffff5c7440d1cb00: fa fb fb fb fc fc fc fc fa fb fb fb fc fc fc fc
-[    9.716227]  ffff5c7440d1cb80: fa fb fb fb fc fc fc fc fa fb fb fb fc fc fc fc
-[    9.723660] >ffff5c7440d1cc00: 00 00 06 fc fc fc fc fc fa fb fb fb fc fc fc fc
-[    9.731092]                          ^
-[    9.734959]  ffff5c7440d1cc80: fa fb fb fb fc fc fc fc 00 00 06 fc fc fc fc fc
-[    9.742392]  ffff5c7440d1cd00: 00 00 06 fc fc fc fc fc fa fb fb fb fc fc fc fc
-[    9.749824] ==================================================================
-
-
-I personally still struggle to understand how this driver could plausibly be
-useful when the software crypto has no issues, is much faster, and is much
-better tested.  What is motivating having this driver in the kernel?
-
-- Eric
+Bart
