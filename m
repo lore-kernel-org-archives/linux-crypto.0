@@ -1,49 +1,48 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 326E2173;
-	Sat, 18 Jan 2025 17:55:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E98C45023;
+	Sun, 19 Jan 2025 04:46:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737222906; cv=none; b=ZHOkACf+3Ry8sLfUOvUfHiWJ8ou3WhSbBhuWOogss4A6Yl4wDe7VOrwGzX7T5Ss9GEQg/WNmop16X7p3W3UpCozmKIuMDjdvnzoy5Z0UcmZq8lwVKC31X8neYodEzl0orY9+Kt8ScrC8HKmaInukKHeLoL6OE6c/AKElfk17yxY=
+	t=1737261983; cv=none; b=AW2afcldXnNFxbMmyWzApeaqgaXepdbYH7zywbfPChe3FBjGiV37EcUO8t3HTW8fGlFbMVVRiwVLYTMNjHYyr3rhzJSooTvrHOTjagn+nA5IliUSHoI4jfXiIfT5m/lnQBaZsHJyq2UnzP1ui8cw2pNQn/YWxST50hbV32LSzpc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737222906; c=relaxed/simple;
-	bh=p3XFn+yR7jJf+lI7IYd80f8frBv7zbx+c8ek2QZPPI0=;
+	s=arc-20240116; t=1737261983; c=relaxed/simple;
+	bh=Yyp0/xqYdZZqOCHjgwu0+cS2qVJD0MIHsRTCeHFvRgc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=d+QXYyEp6tjrme0sLSrMiGAkGwuFvfvq7vVuxiLIZetS0nAbgWVQS4r5PtRUMN3GdxqhfUj9t3yUKMjx+DikuAOf1R6SFzmCyfwc1m22Pud3GPDND+2hKA+X4kRphTEVGbyAO0v+n3SW9agBRyOfurCeLUGl7PBkkn8ai+AePYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z2KzREKb; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=q3y+0C6ongI4c5eF5rDEK+PCXPr4OCN5vZmphOwZ5CXHChvRiH8RT70Jhi7Wvwngp1be9NpkxE2tBgiVA7zxaFM/ridgjOpPzNJWmisUNnDnt1STw0NEuP7EGk5BNbziDkzugxLMOXepISP+PHlcro9+JMKf9rHUkFixt4nRpBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=Tyv5naov; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z2KzREKb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EB47C4CED1;
-	Sat, 18 Jan 2025 17:55:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737222904;
-	bh=p3XFn+yR7jJf+lI7IYd80f8frBv7zbx+c8ek2QZPPI0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Z2KzREKbZQcE/fDtvU4qaWOZVOVq57U/rnGKdkds5VJSKvmV/UR4kSbr90KZYe68X
-	 Hadzlc4JKoivp508nbOWZI7x1FDiUn0y96Wrb3seb45Xo9grgXiOjOjCIXwiZeidtz
-	 OEBq6mzTdbVq50UL10IxG4spFu5qAnJYLzX38lJCF5GjHR95bNJnQHRbDDlBZk+81Y
-	 gZRW3iXKY4BZ9VSRhlFFJqeHdc/59QMTJpWYNEZ+3Y/ZPrN5fGCP+AI+2YCsBZ9JVX
-	 I8w02ZEJ4GNK7SFsiqbkfg2qz8um4CRL81Yto1ReJl638NfAAynenkP7f+yEUbSf71
-	 srzHS9qlmxx6w==
-Date: Sat, 18 Jan 2025 09:55:02 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: neil.armstrong@linaro.org, linux-crypto@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	Thara Gopinath <thara.gopinath@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Stanimir Varbanov <svarbanov@mm-sol.com>
-Subject: Re: [PATCH 9/9] crypto: qce - switch to using a mutex
-Message-ID: <20250118175502.GA66612@sol.localdomain>
-References: <20241203-crypto-qce-refactor-v1-0-c5901d2dd45c@linaro.org>
- <20241203-crypto-qce-refactor-v1-9-c5901d2dd45c@linaro.org>
- <d6220576-eaf5-4415-b25f-b5984255ab78@linaro.org>
- <CAMRc=MevaM4tUNQUs_LjFYaUtDH=YqE-t2gBponGqtK5xE9Gpw@mail.gmail.com>
- <20250118080604.GA721573@sol.localdomain>
- <CAMRc=MeFMYzMY4pU9D6fEpg9bQuuzqg4rQhBU8=z_2eMU+Py-g@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="Tyv5naov"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=kLUKgd2hAE8AB9rvdl9Bzukvw8QgwIcOUzft9k/Vsnc=; b=Tyv5naovbOG5ckbtzCFaHsiruY
+	rL1aqGgyn6PMOsm1/MVzYYT71sw96XNNF72Bz7Ya4OMUXQAsfmcGr7XLXMBsNIt/OXlfrMxum2lHt
+	hSF3EsjXbbTv6zpQ6EFbB476FPTor54bG0Dv5NYd26S8cm7yGGv4SrNQtuaG+fQ7hQLbOhVPO7yjH
+	NzOm90COyh+kAF5v0+Sb/c8ODlCQYHm/oHr/9OkZDLLz5Igvx2Hc6NqTTYa/VMoJRHf3goDe6wVcA
+	uy43ZotiDp0X7osUEBK82zbjMkBtb9xfyoRzFEome0c0xQnSFM3AJWUyMEgwnXsYn7RsnUqYj1Wnh
+	7TDcONRQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tZMzB-00AVYA-23;
+	Sun, 19 Jan 2025 12:45:55 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 19 Jan 2025 12:45:54 +0800
+Date: Sun, 19 Jan 2025 12:45:54 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Chen Ridong <chenridong@huaweicloud.com>
+Cc: steffen.klassert@secunet.com, daniel.m.jordan@oracle.com,
+	nstange@suse.de, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, chenridong@huawei.com,
+	wangweiyang2@huawei.com
+Subject: Re: [PATCH v2 0/3] padata: fix UAF issues
+Message-ID: <Z4yDggNAlq6lRfAq@gondor.apana.org.au>
+References: <20250110061639.1280907-1-chenridong@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,35 +51,31 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAMRc=MeFMYzMY4pU9D6fEpg9bQuuzqg4rQhBU8=z_2eMU+Py-g@mail.gmail.com>
+In-Reply-To: <20250110061639.1280907-1-chenridong@huaweicloud.com>
 
-On Sat, Jan 18, 2025 at 10:28:26AM +0100, Bartosz Golaszewski wrote:
-> I was testing with kcapi-speed and cryptsetup benchmark. I've never
-> seen any errors.
+On Fri, Jan 10, 2025 at 06:16:36AM +0000, Chen Ridong wrote:
+> From: Chen Ridong <chenridong@huawei.com>
 > 
-> Is this after my changes only or did it exist before? You're testing
-> with the tcrypt module? How are you inserting it exactly? What params?
-
-Those are all benchmarks, not tests.  The tests run at registration time if you
-just enable the kconfig options for them:
-
-    # CONFIG_CRYPTO_MANAGER_DISABLE_TESTS is not set
-    CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y
-
-The test failures and KASAN error occur on mainline too, so yes they occur
-before your patchset too.
-
-> >
-> > I personally still struggle to understand how this driver could plausibly be
-> > useful when the software crypto has no issues, is much faster, and is much
-> > better tested.  What is motivating having this driver in the kernel?
+> Fix UAF issues for padata.
 > 
-> We want to use it in conjunction with the upcoming scminvoke (for
-> loading TAs and invoking objects - used to program the keys into the
-> QCE) to support the DRM use-case for decrypting streaming data inside
-> secure buffers upstream.
+> ---
+> v1->v2:
+>  - use synchronize_rcu to fix UAF for padata_reorder.
+>  - add patch to avoid UAF for 'reorder_work'
+> 
+> Chen Ridong (3):
+>   padata: add pd get/put refcnt helper
+>   padata: fix UAF in padata_reorder
+>   padata: avoid UAF for reorder_work
+> 
+>  kernel/padata.c | 43 +++++++++++++++++++++++++++++++++++--------
+>  1 file changed, 35 insertions(+), 8 deletions(-)
+> 
+> -- 
+> 2.34.1
 
-Notably lacking is any claim that any of the current features of the driver are
-actually useful.
-
-- Eric
+All applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
