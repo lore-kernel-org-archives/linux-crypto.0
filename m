@@ -1,80 +1,125 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B8B936D
-	for <linux-crypto@vger.kernel.org>; Mon, 20 Jan 2025 09:34:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACE1D1E4A9
+	for <linux-crypto@vger.kernel.org>; Mon, 20 Jan 2025 13:46:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737365682; cv=none; b=j8Dqy+2BpikK00wVcmGJPD1zlNalX/Xo1j/lbQJZmmon4E2N18VyCwe6Vre57QFSmkA7VXgZkGIy2ZYVY+jtIP0fJpcMcFXtSXbHI/b+t1nBHJc65ShznbqIF6IB2EBwAAFHXtMZC0vQ5GcFsCvmb9sIfpBOBaBQAr3sT+vDypw=
+	t=1737380816; cv=none; b=S1e4NAfU/x5Ks1y3bnOT9LIjMXtfmRODptGv3ppqdPDWqiKfWE48e+Vm6Y/8Nd0n3rTkmlFBOD52j3HwFrZe2w8hcl+Zp3X+BWLGbEIm7Ik13wawF5p1GM2Mqv8O9x23MZ18SE9Cr6RAWBC9PS0QUD8NhEeQDQHrp4DhUdBzHCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737365682; c=relaxed/simple;
-	bh=u2HQiCL+u3gJ8mAykqLQuJvkHpp/IqMu+QM/A8KSWck=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=WpdHyYajz8wnrzobn7od8XrR1wgFSuvqhm1dyRL2dOR8Ma8GQytzpfKDEaMEdCKHg9IpLN1hg2u690ascTe5+DpmjSEG325g6hij9h2jtLLKGclyVuIjxkcqYyYA0X+ww1wh+M7gXzpxrjYBTOxxiLvSF8Xvsral/720jebqhCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ioe+a8/Q; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1737380816; c=relaxed/simple;
+	bh=vdaZayPM67nF/4Tn0WCZcfScGglX0NHRO8C3emddbL4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DdQTY6MuZgTVv7thOB9JT6kkBQvtStdPyUiC3jrX62O7/ioWhqQ+YUyfyGmDvWa5F4mnKIR2VgGcSarPze5H/52yrq/4uqspy0GgDiHpv5/1peJyMFtEBKrcOOuBt3O10v1QmdQLiiUdy/xjT5SWvUYDScH3lWqmiaAa90tZj2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=glF0BiAO; arc=none smtp.client-ip=209.85.208.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ioe+a8/Q"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737365679;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2AwYiuDf1j5uDju1TxVaOib/j90iLN/1cU+I3EHvD7c=;
-	b=Ioe+a8/Q7UP8zzTap/R0fyLb7d7qzLChD0TG1rjHCjqlzWxrXqVs+V4/xYU482b7sN8cUS
-	41StZ20kKOeAiAcv3XbXgOcdo8dLkxWjxLEc4OLMN1+nUhF1PsJMum2AlT399wv93vwzkh
-	e0OAfhXAXPJCP7o905PZe+h2ffdNajU=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-689-LnePKWCkOQW1lKPkfGYpLg-1; Mon,
- 20 Jan 2025 04:34:35 -0500
-X-MC-Unique: LnePKWCkOQW1lKPkfGYpLg-1
-X-Mimecast-MFC-AGG-ID: LnePKWCkOQW1lKPkfGYpLg
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 570F41955DCD;
-	Mon, 20 Jan 2025 09:34:34 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.5])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 76D9919560A3;
-	Mon, 20 Jan 2025 09:34:32 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20250112163059.467573-1-linux@treblig.org>
-References: <20250112163059.467573-1-linux@treblig.org>
-To: linux@treblig.org
-Cc: dhowells@redhat.com, herbert@gondor.apana.org.au,
-    davem@davemloft.net, keyrings@vger.kernel.org,
-    linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: asymmetric_keys - Remove unused key_being_used_for[]
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="glF0BiAO"
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-30613802a04so46923681fa.2
+        for <linux-crypto@vger.kernel.org>; Mon, 20 Jan 2025 05:46:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1737380813; x=1737985613; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=O7uWym8aviUECTT7NP343rKz7l6AiGEcMJ6zJloUFKk=;
+        b=glF0BiAOrO09M02qRo93wBo2eSSg925tV8xA011LlxTUkk4hS/8DkLMvp+a+B9pVHj
+         rxsJpc4NPsPhyUud+srxrdSIGoJmak0gzqFdVB5cyGiBrPKrGGcyvO1xdo5/ouhgaV2T
+         ui42LVJBOHSx9sjxtiunxtQmF4B6OtZmwipO9l8OmYFC/wyY3rDNCj4cEYC0Po2bS7kP
+         YPwlKRXThhSyEluIkeSe7Xg/dzUqNHF/Ia3U3KcameXlWFV4xgPDvP6Pdt2SMUzDPldt
+         Oh1Z1zU3B6Xcy9Sfd3zitpDCwOlWADKsdOES5rKaJGHhJEud0aueLDsOqZ+Z9LiVUdSo
+         P3cA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737380813; x=1737985613;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=O7uWym8aviUECTT7NP343rKz7l6AiGEcMJ6zJloUFKk=;
+        b=V/ZJ45l+0tBFybqvbbBQ3ftCGV9cOmhRrEtwNy1NK6A3OfRRjLUVEpYaiLc1YFmo4g
+         03UZCX9cbvZxN/JDMn3+zmqG1M7zc2ctQL7NoRNSLtgBpYd8SXrF0tOUh+CM5/pL4UTk
+         lYRA4vZejdK0b+637oJuBv5gKfOoYUo/4RCrrp/rUvXCig1R1hP9pH6UohQS07nhR+Qv
+         hl/5eJmSMOMyS4vWuY6C9iGZTvVChieIz4vLssADZ5ElSHfQmASbyCptRXhDtSf/rN7W
+         /y4OGsg9j25K29clPbGYv7ckZilLM2vEj5HUsul43DWAU8e6yUG0AmlalkVyesG1CGIK
+         KeIQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVGvwSDLoBcUdZVYjhfjwiCjH3CSGjofdUgWHR8BJ0CiDkUKV8wecW2Vo1MurraOBm7UJVVcQ4ZZRAKLZQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyTG9mMXxH4LEarLsTzantzSUCEJdjcKcPjo8qPxc5FGtJ90Nxk
+	3O9jZcWVn5O3YcsEukhGlbyD+/1X1nDl44PLHOanVGIhnt1v/LeoLHyFXM1yFhzh6eWXokYbnUL
+	VTrCcP1Lq0gElzG12cKV/E8caJK4vt45w9ZEf0A==
+X-Gm-Gg: ASbGnctltPlt8MKiYeJpXQd8wqrOU5I1FSU6KgEjoZOsN66Lw03WatQUDkkbCEqmmvN
+	duPgnGNhAIBnFjMaEWSlF5nFjSUHcl80fSNnUlF7QfV4vQP2sGYzTqKRW9aTjwnNsS9DeIXiTRg
+	U4h3dmjKI=
+X-Google-Smtp-Source: AGHT+IGQFrCMm8vyRK8vl4hzwtqFf/36t7jhpPxV0M0zp0y+Zz7oKVbBwOYsm8AIgJwc3bHgZHJIcWkIRU9kVfObBko=
+X-Received: by 2002:a2e:8e76:0:b0:2ff:c67f:5197 with SMTP id
+ 38308e7fff4ca-3072ca6a6bfmr38519261fa.13.1737380812745; Mon, 20 Jan 2025
+ 05:46:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <988300.1737365671.1@warthog.procyon.org.uk>
-Date: Mon, 20 Jan 2025 09:34:31 +0000
-Message-ID: <988301.1737365671@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+References: <20241203-crypto-qce-refactor-v1-0-c5901d2dd45c@linaro.org>
+ <20241203-crypto-qce-refactor-v1-9-c5901d2dd45c@linaro.org>
+ <d6220576-eaf5-4415-b25f-b5984255ab78@linaro.org> <CAMRc=MevaM4tUNQUs_LjFYaUtDH=YqE-t2gBponGqtK5xE9Gpw@mail.gmail.com>
+ <20250118080604.GA721573@sol.localdomain> <CAMRc=MeFMYzMY4pU9D6fEpg9bQuuzqg4rQhBU8=z_2eMU+Py-g@mail.gmail.com>
+ <20250118175502.GA66612@sol.localdomain>
+In-Reply-To: <20250118175502.GA66612@sol.localdomain>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Mon, 20 Jan 2025 14:46:41 +0100
+X-Gm-Features: AbW1kvadA5qf4pLYrGVbYIj86oGONAxbZ9gOjq4aNXiA4bcW9hoyMMQqNC0e_GE
+Message-ID: <CAMRc=MdR-8AnwAsMzHn8zj2awZUumO32C_S1-CkjBEqbuKPdeg@mail.gmail.com>
+Subject: Re: [PATCH 9/9] crypto: qce - switch to using a mutex
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: neil.armstrong@linaro.org, linux-crypto@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, Thara Gopinath <thara.gopinath@gmail.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Stanimir Varbanov <svarbanov@mm-sol.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-linux@treblig.org wrote:
+On Sat, Jan 18, 2025 at 6:55=E2=80=AFPM Eric Biggers <ebiggers@kernel.org> =
+wrote:
+>
+> On Sat, Jan 18, 2025 at 10:28:26AM +0100, Bartosz Golaszewski wrote:
+> > I was testing with kcapi-speed and cryptsetup benchmark. I've never
+> > seen any errors.
+> >
+> > Is this after my changes only or did it exist before? You're testing
+> > with the tcrypt module? How are you inserting it exactly? What params?
+>
+> Those are all benchmarks, not tests.  The tests run at registration time =
+if you
+> just enable the kconfig options for them:
+>
+>     # CONFIG_CRYPTO_MANAGER_DISABLE_TESTS is not set
+>     CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=3Dy
+>
+> The test failures and KASAN error occur on mainline too, so yes they occu=
+r
+> before your patchset too.
+>
+> > >
+> > > I personally still struggle to understand how this driver could plaus=
+ibly be
+> > > useful when the software crypto has no issues, is much faster, and is=
+ much
+> > > better tested.  What is motivating having this driver in the kernel?
+> >
+> > We want to use it in conjunction with the upcoming scminvoke (for
+> > loading TAs and invoking objects - used to program the keys into the
+> > QCE) to support the DRM use-case for decrypting streaming data inside
+> > secure buffers upstream.
+>
+> Notably lacking is any claim that any of the current features of the driv=
+er are
+> actually useful.
+>
 
-> key_being_used_for[] is an unused array of textual names for
-> the elements of the enum key_being_used_for.  It was added in 2015 by
-> commit 99db44350672 ("PKCS#7: Appropriately restrict authenticated
-> attributes and content type")
-> 
-> Remove it.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+Noted. I'm still quite early into working on the upstream-bound code
+supporting the streaming use-case but I will consider a proposal to
+remove existing features that are better provided by ARM CE.
 
-Acked-by: David Howells <dhowells@redhat.com>
-
+Thanks,
+Bartosz
