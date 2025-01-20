@@ -1,51 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A98041E2838;
-	Mon, 20 Jan 2025 13:57:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD07F13D531;
+	Mon, 20 Jan 2025 14:22:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737381479; cv=none; b=kIaaZARwrUfzFnRm6Y+w/NxEJKZOT96wIXsPyhXF2bzpDFgB02YuiQUKmn9+yhoVOBgq8IUJqyauO1ybT+QnkRVNgwTylSv6LGweZY8Tn6Rch6rQPzs0tpiGeDhnK6dAQo2yB/pKhHxS/6L2V3jxdUsFX47MXexcQteUPPSIS44=
+	t=1737382941; cv=none; b=tDECKvTrEwCPE1F0zqdu+B8li7yjYo2oh0A6qjfIEWi4UW8kuy8znYQg756uM1cdMz3LGrXeOVuzBoHWfxJnFuvcGC7/l68mF3a9AaCP9o9MpBgjCh6lWT9HCTIFRE7PmUkYtSN/GkRz0FHwhaPO0x9kJ7JBaR2a7w3C5SALG7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737381479; c=relaxed/simple;
-	bh=mMnF1rH8r/RyTbYhURrLkiK4JarAbi2ujmmaTjR3WKo=;
+	s=arc-20240116; t=1737382941; c=relaxed/simple;
+	bh=Q/ah7Xad9Pkqp3TtguBsx5XKqUkR2Fz8GupvOx/hv9c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UG590U1NkvHUdC3b0rUhdAnGqj2fr8XjEFr2v7O4u94MKUHnU5EkK4hvmHCB56LvHiS6K895UB7LR8EeLWlZx8WTWr2AccQ9/WeOOOD/ZJXoXxkyLADIqWKGQcaGI/ibOVS1WyqHQ2VBNic8c7e+oIALLJVp7xk66nNdKbwooFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NuJZpKyP; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=hjYov7FU33SR04Bi6AxjqKa+1bXiugrKAwEohvOk1dZCt+zNLJUjWzloJIdUmaZ4clExck/V53EgDF0ThV9FmK49IO46B/prmKzMDDfbCHkp8N6f8ZdHVklsROgl6WjUa8BGJUE4026k2VxB+2alaHL9qQ+Df5r7hRkPWWwbBGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=btF4+XTF; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NuJZpKyP"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49094C4CEDD;
-	Mon, 20 Jan 2025 13:57:56 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="btF4+XTF"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E5B3C4CEDD;
+	Mon, 20 Jan 2025 14:22:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737381479;
-	bh=mMnF1rH8r/RyTbYhURrLkiK4JarAbi2ujmmaTjR3WKo=;
+	s=k20201202; t=1737382941;
+	bh=Q/ah7Xad9Pkqp3TtguBsx5XKqUkR2Fz8GupvOx/hv9c=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NuJZpKyPx7ny0GSbeehDbouPHXimJr0RgfJE+hx6Q4fg+QRcvvInO7rf1BGVKvVAJ
-	 D2QL3N10JPkWgv6H49sp0CxmdwGPw6gyPkUgyD+yslIxtjv87p35D5gWXVG+vVU7Bj
-	 4smk6TeGY9hii3l0EJK+grE6/2JBBod2xX5R02orL23gee8qA55XrCTSDkfCq0fcH7
-	 f2wx3JGzMxSLc+0ly6E8I1dYqLg3APFHy3LsiP+NR47Ap3O2RTgOEP3F0vRyMYhhjy
-	 2TMc3ZJ/tfL8hh8h3bknAlIEfpYIu9eZ7eeIzG9jmfAxty8suUSUpYqcepx7DwPsAz
-	 C/VQhW0CuySUQ==
-Date: Mon, 20 Jan 2025 13:57:54 +0000
-From: Simon Horman <horms@kernel.org>
+	b=btF4+XTFOp0ga6T7d+3J8b/geuEwFuwnlTi+lf83vRcdKRoTVfYz+j7wryq5Tg4lu
+	 ZK3w9rFFY3hmH8PuksePlIqesvWZnTUqA5jg6XYq0s3ob+luFv7MtS9OMUIw9Fb+d1
+	 PpTguh1N6eFf7/CK1jWbCTnY1iq78Zvb3ZoUwJ2J9PeBxfNfaTQ1fh/lj/8M8/iUgY
+	 EHdLjEY/Swkp03kzxyfecr+1HAz3x7k6EHPdayAGuGa01d6bD/g5yKqk6R2xDjIVze
+	 ItO6SThpO9X9ifELiuv6JUqG2086TJNksTrRHaJ2VUjnGiHZkb8ogNz+vmlMHbJNkL
+	 Sy6xKQupyurPQ==
+Date: Mon, 20 Jan 2025 16:22:17 +0200
+From: Leon Romanovsky <leon@kernel.org>
 To: David Howells <dhowells@redhat.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Trond Myklebust <trond.myklebust@hammerspace.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
-	linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 03/24] crypto: Add 'krb5enc' hash and cipher AEAD
- algorithm
-Message-ID: <20250120135754.GX6206@kernel.org>
-References: <20250117183538.881618-1-dhowells@redhat.com>
- <20250117183538.881618-4-dhowells@redhat.com>
+Cc: lsf-pc@lists.linux-foundation.org, John Hubbard <jhubbard@nvidia.com>,
+	Matthew Wilcox <willy@infradead.org>, brauner@kernel.org,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-mm@kvack.org, linux-block@vger.kernel.org,
+	Christoph Hellwig <hch@lst.de>, Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [LSF/MM/BPF TOPIC] Improving iov_iter - and replacing
+ scatterlists
+Message-ID: <20250120142217.GA153811@unreal>
+References: <886959.1737148612@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -54,71 +47,35 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250117183538.881618-4-dhowells@redhat.com>
+In-Reply-To: <886959.1737148612@warthog.procyon.org.uk>
 
-On Fri, Jan 17, 2025 at 06:35:12PM +0000, David Howells wrote:
-> Add an AEAD template that does hash-then-cipher (unlike authenc that does
-> cipher-then-hash).  This is required for a number of Kerberos 5 encoding
-> types.
+On Fri, Jan 17, 2025 at 09:16:52PM +0000, David Howells wrote:
+> Hi,
 > 
-> [!] Note that the net/sunrpc/auth_gss/ implementation gets a pair of
-> ciphers, one non-CTS and one CTS, using the former to do all the aligned
-> blocks and the latter to do the last two blocks if they aren't also
-> aligned.  It may be necessary to do this here too for performance reasons -
-> but there are considerations both ways:
+> I'd like to propose a discussion of two things: firstly, how might we improve
+> iov_iter and, secondly, would it be possible to replace scatterlists.
+
+<...>
+
+> Rumour has it that John Hubbard may be working along similar lines, possibly
+> just in the area of bio_vecs and ITER_BVEC.
 > 
->  (1) firstly, there is an optimised assembly version of cts(cbc(aes)) on
->      x86_64 that should be used instead of having two ciphers;
 > 
->  (2) secondly, none of the hardware offload drivers seem to offer CTS
->      support (Intel QAT does not, for instance).
-> 
-> However, I don't know if it's possible to query the crypto API to find out
-> whether there's an optimised CTS algorithm available.
-> 
-> Signed-off-by: David Howells <dhowells@redhat.com>
+> [*] Second: Can we replace the uses of scatterlist with iov_iter and reduce
+> the number of iterator classes we have?
 
-...
+<...>
 
-> diff --git a/crypto/krb5enc.c b/crypto/krb5enc.c
+I would say yes to the questions.
 
-...
+Regarding rumors, I don't know, but Christoph, Jason and I are working towards
+this goal. We proposed new DMA API which doesn't need scatterlists and allows
+callers to implement their own data-structures.
 
-> +static int krb5enc_verify_hash(struct aead_request *req, void *hash)
-> +{
-> +	struct crypto_aead *krb5enc = crypto_aead_reqtfm(req);
-> +	struct aead_instance *inst = aead_alg_instance(krb5enc);
-> +	struct krb5enc_instance_ctx *ictx = aead_instance_ctx(inst);
-> +	struct krb5enc_request_ctx *areq_ctx = aead_request_ctx(req);
-> +	struct ahash_request *ahreq = (void *)(areq_ctx->tail + ictx->reqoff);
-> +	unsigned int authsize = crypto_aead_authsize(krb5enc);
-> +	u8 *ihash = ahreq->result + authsize;
-> +
-> +	scatterwalk_map_and_copy(ihash, req->src, ahreq->nbytes, authsize, 0);
-> +
-> +	if (crypto_memneq(ihash, ahreq->result, authsize))
-> +		return -EBADMSG;
-> +	return 0;
-> +}
-> +
-> +static void krb5enc_decrypt_hash_done(void *data, int err)
-> +{
-> +	struct aead_request *req = data;
-> +
-> +	if (err)
-> +		return krb5enc_request_complete(req, err);
-> +
-> +	err = krb5enc_verify_hash(req, 0);
+See this "[PATCH v6 00/17] Provide a new two step DMA mapping API" series
+https://lore.kernel.org/all/cover.1737106761.git.leon@kernel.org
+and its block layer followup "[RFC PATCH 0/7] Block and NMMe PCI use of
+new DMA mapping API"
+https://lore.kernel.org/all/cover.1730037261.git.leon@kernel.org
 
-Hi David,
-
-Sparse complains that the second argument to krb5enc_verify_hash should be
-a pointer rather than an integer. So perhaps this would be slightly better
-expressed as (completely untested!):
-
-	err = krb5enc_verify_hash(req, NULL);
-
-> +	krb5enc_request_complete(req, err);
-
-...
-> +}
+Thanks
