@@ -1,108 +1,167 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59B701F03DF;
-	Mon, 20 Jan 2025 20:47:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F8871BEF9A
+	for <linux-crypto@vger.kernel.org>; Mon, 20 Jan 2025 23:12:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737406044; cv=none; b=NNJv9Xg9tSgaDdLwnk1S05O6b981wz+lQvxFKx4+1dFaeolcOsEUQG4i7nMdkpIfQUUKauxg2dzpxQlr1Tg48BrRbTn83684WpmuCFn2dkIjfPjmb4bcjC5fqMo/1Z5c0xNJZeQQwxMoUeulfmtixpHxpqCb85hrS/5G1/XI6Us=
+	t=1737414740; cv=none; b=LUq2a3TBcqW2Y2GtleYtaJgLOwkNAN3xJ6mNELL1+O4pmSkUxLnyJ9AkbfQVpHugONMfyP1YZh074Y1yb/6tseBnxY9i2BdWBT31PqCMcsyUHrv7TxTINjMlk+a6UIs6vAyYZUe2M5BTuRJ1XVtqKPpJHMvW3JPTWbGp4pnoQ2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737406044; c=relaxed/simple;
-	bh=MoDpvrlbktc0ZMsXkSWxxY4ig0rqpNF5iThW90x655o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TzU2Rm0q7qJ+nvaXH1mw7vvAKYu5SKFONbEtYvINnXI2C6mm77efelFQ1K28YUMeq6J+gYpaPTD5Ff4GOUpcyWv8pT4omuzr4aTffWgQda6z/nFJgniZUwysGcOF5OcruGh3Ti0DRFMtZ+HPCjVQ10MpNQqq3GiVcnH7MbN0J6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YMqMYQjM; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1737414740; c=relaxed/simple;
+	bh=SBvenXYw8OtPipXuO7LE4YWvoIngH1jvhlR3/7YWChk=;
+	h=From:In-Reply-To:References:Cc:Subject:MIME-Version:Content-Type:
+	 Date:Message-ID; b=VoGWH/uQPw6Up3sdFo0vw8g+sA4kfUyQuDBgAOeyx4bgn5TdjGkw+Ha6OJOdqQPXDlg0heGbjpL2YppLz9gtbCAsc84KKyoOyFjRkbalnGuxCNpdQRgz+5KrdUMobP9KhQqPqQKEj5mDgURpEXsfOqk7idSBaC1+931MlT1y2Lc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NCcV/pB1; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YMqMYQjM"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42C32C4CEE3;
-	Mon, 20 Jan 2025 20:47:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737406043;
-	bh=MoDpvrlbktc0ZMsXkSWxxY4ig0rqpNF5iThW90x655o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YMqMYQjMaJTRuMTACTw6Wyc8xEn4k+gJEGHaBdNyb2+6mlms2HLtHSjue6lnLaxsc
-	 UXtxQSJoN8EKXj9dWA5B/oYvNfhd3sTyhUQMWfQgJPAz43gu90LzOJ3Lix+86N/yZR
-	 LcHRurorkvLdGQ+UeW35HHYwMIp8HP6qjr6LunkG1atLLn0cFVQtKCm6sV9oXWTF3C
-	 qpwdcChDm5sHrqdPc7P5W2CxSOqdvlu5ds/LWbHqBdbuRGi5CBvwId3pd2zku1/0sv
-	 07N6zDqAnNRwQeIcVPJwbP+zRZ6ykBUmwe9S9cOo0m2aPKQO8p3+VAvN01TUVVyGKr
-	 9reSJ22Cz+BRw==
-Date: Mon, 20 Jan 2025 12:47:21 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Simon Horman <horms@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Trond Myklebust <trond.myklebust@hammerspace.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
-	linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 03/24] crypto: Add 'krb5enc' hash and cipher AEAD
- algorithm
-Message-ID: <20250120204721.GA53305@sol.localdomain>
-References: <20250120191250.GA39025@sol.localdomain>
- <20250120173937.GA2268@sol.localdomain>
- <20250120135754.GX6206@kernel.org>
- <20250117183538.881618-1-dhowells@redhat.com>
- <20250117183538.881618-4-dhowells@redhat.com>
- <1201143.1737383111@warthog.procyon.org.uk>
- <1212970.1737399580@warthog.procyon.org.uk>
- <1215834.1737404294@warthog.procyon.org.uk>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NCcV/pB1"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737414736;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EIJQ5eR7pxgEx6HUdxvMLLK6G12t5XMgFVgt0W5+/MM=;
+	b=NCcV/pB1V+1LdwI3s83RvWKTp3QNTJzHoVuXkhazA3+Y2zlWclo38oaFd+5e9OfAoHnEpW
+	8uB4DqpAF6TWGoOLKRvQQLQsImUdt5tpNORPZiYVls2i9oxBT65l4iCaYSiXoXq/kZBx3U
+	5dtXHxQ/PjquLcAxzXc3vqqVfC5CuPo=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-157-TiHGSjjiOXOfCzM4ZjoB9Q-1; Mon,
+ 20 Jan 2025 18:12:12 -0500
+X-MC-Unique: TiHGSjjiOXOfCzM4ZjoB9Q-1
+X-Mimecast-MFC-AGG-ID: TiHGSjjiOXOfCzM4ZjoB9Q
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D93631955DB8;
+	Mon, 20 Jan 2025 23:12:08 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.5])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 004053003E7F;
+	Mon, 20 Jan 2025 23:12:03 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <1201143.1737383111@warthog.procyon.org.uk>
+References: <1201143.1737383111@warthog.procyon.org.uk> <20250120135754.GX6206@kernel.org> <20250117183538.881618-1-dhowells@redhat.com> <20250117183538.881618-4-dhowells@redhat.com>
+Cc: dhowells@redhat.com, Simon Horman <horms@kernel.org>,
+    Herbert Xu <herbert@gondor.apana.org.au>,
+    Chuck Lever <chuck.lever@oracle.com>,
+    Trond Myklebust <trond.myklebust@hammerspace.com>,
+    "David S. Miller" <davem@davemloft.net>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+    Paolo Abeni <pabeni@redhat.com>, Eric Biggers <ebiggers@kernel.org>,
+    Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
+    linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+    linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 03/24] crypto: Add 'krb5enc' hash and cipher AEAD algorithm
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1215834.1737404294@warthog.procyon.org.uk>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1434957.1737414722.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 20 Jan 2025 23:12:02 +0000
+Message-ID: <1434958.1737414722@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Mon, Jan 20, 2025 at 08:18:14PM +0000, David Howells wrote:
-> Eric Biggers <ebiggers@kernel.org> wrote:
-> 
-> > In any case, why would you need anything to do asynchronous at all here?
-> 
-> Because authenc, which I copied, passes the asynchronocity mode onto the two
-> algos it runs (one encrypt, one hash).  If authenc is run synchronously, then
-> the algos are run synchronously and serially; but if authenc is run async,
-> then the algos are run asynchronously - but they may still have to be run
-> serially[*] and the second is dispatched from the completion handler of the
-> first.  So two different paths through the code exist, and rxgk and testmgr
-> only test the synchronous path.
+David Howells <dhowells@redhat.com> wrote:
 
-No, it goes in the other direction.  The underlying algorithms decide whether
-they are asynchronous or not, and that gets passed up.  It sounds like what you
-want to do is test your template in the case where the underlying algorithms are
-asynchronous.  There is a way to do that by wrapping the underlying algorithms
-with cryptd.  For example the following works with gcm:
+> > Sparse complains that the second argument to krb5enc_verify_hash shoul=
+d be
+> > a pointer rather than an integer. So perhaps this would be slightly be=
+tter
+> > expressed as (completely untested!):
+> > =
 
-python3 <<EOF
-import socket
-s = socket.socket(socket.AF_ALG, 5, 0)
-s.bind(("aead", "gcm_base(cryptd(ctr(aes-generic)),cryptd(ghash-generic))"))
-EOF
+> > 	err =3D krb5enc_verify_hash(req, NULL);
+> =
 
-This really should just be thought of as complying with the outdated design of
-the crypto API, though.  In practice synchronous is the only case that really
-matters.
+> Actually, no.  It should be "ahreq->result + authsize" and
+> krb5enc_verify_hash() shouldn't calculate ihash, but use its hash parame=
+ter.
 
-> [*] Because in authenc-compatible encoding types, the output of the encryption
-> is hashed.  Older krb5 encodings hash the plaintext and the hash generation
-> and the encrypt can be run in parallel.  For decrypting, the reverse is true;
-> authenc may be able to do the decrypt and the hash in parallel...  But
-> parallellisation also requires that the input and output buffers are not the
-> same.
+Ah.  That's wrong also.  I'm going to drop the second parameter and just
+calculate the hash pointers directly.
 
-The right way to optimize cases like that is to interleave the two computations.
-Look at how the AES-GCM assembly code interleaves AES-CTR and GHASH for example.
-Doing something with async threads is the completely wrong solution here and
-would be much slower.  The amount of time needed to process a single message is
-simply far too short for multithreading to be appropriate on a per message
-basis.
+David
+---
+diff --git a/crypto/krb5enc.c b/crypto/krb5enc.c
+index 931387a8ee6f..e5cec47e7e42 100644
+--- a/crypto/krb5enc.c
++++ b/crypto/krb5enc.c
+@@ -230,7 +230,7 @@ static int krb5enc_encrypt(struct aead_request *req)
+ 	return krb5enc_dispatch_encrypt(req, aead_request_flags(req));
+ }
+ =
 
-- Eric
+-static int krb5enc_verify_hash(struct aead_request *req, void *hash)
++static int krb5enc_verify_hash(struct aead_request *req)
+ {
+ 	struct crypto_aead *krb5enc =3D crypto_aead_reqtfm(req);
+ 	struct aead_instance *inst =3D aead_alg_instance(krb5enc);
+@@ -238,11 +238,12 @@ static int krb5enc_verify_hash(struct aead_request *=
+req, void *hash)
+ 	struct krb5enc_request_ctx *areq_ctx =3D aead_request_ctx(req);
+ 	struct ahash_request *ahreq =3D (void *)(areq_ctx->tail + ictx->reqoff);
+ 	unsigned int authsize =3D crypto_aead_authsize(krb5enc);
+-	u8 *ihash =3D ahreq->result + authsize;
++	u8 *calc_hash =3D areq_ctx->tail;
++	u8 *msg_hash  =3D areq_ctx->tail + authsize;
+ =
+
+-	scatterwalk_map_and_copy(ihash, req->src, ahreq->nbytes, authsize, 0);
++	scatterwalk_map_and_copy(msg_hash, req->src, ahreq->nbytes, authsize, 0)=
+;
+ =
+
+-	if (crypto_memneq(ihash, ahreq->result, authsize))
++	if (crypto_memneq(msg_hash, calc_hash, authsize))
+ 		return -EBADMSG;
+ 	return 0;
+ }
+@@ -254,7 +255,7 @@ static void krb5enc_decrypt_hash_done(void *data, int =
+err)
+ 	if (err)
+ 		return krb5enc_request_complete(req, err);
+ =
+
+-	err =3D krb5enc_verify_hash(req, 0);
++	err =3D krb5enc_verify_hash(req);
+ 	krb5enc_request_complete(req, err);
+ }
+ =
+
+@@ -284,7 +285,7 @@ static int krb5enc_dispatch_decrypt_hash(struct aead_r=
+equest *req)
+ 	if (err < 0)
+ 		return err;
+ =
+
+-	return krb5enc_verify_hash(req, hash);
++	return krb5enc_verify_hash(req);
+ }
+ =
+
+ /*
+@@ -352,7 +353,7 @@ static int krb5enc_init_tfm(struct crypto_aead *tfm)
+ 	crypto_aead_set_reqsize(
+ 		tfm,
+ 		sizeof(struct krb5enc_request_ctx) +
+-		ictx->reqoff +
++		ictx->reqoff + /* Space for two checksums */
+ 		umax(sizeof(struct ahash_request) + crypto_ahash_reqsize(auth),
+ 		     sizeof(struct skcipher_request) + crypto_skcipher_reqsize(enc)));
+ =
+
+
