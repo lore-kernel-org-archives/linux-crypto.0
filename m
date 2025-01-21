@@ -1,167 +1,220 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F8871BEF9A
-	for <linux-crypto@vger.kernel.org>; Mon, 20 Jan 2025 23:12:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08E391119A;
+	Tue, 21 Jan 2025 13:40:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737414740; cv=none; b=LUq2a3TBcqW2Y2GtleYtaJgLOwkNAN3xJ6mNELL1+O4pmSkUxLnyJ9AkbfQVpHugONMfyP1YZh074Y1yb/6tseBnxY9i2BdWBT31PqCMcsyUHrv7TxTINjMlk+a6UIs6vAyYZUe2M5BTuRJ1XVtqKPpJHMvW3JPTWbGp4pnoQ2M=
+	t=1737466858; cv=none; b=bJQoNIMjC/ZXVoJ9wiufPCSv5ONcgARl1wWqraDdni4qk1GowmVhzTHL6R998R8EqbzgTlSvgGzEZlCYymJCYngaqJ0SXqrrIhxezLxr2xByS2OncKC/RsC8VRnyt47GMNuAI5uxtioi9uIDm14kjd45oLvhwocHzVQ4q/+2rSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737414740; c=relaxed/simple;
-	bh=SBvenXYw8OtPipXuO7LE4YWvoIngH1jvhlR3/7YWChk=;
-	h=From:In-Reply-To:References:Cc:Subject:MIME-Version:Content-Type:
-	 Date:Message-ID; b=VoGWH/uQPw6Up3sdFo0vw8g+sA4kfUyQuDBgAOeyx4bgn5TdjGkw+Ha6OJOdqQPXDlg0heGbjpL2YppLz9gtbCAsc84KKyoOyFjRkbalnGuxCNpdQRgz+5KrdUMobP9KhQqPqQKEj5mDgURpEXsfOqk7idSBaC1+931MlT1y2Lc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NCcV/pB1; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1737466858; c=relaxed/simple;
+	bh=O6UDpyy68BQo7X626NvkAmSzVuRiTAwo5GjYO1FKjts=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rEQwzI8gOlpxKvmAG5rEfLCFl3QaHckMVAjI5Qbbgr4hNKX7uuOo8DAHBjFUMyQU0qjpKhxAxpFG5zZ9VVeS8VVvzYJwFYfVmgQyFpWy4z/+SgRVlBJvhROJWQm0JcpvL70u98TRZpKvMYUSvw0amTkvcpyZ6mIXFj1TysfDmYA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=XXJc1fjY; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NCcV/pB1"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737414736;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EIJQ5eR7pxgEx6HUdxvMLLK6G12t5XMgFVgt0W5+/MM=;
-	b=NCcV/pB1V+1LdwI3s83RvWKTp3QNTJzHoVuXkhazA3+Y2zlWclo38oaFd+5e9OfAoHnEpW
-	8uB4DqpAF6TWGoOLKRvQQLQsImUdt5tpNORPZiYVls2i9oxBT65l4iCaYSiXoXq/kZBx3U
-	5dtXHxQ/PjquLcAxzXc3vqqVfC5CuPo=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-157-TiHGSjjiOXOfCzM4ZjoB9Q-1; Mon,
- 20 Jan 2025 18:12:12 -0500
-X-MC-Unique: TiHGSjjiOXOfCzM4ZjoB9Q-1
-X-Mimecast-MFC-AGG-ID: TiHGSjjiOXOfCzM4ZjoB9Q
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D93631955DB8;
-	Mon, 20 Jan 2025 23:12:08 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.5])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 004053003E7F;
-	Mon, 20 Jan 2025 23:12:03 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <1201143.1737383111@warthog.procyon.org.uk>
-References: <1201143.1737383111@warthog.procyon.org.uk> <20250120135754.GX6206@kernel.org> <20250117183538.881618-1-dhowells@redhat.com> <20250117183538.881618-4-dhowells@redhat.com>
-Cc: dhowells@redhat.com, Simon Horman <horms@kernel.org>,
-    Herbert Xu <herbert@gondor.apana.org.au>,
-    Chuck Lever <chuck.lever@oracle.com>,
-    Trond Myklebust <trond.myklebust@hammerspace.com>,
-    "David S. Miller" <davem@davemloft.net>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>, Eric Biggers <ebiggers@kernel.org>,
-    Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
-    linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-    linux-fsdevel@vger.kernel.org, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 03/24] crypto: Add 'krb5enc' hash and cipher AEAD algorithm
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="XXJc1fjY"
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50LBcWDl021758;
+	Tue, 21 Jan 2025 13:40:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=1XuHjAhe+6crgeyPxGiThULHkHEa/Q
+	wDtL3yiBvZqn4=; b=XXJc1fjY1LEte8uWYOHY0rVlVq4wX9PCcoXpIbn1EYs9EL
+	OD4/8pPTNQ9wGah7zwpokGzeZLvKhyS2XwyswSQynQSvx4Pq0nVXT5v0PMm1KdzN
+	F6FmU2v9zN3MF0dGtVIr8337iz/SeaELL+AkChcaIBTAfjVK9Q1TKCVQHZUYF4b8
+	lkEmavTZcGG7bcRDLLuw9HOFrKWm+iyEw+rBb1iDcR2ksQakFyzbWZB9l+0n9NZH
+	7bFXS3CXhWJ3qAfxFUQeEb9d90I2xBmDXS8qIuY9SsKjzzFL1VStL4eYIhJR/WhB
+	kacwVPn3TvuRt93neu9S0HZxZA9oxnhjkLM3qkFg==
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44a1n9b0sf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 Jan 2025 13:40:21 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50LAtOsq021012;
+	Tue, 21 Jan 2025 13:40:19 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 448sb1b14q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 21 Jan 2025 13:40:19 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50LDeIWj60031254
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 21 Jan 2025 13:40:18 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 25C3B2004B;
+	Tue, 21 Jan 2025 13:40:18 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7FD1A20040;
+	Tue, 21 Jan 2025 13:40:17 +0000 (GMT)
+Received: from li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com (unknown [9.155.204.135])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Tue, 21 Jan 2025 13:40:17 +0000 (GMT)
+Date: Tue, 21 Jan 2025 14:40:16 +0100
+From: Alexander Gordeev <agordeev@linux.ibm.com>
+To: Joel Granados <joel.granados@kernel.org>
+Cc: Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
+        Kees Cook <kees@kernel.org>, Luis Chamberlain <mcgrof@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
+        linux-s390@vger.kernel.org, linux-crypto@vger.kernel.org,
+        openipmi-developer@lists.sourceforge.net,
+        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        intel-xe@lists.freedesktop.org, linux-hyperv@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-serial@vger.kernel.org,
+        xen-devel@lists.xenproject.org, linux-aio@kvack.org,
+        linux-fsdevel@vger.kernel.org, netfs@lists.linux.dev,
+        codalist@coda.cs.cmu.edu, linux-mm@kvack.org,
+        linux-nfs@vger.kernel.org, ocfs2-devel@lists.linux.dev,
+        fsverity@lists.linux.dev, linux-xfs@vger.kernel.org,
+        io-uring@vger.kernel.org, bpf@vger.kernel.org,
+        kexec@lists.infradead.org, linux-trace-kernel@vger.kernel.org,
+        linux-hardening@vger.kernel.org, apparmor@lists.ubuntu.com,
+        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        Song Liu <song@kernel.org>,
+        "Steven Rostedt (Google)" <rostedt@goodmis.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        Jani Nikula <jani.nikula@intel.com>,
+        Corey Minyard <cminyard@mvista.com>
+Subject: Re: [PATCH v2] treewide: const qualify ctl_tables where applicable
+Message-ID: <Z4+jwDBrZNRgu85S@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+References: <20250110-jag-ctl_table_const-v2-1-0000e1663144@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1434957.1737414722.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 20 Jan 2025 23:12:02 +0000
-Message-ID: <1434958.1737414722@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250110-jag-ctl_table_const-v2-1-0000e1663144@kernel.org>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: mWjZL4Eizm--6YwnTI2RlL8astD0-e-i
+X-Proofpoint-GUID: mWjZL4Eizm--6YwnTI2RlL8astD0-e-i
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-21_05,2025-01-21_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
+ bulkscore=0 suspectscore=0 adultscore=0 clxscore=1011 priorityscore=1501
+ spamscore=0 impostorscore=0 lowpriorityscore=0 mlxscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
+ definitions=main-2501210112
 
-David Howells <dhowells@redhat.com> wrote:
+On Fri, Jan 10, 2025 at 03:16:08PM +0100, Joel Granados wrote:
 
-> > Sparse complains that the second argument to krb5enc_verify_hash shoul=
-d be
-> > a pointer rather than an integer. So perhaps this would be slightly be=
-tter
-> > expressed as (completely untested!):
-> > =
+Hi Joel,
 
-> > 	err =3D krb5enc_verify_hash(req, NULL);
-> =
+> Add the const qualifier to all the ctl_tables in the tree except for
+> watchdog_hardlockup_sysctl, memory_allocation_profiling_sysctls,
+> loadpin_sysctl_table and the ones calling register_net_sysctl (./net,
+> drivers/inifiniband dirs). These are special cases as they use a
+> registration function with a non-const qualified ctl_table argument or
+> modify the arrays before passing them on to the registration function.
+> 
+> Constifying ctl_table structs will prevent the modification of
+> proc_handler function pointers as the arrays would reside in .rodata.
+> This is made possible after commit 78eb4ea25cd5 ("sysctl: treewide:
+> constify the ctl_table argument of proc_handlers") constified all the
+> proc_handlers.
 
-> Actually, no.  It should be "ahreq->result + authsize" and
-> krb5enc_verify_hash() shouldn't calculate ihash, but use its hash parame=
-ter.
+I could identify at least these occurences in s390 code as well:
 
-Ah.  That's wrong also.  I'm going to drop the second parameter and just
-calculate the hash pointers directly.
-
-David
----
-diff --git a/crypto/krb5enc.c b/crypto/krb5enc.c
-index 931387a8ee6f..e5cec47e7e42 100644
---- a/crypto/krb5enc.c
-+++ b/crypto/krb5enc.c
-@@ -230,7 +230,7 @@ static int krb5enc_encrypt(struct aead_request *req)
- 	return krb5enc_dispatch_encrypt(req, aead_request_flags(req));
- }
- =
-
--static int krb5enc_verify_hash(struct aead_request *req, void *hash)
-+static int krb5enc_verify_hash(struct aead_request *req)
+diff --git a/arch/s390/appldata/appldata_base.c b/arch/s390/appldata/appldata_base.c
+index dd7ba7587dd5..9b83c318f919 100644
+--- a/arch/s390/appldata/appldata_base.c
++++ b/arch/s390/appldata/appldata_base.c
+@@ -204,7 +204,7 @@ appldata_timer_handler(const struct ctl_table *ctl, int write,
  {
- 	struct crypto_aead *krb5enc =3D crypto_aead_reqtfm(req);
- 	struct aead_instance *inst =3D aead_alg_instance(krb5enc);
-@@ -238,11 +238,12 @@ static int krb5enc_verify_hash(struct aead_request *=
-req, void *hash)
- 	struct krb5enc_request_ctx *areq_ctx =3D aead_request_ctx(req);
- 	struct ahash_request *ahreq =3D (void *)(areq_ctx->tail + ictx->reqoff);
- 	unsigned int authsize =3D crypto_aead_authsize(krb5enc);
--	u8 *ihash =3D ahreq->result + authsize;
-+	u8 *calc_hash =3D areq_ctx->tail;
-+	u8 *msg_hash  =3D areq_ctx->tail + authsize;
- =
+ 	int timer_active = appldata_timer_active;
+ 	int rc;
+-	struct ctl_table ctl_entry = {
++	const struct ctl_table ctl_entry = {
+ 		.procname	= ctl->procname,
+ 		.data		= &timer_active,
+ 		.maxlen		= sizeof(int),
+@@ -237,7 +237,7 @@ appldata_interval_handler(const struct ctl_table *ctl, int write,
+ {
+ 	int interval = appldata_interval;
+ 	int rc;
+-	struct ctl_table ctl_entry = {
++	const struct ctl_table ctl_entry = {
+ 		.procname	= ctl->procname,
+ 		.data		= &interval,
+ 		.maxlen		= sizeof(int),
+@@ -269,7 +269,7 @@ appldata_generic_handler(const struct ctl_table *ctl, int write,
+ 	struct list_head *lh;
+ 	int rc, found;
+ 	int active;
+-	struct ctl_table ctl_entry = {
++	const struct ctl_table ctl_entry = {
+ 		.data		= &active,
+ 		.maxlen		= sizeof(int),
+ 		.extra1		= SYSCTL_ZERO,
+diff --git a/arch/s390/kernel/hiperdispatch.c b/arch/s390/kernel/hiperdispatch.c
+index 7857a7e8e56c..7d0ba16085c1 100644
+--- a/arch/s390/kernel/hiperdispatch.c
++++ b/arch/s390/kernel/hiperdispatch.c
+@@ -273,7 +273,7 @@ static int hiperdispatch_ctl_handler(const struct ctl_table *ctl, int write,
+ {
+ 	int hiperdispatch;
+ 	int rc;
+-	struct ctl_table ctl_entry = {
++	const struct ctl_table ctl_entry = {
+ 		.procname	= ctl->procname,
+ 		.data		= &hiperdispatch,
+ 		.maxlen		= sizeof(int),
+diff --git a/arch/s390/kernel/topology.c b/arch/s390/kernel/topology.c
+index 6691808bf50a..26e50de83d80 100644
+--- a/arch/s390/kernel/topology.c
++++ b/arch/s390/kernel/topology.c
+@@ -629,7 +629,7 @@ static int topology_ctl_handler(const struct ctl_table *ctl, int write,
+ 	int enabled = topology_is_enabled();
+ 	int new_mode;
+ 	int rc;
+-	struct ctl_table ctl_entry = {
++	const struct ctl_table ctl_entry = {
+ 		.procname	= ctl->procname,
+ 		.data		= &enabled,
+ 		.maxlen		= sizeof(int),
+@@ -658,7 +658,7 @@ static int polarization_ctl_handler(const struct ctl_table *ctl, int write,
+ {
+ 	int polarization;
+ 	int rc;
+-	struct ctl_table ctl_entry = {
++	const struct ctl_table ctl_entry = {
+ 		.procname	= ctl->procname,
+ 		.data		= &polarization,
+ 		.maxlen		= sizeof(int),
+diff --git a/arch/s390/mm/cmm.c b/arch/s390/mm/cmm.c
+index 939e3bec2db7..8e354c90a3dd 100644
+--- a/arch/s390/mm/cmm.c
++++ b/arch/s390/mm/cmm.c
+@@ -263,7 +263,7 @@ static int cmm_pages_handler(const struct ctl_table *ctl, int write,
+ 			     void *buffer, size_t *lenp, loff_t *ppos)
+ {
+ 	long nr = cmm_get_pages();
+-	struct ctl_table ctl_entry = {
++	const struct ctl_table ctl_entry = {
+ 		.procname	= ctl->procname,
+ 		.data		= &nr,
+ 		.maxlen		= sizeof(long),
+@@ -283,7 +283,7 @@ static int cmm_timed_pages_handler(const struct ctl_table *ctl, int write,
+ 				   loff_t *ppos)
+ {
+ 	long nr = cmm_get_timed_pages();
+-	struct ctl_table ctl_entry = {
++	const struct ctl_table ctl_entry = {
+ 		.procname	= ctl->procname,
+ 		.data		= &nr,
+ 		.maxlen		= sizeof(long),
 
--	scatterwalk_map_and_copy(ihash, req->src, ahreq->nbytes, authsize, 0);
-+	scatterwalk_map_and_copy(msg_hash, req->src, ahreq->nbytes, authsize, 0)=
-;
- =
 
--	if (crypto_memneq(ihash, ahreq->result, authsize))
-+	if (crypto_memneq(msg_hash, calc_hash, authsize))
- 		return -EBADMSG;
- 	return 0;
- }
-@@ -254,7 +255,7 @@ static void krb5enc_decrypt_hash_done(void *data, int =
-err)
- 	if (err)
- 		return krb5enc_request_complete(req, err);
- =
+> Best regards,
+> -- 
+> Joel Granados <joel.granados@kernel.org>
 
--	err =3D krb5enc_verify_hash(req, 0);
-+	err =3D krb5enc_verify_hash(req);
- 	krb5enc_request_complete(req, err);
- }
- =
-
-@@ -284,7 +285,7 @@ static int krb5enc_dispatch_decrypt_hash(struct aead_r=
-equest *req)
- 	if (err < 0)
- 		return err;
- =
-
--	return krb5enc_verify_hash(req, hash);
-+	return krb5enc_verify_hash(req);
- }
- =
-
- /*
-@@ -352,7 +353,7 @@ static int krb5enc_init_tfm(struct crypto_aead *tfm)
- 	crypto_aead_set_reqsize(
- 		tfm,
- 		sizeof(struct krb5enc_request_ctx) +
--		ictx->reqoff +
-+		ictx->reqoff + /* Space for two checksums */
- 		umax(sizeof(struct ahash_request) + crypto_ahash_reqsize(auth),
- 		     sizeof(struct skcipher_request) + crypto_skcipher_reqsize(enc)));
- =
-
-
+Thanks!
