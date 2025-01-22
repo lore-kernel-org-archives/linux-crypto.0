@@ -1,220 +1,174 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2076.outbound.protection.outlook.com [40.107.92.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08E391119A;
-	Tue, 21 Jan 2025 13:40:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737466858; cv=none; b=bJQoNIMjC/ZXVoJ9wiufPCSv5ONcgARl1wWqraDdni4qk1GowmVhzTHL6R998R8EqbzgTlSvgGzEZlCYymJCYngaqJ0SXqrrIhxezLxr2xByS2OncKC/RsC8VRnyt47GMNuAI5uxtioi9uIDm14kjd45oLvhwocHzVQ4q/+2rSc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737466858; c=relaxed/simple;
-	bh=O6UDpyy68BQo7X626NvkAmSzVuRiTAwo5GjYO1FKjts=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rEQwzI8gOlpxKvmAG5rEfLCFl3QaHckMVAjI5Qbbgr4hNKX7uuOo8DAHBjFUMyQU0qjpKhxAxpFG5zZ9VVeS8VVvzYJwFYfVmgQyFpWy4z/+SgRVlBJvhROJWQm0JcpvL70u98TRZpKvMYUSvw0amTkvcpyZ6mIXFj1TysfDmYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=XXJc1fjY; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8B30EED8;
+	Wed, 22 Jan 2025 00:59:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.76
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737507587; cv=fail; b=L6aDE2FrwjX2x5PqtzpPGsMwdOZp+0FZD6EfcXJVBRMxXuWxIP4Yao0TDFRS0fp+9vntm19TT8tLtmQz16WLyurYEyBbf8mbN7f79mDR276VMexUD7+zT995+ybskBYzkIHyZAVegVBk3oLgUvJ0UcoMygUSBcCN16N2PEgySh4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737507587; c=relaxed/simple;
+	bh=yBuyZ7QSWOHEw8lSyhWMQ0QMLn86uP6E5nHaPWdVMAo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KXHskPlzY8I1VMmsJLtY/6scv2xarzj8mL0PCcueig5Ef1PmZiYKogA9M+qWWiEGyWnFizF5XRVwFL+J7Y2VCnRFqvsKKUI9ZGZF5Q5m47NYJ3+1zaHLHoGpy4OvkRUKbjD3WLp5EKu71YxTjclYrybeIlZeVxdU+OPmmh70Yfg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=G+jh3dqw; arc=fail smtp.client-ip=40.107.92.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="XXJc1fjY"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50LBcWDl021758;
-	Tue, 21 Jan 2025 13:40:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pp1; bh=1XuHjAhe+6crgeyPxGiThULHkHEa/Q
-	wDtL3yiBvZqn4=; b=XXJc1fjY1LEte8uWYOHY0rVlVq4wX9PCcoXpIbn1EYs9EL
-	OD4/8pPTNQ9wGah7zwpokGzeZLvKhyS2XwyswSQynQSvx4Pq0nVXT5v0PMm1KdzN
-	F6FmU2v9zN3MF0dGtVIr8337iz/SeaELL+AkChcaIBTAfjVK9Q1TKCVQHZUYF4b8
-	lkEmavTZcGG7bcRDLLuw9HOFrKWm+iyEw+rBb1iDcR2ksQakFyzbWZB9l+0n9NZH
-	7bFXS3CXhWJ3qAfxFUQeEb9d90I2xBmDXS8qIuY9SsKjzzFL1VStL4eYIhJR/WhB
-	kacwVPn3TvuRt93neu9S0HZxZA9oxnhjkLM3qkFg==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44a1n9b0sf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 21 Jan 2025 13:40:21 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 50LAtOsq021012;
-	Tue, 21 Jan 2025 13:40:19 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 448sb1b14q-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 21 Jan 2025 13:40:19 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 50LDeIWj60031254
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 21 Jan 2025 13:40:18 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 25C3B2004B;
-	Tue, 21 Jan 2025 13:40:18 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7FD1A20040;
-	Tue, 21 Jan 2025 13:40:17 +0000 (GMT)
-Received: from li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com (unknown [9.155.204.135])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Tue, 21 Jan 2025 13:40:17 +0000 (GMT)
-Date: Tue, 21 Jan 2025 14:40:16 +0100
-From: Alexander Gordeev <agordeev@linux.ibm.com>
-To: Joel Granados <joel.granados@kernel.org>
-Cc: Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>,
-        Kees Cook <kees@kernel.org>, Luis Chamberlain <mcgrof@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
-        linux-s390@vger.kernel.org, linux-crypto@vger.kernel.org,
-        openipmi-developer@lists.sourceforge.net,
-        intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        intel-xe@lists.freedesktop.org, linux-hyperv@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-serial@vger.kernel.org,
-        xen-devel@lists.xenproject.org, linux-aio@kvack.org,
-        linux-fsdevel@vger.kernel.org, netfs@lists.linux.dev,
-        codalist@coda.cs.cmu.edu, linux-mm@kvack.org,
-        linux-nfs@vger.kernel.org, ocfs2-devel@lists.linux.dev,
-        fsverity@lists.linux.dev, linux-xfs@vger.kernel.org,
-        io-uring@vger.kernel.org, bpf@vger.kernel.org,
-        kexec@lists.infradead.org, linux-trace-kernel@vger.kernel.org,
-        linux-hardening@vger.kernel.org, apparmor@lists.ubuntu.com,
-        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        Song Liu <song@kernel.org>,
-        "Steven Rostedt (Google)" <rostedt@goodmis.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        Jani Nikula <jani.nikula@intel.com>,
-        Corey Minyard <cminyard@mvista.com>
-Subject: Re: [PATCH v2] treewide: const qualify ctl_tables where applicable
-Message-ID: <Z4+jwDBrZNRgu85S@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
-References: <20250110-jag-ctl_table_const-v2-1-0000e1663144@kernel.org>
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="G+jh3dqw"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=xg+NF6Te0JFbPryIxm8HPSkO2WBycp5cWc7gUK1rPa4FnW6aigiHPD+cKM6NO1WUzC8ZxeZs7QrrSp2IBEsGggZ/P51Vp/gOffXVdmWvpRAdzUBuQJugvt8Z9feVeOFmEab09V62Y7SayBT9BZnbH49Wrw4YEFbomvqzFKexUBmVyVthUXPYVvYkBTv7o+q+ps1+cmRGStyuqJppw0A97Jkx2dPwUkA8EdgNZ5jHipidY+M6WhAhLEXxxDJJu1v6HLkOD1t6WaW+h7Fl/uXL1kSnsG3LDasStStF04gJ1iqV5D8pc3RPOPOqyZMzfrkdfPlRG6ZgCi9FTXToLOSI8g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=WN1r903fN4SG1qhKzRjzi4AcfP+o7gYEqmg410hSslk=;
+ b=zWhiL6hwgJkKzHK5wgdHO6WHoyfibwwepxP5WQFJsZzAtmlOvsnhH2dMvkFUxBcjM9YcWuecuSQu6Rw8I1ekrBqClptz+O5Xv83I3+Uo3osArVGKWcHEdCJJrNJnhE9AZxFOJYef9IXrQ7l0jj/sx2JeZtP/rkNzmUu0b6IM4WwqJiU3xUUl1tJAPFH20Ui6/y+6lyhsMEgW7P33Ui2CrFPMle76RnOio700hguRzWqcNqc+HrsPERMidfnBPR7ZcL5SHeau5WxlH1WWvV1/2ddJC3pVtKkyRJLhdqw5KFBOlxFfLL9zxv0WxIBvGd+lstlDH7Byb0QAqMjr2Ysomw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WN1r903fN4SG1qhKzRjzi4AcfP+o7gYEqmg410hSslk=;
+ b=G+jh3dqwrNoW72i4wH+le38gh1YGp7xdyYzFn3PS2jYKRtQiqgVK35ZQz0WUJOBbLH1y6Yq5DUHcGaiPvMLlxVtVDVVKHpLvkToooKzjDVqqUkR6hHtJdCJnBy668RbO8JnCglxG7VfvWm7hneBPDVjmnWaVSgFG5RPiwTE29sI=
+Received: from SJ0PR13CA0152.namprd13.prod.outlook.com (2603:10b6:a03:2c7::7)
+ by CH2PR12MB9495.namprd12.prod.outlook.com (2603:10b6:610:27d::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8377.16; Wed, 22 Jan
+ 2025 00:59:42 +0000
+Received: from SJ5PEPF000001F7.namprd05.prod.outlook.com
+ (2603:10b6:a03:2c7:cafe::2c) by SJ0PR13CA0152.outlook.office365.com
+ (2603:10b6:a03:2c7::7) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8377.14 via Frontend Transport; Wed,
+ 22 Jan 2025 00:59:41 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ SJ5PEPF000001F7.mail.protection.outlook.com (10.167.242.75) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8377.8 via Frontend Transport; Wed, 22 Jan 2025 00:59:41 +0000
+Received: from ethanolx7e2ehost.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 21 Jan
+ 2025 18:59:39 -0600
+From: Ashish Kalra <Ashish.Kalra@amd.com>
+To: <seanjc@google.com>, <pbonzini@redhat.com>, <tglx@linutronix.de>,
+	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
+	<x86@kernel.org>, <hpa@zytor.com>, <thomas.lendacky@amd.com>,
+	<john.allen@amd.com>, <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<joro@8bytes.org>, <suravee.suthikulpanit@amd.com>, <will@kernel.org>,
+	<robin.murphy@arm.com>
+CC: <michael.roth@amd.com>, <dionnaglaze@google.com>, <vasant.hegde@amd.com>,
+	<kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-crypto@vger.kernel.org>, <linux-coco@lists.linux.dev>,
+	<iommu@lists.linux.dev>
+Subject: [PATCH 0/4] Fix broken SNP support with KVM module built-in
+Date: Wed, 22 Jan 2025 00:59:28 +0000
+Message-ID: <cover.1737505394.git.ashish.kalra@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250110-jag-ctl_table_const-v2-1-0000e1663144@kernel.org>
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: mWjZL4Eizm--6YwnTI2RlL8astD0-e-i
-X-Proofpoint-GUID: mWjZL4Eizm--6YwnTI2RlL8astD0-e-i
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-21_05,2025-01-21_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
- bulkscore=0 suspectscore=0 adultscore=0 clxscore=1011 priorityscore=1501
- spamscore=0 impostorscore=0 lowpriorityscore=0 mlxscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2411120000
- definitions=main-2501210112
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ5PEPF000001F7:EE_|CH2PR12MB9495:EE_
+X-MS-Office365-Filtering-Correlation-Id: a0656fa4-b16f-4eb0-34a0-08dd3a800d81
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|7416014|376014|1800799024|82310400026|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?sOBYOzREMA45WYicKtxRBPivBtU1WFvGMHzHiQULStG2kivTljOwkYgL2Yjp?=
+ =?us-ascii?Q?xFyfrR9ysmXlVjMqlsOno7Mb6dmL1/etbZ4Y42IA0Ajf+mf7MkiZkNrUFp36?=
+ =?us-ascii?Q?e/EI+ffeCZFADSDiciQ0NKasUdyNqlVYuWhA3un5qstP895rDlWHiMbflhYG?=
+ =?us-ascii?Q?AqtOWt0fmdZ+mu67DwFm9X/P14HFmllqE0K0hINdN2h/2JK5dxkQqjD8flLL?=
+ =?us-ascii?Q?ws2jFRzS8fadqVBnv7HGScDCdcEd7efc1rgm+ZU8xE/S0iwFxU4XpcvCP+g5?=
+ =?us-ascii?Q?J2O8DtsEdW2cMxFtbdkN1GtHAFDfaWeZwlzI15D3nEL1oTBUQzv51n0Lez3b?=
+ =?us-ascii?Q?dxnKfKTuYPke8XyRi9xrV4zLGqHQZK7sS/HtE/2JFM1D8PYgbEWuH/o+pT4t?=
+ =?us-ascii?Q?ogNH/55ChMnnfCB1GRJ1IBLXAU2n1dnAXLC9f/uH5YZ44XK+p1dPDvvIWnPE?=
+ =?us-ascii?Q?CQ7ZOGqvFoFZ6p3/QTg55mxyxIYXbyIc1ieP41jjAqb+Efp6FNcMRui7E/ch?=
+ =?us-ascii?Q?QqhUq2oRJTlqeG1IFN/UPUycFLSWyN2/s7W4JtTDxzjJg3sF3TsWHzDGn4M6?=
+ =?us-ascii?Q?Cg7Axw+Bscbh0BiPoC0j6gvYXNzBE2M6jnC3jwj8/xEipCgJYLbU+uyQ7bIe?=
+ =?us-ascii?Q?rHrb8WtA/iFG2TH+b6ernClVjUptEMA7MTLht2xe+8/0UUQs7Nr5KnLT4/5a?=
+ =?us-ascii?Q?I3ljIf4s1HaJf0BTKAY3Pn38pRXuS1w05BC/Lh4P4rsBHs+gb3XcBd3z/sP1?=
+ =?us-ascii?Q?ZlVpXxKNmbIbzEV7yG2EgjJsmX5U+CS3b28YBMaJ52cEgjtDxub8XlREivyf?=
+ =?us-ascii?Q?09/TQZgY5Csl8KTd7kKO+KFC2eh1XiHZJ/XETFuPBUiJst4u06/SNUZateVq?=
+ =?us-ascii?Q?jmoemTwCiXUudlLZD9jbX49z4PY0xbMwVWw851pzT4aKQXb4mBMBkYPByb2N?=
+ =?us-ascii?Q?yLfTZZ6/gIbJrLe3Qd4cbpIm5K4hPI8c/90+f6spYRTjO9ktxWbhIetmMM+B?=
+ =?us-ascii?Q?ZLGjEANfn7fNkN84kiCUr+dgWp8SpY/YGSnn5t7KqQ7L6xDZeffewuow2CHg?=
+ =?us-ascii?Q?Lxjq467iwMR/kwv1l8SQ/H/nUWyrE3eB8t20nDsfehKaw3k3NWi+X3dj8akY?=
+ =?us-ascii?Q?QFzjqkSfWhxrYqofbM4A99+GN6ZzhDhRFb3sUy5dAWplq0WM5GRXFvOwxVsj?=
+ =?us-ascii?Q?+nQkoodDpHtPkt55yPWjc9tSUOstUqpTnhJmokfw0wKGKIIENluVE/oMmUi1?=
+ =?us-ascii?Q?QXQS79FSDino/oFPL4/qslbu+QWCUv6YHiV7xyBvq6nDeooB9W4n91zDL0DN?=
+ =?us-ascii?Q?4Z1/49gPfGy5LGX1rzFl3bytVXag95cyx6F5/sp7innB1ljyEid0KsSYIW7o?=
+ =?us-ascii?Q?rGoeNJ1MW94Ry/FD5j2QI+DNBO+msIpCjAOLL1/g/yt8PDlcGuyp6DFgct69?=
+ =?us-ascii?Q?yI+OZG8UeE5zpG0+VwpIuLvXclcnm7a7iwifFfweqyvRkZiu/VrQii4lplZB?=
+ =?us-ascii?Q?5oOCQ6/tjMOmr2k=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(7416014)(376014)(1800799024)(82310400026)(921020);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jan 2025 00:59:41.1712
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: a0656fa4-b16f-4eb0-34a0-08dd3a800d81
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ5PEPF000001F7.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB9495
 
-On Fri, Jan 10, 2025 at 03:16:08PM +0100, Joel Granados wrote:
+From: Ashish Kalra <ashish.kalra@amd.com>
 
-Hi Joel,
+This patch-set fixes the current SNP host enabling code and effectively SNP
+which is broken with respect to the KVM module being built-in.
 
-> Add the const qualifier to all the ctl_tables in the tree except for
-> watchdog_hardlockup_sysctl, memory_allocation_profiling_sysctls,
-> loadpin_sysctl_table and the ones calling register_net_sysctl (./net,
-> drivers/inifiniband dirs). These are special cases as they use a
-> registration function with a non-const qualified ctl_table argument or
-> modify the arrays before passing them on to the registration function.
-> 
-> Constifying ctl_table structs will prevent the modification of
-> proc_handler function pointers as the arrays would reside in .rodata.
-> This is made possible after commit 78eb4ea25cd5 ("sysctl: treewide:
-> constify the ctl_table argument of proc_handlers") constified all the
-> proc_handlers.
+Essentially SNP host enabling code should be invoked before KVM
+initialization, which is currently not the case when KVM is built-in.
 
-I could identify at least these occurences in s390 code as well:
+SNP host support is enabled in snp_rmptable_init() which is invoked as a
+device_initcall(). Here device_initcall() is used as snp_rmptable_init()
+expects AMD IOMMU SNP support to be enabled prior to it and the AMD
+IOMMU driver enables SNP support after PCI bus enumeration.
 
-diff --git a/arch/s390/appldata/appldata_base.c b/arch/s390/appldata/appldata_base.c
-index dd7ba7587dd5..9b83c318f919 100644
---- a/arch/s390/appldata/appldata_base.c
-+++ b/arch/s390/appldata/appldata_base.c
-@@ -204,7 +204,7 @@ appldata_timer_handler(const struct ctl_table *ctl, int write,
- {
- 	int timer_active = appldata_timer_active;
- 	int rc;
--	struct ctl_table ctl_entry = {
-+	const struct ctl_table ctl_entry = {
- 		.procname	= ctl->procname,
- 		.data		= &timer_active,
- 		.maxlen		= sizeof(int),
-@@ -237,7 +237,7 @@ appldata_interval_handler(const struct ctl_table *ctl, int write,
- {
- 	int interval = appldata_interval;
- 	int rc;
--	struct ctl_table ctl_entry = {
-+	const struct ctl_table ctl_entry = {
- 		.procname	= ctl->procname,
- 		.data		= &interval,
- 		.maxlen		= sizeof(int),
-@@ -269,7 +269,7 @@ appldata_generic_handler(const struct ctl_table *ctl, int write,
- 	struct list_head *lh;
- 	int rc, found;
- 	int active;
--	struct ctl_table ctl_entry = {
-+	const struct ctl_table ctl_entry = {
- 		.data		= &active,
- 		.maxlen		= sizeof(int),
- 		.extra1		= SYSCTL_ZERO,
-diff --git a/arch/s390/kernel/hiperdispatch.c b/arch/s390/kernel/hiperdispatch.c
-index 7857a7e8e56c..7d0ba16085c1 100644
---- a/arch/s390/kernel/hiperdispatch.c
-+++ b/arch/s390/kernel/hiperdispatch.c
-@@ -273,7 +273,7 @@ static int hiperdispatch_ctl_handler(const struct ctl_table *ctl, int write,
- {
- 	int hiperdispatch;
- 	int rc;
--	struct ctl_table ctl_entry = {
-+	const struct ctl_table ctl_entry = {
- 		.procname	= ctl->procname,
- 		.data		= &hiperdispatch,
- 		.maxlen		= sizeof(int),
-diff --git a/arch/s390/kernel/topology.c b/arch/s390/kernel/topology.c
-index 6691808bf50a..26e50de83d80 100644
---- a/arch/s390/kernel/topology.c
-+++ b/arch/s390/kernel/topology.c
-@@ -629,7 +629,7 @@ static int topology_ctl_handler(const struct ctl_table *ctl, int write,
- 	int enabled = topology_is_enabled();
- 	int new_mode;
- 	int rc;
--	struct ctl_table ctl_entry = {
-+	const struct ctl_table ctl_entry = {
- 		.procname	= ctl->procname,
- 		.data		= &enabled,
- 		.maxlen		= sizeof(int),
-@@ -658,7 +658,7 @@ static int polarization_ctl_handler(const struct ctl_table *ctl, int write,
- {
- 	int polarization;
- 	int rc;
--	struct ctl_table ctl_entry = {
-+	const struct ctl_table ctl_entry = {
- 		.procname	= ctl->procname,
- 		.data		= &polarization,
- 		.maxlen		= sizeof(int),
-diff --git a/arch/s390/mm/cmm.c b/arch/s390/mm/cmm.c
-index 939e3bec2db7..8e354c90a3dd 100644
---- a/arch/s390/mm/cmm.c
-+++ b/arch/s390/mm/cmm.c
-@@ -263,7 +263,7 @@ static int cmm_pages_handler(const struct ctl_table *ctl, int write,
- 			     void *buffer, size_t *lenp, loff_t *ppos)
- {
- 	long nr = cmm_get_pages();
--	struct ctl_table ctl_entry = {
-+	const struct ctl_table ctl_entry = {
- 		.procname	= ctl->procname,
- 		.data		= &nr,
- 		.maxlen		= sizeof(long),
-@@ -283,7 +283,7 @@ static int cmm_timed_pages_handler(const struct ctl_table *ctl, int write,
- 				   loff_t *ppos)
- {
- 	long nr = cmm_get_timed_pages();
--	struct ctl_table ctl_entry = {
-+	const struct ctl_table ctl_entry = {
- 		.procname	= ctl->procname,
- 		.data		= &nr,
- 		.maxlen		= sizeof(long),
+The first pre-patch in this patch-set is the AMD IOMMU driver patch
+which moves SNP enable check before enabling IOMMUs. With this patch
+applied, the final patch in this patch-set calls snp_rmptable_init()
+early with subsys_initcall() which then enables SNP host support before
+KVM initialization with kvm_amd module built-in. The other two pre-patches
+in the patch-set ensure that the dependent PSP SEV driver is initialized
+before KVM module if KVM module is built-in.
 
+Fixes: c3b86e61b756 ("x86/cpufeatures: Enable/unmask SEV-SNP CPU feature")
 
-> Best regards,
-> -- 
-> Joel Granados <joel.granados@kernel.org>
+Ashish Kalra (1):
+  x86/sev: Fix broken SNP support with KVM module built-in
 
-Thanks!
+Sean Christopherson (2):
+  crypto: ccp: Add external API interface for PSP module initialization
+  KVM: SVM: Ensure PSP module initialized before built-in KVM module
+
+Vasant Hegde (1):
+  iommu/amd: Check SNP support before enabling IOMMU
+
+ arch/x86/kvm/svm/sev.c      | 10 ++++++++++
+ arch/x86/virt/svm/sev.c     |  2 +-
+ drivers/crypto/ccp/sp-dev.c | 12 ++++++++++++
+ drivers/crypto/ccp/sp-dev.h |  1 +
+ drivers/iommu/amd/init.c    |  3 ++-
+ include/linux/psp-sev.h     | 11 +++++++++++
+ 6 files changed, 37 insertions(+), 2 deletions(-)
+
+-- 
+2.34.1
+
