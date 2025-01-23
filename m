@@ -1,125 +1,105 @@
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BC621C07DC;
-	Thu, 23 Jan 2025 20:58:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4595A1ADC94;
+	Thu, 23 Jan 2025 21:13:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737665895; cv=none; b=n9o2DaVtWaB+buXeGhSKKjkgvbBqa+TBQfFPGTrKfSyG7Tamj7M7x4r/RaH/iJSfGc2DZ8i4J56HehIJbEUxdcArkjtwa67KHt4eHmb6Ff3x4y6Z0t9WfKD34wJ/1J+/6VsvnF+3TqZfmFIIj+abyYYdwwPsp+yXd47agmnfb1U=
+	t=1737666800; cv=none; b=mYcRlag71JERfjkFgmFbhoLL7wlt/Fkm71INrZmCo2K8oIrkgfYUMX5dyYpWBXCRwLDQ+LEPjOJUsk8GRjOPhXfDXdS+hvuWKbvlqpq0GcTB/X2MNcH4uDJDwxpwx7VDr03cpynFvNhxbRwY2urob5vk0GR6mB7QT38lFkr3Vjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737665895; c=relaxed/simple;
-	bh=PE2nwUlOlGPJqJwHgXGUqtlHOiwABexmkzxmzZtB1IA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iGEkgBg/BdNjUiAYpRjmOackuXLI8RekpE2a5oCXuOus2OSx9b79ZscmWtghF7O++ZtYSkMnkSmghZ7vgioUUdvLArRXpPu+qN/rBS/dBPVor7+PtEL4U5ugjHuaW/J8Av700uR2ymd8y0/V5OkrP3E7Evzxe8txJVIWdEzW5jQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SUO0sBZA; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1737666800; c=relaxed/simple;
+	bh=i3lPbt0fcoLvkz+WFDp+xCQj6SBZ4HSG9Ilrach0yOM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f8fa4QTv2w35067ygjHhbiE+3ktXBSb5rTQcUOXa5MiTBAxlDLJKQxAXiY/ztmjuI23SsQmZp2CBfiqiZtXZpqLc4dqdTpM5OhWPzCIIg0MruyVZwxlHe7kdIBo413A3k6s/DxRs4mNfw6F9Gc4BetH68NSQ7d01RIiWrNy8Ni8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h2zelItM; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SUO0sBZA"
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4362f61757fso14384065e9.2;
-        Thu, 23 Jan 2025 12:58:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737665892; x=1738270692; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2kIwddxTC6/GCXc+DqWUgAafQQvvpurTDzFy1K5ycls=;
-        b=SUO0sBZAc6022DZzidBFaXyBzKK+e3Sf0eeUgrsDFVUuyrHr9s/4C+MEAFO/lzuJIg
-         5kEA3lWf2Z4r13Wx18/QHwmtw4y9FFr4I0/GVq3ZdUkxpw2f49j8wjFxgdqRMTgCMaof
-         QMnKlcXeRf2Vdls/jsr72m6UB9mHmgHS2Ltu8eA6qXIcvON1fRcyb5sTWsMC3vm/+YRd
-         jrryNHQ12CHHvg3kFM6p6r34UDov1Wya7UH6HQajPGoRCcIJIxeG5JfrCskJ9CrZIRiF
-         9MUbvtx+7BBAxVTSEMbZ+JsCOUcvLFI5C9oTVxdyaT5LKxG3YjBq2FdmL4ZpdR8uRriA
-         Wvuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737665892; x=1738270692;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2kIwddxTC6/GCXc+DqWUgAafQQvvpurTDzFy1K5ycls=;
-        b=dwkIhaiMpJiVdoI4CY6vqmq9AeNKAxD+w55m3xPM3jSs0lSzLmS5xbfpun7qoB1GU5
-         57Ek/PNWfJEonh+vqvPhlJWSh2wXr9z7K154khQF8fvjrqTVE1NBp3Sib8DhdklpwBG2
-         xLFnFYCNDISDVWH3681W5kSfY9nG2ikpHpsfL/Ic4vSLS5/lSJUyTmKw6OFHcYZ3DXbA
-         z5tveUVDKTlpPmHd4rpG9fh9jrEI37i4x2+QQI4B7ocosS4BUciaA2PBx6zO8BXeLiiQ
-         xDG8BsQ6kbMabkEC+JtLXvrsEdj2zvJPGT0F6q6IR/OjkSdOn4/DBzqYnJ2o9EK+khG0
-         HHFA==
-X-Forwarded-Encrypted: i=1; AJvYcCVX2IdwtZZx5SiyyX5lWzoyEvahtY1zFlHhtC6fwevc+35l9Lv4iVdtbjecLO9OT3LeUQLYOq8/hwONVp0q@vger.kernel.org, AJvYcCWEhfcNIOlH9ij3j8bd0nW25Rb5pzg2T6rW0G6KmczAKRdDyNam9PXA9TVbOiNugkmynh3lxuFfmB07SWM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyOwW+c3x3BAIdsiKbU9fHnSd6bIOcxuhb5EjiHWIJXf6yTxvFh
-	QOTgjDVDkLj98PMFVco7r4nwKD5Z4huZM9rYp1kT9ZWXJIWSln0+
-X-Gm-Gg: ASbGncsMuEjK8blIa2jQhypLBmO1pMRgnWmb49JuEoylUr9fs8pgUFYczDEyiLZPt0Q
-	RovHJIKhuK3JNq1xmbVNHsprCFraoU2VLXqok5n6PseXzvoaM5Skcqlom9Bxyss10d/UnTeV54E
-	9TkkTcqMwLFl+bMb9aW9OxZwXPtzRyNlVlY0XfHWzwIDnYCFGJFV7YJ3iLxtnJFqsO36tbbTyiM
-	h6zTi8VP+kZ83TRLEvPAyKFNwa3Za3tN/qJfCWDFC45iq7hwg1MiPDYS+qx9RcGs/wKIBwV72JV
-	fYI39OWcC/oBCfpb/yvi5YSD90aflpIqAAJy+e8jkdnp986pZa905Q==
-X-Google-Smtp-Source: AGHT+IGXt0xGmmwoboEHi45ORJKpcto4d+6RlJVirh/XBYjbQQH0n4MTFEap3mu3DJ2wX0qeE9l5Og==
-X-Received: by 2002:a05:6000:1a8c:b0:385:e5d8:2bea with SMTP id ffacd0b85a97d-38bf56639c9mr24070777f8f.20.1737665891664;
-        Thu, 23 Jan 2025 12:58:11 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c2a1764e9sm698524f8f.17.2025.01.23.12.58.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jan 2025 12:58:11 -0800 (PST)
-Date: Thu, 23 Jan 2025 20:58:10 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: "Theodore Ts'o" <tytso@mit.edu>
-Cc: Eric Biggers <ebiggers@kernel.org>, Linus Torvalds
- <torvalds@linux-foundation.org>, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>, Chao Yu
- <chao@kernel.org>, "Darrick J. Wong" <djwong@kernel.org>, Geert
- Uytterhoeven <geert@linux-m68k.org>, Kent Overstreet
- <kent.overstreet@linux.dev>, "Martin K. Petersen"
- <martin.petersen@oracle.com>, Michael Ellerman <mpe@ellerman.id.au>,
- Vinicius Peixoto <vpeixoto@lkcamp.dev>, WangYuli
- <wangyuli@grjsls0nwwnnilyahiblcmlmlcaoki5s.yundunwaf1.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h2zelItM"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C67BC4CED3;
+	Thu, 23 Jan 2025 21:13:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737666799;
+	bh=i3lPbt0fcoLvkz+WFDp+xCQj6SBZ4HSG9Ilrach0yOM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=h2zelItM9TDXVoI+oegO9sx1N5aSvXK6RAJzIpU744ykx0Sy5pnmg4v0tGbKc/TEm
+	 leH5FWHZV9HbD5oc1wm8FLvzG9w0tzjegBDkT3zATgP87NeCViO+B7Hi8yMJEpMUBO
+	 1VM4kygzkRo26Pw3HPRWBbmbmX0Hou8HFnotpegzBvQ0ZEoW1A7ilWLUC2VghIwhqC
+	 TkDyT6M6fj3ijhzTBXTb+dqrvH3JnLIC9F1D1oSVDbnClKQPtmR+as0pNP1UKrp7br
+	 GdBfunH7I7d2HPlfIOh+U92OuI8ORRFE5p/ZKlokgM8T00D3gKOKYMauhanayoLa70
+	 y31w4NF0aJWpA==
+Date: Thu, 23 Jan 2025 13:13:17 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Theodore Ts'o <tytso@mit.edu>, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	Chao Yu <chao@kernel.org>, "Darrick J. Wong" <djwong@kernel.org>,
+	Geert Uytterhoeven <geert@linux-m68k.org>,
+	Kent Overstreet <kent.overstreet@linux.dev>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Vinicius Peixoto <vpeixoto@lkcamp.dev>,
+	WangYuli <wangyuli@grjsls0nwwnnilyahiblcmlmlcaoki5s.yundunwaf1.com>
 Subject: Re: [GIT PULL] CRC updates for 6.14
-Message-ID: <20250123205810.744c8823@pumpkin>
-In-Reply-To: <20250123140744.GB3875121@mit.edu>
+Message-ID: <20250123211317.GA88607@sol.localdomain>
 References: <20250119225118.GA15398@sol.localdomain>
-	<CAHk-=wgqAZf7Sdyrka5RQQ2MVC1V_C1Gp68KrN=mHjPiRw70Jg@mail.gmail.com>
-	<20250123051633.GA183612@sol.localdomain>
-	<20250123074618.GB183612@sol.localdomain>
-	<20250123140744.GB3875121@mit.edu>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+ <CAHk-=wgqAZf7Sdyrka5RQQ2MVC1V_C1Gp68KrN=mHjPiRw70Jg@mail.gmail.com>
+ <20250123051633.GA183612@sol.localdomain>
+ <20250123074618.GB183612@sol.localdomain>
+ <20250123140744.GB3875121@mit.edu>
+ <20250123181818.GA2117666@google.com>
+ <CAHk-=wiVRnaD5zrJHR=022H0g9CXb15OobYSjOwku3m54Vyb4A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wiVRnaD5zrJHR=022H0g9CXb15OobYSjOwku3m54Vyb4A@mail.gmail.com>
 
-On Thu, 23 Jan 2025 09:07:44 -0500
-"Theodore Ts'o" <tytso@mit.edu> wrote:
-
-> On Wed, Jan 22, 2025 at 11:46:18PM -0800, Eric Biggers wrote:
-> > 
-> > Actually, I'm tempted to just provide slice-by-1 (a.k.a. byte-by-byte) as the
-> > only generic CRC32 implementation.  The generic code has become increasingly
-> > irrelevant due to the arch-optimized code existing.  The arch-optimized code
-> > tends to be 10 to 100 times faster on long messages.  
+On Thu, Jan 23, 2025 at 12:52:30PM -0800, Linus Torvalds wrote:
+> On Thu, 23 Jan 2025 at 10:18, Eric Biggers <ebiggers@kernel.org> wrote:
+> >
+> > FWIW, benchmarking the CRC library functions is easy now; just enable
+> > CONFIG_CRC_KUNIT_TEST=y and CONFIG_CRC_BENCHMARK=y.
+> >
+> > But, it's just a traditional benchmark that calls the functions in a loop, and
+> > doesn't account for dcache thrashing.
 > 
-> Yeah, that's my intuition as well; I would think the CPU's that
-> don't have a CRC32 optimization instruction(s) would probably be the
-> most sensitive to dcache thrashing.
+> Yeah. I suspect the x86 vector version in particular is just not even
+> worth it. If you have the crc instruction, the basic arch-optimized
+> case is presumably already pretty good (and *that* code is tiny).
+
+x86 unfortunately only has an instruction for crc32c, i.e. the variant of CRC32
+that uses the Castagnoli polynomial.  So it works great for crc32c().  But any
+other variant of CRC such as the regular crc32() or crc_t10dif_update() need
+carryless multiplication (PCLMULQDQ) which uses the vector registers.  It is
+super fast on sufficiently long messages, but it does use the vector registers.
+
+FWIW, arm64 has an instruction for both crc32c and crc32.  And RISC-V has
+carryless multiplication using scalar registers.  So things are a bit easier
+there.
+
+> Honestly, I took a quick look at the "by-4" and "by-8" cases, and
+> considering that you still have to do per-byte lookups of the words
+> _anyway_, I would expect that the regular by-1 is presumably not that
+> much worse.
+
+The difference I'm seeing on x86_64 (Ryzen 9 9950X) is 690 MB/s for slice-by-1
+vs. 3091 MB/s for slice-by-8.  It's significant since the latter gives much more
+instruction-level parallelism.  But of course, CPUs on which it matters tend to
+have *much* faster arch-optimized implementations anyway.  Currently the
+x86_64-optimized crc32c_le() is up to 43607 MB/s on the same CPU, and crc32_le()
+is up to 22664 MB/s.  (By adding VPCLMULQDQ support we could actually achieve
+over 80000 MB/s.)  The caveat is that in the [V]PCLMULQDQ case the data length
+has to be long enough for it to be worthwhile, but then again having a 8 KiB
+randomly-accessed data table just to micro-optimize short messages seems not too
+worthwhile.
+
+> IOW, maybe we could try to just do the simple by-1 for the generic
+> case, and cut the x86 version down to the simple "use crc32b" case.
+> And see if anybody even notices...
 > 
-> But given that Geert ran into this on m68k (I assume), maybe we could
-> have him benchmark the various crc32 generic implementation to see if
-> we is the best for him?  That is, assuming that he cares (which he
-> might not. :-).
+>               Linus
 
-The difference between the clock speed and main memory speed on an m68k will
-be a lot less than on anything more recent.
-So I suspect the effect of cache misses is much less (or more likely it is
-pretty much always getting a cache miss).
-Brain wakes up, does the m68k even have a D-cache?
-Checks the m68k user manual section 6 - it only has a I-cache (64 32-bit words).
-So the important thing is probably keeping the loop small.
-A cpu board might have an external data cache.
-
-For a small memory footprint it might be worth considering 4 bits at a time.
-So a 16 word (64 byte) lookup table.
-Thinks....
-You can xor a data byte onto the crc 'accumulator' and then do two separate
-table lookups for each of the high nibbles and xor both onto it before the rotate.
-That is probably a reasonable compromise.
-
-	David
+- Eric
