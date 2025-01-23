@@ -1,100 +1,101 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC3FD3DBB6;
-	Thu, 23 Jan 2025 21:16:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84F501C54A7
+	for <linux-crypto@vger.kernel.org>; Thu, 23 Jan 2025 21:17:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737666965; cv=none; b=sGQwnHUdmW2FnqxHghCN9umQlZJ0/6hbE04R015BazF/C+g/dIvE+kSK67V8Sod+6YYBSEFGJMi5XGpEVVoYjiUOFLIskqGQVORKvKh01pwyPnKDZ3Ftf/P3f9RJfUPHxzDuNd9yD8pZX0s1rjoUnr7wIWtVquoH4F67DU41qNI=
+	t=1737667042; cv=none; b=thRkwDqb1eM+5X3jiEAdtckUWYlxWRGGHfrU46V3OkAQDL2egBLmrnp8nmCq3nbgyxHhrSub99r3SHRxcuaQraejOTJbbW1uZTIj4f+gVmdKNBexeJJXiJpbrR3rSD0ylNYUA8c77A6fjM5NhUIMCfc7BuNXkO++ypbcwznTHWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737666965; c=relaxed/simple;
-	bh=wFzSGi8CTD2KJJ9J3NR4e1pAKz/3JtUKeCqKSyCOcIo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mY1uFYXIBv49IsMcR+MlqvLT3ip8TbIWrid2RfBrceYlHQvruy6Cq/YNelAPICjVm4OhT49LgzX3TjIZ7PNwRk1nsA96y3ihdnSxZCq4D/5+3GUWilxDAC1PuVfP7exVf5fRvXpIeIIN2DuzTJLcIjhiAftjNlQHe6Ih06S2u68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fg9QkOb6; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1737667042; c=relaxed/simple;
+	bh=LhP215z1xU95pTPKSN0xSy4qut+hlbcHEY14YelYgPA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ea/dgsNW+hcZ/H8YDTtf+F9AqfZNvamy10WK2HjLGbmHyCOhig7oizXP9Ir3y5LapEV1r1GrrRs/dCtprxAe7v5XsPRwQ+OAXO9dUwhtf8f6aqXJC43uiZIDOVD2bP/VaY6nIXEdQn24kaCL6/SKye4ClsHUfmVw9/UgWYwjmZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=bABMVhQf; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fg9QkOb6"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B26F3C4CED3;
-	Thu, 23 Jan 2025 21:16:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737666965;
-	bh=wFzSGi8CTD2KJJ9J3NR4e1pAKz/3JtUKeCqKSyCOcIo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Fg9QkOb6mG2vS8TmaYbT2/9CgMGvwHw/47afnvzOuvpGsV1Oc0ekK+EypIA9mFpuJ
-	 T5qUFB0S8qSKxvnEx0+KhtO53c+p6dOn8Suca+ZK3OTQ3IMW4t8Bj0CMI3beSUMagI
-	 BQzmp9cNLq8iZenXNeVnXXDtQ2m8DtDYVSsCq5uZh7jwLBUm1pHPXJSp3LlX6Mn8ik
-	 MgAZKsL0T9zp8tJR2CF8A7lZlyQ0DO5x+uhCJrxCOREvmHA/qPA3bzaqprTaggVUoL
-	 2pjQGEfTDvjcRbkCJBU8f/U+y1svyVVh1rTXBXQsKrxIC9xbAE595vxhMz8+EMRBIN
-	 RtTlt31xABsZg==
-Date: Thu, 23 Jan 2025 13:16:03 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: David Laight <david.laight.linux@gmail.com>
-Cc: Theodore Ts'o <tytso@mit.edu>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>, Chao Yu <chao@kernel.org>,
-	"Darrick J. Wong" <djwong@kernel.org>,
-	Geert Uytterhoeven <geert@linux-m68k.org>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Vinicius Peixoto <vpeixoto@lkcamp.dev>,
-	WangYuli <wangyuli@grjsls0nwwnnilyahiblcmlmlcaoki5s.yundunwaf1.com>
-Subject: Re: [GIT PULL] CRC updates for 6.14
-Message-ID: <20250123211603.GB88607@sol.localdomain>
-References: <20250119225118.GA15398@sol.localdomain>
- <CAHk-=wgqAZf7Sdyrka5RQQ2MVC1V_C1Gp68KrN=mHjPiRw70Jg@mail.gmail.com>
- <20250123051633.GA183612@sol.localdomain>
- <20250123074618.GB183612@sol.localdomain>
- <20250123140744.GB3875121@mit.edu>
- <20250123205810.744c8823@pumpkin>
+	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="bABMVhQf"
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5d647d5df90so2474597a12.2
+        for <linux-crypto@vger.kernel.org>; Thu, 23 Jan 2025 13:17:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google; t=1737667036; x=1738271836; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=+c1m1FICxvzfYRA5u3XGSGM/PTq6nJ74bTecG4JYrAc=;
+        b=bABMVhQfiPlwW2kkwgtfZ0UyKpAoaPo85v1comgXu22AZ1lH/lcB34MhB9/BeFFVqF
+         sE+nctcbNeWo/dWkJF1rUCXFTjUPGceKEboGZ1CqYSclu+QN5r7H90qeIq+5o7znXGyF
+         4yvu7iyhr3uP7pNAspQl0Oh6xy28vSjKDeDU8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737667036; x=1738271836;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+c1m1FICxvzfYRA5u3XGSGM/PTq6nJ74bTecG4JYrAc=;
+        b=m+BUHEWSuw756zyKeSK31H3eKbN8jIyiillyn7pvXQwqnqKlWqzEHNZabmJN2Uqn5x
+         FKLoY8ausrMUhCyuxaWXA4BWPWCDNZ2zL/5tre3OqxbZm02rPUKxRVH+KGmNT5htNv9X
+         52oA7Qqt1hvPH2n5oVWT77n2Yr7ZgMfifJhRZ23P0AbWsJD3HjW5qLYTWeTYQTCTyCZ2
+         hepNNLlzaLC68pYkTRTZ4fabY+UlFnqKIje3s+qMum2AWmbZW7072OYajuoaikKUZl0o
+         dZ9hYc2lTVzHGwe4CniUN6xTiRyHHomytVlxMfv1TzUzAqhQGoARciJ3BsaHUVG/xtvS
+         8scg==
+X-Forwarded-Encrypted: i=1; AJvYcCUkO3wwK9hDi6h4DhM4bfh2qqMrDXkiWF0vsFb6VDuDgdrBQePi51hG7xSL352DvcLBYBDm4PKLmxFBlik=@vger.kernel.org
+X-Gm-Message-State: AOJu0YybEOx2LHQn8pXFoXrklBCzEQin+YZLTKNI9O8FojCDrXUqoMCr
+	6fD81ebYLU/77T3rOmGUMhEDQx6xbCTyBljMx9R6FqjS15P90yLtYoU1ffd25sdH1APxrX/xoKg
+	HQzkVjQ==
+X-Gm-Gg: ASbGncsjbutqDLs5GIN8JzMzYRdkTJJRjlg237R9cFalrrvMM0Mv5KC543l2hbkhDEK
+	4QXOMFqL35FTxbbm5sWfPtGzu2wP78Kqo3xyvuv8gt5SYIys5GXCiz0UzN9h61wf1n/EF0/B8TO
+	cKpaLCfGcWvaRL1h84Q9wUiq6qpqPSyrM8nQ9DlymUizcyBqiAA+d6vBO7JSkzRb2fJSr8tjjHP
+	zDDgcD07+PNaAw0NeKX7dt5OCq90SlZ0pEiXyVoPQLppsuM5kjge9vMelvetdKD9CjnaL+vtk9u
+	P14g6qRBj5bXNBRQETiLO5dKempf9td43dSONGbu5agfGGdjty8Jvjk=
+X-Google-Smtp-Source: AGHT+IGEJvYC1xaHmUFcN5M5z9mcyuCUyHdJY6/iHAR7aRKHocs4k1mOtM9BGw/9VpvlOVlhPgU1SA==
+X-Received: by 2002:a05:6402:3550:b0:5d3:ce7f:abee with SMTP id 4fb4d7f45d1cf-5db7db08623mr25282017a12.25.1737667036629;
+        Thu, 23 Jan 2025 13:17:16 -0800 (PST)
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com. [209.85.218.47])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5dc18628c88sm175237a12.30.2025.01.23.13.17.14
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 23 Jan 2025 13:17:15 -0800 (PST)
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-aaeec07b705so282449766b.2
+        for <linux-crypto@vger.kernel.org>; Thu, 23 Jan 2025 13:17:14 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWSoIqr59qrpD9+VNduqSUc3CgjVvHB/kBmOfeN/560FnlYWtuIfx1PHVA3/5/20KSJYE2YnfSX+sMZG8w=@vger.kernel.org
+X-Received: by 2002:a17:907:7e95:b0:ab2:ffcb:edb4 with SMTP id
+ a640c23a62f3a-ab38b162801mr2134086966b.25.1737667033654; Thu, 23 Jan 2025
+ 13:17:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250123205810.744c8823@pumpkin>
+References: <20250119225118.GA15398@sol.localdomain> <CAHk-=wgqAZf7Sdyrka5RQQ2MVC1V_C1Gp68KrN=mHjPiRw70Jg@mail.gmail.com>
+ <20250123051633.GA183612@sol.localdomain> <20250123074618.GB183612@sol.localdomain>
+ <20250123140744.GB3875121@mit.edu> <20250123181818.GA2117666@google.com>
+ <CAHk-=wiVRnaD5zrJHR=022H0g9CXb15OobYSjOwku3m54Vyb4A@mail.gmail.com> <20250123211317.GA88607@sol.localdomain>
+In-Reply-To: <20250123211317.GA88607@sol.localdomain>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Thu, 23 Jan 2025 13:16:57 -0800
+X-Gmail-Original-Message-ID: <CAHk-=wgmda2CvAiOrg+zznFroPTo2TrdjnHo9f4_Kv1Pwn5iOA@mail.gmail.com>
+X-Gm-Features: AWEUYZkgJr0C-HIVypIhOLVKOKoeKvpeJ33HizapkhrDoRryp7x5yxh45PNB_bY
+Message-ID: <CAHk-=wgmda2CvAiOrg+zznFroPTo2TrdjnHo9f4_Kv1Pwn5iOA@mail.gmail.com>
+Subject: Re: [GIT PULL] CRC updates for 6.14
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: "Theodore Ts'o" <tytso@mit.edu>, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>, Chao Yu <chao@kernel.org>, 
+	"Darrick J. Wong" <djwong@kernel.org>, Geert Uytterhoeven <geert@linux-m68k.org>, 
+	Kent Overstreet <kent.overstreet@linux.dev>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Vinicius Peixoto <vpeixoto@lkcamp.dev>, 
+	WangYuli <wangyuli@grjsls0nwwnnilyahiblcmlmlcaoki5s.yundunwaf1.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Jan 23, 2025 at 08:58:10PM +0000, David Laight wrote:
-> On Thu, 23 Jan 2025 09:07:44 -0500
-> "Theodore Ts'o" <tytso@mit.edu> wrote:
-> 
-> > On Wed, Jan 22, 2025 at 11:46:18PM -0800, Eric Biggers wrote:
-> > > 
-> > > Actually, I'm tempted to just provide slice-by-1 (a.k.a. byte-by-byte) as the
-> > > only generic CRC32 implementation.  The generic code has become increasingly
-> > > irrelevant due to the arch-optimized code existing.  The arch-optimized code
-> > > tends to be 10 to 100 times faster on long messages.  
-> > 
-> > Yeah, that's my intuition as well; I would think the CPU's that
-> > don't have a CRC32 optimization instruction(s) would probably be the
-> > most sensitive to dcache thrashing.
-> > 
-> > But given that Geert ran into this on m68k (I assume), maybe we could
-> > have him benchmark the various crc32 generic implementation to see if
-> > we is the best for him?  That is, assuming that he cares (which he
-> > might not. :-).
-> 
-> The difference between the clock speed and main memory speed on an m68k will
-> be a lot less than on anything more recent.
-> So I suspect the effect of cache misses is much less (or more likely it is
-> pretty much always getting a cache miss).
-> Brain wakes up, does the m68k even have a D-cache?
-> Checks the m68k user manual section 6 - it only has a I-cache (64 32-bit words).
-> So the important thing is probably keeping the loop small.
-> A cpu board might have an external data cache.
-> 
-> For a small memory footprint it might be worth considering 4 bits at a time.
-> So a 16 word (64 byte) lookup table.
-> Thinks....
-> You can xor a data byte onto the crc 'accumulator' and then do two separate
-> table lookups for each of the high nibbles and xor both onto it before the rotate.
-> That is probably a reasonable compromise.
+On Thu, 23 Jan 2025 at 13:13, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> x86 unfortunately only has an instruction for crc32c
 
-Yes, you can do less than a byte at a time (currently one of the choices is even
-one *bit* at a time!), but I think byte-at-a-time is small enough already.
+Yeah, but isn't that like 90% of the uses?
 
-- Eric
+IOW, if you'd make the "select" statements a bit more specific, and
+make ext4 (and others) do "select CRC32C" instead, the other ones
+wouldn't even get selected?
+
+              Linus
