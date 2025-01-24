@@ -1,138 +1,203 @@
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2080.outbound.protection.outlook.com [40.107.220.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D8051CEAD8
-	for <linux-crypto@vger.kernel.org>; Fri, 24 Jan 2025 00:33:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737678787; cv=none; b=dOgamb1Gd9Ub+OMjaSVEjLmwuBw/YttK5Ul7b1VurUrYZsnMi6sDif/9YS8l8FwLZGHg+CTpjzQfVzofhveqzxXg7v31UyuaQaX272JR1wbRwiyuLLl5EZKnWNZfs9CfkExjbzLS/zgQHXgZ0i3XLAfr6Gvl6LaBlAMfAXpiXho=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737678787; c=relaxed/simple;
-	bh=u2rP1KdiIUraqfsqT+LRvUdyCNl/5O8KPNOtBMUohnY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FgjWXziTUxcMSYzJeZ9RGh/P1mgFOEtz21nmW0PoaoLPiaQ6XInJHgYdDA2/9AnqUVtb3GDo0/6ST/GKT9wXm7ONtSmSHd8aGrOYFhnM7K8T3erNxHDJEvYGaBnOijGLCa6yZ6tP/AJPnZL5PLHcae2VfMkC+mxv4vXQb8QrzjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GWabVW1z; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BC9F320B;
+	Fri, 24 Jan 2025 09:18:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.80
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737710317; cv=fail; b=HiMNL4b7oiaL7zsWMkiIex6uwEFy0KywXsDr97eiJfjjdbPsehYKEKzRZ/hEtqwohcoPJ6AGIg0abmPsFL7of1gtMsNZb7sz3AIQY5djTiI6ZJEZcG6ZVPDXbD+skj2FIjBUILaSlMmIDrlE2i1NQFWJf5oO+MkylnkTu7+pb9w=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737710317; c=relaxed/simple;
+	bh=U6fcGcoscRPoMWpgrUIUwbhaidCmb7NwPefWYaod9fE=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Di3kMX/EP6iPz+sDJo9RyQv6jgZY9RMQkIfC/SZHe/+Qwj7Fv27/5rXbu3jraX9Z1Gsw6bTmHqV3fYOEWmpWbl1Nnq+i24CyqeaKYzoTfAh/ZKTMWYNOleDL+OjFWFCGBQXNNaC1qeRaVeBu5iPZWsl01k7wYK1KZhk7/McNT1Y=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=LoWrHsSb; arc=fail smtp.client-ip=40.107.220.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GWabVW1z"
-Date: Thu, 23 Jan 2025 19:32:57 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1737678783;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jvOjD4LumX/0vsXnNNxDA4RM7MKVkyz2ZkN81acom9k=;
-	b=GWabVW1zxjxvh/C3dv9USjxpk4dsztW+SlgOO1EM9DkfgEMAI89yxeB5t0AGaoCYgEHGP2
-	UbVbbqKjwX5REOdkoJcSVrbQM8BT/ZLoR31DcWhh+/a22GAMuCga559NZDy/lifUCcO10I
-	YXftTg29Nj/xctWGiYomxvAVmsrt/Xk=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kent Overstreet <kent.overstreet@linux.dev>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>, 
-	Chao Yu <chao@kernel.org>, "Darrick J. Wong" <djwong@kernel.org>, 
-	Geert Uytterhoeven <geert@linux-m68k.org>, "Martin K. Petersen" <martin.petersen@oracle.com>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Theodore Ts'o <tytso@mit.edu>, 
-	Vinicius Peixoto <vpeixoto@lkcamp.dev>, WangYuli <wangyuli@uniontech.com>
-Subject: Re: [GIT PULL] CRC updates for 6.14
-Message-ID: <v36sousjd5ukqlkpdxslvpu7l37zbu7d7slgc2trjjqwty2bny@qgzew34feo2r>
-References: <20250119225118.GA15398@sol.localdomain>
- <CAHk-=wgqAZf7Sdyrka5RQQ2MVC1V_C1Gp68KrN=mHjPiRw70Jg@mail.gmail.com>
- <20250123051633.GA183612@sol.localdomain>
- <20250123074618.GB183612@sol.localdomain>
- <osjlhhph7hadq4ovynqeegr3rxliamluo7lvq7gje45hnem4dq@53pwc56v4fah>
- <20250123234209.GD88607@sol.localdomain>
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="LoWrHsSb"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=xS5Q9OCU1AXVtdTeYaUg4wC1HtpeVV+1CQQP21ctB9ZW5rEFpBQAbRjMEtAfxk0WNvpOsJqoh4D0rQbzI8SmeuAXLsGR5kLeDeyeDBRn0oHreZYM4ZkauYFJNs+UWZB3K4FPFWcrkpdfgBV+dljbjGcbcAMpRLsVzheIDvRu7Q/n3a0pmI4V71wg/xf8j+0tTqmW3mrhQgLkVWCXD8z7wz3+7j0DCCOWi+sltlrc4kUwEDmWqdpCAgWFe73C1FauatKWSX0/ZJwGtEB3noZLc+j2A8TMGwbK2jqYhiVf3MlXlGY3DDh5/+nY+amM0q/02z6e2IzKyOleUURoRz985g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HzX1Ivp3TBGZHvIZa68+775bZaT2ZVmrnM+SEPHrPs4=;
+ b=Qq5e+sT5d1m+2p6vO0XvEE4cWa0eShd15yTGukeNks18upu9oNh+UD8v3lXda3kagEVDez689l423Qu9Kr33isyd/u03DUT6JSrIlxCbwlDYdLkDGjssisUwF+zOpCwbCh1WhhJhPNMUIUXOjfurxg2yEtAiPnqNPWJ2y4vzgbhFrK23AlIgLflq6Z+cAWQ1WhftOw8vAORlBbHQ6V8tffOd8KaKOYuAGVJtBHEMBIHONsx0cOTYyGXSUA3+N/FvBEEksq/TIfsUDtmIKOBi+vOxsCPLXJ2CfcqnyUCJx656im8IKitJaullnnruBClam6fr2gwLhg9HOQDtBFheqQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HzX1Ivp3TBGZHvIZa68+775bZaT2ZVmrnM+SEPHrPs4=;
+ b=LoWrHsSbLmGDYCCHYBhKtlI5du/DJ5UkVuRM1kvbdw8vDDen4S2u/iEjVcILdQj4XnsnyJYIedj8G2uWcoDA8vqPACDrTrvC5olAehzO8ZR9A5E82B/uV+Z1MGsg9UVw7/GZ1EFU/LpDRb0UWvPycjSVgKzT+y2srRm2mV8+wLE=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from IA1PR12MB8189.namprd12.prod.outlook.com (2603:10b6:208:3f0::13)
+ by MW4PR12MB7311.namprd12.prod.outlook.com (2603:10b6:303:227::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8377.19; Fri, 24 Jan
+ 2025 09:18:34 +0000
+Received: from IA1PR12MB8189.namprd12.prod.outlook.com
+ ([fe80::193b:bbfd:9894:dc48]) by IA1PR12MB8189.namprd12.prod.outlook.com
+ ([fe80::193b:bbfd:9894:dc48%4]) with mapi id 15.20.8377.009; Fri, 24 Jan 2025
+ 09:18:33 +0000
+Message-ID: <09f57158-3b79-4c61-834c-950ed40b7605@amd.com>
+Date: Fri, 24 Jan 2025 10:18:25 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 4/9] KVM: selftests: Add VMGEXIT helper
+To: "Pratik R. Sampat" <prsampat@amd.com>, linux-kernel@vger.kernel.org,
+ x86@kernel.org, kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+Cc: seanjc@google.com, pbonzini@redhat.com, thomas.lendacky@amd.com,
+ tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, shuah@kernel.org, pgonda@google.com,
+ ashish.kalra@amd.com, nikunj@amd.com, michael.roth@amd.com, sraithal@amd.com
+References: <20250123220100.339867-1-prsampat@amd.com>
+ <20250123220100.339867-5-prsampat@amd.com>
+Content-Language: en-US
+From: "Gupta, Pankaj" <pankaj.gupta@amd.com>
+In-Reply-To: <20250123220100.339867-5-prsampat@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR2P281CA0101.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:9c::7) To IA1PR12MB8189.namprd12.prod.outlook.com
+ (2603:10b6:208:3f0::13)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250123234209.GD88607@sol.localdomain>
-X-Migadu-Flow: FLOW_OUT
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: IA1PR12MB8189:EE_|MW4PR12MB7311:EE_
+X-MS-Office365-Filtering-Correlation-Id: 701df5c4-df03-4fbb-fccb-08dd3c58134e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?d0Q1VDhiSjJrT2V3REY5NjFsTE85WURSZWpIWEFISTNFWFBkRlNmcnppeGVL?=
+ =?utf-8?B?cnJ5Mng0cHA5NWRxTGJIU1RxbWRQWXhtN2RldEtITWxrbGZONUFoaVFjR1Rl?=
+ =?utf-8?B?ZGNWZnUxSVVaaDZpc010TG43bzRkeW1jZ2VzWGhWMG16SFh0NCtKZ09aWDE5?=
+ =?utf-8?B?cVpWUlFFVzV1elVFaWFoYmxFcmZrR2dnaDhoRnRiTEIxQ2tsdGlPWEUzZlNw?=
+ =?utf-8?B?TFZzTThwSWpndWJlUXY2SWJUQWx6RW4zcDBSSFVYeDdtdUxzU09peEpJM1lH?=
+ =?utf-8?B?dkZvUVIyK0VpV25HWFVGTmV3Y2w1VmlpanRIdTVTUkRhOGxUK200NmEzQjFk?=
+ =?utf-8?B?ZVZNV2pQUTh6d0cxcGhOZXhXNUpRVTZXL3MyeHRIQndubFlNTDZ0eWhUQ3R5?=
+ =?utf-8?B?bk1VRGtzN3V1SW5jRkpOLzNPeFRqSWZHTURHb3E0bGtKMkZMRHdUSDE4NUt0?=
+ =?utf-8?B?VFU1TXFWWkVObGFuMHJXVVIyVFFUdEhYK2kxU041VmJDcFVGV09nVnIrSzJM?=
+ =?utf-8?B?U1FMK1NoWGpRTGtERlRsM2VPUHBQVkRCcy9qZzV5czY5L2JXNlFTQUI1RkIv?=
+ =?utf-8?B?OHNadVZCZVYzRFk5aEZRM3VWL2V0TlN6OWxmcWRSN0VWbmRjemRVWTNnN0Ji?=
+ =?utf-8?B?UEhzVU5Cd0kzRHVjWE82MW5JYlllb1hHUzNxU3Q5TFVMa2NkazhodWh4Ym1n?=
+ =?utf-8?B?NlhXREt2WVVkcEdScmNEQ29aSml5NThJeHlsaHhwK1dBd1U5SXExSEU0cGR4?=
+ =?utf-8?B?R3JVblBCNTVqQnNsNXRuMXdQaThIZUU0ZHdBR2EzbnV0WTFWM25PbW93bm5a?=
+ =?utf-8?B?S0lnZFN0YnRwdmN6Nm03UFRxSDdWVTg2cmlIVUZMRnQrSFhDY0J5KzU4NGxY?=
+ =?utf-8?B?UGpONWRDQ3pBNHpJaDF1MVRtZnlQbzI4dWVpMGsxb1hjWCtxakJyYVhMSWNn?=
+ =?utf-8?B?eHRicnNOL0lVS2Nha0IyQ01FdmJXRm55cXZHMWpIUHhWNUQzK05kWk9EV0xr?=
+ =?utf-8?B?VWJBd2EwMjFiOE9tZXFhb0Q3NTQ5YlNxYkJVWGwzWEsxeUY2VGZwUXdkOCtj?=
+ =?utf-8?B?N250elUwWXlYWW90RytsQWpuUm1ZSlhqUFJ6dkpHdkdQVWdwTGxWOE84UDF4?=
+ =?utf-8?B?YVN5NEtyTmY2c041eGptMGZOaDl2V3FCNVdxRUFRQlkyckJVb1Q1VVVITjYx?=
+ =?utf-8?B?blFKbGl5cngzQURSRHdiSE9nYW1STC83N09HQ1lBZkVzUVl6aThqc1VnbGFm?=
+ =?utf-8?B?b0pzMWVTQjN4SlBJOWlSdCtHYVRJcFJPWjVIUWdqT1Y4TERuTU9WMjlabSt4?=
+ =?utf-8?B?aFVDQ0xkTlpYZCtMbmZsc2E5cFlybVRnMnlSdkdxdGxBWHRiTXNkVWR6VWRi?=
+ =?utf-8?B?RDd3SkJmMDROTU9DQmhTOWNNdklmaWpPbmUzU3dLcG1nMHN2NHM4N1FlU21k?=
+ =?utf-8?B?RWN2T2FITUNGeXdjRHArYmdKT29NdEQ5UVM2YW9ZL3MwUnF0eTEvMS9LWm4r?=
+ =?utf-8?B?TU1tN3VoQWJiaFlpeXQvbWZQV2dxWEZNTmZXUG9IM1IyQjFXcTI5N0c1RlhH?=
+ =?utf-8?B?cy9WdVQ2ckNhSldyYW91dm0yWnozNWM5V2VUYUJCSGpsMVlPTG9RSnZXSk5P?=
+ =?utf-8?B?eWV1M3Jmd2xlSWM2bE8yK0svUG5JczdSTGpGN3E4Q24weFIzbUNtWTlQQmZI?=
+ =?utf-8?B?aFVVNE1lK0NDazBmU2Vtb3Z6ck1kNS9VMlRZaTB4clNRcEhuOGd4TWhSN1FX?=
+ =?utf-8?B?Y3d5ZTlhL0Q1Y0syRTlCUS9HMzBId0VtQ21uSVhKQ0RzNmxsUEdRYWdlY3E2?=
+ =?utf-8?B?RjBieWYrWkxtRjRZNkJycDNsemZuZjdQdVUxckV6c0RpNkFJdE9Wd0svQStN?=
+ =?utf-8?Q?CJIesDFCcJTdT?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB8189.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?d0JlWG1DS2xjL1ZUdkFmcDd2Q2lkcDlZL21FMWNSWnhsUGYxb1VKMTEwRGR0?=
+ =?utf-8?B?S0hoSzBibVZSRStMLzNBYVoreE5iWWFRSlZiUE9US3A4eGZ6R1MwTnhOVlh1?=
+ =?utf-8?B?ckc4N0lrUG02b21lNWZwUVdFcEtiWmJwbHBETC9wODNDejQ1amZjb2JKRjhT?=
+ =?utf-8?B?c1Q3L3dPS1pURFdzWk10M2x0SGxFY3lpd1BCeC90U0VueUdnRCs0MEViSlJC?=
+ =?utf-8?B?T3NycU1CNmlJY092cjNmV1RnaXNNNGpqNHAxK3UrbmtkTlBDSzQ0QWxTVU9v?=
+ =?utf-8?B?NDZVQmJvSmhXcXNWYlprVUVia01lUkpVYkpyZGZpS1d0ajRjUEJCR0Jzcmp6?=
+ =?utf-8?B?OXQ0eCtTd3h4MERhczNPaHFrTXovVm5yek9OM2gyRXVEMEFBZmdaeEN0eXpV?=
+ =?utf-8?B?b093WGMrS1JUdUV1WHJLcUxPSTlrMDZHNnFhaTA4VUxvUzh5ZHFQMkRyNVph?=
+ =?utf-8?B?NzdyclVKQVZqNWY2RlA3UVhhcGtsKysxVVVnQXR1cnAzbDM1RU0rWWxMemxa?=
+ =?utf-8?B?bnM4Y0JVek9ETWZMWVNCTlRrRTVoWk5iTDZQNE44dGdkVVFydmE4clpSQkRz?=
+ =?utf-8?B?d0VsRE93RWlFd0V6UXU0MnppUjF3YWNSeHdHZm5OcVJWb3h2Um9sRzdPd2lG?=
+ =?utf-8?B?TXpDNWFBVnVTeVB3dmtpZUpSbmlDNDVwZVlwT1RPNDFpWEwrT3NZa1VuL3hD?=
+ =?utf-8?B?ZE4wblBGdjlOek5PaS80RGRXbnN6ZHRXcEdReWJkcmgrenNrclkvQ05iWEhq?=
+ =?utf-8?B?dWRrdjNFYmRXSFBwTk13RzQ4TE9Gcy85cFNNcG05U1pjRnRVb1VocUxaRzdS?=
+ =?utf-8?B?eExCUi84OTJMNFBYdFgxYVBQWlk2SEpqR0oxSVRNVXhFajhnaEl1aHZWN3hJ?=
+ =?utf-8?B?anVHQmdYdjZEVDJCVjFWSlNJTkFFL1JsY2EwR3Z5YjNrTXlRZU5tNDJSaVFP?=
+ =?utf-8?B?K0QyRDhaQnNsK2pSbnRWZWhMT3VJREtQTkoxS3lhRXRQbG9iaGdHd3ZLM25n?=
+ =?utf-8?B?ZGVhRklCMXZYRE5sSCs2dHlsNm9pUTV6b01xaVpZdXFhN1NjVXd4RFdSTXZi?=
+ =?utf-8?B?UzZrN1krZzUvQzRZWnJuTStoQ092Y05MaDNWNWprcUlvMTdWTkFsREFYa2gx?=
+ =?utf-8?B?dHAwZEdrR0lRT3hxTlgrdTJGUnppaU5VT0hCMmxJNGVEQjUwL0psQ05xcEVH?=
+ =?utf-8?B?cHdOOXYvR1hPbk1MSkZRL3FadEh4dzU4TVQ3SzYvTUJ4bjhCd2UySHVKWDhS?=
+ =?utf-8?B?RW1zWjc3V0hUdWZEQ3hQQ05qUHFId0RMOEZnNXVrS0ZhT2I0M2Y2K1pZci92?=
+ =?utf-8?B?K3VqanFiNXpDMEIxbEJiVmNNTnZnNDdYaktRa2ZDMmRSY0VHTXhxeGYyd2dn?=
+ =?utf-8?B?NXBwaGR3bGE2UEZ0dFRQbFZYYWVLOU4rZHF3MU1vbHhxMjdXd1pGalY2RFFS?=
+ =?utf-8?B?S3FObURFKzltSDRqbkRycDRTczNMZVlWb241bWFGaXpUcStmYWFtcExVd2Jn?=
+ =?utf-8?B?Z2RwbFY3VXU4MjZDTnhPTktycGZNRExNU0xmekFyMVUzVTJnUmJuMmFHWGRt?=
+ =?utf-8?B?KzFWN3lpbXFCK2NHeVNZTTBQRjBFUjQ1aTFsMnpyMUtvYlk5Z1lFRDUzSTdD?=
+ =?utf-8?B?MGdPR083Rm43T0V2OGp6V2t3bS9iYzF6RWRKaVg0VlJXRnJJNWUwbDhiTzBT?=
+ =?utf-8?B?Si9pbjN1N3UwTmhZci9jVGhvRDllUFM4WnBFRWxKeVh3UXQxUUN2MjNjR3k1?=
+ =?utf-8?B?Yk9zTSt5a09qUWV5V1dKN0VmMjB2NGJsVXNlOC90SDA2SlpxZEY5WndKKzMr?=
+ =?utf-8?B?U2F3VFN0THhGbTBkejZLMldueXZqTUZXai9Hd3c0cUFMZ0xEM21BOGdBZTVT?=
+ =?utf-8?B?cjdlK0tndlhZSFNqa0w3Zk5UVVYxTzdHREJ6YkMrUnl1b3k4alV6NDJmVGsx?=
+ =?utf-8?B?SG9DK2FkcDQ3d3hFaTVvZ25HcDg4aEtYSXhTbHRJZ0NNb05aWTllUkRYMlpY?=
+ =?utf-8?B?TUlKMkZnaEMyVk5jM2ZSOEtXVmZMOCt2ampMRjhwRDRzN2hzZFdhaWlEbHpM?=
+ =?utf-8?B?bDhobXRyNFM2YWp1OFVuaEh1bGM3SEtMVjZtNXFrdlh5K2FMWllZOHZVcFln?=
+ =?utf-8?Q?XQP5XH3wk9UT6QBdq1cvXP5Tt?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 701df5c4-df03-4fbb-fccb-08dd3c58134e
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB8189.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jan 2025 09:18:33.7835
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: FqwgaEfoUzdPzO+F7oOd5wWPczCg2OIPy/eZFwN6bMp4K3kbEa/ZLvEHJcHIa82exlMJIQuPjS/pvnGq5A+G4A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7311
 
-On Thu, Jan 23, 2025 at 03:42:09PM -0800, Eric Biggers wrote:
-> On Thu, Jan 23, 2025 at 05:36:40PM -0500, Kent Overstreet wrote:
-> > On Wed, Jan 22, 2025 at 11:46:18PM -0800, Eric Biggers wrote:
-> > > On Wed, Jan 22, 2025 at 09:16:33PM -0800, Eric Biggers wrote:
-> > > > As you probably noticed, the other problem is that CRC32 has 4 generic
-> > > > implementations: bit-by-bit, and slice by 1, 4, or 8 bytes.
-> > > > 
-> > > > Bit-by-bit is useless.  Slice by 4 and slice by 8 are too similar to have both.
-> > > > 
-> > > > It's not straightforward to choose between slice by 1 and slice by 4/8, though.
-> > > > When benchmarking slice-by-n, a higher n will always be faster in
-> > > > microbenchmarks (up to about n=16), but the required table size also increases
-> > > > accordingly.  E.g., a slice-by-1 CRC32 uses a 1024-byte table, while slice-by-8
-> > > > uses a 8192-byte table.  This table is accessed randomly, which is really bad on
-> > > > the dcache, and can be really bad for performance in real world scenarios where
-> > > > the system is bottlenecked on memory.
-> > > > 
-> > > > I'm tentatively planning to just say that slice-by-4 is a good enough compromise
-> > > > and have that be the only generic CRC32 implementation.
-> > > > 
-> > > > But I need to try an interleaved implementation too, since it's possible that
-> > > > could give the best of both worlds.
-> > > 
-> > > Actually, I'm tempted to just provide slice-by-1 (a.k.a. byte-by-byte) as the
-> > > only generic CRC32 implementation.  The generic code has become increasingly
-> > > irrelevant due to the arch-optimized code existing.  The arch-optimized code
-> > > tends to be 10 to 100 times faster on long messages.
-> > > 
-> > > The generic CRC32 code is still needed when the CPU features needed by the arch
-> > > code are unavailable.  But that's rare these days.  It's also still needed when
-> > > the CPU has no scalar instructions to accelerate the CRC (e.g. on x86_64, the
-> > > "regular" CRC32 as opposed to the Castagnoli CRC32) *and* the message is too
-> > > short for the overhead of saving and restoring the vector registers to be worth
-> > > it -- typically < 64 bytes or so.  And it's still needed when the CRC is done in
-> > > a context where vector registers can't be used at all.
-> > > 
-> > > But those don't feel like very strong motivations for the huge tables anymore.
-> > > I think the huge tables were really intended for optimizing CRCs of long
-> > > messages back when CPUs didn't have any better way to do it.
-> > 
-> > Have you by chance been looking at performance of 64 bit crc algorithms,
-> > or have any recommendations there?
-> > 
-> > I've been starting to consider switching to a 64 bit crc for the
-> > default for bcachefs - and we do want it to be a regular crc so we can
-> > combine/add them together, not one of the newer fancier add/xor based
-> > hashes.
-> > 
-> > I thought we'd gotten a faster PCLMULQDQ based implementation of a
-> > crc64, but looking again it appears not, hrm.
+On 1/23/2025 11:00 PM, Pratik R. Sampat wrote:
+> Abstract rep vmmcall coded into the VMGEXIT helper for the sev
+> library.
 > 
-> Yep!  I've written an assembly template that expands into a PCLMULQDQ or
-> VPCLMULQDQ implementation of any variant of CRC-8, CRC-16, CRC-32, or CRC-64.
-> The latest work-in-progress version can be found at
-> https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=crc-x86.
-> We just need to decide which CRC variants to wire it up for.  My tentative plan,
-> which is implemented in that git branch, is crc32_le, crc_t10dif, crc64_be, and
-> crc64_nvme.  (crc64_nvme is currently called crc64_rocksoft, but that name makes
-> no sense.)  For crc32_le and crc_t10dif these would replace the existing
-> PCLMULQDQ implementations.  crc64* on the other hand would gain acceleration for
-> the first time, improving performance for those by as much as 100x.  I'm also
-> fixing the CRC64 lib to be organized the way I did CRC32 and CRC-T10DIF.
+> No functional change intended.
 > 
-> That work is targeting 6.15, since there was already enough for 6.14.
+> Signed-off-by: Pratik R. Sampat <prsampat@amd.com>
+
+Reviewed-by: Pankaj Gupta <pankaj.gupta@amd.com>
+
+> ---
+>   tools/testing/selftests/kvm/include/x86/sev.h    | 2 ++
+>   tools/testing/selftests/kvm/x86/sev_smoke_test.c | 2 +-
+>   2 files changed, 3 insertions(+), 1 deletion(-)
 > 
-> Though this approach makes it easy to wire up arbitrary CRC variants for x86, we
-> do need to make sure that anyone we wire up is actually useful.  The users of
-> the optimized crc64_be would be drivers/md/bcache/ and fs/bcachefs/.  So if you
-> could confirm that that would indeed be useful for you (and in particular you
-> haven't deprecated the CRC64 support in favor of xxHash), that would be helpful.
+> diff --git a/tools/testing/selftests/kvm/include/x86/sev.h b/tools/testing/selftests/kvm/include/x86/sev.h
+> index 82c11c81a956..e7df5d0987f6 100644
+> --- a/tools/testing/selftests/kvm/include/x86/sev.h
+> +++ b/tools/testing/selftests/kvm/include/x86/sev.h
+> @@ -27,6 +27,8 @@ enum sev_guest_state {
+>   
+>   #define GHCB_MSR_TERM_REQ	0x100
+>   
+> +#define VMGEXIT()		{ __asm__ __volatile__("rep; vmmcall"); }
+> +
+>   void sev_vm_launch(struct kvm_vm *vm, uint32_t policy);
+>   void sev_vm_launch_measure(struct kvm_vm *vm, uint8_t *measurement);
+>   void sev_vm_launch_finish(struct kvm_vm *vm);
+> diff --git a/tools/testing/selftests/kvm/x86/sev_smoke_test.c b/tools/testing/selftests/kvm/x86/sev_smoke_test.c
+> index a1a688e75266..38f647fe55d2 100644
+> --- a/tools/testing/selftests/kvm/x86/sev_smoke_test.c
+> +++ b/tools/testing/selftests/kvm/x86/sev_smoke_test.c
+> @@ -27,7 +27,7 @@ static void guest_sev_es_code(void)
+>   	 * force "termination" to signal "done" via the GHCB MSR protocol.
+>   	 */
+>   	wrmsr(MSR_AMD64_SEV_ES_GHCB, GHCB_MSR_TERM_REQ);
+> -	__asm__ __volatile__("rep; vmmcall");
+> +	VMGEXIT();
+>   }
+>   
+>   static void guest_sev_code(void)
 
-That's fantastic!
-
-CRC64 isn't deprecated, and I suspect that will be our preferred option
-at some point in the future. xxHash was added only because there is a
-real desire for 64 bit checksums and crc64 wasn't a good option at the
-time.
-
-(It was also designed as a hash function, not for data protection, and
-I'd want to see some actual literature evaluating it as such before I'd
-consider making it the default. And like I mentioned, CRCs have other
-properties we want).
