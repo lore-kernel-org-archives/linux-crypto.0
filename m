@@ -1,97 +1,161 @@
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailbox.box.xen0n.name (mail.xen0n.name [115.28.160.31])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E0FA1DC745;
-	Sat, 25 Jan 2025 11:14:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8B1C26ADD;
+	Sun, 26 Jan 2025 04:26:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.28.160.31
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737803698; cv=none; b=dMS8O8tN3DHbFVJkvhqf3/XgMhFqsXG0Yuz4vyUeXoScU6C0oXCrlHqZ+xK+DbY48ge8kAZPtSdqI1KWEqJMsGnS4TubFtqPkoFAocDcs2HzLcTkLB20SMvlXDxKy5rndnf+SaX2BLyfL/5lhYIo1oVIVNoXJqjmc0o5Cq0LAc8=
+	t=1737865615; cv=none; b=JcaqxwpwW/usptXjYXqBDZYVUS3PY+U0KosIaEEYbuZjLC+WTAZb0EjcfQ+7BWiwt/Rw9ey8cHst7cdZavdlV0gx2O+T7U6chTzqtp02Pr7azejPLAGP1Au4/KfwuEbfjVQjlDyOOAJIdCEVRbc3Ar2npxTN+ROFS0n/+F3wCXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737803698; c=relaxed/simple;
-	bh=Sep3632jZbCvmggc154gHaJqDJBdLEK8UGq+FlPa4lo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=H9Okw65MSmM7mD0otIUy3XpNpowBsY6Nk3MEG7jiy2iR6j4EWExJ0uYfOoZovn33I5IjmV3Ecd1MHK1qlnKA0tXzm3oabKykc8EwZut4nCthYbRcRdGKh92C6kOGQAYXEFFiUbMy4ekFEOAjE668iGeP8uvy45PwKT9t7jYLY/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mcg2EYSM; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1737865615; c=relaxed/simple;
+	bh=2WWxadxOpy+V8YBIupHOiBuQFFba5Q0KmSR3GVcy5TY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gvcmFnDrL7yikB5zZpu8zkS+ZAzmjSf2SqSDpAxNo6EGsiiIU7XmXeEH4nEfsdvMB2P+eLLLNhBIlR5yH34KeKI1OPmhHjhWJmEqjFWdHLQT8EDh0OMZjyszF9WdmtZViQICBhMt7tREPJK+HxPkyr3ZSP5+RY/hfOZjvpBpBoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xen0n.name; spf=pass smtp.mailfrom=xen0n.name; dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b=inxhmB7Z; arc=none smtp.client-ip=115.28.160.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=xen0n.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xen0n.name
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mcg2EYSM"
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-385deda28b3so2111302f8f.0;
-        Sat, 25 Jan 2025 03:14:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737803695; x=1738408495; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aF+h8/fEazDIA+ZyLYnsZgqKWixtRdrDOMUcSf2UUr0=;
-        b=mcg2EYSMlh4ypCE1P5LbNHBZkzMwIa7n+p7zD+LiNiF9swau/L8uLADjS8LRfrLPhQ
-         msKDbqzxr1uIMLNDwNWgKDl15dTREGLEqhTNA6qr+zI8uXmDq4Lqneiy6BySA9wC4Sty
-         9QJXhgcYf99s1o+kaUcumbnlFiAOWm2G8IBW3HuumyOWlzo/K4KLws/bLbfGUf8c0UA6
-         TAqQge1A2SQorn7bkW5ADso+X0hy/FtDrLifRpt8qLvgKb6bBzNuUkMWOeTpoFN2z3tC
-         vIvlUsfmwHPhUXyYnaYtTbn0rswg5rbdEPBsBCpOnsIN4lgQDntQiU2h5JPVOO77xZbZ
-         A7BQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737803695; x=1738408495;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aF+h8/fEazDIA+ZyLYnsZgqKWixtRdrDOMUcSf2UUr0=;
-        b=GNVloinSBR0dl78OAYZ6MjoBGLf6DG3tR1Vy0bkMzMN1OpF9OqAlY3m3nJGd7+eO18
-         oIJfsfjPUB81ERaeOhUSpx1ArLaF/tnbF8VA8Iky9iHJ6EVTxoQ3AWUuiXL/wsvJ6OY+
-         4Wt3Qzwjsh9FXW0nDmzmuuxaNpHMR1si3E0o4olNY96bUIayeLg+MtjrDNMF+tKQxt/f
-         Jp2t03o3pYc9CyJGFxNUzKl2/p7GdA4mhxv1aE56NZUQ9gHyPxDWzpExvdpNCAtbn0X4
-         ANg8Mr62RlzzuPZwmuPoHIYSGu99ekShjTVlOhaNzVOcKYi7XedZwnB2vMeI/MPDP+Xu
-         eWDg==
-X-Forwarded-Encrypted: i=1; AJvYcCVioe6qX6AvdkiWeFOZ+Jta7+c3lGUR2mwOOaHQXkQPYKK9q+Z6VAEh/tWHUbbwtcNZ1oizvfmnquKdEMo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYxZBVSOxeutllqLyvBkKwYxvCslSeJ2seHEQLmy0D0Jbj67hp
-	PFMYo3Sf85uGIJ7l1Z8p3mel2vk9Tn0xHHHmX2AsblXBhuauYIH+7VbVOA==
-X-Gm-Gg: ASbGncuYieodN++AJE43wzkkWUg1bJqyXppQene8ncKkPC2bk3o4qkYwFjjZj8d5+Mf
-	ldKLIvLB4fOQS0u42ZKPUQ5lGfeQuVz/EPmbI9w3hk2Hr6KLdMCb+WjUuoh+7uOnWZVNrc+13Q6
-	PlHqGV9CileY4S40Z130QGOemnZ2TneEBLTVnHCseY9VaAj08ua/DAyB5FRJ0XAWjmBzt6BDUEE
-	aACDZ0cNC8hibedA4mCW3YvhvB1ebbwxTM//uu0W6LHnqG5WP/ApH3Gm4531jdc0gNgixTXK5KT
-	tYeK6TGl7su4nFaFxyhIg95OhbjeHI1XFqFa7Ab1zU4=
-X-Google-Smtp-Source: AGHT+IEM9mAV1tTssWlOUFDafaoIJIaBbHkGqS0a5Rhp3uin03opAIRNomXqn7F+faWNeu5HBwxdSg==
-X-Received: by 2002:a5d:47c9:0:b0:386:416b:9c69 with SMTP id ffacd0b85a97d-38bf5662912mr35311968f8f.16.1737803695434;
-        Sat, 25 Jan 2025 03:14:55 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c2a1c4006sm5337410f8f.94.2025.01.25.03.14.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 25 Jan 2025 03:14:55 -0800 (PST)
-Date: Sat, 25 Jan 2025 11:14:53 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-kernel@vger.kernel.org, Linus Torvalds
- <torvalds@linux-foundation.org>, linux-crypto@vger.kernel.org, Ard
- Biesheuvel <ardb@kernel.org>, Chao Yu <chao@kernel.org>, "Darrick J . Wong"
- <djwong@kernel.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Kent
- Overstreet <kent.overstreet@linux.dev>, "Martin K . Petersen"
- <martin.petersen@oracle.com>, Michael Ellerman <mpe@ellerman.id.au>,
- Theodore Ts'o <tytso@mit.edu>, Vinicius Peixoto <vpeixoto@lkcamp.dev>,
- WangYuli <wangyuli@uniontech.com>
-Subject: Re: [PATCH 2/2] lib/crc32: remove other generic implementations
-Message-ID: <20250125111453.26e33854@pumpkin>
-In-Reply-To: <20250123212904.118683-3-ebiggers@kernel.org>
-References: <20250123212904.118683-1-ebiggers@kernel.org>
-	<20250123212904.118683-3-ebiggers@kernel.org>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	dkim=pass (1024-bit key) header.d=xen0n.name header.i=@xen0n.name header.b="inxhmB7Z"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xen0n.name; s=mail;
+	t=1737865602; bh=2WWxadxOpy+V8YBIupHOiBuQFFba5Q0KmSR3GVcy5TY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=inxhmB7ZfDV3pBV3xQxdJIRxXq2vojtV8aEjUBD/A9mf9i4RLCNC9jIjlSRMk6ExQ
+	 59Y23qmEKs+Ln4LRsww3Y9Pepp2ixqTxCEJaw7+Ys8I0LTlFGxDFPNLGW9pstB5vPl
+	 bGiy+EHtmVAZO6qW4cHuVCql/ClZmF11YZ54VCGw=
+Received: from [IPV6:240e:388:8d02:a200:799b:c189:73a3:70e9] (unknown [IPv6:240e:388:8d02:a200:799b:c189:73a3:70e9])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mailbox.box.xen0n.name (Postfix) with ESMTPSA id 35F63600CE;
+	Sun, 26 Jan 2025 12:26:42 +0800 (CST)
+Message-ID: <d0e9c27c-078f-4126-adbc-3503791af43d@xen0n.name>
+Date: Sun, 26 Jan 2025 12:26:41 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 3/3] misc: ls6000se-sdf: Add driver for Loongson 6000SE
+ SDF
+To: Xi Ruoyao <xry111@xry111.site>, "Zheng, Yaofei" <Yaofei.Zheng@dell.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Qunqin Zhao <zhaoqunqin@loongson.cn>
+Cc: Arnd Bergmann <arnd@arndb.de>, Lee Jones <lee@kernel.org>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "loongarch@lists.linux.dev" <loongarch@lists.linux.dev>,
+ "David S . Miller" <davem@davemloft.net>,
+ "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+ "derek.kiernan@amd.com" <derek.kiernan@amd.com>,
+ "dragan.cvetic@amd.com" <dragan.cvetic@amd.com>,
+ Yinggang Gu <guyinggang@loongson.cn>
+References: <20250114095527.23722-1-zhaoqunqin@loongson.cn>
+ <20250114095527.23722-4-zhaoqunqin@loongson.cn>
+ <ee65851c-4149-4927-a2e7-356cdce2ba25@app.fastmail.com>
+ <97000576d4ba6d94cea70363e321665476697052.camel@xry111.site>
+ <2025011407-muppet-hurricane-196f@gregkh>
+ <122aab11-f657-a48e-6b83-0e01ddd20ed3@loongson.cn>
+ <2025011527-antacid-spilt-cbef@gregkh>
+ <SA3PR19MB73993DCBDE9117AA1E77C127F9192@SA3PR19MB7399.namprd19.prod.outlook.com>
+ <d56121dc6c6953d4f052be5da5203a4e28676b4e.camel@xry111.site>
+Content-Language: en-US
+From: WANG Xuerui <kernel@xen0n.name>
+In-Reply-To: <d56121dc6c6953d4f052be5da5203a4e28676b4e.camel@xry111.site>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, 23 Jan 2025 13:29:04 -0800
-Eric Biggers <ebiggers@kernel.org> wrote:
+Hi,
 
-> From: Eric Biggers <ebiggers@google.com>
+On 1/15/25 19:13, Xi Ruoyao wrote:
+> On Wed, 2025-01-15 at 10:39 +0000, Zheng, Yaofei wrote:
+>>
+>> Internal Use - Confidential
+>>> On Wed, Jan 15, 2025 at 10:58:52AM +0800, Qunqin Zhao wrote:
+>>>>
+>>>> 在 2025/1/14 下午9:21, Greg Kroah-Hartman 写道:
+>>>>> On Tue, Jan 14, 2025 at 06:43:24PM +0800, Xi Ruoyao wrote:
+>>>>>> On Tue, 2025-01-14 at 11:17 +0100, Arnd Bergmann wrote:
+>>>>>>> On Tue, Jan 14, 2025, at 10:55, Qunqin Zhao wrote:
+>>>>>>>> Loongson Secure Device Function device supports the functions
+>>>>>>>> specified in "GB/T 36322-2018". This driver is only
+>>>>>>>> responsible for sending user data to SDF devices or returning SDF device data to users.
+>>>>>>> I haven't been able to find a public version of the standard
+>>>>>> A public copy is available at
+>>>>>> https://openstd.samr.gov.cn/bzgk/gb/ne
+>>>>>> wGbInfo?hcno=69E793FE1769D120C82F78447802E14F__;!!LpKI!g7kUt84vOxl
+>>>>>> 65EbgAJzXoupsM5Bx3FjUDPnKHaEw5RUoyUouS6IwCerRSZ7MIWi0Bw5WHaM2YP7pZ
+>>>>>> IcYiDQOLf3F$ [openstd[.]samr[.]gov[.]cn], pressing the blue
+>>>>>> "online preview" button, enter a captcha and you can see it.  But the copy is in Chinese, and there's an explicit notice saying translating this copy is forbidden, so I cannot translate it for you either.
+>>>>>>
+>>>>>>> but
+>>>>>>> from the table of contents it sounds like this is a standard for
+>>>>>>> cryptographic functions that would otherwise be implemented by a
+>>>>>>> driver in drivers/crypto/ so it can use the normal abstractions
+>>>>>>> for both userspace and in-kernel users.
+>>>>>>>
+>>>>>>> Is there some reason this doesn't work?
+>>>>>> I'm not an lawyer but I guess contributing code for that may have
+>>>>>> some "cryptography code export rule compliance" issue.
+>>>>> Issue with what?  And why?  It's enabling the functionality of the
+>>>>> hardware either way, so the same rules should apply no matter where
+>>>>> the driver ends up in or what apis it is written against, right?
+>>>>
+>>>> SDF and tpm2.0 are both  "library specifications",  which means that
+>>>>
+>>>> it supports a wide variety of functions not only cryptographic
+>>>> functions,
+>>>>
+>>>> but unlike tpm2.0, SDF is only used in China.
+>>>>
+>>>> You can refer to the tpm2.0 specification:
+>>>> https://trustedcomputinggroup.org/resource
+>>>> /tpm-library-specification/__;!!LpKI!g7kUt84vOxl65EbgAJzXoupsM5Bx3FjUD
+>>>> PnKHaEw5RUoyUouS6IwCerRSZ7MIWi0Bw5WHaM2YP7pZIcYiCFoP-hu$
+>>>> [trustedcomputinggroup[.]org]
+>>>
+>>> So this is an accelerator device somehow?  If it provides crypto functions, it must follow the crypto api, you can't just provide a "raw"
+>>> char device node for it as that's not going to be portable at all.
+>>> Please fit it into the proper kernel subsystem for the proper user/kernel api needed to drive this hardware.
+>>>
+>>> thanks,
+>>>
+>>> greg k-h
+>>>
+>>
+>> Hi Qunqin and Ruoyao,
+>>
+>> "GB/T 36322-2018" is just a chinese national standard, not ISO standard, not an
+>> enforced one, "T" repensts "推荐" which means "recommend". From what I understand
+>>   it defined series of C API for cryptography devices after reading the standard.
+>> Linux kernel have user space socket interface using type AF_ALG, and out of tree
+>>   driver "Cryptodev". From my view: "GB/T 36322-2018" can be user space library
+>> using socket interface, just like openssl, if must do it char dev way, do it out
+>>   of tree, and reuse kernel space crypto API.
 > 
-> Now that we've standardized on the byte-by-byte implementation of CRC32
-> as the only generic implementation (see previous commit for the
-> rationale), remove the code for the other implementations.
+> Figure 1 of the section 6.1 says the GB/T 36322 interface is between
+> "cryptography device" and "generic cryptography service and cryptography
+> device management."  IMO in a Linux (or any monolithic-kernel) system at
+> least "cryptography device management" is the job of the kernel, thus
+> exposing the GB/T 36322 interface directly to the userspace seems not a
+> good idea.
+> 
 
-Some of that deleted code is disgusting - well disposed of.
+I've also taken a look at the standard text. The majority of it is the 
+SDF API definition which is in C and with all identifiers in English, so 
+even non-speakers of Chinese can probably understand much of it.
 
-	David
+But I tend to agree that the SDF API is abstract enough that it does not 
+matter whether it's directly exposed by kernel UAPI or not; while I'm 
+not familiar with the Linux crypto subsystem either, it seems entirely 
+appropriate for the kernel driver to expose the standard crypto API, and 
+for the SDF API to reside in a user-space shim. This way we could have 
+non-SDF-aware applications transparently make use of the Loongson HW 
+capability, and also have non-Loongson crypto HW available through the 
+same SDF interface (should some board designer choose to do so).
+
+-- 
+WANG "xen0n" Xuerui
+
+Linux/LoongArch mailing list: https://lore.kernel.org/loongarch/
