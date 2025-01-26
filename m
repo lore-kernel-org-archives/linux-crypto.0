@@ -1,37 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90C4317D358;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74FAA1662E9;
 	Sun, 26 Jan 2025 18:59:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737917946; cv=none; b=EEAJYTMWeLdtE4PMXvexkxMkEqkRwX3NENONVG//LuWWtPeXHg5i9TBH7Qw6B6NPjyXfFZc0nzEjBg6b14bD9vdMn2ewb0wUgeES4H4yusu90VLLwyAKHzcxHGjciY7tbfj0lEuNrIzT9GGlGhXGpIxIDHPZsNxdZHyYGTDwnFo=
+	t=1737917946; cv=none; b=f41fwcWuYggbw7JhmrxeEpheZrlguuksytMM9/mVVE2TfnqOlrudpyKGZtEjmpLx9bMVQnw7m9lrGrOE59yHDPszexcZsbQQNxea5I5ufNds8aZq+qtWZzN/F1WTPxxWnEpRRvA2s7IkP/38inmYwV61jGoimR9VBoDoAGVThtI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1737917946; c=relaxed/simple;
-	bh=r6w1TGpVSqKoSAo8UJWjBKkemEchRp94CZSpKLCcVic=;
+	bh=cLp+xtgZFvwpkQ9rnhvVR1jYwT1rhxWjVeDmOsa9ZVE=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=q5Gdpi+bvQl0+GHVES64KVG7CdgOXI0Y1/xKQkIX5DbEdlslSNpYDRP9wdEH56yMgEoFXHbFi3XaS6nC1E6eE2k4IiRgP9sUBcPyd99S3ooPPH6ZiIgIDgTgC9t7on1EYMKblckk/J3iCmMUeG8qR98h5merQABb84TH5Q1gWmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VKQA9VPT; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:To:Cc; b=rF29MHTczlPgoobwNLslmyTwvauOXcfbDgRmJKbTNh5YrOqR5Uhbr4L8zlnYOKXTsb3nx4T3DcuAA/71/xvDyEL5c9XYWnmreeAegNOivGLPz5Wi8c4cjelvYQSl+IlQ/QQebkHxUkvYuSFSoPkuVH+kbDlp6oOY2kb4s9BbPJ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dNrf36lj; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VKQA9VPT"
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 11B3FC19422;
-	Sun, 26 Jan 2025 18:59:06 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dNrf36lj"
+Received: by smtp.kernel.org (Postfix) with ESMTPS id DCE18C4CEF8;
+	Sun, 26 Jan 2025 18:59:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737917946;
-	bh=r6w1TGpVSqKoSAo8UJWjBKkemEchRp94CZSpKLCcVic=;
+	s=k20201202; t=1737917945;
+	bh=cLp+xtgZFvwpkQ9rnhvVR1jYwT1rhxWjVeDmOsa9ZVE=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=VKQA9VPTPYPBXavTlj/t8VBkruGrWrint1cIPRTVYmzKcYSkLCACJ3dkx6YFGD5aF
-	 I5j0anMoe7fWtO3sLpUNV/oYGmyZ6Pd/1IMgKDwtellO9zkx0HriAYlpGLEZ/hmMXU
-	 X9JdBEmd63a57sa6SmidOk6bIjwFXbcLPOcE4pBEEPJRcMZE8RpbPZ0R5rRqT/aSkI
-	 qLEU8dB2BSh7PNeKGe0KN7uw1wf0MLOqPex7UWVF4pcFmavGTl0z0ngohluNmDNOtz
-	 xsmoello/jN78f1HAh4FwkYSl6GQEzR0w9qf1u6Zl3fdiae50NcCD6vrAii4IvLEl2
-	 1iBMXM+cQuCOQ==
+	b=dNrf36ljJnRNMCWS+C0SkgbKvfKqrKWVcmL/lfG4Mn5cli7iS1qC0yoCe5CerL7Pu
+	 KICQQCoBwp/WJHPsV5pWCu989hAl/91aZeR4WPaoyzrUbV0eO04nWU3Zlbaj+aSfwF
+	 VDhUfMy6u6nbwAn7ncToaDFaE4EUD38NQmKxPK5w4JfdDDZWlWicGmYiX9iNZFq9ET
+	 F42PuvOI1nlufipNmvVxf43QDbe3ypAzB5Bz3iZ1QF/juTFDYTtYONUelCwTZy2ZXa
+	 wBM6wtk2xtmab0zmnJAJjOqguDU0cAuo7zWEJubikJy/tmf+jR0OEiGlEoZ65ECgL6
+	 xGmcqCvvG7MMw==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05F5BC0218D;
-	Sun, 26 Jan 2025 18:59:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3081C0218D;
+	Sun, 26 Jan 2025 18:59:05 +0000 (UTC)
 From: =?utf-8?q?J=2E_Neusch=C3=A4fer_via_B4_Relay?= <devnull+j.ne.posteo.net@kernel.org>
-Date: Sun, 26 Jan 2025 19:59:02 +0100
-Subject: [PATCH 7/9] dt-bindings: watchdog: Convert mpc8xxx-wdt binding to
+Date: Sun, 26 Jan 2025 19:59:00 +0100
+Subject: [PATCH 5/9] dt-bindings: dma: Convert fsl,elo*-dma bindings to
  YAML
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -41,7 +41,7 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Message-Id: <20250126-ppcyaml-v1-7-50649f51c3dd@posteo.net>
+Message-Id: <20250126-ppcyaml-v1-5-50649f51c3dd@posteo.net>
 References: <20250126-ppcyaml-v1-0-50649f51c3dd@posteo.net>
 In-Reply-To: <20250126-ppcyaml-v1-0-50649f51c3dd@posteo.net>
 To: devicetree@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
@@ -69,11 +69,11 @@ Cc: Scott Wood <oss@buserror.net>,
  linux-spi@vger.kernel.org, linux-mtd@lists.infradead.org, 
  =?utf-8?q?J=2E_Neusch=C3=A4fer?= <j.ne@posteo.net>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1737917943; l=3719;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1737917943; l=20040;
  i=j.ne@posteo.net; s=20240329; h=from:subject:message-id;
- bh=INVkBCLHOPyRZgA3id7yu3YiJSlbpT9rkFYnjOPWGRw=;
- b=qIrd3NqNYsZmRHz4Bp4oEm0lNDz7AgiaFpCxd9WVkNnHgQgErhQ8oTpycy+6fz5u6+yLeokS7
- DjGnZr5OgjSAQorB4z4FQuYzKQmxCRJELg+Xp55lZMxlrTDHbra662w
+ bh=fj3a3m484wNQKzrVxwQR5GtW+5KXH8sXnuZSxUycDfc=;
+ b=ut+9Pk3cplt6KMFWkvZBRlC9SBF8OywHoLptLfpelZGYyoaoKECXDJroqgKtYF792mTYezcUM
+ jsxsmclRkYmA7Zfj2cE1eQlohV9Necb/R1qyowa/Zf4BswbQihrnPxz
 X-Developer-Key: i=j.ne@posteo.net; a=ed25519;
  pk=NIe0bK42wNaX/C4bi6ezm7NJK0IQE+8MKBm7igFMIS4=
 X-Endpoint-Received: by B4 Relay for j.ne@posteo.net/20240329 with
@@ -83,115 +83,600 @@ Reply-To: j.ne@posteo.net
 
 From: "J. Neuschäfer" <j.ne@posteo.net>
 
-Convert mpc83xx-wdt.txt to YAML to enable automatic schema validation.
+The devicetree bindings for Freescale DMA engines have so far existed as
+a text file. This patch converts them to YAML, and specifies all the
+compatible strings currently in use in arch/powerpc/boot/dts.
 
 Signed-off-by: J. Neuschäfer <j.ne@posteo.net>
 ---
- .../devicetree/bindings/watchdog/mpc8xxx-wdt.txt   | 25 ---------
- .../devicetree/bindings/watchdog/mpc8xxx-wdt.yaml  | 64 ++++++++++++++++++++++
- 2 files changed, 64 insertions(+), 25 deletions(-)
+ .../devicetree/bindings/dma/fsl,elo-dma.yaml       | 129 +++++++++++++
+ .../devicetree/bindings/dma/fsl,elo3-dma.yaml      | 105 +++++++++++
+ .../devicetree/bindings/dma/fsl,eloplus-dma.yaml   | 120 ++++++++++++
+ .../devicetree/bindings/powerpc/fsl/dma.txt        | 204 ---------------------
+ 4 files changed, 354 insertions(+), 204 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/watchdog/mpc8xxx-wdt.txt b/Documentation/devicetree/bindings/watchdog/mpc8xxx-wdt.txt
-deleted file mode 100644
-index a384ff5b3ce8c62d813fc23d72f74e2158ff543e..0000000000000000000000000000000000000000
---- a/Documentation/devicetree/bindings/watchdog/mpc8xxx-wdt.txt
-+++ /dev/null
-@@ -1,25 +0,0 @@
--* Freescale mpc8xxx watchdog driver (For 83xx, 86xx and 8xx)
--
--Required properties:
--- compatible: Shall contain one of the following:
--	"mpc83xx_wdt" for an mpc83xx
--	"fsl,mpc8610-wdt" for an mpc86xx
--	"fsl,mpc823-wdt" for an mpc8xx
--- reg: base physical address and length of the area hosting the
--       watchdog registers.
--		On the 83xx, "Watchdog Timer Registers" area:	<0x200 0x100>
--		On the 86xx, "Watchdog Timer Registers" area:	<0xe4000 0x100>
--		On the 8xx, "General System Interface Unit" area: <0x0 0x10>
--
--Optional properties:
--- reg: additional physical address and length (4) of location of the
--       Reset Status Register (called RSTRSCR on the mpc86xx)
--		On the 83xx, it is located at offset 0x910
--		On the 86xx, it is located at offset 0xe0094
--		On the 8xx, it is located at offset 0x288
--
--Example:
--		WDT: watchdog@0 {
--		    compatible = "fsl,mpc823-wdt";
--		    reg = <0x0 0x10 0x288 0x4>;
--		};
-diff --git a/Documentation/devicetree/bindings/watchdog/mpc8xxx-wdt.yaml b/Documentation/devicetree/bindings/watchdog/mpc8xxx-wdt.yaml
+diff --git a/Documentation/devicetree/bindings/dma/fsl,elo-dma.yaml b/Documentation/devicetree/bindings/dma/fsl,elo-dma.yaml
 new file mode 100644
-index 0000000000000000000000000000000000000000..c78a424388c6e30bc4656f5444e621c1b397366b
+index 0000000000000000000000000000000000000000..d1f4978a672c1217c322c27f243470b2de8c99d4
 --- /dev/null
-+++ b/Documentation/devicetree/bindings/watchdog/mpc8xxx-wdt.yaml
-@@ -0,0 +1,64 @@
++++ b/Documentation/devicetree/bindings/dma/fsl,elo-dma.yaml
+@@ -0,0 +1,129 @@
 +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
 +%YAML 1.2
 +---
-+$id: http://devicetree.org/schemas/watchdog/mpc8xxx-wdt.yaml#
++$id: http://devicetree.org/schemas/dma/fsl,elo-dma.yaml#
 +$schema: http://devicetree.org/meta-schemas/core.yaml#
 +
-+title: Freescale MPC8xxx watchdog timer (For 83xx, 86xx and 8xx)
++title: Freescale Elo DMA Controller
 +
 +maintainers:
 +  - J. Neuschäfer <j.ne@posteo.net>
 +
++description: |
++  This is a little-endian 4-channel DMA controller, used in Freescale mpc83xx
++  series chips such as mpc8315, mpc8349, mpc8379 etc.
++
++  Note on DMA channel compatible properties: The compatible property must say
++  "fsl,elo-dma-channel" or "fsl,eloplus-dma-channel" to be used by the Elo DMA
++  driver (fsldma).  Any DMA channel used by fsldma cannot be used by another
++  DMA driver, such as the SSI sound drivers for the MPC8610.  Therefore, any
++  DMA channel that should be used for another driver should not use
++  "fsl,elo-dma-channel" or "fsl,eloplus-dma-channel".  For the SSI drivers, for
++  example, the compatible property should be "fsl,ssi-dma-channel".  See
++  ssi.txt for more information.
++
 +properties:
 +  compatible:
-+    enum:
-+      - mpc83xx_wdt       # for an mpc83xx
-+      - fsl,mpc8610-wdt   # for an mpc86xx
-+      - fsl,mpc823-wdt    # for an mpc8xx
-+
-+  device_type:
-+    const: watchdog
++    items:
++      - enum:
++          - fsl,mpc8313-dma
++          - fsl,mpc8315-dma
++          - fsl,mpc8323-dma
++          - fsl,mpc8347-dma
++          - fsl,mpc8349-dma
++          - fsl,mpc8360-dma
++          - fsl,mpc8377-dma
++          - fsl,mpc8378-dma
++          - fsl,mpc8379-dma
++      - const: fsl,elo-dma
 +
 +  reg:
-+    minItems: 1
-+    items:
-+      - description: |
-+          Base physical address and length of the area hosting the watchdog
-+          registers.
++    maxItems: 1
++    description:
++      DMA General Status Register, i.e. DGSR which contains status for
++      all the 4 DMA channels.
 +
-+          On the 83xx, "Watchdog Timer Registers" area:     <0x200 0x100>
-+          On the 86xx, "Watchdog Timer Registers" area:     <0xe4000 0x100>
-+          On the 8xx, "General System Interface Unit" area: <0x0 0x10>
++  ranges: true
 +
-+      - description: |
-+          Additional optional physical address and length (4) of location of
-+          the Reset Status Register (called RSTRSCR on the mpc86xx)
++  cell-index:
++    $ref: /schemas/types.yaml#/definitions/uint32
++    description: Controller index. 0 for controller @ 0x8100.
 +
-+          On the 83xx, it is located at offset 0x910
-+          On the 86xx, it is located at offset 0xe0094
-+          On the 8xx, it is located at offset 0x288
++  interrupts:
++    maxItems: 1
++
++patternProperties:
++  "^dma-channel@.*$":
++    type: object
++
++    properties:
++      compatible:
++        items:
++          - enum:
++              - fsl,mpc8315-dma-channel
++              - fsl,mpc8323-dma-channel
++              - fsl,mpc8347-dma-channel
++              - fsl,mpc8349-dma-channel
++              - fsl,mpc8360-dma-channel
++              - fsl,mpc8377-dma-channel
++              - fsl,mpc8378-dma-channel
++              - fsl,mpc8379-dma-channel
++          - const: fsl,elo-dma-channel
++
++      reg:
++        maxItems: 1
++
++      cell-index:
++        description: DMA channel index starts at 0.
++
++      interrupts: true
 +
 +required:
 +  - compatible
 +  - reg
++  - interrupts
 +
-+allOf:
-+  - $ref: watchdog.yaml#
-+
-+additionalProperties: false
++additionalProperties: true
 +
 +examples:
 +  - |
-+    WDT: watchdog@0 {
-+        compatible = "fsl,mpc823-wdt";
-+        reg = <0x0 0x10 0x288 0x4>;
-+    };
-+
-+  - |
-+    wdt: watchdog@200 {
-+        device_type = "watchdog";
-+        compatible = "mpc83xx_wdt";
-+        reg = <0x200 0x100>;
++    dma@82a8 {
++        #address-cells = <1>;
++        #size-cells = <1>;
++        compatible = "fsl,mpc8349-dma", "fsl,elo-dma";
++        reg = <0x82a8 4>;
++        ranges = <0 0x8100 0x1a4>;
++        interrupt-parent = <&ipic>;
++        interrupts = <71 8>;
++        cell-index = <0>;
++        dma-channel@0 {
++            compatible = "fsl,mpc8349-dma-channel", "fsl,elo-dma-channel";
++            cell-index = <0>;
++            reg = <0 0x80>;
++            interrupt-parent = <&ipic>;
++            interrupts = <71 8>;
++        };
++        dma-channel@80 {
++            compatible = "fsl,mpc8349-dma-channel", "fsl,elo-dma-channel";
++            cell-index = <1>;
++            reg = <0x80 0x80>;
++            interrupt-parent = <&ipic>;
++            interrupts = <71 8>;
++        };
++        dma-channel@100 {
++            compatible = "fsl,mpc8349-dma-channel", "fsl,elo-dma-channel";
++            cell-index = <2>;
++            reg = <0x100 0x80>;
++            interrupt-parent = <&ipic>;
++            interrupts = <71 8>;
++        };
++        dma-channel@180 {
++            compatible = "fsl,mpc8349-dma-channel", "fsl,elo-dma-channel";
++            cell-index = <3>;
++            reg = <0x180 0x80>;
++            interrupt-parent = <&ipic>;
++            interrupts = <71 8>;
++        };
 +    };
 +
 +...
+diff --git a/Documentation/devicetree/bindings/dma/fsl,elo3-dma.yaml b/Documentation/devicetree/bindings/dma/fsl,elo3-dma.yaml
+new file mode 100644
+index 0000000000000000000000000000000000000000..d4853ffd40dc75c7fcdc0dfb15e497ec56f3e1ba
+--- /dev/null
++++ b/Documentation/devicetree/bindings/dma/fsl,elo3-dma.yaml
+@@ -0,0 +1,105 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/dma/fsl,elo3-dma.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Freescale Elo3 DMA Controller
++
++maintainers:
++  - J. Neuschäfer <j.ne@posteo.net>
++
++description: |
++  DMA controller which has same function as EloPlus except that Elo3 has 8
++  channels while EloPlus has only 4, it is used in Freescale Txxx and Bxxx
++  series chips, such as t1040, t4240, b4860.
++
++  Note on DMA channel compatible properties: The compatible property must say
++  "fsl,elo-dma-channel" or "fsl,eloplus-dma-channel" to be used by the Elo DMA
++  driver (fsldma).  Any DMA channel used by fsldma cannot be used by another
++  DMA driver, such as the SSI sound drivers for the MPC8610.  Therefore, any DMA
++  channel that should be used for another driver should not use
++  "fsl,elo-dma-channel" or "fsl,eloplus-dma-channel".  For the SSI drivers, for
++  example, the compatible property should be "fsl,ssi-dma-channel".  See ssi.txt
++  for more information.
++
++properties:
++  compatible:
++    const: fsl,elo3-dma
++
++  reg:
++    maxItems: 2
++    description: |
++      contains two entries for DMA General Status Registers, i.e. DGSR0 which
++      includes status for channel 1~4, and DGSR1 for channel 5~8
++
++  interrupts:
++    maxItems: 1
++
++patternProperties:
++  "^dma-channel@.*$":
++    type: object
++
++    properties:
++      compatible:
++        const: fsl,eloplus-dma-channel
++
++      reg:
++        maxItems: 1
++
++      interrupts: true
++
++examples:
++  - |
++    dma@100300 {
++        #address-cells = <1>;
++        #size-cells = <1>;
++        compatible = "fsl,elo3-dma";
++        reg = <0x100300 0x4>,
++              <0x100600 0x4>;
++        ranges = <0x0 0x100100 0x500>;
++        dma-channel@0 {
++            compatible = "fsl,eloplus-dma-channel";
++            reg = <0x0 0x80>;
++            interrupts = <28 2 0 0>;
++        };
++        dma-channel@80 {
++            compatible = "fsl,eloplus-dma-channel";
++            reg = <0x80 0x80>;
++            interrupts = <29 2 0 0>;
++        };
++        dma-channel@100 {
++            compatible = "fsl,eloplus-dma-channel";
++            reg = <0x100 0x80>;
++            interrupts = <30 2 0 0>;
++        };
++        dma-channel@180 {
++            compatible = "fsl,eloplus-dma-channel";
++            reg = <0x180 0x80>;
++            interrupts = <31 2 0 0>;
++        };
++        dma-channel@300 {
++            compatible = "fsl,eloplus-dma-channel";
++            reg = <0x300 0x80>;
++            interrupts = <76 2 0 0>;
++        };
++        dma-channel@380 {
++            compatible = "fsl,eloplus-dma-channel";
++            reg = <0x380 0x80>;
++            interrupts = <77 2 0 0>;
++        };
++        dma-channel@400 {
++            compatible = "fsl,eloplus-dma-channel";
++            reg = <0x400 0x80>;
++            interrupts = <78 2 0 0>;
++        };
++        dma-channel@480 {
++            compatible = "fsl,eloplus-dma-channel";
++            reg = <0x480 0x80>;
++            interrupts = <79 2 0 0>;
++        };
++    };
++
++additionalProperties: true
++
++...
+diff --git a/Documentation/devicetree/bindings/dma/fsl,eloplus-dma.yaml b/Documentation/devicetree/bindings/dma/fsl,eloplus-dma.yaml
+new file mode 100644
+index 0000000000000000000000000000000000000000..680d64332ddf4d6d68ee8c607ac71211a7e19e6e
+--- /dev/null
++++ b/Documentation/devicetree/bindings/dma/fsl,eloplus-dma.yaml
+@@ -0,0 +1,120 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/dma/fsl,eloplus-dma.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Freescale EloPlus DMA Controller
++
++maintainers:
++  - J. Neuschäfer <j.ne@posteo.net>
++
++description: |
++  This is a 4-channel DMA controller with extended addresses and chaining,
++  mainly used in Freescale mpc85xx/86xx, Pxxx and BSC series chips, such as
++  mpc8540, mpc8641 p4080, bsc9131 etc.
++
++  Note on DMA channel compatible properties: The compatible property must say
++  "fsl,elo-dma-channel" or "fsl,eloplus-dma-channel" to be used by the Elo DMA
++  driver (fsldma).  Any DMA channel used by fsldma cannot be used by another
++  DMA driver, such as the SSI sound drivers for the MPC8610.  Therefore, any DMA
++  channel that should be used for another driver should not use
++  "fsl,elo-dma-channel" or "fsl,eloplus-dma-channel".  For the SSI drivers, for
++  example, the compatible property should be "fsl,ssi-dma-channel".  See ssi.txt
++  for more information.
++
++properties:
++  compatible:
++    oneOf:
++      - items:
++          - enum:
++              - fsl,mpc8540-dma
++              - fsl,mpc8541-dma
++              - fsl,mpc8548-dma
++              - fsl,mpc8555-dma
++              - fsl,mpc8560-dma
++              - fsl,mpc8572-dma
++              - fsl,mpc8641-dma
++          - const: fsl,eloplus-dma
++      - const: fsl,eloplus-dma
++
++  reg:
++    maxItems: 1
++    description:
++      DMA General Status Register, i.e. DGSR which contains
++      status for all the 4 DMA channels
++
++  cell-index:
++    $ref: /schemas/types.yaml#/definitions/uint32
++    description: |
++      controller index.  0 for controller @ 0x21000, 1 for controller @ 0xc000
++
++  interrupts:
++    maxItems: 1
++
++patternProperties:
++  "^dma-channel@.*$":
++    type: object
++
++    properties:
++      compatible:
++        items:
++          - enum:
++              - fsl,mpc8540-dma-channel
++              - fsl,mpc8541-dma-channel
++              - fsl,mpc8548-dma-channel
++              - fsl,mpc8555-dma-channel
++              - fsl,mpc8560-dma-channel
++              - fsl,mpc8572-dma-channel
++          - const: fsl,eloplus-dma-channel
++
++      reg:
++        maxItems: 1
++
++      cell-index:
++        description: DMA channel index starts at 0.
++
++      interrupts: true
++
++examples:
++  - |
++    dma@21300 {
++        #address-cells = <1>;
++        #size-cells = <1>;
++        compatible = "fsl,mpc8540-dma", "fsl,eloplus-dma";
++        reg = <0x21300 4>;
++        ranges = <0 0x21100 0x200>;
++        cell-index = <0>;
++        dma-channel@0 {
++            compatible = "fsl,mpc8540-dma-channel", "fsl,eloplus-dma-channel";
++            reg = <0 0x80>;
++            cell-index = <0>;
++            interrupt-parent = <&mpic>;
++            interrupts = <20 2>;
++        };
++        dma-channel@80 {
++            compatible = "fsl,mpc8540-dma-channel", "fsl,eloplus-dma-channel";
++            reg = <0x80 0x80>;
++            cell-index = <1>;
++            interrupt-parent = <&mpic>;
++            interrupts = <21 2>;
++        };
++        dma-channel@100 {
++            compatible = "fsl,mpc8540-dma-channel", "fsl,eloplus-dma-channel";
++            reg = <0x100 0x80>;
++            cell-index = <2>;
++            interrupt-parent = <&mpic>;
++            interrupts = <22 2>;
++        };
++        dma-channel@180 {
++            compatible = "fsl,mpc8540-dma-channel", "fsl,eloplus-dma-channel";
++            reg = <0x180 0x80>;
++            cell-index = <3>;
++            interrupt-parent = <&mpic>;
++            interrupts = <23 2>;
++        };
++    };
++
++additionalProperties: true
++
++...
+diff --git a/Documentation/devicetree/bindings/powerpc/fsl/dma.txt b/Documentation/devicetree/bindings/powerpc/fsl/dma.txt
+deleted file mode 100644
+index c11ad5c6db2190bf38c160632d9997122e169945..0000000000000000000000000000000000000000
+--- a/Documentation/devicetree/bindings/powerpc/fsl/dma.txt
++++ /dev/null
+@@ -1,204 +0,0 @@
+-* Freescale DMA Controllers
+-
+-** Freescale Elo DMA Controller
+-   This is a little-endian 4-channel DMA controller, used in Freescale mpc83xx
+-   series chips such as mpc8315, mpc8349, mpc8379 etc.
+-
+-Required properties:
+-
+-- compatible        : must include "fsl,elo-dma"
+-- reg               : DMA General Status Register, i.e. DGSR which contains
+-                      status for all the 4 DMA channels
+-- ranges            : describes the mapping between the address space of the
+-                      DMA channels and the address space of the DMA controller
+-- cell-index        : controller index.  0 for controller @ 0x8100
+-- interrupts        : interrupt specifier for DMA IRQ
+-
+-- DMA channel nodes:
+-        - compatible        : must include "fsl,elo-dma-channel"
+-                              However, see note below.
+-        - reg               : DMA channel specific registers
+-        - cell-index        : DMA channel index starts at 0.
+-
+-Optional properties:
+-        - interrupts        : interrupt specifier for DMA channel IRQ
+-                              (on 83xx this is expected to be identical to
+-                              the interrupts property of the parent node)
+-
+-Example:
+-	dma@82a8 {
+-		#address-cells = <1>;
+-		#size-cells = <1>;
+-		compatible = "fsl,mpc8349-dma", "fsl,elo-dma";
+-		reg = <0x82a8 4>;
+-		ranges = <0 0x8100 0x1a4>;
+-		interrupt-parent = <&ipic>;
+-		interrupts = <71 8>;
+-		cell-index = <0>;
+-		dma-channel@0 {
+-			compatible = "fsl,mpc8349-dma-channel", "fsl,elo-dma-channel";
+-			cell-index = <0>;
+-			reg = <0 0x80>;
+-			interrupt-parent = <&ipic>;
+-			interrupts = <71 8>;
+-		};
+-		dma-channel@80 {
+-			compatible = "fsl,mpc8349-dma-channel", "fsl,elo-dma-channel";
+-			cell-index = <1>;
+-			reg = <0x80 0x80>;
+-			interrupt-parent = <&ipic>;
+-			interrupts = <71 8>;
+-		};
+-		dma-channel@100 {
+-			compatible = "fsl,mpc8349-dma-channel", "fsl,elo-dma-channel";
+-			cell-index = <2>;
+-			reg = <0x100 0x80>;
+-			interrupt-parent = <&ipic>;
+-			interrupts = <71 8>;
+-		};
+-		dma-channel@180 {
+-			compatible = "fsl,mpc8349-dma-channel", "fsl,elo-dma-channel";
+-			cell-index = <3>;
+-			reg = <0x180 0x80>;
+-			interrupt-parent = <&ipic>;
+-			interrupts = <71 8>;
+-		};
+-	};
+-
+-** Freescale EloPlus DMA Controller
+-   This is a 4-channel DMA controller with extended addresses and chaining,
+-   mainly used in Freescale mpc85xx/86xx, Pxxx and BSC series chips, such as
+-   mpc8540, mpc8641 p4080, bsc9131 etc.
+-
+-Required properties:
+-
+-- compatible        : must include "fsl,eloplus-dma"
+-- reg               : DMA General Status Register, i.e. DGSR which contains
+-                      status for all the 4 DMA channels
+-- cell-index        : controller index.  0 for controller @ 0x21000,
+-                                         1 for controller @ 0xc000
+-- ranges            : describes the mapping between the address space of the
+-                      DMA channels and the address space of the DMA controller
+-
+-- DMA channel nodes:
+-        - compatible        : must include "fsl,eloplus-dma-channel"
+-                              However, see note below.
+-        - cell-index        : DMA channel index starts at 0.
+-        - reg               : DMA channel specific registers
+-        - interrupts        : interrupt specifier for DMA channel IRQ
+-
+-Example:
+-	dma@21300 {
+-		#address-cells = <1>;
+-		#size-cells = <1>;
+-		compatible = "fsl,mpc8540-dma", "fsl,eloplus-dma";
+-		reg = <0x21300 4>;
+-		ranges = <0 0x21100 0x200>;
+-		cell-index = <0>;
+-		dma-channel@0 {
+-			compatible = "fsl,mpc8540-dma-channel", "fsl,eloplus-dma-channel";
+-			reg = <0 0x80>;
+-			cell-index = <0>;
+-			interrupt-parent = <&mpic>;
+-			interrupts = <20 2>;
+-		};
+-		dma-channel@80 {
+-			compatible = "fsl,mpc8540-dma-channel", "fsl,eloplus-dma-channel";
+-			reg = <0x80 0x80>;
+-			cell-index = <1>;
+-			interrupt-parent = <&mpic>;
+-			interrupts = <21 2>;
+-		};
+-		dma-channel@100 {
+-			compatible = "fsl,mpc8540-dma-channel", "fsl,eloplus-dma-channel";
+-			reg = <0x100 0x80>;
+-			cell-index = <2>;
+-			interrupt-parent = <&mpic>;
+-			interrupts = <22 2>;
+-		};
+-		dma-channel@180 {
+-			compatible = "fsl,mpc8540-dma-channel", "fsl,eloplus-dma-channel";
+-			reg = <0x180 0x80>;
+-			cell-index = <3>;
+-			interrupt-parent = <&mpic>;
+-			interrupts = <23 2>;
+-		};
+-	};
+-
+-** Freescale Elo3 DMA Controller
+-   DMA controller which has same function as EloPlus except that Elo3 has 8
+-   channels while EloPlus has only 4, it is used in Freescale Txxx and Bxxx
+-   series chips, such as t1040, t4240, b4860.
+-
+-Required properties:
+-
+-- compatible        : must include "fsl,elo3-dma"
+-- reg               : contains two entries for DMA General Status Registers,
+-                      i.e. DGSR0 which includes status for channel 1~4, and
+-                      DGSR1 for channel 5~8
+-- ranges            : describes the mapping between the address space of the
+-                      DMA channels and the address space of the DMA controller
+-
+-- DMA channel nodes:
+-        - compatible        : must include "fsl,eloplus-dma-channel"
+-        - reg               : DMA channel specific registers
+-        - interrupts        : interrupt specifier for DMA channel IRQ
+-
+-Example:
+-dma@100300 {
+-	#address-cells = <1>;
+-	#size-cells = <1>;
+-	compatible = "fsl,elo3-dma";
+-	reg = <0x100300 0x4>,
+-	      <0x100600 0x4>;
+-	ranges = <0x0 0x100100 0x500>;
+-	dma-channel@0 {
+-		compatible = "fsl,eloplus-dma-channel";
+-		reg = <0x0 0x80>;
+-		interrupts = <28 2 0 0>;
+-	};
+-	dma-channel@80 {
+-		compatible = "fsl,eloplus-dma-channel";
+-		reg = <0x80 0x80>;
+-		interrupts = <29 2 0 0>;
+-	};
+-	dma-channel@100 {
+-		compatible = "fsl,eloplus-dma-channel";
+-		reg = <0x100 0x80>;
+-		interrupts = <30 2 0 0>;
+-	};
+-	dma-channel@180 {
+-		compatible = "fsl,eloplus-dma-channel";
+-		reg = <0x180 0x80>;
+-		interrupts = <31 2 0 0>;
+-	};
+-	dma-channel@300 {
+-		compatible = "fsl,eloplus-dma-channel";
+-		reg = <0x300 0x80>;
+-		interrupts = <76 2 0 0>;
+-	};
+-	dma-channel@380 {
+-		compatible = "fsl,eloplus-dma-channel";
+-		reg = <0x380 0x80>;
+-		interrupts = <77 2 0 0>;
+-	};
+-	dma-channel@400 {
+-		compatible = "fsl,eloplus-dma-channel";
+-		reg = <0x400 0x80>;
+-		interrupts = <78 2 0 0>;
+-	};
+-	dma-channel@480 {
+-		compatible = "fsl,eloplus-dma-channel";
+-		reg = <0x480 0x80>;
+-		interrupts = <79 2 0 0>;
+-	};
+-};
+-
+-Note on DMA channel compatible properties: The compatible property must say
+-"fsl,elo-dma-channel" or "fsl,eloplus-dma-channel" to be used by the Elo DMA
+-driver (fsldma).  Any DMA channel used by fsldma cannot be used by another
+-DMA driver, such as the SSI sound drivers for the MPC8610.  Therefore, any DMA
+-channel that should be used for another driver should not use
+-"fsl,elo-dma-channel" or "fsl,eloplus-dma-channel".  For the SSI drivers, for
+-example, the compatible property should be "fsl,ssi-dma-channel".  See ssi.txt
+-for more information.
 
 -- 
 2.48.0.rc1.219.gb6b6757d772
