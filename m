@@ -1,71 +1,86 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93390BA27;
-	Tue, 28 Jan 2025 18:48:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A9D65672;
+	Tue, 28 Jan 2025 23:57:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738090080; cv=none; b=AveHJTZVaC+aLivdGdyJyXr6YW6FnN8SOdqD8jtFBefB+wcUZyfQt6U6R2BhuVW4bNHkXIJDiqy3njmCAW5/SUbLGI7NYcahhCOHmY7QmY3tqPxAxEoIb2vwBK3wPvzMSC43m9c+2W5V/wDQIrmkhgNxO/KItHfu0BoeT441lp4=
+	t=1738108676; cv=none; b=anAJuhrEWPAvWcbziQslnLCOzjppUfbfjPgS+5oricHWgCIYZllVlqfOAjUEdtb06OfyHfx9NNV3FEgRnvIs4uLVXoTU/vAPifQrMtPCZOxxunvBtF2k8fMklLohsbM1t97CwfEwRJyztawiFPbf6Qz+IwnUZEUww+mpHobLbqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738090080; c=relaxed/simple;
-	bh=0khbF40FHqbi1PYKMCWlYdaO8t6F0KGG62ljFhW7vYA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fk4N5mqDw24qc4UfxZQL1AsPexBfxVLhp0GkmaJRU1Tk5KSsG5wQWVMUsZOmyHLY60J7s6slMy4lA0/bwyCD1pUhW/fmiVkshPUCLxafd3bhgTqF7lYTmoHFMadB/ym59BG/iR1UiwU6sUHY9F5xkkpl8S0izSk+u/6QNp/hlf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PIEbCmCf; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1738108676; c=relaxed/simple;
+	bh=OKEgbhkRVn9ZHOykHhQBJ8okG75os49PVvyj7W589Ms=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ewWWujjiKsatHRJ1v6ZFDH3g34Ayp9nvc4dBRX/590zwTln11pjyY9CR/TpuGMnC1BGxa0m36kcXGw7gm6wCcBBHadDXv8W+PHsg1i7CevklLt0pmMJbKh/nzp1JFc+LIEA61LbQ3eZWDYSI0CQZJxcz5sh1fmnAu8rGQkw5/f4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LY2iE47i; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PIEbCmCf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF54DC4CED3;
-	Tue, 28 Jan 2025 18:47:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738090080;
-	bh=0khbF40FHqbi1PYKMCWlYdaO8t6F0KGG62ljFhW7vYA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PIEbCmCfWN+77S71JlvrRrpTEVzhgNJFHD43GC3Qj/9XmRdwsk5zhall4VVRR0+VY
-	 4Lx+IuJIaJr5ChlLx9exCwn9o6pHS4fJxkY8nQ4CDQHjE4R6pg8JCeCvBIfLZSICCA
-	 0cjdhy7QN8OlrFFeD3yqIABTmhylYYNZnqkxBdeNLmO1T7lL7HnIQ1cqWObO8iyOSr
-	 lPE0zusNx9oSZwUytuPxojz+541pOEV8PRvfcmbhCdDyJL2G2NTv4a1h14XceG5uuk
-	 NCNCyabCf4eA+PV6mbKt/JQbFSBr/Laa5+iSXeFZfpeX0yJ3Kmne+adscgX6+BHLxq
-	 k9xiQ+vCh9ffA==
-Date: Tue, 28 Jan 2025 18:47:58 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH] crypto: x86/aes-ctr - rewrite AES-NI optimized CTR and
- add VAES support
-Message-ID: <20250128184758.GA662128@google.com>
-References: <20250128063118.187690-1-ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LY2iE47i"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1738108674; x=1769644674;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=OKEgbhkRVn9ZHOykHhQBJ8okG75os49PVvyj7W589Ms=;
+  b=LY2iE47ijN1KhvblG5phfgCERWTwpgl/aVdRYvSaIc+4j+4n9z6UIvm5
+   iPNNCUAWvVVZsBBf5VE2wQWo6sYuObGgKmkB1ZkpYzIw0pwxAMzuKFDJ9
+   zTPd3uN1hb/MNjittkaOlqS+1i9Vuhp9jhaE079KzVe6lhnXh67YO4F21
+   3cGMiwBmVWMcxXyr5JmEeB2YLGuBb/54hb735AX8Q4tCz7DD4DrTj00KR
+   ne7mmlENIPManAYh2/75rSoDXSaQbTt640N2xymRAzsGLjQQjOr5aIcmE
+   PmGtSZYqBrBjgWV7JWlvSc+LgtkPTOY0nPm/fDggNWI6aE/cUVnEzZNrg
+   w==;
+X-CSE-ConnectionGUID: Hpi+zfhUR+2j/o9S3c4KOA==
+X-CSE-MsgGUID: C0sO5rPKRPmHp/2jKts3EQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11329"; a="38519666"
+X-IronPort-AV: E=Sophos;i="6.13,242,1732608000"; 
+   d="scan'208";a="38519666"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2025 15:57:52 -0800
+X-CSE-ConnectionGUID: 0I8aW8OtSnamjXmG2661og==
+X-CSE-MsgGUID: Ej4ZoAsXSHSxEjhg7wbmmw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="109799711"
+Received: from kcaccard-desk.amr.corp.intel.com (HELO kcaccard-desk.intel.com) ([10.125.108.68])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2025 15:57:52 -0800
+From: Kristen Carlson Accardi <kristen@linux.intel.com>
+To: linux-crypto@vger.kernel.org,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net
+Cc: vinicius.gomes@intel.com,
+	Kristen Carlson Accardi <kristen@linux.intel.com>,
+	Kristen Carlson Accardi <kristen.c.accardi@intel.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] MAINTAINERS: Add Vinicius Gomes to MAINTAINERS for IAA Crypto
+Date: Tue, 28 Jan 2025 15:57:43 -0800
+Message-ID: <20250128235744.1369399-1-kristen@linux.intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250128063118.187690-1-ebiggers@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jan 27, 2025 at 10:31:18PM -0800, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> Delete aes_ctrby8_avx-x86_64.S and add a new assembly file
-> aes-ctr-avx-x86_64.S which follows a similar approach to
-> aes-xts-avx-x86_64.S in that it uses a "template" to provide AESNI+AVX,
-> VAES+AVX2, VAES+AVX10/256, and VAES+AVX10/512 code, instead of just
-> AESNI+AVX.  Wire it up to the crypto API accordingly.
+Add Vinicius Gomes to the MAINTAINERS list for the IAA Crypto driver.
 
-I realized there's a slight oversight in this patch: the existing AES-CTR had
-both AVX and non-AVX variants, with the non-AVX assembly located in
-aesni-intel_asm.S.  This patch deletes the non-AVX glue code but leaves the
-non-AVX assembly, causing it to become unused.
+Signed-off-by: Kristen Carlson Accardi <kristen.c.accardi@intel.com>
+---
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-The non-AVX AES-CTR code is x86_64 specific, so it is useful only in x86_64
-kernels running on a CPU microarchitecture that supports AES-NI but not AVX:
-namely Intel Westmere (2010) and the low-power Intel CPU microarchitectures
-Silvermont (2013), Goldmont (2016), Goldmont Plus (2017), and Tremont (2020).
-Tremont's successor, Gracemont (2021), supports AVX.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 936e80f2c9ce..5cd2560e044d 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -11655,6 +11655,7 @@ F:	drivers/dma/ioat*
+ 
+ INTEL IAA CRYPTO DRIVER
+ M:	Kristen Accardi <kristen.c.accardi@intel.com>
++M:	Vinicius Costa Gomes <vinicius.gomes@intel.com>
+ L:	linux-crypto@vger.kernel.org
+ S:	Supported
+ F:	Documentation/driver-api/crypto/iaa/iaa-crypto.rst
+-- 
+2.47.1
 
-I'd lean towards just deleting the non-AVX AES-CTR code.  AES-CTR is less
-important to optimize than AES-XTS and AES-GCM.  But it probably should be a
-separate patch.
-
-- Eric
