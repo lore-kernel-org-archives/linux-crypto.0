@@ -1,215 +1,125 @@
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2052.outbound.protection.outlook.com [40.107.102.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 164201A2C06;
-	Tue, 28 Jan 2025 12:13:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738066437; cv=fail; b=qnWZgx1q/Wa29GQ3awxv/zBA8puOcAFjLAex3x74OND7AFZ+QqTSYVzhEm5uqD2GYTcusfXp+br3b9ztj/heQ3GKxtgNUxWNyyPg94csWNRUSpq10j1UtQ2F5fJ7ThLCrzVxK+jj+QDPc8YVrSeySQZ6KKkkBcH75pGsUCyoZb4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738066437; c=relaxed/simple;
-	bh=CK+VtMOeY46MVI6oYANWDUeay+q6O2cePdZdXT+K5l8=;
-	h=From:To:CC:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=PrSohtnuxCJT32E3Op7KFNkJs2ypUfcnJ8tgelVYAMx9EtZuTdF0aYw2dv3C5kX2rQy4dyCKpZ2RLzGzcabWanksKnROxg4drN4H48GxRke8tyNda+vhw4MQGY++ObclsF6u3nJKTN/uqhQ8aYsjMopD59g7ZndDRYvLRvX7lKI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=L8/iQUN9; arc=fail smtp.client-ip=40.107.102.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F7D01D5CFA
+	for <linux-crypto@vger.kernel.org>; Tue, 28 Jan 2025 15:43:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738079005; cv=none; b=NCATWDNGUKikPaS/cwuebtHT9qt0cLJJIkb0xkvwiJt3uvSDGm2TGnEoi4SkpRBirrNFOso2h4ZAcT5LDa3Ayu7Qaj07jmltuQZw8YFL/G8iHVBpCluOlbUzZNnG3o7k0TS9qxYnfNhCYglM+mpIRlrgVz8zAwrxf+DVjEZRzlk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738079005; c=relaxed/simple;
+	bh=4CM+Y34LzyqTPbJa964bMKTZoegb6ZCbeVLJYvxkr2Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=utgv2sCbaop+WNqUiGJuTIq+P96X7MtwKOG0fnO1hMyOdHq94jdKryKxH3Mw7ei55wrpHjyaKh43v5oq7OzM0VkRFOppkEfR/mjJsUZ3R+HjLwiDzoIPFTDDEuLH3fUTmd3tuwPVXogWI0yOTHW2TTrQzks4eg5v4SEek/i5rd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=ZzdR8vdI; arc=none smtp.client-ip=209.85.219.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="L8/iQUN9"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=EKDZze1Hu66WXvOl8pVE6H7Q0ONRXQTfhZoMQ08Sjuz7sGZSbQlFn/KR89HWiwxocybCCM7OLupGc4YBeE7LDP5Ib7lifTkOze0Pw9Lb2niNCb8m4nBhVQZ3f9LFmneaD8EVV/6bQexyONpG+ScMJWDfdOcHhVgIDnhH1F3wUdOAshY6QzGo9itDtq332ecIz4eDXuZY0JsF4SYA+i8bP45Hb8IcGNyGgPfgKfWbrjzSqaCnNigAvyBU7R7JSwjfrxcGH2B91VDm5KWTrBzl/H/xHBaMKvT6Ok0kqYphB7YXH2pU2/pkRbvopymej86APkbPl53kv8PALzaUfT5UjA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=itc1QvToGoe+J9d2UwWhwo8C6yFjsoavWAQJrBR4Q0w=;
- b=LaaLHMMvo1UXqC21mZPgsmYAsaGForUzvT06eGJ8FdGiS5aB3iIKHPyLqJuJcmXmz/c4q4kINceqQmdrtKFDywGHuj1ETyErhYSVtojvMcyWbTVtCPurVXDF7hnbzCKBQU74xhnCfx3cndINKkbMnblecLzxNxSl0ep39kaFycH7HGkR95hOzG23dUJKW7EtyLMXjRqz6J4UZ4CM6+ZmHlxWQNca+CVJUkYRIPNBWbpTfPysUoKuriw1GV9LCQCP3PJkg13qmJi93fTXaiQMhcbL19aXcXAQuLFaBaXsy4dQzUtswQk8rg3DtwEsIZU/D1baFhI0QaIUtavCsFe7uQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=itc1QvToGoe+J9d2UwWhwo8C6yFjsoavWAQJrBR4Q0w=;
- b=L8/iQUN9XJDJxqy0y0fKm4b/yEDkc2SYynhTTYsYjIStSBxf63Xe3c0PLoWLATV6mWjQcUaDvUoc2P+KPlQAD2tnuaBZMR59OPFFhLyN69oTMHBHzTIfprvrRCi7m6FQhl11JaqUI0HleIqmGNnyOAOnA0EIiPLIdZDt5LluvJs=
-Received: from CH2PR19CA0028.namprd19.prod.outlook.com (2603:10b6:610:4d::38)
- by CYXPR12MB9387.namprd12.prod.outlook.com (2603:10b6:930:e6::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8377.22; Tue, 28 Jan
- 2025 12:13:50 +0000
-Received: from DS3PEPF000099DB.namprd04.prod.outlook.com
- (2603:10b6:610:4d:cafe::69) by CH2PR19CA0028.outlook.office365.com
- (2603:10b6:610:4d::38) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8377.23 via Frontend Transport; Tue,
- 28 Jan 2025 12:13:50 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DS3PEPF000099DB.mail.protection.outlook.com (10.167.17.197) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8398.14 via Frontend Transport; Tue, 28 Jan 2025 12:13:50 +0000
-Received: from BLR-L1-NDADHANI (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 28 Jan
- 2025 06:13:44 -0600
-From: Nikunj A Dadhania <nikunj@amd.com>
-To: "Pratik R. Sampat" <prsampat@amd.com>, <linux-kernel@vger.kernel.org>,
-	<x86@kernel.org>, <kvm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>
-CC: <seanjc@google.com>, <pbonzini@redhat.com>, <thomas.lendacky@amd.com>,
-	<tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
-	<dave.hansen@linux.intel.com>, <shuah@kernel.org>, <pgonda@google.com>,
-	<ashish.kalra@amd.com>, <michael.roth@amd.com>, <sraithal@amd.com>,
-	<prsampat@amd.com>
-Subject: Re: [PATCH v5 3/9] KVM: selftests: SEV-SNP test for KVM_SEV_INIT2
-In-Reply-To: <20250123220100.339867-4-prsampat@amd.com>
-References: <20250123220100.339867-1-prsampat@amd.com>
- <20250123220100.339867-4-prsampat@amd.com>
-Date: Tue, 28 Jan 2025 12:13:41 +0000
-Message-ID: <85ikpzm8zu.fsf@amd.com>
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="ZzdR8vdI"
+Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-e5447fae695so10101570276.2
+        for <linux-crypto@vger.kernel.org>; Tue, 28 Jan 2025 07:43:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1738079001; x=1738683801; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4CM+Y34LzyqTPbJa964bMKTZoegb6ZCbeVLJYvxkr2Y=;
+        b=ZzdR8vdIiohnoZ4hKdRsx8vjUSASU/72vdBDURxTPxW6Y5y+xqJe1XFJv37MN3/RSh
+         1N9DWACiMe42Ssr+6RyacQYB0mKZF7r9X4dw06gLm3TJ5kXU+QA6Pwxa8XDIazhEp8C0
+         9uU7YdXy5cLi0N5EPxtYGd6vErWsFg/mLsK5lwXF/VP7H3vmwwe2R2U45ytaFkUMk6Za
+         lp6jed/BVTI9FjvFUI0MN7HYChc3iERhjHp52qu+iW++/bUjLH+wfDW2Jw7AJF6Rr/MJ
+         y67AxGiMWpozGojGCejMex/pBvJsfQOTerwdd08tOqwT12ksmB/+EE0jtUDQTB2nY1qi
+         QFbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738079001; x=1738683801;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4CM+Y34LzyqTPbJa964bMKTZoegb6ZCbeVLJYvxkr2Y=;
+        b=MWR8dM8wmJF8+RziPAkl7k20uBnK42Z04UisYnI5NA2cF7z01kvnTYCysKiU7q5XFC
+         JOoiL8Qb2eWtrffrxiYY39Fgww/oTKwFPgUxxlDnrDLtHZcHx+tlJ2Kobyxxo0TJ+zUi
+         E55JHKSt/5GtF6wNVuzVTyOS7VL9rSU5dJX1qNgwT008ET80pNblloQFdehiJxGOsk+X
+         d45czOB+Mo4pgs4JD6wT1AeCQg4LaNOXjTxwWTvR5erRIECtpXjcXFle4YGd+8stoWLL
+         +NAsOxe998nzHEfRauiZrmZ2kw00hxeUrxBMPbEj9OgQHmGdSfuqRtOV6MJ2bU6pLoyM
+         f4Ew==
+X-Forwarded-Encrypted: i=1; AJvYcCUdRUkMbAZ35ffLPxHT1ndV6WV/eJhIGIwwIxKqIVBtmsXwCSMSEXy86mSQyxVeF5FTejRD8azvbItnkFA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyUTIPXBqR+iYQWNhkFajDgRuVEH9CEVEbx3sIldW68ROpqfCFR
+	zmfChTYpSVBhgpgaTQGydSfPZIdGe1xnTx8FT7JRadGsBcPyRPxvG8KIPfR70wNcG7xDs/8rIc6
+	FEYha+b2A3S7dclKZmel9J3tSn0Al+CkqeR2R
+X-Gm-Gg: ASbGncstOGLLOn2qRrGR4AwQ8uf8GnWjiRHI4FnFEhlg46E2rb00TVXW5kdNOhdsGSk
+	klT3YD3DEE6RMH5ZGoaElogztZmjxgBsjttdue6lE2wcfiE5Gh++2EHvo3CZvAP2fe2Rk2m4=
+X-Google-Smtp-Source: AGHT+IGuLqrmdoXiE8apV7tzhOJZ5Xm1OF/NxWm8Kjkh7RMoG05FR1MdO9WMx2ebniwyt0o5rEC0Jv+xP432BtVJDY0=
+X-Received: by 2002:a05:690c:4d02:b0:6ef:6646:b50a with SMTP id
+ 00721157ae682-6f6eb6b2881mr361409457b3.20.1738079001445; Tue, 28 Jan 2025
+ 07:43:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS3PEPF000099DB:EE_|CYXPR12MB9387:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7d1c99fe-3882-42e7-1ada-08dd3f953977
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|7416014|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Due0T+XMAiE6VvkKmehubJOYtImITBnmz2Dq4nPBsTVPOWshAA2F2tUw6OfG?=
- =?us-ascii?Q?A5dKYQYdo66GjQc/A1nghZQx8gC9xgYwdJDgakWqa2NI5luBtfi0Sry45JtV?=
- =?us-ascii?Q?gUvcfQu/lBnn3HG8P/vs+cJw9t2zcxgeYyHGbC8KWeOZdYTIAA67gJdR1va7?=
- =?us-ascii?Q?6n5rHSby5rtwlsVR1BB+P7BrTjl/09J+jLWdX1iSS2Ldih1tkgb+qGXZJOlB?=
- =?us-ascii?Q?m6th55YFO4LBYlE7ZtwdXe+SAfERnMi1N9lEalYGFXPMroDQqPkem3FAhggL?=
- =?us-ascii?Q?t2Z5GZDzzqKitrVm4nlxd+xWg6qI8NfculI+tuG8BUp5VcLW5X80AtNJb9rY?=
- =?us-ascii?Q?/y5z7txOOyLrJ2ITFEsfIt2beaS+mNiehnrc50AxrU/qnzoZ3jSxZNn+Ezxy?=
- =?us-ascii?Q?+ufAvkIouqMACmYEgpfXQoXPVX54OchUwwO3CDBq0VSS0jdb/6B4V9y3uQ4y?=
- =?us-ascii?Q?uDNedezomU59uD5GpnbVA5FIVwRfXMMYfiwTV9KrTsV1c6ecOnSaBw2R96Lq?=
- =?us-ascii?Q?oXZ1bUFXfmCwlzJMC+YNw+znxmHIh2iY+m3Z1qeSccEFrOtuKcG3MiIDBoCX?=
- =?us-ascii?Q?vCTyGL1LJ+scFFg+KIHgYD/RoLyuOUKFAAC796i9cceAQfk5FfEPF7eSRTVz?=
- =?us-ascii?Q?+PlbE4Ozwpdd7rBio3OSoV5J73xXsIIrTGCysQ5Rqpt99xFIyAycEl7PZjbD?=
- =?us-ascii?Q?mwqhjgwM3P+ZQJRUbKW4tPCWXJO98YQis2vNsI+PklVCS+D1F26FhUME0Af/?=
- =?us-ascii?Q?Z01uLbhe4tlW2eMVIKgQ0kytbYqNLh2Ondlr/1GA4vWjTAFmODsH4mNFn5sS?=
- =?us-ascii?Q?vcRwWJ0FUnRWCesECfX25DKlXXLOC06HJKz+FrloAO1I8tfTZvgeohhPqKf0?=
- =?us-ascii?Q?2Qs/XwYyA2G6BSj3puH04nSdhWA2VOGQbq2rI9bhG/lLe5Z8R87wovoPWe0h?=
- =?us-ascii?Q?BdlXGlS4YgYjZl2U3Hk6FBxPFQidmUX0AFVuYXxYr1Wfglx3rLDEHYytSqGO?=
- =?us-ascii?Q?4lUhOTClo/jh92dyzk1PRUeDICVAaxzuyLFBhC87e7cSIX+1GcZ+gglWdnBj?=
- =?us-ascii?Q?xvLeTgTdy20YjzT+Wwqx+ubYHaDNd8bF2XVWX/tL7JAsE/zXWfyMg0y4HURK?=
- =?us-ascii?Q?4mZqVDf3wKMFBvQ6zJI0nj+yDVtkz0tgLCM3mqVq6tEO21c7xDyfk/nuEWDk?=
- =?us-ascii?Q?6q9bxssKFdstRA0zUzE+0mbLUrRTMIL4lq7J8ULTcXbH2/xMzGT6Z4TABAKK?=
- =?us-ascii?Q?CM2vLcBQEkG7tHxjwMhW59LcV/a3H/CLPRmc4WbB0WQsUEfeHD/s6ak5nBph?=
- =?us-ascii?Q?Aw7+gMboxvQvSEZ2jHkE8CB8n2dPnCZxQ63cazuKCZlNXDGr/iHybmSI+8qH?=
- =?us-ascii?Q?Dpmi5oHS8mR4gDV5DxZdFASYOHzNVgEgsgDOTr6VDOKzNc3polS1WBpwNpo+?=
- =?us-ascii?Q?xM7cn2uc1IpVGz0lJ3hWipmYaJrGhhfH7ybWjWYCaE6ywRbf0LJDvbDMeryl?=
- =?us-ascii?Q?EG123Hvzo4T0BAc=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jan 2025 12:13:50.2168
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7d1c99fe-3882-42e7-1ada-08dd3f953977
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS3PEPF000099DB.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYXPR12MB9387
+References: <20250110-jag-ctl_table_const-v2-1-0000e1663144@kernel.org>
+ <Z4+jwDBrZNRgu85S@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+ <nslqrapp4v3rknjgtfk4cg64ha7rewrrg24aslo2e5jmxfwce5@t4chrpuk632k>
+ <CAMj1kXEZPe8zk7s67SADK9wVH3cfBup-sAZSC6_pJyng9QT7aw@mail.gmail.com>
+ <f4lfo2fb7ajogucsvisfd5sg2avykavmkizr6ycsllcrco4mo3@qt2zx4zp57zh>
+ <87jzag9ugx.fsf@intel.com> <Z5epb86xkHQ3BLhp@casper.infradead.org> <u2fwibsnbfvulxj6adigla6geiafh2vuve4hcyo4vmeytwjl7p@oz6xonrq5225>
+In-Reply-To: <u2fwibsnbfvulxj6adigla6geiafh2vuve4hcyo4vmeytwjl7p@oz6xonrq5225>
+From: Paul Moore <paul@paul-moore.com>
+Date: Tue, 28 Jan 2025 10:43:10 -0500
+X-Gm-Features: AWEUYZkHRaUuCTQsu1U9C5jhigmIE9c2_8OmkE_i2Qv7ILXtAaTfDLC5EcLBZNk
+Message-ID: <CAHC9VhQnB_bsQaezBfAcA0bE7Zoc99QXrvO1qjpHA-J8+_doYg@mail.gmail.com>
+Subject: Re: Re: Re: Re: [PATCH v2] treewide: const qualify ctl_tables where applicable
+To: Joel Granados <joel.granados@kernel.org>
+Cc: Matthew Wilcox <willy@infradead.org>, Jani Nikula <jani.nikula@intel.com>, 
+	Ard Biesheuvel <ardb@kernel.org>, Alexander Gordeev <agordeev@linux.ibm.com>, 
+	=?UTF-8?Q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>, 
+	Kees Cook <kees@kernel.org>, Luis Chamberlain <mcgrof@kernel.org>, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org, 
+	linux-s390@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	openipmi-developer@lists.sourceforge.net, intel-gfx@lists.freedesktop.org, 
+	dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org, 
+	linux-hyperv@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	linux-raid@vger.kernel.org, linux-scsi@vger.kernel.org, 
+	linux-serial@vger.kernel.org, xen-devel@lists.xenproject.org, 
+	linux-aio@kvack.org, linux-fsdevel@vger.kernel.org, netfs@lists.linux.dev, 
+	codalist@coda.cs.cmu.edu, linux-mm@kvack.org, linux-nfs@vger.kernel.org, 
+	ocfs2-devel@lists.linux.dev, fsverity@lists.linux.dev, 
+	linux-xfs@vger.kernel.org, io-uring@vger.kernel.org, bpf@vger.kernel.org, 
+	kexec@lists.infradead.org, linux-trace-kernel@vger.kernel.org, 
+	linux-hardening@vger.kernel.org, apparmor@lists.ubuntu.com, 
+	linux-security-module@vger.kernel.org, keyrings@vger.kernel.org, 
+	Song Liu <song@kernel.org>, "Steven Rostedt (Google)" <rostedt@goodmis.org>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, "Darrick J. Wong" <djwong@kernel.org>, 
+	Corey Minyard <cminyard@mvista.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-"Pratik R. Sampat" <prsampat@amd.com> writes:
-
-> Add the X86_FEATURE_SNP CPU feature to the architectural definition for
-> the SEV-SNP VM type to exercise the KVM_SEV_INIT2 call. Ensure that the
-> SNP test is skipped in scenarios where CPUID supports it but KVM does
-> not, preventing reporting of failure in such cases.
+On Tue, Jan 28, 2025 at 6:22=E2=80=AFAM Joel Granados <joel.granados@kernel=
+.org> wrote:
+> On Mon, Jan 27, 2025 at 03:42:39PM +0000, Matthew Wilcox wrote:
+> > On Mon, Jan 27, 2025 at 04:55:58PM +0200, Jani Nikula wrote:
+> > > You could have static const within functions too. You get the rodata
+> > > protection and function local scope, best of both worlds?
+> >
+> > timer_active is on the stack, so it can't be static const.
+> >
+> > Does this really need to be cc'd to such a wide distribution list?
+> That is a very good question. I removed 160 people from the original
+> e-mail and left the ones that where previously involved with this patch
+> and left all the lists for good measure. But it seems I can reduce it
+> even more.
 >
-> Signed-off-by: Pratik R. Sampat <prsampat@amd.com>
-
-With a minor nit below:
-
-Reviewed-by: Nikunj A Dadhania <nikunj@amd.com>
-
-> ---
->  tools/testing/selftests/kvm/include/x86/processor.h |  1 +
->  tools/testing/selftests/kvm/x86/sev_init2_tests.c   | 13 +++++++++++++
->  2 files changed, 14 insertions(+)
+> How about this: For these treewide efforts I just leave the people that
+> are/were involved in the series and add two lists: linux-kernel and
+> linux-hardening.
 >
-> diff --git a/tools/testing/selftests/kvm/include/x86/processor.h b/tools/testing/selftests/kvm/include/x86/processor.h
-> index d60da8966772..1e05e610bb06 100644
-> --- a/tools/testing/selftests/kvm/include/x86/processor.h
-> +++ b/tools/testing/selftests/kvm/include/x86/processor.h
-> @@ -199,6 +199,7 @@ struct kvm_x86_cpu_feature {
->  #define	X86_FEATURE_VGIF		KVM_X86_CPU_FEATURE(0x8000000A, 0, EDX, 16)
->  #define X86_FEATURE_SEV			KVM_X86_CPU_FEATURE(0x8000001F, 0, EAX, 1)
->  #define X86_FEATURE_SEV_ES		KVM_X86_CPU_FEATURE(0x8000001F, 0, EAX, 3)
-> +#define X86_FEATURE_SNP			KVM_X86_CPU_FEATURE(0x8000001F, 0, EAX, 4)
+> Unless someone screams, I'll try this out on my next treewide.
 
-Can we keep the naming same as in cpufeatures.h: X86_FEATURE_SEV_SNP ?
+I'm not screaming about it :) but anything that touches the LSM,
+SELinux, or audit code (or matches the regex in MAINTAINERS) I would
+prefer to see on the associated mailing list.
 
-Regards
-Nikunj
-
->
->  /*
->   * KVM defined paravirt features.
-> diff --git a/tools/testing/selftests/kvm/x86/sev_init2_tests.c b/tools/testing/selftests/kvm/x86/sev_init2_tests.c
-> index 3fb967f40c6a..3f8fb2cc3431 100644
-> --- a/tools/testing/selftests/kvm/x86/sev_init2_tests.c
-> +++ b/tools/testing/selftests/kvm/x86/sev_init2_tests.c
-> @@ -28,6 +28,7 @@
->  int kvm_fd;
->  u64 supported_vmsa_features;
->  bool have_sev_es;
-> +bool have_snp;
->  
->  static int __sev_ioctl(int vm_fd, int cmd_id, void *data)
->  {
-> @@ -83,6 +84,9 @@ void test_vm_types(void)
->  	if (have_sev_es)
->  		test_init2(KVM_X86_SEV_ES_VM, &(struct kvm_sev_init){});
->  
-> +	if (have_snp)
-> +		test_init2(KVM_X86_SNP_VM, &(struct kvm_sev_init){});
-> +
->  	test_init2_invalid(0, &(struct kvm_sev_init){},
->  			   "VM type is KVM_X86_DEFAULT_VM");
->  	if (kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SW_PROTECTED_VM))
-> @@ -138,15 +142,24 @@ int main(int argc, char *argv[])
->  		    "sev-es: KVM_CAP_VM_TYPES (%x) does not match cpuid (checking %x)",
->  		    kvm_check_cap(KVM_CAP_VM_TYPES), 1 << KVM_X86_SEV_ES_VM);
->  
-> +	have_snp = kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SNP_VM);
-> +	TEST_ASSERT(!have_snp || kvm_cpu_has(X86_FEATURE_SNP),
-> +		    "sev-snp: KVM_CAP_VM_TYPES (%x) indicates SNP support (bit %d), but CPUID does not",
-> +		    kvm_check_cap(KVM_CAP_VM_TYPES), KVM_X86_SNP_VM);
-> +
->  	test_vm_types();
->  
->  	test_flags(KVM_X86_SEV_VM);
->  	if (have_sev_es)
->  		test_flags(KVM_X86_SEV_ES_VM);
-> +	if (have_snp)
-> +		test_flags(KVM_X86_SNP_VM);
->  
->  	test_features(KVM_X86_SEV_VM, 0);
->  	if (have_sev_es)
->  		test_features(KVM_X86_SEV_ES_VM, supported_vmsa_features);
-> +	if (have_snp)
-> +		test_features(KVM_X86_SNP_VM, supported_vmsa_features);
->  
->  	return 0;
->  }
-> -- 
-> 2.43.0
+--=20
+paul-moore.com
