@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEC0D154C0D;
-	Thu, 30 Jan 2025 03:54:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B79C6187FE0;
+	Thu, 30 Jan 2025 03:54:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738209295; cv=none; b=VVBhjd/Q4oj3T8Nf98Ob+hRip+bDObY32FzzQ56bE1TNYCYFjknPm0Q4KEtQRdHs1gWIM9Yx4kq879+332MjNfjCq+ve3N2O20etb+DXyYISNZd684OA+fPitrrU6rWRasIVXeUL9/mTFKj3FJIA15BXTtzbYg0vaU6Q/f5H8VQ=
+	t=1738209295; cv=none; b=OO9zPCLl3zWV+UNNxbl1eE3047eiQYMzxUbVgEYKGWuyIXiJXwZPnHmE5yIALYd3XSCMFeqfb4f1kBRbsWLYNUvFzr7s2/74VzfxXWzrneQ/c94Q8AL+IRa2IxLsWQALbeci47f6/jC+ToBfdRm9WObBccLVspP9cNp2RhB2oEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1738209295; c=relaxed/simple;
-	bh=f1/UuAODhrSRk/JQyFLsfxhDCW9zbC8c2q+qB+kTyVs=;
+	bh=0eqYRMjhRhzq0f4XiwMQ3bq1W0qGIWErBY26RMDs4R0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=p6m06kaWOfoPZ8VLWtbJUdVtXHHNHY0bQVbZlorMnFM7Le1tKUlYKRoud/prKNIuRn/SETP6Ym/+QYm/chM6FcUyDmKM72WZjbVyFZLk6uhoTNS3f2cDX02topPX2eXTBTL1YzElJnhV8WTfuEqDuoa9aJ8OnUHvfKIAyMhQTkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DkDafz2r; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=EDwWzxRTb0c7Od07BVwqCLcErdn+RiKQj1Ip3sPLbRvNRIWX2vM/fk6bPQOxY8M/0r8d9FKOF0Tu2ZsSPBCIWi9iRu8a/kxuvXbowu8HGvYGJu/9yNNfQlSknHEUC4n4VqMINUWaqpyHCeCNe80I613khbnzWR+7lAUJlRfDv8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JUI85Ig9; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DkDafz2r"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50C7EC4CEE7;
-	Thu, 30 Jan 2025 03:54:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JUI85Ig9"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9574C4CEE1;
+	Thu, 30 Jan 2025 03:54:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738209293;
-	bh=f1/UuAODhrSRk/JQyFLsfxhDCW9zbC8c2q+qB+kTyVs=;
+	s=k20201202; t=1738209295;
+	bh=0eqYRMjhRhzq0f4XiwMQ3bq1W0qGIWErBY26RMDs4R0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=DkDafz2r4w75k5VVI8Xl4fzdrEEZauB5MtzJ0Ybm7ay9jrZEKHUUV5LyW+ootgPjh
-	 zhAU/VvNVZYANxJsFD1lWSDVXDu8luu3Abbf+N1QONi2esMBRCs6zP9fYYJ9os5qyr
-	 9jvvxVoZWsThdz1QO1l5spGcvaCZ0gYWn+LpvpuOi5rXxJGf90Cku6uJicCBfyWZal
-	 Uk8pFl5wsFT4dqLV4bLxPV/VpJaq799gmfg2x8IBVaMkOGlaZ7/CD2txldJc0X+flV
-	 V/uSZjIpKTZf/x0Lp1JyqHisEEKHtJJyLgp3c5VI/DAUQvhuX5HAwmzxWkcZwSFJPu
-	 e3tdkVckweCIw==
+	b=JUI85Ig9LamH1vUOI8ll15pImcXY/L/zshl3XUwMmA9Mjg63Pi0zYcqmUkl3wpcSI
+	 t6HmL04R0jZCR3R9rXkvsTlO2L8TBsgV48J/565MmWxIcXMszwYTIKhnThih1oUaJP
+	 xrtzQ75yWjCthg+FGS17+MOPHitsZp/KFCuml3uZEQU8g3y7oSQtEJMtNtb/vATU9B
+	 dHjZ/Pvw2pFifyawJF3+cVipDqlYCwSyaFcILg6r1wlPkB30VQpgKdasrAfo+P2H1o
+	 bjJOu21W0ri0genNoge16yx/Q3EVxkyd4w9H/FqmHeRj/FzflAPjCqzzZ9GEwckcqI
+	 ATSh8Ujl3tx9Q==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: linux-crypto@vger.kernel.org,
@@ -35,9 +35,9 @@ Cc: linux-crypto@vger.kernel.org,
 	Keith Busch <kbusch@kernel.org>,
 	Kent Overstreet <kent.overstreet@linux.dev>,
 	"Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: [PATCH v2 03/11] lib/crc64: rename CRC64-Rocksoft to CRC64-NVME
-Date: Wed, 29 Jan 2025 19:51:22 -0800
-Message-ID: <20250130035130.180676-4-ebiggers@kernel.org>
+Subject: [PATCH v2 07/11] scripts/gen-crc-consts: add gen-crc-consts.py
+Date: Wed, 29 Jan 2025 19:51:26 -0800
+Message-ID: <20250130035130.180676-8-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250130035130.180676-1-ebiggers@kernel.org>
 References: <20250130035130.180676-1-ebiggers@kernel.org>
@@ -51,166 +51,270 @@ Content-Transfer-Encoding: 8bit
 
 From: Eric Biggers <ebiggers@google.com>
 
-This CRC64 variant comes from the NVME NVM Command Set Specification
-(https://nvmexpress.org/wp-content/uploads/NVM-Express-NVM-Command-Set-Specification-1.0e-2024.07.29-Ratified.pdf).
+Add a Python script that generates constants for computing the given CRC
+variant(s) using x86's pclmulqdq or vpclmulqdq instructions.
 
-The "Rocksoft Model CRC Algorithm", published in 1993 and available at
-https://www.zlib.net/crc_v3.txt, is a generalized CRC algorithm that can
-calculate any variant of CRC, given a list of parameters such as
-polynomial, bit order, etc.  It is not a CRC variant.
+This is specifically tuned for x86's crc-pclmul-template.S.  However,
+other architectures with a 64x64 => 128-bit carryless multiplication
+instruction should be able to use the generated constants too.  (Some
+tweaks may be warranted based on the exact instructions available on
+each arch, so the script may grow an arch argument in the future.)
 
-The NVME NVM Command Set Specification has a table that gives the
-"Rocksoft Model Parameters" for the CRC variant it uses.  When support
-for this CRC variant was added to Linux, this table seems to have been
-misinterpreted as naming the CRC variant the "Rocksoft" CRC.  In fact,
-the CRC variant is not explicitly named by the NVME spec.
+The script also supports generating the tables needed for table-based
+CRC computation.  Thus, it can also be used to reproduce the tables like
+t10_dif_crc_table[] and crc16_table[] that are currently hardcoded in
+the source with no generation script explicitly documented.
 
-Most implementations of this CRC variant outside Linux have been calling
-it CRC64-NVME.  Therefore, update Linux to match.
+Python is used rather than C since it enables implementing the CRC math
+in the simplest way possible, using arbitrary precision integers.  The
+outputs of this script are intended to be checked into the repo, so
+Python will continue to not be required to build the kernel, and the
+script has been optimized for simplicity rather than performance.
 
-While at it, remove the superfluous "update" from the function name, so
-crc64_rocksoft_update() is now just crc64_nvme(), matching most of the
-other CRC library functions.
-
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- block/t10-pi.c        |  2 +-
- include/linux/crc64.h | 11 +++++++----
- lib/crc64.c           | 10 +++++-----
- lib/gen_crc64table.c  | 10 +++++-----
- 4 files changed, 18 insertions(+), 15 deletions(-)
+ MAINTAINERS               |   1 +
+ scripts/gen-crc-consts.py | 214 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 215 insertions(+)
+ create mode 100755 scripts/gen-crc-consts.py
 
-diff --git a/block/t10-pi.c b/block/t10-pi.c
-index 2d05421f0fa5..2577114ff20c 100644
---- a/block/t10-pi.c
-+++ b/block/t10-pi.c
-@@ -208,11 +208,11 @@ static void t10_pi_type1_complete(struct request *rq, unsigned int nr_bytes)
- 	}
- }
+diff --git a/MAINTAINERS b/MAINTAINERS
+index bc8ce7af3303..aabd17a1cc6c 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -6129,10 +6129,11 @@ S:	Maintained
+ T:	git https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git crc-next
+ F:	Documentation/staging/crc*
+ F:	arch/*/lib/crc*
+ F:	include/linux/crc*
+ F:	lib/crc*
++F:	scripts/gen-crc-consts.py
  
- static __be64 ext_pi_crc64(u64 crc, void *data, unsigned int len)
- {
--	return cpu_to_be64(crc64_rocksoft_update(crc, data, len));
-+	return cpu_to_be64(crc64_nvme(crc, data, len));
- }
- 
- static void ext_pi_crc64_generate(struct blk_integrity_iter *iter,
- 		struct blk_integrity *bi)
- {
-diff --git a/include/linux/crc64.h b/include/linux/crc64.h
-index 7880aeab69d6..17cf5af3e78e 100644
---- a/include/linux/crc64.h
-+++ b/include/linux/crc64.h
-@@ -6,20 +6,23 @@
- #define _LINUX_CRC64_H
- 
- #include <linux/types.h>
- 
- u64 __pure crc64_be(u64 crc, const void *p, size_t len);
--u64 __pure crc64_rocksoft_generic(u64 crc, const void *p, size_t len);
-+u64 __pure crc64_nvme_generic(u64 crc, const void *p, size_t len);
- 
- /**
-- * crc64_rocksoft_update - Calculate bitwise Rocksoft CRC64
-+ * crc64_nvme - Calculate CRC64-NVME
-  * @crc: seed value for computation. 0 for a new CRC calculation, or the
-  *	 previous crc64 value if computing incrementally.
-  * @p: pointer to buffer over which CRC64 is run
-  * @len: length of buffer @p
-+ *
-+ * This computes the CRC64 defined in the NVME NVM Command Set Specification,
-+ * *including the bitwise inversion at the beginning and end*.
-  */
--static inline u64 crc64_rocksoft_update(u64 crc, const u8 *p, size_t len)
-+static inline u64 crc64_nvme(u64 crc, const u8 *p, size_t len)
- {
--	return crc64_rocksoft_generic(crc, p, len);
-+	return crc64_nvme_generic(crc, p, len);
- }
- 
- #endif /* _LINUX_CRC64_H */
-diff --git a/lib/crc64.c b/lib/crc64.c
-index b5136fb4c199..d6f3f245eede 100644
---- a/lib/crc64.c
-+++ b/lib/crc64.c
-@@ -20,12 +20,12 @@
-  * x^64 + x^62 + x^57 + x^55 + x^54 + x^53 + x^52 + x^47 + x^46 + x^45 +
-  * x^40 + x^39 + x^38 + x^37 + x^35 + x^33 + x^32 + x^31 + x^29 + x^27 +
-  * x^24 + x^23 + x^22 + x^21 + x^19 + x^17 + x^13 + x^12 + x^10 + x^9 +
-  * x^7 + x^4 + x + 1
-  *
-- * crc64rocksoft[256] table is from the Rocksoft specification polynomial
-- * defined as,
-+ * crc64nvmetable[256] uses the CRC64 polynomial from the NVME NVM Command Set
-+ * Specification and uses least-significant-bit first bit order:
-  *
-  * x^64 + x^63 + x^61 + x^59 + x^58 + x^56 + x^55 + x^52 + x^49 + x^48 + x^47 +
-  * x^46 + x^44 + x^41 + x^37 + x^36 + x^34 + x^32 + x^31 + x^28 + x^26 + x^23 +
-  * x^22 + x^19 + x^16 + x^13 + x^12 + x^10 + x^9 + x^6 + x^4 + x^3 + 1
-  *
-@@ -61,18 +61,18 @@ u64 __pure crc64_be(u64 crc, const void *p, size_t len)
- 
- 	return crc;
- }
- EXPORT_SYMBOL_GPL(crc64_be);
- 
--u64 __pure crc64_rocksoft_generic(u64 crc, const void *p, size_t len)
-+u64 __pure crc64_nvme_generic(u64 crc, const void *p, size_t len)
- {
- 	const unsigned char *_p = p;
- 	size_t i;
- 
- 	crc = ~crc;
- 
- 	for (i = 0; i < len; i++)
--		crc = (crc >> 8) ^ crc64rocksofttable[(crc & 0xff) ^ *_p++];
-+		crc = (crc >> 8) ^ crc64nvmetable[(crc & 0xff) ^ *_p++];
- 
- 	return ~crc;
- }
--EXPORT_SYMBOL_GPL(crc64_rocksoft_generic);
-+EXPORT_SYMBOL_GPL(crc64_nvme_generic);
-diff --git a/lib/gen_crc64table.c b/lib/gen_crc64table.c
-index 55e222acd0b8..e05a4230a0a0 100644
---- a/lib/gen_crc64table.c
-+++ b/lib/gen_crc64table.c
-@@ -15,14 +15,14 @@
-  */
- #include <inttypes.h>
- #include <stdio.h>
- 
- #define CRC64_ECMA182_POLY 0x42F0E1EBA9EA3693ULL
--#define CRC64_ROCKSOFT_POLY 0x9A6C9329AC4BC9B5ULL
-+#define CRC64_NVME_POLY 0x9A6C9329AC4BC9B5ULL
- 
- static uint64_t crc64_table[256] = {0};
--static uint64_t crc64_rocksoft_table[256] = {0};
-+static uint64_t crc64_nvme_table[256] = {0};
- 
- static void generate_reflected_crc64_table(uint64_t table[256], uint64_t poly)
- {
- 	uint64_t i, j, c, crc;
- 
-@@ -80,16 +80,16 @@ static void print_crc64_tables(void)
- 	printf("#include <linux/types.h>\n");
- 	printf("#include <linux/cache.h>\n\n");
- 	printf("static const u64 ____cacheline_aligned crc64table[256] = {\n");
- 	output_table(crc64_table);
- 
--	printf("\nstatic const u64 ____cacheline_aligned crc64rocksofttable[256] = {\n");
--	output_table(crc64_rocksoft_table);
-+	printf("\nstatic const u64 ____cacheline_aligned crc64nvmetable[256] = {\n");
-+	output_table(crc64_nvme_table);
- }
- 
- int main(int argc, char *argv[])
- {
- 	generate_crc64_table(crc64_table, CRC64_ECMA182_POLY);
--	generate_reflected_crc64_table(crc64_rocksoft_table, CRC64_ROCKSOFT_POLY);
-+	generate_reflected_crc64_table(crc64_nvme_table, CRC64_NVME_POLY);
- 	print_crc64_tables();
- 	return 0;
- }
+ CREATIVE SB0540
+ M:	Bastien Nocera <hadess@hadess.net>
+ L:	linux-input@vger.kernel.org
+ S:	Maintained
+diff --git a/scripts/gen-crc-consts.py b/scripts/gen-crc-consts.py
+new file mode 100755
+index 000000000000..43d044ada7be
+--- /dev/null
++++ b/scripts/gen-crc-consts.py
+@@ -0,0 +1,214 @@
++#!/usr/bin/env python3
++# SPDX-License-Identifier: GPL-2.0-or-later
++#
++# Script that generates constants for computing the given CRC variant(s).
++#
++# Copyright 2025 Google LLC
++#
++# Author: Eric Biggers <ebiggers@google.com>
++
++import sys
++
++# XOR (add) an iterable of polynomials.
++def xor(iterable):
++    res = 0
++    for val in iterable:
++        res ^= val
++    return res
++
++# Multiply two polynomials.
++def clmul(a, b):
++    return xor(a << i for i in range(b.bit_length()) if (b & (1 << i)) != 0)
++
++# Polynomial division floor(a / b).
++def div(a, b):
++    q = 0
++    while a.bit_length() >= b.bit_length():
++        q ^= 1 << (a.bit_length() - b.bit_length())
++        a ^= b << (a.bit_length() - b.bit_length())
++    return q
++
++# Reduce the polynomial 'a' modulo the polynomial 'b'.
++def reduce(a, b):
++    return a ^ clmul(div(a, b), b)
++
++# Pretty-print a polynomial.
++def pprint_poly(prefix, poly):
++    terms = ['1' if i == 0 else 'x' if i == 1 else f'x^{i}'
++             for i in reversed(range(poly.bit_length()))
++             if (poly & (1 << i)) != 0]
++    j = 0
++    while j < len(terms):
++        s = prefix + terms[j] + (' +' if j < len(terms) - 1 else '')
++        j += 1
++        while j < len(terms) and len(s) < 72:
++            s += ' ' + terms[j] + (' +' if j < len(terms) - 1 else '')
++            j += 1
++        print(s)
++        prefix = ' * ' + (' ' * (len(prefix) - 3))
++
++# Reverse the bits of a polynomial.
++def bitreverse(poly, num_bits):
++    assert poly.bit_length() <= num_bits
++    return xor(1 << (num_bits - 1 - i) for i in range(num_bits)
++               if (poly & (1 << i)) != 0)
++
++# Format a polynomial as hex.  Bit-reflect it if the CRC is LSB-first.
++def fmt_poly(variant, poly, num_bits):
++    if variant.lsb:
++        poly = bitreverse(poly, num_bits)
++    return f'0x{poly:0{2*num_bits//8}x}'
++
++# Print a comment describing constants generated for the given CRC variant.
++def print_header(variant, what):
++    print('/*')
++    s = f'{"least" if variant.lsb else "most"}-significant-bit-first CRC-{variant.bits}'
++    print(f' * {what} generated for {s} using')
++    pprint_poly(' * G(x) = ', variant.G)
++    print(' */')
++
++# Print a polynomial as hex, but drop a term if needed to keep it in 64 bits.
++def print_poly_truncate65thbit(variant, poly, num_bits, desc):
++    if num_bits > 64:
++        assert num_bits == 65
++        if variant.lsb:
++            assert (poly & 1) != 0
++            poly >>= 1
++            desc += ' - 1'
++        else:
++            poly ^= 1 << 64
++            desc += ' - x^64'
++        num_bits = 64
++    print(f'\t\t{fmt_poly(variant, poly, num_bits)},\t/* {desc} */')
++
++class CrcVariant:
++    def __init__(self, bits, generator_poly, bit_order):
++        self.bits = bits
++        if bit_order not in ['lsb', 'msb']:
++            raise ValueError('Invalid value for bit_order')
++        self.lsb = bit_order == 'lsb'
++        self.name = f'crc{bits}_{bit_order}_0x{generator_poly:0{(2*bits+7)//8}x}'
++        if self.lsb:
++            generator_poly = bitreverse(generator_poly, bits)
++        self.G = generator_poly ^ (1 << bits)
++
++# Generate tables for CRC computation using the "slice-by-N" method.
++# N=1 corresponds to the traditional byte-at-a-time table.
++def gen_slicebyN_tables(variants, n):
++    for v in variants:
++        print('')
++        print_header(v, f'Slice-by-{n} CRC table')
++        print(f'static const u{v.bits} __maybe_unused {v.name}_table[{256*n}] = {{')
++        s = ''
++        for i in range(256 * n):
++            # The i'th table entry is the CRC of the message consisting of byte
++            # i % 256 followed by i // 256 zero bytes.
++            poly = (bitreverse(i % 256, 8) if v.lsb else (i % 256)) << (v.bits + 8*(i//256))
++            next_entry = fmt_poly(v, reduce(poly, v.G), v.bits) + ','
++            if len(s + next_entry) > 71:
++                print(f'\t{s}')
++                s = ''
++            s += (' ' if s else '') + next_entry
++        if s:
++            print(f'\t{s}')
++        print('};')
++
++# Generate constants for carryless multiplication based CRC computation.
++def gen_x86_pclmul_consts(variants):
++    # These are the distances, in bits, to generate folding constants for.
++    FOLD_DISTANCES = [2048, 1024, 512, 256, 128]
++
++    for v in variants:
++        print('')
++        print_header(v, 'CRC folding constants')
++        print('static const struct {')
++        if not v.lsb:
++            print('\tu8 bswap_mask[16];')
++        for i in FOLD_DISTANCES:
++            print(f'\tu64 fold_across_{i}_bits_consts[2];')
++        print('\tu8 shuf_table[48];')
++        print('\tu64 barrett_reduction_consts[2];')
++        print(f'}} {v.name}_consts ____cacheline_aligned __maybe_unused = {{')
++
++        # Byte-reflection mask, needed for MSB CRCs
++        if not v.lsb:
++            print('\t.bswap_mask = {' + ', '.join(str(i) for i in reversed(range(16))) + '},')
++
++        # Fold constants for all distances down to 128 bits
++        k = v.bits - 65 if v.lsb else 0
++        for i in FOLD_DISTANCES:
++            print(f'\t.fold_across_{i}_bits_consts = {{')
++            for j in [64, 0] if v.lsb else [0, 64]:
++                if i + j + k == 128 and not v.lsb:
++                    # Special case: for MSB CRCs, store
++                    # (x^(64 + v.bits) mod G) * x^(64 - v.bits) instead of
++                    # x^128 mod G.  These values are congruent to each other and
++                    # are equivalent for the usual folding across 128 bits, but
++                    # the former value happens to also be needed during the
++                    # final reduction.  It generates a fold across '64 + v.bits'
++                    # bits combined with a left shift by '64 - v.bits' bits.
++                    const = reduce(1 << (64 + v.bits), v.G) << (64 - v.bits)
++                    print(f'\t\t{fmt_poly(v, const, v.bits)},\t/* x^{64+v.bits} mod G(x) * x^{64 - v.bits} */')
++                    continue
++                const = reduce(1 << (i + j + k), v.G)
++                pow_desc = f'{i}{"+" if j >= 0 else "-"}{abs(j)}'
++                if k != 0:
++                    pow_desc += f'{"+" if k >= 0 else "-"}{abs(k)}'
++                print(f'\t\t{fmt_poly(v, const, v.bits)},\t/* x^({pow_desc}) mod G(x) */')
++            print('\t},')
++
++        # Shuffle table for handling 1..15 bytes at end
++        print('\t.shuf_table = {')
++        print('\t\t' + (16*'-1, ').rstrip())
++        print('\t\t' + ''.join(f'{i:2}, ' for i in range(16)).rstrip())
++        print('\t\t' + (16*'-1, ').rstrip())
++        print('\t},')
++
++        # Barrett reduction constants for reducing 128 bits to the final CRC
++        m = 63 if v.lsb else 64
++        print('\t.barrett_reduction_consts = {')
++        print_poly_truncate65thbit(v, div(1<<(m+v.bits), v.G), m+1,
++                                   f'floor(x^{m+v.bits} / G(x))')
++        print_poly_truncate65thbit(v, v.G, v.bits+1, 'G(x)')
++        print('\t},')
++
++        print('};')
++
++def parse_crc_variants(vars_string):
++    variants = []
++    for var_string in vars_string.split(','):
++        bits, bit_order, generator_poly = var_string.split('_')
++        assert bits.startswith('crc')
++        bits = int(bits.removeprefix('crc'))
++        assert generator_poly.startswith('0x')
++        generator_poly = generator_poly.removeprefix('0x')
++        assert len(generator_poly) % 2 == 0
++        generator_poly = int(generator_poly, 16)
++        variants.append(CrcVariant(bits, generator_poly, bit_order))
++    return variants
++
++if len(sys.argv) != 3:
++    sys.stderr.write(f'Usage: {sys.argv[0]} CONSTS_TYPE[,CONSTS_TYPE]... CRC_VARIANT[,CRC_VARIANT]...\n')
++    sys.stderr.write('  CONSTS_TYPE can be sliceby[1-8] or x86_pclmul\n')
++    sys.stderr.write('  CRC_VARIANT is crc${num_bits}_${bit_order}_${generator_poly_as_hex}\n')
++    sys.stderr.write('     E.g. crc16_msb_0x8bb7 or crc32_lsb_0xedb88320\n')
++    sys.stderr.write('     Polynomial must use the given bit_order and exclude x^{num_bits}\n')
++    sys.exit(1)
++
++print('/* SPDX-License-Identifier: GPL-2.0-or-later */')
++print('/*')
++print(' * CRC constants generated by:')
++print(' *')
++print(f' *\t{sys.argv[0]} {" ".join(sys.argv[1:])}')
++print(' *')
++print(' * Do not edit manually.')
++print(' */')
++consts_types = sys.argv[1].split(',')
++variants = parse_crc_variants(sys.argv[2])
++for consts_type in consts_types:
++    if consts_type.startswith('sliceby'):
++        gen_slicebyN_tables(variants, int(consts_type.removeprefix('sliceby')))
++    elif consts_type == 'x86_pclmul':
++        gen_x86_pclmul_consts(variants)
++    else:
++        raise ValueError(f'Unknown consts_type: {consts_type}')
 -- 
 2.48.1
 
