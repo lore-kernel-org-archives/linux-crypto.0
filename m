@@ -1,33 +1,33 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1A8A14D29B;
-	Fri, 31 Jan 2025 08:30:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5A504683;
+	Fri, 31 Jan 2025 08:34:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738312259; cv=none; b=h2eN7srawpRJZLX9PqRXHPcykKMsV1qPfQqAQ+av8XLjzJEHCNRmCZTKwHQx1QCpDeZ1kpbiCRN4aA8LBKxcw6m8NP8e7aYgdkHwjxM5MDT3pmIRQzDSI6nGvvJUPxHKzo/RJn0fFx4PS0TKneJ+tHfs04FzLMbJ24dnCyWNCB8=
+	t=1738312451; cv=none; b=fYkMi1aKbeoTQyQ/B2yNAeLGF6mKpkYoc97rxSasWNZoR4S6Km82sGxTsWDJokKGnAUnd7Qwis93GLLqpRci2SjfilHbZKZuB1d5X1A5M/nB2qCsUpDFWMt2gLUYvQDvJjlHMiFacNnjL9EofzCzS3NkFTXCy0itB7FDY+YXUoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738312259; c=relaxed/simple;
-	bh=7o50BdANCPRn/R5e6hJKywbK5tgqxRIv0dt46oyprvs=;
+	s=arc-20240116; t=1738312451; c=relaxed/simple;
+	bh=8zc6yBsAaJwfFYLXrwfQvFexqnj+mY5XmiFIpp8Hebw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=P4gIceVEhd57zlzfn8zWw6Gg25DbYMN1U7BPkuhhLoPo25eB2vCo2LgAAM7FoBZz2g0NrL4aU/EtMQ54hwZDn95im3yQ1lqWGRYBCTpNqY+b9zNdMtCOFBswX/7r2nsvkuAZ+lX8Cg/4rs4n5Zfj4wh+AHIstj26Zfz18N0f61Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pn6RgJgA; arc=none smtp.client-ip=10.30.226.201
+	 In-Reply-To:Content-Type; b=KDOCODa7Jpa/wMp1YN+cgVnC3eC8q4DCLGngy1js1de6PzCHgQuvO6HdVYjJEhokChBSO/wUP9m11zJelfksbgTZAu7OjRvQM/AgEYghKs/e/jjXZmbYAQG/jor84HUnRMRjoR/pOnQH3RBHE0FLokeCPRk28G8+0vn5KVbbXew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z1/8PE5n; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pn6RgJgA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BAFBC4CED1;
-	Fri, 31 Jan 2025 08:30:53 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z1/8PE5n"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 530C6C4CED1;
+	Fri, 31 Jan 2025 08:34:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738312259;
-	bh=7o50BdANCPRn/R5e6hJKywbK5tgqxRIv0dt46oyprvs=;
+	s=k20201202; t=1738312449;
+	bh=8zc6yBsAaJwfFYLXrwfQvFexqnj+mY5XmiFIpp8Hebw=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=pn6RgJgAIdSxd+7AV8sdFDKic9/I28vHyLtfVc+y3IfoDBuhujNvtZR9S8Br+GdhI
-	 NikSBRd8m8IqzoRXLiXEOG7c9kWolcczBy8RnA3QcuLlu14ynJLPFo/4B/KXNmlX0x
-	 RkTWP9WZKPvV8tgd4AgjKRFTXISRzqnEc0k9f4dHSvOhwL08PVY4Ijb2Bj9nZ1l0ko
-	 kFrORuuHW4LgO/BI4A29ximDb+FmdJ4TGwt2taau1B2iOU4moQBs7Pvsf9FHR9LOUW
-	 UqndXnUrISrnn/WRCR3ycWOsJj03g863zzBZLXF4yKfjul0t4Yv6zPVutIXMaR94vZ
-	 91lXgwaCNGgaA==
-Message-ID: <979564a4-c8e9-4427-8019-349d0794d9af@kernel.org>
-Date: Fri, 31 Jan 2025 09:30:51 +0100
+	b=Z1/8PE5nHVhItfgy2FsiZzSUx6yyyu4UXNRWRDcSjluPCMk9G/nDxzTbE5xeFNUkq
+	 hjVgsE23h34LD77rjkUgLFI4wabgYN9jzTBA/HdVtrqrGuKWh5L0hw9Urxsk1eDyij
+	 +1dT0Fb+35gQ69faNmzvmb0O+REkK/79MzSmZJHoUU92uTpTDn9rGt3UU6/HVEs7rO
+	 qdqhNg9vHeneVNaYHdPjd0VUETOErDwJWfYx8GBW+HFAHehHZbNc7NaD7DF81qhv5p
+	 mDxWTzXpO3XgooYl1hTopR7HAg/HxQpj+4wkC0IlomVaaMF2GA0CdkeFKQz/qOYoST
+	 kPfdbzTU6+JOA==
+Message-ID: <c32d8455-1bf6-44de-acf8-34fe00ae2868@kernel.org>
+Date: Fri, 31 Jan 2025 09:34:02 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -35,7 +35,8 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/7] dt-bindings: rng: add binding for Rockchip RK3588 RNG
+Subject: Re: [PATCH 5/7] hwrng: rockchip: add support for rk3588's standalone
+ TRNG
 To: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>,
  Philipp Zabel <p.zabel@pengutronix.de>, Rob Herring <robh@kernel.org>,
  Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
@@ -46,9 +47,9 @@ To: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>,
 Cc: Sebastian Reichel <sebastian.reichel@collabora.com>,
  devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
  linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org
+ linux-crypto@vger.kernel.org, Lin Jinhan <troy.lin@rock-chips.com>
 References: <20250130-rk3588-trng-submission-v1-0-97ff76568e49@collabora.com>
- <20250130-rk3588-trng-submission-v1-2-97ff76568e49@collabora.com>
+ <20250130-rk3588-trng-submission-v1-5-97ff76568e49@collabora.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -94,100 +95,102 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20250130-rk3588-trng-submission-v1-2-97ff76568e49@collabora.com>
+In-Reply-To: <20250130-rk3588-trng-submission-v1-5-97ff76568e49@collabora.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 30/01/2025 17:31, Nicolas Frattaroli wrote:
-> +title: Rockchip RK3588 TRNG
+> +MODULE_DEVICE_TABLE(of, rk_rng_dt_match);
 > +
-> +description: True Random Number Generator on Rockchip RK3588 SoC
+>  static int rk_rng_probe(struct platform_device *pdev)
+>  {
+>  	struct device *dev = &pdev->dev;
+> +	const struct of_device_id *match;
+>  	struct reset_control *rst;
+>  	struct rk_rng *rk_rng;
+>  	int ret;
+> @@ -139,6 +333,8 @@ static int rk_rng_probe(struct platform_device *pdev)
+>  	if (!rk_rng)
+>  		return -ENOMEM;
+>  
+> +	match = of_match_node(rk_rng_dt_match, dev->of_node);
+> +	rk_rng->soc_data = (struct rk_rng_soc_data *)match->data;
+
+Don't open code getting match data.
+
+>  	rk_rng->base = devm_platform_ioremap_resource(pdev, 0);
+>  	if (IS_ERR(rk_rng->base))
+>  		return PTR_ERR(rk_rng->base);
+> @@ -148,24 +344,30 @@ static int rk_rng_probe(struct platform_device *pdev)
+>  		return dev_err_probe(dev, rk_rng->clk_num,
+>  				     "Failed to get clks property\n");
+>  
+> -	rst = devm_reset_control_array_get_exclusive(dev);
+> -	if (IS_ERR(rst))
+> -		return dev_err_probe(dev, PTR_ERR(rst), "Failed to get reset property\n");
+> +	if (rk_rng->soc_data->reset_optional)
+> +		rst = devm_reset_control_array_get_optional_exclusive(dev);
+> +	else
+> +		rst = devm_reset_control_array_get_exclusive(dev);
 > +
-> +maintainers:
-> +  - Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
-> +
-> +properties:
-> +  compatible:
-> +    enum:
-> +      - rockchip,rk3588-rng
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  clocks:
-> +    items:
-> +      - description: TRNG AHB clock
-> +
-> +  # Optional, not used by some driver implementations
-
-What driver implementations? Downstream? They do not matter, because
-they are full of all sort of crap.
-
-Can this block have interrupt really disconnected? This is the question
-you should answer.
-
-
-> +  interrupts:
-> +    maxItems: 1
-> +
-> +  # Optional, hardware works without explicit reset
-
-Just because bootloader did something? With that reasoning nothing is
-ever required because firmware can abstract it. Either you have there a
-reset or not. In this particular case your driver is irrelevant.
-
-> +  resets:
-> +    maxItems: 1
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +  - clocks
-> +
-
-
-BTW, there is a binding for Rockchip TRNG, with a bit different clocks
-so I have feeling yours is incomplete here.
-
-> +additionalProperties: false
-> +
-> +examples:
-> +  - |
-> +    #include <dt-bindings/clock/rockchip,rk3588-cru.h>
-> +    #include <dt-bindings/interrupt-controller/arm-gic.h>
-> +    #include <dt-bindings/interrupt-controller/irq.h>
-> +    #include <dt-bindings/reset/rockchip,rk3588-cru.h>
-> +    bus {
-> +      #address-cells = <2>;
-> +      #size-cells = <2>;
-> +
-> +      rng@fe378000 {
-> +        compatible = "rockchip,rk3588-rng";
-> +        reg = <0x0 0xfe378000 0x0 0x200>;
-> +        interrupts = <GIC_SPI 400 IRQ_TYPE_LEVEL_HIGH 0>;
-> +        clocks = <&scmi_clk SCMI_HCLK_SECURE_NS>;
-> +        resets = <&scmi_reset SCMI_SRST_H_TRNG_NS>;
-> +        status = "disabled";
-
-Examples cannot be disabled.
-
-> +      };
-> +    };
-> +
-> +...
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index bc8ce7af3303f747e0ef028e5a7b29b0bbba99f4..7daf9bfeb0cb4e9e594b809012c7aa243b0558ae 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -20420,8 +20420,10 @@ F:	include/uapi/linux/rkisp1-config.h
->  ROCKCHIP RK3568 RANDOM NUMBER GENERATOR SUPPORT
->  M:	Daniel Golle <daniel@makrotopia.org>
->  M:	Aurelien Jarno <aurelien@aurel32.net>
-> +M:	Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
-
-Like Conor said, this is not really relevant and should be a separate patch.
+> +	if (rst) {
+> +		if (IS_ERR(rst))
+> +			return dev_err_probe(dev, PTR_ERR(rst), "Failed to get reset property\n");
+>  
+> -	reset_control_assert(rst);
+> -	udelay(2);
+> -	reset_control_deassert(rst);
+> +		reset_control_assert(rst);
+> +		udelay(2);
+> +		reset_control_deassert(rst);
+> +	}
+>  
+>  	platform_set_drvdata(pdev, rk_rng);
+>  
+>  	rk_rng->rng.name = dev_driver_string(dev);
+>  	if (!IS_ENABLED(CONFIG_PM)) {
+> -		rk_rng->rng.init = rk_rng_init;
+> -		rk_rng->rng.cleanup = rk_rng_cleanup;
+> +		rk_rng->rng.init = rk_rng->soc_data->rk_rng_init;
+> +		rk_rng->rng.cleanup = rk_rng->soc_data->rk_rng_cleanup;
+>  	}
+> -	rk_rng->rng.read = rk_rng_read;
+> +	rk_rng->rng.read = rk_rng->soc_data->rk_rng_read;
+>  	rk_rng->dev = dev;
+> -	rk_rng->rng.quality = 900;
+> +	rk_rng->rng.quality = rk_rng->soc_data->quality;
+>  
+>  	pm_runtime_set_autosuspend_delay(dev, RK_RNG_AUTOSUSPEND_DELAY);
+>  	pm_runtime_use_autosuspend(dev);
+> @@ -184,7 +386,7 @@ static int __maybe_unused rk_rng_runtime_suspend(struct device *dev)
+>  {
+>  	struct rk_rng *rk_rng = dev_get_drvdata(dev);
+>  
+> -	rk_rng_cleanup(&rk_rng->rng);
+> +	rk_rng->soc_data->rk_rng_cleanup(&rk_rng->rng);
+>  
+>  	return 0;
+>  }
+> @@ -193,7 +395,7 @@ static int __maybe_unused rk_rng_runtime_resume(struct device *dev)
+>  {
+>  	struct rk_rng *rk_rng = dev_get_drvdata(dev);
+>  
+> -	return rk_rng_init(&rk_rng->rng);
+> +	return rk_rng->soc_data->rk_rng_init(&rk_rng->rng);
+>  }
+>  
+>  static const struct dev_pm_ops rk_rng_pm_ops = {
+> @@ -203,13 +405,6 @@ static const struct dev_pm_ops rk_rng_pm_ops = {
+>  				pm_runtime_force_resume)
+>  };
+>  
+> -static const struct of_device_id rk_rng_dt_match[] = {
+> -	{ .compatible = "rockchip,rk3568-rng", },
+> -	{ /* sentinel */ },
+> -};
 
 
+No, don't move it. Not necessary and not expected to be in other place.
 
 Best regards,
 Krzysztof
