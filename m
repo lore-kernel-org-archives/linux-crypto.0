@@ -1,96 +1,102 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64E9210E0
-	for <linux-crypto@vger.kernel.org>; Fri, 31 Jan 2025 11:35:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D35D1C175C
+	for <linux-crypto@vger.kernel.org>; Fri, 31 Jan 2025 11:39:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738323306; cv=none; b=JLdixDH3Mmoz4cfpF++wgVDbS1U7/eVShnFE2EjvMilQZBBc7ht/8Xot0K93BLc+v8ZkrijFZPFmMX9BxG5ECPnIo3jNQrvej0TNgzGKjzwRskwT49UfCkhZaJkUvrObgy1bl6qDRcIJo2P3A7OOYHiPduIZxZXIoFHjtWzEFp8=
+	t=1738323592; cv=none; b=lsQE9z9wKfF58a8DifQIBWgrDWt1BnNWhc166r4jB0JflQKJ+vnqCJtpWn+kRI2iKfn9SySRgJDL9VUEMHF/ddtB2NNuB7ah4CsHfCUSnGD+NUTz4ByupIZrWxK88qgJL0kELYgvUUYTxQ/8hFpoO7+z6zedtcHBTKaUb9PzUt8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738323306; c=relaxed/simple;
-	bh=9+C38kpUlKBffKn869BxJWa21kRIB/Ljy+iQrrB3cA8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lyixVTnG1LmblCUNm14Qy7sqg3HzbgI4UB6cK06iWUfDM2u4c5Wbb7oVeUWQM8Yys/BfRCtCdFaHMlLGrvzJwHoTnESdsJscAZzUGh79YPlWH+9c5wqsySwFkEdPTFZt2Rk7gMtVhiVfyMECXKwFtdND1W3DR0PM6UJ01SNdnE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=al1/jdfN; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1738323592; c=relaxed/simple;
+	bh=476EBTGgcI5xdYOaJ6LQa3tfmwSruyF9mYzvA+HovWU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WMigdtiMrjXOQtaQJVlURtY1Hzyqr0oKhLJ3zATCyP+gzViTUulSQyf7Qy4q1IlMPzQheU10UFi6u307rchoXm8GLPqZyt90KcGNhV0nOFUmVweTJpDK+unbpAMVH27GpnMDdT2gGgjYi90n2Mg0g6Mu/9JQfVfa+UBy0fPyM1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net; spf=pass smtp.mailfrom=posteo.net; dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b=Mx0r3qb1; arc=none smtp.client-ip=185.67.36.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="al1/jdfN"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1738323304; x=1769859304;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=9+C38kpUlKBffKn869BxJWa21kRIB/Ljy+iQrrB3cA8=;
-  b=al1/jdfNGqNReIRPeRmbPmQpi32H9WnzwDVtVkyTI3KGTH4xpVAjPRt7
-   V2733CCCoQgrIszBfuiQqpO/9XF5Ht17FRg6GdIqUe5d59Soh28SbLI1s
-   fLt53AASsKEK/MVMPYz8pyElwjyNAJoiMk/VavA5eNrROgb6NePjMsIaX
-   r4l0Y6tZpR9k9MKJJDcy5Gs6yTm8s8NQlADSdObJhj4+dRSdVMXVsbCbD
-   VuOupIHBnNj4dAdwzO+i+Cmbt96aD2sF9ZQX54FqQobxnaGprGAKpiUIc
-   6/9nJSi1vo3AeLIFcNpVR98ujJjwSAePM0LfERNryfXmVV36Q21D2VY1h
-   w==;
-X-CSE-ConnectionGUID: BQ+6uPIoQs6M4rjGugmayg==
-X-CSE-MsgGUID: 7hXo8uN9SEqWL/k4f2mJnw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11331"; a="39029257"
-X-IronPort-AV: E=Sophos;i="6.13,248,1732608000"; 
-   d="scan'208";a="39029257"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2025 03:35:04 -0800
-X-CSE-ConnectionGUID: gq4JD6yLRaOi9DNul4drdw==
-X-CSE-MsgGUID: Yazedq1gRqSUIWYsglO5vw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="146794797"
-Received: from t21-qat.iind.intel.com ([10.49.15.35])
-  by orviesa001.jf.intel.com with ESMTP; 31 Jan 2025 03:35:01 -0800
-From: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
-To: herbert@gondor.apana.org.au
-Cc: linux-crypto@vger.kernel.org,
-	qat-linux@intel.com,
-	Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: [RESEND] crypto: qat - set command ids as reserved
-Date: Fri, 31 Jan 2025 11:34:54 +0000
-Message-Id: <20250131113454.3269995-1-suman.kumar.chakraborty@intel.com>
-X-Mailer: git-send-email 2.40.1
+	dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b="Mx0r3qb1"
+Received: from submission (posteo.de [185.67.36.169]) 
+	by mout02.posteo.de (Postfix) with ESMTPS id EA88B240101
+	for <linux-crypto@vger.kernel.org>; Fri, 31 Jan 2025 12:33:45 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.net; s=2017;
+	t=1738323225; bh=476EBTGgcI5xdYOaJ6LQa3tfmwSruyF9mYzvA+HovWU=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:Content-Transfer-Encoding:From;
+	b=Mx0r3qb1A3UOSK2f5X2f8aZ/cla4BLWe91L6NYbDILMpq/Q2MMYQSatiaKTOK+wET
+	 j7OgiaufoPmoH/+Snv9ZwjkcNdXlH/NMIaqvl1zBf2tED2piB0SqSTRwBf6x2OjfzR
+	 /dFI1h+CGXmNQZh+TmIOXgNZuPk7SxlnDbT0VnojHMx/TWeOE4Q09ia2UYHvcIYMPJ
+	 mz6v71TLSUzt1+7woDn4qz/AL6OuEDPhJTIIEhPEA6CGUqUToYtXKGHt6s5x0xzKTw
+	 pHrCPKbTzrTKW3Fv4istIHCrFGWwa/sBMobWilniKzQXYhR2cfFyRi2ydyGf8uvOpu
+	 JEXELxAsRJREw==
+Received: from customer (localhost [127.0.0.1])
+	by submission (posteo.de) with ESMTPSA id 4Ykv0g42F0z9rxF;
+	Fri, 31 Jan 2025 12:33:39 +0100 (CET)
+Date: Fri, 31 Jan 2025 11:33:39 +0000
+From: =?utf-8?Q?J=2E_Neusch=C3=A4fer?= <j.ne@posteo.net>
+To: Frank Li <Frank.li@nxp.com>
+Cc: =?utf-8?Q?J=2E_Neusch=C3=A4fer?= <j.ne@posteo.net>,
+	devicetree@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	Scott Wood <oss@buserror.net>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Naveen N Rao <naveen@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>, Lee Jones <lee@kernel.org>,
+	Vinod Koul <vkoul@kernel.org>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	=?utf-8?Q?J=2E_Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
+	Wim Van Sebroeck <wim@linux-watchdog.org>,
+	Guenter Roeck <linux@roeck-us.net>, Mark Brown <broonie@kernel.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Richard Weinberger <richard@nod.at>,
+	Vignesh Raghavendra <vigneshr@ti.com>, linux-kernel@vger.kernel.org,
+	linux-ide@vger.kernel.org, linux-crypto@vger.kernel.org,
+	dmaengine@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-watchdog@vger.kernel.org, linux-spi@vger.kernel.org,
+	linux-mtd@lists.infradead.org
+Subject: Re: [PATCH 0/9] YAML conversion of several Freescale/PowerPC DT
+ bindings
+Message-ID: <Z5y1E6TUclqzV2Rp@probook>
+References: <20250126-ppcyaml-v1-0-50649f51c3dd@posteo.net>
+ <Z5qr1VkKSlyBE/E4@lizhi-Precision-Tower-5810>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <Z5qr1VkKSlyBE/E4@lizhi-Precision-Tower-5810>
 
-The XP10 algorithm is not supported by any QAT device.
-Remove the definition of bit 7 (ICP_QAT_FW_COMP_20_CMD_XP10_COMPRESS)
-and bit 8 (ICP_QAT_FW_COMP_20_CMD_XP10_DECOMPRESS) in the firmware
-command id enum and rename them as reserved.
-Those bits shall not be used in future.
+On Wed, Jan 29, 2025 at 05:29:41PM -0500, Frank Li wrote:
+> On Sun, Jan 26, 2025 at 07:58:55PM +0100, J. Neuschäfer wrote:
+> > This is a spin-off of the series titled
+> > "powerpc: MPC83xx cleanup and LANCOM NWAPP2 board".
+> >
+> > During the development of that series, it became clear that many
+> > devicetree bindings for Freescale MPC8xxx platforms are still in the old
+> > plain-text format, or don't exist at all, and in any case don't mention
+> > all valid compatible strings.
+> >
+> > Signed-off-by: J. Neuschäfer <j.ne@posteo.net>
+> 
+> Please cc imx@lists.linux.dev next time
+> 
+> Frank
 
-Signed-off-by: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
-Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
----
-Fixed headline of commit message
+Will do.
 
- drivers/crypto/intel/qat/qat_common/icp_qat_fw_comp.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/crypto/intel/qat/qat_common/icp_qat_fw_comp.h b/drivers/crypto/intel/qat/qat_common/icp_qat_fw_comp.h
-index a03d43fef2b3..04f645957e28 100644
---- a/drivers/crypto/intel/qat/qat_common/icp_qat_fw_comp.h
-+++ b/drivers/crypto/intel/qat/qat_common/icp_qat_fw_comp.h
-@@ -16,8 +16,8 @@ enum icp_qat_fw_comp_20_cmd_id {
- 	ICP_QAT_FW_COMP_20_CMD_LZ4_DECOMPRESS = 4,
- 	ICP_QAT_FW_COMP_20_CMD_LZ4S_COMPRESS = 5,
- 	ICP_QAT_FW_COMP_20_CMD_LZ4S_DECOMPRESS = 6,
--	ICP_QAT_FW_COMP_20_CMD_XP10_COMPRESS = 7,
--	ICP_QAT_FW_COMP_20_CMD_XP10_DECOMPRESS = 8,
-+	ICP_QAT_FW_COMP_20_CMD_RESERVED_7 = 7,
-+	ICP_QAT_FW_COMP_20_CMD_RESERVED_8 = 8,
- 	ICP_QAT_FW_COMP_20_CMD_RESERVED_9 = 9,
- 	ICP_QAT_FW_COMP_23_CMD_ZSTD_COMPRESS = 10,
- 	ICP_QAT_FW_COMP_23_CMD_ZSTD_DECOMPRESS = 11,
-
-base-commit: 5351b54115393d1f741a83ed4c6657fb238f65c2
--- 
-2.40.1
-
+Best regards,
+J. Neuschäfer
