@@ -1,153 +1,114 @@
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 600BF14AD3F;
-	Fri, 31 Jan 2025 19:03:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DABBC2AD20;
+	Fri, 31 Jan 2025 22:16:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738350221; cv=none; b=l6PjQxJrUFpyOzomIfskBDbNLg0VUMOpLCG4iX44LOJpgQhEsdLswm7dPbK9oUifcZL31XwDeWo5SuyjGdFbTi+D3dEeypJOBnWNXc5dRylVxZJDxhzfGUd3BPgU2YaSui4AEDXTagco4UaCC7dE3KLzI9ROwQ6asI/Iqc9wdfk=
+	t=1738361781; cv=none; b=Sh1ss7fJuF2+AheaFZI7PjNex/SLWfoFM/GnziDQ/oUmGt2lt7Lb/5ir1wvyHVZpCWPHyqo3L6vW6HRvj7gMeW3zfujK6b/zqe9zqhMiUZpyzOFZ/+/5bTDrOME/b142fxp1+eM+9nGQr7Qg567MopcvAhL9A7HQKq1dtaNG+QM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738350221; c=relaxed/simple;
-	bh=uzxZezk1KcRSDBfkDDnaI/05Lxa4t4IjBjpskgW0ogQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cFrVh35kF14rcJ9hspgD4X2aaBZvW+tmJ/6T3gbokwcYGvfYN5G//Im0/YCaSnolWUP68cuV90ahlZGCXx2b7AGkNNXFphYmla/wOFkxFoo+rWYPJu1SDjgf42V0sG40VSbl0mnjbq3QRikynpsEglug9RKApbzgLfZJ9UQ5x0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FEbWMdyb; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1738361781; c=relaxed/simple;
+	bh=24W6Dps3y7DxZ6YhfkzynKPlf3swLWZxkwFai0Y3sBI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iS+eG9p6wctucV4wMH4Pgv4EU2OMHn74HYUw7653v/SQXGioF6n9I2zLAILZ0fa7R/MXhqC7NKcAKar/jVX5kNFhSOiFHi/uPKxUW9gV84rb3VLIhK/3eeQv5K3y2Dujt058Zww4mYYefcMGirid9L8kEKRA2DJcWmx5g7f5paw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AtfqOBV+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FEbWMdyb"
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-38be3bfb045so2387097f8f.0;
-        Fri, 31 Jan 2025 11:03:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738350217; x=1738955017; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pglTObOFT5rBCszltvVnpJmzw8D/oeXug/disPOkEu0=;
-        b=FEbWMdybdt3UQYzjd//UkZvWxH3FJ/AEOIInsiVqs3hDhy2UtmLBfsF0at46OrTpAZ
-         adGbpzVJ4JjIFTKAuLg6N43lrttuoQi4i43ZTKnwfaMfqOEak+FrbB7yX64xPn8RtQfs
-         uBABEquQptUUTT9GEfsdBl6J5g6++VC1PzCO5JLvMOyHu/9SXR+CruJLujv7ubjFImtp
-         5jd/IrurwKUMzvg7aJRnziM/6vN98rWM7ST/9if0r5vblw10nJs6Gls5xy139G1Y7b1y
-         vlGO5qRLX4D8tGzVCqWbCGW+Z6aRlbbSWYCHK7Aud/LaGGOOTbCN1rpWPl4iALfqa8lF
-         CkOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738350217; x=1738955017;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pglTObOFT5rBCszltvVnpJmzw8D/oeXug/disPOkEu0=;
-        b=gNGIK1WqK0S6DXd7MKYJYb0+6bYY3e4ERxfZrEac2PxuAobwEeecowOCTCvOQU0XMG
-         EZz7Rfu8swnLUSvb1bk5EonQaNXlJ7pbPnIB8jjNBL0evYlVHVZ9P3GiB3OzpZXdMgLt
-         2oeAggXb1pTlb7Avf6sZR5Fdl/I0V9KYa/edxZ7qoNBWwfscH4ly+gHvqmqIo6ZMSzv0
-         Z+hwBFAEbc/S2lGRSH3tK4Bls0zFX9C/U41n7eZruv9QxDAlgWtW2OchrbSBSywD1uRJ
-         9o0bm3JH4ZyxrXjkEq6ihzGB8vxdlUHOyKYK5IUfWlY6DcCKGbkO6ihQ8HvqkDY6gSm9
-         yrGA==
-X-Forwarded-Encrypted: i=1; AJvYcCU272tjlm/WTtnn4kL/ZocT8ievOATnWCiu1JmlZLXyu9C9ZKsg62PgvJMxf3T42wNxf303aqPDV4pbwgzX@vger.kernel.org, AJvYcCUcNeZLAGt/uq2/l6gF9qrZEDyOOILQWqtzNY4A4m/KPVpQajCuB6vFdhpp1ko+C0xpbn9JTP26/wQ=@vger.kernel.org, AJvYcCVAq3+kFFMVezT1Vs9wpPng3pjLYNI5vNYcwcvzlFCL4uE//jPLA8GY+H2wWjTI3mUCsoyOrVOUecOsA0cvOFPXVmk=@vger.kernel.org, AJvYcCVc+DrnT1EWf3cOeJBCqpN52uqkXtf60Xv35YGeF934NJTOvD1X8KF7DuKRLNDDulWVU/fxQlnwzHvOhQ==@vger.kernel.org, AJvYcCWCyPa9p7qioCoHwtF0tg3FcxF5semsglRDBMQeHM9JBv67h1bWZ+hHs5Se/VHZSvOHBU9iEDYAlApDYNWB@vger.kernel.org, AJvYcCXET6HV3yHXnpdfnAevKRuTJAbiFemNiGnFXkl4bt5kB/H6nEHJ4SWz2saiuZg3Q0MCJp7NOEC61CQPD4o=@vger.kernel.org, AJvYcCXoDrRBvmQMOtHrBCAmB8CWvdtadB9vwco7oQkK/O0RTrYXqy7910kz6x9q7xObyy2UBM/cZNX+xw6R@vger.kernel.org
-X-Gm-Message-State: AOJu0YzX83mbmefnGf/2B/022rRiusROqxAMrZuksYQenKRnSVD9EbZd
-	rE0j1BRyrFg2OOy8iF0MlGkxFjfMASGihCzOeMlgONAgAf+PCBp7
-X-Gm-Gg: ASbGncv8py/3dJd8r5ME77JpKSl23J2hmNld88EBkt4jYuVXFwgzaZykeIdBmDN2MXl
-	qHC6w9Vd6W/2aTbCvT94r7uX5wY1GHsbJDViqr8NdqlCNiovqUHMut0gCAcW84di5N7dpzTBgpI
-	QX2mdmrztgxBUmKtgLGm79XCRHyNpZQHXcWWezf7hfFPqcuenpZ48bkxZrkmrDxKj7WjhyiybAE
-	W6DUOaTaGrU1pjhRBvGuLcF7y85GJNX2iGEIJUMcD6w9neDNdMFivOoqLSJ4I2QjfbKhrMd3sAj
-	HVGgmm1PBEoYSI6TefgpnsHttefKv91o2WGUxABXJ6ADQS8JiudWqQ==
-X-Google-Smtp-Source: AGHT+IGOWalHkw0VQDuZrFgGWdO/5t7oYMe9eAr7RV/AmNQsKEb7LjEGNkj8XpJngRC9CG3jrtAtQg==
-X-Received: by 2002:a5d:5f56:0:b0:386:3d27:b4f0 with SMTP id ffacd0b85a97d-38c60f26459mr3846706f8f.14.1738350217335;
-        Fri, 31 Jan 2025 11:03:37 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438e23d444bsm64691365e9.8.2025.01.31.11.03.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 31 Jan 2025 11:03:36 -0800 (PST)
-Date: Fri, 31 Jan 2025 19:03:35 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
- <sboyd@kernel.org>, Nicolas Ferre <nicolas.ferre@microchip.com>, Alexandre
- Belloni <alexandre.belloni@bootlin.com>, Claudiu Beznea
- <claudiu.beznea@tuxon.dev>, Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller"
- <davem@davemloft.net>, Linus Walleij <linus.walleij@linaro.org>, Bartosz
- Golaszewski <brgl@bgdev.pl>, Joel Stanley <joel@jms.id.au>, Andrew Jeffery
- <andrew@codeconstruct.com.au>, Crt Mori <cmo@melexis.com>, Jonathan Cameron
- <jic23@kernel.org>, Lars-Peter Clausen <lars@metafoo.de>, Jacky Huang
- <ychuang3@nuvoton.com>, Shan-Chun Hung <schung@nuvoton.com>, Yury Norov
- <yury.norov@gmail.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Johannes
- Berg <johannes@sipsolutions.net>, Jakub Kicinski <kuba@kernel.org>, Alex
- Elder <elder@ieee.org>, linux-clk@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-renesas-soc@vger.kernel.org,
- linux-crypto@vger.kernel.org, qat-linux@intel.com,
- linux-gpio@vger.kernel.org, linux-aspeed@lists.ozlabs.org,
- linux-iio@vger.kernel.org, linux-sound@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH treewide v2 1/3] bitfield: Add non-constant
- field_{prep,get}() helpers
-Message-ID: <20250131190335.4c18fb3c@pumpkin>
-In-Reply-To: <1824412519cb8791ab428065116927ee7b77cf35.1738329459.git.geert+renesas@glider.be>
-References: <cover.1738329458.git.geert+renesas@glider.be>
-	<1824412519cb8791ab428065116927ee7b77cf35.1738329459.git.geert+renesas@glider.be>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AtfqOBV+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F5C8C4CEE2;
+	Fri, 31 Jan 2025 22:16:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738361780;
+	bh=24W6Dps3y7DxZ6YhfkzynKPlf3swLWZxkwFai0Y3sBI=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=AtfqOBV+hgn5E2OvcJZHV5aNQwRoYZB/CgESGBejHG/zkhQV1sAuR0NIwBLg9xAnH
+	 NMF7ihG8arT55ilvdLTKTWJmugXTWXqCJSDlTZeS2zxMmwQFLqm8D5VukL5YR/EcBJ
+	 mghfb/3SO3dWStF5RQqNApP46SZDdaOsLZ08uuh/lqxQcZeBdoAPNo9gglpGJJlJBa
+	 6d8A+j+Z5Ei31O2xP6t7GYTdzHI8rFqRWRC6V6NAruBJpu/X9qlSJBZZtbTiSe2K0U
+	 95VqbK3A1v+Ko/GNl3nXSzntI4YcNvUJuqPzC39Twtw/FyZPNjLEwB4c+7+1U/hjuu
+	 +Zc2srHyIOMnQ==
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5dc10fe4e62so4761781a12.1;
+        Fri, 31 Jan 2025 14:16:20 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUoDGXIql06RButv7EgOop4qS3j/BACqzomJXaalPacrnSgOXRSqCsviGh/yjmIrCmrtyu34ehI/7zv@vger.kernel.org, AJvYcCUuoJotdYp0dgt9sRrj6AY0kQeDhLbK08PEYpVY07YshMtBOH5eFRF9IHE5ipljEMXiMmS3PFzty7nq@vger.kernel.org, AJvYcCVWozPOAOyqlkmAR6uoS9B+GSsUzjDGlR+V4K3NiazlmgtKAL58hKRtuU2oUA50rKypjtJsl+jSW020TxQF@vger.kernel.org, AJvYcCWplzKe2iz25Tbjbwxv3zZYBPZzJKHBfIP/Zf0npcK9SI7DD1GKrvzH9239OlmjKhXKXtj59fb0mQU=@vger.kernel.org, AJvYcCWwa3DsmZejGwDwlId6GFU13gwR2QUXFCjql3wyKdq2PUaUoHH/zpJmyM+MALDzs9SkpFKktpTtlk9H@vger.kernel.org, AJvYcCXjYHaWnmwsVUouBC198Y04mAfKODGo58t6SP3lTquW0dMpPyjzf+wXDTuFOB5/40bDPd81fq0DkgDTC2sqX14=@vger.kernel.org, AJvYcCXl8HO6SMhwaCzPokccij3qQJLK0OMVwqbzCgHelm/+rft6uTapT7Q7khmlJoJpDqV2yUmOpfhBl13v3O0D@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHiWmgfXmuPrr9Rdt1Xjzb/gndtWkd6HeEb1tGZj/KNn0WX4bL
+	8Dud5l6rBOaTwGyWDnODYYHBPKmF+t2R8K7bm2Pub2RXetUxfFJiSxc28ISIw4VzLn0+urSIGVB
+	m+KwSnOBo6SOk08m0N1AAWT+IHw==
+X-Google-Smtp-Source: AGHT+IG+40Vie6I5qh4Xa+hjwERq+fPWo6Sglqt6y5ghUP/X8RySc2w5nt0i3mGF0G2DQOmC/TQjR33KPq7ga7buNyY=
+X-Received: by 2002:a05:6402:2390:b0:5dc:72e1:63ee with SMTP id
+ 4fb4d7f45d1cf-5dc72e1647cmr7162768a12.6.1738361778979; Fri, 31 Jan 2025
+ 14:16:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250126-ppcyaml-v1-0-50649f51c3dd@posteo.net>
+ <20250126-ppcyaml-v1-5-50649f51c3dd@posteo.net> <20250127044735.GD3106458-robh@kernel.org>
+ <Z5zYGdZU-IXwIuR6@probook>
+In-Reply-To: <Z5zYGdZU-IXwIuR6@probook>
+From: Rob Herring <robh@kernel.org>
+Date: Fri, 31 Jan 2025 16:16:07 -0600
+X-Gmail-Original-Message-ID: <CAL_JsqJAX1QbXvG16NV2g6DGece6KiG_V-uyKQQLA618Oq9miw@mail.gmail.com>
+X-Gm-Features: AWEUYZlhW5XoGn0HVU0ENeDHSySI0kteJDy_cGfJFvW15zruGH8F_vZTC5Jh93M
+Message-ID: <CAL_JsqJAX1QbXvG16NV2g6DGece6KiG_V-uyKQQLA618Oq9miw@mail.gmail.com>
+Subject: Re: [PATCH 5/9] dt-bindings: dma: Convert fsl,elo*-dma bindings to YAML
+To: =?UTF-8?B?Si4gTmV1c2Now6RmZXI=?= <j.ne@posteo.net>
+Cc: devicetree@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
+	Scott Wood <oss@buserror.net>, Madhavan Srinivasan <maddy@linux.ibm.com>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>, 
+	Christophe Leroy <christophe.leroy@csgroup.eu>, Naveen N Rao <naveen@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Lee Jones <lee@kernel.org>, Vinod Koul <vkoul@kernel.org>, 
+	Lorenzo Pieralisi <lpieralisi@kernel.org>, =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kw@linux.com>, 
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, Bjorn Helgaas <bhelgaas@google.com>, 
+	=?UTF-8?B?Si4gTmV1c2Now6RmZXI=?= <j.neuschaefer@gmx.net>, 
+	Wim Van Sebroeck <wim@linux-watchdog.org>, Guenter Roeck <linux@roeck-us.net>, 
+	Mark Brown <broonie@kernel.org>, Miquel Raynal <miquel.raynal@bootlin.com>, 
+	Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>, linux-kernel@vger.kernel.org, 
+	linux-ide@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	dmaengine@vger.kernel.org, linux-pci@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-spi@vger.kernel.org, 
+	linux-mtd@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 31 Jan 2025 14:46:51 +0100
-Geert Uytterhoeven <geert+renesas@glider.be> wrote:
+On Fri, Jan 31, 2025 at 8:03=E2=80=AFAM J. Neusch=C3=A4fer <j.ne@posteo.net=
+> wrote:
+>
+> On Sun, Jan 26, 2025 at 10:47:35PM -0600, Rob Herring wrote:
+> > On Sun, Jan 26, 2025 at 07:59:00PM +0100, J. Neusch=C3=A4fer wrote:
+> > > The devicetree bindings for Freescale DMA engines have so far existed=
+ as
+> > > a text file. This patch converts them to YAML, and specifies all the
+> > > compatible strings currently in use in arch/powerpc/boot/dts.
+> > >
+> > > Signed-off-by: J. Neusch=C3=A4fer <j.ne@posteo.net>
+> > > ---
+> > >  .../devicetree/bindings/dma/fsl,elo-dma.yaml       | 129 +++++++++++=
+++
+> > >  .../devicetree/bindings/dma/fsl,elo3-dma.yaml      | 105 +++++++++++
+> > >  .../devicetree/bindings/dma/fsl,eloplus-dma.yaml   | 120 +++++++++++=
++
+> > >  .../devicetree/bindings/powerpc/fsl/dma.txt        | 204 -----------=
+----------
+> > >  4 files changed, 354 insertions(+), 204 deletions(-)
+> [...]
+> > > +patternProperties:
+> > > +  "^dma-channel@.*$":
+> > > +    type: object
+> >
+> >        additionalProperties: false
+>
+> I'll add it.
+>
+> > (The tools should have highlighted this)
+>
+> With dtschema 2024.11 installed, "make dt_binding_check
+> DT_SCHEMA_FILES=3Dfsl,elo-dma.yaml" does not highlight this.
 
-> The existing FIELD_{GET,PREP}() macros are limited to compile-time
-> constants.  However, it is very common to prepare or extract bitfield
-> elements where the bitfield mask is not a compile-time constant.
-> 
-> To avoid this limitation, the AT91 clock driver and several other
-> drivers already have their own non-const field_{prep,get}() macros.
-> Make them available for general use by consolidating them in
-> <linux/bitfield.h>, and improve them slightly:
->   1. Avoid evaluating macro parameters more than once,
->   2. Replace "ffs() - 1" by "__ffs()",
->   3. Support 64-bit use on 32-bit architectures.
-...
-> diff --git a/include/linux/bitfield.h b/include/linux/bitfield.h
-> index 63928f1732230700..c62324a9fcc81241 100644
-> --- a/include/linux/bitfield.h
-> +++ b/include/linux/bitfield.h
-> @@ -203,4 +203,38 @@ __MAKE_OP(64)
->  #undef __MAKE_OP
->  #undef ____MAKE_OP
->  
-> +/**
-> + * field_prep() - prepare a bitfield element
-> + * @_mask: shifted mask defining the field's length and position
-> + * @_val:  value to put in the field
-> + *
-> + * field_prep() masks and shifts up the value.  The result should be
-> + * combined with other fields of the bitfield using logical OR.
-> + * Unlike FIELD_PREP(), @_mask is not limited to a compile-time constant.
-> + */
-> +#define field_prep(_mask, _val)						\
+Actually, it's the top-level 'addtionalProperties: true' that disables
+the check here. That should be false as well.
 
-You don't need an _ prefix on the 'parameters' - it doesn't gain anything.
-
-> +	({								\
-> +		typeof(_mask) __mask = (_mask);				\
-
-Use: __auto_type __mask = (_mask);
-
-> +		unsigned int __shift = sizeof(_mask) <= 4 ?		\
-> +				       __ffs(__mask) : __ffs64(__mask);	\
-> +		(((typeof(_mask))(_val) << __shift) & (__mask));	\
-
-There are a lot of () in that line, perhaps:
-
-		__auto_type(__mask) = (_mask);
-		typeof (__mask) __val = (_val);
-		unsigned int __shift = ...;
-
-		(__val << __shift) & __mask;
-
-Note the typeof (__mask) - avoids line-length 'bloat' when the arguments are non-trivial.
-
-	David
+Rob
