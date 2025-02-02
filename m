@@ -1,254 +1,172 @@
-Received: from akranes.kaiser.cx (akranes.kaiser.cx [152.53.16.207])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from out.smtpout.orange.fr (out-13.smtpout.orange.fr [193.252.22.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 216CF182;
-	Sat,  1 Feb 2025 19:19:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=152.53.16.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A9F18BE7;
+	Sun,  2 Feb 2025 08:27:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738437544; cv=none; b=Spsk5W+gJwGHMC1kgU+QE4VZcf/rw3+DsWTF1ntV1lqwBjm3z/OhDzySdgu5Vd+9NKsrLV0oxk5hqnvy9AeNXrMtxHxI35flrmvh3aVngXcIMHDJHFrBTEf73NH+QhvLqksrdG2nyc4E6nlZqDdok68kp66H+km1CsT3FasyBR0=
+	t=1738484863; cv=none; b=r7I6IAAd8B5HpnbfRXWLtYdxv6MYPdBP/oLmyeTLde2Zr51UUwgRNYEMGPZmGRTOpvBwEmz90CSlN1cpCMv3Nc/JpV9K+ml2agsMvwTBexcnx1QIn9gbwhCk90sJTiFpVpsAu7tP5jJ6yqke+/4ab8O/eieU2SfhpNBcYBYEF4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738437544; c=relaxed/simple;
-	bh=lp0QGKLKUGfNNosyKXN0Q73Mzcbu/P4DmB5Aecyw7QM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=eOOHzK++hTbe+ud3jhM1YlLlq5p94Uyu88er2b7Ny/5OVZ2NvzOJG+J7PPmtS3Sh6W8RAwvODWqjCFsbglXrMko6fdUd5wiRZhThBYrGmuEVaNeSWYnuMSEo1QPIZuBek5Pkr+xo0zWT5299neCmkU1jIeA5PtCBucc6j98sVMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kaiser.cx; spf=pass smtp.mailfrom=kaiser.cx; arc=none smtp.client-ip=152.53.16.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kaiser.cx
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kaiser.cx
-Received: from ip-037-201-212-008.um10.pools.vodafone-ip.de ([37.201.212.8] helo=martin-debian-3.kaiser.cx)
-	by akranes.kaiser.cx with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <martin@kaiser.cx>)
-	id 1teIOe-002cWg-2j;
-	Sat, 01 Feb 2025 19:39:12 +0100
-From: Martin Kaiser <martin@kaiser.cx>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Kamlesh Gurudasani <kamlesh@ti.com>,
-	Martin Kaiser <martin@kaiser.cx>
-Subject: [PATCH v2] hwrng: imx-rngc - add runtime pm
-Date: Sat,  1 Feb 2025 19:39:07 +0100
-Message-Id: <20250201183907.82570-1-martin@kaiser.cx>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250118160701.32624-1-martin@kaiser.cx>
-References: <20250118160701.32624-1-martin@kaiser.cx>
+	s=arc-20240116; t=1738484863; c=relaxed/simple;
+	bh=3R02TGIEWd2cVE8jGoGk2IukoLrWOAmI6UyxCl1vFdc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LUgU023YRTxZuRNY2oxBcMpXpDjnIJs5WAvy4bNrsR+IxiMNFMm4801PCYAEsuRlxo0shOtlEXLlIWhJWmrAsR54NkfvETJJRjx+g7kttnNa55zVNtwfLWbNwOUR+qAb8sYl78QGpRkYKz3Yw8koIE44Ngxy1Y+Itugh7dDksxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=Er14Dtt3; arc=none smtp.client-ip=193.252.22.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="Er14Dtt3"
+Received: from [172.16.82.72] ([124.33.176.97])
+	by smtp.orange.fr with ESMTPA
+	id eVIrtwgZkM6ZbeVIwtQSlb; Sun, 02 Feb 2025 09:26:29 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1738484790;
+	bh=PzrthrLkW4R8v6fQu4F9Z0+3j1oj2AKD6gdwJR3+YjY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=Er14Dtt3+zfNicUpvicGUD6Vdf5OQJsDpkGPvY598Y41dT4BnaZJiPDU0Z9Am45FA
+	 rt5j0Pz9QRRm/z1mN2d3bb772DaBoyfWVgR/c2muJ80mlphsG3rFguogAus2nGUtIq
+	 SMzYzyRktW1gkaZRsNIAjVI989zqNQFAkzvJwc+c2MnnUIjwGsK+qKlmGw7er9lbI/
+	 pIddcTj+3U4H8qpjYBDjjnhQpTydKf0sXi6FZhIfK4nK0TsNcNc/SvIiJquLWgQ3LP
+	 O1s8+gqFJZHGsDqv+oFJDfLSh35L6j+QPDYeBSJJCpC011UxtV+bXz1kDtn/PestXd
+	 +aDON8InPsqFw==
+X-ME-Helo: [172.16.82.72]
+X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
+X-ME-Date: Sun, 02 Feb 2025 09:26:30 +0100
+X-ME-IP: 124.33.176.97
+Message-ID: <e20a177a-30cd-4088-89e1-b479aba1356c@wanadoo.fr>
+Date: Sun, 2 Feb 2025 17:26:04 +0900
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH treewide v2 1/3] bitfield: Add non-constant
+ field_{prep,get}() helpers
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: linux-clk@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-renesas-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
+ qat-linux@intel.com, linux-gpio@vger.kernel.org,
+ linux-aspeed@lists.ozlabs.org, linux-iio@vger.kernel.org,
+ linux-sound@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
+ <sboyd@kernel.org>, Nicolas Ferre <nicolas.ferre@microchip.com>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S . Miller" <davem@davemloft.net>,
+ Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski
+ <brgl@bgdev.pl>, Joel Stanley <joel@jms.id.au>,
+ Andrew Jeffery <andrew@codeconstruct.com.au>, Crt Mori <cmo@melexis.com>,
+ Jonathan Cameron <jic23@kernel.org>, Lars-Peter Clausen <lars@metafoo.de>,
+ Jacky Huang <ychuang3@nuvoton.com>, Shan-Chun Hung <schung@nuvoton.com>,
+ Yury Norov <yury.norov@gmail.com>,
+ Rasmus Villemoes <linux@rasmusvillemoes.dk>, Jaroslav Kysela
+ <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+ Johannes Berg <johannes@sipsolutions.net>, Jakub Kicinski <kuba@kernel.org>,
+ Alex Elder <elder@ieee.org>
+References: <cover.1738329458.git.geert+renesas@glider.be>
+ <1824412519cb8791ab428065116927ee7b77cf35.1738329459.git.geert+renesas@glider.be>
+Content-Language: en-US
+From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Autocrypt: addr=mailhol.vincent@wanadoo.fr; keydata=
+ xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
+ LFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI+wrIEExYKAFoC
+ GwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AWIQTtj3AFdOZ/IOV06OKrX+uI
+ bbuZwgUCZx41XhgYaGtwczovL2tleXMub3BlbnBncC5vcmcACgkQq1/riG27mcIYiwEAkgKK
+ BJ+ANKwhTAAvL1XeApQ+2NNNEwFWzipVAGvTRigA+wUeyB3UQwZrwb7jsQuBXxhk3lL45HF5
+ 8+y4bQCUCqYGzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrbYZzu0JG5w8gxE6EtQe6LmxKMqP6E
+ yR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDldOjiq1/riG27mcIFAmceMvMCGwwF
+ CQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8VzsZwr/S44HCzcz5+jkxnVVQ5LZ4B
+ ANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
+In-Reply-To: <1824412519cb8791ab428065116927ee7b77cf35.1738329459.git.geert+renesas@glider.be>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Add runtime power management to the imx-rngc driver. Disable the
-peripheral clock when the rngc is idle.
+On 31/01/2025 at 22:46, Geert Uytterhoeven wrote:
+> The existing FIELD_{GET,PREP}() macros are limited to compile-time
+> constants.  However, it is very common to prepare or extract bitfield
+> elements where the bitfield mask is not a compile-time constant.
 
-The callback functions from struct hwrng wake the rngc up when they're
-called and set it to idle on exit. Helper functions which are invoked
-from the callbacks assume that the rngc is active.
+Why is it that the existing FIELD_{GET,PREP}() macros must be limited to
+compile time constants? Instead of creating another variant for
+non-constant bitfields, wouldn't it be better to make the existing macro
+accept both?
 
-Device init and probe are done before runtime pm is enabled. The
-peripheral clock will be handled manually during these steps. Do not use
-devres any more to enable/disable the peripheral clock, this conflicts
-with runtime pm.
+As far as I can see, only __BUILD_BUG_ON_NOT_POWER_OF_2()  and
+__BF_FIELD_CHECK() need to be adjusted. I am thinking of this:
 
-Signed-off-by: Martin Kaiser <martin@kaiser.cx>
----
-v2:
- - remove unnecessary err = 0; assignment
+diff --git a/include/linux/bitfield.h b/include/linux/bitfield.h
+index 63928f173223..c6bedab862d1 100644
+--- a/include/linux/bitfield.h
++++ b/include/linux/bitfield.h
+@@ -8,6 +8,7 @@
+ #define _LINUX_BITFIELD_H
 
- drivers/char/hw_random/imx-rngc.c | 69 +++++++++++++++++++++++--------
- 1 file changed, 52 insertions(+), 17 deletions(-)
+ #include <linux/build_bug.h>
++#include <linux/compiler.h>
+ #include <asm/byteorder.h>
 
-diff --git a/drivers/char/hw_random/imx-rngc.c b/drivers/char/hw_random/imx-rngc.c
-index 5adc4946d60f..9e42571f743f 100644
---- a/drivers/char/hw_random/imx-rngc.c
-+++ b/drivers/char/hw_random/imx-rngc.c
-@@ -13,6 +13,8 @@
- #include <linux/clk.h>
- #include <linux/err.h>
- #include <linux/platform_device.h>
-+#include <linux/pm.h>
-+#include <linux/pm_runtime.h>
- #include <linux/interrupt.h>
- #include <linux/hw_random.h>
- #include <linux/completion.h>
-@@ -53,6 +55,7 @@
- 
- #define RNGC_SELFTEST_TIMEOUT 2500 /* us */
- #define RNGC_SEED_TIMEOUT      200 /* ms */
-+#define RNGC_PM_TIMEOUT        500 /* ms */
- 
- static bool self_test = true;
- module_param(self_test, bool, 0);
-@@ -123,7 +126,11 @@ static int imx_rngc_read(struct hwrng *rng, void *data, size_t max, bool wait)
- {
- 	struct imx_rngc *rngc = container_of(rng, struct imx_rngc, rng);
- 	unsigned int status;
--	int retval = 0;
-+	int err, retval = 0;
+ /*
+@@ -62,15 +63,13 @@
+
+ #define __BF_FIELD_CHECK(_mask, _reg, _val, _pfx)                      \
+        ({                                                              \
+-               BUILD_BUG_ON_MSG(!__builtin_constant_p(_mask),          \
+-                                _pfx "mask is not constant");          \
+-               BUILD_BUG_ON_MSG((_mask) == 0, _pfx "mask is zero");    \
+-               BUILD_BUG_ON_MSG(__builtin_constant_p(_val) ?           \
+-                                ~((_mask) >> __bf_shf(_mask)) &        \
+-                                       (0 + (_val)) : 0,               \
++               BUILD_BUG_ON_MSG(statically_true((_mask) == 0),         \
++                                _pfx "mask is zero");                  \
++               BUILD_BUG_ON_MSG(statically_true(~((_mask) >>
+__bf_shf(_mask)) & \
++                                                (0 + (_val))),         \
+                                 _pfx "value too large for the field"); \
+-               BUILD_BUG_ON_MSG(__bf_cast_unsigned(_mask, _mask) >     \
+-                                __bf_cast_unsigned(_reg, ~0ull),       \
 +
-+	err = pm_runtime_resume_and_get(rngc->dev);
-+	if (err)
-+		return err;
- 
- 	while (max >= sizeof(u32)) {
- 		status = readl(rngc->base + RNGC_STATUS);
-@@ -141,6 +148,8 @@ static int imx_rngc_read(struct hwrng *rng, void *data, size_t max, bool wait)
- 			max -= sizeof(u32);
- 		}
- 	}
-+	pm_runtime_mark_last_busy(rngc->dev);
-+	pm_runtime_put(rngc->dev);
- 
- 	return retval ? retval : -EIO;
- }
-@@ -169,7 +178,11 @@ static int imx_rngc_init(struct hwrng *rng)
- {
- 	struct imx_rngc *rngc = container_of(rng, struct imx_rngc, rng);
- 	u32 cmd, ctrl;
--	int ret;
-+	int ret, err;
+BUILD_BUG_ON_MSG(statically_true(__bf_cast_unsigned(_mask, _mask) > \
 +
-+	err = pm_runtime_resume_and_get(rngc->dev);
-+	if (err)
-+		return err;
- 
- 	/* clear error */
- 	cmd = readl(rngc->base + RNGC_COMMAND);
-@@ -186,15 +199,15 @@ static int imx_rngc_init(struct hwrng *rng)
- 		ret = wait_for_completion_timeout(&rngc->rng_op_done,
- 						  msecs_to_jiffies(RNGC_SEED_TIMEOUT));
- 		if (!ret) {
--			ret = -ETIMEDOUT;
--			goto err;
-+			err = -ETIMEDOUT;
-+			goto out;
- 		}
- 
- 	} while (rngc->err_reg == RNGC_ERROR_STATUS_STAT_ERR);
- 
- 	if (rngc->err_reg) {
--		ret = -EIO;
--		goto err;
-+		err = -EIO;
-+		goto out;
- 	}
- 
- 	/*
-@@ -205,23 +218,29 @@ static int imx_rngc_init(struct hwrng *rng)
- 	ctrl |= RNGC_CTRL_AUTO_SEED;
- 	writel(ctrl, rngc->base + RNGC_CONTROL);
- 
-+out:
- 	/*
- 	 * if initialisation was successful, we keep the interrupt
- 	 * unmasked until imx_rngc_cleanup is called
- 	 * we mask the interrupt ourselves if we return an error
- 	 */
--	return 0;
-+	if (err)
-+		imx_rngc_irq_mask_clear(rngc);
- 
--err:
--	imx_rngc_irq_mask_clear(rngc);
--	return ret;
-+	pm_runtime_put(rngc->dev);
-+	return err;
- }
- 
- static void imx_rngc_cleanup(struct hwrng *rng)
- {
- 	struct imx_rngc *rngc = container_of(rng, struct imx_rngc, rng);
-+	int err;
- 
--	imx_rngc_irq_mask_clear(rngc);
-+	err = pm_runtime_resume_and_get(rngc->dev);
-+	if (!err) {
-+		imx_rngc_irq_mask_clear(rngc);
-+		pm_runtime_put(rngc->dev);
-+	}
- }
- 
- static int __init imx_rngc_probe(struct platform_device *pdev)
-@@ -240,7 +259,7 @@ static int __init imx_rngc_probe(struct platform_device *pdev)
- 	if (IS_ERR(rngc->base))
- 		return PTR_ERR(rngc->base);
- 
--	rngc->clk = devm_clk_get_enabled(&pdev->dev, NULL);
-+	rngc->clk = devm_clk_get(&pdev->dev, NULL);
- 	if (IS_ERR(rngc->clk))
- 		return dev_err_probe(&pdev->dev, PTR_ERR(rngc->clk), "Cannot get rng_clk\n");
- 
-@@ -248,14 +267,18 @@ static int __init imx_rngc_probe(struct platform_device *pdev)
- 	if (irq < 0)
- 		return irq;
- 
-+	clk_prepare_enable(rngc->clk);
-+
- 	ver_id = readl(rngc->base + RNGC_VER_ID);
- 	rng_type = FIELD_GET(RNG_TYPE, ver_id);
- 	/*
- 	 * This driver supports only RNGC and RNGB. (There's a different
- 	 * driver for RNGA.)
- 	 */
--	if (rng_type != RNGC_TYPE_RNGC && rng_type != RNGC_TYPE_RNGB)
-+	if (rng_type != RNGC_TYPE_RNGC && rng_type != RNGC_TYPE_RNGB) {
-+		clk_disable_unprepare(rngc->clk);
- 		return -ENODEV;
-+	}
- 
- 	init_completion(&rngc->rng_op_done);
- 
-@@ -271,15 +294,24 @@ static int __init imx_rngc_probe(struct platform_device *pdev)
- 
- 	ret = devm_request_irq(&pdev->dev,
- 			irq, imx_rngc_irq, 0, pdev->name, (void *)rngc);
--	if (ret)
-+	if (ret) {
-+		clk_disable_unprepare(rngc->clk);
- 		return dev_err_probe(&pdev->dev, ret, "Can't get interrupt working.\n");
-+	}
- 
- 	if (self_test) {
- 		ret = imx_rngc_self_test(rngc);
--		if (ret)
-+		if (ret) {
-+			clk_disable_unprepare(rngc->clk);
- 			return dev_err_probe(&pdev->dev, ret, "self test failed\n");
-+		}
- 	}
- 
-+	pm_runtime_set_autosuspend_delay(&pdev->dev, RNGC_PM_TIMEOUT);
-+	pm_runtime_use_autosuspend(&pdev->dev);
-+	pm_runtime_set_active(&pdev->dev);
-+	devm_pm_runtime_enable(&pdev->dev);
-+
- 	ret = devm_hwrng_register(&pdev->dev, &rngc->rng);
- 	if (ret)
- 		return dev_err_probe(&pdev->dev, ret, "hwrng registration failed\n");
-@@ -309,7 +341,10 @@ static int imx_rngc_resume(struct device *dev)
- 	return 0;
- }
- 
--static DEFINE_SIMPLE_DEV_PM_OPS(imx_rngc_pm_ops, imx_rngc_suspend, imx_rngc_resume);
-+static const struct dev_pm_ops imx_rngc_pm_ops = {
-+	SYSTEM_SLEEP_PM_OPS(pm_runtime_force_suspend, pm_runtime_force_resume)
-+	RUNTIME_PM_OPS(imx_rngc_suspend, imx_rngc_resume, NULL)
-+};
- 
- static const struct of_device_id imx_rngc_dt_ids[] = {
- 	{ .compatible = "fsl,imx25-rngb" },
-@@ -320,7 +355,7 @@ MODULE_DEVICE_TABLE(of, imx_rngc_dt_ids);
- static struct platform_driver imx_rngc_driver = {
- 	.driver = {
- 		.name = KBUILD_MODNAME,
--		.pm = pm_sleep_ptr(&imx_rngc_pm_ops),
-+		.pm = pm_ptr(&imx_rngc_pm_ops),
- 		.of_match_table = imx_rngc_dt_ids,
- 	},
- };
--- 
-2.39.5
+__bf_cast_unsigned(_reg, ~0ull)), \
+                                 _pfx "type of reg too small for mask"); \
+                __BUILD_BUG_ON_NOT_POWER_OF_2((_mask) +                 \
+                                              (1ULL << __bf_shf(_mask))); \
+diff --git a/include/linux/build_bug.h b/include/linux/build_bug.h
+index 3aa3640f8c18..3b8055ebb55f 100644
+--- a/include/linux/build_bug.h
++++ b/include/linux/build_bug.h
+@@ -18,9 +18,9 @@
+
+ /* Force a compilation error if a constant expression is not a power of
+2 */
+ #define __BUILD_BUG_ON_NOT_POWER_OF_2(n)       \
+-       BUILD_BUG_ON(((n) & ((n) - 1)) != 0)
++       BUILD_BUG_ON(statically_true((n) & ((n) - 1)))
+ #define BUILD_BUG_ON_NOT_POWER_OF_2(n)                 \
+-       BUILD_BUG_ON((n) == 0 || (((n) & ((n) - 1)) != 0))
++       BUILD_BUG_ON(statically_true(!(n) || ((n) & ((n) - 1))))
+
+ /*
+  * BUILD_BUG_ON_INVALID() permits the compiler to check the validity of the
+
+
+> To avoid this limitation, the AT91 clock driver and several other
+> drivers already have their own non-const field_{prep,get}() macros.
+> Make them available for general use by consolidating them in
+> <linux/bitfield.h>, and improve them slightly:
+>   1. Avoid evaluating macro parameters more than once,
+>   2. Replace "ffs() - 1" by "__ffs()",
+>   3. Support 64-bit use on 32-bit architectures.
+> 
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+
+(...)
+
+
+Yours sincerely,
+Vincent Mailhol
 
