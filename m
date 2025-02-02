@@ -1,213 +1,156 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DABB21F9F65;
-	Sun,  2 Feb 2025 14:31:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB10E1FBCB6;
+	Sun,  2 Feb 2025 17:53:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738506701; cv=none; b=BV42yTcrZdPDtrFZpt17xaUymFzJzfHaH6F2SN01O3+eYErPBfZMqB1OuuW78arb6AfFdMrd01sCASrLfhWbFhE0ofWjLDBUusDuhorml2r4TvySQfflR0Q9uDhbtdV9F/yu+03CY0E7bv0+NEWnSacWKoWq9+DtBcAuABYm36I=
+	t=1738518839; cv=none; b=ub+LKxdT6Nd/MharsksR5NA1OGvoK75GP6nzkMfqW983mmRZ2L0AewqU6R2H5AAyc1HrDPptuLXxDVsn5N9R9skGp4ykcUs25BXo2IWnOh7ibFC+xZonXxSDqirdj4xL11qldi2HCVlSO+ybIypRv3f3/So90KvAJ2DQ1rvdB6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738506701; c=relaxed/simple;
-	bh=CkmZWRHL7U+9vQ2VN/E7cee2NL7Lwa5MxL18HlBUD7w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=b8jbL22VkC844Ppdg1wpNpSJQvIGM8fTV3e7WV9NxTqR43jQ9qXkI5PWA2GxqVXMCVD99eTKOQQ40MFPBtM3F8u46Ji99WlpEeAWnD8I8ZMaI5AM0aIGXsLJ63x5MqCK27EpEAyfkffrRW+SnPBQPscz+Gy8JAzbeggLkNhCS80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=COuIHXFv; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1738518839; c=relaxed/simple;
+	bh=wJ1UIWu8ialmyd9DgBW/S9FAV5r3Qu1m/hwmDc7n5FU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CbpdXPcWvjXpg4RCUFAdM6KwJmdJsdIAeOQ5A/ke+kaH5UetinyXcGz9lz2JsxvnYgOtsdxYGrV2bDnDyl1stgs46J2s6sU/LFH646AReX6hx3YlKUmDgyq98VILRSIp1GBjx/n4+dzOx6rSMQla+5Qqxaij+GCYzr3jfL+4V7E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EL0EzNW3; arc=none smtp.client-ip=209.85.128.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="COuIHXFv"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAED5C4CEE4;
-	Sun,  2 Feb 2025 14:31:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738506700;
-	bh=CkmZWRHL7U+9vQ2VN/E7cee2NL7Lwa5MxL18HlBUD7w=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=COuIHXFvY9Fmz8k14Tt+PaXNqxvnQ2flvDJEc9wjySYd6LKFnHTTB7o/XrYxFJIuh
-	 TvIKgc4FmDfRYZRRg9lsoWkCfq44zi6EuEVlthbYHvBoa4kvDCAiNgwaV9wxT2lN1p
-	 auSbQfCVCNvhR0gOpJI4bBczNbKSaD7SmywxaqoMkhTI+hqRUz79uTSYvE94XQlL+4
-	 e70Bdkt9kYORsa9zc7ykpHehtuSDm5tnP8SaqXyQ0J2iFquuC0K+Lal+lqqJVVzWvD
-	 cn+GDzFEv0qFPhJY15l6/tPsLDa3MrYDc24OQ6KzWOf3h7quOKuEhtGLZUDJf3sYzp
-	 faYlj0yVRoQfA==
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5439a6179a7so3718620e87.1;
-        Sun, 02 Feb 2025 06:31:40 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVS8Q5QVhhOyF7QBXUYpgK8zR4VKGmCRpWt5ReXgED0WqeXqFF7wOAK+/SOLZrkKQiAtBjG4KG2qw06/g==@vger.kernel.org, AJvYcCXVc0bXPFgbEteMHG9VdB2vPPQ7ZNIpPEqhGS5v+ZO1qlV2RkGcyMoyZriSZkejiP3w6XQ5KC8QuV8EJf+2@vger.kernel.org
-X-Gm-Message-State: AOJu0YwO9aaL6gymuhSu1/QtApANL4g0VcLA1WzZMsUhBKMxS5RPMksL
-	/XDcWF71+D1bd4tUY1tZ+oSfxX65LmXXAxS9pmeVHi27X9HPxILbEUb/84bxzrAMjJG5E9+oa7o
-	Zh0GNly729wn4ZyEWaL8IhDhlf+c=
-X-Google-Smtp-Source: AGHT+IEQeSMyoRHbZbJv5099JI+erk95/GnmFnPSzwQOPTruEfIivETEmL1Rsq2c9JFpXeaImyGgsz4dLL+QhTO6FT4=
-X-Received: by 2002:a05:6512:3f27:b0:541:324e:d3ac with SMTP id
- 2adb3069b0e04-543f0eddce9mr3314661e87.3.1738506699058; Sun, 02 Feb 2025
- 06:31:39 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EL0EzNW3"
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-6f6cb364c7fso17285577b3.3;
+        Sun, 02 Feb 2025 09:53:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738518835; x=1739123635; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bu/o5ZKE+DmrVvfqpvDfKwO+d8/POCqsIdA64ajmPWE=;
+        b=EL0EzNW3p/UPCWPz5ixqlfJGRdBUqpe0WKZhc7nXfdCL8/VqiPW6x9P4SiH1/QOZd0
+         FjJUaHs/RXXdgqfUZ2+Dj0MoNBpGRPht3vC6qkq/vDm+m9Rt8joSyh7lbIDn1ri0e6Zy
+         SZLnZ7yQIz06zgKYYfIfRSaIF9XeCqUgXal7tdaW9T/iD4UQSKDuBVftGrGToRg5YFwf
+         YsXoYFt8d+c6adfG9fmn8Le0OX2t1eiJIDoC8gpMT+6tsiyM0eNoURWxoe2XvN+NH+Yo
+         UQKS6W2PAWb2FSjrcWrNkP9wWJmQKLglJMoaIuAFKA+V3pqOIPvTtc25GlrtT4iWlZrr
+         W5kw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738518835; x=1739123635;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bu/o5ZKE+DmrVvfqpvDfKwO+d8/POCqsIdA64ajmPWE=;
+        b=lFX9CW2Ej/CQ4fh6590qXQwVyC/60LbbjqztW2x0M/K1BcfCVcvAHVgp1jl2FMrt/Q
+         ogSWmE49G//JHtcblA4JZQVyBBlz/tuZw7Q34ZFwQc52dTTJ+a/8e2/We+NlVg/oatPU
+         ewXjt5h+mpme4wRnWSop0viOGmJMvnFugwQzb0HHXchrwJqQ9rqKrTEY3k+i7Oy2qDiU
+         4KBhEIQG+xrweB6ySe6c70cwJO/vZVcgHOzvzHFH2ZRLVayQlqZJAvXjmX6uZVDcMcoY
+         Tc/0kVohcBY8LjnND1vBoPov3Yl53Nh1jA85mwKXeZ2oSS1UFBQ8xdPLuvLLdmYJl3zO
+         kLlg==
+X-Forwarded-Encrypted: i=1; AJvYcCUAaajvYpz8GSj4uwIKIZ6e1iQmkQ4DNRARryjdFX2EF3QRBCoafBEi19HLPBsgZcIGWT2fCR/JEAZaNhYZ/SOoUzg=@vger.kernel.org, AJvYcCUyMLvJz0jFM+cf8vwi/Ol41pBzglnBX8qNf47Jxk3lq6xeFZsudL1z0kjiRZXMFEexC94plh4kX8UZtKOd@vger.kernel.org, AJvYcCUzR0qxnDRAKnfWoDtN3pgFAwaU2XDkKtOdkptEfnOK3Zxfjmg7q8Fk1bLDzpYJRBMRVrNM42XFwBtWaOg=@vger.kernel.org, AJvYcCWQA94JmZ+mXRYpsIgQUearpO9l6cc6scycTAVbiEEPTLjHaar4CO/GMPE2c0LDN0ehWF5Mqe5BBxNK@vger.kernel.org, AJvYcCWqO6+XOXU6i8QtuXaDUDaMEV4eG6QWJT5fIo6YnikOQw0l+hKh91OnZh0v9I/PeSk9EOzYYe45kVNepTAB@vger.kernel.org, AJvYcCX5/ErFzWLIR6q1Cab99QaEUsZ1gqJxQTJjIL/IzcgVE4zKIQq0tVyMaCGsZfTcUcFm9zOA4VXu9sTDzQ==@vger.kernel.org, AJvYcCXRJyy4eB36v/hQq2Jtg1D3kKuZ0NApl+flXdz52yJUYx1J12gZo+nmln1luDa4KrgLviVeAlssVy4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzslZo50tx0HH7PMmBGlgNIgZUjRYuVbFvxRDcnrM0qDjfoIO9t
+	1nPsIS/WBc7/325FpDUdMFw2NqrAhkE6YfOZFPRpnrqUdKJXgEeq
+X-Gm-Gg: ASbGncszc/3FFpH4moRgk6T4zetiveR/EFL2cMbbjKDRjQ92BcpFy8KKKSX5BkbStDL
+	WCd3dz5r0jT9VIZM9kedqZFLY70sORczXebsKTxs4e+VqTY4B7Xpps+EJChlQg/VogIafUrI5N7
+	Fm/jmFsPPXSiuFfQ/UjNvOcNIwYVfWvbQY3J+XBHILjxwC93wIPbCh1YnpJZenG1i9eGlHBAsxF
+	sWKzSNKWf/LTQTsHDMWbIH4xR86BE7Swvqwp7hAky8nFk9S5Ypcvm+JkXFLyjy+0swxyFE84aKX
+	/3JOczHz7VpQRXZE3mTN8ZaaZFV7sO6QGUuf/cqZEcZeoIqQqVI=
+X-Google-Smtp-Source: AGHT+IHHQI3478HvRiKWIVLIdATv32EFyyXdDb7s9xEv/S/0xqBbGzFcSVKK2nIkOtoAuYeOo+6nPg==
+X-Received: by 2002:a05:690c:6e09:b0:6f5:4304:fdc with SMTP id 00721157ae682-6f7a832a301mr158970467b3.6.1738518835574;
+        Sun, 02 Feb 2025 09:53:55 -0800 (PST)
+Received: from localhost (c-73-224-175-84.hsd1.fl.comcast.net. [73.224.175.84])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-6f8c465b884sm17908247b3.59.2025.02.02.09.53.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 02 Feb 2025 09:53:55 -0800 (PST)
+Date: Sun, 2 Feb 2025 12:53:53 -0500
+From: Yury Norov <yury.norov@gmail.com>
+To: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Cc: Geert Uytterhoeven <geert+renesas@glider.be>, linux-clk@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-renesas-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
+	qat-linux@intel.com, linux-gpio@vger.kernel.org,
+	linux-aspeed@lists.ozlabs.org, linux-iio@vger.kernel.org,
+	linux-sound@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S . Miller" <davem@davemloft.net>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>, Joel Stanley <joel@jms.id.au>,
+	Andrew Jeffery <andrew@codeconstruct.com.au>,
+	Crt Mori <cmo@melexis.com>, Jonathan Cameron <jic23@kernel.org>,
+	Lars-Peter Clausen <lars@metafoo.de>,
+	Jacky Huang <ychuang3@nuvoton.com>,
+	Shan-Chun Hung <schung@nuvoton.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Jakub Kicinski <kuba@kernel.org>, Alex Elder <elder@ieee.org>
+Subject: Re: [PATCH treewide v2 1/3] bitfield: Add non-constant
+ field_{prep,get}() helpers
+Message-ID: <Z5-xMUqrDuaE8Eo_@thinkpad>
+References: <cover.1738329458.git.geert+renesas@glider.be>
+ <1824412519cb8791ab428065116927ee7b77cf35.1738329459.git.geert+renesas@glider.be>
+ <e20a177a-30cd-4088-89e1-b479aba1356c@wanadoo.fr>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250130035130.180676-1-ebiggers@kernel.org> <20250130035130.180676-6-ebiggers@kernel.org>
-In-Reply-To: <20250130035130.180676-6-ebiggers@kernel.org>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Sun, 2 Feb 2025 15:31:28 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXG1y4GKQLb5nkNKonV8xEKethwMps7R-Pr-9MRgGPpxSw@mail.gmail.com>
-X-Gm-Features: AWEUYZk_93hvmJv5xf_ICL9sWSiT0RKTicZH6ANMBpKGURarhX1mYS--Rem7CM4
-Message-ID: <CAMj1kXG1y4GKQLb5nkNKonV8xEKethwMps7R-Pr-9MRgGPpxSw@mail.gmail.com>
-Subject: Re: [PATCH v2 05/11] lib/crc64: add support for arch-optimized implementations
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, x86@kernel.org, 
-	linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>, 
-	Kent Overstreet <kent.overstreet@linux.dev>, 
-	"Martin K . Petersen" <martin.petersen@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e20a177a-30cd-4088-89e1-b479aba1356c@wanadoo.fr>
 
-On Thu, 30 Jan 2025 at 04:54, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> From: Eric Biggers <ebiggers@google.com>
->
-> Add support for architecture-optimized implementations of the CRC64
-> library functions, following the approach taken for the CRC32 and
-> CRC-T10DIF library functions.
->
-> Also take the opportunity to tweak the function prototypes:
-> - Use 'const void *' for the lib entry points (since this is easier for
->   users) but 'const u8 *' for the underlying arch and generic functions
->   (since this is easier for the implementations of these functions).
-> - Don't bother with __pure.  It's an unusual optimization that doesn't
->   help properly written code.  It's a weird quirk we can do without.
->
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
->  include/linux/crc64.h | 26 ++++++++++++++++++++++----
->  lib/Kconfig           |  7 +++++++
->  lib/crc64.c           | 36 ++++++++----------------------------
->  3 files changed, 37 insertions(+), 32 deletions(-)
->
+On Sun, Feb 02, 2025 at 05:26:04PM +0900, Vincent Mailhol wrote:
+> On 31/01/2025 at 22:46, Geert Uytterhoeven wrote:
+> > The existing FIELD_{GET,PREP}() macros are limited to compile-time
+> > constants.  However, it is very common to prepare or extract bitfield
+> > elements where the bitfield mask is not a compile-time constant.
+> 
+> Why is it that the existing FIELD_{GET,PREP}() macros must be limited to
+> compile time constants?
 
-Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
+I guess, for historical reasons?
 
-> diff --git a/include/linux/crc64.h b/include/linux/crc64.h
-> index 17cf5af3e78e..41de30b907df 100644
-> --- a/include/linux/crc64.h
-> +++ b/include/linux/crc64.h
-> @@ -5,12 +5,28 @@
->  #ifndef _LINUX_CRC64_H
->  #define _LINUX_CRC64_H
->
->  #include <linux/types.h>
->
-> -u64 __pure crc64_be(u64 crc, const void *p, size_t len);
-> -u64 __pure crc64_nvme_generic(u64 crc, const void *p, size_t len);
-> +u64 crc64_be_arch(u64 crc, const u8 *p, size_t len);
-> +u64 crc64_be_generic(u64 crc, const u8 *p, size_t len);
-> +u64 crc64_nvme_arch(u64 crc, const u8 *p, size_t len);
-> +u64 crc64_nvme_generic(u64 crc, const u8 *p, size_t len);
-> +
-> +/**
-> + * crc64_be - Calculate bitwise big-endian ECMA-182 CRC64
-> + * @crc: seed value for computation. 0 or (u64)~0 for a new CRC calculation,
-> + *       or the previous crc64 value if computing incrementally.
-> + * @p: pointer to buffer over which CRC64 is run
-> + * @len: length of buffer @p
-> + */
-> +static inline u64 crc64_be(u64 crc, const void *p, size_t len)
-> +{
-> +       if (IS_ENABLED(CONFIG_CRC64_ARCH))
-> +               return crc64_be_arch(crc, p, len);
-> +       return crc64_be_generic(crc, p, len);
-> +}
->
->  /**
->   * crc64_nvme - Calculate CRC64-NVME
->   * @crc: seed value for computation. 0 for a new CRC calculation, or the
->   *      previous crc64 value if computing incrementally.
-> @@ -18,11 +34,13 @@ u64 __pure crc64_nvme_generic(u64 crc, const void *p, size_t len);
->   * @len: length of buffer @p
->   *
->   * This computes the CRC64 defined in the NVME NVM Command Set Specification,
->   * *including the bitwise inversion at the beginning and end*.
->   */
-> -static inline u64 crc64_nvme(u64 crc, const u8 *p, size_t len)
-> +static inline u64 crc64_nvme(u64 crc, const void *p, size_t len)
->  {
-> -       return crc64_nvme_generic(crc, p, len);
-> +       if (IS_ENABLED(CONFIG_CRC64_ARCH))
-> +               return ~crc64_nvme_arch(~crc, p, len);
-> +       return ~crc64_nvme_generic(~crc, p, len);
->  }
->
->  #endif /* _LINUX_CRC64_H */
-> diff --git a/lib/Kconfig b/lib/Kconfig
-> index da07fd39cf97..67bbf4f64dd9 100644
-> --- a/lib/Kconfig
-> +++ b/lib/Kconfig
-> @@ -199,10 +199,17 @@ config CRC64
->           This option is provided for the case where no in-kernel-tree
->           modules require CRC64 functions, but a module built outside
->           the kernel tree does. Such modules that use library CRC64
->           functions require M here.
->
-> +config ARCH_HAS_CRC64
-> +       bool
-> +
-> +config CRC64_ARCH
-> +       tristate
-> +       default CRC64 if ARCH_HAS_CRC64 && CRC_OPTIMIZATIONS
-> +
->  config CRC4
->         tristate "CRC4 functions"
->         help
->           This option is provided for the case where no in-kernel-tree
->           modules require CRC4 functions, but a module built outside
-> diff --git a/lib/crc64.c b/lib/crc64.c
-> index d6f3f245eede..5b1b17057f0a 100644
-> --- a/lib/crc64.c
-> +++ b/lib/crc64.c
-> @@ -39,40 +39,20 @@
->  #include "crc64table.h"
->
->  MODULE_DESCRIPTION("CRC64 calculations");
->  MODULE_LICENSE("GPL v2");
->
-> -/**
-> - * crc64_be - Calculate bitwise big-endian ECMA-182 CRC64
-> - * @crc: seed value for computation. 0 or (u64)~0 for a new CRC calculation,
-> - *       or the previous crc64 value if computing incrementally.
-> - * @p: pointer to buffer over which CRC64 is run
-> - * @len: length of buffer @p
-> - */
-> -u64 __pure crc64_be(u64 crc, const void *p, size_t len)
-> +u64 crc64_be_generic(u64 crc, const u8 *p, size_t len)
->  {
-> -       size_t i, t;
-> -
-> -       const unsigned char *_p = p;
-> -
-> -       for (i = 0; i < len; i++) {
-> -               t = ((crc >> 56) ^ (*_p++)) & 0xFF;
-> -               crc = crc64table[t] ^ (crc << 8);
-> -       }
-> -
-> +       while (len--)
-> +               crc = (crc << 8) ^ crc64table[(crc >> 56) ^ *p++];
->         return crc;
->  }
-> -EXPORT_SYMBOL_GPL(crc64_be);
-> +EXPORT_SYMBOL_GPL(crc64_be_generic);
->
-> -u64 __pure crc64_nvme_generic(u64 crc, const void *p, size_t len)
-> +u64 crc64_nvme_generic(u64 crc, const u8 *p, size_t len)
->  {
-> -       const unsigned char *_p = p;
-> -       size_t i;
-> -
-> -       crc = ~crc;
-> -
-> -       for (i = 0; i < len; i++)
-> -               crc = (crc >> 8) ^ crc64nvmetable[(crc & 0xff) ^ *_p++];
-> -
-> -       return ~crc;
-> +       while (len--)
-> +               crc = (crc >> 8) ^ crc64nvmetable[(crc & 0xff) ^ *p++];
-> +       return crc;
->  }
->  EXPORT_SYMBOL_GPL(crc64_nvme_generic);
-> --
-> 2.48.1
->
+> Instead of creating another variant for
+> non-constant bitfields, wouldn't it be better to make the existing macro
+> accept both?
+
+Yes, it would definitely be better IMO.
+
+> As far as I can see, only __BUILD_BUG_ON_NOT_POWER_OF_2()  and
+> __BF_FIELD_CHECK() need to be adjusted. I am thinking of this:
+> 
+> diff --git a/include/linux/bitfield.h b/include/linux/bitfield.h
+> index 63928f173223..c6bedab862d1 100644
+> --- a/include/linux/bitfield.h
+> +++ b/include/linux/bitfield.h
+> @@ -8,6 +8,7 @@
+>  #define _LINUX_BITFIELD_H
+> 
+>  #include <linux/build_bug.h>
+> +#include <linux/compiler.h>
+>  #include <asm/byteorder.h>
+> 
+>  /*
+> @@ -62,15 +63,13 @@
+> 
+>  #define __BF_FIELD_CHECK(_mask, _reg, _val, _pfx)                      \
+>         ({                                                              \
+> -               BUILD_BUG_ON_MSG(!__builtin_constant_p(_mask),          \
+> -                                _pfx "mask is not constant");          \
+> -               BUILD_BUG_ON_MSG((_mask) == 0, _pfx "mask is zero");    \
+> -               BUILD_BUG_ON_MSG(__builtin_constant_p(_val) ?           \
+> -                                ~((_mask) >> __bf_shf(_mask)) &        \
+> -                                       (0 + (_val)) : 0,               \
+> +               BUILD_BUG_ON_MSG(statically_true((_mask) == 0),         \
+> +                                _pfx "mask is zero");                  \
+> +               BUILD_BUG_ON_MSG(statically_true(~((_mask) >>
+
+This should be a const_true(), because statically_true() may be OK
+with something like:
+        ((runtime_var << 1) & 1 == 0)
+
+I think it's your own patch that adds const_true(): 4f3d1be4c2f8a :)
+
+Thanks,
+Yury
