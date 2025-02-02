@@ -1,172 +1,324 @@
-Received: from out.smtpout.orange.fr (out-13.smtpout.orange.fr [193.252.22.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A9F18BE7;
-	Sun,  2 Feb 2025 08:27:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8DA51E495;
+	Sun,  2 Feb 2025 14:27:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738484863; cv=none; b=r7I6IAAd8B5HpnbfRXWLtYdxv6MYPdBP/oLmyeTLde2Zr51UUwgRNYEMGPZmGRTOpvBwEmz90CSlN1cpCMv3Nc/JpV9K+ml2agsMvwTBexcnx1QIn9gbwhCk90sJTiFpVpsAu7tP5jJ6yqke+/4ab8O/eieU2SfhpNBcYBYEF4g=
+	t=1738506432; cv=none; b=b4GWlw7ljjVR+hMf2XPVv7x8GXr7lQjVdHlJA9EETgbbsylkNDgyyyWWRGBRVKj6xeuCznzWN+VXEq47+pHJfr5kDcXSv8+xOAYFUY3wAMIQ7gDdfwLPZ137b65iLOTN1NwFzNWeTZLC2n1rSodNXt9vumQSR23km+apTQ36fSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738484863; c=relaxed/simple;
-	bh=3R02TGIEWd2cVE8jGoGk2IukoLrWOAmI6UyxCl1vFdc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LUgU023YRTxZuRNY2oxBcMpXpDjnIJs5WAvy4bNrsR+IxiMNFMm4801PCYAEsuRlxo0shOtlEXLlIWhJWmrAsR54NkfvETJJRjx+g7kttnNa55zVNtwfLWbNwOUR+qAb8sYl78QGpRkYKz3Yw8koIE44Ngxy1Y+Itugh7dDksxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=Er14Dtt3; arc=none smtp.client-ip=193.252.22.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+	s=arc-20240116; t=1738506432; c=relaxed/simple;
+	bh=jQEZm4XOB3WPJPwFq9iKovjuHwqshJZaixb6rQCjL+w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=k7z0bL4DqHDQ+n3HZBCiqiGEAbtIJc2NFt9hrBo8pEjpJQFEj/i/DfLLKcxH8QEdOnp+oHE2YKeFRI0lBoK/6ia3fucsG6L/VH3hmzssbqLecTfI7qbApY95r1OlHRuLmJ92A2xhd6qQzNDvADwVnHj8cpMfg6iMU4OYsiazXnk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i5mba3cY; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="Er14Dtt3"
-Received: from [172.16.82.72] ([124.33.176.97])
-	by smtp.orange.fr with ESMTPA
-	id eVIrtwgZkM6ZbeVIwtQSlb; Sun, 02 Feb 2025 09:26:29 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1738484790;
-	bh=PzrthrLkW4R8v6fQu4F9Z0+3j1oj2AKD6gdwJR3+YjY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=Er14Dtt3+zfNicUpvicGUD6Vdf5OQJsDpkGPvY598Y41dT4BnaZJiPDU0Z9Am45FA
-	 rt5j0Pz9QRRm/z1mN2d3bb772DaBoyfWVgR/c2muJ80mlphsG3rFguogAus2nGUtIq
-	 SMzYzyRktW1gkaZRsNIAjVI989zqNQFAkzvJwc+c2MnnUIjwGsK+qKlmGw7er9lbI/
-	 pIddcTj+3U4H8qpjYBDjjnhQpTydKf0sXi6FZhIfK4nK0TsNcNc/SvIiJquLWgQ3LP
-	 O1s8+gqFJZHGsDqv+oFJDfLSh35L6j+QPDYeBSJJCpC011UxtV+bXz1kDtn/PestXd
-	 +aDON8InPsqFw==
-X-ME-Helo: [172.16.82.72]
-X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
-X-ME-Date: Sun, 02 Feb 2025 09:26:30 +0100
-X-ME-IP: 124.33.176.97
-Message-ID: <e20a177a-30cd-4088-89e1-b479aba1356c@wanadoo.fr>
-Date: Sun, 2 Feb 2025 17:26:04 +0900
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i5mba3cY"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98755C4CED2;
+	Sun,  2 Feb 2025 14:27:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738506432;
+	bh=jQEZm4XOB3WPJPwFq9iKovjuHwqshJZaixb6rQCjL+w=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=i5mba3cYNaEImviehPJvFXSnotQU6Lz40FeTY3IyzAFWIEzZs+HCswyfT3iviMe31
+	 oY4OjyEHipjkr/H9647OaNKNgpdG/5sIPkOIAWkYhPMOfBEzYw1Gwm4wZ29hhgz/Km
+	 qn/S7dfhFfUoSeudHA0VgEs0VbgjCbjtd61AFZybOUqomxfIdaA1uwI6TLbg97OM5u
+	 ynKugDykjZMPf3a/uKfZxfZzIhHuAEN1JrG8RDlHTAAi7a5Egc3jzigjlmhg0B6Cy9
+	 P3kUDGRRTknxP0wXx73eUXcE9wvLvzdwyHwvqv2+5AzNgtMh043v1Vb9+I+tyxzguQ
+	 VWZlhmBSffo5Q==
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-30034ad2ca3so27674751fa.1;
+        Sun, 02 Feb 2025 06:27:12 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCU8zYLaZ3CKtIKd0GG1nrXHKUMTD2piHxzjVDUdJiJJTGOJ9g4XjCI0wPfk54pK4uNqxTVzIFdzDuBokA==@vger.kernel.org, AJvYcCVCvIaFns0CjEL6VD3QJtw/JkMt32nRQbe7jPjbk3BXJ0o02phyQm54Qxtxy/W44pLfv4pfF80OTshU45U2@vger.kernel.org
+X-Gm-Message-State: AOJu0YwhdhJljIlslbnZPYzx8NJgstbyGOmtJTIlIUIQaWyHFdyt4JrP
+	FbsrcO+ecCkXVYQwkRBK6tvzHPD3j2dkZfm5p6B2JcX6IQABKVo/EXz+c2jLVmZKm4wM8muxydo
+	Yzc4EIUMFIvRyj7ZxnZd4TJHqoRM=
+X-Google-Smtp-Source: AGHT+IEAfnPhEt2EnMuWdM03YPzTR8J0PwLl+3XAC00oSVaStdRmpXraXEwkGNS+VTyKqDGIr5ZfxmawSXyj8Qds9Bs=
+X-Received: by 2002:a2e:bc83:0:b0:2ff:df01:2b43 with SMTP id
+ 38308e7fff4ca-30796891f9cmr86520891fa.18.1738506430919; Sun, 02 Feb 2025
+ 06:27:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH treewide v2 1/3] bitfield: Add non-constant
- field_{prep,get}() helpers
-To: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: linux-clk@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-renesas-soc@vger.kernel.org, linux-crypto@vger.kernel.org,
- qat-linux@intel.com, linux-gpio@vger.kernel.org,
- linux-aspeed@lists.ozlabs.org, linux-iio@vger.kernel.org,
- linux-sound@vger.kernel.org, linux-kernel@vger.kernel.org,
- Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
- <sboyd@kernel.org>, Nicolas Ferre <nicolas.ferre@microchip.com>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S . Miller" <davem@davemloft.net>,
- Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski
- <brgl@bgdev.pl>, Joel Stanley <joel@jms.id.au>,
- Andrew Jeffery <andrew@codeconstruct.com.au>, Crt Mori <cmo@melexis.com>,
- Jonathan Cameron <jic23@kernel.org>, Lars-Peter Clausen <lars@metafoo.de>,
- Jacky Huang <ychuang3@nuvoton.com>, Shan-Chun Hung <schung@nuvoton.com>,
- Yury Norov <yury.norov@gmail.com>,
- Rasmus Villemoes <linux@rasmusvillemoes.dk>, Jaroslav Kysela
- <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
- Johannes Berg <johannes@sipsolutions.net>, Jakub Kicinski <kuba@kernel.org>,
- Alex Elder <elder@ieee.org>
-References: <cover.1738329458.git.geert+renesas@glider.be>
- <1824412519cb8791ab428065116927ee7b77cf35.1738329459.git.geert+renesas@glider.be>
-Content-Language: en-US
-From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Autocrypt: addr=mailhol.vincent@wanadoo.fr; keydata=
- xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
- LFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI+wrIEExYKAFoC
- GwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AWIQTtj3AFdOZ/IOV06OKrX+uI
- bbuZwgUCZx41XhgYaGtwczovL2tleXMub3BlbnBncC5vcmcACgkQq1/riG27mcIYiwEAkgKK
- BJ+ANKwhTAAvL1XeApQ+2NNNEwFWzipVAGvTRigA+wUeyB3UQwZrwb7jsQuBXxhk3lL45HF5
- 8+y4bQCUCqYGzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrbYZzu0JG5w8gxE6EtQe6LmxKMqP6E
- yR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDldOjiq1/riG27mcIFAmceMvMCGwwF
- CQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8VzsZwr/S44HCzcz5+jkxnVVQ5LZ4B
- ANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
-In-Reply-To: <1824412519cb8791ab428065116927ee7b77cf35.1738329459.git.geert+renesas@glider.be>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250130035130.180676-1-ebiggers@kernel.org> <20250130035130.180676-2-ebiggers@kernel.org>
+In-Reply-To: <20250130035130.180676-2-ebiggers@kernel.org>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Sun, 2 Feb 2025 15:26:59 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXF45OmZNRrCntJJPtOysd=DRLtsV3w2VJK8FzGm0xOebA@mail.gmail.com>
+X-Gm-Features: AWEUYZllI8AfXi3fW5jM4iR2OTLuSmDRxhTyvkt5Un-FFJQehDwUbFF4lGXAB4E
+Message-ID: <CAMj1kXF45OmZNRrCntJJPtOysd=DRLtsV3w2VJK8FzGm0xOebA@mail.gmail.com>
+Subject: Re: [PATCH v2 01/11] lib/crc64-rocksoft: stop wrapping the crypto API
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, x86@kernel.org, 
+	linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>, 
+	Kent Overstreet <kent.overstreet@linux.dev>, 
+	"Martin K . Petersen" <martin.petersen@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 31/01/2025 at 22:46, Geert Uytterhoeven wrote:
-> The existing FIELD_{GET,PREP}() macros are limited to compile-time
-> constants.  However, it is very common to prepare or extract bitfield
-> elements where the bitfield mask is not a compile-time constant.
+On Thu, 30 Jan 2025 at 04:54, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> From: Eric Biggers <ebiggers@google.com>
+>
+> Following what was done for the CRC32 and CRC-T10DIF library functions,
+> get rid of the pointless use of the crypto API and make
+> crc64_rocksoft_update() call into the library directly.  This is faster
+> and simpler.
+>
+> Remove crc64_rocksoft() (the version of the function that did not take a
+> 'crc' argument) since it is unused.
+>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>  block/Kconfig         |   2 +-
+>  include/linux/crc64.h |  13 ++++-
+>  lib/Kconfig           |   9 ---
+>  lib/Makefile          |   1 -
+>  lib/crc64-rocksoft.c  | 126 ------------------------------------------
+>  lib/crc64.c           |   7 ---
+>  6 files changed, 12 insertions(+), 146 deletions(-)
+>  delete mode 100644 lib/crc64-rocksoft.c
+>
 
-Why is it that the existing FIELD_{GET,PREP}() macros must be limited to
-compile time constants? Instead of creating another variant for
-non-constant bitfields, wouldn't it be better to make the existing macro
-accept both?
+Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
 
-As far as I can see, only __BUILD_BUG_ON_NOT_POWER_OF_2()  and
-__BF_FIELD_CHECK() need to be adjusted. I am thinking of this:
-
-diff --git a/include/linux/bitfield.h b/include/linux/bitfield.h
-index 63928f173223..c6bedab862d1 100644
---- a/include/linux/bitfield.h
-+++ b/include/linux/bitfield.h
-@@ -8,6 +8,7 @@
- #define _LINUX_BITFIELD_H
-
- #include <linux/build_bug.h>
-+#include <linux/compiler.h>
- #include <asm/byteorder.h>
-
- /*
-@@ -62,15 +63,13 @@
-
- #define __BF_FIELD_CHECK(_mask, _reg, _val, _pfx)                      \
-        ({                                                              \
--               BUILD_BUG_ON_MSG(!__builtin_constant_p(_mask),          \
--                                _pfx "mask is not constant");          \
--               BUILD_BUG_ON_MSG((_mask) == 0, _pfx "mask is zero");    \
--               BUILD_BUG_ON_MSG(__builtin_constant_p(_val) ?           \
--                                ~((_mask) >> __bf_shf(_mask)) &        \
--                                       (0 + (_val)) : 0,               \
-+               BUILD_BUG_ON_MSG(statically_true((_mask) == 0),         \
-+                                _pfx "mask is zero");                  \
-+               BUILD_BUG_ON_MSG(statically_true(~((_mask) >>
-__bf_shf(_mask)) & \
-+                                                (0 + (_val))),         \
-                                 _pfx "value too large for the field"); \
--               BUILD_BUG_ON_MSG(__bf_cast_unsigned(_mask, _mask) >     \
--                                __bf_cast_unsigned(_reg, ~0ull),       \
-+
-BUILD_BUG_ON_MSG(statically_true(__bf_cast_unsigned(_mask, _mask) > \
-+
-__bf_cast_unsigned(_reg, ~0ull)), \
-                                 _pfx "type of reg too small for mask"); \
-                __BUILD_BUG_ON_NOT_POWER_OF_2((_mask) +                 \
-                                              (1ULL << __bf_shf(_mask))); \
-diff --git a/include/linux/build_bug.h b/include/linux/build_bug.h
-index 3aa3640f8c18..3b8055ebb55f 100644
---- a/include/linux/build_bug.h
-+++ b/include/linux/build_bug.h
-@@ -18,9 +18,9 @@
-
- /* Force a compilation error if a constant expression is not a power of
-2 */
- #define __BUILD_BUG_ON_NOT_POWER_OF_2(n)       \
--       BUILD_BUG_ON(((n) & ((n) - 1)) != 0)
-+       BUILD_BUG_ON(statically_true((n) & ((n) - 1)))
- #define BUILD_BUG_ON_NOT_POWER_OF_2(n)                 \
--       BUILD_BUG_ON((n) == 0 || (((n) & ((n) - 1)) != 0))
-+       BUILD_BUG_ON(statically_true(!(n) || ((n) & ((n) - 1))))
-
- /*
-  * BUILD_BUG_ON_INVALID() permits the compiler to check the validity of the
-
-
-> To avoid this limitation, the AT91 clock driver and several other
-> drivers already have their own non-const field_{prep,get}() macros.
-> Make them available for general use by consolidating them in
-> <linux/bitfield.h>, and improve them slightly:
->   1. Avoid evaluating macro parameters more than once,
->   2. Replace "ffs() - 1" by "__ffs()",
->   3. Support 64-bit use on 32-bit architectures.
-> 
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-
-(...)
-
-
-Yours sincerely,
-Vincent Mailhol
-
+> diff --git a/block/Kconfig b/block/Kconfig
+> index 5b623b876d3b..df8973bc0539 100644
+> --- a/block/Kconfig
+> +++ b/block/Kconfig
+> @@ -61,11 +61,11 @@ config BLK_DEV_BSGLIB
+>           If unsure, say N.
+>
+>  config BLK_DEV_INTEGRITY
+>         bool "Block layer data integrity support"
+>         select CRC_T10DIF
+> -       select CRC64_ROCKSOFT
+> +       select CRC64
+>         help
+>         Some storage devices allow extra information to be
+>         stored/retrieved to help protect the data.  The block layer
+>         data integrity option provides hooks which can be used by
+>         filesystems to ensure better data integrity.
+> diff --git a/include/linux/crc64.h b/include/linux/crc64.h
+> index e044c60d1e61..0a595b272166 100644
+> --- a/include/linux/crc64.h
+> +++ b/include/linux/crc64.h
+> @@ -10,9 +10,18 @@
+>  #define CRC64_ROCKSOFT_STRING "crc64-rocksoft"
+>
+>  u64 __pure crc64_be(u64 crc, const void *p, size_t len);
+>  u64 __pure crc64_rocksoft_generic(u64 crc, const void *p, size_t len);
+>
+> -u64 crc64_rocksoft(const unsigned char *buffer, size_t len);
+> -u64 crc64_rocksoft_update(u64 crc, const unsigned char *buffer, size_t len);
+> +/**
+> + * crc64_rocksoft_update - Calculate bitwise Rocksoft CRC64
+> + * @crc: seed value for computation. 0 for a new CRC calculation, or the
+> + *      previous crc64 value if computing incrementally.
+> + * @p: pointer to buffer over which CRC64 is run
+> + * @len: length of buffer @p
+> + */
+> +static inline u64 crc64_rocksoft_update(u64 crc, const u8 *p, size_t len)
+> +{
+> +       return crc64_rocksoft_generic(crc, p, len);
+> +}
+>
+>  #endif /* _LINUX_CRC64_H */
+> diff --git a/lib/Kconfig b/lib/Kconfig
+> index dccb61b7d698..da07fd39cf97 100644
+> --- a/lib/Kconfig
+> +++ b/lib/Kconfig
+> @@ -166,19 +166,10 @@ config ARCH_HAS_CRC_T10DIF
+>
+>  config CRC_T10DIF_ARCH
+>         tristate
+>         default CRC_T10DIF if ARCH_HAS_CRC_T10DIF && CRC_OPTIMIZATIONS
+>
+> -config CRC64_ROCKSOFT
+> -       tristate "CRC calculation for the Rocksoft model CRC64"
+> -       select CRC64
+> -       select CRYPTO
+> -       select CRYPTO_CRC64_ROCKSOFT
+> -       help
+> -         This option provides a CRC64 API to a registered crypto driver.
+> -         This is used with the block layer's data integrity subsystem.
+> -
+>  config CRC_ITU_T
+>         tristate "CRC ITU-T V.41 functions"
+>         help
+>           This option is provided for the case where no in-kernel-tree
+>           modules require CRC ITU-T V.41 functions, but a module built outside
+> diff --git a/lib/Makefile b/lib/Makefile
+> index f1c6e9d76a7c..518018b2a5d4 100644
+> --- a/lib/Makefile
+> +++ b/lib/Makefile
+> @@ -164,11 +164,10 @@ obj-$(CONFIG_CRC_ITU_T)   += crc-itu-t.o
+>  obj-$(CONFIG_CRC32)    += crc32.o
+>  obj-$(CONFIG_CRC64)     += crc64.o
+>  obj-$(CONFIG_CRC4)     += crc4.o
+>  obj-$(CONFIG_CRC7)     += crc7.o
+>  obj-$(CONFIG_CRC8)     += crc8.o
+> -obj-$(CONFIG_CRC64_ROCKSOFT) += crc64-rocksoft.o
+>  obj-$(CONFIG_XXHASH)   += xxhash.o
+>  obj-$(CONFIG_GENERIC_ALLOCATOR) += genalloc.o
+>
+>  obj-$(CONFIG_842_COMPRESS) += 842/
+>  obj-$(CONFIG_842_DECOMPRESS) += 842/
+> diff --git a/lib/crc64-rocksoft.c b/lib/crc64-rocksoft.c
+> deleted file mode 100644
+> index fc9ae0da5df7..000000000000
+> --- a/lib/crc64-rocksoft.c
+> +++ /dev/null
+> @@ -1,126 +0,0 @@
+> -// SPDX-License-Identifier: GPL-2.0-only
+> -
+> -#include <linux/types.h>
+> -#include <linux/module.h>
+> -#include <linux/crc64.h>
+> -#include <linux/err.h>
+> -#include <linux/init.h>
+> -#include <crypto/hash.h>
+> -#include <crypto/algapi.h>
+> -#include <linux/static_key.h>
+> -#include <linux/notifier.h>
+> -
+> -static struct crypto_shash __rcu *crc64_rocksoft_tfm;
+> -static DEFINE_STATIC_KEY_TRUE(crc64_rocksoft_fallback);
+> -static DEFINE_MUTEX(crc64_rocksoft_mutex);
+> -static struct work_struct crc64_rocksoft_rehash_work;
+> -
+> -static int crc64_rocksoft_notify(struct notifier_block *self, unsigned long val, void *data)
+> -{
+> -       struct crypto_alg *alg = data;
+> -
+> -       if (val != CRYPTO_MSG_ALG_LOADED ||
+> -           strcmp(alg->cra_name, CRC64_ROCKSOFT_STRING))
+> -               return NOTIFY_DONE;
+> -
+> -       schedule_work(&crc64_rocksoft_rehash_work);
+> -       return NOTIFY_OK;
+> -}
+> -
+> -static void crc64_rocksoft_rehash(struct work_struct *work)
+> -{
+> -       struct crypto_shash *new, *old;
+> -
+> -       mutex_lock(&crc64_rocksoft_mutex);
+> -       old = rcu_dereference_protected(crc64_rocksoft_tfm,
+> -                                       lockdep_is_held(&crc64_rocksoft_mutex));
+> -       new = crypto_alloc_shash(CRC64_ROCKSOFT_STRING, 0, 0);
+> -       if (IS_ERR(new)) {
+> -               mutex_unlock(&crc64_rocksoft_mutex);
+> -               return;
+> -       }
+> -       rcu_assign_pointer(crc64_rocksoft_tfm, new);
+> -       mutex_unlock(&crc64_rocksoft_mutex);
+> -
+> -       if (old) {
+> -               synchronize_rcu();
+> -               crypto_free_shash(old);
+> -       } else {
+> -               static_branch_disable(&crc64_rocksoft_fallback);
+> -       }
+> -}
+> -
+> -static struct notifier_block crc64_rocksoft_nb = {
+> -       .notifier_call = crc64_rocksoft_notify,
+> -};
+> -
+> -u64 crc64_rocksoft_update(u64 crc, const unsigned char *buffer, size_t len)
+> -{
+> -       struct {
+> -               struct shash_desc shash;
+> -               u64 crc;
+> -       } desc;
+> -       int err;
+> -
+> -       if (static_branch_unlikely(&crc64_rocksoft_fallback))
+> -               return crc64_rocksoft_generic(crc, buffer, len);
+> -
+> -       rcu_read_lock();
+> -       desc.shash.tfm = rcu_dereference(crc64_rocksoft_tfm);
+> -       desc.crc = crc;
+> -       err = crypto_shash_update(&desc.shash, buffer, len);
+> -       rcu_read_unlock();
+> -
+> -       BUG_ON(err);
+> -
+> -       return desc.crc;
+> -}
+> -EXPORT_SYMBOL_GPL(crc64_rocksoft_update);
+> -
+> -u64 crc64_rocksoft(const unsigned char *buffer, size_t len)
+> -{
+> -       return crc64_rocksoft_update(0, buffer, len);
+> -}
+> -EXPORT_SYMBOL_GPL(crc64_rocksoft);
+> -
+> -static int __init crc64_rocksoft_mod_init(void)
+> -{
+> -       INIT_WORK(&crc64_rocksoft_rehash_work, crc64_rocksoft_rehash);
+> -       crypto_register_notifier(&crc64_rocksoft_nb);
+> -       crc64_rocksoft_rehash(&crc64_rocksoft_rehash_work);
+> -       return 0;
+> -}
+> -
+> -static void __exit crc64_rocksoft_mod_fini(void)
+> -{
+> -       crypto_unregister_notifier(&crc64_rocksoft_nb);
+> -       cancel_work_sync(&crc64_rocksoft_rehash_work);
+> -       crypto_free_shash(rcu_dereference_protected(crc64_rocksoft_tfm, 1));
+> -}
+> -
+> -module_init(crc64_rocksoft_mod_init);
+> -module_exit(crc64_rocksoft_mod_fini);
+> -
+> -static int crc64_rocksoft_transform_show(char *buffer, const struct kernel_param *kp)
+> -{
+> -       struct crypto_shash *tfm;
+> -       int len;
+> -
+> -       if (static_branch_unlikely(&crc64_rocksoft_fallback))
+> -               return sprintf(buffer, "fallback\n");
+> -
+> -       rcu_read_lock();
+> -       tfm = rcu_dereference(crc64_rocksoft_tfm);
+> -       len = snprintf(buffer, PAGE_SIZE, "%s\n",
+> -                      crypto_shash_driver_name(tfm));
+> -       rcu_read_unlock();
+> -
+> -       return len;
+> -}
+> -
+> -module_param_call(transform, NULL, crc64_rocksoft_transform_show, NULL, 0444);
+> -
+> -MODULE_AUTHOR("Keith Busch <kbusch@kernel.org>");
+> -MODULE_DESCRIPTION("Rocksoft model CRC64 calculation (library API)");
+> -MODULE_LICENSE("GPL");
+> -MODULE_SOFTDEP("pre: crc64");
+> diff --git a/lib/crc64.c b/lib/crc64.c
+> index 61ae8dfb6a1c..b5136fb4c199 100644
+> --- a/lib/crc64.c
+> +++ b/lib/crc64.c
+> @@ -61,17 +61,10 @@ u64 __pure crc64_be(u64 crc, const void *p, size_t len)
+>
+>         return crc;
+>  }
+>  EXPORT_SYMBOL_GPL(crc64_be);
+>
+> -/**
+> - * crc64_rocksoft_generic - Calculate bitwise Rocksoft CRC64
+> - * @crc: seed value for computation. 0 for a new CRC calculation, or the
+> - *      previous crc64 value if computing incrementally.
+> - * @p: pointer to buffer over which CRC64 is run
+> - * @len: length of buffer @p
+> - */
+>  u64 __pure crc64_rocksoft_generic(u64 crc, const void *p, size_t len)
+>  {
+>         const unsigned char *_p = p;
+>         size_t i;
+>
+> --
+> 2.48.1
+>
