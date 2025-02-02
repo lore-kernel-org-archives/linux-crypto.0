@@ -1,55 +1,55 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8DA51E495;
-	Sun,  2 Feb 2025 14:27:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1A481F9EAA;
+	Sun,  2 Feb 2025 14:27:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738506432; cv=none; b=b4GWlw7ljjVR+hMf2XPVv7x8GXr7lQjVdHlJA9EETgbbsylkNDgyyyWWRGBRVKj6xeuCznzWN+VXEq47+pHJfr5kDcXSv8+xOAYFUY3wAMIQ7gDdfwLPZ137b65iLOTN1NwFzNWeTZLC2n1rSodNXt9vumQSR23km+apTQ36fSA=
+	t=1738506462; cv=none; b=dPFyvibDc0OnO3qYC0d7SwdIGs9JUCnwOUaTYGY4vHMF9NHNA9xXtH/4c6sXUcazO170hJlSQBbnDUxJKRyvgTe7is1lJCGzfR6wqmV2h3Sz+F8xZalwvkuNnZbljNuMqUppbFGX/fPFhzEQ7dZJHtyDgznLI9+NeZD44xGDPfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738506432; c=relaxed/simple;
-	bh=jQEZm4XOB3WPJPwFq9iKovjuHwqshJZaixb6rQCjL+w=;
+	s=arc-20240116; t=1738506462; c=relaxed/simple;
+	bh=b68pz4gOl8YlOvdM1uTxMJG3AplbVLYXqJoL5W41jic=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=k7z0bL4DqHDQ+n3HZBCiqiGEAbtIJc2NFt9hrBo8pEjpJQFEj/i/DfLLKcxH8QEdOnp+oHE2YKeFRI0lBoK/6ia3fucsG6L/VH3hmzssbqLecTfI7qbApY95r1OlHRuLmJ92A2xhd6qQzNDvADwVnHj8cpMfg6iMU4OYsiazXnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i5mba3cY; arc=none smtp.client-ip=10.30.226.201
+	 To:Cc:Content-Type; b=WGxaFFr9u+6eyPgUkLk0pX++wdhiPiuBUIbQf2RhnE5NMxmhbvOda8LnByIPb1I2SNx+ljIzMq0LDJEN3ZAEUxGC4WMW0EqHxSELH4JMyWvMRh8OeBX9NEn0ovS3zSwBdvdxAac4pUIX3jSInRMcwJtrGeIFfaUWftNN8oiZ9go=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zo6JEpD0; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i5mba3cY"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98755C4CED2;
-	Sun,  2 Feb 2025 14:27:12 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zo6JEpD0"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2C59C4CED1;
+	Sun,  2 Feb 2025 14:27:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738506432;
-	bh=jQEZm4XOB3WPJPwFq9iKovjuHwqshJZaixb6rQCjL+w=;
+	s=k20201202; t=1738506462;
+	bh=b68pz4gOl8YlOvdM1uTxMJG3AplbVLYXqJoL5W41jic=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=i5mba3cYNaEImviehPJvFXSnotQU6Lz40FeTY3IyzAFWIEzZs+HCswyfT3iviMe31
-	 oY4OjyEHipjkr/H9647OaNKNgpdG/5sIPkOIAWkYhPMOfBEzYw1Gwm4wZ29hhgz/Km
-	 qn/S7dfhFfUoSeudHA0VgEs0VbgjCbjtd61AFZybOUqomxfIdaA1uwI6TLbg97OM5u
-	 ynKugDykjZMPf3a/uKfZxfZzIhHuAEN1JrG8RDlHTAAi7a5Egc3jzigjlmhg0B6Cy9
-	 P3kUDGRRTknxP0wXx73eUXcE9wvLvzdwyHwvqv2+5AzNgtMh043v1Vb9+I+tyxzguQ
-	 VWZlhmBSffo5Q==
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-30034ad2ca3so27674751fa.1;
-        Sun, 02 Feb 2025 06:27:12 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCU8zYLaZ3CKtIKd0GG1nrXHKUMTD2piHxzjVDUdJiJJTGOJ9g4XjCI0wPfk54pK4uNqxTVzIFdzDuBokA==@vger.kernel.org, AJvYcCVCvIaFns0CjEL6VD3QJtw/JkMt32nRQbe7jPjbk3BXJ0o02phyQm54Qxtxy/W44pLfv4pfF80OTshU45U2@vger.kernel.org
-X-Gm-Message-State: AOJu0YwhdhJljIlslbnZPYzx8NJgstbyGOmtJTIlIUIQaWyHFdyt4JrP
-	FbsrcO+ecCkXVYQwkRBK6tvzHPD3j2dkZfm5p6B2JcX6IQABKVo/EXz+c2jLVmZKm4wM8muxydo
-	Yzc4EIUMFIvRyj7ZxnZd4TJHqoRM=
-X-Google-Smtp-Source: AGHT+IEAfnPhEt2EnMuWdM03YPzTR8J0PwLl+3XAC00oSVaStdRmpXraXEwkGNS+VTyKqDGIr5ZfxmawSXyj8Qds9Bs=
-X-Received: by 2002:a2e:bc83:0:b0:2ff:df01:2b43 with SMTP id
- 38308e7fff4ca-30796891f9cmr86520891fa.18.1738506430919; Sun, 02 Feb 2025
- 06:27:10 -0800 (PST)
+	b=Zo6JEpD0sFPUIRJUsRODi1QdBFGhqw5lQZNgXYIGzNuEju0902ZTlO6nFnKQCog7x
+	 IrfsDpr0huQyfrQIppnG/M1GdQJVsNyaaYzelipiArHZdcaph3nwzYvMjsobbZahTO
+	 JsUTtY8xSN8rPHWYefYnGFeeqjf6WKizGbdEC5DF9F7qv+9GQjYxzi3b6PWAgZqhvd
+	 7SpJyNwVz9iN6622P20H2/81S2Ykcy6BDO3WS5hjvB+KalpdzrSPQe07jbrSZJU3Js
+	 tGk/nESp31lfXSZCYRHMvSNax+TQSh/BNXeqhJinXScPNod4mqnlAZzG5UjVJqcup/
+	 FMehefVIqeI5g==
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5401ab97206so3388349e87.3;
+        Sun, 02 Feb 2025 06:27:42 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCV3V17OvMywNBxMkCyQEsT/swoauBj27OZxi3UzJlNxPcsRXddHCEpDW1GQu0j5b3bc06LngXSpUvRMPA==@vger.kernel.org, AJvYcCVcooS8Yq6S7AEpiwGmSoDEXQRXY35KNRZ5EE5hiYeWhLHN33frC5IFZWaNQOmkoOyGeZNI9NVSNKANR0vp@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlHF7PqA23Bb6afYa4SKZ19iwITyqEJQNnwbWEt3Cxq3TLm1Rb
+	tb9fQlO7hWxH4C+dPkn+G9zhs7sJbBsje/P9Uh32g6xNDvOXDm8sOUXIqsQlcRDUDXOAOtvA5/D
+	N08z5+pTDZBkj+JWVkX2ymJnqdws=
+X-Google-Smtp-Source: AGHT+IGjO9BT6eyDKkjHcOj+a7ATxahcOZCz4LEUD9rXpB8Rfxf0HbUwA/T09Ey6MbiK5M+d2aYOnZ1x3EljKTxWqFw=
+X-Received: by 2002:ac2:4c30:0:b0:542:238d:d714 with SMTP id
+ 2adb3069b0e04-543e4c31223mr5417185e87.32.1738506460972; Sun, 02 Feb 2025
+ 06:27:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250130035130.180676-1-ebiggers@kernel.org> <20250130035130.180676-2-ebiggers@kernel.org>
-In-Reply-To: <20250130035130.180676-2-ebiggers@kernel.org>
+References: <20250130035130.180676-1-ebiggers@kernel.org> <20250130035130.180676-3-ebiggers@kernel.org>
+In-Reply-To: <20250130035130.180676-3-ebiggers@kernel.org>
 From: Ard Biesheuvel <ardb@kernel.org>
-Date: Sun, 2 Feb 2025 15:26:59 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXF45OmZNRrCntJJPtOysd=DRLtsV3w2VJK8FzGm0xOebA@mail.gmail.com>
-X-Gm-Features: AWEUYZllI8AfXi3fW5jM4iR2OTLuSmDRxhTyvkt5Un-FFJQehDwUbFF4lGXAB4E
-Message-ID: <CAMj1kXF45OmZNRrCntJJPtOysd=DRLtsV3w2VJK8FzGm0xOebA@mail.gmail.com>
-Subject: Re: [PATCH v2 01/11] lib/crc64-rocksoft: stop wrapping the crypto API
+Date: Sun, 2 Feb 2025 15:27:29 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXGVRKZZ2ou0_3R09j59C+35pj9KadaeMrcn0WhuBbeE5g@mail.gmail.com>
+X-Gm-Features: AWEUYZmHANfUdWvTu7dta6n_W-QGYL747qnE_qUdGhGrSjK9pzgoQ_NS5RwbdL0
+Message-ID: <CAMj1kXGVRKZZ2ou0_3R09j59C+35pj9KadaeMrcn0WhuBbeE5g@mail.gmail.com>
+Subject: Re: [PATCH v2 02/11] crypto: crc64-rocksoft - remove from crypto API
 To: Eric Biggers <ebiggers@kernel.org>
 Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, x86@kernel.org, 
 	linux-block@vger.kernel.org, Keith Busch <kbusch@kernel.org>, 
@@ -61,264 +61,239 @@ On Thu, 30 Jan 2025 at 04:54, Eric Biggers <ebiggers@kernel.org> wrote:
 >
 > From: Eric Biggers <ebiggers@google.com>
 >
-> Following what was done for the CRC32 and CRC-T10DIF library functions,
-> get rid of the pointless use of the crypto API and make
-> crc64_rocksoft_update() call into the library directly.  This is faster
-> and simpler.
+> Remove crc64-rocksoft from the crypto API.  It has no known user now
+> that the lib is no longer built on top of it.  It was also added much
+> more recently than the longstanding crc32 and crc32c.  Unlike crc32 and
+> crc32c, crc64-rocksoft is also not mentioned in the dm-integrity
+> documentation and there are no references to it in anywhere in the
+> cryptsetup git repo, so it is unlikely to have any user there either.
 >
-> Remove crc64_rocksoft() (the version of the function that did not take a
-> 'crc' argument) since it is unused.
+> Also, this CRC variant is named incorrectly; it has nothing to do with
+> Rocksoft and should be called crc64-nvme.  That is yet another reason to
+> remove it from the crypto API; we would not want anyone to start
+> depending on the current incorrect algorithm name of crc64-rocksoft.
+>
+> Note that this change temporarily makes this CRC variant not be covered
+> by any tests, as previously it was relying on the crypto self-tests.
+> This will be fixed by adding this CRC variant to crc_kunit.
 >
 > Signed-off-by: Eric Biggers <ebiggers@google.com>
 > ---
->  block/Kconfig         |   2 +-
->  include/linux/crc64.h |  13 ++++-
->  lib/Kconfig           |   9 ---
->  lib/Makefile          |   1 -
->  lib/crc64-rocksoft.c  | 126 ------------------------------------------
->  lib/crc64.c           |   7 ---
->  6 files changed, 12 insertions(+), 146 deletions(-)
->  delete mode 100644 lib/crc64-rocksoft.c
+>  crypto/Kconfig                  | 11 ----
+>  crypto/Makefile                 |  1 -
+>  crypto/crc64_rocksoft_generic.c | 89 ---------------------------------
+>  crypto/testmgr.c                |  7 ---
+>  crypto/testmgr.h                | 12 -----
+>  include/linux/crc64.h           |  2 -
+>  6 files changed, 122 deletions(-)
+>  delete mode 100644 crypto/crc64_rocksoft_generic.c
 >
 
 Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
 
-> diff --git a/block/Kconfig b/block/Kconfig
-> index 5b623b876d3b..df8973bc0539 100644
-> --- a/block/Kconfig
-> +++ b/block/Kconfig
-> @@ -61,11 +61,11 @@ config BLK_DEV_BSGLIB
->           If unsure, say N.
->
->  config BLK_DEV_INTEGRITY
->         bool "Block layer data integrity support"
->         select CRC_T10DIF
-> -       select CRC64_ROCKSOFT
-> +       select CRC64
+> diff --git a/crypto/Kconfig b/crypto/Kconfig
+> index 74ae5f52b784..9ffb59b1aac3 100644
+> --- a/crypto/Kconfig
+> +++ b/crypto/Kconfig
+> @@ -1088,21 +1088,10 @@ config CRYPTO_CRCT10DIF
 >         help
->         Some storage devices allow extra information to be
->         stored/retrieved to help protect the data.  The block layer
->         data integrity option provides hooks which can be used by
->         filesystems to ensure better data integrity.
-> diff --git a/include/linux/crc64.h b/include/linux/crc64.h
-> index e044c60d1e61..0a595b272166 100644
-> --- a/include/linux/crc64.h
-> +++ b/include/linux/crc64.h
-> @@ -10,9 +10,18 @@
->  #define CRC64_ROCKSOFT_STRING "crc64-rocksoft"
+>           CRC16 CRC algorithm used for the T10 (SCSI) Data Integrity Field (DIF)
 >
->  u64 __pure crc64_be(u64 crc, const void *p, size_t len);
->  u64 __pure crc64_rocksoft_generic(u64 crc, const void *p, size_t len);
+>           CRC algorithm used by the SCSI Block Commands standard.
 >
-> -u64 crc64_rocksoft(const unsigned char *buffer, size_t len);
-> -u64 crc64_rocksoft_update(u64 crc, const unsigned char *buffer, size_t len);
-> +/**
-> + * crc64_rocksoft_update - Calculate bitwise Rocksoft CRC64
-> + * @crc: seed value for computation. 0 for a new CRC calculation, or the
-> + *      previous crc64 value if computing incrementally.
-> + * @p: pointer to buffer over which CRC64 is run
-> + * @len: length of buffer @p
-> + */
-> +static inline u64 crc64_rocksoft_update(u64 crc, const u8 *p, size_t len)
-> +{
-> +       return crc64_rocksoft_generic(crc, p, len);
-> +}
->
->  #endif /* _LINUX_CRC64_H */
-> diff --git a/lib/Kconfig b/lib/Kconfig
-> index dccb61b7d698..da07fd39cf97 100644
-> --- a/lib/Kconfig
-> +++ b/lib/Kconfig
-> @@ -166,19 +166,10 @@ config ARCH_HAS_CRC_T10DIF
->
->  config CRC_T10DIF_ARCH
->         tristate
->         default CRC_T10DIF if ARCH_HAS_CRC_T10DIF && CRC_OPTIMIZATIONS
->
-> -config CRC64_ROCKSOFT
-> -       tristate "CRC calculation for the Rocksoft model CRC64"
-> -       select CRC64
-> -       select CRYPTO
-> -       select CRYPTO_CRC64_ROCKSOFT
+> -config CRYPTO_CRC64_ROCKSOFT
+> -       tristate "CRC64 based on Rocksoft Model algorithm"
+> -       depends on CRC64
+> -       select CRYPTO_HASH
 > -       help
-> -         This option provides a CRC64 API to a registered crypto driver.
-> -         This is used with the block layer's data integrity subsystem.
+> -         CRC64 CRC algorithm based on the Rocksoft Model CRC Algorithm
 > -
->  config CRC_ITU_T
->         tristate "CRC ITU-T V.41 functions"
->         help
->           This option is provided for the case where no in-kernel-tree
->           modules require CRC ITU-T V.41 functions, but a module built outside
-> diff --git a/lib/Makefile b/lib/Makefile
-> index f1c6e9d76a7c..518018b2a5d4 100644
-> --- a/lib/Makefile
-> +++ b/lib/Makefile
-> @@ -164,11 +164,10 @@ obj-$(CONFIG_CRC_ITU_T)   += crc-itu-t.o
->  obj-$(CONFIG_CRC32)    += crc32.o
->  obj-$(CONFIG_CRC64)     += crc64.o
->  obj-$(CONFIG_CRC4)     += crc4.o
->  obj-$(CONFIG_CRC7)     += crc7.o
->  obj-$(CONFIG_CRC8)     += crc8.o
-> -obj-$(CONFIG_CRC64_ROCKSOFT) += crc64-rocksoft.o
->  obj-$(CONFIG_XXHASH)   += xxhash.o
->  obj-$(CONFIG_GENERIC_ALLOCATOR) += genalloc.o
+> -         Used by the NVMe implementation of T10 DIF (BLK_DEV_INTEGRITY)
+> -
+> -         See https://zlib.net/crc_v3.txt
+> -
+>  endmenu
 >
->  obj-$(CONFIG_842_COMPRESS) += 842/
->  obj-$(CONFIG_842_DECOMPRESS) += 842/
-> diff --git a/lib/crc64-rocksoft.c b/lib/crc64-rocksoft.c
+>  menu "Compression"
+>
+>  config CRYPTO_DEFLATE
+> diff --git a/crypto/Makefile b/crypto/Makefile
+> index f67e853c4690..d3b79b8c9022 100644
+> --- a/crypto/Makefile
+> +++ b/crypto/Makefile
+> @@ -155,11 +155,10 @@ obj-$(CONFIG_CRYPTO_CRC32C) += crc32c_generic.o
+>  obj-$(CONFIG_CRYPTO_CRC32) += crc32_generic.o
+>  CFLAGS_crc32c_generic.o += -DARCH=$(ARCH)
+>  CFLAGS_crc32_generic.o += -DARCH=$(ARCH)
+>  obj-$(CONFIG_CRYPTO_CRCT10DIF) += crct10dif_generic.o
+>  CFLAGS_crct10dif_generic.o += -DARCH=$(ARCH)
+> -obj-$(CONFIG_CRYPTO_CRC64_ROCKSOFT) += crc64_rocksoft_generic.o
+>  obj-$(CONFIG_CRYPTO_AUTHENC) += authenc.o authencesn.o
+>  obj-$(CONFIG_CRYPTO_LZO) += lzo.o lzo-rle.o
+>  obj-$(CONFIG_CRYPTO_LZ4) += lz4.o
+>  obj-$(CONFIG_CRYPTO_LZ4HC) += lz4hc.o
+>  obj-$(CONFIG_CRYPTO_XXHASH) += xxhash_generic.o
+> diff --git a/crypto/crc64_rocksoft_generic.c b/crypto/crc64_rocksoft_generic.c
 > deleted file mode 100644
-> index fc9ae0da5df7..000000000000
-> --- a/lib/crc64-rocksoft.c
+> index ce0f3059b912..000000000000
+> --- a/crypto/crc64_rocksoft_generic.c
 > +++ /dev/null
-> @@ -1,126 +0,0 @@
+> @@ -1,89 +0,0 @@
 > -// SPDX-License-Identifier: GPL-2.0-only
 > -
-> -#include <linux/types.h>
-> -#include <linux/module.h>
 > -#include <linux/crc64.h>
-> -#include <linux/err.h>
-> -#include <linux/init.h>
-> -#include <crypto/hash.h>
-> -#include <crypto/algapi.h>
-> -#include <linux/static_key.h>
-> -#include <linux/notifier.h>
+> -#include <linux/module.h>
+> -#include <crypto/internal/hash.h>
+> -#include <linux/unaligned.h>
 > -
-> -static struct crypto_shash __rcu *crc64_rocksoft_tfm;
-> -static DEFINE_STATIC_KEY_TRUE(crc64_rocksoft_fallback);
-> -static DEFINE_MUTEX(crc64_rocksoft_mutex);
-> -static struct work_struct crc64_rocksoft_rehash_work;
-> -
-> -static int crc64_rocksoft_notify(struct notifier_block *self, unsigned long val, void *data)
+> -static int chksum_init(struct shash_desc *desc)
 > -{
-> -       struct crypto_alg *alg = data;
+> -       u64 *crc = shash_desc_ctx(desc);
 > -
-> -       if (val != CRYPTO_MSG_ALG_LOADED ||
-> -           strcmp(alg->cra_name, CRC64_ROCKSOFT_STRING))
-> -               return NOTIFY_DONE;
+> -       *crc = 0;
 > -
-> -       schedule_work(&crc64_rocksoft_rehash_work);
-> -       return NOTIFY_OK;
-> -}
-> -
-> -static void crc64_rocksoft_rehash(struct work_struct *work)
-> -{
-> -       struct crypto_shash *new, *old;
-> -
-> -       mutex_lock(&crc64_rocksoft_mutex);
-> -       old = rcu_dereference_protected(crc64_rocksoft_tfm,
-> -                                       lockdep_is_held(&crc64_rocksoft_mutex));
-> -       new = crypto_alloc_shash(CRC64_ROCKSOFT_STRING, 0, 0);
-> -       if (IS_ERR(new)) {
-> -               mutex_unlock(&crc64_rocksoft_mutex);
-> -               return;
-> -       }
-> -       rcu_assign_pointer(crc64_rocksoft_tfm, new);
-> -       mutex_unlock(&crc64_rocksoft_mutex);
-> -
-> -       if (old) {
-> -               synchronize_rcu();
-> -               crypto_free_shash(old);
-> -       } else {
-> -               static_branch_disable(&crc64_rocksoft_fallback);
-> -       }
-> -}
-> -
-> -static struct notifier_block crc64_rocksoft_nb = {
-> -       .notifier_call = crc64_rocksoft_notify,
-> -};
-> -
-> -u64 crc64_rocksoft_update(u64 crc, const unsigned char *buffer, size_t len)
-> -{
-> -       struct {
-> -               struct shash_desc shash;
-> -               u64 crc;
-> -       } desc;
-> -       int err;
-> -
-> -       if (static_branch_unlikely(&crc64_rocksoft_fallback))
-> -               return crc64_rocksoft_generic(crc, buffer, len);
-> -
-> -       rcu_read_lock();
-> -       desc.shash.tfm = rcu_dereference(crc64_rocksoft_tfm);
-> -       desc.crc = crc;
-> -       err = crypto_shash_update(&desc.shash, buffer, len);
-> -       rcu_read_unlock();
-> -
-> -       BUG_ON(err);
-> -
-> -       return desc.crc;
-> -}
-> -EXPORT_SYMBOL_GPL(crc64_rocksoft_update);
-> -
-> -u64 crc64_rocksoft(const unsigned char *buffer, size_t len)
-> -{
-> -       return crc64_rocksoft_update(0, buffer, len);
-> -}
-> -EXPORT_SYMBOL_GPL(crc64_rocksoft);
-> -
-> -static int __init crc64_rocksoft_mod_init(void)
-> -{
-> -       INIT_WORK(&crc64_rocksoft_rehash_work, crc64_rocksoft_rehash);
-> -       crypto_register_notifier(&crc64_rocksoft_nb);
-> -       crc64_rocksoft_rehash(&crc64_rocksoft_rehash_work);
 > -       return 0;
 > -}
 > -
-> -static void __exit crc64_rocksoft_mod_fini(void)
+> -static int chksum_update(struct shash_desc *desc, const u8 *data,
+> -                        unsigned int length)
 > -{
-> -       crypto_unregister_notifier(&crc64_rocksoft_nb);
-> -       cancel_work_sync(&crc64_rocksoft_rehash_work);
-> -       crypto_free_shash(rcu_dereference_protected(crc64_rocksoft_tfm, 1));
+> -       u64 *crc = shash_desc_ctx(desc);
+> -
+> -       *crc = crc64_rocksoft_generic(*crc, data, length);
+> -
+> -       return 0;
 > -}
 > -
-> -module_init(crc64_rocksoft_mod_init);
-> -module_exit(crc64_rocksoft_mod_fini);
-> -
-> -static int crc64_rocksoft_transform_show(char *buffer, const struct kernel_param *kp)
+> -static int chksum_final(struct shash_desc *desc, u8 *out)
 > -{
-> -       struct crypto_shash *tfm;
-> -       int len;
+> -       u64 *crc = shash_desc_ctx(desc);
 > -
-> -       if (static_branch_unlikely(&crc64_rocksoft_fallback))
-> -               return sprintf(buffer, "fallback\n");
-> -
-> -       rcu_read_lock();
-> -       tfm = rcu_dereference(crc64_rocksoft_tfm);
-> -       len = snprintf(buffer, PAGE_SIZE, "%s\n",
-> -                      crypto_shash_driver_name(tfm));
-> -       rcu_read_unlock();
-> -
-> -       return len;
+> -       put_unaligned_le64(*crc, out);
+> -       return 0;
 > -}
 > -
-> -module_param_call(transform, NULL, crc64_rocksoft_transform_show, NULL, 0444);
+> -static int __chksum_finup(u64 crc, const u8 *data, unsigned int len, u8 *out)
+> -{
+> -       crc = crc64_rocksoft_generic(crc, data, len);
+> -       put_unaligned_le64(crc, out);
+> -       return 0;
+> -}
 > -
-> -MODULE_AUTHOR("Keith Busch <kbusch@kernel.org>");
-> -MODULE_DESCRIPTION("Rocksoft model CRC64 calculation (library API)");
+> -static int chksum_finup(struct shash_desc *desc, const u8 *data,
+> -                       unsigned int len, u8 *out)
+> -{
+> -       u64 *crc = shash_desc_ctx(desc);
+> -
+> -       return __chksum_finup(*crc, data, len, out);
+> -}
+> -
+> -static int chksum_digest(struct shash_desc *desc, const u8 *data,
+> -                        unsigned int length, u8 *out)
+> -{
+> -       return __chksum_finup(0, data, length, out);
+> -}
+> -
+> -static struct shash_alg alg = {
+> -       .digestsize     =       sizeof(u64),
+> -       .init           =       chksum_init,
+> -       .update         =       chksum_update,
+> -       .final          =       chksum_final,
+> -       .finup          =       chksum_finup,
+> -       .digest         =       chksum_digest,
+> -       .descsize       =       sizeof(u64),
+> -       .base           =       {
+> -               .cra_name               =       CRC64_ROCKSOFT_STRING,
+> -               .cra_driver_name        =       "crc64-rocksoft-generic",
+> -               .cra_priority           =       200,
+> -               .cra_blocksize          =       1,
+> -               .cra_module             =       THIS_MODULE,
+> -       }
+> -};
+> -
+> -static int __init crc64_rocksoft_init(void)
+> -{
+> -       return crypto_register_shash(&alg);
+> -}
+> -
+> -static void __exit crc64_rocksoft_exit(void)
+> -{
+> -       crypto_unregister_shash(&alg);
+> -}
+> -
+> -module_init(crc64_rocksoft_init);
+> -module_exit(crc64_rocksoft_exit);
+> -
 > -MODULE_LICENSE("GPL");
-> -MODULE_SOFTDEP("pre: crc64");
-> diff --git a/lib/crc64.c b/lib/crc64.c
-> index 61ae8dfb6a1c..b5136fb4c199 100644
-> --- a/lib/crc64.c
-> +++ b/lib/crc64.c
-> @@ -61,17 +61,10 @@ u64 __pure crc64_be(u64 crc, const void *p, size_t len)
+> -MODULE_DESCRIPTION("Rocksoft model CRC64 calculation.");
+> -MODULE_ALIAS_CRYPTO("crc64-rocksoft");
+> -MODULE_ALIAS_CRYPTO("crc64-rocksoft-generic");
+> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+> index e61490ba4095..0c1c3a6453b6 100644
+> --- a/crypto/testmgr.c
+> +++ b/crypto/testmgr.c
+> @@ -4757,17 +4757,10 @@ static const struct alg_test_desc alg_test_descs[] = {
+>                 .test = alg_test_crc32c,
+>                 .fips_allowed = 1,
+>                 .suite = {
+>                         .hash = __VECS(crc32c_tv_template)
+>                 }
+> -       }, {
+> -               .alg = "crc64-rocksoft",
+> -               .test = alg_test_hash,
+> -               .fips_allowed = 1,
+> -               .suite = {
+> -                       .hash = __VECS(crc64_rocksoft_tv_template)
+> -               }
+>         }, {
+>                 .alg = "crct10dif",
+>                 .test = alg_test_hash,
+>                 .fips_allowed = 1,
+>                 .suite = {
+> diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+> index d754ab997186..4ab05046b734 100644
+> --- a/crypto/testmgr.h
+> +++ b/crypto/testmgr.h
+> @@ -6018,22 +6018,10 @@ static const struct hash_testvec rmd160_tv_template[] = {
+>  };
 >
->         return crc;
->  }
->  EXPORT_SYMBOL_GPL(crc64_be);
+>  static const u8 zeroes[4096] = { [0 ... 4095] = 0 };
+>  static const u8 ones[4096] = { [0 ... 4095] = 0xff };
 >
-> -/**
-> - * crc64_rocksoft_generic - Calculate bitwise Rocksoft CRC64
-> - * @crc: seed value for computation. 0 for a new CRC calculation, or the
-> - *      previous crc64 value if computing incrementally.
-> - * @p: pointer to buffer over which CRC64 is run
-> - * @len: length of buffer @p
-> - */
->  u64 __pure crc64_rocksoft_generic(u64 crc, const void *p, size_t len)
->  {
->         const unsigned char *_p = p;
->         size_t i;
+> -static const struct hash_testvec crc64_rocksoft_tv_template[] = {
+> -       {
+> -               .plaintext      = zeroes,
+> -               .psize          = 4096,
+> -               .digest         = "\x4e\xb6\x22\xeb\x67\xd3\x82\x64",
+> -       }, {
+> -               .plaintext      = ones,
+> -               .psize          = 4096,
+> -               .digest         = "\xac\xa3\xec\x02\x73\xba\xdd\xc0",
+> -       }
+> -};
+> -
+>  static const struct hash_testvec crct10dif_tv_template[] = {
+>         {
+>                 .plaintext      = "abc",
+>                 .psize          = 3,
+>                 .digest         = (u8 *)(u16 []){ 0x443b },
+> diff --git a/include/linux/crc64.h b/include/linux/crc64.h
+> index 0a595b272166..7880aeab69d6 100644
+> --- a/include/linux/crc64.h
+> +++ b/include/linux/crc64.h
+> @@ -5,12 +5,10 @@
+>  #ifndef _LINUX_CRC64_H
+>  #define _LINUX_CRC64_H
 >
+>  #include <linux/types.h>
+>
+> -#define CRC64_ROCKSOFT_STRING "crc64-rocksoft"
+> -
+>  u64 __pure crc64_be(u64 crc, const void *p, size_t len);
+>  u64 __pure crc64_rocksoft_generic(u64 crc, const void *p, size_t len);
+>
+>  /**
+>   * crc64_rocksoft_update - Calculate bitwise Rocksoft CRC64
 > --
 > 2.48.1
 >
