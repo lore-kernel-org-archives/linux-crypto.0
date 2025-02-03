@@ -1,152 +1,132 @@
-Received: from mailout2.hostsharing.net (mailout2.hostsharing.net [83.223.78.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f41.google.com (mail-ua1-f41.google.com [209.85.222.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E32F6205E05
-	for <linux-crypto@vger.kernel.org>; Mon,  3 Feb 2025 13:53:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.78.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C10207657;
+	Mon,  3 Feb 2025 13:59:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738590818; cv=none; b=bwk3Z2Q3qrCNuqcDoDNvI3fmKD4xnpIpk4eP9pAR+uMWe3D/dlAlgWAwbgD/01dKMWcgD2oAxJmFrN6aSowF4KzZVvQxHdtYUMQqGopEPS38PfSHck80lhIY4v7yu3mO8XMuMfQbUhT83Kxp9ts8bnDnX9mxrMLcHiO39YghNbo=
+	t=1738591195; cv=none; b=Kj17U+yz09k+61xVkK/SGSRNwYvaeyRxN3/03jvKck7wTAWkx53zz6zTeWtE2P/d5/it7n86YZnCGUSFoXMZvCgzy8xLszpHtpTVZdn/UsOubvFXNu42mXZ3NNZJWcxh8ygeJYnl96zAL9m1x35AT4oXC4pzP/mZgjMqX3pzSpw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738590818; c=relaxed/simple;
-	bh=oypw33G6nMp/nj+KxV48Kwa6yUky6wYOXHiMQeLGZeE=;
-	h=Message-ID:In-Reply-To:References:From:Date:Subject:To:Cc; b=u8pXjPXzUdQaxON3VtuPyPjFEE+bVrtUPID5i39Lvn0QAcWHhMJGAx9fsjlqOpjSvvaxqZRJsnQLnDhjMjxR2OvfIxYSHfNuoA7Z23Wb7bVWweN2fr4LXe0YBZ/NucHuY7l+iZJhlYGcTL7JInF6FViKPZlsjfrgmvw9GUOQSWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=pass smtp.mailfrom=wunner.de; arc=none smtp.client-ip=83.223.78.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wunner.de
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by mailout2.hostsharing.net (Postfix) with ESMTPS id 89B9710189B3B;
-	Mon,  3 Feb 2025 14:53:32 +0100 (CET)
-Received: from localhost (unknown [89.246.108.87])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by h08.hostsharing.net (Postfix) with ESMTPSA id 61F6363AEEE5;
-	Mon,  3 Feb 2025 14:53:32 +0100 (CET)
-X-Mailbox-Line: From c59352d994d01f23d364632efec0a7fea70c4503 Mon Sep 17 00:00:00 2001
-Message-ID: <c59352d994d01f23d364632efec0a7fea70c4503.1738562694.git.lukas@wunner.de>
-In-Reply-To: <cover.1738562694.git.lukas@wunner.de>
-References: <cover.1738562694.git.lukas@wunner.de>
-From: Lukas Wunner <lukas@wunner.de>
-Date: Mon, 3 Feb 2025 14:37:05 +0100
-Subject: [PATCH 5/5] crypto: virtio - Drop superfluous [as]kcipher_req pointer
-To: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Gonglei <arei.gonglei@huawei.com>
-Cc: zhenwei pi <pizhenwei@bytedance.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio Perez <eperezma@redhat.com>, linux-crypto@vger.kernel.org, virtualization@lists.linux.dev
+	s=arc-20240116; t=1738591195; c=relaxed/simple;
+	bh=qCz9jE3C8/DH/rIVWt5Lk605SNimvvlqaYiePQLwTYI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HcUxfy/1A2rPjECDqAHZxymKB3sQFB/6mi5CeaxZXWcRnP4x2iQ9tHk9DtHdhJT2LxuZ/mJjmQn72CSqtrMRJMoEBNZQvjit2uJw2BVjpKFdcJXPBXRlh/hYCsZbOJazncobKpdNqQL8s314lPgZlZa0dcytECsBezxCnenlyPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f41.google.com with SMTP id a1e0cc1a2514c-85bafa89d73so853284241.2;
+        Mon, 03 Feb 2025 05:59:52 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738591189; x=1739195989;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2e3vrd26snuR7BBCNgEi1ltS7NqcxsA/B6t8vBEFYDs=;
+        b=RrSJ7HsTNrk2Y2+yINGbXd4woA4DPGMh7QRuj8mqrP20+ajPA8e6MpvQ7GxX/KQ3zh
+         WvKluSGDbFyX1GRu3zEvOWoTt5J+cqjTuVAOtzrtqOQ1dcrOImOpHyLvXXsMqmpyatG2
+         JUHtA3ay3zt0XIZrOF2d7zmfrF2ZYkxGSHgqLGi6vMaY3aMLstwIgqbWKQtAi0fNErn/
+         DqpHUZqbvE07OfKX8pt74juxHJpE+6fW4/JJekrfNQDUZ2j9UY7TMj3fq+RtsRMqf0pC
+         lXLfz/7gsOHlW+rY8VqmqzlAH+JJDeOawa4+EFdHfW4CpYaQmN10RMhhzEo1gIIeORGx
+         fWtg==
+X-Forwarded-Encrypted: i=1; AJvYcCUWu+DXUSSrRSa6+Hqtyo0y7nhY9UMm+6sG8XD/SEtGpKvCkxmG3kNkihjvYll8I4AwaATkArzmwe4goKqJ@vger.kernel.org, AJvYcCVEd+Pu9L0qWO1CkiA/SkZFwJOSpAQyGJzTt9NMtCmnCwXlbw4aD2Uxet8jHhSqqAeA2g52PLKq6B7srA==@vger.kernel.org, AJvYcCWEF4jRaDt7yz/ySGq2fodwVJ1qVvYz5/5WLmCMF/jAWIvuAsjV8vXMwVu33BykDTYMYUSG4O/v4P/1vhspOUgnbBI=@vger.kernel.org, AJvYcCWS42oxkz0pAYv24KgpTgR1mGtCp73L/CHZK7cW+8Hxgst7H5OXOdQ1u0eQvy8dz2lQtw7Cy8m1jgzEon+F@vger.kernel.org, AJvYcCWcQPp3/rzV0d/CGHy45eKjYcXOy/SP1C7snfUMKpoq6hEzfgY93E00S1hhfF2tYHk6TtY0wOIPsKBP@vger.kernel.org, AJvYcCWzCNd+9B/jsBjcPuvZMlBwWO0kWihwtG5xjI7tfYabDEh1Zu/V5zndlJeeUQOmUHng2yUBQy3hlQ8=@vger.kernel.org, AJvYcCX+rPQS2WZZQL0AXZwX0qju9nL7sJIJlZ5VjyJ6/7CVjoX257PrBK7pOrv5XxE2KJod2j31K45JSeRnpd8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyNpOoVfu8Xag1CBkLrD1k5OseCYAjIwWamxeChMx3eFdpI7fmA
+	Clko2tcXB2YwPNm/fteWLtm0ZEWOSy46UW3sAAZ96kGNRniQ7cJ89OP0NIcQ
+X-Gm-Gg: ASbGnctF+3pp8eA7vXgQ3Nci835IRu3PFHGKOqLIqfZ7mDUu4pb5jCzT6a/Xzdke86k
+	sx8hzFRttc15blaZb7sKmb9/Hc1fHwGM8iOw1IfAHUrsQ6AlV0DxOFpUyWRPd20j+WhEp4NhvE+
+	8oUL5QhV2Y+gStZAhfl/50qvSOXmGoP5PzjR9pE+ad8EuIRYz2pAlkMSBQ1lrmi16kRCVo80J3v
+	7e3UL7CoFH8YLpMsaRC2VxhSyVLGkigcGod4np9xiWLHOI6o2wB+D9u/T1B//JGQtPAcJH0xfB/
+	38/TrX/YX3w4fl6LArH1R577K13XRjnfVH8rOld3vIn0isr6o3SDVe7NbA==
+X-Google-Smtp-Source: AGHT+IHMxI/2v0SfcLwteoxT8STy991q5j8vL75bqZcV4zbtOIYaHRNiw16arLwHeEOR+aNooAZEMQ==
+X-Received: by 2002:a05:6102:330b:b0:4b6:d600:a35f with SMTP id ada2fe7eead31-4b9a4eb3fe8mr14586189137.4.1738591189660;
+        Mon, 03 Feb 2025 05:59:49 -0800 (PST)
+Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com. [209.85.221.182])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-866941da3fdsm1549787241.25.2025.02.03.05.59.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Feb 2025 05:59:49 -0800 (PST)
+Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-518ae5060d4so1388081e0c.0;
+        Mon, 03 Feb 2025 05:59:48 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUCSxPdtewQcOQ0VqH6KbxR4AJHf9AWvwOdRbLTbvQjRiAZ4FpuZD5vIUmLA1S5L+pEJdteSv/vOmkN@vger.kernel.org, AJvYcCUHuzVuJTMpt0LQKeVDHJ1VtblVA/jQAqbWjUWIRKIAuAyMlzBNOZ/n6K0qxfK3H0yghOkGUzfpxLj+nA==@vger.kernel.org, AJvYcCUZWFTVihvApMJKLl3n2E9mazFs5hQcdPJnyLYEnO0kTePafT0VDFcesNs+EowedR+CcfkxEFzF4dg=@vger.kernel.org, AJvYcCUl+wcql7GU+jy8A7Dvt2aY/XyP/TwLPAXwO9xOPEQ/OFOMj8i3HBHDoMKuZDAnPGp2HKUaKVISae34fkFw@vger.kernel.org, AJvYcCV/NESNNuh7EgpaWW3U7NQXZ8TenqvtEB3nzQdJP0gppFbLr7BKmXebhvwfM1xasbU1m7lxPWX5uxaf4K+y@vger.kernel.org, AJvYcCWC0XUNHF1VlrFHkUNsacVF3cs7Ach9FCtZrUL+/sL865CKb7gH5rsQRDTFY2MrD+KjCMJAulaNj4aUiVM=@vger.kernel.org, AJvYcCWWdCymXHv2toYAg5XNDIfLqTNh8zJ8w2ClBk1asRJsOYRuIbavqezhrOlfMYhCYUSWlReR4F0bs1YGMfCqAGy3SHI=@vger.kernel.org
+X-Received: by 2002:a05:6122:1990:b0:51c:aa1a:2b5b with SMTP id
+ 71dfb90a1353d-51e9e3fdc44mr15881808e0c.4.1738591188554; Mon, 03 Feb 2025
+ 05:59:48 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <cover.1738329458.git.geert+renesas@glider.be> <1824412519cb8791ab428065116927ee7b77cf35.1738329459.git.geert+renesas@glider.be>
+ <e20a177a-30cd-4088-89e1-b479aba1356c@wanadoo.fr> <Z5-xMUqrDuaE8Eo_@thinkpad>
+ <74cab7d1ec31e7531cdda0f1eb47acdebd5c8d3f.camel@sipsolutions.net> <45920591-e1d6-4337-a906-35bb5319836c@wanadoo.fr>
+In-Reply-To: <45920591-e1d6-4337-a906-35bb5319836c@wanadoo.fr>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Mon, 3 Feb 2025 14:59:36 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdXZKNtAmiMP8uuSngZMsDLGcYwrLS0xNWzN4UfLaccdyA@mail.gmail.com>
+X-Gm-Features: AWEUYZkxzrXQCnvoDXR55r9qIi7LTjZDYDZYK_OEJibEwCDu5alOHeJTYjGkvIg
+Message-ID: <CAMuHMdXZKNtAmiMP8uuSngZMsDLGcYwrLS0xNWzN4UfLaccdyA@mail.gmail.com>
+Subject: Re: [PATCH treewide v2 1/3] bitfield: Add non-constant
+ field_{prep,get}() helpers
+To: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Cc: Johannes Berg <johannes@sipsolutions.net>, Yury Norov <yury.norov@gmail.com>, 
+	linux-clk@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-renesas-soc@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	qat-linux@intel.com, linux-gpio@vger.kernel.org, 
+	linux-aspeed@lists.ozlabs.org, linux-iio@vger.kernel.org, 
+	linux-sound@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, 
+	Nicolas Ferre <nicolas.ferre@microchip.com>, 
+	Alexandre Belloni <alexandre.belloni@bootlin.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S . Miller" <davem@davemloft.net>, Linus Walleij <linus.walleij@linaro.org>, 
+	Bartosz Golaszewski <brgl@bgdev.pl>, Joel Stanley <joel@jms.id.au>, 
+	Andrew Jeffery <andrew@codeconstruct.com.au>, Crt Mori <cmo@melexis.com>, 
+	Jonathan Cameron <jic23@kernel.org>, Lars-Peter Clausen <lars@metafoo.de>, Jacky Huang <ychuang3@nuvoton.com>, 
+	Shan-Chun Hung <schung@nuvoton.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, 
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Alex Elder <elder@ieee.org>
+Content-Type: text/plain; charset="UTF-8"
 
-The request context virtio_crypto_{akcipher,sym}_request contains a
-pointer to the [as]kcipher_request itself.
+Hi Vincent,
 
-The pointer is superfluous as it can be calculated with container_of().
+On Mon, 3 Feb 2025 at 14:37, Vincent Mailhol <mailhol.vincent@wanadoo.fr> wrote:
+> On 03/02/2025 at 16:44, Johannes Berg wrote:
+> > On Sun, 2025-02-02 at 12:53 -0500, Yury Norov wrote:
+> >>> Instead of creating another variant for
+> >>> non-constant bitfields, wouldn't it be better to make the existing macro
+> >>> accept both?
+> >>
+> >> Yes, it would definitely be better IMO.
+> >
+> > On the flip side, there have been discussions in the past (though I
+> > think not all, if any, on the list(s)) about the argument order. Since
+> > the value is typically not a constant, requiring the mask to be a
+> > constant has ensured that the argument order isn't as easily mixed up as
+> > otherwise.
+>
+> If this is a concern, then it can be checked with:
+>
+>   BUILD_BUG_ON_MSG(!__builtin_constant_p(_mask) &&
+>                    __builtin_constant_p(_val),
+>                    _pfx "mask is not constant");
+>
+> It means that we forbid FIELD_PREP(non_const_mask, const_val) but allow
+> any other combination.
 
-Drop the superfluous pointer.
+Even that case looks valid to me. Actually there is already such a user
+in drivers/iio/temperature/mlx90614.c:
 
-Signed-off-by: Lukas Wunner <lukas@wunner.de>
----
-I've considered introducing a static inline to <crypto/[as]kcipher.h>
-to get from the request context to the request, but these two seem to be
-the only occurrences in the tree which would need it, so I figured it's
-probably not worth it.  If anyone disagrees, please speak up.
+    ret |= field_prep(chip_info->fir_config_mask, MLX90614_CONST_FIR);
 
- drivers/crypto/virtio/virtio_crypto_akcipher_algs.c | 9 ++++-----
- drivers/crypto/virtio/virtio_crypto_skcipher_algs.c | 8 +++-----
- 2 files changed, 7 insertions(+), 10 deletions(-)
+So if you want enhanced safety, having both the safer/const upper-case
+variants and the less-safe/non-const lower-case variants makes sense.
 
-diff --git a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
-index ac8eb3d07c93..2e44915c9f23 100644
---- a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
-+++ b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
-@@ -35,7 +35,6 @@ struct virtio_crypto_akcipher_ctx {
- 
- struct virtio_crypto_akcipher_request {
- 	struct virtio_crypto_request base;
--	struct akcipher_request *akcipher_req;
- 	void *src_buf;
- 	void *dst_buf;
- 	uint32_t opcode;
-@@ -67,7 +66,9 @@ static void virtio_crypto_dataq_akcipher_callback(struct virtio_crypto_request *
- {
- 	struct virtio_crypto_akcipher_request *vc_akcipher_req =
- 		container_of(vc_req, struct virtio_crypto_akcipher_request, base);
--	struct akcipher_request *akcipher_req;
-+	struct akcipher_request *akcipher_req =
-+		container_of((void *)vc_akcipher_req, struct akcipher_request,
-+			     __ctx);
- 	int error;
- 
- 	switch (vc_req->status) {
-@@ -86,8 +87,7 @@ static void virtio_crypto_dataq_akcipher_callback(struct virtio_crypto_request *
- 		break;
- 	}
- 
--	akcipher_req = vc_akcipher_req->akcipher_req;
--	/* actual length maybe less than dst buffer */
-+	/* actual length may be less than dst buffer */
- 	akcipher_req->dst_len = len - sizeof(vc_req->status);
- 	sg_copy_from_buffer(akcipher_req->dst, sg_nents(akcipher_req->dst),
- 			    vc_akcipher_req->dst_buf, akcipher_req->dst_len);
-@@ -319,7 +319,6 @@ static int virtio_crypto_rsa_req(struct akcipher_request *req, uint32_t opcode)
- 
- 	vc_req->dataq = data_vq;
- 	vc_req->alg_cb = virtio_crypto_dataq_akcipher_callback;
--	vc_akcipher_req->akcipher_req = req;
- 	vc_akcipher_req->opcode = opcode;
- 
- 	return crypto_transfer_akcipher_request_to_engine(data_vq->engine, req);
-diff --git a/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c b/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
-index e2a481a29b77..1b3fb21a2a7d 100644
---- a/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
-+++ b/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
-@@ -27,7 +27,6 @@ struct virtio_crypto_sym_request {
- 
- 	/* Cipher or aead */
- 	uint32_t type;
--	struct skcipher_request *skcipher_req;
- 	uint8_t *iv;
- 	/* Encryption? */
- 	bool encrypt;
-@@ -55,7 +54,9 @@ static void virtio_crypto_dataq_sym_callback
- {
- 	struct virtio_crypto_sym_request *vc_sym_req =
- 		container_of(vc_req, struct virtio_crypto_sym_request, base);
--	struct skcipher_request *ablk_req;
-+	struct skcipher_request *ablk_req =
-+		container_of((void *)vc_sym_req, struct skcipher_request,
-+			     __ctx);
- 	int error;
- 
- 	/* Finish the encrypt or decrypt process */
-@@ -75,7 +76,6 @@ static void virtio_crypto_dataq_sym_callback
- 			error = -EIO;
- 			break;
- 		}
--		ablk_req = vc_sym_req->skcipher_req;
- 		virtio_crypto_skcipher_finalize_req(vc_sym_req,
- 							ablk_req, error);
- 	}
-@@ -479,7 +479,6 @@ static int virtio_crypto_skcipher_encrypt(struct skcipher_request *req)
- 
- 	vc_req->dataq = data_vq;
- 	vc_req->alg_cb = virtio_crypto_dataq_sym_callback;
--	vc_sym_req->skcipher_req = req;
- 	vc_sym_req->encrypt = true;
- 
- 	return crypto_transfer_skcipher_request_to_engine(data_vq->engine, req);
-@@ -503,7 +502,6 @@ static int virtio_crypto_skcipher_decrypt(struct skcipher_request *req)
- 
- 	vc_req->dataq = data_vq;
- 	vc_req->alg_cb = virtio_crypto_dataq_sym_callback;
--	vc_sym_req->skcipher_req = req;
- 	vc_sym_req->encrypt = false;
- 
- 	return crypto_transfer_skcipher_request_to_engine(data_vq->engine, req);
+Gr{oetje,eeting}s,
+
+                        Geert
+
 -- 
-2.43.0
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
