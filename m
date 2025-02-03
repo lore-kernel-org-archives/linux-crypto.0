@@ -1,142 +1,67 @@
-Received: from out.smtpout.orange.fr (out-70.smtpout.orange.fr [193.252.22.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout1.hostsharing.net (mailout1.hostsharing.net [83.223.95.204])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00DAC20551A;
-	Mon,  3 Feb 2025 13:38:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5201F1E87B
+	for <linux-crypto@vger.kernel.org>; Mon,  3 Feb 2025 13:39:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738589916; cv=none; b=C8AYm79wvMPc/83kQbnKigvTQ0zz+U4UIiD7qMOK007Mm6WMZD3kevDYkjEawY+aJtppNjs5Y4aHnP6lZ0ujc4sE+gj5ichl2Czr2+Knf7Vv6rY5XqzWNHhGaf0ER7QiObdndCPU+AOPlDcAUf03+s4QFYAzhiZvHqZd0ffci18=
+	t=1738590003; cv=none; b=tJTf1TmWgDLcohRaN/eux+WjjaP9Yhq0V/uzqKrFjndZ9lF0K5e4Nqy0d+loR1JRn+XwMT0y61SbnbPC1ueEtnZDw1AMGmqPFUlw7uZHgu8f29l8P/gsZTqNK3MU5RfK6MM27V8srv2dcPoOh14sZHRSYHaBe9B81sJxxJ+AdQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738589916; c=relaxed/simple;
-	bh=vxVOoUrEMpOIpnFj54sWmKsuUYbIQUlu2hobKUo1VJs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Et+6QpfO6QkU+//3kYTchf99MV8z+fIBfDQUjZVmYauJGrqnpmOIL3njGgRov7ecIZrPWnDK18cD5AohXk2BGR61RQ3J3lYNQ7gpO6xH7mrzEV4f1w4RjCVze78RPFEiZO66VftUOzpkmNiwuNnLulXhWsj3j+128H/Udjy/TwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=XwYwJD9q; arc=none smtp.client-ip=193.252.22.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="XwYwJD9q"
-Received: from [172.16.82.72] ([124.33.176.97])
-	by smtp.orange.fr with ESMTPA
-	id ewd2tOy0dEoZKewdIt5Ip4; Mon, 03 Feb 2025 14:37:19 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1738589839;
-	bh=/g4W8zsNjOkB4DJtFhM/WsfKs6gE5EsQ2w79HWI72oI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=XwYwJD9qo2zk974igNaK7YRqOSOeQpGfDoLCz5WdqzVZVaQCeXRz5fRwVtek4nccr
-	 IIPachRHSkoVTOEAWF+Q1RzHqSOorzh7zXI195lPeh6rI9NWNNeXuWFRvNezWJTw3p
-	 PujsqHiaXsnhXn4ml0tu+soSLAwHQx/2ykUaxgbrj/FrCgmqj2lH181uuMut8tBYuy
-	 aja0FJrJQgnw/6NiWOYkVZxNTWgTqVbG3qy26HXJ2+cOUzaAglixyIojvdf5gfQ1kK
-	 saeXLw4BQa+dsq1UxBUW8SPV6tQMuEPXP5HvV9PLKQ6hwtsv5+NhzubCQc+XQUYX3M
-	 ZF/4/IEW0rvcw==
-X-ME-Helo: [172.16.82.72]
-X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
-X-ME-Date: Mon, 03 Feb 2025 14:37:19 +0100
-X-ME-IP: 124.33.176.97
-Message-ID: <45920591-e1d6-4337-a906-35bb5319836c@wanadoo.fr>
-Date: Mon, 3 Feb 2025 22:36:43 +0900
+	s=arc-20240116; t=1738590003; c=relaxed/simple;
+	bh=oVqWY7Tted2qyDFxXmx89UKxolO8UUWaXot3x7Fn5qQ=;
+	h=Message-ID:From:Date:Subject:To:Cc; b=DoY4YWPVkZI/oYPF63KrQBsqNv/eFtFpa4sCwrEKF7OKOqVTZGW+6xUx0pValmnsRsDsIgMcgw2rxpsq0brG/vswllZxvwlhQkfjLTvKzwzN/Rm1NyHJ8b6yugl620P/kLGTmtlWOGiIorDT3IJfIawYNm54fN0ajDGh7tVoe4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=pass smtp.mailfrom=wunner.de; arc=none smtp.client-ip=83.223.95.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wunner.de
+Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by mailout1.hostsharing.net (Postfix) with ESMTPS id 293A710192649;
+	Mon,  3 Feb 2025 14:39:58 +0100 (CET)
+Received: from localhost (unknown [89.246.108.87])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by h08.hostsharing.net (Postfix) with ESMTPSA id F00896068241;
+	Mon,  3 Feb 2025 14:39:57 +0100 (CET)
+X-Mailbox-Line: From c59352d994d01f23d364632efec0a7fea70c4503 Mon Sep 17 00:00:00 2001
+Message-ID: <cover.1738562694.git.lukas@wunner.de>
+From: Lukas Wunner <lukas@wunner.de>
+Date: Mon, 3 Feb 2025 14:37:00 +0100
+Subject: [PATCH 0/5] crypto virtio cleanups
+To: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Gonglei <arei.gonglei@huawei.com>
+Cc: zhenwei pi <pizhenwei@bytedance.com>, lei he <helei.sig11@bytedance.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio Perez <eperezma@redhat.com>, linux-crypto@vger.kernel.org, virtualization@lists.linux.dev
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH treewide v2 1/3] bitfield: Add non-constant
- field_{prep,get}() helpers
-To: Johannes Berg <johannes@sipsolutions.net>,
- Yury Norov <yury.norov@gmail.com>
-Cc: Geert Uytterhoeven <geert+renesas@glider.be>, linux-clk@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-renesas-soc@vger.kernel.org,
- linux-crypto@vger.kernel.org, qat-linux@intel.com,
- linux-gpio@vger.kernel.org, linux-aspeed@lists.ozlabs.org,
- linux-iio@vger.kernel.org, linux-sound@vger.kernel.org,
- linux-kernel@vger.kernel.org, Michael Turquette <mturquette@baylibre.com>,
- Stephen Boyd <sboyd@kernel.org>, Nicolas Ferre
- <nicolas.ferre@microchip.com>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S . Miller" <davem@davemloft.net>,
- Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski
- <brgl@bgdev.pl>, Joel Stanley <joel@jms.id.au>,
- Andrew Jeffery <andrew@codeconstruct.com.au>, Crt Mori <cmo@melexis.com>,
- Jonathan Cameron <jic23@kernel.org>, Lars-Peter Clausen <lars@metafoo.de>,
- Jacky Huang <ychuang3@nuvoton.com>, Shan-Chun Hung <schung@nuvoton.com>,
- Rasmus Villemoes <linux@rasmusvillemoes.dk>, Jaroslav Kysela
- <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
- Jakub Kicinski <kuba@kernel.org>, Alex Elder <elder@ieee.org>
-References: <cover.1738329458.git.geert+renesas@glider.be>
- <1824412519cb8791ab428065116927ee7b77cf35.1738329459.git.geert+renesas@glider.be>
- <e20a177a-30cd-4088-89e1-b479aba1356c@wanadoo.fr> <Z5-xMUqrDuaE8Eo_@thinkpad>
- <74cab7d1ec31e7531cdda0f1eb47acdebd5c8d3f.camel@sipsolutions.net>
-Content-Language: en-US
-From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Autocrypt: addr=mailhol.vincent@wanadoo.fr; keydata=
- xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
- LFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI+wrIEExYKAFoC
- GwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AWIQTtj3AFdOZ/IOV06OKrX+uI
- bbuZwgUCZx41XhgYaGtwczovL2tleXMub3BlbnBncC5vcmcACgkQq1/riG27mcIYiwEAkgKK
- BJ+ANKwhTAAvL1XeApQ+2NNNEwFWzipVAGvTRigA+wUeyB3UQwZrwb7jsQuBXxhk3lL45HF5
- 8+y4bQCUCqYGzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrbYZzu0JG5w8gxE6EtQe6LmxKMqP6E
- yR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDldOjiq1/riG27mcIFAmceMvMCGwwF
- CQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8VzsZwr/S44HCzcz5+jkxnVVQ5LZ4B
- ANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
-In-Reply-To: <74cab7d1ec31e7531cdda0f1eb47acdebd5c8d3f.camel@sipsolutions.net>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-On 03/02/2025 at 16:44, Johannes Berg wrote:
-> On Sun, 2025-02-02 at 12:53 -0500, Yury Norov wrote:
->>
->>> Instead of creating another variant for
->>> non-constant bitfields, wouldn't it be better to make the existing macro
->>> accept both?
->>
->> Yes, it would definitely be better IMO.
-> 
-> On the flip side, there have been discussions in the past (though I
-> think not all, if any, on the list(s)) about the argument order. Since
-> the value is typically not a constant, requiring the mask to be a
-> constant has ensured that the argument order isn't as easily mixed up as
-> otherwise.
+Here's an assortment of trivial crypto virtio cleanups
+which I accumulated while working on commit 5b553e06b321
+("crypto: virtio - Drop sign/verify operations").
 
-If this is a concern, then it can be checked with:
+I've used qemu + libgcrypt backend to ascertain that all
+boot-time crypto selftests still pass after these changes.
+I've also verified that a KEYCTL_PKEY_ENCRYPT operation
+using virtio-pkcs1-rsa produces correct output.
 
-  BUILD_BUG_ON_MSG(!__builtin_constant_p(_mask) &&
-                   __builtin_constant_p(_val),
-                   _pfx "mask is not constant");
+Thanks!
 
-It means that we forbid FIELD_PREP(non_const_mask, const_val) but allow
-any other combination.
+Lukas Wunner (5):
+  crypto: virtio - Fix kernel-doc of virtcrypto_dev_stop()
+  crypto: virtio - Simplify RSA key size caching
+  crypto: virtio - Drop superfluous ctx->tfm backpointer
+  crypto: virtio - Drop superfluous [as]kcipher_ctx pointer
+  crypto: virtio - Drop superfluous [as]kcipher_req pointer
 
-> With a non-constant mask there can also be no validation that the mask
-> is contiguous etc.
-> 
-> Now that doesn't imply a strong objection - personally I've come to
-> prefer the lower-case typed versions anyway - but something to keep in
-> mind when doing this.
-> 
-> However, the suggested change to BUILD_BUG_ON_NOT_POWER_OF_2 almost
-> certainly shouldn't be done for the same reason - not compiling for non-
-> constant values is [IMHO] part of the API contract for that macro. This
-> can be important for the same reasons.
+ .../virtio/virtio_crypto_akcipher_algs.c      | 41 ++++++++-----------
+ drivers/crypto/virtio/virtio_crypto_mgr.c     |  2 +-
+ .../virtio/virtio_crypto_skcipher_algs.c      | 17 ++------
+ 3 files changed, 21 insertions(+), 39 deletions(-)
 
-Your point is fair enough. But I do not see this as a killer argument.
-We can instead just add below helper:
-
-  BUILD_BUG_ON_STATICALLY_NOT_POWER_OF_2()
-
-But, for the same reason why I would rather not have both the
-FIELD_{PREP,GET}() and the field_{prep,get}(), I would also rather not
-have a BUILD_BUG_ON_NOT_POWER_OF_2() and a
-BUILD_BUG_ON_STATICALLY_NOT_POWER_OF_2().
-
-If your concern is the wording of the contract, the description can just
-be updated.
-
-
-Yours sincerely,
-Vincent Mailhol
+-- 
+2.43.0
 
