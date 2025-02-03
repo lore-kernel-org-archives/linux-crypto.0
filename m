@@ -1,16 +1,16 @@
-Received: from mailout1.hostsharing.net (mailout1.hostsharing.net [83.223.95.204])
+Received: from mailout2.hostsharing.net (mailout2.hostsharing.net [83.223.78.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF20F2A1A4
-	for <linux-crypto@vger.kernel.org>; Mon,  3 Feb 2025 13:50:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E32F6205E05
+	for <linux-crypto@vger.kernel.org>; Mon,  3 Feb 2025 13:53:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.78.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738590657; cv=none; b=jAHIpxa3mnYiE978zLCUQN0tuIvctpf0YmOsJa3uSiHLSIuQAWHZuJIXhhdwRZRwjk9ckfTQcy0vVqjLbdNpIu5nEq122XwwqkeR8jDYcln1bteGl4fiRi4FpqX/mdnmphducdfM66S6805+qVtAj89XNyqcIJG2xtEY2PyCY1A=
+	t=1738590818; cv=none; b=bwk3Z2Q3qrCNuqcDoDNvI3fmKD4xnpIpk4eP9pAR+uMWe3D/dlAlgWAwbgD/01dKMWcgD2oAxJmFrN6aSowF4KzZVvQxHdtYUMQqGopEPS38PfSHck80lhIY4v7yu3mO8XMuMfQbUhT83Kxp9ts8bnDnX9mxrMLcHiO39YghNbo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738590657; c=relaxed/simple;
-	bh=3Q0uQUZhuFEVw190TO2aLouN/Paa3OwWEC6ljcuJeFE=;
-	h=Message-ID:In-Reply-To:References:From:Date:Subject:To:Cc; b=tOpUUdjDX8YfBzOTtOsq4ID82bQkkYtuV4Y+1ko1QFgPJLxJ8EIdpZe8NxfNeahD96mDWrc13+5bJFcrRkqqvYd7rh8UuDrk2BDVsYLB02YdDiwqpkjQMW6i4E7uBvpp7yUumf+gWftyqT8+KUeQw/hiyDlTetm6tMdtQzpmMkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=pass smtp.mailfrom=wunner.de; arc=none smtp.client-ip=83.223.95.204
+	s=arc-20240116; t=1738590818; c=relaxed/simple;
+	bh=oypw33G6nMp/nj+KxV48Kwa6yUky6wYOXHiMQeLGZeE=;
+	h=Message-ID:In-Reply-To:References:From:Date:Subject:To:Cc; b=u8pXjPXzUdQaxON3VtuPyPjFEE+bVrtUPID5i39Lvn0QAcWHhMJGAx9fsjlqOpjSvvaxqZRJsnQLnDhjMjxR2OvfIxYSHfNuoA7Z23Wb7bVWweN2fr4LXe0YBZ/NucHuY7l+iZJhlYGcTL7JInF6FViKPZlsjfrgmvw9GUOQSWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=pass smtp.mailfrom=wunner.de; arc=none smtp.client-ip=83.223.78.233
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wunner.de
 Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
@@ -18,21 +18,21 @@ Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
 	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
 	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by mailout1.hostsharing.net (Postfix) with ESMTPS id 01484101920D8;
-	Mon,  3 Feb 2025 14:50:54 +0100 (CET)
+	by mailout2.hostsharing.net (Postfix) with ESMTPS id 89B9710189B3B;
+	Mon,  3 Feb 2025 14:53:32 +0100 (CET)
 Received: from localhost (unknown [89.246.108.87])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by h08.hostsharing.net (Postfix) with ESMTPSA id D77596087DD7;
-	Mon,  3 Feb 2025 14:50:53 +0100 (CET)
-X-Mailbox-Line: From 22eeecc413925da2bcdbea03729c18990a627463 Mon Sep 17 00:00:00 2001
-Message-ID: <22eeecc413925da2bcdbea03729c18990a627463.1738562694.git.lukas@wunner.de>
+	by h08.hostsharing.net (Postfix) with ESMTPSA id 61F6363AEEE5;
+	Mon,  3 Feb 2025 14:53:32 +0100 (CET)
+X-Mailbox-Line: From c59352d994d01f23d364632efec0a7fea70c4503 Mon Sep 17 00:00:00 2001
+Message-ID: <c59352d994d01f23d364632efec0a7fea70c4503.1738562694.git.lukas@wunner.de>
 In-Reply-To: <cover.1738562694.git.lukas@wunner.de>
 References: <cover.1738562694.git.lukas@wunner.de>
 From: Lukas Wunner <lukas@wunner.de>
-Date: Mon, 3 Feb 2025 14:37:04 +0100
-Subject: [PATCH 4/5] crypto: virtio - Drop superfluous [as]kcipher_ctx pointer
+Date: Mon, 3 Feb 2025 14:37:05 +0100
+Subject: [PATCH 5/5] crypto: virtio - Drop superfluous [as]kcipher_req pointer
 To: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Gonglei <arei.gonglei@huawei.com>
 Cc: zhenwei pi <pizhenwei@bytedance.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio Perez <eperezma@redhat.com>, linux-crypto@vger.kernel.org, virtualization@lists.linux.dev
 Precedence: bulk
@@ -42,97 +42,111 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
 The request context virtio_crypto_{akcipher,sym}_request contains a
-pointer to the transform context virtio_crypto_[as]kcipher_ctx.
+pointer to the [as]kcipher_request itself.
 
-The pointer is superfluous as it can be calculated with the cheap
-crypto_akcipher_reqtfm() + akcipher_tfm_ctx() and
-crypto_skcipher_reqtfm() + crypto_skcipher_ctx() combos.
+The pointer is superfluous as it can be calculated with container_of().
 
 Drop the superfluous pointer.
 
 Signed-off-by: Lukas Wunner <lukas@wunner.de>
 ---
- drivers/crypto/virtio/virtio_crypto_akcipher_algs.c | 8 ++++----
- drivers/crypto/virtio/virtio_crypto_skcipher_algs.c | 5 +----
- 2 files changed, 5 insertions(+), 8 deletions(-)
+I've considered introducing a static inline to <crypto/[as]kcipher.h>
+to get from the request context to the request, but these two seem to be
+the only occurrences in the tree which would need it, so I figured it's
+probably not worth it.  If anyone disagrees, please speak up.
+
+ drivers/crypto/virtio/virtio_crypto_akcipher_algs.c | 9 ++++-----
+ drivers/crypto/virtio/virtio_crypto_skcipher_algs.c | 8 +++-----
+ 2 files changed, 7 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
-index aa8255786d6c..ac8eb3d07c93 100644
+index ac8eb3d07c93..2e44915c9f23 100644
 --- a/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
 +++ b/drivers/crypto/virtio/virtio_crypto_akcipher_algs.c
 @@ -35,7 +35,6 @@ struct virtio_crypto_akcipher_ctx {
  
  struct virtio_crypto_akcipher_request {
  	struct virtio_crypto_request base;
--	struct virtio_crypto_akcipher_ctx *akcipher_ctx;
- 	struct akcipher_request *akcipher_req;
+-	struct akcipher_request *akcipher_req;
  	void *src_buf;
  	void *dst_buf;
-@@ -212,7 +211,8 @@ static int virtio_crypto_alg_akcipher_close_session(struct virtio_crypto_akciphe
- static int __virtio_crypto_akcipher_do_req(struct virtio_crypto_akcipher_request *vc_akcipher_req,
- 		struct akcipher_request *req, struct data_queue *data_vq)
+ 	uint32_t opcode;
+@@ -67,7 +66,9 @@ static void virtio_crypto_dataq_akcipher_callback(struct virtio_crypto_request *
  {
--	struct virtio_crypto_akcipher_ctx *ctx = vc_akcipher_req->akcipher_ctx;
-+	struct crypto_akcipher *atfm = crypto_akcipher_reqtfm(req);
-+	struct virtio_crypto_akcipher_ctx *ctx = akcipher_tfm_ctx(atfm);
- 	struct virtio_crypto_request *vc_req = &vc_akcipher_req->base;
- 	struct virtio_crypto *vcrypto = ctx->vcrypto;
- 	struct virtio_crypto_op_data_req *req_data = vc_req->req_data;
-@@ -272,7 +272,8 @@ static int virtio_crypto_rsa_do_req(struct crypto_engine *engine, void *vreq)
- 	struct akcipher_request *req = container_of(vreq, struct akcipher_request, base);
- 	struct virtio_crypto_akcipher_request *vc_akcipher_req = akcipher_request_ctx(req);
- 	struct virtio_crypto_request *vc_req = &vc_akcipher_req->base;
--	struct virtio_crypto_akcipher_ctx *ctx = vc_akcipher_req->akcipher_ctx;
-+	struct crypto_akcipher *atfm = crypto_akcipher_reqtfm(req);
-+	struct virtio_crypto_akcipher_ctx *ctx = akcipher_tfm_ctx(atfm);
- 	struct virtio_crypto *vcrypto = ctx->vcrypto;
- 	struct data_queue *data_vq = vc_req->dataq;
- 	struct virtio_crypto_op_header *header;
-@@ -318,7 +319,6 @@ static int virtio_crypto_rsa_req(struct akcipher_request *req, uint32_t opcode)
+ 	struct virtio_crypto_akcipher_request *vc_akcipher_req =
+ 		container_of(vc_req, struct virtio_crypto_akcipher_request, base);
+-	struct akcipher_request *akcipher_req;
++	struct akcipher_request *akcipher_req =
++		container_of((void *)vc_akcipher_req, struct akcipher_request,
++			     __ctx);
+ 	int error;
+ 
+ 	switch (vc_req->status) {
+@@ -86,8 +87,7 @@ static void virtio_crypto_dataq_akcipher_callback(struct virtio_crypto_request *
+ 		break;
+ 	}
+ 
+-	akcipher_req = vc_akcipher_req->akcipher_req;
+-	/* actual length maybe less than dst buffer */
++	/* actual length may be less than dst buffer */
+ 	akcipher_req->dst_len = len - sizeof(vc_req->status);
+ 	sg_copy_from_buffer(akcipher_req->dst, sg_nents(akcipher_req->dst),
+ 			    vc_akcipher_req->dst_buf, akcipher_req->dst_len);
+@@ -319,7 +319,6 @@ static int virtio_crypto_rsa_req(struct akcipher_request *req, uint32_t opcode)
  
  	vc_req->dataq = data_vq;
  	vc_req->alg_cb = virtio_crypto_dataq_akcipher_callback;
--	vc_akcipher_req->akcipher_ctx = ctx;
- 	vc_akcipher_req->akcipher_req = req;
+-	vc_akcipher_req->akcipher_req = req;
  	vc_akcipher_req->opcode = opcode;
  
+ 	return crypto_transfer_akcipher_request_to_engine(data_vq->engine, req);
 diff --git a/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c b/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
-index 495fc655a51c..e2a481a29b77 100644
+index e2a481a29b77..1b3fb21a2a7d 100644
 --- a/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
 +++ b/drivers/crypto/virtio/virtio_crypto_skcipher_algs.c
 @@ -27,7 +27,6 @@ struct virtio_crypto_sym_request {
  
  	/* Cipher or aead */
  	uint32_t type;
--	struct virtio_crypto_skcipher_ctx *skcipher_ctx;
- 	struct skcipher_request *skcipher_req;
+-	struct skcipher_request *skcipher_req;
  	uint8_t *iv;
  	/* Encryption? */
-@@ -324,7 +323,7 @@ __virtio_crypto_skcipher_do_req(struct virtio_crypto_sym_request *vc_sym_req,
- 		struct data_queue *data_vq)
+ 	bool encrypt;
+@@ -55,7 +54,9 @@ static void virtio_crypto_dataq_sym_callback
  {
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--	struct virtio_crypto_skcipher_ctx *ctx = vc_sym_req->skcipher_ctx;
-+	struct virtio_crypto_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
- 	struct virtio_crypto_request *vc_req = &vc_sym_req->base;
- 	unsigned int ivsize = crypto_skcipher_ivsize(tfm);
- 	struct virtio_crypto *vcrypto = ctx->vcrypto;
-@@ -480,7 +479,6 @@ static int virtio_crypto_skcipher_encrypt(struct skcipher_request *req)
+ 	struct virtio_crypto_sym_request *vc_sym_req =
+ 		container_of(vc_req, struct virtio_crypto_sym_request, base);
+-	struct skcipher_request *ablk_req;
++	struct skcipher_request *ablk_req =
++		container_of((void *)vc_sym_req, struct skcipher_request,
++			     __ctx);
+ 	int error;
+ 
+ 	/* Finish the encrypt or decrypt process */
+@@ -75,7 +76,6 @@ static void virtio_crypto_dataq_sym_callback
+ 			error = -EIO;
+ 			break;
+ 		}
+-		ablk_req = vc_sym_req->skcipher_req;
+ 		virtio_crypto_skcipher_finalize_req(vc_sym_req,
+ 							ablk_req, error);
+ 	}
+@@ -479,7 +479,6 @@ static int virtio_crypto_skcipher_encrypt(struct skcipher_request *req)
  
  	vc_req->dataq = data_vq;
  	vc_req->alg_cb = virtio_crypto_dataq_sym_callback;
--	vc_sym_req->skcipher_ctx = ctx;
- 	vc_sym_req->skcipher_req = req;
+-	vc_sym_req->skcipher_req = req;
  	vc_sym_req->encrypt = true;
  
-@@ -505,7 +503,6 @@ static int virtio_crypto_skcipher_decrypt(struct skcipher_request *req)
+ 	return crypto_transfer_skcipher_request_to_engine(data_vq->engine, req);
+@@ -503,7 +502,6 @@ static int virtio_crypto_skcipher_decrypt(struct skcipher_request *req)
  
  	vc_req->dataq = data_vq;
  	vc_req->alg_cb = virtio_crypto_dataq_sym_callback;
--	vc_sym_req->skcipher_ctx = ctx;
- 	vc_sym_req->skcipher_req = req;
+-	vc_sym_req->skcipher_req = req;
  	vc_sym_req->encrypt = false;
  
+ 	return crypto_transfer_skcipher_request_to_engine(data_vq->engine, req);
 -- 
 2.43.0
 
