@@ -1,81 +1,130 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F01CB2080DF
-	for <linux-crypto@vger.kernel.org>; Mon,  3 Feb 2025 14:51:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2CDD205E1C;
+	Mon,  3 Feb 2025 15:31:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738594284; cv=none; b=e7Z13WMzD6pknd2jWSa2uDjimsPIlCoTJppHClbE3GPW2VNNIHyryUQeDCw3cahEQCZnFMOEb4A2B2Xw3xPOINP+3SZ0kuWYXv1sLFmCjvhpZmjxDzyPQHHH/mhCD+GayYRdD8EFjHbVmNY+Xiu9xV1xW34l3DMucHAva47O5DQ=
+	t=1738596711; cv=none; b=pUydIgHEVwqqR9jueXcX+NLyXh4jMjBqdpGRYCUE/G6P1ahSCyhhh2JMBtlIS+t/6oDEPhQT3+1sHZSmjzrwo7EdH09XGE+FsgKtdigppbVmprMU8HQpDaIa49rzhrY/XPmeGMjtjM8r2wkRrqAkg0e5pjm4R07aW9vJstW8MbQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738594284; c=relaxed/simple;
-	bh=uc9jPXSOkJumH2MlKMyRP4Ub4Dtbc0RCc9o6JV0zI/I=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=m5KizBJzXo7EaykSO9MC8MvtGEa+VvAAuGVyVV+pYPmv+bMSZFaUiNpJ1BasWi9ZyQ0/KORuBwNnsEzHUD/G/gkc644PgMUAoIuniF752XIqeWH6rpdkQMTz1fjhYQmul9/jFohipL7rdO1YkLxhnC1vhW23Lztc78yV1LaAIu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aZwPak+4; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1738596711; c=relaxed/simple;
+	bh=3v8EFM1T7G9E1gQyrUNrG6m+aM4+dQyCmq/iSZIDY4c=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=eo5Ixx/pNVXyfC1uRonGX6K+v2pA9zXlWB1C+C1/jEbjLLRLKHHISXkFCltHIjnc4n9rjIB0KaZjBcyenYA0c1zzbfczIOdb6skOaHm0PAio4FDCGwWYSp9i4Ykvr7NYCSkkUQvonU56W1m5ETd1yqJ28nkXZfrThp7lx00qkXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=WPKbYP2m; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aZwPak+4"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738594282;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=263/793DicuReYm8n6LPz47U+pOenJtRCwlDeJnQaDk=;
-	b=aZwPak+4vM7bBAwxaRapJGvJYtuOBtXUWslssuOg7wGq6IfTPtbyHSfeVEYMLoCGuIDODe
-	LMUAtWEiMufJlPQGeiRKZrmo8RlfnUczuXrMXrkw1JWLuYKz5AXCbKJf7wg/oI3RPE9XQC
-	YqoRyCVxLcUhB/on+WvwNMXGzBQOjgg=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-657-nfZ4DFVIMHum5Xd7-j1IbA-1; Mon,
- 03 Feb 2025 09:51:18 -0500
-X-MC-Unique: nfZ4DFVIMHum5Xd7-j1IbA-1
-X-Mimecast-MFC-AGG-ID: nfZ4DFVIMHum5Xd7-j1IbA
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 872951956080;
-	Mon,  3 Feb 2025 14:51:12 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.92])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 439391956094;
-	Mon,  3 Feb 2025 14:51:08 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20250203142343.248839-1-dhowells@redhat.com>
-References: <20250203142343.248839-1-dhowells@redhat.com>
-To: netdev@vger.kernel.org
-Cc: dhowells@redhat.com, Herbert Xu <herbert@gondor.apana.org.au>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Jakub Kicinski <kuba@kernel.org>,
-    "David S.
- Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-    Simon Horman <horms@kernel.org>,
-    Trond Myklebust <trond.myklebust@hammerspace.com>,
-    Chuck Lever <chuck.lever@oracle.com>,
-    Eric Biggers <ebiggers@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
-    linux-crypto@vger.kernel.org, linux-afs@lists.infradead.org,
-    linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 00/24] net/rxrpc, crypto: Add Kerberos crypto lib and AF_RXRPC GSSAPI security class
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="WPKbYP2m"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=PAvOtJHsIMS59RfRzFfMyl8id23TWAECc7EwAHrUKlY=;
+	t=1738596709; x=1739806309; b=WPKbYP2m554oV92ofNHXgmK4f5Kczfmx2KPMeDJ7kzv1Sml
+	y1H3j1+rZ0GesRwgqUY5RZsVVrDmBPHmpxMcL0DNzmIvmAikxh7BFhj4iy4ABbQ2g8ZExVnUlpK2C
+	GsK61+rWhqpm1tth0kgHRNRp0cpkz+gwtfAwc5g/rHbQANNEruTT4Pf1Xq5CSlWhnCwiIbxYfzKP9
+	IEm9aMR8rkQBGczMUdSCY7UdN6VS75As6bv/VjRl6H11vZbLpPA5zN6thqtKcpAp2rOXzjCmPbLR2
+	lQ1sulqkjKmvqann1uS8o9cDlWWI/at8loLohsF6z7VllXRMpRr8sIgJtkM1PmVw==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1teyQE-00000001gus-0LFB;
+	Mon, 03 Feb 2025 16:31:38 +0100
+Message-ID: <2904baea9188a4707d4b5a9a6bfa517a54323f8a.camel@sipsolutions.net>
+Subject: Re: [PATCH treewide v2 1/3] bitfield: Add non-constant
+ field_{prep,get}() helpers
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Vincent Mailhol <mailhol.vincent@wanadoo.fr>, Yury Norov
+	 <yury.norov@gmail.com>
+Cc: Geert Uytterhoeven <geert+renesas@glider.be>, linux-clk@vger.kernel.org,
+ 	linux-arm-kernel@lists.infradead.org, linux-renesas-soc@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, qat-linux@intel.com,
+ linux-gpio@vger.kernel.org, 	linux-aspeed@lists.ozlabs.org,
+ linux-iio@vger.kernel.org, 	linux-sound@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Michael Turquette	 <mturquette@baylibre.com>,
+ Stephen Boyd <sboyd@kernel.org>, Nicolas Ferre	
+ <nicolas.ferre@microchip.com>, Alexandre Belloni
+ <alexandre.belloni@bootlin.com>,  Claudiu Beznea
+ <claudiu.beznea@tuxon.dev>, Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+ Herbert Xu	 <herbert@gondor.apana.org.au>, "David S . Miller"
+ <davem@davemloft.net>,  Linus Walleij <linus.walleij@linaro.org>, Bartosz
+ Golaszewski <brgl@bgdev.pl>, Joel Stanley <joel@jms.id.au>,  Andrew Jeffery
+ <andrew@codeconstruct.com.au>, Crt Mori <cmo@melexis.com>, Jonathan Cameron
+ <jic23@kernel.org>,  Lars-Peter Clausen	 <lars@metafoo.de>, Jacky Huang
+ <ychuang3@nuvoton.com>, Shan-Chun Hung	 <schung@nuvoton.com>, Rasmus
+ Villemoes <linux@rasmusvillemoes.dk>, Jaroslav Kysela <perex@perex.cz>,
+ Takashi Iwai <tiwai@suse.com>, Jakub Kicinski <kuba@kernel.org>, Alex Elder
+ <elder@ieee.org>
+Date: Mon, 03 Feb 2025 16:31:36 +0100
+In-Reply-To: <45920591-e1d6-4337-a906-35bb5319836c@wanadoo.fr>
+References: <cover.1738329458.git.geert+renesas@glider.be>
+	 <1824412519cb8791ab428065116927ee7b77cf35.1738329459.git.geert+renesas@glider.be>
+	 <e20a177a-30cd-4088-89e1-b479aba1356c@wanadoo.fr>
+	 <Z5-xMUqrDuaE8Eo_@thinkpad>
+	 <74cab7d1ec31e7531cdda0f1eb47acdebd5c8d3f.camel@sipsolutions.net>
+	 <45920591-e1d6-4337-a906-35bb5319836c@wanadoo.fr>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <252339.1738594267.1@warthog.procyon.org.uk>
-Date: Mon, 03 Feb 2025 14:51:07 +0000
-Message-ID: <252340.1738594267@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+X-malware-bazaar: not-scanned
 
-Oops.  This should have been tagged for net-next, not for net.
+On Mon, 2025-02-03 at 22:36 +0900, Vincent Mailhol wrote:
+> > On the flip side, there have been discussions in the past (though I
+> > think not all, if any, on the list(s)) about the argument order. Since
+> > the value is typically not a constant, requiring the mask to be a
+> > constant has ensured that the argument order isn't as easily mixed up a=
+s
+> > otherwise.
+>=20
+> If this is a concern, then it can be checked with:
+>=20
+>   BUILD_BUG_ON_MSG(!__builtin_constant_p(_mask) &&
+>                    __builtin_constant_p(_val),
+>                    _pfx "mask is not constant");
+>=20
+> It means that we forbid FIELD_PREP(non_const_mask, const_val) but allow
+> any other combination.
 
-David
+There almost certainly will be users who want both to be non-constant
+though, and anyway I don't understand how that helps - if you want to
+write the value 0x7 to the (variable) mask 0xF then this won't catch
+anything?
 
+> > However, the suggested change to BUILD_BUG_ON_NOT_POWER_OF_2 almost
+> > certainly shouldn't be done for the same reason - not compiling for non=
+-
+> > constant values is [IMHO] part of the API contract for that macro. This
+> > can be important for the same reasons.
+>=20
+> Your point is fair enough. But I do not see this as a killer argument.
+> We can instead just add below helper:
+>=20
+>   BUILD_BUG_ON_STATICALLY_NOT_POWER_OF_2()
+>=20
+> But, for the same reason why I would rather not have both the
+> FIELD_{PREP,GET}() and the field_{prep,get}(), I would also rather not
+> have a BUILD_BUG_ON_NOT_POWER_OF_2() and a
+> BUILD_BUG_ON_STATICALLY_NOT_POWER_OF_2().
+>=20
+> If your concern is the wording of the contract, the description can just
+> be updated.
+
+No, I just think in both cases it's really bad form to silently update
+the contract removing negative assertions that other people may have
+been relying on. Not because these trigger today, of course, but because
+they may not have added additional checks, or similar.
+
+So arguably then you should have BUILD_BUG_ON_CONST_NOT_POWER_OF_2() or
+so instead, so that all existing users are unaffected by the updates,
+and similarly that's an argument for leaving FIELD_* versions intact. Or
+I guess one could change all existing users to new ones accordingly, say
+FIELD_*_CONST_MASK(), but that's pretty annoying too.
+
+johannes
