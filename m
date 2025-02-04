@@ -1,97 +1,76 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF44F2147E9;
-	Tue,  4 Feb 2025 19:26:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 324B520370B;
+	Tue,  4 Feb 2025 19:54:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738697212; cv=none; b=JrdBXVYcROdyzPS88Nzf0t3T2MOwEgY0wlfvIx5mCYgVXRLc+AMzLhJaNyhLPSEIkUK6bJq8n6p/UfUtldybnqlNB51Z2SrRZ18zs13EGw97ARzr4ZFyIyHXhy0Nv94naDRo+m9c4jR757vo5EfU3tNRYbAAyrEXYAoZ+ypxGx8=
+	t=1738698899; cv=none; b=JqCod+qm8CvdUO+SEwuTLBhCaFHh94HlnTTyP0Aikdy/iUGM9r4IGoohBvj7kD1o+eeuqQdZRcBqZfIwlzL82GGMPPy0vxcHEQeUgMqchd7SZfCbtsZORJMrvE7UG4R79WPZC6JWjOzno56p/Fdp6eyqz8jKEAJCwsb6Ie9Bfqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738697212; c=relaxed/simple;
-	bh=CUugQ4UB8ewPvEhGFpWRj7jO44gq3NLTzSwK4Ta4SAY=;
+	s=arc-20240116; t=1738698899; c=relaxed/simple;
+	bh=uRKxy03qDmELmv7F+dYS75uSo7cXy9zLdsTgSqupSRM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nRkjqWd3l0kW16c/LdsOAVWAA1AFOWpmg1rGZwxGlDS0yqXAsCFO3nfXY22w4WjtI6Gq0jAFTiycVMQBSURR1M48/E0FSUBCQJUXi7pUKb7lT7XR93XN/M/FEB7ijZ7ZNRmvrYoZ8TDR/dxsP2adcO2YQ6QmeU7CRM81Dp/ncNo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=If/fF4qy; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=CvSfWUPq6LkiuZkif+WotRtVN6NdtCR/SD5LNSS/n90icNryustzcuRsVXwE2JKvQ85E+6vvNHlt9qrT8srMTEFENCP+QTXIpGuVbRtBgHWFY7eN6h5++hpfxrd1+UuKM7Nr2wI2N7er7Rf4k5OaDk0sopzsBChd8ggr7vaMV/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=adI0UEcP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="If/fF4qy"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E16DC4CEDF;
-	Tue,  4 Feb 2025 19:26:48 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="adI0UEcP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56B1AC4CEDF;
+	Tue,  4 Feb 2025 19:54:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738697212;
-	bh=CUugQ4UB8ewPvEhGFpWRj7jO44gq3NLTzSwK4Ta4SAY=;
+	s=k20201202; t=1738698898;
+	bh=uRKxy03qDmELmv7F+dYS75uSo7cXy9zLdsTgSqupSRM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=If/fF4qyzjOA0+yCmOfYWkWbEyXoVZvtmd/BWQJb/Z9Whx5AQd32XjDQEApfnoCas
-	 uK3WEjCmaJeTXU24HtocZuLB4vDzq1o3Xb9xZ0cdS7rGqx4L30j4zsUloD+1vJ2I1w
-	 oKYn16tFe+PvCkqe9oBJV+aGSNoaBr8735ZQVvNMOvEqSIyB1T8WMkXoLNhbqrsDA8
-	 Sxv6YIJjBuOTPPhtnVQtwRak96ircyn28PQ92eB5lF9nfzNN6M2t92hcV4sBLoyP7/
-	 92MFLyUW39LLt7ffwe5qaRZphEFKIRW4PeguGrxNaZFsNxGZYQh75+dWpDhhu/N7/G
-	 V3vnVHAl4jlFg==
-Date: Tue, 4 Feb 2025 19:26:46 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
-Cc: Philipp Zabel <p.zabel@pengutronix.de>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Aurelien Jarno <aurelien@aurel32.net>,
-	Sebastian Reichel <sebastian.reichel@collabora.com>,
-	kernel@collabora.com, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v2 2/7] dt-bindings: rng: add binding for Rockchip RK3588
- RNG
-Message-ID: <20250204-monologue-throng-c6772c089404@spud>
-References: <20250204-rk3588-trng-submission-v2-0-608172b6fd91@collabora.com>
- <20250204-rk3588-trng-submission-v2-2-608172b6fd91@collabora.com>
+	b=adI0UEcPSZV9Hl6eJzbMFQ/fyVbiT3XdRGhzg3dlQxvKT3PaSUwncxe8HT3npSYmZ
+	 OOg0klGWK4yV5K6zbYaas4mf3vg/XMYNfF2Rp+WT0ImVluTXVCO62855SHkdOEtm0N
+	 BArHbxg+Xv46fEbsPILhrcWwAvRblgIIvT0Rv2bBlkh8/KYOl4pRfR7O58zhW6Mlbs
+	 0uZ82Z0nn/5Z827Kypl6I7kwdzvuiO/+nGdpzvoPupYeoUCkZru99UHyo6bPZLST3B
+	 V4LyVwprVL5QolCVx+gwis5sNUnXSo1V6klSXXCx9WR3U5ETHe2b8Ojub/2dN94pFi
+	 dSN/INuKC6xwg==
+Date: Tue, 4 Feb 2025 11:54:56 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org, x86@kernel.org,
+	linux-block@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	Keith Busch <kbusch@kernel.org>,
+	Kent Overstreet <kent.overstreet@linux.dev>,
+	"Martin K . Petersen" <martin.petersen@oracle.com>
+Subject: Re: [PATCH v2 00/11] CRC64 library rework and x86 CRC optimization
+Message-ID: <20250204195456.GA1385@sol.localdomain>
+References: <20250130035130.180676-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="3oc7PGcIEvdR+5za"
-Content-Disposition: inline
-In-Reply-To: <20250204-rk3588-trng-submission-v2-2-608172b6fd91@collabora.com>
-
-
---3oc7PGcIEvdR+5za
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20250130035130.180676-1-ebiggers@kernel.org>
 
-On Tue, Feb 04, 2025 at 04:35:47PM +0100, Nicolas Frattaroli wrote:
-> The Rockchip RK3588 SoC has two hardware RNGs accessible to the
-> non-secure world: an RNG in the Crypto IP, and a standalone RNG that is
-> new to this SoC.
->=20
-> Add a binding for this new standalone RNG. It is distinct hardware from
-> the existing rockchip,rk3568-rng, and therefore gets its own binding as
-> the two hardware IPs are unrelated other than both being made by the
-> same vendor.
->=20
-> The RNG is capable of firing an interrupt when entropy is ready.
->=20
-> The reset is optional, as the hardware does a power-on reset, and
-> functions without the software manually resetting it.
->=20
-> Signed-off-by: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
+On Wed, Jan 29, 2025 at 07:51:19PM -0800, Eric Biggers wrote:
+> This patchset applies to commit 72deda0abee6e7 and is also available at:
+> 
+>     git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git crc-x86-v2
+> 
+> This is the next major set of CRC library improvements, targeting 6.15.
+> 
+> Patches 1-5 rework the CRC64 library along the lines of what I did for
+> CRC32 and CRC-T10DIF in 6.14.  They add direct support for
+> architecture-specific optimizations, fix the naming of the NVME CRC64
+> variant, and eliminate a pointless use of the crypto API.
+> 
+> Patches 6-10 replace the existing x86 PCLMULQDQ optimized CRC code with
+> new code that is shared among the different CRC variants and also adds
+> VPCLMULQDQ support, greatly improving performance on recent CPUs.
+> Patch 11 wires up the same optimization to crc64_be() and crc64_nvme()
+> (a.k.a. the old "crc64_rocksoft") which previously were unoptimized,
+> improving the performance of those CRC functions by as much as 100x.
+> crc64_be is used by bcachefs, and crc64_nvme is used by blk-integrity.
 
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
+Applied patches 1-5 to
+https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=crc-next
 
---3oc7PGcIEvdR+5za
-Content-Type: application/pgp-signature; name="signature.asc"
+I'm still working a bit on the x86 assembly and am planning to do a v3 for
+patches 6-11.
 
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZ6Jp9gAKCRB4tDGHoIJi
-0sZwAPwNeNLYaxfWC1AxcDB1tYjKebikVvcKzjwoZADBtieSSQEA6/BVaYCQIuCs
-363NNSW6ibIXN0SYog0H3t+JFHlysQ4=
-=mXHF
------END PGP SIGNATURE-----
-
---3oc7PGcIEvdR+5za--
+- Eric
