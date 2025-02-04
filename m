@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53E6420DD71
-	for <linux-crypto@vger.kernel.org>; Tue,  4 Feb 2025 13:14:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABCF321770E
+	for <linux-crypto@vger.kernel.org>; Tue,  4 Feb 2025 13:14:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738674875; cv=none; b=HsnRUAQhpzi4GnfNyHvHYyBwg46shPSo8C5E4BoCf5fTanpqQv292zhehDTwMkUCyt5v8sXTWGiXp43GAEHIJbzXk1L8MwvLU59ksL41VzuBFcYk/KzRXikyxFc1TgbrQyjG9cXnui/Q3wCBkrejTj7Hc7aRJDONw8O45M+z4zI=
+	t=1738674884; cv=none; b=daDcGwCFUefW5bqP/PvIrH/vbg0I43blw43jHIC5J2QI6OG5DdPB2/BiLkCEd7RVkzZpvybjbHwU38z2NXOkJhWUc7zMAJN/2Tb1BNIWlfhOKqLAYTsHOeaRXRTgNgXM/9D0Eo026kCJ0CvY4U8GLbRufJrj7aiJxJERIV1afNI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738674875; c=relaxed/simple;
-	bh=x1ygPA8J4qnuyDNUMKtqKy91nBFfJUfK5w83C12NV2Y=;
+	s=arc-20240116; t=1738674884; c=relaxed/simple;
+	bh=mUuhldH3XFGgE5Bt6wurmm0YH4002fJXCdOHWBu31FM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GHG1EXBBuuWt2eO1/kDp05OZvzujLrTlU7Xv10lm1Jl6vmUp/cX0pZgn9SnOxvNm2pKZi7Iy2aupR7fAemsezFeON49KHYXFozmHQ1LWgPnWGtS/hTOvYt+hOuOwg6Vv1MWjFy6q6rNR2WC5T9T3+atgR5m8XVb59e61mBjqSyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xy1VEjDK; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=FriaNzn3X1DTZ8dgAWa/nd6pUV1WpE9AjnJ0R7F0Yg+MLB4Hz7T/VVxrqga+Aq6T0pXtgqPpyeZCyz+w6ZnkrEXe4Tf4VkVj8wTPCcwx9hmh4/9IKwQbYjnWqRv6M5ZBzvnT2jBlsOxIMx4a0i2fSte+69yn5spl4c0DqYncUAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xce2ANRd; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xy1VEjDK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8F4DC4CEEA;
-	Tue,  4 Feb 2025 13:14:29 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xce2ANRd"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39B61C4CEDF;
+	Tue,  4 Feb 2025 13:14:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738674874;
-	bh=x1ygPA8J4qnuyDNUMKtqKy91nBFfJUfK5w83C12NV2Y=;
+	s=k20201202; t=1738674884;
+	bh=mUuhldH3XFGgE5Bt6wurmm0YH4002fJXCdOHWBu31FM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Xy1VEjDK7Mv/Bad0x5ax8F/X87+Jb0ktSc8Q11SbC4EeRRhi6k8u3nG2yhndX8RuI
-	 hgrKqWFJrd1AyyrqO1qK0RcLnCHrNvC2SwueWjs+wrBAqd9mXOKjKrGbO123jHgnUq
-	 nXFwJhv604JjCpFuLUgS2JpLdnPym0jQ15cIdEMr8f0aA5HJxnvF0F3ahwTxRM5ztU
-	 ombP8ozvOqGU31j/kZXAgjPHxCXroRURL7vRWmLDmhZpCDO+KpJ1VTJDJTNUbQiTI5
-	 YG4ULW0ZHlZ+EkQFysKTDU/570hOS7IhCBpVJ38vR3r1bO65ZD9iq6v+AvcXpvEVdW
-	 T6rhTUOXebvog==
+	b=Xce2ANRdMeXx0FejqBdqRMKEe0MziS9zBDEqR4ISfpilXA0crLAp0617z0OzHh4Bp
+	 LOEOD04BjuzrfbZcI/GeYvaLpyznV0R66zJOa6zTrgumS3hJ69QmhA0S4uIi1DCOMI
+	 smkMNnSuoautaPRuWMfJjVpSQcNYQT6co48HCTPekYmGo/nH1fQ2igqbtdflWuUX26
+	 KsgqBmPJedt2uDge4zIPp7zm3tiaVxXC+hCJtO7XurTN2cNh8o95VNLijiHe8fE78m
+	 /GtQ1ygjWnHn9u7dln7Ar0X0niOXm1FxtLN9gcSu3ueZ0bAklgajOm8MUQOdYf8W/A
+	 M6KevN7N9WgLw==
 From: =?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
 To: Arnd Bergmann <arnd@arndb.de>,
 	soc@kernel.org
@@ -37,9 +37,9 @@ Cc: arm@kernel.org,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>
-Subject: [PATCH 2/5] platform: cznic: Add keyctl helpers for Turris platform
-Date: Tue,  4 Feb 2025 14:14:12 +0100
-Message-ID: <20250204131415.27014-3-kabel@kernel.org>
+Subject: [PATCH 3/5] platform: cznic: turris-omnia-mcu: Add support for digital message signing with HW private key
+Date: Tue,  4 Feb 2025 14:14:13 +0100
+Message-ID: <20250204131415.27014-4-kabel@kernel.org>
 X-Mailer: git-send-email 2.45.3
 In-Reply-To: <20250204131415.27014-1-kabel@kernel.org>
 References: <20250204131415.27014-1-kabel@kernel.org>
@@ -52,304 +52,324 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Some Turris devices support signing messages with a per-device unique
-asymmetric key that was created on the device at manufacture time.
+Add support for digital message signing with the private key stored in
+the MCU. Turris Omnia boards with MKL MCUs have a NIST256p ECDSA private
+key generated and burned into MCU's flash when manufactured. The private
+key is not readable from the MCU, but MCU allows for signing messages
+with it and retrieving the public key.
 
-Add helper module that helps to expose this ability via the keyctl()
-syscall.
+This is exposed to userspace via the keyctl API.
 
-A device-specific driver can register a signing key by calling
-devm_turris_signing_key_create().
+In userspace, the user can look at /proc/keys or list the keyring:
 
-Both the `.turris-signing-keys` keyring and the signing key are created
-with only the VIEW, READ and SEARCH permissions for userspace - it is
-impossible to link / unlink / move them, set their attributes, or unlink
-the keyring from userspace.
+  $ cat /proc/keys
+  0a3b7cd3 ... keyring   .turris-signing-keys: 1
+  3caf0b1a ... turris-om Turris Omnia SN 0000000A1000023 MCU ECDSA k...
+
+  $ keyctl rlist %:.turris-signing-keys
+  1018104602
+
+To get the public key:
+
+  $ keyctl read 1018104602
+  33 bytes of data in key:
+  025d9108 1fb538ae 8435c88b b4379171 d6b158a9 55751b91 1d23e6a9 d017f4b2
+  1c
+
+To sign a message:
+
+  $ dd if=/dev/urandom of=msg_to_sign bs=32 count=1
+  $ keyctl pkey_sign 1018104602 0 msg_to_sign >signature
 
 Signed-off-by: Marek Behún <kabel@kernel.org>
 ---
- MAINTAINERS                                 |   1 +
- drivers/platform/cznic/Kconfig              |   5 +
- drivers/platform/cznic/Makefile             |   2 +
- drivers/platform/cznic/turris-signing-key.c | 192 ++++++++++++++++++++
- include/linux/turris-signing-key.h          |  33 ++++
- 5 files changed, 233 insertions(+)
- create mode 100644 drivers/platform/cznic/turris-signing-key.c
- create mode 100644 include/linux/turris-signing-key.h
+ drivers/platform/cznic/Kconfig                |  12 ++
+ drivers/platform/cznic/Makefile               |   1 +
+ .../platform/cznic/turris-omnia-mcu-base.c    |   4 +
+ .../platform/cznic/turris-omnia-mcu-keyctl.c  | 162 ++++++++++++++++++
+ drivers/platform/cznic/turris-omnia-mcu.h     |  29 ++++
+ 5 files changed, 208 insertions(+)
+ create mode 100644 drivers/platform/cznic/turris-omnia-mcu-keyctl.c
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 896a307fa065..e37c3f3425a9 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2442,6 +2442,7 @@ F:	include/dt-bindings/bus/moxtet.h
- F:	include/linux/armada-37xx-rwtm-mailbox.h
- F:	include/linux/moxtet.h
- F:	include/linux/turris-omnia-mcu-interface.h
-+F:	include/linux/turris-signing-key.h
- 
- ARM/FARADAY FA526 PORT
- M:	Hans Ulli Kroll <ulli.kroll@googlemail.com>
 diff --git a/drivers/platform/cznic/Kconfig b/drivers/platform/cznic/Kconfig
-index 49c383eb6785..2b4c91ede6d8 100644
+index 2b4c91ede6d8..8318beb7ec94 100644
 --- a/drivers/platform/cznic/Kconfig
 +++ b/drivers/platform/cznic/Kconfig
-@@ -77,4 +77,9 @@ config TURRIS_OMNIA_MCU_TRNG
+@@ -75,6 +75,18 @@ config TURRIS_OMNIA_MCU_TRNG
+ 	  Say Y here to add support for the true random number generator
+ 	  provided by CZ.NIC's Turris Omnia MCU.
  
- endif # TURRIS_OMNIA_MCU
- 
-+config TURRIS_SIGNING_KEY
-+	tristate
++config TURRIS_OMNIA_MCU_KEYCTL
++	bool "Turris Omnia MCU ECDSA message signing"
++	default y
 +	depends on KEYS
 +	depends on ASYMMETRIC_KEY_TYPE
++	depends on TURRIS_OMNIA_MCU_GPIO
++	select TURRIS_SIGNING_KEY
++	help
++	  Say Y here to add support for ECDSA message signing with board private
++	  key (if available on the MCU). This is exposed via the keyctl()
++	  syscall.
 +
- endif # CZNIC_PLATFORMS
+ endif # TURRIS_OMNIA_MCU
+ 
+ config TURRIS_SIGNING_KEY
 diff --git a/drivers/platform/cznic/Makefile b/drivers/platform/cznic/Makefile
-index ce6d997f34d6..2b8606a9486b 100644
+index 2b8606a9486b..ccad7bec82e1 100644
 --- a/drivers/platform/cznic/Makefile
 +++ b/drivers/platform/cznic/Makefile
-@@ -6,3 +6,5 @@ turris-omnia-mcu-$(CONFIG_TURRIS_OMNIA_MCU_GPIO)		+= turris-omnia-mcu-gpio.o
+@@ -3,6 +3,7 @@
+ obj-$(CONFIG_TURRIS_OMNIA_MCU)	+= turris-omnia-mcu.o
+ turris-omnia-mcu-y		:= turris-omnia-mcu-base.o
+ turris-omnia-mcu-$(CONFIG_TURRIS_OMNIA_MCU_GPIO)		+= turris-omnia-mcu-gpio.o
++turris-omnia-mcu-$(CONFIG_TURRIS_OMNIA_MCU_KEYCTL)		+= turris-omnia-mcu-keyctl.o
  turris-omnia-mcu-$(CONFIG_TURRIS_OMNIA_MCU_SYSOFF_WAKEUP)	+= turris-omnia-mcu-sys-off-wakeup.o
  turris-omnia-mcu-$(CONFIG_TURRIS_OMNIA_MCU_TRNG)		+= turris-omnia-mcu-trng.o
  turris-omnia-mcu-$(CONFIG_TURRIS_OMNIA_MCU_WATCHDOG)		+= turris-omnia-mcu-watchdog.o
+diff --git a/drivers/platform/cznic/turris-omnia-mcu-base.c b/drivers/platform/cznic/turris-omnia-mcu-base.c
+index 770e680b96f9..e8fc0d7b3343 100644
+--- a/drivers/platform/cznic/turris-omnia-mcu-base.c
++++ b/drivers/platform/cznic/turris-omnia-mcu-base.c
+@@ -392,6 +392,10 @@ static int omnia_mcu_probe(struct i2c_client *client)
+ 	if (err)
+ 		return err;
+ 
++	err = omnia_mcu_register_keyctl(mcu);
++	if (err)
++		return err;
 +
-+obj-$(CONFIG_TURRIS_SIGNING_KEY) += turris-signing-key.o
-diff --git a/drivers/platform/cznic/turris-signing-key.c b/drivers/platform/cznic/turris-signing-key.c
+ 	return omnia_mcu_register_trng(mcu);
+ }
+ 
+diff --git a/drivers/platform/cznic/turris-omnia-mcu-keyctl.c b/drivers/platform/cznic/turris-omnia-mcu-keyctl.c
 new file mode 100644
-index 000000000000..3b12e5245fb7
+index 000000000000..dc40f942f082
 --- /dev/null
-+++ b/drivers/platform/cznic/turris-signing-key.c
-@@ -0,0 +1,192 @@
++++ b/drivers/platform/cznic/turris-omnia-mcu-keyctl.c
+@@ -0,0 +1,162 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * Some of CZ.NIC's Turris devices support signing messages with a per-device unique asymmetric
-+ * cryptographic key that was burned into the device at manufacture.
-+ *
-+ * This helper module exposes this message signing ability via the keyctl() syscall. Upon load, it
-+ * creates the `.turris-signing-keys` keyring. A device-specific driver then has to create a signing
-+ * key by calling devm_turris_signing_key_create().
++ * CZ.NIC's Turris Omnia MCU ECDSA message signing via keyctl
 + *
 + * 2025 by Marek Behún <kabel@kernel.org>
 + */
 +
++#include <crypto/sha2.h>
++#include <linux/cleanup.h>
++#include <linux/completion.h>
 +#include <linux/device.h>
 +#include <linux/err.h>
-+#include <linux/key-type.h>
++#include <linux/i2c.h>
++#include <linux/interrupt.h>
 +#include <linux/key.h>
-+#include <linux/keyctl.h>
-+#include <linux/module.h>
-+#include <linux/seq_file.h>
++#include <linux/mutex.h>
 +#include <linux/string.h>
 +#include <linux/types.h>
 +
++#include <linux/turris-omnia-mcu-interface.h>
 +#include <linux/turris-signing-key.h>
++#include "turris-omnia-mcu.h"
 +
-+static int turris_signing_key_instantiate(struct key *, struct key_preparsed_payload *)
++static irqreturn_t omnia_msg_signed_irq_handler(int irq, void *dev_id)
 +{
-+	return 0;
-+}
-+
-+static void turris_signing_key_describe(const struct key *key, struct seq_file *m)
-+{
-+	const struct turris_signing_key_subtype *subtype = dereference_key_rcu(key);
-+
-+	if (!subtype)
-+		return;
-+
-+	seq_printf(m, "%s: %*phN", key->description, subtype->public_key_size,
-+		   subtype->get_public_key(key));
-+}
-+
-+static long turris_signing_key_read(const struct key *key, char *buffer, size_t buflen)
-+{
-+	const struct turris_signing_key_subtype *subtype = dereference_key_rcu(key);
-+
-+	if (!subtype)
-+		return -EIO;
-+
-+	if (buffer) {
-+		if (buflen > subtype->public_key_size)
-+			buflen = subtype->public_key_size;
-+
-+		memcpy(buffer, subtype->get_public_key(key), subtype->public_key_size);
-+	}
-+
-+	return subtype->public_key_size;
-+}
-+
-+static bool turris_signing_key_asym_valid_params(const struct turris_signing_key_subtype *subtype,
-+						 const struct kernel_pkey_params *params)
-+{
-+	if (params->encoding && strcmp(params->encoding, "raw"))
-+		return false;
-+
-+	if (params->hash_algo && strcmp(params->hash_algo, subtype->hash_algo))
-+		return false;
-+
-+	return true;
-+}
-+
-+static int turris_signing_key_asym_query(const struct kernel_pkey_params *params,
-+					 struct kernel_pkey_query *info)
-+{
-+	const struct turris_signing_key_subtype *subtype = dereference_key_rcu(params->key);
-+
-+	if (!subtype)
-+		return -EIO;
-+
-+	if (!turris_signing_key_asym_valid_params(subtype, params))
-+		return -EINVAL;
-+
-+	info->supported_ops = KEYCTL_SUPPORTS_SIGN;
-+	info->key_size = subtype->key_size;
-+	info->max_data_size = subtype->data_size;
-+	info->max_sig_size = subtype->sig_size;
-+	info->max_enc_size = 0;
-+	info->max_dec_size = 0;
-+
-+	return 0;
-+}
-+
-+static int turris_signing_key_asym_eds_op(struct kernel_pkey_params *params,
-+				 const void *in, void *out)
-+{
-+	const struct turris_signing_key_subtype *subtype = dereference_key_rcu(params->key);
++	u8 reply[1 + OMNIA_MCU_CRYPTO_SIGNATURE_LEN];
++	struct omnia_mcu *mcu = dev_id;
 +	int err;
 +
-+	if (!subtype)
-+		return -EIO;
++	err = omnia_cmd_read(mcu->client, OMNIA_CMD_CRYPTO_COLLECT_SIGNATURE,
++			     reply, sizeof(reply));
++	if (!err && reply[0] != OMNIA_MCU_CRYPTO_SIGNATURE_LEN)
++		err = -EIO;
 +
-+	if (!turris_signing_key_asym_valid_params(subtype, params))
-+		return -EINVAL;
++	guard(mutex)(&mcu->sign_lock);
 +
-+	if (params->op != kernel_pkey_sign)
-+		return -EOPNOTSUPP;
++	if (mcu->sign_requested) {
++		mcu->sign_err = err;
++		if (!err)
++			memcpy(mcu->signature, &reply[1],
++			       OMNIA_MCU_CRYPTO_SIGNATURE_LEN);
++		mcu->sign_requested = false;
++		complete(&mcu->msg_signed);
++	}
 +
-+	if (params->in_len != subtype->data_size || params->out_len != subtype->sig_size)
-+		return -EINVAL;
++	return IRQ_HANDLED;
++}
 +
-+	err = subtype->sign(params->key, in, out);
++static int omnia_mcu_sign(const struct key *key, const void *msg,
++			  void *signature)
++{
++	struct omnia_mcu *mcu = dev_get_drvdata(turris_signing_key_get_dev(key));
++	u8 cmd[1 + SHA256_DIGEST_SIZE], reply;
++	int err;
++
++	scoped_guard(mutex, &mcu->sign_lock) {
++		if (mcu->sign_requested)
++			return -EBUSY;
++
++		cmd[0] = OMNIA_CMD_CRYPTO_SIGN_MESSAGE;
++		memcpy(&cmd[1], msg, SHA256_DIGEST_SIZE);
++
++		err = omnia_cmd_write_read(mcu->client, cmd, sizeof(cmd),
++					   &reply, 1);
++		if (err)
++			return err;
++
++		if (!reply)
++			return -EBUSY;
++
++		mcu->sign_requested = true;
++	}
++
++	if (wait_for_completion_interruptible(&mcu->msg_signed))
++		return -EINTR;
++
++	guard(mutex)(&mcu->sign_lock);
++
++	if (mcu->sign_err)
++		return mcu->sign_err;
++
++	memcpy(signature, mcu->signature, OMNIA_MCU_CRYPTO_SIGNATURE_LEN);
++
++	/* forget the signature, for security */
++	memzero_explicit(mcu->signature, sizeof(mcu->signature));
++
++	return OMNIA_MCU_CRYPTO_SIGNATURE_LEN;
++}
++
++static const void *omnia_mcu_get_public_key(const struct key *key)
++{
++	struct omnia_mcu *mcu = dev_get_drvdata(turris_signing_key_get_dev(key));
++
++	return mcu->board_public_key;
++}
++
++static const struct turris_signing_key_subtype omnia_signing_key_subtype = {
++	.key_size		= 256,
++	.data_size		= SHA256_DIGEST_SIZE,
++	.sig_size		= OMNIA_MCU_CRYPTO_SIGNATURE_LEN,
++	.public_key_size	= OMNIA_MCU_CRYPTO_PUBLIC_KEY_LEN,
++	.hash_algo		= "sha256",
++	.get_public_key		= omnia_mcu_get_public_key,
++	.sign			= omnia_mcu_sign,
++};
++
++static int omnia_mcu_read_public_key(struct omnia_mcu *mcu)
++{
++	u8 reply[1 + OMNIA_MCU_CRYPTO_PUBLIC_KEY_LEN];
++	int err;
++
++	err = omnia_cmd_read(mcu->client, OMNIA_CMD_CRYPTO_GET_PUBLIC_KEY,
++			     reply, sizeof(reply));
 +	if (err)
 +		return err;
 +
-+	return subtype->sig_size;
-+}
++	if (reply[0] != OMNIA_MCU_CRYPTO_PUBLIC_KEY_LEN)
++		return -EIO;
 +
-+static struct key_type turris_signing_key_type = {
-+	.name		= "turris-signing-key",
-+	.instantiate	= turris_signing_key_instantiate,
-+	.describe	= turris_signing_key_describe,
-+	.read		= turris_signing_key_read,
-+	.asym_query	= turris_signing_key_asym_query,
-+	.asym_eds_op	= turris_signing_key_asym_eds_op,
-+};
-+
-+static struct key *turris_signing_keyring;
-+
-+static void turris_signing_key_release(void *key)
-+{
-+	key_unlink(turris_signing_keyring, key);
-+	key_put(key);
-+}
-+
-+int
-+devm_turris_signing_key_create(struct device *dev, const struct turris_signing_key_subtype *subtype,
-+			       const char *desc)
-+{
-+	struct key *key;
-+	key_ref_t kref;
-+
-+	kref = key_create(make_key_ref(turris_signing_keyring, true),
-+			  turris_signing_key_type.name, desc, NULL, 0,
-+			  (KEY_POS_ALL & ~KEY_POS_SETATTR) | KEY_USR_VIEW | KEY_USR_READ |
-+			  KEY_USR_SEARCH,
-+			  KEY_ALLOC_BUILT_IN | KEY_ALLOC_SET_KEEP | KEY_ALLOC_NOT_IN_QUOTA);
-+	if (IS_ERR(kref))
-+		return PTR_ERR(kref);
-+
-+	key = key_ref_to_ptr(kref);
-+	key->payload.data[1] = dev;
-+	rcu_assign_keypointer(key, subtype);
-+
-+	return devm_add_action_or_reset(dev, turris_signing_key_release, key);
-+}
-+EXPORT_SYMBOL_GPL(devm_turris_signing_key_create);
-+
-+static int turris_signing_key_init(void)
-+{
-+	int err;
-+
-+	err = register_key_type(&turris_signing_key_type);
-+	if (err)
-+		return err;
-+
-+	turris_signing_keyring = keyring_alloc(".turris-signing-keys",
-+					       GLOBAL_ROOT_UID, GLOBAL_ROOT_GID, current_cred(),
-+					       (KEY_POS_ALL & ~KEY_POS_SETATTR) | KEY_USR_VIEW |
-+					       KEY_USR_READ | KEY_USR_SEARCH,
-+					       KEY_ALLOC_BUILT_IN | KEY_ALLOC_SET_KEEP |
-+					       KEY_ALLOC_NOT_IN_QUOTA,
-+					       NULL, NULL);
-+	if (IS_ERR(turris_signing_keyring)) {
-+		pr_err("Cannot allocate Turris keyring\n");
-+
-+		unregister_key_type(&turris_signing_key_type);
-+
-+		return PTR_ERR(turris_signing_keyring);
-+	}
++	memcpy(mcu->board_public_key, &reply[1],
++	       OMNIA_MCU_CRYPTO_PUBLIC_KEY_LEN);
 +
 +	return 0;
 +}
-+module_init(turris_signing_key_init);
 +
-+static void turris_signing_key_exit(void)
++int omnia_mcu_register_keyctl(struct omnia_mcu *mcu)
 +{
-+	key_put(turris_signing_keyring);
-+	unregister_key_type(&turris_signing_key_type);
++	struct device *dev = &mcu->client->dev;
++	char desc[48];
++	int err;
++
++	if (!(mcu->features & OMNIA_FEAT_CRYPTO))
++		return 0;
++
++	err = omnia_mcu_read_public_key(mcu);
++	if (err)
++		return dev_err_probe(dev, err,
++				     "Cannot read board public key\n");
++
++	err = devm_mutex_init(dev, &mcu->sign_lock);
++	if (err)
++		return err;
++
++	init_completion(&mcu->msg_signed);
++
++	err = omnia_mcu_request_irq(mcu, OMNIA_INT_MESSAGE_SIGNED,
++				    omnia_msg_signed_irq_handler,
++				    "turris-omnia-mcu-keyctl");
++	if (err)
++		return dev_err_probe(dev, err,
++				     "Cannot request MESSAGE_SIGNED IRQ\n");
++
++	sprintf(desc, "Turris Omnia SN %016llX MCU ECDSA key",
++		mcu->board_serial_number);
++
++	err = devm_turris_signing_key_create(dev, &omnia_signing_key_subtype,
++					     desc);
++	if (err)
++		return dev_err_probe(dev, err, "Cannot create signing key\n");
++
++	return 0;
 +}
-+module_exit(turris_signing_key_exit);
-+
-+MODULE_AUTHOR("Marek Behun <kabel@kernel.org>");
-+MODULE_DESCRIPTION("CZ.NIC's Turris signing key helper");
-+MODULE_LICENSE("GPL");
-diff --git a/include/linux/turris-signing-key.h b/include/linux/turris-signing-key.h
-new file mode 100644
-index 000000000000..032ca8cbf636
---- /dev/null
-+++ b/include/linux/turris-signing-key.h
-@@ -0,0 +1,33 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * 2025 by Marek Behún <kabel@kernel.org>
-+ */
-+
-+#ifndef __TURRIS_SIGNING_KEY_H
-+#define __TURRIS_SIGNING_KEY_H
-+
-+#include <linux/key.h>
-+#include <linux/types.h>
-+
-+struct device;
-+
-+struct turris_signing_key_subtype {
-+	u16 key_size;
-+	u8 data_size;
-+	u8 sig_size;
-+	u8 public_key_size;
-+	const char *hash_algo;
-+	const void *(*get_public_key)(const struct key *key);
-+	int (*sign)(const struct key *key, const void *msg, void *signature);
+diff --git a/drivers/platform/cznic/turris-omnia-mcu.h b/drivers/platform/cznic/turris-omnia-mcu.h
+index f2084880a00c..8473a3031917 100644
+--- a/drivers/platform/cznic/turris-omnia-mcu.h
++++ b/drivers/platform/cznic/turris-omnia-mcu.h
+@@ -18,6 +18,11 @@
+ #include <linux/watchdog.h>
+ #include <linux/workqueue.h>
+ 
++enum {
++	OMNIA_MCU_CRYPTO_PUBLIC_KEY_LEN	= 1 + 32,
++	OMNIA_MCU_CRYPTO_SIGNATURE_LEN	= 64,
 +};
 +
-+static inline struct device *turris_signing_key_get_dev(const struct key *key)
+ struct i2c_client;
+ struct rtc_device;
+ 
+@@ -56,6 +61,12 @@ struct rtc_device;
+  * @wdt:			watchdog driver structure
+  * @trng:			RNG driver structure
+  * @trng_entropy_ready:		RNG entropy ready completion
++ * @msg_signed:			message signed completion
++ * @sign_lock:			mutex to protect message signing state
++ * @sign_requested:		flag indicating that message signing was requested but not completed
++ * @sign_err:			message signing error number, filled in interrupt handler
++ * @signature:			message signing signature, filled in interrupt handler
++ * @board_public_key:		board public key, if stored in MCU
+  */
+ struct omnia_mcu {
+ 	struct i2c_client *client;
+@@ -89,6 +100,15 @@ struct omnia_mcu {
+ 	struct hwrng trng;
+ 	struct completion trng_entropy_ready;
+ #endif
++
++#ifdef CONFIG_TURRIS_OMNIA_MCU_KEYCTL
++	struct completion msg_signed;
++	struct mutex sign_lock;
++	bool sign_requested;
++	int sign_err;
++	u8 signature[OMNIA_MCU_CRYPTO_SIGNATURE_LEN];
++	u8 board_public_key[OMNIA_MCU_CRYPTO_PUBLIC_KEY_LEN];
++#endif
+ };
+ 
+ #ifdef CONFIG_TURRIS_OMNIA_MCU_GPIO
+@@ -103,6 +123,15 @@ static inline int omnia_mcu_register_gpiochip(struct omnia_mcu *mcu)
+ }
+ #endif
+ 
++#ifdef CONFIG_TURRIS_OMNIA_MCU_KEYCTL
++int omnia_mcu_register_keyctl(struct omnia_mcu *mcu);
++#else
++static inline int omnia_mcu_register_keyctl(struct omnia_mcu *mcu)
 +{
-+	return key->payload.data[1];
++	return 0;
 +}
++#endif
 +
-+int
-+devm_turris_signing_key_create(struct device *dev, const struct turris_signing_key_subtype *subtype,
-+			       const char *desc);
-+
-+#endif /* __TURRIS_SIGNING_KEY_H */
+ #ifdef CONFIG_TURRIS_OMNIA_MCU_SYSOFF_WAKEUP
+ extern const struct attribute_group omnia_mcu_poweroff_group;
+ int omnia_mcu_register_sys_off_and_wakeup(struct omnia_mcu *mcu);
 -- 
 2.45.3
 
