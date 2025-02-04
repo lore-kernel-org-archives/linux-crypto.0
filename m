@@ -1,44 +1,44 @@
 Received: from sender4-op-o15.zoho.com (sender4-op-o15.zoho.com [136.143.188.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0E852144BF;
-	Tue,  4 Feb 2025 15:37:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62B7E215193;
+	Tue,  4 Feb 2025 15:37:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.15
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738683443; cv=pass; b=sJSyoV+3Kc9u1wNNTSzD+yvurJ8Gxh0jtCXxIG2BG0mOCAzdY4tkdNYt0/3osTtJeQm2YVfkHwYHxd2Plqf39k0jJN88Hgi4jhph8055FKptR/7sU4R7GjKvZuJFmD6ioJ4SQewO+03LjgaMWQ9+nmw9r5pZvxJ/22Rvkkea4i4=
+	t=1738683445; cv=pass; b=h6S7ZO3PSCO/qSoeWMX3Jgvg1zXPbSlk210mScEg/YIZuXnoNzGCz3F7hh0zj7GG84zcRAz5ImRFOjcRH6J2PsZGz1Vbd3rfV1V1USqcgynDzsVkb9OmZY+MC5VFY+vxn4kxw+7F8ohZ+yful50+QyJnL6WWiAslXlXfJM1u7xQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738683443; c=relaxed/simple;
-	bh=VvA9T/6/1ouApmi0pVoVzoVvdkTJ5i4k2HhcQaBOuKE=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=XtM56uo8Xy55yFoLTgy87x6IevzP92/oGW2dOaEh36m5cOG17CQ+rQQgocLuAgzU0reIqMQ52in8IyxwZK1OwteRffk8O+QkrXpxidX+9kkEWPztMWj52KH8DpHilQfHsaHd8OWlrxWR40Na4tcVmmM/PSC+WUPbeF5E4qCdouc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=nicolas.frattaroli@collabora.com header.b=fYrbbgsj; arc=pass smtp.client-ip=136.143.188.15
+	s=arc-20240116; t=1738683445; c=relaxed/simple;
+	bh=0jmLzxRIRIANYSi5uhfFZFP3ZVxHZWZq3QaxEhg0EIg=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=XkN49KqoyLGR3Elz6uGLbbe+FCX4myaDTWNzur3wt2Yz8kDvMPNDORMrRncK0unYr+KC+rTuaXQVh1KnSIwt45SyZSbN3JJXxEvxIgm0FxkCeuKxyyheQnFeh9A8qRuyUTBpEeYr8IkFOwehQqNl7CHzEnzdX5wF5BYIqijO7XM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=nicolas.frattaroli@collabora.com header.b=VqiOQIoI; arc=pass smtp.client-ip=136.143.188.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=nicolas.frattaroli@collabora.com header.b="fYrbbgsj"
-ARC-Seal: i=1; a=rsa-sha256; t=1738683388; cv=none; 
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=nicolas.frattaroli@collabora.com header.b="VqiOQIoI"
+ARC-Seal: i=1; a=rsa-sha256; t=1738683404; cv=none; 
 	d=zohomail.com; s=zohoarc; 
-	b=k0lgcf1dvRGVLSzSiPJVLuQRIu+lEHgND/pww59nuxqUd0/lQn+LsTsRPZjQCfo5jHJLo7gLOo/zjoqWUVqnW/eVOJ5f3N/xTEk2WRM2JDTkZ0rstqXZtxgSZiinbFIHY3QNiYCs00P5Zp7kT4Z+Vdcjr5+/g7ft+cYUvR4w0Hc=
+	b=Jlggb8fTFANjDZEgljs5b4UWgyLLGXCA65os1qnPJTI4UjSZ7/3K0cJyfFjdBPnQViD/yeJyzDfCpdsOWlcEnFc75dxBiQ56G5Zz7GIR4QK6EYI8L8nfkALouAeJKc3qhhvGOhDtQwtCWOIIso8ZbQfMhRKD4XCqsOFLIIi9RGs=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1738683388; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=8ujLKurGvDlQE7460495fVpBsgx7EB711zNkKXoYjcI=; 
-	b=H2HkuFYUt57HAPyC5c9ZYxe9rw0ZohIGkiA6SgqJ/xE4QHfSoRp7BVR8jx/5kqUA8gi+hKZ/BvpVaINmVhlGQKCwyr3PFyFjvnvIf80vAGgy2wPLA8ftzk1B+tlx7XsJPzVFJM0/4qW9PyUOogX0L9+7IkrPuKUI+byx2iNo/Gw=
+	t=1738683404; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=cLWASrFa29Q0aJ8RgvPnTlSszHSM+G/gv+i3GP4pQnU=; 
+	b=MV7YLv+0TwJ9R6MT1xauccgHlQL8T5q/8dt/svTxtsEvpIARIA1lvjjCfyp5bfC2nt/kntA6tbGx1llHOHRC1IUySfodxHqOG6jJHWkoZQ8X/fEIk6pJIBw9/EHBi67NYvn0hmzMS+7XIj5IOLlD7m0GkOvjoejyTpqxbUxK98Q=
 ARC-Authentication-Results: i=1; mx.zohomail.com;
 	dkim=pass  header.i=collabora.com;
 	spf=pass  smtp.mailfrom=nicolas.frattaroli@collabora.com;
 	dmarc=pass header.from=<nicolas.frattaroli@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1738683388;
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1738683404;
 	s=zohomail; d=collabora.com; i=nicolas.frattaroli@collabora.com;
-	h=From:From:Subject:Subject:Date:Date:Message-Id:Message-Id:MIME-Version:Content-Type:Content-Transfer-Encoding:To:To:Cc:Cc:Reply-To;
-	bh=8ujLKurGvDlQE7460495fVpBsgx7EB711zNkKXoYjcI=;
-	b=fYrbbgsj+lEyEKT5sYIq9OsndC4T4I9xa4kcOd2en8mHuqe3IdM6uQT8DwXwuuUW
-	dSrdojQi2q6hA0kEEE/mLC7+xpXfi2YblxwHv2AwB29Pd7PpeK4pbZdfub3++Xvn/Fe
-	dAlfLHY+w8jt+IKvbFgqFZjstUJMSVt0uCVTF1LA=
-Received: by mx.zohomail.com with SMTPS id 17386833845484.547279568763543;
-	Tue, 4 Feb 2025 07:36:24 -0800 (PST)
+	h=From:From:Date:Date:Subject:Subject:MIME-Version:Content-Type:Content-Transfer-Encoding:Message-Id:Message-Id:References:In-Reply-To:To:To:Cc:Cc:Reply-To;
+	bh=cLWASrFa29Q0aJ8RgvPnTlSszHSM+G/gv+i3GP4pQnU=;
+	b=VqiOQIoIx2bwtEZpqxAWpm4Jya7YhOXf3sPk6rS6DVGtAjTbA8YiZ8mjuB7TI/2x
+	zT4bxlSUPoWcSb1nvxc1+77RX+gGwO3awAIV4pfOoUA6GhXokcNDJlCG/VfoyuHSJtL
+	1hr8xwdmy2HB5vMpKKvW2BE5KKim0GogLvRpV2cU=
+Received: by mx.zohomail.com with SMTPS id 1738683388528327.5051525050993;
+	Tue, 4 Feb 2025 07:36:28 -0800 (PST)
 From: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
-Subject: [PATCH v2 0/7] RK3588 Hardware Random Number Generator Driver
-Date: Tue, 04 Feb 2025 16:35:45 +0100
-Message-Id: <20250204-rk3588-trng-submission-v2-0-608172b6fd91@collabora.com>
+Date: Tue, 04 Feb 2025 16:35:46 +0100
+Subject: [PATCH v2 1/7] dt-bindings: reset: Add SCMI reset IDs for RK3588
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -47,11 +47,9 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIANEzomcC/4WNQQ6CMBBFr0K6dkwpTmldeQ/DAmqBiUDNFImGc
- HcLF3D5fvLeX0X0TD6Ka7YK9gtFClMCdcqE6+up80CPxEJJhTIvJPCzQGNg5qmD+G5GirsCElE
- hOqu1sSLJL/YtfY7wvUrcU5wDf4+fJd/Xv8klBwm2bNtSozb+Ym8uDEPdBK7PLoyi2rbtBzI5c
- OrAAAAA
-X-Change-ID: 20250130-rk3588-trng-submission-055255c96689
+Message-Id: <20250204-rk3588-trng-submission-v2-1-608172b6fd91@collabora.com>
+References: <20250204-rk3588-trng-submission-v2-0-608172b6fd91@collabora.com>
+In-Reply-To: <20250204-rk3588-trng-submission-v2-0-608172b6fd91@collabora.com>
 To: Philipp Zabel <p.zabel@pengutronix.de>, Rob Herring <robh@kernel.org>, 
  Krzysztof Kozlowski <krzk+dt@kernel.org>, 
  Conor Dooley <conor+dt@kernel.org>, Heiko Stuebner <heiko@sntech.de>, 
@@ -64,115 +62,80 @@ Cc: Sebastian Reichel <sebastian.reichel@collabora.com>,
  linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
  Nicolas Frattaroli <nicolas.frattaroli@collabora.com>, 
  XiaoDong Huang <derrick.huang@rock-chips.com>, 
- Conor Dooley <conor.dooley@microchip.com>, 
- Lin Jinhan <troy.lin@rock-chips.com>
+ Conor Dooley <conor.dooley@microchip.com>
 X-Mailer: b4 0.14.2
 
-This series adds support for the Rockchip RK3588's standalone hardware
-random number generator to the existing mainline rockchip-rng driver.
+When TF-A is used to assert/deassert the resets through SCMI, the
+IDs communicated to it are different than the ones mainline Linux uses.
 
-The RK3588 has several hardware random number generators, one in each
-the secure-world and non-secure-world crypto accelerator, and one
-standalone one in each the secure-world and non-secure-world, so 4
-hwrngs in total. This series adds support for the standalone hwrng,
-which is an entirely new IP on this SoC and distinct from the one in the
-Crypto IP.
+Import the list of SCMI reset IDs from mainline TF-A so that devicetrees
+can use these IDs more easily.
 
-The decision to integrate this into the existing rockchip-rng driver was
-made based on a few factors:
-
-1. The driver is fairly small.
-2. While not much code is shared, some code is, specifically relating to
-   power management, the hwrng interface and the probe function.
-3. I don't want users to figure out why "CONFIG_HW_RANDOM_ROCKCHIP"
-   doesn't enable the RK3588 one, and I really don't see a reason to
-   build without both of them considering the other RK3588 TRNG (for
-   which there is not yet a driver iirc) *does* share code with the
-   existing rockchip-rng driver.
-
-Here are the rngtest5 results from this new driver on my board:
-
-  user@debian-rockchip-rock5b-rk3588:~$ cat /sys/class/misc/hw_random/rng_current 
-  rockchip-rng
-  user@debian-rockchip-rock5b-rk3588:~$ sudo cat /dev/hwrng | rngtest -c 10000 
-  [...]
-  rngtest: bits received from input: 200000032
-  rngtest: FIPS 140-2 successes: 9990
-  rngtest: FIPS 140-2 failures: 10
-  rngtest: FIPS 140-2(2001-10-10) Monobit: 1
-  rngtest: FIPS 140-2(2001-10-10) Poker: 0
-  rngtest: FIPS 140-2(2001-10-10) Runs: 5
-  rngtest: FIPS 140-2(2001-10-10) Long run: 4
-  rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-  rngtest: input channel speed: (min=212.255; avg=29089.272; max=19531250.000)Kibits/s
-  rngtest: FIPS tests speed: (min=64.005; avg=102.494; max=153.818)Mibits/s
-  rngtest: Program run time: 11292340 microseconds
-
-As you can see, the quality of the entropy is quite good, and the
-throughput is an acceptable 29 Mibit/s.
-
-The series starts out with two patches for the bindings. The bindings
-are separate from the rockchip,rk3568-rng bindings, as the required
-properties differ. The SCMI reset ID numbers are needed because mainline
-uses a different reset numbering scheme, but TF-A uses the downstream
-numbering scheme as far as I know. The TRNG must be reset through SCMI.
-
-Next up are two cleanup patches for the existing driver. Even if a
-decision is made to split the drivers for whatever reason, these two
-patches should be used in the rk3568-rng driver as they get rid of small
-peculiarities in the code without meaningfully changing how the driver
-works.
-
-Next up is the main driver patch that adds support for the new TRNG. As
-the driver was developed by reading the downstream vendor code for this
-particular device and reworking it, I've included the downstream vendor
-developer who wrote the driver as a Co-developed-by tag with their
-existing downstream sign-off.
-
-The penultimate patch adds the node to the rk3588-base.dtsi, and
-enables it.
-
-The final patch adds myself to the MAINTAINERS of this driver and these
-bindings.
-
+Co-developed-by: XiaoDong Huang <derrick.huang@rock-chips.com>
+Signed-off-by: XiaoDong Huang <derrick.huang@rock-chips.com>
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
 Signed-off-by: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
 ---
-Changes in v2:
-- Drop mailmap patch
-- driver: restore the OF matching to how it was, and change soc_data to
-  const
-- dts: get rid of the board specific DTS enablement and instead enable
-  it in rk3588-base
-- bindings: drop the change of adding myself to maintainers from the
-  bindings patch, make it a separate patch
-- bindings: get rid of the comments
-- bindings: set status = "okay" in the example
-- bindings: make interrupts property required
-- Add a patch to add me to the MAINTAINERS for this driver/binding
-- Link to v1: https://lore.kernel.org/r/20250130-rk3588-trng-submission-v1-0-97ff76568e49@collabora.com
+ include/dt-bindings/reset/rockchip,rk3588-cru.h | 41 ++++++++++++++++++++++++-
+ 1 file changed, 40 insertions(+), 1 deletion(-)
 
----
-Nicolas Frattaroli (7):
-      dt-bindings: reset: Add SCMI reset IDs for RK3588
-      dt-bindings: rng: add binding for Rockchip RK3588 RNG
-      hwrng: rockchip: store dev pointer in driver struct
-      hwrng: rockchip: eliminate some unnecessary dereferences
-      hwrng: rockchip: add support for rk3588's standalone TRNG
-      arm64: dts: rockchip: Add rng node to RK3588
-      MAINTAINERS: add Nicolas Frattaroli to rockchip-rng maintainers
+diff --git a/include/dt-bindings/reset/rockchip,rk3588-cru.h b/include/dt-bindings/reset/rockchip,rk3588-cru.h
+index e2fe4bd5f7f01569c804ae4ea87c7cf0433d2ae7..878beae6dc3baaa9a2eb46f7a81454d360968754 100644
+--- a/include/dt-bindings/reset/rockchip,rk3588-cru.h
++++ b/include/dt-bindings/reset/rockchip,rk3588-cru.h
+@@ -1,6 +1,6 @@
+ /* SPDX-License-Identifier: (GPL-2.0 OR MIT) */
+ /*
+- * Copyright (c) 2021 Rockchip Electronics Co. Ltd.
++ * Copyright (c) 2021, 2024 Rockchip Electronics Co. Ltd.
+  * Copyright (c) 2022 Collabora Ltd.
+  *
+  * Author: Elaine Zhang <zhangqing@rock-chips.com>
+@@ -753,4 +753,43 @@
+ 
+ #define SRST_A_HDMIRX_BIU		660
+ 
++/* SCMI Secure Resets */
++
++/* Name=SECURE_SOFTRST_CON00,Offset=0xA00 */
++#define SCMI_SRST_A_SECURE_NS_BIU	10
++#define SCMI_SRST_H_SECURE_NS_BIU	11
++#define SCMI_SRST_A_SECURE_S_BIU	12
++#define SCMI_SRST_H_SECURE_S_BIU	13
++#define SCMI_SRST_P_SECURE_S_BIU	14
++#define SCMI_SRST_CRYPTO_CORE		15
++/* Name=SECURE_SOFTRST_CON01,Offset=0xA04 */
++#define SCMI_SRST_CRYPTO_PKA		16
++#define SCMI_SRST_CRYPTO_RNG		17
++#define SCMI_SRST_A_CRYPTO		18
++#define SCMI_SRST_H_CRYPTO		19
++#define SCMI_SRST_KEYLADDER_CORE	25
++#define SCMI_SRST_KEYLADDER_RNG		26
++#define SCMI_SRST_A_KEYLADDER		27
++#define SCMI_SRST_H_KEYLADDER		28
++#define SCMI_SRST_P_OTPC_S		29
++#define SCMI_SRST_OTPC_S		30
++#define SCMI_SRST_WDT_S			31
++/* Name=SECURE_SOFTRST_CON02,Offset=0xA08 */
++#define SCMI_SRST_T_WDT_S		32
++#define SCMI_SRST_H_BOOTROM		33
++#define SCMI_SRST_A_DCF			34
++#define SCMI_SRST_P_DCF			35
++#define SCMI_SRST_H_BOOTROM_NS		37
++#define SCMI_SRST_P_KEYLADDER		46
++#define SCMI_SRST_H_TRNG_S		47
++/* Name=SECURE_SOFTRST_CON03,Offset=0xA0C */
++#define SCMI_SRST_H_TRNG_NS		48
++#define SCMI_SRST_D_SDMMC_BUFFER	49
++#define SCMI_SRST_H_SDMMC		50
++#define SCMI_SRST_H_SDMMC_BUFFER	51
++#define SCMI_SRST_SDMMC			52
++#define SCMI_SRST_P_TRNG_CHK		53
++#define SCMI_SRST_TRNG_S		54
++
++
+ #endif
 
- .../bindings/rng/rockchip,rk3588-rng.yaml          |  60 +++++
- MAINTAINERS                                        |   2 +
- arch/arm64/boot/dts/rockchip/rk3588-base.dtsi      |   9 +
- drivers/char/hw_random/Kconfig                     |   3 +-
- drivers/char/hw_random/rockchip-rng.c              | 250 ++++++++++++++++++---
- include/dt-bindings/reset/rockchip,rk3588-cru.h    |  41 +++-
- 6 files changed, 335 insertions(+), 30 deletions(-)
----
-base-commit: 72deda0abee6e705ae71a93f69f55e33be5bca5c
-change-id: 20250130-rk3588-trng-submission-055255c96689
-
-Best regards,
 -- 
-Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
+2.48.1
 
