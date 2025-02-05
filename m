@@ -1,105 +1,217 @@
-Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.65])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C845A21CFEF
-	for <linux-crypto@vger.kernel.org>; Tue,  4 Feb 2025 23:34:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17B9D163;
+	Wed,  5 Feb 2025 00:05:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738712075; cv=none; b=nUkVvYrEoaRwn8PvkBlTNlZ2s1pEooZznVpmEvx/Z/vrvAdzfGvAQUMmGO1p7lZ+60AXqiLHSeRYmv/K7fm5T74YHqcVNbZKL4FJsTzRB6Y5vyFCnu0on/6gff2ImN8u2XwEDyAEoFeOM47ZEZ0SQwFoPzpYkExq/kEJhbuCbaw=
+	t=1738713925; cv=none; b=eWS7Jg/RVMMeyMkI//QCIus/qAZVyvfLITWZWvj2Aq11wGTBkMXqMDdG2pRuZea7PVgIVt07ORKIztYcxEAmTecFlwo+0ZSYpiLWeeRpKVqpprTEZfXX4+IdzAMuWjFSDhs1/No/KWfGIomzYWV2EhZnVWU1MMCoq59YTn0xG28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738712075; c=relaxed/simple;
-	bh=ZyVExCqzB2iyA3bGQRpDduhuvKS4WRQAEUDFtlqCUyc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iQOB5Vr4CVknYwsEOBv6DLt/3r61SjJbBTxErSTj54aGlPw6eiMwcUzu5ezhouOtwyZaDhZ2G1UPKq09YktcLtf5+4dqzqzluxNSCIt48P8xYGLgahxGMzumP41PpKM/hmslGv2c/unoE8i+QDjCVmep6NXjbtc6sw2F355f2UA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net; spf=pass smtp.mailfrom=posteo.net; dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b=DBuTUrKv; arc=none smtp.client-ip=185.67.36.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.net
+	s=arc-20240116; t=1738713925; c=relaxed/simple;
+	bh=TpT8m4eW9ShlTWllgAg6QDuHnGnaxHICKxhgAArSePc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qv5Xu/EToAyPr8kTMSWlsAnYMYM0hc1oeN0XVN4KxJt+y7IYO6GkEua18FmQl9S2aIBg8wLYH4iTyQcoL1vRZ21+FX/BFEAODUhsZDFoQTnkG7WE9VZrhmQEGmDTb5BBhzQhgdU+tw/1Z8V9DqkwkPMaNXKqwlOCoDY2pkdQwSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dlFtdDJq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b="DBuTUrKv"
-Received: from submission (posteo.de [185.67.36.169]) 
-	by mout01.posteo.de (Postfix) with ESMTPS id 49EAD240027
-	for <linux-crypto@vger.kernel.org>; Wed,  5 Feb 2025 00:34:31 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.net; s=2017;
-	t=1738712071; bh=ZyVExCqzB2iyA3bGQRpDduhuvKS4WRQAEUDFtlqCUyc=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:Content-Transfer-Encoding:From;
-	b=DBuTUrKvwBPCFb3wwTF27nUmKACldPAcQK56BYzilnfVJPf906YaloXYiMrBH0c8c
-	 vIuQx+YGYTxutPEplefcxq8yPY37zyFAgpbLU6vWf/V/09gaXv9jpMdG1O9VTiAqZf
-	 y3RU6mPPwJm03hw0li/MOC9HLNHPTIthKkPNCuvplIYQqPzLkejWIoUDMNA6fb0GEz
-	 MXx7QT9XTpACA6ETCFVSYuQe4WroRMb+BIlsBRIPjO+EN0pliE531twvejZqcI+Nlt
-	 GgJWtXw4wqJWoCOpmvC72HFB+3ku/yRvl2HD/J/3mKxYeJYNYBMkjmgGhoKwtjXWMV
-	 Fi8SRj0C0Cjow==
-Received: from customer (localhost [127.0.0.1])
-	by submission (posteo.de) with ESMTPSA id 4YnfpX3DL2z6tyt;
-	Wed,  5 Feb 2025 00:34:28 +0100 (CET)
-Date: Tue,  4 Feb 2025 23:34:28 +0000
-From: =?utf-8?Q?J=2E_Neusch=C3=A4fer?= <j.ne@posteo.net>
-To: Frank Li <Frank.li@nxp.com>
-Cc: =?utf-8?Q?J=2E_Neusch=C3=A4fer?= <j.ne@posteo.net>,
-	devicetree@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	Scott Wood <oss@buserror.net>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Naveen N Rao <naveen@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Niklas Cassel <cassel@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>, Lee Jones <lee@kernel.org>,
-	Vinod Koul <vkoul@kernel.org>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	=?utf-8?Q?J=2E_Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
-	Wim Van Sebroeck <wim@linux-watchdog.org>,
-	Guenter Roeck <linux@roeck-us.net>, Mark Brown <broonie@kernel.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Richard Weinberger <richard@nod.at>,
-	Vignesh Raghavendra <vigneshr@ti.com>, linux-kernel@vger.kernel.org,
-	linux-ide@vger.kernel.org, linux-crypto@vger.kernel.org,
-	dmaengine@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-watchdog@vger.kernel.org, linux-spi@vger.kernel.org,
-	linux-mtd@lists.infradead.org
-Subject: Re: [PATCH 6/9] dt-bindings: pci: Add fsl,mpc83xx-pcie bindings
-Message-ID: <Z6KkBEaGTkSyWiE_@probook>
-References: <20250126-ppcyaml-v1-0-50649f51c3dd@posteo.net>
- <20250126-ppcyaml-v1-6-50649f51c3dd@posteo.net>
- <Z5qx3jAFE81Ni2cJ@lizhi-Precision-Tower-5810>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dlFtdDJq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CE83C4CEE4;
+	Wed,  5 Feb 2025 00:05:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738713924;
+	bh=TpT8m4eW9ShlTWllgAg6QDuHnGnaxHICKxhgAArSePc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=dlFtdDJqRBxkT5x98vpvjXYWhV3jBJwnCAdK9G8UAZjLd8ccBLdDoKrJXmKWRkSQU
+	 IIqYMHT2WLp1rTwd9x4OzNhI9+VURCO6V8k14kWVUGofeJEYIy8LzuSpQLwoQ/iiWf
+	 Dh4GODqaIiv5TuWJqQRBhCRjffw8hdDW+a1uLKFgN0K1ICE1FOJsMq0F1nIxqKn9D7
+	 7QEfSdAzlc4futgaxWTpqCtFGLM/rn8JIbZTLnjhgiEqBZ/FIQy4GubJ5iLCcSwY/H
+	 chKDIeiJj2tY9GfgpRqVtbQCO+mrmqUPoVswCbTXLRB9p2JLQF0BKlGYQPCi3Q6VdA
+	 h2mhfl/RlkdEQ==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>
+Subject: [PATCH] lib/crc32: remove obsolete CRC32 options from defconfig files
+Date: Tue,  4 Feb 2025 16:04:24 -0800
+Message-ID: <20250205000424.75149-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <Z5qx3jAFE81Ni2cJ@lizhi-Precision-Tower-5810>
 
-On Wed, Jan 29, 2025 at 05:55:26PM -0500, Frank Li wrote:
-> On Sun, Jan 26, 2025 at 07:59:01PM +0100, J. Neuschäfer wrote:
-> > Supplement Documentation/devicetree/bindings/pci/fsl,pci.txt with a more
-> > formal binding in YAML format.
-> >
-> > Signed-off-by: J. Neuschäfer <j.ne@posteo.net>
-> > ---
-> >  .../devicetree/bindings/pci/fsl,mpc8xxx-pci.yaml   | 83 ++++++++++++++++++++++
-> >  1 file changed, 83 insertions(+)
-[...]
-> > +examples:
-> > +  - |
-> > +    #include <dt-bindings/interrupt-controller/irq.h>
-> > +
-> > +    pci1: pcie@e0009000 {
-> 
-> needn't label here
+From: Eric Biggers <ebiggers@google.com>
 
-Will change.
+Remove all remaining references to CONFIG_CRC32_BIT,
+CONFIG_CRC32_SARWATE, CONFIG_CRC32_SLICEBY4, and CONFIG_CRC32_SLICEBY8.
+These options no longer exist, now that we've standardized on a single
+generic CRC32 implementation.
 
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ arch/arm/configs/moxart_defconfig         | 1 -
+ arch/mips/configs/bcm47xx_defconfig       | 1 -
+ arch/mips/configs/db1xxx_defconfig        | 1 -
+ arch/mips/configs/rt305x_defconfig        | 1 -
+ arch/mips/configs/xway_defconfig          | 1 -
+ arch/powerpc/configs/adder875_defconfig   | 1 -
+ arch/powerpc/configs/ep88xc_defconfig     | 1 -
+ arch/powerpc/configs/mpc866_ads_defconfig | 1 -
+ arch/powerpc/configs/mpc885_ads_defconfig | 1 -
+ arch/powerpc/configs/tqm8xx_defconfig     | 1 -
+ 10 files changed, 10 deletions(-)
 
-Thanks,
-J. Neuschäfer
+diff --git a/arch/arm/configs/moxart_defconfig b/arch/arm/configs/moxart_defconfig
+index 34d079e03b3c5..fa06d98e43fcd 100644
+--- a/arch/arm/configs/moxart_defconfig
++++ b/arch/arm/configs/moxart_defconfig
+@@ -116,11 +116,10 @@ CONFIG_MOXART_DMA=y
+ CONFIG_EXT3_FS=y
+ CONFIG_TMPFS=y
+ CONFIG_CONFIGFS_FS=y
+ CONFIG_JFFS2_FS=y
+ CONFIG_KEYS=y
+-CONFIG_CRC32_BIT=y
+ CONFIG_DMA_API_DEBUG=y
+ CONFIG_PRINTK_TIME=y
+ CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT=y
+ # CONFIG_ENABLE_MUST_CHECK is not set
+ CONFIG_KGDB=y
+diff --git a/arch/mips/configs/bcm47xx_defconfig b/arch/mips/configs/bcm47xx_defconfig
+index 6a68a96d13f80..f56e8db5da951 100644
+--- a/arch/mips/configs/bcm47xx_defconfig
++++ b/arch/mips/configs/bcm47xx_defconfig
+@@ -67,11 +67,10 @@ CONFIG_BCMA_DRIVER_GMAC_CMN=y
+ CONFIG_USB=y
+ CONFIG_USB_HCD_BCMA=y
+ CONFIG_USB_HCD_SSB=y
+ CONFIG_LEDS_TRIGGER_TIMER=y
+ CONFIG_LEDS_TRIGGER_DEFAULT_ON=y
+-CONFIG_CRC32_SARWATE=y
+ CONFIG_PRINTK_TIME=y
+ CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT=y
+ CONFIG_DEBUG_INFO_REDUCED=y
+ CONFIG_STRIP_ASM_SYMS=y
+ CONFIG_DEBUG_FS=y
+diff --git a/arch/mips/configs/db1xxx_defconfig b/arch/mips/configs/db1xxx_defconfig
+index 6eff21ff15d54..281dd7d0f8059 100644
+--- a/arch/mips/configs/db1xxx_defconfig
++++ b/arch/mips/configs/db1xxx_defconfig
+@@ -214,9 +214,8 @@ CONFIG_NLS_UTF8=y
+ CONFIG_SECURITYFS=y
+ CONFIG_CRYPTO_USER=y
+ CONFIG_CRYPTO_CRYPTD=y
+ CONFIG_CRYPTO_USER_API_HASH=y
+ CONFIG_CRYPTO_USER_API_SKCIPHER=y
+-CONFIG_CRC32_SLICEBY4=y
+ CONFIG_FONTS=y
+ CONFIG_FONT_8x8=y
+ CONFIG_MAGIC_SYSRQ=y
+diff --git a/arch/mips/configs/rt305x_defconfig b/arch/mips/configs/rt305x_defconfig
+index 332f9094e8479..8404e0a9d8b22 100644
+--- a/arch/mips/configs/rt305x_defconfig
++++ b/arch/mips/configs/rt305x_defconfig
+@@ -127,11 +127,10 @@ CONFIG_JFFS2_COMPRESSION_OPTIONS=y
+ CONFIG_SQUASHFS=y
+ # CONFIG_SQUASHFS_ZLIB is not set
+ CONFIG_SQUASHFS_XZ=y
+ CONFIG_CRYPTO_ARC4=m
+ CONFIG_CRC_ITU_T=m
+-CONFIG_CRC32_SARWATE=y
+ # CONFIG_XZ_DEC_X86 is not set
+ # CONFIG_XZ_DEC_POWERPC is not set
+ # CONFIG_XZ_DEC_IA64 is not set
+ # CONFIG_XZ_DEC_ARM is not set
+ # CONFIG_XZ_DEC_ARMTHUMB is not set
+diff --git a/arch/mips/configs/xway_defconfig b/arch/mips/configs/xway_defconfig
+index 08c0aa03fd564..7b91edfe3e075 100644
+--- a/arch/mips/configs/xway_defconfig
++++ b/arch/mips/configs/xway_defconfig
+@@ -139,11 +139,10 @@ CONFIG_JFFS2_COMPRESSION_OPTIONS=y
+ CONFIG_SQUASHFS=y
+ # CONFIG_SQUASHFS_ZLIB is not set
+ CONFIG_SQUASHFS_XZ=y
+ CONFIG_CRYPTO_ARC4=m
+ CONFIG_CRC_ITU_T=m
+-CONFIG_CRC32_SARWATE=y
+ CONFIG_PRINTK_TIME=y
+ CONFIG_STRIP_ASM_SYMS=y
+ CONFIG_DEBUG_FS=y
+ CONFIG_MAGIC_SYSRQ=y
+ # CONFIG_SCHED_DEBUG is not set
+diff --git a/arch/powerpc/configs/adder875_defconfig b/arch/powerpc/configs/adder875_defconfig
+index 97f4d48517356..3c6445c98a85f 100644
+--- a/arch/powerpc/configs/adder875_defconfig
++++ b/arch/powerpc/configs/adder875_defconfig
+@@ -42,10 +42,9 @@ CONFIG_THERMAL=y
+ # CONFIG_DNOTIFY is not set
+ CONFIG_TMPFS=y
+ CONFIG_CRAMFS=y
+ CONFIG_NFS_FS=y
+ CONFIG_ROOT_NFS=y
+-CONFIG_CRC32_SLICEBY4=y
+ CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT=y
+ CONFIG_DEBUG_FS=y
+ CONFIG_MAGIC_SYSRQ=y
+ CONFIG_DETECT_HUNG_TASK=y
+diff --git a/arch/powerpc/configs/ep88xc_defconfig b/arch/powerpc/configs/ep88xc_defconfig
+index 50cc59eb36cf1..354180ab94bcc 100644
+--- a/arch/powerpc/configs/ep88xc_defconfig
++++ b/arch/powerpc/configs/ep88xc_defconfig
+@@ -45,9 +45,8 @@ CONFIG_SERIAL_CPM_CONSOLE=y
+ # CONFIG_DNOTIFY is not set
+ CONFIG_TMPFS=y
+ CONFIG_CRAMFS=y
+ CONFIG_NFS_FS=y
+ CONFIG_ROOT_NFS=y
+-CONFIG_CRC32_SLICEBY4=y
+ CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT=y
+ CONFIG_MAGIC_SYSRQ=y
+ CONFIG_DETECT_HUNG_TASK=y
+diff --git a/arch/powerpc/configs/mpc866_ads_defconfig b/arch/powerpc/configs/mpc866_ads_defconfig
+index 6f449411abf7b..a0d27c59ea788 100644
+--- a/arch/powerpc/configs/mpc866_ads_defconfig
++++ b/arch/powerpc/configs/mpc866_ads_defconfig
+@@ -37,6 +37,5 @@ CONFIG_EXT4_FS=y
+ CONFIG_TMPFS=y
+ CONFIG_CRAMFS=y
+ CONFIG_NFS_FS=y
+ CONFIG_ROOT_NFS=y
+ CONFIG_CRC_CCITT=y
+-CONFIG_CRC32_SLICEBY4=y
+diff --git a/arch/powerpc/configs/mpc885_ads_defconfig b/arch/powerpc/configs/mpc885_ads_defconfig
+index 77306be62e9ee..89da51d724fb1 100644
+--- a/arch/powerpc/configs/mpc885_ads_defconfig
++++ b/arch/powerpc/configs/mpc885_ads_defconfig
+@@ -68,11 +68,10 @@ CONFIG_TMPFS=y
+ CONFIG_CRAMFS=y
+ CONFIG_NFS_FS=y
+ CONFIG_ROOT_NFS=y
+ CONFIG_CRYPTO=y
+ CONFIG_CRYPTO_DEV_TALITOS=y
+-CONFIG_CRC32_SLICEBY4=y
+ CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT=y
+ CONFIG_MAGIC_SYSRQ=y
+ CONFIG_DEBUG_FS=y
+ CONFIG_DEBUG_VM_PGTABLE=y
+ CONFIG_DETECT_HUNG_TASK=y
+diff --git a/arch/powerpc/configs/tqm8xx_defconfig b/arch/powerpc/configs/tqm8xx_defconfig
+index 383c0966e92fd..425f10837a185 100644
+--- a/arch/powerpc/configs/tqm8xx_defconfig
++++ b/arch/powerpc/configs/tqm8xx_defconfig
+@@ -52,9 +52,8 @@ CONFIG_HW_RANDOM=y
+ # CONFIG_DNOTIFY is not set
+ CONFIG_TMPFS=y
+ CONFIG_CRAMFS=y
+ CONFIG_NFS_FS=y
+ CONFIG_ROOT_NFS=y
+-CONFIG_CRC32_SLICEBY4=y
+ CONFIG_DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT=y
+ CONFIG_MAGIC_SYSRQ=y
+ CONFIG_DETECT_HUNG_TASK=y
+
+base-commit: 2014c95afecee3e76ca4a56956a936e23283f05b
+-- 
+2.48.1
+
