@@ -1,40 +1,71 @@
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9157E2139CB;
-	Wed,  5 Feb 2025 03:56:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D3A538F82;
+	Wed,  5 Feb 2025 06:58:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738727796; cv=none; b=eswerYOdb+4TH6AVK8PtxdnpDtJUCYEh8ZxvRDHrEfRJYs8/mtRHKAG2zgTzsetVNpWzPnbsMJV6le42RdKB6JOMmwchKU4pk46uM0XiiH0J1ueZPNJVl1E3mLtsUhkMzX2TvwnlLYAbu5iaW3knUK6P/NadDrX01u61qpk8beQ=
+	t=1738738718; cv=none; b=cVX4iMjUo7ShzZxY4U7q8M/N0Xtpt658eIpjS64tOQWZjtdzV10T77ZjMwrJMW3F/AifAkME/yZxJ5+XCyz2QgSdvHOkjiWEZJHnEcWLitVttat0vk5JQGTTI34Q+PXisiThEVHdokHjRLBFNd0q2/F1fWAWZvP9FQi+D+qIBSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738727796; c=relaxed/simple;
-	bh=9xDkvOAHcY5SWiCewkd+/YfFw7uIe/3NoERnqxPUFb0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=d/rYZBErkI4uZYoJbyK7Y1YWc/uWN6onD/L6PJHVMv/IgKaPFErC30J2tX5MP7HE12iq0xGTGeCnGQNqQl6+4aTjvqHEuMSVAXjjB+d2x7KajxZkiPyH6Zh5I/f4h458+HiIIsZcffMAEEfIMdB7rpo/x8MYnkpuiyS986VlfN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4YnmY550DjzgcSy;
-	Wed,  5 Feb 2025 11:53:13 +0800 (CST)
-Received: from kwepemd200024.china.huawei.com (unknown [7.221.188.85])
-	by mail.maildlp.com (Postfix) with ESMTPS id 10A9A1401F3;
-	Wed,  5 Feb 2025 11:56:31 +0800 (CST)
-Received: from localhost.huawei.com (10.90.30.45) by
- kwepemd200024.china.huawei.com (7.221.188.85) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 5 Feb 2025 11:56:30 +0800
-From: Chenghai Huang <huangchenghai2@huawei.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC: <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-	<liulongfang@huawei.com>, <shenyang39@huawei.com>, <qianweili@huawei.com>,
-	<linwenkai6@hisilicon.com>, <wangzhou1@hisilicon.com>
-Subject: [PATCH 3/3] crypto: hisilicon/sec2 - fix for sec spec check
-Date: Wed, 5 Feb 2025 11:56:28 +0800
-Message-ID: <20250205035628.845962-4-huangchenghai2@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20250205035628.845962-1-huangchenghai2@huawei.com>
-References: <20250205035628.845962-1-huangchenghai2@huawei.com>
+	s=arc-20240116; t=1738738718; c=relaxed/simple;
+	bh=c6txvKKgQyXCCdt1FDoh6GYOjKGvsG2esP9LYdJogSQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mwcu4djbjNsWBzE6OeQT8pIrY1KpUZe0dz2OQw0K8Zs4wR73rfMB7ExpCB67bxU3VGZvJgD7kasImFsxwyAp78X6+vLU0BeqgK9a989x1o8dfMd4Ynvs6+du9lQ0FAdNEtQj09KO7sBZQxZmgW8jeOQX2XRccapzmrcx+zgnkds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZhKsal26; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZhKsal26"
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2165448243fso32177685ad.1;
+        Tue, 04 Feb 2025 22:58:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738738716; x=1739343516; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8kd7vO1mBpQG2GAzZAeXH5DIUcIHEuC0PONU4wK72z0=;
+        b=ZhKsal261zDeoavhdhjF03Wb9E6bDbP2dHPELE5YlJadbTLk7JpuGdGF/eRv2O3fVK
+         8MUvglE0n2YHuflfVAyARVPUwKsjYdZYyeFLzsI0BiCJyvRUMYnziT2M4LhWRBDhxTsP
+         /sJ+z+jtKooz/HlYwhomztSc4/K3HdW0vfan/pKiSsB5E5DCIk01NMoLLhWlnk/gV6JY
+         9TIY8NF29dtxhvBQVvJJAkylVq97yhjrqB9bWPSqANn5uESP5zdixu41m40WnuY1iWPD
+         UUwvkukLUyK62yoBPFwcBl8HxxHoRkMZfukJhgrfEIhTf6ZPq08SdUdS6Kw5kUdHHRJt
+         3P0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738738716; x=1739343516;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8kd7vO1mBpQG2GAzZAeXH5DIUcIHEuC0PONU4wK72z0=;
+        b=Ng+6wD4sPKcvF6KaA1iDkPqoJLhi1SQHuxop9LPWrO0lZEl6EziQJbk4uJP3cbrd3I
+         Te7xwWfpOSo6DDjS9c69CiIEGvzVwJ8PQfSNzM1nLeVPxe8kTVlaQfauMbM+iFjqXZ9I
+         F45Pmf/iG1rGtmBGd1br7Ha3iYJZ9Fl9FD7BRs7Ohjht8wtFgWctJKqHPLGyMbqHH2Y7
+         2RI4J++2juY5Wka9w44qwOaz9p+g3RKX0H6LLxmhCw40DsD7ywk6kgJpE6RwRrJA4i53
+         5JJuG2wCAnfg4xE3fKVqSaMaf/99dfktefAtku3OcFMgqcUjp/Dskkd90a7xRb79wMjn
+         s1CQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWhM5+jCS+T5bl8NJj50EX4gKzYRyqWRzUknWZ2F+b0PincQT5E9QPDnjujIek7RzWcKo03CBagiPKrGRE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxhC3ryOlQUW2g0cVHMbaZGIH72hocbcQoO0gryXyaitIBmkvbx
+	Xy0wQUDISS1ZiB2A8/TnE1L/ciD/u2ZjLCkHtzc0x4sIK/quitHk
+X-Gm-Gg: ASbGncta750Mh5PaiHNcufjTfuFBYAVPH9zz6RuH9PdOH1464yB9uLL+m71JcBZ/f5J
+	CofHkXkTm7mYqDJamA8bdr0MUcUIkQtQpOn/MJJNXNyEC3Se7zcXAoiVmBWLG7kylBG7virIC6i
+	ScL2DrmIVCtxjkHBWIc7R6g8p/rYPkMLyjQSPnlJXk4XMBH8GT2Zh8Lr51If75fQrWynHnSqTlO
+	97k4HdhFl4RHEhqrwT94BW4WaBF+66tMe5QbnNk3wHqjGYzWguyQPNloHCk3QTrMBmJjG4tHaSE
+	ghO8sTW2kcZoRfk6cD2i/aOibYLRrGL+0qCs7k5msAfJSRE7uNoriUkpFU10nA==
+X-Google-Smtp-Source: AGHT+IHfHQKhkBH6SnAi3ELRcLWQHwUP67+tCkKUBnDupDjD7giii5QzmxoANqH3MWy9/toD2fNc4Q==
+X-Received: by 2002:a05:6a20:6f07:b0:1ed:9abe:c663 with SMTP id adf61e73a8af0-1ede88306c8mr2956025637.10.1738738716391;
+        Tue, 04 Feb 2025 22:58:36 -0800 (PST)
+Received: from stone-arch-VM.localdomain ([103.233.162.226])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-acec04794b1sm11174436a12.53.2025.02.04.22.58.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Feb 2025 22:58:35 -0800 (PST)
+From: Zhihang Shao <zhihang.shao.iscas@gmail.com>
+To: ebiggers@kernel.org
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	ardb@kernel.org,
+	Zhihang Shao <zhihang.shao.iscas@gmail.com>
+Subject: [PATCH v3] riscv: Optimize crct10dif with zbc extension
+Date: Wed,  5 Feb 2025 14:58:15 +0800
+Message-ID: <20250205065815.91132-1-zhihang.shao.iscas@gmail.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -42,275 +73,193 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemd200024.china.huawei.com (7.221.188.85)
 
-From: Wenkai Lin <linwenkai6@hisilicon.com>
+The current CRC-T10DIF algorithm on RISC-V platform is based on
+table-lookup optimization.
+Given the previous work on optimizing crc32 calculations with zbc
+extension, it is believed that this will be equally effective for
+accelerating crc-t10dif.
 
-During encryption and decryption, user requests
-must be checked first, if the specifications that
-are not supported by the hardware are used, the
-software computing is used for processing.
+Therefore this patch offers an implementation of crc-t10dif using zbc
+extension. This can detect whether the current runtime environment
+supports zbc feature and, if so, uses it to accelerate crc-t10dif
+calculations.
 
-Fixes: 2f072d75d1ab ("crypto: hisilicon - Add aead support on SEC2")
-Signed-off-by: Wenkai Lin <linwenkai6@hisilicon.com>
-Signed-off-by: Chenghai Huang <huangchenghai2@huawei.com>
+This patch is updated due to the patchset of updating kernel's
+CRC-T10DIF library in 6.14, which is finished by Eric Biggers.
+Also, I used crc_kunit.c to test the performance of crc-t10dif optimized
+by crc extension.
+
+Signed-off-by: Zhihang Shao <zhihang.shao.iscas@gmail.com>
 ---
- drivers/crypto/hisilicon/sec2/sec.h        |   1 -
- drivers/crypto/hisilicon/sec2/sec_crypto.c | 101 ++++++++-------------
- 2 files changed, 39 insertions(+), 63 deletions(-)
+ arch/riscv/Kconfig                |   1 +
+ arch/riscv/lib/Makefile           |   1 +
+ arch/riscv/lib/crc-t10dif-riscv.c | 132 ++++++++++++++++++++++++++++++
+ 3 files changed, 134 insertions(+)
+ create mode 100644 arch/riscv/lib/crc-t10dif-riscv.c
 
-diff --git a/drivers/crypto/hisilicon/sec2/sec.h b/drivers/crypto/hisilicon/sec2/sec.h
-index 4b9970230..703920b49 100644
---- a/drivers/crypto/hisilicon/sec2/sec.h
-+++ b/drivers/crypto/hisilicon/sec2/sec.h
-@@ -37,7 +37,6 @@ struct sec_aead_req {
- 	u8 *a_ivin;
- 	dma_addr_t a_ivin_dma;
- 	struct aead_request *aead_req;
--	bool fallback;
- };
- 
- /* SEC request of Crypto */
-diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-index 23e98a21b..8ea5305bc 100644
---- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-@@ -690,14 +690,10 @@ static int sec_skcipher_fbtfm_init(struct crypto_skcipher *tfm)
- 
- 	c_ctx->fallback = false;
- 
--	/* Currently, only XTS mode need fallback tfm when using 192bit key */
--	if (likely(strncmp(alg, "xts", SEC_XTS_NAME_SZ)))
--		return 0;
--
- 	c_ctx->fbtfm = crypto_alloc_sync_skcipher(alg, 0,
- 						  CRYPTO_ALG_NEED_FALLBACK);
- 	if (IS_ERR(c_ctx->fbtfm)) {
--		pr_err("failed to alloc xts mode fallback tfm!\n");
-+		pr_err("failed to alloc fallback tfm for %s!\n", alg);
- 		return PTR_ERR(c_ctx->fbtfm);
- 	}
- 
-@@ -857,7 +853,7 @@ static int sec_skcipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 	}
- 
- 	memcpy(c_ctx->c_key, key, keylen);
--	if (c_ctx->fallback && c_ctx->fbtfm) {
-+	if (c_ctx->fbtfm) {
- 		ret = crypto_sync_skcipher_setkey(c_ctx->fbtfm, key, keylen);
- 		if (ret) {
- 			dev_err(dev, "failed to set fallback skcipher key!\n");
-@@ -1155,8 +1151,10 @@ static int sec_aead_setkey(struct crypto_aead *tfm, const u8 *key,
- 	}
- 
- 	ret = crypto_authenc_extractkeys(&keys, key, keylen);
--	if (ret)
-+	if (ret) {
-+		dev_err(dev, "sec extract aead keys err!\n");
- 		goto bad_key;
-+	}
- 
- 	ret = sec_aead_aes_set_key(c_ctx, &keys);
- 	if (ret) {
-@@ -1170,12 +1168,6 @@ static int sec_aead_setkey(struct crypto_aead *tfm, const u8 *key,
- 		goto bad_key;
- 	}
- 
--	if (ctx->a_ctx.a_key_len & WORD_MASK) {
--		ret = -EINVAL;
--		dev_err(dev, "AUTH key length error!\n");
--		goto bad_key;
--	}
--
- 	ret = sec_aead_fallback_setkey(a_ctx, tfm, key, keylen);
- 	if (ret) {
- 		dev_err(dev, "set sec fallback key err!\n");
-@@ -1995,8 +1987,7 @@ static int sec_aead_sha512_ctx_init(struct crypto_aead *tfm)
- 	return sec_aead_ctx_init(tfm, "sha512");
- }
- 
--static int sec_skcipher_cryptlen_check(struct sec_ctx *ctx,
--	struct sec_req *sreq)
-+static int sec_skcipher_cryptlen_check(struct sec_ctx *ctx, struct sec_req *sreq)
- {
- 	u32 cryptlen = sreq->c_req.sk_req->cryptlen;
- 	struct device *dev = ctx->dev;
-@@ -2018,10 +2009,6 @@ static int sec_skcipher_cryptlen_check(struct sec_ctx *ctx,
- 		}
- 		break;
- 	case SEC_CMODE_CTR:
--		if (unlikely(ctx->sec->qm.ver < QM_HW_V3)) {
--			dev_err(dev, "skcipher HW version error!\n");
--			ret = -EINVAL;
--		}
- 		break;
- 	default:
- 		ret = -EINVAL;
-@@ -2030,17 +2017,21 @@ static int sec_skcipher_cryptlen_check(struct sec_ctx *ctx,
- 	return ret;
- }
- 
--static int sec_skcipher_param_check(struct sec_ctx *ctx, struct sec_req *sreq)
-+static int sec_skcipher_param_check(struct sec_ctx *ctx,
-+				    struct sec_req *sreq, bool *need_fallback)
- {
- 	struct skcipher_request *sk_req = sreq->c_req.sk_req;
- 	struct device *dev = ctx->dev;
- 	u8 c_alg = ctx->c_ctx.c_alg;
- 
--	if (unlikely(!sk_req->src || !sk_req->dst ||
--		     sk_req->cryptlen > MAX_INPUT_DATA_LEN)) {
-+	if (unlikely(!sk_req->src || !sk_req->dst)) {
- 		dev_err(dev, "skcipher input param error!\n");
- 		return -EINVAL;
- 	}
+diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+index 7612c52e9b1e..db1cf9666dfd 100644
+--- a/arch/riscv/Kconfig
++++ b/arch/riscv/Kconfig
+@@ -25,6 +25,7 @@ config RISCV
+ 	select ARCH_ENABLE_THP_MIGRATION if TRANSPARENT_HUGEPAGE
+ 	select ARCH_HAS_BINFMT_FLAT
+ 	select ARCH_HAS_CRC32 if RISCV_ISA_ZBC
++	select ARCH_HAS_CRC_T10DIF if RISCV_ISA_ZBC
+ 	select ARCH_HAS_CURRENT_STACK_POINTER
+ 	select ARCH_HAS_DEBUG_VIRTUAL if MMU
+ 	select ARCH_HAS_DEBUG_VM_PGTABLE
+diff --git a/arch/riscv/lib/Makefile b/arch/riscv/lib/Makefile
+index 79368a895fee..689895b271bd 100644
+--- a/arch/riscv/lib/Makefile
++++ b/arch/riscv/lib/Makefile
+@@ -16,6 +16,7 @@ lib-$(CONFIG_MMU)	+= uaccess.o
+ lib-$(CONFIG_64BIT)	+= tishift.o
+ lib-$(CONFIG_RISCV_ISA_ZICBOZ)	+= clear_page.o
+ obj-$(CONFIG_CRC32_ARCH)	+= crc32-riscv.o
++obj-$(CONFIG_CRC_T10DIF_ARCH) += crc-t10dif-riscv.o
+ obj-$(CONFIG_FUNCTION_ERROR_INJECTION) += error-inject.o
+ lib-$(CONFIG_RISCV_ISA_V)	+= xor.o
+ lib-$(CONFIG_RISCV_ISA_V)	+= riscv_v_helpers.o
+diff --git a/arch/riscv/lib/crc-t10dif-riscv.c b/arch/riscv/lib/crc-t10dif-riscv.c
+new file mode 100644
+index 000000000000..b1ff7309f0f5
+--- /dev/null
++++ b/arch/riscv/lib/crc-t10dif-riscv.c
+@@ -0,0 +1,132 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Accelerated CRC-T10DIF implementation with RISC-V Zbc extension.
++ *
++ * Copyright (C) 2024 Institute of Software, CAS.
++ */
 +
-+	if (sk_req->cryptlen > MAX_INPUT_DATA_LEN)
-+		*need_fallback = true;
++#include <asm/alternative-macros.h>
++#include <asm/byteorder.h>
++#include <asm/hwcap.h>
 +
- 	sreq->c_req.c_len = sk_req->cryptlen;
- 
- 	if (ctx->pbuf_supported && sk_req->cryptlen <= SEC_PBUF_SZ)
-@@ -2098,6 +2089,7 @@ static int sec_skcipher_crypto(struct skcipher_request *sk_req, bool encrypt)
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(sk_req);
- 	struct sec_req *req = skcipher_request_ctx(sk_req);
- 	struct sec_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	bool need_fallback = false;
- 	int ret;
- 
- 	if (!sk_req->cryptlen) {
-@@ -2111,11 +2103,11 @@ static int sec_skcipher_crypto(struct skcipher_request *sk_req, bool encrypt)
- 	req->c_req.encrypt = encrypt;
- 	req->ctx = ctx;
- 
--	ret = sec_skcipher_param_check(ctx, req);
-+	ret = sec_skcipher_param_check(ctx, req, &need_fallback);
- 	if (unlikely(ret))
- 		return -EINVAL;
- 
--	if (unlikely(ctx->c_ctx.fallback))
-+	if (unlikely(ctx->c_ctx.fallback || need_fallback))
- 		return sec_skcipher_soft_crypto(ctx, sk_req, encrypt);
- 
- 	return ctx->req_op->process(ctx, req);
-@@ -2223,52 +2215,35 @@ static int sec_aead_spec_check(struct sec_ctx *ctx, struct sec_req *sreq)
- 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
- 	size_t sz = crypto_aead_authsize(tfm);
- 	u8 c_mode = ctx->c_ctx.c_mode;
--	struct device *dev = ctx->dev;
- 	int ret;
- 
--	/* Hardware does not handle cases where authsize is not 4 bytes aligned */
--	if (c_mode == SEC_CMODE_CBC && (sz & WORD_MASK)) {
--		sreq->aead_req.fallback = true;
-+	if (unlikely(ctx->sec->qm.ver == QM_HW_V2 && !sreq->c_req.c_len))
- 		return -EINVAL;
--	}
- 
- 	if (unlikely(req->cryptlen + req->assoclen > MAX_INPUT_DATA_LEN ||
--	    req->assoclen > SEC_MAX_AAD_LEN)) {
--		dev_err(dev, "aead input spec error!\n");
-+		     req->assoclen > SEC_MAX_AAD_LEN))
- 		return -EINVAL;
--	}
- 
- 	if (c_mode == SEC_CMODE_CCM) {
--		if (unlikely(req->assoclen > SEC_MAX_CCM_AAD_LEN)) {
--			dev_err_ratelimited(dev, "CCM input aad parameter is too long!\n");
-+		if (unlikely(req->assoclen > SEC_MAX_CCM_AAD_LEN))
- 			return -EINVAL;
--		}
--		ret = aead_iv_demension_check(req);
--		if (ret) {
--			dev_err(dev, "aead input iv param error!\n");
--			return ret;
--		}
--	}
- 
--	if (sreq->c_req.encrypt)
--		sreq->c_req.c_len = req->cryptlen;
--	else
--		sreq->c_req.c_len = req->cryptlen - sz;
--	if (c_mode == SEC_CMODE_CBC) {
--		if (unlikely(sreq->c_req.c_len & (AES_BLOCK_SIZE - 1))) {
--			dev_err(dev, "aead crypto length error!\n");
-+		ret = aead_iv_demension_check(req);
-+		if (unlikely(ret))
-+			return -EINVAL;
-+	} else if (c_mode == SEC_CMODE_CBC) {
-+		if (unlikely(sz & WORD_MASK))
-+			return -EINVAL;
-+		if (unlikely(ctx->a_ctx.a_key_len & WORD_MASK))
- 			return -EINVAL;
--		}
- 	}
- 
- 	return 0;
- }
- 
--static int sec_aead_param_check(struct sec_ctx *ctx, struct sec_req *sreq)
-+static int sec_aead_param_check(struct sec_ctx *ctx, struct sec_req *sreq, bool *need_fallback)
- {
- 	struct aead_request *req = sreq->aead_req.aead_req;
--	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
--	size_t authsize = crypto_aead_authsize(tfm);
- 	struct device *dev = ctx->dev;
- 	u8 c_alg = ctx->c_ctx.c_alg;
- 
-@@ -2277,12 +2252,10 @@ static int sec_aead_param_check(struct sec_ctx *ctx, struct sec_req *sreq)
- 		return -EINVAL;
- 	}
- 
--	if (ctx->sec->qm.ver == QM_HW_V2) {
--		if (unlikely(!req->cryptlen || (!sreq->c_req.encrypt &&
--			     req->cryptlen <= authsize))) {
--			sreq->aead_req.fallback = true;
--			return -EINVAL;
--		}
-+	if (unlikely(ctx->c_ctx.c_mode == SEC_CMODE_CBC &&
-+		     sreq->c_req.c_len & (AES_BLOCK_SIZE - 1))) {
-+		dev_err(dev, "aead cbc mode input data length error!\n");
-+		return -EINVAL;
- 	}
- 
- 	/* Support AES or SM4 */
-@@ -2291,8 +2264,10 @@ static int sec_aead_param_check(struct sec_ctx *ctx, struct sec_req *sreq)
- 		return -EINVAL;
- 	}
- 
--	if (unlikely(sec_aead_spec_check(ctx, sreq)))
-+	if (unlikely(sec_aead_spec_check(ctx, sreq))) {
-+		*need_fallback = true;
- 		return -EINVAL;
++#include <linux/byteorder/generic.h>
++#include <linux/crc-t10dif.h>
++#include <linux/minmax.h>
++#include <linux/module.h>
++#include <linux/types.h>
++
++#define CRCT10DIF_POLY 0x8bb7
++
++#if __riscv_xlen == 64
++#define STEP_ORDER 3
++
++#define CRCT10DIF_POLY_QT_BE 0xf65a57f81d33a48a
++
++static inline u64 crct10dif_prep(u16 crc, unsigned long const *ptr)
++{
++	return ((u64)crc << 48) ^ (__force u64)__cpu_to_be64(*ptr);
++}
++
++#elif __riscv_xlen == 32
++#define STEP_ORDER 2
++#define CRCT10DIF_POLY_QT_BE 0xf65a57f8
++
++static inline u32 crct10dif_prep(u16 crc, unsigned long const *ptr)
++{
++	return ((u32)crc << 16) ^ (__force u32)__cpu_to_be32(*ptr);
++}
++
++#else
++#error "Unexpected __riscv_xlen"
++#endif
++
++static inline u16 crct10dif_zbc(unsigned long s)
++{
++	u16 crc;
++
++	asm volatile   (".option push\n"
++			".option arch,+zbc\n"
++			"clmulh %0, %1, %2\n"
++			"xor    %0, %0, %1\n"
++			"clmul  %0, %0, %3\n"
++			".option pop\n"
++			: "=&r" (crc)
++			: "r"(s),
++			  "r"(CRCT10DIF_POLY_QT_BE),
++			  "r"(CRCT10DIF_POLY)
++			:);
++
++	return crc;
++}
++
++#define STEP (1 << STEP_ORDER)
++#define OFFSET_MASK (STEP - 1)
++
++static inline u16 crct10dif_unaligned(u16 crc, const u8 *p, size_t len)
++{
++	size_t bits = len * 8;
++	unsigned long s = 0;
++	u16 crc_low = 0;
++
++	for (int i = 0; i < len; i++)
++		s = *p++ | (s << 8);
++
++	if (len < sizeof(u16)) {
++		s ^= crc >> (16 - bits);
++		crc_low = crc << bits;
++	} else {
++		s ^= (unsigned long)crc << (bits - 16);
 +	}
- 
- 	if (ctx->pbuf_supported && (req->cryptlen + req->assoclen) <=
- 		SEC_PBUF_SZ)
-@@ -2336,17 +2311,19 @@ static int sec_aead_crypto(struct aead_request *a_req, bool encrypt)
- 	struct crypto_aead *tfm = crypto_aead_reqtfm(a_req);
- 	struct sec_req *req = aead_request_ctx(a_req);
- 	struct sec_ctx *ctx = crypto_aead_ctx(tfm);
-+	size_t sz = crypto_aead_authsize(tfm);
-+	bool need_fallback = false;
- 	int ret;
- 
- 	req->flag = a_req->base.flags;
- 	req->aead_req.aead_req = a_req;
- 	req->c_req.encrypt = encrypt;
- 	req->ctx = ctx;
--	req->aead_req.fallback = false;
-+	req->c_req.c_len = a_req->cryptlen - (req->c_req.encrypt ? 0 : sz);
- 
--	ret = sec_aead_param_check(ctx, req);
-+	ret = sec_aead_param_check(ctx, req, &need_fallback);
- 	if (unlikely(ret)) {
--		if (req->aead_req.fallback)
-+		if (need_fallback)
- 			return sec_aead_soft_crypto(ctx, a_req, encrypt);
- 		return -EINVAL;
- 	}
++
++	crc = crct10dif_zbc(s);
++	crc ^= crc_low;
++
++	return crc;
++}
++
++u16 crc_t10dif_arch(u16 crc, const u8 *p, size_t len)
++{
++	size_t offset, head_len, tail_len;
++	unsigned long const *p_ul;
++	unsigned long s;
++
++	asm goto(ALTERNATIVE("j %l[legacy]", "nop", 0,
++			     RISCV_ISA_EXT_ZBC, 1)
++		 : : : : legacy);
++
++	offset = (unsigned long)p & OFFSET_MASK;
++	if (offset && len) {
++		head_len = min(STEP - offset, len);
++		crc = crct10dif_unaligned(crc, p, head_len);
++		p += head_len;
++		len -= head_len;
++	}
++
++	tail_len = len & OFFSET_MASK;
++	len = len >> STEP_ORDER;
++	p_ul = (unsigned long const *)p;
++
++	for (int i = 0; i < len; i++) {
++		s = crct10dif_prep(crc, p_ul);
++		crc = crct10dif_zbc(s);
++		p_ul++;
++	}
++
++	p = (unsigned char const *)p_ul;
++	if (tail_len)
++		crc = crct10dif_unaligned(crc, p, tail_len);
++
++	return crc;
++legacy:
++	return crc_t10dif_generic(crc, p, len);
++}
++EXPORT_SYMBOL(crc_t10dif_arch);
++
++bool crc_t10dif_is_optimized(void)
++{
++	return riscv_has_extension_likely(RISCV_ISA_EXT_ZBC);
++}
++EXPORT_SYMBOL(crc_t10dif_is_optimized);
++
++MODULE_DESCRIPTION("CRC-T10DIF using RISC-V ZBC Extension");
++MODULE_LICENSE("GPL");
 -- 
-2.33.0
+2.47.0
 
