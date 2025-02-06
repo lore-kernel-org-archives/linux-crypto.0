@@ -1,120 +1,355 @@
-Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B2C519F419
-	for <linux-crypto@vger.kernel.org>; Thu,  6 Feb 2025 18:49:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29B011A8403;
+	Thu,  6 Feb 2025 18:55:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738867758; cv=none; b=bngU554Qd5958GkJMmyR1a873I+7gbt4AxB0AS6FPZEL1wr7BLEfsNiur7YxviCPTYVK9w5VU0KUgpX4p9M1HkkmYvOkwozn6pxgTIbhF4e2DifBngI9Bttk+JR/U3x5b2l8ZWh9XoK/O07lrLisyG0neGI2uVhPCy5+DsMLvP0=
+	t=1738868130; cv=none; b=GDudWPeANW+J3+9dgDwE4nQcmm7Pt7CiRcnF4jUZ7VC57WHWDO5YWEst/RWb8N4N8oXekMtlb7DFOn/Ut6WdcePhcs7LoxopcKDE4k/fQ3hco5CEMvcvvuMhMVsx+a/QPjLLZlZFAzstvjaD+lGw8oOoKU+jG+eQjW5uUjxjDW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738867758; c=relaxed/simple;
-	bh=v+PUw2Q3Yxfuone7yJBVYRyJPvIXK21JmruUcVnGGvM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rn9GPIIi7KsEL3AUKZyHonKanNGG/mmJ5u7Jei8fsIrS7j9PxKDdbZFzbeE8xYd1GBOsJSGCFkUcaWMsjBPSiKh1En4P+QMPFrmnAVlcldVCCoBPrJbcIJx7GxpBWcws8rgP+kSXZq9PzpdgPSBYJl0WgcJqMzYhMY3nMMP48fk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gVE4HK7V; arc=none smtp.client-ip=209.85.128.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	s=arc-20240116; t=1738868130; c=relaxed/simple;
+	bh=zkkxyfIG0OOmQntw88Fk9AnTma1lswnzVnPyXdNOqdM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=beZ6C0D288a0ocZ8bFv6sdj4HANa02aS7bsxc5tzrL4YXRfYAqL1v5/teVpDQvHKi8EKQIpRyls2G4ThaBvDxGVcj1/MCQ9D4QJK8zLZ/1Q0eadQA6QlYPd55gOTrI+soG0hEI5jU06jO23xuaau11thO8Dv3kYKXBuYneAuQo0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vscQJhMA; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gVE4HK7V"
-Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-6f768e9be1aso20512647b3.0
-        for <linux-crypto@vger.kernel.org>; Thu, 06 Feb 2025 10:49:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738867755; x=1739472555; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=nlRt5j/kIPL45Og0/CWS7P0L4BsTBNK9TmluKrchWAg=;
-        b=gVE4HK7VZHX0tmUnRQSmq/NB+pGNxl1b7NvNA9RtH7vz8x5q66Bg3FNvdwHIFg8CR6
-         lHi1qcYoNk1qOXiyXDkTJg6YL4ct6PYidywLwQ1/7rmqRhMQFVvSE2uIgFOgXMNEz5fY
-         e16w3lqDIEvpOXTbCKG0gys/MnGdO7IvoHNXpnJGGTlZ0Uodw8YdMgoChpl2r7nUkcpU
-         N2WFTyPBJnZ7Ha1xjhIA2uLdGWw0irMR46XwLZAJ17PzuIwGcC376AmGaY6nnjaZGQco
-         6hAoANpLeMwSEyfWhrZpjsDeow9q4LtVP98mUJok/fyfYumZTHRD2wqicNoDiKogsjRN
-         O6gQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738867755; x=1739472555;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=nlRt5j/kIPL45Og0/CWS7P0L4BsTBNK9TmluKrchWAg=;
-        b=j0nx+CbFeqA9iZSwR13+LNm5w3KyJHDb5VN1hB75TiKok2DaXNfQJsGxn8rfE5KbDn
-         1FYoPVCX6DcTPq5GB+rdLUU+q2pUmY4PFqqB1kHb2fX1Y7jPd+h+Kb96IhKwAv8Zm8ZA
-         oH6y+hgTupZIwdjOfYChWXemK2zoj4YW2qEpL0+HlqWQG8lsv3dHpgdipV9WUW/gfVVf
-         ubFLKGbLNiKqH+cMhPdddfBPR9NNHn2zlnshkpo7zduWTBWnBGtEXNgiUVO+Sjdt8ktQ
-         /yvfy/OiKvOOYoxtVlCupWvQGpRbMyoHVv/TXlaT/mUY6WA33ofu+vFb5UyhlQJOVm7j
-         hmrw==
-X-Forwarded-Encrypted: i=1; AJvYcCUKfSDB0FHggLeXmLw0KSfuZjp31oujCUmXXgegQktnYUiNPETmvoMn+ss2QYMl7ZIU9fwR2chdn7m7EBg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYEsrb6oBKi7eOwsiwf+YVz07lhNwKk0OHiscP3C3HfujVm4pf
-	ZcRInCYvPK2A/PO6avi3Rv4mUausa/Ugt+pKDKzcbDnFDfEDx43vYbSRGxjeztuapoIB/a955Kr
-	bwwSexxBSo5jkB5VVfuZl1Ifqzxdk4PHO2L0R
-X-Gm-Gg: ASbGncsgDS6o2WF6FnNL9KGTNTxy6evLW/WGR42phsyt18IDDJXubhBfLKclc5U2r0F
-	wquMUN3UjhU8GnVuBbKeS/hsgzcf59iPd0i0VMfMbLUFpaa8+ihyjmn3CcFN8kwtjgZIhycUtvi
-	+z1Pqc9yQvqvyeqAp/BbL0tiass2s=
-X-Google-Smtp-Source: AGHT+IG732MPGs5331pepE+AcF55+6p+ypSgIeWmQCP+V3pUV36KCk1Ozv7+1d7SFih6fjpij0+2+MtlgsbuGXkbOy0=
-X-Received: by 2002:a05:690c:7089:b0:6f9:492e:94db with SMTP id
- 00721157ae682-6f9b381fca2mr191027b3.2.1738867755278; Thu, 06 Feb 2025
- 10:49:15 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vscQJhMA"
+Date: Thu, 6 Feb 2025 18:55:17 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1738868125;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IE2TFxPKO+IrHATrEX31PKxXzRPzX1be6OBA9ZsVKKY=;
+	b=vscQJhMAY8Noh8UAlAt6IUGXd+ej7jSsulqMPFHwxE7ssjb5WRhbWMYhqFOz7e39315g4L
+	dwtAE0zr262rNkeRVQ0PNZPOl5XVRC73L2/FpsO0cWrYWtRgAckOuwD3pW/T6hRmnrgtEl
+	L5KMr7JTVkZ+QyyYFAlp+BQZXyVrMYQ=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, hannes@cmpxchg.org,
+	nphamcs@gmail.com, chengming.zhou@linux.dev, usamaarif642@gmail.com,
+	ryan.roberts@arm.com, 21cnbao@gmail.com, akpm@linux-foundation.org,
+	linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+	davem@davemloft.net, clabbe@baylibre.com, ardb@kernel.org,
+	ebiggers@google.com, surenb@google.com, kristen.c.accardi@intel.com,
+	wajdi.k.feghali@intel.com, vinodh.gopal@intel.com
+Subject: Re: [PATCH v6 12/16] mm: zswap: Allocate pool batching resources if
+ the compressor supports batching.
+Message-ID: <Z6UFlV2B47vgpXgt@google.com>
+References: <20250206072102.29045-1-kanchana.p.sridhar@intel.com>
+ <20250206072102.29045-13-kanchana.p.sridhar@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250206181711.1902989-1-elver@google.com> <20250206181711.1902989-2-elver@google.com>
- <552e940f-df40-4776-916e-78decdaafb49@acm.org>
-In-Reply-To: <552e940f-df40-4776-916e-78decdaafb49@acm.org>
-From: Marco Elver <elver@google.com>
-Date: Thu, 6 Feb 2025 19:48:38 +0100
-X-Gm-Features: AWEUYZnk9rIG8ZqxXrgEaM8RCQ6m2IyEZ2vODfXrtzceps44fJ5AzWTWAEX80U4
-Message-ID: <CANpmjNP6by9Kp0rf=ihwj_3j6AW+5aSm6L3LZ4NEW7uvBAV02Q@mail.gmail.com>
-Subject: Re: [PATCH RFC 01/24] compiler_types: Move lock checking attributes
- to compiler-capability-analysis.h
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: "Paul E. McKenney" <paulmck@kernel.org>, Alexander Potapenko <glider@google.com>, 
-	Bill Wendling <morbo@google.com>, Boqun Feng <boqun.feng@gmail.com>, 
-	Dmitry Vyukov <dvyukov@google.com>, Frederic Weisbecker <frederic@kernel.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Ingo Molnar <mingo@kernel.org>, 
-	Jann Horn <jannh@google.com>, Joel Fernandes <joel@joelfernandes.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Josh Triplett <josh@joshtriplett.org>, 
-	Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Thomas Gleixner <tglx@linutronix.de>, Uladzislau Rezki <urezki@gmail.com>, Waiman Long <longman@redhat.com>, 
-	Will Deacon <will@kernel.org>, kasan-dev@googlegroups.com, linux-kernel@vger.kernel.org, 
-	llvm@lists.linux.dev, rcu@vger.kernel.org, linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250206072102.29045-13-kanchana.p.sridhar@intel.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 6 Feb 2025 at 19:40, Bart Van Assche <bvanassche@acm.org> wrote:
->
-> On 2/6/25 10:09 AM, Marco Elver wrote:
-> > +/* Sparse context/lock checking support. */
-> > +# define __must_hold(x)              __attribute__((context(x,1,1)))
-> > +# define __acquires(x)               __attribute__((context(x,0,1)))
-> > +# define __cond_acquires(x)  __attribute__((context(x,0,-1)))
-> > +# define __releases(x)               __attribute__((context(x,1,0)))
-> > +# define __acquire(x)                __context__(x,1)
-> > +# define __release(x)                __context__(x,-1)
-> > +# define __cond_lock(x, c)   ((c) ? ({ __acquire(x); 1; }) : 0)
->
-> If support for Clang thread-safety attributes is added, an important
-> question is what to do with the sparse context attribute. I think that
-> more developers are working on improving and maintaining Clang than
-> sparse. How about reducing the workload of kernel maintainers by
-> only supporting the Clang thread-safety approach and by dropping support
-> for the sparse context attribute?
+On Wed, Feb 05, 2025 at 11:20:58PM -0800, Kanchana P Sridhar wrote:
+> This patch adds support for the per-CPU acomp_ctx to track multiple
+> compression/decompression requests. The zswap_cpu_comp_prepare() cpu
 
-My 2c: I think Sparse's context tracking is a subset, and generally
-less complete, favoring false negatives over false positives (also
-does not support guarded_by).
-So in theory they can co-exist.
-In practice, I agree, there will be issues with maintaining both,
-because there will always be some odd corner-case which doesn't quite
-work with one or the other (specifically Sparse is happy to auto-infer
-acquired and released capabilities/contexts of functions and doesn't
-warn you if you still hold a lock when returning from a function).
+nit: s/cpu/CPU
 
-I'd be in favor of deprecating Sparse's context tracking support,
-should there be consensus on that.
+> onlining code will check if the compressor supports batching. If so, it
+> will allocate the necessary batching resources.
+> 
+> However, zswap does not use more than one request yet. Follow-up patches
+> will actually utilize the multiple acomp_ctx requests/buffers for batch
+> compression/decompression of multiple pages.
+> 
+> The newly added ZSWAP_MAX_BATCH_SIZE limits the amount of extra memory used
+> for batching. There is no extra memory usage for compressors that do not
+> support batching.
 
-Thanks,
--- Marco
+That's not entirely accurate, there's a tiny bit of extra overhead to
+allocate the arrays. It can be avoided, but I am not sure it's worth the
+complexity.
+
+> 
+> Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
+> ---
+>  mm/zswap.c | 132 +++++++++++++++++++++++++++++++++++++++--------------
+>  1 file changed, 98 insertions(+), 34 deletions(-)
+> 
+> diff --git a/mm/zswap.c b/mm/zswap.c
+> index a2baceed3bf9..dc7d1ff04b22 100644
+> --- a/mm/zswap.c
+> +++ b/mm/zswap.c
+> @@ -78,6 +78,16 @@ static bool zswap_pool_reached_full;
+>  
+>  #define ZSWAP_PARAM_UNSET ""
+>  
+> +/*
+> + * For compression batching of large folios:
+> + * Maximum number of acomp compress requests that will be processed
+> + * in a batch, iff the zswap compressor supports batching.
+> + * This limit exists because we preallocate enough requests and buffers
+> + * in the per-cpu acomp_ctx accordingly. Hence, a higher limit means higher
+> + * memory usage.
+> + */
+> +#define ZSWAP_MAX_BATCH_SIZE 8U
+> +
+>  static int zswap_setup(void);
+>  
+>  /* Enable/disable zswap */
+> @@ -143,9 +153,10 @@ bool zswap_never_enabled(void)
+>  
+>  struct crypto_acomp_ctx {
+>  	struct crypto_acomp *acomp;
+> -	struct acomp_req *req;
+> +	struct acomp_req **reqs;
+> +	u8 **buffers;
+> +	unsigned int nr_reqs;
+>  	struct crypto_wait wait;
+> -	u8 *buffer;
+>  	struct mutex mutex;
+>  	bool is_sleepable;
+>  };
+> @@ -821,15 +832,13 @@ static int zswap_cpu_comp_prepare(unsigned int cpu, struct hlist_node *node)
+>  	struct zswap_pool *pool = hlist_entry(node, struct zswap_pool, node);
+>  	struct crypto_acomp_ctx *acomp_ctx = per_cpu_ptr(pool->acomp_ctx, cpu);
+>  	struct crypto_acomp *acomp = NULL;
+> -	struct acomp_req *req = NULL;
+> -	u8 *buffer = NULL;
+> -	int ret;
+> +	unsigned int nr_reqs = 1;
+> +	int ret = -ENOMEM;
+> +	int i;
+>  
+> -	buffer = kmalloc_node(PAGE_SIZE * 2, GFP_KERNEL, cpu_to_node(cpu));
+> -	if (!buffer) {
+> -		ret = -ENOMEM;
+> -		goto fail;
+> -	}
+> +	acomp_ctx->buffers = NULL;
+> +	acomp_ctx->reqs = NULL;
+> +	acomp_ctx->nr_reqs = 0;
+>  
+>  	acomp = crypto_alloc_acomp_node(pool->tfm_name, 0, 0, cpu_to_node(cpu));
+>  	if (IS_ERR(acomp)) {
+> @@ -839,12 +848,30 @@ static int zswap_cpu_comp_prepare(unsigned int cpu, struct hlist_node *node)
+>  		goto fail;
+>  	}
+>  
+> -	req = acomp_request_alloc(acomp);
+> -	if (!req) {
+> -		pr_err("could not alloc crypto acomp_request %s\n",
+> -		       pool->tfm_name);
+> -		ret = -ENOMEM;
+> +	if (acomp_has_async_batching(acomp))
+> +		nr_reqs = min(ZSWAP_MAX_BATCH_SIZE, crypto_acomp_batch_size(acomp));
+
+Do we need to check acomp_has_async_batching() here? Shouldn't
+crypto_acomp_batch_size() just return 1 if batching is not supported?
+
+> +
+> +	acomp_ctx->buffers = kcalloc_node(nr_reqs, sizeof(u8 *), GFP_KERNEL, cpu_to_node(cpu));
+> +	if (!acomp_ctx->buffers)
+> +		goto fail;
+> +
+> +	for (i = 0; i < nr_reqs; ++i) {
+> +		acomp_ctx->buffers[i] = kmalloc_node(PAGE_SIZE * 2, GFP_KERNEL, cpu_to_node(cpu));
+> +		if (!acomp_ctx->buffers[i])
+> +			goto fail;
+> +	}
+> +
+> +	acomp_ctx->reqs = kcalloc_node(nr_reqs, sizeof(struct acomp_req *), GFP_KERNEL, cpu_to_node(cpu));
+> +	if (!acomp_ctx->reqs)
+>  		goto fail;
+> +
+> +	for (i = 0; i < nr_reqs; ++i) {
+> +		acomp_ctx->reqs[i] = acomp_request_alloc(acomp);
+> +		if (!acomp_ctx->reqs[i]) {
+> +			pr_err("could not alloc crypto acomp_request reqs[%d] %s\n",
+> +			       i, pool->tfm_name);
+> +			goto fail;
+> +		}
+>  	}
+>  
+>  	/*
+> @@ -853,6 +880,13 @@ static int zswap_cpu_comp_prepare(unsigned int cpu, struct hlist_node *node)
+>  	 * again resulting in a deadlock.
+>  	 */
+>  	mutex_lock(&acomp_ctx->mutex);
+
+I had moved all the acomp_ctx initializations under the mutex to keep
+its state always fully initialized or uninitialized for anyone holding
+the lock. With this change, acomp_ctx->reqs will be set to non-NULL
+before the mutex is held and the acomp_ctx is fully initialized.
+
+The code in the compression/decompression path uses acomp_ctx->reqes to
+check if the acomp_ctx can be used. While I don't believe it's currently
+possible for zswap_cpu_comp_prepare() to race with these paths, I did
+this to be future proof. I don't want the code to end up initializing
+some of the struct under the lock and some of it without it.
+
+So I think there's two options here:
+- Do the due diligence check that holding the mutex is not required when
+  initializing acomp_ctx here, and remove the mutex locking here
+  completely.
+- Keep the initializations in the lock critical section (i.e. allocate
+  everything first, then initialize under the lock).
+
+> +
+> +	/*
+> +	 * The crypto_wait is used only in fully synchronous, i.e., with scomp
+> +	 * or non-poll mode of acomp, hence there is only one "wait" per
+> +	 * acomp_ctx, with callback set to reqs[0], under the assumption that
+> +	 * there is at least 1 request per acomp_ctx.
+> +	 */
+>  	crypto_init_wait(&acomp_ctx->wait);
+>  
+>  	/*
+> @@ -860,20 +894,33 @@ static int zswap_cpu_comp_prepare(unsigned int cpu, struct hlist_node *node)
+>  	 * crypto_wait_req(); if the backend of acomp is scomp, the callback
+>  	 * won't be called, crypto_wait_req() will return without blocking.
+>  	 */
+> -	acomp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+> +	acomp_request_set_callback(acomp_ctx->reqs[0], CRYPTO_TFM_REQ_MAY_BACKLOG,
+>  				   crypto_req_done, &acomp_ctx->wait);
+>  
+> -	acomp_ctx->buffer = buffer;
+> +	acomp_ctx->nr_reqs = nr_reqs;
+>  	acomp_ctx->acomp = acomp;
+>  	acomp_ctx->is_sleepable = acomp_is_async(acomp);
+> -	acomp_ctx->req = req;
+>  	mutex_unlock(&acomp_ctx->mutex);
+>  	return 0;
+>  
+>  fail:
+> +	if (acomp_ctx->buffers) {
+> +		for (i = 0; i < nr_reqs; ++i)
+> +			kfree(acomp_ctx->buffers[i]);
+> +		kfree(acomp_ctx->buffers);
+> +		acomp_ctx->buffers = NULL;
+> +	}
+> +
+> +	if (acomp_ctx->reqs) {
+> +		for (i = 0; i < nr_reqs; ++i)
+> +			if (!IS_ERR_OR_NULL(acomp_ctx->reqs[i]))
+> +				acomp_request_free(acomp_ctx->reqs[i]);
+> +		kfree(acomp_ctx->reqs);
+> +		acomp_ctx->reqs = NULL;
+> +	}
+> +
+>  	if (acomp)
+>  		crypto_free_acomp(acomp);
+> -	kfree(buffer);
+>  	return ret;
+>  }
+>  
+> @@ -883,14 +930,31 @@ static int zswap_cpu_comp_dead(unsigned int cpu, struct hlist_node *node)
+>  	struct crypto_acomp_ctx *acomp_ctx = per_cpu_ptr(pool->acomp_ctx, cpu);
+>  
+>  	mutex_lock(&acomp_ctx->mutex);
+> +
+>  	if (!IS_ERR_OR_NULL(acomp_ctx)) {
+> -		if (!IS_ERR_OR_NULL(acomp_ctx->req))
+> -			acomp_request_free(acomp_ctx->req);
+> -		acomp_ctx->req = NULL;
+> +		int i;
+> +
+> +		if (acomp_ctx->reqs) {
+> +			for (i = 0; i < acomp_ctx->nr_reqs; ++i)
+> +				if (!IS_ERR_OR_NULL(acomp_ctx->reqs[i]))
+> +					acomp_request_free(acomp_ctx->reqs[i]);
+> +			kfree(acomp_ctx->reqs);
+> +			acomp_ctx->reqs = NULL;
+> +		}
+> +
+> +		if (acomp_ctx->buffers) {
+> +			for (i = 0; i < acomp_ctx->nr_reqs; ++i)
+> +				kfree(acomp_ctx->buffers[i]);
+> +			kfree(acomp_ctx->buffers);
+> +			acomp_ctx->buffers = NULL;
+> +		}
+> +
+
+The code here seems to be almost exactly like the failure path in
+zswap_cpu_comp_prepare(), would it be better to put it in a helper?
+
+>  		if (!IS_ERR_OR_NULL(acomp_ctx->acomp))
+>  			crypto_free_acomp(acomp_ctx->acomp);
+> -		kfree(acomp_ctx->buffer);
+> +
+> +		acomp_ctx->nr_reqs = 0;
+>  	}
+> +
+>  	mutex_unlock(&acomp_ctx->mutex);
+>  
+>  	return 0;
+> @@ -903,7 +967,7 @@ static struct crypto_acomp_ctx *acomp_ctx_get_cpu_lock(struct zswap_pool *pool)
+>  	for (;;) {
+>  		acomp_ctx = raw_cpu_ptr(pool->acomp_ctx);
+>  		mutex_lock(&acomp_ctx->mutex);
+> -		if (likely(acomp_ctx->req))
+> +		if (likely(acomp_ctx->reqs))
+>  			return acomp_ctx;
+>  		/*
+>  		 * It is possible that we were migrated to a different CPU after
+> @@ -935,7 +999,7 @@ static bool zswap_compress(struct page *page, struct zswap_entry *entry,
+>  	u8 *dst;
+>  
+>  	acomp_ctx = acomp_ctx_get_cpu_lock(pool);
+> -	dst = acomp_ctx->buffer;
+> +	dst = acomp_ctx->buffers[0];
+>  	sg_init_table(&input, 1);
+>  	sg_set_page(&input, page, PAGE_SIZE, 0);
+>  
+> @@ -945,7 +1009,7 @@ static bool zswap_compress(struct page *page, struct zswap_entry *entry,
+>  	 * giving the dst buffer with enough length to avoid buffer overflow.
+>  	 */
+>  	sg_init_one(&output, dst, PAGE_SIZE * 2);
+> -	acomp_request_set_params(acomp_ctx->req, &input, &output, PAGE_SIZE, dlen);
+> +	acomp_request_set_params(acomp_ctx->reqs[0], &input, &output, PAGE_SIZE, dlen);
+>  
+>  	/*
+>  	 * it maybe looks a little bit silly that we send an asynchronous request,
+> @@ -959,8 +1023,8 @@ static bool zswap_compress(struct page *page, struct zswap_entry *entry,
+>  	 * but in different threads running on different cpu, we have different
+>  	 * acomp instance, so multiple threads can do (de)compression in parallel.
+>  	 */
+> -	comp_ret = crypto_wait_req(crypto_acomp_compress(acomp_ctx->req), &acomp_ctx->wait);
+> -	dlen = acomp_ctx->req->dlen;
+> +	comp_ret = crypto_wait_req(crypto_acomp_compress(acomp_ctx->reqs[0]), &acomp_ctx->wait);
+> +	dlen = acomp_ctx->reqs[0]->dlen;
+>  	if (comp_ret)
+>  		goto unlock;
+>  
+> @@ -1011,19 +1075,19 @@ static void zswap_decompress(struct zswap_entry *entry, struct folio *folio)
+>  	 */
+>  	if ((acomp_ctx->is_sleepable && !zpool_can_sleep_mapped(zpool)) ||
+>  	    !virt_addr_valid(src)) {
+> -		memcpy(acomp_ctx->buffer, src, entry->length);
+> -		src = acomp_ctx->buffer;
+> +		memcpy(acomp_ctx->buffers[0], src, entry->length);
+> +		src = acomp_ctx->buffers[0];
+>  		zpool_unmap_handle(zpool, entry->handle);
+>  	}
+>  
+>  	sg_init_one(&input, src, entry->length);
+>  	sg_init_table(&output, 1);
+>  	sg_set_folio(&output, folio, PAGE_SIZE, 0);
+> -	acomp_request_set_params(acomp_ctx->req, &input, &output, entry->length, PAGE_SIZE);
+> -	BUG_ON(crypto_wait_req(crypto_acomp_decompress(acomp_ctx->req), &acomp_ctx->wait));
+> -	BUG_ON(acomp_ctx->req->dlen != PAGE_SIZE);
+> +	acomp_request_set_params(acomp_ctx->reqs[0], &input, &output, entry->length, PAGE_SIZE);
+> +	BUG_ON(crypto_wait_req(crypto_acomp_decompress(acomp_ctx->reqs[0]), &acomp_ctx->wait));
+> +	BUG_ON(acomp_ctx->reqs[0]->dlen != PAGE_SIZE);
+>  
+> -	if (src != acomp_ctx->buffer)
+> +	if (src != acomp_ctx->buffers[0])
+>  		zpool_unmap_handle(zpool, entry->handle);
+>  	acomp_ctx_put_unlock(acomp_ctx);
+>  }
+> -- 
+> 2.27.0
+> 
