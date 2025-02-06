@@ -1,63 +1,66 @@
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
+Received: from mail-ed1-f73.google.com (mail-ed1-f73.google.com [209.85.208.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A87B1A4E70
-	for <linux-crypto@vger.kernel.org>; Thu,  6 Feb 2025 18:17:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D037B1A5BB0
+	for <linux-crypto@vger.kernel.org>; Thu,  6 Feb 2025 18:17:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738865869; cv=none; b=cm8V8/q6teSkn2sYJsOfwApYf/Hy/chb06la9q2QBqjfGe8K1AwnrL6RCRj0DnIrihhd1DZkE6vw9SJAVa6Kkr3z9Eb5hF+xJg9bMdJZZ498WbnQp0h49CY6qvwajaJDZ3vSYduwlWk0SZDb+zv4lrLLvEkRuqfTM2PhuHIrXDw=
+	t=1738865872; cv=none; b=rd5Dobgzul9QD/mv+WyDk3yGuJcBPlfj9pcWaE9PJWdE6Cejl+rzZmTBgdoU5us1Fh5hLFaMi17x2IM6fc/d1TpWCiIARHaO/CxThQ2WF2MyF07tpdEbS4CABgKxdaP65K9MNQHzbAul92hG81Du6+3XloQIs9xQs7P+A1LKlnc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738865869; c=relaxed/simple;
-	bh=m2lB1MS02UfQGRvMOFdd1cz7mXWpeyn5Q1URRAUmMV4=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=pTTIWTdaGeW6RXMl8kARKiGTNZ80djGXTHBqouEMZiWDb0/Q93z6Oszo517ItgIDCrVFWw/r4BnER0KBrpWes83YJ+2fis6JHTbHtTQVZ2dXrhr03EYuvINc0WhdCsFXfBi2ATrA/qMYiFlu/7BBJvwgubz5WgPFMP66FK6HOuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--elver.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rhLkmdet; arc=none smtp.client-ip=209.85.221.73
+	s=arc-20240116; t=1738865872; c=relaxed/simple;
+	bh=yFPTPmKgM1WyRS4/pLwj/qD4AEqMsgmnBOUoRJkxsqk=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=EEkk4Lcm5oOMqt1fudLpoYwQH1ylo5OLfmJyc5Ip76JdBoLUHNDcx4pkll9OHfVQY53yvfw+SQjo2EjvqNTSi6O01yA6/4Z9QycNxJx4+6CjzfTTqUOQKJK1AIl7FF/Cmifd0bJ6glIeHHn+HsOEYygEA7kPiytyLYgHwSgRMx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--elver.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h8Q5oXDB; arc=none smtp.client-ip=209.85.208.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--elver.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rhLkmdet"
-Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-38db4eacf7aso281449f8f.3
-        for <linux-crypto@vger.kernel.org>; Thu, 06 Feb 2025 10:17:46 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h8Q5oXDB"
+Received: by mail-ed1-f73.google.com with SMTP id 4fb4d7f45d1cf-5dce1b1a2b3so1385807a12.1
+        for <linux-crypto@vger.kernel.org>; Thu, 06 Feb 2025 10:17:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738865865; x=1739470665; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=wjF/wnCzuGEvgHEer/kAKPbsva6fhifSjqXPblr3+7Y=;
-        b=rhLkmdetqWlVudAi28NDS0DfLVpZPAmQdwjqFvruwJpU0HzoD417je1rSNvESdiDii
-         o2vFtDYIliNqEuo3MjTC2F9R2Fq6UDt+LMqN9AnN0C4LZWJVz505UkTi+gw6gpsDvVxV
-         cRaN/1bPgp5yqpJEETdth0lRM2SgDWK2WYW3ltMRfmUilVUwXhv79uYpuEPEcN5bXcFR
-         AhjKVU07PeszQjxT5A9VFzgJZpYPb87ZEXr2QffPYlFQD3haZBqjogBvwQPUXIHUPh+i
-         Py+hWNBA+HVtrOvUhjuwlMDjITbzdfCIuL/kKo96t2kkjxk/wsTRQAlG/qZLpx9pTLFq
-         0QdA==
+        d=google.com; s=20230601; t=1738865868; x=1739470668; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=qF82DJs8+giiKRyetuSOsU+JANR9VCfWNPadmkefX9I=;
+        b=h8Q5oXDBlm8Do82HkcBRkumMnHB5P/Hw1WzIcIg1XuVgBAWhfqnu+NP8ZpS4/ZaT+O
+         rNy5fc0uBT7EV78LB8BI3wY+PgP62QqLEFb9n4cB/PSfdZ0mLKelYPcdFhXdhlC6ZWTj
+         p7DIK6a3KPxScbjtaPUY0VojhABy0qQgjGUXBFRNbicEx+m5lzpn1m5fQq9dPzcsfi/S
+         aRqzCLfuX5PTx/wya/4c/rRY+0yhEpg9rTi/+QtEAO54nLG53zPNyc6ZsGMH4P4lTAyE
+         ZT/Xug3WG8KOK7wuEzNTXzzb0kOVWVmGWeXdUIFL5PwnbLUOaYqn3rOJEUZj2K3t0h3e
+         ocTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738865865; x=1739470665;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wjF/wnCzuGEvgHEer/kAKPbsva6fhifSjqXPblr3+7Y=;
-        b=BXbZKTTF8x9rdaphIODjUMiixUFTeQksahuLZhfeekDWAEN9cpgi351TOgcISsNfKR
-         mv6U1MiAG6E32WFi3FSbUE2zhB02MjKRbh5iHLzYiI+o7BJzW3HZkfy/RIYjrqyjT2I/
-         TcCPQH6CJvW3Tc52K2I6U6UyJ3guHrp8sQrULR5IeIL1mP/JueWdVCmXyPOGM8ZLmR+q
-         xMSywSbz/yHQ0zCfhZy1LBxK99Xrovwzh5712R7YzJUwHaQ8pgsSmK7EG5wxAvA2/W3S
-         uWlNhiyO6K50a9pZS8sKNeXRQ1E6uBG3DTBM5YDFtblWkPyuAPyM1zjb5JDSS+ibJdP9
-         pMYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVoYbCEpp7aul1xfQmQC2B1dXbxSu8CYyanzRW7bL+OIUdFtec1iIETYYQnJzLzWjDcmnhSyFKU1oV5bkw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDhs+zGnRTTL5qC38A3agPVOa8GA7JMGgWOfdxDfIzg92pW7e2
-	ywbYiCXZ0yGJz8Jt7IpvY1j71xTwjOpXtIG7hRq2d7inX7Ocy6iXn7Ovft9D9kfrTJ/f7VxWAA=
+        d=1e100.net; s=20230601; t=1738865868; x=1739470668;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qF82DJs8+giiKRyetuSOsU+JANR9VCfWNPadmkefX9I=;
+        b=SDOhF2oH/6a1aH575xc1OBiurie4XOxaS0nLk/8bt/U1MT09rYEKc2sS1Nh4EqHISk
+         dX1bp/NdwVKcMb8jgMTUHRuGZpmLQCS9j38J0ZZqLpGTWRoFJ8ZV7lqF2FYA38D3d8hZ
+         dMvVnoBR9FRgM+3MPYLWYABNvfAU0vQjjR0RQu++TmIKTqEbslT6NakfWbmgU7jbh9FL
+         DrTd69v80muLOJGPfI9EarDXzEVPzqNG42Pqza1MZPgG/9BDAZQkOPDIDXlPUrwgutHz
+         WlTfnpmjxX2yKVEWFNsvEYkeyKfhOvJWuy1TLLAR28BeNa2+RrqMG8SuTvrFWWMI/lKo
+         /faQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXXew1bcEscUD8ys+5IeB1eQsm3ABzzE9egQnl/Uv3Z6J4psXrd+XEGYqrHQj5tZpKZGO4PcE9WYGo05Gc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx2OwfioepH2/bbPQN2RDaPrAUTtiw1D52SR6+h5VO1dEDqKoKe
+	Uhe3yp6bJlenPyt2JCQ9iYGU/wkLGbNE98WuTOn9ABEjx8+FOixYtzXIyuJnpiwbI5k/dV2LTQ=
 	=
-X-Google-Smtp-Source: AGHT+IHceiLqVjWoGH3yPpdLSANFr8o1qgOjW43BMYUdBqRdyMmyJgAZaJiMaJnNeWXnSRRf+gksH835TQ==
-X-Received: from wrpc10.prod.google.com ([2002:adf:ef4a:0:b0:38b:ed0c:b648])
- (user=elver job=prod-delivery.src-stubby-dispatcher) by 2002:a5d:5849:0:b0:38d:b0fe:8c99
- with SMTP id ffacd0b85a97d-38db49101c1mr7178227f8f.48.1738865865616; Thu, 06
- Feb 2025 10:17:45 -0800 (PST)
-Date: Thu,  6 Feb 2025 19:09:54 +0100
+X-Google-Smtp-Source: AGHT+IFhkhtKPOLjUVtcZrbrdXay8cNt9Gf56kNUcmjSPeBOeQQDqEs7f95+SgyQPwoEkhsZdOCvuOgK1w==
+X-Received: from edbcs11.prod.google.com ([2002:a05:6402:c4b:b0:5dc:22e2:2325])
+ (user=elver job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6402:5290:b0:5dc:5a2f:a726
+ with SMTP id 4fb4d7f45d1cf-5de45072314mr470242a12.22.1738865868148; Thu, 06
+ Feb 2025 10:17:48 -0800 (PST)
+Date: Thu,  6 Feb 2025 19:09:55 +0100
+In-Reply-To: <20250206181711.1902989-1-elver@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20250206181711.1902989-1-elver@google.com>
 X-Mailer: git-send-email 2.48.1.502.g6dc24dfdaf-goog
-Message-ID: <20250206181711.1902989-1-elver@google.com>
-Subject: [PATCH RFC 00/24] Compiler-Based Capability- and Locking-Analysis
+Message-ID: <20250206181711.1902989-2-elver@google.com>
+Subject: [PATCH RFC 01/24] compiler_types: Move lock checking attributes to compiler-capability-analysis.h
 From: Marco Elver <elver@google.com>
 To: elver@google.com
 Cc: "Paul E. McKenney" <paulmck@kernel.org>, Alexander Potapenko <glider@google.com>, 
@@ -76,210 +79,102 @@ Cc: "Paul E. McKenney" <paulmck@kernel.org>, Alexander Potapenko <glider@google.
 	llvm@lists.linux.dev, rcu@vger.kernel.org, linux-crypto@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-[ Note: Bart and I had concurrently been working on bringing Clang's
-  -Wthread-safety to the kernel:
-    https://lore.kernel.org/all/20250206175114.1974171-1-bvanassche@acm.org/
-  Having both RFCs out should hopefully provide a good picture on these
-  design points and trade-offs - the approaches differ significantly. ]
+The conditional definition of lock checking macros and attributes is
+about to become more complex. Factor them out into their own header for
+better readability, and to make it obvious which features are supported
+by which mode (currently only Sparse). This is the first step towards
+generalizing towards "capability analysis".
 
-Capability analysis is a C language extension, which enables statically
-checking that user-definable "capabilities" are acquired and released where
-required. An obvious application is lock-safety checking for the kernel's
-various synchronization primitives (each of which represents a "capability"),
-and checking that locking rules are not violated.
+No functional change intended.
 
-Clang originally called the feature "Thread Safety Analysis" [1], with
-some terminology still using the thread-safety-analysis-only names. This
-was later changed and the feature became more flexible, gaining the
-ability to define custom "capabilities". Its foundations can be found in
-"capability systems", used to specify the permissibility of operations
-to depend on some capability being held (or not held).
-
-[1] https://clang.llvm.org/docs/ThreadSafetyAnalysis.html
-[2] https://www.cs.cornell.edu/talc/papers/capabilities.pdf
-
-Because the feature is not just able to express capabilities related to
-synchronization primitives, the naming chosen for the kernel departs
-from Clang's initial "Thread Safety" nomenclature and refers to the
-feature as "Capability Analysis" to avoid confusion. The implementation
-still makes references to the older terminology in some places, such as
-`-Wthread-safety` being the warning enabled option that also still
-appears in diagnostic messages.
-
-Enabling capability analysis can be seen as enabling a dialect of Linux
-C with a Capability System.
-
-Additional details can be found in the added kernel-doc documentation.
-
-=== Development Approach ===
-
-Prior art exists in the form of Sparse's context tracking. Locking
-annotations on functions exist, so the concept of analyzing locking rules
-is not foreign to the kernel's codebase.
-
-However, Clang's analysis is more complete vs. Sparse's, with the
-typical trade-offs in static analysis: improved completeness is
-sacrificed for more possible false positives or additional annotations
-required by the programmer. Numerous options exist to disable or opt out
-certain code from analysis.
-
-This series aims to retain compatibility with Sparse, which can provide
-tree-wide analysis of a subset of the capability analysis introduced.
-For the most part, the new (and old) keywords used for annotations are
-shared between Sparse and Clang.
-
-One big question is how to enable this feature, given we end up with a
-new dialect of C - 2 approaches have been considered:
-
-
-	A. Tree-wide all-or-nothing approach. This approach requires
-	   tree-wide changes, adding annotations or selective opt-outs.
-	   Making additional primitives capability-enabled increases
-	   churn, esp. where maintainers are unaware of the feature's
-	   existence and how to use it.
-
-Because we can't change the programming language (even if from one C
-dialect to another) of the kernel overnight, a different approach might
-cause less friction.
-
-	B. A selective, incremental, and much less intrusive approach.
-	   Maintainers of subsystems opt in their modules or directories
-	   into "capability analysis" (via Makefile):
-
-	     CAPABILITY_ANALYSIS_foo.o := y	# foo.o only
-	     CAPABILITY_ANALYSIS := y  		# all TUs
-
-	   Most (eventually all) synchronization primitives and more
-	   capabilities (including ones that could track "irq disabled",
-	   "preemption" disabled, etc.) could be supported.
-
-The approach taken by this series if B. This ensures that only
-subsystems where maintainers are willing to deal with any warnings one
-way or another. Introducing the feature can be done incrementally,
-without large tree-wide changes and adding numerous opt-outs and
-annotations to the majority of code.
-
-=== Initial Uses ===
-
-With this initial series, the following synchronization primitives are
-supported: `raw_spinlock_t`, `spinlock_t`, `rwlock_t`, `mutex`,
-`seqlock_t`, `bit_spinlock`, RCU, SRCU (`srcu_struct`), `rw_semaphore`,
-`local_lock_t`.
-
-As an initial proof-of-concept, this series also enables capability
-analysis for the following subsystems: kfence, kcov, stackdepot,
-rhashtable. (Those subsystems were chosen because I am familiar with
-their locking rules; rhashtable was chosen semi-randomly as a test
-because it combines a bunch of things: RCU, mutex, bit_spinlock.)
-
-The initial benefits are static detection of violations of locking
-rules. As more capabilities are added, we would see more static checking
-beyond what regular C can provide, all while remaining easy (read quick)
-to use via the Clang compiler.
-
-=== Appendix ===
-
-The following pending Clang patch is recommended, but not a strong
-dependency:
-
-	https://github.com/llvm/llvm-project/pull/123063
-
-This series is also available at this Git tree:
-
-	https://git.kernel.org/pub/scm/linux/kernel/git/melver/linux.git/log/?h=cap-analysis
-
-Marco Elver (24):
-  compiler_types: Move lock checking attributes to
-    compiler-capability-analysis.h
-  compiler-capability-analysis: Rename __cond_lock() to __cond_acquire()
-  compiler-capability-analysis: Add infrastructure for Clang's
-    capability analysis
-  compiler-capability-analysis: Add test stub
-  Documentation: Add documentation for Compiler-Based Capability
-    Analysis
-  checkpatch: Warn about capability_unsafe() without comment
-  cleanup: Basic compatibility with capability analysis
-  lockdep: Annotate lockdep assertions for capability analysis
-  locking/rwlock, spinlock: Support Clang's capability analysis
-  compiler-capability-analysis: Change __cond_acquires to take return
-    value
-  locking/mutex: Support Clang's capability analysis
-  locking/seqlock: Support Clang's capability analysis
-  bit_spinlock: Include missing <asm/processor.h>
-  bit_spinlock: Support Clang's capability analysis
-  rcu: Support Clang's capability analysis
-  srcu: Support Clang's capability analysis
-  kref: Add capability-analysis annotations
-  locking/rwsem: Support Clang's capability analysis
-  locking/local_lock: Support Clang's capability analysis
-  debugfs: Make debugfs_cancellation a capability struct
-  kfence: Enable capability analysis
-  kcov: Enable capability analysis
-  stackdepot: Enable capability analysis
-  rhashtable: Enable capability analysis
-
- .../dev-tools/capability-analysis.rst         | 149 ++++++
- Documentation/dev-tools/index.rst             |   1 +
- Documentation/dev-tools/sparse.rst            |   4 +
- Makefile                                      |   1 +
- .../net/wireless/intel/iwlwifi/iwl-trans.h    |   2 +-
- .../wireless/intel/iwlwifi/pcie/internal.h    |   2 +-
- fs/dlm/lock.c                                 |   2 +-
- include/linux/bit_spinlock.h                  |  24 +-
- include/linux/cleanup.h                       |  18 +-
- include/linux/compiler-capability-analysis.h  | 407 +++++++++++++++
- include/linux/compiler_types.h                |  18 +-
- include/linux/debugfs.h                       |  12 +-
- include/linux/kref.h                          |   2 +
- include/linux/list_bl.h                       |   2 +
- include/linux/local_lock.h                    |  18 +-
- include/linux/local_lock_internal.h           |  41 +-
- include/linux/lockdep.h                       |  12 +-
- include/linux/mm.h                            |   6 +-
- include/linux/mutex.h                         |  29 +-
- include/linux/mutex_types.h                   |   4 +-
- include/linux/rcupdate.h                      |  73 ++-
- include/linux/refcount.h                      |   6 +-
- include/linux/rhashtable.h                    |  14 +-
- include/linux/rwlock.h                        |  27 +-
- include/linux/rwlock_api_smp.h                |  29 +-
- include/linux/rwlock_rt.h                     |  37 +-
- include/linux/rwlock_types.h                  |  10 +-
- include/linux/rwsem.h                         |  56 +-
- include/linux/sched/signal.h                  |   2 +-
- include/linux/seqlock.h                       |  24 +
- include/linux/seqlock_types.h                 |   5 +-
- include/linux/spinlock.h                      |  61 ++-
- include/linux/spinlock_api_smp.h              |  14 +-
- include/linux/spinlock_api_up.h               |  71 +--
- include/linux/spinlock_rt.h                   |  27 +-
- include/linux/spinlock_types.h                |  10 +-
- include/linux/spinlock_types_raw.h            |   5 +-
- include/linux/srcu.h                          |  61 ++-
- kernel/Makefile                               |   2 +
- kernel/kcov.c                                 |  40 +-
- kernel/time/posix-timers.c                    |   2 +-
- lib/Kconfig.debug                             |  43 ++
- lib/Makefile                                  |   6 +
- lib/rhashtable.c                              |  12 +-
- lib/stackdepot.c                              |  24 +-
- lib/test_capability-analysis.c                | 481 ++++++++++++++++++
- mm/kfence/Makefile                            |   2 +
- mm/kfence/core.c                              |  24 +-
- mm/kfence/kfence.h                            |  18 +-
- mm/kfence/kfence_test.c                       |   4 +
- mm/kfence/report.c                            |   8 +-
- net/ipv4/tcp_sigpool.c                        |   2 +-
- scripts/Makefile.capability-analysis          |   5 +
- scripts/Makefile.lib                          |  10 +
- scripts/checkpatch.pl                         |   8 +
- tools/include/linux/compiler_types.h          |   4 +-
- 56 files changed, 1682 insertions(+), 299 deletions(-)
- create mode 100644 Documentation/dev-tools/capability-analysis.rst
+Signed-off-by: Marco Elver <elver@google.com>
+---
+ include/linux/compiler-capability-analysis.h | 32 ++++++++++++++++++++
+ include/linux/compiler_types.h               | 18 ++---------
+ 2 files changed, 34 insertions(+), 16 deletions(-)
  create mode 100644 include/linux/compiler-capability-analysis.h
- create mode 100644 lib/test_capability-analysis.c
- create mode 100644 scripts/Makefile.capability-analysis
 
+diff --git a/include/linux/compiler-capability-analysis.h b/include/linux/compiler-capability-analysis.h
+new file mode 100644
+index 000000000000..7546ddb83f86
+--- /dev/null
++++ b/include/linux/compiler-capability-analysis.h
+@@ -0,0 +1,32 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Macros and attributes for compiler-based static capability analysis.
++ */
++
++#ifndef _LINUX_COMPILER_CAPABILITY_ANALYSIS_H
++#define _LINUX_COMPILER_CAPABILITY_ANALYSIS_H
++
++#ifdef __CHECKER__
++
++/* Sparse context/lock checking support. */
++# define __must_hold(x)		__attribute__((context(x,1,1)))
++# define __acquires(x)		__attribute__((context(x,0,1)))
++# define __cond_acquires(x)	__attribute__((context(x,0,-1)))
++# define __releases(x)		__attribute__((context(x,1,0)))
++# define __acquire(x)		__context__(x,1)
++# define __release(x)		__context__(x,-1)
++# define __cond_lock(x, c)	((c) ? ({ __acquire(x); 1; }) : 0)
++
++#else /* !__CHECKER__ */
++
++# define __must_hold(x)
++# define __acquires(x)
++# define __cond_acquires(x)
++# define __releases(x)
++# define __acquire(x)		(void)0
++# define __release(x)		(void)0
++# define __cond_lock(x, c)	(c)
++
++#endif /* __CHECKER__ */
++
++#endif /* _LINUX_COMPILER_CAPABILITY_ANALYSIS_H */
+diff --git a/include/linux/compiler_types.h b/include/linux/compiler_types.h
+index 981cc3d7e3aa..4a458e41293c 100644
+--- a/include/linux/compiler_types.h
++++ b/include/linux/compiler_types.h
+@@ -24,6 +24,8 @@
+ # define BTF_TYPE_TAG(value) /* nothing */
+ #endif
+ 
++#include <linux/compiler-capability-analysis.h>
++
+ /* sparse defines __CHECKER__; see Documentation/dev-tools/sparse.rst */
+ #ifdef __CHECKER__
+ /* address spaces */
+@@ -34,14 +36,6 @@
+ # define __rcu		__attribute__((noderef, address_space(__rcu)))
+ static inline void __chk_user_ptr(const volatile void __user *ptr) { }
+ static inline void __chk_io_ptr(const volatile void __iomem *ptr) { }
+-/* context/locking */
+-# define __must_hold(x)	__attribute__((context(x,1,1)))
+-# define __acquires(x)	__attribute__((context(x,0,1)))
+-# define __cond_acquires(x) __attribute__((context(x,0,-1)))
+-# define __releases(x)	__attribute__((context(x,1,0)))
+-# define __acquire(x)	__context__(x,1)
+-# define __release(x)	__context__(x,-1)
+-# define __cond_lock(x,c)	((c) ? ({ __acquire(x); 1; }) : 0)
+ /* other */
+ # define __force	__attribute__((force))
+ # define __nocast	__attribute__((nocast))
+@@ -62,14 +56,6 @@ static inline void __chk_io_ptr(const volatile void __iomem *ptr) { }
+ 
+ # define __chk_user_ptr(x)	(void)0
+ # define __chk_io_ptr(x)	(void)0
+-/* context/locking */
+-# define __must_hold(x)
+-# define __acquires(x)
+-# define __cond_acquires(x)
+-# define __releases(x)
+-# define __acquire(x)	(void)0
+-# define __release(x)	(void)0
+-# define __cond_lock(x,c) (c)
+ /* other */
+ # define __force
+ # define __nocast
 -- 
 2.48.1.502.g6dc24dfdaf-goog
 
