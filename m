@@ -1,46 +1,46 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E57CA22653E;
-	Thu,  6 Feb 2025 07:21:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BC1B226523;
+	Thu,  6 Feb 2025 07:21:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738826480; cv=none; b=ZNxQsK0hJg/oebUEPklWv01Ss/S+lCLrfLwIhF3WjcPlxV75dEKfUFBjUy0Teyie6hGV7Z/oPp3P5A6bBBFZNcUvpRa7j5d6MCnhIL95PbzYYMB+AnnKvyxDsye0yTG39/nVIoYGnIC2tqQSXwZ5hoQ4HdAloolLeVeqrNpov44=
+	t=1738826481; cv=none; b=qObJNmzyBOUpjW84WmdyKfgOsj+iUehFqM+X70zo9HvrFYmmVCXOYz2zh5ItgBqbE3X05H0ZqXzhIzHfz3sefGXTHL3Wa0ash6H/pqdPDF6Bs9Dc5tR6IXuzGfvSkfXIUUIC+X0e30rnJ5QOPf3fZBmLMnEEOj515tJuKLHjNQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738826480; c=relaxed/simple;
-	bh=iqZv8rJXdWI52EmscIRZweGSd8xTWCD0Rr/EovMHLuY=;
+	s=arc-20240116; t=1738826481; c=relaxed/simple;
+	bh=hGMXf+St2ZchUBtwIHiThEldg2uqLPjq0XggSNACRI4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=XMXOs87u/SjyOMJRfNTq3GEBV6TgJrPhPq/kX0zYFN6mXjh/J1CeyEExT5ZDrQ2aTt1nZrgEES70Uf15irT9FYSSAc3F7UGhGOgCRKG4IyIopv7DbAgNkPk6n/GtNsPbK7fBHiHpILA0FwpE8fkWIm1zonAd5M4kNMgU5l/3r1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eess9Iex; arc=none smtp.client-ip=192.198.163.8
+	 MIME-Version; b=hWPHuij2leI1Vh2IZJ/wpN/CE9gkjzGjz+fOiEA7wUQUezvIo5OFIacxsYmy/jkksJiwzDkQHBfje5NcbgxClyZlqLQIcQ/dP4vkhvYTurjv3KwTnQhNa1nwCOnpL6ZOQC8r7gyZB9plJJ22vYmHOk8ewpU+GZ8L6XsixLnL4Sg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=m2RvUlr7; arc=none smtp.client-ip=192.198.163.8
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eess9Iex"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="m2RvUlr7"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1738826479; x=1770362479;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=iqZv8rJXdWI52EmscIRZweGSd8xTWCD0Rr/EovMHLuY=;
-  b=eess9IexY9pUhwNnzWs41PRhnBZIipSIrnNB9kG6280M/tvM9YwCGI08
-   HrfDJgliSanxtGy6Mr8OnCQm34GFa5Yz4qpfzxqULOlpkMGGxUK7HDD1J
-   4tdlAa2ADarkexk/agX4Su9kTtgGP+fROPxScvf4QUKP1Y55PWihMUKyT
-   ihyU88YiiPFTwGO+oyKr0FlkCzskD0Z1q9IaBJSwLwZPzZLznehIbAvly
-   yw3pVDLti5mA5sS6EzZ5XiYT3LUJ2fpUPv+N9qV2NcT0iA1CnWofgn+Oz
-   QzSOvseNzNrJT/LYprTVM9aSIILZHukkW4XXA9mK8E4Va6X105tMilI1a
+  bh=hGMXf+St2ZchUBtwIHiThEldg2uqLPjq0XggSNACRI4=;
+  b=m2RvUlr7k03CoV+w+5k8d+B6qBibVr01WBmg0J9GStkuv4qiasvWo89e
+   4Ba5LyRn6pFIToNF4MnflDLeSQOPEidZau2f5ZT9l19PLOebpkIg3O697
+   B/+OnOunoWkDLZeczL/xjsCU9sSx+4TZfvTBrl4tpwJcgai/kawlEnHoS
+   mAhgf15pxt2hZbIeouvZUpbhfVzTkuq+dDmFq4wFyLN/waxFWq5FdaKDA
+   wAjGvx7te0BiHE57YIUdHOkdj3arJBz0Ux9/ndqdjCbEt/lhSF8G4AgHS
+   6aXDIkOZp3j4dRyDHTG8Plp29wT+sIxAweQ8F2ms1iNd1CorFTfX00rbv
    w==;
-X-CSE-ConnectionGUID: C+mUYK7ZTQyQYKKjjd77dQ==
-X-CSE-MsgGUID: swCcEsNBQ96kk12qjLy0pA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11336"; a="56962734"
+X-CSE-ConnectionGUID: MmjPVO3YT8OVTdDslRVi1g==
+X-CSE-MsgGUID: /aCx2EtwT3yoEBRVLjCE6g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11336"; a="56962745"
 X-IronPort-AV: E=Sophos;i="6.13,263,1732608000"; 
-   d="scan'208";a="56962734"
+   d="scan'208";a="56962745"
 Received: from orviesa008.jf.intel.com ([10.64.159.148])
   by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2025 23:21:06 -0800
-X-CSE-ConnectionGUID: ILym3snHR9yvBXAi4N76GQ==
-X-CSE-MsgGUID: LTcU3nkoQeadkuMSgJpNTQ==
+X-CSE-ConnectionGUID: T5sTzomPTre7jUusWIkprA==
+X-CSE-MsgGUID: 3PROnXzOSNuq6V4KrEWVwQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="112022646"
+   d="scan'208";a="112022649"
 Received: from jf5300-b11a338t.jf.intel.com ([10.242.51.115])
   by orviesa008.jf.intel.com with ESMTP; 05 Feb 2025 23:21:06 -0800
 From: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
@@ -65,9 +65,9 @@ To: linux-kernel@vger.kernel.org,
 Cc: wajdi.k.feghali@intel.com,
 	vinodh.gopal@intel.com,
 	kanchana.p.sridhar@intel.com
-Subject: [PATCH v6 14/16] mm: zswap: Introduce zswap_compress_folio() to compress all pages in a folio.
-Date: Wed,  5 Feb 2025 23:21:00 -0800
-Message-Id: <20250206072102.29045-15-kanchana.p.sridhar@intel.com>
+Subject: [PATCH v6 15/16] mm: zswap: Compress batching with Intel IAA in zswap_store() of large folios.
+Date: Wed,  5 Feb 2025 23:21:01 -0800
+Message-Id: <20250206072102.29045-16-kanchana.p.sridhar@intel.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <20250206072102.29045-1-kanchana.p.sridhar@intel.com>
 References: <20250206072102.29045-1-kanchana.p.sridhar@intel.com>
@@ -79,62 +79,196 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch encapsulates away the computes for compressing the pages in a
-folio and storing the compressed memory in zpool, into a distinct
-zswap_compress_folio() procedure.
+zswap_compress_folio() is modified to detect if the pool's acomp_ctx has
+more than one "nr_reqs", which will be the case if the cpu onlining code
+has allocated multiple batching resources in the acomp_ctx. If so, it means
+compress batching can be used with a batch-size of "acomp_ctx->nr_reqs".
 
-For now, zswap_compress_folio() simply calls zswap_compress() for each page
-in the folio it is called with.
+If compress batching can be used, zswap_compress_folio() will invoke the
+newly added zswap_batch_compress() procedure to compress and store the
+folio in batches of "acomp_ctx->nr_reqs" pages.
 
-This facilitates adding compress batching in subsequent patches.
+With Intel IAA, the iaa_crypto driver will compress each batch of pages in
+parallel in hardware.
+
+Hence, zswap_batch_compress() does the same computes for a batch, as
+zswap_compress() does for a page; and returns true if the batch was
+successfully compressed/stored, and false otherwise.
+
+If the pool does not support compress batching, or the folio has only one
+page, zswap_compress_folio() calls zswap_compress() for each individual
+page in the folio, as before.
 
 Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
 ---
- mm/zswap.c | 24 ++++++++++++++++++------
- 1 file changed, 18 insertions(+), 6 deletions(-)
+ mm/zswap.c | 122 +++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 113 insertions(+), 9 deletions(-)
 
 diff --git a/mm/zswap.c b/mm/zswap.c
-index af682bf0f690..6563d12e907b 100644
+index 6563d12e907b..f1cba77eda62 100644
 --- a/mm/zswap.c
 +++ b/mm/zswap.c
-@@ -1509,6 +1509,22 @@ static void shrink_worker(struct work_struct *w)
+@@ -985,10 +985,11 @@ static void acomp_ctx_put_unlock(struct crypto_acomp_ctx *acomp_ctx)
+ 	mutex_unlock(&acomp_ctx->mutex);
+ }
+ 
++/* The per-cpu @acomp_ctx mutex should be locked/unlocked in the caller. */
+ static bool zswap_compress(struct page *page, struct zswap_entry *entry,
+-			   struct zswap_pool *pool)
++			   struct zswap_pool *pool,
++			   struct crypto_acomp_ctx *acomp_ctx)
+ {
+-	struct crypto_acomp_ctx *acomp_ctx;
+ 	struct scatterlist input, output;
+ 	int comp_ret = 0, alloc_ret = 0;
+ 	unsigned int dlen = PAGE_SIZE;
+@@ -998,7 +999,6 @@ static bool zswap_compress(struct page *page, struct zswap_entry *entry,
+ 	gfp_t gfp;
+ 	u8 *dst;
+ 
+-	acomp_ctx = acomp_ctx_get_cpu_lock(pool);
+ 	dst = acomp_ctx->buffers[0];
+ 	sg_init_table(&input, 1);
+ 	sg_set_page(&input, page, PAGE_SIZE, 0);
+@@ -1051,7 +1051,6 @@ static bool zswap_compress(struct page *page, struct zswap_entry *entry,
+ 	else if (alloc_ret)
+ 		zswap_reject_alloc_fail++;
+ 
+-	acomp_ctx_put_unlock(acomp_ctx);
+ 	return comp_ret == 0 && alloc_ret == 0;
+ }
+ 
+@@ -1509,20 +1508,125 @@ static void shrink_worker(struct work_struct *w)
  * main API
  **********************************/
  
-+static bool zswap_compress_folio(struct folio *folio,
++/* The per-cpu @acomp_ctx mutex should be locked/unlocked in the caller. */
++static bool zswap_batch_compress(struct folio *folio,
++				 long index,
++				 unsigned int batch_size,
 +				 struct zswap_entry *entries[],
-+				 struct zswap_pool *pool)
++				 struct zswap_pool *pool,
++				 struct crypto_acomp_ctx *acomp_ctx)
 +{
-+	long index, nr_pages = folio_nr_pages(folio);
++	int comp_errors[ZSWAP_MAX_BATCH_SIZE] = { 0 };
++	unsigned int dlens[ZSWAP_MAX_BATCH_SIZE];
++	struct page *pages[ZSWAP_MAX_BATCH_SIZE];
++	unsigned int i, nr_batch_pages;
++	bool ret = true;
 +
-+	for (index = 0; index < nr_pages; ++index) {
-+		struct page *page = folio_page(folio, index);
++	nr_batch_pages = min((unsigned int)(folio_nr_pages(folio) - index), batch_size);
 +
-+		if (!zswap_compress(page, entries[index], pool))
-+			return false;
++	for (i = 0; i < nr_batch_pages; ++i) {
++		pages[i] = folio_page(folio, index + i);
++		dlens[i] = PAGE_SIZE;
 +	}
 +
-+	return true;
++	/*
++	 * Batch compress @nr_batch_pages. If IAA is the compressor, the
++	 * hardware will compress @nr_batch_pages in parallel.
++	 */
++	ret = crypto_acomp_batch_compress(
++		acomp_ctx->reqs,
++		NULL,
++		pages,
++		acomp_ctx->buffers,
++		dlens,
++		comp_errors,
++		nr_batch_pages);
++
++	if (ret) {
++		/*
++		 * All batch pages were successfully compressed.
++		 * Store the pages in zpool.
++		 */
++		struct zpool *zpool = pool->zpool;
++		gfp_t gfp = __GFP_NORETRY | __GFP_NOWARN | __GFP_KSWAPD_RECLAIM;
++
++		if (zpool_malloc_support_movable(zpool))
++			gfp |= __GFP_HIGHMEM | __GFP_MOVABLE;
++
++		for (i = 0; i < nr_batch_pages; ++i) {
++			unsigned long handle;
++			char *buf;
++			int err;
++
++			err = zpool_malloc(zpool, dlens[i], gfp, &handle);
++
++			if (err) {
++				if (err == -ENOSPC)
++					zswap_reject_compress_poor++;
++				else
++					zswap_reject_alloc_fail++;
++
++				ret = false;
++				break;
++			}
++
++			buf = zpool_map_handle(zpool, handle, ZPOOL_MM_WO);
++			memcpy(buf, acomp_ctx->buffers[i], dlens[i]);
++			zpool_unmap_handle(zpool, handle);
++
++			entries[i]->handle = handle;
++			entries[i]->length = dlens[i];
++		}
++	} else {
++		/* Some batch pages had compression errors. */
++		for (i = 0; i < nr_batch_pages; ++i) {
++			if (comp_errors[i]) {
++				if (comp_errors[i] == -ENOSPC)
++					zswap_reject_compress_poor++;
++				else
++					zswap_reject_compress_fail++;
++			}
++		}
++	}
++
++	return ret;
 +}
 +
- /*
-  * Store all pages in a folio.
-  *
-@@ -1542,12 +1558,8 @@ static bool zswap_store_folio(struct folio *folio,
- 		entries[index]->handle = (unsigned long)ERR_PTR(-EINVAL);
- 	}
+ static bool zswap_compress_folio(struct folio *folio,
+ 				 struct zswap_entry *entries[],
+ 				 struct zswap_pool *pool)
+ {
+ 	long index, nr_pages = folio_nr_pages(folio);
++	struct crypto_acomp_ctx *acomp_ctx;
++	unsigned int batch_size;
++	bool ret = true;
  
 -	for (index = 0; index < nr_pages; ++index) {
 -		struct page *page = folio_page(folio, index);
--
--		if (!zswap_compress(page, entries[index], pool))
--			goto store_folio_failed;
--	}
-+	if (!zswap_compress_folio(folio, entries, pool))
-+		goto store_folio_failed;
++	acomp_ctx = acomp_ctx_get_cpu_lock(pool);
++	batch_size = acomp_ctx->nr_reqs;
++
++	if ((batch_size > 1) && (nr_pages > 1)) {
++		for (index = 0; index < nr_pages; index += batch_size) {
++
++			if (!zswap_batch_compress(folio, index, batch_size,
++						  &entries[index], pool, acomp_ctx)) {
++				ret = false;
++				goto unlock_acomp_ctx;
++			}
++		}
++	} else {
++		for (index = 0; index < nr_pages; ++index) {
++			struct page *page = folio_page(folio, index);
  
- 	for (index = 0; index < nr_pages; ++index) {
- 		swp_entry_t page_swpentry = page_swap_entry(folio_page(folio, index));
+-		if (!zswap_compress(page, entries[index], pool))
+-			return false;
++			if (!zswap_compress(page, entries[index], pool, acomp_ctx)) {
++				ret = false;
++				goto unlock_acomp_ctx;
++			}
++		}
+ 	}
+ 
+-	return true;
++unlock_acomp_ctx:
++	acomp_ctx_put_unlock(acomp_ctx);
++	return ret;
+ }
+ 
+ /*
 -- 
 2.27.0
 
