@@ -1,150 +1,153 @@
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2051.outbound.protection.outlook.com [40.107.220.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DA9323C367;
-	Thu,  6 Feb 2025 22:12:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738879954; cv=fail; b=ZCeZdJxR0ExPhe09g2aoF+fqtFRW1N003SYPPzz2w1wTNx63fQ/gIJ6FXG9n1E24CFySb7MMs+4pfin10Mxk8TS0RBWkkhWpmsHJVdbv2nnNGsF0hIzxUME69S6ia5d/LNdjl/SbWg4b16S1HuZThq8PGp7CSpNDKyLPps/ySNY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738879954; c=relaxed/simple;
-	bh=C/HKRQjA9Z/3lP6yQU6DF7LnU33UhbQComseguP5Vi4=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=oKFwcjW59ej1f7ldHKgDUSkRrwzhS8J6d74OPeY4jsz1l6Rd6v2pX5l5p4t/yHv2rWsNNi89OxXTU9aZRpxLZjzT7JynF1p+jsEVvu2qkqKgasjYPs7rr6g4teR7EKc9500efji7vOwFFCZNpNWcAMqHbzOujchAX4MwU0X773A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=pZX2eWOK; arc=fail smtp.client-ip=40.107.220.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2A5919C55E;
+	Thu,  6 Feb 2025 22:28:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738880939; cv=none; b=PlOAWrBey7thKM2Zyho0NiYSk9j759qbaE8pUh2lYeCHfMP4rE7DljLh8/jr46zfzsCQVI2TyEns16anyFTL7YotGqtHdcH6ZSdBv2NMqSG/eyCOEcN1R5d8jOmIuY+aq5L1DEGNOS0go0CrW6EP4i1ytIQeIYGOdfHUgCrDTUI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738880939; c=relaxed/simple;
+	bh=Mx+lQZoBdZSk05cMHd62AFuGqNDVMxjNyfwaalYB3AI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=oJBLPqOjE4EhBIBkSRTYticzGZr2iCWjO8Hn2Velbnj4TYT49YpPX2VsY1YiIAbNkXtthGP7+DcGRvQb/6s7Be4IWKrkNhCNoJ7PLBPBMLPgvjHEGnNrNG8RUB0nU3s6F7WhlvpmOqjx2TJTc3BFNQEyr8vU0weXf0ByCOAtjt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QXZ3fdp+; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="pZX2eWOK"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ersB1IOFRNxgKIsFageqvfLA6i2Xo1VdGCpT2VKdxdkgPF95Bo1N65i8WDYmVHfgCzoq0fJyLbjwQBVka1COjyIk5WVfN2x6BFFY07RZrvS5l+Li0A6bkSP3OyRGOdLxVbd0R4XkSOOqwVDZh7+amZCkZyr8aZ8jW4QO0XcK9IwKM97OU9zLas8Y86Qcxyb/H8BDj2k7KluV2+TkgOpnAPSmbedcBFGQO6NEWkrYwE45vP7ot4FAB7iZu7peWs/BSP3yHi0sBpDbvKBZ8ZKivxpZCDPVI7ZqIsSbYCvgUALT/GCP5IHmjG/gscql2wOKu8xIQ5iNOu/yX76e+JhAYg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+QGH74ulhxXlF6AxmHSJwJMdnh62/b2+XypTETEFoX8=;
- b=i4fufH+vop2a9/YpZhTWxZtzbhe+ltia09rvxXr4ncjdRMB8ZHkKNN2BbHwI9sjekwolXGEHwDspPuu+xvv09ki9V6bZgANJ46ulGNU5J9vLCCWBg60cWNR40JpX0Ch97sBPsFIZ6vY4FqVkCAqap1cZpuhy+WeRgEtCL6krVv/slV4FACoW0hEvRvq5aHDNS3V9O3uEnXTfbn7ekesanPEv1ANgq7WLtOUOzcWV8kTi6b2TmURp4+gvq3ZzrRWmGvw5d0DcjU+ntBD+0rRao0AH706hyLe2iWzrf9+uHRml8dgx9annJJHgSXgu9WXxhkcfJpQzn8DMu46Ksc99Qw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=gondor.apana.org.au smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+QGH74ulhxXlF6AxmHSJwJMdnh62/b2+XypTETEFoX8=;
- b=pZX2eWOKV3Yr8wn6mQRuQ7ogknMYsWkK1oLcDL26HLHwvRzCM9zqgPi2vanhxuPP2mmcn9HfkVnaMWyt3GaJbPIlvQbty8Img2Jm1QIOfOi34E8SMqGrqWo/ROS4uPTJF25Vr/v2IjLunZAfcGOnqf/aDdaBnsFo4AwhwJv2/Co=
-Received: from MN2PR04CA0003.namprd04.prod.outlook.com (2603:10b6:208:d4::16)
- by SA3PR12MB7830.namprd12.prod.outlook.com (2603:10b6:806:315::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.24; Thu, 6 Feb
- 2025 22:12:28 +0000
-Received: from BN1PEPF00006003.namprd05.prod.outlook.com
- (2603:10b6:208:d4:cafe::46) by MN2PR04CA0003.outlook.office365.com
- (2603:10b6:208:d4::16) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8356.22 via Frontend Transport; Thu,
- 6 Feb 2025 22:12:28 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN1PEPF00006003.mail.protection.outlook.com (10.167.243.235) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8398.14 via Frontend Transport; Thu, 6 Feb 2025 22:12:27 +0000
-Received: from andbang9.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 6 Feb
- 2025 16:12:23 -0600
-From: Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>
-To: Tom Lendacky <Thomas.Lendacky@amd.com>, John Allen <john.allen@amd.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S . Miller"
-	<davem@davemloft.net>, Mario Limonciello <Mario.Limonciello@amd.com>,
-	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>, Thomas Rijo-john
-	<Rijo-john.Thomas@amd.com>, Rajib Mahapatra <Rajib.Mahapatra@amd.com>,
-	"Nimesh Easow" <Nimesh.Easow@amd.com>
-Subject: [PATCH] crypto: ccp - Add support for PCI device 0x1134
-Date: Fri, 7 Feb 2025 03:41:52 +0530
-Message-ID: <8e2b6da988e7cb922010847bb07b5e9cf84bb563.1738879803.git.Devaraj.Rangasamy@amd.com>
-X-Mailer: git-send-email 2.25.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QXZ3fdp+"
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-436341f575fso16876965e9.1;
+        Thu, 06 Feb 2025 14:28:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738880936; x=1739485736; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AzyZcVghqPnN4Mo2A4ODdE05nTAFhlmixOy6XL/94ac=;
+        b=QXZ3fdp+aF98Lhs7zPuzLQmaE7ERbvtUJE/hwMg9FrCF+eDG6qOmwv2rOwGpmOllAE
+         6bVcaFuy8tavH+O2Eo7xebYSMfo2E2YoFQ58iUmFhc3dnZpd50PC+mY+ha2DCyBYENbk
+         ov6v7sI2FZsBSZtF7lCpGOelHjfb5hMGEjTkQKsC42kEABcvUh0uc1p25NdPkZViqMN7
+         YMpKGRir2soyoQkcLEpEr3qOl+o/T1+GIlZA1NyGTdnC6pPs9dbrC5br6c3DTyH6slHZ
+         BOpsFR8bh2bwnNPhhz3FZTuFtFEVs0XnlV5bjwa3Gj5QgzmXqRmjrFnE3V3ktXU8S1ru
+         IgiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738880936; x=1739485736;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AzyZcVghqPnN4Mo2A4ODdE05nTAFhlmixOy6XL/94ac=;
+        b=uD1z93ct9bXgDljoWt/5PlQUzf0nRohxxyA/PDqW2nkWN4toNb4Pm+uL4HVyUMtQKp
+         KOMbPpw0vuIe9M8YWiUmTZ1EQmZ8XxHrh1Ew2wfo5zhUtlNTYO2cV3+NQKxJ+oMj85+U
+         /I4rlVPgeHhi/ET0yepcak+Nyky36mvulmOOD/fy6Lx8DqJ+5AyxwlQoG1A9StYDDbx6
+         8p16LUidDGA4hzJ5X0pMtUKQH1nNjoFV15DhjIceCllrXdr8419UYU9IZtsFq0CnTsSs
+         poL9+DmQfgHNl2TRQOk1ObaXW0ZkLSTKKxPTbKCw5BTrkaA3935vPVkMyF1pu2DqHFhb
+         psjw==
+X-Forwarded-Encrypted: i=1; AJvYcCVNBsRpjxGBQsXDa8Coz/A3PHrF2rO9V7UtTI0UiCchi9CHngMrIlg4Ff3xd4tlTsclzKlsrldniqJrTg==@vger.kernel.org, AJvYcCWEKYBarJEBIsHZvAtC/6mPoLdqR+to8Vo4LxX+hhqJHYBce8oa6J6AXpeTpp2yBua9fNqs3IYQqYIwEnmb@vger.kernel.org
+X-Gm-Message-State: AOJu0YxmkjkyuC6I3yGt5y0kGablPFA3YNQw+l1T6reOdQEAxufNNxUd
+	msrL1g+T/7jkkoc2P7N2tzr8hKi/dELuneCg27n611eaPWBS1oLq
+X-Gm-Gg: ASbGnctgy9PtTXYauVEvvrGsulX4D7HNXskvXp1K5pjQMVgaJr/Qj9s4is82NR4aXdC
+	cWcFksCepYmtE0uXP+C/y2n9vc4IbHSvDPqFEncfwn8IFu425RFcoVLlP+7gdqQwlN+r3mJ+sHc
+	LPuIvad4MBmtlQGj2YI/H25L298j02l6hI9obucn/v5Q4oCudLPgABy6hPFbEcZjKRa0bnHNzt4
+	7vYVL3H9gieyHQKtCOR2gBaBvrGRFWdTtxACnGUtGY5b7ZBCWpNZMCizVLzWgkyMqHyixext4dK
+	FtCC3ridMzmfQY9dMoqHH64jPny289MaVvQpqbfMofWcooexRD8H8A==
+X-Google-Smtp-Source: AGHT+IGeOLZPXsD8/kTcfydH/2F1RNTk+fwe51Rf4ZsVHsczDEc3rlGGaGfvDtqjbHviwX7XGFtOtg==
+X-Received: by 2002:a05:600c:1547:b0:434:f5c0:329f with SMTP id 5b1f17b1804b1-439249918aamr12511115e9.14.1738880935750;
+        Thu, 06 Feb 2025 14:28:55 -0800 (PST)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4391da9652bsm33244655e9.2.2025.02.06.14.28.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Feb 2025 14:28:55 -0800 (PST)
+Date: Thu, 6 Feb 2025 22:28:53 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+ x86@kernel.org, linux-block@vger.kernel.org, Ard Biesheuvel
+ <ardb@kernel.org>, Keith Busch <kbusch@kernel.org>, Kent Overstreet
+ <kent.overstreet@linux.dev>, "Martin K . Petersen"
+ <martin.petersen@oracle.com>
+Subject: Re: [PATCH v3 2/6] scripts/gen-crc-consts: add gen-crc-consts.py
+Message-ID: <20250206222853.1f9d11c3@pumpkin>
+In-Reply-To: <20250206200843.GA1237@sol.localdomain>
+References: <20250206073948.181792-1-ebiggers@kernel.org>
+	<20250206073948.181792-3-ebiggers@kernel.org>
+	<20250206193117.7a9a463c@pumpkin>
+	<20250206200843.GA1237@sol.localdomain>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN1PEPF00006003:EE_|SA3PR12MB7830:EE_
-X-MS-Office365-Filtering-Correlation-Id: a1cd5482-325a-4167-a13a-08dd46fb5751
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?MhXG6vTl0d5hUHSIQovpG/DAp1q09K49I5i/+fJjyXPs9bCIkrc1xBudRaDT?=
- =?us-ascii?Q?2tr5+MVL3sZWI8LVH65ogO2SFVfFNa6mCMxr2bDNqxykUjuudeaScq7faTYd?=
- =?us-ascii?Q?wIC+iRNI0eyx/oz5dJpGKteNHTVAHgUfYMxeSbwiJsoSskmZsITtPd5i1zDE?=
- =?us-ascii?Q?CkPyMQlzJ6UbOk+bwj2VnUu/WbpatTLwYJEkIR6PTJshFW1kuaNHb4U2ybGG?=
- =?us-ascii?Q?676c3R1Yn5fGuS1Tkp3tXNFxPjMszbH+sACc6DZwVF4+eywvyZ6/Y/YPtZD/?=
- =?us-ascii?Q?YsOCbuhJQz07GJ2IzCccbb2Dpza0qN3yZvJ31ZTNnCqT1qmtlFgKHf3XnFc8?=
- =?us-ascii?Q?BHSx3SogA/vCzEZjI/IwwlSHk6vsI8QC7P3/QiSlYizqgg/YEG9OjCt9+eqz?=
- =?us-ascii?Q?cVem0nOpcrLZLyCjYx7Rl/2JyxsLYKKh99jtpOLT0MYncsfRPXaDSjMYSCDn?=
- =?us-ascii?Q?lead0fTR1Q25M2769+xu6t2K1aWSTW5VKraFawqnbxW34ihtnc8rNPwZDlzV?=
- =?us-ascii?Q?lod1xxa2VKQh25m6YA1gyLTj0wlTcNP1scNZrepnuGODEbhyIZUnQqWrqRea?=
- =?us-ascii?Q?I7qTHu+QKV4BtrbHrJxKuBHVRUlgT3xG92pOR3t/9w6vhlDIcmat2tkKzpWZ?=
- =?us-ascii?Q?FpnbJSdFRg/cUqGi76zbDyLoVSOu1jyj9tXysN/gSTPoRWNYN+3/OBrqsJuC?=
- =?us-ascii?Q?AnFU2va4+2aNgbSV2x+RqUr452h9h+GeRoLBlLfiIJxkTGqRO3Yi7tw8TRWZ?=
- =?us-ascii?Q?YaW+pBMvzuYImXPPSVheMMyhaEk+aDJPu4guD7CNDQO37W00gMKJc6LMi3w3?=
- =?us-ascii?Q?6k2I81mCXbCDJq8qx/bGcLGSriix2kVbSTPmFI68x0kWNEgNawyMTnUoAI58?=
- =?us-ascii?Q?qaFWKVqCpkvk6ofsvd8X7pwHrF95pdggr2onpaTxWtff6tkn40VqS7VYWz2+?=
- =?us-ascii?Q?QhNh8mHl+/RK69p55uUce85723edwnzEfCTHm7GqmnSdVuurHmEZYPFwMbdE?=
- =?us-ascii?Q?jit3e2hOK4GxJcx8lflNwbdxFYTBYw0NRrK40Ip/jQvo5jsXBnbsNQ+fKbaT?=
- =?us-ascii?Q?0JtwW3pUBrBm7OndLpypVcFv0jCkgYXBziz2kLjnuGbSK4wOf6kT5KIhUd1X?=
- =?us-ascii?Q?A/T8ULqmUkL77N7UHmlBDcLgY7Mn/OR9d98zfCR73rvGL5ojK0eyyyu9ZNTP?=
- =?us-ascii?Q?VNaJJ1nDrfAnV2Ga/g3pIeY5xwxI/XMcrQxbPeTkCVFmARkSJK5Fkp+KsXMH?=
- =?us-ascii?Q?+lPorONsd+AZNX8ZOC5YI1fnnKDP1R+65AJeuUc8pIMzJAqv/xizu/cMdv5P?=
- =?us-ascii?Q?5sS38dTsrYM85NDdaUXLSnVXH+3a5oX2kjnU312Lesej0DTczeLFdd1BDx9I?=
- =?us-ascii?Q?0mqw/OF4bTH4hpwn6zL6Uxpr6dQko9wA7ip19zBDlDvbf2dMk1mQWMJegLx6?=
- =?us-ascii?Q?Ay5fN9C2RNHQ+sOBuJXM9dwlm3owpc5nEBW3uKZ9t1Bbvkyol8nnPhZHllbD?=
- =?us-ascii?Q?wN+zhe7Rj/YAQEg=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Feb 2025 22:12:27.1556
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a1cd5482-325a-4167-a13a-08dd46fb5751
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN1PEPF00006003.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB7830
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-PCI device 0x1134 shares same register features as PCI device 0x17E0.
-Hence reuse same data for the new PCI device ID 0x1134.
+On Thu, 6 Feb 2025 12:08:43 -0800
+Eric Biggers <ebiggers@kernel.org> wrote:
 
-Signed-off-by: Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>
----
- drivers/crypto/ccp/sp-pci.c | 1 +
- 1 file changed, 1 insertion(+)
+> On Thu, Feb 06, 2025 at 07:31:17PM +0000, David Laight wrote:
+> > On Wed,  5 Feb 2025 23:39:44 -0800
+> > Eric Biggers <ebiggers@kernel.org> wrote:
+> >   
+> > > From: Eric Biggers <ebiggers@google.com>
+> > > 
+> > > Add a Python script that generates constants for computing the given CRC
+> > > variant(s) using x86's pclmulqdq or vpclmulqdq instructions.
+> > > 
+> > > This is specifically tuned for x86's crc-pclmul-template.S.  However,
+> > > other architectures with a 64x64 => 128-bit carryless multiplication
+> > > instruction should be able to use the generated constants too.  (Some
+> > > tweaks may be warranted based on the exact instructions available on
+> > > each arch, so the script may grow an arch argument in the future.)
+> > > 
+> > > The script also supports generating the tables needed for table-based
+> > > CRC computation.  Thus, it can also be used to reproduce the tables like
+> > > t10_dif_crc_table[] and crc16_table[] that are currently hardcoded in
+> > > the source with no generation script explicitly documented.
+> > > 
+> > > Python is used rather than C since it enables implementing the CRC math
+> > > in the simplest way possible, using arbitrary precision integers.  The
+> > > outputs of this script are intended to be checked into the repo, so
+> > > Python will continue to not be required to build the kernel, and the
+> > > script has been optimized for simplicity rather than performance.  
+> > 
+> > It might be better to output #defines that just contain array
+> > initialisers rather than the definition of the actual array itself.
+> > 
+> > Then any code that wants the values can include the header and
+> > just use the constant data it wants to initialise its own array.
+> > 
+> > 	David  
+> 
+> The pclmul constants use structs, not arrays.  Maybe you are asking for the
+> script to only generate the struct initializers?
 
-diff --git a/drivers/crypto/ccp/sp-pci.c b/drivers/crypto/ccp/sp-pci.c
-index 248d98fd8c48..5357c4308da0 100644
---- a/drivers/crypto/ccp/sp-pci.c
-+++ b/drivers/crypto/ccp/sp-pci.c
-@@ -529,6 +529,7 @@ static const struct pci_device_id sp_pci_table[] = {
- 	{ PCI_VDEVICE(AMD, 0x14CA), (kernel_ulong_t)&dev_vdata[5] },
- 	{ PCI_VDEVICE(AMD, 0x15C7), (kernel_ulong_t)&dev_vdata[6] },
- 	{ PCI_VDEVICE(AMD, 0x1649), (kernel_ulong_t)&dev_vdata[6] },
-+	{ PCI_VDEVICE(AMD, 0x1134), (kernel_ulong_t)&dev_vdata[7] },
- 	{ PCI_VDEVICE(AMD, 0x17E0), (kernel_ulong_t)&dev_vdata[7] },
- 	{ PCI_VDEVICE(AMD, 0x156E), (kernel_ulong_t)&dev_vdata[8] },
- 	/* Last entry must be zero */
---
-2.25.1
+I'd not read the python that closely.
+
+> This suggestion seems a bit more complicated than just having everything in one place.
+
+It'll be in several places anyway since the python file is only going
+to generate the lookup tables.
+
+> It would allow
+> putting the struct definitions in the CRC-variant-specific files while keeping
+> the struct initializers all in one file, so __maybe_unused would no longer need
+> to be used on the definitions.  But the actual result would be the same, just
+> achieved in what seems like a slightly more difficult way.
+
+It would leave the variable declarations in the file that used them - making
+it easier to see what they are.
+It also gives the option of minor changes in the variable name/attributes
+which might be useful at some point (or some architecture).
+
+I've got some similar tables for a normal byte-lookup crc16 (hdlc).
+And for doing the hdlc bit-stuffing and flag/abort detection on
+a byte-by-byte basis
+The whole lot is 11k - quite a lot of memory inside an fpga!
+I started with the 'header' containing the initialised data, but
+later changed it to just #define for the initialiser - worked better
+that way.
+
+	David
+
 
