@@ -1,466 +1,387 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B064723959B;
-	Thu,  6 Feb 2025 19:24:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738869890; cv=fail; b=KK0y0b+4B9YRNQap4mM/kQKXMU76LRayeoG+rW5gCVg6ErQFP78XqVEWuq7RifFBoj9NvGmdIkVJXg0wNTFbxaHUvCC3ctoRForG6pXeV1v/qjC9mxAqkhC8Z2rE1LPCti/vR3nfAy/fRIGgZuLM1EwGRMNgZZ07OH3gmg043rc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738869890; c=relaxed/simple;
-	bh=4pY+ZwqJ9KRyeO8HPCogAezX6qGpMhYqMvaekIEr5Rc=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=A+RzFAZxgamZr6y8bxXIXSefny0If3AY1etHHuplJfk9j9cseKRvxiWohvMxHHvLOnH8t/9zubYW4MDDXzw/Af0RrNnEH6Of4NIMpXdPBZVuWgp8MXYcnesEg4SVs2eWf4GOPPsUXI2CTOZHl72DP1bP6P/z9mv/ECvlcDgt1mE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XPz8HgrN; arc=fail smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C143E17B50B;
+	Thu,  6 Feb 2025 19:31:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738870282; cv=none; b=c6Sf9frRCUzIji1SGiYyKAyTl7eCdvt49Vg1xG/w0R1LIc58odBP5MIU8VAE7oIT9yegsMSBVZcwFvvhJJPgbj7KOWyQD4R3WSrmAjZeS7dnKMSL3h+aGzVcWbVDIvAboxOpU8o8EwGsuU3wXTBlH/Q+Y2zLBppoW7Tz/Sj+Dkc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738870282; c=relaxed/simple;
+	bh=NAFm1eLpYert9vXtw/1gQKmaI8vqQmc+ncGEXsi2PHQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Lvnz2csjuZYRr0iCueToV7+zPAIbqGkZ6s7xgq1mAZPsR3DMMaPZrqWfImqMtaavx8/kkOMKxisbDv96Oq1VBNK939ktFvvaJZIMW7/0ZLTM6ZYdT1hM3IlQTUtvDUaaWLBDGPb+jXkd1CTEl2Sfr/NttiBRxRVR/ZYEy+0QpXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W01c97vk; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XPz8HgrN"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1738869888; x=1770405888;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=4pY+ZwqJ9KRyeO8HPCogAezX6qGpMhYqMvaekIEr5Rc=;
-  b=XPz8HgrNqx5g5yMhvyslvDz2L5o7Rvy5Od2UE+xgFvrZH8zfu0piQHVv
-   daqH7b/STkKHS1YYFPqbXGD13kuWo4+0+THuIri7o6P/0uD93HOPf6Jqg
-   YH5tJ6cbW10QsGDJqMq1paXMtU4xOisgH4pJGchTk21ZZvl7jwXCwLcnw
-   TVdeHKRQGeYgdGiRrcZtIs1ujFJQYBlRmpGFSGQLXjFiSfIBEmwncrEPy
-   k72tR6JHhZDmVPIQSQTspYI+hYBcw429Yh8G9IMw9i1zczocZRxMem2cu
-   N0BO62lxSGVXK38NlJEkNCemZntAUp5VYPKUwupyy7LaEjBoMUT7B/Xxd
-   Q==;
-X-CSE-ConnectionGUID: ixNPMebxSImCQo1GqJImkg==
-X-CSE-MsgGUID: du1iY0CYQYyWkkhRoN/KhA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11336"; a="39399365"
-X-IronPort-AV: E=Sophos;i="6.13,265,1732608000"; 
-   d="scan'208";a="39399365"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2025 11:24:47 -0800
-X-CSE-ConnectionGUID: 89ghzegmTqeOLnMHDHkBvw==
-X-CSE-MsgGUID: sKSMkvtgSg+zbRUOgXOGFQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,265,1732608000"; 
-   d="scan'208";a="111503017"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmviesa008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 06 Feb 2025 11:24:46 -0800
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Thu, 6 Feb 2025 11:24:45 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Thu, 6 Feb 2025 11:24:45 -0800
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.42) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Thu, 6 Feb 2025 11:24:42 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=UIeVWHsI/P9kwncM2BeZgXGsa9oEJTKp15kFuq75tbiaTxsKyuNVLFXCC+aH8mIfgIkEhL5txv8psSg7t9UkD84xbQAGnwJ57yA6HWFd0muFDkGENcPFcnIZCORMEX33SEzkaB6kL2mWYrDlfr35Fa3b0oVXXWt9/I01JTaX83vzVfma0sJFyrGc7+SIRzNl9Zgpmlq0oOeNA2OslrdNOnabep4fh89oCtzpNr6sof1iPA1UZOmeqBHkqqjj9dIR7lwqhS4xqDG2Aeb5tHx8b6J+JPo5FiVlCPGHbmgzlL8WfeYvNNWU0cwcNZpBpoor4bbTJ5MQ9zH+Bs/2kwKhyQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DhCmvfpOzRasG4Lp9SG0esnWtFfL45Frv7BnOHXX/ZQ=;
- b=gdzPSVFQKYi3VkqptPpE6JJol7lO9YxaifxFwyT5hTSAG9qr40jchwCgzmSEeUzZnG+4ro14Y/OT6PGM+r1D/CtcDxYTudzJaFoqy9IHaHU//RUR+M5H21bVoW8MnRWTMUs8kpVlRcCjnrJ7DApxE4RGM9GIc9mtGgae0h2TqV1DeI2vapf5bT85i8f4aR06NFMTSBtVivktI4Eqt7yoLIKXg95OU7+KqiNMwpZEoNcEUCEeFtnCggWjCtu9VkuPmCBkdOrjODKjhdUAZ7/s1rB11LbKVW/8n9CcmLoBP+D0ShBraXQbI4X+gi+A0afRkl5W3SsIRrq3w1XynvHaKg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from SA3PR11MB8120.namprd11.prod.outlook.com (2603:10b6:806:2f3::7)
- by SA0PR11MB4736.namprd11.prod.outlook.com (2603:10b6:806:9f::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.26; Thu, 6 Feb
- 2025 19:24:27 +0000
-Received: from SA3PR11MB8120.namprd11.prod.outlook.com
- ([fe80::3597:77d7:f969:142c]) by SA3PR11MB8120.namprd11.prod.outlook.com
- ([fe80::3597:77d7:f969:142c%5]) with mapi id 15.20.8398.025; Thu, 6 Feb 2025
- 19:24:27 +0000
-From: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
-To: Yosry Ahmed <yosry.ahmed@linux.dev>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>, "hannes@cmpxchg.org"
-	<hannes@cmpxchg.org>, "nphamcs@gmail.com" <nphamcs@gmail.com>,
-	"chengming.zhou@linux.dev" <chengming.zhou@linux.dev>,
-	"usamaarif642@gmail.com" <usamaarif642@gmail.com>, "ryan.roberts@arm.com"
-	<ryan.roberts@arm.com>, "21cnbao@gmail.com" <21cnbao@gmail.com>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"davem@davemloft.net" <davem@davemloft.net>, "clabbe@baylibre.com"
-	<clabbe@baylibre.com>, "ardb@kernel.org" <ardb@kernel.org>,
-	"ebiggers@google.com" <ebiggers@google.com>, "surenb@google.com"
-	<surenb@google.com>, "Accardi, Kristen C" <kristen.c.accardi@intel.com>,
-	"Feghali, Wajdi K" <wajdi.k.feghali@intel.com>, "Gopal, Vinodh"
-	<vinodh.gopal@intel.com>, "Sridhar, Kanchana P"
-	<kanchana.p.sridhar@intel.com>
-Subject: RE: [PATCH v6 15/16] mm: zswap: Compress batching with Intel IAA in
- zswap_store() of large folios.
-Thread-Topic: [PATCH v6 15/16] mm: zswap: Compress batching with Intel IAA in
- zswap_store() of large folios.
-Thread-Index: AQHbeGfAjZbrwpkGjEqL/QTV2aedp7M6pMeAgAABk4A=
-Date: Thu, 6 Feb 2025 19:24:27 +0000
-Message-ID: <SA3PR11MB81203800298A246D7D6CB75EC9F62@SA3PR11MB8120.namprd11.prod.outlook.com>
-References: <20250206072102.29045-1-kanchana.p.sridhar@intel.com>
- <20250206072102.29045-16-kanchana.p.sridhar@intel.com>
- <Z6UJKTCkffZ93us5@google.com>
-In-Reply-To: <Z6UJKTCkffZ93us5@google.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA3PR11MB8120:EE_|SA0PR11MB4736:EE_
-x-ms-office365-filtering-correlation-id: 6a7ed0bb-84a5-46c6-464b-08dd46e3df22
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?FkL7kfWTWFIEKDQ7ERoAsMKAmD6bBrpCQ+aB5Pqcyh4d3xXI6ulV2o2fKJma?=
- =?us-ascii?Q?3HuDlmG01GXEHgPVKfz1CJR85zGLy+bqbAlow4Nzko1RXnJGZj4WH5muJr/y?=
- =?us-ascii?Q?g/NI2uIVhCFjBhhPjoM60wzDIkxRUnaJA9AEMXvUmk1ZATsRT7yARU992OYX?=
- =?us-ascii?Q?BBrV7YpBhE9ksiByWoF5orR6jC8abDaeKLYY8Fm6Hunq9Eiv6n3GrZeKpiTl?=
- =?us-ascii?Q?8YBW6HwWIASkAVOEbo/tDv8Yqbsj6wrCJOX1qJuZ4D//jMyQZWyQXaqNNy5o?=
- =?us-ascii?Q?zv4WNRt/Cj7cj8WD3cevITHVDX49Y19DiOGlBX2i6gNjyBlWgAwKEv08bw6H?=
- =?us-ascii?Q?LiCOIZiuXgFWb8UCU9H9e9kvxIWuzHOWzFQeviJA4jqpTFQYl6EVXEdK1ASz?=
- =?us-ascii?Q?P2Lh2NRkLrEGooBaXbWt9zgUmO/nn8JTFBGwu//OITViOJIkVv5DjSnvRk9Q?=
- =?us-ascii?Q?twAVWP2RaVEEj4K+0BGv7TKlIPAtDvmJjy2LEWJlpyEpUiB604Usp9zYs9YA?=
- =?us-ascii?Q?5P1fBNGsV0g7DLSaPsgi32umuvHuYuwyAlUDWf+Owpbx74hbFvKbmfydK1AS?=
- =?us-ascii?Q?YuKH8qzy0/vV2fcUtrVof3gwf+LA/aBBl0ozuUqHnTcDvT7nAnk/eBk6n8hi?=
- =?us-ascii?Q?wtCCespVyVxV+yUzGgNuqBvtKGu2JfpVGApDfmizaOK+6kmt2q9pbWl3j1M+?=
- =?us-ascii?Q?7cElgR7KeY+4wX0k7EpCQl/blJsbvlcujmd+5na6rvUkPQl9FvS/++rAAU1t?=
- =?us-ascii?Q?irivN5V09Q4Vv6NHfJUCUUVkQH8Y6uX6H553LZYJgFV6hnaf7YzBy/gamP8n?=
- =?us-ascii?Q?hMrpGJj/0s0nJpi/Vost4LtZA5S9dAlaqnI7vEtCbUH0x/Ab27Yrt6vjTwbQ?=
- =?us-ascii?Q?LU45om0xcBKL0kn+uaViLNw19j0/mCwjYoMqmKu9pvATKcHi/AVmP33bxcBa?=
- =?us-ascii?Q?60OMxD+L1A7aZZKhkfEPbpeU5LZA3Urp6rfrUTrjcqa3P6ujHoHEWkg6Qth8?=
- =?us-ascii?Q?DxO4xLlQizwdSetaQHCr29Fe/lpaU6Kk3PmjIZDp8EYLGaaUnPhgOfR71Jjw?=
- =?us-ascii?Q?gdt+bBMjJuGAkwKinJYwVfWAwyB0nr6FfARjC/PMP429oSf7U6c8D2+hjy2h?=
- =?us-ascii?Q?Lbwolq4mLbEGhy+pOaUT2APcloMDE4WRBxMTjKS2uZeXJipuvKSkLaqj+FvR?=
- =?us-ascii?Q?DiQq+hDrVIrlhN4KbDmY3SVvSczp0S+bE+S8MgjvjH4zIPG+HerS/+VdpItx?=
- =?us-ascii?Q?QqpnK0oa/OZA/2hCV5YTD0mqNyRuW35iq0O0PV4+sa8/eQiCjYJaS7+0lb7+?=
- =?us-ascii?Q?JfJOoiE3hpRXtSD6LiIT3ZMpzllGtmTdUFPRx6dm9FatXvbQZrH9thuz1gan?=
- =?us-ascii?Q?fF3eDKW2ulvqB9Dox+7hGzxq7FwZGyFygf4jhiaa69v83pecixf9dk5QttYu?=
- =?us-ascii?Q?sIwhW63PyLn4eOTNdv+aTHzQJU9I90wF?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR11MB8120.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?OgzYIl/xvI4YioZ/szQXG5hU1XunRrCL0dqinkXQlM7CAu2OXcMmK5LfosQT?=
- =?us-ascii?Q?SYodTwJrH6BEE1Men+7nde9JPFjvibT0hZKVkK+wB87yQ+f5DgAdqB9tQDjG?=
- =?us-ascii?Q?Ge+dQxsgv20Y103RREgai4aeE+adHawVFvf7ZNdqTg7Bpg8k/xJbmxVhoERa?=
- =?us-ascii?Q?GbDdhfVhBnxDoTxrFqI8UfwvPIYC2tZRFPDxO0cyx0eY8S7SZS6tKO2XfRY0?=
- =?us-ascii?Q?HQVpNcYtvmoliM8zVm9+Vs39/eTrUIQx7MM+7W77JfmQa9xlf8P1iq2uG25Q?=
- =?us-ascii?Q?BojFVJgcLgLvKeDLKvST+fCFfWEDMuNB5wOP9X2BgmdiqWXpxHbb9+cSqLWR?=
- =?us-ascii?Q?mGgwjk2gE7Qe993nGLch6r9yeqEOH6ocPNz/bY3L+0OT9PGZO4lDw3/63vNX?=
- =?us-ascii?Q?5Oskf4okzzdMI0RSeDPZkulAxcvbQDw0gDb5j6sYv6LPY2CRFkyfU/WIVlFz?=
- =?us-ascii?Q?JnrPV0n52zW9g4b2h/REsTmk3bFr4ulxLgJi6vKsAkfAkFGRFFbJRee0myNW?=
- =?us-ascii?Q?QMS104Z2D8iiqhRT0q54uzypMUPyGRjo5vKevj0NUfekCJ2hR7rlVUrNw2hW?=
- =?us-ascii?Q?9AtxK2uFbx5PbUh9ZEgzxBkA35KHBizEV1tEtT4idOaBbLyLm6OIAyh0EFPv?=
- =?us-ascii?Q?nVol0KK8k9OHFTDx+glxqkVvca3RGZqqKVfZO0+31YlhbjP8OA++cTk29uew?=
- =?us-ascii?Q?VYV0LGEcIucNVd2QY3R5NDB0NGbvEQFZsmiQ3ETABUB+hQonLxE8EhQfPcme?=
- =?us-ascii?Q?nrC8cs3lnZtWizzf3R3BqZnstWvF3OnJf7a63m0ZEacN+KFtKd9umn++EVxv?=
- =?us-ascii?Q?o4ZGWp4hkxoSK7HrC/XYOMA+hoRymPEG68gWwME4I/D1GcewldUtP5xf7otU?=
- =?us-ascii?Q?HT/X4XWk54Y7YsvTJHOwbxcsF16JQIWKOSbFIQQONISTeFDJe1Xk5PaeiXFi?=
- =?us-ascii?Q?AHJbaThrhCB/Qb3stbOd5FKUQAwMfbExvGeN+4hSy6xp5700ewDKrqq07Mhg?=
- =?us-ascii?Q?zRePjBtdbZ6buLwcBly58lr6UxPCZUDpjoouYTYUDIql/Iv/zFCD/3c1/VxE?=
- =?us-ascii?Q?qIVjy5+6brJpAfe0pCL5SVerEeqPdQGl8BbYz4ZJOYDDpJMT633AZDozv+/8?=
- =?us-ascii?Q?kNp0wr8ZN1Y7Pz/jkVGJwUpWHop4sItWGWDk23Us+HscceCSC0XsbwjZd2zh?=
- =?us-ascii?Q?E9IJ+WDyOFAV5P6zy4jrFQa1zqX5JWlHKAeKQAUOBuKAPOC8ob1TM7a1V3ru?=
- =?us-ascii?Q?z1l/yYUDxCOt7/H0v4mBj60sE2mK+/OosWKxJ4O8nhGcqdgxE8K/UqsgWXXU?=
- =?us-ascii?Q?KUtNLBm6tYgONGpmkKNdoDPJtYJHwWqvCLMRGKcLXU8J5NIXLYuAe1k5qsU7?=
- =?us-ascii?Q?gcezEXu+9ekj0U9W4V6oGv36vc5ZlRsFwTgaBk8H9pNu3xCFM73fah7aMYNX?=
- =?us-ascii?Q?3BYI7w5K2a9KXq+xdywZ/Qp8bvkRRUpZnyf1OlBiPrSUisx9I7/9ui/LN0ct?=
- =?us-ascii?Q?k9OsdOIzt2BgUUhtkaH+ujzCkwk26KM69ZLw3wmqj1tp8EqTAEULMk7CTB/j?=
- =?us-ascii?Q?TqNRXcKhfNb24CpebYD28KckuzAT0neCnHWmvlTk4zU2pP+qGQNSY/rWiYvn?=
- =?us-ascii?Q?tA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W01c97vk"
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-38dc5764fc0so501662f8f.3;
+        Thu, 06 Feb 2025 11:31:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738870279; x=1739475079; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Vtid46726QjWowddDI5xX/yk9x7tgopwugY0X3Dz+hI=;
+        b=W01c97vk1Kw49xtIcav6Mb8ipcnJ6PkKP7CyOEz+1okLde2x73VQiSpIdf8etG57dF
+         ViiVbYgz30WjcAZc5BlPTkrvXOYQ4ao5uIN+WEXro4acUEJyBGe0pVTrTovEyjj7D2L1
+         Xit68tuRnc82hnz7pAu2SaJ3TmyVNSACpngEpYD6EHK4xVx2rZiLBNF4hkza+Kc5iM6X
+         Za50GRv0hm2mKd2TmHgsUi+tTLTTZ3tnAQ/jpjAWj92bP9AwcHcErJmXt1qINxFbhGsy
+         fgqK6F8/LpFR+qpFU028vEyqTMgKz9WIdNKEX04iJjqmDnFf8VSbBwbxpYTjWHPPhbuA
+         Qw8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738870279; x=1739475079;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Vtid46726QjWowddDI5xX/yk9x7tgopwugY0X3Dz+hI=;
+        b=NolddJJf64g3ITH3Yg4G3yQVJH38hbfbzCO8/oV2fka2zXIzuGZ0pZkidpd0Fszcwy
+         kUg14dF+luGhmSMKeBjRIFefuv2HdmQ79gxtUFiDxul3LEcNBag70pMj/3OmuaVpxBZX
+         sDGAWaHqjD7uNH6PS01ssxi4JJ12Tqh2Kqwwt8jSloSFOOJsPShxmMAo1jVroJc6m6K5
+         ywdPJREmi0Og6VYO9b6+y4AFteaVqNEyramxKWI1ffDdu33yKkFBBZSSD0njomRgWrK6
+         xOYe1oxfdkAbQsA5OqsM2vrhBEtV3lR7nQEUm108cB09VOLZ2hAczf/cni98hwwNUyzJ
+         BnlA==
+X-Forwarded-Encrypted: i=1; AJvYcCV4OvZgpqQdemA/yCxSm1hcavf0orQCW06qhV7K4PV2yTWbm6pTLiaMd8tzuapTmKEyRs1mvC6odJZAzofK@vger.kernel.org, AJvYcCVHdK0D3ARMpheyhAtpd1cLlVpVAFBA0Nq1giJbPDES4zzP4VT3HM/47e72nCEpT7GTIM0oFlg3chPfpg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSS41Mu6r/lBMMTekNPyJZQqE+k8rgFaI5sSmMouCwT2cyYOnZ
+	V6hwlrUy4Lolzxco8krFEv+qEAGc9Pc4rG5k+Xp0XdktKqYSppUg
+X-Gm-Gg: ASbGncvlwanxwUOEzEJuh2DINKrmsPPxD72rNYHQH7+gDxYD/ERcUT16rj5idJSf4xV
+	07qrsit2kX9OTsrTOA+3I89FQFG6mo7K6BRdodJ33mEnafamX7frf0HmXogJLmNRoEJBIgjWY8Y
+	T6B78r8OpISi8kKBGJrZK1qAD6U2zUWaSmC1UU+k1LPO3GYQWkd/iSJrm6UZMVixKABxNWxhB8a
+	a7vYvTbW3iG/LEK87yYiAXxTnRipLTIiNEvyroj6Z05T+TC0yN13lzWa9IUi0GcOc5pPzABNLQP
+	qjGCr1v6SJfY2su8KjO1CSURviwebGCgbHE6HJX2MhTk4eV0qrsusg==
+X-Google-Smtp-Source: AGHT+IEbeLPvuzNHsdRHKpDkT6UVHoOjxzZ6jIfVJxALCHSeX7RuhxuIDNIk9IhHKHqOIFdGd8uxqQ==
+X-Received: by 2002:a05:6000:1569:b0:38d:baf7:8d3a with SMTP id ffacd0b85a97d-38dc8da77c0mr206137f8f.7.1738870278808;
+        Thu, 06 Feb 2025 11:31:18 -0800 (PST)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4391da96502sm29722995e9.1.2025.02.06.11.31.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Feb 2025 11:31:18 -0800 (PST)
+Date: Thu, 6 Feb 2025 19:31:17 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+ x86@kernel.org, linux-block@vger.kernel.org, Ard Biesheuvel
+ <ardb@kernel.org>, Keith Busch <kbusch@kernel.org>, Kent Overstreet
+ <kent.overstreet@linux.dev>, "Martin K . Petersen"
+ <martin.petersen@oracle.com>
+Subject: Re: [PATCH v3 2/6] scripts/gen-crc-consts: add gen-crc-consts.py
+Message-ID: <20250206193117.7a9a463c@pumpkin>
+In-Reply-To: <20250206073948.181792-3-ebiggers@kernel.org>
+References: <20250206073948.181792-1-ebiggers@kernel.org>
+	<20250206073948.181792-3-ebiggers@kernel.org>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA3PR11MB8120.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6a7ed0bb-84a5-46c6-464b-08dd46e3df22
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Feb 2025 19:24:27.1423
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: h46ehVRFPo+FmTCXHFZCICzzsoZJ9SBHzPdrrMKhvm/27pO11/sNPSg64lqeosy5KuIGEkAdf8IuFbigvI0d7inUwiI+AD2QjSUkoBqwKW4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB4736
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Wed,  5 Feb 2025 23:39:44 -0800
+Eric Biggers <ebiggers@kernel.org> wrote:
 
-> -----Original Message-----
-> From: Yosry Ahmed <yosry.ahmed@linux.dev>
-> Sent: Thursday, February 6, 2025 11:11 AM
-> To: Sridhar, Kanchana P <kanchana.p.sridhar@intel.com>
-> Cc: linux-kernel@vger.kernel.org; linux-mm@kvack.org;
-> hannes@cmpxchg.org; nphamcs@gmail.com; chengming.zhou@linux.dev;
-> usamaarif642@gmail.com; ryan.roberts@arm.com; 21cnbao@gmail.com;
-> akpm@linux-foundation.org; linux-crypto@vger.kernel.org;
-> herbert@gondor.apana.org.au; davem@davemloft.net;
-> clabbe@baylibre.com; ardb@kernel.org; ebiggers@google.com;
-> surenb@google.com; Accardi, Kristen C <kristen.c.accardi@intel.com>;
-> Feghali, Wajdi K <wajdi.k.feghali@intel.com>; Gopal, Vinodh
-> <vinodh.gopal@intel.com>
-> Subject: Re: [PATCH v6 15/16] mm: zswap: Compress batching with Intel IAA
-> in zswap_store() of large folios.
->=20
-> On Wed, Feb 05, 2025 at 11:21:01PM -0800, Kanchana P Sridhar wrote:
-> > zswap_compress_folio() is modified to detect if the pool's acomp_ctx ha=
-s
-> > more than one "nr_reqs", which will be the case if the cpu onlining cod=
-e
-> > has allocated multiple batching resources in the acomp_ctx. If so, it m=
-eans
-> > compress batching can be used with a batch-size of "acomp_ctx->nr_reqs"=
-.
-> >
-> > If compress batching can be used, zswap_compress_folio() will invoke th=
-e
-> > newly added zswap_batch_compress() procedure to compress and store the
-> > folio in batches of "acomp_ctx->nr_reqs" pages.
-> >
-> > With Intel IAA, the iaa_crypto driver will compress each batch of pages=
- in
-> > parallel in hardware.
-> >
-> > Hence, zswap_batch_compress() does the same computes for a batch, as
-> > zswap_compress() does for a page; and returns true if the batch was
-> > successfully compressed/stored, and false otherwise.
-> >
-> > If the pool does not support compress batching, or the folio has only o=
-ne
-> > page, zswap_compress_folio() calls zswap_compress() for each individual
-> > page in the folio, as before.
-> >
-> > Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
-> > ---
-> >  mm/zswap.c | 122
-> +++++++++++++++++++++++++++++++++++++++++++++++++----
-> >  1 file changed, 113 insertions(+), 9 deletions(-)
-> >
-> > diff --git a/mm/zswap.c b/mm/zswap.c
-> > index 6563d12e907b..f1cba77eda62 100644
-> > --- a/mm/zswap.c
-> > +++ b/mm/zswap.c
-> > @@ -985,10 +985,11 @@ static void acomp_ctx_put_unlock(struct
-> crypto_acomp_ctx *acomp_ctx)
-> >  	mutex_unlock(&acomp_ctx->mutex);
-> >  }
-> >
-> > +/* The per-cpu @acomp_ctx mutex should be locked/unlocked in the
-> caller. */
->=20
-> Please use lockdep assertions rather than comments for internal locking r=
-ules.
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> Add a Python script that generates constants for computing the given CRC
+> variant(s) using x86's pclmulqdq or vpclmulqdq instructions.
+> 
+> This is specifically tuned for x86's crc-pclmul-template.S.  However,
+> other architectures with a 64x64 => 128-bit carryless multiplication
+> instruction should be able to use the generated constants too.  (Some
+> tweaks may be warranted based on the exact instructions available on
+> each arch, so the script may grow an arch argument in the future.)
+> 
+> The script also supports generating the tables needed for table-based
+> CRC computation.  Thus, it can also be used to reproduce the tables like
+> t10_dif_crc_table[] and crc16_table[] that are currently hardcoded in
+> the source with no generation script explicitly documented.
+> 
+> Python is used rather than C since it enables implementing the CRC math
+> in the simplest way possible, using arbitrary precision integers.  The
+> outputs of this script are intended to be checked into the repo, so
+> Python will continue to not be required to build the kernel, and the
+> script has been optimized for simplicity rather than performance.
 
-Sure. Thanks for the suggestion.
+It might be better to output #defines that just contain array
+initialisers rather than the definition of the actual array itself.
 
->=20
-> >  static bool zswap_compress(struct page *page, struct zswap_entry *entr=
-y,
-> > -			   struct zswap_pool *pool)
-> > +			   struct zswap_pool *pool,
-> > +			   struct crypto_acomp_ctx *acomp_ctx)
-> >  {
-> > -	struct crypto_acomp_ctx *acomp_ctx;
-> >  	struct scatterlist input, output;
-> >  	int comp_ret =3D 0, alloc_ret =3D 0;
-> >  	unsigned int dlen =3D PAGE_SIZE;
-> > @@ -998,7 +999,6 @@ static bool zswap_compress(struct page *page,
-> struct zswap_entry *entry,
-> >  	gfp_t gfp;
-> >  	u8 *dst;
-> >
-> > -	acomp_ctx =3D acomp_ctx_get_cpu_lock(pool);
-> >  	dst =3D acomp_ctx->buffers[0];
-> >  	sg_init_table(&input, 1);
-> >  	sg_set_page(&input, page, PAGE_SIZE, 0);
-> > @@ -1051,7 +1051,6 @@ static bool zswap_compress(struct page *page,
-> struct zswap_entry *entry,
-> >  	else if (alloc_ret)
-> >  		zswap_reject_alloc_fail++;
-> >
-> > -	acomp_ctx_put_unlock(acomp_ctx);
-> >  	return comp_ret =3D=3D 0 && alloc_ret =3D=3D 0;
-> >  }
-> >
-> > @@ -1509,20 +1508,125 @@ static void shrink_worker(struct work_struct
-> *w)
-> >  * main API
-> >  **********************************/
-> >
-> > +/* The per-cpu @acomp_ctx mutex should be locked/unlocked in the
-> caller. */
-> > +static bool zswap_batch_compress(struct folio *folio,
-> > +				 long index,
-> > +				 unsigned int batch_size,
-> > +				 struct zswap_entry *entries[],
-> > +				 struct zswap_pool *pool,
-> > +				 struct crypto_acomp_ctx *acomp_ctx)
-> > +{
-> > +	int comp_errors[ZSWAP_MAX_BATCH_SIZE] =3D { 0 };
-> > +	unsigned int dlens[ZSWAP_MAX_BATCH_SIZE];
-> > +	struct page *pages[ZSWAP_MAX_BATCH_SIZE];
-> > +	unsigned int i, nr_batch_pages;
-> > +	bool ret =3D true;
-> > +
-> > +	nr_batch_pages =3D min((unsigned int)(folio_nr_pages(folio) - index),
-> batch_size);
-> > +
-> > +	for (i =3D 0; i < nr_batch_pages; ++i) {
-> > +		pages[i] =3D folio_page(folio, index + i);
-> > +		dlens[i] =3D PAGE_SIZE;
-> > +	}
-> > +
-> > +	/*
-> > +	 * Batch compress @nr_batch_pages. If IAA is the compressor, the
-> > +	 * hardware will compress @nr_batch_pages in parallel.
-> > +	 */
->=20
-> Please do not specifically mention IAA in zswap.c, as batching could be
-> supported in the future by other compressors.
+Then any code that wants the values can include the header and
+just use the constant data it wants to initialise its own array.
 
-Ok.
+	David
 
->=20
-> > +	ret =3D crypto_acomp_batch_compress(
-> > +		acomp_ctx->reqs,
-> > +		NULL,
-> > +		pages,
-> > +		acomp_ctx->buffers,
-> > +		dlens,
-> > +		comp_errors,
-> > +		nr_batch_pages);
->=20
-> Does crypto_acomp_batch_compress() not require calling
-> crypto_wait_req()?
+> 
+> Acked-by: Ard Biesheuvel <ardb@kernel.org>
+> Acked-by: Keith Busch <kbusch@kernel.org>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>  MAINTAINERS               |   1 +
+>  scripts/gen-crc-consts.py | 239 ++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 240 insertions(+)
+>  create mode 100755 scripts/gen-crc-consts.py
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 896a307fa0654..3532167f31939 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -6130,10 +6130,11 @@ S:	Maintained
+>  T:	git https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git crc-next
+>  F:	Documentation/staging/crc*
+>  F:	arch/*/lib/crc*
+>  F:	include/linux/crc*
+>  F:	lib/crc*
+> +F:	scripts/gen-crc-consts.py
+>  
+>  CREATIVE SB0540
+>  M:	Bastien Nocera <hadess@hadess.net>
+>  L:	linux-input@vger.kernel.org
+>  S:	Maintained
+> diff --git a/scripts/gen-crc-consts.py b/scripts/gen-crc-consts.py
+> new file mode 100755
+> index 0000000000000..608714ba451eb
+> --- /dev/null
+> +++ b/scripts/gen-crc-consts.py
+> @@ -0,0 +1,239 @@
+> +#!/usr/bin/env python3
+> +# SPDX-License-Identifier: GPL-2.0-or-later
+> +#
+> +# Script that generates constants for computing the given CRC variant(s).
+> +#
+> +# Copyright 2025 Google LLC
+> +#
+> +# Author: Eric Biggers <ebiggers@google.com>
+> +
+> +import sys
+> +
+> +# XOR (add) an iterable of polynomials.
+> +def xor(iterable):
+> +    res = 0
+> +    for val in iterable:
+> +        res ^= val
+> +    return res
+> +
+> +# Multiply two polynomials.
+> +def clmul(a, b):
+> +    return xor(a << i for i in range(b.bit_length()) if (b & (1 << i)) != 0)
+> +
+> +# Polynomial division floor(a / b).
+> +def div(a, b):
+> +    q = 0
+> +    while a.bit_length() >= b.bit_length():
+> +        q ^= 1 << (a.bit_length() - b.bit_length())
+> +        a ^= b << (a.bit_length() - b.bit_length())
+> +    return q
+> +
+> +# Reduce the polynomial 'a' modulo the polynomial 'b'.
+> +def reduce(a, b):
+> +    return a ^ clmul(div(a, b), b)
+> +
+> +# Pretty-print a polynomial.
+> +def pprint_poly(prefix, poly):
+> +    terms = [f'x^{i}' for i in reversed(range(poly.bit_length()))
+> +             if (poly & (1 << i)) != 0]
+> +    j = 0
+> +    while j < len(terms):
+> +        s = prefix + terms[j] + (' +' if j < len(terms) - 1 else '')
+> +        j += 1
+> +        while j < len(terms) and len(s) < 73:
+> +            s += ' ' + terms[j] + (' +' if j < len(terms) - 1 else '')
+> +            j += 1
+> +        print(s)
+> +        prefix = ' * ' + (' ' * (len(prefix) - 3))
+> +
+> +# Reverse the bits of a polynomial.
+> +def bitreverse(poly, num_bits):
+> +    assert poly.bit_length() <= num_bits
+> +    return xor(1 << (num_bits - 1 - i) for i in range(num_bits)
+> +               if (poly & (1 << i)) != 0)
+> +
+> +# Format a polynomial as hex.  Bit-reflect it if the CRC is lsb-first.
+> +def fmt_poly(variant, poly, num_bits):
+> +    if variant.lsb:
+> +        poly = bitreverse(poly, num_bits)
+> +    return f'0x{poly:0{2*num_bits//8}x}'
+> +
+> +# Print a pair of 64-bit polynomial multipliers.  They are always passed in the
+> +# order [HI64_TERMS, LO64_TERMS] but will be printed in the appropriate order.
+> +def print_mult_pair(variant, mults):
+> +    mults = list(mults if variant.lsb else reversed(mults))
+> +    terms = ["HI64_TERMS", "LO64_TERMS"] if variant.lsb else ["LO64_TERMS", "HI64_TERMS"]
+> +    for i in range(2):
+> +        print(f'\t\t{fmt_poly(variant, mults[i]["val"], 64)},\t/* {terms[i]}: {mults[i]["desc"]} */')
+> +
+> +# Print a comment describing constants generated for the given CRC variant.
+> +def print_header(variant, what):
+> +    print('/*')
+> +    s = f'{"least" if variant.lsb else "most"}-significant-bit-first CRC-{variant.bits}'
+> +    print(f' * {what} generated for {s} using')
+> +    pprint_poly(' * G(x) = ', variant.G)
+> +    print(' */')
+> +
+> +class CrcVariant:
+> +    def __init__(self, bits, generator_poly, bit_order):
+> +        self.bits = bits
+> +        if bit_order not in ['lsb', 'msb']:
+> +            raise ValueError('Invalid value for bit_order')
+> +        self.lsb = bit_order == 'lsb'
+> +        self.name = f'crc{bits}_{bit_order}_0x{generator_poly:0{(2*bits+7)//8}x}'
+> +        if self.lsb:
+> +            generator_poly = bitreverse(generator_poly, bits)
+> +        self.G = generator_poly ^ (1 << bits)
+> +
+> +# Generate tables for CRC computation using the "slice-by-N" method.
+> +# N=1 corresponds to the traditional byte-at-a-time table.
+> +def gen_slicebyN_tables(variants, n):
+> +    for v in variants:
+> +        print('')
+> +        print_header(v, f'Slice-by-{n} CRC table')
+> +        print(f'static const u{v.bits} __maybe_unused {v.name}_table[{256*n}] = {{')
+> +        s = ''
+> +        for i in range(256 * n):
+> +            # The i'th table entry is the CRC of the message consisting of byte
+> +            # i % 256 followed by i // 256 zero bytes.
+> +            poly = (bitreverse(i % 256, 8) if v.lsb else (i % 256)) << (v.bits + 8*(i//256))
+> +            next_entry = fmt_poly(v, reduce(poly, v.G), v.bits) + ','
+> +            if len(s + next_entry) > 71:
+> +                print(f'\t{s}')
+> +                s = ''
+> +            s += (' ' if s else '') + next_entry
+> +        if s:
+> +            print(f'\t{s}')
+> +        print('};')
+> +
+> +# Generate constants for carryless multiplication based CRC computation.
+> +def gen_x86_pclmul_consts(variants):
+> +    # These are the distances, in bits, to generate folding constants for.
+> +    FOLD_DISTANCES = [2048, 1024, 512, 256, 128]
+> +
+> +    for v in variants:
+> +        (G, n, lsb) = (v.G, v.bits, v.lsb)
+> +        print('')
+> +        print_header(v, 'CRC folding constants')
+> +        print('static const struct {')
+> +        if not lsb:
+> +            print('\tu8 bswap_mask[16];')
+> +        for i in FOLD_DISTANCES:
+> +            print(f'\tu64 fold_across_{i}_bits_consts[2];')
+> +        print('\tu8 shuf_table[48];')
+> +        print('\tu64 barrett_reduction_consts[2];')
+> +        print(f'}} {v.name}_consts ____cacheline_aligned __maybe_unused = {{')
+> +
+> +        # Byte-reflection mask, needed for msb-first CRCs
+> +        if not lsb:
+> +            print('\t.bswap_mask = {' + ', '.join(str(i) for i in reversed(range(16))) + '},')
+> +
+> +        # Fold constants for all distances down to 128 bits
+> +        for i in FOLD_DISTANCES:
+> +            print(f'\t.fold_across_{i}_bits_consts = {{')
+> +            # Given 64x64 => 128 bit carryless multiplication instructions, two
+> +            # 64-bit fold constants are needed per "fold distance" i: one for
+> +            # HI64_TERMS that is basically x^(i+64) mod G and one for LO64_TERMS
+> +            # that is basically x^i mod G.  The exact values however undergo a
+> +            # couple adjustments, described below.
+> +            mults = []
+> +            for j in [64, 0]:
+> +                pow_of_x = i + j
+> +                if lsb:
+> +                    # Each 64x64 => 128 bit carryless multiplication instruction
+> +                    # actually generates a 127-bit product in physical bits 0
+> +                    # through 126, which in the lsb-first case represent the
+> +                    # coefficients of x^1 through x^127, not x^0 through x^126.
+> +                    # Thus in the lsb-first case, each such instruction
+> +                    # implicitly adds an extra factor of x.  The below removes a
+> +                    # factor of x from each constant to compensate for this.
+> +                    # For n < 64 the x could be removed from either the reduced
+> +                    # part or unreduced part, but for n == 64 the reduced part
+> +                    # is the only option; we just always use the reduced part.
+> +                    pow_of_x -= 1
+> +                # Make a factor of 64-n be applied unreduced rather than
+> +                # reduced, to cause the product to use only the x^n and above
+> +                # terms and always be zero in the x^0 through x^(n-1) terms.
+> +                # Usually this makes no difference as it does not affect the
+> +                # product's congruence class mod G and the constant remains
+> +                # 64-bit, but part of the final reduction from 128 bits does
+> +                # rely on this property when it reuses one of the constants.
+> +                pow_of_x -= 64 - n
+> +                mults.append({ 'val': reduce(1 << pow_of_x, G) << (64 - n),
+> +                               'desc': f'(x^{pow_of_x} mod G) * x^{64-n}' })
+> +            print_mult_pair(v, mults)
+> +            print('\t},')
+> +
+> +        # Shuffle table for handling 1..15 bytes at end
+> +        print('\t.shuf_table = {')
+> +        print('\t\t' + (16*'-1, ').rstrip())
+> +        print('\t\t' + ''.join(f'{i:2}, ' for i in range(16)).rstrip())
+> +        print('\t\t' + (16*'-1, ').rstrip())
+> +        print('\t},')
+> +
+> +        # Barrett reduction constants for reducing 128 bits to the final CRC
+> +        print('\t.barrett_reduction_consts = {')
+> +        mults = []
+> +
+> +        val = div(1 << (63+n), G)
+> +        desc = f'floor(x^{63+n} / G)'
+> +        if not lsb:
+> +            val = (val << 1) - (1 << 64)
+> +            desc = f'({desc} * x) - x^64'
+> +        mults.append({ 'val': val, 'desc': desc })
+> +
+> +        val = G - (1 << n)
+> +        desc = f'G - x^{n}'
+> +        if lsb and n == 64:
+> +            assert (val & 1) != 0
+> +            val >>= 1
+> +            desc = f'({desc} - x^0) / x'
+> +        else:
+> +            pow_of_x = 64 - n - (1 if lsb else 0)
+> +            val <<= pow_of_x
+> +            desc = f'({desc}) * x^{pow_of_x}'
+> +        mults.append({ 'val': val, 'desc': desc })
+> +
+> +        print_mult_pair(v, mults)
+> +        print('\t},')
+> +
+> +        print('};')
+> +
+> +def parse_crc_variants(vars_string):
+> +    variants = []
+> +    for var_string in vars_string.split(','):
+> +        bits, bit_order, generator_poly = var_string.split('_')
+> +        assert bits.startswith('crc')
+> +        bits = int(bits.removeprefix('crc'))
+> +        assert generator_poly.startswith('0x')
+> +        generator_poly = generator_poly.removeprefix('0x')
+> +        assert len(generator_poly) % 2 == 0
+> +        generator_poly = int(generator_poly, 16)
+> +        variants.append(CrcVariant(bits, generator_poly, bit_order))
+> +    return variants
+> +
+> +if len(sys.argv) != 3:
+> +    sys.stderr.write(f'Usage: {sys.argv[0]} CONSTS_TYPE[,CONSTS_TYPE]... CRC_VARIANT[,CRC_VARIANT]...\n')
+> +    sys.stderr.write('  CONSTS_TYPE can be sliceby[1-8] or x86_pclmul\n')
+> +    sys.stderr.write('  CRC_VARIANT is crc${num_bits}_${bit_order}_${generator_poly_as_hex}\n')
+> +    sys.stderr.write('     E.g. crc16_msb_0x8bb7 or crc32_lsb_0xedb88320\n')
+> +    sys.stderr.write('     Polynomial must use the given bit_order and exclude x^{num_bits}\n')
+> +    sys.exit(1)
+> +
+> +print('/* SPDX-License-Identifier: GPL-2.0-or-later */')
+> +print('/*')
+> +print(' * CRC constants generated by:')
+> +print(' *')
+> +print(f' *\t{sys.argv[0]} {" ".join(sys.argv[1:])}')
+> +print(' *')
+> +print(' * Do not edit manually.')
+> +print(' */')
+> +consts_types = sys.argv[1].split(',')
+> +variants = parse_crc_variants(sys.argv[2])
+> +for consts_type in consts_types:
+> +    if consts_type.startswith('sliceby'):
+> +        gen_slicebyN_tables(variants, int(consts_type.removeprefix('sliceby')))
+> +    elif consts_type == 'x86_pclmul':
+> +        gen_x86_pclmul_consts(variants)
+> +    else:
+> +        raise ValueError(f'Unknown consts_type: {consts_type}')
 
-It actually doesn't. If the crypto_wait parameter is NULL, the API requires
-the driver to provide a way to process request completions asynchronously,
-as described in patch 2 that adds the crypto batching API.
-
->=20
-> > +
-> > +	if (ret) {
-> > +		/*
-> > +		 * All batch pages were successfully compressed.
-> > +		 * Store the pages in zpool.
-> > +		 */
-> > +		struct zpool *zpool =3D pool->zpool;
-> > +		gfp_t gfp =3D __GFP_NORETRY | __GFP_NOWARN |
-> __GFP_KSWAPD_RECLAIM;
-> > +
-> > +		if (zpool_malloc_support_movable(zpool))
-> > +			gfp |=3D __GFP_HIGHMEM | __GFP_MOVABLE;
-> > +
-> > +		for (i =3D 0; i < nr_batch_pages; ++i) {
-> > +			unsigned long handle;
-> > +			char *buf;
-> > +			int err;
-> > +
-> > +			err =3D zpool_malloc(zpool, dlens[i], gfp, &handle);
-> > +
-> > +			if (err) {
-> > +				if (err =3D=3D -ENOSPC)
-> > +					zswap_reject_compress_poor++;
-> > +				else
-> > +					zswap_reject_alloc_fail++;
-> > +
-> > +				ret =3D false;
-> > +				break;
-> > +			}
-> > +
-> > +			buf =3D zpool_map_handle(zpool, handle,
-> ZPOOL_MM_WO);
-> > +			memcpy(buf, acomp_ctx->buffers[i], dlens[i]);
-> > +			zpool_unmap_handle(zpool, handle);
-> > +
-> > +			entries[i]->handle =3D handle;
-> > +			entries[i]->length =3D dlens[i];
-> > +		}
-> > +	} else {
-> > +		/* Some batch pages had compression errors. */
-> > +		for (i =3D 0; i < nr_batch_pages; ++i) {
-> > +			if (comp_errors[i]) {
-> > +				if (comp_errors[i] =3D=3D -ENOSPC)
-> > +					zswap_reject_compress_poor++;
-> > +				else
-> > +					zswap_reject_compress_fail++;
-> > +			}
-> > +		}
-> > +	}
->=20
-> This function is awfully close to zswap_compress(). It's essentially a
-> vectorized version and uses crypto_acomp_batch_compress() instead of
-> crypto_acomp_compress().
->=20
-> My questions are:
-> - Can we use crypto_acomp_batch_compress() for the non-batched case as
->   well to unify the code? Does it cause any regressions?
->=20
-> - If we have to use different compressions APIs, can we at least reuse
->   the rest of the code? We can abstract the compression call into a
->   helper that chooses the appropriate API based on the batch size. The
->   rest should be the same AFAICT.
-
-All good ideas. Let me think about this some more, and gather some data.
-
-Thanks,
-Kanchana
-
->=20
-> > +
-> > +	return ret;
-> > +}
-> > +
-> >  static bool zswap_compress_folio(struct folio *folio,
-> >  				 struct zswap_entry *entries[],
-> >  				 struct zswap_pool *pool)
-> >  {
-> >  	long index, nr_pages =3D folio_nr_pages(folio);
-> > +	struct crypto_acomp_ctx *acomp_ctx;
-> > +	unsigned int batch_size;
-> > +	bool ret =3D true;
-> >
-> > -	for (index =3D 0; index < nr_pages; ++index) {
-> > -		struct page *page =3D folio_page(folio, index);
-> > +	acomp_ctx =3D acomp_ctx_get_cpu_lock(pool);
-> > +	batch_size =3D acomp_ctx->nr_reqs;
-> > +
-> > +	if ((batch_size > 1) && (nr_pages > 1)) {
-> > +		for (index =3D 0; index < nr_pages; index +=3D batch_size) {
-> > +
-> > +			if (!zswap_batch_compress(folio, index, batch_size,
-> > +						  &entries[index], pool,
-> acomp_ctx)) {
-> > +				ret =3D false;
-> > +				goto unlock_acomp_ctx;
-> > +			}
-> > +		}
-> > +	} else {
-> > +		for (index =3D 0; index < nr_pages; ++index) {
-> > +			struct page *page =3D folio_page(folio, index);
-> >
-> > -		if (!zswap_compress(page, entries[index], pool))
-> > -			return false;
-> > +			if (!zswap_compress(page, entries[index], pool,
-> acomp_ctx)) {
-> > +				ret =3D false;
-> > +				goto unlock_acomp_ctx;
-> > +			}
-> > +		}
-> >  	}
-> >
-> > -	return true;
-> > +unlock_acomp_ctx:
-> > +	acomp_ctx_put_unlock(acomp_ctx);
-> > +	return ret;
-> >  }
-> >
-> >  /*
-> > --
-> > 2.27.0
-> >
