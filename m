@@ -1,91 +1,110 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from 009.lax.mailroute.net (009.lax.mailroute.net [199.89.1.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C1FC18C930;
-	Fri,  7 Feb 2025 20:04:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 843991AB6D8;
+	Fri,  7 Feb 2025 20:58:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.1.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738958662; cv=none; b=q6sgQqFxE8LPlBdSD67UoigQV+QkPWEfU5AZGau43yfai0xmyw5IJKdZjMZzHyg8X8qQMCs9zRXcFxQ97lWzelDKPYN2Q6kjyCtZP76atAibNqwXAJMqdYTk/iJA32L5cFOu4py489xTkxXtKjTOrlW21Tw2/bEhV6mVTQa3QjM=
+	t=1738961930; cv=none; b=EncQPJtEzDZUVW2y2DqnYUzkCeGjBhzJlmOGu1GAHxUujkmLqK9U5Ikw7s+/8MO0Xc3XAUOuDixvF7bnhlWA1M5Qtruo+yCFPPB8YicZQS0LtEl5eAVOxRis+t0kz+xgymbPVd9Wn2DgZgdDq/+EOYO8DH4HARy0zSPjJEU5YHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738958662; c=relaxed/simple;
-	bh=V/d0cHVmH87BvmOD994J3enMdP4akQHipKqVYK9lI+E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GKKKSUOkvhAzx34fQAnlCwHcUwpvikTyx65VL1lIT3Mr/BtXT3BrKH2dFUNMwgKIK43p8jWQXdSAzjkkCSANVQLkEJr17WzMJsC5Hn4SozCJL4zh7pVpAWwHBLK0CG0sShTj8HvG9PocWe7rKi9WS360BzvVxOu/GSy2ZTWLgvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r5IPLDS1; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1738961930; c=relaxed/simple;
+	bh=xAwZ9HQ5MAYCQ2LR1z5gYPvNqDl0kPb5mILIXPxKDY0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XSjs1730Y0Scu8t/TGgh54GonDgLK0NhS26sDS8n9S2tKS85W921BhKd8U/jZLHFxMDWCPhGVGN/cdtdTiNx/flKMMd/zOQ1wAckbhw9OW9vHK/UVkBAPrp5gy40fNaMEGexpo0AVMYQVGXnyI2OGhGqA1uFa5fwdr8yfRoXfGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=VacKsLnk; arc=none smtp.client-ip=199.89.1.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r5IPLDS1"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C742C4CED1;
-	Fri,  7 Feb 2025 20:04:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738958661;
-	bh=V/d0cHVmH87BvmOD994J3enMdP4akQHipKqVYK9lI+E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=r5IPLDS1OfDoymxXg1xTZN0El7zvLcoyuS18V+fkNQyxEQyMCBRZPn7hbKjNuwYOB
-	 brbI/QyMHmPyQnUTKkz6tV7c90QQeIxyYg53bH3NVtJePTiRpjvRVdGJftED+97zMZ
-	 aQH1e+IB+APL3n4or51dNWIHUa6VGWa5rzgrfzN79itYImyABatpR9uPwiww/UvhL1
-	 kTOiiNoOvG5bScnHYzyDOtWsK3dXk/F9aQLSg5fSbZ+gQsWgKUIcXce0pIqJpHw30b
-	 R5fm/5WgoxPIk5fJKM8z8icyI4pjH08MBnD3XK8cTnCzQr3VM8Hsi/y4V6CdFD9KUD
-	 3gRfoXesMl7nQ==
-Date: Fri, 7 Feb 2025 20:04:19 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: netdev@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Trond Myklebust <trond.myklebust@hammerspace.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
-	linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 03/24] crypto: Add 'krb5enc' hash and cipher AEAD
- algorithm
-Message-ID: <20250207200419.GA2819332@google.com>
-References: <20250203142343.248839-1-dhowells@redhat.com>
- <20250203142343.248839-4-dhowells@redhat.com>
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="VacKsLnk"
+Received: from localhost (localhost [127.0.0.1])
+	by 009.lax.mailroute.net (Postfix) with ESMTP id 4YqRCP5bPRzlgTwQ;
+	Fri,  7 Feb 2025 20:58:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1738961910; x=1741553911; bh=cPoTgIZpKmlByO7NU1gC7bDa
+	ucVwG90zqII2j1CUOIQ=; b=VacKsLnkTdDYtPmt5J4MPD4Qx4KqDnMmmqgENTJ6
+	EtGKhhNCL3FbJzNKd+ETkPPQM7+k0i3yX2iW8q/3iMGik+SUc/EL6VtGWa/NeKJN
+	Xf+/DVOiqp671Tk9LAbh+uq9jSBWZPDCH6WEM2Pa99LrTCfC/C87dWCgPe+7K9Xk
+	fMbRKCIgv980B/wIrp69eB1ri2/70yj+HAHygqGUrxfkh47z6ndhXJmkhf+Izy1r
+	tAkHcBQg1sSGNalB0ZQLoJflY/+OnefFs9gkD6Te4zEZ5jQ7crrhLu+66NEMH6Yj
+	Xsf+d717IbvZq+tYBbHv0evOn2tmB661eFAH2wyxXERWAw==
+X-Virus-Scanned: by MailRoute
+Received: from 009.lax.mailroute.net ([127.0.0.1])
+ by localhost (009.lax [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id Wva0VBNH7R1P; Fri,  7 Feb 2025 20:58:30 +0000 (UTC)
+Received: from [100.66.154.22] (unknown [104.135.204.82])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 009.lax.mailroute.net (Postfix) with ESMTPSA id 4YqRC05LwRzlgTwF;
+	Fri,  7 Feb 2025 20:58:20 +0000 (UTC)
+Message-ID: <38bde2a3-762d-49ed-a2a6-ac3bd698bedc@acm.org>
+Date: Fri, 7 Feb 2025 12:58:20 -0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250203142343.248839-4-dhowells@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC 11/24] locking/mutex: Support Clang's capability
+ analysis
+To: Peter Zijlstra <peterz@infradead.org>, Marco Elver <elver@google.com>
+Cc: "Paul E. McKenney" <paulmck@kernel.org>,
+ Alexander Potapenko <glider@google.com>, Bill Wendling <morbo@google.com>,
+ Boqun Feng <boqun.feng@gmail.com>, Dmitry Vyukov <dvyukov@google.com>,
+ Frederic Weisbecker <frederic@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Ingo Molnar <mingo@kernel.org>, Jann Horn <jannh@google.com>,
+ Joel Fernandes <joel@joelfernandes.org>, Jonathan Corbet <corbet@lwn.net>,
+ Josh Triplett <josh@joshtriplett.org>, Justin Stitt
+ <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>,
+ Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+ Nick Desaulniers <ndesaulniers@google.com>,
+ Steven Rostedt <rostedt@goodmis.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Uladzislau Rezki <urezki@gmail.com>, Waiman Long <longman@redhat.com>,
+ Will Deacon <will@kernel.org>, kasan-dev@googlegroups.com,
+ linux-kernel@vger.kernel.org, llvm@lists.linux.dev, rcu@vger.kernel.org,
+ linux-crypto@vger.kernel.org
+References: <20250206181711.1902989-1-elver@google.com>
+ <20250206181711.1902989-12-elver@google.com>
+ <20250207083119.GV7145@noisy.programming.kicks-ass.net>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20250207083119.GV7145@noisy.programming.kicks-ass.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Feb 03, 2025 at 02:23:19PM +0000, David Howells wrote:
-> [!] Note that the net/sunrpc/auth_gss/ implementation gets a pair of
-> ciphers, one non-CTS and one CTS, using the former to do all the aligned
-> blocks and the latter to do the last two blocks if they aren't also
-> aligned.  It may be necessary to do this here too for performance reasons -
-> but there are considerations both ways:
-> 
->  (1) firstly, there is an optimised assembly version of cts(cbc(aes)) on
->      x86_64 that should be used instead of having two ciphers;
-> 
->  (2) secondly, none of the hardware offload drivers seem to offer CTS
->      support (Intel QAT does not, for instance).
-> 
-> However, I don't know if it's possible to query the crypto API to find out
-> whether there's an optimised CTS algorithm available.
+On 2/7/25 12:31 AM, Peter Zijlstra wrote:
+> Can we please fix up all the existing __cond_lock() code too?
 
-Linux's "cts" is specifically the CS3 variant of CTS (using the terminology of
-NIST SP800-38A https://dl.acm.org/doi/pdf/10.5555/2206248) which unconditionally
-swaps the last two blocks.  Is that the variant that is needed here?  SP800-38A
-mentions that CS3 is the variant used in Kerberos 5, so I assume yes.  If yes,
-then you need to use cts(cbc(aes)) unconditionally.  (BTW, I hope you have some
-test that shows that you actually implemented the Kerberos protocol correctly?)
+It would be great to get rid of __cond_lock().
 
-x86_64 already has an AES-NI assembly optimized cts(cbc(aes)), as you mentioned.
-I will probably add a VAES optimized cts(cbc(aes)) at some point; I've just been
-doing other modes first.  I don't see why off-CPU hardware offload support
-should deserve much attention here, given the extremely high speed of on-CPU
-crypto these days and the great difficulty of integrating off-CPU acceleration
-efficiently.  In particular it seems weird to consider Intel QAT a reasonable
-thing to use over VAES.  Regardless, absent direct support for cts(cbc(aes)) the
-cts template will build it on top of cbc(aes) anyway.
+In the description of commit 4a557a5d1a61 ("sparse: introduce
+conditional lock acquire function attribute") I found the following
+URL: 
+https://lore.kernel.org/all/CAHk-=wjZfO9hGqJ2_hGQG3U_XzSh9_XaXze=HgPdvJbgrvASfA@mail.gmail.com/
 
-- Eric
+That URL points at an e-mail from Linus Torvalds with a patch for sparse
+that implements support for __cond_acquires(). It seems to me that the
+sparse patch has never been applied to the sparse code base (the git URL
+for sparse is available at https://sparse.docs.kernel.org/en/latest/).
+Additionally, the most recent commit to the sparse code base is from
+more than a year ago (see also 
+https://git.kernel.org/pub/scm/devel/sparse/sparse.git/).
+
+In other words, switching from __cond_lock() to __cond_acquires()
+probably will make sparse report more "context imbalance" warnings.
+
+If this is a concern to anyone, please speak up.
+
+Thanks,
+
+Bart.
 
