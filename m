@@ -1,72 +1,57 @@
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19DCB1D618A;
-	Fri,  7 Feb 2025 09:41:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C49F41DE2CD;
+	Fri,  7 Feb 2025 09:42:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738921292; cv=none; b=R5xpwuLiWanwirdgJBS75CItW4c/gjDN0DDR+GcKsBbTRlKcr1nkdrO6dG6HZbSplTJ4OzjhWDyKQ0UCO86Rnq1VQ4OrHguLHh0rZyaeUyiOJjp2nRKBsEPyOuLiQEYFxAEpjuKUOLDwveVbIVH6b4XzOby+whGG5aedBVLEbEI=
+	t=1738921334; cv=none; b=BIRGhLVOeyjPGUS7iXKOfULlTWGCLKTeKA+HXshPh9dekyIQa3zZsmdOXAWYw9ksD1KBrmR79x4C3TfUxfQ13bDaECr5aZ4NHch9HG5k3NaArAcB+7EgfGv0U2FEFWkp8f1KqOYY9h0V49ELDMTNF3v3pFmFY0K3/+iu8rVdBzg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738921292; c=relaxed/simple;
-	bh=cP0kGHuvU3nRFuyuh7Kc7W3rfxUKkOVYL5Mob7ZUKgE=;
+	s=arc-20240116; t=1738921334; c=relaxed/simple;
+	bh=EewjN7nUhhtBPJOdfrZj64y7+JiFITVsxY5wBikw+WQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PCarXidu8hj5eSnJHmDq4tWEGyb96Om3WXSzR5PztI8C6agOthUcPVZLPizILccNtUwQ/QIcXX4t4O+Dp0y1PIHFsOMeUkwYt8vkTwQyGmVmdmCzI45eKmcTCwuhMgzWtYIVnMtge9HaFaQW8+3GX65/5nBdJ/pSKLhQ97sHiRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=W0PE77Qt; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=YaroOi9OJkcqxJ9pYjTXQxe+jCnMiVL5EaSqPN+qPZmqjpyqzyHTLW5qPZ2Qgg6qBgPXC+8QhWtvu+1i9KvhTRsMLH+7y/KCHmDQDp0DpIduj6eMAMiROjfeh8UZwp+VotxJumfMdG+Vopzp1DpRq6TuRtRxp24wPLu+OWvjadw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=ZXDaVjrD; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="W0PE77Qt"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=Y1gqRSqWYUoS/5b4bvazFO7Ddo/G+ehsqfGlUNrq33s=; b=W0PE77QtqF8+1sI/uGMrmKcTum
-	6MbjNVPlK/r7lq3fEtLxK7DIar/jgbEkq5rQMStZsn1YzeUUJJKrM0YOHEPiO5iiIVh1mTEPwgQsx
-	DLsFn4XV4xB7ZGONnwOvWFYljnOHWJKo6k8qiI2Edw07tcYIE9vvXks8Si9jjL5ky9QxjWmDTYYNV
-	XrH5mRb/iSXkukM7UaWenYruIzNnBX8U4NfxKUyL1wBBaeGmu2q/LldwyXpdkSopKUPaE0F4j+IJZ
-	EtrqvIJKdj/0oI+yCGbc5rT/PpXvw8DN3NsgSDQkT9PMk/9lpoeSUNHnZkmD1mQiBJFFcwKllgWeP
-	fE4idlew==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1tgKrR-0000000H9UC-0XlV;
-	Fri, 07 Feb 2025 09:41:21 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 1A6313002F0; Fri,  7 Feb 2025 10:41:20 +0100 (CET)
-Date: Fri, 7 Feb 2025 10:41:20 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-To: Marco Elver <elver@google.com>
-Cc: "Paul E. McKenney" <paulmck@kernel.org>,
-	Alexander Potapenko <glider@google.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Bill Wendling <morbo@google.com>, Boqun Feng <boqun.feng@gmail.com>,
-	Dmitry Vyukov <dvyukov@google.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Ingo Molnar <mingo@kernel.org>, Jann Horn <jannh@google.com>,
-	Joel Fernandes <joel@joelfernandes.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Josh Triplett <josh@joshtriplett.org>,
-	Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Uladzislau Rezki <urezki@gmail.com>,
-	Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>,
-	kasan-dev@googlegroups.com, linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev, rcu@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH RFC 02/24] compiler-capability-analysis: Rename
- __cond_lock() to __cond_acquire()
-Message-ID: <20250207094120.GA7145@noisy.programming.kicks-ass.net>
-References: <20250206181711.1902989-1-elver@google.com>
- <20250206181711.1902989-3-elver@google.com>
- <20250207082832.GU7145@noisy.programming.kicks-ass.net>
- <Z6XTKTo_LMj9KmbY@elver.google.com>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="ZXDaVjrD"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=MhA1jDIfQ8iLGh9WfIUR3+LgFXMnqWm6EVDsj31vync=; b=ZXDaVjrDmJbS9jssNlbQ3D9Elb
+	r5Xsr+O3eH47BnThcCfwS3N8+p4zkexJmJG/747y6dDuOu7tkQkOCvKJ/GIuRunQjUD6KD25n0+X3
+	kcG1BAZ7Itvv9TbLunVGLSNIL1mtgJ3nUXgMX0L0AqAZcAaGEdBVjoDUsKQTUOzpRXN09nHvpZUNL
+	gxmLUvE2bu1GrU38+PRWbHHxCXP/OkHk9Ra1tn1ik0thv5vZatZna2CGm8jwG8HBcv9Yy+l75vUsS
+	o1ViSi5mUUyx6WHm0LR1XrsNS8UhS0DYuuJvLTJx0/gsGGdfUYRudFcqYM/d22WAdImA1rarkFFsF
+	lnfvqmgw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tgJwx-00FpRv-2r;
+	Fri, 07 Feb 2025 16:56:21 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 07 Feb 2025 16:56:20 +0800
+Date: Fri, 7 Feb 2025 16:56:20 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: David Howells <dhowells@redhat.com>
+Cc: netdev@vger.kernel.org, Marc Dionne <marc.dionne@auristor.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Trond Myklebust <trond.myklebust@hammerspace.com>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
+	linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 03/24] crypto: Add 'krb5enc' hash and cipher AEAD
+ algorithm
+Message-ID: <Z6XKtPKryJsRfYvK@gondor.apana.org.au>
+References: <20250203142343.248839-1-dhowells@redhat.com>
+ <20250203142343.248839-4-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -75,60 +60,23 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z6XTKTo_LMj9KmbY@elver.google.com>
+In-Reply-To: <20250203142343.248839-4-dhowells@redhat.com>
 
-On Fri, Feb 07, 2025 at 10:32:25AM +0100, Marco Elver wrote:
-> On Fri, Feb 07, 2025 at 09:28AM +0100, Peter Zijlstra wrote:
-> > On Thu, Feb 06, 2025 at 07:09:56PM +0100, Marco Elver wrote:
-> > > Just like the pairing of attribute __acquires() with a matching
-> > > function-like macro __acquire(), the attribute __cond_acquires() should
-> > > have a matching function-like macro __cond_acquire().
-> > > 
-> > > To be consistent, rename __cond_lock() to __cond_acquire().
-> > 
-> > So I hate this __cond_lock() thing we have with a passion. I think it is
-> > one of the very worst annotations possible since it makes a trainwreck
-> > of the trylock code.
-> > 
-> > It is a major reason why mutex is not annotated with this nonsense.
-> > 
-> > Also, I think very dim of sparse in general -- I don't think I've ever
-> > managed to get a useful warning from between all the noise it generates.
-> 
-> Happy to reduce the use of __cond_lock(). :-)
-> Though one problem I found is it's still needed for those complex
-> statement-expression *_trylock that spinlock.h/rwlock.h has, where we
-> e.g. have (with my changes):
-> 
-> 	#define raw_spin_trylock_irqsave(lock, flags)		\
-> 		__cond_acquire(lock, ({				\
-> 			local_irq_save(flags);			\
-> 			_raw_spin_trylock(lock) ?		\
-> 			1 : ({ local_irq_restore(flags); 0; }); \
-> 		}))
-> 
-> Because there's an inner condition using _raw_spin_trylock() and the
-> result of _raw_spin_trylock() is no longer directly used in a branch
-> that also does the unlock, Clang becomes unhappy and complains. I.e.
-> annotating _raw_spin_trylock with __cond_acquires(1, lock) doesn't work
-> for this case because it's in a complex statement-expression. The only
-> way to make it work was to wrap it into a function that has attribute
-> __cond_acquires(1, lock) which is what I made __cond_lock/acquire do.
+On Mon, Feb 03, 2025 at 02:23:19PM +0000, David Howells wrote:
+>
+> [!] Note that the net/sunrpc/auth_gss/ implementation gets a pair of
+> ciphers, one non-CTS and one CTS, using the former to do all the aligned
+> blocks and the latter to do the last two blocks if they aren't also
+> aligned.  It may be necessary to do this here too for performance reasons -
+> but there are considerations both ways:
 
-Does something like:
+The CTS template will take any hardware accelerated CBC implementation
+and turn it into CTS.
 
-static inline bool
-_raw_spin_trylock_irqsave(raw_spinlock_t *lock, unsigned long *flags)
-	__cond_acquire(1, lock)
-{
-	local_irq_save(*flags);
-	if (_raw_spin_trylock(lock))
-		return true;
-	local_irq_restore(*flags);
-	return false;
-}
+So there is no reason to do the CTS/CBC thing by hand at all.
 
-#define raw_spin_trylock_irqsave(lock, flags) \
-	_raw_spin_trylock_irqsave((lock), &(flags))
-
-work?
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
