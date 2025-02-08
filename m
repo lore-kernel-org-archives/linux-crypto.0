@@ -1,38 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B51A8479;
-	Sat,  8 Feb 2025 02:49:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B54829D0E;
+	Sat,  8 Feb 2025 02:49:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738982963; cv=none; b=osPKS6IcOhusuZ3g3b9IdDwvwaGz3AUWsF4OaXVgoedvEbNHmXIZTSj9+KymyCgO/v5TIOZAIpODn+2SO9AVxXe7rViPDzxPvY+NWfdqAOcJJ/Inio4lDuDjUMWkMGAv/fuhJ526a7g5clfyvzUA0E+NcUjrQJJFiwN5SXcJIiM=
+	t=1738982963; cv=none; b=ZVA5/bYjd8mhaqrhayW6hC8rF8oJoDipz9Tv5fmTjmHp8ss2KPfzjQWQuxqY3+/Is+fBwaI+/TGaTfJ1+/tfA76CDaVgJ0DGAgBoTwlVMVB78O4oz6zcf4OdFudYUgnHF1NVbefiQCu13jHH2dwAN4uoUxlGS74o5gxMQ9Sppf8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1738982963; c=relaxed/simple;
-	bh=Ze1FtiaEDEbbnypfR+zfcnEH0GEhEqceBLI6T9MCSuQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ci9pf+q7jBxALPQfwsTlmh7BL3H6U3n6AfztSmQdWmgwv/alNSjYReRU1/BP6r5Nbh8ZjzH+Q0ttR2Gtg1jwupFpWvCgxzzo1MExO/whKlPgdzNKxQ6tlT2MQscCHqim4mqKMSI+0OLa6rq59a2x6yFsDhQAVRFEtDLYkOnFlto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X0eDw6+G; arc=none smtp.client-ip=10.30.226.201
+	bh=CcbjCnOKgUgi0bXsM96+1hSnj0FEL/khYEZSB2AazeA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=t5hKP34P8QojSiF/f3+xaFwRY3/QwduS/g8M5GTSTYNmVp3d6Srlc2dID1/hYjL6+NMeFTsEscIZd2I1F8Pg/zE2CMdfuQenaA6kXixcwp+fxH3/FQTJZXntZQI52s2O8XoMFni3QqmwkuNLXs5C5eYA5iXx4eMgi5KygjdJEq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XHzXWgiG; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X0eDw6+G"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A69D4C4CED1;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XHzXWgiG"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9BDFC4CED6;
 	Sat,  8 Feb 2025 02:49:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738982962;
-	bh=Ze1FtiaEDEbbnypfR+zfcnEH0GEhEqceBLI6T9MCSuQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=X0eDw6+GLDQrwkLdWgF006RorrqEdDiMJuPCpab0HeV6LxdnkHoFkDjroPZDw2Gjr
-	 n8t2558gxegUqnvU2KZei6/v0HkHkknOMsnBXV8iO7pGsrmaYqfM9GC7UCboRpsuxg
-	 1tM7OqYKxNURT0um0P1cp42Z9O5+4D2eYywKuxkZrLnQJDaEZl43MwIjSq3VpQXA/I
-	 nncX2DPsewca12kVvTFf1hgARnzQQX3Ey4xp5OUmZbK12Pg2Gzg3z48oiY0nvPAlOj
-	 NcsjLYpyS3SQTRIKij4W0P/gNoo5LNmsdeDqWliAjsPf2MjiG0ExkXA+S8bkhXtit2
-	 X9HKCIItml2xw==
+	s=k20201202; t=1738982963;
+	bh=CcbjCnOKgUgi0bXsM96+1hSnj0FEL/khYEZSB2AazeA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=XHzXWgiGWT7/za6es3R66EVIPwn7nolhuIKqtLFEU/Qbkraq/6to5kCTx9rzNMRk9
+	 82b+gAYRg+uSrzQSKVvghqziDRXD9KZ4X1rj3TI4nOOXuioQ/G8lFSFGUDg+U7Qwb+
+	 aVIsqlfkLQ4eY099lMOtwYLJH6D/SxAvbTNbFqhNGXKMAQA+vrKBXMY8qWSLIEnJZ2
+	 zYHAjd3uOi0TDKo6+Udr/uSyVg5yh7qEvY8pBsqvDKg93K96S3toNpZ27LRnPIiGWA
+	 YA+Xtf9hYotEJpMPEQf4DTKz7gdmGhHkjWckziniERjljpc9J92nqcSPyAqNsFH9U3
+	 L/OJUkpzLOGiA==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: linux-crypto@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>
-Subject: [PATCH v2 0/6] A few more CRC32 library cleanups
-Date: Fri,  7 Feb 2025 18:49:05 -0800
-Message-ID: <20250208024911.14936-1-ebiggers@kernel.org>
+	Ard Biesheuvel <ardb@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>
+Subject: [PATCH v2 1/6] mips/crc32: remove unused enums
+Date: Fri,  7 Feb 2025 18:49:06 -0800
+Message-ID: <20250208024911.14936-2-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250208024911.14936-1-ebiggers@kernel.org>
+References: <20250208024911.14936-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -41,52 +45,45 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series makes the CRC32 library functions have consistent
-prototypes, and it makes the Castagnoli CRC32 be consistently called
-simply crc32c instead of a mix of crc32c, crc32c_le, and __crc32c_le.
+From: Eric Biggers <ebiggers@google.com>
 
-This series applies to the crc tree.
+Remove enum crc_op_size and enum crc_type, since they are never actually
+used.  Tokens with the names of the enum values do appear in the file,
+but they are only used for token concatenation with the preprocessor.
 
-Changed in v2:
-- Added mips/crc32 patch to fix a build error.
-- Reformatted the kerneldoc comment for crc32c_combine() and moved it to
-  the correct place.
+This prevents a conflict with the addition of crc32c() to linux/crc32.h.
 
-Eric Biggers (6):
-  mips/crc32: remove unused enums
-  lib/crc32: use void pointer for data
-  lib/crc32: don't bother with pure and const function attributes
-  lib/crc32: standardize on crc32c() name for Castagnoli CRC32
-  lib/crc32: rename __crc32c_le_combine() to crc32c_combine()
-  lib/crc32: remove "_le" from crc32c base and arch functions
+Reported-by: Nathan Chancellor <nathan@kernel.org>
+Closes: https://lore.kernel.org/r/20250207224233.GA1261167@ax162
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ arch/mips/lib/crc32-mips.c | 9 ---------
+ 1 file changed, 9 deletions(-)
 
- arch/arm/lib/crc32-glue.c                     | 12 ++--
- arch/arm64/lib/crc32-glue.c                   | 10 ++--
- arch/loongarch/lib/crc32-loongarch.c          |  6 +-
- arch/mips/lib/crc32-mips.c                    | 15 +----
- arch/powerpc/lib/crc32-glue.c                 | 10 ++--
- arch/riscv/lib/crc32-riscv.c                  | 17 +++---
- arch/s390/lib/crc32-glue.c                    |  2 +-
- arch/sparc/lib/crc32_glue.c                   | 10 ++--
- arch/x86/lib/crc32-glue.c                     |  6 +-
- crypto/crc32c_generic.c                       |  8 +--
- drivers/crypto/stm32/stm32-crc32.c            |  2 +-
- drivers/infiniband/sw/siw/siw.h               |  4 +-
- drivers/md/raid5-cache.c                      | 31 +++++------
- drivers/md/raid5-ppl.c                        | 16 +++---
- .../net/ethernet/broadcom/bnx2x/bnx2x_sp.c    |  2 +-
- drivers/thunderbolt/ctl.c                     |  2 +-
- drivers/thunderbolt/eeprom.c                  |  2 +-
- include/linux/crc32.h                         | 55 +++++++++----------
- include/linux/crc32c.h                        |  8 ---
- include/net/sctp/checksum.h                   |  7 +--
- lib/crc32.c                                   | 21 ++++---
- lib/crc_kunit.c                               |  2 +-
- sound/soc/codecs/aw88395/aw88395_device.c     |  2 +-
- 23 files changed, 112 insertions(+), 138 deletions(-)
-
-
-base-commit: 0ebb2a6a60d195071d19c34da97b4ce67f4d7086
+diff --git a/arch/mips/lib/crc32-mips.c b/arch/mips/lib/crc32-mips.c
+index 083e5d693a169..100ac586aadb2 100644
+--- a/arch/mips/lib/crc32-mips.c
++++ b/arch/mips/lib/crc32-mips.c
+@@ -14,19 +14,10 @@
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <asm/mipsregs.h>
+ #include <linux/unaligned.h>
+ 
+-enum crc_op_size {
+-	b, h, w, d,
+-};
+-
+-enum crc_type {
+-	crc32,
+-	crc32c,
+-};
+-
+ #ifndef TOOLCHAIN_SUPPORTS_CRC
+ #define _ASM_SET_CRC(OP, SZ, TYPE)					  \
+ _ASM_MACRO_3R(OP, rt, rs, rt2,						  \
+ 	".ifnc	\\rt, \\rt2\n\t"					  \
+ 	".error	\"invalid operands \\\"" #OP " \\rt,\\rs,\\rt2\\\"\"\n\t" \
 -- 
 2.48.1
 
