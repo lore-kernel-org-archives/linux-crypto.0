@@ -1,289 +1,423 @@
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2069.outbound.protection.outlook.com [40.107.236.69])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 798B517B425;
-	Sat,  8 Feb 2025 04:52:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.69
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738990380; cv=fail; b=bfmFYWjIbR4qoZ6FER7SFoesbF3g2zyrQOJtXwyvVGPRKaSisNyQDfO+t0Z8SYkbuBlpFKm2X1wxkzkqgiRt2qN3BtHyHsNTbcvGNKIBzWG7zBGF4D/5AO8ObrD5n5JLeyEGM9mqX54s1oOMD9195H26G2uloxyjs/NP7VT4nNs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738990380; c=relaxed/simple;
-	bh=p6Hp1Mn4xW9X8TtV2uYFMvs+PNig+kai8rzLYpv8mYk=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=X18rG5ZnbZ4Jurx781zXIf+tO+cL7pV0kGV4e99vf/QIivi8WMkoLKJLE9piV4Lh5VLtL1Dd/kq0aOopqiUZYsfux7rFn4kMl9E5ogPWOiJc8b0+baGTrS+h+ddvoZuH0UB96AEmuANlNwFIU21OAjpU2/hZEZ1dL+cb27+huLw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ieVHFamt; arc=fail smtp.client-ip=40.107.236.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25F421ACED2;
+	Sat,  8 Feb 2025 09:07:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739005654; cv=none; b=QFEB4d3L7tCaVlkGiqDC9eTb4QxBHYQu9K1mPetY6AZlcwwoelqi85rICmhEX15z6NY7NYpx92ETzA49vcbdVLexNUzRrxm8Zo5ZouYT+u+Djh+S5fdLVKywqvGKd6WNzW2AYPVJWilHb56y5VQHuTxgijPrzr5aUByAkDY3l9M=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739005654; c=relaxed/simple;
+	bh=gmgM6qnspJyPPeEevFrxQ1pNgNpJZeT3J5KPCPHoxJY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qVkGbSkmWw8SAPJ/+rewFq//5SMj6rueMPXwPh08ksY/MhjR+hWS4pbMVC959G06J2k1A8ILhDLsE3XIu/IRICmpTLTScZgX0cRUljWtlLMx4eyiiIAPoM5ujqVYeJM5JrvSWmgeiVwIZZSd+xJ0vj9QqzH79mE5xFx78IMh528=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jNE//WYT; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ieVHFamt"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=oaoEcPd2sRo+Vyy5c8YZRfTlI6qtJjVvFunWcBPUF7wkAy84bYxZLje3LxCF844CU+IBp420+Wtu3DYtcrUMhFKblniDm/D0kgjvv7YIDiUjOLZaOAEvtSX/P1tojBWC3MDvNKgMsW2IkMWKqRzlcLpxsTW9ywwFx04bjvxTPOB5pSzIpmKOUSoUnB3ldDrkqQ7TqrPEmuo6aQME29uxoTxAXE9OsRtEfiNNH1qAZcLlHpIotpovY192bB0xpDVcpo3VYC2gdMfRnB3I6yBDGF97+NsMwQqBRGlrqT8Whc3LLLcSqmrBw6Mi/34kqLOsp1XXuof3tWWSsWgwuQ6fcw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bK0eH143pXYV0phDM0y3vn7Hge1QJQn/oKeByWzDVoU=;
- b=Tc9pvUm1y4Xp0HrjWMAveSEHycw2reUhbTzPL3TRbUXzNdb1C5krX9Lo/FWmHI5g8Nlxu7JX32KNd2tZF3mq5VfJfFiewt/7Q0bf/9OuFHOulSAlWZn0oI3oZkLYJoZYZhJKSK9e20979gFwN7CdO7fOmsMoswC/GoAGDPKtGogwnZa4EZ2SpHzh1t5f9DbsNI4hRoRzV0GmQPE1iQxPGIaNFpeb2EujgVUet+gDUjECOI05Mbzs8/S9cAUMBGUtDVRJk/bCYk/P4Bg151eNNUHl95AtryESTp90vKj+q2DhuYU4zVVAL9H3ueYk5cEIez3ZrUhinWW8DqAemrIZyg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bK0eH143pXYV0phDM0y3vn7Hge1QJQn/oKeByWzDVoU=;
- b=ieVHFamt0jus+m67ZRgSo0SWK9XwTh9dFDh4o78pJkmz9q41eR1cJu2u9cv6JUwsr8+6sk6SU1Rd4e5qCvDwXzIQnLsTrdJjuQm9HoG0cvvF4p5IsxeRkGNvGoWKp6Qgm26JCFfiWw4sw9DQFijLWoBV5Gx/KwvoQxPAqEm42/Y=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from BL3PR12MB9049.namprd12.prod.outlook.com (2603:10b6:208:3b8::21)
- by MN2PR12MB4373.namprd12.prod.outlook.com (2603:10b6:208:261::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8422.12; Sat, 8 Feb
- 2025 04:52:55 +0000
-Received: from BL3PR12MB9049.namprd12.prod.outlook.com
- ([fe80::c170:6906:9ef3:ecef]) by BL3PR12MB9049.namprd12.prod.outlook.com
- ([fe80::c170:6906:9ef3:ecef%3]) with mapi id 15.20.8422.009; Sat, 8 Feb 2025
- 04:52:55 +0000
-Message-ID: <30d6b5d6-d397-490a-afcf-0cae9d6d303c@amd.com>
-Date: Fri, 7 Feb 2025 22:52:50 -0600
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 1/3] crypto: ccp: Add external API interface for PSP
- module initialization
-To: Tom Lendacky <thomas.lendacky@amd.com>, seanjc@google.com,
- pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- john.allen@amd.com, herbert@gondor.apana.org.au, davem@davemloft.net,
- joro@8bytes.org, suravee.suthikulpanit@amd.com, will@kernel.org,
- robin.murphy@arm.com
-Cc: michael.roth@amd.com, dionnaglaze@google.com, nikunj@amd.com,
- ardb@kernel.org, kevinloughlin@google.com, Neeraj.Upadhyay@amd.com,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org, linux-coco@lists.linux.dev,
- iommu@lists.linux.dev
-References: <cover.1738618801.git.ashish.kalra@amd.com>
- <02f6935e6156df959d0542899c5e1a12d65d2b61.1738618801.git.ashish.kalra@amd.com>
- <2794745e-c33a-68dc-f0e7-961e1631299e@amd.com>
-Content-Language: en-US
-From: "Kalra, Ashish" <ashish.kalra@amd.com>
-In-Reply-To: <2794745e-c33a-68dc-f0e7-961e1631299e@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA1PR04CA0001.namprd04.prod.outlook.com
- (2603:10b6:806:2ce::8) To BL3PR12MB9049.namprd12.prod.outlook.com
- (2603:10b6:208:3b8::21)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jNE//WYT"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77C85C4CEE4;
+	Sat,  8 Feb 2025 09:07:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739005653;
+	bh=gmgM6qnspJyPPeEevFrxQ1pNgNpJZeT3J5KPCPHoxJY=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=jNE//WYTwvHx/IhLAAUoKdBRV72fk5L1AJK+94O6VXv7ASOCK/GVIumAflkasico7
+	 1bCCI05chAl0Y//nbWQa/+s7UKbW1bsoep0PtrAnC570r2KLOg8kaBDes2WLG9Lrlu
+	 ooNBrOsGYHARCidy6YRkCzgCiNiMEwIiT2brnHL1efo10AZe+OapwAs37rrysSMFbr
+	 dPW5cr1/xAoxTK/VlZFJnaMqvkumc7ntNpZgqMR1d0Ytd2nuRXlrkNOh2x637el8nN
+	 z/EJRj+rETRHS2c1Xtv9LQULIHgP1iy5A8OAvvnsZSH0Owe6f+JKXFdjsEzKwof83c
+	 m+cXy/Y7TrAYQ==
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-54504a6955aso335789e87.2;
+        Sat, 08 Feb 2025 01:07:33 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUDcb3ftvI20/h3GFB57XCkhZmKXrTVOCAxKkCMcD33U5pJOLsgxCMXC3ED/fq1n855jqvV5269yCV6aqo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZqbWyImB998yC//rSZdyDC9MMwdGcTe6SgYrlAh8Ql6iTN4ty
+	IXJ/ze0BOeSkfqeeun26OR2F2OEHo/k0MQKUaqax39B4VuPnkRsdcdbqQCWXXcmeHYjnNzbQwn2
+	eQaoi43ru1jOLxUYbp2TDraPeiBg=
+X-Google-Smtp-Source: AGHT+IE3u++5lGokgNRf6tmGJPH5GO+cGJmOpvDQOzBK3oD6bKz/N+lFkmeKLuQ/gzZx4lxiY5tyxjRBERb5aHVInBc=
+X-Received: by 2002:a05:6512:b9a:b0:540:1f7d:8b9c with SMTP id
+ 2adb3069b0e04-54414ae5fd6mr2479683e87.45.1739005651496; Sat, 08 Feb 2025
+ 01:07:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL3PR12MB9049:EE_|MN2PR12MB4373:EE_
-X-MS-Office365-Filtering-Correlation-Id: c1579123-6dd0-4544-f2fb-08dd47fc7359
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|7416014|376014|921020|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?cTAwdFgvMzBiZjRjanRpaW5QNVBHM1pQTTU5MUlTZjlSVURpR3ZjbmFub3pr?=
- =?utf-8?B?MXBGTzRFVStkU3RhQmx4YlhueEJKVjRFSGZQMjRkZlRLWkk4aldxSTM0Q1hF?=
- =?utf-8?B?dHcxQkluREFsdWs3WjVmakFpVmNJVzV2L3FwakU5N2ovNlJBRHl0ZkxhRlNa?=
- =?utf-8?B?elpoNmNUK2VyRE00aGNRUHVjRnA1REVmUWpUQWFDdEtVVWpYWStrSFl0NGt1?=
- =?utf-8?B?QWxQYk9Camg2UThielRYTUhlaHRmOXBCT2swek1YUXVuOXliWStIZVZtOTh5?=
- =?utf-8?B?QjVWS2NUQlVxVmMwRHZQTm5IKzQ5cE1YRkVOWFFDdmxwOGU4VEhNa0s5MTB5?=
- =?utf-8?B?M0hvdFdERTc3SXJRSVJZWExUSVorcHVMTGRDeXdPNTJtamZsN2U1bXVQM2Jh?=
- =?utf-8?B?Zmt0UmgzcHRmcGZZTGdZSnZUWDhSVExyb1ZWN0pkNUsxcFNIQnpCbkN4Rncr?=
- =?utf-8?B?dHNsRURTMFBEaGxEcU56eVc2b0NjQkR4eUJQSDRnZnRXOGNhcVUwSm43K0I4?=
- =?utf-8?B?MFMwREd4Mm01M1F1ZmZCUXpBdVNYSXlKU1BLWlhaaGxBMDVBSUthQnZ6UUVo?=
- =?utf-8?B?V2JVbUw3Rjl3L0JxRmlRU1pyNDdIaU1MK0JqbmxJWm5DSGYrbzQ0QzdCZ0NJ?=
- =?utf-8?B?T3BaZnZNRzhkbEJwaFN0TFhOK3RtRy9KQUZZK3ZPZFhXZWJmZVFhdkV6ZzZY?=
- =?utf-8?B?bFUxTWt6bUtYcG8yVGZULzRlSlZiMlBITGRySlF0SEJVTzdJL21jWlg5REdB?=
- =?utf-8?B?R1hsd1NoVGJxSXloL3pFV05aclVpRlc5VG1TSFZYNVJJSTI0NWh6YXdUcVFV?=
- =?utf-8?B?V0gyb3NFOXVGLzc1VmczaTdjU0hyUUhzQ2YwcmJhUXNUZ0RhRUlkNkptUURJ?=
- =?utf-8?B?ODQ5WFRHN0VJSmxsYWxYeFc2cGJHeEtXWDkwVWk5Rk50YTZKQUV3NUZuSU5W?=
- =?utf-8?B?REJoR2p4MjlsRnlxTTlIcVV1UEpiL2ZNRlZYcnFiWnp0M1kzalBHV1RoMEFy?=
- =?utf-8?B?VE12K1J5OUpjaEFOYURPTVpYYmpFaURqdkIrRXI3d3JEQnZhY0J6WHJtM2Jh?=
- =?utf-8?B?ZEJRSTFYYXhxQjg1WXZuUS93R3UweWdVS0FCeU9ROWkwM3RjdVJPMmgxV3RB?=
- =?utf-8?B?VFB3U2Z5NjNoVEgxVGc4Smp6Ukg5ZjF0ZHZaQVdYbmwvQnNGenBHSEI5aE9s?=
- =?utf-8?B?aVZSaDlnTzVCbHJLWHRva1F3bWNyelpaeVB5dmpNaHFCK3FoZnp2M2F0Y2l0?=
- =?utf-8?B?cWhQL2NhbW94R3JvblpZbXVBb2dPYUhZN3k1ak1sb3ZlWmZ2TFJGd1FKQUsv?=
- =?utf-8?B?VDZGVllnY0dQSEF6SFZPbngxWUVCNUhtS0N3eGVMMFYxUE1zOUtuR2tKbFMw?=
- =?utf-8?B?NEdYQ25JUmJvcTNRTk85TmJla0d2Y1ZlcXgxVDJzZ1lyWFJTcnVEQU4vWGVV?=
- =?utf-8?B?OExYb2ZYdEZOZ2FibG0yN3JlaUZhTitwalIrWmdxcWFnVzh6Y1A4QTE2eUxs?=
- =?utf-8?B?WmZqT3JyWkdGVUx2cGZaclFhWjlnelljcUhpM3g2c0lUcnMrTUdpdmpOaUpO?=
- =?utf-8?B?UlMxUXI2dGdSZEpvWGpkb29nTHdsajRaajdCWVkyc2lEallBR29ZbktGSjRl?=
- =?utf-8?B?MDhqTWU1eEEycEp4eUhoR0FJUHBJamxaWjZ2V3VhZ2hJSU96V3NlZnFCWFpR?=
- =?utf-8?B?SkF3RUJ1K3ZIK0txaHdKUjFZbVJCZHlvcXU0eVFDOERZaGYrQVIyQWMrUnBp?=
- =?utf-8?B?aGZENkt0SUhYK25kZ05rQVRmRG5Yb25JQkRqU1Q5VnZVVEt4dG0zVndmRThV?=
- =?utf-8?B?VWZHMCtCeW9WQ0cwMm1QSGtVK1ZLTkl1VmZxK3NzTmhQT0dnbnhvR2l1TVdG?=
- =?utf-8?B?dXdzME5abWFhTXpDeHBwL0Zma25uL2JsM3FYMVRyYUdBMS82VmFVc2ZtUURI?=
- =?utf-8?Q?DLQ1FOecwuo=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR12MB9049.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(921020)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?VnJ3T0ZBaThjRE1Vcm0zZEc4TzN2Ty9zaG5oTkJyeVNZOEN1NDlzdXIwK1Uy?=
- =?utf-8?B?UnJubzM4YjA3U3oyYk4yMm4xNk0rZXNuVXJuKzFNYU9kcnRsZG1GQ0wwY0dP?=
- =?utf-8?B?dXpGTTVNMHlLUnJydXNCTzlPMklIQkxlVkpxODFFSUdkQlFSMGZaampaOTVZ?=
- =?utf-8?B?Y24wK0JJRy9NQU1rRHRlRk5reHgvaGV2Tk1hREtrNDY5VHc1b1F2VW9tMWgy?=
- =?utf-8?B?UGp6VTFCcW1FbUNLRTZ2MU4zdjF5Zzl2QTJDZFU3emx3dFA5M3FtRS9lb2Js?=
- =?utf-8?B?NG42UVBaL1VxdWZUQTZPVDNvclk2QzJvQmV6THZDdEhFMDhrT1J4K09qTEpE?=
- =?utf-8?B?ekpBSVgyV2lqb09PYlZSeHpMUzdiSkU2RTFqL3BJZXVOMVMyU1pXeDRzRDdZ?=
- =?utf-8?B?ZkxoT3YyWG5aMFFLaU1FRGZhUEF4aWMxN3ZWaXY1TEJmUi9QWm9idy9HbjY1?=
- =?utf-8?B?cVZKeCtVY2d2TlllNUlvVjlBanFaTnVVTDRZTStmcXdqTHVMYy9sN0ZxVFVk?=
- =?utf-8?B?SVY3YnptZitrN0xGcmNvcnZRNFlJcGhsbVFsUUtia3o2OS95bzJnYm5zQ3cv?=
- =?utf-8?B?MGlIYkRMZDJLTU54SkhBY1dSWjI4RjBFdmZaaSswazZ5VFZuV2hBWE5CZTFZ?=
- =?utf-8?B?cUMyamVHQUlYbm03U05lS2pMRzlhRThFNXVRN29FcDN2azZ2akRVblVEWDFp?=
- =?utf-8?B?OFgzOFpJVTYxUm1BaEwreWpGbG1hMllFU0JpdzhuUjltVXZXSkFCS1dHSDhW?=
- =?utf-8?B?SktZNDJ4VXRndVZwbXNJOTJuN0lsOUtHQ2xNRjJUbU9vVzlWU2lqWkMyNllp?=
- =?utf-8?B?MFl0TGs0S2p6WVVzeC8vbE9rYWM0UWNETCtPQTdCcVkzZkJYbW14ZDBaS1I3?=
- =?utf-8?B?N3l5L3pPRkRRMWphL0EzejNoL1BFcFNMUm9IM0pjQnpuN1JOaGFibExZaDVC?=
- =?utf-8?B?M0o5eTlrdCtLazdHY1Vha0hONHB3YXBGVmE0K3BiZWdmSmNZcm55RnEyU1FH?=
- =?utf-8?B?dlVWK3pmcGdwa2ptcSt6ckxETm1Xdks5T1FsZUduTUdoeU9Na0xnREREMGVE?=
- =?utf-8?B?RDJpL3FzbjhObDNFNmVXRlo5RDVGNWNYenpxV1I5ZFhnZ3FlOWpRTEY5Ty9z?=
- =?utf-8?B?eUk5dGtmRmdFQUdSK25HRkczNS9hNE1pbldFSEQ2NWV3eUNOalFmVTBvSHUw?=
- =?utf-8?B?Q2pFVzJMUGxMdzA3S3NCVE1jL3FXeXBud2p5VlA2MWJnek56OEZoTC9OU1NE?=
- =?utf-8?B?cllWOTVjeFdrbCtNKy85VW53RjV3MmZjbnJRTWsrQXdEKytibnd4TGJHd2Iv?=
- =?utf-8?B?QXc3NGxUK2RjWnNyR0tabGNPOUZGMkJ6TGVZZ0xMK1RETkxHeWhLeXd6NlVG?=
- =?utf-8?B?WC8yTjMwZU5NdDUxRjBMKzkzWlZwOC9LclVFaFN5YW1SazhBQVNpb1Y3Tlcz?=
- =?utf-8?B?WGxqRHpuWDZVR1pmQ3J6LytlODJzRVhlMXB0ZVlpYUxYcHRZakVKU2V2NnJQ?=
- =?utf-8?B?UGRjbklLdVkvcmsrTVhuaWZ6L0EyMGhqakdVenZuY2hheTZUeWQ3cWF3YXoz?=
- =?utf-8?B?TEd1NytrZGJMSGpvOWUxVlBDcGtqZVRDK3RoeG96TmQ1WCtqSTB3cjd3eFQ4?=
- =?utf-8?B?Vmc2cEo1Y0h5WTAveUxTNEFlSm1STExpN25YdzJlT3pyUXEwMGlSMjdRQjVY?=
- =?utf-8?B?T0V5WUZ1NGRoY2tMNHpQcm93N1JNVTR4ak5WL3FiTkJsN1NkV01sNWlSZGtO?=
- =?utf-8?B?d2pnd1ZPeWtYSVYzc3JPcEtlaVg4Q3c1VFJVd1FKbUZFU0NqMnBWMW5Wb1di?=
- =?utf-8?B?YXNRS0NVRjd5bWRMQmNFaE05S2FoamRtRXcrYWZUMWRDdjRyc0VURkppT0xv?=
- =?utf-8?B?NEtpSVhISWlmeGM4RWlUMktVMndBcWtHNlN3SU5CTmVwOU1zcGxYQVVHUnli?=
- =?utf-8?B?RnFPR0NzM2V5MW1HTld6Z2lKQXhwWXdqWno2ditxNFhEUEVWR0dvbStpTHFX?=
- =?utf-8?B?ZDl4SnBWaytHYTR6M3IwcktEMjRDMmZxYjJLelc2Mk9FQ1JyUllKQ3hhQUhO?=
- =?utf-8?B?a2Y1a0pESDd0WEl0cmNWWTE2cDQ2ODJsaTN2VWVUVVhjUWZlR3FNazJod0cz?=
- =?utf-8?Q?iJMkFAYGjyLPJi+oPolnA8Km0?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c1579123-6dd0-4544-f2fb-08dd47fc7359
-X-MS-Exchange-CrossTenant-AuthSource: BL3PR12MB9049.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Feb 2025 04:52:55.1706
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: BbVTQ3TXGJzgGETT4zYW7VTwUBUH1IwWcfrAmioz2JyILueiCYzoj61sU18/RTnBiGk0nrqWdnacKcWKZM3ipg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4373
+References: <20250208035213.109836-1-ebiggers@kernel.org>
+In-Reply-To: <20250208035213.109836-1-ebiggers@kernel.org>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Sat, 8 Feb 2025 10:07:20 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXGr38moMGUj-p1m3u=N=RZ7XKfnCfPebd1+rTGgwmJfKQ@mail.gmail.com>
+X-Gm-Features: AWEUYZnOzyRcbu7HS6_Dq1Y3G-QaV7QZQ78tzN0zR1_EWz3Z7-Fe3eXD3iqcQa4
+Message-ID: <CAMj1kXGr38moMGUj-p1m3u=N=RZ7XKfnCfPebd1+rTGgwmJfKQ@mail.gmail.com>
+Subject: Re: [PATCH v3] crypto: x86/aes-ctr - rewrite AESNI+AVX optimized CTR
+ and add VAES support
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hello Tom,
+Hi Eric,
 
-On 2/7/2025 3:45 PM, Tom Lendacky wrote:
-> On 2/3/25 15:56, Ashish Kalra wrote:
->> From: Sean Christopherson <seanjc@google.com>
->>
->> KVM is dependent on the PSP SEV driver and PSP SEV driver needs to be
->> loaded before KVM module. In case of module loading any dependent
->> modules are automatically loaded but in case of built-in modules there
->> is no inherent mechanism available to specify dependencies between
->> modules and ensure that any dependent modules are loaded implicitly.
->>
->> Add a new external API interface for PSP module initialization which
->> allows PSP SEV driver to be loaded explicitly if KVM is built-in.
->>
->> Signed-off-by: Sean Christopherson <seanjc@google.com>
->> Co-developed-by: Ashish Kalra <ashish.kalra@amd.com>
->> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
->> ---
->>  drivers/crypto/ccp/sp-dev.c | 14 ++++++++++++++
->>  include/linux/psp-sev.h     |  9 +++++++++
->>  2 files changed, 23 insertions(+)
->>
->> diff --git a/drivers/crypto/ccp/sp-dev.c b/drivers/crypto/ccp/sp-dev.c
->> index 7eb3e4668286..3467f6db4f50 100644
->> --- a/drivers/crypto/ccp/sp-dev.c
->> +++ b/drivers/crypto/ccp/sp-dev.c
->> @@ -19,6 +19,7 @@
->>  #include <linux/types.h>
->>  #include <linux/ccp.h>
->>  
->> +#include "sev-dev.h"
->>  #include "ccp-dev.h"
->>  #include "sp-dev.h"
->>  
->> @@ -253,8 +254,12 @@ struct sp_device *sp_get_psp_master_device(void)
->>  static int __init sp_mod_init(void)
->>  {
->>  #ifdef CONFIG_X86
->> +	static bool initialized;
->>  	int ret;
->>  
->> +	if (initialized)
->> +		return 0;
-> 
-> Do we need any kind of mutex protection here? Is the init process
-> parallelized? We only have one caller today, so probably not a big deal.
-> 
+On Sat, 8 Feb 2025 at 04:52, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> From: Eric Biggers <ebiggers@google.com>
+>
+> Delete aes_ctrby8_avx-x86_64.S and add a new assembly file
+> aes-ctr-avx-x86_64.S which follows a similar approach to
+> aes-xts-avx-x86_64.S in that it uses a "template" to provide AESNI+AVX,
+> VAES+AVX2, VAES+AVX10/256, and VAES+AVX10/512 code, instead of just
+> AESNI+AVX.  Wire it up to the crypto API accordingly.
+>
+> This greatly improves the performance of AES-CTR and AES-XCTR on
+> VAES-capable CPUs, with the best case being AMD Zen 5 where an over 230%
+> increase in throughput is seen on long messages.  Performance on
+> non-VAES-capable CPUs remains about the same, and the non-AVX AES-CTR
+> code (aesni_ctr_enc) is also kept as-is for now.  There are some slight
+> regressions (less than 10%) on some short message lengths on some CPUs;
+> these are difficult to avoid, given how the previous code was so heavily
+> unrolled by message length, and they are not particularly important.
+> Detailed performance results are given in the tables below.
+>
+> Both CTR and XCTR support is retained.  The main loop remains
+> 8-vector-wide, which differs from the 4-vector-wide main loops that are
+> used in the XTS and GCM code.  A wider loop is appropriate for CTR and
+> XCTR since they have fewer other instructions (such as vpclmulqdq) to
+> interleave with the AES instructions.
+>
+> Similar to what was the case for AES-GCM, the new assembly code also has
+> a much smaller binary size, as it fixes the excessive unrolling by data
+> length and key length present in the old code.  Specifically, the new
+> assembly file compiles to about 9 KB of text vs. 28 KB for the old file.
+> This is despite 4x as many implementations being included.
+>
+> The tables below show the detailed performance results.  The tables show
+> percentage improvement in single-threaded throughput for repeated
+> encryption of the given message length; an increase from 6000 MB/s to
+> 12000 MB/s would be listed as 100%.  They were collected by directly
+> measuring the Linux crypto API performance using a custom kernel module.
+> The tested CPUs were all server processors from Google Compute Engine
+> except for Zen 5 which was a Ryzen 9 9950X desktop processor.
+>
+> Table 1: AES-256-CTR throughput improvement,
+>          CPU microarchitecture vs. message length in bytes:
+>
+>                      | 16384 |  4096 |  4095 |  1420 |   512 |   500 |
+> ---------------------+-------+-------+-------+-------+-------+-------+
+> AMD Zen 5            |  232% |  203% |  212% |  143% |   71% |   95% |
+> Intel Emerald Rapids |  116% |  116% |  117% |   91% |   78% |   79% |
+> Intel Ice Lake       |  109% |  103% |  107% |   81% |   54% |   56% |
+> AMD Zen 4            |  109% |   91% |  100% |   70% |   43% |   59% |
+> AMD Zen 3            |   92% |   78% |   87% |   57% |   32% |   43% |
+> AMD Zen 2            |    9% |    8% |   14% |   12% |    8% |   21% |
+> Intel Skylake        |    7% |    7% |    8% |    5% |    3% |    8% |
+>
+>                      |   300 |   200 |    64 |    63 |    16 |
+> ---------------------+-------+-------+-------+-------+-------+
+> AMD Zen 5            |   57% |   39% |   -9% |    7% |   -7% |
+> Intel Emerald Rapids |   37% |   42% |   -0% |   13% |   -8% |
+> Intel Ice Lake       |   39% |   30% |   -1% |   14% |   -9% |
+> AMD Zen 4            |   42% |   38% |   -0% |   18% |   -3% |
+> AMD Zen 3            |   38% |   35% |    6% |   31% |    5% |
+> AMD Zen 2            |   24% |   23% |    5% |   30% |    3% |
+> Intel Skylake        |    9% |    1% |   -4% |   10% |   -7% |
+>
+> Table 2: AES-256-XCTR throughput improvement,
+>          CPU microarchitecture vs. message length in bytes:
+>
+>                      | 16384 |  4096 |  4095 |  1420 |   512 |   500 |
+> ---------------------+-------+-------+-------+-------+-------+-------+
+> AMD Zen 5            |  240% |  201% |  216% |  151% |   75% |  108% |
+> Intel Emerald Rapids |  100% |   99% |  102% |   91% |   94% |  104% |
+> Intel Ice Lake       |   93% |   89% |   92% |   74% |   50% |   64% |
+> AMD Zen 4            |   86% |   75% |   83% |   60% |   41% |   52% |
+> AMD Zen 3            |   73% |   63% |   69% |   45% |   21% |   33% |
+> AMD Zen 2            |   -2% |   -2% |    2% |    3% |   -1% |   11% |
+> Intel Skylake        |   -1% |   -1% |    1% |    2% |   -1% |    9% |
+>
+>                      |   300 |   200 |    64 |    63 |    16 |
+> ---------------------+-------+-------+-------+-------+-------+
+> AMD Zen 5            |   78% |   56% |   -4% |   38% |   -2% |
+> Intel Emerald Rapids |   61% |   55% |    4% |   32% |   -5% |
+> Intel Ice Lake       |   57% |   42% |    3% |   44% |   -4% |
+> AMD Zen 4            |   35% |   28% |   -1% |   17% |   -3% |
+> AMD Zen 3            |   26% |   23% |   -3% |   11% |   -6% |
+> AMD Zen 2            |   13% |   24% |   -1% |   14% |   -3% |
+> Intel Skylake        |   16% |    8% |   -4% |   35% |   -3% |
+>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>
 
-Yes the booting will be parallelized, but the main reason we needed to 
-explicitly initialize the PSP driver from KVM module load time was that
-for the built-in modules case, KVM module was being loaded before the PSP
-driver, as per the order of compilation of modules.
+Very nice results! One remark below.
+...
+> diff --git a/arch/x86/crypto/aes-ctr-avx-x86_64.S b/arch/x86/crypto/aes-ctr-avx-x86_64.S
+> new file mode 100644
+> index 0000000000000..25cab1d8e63f9
+> --- /dev/null
+> +++ b/arch/x86/crypto/aes-ctr-avx-x86_64.S
+> @@ -0,0 +1,592 @@
+> +/* SPDX-License-Identifier: Apache-2.0 OR BSD-2-Clause */
+> +//
+> +// Copyright 2025 Google LLC
+> +//
+> +// Author: Eric Biggers <ebiggers@google.com>
+> +//
+> +// This file is dual-licensed, meaning that you can use it under your choice of
+> +// either of the following two licenses:
+> +//
+> +// Licensed under the Apache License 2.0 (the "License").  You may obtain a copy
+> +// of the License at
+> +//
+> +//     http://www.apache.org/licenses/LICENSE-2.0
+> +//
+> +// Unless required by applicable law or agreed to in writing, software
+> +// distributed under the License is distributed on an "AS IS" BASIS,
+> +// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+> +// See the License for the specific language governing permissions and
+> +// limitations under the License.
+> +//
+> +// or
+> +//
+> +// Redistribution and use in source and binary forms, with or without
+> +// modification, are permitted provided that the following conditions are met:
+> +//
+> +// 1. Redistributions of source code must retain the above copyright notice,
+> +//    this list of conditions and the following disclaimer.
+> +//
+> +// 2. Redistributions in binary form must reproduce the above copyright
+> +//    notice, this list of conditions and the following disclaimer in the
+> +//    documentation and/or other materials provided with the distribution.
+> +//
+> +// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+> +// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+> +// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+> +// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+> +// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+> +// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+> +// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+> +// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+> +// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+> +// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+> +// POSSIBILITY OF SUCH DAMAGE.
+> +//
+> +//------------------------------------------------------------------------------
+> +//
+> +// This file contains x86_64 assembly implementations of AES-CTR and AES-XCTR
+> +// using the following sets of CPU features:
+> +//     - AES-NI && AVX
+> +//     - VAES && AVX2
+> +//     - VAES && (AVX10/256 || (AVX512BW && AVX512VL)) && BMI2
+> +//     - VAES && (AVX10/512 || (AVX512BW && AVX512VL)) && BMI2
+> +//
+> +// See the function definitions at the bottom of the file for more information.
+> +
+> +#include <linux/linkage.h>
+> +#include <linux/cfi_types.h>
+> +
+> +.section .rodata
+> +.p2align 4
+> +
+> +.Lbswap_mask:
+> +       .octa   0x000102030405060708090a0b0c0d0e0f
+> +
+> +.Lctr_pattern:
+> +       .quad   0, 0
+> +.Lone:
+> +       .quad   1, 0
+> +.Ltwo:
+> +       .quad   2, 0
+> +       .quad   3, 0
+> +
+> +.Lfour:
+> +       .quad   4, 0
+> +
+> +.text
+> +
+> +// Move a vector between memory and a register.
+> +// The register operand must be in the first 16 vector registers.
+> +.macro _vmovdqu        src, dst
+> +.if VL < 64
+> +       vmovdqu         \src, \dst
+> +.else
+> +       vmovdqu8        \src, \dst
+> +.endif
+> +.endm
+> +
+> +// Move a vector between registers.
+> +// The registers must be in the first 16 vector registers.
+> +.macro _vmovdqa        src, dst
+> +.if VL < 64
+> +       vmovdqa         \src, \dst
+> +.else
+> +       vmovdqa64       \src, \dst
+> +.endif
+> +.endm
+> +
+> +// Broadcast a 128-bit value from memory to all 128-bit lanes of a vector
+> +// register.  The register operand must be in the first 16 vector registers.
+> +.macro _vbroadcast128  src, dst
+> +.if VL == 16
+> +       vmovdqu         \src, \dst
+> +.elseif VL == 32
+> +       vbroadcasti128  \src, \dst
+> +.else
+> +       vbroadcasti32x4 \src, \dst
+> +.endif
+> +.endm
+> +
+> +// XOR two vectors together.
+> +// Any register operands must be in the first 16 vector registers.
+> +.macro _vpxor  src1, src2, dst
+> +.if VL < 64
+> +       vpxor           \src1, \src2, \dst
+> +.else
+> +       vpxord          \src1, \src2, \dst
+> +.endif
+> +.endm
+> +
+> +// Load 1 <= %ecx <= 15 bytes from the pointer \src into the xmm register \dst
+> +// and zeroize any remaining bytes.  Clobbers %rax, %rcx, and \tmp{64,32}.
+> +.macro _load_partial_block     src, dst, tmp64, tmp32
+> +       sub             $8, %ecx                // LEN - 8
+> +       jle             .Lle8\@
+> +
+> +       // Load 9 <= LEN <= 15 bytes.
+> +       vmovq           (\src), \dst            // Load first 8 bytes
+> +       mov             (\src, %rcx), %rax      // Load last 8 bytes
+> +       neg             %ecx
+> +       shl             $3, %ecx
+> +       shr             %cl, %rax               // Discard overlapping bytes
+> +       vpinsrq         $1, %rax, \dst, \dst
+> +       jmp             .Ldone\@
+> +
+> +.Lle8\@:
+> +       add             $4, %ecx                // LEN - 4
+> +       jl              .Llt4\@
+> +
+> +       // Load 4 <= LEN <= 8 bytes.
+> +       mov             (\src), %eax            // Load first 4 bytes
+> +       mov             (\src, %rcx), \tmp32    // Load last 4 bytes
+> +       jmp             .Lcombine\@
+> +
+> +.Llt4\@:
+> +       // Load 1 <= LEN <= 3 bytes.
+> +       add             $2, %ecx                // LEN - 2
+> +       movzbl          (\src), %eax            // Load first byte
+> +       jl              .Lmovq\@
+> +       movzwl          (\src, %rcx), \tmp32    // Load last 2 bytes
+> +.Lcombine\@:
+> +       shl             $3, %ecx
+> +       shl             %cl, \tmp64
+> +       or              \tmp64, %rax            // Combine the two parts
+> +.Lmovq\@:
+> +       vmovq           %rax, \dst
+> +.Ldone\@:
+> +.endm
+> +
+> +// Store 1 <= %ecx <= 15 bytes from the xmm register \src to the pointer \dst.
+> +// Clobbers %rax, %rcx, and \tmp{64,32}.
+> +.macro _store_partial_block    src, dst, tmp64, tmp32
+> +       sub             $8, %ecx                // LEN - 8
+> +       jl              .Llt8\@
+> +
+> +       // Store 8 <= LEN <= 15 bytes.
+> +       vpextrq         $1, \src, %rax
+> +       mov             %ecx, \tmp32
+> +       shl             $3, %ecx
+> +       ror             %cl, %rax
+> +       mov             %rax, (\dst, \tmp64)    // Store last LEN - 8 bytes
+> +       vmovq           \src, (\dst)            // Store first 8 bytes
+> +       jmp             .Ldone\@
+> +
+> +.Llt8\@:
+> +       add             $4, %ecx                // LEN - 4
+> +       jl              .Llt4\@
+> +
+> +       // Store 4 <= LEN <= 7 bytes.
+> +       vpextrd         $1, \src, %eax
+> +       mov             %ecx, \tmp32
+> +       shl             $3, %ecx
+> +       ror             %cl, %eax
+> +       mov             %eax, (\dst, \tmp64)    // Store last LEN - 4 bytes
+> +       vmovd           \src, (\dst)            // Store first 4 bytes
+> +       jmp             .Ldone\@
+> +
+> +.Llt4\@:
+> +       // Store 1 <= LEN <= 3 bytes.
+> +       vpextrb         $0, \src, 0(\dst)
+> +       cmp             $-2, %ecx               // LEN - 4 == -2, i.e. LEN == 2?
+> +       jl              .Ldone\@
+> +       vpextrb         $1, \src, 1(\dst)
+> +       je              .Ldone\@
+> +       vpextrb         $2, \src, 2(\dst)
+> +.Ldone\@:
+> +.endm
+> +
+> +// Prepare the next two vectors of AES inputs in AESDATA\i0 and AESDATA\i1, and
+> +// XOR each with the zero-th round key.  Also update LE_CTR if !\final.
+> +.macro _prepare_2_ctr_vecs     is_xctr, i0, i1, final=0
+> +.if \is_xctr
+> +  .if USE_AVX10
+> +       _vmovdqa        LE_CTR, AESDATA\i0
+> +       vpternlogd      $0x96, XCTR_IV, RNDKEY0, AESDATA\i0
+> +  .else
+> +       vpxor           XCTR_IV, LE_CTR, AESDATA\i0
+> +       vpxor           RNDKEY0, AESDATA\i0, AESDATA\i0
+> +  .endif
+> +       vpaddq          LE_CTR_INC1, LE_CTR, AESDATA\i1
+> +
+> +  .if USE_AVX10
+> +       vpternlogd      $0x96, XCTR_IV, RNDKEY0, AESDATA\i1
+> +  .else
+> +       vpxor           XCTR_IV, AESDATA\i1, AESDATA\i1
+> +       vpxor           RNDKEY0, AESDATA\i1, AESDATA\i1
+> +  .endif
+> +.else
+> +       vpshufb         BSWAP_MASK, LE_CTR, AESDATA\i0
+> +       _vpxor          RNDKEY0, AESDATA\i0, AESDATA\i0
+> +       vpaddq          LE_CTR_INC1, LE_CTR, AESDATA\i1
+> +       vpshufb         BSWAP_MASK, AESDATA\i1, AESDATA\i1
+> +       _vpxor          RNDKEY0, AESDATA\i1, AESDATA\i1
+> +.endif
+> +.if !\final
+> +       vpaddq          LE_CTR_INC2, LE_CTR, LE_CTR
+> +.endif
+> +.endm
+> +
+> +// Do all AES rounds on the data in the given AESDATA vectors, excluding the
+> +// zero-th and last rounds.
+> +.macro _aesenc_loop    vecs
 
-So as kvm_amd module will be loading before CCP driver, therefore,
-i don't believe kvm module load -> sev_module_init() -> sp_mod_init() can execute
-concurrently with CCP module probe -> sp_mod_init(). 
+If you make this vecs:vararg, you can drop the "" around the arguments
+in the callers.
 
-Therefore i believe, the above code in sp_mod_init() should be safe. 
 
-And sev_module_init() is only called in case kvm_amd module is built-in.
+> +       mov             KEY, %rax
+> +1:
+> +       _vbroadcast128  (%rax), RNDKEY
+> +.irp i, \vecs
+> +       vaesenc         RNDKEY, AESDATA\i, AESDATA\i
+> +.endr
+> +       add             $16, %rax
+> +       cmp             %rax, RNDKEYLAST_PTR
+> +       jne             1b
+> +.endm
+> +
+> +// Finalize the keystream blocks in the given AESDATA vectors by doing the last
+> +// AES round, then XOR those keystream blocks with the corresponding data.
+> +// Reduce latency by doing the XOR before the vaesenclast, utilizing the
+> +// property vaesenclast(key, a) ^ b == vaesenclast(key ^ b, a).
+> +.macro _aesenclast_and_xor     vecs
 
-Thanks,
-Ashish
+Same here
 
-> If we don't need that:
-> 
-> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
-> 
-> Thanks,
-> Tom
-> 
->> +
->>  	ret = sp_pci_init();
->>  	if (ret)
->>  		return ret;
->> @@ -263,6 +268,8 @@ static int __init sp_mod_init(void)
->>  	psp_pci_init();
->>  #endif
->>  
->> +	initialized = true;
->> +
->>  	return 0;
->>  #endif
->>  
->> @@ -279,6 +286,13 @@ static int __init sp_mod_init(void)
->>  	return -ENODEV;
->>  }
->>  
->> +#if IS_BUILTIN(CONFIG_KVM_AMD) && IS_ENABLED(CONFIG_KVM_AMD_SEV)
->> +int __init sev_module_init(void)
->> +{
->> +	return sp_mod_init();
->> +}
->> +#endif
->> +
->>  static void __exit sp_mod_exit(void)
->>  {
->>  #ifdef CONFIG_X86
->> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
->> index 903ddfea8585..f3cad182d4ef 100644
->> --- a/include/linux/psp-sev.h
->> +++ b/include/linux/psp-sev.h
->> @@ -814,6 +814,15 @@ struct sev_data_snp_commit {
->>  
->>  #ifdef CONFIG_CRYPTO_DEV_SP_PSP
->>  
->> +/**
->> + * sev_module_init - perform PSP SEV module initialization
->> + *
->> + * Returns:
->> + * 0 if the PSP module is successfully initialized
->> + * negative value if the PSP module initialization fails
->> + */
->> +int sev_module_init(void);
->> +
->>  /**
->>   * sev_platform_init - perform SEV INIT command
->>   *
+> +.irp i, \vecs
+> +       _vpxor          \i*VL(SRC), RNDKEYLAST, RNDKEY
+> +       vaesenclast     RNDKEY, AESDATA\i, AESDATA\i
+> +.endr
+> +.irp i, \vecs
+> +       _vmovdqu        AESDATA\i, \i*VL(DST)
+> +.endr
+> +.endm
+> +
 
+...
