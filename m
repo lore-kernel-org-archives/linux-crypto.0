@@ -1,82 +1,85 @@
-Received: from mail.manjaro.org (mail.manjaro.org [116.203.91.91])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF9F9339A8;
-	Sun,  9 Feb 2025 10:13:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.91.91
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C01914E2E2
+	for <linux-crypto@vger.kernel.org>; Sun,  9 Feb 2025 10:17:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739096024; cv=none; b=YhCcwe7Jzbd6tijIjttEy8zYb3mu7l7JbTSO0XfZpqM9BOpEsDQbkToZB2hD6hfnmu7UYHUns+KRjWX7F/KfLNXdORS97rox4VOPP7JU43dBF7FOPhQziiHSTLI+QMbQw8SHUu2fVaPC1feyKRHxaTt+cwqiVtMGbjdwJ5pAtoM=
+	t=1739096257; cv=none; b=h3n/THmfxW7TYuXL4iY2T7NT7vc0zKzatl33E/Ffq1V8WJB8ksmvzRyc492RbemHgzK+U1e5dxb4IJOpr9pJNICF3ZL69pjZm/wfF7A6uN/WKluQjvzoK9OS90hgWzHvxTJMVzz29V1lL98nnh13GD+Eo5OZ0oQmfrDDXoOGYB4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739096024; c=relaxed/simple;
-	bh=qGVvyAjvkARhsdgoLHKbogxpRXGIPYmKtpRyzaX0DVc=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=u/hG0FSwZbURiBFNOgtJ60T+d+bwTudOUzy8CLeXYediksL3lYjSOMqbDkYyw38LjssS6x0hquM3iB6ExZIpFXlt2R5+CAzLBz7vVivXbYYdEkMya9wDYqesO+aghdS9nYYi9DEa1NNEvSPtn8y6vv8Zg3WaO0bzI8mSiWDhCrA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org; spf=pass smtp.mailfrom=manjaro.org; dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b=N6YXyenM; arc=none smtp.client-ip=116.203.91.91
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manjaro.org
+	s=arc-20240116; t=1739096257; c=relaxed/simple;
+	bh=qzlJt3KwfcAeHRdso7ksznt1W1jDx+6Cw6lGA7Ifc8c=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=oEmDmeIyWkRcUQRx3XkgTU5zX3v3LU/M790fnSJwualXkOfT9wT0LmJKI6URtz4fxO3hvhAp44OXxuS+ADfz5s1Z864W9HVZrf8LbVBPmXOOnYK2X0iXiadCdbpNpiuq4YsKgLARrHn2C7sJR1EQ6bnKxIbjAmEUX7M9Cdrywj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=NuX8TQ2w; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b="N6YXyenM"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="NuX8TQ2w"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=Content-Type:MIME-Version:Message-ID:Subject:To:From:Date:
+	Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=A82FAWxHJleqck+AE45WSC9Rbsnq5ELVc+buPu3gWKk=; b=NuX8TQ2wBnhmFogjbTQtTPILxl
+	LnpR3qTR+Bp1QoP2m3tZrOljRgOvntZjvGLR0FjAlsG4+ZvAR1LurRJ/9LAuFEvSZoh+69yM3TNlL
+	LauEhAMzBsoMvB3lkPYsXjQEkrPO3MYaW5oDDUqyMqBNAVl2xUctiE0DqwgHre6nLzUK+ZxrWfdQ6
+	4tRS0Sf0rpA+jwdre2Yv76L4ZkbdxKbBoVEVqQZU/AEip7IiKiFNWaAWZI6MznDtUT/ylf5fNTVED
+	2eArLIRpH3swkjDvjzY43tfxj4P2yraEQuXIjJaimuoOe7UBwZjzgFxgYCo8oDwAzNgQU/7SFdjNN
+	M9OTPjIA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1th4Ab-00GIe1-2H;
+	Sun, 09 Feb 2025 18:17:31 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 09 Feb 2025 18:17:30 +0800
+Date: Sun, 9 Feb 2025 18:17:30 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [PATCH] crypto: inside-secure - Eliminate duplication in top-level
+ Makefile
+Message-ID: <Z6iAutkbBLR8QU1I@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manjaro.org; s=2021;
-	t=1739096021;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bONUnRdzPUqHC/OVdxeueVRpPfRNRz240WD8k87l8ok=;
-	b=N6YXyenM5acxZBZdecaIYbqIOwfJbZ6y6Mza/2uhoU7uHo4LTb5/b5nMQBstUzrpA7hlE3
-	UrpWPkgXPz7LEMSe5LPaMNWQWBK98xTvQ+Bkjgifa/VeL1ol61+ieOCO9VgPXmW933jWhi
-	qMbyIDAqSUFvum0zHxiouia2PI3GMOOJdmATs2TBLX9RecUmxWAqal9CuiznVNOphOEf5N
-	fREZVogA4DeDIib/C8Jq3Qi2U64xAHtptPEZtn2XxvfH9OCo/XChEzUxmLgdPojFt4lCsw
-	+bBntxMd9gg2Yci5b6zeXI9MlIxm9eP11W4FGT3JQdAjuU/2jXlv+4VeNBcMfQ==
-Date: Sun, 09 Feb 2025 11:13:38 +0100
-From: Dragan Simic <dsimic@manjaro.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
- olivia@selenic.com, didi.debian@cknow.org, heiko@sntech.de
-Subject: Re: [PATCH 3/3] hwrng: Don't default to HW_RANDOM when UML_RANDOM is
- the trigger
-In-Reply-To: <Z6h7RoBpKd1ZDKhz@gondor.apana.org.au>
-References: <cover.1736946020.git.dsimic@manjaro.org>
- <3d3f93bd1f8b9629e48b9ad96099e33069a455c1.1736946020.git.dsimic@manjaro.org>
- <Z6hyK-nU_mLxw-TN@gondor.apana.org.au>
- <1b5988c648403676342b4340c3d78023@manjaro.org>
- <Z6h7RoBpKd1ZDKhz@gondor.apana.org.au>
-Message-ID: <d6fd6707808ec4429071e5473c9c2dca@manjaro.org>
-X-Sender: dsimic@manjaro.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Authentication-Results: ORIGINATING;
-	auth=pass smtp.auth=dsimic@manjaro.org smtp.mailfrom=dsimic@manjaro.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On 2025-02-09 10:54, Herbert Xu wrote:
-> On Sun, Feb 09, 2025 at 10:37:52AM +0100, Dragan Simic wrote:
->> 
->> Could you, please, clarify why we need(ed) the defaults at all?
->> Also, I'm a bit puzzled about what would be the defaults that are
->> actually needed?  Are you actually referring to what I proposed
->> in my earlier response? [1]  I'd appreciate a clarification.
-> 
-> In general there shouldn't be any default.  The only exception
-> would be perhaps for embedded boards where the RNG is always
-> present given the dependencies.  But in that case the default
-> should be conditional on the dependency (or perhaps the whole
-> config should become unconditional).
-> 
-> The current defaults are mostly there for historical reasons.
+Instead of having two entries for inside-secure in the top-level
+Makefile, make it just a single one.
 
-Thanks for the clarification.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-I think it would be the best to get rid of the current defaults
-in the drivers/char/hw_random/Kconfig file entirely, together with
-updating as many of the affected arch/*/configs/*_defconfig files
-as possible to select the relevant HW_RANDOM_* config option(s)
-whenever that's a sane thing to do.
-
-Such an approach should be both proper and least disruptive.
+diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
+index 62c7ce3c9d3e..c97f0ebc55ec 100644
+--- a/drivers/crypto/Makefile
++++ b/drivers/crypto/Makefile
+@@ -43,11 +43,10 @@ obj-$(CONFIG_CRYPTO_DEV_TEGRA) += tegra/
+ obj-$(CONFIG_CRYPTO_DEV_VIRTIO) += virtio/
+ #obj-$(CONFIG_CRYPTO_DEV_VMX) += vmx/
+ obj-$(CONFIG_CRYPTO_DEV_BCM_SPU) += bcm/
+-obj-$(CONFIG_CRYPTO_DEV_SAFEXCEL) += inside-secure/
++obj-y += inside-secure/
+ obj-$(CONFIG_CRYPTO_DEV_ARTPEC6) += axis/
+ obj-y += xilinx/
+ obj-y += hisilicon/
+ obj-$(CONFIG_CRYPTO_DEV_AMLOGIC_GXL) += amlogic/
+ obj-y += intel/
+ obj-y += starfive/
+-obj-y += inside-secure/eip93/
+diff --git a/drivers/crypto/inside-secure/Makefile b/drivers/crypto/inside-secure/Makefile
+index 13f64f96c626..30d13fd5d58e 100644
+--- a/drivers/crypto/inside-secure/Makefile
++++ b/drivers/crypto/inside-secure/Makefile
+@@ -1,3 +1,4 @@
+ # SPDX-License-Identifier: GPL-2.0-only
+ obj-$(CONFIG_CRYPTO_DEV_SAFEXCEL) += crypto_safexcel.o
+ crypto_safexcel-objs := safexcel.o safexcel_ring.o safexcel_cipher.o safexcel_hash.o
++obj-y += eip93/
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
