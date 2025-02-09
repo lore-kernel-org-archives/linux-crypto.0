@@ -1,46 +1,47 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FFD616EB7C
-	for <linux-crypto@vger.kernel.org>; Sun,  9 Feb 2025 10:25:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFF431581E5;
+	Sun,  9 Feb 2025 10:25:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739096724; cv=none; b=dIrablQ2+2+wTivSQtekP2LNZBJAvEc3uS4x31KoxcpjZ3h+9DFYCKQvd1NXtzkRpW5mtEzx4HueASNTgQY8IHuMNC5II0uJH5tEbthmQThqVNu50STgMwL5qGdjF9rFQqL0bRv9Mxc6nui0XqlYKsPOVV/j5JQLy7rZ2gyR/zo=
+	t=1739096747; cv=none; b=rr1q/vzQhNmFlxk/KAsH2d6CqXplyEqt3N51MuQ1iRcT1vep13XHouGPOMsTw5gHg/rer8g3AYnOE0OnKBE04CkkPzykDBXaJtrPNKK7gQTUzB4s6Mwy5GEVUAN5fBo/Bhi38xy2eqUvU19MuaEiYy+5ns7RA2r6fr+2vcHZHn8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739096724; c=relaxed/simple;
-	bh=V3sKsXexpzB0HCBB1zyLyPENhrHhIutJd1BaKq3MWMA=;
+	s=arc-20240116; t=1739096747; c=relaxed/simple;
+	bh=56AiyWWAPmqUuIe3wpQsaB1KGID+cdJYyD3tuB1DMhI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c4/xw1DLyb24A3qj7IthliNyi7CpoOQTN46iM9Is4Cjoz6pdB+I0dQ+BFAxfzOfQV7eD8U3VYk38Qe7380PvuUt3S/o27GuO4AAyZjUozHalUNuKq0Q3MhTDBQ78b01V+sUhSj5fIDvWR+H4QYp2xEaaeSiGTT+okxVktJkZgBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=CtzrMa5Q; arc=none smtp.client-ip=144.6.53.87
+	 Content-Type:Content-Disposition:In-Reply-To; b=aaANEsg8HrRCvHs2sDFtULKaJVbRqMtz6qgf8jrNBb/HfPfQr7WE50fomY+vuOrfl6ve/fIEfS/0Yu/ISfsY2SoXElGhMp2HUinbp00A5ceKaYMYmn/fPhunbm0g2/7fiFsZ/WnI2kAq0OF9cHtuAJjHqCLXeE/DzFbPA4d79n0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=O3p3Jg4O; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="CtzrMa5Q"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="O3p3Jg4O"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
 	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=y18cA3R0JYeos0enClTV+gbA9D0KY9KLed/cG/prBug=; b=CtzrMa5QvVf1uHBO8U39/e/CP6
-	vPsZpLVOSLXDejyWsWdN48BMTShfogpXH7VrlJ22UZaYVt7UPAZftCMomVJlLDRRj8WIpbGpFuy1I
-	OvPeVoYZxgV0xhtBSSGqVsyOjJUed5rzvLf/EJWbwzRtAht7R230euDr524MUA/apER848JLsn4PH
-	A/LzNajUBx3OsuYnjMYCqvf11eYi2uDXxr+WsWr7E7m1VCBvehf/vsyf4u/V3SuPMBko+Fv8dqT5j
-	zkTvIk0WGSV/sTF2La9ECcsQqwIaFTJyhuzReP0LLL1I6jhPwb83Z01G2j+YcCTA4KcUJPJOGVqQd
-	GKF4YTww==;
+	bh=1iBm607sBxcA6KdkZ1ibPdZIisFBHiGLsffWZjG6130=; b=O3p3Jg4OPyqL2e3J+baquR0gL/
+	JdgazGqX94YfNiEpSOt0/1NJBX1KVhhD1XVSo4CBlkaeQIFwEkTpUXkDkM3xxAWlvHQ3OM7+/IHKt
+	WUy+KJ7J4GpRjKOMDGPhREj7t2qZwuoQ1BSxHicAIcd1vkTokZTRJp1sfScV//bCs/DXxDVYofSKx
+	uwnVEFPyZC4HQ/JbUc4fGBh+Y9WV6wQu1f/tMl4KLuUji8U4RX6wIajyo1pSEpXs2PaygzqplTn/k
+	sWak4NBN3qDcJmtyVMTLVIHBXviJ3BZxyaoC4kyQC18PbL8HwJq/ZlNmDqeRJuyj1+lzxUycfQoQK
+	kGdwts7w==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1th4I9-00GIs7-1m;
-	Sun, 09 Feb 2025 18:25:19 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 09 Feb 2025 18:25:18 +0800
-Date: Sun, 9 Feb 2025 18:25:18 +0800
+	id 1th4IR-00GIsF-0Y;
+	Sun, 09 Feb 2025 18:25:36 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 09 Feb 2025 18:25:35 +0800
+Date: Sun, 9 Feb 2025 18:25:35 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
-Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Subject: Re: [RESEND] crypto: qat - set command ids as reserved
-Message-ID: <Z6iCjt7I4aAiDv-A@gondor.apana.org.au>
-References: <20250131113454.3269995-1-suman.kumar.chakraborty@intel.com>
+To: Martin Kaiser <martin@kaiser.cx>
+Cc: linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, Kamlesh Gurudasani <kamlesh@ti.com>
+Subject: Re: [PATCH v2] hwrng: imx-rngc - add runtime pm
+Message-ID: <Z6iCn97oKQuXZd-Y@gondor.apana.org.au>
+References: <20250118160701.32624-1-martin@kaiser.cx>
+ <20250201183907.82570-1-martin@kaiser.cx>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,22 +50,28 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250131113454.3269995-1-suman.kumar.chakraborty@intel.com>
+In-Reply-To: <20250201183907.82570-1-martin@kaiser.cx>
 
-On Fri, Jan 31, 2025 at 11:34:54AM +0000, Suman Kumar Chakraborty wrote:
-> The XP10 algorithm is not supported by any QAT device.
-> Remove the definition of bit 7 (ICP_QAT_FW_COMP_20_CMD_XP10_COMPRESS)
-> and bit 8 (ICP_QAT_FW_COMP_20_CMD_XP10_DECOMPRESS) in the firmware
-> command id enum and rename them as reserved.
-> Those bits shall not be used in future.
+On Sat, Feb 01, 2025 at 07:39:07PM +0100, Martin Kaiser wrote:
+> Add runtime power management to the imx-rngc driver. Disable the
+> peripheral clock when the rngc is idle.
 > 
-> Signed-off-by: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
-> Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> The callback functions from struct hwrng wake the rngc up when they're
+> called and set it to idle on exit. Helper functions which are invoked
+> from the callbacks assume that the rngc is active.
+> 
+> Device init and probe are done before runtime pm is enabled. The
+> peripheral clock will be handled manually during these steps. Do not use
+> devres any more to enable/disable the peripheral clock, this conflicts
+> with runtime pm.
+> 
+> Signed-off-by: Martin Kaiser <martin@kaiser.cx>
 > ---
-> Fixed headline of commit message
+> v2:
+>  - remove unnecessary err = 0; assignment
 > 
->  drivers/crypto/intel/qat/qat_common/icp_qat_fw_comp.h | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  drivers/char/hw_random/imx-rngc.c | 69 +++++++++++++++++++++++--------
+>  1 file changed, 52 insertions(+), 17 deletions(-)
 
 Patch applied.  Thanks.
 -- 
