@@ -1,197 +1,86 @@
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81AB27DA82
-	for <linux-crypto@vger.kernel.org>; Sun,  9 Feb 2025 13:17:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFB4F14F70;
+	Sun,  9 Feb 2025 16:34:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739107024; cv=none; b=NUdRawHpqlY0ErmkcncQssLb55UgUolPFwiwW21oOSqWXkT6urYQXfUkXRNlIFWOzt2tcDRO87w7rI/ZqwBoZwPSFK5p7P4Y8icNugclmauE7zMgEsdlRYPGz0UOu6LDIQYtQV5csPCOF3Uk2MBAds7Yc5YWaHWm4OCvSCOSyak=
+	t=1739118873; cv=none; b=j5NGDfaV1DrdgeexUrB6CLUAsDI0U8wnGvfmZ2wF97UO42dy4f0ebRQYfhJwO3rbaZ9hGQp5kqcbBMOLC0nqHTzd4TaId/PJQQ2YNCEQYPfVzP/dr0D5LgQin966ieMJfwrzxZjU5F/ujOANkiGXviGC2drozXoKN4digxS6o2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739107024; c=relaxed/simple;
-	bh=6xisQHSVs6AKJZzRJl2B7Tep1ymrWUdAcKtZnIjobhk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Qvv//ri7Wa/lHR/MX4FiW7ko4JcrfxoBS6VSQp7ohTqt5SqEcmxQEPE7Wn6952B5ORFwsPBRwX86WinMNU89Yapg2pKo7EoW1LUzLENHuJ50N9gCzAqcJSbRyn96sI620n3WBq/inFPeRTOpQOJk6cNFRciLmt+HtsD81UY9Dto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=ShL7TjsH; arc=none smtp.client-ip=209.85.216.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+	s=arc-20240116; t=1739118873; c=relaxed/simple;
+	bh=m2p5tN8xBFikB7p9GuYbTf9YDLdou5SWbVeyIqJJ5vo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fbdnOvh6Mdj3upfMLHgYsDBCfP17kdQN+oQtb6ucgGcKj3wGMSw/mE8hjSvCXECwtSJGJauIpgklTfpRKvbITLGNlyHiaM7cb+G/mfB5VDiR/guckumyaxzs8MLhl7/dKTGIxhOWj3zWRqx+a0apR3uJ/y5wsig1Aw/IYlvnv3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S7cgtAUb; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="ShL7TjsH"
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2fa1d9fb990so5025866a91.2
-        for <linux-crypto@vger.kernel.org>; Sun, 09 Feb 2025 05:17:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1739107022; x=1739711822; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=t/0q6Uy3c6A9AJQewjPZhHBDpxyDYOtnZ7qmoIYHB+Y=;
-        b=ShL7TjsH9xpdfhty3I0wsUuxFVNPyp4oeWkuzcl4KPVviiJCcfQ7ViQFMqUsL15Odt
-         b7ygx0BXH7GOb8frerqaSSIz4UvVTKzs1V9w1Fd18tapiu/bXwKnhTAqN36PVOkqdvzv
-         l7cahAKTPTNpOprL70/QEi/3lotbiL7nwwkvQRLbiZJLacRBtOMdXgqgnYHYXJsiJIfs
-         7gSQF1bGihMCFO3BXJ+yrj6Nut+Yn9co+xcSkWLW9r1X5ROjG1itYBwz4UGg+OySCxQf
-         sxDioRF9fcEoVNWy6jLNLVh9eW5v1jOTuEIqmPEEViUX7OeRGVsOBVG34nKXm/9/lqL6
-         snbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739107022; x=1739711822;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=t/0q6Uy3c6A9AJQewjPZhHBDpxyDYOtnZ7qmoIYHB+Y=;
-        b=i6S5wgmpvNAYruHjOZgnBNRCHPVF3AheHgs+HLg39Mlnn4BBalVP9doeZmTqiKAs48
-         wAyygIPVwmq33XqB9ejiuHFtuJaJqY7bQTnX1dBL07GMGfvGeLjWfq8/6QPHYqZqcBkN
-         9DhdGVRw/NB6WWeZp6t20+21OGzZsYldQbrnJZQy8gcfs9B4JqM1iGyBOCYPtwQmA35Y
-         HwoC0bNQ2dDTq02zSiRzNbEfEz+ZzpTnlGgciEgDgPS1WPUWP4mr0822d/SbmyZd3uCC
-         k8W4rXR6IKhLkblUgaw7U0yHlaQ+NIY95aUTyanpNVv4Ezh2CgeR4whsGkJb1o87+0mq
-         fZiw==
-X-Forwarded-Encrypted: i=1; AJvYcCWmn83Oj3jfUO4kQoiW15QHbKWXlmTF3J7mxEmhX4v+cn8l6v3qg0J85a1ZAvD27mlD8zcrMDCDUh9K0ZQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzI3hkY6iXbBZH4PUemJfTe9YhQke4D/EwPehwhErnz5VxjdLJr
-	A1qPpCFf2qADEfYPnUMuX/fYEbEdE9FasAGCTdrQ/K6E3fuFX84o1vGbMlKEeaB42G5Yxol7XAK
-	VOxvkGV4ZJwDTqMrfIt6jrMYg3PhJumwppcqkCQ==
-X-Gm-Gg: ASbGncsoRxkzcOJdhTTXZVxVGRuRplwIcG8Z9D+fPbmFo/bAS1fX6QNOCdXroyDwD8X
-	V77Z1XytNsaNgwemGV2xb+M10lvQMfq0nI9rdrruSzByO508oijZo+IcnZdwm7m5bcxGBTq+OXN
-	TH3ECNkuzuqmosCIbE4l3ezBlLTPTX6g==
-X-Google-Smtp-Source: AGHT+IFrys//LwPqEe4ZgEwDr3uizqqJxUMuZeWS4T5vuTlUtXlxEOCX1+ppGlLTBiAIjYGJwhERgjno7Pm5OXUJOAk=
-X-Received: by 2002:a17:90b:38c3:b0:2ee:ab29:1482 with SMTP id
- 98e67ed59e1d1-2fa24271b9dmr17676607a91.16.1739107021616; Sun, 09 Feb 2025
- 05:17:01 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S7cgtAUb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F913C4CEE2;
+	Sun,  9 Feb 2025 16:34:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739118872;
+	bh=m2p5tN8xBFikB7p9GuYbTf9YDLdou5SWbVeyIqJJ5vo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=S7cgtAUbyiNT7rhsLTSFiw++3hU6xKcppoyJGuXqlh2zYhK8L6M4g2q4/HC6/SDTy
+	 7VOqBdCtJdlgbEqdcVw1edjOapkYquNjVHjcc7HNXmiXVOITIUbSDJSmh35TN/rmsm
+	 vDHJVLRjQcaF+1lh+0nJwgV47biBiNAr33Wq2T3TAKaUtjFG6D1Em+xOq9C6M9HDxO
+	 zATkrgMzNFdvL7RqtF9Aowp7LALS5XH+K15Pa1tNJe6djizdbQFtifLAvP0vMp5hoc
+	 plNRiwE4Ekefmsop6zKNjowCn47uQqaLIPlv2TiH5ZJBlA7qaRvu9Rofpy5j8O7J35
+	 kdwTQwmQcgCcg==
+Date: Sun, 9 Feb 2025 08:34:30 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Harald Freudenberger <freude@linux.ibm.com>, davem@davemloft.net,
+	dengler@linux.ibm.com, linux-s390@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v10 2/5] s390/crypto: New s390 specific protected key
+ hash phmac
+Message-ID: <20250209163430.GB1230@sol.localdomain>
+References: <20250115162231.83516-1-freude@linux.ibm.com>
+ <20250115162231.83516-3-freude@linux.ibm.com>
+ <Z6hrvQzb5G_wqlni@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1738521533.git.lukas@wunner.de> <3d74d6134f4f87a90ebe0a37cb06c6ec144ceef7.1738521533.git.lukas@wunner.de>
- <Z6h8L0D-CBhZUiVR@gondor.apana.org.au> <Z6iRssS26IOjWbfx@wunner.de>
-In-Reply-To: <Z6iRssS26IOjWbfx@wunner.de>
-From: Ignat Korchagin <ignat@cloudflare.com>
-Date: Sun, 9 Feb 2025 13:16:50 +0000
-X-Gm-Features: AWEUYZl93UXoS8Qs2EeTErAJ5BO1UGgAv0crmqrJhP9OY4-4APU0Swls6MmXuxs
-Message-ID: <CALrw=nEyTeP=6QcdEvaeMLZEq_pYB9WO=vFt2K2FuJ1TEmP1Lg@mail.gmail.com>
-Subject: Re: [PATCH v2 3/4] crypto: ecdsa - Fix enc/dec size reported by KEYCTL_PKEY_QUERY
-To: Lukas Wunner <lukas@wunner.de>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Stefan Berger <stefanb@linux.ibm.com>, Vitaly Chikunov <vt@altlinux.org>, 
-	David Howells <dhowells@redhat.com>, linux-crypto@vger.kernel.org, 
-	keyrings@vger.kernel.org, Eric Biggers <ebiggers@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z6hrvQzb5G_wqlni@gondor.apana.org.au>
 
-On Sun, Feb 9, 2025 at 11:29=E2=80=AFAM Lukas Wunner <lukas@wunner.de> wrot=
-e:
->
-> On Sun, Feb 09, 2025 at 05:58:07PM +0800, Herbert Xu wrote:
-> > On Sun, Feb 02, 2025 at 08:00:53PM +0100, Lukas Wunner wrote:
-> > > KEYCTL_PKEY_QUERY system calls for ecdsa keys return the key size as
-> > > max_enc_size and max_dec_size, even though such keys cannot be used f=
-or
-> > > encryption/decryption.  They're exclusively for signature generation =
-or
-> > > verification.
-> > >
-> > > Only rsa keys with pkcs1 encoding can also be used for encryption or
-> > > decryption.
-> > >
-> > > Return 0 instead for ecdsa keys (as well as ecrdsa keys).
+On Sun, Feb 09, 2025 at 04:47:57PM +0800, Herbert Xu wrote:
+> On Wed, Jan 15, 2025 at 05:22:28PM +0100, Harald Freudenberger wrote:
 > >
-> > I think we should discuss who is using these user-space APIs
-> > before doing any more work on them.  The in-kernel asymmetric
-> > crypto code is not safe against side-channel attacks.  As there
-> > are no in-kernel users of private-key functionality, we should
-> > consider getting rid of private key support completely.
-> >
-> > As it stands the only user is this user-space API.
+> > +static int s390_phmac_init(struct ahash_request *req)
+> > +{
+> > +	struct s390_phmac_req_ctx *req_ctx = ahash_request_ctx(req);
+> > +	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+> > +	struct s390_kmac_sha2_ctx *ctx = &req_ctx->sha2_ctx;
+> > +	int rc;
+> > +
+> > +	/*
+> > +	 * First try synchronous. If this fails for any reason
+> > +	 * schedule this request asynchronous via workqueue.
+> > +	 */
+> > +
+> > +	rc = phmac_init(tfm, ctx, false);
+> > +	if (!rc)
+> > +		goto out;
+> > +
+> > +	req_ctx->req = req;
+> > +	INIT_DELAYED_WORK(&req_ctx->work, phmac_wq_init_fn);
+> > +	schedule_delayed_work(&req_ctx->work, 0);
+> > +	rc = -EINPROGRESS;
+> 
+> This creates a resource problem because there is no limit on how
+> many requests that can be delayed in this manner for a given tfm.
+> 
+> When we hit this case, I presume this is a system-wide issue and
+> all requests would go pending? If that is the case, I suggest
+> allocating a system-wide queue through crypto_engine and using
+> that to limit how many requests that can become EINPROGRESS.
 
-Please don't! Keyrings + asymmetric crypto is a great building block
-for secure architectures. If anything we want more of this, not less.
-We can get rid of various ssh-agents and anything that tries to keep
-cryptographic material in a separate address space. It is the most
-straightforward way to avoid heartbleed-like vulnerabilities [1].
-Before this we had to design whole solutions just to separate private
-keys from network facing code [2].
+Or just make it synchronous which would be way easier, and the calling code uses
+it synchronously anyway.
 
-Now, in-kernel RSA implementation is indeed a downside, but again -
-one could swap internal implementations and provide their own. We have
-an internal BoringSSL-based in-kernel crypto driver (which I hope to
-open source one day) which avoids this problem. I remember there was
-also some work to expose TPMs through the keyrings API, which would
-solve this problem as well [3]. In general this API allows adopting
-various platform crypto chips very easily and should be encouraged. I
-made a presentation explaining why this API is much better for TPMs,
-for example, rather than directly using /dev/tpm from userspace [4].
-
-On the topic of better RSA implementation: last year we've been
-working with folks from a company called Cryspen with the hope to
-produce better and even formally-verified RSA and ECDSA
-implementations for the Linux kernel (based on their HACL open source
-library). We got pretty good results [5] for RSA: tl;dr signing is
-faster than the current in-kernel code, but verification is slower
-(not a problem as we can use verification from the in-kernel
-implementation as we don't care about side channels there).
-Unfortunately the work was deprioritised this year, but if there is
-enough interest from the kernel community (and hopefully support to
-make the code more "kernel-integration friendly) I can try to make a
-case to re-prioritise this again.
-
-> Personally I am not using this user-space API, so I don't really
-> have a dog in this fight.  I just noticed the incorrect output
-> for KEYCTL_PKEY_QUERY and thought it might be better if it's fixed.
->
-> One user of this API is the Embedded Linux Library, which in turn
-> is used by Intel Wireless Daemon:
->
-> https://git.kernel.org/pub/scm/libs/ell/ell.git/tree/ell/key.c
-> https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/src/eap-tls.=
-c
->
-> Basically IWD seems to be invoking the kernel's Key Retention Service for
-> EAP authentication.  It's still maintained and known to have active users=
-,
-> so removing the user-space keyctl ABI would definitely cause breakage.
->
-> I've just checked for other reverse dependencies of the "libell0" package
-> on Debian, it lists "bluez" and "mptcpd" but looking at their source code
-> reveals they're not using the l_key_*() functions, so they would not be
-> affected by removal.
->
-> There's a keyring package for go, so I suppose there may be go applicatio=
-ns
-> out there using it:
->
-> https://pkg.go.dev/pault.ag/go/keyring
->
-> Then there's the keyutils library...
->
-> https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/keyutils.git
->
-> ...and listing the reverse dependencies for "libkeyutils1" on Debian
-> reveals a slew of packages which are using it:
->
->   gdm3 samba-libs sssd-common python3-keyutils nfs-common ndctl
->   mokutil kstart libkrb5-3 kafs-client ima-evm-utils ceph-common
->   libecryptfs1 ecryptfs-utils cifs-utils
->
-> And "python3-keyutils" in turn has this reverse dependency:
->
->   udiskie
->
-> Finally, folks at cloudflare praised the kernel's Key Retention Service
-> and encouraged everyone to use it... :)
->
-> https://blog.cloudflare.com/the-linux-kernel-key-retention-service-and-wh=
-y-you-should-use-it-in-your-next-application/
->
-> In short, it doesn't seem trivial to drop this user-space API.
->
-> Thanks,
->
-> Lukas
-
-Thanks,
-Ignat
-
-[1]: https://heartbleed.com/
-[2]: https://blog.cloudflare.com/keyless-ssl-the-nitty-gritty-technical-det=
-ails/
-[3]: https://lore.kernel.org/lkml/97dd7485-51bf-4e47-83ab-957710fc2182@linu=
-x.ibm.com/T/
-[4]: https://youtu.be/g8b4K5FQUj8?si=3DyY8mkoRuyE_SKBjh
-[5]: https://md.cryspen.com/cf_hacs_kernel
+- Eric
