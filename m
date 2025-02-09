@@ -1,110 +1,103 @@
-Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.65])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC08B21348
-	for <linux-crypto@vger.kernel.org>; Sun,  9 Feb 2025 17:45:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 256B71E0B73
+	for <linux-crypto@vger.kernel.org>; Sun,  9 Feb 2025 17:54:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739123135; cv=none; b=tvoYRq3IbbQ6LQ9Wx2JuDLTIr44iIHRBVEfgeyGxeMceGyQmK/S6ZXyFibEszeDvB93PKZtbSdBeq847D/BRJQK6uaNn+Zw5hZOaSvWcawNcAXI6CpcZcYH4iBvW3ZJrJLchzjqiWOb4B4LEYCvuRJjE0JhFPbhkxjntDiwhtAc=
+	t=1739123650; cv=none; b=XheYdP+Dpxz5y+u2+eeUlGJAa77Pixa9OzOVcVL1kpOY6w/6DL/uLQZ+mhkVGPKg5qqPQ6E9yXj1O2DcgxqQgpSWHU/3DOiwhg1HRuJqv4HzdOTlxSfGOLYd/PianjK7+G6bbw1SDdht3GhiWzRpmsvzoGGnq+nF+IaESBZsxng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739123135; c=relaxed/simple;
-	bh=wwaN1MEN5EN7ialSuuoReLLWAW4uA92LExoXB3rQqdE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Sfsbww0HZvZ/yTJZIYv4xFTK+aBd8dGgfo65bTwXA60tCstR7BZFnJRcvWdq1p3oa23roWkD/h26Drr0NsojTMai4w9Nhe7q3CtWpm/zJPqMSm39LXr5iKWEvTek9OuLcGE2Sxs3Dn8cYUVksUH00f8hMKVTBhup17DJwe8m2xU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net; spf=pass smtp.mailfrom=posteo.net; dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b=pFQz+Mcg; arc=none smtp.client-ip=185.67.36.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.net
+	s=arc-20240116; t=1739123650; c=relaxed/simple;
+	bh=k99UAQAdKzxoqi1fK05SSQ9xO4q/5wpfZNfxu+vdzsc=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=a3c/jQKSLBfIQCnuFStzDf+J4W3tEMIKufZ2eyQRWRQc+Fzpx/nGDA89wa0HXG+qP0PwdoFs9XQm4S6zb9F1/7YruaWtS7myIlENIlv9tS8oPooDHzrCn1mEq9XobeCkFEfyapqe0eCcHo85/ZdTzUY6lhKNtu0ehA+Euwvev4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KlcbLrs4; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b="pFQz+Mcg"
-Received: from submission (posteo.de [185.67.36.169]) 
-	by mout01.posteo.de (Postfix) with ESMTPS id 40B10240029
-	for <linux-crypto@vger.kernel.org>; Sun,  9 Feb 2025 18:45:32 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.net; s=2017;
-	t=1739123132; bh=wwaN1MEN5EN7ialSuuoReLLWAW4uA92LExoXB3rQqdE=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:Content-Transfer-Encoding:From;
-	b=pFQz+McgXOD4SJpqS3t88fYmh0f5343D1MX9fCQZ5W5ZdV5d90NJnQIiHn4PjdCht
-	 jpzs5EMtNx/SAOBHAvluntIEwLOprerzu70UzAecNitIGH8k0ZnZrhUFsPPYt30bPa
-	 5W++llA90llvNmYGZGg6pjdtnttlirT0AnVYIO3h/V52Nxuo2QcmZfdHQ5yO7Q21SW
-	 jvIRtzOr5XZUGt9zXBs5HlCATqYCjE2JIiSc7GPY4SJyuH2VUSeO6sOP/akjsfoNL7
-	 NQWpd+m9PlYAgJGrD6+VmVwjqa+7KOvmx5tud7mokjtobj+GT1nLVBwQhE74lhhlhe
-	 V93cWZaX8J0/A==
-Received: from customer (localhost [127.0.0.1])
-	by submission (posteo.de) with ESMTPSA id 4YrZqX2D0Mz9rxK;
-	Sun,  9 Feb 2025 18:45:28 +0100 (CET)
-Date: Sun,  9 Feb 2025 17:45:27 +0000
-From: =?utf-8?Q?J=2E_Neusch=C3=A4fer?= <j.ne@posteo.net>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: =?utf-8?Q?J=2E_Neusch=C3=A4fer?= <j.ne@posteo.net>,
-	"Rob Herring (Arm)" <robh@kernel.org>,
-	Mark Brown <broonie@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, linux-ide@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-crypto@vger.kernel.org, Vinod Koul <vkoul@kernel.org>,
-	dmaengine@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
-	linuxppc-dev@lists.ozlabs.org, linux-spi@vger.kernel.org,
-	=?utf-8?Q?J=2E_Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Naveen N Rao <naveen@kernel.org>,
-	Vignesh Raghavendra <vigneshr@ti.com>, imx@lists.linux.dev,
-	Niklas Cassel <cassel@kernel.org>, Scott Wood <oss@buserror.net>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Richard Weinberger <richard@nod.at>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Lee Jones <lee@kernel.org>, linux-watchdog@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	linux-mtd@lists.infradead.org,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Wim Van Sebroeck <wim@linux-watchdog.org>,
-	linux-kernel@vger.kernel.org,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	linux-pci@vger.kernel.org
-Subject: Re: [PATCH v2 09/12] dt-bindings: memory-controllers: Convert
- fsl,elbc to YAML
-Message-ID: <Z6jptzP7KLxmIJeL@probook>
-References: <20250207-ppcyaml-v2-0-8137b0c42526@posteo.net>
- <20250207-ppcyaml-v2-9-8137b0c42526@posteo.net>
- <173897189669.2630636.11579554304003668196.robh@kernel.org>
- <Z6jlrU7EPeATjK8s@probook>
- <4c41a8e2-b097-4b95-ba0a-115dbbfc4e1a@kernel.org>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KlcbLrs4"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739123648;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HZy+2KXL+332PNbEE4REP74hQEw249CGirMqJVtIdAE=;
+	b=KlcbLrs4DAF44kTyEMpHa6Xsp+cliKXHGH7Frtz0kp/QZ9Bjys9qRD6aucw24HMRLHISjS
+	ilFhwHA3YAYyWanCk7/K+0FcsncGHdnqsHsYhGngIQgwqLuJjJBUPWFrLYxORy9dStHsiV
+	ioLvxfx0KZaPEOM3YWeBTSsgoFQ9RF0=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-179-fiKubr2EN-OLiH49vN8dyQ-1; Sun,
+ 09 Feb 2025 12:54:03 -0500
+X-MC-Unique: fiKubr2EN-OLiH49vN8dyQ-1
+X-Mimecast-MFC-AGG-ID: fiKubr2EN-OLiH49vN8dyQ
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 72BCF180036F;
+	Sun,  9 Feb 2025 17:54:00 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.92])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 794E51800360;
+	Sun,  9 Feb 2025 17:53:55 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <Z6XKtPKryJsRfYvK@gondor.apana.org.au>
+References: <Z6XKtPKryJsRfYvK@gondor.apana.org.au> <20250203142343.248839-1-dhowells@redhat.com> <20250203142343.248839-4-dhowells@redhat.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: dhowells@redhat.com, netdev@vger.kernel.org,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Jakub Kicinski <kuba@kernel.org>,
+    "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+    Simon Horman <horms@kernel.org>,
+    Trond Myklebust <trond.myklebust@hammerspace.com>,
+    Chuck Lever <chuck.lever@oracle.com>,
+    Eric Biggers <ebiggers@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
+    linux-crypto@vger.kernel.org, linux-afs@lists.infradead.org,
+    linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 03/24] crypto: Add 'krb5enc' hash and cipher AEAD algorithm
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <4c41a8e2-b097-4b95-ba0a-115dbbfc4e1a@kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1934017.1739123634.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 09 Feb 2025 17:53:54 +0000
+Message-ID: <1934018.1739123634@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Sun, Feb 09, 2025 at 06:30:44PM +0100, Krzysztof Kozlowski wrote:
-> On 09/02/2025 18:28, J. Neuschäfer wrote:
-> > On Fri, Feb 07, 2025 at 05:44:59PM -0600, Rob Herring (Arm) wrote:
-> >> On Fri, 07 Feb 2025 22:30:26 +0100, J. Neuschäfer wrote:
-> > [...]
-> >>>  .../bindings/memory-controllers/fsl,elbc.yaml      | 146 +++++++++++++++++++++
-> >>>  .../devicetree/bindings/powerpc/fsl/lbc.txt        |  43 ------
-> >>>  2 files changed, 146 insertions(+), 43 deletions(-)
-> > [...]
-> >> dtschema/dtc warnings/errors:
-> >> Documentation/devicetree/bindings/memory-controllers/fsl,elbc.example.dtb: /example-0/localbus@f0010100/simple-periph@2,0: failed to match any schema with compatible: ['fsl,elbc-gpcm-uio']
-> >> Documentation/devicetree/bindings/memory-controllers/fsl,elbc.example.dtb: /example-1/localbus@e0005000/nand@1,0: failed to match any schema with compatible: ['fsl,mpc8315-fcm-nand', 'fsl,elbc-fcm-nand']
-> >> Documentation/devicetree/bindings/memory-controllers/fsl,elbc.example.dtb: /example-1/localbus@e0005000/nand@1,0: failed to match any schema with compatible: ['fsl,mpc8315-fcm-nand', 'fsl,elbc-fcm-nand']
-> > 
-> > I think this is due to how the patches are ordered in the series.
-> 
-> If that's possible, this should be fixed, e.g.  by re-ordering the patches.
+Herbert Xu <herbert@gondor.apana.org.au> wrote:
 
-Yes, I'll do that for the next iteration
+> > [!] Note that the net/sunrpc/auth_gss/ implementation gets a pair of
+> > ciphers, one non-CTS and one CTS, using the former to do all the align=
+ed
+> > blocks and the latter to do the last two blocks if they aren't also
+> > aligned.  It may be necessary to do this here too for performance reas=
+ons -
+> > but there are considerations both ways:
+> =
 
+> The CTS template will take any hardware accelerated CBC implementation
+> and turn it into CTS.
+> =
 
-Best regards,
-J. Neuschäfer
+> So there is no reason to do the CTS/CBC thing by hand at all.
+
+Glad to hear it.  I'm just reporting what net/sunrpc/ does now.  My suspic=
+ion
+is that this is from before a lot of cpu crypto-based optimisations were m=
+ade
+available in the crypto layer.
+
+David
+
