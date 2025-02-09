@@ -1,180 +1,153 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55D671BD9CE;
-	Sun,  9 Feb 2025 11:52:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A04B613D28F;
+	Sun,  9 Feb 2025 12:27:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739101971; cv=none; b=HQGXOCUdQCSDl0KBKBjeuqk5Pm1Pb5ZnT4ckjQeXJOUgrYBo86u7+fkttWeo7AiAKZEPzTs55AGSXMmpvddtUmYpJErG5t6J5sQLWcCYx8CVEzx9vwRe9duOhHeFLX3gY0y/tqeGSa3/OuEKAAjBmQKMoNddXKgw+jp25Hq+aZY=
+	t=1739104072; cv=none; b=A5bBQC9tBmxrp4F2Ca6sVGsWLMhVKq2p0wDmhN0slIIsFQH42ZxIsq/9vxu9t04iCJ7bQ2Yvql/tDmaOJyrGcyeHfT99c9zg1uKpRjKxRRXG26OJND1QxySQRAgN31tjjykgeSQYoiD3jrp4y5/YWn0CwW6cf78Vx2Bp5g0yLA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739101971; c=relaxed/simple;
-	bh=PhDbKNXuTiUKPAVw6tHZWO5JOsIIkmKxc+7r3DftrjA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KjcbCqniyO8c1cVuNsFwrCPt/xvOKGBkNTDvVbJ2o0xUfhzC6Lh/yd0j1yZmXx74wYTbAQlqAKG/zIBW73IY+51U1Tj3znw1IL1gszYrCAq1y7Xcw/L8Tr+D1nJiTmffCh4BQySXa2PMgncTx8TZ3OHw1wAlPBmab5c8HMV9cAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rhEskkbt; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739104072; c=relaxed/simple;
+	bh=BSXNirLH3zvz2GV0XOlsh3+a7jUDmmAsutL9GmheFYA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PgXq930noAs3xMIMuBGqTA5QC7eQFTybNdckPdShhniMnW6WyzHPD1Y0K68NePEK78qy+gW2BPqu8QISDiO2lfN3+J9xTJGaJkgKziDujB6i3YqQVAPoPvD9UergzPKP5BNflo2rmmSqoNNO4/f2lQB2PLPPOJJ0+cJtqb7EWs8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NmvmaZbK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rhEskkbt"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2F62C4CEDD;
-	Sun,  9 Feb 2025 11:52:50 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NmvmaZbK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93228C4CEE2;
+	Sun,  9 Feb 2025 12:27:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739101970;
-	bh=PhDbKNXuTiUKPAVw6tHZWO5JOsIIkmKxc+7r3DftrjA=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=rhEskkbtZrAlSE/k6prcUyV4pQpG/rO+F7UMqt8pdHxQyHhJTj/B63V4TdtDxSBeD
-	 jVqhBNQrd5mGn1rva6Beaci/kMQ/k5W7hngMwLVt22yEfkvOc3ZmVQ7I94k0dbxjI0
-	 57U+ReZO6iFhbVDVwfI3+NO+mGo5Vs657DWuZuLxKo9+KoPGmzxilcMCQmMhyXnVju
-	 jpos/hC5XfHZCsMtiofe8Q28M/6kuaUz50DsbSqBJClSNaZ/IJ6y/1uS4oXMs5UhHh
-	 fsvj8PIWGa+tqwR0bmipLKgn493ezch3tv3kIvZemlF5t0/aTY99TRloXJuLhO0rDY
-	 5w4XQNQUexqBw==
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5450622b325so893471e87.1;
-        Sun, 09 Feb 2025 03:52:50 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUyBsIfsTb/GgLimOyCJXfnXfvnh4T1Pg18oth5I3iDDmHgPO/qBrI++2jKfLWK7MMdox6nrDsK0IlB6gw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YywDb3OZ1sineXGuPZ0doQdwYH4BkaSUfcMrH/4UU9v56mQ5RsU
-	SDF4s0rQkmj7RN/4yOlU24EiCIAPg4iQRWHkYvUa4aazu2woGVeirLIioJEKIZTUMf2zJYFjsmp
-	bgazdAXnanozd/0p3jv9eD3OlSPQ=
-X-Google-Smtp-Source: AGHT+IFMz/1AaymgWDvJG5mFSjJfibgeJWLHfZLKMkdEQ4nfnhAycUE8XD2JF5ovK61CCIr9uboKjrDPsfJb5269FIw=
-X-Received: by 2002:a05:6512:3fc:b0:542:98bb:5674 with SMTP id
- 2adb3069b0e04-54414ae0732mr2587641e87.33.1739101969127; Sun, 09 Feb 2025
- 03:52:49 -0800 (PST)
+	s=k20201202; t=1739104072;
+	bh=BSXNirLH3zvz2GV0XOlsh3+a7jUDmmAsutL9GmheFYA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NmvmaZbKGIDIztWxHMvUpjMTRqPZK8Rj6b3Q/rMF2jsOQv0Sqg9brnJQlKuA8KUXb
+	 4ZOlnI2mj4b8+3W67c8dWEL5W5u4rJ2J1C2ZQ1CeA8cF0t+rUuf9voc9T1MItrRKd2
+	 e4Skd25IfhS9nnzUwPCaBfhqBSnnqSrfr2GT8Y+LREV7JvOQlLU+NN41NeRn63keP1
+	 IvtS0BLQl6WTFuysOT82FbzCXJ7COBLNJDiV5Q42tnhJSWZMn6VI0I+xZ+F/eFFjHe
+	 ViySV4XWVUQpAtu5eD863ujlD5MnB9cnds6SrgHbjfatCbMTYp6Oi86K/NBMfSnufO
+	 4tonCTVZYSaAA==
+Date: Sun, 9 Feb 2025 13:27:49 +0100
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: T Pratham <t-pratham@ti.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, linux-crypto@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, Vignesh Raghavendra <vigneshr@ti.com>, 
+	Praneeth Bajjuri <praneeth@ti.com>, Kamlesh Gurudasani <kamlesh@ti.com>, 
+	Manorit Chawdhry <m-chawdhry@ti.com>
+Subject: Re: [PATCH RFC 1/3] dt-bindings: crypto: Add binding for TI DTHE V2
+ driver
+Message-ID: <20250209-sincere-honored-vole-dda3c7@krzk-bin>
+References: <20250206-dthe-v2-aes-v1-0-1e86cf683928@ti.com>
+ <20250206-dthe-v2-aes-v1-1-1e86cf683928@ti.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250208175647.12333-1-ebiggers@kernel.org>
-In-Reply-To: <20250208175647.12333-1-ebiggers@kernel.org>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Sun, 9 Feb 2025 12:52:38 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXFt9d2vmNOaYk9+3CpEv9ZfTPTrDGgTKYOe-RCRgg7UFA@mail.gmail.com>
-X-Gm-Features: AWEUYZnebgQyXs_mccyGE8n-LAEqlU7sljhb1y7T8aDJbHuCulO7Hsw4P7U92Vs
-Message-ID: <CAMj1kXFt9d2vmNOaYk9+3CpEv9ZfTPTrDGgTKYOe-RCRgg7UFA@mail.gmail.com>
-Subject: Re: [PATCH] lib/crc-t10dif: remove crc_t10dif_is_optimized()
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	Zhihang Shao <zhihang.shao.iscas@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250206-dthe-v2-aes-v1-1-1e86cf683928@ti.com>
 
-On Sat, 8 Feb 2025 at 18:57, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> From: Eric Biggers <ebiggers@google.com>
->
-> With the "crct10dif" algorithm having been removed from the crypto API,
-> crc_t10dif_is_optimized() is no longer used.
->
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+On Thu, Feb 06, 2025 at 02:44:30PM +0530, T Pratham wrote:
+> Add new DT binding for Texas Instruments DTHE V2 crypto driver.
+
+This was never tested so only limited review.
+
+Subject and commit msg: Bindings are for hardware, not driver. Rephrase
+to accurately describe the hardware.
+
+
+> 
+> DTHE V2 is introduced as a part of TI AM62L SoC and can currently be
+> only found in it.
+> 
+> Signed-off-by: T Pratham <t-pratham@ti.com>
 > ---
->
-> This applies to
-> https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=crc-next
->
->  arch/arm/lib/crc-t10dif-glue.c     | 6 ------
->  arch/arm64/lib/crc-t10dif-glue.c   | 6 ------
->  arch/powerpc/lib/crc-t10dif-glue.c | 6 ------
->  arch/x86/lib/crc-t10dif-glue.c     | 6 ------
->  include/linux/crc-t10dif.h         | 9 ---------
->  5 files changed, 33 deletions(-)
->
+> PS: Please note that the dmas option in dt-bindings is subject to change in
+> future as dma driver is not finalized yet. Any updated changes will be
+> sent in the next version of the patch.
+> 
+>  .../devicetree/bindings/crypto/ti,dthev2.yaml      | 50 ++++++++++++++++++++++
+>  MAINTAINERS                                        |  6 +++
+>  2 files changed, 56 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/crypto/ti,dthev2.yaml b/Documentation/devicetree/bindings/crypto/ti,dthev2.yaml
+> new file mode 100644
+> index 0000000000000000000000000000000000000000..9c871fe191ae0a3341d047d4565ec1e1bf1f21ef
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/crypto/ti,dthev2.yaml
 
-Acked-by: Ard Biesheuvel <ardb@kernel.org>
+Filename matching compatible.
 
-> diff --git a/arch/arm/lib/crc-t10dif-glue.c b/arch/arm/lib/crc-t10dif-glue.c
-> index d24dee62670e..f3584ba70e57 100644
-> --- a/arch/arm/lib/crc-t10dif-glue.c
-> +++ b/arch/arm/lib/crc-t10dif-glue.c
-> @@ -67,14 +67,8 @@ arch_initcall(crc_t10dif_arm_init);
->  static void __exit crc_t10dif_arm_exit(void)
->  {
->  }
->  module_exit(crc_t10dif_arm_exit);
->
-> -bool crc_t10dif_is_optimized(void)
-> -{
-> -       return static_key_enabled(&have_neon);
-> -}
-> -EXPORT_SYMBOL(crc_t10dif_is_optimized);
-> -
->  MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
->  MODULE_DESCRIPTION("Accelerated CRC-T10DIF using ARM NEON and Crypto Extensions");
->  MODULE_LICENSE("GPL v2");
-> diff --git a/arch/arm64/lib/crc-t10dif-glue.c b/arch/arm64/lib/crc-t10dif-glue.c
-> index dab7e3796232..a007d0c5f3fe 100644
-> --- a/arch/arm64/lib/crc-t10dif-glue.c
-> +++ b/arch/arm64/lib/crc-t10dif-glue.c
-> @@ -68,14 +68,8 @@ arch_initcall(crc_t10dif_arm64_init);
->  static void __exit crc_t10dif_arm64_exit(void)
->  {
->  }
->  module_exit(crc_t10dif_arm64_exit);
->
-> -bool crc_t10dif_is_optimized(void)
-> -{
-> -       return static_key_enabled(&have_asimd);
-> -}
-> -EXPORT_SYMBOL(crc_t10dif_is_optimized);
-> -
->  MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
->  MODULE_DESCRIPTION("CRC-T10DIF using arm64 NEON and Crypto Extensions");
->  MODULE_LICENSE("GPL v2");
-> diff --git a/arch/powerpc/lib/crc-t10dif-glue.c b/arch/powerpc/lib/crc-t10dif-glue.c
-> index 730850dbc51d..f411b0120cc5 100644
-> --- a/arch/powerpc/lib/crc-t10dif-glue.c
-> +++ b/arch/powerpc/lib/crc-t10dif-glue.c
-> @@ -76,14 +76,8 @@ arch_initcall(crc_t10dif_powerpc_init);
->  static void __exit crc_t10dif_powerpc_exit(void)
->  {
->  }
->  module_exit(crc_t10dif_powerpc_exit);
->
-> -bool crc_t10dif_is_optimized(void)
-> -{
-> -       return static_key_enabled(&have_vec_crypto);
-> -}
-> -EXPORT_SYMBOL(crc_t10dif_is_optimized);
-> -
->  MODULE_AUTHOR("Daniel Axtens <dja@axtens.net>");
->  MODULE_DESCRIPTION("CRCT10DIF using vector polynomial multiply-sum instructions");
->  MODULE_LICENSE("GPL");
-> diff --git a/arch/x86/lib/crc-t10dif-glue.c b/arch/x86/lib/crc-t10dif-glue.c
-> index 13f07ddc9122..7734bdbc2e39 100644
-> --- a/arch/x86/lib/crc-t10dif-glue.c
-> +++ b/arch/x86/lib/crc-t10dif-glue.c
-> @@ -39,13 +39,7 @@ arch_initcall(crc_t10dif_x86_init);
->  static void __exit crc_t10dif_x86_exit(void)
->  {
->  }
->  module_exit(crc_t10dif_x86_exit);
->
-> -bool crc_t10dif_is_optimized(void)
-> -{
-> -       return static_key_enabled(&have_pclmulqdq);
-> -}
-> -EXPORT_SYMBOL(crc_t10dif_is_optimized);
-> -
->  MODULE_DESCRIPTION("CRC-T10DIF using PCLMULQDQ instructions");
->  MODULE_LICENSE("GPL");
-> diff --git a/include/linux/crc-t10dif.h b/include/linux/crc-t10dif.h
-> index d0706544fc11..a559fdff3f7e 100644
-> --- a/include/linux/crc-t10dif.h
-> +++ b/include/linux/crc-t10dif.h
-> @@ -17,15 +17,6 @@ static inline u16 crc_t10dif_update(u16 crc, const u8 *p, size_t len)
->  static inline u16 crc_t10dif(const u8 *p, size_t len)
->  {
->         return crc_t10dif_update(0, p, len);
->  }
->
-> -#if IS_ENABLED(CONFIG_CRC_T10DIF_ARCH)
-> -bool crc_t10dif_is_optimized(void);
-> -#else
-> -static inline bool crc_t10dif_is_optimized(void)
-> -{
-> -       return false;
-> -}
-> -#endif
-> -
->  #endif
->
-> base-commit: 3dceb9c4f1202d2c374976936ef803bf4b076fa7
-> --
-> 2.48.1
->
+> @@ -0,0 +1,50 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/crypto/ti,dthev2.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: K3 SoC DTHE V2 crypto module
+> +
+> +maintainers:
+> +  - T Pratham <t-pratham@ti.com>
+> +
+> +properties:
+> +  compatible:
+> +    enum:
+> +      - ti,dthe-v2
+
+NAK, SoC-based compatible instead.
+
+
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  dmas:
+> +    items:
+> +      - description: 'AES Engine RX DMA Channel'
+> +      - description: 'AES Engine TX DMA Channel'
+> +      - description: 'SHA Engine TX DMA Channel'
+> +
+> +  dma-names:
+> +    items:
+> +      - const: rx
+> +      - const: tx1
+> +      - const: tx2
+> +
+> +
+
+Drop stray blank line
+
+> +required:
+> +  - compatible
+> +  - reg
+> +  - dmas
+> +  - dma-names
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +
+
+Drop stray blank line
+
+> +    crypto: crypto@40800000 {
+
+Drop label
+
+> +		compatible = "ti,dthe-v2";
+> +		reg = <0x00 0x40800000 0x00 0x10000>;
+> +
+> +		dmas = <&main_bcdma 0 0xc701 0>, <&main_bcdma 0 0x4700 0>, <&main_bcdma 0 0xc700 0>;
+
+Wrap according to coding style.
+
+Best regards,
+Krzysztof
+
