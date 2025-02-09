@@ -1,103 +1,120 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from baldur.buserror.net (baldur.buserror.net [165.227.176.147])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28D7713B7A3;
-	Sun,  9 Feb 2025 19:05:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 689EB38DDB;
+	Sun,  9 Feb 2025 20:50:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=165.227.176.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739127928; cv=none; b=XRbPCIfAogwYxvjKAKOxnZMjh+FxYLa/GOw0sPHVOcDH0U3UKUKcsDs6hRzSz+C/mVA6bcaYBuwkdHV7jYJGJ9JA+Zxyz9p2Vt4W0RhtcfqrNaENNWiyPdL+VPvnKFl7tUQXpZOgzUXtqUFRggo4tEsRPXCaeQXBn1WVWwIy8I4=
+	t=1739134211; cv=none; b=pHtsp1/Onn2sPV/F8NjTtx7rQldj/4e0Y+x6xU6fZkOkxKbTlb9DLdbcAz4fEPd70g9rt7aIMw0Ttep6AriU9FfgRGLmsjAUOAaU7N8lPnWVkPcMVGNK+2D89ZqDWnsYcEpJUy/yMIHtXsUuSCops2X1jgMLXTrP2//ClV/12l0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739127928; c=relaxed/simple;
-	bh=natJcidB7q3O8woW65n2ijBytWe0W+0jkr1HKsigs5s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rKY0+sTGVzcgQZ7XwNUMxyD6zd4UUNke+ajkkAU8vDh1XmTqwFLKgazVQ68BhHJ8aOnAKiR/81UIPFm+VaF5DHYrEpEsEzrR822Onio96YRdtCHxBfOLzDO/JXN8P8/nVF9AG1AojeqA7+uwhDXK51XQLyuUCtpetYWvFjzRdro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uJVgBgpK; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739134211; c=relaxed/simple;
+	bh=QhRwFeKqWMeHZQA5gyZTCQJnuWVF8Yk6P25dHCpDbWU=;
+	h=Date:From:To:Cc:Message-ID:References:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To:Subject; b=gqJb6KOBT2WFLCDw9DzSxj0fpPd4Prp4W8iYP+kRbH3PkMV9WG+UIdJITM8N+RBZfMv3jSrRljc1wx+KXwqnBBt3GhFHxiDLzUEnyOY0MKkXtN8tLd2IKJugqwETVKpS8lxPjSggy+IM1pWEvIn7NX9O0U3d+CtW313crM+HeiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=buserror.net; spf=pass smtp.mailfrom=buserror.net; dkim=pass (2048-bit key) header.d=buserror.net header.i=@buserror.net header.b=JwerkDeF; arc=none smtp.client-ip=165.227.176.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=buserror.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=buserror.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uJVgBgpK"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 082BAC4CEDD;
-	Sun,  9 Feb 2025 19:05:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739127927;
-	bh=natJcidB7q3O8woW65n2ijBytWe0W+0jkr1HKsigs5s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=uJVgBgpK/Wrib4Ot1ITnWyLr/M9lHiSwNDfQztynIRSmG/2QoUlAq3TuVHHLSNpMH
-	 17YzI74Zrp+QZm8F1qw2mzEb92pCmSPzdsegZA6Wpd2HvFm67PWAVvxSFnyKy6/++l
-	 j76BA8Y+63msoJJYEIJulprPti90jnbJ7DUhQ5q/hZR2mwSVLT9pWV8+dwMgVzcD+Y
-	 RqxYHsM207TqKSYdVd8Y/16alDEznDG2zTt8/dBFnLifjEVfvV/pKfgiSydudMC9NV
-	 qyjDtrA8NPfijmkQokMfbM7+s8GXffc4PlSVcEs3HyNnMVawIuh6EArXN5kU9BS7Xs
-	 4HBcqh+rilkJg==
-Date: Sun, 9 Feb 2025 11:05:25 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: netdev@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Trond Myklebust <trond.myklebust@hammerspace.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>,
-	qat-linux <qat-linux@intel.com>, linux-crypto@vger.kernel.org,
-	linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 03/24] crypto: Add 'krb5enc' hash and cipher AEAD
- algorithm
-Message-ID: <20250209190525.GA6017@sol.localdomain>
-References: <20250207200419.GA2819332@google.com>
- <20250203142343.248839-1-dhowells@redhat.com>
- <20250203142343.248839-4-dhowells@redhat.com>
- <1934772.1739126247@warthog.procyon.org.uk>
+	dkim=pass (2048-bit key) header.d=buserror.net header.i=@buserror.net header.b="JwerkDeF"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=buserror.net; s=rsa_sel; h=Subject:In-Reply-To:Content-Transfer-Encoding:
+	Content-Type:MIME-Version:References:Message-ID:Cc:To:From:Date:Sender:
+	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=MuELZahnfjB2zfNBXkn/7vS+YWEIHeJmEyTF3bHn8yY=; b=JwerkDeFpUYmUtvgiyfDWFRcyc
+	M1SayaRB+qccNqxuZLeR/Bh0Zi4doXvs2AuwQ4bXULgliRwmuL+46mVeaEmUJnjt20xSeByKQCeF7
+	pqQnatSRU4+zfcORETcgPqMoDuz9Ijk4jbJsPiKiaLEQcbpIHWc/P0F4c/jFvX5d56ebaA3NJGjAd
+	XSH27+KqmV7Z5IMLaNqwxgX15BzUCAKWCpbNvQyD4qc8VY5U6w9qaUHRzKdRGVNRg0Fih8GzX5jbP
+	YQTGOo2FWDlTffHnVVvamHnt6obLmm/skiwsWgFKjykOnhriFwqciL6UJ9O4Wfc6dQ7QoO2ga6o7N
+	QoWK9LuQ==;
+Received: from oss by baldur.buserror.net with local (Exim 4.96)
+	(envelope-from <oss@buserror.net>)
+	id 1thEFY-00C5fM-1y;
+	Sun, 09 Feb 2025 14:49:57 -0600
+Date: Sun, 9 Feb 2025 14:49:56 -0600
+From: Crystal Wood <oss@buserror.net>
+To: j.ne@posteo.net
+Cc: devicetree@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	Krzysztof Kozlowski <krzk@kernel.org>, imx@lists.linux.dev,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Naveen N Rao <naveen@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>, Lee Jones <lee@kernel.org>,
+	Vinod Koul <vkoul@kernel.org>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	=?iso-8859-1?Q?J=2E_Neusch=E4fer?= <j.neuschaefer@gmx.net>,
+	Wim Van Sebroeck <wim@linux-watchdog.org>,
+	Guenter Roeck <linux@roeck-us.net>, Mark Brown <broonie@kernel.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Richard Weinberger <richard@nod.at>,
+	Vignesh Raghavendra <vigneshr@ti.com>, linux-kernel@vger.kernel.org,
+	linux-ide@vger.kernel.org, linux-crypto@vger.kernel.org,
+	dmaengine@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-watchdog@vger.kernel.org, linux-spi@vger.kernel.org,
+	linux-mtd@lists.infradead.org, Li Yang <leoyang.li@nxp.com>,
+	John Ogness <john.ogness@linutronix.de>
+Message-ID: <Z6kU9G4u3BbBJn5p@buserror.net>
+References: <20250207-ppcyaml-v2-0-8137b0c42526@posteo.net>
+ <20250207-ppcyaml-v2-9-8137b0c42526@posteo.net>
+ <Z6kQpuQf5m-bXTyt@buserror.net>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <1934772.1739126247@warthog.procyon.org.uk>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Z6kQpuQf5m-bXTyt@buserror.net>
+X-SA-Exim-Connect-IP: <locally generated>
+X-SA-Exim-Rcpt-To: j.ne@posteo.net, devicetree@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, krzk@kernel.org, imx@lists.linux.dev, maddy@linux.ibm.com, mpe@ellerman.id.au, npiggin@gmail.com, christophe.leroy@csgroup.eu, naveen@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, dlemoal@kernel.org, cassel@kernel.org, herbert@gondor.apana.org.au, davem@davemloft.net, lee@kernel.org, vkoul@kernel.org, lpieralisi@kernel.org, kw@linux.com, manivannan.sadhasivam@linaro.org, bhelgaas@google.com, j.neuschaefer@gmx.net, wim@linux-watchdog.org, linux@roeck-us.net, broonie@kernel.org, miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com, linux-kernel@vger.kernel.org, linux-ide@vger.kernel.org, linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org, linux-pci@vger.kernel.org, linux-watchdog@vger.kernel.org, linux-spi@vger.kernel.org, linux-mtd@lists.infradead.org, leoyang.li@nxp.com, john.ogness@linutronix.de
+X-SA-Exim-Mail-From: oss@buserror.net
+X-Spam-Level: 
+X-Spam-Report: 
+	*  -15 BAYES_00 BODY: Bayes spam probability is 0 to 1%
+	*      [score: 0.0000]
+	* -0.0 NO_RELAYS Informational: message was not relayed via SMTP
+Subject: Re: [PATCH v2 09/12] dt-bindings: memory-controllers: Convert
+ fsl,elbc to YAML
+X-SA-Exim-Version: 4.2.1 (built Wed, 06 Jul 2022 17:57:39 +0000)
+X-SA-Exim-Scanned: Yes (on baldur.buserror.net)
 
-On Sun, Feb 09, 2025 at 06:37:27PM +0000, David Howells wrote:
-> One of the issues I have with doing it on the CPU is that you have to do two
-> operations and, currently, they're done synchronously and serially.
+On Sun, Feb 09, 2025 at 02:31:35PM -0600, Crystal Wood wrote:
+> On Fri, Feb 07, 2025 at 10:30:26PM +0100, J. Neuschäfer via B4 Relay wrote:
+> > +        simple-periph@2,0 {
+> > +            compatible = "fsl,elbc-gpcm-uio";
+> > +            reg = <0x2 0x0 0x10000>;
+> > +            elbc-gpcm-br = <0xfd810800>;
+> > +            elbc-gpcm-or = <0xffff09f7>;
+> > +        };
 > 
-> Can you implement "auth5enc(hmac(sha256),cts(cbc(aes)))" in assembly and
-> actually make the assembly do both the AES and SHA at the same time?  It looks
-> like it *might* be possible - but that you might be an XMM register short of
-> being able to do it:-/
+> I know this isn't new, but... since we're using this as an example,
+> where is the documentation for this fsl,elbc-gpcm-uio and
+> elbc-gpcm-br/or?  What exactly is a simple-periph?
+> 
+> There are no in-tree device trees that use this either.  The bcsr
+> node was actually a much more normal example, despite that particular
+> platform having been removed.  There are other bcsr nodes that still
+> exist that could be used instead.
 
-Yes, that would be the proper way to optimize that algorithm.  Someone just
-needs to do it.  (And presumably you want this one and not Camellia which you
-are also pushing for some reason?)
+OK, I noticed patch 10 after I sent this :-P
 
-> > I don't see why off-CPU hardware offload support should deserve much
-> > attention here, given the extremely high speed of on-CPU crypto these days
-> > and the great difficulty of integrating off-CPU acceleration efficiently.
-> > In particular it seems weird to consider Intel QAT a reasonable thing to use
-> > over VAES.
-> 
-> Because some modern CPUs come with on-die crypto offload - and that can do
-> hash+encrypt or encrypt+hash in parallel.  Now, there are a couple of issues
-> with using the QAT here:
-> 
->  (1) It doesn't support CTS.  This means we'd have to impose the CTS from
->      above - and that may well make it unusable in doing hash + encrypt
->      simultaneously.
-> 
->  (2) It really needs batching to make it cheap enough to use.  This might
->      actually be less of a problem - at least for rxgk.  The data is split up
->      into fixed-size packets, but for a large amount of data we can end up
->      filling packets faster than we can transmit them.  This offers the
->      opportunity to batch them - up to ~8192 packets in a single batch.
-> 
-> For NFS, things are a bit different.  Because that mostly uses a streaming
-> transport these days, it wants to prepare a single huge message in one go -
-> and being able to parallellise the encrypt and the hash could be a benefit.
+Seems I didn't like it too much when it was new either:
+https://lkml.org/lkml/2014/12/9/530
 
-Right, the batching is always a huge issue for those types of accelerators.  A
-much more promising approach is to just fully take advantage of the CPU
-instructions that already accelerate the same algorithms very well.
+And it's still a bad example for how GPCM devices on this bus should
+normally be represented.
 
-- Eric
+-Crystal
