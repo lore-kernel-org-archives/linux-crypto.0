@@ -1,48 +1,45 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CFF83FD4;
-	Sun,  9 Feb 2025 09:15:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FC831487F6
+	for <linux-crypto@vger.kernel.org>; Sun,  9 Feb 2025 09:18:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739092534; cv=none; b=N556f+Z0dphOX6daq/ze6cjeC7AKPGKUSx1TctJ8hxLU0IVP5pe5mH/JnSiShC620/GB61k5QnLTA61yN4g7HFkSaXReFRG7YRoF3E3koyc0CFkzFEnCxkpyeL9QBRXJqY9AajaA3uVrHcJxO4yQlenSjgsdQdujTWArjP4YIhY=
+	t=1739092725; cv=none; b=t6oegaDMYQHvVB1mk+QO1NEU04z5QOGjLSwxRbPnwduN9ATZFPeoDupv/xC0SmCb0v6vAZaR2gA0/6nQpnraWq/3rGCPP52DACqmnqJv9sDIY65uj9sPUvRxIcGuV6FcMlPjK8kQk20BQNU4i71Xui4ofXpWPmyzHjeSlxBwWbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739092534; c=relaxed/simple;
-	bh=pdNmNdB4q9tSI3XCvQZF07ktkkgO2HLXwVfSrPn6U3o=;
+	s=arc-20240116; t=1739092725; c=relaxed/simple;
+	bh=vjCPsWJBW4bnvJy3NHHAn0qFkUsqMrC7lQpMmcO7Qf0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aH/k7RKCikat0ddLCI8r6l5xKv3m13y3e1OouAyeQX7/vhIK5IEhwAzAECjHR2tz5ekfuapyH7Z7Ol32BurrE+Wo79wFM2s347LDqYsZ1SsxeG5RmX/BDTHYzYni/gm0apOPspv/dtAYDe6j0dDT3ymIv9jtCPxYS8ZmV1LfXd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=WjyQYCyK; arc=none smtp.client-ip=144.6.53.87
+	 Content-Type:Content-Disposition:In-Reply-To; b=iV7CCHGlmG1FoMLJOWATRQDJ97xEQ6KqF5CLcX1GNpkMGLGfEVz2hHdxZhJ4o1kCO+uFeA3Rc96Se5xoCCo64S+vNxNYsTp/EFSGroTKX6oPtqKiM8JPgUrf7QzsAEz/YIiEIzdmWCnd6RCcw2lc/ucTA+2NPVSjqTFZDqDvhCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=ruEX0hut; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="WjyQYCyK"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="ruEX0hut"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
 	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=c40SNNDrCukYaDzZcrO7o78IDcQK+pnm5tlYNyilnX8=; b=WjyQYCyKsJnpQiNF96keXAsdIA
-	S+GZjoGTGik8ENshKhXeoxxTXTPJsvFbxU6nPhRk8NgXuwE3QeF5wY+kD/7IYddciiBSpf9+Bnm3t
-	AA5R94F1+PcVtU/lxQRnOIvITWc+XUouZsZRyevOAaWxgC3pHHPmQXYWcp9qEG/HhXLOI8n7vg4sr
-	fDm920VI/jQMUP8/8zHoB6Il1Hz3BMn4Q1nGYmykUPGmrQ7KK3iCQR14bQntk9eCKjDadsZeyKwxo
-	3JGEHe+QDEvegIYBii4tDEaZntBAJ+w+rmRL4Lge6o08XrM6YXsV9Lfu1qPIyKTwoWkW4NDWsiMxY
-	CG0RS/TA==;
+	bh=IJ8a6TRoEyvGfhA9iOR3JSTkGUZ58qh8U5Mi9pIl1uc=; b=ruEX0hutnxukaXzBICiv94m0M9
+	w9WtFGQcW5dTBm5sdP8IMRwr0eDmYhsfoEya/Mj1vwcOFEyzw6CHWqGX54ngRq9Rxl+wD3qo9i09H
+	xLgXUXPWyKxgYev67OTMGPpotX75M4DL/H6G0BFMg7Tvc9tMOA4oWVM+U54I3SaTvLcI4fO2dRnXh
+	N+oIikWRfmR1zgdaXtLJ9M7ScPzsRS8wQ9oHRgsAhqiFNzwbyoCVwavfpKiWHemAEZ+PxA4gH/w+H
+	1PYJofEoXKY4cmjzsilPsd06oP/ZgqsE41KGJgoSUy4+w0kRE/fZ+lQFuvCO9Yq7K2DEEYFDBlC7s
+	6n78mhwA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1th3CU-00GI9i-1Z;
-	Sun, 09 Feb 2025 17:15:24 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 09 Feb 2025 17:15:23 +0800
-Date: Sun, 9 Feb 2025 17:15:23 +0800
+	id 1th3Fc-00GID6-0B;
+	Sun, 09 Feb 2025 17:18:37 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 09 Feb 2025 17:18:36 +0800
+Date: Sun, 9 Feb 2025 17:18:36 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Dragan Simic <dsimic@manjaro.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	olivia@selenic.com, didi.debian@cknow.org, heiko@sntech.de
-Subject: Re: [PATCH 3/3] hwrng: Don't default to HW_RANDOM when UML_RANDOM is
- the trigger
-Message-ID: <Z6hyK-nU_mLxw-TN@gondor.apana.org.au>
-References: <cover.1736946020.git.dsimic@manjaro.org>
- <3d3f93bd1f8b9629e48b9ad96099e33069a455c1.1736946020.git.dsimic@manjaro.org>
+To: Markus Theil <theil.markus@gmail.com>
+Cc: linux-crypto@vger.kernel.org, davem@davemloft.net, smueller@chronox.de
+Subject: Re: [PATCH] crypto: jitter - add cmdline oversampling overrides
+Message-ID: <Z6hy7LFoHPffWuWi@gondor.apana.org.au>
+References: <20250127160236.7821-1-theil.markus@gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -51,39 +48,39 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3d3f93bd1f8b9629e48b9ad96099e33069a455c1.1736946020.git.dsimic@manjaro.org>
+In-Reply-To: <20250127160236.7821-1-theil.markus@gmail.com>
 
-On Wed, Jan 15, 2025 at 02:07:02PM +0100, Dragan Simic wrote:
-> Since the commit 72d3e093afae (um: random: Register random as hwrng-core
-> device), selecting the UML_RANDOM option may result in various HW_RANDOM_*
-> options becoming selected as well, which doesn't make much sense for UML
-> that obviously cannot use any of those HWRNG devices.
+On Mon, Jan 27, 2025 at 05:02:36PM +0100, Markus Theil wrote:
+> As already mentioned in the comments, using a cryptographic
+> hash function, like SHA3-256, decreases the expected entropy
+> due to properties of random mappings (collisions and unused values).
 > 
-> Let's have the HW_RANDOM_* options selected by default only when UML_RANDOM
-> actually isn't already selected.  With that in place, selecting UML_RANDOM
-> no longer "triggers" the selection of various HW_RANDOM_* options.
+> When mapping 256 bit of entropy to 256 output bits, this results
+> in roughly 6 bit entropy loss (depending on the estimate formula
+> for mapping 256 bit to 256 bit via a random mapping):
 > 
-> Fixes: 72d3e093afae (um: random: Register random as hwrng-core device)
-> Reported-by: Diederik de Haas <didi.debian@cknow.org>
-> Signed-off-by: Dragan Simic <dsimic@manjaro.org>
+> NIST approximation (count all input bits as input): 255.0
+> NIST approximation (count only entropy bits as input): 251.69 Bit
+> BSI approximation (count only entropy bits as input): 250.11 Bit
+> 
+> Therefore add a cmdline override for the 64 bit oversampling safety margin,
+> This results in an expected entropy of nearly 256 bit also after hashing,
+> when desired.
+> 
+> Only enable this, when you are aware of the increased runtime per
+> iteration.
+> 
+> This override is only possible, when not in FIPS mode (as FIPS mandates
+> this to be true for a full entropy claim).
+> 
+> Signed-off-by: Markus Theil <theil.markus@gmail.com>
 > ---
->  drivers/char/hw_random/Kconfig | 76 +++++++++++++++++-----------------
->  1 file changed, 38 insertions(+), 38 deletions(-)
-> 
-> diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-> index e84c7f431840..283aba711af5 100644
-> --- a/drivers/char/hw_random/Kconfig
-> +++ b/drivers/char/hw_random/Kconfig
-> @@ -38,47 +38,47 @@ config HW_RANDOM_TIMERIOMEM
->  config HW_RANDOM_INTEL
->  	tristate "Intel HW Random Number Generator support"
->  	depends on (X86 || COMPILE_TEST) && PCI
-> -	default HW_RANDOM
-> +	default HW_RANDOM if !UML_RANDOM
+>  crypto/jitterentropy.c | 33 +++++++++++++++++++++++++++------
+>  1 file changed, 27 insertions(+), 6 deletions(-)
 
-This is disgusting.  Just remove all the defaults, and we can
-add back the ones actually needed.  Just remember to set the
-default to something sane like HW_RANDOM && dependencies.
+Why does this need to be a toggle?
+
+Why can't you just make this conditional on fips_enabled?
 
 Cheers,
 -- 
