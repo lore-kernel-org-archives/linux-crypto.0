@@ -1,56 +1,39 @@
-Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBD551BBBEA;
-	Mon, 10 Feb 2025 09:24:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.18.73.165
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FAA11C5D4A
+	for <linux-crypto@vger.kernel.org>; Mon, 10 Feb 2025 10:05:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739179470; cv=none; b=orB8Fnrur7VV2nsS4jYqJd7Ka1AgIkjy6uFEcEN/YVM8N1bk4OVbQyxVESvi/VdJvBlqhOj7bddq+rR29rdnfCgrp7bH2W0sUBINF22Yme2Tk2gdlBCJM4ND3L1GVJMGH0w28qITjD1A7PiboecXCldhLohfRN762sx0yEQ37n4=
+	t=1739181927; cv=none; b=fxXMY1Yh6CMspwjg3/c7Snkde6rWfuxGqHaEI9Ap6UvTXjUFI7TOG+PJ1MUCUzch22uyqpN0lRKWa11xGNc8HYTt9rfFk4DyjHRQUWURYMYnTPUvg3ilcAIp8VvhnPLuFeoCwTfVlG0HeX7IVjNxylDxhcV04xRBiEsyn42VziA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739179470; c=relaxed/simple;
-	bh=DSLcEZITRPL62T9rigCQskjKO0Hvwus0+e1uc/TnvEg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=con00DUrnhxZFBjNi+LVJyJ0WXblqaV2yV7tP2Uj1yVjXnySOnWU+RMEeGg493G4EkqR7f+7m04DptuL9DjqcdqIarnDD3r5mBbHJxjl9zoDyDn677exa5ruCRdFZD8VPHrols6Mh+uKMsxfXa40i4xvez7CZHMRgoUsAjbzF+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=ut+ANQFZ; arc=none smtp.client-ip=37.18.73.165
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
+	s=arc-20240116; t=1739181927; c=relaxed/simple;
+	bh=/GXtnNgBhVaK9si1n2wfXRE8IjQEsoRgqZ4hA3aAVL4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cI0VetPIvk6ZIdjbD+snp8hPIDPAbArxbNZ5YDNMZooqs2I1LW9E8JhJmUjRW4bySsLhnEeBCQw1AzAadHtL345mjg4nAI6bPZHsRj96cYHPTjgVSAm5lhspzSFHocrkQ13YmHrnXDlkZV5y91m6gcLZFtiC9REFp4t5de7et7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=huSHdnOu; arc=none smtp.client-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="ut+ANQFZ"
-Received: from p-infra-ksmg-sc-msk01.sberdevices.ru (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id CB08B10000C;
-	Mon, 10 Feb 2025 12:14:56 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru CB08B10000C
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
-	s=mail; t=1739178896;
-	bh=DSLcEZITRPL62T9rigCQskjKO0Hvwus0+e1uc/TnvEg=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=ut+ANQFZiByN3Lz+Olhyd4425H90AilO40Ck3WYciKkESk6DoMbCeTRjrFnKQ1QJD
-	 f1yzw6qb65rP44IF+ltAiS460YWv8r6jgfwgKZ0ODUq/xPwOemUpWZHOdIrjPYvqQx
-	 Qii4zaTC/12leKEAsVVe/vhqeDJeaitjQRu+prfxkDCvnLc6lx8rJteTPKKnqqr45z
-	 bfAlJzla9QmZI5za1mR5a5IrmhX+a+UErDgJSMbS30mb25aqv0Y2Y7DIDzCHgQysub
-	 0jf343yxfh71zA2SZJdb0AoLa8at7ImyGnfW54q0ir8AzWfMNDzrCn8+Df9cg3Mu5Q
-	 31Zxvjrm5cCXg==
-Received: from smtp.sberdevices.ru (p-exch-cas-a-m1.sberdevices.ru [172.24.201.216])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Mon, 10 Feb 2025 12:14:56 +0300 (MSK)
-From: Alexey Romanov <avromanov@salutedevices.com>
-To: <herbert@gondor.apana.org.au>
-CC: <avromanov@salutedevices.com>, <clabbe@baylibre.com>,
-	<conor+dt@kernel.org>, <davem@davemloft.net>, <devicetree@vger.kernel.org>,
-	<jbrunet@baylibre.com>, <kernel@salutedevices.com>, <khilman@baylibre.com>,
-	<krzk+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
-	<linux-amlogic@lists.infradead.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<martin.blumenstingl@googlemail.com>, <neil.armstrong@linaro.org>,
-	<robh+dt@kernel.org>, <vadim.fedorenko@linux.dev>
-Subject: [PATCH v11 00/22] Support more Amlogic SoC families in crypto driver
-Date: Mon, 10 Feb 2025 12:13:13 +0300
-Message-ID: <20250210091313.15190-1-avromanov@salutedevices.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <Z2aokzSrAHpJE_PG@gondor.apana.org.au>
-References: <Z2aokzSrAHpJE_PG@gondor.apana.org.au>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="huSHdnOu"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1739181913;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=/yfZjw6DEKW+KVLwMtE/ioFVCrDSjPMT5tt7y5+KtVs=;
+	b=huSHdnOueFx28IvLMOKd8lBxBePdyz/7trxJSiHfqEBTytR+VZDFyj3N5Abx7VXfk/1v3n
+	ft0pPMklYm5+9iuAzTt/4nA68bv6hgkVBVBB2eLVPewfhAFr2FWW3TUXIkIQzGK1G/TQRz
+	saHAOckNebKxzoflikj83W/9U6KNRy4=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: ahash - use str_yes_no() helper in crypto_ahash_show()
+Date: Mon, 10 Feb 2025 11:04:48 +0100
+Message-ID: <20250210100449.1197-1-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -58,25 +41,38 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: p-i-exch-a-m2.sberdevices.ru (172.24.196.120) To
- p-exch-cas-a-m1.sberdevices.ru (172.24.201.216)
-X-KSMG-Rule-ID: 1
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Lua-Profiles: 190896 [Feb 10 2025]
-X-KSMG-AntiSpam-Version: 6.1.1.7
-X-KSMG-AntiSpam-Envelope-From: avromanov@salutedevices.com
-X-KSMG-AntiSpam-Rate: 0
-X-KSMG-AntiSpam-Status: not_detected
-X-KSMG-AntiSpam-Method: none
-X-KSMG-AntiSpam-Auth: dkim=none
-X-KSMG-AntiSpam-Info: LuaCore: 50 0.3.50 df4aeb250ed63fd3baa80a493fa6caee5dd9e10f, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;salutedevices.com:7.1.1;127.0.0.199:7.1.2;smtp.sberdevices.ru:7.1.1,5.0.1, FromAlignment: s
-X-MS-Exchange-Organization-SCL: -1
-X-KSMG-AntiSpam-Interceptor-Info: scan successful
-X-KSMG-AntiPhishing: Clean
-X-KSMG-LinksScanning: Clean
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2025/02/10 05:33:00 #27152708
-X-KSMG-AntiVirus-Status: Clean, skipped
+X-Migadu-Flow: FLOW_OUT
 
-Hello guys!
-Gently reminder.
+Remove hard-coded strings by using the str_yes_no() helper function.
+
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+---
+ crypto/ahash.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/crypto/ahash.c b/crypto/ahash.c
+index b08b89ec26ec..923c68a39ddd 100644
+--- a/crypto/ahash.c
++++ b/crypto/ahash.c
+@@ -21,6 +21,7 @@
+ #include <linux/slab.h>
+ #include <linux/seq_file.h>
+ #include <linux/string.h>
++#include <linux/string_choices.h>
+ #include <net/netlink.h>
+ 
+ #include "hash.h"
+@@ -536,8 +537,8 @@ static void crypto_ahash_show(struct seq_file *m, struct crypto_alg *alg)
+ static void crypto_ahash_show(struct seq_file *m, struct crypto_alg *alg)
+ {
+ 	seq_printf(m, "type         : ahash\n");
+-	seq_printf(m, "async        : %s\n", alg->cra_flags & CRYPTO_ALG_ASYNC ?
+-					     "yes" : "no");
++	seq_printf(m, "async        : %s\n",
++		   str_yes_no(alg->cra_flags & CRYPTO_ALG_ASYNC));
+ 	seq_printf(m, "blocksize    : %u\n", alg->cra_blocksize);
+ 	seq_printf(m, "digestsize   : %u\n",
+ 		   __crypto_hash_alg_common(alg)->digestsize);
+-- 
+2.48.0
+
