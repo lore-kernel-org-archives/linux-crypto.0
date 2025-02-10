@@ -1,55 +1,51 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 238D81BBBE5;
-	Mon, 10 Feb 2025 07:55:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA2291BBBC6;
+	Mon, 10 Feb 2025 07:57:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739174112; cv=none; b=pD8Jz99ZceZwgE7knr5eIVjnsBuKvD4zqcIIBieyaA1WEo4OnaBTOzylDNr0n90USbFl1U5mcjKAsfGwSTf6oiASn8p2AI38witlbsoBO/BzW/sV7F5z8uJpGQai3lk9JuW17iZ+TRLqtoe9s7nU8ce2deosFib0tIdL0HfHT8c=
+	t=1739174259; cv=none; b=pJGknZPnSfu8si0B/TeGSWV2SmvbM9ViH5r9zn3L3z0gRIw839v7smgip1vsW7dDjQ+w04jQiSFm0+bMs1FudGt1qmO5JLfYDFxXv4lFQ6DuCbBdMcLsf0FtEab/u68IyJ3fWe8DWf66PJcDfgMs1TpzE4ZuuBaDFyxvmPBjsy8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739174112; c=relaxed/simple;
-	bh=+yH1+/vfua0kb36HoGky/YL7GDTdPlx9P92pxcH8WZM=;
+	s=arc-20240116; t=1739174259; c=relaxed/simple;
+	bh=6ETEw5H8ZqzQ0B+FIB+Exlg/agVeevaj2YaJliPyEL8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cMc94t7+QOTUBMfa1Uh+hdAH/R+oacEvmygty+K66MWelGBssdGfYm+fNUWUMr55rFVQUrlXuGL3TK9uyn8V/Gcy+rXCGc8iqmlVhSs7xxCd4kHcgtNYYLnBnRpRWD/UNG+CO6EmUWBTa/pHMbTe47Rr/Yh2SQwhk0aK6G/ud2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=axz2LlYX; arc=none smtp.client-ip=144.6.53.87
+	 Content-Type:Content-Disposition:In-Reply-To; b=mapEaNsrVT17GcVCRvuw51Nu0ll3ibDcC9E5rLm6o1grNkyILWbzoLnSQvG27zBaDQd8LeGQpZTEKswYpSY9vNYfZz/eaMCtr9rYgdsAQNG4DuI+uicpf4KfqqavuBmjF4mjB3LF9xydv7e0wy0TWnteK2rN9z+YGGUhd7xZSTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=HFGN6Xoy; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="axz2LlYX"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="HFGN6Xoy"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
 	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=Exdjmonj6GK2zeEbY00Q7n//w+UT1eEbVIkBvF29tHM=; b=axz2LlYXnNo/cSiE+jX4BNynyG
-	aAsl+QFMe/xPo5snnamjApb8+d14yXzABQ2XJubygwD8QTwWmm/A6Vg4dl2bq0sk3TyiidNT1az/K
-	4AZKYcU24xlJUdpBe9fLrsf1LlSoadiZ5s7VH1ULrFebtJ9GVoCXvCnK52zNvZWcnr8hjjvEh/omZ
-	t4IHiT51SsAvzcezLIDUsIFW/muZbbeWdCHUypiTNpUCp3R/w4qWJAWUQCqWw5Bp9IKHOnkBmknh7
-	x6WVZChtwyRzMDtPVtHZZiZPSF1nYooOf73B+lNZEW03Zqv/U4B/kVTlimISWGgMShQBa4XLhvc9u
-	frxKvZgg==;
+	bh=j/HMFOGnESrooOt4kbIgEotWXCCpINQo9WsZPNP1PYE=; b=HFGN6XoygPH/6jlzf6c6TjvaBw
+	RgEqDZ8q0dU720z+Zdv6fU02KDx8S3nVmnLxFUQU6Qe7KPWXxNus9pMYXh/t+FZG/2G6rrUBO15rC
+	rQbuFMSMDxqrhxxKpiT4Cpkx60i6qznNgpToLwqI3r+CEU96i/THzIJGmbr4Tt4bMNiGSbQ2Qtl7M
+	9bXzJH72AgjBB96OTdLU3DuWlHDZZSK0vNx637ne6TnWEj1xK+tBm2ERN/Njxr7n5/f/O302yaz/g
+	g2m5Gb3GIknQzr/zOqQ+kMDf0e4hjCjHimBn+xuqxCJFijRpLBGccqbU5SfXqp2b9XNo6NuVL7Xj+
+	Wq7wH6hg==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1thOQ1-00Gcm7-0a;
-	Mon, 10 Feb 2025 15:54:47 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 10 Feb 2025 15:54:45 +0800
-Date: Mon, 10 Feb 2025 15:54:45 +0800
+	id 1thOSc-00Gcs7-2l;
+	Mon, 10 Feb 2025 15:57:28 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 10 Feb 2025 15:57:27 +0800
+Date: Mon, 10 Feb 2025 15:57:27 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Lukas Wunner <lukas@wunner.de>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Stefan Berger <stefanb@linux.ibm.com>,
-	Vitaly Chikunov <vt@altlinux.org>,
-	David Howells <dhowells@redhat.com>,
-	Ignat Korchagin <ignat@cloudflare.com>,
-	linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
-	Eric Biggers <ebiggers@google.com>
-Subject: Re: [PATCH v2 3/4] crypto: ecdsa - Fix enc/dec size reported by
- KEYCTL_PKEY_QUERY
-Message-ID: <Z6mwxUaS33EastB3@gondor.apana.org.au>
-References: <cover.1738521533.git.lukas@wunner.de>
- <3d74d6134f4f87a90ebe0a37cb06c6ec144ceef7.1738521533.git.lukas@wunner.de>
- <Z6h8L0D-CBhZUiVR@gondor.apana.org.au>
- <Z6iRssS26IOjWbfx@wunner.de>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Harald Freudenberger <freude@linux.ibm.com>, davem@davemloft.net,
+	dengler@linux.ibm.com, linux-s390@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v10 2/5] s390/crypto: New s390 specific protected key
+ hash phmac
+Message-ID: <Z6mxZ8lfO6zzD7x0@gondor.apana.org.au>
+References: <20250115162231.83516-1-freude@linux.ibm.com>
+ <20250115162231.83516-3-freude@linux.ibm.com>
+ <Z6hrvQzb5G_wqlni@gondor.apana.org.au>
+ <20250209163430.GB1230@sol.localdomain>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -58,22 +54,23 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z6iRssS26IOjWbfx@wunner.de>
+In-Reply-To: <20250209163430.GB1230@sol.localdomain>
 
-On Sun, Feb 09, 2025 at 12:29:54PM +0100, Lukas Wunner wrote:
+On Sun, Feb 09, 2025 at 08:34:30AM -0800, Eric Biggers wrote:
 >
-> One user of this API is the Embedded Linux Library, which in turn
-> is used by Intel Wireless Daemon:
-> 
-> https://git.kernel.org/pub/scm/libs/ell/ell.git/tree/ell/key.c
-> https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/src/eap-tls.c
+> Or just make it synchronous which would be way easier, and the calling code uses
+> it synchronously anyway.
 
-Surely this doesn't use the private key part of the API, does it?
+Note that synchronous in general does not make the problem go away.
+The important thing here is to give congestion feedback in the form
+of EBUSY which tells the user to stop generating more data until a
+callback is made.
 
-While I intensely dislike the entire API being there, it's only the
-private key part that I really want to remove.
+While synchronous can be a form of congestion control by requiring
+an extra thread for each waiting request, it doesn't really give
+that feedback to the upper level.
 
-Thanks,
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
