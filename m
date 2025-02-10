@@ -1,103 +1,82 @@
-Received: from mslow3.mail.gandi.net (mslow3.mail.gandi.net [217.70.178.249])
+Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D688D1E4A9;
-	Mon, 10 Feb 2025 08:45:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBD551BBBEA;
+	Mon, 10 Feb 2025 09:24:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.18.73.165
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739177133; cv=none; b=WOSzAmx+FdNbRKt8aJs0afrTV92+8PpLO0p8fdnsZX9fKbG1yDqRpwGTzxVop1+tkfd05oCXi97GhBZ2PlrAm6rB0RNFJv/eWAU0Dz1ZT0nue0wJVYSCID8+U20mr7skaFUcpNpuCAut5gqzamqJ+qBHtYOBmMNOqD7qa5WhUX4=
+	t=1739179470; cv=none; b=orB8Fnrur7VV2nsS4jYqJd7Ka1AgIkjy6uFEcEN/YVM8N1bk4OVbQyxVESvi/VdJvBlqhOj7bddq+rR29rdnfCgrp7bH2W0sUBINF22Yme2Tk2gdlBCJM4ND3L1GVJMGH0w28qITjD1A7PiboecXCldhLohfRN762sx0yEQ37n4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739177133; c=relaxed/simple;
-	bh=8e9TvzMvnN655dD9mW3ziQ4pedVgVTCtFygXZeQGWbI=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=KyxgRLA/Ci3epCkfPiSGZZ3uXWW52YyNBuEfnc4EqMpXVobiGuEXG9r+99AVQV8RfEiCWqv9SkE3filo8TaDep31yyI9TBqHIWkb3ryNdvPDQlotWHJ0ordISoiYT1hX5hWztS3Mc41vKOmV+k1Hbj6AwKx5sBEshAjEgB2Ac5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ZY02NguF; arc=none smtp.client-ip=217.70.178.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+	s=arc-20240116; t=1739179470; c=relaxed/simple;
+	bh=DSLcEZITRPL62T9rigCQskjKO0Hvwus0+e1uc/TnvEg=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=con00DUrnhxZFBjNi+LVJyJ0WXblqaV2yV7tP2Uj1yVjXnySOnWU+RMEeGg493G4EkqR7f+7m04DptuL9DjqcdqIarnDD3r5mBbHJxjl9zoDyDn677exa5ruCRdFZD8VPHrols6Mh+uKMsxfXa40i4xvez7CZHMRgoUsAjbzF+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=ut+ANQFZ; arc=none smtp.client-ip=37.18.73.165
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ZY02NguF"
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::227])
-	by mslow3.mail.gandi.net (Postfix) with ESMTP id 55A93582BA6;
-	Mon, 10 Feb 2025 08:27:35 +0000 (UTC)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 6E7EC441F0;
-	Mon, 10 Feb 2025 08:27:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1739176047;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8e9TvzMvnN655dD9mW3ziQ4pedVgVTCtFygXZeQGWbI=;
-	b=ZY02NguFvp2D4ou3No/QCzpfSTJ/vEq/6qT+XJ/nvm4ksYAK39lFMb0mQgDBqM0QIBRl1F
-	8lQkkIF/mc8rfl0l4flqx4G6JMtztvl8iq4f4mpGpYsw9F+0rmgop6/sp/OOfQsixdP9Hn
-	F5EBu6cuuY9MfhzpBOyfm3OiCFVmX2cf9gRlizM56NuNZNK60icbcTT+3/d+T/Unba6ad9
-	nIAJD/b54HfwpeWm89ATdYeoXB7ZO5w+IHsHy0eoz3L543OybW2v5YkqjOB1Y1pInLZonw
-	gvl82hS9MNgYZaE0ZItYKARh4AqYqBh+HH0IcpFf14eU4/gDM4YqjQJ7ekjhow==
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: J. =?utf-8?Q?Neusch=C3=A4fer?= via B4 Relay
- <devnull+j.ne.posteo.net@kernel.org>
-Cc: devicetree@vger.kernel.org,  linuxppc-dev@lists.ozlabs.org,  Krzysztof
- Kozlowski <krzk@kernel.org>,  j.ne@posteo.net,  imx@lists.linux.dev,
-  Scott Wood <oss@buserror.net>,  Madhavan Srinivasan
- <maddy@linux.ibm.com>,  Michael Ellerman <mpe@ellerman.id.au>,  Nicholas
- Piggin <npiggin@gmail.com>,  Christophe Leroy
- <christophe.leroy@csgroup.eu>,  Naveen N Rao <naveen@kernel.org>,  Rob
- Herring <robh@kernel.org>,  Krzysztof Kozlowski <krzk+dt@kernel.org>,
-  Conor Dooley <conor+dt@kernel.org>,  Damien Le Moal <dlemoal@kernel.org>,
-  Niklas Cassel <cassel@kernel.org>,  Herbert Xu
- <herbert@gondor.apana.org.au>,  "David S. Miller" <davem@davemloft.net>,
-  Lee Jones <lee@kernel.org>,  Vinod Koul <vkoul@kernel.org>,  Lorenzo
- Pieralisi <lpieralisi@kernel.org>,  Krzysztof =?utf-8?Q?Wilczy=C5=84ski?=
- <kw@linux.com>,
-  Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,  Bjorn Helgaas
- <bhelgaas@google.com>,  J. =?utf-8?Q?Neusch=C3=A4fer?=
- <j.neuschaefer@gmx.net>,  Wim Van
- Sebroeck <wim@linux-watchdog.org>,  Guenter Roeck <linux@roeck-us.net>,
-  Mark Brown <broonie@kernel.org>,  Richard Weinberger <richard@nod.at>,
-  Vignesh Raghavendra <vigneshr@ti.com>,  linux-kernel@vger.kernel.org,
-  linux-ide@vger.kernel.org,  linux-crypto@vger.kernel.org,
-  dmaengine@vger.kernel.org,  linux-pci@vger.kernel.org,
-  linux-watchdog@vger.kernel.org,  linux-spi@vger.kernel.org,
-  linux-mtd@lists.infradead.org
-Subject: Re: [PATCH v2 12/12] dt-bindings: mtd: raw-nand-chip: Relax node
- name pattern
-In-Reply-To: <20250207-ppcyaml-v2-12-8137b0c42526@posteo.net> ("J.
- =?utf-8?Q?Neusch=C3=A4fer?=
-	via B4 Relay"'s message of "Fri, 07 Feb 2025 22:30:29 +0100")
-References: <20250207-ppcyaml-v2-0-8137b0c42526@posteo.net>
-	<20250207-ppcyaml-v2-12-8137b0c42526@posteo.net>
-User-Agent: mu4e 1.12.7; emacs 29.4
-Date: Mon, 10 Feb 2025 09:27:22 +0100
-Message-ID: <87o6zaurv9.fsf@bootlin.com>
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="ut+ANQFZ"
+Received: from p-infra-ksmg-sc-msk01.sberdevices.ru (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id CB08B10000C;
+	Mon, 10 Feb 2025 12:14:56 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru CB08B10000C
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1739178896;
+	bh=DSLcEZITRPL62T9rigCQskjKO0Hvwus0+e1uc/TnvEg=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
+	b=ut+ANQFZiByN3Lz+Olhyd4425H90AilO40Ck3WYciKkESk6DoMbCeTRjrFnKQ1QJD
+	 f1yzw6qb65rP44IF+ltAiS460YWv8r6jgfwgKZ0ODUq/xPwOemUpWZHOdIrjPYvqQx
+	 Qii4zaTC/12leKEAsVVe/vhqeDJeaitjQRu+prfxkDCvnLc6lx8rJteTPKKnqqr45z
+	 bfAlJzla9QmZI5za1mR5a5IrmhX+a+UErDgJSMbS30mb25aqv0Y2Y7DIDzCHgQysub
+	 0jf343yxfh71zA2SZJdb0AoLa8at7ImyGnfW54q0ir8AzWfMNDzrCn8+Df9cg3Mu5Q
+	 31Zxvjrm5cCXg==
+Received: from smtp.sberdevices.ru (p-exch-cas-a-m1.sberdevices.ru [172.24.201.216])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Mon, 10 Feb 2025 12:14:56 +0300 (MSK)
+From: Alexey Romanov <avromanov@salutedevices.com>
+To: <herbert@gondor.apana.org.au>
+CC: <avromanov@salutedevices.com>, <clabbe@baylibre.com>,
+	<conor+dt@kernel.org>, <davem@davemloft.net>, <devicetree@vger.kernel.org>,
+	<jbrunet@baylibre.com>, <kernel@salutedevices.com>, <khilman@baylibre.com>,
+	<krzk+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
+	<linux-amlogic@lists.infradead.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<martin.blumenstingl@googlemail.com>, <neil.armstrong@linaro.org>,
+	<robh+dt@kernel.org>, <vadim.fedorenko@linux.dev>
+Subject: [PATCH v11 00/22] Support more Amlogic SoC families in crypto driver
+Date: Mon, 10 Feb 2025 12:13:13 +0300
+Message-ID: <20250210091313.15190-1-avromanov@salutedevices.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <Z2aokzSrAHpJE_PG@gondor.apana.org.au>
+References: <Z2aokzSrAHpJE_PG@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdefjeehkecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvefujghffgffkfggtgfgsehtqhertddtreejnecuhfhrohhmpefoihhquhgvlhcutfgrhihnrghluceomhhiqhhuvghlrdhrrgihnhgrlhessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepffeghfejtdefieeguddukedujeektdeihfelleeuieeuveehkedvleduheeivdefnecukfhppeelvddrudekgedrleekrdekgeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeelvddrudekgedrleekrdekgedphhgvlhhopehlohgtrghlhhhoshhtpdhmrghilhhfrhhomhepmhhiqhhuvghlrdhrrgihnhgrlhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepfeelpdhrtghpthhtohepuggvvhhnuhhllhdojhdrnhgvrdhpohhsthgvohdrnhgvtheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggvvhhitggvthhrvggvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugihpphgtqdguvghvsehlihhsthhsrdhoiihlrggsshdrohhrghdprhgtphhtthhopehkrhiikheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepjhdrnhgvsehpohhst
- hgvohdrnhgvthdprhgtphhtthhopehimhigsehlihhsthhsrdhlihhnuhigrdguvghvpdhrtghpthhtohepohhsshessghushgvrhhrohhrrdhnvghtpdhrtghpthhtohepmhgrugguhieslhhinhhugidrihgsmhdrtghomh
-X-GND-Sasl: miquel.raynal@bootlin.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: p-i-exch-a-m2.sberdevices.ru (172.24.196.120) To
+ p-exch-cas-a-m1.sberdevices.ru (172.24.201.216)
+X-KSMG-Rule-ID: 1
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 190896 [Feb 10 2025]
+X-KSMG-AntiSpam-Version: 6.1.1.7
+X-KSMG-AntiSpam-Envelope-From: avromanov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 50 0.3.50 df4aeb250ed63fd3baa80a493fa6caee5dd9e10f, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;salutedevices.com:7.1.1;127.0.0.199:7.1.2;smtp.sberdevices.ru:7.1.1,5.0.1, FromAlignment: s
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2025/02/10 05:33:00 #27152708
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-Hello,
-
-On 07/02/2025 at 22:30:29 +01, J. Neusch=C3=A4fer via B4 Relay <devnull+j.n=
-e.posteo.net@kernel.org> wrote:
-
-> From: "J. Neusch=C3=A4fer" <j.ne@posteo.net>
->
-> In some scenarios, such as under the Freescale eLBC bus, there are raw
-> NAND chips with a unit address that has a comma in it (cs,offset).
-> Relax the $nodename pattern in raw-nand-chip.yaml to allow such unit
-> addresses.
-
-This is super specific to this controller, I'd rather avoid that in the
-main (shared) files. I believe you can force another node name in the
-controller's binding instead?
-
-Thanks,
-Miqu=C3=A8l
+Hello guys!
+Gently reminder.
