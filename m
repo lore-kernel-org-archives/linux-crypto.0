@@ -1,31 +1,31 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65258257447;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9E96257456;
 	Mon, 10 Feb 2025 17:46:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739209562; cv=none; b=PeBoU1I0Xt0FXLj7/ZCPbTKqY8SaWGB5m8TcaKdXIkwd1O8IFc6CLLnVbbFtNqk1bQcBEGclAGm1EePEYMay9JONgiCfcnyT3jlRePUFfI8sL2MoIqicmv/o4qDZn8FlbKe7NFPc2QL6IOElG26CfE38ODYX4fDXhPdtqn/cGWU=
+	t=1739209562; cv=none; b=FeBq0HWR/afBNejmYsVE94r26ZDXKRJ/UBaIlCVYoM+9Y97OHdpdbfV2YKj08SUpvAj1MIhcKb3eu/siNt05AkXpd5Zid7x8z1zv37FVUW/iRXgGdYVj1vu4bDh2WHQhcoolgpwDAMVU+q9KkRUOUtNGX3FKeeqJvRQluFYoYHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1739209562; c=relaxed/simple;
-	bh=z6ns6SX6BDsF5o1+GGTCw/veJyquTQ8/c83+1op292c=;
+	bh=F4V82h98SHCOKzxf3nBrpwV7MPYF4gyLV1ygLyE8b+w=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WUJxKZwp0prXhTyx14fh6fWiEX55YBtJscvq6BNJooobrTGhKI6Qcd/kjt5G8fYbh02oQfjLd+LVUaaioOXkcCiRVVqiw7EgPDPkb1sO/BgdWrhmy6H55ALePBvOAT/bMrtVOxHLWiBw5p6USKeBcn/oZhspY+dmBrlHZcIEGVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vi1Qsxml; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=IY0IMapNm2taHVr/Haiu2GUqe/B7Biou4JY42fwFIcq5MgIaXQ7ZMg+TxLv/kolIitdlnu1g+P6FKSnHg+mwx3MIrszOhc/0oFyA0CL8gw70GqDBnmd83m6euI+4Ta776ysXh6Sd9n7L1MyUK+jOWMclnJVYBKR0bsaEq7w7Xcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R5UCLQ+p; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vi1Qsxml"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93E22C4CEEB;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R5UCLQ+p"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05032C4CEE7;
 	Mon, 10 Feb 2025 17:46:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739209561;
-	bh=z6ns6SX6BDsF5o1+GGTCw/veJyquTQ8/c83+1op292c=;
+	s=k20201202; t=1739209562;
+	bh=F4V82h98SHCOKzxf3nBrpwV7MPYF4gyLV1ygLyE8b+w=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Vi1QsxmlTU6i05pT+BrOk/MLndnwHqGXbRAj4I62LjnUgSdXzs3/Ehs7tUDKpPHyS
-	 J4HqZ+UaHIH84Q46MpSW3n48FdYYKD0FIgpDSYFwRMnt/jziq8PhkbWrxA61W9pPB2
-	 3TJ5nHRmuRJOyaMcqQL3Mi3DwSDtziIIiQpNLcP1g34b5ZlBU8cFDIwztWFoHRSlkM
-	 jayDwnXx0p8GKTysXfLDxVPWEiDkCYsPaPv2MQ/JpnzlnDr9zWHZMG86SHxta0LMT8
-	 mDPwSDAG7ILrG7642BBGGdyeVpdzCLqI85q1s5Pti6AIBJeCq7tMcwi8Sy0gqwNDwt
-	 CELEtZaGqx1lQ==
+	b=R5UCLQ+puGZaD6dtGGZf6eD0vpXXfDYk3kc9equrs5pMkBGT4MVAMmtpXpo/VYrys
+	 lQ6hdCYq2/peAC3NaQR65v6OyKSE7LiTn/QKZpvpWuZ0dQVC8UXZ37ZFSvWhy/GiKY
+	 Jr6/8hsEBwhdoxYYN46dDeTDTSrezN8rxd5gNnb8+PPxawDMN/v0+obfLFBi4Y/3Z8
+	 SokwXWPBTMTQwFbW/WY1umnIgvR2Hpy/NeV9fBlZLnCYS2+C74pUy5tp8ENvhPX+KW
+	 Pq2BHxIK3iEh+7V5ttsUepFcvq6PyOfNngHhaYR7vrd9XfAbIW/MOkosxcvj2aEcG3
+	 YcW9zL0p6iHKg==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: linux-crypto@vger.kernel.org,
@@ -35,9 +35,9 @@ Cc: linux-crypto@vger.kernel.org,
 	Keith Busch <kbusch@kernel.org>,
 	Kent Overstreet <kent.overstreet@linux.dev>,
 	"Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: [PATCH v4 3/6] x86/crc: add "template" for [V]PCLMULQDQ based CRC functions
-Date: Mon, 10 Feb 2025 09:45:37 -0800
-Message-ID: <20250210174540.161705-4-ebiggers@kernel.org>
+Subject: [PATCH v4 4/6] x86/crc32: implement crc32_le using new template
+Date: Mon, 10 Feb 2025 09:45:38 -0800
+Message-ID: <20250210174540.161705-5-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250210174540.161705-1-ebiggers@kernel.org>
 References: <20250210174540.161705-1-ebiggers@kernel.org>
@@ -51,734 +51,404 @@ Content-Transfer-Encoding: 8bit
 
 From: Eric Biggers <ebiggers@google.com>
 
-The Linux kernel implements many variants of CRC, such as crc16,
-crc_t10dif, crc32_le, crc32c, crc32_be, crc64_nvme, and crc64_be.  On
-x86, except for crc32c which has special scalar instructions, the
-fastest way to compute any of these CRCs on any message of length
-roughly >= 16 bytes is to use the SIMD carryless multiplication
-instructions PCLMULQDQ or VPCLMULQDQ.  Depending on the available CPU
-features this can mean PCLMULQDQ+SSE4.1, VPCLMULQDQ+AVX2,
-VPCLMULQDQ+AVX10/256, or VPCLMULQDQ+AVX10/512 (or the AVX512 equivalents
-to AVX10/*).  This results in a total of 20+ CRC implementations being
-potentially needed to properly optimize all CRCs that someone cares
-about for x86.  Besides crc32c, currently only crc32_le and crc_t10dif
-are actually optimized for x86, and they only use PCLMULQDQ, which means
-they can be 2-4x slower than what is possible with VPCLMULQDQ.
+Instantiate crc-pclmul-template.S for crc32_le, and delete the original
+PCLMULQDQ optimized implementation.  This has the following advantages:
 
-Fortunately, at a high level the code that is needed for any
-[V]PCLMULQDQ based CRC implementation is mostly the same.  Therefore,
-this patch introduces an assembly macro that expands into the body of a
-[V]PCLMULQDQ based CRC function for a given number of bits (8, 16, 32,
-or 64), bit order (lsb or msb-first), vector length, and AVX level.
+- Less CRC-variant-specific code.
+- VPCLMULQDQ support, greatly improving performance on sufficiently long
+  messages on newer CPUs.
+- A faster reduction from 128 bits to the final CRC.
+- Support for lengths not a multiple of 16 bytes, improving performance
+  for such lengths.
+- Support for misaligned buffers, improving performance in such cases.
 
-The function expects to be passed a constants table, specific to the
-polynomial desired, that was generated by the script previously added.
-When two CRC variants share the same number of bits and bit order, the
-same functions can be reused, with only the constants table differing.
+Benchmark results on AMD Ryzen 9 9950X (Zen 5) using crc_kunit:
 
-A new C header is also added to make it easy to integrate the new
-assembly code using a static call.
-
-The result is that it becomes straightforward to wire up an optimized
-implementation of any CRC-8, CRC-16, CRC-32, or CRC-64 for x86.  Later
-patches will wire up specific CRC variants.
-
-Although this new template allows easily generating many functions, care
-was taken to still keep the binary size fairly low.  Each generated
-function is only 550 to 850 bytes depending on the CRC variant and
-target CPU features.  And only one function per CRC variant is actually
-used at runtime (since all functions support all lengths >= 16 bytes).
-
-Note that a similar approach should also work for other architectures
-that have carryless multiplication instructions, such as arm64.
+	Length     Before        After
+	------     ------        -----
+	     1     427 MB/s      605 MB/s
+	    16     710 MB/s     3631 MB/s
+	    64     704 MB/s     7615 MB/s
+	   127    3610 MB/s     9710 MB/s
+	   128    8759 MB/s    12702 MB/s
+	   200    7083 MB/s    15343 MB/s
+	   256   17284 MB/s    22904 MB/s
+	   511   10919 MB/s    27309 MB/s
+	   512   19849 MB/s    48900 MB/s
+	  1024   21216 MB/s    62630 MB/s
+	  3173   22150 MB/s    72437 MB/s
+	  4096   22496 MB/s    79593 MB/s
+	 16384   22018 MB/s    85106 MB/s
 
 Acked-by: Ard Biesheuvel <ardb@kernel.org>
 Acked-by: Keith Busch <kbusch@kernel.org>
+Reviewed-by: "Martin K. Petersen" <martin.petersen@oracle.com>
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- arch/x86/lib/crc-pclmul-template.S | 584 +++++++++++++++++++++++++++++
- arch/x86/lib/crc-pclmul-template.h |  81 ++++
- 2 files changed, 665 insertions(+)
- create mode 100644 arch/x86/lib/crc-pclmul-template.S
- create mode 100644 arch/x86/lib/crc-pclmul-template.h
+ arch/x86/lib/crc-pclmul-consts.h |  53 ++++++++
+ arch/x86/lib/crc32-glue.c        |  37 ++----
+ arch/x86/lib/crc32-pclmul.S      | 219 +------------------------------
+ 3 files changed, 65 insertions(+), 244 deletions(-)
+ create mode 100644 arch/x86/lib/crc-pclmul-consts.h
 
-diff --git a/arch/x86/lib/crc-pclmul-template.S b/arch/x86/lib/crc-pclmul-template.S
+diff --git a/arch/x86/lib/crc-pclmul-consts.h b/arch/x86/lib/crc-pclmul-consts.h
 new file mode 100644
-index 0000000000000..dc91cc074b300
+index 0000000000000..34fdcb0446b03
 --- /dev/null
-+++ b/arch/x86/lib/crc-pclmul-template.S
-@@ -0,0 +1,584 @@
++++ b/arch/x86/lib/crc-pclmul-consts.h
+@@ -0,0 +1,53 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
-+//
-+// Template to generate [V]PCLMULQDQ-based CRC functions for x86
-+//
++/*
++ * CRC constants generated by:
++ *
++ *	./scripts/gen-crc-consts.py x86_pclmul crc32_lsb_0xedb88320
++ *
++ * Do not edit manually.
++ */
++
++/*
++ * CRC folding constants generated for least-significant-bit-first CRC-32 using
++ * G(x) = x^32 + x^26 + x^23 + x^22 + x^16 + x^12 + x^11 + x^10 + x^8 + x^7 +
++ *        x^5 + x^4 + x^2 + x^1 + x^0
++ */
++static const struct {
++	u64 fold_across_2048_bits_consts[2];
++	u64 fold_across_1024_bits_consts[2];
++	u64 fold_across_512_bits_consts[2];
++	u64 fold_across_256_bits_consts[2];
++	u64 fold_across_128_bits_consts[2];
++	u8 shuf_table[48];
++	u64 barrett_reduction_consts[2];
++} crc32_lsb_0xedb88320_consts ____cacheline_aligned __maybe_unused = {
++	.fold_across_2048_bits_consts = {
++		0x00000000ce3371cb,	/* HI64_TERMS: (x^2079 mod G) * x^32 */
++		0x00000000e95c1271,	/* LO64_TERMS: (x^2015 mod G) * x^32 */
++	},
++	.fold_across_1024_bits_consts = {
++		0x0000000033fff533,	/* HI64_TERMS: (x^1055 mod G) * x^32 */
++		0x00000000910eeec1,	/* LO64_TERMS: (x^991 mod G) * x^32 */
++	},
++	.fold_across_512_bits_consts = {
++		0x000000008f352d95,	/* HI64_TERMS: (x^543 mod G) * x^32 */
++		0x000000001d9513d7,	/* LO64_TERMS: (x^479 mod G) * x^32 */
++	},
++	.fold_across_256_bits_consts = {
++		0x00000000f1da05aa,	/* HI64_TERMS: (x^287 mod G) * x^32 */
++		0x0000000081256527,	/* LO64_TERMS: (x^223 mod G) * x^32 */
++	},
++	.fold_across_128_bits_consts = {
++		0x00000000ae689191,	/* HI64_TERMS: (x^159 mod G) * x^32 */
++		0x00000000ccaa009e,	/* LO64_TERMS: (x^95 mod G) * x^32 */
++	},
++	.shuf_table = {
++		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
++		 0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
++		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
++	},
++	.barrett_reduction_consts = {
++		0xb4e5b025f7011641,	/* HI64_TERMS: floor(x^95 / G) */
++		0x00000001db710640,	/* LO64_TERMS: (G - x^32) * x^31 */
++	},
++};
+diff --git a/arch/x86/lib/crc32-glue.c b/arch/x86/lib/crc32-glue.c
+index 131c305e9ea0d..9c3f9c1b7bb9d 100644
+--- a/arch/x86/lib/crc32-glue.c
++++ b/arch/x86/lib/crc32-glue.c
+@@ -5,47 +5,24 @@
+  * Copyright (C) 2008 Intel Corporation
+  * Copyright 2012 Xyratex Technology Limited
+  * Copyright 2024 Google LLC
+  */
+ 
+-#include <asm/cpufeatures.h>
+-#include <asm/simd.h>
+-#include <crypto/internal/simd.h>
+ #include <linux/crc32.h>
+-#include <linux/linkage.h>
+ #include <linux/module.h>
+-
+-/* minimum size of buffer for crc32_pclmul_le_16 */
+-#define CRC32_PCLMUL_MIN_LEN	64
++#include "crc-pclmul-template.h"
+ 
+ static DEFINE_STATIC_KEY_FALSE(have_crc32);
+ static DEFINE_STATIC_KEY_FALSE(have_pclmulqdq);
+ 
+-u32 crc32_pclmul_le_16(u32 crc, const u8 *buffer, size_t len);
++DECLARE_CRC_PCLMUL_FUNCS(crc32_lsb, u32);
+ 
+ u32 crc32_le_arch(u32 crc, const u8 *p, size_t len)
+ {
+-	if (len >= CRC32_PCLMUL_MIN_LEN + 15 &&
+-	    static_branch_likely(&have_pclmulqdq) && crypto_simd_usable()) {
+-		size_t n = -(uintptr_t)p & 15;
+-
+-		/* align p to 16-byte boundary */
+-		if (n) {
+-			crc = crc32_le_base(crc, p, n);
+-			p += n;
+-			len -= n;
+-		}
+-		n = round_down(len, 16);
+-		kernel_fpu_begin();
+-		crc = crc32_pclmul_le_16(crc, p, n);
+-		kernel_fpu_end();
+-		p += n;
+-		len -= n;
+-	}
+-	if (len)
+-		crc = crc32_le_base(crc, p, len);
+-	return crc;
++	CRC_PCLMUL(crc, p, len, crc32_lsb, crc32_lsb_0xedb88320_consts,
++		   have_pclmulqdq);
++	return crc32_le_base(crc, p, len);
+ }
+ EXPORT_SYMBOL(crc32_le_arch);
+ 
+ #ifdef CONFIG_X86_64
+ #define CRC32_INST "crc32q %1, %q0"
+@@ -95,12 +72,14 @@ EXPORT_SYMBOL(crc32_be_arch);
+ 
+ static int __init crc32_x86_init(void)
+ {
+ 	if (boot_cpu_has(X86_FEATURE_XMM4_2))
+ 		static_branch_enable(&have_crc32);
+-	if (boot_cpu_has(X86_FEATURE_PCLMULQDQ))
++	if (boot_cpu_has(X86_FEATURE_PCLMULQDQ)) {
+ 		static_branch_enable(&have_pclmulqdq);
++		INIT_CRC_PCLMUL(crc32_lsb);
++	}
+ 	return 0;
+ }
+ arch_initcall(crc32_x86_init);
+ 
+ static void __exit crc32_x86_exit(void)
+diff --git a/arch/x86/lib/crc32-pclmul.S b/arch/x86/lib/crc32-pclmul.S
+index f9637789cac19..f20f40fb0172d 100644
+--- a/arch/x86/lib/crc32-pclmul.S
++++ b/arch/x86/lib/crc32-pclmul.S
+@@ -1,217 +1,6 @@
+-/* SPDX-License-Identifier: GPL-2.0-only */
+-/*
+- * Copyright 2012 Xyratex Technology Limited
+- *
+- * Using hardware provided PCLMULQDQ instruction to accelerate the CRC32
+- * calculation.
+- * CRC32 polynomial:0x04c11db7(BE)/0xEDB88320(LE)
+- * PCLMULQDQ is a new instruction in Intel SSE4.2, the reference can be found
+- * at:
+- * http://www.intel.com/products/processor/manuals/
+- * Intel(R) 64 and IA-32 Architectures Software Developer's Manual
+- * Volume 2B: Instruction Set Reference, N-Z
+- *
+- * Authors:   Gregory Prestas <Gregory_Prestas@us.xyratex.com>
+- *	      Alexander Boyko <Alexander_Boyko@xyratex.com>
+- */
++/* SPDX-License-Identifier: GPL-2.0-or-later */
 +// Copyright 2025 Google LLC
-+//
-+// Author: Eric Biggers <ebiggers@google.com>
-+
-+#include <linux/linkage.h>
-+
-+// Offsets within the generated constants table
-+.set OFFSETOF_BSWAP_MASK,			-5*16	// msb-first CRCs only
-+.set OFFSETOF_FOLD_ACROSS_2048_BITS_CONSTS,	-4*16	// must precede next
-+.set OFFSETOF_FOLD_ACROSS_1024_BITS_CONSTS,	-3*16	// must precede next
-+.set OFFSETOF_FOLD_ACROSS_512_BITS_CONSTS,	-2*16	// must precede next
-+.set OFFSETOF_FOLD_ACROSS_256_BITS_CONSTS,	-1*16	// must precede next
-+.set OFFSETOF_FOLD_ACROSS_128_BITS_CONSTS,	0*16	// must be 0
-+.set OFFSETOF_SHUF_TABLE,			1*16
-+.set OFFSETOF_BARRETT_REDUCTION_CONSTS,		4*16
-+
-+// Emit a VEX (or EVEX) coded instruction if allowed, or emulate it using the
-+// corresponding non-VEX instruction plus any needed moves.  The supported
-+// instruction formats are:
-+//
-+//     - Two-arg [src, dst], where the non-VEX format is the same.
-+//     - Three-arg [src1, src2, dst] where the non-VEX format is
-+//	 [src1, src2_and_dst].  If src2 != dst, then src1 must != dst too.
-+//
-+// \insn gives the instruction without a "v" prefix and including any immediate
-+// argument if needed to make the instruction follow one of the above formats.
-+// If \unaligned_mem_tmp is given, then the emitted non-VEX code moves \arg1 to
-+// it first; this is needed when \arg1 is an unaligned mem operand.
-+.macro	_cond_vex	insn:req, arg1:req, arg2:req, arg3, unaligned_mem_tmp
-+.if AVX_LEVEL == 0
-+  // VEX not allowed.  Emulate it.
-+  .ifnb \arg3 // Three-arg [src1, src2, dst]
-+    .ifc "\arg2", "\arg3" // src2 == dst?
-+      .ifnb \unaligned_mem_tmp
-+	movdqu		\arg1, \unaligned_mem_tmp
-+	\insn		\unaligned_mem_tmp, \arg3
-+      .else
-+	\insn		\arg1, \arg3
-+      .endif
-+    .else // src2 != dst
-+      .ifc "\arg1", "\arg3"
-+	.error "Can't have src1 == dst when src2 != dst"
-+      .endif
-+      .ifnb \unaligned_mem_tmp
-+	movdqu		\arg1, \unaligned_mem_tmp
-+	movdqa		\arg2, \arg3
-+	\insn		\unaligned_mem_tmp, \arg3
-+      .else
-+	movdqa		\arg2, \arg3
-+	\insn		\arg1, \arg3
-+      .endif
-+    .endif
-+  .else // Two-arg [src, dst]
-+    .ifnb \unaligned_mem_tmp
-+	movdqu		\arg1, \unaligned_mem_tmp
-+	\insn		\unaligned_mem_tmp, \arg2
-+    .else
-+	\insn		\arg1, \arg2
-+    .endif
-+  .endif
-+.else
-+  // VEX is allowed.  Emit the desired instruction directly.
-+  .ifnb \arg3
-+	v\insn		\arg1, \arg2, \arg3
-+  .else
-+	v\insn		\arg1, \arg2
-+  .endif
-+.endif
-+.endm
-+
-+// Broadcast an aligned 128-bit mem operand to all 128-bit lanes of a vector
-+// register of length VL.
-+.macro	_vbroadcast	src, dst
-+.if VL == 16
-+	_cond_vex movdqa,	\src, \dst
-+.elseif VL == 32
-+	vbroadcasti128		\src, \dst
-+.else
-+	vbroadcasti32x4		\src, \dst
-+.endif
-+.endm
-+
-+// Load \vl bytes from the unaligned mem operand \src into \dst, and if the CRC
-+// is msb-first use \bswap_mask to reflect the bytes within each 128-bit lane.
-+.macro	_load_data	vl, src, bswap_mask, dst
-+.if \vl < 64
-+	_cond_vex movdqu,	"\src", \dst
-+.else
-+	vmovdqu8		\src, \dst
-+.endif
-+.if !LSB_CRC
-+	_cond_vex pshufb,	\bswap_mask, \dst, \dst
-+.endif
-+.endm
-+
-+.macro	_prepare_v0	vl, v0, v1, bswap_mask
-+.if LSB_CRC
-+  .if \vl < 64
-+	_cond_vex pxor,		(BUF), \v0, \v0, unaligned_mem_tmp=\v1
-+  .else
-+	vpxorq			(BUF), \v0, \v0
-+  .endif
-+.else
-+	_load_data		\vl, (BUF), \bswap_mask, \v1
-+  .if \vl < 64
-+	_cond_vex pxor,		\v1, \v0, \v0
-+  .else
-+	vpxorq			\v1, \v0, \v0
-+  .endif
-+.endif
-+.endm
-+
-+// The x^0..x^63 terms, i.e. poly128 mod x^64, i.e. the physically low qword for
-+// msb-first order or the physically high qword for lsb-first order
-+#define LO64_TERMS 0
-+
-+// The x^64..x^127 terms, i.e. floor(poly128 / x^64), i.e. the physically high
-+// qword for msb-first order or the physically low qword for lsb-first order
-+#define HI64_TERMS 1
-+
-+// Multiply the given \src1_terms of each 128-bit lane of \src1 by the given
-+// \src2_terms of each 128-bit lane of \src2, and write the result(s) to \dst.
-+.macro	_pclmulqdq	src1, src1_terms, src2, src2_terms, dst
-+	_cond_vex "pclmulqdq $((\src1_terms ^ LSB_CRC) << 4) ^ (\src2_terms ^ LSB_CRC),", \
-+		  \src1, \src2, \dst
-+.endm
-+
-+// Fold \acc into \data and store the result back into \acc.  \data can be an
-+// unaligned mem operand if using VEX is allowed and the CRC is lsb-first so no
-+// byte-reflection is needed; otherwise it must be a vector register.  \consts
-+// is a vector register containing the needed fold constants, and \tmp is a
-+// temporary vector register.  All arguments must be the same length.
-+.macro	_fold_vec	acc, data, consts, tmp
-+	_pclmulqdq	\consts, HI64_TERMS, \acc, HI64_TERMS, \tmp
-+	_pclmulqdq	\consts, LO64_TERMS, \acc, LO64_TERMS, \acc
-+.if AVX_LEVEL < 10
-+	_cond_vex pxor,	\data, \tmp, \tmp
-+	_cond_vex pxor,	\tmp, \acc, \acc
-+.else
-+	vpternlogq	$0x96, \data, \tmp, \acc
-+.endif
-+.endm
-+
-+// Fold \acc into \data and store the result back into \acc.  \data is an
-+// unaligned mem operand, \consts is a vector register containing the needed
-+// fold constants, \bswap_mask is a vector register containing the
-+// byte-reflection table if the CRC is msb-first, and \tmp1 and \tmp2 are
-+// temporary vector registers.  All arguments must have length \vl.
-+.macro	_fold_vec_mem	vl, acc, data, consts, bswap_mask, tmp1, tmp2
-+.if AVX_LEVEL == 0 || !LSB_CRC
-+	_load_data	\vl, \data, \bswap_mask, \tmp1
-+	_fold_vec	\acc, \tmp1, \consts, \tmp2
-+.else
-+	_fold_vec	\acc, \data, \consts, \tmp1
-+.endif
-+.endm
-+
-+// Load the constants for folding across 2**i vectors of length VL at a time
-+// into all 128-bit lanes of the vector register CONSTS.
-+.macro	_load_vec_folding_consts	i
-+	_vbroadcast OFFSETOF_FOLD_ACROSS_128_BITS_CONSTS+(4-LOG2_VL-\i)*16(CONSTS_PTR), \
-+		    CONSTS
-+.endm
-+
-+// Given vector registers \v0 and \v1 of length \vl, fold \v0 into \v1 and store
-+// the result back into \v0.  If the remaining length mod \vl is nonzero, also
-+// fold \vl data bytes from BUF.  For both operations the fold distance is \vl.
-+// \consts must be a register of length \vl containing the fold constants.
-+.macro	_fold_vec_final	vl, v0, v1, consts, bswap_mask, tmp1, tmp2
-+	_fold_vec	\v0, \v1, \consts, \tmp1
-+	test		$\vl, LEN8
-+	jz		.Lfold_vec_final_done\@
-+	_fold_vec_mem	\vl, \v0, (BUF), \consts, \bswap_mask, \tmp1, \tmp2
-+	add		$\vl, BUF
-+.Lfold_vec_final_done\@:
-+.endm
-+
-+// This macro generates the body of a CRC function with the following prototype:
-+//
-+// crc_t crc_func(crc_t crc, const u8 *buf, size_t len, const void *consts);
-+//
-+// |crc| is the initial CRC, and crc_t is a data type wide enough to hold it.
-+// |buf| is the data to checksum.  |len| is the data length in bytes, which must
-+// be at least 16.  |consts| is a pointer to the fold_across_128_bits_consts
-+// field of the constants struct that was generated for the chosen CRC variant.
-+//
-+// Moving onto the macro parameters, \n is the number of bits in the CRC, e.g.
-+// 32 for a CRC-32.  Currently the supported values are 8, 16, 32, and 64.  If
-+// the file is compiled in i386 mode, then the maximum supported value is 32.
-+//
-+// \lsb_crc is 1 if the CRC processes the least significant bit of each byte
-+// first, i.e. maps bit0 to x^7, bit1 to x^6, ..., bit7 to x^0.  \lsb_crc is 0
-+// if the CRC processes the most significant bit of each byte first, i.e. maps
-+// bit0 to x^0, bit1 to x^1, bit7 to x^7.
-+//
-+// \vl is the maximum length of vector register to use in bytes: 16, 32, or 64.
-+//
-+// \avx_level is the level of AVX support to use: 0 for SSE only, 2 for AVX2, or
-+// 10 for AVX10 or AVX512.
-+//
-+// If \vl == 16 && \avx_level == 0, the generated code requires:
-+// PCLMULQDQ && SSE4.1.  (Note: all known CPUs with PCLMULQDQ also have SSE4.1.)
-+//
-+// If \vl == 32 && \avx_level == 2, the generated code requires:
-+// VPCLMULQDQ && AVX2.
-+//
-+// If \vl == 32 && \avx_level == 10, the generated code requires:
-+// VPCLMULQDQ && (AVX10/256 || (AVX512BW && AVX512VL))
-+//
-+// If \vl == 64 && \avx_level == 10, the generated code requires:
-+// VPCLMULQDQ && (AVX10/512 || (AVX512BW && AVX512VL))
-+//
-+// Other \vl and \avx_level combinations are either not supported or not useful.
-+.macro	_crc_pclmul	n, lsb_crc, vl, avx_level
-+	.set	LSB_CRC,	\lsb_crc
-+	.set	VL,		\vl
-+	.set	AVX_LEVEL,	\avx_level
-+
-+	// Define aliases for the xmm, ymm, or zmm registers according to VL.
-+.irp i, 0,1,2,3,4,5,6,7
-+  .if VL == 16
-+	.set	V\i,		%xmm\i
-+	.set	LOG2_VL,	4
-+  .elseif VL == 32
-+	.set	V\i,		%ymm\i
-+	.set	LOG2_VL,	5
-+  .elseif VL == 64
-+	.set	V\i,		%zmm\i
-+	.set	LOG2_VL,	6
-+  .else
-+	.error "Unsupported vector length"
-+  .endif
-+.endr
-+	// Define aliases for the function parameters.
-+	// Note: when crc_t is shorter than u32, zero-extension to 32 bits is
-+	// guaranteed by the ABI.  Zero-extension to 64 bits is *not* guaranteed
-+	// when crc_t is shorter than u64.
-+#ifdef __x86_64__
-+.if \n <= 32
-+	.set	CRC,		%edi
-+.else
-+	.set	CRC,		%rdi
-+.endif
-+	.set	BUF,		%rsi
-+	.set	LEN,		%rdx
-+	.set	LEN32,		%edx
-+	.set	LEN8,		%dl
-+	.set	CONSTS_PTR,	%rcx
-+#else
-+	// 32-bit support, assuming -mregparm=3 and not including support for
-+	// CRC-64 (which would use both eax and edx to pass the crc parameter).
-+	.set	CRC,		%eax
-+	.set	BUF,		%edx
-+	.set	LEN,		%ecx
-+	.set	LEN32,		%ecx
-+	.set	LEN8,		%cl
-+	.set	CONSTS_PTR,	%ebx	// Passed on stack
-+#endif
-+
-+	// Define aliases for some local variables.  V0-V5 are used without
-+	// aliases (for accumulators, data, temporary values, etc).  Staying
-+	// within the first 8 vector registers keeps the code 32-bit SSE
-+	// compatible and reduces the size of 64-bit SSE code slightly.
-+	.set	BSWAP_MASK,	V6
-+	.set	BSWAP_MASK_YMM,	%ymm6
-+	.set	BSWAP_MASK_XMM,	%xmm6
-+	.set	CONSTS,		V7
-+	.set	CONSTS_YMM,	%ymm7
-+	.set	CONSTS_XMM,	%xmm7
-+
-+#ifdef __i386__
-+	push		CONSTS_PTR
-+	mov		8(%esp), CONSTS_PTR
-+#endif
-+
-+	// Create a 128-bit vector that contains the initial CRC in the end
-+	// representing the high-order polynomial coefficients, and the rest 0.
-+	// If the CRC is msb-first, also load the byte-reflection table.
-+.if \n <= 32
-+	_cond_vex movd,	CRC, %xmm0
-+.else
-+	_cond_vex movq,	CRC, %xmm0
-+.endif
-+.if !LSB_CRC
-+	_cond_vex pslldq, $(128-\n)/8, %xmm0, %xmm0
-+	_vbroadcast	OFFSETOF_BSWAP_MASK(CONSTS_PTR), BSWAP_MASK
-+.endif
-+
-+	// Load the first vector of data and XOR the initial CRC into the
-+	// appropriate end of the first 128-bit lane of data.  If LEN < VL, then
-+	// use a short vector and jump ahead to the final reduction.  (LEN >= 16
-+	// is guaranteed here but not necessarily LEN >= VL.)
-+.if VL >= 32
-+	cmp		$VL, LEN
-+	jae		.Lat_least_1vec\@
-+  .if VL == 64
-+	cmp		$32, LEN32
-+	jb		.Lless_than_32bytes\@
-+	_prepare_v0	32, %ymm0, %ymm1, BSWAP_MASK_YMM
-+	add		$32, BUF
-+	jmp		.Lreduce_256bits_to_128bits\@
-+.Lless_than_32bytes\@:
-+  .endif
-+	_prepare_v0	16, %xmm0, %xmm1, BSWAP_MASK_XMM
-+	add		$16, BUF
-+	vmovdqa		OFFSETOF_FOLD_ACROSS_128_BITS_CONSTS(CONSTS_PTR), CONSTS_XMM
-+	jmp		.Lcheck_for_partial_block\@
-+.Lat_least_1vec\@:
-+.endif
-+	_prepare_v0	VL, V0, V1, BSWAP_MASK
-+
-+	// Handle VL <= LEN < 4*VL.
-+	cmp		$4*VL-1, LEN
-+	ja		.Lat_least_4vecs\@
-+	add		$VL, BUF
-+	// If VL <= LEN < 2*VL, then jump ahead to the reduction from 1 vector.
-+	// If VL==16 then load fold_across_128_bits_consts first, as the final
-+	// reduction depends on it and it won't be loaded anywhere else.
-+	cmp		$2*VL-1, LEN32
-+.if VL == 16
-+	_cond_vex movdqa, OFFSETOF_FOLD_ACROSS_128_BITS_CONSTS(CONSTS_PTR), CONSTS_XMM
-+.endif
-+	jbe		.Lreduce_1vec_to_128bits\@
-+	// Otherwise 2*VL <= LEN < 4*VL.  Load one more vector and jump ahead to
-+	// the reduction from 2 vectors.
-+	_load_data	VL, (BUF), BSWAP_MASK, V1
-+	add		$VL, BUF
-+	jmp		.Lreduce_2vecs_to_1\@
-+
-+.Lat_least_4vecs\@:
-+	// Load 3 more vectors of data.
-+	_load_data	VL, 1*VL(BUF), BSWAP_MASK, V1
-+	_load_data	VL, 2*VL(BUF), BSWAP_MASK, V2
-+	_load_data	VL, 3*VL(BUF), BSWAP_MASK, V3
-+	sub		$-4*VL, BUF	// Shorter than 'add 4*VL' when VL=32
-+	add		$-4*VL, LEN	// Shorter than 'sub 4*VL' when VL=32
-+
-+	// Main loop: while LEN >= 4*VL, fold the 4 vectors V0-V3 into the next
-+	// 4 vectors of data and write the result back to V0-V3.
-+	cmp		$4*VL-1, LEN	// Shorter than 'cmp 4*VL' when VL=32
-+	jbe		.Lreduce_4vecs_to_2\@
-+	_load_vec_folding_consts	2
-+.Lfold_4vecs_loop\@:
-+	_fold_vec_mem	VL, V0, 0*VL(BUF), CONSTS, BSWAP_MASK, V4, V5
-+	_fold_vec_mem	VL, V1, 1*VL(BUF), CONSTS, BSWAP_MASK, V4, V5
-+	_fold_vec_mem	VL, V2, 2*VL(BUF), CONSTS, BSWAP_MASK, V4, V5
-+	_fold_vec_mem	VL, V3, 3*VL(BUF), CONSTS, BSWAP_MASK, V4, V5
-+	sub		$-4*VL, BUF
-+	add		$-4*VL, LEN
-+	cmp		$4*VL-1, LEN
-+	ja		.Lfold_4vecs_loop\@
-+
-+	// Fold V0,V1 into V2,V3 and write the result back to V0,V1.  Then fold
-+	// two more vectors of data from BUF, if at least that much remains.
-+.Lreduce_4vecs_to_2\@:
-+	_load_vec_folding_consts	1
-+	_fold_vec	V0, V2, CONSTS, V4
-+	_fold_vec	V1, V3, CONSTS, V4
-+	test		$2*VL, LEN8
-+	jz		.Lreduce_2vecs_to_1\@
-+	_fold_vec_mem	VL, V0, 0*VL(BUF), CONSTS, BSWAP_MASK, V4, V5
-+	_fold_vec_mem	VL, V1, 1*VL(BUF), CONSTS, BSWAP_MASK, V4, V5
-+	sub		$-2*VL, BUF
-+
-+	// Fold V0 into V1 and write the result back to V0.  Then fold one more
-+	// vector of data from BUF, if at least that much remains.
-+.Lreduce_2vecs_to_1\@:
-+	_load_vec_folding_consts	0
-+	_fold_vec_final	VL, V0, V1, CONSTS, BSWAP_MASK, V4, V5
-+
-+.Lreduce_1vec_to_128bits\@:
-+.if VL == 64
-+	// Reduce 512-bit %zmm0 to 256-bit %ymm0.  Then fold 256 more bits of
-+	// data from BUF, if at least that much remains.
-+	vbroadcasti128	OFFSETOF_FOLD_ACROSS_256_BITS_CONSTS(CONSTS_PTR), CONSTS_YMM
-+	vextracti64x4	$1, %zmm0, %ymm1
-+	_fold_vec_final	32, %ymm0, %ymm1, CONSTS_YMM, BSWAP_MASK_YMM, %ymm4, %ymm5
-+.Lreduce_256bits_to_128bits\@:
-+.endif
-+.if VL >= 32
-+	// Reduce 256-bit %ymm0 to 128-bit %xmm0.  Then fold 128 more bits of
-+	// data from BUF, if at least that much remains.
-+	vmovdqa		OFFSETOF_FOLD_ACROSS_128_BITS_CONSTS(CONSTS_PTR), CONSTS_XMM
-+	vextracti128	$1, %ymm0, %xmm1
-+	_fold_vec_final	16, %xmm0, %xmm1, CONSTS_XMM, BSWAP_MASK_XMM, %xmm4, %xmm5
-+.Lcheck_for_partial_block\@:
-+.endif
-+	and		$15, LEN32
-+	jz		.Lreduce_128bits_to_crc\@
-+
-+	// 1 <= LEN <= 15 data bytes remain in BUF.  The polynomial is now
-+	// A*(x^(8*LEN)) + B, where A is the 128-bit polynomial stored in %xmm0
-+	// and B is the polynomial of the remaining LEN data bytes.  To reduce
-+	// this to 128 bits without needing fold constants for each possible
-+	// LEN, rearrange this expression into C1*(x^128) + C2, where
-+	// C1 = floor(A / x^(128 - 8*LEN)) and C2 = A*x^(8*LEN) + B mod x^128.
-+	// Then fold C1 into C2, which is just another fold across 128 bits.
-+
-+.if !LSB_CRC || AVX_LEVEL == 0
-+	// Load the last 16 data bytes.  Note that originally LEN was >= 16.
-+	_load_data	16, "-16(BUF,LEN)", BSWAP_MASK_XMM, %xmm2
-+.endif // Else will use vpblendvb mem operand later.
-+.if !LSB_CRC
-+	neg		LEN	// Needed for indexing shuf_table
-+.endif
-+
-+	// tmp = A*x^(8*LEN) mod x^128
-+	// lsb: pshufb by [LEN, LEN+1, ..., 15, -1, -1, ..., -1]
-+	//	i.e. right-shift by LEN bytes.
-+	// msb: pshufb by [-1, -1, ..., -1, 0, 1, ..., 15-LEN]
-+	//	i.e. left-shift by LEN bytes.
-+	_cond_vex movdqu,	"OFFSETOF_SHUF_TABLE+16(CONSTS_PTR,LEN)", %xmm3
-+	_cond_vex pshufb,	%xmm3, %xmm0, %xmm1
-+
-+	// C1 = floor(A / x^(128 - 8*LEN))
-+	// lsb: pshufb by [-1, -1, ..., -1, 0, 1, ..., LEN-1]
-+	//	i.e. left-shift by 16-LEN bytes.
-+	// msb: pshufb by [16-LEN, 16-LEN+1, ..., 15, -1, -1, ..., -1]
-+	//	i.e. right-shift by 16-LEN bytes.
-+	_cond_vex pshufb,	"OFFSETOF_SHUF_TABLE+32*!LSB_CRC(CONSTS_PTR,LEN)", \
-+				%xmm0, %xmm0, unaligned_mem_tmp=%xmm4
-+
-+	// C2 = tmp + B.  This is just a blend of tmp with the last 16 data
-+	// bytes (reflected if msb-first).  The blend mask is the shuffle table
-+	// that was used to create tmp.  0 selects tmp, and 1 last16databytes.
-+.if AVX_LEVEL == 0
-+	movdqa		%xmm0, %xmm4
-+	movdqa		%xmm3, %xmm0
-+	pblendvb	%xmm2, %xmm1	// uses %xmm0 as implicit operand
-+	movdqa		%xmm4, %xmm0
-+.elseif LSB_CRC
-+	vpblendvb	%xmm3, -16(BUF,LEN), %xmm1, %xmm1
-+.else
-+	vpblendvb	%xmm3, %xmm2, %xmm1, %xmm1
-+.endif
-+
-+	// Fold C1 into C2 and store the 128-bit result in %xmm0.
-+	_fold_vec	%xmm0, %xmm1, CONSTS_XMM, %xmm4
-+
-+.Lreduce_128bits_to_crc\@:
-+	// Compute the CRC as %xmm0 * x^n mod G.  Here %xmm0 means the 128-bit
-+	// polynomial stored in %xmm0 (using either lsb-first or msb-first bit
-+	// order according to LSB_CRC), and G is the CRC's generator polynomial.
-+
-+	// First, multiply %xmm0 by x^n and reduce the result to 64+n bits:
-+	//
-+	//	t0 := (x^(64+n) mod G) * floor(%xmm0 / x^64) +
-+	//	      x^n * (%xmm0 mod x^64)
-+	//
-+	// Store t0 * x^(64-n) in %xmm0.  I.e., actually do:
-+	//
-+	//	%xmm0 := ((x^(64+n) mod G) * x^(64-n)) * floor(%xmm0 / x^64) +
-+	//		 x^64 * (%xmm0 mod x^64)
-+	//
-+	// The extra unreduced factor of x^(64-n) makes floor(t0 / x^n) aligned
-+	// to the HI64_TERMS of %xmm0 so that the next pclmulqdq can easily
-+	// select it.  The 64-bit constant (x^(64+n) mod G) * x^(64-n) in the
-+	// msb-first case, or (x^(63+n) mod G) * x^(64-n) in the lsb-first case
-+	// (considering the extra factor of x that gets implicitly introduced by
-+	// each pclmulqdq when using lsb-first order), is identical to the
-+	// constant that was used earlier for folding the LO64_TERMS across 128
-+	// bits.  Thus it's already available in LO64_TERMS of CONSTS_XMM.
-+	_pclmulqdq		CONSTS_XMM, LO64_TERMS, %xmm0, HI64_TERMS, %xmm1
-+.if LSB_CRC
-+	_cond_vex psrldq,	$8, %xmm0, %xmm0  // x^64 * (%xmm0 mod x^64)
-+.else
-+	_cond_vex pslldq,	$8, %xmm0, %xmm0  // x^64 * (%xmm0 mod x^64)
-+.endif
-+	_cond_vex pxor,		%xmm1, %xmm0, %xmm0
-+	// The HI64_TERMS of %xmm0 now contain floor(t0 / x^n).
-+	// The LO64_TERMS of %xmm0 now contain (t0 mod x^n) * x^(64-n).
-+
-+	// First step of Barrett reduction: Compute floor(t0 / G).  This is the
-+	// polynomial by which G needs to be multiplied to cancel out the x^n
-+	// and higher terms of t0, i.e. to reduce t0 mod G.  First do:
-+	//
-+	//	t1 := floor(x^(63+n) / G) * x * floor(t0 / x^n)
-+	//
-+	// Then the desired value floor(t0 / G) is floor(t1 / x^64).  The 63 in
-+	// x^(63+n) is the maximum degree of floor(t0 / x^n) and thus the lowest
-+	// value that makes enough precision be carried through the calculation.
-+	//
-+	// The '* x' makes it so the result is floor(t1 / x^64) rather than
-+	// floor(t1 / x^63), making it qword-aligned in HI64_TERMS so that it
-+	// can be extracted much more easily in the next step.  In the lsb-first
-+	// case the '* x' happens implicitly.  In the msb-first case it must be
-+	// done explicitly; floor(x^(63+n) / G) * x is a 65-bit constant, so the
-+	// constant passed to pclmulqdq is (floor(x^(63+n) / G) * x) - x^64, and
-+	// the multiplication by the x^64 term is handled using a pxor.  The
-+	// pxor causes the low 64 terms of t1 to be wrong, but they are unused.
-+	_cond_vex movdqa,	OFFSETOF_BARRETT_REDUCTION_CONSTS(CONSTS_PTR), CONSTS_XMM
-+	_pclmulqdq		CONSTS_XMM, HI64_TERMS, %xmm0, HI64_TERMS, %xmm1
-+.if !LSB_CRC
-+	_cond_vex pxor,		%xmm0, %xmm1, %xmm1 // += x^64 * floor(t0 / x^n)
-+.endif
-+	// The HI64_TERMS of %xmm1 now contain floor(t1 / x^64) = floor(t0 / G).
-+
-+	// Second step of Barrett reduction: Cancel out the x^n and higher terms
-+	// of t0 by subtracting the needed multiple of G.  This gives the CRC:
-+	//
-+	//	crc := t0 - (G * floor(t0 / G))
-+	//
-+	// But %xmm0 contains t0 * x^(64-n), so it's more convenient to do:
-+	//
-+	//	crc := ((t0 * x^(64-n)) - ((G * x^(64-n)) * floor(t0 / G))) / x^(64-n)
-+	//
-+	// Furthermore, since the resulting CRC is n-bit, if mod x^n is
-+	// explicitly applied to it then the x^n term of G makes no difference
-+	// in the result and can be omitted.  This helps keep the constant
-+	// multiplier in 64 bits in most cases.  This gives the following:
-+	//
-+	//	%xmm0 := %xmm0 - (((G - x^n) * x^(64-n)) * floor(t0 / G))
-+	//	crc := (%xmm0 / x^(64-n)) mod x^n
-+	//
-+	// In the lsb-first case, each pclmulqdq implicitly introduces
-+	// an extra factor of x, so in that case the constant that needs to be
-+	// passed to pclmulqdq is actually '(G - x^n) * x^(63-n)' when n <= 63.
-+	// For lsb-first CRCs where n=64, the extra factor of x cannot be as
-+	// easily avoided.  In that case, instead pass '(G - x^n - x^0) / x' to
-+	// pclmulqdq and handle the x^0 term (i.e. 1) separately.  (All CRC
-+	// polynomials have nonzero x^n and x^0 terms.)  It works out as: the
-+	// CRC has be XORed with the physically low qword of %xmm1, representing
-+	// floor(t0 / G).  The most efficient way to do that is to move it to
-+	// the physically high qword and use a ternlog to combine the two XORs.
-+.if LSB_CRC && \n == 64
-+	_cond_vex punpcklqdq,	%xmm1, %xmm2, %xmm2
-+	_pclmulqdq		CONSTS_XMM, LO64_TERMS, %xmm1, HI64_TERMS, %xmm1
-+    .if AVX_LEVEL < 10
-+	_cond_vex pxor,		%xmm2, %xmm0, %xmm0
-+	_cond_vex pxor,		%xmm1, %xmm0, %xmm0
-+    .else
-+	vpternlogq		$0x96, %xmm2, %xmm1, %xmm0
-+    .endif
-+	_cond_vex "pextrq $1,",	%xmm0, %rax  // (%xmm0 / x^0) mod x^64
-+.else
-+	_pclmulqdq		CONSTS_XMM, LO64_TERMS, %xmm1, HI64_TERMS, %xmm1
-+	_cond_vex pxor,		%xmm1, %xmm0, %xmm0
-+  .if \n == 8
-+	_cond_vex "pextrb $7 + LSB_CRC,", %xmm0, %eax // (%xmm0 / x^56) mod x^8
-+  .elseif \n == 16
-+	_cond_vex "pextrw $3 + LSB_CRC,", %xmm0, %eax // (%xmm0 / x^48) mod x^16
-+  .elseif \n == 32
-+	_cond_vex "pextrd $1 + LSB_CRC,", %xmm0, %eax // (%xmm0 / x^32) mod x^32
-+  .else // \n == 64 && !LSB_CRC
-+	_cond_vex movq,		%xmm0, %rax  // (%xmm0 / x^0) mod x^64
-+  .endif
-+.endif
-+
-+.if VL > 16
-+	vzeroupper	// Needed when ymm or zmm registers may have been used.
-+.endif
-+#ifdef __i386__
-+	pop		CONSTS_PTR
-+#endif
-+	RET
-+.endm
-+
-+#ifdef CONFIG_AS_VPCLMULQDQ
-+#define DEFINE_CRC_PCLMUL_FUNCS(prefix, bits, lsb)			\
-+SYM_FUNC_START(prefix##_pclmul_sse);					\
-+	_crc_pclmul	n=bits, lsb_crc=lsb, vl=16, avx_level=0;	\
-+SYM_FUNC_END(prefix##_pclmul_sse);					\
-+									\
-+SYM_FUNC_START(prefix##_vpclmul_avx2);					\
-+	_crc_pclmul	n=bits, lsb_crc=lsb, vl=32, avx_level=2;	\
-+SYM_FUNC_END(prefix##_vpclmul_avx2);					\
-+									\
-+SYM_FUNC_START(prefix##_vpclmul_avx10_256);				\
-+	_crc_pclmul	n=bits, lsb_crc=lsb, vl=32, avx_level=10;	\
-+SYM_FUNC_END(prefix##_vpclmul_avx10_256);				\
-+									\
-+SYM_FUNC_START(prefix##_vpclmul_avx10_512);				\
-+	_crc_pclmul	n=bits, lsb_crc=lsb, vl=64, avx_level=10;	\
-+SYM_FUNC_END(prefix##_vpclmul_avx10_512);
-+#else
-+#define DEFINE_CRC_PCLMUL_FUNCS(prefix, bits, lsb)			\
-+SYM_FUNC_START(prefix##_pclmul_sse);					\
-+	_crc_pclmul	n=bits, lsb_crc=lsb, vl=16, avx_level=0;	\
-+SYM_FUNC_END(prefix##_pclmul_sse);
-+#endif // !CONFIG_AS_VPCLMULQDQ
-diff --git a/arch/x86/lib/crc-pclmul-template.h b/arch/x86/lib/crc-pclmul-template.h
-new file mode 100644
-index 0000000000000..7b89f0edbc179
---- /dev/null
-+++ b/arch/x86/lib/crc-pclmul-template.h
-@@ -0,0 +1,81 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ * Macros for accessing the [V]PCLMULQDQ-based CRC functions that are
-+ * instantiated by crc-pclmul-template.S
-+ *
-+ * Copyright 2025 Google LLC
-+ *
-+ * Author: Eric Biggers <ebiggers@google.com>
-+ */
-+#ifndef _CRC_PCLMUL_TEMPLATE_H
-+#define _CRC_PCLMUL_TEMPLATE_H
-+
-+#include <asm/cpufeatures.h>
-+#include <asm/simd.h>
-+#include <crypto/internal/simd.h>
-+#include <linux/static_call.h>
-+#include "crc-pclmul-consts.h"
-+
-+#define DECLARE_CRC_PCLMUL_FUNCS(prefix, crc_t)				\
-+crc_t prefix##_pclmul_sse(crc_t crc, const u8 *p, size_t len,		\
-+			  const void *consts_ptr);			\
-+crc_t prefix##_vpclmul_avx2(crc_t crc, const u8 *p, size_t len,		\
-+			    const void *consts_ptr);			\
-+crc_t prefix##_vpclmul_avx10_256(crc_t crc, const u8 *p, size_t len,	\
-+				 const void *consts_ptr);		\
-+crc_t prefix##_vpclmul_avx10_512(crc_t crc, const u8 *p, size_t len,	\
-+				 const void *consts_ptr);		\
-+DEFINE_STATIC_CALL(prefix##_pclmul, prefix##_pclmul_sse)
-+
-+#define INIT_CRC_PCLMUL(prefix)						\
-+do {									\
-+	if (IS_ENABLED(CONFIG_AS_VPCLMULQDQ) &&				\
-+	    boot_cpu_has(X86_FEATURE_VPCLMULQDQ) &&			\
-+	    boot_cpu_has(X86_FEATURE_AVX2) &&				\
-+	    cpu_has_xfeatures(XFEATURE_MASK_YMM, NULL)) {		\
-+		if (boot_cpu_has(X86_FEATURE_AVX512BW) &&		\
-+		    boot_cpu_has(X86_FEATURE_AVX512VL) &&		\
-+		    cpu_has_xfeatures(XFEATURE_MASK_AVX512, NULL)) {	\
-+			if (boot_cpu_has(X86_FEATURE_PREFER_YMM))	\
-+				static_call_update(prefix##_pclmul,	\
-+						   prefix##_vpclmul_avx10_256); \
-+			else						\
-+				static_call_update(prefix##_pclmul,	\
-+						   prefix##_vpclmul_avx10_512); \
-+		} else {						\
-+			static_call_update(prefix##_pclmul,		\
-+					   prefix##_vpclmul_avx2);	\
-+		}							\
-+	}								\
-+} while (0)
-+
-+/*
-+ * Call a [V]PCLMULQDQ optimized CRC function if the data length is at least 16
-+ * bytes, the CPU has PCLMULQDQ support, and the current context may use SIMD.
-+ *
-+ * 16 bytes is the minimum length supported by the [V]PCLMULQDQ functions.
-+ * There is overhead associated with kernel_fpu_begin() and kernel_fpu_end(),
-+ * varying by CPU and factors such as which parts of the "FPU" state userspace
-+ * has touched, which could result in a larger cutoff being better.  Indeed, a
-+ * larger cutoff is usually better for a *single* message.  However, the
-+ * overhead of the FPU section gets amortized if multiple FPU sections get
-+ * executed before returning to userspace, since the XSAVE and XRSTOR occur only
-+ * once.  Considering that and the fact that the [V]PCLMULQDQ code is lighter on
-+ * the dcache than the table-based code is, a 16-byte cutoff seems to work well.
-+ */
-+#define CRC_PCLMUL(crc, p, len, prefix, consts, have_pclmulqdq)		\
-+do {									\
-+	if ((len) >= 16 && static_branch_likely(&(have_pclmulqdq)) &&	\
-+	    crypto_simd_usable()) {					\
-+		const void *consts_ptr;					\
-+									\
-+		consts_ptr = (consts).fold_across_128_bits_consts;	\
-+		kernel_fpu_begin();					\
-+		crc = static_call(prefix##_pclmul)((crc), (p), (len),	\
-+						   consts_ptr);		\
-+		kernel_fpu_end();					\
-+		return crc;						\
-+	}								\
-+} while (0)
-+
-+#endif /* _CRC_PCLMUL_TEMPLATE_H */
+ 
+-#include <linux/linkage.h>
++#include "crc-pclmul-template.S"
+ 
+-
+-.section .rodata
+-.align 16
+-/*
+- * [x4*128+32 mod P(x) << 32)]'  << 1   = 0x154442bd4
+- * #define CONSTANT_R1  0x154442bd4LL
+- *
+- * [(x4*128-32 mod P(x) << 32)]' << 1   = 0x1c6e41596
+- * #define CONSTANT_R2  0x1c6e41596LL
+- */
+-.Lconstant_R2R1:
+-	.octa 0x00000001c6e415960000000154442bd4
+-/*
+- * [(x128+32 mod P(x) << 32)]'   << 1   = 0x1751997d0
+- * #define CONSTANT_R3  0x1751997d0LL
+- *
+- * [(x128-32 mod P(x) << 32)]'   << 1   = 0x0ccaa009e
+- * #define CONSTANT_R4  0x0ccaa009eLL
+- */
+-.Lconstant_R4R3:
+-	.octa 0x00000000ccaa009e00000001751997d0
+-/*
+- * [(x64 mod P(x) << 32)]'       << 1   = 0x163cd6124
+- * #define CONSTANT_R5  0x163cd6124LL
+- */
+-.Lconstant_R5:
+-	.octa 0x00000000000000000000000163cd6124
+-.Lconstant_mask32:
+-	.octa 0x000000000000000000000000FFFFFFFF
+-/*
+- * #define CRCPOLY_TRUE_LE_FULL 0x1DB710641LL
+- *
+- * Barrett Reduction constant (u64`) = u` = (x**64 / P(x))` = 0x1F7011641LL
+- * #define CONSTANT_RU  0x1F7011641LL
+- */
+-.Lconstant_RUpoly:
+-	.octa 0x00000001F701164100000001DB710641
+-
+-#define CONSTANT %xmm0
+-
+-#ifdef __x86_64__
+-#define CRC     %edi
+-#define BUF     %rsi
+-#define LEN     %rdx
+-#else
+-#define CRC     %eax
+-#define BUF     %edx
+-#define LEN     %ecx
+-#endif
+-
+-
+-
+-.text
+-/**
+- *      Calculate crc32
+- *      CRC - initial crc32
+- *      BUF - buffer (16 bytes aligned)
+- *      LEN - sizeof buffer (16 bytes aligned), LEN should be greater than 63
+- *      return %eax crc32
+- *      u32 crc32_pclmul_le_16(u32 crc, const u8 *buffer, size_t len);
+- */
+-
+-SYM_FUNC_START(crc32_pclmul_le_16) /* buffer and buffer size are 16 bytes aligned */
+-	movdqa  (BUF), %xmm1
+-	movdqa  0x10(BUF), %xmm2
+-	movdqa  0x20(BUF), %xmm3
+-	movdqa  0x30(BUF), %xmm4
+-	movd    CRC, CONSTANT
+-	pxor    CONSTANT, %xmm1
+-	sub     $0x40, LEN
+-	add     $0x40, BUF
+-	cmp     $0x40, LEN
+-	jb      .Lless_64
+-
+-#ifdef __x86_64__
+-	movdqa .Lconstant_R2R1(%rip), CONSTANT
+-#else
+-	movdqa .Lconstant_R2R1, CONSTANT
+-#endif
+-
+-.Lloop_64:/*  64 bytes Full cache line folding */
+-	prefetchnta    0x40(BUF)
+-	movdqa  %xmm1, %xmm5
+-	movdqa  %xmm2, %xmm6
+-	movdqa  %xmm3, %xmm7
+-#ifdef __x86_64__
+-	movdqa  %xmm4, %xmm8
+-#endif
+-	pclmulqdq $0x00, CONSTANT, %xmm1
+-	pclmulqdq $0x00, CONSTANT, %xmm2
+-	pclmulqdq $0x00, CONSTANT, %xmm3
+-#ifdef __x86_64__
+-	pclmulqdq $0x00, CONSTANT, %xmm4
+-#endif
+-	pclmulqdq $0x11, CONSTANT, %xmm5
+-	pclmulqdq $0x11, CONSTANT, %xmm6
+-	pclmulqdq $0x11, CONSTANT, %xmm7
+-#ifdef __x86_64__
+-	pclmulqdq $0x11, CONSTANT, %xmm8
+-#endif
+-	pxor    %xmm5, %xmm1
+-	pxor    %xmm6, %xmm2
+-	pxor    %xmm7, %xmm3
+-#ifdef __x86_64__
+-	pxor    %xmm8, %xmm4
+-#else
+-	/* xmm8 unsupported for x32 */
+-	movdqa  %xmm4, %xmm5
+-	pclmulqdq $0x00, CONSTANT, %xmm4
+-	pclmulqdq $0x11, CONSTANT, %xmm5
+-	pxor    %xmm5, %xmm4
+-#endif
+-
+-	pxor    (BUF), %xmm1
+-	pxor    0x10(BUF), %xmm2
+-	pxor    0x20(BUF), %xmm3
+-	pxor    0x30(BUF), %xmm4
+-
+-	sub     $0x40, LEN
+-	add     $0x40, BUF
+-	cmp     $0x40, LEN
+-	jge     .Lloop_64
+-.Lless_64:/*  Folding cache line into 128bit */
+-#ifdef __x86_64__
+-	movdqa  .Lconstant_R4R3(%rip), CONSTANT
+-#else
+-	movdqa  .Lconstant_R4R3, CONSTANT
+-#endif
+-	prefetchnta     (BUF)
+-
+-	movdqa  %xmm1, %xmm5
+-	pclmulqdq $0x00, CONSTANT, %xmm1
+-	pclmulqdq $0x11, CONSTANT, %xmm5
+-	pxor    %xmm5, %xmm1
+-	pxor    %xmm2, %xmm1
+-
+-	movdqa  %xmm1, %xmm5
+-	pclmulqdq $0x00, CONSTANT, %xmm1
+-	pclmulqdq $0x11, CONSTANT, %xmm5
+-	pxor    %xmm5, %xmm1
+-	pxor    %xmm3, %xmm1
+-
+-	movdqa  %xmm1, %xmm5
+-	pclmulqdq $0x00, CONSTANT, %xmm1
+-	pclmulqdq $0x11, CONSTANT, %xmm5
+-	pxor    %xmm5, %xmm1
+-	pxor    %xmm4, %xmm1
+-
+-	cmp     $0x10, LEN
+-	jb      .Lfold_64
+-.Lloop_16:/* Folding rest buffer into 128bit */
+-	movdqa  %xmm1, %xmm5
+-	pclmulqdq $0x00, CONSTANT, %xmm1
+-	pclmulqdq $0x11, CONSTANT, %xmm5
+-	pxor    %xmm5, %xmm1
+-	pxor    (BUF), %xmm1
+-	sub     $0x10, LEN
+-	add     $0x10, BUF
+-	cmp     $0x10, LEN
+-	jge     .Lloop_16
+-
+-.Lfold_64:
+-	/* perform the last 64 bit fold, also adds 32 zeroes
+-	 * to the input stream */
+-	pclmulqdq $0x01, %xmm1, CONSTANT /* R4 * xmm1.low */
+-	psrldq  $0x08, %xmm1
+-	pxor    CONSTANT, %xmm1
+-
+-	/* final 32-bit fold */
+-	movdqa  %xmm1, %xmm2
+-#ifdef __x86_64__
+-	movdqa  .Lconstant_R5(%rip), CONSTANT
+-	movdqa  .Lconstant_mask32(%rip), %xmm3
+-#else
+-	movdqa  .Lconstant_R5, CONSTANT
+-	movdqa  .Lconstant_mask32, %xmm3
+-#endif
+-	psrldq  $0x04, %xmm2
+-	pand    %xmm3, %xmm1
+-	pclmulqdq $0x00, CONSTANT, %xmm1
+-	pxor    %xmm2, %xmm1
+-
+-	/* Finish up with the bit-reversed barrett reduction 64 ==> 32 bits */
+-#ifdef __x86_64__
+-	movdqa  .Lconstant_RUpoly(%rip), CONSTANT
+-#else
+-	movdqa  .Lconstant_RUpoly, CONSTANT
+-#endif
+-	movdqa  %xmm1, %xmm2
+-	pand    %xmm3, %xmm1
+-	pclmulqdq $0x10, CONSTANT, %xmm1
+-	pand    %xmm3, %xmm1
+-	pclmulqdq $0x00, CONSTANT, %xmm1
+-	pxor    %xmm2, %xmm1
+-	pextrd  $0x01, %xmm1, %eax
+-
+-	RET
+-SYM_FUNC_END(crc32_pclmul_le_16)
++DEFINE_CRC_PCLMUL_FUNCS(crc32_lsb, /* bits= */ 32, /* lsb= */ 1)
 -- 
 2.48.1
 
