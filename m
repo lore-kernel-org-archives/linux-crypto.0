@@ -1,131 +1,114 @@
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C886A17BB6
-	for <linux-crypto@vger.kernel.org>; Mon, 10 Feb 2025 12:40:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B59E1C07E5;
+	Mon, 10 Feb 2025 12:59:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739191215; cv=none; b=brl8ZRcUFz4Q4GzBzdfGR04Fqx7MCCm6LlvV/xBls9OOoijRwQmsYV+HcaR4teNliwEZ9m3x82r12Rodrw3XEKyvvL+Nim4SnLGB0j0VPDwFvT3ZdzIeEBkLZK0ELFPoKCF9VSeZEU6HAFWDa519111S1FFqx1Jias+3V+Okl6U=
+	t=1739192385; cv=none; b=VqJE0mLDM7KrigNTUXZUg9rqwbvh56UmuZYrGqHI5c51C2OsTKImxVANJglvaGxP4SX+GJ3YN/CBRN2v86jGvhbhwhdMWVSeSKzstaiKZOlo2fUa+XnM72YPeXCIt24dq3OAUFGtLAGuffbQotXBdGzzFf1JC5pjj0lsgAepp4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739191215; c=relaxed/simple;
-	bh=vC/2p3vue+xQRI8AHSDC2HfA+L1Yp//ojjEwI0nkQRY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AREppmxTrwW+WYRp5UmHEsG9uPz59y1l41ATkp2k+UNGJUwAkXYkFHiw33O8o12DOzztvwaxBjngJzW5X2igBZPEsyG5yto0LUbNXkmhaNbb16aWSzUW8AjrTf5k+bgHAtVxFpPd8NjdxiWeCSLDRSalvh37NOCgkbK1XuNljyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CL1DgAU8; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1739192385; c=relaxed/simple;
+	bh=owpoSk7EuQEMFHDc/s6Anvm+qbdzkCtpH98wS+rR4qg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ehiRnoBBL0Zy1owAgIH0u1Xpwngl6IQ0E7dStvRvOwhXiCBcFBfzDt5sf7Is2WGtQm6TcM5YXXQcAP2Rb34sxU88n9GIQeA/5dShQuoKkM8AFxLS3q1Gl+VrJxFiL98R8jf//WXmi8gxAxkN3/IRcOzvuF7pdeB3/1TY0eQ3jLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L47QptUn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CL1DgAU8"
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-ab7c81b8681so113193466b.0
-        for <linux-crypto@vger.kernel.org>; Mon, 10 Feb 2025 04:40:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739191212; x=1739796012; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=RJK+xXuuNshrOOmsp2OjLGqkJM8XBht+rlbmPUYy3P0=;
-        b=CL1DgAU8ScbQZ03QUbDFIav/gb+pHOile5HfCQXCUmEVQUvT0GKd/XccVFII7ta8fq
-         VOWPApbhz0qSfw31xYJqENGjvZg9zQTFcVIlynIAwFFuU4g/I7VqWB2LIUrlqjccR4Iv
-         AaRT+wiF53frCwSr9Lb35SGgF5mk5j3r+CreXf6e3ioM4P5Q4ute0TceNeZTk9bKdTsQ
-         6ZRjpJtGpeezuoTTBIeErI7DVRshmI1T9N27x5CRjdbJGrVATkwA9St6+Oslu3L0XimJ
-         ToWKwlXOQ4Vagt0pvsdXgCJY3pgU1p2vokw4WDcIt0KQ3izR/13W9nE87MI58oy2/+eR
-         ChnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739191212; x=1739796012;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RJK+xXuuNshrOOmsp2OjLGqkJM8XBht+rlbmPUYy3P0=;
-        b=QEA9VwSTTZZXmmvvk2m5JL4vVV2145f2Ej80YJbQbdZnaXY9JKTrZRa6FKfpr2I/0S
-         G4ZuW43hDG39+N1sbrQ38Gnu54BjTXsWx4MojzoHLfvLB2SqpGBK6muxo0DIk/9y1hJk
-         o6y+/VaZEFjZhV4ecm2s3vv6OZNVsE4Y6dp75+qKWgjefKOGPA12XmTfStfCiK6zeFt+
-         Pxfnt6sits22drmB/jDw0+P7H7gLH9m3xtW83V+TBP/gm2Oh5y3GDFCMVBF0tnOomr2c
-         i7uwhgFU73BvC/vShhZtyDlJFpJVxWGu2sEOvtIWFKM3BT4/njyfO48KJbUWpUGsq2nR
-         X8gQ==
-X-Gm-Message-State: AOJu0YzGWQg5ogXDO/9zoLGlZNuOvuVFNLb6GxB0iT59zQ9jCVl4p9Bs
-	ylxfN6s6Za5sBI+cXzo59VH6x4Az+WXU/sJRjEnByKXsarh5SuefbLaPV0TWa7YfkA==
-X-Gm-Gg: ASbGncsE/P88wtXq+ABJoZHmerWlqEsfJsUUFwg7VWgw9/y0c7DQysgGFtqo4xMuVSK
-	LWr1/Irv8lmwXTCxnltxRjgMHNo+BJXIIvvGrAa/5Ql+DtEBwQSTSpKZGWccZOc/gofcDBfsDT0
-	wb5mUF6CMJIPHwffqma4Zgler4NTm8LgaERE6ay9H9mDNFTbR9k375axMq1apGJI79T+r2RWfXQ
-	izo8nrrDHakU150TblfGFeZT2ZdzuD+klx7+c4QZT4sgdqwfYtWzQe3paFFc+WMQ0ALMbn8IeEg
-	Zv3P9BGDwrTQ6M/QP1TRzJDu957FuLFrT49+dDbkPh6m3ZgqGGQHz2H99rs7wL3WFM4jg7JT5eR
-	/GVIyd6FjthE1o+Y5fV/6/wmOq2GRReuXPiSKTiQke/MAE8c5qMU=
-X-Google-Smtp-Source: AGHT+IHBmTV/q8kkdD9VoXT0z82FGAVcIGVICf5E+QzF192xxTnzFAraIFL/vjVbGpVUTPh4qm5XHQ==
-X-Received: by 2002:a17:907:9628:b0:ab2:bd0b:acdf with SMTP id a640c23a62f3a-ab789c1d683mr1521631766b.36.1739191211777;
-        Mon, 10 Feb 2025 04:40:11 -0800 (PST)
-Received: from ?IPV6:2003:d0:af0c:d200:8ab2:e79e:9971:853b? (p200300d0af0cd2008ab2e79e9971853b.dip0.t-ipconnect.de. [2003:d0:af0c:d200:8ab2:e79e:9971:853b])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab79fea9e06sm543811566b.60.2025.02.10.04.40.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Feb 2025 04:40:11 -0800 (PST)
-Message-ID: <1157db48-ba02-4977-9604-fdca26da575b@gmail.com>
-Date: Mon, 10 Feb 2025 13:40:10 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L47QptUn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A013BC4CED1;
+	Mon, 10 Feb 2025 12:59:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739192385;
+	bh=owpoSk7EuQEMFHDc/s6Anvm+qbdzkCtpH98wS+rR4qg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=L47QptUnYsLmPtLriLWk/mFFeLwNiicn+sgpWdC5JUSMTLZnSmIRzeQDhotnIur3r
+	 T2PuqbTS/9961JLV3JPPepnAz8kzwwutEm5mDhmRhSHxuZH4PQnHKMkrLwb3GPOjHA
+	 NpPVnElP0StXHHIoZj1w22xh56585gTSbrBY7+L57cEPFC6uCdNmrFC/MUkYw3SmRK
+	 n5/QSF7k6FBHTpUbZ67QqyzIKpLf4ytrKpPtTZ0N6INEXGzBtjbEYsgzZUuU7v7aIl
+	 JLWU2qWBoJkLmMZNXGQyO/SdAFBFganR7Bnr2lyPsoxWxMbx6VHV2JRJ0r/cgC/OB8
+	 ON23cJ8tHySjg==
+Date: Mon, 10 Feb 2025 12:59:35 +0000
+From: Mark Brown <broonie@kernel.org>
+To: =?iso-8859-1?Q?J=2E_Neusch=E4fer?= <j.ne@posteo.net>
+Cc: devicetree@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	Krzysztof Kozlowski <krzk@kernel.org>, imx@lists.linux.dev,
+	Scott Wood <oss@buserror.net>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Naveen N Rao <naveen@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>, Lee Jones <lee@kernel.org>,
+	Vinod Koul <vkoul@kernel.org>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Wim Van Sebroeck <wim@linux-watchdog.org>,
+	Guenter Roeck <linux@roeck-us.net>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Richard Weinberger <richard@nod.at>,
+	Vignesh Raghavendra <vigneshr@ti.com>, linux-kernel@vger.kernel.org,
+	linux-ide@vger.kernel.org, linux-crypto@vger.kernel.org,
+	dmaengine@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-watchdog@vger.kernel.org, linux-spi@vger.kernel.org,
+	linux-mtd@lists.infradead.org
+Subject: Re: [PATCH v2 00/12] YAML conversion of several Freescale/PowerPC DT
+ bindings
+Message-ID: <0fe3416c-c3f3-44c4-a1c0-7e8262c54d4b@sirena.org.uk>
+References: <20250207-ppcyaml-v2-0-8137b0c42526@posteo.net>
+ <611e47da-ba87-4c21-a6b7-cf051dc88158@sirena.org.uk>
+ <Z6a_f03Ct9aB7Bbn@probook>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] crypto: jitter - add cmdline oversampling overrides
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org, davem@davemloft.net, smueller@chronox.de
-References: <20250127160236.7821-1-theil.markus@gmail.com>
- <Z6hy7LFoHPffWuWi@gondor.apana.org.au>
-Content-Language: en-US
-From: Markus Theil <theil.markus@gmail.com>
-In-Reply-To: <Z6hy7LFoHPffWuWi@gondor.apana.org.au>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="Erlp5XHmWCbFSP4H"
+Content-Disposition: inline
+In-Reply-To: <Z6a_f03Ct9aB7Bbn@probook>
+X-Cookie: A beer delayed is a beer denied.
 
-Hi (& sorry for replying in HTML the last time :(),
 
-On 09.02.25 10:18, Herbert Xu wrote:
-> On Mon, Jan 27, 2025 at 05:02:36PM +0100, Markus Theil wrote:
->> As already mentioned in the comments, using a cryptographic
->> hash function, like SHA3-256, decreases the expected entropy
->> due to properties of random mappings (collisions and unused values).
->>
->> When mapping 256 bit of entropy to 256 output bits, this results
->> in roughly 6 bit entropy loss (depending on the estimate formula
->> for mapping 256 bit to 256 bit via a random mapping):
->>
->> NIST approximation (count all input bits as input): 255.0
->> NIST approximation (count only entropy bits as input): 251.69 Bit
->> BSI approximation (count only entropy bits as input): 250.11 Bit
->>
->> Therefore add a cmdline override for the 64 bit oversampling safety margin,
->> This results in an expected entropy of nearly 256 bit also after hashing,
->> when desired.
->>
->> Only enable this, when you are aware of the increased runtime per
->> iteration.
->>
->> This override is only possible, when not in FIPS mode (as FIPS mandates
->> this to be true for a full entropy claim).
->>
->> Signed-off-by: Markus Theil <theil.markus@gmail.com>
->> ---
->>   crypto/jitterentropy.c | 33 +++++++++++++++++++++++++++------
->>   1 file changed, 27 insertions(+), 6 deletions(-)
-> 
-> Why does this need to be a toggle?
+--Erlp5XHmWCbFSP4H
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-It slightly increases the runtime of the code per 256 Bit random number 
-generated, which possibly doesn't suit embedded guys using this RNG but 
-demanding short system bootup.
-So users who can live with this penalty can enable it, others probably 
-won't tolerate it. With this being a toggle, it will also be easier to 
-enable this in default distribution kernels running e.g. in cloud instances.
+On Sat, Feb 08, 2025 at 02:20:47AM +0000, J. Neusch=E4fer wrote:
+> On Fri, Feb 07, 2025 at 09:38:05PM +0000, Mark Brown wrote:
 
-> 
-> Why can't you just make this conditional on fips_enabled?
+> > What's the story with dependencies here - why is all this stuff in one
+> > series?
 
-This was also my first thought, just enable fips mode. Our workloads 
-don't have to run in FIPS mode and I don't know which software may 
-reacts to the kernel announcing to be fips enabled in an unexpected way.
+> The patches are independent of each other, except for the four elbc/nand
+> patches. They are in the same series because they came up during the
+> same project and achieve similar goals, but it isn't necessary.
 
-So basically, this seems to be useful, even when not in FIPS mode.
+Please don't do this, it just makes it harder to merge things since it
+makes it look like there's cross tree merges needed when that's not the
+case, complicating merging, and puts the entire series in everyone's
+inbox which makes things more noisy.
 
-BR
-Markus
+--Erlp5XHmWCbFSP4H
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmep+DcACgkQJNaLcl1U
+h9CQGgf/VRshpAxNRM+4y4pK3dFBOw1Ky/VAXan0LIOgCUmAP8+L3qoihpm6VZoz
+o6W4ioH6XERLRHTxdkiieODuhDTDhXH7sNTVvzzLejKyo4DbHvQBsMo2X0+kEZ3X
+n3ZFgc8GgqMbmv9EIVATYRnbBCUhhcD7EEZlTvxDDbErDipAGaaYMYTPsbMOZ1qY
+WWHWlzndWagcVtYf4Qf5bx4FjpS97qnE+VS801C6WgxbmrOFcWrTga0hXVlhQeu/
+V+FDM+XojBDbeAKOvkXZkHAybyY9U37wa0h0kmq6cDBuherZ5XdAXyw0K5uvqA4W
+0ywZYqZ4Ucmy7mvcfUgmcUR9E3GnMg==
+=m2SC
+-----END PGP SIGNATURE-----
+
+--Erlp5XHmWCbFSP4H--
