@@ -1,223 +1,80 @@
-Received: from baldur.buserror.net (baldur.buserror.net [165.227.176.147])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB81A1DFE16;
-	Sun,  9 Feb 2025 21:18:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=165.227.176.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 238D81BBBE5;
+	Mon, 10 Feb 2025 07:55:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739135911; cv=none; b=MNwEr+nn9+4g2L8bz7nAjFGVL4iE6HwuIVR9WpzukCjwi6cbGV/3iT35XX5B0uS0cUzQAeBKbSBbmgFFJj+MwhQ8hsMpK2/iWRlfKz6eYqoyVBiSM4d4bP5E62whuB2A6FG2RzF/fItzo/GZQ6NJgEuoJ/7te4eTAfFEDTDFl5o=
+	t=1739174112; cv=none; b=pD8Jz99ZceZwgE7knr5eIVjnsBuKvD4zqcIIBieyaA1WEo4OnaBTOzylDNr0n90USbFl1U5mcjKAsfGwSTf6oiASn8p2AI38witlbsoBO/BzW/sV7F5z8uJpGQai3lk9JuW17iZ+TRLqtoe9s7nU8ce2deosFib0tIdL0HfHT8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739135911; c=relaxed/simple;
-	bh=Kg6oaiN5VgUed118o3orQZEWOHSb84YE2ygFB+H2ORo=;
-	h=Date:From:To:Cc:Message-ID:References:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To:Subject; b=dU7dlYWvVjs2yHmPCYz9K7BAbCKotz8kkMlb5ky3IEdRrGHKMWyFrcYC34CfyFIVchSjoMQpv/9SWRnNwdnEc0VzsOi6b+Y4eadHUZZlGOkAGP5BvMSa20l/j1F0YYdU++oinV5IewEXtrT85cACLK8fqPKaBEvOIc4awoS/0+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=buserror.net; spf=pass smtp.mailfrom=buserror.net; dkim=pass (2048-bit key) header.d=buserror.net header.i=@buserror.net header.b=0UnPtkDc; arc=none smtp.client-ip=165.227.176.147
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=buserror.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=buserror.net
+	s=arc-20240116; t=1739174112; c=relaxed/simple;
+	bh=+yH1+/vfua0kb36HoGky/YL7GDTdPlx9P92pxcH8WZM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cMc94t7+QOTUBMfa1Uh+hdAH/R+oacEvmygty+K66MWelGBssdGfYm+fNUWUMr55rFVQUrlXuGL3TK9uyn8V/Gcy+rXCGc8iqmlVhSs7xxCd4kHcgtNYYLnBnRpRWD/UNG+CO6EmUWBTa/pHMbTe47Rr/Yh2SQwhk0aK6G/ud2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=axz2LlYX; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=buserror.net header.i=@buserror.net header.b="0UnPtkDc"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=buserror.net; s=rsa_sel; h=Subject:In-Reply-To:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:References:Message-ID:Cc:To:From:Date:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=EpToGD3dUgsdAKwVgr42gOxVA1d/S1QPZ4reqp0Dgs8=; b=0UnPtkDcmzDcjvHDUHyLT2CjRU
-	Wu31RLzuZn8p0dV1DURWjhl+4+u/yXCjfpbN//Fv+gzr7dFxyWAIY13siJk1+2c2h7flpXKEbo5GK
-	Nzb0MrDhlkKl23df30ZGunrnNmUcpvB/tY7q0jPyZACh4u0zgcDKAURgcZgDdJCfSub1blBNmf6Ye
-	2sc/RnS11ATYBdxLh4TOGHrIUM868ob5a1q6cLyIoCxxUqwRzg3HVOyqHUfIDBNgC955YJewdlyOP
-	VUcjGVLAyzhCUnLHWphUkyZmWKmwZrAiNhydfaGiX5Yiakntm82WcDWO+upyCLZ9SU2k3ajGLNyec
-	oI4TO6mg==;
-Received: from oss by baldur.buserror.net with local (Exim 4.96)
-	(envelope-from <oss@buserror.net>)
-	id 1thDxm-00C5Xt-1r;
-	Sun, 09 Feb 2025 14:31:35 -0600
-Date: Sun, 9 Feb 2025 14:31:34 -0600
-From: Crystal Wood <oss@buserror.net>
-To: j.ne@posteo.net
-Cc: devicetree@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	Krzysztof Kozlowski <krzk@kernel.org>, imx@lists.linux.dev,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Naveen N Rao <naveen@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Niklas Cassel <cassel@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>, Lee Jones <lee@kernel.org>,
-	Vinod Koul <vkoul@kernel.org>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	=?iso-8859-1?Q?J=2E_Neusch=E4fer?= <j.neuschaefer@gmx.net>,
-	Wim Van Sebroeck <wim@linux-watchdog.org>,
-	Guenter Roeck <linux@roeck-us.net>, Mark Brown <broonie@kernel.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Richard Weinberger <richard@nod.at>,
-	Vignesh Raghavendra <vigneshr@ti.com>, linux-kernel@vger.kernel.org,
-	linux-ide@vger.kernel.org, linux-crypto@vger.kernel.org,
-	dmaengine@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-watchdog@vger.kernel.org, linux-spi@vger.kernel.org,
-	linux-mtd@lists.infradead.org, Li Yang <leoyang.li@nxp.com>,
-	John Ogness <john.ogness@linutronix.de>
-Message-ID: <Z6kQpuQf5m-bXTyt@buserror.net>
-References: <20250207-ppcyaml-v2-0-8137b0c42526@posteo.net>
- <20250207-ppcyaml-v2-9-8137b0c42526@posteo.net>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="axz2LlYX"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=Exdjmonj6GK2zeEbY00Q7n//w+UT1eEbVIkBvF29tHM=; b=axz2LlYXnNo/cSiE+jX4BNynyG
+	aAsl+QFMe/xPo5snnamjApb8+d14yXzABQ2XJubygwD8QTwWmm/A6Vg4dl2bq0sk3TyiidNT1az/K
+	4AZKYcU24xlJUdpBe9fLrsf1LlSoadiZ5s7VH1ULrFebtJ9GVoCXvCnK52zNvZWcnr8hjjvEh/omZ
+	t4IHiT51SsAvzcezLIDUsIFW/muZbbeWdCHUypiTNpUCp3R/w4qWJAWUQCqWw5Bp9IKHOnkBmknh7
+	x6WVZChtwyRzMDtPVtHZZiZPSF1nYooOf73B+lNZEW03Zqv/U4B/kVTlimISWGgMShQBa4XLhvc9u
+	frxKvZgg==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1thOQ1-00Gcm7-0a;
+	Mon, 10 Feb 2025 15:54:47 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 10 Feb 2025 15:54:45 +0800
+Date: Mon, 10 Feb 2025 15:54:45 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Lukas Wunner <lukas@wunner.de>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Stefan Berger <stefanb@linux.ibm.com>,
+	Vitaly Chikunov <vt@altlinux.org>,
+	David Howells <dhowells@redhat.com>,
+	Ignat Korchagin <ignat@cloudflare.com>,
+	linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
+	Eric Biggers <ebiggers@google.com>
+Subject: Re: [PATCH v2 3/4] crypto: ecdsa - Fix enc/dec size reported by
+ KEYCTL_PKEY_QUERY
+Message-ID: <Z6mwxUaS33EastB3@gondor.apana.org.au>
+References: <cover.1738521533.git.lukas@wunner.de>
+ <3d74d6134f4f87a90ebe0a37cb06c6ec144ceef7.1738521533.git.lukas@wunner.de>
+ <Z6h8L0D-CBhZUiVR@gondor.apana.org.au>
+ <Z6iRssS26IOjWbfx@wunner.de>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250207-ppcyaml-v2-9-8137b0c42526@posteo.net>
-X-SA-Exim-Connect-IP: <locally generated>
-X-SA-Exim-Rcpt-To: j.ne@posteo.net, devicetree@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, krzk@kernel.org, imx@lists.linux.dev, maddy@linux.ibm.com, mpe@ellerman.id.au, npiggin@gmail.com, christophe.leroy@csgroup.eu, naveen@kernel.org, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, dlemoal@kernel.org, cassel@kernel.org, herbert@gondor.apana.org.au, davem@davemloft.net, lee@kernel.org, vkoul@kernel.org, lpieralisi@kernel.org, kw@linux.com, manivannan.sadhasivam@linaro.org, bhelgaas@google.com, j.neuschaefer@gmx.net, wim@linux-watchdog.org, linux@roeck-us.net, broonie@kernel.org, miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com, linux-kernel@vger.kernel.org, linux-ide@vger.kernel.org, linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org, linux-pci@vger.kernel.org, linux-watchdog@vger.kernel.org, linux-spi@vger.kernel.org, linux-mtd@lists.infradead.org, leoyang.li@nxp.com, john.ogness@linutronix.de
-X-SA-Exim-Mail-From: oss@buserror.net
-X-Spam-Level: 
-X-Spam-Report: 
-	*  -15 BAYES_00 BODY: Bayes spam probability is 0 to 1%
-	*      [score: 0.0000]
-	* -0.0 NO_RELAYS Informational: message was not relayed via SMTP
-Subject: Re: [PATCH v2 09/12] dt-bindings: memory-controllers: Convert
- fsl,elbc to YAML
-X-SA-Exim-Version: 4.2.1 (built Wed, 06 Jul 2022 17:57:39 +0000)
-X-SA-Exim-Scanned: Yes (on baldur.buserror.net)
+In-Reply-To: <Z6iRssS26IOjWbfx@wunner.de>
 
-On Fri, Feb 07, 2025 at 10:30:26PM +0100, J. Neuschäfer via B4 Relay wrote:
-> From: "J. Neuschäfer" <j.ne@posteo.net>
+On Sun, Feb 09, 2025 at 12:29:54PM +0100, Lukas Wunner wrote:
+>
+> One user of this API is the Embedded Linux Library, which in turn
+> is used by Intel Wireless Daemon:
 > 
-> Convert the Freescale localbus controller bindings from text form to
-> YAML. The updated list of compatible strings reflects current usage
-> in arch/powerpc/boot/dts/, except that many existing device trees
-> erroneously specify "simple-bus" in addition to fsl,*elbc.
-> 
-> Changes compared to the txt version:
->  - removed the board-control (fsl,mpc8272ads-bcsr) node because it only
->    appears in this example and nowhere else
->  - added a new example with NAND flash
->  - updated list of compatible strings
-> 
-> Signed-off-by: J. Neuschäfer <j.ne@posteo.net>
-> ---
-> 
-> V2:
-> - fix order of properties in examples, according to dts coding style
-> - move to Documentation/devicetree/bindings/memory-controllers
-> - clarify the commit message a tiny bit
-> - remove unnecessary multiline markers (|)
-> - define address format in patternProperties
-> - trim subject line (remove "binding")
-> - remove use of "simple-bus", because it's technically incorrect
+> https://git.kernel.org/pub/scm/libs/ell/ell.git/tree/ell/key.c
+> https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/src/eap-tls.c
 
-While I admit I haven't been following recent developments in this area,
-as someone who was involved when "simple-bus" was created (and was on the
-ePAPR committee that standardized it) I'm surprised to hear simple-bus
-being called "erroneous" or "technically incorrect" here.
+Surely this doesn't use the private key part of the API, does it?
 
-For non-NAND devices this bus generally meets the definition of "an
-internal I/O bus that cannot be probed for devices" where "devices on the
-bus can be accessed directly without additional configuration
-required".  NAND flash is an exception, but those devices have
-compatibles that are specific to the bus controller.
+While I intensely dislike the entire API being there, it's only the
+private key part that I really want to remove.
 
-The fact that the address encoding is non-linear is irrelevant; the
-addresses can still be translated using the standard "ranges" mechanism. 
-This seems to be a disconnect between the schema verification and the way
-the compatible has previously been defined and used.
-
-And as a practical matter, unless I'm missing something (which I might be
-since I haven't been in devicetree-land for nearly a decade), Linux is
-relying on simple-bus to probe these devices.  There is a driver that
-binds to the bus itself but that is just for error interrupts and NAND.
-
-You'd probably need something like commit 3e25f800afb82bd9e5f8 ("memory:
-fsl_ifc: populate child devices without relying on simple-bus") and the 
-subsequent fix in dd8adc713b1656 ("memory: fsl_ifc: populate child
-nodes of buses and mfd devices")...
-
-I'm curious what the reasoning was for removing simple-bus from IFC.  It
-seems that the schema verification also played a role in that:
-https://www.spinics.net/lists/devicetree/msg220418.html
-
-...but there's also the comment in 985ede63a045eabf3f9d ("dt-bindings:
-memory: fsl: convert ifc binding to yaml schema") that "this will help to
-enforce the correct probe order between parent device and child devices",
-but was that really not already guaranteed by the parent/child
-relationship (and again, it should only really matter for NAND except for
-the possibility of missing error reports during early boot)?
-
-> +  compatible:
-> +    oneOf:
-> +      - items:
-> +          - enum:
-> +              - fsl,mpc8313-elbc
-> +              - fsl,mpc8315-elbc
-> +              - fsl,mpc8377-elbc
-> +              - fsl,mpc8378-elbc
-> +              - fsl,mpc8379-elbc
-> +              - fsl,mpc8536-elbc
-> +              - fsl,mpc8569-elbc
-> +              - fsl,mpc8572-elbc
-> +              - fsl,p1020-elbc
-> +              - fsl,p1021-elbc
-> +              - fsl,p1023-elbc
-> +              - fsl,p2020-elbc
-> +              - fsl,p2041-elbc
-> +              - fsl,p3041-elbc
-> +              - fsl,p4080-elbc
-> +              - fsl,p5020-elbc
-> +              - fsl,p5040-elbc
-> +          - const: fsl,elbc
-
-Is it really necessary to list every single chip?
-
-And then it would need to be updated when new ones came out?  I know this
-particular line of chips is not going to see any new members at this
-point, but as far as the general approach goes...
-
-Does the schema validation complain if it sees an extra compatible it
-doesn't recognize?  If so that's obnoxious.
-
-> +examples:
-> +  - |
-> +    localbus@f0010100 {
-> +        compatible = "fsl,mpc8272-localbus",
-> +                     "fsl,pq2-localbus";
-> +        reg = <0xf0010100 0x40>;
-> +        ranges = <0x0 0x0 0xfe000000 0x02000000
-> +                  0x1 0x0 0xf4500000 0x00008000
-> +                  0x2 0x0 0xfd810000 0x00010000>;
-> +        #address-cells = <2>;
-> +        #size-cells = <1>;
-> +
-> +        flash@0,0 {
-> +            compatible = "jedec-flash";
-> +            reg = <0x0 0x0 0x2000000>;
-> +            bank-width = <4>;
-> +            device-width = <1>;
-> +        };
-> +
-> +        simple-periph@2,0 {
-> +            compatible = "fsl,elbc-gpcm-uio";
-> +            reg = <0x2 0x0 0x10000>;
-> +            elbc-gpcm-br = <0xfd810800>;
-> +            elbc-gpcm-or = <0xffff09f7>;
-> +        };
-
-I know this isn't new, but... since we're using this as an example,
-where is the documentation for this fsl,elbc-gpcm-uio and
-elbc-gpcm-br/or?  What exactly is a simple-periph?
-
-There are no in-tree device trees that use this either.  The bcsr
-node was actually a much more normal example, despite that particular
-platform having been removed.  There are other bcsr nodes that still
-exist that could be used instead.
-
--Crystal
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
