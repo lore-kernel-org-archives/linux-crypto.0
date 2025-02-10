@@ -1,265 +1,131 @@
-Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E1811DF738
-	for <linux-crypto@vger.kernel.org>; Mon, 10 Feb 2025 11:31:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C886A17BB6
+	for <linux-crypto@vger.kernel.org>; Mon, 10 Feb 2025 12:40:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739187095; cv=none; b=i6wJkf5JHcLKwb6UZ6OPFsMx0W8+rnHfBoaSXhnxRuFtE2fRxuCMv/nvplevQDvnCFmww9S1F4Wqe5MprPryvshvTHlT6iiUiPL9Z4Kuccx3aBeV7r5MLBXaHfF5dyTzGuxcji8L+SymRIH+tTXFMhS3luALwJQRzLz2u3l8GZ4=
+	t=1739191215; cv=none; b=brl8ZRcUFz4Q4GzBzdfGR04Fqx7MCCm6LlvV/xBls9OOoijRwQmsYV+HcaR4teNliwEZ9m3x82r12Rodrw3XEKyvvL+Nim4SnLGB0j0VPDwFvT3ZdzIeEBkLZK0ELFPoKCF9VSeZEU6HAFWDa519111S1FFqx1Jias+3V+Okl6U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739187095; c=relaxed/simple;
-	bh=JF/n15lnAm7NZMFbEUTi4J8f8m2TQ7lxj7+v1eHdIuY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rWvdNOJQTfb/qms6DRYkvy87j6+hn3ceCexrTmhpfJQIbRd/8Cl+6sk+4aqZeqGl9tU65VAC7xZOWqcoWMzjcH3yeFlMCHroTdaf+Gk9Amy3f7/2I9o9eKz+q8cgeZMv1tAD+v7tdRwAKvZxjudfo2cpgoh3ppormj4qIrWE2ko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net; spf=pass smtp.mailfrom=posteo.net; dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b=JpmWN1g6; arc=none smtp.client-ip=185.67.36.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.net
+	s=arc-20240116; t=1739191215; c=relaxed/simple;
+	bh=vC/2p3vue+xQRI8AHSDC2HfA+L1Yp//ojjEwI0nkQRY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AREppmxTrwW+WYRp5UmHEsG9uPz59y1l41ATkp2k+UNGJUwAkXYkFHiw33O8o12DOzztvwaxBjngJzW5X2igBZPEsyG5yto0LUbNXkmhaNbb16aWSzUW8AjrTf5k+bgHAtVxFpPd8NjdxiWeCSLDRSalvh37NOCgkbK1XuNljyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CL1DgAU8; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b="JpmWN1g6"
-Received: from submission (posteo.de [185.67.36.169]) 
-	by mout01.posteo.de (Postfix) with ESMTPS id 44208240029
-	for <linux-crypto@vger.kernel.org>; Mon, 10 Feb 2025 12:31:25 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.net; s=2017;
-	t=1739187085; bh=JF/n15lnAm7NZMFbEUTi4J8f8m2TQ7lxj7+v1eHdIuY=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:Content-Transfer-Encoding:From;
-	b=JpmWN1g6e9WQyrXQ7YqKa6Kz7YaEDYolPFawuJollCAzXyAykqbJGoZ+zalrhTLl8
-	 0f20eLO/gb+kGMQG2fH5TKmJEFrqGaN6UwBOAyyTSCiSuA57Gfh1FfJR75F2BTuW7Y
-	 /y2wCp2bUoNfwe8q67lwJI2tleg3YW+PS4g+S57IUQyxrG6AeC8sx71dc9aXf0Q5rE
-	 ikLvW6yzzw4cRkk6JOrSz2ttcOw/XLuzsx6rsHe0z0p6E3OCWI5L8kDFa14iqPeDcP
-	 /xijkoq/1z1YJJwTE3M4e6n7DlQEG+y3BB99cR2HqY4pCUnD30XDSw+fWIzzAOuBpH
-	 CY8rACCyyxnAw==
-Received: from customer (localhost [127.0.0.1])
-	by submission (posteo.de) with ESMTPSA id 4Ys2TK4ysMz6tw3;
-	Mon, 10 Feb 2025 12:31:17 +0100 (CET)
-Date: Mon, 10 Feb 2025 11:31:01 +0000
-From: =?utf-8?Q?J=2E_Neusch=C3=A4fer?= <j.ne@posteo.net>
-To: Crystal Wood <oss@buserror.net>
-Cc: j.ne@posteo.net, devicetree@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	Krzysztof Kozlowski <krzk@kernel.org>, imx@lists.linux.dev,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Naveen N Rao <naveen@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Niklas Cassel <cassel@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>, Lee Jones <lee@kernel.org>,
-	Vinod Koul <vkoul@kernel.org>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	=?utf-8?Q?J=2E_Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
-	Wim Van Sebroeck <wim@linux-watchdog.org>,
-	Guenter Roeck <linux@roeck-us.net>, Mark Brown <broonie@kernel.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Richard Weinberger <richard@nod.at>,
-	Vignesh Raghavendra <vigneshr@ti.com>, linux-kernel@vger.kernel.org,
-	linux-ide@vger.kernel.org, linux-crypto@vger.kernel.org,
-	dmaengine@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-watchdog@vger.kernel.org, linux-spi@vger.kernel.org,
-	linux-mtd@lists.infradead.org, Li Yang <leoyang.li@nxp.com>,
-	John Ogness <john.ogness@linutronix.de>
-Subject: Re: [PATCH v2 09/12] dt-bindings: memory-controllers: Convert
- fsl,elbc to YAML
-Message-ID: <Z6njdeo8kHw6RtYH@probook>
-References: <20250207-ppcyaml-v2-0-8137b0c42526@posteo.net>
- <20250207-ppcyaml-v2-9-8137b0c42526@posteo.net>
- <Z6kQpuQf5m-bXTyt@buserror.net>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CL1DgAU8"
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-ab7c81b8681so113193466b.0
+        for <linux-crypto@vger.kernel.org>; Mon, 10 Feb 2025 04:40:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739191212; x=1739796012; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=RJK+xXuuNshrOOmsp2OjLGqkJM8XBht+rlbmPUYy3P0=;
+        b=CL1DgAU8ScbQZ03QUbDFIav/gb+pHOile5HfCQXCUmEVQUvT0GKd/XccVFII7ta8fq
+         VOWPApbhz0qSfw31xYJqENGjvZg9zQTFcVIlynIAwFFuU4g/I7VqWB2LIUrlqjccR4Iv
+         AaRT+wiF53frCwSr9Lb35SGgF5mk5j3r+CreXf6e3ioM4P5Q4ute0TceNeZTk9bKdTsQ
+         6ZRjpJtGpeezuoTTBIeErI7DVRshmI1T9N27x5CRjdbJGrVATkwA9St6+Oslu3L0XimJ
+         ToWKwlXOQ4Vagt0pvsdXgCJY3pgU1p2vokw4WDcIt0KQ3izR/13W9nE87MI58oy2/+eR
+         ChnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739191212; x=1739796012;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RJK+xXuuNshrOOmsp2OjLGqkJM8XBht+rlbmPUYy3P0=;
+        b=QEA9VwSTTZZXmmvvk2m5JL4vVV2145f2Ej80YJbQbdZnaXY9JKTrZRa6FKfpr2I/0S
+         G4ZuW43hDG39+N1sbrQ38Gnu54BjTXsWx4MojzoHLfvLB2SqpGBK6muxo0DIk/9y1hJk
+         o6y+/VaZEFjZhV4ecm2s3vv6OZNVsE4Y6dp75+qKWgjefKOGPA12XmTfStfCiK6zeFt+
+         Pxfnt6sits22drmB/jDw0+P7H7gLH9m3xtW83V+TBP/gm2Oh5y3GDFCMVBF0tnOomr2c
+         i7uwhgFU73BvC/vShhZtyDlJFpJVxWGu2sEOvtIWFKM3BT4/njyfO48KJbUWpUGsq2nR
+         X8gQ==
+X-Gm-Message-State: AOJu0YzGWQg5ogXDO/9zoLGlZNuOvuVFNLb6GxB0iT59zQ9jCVl4p9Bs
+	ylxfN6s6Za5sBI+cXzo59VH6x4Az+WXU/sJRjEnByKXsarh5SuefbLaPV0TWa7YfkA==
+X-Gm-Gg: ASbGncsE/P88wtXq+ABJoZHmerWlqEsfJsUUFwg7VWgw9/y0c7DQysgGFtqo4xMuVSK
+	LWr1/Irv8lmwXTCxnltxRjgMHNo+BJXIIvvGrAa/5Ql+DtEBwQSTSpKZGWccZOc/gofcDBfsDT0
+	wb5mUF6CMJIPHwffqma4Zgler4NTm8LgaERE6ay9H9mDNFTbR9k375axMq1apGJI79T+r2RWfXQ
+	izo8nrrDHakU150TblfGFeZT2ZdzuD+klx7+c4QZT4sgdqwfYtWzQe3paFFc+WMQ0ALMbn8IeEg
+	Zv3P9BGDwrTQ6M/QP1TRzJDu957FuLFrT49+dDbkPh6m3ZgqGGQHz2H99rs7wL3WFM4jg7JT5eR
+	/GVIyd6FjthE1o+Y5fV/6/wmOq2GRReuXPiSKTiQke/MAE8c5qMU=
+X-Google-Smtp-Source: AGHT+IHBmTV/q8kkdD9VoXT0z82FGAVcIGVICf5E+QzF192xxTnzFAraIFL/vjVbGpVUTPh4qm5XHQ==
+X-Received: by 2002:a17:907:9628:b0:ab2:bd0b:acdf with SMTP id a640c23a62f3a-ab789c1d683mr1521631766b.36.1739191211777;
+        Mon, 10 Feb 2025 04:40:11 -0800 (PST)
+Received: from ?IPV6:2003:d0:af0c:d200:8ab2:e79e:9971:853b? (p200300d0af0cd2008ab2e79e9971853b.dip0.t-ipconnect.de. [2003:d0:af0c:d200:8ab2:e79e:9971:853b])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab79fea9e06sm543811566b.60.2025.02.10.04.40.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 10 Feb 2025 04:40:11 -0800 (PST)
+Message-ID: <1157db48-ba02-4977-9604-fdca26da575b@gmail.com>
+Date: Mon, 10 Feb 2025 13:40:10 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Z6kQpuQf5m-bXTyt@buserror.net>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] crypto: jitter - add cmdline oversampling overrides
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, davem@davemloft.net, smueller@chronox.de
+References: <20250127160236.7821-1-theil.markus@gmail.com>
+ <Z6hy7LFoHPffWuWi@gondor.apana.org.au>
+Content-Language: en-US
+From: Markus Theil <theil.markus@gmail.com>
+In-Reply-To: <Z6hy7LFoHPffWuWi@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sun, Feb 09, 2025 at 02:31:34PM -0600, Crystal Wood wrote:
-> On Fri, Feb 07, 2025 at 10:30:26PM +0100, J. Neuschäfer via B4 Relay wrote:
-> > From: "J. Neuschäfer" <j.ne@posteo.net>
-> > 
-> > Convert the Freescale localbus controller bindings from text form to
-> > YAML. The updated list of compatible strings reflects current usage
-> > in arch/powerpc/boot/dts/, except that many existing device trees
-> > erroneously specify "simple-bus" in addition to fsl,*elbc.
-> > 
-> > Changes compared to the txt version:
-> >  - removed the board-control (fsl,mpc8272ads-bcsr) node because it only
-> >    appears in this example and nowhere else
-> >  - added a new example with NAND flash
-> >  - updated list of compatible strings
-> > 
-> > Signed-off-by: J. Neuschäfer <j.ne@posteo.net>
-> > ---
-> > 
-> > V2:
-> > - fix order of properties in examples, according to dts coding style
-> > - move to Documentation/devicetree/bindings/memory-controllers
-> > - clarify the commit message a tiny bit
-> > - remove unnecessary multiline markers (|)
-> > - define address format in patternProperties
-> > - trim subject line (remove "binding")
-> > - remove use of "simple-bus", because it's technically incorrect
+Hi (& sorry for replying in HTML the last time :(),
+
+On 09.02.25 10:18, Herbert Xu wrote:
+> On Mon, Jan 27, 2025 at 05:02:36PM +0100, Markus Theil wrote:
+>> As already mentioned in the comments, using a cryptographic
+>> hash function, like SHA3-256, decreases the expected entropy
+>> due to properties of random mappings (collisions and unused values).
+>>
+>> When mapping 256 bit of entropy to 256 output bits, this results
+>> in roughly 6 bit entropy loss (depending on the estimate formula
+>> for mapping 256 bit to 256 bit via a random mapping):
+>>
+>> NIST approximation (count all input bits as input): 255.0
+>> NIST approximation (count only entropy bits as input): 251.69 Bit
+>> BSI approximation (count only entropy bits as input): 250.11 Bit
+>>
+>> Therefore add a cmdline override for the 64 bit oversampling safety margin,
+>> This results in an expected entropy of nearly 256 bit also after hashing,
+>> when desired.
+>>
+>> Only enable this, when you are aware of the increased runtime per
+>> iteration.
+>>
+>> This override is only possible, when not in FIPS mode (as FIPS mandates
+>> this to be true for a full entropy claim).
+>>
+>> Signed-off-by: Markus Theil <theil.markus@gmail.com>
+>> ---
+>>   crypto/jitterentropy.c | 33 +++++++++++++++++++++++++++------
+>>   1 file changed, 27 insertions(+), 6 deletions(-)
 > 
-> While I admit I haven't been following recent developments in this area,
-> as someone who was involved when "simple-bus" was created (and was on the
-> ePAPR committee that standardized it) I'm surprised to hear simple-bus
-> being called "erroneous" or "technically incorrect" here.
+> Why does this need to be a toggle?
 
-It is quite possible that my understanding of it is incomplete or wrong.
-
-> 
-> For non-NAND devices this bus generally meets the definition of "an
-> internal I/O bus that cannot be probed for devices" where "devices on the
-> bus can be accessed directly without additional configuration
-> required".  NAND flash is an exception, but those devices have
-> compatibles that are specific to the bus controller.
-> 
-> The fact that the address encoding is non-linear is irrelevant; the
-> addresses can still be translated using the standard "ranges" mechanism. 
-> This seems to be a disconnect between the schema verification and the way
-> the compatible has previously been defined and used.
-
-This is what led me to my assumptions: The simple-bus validation logic
-in dtc complains about unit addresses such as nand@1,0 which are quite
-appropriate for the eLBC.
+It slightly increases the runtime of the code per 256 Bit random number 
+generated, which possibly doesn't suit embedded guys using this RNG but 
+demanding short system bootup.
+So users who can live with this penalty can enable it, others probably 
+won't tolerate it. With this being a toggle, it will also be easier to 
+enable this in default distribution kernels running e.g. in cloud instances.
 
 > 
-> And as a practical matter, unless I'm missing something (which I might be
-> since I haven't been in devicetree-land for nearly a decade), Linux is
-> relying on simple-bus to probe these devices.  There is a driver that
-> binds to the bus itself but that is just for error interrupts and NAND.
+> Why can't you just make this conditional on fips_enabled?
 
-As of now, yes, that's correct. Without simple-bus, a current Linux
-kernel doesn't find the device nodes inside such a localbus.
+This was also my first thought, just enable fips mode. Our workloads 
+don't have to run in FIPS mode and I don't know which software may 
+reacts to the kernel announcing to be fips enabled in an unexpected way.
 
-> 
-> You'd probably need something like commit 3e25f800afb82bd9e5f8 ("memory:
-> fsl_ifc: populate child devices without relying on simple-bus") and the 
-> subsequent fix in dd8adc713b1656 ("memory: fsl_ifc: populate child
-> nodes of buses and mfd devices")...
+So basically, this seems to be useful, even when not in FIPS mode.
 
-I have prepared such a patch, based on the same assumptions:
+BR
+Markus
 
-  [PATCH] powerpc/fsl_lbc: Explicitly populate bus
-  https://lore.kernel.org/lkml/20250209-localbus-v1-1-efcd780153a0@posteo.net/
-
-> 
-> I'm curious what the reasoning was for removing simple-bus from IFC.  It
-> seems that the schema verification also played a role in that:
-> https://www.spinics.net/lists/devicetree/msg220418.html
-
-Yes, that's the same as my reasoning.
-
-> 
-> ...but there's also the comment in 985ede63a045eabf3f9d ("dt-bindings:
-> memory: fsl: convert ifc binding to yaml schema") that "this will help to
-> enforce the correct probe order between parent device and child devices",
-> but was that really not already guaranteed by the parent/child
-> relationship (and again, it should only really matter for NAND except for
-> the possibility of missing error reports during early boot)?
-
-I'm inclined to agree with you, but it's somewhat beyond my skill level.
-
-I'll let Li Yang or Rob Herring comment on that.
-
-> 
-> > +  compatible:
-> > +    oneOf:
-> > +      - items:
-> > +          - enum:
-> > +              - fsl,mpc8313-elbc
-> > +              - fsl,mpc8315-elbc
-> > +              - fsl,mpc8377-elbc
-> > +              - fsl,mpc8378-elbc
-> > +              - fsl,mpc8379-elbc
-> > +              - fsl,mpc8536-elbc
-> > +              - fsl,mpc8569-elbc
-> > +              - fsl,mpc8572-elbc
-> > +              - fsl,p1020-elbc
-> > +              - fsl,p1021-elbc
-> > +              - fsl,p1023-elbc
-> > +              - fsl,p2020-elbc
-> > +              - fsl,p2041-elbc
-> > +              - fsl,p3041-elbc
-> > +              - fsl,p4080-elbc
-> > +              - fsl,p5020-elbc
-> > +              - fsl,p5040-elbc
-> > +          - const: fsl,elbc
-> 
-> Is it really necessary to list every single chip?
-> 
-> And then it would need to be updated when new ones came out?  I know this
-> particular line of chips is not going to see any new members at this
-> point, but as far as the general approach goes...
-
-As far as I'm aware, this reflects common practice today.
-
-> 
-> Does the schema validation complain if it sees an extra compatible it
-> doesn't recognize?  If so that's obnoxious.
-
-Yes.
-
-> 
-> > +examples:
-> > +  - |
-> > +    localbus@f0010100 {
-> > +        compatible = "fsl,mpc8272-localbus",
-> > +                     "fsl,pq2-localbus";
-> > +        reg = <0xf0010100 0x40>;
-> > +        ranges = <0x0 0x0 0xfe000000 0x02000000
-> > +                  0x1 0x0 0xf4500000 0x00008000
-> > +                  0x2 0x0 0xfd810000 0x00010000>;
-> > +        #address-cells = <2>;
-> > +        #size-cells = <1>;
-> > +
-> > +        flash@0,0 {
-> > +            compatible = "jedec-flash";
-> > +            reg = <0x0 0x0 0x2000000>;
-> > +            bank-width = <4>;
-> > +            device-width = <1>;
-> > +        };
-> > +
-> > +        simple-periph@2,0 {
-> > +            compatible = "fsl,elbc-gpcm-uio";
-> > +            reg = <0x2 0x0 0x10000>;
-> > +            elbc-gpcm-br = <0xfd810800>;
-> > +            elbc-gpcm-or = <0xffff09f7>;
-> > +        };
-> 
-> I know this isn't new, but... since we're using this as an example,
-> where is the documentation for this fsl,elbc-gpcm-uio and
-> elbc-gpcm-br/or?  What exactly is a simple-periph?
-
-fsl,elbc-gpcm-uio is handled in the following patch
-(dt-bindings: memory-controllers: Add fsl,elbc-gpcm-uio).
-
-simple-periph is something I haven't thought about, because this whole
-example comes from the old txt-format binding. The whole purpose of
-fsl,elbc-gpcm-uio is to allow userspace drivers to interact with
-localbus devices, so that doesn't make the intention any clearer, either.
-
-> 
-> There are no in-tree device trees that use this either.  The bcsr
-> node was actually a much more normal example, despite that particular
-> platform having been removed.  There are other bcsr nodes that still
-> exist that could be used instead.
-
-Ah, fsl,mpc8568mds-bcsr for example, good point. I'll add it back.
-
-> 
-> -Crystal
-
-Thank you for reaching out!
-
-Best regards,
-J. Neuschäfer
