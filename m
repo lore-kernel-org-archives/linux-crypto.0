@@ -1,270 +1,179 @@
-Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5C8B1E3DF7;
-	Tue, 11 Feb 2025 07:40:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01D651D5178;
+	Tue, 11 Feb 2025 08:06:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739259616; cv=none; b=M1Oc5h0ZPz82FN4ZPuu8jAarTz958u6m286MgOEPLLgWlOP6RB+3EGfOg5vDp+M/5A7ZfHEPuGe5QH1BuUz4FvTyRKwU1j8V6VchR0LOis7BHyT8hYSKdbZjGrVGviTJOO8iq9Tsy3RR1Gntr8FdQU0Kba+Q1Jqiu0uufuiL0Lg=
+	t=1739261207; cv=none; b=kZD/utoB34vaTC7ryt0vXw237kewwYDkZr3+/by8jceK4rxdZ2LrCMuCdNfFeEDqvW/T/cG0Te+e89qMGfNKzwsgy/ivX6oEtNVvh8wKpx+VC275HE+gE0TK6wHaoJYMITr9IpQf5gbP1XTZcu5393U8jlBJIdPXhshqpqPTzmo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739259616; c=relaxed/simple;
-	bh=beJJmS5KhmQpKqkqoSD5HJLmQz/rWVlme+hJ0TKjkbk=;
+	s=arc-20240116; t=1739261207; c=relaxed/simple;
+	bh=2jP2zbkt7LWl+/bugR4lAeF/IEYJn8uooGiAdMDZA1Y=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZV92+vVFDhzgRpIbLIx1pCtsDQdymdYKwbZRyD9DK6VjyCGsKKm2l42wMrvfbh19tW2JuBr4LcggjsKPCNzw53znmZ3j5Wx3r6HPMABpxVipdqFeL9M9LVKdwGHOm/Lf3AqKkCP5gw/Iv0bbEG36xQpZeYnYBACZyRnF6fPeFFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from mail-ej1-f41.google.com (unknown [209.85.218.41])
-	by APP-03 (Coremail) with SMTP id rQCowADnzTAw_apnJpFeDA--.31350S2;
-	Tue, 11 Feb 2025 15:33:05 +0800 (CST)
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-ab78bcb4b19so687060366b.2;
-        Mon, 10 Feb 2025 23:33:05 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVZiU4mMNrddg1iSVuPTfzKde/lf8ufY7q0BjQTo68SHgohobMMKWOshw4luZdpxsESggXIcst70wPxKECP@vger.kernel.org, AJvYcCW8eGYEtHdQjZOm1YTE5zgm2xyBNXmQpr9V+2rAFlbdNjViAjvUifNRakuzVcBhwrOM3D+c1u/b0LLyc9g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwU2zrEfhYpfVqzJ8TX4LvwU3hvAGA/gwwLk/Q0S6x5pOXFm+FR
-	xOtpW9k/3H6gnCJwds2M5iPocQns2EnMBURtww5yWXO3cpypBJ+V2SIt9Efzw/V5/EQLdWxYA6u
-	9c5iRTlbMCs+8kT2JswXM+nxFlBY=
-X-Google-Smtp-Source: AGHT+IHAwCNj07u8aeVQ4vMQiCfg+P4MVm57iVQx3ohWOvjItM6I9wWFswl6UR1flM66NCYqiGOpCSMe1tRHdiN6gMc=
-X-Received: by 2002:a17:907:9806:b0:ab7:46cd:4803 with SMTP id
- a640c23a62f3a-ab789ade88fmr1591185966b.18.1739259184101; Mon, 10 Feb 2025
- 23:33:04 -0800 (PST)
+	 To:Cc:Content-Type; b=YVXrrfwkIroJwvrmr+qhq0tpEg+SIlonHwjGVG79iStiDISHAIP85awU//IoweYjph7FaS8BQ93zKB/WC6LIVUY9Uo8NdorGEf1UK+FgCGoBQ2R9hswyMq/LBr60mzJD7MieCboxRNTF1vrN+ywIIdA99kVT2CYMlOXKjvFmjfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EQN1Ek6/; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EQN1Ek6/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F6BBC4CEDD;
+	Tue, 11 Feb 2025 08:06:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739261206;
+	bh=2jP2zbkt7LWl+/bugR4lAeF/IEYJn8uooGiAdMDZA1Y=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=EQN1Ek6/+md+VOZqr40C3pMmVqA4uCPEakT1Vkt6yPelL4pCqzyX6Y+HVTCNc2K7c
+	 os2A6Dj04h7adub0avYREMeSlgjttxxqFDfqtiuJypOfSwKdyWm7/siJOyYAEfYqcF
+	 13jvCKGi2/G72hxiVtbIbpDmcXVmYkYYY9cJH7fv2e4J7euwtY8bJUbAvtsYFyaqPh
+	 WNYnrpPnA2UCYVxPCE1kdd9SMGJXdgEccbbtagh5FRGc9JTEgYiqB2IBlk2s6yifZF
+	 PLr3If0Cu+Lgdlts/90+fZHptG9BFq5rTONZxuG2+kllfjlliVUrpn7a0/yZoj/Wpt
+	 flaaY6xA7pvRw==
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5450cf0cb07so1476699e87.0;
+        Tue, 11 Feb 2025 00:06:46 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXucw7K0h6rJaHZ/RQf7etugecHugN2V5ndK7JCHdcJgMHQcZCriXDwo1iPwRstay3LgQGpwZ8Awu/9O9E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzlMiGdthntk/bo06HseM3Skq1Xu2lkJvLqmAOetMKRCMg2nAOO
+	kgw8Cyc3P58yyx8/GOyMXWAyARU0z5NJX+NEuk/jYwqu5y3G6Qak4IdLijhbEsUInaJHbP2xKO2
+	O3DCLQIO7lAy84AbR0TiyzPYO0jk=
+X-Google-Smtp-Source: AGHT+IEaV6exEDwvJeZ33T3YoFFE0sQrHjviLq59act6YoD68VrvkRY8otxx6UM7RDIa8Is3qHmc6Q9/DAdHpUZuSBk=
+X-Received: by 2002:a05:6512:220b:b0:545:944:aadd with SMTP id
+ 2adb3069b0e04-5450944abc4mr2306081e87.37.1739261204716; Tue, 11 Feb 2025
+ 00:06:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250211071101.181652-1-zhihang.shao.iscas@gmail.com>
-In-Reply-To: <20250211071101.181652-1-zhihang.shao.iscas@gmail.com>
-Reply-To: zhangchunyan@iscas.ac.cn
-From: Chunyan Zhang <zhangchunyan@iscas.ac.cn>
-Date: Tue, 11 Feb 2025 15:32:27 +0800
-X-Gmail-Original-Message-ID: <CAOsKWHA9XHygkz1pedRYftmnK9XZ5sENDk1pvf7UEXsjBubepA@mail.gmail.com>
-X-Gm-Features: AWEUYZlXBBviCHia7xS16GpqqRCUdV3l5h6e5wQ7ZTpwghOFSFroDhhIYbxdu_Y
-Message-ID: <CAOsKWHA9XHygkz1pedRYftmnK9XZ5sENDk1pvf7UEXsjBubepA@mail.gmail.com>
-Subject: Re: [PATCH v4] riscv: Optimize crct10dif with zbc extension
-To: Zhihang Shao <zhihang.shao.iscas@gmail.com>
-Cc: ebiggers@kernel.org, linux-crypto@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	ardb@kernel.org
+References: <20250210165020.42611-1-ebiggers@kernel.org>
+In-Reply-To: <20250210165020.42611-1-ebiggers@kernel.org>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Tue, 11 Feb 2025 09:06:33 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXEn2tGa0w5R2868L_yw_K1hXGi+RHq2BiO_vgC9TS7GLQ@mail.gmail.com>
+X-Gm-Features: AWEUYZnGSdBcP4cvXyx1aQOKl0cK8T3e1AMQ0-W26Qvg0ba6gExtyK9lONyNotg
+Message-ID: <CAMj1kXEn2tGa0w5R2868L_yw_K1hXGi+RHq2BiO_vgC9TS7GLQ@mail.gmail.com>
+Subject: Re: [PATCH v4] crypto: x86/aes-ctr - rewrite AESNI+AVX optimized CTR
+ and add VAES support
+To: Eric Biggers <ebiggers@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-CM-TRANSID:rQCowADnzTAw_apnJpFeDA--.31350S2
-X-Coremail-Antispam: 1UD129KBjvJXoW3Gr4UCF1fJFy5ZFyUuFW3KFg_yoW7ZFWDpF
-	Wvkrs3tFWUWay7GrWxZ347WFn8Cw4vgw4agry7GFy5JF1DZrW8ZFZ5Kas29rs7JF1kJrWI
-	kF95ur98CrWDJ3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvIb7Iv0xC_tr1lb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I2
-	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
-	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xII
-	jxv20xvEc7CjxVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26F4UJVW0owA2z4x0Y4
-	vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF
-	0cIa020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr
-	0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxG
-	rwCY02Avz4vEIxC_GF4l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2
-	IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v2
-	6r126r1DMIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2
-	IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv
-	67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf
-	9x07jI0PfUUUUU=
-X-CM-SenderInfo: x2kd0wxfkx051dq6x2xfdvhtffof0/1tbiBwwKB2eq7yQwAAAAsw
 
-On Tue, 11 Feb 2025 at 15:11, Zhihang Shao <zhihang.shao.iscas@gmail.com> wrote:
+On Mon, 10 Feb 2025 at 17:51, Eric Biggers <ebiggers@kernel.org> wrote:
 >
-> The current CRC-T10DIF algorithm on RISC-V platform is based on
-> table-lookup optimization.
-> Given the previous work on optimizing crc32 calculations with zbc
-> extension, it is believed that this will be equally effective for
-> accelerating crc-t10dif.
+> From: Eric Biggers <ebiggers@google.com>
 >
-> Therefore this patch offers an implementation of crc-t10dif using zbc
-> extension. This can detect whether the current runtime environment
-> supports zbc feature and, if so, uses it to accelerate crc-t10dif
-> calculations.
+> Delete aes_ctrby8_avx-x86_64.S and add a new assembly file
+> aes-ctr-avx-x86_64.S which follows a similar approach to
+> aes-xts-avx-x86_64.S in that it uses a "template" to provide AESNI+AVX,
+> VAES+AVX2, VAES+AVX10/256, and VAES+AVX10/512 code, instead of just
+> AESNI+AVX.  Wire it up to the crypto API accordingly.
 >
-> This patch is updated due to the patchset of updating kernel's
-> CRC-T10DIF library in 6.14, which is finished by Eric Biggers.
-> Also, I used crc_kunit.c to test the performance of crc-t10dif
-> optimized by crc extension.
+> This greatly improves the performance of AES-CTR and AES-XCTR on
+> VAES-capable CPUs, with the best case being AMD Zen 5 where an over 230%
+> increase in throughput is seen on long messages.  Performance on
+> non-VAES-capable CPUs remains about the same, and the non-AVX AES-CTR
+> code (aesni_ctr_enc) is also kept as-is for now.  There are some slight
+> regressions (less than 10%) on some short message lengths on some CPUs;
+> these are difficult to avoid, given how the previous code was so heavily
+> unrolled by message length, and they are not particularly important.
+> Detailed performance results are given in the tables below.
 >
-> Signed-off-by: Zhihang Shao <zhihang.shao.iscas@gmail.com>
-
-You should add Eric's Acked-by and Tested-by, apart from that, feel free to add,
-
-Reviewed-by: Chunyan Zhang <zhangchunyan@iscas.ac.cn>
-
-Thanks,
-Chunyan
-
-
+> Both CTR and XCTR support is retained.  The main loop remains
+> 8-vector-wide, which differs from the 4-vector-wide main loops that are
+> used in the XTS and GCM code.  A wider loop is appropriate for CTR and
+> XCTR since they have fewer other instructions (such as vpclmulqdq) to
+> interleave with the AES instructions.
 >
+> Similar to what was the case for AES-GCM, the new assembly code also has
+> a much smaller binary size, as it fixes the excessive unrolling by data
+> length and key length present in the old code.  Specifically, the new
+> assembly file compiles to about 9 KB of text vs. 28 KB for the old file.
+> This is despite 4x as many implementations being included.
+>
+> The tables below show the detailed performance results.  The tables show
+> percentage improvement in single-threaded throughput for repeated
+> encryption of the given message length; an increase from 6000 MB/s to
+> 12000 MB/s would be listed as 100%.  They were collected by directly
+> measuring the Linux crypto API performance using a custom kernel module.
+> The tested CPUs were all server processors from Google Compute Engine
+> except for Zen 5 which was a Ryzen 9 9950X desktop processor.
+>
+> Table 1: AES-256-CTR throughput improvement,
+>          CPU microarchitecture vs. message length in bytes:
+>
+>                      | 16384 |  4096 |  4095 |  1420 |   512 |   500 |
+> ---------------------+-------+-------+-------+-------+-------+-------+
+> AMD Zen 5            |  232% |  203% |  212% |  143% |   71% |   95% |
+> Intel Emerald Rapids |  116% |  116% |  117% |   91% |   78% |   79% |
+> Intel Ice Lake       |  109% |  103% |  107% |   81% |   54% |   56% |
+> AMD Zen 4            |  109% |   91% |  100% |   70% |   43% |   59% |
+> AMD Zen 3            |   92% |   78% |   87% |   57% |   32% |   43% |
+> AMD Zen 2            |    9% |    8% |   14% |   12% |    8% |   21% |
+> Intel Skylake        |    7% |    7% |    8% |    5% |    3% |    8% |
+>
+>                      |   300 |   200 |    64 |    63 |    16 |
+> ---------------------+-------+-------+-------+-------+-------+
+> AMD Zen 5            |   57% |   39% |   -9% |    7% |   -7% |
+> Intel Emerald Rapids |   37% |   42% |   -0% |   13% |   -8% |
+> Intel Ice Lake       |   39% |   30% |   -1% |   14% |   -9% |
+> AMD Zen 4            |   42% |   38% |   -0% |   18% |   -3% |
+> AMD Zen 3            |   38% |   35% |    6% |   31% |    5% |
+> AMD Zen 2            |   24% |   23% |    5% |   30% |    3% |
+> Intel Skylake        |    9% |    1% |   -4% |   10% |   -7% |
+>
+> Table 2: AES-256-XCTR throughput improvement,
+>          CPU microarchitecture vs. message length in bytes:
+>
+>                      | 16384 |  4096 |  4095 |  1420 |   512 |   500 |
+> ---------------------+-------+-------+-------+-------+-------+-------+
+> AMD Zen 5            |  240% |  201% |  216% |  151% |   75% |  108% |
+> Intel Emerald Rapids |  100% |   99% |  102% |   91% |   94% |  104% |
+> Intel Ice Lake       |   93% |   89% |   92% |   74% |   50% |   64% |
+> AMD Zen 4            |   86% |   75% |   83% |   60% |   41% |   52% |
+> AMD Zen 3            |   73% |   63% |   69% |   45% |   21% |   33% |
+> AMD Zen 2            |   -2% |   -2% |    2% |    3% |   -1% |   11% |
+> Intel Skylake        |   -1% |   -1% |    1% |    2% |   -1% |    9% |
+>
+>                      |   300 |   200 |    64 |    63 |    16 |
+> ---------------------+-------+-------+-------+-------+-------+
+> AMD Zen 5            |   78% |   56% |   -4% |   38% |   -2% |
+> Intel Emerald Rapids |   61% |   55% |    4% |   32% |   -5% |
+> Intel Ice Lake       |   57% |   42% |    3% |   44% |   -4% |
+> AMD Zen 4            |   35% |   28% |   -1% |   17% |   -3% |
+> AMD Zen 3            |   26% |   23% |   -3% |   11% |   -6% |
+> AMD Zen 2            |   13% |   24% |   -1% |   14% |   -3% |
+> Intel Skylake        |   16% |    8% |   -4% |   35% |   -3% |
+>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 > ---
-> v4:
-> - Use proper data types and remove #defines according
-> to Eric's comments. (Eric)
-> ---
-> v3:
-> - Rebase for Eric's crc tree. (Eric)
-> ---
-> v2:
-> - Use crypto self-tests instead. (Eric)
-> - Fix some format errors in arch/riscv/crypto/Kconfig. (Chunyan)
-> ---
->  arch/riscv/Kconfig                |   1 +
->  arch/riscv/lib/Makefile           |   1 +
->  arch/riscv/lib/crc-t10dif-riscv.c | 120 ++++++++++++++++++++++++++++++
->  3 files changed, 122 insertions(+)
->  create mode 100644 arch/riscv/lib/crc-t10dif-riscv.c
 >
-> diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
-> index 7612c52e9b1e..db1cf9666dfd 100644
-> --- a/arch/riscv/Kconfig
-> +++ b/arch/riscv/Kconfig
-> @@ -25,6 +25,7 @@ config RISCV
->         select ARCH_ENABLE_THP_MIGRATION if TRANSPARENT_HUGEPAGE
->         select ARCH_HAS_BINFMT_FLAT
->         select ARCH_HAS_CRC32 if RISCV_ISA_ZBC
-> +       select ARCH_HAS_CRC_T10DIF if RISCV_ISA_ZBC
->         select ARCH_HAS_CURRENT_STACK_POINTER
->         select ARCH_HAS_DEBUG_VIRTUAL if MMU
->         select ARCH_HAS_DEBUG_VM_PGTABLE
-> diff --git a/arch/riscv/lib/Makefile b/arch/riscv/lib/Makefile
-> index 79368a895fee..689895b271bd 100644
-> --- a/arch/riscv/lib/Makefile
-> +++ b/arch/riscv/lib/Makefile
-> @@ -16,6 +16,7 @@ lib-$(CONFIG_MMU)     += uaccess.o
->  lib-$(CONFIG_64BIT)    += tishift.o
->  lib-$(CONFIG_RISCV_ISA_ZICBOZ) += clear_page.o
->  obj-$(CONFIG_CRC32_ARCH)       += crc32-riscv.o
-> +obj-$(CONFIG_CRC_T10DIF_ARCH) += crc-t10dif-riscv.o
->  obj-$(CONFIG_FUNCTION_ERROR_INJECTION) += error-inject.o
->  lib-$(CONFIG_RISCV_ISA_V)      += xor.o
->  lib-$(CONFIG_RISCV_ISA_V)      += riscv_v_helpers.o
-> diff --git a/arch/riscv/lib/crc-t10dif-riscv.c b/arch/riscv/lib/crc-t10dif-riscv.c
-> new file mode 100644
-> index 000000000000..da90e2900ca7
-> --- /dev/null
-> +++ b/arch/riscv/lib/crc-t10dif-riscv.c
-> @@ -0,0 +1,120 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Accelerated CRC-T10DIF implementation with RISC-V Zbc extension.
-> + *
-> + * Copyright (C) 2024 Institute of Software, CAS.
-> + */
-> +
-> +#include <asm/alternative-macros.h>
-> +#include <asm/byteorder.h>
-> +#include <asm/hwcap.h>
-> +
-> +#include <linux/byteorder/generic.h>
-> +#include <linux/crc-t10dif.h>
-> +#include <linux/minmax.h>
-> +#include <linux/module.h>
-> +#include <linux/types.h>
-> +
-> +#define CRCT10DIF_POLY 0x8bb7
-> +
-> +#if __riscv_xlen == 64
-> +#define CRCT10DIF_POLY_QT_BE 0xf65a57f81d33a48a
-> +
-> +static inline u64 crct10dif_prep(u16 crc, const __be64 *ptr)
-> +{
-> +       return ((u64)crc << 48) ^ __be64_to_cpu(*ptr);
-> +}
-> +
-> +#elif __riscv_xlen == 32
-> +#define CRCT10DIF_POLY_QT_BE 0xf65a57f8
-> +
-> +static inline u32 crct10dif_prep(u16 crc, const __be32 *ptr)
-> +{
-> +       return ((u32)crc << 16) ^ __be32_to_cpu(*ptr);
-> +}
-> +
-> +#else
-> +#error "Unexpected __riscv_xlen"
-> +#endif
-> +
-> +static inline u16 crct10dif_zbc(unsigned long s)
-> +{
-> +       u16 crc;
-> +
-> +       asm volatile   (".option push\n"
-> +                       ".option arch,+zbc\n"
-> +                       "clmulh %0, %1, %2\n"
-> +                       "xor    %0, %0, %1\n"
-> +                       "clmul  %0, %0, %3\n"
-> +                       ".option pop\n"
-> +                       : "=&r" (crc)
-> +                       : "r"(s),
-> +                         "r"(CRCT10DIF_POLY_QT_BE),
-> +                         "r"(CRCT10DIF_POLY)
-> +                       :);
-> +
-> +       return crc;
-> +}
-> +
-> +static inline u16 crct10dif_unaligned(u16 crc, const u8 *p, size_t len)
-> +{
-> +       size_t bits = len * 8;
-> +       unsigned long s = 0;
-> +       u16 crc_low = 0;
-> +
-> +       for (int i = 0; i < len; i++)
-> +               s = *p++ | (s << 8);
-> +
-> +       if (len < sizeof(u16)) {
-> +               s ^= crc >> (16 - bits);
-> +               crc_low = crc << bits;
-> +       } else {
-> +               s ^= (unsigned long)crc << (bits - 16);
-> +       }
-> +
-> +       crc = crct10dif_zbc(s);
-> +       crc ^= crc_low;
-> +
-> +       return crc;
-> +}
-> +
-> +u16 crc_t10dif_arch(u16 crc, const u8 *p, size_t len)
-> +{
-> +       size_t offset, head_len, tail_len;
-> +       const __be64 *p_ul;
-> +       unsigned long s;
-> +
-> +       asm goto(ALTERNATIVE("j %l[legacy]", "nop", 0,
-> +                            RISCV_ISA_EXT_ZBC, 1)
-> +                : : : : legacy);
-> +
-> +       offset = (unsigned long)p & (sizeof(unsigned long) - 1);
-> +       if (offset && len) {
-> +               head_len = min(sizeof(unsigned long) - offset, len);
-> +               crc = crct10dif_unaligned(crc, p, head_len);
-> +               p += head_len;
-> +               len -= head_len;
-> +       }
-> +
-> +       tail_len = len & (sizeof(unsigned long) - 1);
-> +       len = len >> ilog2(sizeof(unsigned long));
-> +       p_ul = (const __be64 *)p;
-> +
-> +       for (int i = 0; i < len; i++) {
-> +               s = crct10dif_prep(crc, p_ul);
-> +               crc = crct10dif_zbc(s);
-> +               p_ul++;
-> +       }
-> +
-> +       p = (const u8 *)p_ul;
-> +       if (tail_len)
-> +               crc = crct10dif_unaligned(crc, p, tail_len);
-> +
-> +       return crc;
-> +legacy:
-> +       return crc_t10dif_generic(crc, p, len);
-> +}
-> +EXPORT_SYMBOL(crc_t10dif_arch);
-> +
-> +MODULE_DESCRIPTION("CRC-T10DIF using RISC-V ZBC Extension");
-> +MODULE_LICENSE("GPL");
-> --
-> 2.47.0
+> Changed in v4:
+> - Used 'varargs' in assembly macros where appropriate.
 >
+> Changed in v3:
+> - Dropped the patch removing the non-AVX AES-CTR for now
+> - Changed license of aes-ctr-avx-x86_64.S to Apache-2.0 OR BSD-2-Clause,
+>   same as what I used for the AES-GCM assembly files.  I've received
+>   interest in this code possibly being reused in other projects.
+> - Updated commit message to remove an ambiguous statement
+> - Updated commit message to clarify that the non-AVX code is unchanged
+> - Added comment above ctr_crypt_aesni() noting that it's non-AVX
+>
+> Changed in v2:
+> - Split the removal of the non-AVX implementation of AES-CTR into a
+>   separate patch, and removed the assembly code too.
+> - Made some minor tweaks to the new assembly file, including fixing a
+>   build error when aesni-intel is built as a module.
+>
+>  arch/x86/crypto/Makefile                |   2 +-
+>  arch/x86/crypto/aes-ctr-avx-x86_64.S    | 592 +++++++++++++++++++++++
+>  arch/x86/crypto/aes_ctrby8_avx-x86_64.S | 597 ------------------------
+>  arch/x86/crypto/aesni-intel_glue.c      | 404 ++++++++--------
+>  4 files changed, 803 insertions(+), 792 deletions(-)
+>  create mode 100644 arch/x86/crypto/aes-ctr-avx-x86_64.S
+>  delete mode 100644 arch/x86/crypto/aes_ctrby8_avx-x86_64.S
 >
 
+Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
+
+I've tested this with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y on a CPU
+that supports all variants, so
+
+Tested-by: Ard Biesheuvel <ardb@kernel.org>
