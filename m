@@ -1,174 +1,141 @@
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2085.outbound.protection.outlook.com [40.107.236.85])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C574262D21;
-	Tue, 11 Feb 2025 17:21:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.85
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739294474; cv=fail; b=Co59ygllmvpceEyTjPEyeUrab3tlq/8AvWXdWgB33Qw8hkpIr3NawPkh+oZcM+ZZpAp6c7tOn6nCLJ/8jd9EVhSV9cUZGbFJBqBtyLuMla/KLWNqLKBSygwGjMS1x4Sjn/RSCA3rjRhM2w8D1s2y9o+1dmZ6vdy3pZfe95NaVCM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739294474; c=relaxed/simple;
-	bh=37W3yOA3j/RWRFmUR0HLIPlC8kpGry9zzti8PefNSrg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JWFlCAI/qPUUVFOeoZIzZQLkS+gbCqyS0eJDUUCoTdQ67pJ3I3wZUDjH5Y06v+vBxWZSSf0JyELD2G7zUgIrxpNGL5IwUcQ9hCx/CYRw2vZ3T0W4ps28arXj+WGbP1zto+/ZRbWwckSFCg0jSexQ2Hh53oxDTdwtJ55HlK8X7o4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Pa5CMcHa; arc=fail smtp.client-ip=40.107.236.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C9ED261564;
+	Tue, 11 Feb 2025 17:52:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739296366; cv=none; b=nD5gN3yZet0TPtjfasFQ7RlhnptYZpNy4P/W2s4REZncyRx0qCsPlxaVLe4q1AeVoy5gLzjuXrj7j+kJGBKNglW6+RW6gwp5oRh4K9f/smiBjysB3pMmYX093eP4Ia2nPXTpbZtmEnqkFKnnymQKSrmH/FjIhW0uH6FvSS5sLXE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739296366; c=relaxed/simple;
+	bh=Gls7ZslF1W+313UhYUN4pkhQXNUWceUe93PWKZiH2Gk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QBOq+US6bXjfWFuoK78oOBZ3wtmT4KwnHkdENrC34cSXgK1IrO5KwMfDHRYP+dK60ZTsxy0Ad2zOPnaWD+86M68IrabOZK5MEepDXUxhpXMOVyCsaq9IGUd5BkF84rtejO//UJdmYPejGGC9HdFK6u7LasPOFkaneww9n3gORoU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CP3LfzXQ; arc=none smtp.client-ip=209.85.222.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Pa5CMcHa"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=JK7I4N+limHnlSh2eSPA/LSh0r3l/9Hr/a1w0GO2JJB9LNzb1ZYnmUJCO4wZ98POuxtHGY0xDeU7mkxNjC6Chhm8NNUb04RPUCxl6uYV6xFX0efcoYI/iwSB2XT6dkw1ZOssoCOG+5LB8vFXkNWG6qjftXJHNEy9IFx4YMktiE1Az7i3uonIgM9S46ifTJnoRFkuSEng6pZFw31M7e9M06m3zkpKaE6pQs++5LtNusGYhscUvjuj/A96Wfj34/tBN+MM5vUXB9G5vKbv33qsHlziVdB9roSX0top1bjlFGL+zWKFvTX0jwwG5wSbH4Tk9SJ9Kfd9QLw8EOAPxL+jJg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2xkh8gOUn+tIzldnXrb/Kpm4oA/hXqAd1LJMDcwDARU=;
- b=ury7+Spupsbq1ZIwvw99kPViVaK9RmG5mLS8xUcxCw4DhkoIX8Nel3AMG0paqDGRUQaHxzHa1mQu6Qt4nCWV4P47OT/eDZKZhrYdJyKRTH22TulKk0XxnK5qbgwbsJzuEVn+R7/SkxHuHlY5mfBaTCbulbbQ7LpFIyfwZnl22OjF2xOx/2Xb3OTPRT/qPbpvlKWdCJASMX1REjJNg+SbYi93xsAUT3quMNKHiZG4b7BcW5PFGEijLiLLn9utD7Nx/naqTeFL/wFVWALwE659hyvJfmzrG1Cg9mO+v4R39FZWLd7b38wLJworFzKSn621X/ue2z1ReXQ94l7v3K2Vyw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=gondor.apana.org.au
- smtp.mailfrom=nvidia.com; dmarc=pass (p=reject sp=reject pct=100) action=none
- header.from=nvidia.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2xkh8gOUn+tIzldnXrb/Kpm4oA/hXqAd1LJMDcwDARU=;
- b=Pa5CMcHa+lkvMvuH2RukCtscbvzlPDnfUofOTr/WUO9z5ZL5Xe1ole2JnjDxIWEbkcB84D3yjGNwf/R/SZeOmxXtMF99fxNbe0P0wdjBOcnQOhl5UaJA9tkuCbelNfwnQRo1ht5DtBOfR6MYRi/GfyKkQMnJx1mmRE7Q1xlHzBGE7ve5gQwGZ8AlwpWGF3f9xhsTPd19taFcmD0tWFoIYY7k4sWocfBG/lG6NNw7OhfvNh3+GVjDV2aZ2EleH/EEvs1b/9b3dI3uXbke7gqzA+GAc5MwHSD+FgyaMOqltDt7dDfDA3j0xM0r7h5HoKoWzoFEN0+Kx5Mqyk0FXDrDIA==
-Received: from DM6PR08CA0037.namprd08.prod.outlook.com (2603:10b6:5:1e0::11)
- by DM6PR12MB4108.namprd12.prod.outlook.com (2603:10b6:5:220::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.11; Tue, 11 Feb
- 2025 17:21:07 +0000
-Received: from DS1PEPF00017095.namprd03.prod.outlook.com
- (2603:10b6:5:1e0:cafe::ce) by DM6PR08CA0037.outlook.office365.com
- (2603:10b6:5:1e0::11) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8398.31 via Frontend Transport; Tue,
- 11 Feb 2025 17:21:07 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- DS1PEPF00017095.mail.protection.outlook.com (10.167.17.138) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8445.10 via Frontend Transport; Tue, 11 Feb 2025 17:21:07 +0000
-Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 11 Feb
- 2025 09:20:44 -0800
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail203.nvidia.com
- (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Tue, 11 Feb
- 2025 09:20:44 -0800
-Received: from BUILDSERVER-IO-L4T.nvidia.com (10.127.8.9) by mail.nvidia.com
- (10.129.68.7) with Microsoft SMTP Server id 15.2.1544.14 via Frontend
- Transport; Tue, 11 Feb 2025 09:20:41 -0800
-From: Akhil R <akhilrajeev@nvidia.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-	<thierry.reding@gmail.com>, <jonathanh@nvidia.com>,
-	<linux-crypto@vger.kernel.org>, <linux-tegra@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-CC: Akhil R <akhilrajeev@nvidia.com>
-Subject: [PATCH v2 10/10] crypto: tegra: Use HMAC fallback when keyslots are full
-Date: Tue, 11 Feb 2025 22:47:13 +0530
-Message-ID: <20250211171713.65770-11-akhilrajeev@nvidia.com>
-X-Mailer: git-send-email 2.43.2
-In-Reply-To: <20250211171713.65770-1-akhilrajeev@nvidia.com>
-References: <20250211171713.65770-1-akhilrajeev@nvidia.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CP3LfzXQ"
+Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-7c0155af484so767107885a.0;
+        Tue, 11 Feb 2025 09:52:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739296363; x=1739901163; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=alxnJNPbq/1DdW4EjlxryX0UCz6LPOMWVCLdewe/w6A=;
+        b=CP3LfzXQzRQrO/taTyzrDJV5LlGe+KNJS6AvYxNIF/X9wsfLD/zmSMn/Ccp8NNuSRU
+         T12CyXhs8aZ3Qtyej4R2I2aDCnss8B5Wolo+NbC6IA2EYz13yyXpxsErBM+U6+B7XMxk
+         2H9IFDfXcTQg4nTBC1qmUTUgbkFSDX5/B+kfW6DlMd279OTmoR1PGyTjCosT2rQ2P3Mr
+         GMWXXd6t2t/GxNJHq184hhAgsk5xaugiH/dXfJ8AU8h5YVNHUVZt2vnbBzH3JptUBbdo
+         GLlHPN9zbxg3RJwAouOvFb1JQIegUVpQhUUrBe3M/83p5q0favya47eUef4hhLE3wf4D
+         U6cg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739296363; x=1739901163;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=alxnJNPbq/1DdW4EjlxryX0UCz6LPOMWVCLdewe/w6A=;
+        b=rgK6x3XzQQ5ejTWIlOgykoFHFZ0YP4FZtBsxexN+ZWOt1wt5aYyWDo5OPdw6oatt3r
+         f8j715JUUDz+bcE9rsgOQeCRE0VUVhvi1oRckCFIKLlMaOk2uJCY0zTw//SINmbPUYpq
+         FI28NU0UWega2EEI9lSObs7AR6XtW2W9GC8JkfJdl2nt2YWiEniF55Z5l1YW+De+p5FO
+         wEDL84nU4yLxpq0Bkw52XIO15spilzKkN3+YhCvbp7pFHUF/wO3EWjLvI2bYmmdk6hgr
+         Zj+8VmoqIhAnSnHEIfrMWW5Nm+KFt3xKzWpH6eDAPVfweHTRBf1UAVhm844IZ18YbD3x
+         hKMg==
+X-Forwarded-Encrypted: i=1; AJvYcCW2Pji6zjV6eUEUphvanjQfqwTz/gOlDCvCg7/GNoVPMC1WjcEZ89aYF7Md0+Fbn6DZojP6CFnqVvDt0meC@vger.kernel.org, AJvYcCWI8s3Eg03w7Nm7j7G/mwzqvoOJbF8ghcBDYtoKHrAiE5WzaEROcdRTZotzp64dGCKQ1S2n/s/2oZFtcFk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxp17fWepkBDxYXQuobTu6FuejvAvCW2j8HsBEHxO3bZmr0CkLE
+	K0iGS8FYDIBsVqB2q3MGvZECqkG7eTCQt/x6yehroQvFq0YcK79U8DiqY71xZpx+U3MPY4315Nv
+	iMl40Vrhq6aPmoSqR3TykFvemVP8=
+X-Gm-Gg: ASbGncuf15C6d3gfI55kYvmmY/fYzFSK0dr5fjY9O374V1Y47rYcGFQXdrhy5S8p2Hn
+	jUUNsEZHBKrpjdQph8dNB2UbCkx5RCjHR6aZJHIU2rKNihi7VYJ1XXrbmHcoO5W8+SYLsRvHVk+
+	tOfLidwMQUHEp9d0IpcbuouhubmFHU
+X-Google-Smtp-Source: AGHT+IE3VPNOnU63mQthg4Oyhovmexbq09LRCaEDUIKUz/i4EAR1nU8AN5MdiuFBRNFyRDfkrKCEN5igQcBrWu/GWxo=
+X-Received: by 2002:a05:6214:1c49:b0:6d8:846b:cd8d with SMTP id
+ 6a1803df08f44-6e46edac168mr3233286d6.30.1739296363271; Tue, 11 Feb 2025
+ 09:52:43 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-NVConfidentiality: public
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: AnonymousSubmission
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF00017095:EE_|DM6PR12MB4108:EE_
-X-MS-Office365-Filtering-Correlation-Id: ef9ff5fc-8fc2-43cc-ccab-08dd4ac07884
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|376014|82310400026|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?O3PzD+nocRCCb5EqzABvpZ8ph1Uv7K/60aZ+aKA3nqH9jJXiJ8SpMECBBSKr?=
- =?us-ascii?Q?iAcJlgesWDpqrCRgX2Gl0LyCUBDg50/sZonlX+wD6qMHUfVnaigUIlnjVI+8?=
- =?us-ascii?Q?u4Ly6EUxPDiw+Yf6M07cb8z6IqSGIJ77+vABSWlFnO2GXwaOlKrZ88JLdYPE?=
- =?us-ascii?Q?M6XCMwe5ciu+iKHYSwY+85/5OLiEWXESKr9BOAPJy8t5CYfWnai4C1JXv/UW?=
- =?us-ascii?Q?GKGFQ+9SUKOsS+uwy4j1rV+S+Hx9Cw0RbEB98V2DN1tXMrLmDrOaP45NGqLA?=
- =?us-ascii?Q?3eE/gFcxlw7B1NfhiAg5Jbb0vboEKS2kIu1B630nlvUZtlEagz2qu9vN/7Rs?=
- =?us-ascii?Q?hLXmoSUzQp/lsYFr4H6Y1/2zdJxQGGZfHR13gjxtJhjuvsFixYOUjSecGLYL?=
- =?us-ascii?Q?g5joCCyA7lj4qP1/agh3MMEL/imibbgcN7Ej9ayaO00ahlDj2ikIEc4cyjQP?=
- =?us-ascii?Q?0/0CU6fOOv6Ph9qUF1EEsJtyvnHWpkS8sMenAlkBD0tuTFDbBnku5+cV2NVw?=
- =?us-ascii?Q?mDiam+ONcgZDOIReuMQtBkwRQafd8K+i/SQgJ2O7Hmcac/P2S/VFwJuWgxsP?=
- =?us-ascii?Q?dFeqFK5nWavQlV4qD31ddeT7wRkCobQlBpiD3TnO1ZlrnUUAEXm6a20htlJi?=
- =?us-ascii?Q?aj9i/3yM2zojg17KUbzDlGvfxjyLFOL+Tn6atEW94bpqEstH+HPJMGRxS2X1?=
- =?us-ascii?Q?n4d2ym9CXnnLtlm7eE/kBmR5pQcD3EEnSo/9fL2RS5AAKp6Rpc1XRXj5S72r?=
- =?us-ascii?Q?EDByVMRRa2V5HIecg2QfIlmfX5tTaE1PVvve/QQ2DUKNsvCU79Qk2loyes2T?=
- =?us-ascii?Q?Cf3QTfdt9ooSngY7w/LlJ+jZR+OFudLlZp0HLRH8l0VKBEg+hnGm0fDjP+ZE?=
- =?us-ascii?Q?Wl+368mm7Sli2fTV8RV8VUR8aB9vIa22J8BdJm2aQO7m0VHjxaqhnaPn9weZ?=
- =?us-ascii?Q?B+p1jqZv/1RyRLIakyEPnYktaKLPBC9h/Cc8Yq7hgZFtQIHPJS5N7d21ix9R?=
- =?us-ascii?Q?BT16yQBAAVfSlyxSimEnPgW4i1/I9/VvBQ+eq9VvqPT2hexVhwTKjMp6Y7Cq?=
- =?us-ascii?Q?qB9ORD4VUcIacurr6zGB/D5nPWftxD8U3KgoXZbfAzsCSLyNT3rEKaCHDNjo?=
- =?us-ascii?Q?fCDgMD0UfNeXzo6p5ByQPB5pPmsmizKvp2gqI5885S75toc1ZMM9rYft3H5e?=
- =?us-ascii?Q?EYdy1PfQFOccw+h4ajG23YEG/cwqCBueDu9tNcLr+lJeZERdadGO8qWDjPMF?=
- =?us-ascii?Q?PcFmRB1+7pQSu8sn46ZExNk7bZYp7qaO4cJVTJGAVpM5+rqzMoo5NYuwOj2t?=
- =?us-ascii?Q?KbAx3/Rw1fegB7+Q7MQtvVQWZLcTN4zL2qkcerWALwGc+sSEYqOtcSQjMuU6?=
- =?us-ascii?Q?QvHdMLvMF/w73XHVrreetGJhkULe3zAnvHtkewNDmdpY+wXuoEB/1JE3gcM2?=
- =?us-ascii?Q?fM7OIQJwj6fOwTgnfrsnBJueK8grff1MPVFJdXbrKazU2vAQZ6fUXyRKZjXY?=
- =?us-ascii?Q?wo74c5Vj2OQIox0=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(376014)(82310400026)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Feb 2025 17:21:07.0905
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ef9ff5fc-8fc2-43cc-ccab-08dd4ac07884
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS1PEPF00017095.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4108
+References: <20250206072102.29045-1-kanchana.p.sridhar@intel.com> <20250211170513.GB1227@sol.localdomain>
+In-Reply-To: <20250211170513.GB1227@sol.localdomain>
+From: Nhat Pham <nphamcs@gmail.com>
+Date: Tue, 11 Feb 2025 09:52:32 -0800
+X-Gm-Features: AWEUYZlcOdbZA9SqNCGkgKNQARGdRy_FNFi_eHNg0PXmpnE9bsAdcYk9s4FLLwY
+Message-ID: <CAKEwX=PRzZEYOuTECjjqYbUDXUjMzOc-R5s14-iX8qevDxGBpA@mail.gmail.com>
+Subject: Re: [PATCH v6 00/16] zswap IAA compress batching
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, hannes@cmpxchg.org, yosry.ahmed@linux.dev, 
+	chengming.zhou@linux.dev, usamaarif642@gmail.com, ryan.roberts@arm.com, 
+	21cnbao@gmail.com, akpm@linux-foundation.org, linux-crypto@vger.kernel.org, 
+	herbert@gondor.apana.org.au, davem@davemloft.net, clabbe@baylibre.com, 
+	ardb@kernel.org, surenb@google.com, kristen.c.accardi@intel.com, 
+	wajdi.k.feghali@intel.com, vinodh.gopal@intel.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The intermediate results for HMAC is stored in the allocated keyslot by
-the hardware. Dynamic allocation of keyslot during an operation is hence
-not possible. As the number of keyslots are limited in the hardware,
-fallback to the HMAC software implementation if keyslots are not available
+On Tue, Feb 11, 2025 at 9:05=E2=80=AFAM Eric Biggers <ebiggers@kernel.org> =
+wrote:
+>
+> On Wed, Feb 05, 2025 at 11:20:46PM -0800, Kanchana P Sridhar wrote:
+>
+> So, zswap is passed a large folio to swap out, and it divides it into 4K =
+pages
+> and compresses each independently.  The performance improvement in this p=
+atchset
+> comes entirely from compressing the folio's pages in parallel, synchronou=
+sly,
+> using IAA.
+>
+> Before even considering IAA and going through all the pain of supporting
+> batching with an off-CPU offload, wouldn't it make a lot more sense to tr=
+y just
+> compressing each folio in software as a single unit?  Compared to the exi=
+sting
+> approach of compressing the folio in 4K chunks, that should be much faste=
+r and
+> produce a much better compression ratio.  Compression algorithms are very=
+ much
+> designed for larger amounts of data, so that they can find more matches.
+>
+> It looks like the mm subsystem used to always break up folios when swappi=
+ng them
+> out, but that is now been fixed.  It looks like zswap just hasn't been up=
+dated
+> to do otherwise yet?
+>
+> FWIW, here are some speed and compression ratio results I collected in a
+> compression benchmark module that tests feeding vmlinux (uncompressed_siz=
+e:
+> 26624 KiB) though zstd in 4 KiB page or 2 MiB folio-sized chunks:
+>
+> zstd level 3, 4K chunks: 86 ms; compressed_size 9429 KiB
+> zstd level 3, 2M chunks: 57 ms; compressed_size 8251 KiB
+> zstd level 1, 4K chunks: 65 ms; compressed_size 9806 KiB
+> zstd level 1, 2M chunks: 34 ms; compressed_size 8878 KiB
+>
+> The current zswap parameterization is "zstd level 3, 4K chunks".  I would
+> recommend "zstd level 1, 2M chunks", which would be 2.5 times as fast and=
+ give a
+> 6% better compression ratio.
+>
+> What is preventing zswap from compressing whole folios?
 
-Fixes: 0880bb3b00c8 ("crypto: tegra - Add Tegra Security Engine driver")
-Signed-off-by: Akhil R <akhilrajeev@nvidia.com>
----
- drivers/crypto/tegra/tegra-se-hash.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+Thanks for the input, Eric! That was one of the directions we have
+been exploring for zswap and zram. Here's what's going on:
 
-diff --git a/drivers/crypto/tegra/tegra-se-hash.c b/drivers/crypto/tegra/tegra-se-hash.c
-index 89c1e1a0016b..c607a37d5e0e 100644
---- a/drivers/crypto/tegra/tegra-se-hash.c
-+++ b/drivers/crypto/tegra/tegra-se-hash.c
-@@ -631,13 +631,18 @@ static int tegra_hmac_setkey(struct crypto_ahash *tfm, const u8 *key,
- 			     unsigned int keylen)
- {
- 	struct tegra_sha_ctx *ctx = crypto_ahash_ctx(tfm);
-+	int ret;
- 
- 	if (aes_check_keylen(keylen))
- 		return tegra_hmac_fallback_setkey(ctx, key, keylen);
- 
-+	ret = tegra_key_submit(ctx->se, key, keylen, ctx->alg, &ctx->key_id);
-+	if (ret)
-+		return tegra_hmac_fallback_setkey(ctx, key, keylen);
-+
- 	ctx->fallback = false;
- 
--	return tegra_key_submit(ctx->se, key, keylen, ctx->alg, &ctx->key_id);
-+	return 0;
- }
- 
- static int tegra_sha_init(struct ahash_request *req)
--- 
-2.43.2
+The first issue is zsmalloc, which is the backend memory allocator for
+zswap, currently does not support larger-than-4K object size. Barry
+Song is working on this:
 
+https://lore.kernel.org/linux-mm/20241121222521.83458-1-21cnbao@gmail.com/
+
+Performance-wise, compressing whole folios also means that at swap-in
+time, you have to decompress and load the entire folio/chunk. This can
+create extra memory pressure (for example, you have to either allocate
+a huge page or multiple small pages for the folio/chunk), which is
+particularly bad when the system is already in trouble :) I believe
+that is one of the blockers for the above patch series as well.
