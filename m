@@ -1,78 +1,175 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35EFD25EFAC;
-	Mon, 10 Feb 2025 23:14:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CA932CA8;
+	Tue, 11 Feb 2025 00:01:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739229285; cv=none; b=gk5rgzZaAh7Yv+gEhTZB6kQF9WPPXyPK67gThPH8s+x66cIFQjSUghf/9PmpUNnC+WSU33t4OKicFJybmkdX7SjBex3XvblHkcRX06j7ezuMEr+uwcMYSMfSxqd3hf9lzyHeb8XkPtxhm4Q0VMiGs41UX8kIbhKFWQFCOW3FImE=
+	t=1739232119; cv=none; b=orpFdI33HLmsABVyv6jrgt3/YwVn5flWOq3fJWFpL5RRJGnLl+TQ8E6gPsiGGgZ/2G8+ypw4gQPe8rwVUKKTqrykFqCkLSykJKDHnFWu5BCvufLLgaIgcwRrsF7nFE1dsvPJDKJ1mC9vJvLTKJSqdhOIznBK0ZyGyWdvgH9TR4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739229285; c=relaxed/simple;
-	bh=COrp6hWGzz8/siYvHimfWfsoXzmyNa/p3dR3OMKEEnM=;
+	s=arc-20240116; t=1739232119; c=relaxed/simple;
+	bh=rAzkLZM09qQrVfb6++qtL1NVW6ye9kBKxmsecVL8AX0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Qrf3e8mYWgQ9AY+kvcQNT+86amTcXHA2CplsDBKJ434aOzvficbF9laGMk6P386NzAQycCJzFpNfO2dHWtH358RpgM1+c1d8wI7/8dv+ugYWO3kuHaxA/Q/DB4SqbZgA7Vbbr+v2wJKDvSJwQn8ET8F7knQFuyWhm7tW1GmAGbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=WEoASmAk; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=phFMG2lITeO1sBiL+tcqCk0YYkqm300xsFdDUTlBNXXmTtVx7kSlclcHARSB33E1tkr315T1J3OVjOWqTkv+tADy74Jl61o83S+/0SbuKzt4Xd07mom6QSY79N0nAhb/jWhrd3q/+sbcVeuEHT0xFVW+lGeczAdrU16k1YssuLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q1j87QGs; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="WEoASmAk"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=2pClLF4sbthFxm3CTGXCUQu05y9qNQMNR5mihhu0gv0=; b=WEoASmAkNhYWMTh+g9+nnGuSE/
-	T/G0eVrAMHE+31fkAylQmhxZOSqM7SPo0iCL22NatKIl8fBHjE9OB0W2yeScR9kpnOZUuhnSbpL0/
-	JC2LjlqxqSZCRvZH6C3vLa6sBL4mJJmTNf1HAmNIAgqzHlIaJMEj6bZIm7zi03BqjA6ZoYy/LxoiC
-	eOc991GA0uSeeLbhWWqfM4uk2V7cA8yxQc90em64fqfICvr+rxieh3jcVW7GBU3t8YhSVpi2pnS+z
-	+saHNY2d2EMdSS3lp+4uXH0KpnHxssRv6YrSurKxMSnaP6u4883jUlSl64apzTgu2m0YRAbEidUrI
-	GTLnrRwg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1thclx-00Grrl-2h;
-	Tue, 11 Feb 2025 07:14:23 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 11 Feb 2025 07:14:22 +0800
-Date: Tue, 11 Feb 2025 07:14:22 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Harald Freudenberger <freude@linux.ibm.com>, davem@davemloft.net,
-	dengler@linux.ibm.com, linux-s390@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v10 2/5] s390/crypto: New s390 specific protected key
- hash phmac
-Message-ID: <Z6qITvR7LPBjyEf6@gondor.apana.org.au>
-References: <20250115162231.83516-1-freude@linux.ibm.com>
- <20250115162231.83516-3-freude@linux.ibm.com>
- <Z6hrvQzb5G_wqlni@gondor.apana.org.au>
- <20250209163430.GB1230@sol.localdomain>
- <Z6mxZ8lfO6zzD7x0@gondor.apana.org.au>
- <20250210163246.GD1264@sol.localdomain>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q1j87QGs"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C868C4CEDF;
+	Tue, 11 Feb 2025 00:01:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739232118;
+	bh=rAzkLZM09qQrVfb6++qtL1NVW6ye9kBKxmsecVL8AX0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=q1j87QGsjnUkqkcVlg2v4gnZWuuz2UEGFoQfFx8S5hm6OD3/mp8QI0dCwQT4YmTEr
+	 IB2Hu3/xsA738TjmL9hvDacqP3Cn1fn1l38WTUXKf4SHgxcaaqcmtfDjrQUDk9eoqE
+	 gB6wCJ5myKFPgBwelHmsgcxfai/gZhPdUPy8zVu8z/cx9kuD9+RM3Bb/ajecRTWHax
+	 fVRq4VYORDNdvHY/BD15McfYj6CkfxzLNVClI1u8/Pfa9FJn4JqDpQ7Nyn/Fr2156J
+	 CGUj1Kbf4bjxLul7s2ASKdEhbPJl+pwIxxn70nR5a5VyWkDiXJ4SybO3o/a5i5XUEL
+	 d5paRyJt5qYuQ==
+Date: Mon, 10 Feb 2025 18:01:57 -0600
+From: Rob Herring <robh@kernel.org>
+To: =?iso-8859-1?Q?J=2E_Neusch=E4fer?= <j.ne@posteo.net>
+Cc: devicetree@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	Krzysztof Kozlowski <krzk@kernel.org>, imx@lists.linux.dev,
+	Scott Wood <oss@buserror.net>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Naveen N Rao <naveen@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>, Lee Jones <lee@kernel.org>,
+	Vinod Koul <vkoul@kernel.org>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	=?iso-8859-1?Q?J=2E_Neusch=E4fer?= <j.neuschaefer@gmx.net>,
+	Wim Van Sebroeck <wim@linux-watchdog.org>,
+	Guenter Roeck <linux@roeck-us.net>, Mark Brown <broonie@kernel.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Richard Weinberger <richard@nod.at>,
+	Vignesh Raghavendra <vigneshr@ti.com>, linux-kernel@vger.kernel.org,
+	linux-ide@vger.kernel.org, linux-crypto@vger.kernel.org,
+	dmaengine@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-watchdog@vger.kernel.org, linux-spi@vger.kernel.org,
+	linux-mtd@lists.infradead.org
+Subject: Re: [PATCH v2 11/12] dt-bindings: nand: Add fsl,elbc-fcm-nand
+Message-ID: <20250211000157.GA240011-robh@kernel.org>
+References: <20250207-ppcyaml-v2-0-8137b0c42526@posteo.net>
+ <20250207-ppcyaml-v2-11-8137b0c42526@posteo.net>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20250210163246.GD1264@sol.localdomain>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250207-ppcyaml-v2-11-8137b0c42526@posteo.net>
 
-On Mon, Feb 10, 2025 at 08:32:46AM -0800, Eric Biggers wrote:
->
-> Which is of course entirely theoretical, given that the proposed user waits
-> synchronously for each request to complete anyway.  And hardly anyone wants to
-> do otherwise since it is way too much of a pain.
+On Fri, Feb 07, 2025 at 10:30:28PM +0100, J. Neuschäfer wrote:
+> Formalize the binding already supported by the fsl_elbc_nand.c driver
+> and used in several device trees in arch/powerpc/boot/dts/.
+> 
+> Signed-off-by: J. Neuschäfer <j.ne@posteo.net>
+> ---
+> 
+> V2:
+> - split out from fsl,elbc binding patch
+> - constrain #address-cells and #size-cells
+> - add a general description
+> - use unevaluatedProperties=false instead of additionalProperties=false
+> - fix property order to comply with dts coding style
+> - include raw-nand-chip.yaml instead of nand-chip.yaml
 
-We don't design things for a single user.  When you write an
-algorithm through the Crypto API, it becomes available to *all*
-users.
+Why? Doesn't look like you use anything from it. I think the correct 
+thing to use here is just mtd.yaml to pick up partitions.
 
-Just because a single user might be naturally resistant to congestion,
-it doesn't make this a non-issue or theoretical.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> ---
+>  .../devicetree/bindings/mtd/fsl,elbc-fcm-nand.yaml | 68 ++++++++++++++++++++++
+>  1 file changed, 68 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/mtd/fsl,elbc-fcm-nand.yaml b/Documentation/devicetree/bindings/mtd/fsl,elbc-fcm-nand.yaml
+> new file mode 100644
+> index 0000000000000000000000000000000000000000..1de97bb24fa4a83e2ea5d94ab822dd0e37baa102
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/mtd/fsl,elbc-fcm-nand.yaml
+> @@ -0,0 +1,68 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/mtd/fsl,elbc-fcm-nand.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: NAND flash attached to Freescale eLBC
+> +
+> +description:
+> +  The Freescale Enhanced Local Bus controller (eLBC) contains logic to
+> +  interface with NAND flash, called the NAND Flash Control Machine (FCM).
+> +  This binding describes flash attached to an eLBC using the FCM.
+> +
+> +maintainers:
+> +  - J. Neuschäfer <j.ne@posteo.net>
+> +
+> +allOf:
+> +  - $ref: raw-nand-chip.yaml#
+> +
+> +properties:
+> +  compatible:
+> +    oneOf:
+> +      - items:
+> +          - enum:
+> +              - fsl,mpc8313-fcm-nand
+> +              - fsl,mpc8315-fcm-nand
+> +              - fsl,mpc8377-fcm-nand
+> +              - fsl,mpc8378-fcm-nand
+> +              - fsl,mpc8379-fcm-nand
+> +              - fsl,mpc8536-fcm-nand
+> +              - fsl,mpc8569-fcm-nand
+> +              - fsl,mpc8572-fcm-nand
+> +              - fsl,p1020-fcm-nand
+> +              - fsl,p1021-fcm-nand
+> +              - fsl,p1025-fcm-nand
+> +              - fsl,p2020-fcm-nand
+> +          - const: fsl,elbc-fcm-nand
+> +      - const: fsl,elbc-fcm-nand
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  "#address-cells":
+> +    const: 1
+> +
+> +  "#size-cells":
+> +    const: 1
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +
+> +unevaluatedProperties: false
+> +
+> +examples:
+> +  - |
+> +    localbus {
+> +        #address-cells = <2>;
+> +        #size-cells = <1>;
+> +
+> +        nand@1,0 {
+> +            compatible = "fsl,mpc8315-fcm-nand",
+> +                         "fsl,elbc-fcm-nand";
+> +            reg = <0x1 0x0 0x2000>;
+> +            #address-cells = <1>;
+> +            #size-cells = <1>;
+> +        };
+> +    };
+> 
+> -- 
+> 2.48.0.rc1.219.gb6b6757d772
+> 
