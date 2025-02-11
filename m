@@ -1,135 +1,120 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B14A31FBCA1;
-	Tue, 11 Feb 2025 12:09:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77492320F
+	for <linux-crypto@vger.kernel.org>; Tue, 11 Feb 2025 13:21:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739275762; cv=none; b=mFXFYD0DBUGkMPxJWIY4QbKzYJZ4+8ix7qZXqbCuM3rxEJdWz39NrUiL/sLDvFYM6iva8z596Uv/Iz0kelRcm8rvHp4wO8TZTDWcBO9RqR0bnLuXRKHb8VKJ0QRFgykTOdsDcvRf0bzWovCzawWFoRTmb5gL3w3ZpCP8D5DZx/I=
+	t=1739280116; cv=none; b=hg077xp6RLNj6swkGvmr6xqPdlhVjcjFDU9JekMYoQoZ4ERpqZ4sYE81GeY2JpbYZVTUU6Bza3O/s8U+OXJhlxkhWcMtSagjHhEY8cEVGFJiYvBimzxpUQA+qqaPASTDBiDhSA6GeXi7rpPHGrrpqoSY/VdZ1qjDBWxGAUC+sMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739275762; c=relaxed/simple;
-	bh=97jrskvhlAXgZqsK+kGEXoVzNhFqmpE13NGubMutl0Y=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=FMv02LEh+lbemaZeab1dSH/Dz4TYfWhDHzMFCtmbwtinuJBo1kzsOZSuutlw8h9eqhhyuGFHk5SgtBsWf42l8U4Dxb/1Vhox/5Yaw5xcrytE022Qc3rsAgrWA6pv7NhXz5Oq5yeOl93p/cn9kRP29pVNi1WZI5IlgdbbeFpJGww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=RJPOwar6; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1739280116; c=relaxed/simple;
+	bh=7EBzLd/MkkAQO/2gIs3RgMZYWCN0hifel1hX00qZrX0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ln4k4Nf7auFTWR+IvwSv+c93meTSWwuH0HaJCHZ/tqCIQT0ykqAm+KpB7wjZvi65UAfmBDIRnHaezrm52KD6MupCTgAxvy5F5NS+meXNuKqzFy4ONwxEeNmYzJ9Kf/1H20d6xzIis2S2C1K4XQYFNnqhXAVWY+T8gcvDj+iWQKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=TQ4lQdem; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="RJPOwar6"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51B7X3Vn015490;
-	Tue, 11 Feb 2025 12:09:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:to; s=pp1;
-	 bh=ccsXllvEBKuTE+D4Q/u6d4MvUjvSi5fxXuGxl/E063Y=; b=RJPOwar6uQI9
-	UTL3gXZpciZDDHWHw/CieV90v+EKJQFJyhVAeC58NbJbRLwETvZ9XKJvnC8SiWEQ
-	zuBQjDcPWl8jFvaEJCnA1zPD/BUrrSQuqWWxe7CvwiM9Fv6lx+5YwIXxQkYNdvj1
-	nDrTGzA+8TDeN+Cws1fsuJ/FOPxzu+fqlpyaORY2EjulTfgfxs3TLMiNzjdx+dll
-	bcEDL5VhGUd0ktWOOJi4FJF9yYha9dNcrGfikf1NQh3C/ns+Wi3PZWWeP3OKATrr
-	B+8sJgEAXIZKVizCC4NJo6x/4aNDTHmvgbwChS7ISQv6mAWmHF5ew56FJm2cdhAl
-	MktTIdAwmw==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44r28ps54h-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 11 Feb 2025 12:09:14 +0000 (GMT)
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 51BBkuZR006250;
-	Tue, 11 Feb 2025 12:09:14 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44r28ps54f-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 11 Feb 2025 12:09:14 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51B8KD94021894;
-	Tue, 11 Feb 2025 12:09:13 GMT
-Received: from smtprelay01.wdc07v.mail.ibm.com ([172.16.1.68])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 44phkskb6g-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 11 Feb 2025 12:09:13 +0000
-Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
-	by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51BC9C3N25821886
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 11 Feb 2025 12:09:13 GMT
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D8E305805E;
-	Tue, 11 Feb 2025 12:09:12 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 612AE58045;
-	Tue, 11 Feb 2025 12:09:12 +0000 (GMT)
-Received: from ltc.linux.ibm.com (unknown [9.5.196.140])
-	by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 11 Feb 2025 12:09:12 +0000 (GMT)
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="TQ4lQdem"
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51BBA8cH000863
+	for <linux-crypto@vger.kernel.org>; Tue, 11 Feb 2025 13:21:55 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	WxaAP2OfJQcefUPkd/AkugD6llbStw6Nvz+c51lPgbo=; b=TQ4lQdemhNvxlgq2
+	XeHBvjp7cWkPU71K165PmuaP/MupUpjICDswGQAaxophv32VBKQQm/wMs1zW7J4g
+	nLsNkkz8dXrA59l+2KM6w4/BYqafJkqh9PRzP5mjqc8INvndb9ytXWBrAP2GBRie
+	DQ1yTqAezUDA4h1zCqpeu6Tg38dtKxNu7B/CekTAMb5pDg2vM9eTz7fy9Ok5tdnl
+	ljgJDciZLsuCB6+daXRR9M8iUpc2P29t8e+SXdJHDh0Ngi7Z1sWFEhlPCz6tjS65
+	5NeTt8A56w6OflbCArJPCQWpVjmFnneAaRnA8t+EOaUWyXNrZzru3g879zgRg6cw
+	yWkksw==
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com [209.85.222.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44qgtk3rwk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+	for <linux-crypto@vger.kernel.org>; Tue, 11 Feb 2025 13:21:54 +0000 (GMT)
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7c060bcafebso30310285a.3
+        for <linux-crypto@vger.kernel.org>; Tue, 11 Feb 2025 05:21:54 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739280113; x=1739884913;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WxaAP2OfJQcefUPkd/AkugD6llbStw6Nvz+c51lPgbo=;
+        b=DkdEIQ8reGpDRIP8XrBGC8JP1Dd6+LGgOm+8JUXRFQdM4OJ3B9WinkB7St9FEoy4MC
+         zFY/MDTYLmeGaw4oIiVuj2LdpGqhw5LRvsTPSOoTJOwrD6BcbjOvu2HZ2mGqIQEa8uie
+         HRkCAl2QpL7CcL4CiQdhXNV0SzJ+sWsUxI2gZUSgG56plRRjSkzP6QsrZ0w+lKxhPFyr
+         WrqBZBLvWdOZxB3sg977sOwyNet5UxC3XZhNxsuolT3qZJ8EqgzXv5CHjUNLKDvWEY49
+         Sbef4oLOZ0z4iliSJslguDV0r/tDkQW79z1s3GtYMRKN2zmVRkrExtpwV2LFkraCyvxq
+         Z6Iw==
+X-Gm-Message-State: AOJu0YwqEhyIkNii3AEK6c1sCzTtrORfHzHhzhr6Gq2XNjhb980rm5Ss
+	H+hN0tUdK4Yvya1nBlPGceqqs1wfkZxKQaZWrQ3Cg6SCJo13AAU+TdkdaxspjxRI3WY1VqYiesb
+	VqYcV6v6JS62SkktTRZq3+CUOjt818XZYoc3pisxPEs3CmIayiu/H6wnY5uvg8WU=
+X-Gm-Gg: ASbGnctU71XonvzZ94r50G1YHfEfCa8Kav59D2zyYcRFtvV89sP2rQLu0Lvp4zx1HAu
+	BsS0TchejsHXPJE7krN+2uce+UGeTwmRzrfxV8TZBkpNA9S6Y1jfo1d5JvYwDHbMUZG2U3+SDMk
+	FTTESkGod1oq6BrxK1GHHomrDGc0yRZnH7BJzopWT9mjRu01Rc/jrG5I76uMlx8+eOYyjoxNsKi
+	xvL3kxZ4k2YOl4McG1iDPiBxRlDC90FS0DjOLu0JsSRCzbTcA3Zl5eqLM2tEekzukUTtId5j2M6
+	i/SK/En9Nv0GwN/UlZxObwkyKkWOkHCGB/Y6l/4ITmhIS+FnxjKbTJMsFfo=
+X-Received: by 2002:a05:620a:1a28:b0:7b6:c3ad:6cc4 with SMTP id af79cd13be357-7c069cf37c0mr143517585a.5.1739280113517;
+        Tue, 11 Feb 2025 05:21:53 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE0dqsw15wKwS/BY+L64XWNIZkK61jXi1TTzfL+uXdnejS6AhoibNvrqpmqVJiiO/CfpHiYiw==
+X-Received: by 2002:a05:620a:1a28:b0:7b6:c3ad:6cc4 with SMTP id af79cd13be357-7c069cf37c0mr143514985a.5.1739280113155;
+        Tue, 11 Feb 2025 05:21:53 -0800 (PST)
+Received: from [192.168.65.90] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5dcf1b7adc4sm9578260a12.19.2025.02.11.05.21.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 11 Feb 2025 05:21:51 -0800 (PST)
+Message-ID: <59592224-7e99-4eba-b41d-7bfa6b1695cb@oss.qualcomm.com>
+Date: Tue, 11 Feb 2025 14:21:49 +0100
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Tue, 11 Feb 2025 13:09:12 +0100
-From: Harald Freudenberger <freude@linux.ibm.com>
-To: ebiggers@google.com
-Cc: linux-s390@vger.kernel.org, linux-crypto@vger.kernel.org,
-        davem@davemloft.net, dengler@linux.ibm.com,
-        herbert@gondor.apana.org.au
-Subject: Re: [PATCH v10 2/5] s390/crypto: New s390 specific protected key hash
- phmac
-Reply-To: freude@linux.ibm.com
-Mail-Reply-To: freude@linux.ibm.com
-In-Reply-To: <20250115162231.83516-3-freude@linux.ibm.com>
-References: <20250115162231.83516-1-freude@linux.ibm.com>
- <20250115162231.83516-3-freude@linux.ibm.com>
-Message-ID: <265b5abbf32fcb6748abad7d0ec360cc@linux.ibm.com>
-X-Sender: freude@linux.ibm.com
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 6/6] arm64: dts: qcom: sm8750: Add ICE nodes
+To: Melody Olvera <quic_molvera@quicinc.com>,
+        Thara Gopinath <thara.gopinath@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+ <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konradybcio@kernel.org>, Vinod Koul <vkoul@kernel.org>,
+        Satya Durga Srinivasu Prabhala <quic_satyap@quicinc.com>,
+        Trilok Soni <quic_tsoni@quicinc.com>
+Cc: linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Gaurav Kashyap <quic_gaurkash@quicinc.com>
+References: <20250113-sm8750_crypto_master-v1-0-d8e265729848@quicinc.com>
+ <20250113-sm8750_crypto_master-v1-6-d8e265729848@quicinc.com>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <20250113-sm8750_crypto_master-v1-6-d8e265729848@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: C0SWG3XnLjOOKPqLicsAjG0L2MUzOc_h
-X-Proofpoint-GUID: eajUi9FSaQ9LqZDSBSEyFzFCnms2-X_1
+X-Proofpoint-GUID: ZARe8ODYCibQ1NcYIHX7D1toDSJCXKJK
+X-Proofpoint-ORIG-GUID: ZARe8ODYCibQ1NcYIHX7D1toDSJCXKJK
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
  definitions=2025-02-11_05,2025-02-11_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
- suspectscore=0 impostorscore=0 mlxlogscore=594 lowpriorityscore=0
- clxscore=1015 phishscore=0 priorityscore=1501 malwarescore=0 spamscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2501170000 definitions=main-2502110077
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
+ priorityscore=1501 suspectscore=0 phishscore=0 impostorscore=0
+ adultscore=0 clxscore=1015 mlxscore=0 malwarescore=0 bulkscore=0
+ lowpriorityscore=0 mlxlogscore=739 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2501170000 definitions=main-2502110088
 
-On 2025-01-15 17:22, Harald Freudenberger wrote:
-> Add support for protected key hmac ("phmac") for s390 arch.
+On 13.01.2025 10:16 PM, Melody Olvera wrote:
+> From: Gaurav Kashyap <quic_gaurkash@quicinc.com>
 > 
-> With the latest machine generation there is now support for
-> protected key (that is a key wrapped by a master key stored
-> in firmware) hmac for sha2 (sha224, sha256, sha384 and sha512)
-> for the s390 specific CPACF instruction kmac.
+> Add the SM8750 nodes for the UFS Inline Crypto Engine (ICE).
 > 
-> This patch adds support via 4 new ahashes registered as
-> phmac(sha224), phmac(sha256), phmac(sha384) and phmac(sha512).
-> 
-> Co-developed-by: Holger Dengler <dengler@linux.ibm.com>
-> Signed-off-by: Holger Dengler <dengler@linux.ibm.com>
-> Signed-off-by: Harald Freudenberger <freude@linux.ibm.com>
+> Signed-off-by: Gaurav Kashyap <quic_gaurkash@quicinc.com>
+> Signed-off-by: Melody Olvera <quic_molvera@quicinc.com>
 > ---
 
-...
+Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
 
-> +
-> +	  Select this option if you want to use the phmac digests
-> +	  for example to use dm-integrity with secure/protected keys.
-> +
->  config S390_PRNG
->  	tristate "Pseudo random number generator device driver"
->  	depends on S390
-
-Hello Eric
-
-with your commit
-   7fa481734016 crypto: ahash - make hash walk functions private to 
-ahash.c
-you move the crypto_hash_walk_* functions to private context into 
-ahash.c.
-So for example my new phmac does not compile any more.
-What is the replacement for these functions then? Should I really do
-the scatter walk by my own now or is there a set of new functions to 
-come?
+Konrad
