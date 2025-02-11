@@ -1,58 +1,59 @@
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07F751F2373
-	for <linux-crypto@vger.kernel.org>; Tue, 11 Feb 2025 10:00:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F3871E8835
+	for <linux-crypto@vger.kernel.org>; Tue, 11 Feb 2025 10:00:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739268010; cv=none; b=eQOcPio2Lniqr8uplBR3IjB0y7UcrduioRL6hzF6kjED0cij6ifMDZmhOL6PN+zgsf8rpQmOpNAuSsvMOJS+Imdei5s373NTB1HxnpXaLzUMhV4Azk12wzbGQZXAhPhDLhmWUqP5Ecos6K5yk/No519dcr9tMcirOtiYPiwH8g0=
+	t=1739268012; cv=none; b=BU6UqiVEQVpziaKzhZRAKPD8fPZ6yMms3hslMnEs/9aJKe+IowSdNwMazx6Bi0Gg5imWd8R1xCXwX9cgAd/DmijaVQSYGPs9OEWkx0V/Y1+P7SYloOAeWc+rxOjbtUM52g0JRNm/YSyarrYSiuSzepefVCaqkn1xET2EuAU3MRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739268010; c=relaxed/simple;
-	bh=ro8caf7SM8Y1ZMwQAsFd5F/uNYeQwmr4nuVwl9FzKas=;
+	s=arc-20240116; t=1739268012; c=relaxed/simple;
+	bh=UrX4fAAXuaYWVJ+TWG7YU31ZhRrq5hNw3Bj6jhKR52g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=K7eKOhtjFhcOM2Y/VlsuSkfCILN7yanY3IX8cSR7NjXNuFseswFk4pKx4xW5HvPBo26cMfKI50AIhuaqFUXYJAnZkE6Srv+qORE2U3wcuZLMmLOMO6ZKGA43DDvE0ILmYATJNswwSt/L1/T8g5Jclv4PIah1BNOWFC7zFin3+h8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iRtQEft8; arc=none smtp.client-ip=192.198.163.16
+	 MIME-Version; b=Y8LG54KKAnuDIuqCSXoDgMRZzPjv8501kHXVYAHETpAz6tyF1FhQBMD5jTSsjNybmoDfSOSxVIS7CW/uBhczJHJ8QEhWjZf9pL+ZlBCMwPruNz5n3AIukXathAEOPox6pHH9KOp1usGIQeU/fNDg+TTbZbb0oZjwXkqOb78OH5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l7KcpXrQ; arc=none smtp.client-ip=192.198.163.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iRtQEft8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l7KcpXrQ"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739268009; x=1770804009;
+  t=1739268010; x=1770804010;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ro8caf7SM8Y1ZMwQAsFd5F/uNYeQwmr4nuVwl9FzKas=;
-  b=iRtQEft8DVeTXBly6vfYDhOUPPQ8WSNBptqHMEMgAtalxAy1/aOljKbk
-   APN5bOCAD3ik7KVeqwColUkQf3Z7CE54fvkWXvQI4rYoNTejWwSVZl5IL
-   LYsIdfJlqP32+Rae6YExE4F2eUmuQl6/6WO2TxCjaltDA0V/4Vm3CTvQg
-   1NUC1nTPOZrXnnj6VWDtIs/AY86RbQI3xu0NVsof37hKvnkvQgqmJB3pC
-   i0qI2z5/LLgpd4hibsYienx+Cr+PAQ4E05p0QO8IaKKWy6Y1ar0Bzbq/7
-   bQhlrFA5twNP74Mh1JZJDnVWcy+uU0zfJmdgC+yvCmIcqrfggoXdY/2oe
-   Q==;
-X-CSE-ConnectionGUID: 8bnPgRgSRSWjW3B2hlM4bg==
-X-CSE-MsgGUID: YINzo5UPQAaqNrypRGT3yA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11341"; a="27477127"
+  bh=UrX4fAAXuaYWVJ+TWG7YU31ZhRrq5hNw3Bj6jhKR52g=;
+  b=l7KcpXrQquvE4FWkkg7v1Hv9AI7MCV4CtolzjuaJqt9dyPGEW96JhoHl
+   nkOqw3dtnOYXipbGt0/F2iSguYPXvmTcsMrGXpiaVp5clJGRo0Sak+Puh
+   ZWfL/4qPvSPRRPdsVGongiPheR71WRCt7627m4s/QFT795ockEmKrffNC
+   r74mo5qtDN4w4RkJFD9/z7P5qKRkreTgxMYiP93OJWEyLpDD/KZj5iNKU
+   gJL3kcr78lI5fQm27Ju15AmycEdGMdxb12AVdiECT/V6AcdTFhS4WumLD
+   TtxN83X2HbzZGEUa3vtwVqUVpjfWo0qirbrsux7CDb8tyDwPkcK2a77B/
+   A==;
+X-CSE-ConnectionGUID: JwZctBrtQOi+p/yvDOyqDA==
+X-CSE-MsgGUID: Bdkc7ueFQpa48y1HOlWz/w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11341"; a="27477131"
 X-IronPort-AV: E=Sophos;i="6.13,277,1732608000"; 
-   d="scan'208";a="27477127"
+   d="scan'208";a="27477131"
 Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2025 02:00:08 -0800
-X-CSE-ConnectionGUID: PSA598ErQiuJR6/+Masxrw==
-X-CSE-MsgGUID: UOt6zjBLTCKAmPFx5eiWgQ==
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2025 02:00:10 -0800
+X-CSE-ConnectionGUID: f0SOTQlHT++L8PCDy0w7Ew==
+X-CSE-MsgGUID: sDmD+dIkS0m9D22MM3zISQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="112321333"
+   d="scan'208";a="112321342"
 Received: from unknown (HELO silpixa00400314.ger.corp.intel.com) ([10.237.223.156])
-  by orviesa010.jf.intel.com with ESMTP; 11 Feb 2025 02:00:07 -0800
+  by orviesa010.jf.intel.com with ESMTP; 11 Feb 2025 02:00:08 -0800
 From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
 To: herbert@gondor.apana.org.au
 Cc: linux-crypto@vger.kernel.org,
 	andriy.shevchenko@intel.com,
 	qat-linux@intel.com,
 	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Ahsan Atta <ahsan.atta@intel.com>,
 	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: [PATCH 1/2] crypto: qat - fix object goals in Makefiles
-Date: Tue, 11 Feb 2025 09:58:52 +0000
-Message-ID: <20250211095952.14442-2-giovanni.cabiddu@intel.com>
+Subject: [PATCH 2/2] crypto: qat - reorder objects in qat_common Makefile
+Date: Tue, 11 Feb 2025 09:58:53 +0000
+Message-ID: <20250211095952.14442-3-giovanni.cabiddu@intel.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250211095952.14442-1-giovanni.cabiddu@intel.com>
 References: <20250211095952.14442-1-giovanni.cabiddu@intel.com>
@@ -65,119 +66,119 @@ MIME-Version: 1.0
 Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
 Content-Transfer-Encoding: 8bit
 
-Align with kbuild documentation by using <module_name>-y instead of
-<module_name>-objs, following the kernel convention for building modules
-from multiple object files.
+The objects in the qat_common Makefile are currently listed in a random
+order.
 
-Link: https://docs.kernel.org/kbuild/makefiles.html#loadable-module-goals-obj-m
+Reorder the objects alphabetically to make it easier to find where to
+add a new object.
+
 Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Suggested-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Reviewed-by: Ahsan Atta <ahsan.atta@intel.com>
 Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 ---
- drivers/crypto/intel/qat/qat_420xx/Makefile      | 2 +-
- drivers/crypto/intel/qat/qat_4xxx/Makefile       | 2 +-
- drivers/crypto/intel/qat/qat_c3xxx/Makefile      | 2 +-
- drivers/crypto/intel/qat/qat_c3xxxvf/Makefile    | 2 +-
- drivers/crypto/intel/qat/qat_c62x/Makefile       | 2 +-
- drivers/crypto/intel/qat/qat_c62xvf/Makefile     | 2 +-
- drivers/crypto/intel/qat/qat_common/Makefile     | 2 +-
- drivers/crypto/intel/qat/qat_dh895xcc/Makefile   | 2 +-
- drivers/crypto/intel/qat/qat_dh895xccvf/Makefile | 2 +-
- 9 files changed, 9 insertions(+), 9 deletions(-)
+ drivers/crypto/intel/qat/qat_common/Makefile | 66 ++++++++++----------
+ 1 file changed, 33 insertions(+), 33 deletions(-)
 
-diff --git a/drivers/crypto/intel/qat/qat_420xx/Makefile b/drivers/crypto/intel/qat/qat_420xx/Makefile
-index 45728659fbc4..72b24b1804cf 100644
---- a/drivers/crypto/intel/qat/qat_420xx/Makefile
-+++ b/drivers/crypto/intel/qat/qat_420xx/Makefile
-@@ -1,4 +1,4 @@
- # SPDX-License-Identifier: GPL-2.0-only
- ccflags-y := -I $(src)/../qat_common
- obj-$(CONFIG_CRYPTO_DEV_QAT_420XX) += qat_420xx.o
--qat_420xx-objs := adf_drv.o adf_420xx_hw_data.o
-+qat_420xx-y := adf_drv.o adf_420xx_hw_data.o
-diff --git a/drivers/crypto/intel/qat/qat_4xxx/Makefile b/drivers/crypto/intel/qat/qat_4xxx/Makefile
-index 9ba202079a22..e8480bb80dee 100644
---- a/drivers/crypto/intel/qat/qat_4xxx/Makefile
-+++ b/drivers/crypto/intel/qat/qat_4xxx/Makefile
-@@ -1,4 +1,4 @@
- # SPDX-License-Identifier: (BSD-3-Clause OR GPL-2.0-only)
- ccflags-y := -I $(src)/../qat_common
- obj-$(CONFIG_CRYPTO_DEV_QAT_4XXX) += qat_4xxx.o
--qat_4xxx-objs := adf_drv.o adf_4xxx_hw_data.o
-+qat_4xxx-y := adf_drv.o adf_4xxx_hw_data.o
-diff --git a/drivers/crypto/intel/qat/qat_c3xxx/Makefile b/drivers/crypto/intel/qat/qat_c3xxx/Makefile
-index 7a06ad519bfc..d9e568572da8 100644
---- a/drivers/crypto/intel/qat/qat_c3xxx/Makefile
-+++ b/drivers/crypto/intel/qat/qat_c3xxx/Makefile
-@@ -1,4 +1,4 @@
- # SPDX-License-Identifier: GPL-2.0-only
- ccflags-y := -I $(src)/../qat_common
- obj-$(CONFIG_CRYPTO_DEV_QAT_C3XXX) += qat_c3xxx.o
--qat_c3xxx-objs := adf_drv.o adf_c3xxx_hw_data.o
-+qat_c3xxx-y := adf_drv.o adf_c3xxx_hw_data.o
-diff --git a/drivers/crypto/intel/qat/qat_c3xxxvf/Makefile b/drivers/crypto/intel/qat/qat_c3xxxvf/Makefile
-index 7ef633058c4f..31a908a211ac 100644
---- a/drivers/crypto/intel/qat/qat_c3xxxvf/Makefile
-+++ b/drivers/crypto/intel/qat/qat_c3xxxvf/Makefile
-@@ -1,4 +1,4 @@
- # SPDX-License-Identifier: GPL-2.0-only
- ccflags-y := -I $(src)/../qat_common
- obj-$(CONFIG_CRYPTO_DEV_QAT_C3XXXVF) += qat_c3xxxvf.o
--qat_c3xxxvf-objs := adf_drv.o adf_c3xxxvf_hw_data.o
-+qat_c3xxxvf-y := adf_drv.o adf_c3xxxvf_hw_data.o
-diff --git a/drivers/crypto/intel/qat/qat_c62x/Makefile b/drivers/crypto/intel/qat/qat_c62x/Makefile
-index cc9255b3b198..cbdaaa135e84 100644
---- a/drivers/crypto/intel/qat/qat_c62x/Makefile
-+++ b/drivers/crypto/intel/qat/qat_c62x/Makefile
-@@ -1,4 +1,4 @@
- # SPDX-License-Identifier: GPL-2.0-only
- ccflags-y := -I $(src)/../qat_common
- obj-$(CONFIG_CRYPTO_DEV_QAT_C62X) += qat_c62x.o
--qat_c62x-objs := adf_drv.o adf_c62x_hw_data.o
-+qat_c62x-y := adf_drv.o adf_c62x_hw_data.o
-diff --git a/drivers/crypto/intel/qat/qat_c62xvf/Makefile b/drivers/crypto/intel/qat/qat_c62xvf/Makefile
-index 256786662d60..60e499b041ec 100644
---- a/drivers/crypto/intel/qat/qat_c62xvf/Makefile
-+++ b/drivers/crypto/intel/qat/qat_c62xvf/Makefile
-@@ -1,4 +1,4 @@
- # SPDX-License-Identifier: GPL-2.0-only
- ccflags-y := -I $(src)/../qat_common
- obj-$(CONFIG_CRYPTO_DEV_QAT_C62XVF) += qat_c62xvf.o
--qat_c62xvf-objs := adf_drv.o adf_c62xvf_hw_data.o
-+qat_c62xvf-y := adf_drv.o adf_c62xvf_hw_data.o
 diff --git a/drivers/crypto/intel/qat/qat_common/Makefile b/drivers/crypto/intel/qat/qat_common/Makefile
-index 7acf9c576149..c515cc1e986a 100644
+index c515cc1e986a..af5df29fd2e3 100644
 --- a/drivers/crypto/intel/qat/qat_common/Makefile
 +++ b/drivers/crypto/intel/qat/qat_common/Makefile
-@@ -1,7 +1,7 @@
+@@ -1,62 +1,62 @@
  # SPDX-License-Identifier: GPL-2.0
  obj-$(CONFIG_CRYPTO_DEV_QAT) += intel_qat.o
  ccflags-y += -DDEFAULT_SYMBOL_NAMESPACE='"CRYPTO_QAT"'
--intel_qat-objs := adf_cfg.o \
-+intel_qat-y := adf_cfg.o \
- 	adf_isr.o \
- 	adf_ctl_drv.o \
+-intel_qat-y := adf_cfg.o \
+-	adf_isr.o \
+-	adf_ctl_drv.o \
++intel_qat-y := adf_accel_engine.o \
++	adf_admin.o \
++	adf_aer.o \
++	adf_cfg.o \
  	adf_cfg_services.o \
-diff --git a/drivers/crypto/intel/qat/qat_dh895xcc/Makefile b/drivers/crypto/intel/qat/qat_dh895xcc/Makefile
-index cfd3bd757715..5bf5c890c362 100644
---- a/drivers/crypto/intel/qat/qat_dh895xcc/Makefile
-+++ b/drivers/crypto/intel/qat/qat_dh895xcc/Makefile
-@@ -1,4 +1,4 @@
- # SPDX-License-Identifier: GPL-2.0-only
- ccflags-y := -I $(src)/../qat_common
- obj-$(CONFIG_CRYPTO_DEV_QAT_DH895xCC) += qat_dh895xcc.o
--qat_dh895xcc-objs := adf_drv.o adf_dh895xcc_hw_data.o
-+qat_dh895xcc-y := adf_drv.o adf_dh895xcc_hw_data.o
-diff --git a/drivers/crypto/intel/qat/qat_dh895xccvf/Makefile b/drivers/crypto/intel/qat/qat_dh895xccvf/Makefile
-index 64b54e92b2b4..93f9c81edf09 100644
---- a/drivers/crypto/intel/qat/qat_dh895xccvf/Makefile
-+++ b/drivers/crypto/intel/qat/qat_dh895xccvf/Makefile
-@@ -1,4 +1,4 @@
- # SPDX-License-Identifier: GPL-2.0-only
- ccflags-y := -I $(src)/../qat_common
- obj-$(CONFIG_CRYPTO_DEV_QAT_DH895xCCVF) += qat_dh895xccvf.o
--qat_dh895xccvf-objs := adf_drv.o adf_dh895xccvf_hw_data.o
-+qat_dh895xccvf-y := adf_drv.o adf_dh895xccvf_hw_data.o
++	adf_clock.o \
++	adf_ctl_drv.o \
+ 	adf_dev_mgr.o \
+-	adf_init.o \
+-	adf_accel_engine.o \
+-	adf_aer.o \
+-	adf_transport.o \
+-	adf_admin.o \
+-	adf_hw_arbiter.o \
+-	adf_sysfs.o \
+-	adf_sysfs_ras_counters.o \
++	adf_gen2_config.o \
++	adf_gen2_dc.o \
+ 	adf_gen2_hw_csr_data.o \
+ 	adf_gen2_hw_data.o \
+-	adf_gen2_config.o \
+ 	adf_gen4_config.o \
++	adf_gen4_dc.o \
+ 	adf_gen4_hw_csr_data.o \
+ 	adf_gen4_hw_data.o \
+-	adf_gen4_vf_mig.o \
+ 	adf_gen4_pm.o \
+-	adf_gen2_dc.o \
+-	adf_gen4_dc.o \
+ 	adf_gen4_ras.o \
+ 	adf_gen4_timer.o \
+-	adf_clock.o \
++	adf_gen4_vf_mig.o \
++	adf_hw_arbiter.o \
++	adf_init.o \
++	adf_isr.o \
+ 	adf_mstate_mgr.o \
+-	qat_crypto.o \
+-	qat_compression.o \
+-	qat_comp_algs.o \
+-	qat_algs.o \
+-	qat_asym_algs.o \
+-	qat_algs_send.o \
+-	adf_rl.o \
+ 	adf_rl_admin.o \
++	adf_rl.o \
++	adf_sysfs.o \
++	adf_sysfs_ras_counters.o \
+ 	adf_sysfs_rl.o \
+-	qat_uclo.o \
+-	qat_hal.o \
++	adf_transport.o \
++	qat_algs.o \
++	qat_algs_send.o \
++	qat_asym_algs.o \
+ 	qat_bl.o \
+-	qat_mig_dev.o
++	qat_comp_algs.o \
++	qat_compression.o \
++	qat_crypto.o \
++	qat_hal.o \
++	qat_mig_dev.o \
++	qat_uclo.o
+ 
+-intel_qat-$(CONFIG_DEBUG_FS) += adf_transport_debug.o \
++intel_qat-$(CONFIG_DEBUG_FS) += adf_cnv_dbgfs.o \
++				adf_dbgfs.o \
+ 				adf_fw_counters.o \
+-				adf_cnv_dbgfs.o \
+ 				adf_gen4_pm_debugfs.o \
+ 				adf_gen4_tl.o \
+-				adf_heartbeat.o \
+ 				adf_heartbeat_dbgfs.o \
++				adf_heartbeat.o \
+ 				adf_pm_dbgfs.o \
+ 				adf_telemetry.o \
+ 				adf_tl_debugfs.o \
+-				adf_dbgfs.o
++				adf_transport_debug.o
+ 
+-intel_qat-$(CONFIG_PCI_IOV) += adf_sriov.o adf_vf_isr.o adf_pfvf_utils.o \
++intel_qat-$(CONFIG_PCI_IOV) += adf_gen2_pfvf.o adf_gen4_pfvf.o \
+ 			       adf_pfvf_pf_msg.o adf_pfvf_pf_proto.o \
+-			       adf_pfvf_vf_msg.o adf_pfvf_vf_proto.o \
+-			       adf_gen2_pfvf.o adf_gen4_pfvf.o
++			       adf_pfvf_utils.o adf_pfvf_vf_msg.o \
++			       adf_pfvf_vf_proto.o adf_sriov.o adf_vf_isr.o
+ 
+ intel_qat-$(CONFIG_CRYPTO_DEV_QAT_ERROR_INJECTION) += adf_heartbeat_inject.o
 -- 
 2.48.1
 
