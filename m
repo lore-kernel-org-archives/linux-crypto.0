@@ -1,44 +1,45 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 595291F55ED;
-	Tue, 11 Feb 2025 15:31:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1869C254B05;
+	Tue, 11 Feb 2025 17:05:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739287913; cv=none; b=qemyc3426AIlAK2WkcicT3jN38Hy89NZqeC5Qx2su8S9Ye/3lZtE4Pri6lg7wqnU9ksA4hU9gEtWXATPPDSYA++FGkqh/G8e6HqSdbjQ432TPr03UxGdI5yDTpK/FWpawpl2Kk2BqBRnNQcx5EDzy9pmWv7QtHxDxEEqFKnDiFg=
+	t=1739293517; cv=none; b=he7W9LTJ2YBiSXTs2/360m5a0ZXu1XWwP7CaUP3v+b16qDClMmMOrtmexb8RsCJWwVTlIK/D4HTsEcndGEyhUzeh/LkVtGMb5hXILKSItkRqpksDKb7UnI9Yn25uYW6wyrkoDLBSm6hlOK/tOjCRQMvkyEuZQvvxhugGdc4CHWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739287913; c=relaxed/simple;
-	bh=BuvtqjV55gZ0tKhPQub/uLEqKJ0jsP/YnyzafgATcPE=;
+	s=arc-20240116; t=1739293517; c=relaxed/simple;
+	bh=4SlwwWxS+SQPd/d/oR8xE4I/YSQQ0zoz8M3b8E1zjEw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ahKoQaTUJ4vAvb2I9iqK3yMmgA54CqmcC2ED3EMQfsQV/fq7Lnu7/8xrjPcKSmVt97LNakfNLsCFluOVRzv/XiErDG+eOZPC4Hc6WhQQp602alXnc4oRPoZog1t5i08Yp7DckGZoKGYQa0u4rtn7/vin/+oJJmsI3Dp4OeF4/bE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oAihRzm8; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=NoaIPNUyjAAsx+/WftDs9YFWlDoWKgPLPvHPwNWdLg55Cm4t8MEy8v6uWZDuot9eDLwL+0Ng4N81M4+yvbSEBp4vC4GmfDmjAvEmPudGppXmhEE6JpEKIFIWU9QXhz2hCAHvKkCQDYZA8B5AhWoNp8u4FIfoMshEAz2sAEgjVcA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mBdf+Ih1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oAihRzm8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82ED7C4CEDD;
-	Tue, 11 Feb 2025 15:31:52 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mBdf+Ih1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E328CC4CEDD;
+	Tue, 11 Feb 2025 17:05:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739287912;
-	bh=BuvtqjV55gZ0tKhPQub/uLEqKJ0jsP/YnyzafgATcPE=;
+	s=k20201202; t=1739293515;
+	bh=4SlwwWxS+SQPd/d/oR8xE4I/YSQQ0zoz8M3b8E1zjEw=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=oAihRzm8tvtP4l3Icb9yKW/TQcrsCLazIAneqqp06Mvm/NXXCi5vJvafFte5ECOfK
-	 iU8psq2u7+NX3LeDJ951NnsAqXOTE7BM44yWqjk1igX6h8KMFBX6TPWXQNIBfOxIrc
-	 mUIt3WWjBrKLy7dThYw00GfFF5i8eA0/RqL4XOONAm+l2jA6zkmDvnP5q6sHYVjq2N
-	 q0tbVGImCYlI5hkG0f2YKu74s6DmRD8nhhkSdkUcWYd92iTQQfTTybvFA+M/+4sLn2
-	 u3cLcOg2oxycTHw69SWKxr9/OanlNorarORNsqv2JleD401/YPHh4KAV3RpCndf8xe
-	 Cc/cjgoFdFXdg==
-Date: Tue, 11 Feb 2025 07:31:51 -0800
+	b=mBdf+Ih1kmF4vUqTTwGdNBZW1z5ZtYlGN9Kh6h5Gk5GhSITdAVnJPI6X6ephobZNV
+	 hos0cutdV7vSuPGGlstWzPG9Kvn7ZIMgJil6bGWg0cUUmp07Wce1WBsK3AUpU+WxeY
+	 iMHkw7qzR78mKym7mwM9oukCpMwUmAdw9jASVA3ZjiHEw/cahlZPna0Fpm4sZfmuid
+	 fSPRg7tcveI4gATGV9y28wo++LFYoqM7al68GG2FaQel8Sh2S2edpAubVwe7D9JE1D
+	 tiHk93fnPPxWR2j0nC8rEU72HvMlGhSFP/eFEn3MdibI33N4fEbj5/BW+Ir+9x+HjN
+	 PBwHo/3BR1nwA==
+Date: Tue, 11 Feb 2025 09:05:13 -0800
 From: Eric Biggers <ebiggers@kernel.org>
-To: Harald Freudenberger <freude@linux.ibm.com>
-Cc: linux-s390@vger.kernel.org, linux-crypto@vger.kernel.org,
-	davem@davemloft.net, dengler@linux.ibm.com,
-	herbert@gondor.apana.org.au, Mikulas Patocka <mpatocka@redhat.com>,
-	dm-devel@lists.linux.dev
-Subject: Re: [PATCH v10 2/5] s390/crypto: New s390 specific protected key
- hash phmac
-Message-ID: <20250211153151.GA1227@sol.localdomain>
-References: <20250115162231.83516-1-freude@linux.ibm.com>
- <20250115162231.83516-3-freude@linux.ibm.com>
- <265b5abbf32fcb6748abad7d0ec360cc@linux.ibm.com>
+To: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, hannes@cmpxchg.org,
+	yosry.ahmed@linux.dev, nphamcs@gmail.com, chengming.zhou@linux.dev,
+	usamaarif642@gmail.com, ryan.roberts@arm.com, 21cnbao@gmail.com,
+	akpm@linux-foundation.org, linux-crypto@vger.kernel.org,
+	herbert@gondor.apana.org.au, davem@davemloft.net,
+	clabbe@baylibre.com, ardb@kernel.org, surenb@google.com,
+	kristen.c.accardi@intel.com, wajdi.k.feghali@intel.com,
+	vinodh.gopal@intel.com
+Subject: Re: [PATCH v6 00/16] zswap IAA compress batching
+Message-ID: <20250211170513.GB1227@sol.localdomain>
+References: <20250206072102.29045-1-kanchana.p.sridhar@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -47,49 +48,45 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <265b5abbf32fcb6748abad7d0ec360cc@linux.ibm.com>
+In-Reply-To: <20250206072102.29045-1-kanchana.p.sridhar@intel.com>
 
-[+dm-devel]
+On Wed, Feb 05, 2025 at 11:20:46PM -0800, Kanchana P Sridhar wrote:
+> IAA Compression Batching:
+> =========================
+> 
+> This patch-series introduces the use of the Intel Analytics Accelerator
+> (IAA) for parallel batch compression of pages in large folios to improve
+> zswap swapout latency.
 
-On Tue, Feb 11, 2025 at 01:09:12PM +0100, Harald Freudenberger wrote:
-> On 2025-01-15 17:22, Harald Freudenberger wrote:
-> > Add support for protected key hmac ("phmac") for s390 arch.
-> > 
-> > With the latest machine generation there is now support for
-> > protected key (that is a key wrapped by a master key stored
-> > in firmware) hmac for sha2 (sha224, sha256, sha384 and sha512)
-> > for the s390 specific CPACF instruction kmac.
-> > 
-> > This patch adds support via 4 new ahashes registered as
-> > phmac(sha224), phmac(sha256), phmac(sha384) and phmac(sha512).
-> > 
-> > Co-developed-by: Holger Dengler <dengler@linux.ibm.com>
-> > Signed-off-by: Holger Dengler <dengler@linux.ibm.com>
-> > Signed-off-by: Harald Freudenberger <freude@linux.ibm.com>
-> > ---
-> 
-> ...
-> 
-> > +
-> > +	  Select this option if you want to use the phmac digests
-> > +	  for example to use dm-integrity with secure/protected keys.
-> > +
-> >  config S390_PRNG
-> >  	tristate "Pseudo random number generator device driver"
-> >  	depends on S390
-> 
-> Hello Eric
-> 
-> with your commit
->   7fa481734016 crypto: ahash - make hash walk functions private to ahash.c
-> you move the crypto_hash_walk_* functions to private context into ahash.c.
-> So for example my new phmac does not compile any more.
-> What is the replacement for these functions then? Should I really do
-> the scatter walk by my own now or is there a set of new functions to come?
+So, zswap is passed a large folio to swap out, and it divides it into 4K pages
+and compresses each independently.  The performance improvement in this patchset
+comes entirely from compressing the folio's pages in parallel, synchronously,
+using IAA.
 
-This is just another ridiculous problem caused by trying to shoehorn CPU-based
-crypto into ahash which is an interface designed for off-CPU offload.
-I've already given the solution here:
-https://lore.kernel.org/dm-devel/20250116080324.GA3910@sol.localdomain/
+Before even considering IAA and going through all the pain of supporting
+batching with an off-CPU offload, wouldn't it make a lot more sense to try just
+compressing each folio in software as a single unit?  Compared to the existing
+approach of compressing the folio in 4K chunks, that should be much faster and
+produce a much better compression ratio.  Compression algorithms are very much
+designed for larger amounts of data, so that they can find more matches.
+
+It looks like the mm subsystem used to always break up folios when swapping them
+out, but that is now been fixed.  It looks like zswap just hasn't been updated
+to do otherwise yet?
+
+FWIW, here are some speed and compression ratio results I collected in a
+compression benchmark module that tests feeding vmlinux (uncompressed_size:
+26624 KiB) though zstd in 4 KiB page or 2 MiB folio-sized chunks:
+
+zstd level 3, 4K chunks: 86 ms; compressed_size 9429 KiB
+zstd level 3, 2M chunks: 57 ms; compressed_size 8251 KiB
+zstd level 1, 4K chunks: 65 ms; compressed_size 9806 KiB
+zstd level 1, 2M chunks: 34 ms; compressed_size 8878 KiB
+
+The current zswap parameterization is "zstd level 3, 4K chunks".  I would
+recommend "zstd level 1, 2M chunks", which would be 2.5 times as fast and give a
+6% better compression ratio.
+
+What is preventing zswap from compressing whole folios?
 
 - Eric
