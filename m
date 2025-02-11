@@ -1,120 +1,148 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77492320F
-	for <linux-crypto@vger.kernel.org>; Tue, 11 Feb 2025 13:21:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29ADD24C66D
+	for <linux-crypto@vger.kernel.org>; Tue, 11 Feb 2025 13:55:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739280116; cv=none; b=hg077xp6RLNj6swkGvmr6xqPdlhVjcjFDU9JekMYoQoZ4ERpqZ4sYE81GeY2JpbYZVTUU6Bza3O/s8U+OXJhlxkhWcMtSagjHhEY8cEVGFJiYvBimzxpUQA+qqaPASTDBiDhSA6GeXi7rpPHGrrpqoSY/VdZ1qjDBWxGAUC+sMw=
+	t=1739282159; cv=none; b=m3/W+4XUNPyswR9dLy9GHVti/RRw9HBHihdHfdtucBVlV2cHHgMcHdEYysVzUy/sPshSGceI7U2PD+OUHdVy7CpTvSKaY5ph35cNPmoB1ZhWT94vaaBCadAB3o555Fz7axQ9yCzo5T+C0bgxcfSicltjedjvL0r0y7afXveIabs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739280116; c=relaxed/simple;
-	bh=7EBzLd/MkkAQO/2gIs3RgMZYWCN0hifel1hX00qZrX0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ln4k4Nf7auFTWR+IvwSv+c93meTSWwuH0HaJCHZ/tqCIQT0ykqAm+KpB7wjZvi65UAfmBDIRnHaezrm52KD6MupCTgAxvy5F5NS+meXNuKqzFy4ONwxEeNmYzJ9Kf/1H20d6xzIis2S2C1K4XQYFNnqhXAVWY+T8gcvDj+iWQKc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=TQ4lQdem; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1739282159; c=relaxed/simple;
+	bh=tvddLOD38SbA+nE14izQGPNoMlGp5ZWiCv7xIdyaTR8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XdlNxB4YIsfcf6KknIJpsTp7kKMhJhObirMg2WiNwrHY2tvYVxqb239A4G/ESNXlHEivw5yZlXMHwBrAxwZkyPNOSgHBhuYBypTyRloJwzyf4uPIHhp7PwyRqYW3NcADkrhzsAE32jATBPJ0su18IpAfJdIhof7JuIuLt65JqUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LjEEbJVK; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="TQ4lQdem"
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51BBA8cH000863
-	for <linux-crypto@vger.kernel.org>; Tue, 11 Feb 2025 13:21:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	WxaAP2OfJQcefUPkd/AkugD6llbStw6Nvz+c51lPgbo=; b=TQ4lQdemhNvxlgq2
-	XeHBvjp7cWkPU71K165PmuaP/MupUpjICDswGQAaxophv32VBKQQm/wMs1zW7J4g
-	nLsNkkz8dXrA59l+2KM6w4/BYqafJkqh9PRzP5mjqc8INvndb9ytXWBrAP2GBRie
-	DQ1yTqAezUDA4h1zCqpeu6Tg38dtKxNu7B/CekTAMb5pDg2vM9eTz7fy9Ok5tdnl
-	ljgJDciZLsuCB6+daXRR9M8iUpc2P29t8e+SXdJHDh0Ngi7Z1sWFEhlPCz6tjS65
-	5NeTt8A56w6OflbCArJPCQWpVjmFnneAaRnA8t+EOaUWyXNrZzru3g879zgRg6cw
-	yWkksw==
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com [209.85.222.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44qgtk3rwk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Tue, 11 Feb 2025 13:21:54 +0000 (GMT)
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7c060bcafebso30310285a.3
-        for <linux-crypto@vger.kernel.org>; Tue, 11 Feb 2025 05:21:54 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LjEEbJVK"
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-2f44353649aso8177567a91.0
+        for <linux-crypto@vger.kernel.org>; Tue, 11 Feb 2025 05:55:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1739282157; x=1739886957; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=AhF+JZnbICstMQ4SyijmaSYDsITfNwFybUAYOWyiZXU=;
+        b=LjEEbJVKsnr9/Bsf8TZWXbIEH1ixlpJK61YR+lS6w6zVvRx0ZMR8sUTqELQhPhYvx0
+         g6F8Xe/usYq8l/6WOpRHuk63HnkmtvH6PvLGsgcpB+9NeHgdaGSBIJq7nbE9ilO28O3R
+         g3w0p4vW/9Pggxyymt7DJIK4Hpcvocw8jjphJjx7OaqZAwzzfqGCiK52B5fxCqrBWDSn
+         JGYdvodniqgfzB9aSif2AxWUg746i+Z5vsZbd0bmnP4JxqvmBMgVZuEuui9KQ0lE1efb
+         pciajeEA29strUtEP+X4Z67WFSHVxbszxRS3WwB/ywXHhenuZtNgHUZJIRZokwpsrs7K
+         sNEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739280113; x=1739884913;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WxaAP2OfJQcefUPkd/AkugD6llbStw6Nvz+c51lPgbo=;
-        b=DkdEIQ8reGpDRIP8XrBGC8JP1Dd6+LGgOm+8JUXRFQdM4OJ3B9WinkB7St9FEoy4MC
-         zFY/MDTYLmeGaw4oIiVuj2LdpGqhw5LRvsTPSOoTJOwrD6BcbjOvu2HZ2mGqIQEa8uie
-         HRkCAl2QpL7CcL4CiQdhXNV0SzJ+sWsUxI2gZUSgG56plRRjSkzP6QsrZ0w+lKxhPFyr
-         WrqBZBLvWdOZxB3sg977sOwyNet5UxC3XZhNxsuolT3qZJ8EqgzXv5CHjUNLKDvWEY49
-         Sbef4oLOZ0z4iliSJslguDV0r/tDkQW79z1s3GtYMRKN2zmVRkrExtpwV2LFkraCyvxq
-         Z6Iw==
-X-Gm-Message-State: AOJu0YwqEhyIkNii3AEK6c1sCzTtrORfHzHhzhr6Gq2XNjhb980rm5Ss
-	H+hN0tUdK4Yvya1nBlPGceqqs1wfkZxKQaZWrQ3Cg6SCJo13AAU+TdkdaxspjxRI3WY1VqYiesb
-	VqYcV6v6JS62SkktTRZq3+CUOjt818XZYoc3pisxPEs3CmIayiu/H6wnY5uvg8WU=
-X-Gm-Gg: ASbGnctU71XonvzZ94r50G1YHfEfCa8Kav59D2zyYcRFtvV89sP2rQLu0Lvp4zx1HAu
-	BsS0TchejsHXPJE7krN+2uce+UGeTwmRzrfxV8TZBkpNA9S6Y1jfo1d5JvYwDHbMUZG2U3+SDMk
-	FTTESkGod1oq6BrxK1GHHomrDGc0yRZnH7BJzopWT9mjRu01Rc/jrG5I76uMlx8+eOYyjoxNsKi
-	xvL3kxZ4k2YOl4McG1iDPiBxRlDC90FS0DjOLu0JsSRCzbTcA3Zl5eqLM2tEekzukUTtId5j2M6
-	i/SK/En9Nv0GwN/UlZxObwkyKkWOkHCGB/Y6l/4ITmhIS+FnxjKbTJMsFfo=
-X-Received: by 2002:a05:620a:1a28:b0:7b6:c3ad:6cc4 with SMTP id af79cd13be357-7c069cf37c0mr143517585a.5.1739280113517;
-        Tue, 11 Feb 2025 05:21:53 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE0dqsw15wKwS/BY+L64XWNIZkK61jXi1TTzfL+uXdnejS6AhoibNvrqpmqVJiiO/CfpHiYiw==
-X-Received: by 2002:a05:620a:1a28:b0:7b6:c3ad:6cc4 with SMTP id af79cd13be357-7c069cf37c0mr143514985a.5.1739280113155;
-        Tue, 11 Feb 2025 05:21:53 -0800 (PST)
-Received: from [192.168.65.90] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5dcf1b7adc4sm9578260a12.19.2025.02.11.05.21.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Feb 2025 05:21:51 -0800 (PST)
-Message-ID: <59592224-7e99-4eba-b41d-7bfa6b1695cb@oss.qualcomm.com>
-Date: Tue, 11 Feb 2025 14:21:49 +0100
+        d=1e100.net; s=20230601; t=1739282157; x=1739886957;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=AhF+JZnbICstMQ4SyijmaSYDsITfNwFybUAYOWyiZXU=;
+        b=HbSsDAh3MmkjX01Zxo+nrT+g36e+h9chUiedqrFNDNV8uGLv3wd2WjXJpd96ESY0UB
+         m0+BtBDSwhZ01eWFLu/UZPHufrNpiDlPzzJvX3hGUuSmaFiSkAYCCq/vFAYKjx7IoxV2
+         CtWdxKphjyN+4V5hBNMRqCmkoYf3+pb5H/7FxZQViqxBeLk8KAZLMeBquReSB5Gw3anb
+         syO3V+JlmfSGTrbi3omLcYpKGQ+SsCQpK5zY5dALu0K2PAhRv5BhTxGM2bz6d2VFR2ir
+         9D+kqyjQ1Hu/aYRsxSbvaaDGbmu0+rAI4F54wDC/rHvPBtpFAr4ou7U26oC0c+EfEmu/
+         wmhg==
+X-Forwarded-Encrypted: i=1; AJvYcCU76XaeetViwj0GVWvgLcms9tIBC9sS8+dQ2mufEDl2nvJfBLVnN4wGozeA3kgPOtrDf2IibIpOLH/yqMo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFWgC9/5FOnJLOw1btGeMZvXt9z40x/NjvyMRCTSSBUW4bIqRb
+	YWrSLctCcDOAe42irP9ETDmKQdDT+5aLqtldTqc5BR3riSPRARfz2m3StDSQbXVzoVxzOYtqwzV
+	/OBQpFlnGkAdNoKsPztIpXkCFsYfudIJtQlVZ
+X-Gm-Gg: ASbGncvPW5F0kjV4tKArBWghI04LNa+o95YG1o7VZWP5WUUi3Kt2WjFrgcw4CQgH2Y4
+	uB8+9YrwxHCt37seTOxalzZTynQj52hEejLqSDHXAx4n7/uDV7RXToMhkTqWmx5R+/bAoym5Wb6
+	5jIP5QMEX88yAP2OH/ADSkCLEmrrY=
+X-Google-Smtp-Source: AGHT+IGroUNVHpMBAUy/bObZea2jE/snBP4iAn1fJ0F8Y+yGqofcGPH5OOKF/rW4Qwm5mzGvQOH1DLn2V2e6J52emRE=
+X-Received: by 2002:a17:90b:1d45:b0:2ea:5e0c:2847 with SMTP id
+ 98e67ed59e1d1-2fa9ee17fb8mr4391611a91.22.1739282157250; Tue, 11 Feb 2025
+ 05:55:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 6/6] arm64: dts: qcom: sm8750: Add ICE nodes
-To: Melody Olvera <quic_molvera@quicinc.com>,
-        Thara Gopinath <thara.gopinath@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
- <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>, Vinod Koul <vkoul@kernel.org>,
-        Satya Durga Srinivasu Prabhala <quic_satyap@quicinc.com>,
-        Trilok Soni <quic_tsoni@quicinc.com>
-Cc: linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Gaurav Kashyap <quic_gaurkash@quicinc.com>
-References: <20250113-sm8750_crypto_master-v1-0-d8e265729848@quicinc.com>
- <20250113-sm8750_crypto_master-v1-6-d8e265729848@quicinc.com>
-Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <20250113-sm8750_crypto_master-v1-6-d8e265729848@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-GUID: ZARe8ODYCibQ1NcYIHX7D1toDSJCXKJK
-X-Proofpoint-ORIG-GUID: ZARe8ODYCibQ1NcYIHX7D1toDSJCXKJK
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-11_05,2025-02-11_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- priorityscore=1501 suspectscore=0 phishscore=0 impostorscore=0
- adultscore=0 clxscore=1015 mlxscore=0 malwarescore=0 bulkscore=0
- lowpriorityscore=0 mlxlogscore=739 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2501170000 definitions=main-2502110088
+References: <20250206181711.1902989-1-elver@google.com> <20250206181711.1902989-9-elver@google.com>
+ <e276263f-2bc5-450e-9a35-e805ad8f277b@acm.org> <CANpmjNMfxcpyAY=jCKSBj-Hud-Z6OhdssAXWcPaqDNyjXy0rPQ@mail.gmail.com>
+ <f5eda818-6119-4b8f-992f-33bc9c184a64@acm.org>
+In-Reply-To: <f5eda818-6119-4b8f-992f-33bc9c184a64@acm.org>
+From: Marco Elver <elver@google.com>
+Date: Tue, 11 Feb 2025 14:55:20 +0100
+X-Gm-Features: AWEUYZkwbHjIdQKR2hqck9okMpxl0TDfWkkc2sBGpPLWquXQ8_lyXjiGcdcjlSE
+Message-ID: <CANpmjNPxyWey6v1tj6TwtN6Pe8Ze=wrfFFjuJFzCQTd4XM8xQA@mail.gmail.com>
+Subject: Re: [PATCH RFC 08/24] lockdep: Annotate lockdep assertions for
+ capability analysis
+To: Bart Van Assche <bvanassche@acm.org>
+Cc: "Paul E. McKenney" <paulmck@kernel.org>, Alexander Potapenko <glider@google.com>, 
+	Bill Wendling <morbo@google.com>, Boqun Feng <boqun.feng@gmail.com>, 
+	Dmitry Vyukov <dvyukov@google.com>, Frederic Weisbecker <frederic@kernel.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Ingo Molnar <mingo@kernel.org>, 
+	Jann Horn <jannh@google.com>, Joel Fernandes <joel@joelfernandes.org>, 
+	Jonathan Corbet <corbet@lwn.net>, Josh Triplett <josh@joshtriplett.org>, 
+	Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Thomas Gleixner <tglx@linutronix.de>, Uladzislau Rezki <urezki@gmail.com>, Waiman Long <longman@redhat.com>, 
+	Will Deacon <will@kernel.org>, kasan-dev@googlegroups.com, linux-kernel@vger.kernel.org, 
+	llvm@lists.linux.dev, rcu@vger.kernel.org, linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On 13.01.2025 10:16 PM, Melody Olvera wrote:
-> From: Gaurav Kashyap <quic_gaurkash@quicinc.com>
-> 
-> Add the SM8750 nodes for the UFS Inline Crypto Engine (ICE).
-> 
-> Signed-off-by: Gaurav Kashyap <quic_gaurkash@quicinc.com>
-> Signed-off-by: Melody Olvera <quic_molvera@quicinc.com>
-> ---
+On Mon, 10 Feb 2025 at 19:54, Bart Van Assche <bvanassche@acm.org> wrote:
+>
+>
+> On 2/10/25 10:23 AM, Marco Elver wrote:
+> > If you try to write code where you access a guarded_by variable, but
+> > the lock is held not in all paths we can write it like this:
+> >
+> > struct bar {
+> >    spinlock_t lock;
+> >    bool a; // true if lock held
+> >    int counter __var_guarded_by(&lock);
+> > };
+> > void foo(struct bar *d)
+> > {
+> >     ...
+> >     if (d->a) {
+> >       lockdep_assert_held(&d->lock);
+> >       d->counter++;
+> >     } else {
+> >       // lock not held!
+> >     }
+> >    ...
+> > }
+> >
+> > Without lockdep_assert_held() you get false positives, and there's no
+> > other good way to express this if you do not want to always call foo()
+> > with the lock held.
+> >
+> > It essentially forces addition of lockdep checks where the static
+> > analysis can't quite prove what you've done is right. This is
+> > desirable over adding no-analysis attributes and not checking anything
+> > at all.
+>
+> In the above I see that two different options have been mentioned for
+> code that includes conditional lockdep_assert_held() calls:
+> - Either include __assert_cap() in the lockdep_assert_held() definition.
+> - Or annotate the entire function with __no_thread_safety_analysis.
+>
+> I think there is a third possibility: add an explicit __assert_cap()
+> call under the lockdep_assert_held() call. With this approach the
+> thread-safety analysis remains enabled for the annotated function and
+> the compiler will complain if neither __must_hold() nor __assert_cap()
+> has been used.
 
-Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+That's just adding more clutter. Being able to leverage existing
+lockdep_assert to avoid false positives (at potential cost of few
+false negatives) is a decent trade-off. Sure, having maximum checking
+guarantees would be nice, but there's a balance we have to strike vs.
+ergonomics, usability, and pointless clutter.
 
-Konrad
+Can we initially try to avoid clutter as much as possible? Then, if
+you feel coverage is not good enough, make the analysis stricter by
+e.g. removing the implicit assert from lockdep_assert in later patches
+and see how it goes.
+
+I'm basing my judgement here on experience having worked on other
+analysis in the kernel, and the biggest request from maintainers has
+always been to "avoid useless clutter and false positives at all
+cost", often at the cost of increased potential for false negatives
+but avoiding false positives and reducing annotations (I can dig out
+discussions we had for KMSAN if you do not believe me...).
