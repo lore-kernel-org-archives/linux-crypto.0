@@ -1,262 +1,280 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67010208A7;
-	Wed, 12 Feb 2025 04:49:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739335751; cv=none; b=bPq67FqzHtJkE50NCBFsS+OH3Vthff4JGcFbGfzEwmfm/6DXAPcG3jPJLJWXpx645D4HzIVHvU4nINg2dm6NyYlVSvUOFCHtI0nvcIsVP0t+SSZ30qblVENKO0SJjMdGsLKHbLIcNqfZ/VJKNnTikjAUzGcpkgOByWC6aR78kRU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739335751; c=relaxed/simple;
-	bh=SZHbFT5hPcDSmpSzZXIPq92JgekFc7wyIuw+QzgaAJo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a5aY15b/csWpEsumEMTzeHaOuv0Zdnedq5Sa1C88sXQ7a8+hK8l+a1mkvM56bGAO5ik8f/7NuSIV209gXr1FndaU5GK50NZ3dZc9nlXnOYjjWyurFTRhOpLv1Le3UH6hhIaxuLy0gTcrjPIwBWWwZy77sqTBcebtOIPjYVeNJuk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=jesQSFU5; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 959F55474C;
+	Wed, 12 Feb 2025 04:57:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739336247; cv=fail; b=SpFeZ+moZQXTeos6F/APu5uB+pXqt0qMuHK5K4d4gGFsyq+EPUhrqHwcriGqfrWEWWjlPR/542TEkxViS61GNGpabyxeNDxD2gGdaewrM5PyXaNTi4ldSrmpSPyaBRG4hza26u6e3HiRj9/YW0j4WEAMttw3wg4mX/i1M7tCWpQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739336247; c=relaxed/simple;
+	bh=AQpPbs3ANiO1zq2hKzoZ8mztP1k1Qwws2zEi1j6lenE=;
+	h=Date:From:To:CC:Subject:Message-ID:Content-Type:
+	 Content-Disposition:MIME-Version; b=sbzwtey7z9MmHLjqCOgDdaIt4zHr2dZazWjEWSZ8TOJLzz6bP1FaTVGKEQuVwhvSYY3kXZdLXznsgOrK8E31Ms/5OqtL+6d0Uvdn+wto6SrsLKf9Eh0I9osvkh43bMueej44YETmmWupIiBYwpAltBYE60Uz4h7eTQ5EUqVIQBo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=d3Ka9cjg; arc=fail smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="jesQSFU5"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=q5G5BQZ/AdEoSNHs040ekLzH6kmkOaqYgMRUB269QUg=; b=jesQSFU5EzbhRAfZ5zYF7YSu6J
-	QvsxSvRBdX8rjqU6mWBN3O8kQ8o/ExqO11DXK79XfntUUrV0COcMZJ5m5IwH6I3lMLytckw9pDhsy
-	2gWRFdoZHTRYPpRhDPufZvSiDRv/+bkgSZB2WAAWs0ssBTNwCxEKjd92JdyFv5TwbpLEvQ4A78M40
-	DK5UvKTRarZOQjmoa8zRipwrxyWrOWGY2FoBQaFeNIrbyP/TboQ/uMPQb0C96dqMNwTr7MjHDJ2Ko
-	vLVOJJ+yVX9W2i+4JHBQO0K9jwtis8o+rJ+xoGaFTJX9e1hv6wr1eehvNblDmvIs3J7H/aUnVjzPQ
-	XRZ/2jfw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1ti4TG-00HDt4-35;
-	Wed, 12 Feb 2025 12:48:56 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 12 Feb 2025 12:48:55 +0800
-Date: Wed, 12 Feb 2025 12:48:55 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: kernel test robot <lkp@intel.com>
-Cc: Danny Tsen <dtsen@linux.ibm.com>, oe-kbuild-all@lists.linux.dev,
-	linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [PATCH] crypto: lib/Kconfig - Fix lib built-in failure when arch is
- modular
-Message-ID: <Z6woN4vgdaywOZxm@gondor.apana.org.au>
-References: <202501230223.ikroNDr1-lkp@intel.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d3Ka9cjg"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739336246; x=1770872246;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=AQpPbs3ANiO1zq2hKzoZ8mztP1k1Qwws2zEi1j6lenE=;
+  b=d3Ka9cjgEmfzZJuTRcc43Ho+v4SckzprnZJeHYG5DL9/IBkyppBX0vP6
+   LN8VREtcry8WFK+Xo3brdgzvg/NJZk3vu/t7MiEey+bS/Q3y4kYFZWYMp
+   VQd7YsAWtM8A+jrozg7syV7cY/lY+TjWRlUwWy1bKXArKgRvMK5hPE1IM
+   bDvo/1o/O/sxQNhIgIMqKmdEqAATm/uoMpwbG2faKzlNJhBJqNNBBenvn
+   JMKb2y3Xdt/vCaavd1Aw4enWQNv/FiuXN+uPJOVX230+0kjBxoNnRSqhp
+   SCf8fZwP4m1LVTAB2FmuoJIOmtKwAgajJ7tOiN6EcG3jOmK1HEPM+MrRd
+   g==;
+X-CSE-ConnectionGUID: w4AZ1HXsQo+ww9iw8+Zenw==
+X-CSE-MsgGUID: Z0ZTUTNVSm+gcYBWlPFwlA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11342"; a="40122054"
+X-IronPort-AV: E=Sophos;i="6.13,279,1732608000"; 
+   d="scan'208";a="40122054"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2025 20:57:25 -0800
+X-CSE-ConnectionGUID: iVq0sBg+QEqvWFSfYrLTJQ==
+X-CSE-MsgGUID: 6kJ4X5b+S2OKsq0KR4WeKQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="113608302"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orviesa008.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 11 Feb 2025 20:57:24 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Tue, 11 Feb 2025 20:57:24 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Tue, 11 Feb 2025 20:57:24 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.177)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Tue, 11 Feb 2025 20:57:22 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=yKLj7DOMTgx0hPSW8+c0iJIr6MMT2h4jO+I8QvYu6Hug5c2r4+PZXkY48OZE1wuHPqZf1GpYu5tshs+ELjYqhdi2Fatw+j1NmMEx2AzvgBnAjJRrZyH2aNYHQJavOkRLbGbr6OPHaDW8d9noBiOHQZerxJwD7ZIE2t5LHV4Q1Q6U8Fl/lvqApGmwxzf1YgyutgRNxN4P6JHevhLtCmvbglfAQ9gJZpIISIfLPzw4QIsWUlamrdwn7/bIkoNTig5zeeUWZGUQjVDY6D4EWK8bx3OlY34FxpeZ1C/2ksZgLPkZ+JuGeA20J+UnkYodOHXlKWpbXhMnQ8VaAy8x7xHIQQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9xS19ITpW6p3lFQ69S9JrjzYnurvyZFlE9K3RIGnEBE=;
+ b=nMI92rH0fDDDf8rVdmxegIxVWxm4KvaLE3lDWEZ6/L26BJk+cgwBWW5rEr7jyLGF3/jQIi3zsu/W1xgl4//nfqrb9rDqDINc/HHw20Hro8YA8JrjT47FmbCtzRJvHQVt/jffrw3KwzlDdoczM/8cOyBU5z8ftA7R/rRwPNcKycT66Xmkl5szkWEmCfRgMAOHv2n0zrYnt20M/RJfk5XRjv559uU/fYVW2jQ1/A4JfqIMEqqjljBHzaSJALFj7trjzFHrLv9lOlXMecMfZFhy6/SmvKZXXJLduNhX8vtC0QtN1GAg02G3tE27ZAgyaFZVCsoMSHzhq/0QJTUCEFJEdA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from LV3PR11MB8603.namprd11.prod.outlook.com (2603:10b6:408:1b6::9)
+ by CH3PR11MB8702.namprd11.prod.outlook.com (2603:10b6:610:1cb::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.11; Wed, 12 Feb
+ 2025 04:57:21 +0000
+Received: from LV3PR11MB8603.namprd11.prod.outlook.com
+ ([fe80::4622:29cf:32b:7e5c]) by LV3PR11MB8603.namprd11.prod.outlook.com
+ ([fe80::4622:29cf:32b:7e5c%3]) with mapi id 15.20.8422.015; Wed, 12 Feb 2025
+ 04:57:21 +0000
+Date: Wed, 12 Feb 2025 12:57:07 +0800
+From: kernel test robot <oliver.sang@intel.com>
+To: Frederic Weisbecker <frederic@kernel.org>
+CC: <oe-lkp@lists.linux.dev>, <lkp@intel.com>, <linux-kernel@vger.kernel.org>,
+	Dan Carpenter <dan.carpenter@linaro.org>, <kvm@vger.kernel.org>,
+	<linux-crypto@vger.kernel.org>, <linux-pm@vger.kernel.org>,
+	<dri-devel@lists.freedesktop.org>, <intel-gfx@lists.freedesktop.org>,
+	<linux-arm-msm@vger.kernel.org>, <freedreno@lists.freedesktop.org>,
+	<linux-media@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<intel-wired-lan@lists.osuosl.org>, <chrome-platform@lists.linux.dev>,
+	<linux-spi@vger.kernel.org>, <linux-usb@vger.kernel.org>,
+	<virtualization@lists.linux.dev>, <linux-watchdog@vger.kernel.org>,
+	<linux-erofs@lists.ozlabs.org>, <rcu@vger.kernel.org>,
+	<oliver.sang@intel.com>
+Subject: [linus:master] [treewide]  b04e317b52:
+ INFO:task_blocked_for_more_than#seconds
+Message-ID: <202502121025.55bfa801-lkp@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+X-ClientProxiedBy: SG2PR02CA0026.apcprd02.prod.outlook.com
+ (2603:1096:3:18::14) To LV3PR11MB8603.namprd11.prod.outlook.com
+ (2603:10b6:408:1b6::9)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202501230223.ikroNDr1-lkp@intel.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV3PR11MB8603:EE_|CH3PR11MB8702:EE_
+X-MS-Office365-Filtering-Correlation-Id: c46323ac-296c-42bc-785a-08dd4b21bb95
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?uo0w6I6vEaKTOCsL7J8ifJ45cTTuQ7UqOValydjixMDw3twVrS4OVfepdsDw?=
+ =?us-ascii?Q?PcyRBJ07OcBrIf/LxcwO/99xJKp9q0UG29kWiCFHsxg6fpaJa+Oz4o5aBLl1?=
+ =?us-ascii?Q?3rznIjpUm1kISONqnkSnFlac+Fr2j85zPQiKhlw9az66GnuRfky7G7GJnI0A?=
+ =?us-ascii?Q?E+LmTkYnsVET7KtAFJthQuNXyp846a+QPGAkwYEoTPuneoan5UMt8CmzZ4Bm?=
+ =?us-ascii?Q?PGSdCSfNHSORQ3nELCE5IoWY1O12yKyZOioIebPLhVzYLeQe7ltUV7TxO7NB?=
+ =?us-ascii?Q?1Y31gxPssspJHy1rQPtlnPkxLQ6ipFsvp7smEw4wETmrpj+RsElD3MItteKI?=
+ =?us-ascii?Q?HLq5901/2WweX8xqFcUOrMUydVquWbPktX2zxTv7+STmLBpUAfHGJx9wPm2Y?=
+ =?us-ascii?Q?t3vi6rg0W6AOLMRJEsW3ZyobsLab8zfYT2J+m/DNmL8Wub0xShPZ/Equrk7v?=
+ =?us-ascii?Q?oMxvfvwJmuNkWzg6QgNdlqhczdn6rHlgfRoJmtXiM3+FyEvX+JgAsaBKr3cN?=
+ =?us-ascii?Q?zzQdHHp/h+2L1BrnRCgnKwmRrvv3Zo5hBDHAICua8UY8QQLY6E+TOpBuczJb?=
+ =?us-ascii?Q?uGJSJDdW8lvhXl57ggD2fjDJRRghlTrldMYRDwjvSKc6GTCyXi7X1r3G0cLb?=
+ =?us-ascii?Q?AimKgWsXQnIDu9KRpYiYqytOo5OPnomE9kzKlxTdyhTXenvFRqo1YjqYppOA?=
+ =?us-ascii?Q?ElkWo4Jio+ThalcuafQd95MXdjbsc/HuUYBtT2dD9Fz0pJ3DOQKtmijV5Ovc?=
+ =?us-ascii?Q?o7cALViBOWMmD1k784EuIu94EuhRHfeYoTA567j4Vx0ZpuqP1rzPmbieRXVp?=
+ =?us-ascii?Q?ooTTOvT7sedV/V8LQFCE+sdJeaOrZBlXUo7egVjtCKEGtnCgnoU8avPHbbtx?=
+ =?us-ascii?Q?pAN59K3QId/lVaP4Igc2wD0YcgTHnR5dS8uamFQa0cIJDGmcRk85gbzTOi2d?=
+ =?us-ascii?Q?PDZglBkS+0wrxllbCQz87gtFV5kcAKqTYRGTjYBfqVu7gKSJEHFGob1h5/Sr?=
+ =?us-ascii?Q?dsJSTZH6ZU9w82PCl6c7aRcg5mUiyfX5pl+14LRRrNhM37QF+BlCSn4lzFTc?=
+ =?us-ascii?Q?g89pe1eGkrcAfAXybcl4bs4r1S1h0sInVBFTDSz0vq7qhZoYzx6CcDyCO0YA?=
+ =?us-ascii?Q?fM3yb5SQOLQ2SosVItpZv99z02frAPl8Ya0OItxnfUJRNS1kKNTB9Zqh4++R?=
+ =?us-ascii?Q?AgjA/6/dv52kckc2NEDO0wZRmLf8o7dMXqnSpZ/kVsP/jf+dAnVldB7Z7pNM?=
+ =?us-ascii?Q?iDOl7LsH8MLafJ6UkaVsAhdIVf/Z4fBgEtX8oAXl22JcHEvbmGlVHMSdIUE8?=
+ =?us-ascii?Q?qFrzxZ/Y/XMbQrOwBl1wDiZZYzTRUi506Vh7xI1JhYRwGw=3D=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR11MB8603.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?zrKrFoT4L86AWYuH+4n/i+5S8HqBpf07m7dbtjR2bNubIPSfZD0CxtYiWnGI?=
+ =?us-ascii?Q?IZYTXsIYzwHfKJwpQ/bMO/St9qOKjiyDE9yefNmRWqsHbTjZEXSb7taSbCQN?=
+ =?us-ascii?Q?og5mlqxO97K36cVDO/bEb08/Xr9YVMidqiX+q6LQot08/Y1Mdavzk/2wb0Ul?=
+ =?us-ascii?Q?eONBUAEi5CvvN5yxSRg+2yzZHtjSLIGkC7eIXosoCubODr+GXoId2Kl2dYiR?=
+ =?us-ascii?Q?GBqP6AQQgf3v47OvaqLhy2jiB/fGJm05fwHDvyUP4BIyZrHAPYxPvjjDYwbI?=
+ =?us-ascii?Q?Tqf+xQCrfLDR48HYbugCOUO0ByYZCB4KfM2raXDndeWQYocG+5FwBxCM9/gt?=
+ =?us-ascii?Q?RpsElh6ziUsMIJv0tgoL8gAd5ra4a2dG3SuqEowlqLRlw/g9gr33oOn+klaP?=
+ =?us-ascii?Q?Pz1yyu29HJYWzhgA3MlJor8pbLNKsQwrdAQavL12BkJ/f/hbgVAa3GMthBTm?=
+ =?us-ascii?Q?iyxl5hXShF4y4Y/l1JWPXKQ48dUy/HXWZIZ4bBlp/ERV694qTwVLCG/dE0eT?=
+ =?us-ascii?Q?Qq0sar7zOzrqHmqeT44C3wWkOfdv6Yq9LJTbfTjxxbC9k/mVZIaWgeBM1rdL?=
+ =?us-ascii?Q?cSLrAwqvB8KRwrGPhHEt5TfFCgKk546ho1u1w28kOLhnPincavBJIHZdywh/?=
+ =?us-ascii?Q?fmBaJufw9XzebE2AAWIo//oLG27Aa8z+czUrDEN8EoWTULL4OlOSzg+WEESe?=
+ =?us-ascii?Q?33UE7E2S2rU20bt+zPAJ8W3hmplA1W70Ngdy3dusV5l8Y+Mp1GYn6J1csKyp?=
+ =?us-ascii?Q?fyOdiEvOEPYC+how3CWISze2NYRurdV+reYXeB+mERwnrXuKNyh9TDhkfzez?=
+ =?us-ascii?Q?Qjg6etk+wglUQvPh0yeURScQWDkhZuhzKr2K0ayIDWti2iiZ2wMJHXaicpxz?=
+ =?us-ascii?Q?rDDelL1nq1gng185xUrdqLfaB14V17D2jQra/nRyzrtDr9gCbzGyAIYd47SQ?=
+ =?us-ascii?Q?+twN0sbDFcQ1Ygw2aUJ+q16JANTTiBdNHSdWWc8iXoTTVcpUh7YC6YbGca56?=
+ =?us-ascii?Q?GpHfaIwvBJHzCOB8mxalwLmgPRol7bursofdO6I+nxWEozermfdqx430ihHY?=
+ =?us-ascii?Q?FuuE0Ml447SuO50C4yWZCfkoLdbXwKCI2vwKhbKNwNSrwTi7Ia/y62Rf+CW6?=
+ =?us-ascii?Q?qQtXn0NHnt/FN+cPrz/P7JAc3nR9MSDW+ZrWR4QOHHsdqDz1j+uYCm813zli?=
+ =?us-ascii?Q?lCg+RQ1Ll9a02Z1XgPvlOFf4UQHWOA6XDNO1bozzEj7vScdCG1xnc9nVIRAw?=
+ =?us-ascii?Q?95X3RJ+ULbOzzn38nA7ANxAgyZS+6yAEt0bFPYqbTWero443GbTVzA6X8KVb?=
+ =?us-ascii?Q?Y/YUTyptjMOiHkZqBYLznIQZo6yLm8VX8io3tPPNlMXfqcqLTclejBZ3HnRf?=
+ =?us-ascii?Q?2c3VYENz1vPWtZtYl2JLBkZ19E9yOwO5vY5MmJiKFy2yIqomrUOBN04EALgv?=
+ =?us-ascii?Q?Ikn5uuyWY2y/6MzzJ82VDvTbva1LY9HakhtJ1VhPZx0wd3cSVtCiZ6hOQPaN?=
+ =?us-ascii?Q?9vi9+iLOJMKetZUBETrR4dH7fHhmLTGtDqDnHAKWe99i6oFnBl3RQJfMG+KK?=
+ =?us-ascii?Q?odjtyn67cplQrrV4FDt5AfAgflHlHWDET4srGm3FaAT+DakLoxJLdtQTndb5?=
+ =?us-ascii?Q?TA=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: c46323ac-296c-42bc-785a-08dd4b21bb95
+X-MS-Exchange-CrossTenant-AuthSource: LV3PR11MB8603.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Feb 2025 04:57:21.0389
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: LyN3mmZxBrwyJ6R8ZuLzRn9HoAcyKcqw/XreDJlhnnDYmw3Nn/aRxGMumgMEHGQ+sJiYnz2JYqc+wINeTP4EZA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8702
+X-OriginatorOrg: intel.com
 
-On Thu, Jan 23, 2025 at 02:18:27AM +0800, kernel test robot wrote:
-> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
-> head:   c4b9570cfb63501638db720f3bee9f6dfd044b82
-> commit: b42519dbba838c928e82b55f32712fbe3eed2c45 crypto: ppc/curve25519 - Update Kconfig and Makefile for ppc64le
-> date:   8 months ago
-> config: powerpc64-randconfig-r111-20250122 (https://download.01.org/0day-ci/archive/20250123/202501230223.ikroNDr1-lkp@intel.com/config)
-> compiler: clang version 15.0.7 (https://github.com/llvm/llvm-project 8dfdcc7b7bf66834a761bd8de445840ef68e4d1a)
-> reproduce: (https://download.01.org/0day-ci/archive/20250123/202501230223.ikroNDr1-lkp@intel.com/reproduce)
 
-Thanks for the report.  This is the old built-in vs. modular Kconfig
-problem.  This patch should fix it:
 
----8<---
-The HAVE_ARCH Kconfig options in lib/crypto try to solve the
-modular versus built-in problem, but it still fails when the
-the LIB option (e.g., CRYPTO_LIB_CURVE25519) is selected externally.
+Hello,
 
-Fix this by introducing a level of indirection with ARCH_MAY_HAVE
-Kconfig options, these then go on to select the ARCH_HAVE options
-if the ARCH Kconfig options matches that of the LIB option.
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202501230223.ikroNDr1-lkp@intel.com/
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+we noticed the issue happens with a low rate on this commit, but keeps clean
+on parent when we even run the tests up to 999 times. just FYI.
 
-diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
-index 32650c8431d9..47d9cc59f254 100644
---- a/arch/arm/crypto/Kconfig
-+++ b/arch/arm/crypto/Kconfig
-@@ -6,7 +6,7 @@ config CRYPTO_CURVE25519_NEON
- 	tristate "Public key crypto: Curve25519 (NEON)"
- 	depends on KERNEL_MODE_NEON
- 	select CRYPTO_LIB_CURVE25519_GENERIC
--	select CRYPTO_ARCH_HAVE_LIB_CURVE25519
-+	select CRYPTO_ARCH_MAY_HAVE_LIB_CURVE25519
- 	help
- 	  Curve25519 algorithm
- 
-@@ -47,7 +47,7 @@ config CRYPTO_NHPOLY1305_NEON
- config CRYPTO_POLY1305_ARM
- 	tristate "Hash functions: Poly1305 (NEON)"
- 	select CRYPTO_HASH
--	select CRYPTO_ARCH_HAVE_LIB_POLY1305
-+	select CRYPTO_ARCH_MAY_HAVE_LIB_POLY1305
- 	help
- 	  Poly1305 authenticator algorithm (RFC7539)
- 
-@@ -214,7 +214,7 @@ config CRYPTO_AES_ARM_CE
- config CRYPTO_CHACHA20_NEON
- 	tristate "Ciphers: ChaCha20, XChaCha20, XChaCha12 (NEON)"
- 	select CRYPTO_SKCIPHER
--	select CRYPTO_ARCH_HAVE_LIB_CHACHA
-+	select CRYPTO_ARCH_MAY_HAVE_LIB_CHACHA
- 	help
- 	  Length-preserving ciphers: ChaCha20, XChaCha20, and XChaCha12
- 	  stream cipher algorithms
-diff --git a/arch/powerpc/crypto/Kconfig b/arch/powerpc/crypto/Kconfig
-index 5b315e9756b3..e453cb0c82d2 100644
---- a/arch/powerpc/crypto/Kconfig
-+++ b/arch/powerpc/crypto/Kconfig
-@@ -6,7 +6,7 @@ config CRYPTO_CURVE25519_PPC64
- 	tristate "Public key crypto: Curve25519 (PowerPC64)"
- 	depends on PPC64 && CPU_LITTLE_ENDIAN
- 	select CRYPTO_LIB_CURVE25519_GENERIC
--	select CRYPTO_ARCH_HAVE_LIB_CURVE25519
-+	select CRYPTO_ARCH_MAY_HAVE_LIB_CURVE25519
- 	help
- 	  Curve25519 algorithm
- 
-@@ -95,7 +95,7 @@ config CRYPTO_CHACHA20_P10
- 	depends on PPC64 && CPU_LITTLE_ENDIAN && VSX
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_LIB_CHACHA_GENERIC
--	select CRYPTO_ARCH_HAVE_LIB_CHACHA
-+	select CRYPTO_ARCH_MAY_HAVE_LIB_CHACHA
- 	help
- 	  Length-preserving ciphers: ChaCha20, XChaCha20, and XChaCha12
- 	  stream cipher algorithms
-diff --git a/arch/x86/crypto/Kconfig b/arch/x86/crypto/Kconfig
-index 4757bf922075..c189dad0969b 100644
---- a/arch/x86/crypto/Kconfig
-+++ b/arch/x86/crypto/Kconfig
-@@ -6,7 +6,7 @@ config CRYPTO_CURVE25519_X86
- 	tristate "Public key crypto: Curve25519 (ADX)"
- 	depends on X86 && 64BIT
- 	select CRYPTO_LIB_CURVE25519_GENERIC
--	select CRYPTO_ARCH_HAVE_LIB_CURVE25519
-+	select CRYPTO_ARCH_MAY_HAVE_LIB_CURVE25519
- 	help
- 	  Curve25519 algorithm
- 
-@@ -352,7 +352,7 @@ config CRYPTO_CHACHA20_X86_64
- 	depends on X86 && 64BIT
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_LIB_CHACHA_GENERIC
--	select CRYPTO_ARCH_HAVE_LIB_CHACHA
-+	select CRYPTO_ARCH_MAY_HAVE_LIB_CHACHA
- 	help
- 	  Length-preserving ciphers: ChaCha20, XChaCha20, and XChaCha12
- 	  stream cipher algorithms
-@@ -420,7 +420,7 @@ config CRYPTO_POLY1305_X86_64
- 	tristate "Hash functions: Poly1305 (SSE2/AVX2)"
- 	depends on X86 && 64BIT
- 	select CRYPTO_LIB_POLY1305_GENERIC
--	select CRYPTO_ARCH_HAVE_LIB_POLY1305
-+	select CRYPTO_ARCH_MAY_HAVE_LIB_POLY1305
- 	help
- 	  Poly1305 authenticator algorithm (RFC7539)
- 
-diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
-index b01253cac70a..c542ef1d64d0 100644
---- a/lib/crypto/Kconfig
-+++ b/lib/crypto/Kconfig
-@@ -42,12 +42,17 @@ config CRYPTO_LIB_BLAKE2S_GENERIC
- 	  of CRYPTO_LIB_BLAKE2S.
- 
- config CRYPTO_ARCH_HAVE_LIB_CHACHA
--	tristate
-+	bool
- 	help
- 	  Declares whether the architecture provides an arch-specific
- 	  accelerated implementation of the ChaCha library interface,
- 	  either builtin or as a module.
- 
-+config CRYPTO_ARCH_MAY_HAVE_LIB_CHACHA
-+	tristate
-+	select CRYPTO_ARCH_HAVE_LIB_CHACHA if CRYPTO_LIB_CHACHA=m
-+	select CRYPTO_ARCH_HAVE_LIB_CHACHA if CRYPTO_ARCH_MAY_HAVE_LIB_CHACHA=y
-+
- config CRYPTO_LIB_CHACHA_GENERIC
- 	tristate
- 	select CRYPTO_LIB_UTILS
-@@ -60,7 +65,6 @@ config CRYPTO_LIB_CHACHA_GENERIC
- 
- config CRYPTO_LIB_CHACHA
- 	tristate "ChaCha library interface"
--	depends on CRYPTO_ARCH_HAVE_LIB_CHACHA || !CRYPTO_ARCH_HAVE_LIB_CHACHA
- 	select CRYPTO_LIB_CHACHA_GENERIC if CRYPTO_ARCH_HAVE_LIB_CHACHA=n
- 	help
- 	  Enable the ChaCha library interface. This interface may be fulfilled
-@@ -68,12 +72,17 @@ config CRYPTO_LIB_CHACHA
- 	  is available and enabled.
- 
- config CRYPTO_ARCH_HAVE_LIB_CURVE25519
--	tristate
-+	bool
- 	help
- 	  Declares whether the architecture provides an arch-specific
- 	  accelerated implementation of the Curve25519 library interface,
- 	  either builtin or as a module.
- 
-+config CRYPTO_ARCH_MAY_HAVE_LIB_CURVE25519
-+	tristate
-+	select CRYPTO_ARCH_HAVE_LIB_CURVE25519 if CRYPTO_LIB_CURVE25519=m
-+	select CRYPTO_ARCH_HAVE_LIB_CURVE25519 if CRYPTO_ARCH_MAY_HAVE_LIB_CURVE25519=y
-+
- config CRYPTO_LIB_CURVE25519_GENERIC
- 	tristate
- 	help
-@@ -85,7 +94,6 @@ config CRYPTO_LIB_CURVE25519_GENERIC
- 
- config CRYPTO_LIB_CURVE25519
- 	tristate "Curve25519 scalar multiplication library"
--	depends on CRYPTO_ARCH_HAVE_LIB_CURVE25519 || !CRYPTO_ARCH_HAVE_LIB_CURVE25519
- 	select CRYPTO_LIB_CURVE25519_GENERIC if CRYPTO_ARCH_HAVE_LIB_CURVE25519=n
- 	select CRYPTO_LIB_UTILS
- 	help
-@@ -104,12 +112,17 @@ config CRYPTO_LIB_POLY1305_RSIZE
- 	default 1
- 
- config CRYPTO_ARCH_HAVE_LIB_POLY1305
--	tristate
-+	bool
- 	help
- 	  Declares whether the architecture provides an arch-specific
- 	  accelerated implementation of the Poly1305 library interface,
- 	  either builtin or as a module.
- 
-+config CRYPTO_ARCH_MAY_HAVE_LIB_POLY1305
-+	tristate
-+	select CRYPTO_ARCH_HAVE_LIB_POLY1305 if CRYPTO_LIB_POLY1305=m
-+	select CRYPTO_ARCH_HAVE_LIB_POLY1305 if CRYPTO_ARCH_MAY_HAVE_LIB_POLY1305=y
-+
- config CRYPTO_LIB_POLY1305_GENERIC
- 	tristate
- 	help
-@@ -121,7 +134,6 @@ config CRYPTO_LIB_POLY1305_GENERIC
- 
- config CRYPTO_LIB_POLY1305
- 	tristate "Poly1305 library interface"
--	depends on CRYPTO_ARCH_HAVE_LIB_POLY1305 || !CRYPTO_ARCH_HAVE_LIB_POLY1305
- 	select CRYPTO_LIB_POLY1305_GENERIC if CRYPTO_ARCH_HAVE_LIB_POLY1305=n
- 	help
- 	  Enable the Poly1305 library interface. This interface may be fulfilled
-@@ -130,8 +142,6 @@ config CRYPTO_LIB_POLY1305
- 
- config CRYPTO_LIB_CHACHA20POLY1305
- 	tristate "ChaCha20-Poly1305 AEAD support (8-byte nonce library version)"
--	depends on CRYPTO_ARCH_HAVE_LIB_CHACHA || !CRYPTO_ARCH_HAVE_LIB_CHACHA
--	depends on CRYPTO_ARCH_HAVE_LIB_POLY1305 || !CRYPTO_ARCH_HAVE_LIB_POLY1305
- 	depends on CRYPTO
- 	select CRYPTO_LIB_CHACHA
- 	select CRYPTO_LIB_POLY1305
+41f70d8e16349c65 b04e317b522630b46f78ee62ecb
+---------------- ---------------------------
+       fail:runs  %reproduction    fail:runs
+           |             |             |
+           :999          2%          16:999   dmesg.INFO:task_blocked_for_more_than#seconds
+           :999          2%          16:999   dmesg.Kernel_panic-not_syncing:hung_task:blocked_tasks
+
+
+kernel test robot noticed "INFO:task_blocked_for_more_than#seconds" on:
+
+commit: b04e317b522630b46f78ee62ecbdc5734e8d43de ("treewide: Introduce kthread_run_worker[_on_cpu]()")
+https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git master
+
+[test failed on linus/master      7ee983c850b40043ac4751836fbd9a2b4d0c5937]
+[test failed on linux-next/master ed58d103e6da15a442ff87567898768dc3a66987]
+
+in testcase: rcuscale
+version: 
+with following parameters:
+
+	runtime: 300s
+	scale_type: rcu
+
+
+
+config: i386-randconfig-052-20250205
+compiler: gcc-12
+test machine: qemu-system-x86_64 -enable-kvm -cpu SandyBridge -smp 2 -m 16G
+
+(please refer to attached dmesg/kmsg for entire log/backtrace)
+
+
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <oliver.sang@intel.com>
+| Closes: https://lore.kernel.org/oe-lkp/202502121025.55bfa801-lkp@intel.com
+
+
+[ 1023.501569][   T32] INFO: task UVCG:82 blocked for more than 491 seconds.
+[ 1023.510932][   T32]       Tainted: G                T  6.13.0-rc2-00014-gb04e317b5226 #1
+[ 1023.528506][   T32] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+[ 1023.551252][   T32] task:UVCG            state:D stack:0     pid:82    tgid:82    ppid:2      flags:0x00004000
+[ 1023.582336][   T32] Call Trace:
+[ 1023.599286][ T32] __schedule (kernel/sched/core.c:5372 kernel/sched/core.c:6756) 
+[ 1023.617204][ T32] ? __this_cpu_preempt_check (lib/smp_processor_id.c:67) 
+[ 1023.637326][ T32] schedule (kernel/sched/core.c:6834 kernel/sched/core.c:6848) 
+[ 1023.653175][ T32] schedule_preempt_disabled (kernel/sched/core.c:6906) 
+[ 1023.672095][ T32] kthread (kernel/kthread.c:453) 
+[ 1023.684220][ T32] ? kthread_flush_work (kernel/kthread.c:970) 
+[ 1023.700611][ T32] ? kthread_is_per_cpu (kernel/kthread.c:413) 
+[ 1023.716756][ T32] ret_from_fork (arch/x86/kernel/process.c:153) 
+[ 1023.732758][ T32] ? kthread_is_per_cpu (kernel/kthread.c:413) 
+[ 1023.748605][ T32] ret_from_fork_asm (arch/x86/entry/entry_32.S:737) 
+[ 1023.764004][ T32] entry_INT80_32 (arch/x86/entry/entry_32.S:942) 
+[ 1023.776959][   T32]
+[ 1023.776959][   T32] Showing all locks held in the system:
+[ 1023.803410][   T32] 1 lock held by khungtaskd/32:
+[ 1023.815913][ T32] #0: c3baa3d4 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire (include/linux/rcupdate.h:336) 
+[ 1023.842061][   T32] 1 lock held by in:imklog/227:
+[ 1023.849815][ T32] #0: ecd0e884 (&f->f_pos_lock){+.+.}-{4:4}, at: fdget_pos (fs/file.c:1194) 
+[ 1023.877481][   T32] 1 lock held by dmesg/494:
+[ 1023.885260][   T32] 2 locks held by depmod/567:
+[ 1023.903871][   T32]
+[ 1023.907007][   T32] =============================================
+[ 1023.907007][   T32]
+[ 1023.938278][   T32] Kernel panic - not syncing: hung_task: blocked tasks
+[ 1023.951013][   T32] CPU: 0 UID: 0 PID: 32 Comm: khungtaskd Tainted: G                T  6.13.0-rc2-00014-gb04e317b5226 #1 78ab3595737b7bb7ccfbfed5c1dcb65e25af99a7
+[ 1023.973770][   T32] Tainted: [T]=RANDSTRUCT
+[ 1023.979010][   T32] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+[ 1023.991787][   T32] Call Trace:
+[ 1023.995862][ T32] dump_stack_lvl (lib/dump_stack.c:122) 
+[ 1024.001535][ T32] dump_stack (lib/dump_stack.c:130) 
+[ 1024.006622][ T32] panic (kernel/panic.c:258 kernel/panic.c:375) 
+[ 1024.011360][ T32] check_hung_uninterruptible_tasks (kernel/hung_task.c:239) 
+[ 1024.018678][ T32] watchdog (kernel/hung_task.c:398) 
+[ 1024.023798][ T32] kthread (kernel/kthread.c:466) 
+[ 1024.028697][ T32] ? check_hung_uninterruptible_tasks (kernel/hung_task.c:380) 
+[ 1024.036601][ T32] ? kthread_is_per_cpu (kernel/kthread.c:413) 
+[ 1024.042763][ T32] ret_from_fork (arch/x86/kernel/process.c:153) 
+[ 1024.048431][ T32] ? kthread_is_per_cpu (kernel/kthread.c:413) 
+[ 1024.054588][ T32] ret_from_fork_asm (arch/x86/entry/entry_32.S:737) 
+[ 1024.060422][ T32] entry_INT80_32 (arch/x86/entry/entry_32.S:942) 
+[ 1024.067908][   T32] Kernel Offset: disabled
+
+
+
+The kernel config and materials to reproduce are available at:
+https://download.01.org/0day-ci/archive/20250212/202502121025.55bfa801-lkp@intel.com
+
+
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
+
