@@ -1,100 +1,325 @@
-Received: from bmailout1.hostsharing.net (bmailout1.hostsharing.net [83.223.95.100])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2A6625743C;
-	Wed, 12 Feb 2025 16:36:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 651411DC07D;
+	Wed, 12 Feb 2025 19:33:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739378171; cv=none; b=i5FCg7lh0G8MvY5A4BvyK4FY6HMUeK9TTWAmOn6bDw1Y0/kx5NEfosty0MltGQdSdAr6r71peziqGoJmceVqDGLbM1l/qetoqpX8iGCHTlqzBaAM+Z8QqAhwZ8UlD9hG54LZKyP59+OU46YPzi6sMoM9v13RNMlgoPwxNhhddyk=
+	t=1739388797; cv=none; b=mhlcWa7TPHZpp2+M2c0SrXiMRbpeuoSPGH/STVtXwzxF/JHqCy5yI/MOOa/ab9/ze+7Y0tGAH7BAjc5U0gXSHB4cz8mqclQ8ZXszWI1KV+7aN2yS31QOWFSbZ2P98TkEzeGt7txektcdppVk8aA5oEF1A+iKHPChQ3xtrDgFBSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739378171; c=relaxed/simple;
-	bh=ozwS80Px8jgB+KR4DO9OSCcBIuaqE6z6a9AlLrJXX1Q=;
+	s=arc-20240116; t=1739388797; c=relaxed/simple;
+	bh=DA8aW6TC91af7qZ599ujgZGfby8bu3yyXCCl/yeb3Fg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Nl6YH6OvlebB6L3X5HAa3CjLYXWxeRaASxdnIaRZab0O3n8jW7Q2HmSH11UhvHkwmdx2xDfF7Gymi5cS27623K8JfWIxJHzGKlhM65uY7fUSQENFg/QlfUQdjpBSdS1dkWxUml7yQl2oUwq6cKhBfP7G6yOjU/IBjQgUojmWdxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.95.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout1.hostsharing.net (Postfix) with ESMTPS id 5C348300135A1;
-	Wed, 12 Feb 2025 17:36:01 +0100 (CET)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id 452231B825A; Wed, 12 Feb 2025 17:36:01 +0100 (CET)
-Date: Wed, 12 Feb 2025 17:36:01 +0100
-From: Lukas Wunner <lukas@wunner.de>
-To: Alexey Kardashevskiy <aik@amd.com>
-Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Bjorn Helgaas <helgaas@kernel.org>,
-	David Howells <dhowells@redhat.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Woodhouse <dwmw2@infradead.org>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	linux-pci@vger.kernel.org, linux-cxl@vger.kernel.org,
-	linux-coco@lists.linux.dev, keyrings@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linuxarm@huawei.com,
-	David Box <david.e.box@intel.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	"Li, Ming" <ming4.li@intel.com>,
-	Ilpo Jarvinen <ilpo.jarvinen@linux.intel.com>,
-	Alistair Francis <alistair.francis@wdc.com>,
-	Wilfred Mallawa <wilfred.mallawa@wdc.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=BVHCvSPoyNfulxyQvLfOY+MI3DmXYzDJz3RCc9rL5gR0Azwi/jkwuAIiU15IxKPoxJvh2Xiev2RnsY8HXYXfAfgpmp+3npNN3sktCzHOkkfx0YE2t/rNf6G01QfTVxefMv8CeBaPEe5gGt3obQAa3UID3jTOZ8NgEuFeHpVf5po=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o4BnvrUb; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o4BnvrUb"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3C5AC4CEDF;
+	Wed, 12 Feb 2025 19:33:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739388795;
+	bh=DA8aW6TC91af7qZ599ujgZGfby8bu3yyXCCl/yeb3Fg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=o4BnvrUbuKt991EKanNsBOItVAGsM6PWGCh7sTdEonDfyh/BCF8oLxPYtgnnGAp4K
+	 B664GQwZwUzlCy0U3Igue+7lF0xzMIlbi2twjdxobGT5gDs5im3ir8lc5b5rAf1Ras
+	 IjJnEME07Et62oxLoX3sbhm6rgPQd6WPwoWwXSE0pryqmwJvOf+scUMY0sU4q7efnw
+	 eZ8OJDMTiGf8QTdZ7pVQAmXNtgQDT/NQqv1T6rFsLQQ+vV+TZIUtqswu6vJyUp40Uw
+	 ehxX5ZUz4uBREJmIvDdReeoT5QHtBo0HL5dqNz2mM2T8m7w/tQ+qycL2b+kJ1xaJCP
+	 lFZ9DHVjhcYJQ==
+Date: Wed, 12 Feb 2025 13:33:14 -0600
+From: Rob Herring <robh@kernel.org>
+To: =?iso-8859-1?Q?J=2E_Neusch=E4fer?= <j.ne@posteo.net>
+Cc: devicetree@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	Krzysztof Kozlowski <krzk@kernel.org>, imx@lists.linux.dev,
+	Scott Wood <oss@buserror.net>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Naveen N Rao <naveen@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
 	Damien Le Moal <dlemoal@kernel.org>,
-	Dhaval Giani <dhaval.giani@amd.com>,
-	Gobikrishna Dhanuskodi <gdhanuskodi@nvidia.com>,
-	Jason Gunthorpe <jgg@nvidia.com>, Peter Gonda <pgonda@google.com>,
-	Jerome Glisse <jglisse@google.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Alexander Graf <graf@amazon.com>, Samuel Ortiz <sameo@rivosinc.com>,
-	Eric Biggers <ebiggers@google.com>,
-	Stefan Berger <stefanb@linux.ibm.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Alan Stern <stern@rowland.harvard.edu>
-Subject: Re: [PATCH v2 00/18] PCI device authentication
-Message-ID: <Z6zN8R-E9uJpkU7j@wunner.de>
-References: <cover.1719771133.git.lukas@wunner.de>
- <2140c4e4-6df0-47c7-8301-c6eb70ada27d@amd.com>
- <ZovrK7GsDpOMp3Bz@wunner.de>
- <b1595ceb-a916-4ff0-97bd-1a223e0cef15@amd.com>
+	Niklas Cassel <cassel@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>, Lee Jones <lee@kernel.org>,
+	Vinod Koul <vkoul@kernel.org>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	=?iso-8859-1?Q?J=2E_Neusch=E4fer?= <j.neuschaefer@gmx.net>,
+	Wim Van Sebroeck <wim@linux-watchdog.org>,
+	Guenter Roeck <linux@roeck-us.net>, Mark Brown <broonie@kernel.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Richard Weinberger <richard@nod.at>,
+	Vignesh Raghavendra <vigneshr@ti.com>, linux-kernel@vger.kernel.org,
+	linux-ide@vger.kernel.org, linux-crypto@vger.kernel.org,
+	dmaengine@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-watchdog@vger.kernel.org, linux-spi@vger.kernel.org,
+	linux-mtd@lists.infradead.org
+Subject: Re: [PATCH v2 03/12] dt-bindings: crypto: Convert fsl,sec-2.0 to YAML
+Message-ID: <20250212193314.GA4134845-robh@kernel.org>
+References: <20250207-ppcyaml-v2-0-8137b0c42526@posteo.net>
+ <20250207-ppcyaml-v2-3-8137b0c42526@posteo.net>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <b1595ceb-a916-4ff0-97bd-1a223e0cef15@amd.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250207-ppcyaml-v2-3-8137b0c42526@posteo.net>
 
-On Tue, Feb 11, 2025 at 12:30:21PM +1100, Alexey Kardashevskiy wrote:
-> > > On 1/7/24 05:35, Lukas Wunner wrote:
-> > > > PCI device authentication v2
-> > > > 
-> > > > Authenticate PCI devices with CMA-SPDM (PCIe r6.2 sec 6.31) and
-> > > > expose the result in sysfs.
+On Fri, Feb 07, 2025 at 10:30:20PM +0100, J. Neuschäfer wrote:
+> Convert the Freescale security engine (crypto accelerator) binding from
+> text form to YAML. The list of compatible strings reflects what was
+> previously described in prose; not all combinations occur in existing
+> devicetrees.
 > 
-> Has any further development happened since then? I am asking as I have the
-> CMA-v2 in my TSM exercise tree (to catch conflicts, etc) but I do not see
-> any change in your github or kernel.org/devsec since v2 and that v2 does not
-> merge nicely with the current upstream.
+> Signed-off-by: J. Neuschäfer <j.ne@posteo.net>
+> ---
+> 
+> V2:
+> - several improvements suggested by Rob Herring:
+>   - remove unnecessary multiline markers
+>   - constrain fsl,num-channels to enum: [1,4]
+>   - constrain fsl,channel-fifo-len to plausible limits
+>   - constrain fsl,exec-units-mask to maximum=0xfff
+> - trim subject line (remove "binding")
+> ---
+>  .../devicetree/bindings/crypto/fsl,sec2.0.yaml     | 142 +++++++++++++++++++++
+>  .../devicetree/bindings/crypto/fsl-sec2.txt        |  65 ----------
+>  2 files changed, 142 insertions(+), 65 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/crypto/fsl,sec2.0.yaml b/Documentation/devicetree/bindings/crypto/fsl,sec2.0.yaml
+> new file mode 100644
+> index 0000000000000000000000000000000000000000..0b82f3b68b5f82e7fb52d292a623d452c1cdb059
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/crypto/fsl,sec2.0.yaml
+> @@ -0,0 +1,142 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/crypto/fsl,sec2.0.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Freescale SoC SEC Security Engines versions 1.x-2.x-3.x
+> +
+> +maintainers:
+> +  - J. Neuschäfer <j.ne@posteo.net.
 
-Please find a rebase of v2 on v6.14-rc2 on this branch:
+missing >
 
-https://github.com/l1k/linux/commits/doe
+> +
+> +properties:
+> +  compatible:
+> +    description:
+> +      Should contain entries for this and backward compatible SEC versions,
+> +      high to low. Warning - SEC1 and SEC2 are mutually exclusive.
+> +    oneOf:
+> +      - items:
+> +          - const: fsl,sec3.3
+> +          - const: fsl,sec3.1
+> +          - const: fsl,sec3.0
+> +          - const: fsl,sec2.4
+> +          - const: fsl,sec2.2
+> +          - const: fsl,sec2.1
+> +          - const: fsl,sec2.0
+> +      - items:
+> +          - const: fsl,sec3.1
+> +          - const: fsl,sec3.0
+> +          - const: fsl,sec2.4
+> +          - const: fsl,sec2.2
+> +          - const: fsl,sec2.1
+> +          - const: fsl,sec2.0
+> +      - items:
+> +          - const: fsl,sec3.0
+> +          - const: fsl,sec2.4
+> +          - const: fsl,sec2.2
+> +          - const: fsl,sec2.1
+> +          - const: fsl,sec2.0
+> +      - items:
+> +          - const: fsl,sec2.4
+> +          - const: fsl,sec2.2
+> +          - const: fsl,sec2.1
+> +          - const: fsl,sec2.0
+> +      - items:
+> +          - const: fsl,sec2.2
+> +          - const: fsl,sec2.1
+> +          - const: fsl,sec2.0
+> +      - items:
+> +          - const: fsl,sec2.1
+> +          - const: fsl,sec2.0
+> +      - items:
+> +          - const: fsl,sec2.0
+> +      - items:
+> +          - const: fsl,sec1.2
+> +          - const: fsl,sec1.0
+> +      - items:
+> +          - const: fsl,sec1.0
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  interrupts:
+> +    maxItems: 1
+> +
+> +  fsl,num-channels:
+> +    $ref: /schemas/types.yaml#/definitions/uint32
+> +    enum: [ 1, 4 ]
+> +    description: An integer representing the number of channels available.
+> +
+> +  fsl,channel-fifo-len:
+> +    $ref: /schemas/types.yaml#/definitions/uint32
+> +    maximum: 100
+> +    description:
+> +      An integer representing the number of descriptor pointers each channel
+> +      fetch fifo can hold.
+> +
+> +  fsl,exec-units-mask:
+> +    $ref: /schemas/types.yaml#/definitions/uint32
+> +    maximum: 0xfff
+> +    description: |
+> +      The bitmask representing what execution units (EUs) are available.
+> +      EU information should be encoded following the SEC's Descriptor Header
+> +      Dword EU_SEL0 field documentation, i.e. as follows:
+> +
+> +        bit 0  = reserved - should be 0
+> +        bit 1  = set if SEC has the ARC4 EU (AFEU)
+> +        bit 2  = set if SEC has the DES/3DES EU (DEU)
+> +        bit 3  = set if SEC has the message digest EU (MDEU/MDEU-A)
+> +        bit 4  = set if SEC has the random number generator EU (RNG)
+> +        bit 5  = set if SEC has the public key EU (PKEU)
+> +        bit 6  = set if SEC has the AES EU (AESU)
+> +        bit 7  = set if SEC has the Kasumi EU (KEU)
+> +        bit 8  = set if SEC has the CRC EU (CRCU)
+> +        bit 11 = set if SEC has the message digest EU extended alg set (MDEU-B)
+> +
+> +      remaining bits are reserved for future SEC EUs.
+> +
+> +  fsl,descriptor-types-mask:
+> +    $ref: /schemas/types.yaml#/definitions/uint32
+> +    description: |
+> +      The bitmask representing what descriptors are available. Descriptor type
+> +      information should be encoded following the SEC's Descriptor Header Dword
+> +      DESC_TYPE field documentation, i.e. as follows:
+> +
+> +        bit 0  = set if SEC supports the aesu_ctr_nonsnoop desc. type
+> +        bit 1  = set if SEC supports the ipsec_esp descriptor type
+> +        bit 2  = set if SEC supports the common_nonsnoop desc. type
+> +        bit 3  = set if SEC supports the 802.11i AES ccmp desc. type
+> +        bit 4  = set if SEC supports the hmac_snoop_no_afeu desc. type
+> +        bit 5  = set if SEC supports the srtp descriptor type
+> +        bit 6  = set if SEC supports the non_hmac_snoop_no_afeu desc.type
+> +        bit 7  = set if SEC supports the pkeu_assemble descriptor type
+> +        bit 8  = set if SEC supports the aesu_key_expand_output desc.type
+> +        bit 9  = set if SEC supports the pkeu_ptmul descriptor type
+> +        bit 10 = set if SEC supports the common_nonsnoop_afeu desc. type
+> +        bit 11 = set if SEC supports the pkeu_ptadd_dbl descriptor type
 
-A portion of the crypto patches that were part of v2 have landed in v6.13.
-So the rebased version has shrunk.
+Why 3 variations of 'descriptor type'?
 
-There was a bit of fallout caused by the upstreamed crypto patches
-and dealing with that kept me occupied during the v6.13 cycle.
-However I'm now back working on the PCI/CMA patches,
-specifically the migration to netlink for retrieval of signatures
-and measurements as discussed at Plumbers.
-
-Thanks,
-
-Lukas
+> +
+> +      ..and so on and so forth.
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - fsl,num-channels
+> +  - fsl,channel-fifo-len
+> +  - fsl,exec-units-mask
+> +  - fsl,descriptor-types-mask
+> +
+> +unevaluatedProperties: false
+> +
+> +examples:
+> +  - |
+> +    /* MPC8548E */
+> +    crypto@30000 {
+> +        compatible = "fsl,sec2.1", "fsl,sec2.0";
+> +        reg = <0x30000 0x10000>;
+> +        interrupts = <29 2>;
+> +        interrupt-parent = <&mpic>;
+> +        fsl,num-channels = <4>;
+> +        fsl,channel-fifo-len = <24>;
+> +        fsl,exec-units-mask = <0xfe>;
+> +        fsl,descriptor-types-mask = <0x12b0ebf>;
+> +    };
+> diff --git a/Documentation/devicetree/bindings/crypto/fsl-sec2.txt b/Documentation/devicetree/bindings/crypto/fsl-sec2.txt
+> deleted file mode 100644
+> index 125f155d00d052eec7d5093b5c5076cbe720417f..0000000000000000000000000000000000000000
+> --- a/Documentation/devicetree/bindings/crypto/fsl-sec2.txt
+> +++ /dev/null
+> @@ -1,65 +0,0 @@
+> -Freescale SoC SEC Security Engines versions 1.x-2.x-3.x
+> -
+> -Required properties:
+> -
+> -- compatible : Should contain entries for this and backward compatible
+> -  SEC versions, high to low, e.g., "fsl,sec2.1", "fsl,sec2.0" (SEC2/3)
+> -                             e.g., "fsl,sec1.2", "fsl,sec1.0" (SEC1)
+> -    warning: SEC1 and SEC2 are mutually exclusive
+> -- reg : Offset and length of the register set for the device
+> -- interrupts : the SEC's interrupt number
+> -- fsl,num-channels : An integer representing the number of channels
+> -  available.
+> -- fsl,channel-fifo-len : An integer representing the number of
+> -  descriptor pointers each channel fetch fifo can hold.
+> -- fsl,exec-units-mask : The bitmask representing what execution units
+> -  (EUs) are available. It's a single 32-bit cell. EU information
+> -  should be encoded following the SEC's Descriptor Header Dword
+> -  EU_SEL0 field documentation, i.e. as follows:
+> -
+> -	bit 0  = reserved - should be 0
+> -	bit 1  = set if SEC has the ARC4 EU (AFEU)
+> -	bit 2  = set if SEC has the DES/3DES EU (DEU)
+> -	bit 3  = set if SEC has the message digest EU (MDEU/MDEU-A)
+> -	bit 4  = set if SEC has the random number generator EU (RNG)
+> -	bit 5  = set if SEC has the public key EU (PKEU)
+> -	bit 6  = set if SEC has the AES EU (AESU)
+> -	bit 7  = set if SEC has the Kasumi EU (KEU)
+> -	bit 8  = set if SEC has the CRC EU (CRCU)
+> -	bit 11 = set if SEC has the message digest EU extended alg set (MDEU-B)
+> -
+> -remaining bits are reserved for future SEC EUs.
+> -
+> -- fsl,descriptor-types-mask : The bitmask representing what descriptors
+> -  are available. It's a single 32-bit cell. Descriptor type information
+> -  should be encoded following the SEC's Descriptor Header Dword DESC_TYPE
+> -  field documentation, i.e. as follows:
+> -
+> -	bit 0  = set if SEC supports the aesu_ctr_nonsnoop desc. type
+> -	bit 1  = set if SEC supports the ipsec_esp descriptor type
+> -	bit 2  = set if SEC supports the common_nonsnoop desc. type
+> -	bit 3  = set if SEC supports the 802.11i AES ccmp desc. type
+> -	bit 4  = set if SEC supports the hmac_snoop_no_afeu desc. type
+> -	bit 5  = set if SEC supports the srtp descriptor type
+> -	bit 6  = set if SEC supports the non_hmac_snoop_no_afeu desc.type
+> -	bit 7  = set if SEC supports the pkeu_assemble descriptor type
+> -	bit 8  = set if SEC supports the aesu_key_expand_output desc.type
+> -	bit 9  = set if SEC supports the pkeu_ptmul descriptor type
+> -	bit 10 = set if SEC supports the common_nonsnoop_afeu desc. type
+> -	bit 11 = set if SEC supports the pkeu_ptadd_dbl descriptor type
+> -
+> -  ..and so on and so forth.
+> -
+> -Example:
+> -
+> -	/* MPC8548E */
+> -	crypto@30000 {
+> -		compatible = "fsl,sec2.1", "fsl,sec2.0";
+> -		reg = <0x30000 0x10000>;
+> -		interrupts = <29 2>;
+> -		interrupt-parent = <&mpic>;
+> -		fsl,num-channels = <4>;
+> -		fsl,channel-fifo-len = <24>;
+> -		fsl,exec-units-mask = <0xfe>;
+> -		fsl,descriptor-types-mask = <0x12b0ebf>;
+> -	};
+> 
+> -- 
+> 2.48.0.rc1.219.gb6b6757d772
+> 
