@@ -1,142 +1,172 @@
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 758AF211479
-	for <linux-crypto@vger.kernel.org>; Wed, 12 Feb 2025 15:23:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1D5F21B1BE;
+	Wed, 12 Feb 2025 15:48:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739373788; cv=none; b=lPpGI69kjFkfQ9FIPhgms8IMOYepPmpJF4Cq5397GYeW66fOcjcyFG+V5KorVrrRvds7jVeRw9HU1b3VZqy2DReQ0AvK9mDfXiSKl5dfmENKYrbtsjTmaDK7/rdx9FVxExLWADe6sbfkuyPEzhcW+58mBJgMkHwq6vBseqJiKi8=
+	t=1739375300; cv=none; b=TWIIZiWvH6BwJjJzR9C4C9/xfj0jK3SHCD/RJNYx7FbQqGG/fSRT9D4fu1vsS7cr2pH1pT3tNuksOWYsoIeR46DCh3HH6vHJnZI45K4IQ7ZwvGtCZpTq7OAURTKtgNgEdeZkuYn3PowyTw5Qz0cn/kImE2g9gzhx7Bez4sfVr08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739373788; c=relaxed/simple;
-	bh=3bCzMZ8uPx9wHcLyBkOJVFJa96hKBwTfSgNNOm9Azyg=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=CeaReGR1ztvQGKISLlI9zUqNy5ovchJ6LT7GkITCdNcIisqgSLH/n87xQJqlPw+zmDFa/aT0WML7zNhDFN10ot1TqA0isW9OWltedDYQ97hsb/4j6tkLmdf47GEF9Z/lWYE+jXJNCEaU19UrbACKJdUgeyCgZNTKI6aNOcXZ5dc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=pVpe2sQC; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1739375300; c=relaxed/simple;
+	bh=jGTcO7uOKoo9Sew7/PnGEbprmSHHDRcuUgN9YyNsgpk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UfwoJYS2YqxPdVKHssJeJAvQXwUt9JD0g6sZKv1bQw2n770VrKmq8upBOpBAYBlhUk6dmW+Vl4gTgZRJ94q+ngHLybG5D+KLIS9DSjDSi2Qe36heIhJCErj5MSOyu4fSvKrYcw5/7SjuP0dxWElWPe2L4pzJWWk3Dgps2Ktyqm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LpKfe7nh; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pVpe2sQC"
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5deb956aa5eso611814a12.2
-        for <linux-crypto@vger.kernel.org>; Wed, 12 Feb 2025 07:23:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1739373785; x=1739978585; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=64YvJQuCzRGu1P61pUIAXqWgUq9X+jvhdIKiLQpBSyU=;
-        b=pVpe2sQCfa4F8wfHBD+xFHbvn6nWLyngRZkO2fJ6DjtTyjhALLbhrQ7crGbqajyvDM
-         +yVAegXR2bHPWJ9mlczujiWPVnuJNZBynC3PAkfMeBqg3/5oEuQTobGh4+4xVtzdLUuY
-         6xFZU1uPL8QVbyoEn75jAB+TbsfRNu6aWoANHmNeTxLsB16scUwunkr7MHWI+wtOfXN8
-         Q983PdEQZvIdHpPPo9MtbUwloagEer6sP6kjVriFM+djDBxzjqhmJ7ONf3VKNdW1SxQJ
-         Tq5gwAFDgEIQkEfwz4SeZn6D6hhYmYVMw19CBnlHONrLBH2y9I5/lBahN76LJkMD97yF
-         eUpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739373785; x=1739978585;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=64YvJQuCzRGu1P61pUIAXqWgUq9X+jvhdIKiLQpBSyU=;
-        b=MLUFSa4B5/Yw2j/7c6M0iDyQQum4mAGzWtAr865gB+d0maqL2GPyxs9fXRELCUjIsi
-         HclahNHg+8vsMQDLnqaKvtokFldbnARuOnmvGwsH5tgfaSxeneeNsHYEeKksUoCNsNww
-         jOvgM0+MlXWXV+lLJkKWsrZ7E32Bt/BoUrsQmn61RnUYYvJZPhN+OzMGA7rfCB1dq3KD
-         3JX4O9+Irk8IKnrr0y/hH1ERzerTNXA7g5j7asmlHRdLVm1fcf5AW1kM+IE3sQhBth6B
-         viiawz2w63elGOt9y9gZZm2V4YNyv/0o8qKAjuV1u2DLoCf7jT3gmsxAwM9c4KSEjiMw
-         fStQ==
-X-Gm-Message-State: AOJu0YwgClor6xCk4azrRtgb0NFeiFjrKNNgUOA6VT18Jczu4lVVLTih
-	i9K2fW6t0kdSGkTw8cQ13yfmjc9hKMORiffk8FCYF0W+WsdYhhnIvCo0at+9CQg=
-X-Gm-Gg: ASbGncvzcUG4ityntXX/VGdqGtguWwjnMF/B2h2atOjZfd5k1lnKHUvEhPX9Owxpm3v
-	xgPHwhifjZaWvIPeSPi4+8YO+U/5PRdEfSevmMsEnsfkY3g1YEqoiYEtfk+SQCltr3VqddqgqF4
-	8dyciT6RlfyAvt2PRObYFVUj8tMN18SYY0NV4AVVi6ASzh3rrSzZGe/23OMBAmD36eOyYiiQ74a
-	apsv3aF4Jpy33kfFSr8r2Qgk4Dnc13GJ2cjEY2X3VrEpJvtWeZV2NWsF4iHPk4aZIHkaucygfRa
-	NwTgM6OtvWMtvzJknPJz
-X-Google-Smtp-Source: AGHT+IF5KX1fW5IY0ZYPNxkMuagyVfdIq4Krzhqtj5uIsKy6X9aHz4JDV52RREfahA7utOyaZduAww==
-X-Received: by 2002:a05:6402:2399:b0:5de:b947:b22a with SMTP id 4fb4d7f45d1cf-5deb947b247mr3091298a12.11.1739373784596;
-        Wed, 12 Feb 2025 07:23:04 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-ab7cc3c8cccsm539270466b.173.2025.02.12.07.23.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Feb 2025 07:23:04 -0800 (PST)
-Date: Wed, 12 Feb 2025 18:23:01 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: linux-crypto@vger.kernel.org
-Subject: [bug report] crypto: eip93 - Add Inside Secure SafeXcel EIP-93
- crypto engine support
-Message-ID: <cea9bafd-3dde-4028-9b20-4832dd2977e6@stanley.mountain>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LpKfe7nh"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFE85C4CEDF;
+	Wed, 12 Feb 2025 15:48:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739375299;
+	bh=jGTcO7uOKoo9Sew7/PnGEbprmSHHDRcuUgN9YyNsgpk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=LpKfe7nhCwi7G2IBXWHGfrifPCjdBtpx5STvudjspOxexJrzMWCekZRcSy+b9Vbp+
+	 q23nMNet1qLz58BEZ7ZJD8Od5x3hBDTSM3JPm7qU44xp3eGoyc8iDo8CdUcyssUwv7
+	 ucT4r7Gg/OrMxzjjmuKXivISpXYBEXztV/dyfH5UdVJmNLRpjs2QZFPCXKxPg/2m73
+	 xaoF0NsbIXnwxVpu9Gejxt/KRvD6osrOClBaVLbZMUK3VuGKQtBnT+vx7JNinCz6ks
+	 qTQj4l3I4sNeubtfDCs5JH0CeW6fK+HH1wJC3P4sDY2e7e90cBJ+tkB6i1nnKWrFL1
+	 WIc/dou+/Dh1w==
+From: Eric Biggers <ebiggers@kernel.org>
+To: fsverity@lists.linux.dev
+Cc: linux-crypto@vger.kernel.org,
+	dm-devel@lists.linux.dev,
+	x86@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Alasdair Kergon <agk@redhat.com>,
+	Mike Snitzer <snitzer@kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Mikulas Patocka <mpatocka@redhat.com>
+Subject: [PATCH v8 0/7] Optimize dm-verity and fsverity using multibuffer hashing
+Date: Wed, 12 Feb 2025 07:47:11 -0800
+Message-ID: <20250212154718.44255-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-Hello Christian Marangi,
+[ This patchset keeps getting rejected by Herbert, who prefers a
+  complex, buggy, and slow alternative that shoehorns CPU-based hashing
+  into the asynchronous hash API which is designed for off-CPU offload:
+  https://lore.kernel.org/linux-crypto/cover.1730021644.git.herbert@gondor.apana.org.au/
+  This patchset is a much better way to do it though, and I've already
+  been maintaining it downstream as it would not be reasonable to go the
+  asynchronous hash route instead.  Let me know if there are any
+  objections to me taking this patchset through the fsverity tree, or at
+  least patches 1-5 as the dm-verity patches could go in separately. ]
 
-Commit 9739f5f93b78 ("crypto: eip93 - Add Inside Secure SafeXcel
-EIP-93 crypto engine support") from Jan 14, 2025 (linux-next), leads
-to the following Smatch static checker warning:
+[ This patchset applies to v6.14-rc2 ]
 
-drivers/crypto/inside-secure/eip93/eip93-common.c:233 check_valid_request() warn: 'src_nents' unsigned <= 0
-drivers/crypto/inside-secure/eip93/eip93-common.c:237 check_valid_request() warn: error code type promoted to positive: 'src_nents'
-drivers/crypto/inside-secure/eip93/eip93-common.c:240 check_valid_request() warn: error code type promoted to positive: 'dst_nents'
+On many modern CPUs, it is possible to compute the SHA-256 hash of two
+equal-length messages in about the same time as a single message, if all
+the instructions are interleaved.  This is because each SHA-256 (and
+also most other cryptographic hash functions) is inherently serialized
+and therefore can't always take advantage of the CPU's full throughput.
 
-drivers/crypto/inside-secure/eip93/eip93-common.c
-    201 int check_valid_request(struct eip93_cipher_reqctx *rctx)
-    202 {
-    203         struct scatterlist *src = rctx->sg_src;
-    204         struct scatterlist *dst = rctx->sg_dst;
-    205         u32 src_nents, dst_nents;
-    206         u32 textsize = rctx->textsize;
-    207         u32 authsize = rctx->authsize;
-    208         u32 blksize = rctx->blksize;
-    209         u32 totlen_src = rctx->assoclen + rctx->textsize;
-    210         u32 totlen_dst = rctx->assoclen + rctx->textsize;
-    211         u32 copy_len;
-    212         bool src_align, dst_align;
-    213         int err = -EINVAL;
-    214 
-    215         if (!IS_CTR(rctx->flags)) {
-    216                 if (!IS_ALIGNED(textsize, blksize))
-    217                         return err;
-    218         }
-    219 
-    220         if (authsize) {
-    221                 if (IS_ENCRYPT(rctx->flags))
-    222                         totlen_dst += authsize;
-    223                 else
-    224                         totlen_src += authsize;
-    225         }
-    226 
-    227         src_nents = sg_nents_for_len(src, totlen_src);
-    228         dst_nents = sg_nents_for_len(dst, totlen_dst);
+An earlier attempt to support multibuffer hashing in Linux was based
+around the ahash API.  That approach had some major issues, as does the
+alternative ahash-based approach proposed by Herbert (e.g. see my
+responses at
+https://lore.kernel.org/linux-crypto/20240610164258.GA3269@sol.localdomain/
+and
+https://lore.kernel.org/linux-crypto/20241028190045.GA1408@sol.localdomain/,
+and the other discussion on v4
+https://lore.kernel.org/linux-crypto/20240603183731.108986-1-ebiggers@kernel.org/T/#t)
+This patchset instead takes a much simpler approach of just adding a
+synchronous API for hashing equal-length messages.
 
-These return -EINVAL on error.
+This works well for dm-verity and fsverity, which use Merkle trees and
+therefore hash large numbers of equal-length messages.
 
-    229 
-    230         if (src == dst) {
-    231                 src_nents = max(src_nents, dst_nents);
-    232                 dst_nents = src_nents;
---> 233                 if (unlikely((totlen_src || totlen_dst) && src_nents <= 0))
-                                                                   ^^^^^^^^^^^^^^
-It's unsigned so it can't be less than zero.
+This patchset is organized as follows:
 
-    234                         return err;
-    235 
-    236         } else {
-    237                 if (unlikely(totlen_src && src_nents <= 0))
-                                                   ^^^^^^^^^^^^^^
-    238                         return err;
-    239 
-    240                 if (unlikely(totlen_dst && dst_nents <= 0))
-                                                   ^^^^^^^^^^^^^^
-Same.
+- Patch 1-2 add crypto_shash_finup_mb() and tests for it.
+- Patch 3-4 implement finup_mb on x86_64 and arm64, using an
+  interleaving factor of 2.
+- Patch 5 adds multibuffer hashing support to fsverity.
+- Patch 6-7 add multibuffer hashing support to dm-verity.
 
-    241                         return err;
-    242         }
-    243 
-    244         if (authsize) {
-    245                 if (dst_nents == 1 && src_nents == 1) {
-    246                         src_align = eip93_is_sg_aligned(src, totlen_src, blksize);
+This patchset increases raw SHA-256 hashing throughput by up to 98%,
+depending on the CPU (see patches for per-CPU results).  The throughput
+of cold-cache reads from dm-verity and fsverity increases by around 35%.
 
-regards,
-dan carpenter
+Changed in v8:
+  - Rebased onto v6.14-rc2 and updated cover letter.
+
+Changed in v7:
+  - Rebased onto v6.12-rc1 and dropped patches that were upstreamed.
+  - Added performance results for more CPUs.
+
+Changed in v6:
+  - All patches: added Reviewed-by and Acked-by tags
+  - "crypto: testmgr - add tests for finup_mb": Whitespace fix
+  - "crypto: testmgr - generate power-of-2 lengths more often":
+    Fixed undefined behavior
+  - "fsverity: improve performance by using multibuffer hashing":
+    Simplified a comment
+  - "dm-verity: reduce scope of real and wanted digests":
+    Fixed mention of nonexistent function in commit message
+  - "dm-verity: improve performance by using multibuffer hashing":
+    Two small optimizations, and simplified a comment
+
+Changed in v5:
+  - Reworked the dm-verity patches again.  Split the preparation work
+    into separate patches, fixed two bugs, and added some new cleanups.
+  - Other small cleanups
+
+Changed in v4:
+  - Reorganized the fsverity and dm-verity code to have a unified code
+    path for single-block vs. multi-block processing.  For data blocks
+    they now use only crypto_shash_finup_mb().
+
+Changed in v3:
+  - Change API from finup2x to finup_mb.  It now takes arrays of data
+    buffer and output buffers, avoiding hardcoding 2x in the API.
+
+Changed in v2:
+  - Rebase onto cryptodev/master
+  - Add more comments to assembly
+  - Reorganize some of the assembly slightly
+  - Fix the claimed throughput improvement on arm64
+  - Fix incorrect kunmap order in fs/verity/verify.c
+  - Adjust testmgr generation logic slightly
+  - Explicitly check for INT_MAX before casting unsigned int to int
+  - Mention SHA3 based parallel hashes
+  - Mention AVX512-based approach
+
+Eric Biggers (7):
+  crypto: shash - add support for finup_mb
+  crypto: testmgr - add tests for finup_mb
+  crypto: x86/sha256-ni - add support for finup_mb
+  crypto: arm64/sha256-ce - add support for finup_mb
+  fsverity: improve performance by using multibuffer hashing
+  dm-verity: reduce scope of real and wanted digests
+  dm-verity: improve performance by using multibuffer hashing
+
+ arch/arm64/crypto/sha2-ce-core.S    | 281 ++++++++++++++++++++-
+ arch/arm64/crypto/sha2-ce-glue.c    |  40 +++
+ arch/x86/crypto/sha256_ni_asm.S     | 368 ++++++++++++++++++++++++++++
+ arch/x86/crypto/sha256_ssse3_glue.c |  39 +++
+ crypto/shash.c                      |  58 +++++
+ crypto/testmgr.c                    |  73 +++++-
+ drivers/md/dm-verity-fec.c          |  19 +-
+ drivers/md/dm-verity-fec.h          |   5 +-
+ drivers/md/dm-verity-target.c       | 192 +++++++++++----
+ drivers/md/dm-verity.h              |  34 +--
+ fs/verity/fsverity_private.h        |   7 +
+ fs/verity/hash_algs.c               |   8 +-
+ fs/verity/verify.c                  | 169 ++++++++++---
+ include/crypto/hash.h               |  52 +++-
+ 14 files changed, 1224 insertions(+), 121 deletions(-)
+
+
+base-commit: a64dcfb451e254085a7daee5fe51bf22959d52d3
+-- 
+2.48.1
+
