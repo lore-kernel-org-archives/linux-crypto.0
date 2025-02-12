@@ -1,123 +1,134 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BC9F20C487;
-	Wed, 12 Feb 2025 12:44:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D193921018A;
+	Wed, 12 Feb 2025 15:20:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739364280; cv=none; b=eC1V6NbN2D+wZehPEJirz05q/pZ15BReOilCNivm5qtY+PYXnFSXkNR9Tqiz9orfJ7q1oDNJwSBDmPrUE+X+SOvLWRRQHvBPPBv+lU3gsBQ8UgjYNtHW8iUpJMiMltXaV+spXzqhoZPDQ+aK9N6/ZP0qsQBw7cwHrBNG+w8i89M=
+	t=1739373659; cv=none; b=ElzX+ppErpb8lmkeWjBFn0YRCNPRzGQwQdv+HsqlsMu5VHbhrr2oiePXT9bekv+uEPsPweR4GhEb5GWv5ZUMk8ctjcUaYF5X8g1VuELlDlzacLVdpC/Ww2kaFPT280f0wgb5JjlQut2jfFH7j5LKz/PEjOjP6ww/5GlFMbZI9N4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739364280; c=relaxed/simple;
-	bh=+mhHkXqhc4VDwPi7MLWcNjZdhTc4zZo0gwq+T5cTOIY=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=qt0m9RiwmHpRLQ+XABRLF70jn5Z3s8Omob7SQxcEzofj9DsdXtgtXADQGaShYhHZ8Nzjt6U/VYRJA+MqLDmALy3uzGNLld4J3hmKFLToTVHkIFZefFDFRhKpoHc0QFLmC0CyoXPE1ncwS+jdmU4MIe0C4OfW7hVFgDo4meB9P3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=bU3Rd2tJ; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1739373659; c=relaxed/simple;
+	bh=l70dMKRZZuIcTN7P7KYGeI54CkmfOAguGwGNr3boZ6o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JIge2/Ul0m0/eLMQzoR4051SS8+oTiCg1BX0Az4RBPyKxn9InRp+1dH9fb2MsYSADCS3YeDoyvKYP6oShBu+jd+VoX7mjMdR91lejhPUNeGQew0TQl7+APngark+z6uMZ0k2pDWMC7tiXE4L0EFTdT3hRN31gwK+X4xlqhX5+fI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gQw1dYcA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="bU3Rd2tJ"
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51CBpiSd013640;
-	Wed, 12 Feb 2025 12:43:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=+mhHkX
-	qhc4VDwPi7MLWcNjZdhTc4zZo0gwq+T5cTOIY=; b=bU3Rd2tJlFFQqu5BV1YnSW
-	tkSX87Qk0oNHNsqBvOCKKjQZaMiiiZktgkFwm6RXdYLRIRz3064de3ZJXTpXluHu
-	jR03F9uRrZfaZigIPn78pnGDR9HygsJhvJ5DYCArhv2PG3aDrjD9XnfD+jBDYhlz
-	xI8W+J8GZ+nTiq+IF6s6C8efmO99g52z7VbIvRvo7u/PcEmBojze6dbCKo6XXUlL
-	j/3GiABLIEtJd6Ef0p7jqIKghjbxcTQr0y0HzxcxSdS0S7J5xaN+VGT0Pq9ntVu1
-	f6RR3BKMvXasb0aO6cNUobfx/7R+rEz600ZMWb7fDBrUlrWX8HgZMXek6yAfaF7A
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44rfpa3bm3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 12 Feb 2025 12:43:04 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 51CCK66g021894;
-	Wed, 12 Feb 2025 12:43:03 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44rfpa3bky-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 12 Feb 2025 12:43:03 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51CCdn11028217;
-	Wed, 12 Feb 2025 12:43:02 GMT
-Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44phyygqa4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 12 Feb 2025 12:43:02 +0000
-Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51CCh1wq27132606
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 12 Feb 2025 12:43:01 GMT
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7A3245805F;
-	Wed, 12 Feb 2025 12:43:01 +0000 (GMT)
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3039258051;
-	Wed, 12 Feb 2025 12:43:00 +0000 (GMT)
-Received: from li-43857255-d5e6-4659-90f1-fc5cee4750ad.ibm.com (unknown [9.61.169.88])
-	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 12 Feb 2025 12:43:00 +0000 (GMT)
-Message-ID: <6f7120f292a7863e7c69d3cb49f224efd12ee629.camel@linux.ibm.com>
-Subject: Re: [RFC PATCH v3 07/13] keys: Add ability to track intended usage
- of the public key
-From: Mimi Zohar <zohar@linux.ibm.com>
-To: Jarkko Sakkinen <jarkko.sakkinen@kernel.org>,
-        Eric Snowberg
-	 <eric.snowberg@oracle.com>
-Cc: linux-security-module@vger.kernel.org, dhowells@redhat.com,
-        dwmw2@infradead.org, herbert@gondor.apana.org.au, davem@davemloft.net,
-        ardb@kernel.org, paul@paul-moore.com, jmorris@namei.org,
-        serge@hallyn.com, roberto.sassu@huawei.com, dmitry.kasatkin@gmail.com,
-        mic@digikod.net, casey@schaufler-ca.com, stefanb@linux.ibm.com,
-        ebiggers@kernel.org, rdunlap@infradead.org,
-        linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-efi@vger.kernel.org,
-        linux-integrity@vger.kernel.org
-Date: Wed, 12 Feb 2025 07:42:59 -0500
-In-Reply-To: <Z6UU7anXtW43AhNR@kernel.org>
-References: <20241017155516.2582369-1-eric.snowberg@oracle.com>
-	 <20241017155516.2582369-8-eric.snowberg@oracle.com>
-	 <Z6UU7anXtW43AhNR@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-2.fc40) 
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gQw1dYcA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75818C4CEDF;
+	Wed, 12 Feb 2025 15:20:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739373658;
+	bh=l70dMKRZZuIcTN7P7KYGeI54CkmfOAguGwGNr3boZ6o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gQw1dYcANs1L+I6pI6LMs0z3EhXQQ20a41aWQcrsTE6vEtMYSnoC0vvf4psAphxBF
+	 dHGaKMpWKlyVGMr10FKYAnwcN5NcHxYzIW+vWZwWvKTokAfaBslGTqbYyOFC5p3FAv
+	 afijLUbuFPg609q6nBnUIMc7CFIOyfB4qBVEBxLwYD1uclpKrDWBUg5YCiz/R2yr8N
+	 nJCzfv1LLpYeQxUhRWxHEQAsfGahfRGqM45tb+q3ay3QYhyzwvLrZgK028CusANr6L
+	 kupL48i8z3ujPqJivFu3FKEv7heU2XaEoG9LVtqSBG/JAYYVjscaWKolfoD3qtMDYf
+	 3yrr66V8+TdTw==
+Date: Wed, 12 Feb 2025 07:20:56 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: Harald Freudenberger <freude@linux.ibm.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
+	dengler@linux.ibm.com, linux-s390@vger.kernel.org,
+	linux-crypto@vger.kernel.org, dm-devel@lists.linux.dev
+Subject: Re: [PATCH v10 2/5] s390/crypto: New s390 specific protected key
+ hash phmac
+Message-ID: <20250212152056.GA1256@sol.localdomain>
+References: <20250115162231.83516-1-freude@linux.ibm.com>
+ <20250115162231.83516-3-freude@linux.ibm.com>
+ <Z6hrvQzb5G_wqlni@gondor.apana.org.au>
+ <20250209163430.GB1230@sol.localdomain>
+ <9971160da17b1d18d4bdc87fc1297fda@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: WPOio9vJuKimRSeTX5erqwTICYwt3Uiv
-X-Proofpoint-ORIG-GUID: PANYEldy6s1JY0QEJs3RxZgvBxokQCaR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-12_04,2025-02-11_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 malwarescore=0
- mlxscore=0 lowpriorityscore=0 adultscore=0 bulkscore=0 priorityscore=1501
- mlxlogscore=923 clxscore=1011 phishscore=0 impostorscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2501170000
- definitions=main-2502120097
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9971160da17b1d18d4bdc87fc1297fda@linux.ibm.com>
 
-On Thu, 2025-02-06 at 22:13 +0200, Jarkko Sakkinen wrote:
-> On Thu, Oct 17, 2024 at 09:55:10AM -0600, Eric Snowberg wrote:
-> > Add two new fields in public_key_signature to track the intended usage =
-of
-> > the signature.=C2=A0 Also add a flag for the revocation pass.=C2=A0 Dur=
-ing signature
-> > validation, two verifications can take place for the same signature.=C2=
-=A0 One
-> > to see if it verifies against something on the .blacklist keyring and
-> > the other to see if it verifies against the supplied keyring. The flag
-> > is used to determine which stage the verification is in.
-> >=20
-> > Signed-off-by: Eric Snowberg <eric.snowberg@oracle.com>
->=20
-> Mimi, was this the patch set you asked to look at while ago?</offtopic>
+On Wed, Feb 12, 2025 at 12:17:46PM +0100, Harald Freudenberger wrote:
+> On 2025-02-09 17:34, Eric Biggers wrote:
+> > On Sun, Feb 09, 2025 at 04:47:57PM +0800, Herbert Xu wrote:
+> > > On Wed, Jan 15, 2025 at 05:22:28PM +0100, Harald Freudenberger wrote:
+> > > >
+> > > > +static int s390_phmac_init(struct ahash_request *req)
+> > > > +{
+> > > > +	struct s390_phmac_req_ctx *req_ctx = ahash_request_ctx(req);
+> > > > +	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+> > > > +	struct s390_kmac_sha2_ctx *ctx = &req_ctx->sha2_ctx;
+> > > > +	int rc;
+> > > > +
+> > > > +	/*
+> > > > +	 * First try synchronous. If this fails for any reason
+> > > > +	 * schedule this request asynchronous via workqueue.
+> > > > +	 */
+> > > > +
+> > > > +	rc = phmac_init(tfm, ctx, false);
+> > > > +	if (!rc)
+> > > > +		goto out;
+> > > > +
+> > > > +	req_ctx->req = req;
+> > > > +	INIT_DELAYED_WORK(&req_ctx->work, phmac_wq_init_fn);
+> > > > +	schedule_delayed_work(&req_ctx->work, 0);
+> > > > +	rc = -EINPROGRESS;
+> > > 
+> > > This creates a resource problem because there is no limit on how
+> > > many requests that can be delayed in this manner for a given tfm.
+> > > 
+> > > When we hit this case, I presume this is a system-wide issue and
+> > > all requests would go pending? If that is the case, I suggest
+> > > allocating a system-wide queue through crypto_engine and using
+> > > that to limit how many requests that can become EINPROGRESS.
+> > 
+> > Or just make it synchronous which would be way easier, and the calling
+> > code uses
+> > it synchronously anyway.
+> > 
+> > - Eric
+> 
+> A word about synchronous vs asynchronous...
+> 
+> As a synchronous hash (or chipher or whatever) MUST NOT sleep I can't
+> really implement the pkey stuff in a synchronous way:
 
-Yes, in particular please take a look at Paul's comment on 00/13.
+As I said at
+https://lore.kernel.org/dm-devel/20250116080324.GA3910@sol.localdomain/, shash
+could fairly easily be fixed to support sleepable algorithms (e.g.
+CRYPTO_ALG_SLEEPABLE).
 
-Mimi
+This would be *much* simpler than doing it with ahash.
+
+You even had it as a shash already in the first version of your patchset, just
+missing the bits that add the support for sleepable algorithms.
+
+I am trying to help you by suggesting an approach that would be much easier.
+There is no need to shoehorn CPU-based crypto into ahash, which is designed for
+off-CPU offload.
+
+> The issue with pkey (We call it "protected key") is that it is some kind
+> of hardware based key. As such it needs some special preparation action
+> to be done upfront in the hardware/firmware to use such a pkey.
+> Now think about KVM live guest migration where a guest suddenly awakes
+> (Well the guest is not even aware of this) on a new machine with another
+> hardware. So out of the sudden a hardware based crypto operation fails
+> with an indication that the hardware/firmware can't deal with this
+> key object and needs re-preparation. Usually this preparation step is
+> some kind of asynchronous operation (write some pci registers or run
+> some DMA sequences or refresh the working key material via an HSM
+> communication...) and as such may take some time and involve even
+> sleeping on a mutex or completion until another kernel thread is done.
+> Please note this is not unique to pkey on system z but may apply
+> to all kinds of hardware/firmware based keys in situations like
+> KVM live guest migration or suspend/resume.
+
+I.e. it already uses a kernel thread that does the operation synchronously (as
+opposed to being actual hardware offload that does not consume a thread and
+signals completion to the CPU via an interrupt), in addition to the caller's
+thread which also waits synchronously via crypto_wait_req().  There is really no
+need to make it async, nor to use scatterlists.
+
+- Eric
