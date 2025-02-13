@@ -1,116 +1,129 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C39B4211460;
-	Thu, 13 Feb 2025 10:10:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CB6921128A
+	for <linux-crypto@vger.kernel.org>; Thu, 13 Feb 2025 12:37:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739441423; cv=none; b=O2cLktU/ypQMSZvBxBnQ+UznrWnMD7k6ib5cg8eI3QZpBzMxpJPY5vTryX1mwpJEqArDgodk2itubV5OdNfaKN1RBxQu7iKvu8ra27fhAJUZrqYpZ5Lcdf7ohe3dqFKmPvlHYlV4U4cpli78sRkH1VmgCKScLFCOUR20GplWTtA=
+	t=1739450237; cv=none; b=n48BZ0QI2bBt7Ocry9EauCKJ4piSi2CFo0nirolRbrEEj8McVzX4xCd6HQf0FhnN9/Q8kYqMTUBMvxnwxtZJYtd88I525e6mtVMeq84LYk5eux3QYgKdSlHuki4U4/8G4QyxFR+Ek1P37W2oseigWYXl9BdLPL71Wf7QHxSz8oc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739441423; c=relaxed/simple;
-	bh=42FVAKglSdA4GCM9HFlOhDKZOpyrLuyiIonz/DiE3L8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TFHKZJ5Fc/rWuU0ijpwao0zkxDmdFi33Rm42+nusNneoEeYuMLIM2nYFbtX6dfLTesl8iewXyRr39v8eX1Hajx/i6SsBhG/YWCt4/b1DIO9CNIdO0jUBLaYXjKedplpVwJWNMT9HI1lpZpjoErCs5ep4p09VZVZw8M/pHQvotNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QduZ+V/D; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739450237; c=relaxed/simple;
+	bh=fW7sAMZGzRYFL3koODOtSKxG2i5kLbxepRPq763TAis=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=jbZrt0d1z0qpm58tqqtN4njYbrbc0ZsKW3d7YEJFX58PftMWFiCqvU3KKNmQw8VAO7JJ/DWqSQ6hOF0bx94B92JvyEXS+AFnGzmBAfs+rZyStBmLZ7NBA7x53TxVxzX55OigjH3sClWk+fdHHr7x/1J0skca5Axw/+6leDsOx7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=mhozXbqv; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QduZ+V/D"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5470AC4CEE6;
-	Thu, 13 Feb 2025 10:10:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739441423;
-	bh=42FVAKglSdA4GCM9HFlOhDKZOpyrLuyiIonz/DiE3L8=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=QduZ+V/DRRjp2YWO++Ujfw3lygiGvik5JyzHxwkbzuCCpkjDQA2xTe9472qCN+Nmm
-	 g8UPJBRO1x11HRM2ivIE8CcqfDWwXrogX25VnK26nn9dKYYSxVlODPp0HlmILK/i/p
-	 ILEi1lvFLnbPFZ1RBFxCyUR9zSS2JVm7RVMD5EUeUO5vRTsL2pHLncYcwgGow9yA1I
-	 mYmv3jE4woQi5p93XX32ny0y8aYTG6xUG+cNojoNuN4gr//3nWs+4xcMdeJ3iK/26I
-	 8RMuhd8w68G4+i9xGt3TiXQciFWBB6LoanAcebArn+JtR6Jr1P+7tTOJogzdZMgjnR
-	 bu3Pc5MrK9oNg==
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-30761be8fa8so7688601fa.2;
-        Thu, 13 Feb 2025 02:10:23 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVb9ccK0jSaxkhh/Z/JG28X1YnieBlj7v1teeXPQSUDgVHWpdiMYy0TNXGEsZwbz6v4QTtUIBsQDgb7XQE=@vger.kernel.org, AJvYcCWwFS3C1M4aQO6e0+Lhko+k8b/2Ynh5vLNblv0uy1C9YACKr3uKEOd1JjoKYmenK63Cip6IjhpSbOVBedJg@vger.kernel.org, AJvYcCXkErUz+niTcjgSykqpjHaNOPza3lLBKX/cGQk69QtymOuEmGhR7/fDwAJ+tmS14z+4KEQusWXO@vger.kernel.org
-X-Gm-Message-State: AOJu0YyeNyQIcl6lazNEFA7UknbxtWuvkGdUaZBK9suLluzkeub6fGxn
-	Q9hKQjvF0R0J1kNXaGnIIWPS0Nlx8GCzePS5WhxjBKEiAq7rDsjVzz1ZtOSt5NgebHgdhHTupR9
-	GJEyU4gmtZkeCAksstJRigUD4CmI=
-X-Google-Smtp-Source: AGHT+IHR+xr20cYmx6lgB9lVJM3c3+XAiEna+ZFlbjgJt6DHiy1GJEpnHOR+KpKMxfjEGw7dyQYgQ9iz1/SKleqfvSQ=
-X-Received: by 2002:a05:6512:159b:b0:545:4d1:64c0 with SMTP id
- 2adb3069b0e04-5451dd9e2admr736305e87.27.1739441421532; Thu, 13 Feb 2025
- 02:10:21 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mhozXbqv"
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4361e89b6daso5669325e9.3
+        for <linux-crypto@vger.kernel.org>; Thu, 13 Feb 2025 04:37:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1739450233; x=1740055033; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7TJDPbYKYTh8WSIk+sYTlBV8pwulu5n/wnEdfyFCUrI=;
+        b=mhozXbqvvMzdCLQqxFj+58mnr1s/1m5HGlN4V7bbQK/nRrf8H2WM7FfaDunJpUsWon
+         z9rTuo+NlacAOg/ilr1m3L+KK4Loc7HopJms4QABqx1jNT29Li1bQ3XnvbuN2jVKvdQ+
+         16TXEvCufIDNmLy4qiGKVbgb4txhi5+vIpYNpcNwxvtrR+fDQAsnANbJCYmcjXhTF8vG
+         T2rah8ZAtfq2ftzJMxYQghOlIH0arL4YOMgHDvSAK40xY2wTA/o+miqmlyBYeOOLYj6b
+         9/KUbEwt+chalqSqe1jqd8F7zBq0t8XA1GwR/UrbzQ/6b66qhvO/l+pKDTaQgRVmSdME
+         wQvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739450233; x=1740055033;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7TJDPbYKYTh8WSIk+sYTlBV8pwulu5n/wnEdfyFCUrI=;
+        b=GkQMTm7zhAGWz1rS4bYpjbkXzVN40jAQHO/CPcaCFxbgeXwIjy+AwgQ0jN8KEITBMY
+         5bzioJE1yauY+e9R8rt4DZKUU3Mq5CfJ7pGVDlEQCI5v28Fq+rZiRoNbxr5Sd4ejqV46
+         nhRlPm/myjDvhWE4MN2MVxzYwuZ7RFsbAphhQE7BEu3JACU3xlQrOAT+fQyBNRc6E7LZ
+         Ilt3AFB9EFFoTg+zrMgoXW0JsDhEu3mCHbCmjGmAYwui/plqNF82LtNkD7qiSDhEDFlk
+         /JnnxyqG6HC/3ocketu0HriTITb84ilP1MD2UdCwJxVPDSTBRfoeNCO190JRJLAtmfXM
+         paDg==
+X-Forwarded-Encrypted: i=1; AJvYcCXietN5StGDYZPYiUHqYXsstibbwEwqMwspsS15BIk9diKUpHYEGjaRXs7bnmK/bPq+ieiLYK3WLyfuh24=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyiI3rc4jKu2tjwl3gQoMK+pFHn4/czz3zul/6O+s9e37C8+Jyi
+	v/MbcBiEIAD5sWY0c3igAq6TLP2Caxu5N1kRcmjHZ0gO7dCJL3F3xl8z0TDIUtg=
+X-Gm-Gg: ASbGncsBQuCHH502tBB/TcogKkDgPJ23XNRjjKyQJZGTxo2uKMTb1uaf5rwuKrj15Q3
+	1yHlaQza5Tzkv/Px9Vk6Te1GBEyPFrDRcribdzOjvDiCUIJKa9XnxTc9UglfMRrii+Qsu7iruoG
+	QxMOoDMDJgQmR+rVnKMHeergt3fxgS154cvIwrzKiEGh7s4FsQ+uCOTn7phTX9SMqUUvqH3gRx+
+	5eH27+DFbYqPd4bSxCg63pq1dfUjwSfYX9MKOqR5pdUuMH+MAP98wgRzbRo6DBqeQvsaWpbU1Da
+	Gnqw9uLsRxNeOUc=
+X-Google-Smtp-Source: AGHT+IHCnSIDPuuaeLeVFJyMSspPK+FKiAXgRR0sKtkEv2sUasQGTaTDJbYx14VE6LnD8+r1DExYHA==
+X-Received: by 2002:a05:600c:1603:b0:439:6003:8ac1 with SMTP id 5b1f17b1804b1-43960038b11mr34177115e9.28.1739450233560;
+        Thu, 13 Feb 2025 04:37:13 -0800 (PST)
+Received: from [127.0.1.1] ([86.123.96.125])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4395a1aa741sm47161495e9.31.2025.02.13.04.37.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 Feb 2025 04:37:12 -0800 (PST)
+From: Abel Vesa <abel.vesa@linaro.org>
+Date: Thu, 13 Feb 2025 14:37:05 +0200
+Subject: [PATCH] dt-bindings: crypto: qcom-qce: Document the X1E80100
+ crypto engine
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250212154718.44255-1-ebiggers@kernel.org> <Z61yZjslWKmDGE_t@gondor.apana.org.au>
-In-Reply-To: <Z61yZjslWKmDGE_t@gondor.apana.org.au>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Thu, 13 Feb 2025 11:10:10 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXE+K4XbmxkXwzj9tHE2DP_A5pKLPPFv6+Fa=CtH8rD24Q@mail.gmail.com>
-X-Gm-Features: AWEUYZkVud9S7L-5xo9HDDz6-H1l2qn4wDw7iDL4qi7FjFF8ciQmJoIc0opMONg
-Message-ID: <CAMj1kXE+K4XbmxkXwzj9tHE2DP_A5pKLPPFv6+Fa=CtH8rD24Q@mail.gmail.com>
-Subject: Re: [PATCH v8 0/7] Optimize dm-verity and fsverity using multibuffer hashing
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Eric Biggers <ebiggers@kernel.org>, fsverity@lists.linux.dev, 
-	linux-crypto@vger.kernel.org, dm-devel@lists.linux.dev, x86@kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Sami Tolvanen <samitolvanen@google.com>, Alasdair Kergon <agk@redhat.com>, 
-	Mike Snitzer <snitzer@kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, 
-	Mikulas Patocka <mpatocka@redhat.com>, David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250213-dt-bindings-qcom-qce-x1e80100-v1-1-d17ef73a1c12@linaro.org>
+X-B4-Tracking: v=1; b=H4sIAHDnrWcC/x3MQQqDMBBA0avIrB2YSQmmvUpxYcwkzqKxTaQI4
+ t0Nbj68zT+gSlGp8OoOKPLXqmtu4L6DeZlyEtTQDIaMJcMPDBt6zUFzqvib10+L4M7iiImQ3HO
+ YODrrvYX2+BaJut//93ieFwxE/ChvAAAA
+X-Change-ID: 20250213-dt-bindings-qcom-qce-x1e80100-0897a1f85bb5
+To: Thara Gopinath <thara.gopinath@gmail.com>, 
+ Herbert Xu <herbert@gondor.apana.org.au>, 
+ "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+ Konrad Dybcio <konradybcio@kernel.org>
+Cc: linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org, 
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Abel Vesa <abel.vesa@linaro.org>
+X-Mailer: b4 0.15-dev-dedf8
+X-Developer-Signature: v=1; a=openpgp-sha256; l=976; i=abel.vesa@linaro.org;
+ h=from:subject:message-id; bh=fW7sAMZGzRYFL3koODOtSKxG2i5kLbxepRPq763TAis=;
+ b=owEBbQKS/ZANAwAKARtfRMkAlRVWAcsmYgBnredzuhOx0PfCHwYpuKRbzHl5QJnhG8uSM+zpk
+ K3xJEniYsWJAjMEAAEKAB0WIQRO8+4RTnqPKsqn0bgbX0TJAJUVVgUCZ63ncwAKCRAbX0TJAJUV
+ VpNYEADGwFG5I95EljWZkGby8HB2fYaHTw0zMFf0IZ7940Kn+aCEECtUQY4sOe15R6q5ez+TmaD
+ b9LpSCttPVAnoK+e4WDvZkYyZRGJdBPyxZTff9raXGpDR2/LptFnyAw6xbJjKPB8clDX5rQzSBr
+ w+bGpGaPGk5zwkkIxwUWqPfMqXibCLadauy9r7dCxylQf/lasQIN9wDaS/dPzGjkSfi6It28Qms
+ h+rk24sxs6iUigfti3scl0YCV26SPMAu3dJbDH1JW6OLJTDE7lS8R/mB4hk4HCZp/xdrP/jXxjB
+ d1JJ+4n0rffwqNFf/AxoFBdqUWC1mRoajBtrZWgJPs0MP9rrVrwOCNC0510j78AFPoQG3iByleW
+ gG2ld8ITyJcicpBdGjvHPvEYO5QcYJx0xVlexhPSBTJptWTo3Lf97bmC8FHT699R47A/buvRfr/
+ aSY2xu8/bWToRhUCc9UGBTi5CsGKMFhHvoHe3sJ7F3d33eirQPTJomrAeuU044bKpSbXeYCPE+/
+ fCmB7Uu7xOhXHyu0iJJqupevlfMlb/l9m4LekvtpO5QaXj7LbCGLdbhueiBP1TcLLt2pe/yD2R2
+ N82iPVR7+ycDuXnwyQRje8heY1VtxmN61+FqoFgCVm8nEq2XJbZSsYSmU2HdbXI51/Equ6ArtHJ
+ FFp49f6WbXc5fmg==
+X-Developer-Key: i=abel.vesa@linaro.org; a=openpgp;
+ fpr=6AFF162D57F4223A8770EF5AF7BF214136F41FAE
 
-On Thu, 13 Feb 2025 at 05:17, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> On Wed, Feb 12, 2025 at 07:47:11AM -0800, Eric Biggers wrote:
-> > [ This patchset keeps getting rejected by Herbert, who prefers a
-> >   complex, buggy, and slow alternative that shoehorns CPU-based hashing
-> >   into the asynchronous hash API which is designed for off-CPU offload:
-> >   https://lore.kernel.org/linux-crypto/cover.1730021644.git.herbert@gondor.apana.org.au/
-> >   This patchset is a much better way to do it though, and I've already
-> >   been maintaining it downstream as it would not be reasonable to go the
-> >   asynchronous hash route instead.  Let me know if there are any
-> >   objections to me taking this patchset through the fsverity tree, or at
-> >   least patches 1-5 as the dm-verity patches could go in separately. ]
->
-> Yes I object.  While I very much like this idea of parallel hashing
-> that you're introducing, shoehorning it into shash is restricting
-> this to storage-based users.
->
-> Networking is equally able to benefit from paralell hashing, and
-> parallel crypto (in particular, AEAD) in general.  In fact, both
-> TLS and IPsec can benefit directly from bulk submission instead
-> of the current scheme where a single packet is processed at a time.
->
-> But thanks for the reminder and I will be posting my patches
-> soon.
->
+Document the crypto engine on the X1E80100 Platform.
 
-I have to second Eric here, simply because his work has been ready to
-go for a year now, while you keep rejecting it on the basis that
-you're creating something better, and the only thing you have managed
-to produce in the meantime didn't even work.
+Signed-off-by: Abel Vesa <abel.vesa@linaro.org>
+---
+ Documentation/devicetree/bindings/crypto/qcom-qce.yaml | 1 +
+ 1 file changed, 1 insertion(+)
 
-I strongly urge you to accept Eric's work, and if your approach is
-really superior, it should be fairly easy making that point with
-working code once you get around to producing it, and we can switch
-over the users then.
+diff --git a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
+index 3ed56d9d378e38a7ed3f5cd606c4dc20955194f0..3f35122f7873c2f822772e091cf61814bddfb892 100644
+--- a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
++++ b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
+@@ -55,6 +55,7 @@ properties:
+               - qcom,sm8550-qce
+               - qcom,sm8650-qce
+               - qcom,sm8750-qce
++              - qcom,x1e80100-qce
+           - const: qcom,sm8150-qce
+           - const: qcom,qce
+ 
 
-The increased flexibility you claim your approach will have does not
-mesh with my understanding of where the opportunities for improvement
-are: CPU-based SHA can be tightly interleaved at the instruction level
-to have a performance gain of almost 2x. Designing a more flexible
-ahash based multibuffer API that can still take advantage of this to
-the same extent is not straight-forward, and you going off and cooking
-up something by yourself for months at a time does not inspire
-confidence that this will converge any time soon, if at all.
+---
+base-commit: 7b7a883c7f4de1ee5040bd1c32aabaafde54d209
+change-id: 20250213-dt-bindings-qcom-qce-x1e80100-0897a1f85bb5
 
-Also, your network use case is fairly theoretical, whereas the
-fsverity and dm-verity code runs on 100s of millions of mobile phones
-in the field, so sacrificing any performance of the latter to serve
-the former seems misguided to me.
+Best regards,
+-- 
+Abel Vesa <abel.vesa@linaro.org>
 
-So could you please remove yourself from the critical path here, and
-merge this while we wait for your better alternative to materialize?
-
-Thanks,
-Ard.
