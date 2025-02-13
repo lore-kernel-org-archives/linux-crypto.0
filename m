@@ -1,220 +1,116 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CAA520B7FF;
-	Thu, 13 Feb 2025 10:05:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C39B4211460;
+	Thu, 13 Feb 2025 10:10:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739441119; cv=none; b=HxPVfX6/h/rSVqe3+I1hP1csEadm2J09IJQHcEJsk4kPHxogjwXrj3bL+jxbz4Jl4+24t7VEoPQa9YDxUgAQq0Ut2itLOh28rshRmylpI0Rq/M7CflSDnPclQavDo8+IeNSffSqyq6pkN1MbMAVs5Jqed0q/d3V7GJSn8U8aQNM=
+	t=1739441423; cv=none; b=O2cLktU/ypQMSZvBxBnQ+UznrWnMD7k6ib5cg8eI3QZpBzMxpJPY5vTryX1mwpJEqArDgodk2itubV5OdNfaKN1RBxQu7iKvu8ra27fhAJUZrqYpZ5Lcdf7ohe3dqFKmPvlHYlV4U4cpli78sRkH1VmgCKScLFCOUR20GplWTtA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739441119; c=relaxed/simple;
-	bh=bESPLDr+8nVNncMhL1D53mkVy8OYQrkWgX15UF2J8sc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hshZ+HV54seeTb3oy73VnbyH7VV4dqPzhJ2lBp72C8u35fEwPLlB3zAFocacdUEOVFTMME11PMmFaAglSoBvJ5cUYkAdiLYrEUqxsKfaV42ntOMDz3pHnkGQnEe4S8d19FYE3dZQgwNApZ2dkt3EqOEfZl9d4A9dJifi1f4zwgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LpnldGkJ; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1739441423; c=relaxed/simple;
+	bh=42FVAKglSdA4GCM9HFlOhDKZOpyrLuyiIonz/DiE3L8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TFHKZJ5Fc/rWuU0ijpwao0zkxDmdFi33Rm42+nusNneoEeYuMLIM2nYFbtX6dfLTesl8iewXyRr39v8eX1Hajx/i6SsBhG/YWCt4/b1DIO9CNIdO0jUBLaYXjKedplpVwJWNMT9HI1lpZpjoErCs5ep4p09VZVZw8M/pHQvotNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QduZ+V/D; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LpnldGkJ"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739441117; x=1770977117;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=bESPLDr+8nVNncMhL1D53mkVy8OYQrkWgX15UF2J8sc=;
-  b=LpnldGkJ6iECZducrshW0NyXWQdcfaMyiKCi9cmQrXBjZW77WIxDoGkP
-   T9FEOSQHvVEl6I+Wjnv5g2sHSqvOrM5V6lAfjmH1b50GUzCTqpg5zZjr5
-   6CiKnBZUa05cvGU4y+sZ5shQeMCFqidK6t7rYJ7uWZ85WW3RsNW52tHcp
-   9uml1YfbfzBfRJWEQSathpLFlyB1Qqgp3WropPVxlMxxyST/722LxvbCt
-   aoblcc265e/tl5l2onZ2sLhwrGZOpslzZ98TjIvACExc533pN5Opf/j4G
-   NZPItb9thb5XtFPQplOG2XKsEuWnpbs4c+Cw9oYNqdbZCz2Etd5XnRWYW
-   A==;
-X-CSE-ConnectionGUID: IhIHV3QNQf+m9Z96mxUzuA==
-X-CSE-MsgGUID: K/8lI4+hSmWmktiqrM6TIQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11343"; a="65488301"
-X-IronPort-AV: E=Sophos;i="6.13,282,1732608000"; 
-   d="scan'208";a="65488301"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Feb 2025 02:05:16 -0800
-X-CSE-ConnectionGUID: HQaiDeNsQzaJnXRKxE40dw==
-X-CSE-MsgGUID: pi9aOJ/CQlCXzQxpQOQVMQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,282,1732608000"; 
-   d="scan'208";a="112864987"
-Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
-  by orviesa009.jf.intel.com with ESMTP; 13 Feb 2025 02:05:13 -0800
-Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tiW5m-0016tb-0v;
-	Thu, 13 Feb 2025 10:05:10 +0000
-Date: Thu, 13 Feb 2025 18:04:59 +0800
-From: kernel test robot <lkp@intel.com>
-To: Akhil R <akhilrajeev@nvidia.com>, herbert@gondor.apana.org.au,
-	davem@davemloft.net, thierry.reding@gmail.com, jonathanh@nvidia.com,
-	linux-crypto@vger.kernel.org, linux-tegra@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Akhil R <akhilrajeev@nvidia.com>
-Subject: Re: [PATCH v2 06/10] crypto: tegra: Fix HASH intermediate result
- handling
-Message-ID: <202502131717.CFOwEfqA-lkp@intel.com>
-References: <20250211171713.65770-7-akhilrajeev@nvidia.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QduZ+V/D"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5470AC4CEE6;
+	Thu, 13 Feb 2025 10:10:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739441423;
+	bh=42FVAKglSdA4GCM9HFlOhDKZOpyrLuyiIonz/DiE3L8=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=QduZ+V/DRRjp2YWO++Ujfw3lygiGvik5JyzHxwkbzuCCpkjDQA2xTe9472qCN+Nmm
+	 g8UPJBRO1x11HRM2ivIE8CcqfDWwXrogX25VnK26nn9dKYYSxVlODPp0HlmILK/i/p
+	 ILEi1lvFLnbPFZ1RBFxCyUR9zSS2JVm7RVMD5EUeUO5vRTsL2pHLncYcwgGow9yA1I
+	 mYmv3jE4woQi5p93XX32ny0y8aYTG6xUG+cNojoNuN4gr//3nWs+4xcMdeJ3iK/26I
+	 8RMuhd8w68G4+i9xGt3TiXQciFWBB6LoanAcebArn+JtR6Jr1P+7tTOJogzdZMgjnR
+	 bu3Pc5MrK9oNg==
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-30761be8fa8so7688601fa.2;
+        Thu, 13 Feb 2025 02:10:23 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVb9ccK0jSaxkhh/Z/JG28X1YnieBlj7v1teeXPQSUDgVHWpdiMYy0TNXGEsZwbz6v4QTtUIBsQDgb7XQE=@vger.kernel.org, AJvYcCWwFS3C1M4aQO6e0+Lhko+k8b/2Ynh5vLNblv0uy1C9YACKr3uKEOd1JjoKYmenK63Cip6IjhpSbOVBedJg@vger.kernel.org, AJvYcCXkErUz+niTcjgSykqpjHaNOPza3lLBKX/cGQk69QtymOuEmGhR7/fDwAJ+tmS14z+4KEQusWXO@vger.kernel.org
+X-Gm-Message-State: AOJu0YyeNyQIcl6lazNEFA7UknbxtWuvkGdUaZBK9suLluzkeub6fGxn
+	Q9hKQjvF0R0J1kNXaGnIIWPS0Nlx8GCzePS5WhxjBKEiAq7rDsjVzz1ZtOSt5NgebHgdhHTupR9
+	GJEyU4gmtZkeCAksstJRigUD4CmI=
+X-Google-Smtp-Source: AGHT+IHR+xr20cYmx6lgB9lVJM3c3+XAiEna+ZFlbjgJt6DHiy1GJEpnHOR+KpKMxfjEGw7dyQYgQ9iz1/SKleqfvSQ=
+X-Received: by 2002:a05:6512:159b:b0:545:4d1:64c0 with SMTP id
+ 2adb3069b0e04-5451dd9e2admr736305e87.27.1739441421532; Thu, 13 Feb 2025
+ 02:10:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250211171713.65770-7-akhilrajeev@nvidia.com>
+References: <20250212154718.44255-1-ebiggers@kernel.org> <Z61yZjslWKmDGE_t@gondor.apana.org.au>
+In-Reply-To: <Z61yZjslWKmDGE_t@gondor.apana.org.au>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Thu, 13 Feb 2025 11:10:10 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXE+K4XbmxkXwzj9tHE2DP_A5pKLPPFv6+Fa=CtH8rD24Q@mail.gmail.com>
+X-Gm-Features: AWEUYZkVud9S7L-5xo9HDDz6-H1l2qn4wDw7iDL4qi7FjFF8ciQmJoIc0opMONg
+Message-ID: <CAMj1kXE+K4XbmxkXwzj9tHE2DP_A5pKLPPFv6+Fa=CtH8rD24Q@mail.gmail.com>
+Subject: Re: [PATCH v8 0/7] Optimize dm-verity and fsverity using multibuffer hashing
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Eric Biggers <ebiggers@kernel.org>, fsverity@lists.linux.dev, 
+	linux-crypto@vger.kernel.org, dm-devel@lists.linux.dev, x86@kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Sami Tolvanen <samitolvanen@google.com>, Alasdair Kergon <agk@redhat.com>, 
+	Mike Snitzer <snitzer@kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, 
+	Mikulas Patocka <mpatocka@redhat.com>, David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Akhil,
+On Thu, 13 Feb 2025 at 05:17, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> On Wed, Feb 12, 2025 at 07:47:11AM -0800, Eric Biggers wrote:
+> > [ This patchset keeps getting rejected by Herbert, who prefers a
+> >   complex, buggy, and slow alternative that shoehorns CPU-based hashing
+> >   into the asynchronous hash API which is designed for off-CPU offload:
+> >   https://lore.kernel.org/linux-crypto/cover.1730021644.git.herbert@gondor.apana.org.au/
+> >   This patchset is a much better way to do it though, and I've already
+> >   been maintaining it downstream as it would not be reasonable to go the
+> >   asynchronous hash route instead.  Let me know if there are any
+> >   objections to me taking this patchset through the fsverity tree, or at
+> >   least patches 1-5 as the dm-verity patches could go in separately. ]
+>
+> Yes I object.  While I very much like this idea of parallel hashing
+> that you're introducing, shoehorning it into shash is restricting
+> this to storage-based users.
+>
+> Networking is equally able to benefit from paralell hashing, and
+> parallel crypto (in particular, AEAD) in general.  In fact, both
+> TLS and IPsec can benefit directly from bulk submission instead
+> of the current scheme where a single packet is processed at a time.
+>
+> But thanks for the reminder and I will be posting my patches
+> soon.
+>
 
-kernel test robot noticed the following build warnings:
+I have to second Eric here, simply because his work has been ready to
+go for a year now, while you keep rejecting it on the basis that
+you're creating something better, and the only thing you have managed
+to produce in the meantime didn't even work.
 
-[auto build test WARNING on herbert-crypto-2.6/master]
-[also build test WARNING on herbert-cryptodev-2.6/master linus/master v6.14-rc2 next-20250213]
-[cannot apply to tegra/for-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+I strongly urge you to accept Eric's work, and if your approach is
+really superior, it should be fairly easy making that point with
+working code once you get around to producing it, and we can switch
+over the users then.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Akhil-R/crypto-tegra-Use-separate-buffer-for-setkey/20250212-012434
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git master
-patch link:    https://lore.kernel.org/r/20250211171713.65770-7-akhilrajeev%40nvidia.com
-patch subject: [PATCH v2 06/10] crypto: tegra: Fix HASH intermediate result handling
-config: i386-buildonly-randconfig-002-20250213 (https://download.01.org/0day-ci/archive/20250213/202502131717.CFOwEfqA-lkp@intel.com/config)
-compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250213/202502131717.CFOwEfqA-lkp@intel.com/reproduce)
+The increased flexibility you claim your approach will have does not
+mesh with my understanding of where the opportunities for improvement
+are: CPU-based SHA can be tightly interleaved at the instruction level
+to have a performance gain of almost 2x. Designing a more flexible
+ahash based multibuffer API that can still take advantage of this to
+the same extent is not straight-forward, and you going off and cooking
+up something by yourself for months at a time does not inspire
+confidence that this will converge any time soon, if at all.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202502131717.CFOwEfqA-lkp@intel.com/
+Also, your network use case is fairly theoretical, whereas the
+fsverity and dm-verity code runs on 100s of millions of mobile phones
+in the field, so sacrificing any performance of the latter to serve
+the former seems misguided to me.
 
-All warnings (new ones prefixed by >>):
+So could you please remove yourself from the critical path here, and
+merge this while we wait for your better alternative to materialize?
 
-   In file included from drivers/crypto/tegra/tegra-se-hash.c:8:
-   In file included from include/linux/dma-mapping.h:8:
-   In file included from include/linux/scatterlist.h:8:
-   In file included from include/linux/mm.h:2223:
-   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
->> drivers/crypto/tegra/tegra-se-hash.c:343:22: warning: format specifies type 'unsigned long' but the argument has type 'ssize_t' (aka 'int') [-Wformat]
-     342 |         dev_dbg(se->dev, "msg len %llu msg left %llu sz %lu cfg %#x",
-         |                                                         ~~~
-         |                                                         %zd
-     343 |                 msg_len, msg_left, rctx->datbuf.size, rctx->config);
-         |                                    ^~~~~~~~~~~~~~~~~
-   include/linux/dev_printk.h:165:39: note: expanded from macro 'dev_dbg'
-     165 |         dynamic_dev_dbg(dev, dev_fmt(fmt), ##__VA_ARGS__)
-         |                                      ~~~     ^~~~~~~~~~~
-   include/linux/dynamic_debug.h:274:19: note: expanded from macro 'dynamic_dev_dbg'
-     274 |                            dev, fmt, ##__VA_ARGS__)
-         |                                 ~~~    ^~~~~~~~~~~
-   include/linux/dynamic_debug.h:250:59: note: expanded from macro '_dynamic_func_call'
-     250 |         _dynamic_func_call_cls(_DPRINTK_CLASS_DFLT, fmt, func, ##__VA_ARGS__)
-         |                                                                  ^~~~~~~~~~~
-   include/linux/dynamic_debug.h:248:65: note: expanded from macro '_dynamic_func_call_cls'
-     248 |         __dynamic_func_call_cls(__UNIQUE_ID(ddebug), cls, fmt, func, ##__VA_ARGS__)
-         |                                                                        ^~~~~~~~~~~
-   include/linux/dynamic_debug.h:224:15: note: expanded from macro '__dynamic_func_call_cls'
-     224 |                 func(&id, ##__VA_ARGS__);                       \
-         |                             ^~~~~~~~~~~
-   drivers/crypto/tegra/tegra-se-hash.c:701:6: warning: unused variable 'ret' [-Wunused-variable]
-     701 |         int ret;
-         |             ^~~
-   3 warnings generated.
-
-
-vim +343 drivers/crypto/tegra/tegra-se-hash.c
-
-   265	
-   266	static int tegra_sha_prep_cmd(struct tegra_sha_ctx *ctx, u32 *cpuvaddr,
-   267				      struct tegra_sha_reqctx *rctx)
-   268	{
-   269		struct tegra_se *se = ctx->se;
-   270		u64 msg_len, msg_left;
-   271		int i = 0;
-   272	
-   273		msg_len = rctx->total_len * 8;
-   274		msg_left = rctx->datbuf.size * 8;
-   275	
-   276		/*
-   277		 * If IN_ADDR_HI_0.SZ > SHA_MSG_LEFT_[0-3] to the HASH engine,
-   278		 * HW treats it as the last buffer and process the data.
-   279		 * Therefore, add an extra byte to msg_left if it is not the
-   280		 * last buffer.
-   281		 */
-   282		if (rctx->task & SHA_UPDATE) {
-   283			msg_left += 8;
-   284			msg_len += 8;
-   285		}
-   286	
-   287		cpuvaddr[i++] = host1x_opcode_setpayload(8);
-   288		cpuvaddr[i++] = se_host1x_opcode_incr_w(SE_SHA_MSG_LENGTH);
-   289		cpuvaddr[i++] = lower_32_bits(msg_len);
-   290		cpuvaddr[i++] = upper_32_bits(msg_len);
-   291		cpuvaddr[i++] = 0;
-   292		cpuvaddr[i++] = 0;
-   293		cpuvaddr[i++] = lower_32_bits(msg_left);
-   294		cpuvaddr[i++] = upper_32_bits(msg_left);
-   295		cpuvaddr[i++] = 0;
-   296		cpuvaddr[i++] = 0;
-   297		cpuvaddr[i++] = host1x_opcode_setpayload(2);
-   298		cpuvaddr[i++] = se_host1x_opcode_incr_w(SE_SHA_CFG);
-   299		cpuvaddr[i++] = rctx->config;
-   300	
-   301		if (rctx->task & SHA_FIRST) {
-   302			cpuvaddr[i++] = SE_SHA_TASK_HASH_INIT;
-   303			rctx->task &= ~SHA_FIRST;
-   304		} else {
-   305			/*
-   306			 * If it isn't the first task, program the HASH_RESULT register
-   307			 * with the intermediate result from the previous task
-   308			 */
-   309			i += tegra_se_insert_hash_result(ctx, cpuvaddr + i, rctx);
-   310		}
-   311	
-   312		cpuvaddr[i++] = host1x_opcode_setpayload(4);
-   313		cpuvaddr[i++] = se_host1x_opcode_incr_w(SE_SHA_IN_ADDR);
-   314		cpuvaddr[i++] = rctx->datbuf.addr;
-   315		cpuvaddr[i++] = (u32)(SE_ADDR_HI_MSB(upper_32_bits(rctx->datbuf.addr)) |
-   316					SE_ADDR_HI_SZ(rctx->datbuf.size));
-   317	
-   318		if (rctx->task & SHA_UPDATE) {
-   319			cpuvaddr[i++] = rctx->intr_res.addr;
-   320			cpuvaddr[i++] = (u32)(SE_ADDR_HI_MSB(upper_32_bits(rctx->intr_res.addr)) |
-   321						SE_ADDR_HI_SZ(rctx->intr_res.size));
-   322		} else {
-   323			cpuvaddr[i++] = rctx->digest.addr;
-   324			cpuvaddr[i++] = (u32)(SE_ADDR_HI_MSB(upper_32_bits(rctx->digest.addr)) |
-   325						SE_ADDR_HI_SZ(rctx->digest.size));
-   326		}
-   327	
-   328		if (rctx->key_id) {
-   329			cpuvaddr[i++] = host1x_opcode_setpayload(1);
-   330			cpuvaddr[i++] = se_host1x_opcode_nonincr_w(SE_SHA_CRYPTO_CFG);
-   331			cpuvaddr[i++] = SE_AES_KEY_INDEX(rctx->key_id);
-   332		}
-   333	
-   334		cpuvaddr[i++] = host1x_opcode_setpayload(1);
-   335		cpuvaddr[i++] = se_host1x_opcode_nonincr_w(SE_SHA_OPERATION);
-   336		cpuvaddr[i++] = SE_SHA_OP_WRSTALL | SE_SHA_OP_START |
-   337				SE_SHA_OP_LASTBUF;
-   338		cpuvaddr[i++] = se_host1x_opcode_nonincr(host1x_uclass_incr_syncpt_r(), 1);
-   339		cpuvaddr[i++] = host1x_uclass_incr_syncpt_cond_f(1) |
-   340				host1x_uclass_incr_syncpt_indx_f(se->syncpt_id);
-   341	
-   342		dev_dbg(se->dev, "msg len %llu msg left %llu sz %lu cfg %#x",
- > 343			msg_len, msg_left, rctx->datbuf.size, rctx->config);
-   344	
-   345		return i;
-   346	}
-   347	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks,
+Ard.
