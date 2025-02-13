@@ -1,52 +1,54 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E116205E06;
-	Thu, 13 Feb 2025 04:09:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C56770810;
+	Thu, 13 Feb 2025 04:17:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739419757; cv=none; b=djiKJl5NRa7sf5VmgKwDVPsC50xo2fpSCXugRrZl3BKb1x7HdEW59cTEew3iIfG0VoqS+8g8ebLwCDLZtM2ovLgdg0pXvglWl62vgfnFuGStudg+WTJ7OUM6AV1p3uerouBaaAcdyaebcXzrttuisqq9Y4Auem80984j9LkCGFI=
+	t=1739420270; cv=none; b=Ti2I1reFwaA993tcx0/gd3Y11aV/xT2uEP2Vn07uCJjv4F4mW6Fodokx9gKX6y+j657FHgIKGMtAPGCIEODxvwASkZrhxk3SjvocYVoTI0uuzeB4vqVJ5wyppbSlUjZBIQ/ScYfEN52X+L5zhACTGfYYDhScU08KJrGOQsGcM9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739419757; c=relaxed/simple;
-	bh=Wcl938ZKvkUh4XqOPIJ+fJuG7yca7zh5/sesrLOC8Ds=;
+	s=arc-20240116; t=1739420270; c=relaxed/simple;
+	bh=2vwtRaY8rOUQYf6eoQ/uOWinMGiyPsh+rWgpCkv21aM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=shZ3e5pf1A8vjZTk12sJm23yWUHFdMdnh06gN7hrwqlXwMM3kwK0MTXnH/YlGH+tbFG7qE3AFJ6CIU5oSELz/28NR3+BEwXnOZ9czed1Vckp2hvdNMCwLtK6gnwfCXZu2xCSWCiRIVxNzgJjDoNDgUb8jruFdVtpECCw3a4ajXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=njljT/FO; arc=none smtp.client-ip=144.6.53.87
+	 Content-Type:Content-Disposition:In-Reply-To; b=LmVRHWW6232Der1AGCn6oExEds2ffc8Z9lU8Z2ZvL4lcj8ax7E9S6AZQ76pQS+4BXcvSUQ7NWNfm3kinE3uHX+1gg73WzwTKsY2wrQbwbvjf5cIbJUABXz2YOzR8UIWn19Rvqz63jUA9ZHOU7aDbK+nmtvF4TUsdjZslJbUs4EI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=TaY0sHpQ; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="njljT/FO"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="TaY0sHpQ"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
 	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=lCsvZsTofR4Py2O1aHZXrInHbqtjddVUbWlHMZBzL2E=; b=njljT/FO3VhAs4Z7hgp84SYXrC
-	NHO8Rr9WAKnUOA5kx8JrAKiv1KI9adSWNUy6UCXgDw2WTgTJON95Ef1FX/3w/LJkTJDa46XmriQG7
-	jJvfboAtFTuNXQ+GcSF3oYMafeZyydsV9Dx9bpmvf1fPYsS5/LZU3/TAKXROUTjAB62yCW+zRr77m
-	b1u5qiECdajoOi/ImW+huUQzlkiFNb1g9w7qd0k7h6EinT2NWdC/nis4GPt2CniY79FIizsmYbHIz
-	zd/8uCBuCRyoioveY7bMHNnoeW0FSDS5k8c0gef2rvZFmfvZpoIq4N1+eZTMX1AIFvCJxymy0Fzk4
-	LMDwy5Lg==;
+	bh=RgLeQjspT74MnPRQdy/BnqqUlzDaDSRUeORQX7ILuZ4=; b=TaY0sHpQhYJBJrGuUjHmblyVsO
+	3nfjIPVNgsz8aIXvokaa92wEtUvu6saTV3ZV/dCn6ESly8nM5nUtYyd+mOiS0dRnM9UXsjdfzQqOz
+	zT/JPVvmkDkVqNUaKciZW/VOCHjwe1SoFFjtIazL8O01ndlR1Z3IJSj2h9FBnbxlz5Uf4WSA/Etzq
+	PaBGIc6KQx4hJc3RFBkEtZqr/uN1GFAbjE/NKD7pUsIxJwXlocDPZPiU6fgkZRV2a7NouI4rmyALJ
+	fyw5cZu+GkRkbLvb5bVRSt3t8ga5fv8vo8ter49SAHAAnishj/tIELSXsclqrf15tkeHsv7MlxCqX
+	DeyzhKxg==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tiQK4-00HUsx-0x;
-	Thu, 13 Feb 2025 12:08:54 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 13 Feb 2025 12:08:53 +0800
-Date: Thu, 13 Feb 2025 12:08:53 +0800
+	id 1tiQSb-00HUzh-1W;
+	Thu, 13 Feb 2025 12:17:43 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 13 Feb 2025 12:17:42 +0800
+Date: Thu, 13 Feb 2025 12:17:42 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Harald Freudenberger <freude@linux.ibm.com>
-Cc: Eric Biggers <ebiggers@kernel.org>, davem@davemloft.net,
-	dengler@linux.ibm.com, linux-s390@vger.kernel.org,
-	linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v10 2/5] s390/crypto: New s390 specific protected key
- hash phmac
-Message-ID: <Z61wVdSjgnRr7uaX@gondor.apana.org.au>
-References: <20250115162231.83516-1-freude@linux.ibm.com>
- <20250115162231.83516-3-freude@linux.ibm.com>
- <Z6hrvQzb5G_wqlni@gondor.apana.org.au>
- <20250209163430.GB1230@sol.localdomain>
- <9971160da17b1d18d4bdc87fc1297fda@linux.ibm.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: fsverity@lists.linux.dev, linux-crypto@vger.kernel.org,
+	dm-devel@lists.linux.dev, x86@kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH v8 0/7] Optimize dm-verity and fsverity using multibuffer
+ hashing
+Message-ID: <Z61yZjslWKmDGE_t@gondor.apana.org.au>
+References: <20250212154718.44255-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -55,37 +57,30 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9971160da17b1d18d4bdc87fc1297fda@linux.ibm.com>
+In-Reply-To: <20250212154718.44255-1-ebiggers@kernel.org>
 
-On Wed, Feb 12, 2025 at 12:17:46PM +0100, Harald Freudenberger wrote:
->
-> There are other downsides with the asynch implementations:
-> They are much more complex and thus expensive and - how the hell can a
-> test cover all the code branches?
+On Wed, Feb 12, 2025 at 07:47:11AM -0800, Eric Biggers wrote:
+> [ This patchset keeps getting rejected by Herbert, who prefers a
+>   complex, buggy, and slow alternative that shoehorns CPU-based hashing
+>   into the asynchronous hash API which is designed for off-CPU offload:
+>   https://lore.kernel.org/linux-crypto/cover.1730021644.git.herbert@gondor.apana.org.au/
+>   This patchset is a much better way to do it though, and I've already
+>   been maintaining it downstream as it would not be reasonable to go the
+>   asynchronous hash route instead.  Let me know if there are any
+>   objections to me taking this patchset through the fsverity tree, or at
+>   least patches 1-5 as the dm-verity patches could go in separately. ]
 
-I think rather than writing an ahash algorithm from scratch,
-this could be done in a way similar to the simd wrapper.
+Yes I object.  While I very much like this idea of parallel hashing
+that you're introducing, shoehorning it into shash is restricting
+this to storage-based users.
 
-In fact, forget about phmac for the moment, and please fix
-the one that's already in the kernel: paes.
+Networking is equally able to benefit from paralell hashing, and
+parallel crypto (in particular, AEAD) in general.  In fact, both
+TLS and IPsec can benefit directly from bulk submission instead
+of the current scheme where a single packet is processed at a time.
 
-Under the simd model, you turn paes into an internal algorithm
-that is always synchronous.  In the exceptional case, you return
-an error so that the wrapper can then enter the async path.
-
-The wrapper handles all the complexities of the async path and
-hides it from the actual paes code.
-
-> Next is the thing with the CRYPTO_ALG_ALLOCATES_MEMORY flag. If I
-> want to have a hash implementation usable for dm-integrity the alg
-> implementation must NOT set this flag and must not allocate any memory
-> during crypto operations (includung setkey()). As of now I am still not
-> through with the phmac code for this. And I only have a faint idea on
-> how to implement this on the pkey and maybe zcrypt code...
-
-Why do you need to allocate memory? If anything ahash makes this
-slightly easier since you can allocate your own memory beforehand
-through the request object.
+But thanks for the reminder and I will be posting my patches
+soon.
 
 Cheers,
 -- 
