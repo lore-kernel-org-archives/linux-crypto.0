@@ -1,129 +1,91 @@
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C5971519BF;
-	Fri, 14 Feb 2025 16:46:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65354245002
+	for <linux-crypto@vger.kernel.org>; Fri, 14 Feb 2025 16:50:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739551581; cv=none; b=uVc3s7BBkLX6D65sXFUwUZlx3uXNKwjdYKXMQU7dT8D1NKvCYA3vFulIULH3pNDM920RE5HJxxJvDYoLTyz0NuOxJxvRnO/BDrhKymoh3i4OncK6bbmRwZuMNbJyAAyNwxCvrjrtbwf8DZPqbVQcIoPWUG1IW9txv1PD3xvYgJU=
+	t=1739551812; cv=none; b=TUO+j71lY+tTHflwms50XOMEUTOAIOqtFgATYn8xRaVIqJarBpLLFQpv+AZIF/KlNK1z8R15G9EJZB5k7PlruqmZ5LPy/tDxqkVGu9AQfNk+sRfOo12X8p9w9//ztMtKi6/fUrvbURvJzpjDFnr4SEBy6hGDMx37U5bdZqQjTEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739551581; c=relaxed/simple;
-	bh=zG4mJe4owvwGLwC906K8suHMoRJnspdnmPqfvRkK3NQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=E2fLxbS2SVq9gN4TfngIvDohd4zSYDbE3mO6216v69p6DKZDNwjfMANEs2oE/TuJT7PNncCkKRhwrcErbUrrcSkly15dHqMRm6LFerjTpHXvnpHKq4BC8RJWeh+V4pf4oHGgUYrgUo6h4TuJk5sZGzcvVm6EkuGDg0Z45nqERuk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fAQePg0K; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1739551812; c=relaxed/simple;
+	bh=gPoxK90B3Kqc/vZW7WBculCQBSTvt/GSpX4CcAVf7Pw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dA17LpF9VKbVNAu+hfie4ZKPLoZfiqJM2e4jYgrnDORhneiMcG3DpbiX2tRLcrzFqXjS+s1eey5CjhOzBg7oOpv3mm4S+fq0TqrSVI6N4JL0RodCrsCWpXNI0/h3X8jGNyCu4e61kfqMkUR8OFK27BOd2SceCxxkjtyWwEugGMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Yx/RAmga; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fAQePg0K"
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-38f2cb1ba55so773553f8f.3;
-        Fri, 14 Feb 2025 08:46:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739551578; x=1740156378; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gEUK7M60lRQardXDr3rcqI3xJ8vpCF/l2APWaA9DFUQ=;
-        b=fAQePg0KX/ovVhCMZ0a0eWgYfWs09N7n+zg5KUef6HHZyHU8w04QcvECStOaCR2fzz
-         Es1d15DrFhH3leuNL6UgqVCS7KM4z9HhHOXeI0Q8CAUwxWYMv3Ft65K1T8dFqwUcJdwq
-         DLvV3yQrlE3EUy6xjXz97sWNjcRqPAqYe0rwkHCDSYp+o8q2rXU3fjPNHPdyrVZmygdp
-         O/6/e9IXBMKHVhat9MEvYqWp3z9WXlAiQVPGs5XokGF03VVav3LZWhJihP5fGt3CRUpc
-         iTEXDr9wIorIOYtT51yyOPWqhVrY6pweF1xk5MER35qwSzTHD0pTo5k9PH1fxJ/UVSFV
-         X8SA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739551578; x=1740156378;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gEUK7M60lRQardXDr3rcqI3xJ8vpCF/l2APWaA9DFUQ=;
-        b=k8jzEi6F56iJh0VK7/bS+3NajblSXXUBZwqpvwSzPuOuNBb67lVV3fpkLRTkeSjPb9
-         SF52znbSRbyiUduT/yIHNxAm4wzBmPDZsEf4SLM/e2feyiTNfXig8G0PGkwZ2BO47jlr
-         jqEDJrcy6//hwdIJ7fDYfx14ynzhFuazqatxQO0dJpW0Y8YPiFO8fCG3ke6vSv/dko9J
-         OpFVlLUdcPtbmMynqkgTjJ8NScXFd5ukj5NyMArfYjhH2Hy9U7oNz4olPAA7Pio8OeIy
-         B7e6nkySDaS8db+yPLxHAenQihBc6l+FdsEhxAcYHhplK5pzvZwQ+rZxC9o6hIIrhYDT
-         9o7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU1Zdf4fBVlHK4MWugJ3uWNrK/6LYsdisHmoQd/eQbGkX45DmvSmTAKKSYns2ZJCmYah2WA+9gD4rrs@vger.kernel.org, AJvYcCUCipk2X2XIUx4bwULHfKHsyg7BZ7jE2dopU0Mx76UNvPinPWVWokDfpkH3J5Ru5+YN45G3kDcj3GarSOk=@vger.kernel.org, AJvYcCW94QmidKbb4EAIYCxoJ6WFdFfphEZUWq1Pb48fxT2WnYYDdaAG8zCC/e5f8OwZDu46t1k8YUXycNHtugxc@vger.kernel.org, AJvYcCWUnYeT4YAMPkZk9iXPjUdD3dzYhibvKlEMhiCJvASijQpTqnm5CqnfW88vt0RpmhEOG5EfVYHiDxB8xQ==@vger.kernel.org, AJvYcCXcyrRMBaNkIj4TtTGTLNJHOU+JOldthbJCzqOmOCLvDhtrfFiV81q00Vu2/8lUscItKyn3/OqMfIxqarZC@vger.kernel.org, AJvYcCXp0hc5zxzMMiqpke7GnkmBF6fQkaGeNz77VgBNllSU5tOLcFJfg5ZVJLHzpIT2jR2AO6M4DaJAQ50=@vger.kernel.org, AJvYcCXxkXzKOxN7C5ZAjCGD+BEgf2MNITMB19al2ORgPOmX2voSMRPUTo1IahPD/kkOPzFCGsZ5HaGBR1DY5kHwKzlyFn4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZnjVNulkh2ccbDW1uzVPKGXZs9P508aO2X9SsbSOkHaJweMFy
-	qnuMcwHBOkFw34QmLWcUlJeNCY5SEVk5ZBdIno1bJNDzNYQU4Ds6
-X-Gm-Gg: ASbGncsH1SidTUEuD7ilwDGry6lKGCScU4XnhALYjwa1FsbszV4KCFH1vrewtWNxp7A
-	0WdAsy9jz2Ts4xV5kkMgurcG+J27hJIev/HtNaqdELz49XkKKctQegj7p4x90PYO4lyZLEZycdM
-	rTCxvSEzj1iDUDxRk8HvPw5CelTViuqSqq9uXP8SJ7PDAv+liyDFydAaRvTelK6ZryBZ90zScUy
-	m2H8pLodAUFH/l7uNdztbI1C4ZgDvKXQAOMmU416y6yTdcwapRnEFdhqNQI/F8tuzPMV5EcUiaf
-	k3v8fbD1R7+Y3uEZlKpKECCCpanVwyk8Rb8AsBJw3yprdlZqFRItMQ==
-X-Google-Smtp-Source: AGHT+IG9iRvkwD2Pnjr513qQIYSAcwjpWUdTSopHyr3FX8/GpCTlATk6Kd4aSQlT7eXs7Bpa1c1skw==
-X-Received: by 2002:a05:6000:1f81:b0:38f:2173:b7b7 with SMTP id ffacd0b85a97d-38f2173b9aemr11306900f8f.18.1739551577421;
-        Fri, 14 Feb 2025 08:46:17 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f259f8217sm5125878f8f.90.2025.02.14.08.46.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 Feb 2025 08:46:17 -0800 (PST)
-Date: Fri, 14 Feb 2025 16:46:14 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Geert Uytterhoeven <geert+renesas@glider.be>, Michael Turquette
- <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, Nicolas Ferre
- <nicolas.ferre@microchip.com>, Alexandre Belloni
- <alexandre.belloni@bootlin.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Giovanni Cabiddu <giovanni.cabiddu@intel.com>, Herbert Xu
- <herbert@gondor.apana.org.au>, David Miller <davem@davemloft.net>, Linus
- Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>,
- Joel Stanley <joel@jms.id.au>, Andrew Jeffery
- <andrew@codeconstruct.com.au>, Crt Mori <cmo@melexis.com>, Jonathan Cameron
- <jic23@kernel.org>, Lars-Peter Clausen <lars@metafoo.de>, Jacky Huang
- <ychuang3@nuvoton.com>, Shan-Chun Hung <schung@nuvoton.com>, Yury Norov
- <yury.norov@gmail.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Johannes
- Berg <johannes@sipsolutions.net>, Alex Elder <elder@ieee.org>, Vincent
- Mailhol <mailhol.vincent@wanadoo.fr>, linux-clk@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-renesas-soc@vger.kernel.org,
- linux-crypto@vger.kernel.org, qat-linux@intel.com,
- linux-gpio@vger.kernel.org, linux-aspeed@lists.ozlabs.org,
- linux-iio@vger.kernel.org, linux-sound@vger.kernel.org,
- linux-kernel@vger.kernel.org, Jonathan Cameron
- <Jonathan.Cameron@huawei.com>
-Subject: Re: [PATCH treewide v3 2/4] bitfield: Add non-constant
- field_{prep,get}() helpers
-Message-ID: <20250214164614.29bbc620@pumpkin>
-In-Reply-To: <20250214073402.0129e259@kernel.org>
-References: <cover.1739540679.git.geert+renesas@glider.be>
-	<2d30e5ffe70ce35f952b7d497d2959391fbf0580.1739540679.git.geert+renesas@glider.be>
-	<20250214073402.0129e259@kernel.org>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Yx/RAmga"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739551811; x=1771087811;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=gPoxK90B3Kqc/vZW7WBculCQBSTvt/GSpX4CcAVf7Pw=;
+  b=Yx/RAmgaJ1QP8f7Ude3bCKBtniLFw3Y9ztHpFRkIt9qW47pVIYU+2VVl
+   11EmAEDZhT+B1Z7o0BvzI43nJ7Oq1rbnjGXklPsOEvZTjY/YRxIVDeWAd
+   IW32AcdZjy31+d2fRA5y2/ycdzHJybrJ9MHUbZKHfC4KPx+inll234qd+
+   YTbtKuOYmebSipWVGeAEV6Oa+sxKV4cAHmfE1rSYdt3fFWrHH4cVg51Ab
+   AZlsDKHDZaemy/gnHl0nRjVvq+VkJ20ucbME4ZEVWUJqFgvuazcH2CKFm
+   vv5jNlrlgdIq34nH152cXAfYLY3a6yxXbJtJgVQrZxuSbKM5EqJxlZG4g
+   w==;
+X-CSE-ConnectionGUID: XJpqCs7yQ7i76fSf4uScew==
+X-CSE-MsgGUID: oxIIFgspROmwvFHiaB6+og==
+X-IronPort-AV: E=McAfee;i="6700,10204,11345"; a="43959785"
+X-IronPort-AV: E=Sophos;i="6.13,286,1732608000"; 
+   d="scan'208";a="43959785"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Feb 2025 08:50:10 -0800
+X-CSE-ConnectionGUID: eXqy6qltQUmMeAyMvQMxfA==
+X-CSE-MsgGUID: 9cZJbrWtSD2DkVfsl0y9Bg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="118126351"
+Received: from unknown (HELO silpixa00400314.ger.corp.intel.com) ([10.237.223.156])
+  by fmviesa005.fm.intel.com with ESMTP; 14 Feb 2025 08:49:20 -0800
+From: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+To: herbert@gondor.apana.org.au
+Cc: linux-crypto@vger.kernel.org,
+	andriy.shevchenko@intel.com,
+	qat-linux@intel.com,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH 0/2] crypto: qat - refactor service parsing logic
+Date: Fri, 14 Feb 2025 16:40:41 +0000
+Message-ID: <20250214164855.64851-2-giovanni.cabiddu@intel.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Organization: Intel Research and Development Ireland Ltd - Co. Reg. #308263 - Collinstown Industrial Park, Leixlip, County Kildare - Ireland
+Content-Transfer-Encoding: 8bit
 
-On Fri, 14 Feb 2025 07:34:02 -0800
-Jakub Kicinski <kuba@kernel.org> wrote:
+This small series refactors the service parsing logic in the QAT driver
+by replacing hard-coded service strings with a more flexible approach.
 
-> On Fri, 14 Feb 2025 14:55:51 +0100 Geert Uytterhoeven wrote:
-> > The existing FIELD_{GET,PREP}() macros are limited to compile-time
-> > constants.  However, it is very common to prepare or extract bitfield
-> > elements where the bitfield mask is not a compile-time constant.
-> > 
-> > To avoid this limitation, the AT91 clock driver and several other
-> > drivers already have their own non-const field_{prep,get}() macros.
-> > Make them available for general use by consolidating them in
-> > <linux/bitfield.h>, and improve them slightly:
-> >   1. Avoid evaluating macro parameters more than once,
-> >   2. Replace "ffs() - 1" by "__ffs()",
-> >   3. Support 64-bit use on 32-bit architectures.
-> > 
-> > This is deliberately not merged into the existing FIELD_{GET,PREP}()
-> > macros, as people expressed the desire to keep stricter variants for
-> > increased safety, or for performance critical paths.  
-> 
-> I really really think that people should just use the static inline
-> helpers if the field is not constant. And we should do something like
-> below so that people can actually find them.
+The first patch removes an unnecessary export. The second patch reworks
+the service parsing logic to allow being extended in future.
 
-Especially since you really don't want to be calling ffs() on variables.
+Giovanni Cabiddu (1):
+  crypto: qat - do not export adf_cfg_services
 
-Much better to have saved the low bit and field width/mask.
+Małgorzata Mielnik (1):
+  crypto: qat - refactor service parsing logic
 
-	David
+ .../intel/qat/qat_420xx/adf_420xx_hw_data.c   |  16 +-
+ .../intel/qat/qat_4xxx/adf_4xxx_hw_data.c     |  11 +-
+ .../intel/qat/qat_common/adf_accel_devices.h  |   1 +
+ .../intel/qat/qat_common/adf_cfg_services.c   | 167 +++++++++++++++---
+ .../intel/qat/qat_common/adf_cfg_services.h   |  26 ++-
+ .../intel/qat/qat_common/adf_cfg_strings.h    |   6 +-
+ .../intel/qat/qat_common/adf_gen4_config.c    |  15 +-
+ .../intel/qat/qat_common/adf_gen4_hw_data.c   |  26 ++-
+ .../intel/qat/qat_common/adf_gen4_hw_data.h   |   1 +
+ .../crypto/intel/qat/qat_common/adf_sysfs.c   |  12 +-
+ 10 files changed, 202 insertions(+), 79 deletions(-)
+
+-- 
+2.48.1
+
