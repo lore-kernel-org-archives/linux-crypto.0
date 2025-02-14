@@ -1,161 +1,102 @@
-Received: from mail-ua1-f46.google.com (mail-ua1-f46.google.com [209.85.222.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC0DA2566D9;
-	Fri, 14 Feb 2025 10:28:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12FBB245B0B;
+	Fri, 14 Feb 2025 10:51:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739528909; cv=none; b=mj6mTPPMApo8pLe1pqx3U+58+BtMLbOpVEOcCbSNpUDoqL1DxJLLIGCn5HL/wFtdnrdWFONWSRcrhiw4H0+O+wHQruKfGl6JOwMasaRw2X0WMMu8XhseNdeAaHqkDggTUVKfrbsa1fMHyMj0ShlIwPj29/6B4VNWaaMQOg8WtTI=
+	t=1739530263; cv=none; b=ukrsRa3rtFdSmfweaNN06X8pXA7NJ20tnJKXiQZkEozLO2nN4MF1pnYGAvHtxOHEsciz0hyeQR1r9KG878vxOpLMTCw+PtRhYIAcDSAPEXKcFk5e4+cPtHAaaSG1Z2WWK4HyuySkTilRvqP9zaGPKMo6oIvWJYTlyxUBrRPveiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739528909; c=relaxed/simple;
-	bh=HkXvzUaZbtDUm8GieM/LwNsjaKwR4/lhnzAFeAhmDrs=;
+	s=arc-20240116; t=1739530263; c=relaxed/simple;
+	bh=6Jn8hY/sj0Vyp9Oc8m9BXlUSR+CXepQ6Dz6GoxyvGmM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fmdiS7keOswVj4AfZw3c2KvgSKWGBQO637g6s2uuI3+7jVe3WMIVAxIVzTG/VVwI3kKQq/ev9CSn/G6F3NwXYPFdThiqw5qGslwHmFuixZkK06cDmFzj7cMbj3WgXr51/WkEUMmagCTiv8L65SQlSBMycEqg1k3Cc8W23raFnOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.222.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f46.google.com with SMTP id a1e0cc1a2514c-860f0e91121so1845440241.0;
-        Fri, 14 Feb 2025 02:28:27 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739528905; x=1740133705;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DD+ssK7Im57vlq5FNxfqHbbrTwFIXn9O88i3TIuD0PI=;
-        b=JbVhTfhGIYpojq17+W3u20mUpdAIWWa1tvL4aQBZvD5MOixxF0gd76szsgG+4XFFxq
-         KJUViOlXbQEjcxpG0ejfDb+tQW6MFc4a8bS5wttuEa2YQNfkPrELPMAYpmghgbUO/bj5
-         jz7dBuvEoD7oL1uJk9aj7iVIOndUfIbgB5UQXN83rBaN0lAU7PQ8TEwUjITv9TA4+gLO
-         oniK6iGtyjEsitwFVJArLKTJQutFImCpIRISIV2llKaZYlyeYkqxfFqLRiIXwmN1se1/
-         4L99p+Im9KuLXbnnjm4Owv65kXA5apMtE3kXQDHnxjrlRQu5fumDCzYRef32AjM7XrRQ
-         BOCw==
-X-Forwarded-Encrypted: i=1; AJvYcCUiUJoL4Te2VEpWU/yQa7sVUMW2hHtCmLMsB1ToztS+oaoJ92njwbVKJk3wa5Z4u+yiVVxAl8vFPIVxJA==@vger.kernel.org, AJvYcCUmtUW8i/iSLUVtPFWatyZ0ObM1dl9jrrsaKbOXwwxOdsowyRk061J2ew/s665cR6jFbcizxl/uVTeH57eyhibRSmc=@vger.kernel.org, AJvYcCVIdu2RAPbLpLdTDnaSJGokcrkyS20fbX1oSeD0yxPSIAx9tV04LXkZXdkp6XBj4GIg4rpOMGNZmRY=@vger.kernel.org, AJvYcCVJRSGV00Zv+SHULWlOSMW3zXPH7WHewzk0HL8mYg9671/QDjUrKVI4+Ntqz4FuD1W4jMjl8IfOgZvMDG8=@vger.kernel.org, AJvYcCWrnCmcSAl9CLRHHVDX3fDXsw80SSwG28aXYrVsA0CpNktNGVypWaFzVJMon+ufQDmSKxBS+JdeIuAz5mkv@vger.kernel.org, AJvYcCX6l/8UDRHSDx53Ctx/ixmxGgz/BaPJG2EmLM6bwUTip4PJIXv+6HoczPGOSOJqOAG6LGKoo8baZPb8EBrA@vger.kernel.org, AJvYcCXCj2vR9py3dXnUBl04GVleSZLzKmRENp8KLA0GNe76CsuUp2e5YMvk/bHFK5nT1nkYzPy8G6ca/JQ6@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx9yXDe2TKk0lQAX4OTIuw9bmRgkZTuLrN+4yXr/x5e2W9aAegn
-	S1qh7i9dIWkITfkNLavNK1YuKaA8+3w1BbPAzfvAgJmP0arYYXMtKZ3lODBf3AE=
-X-Gm-Gg: ASbGncvg8pD+bUzAkA0HzoNw9JD8pTlc6echtP509S0Y1e699xTFPYMcOqDGeB+NYM9
-	hx4DV4zbpWmEwQNv2fwixwkswJiRa/8KU9QYA0SiFwWgyrpMwoEJXFWhvfrFXVC4r8KYOpgI3mN
-	wz0I2AZqSizGNn8fLzFkQKErsXUWGnHA0q9Q2qHPYhGESPDz1j2Zk0qrXrtZiyBDVC65+XJ4lvu
-	oVnZmNMNbG1sk67TxgnT5MOny5/nXP2aNXXtcA8C9UPM3Rz+49xRFfIXXf4TDlqUA8QuvFpoWri
-	w7oneVIHYAS/iMMY5J8FwSCQ1g10NW7uB/lV4oJWiJ5Nl7ITA2QikQ==
-X-Google-Smtp-Source: AGHT+IEKiaeKBRzxQM/1KzXGMyx9lWg1nfN6iTMlWnWde3zYMMm0H/7R4uLfb2ckogPdFqw+4MzbMA==
-X-Received: by 2002:a05:6102:2749:b0:4bc:1600:7c43 with SMTP id ada2fe7eead31-4bc16007c6emr1580769137.11.1739528905455;
-        Fri, 14 Feb 2025 02:28:25 -0800 (PST)
-Received: from mail-vs1-f47.google.com (mail-vs1-f47.google.com. [209.85.217.47])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-868e8548ae3sm536863241.2.2025.02.14.02.28.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 14 Feb 2025 02:28:23 -0800 (PST)
-Received: by mail-vs1-f47.google.com with SMTP id ada2fe7eead31-4bbb56bbbd4so1807993137.1;
-        Fri, 14 Feb 2025 02:28:23 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUc0a1xwQlaItPr0wtGa1oeiIwsW9tLZxbCg9TCVDEzNu+tcmwcm3P3oSQL+8pCDUeuKpcsJXWpc2vfdA==@vger.kernel.org, AJvYcCVT0vFtgOAjXIh/vHIRUzTJjRfPpJW2rmAuhWico4cTIvb9kEVchR5BEXctXcMRJzLk5xljXQ/cEO0J+gt7YnuePvw=@vger.kernel.org, AJvYcCVm6dS2hGkD8R7mdOq3zjxhAvBBN8H02AMCYWNDf8porsnq8pXkEOynDIX1PHB1iyqCODPwJE8AJVeEivRv@vger.kernel.org, AJvYcCVz9wDj1/rGI1N2FrU7m5AwWJjcqWx+0k7eWeVgALrDdAuXtjLn0ZIDBsXhnVtT7uyGxxP7CZdyG8M=@vger.kernel.org, AJvYcCWI5mKmLluJ4VLIneptFo+ykZtQEi0N3ppigqCNpNCjpcF4znltj5hzBy2o9UFi4+PNInP83hvodxovWf92@vger.kernel.org, AJvYcCWQaYPQ0bl9aPNyVn3be+sK10ytEBG1GesH/1+sLsXvx8xk6rcgzhrFJ0O97QmTF258zsm2lsioFQ6V@vger.kernel.org, AJvYcCWZ95hd1DxtIm1cWw+V33v3fhOFYpAOvSR8lUrrKUjVK9NmFMyscF7JRWTRwJCOd4ncjS+04+Yrvrwk0RI=@vger.kernel.org
-X-Received: by 2002:a05:6102:50a4:b0:4bb:ceeb:eaca with SMTP id
- ada2fe7eead31-4bc04dc0ad2mr4618891137.1.1739528903305; Fri, 14 Feb 2025
- 02:28:23 -0800 (PST)
+	 To:Cc:Content-Type; b=YMJlFOA8HZ/KJ4J/qgaj4BaCP7e7nIU56JM9GM7HfAgPOC24kwsIPrfFa0xYCbsWDDwVvSSVNnt1fT0PzEHxKE0ECnC0FIPSco449J0OrJANXgB3A60HdjtlLvpERDxrKPLVyeQ0/zcqHWaH/HZd73f5esI4e5tAuFUeiWDiQ5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VRsIYOrX; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VRsIYOrX"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C27EC4CEDF;
+	Fri, 14 Feb 2025 10:51:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739530262;
+	bh=6Jn8hY/sj0Vyp9Oc8m9BXlUSR+CXepQ6Dz6GoxyvGmM=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=VRsIYOrXB4NBmaHnCnh1uRaIbgK1hXsNVaNz80MfbnD6MVpllwkX+Ak12MXoDJHcV
+	 ys6MmQ9o2cpS8i3Vi7Bu3Lc0qaPCyUl/+Wehmwb+DWyODTsnbbG70xkXTu09G85ek6
+	 oKOzzzEfsyiggpI64zaVrWPSzL7j2WgI8P+RDQH0vdoZuqQ/SL8X7IFVD98QPIX2up
+	 Yymer9b//q1dKe/m4zomdwTDoM8rJOr3/EgutNtanp1n1AQiwty6iUdSBdjPo2XY+M
+	 CQ0VKj0yNlCs2PAom9g9m52G7jyDnzJIpE1f6SMrCUf09pyfQt2/ehewrWeFXSS//H
+	 GhfM6r7edJq/w==
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-543e49a10f5so2015147e87.1;
+        Fri, 14 Feb 2025 02:51:02 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUjSLQE5g84o/XvpuGjKIMXRjs3AGrG72dSftBGtZjHKVWkZTEDYX0/IbuJbichzRuAcqMFU7634QQBeARv@vger.kernel.org, AJvYcCUsdSNcKZq+PVIX+9FsZqtU1ovxdK7JxjvT2xyV5yHmTP6PiQjnADJeIssu72modoze9RXEYOwC@vger.kernel.org, AJvYcCWTfDP18vF+23BTbuCFp4V/84x1fE26w5LwEtnxROSQA6AjPdd8t9KDRI42XPqMZKbF9trBMboideJtK/A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrfytJiiN+4YBKs4ilfa7nt5U+/lPAhZRaKAy/f+VUimZ0NpgZ
+	3OrY3e3qydDt6945VXOsGS+huAHI/BtK3SWvROdCtXlmYATCDyf60zjt147jmMERtMqJhRvsqpa
+	Df9vYGiX7vT7GEq2HaUwQBzgCXkc=
+X-Google-Smtp-Source: AGHT+IE51G43p8pR1toPTVSYBg68ovY9ZnGfaoNwwqJs6GgOaOCJnB/+CJEzpaQ+RZJoWPf4T1kKfJId9pTwob2I0YE=
+X-Received: by 2002:a05:6512:1155:b0:545:296e:ac28 with SMTP id
+ 2adb3069b0e04-545296eaef4mr578053e87.24.1739530260860; Fri, 14 Feb 2025
+ 02:51:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1738329458.git.geert+renesas@glider.be> <1824412519cb8791ab428065116927ee7b77cf35.1738329459.git.geert+renesas@glider.be>
- <20250131190335.4c18fb3c@pumpkin>
-In-Reply-To: <20250131190335.4c18fb3c@pumpkin>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Fri, 14 Feb 2025 11:28:11 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdVP+GBFMfd-C_7oiXHKSbycPv6adxJdM-Kt03+m9UqDiw@mail.gmail.com>
-X-Gm-Features: AWEUYZm97sUT3mKi6JQWzWdUxKryfF3L2VZZmMQJHiBs0ICC7K3YkCuZ7Ruhdt0
-Message-ID: <CAMuHMdVP+GBFMfd-C_7oiXHKSbycPv6adxJdM-Kt03+m9UqDiw@mail.gmail.com>
-Subject: Re: [PATCH treewide v2 1/3] bitfield: Add non-constant
- field_{prep,get}() helpers
-To: David Laight <david.laight.linux@gmail.com>
-Cc: Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, 
-	Nicolas Ferre <nicolas.ferre@microchip.com>, 
-	Alexandre Belloni <alexandre.belloni@bootlin.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
-	Giovanni Cabiddu <giovanni.cabiddu@intel.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S . Miller" <davem@davemloft.net>, Linus Walleij <linus.walleij@linaro.org>, 
-	Bartosz Golaszewski <brgl@bgdev.pl>, Joel Stanley <joel@jms.id.au>, 
-	Andrew Jeffery <andrew@codeconstruct.com.au>, Crt Mori <cmo@melexis.com>, 
-	Jonathan Cameron <jic23@kernel.org>, Lars-Peter Clausen <lars@metafoo.de>, Jacky Huang <ychuang3@nuvoton.com>, 
-	Shan-Chun Hung <schung@nuvoton.com>, Yury Norov <yury.norov@gmail.com>, 
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
-	Johannes Berg <johannes@sipsolutions.net>, Jakub Kicinski <kuba@kernel.org>, Alex Elder <elder@ieee.org>, 
-	linux-clk@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-renesas-soc@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	qat-linux@intel.com, linux-gpio@vger.kernel.org, 
-	linux-aspeed@lists.ozlabs.org, linux-iio@vger.kernel.org, 
-	linux-sound@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250212154718.44255-1-ebiggers@kernel.org> <Z61yZjslWKmDGE_t@gondor.apana.org.au>
+ <20250213063304.GA11664@sol.localdomain> <Z66uH_aeKc7ubONg@gondor.apana.org.au>
+ <20250214033518.GA2771@sol.localdomain> <Z669mxPsSpej6K6K@gondor.apana.org.au>
+In-Reply-To: <Z669mxPsSpej6K6K@gondor.apana.org.au>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Fri, 14 Feb 2025 11:50:49 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXHS+BaLnUSQf9uiTvXhSee=+8W1B-DY5MFHTxgpe1iMyg@mail.gmail.com>
+X-Gm-Features: AWEUYZk9BVG_mnviM5EBJUUBfeH7CmJgTUXwh6dulpUSYK22Lsgwd5629FUH9e4
+Message-ID: <CAMj1kXHS+BaLnUSQf9uiTvXhSee=+8W1B-DY5MFHTxgpe1iMyg@mail.gmail.com>
+Subject: Re: [PATCH v8 0/7] Optimize dm-verity and fsverity using multibuffer hashing
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Eric Biggers <ebiggers@kernel.org>, fsverity@lists.linux.dev, 
+	linux-crypto@vger.kernel.org, dm-devel@lists.linux.dev, x86@kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Sami Tolvanen <samitolvanen@google.com>, Alasdair Kergon <agk@redhat.com>, 
+	Mike Snitzer <snitzer@kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, 
+	Mikulas Patocka <mpatocka@redhat.com>, David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Hi David,
-
-On Fri, 31 Jan 2025 at 20:03, David Laight <david.laight.linux@gmail.com> wrote:
-> On Fri, 31 Jan 2025 14:46:51 +0100
-> Geert Uytterhoeven <geert+renesas@glider.be> wrote:
-> > The existing FIELD_{GET,PREP}() macros are limited to compile-time
-> > constants.  However, it is very common to prepare or extract bitfield
-> > elements where the bitfield mask is not a compile-time constant.
+On Fri, 14 Feb 2025 at 04:51, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> On Thu, Feb 13, 2025 at 07:35:18PM -0800, Eric Biggers wrote:
 > >
-> > To avoid this limitation, the AT91 clock driver and several other
-> > drivers already have their own non-const field_{prep,get}() macros.
-> > Make them available for general use by consolidating them in
-> > <linux/bitfield.h>, and improve them slightly:
-> >   1. Avoid evaluating macro parameters more than once,
-> >   2. Replace "ffs() - 1" by "__ffs()",
-> >   3. Support 64-bit use on 32-bit architectures.
-> ...
-> > diff --git a/include/linux/bitfield.h b/include/linux/bitfield.h
-> > index 63928f1732230700..c62324a9fcc81241 100644
-> > --- a/include/linux/bitfield.h
-> > +++ b/include/linux/bitfield.h
-> > @@ -203,4 +203,38 @@ __MAKE_OP(64)
-> >  #undef __MAKE_OP
-> >  #undef ____MAKE_OP
+> > It absolutely is designed for an obsolete form of hardware offload.  Have you
+> > ever tried actually using it?  Here's how to hash a buffer of data with shash:
 > >
-> > +/**
-> > + * field_prep() - prepare a bitfield element
-> > + * @_mask: shifted mask defining the field's length and position
-> > + * @_val:  value to put in the field
-> > + *
-> > + * field_prep() masks and shifts up the value.  The result should be
-> > + * combined with other fields of the bitfield using logical OR.
-> > + * Unlike FIELD_PREP(), @_mask is not limited to a compile-time constant.
-> > + */
-> > +#define field_prep(_mask, _val)                                              \
+> >       return crypto_shash_tfm_digest(tfm, data, size, out)
+> >
+> > ... and here's how to do it with the SHA-256 library, for what it's worth:
+> >
+> >       sha256(data, size, out)
+> >
+> > and here's how to do it with ahash:
 >
-> You don't need an _ prefix on the 'parameters' - it doesn't gain anything.
-
-I just followed the style of all other macros in this file.
-I can add a new patch converting the existing macros, though...
-
+> Try the new virt ahash interface, and we could easily put the
+> request object on the stack for sync algorithms:
 >
-> > +     ({                                                              \
-> > +             typeof(_mask) __mask = (_mask);                         \
+>         SYNC_AHASH_REQUEST_ON_STACK(req, alg);
 >
-> Use: __auto_type __mask = (_mask);
-
-Likewise ;-)
-
-> > +             unsigned int __shift = sizeof(_mask) <= 4 ?             \
-> > +                                    __ffs(__mask) : __ffs64(__mask); \
-> > +             (((typeof(_mask))(_val) << __shift) & (__mask));        \
+>         ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP, NULL, NULL);
+>         ahash_request_set_virt(req, data, out, size);
 >
-> There are a lot of () in that line, perhaps:
+>         return crypto_ahash_digest(req);
 >
->                 __auto_type(__mask) = (_mask);
->                 typeof (__mask) __val = (_val);
->                 unsigned int __shift = ...;
->
->                 (__val << __shift) & __mask;
->
-> Note the typeof (__mask) - avoids line-length 'bloat' when the arguments are non-trivial.
 
-OK, thanks!
+Whatever happened to not adding infrastructure to the kernel without a user?
 
-Gr{oetje,eeting}s,
+You keep saying how great this will all work for hypothetical cases,
+and from any other contributor, we would expect to see working code
+that demonstrates the advantages of the approach.
 
-                        Geert
+But it seems you have no interest in actually writing this networking
+code, and nor has anybody else, as far as I can tell, which makes your
+claims rather dubious.
 
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+IOW, even if all your claims are correct, it really makes no
+difference when nobody can be bothered to take advantage of it, and we
+should just go with Eric's working code.
