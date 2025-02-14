@@ -1,106 +1,142 @@
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0E072746B;
-	Fri, 14 Feb 2025 01:12:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEA46131E2D
+	for <linux-crypto@vger.kernel.org>; Fri, 14 Feb 2025 02:10:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739495527; cv=none; b=GzaOIZsL7HeiaROogdYwJ8LRnJxRSd4rClKQmuWzieeo6LqHUC6RfDOYP9/4EtebfZSZQmuXgZPbXer9wJH+zpjknQiz2artZkWqH/V1qPoKdGLhuWDqNOBu2aWaX9idZ8UpW2tQD0w57oqByUTufrF/1/9NxVuehE+k8Ztj90U=
+	t=1739499050; cv=none; b=YAU+6xi9L9Htghv7D0ZhabBXYtBMD3g8+K+UtdAmrWaoAdJYmXSdDtLRjGq/RhdKNdWNZx1yeAxDJAHS2vbMqZjB6VFjTfMDJTZKEnEblmCJYuOf77URNqkaZNs3JE95rRIMc5nLsPoRgcZVMdjzKkfwTvwKNEZNzPAcROHCzQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739495527; c=relaxed/simple;
-	bh=EzldPKqL3LAA14BzaUNue2LoVJXYI+QCGXKPYLf8IpE=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=RX2DhGSm96zrdfxF8P/iodvGM/owGmRZq0GIl5+AYraYsNyfb1MMp1xue0ynPzaSEyaZ82mRDuXhiGpZBCcnBVR9LqH62oM+bQpZS3Sytl0VlnMfl93GtTd36cWAlrLlUaxbgMVHA2MU/Xy5aei4+0sEGW6Y3t/H846N2jUWSkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.164])
-	by gateway (Coremail) with SMTP id _____8DxvnNbmK5nn+N0AA--.39658S3;
-	Fri, 14 Feb 2025 09:11:55 +0800 (CST)
-Received: from [10.20.42.164] (unknown [10.20.42.164])
-	by front1 (Coremail) with SMTP id qMiowMBxGcRPmK5ndCgRAA--.1798S2;
-	Fri, 14 Feb 2025 09:11:46 +0800 (CST)
-Subject: Re: [PATCH v2 3/3] tpm: Add a driver for Loongson TPM device
-To: Jarkko Sakkinen <jarkko@kernel.org>
-Cc: lee@kernel.org, herbert@gondor.apana.org.au, davem@davemloft.net,
- peterhuewe@gmx.de, linux-kernel@vger.kernel.org, loongarch@lists.linux.dev,
- linux-crypto@vger.kernel.org, jgg@ziepe.ca, linux-integrity@vger.kernel.org,
- Yinggang Gu <guyinggang@loongson.cn>
-References: <20250212033113.15137-1-zhaoqunqin@loongson.cn>
- <20250212033113.15137-4-zhaoqunqin@loongson.cn> <Z60SfDaWnbgddUnA@kernel.org>
- <c825cd7b-a255-d296-baa0-c1a746cb1bce@loongson.cn>
- <Z65tuC722nnuhWEO@kernel.org>
-From: Qunqin Zhao <zhaoqunqin@loongson.cn>
-Message-ID: <0c7982a4-a8bd-77fd-86b3-ed2d2451ed0a@loongson.cn>
-Date: Fri, 14 Feb 2025 09:12:27 +0800
-User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1739499050; c=relaxed/simple;
+	bh=WhJmekLyQeapuWa9J6WUco9/aFXXshTQJPKudksd1Lo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jDxMaKY31oo0aeIJdgaBmkM+yPm+Xufd7nILQrxCUIzFL90htcvcXpOCqLdm1MrQC5YNcfRNQ3sKqUVztzERnmZiCQX5Y1GMNCD37VwX7GipAQQ0V2b7jDb/58hm0egGUqcUqpTSxEJtxOQ0CDTNtAVmfD8yoaQKxtf0fb9Th8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net; spf=pass smtp.mailfrom=posteo.net; dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b=Nm3LODJX; arc=none smtp.client-ip=185.67.36.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.net
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b="Nm3LODJX"
+Received: from submission (posteo.de [185.67.36.169]) 
+	by mout01.posteo.de (Postfix) with ESMTPS id B7B72240028
+	for <linux-crypto@vger.kernel.org>; Fri, 14 Feb 2025 03:04:08 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.net; s=2017;
+	t=1739498648; bh=WhJmekLyQeapuWa9J6WUco9/aFXXshTQJPKudksd1Lo=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:Content-Transfer-Encoding:From;
+	b=Nm3LODJXhqQCCv69Zz1N9FqongFoJT3V0NUa6zSUc6NA8FVuLeDXb1gY6jUNVQHk0
+	 za741AL0WLueAGlA/BFA+QKYt3CF9TzSKV5uIWL7ZRmYG65M75ziCewHvxV5bFjNvF
+	 iazMruPIDK5iKbKAZ/b3L7MbUm8urNpdqjf+7oZ+ilPu+gH9g8Qi0ILU6wPJ9jr/f2
+	 88Oy6Dd1u/V7CrpE27zO9e3Rst0yJX5xnoQo7GnAyMla0eUpw+1+/KNjIMvlu9JPTk
+	 Vkmt2BtBE48By8yPb8A9xA3GJCSUKi5lFDCACraCv2ZCkP4OvojLM4EmP/9XViOo53
+	 4Xmtf91bi8dMw==
+Received: from customer (localhost [127.0.0.1])
+	by submission (posteo.de) with ESMTPSA id 4YvFhy67kgz9rxF;
+	Fri, 14 Feb 2025 03:04:02 +0100 (CET)
+Date: Fri, 14 Feb 2025 02:04:02 +0000
+From: =?utf-8?Q?J=2E_Neusch=C3=A4fer?= <j.ne@posteo.net>
+To: Rob Herring <robh@kernel.org>
+Cc: =?utf-8?Q?J=2E_Neusch=C3=A4fer?= <j.ne@posteo.net>,
+	devicetree@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	Krzysztof Kozlowski <krzk@kernel.org>, imx@lists.linux.dev,
+	Scott Wood <oss@buserror.net>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Naveen N Rao <naveen@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>, Lee Jones <lee@kernel.org>,
+	Vinod Koul <vkoul@kernel.org>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	=?utf-8?Q?J=2E_Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
+	Wim Van Sebroeck <wim@linux-watchdog.org>,
+	Guenter Roeck <linux@roeck-us.net>, Mark Brown <broonie@kernel.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Richard Weinberger <richard@nod.at>,
+	Vignesh Raghavendra <vigneshr@ti.com>, linux-kernel@vger.kernel.org,
+	linux-ide@vger.kernel.org, linux-crypto@vger.kernel.org,
+	dmaengine@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-watchdog@vger.kernel.org, linux-spi@vger.kernel.org,
+	linux-mtd@lists.infradead.org
+Subject: Re: [PATCH v2 03/12] dt-bindings: crypto: Convert fsl,sec-2.0 to YAML
+Message-ID: <Z66kksKzsknmOy5Q@probook>
+References: <20250207-ppcyaml-v2-0-8137b0c42526@posteo.net>
+ <20250207-ppcyaml-v2-3-8137b0c42526@posteo.net>
+ <20250212193314.GA4134845-robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <Z65tuC722nnuhWEO@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-CM-TRANSID:qMiowMBxGcRPmK5ndCgRAA--.1798S2
-X-CM-SenderInfo: 52kd01pxqtx0o6or00hjvr0hdfq/
-X-Coremail-Antispam: 1Uk129KBj93XoW7KF4kuFWfKrWkGw18tFyrAFc_yoW8GrW5pr
-	1kAFn5Cry7Gr47K3sIq3y5CrnYq3s2qF9rur9rtw1qqr90ya43Jr1UtF1UCrs8Xr1rGrW0
-	qrZayr43Ka1Yv3cCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUP0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	GcCE3s1ln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2
-	x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r126r1D
-	McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7
-	I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCF
-	x2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r
-	1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij
-	64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr
-	0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF
-	0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8Dl1DUUUUU==
+In-Reply-To: <20250212193314.GA4134845-robh@kernel.org>
+
+On Wed, Feb 12, 2025 at 01:33:14PM -0600, Rob Herring wrote:
+> On Fri, Feb 07, 2025 at 10:30:20PM +0100, J. Neuschäfer wrote:
+> > Convert the Freescale security engine (crypto accelerator) binding from
+> > text form to YAML. The list of compatible strings reflects what was
+> > previously described in prose; not all combinations occur in existing
+> > devicetrees.
+> > 
+> > Signed-off-by: J. Neuschäfer <j.ne@posteo.net>
+> > ---
+> > 
+> > V2:
+> > - several improvements suggested by Rob Herring:
+> >   - remove unnecessary multiline markers
+> >   - constrain fsl,num-channels to enum: [1,4]
+> >   - constrain fsl,channel-fifo-len to plausible limits
+> >   - constrain fsl,exec-units-mask to maximum=0xfff
+> > - trim subject line (remove "binding")
+> > ---
+> >  .../devicetree/bindings/crypto/fsl,sec2.0.yaml     | 142 +++++++++++++++++++++
+> >  .../devicetree/bindings/crypto/fsl-sec2.txt        |  65 ----------
+> >  2 files changed, 142 insertions(+), 65 deletions(-)
+[...]
+> > +title: Freescale SoC SEC Security Engines versions 1.x-2.x-3.x
+> > +
+> > +maintainers:
+> > +  - J. Neuschäfer <j.ne@posteo.net.
+> 
+> missing >
+
+Good catch, will fix.
 
 
-在 2025/2/14 上午6:10, Jarkko Sakkinen 写道:
->>>> for it.
->>>>
->>>> Co-developed-by: Yinggang Gu <guyinggang@loongson.cn>
->>>> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
->>>> Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
->>>> ---
->>>>    MAINTAINERS                 |   1 +
->>>>    drivers/char/tpm/Kconfig    |   9 ++++
->>>>    drivers/char/tpm/Makefile   |   1 +
->>>>    drivers/char/tpm/tpm_lsse.c | 104 ++++++++++++++++++++++++++++++++++++
->>>>    4 files changed, 115 insertions(+)
->>>>    create mode 100644 drivers/char/tpm/tpm_lsse.c
->>>>
->>>> diff --git a/MAINTAINERS b/MAINTAINERS
->>>> index 6493d58436..6aad0f08ad 100644
->>>> --- a/MAINTAINERS
->>>> +++ b/MAINTAINERS
->>>> @@ -13484,6 +13484,7 @@ LOONGSON CRYPTO DRIVER
->>>>    M:	Qunqin Zhao <zhaoqunqin@loongson.com>
->>>>    L:	linux-crypto@vger.kernel.org
->>>>    S:	Maintained
->>>> +F:	drivers/char/tpm/tpm_lsse.c
->>>>    F:	drivers/crypto/loongson/
->>>>    LOONGSON-2 APB DMA DRIVER
->>> Probably MAINTAINERS update should be a separate patch.
->> Some  MAINTAINERS updates are not  separated form the driver patch.  Like
->> the submit of "drivers/mfd/max7714*".
->>
->> So it seems whether the updates to MAINTAINERS  are separated or not is OK.
-> I'd prefer them separated from code changes. They are separate tasks
-> per se.
+> > +  fsl,descriptor-types-mask:
+> > +    $ref: /schemas/types.yaml#/definitions/uint32
+> > +    description: |
+> > +      The bitmask representing what descriptors are available. Descriptor type
+> > +      information should be encoded following the SEC's Descriptor Header Dword
+> > +      DESC_TYPE field documentation, i.e. as follows:
+> > +
+> > +        bit 0  = set if SEC supports the aesu_ctr_nonsnoop desc. type
+> > +        bit 1  = set if SEC supports the ipsec_esp descriptor type
+> > +        bit 2  = set if SEC supports the common_nonsnoop desc. type
+> > +        bit 3  = set if SEC supports the 802.11i AES ccmp desc. type
+> > +        bit 4  = set if SEC supports the hmac_snoop_no_afeu desc. type
+> > +        bit 5  = set if SEC supports the srtp descriptor type
+> > +        bit 6  = set if SEC supports the non_hmac_snoop_no_afeu desc.type
+> > +        bit 7  = set if SEC supports the pkeu_assemble descriptor type
+> > +        bit 8  = set if SEC supports the aesu_key_expand_output desc.type
+> > +        bit 9  = set if SEC supports the pkeu_ptmul descriptor type
+> > +        bit 10 = set if SEC supports the common_nonsnoop_afeu desc. type
+> > +        bit 11 = set if SEC supports the pkeu_ptadd_dbl descriptor type
+> 
+> Why 3 variations of 'descriptor type'?
 
-OK, thanks.
+The reasons have been lost in time, I suppose. I'll normalize the spelling.
 
-BR, Qunqin.
 
->
-> BR, Jarkko
-
+Thanks,
+J. Neuschäfer
