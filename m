@@ -1,43 +1,69 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 158E61537AC
-	for <linux-crypto@vger.kernel.org>; Sat, 15 Feb 2025 00:57:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AF8D1C84C3
+	for <linux-crypto@vger.kernel.org>; Sat, 15 Feb 2025 13:15:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739581082; cv=none; b=cIv5sGPIkKpMdahe0k8qKgtW3e9/4l8Jeok3VaaENDLVu/w3A8o6yLNdQuwbCJR9gleYaYJQ4kybPU/EDshw/KNFLxMBf+PPtuhuXDXx+Hgs5d09gsR+XgeNUIDoUvpQf4CTUJhg13mGDpEafzbMpG3X0JfAQMgwE9ycuo5KGDI=
+	t=1739625304; cv=none; b=D2asXR3b1yv1R2rJXurA1kuhMcKhUGNyWa6OSsgZ8YfiEr7zd+fLQQJWMxCURBC9tB4Aji/LF3pSlU+Mdu8YM9w5IGNjnjnjuBWdlmJzF/G/Irwsv/SshpiZuDLJvxa/pWlf0gVPmuSnvBJBT8b8i4MZIelEDO1CpuN9X9VCnvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739581082; c=relaxed/simple;
-	bh=7EkgeRkqQSKVjMmkjv8maCXbXIfoNO1G6FYyiRqjw/c=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=mGq1KKEK3VyTmBgCXobBRtsynppMx2G2PHRevvKEydt73EvnYLt7S23B/G1aP9+fC+2597duK1kOcLZRcTzHXVjpPw0UTdZDISKaF/vimnYmVKx11m6zeuqfFZ3ngFnKP8bIWetPrKNoUyvsaIUdb/JttNmzu21LpqMJ2WyfpSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=dUFCciIU; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1739625304; c=relaxed/simple;
+	bh=osL9ANixDxg2wKESmidrgMn97s4G8GbN85dcsS82vGQ=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qc3B0eBiMc/4uNc3L+cmw4biFQY2nvKWwY//9m6ZrmCWy+lj5k278PKGck62GLcZDRtbHSHXGASJl8djVlTNvOJxzEet5e6Kkic2aglw9libWyPJmprQ04B4iS+Q7jg4+0vA6Zv1xpt6DPJPhORrVA03lG7Kb+cyvg0qFMTOwXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jI/NxDt0; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="dUFCciIU"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=Content-Type:MIME-Version:Message-ID:Subject:To:From:Date:
-	Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=KA/h3qwOfcGJivcngbCDsIeZby/i1K8XRBlXUF18m3c=; b=dUFCciIUDdONlQaAnMTjnn/Q8W
-	LiHcL+rTgObUjcanc8GL0+yzJpFVYTMHfV/zKIOSvQ2ozXI1ghx1Bx6uOrg4MA9W5i+CpVO2mUbm3
-	QP4IgSvu27g1i2F7rPeZonep+woSqCYuG86igrTB6o9DJ0lg4DEsS97s7XV18GIrywSX9fZb3yQ3v
-	R6hOUrsYqmnTNpmZJjaq5h4x2ECihaEt5DakXvVTebRCviCIJq6mqfpC7CKUB8k6F4HLTXvIGCgev
-	6isAy21maXpOGSTi6aTSts+2shsABT46wGvVQEbApoHRiMz5W7DHJ3cYzt2TlQ0Ocx6FzhO+nG0pw
-	8P04l9pg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tj6II-000TH1-2R;
-	Sat, 15 Feb 2025 08:57:52 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 15 Feb 2025 08:57:51 +0800
-Date: Sat, 15 Feb 2025 08:57:51 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [PATCH] crypto: skcipher - Zap type in crypto_alloc_sync_skcipher
-Message-ID: <Z6_mj5mfTrB3X23s@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jI/NxDt0"
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-38a25d4b9d4so1901391f8f.0
+        for <linux-crypto@vger.kernel.org>; Sat, 15 Feb 2025 05:15:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739625301; x=1740230101; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=JktJoiLjN9G+FXngOuwQrKpiqMxxFGFsweUWP3aKSZM=;
+        b=jI/NxDt0AnmGpMVTd4MtslbW7x2zg+wiEICwAVlR5uQs7h2XarqGlJtnFJjC5fpwbA
+         7+nMijCrU01TkmjQ0k2M+I3saZrbH6d0vAusUf8E/hIB7qOkUlJpPEchiO4PlKSWh1l9
+         Y1kAbD2y9Tuw1XaWSQJn465MXNoyxcC+Ljcd///VmPEHZriAI+W/qzF5jgE8k7iWvVDi
+         PfYAYcIFuCVcIfS4jTuOiJyk6SkR6t0VbBEE31q2/MoyDJcsk8JhIYaF24mC2jUA4njs
+         qYRZ1dF7HAi68Q/E6gvYSkEVBYfPOqWHx9MQtsN9KauLAlGfBGpB7A7aazSHPjcOP9ZL
+         ynrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739625301; x=1740230101;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JktJoiLjN9G+FXngOuwQrKpiqMxxFGFsweUWP3aKSZM=;
+        b=wwo0E3g2p+msFtygQcuH8+1zaZHduGvzws3L66wqdArrB9mLZhJavcbEx03ZwbEibA
+         4VFVBc5oKUZ2Ici50FYBelLgWGOxur8FJFNpYcU8baLzKto+Bydg5+m77Bxi9drEm8Wz
+         GJ6gAtgm2AL+146wz912HL52imp8MNNubCRWfKc6JtEevhflzGjUCrgh+AxDaoXYxW5b
+         AuFeC8x6grhl002uVhLrs5lvfnBWPJWyB4rEXab9nzTEJ8fjZtNmZ093iSHqWV91ULdu
+         J/Nf+iVkDP9yEI3lZlDQlLo0SnRWKXYsATeS2tHKRmJ5gOML9lB8oz0Km4QxQd5KZvwc
+         vXvA==
+X-Gm-Message-State: AOJu0Yw9Z+IoPNJa3ohkshhLSGMSZbyBDvEp/ZYRYiojoOQBbH2zLCc/
+	qnqmyp8JAWdOXyS3uqMLLZ4Hr0J40s+HdBEeR3d++B/Q2zPcw1ua
+X-Gm-Gg: ASbGncvTCzmPYLc1IhQ5E1Cb5RqJb2fYtDDEsHpUpdLUJGr9LmFYr4kU5mfocrHgchW
+	NUGi5FXTWQCvh5xAFQgzDSg8R9tKX3JjKyMPl5egT3D0sh11SV2cik2enpoMsN1CMIiABXHd8Q5
+	DtViVH2PVlG2OZFPAnzANvyszgSYOk5nA/qTNR1C7ka3+ux6VbqOMi00CnsLdWzwBFqizIax8ZL
+	cL4XYdQLpFmwZhuepD4gVCFBMwfdMoVuEpKJ9JY4QsyrGED/dEErvcsJhyIM7wMCrM3P0Ro3avv
+	uA3QLOaGJZ9dUQ==
+X-Google-Smtp-Source: AGHT+IHkbYJ4+h4s01OLrB6MUmN/H9WDTDB0+IezimJTq8anopSta0j2NLvE3J308MqSir+OWxj/Kg==
+X-Received: by 2002:a05:6000:1f87:b0:38d:e6b6:5096 with SMTP id ffacd0b85a97d-38f33f3d4bamr3549207f8f.15.1739625299651;
+        Sat, 15 Feb 2025 05:14:59 -0800 (PST)
+Received: from Ansuel-XPS. ([87.6.198.177])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f258f5fabsm7137141f8f.45.2025.02.15.05.14.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 15 Feb 2025 05:14:59 -0800 (PST)
+Message-ID: <67b09353.5d0a0220.245b91.dc34@mx.google.com>
+X-Google-Original-Message-ID: <Z7CTTJ2Nc3DaoPPI@Ansuel-XPS.>
+Date: Sat, 15 Feb 2025 14:14:52 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: linux-crypto@vger.kernel.org
+Subject: Re: [bug report] crypto: eip93 - Add Inside Secure SafeXcel EIP-93
+ crypto engine support
+References: <cea9bafd-3dde-4028-9b20-4832dd2977e6@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -46,25 +72,82 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <cea9bafd-3dde-4028-9b20-4832dd2977e6@stanley.mountain>
 
-The type needs to be zeroed as otherwise the user could use it to
-allocate an asynchronous sync skcipher.
+On Wed, Feb 12, 2025 at 06:23:01PM +0300, Dan Carpenter wrote:
+> Hello Christian Marangi,
+> 
+> Commit 9739f5f93b78 ("crypto: eip93 - Add Inside Secure SafeXcel
+> EIP-93 crypto engine support") from Jan 14, 2025 (linux-next), leads
+> to the following Smatch static checker warning:
+> 
+> drivers/crypto/inside-secure/eip93/eip93-common.c:233 check_valid_request() warn: 'src_nents' unsigned <= 0
+> drivers/crypto/inside-secure/eip93/eip93-common.c:237 check_valid_request() warn: error code type promoted to positive: 'src_nents'
+> drivers/crypto/inside-secure/eip93/eip93-common.c:240 check_valid_request() warn: error code type promoted to positive: 'dst_nents'
+> 
+> drivers/crypto/inside-secure/eip93/eip93-common.c
+>     201 int check_valid_request(struct eip93_cipher_reqctx *rctx)
+>     202 {
+>     203         struct scatterlist *src = rctx->sg_src;
+>     204         struct scatterlist *dst = rctx->sg_dst;
+>     205         u32 src_nents, dst_nents;
+>     206         u32 textsize = rctx->textsize;
+>     207         u32 authsize = rctx->authsize;
+>     208         u32 blksize = rctx->blksize;
+>     209         u32 totlen_src = rctx->assoclen + rctx->textsize;
+>     210         u32 totlen_dst = rctx->assoclen + rctx->textsize;
+>     211         u32 copy_len;
+>     212         bool src_align, dst_align;
+>     213         int err = -EINVAL;
+>     214 
+>     215         if (!IS_CTR(rctx->flags)) {
+>     216                 if (!IS_ALIGNED(textsize, blksize))
+>     217                         return err;
+>     218         }
+>     219 
+>     220         if (authsize) {
+>     221                 if (IS_ENCRYPT(rctx->flags))
+>     222                         totlen_dst += authsize;
+>     223                 else
+>     224                         totlen_src += authsize;
+>     225         }
+>     226 
+>     227         src_nents = sg_nents_for_len(src, totlen_src);
+>     228         dst_nents = sg_nents_for_len(dst, totlen_dst);
+> 
+> These return -EINVAL on error.
+> 
+>     229 
+>     230         if (src == dst) {
+>     231                 src_nents = max(src_nents, dst_nents);
+>     232                 dst_nents = src_nents;
+> --> 233                 if (unlikely((totlen_src || totlen_dst) && src_nents <= 0))
+>                                                                    ^^^^^^^^^^^^^^
+> It's unsigned so it can't be less than zero.
+> 
+>     234                         return err;
+>     235 
+>     236         } else {
+>     237                 if (unlikely(totlen_src && src_nents <= 0))
+>                                                    ^^^^^^^^^^^^^^
+>     238                         return err;
+>     239 
+>     240                 if (unlikely(totlen_dst && dst_nents <= 0))
+>                                                    ^^^^^^^^^^^^^^
+> Same.
+> 
+>     241                         return err;
+>     242         }
+>     243 
+>     244         if (authsize) {
+>     245                 if (dst_nents == 1 && src_nents == 1) {
+>     246                         src_align = eip93_is_sg_aligned(src, totlen_src, blksize);
+>
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Thanks, this wasn't reported in the first run so sorry for not noticing
+this. I will take care of sending a follow-up patch to address this.
 
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index e3751cc88b76..cdf0f11c7eaa 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -682,6 +682,7 @@ struct crypto_sync_skcipher *crypto_alloc_sync_skcipher(
- 
- 	/* Only sync algorithms allowed. */
- 	mask |= CRYPTO_ALG_ASYNC | CRYPTO_ALG_SKCIPHER_REQSIZE_LARGE;
-+	type &= ~(CRYPTO_ALG_ASYNC | CRYPTO_ALG_SKCIPHER_REQSIZE_LARGE);
- 
- 	tfm = crypto_alloc_tfm(alg_name, &crypto_skcipher_type, type, mask);
- 
+Again thanks for the report!
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+	Ansuel
