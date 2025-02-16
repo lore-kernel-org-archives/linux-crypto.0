@@ -1,360 +1,78 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9C19199B8
-	for <linux-crypto@vger.kernel.org>; Sun, 16 Feb 2025 03:10:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D49DA1401C;
+	Sun, 16 Feb 2025 03:26:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739675424; cv=none; b=eY9Rh734QAo2rkuukCO/WbUVIcO76IjLO83tBkjKB43x9sHhRJe0bmkplI10vD2txh+KdVcNtpwYsfI7eX9NQWP2uQR55BjB1kpJj7bmaryf680FJVipiYp0DS0XbdYEUB20lAvgoDK2K2D/jV7CbQaxfW976ZBt0qrFZt8z/Co=
+	t=1739676380; cv=none; b=NGghYKv7x6jh8SGUxf4GhCq1wCy8AXEZTQxo4JrG6IqPzhWrdbawqo+eyGnUmay2GCOK5MxWsDRnyaZhY8sR6jUYssaWskp8CfkyigrGFKZjvNmi1hnOqUpIX0Ic3nX5/IAPYbv6oogqd7TOhjAbyNKnJTI5VHKkTELMr3+ch8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739675424; c=relaxed/simple;
-	bh=p+/lVKuxK3rootGsjG5xAoagLcyOv18N6K9+Ale1Bu0=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To:Cc; b=QNSHzVstosy90Q1+Y5552NRNb0VLiHDwmFKdZXdyQdCiJo6NdQxcklF7Spfp2Qne7fy+3nzp8wcogVoh9HPo2/LZ0jOB0tzaZlSZE7SmOs73QKvg8Vgmsme51TdHgAmfb9Qln8kDrngNw33RISIBFEgNdNOpSD7ullhmTm6NGY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=shEke4aE; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1739676380; c=relaxed/simple;
+	bh=xPxs9EGZOUB8OVEByI5GmnmSdMJ0bdd8pkV5n8kPmQU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IJzkyFNJuvuGs7kx7+6J4Y62O7QSqzF8HxeWuP+SF170Glfb/huR0clyRUbJlGVXGwDyZA65A6c6dWlTVCn7m78y/Vawnv5jpptjMeHabvxrxTH7vkvEPqOiqQ/wFpqqf1P1hfwMiv/b5BKIvg5bdchMXCU+53OuUu4OCU16VXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EHAF/EUU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="shEke4aE"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=Cc:To:Subject:From:References:In-Reply-To:Message-Id:Date:
-	Sender:Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=wquegPewatpvz20WiIh0fEF1nRCAWV/gKId/8RXXn9w=; b=shEke4aEZgJsRANcK8vh2jOBAc
-	fgv+QYRBn+0+81pISVy/mDQxuI3w8LaEkel1+MyTyML1NlQYmEsVc293ojeg10KolviSR0UpGYzK/
-	AFnhw00sduU9oKqYWc3d54zHwDMQWoTNk9B8q1nVlRmidTDwOI5d0tTWvnMCqM5h4FQFbPKUKOMp9
-	8udWoid2Z5xwpckwkYiTJfQacn0bWMNe64L9tZx4WPl0/CtwnyxHGZornWkrGXrXLwXDuxy1IPvoV
-	guyoI3yWJ3vShcxwGFG+y2c2GSV8AjDxVdBlrVnrCd5whenyoR5gdeLVtVf1NEq5iA30EN9G9gMTm
-	ZFIDOahw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tjUq1-000gcf-2g;
-	Sun, 16 Feb 2025 11:10:19 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 16 Feb 2025 11:10:18 +0800
-Date: Sun, 16 Feb 2025 11:10:18 +0800
-Message-Id: <dd11ea3e7231fb46f68d902ba38a5b688e378bfe.1739674648.1.git.herbert@gondor.apana.org.au>
-In-Reply-To: <cover.1739674648.git.herbert@gondor.apana.org.au>
-References: <cover.1739674648.git.herbert@gondor.apana.org.au>
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v2 PATCH 11/11] fsverity: improve performance by using multibuffer
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EHAF/EUU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1771C4CEDD;
+	Sun, 16 Feb 2025 03:26:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739676379;
+	bh=xPxs9EGZOUB8OVEByI5GmnmSdMJ0bdd8pkV5n8kPmQU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=EHAF/EUUukABpePQNqnEyDMKwBXXAkMiwVJkYCnRypfkz5uy5jRqyArIqEStpbsZs
+	 qBvytX3fCE61LQzRGMQaw5WPPept3cqmogo9dnft/Jt2dIVgwkTDuOrSU4AR4gaZQJ
+	 IO9omqJ4440C0sDWlUazodFN6MQEI8JMNKTV5zvxNWVnbgBdcAcK9pmVV7USfaxfFJ
+	 ycqf0eN4p06VKXxPboUct9YcPs3pQ8s+GANnX2NHbaNtWmbr5dZ4Oak321lljY+Zuq
+	 Ug1LjL8zI/O0pIsUHjP2Pj/jD/lXksB+ogv62k+b0yuKHm3lDaG1QgiRjnkb3rztHN
+	 G3nz+tOmZEagA==
+Date: Sat, 15 Feb 2025 19:26:16 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Jakub Kicinski <kuba@kernel.org>, fsverity@lists.linux.dev,
+	linux-crypto@vger.kernel.org, dm-devel@lists.linux.dev,
+	x86@kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Mikulas Patocka <mpatocka@redhat.com>,
+	David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH v8 0/7] Optimize dm-verity and fsverity using multibuffer
  hashing
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Cc: Eric Biggers <ebiggers@kernel.org>, Ard Biesheuvel <ardb@kernel.org>, Megha Dey <megha.dey@linux.intel.com>, Tim Chen <tim.c.chen@linux.intel.com>
+Message-ID: <20250216032616.GA90952@quark.localdomain>
+References: <20250212154718.44255-1-ebiggers@kernel.org>
+ <Z61yZjslWKmDGE_t@gondor.apana.org.au>
+ <20250213063304.GA11664@sol.localdomain>
+ <20250215090412.46937c11@kernel.org>
+ <Z7FM9rhEA7n476EJ@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z7FM9rhEA7n476EJ@gondor.apana.org.au>
 
-From: Eric Biggers <ebiggers@google.com>
+On Sun, Feb 16, 2025 at 10:27:02AM +0800, Herbert Xu wrote:
+> On Sat, Feb 15, 2025 at 09:04:12AM -0800, Jakub Kicinski wrote:
+> >
+> > Can confirm, FWIW. I don't know as much about IPsec, but for TLS
+> > lightweight SW-only crypto would be ideal.
+> 
+> Please note that while CPU-only crypto is the best for networking,
+> it actually operates in asynchronous mode on x86.  This is because
+> RX occurs in softirq context, which may not be able to use SIMD on
+> x86.
 
-When supported by the hash algorithm, use crypto_shash_finup_mb() to
-interleave the hashing of pairs of data blocks.  On some CPUs this
-nearly doubles hashing performance.  The increase in overall throughput
-of cold-cache fsverity reads that I'm seeing on arm64 and x86_64 is
-roughly 35% (though this metric is hard to measure as it jumps around a
-lot).
+Well, the async fallback (using cryptd) occurs only when a kernel-mode FPU
+section in process context is interrupted by a hardirq and at the end of it a
+softirq also tries to use kernel-mode FPU.  It's generally a rare case but also
+a terrible implementation that is really bad for performance; this should never
+have been implemented this way.  I am planning to fix it so that softirqs on x86
+will always be able to use the FPU, like they can on some of the other arches
+like arm64 and riscv.
 
-For now this is only done on the verification path, and only for data
-blocks, not Merkle tree blocks.  We could use finup_mb on Merkle tree
-blocks too, but that is less important as there aren't as many Merkle
-tree blocks as data blocks, and that would require some additional code
-restructuring.  We could also use finup_mb to accelerate building the
-Merkle tree, but verification performance is more important.
-
-Reviewed-by: Sami Tolvanen <samitolvanen@google.com>
-Acked-by: Ard Biesheuvel <ardb@kernel.org>
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- fs/verity/fsverity_private.h |   2 +
- fs/verity/verify.c           | 179 +++++++++++++++++++++++++++++------
- 2 files changed, 151 insertions(+), 30 deletions(-)
-
-diff --git a/fs/verity/fsverity_private.h b/fs/verity/fsverity_private.h
-index aecc221daf8b..3d03fb1e41f0 100644
---- a/fs/verity/fsverity_private.h
-+++ b/fs/verity/fsverity_private.h
-@@ -152,6 +152,8 @@ static inline void fsverity_init_signature(void)
- 
- /* verify.c */
- 
-+#define FS_VERITY_MAX_PENDING_DATA_BLOCKS	2
-+
- void __init fsverity_init_workqueue(void);
- 
- #endif /* _FSVERITY_PRIVATE_H */
-diff --git a/fs/verity/verify.c b/fs/verity/verify.c
-index 4fcad0825a12..15bf0887a827 100644
---- a/fs/verity/verify.c
-+++ b/fs/verity/verify.c
-@@ -10,6 +10,27 @@
- #include <crypto/hash.h>
- #include <linux/bio.h>
- 
-+struct fsverity_pending_block {
-+	const void *data;
-+	u64 pos;
-+	u8 real_hash[FS_VERITY_MAX_DIGEST_SIZE];
-+};
-+
-+struct fsverity_verification_context {
-+	struct inode *inode;
-+	struct fsverity_info *vi;
-+	unsigned long max_ra_pages;
-+
-+	/*
-+	 * This is the queue of data blocks that are pending verification.  We
-+	 * allow multiple blocks to be queued up in order to support multibuffer
-+	 * hashing, i.e. interleaving the hashing of multiple messages.  On many
-+	 * CPUs this improves performance significantly.
-+	 */
-+	int num_pending;
-+	struct fsverity_pending_block pending_blocks[FS_VERITY_MAX_PENDING_DATA_BLOCKS];
-+};
-+
- static struct workqueue_struct *fsverity_read_workqueue;
- 
- /*
-@@ -79,7 +100,7 @@ static bool is_hash_block_verified(struct fsverity_info *vi, struct page *hpage,
- }
- 
- /*
-- * Verify a single data block against the file's Merkle tree.
-+ * Verify the hash of a single data block against the file's Merkle tree.
-  *
-  * In principle, we need to verify the entire path to the root node.  However,
-  * for efficiency the filesystem may cache the hash blocks.  Therefore we need
-@@ -90,8 +111,10 @@ static bool is_hash_block_verified(struct fsverity_info *vi, struct page *hpage,
-  */
- static bool
- verify_data_block(struct inode *inode, struct fsverity_info *vi,
--		  const void *data, u64 data_pos, unsigned long max_ra_pages)
-+		  const struct fsverity_pending_block *dblock,
-+		  unsigned long max_ra_pages)
- {
-+	const u64 data_pos = dblock->pos;
- 	const struct merkle_tree_params *params = &vi->tree_params;
- 	const unsigned int hsize = params->digest_size;
- 	int level;
-@@ -115,8 +138,12 @@ verify_data_block(struct inode *inode, struct fsverity_info *vi,
- 	 */
- 	u64 hidx = data_pos >> params->log_blocksize;
- 
--	/* Up to 1 + FS_VERITY_MAX_LEVELS pages may be mapped at once */
--	BUILD_BUG_ON(1 + FS_VERITY_MAX_LEVELS > KM_MAX_IDX);
-+	/*
-+	 * Up to FS_VERITY_MAX_PENDING_DATA_BLOCKS + FS_VERITY_MAX_LEVELS pages
-+	 * may be mapped at once.
-+	 */
-+	BUILD_BUG_ON(FS_VERITY_MAX_PENDING_DATA_BLOCKS +
-+		     FS_VERITY_MAX_LEVELS > KM_MAX_IDX);
- 
- 	if (unlikely(data_pos >= inode->i_size)) {
- 		/*
-@@ -127,7 +154,7 @@ verify_data_block(struct inode *inode, struct fsverity_info *vi,
- 		 * any part past EOF should be all zeroes.  Therefore, we need
- 		 * to verify that any data blocks fully past EOF are all zeroes.
- 		 */
--		if (memchr_inv(data, 0, params->block_size)) {
-+		if (memchr_inv(dblock->data, 0, params->block_size)) {
- 			fsverity_err(inode,
- 				     "FILE CORRUPTED!  Data past EOF is not zeroed");
- 			return false;
-@@ -221,10 +248,8 @@ verify_data_block(struct inode *inode, struct fsverity_info *vi,
- 		put_page(hpage);
- 	}
- 
--	/* Finally, verify the data block. */
--	if (fsverity_hash_block(params, inode, data, real_hash) != 0)
--		goto error;
--	if (memcmp(want_hash, real_hash, hsize) != 0)
-+	/* Finally, verify the hash of the data block. */
-+	if (memcmp(want_hash, dblock->real_hash, hsize) != 0)
- 		goto corrupted;
- 	return true;
- 
-@@ -233,7 +258,8 @@ verify_data_block(struct inode *inode, struct fsverity_info *vi,
- 		     "FILE CORRUPTED! pos=%llu, level=%d, want_hash=%s:%*phN, real_hash=%s:%*phN",
- 		     data_pos, level - 1,
- 		     params->hash_alg->name, hsize, want_hash,
--		     params->hash_alg->name, hsize, real_hash);
-+		     params->hash_alg->name, hsize,
-+		     level == 0 ? dblock->real_hash : real_hash);
- error:
- 	for (; level > 0; level--) {
- 		kunmap_local(hblocks[level - 1].addr);
-@@ -242,13 +268,91 @@ verify_data_block(struct inode *inode, struct fsverity_info *vi,
- 	return false;
- }
- 
--static bool
--verify_data_blocks(struct folio *data_folio, size_t len, size_t offset,
--		   unsigned long max_ra_pages)
-+static void
-+fsverity_init_verification_context(struct fsverity_verification_context *ctx,
-+				   struct inode *inode,
-+				   unsigned long max_ra_pages)
- {
--	struct inode *inode = data_folio->mapping->host;
--	struct fsverity_info *vi = inode->i_verity_info;
--	const unsigned int block_size = vi->tree_params.block_size;
-+	ctx->inode = inode;
-+	ctx->vi = inode->i_verity_info;
-+	ctx->max_ra_pages = max_ra_pages;
-+	ctx->num_pending = 0;
-+}
-+
-+static void
-+fsverity_clear_pending_blocks(struct fsverity_verification_context *ctx)
-+{
-+	int i;
-+
-+	for (i = ctx->num_pending - 1; i >= 0; i--) {
-+		kunmap_local(ctx->pending_blocks[i].data);
-+		ctx->pending_blocks[i].data = NULL;
-+	}
-+	ctx->num_pending = 0;
-+}
-+
-+static bool
-+fsverity_verify_pending_blocks(struct fsverity_verification_context *ctx)
-+{
-+	struct inode *inode = ctx->inode;
-+	struct fsverity_info *vi = ctx->vi;
-+	const struct merkle_tree_params *params = &vi->tree_params;
-+	SYNC_HASH_REQUESTS_ON_STACK(reqs, FS_VERITY_MAX_PENDING_DATA_BLOCKS, params->hash_alg->tfm);
-+	struct ahash_request *req;
-+	int i;
-+	int err;
-+
-+	if (ctx->num_pending == 0)
-+		return true;
-+
-+	req = sync_hash_requests(reqs, 0);
-+	for (i = 0; i < ctx->num_pending; i++) {
-+		struct ahash_request *reqi = sync_hash_requests(reqs, i);
-+
-+		ahash_request_set_callback(reqi, CRYPTO_TFM_REQ_MAY_SLEEP,
-+					   NULL, NULL);
-+		ahash_request_set_virt(reqi, ctx->pending_blocks[i].data,
-+				       ctx->pending_blocks[i].real_hash,
-+				       params->block_size);
-+		if (i)
-+			ahash_request_chain(reqi, req);
-+		if (!params->hashstate)
-+			continue;
-+
-+		err = crypto_ahash_import(reqi, params->hashstate);
-+		if (err) {
-+			fsverity_err(inode, "Error %d importing hash state", err);
-+			return false;
-+		}
-+	}
-+
-+	if (params->hashstate)
-+		err = crypto_ahash_finup(req);
-+	else
-+		err = crypto_ahash_digest(req);
-+	if (err) {
-+		fsverity_err(inode, "Error %d computing block hashes", err);
-+		return false;
-+	}
-+
-+	for (i = 0; i < ctx->num_pending; i++) {
-+		if (!verify_data_block(inode, vi, &ctx->pending_blocks[i],
-+				       ctx->max_ra_pages))
-+			return false;
-+	}
-+
-+	fsverity_clear_pending_blocks(ctx);
-+	return true;
-+}
-+
-+static bool
-+fsverity_add_data_blocks(struct fsverity_verification_context *ctx,
-+			 struct folio *data_folio, size_t len, size_t offset)
-+{
-+	struct fsverity_info *vi = ctx->vi;
-+	const struct merkle_tree_params *params = &vi->tree_params;
-+	const unsigned int block_size = params->block_size;
-+	const int mb_max_msgs = FS_VERITY_MAX_PENDING_DATA_BLOCKS;
- 	u64 pos = (u64)data_folio->index << PAGE_SHIFT;
- 
- 	if (WARN_ON_ONCE(len <= 0 || !IS_ALIGNED(len | offset, block_size)))
-@@ -257,14 +361,11 @@ verify_data_blocks(struct folio *data_folio, size_t len, size_t offset,
- 			 folio_test_uptodate(data_folio)))
- 		return false;
- 	do {
--		void *data;
--		bool valid;
--
--		data = kmap_local_folio(data_folio, offset);
--		valid = verify_data_block(inode, vi, data, pos + offset,
--					  max_ra_pages);
--		kunmap_local(data);
--		if (!valid)
-+		ctx->pending_blocks[ctx->num_pending].data =
-+			kmap_local_folio(data_folio, offset);
-+		ctx->pending_blocks[ctx->num_pending].pos = pos + offset;
-+		if (++ctx->num_pending == mb_max_msgs &&
-+		    !fsverity_verify_pending_blocks(ctx))
- 			return false;
- 		offset += block_size;
- 		len -= block_size;
-@@ -286,7 +387,15 @@ verify_data_blocks(struct folio *data_folio, size_t len, size_t offset,
-  */
- bool fsverity_verify_blocks(struct folio *folio, size_t len, size_t offset)
- {
--	return verify_data_blocks(folio, len, offset, 0);
-+	struct fsverity_verification_context ctx;
-+
-+	fsverity_init_verification_context(&ctx, folio->mapping->host, 0);
-+
-+	if (fsverity_add_data_blocks(&ctx, folio, len, offset) &&
-+	    fsverity_verify_pending_blocks(&ctx))
-+		return true;
-+	fsverity_clear_pending_blocks(&ctx);
-+	return false;
- }
- EXPORT_SYMBOL_GPL(fsverity_verify_blocks);
- 
-@@ -307,6 +416,8 @@ EXPORT_SYMBOL_GPL(fsverity_verify_blocks);
-  */
- void fsverity_verify_bio(struct bio *bio)
- {
-+	struct inode *inode = bio_first_folio_all(bio)->mapping->host;
-+	struct fsverity_verification_context ctx;
- 	struct folio_iter fi;
- 	unsigned long max_ra_pages = 0;
- 
-@@ -323,13 +434,21 @@ void fsverity_verify_bio(struct bio *bio)
- 		max_ra_pages = bio->bi_iter.bi_size >> (PAGE_SHIFT + 2);
- 	}
- 
-+	fsverity_init_verification_context(&ctx, inode, max_ra_pages);
-+
- 	bio_for_each_folio_all(fi, bio) {
--		if (!verify_data_blocks(fi.folio, fi.length, fi.offset,
--					max_ra_pages)) {
--			bio->bi_status = BLK_STS_IOERR;
--			break;
--		}
-+		if (!fsverity_add_data_blocks(&ctx, fi.folio, fi.length,
-+					      fi.offset))
-+			goto ioerr;
- 	}
-+
-+	if (!fsverity_verify_pending_blocks(&ctx))
-+		goto ioerr;
-+	return;
-+
-+ioerr:
-+	fsverity_clear_pending_blocks(&ctx);
-+	bio->bi_status = BLK_STS_IOERR;
- }
- EXPORT_SYMBOL_GPL(fsverity_verify_bio);
- #endif /* CONFIG_BLOCK */
--- 
-2.39.5
-
+- Eric
