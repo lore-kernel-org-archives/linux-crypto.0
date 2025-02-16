@@ -1,104 +1,106 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C84313D897
-	for <linux-crypto@vger.kernel.org>; Sun, 16 Feb 2025 11:43:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC5F8200CD;
+	Sun, 16 Feb 2025 15:34:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.11.138.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739706186; cv=none; b=qqhZP8BrGa2HyY3k4xg2JJat+X9M0+ICixq0Ki+tF/EMWZuvR7oIwMmpXX9B1r9HOk3CiubJUA6n3qD7uy6vtNc+6+rvmvMFHtoMqgm5lzKr2Swe/a0PzW01qfUOmvojX1YVwPvJeP+UZ+6pDhlVpSahl8h/7NvS6MtCe67+U0A=
+	t=1739720064; cv=none; b=KTiUmEowRucorodgrZ+cZw3fyONQcklK4IU5DCDxFMbJnFk46KVWDkqL4Mq9jDmgGrfELh1YtdDf71nnK+VOlryyC3JwdAMvwEC15E7UqRv00ovqnc6HmT2FefTGSvGV2D0BGDXFUHlHtS7EjmFOyPEqQj/TZRojG/+P+7truNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739706186; c=relaxed/simple;
-	bh=zk3b78TcMLcpEwC8P2M9C644oKojIcpaSL0LfWDMapI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XM6uAC+M/iACxJJXNnB3MyyPy/Iny5rLksODw/8CLPvJdd0+XLOzLG2kuPnly5mi5xQ9y0Ly2FsRycHEVmjNiRR1ANVC81ALA84/Mpl5k0XPdrE/yGyxtA2AkhPHC1+BEn590/fEhmpwdTmVj3FQ3gF6xV4PU2IeImEf6KU8Jl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NQf6R7As; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1739720064; c=relaxed/simple;
+	bh=FJWQsNilroRisQAUTQKW7ddDQyvmTvRoFXGR/hOtyPM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CMYx/S2MpBt3eXkLN6yecEpUtE4LbszxFPDNBxp+cF0Va9aq76EtSMO9n09vmRQ3d+uwf7WEoi3FLB7nim/WNlzerViYVVnSD+Cen+TkOJNuGu84mqmepauC6oOi3qf5qK7xXUt1fiNQTbsnezoeu66W4ZXu5sFDo3ZsHefSL4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sntech.de; spf=pass smtp.mailfrom=sntech.de; dkim=pass (2048-bit key) header.d=sntech.de header.i=@sntech.de header.b=sfEtQBKP; arc=none smtp.client-ip=185.11.138.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sntech.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sntech.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NQf6R7As"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739706184; x=1771242184;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=zk3b78TcMLcpEwC8P2M9C644oKojIcpaSL0LfWDMapI=;
-  b=NQf6R7Asf+jb06mtRCwxvz/Jny4K4d3VekD9Bm5b2LyLgrFZ2dwP1y30
-   mNCNLYjHuomMVtmbyE67YMOOtah3bOLRGWiuP59v9tCVkpyGOj4tDx9Ze
-   qMf9NeGK0OSXmaCnKZdaABb33nfzcAatT6OQrm9yg9maQtxG29DKyPejl
-   f+yb5S1ahhZZ6QOjqeE4PBksCpd6gV7STnfh30n6cLEdubhtjUE0usxJX
-   h/KSKE67ogfvlqmdd8UV0Hr9uvozmJbUgK80NSJo6A32VvTpMv4DmzXoF
-   7y5anc0uTBCuqF9ncUfb/uZztg33Dg/iA3uyRensP0d3y5xT+DvO6g1kA
-   w==;
-X-CSE-ConnectionGUID: D8BPq1b5TTOfflBXYvLyUg==
-X-CSE-MsgGUID: c063th/IRu6dircWoIWz+A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11346"; a="65757806"
-X-IronPort-AV: E=Sophos;i="6.13,290,1732608000"; 
-   d="scan'208";a="65757806"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Feb 2025 03:43:03 -0800
-X-CSE-ConnectionGUID: xgIKFAEbTtelWEauRC7EFA==
-X-CSE-MsgGUID: OaQC6mnYRAijcOQ0btNEnA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,291,1732608000"; 
-   d="scan'208";a="113829798"
-Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
-  by orviesa006.jf.intel.com with ESMTP; 16 Feb 2025 03:43:01 -0800
-Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tjd35-001Bt5-0m;
-	Sun, 16 Feb 2025 11:42:59 +0000
-Date: Sun, 16 Feb 2025 19:42:43 +0800
-From: kernel test robot <lkp@intel.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Eric Biggers <ebiggers@kernel.org>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Megha Dey <megha.dey@linux.intel.com>,
-	Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [v2 PATCH 09/11] crypto: hash - Add sync hash interface
-Message-ID: <202502161953.REiC4YpV-lkp@intel.com>
-References: <d6e10dbf172f0b7c791f5406d55e8f1c74492d57.1739674648.git.herbert@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=sntech.de header.i=@sntech.de header.b="sfEtQBKP"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=sntech.de;
+	s=gloria202408; h=Content-Transfer-Encoding:Content-Type:MIME-Version:
+	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=X3B5AHta8iT81vmhTEO3/fEUlWSWkvof26s+ONKqoy0=; b=sfEtQBKPCi+F28t1DCWdgzr+rS
+	ZT0m+CgsJ/TAjHBJfAkL6XIWqlm/gAVG5gbA+jSKTjOdO4i+LUPw8dt/+bBPYbwrK+2wI6wbshOA/
+	7ctZhdsbaEuwtMXbdPxMLmdres3KxLyF2I6nJM6A4TDFXXnCUDGTSCIVhFFIlmCdG7y4wfDkhb4aA
+	VJExjfyLn6B5NmvNQz9hctvZyUeAeZZlLH+MU4Q5n5T5fYy0Af+9kKZHwBvzvxbkGp5RwRHvzh6or
+	rxb/WfRFI1i1xanjQxM9Vq0db8NSVOTLPSg0IbP8dpaVtkm6oyWhGbW3OEAEni1qpbRoV7NwtiIOi
+	Xqwl+HNA==;
+Received: from i53875bc0.versanet.de ([83.135.91.192] helo=localhost.localdomain)
+	by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <heiko@sntech.de>)
+	id 1tjgeS-0007m6-5F; Sun, 16 Feb 2025 16:33:48 +0100
+From: Heiko Stuebner <heiko@sntech.de>
+To: Philipp Zabel <p.zabel@pengutronix.de>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Aurelien Jarno <aurelien@aurel32.net>,
+	Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
+Cc: Heiko Stuebner <heiko@sntech.de>,
+	Sebastian Reichel <sebastian.reichel@collabora.com>,
+	kernel@collabora.com,
+	devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-rockchip@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	XiaoDong Huang <derrick.huang@rock-chips.com>,
+	Conor Dooley <conor.dooley@microchip.com>,
+	Lin Jinhan <troy.lin@rock-chips.com>
+Subject: Re: (subset) [PATCH v2 0/7] RK3588 Hardware Random Number Generator Driver
+Date: Sun, 16 Feb 2025 16:33:37 +0100
+Message-ID: <173971983108.1865604.1801020506672691939.b4-ty@sntech.de>
+X-Mailer: git-send-email 2.47.2
+In-Reply-To: <20250204-rk3588-trng-submission-v2-0-608172b6fd91@collabora.com>
+References: <20250204-rk3588-trng-submission-v2-0-608172b6fd91@collabora.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d6e10dbf172f0b7c791f5406d55e8f1c74492d57.1739674648.git.herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-Hi Herbert,
 
-kernel test robot noticed the following build warnings:
+On Tue, 04 Feb 2025 16:35:45 +0100, Nicolas Frattaroli wrote:
+> This series adds support for the Rockchip RK3588's standalone hardware
+> random number generator to the existing mainline rockchip-rng driver.
+> 
+> The RK3588 has several hardware random number generators, one in each
+> the secure-world and non-secure-world crypto accelerator, and one
+> standalone one in each the secure-world and non-secure-world, so 4
+> hwrngs in total. This series adds support for the standalone hwrng,
+> which is an entirely new IP on this SoC and distinct from the one in the
+> Crypto IP.
+> 
+> [...]
 
-[auto build test WARNING on herbert-cryptodev-2.6/master]
-[cannot apply to herbert-crypto-2.6/master brauner-vfs/vfs.all linus/master v6.14-rc2]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Applied, thanks!
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Herbert-Xu/crypto-ahash-Only-save-callback-and-data-in-ahash_save_req/20250216-150941
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-patch link:    https://lore.kernel.org/r/d6e10dbf172f0b7c791f5406d55e8f1c74492d57.1739674648.git.herbert%40gondor.apana.org.au
-patch subject: [v2 PATCH 09/11] crypto: hash - Add sync hash interface
-config: s390-randconfig-001-20250216 (https://download.01.org/0day-ci/archive/20250216/202502161953.REiC4YpV-lkp@intel.com/config)
-compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250216/202502161953.REiC4YpV-lkp@intel.com/reproduce)
+[6/7] arm64: dts: rockchip: Add rng node to RK3588
+      commit: 6ee0b9ad3995ee5fa229035c69013b7dd0d3634b
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202502161953.REiC4YpV-lkp@intel.com/
+I've dropped the status=okay - this is the default so not needed
+on always-on blocks
 
-All warnings (new ones prefixed by >>, old ones prefixed by <<):
+Also dropped the rng phandle, as boards should not need to change
+the rng.
 
-ERROR: modpost: vmlinux: 'crypto_shash_tfm_digest' exported twice. Previous export was in vmlinux
-WARNING: modpost: missing MODULE_DESCRIPTION() in lib/slub_kunit.o
->> WARNING: modpost: EXPORT symbol "crypto_shash_tfm_digest" [vmlinux] version generation failed, symbol will not be versioned.
-Is "crypto_shash_tfm_digest" prototyped in <asm/asm-prototypes.h>?
+And I've changed the reset-id constant to its "48" numeric equivalent.
+The reset-id change is making its way through the crypto tree
+(needed by the binding-example).
+I've also queued a patch for 6.16 to change that back once the
+header is available to everything after 6.15-rc1.
 
+
+Best regards,
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Heiko Stuebner <heiko@sntech.de>
