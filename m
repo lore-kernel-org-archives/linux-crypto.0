@@ -1,147 +1,96 @@
-Received: from mout01.posteo.de (mout01.posteo.de [185.67.36.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4403C1990D9
-	for <linux-crypto@vger.kernel.org>; Sun, 16 Feb 2025 16:00:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 218A81B808
+	for <linux-crypto@vger.kernel.org>; Sun, 16 Feb 2025 16:24:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739721612; cv=none; b=BmKH0gY4u8FdtfvQE7gtAoszPrURVdtknTBAOyX4L36kcVl6uB83dlPr0Nz0aqKmzZf4fnKo44MUHXODYJqPCb5+UejHwnoKL7Nem49gkLnLsqyiIqWICwlX5a1am8wvMhFtGvpSsDQXRcvVnhEAONqxZCrxxhoxPQ+IzxNhptU=
+	t=1739723050; cv=none; b=n2tX0fQjfW8FHC+pJIRawRil5RapC8nZFvOXugtF0hMcdfy4drz36J1ZAEgRCERJSn87uIpAJSv7Q+xyxJHcArjXdt0CbRG7L+H+gDtEMp4EzOGs5d7oRIHUUSxDul96Jvwcp4z26AClFxqdD1eRmB4DYZzUFkW6NTUvfcDRn4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739721612; c=relaxed/simple;
-	bh=EF26j1suwLuBzziUeMgwWp0X8x4RpIgeD8Jxuuo4ULs=;
+	s=arc-20240116; t=1739723050; c=relaxed/simple;
+	bh=vBzH3Bx7JA+ZtuGII1BqJFgi0PM0CQBNVNzw+929y4o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JJkvbJgF+L91pEsg4w21aFOlMCAJMaynP5GajLBmLFQgde5gYPbNPBmno6WPOrHRgogC8S6cX/8l3445PPY6DItdKXfY5me4Dwdyego8wI0Ely19Uf74Ltz7/E/S0ya4WSBOqIlwUKjM5QirtlNttMFYGXNGvGmLNRJ9WAHjMNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net; spf=pass smtp.mailfrom=posteo.net; dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b=pTgJM2RV; arc=none smtp.client-ip=185.67.36.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.net
+	 Content-Type:Content-Disposition:In-Reply-To; b=YewuB4A3oL2SeUd+8qAhWm4bRFVDTKYnp+4OmvyaANXIfEjVCWQi7e5N572ufYRl5lF/iHGpZM6Hs79rrQVkiciwr6+N1ZUdoW4/a2G+5918tNTLRayGr4kGWOWGNxXBznRl9VI1F1+d7L4U2gm/IEADFE7Zlp8byxfC1SjLBPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=yXLfPT4P; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b="pTgJM2RV"
-Received: from submission (posteo.de [185.67.36.169]) 
-	by mout01.posteo.de (Postfix) with ESMTPS id 79EBA240028
-	for <linux-crypto@vger.kernel.org>; Sun, 16 Feb 2025 17:00:04 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.net; s=2017;
-	t=1739721604; bh=EF26j1suwLuBzziUeMgwWp0X8x4RpIgeD8Jxuuo4ULs=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:Content-Transfer-Encoding:From;
-	b=pTgJM2RVrLprfYbMXybmlG4KLOjVo9E5qpqmA+ccmW85RElh5VpLIRz1jG+WN+S/n
-	 /1a+/Z7pYIDe5dnKfrSx017pXnXOnaK0Z4oSx9JPbq5XY211pMBp1oBmcel4YGxq52
-	 F3RFdjVJ+IRnPS7aXKXN0RW4qOCHxnRfvy1KzqoSH8ARmyd2EiaZD4HdzFGgnbeGt1
-	 EF0887xrzs+xoKfuvZWrJfWF4lUIF/f4kWYDcBTen21LugjWTYJ/6EFcuL+Jof8s8x
-	 Rz6Ymj2KIeS3xT0Ke1YT8gFrFa0zSQbesigmbblCfD+ohW23aPetTyHEH8BbIFFnzO
-	 aesaOV6qAm6Dw==
-Received: from customer (localhost [127.0.0.1])
-	by submission (posteo.de) with ESMTPSA id 4Ywr8V6Vlfz9rxW;
-	Sun, 16 Feb 2025 16:59:54 +0100 (CET)
-Date: Sun, 16 Feb 2025 15:59:54 +0000
-From: =?utf-8?Q?J=2E_Neusch=C3=A4fer?= <j.ne@posteo.net>
-To: Rob Herring <robh@kernel.org>
-Cc: Crystal Wood <oss@buserror.net>, j.ne@posteo.net,
-	devicetree@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	Krzysztof Kozlowski <krzk@kernel.org>, imx@lists.linux.dev,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Naveen N Rao <naveen@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Niklas Cassel <cassel@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>, Lee Jones <lee@kernel.org>,
-	Vinod Koul <vkoul@kernel.org>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	=?utf-8?Q?J=2E_Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
-	Wim Van Sebroeck <wim@linux-watchdog.org>,
-	Guenter Roeck <linux@roeck-us.net>, Mark Brown <broonie@kernel.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Richard Weinberger <richard@nod.at>,
-	Vignesh Raghavendra <vigneshr@ti.com>, linux-kernel@vger.kernel.org,
-	linux-ide@vger.kernel.org, linux-crypto@vger.kernel.org,
-	dmaengine@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-watchdog@vger.kernel.org, linux-spi@vger.kernel.org,
-	linux-mtd@lists.infradead.org, Li Yang <leoyang.li@nxp.com>,
-	John Ogness <john.ogness@linutronix.de>
-Subject: Re: [PATCH v2 09/12] dt-bindings: memory-controllers: Convert
- fsl,elbc to YAML
-Message-ID: <Z7ILej_AJYot_wKP@probook>
-References: <20250207-ppcyaml-v2-0-8137b0c42526@posteo.net>
- <20250207-ppcyaml-v2-9-8137b0c42526@posteo.net>
- <Z6kQpuQf5m-bXTyt@buserror.net>
- <20250210215324.GA1040564-robh@kernel.org>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yXLfPT4P"
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-abb75200275so157679066b.3
+        for <linux-crypto@vger.kernel.org>; Sun, 16 Feb 2025 08:24:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1739723046; x=1740327846; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=oef0lI60XKJ4r62kZ4qBExl4oYf0hGjxAlC0q+vCbdg=;
+        b=yXLfPT4PRLPet1GPMmk3P0ajR+R7+cV382rsmolPFos5uuQlKRLRNg/PHKGeIIKiku
+         8CThjVXTeQbABKi50+4KXNxh7xM08XM4MTaujZn4u2im43lUHC9wjt0EH7Nf/IiaTHRl
+         MsH1/VIV1b/cP421WuLdb6GNqAwuDgugL0VVa4Yk9ARcWdiLkNWPcR/CAu8kdr+ZvmzI
+         tSURnIeR4IzyZj7rI2iMWpbxjbxNvDEyJFYZ7/ADtParlCQa1sDJFN6fSD606OI+9fBs
+         9+ry6SvYLe5dWZuGNNv8kwjthno8Rz0iqBtWLkdbmOpa3mZWXQAEIR7e54YztBhrNetL
+         9ilA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739723046; x=1740327846;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oef0lI60XKJ4r62kZ4qBExl4oYf0hGjxAlC0q+vCbdg=;
+        b=lqvRjxav6fUiTMhm+f4MdxWKir46PWy2Qz7WsGG9uZhcqxxFwU2VdxTIj1RiJZvp57
+         xTGo3GQpgLN4VH6vb0VuI7xvgp8jwtbfADdeZEMU52uSJ2Gd0o3LU2FD1wJD/VTMW7Lx
+         PrOn95lJ7HStD/7GzqrxDlPdsusl56509gZg4xmjubeVeLm98uv1aobmpDvK3SwUXpgO
+         n5DOU6jPjdnVh9OUpWtaH7BBZ7Sg8yLvNqfAfNsHe38Rey/iQyaAU7yBzx20ALZHC9qJ
+         WWYwbFYvn7ZOF0j/4cCRyqC7y/ttnbB5s1zeWnXRFsIej/v1LY4LQCHha5MTIAcgGXYH
+         WJVw==
+X-Gm-Message-State: AOJu0YyWnqZ7TXBmXmsGlnx92dYChQ1CIoPv1S/oyE3P8gib5DdyWgFg
+	7qz/jn6xxvqU+V+xJ/uIpaGCWWvjKPxSEgbvcxWu34NmQv97jd99QDPxSNSb79s=
+X-Gm-Gg: ASbGncsgymhqsXMytKaq61TjRn0nsz7aECvyX0UCi7uz99lrejg4gQaTO6bK6Y/tGmd
+	/PHLD6+kR+O2QTrs0e5qNMdig6f/mGadUdxwVbaM5zQ73yt0ZFu851XAIh1oTnB81hPMq3FYyo1
+	j8myvvck0wh6K6wXr+yQhuMtsq39igPewT6C/aZWnSTiOLORI/A1paR3SXZlAEk3vWfvcZVcOfz
+	LVOjXQ6hsV39vbSlk8eJw0EVBtKHkOoZ+fmjTe9G8TiPmTl7c1hz34W9zRilWJcm1jlImQz8Zky
+	W+HxI4N1/BBnHFja04U2
+X-Google-Smtp-Source: AGHT+IHucXk/pLP5vjlI6fehiUJ88SFq80kV4DNTXa8W0NIx80r2CHKN/T7Ez+W8H6vX2fEnhXT+IA==
+X-Received: by 2002:a17:907:78b:b0:ab7:c115:68fd with SMTP id a640c23a62f3a-abb70e61a23mr673447866b.53.1739723046246;
+        Sun, 16 Feb 2025 08:24:06 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-abb98640619sm77136166b.54.2025.02.16.08.24.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 16 Feb 2025 08:24:05 -0800 (PST)
+Date: Sun, 16 Feb 2025 19:24:01 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: linux-crypto@vger.kernel.org
+Subject: Re: [bug report] crypto: eip93 - Add Inside Secure SafeXcel EIP-93
+ crypto engine support
+Message-ID: <02d25648-e223-43d0-be12-a1ba836d319f@stanley.mountain>
+References: <cea9bafd-3dde-4028-9b20-4832dd2977e6@stanley.mountain>
+ <67b09353.5d0a0220.245b91.dc34@mx.google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250210215324.GA1040564-robh@kernel.org>
+In-Reply-To: <67b09353.5d0a0220.245b91.dc34@mx.google.com>
 
-On Mon, Feb 10, 2025 at 03:53:24PM -0600, Rob Herring wrote:
-> On Sun, Feb 09, 2025 at 02:31:34PM -0600, Crystal Wood wrote:
-> > On Fri, Feb 07, 2025 at 10:30:26PM +0100, J. Neuschäfer via B4 Relay wrote:
-> > > From: "J. Neuschäfer" <j.ne@posteo.net>
-> > > 
-> > > Convert the Freescale localbus controller bindings from text form to
-> > > YAML. The updated list of compatible strings reflects current usage
-> > > in arch/powerpc/boot/dts/, except that many existing device trees
-> > > erroneously specify "simple-bus" in addition to fsl,*elbc.
-> > > 
-> > > Changes compared to the txt version:
-> > >  - removed the board-control (fsl,mpc8272ads-bcsr) node because it only
-> > >    appears in this example and nowhere else
-> > >  - added a new example with NAND flash
-> > >  - updated list of compatible strings
-> > > 
-> > > Signed-off-by: J. Neuschäfer <j.ne@posteo.net>
-> > > ---
-> > > 
-> > > V2:
-> > > - fix order of properties in examples, according to dts coding style
-> > > - move to Documentation/devicetree/bindings/memory-controllers
-> > > - clarify the commit message a tiny bit
-> > > - remove unnecessary multiline markers (|)
-> > > - define address format in patternProperties
-> > > - trim subject line (remove "binding")
-> > > - remove use of "simple-bus", because it's technically incorrect
-> > 
-> > While I admit I haven't been following recent developments in this area,
-> > as someone who was involved when "simple-bus" was created (and was on the
-> > ePAPR committee that standardized it) I'm surprised to hear simple-bus
-> > being called "erroneous" or "technically incorrect" here.
-> 
-> Erroneous because the binding did not say "simple-bus" was used. Not 
-> uncommon with the old .txt bindings.
-> 
-> Generally, if a bus has control registers or resources like clocks, then 
-> we tend not to call them 'simple-bus'. And '"specific-bus", 
-> "simple-bus"' gives some problems around what driver if any do you 
-> bind to. 
-[...]
-> > You'd probably need something like commit 3e25f800afb82bd9e5f8 ("memory:
-> > fsl_ifc: populate child devices without relying on simple-bus") and the 
-> > subsequent fix in dd8adc713b1656 ("memory: fsl_ifc: populate child
-> > nodes of buses and mfd devices")...
-> > 
-> > I'm curious what the reasoning was for removing simple-bus from IFC.  It
-> > seems that the schema verification also played a role in that:
-> > https://www.spinics.net/lists/devicetree/msg220418.html
-> 
-> If a kernel change is needed to support changed .dts files, then we 
-> shouldn't be doing that here (being mature platforms). That would mean 
-> new DTB will not work with existing kernels.
+On Sat, Feb 15, 2025 at 02:14:52PM +0100, Christian Marangi wrote:
+> Thanks, this wasn't reported in the first run so sorry for not noticing
+> this. I will take care of sending a follow-up patch to address this.
 
-Alright, I'll keep simple-bus in the eLBC binding for historical
-compatibility.
+> On Wed, Feb 12, 2025 at 06:23:01PM +0300, Dan Carpenter wrote:
+>
+> > drivers/crypto/inside-secure/eip93/eip93-common.c:233 check_valid_request() warn: 'src_nents' unsigned <= 0
+> > drivers/crypto/inside-secure/eip93/eip93-common.c:237 check_valid_request() warn: error code type promoted to positive: 'src_nents'
+> > drivers/crypto/inside-secure/eip93/eip93-common.c:240 check_valid_request() warn: error code type promoted to positive: 'dst_nents'
 
+The first one isn't a published check.  I should clean it up and publish
+it.  It has a few false positives where the less than zero is harmless
+but it doesn't print too many warnings.
 
-Thank you both for your discussion.
+The latter two warnings require the cross function database to work.
+The check needs to know which functions return negative error codes.
 
+regards,
+dan carpenter
 
-J. Neuschäfer
