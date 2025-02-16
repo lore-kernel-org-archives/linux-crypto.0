@@ -1,87 +1,109 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C87A6179A3
-	for <linux-crypto@vger.kernel.org>; Sun, 16 Feb 2025 19:51:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ACB2C2EF;
+	Sun, 16 Feb 2025 23:00:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739735491; cv=none; b=ZIFk7Cx9GW63n+aRMrwnhq3gDP1khpCF+ledoFG5Nypy57YCd0tIxwO4eQqQ2DwYWqfEKqjAhsTie3dFOIHp1WN0xFC6R7+gocaly3Ild6EVV5p1lghXJIxCNcEs8FpjVWsXb839Hx4HZVukzrzNoJlZtA7v+K4VcGamZzLWCvE=
+	t=1739746832; cv=none; b=MgtioPSW2T0v6yCreQcp5enYrIwvzAI6ahtyKWdmv9GZNElHAd0ksHh5XwefvfXg6mCr3OFWehZK+6zGzNDV0jb97vvTClE75iW9MNxdt2X/Ah/GyRT1ifBAWfM59q6CNwijmc7eN2Y1Y8tLiFklSJ470ecVQymUeTQdPSERxzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739735491; c=relaxed/simple;
-	bh=1hBQwnDsIBVBB3OG+j7Sc9xkUPWjklD42Afi4XMHbY0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a3OagONseMp0GMo+rl82qNPkjHTZBErwbb/SLT02m+vLkAVltBVfHO+MX8suvqE/30yoWdTXtd9ElS60biejMr8UbAfu96CQLr6NOQLhqSCmiCt3kDVR3oC96MQv6425R4szL9lmBzWwhirT6cYQ1gAzeNrKJuqfC8JZSIHQsWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PbCxRDgb; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739746832; c=relaxed/simple;
+	bh=2d6ZtWkWQ357DtEP1dRgzHJghjeMoRX2Npj7Yv4hSGE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tjtbhQk1zHn1FzCDjQrLsbUUBbvTbOIeVXnXpHikoF1qngBqL9YS7nut0h6gBqhxKjlo5mgWfXbuLdUCFNjaZXI9sa/mEQ28VWNH26FGCJHLdPAv4S8jDudCBTC5YjASpkx7e/mUC3Btyo8XiBncTxdDjsHZu4lSk5roIvGLa+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QohltwnV; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PbCxRDgb"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A3AFC4CEDD;
-	Sun, 16 Feb 2025 19:51:31 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QohltwnV"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65928C4CEDD;
+	Sun, 16 Feb 2025 23:00:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739735491;
-	bh=1hBQwnDsIBVBB3OG+j7Sc9xkUPWjklD42Afi4XMHbY0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PbCxRDgba8DiOQd5mmfKG6IWPCNSuHfwDMKAC813L2AwittQvPkroZDjkVV9J1omP
-	 vbdhCygMnyOhmOeL9+8XsK7HyvZTtoMs64OAh5QVfDGqa9JuTOva/2YisZAK8voGAm
-	 6ch6SVS0GkLhD/dFmmaYrK49vXA69FyHcEEe+Wla1uQi9hIrA1n43iORRO0PbeU+sf
-	 ZrLAEXE+eoO8F+KM7rggMEh+d7k1hyhmGw1Na6iu8v8J51yLFq7m/d7iO+Hi+zRPZe
-	 jdtfuHGu9seO9Gj+Cmzq5ceHTRNPAHna1G2gGctME3jzlpemVYFzvaxewlQk/EV5xr
-	 sI/4XUBSrLVLQ==
-Date: Sun, 16 Feb 2025 11:51:29 -0800
+	s=k20201202; t=1739746831;
+	bh=2d6ZtWkWQ357DtEP1dRgzHJghjeMoRX2Npj7Yv4hSGE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=QohltwnVNTwOz7KDrIKCLR37vW5W4nrOzm7uF7UIuCKk1SlnGDxR0Z/2pl3ag4fm9
+	 SY5blg5pleNqD+N3p2pu3d2nWtMCvQEihDPmiyWmHwgRO9vEgBKe4d4reZuZDyZyGM
+	 EkAiu18j4zY5bfptlaaAhja8S/IeQ07X6uZkD7vLBiMDXyDkd6NOZt/OGAAwacjEc0
+	 4aBn2i/12jAC6TPGTJSeL3H2ZM6tUyGWGmHLbNgTpyCHhPXIJS2kXgdmG398QvYsP0
+	 qlPhWtPFLB4P5gZuswb7PN1rWTQJva2HMrcvWrvNKMzN0R40VYUBZz2ydGC8sPGoYe
+	 mc9HLIccc8gyA==
 From: Eric Biggers <ebiggers@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+To: linux-kernel@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	Zhihang Shao <zhihang.shao.iscas@gmail.com>,
 	Ard Biesheuvel <ardb@kernel.org>,
-	Megha Dey <megha.dey@linux.intel.com>,
-	Tim Chen <tim.c.chen@linux.intel.com>
-Subject: Re: [v2 PATCH 00/11] Multibuffer hashing take two
-Message-ID: <20250216195129.GB2404@sol.localdomain>
-References: <cover.1739674648.git.herbert@gondor.apana.org.au>
- <20250216033816.GB90952@quark.localdomain>
- <Z7HHhWZI4Nb_-sJh@gondor.apana.org.au>
+	Xiao Wang <xiao.w.wang@intel.com>,
+	Charlie Jenkins <charlie@rivosinc.com>
+Subject: [PATCH 0/4] RISC-V CRC optimizations
+Date: Sun, 16 Feb 2025 14:55:26 -0800
+Message-ID: <20250216225530.306980-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z7HHhWZI4Nb_-sJh@gondor.apana.org.au>
+Content-Transfer-Encoding: 8bit
 
-On Sun, Feb 16, 2025 at 07:09:57PM +0800, Herbert Xu wrote:
-> On Sat, Feb 15, 2025 at 07:38:16PM -0800, Eric Biggers wrote:
-> > 
-> > This new version hasn't fundamentally changed anything.  It's still a much
-> > worse, unnecessarily complex and still incomplete implementation compared to my
-> > patchset which has been ready to go for nearly a year already.  Please refer to
-> > all the previous feedback that I've given.
-> 
-> FWIW, my interface is a lot simpler than yours to implement, since
-> it doesn't deal with the partial buffer non-sense in assembly.  In
-> fact that was a big mistake with the original API, the partial data
-> handling should've been moved to the API layer a long time ago.
+This patchset is a replacement for
+"[PATCH v4] riscv: Optimize crct10dif with Zbc extension"
+(https://lore.kernel.org/r/20250211071101.181652-1-zhihang.shao.iscas@gmail.com/).
+It adopts the approach that I'm taking for x86 where code is shared
+among CRC variants.  It replaces the existing Zbc optimized CRC32
+functions, then adds Zbc optimized CRC-T10DIF and CRC64 functions.
 
-We've already discussed this.  It is part of the multibuffer optimization, as
-instruction interleaving is applicable to partial block handling and
-finalization too.  It also makes those parts able to use SIMD.  Both of those
-improve performance.  But more importantly it eliminates the need for a separate
-descriptor for each message.  That results in massive simplifications up the
-stack.  The per-algorithm C glue code is much simpler, the API is much simpler
-and has fewer edge cases, and with only one descriptor being needed it becomes
-feasible to allocate it on the stack.  Overall it's just much more streamlined.
+This new code should be significantly faster than the current Zbc
+optimized CRC32 code and the previously proposed CRC-T10DIF code.  It
+uses "folding" instead of just Barrett reduction, and it also implements
+Barrett reduction more efficiently.
 
-For all these reasons my version ends up with a much smaller diffstat, despite
-the assembly code being longer and more optimized.
+This applies to crc-next at
+https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=crc-next.
+It depends on other patches that are queued there for 6.15, so I plan to
+take it through there if there are no objections.
 
-I see that you didn't even bother to include any tests for all the edge cases in
-your API where descriptors and/or scatterlists aren't synced up.  As I've
-explained before, these cases would be a huge pain to get right.
+Tested with crc_kunit in QEMU (set CONFIG_CRC_KUNIT_TEST=y and
+CONFIG_CRC_BENCHMARK=y), both 32-bit and 64-bit.  I don't have real Zbc
+capable hardware to benchmark this on, but the new code should work very
+well; similar optimizations work very well on other architectures.
 
-But of course, there is no need to go there in the first place.  Cryptographic
-APIs should be simple and not include unnecessary edge cases.  It seems you
-still have a misconception that your more complex API would make my work useful
-for IPsec, but again that is still incorrect, as I've explained many times.  The
-latest bogus claims that you've been making, like that GHASH is not
-parallelizable, don't exactly inspire confidence either.
+Eric Biggers (4):
+  riscv/crc: add "template" for Zbc optimized CRC functions
+  riscv/crc32: reimplement the CRC32 functions using new template
+  riscv/crc-t10dif: add Zbc optimized CRC-T10DIF function
+  riscv/crc64: add Zbc optimized CRC64 functions
 
-- Eric
+ arch/riscv/Kconfig                  |   2 +
+ arch/riscv/lib/Makefile             |   5 +
+ arch/riscv/lib/crc-clmul-consts.h   | 122 +++++++++++
+ arch/riscv/lib/crc-clmul-template.h | 265 ++++++++++++++++++++++++
+ arch/riscv/lib/crc-clmul.h          |  23 +++
+ arch/riscv/lib/crc-t10dif.c         |  24 +++
+ arch/riscv/lib/crc16_msb.c          |  18 ++
+ arch/riscv/lib/crc32-riscv.c        | 310 ----------------------------
+ arch/riscv/lib/crc32.c              |  53 +++++
+ arch/riscv/lib/crc32_lsb.c          |  18 ++
+ arch/riscv/lib/crc32_msb.c          |  18 ++
+ arch/riscv/lib/crc64.c              |  34 +++
+ arch/riscv/lib/crc64_lsb.c          |  18 ++
+ arch/riscv/lib/crc64_msb.c          |  18 ++
+ scripts/gen-crc-consts.py           |  55 ++++-
+ 15 files changed, 672 insertions(+), 311 deletions(-)
+ create mode 100644 arch/riscv/lib/crc-clmul-consts.h
+ create mode 100644 arch/riscv/lib/crc-clmul-template.h
+ create mode 100644 arch/riscv/lib/crc-clmul.h
+ create mode 100644 arch/riscv/lib/crc-t10dif.c
+ create mode 100644 arch/riscv/lib/crc16_msb.c
+ delete mode 100644 arch/riscv/lib/crc32-riscv.c
+ create mode 100644 arch/riscv/lib/crc32.c
+ create mode 100644 arch/riscv/lib/crc32_lsb.c
+ create mode 100644 arch/riscv/lib/crc32_msb.c
+ create mode 100644 arch/riscv/lib/crc64.c
+ create mode 100644 arch/riscv/lib/crc64_lsb.c
+ create mode 100644 arch/riscv/lib/crc64_msb.c
+
+
+base-commit: cf1ea3a7c1f63cba7d1dd313ee3accde0c0c8988
+-- 
+2.48.1
+
