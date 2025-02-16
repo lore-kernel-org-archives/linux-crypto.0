@@ -1,42 +1,42 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8711018027
-	for <linux-crypto@vger.kernel.org>; Sun, 16 Feb 2025 03:07:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9C19199B8
+	for <linux-crypto@vger.kernel.org>; Sun, 16 Feb 2025 03:10:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739675261; cv=none; b=DYDC7hcmhPncEcRb/WNNHaNFcWBN1ZfYopQi6E32yfjWSiHgb+Y7xcn2I6iCrAD8hhoSlRoi1Fr1LXpnsubNid4VEwdCxRCJKbVpr/Bw/YRifFdDbVO82KtkY3mkCt+5Xa4DH9SpXfdhg/Rvw/W8wmI8fBhOkjtDIO+SZyOMJw0=
+	t=1739675424; cv=none; b=eY9Rh734QAo2rkuukCO/WbUVIcO76IjLO83tBkjKB43x9sHhRJe0bmkplI10vD2txh+KdVcNtpwYsfI7eX9NQWP2uQR55BjB1kpJj7bmaryf680FJVipiYp0DS0XbdYEUB20lAvgoDK2K2D/jV7CbQaxfW976ZBt0qrFZt8z/Co=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739675261; c=relaxed/simple;
-	bh=Rjy/TlZfCvvivByd7aDUZlNoawUqdRePD1fCzBywmIQ=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To:Cc; b=Ox3mOz0dWK07x8q9kdBivBeVXdBkQOB519xkb2rgPgoML9ZCGT1TwiyO3qrcwq5ChLSe6yGv45uox1lAMBgCFBhQ7m3+sDp9eh1iNCUDI5HKr+4VzsBQsRxH4QlB0h3Ezq57dFh18YgBs3Ng3/Z4po2oh3W35txHEtr+xleG//4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=aEcSeJwf; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	s=arc-20240116; t=1739675424; c=relaxed/simple;
+	bh=p+/lVKuxK3rootGsjG5xAoagLcyOv18N6K9+Ale1Bu0=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To:Cc; b=QNSHzVstosy90Q1+Y5552NRNb0VLiHDwmFKdZXdyQdCiJo6NdQxcklF7Spfp2Qne7fy+3nzp8wcogVoh9HPo2/LZ0jOB0tzaZlSZE7SmOs73QKvg8Vgmsme51TdHgAmfb9Qln8kDrngNw33RISIBFEgNdNOpSD7ullhmTm6NGY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=shEke4aE; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="aEcSeJwf"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="shEke4aE"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=Cc:To:Subject:From:References:In-Reply-To:Message-Id:Date:
 	Sender:Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
 	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
 	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=rvcAqMKpJHp+/RooV/oWQbv8bhWfOMn+9E9F8T+I0nE=; b=aEcSeJwfh7+ksuP0nyge7+J6VP
-	RxOj9wYlmn4763vRR9EnAblPQJKeUMYH9+g9uDZ5v2KfwkVrFG8ifdYhxoIPiLQRxYonJO7XqKGN3
-	5XxTlVVcs7sZn8yywQB6X1yLhJRciOcu7jtC7PL16+r3G84hWMO8EsiwuQMihJeht56xekaDUWnoM
-	qJCxV3AjBQFT/rQp75y/jbNRROfLf77uATESTb5IiYUuZCPR1LvBhxLnzk8uriOdKJ01sy2b1xITx
-	FarBhmw1ZWm7FQbEgYflK0fhAuOqaj9x1eSCgHdRJNruRha7Vz6Btpkqocedx2UjtNo5TJ/N8TjcC
-	Xwww7qbw==;
+	bh=wquegPewatpvz20WiIh0fEF1nRCAWV/gKId/8RXXn9w=; b=shEke4aEZgJsRANcK8vh2jOBAc
+	fgv+QYRBn+0+81pISVy/mDQxuI3w8LaEkel1+MyTyML1NlQYmEsVc293ojeg10KolviSR0UpGYzK/
+	AFnhw00sduU9oKqYWc3d54zHwDMQWoTNk9B8q1nVlRmidTDwOI5d0tTWvnMCqM5h4FQFbPKUKOMp9
+	8udWoid2Z5xwpckwkYiTJfQacn0bWMNe64L9tZx4WPl0/CtwnyxHGZornWkrGXrXLwXDuxy1IPvoV
+	guyoI3yWJ3vShcxwGFG+y2c2GSV8AjDxVdBlrVnrCd5whenyoR5gdeLVtVf1NEq5iA30EN9G9gMTm
+	ZFIDOahw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tjUnP-000gaN-0b;
-	Sun, 16 Feb 2025 11:07:36 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 16 Feb 2025 11:07:35 +0800
-Date: Sun, 16 Feb 2025 11:07:35 +0800
-Message-Id: <dd11ea3e7231fb46f68d902ba38a5b688e378bfe.1739674648.git.herbert@gondor.apana.org.au>
+	id 1tjUq1-000gcf-2g;
+	Sun, 16 Feb 2025 11:10:19 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 16 Feb 2025 11:10:18 +0800
+Date: Sun, 16 Feb 2025 11:10:18 +0800
+Message-Id: <dd11ea3e7231fb46f68d902ba38a5b688e378bfe.1739674648.1.git.herbert@gondor.apana.org.au>
 In-Reply-To: <cover.1739674648.git.herbert@gondor.apana.org.au>
 References: <cover.1739674648.git.herbert@gondor.apana.org.au>
-From: Eric Biggers <ebiggers@google.com>
+From: Herbert Xu <herbert@gondor.apana.org.au>
 Subject: [v2 PATCH 11/11] fsverity: improve performance by using multibuffer
  hashing
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
@@ -46,6 +46,8 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+
+From: Eric Biggers <ebiggers@google.com>
 
 When supported by the hash algorithm, use crypto_shash_finup_mb() to
 interleave the hashing of pairs of data blocks.  On some CPUs this
