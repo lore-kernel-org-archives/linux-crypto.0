@@ -1,271 +1,162 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7D711A76DE;
-	Sun, 16 Feb 2025 23:00:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10069192D80
+	for <linux-crypto@vger.kernel.org>; Mon, 17 Feb 2025 07:53:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739746833; cv=none; b=bqCiCjjHH9cBwvWldclrMdt2Gqr/jLhIYgq9hptqXZCsFkgR9uZYD+DAb5FpTmxNUjjA2DKbfNWm6nO3fB190IRsnA21SueUgTdCaTtKr0pGnl/g2vWhWZAWq8HpVueIPbp40vURJM9bdWpxo9dy/eVcgAO8K1v/hvDH3Ii6KAA=
+	t=1739778810; cv=none; b=rsj+KricU52cWL7mI4wJMNuNS3KqsduCEBCYh6u1X7f8Yohrzs7Er2jatqk2tSctRLU5Z7WH366CzUuKDOZJ5VVo1mB51k7Kyt0jzC2Jb6qPEsITknizA+sSxaTB/nTTk9ptr6t9e9B8IMEk6TakdBtHjq/m1LvQcHnNBpM+wVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739746833; c=relaxed/simple;
-	bh=lEjXKuNQrqFQrs67kbVmsLM6h39EaeFvwXc4cVIAC3M=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CCa0221OEaI9TozET8MrviQRS/NJqsJY0CZ3u56scExv+JNmwuikP2bOuPLhKfHitjt9DpLHS2kdlzngKFdFuyk/3bhsdrmQtLc5jsmrLjREz3NzYwNyrjo4N9Sv1yqppGGh2CZSBgV053Fjk1pBugqrWtMqOsE4L8E9kJ+Lohs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tmKYvSzp; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tmKYvSzp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1F5EC4CEF1;
-	Sun, 16 Feb 2025 23:00:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739746833;
-	bh=lEjXKuNQrqFQrs67kbVmsLM6h39EaeFvwXc4cVIAC3M=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tmKYvSzpXWbDg2X4OFjHLNu15ZWyE6kFgy4zF95Rw6C6TWaZxtwhqFIk1xNFvPJCv
-	 cnBJxxCe6qjr2rLUqqOFmt3CEvsqiTKmrGC+oTjHXKecCYo/K5XNo/uR2XlJ9CVfyW
-	 NQj0MSu1yiNDq43Vqm9vCG8VBwUsMXX6YtltduTUF3QOSwvm9N9vhwitoXe7JIn18h
-	 BjZaxDeiDniSbKy8MtN9zTdNO5hcjdWIxE9ipMMxfHThoMHcIxuDPXmLr6H9NjZ3V/
-	 rJp9yot0IgjLENEQ/EIoiu/FDFPEFWkVsJJVxA2himVPLUd2z60rbKnNJ7rXmXcHNK
-	 ih0OuGXW2Cwsg==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	Zhihang Shao <zhihang.shao.iscas@gmail.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Xiao Wang <xiao.w.wang@intel.com>,
-	Charlie Jenkins <charlie@rivosinc.com>
-Subject: [PATCH 4/4] riscv/crc64: add Zbc optimized CRC64 functions
-Date: Sun, 16 Feb 2025 14:55:30 -0800
-Message-ID: <20250216225530.306980-5-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250216225530.306980-1-ebiggers@kernel.org>
-References: <20250216225530.306980-1-ebiggers@kernel.org>
+	s=arc-20240116; t=1739778810; c=relaxed/simple;
+	bh=0eB6pfik9lPrKnBrPr5YRGNnZCcmDvEsBLomBFwCLzw=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=HmglxmmJS/kPSu/Yv93stArsN29Hm28DjmOQgrALJbKO8VTUZyrvMqxbDthruChnCGsLE1aHvosArqIg6lFGVy/RZAyyzlvjuZkyVhQlO98qK4xg2RzJ+TmwJkqlOpuRyyKlnAJ7f1fQ/iDKxkohcYAZ7ss0WpTf+WCzLcQqAgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3d143a428bcso78137485ab.1
+        for <linux-crypto@vger.kernel.org>; Sun, 16 Feb 2025 23:53:28 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739778808; x=1740383608;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OnjOPcPtQJidYYXAir6799pgHthwAAAi4v1nTbaniHg=;
+        b=oT3ODYnTGQuJkZtXwZKahK6z4KbZYpSQ4VcPy6bnTlAgJQ2D53hKlT/qSEzTeFMBT0
+         Q84l3Kw+RZ5VhsLJqLVf/xvHgH89muy0wfRc7UAzC9gyEBpw+MDAKgZPRon3/87G9Fms
+         qhI1UFjf73VCbculo98V1czS/RteDypkx95D77jmCZhHbhwsqqDgGwGrAhg99yY9VPrH
+         vH4tAg4v0DLvRGf/8OPxaXfpDYmtumqBNEsEO1OGa+xpMzBuViTD8SQ/cQehGJwb/ZAH
+         ixaDrUVq4bhsZUw4ApSlVfkXF6LEehTtgaFffBQZ/nMGEUEoWkJKrKxidHWNVCZ6GKBN
+         WpAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXKmv7LlBpOL2WkPKSbQBSQGHtLKaCOJkXuBGtGa5xXY9mMpl1JHIB3bo+ZaxbqmBorcvyP8Hwf9WoO4EM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6alaJt6U8ZlA8c5U6hGr7OIrUWlF2Kw3fulx+dxowe3ykpc/f
+	JjT9Ijg6S8xSvV7bQFAwCXZRGuC8ox44exrWjwQxMaGAPLcjRsnD1ypXu/kcgXfMcA6MNWm4lft
+	2jlFCLcZpipprm4oppa+/txOE9xqmK13109fTJGrnFcIU1dH+M/Vw6Ek=
+X-Google-Smtp-Source: AGHT+IHUJpTvEOY7k+3N0NKWON1rIkG0PuVtRogPOq4lO3+Q5V6JgBp9PpQFV246dsEQo5Da/Bkt6x18R8Y0eY73CR4Sa7BdehDk
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:240b:b0:3d2:75bc:730 with SMTP id
+ e9e14a558f8ab-3d2809d9587mr73860745ab.19.1739778808203; Sun, 16 Feb 2025
+ 23:53:28 -0800 (PST)
+Date: Sun, 16 Feb 2025 23:53:28 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67b2eaf8.050a0220.173698.0020.GAE@google.com>
+Subject: [syzbot] [crypto?] KASAN: use-after-free Read in crypto_poly1305_update
+From: syzbot <syzbot+d587b24799bd8c2d32f4@syzkaller.appspotmail.com>
+To: bp@alien8.de, dave.hansen@linux.intel.com, davem@davemloft.net, 
+	herbert@gondor.apana.org.au, hpa@zytor.com, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, mingo@redhat.com, 
+	syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-From: Eric Biggers <ebiggers@google.com>
+Hello,
 
-Wire up crc64_be_arch() and crc64_nvme_arch() for 64-bit RISC-V using
-crc-clmul-template.h.  This greatly improves the performance of these
-CRCs on Zbc-capable CPUs in 64-bit kernels.
+syzbot found the following issue on:
 
-These optimized CRC64 functions are not yet supported in 32-bit kernels,
-since crc-clmul-template.h assumes that the CRC fits in an unsigned
-long.  That implementation limitation could be addressed, but it would
-add a fair bit of complexity, so it has been omitted for now.
+HEAD commit:    ba643b6d8440 Merge tag 'irq_urgent_for_v6.14_rc3' of git:/..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=176ea898580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=c776e555cfbdb82d
+dashboard link: https://syzkaller.appspot.com/bug?extid=d587b24799bd8c2d32f4
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=150557df980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10eea898580000
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-ba643b6d.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/b6a86fb77c0b/vmlinux-ba643b6d.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/c4725da84fe0/bzImage-ba643b6d.xz
+mounted in repro: https://storage.googleapis.com/syzbot-assets/769f8967e4f1/mount_0.gz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+d587b24799bd8c2d32f4@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KASAN: use-after-free in crypto_poly1305_update+0x28/0x40 arch/x86/crypto/poly1305_glue.c:230
+Read of size 8 at addr ffff888049757390 by task syz-executor358/5305
+
+CPU: 0 UID: 0 PID: 5305 Comm: syz-executor358 Not tainted 6.14.0-rc2-syzkaller-00346-gba643b6d8440 #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+ print_address_description mm/kasan/report.c:378 [inline]
+ print_report+0x169/0x550 mm/kasan/report.c:489
+ kasan_report+0x143/0x180 mm/kasan/report.c:602
+ kasan_check_range+0x282/0x290 mm/kasan/generic.c:189
+ __asan_memcpy+0x29/0x70 mm/kasan/shadow.c:105
+ crypto_poly1305_update+0x28/0x40 arch/x86/crypto/poly1305_glue.c:230
+ bch2_checksum+0x5fa/0x780 fs/bcachefs/checksum.c:239
+ bch2_btree_node_read_done+0x1402/0x6180 fs/bcachefs/btree_io.c:1130
+ btree_node_read_work+0x6dc/0x1380 fs/bcachefs/btree_io.c:1358
+ bch2_btree_node_read+0x2433/0x29f0
+ __bch2_btree_root_read fs/bcachefs/btree_io.c:1789 [inline]
+ bch2_btree_root_read+0x626/0x7b0 fs/bcachefs/btree_io.c:1811
+ read_btree_roots+0x3d3/0xa70 fs/bcachefs/recovery.c:581
+ bch2_fs_recovery+0x260f/0x3de0 fs/bcachefs/recovery.c:928
+ bch2_fs_start+0x37c/0x610 fs/bcachefs/super.c:1041
+ bch2_fs_get_tree+0xdb7/0x17a0 fs/bcachefs/fs.c:2203
+ vfs_get_tree+0x90/0x2b0 fs/super.c:1814
+ do_new_mount+0x2be/0xb40 fs/namespace.c:3560
+ do_mount fs/namespace.c:3900 [inline]
+ __do_sys_mount fs/namespace.c:4111 [inline]
+ __se_sys_mount+0x2d6/0x3c0 fs/namespace.c:4088
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fd8b49b71ba
+Code: d8 64 89 02 48 c7 c0 ff ff ff ff eb a6 e8 5e 04 00 00 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 49 89 ca b8 a5 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fff5a4d7e78 EFLAGS: 00000282 ORIG_RAX: 00000000000000a5
+RAX: ffffffffffffffda RBX: 00007fff5a4d7e90 RCX: 00007fd8b49b71ba
+RDX: 0000400000000000 RSI: 0000400000000200 RDI: 00007fff5a4d7e90
+RBP: 0000400000000000 R08: 00007fff5a4d7ed0 R09: 000000000000f634
+R10: 0000000002a08414 R11: 0000000000000282 R12: 0000400000000200
+R13: 00007fff5a4d7ed0 R14: 0000000000000003 R15: 0000000002a08414
+ </TASK>
+
+The buggy address belongs to the physical page:
+page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x49757
+flags: 0x4fff00000000000(node=1|zone=1|lastcpupid=0x7ff)
+raw: 04fff00000000000 ffffea000125d5c8 ffffea000125d5c8 0000000000000000
+raw: 0000000000000000 0000000000000000 00000000ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner info is not present (never set?)
+
+Memory state around the buggy address:
+ ffff888049757280: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+ ffff888049757300: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+>ffff888049757380: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+                         ^
+ ffff888049757400: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+ ffff888049757480: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+==================================================================
+
+
 ---
- arch/riscv/Kconfig                |  1 +
- arch/riscv/lib/Makefile           |  2 ++
- arch/riscv/lib/crc-clmul-consts.h | 34 ++++++++++++++++++++++++++++++-
- arch/riscv/lib/crc-clmul.h        |  6 ++++++
- arch/riscv/lib/crc64.c            | 34 +++++++++++++++++++++++++++++++
- arch/riscv/lib/crc64_lsb.c        | 18 ++++++++++++++++
- arch/riscv/lib/crc64_msb.c        | 18 ++++++++++++++++
- 7 files changed, 112 insertions(+), 1 deletion(-)
- create mode 100644 arch/riscv/lib/crc64.c
- create mode 100644 arch/riscv/lib/crc64_lsb.c
- create mode 100644 arch/riscv/lib/crc64_msb.c
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
-index db1cf9666dfd..e10dda2d0bfe 100644
---- a/arch/riscv/Kconfig
-+++ b/arch/riscv/Kconfig
-@@ -23,10 +23,11 @@ config RISCV
- 	select ARCH_ENABLE_MEMORY_HOTREMOVE if MEMORY_HOTPLUG
- 	select ARCH_ENABLE_SPLIT_PMD_PTLOCK if PGTABLE_LEVELS > 2
- 	select ARCH_ENABLE_THP_MIGRATION if TRANSPARENT_HUGEPAGE
- 	select ARCH_HAS_BINFMT_FLAT
- 	select ARCH_HAS_CRC32 if RISCV_ISA_ZBC
-+	select ARCH_HAS_CRC64 if 64BIT && RISCV_ISA_ZBC
- 	select ARCH_HAS_CRC_T10DIF if RISCV_ISA_ZBC
- 	select ARCH_HAS_CURRENT_STACK_POINTER
- 	select ARCH_HAS_DEBUG_VIRTUAL if MMU
- 	select ARCH_HAS_DEBUG_VM_PGTABLE
- 	select ARCH_HAS_DEBUG_WX
-diff --git a/arch/riscv/lib/Makefile b/arch/riscv/lib/Makefile
-index 06d9552b9c8b..b1c46153606a 100644
---- a/arch/riscv/lib/Makefile
-+++ b/arch/riscv/lib/Makefile
-@@ -15,10 +15,12 @@ endif
- lib-$(CONFIG_MMU)	+= uaccess.o
- lib-$(CONFIG_64BIT)	+= tishift.o
- lib-$(CONFIG_RISCV_ISA_ZICBOZ)	+= clear_page.o
- obj-$(CONFIG_CRC32_ARCH)	+= crc32-riscv.o
- crc32-riscv-y := crc32.o crc32_msb.o crc32_lsb.o
-+obj-$(CONFIG_CRC64_ARCH) += crc64-riscv.o
-+crc64-riscv-y := crc64.o crc64_msb.o crc64_lsb.o
- obj-$(CONFIG_CRC_T10DIF_ARCH)	+= crc-t10dif-riscv.o
- crc-t10dif-riscv-y := crc-t10dif.o crc16_msb.o
- obj-$(CONFIG_FUNCTION_ERROR_INJECTION) += error-inject.o
- lib-$(CONFIG_RISCV_ISA_V)	+= xor.o
- lib-$(CONFIG_RISCV_ISA_V)	+= riscv_v_helpers.o
-diff --git a/arch/riscv/lib/crc-clmul-consts.h b/arch/riscv/lib/crc-clmul-consts.h
-index b3a02b9096cd..8d73449235ef 100644
---- a/arch/riscv/lib/crc-clmul-consts.h
-+++ b/arch/riscv/lib/crc-clmul-consts.h
-@@ -1,10 +1,10 @@
- /* SPDX-License-Identifier: GPL-2.0-or-later */
- /*
-  * CRC constants generated by:
-  *
-- *	./scripts/gen-crc-consts.py riscv_clmul crc16_msb_0x8bb7,crc32_msb_0x04c11db7,crc32_lsb_0xedb88320,crc32_lsb_0x82f63b78
-+ *	./scripts/gen-crc-consts.py riscv_clmul crc16_msb_0x8bb7,crc32_msb_0x04c11db7,crc32_lsb_0xedb88320,crc32_lsb_0x82f63b78,crc64_msb_0x42f0e1eba9ea3693,crc64_lsb_0x9a6c9329ac4bc9b5
-  *
-  * Do not edit manually.
-  */
- 
- struct crc_clmul_consts {
-@@ -86,5 +86,37 @@ static const struct crc_clmul_consts crc32_lsb_0x82f63b78_consts __maybe_unused
- 	.fold_across_2_longs_const_lo = 0xdd45aab8, /* x^63 mod G */
- 	.barrett_reduction_const_1 = 0xdea713f1, /* floor(x^63 / G) */
- 	.barrett_reduction_const_2 = 0x82f63b78, /* (G - x^32) * x^0 */
- #endif
- };
-+
-+/*
-+ * Constants generated for most-significant-bit-first CRC-64 using
-+ * G(x) = x^64 + x^62 + x^57 + x^55 + x^54 + x^53 + x^52 + x^47 + x^46 + x^45 +
-+ *        x^40 + x^39 + x^38 + x^37 + x^35 + x^33 + x^32 + x^31 + x^29 + x^27 +
-+ *        x^24 + x^23 + x^22 + x^21 + x^19 + x^17 + x^13 + x^12 + x^10 + x^9 +
-+ *        x^7 + x^4 + x^1 + x^0
-+ */
-+#ifdef CONFIG_64BIT
-+static const struct crc_clmul_consts crc64_msb_0x42f0e1eba9ea3693_consts __maybe_unused = {
-+	.fold_across_2_longs_const_hi = 0x4eb938a7d257740e, /* x^192 mod G */
-+	.fold_across_2_longs_const_lo = 0x05f5c3c7eb52fab6, /* x^128 mod G */
-+	.barrett_reduction_const_1 = 0xabc694e836627c39, /* floor(x^127 / G) */
-+	.barrett_reduction_const_2 = 0x42f0e1eba9ea3693, /* G - x^64 */
-+};
-+#endif
-+
-+/*
-+ * Constants generated for least-significant-bit-first CRC-64 using
-+ * G(x) = x^64 + x^63 + x^61 + x^59 + x^58 + x^56 + x^55 + x^52 + x^49 + x^48 +
-+ *        x^47 + x^46 + x^44 + x^41 + x^37 + x^36 + x^34 + x^32 + x^31 + x^28 +
-+ *        x^26 + x^23 + x^22 + x^19 + x^16 + x^13 + x^12 + x^10 + x^9 + x^6 +
-+ *        x^4 + x^3 + x^0
-+ */
-+#ifdef CONFIG_64BIT
-+static const struct crc_clmul_consts crc64_lsb_0x9a6c9329ac4bc9b5_consts __maybe_unused = {
-+	.fold_across_2_longs_const_hi = 0xeadc41fd2ba3d420, /* x^191 mod G */
-+	.fold_across_2_longs_const_lo = 0x21e9761e252621ac, /* x^127 mod G */
-+	.barrett_reduction_const_1 = 0x27ecfa329aef9f77, /* floor(x^127 / G) */
-+	.barrett_reduction_const_2 = 0x9a6c9329ac4bc9b5, /* (G - x^64) * x^0 */
-+};
-+#endif
-diff --git a/arch/riscv/lib/crc-clmul.h b/arch/riscv/lib/crc-clmul.h
-index 162c1b12b219..dd1736245815 100644
---- a/arch/riscv/lib/crc-clmul.h
-+++ b/arch/riscv/lib/crc-clmul.h
-@@ -11,7 +11,13 @@ u16 crc16_msb_clmul(u16 crc, const void *p, size_t len,
- 		    const struct crc_clmul_consts *consts);
- u32 crc32_msb_clmul(u32 crc, const void *p, size_t len,
- 		    const struct crc_clmul_consts *consts);
- u32 crc32_lsb_clmul(u32 crc, const void *p, size_t len,
- 		    const struct crc_clmul_consts *consts);
-+#ifdef CONFIG_64BIT
-+u64 crc64_msb_clmul(u64 crc, const void *p, size_t len,
-+		    const struct crc_clmul_consts *consts);
-+u64 crc64_lsb_clmul(u64 crc, const void *p, size_t len,
-+		    const struct crc_clmul_consts *consts);
-+#endif
- 
- #endif /* _RISCV_CRC_CLMUL_H */
-diff --git a/arch/riscv/lib/crc64.c b/arch/riscv/lib/crc64.c
-new file mode 100644
-index 000000000000..f0015a27836a
---- /dev/null
-+++ b/arch/riscv/lib/crc64.c
-@@ -0,0 +1,34 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * RISC-V optimized CRC64 functions
-+ *
-+ * Copyright 2025 Google LLC
-+ */
-+
-+#include <asm/hwcap.h>
-+#include <asm/alternative-macros.h>
-+#include <linux/crc64.h>
-+#include <linux/module.h>
-+
-+#include "crc-clmul.h"
-+
-+u64 crc64_be_arch(u64 crc, const u8 *p, size_t len)
-+{
-+	if (riscv_has_extension_likely(RISCV_ISA_EXT_ZBC))
-+		return crc64_msb_clmul(crc, p, len,
-+				       &crc64_msb_0x42f0e1eba9ea3693_consts);
-+	return crc64_be_generic(crc, p, len);
-+}
-+EXPORT_SYMBOL(crc64_be_arch);
-+
-+u64 crc64_nvme_arch(u64 crc, const u8 *p, size_t len)
-+{
-+	if (riscv_has_extension_likely(RISCV_ISA_EXT_ZBC))
-+		return crc64_lsb_clmul(crc, p, len,
-+				       &crc64_lsb_0x9a6c9329ac4bc9b5_consts);
-+	return crc64_nvme_generic(crc, p, len);
-+}
-+EXPORT_SYMBOL(crc64_nvme_arch);
-+
-+MODULE_DESCRIPTION("RISC-V optimized CRC64 functions");
-+MODULE_LICENSE("GPL");
-diff --git a/arch/riscv/lib/crc64_lsb.c b/arch/riscv/lib/crc64_lsb.c
-new file mode 100644
-index 000000000000..c5371bb85d90
---- /dev/null
-+++ b/arch/riscv/lib/crc64_lsb.c
-@@ -0,0 +1,18 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * RISC-V optimized least-significant-bit-first CRC64
-+ *
-+ * Copyright 2025 Google LLC
-+ */
-+
-+#include "crc-clmul.h"
-+
-+typedef u64 crc_t;
-+#define LSB_CRC 1
-+#include "crc-clmul-template.h"
-+
-+u64 crc64_lsb_clmul(u64 crc, const void *p, size_t len,
-+		    const struct crc_clmul_consts *consts)
-+{
-+	return crc_clmul(crc, p, len, consts);
-+}
-diff --git a/arch/riscv/lib/crc64_msb.c b/arch/riscv/lib/crc64_msb.c
-new file mode 100644
-index 000000000000..1925d1dbe225
---- /dev/null
-+++ b/arch/riscv/lib/crc64_msb.c
-@@ -0,0 +1,18 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * RISC-V optimized most-significant-bit-first CRC64
-+ *
-+ * Copyright 2025 Google LLC
-+ */
-+
-+#include "crc-clmul.h"
-+
-+typedef u64 crc_t;
-+#define LSB_CRC 0
-+#include "crc-clmul-template.h"
-+
-+u64 crc64_msb_clmul(u64 crc, const void *p, size_t len,
-+		    const struct crc_clmul_consts *consts)
-+{
-+	return crc_clmul(crc, p, len, consts);
-+}
--- 
-2.48.1
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
