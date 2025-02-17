@@ -1,107 +1,95 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 537D022A1E6;
-	Mon, 17 Feb 2025 18:50:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70848225A32;
+	Mon, 17 Feb 2025 18:51:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739818202; cv=none; b=D83weKJ3hFgTyTWZyoxM2XDLXtAl9EVkWgPNxnZvO+1r7ao3S5i1F9P20+EPFyra0Yxd50bfvTnVHQCxF8gLl4atAta9oRmbEzYPeXOeN7wc9TTKW5v0bAd2bxuHtBG0GhJ+soOXNv/9nrWQGf2TgdHDBlmZM5YGcx1njDf/FWk=
+	t=1739818306; cv=none; b=EExDBrvYbf49tuyo7UBfATZ2vepS+Vj3O3YpZaonnWZKgcrCB16gxZ0vNJfiYHA+Enp+DoZQ58l4DUpRbtsaDWKHKYQJ3dfivLSQiuljpgEfKpehNCV83MuI0kKun3TtZ1IeQXgrBFZqjIQ+LdBUwX0gh5kCxq/7TMATkeMeVmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739818202; c=relaxed/simple;
-	bh=bSkaPVIT6VfRE0JIpCa1oHUI1xXQj1fjU7es/My1gRM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EjQDnEEJiVnj49vYG+iof/QxY4p9zf2NnQWXrdcTE4Oe0WEvlMsSAPAfP+lSIRYOKgjAjA5HKz6gCgb8+yufBN5yvqH6azAAqCve9NF9K+EvyEEEhLgmpsc2xYYBpIw/wAAUCkmQ8zpuBKlN6tvDN7V4atlwM8+6ftLzwyzK5wg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cY4c2KC2; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739818306; c=relaxed/simple;
+	bh=4UetnDp/IjG2cLYw6HtQVxgGl/nS4VUSWoWAf/niGso=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jciXjrKNOBlGt7YKSW10M3LyFVmANLKQaCvlj62yMzSZx9xDyxqh2F5nAeonyrHC2d7lcCVYJ4dXxE4rzqdGtKHpFXrPPA9MrQAaoSgSasoecOrKLVnaVmtLsKE/RDYj/ilLTgqXKVvmJ3HRqUubp9Ax7cLV3nLNUZPnJEwsKLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RjHfMYiW; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cY4c2KC2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 870CCC4CED1;
-	Mon, 17 Feb 2025 18:50:01 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RjHfMYiW"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBD80C4CED1;
+	Mon, 17 Feb 2025 18:51:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739818201;
-	bh=bSkaPVIT6VfRE0JIpCa1oHUI1xXQj1fjU7es/My1gRM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cY4c2KC24HnubKXjrX0Oxg25o0kMezl+Yqkk1suSt1BWnLHdJxZM5w8PjZRm12lak
-	 DVCAMefgBVLG3tNaqjG8wJFCZZtc37AsAsTXSabdrhFjKa/ULzyLolFhkR3HcFzyVT
-	 7QZjOeN0Uh3kvvqTO5rCzZ1jSla1YRc5R70ydCJ/C0Sv8YwTsVv2f6hfC3l7zyXrIV
-	 Vocghvvv5K9EWGO6dEoLjQ0fJrGmD4wRMNusQI6ePZvFBYM2kdC0E1lFBH9XvsYF0r
-	 71sV0zD4FjCp8K0blysR2qUTSfB/mOkbT6Nw5jpXc8EZ3HFSVeFDKzh+THvF/46hc0
-	 U5MGuq+iNeQFQ==
-Date: Mon, 17 Feb 2025 10:50:00 -0800
+	s=k20201202; t=1739818306;
+	bh=4UetnDp/IjG2cLYw6HtQVxgGl/nS4VUSWoWAf/niGso=;
+	h=From:To:Cc:Subject:Date:From;
+	b=RjHfMYiW5A/fk8zL3VSABNTxhXk3MFxWepC30kCBJjEbu0HNUhcdGmxZv73/+QUrS
+	 YZR7bQe3XrzHyPg6Hj3EIY1JwaGhJAX8wPbPhmzaQZRtljfqt3ckW6uVTouoQP77y2
+	 7huLAb76SR/OmbR0g6YOvxhjIi0Pd1oSCPTMWtDFZDcflHjd2KvLzPXv8uDwzgWkqm
+	 ghjzfGRuFhm/E+PwgVXUu2CTMsTamMl0FnK4ghCGrnhzi/qBwbi/0+lsliE3csjZ0d
+	 RuBF4wMoB04g4PuWG8uIfh8EuWXG5ZcFukkUvdBGjYvEnLCbU/J8+LBZfuRK4VOaFe
+	 KqAjWjHlg5OYQ==
 From: Eric Biggers <ebiggers@kernel.org>
-To: Lucas Tanure <tanure@linux.com>
-Cc: kernelnewbies <kernelnewbies@kernelnewbies.org>,
-	linux-fscrypt@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-	linux-crypto@vger.kernel.org,
-	"krzysztof.opasiak@neat.no" <krzysztof.opasiak@neat.no>,
-	"lucas.tanure@neat.no" <lucas.tanure@neat.no>
-Subject: Re: crypto: fscrypt: crypto_create_tfm_node memory leak
-Message-ID: <20250217185000.GC1258@sol.localdomain>
-References: <CAJX_Q+24svAcoyxqcUu4z2g08bJeRFEmzYtVK1paoZ0xBX_uTA@mail.gmail.com>
+To: fsverity@lists.linux.dev
+Cc: linux-crypto@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH] Revert "fsverity: relax build time dependency on CRYPTO_SHA256"
+Date: Mon, 17 Feb 2025 10:51:05 -0800
+Message-ID: <20250217185105.26751-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJX_Q+24svAcoyxqcUu4z2g08bJeRFEmzYtVK1paoZ0xBX_uTA@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Feb 17, 2025 at 06:43:15PM +0000, Lucas Tanure wrote:
-> Hi,
-> 
-> I am working with Android 13 and V5.15 kernel. During our development,
-> I found a memory leak using kmemleak.
-> 
-> Steps I did to find the memleak:
-> mount -t debugfs debugfs /sys/kernel/debug
-> echo scan=5 > /sys/kernel/debug/kmemleak
-> cat /sys/kernel/debug/kmemleak
-> 
-> Stack I got (hundreds of them):
-> unreferenced object 0xffffff8101d31000 (size 1024):
->   comm "binder:1357_2", pid 1357, jiffies 4294899464 (age 394.468s)
->   hex dump (first 32 bytes):
->     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->   backtrace:
->     [<ffffffd327cac060>] crypto_create_tfm_node+0x64/0x228
->     [<ffffffd3279f8c4c>] fscrypt_prepare_key+0xbc/0x230
->     [<ffffffd3279f9758>] fscrypt_setup_v1_file_key+0x48c/0x510
->     [<ffffffd3279f8394>] fscrypt_setup_encryption_info+0x210/0x43c
->     [<ffffffd3279f8108>] fscrypt_prepare_new_inode+0x128/0x1a4
->     [<ffffffd327bcc878>] f2fs_new_inode+0x27c/0x89c
->     [<ffffffd327bce7c4>] f2fs_mkdir+0x78/0x278
->     [<ffffffd32796a3bc>] vfs_mkdir+0x138/0x204
->     [<ffffffd32796a108>] do_mkdirat+0x88/0x204
->     [<ffffffd32796a068>] __arm64_sys_mkdirat+0x40/0x58
->     [<ffffffd3274be5d4>] invoke_syscall+0x60/0x150
->     [<ffffffd3274be528>] el0_svc_common+0xc8/0x114
->     [<ffffffd3274be3f0>] do_el0_svc+0x28/0x98
->     [<ffffffd328abcf88>] el0_svc+0x28/0x90
->     [<ffffffd328abcefc>] el0t_64_sync_handler+0x88/0xec
->     [<ffffffd32741164c>] el0t_64_sync+0x1b8/0x1bc
-> 
-> After checking upstream, I came up with the following:
-> cff805b1518f  fscrypt: fix keyring memory leak on mount failure
-> 
-> But my kernel has this patch. So I continued to dig around this and
-> saw the function fscrypt_prepare_key in fs/crypto/keysetup.c for
-> V5.15.
-> I can't see the pointer tfm being used anywhere or saved, and
-> smp_store_release doesn't kfree it.
-> Is smp_store_release doing something with that pointer that makes this
-> memory leak a false positive?
-> 
-> Any help with this issue would be much appreciated.
-> Thanks
+From: Eric Biggers <ebiggers@google.com>
 
-The pointer to the crypto_skcipher 'tfm' is stored in the fscrypt_inode_info
-(previously fscrypt_info) which is stored in inode::i_crypt_info.  It gets freed
-when the inode is evicted.  I don't know why you're getting a kmemleak warning.
-Perhaps f2fs in that version of the kernel has a bug that is leaking inodes.
+This reverts commit e3a606f2c544b231f6079c8c5fea451e772e1139 because it
+allows people to create broken configurations that enable FS_VERITY but
+not SHA-256 support.
 
-smp_store_release is just a fancy way of doing a store that includes a memory
-barrier.
+The commit did allow people to disable the generic SHA-256
+implementation when it's not needed.  But that at best allowed saving a
+bit of code.  In the real world people are unlikely to intentionally and
+correctly make such a tweak anyway, as they tend to just be confused by
+what all the different crypto kconfig options mean.
 
-- Eric
+Of course we really need the crypto API to enable the correct
+implementations automatically, but that's for a later fix.
+
+Cc: Ard Biesheuvel <ardb@kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ fs/verity/Kconfig | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
+
+diff --git a/fs/verity/Kconfig b/fs/verity/Kconfig
+index e1036e5353521..40569d3527a71 100644
+--- a/fs/verity/Kconfig
++++ b/fs/verity/Kconfig
+@@ -2,17 +2,13 @@
+ 
+ config FS_VERITY
+ 	bool "FS Verity (read-only file-based authenticity protection)"
+ 	select CRYPTO
+ 	select CRYPTO_HASH_INFO
+-	# SHA-256 is implied as it's intended to be the default hash algorithm.
++	# SHA-256 is selected as it's intended to be the default hash algorithm.
+ 	# To avoid bloat, other wanted algorithms must be selected explicitly.
+-	# Note that CRYPTO_SHA256 denotes the generic C implementation, but
+-	# some architectures provided optimized implementations of the same
+-	# algorithm that may be used instead. In this case, CRYPTO_SHA256 may
+-	# be omitted even if SHA-256 is being used.
+-	imply CRYPTO_SHA256
++	select CRYPTO_SHA256
+ 	help
+ 	  This option enables fs-verity.  fs-verity is the dm-verity
+ 	  mechanism implemented at the file level.  On supported
+ 	  filesystems (currently ext4, f2fs, and btrfs), userspace can
+ 	  use an ioctl to enable verity for a file, which causes the
+
+base-commit: 0ad2507d5d93f39619fc42372c347d6006b64319
+-- 
+2.48.1
+
