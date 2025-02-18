@@ -1,63 +1,83 @@
-Received: from lelvem-ot02.ext.ti.com (lelvem-ot02.ext.ti.com [198.47.23.235])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2044.outbound.protection.outlook.com [40.107.94.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05F1E239066;
-	Tue, 18 Feb 2025 10:50:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.235
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739875855; cv=none; b=G83GzGyF9Yi4tkGs3hLUZfCZyMJdzZK8Zs5qxZV+lJMVQhEM5EdcB2KMDaOMLKhqPRLG3gOzCVD17fe1HnQIKvSjRcdtcMgrTgv3KnIwb2l5rhC49818EIvAV4ZH9aU9W15CDLr9nfFQ6U++CaIBqEMzNoQtj2MW4ipbOiyHhYI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739875855; c=relaxed/simple;
-	bh=oCwNWZI/n6K/e0KeD0KECH58mj3BowZrbon38IxBlxQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=acMqIJtAmiHXBIkJb4ofdRf7y5AU/F1fVVcsayyMk8rPtWASM/wfvxZH4YXLPqrnaXSowFu253lMF2A3H1iSx/cPdSHz4IczO3L+AXI0TfJqorzHShWa08VHzHxe2PbkOYTMJgJP61RtapEmwPGUgfhFBKEeqzrFvDnlQfw0RQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=uc6tII9z; arc=none smtp.client-ip=198.47.23.235
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEAB823AE96;
+	Tue, 18 Feb 2025 11:10:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739877046; cv=fail; b=do9I9efk/D4R+hutlPbPCz/4l8s7BK10N3CbeOxogJe1+P/FVOKUICPDyT1qH/tI7WletcsirZLBeADFJ5a/WZjkWFIkJXxbNRIMKU0mQvWQMasd3eFWQLT6cnqWa8Gxv72w46mwyb2Ztphg9ppz38yhbNPQb7lGFEdseOm23AY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739877046; c=relaxed/simple;
+	bh=3CIMMHlJgUgFrmEFyAJPzB5mfSGqdyzPfcpp2qLv3nE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rrDE072AxH1VOVXcbVbGivgKPQyAhO1otRx9nVsBCZzqfq6A4tgP5R46/dNuqq+R2ayVWaIWI+wBkh/jtDb5vYHK0FGbs4EXY3ia5zTuVOa07FbnlCOiWIRWkJTf9noRWoB5NSDHecKeKNMA5byF359/gC0XZNDek2ReLcWeTKQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=QTjAOU3l; arc=fail smtp.client-ip=40.107.94.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="uc6tII9z"
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by lelvem-ot02.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 51IAonM1841376
-	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-	Tue, 18 Feb 2025 04:50:49 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1739875849;
-	bh=TDl/MlAWM7RZZrWvhYbB3Rt/Ey4V28+9NkFSVKszwOI=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=uc6tII9z0D4gFcudlm0OtGDthvVmRegD5YtEy/WZZX3S16wU67C2EsKKPtZ8ACBEh
-	 2SC8HE6KHCMR9V7lJoq2bjLL3GM0cemJQFT0WCZzsP7HKEx8zDG0ax4Oi0rBtVI7qN
-	 OZbBlLHHWlJvFDS4XcuajbcvZgu5YXEjtIvVJdFI=
-Received: from DFLE100.ent.ti.com (dfle100.ent.ti.com [10.64.6.21])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTP id 51IAonnI034528;
-	Tue, 18 Feb 2025 04:50:49 -0600
-Received: from DFLE112.ent.ti.com (10.64.6.33) by DFLE100.ent.ti.com
- (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 18
- Feb 2025 04:50:48 -0600
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE112.ent.ti.com
- (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Tue, 18 Feb 2025 04:50:49 -0600
-Received: from pratham-Workstation-PC (pratham-workstation-pc.dhcp.ti.com [172.24.227.40])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 51IAolbJ095035;
-	Tue, 18 Feb 2025 04:50:48 -0600
-From: T Pratham <t-pratham@ti.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller"
-	<davem@davemloft.net>, T Pratham <t-pratham@ti.com>
-CC: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Vignesh
- Raghavendra <vigneshr@ti.com>,
-        Praneeth Bajjuri <praneeth@ti.com>,
-        Kamlesh
- Gurudasani <kamlesh@ti.com>,
-        Manorit Chawdhry <m-chawdhry@ti.com>
-Subject: [PATCH RFC 2/2] crypto: ti: Add support for MD5 in DTHE V2 Hashing Engine driver
-Date: Tue, 18 Feb 2025 16:19:43 +0530
-Message-ID: <20250218104943.2304730-3-t-pratham@ti.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250218104943.2304730-1-t-pratham@ti.com>
-References: <20250218104943.2304730-1-t-pratham@ti.com>
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="QTjAOU3l"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=pQzy6P2TavPzZActWopZPPZ/FEnBwo3NEMnFx42/rxUPzC+JFz2hRkgkPV5kQxQ3VScrek5rgIePHe0NtEm7V0k3OCJx4bt9/2ru4ylomXa1IJ4pqLrutyVypikKAjXFeh2RsDmdpTdChj3SV5ffnnyszhOytoae+gABK62QaXfOn0AHMIduu7J8hkzfFRF9LQiYh5fAp7j/VI4TzvexSZy2mTvG2LqU4peGtwQl0SoIu2S64IAoXQJO7BrhJwjzMnXhtVZEUIO+ozULOpYHZPxZhkOPPGNFSLV60GQc536vWnTkYmF3bU+LGgWO+83F+V+ojiUeUkQ/0iWfnOMhMg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4LjYr4evbsIWdByov3Icl/PWXdikuFGSHDHGhtjU6Ek=;
+ b=tDb6Zk4plBHppUYi9sqUBEdlQfFKq/XeobleuKCwznuLz0ZI5+xJKcO3jfBqvpvP6tovtIwhXfi7fKWZTlPbyVaPlG4OWNgjGVTfvPHuggr3eM5d1tJWfFHGLeEDlIbv5fISBqov5ch2uSfkLqeLvkyEH7nkxBeAUwL29bFmls5ezJJOUNoF1UQA0Q2XT4ZU5PgUqqNSdFVVpKqtyrP94Kl0WF9Q3tYhqBGBkcGlIKqg48BWg4LO14YRlLOqkcb/f2A7FcZjGE0ZFAOFmtMcWZleCfD0KNMslht+3bygvuvje52gDTFLgesHVUQdOF8Z6Di/E12vKNagPaUfFbKsrQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4LjYr4evbsIWdByov3Icl/PWXdikuFGSHDHGhtjU6Ek=;
+ b=QTjAOU3lj5OhmyAYfud6SezF9EdkDLsdqk6jFXNBkikKkL2bVyEL+tajzKXN5cDcraOr8jvsPMNKpXJrSRnC9YB5mujAtLdMqKKH6ckcPwDw8GvV0i/s8et7BeRBwdk65ek0KYlLzccZy8FZn7cw4X4r33m0g4t7+PkKCa8yWYg=
+Received: from PH7P220CA0085.NAMP220.PROD.OUTLOOK.COM (2603:10b6:510:32c::26)
+ by IA1PR12MB6116.namprd12.prod.outlook.com (2603:10b6:208:3e8::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.18; Tue, 18 Feb
+ 2025 11:10:38 +0000
+Received: from CY4PEPF0000EE3E.namprd03.prod.outlook.com
+ (2603:10b6:510:32c:cafe::8a) by PH7P220CA0085.outlook.office365.com
+ (2603:10b6:510:32c::26) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8466.14 via Frontend Transport; Tue,
+ 18 Feb 2025 11:10:38 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CY4PEPF0000EE3E.mail.protection.outlook.com (10.167.242.16) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8466.11 via Frontend Transport; Tue, 18 Feb 2025 11:10:37 +0000
+Received: from aiemdee.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 18 Feb
+ 2025 05:10:29 -0600
+From: Alexey Kardashevskiy <aik@amd.com>
+To: <x86@kernel.org>
+CC: <kvm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<linux-pci@vger.kernel.org>, <linux-arch@vger.kernel.org>, "Sean
+ Christopherson" <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	"Tom Lendacky" <thomas.lendacky@amd.com>, Ashish Kalra
+	<ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>, Suravee Suthikulpanit
+	<suravee.suthikulpanit@amd.com>, Robin Murphy <robin.murphy@arm.com>, "Jason
+ Gunthorpe" <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>, Bjorn Helgaas
+	<bhelgaas@google.com>, Dan Williams <dan.j.williams@intel.com>, "Christoph
+ Hellwig" <hch@lst.de>, Nikunj A Dadhania <nikunj@amd.com>, Michael Roth
+	<michael.roth@amd.com>, Vasant Hegde <vasant.hegde@amd.com>, Joao Martins
+	<joao.m.martins@oracle.com>, Nicolin Chen <nicolinc@nvidia.com>, Lu Baolu
+	<baolu.lu@linux.intel.com>, Steve Sistare <steven.sistare@oracle.com>, "Lukas
+ Wunner" <lukas@wunner.de>, Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Dionna Glaze
+	<dionnaglaze@google.com>, Yi Liu <yi.l.liu@intel.com>,
+	<iommu@lists.linux.dev>, <linux-coco@lists.linux.dev>, Zhi Wang
+	<zhiw@nvidia.com>, AXu Yilun <yilun.xu@linux.intel.com>, "Aneesh Kumar K . V"
+	<aneesh.kumar@kernel.org>, Alexey Kardashevskiy <aik@amd.com>
+Subject: [RFC PATCH v2 00/22] TSM: Secure VFIO, TDISP, SEV TIO
+Date: Tue, 18 Feb 2025 22:09:47 +1100
+Message-ID: <20250218111017.491719-1-aik@amd.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -66,138 +86,292 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE3E:EE_|IA1PR12MB6116:EE_
+X-MS-Office365-Filtering-Correlation-Id: ec7af72f-8c2f-4855-4031-08dd500cdfc4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|82310400026|1800799024|36860700013|13003099007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?ay7HhRuVZawlIjIhODDBtXdACYwZkP0hHqC8DCwDHz2eBMHY2NQ2Wk/yVi6J?=
+ =?us-ascii?Q?Csb0PnPSVUCe08keB52k3P4T6DHOEnZb8PvsLfaurcMp8WvB2Xe+rmOkRXXm?=
+ =?us-ascii?Q?B1zlM5emiS1B1uG5rgxvVP/hB2raH4n0xfc9HFCWdeqKXknNGRWqpLgcv1Bf?=
+ =?us-ascii?Q?2bxyP67WsdvPNw3ScKHxJvd2ZQS1UFuJ8oxjnWwgJkhbqANXxJsUk/J7muZH?=
+ =?us-ascii?Q?MbP7Lv3d28l2XTa5A0yydNxE39LIH6hxqohmMrm0kKSoBBQK2/Y1/8uPBGpA?=
+ =?us-ascii?Q?/ISizYFuPm90beDanht8kBV9t9KN2TG75pxquBCEVPL0Mmmukay0Uc8M4MBh?=
+ =?us-ascii?Q?JNkVCCG2Nw5oBMxS69/Z1+5OGhWP+GGIW/QYfHBoX+g2n5EXC56mLyaz8IfG?=
+ =?us-ascii?Q?+ThbBiddV62KZXEp63jApcvKE2+EEKDT5GW3E31347ZyEJJGGMIHgsPfPiEK?=
+ =?us-ascii?Q?9WuPD+Ntn6jBtXEgVn0J4/pEy5LGhz3vql7SPbjx1eN6lxTvgdO0sjTq4i3d?=
+ =?us-ascii?Q?MLk49lb//R4NDGPtWsIq6oXGNDzZsxjf7mSdHjYe7Ll2R98cBOsg3zKccp45?=
+ =?us-ascii?Q?QU+NSHvGXuNBoXdkuvOP1B1s+rQ0iUw1Nl5mht89SN1GalVsWZofELHV0gxW?=
+ =?us-ascii?Q?yj91RbXRk3x1Q/xs0tJ5DMbZz/NrxLuk74PK9Y6o6/ITzbqcK4S6LMcW0JnP?=
+ =?us-ascii?Q?t0mZFt84X3VcdSwC7h9NUEqoOeg2uEnVrzIM/Jj46rez9eh34+rVul90JKUv?=
+ =?us-ascii?Q?LtQy6EjZRfZ7+Bor/a0gMBumYUwuLSOyrQujYETDSWn/FN9U2qfe3hN+Z8Or?=
+ =?us-ascii?Q?ND/JthbF6n4AZADLmahqSQ+3UNSIoT3akmiSR0i09OnKmTMAcMyYLw53/bLl?=
+ =?us-ascii?Q?ofcy/trgPNvsEYQUIkAgvr22u9RY5q/f8FEtvsYxoIoxlgyGw2kMZChrhJIo?=
+ =?us-ascii?Q?UY5h1mB3oNeH6O+IJ+zaZDIoHPMLMz6tzKzRJqDcyFiu65wH7QKaN9Kk68EJ?=
+ =?us-ascii?Q?HTGJ9FCdEs9jHQTe5/f+/MFypQOJkgvO9G0voA61LPKH0CRw0ii6mc1vdkaO?=
+ =?us-ascii?Q?oQYNNAPUJNVSRV8uxT8mXUJ5rlc46TWgyvchTU6IlpyY+ktVajSnhlBbU9d/?=
+ =?us-ascii?Q?ZdWFP7Uf6BX/3FyXY8MlFI5874VmQAIPThFSfDC/RU9KaxB8gbt4FodQPMFh?=
+ =?us-ascii?Q?wCozhwgA9wmi2tRT1lxRlxqEXy8x8vwRkmYDqbFxD3c1aScJaoSHZTJczn4J?=
+ =?us-ascii?Q?XMExbeAc6zn97QTTwNTEnaVFYuusb3Vp97TbmUu7xxinLEmLFOpKFl4U1YDR?=
+ =?us-ascii?Q?ZE6QPsItl6w6RD8wDASvBs/vyOj3RRChd4ArFHFbs3QzSRc4dk8sTG2fAvf/?=
+ =?us-ascii?Q?eF4yDuWMG6+qcVABqUNb0tAKfgzyIhrzpKKOytrzVLjUSdqEVG373cWw1cm7?=
+ =?us-ascii?Q?6PSTI9M5BNfoFNhoo7hD5cA+ObLZxT+9?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(7416014)(82310400026)(1800799024)(36860700013)(13003099007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Feb 2025 11:10:37.8769
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: ec7af72f-8c2f-4855-4031-08dd500cdfc4
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000EE3E.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6116
 
-Add support for MD5 algorithm of the hashing engine of DTHE V2 crypto
-accelerator driver.
+Here are some patches to enable SEV-TIO on AMD Turin. It's been a while
+and got quiet and I kept fixing my tree and wondering if I am going in
+the right direction.
 
-Signed-off-by: T Pratham <t-pratham@ti.com>
----
- drivers/crypto/ti/Kconfig  |  1 +
- drivers/crypto/ti/dthev2.c | 56 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 57 insertions(+)
+SEV-TIO allow a guest to establish trust in a device that supports TEE
+Device Interface Security Protocol (TDISP, defined in PCIe r6.0+) and
+then interact with the device via private memory.
 
-diff --git a/drivers/crypto/ti/Kconfig b/drivers/crypto/ti/Kconfig
-index 39d9d8cb6b78..ab4da73dffc4 100644
---- a/drivers/crypto/ti/Kconfig
-+++ b/drivers/crypto/ti/Kconfig
-@@ -6,6 +6,7 @@ config CRYPTO_DEV_TI_DTHE_V2
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_SHA256
- 	select CRYPTO_SHA512
-+	select CRYPTO_MD5
- 	help
- 	  This enables support for the TI DTHE V2 hw crypto accelerator
- 	  which can be found on TI K3 SOCs. Selecting this enables use
-diff --git a/drivers/crypto/ti/dthev2.c b/drivers/crypto/ti/dthev2.c
-index d5ed0f4621f5..ff2d5ef47c2a 100644
---- a/drivers/crypto/ti/dthev2.c
-+++ b/drivers/crypto/ti/dthev2.c
-@@ -25,6 +25,7 @@
- #include <crypto/internal/aead.h>
- #include <crypto/internal/hash.h>
- #include <crypto/internal/skcipher.h>
-+#include <crypto/md5.h>
- #include <crypto/sha2.h>
- 
- #include <linux/delay.h>
-@@ -363,6 +364,25 @@ static int dthe_sha224_cra_init(struct crypto_tfm *tfm)
- 	return 0;
- }
- 
-+static int dthe_md5_cra_init(struct crypto_tfm *tfm)
-+{
-+	struct dthe_tfm_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct dthe_data *dev_data = dthe_get_dev(ctx);
-+
-+	if (!dev_data)
-+		return -ENODEV;
-+
-+	ctx->ctx_info.hash_ctx = kzalloc(sizeof(*ctx->ctx_info.hash_ctx), GFP_KERNEL);
-+	if (!ctx->ctx_info.hash_ctx)
-+		return -ENOMEM;
-+
-+	ctx->ctx_info.hash_ctx->mode = DTHE_HASH_MD5;
-+	ctx->ctx_info.hash_ctx->block_size = MD5_BLOCK_WORDS * 4;
-+	ctx->ctx_info.hash_ctx->digest_size = MD5_DIGEST_SIZE;
-+	ctx->ctx_info.hash_ctx->phash_size = MD5_DIGEST_SIZE;
-+	return 0;
-+}
-+
- static void dthe_hash_cra_exit(struct crypto_tfm *tfm)
- {
- 	struct dthe_tfm_ctx *ctx = crypto_tfm_ctx(tfm);
-@@ -602,6 +622,8 @@ static int dthe_hash_update(struct ahash_request *req)
- 				memcpy(sctx->phash, sha256_zero_message_hash, sctx->digest_size);
- 			else if (sctx->mode == DTHE_HASH_SHA224)
- 				memcpy(sctx->phash, sha224_zero_message_hash, sctx->digest_size);
-+			else if (sctx->mode == DTHE_HASH_MD5)
-+				memcpy(sctx->phash, md5_zero_message_hash, sctx->digest_size);
- 		}
- 
- 		return 0;
-@@ -736,6 +758,8 @@ static int dthe_hash_final(struct ahash_request *req)
- 			memcpy(req->result, sha256_zero_message_hash, sctx->digest_size);
- 		else if (sctx->mode == DTHE_HASH_SHA224)
- 			memcpy(req->result, sha224_zero_message_hash, sctx->digest_size);
-+		else if (sctx->mode == DTHE_HASH_MD5)
-+			memcpy(req->result, md5_zero_message_hash, sctx->digest_size);
- 	}
- 
- 	memcpy(req->result, sctx->phash, sctx->digest_size);
-@@ -774,6 +798,8 @@ static int dthe_hash_finup(struct ahash_request *req)
- 				memcpy(req->result, sha256_zero_message_hash, sctx->digest_size);
- 			else if (sctx->mode == DTHE_HASH_SHA224)
- 				memcpy(req->result, sha224_zero_message_hash, sctx->digest_size);
-+			else if (sctx->mode == DTHE_HASH_MD5)
-+				memcpy(req->result, md5_zero_message_hash, sctx->digest_size);
- 		}
- 		return 0;
- 	}
-@@ -870,6 +896,8 @@ static int dthe_hash_digest(struct ahash_request *req)
- 			memcpy(req->result, sha256_zero_message_hash, sctx->digest_size);
- 		else if (sctx->mode == DTHE_HASH_SHA224)
- 			memcpy(req->result, sha224_zero_message_hash, sctx->digest_size);
-+		else if (sctx->mode == DTHE_HASH_MD5)
-+			memcpy(req->result, md5_zero_message_hash, sctx->digest_size);
- 		return 0;
- 	}
- 
-@@ -1366,6 +1394,34 @@ static struct ahash_alg hash_algs[] = {
- 			}
- 		}
- 	},
-+	{
-+		.init	= dthe_hash_init,
-+		.update	= dthe_hash_update,
-+		.final	= dthe_hash_final,
-+		.finup	= dthe_hash_finup,
-+		.digest	= dthe_hash_digest,
-+		.export = dthe_hash_export,
-+		.import = dthe_hash_import,
-+		.halg	= {
-+			.digestsize = MD5_DIGEST_SIZE,
-+			.statesize = sizeof(struct dthe_hash_ctx),
-+			.base = {
-+				.cra_name	 = "md5",
-+				.cra_driver_name = "md5-dthe_v2",
-+				.cra_priority	 = 400,
-+				.cra_flags	 = CRYPTO_ALG_TYPE_AHASH |
-+						   CRYPTO_ALG_ASYNC |
-+						   CRYPTO_ALG_OPTIONAL_KEY |
-+						   CRYPTO_ALG_KERN_DRIVER_ONLY |
-+						   CRYPTO_ALG_ALLOCATES_MEMORY,
-+				.cra_blocksize	 = MD5_BLOCK_WORDS * 4,
-+				.cra_ctxsize	 = sizeof(struct dthe_tfm_ctx),
-+				.cra_module	 = THIS_MODULE,
-+				.cra_init	 = dthe_md5_cra_init,
-+				.cra_exit	 = dthe_hash_cra_exit,
-+			}
-+		}
-+	},
- };
- 
- static struct skcipher_alg cipher_algs[] = {
+These include both guest and host support. QEMU also requires changes.
+This is more to show what it takes on AMD EPYC to pass through TDISP
+devices, hence "RFC".
+
+Components affected:
+KVM
+IOMMUFD
+CCP (AMD)
+SEV-GUEST (AMD)
+
+New components:
+PCI IDE
+PCI TSM
+VIRT CoCo TSM
+VIRT CoCo TSM-HOST
+VIRT CoCo TSM-GUEST
+
+
+This is based on a merge of Lukas'es CMA and 1 week old upstream + some of Dan's patches:
+
+https://github.com/aik/linux/tree/tsm
+https://github.com/aik/qemu/tree/tsm
+
+Not using "[PATCH 03/11] coco/tsm: Introduce a class device for TEE Security Managers"
+yet as may be (may be) my approach makes sense too. Tried to stick to the terminology.
+I have done some changes on top of that, these are on github, not posting here as
+I expect those to be addressed in that thread:
+https://lore.kernel.org/linux-coco/173343739517.1074769.13134786548545925484.stgit@dwillia2-xfh.jf.intel.com/T/
+
+
+SEV TIO spec:
+https://www.amd.com/content/dam/amd/en/documents/epyc-technical-docs/specifications/58271_0_70.pdf
+Whitepaper:
+https://www.amd.com/content/dam/amd/en/documents/epyc-business-docs/white-papers/sev-tio-whitepaper.pdf
+
+
+Acronyms:
+
+TEE - Trusted Execution Environments, a concept of managing trust between the host
+	and devices
+TSM - TEE Security Manager (TSM), an entity which ensures security on the host
+PSP - AMD platform secure processor (also "ASP", "AMD-SP"), acts as TSM on AMD.
+SEV TIO - the TIO protocol implemented by the PSP and used by the host
+GHCB - guest/host communication block - a protocol for guest-to-host communication
+	via a shared page
+TDISP - TEE Device Interface Security Protocol (PCIe).
+
+
+Flow:
+
+- Boot host OS, load CCP and PCI TSM (they will load TSM-HOST too)
+- PCI TSM creates sysfs nodes in "coco/tsm: Add tsm and tsm-host modules" for all TDISP-capable devices
+- Enable IDE via "echo 0 > /sys/bus/pci/devices/0000:e1:00.0/tsm-dev/tdev:0000:e1:00.0/tsm_dev_connect"
+- Examine certificates/measurements/status via sysfs
+
+- run an SNP VM _without_ VFIO PCI device, wait till it is booted
+- hotplug a TDISP-capable PCI function, IOMMUFD must be used (not a VFIO container)
+- QEMU pins all guest memory via IOMMUFD map-from-fd ioctl()
+- the VM detects a TDISP-capable device, creates sysfs nodes in "coco/tsm: Add tsm-guest module"
+- the VM loads the device driver which goes as usual till enabling bus master (for convinience)
+- TSM-GUEST modules listens for bus master event (hacked in "pci: Add BUS_NOTIFY_PCI_BUS_MASTER event")
+- TSM-GUEST requests TDI ("trusted PCI VF") info, traps into QEMU
+- QEMU binds the VF to the Coco VM in the secure fw (AMD PSP) via IOMMUFD ioctl
+- QEMU reads certificates/measurements/interface report from the hosts sysfs and writes to the guest memory
+- the guest receives all the data, examines it (not in this series though)
+- the guest enables secure DMA and MMIO by calling GHCB which traps into QEMU
+- QEMU calls IOMMUFD ioctl to enable secure DMA and MMIO
+- the guest can now stop sharing memory for DMA (and expect DMA to encrypted memory to work) and
+start accessing validated MMIO with Cbit set.
+
+
+
+Assumptions
+
+This requires hotpligging into the VM vs passing the device via the command line as
+VFIO maps all guest memory as the device init step which is too soon as
+SNP LAUNCH UPDATE happens later and will fail if VFIO maps private memory before that.
+
+This requires the BME hack as MMIO and BusMaster enable bits cannot be 0 after MMIO
+validation is done and there are moments in the guest OS booting process when this
+appens.
+
+SVSM could help addressing these (not implemented).
+
+QEMU advertises TEE-IO capability to the VM. An additional x-tio flag is added to
+vfio-pci.
+
+Trying to avoid the device driver modification as much as possible at
+the moment as my test devices already exist in non-TDISP form and need to work without
+modification. Arguably this may not be always the case.
+
+
+TODOs
+
+Deal with PCI reset. Hot unplug+plug? Power states too.
+Actually collaborate with CMA.
+Other tons of things.
+
+
+The previous conversation is here:
+https://lore.kernel.org/r/20240823132137.336874-1-aik@amd.com
+
+
+Changes:
+v2:
+* redid the whole thing pretty much
+* RMPUPDATE API for QEMU
+* switched to IOMMUFD
+* mapping guest memory via IOMMUFD map-from-fd
+* marking resouces as validated
+* more modules
+* moved tons to the userspace (QEMU), such as TDI bind and GHCB guest requests
+
+
+Sean, get_maintainer.pl produced more than 100 emails for the entire
+patchset, should I have posted them all anyway?
+
+Please comment. Thanks.
+
+
+
+Alexey Kardashevskiy (22):
+  pci/doe: Define protocol types and make those public
+  PCI/IDE: Fixes to make it work on AMD SNP-SEV
+  PCI/IDE: Init IDs on all IDE streams beforehand
+  iommu/amd: Report SEV-TIO support
+  crypto: ccp: Enable SEV-TIO feature in the PSP when supported
+  KVM: X86: Define tsm_get_vmid
+  coco/tsm: Add tsm and tsm-host modules
+  pci/tsm: Add PCI driver for TSM
+  crypto/ccp: Implement SEV TIO firmware interface
+  KVM: SVM: Add uAPI to change RMP for MMIO
+  KVM: SEV: Add TIO VMGEXIT
+  iommufd: Allow mapping from guest_memfd
+  iommufd: amd-iommu: Add vdevice support
+  iommufd: Add TIO calls
+  KVM: X86: Handle private MMIO as shared
+  coco/tsm: Add tsm-guest module
+  resource: Mark encrypted MMIO resource on validation
+  coco/sev-guest: Implement the guest support for SEV TIO
+  RFC: pci: Add BUS_NOTIFY_PCI_BUS_MASTER event
+  sev-guest: Stop changing encrypted page state for TDISP devices
+  pci: Allow encrypted MMIO mapping via sysfs
+  pci: Define pci_iomap_range_encrypted
+
+ drivers/crypto/ccp/Makefile                 |   13 +
+ drivers/pci/Makefile                        |    3 +
+ drivers/virt/coco/Makefile                  |    2 +
+ drivers/virt/coco/guest/Makefile            |    3 +
+ drivers/virt/coco/host/Makefile             |    6 +
+ drivers/virt/coco/sev-guest/Makefile        |    2 +-
+ arch/x86/include/asm/kvm-x86-ops.h          |    1 +
+ arch/x86/include/asm/kvm_host.h             |    2 +
+ arch/x86/include/asm/sev.h                  |   31 +
+ arch/x86/include/uapi/asm/kvm.h             |   11 +
+ arch/x86/include/uapi/asm/svm.h             |    2 +
+ drivers/crypto/ccp/sev-dev-tio.h            |  111 ++
+ drivers/crypto/ccp/sev-dev.h                |   19 +
+ drivers/iommu/amd/amd_iommu_types.h         |    3 +
+ drivers/iommu/iommufd/iommufd_private.h     |    3 +
+ include/asm-generic/pci_iomap.h             |    4 +
+ include/linux/amd-iommu.h                   |    2 +
+ include/linux/device.h                      |    4 +
+ include/linux/device/bus.h                  |    3 +
+ include/linux/dma-direct.h                  |    8 +
+ include/linux/ioport.h                      |    2 +
+ include/linux/kvm_host.h                    |    2 +
+ include/linux/pci-doe.h                     |    4 +
+ include/linux/pci-ide.h                     |   19 +-
+ include/linux/pci.h                         |    2 +-
+ include/linux/psp-sev.h                     |   61 +-
+ include/linux/swiotlb.h                     |    8 +
+ include/linux/tsm.h                         |  315 ++++
+ include/uapi/linux/iommufd.h                |   26 +
+ include/uapi/linux/kvm.h                    |   24 +
+ include/uapi/linux/pci_regs.h               |    5 +-
+ include/uapi/linux/psp-sev.h                |    6 +-
+ include/uapi/linux/sev-guest.h              |   39 +
+ arch/x86/coco/sev/core.c                    |   19 +-
+ arch/x86/kvm/mmu/mmu.c                      |    6 +-
+ arch/x86/kvm/svm/sev.c                      |  205 +++
+ arch/x86/kvm/svm/svm.c                      |   12 +
+ arch/x86/mm/ioremap.c                       |    2 +
+ arch/x86/mm/mem_encrypt.c                   |    6 +
+ arch/x86/virt/svm/sev.c                     |   34 +-
+ drivers/crypto/ccp/sev-dev-tio.c            | 1664 ++++++++++++++++++++
+ drivers/crypto/ccp/sev-dev-tsm.c            |  709 +++++++++
+ drivers/crypto/ccp/sev-dev.c                |   94 +-
+ drivers/iommu/amd/init.c                    |    9 +
+ drivers/iommu/amd/iommu.c                   |   60 +-
+ drivers/iommu/iommufd/main.c                |    6 +
+ drivers/iommu/iommufd/pages.c               |   88 +-
+ drivers/iommu/iommufd/viommu.c              |  112 ++
+ drivers/pci/doe.c                           |    2 -
+ drivers/pci/ide.c                           |  103 +-
+ drivers/pci/iomap.c                         |   24 +
+ drivers/pci/mmap.c                          |   11 +-
+ drivers/pci/pci-sysfs.c                     |   27 +-
+ drivers/pci/pci.c                           |    3 +
+ drivers/pci/proc.c                          |    2 +-
+ drivers/pci/tsm.c                           |  233 +++
+ drivers/virt/coco/guest/tsm-guest.c         |  326 ++++
+ drivers/virt/coco/host/tsm-host.c           |  551 +++++++
+ drivers/virt/coco/sev-guest/sev_guest.c     |   10 +
+ drivers/virt/coco/sev-guest/sev_guest_tio.c |  738 +++++++++
+ drivers/virt/coco/tsm.c                     |  638 ++++++++
+ kernel/resource.c                           |   48 +
+ virt/kvm/kvm_main.c                         |    6 +
+ Documentation/virt/coco/tsm.rst             |  132 ++
+ drivers/crypto/ccp/Kconfig                  |    2 +
+ drivers/pci/Kconfig                         |   15 +
+ drivers/virt/coco/Kconfig                   |   14 +
+ drivers/virt/coco/guest/Kconfig             |    3 +
+ drivers/virt/coco/host/Kconfig              |    6 +
+ drivers/virt/coco/sev-guest/Kconfig         |    1 +
+ 70 files changed, 6614 insertions(+), 53 deletions(-)
+ create mode 100644 drivers/virt/coco/host/Makefile
+ create mode 100644 drivers/crypto/ccp/sev-dev-tio.h
+ create mode 100644 drivers/crypto/ccp/sev-dev-tio.c
+ create mode 100644 drivers/crypto/ccp/sev-dev-tsm.c
+ create mode 100644 drivers/pci/tsm.c
+ create mode 100644 drivers/virt/coco/guest/tsm-guest.c
+ create mode 100644 drivers/virt/coco/host/tsm-host.c
+ create mode 100644 drivers/virt/coco/sev-guest/sev_guest_tio.c
+ create mode 100644 drivers/virt/coco/tsm.c
+ create mode 100644 Documentation/virt/coco/tsm.rst
+ create mode 100644 drivers/virt/coco/host/Kconfig
+
 -- 
-2.34.1
+2.47.1
 
