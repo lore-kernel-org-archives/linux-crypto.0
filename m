@@ -1,65 +1,42 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 592932309B6;
-	Tue, 18 Feb 2025 08:37:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71A85232787;
+	Tue, 18 Feb 2025 08:43:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739867857; cv=none; b=SmAxM37Zl7iWFjG0BwQXAij06ukSnRPsemioto+Kn4sVxjfX21nV9C3iQedfO1C3UD+AR5oTVpMFb16mxB2X3yz6h5Gf4iG7yvyg/WOxA3qgquOjmZgu/MqncOXms4QWHdXSH2KZqBrzN7gfwNXiuDgU8ivcBq75JKUG3+g4Hhw=
+	t=1739868206; cv=none; b=dRbCkisTu4HMhBsXklu9bEMYJlhtRI1UukXA5jL3tALFuOCRZ7bTgLJYu3FNrk2BDRY6ag+j9nB2827KnTX30El1KgL1ng6jzeQTGGi0i/Aalv921uKnxC081dCs5PUpMzSTU8Oc0E18h+4kEQ5Tmk6vzJtuhVFGfO7wRjHjrwE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739867857; c=relaxed/simple;
-	bh=t8ya/t1G3whzwy4abpFTKD46+lSOSltLTjgq6opU1PE=;
+	s=arc-20240116; t=1739868206; c=relaxed/simple;
+	bh=A/CCR/2WH1cVpTRVUOEEmzgqWCrL/UskAPkmJyUs57o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qarYSg3etBl/QrOKux7K2n6Oth1/XBpbipg9paO6+VYIoKxrRo8f4DWdwHfD8wdQL5URMGaCI+UctAJiQHwnsozhEJQ+qRc9kiz2ecvGIuFFY5tUgG+1TTptvG6Klr9HHZ4L4nikzpvRyNLpdrb+Z8zn+hI+OOAHdL+f26+lNjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=q+T8dPHM; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=XZrmzzVHT6KXHrBMgWsM/5B+S/vlcQxW4ixITqsA+L0Vjcq4HjjONcO+Bo3IfG0OEEr2YqAzlQpYBI5PobZvyPGz+o7Sng43KxjswU2sxkCCYSjqvEGamyWXXl8X6O0n7ljyIPcfMjntzyzWclF8ThhfeTp2/dpfUhqBcN8vToM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fXlExSU3; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="q+T8dPHM"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=ZqfEr2IqxhLtqyCvqqpJalwtiPRJPsXMgYfoDKAIWO0=; b=q+T8dPHMXwBow2nZZ3CAmxWT6O
-	O18UJ4HOVAaFVj6uTmPtqFfayvQxP48R+vcELEbpnepO8zt76cUDV2OCSgzeT9IgL4Po/ml23D1Lu
-	K04RFcENCGOMDX9sPEzFtZzn9LGai4zjpZCX+awpzCCfL5PuOOi4gI8dOiET51uJKHST5XAGsrcaF
-	GdEC9AqfzcEV08QbrBgi+wmfXKRffQpSPvrHtc53ncZtcU5807eL6tDypAK4rokdl7cp9PHzUntqv
-	PwLMvw6Bdam3x3qQ7h0BR9yl/n3EfZzO8W7Fmncd1ok1SPgdK8i1iZARy6lt8QPRrhnVy1N1KJzwP
-	s0x4LZpQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tkItd-001BwH-2L;
-	Tue, 18 Feb 2025 16:37:23 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 18 Feb 2025 16:37:22 +0800
-Date: Tue, 18 Feb 2025 16:37:22 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
-Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-	Eric Biggers <ebiggers@kernel.org>,
-	"agk@redhat.com" <agk@redhat.com>,
-	"snitzer@kernel.org" <snitzer@kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"dm-devel@redhat.com" <dm-devel@redhat.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"qat-linux@intel.com" <qat-linux@intel.com>,
-	"heinzm@redhat.com" <heinzm@redhat.com>,
-	Horia Geanta <horia.geanta@nxp.com>, Varun Sethi <V.Sethi@nxp.com>,
-	Pankaj Gupta <pankaj.gupta@nxp.com>,
-	Gaurav Jain <gaurav.jain@nxp.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	Iuliana Prodan <iuliana.prodan@nxp.com>,
-	Fiona Trahe <fiona.trahe@intel.com>
-Subject: Re: [PATCH 1/3] dm integrity: do not filter algos with
- CRYPTO_ALG_ALLOCATES_MEMORY
-Message-ID: <Z7RGwot_t0RLc3-F@gondor.apana.org.au>
-References: <20230705164009.58351-1-giovanni.cabiddu@intel.com>
- <20230705164009.58351-2-giovanni.cabiddu@intel.com>
- <20230705201205.GA866@sol.localdomain>
- <ZKXZUl4VgZkMbOL0@gcabiddu-mobl1.ger.corp.intel.com>
- <ZKXnUeueV6ncaJM6@gondor.apana.org.au>
- <PAXPR04MB8301C112A114A6AC5A19D69B8E452@PAXPR04MB8301.eurprd04.prod.outlook.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fXlExSU3"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 173BDC4CEE2;
+	Tue, 18 Feb 2025 08:43:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739868205;
+	bh=A/CCR/2WH1cVpTRVUOEEmzgqWCrL/UskAPkmJyUs57o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fXlExSU35b/UGYNbHeSAfWSDYpsi0rB8E9f+BtZwpg2CNz8OF3qakh2T0+OIVCMN/
+	 9IpHSzw7YQ0zOij0fB+4l6GPPOCFopjnGFj4YLuNZoRaQDnfVLO/x7syRfB0Rzt4nh
+	 Dadog/0C2QShMa/Y/g38Qd3jUuX+Q+ngKIMCyUpGU0X9SJ3IXplgq4u2+o7JqZFKhN
+	 Qcb202Ygyq/s4J/ggKs6W1qOT1pu4/7QST13Du/cyv9agb8/dwzI9IIc4IFjh9O8so
+	 DY/20ZLAg7fmL3cYxjqILn6VUT2kjUyGG2hr7ygB8pcXn8XkJbKjy7a+NAWL8RczGm
+	 Zg4p3TGRXp8vw==
+Date: Tue, 18 Feb 2025 09:43:15 +0100
+From: Ingo Molnar <mingo@kernel.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org,
+	linux-crypto@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [PATCH] x86/crc: add ANNOTATE_NOENDBR to suppress objtool
+ warnings
+Message-ID: <Z7RII_fnk1d2nB3r@gmail.com>
+References: <20250217193230.100443-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -68,27 +45,67 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <PAXPR04MB8301C112A114A6AC5A19D69B8E452@PAXPR04MB8301.eurprd04.prod.outlook.com>
+In-Reply-To: <20250217193230.100443-1-ebiggers@kernel.org>
 
-On Wed, Feb 07, 2024 at 06:22:06AM +0000, Meenakshi Aggarwal wrote:
+
+* Eric Biggers <ebiggers@kernel.org> wrote:
+
+> From: Eric Biggers <ebiggers@google.com>
 > 
-> What are your plans for this change?
+> The assembly functions generated by crc-pclmul-template.S are called
+> only via static_call, so they do not need to begin with an endbr
+> instruction.  But objtool still warns about a missing endbr by default.
+> Add ANNOTATE_NOENDBR to suppress these warnings:
+> 
+>     vmlinux.o: warning: objtool: crc32_x86_init+0x1c0: relocation to !ENDBR: crc32_lsb_vpclmul_avx10_256+0x0
+>     vmlinux.o: warning: objtool: crc64_x86_init+0x183: relocation to !ENDBR: crc64_msb_vpclmul_avx10_256+0x0
+>     vmlinux.o: warning: objtool: crc_t10dif_x86_init+0x183: relocation to !ENDBR: crc16_msb_vpclmul_avx10_256+0x0
+>     vmlinux.o: warning: objtool: __SCK__crc32_lsb_pclmul+0x0: data relocation to !ENDBR: crc32_lsb_pclmul_sse+0x0
+>     vmlinux.o: warning: objtool: __SCK__crc64_lsb_pclmul+0x0: data relocation to !ENDBR: crc64_lsb_pclmul_sse+0x0
+>     vmlinux.o: warning: objtool: __SCK__crc64_msb_pclmul+0x0: data relocation to !ENDBR: crc64_msb_pclmul_sse+0x0
+>     vmlinux.o: warning: objtool: __SCK__crc16_msb_pclmul+0x0: data relocation to !ENDBR: crc16_msb_pclmul_sse+0x0
+> 
+> Fixes: 8d2d3e72e35b ("x86/crc: add "template" for [V]PCLMULQDQ based CRC functions")
+> Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+> Closes: https://lore.kernel.org/r/20250217170555.3d14df62@canb.auug.org.au/
+> Suggested-by: Peter Zijlstra <peterz@infradead.org>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+> 
+> This applies to
+> https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=crc-next
+> 
+>  arch/x86/lib/crc-pclmul-template.S | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/arch/x86/lib/crc-pclmul-template.S b/arch/x86/lib/crc-pclmul-template.S
+> index dc91cc074b300..a19b730b642d3 100644
+> --- a/arch/x86/lib/crc-pclmul-template.S
+> +++ b/arch/x86/lib/crc-pclmul-template.S
+> @@ -5,10 +5,11 @@
+>  // Copyright 2025 Google LLC
+>  //
+>  // Author: Eric Biggers <ebiggers@google.com>
+>  
+>  #include <linux/linkage.h>
+> +#include <linux/objtool.h>
+>  
+>  // Offsets within the generated constants table
+>  .set OFFSETOF_BSWAP_MASK,			-5*16	// msb-first CRCs only
+>  .set OFFSETOF_FOLD_ACROSS_2048_BITS_CONSTS,	-4*16	// must precede next
+>  .set OFFSETOF_FOLD_ACROSS_1024_BITS_CONSTS,	-3*16	// must precede next
+> @@ -270,10 +271,14 @@
+>  	.set	BSWAP_MASK_XMM,	%xmm6
+>  	.set	CONSTS,		V7
+>  	.set	CONSTS_YMM,	%ymm7
+>  	.set	CONSTS_XMM,	%xmm7
+>  
+> +	// Use ANNOTATE_NOENDBR to suppress an objtool warning, since the
+> +	// functions generated by this macro are called only by static_call.
+> +	ANNOTATE_NOENDBR
 
-I finally have a solution for you.
+Acked-by: Ingo Molnar <mingo@kernel.org>
 
-The answer is to use a software fallback.  As software fallbacks
-do not need to allocate memory, they can be used in an OOM situation
-and you fail to allocate memory in the driver with GFP_ATOMIC.
+Thanks,
 
-This can either be done using the existing shash interface through
-SHASH_DESC_ON_STACK, or with my new hash interface where you can
-use HASH_REQUEST_ON_STACK.
-
-Once you have implemented this fallback strategy you may remove
-the CRYPTO_ALG_ALLOCATES_MEMORY flag from your driver.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+	Ingo
