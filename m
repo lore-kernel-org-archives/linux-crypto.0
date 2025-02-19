@@ -1,93 +1,128 @@
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11C351BD9C1;
-	Wed, 19 Feb 2025 07:49:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86FA71D6DC5;
+	Wed, 19 Feb 2025 11:13:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739951377; cv=none; b=tUkx68skJEs0uktvRp5rYco4c8DoKfPpHpQS7tBPgA51KJ9SsOALceEm1Mikic0iorxVtlIfb9jO1ooMQK08uCu58PpTr8d9YUdkESuHxsdyPzbD7tzhSiOmqtkPu81zINERef8c1etTzxMTbvFkk27XKTxfTnzzhj4lXcUiGSk=
+	t=1739963611; cv=none; b=O4j+L5pU5rtTiqTaduDY2dAJQK7ACqLlRE4Qvd8aCRHQ1cIW32DW4d6nNo5NBP1NM3TA85iRvApVvlvA23/x2yccJf1tf9zXs2dvlpFS+bOGf8BlWimTLR1jCDTsdZDxjVabXyqF58Z0yoN2zJ/gBOCJvB+MV521lA54j2o9j3k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739951377; c=relaxed/simple;
-	bh=QW0YLd5UiVymKP5/70LE4zlHCAJ02RQWRAnH96fjx4M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=c9mtNnav2JNBqMjAjQR6IxflJ9AqCI8HgDg+MzQ/Ee7lRyJCOE9KSPNCSg2nKnhhrjZDivrW0D+VrPo85KenLmgSv6tq71dTFD9J/K8xvMROyn2fiq3AZ74fidgyrguboFa0siWFb90WVBn4wZuBv2DI0Nn+EHYn6js6XyixF8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.2] (ip5f5af295.dynamic.kabel-deutschland.de [95.90.242.149])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 14F8161E64788;
-	Wed, 19 Feb 2025 08:48:53 +0100 (CET)
-Message-ID: <82eadd04-26ed-4560-9a9d-2a55ab72a84b@molgen.mpg.de>
-Date: Wed, 19 Feb 2025 08:48:52 +0100
+	s=arc-20240116; t=1739963611; c=relaxed/simple;
+	bh=mlCF+3bzZOAa8f3gAfZzRMJclFUXFMrrk4oBZGG7YHg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qkAPg6S05qLCKfoWH71uoN48hPECmKi+2xdDOLCSMlp3jYCRT7+ehDBKGo5SnmqiaN/ZwZJFn04VC3Tz8NFgy1hcLXbtIgPoFaaV/w4/uiWN5hITFHm99/j2NyGxfFSSJ4ZVUZQ2GWUo5puj4OVbNTz/0sjMBPgrluituFnT+iE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QeM4Fcg/; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QeM4Fcg/"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1739963606;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Brim4R+j1jrxpbFoMdiijr4HsKQ5qnKt7XsTd8hfjR4=;
+	b=QeM4Fcg/by7mp4kHFyP5H0V6yq29ZO+igAYVxIOoy6HGJPMN/JgJ5kxDrhnhzZ5BUr/KKx
+	W7zlWk6GRTVw3+biryCrIZ+4BewA5MBGKP8l0IryPYb0pJWbiavXnuovEgRKaJUxgZT8gZ
+	OHmIR86aih48DwtAdNmTQK0U+qKlen8=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Chen Ridong <chenridong@huawei.com>,
+	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [RESEND PATCH] crypto: bcm - set memory to zero only once
+Date: Wed, 19 Feb 2025 12:12:53 +0100
+Message-ID: <20250219111254.2654-2-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V3 2/6] MAINTAINERS: Add maintainer for Loongson Security
- Module driver
-To: Qunqin Zhao <zhaoqunqin@loongson.cn>
-Cc: lee@kernel.org, herbert@gondor.apana.org.au, davem@davemloft.net,
- peterhuewe@gmx.de, jarkko@kernel.org, linux-kernel@vger.kernel.org,
- loongarch@lists.linux.dev, linux-crypto@vger.kernel.org, jgg@ziepe.ca,
- linux-integrity@vger.kernel.org
-References: <20250219073214.16866-1-zhaoqunqin@loongson.cn>
- <20250219073214.16866-3-zhaoqunqin@loongson.cn>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20250219073214.16866-3-zhaoqunqin@loongson.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Dear Qunqin,
+Use kmalloc_array() instead of kcalloc() because sg_init_table() already
+sets the memory to zero. This avoids zeroing the memory twice.
 
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+---
+ drivers/crypto/bcm/cipher.c | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
-Thank you for your patch, and for wanting to maintain this code. Two 
-minor things should you resend:
+diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
+index 9e6798efbfb7..d4da2b5b595f 100644
+--- a/drivers/crypto/bcm/cipher.c
++++ b/drivers/crypto/bcm/cipher.c
+@@ -140,8 +140,8 @@ spu_skcipher_rx_sg_create(struct brcm_message *mssg,
+ 	struct iproc_ctx_s *ctx = rctx->ctx;
+ 	u32 datalen;		/* Number of bytes of response data expected */
+ 
+-	mssg->spu.dst = kcalloc(rx_frag_num, sizeof(struct scatterlist),
+-				rctx->gfp);
++	mssg->spu.dst = kmalloc_array(rx_frag_num, sizeof(struct scatterlist),
++				      rctx->gfp);
+ 	if (!mssg->spu.dst)
+ 		return -ENOMEM;
+ 
+@@ -204,8 +204,8 @@ spu_skcipher_tx_sg_create(struct brcm_message *mssg,
+ 	u32 datalen;		/* Number of bytes of response data expected */
+ 	u32 stat_len;
+ 
+-	mssg->spu.src = kcalloc(tx_frag_num, sizeof(struct scatterlist),
+-				rctx->gfp);
++	mssg->spu.src = kmalloc_array(tx_frag_num, sizeof(struct scatterlist),
++				      rctx->gfp);
+ 	if (unlikely(!mssg->spu.src))
+ 		return -ENOMEM;
+ 
+@@ -531,8 +531,8 @@ spu_ahash_rx_sg_create(struct brcm_message *mssg,
+ 	struct scatterlist *sg;	/* used to build sgs in mbox message */
+ 	struct iproc_ctx_s *ctx = rctx->ctx;
+ 
+-	mssg->spu.dst = kcalloc(rx_frag_num, sizeof(struct scatterlist),
+-				rctx->gfp);
++	mssg->spu.dst = kmalloc_array(rx_frag_num, sizeof(struct scatterlist),
++				      rctx->gfp);
+ 	if (!mssg->spu.dst)
+ 		return -ENOMEM;
+ 
+@@ -586,8 +586,8 @@ spu_ahash_tx_sg_create(struct brcm_message *mssg,
+ 	u32 datalen;		/* Number of bytes of response data expected */
+ 	u32 stat_len;
+ 
+-	mssg->spu.src = kcalloc(tx_frag_num, sizeof(struct scatterlist),
+-				rctx->gfp);
++	mssg->spu.src = kmalloc_array(tx_frag_num, sizeof(struct scatterlist),
++				      rctx->gfp);
+ 	if (!mssg->spu.src)
+ 		return -ENOMEM;
+ 
+@@ -1076,8 +1076,8 @@ static int spu_aead_rx_sg_create(struct brcm_message *mssg,
+ 		/* have to catch gcm pad in separate buffer */
+ 		rx_frag_num++;
+ 
+-	mssg->spu.dst = kcalloc(rx_frag_num, sizeof(struct scatterlist),
+-				rctx->gfp);
++	mssg->spu.dst = kmalloc_array(rx_frag_num, sizeof(struct scatterlist),
++				      rctx->gfp);
+ 	if (!mssg->spu.dst)
+ 		return -ENOMEM;
+ 
+@@ -1178,8 +1178,8 @@ static int spu_aead_tx_sg_create(struct brcm_message *mssg,
+ 	u32 assoc_offset = 0;
+ 	u32 stat_len;
+ 
+-	mssg->spu.src = kcalloc(tx_frag_num, sizeof(struct scatterlist),
+-				rctx->gfp);
++	mssg->spu.src = kmalloc_array(tx_frag_num, sizeof(struct scatterlist),
++				      rctx->gfp);
+ 	if (!mssg->spu.src)
+ 		return -ENOMEM;
+ 
+-- 
+2.48.1
 
-I found it quite useful to have the maintainer name in the summary/title 
-as often only the `git log --oneline` output is used in change-logs. I 
-suggest:
-
-MAINTAINERS: Add Qunqin Zhao for new Loongson Security Module driver
-
-Am 19.02.25 um 08:32 schrieb Qunqin Zhao:
-> This patch adds an entry for Loongson Security Module driver in the list
-> of Maintainers.
-
-Maintainers could be spelled lowercase.
-
-> Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
-> ---
->   MAINTAINERS | 7 +++++++
->   1 file changed, 7 insertions(+)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 5583df569c..cd6c029398 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -13494,6 +13494,13 @@ S:	Maintained
->   F:	Documentation/devicetree/bindings/i2c/loongson,ls2x-i2c.yaml
->   F:	drivers/i2c/busses/i2c-ls2x.c
->   
-> +LOONGSON SECURITY MODULE DRIVER
-> +M:	Qunqin Zhao <zhaoqunqin@loongson.cn>
-> +L:	loongarch@lists.linux.dev
-> +S:	Maintained
-> +F:	drivers/mfd/ls6000se.c
-> +F:	include/linux/mfd/ls6000se.h
-> +
->   LOONGSON-2 SOC SERIES CLOCK DRIVER
->   M:	Yinbo Zhu <zhuyinbo@loongson.cn>
->   L:	linux-clk@vger.kernel.org
-
-
-Kind regards,
-
-Paul
