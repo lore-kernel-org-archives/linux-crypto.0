@@ -1,96 +1,157 @@
-Received: from mail.manjaro.org (mail.manjaro.org [116.203.91.91])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 633591FDE02;
-	Wed, 19 Feb 2025 18:06:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.91.91
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 787812147E8;
+	Wed, 19 Feb 2025 18:09:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739988400; cv=none; b=qK6v5yQRu/4mTVRF91tHbBZyX/2IvDzd4EHqjQ2KDOxzo0vMiYEMpsHsvEIw9lcO7it4VQEXPO5XXfqZ4FpeU0/h3/Mv5EO0RFLn32K77eYgPff4ShCWwIqm2aRjX2t9lLB91gVSounDrClbEeFlt6vTxnfLLsQARTbnyeH9mj8=
+	t=1739988569; cv=none; b=MCY/SdI/47UNEFXiycESsSIacxKO4VjwIGjF42JvG5Uwfj4yvoTg4p/8m4LIjbeJ5KJkg873+WOZ6/7RoM41giPtorc9zoTeEP21OwlAAAgbIGUkyV3ClfKSR2ZrJPu0x/zXgNBYMyKuM0BZuTUyM5naN6C/e3/K+M37P++5V34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739988400; c=relaxed/simple;
-	bh=6ogUIgrAUfVQXMcIl58LWYrJq8u3rq5wF2TdTmhQk90=;
-	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
-	 Message-ID:Content-Type; b=GXiw3KTbs/5DmQG6dHZFVuBsYWObnRmZWWSD5ZVA3LlCkfz1F1Bk03PrsdbGUFJzWvQVypiGbVScEIPlTn3beMVEUsdm5jIdrMlT3hXFcD5g8RQYpXEWeBM61p4ltmkgK2SiGNz8hBc81Z+1sMBljB48Idl1QA2XhDYx0sHIjrM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org; spf=pass smtp.mailfrom=manjaro.org; dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b=VEb/nLBH; arc=none smtp.client-ip=116.203.91.91
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manjaro.org
+	s=arc-20240116; t=1739988569; c=relaxed/simple;
+	bh=89pN2lzpnqx4pWKh5CtnkftsUiCXfM/YS4po5Dm9sWw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mQU8+XjZgPha3R01o/VSKaL1HGD+lZhgWBhWkp96kJJKlZvJaKS6igzluVVhw6nIe8S7pAUQT5dU8GB9Kc5eVn6VscgxImjh8jf5aV/Mh/iznGzjZbIUUER7SUgmviHjZMPsb8rf9W1Kia2MQ6fu1GCrJyoL/4ghVTAqff0sgms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=LTG+FjzA; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b="VEb/nLBH"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="LTG+FjzA"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABE1AC4CED1;
+	Wed, 19 Feb 2025 18:09:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1739988569;
+	bh=89pN2lzpnqx4pWKh5CtnkftsUiCXfM/YS4po5Dm9sWw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LTG+FjzABQ7n7DrisxPtoZmA2zEvi4uzF9hzOHHpMb5sB6eWt5cCLd8cAhHAzbPe6
+	 EYcNhRG2vo3DAhoUmQtN7iN8JrDv9YWu1AM8OPan6/tSHDfSZ2iIqHyxJDXow5aU8K
+	 a9XJsPDHtMBPOu16IiImWiw7pN+dh4YezumkgO+w=
+Date: Wed, 19 Feb 2025 19:09:26 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Naresh Kamboju <naresh.kamboju@linaro.org>, stable@vger.kernel.org,
+	patches@lists.linux.dev, linux-kernel@vger.kernel.org,
+	torvalds@linux-foundation.org, akpm@linux-foundation.org,
+	linux@roeck-us.net, shuah@kernel.org, patches@kernelci.org,
+	lkft-triage@lists.linaro.org, pavel@denx.de, jonathanh@nvidia.com,
+	f.fainelli@gmail.com, sudipm.mukherjee@gmail.com,
+	srw@sladewatkins.net, rwarsow@gmx.de, conor@kernel.org,
+	hargar@microsoft.com, broonie@kernel.org,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	linux-fsdevel@vger.kernel.org, linux-mm <linux-mm@kvack.org>,
+	Anders Roxell <anders.roxell@linaro.org>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Herbert Xu <herbert@gondor.apana.org.au>, willy@infradead.org,
+	Pankaj Raghav <p.raghav@samsung.com>,
+	Yang Shi <yang@os.amperecomputing.com>,
+	David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH 6.6 000/389] 6.6.76-rc2 review
+Message-ID: <2025021959-koala-flypaper-1ad5@gregkh>
+References: <20250206155234.095034647@linuxfoundation.org>
+ <CA+G9fYvKzV=jo9AmKH2tJeLr0W8xyjxuVO-P+ZEBdou6C=mKUw@mail.gmail.com>
+ <CA+G9fYtqBxt+JwSLCcVBchh94GVRhbo9rTP26ceJ=sf4MDo61Q@mail.gmail.com>
+ <Z7Xj-zIe-Sa1syG7@arm.com>
+ <Z7YSYArXkRFEy6FO@arm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manjaro.org; s=2021;
-	t=1739988390;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cF7ELyOX8wQ6lDtEFZ09lHtUbLqKTiasQBuB9+dFHQ8=;
-	b=VEb/nLBHJtl/OA/zYaEUzJ6xb1LyjwgYiBnKB5wpv06Yhs0Na3UY5KRHVT0wUEgeXsr8bC
-	iUuyxiEUqfEQ+yhjP18ojQ92tKkd2lM8Mahk3BkAo9rsSJI+0C0n4Ni+/V11sPqpYA7uE8
-	Zca2RVZM5BWlyTL42UlEHLxfn8xLRRWJD1MMWudQG7/IfKGJmB7s8ZIrV60fzfhqE79Z5L
-	wAoFdz/yIqJrfRvhNhLLqCT2PfZeFwNMC5Ntu41fl9WsE+Y8AcYWSfo9pmhq40ZyLIhsYt
-	oHONwfPR9kKT5znsTmf5k9oemaRVWQ4tYv7kfbAquyp9P4wNK+ZmHHjI1cHUXA==
-Date: Wed, 19 Feb 2025 19:06:26 +0100
-From: Dragan Simic <dsimic@manjaro.org>
-To: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: Olivia Mackall <olivia@selenic.com>, Herbert Xu
- <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] hwrng: Fix indentation of HW_RANDOM_CN10K help text
-In-Reply-To: <54eae580e3ee5686db692dd6c0927b23134a1cec.1739977165.git.geert+renesas@glider.be>
-References: <54eae580e3ee5686db692dd6c0927b23134a1cec.1739977165.git.geert+renesas@glider.be>
-Message-ID: <c94a6961491f59d5c81c607530976136@manjaro.org>
-X-Sender: dsimic@manjaro.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Authentication-Results: ORIGINATING;
-	auth=pass smtp.auth=dsimic@manjaro.org smtp.mailfrom=dsimic@manjaro.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z7YSYArXkRFEy6FO@arm.com>
 
-Hello Geert,
-
-On 2025-02-19 16:03, Geert Uytterhoeven wrote:
-> Change the indentation of the help text of the HW_RANDOM_CN10K symbol
-> from one TAB plus one space to one TAB plus two spaces, as is 
-> customary.
+On Wed, Feb 19, 2025 at 05:18:24PM +0000, Catalin Marinas wrote:
+> On Wed, Feb 19, 2025 at 02:00:27PM +0000, Catalin Marinas wrote:
+> > > On Sat, 8 Feb 2025 at 16:54, Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
+> > > > Regression on qemu-arm64 and FVP noticed this kernel warning running
+> > > > selftests: arm64: check_hugetlb_options test case on 6.6.76-rc1 and
+> > > > 6.6.76-rc2.
+> > > >
+> > > > Test regression: WARNING-arch-arm64-mm-copypage-copy_highpage
+> > > >
+> > > > ------------[ cut here ]------------
+> > > > [   96.920028] WARNING: CPU: 1 PID: 3611 at
+> > > > arch/arm64/mm/copypage.c:29 copy_highpage
+> > > > (arch/arm64/include/asm/mte.h:87)
+> > > > [   96.922100] Modules linked in: crct10dif_ce sm3_ce sm3 sha3_ce
+> > > > sha512_ce sha512_arm64 fuse drm backlight ip_tables x_tables
+> > > > [   96.925603] CPU: 1 PID: 3611 Comm: check_hugetlb_o Not tainted 6.6.76-rc2 #1
+> > > > [   96.926956] Hardware name: linux,dummy-virt (DT)
+> > > > [   96.927695] pstate: 43402009 (nZcv daif +PAN -UAO +TCO +DIT -SSBS BTYPE=--)
+> > > > [   96.928687] pc : copy_highpage (arch/arm64/include/asm/mte.h:87)
+> > > > [   96.929037] lr : copy_highpage
+> > > > (arch/arm64/include/asm/alternative-macros.h:232
+> > > > arch/arm64/include/asm/cpufeature.h:443
+> > > > arch/arm64/include/asm/cpufeature.h:504
+> > > > arch/arm64/include/asm/cpufeature.h:814 arch/arm64/mm/copypage.c:27)
+> > > > [   96.929399] sp : ffff800088aa3ab0
+> > > > [   96.930232] x29: ffff800088aa3ab0 x28: 00000000000001ff x27: 0000000000000000
+> > > > [   96.930784] x26: 0000000000000000 x25: 0000ffff9b800000 x24: 0000ffff9b9ff000
+> > > > [   96.931402] x23: fffffc0003257fc0 x22: ffff0000c95ff000 x21: ffff0000c93ff000
+> > > > [   96.932054] x20: fffffc0003257fc0 x19: fffffc000324ffc0 x18: 0000ffff9b800000
+> > > > [   96.933357] x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000
+> > > > [   96.934091] x14: 0000000000000000 x13: 0000000000000000 x12: 0000000000000000
+> > > > [   96.935095] x11: 0000000000000000 x10: 0000000000000000 x9 : 0000000000000000
+> > > > [   96.935982] x8 : 0bfffc0001800000 x7 : 0000000000000000 x6 : 0000000000000000
+> > > > [   96.936536] x5 : 0000000000000000 x4 : 0000000000000000 x3 : 0000000000000000
+> > > > [   96.937089] x2 : 0000000000000000 x1 : ffff0000c9600000 x0 : ffff0000c9400080
+> > > > [   96.939431] Call trace:
+> > > > [   96.939920] copy_highpage (arch/arm64/include/asm/mte.h:87)
+> > > > [   96.940443] copy_user_highpage (arch/arm64/mm/copypage.c:40)
+> > > > [   96.940963] copy_user_large_folio (mm/memory.c:5977 mm/memory.c:6109)
+> > > > [   96.941535] hugetlb_wp (mm/hugetlb.c:5701)
+> > > > [   96.941948] hugetlb_fault (mm/hugetlb.c:6237)
+> > > > [   96.942344] handle_mm_fault (mm/memory.c:5330)
+> > > > [   96.942794] do_page_fault (arch/arm64/mm/fault.c:513
+> > > > arch/arm64/mm/fault.c:626)
+> > > > [   96.943341] do_mem_abort (arch/arm64/mm/fault.c:846)
+> > > > [   96.943797] el0_da (arch/arm64/kernel/entry-common.c:133
+> > > > arch/arm64/kernel/entry-common.c:144
+> > > > arch/arm64/kernel/entry-common.c:547)
+> > > > [   96.944229] el0t_64_sync_handler (arch/arm64/kernel/entry-common.c:0)
+> > > > [   96.944765] el0t_64_sync (arch/arm64/kernel/entry.S:599)
+> > > > [   96.945383] ---[ end trace 0000000000000000 ]---
+> > 
+> > Prior to commit 25c17c4b55de ("hugetlb: arm64: add mte support"), there
+> > was no hugetlb support with MTE, so the above code path should not
+> > happen - it seems to get a PROT_MTE hugetlb page which should have been
+> > prevented by arch_validate_flags(). Or something else corrupts the page
+> > flags and we end up with some random PG_mte_tagged set.
 > 
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> ---
-> While commit 67b78a34e48b9810 ("hwrng: Kconfig - Use tabs as leading
-> whitespace consistently in Kconfig") fixed some indentation for the
-> HW_RANDOM_CN10K symbol, it did not fix everything...
-
-Oh, I totally missed that, my bad.  Thanks for the patch, and
-please feel free to include
-
-Reviewed-by: Dragan Simic <dsimic@manjaro.org>
-
-> ---
->  drivers/char/hw_random/Kconfig | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+> The problem is in the arm64 arch_calc_vm_flag_bits() as it returns
+> VM_MTE_ALLOWED for any MAP_ANONYMOUS ignoring MAP_HUGETLB (it's been
+> doing this since day 1 of MTE). The implementation does handle the
+> hugetlb file mmap() correctly but not the MAP_ANONYMOUS case.
 > 
-> diff --git a/drivers/char/hw_random/Kconfig 
-> b/drivers/char/hw_random/Kconfig
-> index 1ec4cad1e210a2ac..c67de9579664c762 100644
-> --- a/drivers/char/hw_random/Kconfig
-> +++ b/drivers/char/hw_random/Kconfig
-> @@ -583,11 +583,11 @@ config HW_RANDOM_CN10K
->  	depends on HW_RANDOM && PCI && (ARM64 || (64BIT && COMPILE_TEST))
->  	default HW_RANDOM if ARCH_THUNDER
->  	help
-> -	 This driver provides support for the True Random Number
-> -	 generator available in Marvell CN10K SoCs.
-> +	  This driver provides support for the True Random Number
-> +	  generator available in Marvell CN10K SoCs.
+> The fix would be something like below:
 > 
-> -	 To compile this driver as a module, choose M here.
-> -	 The module will be called cn10k_rng. If unsure, say Y.
-> +	  To compile this driver as a module, choose M here.
-> +	  The module will be called cn10k_rng. If unsure, say Y.
+> -----------------8<--------------------------
+> diff --git a/arch/arm64/include/asm/mman.h b/arch/arm64/include/asm/mman.h
+> index 5966ee4a6154..8ff5d88c9f12 100644
+> --- a/arch/arm64/include/asm/mman.h
+> +++ b/arch/arm64/include/asm/mman.h
+> @@ -28,7 +28,8 @@ static inline unsigned long arch_calc_vm_flag_bits(unsigned long flags)
+>  	 * backed by tags-capable memory. The vm_flags may be overridden by a
+>  	 * filesystem supporting MTE (RAM-based).
+>  	 */
+> -	if (system_supports_mte() && (flags & MAP_ANONYMOUS))
+> +	if (system_supports_mte() &&
+> +	    ((flags & MAP_ANONYMOUS) && !(flags & MAP_HUGETLB)))
+>  		return VM_MTE_ALLOWED;
 > 
->  config HW_RANDOM_JH7110
->  	tristate "StarFive JH7110 Random Number Generator support"
+>  	return 0;
+> -------------------8<-----------------------
+> 
+> This fix won't make sense for mainline since it supports MAP_HUGETLB
+> already.
+> 
+> Greg, are you ok with a stable-only fix as above or you'd rather see the
+> full 25c17c4b55de ("hugetlb: arm64: add mte support") backported?
+
+A stable-only fix for this is fine, thanks!  Can you send it with a
+changelog and I'll queue it up.  Does it also need to go to older
+kernels as well?
+
+thanks,
+
+greg k-h
