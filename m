@@ -1,157 +1,135 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 787812147E8;
-	Wed, 19 Feb 2025 18:09:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C4221481B;
+	Wed, 19 Feb 2025 18:24:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739988569; cv=none; b=MCY/SdI/47UNEFXiycESsSIacxKO4VjwIGjF42JvG5Uwfj4yvoTg4p/8m4LIjbeJ5KJkg873+WOZ6/7RoM41giPtorc9zoTeEP21OwlAAAgbIGUkyV3ClfKSR2ZrJPu0x/zXgNBYMyKuM0BZuTUyM5naN6C/e3/K+M37P++5V34=
+	t=1739989467; cv=none; b=d19bZMwWgawk+TKw4v5I7dW64ElJ7OD+hu/jFPFYsJhD4HqNPnsx6bqGfnq69Nk3cbNej3IDgA2EJ306bXsQ+pJV9BtA+3jZXEqprpb94Fnwt7kL7TUZeq9Mabb3pZVeA08k0UQnYuhtq/y5Mfq34czs5+MduQ05ldQvfUeJ/KU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739988569; c=relaxed/simple;
-	bh=89pN2lzpnqx4pWKh5CtnkftsUiCXfM/YS4po5Dm9sWw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mQU8+XjZgPha3R01o/VSKaL1HGD+lZhgWBhWkp96kJJKlZvJaKS6igzluVVhw6nIe8S7pAUQT5dU8GB9Kc5eVn6VscgxImjh8jf5aV/Mh/iznGzjZbIUUER7SUgmviHjZMPsb8rf9W1Kia2MQ6fu1GCrJyoL/4ghVTAqff0sgms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=LTG+FjzA; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1739989467; c=relaxed/simple;
+	bh=MnAffNGuOsgnzdGST98He9D12GmU6n41qfc44ByLtiI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=j5VqRwoPvkuzNMdh85UBR/wameYTqVhYvozBMpEiaHsSJdZgE5GsrqZQ1LBKUe8avCsXdLmn5NNyj0GJlf7DC4JsjrThpYf1ltYdDvNdilsXZnr881kMv38wWsDEXnccFK4Zs6JuzePTAU+CXwN18WuQCKhbnLrx63kxWPTmbrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YPGrKe6W; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="LTG+FjzA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABE1AC4CED1;
-	Wed, 19 Feb 2025 18:09:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1739988569;
-	bh=89pN2lzpnqx4pWKh5CtnkftsUiCXfM/YS4po5Dm9sWw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LTG+FjzABQ7n7DrisxPtoZmA2zEvi4uzF9hzOHHpMb5sB6eWt5cCLd8cAhHAzbPe6
-	 EYcNhRG2vo3DAhoUmQtN7iN8JrDv9YWu1AM8OPan6/tSHDfSZ2iIqHyxJDXow5aU8K
-	 a9XJsPDHtMBPOu16IiImWiw7pN+dh4YezumkgO+w=
-Date: Wed, 19 Feb 2025 19:09:26 +0100
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Naresh Kamboju <naresh.kamboju@linaro.org>, stable@vger.kernel.org,
-	patches@lists.linux.dev, linux-kernel@vger.kernel.org,
-	torvalds@linux-foundation.org, akpm@linux-foundation.org,
-	linux@roeck-us.net, shuah@kernel.org, patches@kernelci.org,
-	lkft-triage@lists.linaro.org, pavel@denx.de, jonathanh@nvidia.com,
-	f.fainelli@gmail.com, sudipm.mukherjee@gmail.com,
-	srw@sladewatkins.net, rwarsow@gmx.de, conor@kernel.org,
-	hargar@microsoft.com, broonie@kernel.org,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	linux-fsdevel@vger.kernel.org, linux-mm <linux-mm@kvack.org>,
-	Anders Roxell <anders.roxell@linaro.org>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Herbert Xu <herbert@gondor.apana.org.au>, willy@infradead.org,
-	Pankaj Raghav <p.raghav@samsung.com>,
-	Yang Shi <yang@os.amperecomputing.com>,
-	David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH 6.6 000/389] 6.6.76-rc2 review
-Message-ID: <2025021959-koala-flypaper-1ad5@gregkh>
-References: <20250206155234.095034647@linuxfoundation.org>
- <CA+G9fYvKzV=jo9AmKH2tJeLr0W8xyjxuVO-P+ZEBdou6C=mKUw@mail.gmail.com>
- <CA+G9fYtqBxt+JwSLCcVBchh94GVRhbo9rTP26ceJ=sf4MDo61Q@mail.gmail.com>
- <Z7Xj-zIe-Sa1syG7@arm.com>
- <Z7YSYArXkRFEy6FO@arm.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YPGrKe6W"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 028C7C4CED1;
+	Wed, 19 Feb 2025 18:24:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739989467;
+	bh=MnAffNGuOsgnzdGST98He9D12GmU6n41qfc44ByLtiI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=YPGrKe6WopB9r+cQOljZNncGAxLtvjs3kio1C1TPdc1hr5wc2IbmljIQ0HIEX04u5
+	 Lo+MhcAOBaa4xQGvYOWA1fTchQLK0wJHUeTDJO+rqPEWbb0G2Rs+3zODzKXdbHFEHO
+	 ne8dna6ynngvy3kN0Q25j5APWOgUyFK4nFHbqMIdE0GqwsTFlLnAslFB0mxEOENvxp
+	 OeYVVv7U53y2gY960MRCRVbISIynQVsS3K8AQ1ZP4m82n0EntuYkCvheWCc42ZgTq3
+	 MJFX8zb4motA1Z3Q3jnmi84MIphZQC4ld8nvPh/oqubwLXHN3qAETDG0oLANRCjMXv
+	 jQ6ejMsHRSyaw==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v3 00/19] crypto: scatterlist handling improvements
+Date: Wed, 19 Feb 2025 10:23:22 -0800
+Message-ID: <20250219182341.43961-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z7YSYArXkRFEy6FO@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, Feb 19, 2025 at 05:18:24PM +0000, Catalin Marinas wrote:
-> On Wed, Feb 19, 2025 at 02:00:27PM +0000, Catalin Marinas wrote:
-> > > On Sat, 8 Feb 2025 at 16:54, Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
-> > > > Regression on qemu-arm64 and FVP noticed this kernel warning running
-> > > > selftests: arm64: check_hugetlb_options test case on 6.6.76-rc1 and
-> > > > 6.6.76-rc2.
-> > > >
-> > > > Test regression: WARNING-arch-arm64-mm-copypage-copy_highpage
-> > > >
-> > > > ------------[ cut here ]------------
-> > > > [   96.920028] WARNING: CPU: 1 PID: 3611 at
-> > > > arch/arm64/mm/copypage.c:29 copy_highpage
-> > > > (arch/arm64/include/asm/mte.h:87)
-> > > > [   96.922100] Modules linked in: crct10dif_ce sm3_ce sm3 sha3_ce
-> > > > sha512_ce sha512_arm64 fuse drm backlight ip_tables x_tables
-> > > > [   96.925603] CPU: 1 PID: 3611 Comm: check_hugetlb_o Not tainted 6.6.76-rc2 #1
-> > > > [   96.926956] Hardware name: linux,dummy-virt (DT)
-> > > > [   96.927695] pstate: 43402009 (nZcv daif +PAN -UAO +TCO +DIT -SSBS BTYPE=--)
-> > > > [   96.928687] pc : copy_highpage (arch/arm64/include/asm/mte.h:87)
-> > > > [   96.929037] lr : copy_highpage
-> > > > (arch/arm64/include/asm/alternative-macros.h:232
-> > > > arch/arm64/include/asm/cpufeature.h:443
-> > > > arch/arm64/include/asm/cpufeature.h:504
-> > > > arch/arm64/include/asm/cpufeature.h:814 arch/arm64/mm/copypage.c:27)
-> > > > [   96.929399] sp : ffff800088aa3ab0
-> > > > [   96.930232] x29: ffff800088aa3ab0 x28: 00000000000001ff x27: 0000000000000000
-> > > > [   96.930784] x26: 0000000000000000 x25: 0000ffff9b800000 x24: 0000ffff9b9ff000
-> > > > [   96.931402] x23: fffffc0003257fc0 x22: ffff0000c95ff000 x21: ffff0000c93ff000
-> > > > [   96.932054] x20: fffffc0003257fc0 x19: fffffc000324ffc0 x18: 0000ffff9b800000
-> > > > [   96.933357] x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000
-> > > > [   96.934091] x14: 0000000000000000 x13: 0000000000000000 x12: 0000000000000000
-> > > > [   96.935095] x11: 0000000000000000 x10: 0000000000000000 x9 : 0000000000000000
-> > > > [   96.935982] x8 : 0bfffc0001800000 x7 : 0000000000000000 x6 : 0000000000000000
-> > > > [   96.936536] x5 : 0000000000000000 x4 : 0000000000000000 x3 : 0000000000000000
-> > > > [   96.937089] x2 : 0000000000000000 x1 : ffff0000c9600000 x0 : ffff0000c9400080
-> > > > [   96.939431] Call trace:
-> > > > [   96.939920] copy_highpage (arch/arm64/include/asm/mte.h:87)
-> > > > [   96.940443] copy_user_highpage (arch/arm64/mm/copypage.c:40)
-> > > > [   96.940963] copy_user_large_folio (mm/memory.c:5977 mm/memory.c:6109)
-> > > > [   96.941535] hugetlb_wp (mm/hugetlb.c:5701)
-> > > > [   96.941948] hugetlb_fault (mm/hugetlb.c:6237)
-> > > > [   96.942344] handle_mm_fault (mm/memory.c:5330)
-> > > > [   96.942794] do_page_fault (arch/arm64/mm/fault.c:513
-> > > > arch/arm64/mm/fault.c:626)
-> > > > [   96.943341] do_mem_abort (arch/arm64/mm/fault.c:846)
-> > > > [   96.943797] el0_da (arch/arm64/kernel/entry-common.c:133
-> > > > arch/arm64/kernel/entry-common.c:144
-> > > > arch/arm64/kernel/entry-common.c:547)
-> > > > [   96.944229] el0t_64_sync_handler (arch/arm64/kernel/entry-common.c:0)
-> > > > [   96.944765] el0t_64_sync (arch/arm64/kernel/entry.S:599)
-> > > > [   96.945383] ---[ end trace 0000000000000000 ]---
-> > 
-> > Prior to commit 25c17c4b55de ("hugetlb: arm64: add mte support"), there
-> > was no hugetlb support with MTE, so the above code path should not
-> > happen - it seems to get a PROT_MTE hugetlb page which should have been
-> > prevented by arch_validate_flags(). Or something else corrupts the page
-> > flags and we end up with some random PG_mte_tagged set.
-> 
-> The problem is in the arm64 arch_calc_vm_flag_bits() as it returns
-> VM_MTE_ALLOWED for any MAP_ANONYMOUS ignoring MAP_HUGETLB (it's been
-> doing this since day 1 of MTE). The implementation does handle the
-> hugetlb file mmap() correctly but not the MAP_ANONYMOUS case.
-> 
-> The fix would be something like below:
-> 
-> -----------------8<--------------------------
-> diff --git a/arch/arm64/include/asm/mman.h b/arch/arm64/include/asm/mman.h
-> index 5966ee4a6154..8ff5d88c9f12 100644
-> --- a/arch/arm64/include/asm/mman.h
-> +++ b/arch/arm64/include/asm/mman.h
-> @@ -28,7 +28,8 @@ static inline unsigned long arch_calc_vm_flag_bits(unsigned long flags)
->  	 * backed by tags-capable memory. The vm_flags may be overridden by a
->  	 * filesystem supporting MTE (RAM-based).
->  	 */
-> -	if (system_supports_mte() && (flags & MAP_ANONYMOUS))
-> +	if (system_supports_mte() &&
-> +	    ((flags & MAP_ANONYMOUS) && !(flags & MAP_HUGETLB)))
->  		return VM_MTE_ALLOWED;
-> 
->  	return 0;
-> -------------------8<-----------------------
-> 
-> This fix won't make sense for mainline since it supports MAP_HUGETLB
-> already.
-> 
-> Greg, are you ok with a stable-only fix as above or you'd rather see the
-> full 25c17c4b55de ("hugetlb: arm64: add mte support") backported?
+This series can also be retrieved from:
 
-A stable-only fix for this is fine, thanks!  Can you send it with a
-changelog and I'll queue it up.  Does it also need to go to older
-kernels as well?
+    git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git crypto-scatterlist-v3
 
-thanks,
+This series cleans up and optimizes the code that translates between
+scatterlists (the input to the API) and virtual addresses (what software
+implementations operate on) for skcipher and aead algorithms.
 
-greg k-h
+This takes the form of cleanups and optimizations to the skcipher_walk
+functions and a rework of the underlying scatter_walk functions.
+
+The unnecessary use of scatterlists still remains a huge pain point of
+many of the crypto APIs, with the exception of lib/crypto/, shash, and
+scomp which do it properly.  But this series at least reduces (but not
+eliminates) the impact on performance that the scatterlists have.
+
+An an example, this patchset improves IPsec throughput by about 5%, as
+measured using iperf3 bidirectional TCP between two c3d-standard-4 (AMD
+Genoa) instances in Google Compute Engine using transport mode IPsec
+with AES-256-GCM.
+
+This series is organized as follows:
+
+- Patch 1-5 improve scatter_walk, introducing easier-to-use functions
+  and optimizing performance in some cases.
+- Patch 6-17 convert users to use the new functions.
+- Patch 18 removes functions that are no longer needed.
+- Patch 19 optimizes the walker on !HIGHMEM platforms to start returning
+  data segments that can cross a page boundary.  This can significantly
+  improve performance in cases where messages can cross pages, such as
+  IPsec.  Previously there was a large overhead caused by packets being
+  unnecessarily divided into multiple parts by the walker, including
+  hitting skcipher_next_slow() which uses a single-block bounce buffer.
+
+Changed in v3:
+- Dropped patches that were upstreamed.
+- Added a Reviewed-by and Tested-by.
+
+Changed in v2:
+- Added comment to scatterwalk_done_dst().
+- Added scatterwalk_get_sglist() and use it in net/tls/.
+- Dropped the keywrap patch, as keywrap is being removed by
+  https://lore.kernel.org/r/20241227220802.92550-1-ebiggers@kernel.org
+
+Eric Biggers (19):
+  crypto: scatterwalk - move to next sg entry just in time
+  crypto: scatterwalk - add new functions for skipping data
+  crypto: scatterwalk - add new functions for iterating through data
+  crypto: scatterwalk - add new functions for copying data
+  crypto: scatterwalk - add scatterwalk_get_sglist()
+  crypto: skcipher - use scatterwalk_start_at_pos()
+  crypto: aegis - use the new scatterwalk functions
+  crypto: arm/ghash - use the new scatterwalk functions
+  crypto: arm64 - use the new scatterwalk functions
+  crypto: nx - use the new scatterwalk functions
+  crypto: s390/aes-gcm - use the new scatterwalk functions
+  crypto: s5p-sss - use the new scatterwalk functions
+  crypto: stm32 - use the new scatterwalk functions
+  crypto: x86/aes-gcm - use the new scatterwalk functions
+  crypto: x86/aegis - use the new scatterwalk functions
+  net/tls: use the new scatterwalk functions
+  crypto: skcipher - use the new scatterwalk functions
+  crypto: scatterwalk - remove obsolete functions
+  crypto: scatterwalk - don't split at page boundaries when !HIGHMEM
+
+ arch/arm/crypto/ghash-ce-glue.c       |  15 +-
+ arch/arm64/crypto/aes-ce-ccm-glue.c   |  17 +--
+ arch/arm64/crypto/ghash-ce-glue.c     |  16 +-
+ arch/arm64/crypto/sm4-ce-ccm-glue.c   |  27 ++--
+ arch/arm64/crypto/sm4-ce-gcm-glue.c   |  31 ++--
+ arch/s390/crypto/aes_s390.c           |  33 ++---
+ arch/x86/crypto/aegis128-aesni-glue.c |  10 +-
+ arch/x86/crypto/aesni-intel_glue.c    |  28 ++--
+ crypto/aegis128-core.c                |  10 +-
+ crypto/scatterwalk.c                  |  91 +++++++-----
+ crypto/skcipher.c                     |  65 +++------
+ drivers/crypto/nx/nx-aes-ccm.c        |  16 +-
+ drivers/crypto/nx/nx-aes-gcm.c        |  17 +--
+ drivers/crypto/nx/nx.c                |  31 +---
+ drivers/crypto/nx/nx.h                |   3 -
+ drivers/crypto/s5p-sss.c              |  38 ++---
+ drivers/crypto/stm32/stm32-cryp.c     |  34 ++---
+ include/crypto/scatterwalk.h          | 203 +++++++++++++++++++++-----
+ net/tls/tls_device_fallback.c         |  31 +---
+ 19 files changed, 363 insertions(+), 353 deletions(-)
+
+
+base-commit: c346fef6fef53fa57ff323b701e7bad82290d0e7
+-- 
+2.48.1
+
