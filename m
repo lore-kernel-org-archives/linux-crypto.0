@@ -1,43 +1,44 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2025B1E7C25;
-	Wed, 19 Feb 2025 13:44:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 182781E1A3B;
+	Wed, 19 Feb 2025 14:00:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739972657; cv=none; b=Gc5hTCFnIsfKIdnHY3qygzZqejYdKee1Ut0QVJnsRWQAGk8iUTirioHVYi9RwXAypRF5QFjp+vdCjGIkkSXgsSzSVFvWgouqTEw3YYqMAKHXHtghM0vNsH5ex5N0+0Mu4E5HzGmqYVr3dCMedfmFg3tL2CsLVfete8rMlIRdhMo=
+	t=1739973636; cv=none; b=fN60iAVogz15l9nFLg04/CIrRDOsYUBd/WGEQMCHL5csu9tRYg1baJ1iUxDD+nkOUnNMVZ5eMmcnSqhH8k/0P0CiESqsLM3JpkSS52WxMEBHa1RHZRsWu8rO1QyjYnQXOACZbiyZ0NBF4077yabm+G9vXB7Uo3tW4oPQJsW3xGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739972657; c=relaxed/simple;
-	bh=N7+6L64rjXg9fF5fR618d6CJYqV7II10i29eiKI9P44=;
+	s=arc-20240116; t=1739973636; c=relaxed/simple;
+	bh=X+M3x8vareZ1kGwEPWZ3GJcEu+0g9qcC+YP820OHeSY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UmxviMQSO/AtLZIyxaJw998otWt4Itg8KCessBlybleEVjwGVeDp27v8sFoEScxXV6hayuX6jDX9ZPVH0s1oaFpSdeYj/ua6HUqUFxqxamiV+wMrepDcd1A7b8hmNYNvCdQapOFxCUFg5GwB1LMI8HR/LE3t5QIdV+R8L4HRPQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W2yZ+zij; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W2yZ+zij"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E41DC4CED1;
-	Wed, 19 Feb 2025 13:44:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739972657;
-	bh=N7+6L64rjXg9fF5fR618d6CJYqV7II10i29eiKI9P44=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=W2yZ+zijHcI2QmoLkybU+92OwkkHfakORiz+k8Xb1xX9jauDjuU6UkFDjczaZxBug
-	 qmEq5CwxZvDhBpNgn9FZpgPpoUv4PW0ZbYolJ1fGpA83s2RV16cViOngiEJJoxitvT
-	 hGGItpGR4TQS/dXPb1rXR9LfYzZu+2LeymZT34Y/jSXyRDnGTORVZzYUKOnBMZLiKZ
-	 nKbGbMyUTWTheU4uohc/DvmBguIZwIZAnfhnOseWOk/c2pdpVxxTDO85fJF5aWZ3uS
-	 5gLoFfykuXJ6A1afHm3VzvIKYxm8ziodb8zVq9EwDQweAOiW5dm/ndb4T/9lWJzaOc
-	 buAa72zDn/1GA==
-Date: Wed, 19 Feb 2025 15:44:12 +0200
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: Qunqin Zhao <zhaoqunqin@loongson.cn>
-Cc: lee@kernel.org, herbert@gondor.apana.org.au, davem@davemloft.net,
-	peterhuewe@gmx.de, linux-kernel@vger.kernel.org,
-	loongarch@lists.linux.dev, linux-crypto@vger.kernel.org,
-	jgg@ziepe.ca, linux-integrity@vger.kernel.org,
-	Yinggang Gu <guyinggang@loongson.cn>
-Subject: Re: [PATCH V3 5/6] tpm: Add a driver for Loongson TPM device
-Message-ID: <Z7XgLNU1xXqgOBIL@kernel.org>
-References: <20250219073350.16915-1-zhaoqunqin@loongson.cn>
- <20250219073350.16915-2-zhaoqunqin@loongson.cn>
+	 Content-Type:Content-Disposition:In-Reply-To; b=PdJnZu0djCyCsV5qbTbTWtyRNZyTcjcbyL1VAOyaF9nbvBSXaKoFJOE1aSDFzJqQIx6r3ew/RNZFm7CGUFBqrp4HFmtIu0z7ZasToxsXB6X+b9oWV8AlSgX5ICdZkR+MZDHl/A4r/bbmZVSDcaJ02r0USR4DSL30JhvOJqNUD5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B8DAC4CED1;
+	Wed, 19 Feb 2025 14:00:30 +0000 (UTC)
+Date: Wed, 19 Feb 2025 14:00:27 +0000
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Naresh Kamboju <naresh.kamboju@linaro.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, stable@vger.kernel.org,
+	patches@lists.linux.dev, linux-kernel@vger.kernel.org,
+	torvalds@linux-foundation.org, akpm@linux-foundation.org,
+	linux@roeck-us.net, shuah@kernel.org, patches@kernelci.org,
+	lkft-triage@lists.linaro.org, pavel@denx.de, jonathanh@nvidia.com,
+	f.fainelli@gmail.com, sudipm.mukherjee@gmail.com,
+	srw@sladewatkins.net, rwarsow@gmx.de, conor@kernel.org,
+	hargar@microsoft.com, broonie@kernel.org,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	linux-fsdevel@vger.kernel.org, linux-mm <linux-mm@kvack.org>,
+	Anders Roxell <anders.roxell@linaro.org>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Herbert Xu <herbert@gondor.apana.org.au>, willy@infradead.org,
+	Pankaj Raghav <p.raghav@samsung.com>,
+	Yang Shi <yang@os.amperecomputing.com>,
+	David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH 6.6 000/389] 6.6.76-rc2 review
+Message-ID: <Z7Xj-zIe-Sa1syG7@arm.com>
+References: <20250206155234.095034647@linuxfoundation.org>
+ <CA+G9fYvKzV=jo9AmKH2tJeLr0W8xyjxuVO-P+ZEBdou6C=mKUw@mail.gmail.com>
+ <CA+G9fYtqBxt+JwSLCcVBchh94GVRhbo9rTP26ceJ=sf4MDo61Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -46,176 +47,96 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250219073350.16915-2-zhaoqunqin@loongson.cn>
+In-Reply-To: <CA+G9fYtqBxt+JwSLCcVBchh94GVRhbo9rTP26ceJ=sf4MDo61Q@mail.gmail.com>
 
-On Wed, Feb 19, 2025 at 03:33:49PM +0800, Qunqin Zhao wrote:
-> Loongson security engine supports random number generation, hash,
-> symmetric encryption and asymmetric encryption. Based on these
-> encryption functions, TPM2 have been implemented in the Loongson
-> security engine firmware. This driver is responsible for copying data
-> into the memory visible to the firmware and receiving data from the
-> firmware.
+On Mon, Feb 17, 2025 at 05:00:43PM +0530, Naresh Kamboju wrote:
+> On Sat, 8 Feb 2025 at 16:54, Naresh Kamboju <naresh.kamboju@linaro.org> wrote:
+[...]
+> We observed a kernel warning on QEMU-ARM64 and FVP while running the
+> newly added selftest: arm64: check_hugetlb_options. This issue appears
+> on 6.6.76 onward and 6.12.13 onward, as reported in the stable review [1].
+> However, the test case passes successfully on stable 6.13.
 > 
-> Co-developed-by: Yinggang Gu <guyinggang@loongson.cn>
-> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
-> Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
-> ---
-> v3: Added reminder about Loongson security engine to git log.
+> The selftests: arm64: check_hugetlb_options test was introduced following
+> the recent upgrade of kselftest test sources to the stable 6.13 branch.
+> As you are aware, LKFT runs the latest kselftest sources (from stable
+> 6.13.x) on 6.12.x, 6.6.x, and older kernels for validation purposes.
 > 
->  drivers/char/tpm/Kconfig    |   9 ++++
->  drivers/char/tpm/Makefile   |   1 +
->  drivers/char/tpm/tpm_lsse.c | 104 ++++++++++++++++++++++++++++++++++++
->  3 files changed, 114 insertions(+)
->  create mode 100644 drivers/char/tpm/tpm_lsse.c
+> From Anders' bisection results, we identified that the missing patch on
+> 6.12 is likely causing this regression:
 > 
-> diff --git a/drivers/char/tpm/Kconfig b/drivers/char/tpm/Kconfig
-> index 0fc9a510e0..56d0417065 100644
-> --- a/drivers/char/tpm/Kconfig
-> +++ b/drivers/char/tpm/Kconfig
-> @@ -225,5 +225,14 @@ config TCG_FTPM_TEE
->  	help
->  	  This driver proxies for firmware TPM running in TEE.
->  
-> +config TCG_LSSE
-> +	tristate "Loongson TPM Interface"
-> +	depends on MFD_LS6000SE
-> +	help
-> +	  If you want to make Loongson TPM support available, say Yes and
-> +	  it will be accessible from within Linux. To compile this
-> +	  driver as a module, choose M here; the module will be called
-> +	  tpm_lsse.
-> +
->  source "drivers/char/tpm/st33zp24/Kconfig"
->  endif # TCG_TPM
-> diff --git a/drivers/char/tpm/Makefile b/drivers/char/tpm/Makefile
-> index 9bb142c752..bf2280352d 100644
-> --- a/drivers/char/tpm/Makefile
-> +++ b/drivers/char/tpm/Makefile
-> @@ -44,3 +44,4 @@ obj-$(CONFIG_TCG_XEN) += xen-tpmfront.o
->  obj-$(CONFIG_TCG_CRB) += tpm_crb.o
->  obj-$(CONFIG_TCG_VTPM_PROXY) += tpm_vtpm_proxy.o
->  obj-$(CONFIG_TCG_FTPM_TEE) += tpm_ftpm_tee.o
-> +obj-$(CONFIG_TCG_LSSE) += tpm_lsse.o
-> diff --git a/drivers/char/tpm/tpm_lsse.c b/drivers/char/tpm/tpm_lsse.c
-> new file mode 100644
-> index 0000000000..3fd2d9bac8
-> --- /dev/null
-> +++ b/drivers/char/tpm/tpm_lsse.c
-> @@ -0,0 +1,104 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/* Copyright (c) 2025 Loongson Technology Corporation Limited. */
-> +
-> +#include <linux/device.h>
-> +#include <linux/mfd/ls6000se.h>
-> +#include <linux/platform_device.h>
-> +#include <linux/wait.h>
-> +
-> +#include "tpm.h"
-> +
-> +struct tpm_msg {
-> +	u32 cmd;
-> +	u32 data_off;
-> +	u32 data_len;
-> +	u32 info[5];
-> +};
-> +
-> +struct tpm_dev {
-> +	struct lsse_ch *se_ch;
-> +	struct completion tpm_completion;
-> +};
-> +
-> +static void tpm_complete(struct lsse_ch *ch)
-> +{
-> +	struct tpm_dev *td = ch->priv;
-> +
-> +	complete(&td->tpm_completion);
-> +}
-> +
-> +static int tpm_ls_recv(struct tpm_chip *chip, u8 *buf, size_t count)
-> +{
-> +	struct tpm_dev *td = dev_get_drvdata(&chip->dev);
-> +	struct tpm_msg *rmsg;
-> +	int sig;
-> +
-> +	sig = wait_for_completion_interruptible(&td->tpm_completion);
-> +	if (sig)
-> +		return sig;
-> +
-> +	rmsg = td->se_ch->rmsg;
-> +	memcpy(buf, td->se_ch->data_buffer, rmsg->data_len);
-> +
-> +	return rmsg->data_len;
-> +}
-> +
-> +static int tpm_ls_send(struct tpm_chip *chip, u8 *buf, size_t count)
-> +{
-> +	struct tpm_dev *td = dev_get_drvdata(&chip->dev);
-> +	struct tpm_msg *smsg = td->se_ch->smsg;
-> +
-> +	memcpy(td->se_ch->data_buffer, buf, count);
-> +	smsg->data_len = count;
-> +
-> +	return se_send_ch_requeset(td->se_ch);
-> +}
-> +
-> +static const struct tpm_class_ops lsse_tpm_ops = {
-> +	.flags = TPM_OPS_AUTO_STARTUP,
-> +	.recv = tpm_ls_recv,
-> +	.send = tpm_ls_send,
-> +};
-> +
-> +static int lsse_tpm_probe(struct platform_device *pdev)
+> First fixed commit:
+> [25c17c4b55def92a01e3eecc9c775a6ee25ca20f]
+> hugetlb: arm64: add MTE support
 
-tpm_lsse_
+I wouldn't backport this and it's definitely not a fix for the problem
+reported.
 
-> +{
-> +	struct device *dev = &pdev->dev;
-> +	struct tpm_chip *chip;
-> +	struct tpm_msg *smsg;
-> +	struct tpm_dev *td;
-> +
-> +	td = devm_kzalloc(dev, sizeof(struct tpm_dev), GFP_KERNEL);
-> +	if (!td)
-> +		return -ENOMEM;
-> +
-> +	init_completion(&td->tpm_completion);
-> +	td->se_ch = se_init_ch(dev->parent, SE_CH_TPM, PAGE_SIZE,
-> +			       2 * sizeof(struct tpm_msg), td, tpm_complete);
-> +	if (!td->se_ch)
-> +		return -ENODEV;
-> +	smsg = td->se_ch->smsg;
-> +	smsg->cmd = SE_CMD_TPM;
-> +	smsg->data_off = td->se_ch->off;
-> +
-> +	chip = tpmm_chip_alloc(dev, &lsse_tpm_ops);
-> +	if (IS_ERR(chip))
-> +		return PTR_ERR(chip);
-> +	chip->flags = TPM_CHIP_FLAG_TPM2 | TPM_CHIP_FLAG_IRQ;
-> +	dev_set_drvdata(&chip->dev, td);
-> +
-> +	return tpm_chip_register(chip);
-> +}
-> +
-> +static struct platform_driver lsse_tpm_driver = {
-> +	.probe   = lsse_tpm_probe,
-> +	.driver  = {
-> +		.name  = "ls6000se-tpm",
-> +	},
-> +};
-> +module_platform_driver(lsse_tpm_driver);
-> +
-> +MODULE_ALIAS("platform:ls6000se-tpm");
-> +MODULE_LICENSE("GPL");
-> +MODULE_AUTHOR("Yinggang Gu <guyinggang@loongson.cn>");
-> +MODULE_AUTHOR("Qunqin Zhao <zhaoqunqin@loongson.cn>");
-
-Remove MODULE_AUTHOR fields. Git encodes this already.
-
-> +MODULE_DESCRIPTION("Loongson TPM driver");
-> -- 
-> 2.43.0
+> Could you confirm whether this patch is eligible for backporting to
+> 6.12 and 6.6 kernels?
+> If backporting is not an option, we will need to skip running this
+> test case on older kernels.
 > 
+> > 1)
+> > Regression on qemu-arm64 and FVP noticed this kernel warning running
+> > selftests: arm64: check_hugetlb_options test case on 6.6.76-rc1 and
+> > 6.6.76-rc2.
+> >
+> > Test regression: WARNING-arch-arm64-mm-copypage-copy_highpage
+> >
+> > ------------[ cut here ]------------
+> > [   96.920028] WARNING: CPU: 1 PID: 3611 at
+> > arch/arm64/mm/copypage.c:29 copy_highpage
+> > (arch/arm64/include/asm/mte.h:87)
+> > [   96.922100] Modules linked in: crct10dif_ce sm3_ce sm3 sha3_ce
+> > sha512_ce sha512_arm64 fuse drm backlight ip_tables x_tables
+> > [   96.925603] CPU: 1 PID: 3611 Comm: check_hugetlb_o Not tainted 6.6.76-rc2 #1
+> > [   96.926956] Hardware name: linux,dummy-virt (DT)
+> > [   96.927695] pstate: 43402009 (nZcv daif +PAN -UAO +TCO +DIT -SSBS BTYPE=--)
+> > [   96.928687] pc : copy_highpage (arch/arm64/include/asm/mte.h:87)
+> > [   96.929037] lr : copy_highpage
+> > (arch/arm64/include/asm/alternative-macros.h:232
+> > arch/arm64/include/asm/cpufeature.h:443
+> > arch/arm64/include/asm/cpufeature.h:504
+> > arch/arm64/include/asm/cpufeature.h:814 arch/arm64/mm/copypage.c:27)
+> > [   96.929399] sp : ffff800088aa3ab0
+> > [   96.930232] x29: ffff800088aa3ab0 x28: 00000000000001ff x27: 0000000000000000
+> > [   96.930784] x26: 0000000000000000 x25: 0000ffff9b800000 x24: 0000ffff9b9ff000
+> > [   96.931402] x23: fffffc0003257fc0 x22: ffff0000c95ff000 x21: ffff0000c93ff000
+> > [   96.932054] x20: fffffc0003257fc0 x19: fffffc000324ffc0 x18: 0000ffff9b800000
+> > [   96.933357] x17: 0000000000000000 x16: 0000000000000000 x15: 0000000000000000
+> > [   96.934091] x14: 0000000000000000 x13: 0000000000000000 x12: 0000000000000000
+> > [   96.935095] x11: 0000000000000000 x10: 0000000000000000 x9 : 0000000000000000
+> > [   96.935982] x8 : 0bfffc0001800000 x7 : 0000000000000000 x6 : 0000000000000000
+> > [   96.936536] x5 : 0000000000000000 x4 : 0000000000000000 x3 : 0000000000000000
+> > [   96.937089] x2 : 0000000000000000 x1 : ffff0000c9600000 x0 : ffff0000c9400080
+> > [   96.939431] Call trace:
+> > [   96.939920] copy_highpage (arch/arm64/include/asm/mte.h:87)
+> > [   96.940443] copy_user_highpage (arch/arm64/mm/copypage.c:40)
+> > [   96.940963] copy_user_large_folio (mm/memory.c:5977 mm/memory.c:6109)
+> > [   96.941535] hugetlb_wp (mm/hugetlb.c:5701)
+> > [   96.941948] hugetlb_fault (mm/hugetlb.c:6237)
+> > [   96.942344] handle_mm_fault (mm/memory.c:5330)
+> > [   96.942794] do_page_fault (arch/arm64/mm/fault.c:513
+> > arch/arm64/mm/fault.c:626)
+> > [   96.943341] do_mem_abort (arch/arm64/mm/fault.c:846)
+> > [   96.943797] el0_da (arch/arm64/kernel/entry-common.c:133
+> > arch/arm64/kernel/entry-common.c:144
+> > arch/arm64/kernel/entry-common.c:547)
+> > [   96.944229] el0t_64_sync_handler (arch/arm64/kernel/entry-common.c:0)
+> > [   96.944765] el0t_64_sync (arch/arm64/kernel/entry.S:599)
+> > [   96.945383] ---[ end trace 0000000000000000 ]---
 
-Prefix all with tpm_lsse instead of tpm
+Prior to commit 25c17c4b55de ("hugetlb: arm64: add mte support"), there
+was no hugetlb support with MTE, so the above code path should not
+happen - it seems to get a PROT_MTE hugetlb page which should have been
+prevented by arch_validate_flags(). Or something else corrupts the page
+flags and we end up with some random PG_mte_tagged set.
 
-BR, Jarkko
+Does this happen with vanilla 6.6? I wonder whether we always had this
+issue, only that we haven't noticed until the hugetlb MTE kselftest.
+There were some backports in this area but I don't see how they would
+have caused this.
+
+-- 
+Catalin
