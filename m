@@ -1,101 +1,43 @@
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 277631E2842
-	for <linux-crypto@vger.kernel.org>; Wed, 19 Feb 2025 13:35:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2025B1E7C25;
+	Wed, 19 Feb 2025 13:44:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739972122; cv=none; b=hPsH0jTvTq44PXkCEaG+rnPlFeA/Mw2op1CcwbwujkYZpBmDhsgVa76URmlZCCdLyxGtP5zoKPadOA7hs9N55Ui8FHbqLvhJ3BW6woeeB6SK0P3VUtF+mbtEoJ53j+HQ6RMinnfPEomWGm8YqHSXJCPzZHLzLCP+cqqogrPa5Bg=
+	t=1739972657; cv=none; b=Gc5hTCFnIsfKIdnHY3qygzZqejYdKee1Ut0QVJnsRWQAGk8iUTirioHVYi9RwXAypRF5QFjp+vdCjGIkkSXgsSzSVFvWgouqTEw3YYqMAKHXHtghM0vNsH5ex5N0+0Mu4E5HzGmqYVr3dCMedfmFg3tL2CsLVfete8rMlIRdhMo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739972122; c=relaxed/simple;
-	bh=kwuC7LMCmQ78MDZA4UVL8LfwL1KaSncs8M3Y3if2YfU=;
+	s=arc-20240116; t=1739972657; c=relaxed/simple;
+	bh=N7+6L64rjXg9fF5fR618d6CJYqV7II10i29eiKI9P44=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SJAkbAHWW36RIYHj0aZzmfdYt1dI1uXZ/ZJGrjuZBo8PRE+K1QVZeobusUdAtXcvz/JDytJeeB+VVWddsljGzHXt0GNX3zqrZblEjvVQlchvRAl0c+bEaZC2DbQFuY92oa69BnBNGsjkJIx5WoXerVswNJs6kVFOaaCmht/m7fw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=jtgM80hx; arc=none smtp.client-ip=209.85.222.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	 Content-Type:Content-Disposition:In-Reply-To; b=UmxviMQSO/AtLZIyxaJw998otWt4Itg8KCessBlybleEVjwGVeDp27v8sFoEScxXV6hayuX6jDX9ZPVH0s1oaFpSdeYj/ua6HUqUFxqxamiV+wMrepDcd1A7b8hmNYNvCdQapOFxCUFg5GwB1LMI8HR/LE3t5QIdV+R8L4HRPQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W2yZ+zij; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="jtgM80hx"
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7c0a159ded2so259307185a.0
-        for <linux-crypto@vger.kernel.org>; Wed, 19 Feb 2025 05:35:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1739972118; x=1740576918; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=u0TYJ7fM/SXqqc8EBI871wMY2GiJMGDqWwXqUj2bdTg=;
-        b=jtgM80hxuw/aZlMjn/7s1Lv5izN5Xz5dx0uOLO46u94Qc4/o2z6W16NfVPLzFrXqJB
-         zmd7NYTrkgJ5Cg8SZHwQZs+uwi4m11wWJiRpxCq91lDEUavwZ/E2qOXb4VtN5u5lXlqX
-         B6YLNC0cnnkgPXk4q4LRGS3ajhRHy6q9dsWE9ZJgz04lkzSm3SDN8XonoY7CPayKNPhS
-         C87sGJ9R1xYgv20qgtPikzDqyENDsSLeaydIPpaSPuKCreJyyLvwJ7TTMvNFm2eqw8k5
-         xtlTHiFMiEWN48Q0zfK1gFbAcA0S0WXnpnIaYeLFxdbbqJndqL7gQAYw04e8QC0VTXwv
-         oeaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739972118; x=1740576918;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=u0TYJ7fM/SXqqc8EBI871wMY2GiJMGDqWwXqUj2bdTg=;
-        b=tPhUUQImPh+zUz5ScYQ8wuHH/ySg32vI+uTgbbQ18S0p8M9bC1+5nWubf0NXJ9I2ni
-         UCRp6VJEXnQaGg8LvE5rCCUgMzU/WfNIxx74xNMb3WoPrHmNErUb2EylTUQBYYD4ELlh
-         F0YRURfQQSKF7SaiZtGS+IC1UVbSKEjiWcYzFU/EOQI2NfaaFS05sCASKf4alAk6nfq5
-         vYehHS+IPBzJUwhOahYBRVWMe7kdhbathJkznFZqz/Ts5Ucf6rFe1e6ibrsVYZff3Apc
-         SvUNmBGM1DSsI4K+lv4l+kblD+B3xagUlqq5r/lf5/5HLTFZseuvx3nL198CRep6QEdP
-         trcw==
-X-Forwarded-Encrypted: i=1; AJvYcCVhDNW+YEwQAOeS2jZ3X+tZvtQls5VdbB6g2CEpM+Sd2s4eCX7tBqewsGh0jJ4BGTdmy0BNaRGP9ev/rjI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWZZn6Sh6QsAw6ysDKXTUXw/3JmoG4NRv8EBTsQMn5ioNJdEQV
-	ZOpGKJOGhMJ3S+vGn/71ba608Hdi6wUWODfLWBq61bo5AQUZ3dUKnOXvwBOxq3s=
-X-Gm-Gg: ASbGncvDCBhFAhHpmM2/g21DaMcHEKxQNmYQ3A+Oa1QyAfbd9aUadbMzh+UfESK+sKF
-	mknZtec/EKgUvorgj0c6fMfAxZOQhabkuu/Z4iYOxXfi2HJjjCfBNRrtKN04aXwB1dc7TRQsSVI
-	NVYMlnaASARkNbKPOXVmNpZ6bsDagBz8u2NA+EX5kbgi68UoZjLmD5tStQwmPneAfL/54eNUMtl
-	DidLC/7weG8449W357InlJRkMZ4h9fCbsNgax74/u73qsLX0o9eal7cGex30rhly+ORSS648f5D
-	gnrRi0ynSAC3TozgWxwDLpwpeJwp4yNaTqnL6SGxRSmcuHfllmcjmQ7cG3HsJ1B4
-X-Google-Smtp-Source: AGHT+IEztxOuEVoB32w5goUsqWZrTGGQfC8OhdWXN67VQGqwlVLEaJp8Xn8cLar0Y8Ac8adbEPAFWw==
-X-Received: by 2002:a05:6214:c4b:b0:6e6:5a8a:aba with SMTP id 6a1803df08f44-6e6974f98ebmr57605336d6.21.1739972117896;
-        Wed, 19 Feb 2025 05:35:17 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e65d785cf1sm74757816d6.42.2025.02.19.05.35.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Feb 2025 05:35:17 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1tkkEO-0000000065j-2JVM;
-	Wed, 19 Feb 2025 09:35:16 -0400
-Date: Wed, 19 Feb 2025 09:35:16 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Alexey Kardashevskiy <aik@amd.com>
-Cc: x86@kernel.org, kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Ashish Kalra <ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Christoph Hellwig <hch@lst.de>, Nikunj A Dadhania <nikunj@amd.com>,
-	Michael Roth <michael.roth@amd.com>,
-	Vasant Hegde <vasant.hegde@amd.com>,
-	Joao Martins <joao.m.martins@oracle.com>,
-	Nicolin Chen <nicolinc@nvidia.com>,
-	Lu Baolu <baolu.lu@linux.intel.com>,
-	Steve Sistare <steven.sistare@oracle.com>,
-	Lukas Wunner <lukas@wunner.de>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Dionna Glaze <dionnaglaze@google.com>, Yi Liu <yi.l.liu@intel.com>,
-	iommu@lists.linux.dev, linux-coco@lists.linux.dev,
-	Zhi Wang <zhiw@nvidia.com>, AXu Yilun <yilun.xu@linux.intel.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-Subject: Re: [RFC PATCH v2 12/22] iommufd: Allow mapping from guest_memfd
-Message-ID: <20250219133516.GL3696814@ziepe.ca>
-References: <20250218111017.491719-1-aik@amd.com>
- <20250218111017.491719-13-aik@amd.com>
- <20250218141634.GI3696814@ziepe.ca>
- <340d8dba-1b09-4875-8604-cd9f66ca1407@amd.com>
- <20250218235105.GK3696814@ziepe.ca>
- <06b850ab-5321-4134-9b24-a83aaab704bf@amd.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W2yZ+zij"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E41DC4CED1;
+	Wed, 19 Feb 2025 13:44:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739972657;
+	bh=N7+6L64rjXg9fF5fR618d6CJYqV7II10i29eiKI9P44=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=W2yZ+zijHcI2QmoLkybU+92OwkkHfakORiz+k8Xb1xX9jauDjuU6UkFDjczaZxBug
+	 qmEq5CwxZvDhBpNgn9FZpgPpoUv4PW0ZbYolJ1fGpA83s2RV16cViOngiEJJoxitvT
+	 hGGItpGR4TQS/dXPb1rXR9LfYzZu+2LeymZT34Y/jSXyRDnGTORVZzYUKOnBMZLiKZ
+	 nKbGbMyUTWTheU4uohc/DvmBguIZwIZAnfhnOseWOk/c2pdpVxxTDO85fJF5aWZ3uS
+	 5gLoFfykuXJ6A1afHm3VzvIKYxm8ziodb8zVq9EwDQweAOiW5dm/ndb4T/9lWJzaOc
+	 buAa72zDn/1GA==
+Date: Wed, 19 Feb 2025 15:44:12 +0200
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: Qunqin Zhao <zhaoqunqin@loongson.cn>
+Cc: lee@kernel.org, herbert@gondor.apana.org.au, davem@davemloft.net,
+	peterhuewe@gmx.de, linux-kernel@vger.kernel.org,
+	loongarch@lists.linux.dev, linux-crypto@vger.kernel.org,
+	jgg@ziepe.ca, linux-integrity@vger.kernel.org,
+	Yinggang Gu <guyinggang@loongson.cn>
+Subject: Re: [PATCH V3 5/6] tpm: Add a driver for Loongson TPM device
+Message-ID: <Z7XgLNU1xXqgOBIL@kernel.org>
+References: <20250219073350.16915-1-zhaoqunqin@loongson.cn>
+ <20250219073350.16915-2-zhaoqunqin@loongson.cn>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -104,62 +46,176 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <06b850ab-5321-4134-9b24-a83aaab704bf@amd.com>
+In-Reply-To: <20250219073350.16915-2-zhaoqunqin@loongson.cn>
 
-On Wed, Feb 19, 2025 at 11:43:46AM +1100, Alexey Kardashevskiy wrote:
-> On 19/2/25 10:51, Jason Gunthorpe wrote:
-> > On Wed, Feb 19, 2025 at 10:35:28AM +1100, Alexey Kardashevskiy wrote:
-> > 
-> > > With in-place conversion, we could map the entire guest once in the HV IOMMU
-> > > and control the Cbit via the guest's IOMMU table (when available). Thanks,
-> > 
-> > Isn't it more complicated than that? I understood you need to have a
-> > IOPTE boundary in the hypervisor at any point where the guest Cbit
-> > changes - so you can't just dump 1G hypervisor pages to cover the
-> > whole VM, you have to actively resize ioptes?
+On Wed, Feb 19, 2025 at 03:33:49PM +0800, Qunqin Zhao wrote:
+> Loongson security engine supports random number generation, hash,
+> symmetric encryption and asymmetric encryption. Based on these
+> encryption functions, TPM2 have been implemented in the Loongson
+> security engine firmware. This driver is responsible for copying data
+> into the memory visible to the firmware and receiving data from the
+> firmware.
 > 
-> When the guest Cbit changes, only AMD RMP table requires update but not
-> necessaryly NPT or IOPTEs.
-> (I may have misunderstood the question, what meaning does "dump 1G pages"
-> have?).
+> Co-developed-by: Yinggang Gu <guyinggang@loongson.cn>
+> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+> Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
+> ---
+> v3: Added reminder about Loongson security engine to git log.
+> 
+>  drivers/char/tpm/Kconfig    |   9 ++++
+>  drivers/char/tpm/Makefile   |   1 +
+>  drivers/char/tpm/tpm_lsse.c | 104 ++++++++++++++++++++++++++++++++++++
+>  3 files changed, 114 insertions(+)
+>  create mode 100644 drivers/char/tpm/tpm_lsse.c
+> 
+> diff --git a/drivers/char/tpm/Kconfig b/drivers/char/tpm/Kconfig
+> index 0fc9a510e0..56d0417065 100644
+> --- a/drivers/char/tpm/Kconfig
+> +++ b/drivers/char/tpm/Kconfig
+> @@ -225,5 +225,14 @@ config TCG_FTPM_TEE
+>  	help
+>  	  This driver proxies for firmware TPM running in TEE.
+>  
+> +config TCG_LSSE
+> +	tristate "Loongson TPM Interface"
+> +	depends on MFD_LS6000SE
+> +	help
+> +	  If you want to make Loongson TPM support available, say Yes and
+> +	  it will be accessible from within Linux. To compile this
+> +	  driver as a module, choose M here; the module will be called
+> +	  tpm_lsse.
+> +
+>  source "drivers/char/tpm/st33zp24/Kconfig"
+>  endif # TCG_TPM
+> diff --git a/drivers/char/tpm/Makefile b/drivers/char/tpm/Makefile
+> index 9bb142c752..bf2280352d 100644
+> --- a/drivers/char/tpm/Makefile
+> +++ b/drivers/char/tpm/Makefile
+> @@ -44,3 +44,4 @@ obj-$(CONFIG_TCG_XEN) += xen-tpmfront.o
+>  obj-$(CONFIG_TCG_CRB) += tpm_crb.o
+>  obj-$(CONFIG_TCG_VTPM_PROXY) += tpm_vtpm_proxy.o
+>  obj-$(CONFIG_TCG_FTPM_TEE) += tpm_ftpm_tee.o
+> +obj-$(CONFIG_TCG_LSSE) += tpm_lsse.o
+> diff --git a/drivers/char/tpm/tpm_lsse.c b/drivers/char/tpm/tpm_lsse.c
+> new file mode 100644
+> index 0000000000..3fd2d9bac8
+> --- /dev/null
+> +++ b/drivers/char/tpm/tpm_lsse.c
+> @@ -0,0 +1,104 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/* Copyright (c) 2025 Loongson Technology Corporation Limited. */
+> +
+> +#include <linux/device.h>
+> +#include <linux/mfd/ls6000se.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/wait.h>
+> +
+> +#include "tpm.h"
+> +
+> +struct tpm_msg {
+> +	u32 cmd;
+> +	u32 data_off;
+> +	u32 data_len;
+> +	u32 info[5];
+> +};
+> +
+> +struct tpm_dev {
+> +	struct lsse_ch *se_ch;
+> +	struct completion tpm_completion;
+> +};
+> +
+> +static void tpm_complete(struct lsse_ch *ch)
+> +{
+> +	struct tpm_dev *td = ch->priv;
+> +
+> +	complete(&td->tpm_completion);
+> +}
+> +
+> +static int tpm_ls_recv(struct tpm_chip *chip, u8 *buf, size_t count)
+> +{
+> +	struct tpm_dev *td = dev_get_drvdata(&chip->dev);
+> +	struct tpm_msg *rmsg;
+> +	int sig;
+> +
+> +	sig = wait_for_completion_interruptible(&td->tpm_completion);
+> +	if (sig)
+> +		return sig;
+> +
+> +	rmsg = td->se_ch->rmsg;
+> +	memcpy(buf, td->se_ch->data_buffer, rmsg->data_len);
+> +
+> +	return rmsg->data_len;
+> +}
+> +
+> +static int tpm_ls_send(struct tpm_chip *chip, u8 *buf, size_t count)
+> +{
+> +	struct tpm_dev *td = dev_get_drvdata(&chip->dev);
+> +	struct tpm_msg *smsg = td->se_ch->smsg;
+> +
+> +	memcpy(td->se_ch->data_buffer, buf, count);
+> +	smsg->data_len = count;
+> +
+> +	return se_send_ch_requeset(td->se_ch);
+> +}
+> +
+> +static const struct tpm_class_ops lsse_tpm_ops = {
+> +	.flags = TPM_OPS_AUTO_STARTUP,
+> +	.recv = tpm_ls_recv,
+> +	.send = tpm_ls_send,
+> +};
+> +
+> +static int lsse_tpm_probe(struct platform_device *pdev)
 
-AFAIK that is not true, if there are mismatches in page size, ie the
-RMP is 2M and the IOPTE is 1G then things do not work properly.
+tpm_lsse_
 
-It is why we had to do this:
+> +{
+> +	struct device *dev = &pdev->dev;
+> +	struct tpm_chip *chip;
+> +	struct tpm_msg *smsg;
+> +	struct tpm_dev *td;
+> +
+> +	td = devm_kzalloc(dev, sizeof(struct tpm_dev), GFP_KERNEL);
+> +	if (!td)
+> +		return -ENOMEM;
+> +
+> +	init_completion(&td->tpm_completion);
+> +	td->se_ch = se_init_ch(dev->parent, SE_CH_TPM, PAGE_SIZE,
+> +			       2 * sizeof(struct tpm_msg), td, tpm_complete);
+> +	if (!td->se_ch)
+> +		return -ENODEV;
+> +	smsg = td->se_ch->smsg;
+> +	smsg->cmd = SE_CMD_TPM;
+> +	smsg->data_off = td->se_ch->off;
+> +
+> +	chip = tpmm_chip_alloc(dev, &lsse_tpm_ops);
+> +	if (IS_ERR(chip))
+> +		return PTR_ERR(chip);
+> +	chip->flags = TPM_CHIP_FLAG_TPM2 | TPM_CHIP_FLAG_IRQ;
+> +	dev_set_drvdata(&chip->dev, td);
+> +
+> +	return tpm_chip_register(chip);
+> +}
+> +
+> +static struct platform_driver lsse_tpm_driver = {
+> +	.probe   = lsse_tpm_probe,
+> +	.driver  = {
+> +		.name  = "ls6000se-tpm",
+> +	},
+> +};
+> +module_platform_driver(lsse_tpm_driver);
+> +
+> +MODULE_ALIAS("platform:ls6000se-tpm");
+> +MODULE_LICENSE("GPL");
+> +MODULE_AUTHOR("Yinggang Gu <guyinggang@loongson.cn>");
+> +MODULE_AUTHOR("Qunqin Zhao <zhaoqunqin@loongson.cn>");
 
-> > This was the whole motivation to adding the page size override kernel
-> > command line.
+Remove MODULE_AUTHOR fields. Git encodes this already.
 
-commit f0295913c4b4f377c454e06f50c1a04f2f80d9df
-Author: Joerg Roedel <jroedel@suse.de>
-Date:   Thu Sep 5 09:22:40 2024 +0200
+> +MODULE_DESCRIPTION("Loongson TPM driver");
+> -- 
+> 2.43.0
+> 
 
-    iommu/amd: Add kernel parameters to limit V1 page-sizes
-    
-    Add two new kernel command line parameters to limit the page-sizes
-    used for v1 page-tables:
-    
-            nohugepages     - Limits page-sizes to 4KiB
-    
-            v2_pgsizes_only - Limits page-sizes to 4Kib/2Mib/1GiB; The
-                              same as the sizes used with v2 page-tables
-    
-    This is needed for multiple scenarios. When assigning devices to
-    SEV-SNP guests the IOMMU page-sizes need to match the sizes in the RMP
-    table, otherwise the device will not be able to access all shared
-    memory.
-    
-    Also, some ATS devices do not work properly with arbitrary IO
-    page-sizes as supported by AMD-Vi, so limiting the sizes used by the
-    driver is a suitable workaround.
-    
-    All-in-all, these parameters are only workarounds until the IOMMU core
-    and related APIs gather the ability to negotiate the page-sizes in a
-    better way.
-    
-    Signed-off-by: Joerg Roedel <jroedel@suse.de>
-    Reviewed-by: Vasant Hegde <vasant.hegde@amd.com>
-    Link: https://lore.kernel.org/r/20240905072240.253313-1-joro@8bytes.org
+Prefix all with tpm_lsse instead of tpm
 
-Jason
+BR, Jarkko
