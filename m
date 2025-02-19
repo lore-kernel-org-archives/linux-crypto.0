@@ -1,38 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C82721A455;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB2B421B1B5;
 	Wed, 19 Feb 2025 18:24:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739989471; cv=none; b=NfddZh4AOZl9isUgWm0FTKcYCsdUEvYH2REnGwzF7scMVpHmF/CXhwdoc604L6b8vXh4mCejQbPG+MBgxD2eIV/0ILFlSjWccEwS2B7plyaTxjgcWa5OuUUGPooUH4lYDw4A+TX392ypa+uvXQX9C2Vfa5E3HwHcuf7TmSGsP18=
+	t=1739989471; cv=none; b=U25LTH5DjJnbGI2GJ9KR4NpJTbGg2UpYjnheSSKM5inriUHM46Hgqp8hVuOEuQzllhyBALTZlwS01PdQdcqdeRl0d2DbXNoixiB5WaSuWeFjzopIL1uQ0z5ALEzr8abrtVStPlUyyJX3zOtpp24A8ErhEAKQLhpvxR/lPwRI4BM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1739989471; c=relaxed/simple;
-	bh=DMl5gHfD8qUZ3YL0b5yRXo2ontnZm0E6uzFbcU4n97Q=;
+	bh=cXUqK6gzrQ6Jb8f2XQHgstHPltOXwTTStbk2H1bPmow=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hvQWXVj0/lcCV7qLF/E7kJOm10n9XXqDhT65oqyyD7edzGfEk9cN4D2tdvAOk/zlgXQ0PmyEk407EHLC5Cr9OxlCBPVCbdJYPCTxuVYB0gAI6k1+Vo1rLgIlFMRgaI2U9q+T/CLgY1wruCw1/qA1DJ/iAho16aJ6n8GbolGOuas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pm5aLEls; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=Xygc26FoTw8ZRlkCkKjGWW2cyu/KGdZtMqufiblvilP58y+068vsKhcOrXCf+arC5xDYgcipidgJjgwHMXDuGrcTx0t/75ZDGA0/79YYrF0ZBiDSKx4fu51whM4+EHmXuGzp+3pliIbOcwALEAMHCiDWkb/dFLIOzwjZ8N0NC1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kBs4SFo1; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pm5aLEls"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08CECC4CEDD;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kBs4SFo1"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F8FDC4CEE9;
 	Wed, 19 Feb 2025 18:24:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1739989471;
-	bh=DMl5gHfD8qUZ3YL0b5yRXo2ontnZm0E6uzFbcU4n97Q=;
+	bh=cXUqK6gzrQ6Jb8f2XQHgstHPltOXwTTStbk2H1bPmow=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=pm5aLElsFC9f8IRhcPWIG7PYWCKWJe5LAjTvmEo+WqLtfMWdqKMTvpte5ibgOSdhW
-	 d9GIcEHvqXx8VCOvVzkt5/RwQ5VRaNHA+c92FDEX5jRm+c4EteQp5lgtm89OkV6v8m
-	 czhZWMA/4mYa+9izPUDyJ1p0B9fs6WKMAXzSsXc3dEhn1CoL0pQa6AjwIztVVC+7AA
-	 yaEBGcYSnfifqZtYo6NbX3SNWFADfupAEGA7L7kuBQzLT9QypC11vgkxzTQgubKV9h
-	 g+ln6hlW8NpYyBkhWMb+VbgWoxDsN2nlSDdoTrMngr+kvFaoEf5k4yzQ0u69rWJtfw
-	 HTPivI50Kxevw==
+	b=kBs4SFo1yJD+EOXqO74HzIV7aOWP8Zs4387sigrp++bBLIaVkEQxhnBDdW+6dEGh1
+	 AlrcIasD9/EKoOd+GGwmKXWPq1yFkUkv/4/LjCpv8sGPBZSQ9BdBVncrONvEKO7Y4p
+	 sga/5WKolx5qUc5EJUO/wYsK3nRygi4L9W8NPfUoIeQx/ryqCHRBMCgJGxBaQkv0MC
+	 Umj1Q5PtHGD8INYDOVPMA6BZBzRFqSxy1abrg9k7WsPvv2uXqlr7YHRxWyeI4xByh4
+	 7RfW1OxrI3s8FVHx48kjN+dnVt4kYd67egfiD2N0USjGVVYV5e/qe9zL+ahymajH0t
+	 BYu9hHiyjDqWw==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH v3 14/19] crypto: x86/aes-gcm - use the new scatterwalk functions
-Date: Wed, 19 Feb 2025 10:23:36 -0800
-Message-ID: <20250219182341.43961-15-ebiggers@kernel.org>
+	netdev@vger.kernel.org,
+	Boris Pismenny <borisp@nvidia.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>
+Subject: [PATCH v3 16/19] net/tls: use the new scatterwalk functions
+Date: Wed, 19 Feb 2025 10:23:38 -0800
+Message-ID: <20250219182341.43961-17-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250219182341.43961-1-ebiggers@kernel.org>
 References: <20250219182341.43961-1-ebiggers@kernel.org>
@@ -46,84 +49,121 @@ Content-Transfer-Encoding: 8bit
 
 From: Eric Biggers <ebiggers@google.com>
 
-In gcm_process_assoc(), use scatterwalk_next() which consolidates
-scatterwalk_clamp() and scatterwalk_map().  Use scatterwalk_done_src()
-which consolidates scatterwalk_unmap(), scatterwalk_advance(), and
-scatterwalk_done().
+Replace calls to the deprecated function scatterwalk_copychunks() with
+memcpy_from_scatterwalk(), memcpy_to_scatterwalk(), or
+scatterwalk_skip() as appropriate.  The new functions generally behave
+more as expected and eliminate the need to call scatterwalk_done() or
+scatterwalk_pagedone().
 
-Also rename some variables to avoid implying that anything is actually
-mapped (it's not), or that the loop is going page by page (it is for
-now, but nothing actually requires that to be the case).
+However, the new functions intentionally do not advance to the next sg
+entry right away, which would have broken chain_to_walk() which is
+accessing the fields of struct scatter_walk directly.  To avoid this,
+replace chain_to_walk() with scatterwalk_get_sglist() which supports the
+needed functionality.
 
+Cc: Boris Pismenny <borisp@nvidia.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: John Fastabend <john.fastabend@gmail.com>
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- arch/x86/crypto/aesni-intel_glue.c | 28 ++++++++++++++--------------
- 1 file changed, 14 insertions(+), 14 deletions(-)
+ net/tls/tls_device_fallback.c | 31 ++++++-------------------------
+ 1 file changed, 6 insertions(+), 25 deletions(-)
 
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index 3e0cc15050f32..f963f5c04006d 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -1279,45 +1279,45 @@ static void gcm_process_assoc(const struct aes_gcm_key *key, u8 ghash_acc[16],
+diff --git a/net/tls/tls_device_fallback.c b/net/tls/tls_device_fallback.c
+index f9e3d3d90dcf5..03d508a45aaee 100644
+--- a/net/tls/tls_device_fallback.c
++++ b/net/tls/tls_device_fallback.c
+@@ -35,21 +35,10 @@
+ #include <net/ip6_checksum.h>
+ #include <linux/skbuff_ref.h>
  
- 	memset(ghash_acc, 0, 16);
- 	scatterwalk_start(&walk, sg_src);
+ #include "tls.h"
  
- 	while (assoclen) {
--		unsigned int len_this_page = scatterwalk_clamp(&walk, assoclen);
--		void *mapped = scatterwalk_map(&walk);
--		const void *src = mapped;
-+		unsigned int orig_len_this_step;
-+		const u8 *orig_src = scatterwalk_next(&walk, assoclen,
-+						      &orig_len_this_step);
-+		unsigned int len_this_step = orig_len_this_step;
- 		unsigned int len;
-+		const u8 *src = orig_src;
+-static void chain_to_walk(struct scatterlist *sg, struct scatter_walk *walk)
+-{
+-	struct scatterlist *src = walk->sg;
+-	int diff = walk->offset - src->offset;
+-
+-	sg_set_page(sg, sg_page(src),
+-		    src->length - diff, walk->offset);
+-
+-	scatterwalk_crypto_chain(sg, sg_next(src), 2);
+-}
+-
+ static int tls_enc_record(struct aead_request *aead_req,
+ 			  struct crypto_aead *aead, char *aad,
+ 			  char *iv, __be64 rcd_sn,
+ 			  struct scatter_walk *in,
+ 			  struct scatter_walk *out, int *in_len,
+@@ -67,20 +56,17 @@ static int tls_enc_record(struct aead_request *aead_req,
+ 	DEBUG_NET_WARN_ON_ONCE(!cipher_desc || !cipher_desc->offloadable);
  
--		assoclen -= len_this_page;
--		scatterwalk_advance(&walk, len_this_page);
- 		if (unlikely(pos)) {
--			len = min(len_this_page, 16 - pos);
-+			len = min(len_this_step, 16 - pos);
- 			memcpy(&buf[pos], src, len);
- 			pos += len;
- 			src += len;
--			len_this_page -= len;
-+			len_this_step -= len;
- 			if (pos < 16)
- 				goto next;
- 			aes_gcm_aad_update(key, ghash_acc, buf, 16, flags);
- 			pos = 0;
- 		}
--		len = len_this_page;
-+		len = len_this_step;
- 		if (unlikely(assoclen)) /* Not the last segment yet? */
- 			len = round_down(len, 16);
- 		aes_gcm_aad_update(key, ghash_acc, src, len, flags);
- 		src += len;
--		len_this_page -= len;
--		if (unlikely(len_this_page)) {
--			memcpy(buf, src, len_this_page);
--			pos = len_this_page;
-+		len_this_step -= len;
-+		if (unlikely(len_this_step)) {
-+			memcpy(buf, src, len_this_step);
-+			pos = len_this_step;
- 		}
- next:
--		scatterwalk_unmap(mapped);
--		scatterwalk_pagedone(&walk, 0, assoclen);
-+		scatterwalk_done_src(&walk, orig_src, orig_len_this_step);
- 		if (need_resched()) {
- 			kernel_fpu_end();
- 			kernel_fpu_begin();
- 		}
-+		assoclen -= orig_len_this_step;
+ 	buf_size = TLS_HEADER_SIZE + cipher_desc->iv;
+ 	len = min_t(int, *in_len, buf_size);
+ 
+-	scatterwalk_copychunks(buf, in, len, 0);
+-	scatterwalk_copychunks(buf, out, len, 1);
++	memcpy_from_scatterwalk(buf, in, len);
++	memcpy_to_scatterwalk(out, buf, len);
+ 
+ 	*in_len -= len;
+ 	if (!*in_len)
+ 		return 0;
+ 
+-	scatterwalk_pagedone(in, 0, 1);
+-	scatterwalk_pagedone(out, 1, 1);
+-
+ 	len = buf[4] | (buf[3] << 8);
+ 	len -= cipher_desc->iv;
+ 
+ 	tls_make_aad(aad, len - cipher_desc->tag, (char *)&rcd_sn, buf[0], prot);
+ 
+@@ -88,12 +74,12 @@ static int tls_enc_record(struct aead_request *aead_req,
+ 
+ 	sg_init_table(sg_in, ARRAY_SIZE(sg_in));
+ 	sg_init_table(sg_out, ARRAY_SIZE(sg_out));
+ 	sg_set_buf(sg_in, aad, TLS_AAD_SPACE_SIZE);
+ 	sg_set_buf(sg_out, aad, TLS_AAD_SPACE_SIZE);
+-	chain_to_walk(sg_in + 1, in);
+-	chain_to_walk(sg_out + 1, out);
++	scatterwalk_get_sglist(in, sg_in + 1);
++	scatterwalk_get_sglist(out, sg_out + 1);
+ 
+ 	*in_len -= len;
+ 	if (*in_len < 0) {
+ 		*in_len += cipher_desc->tag;
+ 		/* the input buffer doesn't contain the entire record.
+@@ -108,14 +94,12 @@ static int tls_enc_record(struct aead_request *aead_req,
+ 
+ 		*in_len = 0;
  	}
- 	if (unlikely(pos))
- 		aes_gcm_aad_update(key, ghash_acc, buf, pos, flags);
+ 
+ 	if (*in_len) {
+-		scatterwalk_copychunks(NULL, in, len, 2);
+-		scatterwalk_pagedone(in, 0, 1);
+-		scatterwalk_copychunks(NULL, out, len, 2);
+-		scatterwalk_pagedone(out, 1, 1);
++		scatterwalk_skip(in, len);
++		scatterwalk_skip(out, len);
+ 	}
+ 
+ 	len -= cipher_desc->tag;
+ 	aead_request_set_crypt(aead_req, sg_in, sg_out, len, iv);
+ 
+@@ -160,13 +144,10 @@ static int tls_enc_records(struct aead_request *aead_req,
+ 				    cpu_to_be64(rcd_sn), &in, &out, &len, prot);
+ 		rcd_sn++;
+ 
+ 	} while (rc == 0 && len);
+ 
+-	scatterwalk_done(&in, 0, 0);
+-	scatterwalk_done(&out, 1, 0);
+-
+ 	return rc;
  }
  
+ /* Can't use icsk->icsk_af_ops->send_check here because the ip addresses
+  * might have been changed by NAT.
 -- 
 2.48.1
 
