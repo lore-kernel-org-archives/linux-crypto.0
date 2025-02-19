@@ -1,41 +1,41 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF15B217F33;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCF0121858A;
 	Wed, 19 Feb 2025 18:24:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739989470; cv=none; b=tKMAyaltsISTmLAttVfAeKKZ6Qw8zsdR+W6Y8RLj0TDhD06vLxx1piMYggNetodWgpu2a4qgd2ZNR6VbfbuBg6vEfKha8r5fvYvf1yool2ne96MNf2jlZNZY+2RBaHmhvbG91A9l/8WLiYPmiRtxAe52ajhcBwQSr10T8Pc25eY=
+	t=1739989471; cv=none; b=CWi+9/9f7EIvcfayAbMl2YIfoI3d3pfRTFZoKk8elXeNVQjoZrKvIfr/dWpxxqFg4S+KRLBOgjbOuu1rcBIwR+DiiRAhfWmGYHtKm8Xa4WeAPPGAApPByzyOlKDxv3kvpdyyS8NuX6sRAUy9Aqt9QYtDnBUQQvRFafRPNWylLTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739989470; c=relaxed/simple;
-	bh=qzT0MJ9mKrHr5wUabQxbT1zAY3hHrks2Yh9qtZdKQD8=;
+	s=arc-20240116; t=1739989471; c=relaxed/simple;
+	bh=HOiG+O4t1HfyKMWrjgRzX33QT2jP4GmEeXBmoU0A50Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KLAFfOjg4Mpi+U6usi0BWYT/JRMbQpFfkDSdCcw2+b+CzSm6OTNR++LIC08JXncW+MhJyjb/DtqT4FdXKiw91EKIxfAfwQWgLbH1A4YglORjgm0Vl5Jco5mHt8Z5XXnqDTG1D0HwRa8yH+7tRDBb8b2GrQcm7ba7YVCXivGddDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i1T/Ts0k; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version; b=GblpZumGVTWtQV4sLnVPNZx6K2cl9+CEsu8bsRMbGm+tFgBYHT7fpIL/pNWHp8lwB9fJDJZli5b+vLkgFd7L5zLIjGsUjgbSGZhm1hLcWUqhpvjndqNK5gcDLt/TANJFOLrLLEb6g54vtumkK5GlvFwaaMStM4r9iCYel1adxIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IPJrzJKy; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i1T/Ts0k"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDD44C4CEEC;
-	Wed, 19 Feb 2025 18:24:29 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IPJrzJKy"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49A27C4CEE7;
+	Wed, 19 Feb 2025 18:24:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1739989470;
-	bh=qzT0MJ9mKrHr5wUabQxbT1zAY3hHrks2Yh9qtZdKQD8=;
+	bh=HOiG+O4t1HfyKMWrjgRzX33QT2jP4GmEeXBmoU0A50Q=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=i1T/Ts0kwZ+vSYuzOse9KsmIzaVpXGAhwtksjtcvf+Q+Cbj5YF0PE9KBn7dRMXMTy
-	 4zJYEmrqjSbLKfQS5NNQkgGrBSSX0QyfeY9AAV9sWmDjzHGD5TRLdi2FHhI+iUvQDD
-	 rV6M6FEoQQM7UEuS5naXQfaFdoCDKPqdfi0Hg4tJrblV8nakTq2rA0j9bLALofYvqR
-	 SJz4Xh+hlbwGEwg2rF14tbN/aUgttIREgbj8pzHuz5rDHHHTsfzMNwUMsupRB/F6Jy
-	 APMfjNTgNsFDPZdyy9JpoqJ6s0QV0ji1aKUs+8uXAk56Hk1rEqH7op9Kr28eIne+Ti
-	 w5FN6NjUHTLFg==
+	b=IPJrzJKyTjzzW5651CV6n/FmWiHbbrYHJPlpLGR8jJjga6vogmJH80C1lBCe9WRr7
+	 taoB9Ut8ch1UHalGw161IFk3yGolguEinnhPeMhWbJtwKNdpcZOf03QY8v2VWCKy18
+	 fl9Q/nm2nnPj0/DD/ZB4oR57O6iSB9SowtWLX0rIpnVgQ5y2xZtzJaEvBzspy0mDh3
+	 rOiZ3dJvv+NI6cLgfUQdyvb9NY5PRGzCVQhXqFllHugz5unoeIhlQ2jRJT4KaQx+dw
+	 WU+BFK+3dM71cjDW6FctN6r6mBtLf7y4Ef3xztvb9h3hbC1sWkUzoaBIapd+sobwoE
+	 xDuzG1poSqe7A==
 From: Eric Biggers <ebiggers@kernel.org>
 To: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
-	Holger Dengler <dengler@linux.ibm.com>,
-	linux-s390@vger.kernel.org,
-	Harald Freudenberger <freude@linux.ibm.com>
-Subject: [PATCH v3 11/19] crypto: s390/aes-gcm - use the new scatterwalk functions
-Date: Wed, 19 Feb 2025 10:23:33 -0800
-Message-ID: <20250219182341.43961-12-ebiggers@kernel.org>
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Vladimir Zapolskiy <vz@mleia.com>,
+	linux-samsung-soc@vger.kernel.org
+Subject: [PATCH v3 12/19] crypto: s5p-sss - use the new scatterwalk functions
+Date: Wed, 19 Feb 2025 10:23:34 -0800
+Message-ID: <20250219182341.43961-13-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250219182341.43961-1-ebiggers@kernel.org>
 References: <20250219182341.43961-1-ebiggers@kernel.org>
@@ -49,112 +49,148 @@ Content-Transfer-Encoding: 8bit
 
 From: Eric Biggers <ebiggers@google.com>
 
-Use scatterwalk_next() which consolidates scatterwalk_clamp() and
-scatterwalk_map().  Use scatterwalk_done_src() and
-scatterwalk_done_dst() which consolidate scatterwalk_unmap(),
-scatterwalk_advance(), and scatterwalk_done().
+s5p_sg_copy_buf() open-coded a copy from/to a scatterlist using
+scatterwalk_* functions that are planned for removal.  Replace it with
+the new functions memcpy_from_sglist() and memcpy_to_sglist() instead.
+Also take the opportunity to replace calls to scatterwalk_map_and_copy()
+in the same file; this eliminates the confusing 'out' argument.
 
-Besides the new functions being a bit easier to use, this is necessary
-because scatterwalk_done() is planned to be removed.
-
-Reviewed-by: Harald Freudenberger <freude@linux.ibm.com>
-Tested-by: Harald Freudenberger <freude@linux.ibm.com>
-Cc: Holger Dengler <dengler@linux.ibm.com>
-Cc: linux-s390@vger.kernel.org
+Cc: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Vladimir Zapolskiy <vz@mleia.com>
+Cc: linux-samsung-soc@vger.kernel.org
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- arch/s390/crypto/aes_s390.c | 33 +++++++++++++--------------------
- 1 file changed, 13 insertions(+), 20 deletions(-)
+ drivers/crypto/s5p-sss.c | 38 +++++++++++---------------------------
+ 1 file changed, 11 insertions(+), 27 deletions(-)
 
-diff --git a/arch/s390/crypto/aes_s390.c b/arch/s390/crypto/aes_s390.c
-index 9c46b1b630b1a..7fd303df05abd 100644
---- a/arch/s390/crypto/aes_s390.c
-+++ b/arch/s390/crypto/aes_s390.c
-@@ -785,32 +785,25 @@ static void gcm_walk_start(struct gcm_sg_walk *gw, struct scatterlist *sg,
- 	scatterwalk_start(&gw->walk, sg);
+diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
+index 57ab237e899e3..b4c3c14dafd5c 100644
+--- a/drivers/crypto/s5p-sss.c
++++ b/drivers/crypto/s5p-sss.c
+@@ -456,34 +456,21 @@ static void s5p_free_sg_cpy(struct s5p_aes_dev *dev, struct scatterlist **sg)
+ 
+ 	kfree(*sg);
+ 	*sg = NULL;
  }
  
- static inline unsigned int _gcm_sg_clamp_and_map(struct gcm_sg_walk *gw)
- {
--	struct scatterlist *nextsg;
+-static void s5p_sg_copy_buf(void *buf, struct scatterlist *sg,
+-			    unsigned int nbytes, int out)
+-{
+-	struct scatter_walk walk;
 -
--	gw->walk_bytes = scatterwalk_clamp(&gw->walk, gw->walk_bytes_remain);
--	while (!gw->walk_bytes) {
--		nextsg = sg_next(gw->walk.sg);
--		if (!nextsg)
--			return 0;
--		scatterwalk_start(&gw->walk, nextsg);
--		gw->walk_bytes = scatterwalk_clamp(&gw->walk,
--						   gw->walk_bytes_remain);
--	}
--	gw->walk_ptr = scatterwalk_map(&gw->walk);
-+	if (gw->walk_bytes_remain == 0)
-+		return 0;
-+	gw->walk_ptr = scatterwalk_next(&gw->walk, gw->walk_bytes_remain,
-+					&gw->walk_bytes);
- 	return gw->walk_bytes;
- }
- 
- static inline void _gcm_sg_unmap_and_advance(struct gcm_sg_walk *gw,
--					     unsigned int nbytes)
-+					     unsigned int nbytes, bool out)
+-	if (!nbytes)
+-		return;
+-
+-	scatterwalk_start(&walk, sg);
+-	scatterwalk_copychunks(buf, &walk, nbytes, out);
+-	scatterwalk_done(&walk, out, 0);
+-}
+-
+ static void s5p_sg_done(struct s5p_aes_dev *dev)
  {
- 	gw->walk_bytes_remain -= nbytes;
--	scatterwalk_unmap(gw->walk_ptr);
--	scatterwalk_advance(&gw->walk, nbytes);
--	scatterwalk_done(&gw->walk, 0, gw->walk_bytes_remain);
-+	if (out)
-+		scatterwalk_done_dst(&gw->walk, gw->walk_ptr, nbytes);
-+	else
-+		scatterwalk_done_src(&gw->walk, gw->walk_ptr, nbytes);
- 	gw->walk_ptr = NULL;
- }
+ 	struct skcipher_request *req = dev->req;
+ 	struct s5p_aes_reqctx *reqctx = skcipher_request_ctx(req);
  
- static int gcm_in_walk_go(struct gcm_sg_walk *gw, unsigned int minbytesneeded)
- {
-@@ -842,11 +835,11 @@ static int gcm_in_walk_go(struct gcm_sg_walk *gw, unsigned int minbytesneeded)
+ 	if (dev->sg_dst_cpy) {
+ 		dev_dbg(dev->dev,
+ 			"Copying %d bytes of output data back to original place\n",
+ 			dev->req->cryptlen);
+-		s5p_sg_copy_buf(sg_virt(dev->sg_dst_cpy), dev->req->dst,
+-				dev->req->cryptlen, 1);
++		memcpy_to_sglist(dev->req->dst, 0, sg_virt(dev->sg_dst_cpy),
++				 dev->req->cryptlen);
+ 	}
+ 	s5p_free_sg_cpy(dev, &dev->sg_src_cpy);
+ 	s5p_free_sg_cpy(dev, &dev->sg_dst_cpy);
+ 	if (reqctx->mode & FLAGS_AES_CBC)
+ 		memcpy_fromio(req->iv, dev->aes_ioaddr + SSS_REG_AES_IV_DATA(0), AES_BLOCK_SIZE);
+@@ -524,11 +511,11 @@ static int s5p_make_sg_cpy(struct s5p_aes_dev *dev, struct scatterlist *src,
+ 		kfree(*dst);
+ 		*dst = NULL;
+ 		return -ENOMEM;
+ 	}
  
- 	while (1) {
- 		n = min(gw->walk_bytes, AES_BLOCK_SIZE - gw->buf_bytes);
- 		memcpy(gw->buf + gw->buf_bytes, gw->walk_ptr, n);
- 		gw->buf_bytes += n;
--		_gcm_sg_unmap_and_advance(gw, n);
-+		_gcm_sg_unmap_and_advance(gw, n, false);
- 		if (gw->buf_bytes >= minbytesneeded) {
- 			gw->ptr = gw->buf;
- 			gw->nbytes = gw->buf_bytes;
- 			goto out;
+-	s5p_sg_copy_buf(pages, src, dev->req->cryptlen, 0);
++	memcpy_from_sglist(pages, src, 0, dev->req->cryptlen);
+ 
+ 	sg_init_table(*dst, 1);
+ 	sg_set_buf(*dst, pages, len);
+ 
+ 	return 0;
+@@ -1033,12 +1020,11 @@ static int s5p_hash_copy_sgs(struct s5p_hash_reqctx *ctx,
+ 	}
+ 
+ 	if (ctx->bufcnt)
+ 		memcpy(buf, ctx->dd->xmit_buf, ctx->bufcnt);
+ 
+-	scatterwalk_map_and_copy(buf + ctx->bufcnt, sg, ctx->skip,
+-				 new_len, 0);
++	memcpy_from_sglist(buf + ctx->bufcnt, sg, ctx->skip, new_len);
+ 	sg_init_table(ctx->sgl, 1);
+ 	sg_set_buf(ctx->sgl, buf, len);
+ 	ctx->sg = ctx->sgl;
+ 	ctx->sg_len = 1;
+ 	ctx->bufcnt = 0;
+@@ -1227,12 +1213,11 @@ static int s5p_hash_prepare_request(struct ahash_request *req, bool update)
+ 		int len = BUFLEN - ctx->bufcnt % BUFLEN;
+ 
+ 		if (len > nbytes)
+ 			len = nbytes;
+ 
+-		scatterwalk_map_and_copy(ctx->buffer + ctx->bufcnt, req->src,
+-					 0, len, 0);
++		memcpy_from_sglist(ctx->buffer + ctx->bufcnt, req->src, 0, len);
+ 		ctx->bufcnt += len;
+ 		nbytes -= len;
+ 		ctx->skip = len;
+ 	} else {
+ 		ctx->skip = 0;
+@@ -1251,13 +1236,12 @@ static int s5p_hash_prepare_request(struct ahash_request *req, bool update)
+ 			xmit_len -= xmit_len & (BUFLEN - 1);
+ 
+ 		hash_later = ctx->total - xmit_len;
+ 		/* copy hash_later bytes from end of req->src */
+ 		/* previous bytes are in xmit_buf, so no overwrite */
+-		scatterwalk_map_and_copy(ctx->buffer, req->src,
+-					 req->nbytes - hash_later,
+-					 hash_later, 0);
++		memcpy_from_sglist(ctx->buffer, req->src,
++				   req->nbytes - hash_later, hash_later);
+ 	}
+ 
+ 	if (xmit_len > BUFLEN) {
+ 		ret = s5p_hash_prepare_sgs(ctx, req->src, nbytes - hash_later,
+ 					   final);
+@@ -1265,12 +1249,12 @@ static int s5p_hash_prepare_request(struct ahash_request *req, bool update)
+ 			return ret;
+ 	} else {
+ 		/* have buffered data only */
+ 		if (unlikely(!ctx->bufcnt)) {
+ 			/* first update didn't fill up buffer */
+-			scatterwalk_map_and_copy(ctx->dd->xmit_buf, req->src,
+-						 0, xmit_len, 0);
++			memcpy_from_sglist(ctx->dd->xmit_buf, req->src,
++					   0, xmit_len);
  		}
-@@ -902,11 +895,11 @@ static int gcm_in_walk_done(struct gcm_sg_walk *gw, unsigned int bytesdone)
- 			memmove(gw->buf, gw->buf + bytesdone, n);
- 			gw->buf_bytes = n;
- 		} else
- 			gw->buf_bytes = 0;
- 	} else
--		_gcm_sg_unmap_and_advance(gw, bytesdone);
-+		_gcm_sg_unmap_and_advance(gw, bytesdone, false);
  
- 	return bytesdone;
- }
+ 		sg_init_table(ctx->sgl, 1);
+ 		sg_set_buf(ctx->sgl, ctx->dd->xmit_buf, xmit_len);
  
- static int gcm_out_walk_done(struct gcm_sg_walk *gw, unsigned int bytesdone)
-@@ -920,14 +913,14 @@ static int gcm_out_walk_done(struct gcm_sg_walk *gw, unsigned int bytesdone)
- 		for (i = 0; i < bytesdone; i += n) {
- 			if (!_gcm_sg_clamp_and_map(gw))
- 				return i;
- 			n = min(gw->walk_bytes, bytesdone - i);
- 			memcpy(gw->walk_ptr, gw->buf + i, n);
--			_gcm_sg_unmap_and_advance(gw, n);
-+			_gcm_sg_unmap_and_advance(gw, n, true);
- 		}
- 	} else
--		_gcm_sg_unmap_and_advance(gw, bytesdone);
-+		_gcm_sg_unmap_and_advance(gw, bytesdone, true);
+@@ -1504,12 +1488,12 @@ static int s5p_hash_update(struct ahash_request *req)
  
- 	return bytesdone;
- }
+ 	if (!req->nbytes)
+ 		return 0;
  
- static int gcm_aes_crypt(struct aead_request *req, unsigned int flags)
+ 	if (ctx->bufcnt + req->nbytes <= BUFLEN) {
+-		scatterwalk_map_and_copy(ctx->buffer + ctx->bufcnt, req->src,
+-					 0, req->nbytes, 0);
++		memcpy_from_sglist(ctx->buffer + ctx->bufcnt, req->src,
++				   0, req->nbytes);
+ 		ctx->bufcnt += req->nbytes;
+ 		return 0;
+ 	}
+ 
+ 	return s5p_hash_enqueue(req, true); /* HASH_OP_UPDATE */
 -- 
 2.48.1
 
