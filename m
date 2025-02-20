@@ -1,56 +1,105 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C3A21F3FED
-	for <linux-crypto@vger.kernel.org>; Thu, 20 Feb 2025 12:48:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 655AE1B85CC;
+	Thu, 20 Feb 2025 14:12:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740055682; cv=none; b=UndM8WAto0Gz2ItKv0iyBufz48evmsOXAHaqLrDgqSajErT9dwLJ8vyHGo3sHetQwgUVDH0XgtmcMjsM8PYKTjLiHaO2gFa9A4KG4nQtAYKQ6Xts7rzzti9fiOjE9zFjcDQUy6LVowY20DSZZbIbaDxQdPvvVdESoEPseY/3dsU=
+	t=1740060764; cv=none; b=EGNWaADFUh976WPB5H4p2UaHC4P1o6DwOFKrzagrxXxPX0gTgBOugA2T3vOOqxUmqyDkCSxzvdkyTlJwyEBNZNtapS2c+edEtc5OFuSTvTuA6ns8mSybSnstrmfzc4aQszj82XvZUjblbU50dM3nuA7xmXScDWhDP0QegwaFrCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740055682; c=relaxed/simple;
-	bh=HfiQu/e9OYoDP5LE2IQ2WrA/SQR7aHF9x517fW1MTNw=;
+	s=arc-20240116; t=1740060764; c=relaxed/simple;
+	bh=CgMhOLPIqnUrQGVtHOebIzfzAW0Y/EgFH2JAI5ghWFw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PREw2vW9F0PvfygsCOOGhrxUWav1mRKL3nqgCFG/ROS8LNeHTIp6z/fzbj6/pGL7f17L/qyW0J4rsBPYf2hE3MYcb5uhVrDa6X3nLw5Vgl0yeaOMQBfT8s2WSHZQ5py5G80weSUVI2dJEy5Hfp44sL5gfxna2/gDBVM1T3Ambcs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lejZZhPD; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=hZHfdnoEQtQqOP0vpRPnv5OPUGfPzunKd3LmlgD5ahlXvKJabHLuOJYY5pTT9hKVOO74xwov7gS0EWskIjt5IZ1ewgZzQQRQ/5iIOWT8JXAGskVRijQGHxq64UVX8jkAFMHnZZhenfscYz6AAEvR4iZTTp1JANcc0j+30paByZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cp82GZDt; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lejZZhPD"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E1BEC4CED1;
-	Thu, 20 Feb 2025 12:47:59 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cp82GZDt"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42C41C4CED1;
+	Thu, 20 Feb 2025 14:12:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740055681;
-	bh=HfiQu/e9OYoDP5LE2IQ2WrA/SQR7aHF9x517fW1MTNw=;
+	s=k20201202; t=1740060763;
+	bh=CgMhOLPIqnUrQGVtHOebIzfzAW0Y/EgFH2JAI5ghWFw=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lejZZhPDIwHImFW7BOYmqh4dFN+iFwFw8+uwl1macPt2Pzf+f5CX+w6vFF98BXaAG
-	 iK1Y1dhaPG9RT32XJuHHYV6wOq4nYqYfDAHlCzobRU+toCQpbr3yYnW+mWmdESE0g/
-	 T87SnQXhiNl+hfgmy4szFuOWTQ0SEOJR6kv8EWnPA2neTbkwQ7LKjrzETXDg8nrsd7
-	 ZVJBoKk2CgFhVzsfoK8wK9ZiMA+8I7DwAz5S8HKI5we6xAqKYBGIMVMEtzDzIzfD3w
-	 1ccfpqUmA+qQvNC5m1wMbH3jHh/LfJYk1g7GgIxGGbT21XvBOFUslhbR9LbK/Rn8d4
-	 0yU4zEmiam3ow==
-Date: Thu, 20 Feb 2025 13:47:56 +0100
-From: Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>, soc@kernel.org, 
-	arm@kernel.org, Andy Shevchenko <andy@kernel.org>, 
-	Hans de Goede <hdegoede@redhat.com>, Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>, 
-	linux-crypto@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH 0/5] Turris ECDSA signatures via keyctl()
-Message-ID: <owevknlvu3slxa5uyh6myz7qqpupwrqditsqvipwbw6k6z5sly@3rwki2sta4zl>
-References: <20250204131415.27014-1-kabel@kernel.org>
+	b=Cp82GZDtwZjIWdJWnPhv6HXLzuBd4Sg/sAZInCNWHt3XxsRyEJICw3ScJkMeJMHsU
+	 qscALgBk3I+6fW1qIG1cyUH/fnMkeHssycGVm5Crk4KIpLpI9x/Pa1IhL/BZKbtVdK
+	 tNzZrVoDAG1kJ6lFUS+5FZM/dfz7iVqbjNbPvNNU3YCiI86u6zQXXAvVXOKO5vzciV
+	 UnPGI91eme0KXlHtyOvJ5IaZ+rWJGG/LvKNZieOBTkRK4WDVtbDGOrfcIxEj9I8iw1
+	 gbY2L2Pmyazs7t5vtMtodyrAhFwyJH/JndFzm3Bbyb/FbO212W3t/hEsIltaIaieIV
+	 VHPn8GlKtsNGA==
+Date: Thu, 20 Feb 2025 16:12:39 +0200
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: Qunqin Zhao <zhaoqunqin@loongson.cn>
+Cc: lee@kernel.org, herbert@gondor.apana.org.au, davem@davemloft.net,
+	peterhuewe@gmx.de, linux-kernel@vger.kernel.org,
+	loongarch@lists.linux.dev, linux-crypto@vger.kernel.org,
+	jgg@ziepe.ca, linux-integrity@vger.kernel.org,
+	Yinggang Gu <guyinggang@loongson.cn>
+Subject: Re: [PATCH V3 5/6] tpm: Add a driver for Loongson TPM device
+Message-ID: <Z7c4V3vW5BV5XbdC@kernel.org>
+References: <20250219073350.16915-1-zhaoqunqin@loongson.cn>
+ <20250219073350.16915-2-zhaoqunqin@loongson.cn>
+ <Z7XgLNU1xXqgOBIL@kernel.org>
+ <4e0a3b40-07b8-06bf-8814-a121308ebf69@loongson.cn>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250204131415.27014-1-kabel@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <4e0a3b40-07b8-06bf-8814-a121308ebf69@loongson.cn>
 
-Hi Arnd et al.,
+On Thu, Feb 20, 2025 at 07:23:42PM +0800, Qunqin Zhao wrote:
+> 
+> 在 2025/2/19 下午9:44, Jarkko Sakkinen 写道:
+> > > +
+> > > +static const struct tpm_class_ops lsse_tpm_ops = {
+> > > +	.flags = TPM_OPS_AUTO_STARTUP,
+> > > +	.recv = tpm_ls_recv,
+> > > +	.send = tpm_ls_send,
+> > > +};
+> > > +
+> > > +static int lsse_tpm_probe(struct platform_device *pdev)
+> > tpm_lsse_
+> OK.
+> > +
+> > +static struct platform_driver lsse_tpm_driver = {
+> > +	.probe   = lsse_tpm_probe,
+> > +	.driver  = {
+> > +		.name  = "ls6000se-tpm",
+> > +	},
+> > +};
+> > +module_platform_driver(lsse_tpm_driver);
+> > +
+> > +MODULE_ALIAS("platform:ls6000se-tpm");
+> > +MODULE_LICENSE("GPL");
+> > +MODULE_AUTHOR("Yinggang Gu <guyinggang@loongson.cn>");
+> > +MODULE_AUTHOR("Qunqin Zhao <zhaoqunqin@loongson.cn>");
+> > Remove MODULE_AUTHOR fields. Git encodes this already.
+> 
+> Do you mean that "modinfo" will still show the author after removing
+> MODULE_AUTHOR fields?
 
-any comments on this series?
+What is the utility of showing that? Nobody ever updates those in real
+life, so you really can't trust them anyhow. We're better of not showing
+anything at all.
 
-Thanks,
+> 
+> > 
+> > > +MODULE_DESCRIPTION("Loongson TPM driver");
+> > > -- 
+> > > 2.43.0
+> > > 
+> > Prefix all with tpm_lsse instead of tpm
+> 
+> OK, thanks for your comments.
+> 
+> BR, Qunqin.
+> 
+> > 
+> > BR, Jarkko
+> 
 
-Marek
+BR, Jarkko
