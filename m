@@ -1,250 +1,114 @@
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2052.outbound.protection.outlook.com [40.107.220.52])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69B101CDA0B;
-	Thu, 20 Feb 2025 02:29:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740018564; cv=fail; b=fxw813WItTY/CxxrrbuPLa6VTI4xMt2dhdSQC6CmroWZkQoHj/QtqYzLt+fDfXbjCPuZ20ylD0XKxhPh0KCXKNiGqRkhNoRWhXI0ENfye0oLRvYUExi3jC7+SL0m9QwJmf9Qwn0Vix/9OPIFu2RezxnqxlOaxnCrPGRKX6bM1ac=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740018564; c=relaxed/simple;
-	bh=s4QDMZlYRextyQXLqpAM47tSsnpkuiZfDkxUrkbkYVc=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=I5OEt8zEUCCByvLY4xOggkC5UhT0rf2XeeCyoqhTPVLPR54F+z/0leg1XlKXmTnOszN1wkHl0ycNxROXcPmcdErytXyuOtdiddD+ynsKme4z+MLIpV1ARqlO+02aguVlSOU1mQbJXTQJVUUTvOf6sNi6yU35JcHx2+dzn0df2qM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=48iRfnXd; arc=fail smtp.client-ip=40.107.220.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CBA3A930;
+	Thu, 20 Feb 2025 05:16:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740028587; cv=none; b=cBXjH3/A2eVRdwqMP2rUbBTKY8HmNoAkHE8Sy7cK8IxgCcgNM19UC9xLf/y1moLaCcRDioGJwNMNj3fWCeycLRXZeSnImiUuFxvtF3xaxDOsWU8iUd0+/4anhVbFqgv2IopBDzWcYpzI6/AyM5N+vooCwWYPxJM8pNKEpnwyedM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740028587; c=relaxed/simple;
+	bh=KqkamthdFH3SEg6xMpi7YCzCOJefi/zrVa3zI3N+U4s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pMPjyKhH6CxseieyZz0sEbbpfIOOK5LriCuQ2/qosRuNIiRoxHvaOLyFFRpN8bSiDZMlHec7Mtf50O4ndu3YVDihLNnBbpdmViFDadqopCBBIOcYK1v4/6FhJTwKl/pt/RRGAO74rHoCO73LCi0Dct/m0MI6vA4CT4sPRU2lzUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OXF3YBvO; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="48iRfnXd"
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=d58s5z4QVhutgizQKfUTn8Pktx1VV6o587jvAZ4BPtyIw8tpay4Pfu45D3HKoQpCJab9pzG7/H87xjI4yGZ291D9d/XcWTv+EwvrA18eOZuL1xmz/2yUOxhMGkkh2wz91SK3RHYajrvW86V6D3NKboLC9no5o77bURhC28hHM9VI9DLRHW4dKOPeIoQpTvnhjl5O1YjI23nhG12c2DrH4Lvq3DoDAyybJfY4+OsnuGcFqXhUFsT6VTphcqLzkspq+wkNVf8iKnh74POgEONCUvqXtz9BWk0BivfbM7E/xJwy4kdbCh9cRLa4c3tALLkXB4WItrEnWxhkHFM4X9/1jA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zABdxna/QVkO6OOIUnODSqnqub/oyBlVnhwDBklxWy4=;
- b=S7b4zoGXqhKg4dxAJ5V6w/OZebtVKXhDQiHg5P0JD7EQR+cLboiGArD92f8XHMz2a//eGRyB6r76z5kdJS8/X8PK0qXfSwemUmN0BnVQ2KxwKf6ZcBk1+3lk+R6nzw3BntSQzR1KAzF5CUrVhgWEnRcmZMyvIX2duqWi6ZsfUP1+MpdP9ERjxcVes7lDcbXJA0agQ3zsfWDWMw13oKpTupP5Ppg/3r2WNJvFcUE3eLUD264PFEScGpJf/zJU0zkVH1Yez7WeR87D2n+OqGMJU0KcTjPk5kLEC2QfxqAP1sElv67L70lXwe8A4pfZJIrF7usic0mNlcZNyVrhOte1Uw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zABdxna/QVkO6OOIUnODSqnqub/oyBlVnhwDBklxWy4=;
- b=48iRfnXdK9JN1snBta0KojpqD2XuipYNBkcY9RWRxg/O+mRNc5MdWUbpFSYeLjfSTeVzY+vRq4kKxoRoVNjP2FjfKjsHZBDCV847+Q+v3f5jFq60q4IClss1qBGyUAOBMx3a61PIiaHsdAw+cI0ca6K7a5IM7WPKj5OUerJOm8M=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from CH3PR12MB9194.namprd12.prod.outlook.com (2603:10b6:610:19f::7)
- by IA0PR12MB8349.namprd12.prod.outlook.com (2603:10b6:208:407::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.19; Thu, 20 Feb
- 2025 02:29:19 +0000
-Received: from CH3PR12MB9194.namprd12.prod.outlook.com
- ([fe80::53fb:bf76:727f:d00f]) by CH3PR12MB9194.namprd12.prod.outlook.com
- ([fe80::53fb:bf76:727f:d00f%5]) with mapi id 15.20.8445.016; Thu, 20 Feb 2025
- 02:29:19 +0000
-Message-ID: <cfc62524-095d-4895-8471-cad2c5a712d1@amd.com>
-Date: Thu, 20 Feb 2025 13:29:06 +1100
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [RFC PATCH v2 12/22] iommufd: Allow mapping from guest_memfd
-Content-Language: en-US
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: x86@kernel.org, kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
- linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
- Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Tom Lendacky <thomas.lendacky@amd.com>,
- Ashish Kalra <ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>,
- Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
- Robin Murphy <robin.murphy@arm.com>, Kevin Tian <kevin.tian@intel.com>,
- Bjorn Helgaas <bhelgaas@google.com>, Dan Williams
- <dan.j.williams@intel.com>, Christoph Hellwig <hch@lst.de>,
- Nikunj A Dadhania <nikunj@amd.com>, Michael Roth <michael.roth@amd.com>,
- Vasant Hegde <vasant.hegde@amd.com>, Joao Martins
- <joao.m.martins@oracle.com>, Nicolin Chen <nicolinc@nvidia.com>,
- Lu Baolu <baolu.lu@linux.intel.com>,
- Steve Sistare <steven.sistare@oracle.com>, Lukas Wunner <lukas@wunner.de>,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Dionna Glaze <dionnaglaze@google.com>, Yi Liu <yi.l.liu@intel.com>,
- iommu@lists.linux.dev, linux-coco@lists.linux.dev, Zhi Wang
- <zhiw@nvidia.com>, AXu Yilun <yilun.xu@linux.intel.com>,
- "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-References: <20250218111017.491719-1-aik@amd.com>
- <20250218111017.491719-13-aik@amd.com> <20250218141634.GI3696814@ziepe.ca>
- <340d8dba-1b09-4875-8604-cd9f66ca1407@amd.com>
- <20250218235105.GK3696814@ziepe.ca>
- <06b850ab-5321-4134-9b24-a83aaab704bf@amd.com>
- <20250219133516.GL3696814@ziepe.ca>
-From: Alexey Kardashevskiy <aik@amd.com>
-In-Reply-To: <20250219133516.GL3696814@ziepe.ca>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MEWPR01CA0174.ausprd01.prod.outlook.com
- (2603:10c6:220:1f2::15) To CH3PR12MB9194.namprd12.prod.outlook.com
- (2603:10b6:610:19f::7)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OXF3YBvO"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74BF7C4CED1;
+	Thu, 20 Feb 2025 05:16:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740028586;
+	bh=KqkamthdFH3SEg6xMpi7YCzCOJefi/zrVa3zI3N+U4s=;
+	h=From:To:Cc:Subject:Date:From;
+	b=OXF3YBvObn35kRPTlfRtpFvrzwxPX+uAOlUkjagWTF3kjChcWYUNP3wQOLSrJmvsw
+	 7bs2YY9nkvJ69rV6GyAR27KD603+h/Cs77zcrH66KdgKu6BjdzsxBLeFJHHBowhuSK
+	 f9dCh8srMNcKi6R4V3LbnYx4awoI1jE4abFSaJV3fsFOx1MqvBDlZ9SmykCl2ym3Xq
+	 LN06xmJthSfXbnG+g1KglEJi4VTW/c4pKEgcIWYRRGQtRVZGi+PIw9mOX7DlsKw7+D
+	 unMlSbXnZimWem3mPqk2gn7Gqkmzl9fE/qtycjRVPd0tWCysMZFZ025SdUTDUKX4ss
+	 fOdKaSW7JaHtQ==
+From: Eric Biggers <ebiggers@kernel.org>
+To: x86@kernel.org
+Cc: linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Ben Greear <greearb@candelatech.com>,
+	Xiao Liang <shaw.leon@gmail.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Andy Lutomirski <luto@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>
+Subject: [RFC PATCH 0/2] Eliminate the no-SIMD en/decryption fallbacks on x86
+Date: Wed, 19 Feb 2025 21:13:23 -0800
+Message-ID: <20250220051325.340691-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB9194:EE_|IA0PR12MB8349:EE_
-X-MS-Office365-Filtering-Correlation-Id: c9f23549-9bed-4c13-7086-08dd515660d2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?YUJ4emsrODQ2d3RvZkVWbzRyMTJJT2NOOTByTlB5OXNleExhWUsvRnRkVlZQ?=
- =?utf-8?B?RVNWM2N3dzRuQk91Zk1NZUdhbnJxSmFTcnFPc1B1YldNVktRVVJXWDhBWGlY?=
- =?utf-8?B?QkxsL0k1NHRIVWs2NXBWQkt1OERxejRjN2o0dTJzb1FablBxSnRvc2I3dDNt?=
- =?utf-8?B?Q2RDREVROC96SFI4cVYyRjlackd3dGZKdUp3SDJudzhDOXk1bzdlb1NJdXFE?=
- =?utf-8?B?eHlBWkdvbnJQSk5DWlhKSXZKdE1ZU1FnNjNxNzlNeW91bnhYRjUrT0xIM3No?=
- =?utf-8?B?MTVMMzlwY0tLSnNnbk1seUdxQXVjY2dBalVwQ0JQbEdDTDhJL055M2xld243?=
- =?utf-8?B?ZktvdHZTSnR6bW1SYnFCYkdzZnNrTXVGY0RtRUtHZ1pYcG5Fb05pVU5qWnoz?=
- =?utf-8?B?bnN0RjQrUDI1ZHR1bVVnYlpYd3p4RmdTMncxTFp5TGtwb0s3cU1odXJCd1dM?=
- =?utf-8?B?MGJCQXVLRXFKQk50dHBkVytnYktJU2xUWm5BYnBlcUlvZStCcjNEU09ndENM?=
- =?utf-8?B?dmZBTUFIUm1XTlJ0djB0ZHVMblRYdzRhd2gzcW9VU1MrMWVOU0c2ZW40WDR4?=
- =?utf-8?B?bmhTR3NveWllTzVNRDB0eVpRUzNMVGdHRjRJejJDb1Z6Y0ExNXJJOWpvbHdp?=
- =?utf-8?B?Z2h4dXlZdmVjL2tNdFRjMFlBOURiQzJzWkl2RnVmZXV4dlM3Vzh0VHdzc3ZF?=
- =?utf-8?B?OFl2RE5mWmI5dzVCNXpieWRoOGZJeFg0b1AxWjh5clVRUjJDQXhyVVhJQnhk?=
- =?utf-8?B?M2VXZmhDaFhxSzFzVWpMOVlBRUQ0UkJtTVVJTDJVTVhzTGxwMUdGb2dNZkZ1?=
- =?utf-8?B?azlIa0FQbGd2cm50UnRXMmh0K3ZKL2dqRHJHUnhnRUIxM2E1YUFZSlZHRVNh?=
- =?utf-8?B?Ny9sM1F5QmY1L1ZiV0pqYnphMkFZUUo1bTlZRXZ0ZVJnTHdIVHdEV1hXNVA4?=
- =?utf-8?B?K21rOVQyc1U1SlVhSkFNMm5ZWE9OaUdtckJheGl2dXlUMWFkbDhFSzFadzVC?=
- =?utf-8?B?Y2xHS2R0YWloSmppc1duYnNjWXNQMzZlMHVROWRnS05JSUFHYkh2OVF4V2ZR?=
- =?utf-8?B?REhLZGlSeEtrZllRSDQwaUd4TFRDUTVzandVTVpFWHMxWjE1LzNKeEt1S2hs?=
- =?utf-8?B?NXQ2akNkQ2RIaDhla1grdXdmNkw4VlFaTndNZUtpc1lwb3BGd0tOanZLTmFj?=
- =?utf-8?B?Z0NwL0Era0hNN1MwUnR1L2piOTYyLzhrZzNFMHV1U1hBUGdHZ3hDanVOS3Jq?=
- =?utf-8?B?U0p3bkJhb29VMVBmbVVabXR2OHZDcHJWVnpNWFU2emtrNlFOVGxzK3VZZDh1?=
- =?utf-8?B?cFVpdHRDUld3WjVzZHRIdXdidHpPRUk0ZElheVBXcG84QUQveFRCTkhsK0to?=
- =?utf-8?B?MXpMNTdkbitWdlZtNUlLa2N2eEhadUdOdVBnT0VldHM2a1NibmlyREdya0l0?=
- =?utf-8?B?RjBRbS8vanZhLzBpQlluaS9OM3lhdGVzR0xMblNQRjN5MEFEVWVyRkN6TUU1?=
- =?utf-8?B?aXNhdlJKeWREWlZpRmRNcS9CSzA4WmRZUEM4Ym9ybWtMR2ZOVk9XaEhDeVRr?=
- =?utf-8?B?QWVtbDZ1NWdncEpoKzhIdnJ3TFdvWXh6QVlURXVwNzM0Y2pnbkkrREJKT2pt?=
- =?utf-8?B?bTU3aWxFUGJNc3J3ZXFYUWpFemlzN1Y1Z0FXS2NYak1KaEIydW1yazdPUnlD?=
- =?utf-8?B?a2JYa1ppNEJGWHFoWUNua3ppOFcySHlWVFZvMFpvblRxTGhhSitVYUo3VnVY?=
- =?utf-8?B?bXhJUWkzejZWcGF6UlJRRXlKYmJKRUJjaGVaOFdXbGNteEl6SkpsODc3WGls?=
- =?utf-8?B?UVNrL3laWVdiT2VYTlZjdEZtNjNzU3Ntb3RXUjFFSUs3MVByL3orRUNITlB3?=
- =?utf-8?Q?xkVdvEX+DFKcz?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB9194.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?MFlsQjFKWERwSTBIZkMwSlN3Yk80QkYwUllJYTlET3M4cldaNnBsSUxXM1dN?=
- =?utf-8?B?VHA0TVJOQzVVeG9uNlVBc1NYbG1UOHpKZGxVbUFVd1ludXlXcXdWc2ZiY2Vu?=
- =?utf-8?B?TVVJMFNhYzQzOFZsdDFFWXZTUnVRTXA3WHBSckgwc1RDQnNzSm5TWkFqdFZo?=
- =?utf-8?B?aDFNQ3hRcWo0L2lqS1R4ZVVkcXI1YjdZR09QQnlOVTRUTlNrTGpTUzB6WDJn?=
- =?utf-8?B?RmJTMG5sM29rMTFLcjQwQWd1aWVYYVNLUWUwSmJRNHE3N2NTWHV4ajg2cFow?=
- =?utf-8?B?bVJaVlhLZkVYTFJ6ei9UTnBHRGV0Um9WVnVOUklRMHZpYkNkamw5NXFKclBJ?=
- =?utf-8?B?UTdEMGlON2tmWllpUnRRY25KZnJ4MmpmbFpyRWVLWEw2NXV5MlZoSTl4MnlY?=
- =?utf-8?B?OTFRNUtnSjhCb1l1T2RLN1NYenJOR0lmbFB4ZzNDckZEbnhscXZ3d3owby9I?=
- =?utf-8?B?MU40MnRGR0sxVkxsVXcra2xZbnVsYVRncUorNm5IbXB2dEZaVFk2dUxQZkFa?=
- =?utf-8?B?dHMrS3Z3QlUvWU5iSVRJWFk4dXVoSEZ1c1lMSFJCZU1EaFhIYUUvRm5meUVq?=
- =?utf-8?B?bjNLQkw1SVpvWlc4b09kMUl1N082UEtoSlRCZS8rUVlpMzhjcSt3UWVxMWF2?=
- =?utf-8?B?ci9SWFpJM0RrTlFhUnJOYjFJdnU1VEUxUHRLc3JIVXVJNlZmWmZqUWlkNnFO?=
- =?utf-8?B?MHNlM054ZGY0c2VsamFsQWJGTUdKZkVFcno0dEpJUHRzK1d4K1Vld2lUUTVh?=
- =?utf-8?B?TWJBSHRSTzlLejhFZGprMy9xMFFWWFJxOVBGUytkWXpZSEVPSlNNejR5czZ5?=
- =?utf-8?B?WWNqejZQQWg1a3BiVGFJMW5vSkVNZndoRll5YWVLRmlxZGVzVURZL3NqVnhO?=
- =?utf-8?B?NzFKckdKUHZyTlVmTHJTN2NjTFZERmoyVFZkdyttaFlxNzNZajJZTVlYZFl1?=
- =?utf-8?B?ZnpzR3BOSVJTeDVzL3FhUTlIMzhzMGxOY0JZWmZyb0diZjJCYm9XMTh1dzFm?=
- =?utf-8?B?eEM3d2xSbktJWkg0cE5DRnRIM2xBL2JZK3pqajc5Qk9MR2p1c1d4ay9vejFi?=
- =?utf-8?B?VE5SVVRVc0JvQ2d3M1RoOHdjOWU2b1lRWHdNVjV4TFdrTitVbS90T3F6UmZK?=
- =?utf-8?B?KzlUYS9sSFNkQlpKNVE4c0d1VjZjdHlRenNVWnJHdFhFYk96SFRzUWp5OXp0?=
- =?utf-8?B?NHpFRCs0R2p6KzhUOUcxNDhZWWIvR2xGK2YyZ2JjNTduajBKMFVYVGMzRFBy?=
- =?utf-8?B?ZDJhWjllUHN2VHFrMUliVUZQOHBQbzdBem5HSE5iSXBJRDA0QlNsdXoyMzFD?=
- =?utf-8?B?b3hHeDNQdFJZQUlWOEcvV2hkUnhRbWxMalVaOUZncVFlMHVoYkV6RWM3OWpm?=
- =?utf-8?B?WDV5RkYyOUpCZDJEV0VVZlQ5Ym5lTDhVVEE5aVo4ejZNcGV5ZUR1bWVrQXIz?=
- =?utf-8?B?aUdPd1o5RzhteE5MaEliQVZvcktOdmdiVUh3SWp2bkVLQ0d3VzFqSjcvUXQr?=
- =?utf-8?B?YUQySTZsZVk5bzB1d0JoNExKNExpK0o5WlBnSmJIbEgzOFduZlVnQTBwd2NY?=
- =?utf-8?B?OExpZGtuNVgvUzQ3MjZoQ2RYUmQycmJ0VW83NksxMSs2amU0cm9hbGlCM3cy?=
- =?utf-8?B?eXV1NTl5bHowZ3ZuNzArVGZMWUlvM09rcmhEamk3SERNdWNGVXhnMVIwck5O?=
- =?utf-8?B?QTZnY2ZaVDUraGNSL1FWR29GbE9mQnlvRFhkWTJCRGQ1TTVHajZrTzlMb1RC?=
- =?utf-8?B?UFl0MmR5QXF4a2FPTXM5b0FVWXBWYWV2djlVV0tGb094RXUwMWE1UUZiUGgy?=
- =?utf-8?B?dG9jc3hrYWhyMXlvTjhOTy81VGVzUXlOYkRHQ1k4dDFDMXgwOHBrb2xPQjgw?=
- =?utf-8?B?SWNlQVkvNytmVnZOQytvZXZRVnVjelJsZjBBdTUxU2RLazdaeVlmcW5aOVdS?=
- =?utf-8?B?VmFPRHdnTkkwdFVuTHFBQkM4dnkwSk1qbFVCMmRORDNuVk9Gb1hBTGtKRmQy?=
- =?utf-8?B?VlBsamdwcXZLeU1UckVrR0hqdGFWV3ducGgyc2Q1b3Z3Y2ZvcUgvTVpmRDBj?=
- =?utf-8?B?UVhqZGRkN2pabjZPbjZob0FaOXR1YnJETG0wMlRBSkVqOTh0NFUzVkNMVEk3?=
- =?utf-8?Q?hqVl6bVux+Zkn4lTTjR/weXb8?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c9f23549-9bed-4c13-7086-08dd515660d2
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB9194.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2025 02:29:19.3471
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9KqEFKgAMOeb+8kqj9j5U+qz+5/r1+dRnAVpuwz2gKnLkd/bIi/nMrp+z7t8Pdj6RlQTl5+0HQmpo80hFLYlHw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8349
+Content-Transfer-Encoding: 8bit
+
+The patchset can also be retrieved from:
+ 
+    git fetch https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git x86-softirq-fpu-fix-v1
+
+This patchset fixes a longstanding issue where kernel-mode FPU (i.e.,
+SIMD) was not reliably usable in softirqs in x86, which was creating the
+need for a fallback.  The fallback was really bad for performance, and
+it even hurt performance for users that never encountered the edge case
+where kernel-mode FPU was not usable.
+
+This patchset aligns x86 with other architectures such as arm, arm64,
+and riscv by making kernel-mode FPU work in softirqs reliably.  There
+are a few possible ways to achieve that, and for now I just went with
+the simplest way; see patch 1 for details.
+
+Patch 2 eliminates all uses of the "crypto SIMD helper" from x86, as
+patch 1 makes it unnecessary.  For the RFC it is just one big patch;
+I'll probably split patch 2 up if this progresses past RFC status.
+
+Performance results have been positive.  All en/decryption is now
+slightly faster on x86, as it no longer take a detour through
+crypto/simd.c.  I get a 7% or 23% improvement for AES-XTS, for example.
+
+I also benchmarked bidirectional IPsec, which has been claimed to often
+hit the edge case where kernel-mode FPU was previously not usable in
+softirq context.  Ultimately, I was not actually able to reproduce that
+edge case being reached unless I reduced the number of CPUs to 1, in
+which case it then started being occasionally reached.  Regardless, even
+without that case being reached, IPsec throughput still improved by 2%.
+In situations where that case was being reached, or where users required
+a synchronous algorithm, a much larger improvement should be seen.
+
+Eric Biggers (2):
+  x86/fpu: make kernel-mode FPU reliably usable in softirqs
+  crypto: x86 - stop using the SIMD helper
+
+ arch/x86/crypto/Kconfig                    |  14 --
+ arch/x86/crypto/aegis128-aesni-glue.c      |  13 +-
+ arch/x86/crypto/aesni-intel_glue.c         | 168 ++++++++-------------
+ arch/x86/crypto/aria_aesni_avx2_glue.c     |  22 +--
+ arch/x86/crypto/aria_aesni_avx_glue.c      |  20 +--
+ arch/x86/crypto/aria_gfni_avx512_glue.c    |  22 +--
+ arch/x86/crypto/camellia_aesni_avx2_glue.c |  21 +--
+ arch/x86/crypto/camellia_aesni_avx_glue.c  |  21 +--
+ arch/x86/crypto/cast5_avx_glue.c           |  21 +--
+ arch/x86/crypto/cast6_avx_glue.c           |  20 +--
+ arch/x86/crypto/serpent_avx2_glue.c        |  21 +--
+ arch/x86/crypto/serpent_avx_glue.c         |  21 +--
+ arch/x86/crypto/serpent_sse2_glue.c        |  21 +--
+ arch/x86/crypto/sm4_aesni_avx2_glue.c      |  30 ++--
+ arch/x86/crypto/sm4_aesni_avx_glue.c       |  30 ++--
+ arch/x86/crypto/twofish_avx_glue.c         |  21 +--
+ arch/x86/include/asm/fpu/api.h             |  17 +--
+ arch/x86/kernel/fpu/core.c                 |  37 ++---
+ 18 files changed, 180 insertions(+), 360 deletions(-)
 
 
-
-On 20/2/25 00:35, Jason Gunthorpe wrote:
-> On Wed, Feb 19, 2025 at 11:43:46AM +1100, Alexey Kardashevskiy wrote:
->> On 19/2/25 10:51, Jason Gunthorpe wrote:
->>> On Wed, Feb 19, 2025 at 10:35:28AM +1100, Alexey Kardashevskiy wrote:
->>>
->>>> With in-place conversion, we could map the entire guest once in the HV IOMMU
->>>> and control the Cbit via the guest's IOMMU table (when available). Thanks,
->>>
->>> Isn't it more complicated than that? I understood you need to have a
->>> IOPTE boundary in the hypervisor at any point where the guest Cbit
->>> changes - so you can't just dump 1G hypervisor pages to cover the
->>> whole VM, you have to actively resize ioptes?
->>
->> When the guest Cbit changes, only AMD RMP table requires update but not
->> necessaryly NPT or IOPTEs.
->> (I may have misunderstood the question, what meaning does "dump 1G pages"
->> have?).
-> 
-> AFAIK that is not true, if there are mismatches in page size, ie the
-> RMP is 2M and the IOPTE is 1G then things do not work properly.
-
-
-Right, so I misunderstood. When I first replied, I assumed the current 
-situation of 4K pages everywhere. IOPTEs larger than RMP entries are 
-likely to cause failed RMP checks (confirming now, surprises sometime 
-happen). Thanks,
-
-
-> It is why we had to do this:
-> 
->>> This was the whole motivation to adding the page size override kernel
->>> command line.
-> 
-> commit f0295913c4b4f377c454e06f50c1a04f2f80d9df
-> Author: Joerg Roedel <jroedel@suse.de>
-> Date:   Thu Sep 5 09:22:40 2024 +0200
-> 
->      iommu/amd: Add kernel parameters to limit V1 page-sizes
->      
->      Add two new kernel command line parameters to limit the page-sizes
->      used for v1 page-tables:
->      
->              nohugepages     - Limits page-sizes to 4KiB
->      
->              v2_pgsizes_only - Limits page-sizes to 4Kib/2Mib/1GiB; The
->                                same as the sizes used with v2 page-tables
->      
->      This is needed for multiple scenarios. When assigning devices to
->      SEV-SNP guests the IOMMU page-sizes need to match the sizes in the RMP
->      table, otherwise the device will not be able to access all shared
->      memory.
->      
->      Also, some ATS devices do not work properly with arbitrary IO
->      page-sizes as supported by AMD-Vi, so limiting the sizes used by the
->      driver is a suitable workaround.
->      
->      All-in-all, these parameters are only workarounds until the IOMMU core
->      and related APIs gather the ability to negotiate the page-sizes in a
->      better way.
->      
->      Signed-off-by: Joerg Roedel <jroedel@suse.de>
->      Reviewed-by: Vasant Hegde <vasant.hegde@amd.com>
->      Link: https://lore.kernel.org/r/20240905072240.253313-1-joro@8bytes.org
-> 
-> Jason
-
+base-commit: 0ad2507d5d93f39619fc42372c347d6006b64319
+prerequisite-patch-id: ec1feea7e6f4d03e4e4c64c492197b89c957611a
 -- 
-Alexey
+2.48.1
 
