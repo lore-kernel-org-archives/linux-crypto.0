@@ -1,186 +1,252 @@
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2057.outbound.protection.outlook.com [40.107.236.57])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACF3C1FC7F5
-	for <linux-crypto@vger.kernel.org>; Thu, 20 Feb 2025 14:27:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740061636; cv=none; b=bqUrnmk9zG3kjKJyURrPTFi7c/ZkeZnheU5HQPuCGFTEUcwXAsBeYcxN82o3pN8uCAiThwlkGSw+mYpIEMWBLaAuc9m6hT33ovJUcFOlZqs54EFWyqmkXRZtsIUdcF9gXtGPMHIrcvlCMhKrAY1/w2ay5A7Zdr2E3kxeKdgSxkw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740061636; c=relaxed/simple;
-	bh=D6cKUGAMjY2KP9aAcuVHBx8VTJJeLQ/lOCGq6SoaKoY=;
-	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WUBAwsrbqdtuDwVkMEdQjrGSXhE57lXQCoDA2hClvc+HntASMFUyhJwJPU8gZvqLyAZXMeHOR+ikU0k2dmoBIFg8uEMkHkDEfIq3+jnfX8XBPjCb+I+owQoeOqk6qsrAblCBAygwZnN9PD8HvQ+yLZ2Ea8EE5Lj51L2dLTQ8XKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=1m3xmRyk; arc=none smtp.client-ip=209.85.208.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8B48200BA8;
+	Thu, 20 Feb 2025 16:34:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.57
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740069298; cv=fail; b=h1z/IvsF4A547zk/tT55lSB7jl/mW8JcHJ6pPmdpR1hWHfVaf/deMODcKl2Tcr1WVqi3ukjLTnpzX3xSTYHNSjBppmQ6JqrnCbJY/zknU0jbTmK112fgFaSQbYHDVZSprQLL5fEuOH5d5Ht5xbSixPA/WGSIwOQ/fPwpMj9m7NI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740069298; c=relaxed/simple;
+	bh=QFE4OiDZaNWLXEXAJRi+U1OPThBK4yBGWulLE3+R4dY=;
+	h=Message-ID:Date:From:To:Cc:References:Subject:In-Reply-To:
+	 Content-Type:MIME-Version; b=WNef2gpDGVE6+wIOCZwRN7EAfI0gG0hbY2PqfZGGVxaZ6YaCi7SvcKWGP7Q+spzps2xCzrAlePfIoE2M/W0NBOj5K51OvKg1qgUu1J/r/rFwbNir5isUF+MAWKl+L7ZFPIIUCr18k+wv5ZwvBMmwIkU3+0cl5woKo31qPNe6fyc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=y2rsnKhq; arc=fail smtp.client-ip=40.107.236.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="1m3xmRyk"
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-309311e7b39so9257811fa.2
-        for <linux-crypto@vger.kernel.org>; Thu, 20 Feb 2025 06:27:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1740061633; x=1740666433; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:references:mime-version:in-reply-to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=f4w4pCG0U42bM1eFKeaBN0EiFoNbUjvKtinnx1nWT1E=;
-        b=1m3xmRykIuZhKeySuszDijNS5tRgWKAj3JorvIq88ISoinxUpTQqYJ8kElekvXgTnL
-         hx3K9+bo+Sv40qqPlCkdYWDol0/+UivyxvriNVn3fhfifaYGofdvXCWqpMZd7I9VosKS
-         3/u1NCKXNvaXf7MT8iouYxLoK4kQQ11B14CzKaXb/Y5Pj6eNyuI8tE5aJHefEvMwU1Cq
-         ey4tnWvMGRUdaG92IR9swdufHVZ9gCXUeSJP5ShNYvni6jM6afPTA+MPNoXBdrB4O5Z4
-         KPuwd2G3w2NCe5Cn60iA9aUQSqueXs3suE+J1Pvu23Mt+BBU90emWuV49welFUqCXnuv
-         ZOUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740061633; x=1740666433;
-        h=cc:to:subject:message-id:date:references:mime-version:in-reply-to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=f4w4pCG0U42bM1eFKeaBN0EiFoNbUjvKtinnx1nWT1E=;
-        b=B3wAcZUJHHoDRepUpBiAqCtRTa7OFBJkVkVrWB379thpT1xb7gMQA1j5UHPgh2kIMK
-         bWJIEKFmDDgPlPVcx//iJ35ZN0iuj8S79+MwETDS2zIN9pW6naflvnQgrIIBlWpsd9GW
-         OjymXhnfERa/oY7/MXdUQtol1p7ZDCQ7YWyenJGt2xvINecRU4tJp2O12QI2WLx2FjzD
-         Ff6dPMuELbaxIevaHUshJcAXZNmNEfniad3O4tH6iC5j8RS8v2W337JDCafIU9uAGoJK
-         EebrFvM5fJIQ9sActqJWxeyzIrBpCCvuxYd1nZPnDX4BsSuNwcLiXTYqCn54EftkHmmE
-         db5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVyxt1NtgK2MulxurZui2ieq5ufPgLGm/U5OO+4C47NtmPu/9QwtmRwfCOSAQ8JqHlxut0fAvxQeIFKoHA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyhBC8hiKoXLnG79TAYeBKVmN8ttOw/pCN7HH/YkyvA2y5TNac5
-	BTfP+NY/E3uXmhYrp7qYA5+bXwv5qXZnum1PaDhAUdXV73vYbpKifuwPenWChBn1y6tFMMzWfdE
-	LeG9PTDm1L2aQZDVIQXDIfKP99QldA2lnalapLQ==
-X-Gm-Gg: ASbGncsNjulJupU08PqKYe6zzeCTe+pMtJh3MJOwdOrsWOQVYOHbt4q94MFVVfeU8Fi
-	LIbsiIT0DFSRDhLakCf6pSw5oScK7EvY6oDqA2qV4zLZJa0WNG0qUxzJxlHlaKqkUMcS/DztDIZ
-	8FWH7NWW1ccyPs5s6tHdSyeMtALes=
-X-Google-Smtp-Source: AGHT+IFS//uyEFsNocKn2QLBwjZb9V54vS30Ztrpi06h9vM6OhVZ6S9T58uetg7ksyx1gj4KaWKe+Evafv0S+hCPfHg=
-X-Received: by 2002:a2e:900f:0:b0:309:26cd:9304 with SMTP id
- 38308e7fff4ca-30a45043f96mr31527421fa.26.1740061632696; Thu, 20 Feb 2025
- 06:27:12 -0800 (PST)
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 20 Feb 2025 15:27:11 +0100
-Received: from 969154062570 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 20 Feb 2025 15:27:11 +0100
-From: brgl@bgdev.pl
-In-Reply-To: <20250115103004.3350561-1-quic_mdalam@quicinc.com>
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="y2rsnKhq"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=QYhsDffP3nbioBxLkFAHaqzxqB3Y82S05mjBEyxFWeNTYVGtX1L/Eq8Y5btqSzC+HpOTvpGxh8MjvdecuSTNUuR+8OyrRQfjIR0f/frZS7YYt2geGVlK+jXRL+aVD5YfilGjMZv2j3xn407NDQX9reh+HDRJ3w+DCp4UH2ESgaYJGOH4awtrIi418GfuAHrsY/C1FtWLQp+olVRpvF4yuEIH1aHqkLiDzsmmraX2mlaZiRNYA2hVqu5T335h/V2nReic/n7sUwilgIN6YYRMKYdxZ1j4XGuxJGPSSl6565CIRXa3b4Vhseq2NaWTHjaj0vRyg+pBkBObOeMMHXAjyg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+u/pUAMfvqEZJveWphoeTsijv+awaBgiD9u7BUKLIsM=;
+ b=m0yaNzFMmBzSl5OwPL4xuhJ6OT6FxNbCdrX+iPdGSavvRgwPh/hJZ5s5vJwJgtb5J65j0b61+rkzm3ODAJ1tjTCrM0C+xIIQQDAOPHyxd0SomwxXmiTZjbdKW9uUySQY+SDwLrVk8IHFSj5JztEJwDB8KmnaHi9m7jWw7QUJmtXaNtA9mslYym9mXj1NgGXE0CGWbCWRHlWd+tDIYHSZp8njBk1nqmhhVIjtVhEmfnC7Jp3gcA/nRLqhIe34eHxyrc4Pd9FrMIl9rz0XeiVk53OXAL9pCxSzSDTAsHMci59kYtqp17KRvSZRCBT6m3k5rTSvIL2+oKqJmu4WBQayqg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+u/pUAMfvqEZJveWphoeTsijv+awaBgiD9u7BUKLIsM=;
+ b=y2rsnKhqkT52HaahHcsqtTG62MVRRAjI6evJGySQubA3g9TQcAELYhKYALVlWgqyoiN4ud8KFgoXwBMcyXOZbcRH+u1539qsPYYiMi3HozY94dblUwpryqf4f3fhJyxM0AopJzpWZRe+MPy9/FX68rQ8dmPpTNtXoEt4NEd3DcA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5070.namprd12.prod.outlook.com (2603:10b6:5:389::22)
+ by PH7PR12MB6719.namprd12.prod.outlook.com (2603:10b6:510:1b2::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8445.19; Thu, 20 Feb
+ 2025 16:34:54 +0000
+Received: from DM4PR12MB5070.namprd12.prod.outlook.com
+ ([fe80::20a9:919e:fd6b:5a6e]) by DM4PR12MB5070.namprd12.prod.outlook.com
+ ([fe80::20a9:919e:fd6b:5a6e%7]) with mapi id 15.20.8466.016; Thu, 20 Feb 2025
+ 16:34:53 +0000
+Message-ID: <d72dbe54-2d50-9859-7004-03daf419be86@amd.com>
+Date: Thu, 20 Feb 2025 10:34:51 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+From: Tom Lendacky <thomas.lendacky@amd.com>
+To: Dionna Glaze <dionnaglaze@google.com>, linux-kernel@vger.kernel.org,
+ x86@kernel.org, "Borislav Petkov (AMD)" <bp@alien8.de>,
+ Herbert Xu <herbert@gondor.apana.org.au>, linux-crypto@vger.kernel.org
+Cc: linux-coco@lists.linux.dev, Alexey Kardashevskiy <aik@amd.com>,
+ Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Dave Hansen <dave.hansen@linux.intel.com>,
+ John Allen <john.allen@amd.com>, "David S. Miller" <davem@davemloft.net>,
+ Luis Chamberlain <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>,
+ Danilo Krummrich <dakr@redhat.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>,
+ Tianfei zhang <tianfei.zhang@intel.com>, stable@vger.kernel.org,
+ Ashish Kalra <ashish.kalra@amd.com>, Michael Roth <michael.roth@amd.com>
+References: <20241112232253.3379178-1-dionnaglaze@google.com>
+ <20241112232253.3379178-5-dionnaglaze@google.com>
+ <d6ad4239-eb8a-9618-5be4-226dcf3e946c@amd.com>
+Content-Language: en-US
+Subject: Re: [PATCH v6 4/8] crypto: ccp: Fix uapi definitions of PSP errors
+In-Reply-To: <d6ad4239-eb8a-9618-5be4-226dcf3e946c@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN4PR0501CA0011.namprd05.prod.outlook.com
+ (2603:10b6:803:40::24) To DM4PR12MB5070.namprd12.prod.outlook.com
+ (2603:10b6:5:389::22)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250115103004.3350561-1-quic_mdalam@quicinc.com>
-Date: Thu, 20 Feb 2025 15:27:11 +0100
-X-Gm-Features: AWEUYZnDIRu5h76xjpO3J8aX5TCNfdHy8wWm6gSkGIVob_i8mUp6Yw4WICtLlfY
-Message-ID: <CAMRc=MeW7D+6rUNWBQ61kP-zx9paiLKFF-Y7SbFq+_fRKiq8=w@mail.gmail.com>
-Subject: Re: [PATCH v6 00/12] dmaengine: qcom: bam_dma: add cmd descriptor support
-To: Md Sadre Alam <quic_mdalam@quicinc.com>
-Cc: quic_utiwari@quicinc.com, quic_srichara@quicinc.com, 
-	quic_varada@quicinc.com, vkoul@kernel.org, corbet@lwn.net, 
-	thara.gopinath@gmail.com, herbert@gondor.apana.org.au, davem@davemloft.net, 
-	martin.petersen@oracle.com, enghua.yu@intel.com, u.kleine-koenig@baylibre.com, 
-	dmaengine@vger.kernel.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|PH7PR12MB6719:EE_
+X-MS-Office365-Filtering-Correlation-Id: b1ab8416-2ebf-466f-3df4-08dd51cc810f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|366016|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?aHNtN2dSanRLbEVBVnkxU1ZDTGZ2cDJnVzdTRTNBMTY2NVFCVzlBY1VlTnA5?=
+ =?utf-8?B?WGZjbVdudk5CbGlyTlNLUWZQU2VvRElNcWZNZUtucVRzNzNJRG9RQVpLbkNM?=
+ =?utf-8?B?cHVXejVudVZnSWV1Wkt4ZENKc25tcEtxSGtmcXo5MXFyQS9HdmNGVEJpL1Fz?=
+ =?utf-8?B?WThPN1VUMDQwcFZmWmE4REJMaTRBS0x6Tm5YcXZBYk93MkZ6eEdIMXNoOHhv?=
+ =?utf-8?B?Q0kxOHpBbWdKdFMzeDFZMnZVT1k2bWMvM05tdXJPWmV4MFJnOHVHemRTaU9x?=
+ =?utf-8?B?cTA2bVZPajFISTQxbDdZY1J6ZlBmdFFXUTNUVXVqQngxUndiRmxLaG5abGg3?=
+ =?utf-8?B?VWR1RWNBUWFOTlpZTjIxNDEzeXFOcVFNMmFSdk1kN0hiekdBM3MySUVXWGJz?=
+ =?utf-8?B?dktBdXkwNkpGOTAyb3ZqVDJYUVFuRXIvSFZLWDBaeVYrbjVHU1NnUTd0T29p?=
+ =?utf-8?B?M085QnlWNlZ1WGV5RFllYVo1WTNtMU5OYnFKbWFwR250eXI5a21tcy81RnRR?=
+ =?utf-8?B?UkdtNTBRb2QvS2duRnJ5MHd1WWFRTGV1Y1RpMjlBZDNFQXZkOFo5TjdwNTg1?=
+ =?utf-8?B?RUhLWFp3WE9xVDNNdERmVHNCc05UY1RoaWZpcU1RSDF5V0VxQWN2Q2ZweVUz?=
+ =?utf-8?B?VXEyaURkWnlLZzBXSXFtay8zWlNrenJ5Nkx1c1RmUkJhUUM1dkJSb0QvS3gv?=
+ =?utf-8?B?RXVoT0NKYktqU1lpZ3ZKYnFsQXFocEc0ZUtQemxYc016alk4czhOL01RMndG?=
+ =?utf-8?B?ZmdSRmlzZUQxVGloTXQyVkxZWkRDajdsTE1tb0VhNFhwSjNaYjlkei9GME5U?=
+ =?utf-8?B?TmhMaER0blgxQVpFRmJMZS9vREt0aUlqSE53SzhKUFlqdERqSUJQdFZMMWZn?=
+ =?utf-8?B?dGgvbnJtY05VdHJBZEplUnNFMW1lS1Z1WkxjN3NkbFg1QTZINTAwUW5tOGFE?=
+ =?utf-8?B?L2p5cGhTZzFDSlFhTGFwd1JJaGE0bjFlOHJhYWJvVXgzZy9EaS9RcXZnOFlr?=
+ =?utf-8?B?RjNJWklNMDRHa2ZtUzErTkpPMExIUG51ZTBydmhKUU9oTDA4YWorVWZhRjlT?=
+ =?utf-8?B?Y2c0SVlaOGZHWGtJUExUMGpNTnVJVHl3VGF0UVpPcDBGaGdrempVN0hKT0ZJ?=
+ =?utf-8?B?TFhBTGxOOXJBS1VtQzJXREIwcmp4V3JKcXJFOEZZRWdrK3krZTFLZGorVHlI?=
+ =?utf-8?B?QVRLRTRDZEIrRTZzVWYrNEdZdzNZdFhIYUprUWdTdEhOd3pVUDZFNjRwN0lR?=
+ =?utf-8?B?K1RPUGZqSGVISFhaVlhQU3ZZWENxWjR5bTZqU3BjMEpBWGNYWHhUMDZTVzhG?=
+ =?utf-8?B?MWR4SkdTcGdhOFczczhjMTVEUS9ZU1Vxa0ZWQ3VGcStRbXI2d1N6YkliUTBo?=
+ =?utf-8?B?Y3VoM25ORVFBeVZPQWdhU3FxdFpuY3BKYzVKS09TNDRRRFNXTHhMZkl0QStS?=
+ =?utf-8?B?UDdHTEtqek9YOGRqZTFLZXFldVpPKytPMGt2eVA3TTVNakp1OE9BZ05CMXBr?=
+ =?utf-8?B?anV0WHRodGZUWTB6Vk5PT1lEcGR0Vi8yNHRyTXZnZWpCMXJHZjJRUDZ4Lzd5?=
+ =?utf-8?B?MUwwRi9kTXRSSDBxUXcyb3FGR05UQlcyQ0RtaXMrSVYwVUFDdTFNZk9GazZq?=
+ =?utf-8?B?TVExc2pydTNnMDZHSlFrRTVYT29FSGpIYk4rRXFLV1pLclFPNDVkRzRMcW40?=
+ =?utf-8?B?MUl6WkFOMEovdFBnajMzQmVYakk3aVJxWTdkNWgwV3pQTWQzc3BzRUNVT2Fn?=
+ =?utf-8?B?alZtUFVaUGo3b2Z0V0RkaUpiWFZ5ZHJsU09UOUp1Z0xKK1RqTEg3M1Aycytq?=
+ =?utf-8?B?SHRML0E2Sk9KenpBQXlJR2xJa1R1bXlGd3l3ODE0TlJCK2FvTC95cnNCMWdM?=
+ =?utf-8?Q?3PKxL9EeI3tgL?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?YjdUVzlRZm9nMnpmdXdidWZtVHl5UXliVWJqa1IzcFk0dUxDYXV4c0xNWnZT?=
+ =?utf-8?B?ektNaTV1SnhCNGFjNVhHMEg2YU5xWmx5T3VOcFRqRUJBMWhRL0NibjdNc0Vz?=
+ =?utf-8?B?b2RFRnlYZFBnWVc1blgzczErOEtlT3Z6NXV3ZVc5dC9lWnU5Y3FrYTBiWFhx?=
+ =?utf-8?B?YjdNYXIxazFXYnJDenZUdVVoMktCcGZ3ZHNQUjV4WGJuMWJYZWNKK2lYUTZS?=
+ =?utf-8?B?cE9lanUxZ1ZDQTI5eFI5TjF0bmg4N3NJaUVGM3Y4MkFENzNhU2lWZWRjeFYr?=
+ =?utf-8?B?b1FZVkd5SmMrWWE0bTRNcEY0Ym9zRGJEaUVtR2F1YVNib2xQZkg5ejdEUHAx?=
+ =?utf-8?B?M09sQlF5dkNEc1lpb1ErZEpZYit6clMvaCswYUk4cUVpbllsREtFamxRemZx?=
+ =?utf-8?B?a1hSQ1U4MHhIbWR2Ti9LWXdqRE1QNEw4TkVDYXNscGFnc1BLSDZ0Q24zN2lk?=
+ =?utf-8?B?VTc5VTJkWTZvdEQvWlpVWkRJZGhwWUlSUmJrOFQ2emJ0UGJRcldzcEY0MG1H?=
+ =?utf-8?B?RFlCZEtVOER1Y2ZkdjcwUkJ1bW1sTXozWDlQblhFaDdQTE9wTHMrTGZ5NmxH?=
+ =?utf-8?B?eDNzZEhnSXFyOXZ5bkNScE9TM0YwY3Rvb210dC9tQ1VuRU1WUUFzdXQrZ3dC?=
+ =?utf-8?B?bkd2eUR6YitXVHhYN2gyT3JtNXc0NkhJMnFxQWVUOGVERFlTUlZ6bFF0RW9B?=
+ =?utf-8?B?MGxLbUh6ZHU0WGsxWDZHY2dOT0Z4aEsxb3pnUHdnSUE2ckl1aVYvdFVOYUZQ?=
+ =?utf-8?B?UWZzaHMyRmhBNzVna0RVK1kwcUxDWThtZ0twRXk5SzV0WUxiR2g1TzlKcGY2?=
+ =?utf-8?B?bnJ5S0lHcnd2RVEzWVFEVERwcFZ4N2VlWjNhc28zYzM4RkVNZnBhY1g0cGIw?=
+ =?utf-8?B?NmduUUZNWldSdUVCWjRzNWRqK3QweEVtb1F5TWVpdFhHYTRsbkVib0JseklH?=
+ =?utf-8?B?ZmFuRiswaU1hMCt1QzlQWVVHSm8yNjMwdGY0YTZ0anh3bm9JZEpPRzkzeUxj?=
+ =?utf-8?B?UFJkQ1RwRW9jMnZxaThtQUVEbFpBcU92MnNZcWpvb1RJYTBwZnN1QjNlOUJq?=
+ =?utf-8?B?NGpIZWErRjdIYk5xdG9rMGViT0lBMzZFSWhLL1pUN2daTSt3UzFISmtuWFJ3?=
+ =?utf-8?B?dUE5TFB0WmhlLzRGKzh4SGN4TmRnckp6bno2cVRxZENrb1dZVmlzVVc3cWht?=
+ =?utf-8?B?N2txM3VicmwyTVhSV0NadndyTGhJMWpiWk1mODU5WG1RWWc3OXlxZHByQURq?=
+ =?utf-8?B?c0hwZjNLZTlyVXpmcWk0MTZoeGJkU2lqWWgrYnVjZEU1NHJickZuSk1qT2VT?=
+ =?utf-8?B?Q2U3YzIveXBmdFh5ajVzVkxPRVRDYU5HSGcrN0s2QXRMNUgzWUtZQlRFVnp4?=
+ =?utf-8?B?NlZuOHUwcDc0MHFNZ3JqNUNNbFcvUXY1bWd6VmVhdGtCb0dzd01ndVZ2RFFP?=
+ =?utf-8?B?QUJ6cVExbG82bVdEQk5tY2ROWTJaY3pGbFlsdjV2RmZycmpYTjhZNWMrTE1C?=
+ =?utf-8?B?MFdyanI3TDFGVGdpVDVKTTNPY0x2MXJiVGlpMWVzZnBXMGdUQmJUMEplQzZB?=
+ =?utf-8?B?bW1ZSmJ6K1Q2QkJGMERKQ3hMb3pLdXhlMmx1VjU3ZVV4cG5BRVBhWXloREU3?=
+ =?utf-8?B?dDhQK3hOc3pxTlJ6ajJrTSs5SFgrRFhJcmcvZ2pKSm9KV1hnN0V3SFg3RnFE?=
+ =?utf-8?B?MUpmK1I0Q0E3LzlSOTVWM2ZhNFYrS29VUi9vbk5UaGV5UkJaZmJYUWorUzV0?=
+ =?utf-8?B?WC81a05nMXF2RzB2d3MxNnNRQU9DN1VmWlFDdXZHWlRFejljbStlYzVzc3Ry?=
+ =?utf-8?B?dGRvaDZ0UWhHL3ZFd0dhcm1zSVZLNy91eWhRSEcyMHRnNmtqMkZpRDVHZ1Bv?=
+ =?utf-8?B?TE5pSGQzTEhhUGlILzRVUG00NVdHWkxZU2lUdUpMV1dPUDYwY2M0Q2VNYzJa?=
+ =?utf-8?B?UzZEanhTc2o4QXJDVEhydWVFendrMnZEb3hjQUVnNjFEUXErSkVhYzNnOHNN?=
+ =?utf-8?B?blJUc3BlcWJONzZUOHRGejhpK2NQa3NIUEhZaEVPYTg2a29GZG5ETUxBd2J6?=
+ =?utf-8?B?ZzVoU1ZBNkZFc2s4VElaaVhHcEExTDRyZzZ0cTFmb21Zb0V3S1ZDWmY4NzBD?=
+ =?utf-8?Q?G3eDdpIIHcSxXBmfZVY26HbLR?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b1ab8416-2ebf-466f-3df4-08dd51cc810f
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5070.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Feb 2025 16:34:53.8379
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: H76D6BBEbEZ91zd3KwGcn0HStZzfozgjcQJ4wg/l58JQitbatYZW/8//jutnPCxprn8bQhQsRkkMYueYTrXESw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6719
 
-On Wed, 15 Jan 2025 11:29:52 +0100, Md Sadre Alam
-<quic_mdalam@quicinc.com> said:
-> Requirements:
->   In QCE crypto driver we are accessing the crypto engine registers
->   directly via CPU read/write. Trust Zone could possibly to perform some
->   crypto operations simultaneously, a race condition will be created and
->   this could result in undefined behavior.
->
->   To avoid this behavior we need to use BAM HW LOCK/UNLOCK feature on BAM
->   pipes, and this LOCK/UNLOCK will be set via sending a command descriptor,
->   where the HLOS/TZ QCE crypto driver prepares a command descriptor with a
->   dummy write operation on one of the QCE crypto engine register and pass
->   the LOCK/UNLOCK flag along with it.
->
+On 11/13/24 10:24, Tom Lendacky wrote:
+> On 11/12/24 17:22, Dionna Glaze wrote:
+>> From: Alexey Kardashevskiy <aik@amd.com>
+>>
+>> Additions to the error enum after the explicit 0x27 setting for
+>> SEV_RET_INVALID_KEY leads to incorrect value assignments.
+>>
+>> Use explicit values to match the manufacturer specifications more
+>> clearly.
+>>
+>> Fixes: 3a45dc2b419e ("crypto: ccp: Define the SEV-SNP commands")
+>>
+>> CC: Sean Christopherson <seanjc@google.com>
+>> CC: Paolo Bonzini <pbonzini@redhat.com>
+>> CC: Thomas Gleixner <tglx@linutronix.de>
+>> CC: Ingo Molnar <mingo@redhat.com>
+>> CC: Borislav Petkov <bp@alien8.de>
+>> CC: Dave Hansen <dave.hansen@linux.intel.com>
+>> CC: Ashish Kalra <ashish.kalra@amd.com>
+>> CC: Tom Lendacky <thomas.lendacky@amd.com>
+>> CC: John Allen <john.allen@amd.com>
+>> CC: Herbert Xu <herbert@gondor.apana.org.au>
+>> CC: "David S. Miller" <davem@davemloft.net>
+>> CC: Michael Roth <michael.roth@amd.com>
+>> CC: Luis Chamberlain <mcgrof@kernel.org>
+>> CC: Russ Weight <russ.weight@linux.dev>
+>> CC: Danilo Krummrich <dakr@redhat.com>
+>> CC: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+>> CC: "Rafael J. Wysocki" <rafael@kernel.org>
+>> CC: Tianfei zhang <tianfei.zhang@intel.com>
+>> CC: Alexey Kardashevskiy <aik@amd.com>
+>> CC: stable@vger.kernel.org
+>>
+>> Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
+>> Signed-off-by: Dionna Glaze <dionnaglaze@google.com>
+> 
+> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
 
-On rb3gen2 I'm seeing the following when running cryptsetup benchmark:
+@Boris or @Herbert, can we pick up this fix separate from this series?
+It can probably go through either the tip tree or crypto tree.
 
-# cryptsetup benchmark
-# Tests are approximate using memory only (no storage IO).
-PBKDF2-sha1      1452321 iterations per second for 256-bit key
-PBKDF2-sha256    2641249 iterations per second for 256-bit key
-PBKDF2-sha512    1278751 iterations per second for 256-bit key
-PBKDF2-ripemd160  760940 iterations per second for 256-bit key
-PBKDF2-whirlpool     N/A
-argon2i       4 iterations, 1008918 memory, 4 parallel threads (CPUs)
-for 256-bit key (requested 2000 ms time)
-argon2id      4 iterations, 1048576 memory, 4 parallel threads (CPUs)
-for 256-bit key (requested 2000 ms time)
-[   43.558496] NET: Registered PF_ALG protocol family
-[   43.570034] arm-smmu 15000000.iommu: Unhandled context fault:
-fsr=0x402, iova=0xfffdf000, fsynr=0x7b0003, cbfrsynra=0x4e4, cb=0
-[   43.582069] arm-smmu 15000000.iommu: FSR    = 00000402 [Format=2
-TF], SID=0x4e4
-[   43.592758] arm-smmu 15000000.iommu: FSYNR0 = 007b0003 [S1CBNDX=123 PLVL=3]
-[   43.608107] Internal error: synchronous external abort:
-0000000096000010 [#1] PREEMPT SMP
-[   43.616509] Modules linked in: algif_skcipher af_alg bluetooth
-ecdh_generic ecc ipv6 snd_soc_hdmi_codec phy_qcom_edp venus_dec
-venus_enc videobuf2_dma_contig videobuf2_memops nb7vpq904m
-lontium_lt9611uxc msm leds_qcom_lpg qcom_battmgr pmic_glink_altmode
-aux_hpd_bridge ocmem qcom_pbs venus_core ucsi_glink drm_exec
-typec_ucsi qcom_pon qcom_spmi_adc5 led_class_multicolor
-qcom_spmi_temp_alarm rtc_pm8xxx gpu_sched v4l2_mem2mem ath11k_ahb
-qcom_vadc_common nvmem_qcom_spmi_sdam drm_dp_aux_bus videobuf2_v4l2
-qcom_stats dispcc_sc7280 drm_display_helper videodev ath11k
-videobuf2_common coresight_stm drm_client_lib camcc_sc7280
-videocc_sc7280 mac80211 mc i2c_qcom_geni phy_qcom_qmp_combo stm_core
-coresight_replicator aux_bridge coresight_tmc coresight_funnel
-llcc_qcom libarc4 gpi icc_bwmon typec phy_qcom_snps_femto_v2 coresight
-qcrypto qcom_q6v5_pas authenc qcom_pil_info qcom_q6v5 gpucc_sc7280
-ufs_qcom libdes qcom_sysmon qcom_common pinctrl_sc7280_lpass_lpi
-qcom_glink_smem mdt_loader phy_qcom_qmp_ufs lpassaudiocc_sc7280
-[   43.616763]  pinctrl_lpass_lpi cfg80211 phy_qcom_qmp_pcie
-icc_osm_l3 rfkill qcom_rng qrtr nvmem_reboot_mode display_connector
-socinfo drm_kms_helper pmic_glink pdr_interface qcom_pdr_msg
-qmi_helpers drm backlight
-[   43.727571] CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted
-6.14.0-rc3-next-20250220-00012-g2a8d60663e03-dirty #53
-[   43.738291] Hardware name: Qualcomm Technologies, Inc. Robotics RB3gen2 (DT)
-[   43.745535] pstate: 604000c5 (nZCv daIF +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-[   43.752685] pc : bam_dma_irq+0x374/0x3b0
-[   43.756736] lr : bam_dma_irq+0x2c8/0x3b0
-[   43.760781] sp : ffff800080003e90
-[   43.764200] x29: ffff800080003e90 x28: ffffd03eaae84880 x27: 000000009edf8000
-[   43.771543] x26: ffff45a746642c80 x25: 0000000a24f8499b x24: ffff45a742dca080
-[   43.778886] x23: ffff45a742df7600 x22: 000000000000006e x21: ffff8000811c3000
-[   43.786228] x20: ffff45a742df7630 x19: ffff45a742eaab80 x18: 0000000000000001
-[   43.793568] x17: ffff75698e7b4000 x16: ffff800080000000 x15: 0000000000000034
-[   43.800902] x14: 0000000000000038 x13: 0000000000010008 x12: 071c71c71c71c71c
-[   43.808244] x11: 0000000000000040 x10: ffff45a74000a230 x9 : ffff45a74000a228
-[   43.815587] x8 : ffff45a7407a1dd0 x7 : 0000000000000000 x6 : 0000000000000000
-[   43.822920] x5 : ffff45a7407a1da8 x4 : 0000000000000000 x3 : 0000000000000018
-[   43.830253] x2 : ffff8000811c0000 x1 : ffff8000811c0018 x0 : 0000000000000002
-[   43.837594] Call trace:
-[   43.840115]  bam_dma_irq+0x374/0x3b0 (P)
-[   43.844163]  __handle_irq_event_percpu+0x48/0x140
-[   43.849006]  handle_irq_event+0x4c/0xb0
-[   43.852961]  handle_fasteoi_irq+0xa0/0x1bc
-[   43.857186]  handle_irq_desc+0x34/0x58
-[   43.861054]  generic_handle_domain_irq+0x1c/0x28
-[   43.865812]  gic_handle_irq+0x4c/0x120
-[   43.869680]  call_on_irq_stack+0x24/0x64
-[   43.873728]  do_interrupt_handler+0x80/0x84
-[   43.878039]  el1_interrupt+0x34/0x68
-[   43.881732]  el1h_64_irq_handler+0x18/0x24
-[   43.885955]  el1h_64_irq+0x6c/0x70
-[   43.889465]  cpuidle_enter_state+0xac/0x320 (P)
-[   43.894133]  cpuidle_enter+0x38/0x50
-[   43.897826]  do_idle+0x1e4/0x260
-[   43.901151]  cpu_startup_entry+0x38/0x3c
-[   43.905195]  rest_init+0xdc/0xe0
-[   43.908531]  console_on_rootfs+0x0/0x6c
-[   43.912490]  __primary_switched+0x88/0x90
-[   43.916621] Code: b9409063 1b047c21 8b030021 8b010041 (b9000020)
-[   43.922881] ---[ end trace 0000000000000000 ]---
-[   43.927633] Kernel panic - not syncing: synchronous external abort:
-Fatal exception in interrupt
-[   43.936653] SMP: stopping secondary CPUs
-[   43.941042] Kernel Offset: 0x503e28e00000 from 0xffff800080000000
-[   43.947306] PHYS_OFFSET: 0xfff0ba59c0000000
-[   43.951615] CPU features: 0x300,00000170,00801250,8200720b
-[   43.957257] Memory Limit: none
-[   43.960405] ---[ end Kernel panic - not syncing: synchronous
-external abort: Fatal exception in interrupt ]---
+Thanks,
+Tom
 
-Bartosz
+> 
+>> ---
+>>  include/uapi/linux/psp-sev.h | 21 ++++++++++++++-------
+>>  1 file changed, 14 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/include/uapi/linux/psp-sev.h b/include/uapi/linux/psp-sev.h
+>> index 832c15d9155bd..eeb20dfb1fdaa 100644
+>> --- a/include/uapi/linux/psp-sev.h
+>> +++ b/include/uapi/linux/psp-sev.h
+>> @@ -73,13 +73,20 @@ typedef enum {
+>>  	SEV_RET_INVALID_PARAM,
+>>  	SEV_RET_RESOURCE_LIMIT,
+>>  	SEV_RET_SECURE_DATA_INVALID,
+>> -	SEV_RET_INVALID_KEY = 0x27,
+>> -	SEV_RET_INVALID_PAGE_SIZE,
+>> -	SEV_RET_INVALID_PAGE_STATE,
+>> -	SEV_RET_INVALID_MDATA_ENTRY,
+>> -	SEV_RET_INVALID_PAGE_OWNER,
+>> -	SEV_RET_INVALID_PAGE_AEAD_OFLOW,
+>> -	SEV_RET_RMP_INIT_REQUIRED,
+>> +	SEV_RET_INVALID_PAGE_SIZE          = 0x0019,
+>> +	SEV_RET_INVALID_PAGE_STATE         = 0x001A,
+>> +	SEV_RET_INVALID_MDATA_ENTRY        = 0x001B,
+>> +	SEV_RET_INVALID_PAGE_OWNER         = 0x001C,
+>> +	SEV_RET_AEAD_OFLOW                 = 0x001D,
+>> +	SEV_RET_EXIT_RING_BUFFER           = 0x001F,
+>> +	SEV_RET_RMP_INIT_REQUIRED          = 0x0020,
+>> +	SEV_RET_BAD_SVN                    = 0x0021,
+>> +	SEV_RET_BAD_VERSION                = 0x0022,
+>> +	SEV_RET_SHUTDOWN_REQUIRED          = 0x0023,
+>> +	SEV_RET_UPDATE_FAILED              = 0x0024,
+>> +	SEV_RET_RESTORE_REQUIRED           = 0x0025,
+>> +	SEV_RET_RMP_INITIALIZATION_FAILED  = 0x0026,
+>> +	SEV_RET_INVALID_KEY                = 0x0027,
+>>  	SEV_RET_MAX,
+>>  } sev_ret_code;
+>>  
