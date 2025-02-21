@@ -1,50 +1,50 @@
 Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FFDC20CCE7;
-	Fri, 21 Feb 2025 13:05:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D379720E312;
+	Fri, 21 Feb 2025 13:05:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740143139; cv=none; b=sWsJMi8fQE+gPNuzDzYJnWmvXSSZm3FNvoaVZuKABQwd2/khVI6QoGy2I6C8oXkUoDBSJV6ae6L7g6zZ55FRGZzb6pi8numCpNnN54kWMoAFVA58k74PK+chXkqz85HPlbQBfDY7CETnz+898yxeym3lvfwSjTXzDwRh/AMs8Vc=
+	t=1740143139; cv=none; b=Hiqpp1JboHJ3EY/F70KhaEEU3lbDM4XK/I97zh7pXMUMrKbHgMN57uTkUNKX255F7IUtSPzjvJGk6dSvSfWwzM98o2ae0uXW9HUzxDoah4PdNLWAnpqz5FzGdZldnMqkYD0vNEDNbUZQtbb8cgJxWEFveuwdXaCCr23nWRBclRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1740143139; c=relaxed/simple;
-	bh=UqvytLdopItWGXyDMaFScrdLk0zpyWJi+0VnlcphEQ4=;
+	bh=YFQGHQHEVWREtFfoPBas1ZphEeEkrv/cYduerf3nQfI=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=lAAu/mmwTPIbFfXV13UjnzVqiPg7L/7GwsHcKc2L/nG5zItLmshyUitbvPMW/DHZqnK3Ji8ftigNWk9benfVYgIt6yi/SaaI3eSgGWlgbtF01PgIARFUyNAl3wjyJPuJ/6/RrnrbFJg45OYBqKeS3k7mTgZqhQXBNdGiHI4FuMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=LPO9aBDD; arc=none smtp.client-ip=205.220.180.131
+	 In-Reply-To:To:CC; b=pAI2sRsE8AtfOvxpaeisjlQw0PLc3KdbzxWi9pXyMBLQ+/e46j14OmXt7ZexOpX5wh7DW506o6u7or3I5xOuIScJ1I+MssURxpJX2PEEMyDPToxmkf9ejzF/RwZ+4Q8ljs3d1MKI4GGwQXYWZHoruRWpAsyKiZMYNOrQCQ/rxnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Xx+pZRdn; arc=none smtp.client-ip=205.220.180.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="LPO9aBDD"
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51LBulhk008309;
-	Fri, 21 Feb 2025 13:02:41 GMT
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Xx+pZRdn"
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51L6IYHq018868;
+	Fri, 21 Feb 2025 13:02:44 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	a3BtQIhlA8aAG89uR+C8DMvJdtYemVsNlnwoCtpLicg=; b=LPO9aBDDMsxB31dw
-	WyjEK3CLUErmibrT9lWzXMKIOlj9scR21l/EvLCqI1iE+F6d7ajSGM1Q7o7/UTva
-	d6BCo5GfnagS3ZlFBms2f+vn949oTKynvFtUIgGlvTucQIzBAPCpUtJJ7kyNxIls
-	gp2VHXA0pCLqa69VB1ozNks7kF5WZb0sVY3fIhvMfxrNG/9yv9mwvqsZokftd1GN
-	2nTbNp4amwmIW1yvtDpVUeXeW2HKIdUTXbDD+E/BaCPpa8tR4lGMcaskaUE7xURJ
-	tBul1zdDWMev8T8r9cAZcCIQWRVn7cSKVD/7UYWMHBDw1IOKOUSMC6HEBlauMjmc
-	aIzqRQ==
+	/Q9qz3ZZdoCTR7XNck0p4FMWguo74EqG/wO/FOpmnuA=; b=Xx+pZRdnAp2LVSgV
+	CoFPMlTIj6Ajqn8dgmuN++Pj/UUnZY5QhY35b/F4eLgFsFyndQrmr6Q/XtZU6j81
+	nwBvNsxIMiIT9zuaXujzuha6irHDvR8JQi91YYZpYjPS7vMSLtSgCUmhPJpgTojZ
+	SihrwsUWsi+Li/9nDL+M8IrpVsPGg5cL/zrFefccd/5sgHQdnCzjsCUu1E37KKjJ
+	LvvNZ6BBKe9+mDhm8/2RyksgNeFwVdO0k2248vU01eYDO7iHQus+cU0NYDSWJIBa
+	SWT6FRzB8bKJKYIgCKQI/w86ajbsm+E5Uteb/ANM1SMNG9DpYqV/GH4b15VmTvCf
+	kellyw==
 Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44vyy3j2mu-1
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44xm3rhaag-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 21 Feb 2025 13:02:41 +0000 (GMT)
+	Fri, 21 Feb 2025 13:02:43 +0000 (GMT)
 Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 51LD2Whs027840
+	by NASANPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 51LD2gur028017
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 21 Feb 2025 13:02:32 GMT
+	Fri, 21 Feb 2025 13:02:42 GMT
 Received: from hu-zijuhu-lv.qualcomm.com (10.49.16.6) by
  nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Fri, 21 Feb 2025 05:02:31 -0800
+ 15.2.1544.9; Fri, 21 Feb 2025 05:02:41 -0800
 From: Zijun Hu <quic_zijuhu@quicinc.com>
-Date: Fri, 21 Feb 2025 05:02:09 -0800
-Subject: [PATCH *-next 04/18] crypto: scomp - Remove needless return in
- void API crypto_scomp_free_ctx()
+Date: Fri, 21 Feb 2025 05:02:22 -0800
+Subject: [PATCH *-next 17/18] dma-mapping: Remove needless return in five
+ void APIs
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -53,7 +53,7 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-ID: <20250221-rmv_return-v1-4-cc8dff275827@quicinc.com>
+Message-ID: <20250221-rmv_return-v1-17-cc8dff275827@quicinc.com>
 References: <20250221-rmv_return-v1-0-cc8dff275827@quicinc.com>
 In-Reply-To: <20250221-rmv_return-v1-0-cc8dff275827@quicinc.com>
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -109,38 +109,81 @@ X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
  nasanex01a.na.qualcomm.com (10.52.223.231)
 X-QCInternal: smtphost
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: oXrPtGt6iYym3jCKcWCq-N451L8zfZaz
-X-Proofpoint-GUID: oXrPtGt6iYym3jCKcWCq-N451L8zfZaz
+X-Proofpoint-ORIG-GUID: IV7B4yMbMqYcwBNPpAuc_lo8ao45zX7c
+X-Proofpoint-GUID: IV7B4yMbMqYcwBNPpAuc_lo8ao45zX7c
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
  definitions=2025-02-21_04,2025-02-20_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1011
- phishscore=0 adultscore=0 lowpriorityscore=0 bulkscore=0 impostorscore=0
- priorityscore=1501 malwarescore=0 spamscore=0 mlxlogscore=812 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2502100000
- definitions=main-2502210096
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxscore=0
+ suspectscore=0 mlxlogscore=750 phishscore=0 bulkscore=0 lowpriorityscore=0
+ impostorscore=0 malwarescore=0 priorityscore=1501 adultscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2502100000 definitions=main-2502210095
 
-Remove needless 'return' in void API crypto_scomp_free_ctx() since both
-the API and crypto_scomp_alg(@tfm)->free_ctx() are void functions.
+Remove needless 'return' in the following void APIs:
+
+ dma_unmap_single_attrs()
+ dma_sync_single_range_for_cpu()
+ dma_sync_single_range_for_device()
+ dma_free_coherent()
+ dma_free_wc()
+
+Since both the API and callee involved are void functions.
 
 Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
 ---
- include/crypto/internal/scompress.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/linux/dma-mapping.h | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/include/crypto/internal/scompress.h b/include/crypto/internal/scompress.h
-index 07a10fd2d321..44130680dc0a 100644
---- a/include/crypto/internal/scompress.h
-+++ b/include/crypto/internal/scompress.h
-@@ -79,7 +79,7 @@ static inline void *crypto_scomp_alloc_ctx(struct crypto_scomp *tfm)
- static inline void crypto_scomp_free_ctx(struct crypto_scomp *tfm,
- 					 void *ctx)
+diff --git a/include/linux/dma-mapping.h b/include/linux/dma-mapping.h
+index b79925b1c433..a5de6ecaace3 100644
+--- a/include/linux/dma-mapping.h
++++ b/include/linux/dma-mapping.h
+@@ -388,21 +388,21 @@ static inline dma_addr_t dma_map_single_attrs(struct device *dev, void *ptr,
+ static inline void dma_unmap_single_attrs(struct device *dev, dma_addr_t addr,
+ 		size_t size, enum dma_data_direction dir, unsigned long attrs)
  {
--	return crypto_scomp_alg(tfm)->free_ctx(tfm, ctx);
-+	crypto_scomp_alg(tfm)->free_ctx(tfm, ctx);
+-	return dma_unmap_page_attrs(dev, addr, size, dir, attrs);
++	dma_unmap_page_attrs(dev, addr, size, dir, attrs);
  }
  
- static inline int crypto_scomp_compress(struct crypto_scomp *tfm,
+ static inline void dma_sync_single_range_for_cpu(struct device *dev,
+ 		dma_addr_t addr, unsigned long offset, size_t size,
+ 		enum dma_data_direction dir)
+ {
+-	return dma_sync_single_for_cpu(dev, addr + offset, size, dir);
++	dma_sync_single_for_cpu(dev, addr + offset, size, dir);
+ }
+ 
+ static inline void dma_sync_single_range_for_device(struct device *dev,
+ 		dma_addr_t addr, unsigned long offset, size_t size,
+ 		enum dma_data_direction dir)
+ {
+-	return dma_sync_single_for_device(dev, addr + offset, size, dir);
++	dma_sync_single_for_device(dev, addr + offset, size, dir);
+ }
+ 
+ /**
+@@ -478,7 +478,7 @@ static inline void *dma_alloc_coherent(struct device *dev, size_t size,
+ static inline void dma_free_coherent(struct device *dev, size_t size,
+ 		void *cpu_addr, dma_addr_t dma_handle)
+ {
+-	return dma_free_attrs(dev, size, cpu_addr, dma_handle, 0);
++	dma_free_attrs(dev, size, cpu_addr, dma_handle, 0);
+ }
+ 
+ 
+@@ -606,8 +606,8 @@ static inline void *dma_alloc_wc(struct device *dev, size_t size,
+ static inline void dma_free_wc(struct device *dev, size_t size,
+ 			       void *cpu_addr, dma_addr_t dma_addr)
+ {
+-	return dma_free_attrs(dev, size, cpu_addr, dma_addr,
+-			      DMA_ATTR_WRITE_COMBINE);
++	dma_free_attrs(dev, size, cpu_addr, dma_addr,
++		       DMA_ATTR_WRITE_COMBINE);
+ }
+ 
+ static inline int dma_mmap_wc(struct device *dev,
 
 -- 
 2.34.1
