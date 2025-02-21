@@ -1,165 +1,130 @@
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AA9D2512C4
-	for <linux-crypto@vger.kernel.org>; Fri, 21 Feb 2025 19:00:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CDBF1E3DF4;
+	Fri, 21 Feb 2025 19:31:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740164450; cv=none; b=JOnTc7WPq1WRbivgrOg5knjktvGW+FwvjDoRPjXoPXFsfK5F5r1inW+xDzcgtDlDHIgCS2iaq4Negs9FXP5OBVw65Uw+7ggYvt+EubGmrSc0jdFovRL96VP3JghzVxaqihglgA28D8efwgf/Euf0Eo7ZL8vp+tp/RtzjWasXg4E=
+	t=1740166286; cv=none; b=DWXUWLGl9Gky04kZKGZOkvPLre3ThgHCvixtEar1OaLQgKfGknvhHCRPBJuhrjKKmea2rPT9Xul3FaaempKS/xexxcHJ1vYhXo7PpIx6caL2cER9agrIPVgXf+5tJVdAwMJ949mfzRpG4EdU5Omz7OsQQU2e0MpdSMyu8kdkaCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740164450; c=relaxed/simple;
-	bh=8DcTK+BWqvLFgfUlFyhU8LrkRaYzJUE29H3MUIQ1fWs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=D9BHBNXWJtnHwYcfqM/tHgCe92ZsVMZ3LS39bT1R52AmQ9lV0XMZ1V6rl5AEsF2lu7NFwZKFhAlHLq3CycEAxDugDDD5yvG6OPrMIXGWO9pXKes8VVo1oqU2BMoWpAtEzR4rBB8gjmqOwRhT6U5gJpC5xTrXE8e+ifrGsSblaRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=UNYvQFMm; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+	s=arc-20240116; t=1740166286; c=relaxed/simple;
+	bh=OcFmx+DsPBP5CqRzWFl002eCPcOUmr7GbAdpsEhzr4w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C9h/rTEUvLKTTu8OePmmku5wg9y0QW8suu+KkgTE0uOzEvBpv2Ic8tmlW72INo2y4OrwCQC80yVTtV+nSpTwBmC/0HVpZwC0yPdL9lm25ykPGkv57UKnswZKWniPvz4Upp4vjJt1x8J3fKmkgAe1RrtILj2a/xzjFZe+8MdaFo0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M0HqZufP; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="UNYvQFMm"
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-220c4159f87so35606035ad.0
-        for <linux-crypto@vger.kernel.org>; Fri, 21 Feb 2025 11:00:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1740164445; x=1740769245; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=77hh0wQ+sFBBrkK6MEd/a6yvUwrcItGhllYO30mC8s0=;
-        b=UNYvQFMm8ipUKK4diYQfDub/mJ3b9O2f8Chy60VevlYCmcNPan3W66AyRVIA6wmHxj
-         sEdXQvtj4pUx/R+o/c+9Zmw89vLM6qGHXoczVYe/kus4+VnTjeJqo+ISOq5INGRV0add
-         81hc29lvOOsp3WQW7s36p2Duld12MGGM3TexmriVIleBupxJSOy6Al3Ql+53xA39jkAm
-         tQzBJ5C2lr01f30oCQlgv9W7TdqF81kI7Go8YQ7NMuL+vxuNhMzx0DOGJQ7rvDh4FUnV
-         XCi9V8cVRDRleYhP/B6LzIiZc5tevohGrxttxwEdHxmKo7ox8fUQiKFYEXmpgPzY9T2p
-         XsfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740164445; x=1740769245;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=77hh0wQ+sFBBrkK6MEd/a6yvUwrcItGhllYO30mC8s0=;
-        b=FF/CuxCBmYd4TkEeeO27CUUI93FGLOV6yEVXoSdveFY5eUf1KWiBdi5fuwqYfv7auZ
-         ke6BcFPsqOsVNbLdgXap/Et/7I7Q558KayalGmSDMpLqtudwUSLqh2q8I/XRCJIFxHB2
-         wl6P71vE1kD2tnL8NcLznvUtiNzHZ+ZQ05oZmK3TvsVBKRUT5BQcO//70ZtNY0Xco1kX
-         bnaUosjK/phTq2FO8WXOVbuJFT10Rh+rYxAC92WkvnSsebpoIjI6r4RvTXglwUQvIa53
-         7P/cxJvEj9zk9wTr2OnI1u1qNuCEsiuYkbnMh9E8CErs7/UL/bOuEnbMBcO9v2pFSLxw
-         A5xw==
-X-Forwarded-Encrypted: i=1; AJvYcCUrxpCTLCDc2yLaCKWoCUpY8i4n0r1RbrOPzWLKqujaSjL+q76DghUkMaKQrp3hGMVdaoKMIP+RWflOgA0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxzEmpm6ZRcI914GJO2Uw9wyonrkUfKwzfoc5GGw7kqqdyWphTD
-	Io71sHZCicZfUKRq2kElKR4yMRfPPRYFkJeM7HgRG33T4XV/G6UixTRNCx0dTUQ=
-X-Gm-Gg: ASbGncvbnen2/XGza7+lpwAxAUI5PPr+l7DsJXge5tE3vfbn3AApjNlMlfcXBFMM5oO
-	1DzvakxwQOqcpOFeOCmOn/1m1hHNygc8u7desj0njqmK3wsNHhRrVdgzQShtcP2uaATK3izYGG/
-	Uz2cdr+Fs3NaSg7s/2hEZZh357cy4KQqNzxAxrixiWfhrnWdd50eew2ni+LgGRwfNvgMZiIBQ98
-	WTDmekVm1SWPYn6ZajWkb+WgGeJl0F+U6Gk59dLX7DOOh6DuepTZUkYdRhtVLwoTK/VaoDQUyRi
-	0aiupZfplYubly7OjLsWnqCCCOGqDa+Zsw8yStz1yUQ8KoeAUdBs1qCb+1SlsCkzuNffldc2i2n
-	8buQ=
-X-Google-Smtp-Source: AGHT+IGGJurj1ywGFGfMqLad+W4V0w/HWPMlDvnZ5WiNoOtzbXCiXiC9jiI+n/maSmmLogJdgVe5uw==
-X-Received: by 2002:a17:903:2346:b0:21f:6fb9:9299 with SMTP id d9443c01a7336-2219ff5e7c8mr68299995ad.27.1740164445571;
-        Fri, 21 Feb 2025 11:00:45 -0800 (PST)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-220d5364676sm141352715ad.82.2025.02.21.11.00.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 21 Feb 2025 11:00:45 -0800 (PST)
-Date: Fri, 21 Feb 2025 11:00:42 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Zijun Hu <quic_zijuhu@quicinc.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Will Deacon
- <will@kernel.org>, "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Andrew
- Morton <akpm@linux-foundation.org>, Nick Piggin <npiggin@gmail.com>, Peter
- Zijlstra <peterz@infradead.org>, Arnd Bergmann <arnd@arndb.de>, Thomas
- Gleixner <tglx@linutronix.de>, Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, "Rafael J. Wysocki"
- <rafael@kernel.org>, "Danilo Krummrich" <dakr@kernel.org>, Eric Dumazet
- <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Johannes Berg
- <johannes@sipsolutions.net>, "Jamal Hadi Salim" <jhs@mojatatu.com>, Cong
- Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Jason
- Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, Linus Walleij
- <linus.walleij@linaro.org>, "Bartosz Golaszewski" <brgl@bgdev.pl>, Lee
- Jones <lee@kernel.org>, Thomas Graf <tgraf@suug.ch>, Christoph Hellwig
- <hch@lst.de>, Marek Szyprowski <m.szyprowski@samsung.com>, Robin Murphy
- <robin.murphy@arm.com>, "Miquel Raynal" <miquel.raynal@bootlin.com>,
- Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>,
- Zijun Hu <zijun_hu@icloud.com>, <linux-arch@vger.kernel.org>,
- <linux-mm@kvack.org>, <linux-kernel@vger.kernel.org>,
- <linux-crypto@vger.kernel.org>, <netdev@vger.kernel.org>,
- <linux-wireless@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
- <linux-gpio@vger.kernel.org>, <linux-pm@vger.kernel.org>,
- <iommu@lists.linux.dev>, <linux-mtd@lists.infradead.org>
-Subject: Re: [PATCH *-next 00/18] Remove weird and needless 'return' for
- void APIs
-Message-ID: <20250221110042.2ec3c276@hermes.local>
-In-Reply-To: <20250221-rmv_return-v1-0-cc8dff275827@quicinc.com>
-References: <20250221-rmv_return-v1-0-cc8dff275827@quicinc.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M0HqZufP"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13C99C4CED6;
+	Fri, 21 Feb 2025 19:31:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740166286;
+	bh=OcFmx+DsPBP5CqRzWFl002eCPcOUmr7GbAdpsEhzr4w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=M0HqZufPOadn2dlMyrgC+cPT1QIiGxdmxtdItYvN5wLf7ZACCOd4ZVS3GBJ5eypDc
+	 PfMKJGJi+agSGEKxRHJBRxBz2SGoSmcc8bcyB3J5/TSqJdGsXlD2/RieFsSA5BtJzw
+	 7LmvBSqtmwd/h3qs/mHpZDKF2bu8nV0ej2zzwmYlbcQcaHtgZ8PRuvYyaAmVPXuwxi
+	 yQoSeWRBZhPrfUEdK3keQ3XcMHmQxt360P9rNbYOgqUBQ3mg2lEoNfU1Nnx/Mpap+l
+	 E5o/SOcUJgG1upsxgN4UKtvZd11NDXecjRVs+2ZRrYrUlEFUx27rzPQAs4efy0PSdC
+	 HuZJ2hvboIB8Q==
+Date: Fri, 21 Feb 2025 19:31:24 +0000
+From: Eric Biggers <ebiggers@kernel.org>
+To: Xiao Liang <shaw.leon@gmail.com>
+Cc: x86@kernel.org, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	Ben Greear <greearb@candelatech.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Andy Lutomirski <luto@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [RFC PATCH 1/2] x86/fpu: make kernel-mode FPU reliably usable in
+ softirqs
+Message-ID: <20250221193124.GA3790599@google.com>
+References: <20250220051325.340691-1-ebiggers@kernel.org>
+ <20250220051325.340691-2-ebiggers@kernel.org>
+ <CABAhCOQjnSsos3gm4GWrxFUdV8dw-=r_mMn0+xdjnZjJ0PQ9MA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CABAhCOQjnSsos3gm4GWrxFUdV8dw-=r_mMn0+xdjnZjJ0PQ9MA@mail.gmail.com>
 
-On Fri, 21 Feb 2025 05:02:05 -0800
-Zijun Hu <quic_zijuhu@quicinc.com> wrote:
+Hi Xiao,
 
-> This patch series is to remove weird and needless 'return' for
-> void APIs under include/ with the following pattern:
+On Fri, Feb 21, 2025 at 03:38:27PM +0800, Xiao Liang wrote:
+> > Therefore, this patch updates x86 accordingly to reliably support
+> > kernel-mode FPU in softirqs (except when hardirqs are disabled).
+> >
+> > This is done by just disabling softirq processing in kernel-mode FPU
+> > sections, as that prevents the nesting that was problematic.
+> >
+> > This will delay some softirqs slightly, but only ones that would have
+> > otherwise been nested inside a task context kernel-mode FPU section.
+> > Any such softirqs would have taken the slow fallback path before if they
+> > tried to do any en/decryption.  Now these softirqs will just run at the
+> > end of the task context kernel-mode FPU section (since local_bh_enable()
+> > runs pending softirqs) and will no longer take the slow fallback path.
 > 
-> api_header.h:
-> 
-> void api_func_a(...);
-> 
-> static inline void api_func_b(...)
-> {
-> 	return api_func_a(...);
-> }
-> 
-> Remove the needless 'return' in api_func_b().
-> 
-> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
-> ---
-> Zijun Hu (18):
->       mm/mmu_gather: Remove needless return in void API tlb_remove_page()
->       cpu: Remove needless return in void API suspend_enable_secondary_cpus()
->       crypto: api - Remove needless return in void API crypto_free_tfm()
->       crypto: scomp - Remove needless return in void API crypto_scomp_free_ctx()
->       sysfs: Remove needless return in void API sysfs_enable_ns()
->       skbuff: Remove needless return in void API consume_skb()
->       wifi: mac80211: Remove needless return in void API _ieee80211_hw_set()
->       net: sched: Remove needless return in void API qdisc_watchdog_schedule_ns()
->       ipv4/igmp: Remove needless return in void API ip_mc_dec_group()
->       IB/rdmavt: Remove needless return in void API rvt_mod_retry_timer()
->       ratelimit: Remove needless return in void API ratelimit_default_init()
->       siox: Remove needless return in void API siox_driver_unregister()
->       gpiolib: Remove needless return in two void APIs
->       PM: wakeup: Remove needless return in three void APIs
->       mfd: db8500-prcmu: Remove needless return in three void APIs
->       rhashtable: Remove needless return in three void APIs
->       dma-mapping: Remove needless return in five void APIs
->       mtd: nand: Do not return void function in void function
-> 
->  include/asm-generic/tlb.h           |  2 +-
->  include/crypto/internal/scompress.h |  2 +-
->  include/linux/cpu.h                 |  2 +-
->  include/linux/crypto.h              |  2 +-
->  include/linux/dma-mapping.h         | 12 ++++++------
->  include/linux/gpio.h                |  4 ++--
->  include/linux/igmp.h                |  2 +-
->  include/linux/mfd/dbx500-prcmu.h    |  6 +++---
->  include/linux/mtd/nand.h            | 18 ++++++++++++------
->  include/linux/pm_wakeup.h           |  6 +++---
->  include/linux/ratelimit.h           |  4 ++--
->  include/linux/rhashtable.h          |  6 +++---
->  include/linux/siox.h                |  2 +-
->  include/linux/skbuff.h              |  2 +-
->  include/linux/sysfs.h               |  2 +-
->  include/net/mac80211.h              |  2 +-
->  include/net/pkt_sched.h             |  2 +-
->  include/rdma/rdmavt_qp.h            |  2 +-
->  18 files changed, 42 insertions(+), 36 deletions(-)
-> ---
-> base-commit: 2014c95afecee3e76ca4a56956a936e23283f05b
-> change-id: 20250221-rmv_return-f1dc82d492f0
-> 
-> Best regards,
+> I think this will delay all softirqs, including those that don't use
+> FPU. Will there be a performance impact?
+> (I guess you've noticed the patch I submitted last year. And this is
+> the main reason why it was implemented in the way you mentioned as
+> the second alternative.)
 
-Is this something that could be done with a coccinelle script?
+Thanks for taking a look at this patch!  It's true that this patch makes all
+softirqs on the same CPU be delayed until the end of the current kernel-mode FPU
+section.  But, I'm a bit skeptical that it actually matters enough on x86 to go
+with a more complex solution that would allow nested kernel-mode FPU.
+Kernel-mode FPU sections are generally short; the usual cases are en/decrypting
+disk sectors or network packets that are 4 KiB or less.
+
+Even if a longer buffer is passed in, most of the x86 SIMD-optimized code
+already divides the buffer into chunks of at most 4 KiB and uses a separate
+kernel-mode FPU section for each chunk.  This happens either explicitly, or
+implicitly via the skcipher_walk_* functions which never return more than
+PAGE_SIZE (i.e. 4 KiB on x86) in a single step.  There is some code that does
+not do this, e.g. the CRC code, but that could easily be fixed.
+
+The commonly-used x86 SIMD-optimized code is also super fast these days, and is
+only getting faster.  For example, on an AMD desktop processor from this year I
+get roughly 35 GB/s AES-256-XTS, 25 GB/s AES-256-GCM, or 80 GB/s any CRC,
+courtesy of VAES and VPCLMULQDQ (measuring single-threaded throughput at max
+frequency).  That works out to 50-165 nanoseconds per 4 KiB.  Increasingly these
+algorithms can be thought of as similar to memcpy() in speed.
+
+Of course, the worst case is probably about 100x slower -- consider a CPU that
+is much older, and from a low-voltage product line (e.g. Intel Atom), and not
+running at its max frequency, and computing a much slower crypto algorithm that
+lacks hardware acceleration like Serpent-XTS, or even AES-something if the CPU
+is so old (over 15 years) as to lack AES-NI.
+
+But, the super slow crypto algorithms are becoming increasingly rare.  The
+crypto algorithms in use these days tend to have hardware acceleration on x86
+(via AES-NI, PCLMULQDQ, or SHA extensions) or at least be fast with SSE / AVX.
+
+So while the worst case is likely about 20 microseconds on certain systems where
+everything lines up the wrong way, realistically the worst case on most systems
+based on what's actually being used is probably less than 1 microsecond.
+
+That seems probably short enough to be acceptable?  Remember that preemption was
+already being disabled during this time.  And this is only on one CPU.
+
+I think it's also important to note that when local_bh_enable() re-enables
+softirq processing (when called from kernel_fpu_end()), it also immediatelly
+runs any pending softirqs.  Thus there would be no additional delay; the CPU
+will *immediately* run any pending softirqs.
+
+As for supporting nested kernel-mode FPU if we wanted to go that way: yes, your
+patch from last year
+https://lore.kernel.org/lkml/20240403140138.393825-1-shaw.leon@gmail.com/
+ostensibly did that.  However, I found some bugs in it; e.g., it didn't take
+into account that struct fpu is variable-length.  So it didn't turn out as
+simple as that patch made it seem.  Just extending fpregs_{lock,unlock}() to
+kernel-mode FPU is a simpler solution with fewer edge cases, and it avoids
+increasing the memory usage of the kernel.  So I thought I'd propose that first.
+
+- Eric
