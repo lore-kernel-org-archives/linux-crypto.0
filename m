@@ -1,151 +1,186 @@
-Received: from flow-a5-smtp.messagingengine.com (flow-a5-smtp.messagingengine.com [103.168.172.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D04601D5CCC;
-	Fri, 21 Feb 2025 15:42:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EAB31FF1CB
+	for <linux-crypto@vger.kernel.org>; Fri, 21 Feb 2025 17:10:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740152532; cv=none; b=Mdx1IT/hsDFGOs8qoan9jttG/uhTSegkMlG843mNtdOwGYF4iM6Ue35+I0M9vQX8QmmShKghlWQgn8dQk8X/zXrRb3h2BiqyKHcoh9cP1/3pE3bT9XWccEa0UJgUVDr8dOzZn5jq1NauABA20fyRB0X24ndpOFbY0env+4bfbUQ=
+	t=1740157814; cv=none; b=MxHoPNSjmgiZX1vYRo2XDDTq/SHQ29HIozE2pxBo+17Ph7b+1cNdlYch1YuXd8zDIeQvOMCwzUopWrmD3EnV1FvvqZ3rYcHy1imAf+iXBsguujl71S4aM7sb2d9MixO1oHi1aXADDtP7xuNFEuYCD8x3FqtEa0soAZ6GRTCOT3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740152532; c=relaxed/simple;
-	bh=QqbTVfRf9FmdvF8GodySpCwEsO8rjlDVjLOto+qoQ2k=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=WnXfwK3fqOvm3TRp1PBrUIB9WXVsnICw4/qc3hI6slLLAuHcK9BbiYmNd08HfNAm2Blj0qv1vakQ+4Rb/t8yGiQmY19PIJ3ls4l7Y6iFxdQnQO4yK8hs3Sp38AqNdZd4WSEWfg/+/tWWsd5vwA39OEeXlFU0SwmAT7Jr1sTgRD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=Aua5F14v; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=hK/x4O6o; arc=none smtp.client-ip=103.168.172.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	s=arc-20240116; t=1740157814; c=relaxed/simple;
+	bh=aeZfSLvONakrPfUFPz6/WEr+o9IGTdzP41h/PEH+b6E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OI3oVLz6bf3nmpTO3quuErjmr8bHM+nZJv/hTUhq7zyJWNeviUkMZ959gddIvXOjQpCazfNlPH4x+BwZvw2Yue8OYszU5jdj1yKB76Pu1+wz0FECblyXBtg6VVu2YPgu0yo/k2E0kEaigFygoUqr9b6cLyFImckJ1CkkyuvR9So=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KxfAqnV9; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="Aua5F14v";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="hK/x4O6o"
-Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
-	by mailflow.phl.internal (Postfix) with ESMTP id 68A162008E9;
-	Fri, 21 Feb 2025 10:42:07 -0500 (EST)
-Received: from phl-imap-11 ([10.202.2.101])
-  by phl-compute-11.internal (MEProxy); Fri, 21 Feb 2025 10:42:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1740152527;
-	 x=1740159727; bh=Zogi8f8M8Um40C2L5aiooebB5l2P6zGuaVkKnMZ0aqo=; b=
-	Aua5F14vWebL0DOxXVcNVFiZkYyvO+ZDn0lBIGthpSro7L8yySiSiaVg08WR7pLs
-	JojgEjUtKFzq3p96R+2HmZUtkfnB835nBY2UB1NRwsKhE3G6/KpCcrJCM9nOPLjg
-	2axdv5yBZa5jZAlSVtFXsSKh6/ocWFYVTAyli8xq5LHUWD1AKQJ5G4+Mr/4ewUSx
-	Yn/azkxhSGwazkgtAuJI1r5HiztAgb54Hy57zjASBXgbNstUSX1FQ056H8+WzBWb
-	bY73DEtylf/GOrATlkUX6KJLQyEzNftkEsaFLVyJSfRZdT3QoOtN3rFZ19iqpA5R
-	KJtz9HVtMoMVC5CtzTJTYw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1740152527; x=
-	1740159727; bh=Zogi8f8M8Um40C2L5aiooebB5l2P6zGuaVkKnMZ0aqo=; b=h
-	K/x4O6oyNBPbMt/oANZVu7iwmMXMPEIsjZuQL8HZIOTsUUJO7Auhm1hFIArdijoJ
-	AB7VBKyq2IuRmCYnjPjcsdGs9S/cnI6aMm4jXLNLxVrlFDCnDgv/of6zLAJcxDcI
-	eL4AzPwv+QV8bY2ycaIOH64w/uZlZdCJ8e62DGEoD1siZA0vWqTZ/ReNgiqYKlv1
-	mihPOMp/ykpji+1Q19VspQRFz5r4aZTlYen0gNe9e7yhu15yzjE/MGurq1TMqurP
-	hR+5nH3l3BZzUbTYF6NMvpDtU6o63shcpD1jG8+Rp04xMu2H9dbuLLoa9S/eymhA
-	yXXAttMvAK8zmGaHmjzhA==
-X-ME-Sender: <xms:zJ64Z_O-mJRwvj1sCRG9GGTKNu1XV-MwxBvTkYAwkyjdP5scRxTp6w>
-    <xme:zJ64Z5-7kYr4fO9OJH0gelcDWR2xhP9EYBEJ8--FzYH7AgrGrnjPAP3VTDrGorGbV
-    -A7lGF4HomKqch4ruc>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdejtdegtdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenucfjughrpefoggffhffvvefkjghfufgtgfesthejredtredt
-    tdenucfhrhhomhepfdetrhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusg
-    druggvqeenucggtffrrghtthgvrhhnpefhtdfhvddtfeehudekteeggffghfejgeegteef
-    gffgvedugeduveelvdekhfdvieenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
-    epmhgrihhlfhhrohhmpegrrhhnugesrghrnhgusgdruggvpdhnsggprhgtphhtthhopeeg
-    gedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprhhosghinhdrmhhurhhphhihse
-    grrhhmrdgtohhmpdhrtghpthhtohepsghrghhlsegsghguvghvrdhplhdprhgtphhtthho
-    pehmihhquhgvlhdrrhgrhihnrghlsegsohhothhlihhnrdgtohhmpdhrtghpthhtohepug
-    grvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehnphhighhgihhnsehg
-    mhgrihhlrdgtohhmpdhrtghpthhtohepgihihihouhdrfigrnhhgtghonhhgsehgmhgrih
-    hlrdgtohhmpdhrtghpthhtohephhgvrhgsvghrthesghhonhguohhrrdgrphgrnhgrrdho
-    rhhgrdgruhdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtg
-    hpthhtohepiihijhhunhgphhhusehitghlohhuugdrtghomh
-X-ME-Proxy: <xmx:zJ64Z-QUkr7NyVicJsKDYCmEUML1cB41zvxitesRRl9w-vpZ4FIx9Q>
-    <xmx:zJ64ZzspC6JLy2xq6-H8dKC9b0W5UnN9XvAeR1biFGIhHAZHAhfaHQ>
-    <xmx:zJ64Z3dUc26wh_PxcfOohxsJWUrbvmi2AkE15Toc-0r6NXyMPFxzTg>
-    <xmx:zJ64Z_18mDWkVYuOyPdwsKM_ggsOAz5LQTjd3DnTKUlYpcS_8aoEYw>
-    <xmx:z564Z_SJKpL1igBqLIymTzZOJvFYGQRqn-AF7i_kx_KjtJ_VxT8ih3L7>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 469352220072; Fri, 21 Feb 2025 10:42:04 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KxfAqnV9"
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-439ac3216dcso11712915e9.1
+        for <linux-crypto@vger.kernel.org>; Fri, 21 Feb 2025 09:10:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740157811; x=1740762611; darn=vger.kernel.org;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9Ae5OH7jwtkminWKyF9PaRglXPc6x2IkfIyVHHThfxY=;
+        b=KxfAqnV9ZfFtqjWVvQBrWEs09AEtjeoqIQLN7k3u7sUqge3nP0eHwF/4C7k0cS6FYm
+         A9eHzf0DaYgwo1b2xRVtgwqAg7X65q1VV/McghBBWgNdnMclCImICPW9oeAfXW1qq1ZU
+         /PyhNKx1rwHrzlI7sjK86zRJjM2vddp9gI/EqOqE82IFLNJ6NWDWO/h5OiaeN+ypcAJC
+         J5ff38xRCU2ey3y23/jfDuwxARXASLXxSxeACD6OGktT31lxQWfu7j/gDVWVyGRM8tiA
+         bVVt5QfDceiVliw1vPWvPGWXe6sN8ebtifjxJUaHp8vPq20mHER+10GnrFn27xq8vThD
+         y70Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740157811; x=1740762611;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9Ae5OH7jwtkminWKyF9PaRglXPc6x2IkfIyVHHThfxY=;
+        b=WFGwT8VA01LHtFAJXskYhUtVD79uuu+8BLZg5AMOzdeXVhyWj/ZxbZQTVYDpg+Lf7o
+         +Z4e8qaY5gh59CuaVawq5apPFwr+omV+uIVHyVmftwUYLVpgV0uguoovguQnTij+a03O
+         iMuoBm5ut0D/doAgsx4d6AzpEi77guEXEGFsY/MyYgZvypL3g0LaUVUHOLTY1JqBZl0h
+         tVZEppd+K+nqlNn6VzKEdsr5IowTdxmoDch03qcAKFKuk+nKh51gqpvEEmc5ryFIZ9t6
+         SupGFgyr+a8mMVYuMY+e9Z/+KtalE9l2rrdL7Wf3ljVxPI5z3e5vHvEu3lJh8BACXKFN
+         KB/g==
+X-Forwarded-Encrypted: i=1; AJvYcCVWk0NT7KlW5TaaXe6ngvyGhozxKo8GScsL6mLCxWHpx7iJBpRCMxSiUgNSEM08Mvas5PyMSfUUzy+EFmM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwscfrN+E61AYoX2hFiH//CVm4CTk/SYqW/x3OypsGq6DAK1V5V
+	AUEqX7oXh1p1xcTeRO4rzv06CzopG8q2WNUuzCve0b4KJH9hIovI+PideYtA4g==
+X-Gm-Gg: ASbGncs0QyofB2VI1STwvPQSUl6j2E8BEQkn7biaNglAaT3umJlewjlIJyOAMmjrnJU
+	pIozJc/L5s4G6rWmPYfLeD3lazsw/SCce1thFzZc8SaIspLJpDa9Tl7J60pZzxx3BNmNHJA9Wnz
+	/4r42FOoh5N89diDujHbrDd5wGZDL2zYZNqqSAFqNYpndFzkHCAXQY1nHAODxX8jLJjCTFg+Yll
+	DDWcSls5Sud9MMT5vD/5wiGf4OVHSr6R9SDplZ4PT3kIB7ako74QIjkYeAZ2uAOBPqaCDu4gXNa
+	pO7N/Y7S9EShfQC/8yCaeRWgsq2Xe6ol2RefwSHpUpX8StG7H0g16G8e2Q8U
+X-Google-Smtp-Source: AGHT+IEhS0wHzWZ8v8tDe/zSH7y0WxAcPZjhTbw7jssA/vfQ5STDgIJLHbo0vQIMFfjV4xZX+eKRaw==
+X-Received: by 2002:a05:6000:154a:b0:38d:e3da:8b50 with SMTP id ffacd0b85a97d-38f7082821bmr3755812f8f.39.1740157810923;
+        Fri, 21 Feb 2025 09:10:10 -0800 (PST)
+Received: from elver.google.com ([2a00:79e0:2834:9:9d7a:cec:e5e:1ee2])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38f561bee3esm9232017f8f.21.2025.02.21.09.10.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Feb 2025 09:10:10 -0800 (PST)
+Date: Fri, 21 Feb 2025 18:10:02 +0100
+From: Marco Elver <elver@google.com>
+To: "Paul E. McKenney" <paulmck@kernel.org>
+Cc: Alexander Potapenko <glider@google.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Bill Wendling <morbo@google.com>, Boqun Feng <boqun.feng@gmail.com>,
+	Dmitry Vyukov <dvyukov@google.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Ingo Molnar <mingo@kernel.org>, Jann Horn <jannh@google.com>,
+	Joel Fernandes <joel@joelfernandes.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>,
+	kasan-dev@googlegroups.com, linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev, rcu@vger.kernel.org,
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCH RFC 15/24] rcu: Support Clang's capability analysis
+Message-ID: <Z7izasDAOC_Vtaeh@elver.google.com>
+References: <20250206181711.1902989-1-elver@google.com>
+ <20250206181711.1902989-16-elver@google.com>
+ <a1483cb1-13a5-4d6e-87b0-fda5f66b0817@paulmck-laptop>
+ <CANpmjNOPiZ=h69V207AfcvWOB=Q+6QWzBKoKk1qTPVdfKsDQDw@mail.gmail.com>
+ <3f255ebb-80ca-4073-9d15-fa814d0d7528@paulmck-laptop>
+ <CANpmjNNHTg+uLOe-LaT-5OFP+bHaNxnKUskXqVricTbAppm-Dw@mail.gmail.com>
+ <772d8ec7-e743-4ea8-8d62-6acd80bdbc20@paulmck-laptop>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Fri, 21 Feb 2025 16:40:58 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Zijun Hu" <quic_zijuhu@quicinc.com>,
- "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
- "Will Deacon" <will@kernel.org>,
- "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
- "Andrew Morton" <akpm@linux-foundation.org>,
- "Nicholas Piggin" <npiggin@gmail.com>,
- "Peter Zijlstra" <peterz@infradead.org>,
- "Thomas Gleixner" <tglx@linutronix.de>,
- "Herbert Xu" <herbert@gondor.apana.org.au>,
- "David S . Miller" <davem@davemloft.net>,
- "Rafael J . Wysocki" <rafael@kernel.org>,
- "Danilo Krummrich" <dakr@kernel.org>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>,
- "Johannes Berg" <johannes@sipsolutions.net>,
- "Jamal Hadi Salim" <jhs@mojatatu.com>,
- "Cong Wang" <xiyou.wangcong@gmail.com>, "Jiri Pirko" <jiri@resnulli.us>,
- "Jason Gunthorpe" <jgg@ziepe.ca>, "Leon Romanovsky" <leon@kernel.org>,
- "Linus Walleij" <linus.walleij@linaro.org>,
- "Bartosz Golaszewski" <brgl@bgdev.pl>, "Lee Jones" <lee@kernel.org>,
- "Thomas Graf" <tgraf@suug.ch>, "Christoph Hellwig" <hch@lst.de>,
- "Marek Szyprowski" <m.szyprowski@samsung.com>,
- "Robin Murphy" <robin.murphy@arm.com>,
- "Miquel Raynal" <miquel.raynal@bootlin.com>,
- "Richard Weinberger" <richard@nod.at>,
- "Vignesh Raghavendra" <vigneshr@ti.com>
-Cc: "Zijun Hu" <zijun_hu@icloud.com>, Linux-Arch <linux-arch@vger.kernel.org>,
- linux-mm@kvack.org, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
- linux-wireless@vger.kernel.org, linux-rdma@vger.kernel.org,
- "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
- linux-pm@vger.kernel.org, iommu@lists.linux.dev,
- linux-mtd@lists.infradead.org
-Message-Id: <5d662c4c-76f7-4e5c-82f3-2aeeaf9e3311@app.fastmail.com>
-In-Reply-To: <20250221-rmv_return-v1-0-cc8dff275827@quicinc.com>
-References: <20250221-rmv_return-v1-0-cc8dff275827@quicinc.com>
-Subject: Re: [PATCH *-next 00/18] Remove weird and needless 'return' for void APIs
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <772d8ec7-e743-4ea8-8d62-6acd80bdbc20@paulmck-laptop>
+User-Agent: Mutt/2.2.13 (2024-03-09)
 
-On Fri, Feb 21, 2025, at 14:02, Zijun Hu wrote:
-> This patch series is to remove weird and needless 'return' for
-> void APIs under include/ with the following pattern:
->
-> api_header.h:
->
-> void api_func_a(...);
->
-> static inline void api_func_b(...)
-> {
-> 	return api_func_a(...);
-> }
->
-> Remove the needless 'return' in api_func_b().
->
-> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+On Thu, Feb 20, 2025 at 05:26PM -0800, Paul E. McKenney wrote:
+[...]
+> > That's what I've tried with this patch (rcu_read_lock_bh() also
+> > acquires "RCU", on top of "RCU_BH"). I need to add a re-entrancy test,
+> > and make sure it doesn't complain about that. At a later stage we
+> > might also want to add more general "BH" and "IRQ" capabilities to
+> > denote they're disabled when held, but that'd overcomplicate the first
+> > version of this series.
+> 
+> Fair enough!  Then would it work to just do "RCU" now, and ad the "BH"
+> and "IRQ" when those capabilities are added?
 
-I have no objection to the changes, but I think you should
-describe the motivation for them beyond them being 'weird'.
+I tried if this kind of re-entrant locking works - a test like this:
 
-Do these 'return' statements get in the way of some other
-work you are doing? Is there a compiler warning you want
-to enable to ensure they don't come back? Is this all of
-the instances in the kernel or just the ones you found by
-inspection?
+ | --- a/lib/test_capability-analysis.c
+ | +++ b/lib/test_capability-analysis.c
+ | @@ -370,6 +370,15 @@ static void __used test_rcu_guarded_reader(struct test_rcu_data *d)
+ |  	rcu_read_unlock_sched();
+ |  }
+ |  
+ | +static void __used test_rcu_reentrancy(struct test_rcu_data *d)
+ | +{
+ | +	rcu_read_lock();
+ | +	rcu_read_lock_bh();
+ | +	(void)rcu_dereference(d->data);
+ | +	rcu_read_unlock_bh();
+ | +	rcu_read_unlock();
+ | +}
 
-    Arnd
+
+ | $ make lib/test_capability-analysis.o
+ |   DESCEND objtool
+ |   CC      arch/x86/kernel/asm-offsets.s
+ |   INSTALL libsubcmd_headers
+ |   CALL    scripts/checksyscalls.sh
+ |   CC      lib/test_capability-analysis.o
+ | lib/test_capability-analysis.c:376:2: error: acquiring __capability_RCU 'RCU' that is already held [-Werror,-Wthread-safety-analysis]
+ |   376 |         rcu_read_lock_bh();
+ |       |         ^
+ | lib/test_capability-analysis.c:375:2: note: __capability_RCU acquired here
+ |   375 |         rcu_read_lock();
+ |       |         ^
+ | lib/test_capability-analysis.c:379:2: error: releasing __capability_RCU 'RCU' that was not held [-Werror,-Wthread-safety-analysis]
+ |   379 |         rcu_read_unlock();
+ |       |         ^
+ | lib/test_capability-analysis.c:378:2: note: __capability_RCU released here
+ |   378 |         rcu_read_unlock_bh();
+ |       |         ^
+ | 2 errors generated.
+ | make[3]: *** [scripts/Makefile.build:207: lib/test_capability-analysis.o] Error 1
+ | make[2]: *** [scripts/Makefile.build:465: lib] Error 2
+
+
+... unfortunately even for shared locks, the compiler does not like
+re-entrancy yet. It's not yet supported, and to fix that I'd have to go
+and implement that in Clang first before coming back to this.
+
+I see 2 options for now:
+
+  a. Accepting the limitation that doing a rcu_read_lock() (and
+     variants) while the RCU read lock is already held in the same function
+     will result in a false positive warning (like above). Cases like that
+     will need to disable the analysis for that piece of code.
+
+  b. Make the compiler not warn about unbalanced rcu_read_lock/unlock(),
+     but instead just help enforce a rcu_read_lock() was issued somewhere
+     in the function before an RCU-guarded access.
+
+Option (b) is obviously weaker than (a), but avoids the false positives
+while accepting more false negatives.
+
+For all the code that I have already tested this on I observed no false
+positives, so I'd go with (a), but I'm also fine with the weaker
+checking for now until the compiler gains re-entrancy support.
+
+Preferences?
+
+Thanks,
+-- Marco
