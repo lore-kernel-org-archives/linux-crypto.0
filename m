@@ -1,79 +1,110 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from xry111.site (xry111.site [89.208.246.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50EAE200136;
-	Fri, 21 Feb 2025 09:26:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5A032AE89;
+	Fri, 21 Feb 2025 11:34:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.208.246.23
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740129983; cv=none; b=BDmcDWw3XQU/KIRGXvhOkn9i62QzmSSJKZISn65Bt/5Fk+MgIw0Drf3RGiPZG3qK3cKzuPIzbGo8c/WwKs09to12SAq5KAG306uJbiMHHgVu6hoE7DDAtg0cSgRe/IlJgDEtmfdsspoHaCzYvdrppBk1NQ4cyz9sjTDmKySVRxY=
+	t=1740137649; cv=none; b=NaXxw/XR4y0e/9Vsq2dSvjZXfUeiovNk2pLx6ptU3mMT3hWa5QdxRicHguDkiXoOvoZMdTHovQ558giglErAiZjYdBTVC3K2baxlOmViSZQIJYiiwJ2bCP0Vq4nIntHYNAdLVBDSeiSvOWsch0Y2aWO1VKRvQ6D4jUHXNyMr35c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740129983; c=relaxed/simple;
-	bh=hOSsedCj3g38FhSSOd3SZ3fzOuo+HAK04UOzp4+ZXs4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XQh4o6xZF6sFmam62nf2PjBHCM4G5n0zdhOoG0r23oMK6fsMR7kqTIVAPdRNwCVFAuY58u0xesDNRhkegmQz9apPUgwp0Ikf/uG7jXVzCJLB8JGH1Z2tLPfbaCaAzrI2NPm5fmU5rPjJw8tvK8iGG2gSP6c5E+Iu3Saa4gzqcXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=kG7XmSet; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1740137649; c=relaxed/simple;
+	bh=OS9hY96E/r8fylEp9fwxYpkQLLw5dBFt3WyoGpksN6I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FeR3n8PDabA07aM/KGdp6OldDvj0gmsLEk6IyD5CDMIRw7azqj8IV3poTVkQGlJc8pWVeJ+jUfjLJnZ7wJO31u/qeuda46951LuI7+dibZY6H+8LB9zrBCf4qyieMsCuZ4mL+eUHL7sh8NeGRHw8J3Qejc7F6Jueqv8bzLNKVhU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site; spf=pass smtp.mailfrom=xry111.site; dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b=amq0o053; arc=none smtp.client-ip=89.208.246.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=xry111.site
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=xry111.site
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="kG7XmSet"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=XVUfXHkgpf0123n4/unRomqnVdNIJe5wzJMUHc/kqRE=; b=kG7XmSetoUZNQPGCyJL6PT6Gm0
-	N6tTiUhuzxjKG+Fmgqn42cXHYBopi+X4PM0AY9OfGgP4vxXrkLnMYYfn7/WNzLkGJgG0e1OXuct5v
-	c7gZHkjizflCnSjVkuwLcEmuvWHf7iluts+cY/OllGDpWhVmbbyWm8PGXmr3EPU3gWOLIbs7oPbJl
-	hbREmBl3R/iYaMktJ5SjctwVgp5BdfF7QhfAcVf4b7Cw9WkxeHDCtu/TvaqBW6lE3rD9o2pmM0922
-	ElicLgm5czPVDjG7Pc81dDOnR1NMTbE66eUZpvC5v3pQzKSirHXrUrxB5NTLcFZAR3xo3Z8RTUwC4
-	agpOZtag==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tlPIR-000YQo-20;
-	Fri, 21 Feb 2025 17:26:12 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 21 Feb 2025 17:26:11 +0800
-Date: Fri, 21 Feb 2025 17:26:11 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Antoine Tenart <atenart@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Richard van Schagen <vschagen@icloud.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Dan Carpenter <dan.carpenter@linaro.org>
-Subject: Re: [PATCH] crypto: inside-secure: eip93: Correctly handle return of
- for sg_nents_for_len
-Message-ID: <Z7hGs9rzgceurzWo@gondor.apana.org.au>
-References: <20250215233621.6277-1-ansuelsmth@gmail.com>
+	dkim=pass (1024-bit key) header.d=xry111.site header.i=@xry111.site header.b="amq0o053"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=xry111.site;
+	s=default; t=1740137647;
+	bh=Cc8ye2VMQWy+pBTH7jzTDaj20fNnEg8wmnHIfxMAHh8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=amq0o05359nZly4KUjcES+dsDoBoRWd42N1782YEbjVd7UEBtI2L5JF0TbIJG8KzU
+	 pzQLPcngYjmPkOoVJNLLmQaVdeEJRAC17ywo0O+86sQI4TdamXmX9SCHhc+UlJX2Yp
+	 mNJE9vQDNHKQP9detTCqWxIRgZpk9CRrsDn2HJRU=
+Received: from stargazer.. (unknown [IPv6:240e:454:4311:1f25:535e:dcbe:c175:b1da])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (secp384r1) server-digest SHA384)
+	(Client did not present a certificate)
+	(Authenticated sender: xry111@xry111.site)
+	by xry111.site (Postfix) with ESMTPSA id CCC45664E4;
+	Fri, 21 Feb 2025 06:34:01 -0500 (EST)
+From: Xi Ruoyao <xry111@xry111.site>
+To: Huacai Chen <chenhuacai@kernel.org>,
+	WANG Xuerui <kernel@xen0n.name>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: linux-crypto@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Xi Ruoyao <xry111@xry111.site>
+Subject: [PATCH] LoongArch: vDSO: vgetrandom-chacha: Make use of the t8 register
+Date: Fri, 21 Feb 2025 19:32:43 +0800
+Message-ID: <20250221113341.108063-1-xry111@xry111.site>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250215233621.6277-1-ansuelsmth@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Sun, Feb 16, 2025 at 12:36:18AM +0100, Christian Marangi wrote:
-> Fix smatch warning for sg_nents_for_len return value in Inside Secure
-> EIP93 driver.
-> 
-> The return value of sg_nents_for_len was assigned to an u32 and the
-> error was ignored and converted to a positive integer.
-> 
-> Rework the code to correctly handle the error from sg_nents_for_len to
-> mute smatch warning.
-> 
-> Fixes: 9739f5f93b78 ("crypto: eip93 - Add Inside Secure SafeXcel EIP-93 crypto engine support")
-> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> ---
->  .../crypto/inside-secure/eip93/eip93-common.c | 25 ++++++++++++++-----
->  1 file changed, 19 insertions(+), 6 deletions(-)
+So we don't need to reuse a register and rematerialize a constant.  I
+couldn't count :(.
 
-Patch applied.  Thanks.
+Signed-off-by: Xi Ruoyao <xry111@xry111.site>
+---
+
+Tested with vdso_test_getrandom and vdso_test_chacha.
+
+ arch/loongarch/vdso/vgetrandom-chacha.S | 13 +++----------
+ 1 file changed, 3 insertions(+), 10 deletions(-)
+
+diff --git a/arch/loongarch/vdso/vgetrandom-chacha.S b/arch/loongarch/vdso/vgetrandom-chacha.S
+index c2733e6c3a8d..c4dd2bab8825 100644
+--- a/arch/loongarch/vdso/vgetrandom-chacha.S
++++ b/arch/loongarch/vdso/vgetrandom-chacha.S
+@@ -58,9 +58,7 @@ SYM_FUNC_START(__arch_chacha20_blocks_nostack)
+ #define copy0		t5
+ #define copy1		t6
+ #define copy2		t7
+-
+-/* Reuse i as copy3 */
+-#define copy3		i
++#define copy3		t8
+ 
+ /* Packs to be used with OP_4REG */
+ #define line0		state0, state1, state2, state3
+@@ -99,6 +97,7 @@ SYM_FUNC_START(__arch_chacha20_blocks_nostack)
+ 	li.w		copy0, 0x61707865
+ 	li.w		copy1, 0x3320646e
+ 	li.w		copy2, 0x79622d32
++	li.w		copy3, 0x6b206574
+ 
+ 	ld.w		cnt_lo, counter, 0
+ 	ld.w		cnt_hi, counter, 4
+@@ -108,7 +107,7 @@ SYM_FUNC_START(__arch_chacha20_blocks_nostack)
+ 	move		state0, copy0
+ 	move		state1, copy1
+ 	move		state2, copy2
+-	li.w		state3, 0x6b206574
++	move		state3, copy3
+ 
+ 	/* state[4,5,..,11] = key */
+ 	ld.w		state4, key, 0
+@@ -167,12 +166,6 @@ SYM_FUNC_START(__arch_chacha20_blocks_nostack)
+ 	addi.w		i, i, -1
+ 	bnez		i, .Lpermute
+ 
+-	/*
+-	 * copy[3] = "expa", materialize it here because copy[3] shares the
+-	 * same register with i which just became dead.
+-	 */
+-	li.w		copy3, 0x6b206574
+-
+ 	/* output[0,1,2,3] = copy[0,1,2,3] + state[0,1,2,3] */
+ 	OP_4REG	add.w	line0, copy
+ 	st.w		state0, output, 0
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.48.1
+
