@@ -1,101 +1,126 @@
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E2E11D7E50;
-	Fri, 21 Feb 2025 19:37:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43A4E1FC7E6
+	for <linux-crypto@vger.kernel.org>; Fri, 21 Feb 2025 19:47:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740166631; cv=none; b=WruvxAK7FFkF9clZ5vCpWqlkXLGqmWvJRta3G6WMko6FDE8DC3cYwlcLUGMYh9rhkQ5BVpDzGJdzH4SxSnypEQCVg+YousihfUjC4mXWfdg2yR87cEvdQy4AmBJVSl7pAyI/JX+5BosqcnDQhgKgxE4Y3WIMpXa6CTjY/AMAt8E=
+	t=1740167244; cv=none; b=KDiDTWPnfOEykH5bTSuvDsMPukg5Q7615AYOqXvncw1DAgln/aTXbYPHUB9Rt/FjBnrYCxnP8VBR3Cim0qNbNFTDUBsup+Dz1mGZDu46/hhzs26dN44e26Lt9GMkNHziNJ0ZXA8bjDApRf8IKxWBjB6xSochcah/sJSa2Vc3E8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740166631; c=relaxed/simple;
-	bh=zDxTSXduPQXA4xHKPlyHXnfxQxWR7o6zkvl4FTCCsPY=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=dmMWGoXoXEY6oa8NJhs9jrpdSplL+kDw7q2ViLlL0fllnhUaeKbbPldHibjk69kcp+JDhLIgdDjn64HeK+mChoNMUEZPIZpmWG6GvWoWFC8XUaYIrxRjYVJtiUslNOCSHXFSHRhinOh8y343oOmD50Fr5SuOr26mT0jwz/8vYhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=nXuh8rCG; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+	s=arc-20240116; t=1740167244; c=relaxed/simple;
+	bh=ncoDsRKjh28vVH6GzAvugCMHO3v1MHxTwR6FKJOs+vU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NBrQ4CYRvshivktVwMqNvS0wlejoWaTwFjGfgIxf6o9nOs2n08CC00S098fI8p8dZjGcR0zwo8BZB5h+5RxNPiEs1mX2PRrQru6IBb6Vxhb8RnSRD0KkrzRh7oExhVm9NKh3muwwOV0mk1xotMn336MFE054cA1hL00TQJSowK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Rlw3cuGI; arc=none smtp.client-ip=209.85.216.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="nXuh8rCG"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=zDxTSXduPQXA4xHKPlyHXnfxQxWR7o6zkvl4FTCCsPY=;
-	t=1740166629; x=1741376229; b=nXuh8rCGqsfC3M2xAznPkwmoiPBWtC+d9yFk7989Wm+EiBe
-	cq6CGtatT5XGh/DqtDIy+UVkvnpDwSnALN0h3GIkDMzWpdgd0M5LrLl9kUwr0WoiJ2jv9rXYWI98t
-	BX94haLt4oatQhLfxjfHjJ8bLruAkrTbhAq3hnbNU5LBsY850740i8Yk2zyjzlGjCma/Q8f9c/yHY
-	4YT8TYd3DU76NDpemOfAkK2N1vbWMftzJ6EIK6LI8rw1hG1xmbpVS/h91s7ASEIGED99av4bwzot4
-	uPBPOv8Vz33cBJ18VPWaTfUWMohuHYnxweLYJFnPgprQtfISwoRrqINnv6hgqgDg==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1tlYp2-00000005Y57-49wJ;
-	Fri, 21 Feb 2025 20:36:29 +0100
-Message-ID: <9af9413b7ab41c6b2db5f862d0fa50e9de279d67.camel@sipsolutions.net>
-Subject: Re: [PATCH *-next 00/18] Remove weird and needless 'return' for
- void APIs
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Stephen Hemminger <stephen@networkplumber.org>, Zijun Hu
-	 <quic_zijuhu@quicinc.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Will Deacon	
- <will@kernel.org>, "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Andrew
- Morton	 <akpm@linux-foundation.org>, Nick Piggin <npiggin@gmail.com>, Peter
- Zijlstra	 <peterz@infradead.org>, Arnd Bergmann <arnd@arndb.de>, Thomas
- Gleixner	 <tglx@linutronix.de>, Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>, "Rafael J. Wysocki"
- <rafael@kernel.org>, Danilo Krummrich	 <dakr@kernel.org>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski	 <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman	 <horms@kernel.org>, Jamal Hadi Salim
- <jhs@mojatatu.com>, Cong Wang	 <xiyou.wangcong@gmail.com>, Jiri Pirko
- <jiri@resnulli.us>, Jason Gunthorpe	 <jgg@ziepe.ca>, Leon Romanovsky
- <leon@kernel.org>, Linus Walleij	 <linus.walleij@linaro.org>, Bartosz
- Golaszewski <brgl@bgdev.pl>, Lee Jones	 <lee@kernel.org>, Thomas Graf
- <tgraf@suug.ch>, Christoph Hellwig <hch@lst.de>,  Marek Szyprowski
- <m.szyprowski@samsung.com>, Robin Murphy <robin.murphy@arm.com>, Miquel
- Raynal	 <miquel.raynal@bootlin.com>, Richard Weinberger <richard@nod.at>,
- Vignesh Raghavendra <vigneshr@ti.com>, Zijun Hu <zijun_hu@icloud.com>,
- linux-arch@vger.kernel.org, 	linux-mm@kvack.org,
- linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-pm@vger.kernel.org, 	iommu@lists.linux.dev,
- linux-mtd@lists.infradead.org
-Date: Fri, 21 Feb 2025 20:36:26 +0100
-In-Reply-To: <20250221110042.2ec3c276@hermes.local>
-References: <20250221-rmv_return-v1-0-cc8dff275827@quicinc.com>
-	 <20250221110042.2ec3c276@hermes.local>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Rlw3cuGI"
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2fcce9bb0ecso4893962a91.3
+        for <linux-crypto@vger.kernel.org>; Fri, 21 Feb 2025 11:47:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740167242; x=1740772042; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ncoDsRKjh28vVH6GzAvugCMHO3v1MHxTwR6FKJOs+vU=;
+        b=Rlw3cuGIAxcg3WfnonzHELaqFki5MHtrG88b+PJaqXoftFWAZOw1iwZ7B1dfoO28lE
+         cgOxQhBbPToKTYZs3SAS2fpr/CNVn2uKrY1+gYr7U9B87SQeqLulqBAGHMFnScG529Io
+         J1afxgCpTtyCRUNAGoytzPI8L+xOVLjOZuTFUUMBeeZ0GWjqlEGww6XN2usVQ/obfe7s
+         aF7KhEyDbzze8qpQOk1Pnh3cmgcvUS6vvk2GQW9xfM9dhI3T7rxZoCyoAAdjyddnwUBB
+         WvzZVn/qykY8G9mwQKVo1B0YjmbP2Q1hQb4b/EccXjSfF+7eF3Jib9Hl4/RFrELxYXAd
+         htZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740167242; x=1740772042;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ncoDsRKjh28vVH6GzAvugCMHO3v1MHxTwR6FKJOs+vU=;
+        b=pmmkv+WQ3BXE32lIndx/wfkuTy93PeqERifixibKcNqYCJUhiIbL9NYP4Z2SGVBBwN
+         /WbbW3/ykxtxAW7ye/Gif6J2Al8BTpRF9FnxzptsNaSvc2m9CcW/y884qET0ZGDOxk/H
+         0DUj1DNPTeiLdP7G+lSYXSYlOo4rB9JVHgQu08PnCH1lnI169sk7XNG+wAXeTGZBxSgz
+         SZt6AxdBF2BPiNeOxS4DsIyLDax5XrRpJqYIj2SOo4/HfhjaD8EnjN5uruHZ181PMLxq
+         7c9c2Puse3mR3tZdcZ+CDNI2T+TbquECkkXN/oC196oObfycz4Am/xj4eQz8eN2w6wL0
+         WKyA==
+X-Forwarded-Encrypted: i=1; AJvYcCV+pngO9WVhV9bZjQ9IiYlz5dGbpNhxyRiKpfMNRdx2TAqIOliJSHUn/l12qrbnleMtVgdBKqwFuORhXRQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+dzFwCylg1eykW5fp5xVrY0e5u/wdQriOTfxBAckAeXCzKbBM
+	NfDXIpSXi7QSeH5eJ3qMBxhETDfKE3JxXEdzSiWir50UXIdgKge8/RAPIZHR8A38F7CA9JBuIXu
+	cWldRZdO1ut3We17AxNjg7LZSbTtCnOWGvXml
+X-Gm-Gg: ASbGncsq9CFUqJjOPT2fU/mV2MhqxZcLrJ286sBPO5bVCmy4gw6nwyLLrT2UH+eKcH/
+	nKB+tZbreU6dH2JkZ7ZM+5Jf2+6rmZgJTISbtOpwWovRhGHiE5kzHlcePev5r8Q8K2fyZoBzjHM
+	CELU/pqbE7avCD+Xsf9fWZSy0olb8WTTrFHLFe2rQ=
+X-Google-Smtp-Source: AGHT+IGtec9D57fNEpwTOF5VC56kG+DMvBkePfQGlMMOOM8lBQqp82lJKRrsNscMiVitOb/6ZYzBRGWC+K08kh5F0Y8=
+X-Received: by 2002:a17:90b:2252:b0:2ee:9b2c:3253 with SMTP id
+ 98e67ed59e1d1-2fce7b26274mr7182179a91.30.1740167242446; Fri, 21 Feb 2025
+ 11:47:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+References: <20250206181711.1902989-1-elver@google.com> <20250206181711.1902989-16-elver@google.com>
+ <a1483cb1-13a5-4d6e-87b0-fda5f66b0817@paulmck-laptop> <CANpmjNOPiZ=h69V207AfcvWOB=Q+6QWzBKoKk1qTPVdfKsDQDw@mail.gmail.com>
+ <3f255ebb-80ca-4073-9d15-fa814d0d7528@paulmck-laptop> <CANpmjNNHTg+uLOe-LaT-5OFP+bHaNxnKUskXqVricTbAppm-Dw@mail.gmail.com>
+ <772d8ec7-e743-4ea8-8d62-6acd80bdbc20@paulmck-laptop> <Z7izasDAOC_Vtaeh@elver.google.com>
+ <aa50d616-fdbb-4c68-86ff-82bb57aaa26a@paulmck-laptop> <20250221185220.GA7373@noisy.programming.kicks-ass.net>
+In-Reply-To: <20250221185220.GA7373@noisy.programming.kicks-ass.net>
+From: Marco Elver <elver@google.com>
+Date: Fri, 21 Feb 2025 20:46:45 +0100
+X-Gm-Features: AWEUYZkA99crBxIegh1gRRcMrAoKxxzyxwRGmWJRS2whchm4-Eofmj8EM7dMgko
+Message-ID: <CANpmjNOreC6EqOntBEOAVZJ5QuSnftoa0bc7mopeMt76Bzs1Ag@mail.gmail.com>
+Subject: Re: [PATCH RFC 15/24] rcu: Support Clang's capability analysis
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: "Paul E. McKenney" <paulmck@kernel.org>, Alexander Potapenko <glider@google.com>, 
+	Bart Van Assche <bvanassche@acm.org>, Bill Wendling <morbo@google.com>, Boqun Feng <boqun.feng@gmail.com>, 
+	Dmitry Vyukov <dvyukov@google.com>, Frederic Weisbecker <frederic@kernel.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Ingo Molnar <mingo@kernel.org>, 
+	Jann Horn <jannh@google.com>, Joel Fernandes <joel@joelfernandes.org>, 
+	Jonathan Corbet <corbet@lwn.net>, Josh Triplett <josh@joshtriplett.org>, 
+	Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
+	Steven Rostedt <rostedt@goodmis.org>, Thomas Gleixner <tglx@linutronix.de>, 
+	Uladzislau Rezki <urezki@gmail.com>, Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>, 
+	kasan-dev@googlegroups.com, linux-kernel@vger.kernel.org, 
+	llvm@lists.linux.dev, rcu@vger.kernel.org, linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 2025-02-21 at 11:00 -0800, Stephen Hemminger wrote:
->=20
-> Is this something that could be done with a coccinelle script?
->=20
+On Fri, 21 Feb 2025 at 19:52, Peter Zijlstra <peterz@infradead.org> wrote:
+>
+> On Fri, Feb 21, 2025 at 10:08:06AM -0800, Paul E. McKenney wrote:
+>
+> > > ... unfortunately even for shared locks, the compiler does not like
+> > > re-entrancy yet. It's not yet supported, and to fix that I'd have to go
+> > > and implement that in Clang first before coming back to this.
+> >
+> > This would be needed for some types of reader-writer locks, and also for
+> > reference counting, so here is hoping that such support is forthcoming
+> > sooner rather than later.
+>
+> Right, so I read the clang documentation for this feature the other day,
+> and my take away was that this was all really primitive and lots of work
+> will need to go into making this more capable before we can cover much
+> of the more interesting things we do in the kernel.
+>
+> Notably the whole guarded_by member annotations, which are very cool in
+> concept, are very primitive in practise and will need much extensions.
 
-Almost enough to do this:
+I have one extension in flight:
+https://github.com/llvm/llvm-project/pull/127396 - it'll improve
+coverage for pointer passing of guarded_by members.
 
-@@
-identifier fn;
-expression E;
-@@
-void fn(...)
-{
-...
--return
-E;
-}
+Anything else you see as urgent? Re-entrant locks support a deal breaker?
 
+But yes, a lot of complex locking patterns will not easily be
+expressible right away.
 
-It takes a long time to run though, and does some wrong things as well:
-if the return is in the middle of the function, it still matches and
-removes it erroneously.
+> To that effect, and because this is basically a static analysis pass
+> with no codegen implications, I would suggest that we keep the whole
+> feature limited to the very latest clang version for now and don't
+> bother supporting older versions at all.
 
-johannes
+Along those lines, in an upcoming v2, I'm planning to bump it up to
+Clang 20+ because that version introduced a reasonable way to ignore
+warnings in not-yet-annotated headers:
+https://git.kernel.org/pub/scm/linux/kernel/git/melver/linux.git/commit/?h=cap-analysis/dev&id=2432a39eae8197f5058c578430bd1906c18480c3
