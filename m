@@ -1,50 +1,50 @@
 Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98C1721CFED;
-	Fri, 21 Feb 2025 13:05:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1647F22331E;
+	Fri, 21 Feb 2025 13:05:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740143149; cv=none; b=jswJR7YwHCttk4ShGLEULPS5Iz+L8jTmQRBCi5BJV+aOgeA9e1rGvindYSGX8y3EET1YsHvSBap7jeNsDbhq/XAi4CANYmsS92yICFG1nw+SZJc8POAdLiIYXt6/98H14q+Nu+O1o/GlQIZTEqZO8wq7/vkbskZkcG380xHxP/M=
+	t=1740143153; cv=none; b=a+gfDdZEt5JvXaWk4Z8L8j1nNdaQyxoD2+QefaO1+xI2TGzjO3TFGTTeQTG3PvF+J5THrve/znuOGrp3BkbwMadQLlbfBh/mBA68wY4jQ8oiOmGPqRrNe5WcJPM2Hd92dKqZrpx8vVKUAFDLmoKZ748SydEohoOdd7gmpsOIKC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740143149; c=relaxed/simple;
-	bh=TWoEPqZJdrU1mXzfAYO1Lq0kOZR4MuybGWiavzem1YY=;
+	s=arc-20240116; t=1740143153; c=relaxed/simple;
+	bh=/I6J3/xUjow+0WgP+TVAWOTlXqQ0okRRsj40L7zjJwg=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=ZSke0kjc+p+aypUb5mYjoxK6lFsJwbDfQLtmJt/wwPQr6/KOC/JpO4yfR1hrf9rB6TGNR2/dN0J/8uwYnKqBDj6p56qGAog/gGag9i7BtQ7pl3TXviQ/f+tTH2kvqwJylgk9trouEWnvjd4jYItkZ1xXEqZU3PiG7Wb4C+BVMzM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=k4/RDLYA; arc=none smtp.client-ip=205.220.180.131
+	 In-Reply-To:To:CC; b=EQBPFUGW1lh2vtZGb4YuMhOA/sbwFsxl1VATC+7YMvGes5b5rIO2l/+QsUnYMkQiqcZSzYuMKR2G5U8x6nOPTfe8J10mVcWWBIUnN7uvCPmPesNqveUro3Y3An0WLCqm8LBPrITvHw/FyWxRT42E4FVwrVEV8OEjBJpjPC6Ng4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=fj5Rr2Gq; arc=none smtp.client-ip=205.220.180.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="k4/RDLYA"
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51L603ls016207;
-	Fri, 21 Feb 2025 13:02:53 GMT
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="fj5Rr2Gq"
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51L6IIic018792;
+	Fri, 21 Feb 2025 13:02:45 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
 	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	julPx67IQ3FmBl4gwmVVCyKrnfGS063OMiD1KD32OCg=; b=k4/RDLYACQM644LC
-	fiklJgZI5EwoIby5+xay8N3TUAlaSmASI6qLRkxLhRMDhZHUsNkLVBQai1O79Hqi
-	AyYDWXdSmGYpEdUSmb7xsD2Jb1LPVNH8TxdQCjmI1aSQalyhqcaCtmJ5E/aE6rPg
-	vpJYnj71GAzNgAPuD18KUAi51lCizP/r/evdR8lOUGF2uNprDyZXriQuBvhPMxtR
-	FSHKHewlb4OH9uXSA8S3e62Z+Ex14rpdxzZiR/Vmng3eHoEXGkFakDG49rAUf02a
-	L8SsmxfrJuc2yZxuZGwXiL5gCM+W1Dr/g48UCwmFG7BIb4Ugh935lyA+N5dOtLK6
-	C95jrg==
-Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44xku6scbx-1
+	Tm0Zt0Z5RF7rdSISUfZdhv6NUQ6vAdfywek+iOtN6ys=; b=fj5Rr2GqOR7fi3FG
+	fjsXss2q2XoaUgou8BqAEeuLk62qi3JZ4uNEICFBcHVUhQgKhMH8iqNcQ+14OsDI
+	3D8JYvyo18EgihIddxyPogVOfhf+IguAN7tT+m9DJTvKNDYweVPExp19+qrKn5lb
+	hJeVgUYsrkGHEsc8mTukuCQ/wQiA7crqrDWy327ibsMuw7PvZxg3Vz/wURGUYS/7
+	43fQHWlJsBBU6V8nSV8AvPbYEQEkm40tUJfw5Vefj3GBZpSSPnlVT4BnsMrqvN8J
+	daY07Suy0b7Bz+hzpkbQ5CZ24JJJhm+4rTFweOuxERxbV2XKM1wQxCv0ZMX/FHir
+	v8rajQ==
+Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44xm3rhaak-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 21 Feb 2025 13:02:52 +0000 (GMT)
+	Fri, 21 Feb 2025 13:02:44 +0000 (GMT)
 Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 51LD2ZUa020247
+	by NASANPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 51LD2h8q028033
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 21 Feb 2025 13:02:35 GMT
+	Fri, 21 Feb 2025 13:02:43 GMT
 Received: from hu-zijuhu-lv.qualcomm.com (10.49.16.6) by
  nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Fri, 21 Feb 2025 05:02:34 -0800
+ 15.2.1544.9; Fri, 21 Feb 2025 05:02:42 -0800
 From: Zijun Hu <quic_zijuhu@quicinc.com>
-Date: Fri, 21 Feb 2025 05:02:13 -0800
-Subject: [PATCH *-next 08/18] net: sched: Remove needless return in void
- API qdisc_watchdog_schedule_ns()
+Date: Fri, 21 Feb 2025 05:02:23 -0800
+Subject: [PATCH *-next 18/18] mtd: nand: Do not return void function in
+ void function
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -53,7 +53,7 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-ID: <20250221-rmv_return-v1-8-cc8dff275827@quicinc.com>
+Message-ID: <20250221-rmv_return-v1-18-cc8dff275827@quicinc.com>
 References: <20250221-rmv_return-v1-0-cc8dff275827@quicinc.com>
 In-Reply-To: <20250221-rmv_return-v1-0-cc8dff275827@quicinc.com>
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -109,38 +109,77 @@ X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
  nasanex01a.na.qualcomm.com (10.52.223.231)
 X-QCInternal: smtphost
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: FYztKemt9Tqs0W9uKA0g8HoIcTexhhme
-X-Proofpoint-GUID: FYztKemt9Tqs0W9uKA0g8HoIcTexhhme
+X-Proofpoint-ORIG-GUID: SV8SpptYSPEhBGh6-hClx7JhQY8AZVMI
+X-Proofpoint-GUID: SV8SpptYSPEhBGh6-hClx7JhQY8AZVMI
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
  definitions=2025-02-21_04,2025-02-20_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 spamscore=0 impostorscore=0 suspectscore=0 clxscore=1015
- mlxscore=0 bulkscore=0 phishscore=0 mlxlogscore=999 lowpriorityscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2502100000 definitions=main-2502210096
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxscore=0
+ suspectscore=0 mlxlogscore=763 phishscore=0 bulkscore=0 lowpriorityscore=0
+ impostorscore=0 malwarescore=0 priorityscore=1501 adultscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2502100000 definitions=main-2502210095
 
-Remove needless 'return' in void API qdisc_watchdog_schedule_ns() since
-both the API and qdisc_watchdog_schedule_range_ns() are void functions.
+In the following three void APIs:
+
+	nanddev_pos_next_lun()
+	nanddev_pos_next_eraseblock()
+	nanddev_pos_next_page()
+
+For void function void func(...), convert weird statement:
+	return func(...);
+"to":
+	func(...);
+	return;
 
 Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
 ---
- include/net/pkt_sched.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/linux/mtd/nand.h | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
 
-diff --git a/include/net/pkt_sched.h b/include/net/pkt_sched.h
-index d7b7b6cd4aa1..b4d9ea54d947 100644
---- a/include/net/pkt_sched.h
-+++ b/include/net/pkt_sched.h
-@@ -78,7 +78,7 @@ void qdisc_watchdog_schedule_range_ns(struct qdisc_watchdog *wd, u64 expires,
- static inline void qdisc_watchdog_schedule_ns(struct qdisc_watchdog *wd,
- 					      u64 expires)
+diff --git a/include/linux/mtd/nand.h b/include/linux/mtd/nand.h
+index 0e2f228e8b4a..8e3f6cca0b24 100644
+--- a/include/linux/mtd/nand.h
++++ b/include/linux/mtd/nand.h
+@@ -863,8 +863,10 @@ static inline void nanddev_pos_next_target(struct nand_device *nand,
+ static inline void nanddev_pos_next_lun(struct nand_device *nand,
+ 					struct nand_pos *pos)
  {
--	return qdisc_watchdog_schedule_range_ns(wd, expires, 0ULL);
-+	qdisc_watchdog_schedule_range_ns(wd, expires, 0ULL);
- }
+-	if (pos->lun >= nand->memorg.luns_per_target - 1)
+-		return nanddev_pos_next_target(nand, pos);
++	if (pos->lun >= nand->memorg.luns_per_target - 1) {
++		nanddev_pos_next_target(nand, pos);
++		return;
++	}
  
- static inline void qdisc_watchdog_schedule(struct qdisc_watchdog *wd,
+ 	pos->lun++;
+ 	pos->page = 0;
+@@ -883,8 +885,10 @@ static inline void nanddev_pos_next_lun(struct nand_device *nand,
+ static inline void nanddev_pos_next_eraseblock(struct nand_device *nand,
+ 					       struct nand_pos *pos)
+ {
+-	if (pos->eraseblock >= nand->memorg.eraseblocks_per_lun - 1)
+-		return nanddev_pos_next_lun(nand, pos);
++	if (pos->eraseblock >= nand->memorg.eraseblocks_per_lun - 1) {
++		nanddev_pos_next_lun(nand, pos);
++		return;
++	}
+ 
+ 	pos->eraseblock++;
+ 	pos->page = 0;
+@@ -902,8 +906,10 @@ static inline void nanddev_pos_next_eraseblock(struct nand_device *nand,
+ static inline void nanddev_pos_next_page(struct nand_device *nand,
+ 					 struct nand_pos *pos)
+ {
+-	if (pos->page >= nand->memorg.pages_per_eraseblock - 1)
+-		return nanddev_pos_next_eraseblock(nand, pos);
++	if (pos->page >= nand->memorg.pages_per_eraseblock - 1) {
++		nanddev_pos_next_eraseblock(nand, pos);
++		return;
++	}
+ 
+ 	pos->page++;
+ }
 
 -- 
 2.34.1
