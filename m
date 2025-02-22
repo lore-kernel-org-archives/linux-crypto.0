@@ -1,77 +1,76 @@
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5605B1DC985
-	for <linux-crypto@vger.kernel.org>; Sat, 22 Feb 2025 12:31:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0385C18A6A7
+	for <linux-crypto@vger.kernel.org>; Sat, 22 Feb 2025 14:27:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740227512; cv=none; b=Uiihqf8Iq6i6Sc0kibLa+Sid0KKIO9yd+ffV96z4/dQhnC6ZBAMtN9+WkB+iVfQ5b3ppscofnSh9L+F+c4HFbui5p+DWcXWdpkH9BcC0JxyK+IESplym7Q4+o7ZjAGmWDAx62etqXIiDL2UXGxNclHa5KYZeNfY5loO6rn/61a0=
+	t=1740234480; cv=none; b=cpEmRlI+EWfTZvYA0ZAtvQsnuCGZrtP/DzwOEnvDQ9mpr93kgAtX3zXp15+MoxeBtLt067Wbb5PMyMOQELl00LT/GzjWwK//sziAja39H2kYS2xm36QYbEen6X9o8LrKFLSc/YLPRIbQuqtGBY/Ct8CRvoOKinEqqbXcszFs9IU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740227512; c=relaxed/simple;
-	bh=H5VZ+AzcMDDSp+rSHY7kV+abXJqzCU4+rgQjNAkzN7c=;
+	s=arc-20240116; t=1740234480; c=relaxed/simple;
+	bh=bWACM+CIjldQm4d9hS/Qm6lGurt3JhxvPdGMNHlxy0k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZwIsAmdtOKVA/mTPCAf+qo9/XBzXOd+DON0D2N2+jO99YCiGBdsW5W1Z8y7wcXDugWhXHpFr3CQxZyYJOWUYZi2SCegm7IrRtbSn/9czq3d9IF2mGOi9plWTqOOTCczm/50EMJttIe+eaXke1FdBmnUdsODhA6Y6QdM6P0VuIZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=hDZeE8Gy; arc=none smtp.client-ip=209.85.216.49
+	 Content-Type:Content-Disposition:In-Reply-To; b=g6pkl2SQCJrYslel5swvH6YcBmItnjfbz6zGeSCdjrgEEDgvzJGuX/hMf3P3BdkGHbV72XSe4KRthHGBc/nL21Dyt8x7TPPkBrWxrGquOLdWbm4wc4UY1SjQN2Tp6PuPDhrNjlaGsRQRRnOmxNoh1uMHzpRIPHsrzAIcVxQ1X6Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=dxkqJ/Zo; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="hDZeE8Gy"
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2fc32756139so4722083a91.1
-        for <linux-crypto@vger.kernel.org>; Sat, 22 Feb 2025 04:31:51 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="dxkqJ/Zo"
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-220e83d65e5so58139755ad.1
+        for <linux-crypto@vger.kernel.org>; Sat, 22 Feb 2025 06:27:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1740227510; x=1740832310; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1740234478; x=1740839278; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XBQF6pBy+4ocO8lCtdZYh37OSSsL3UX8OWQxKrmEKV4=;
-        b=hDZeE8GyM7uju+bCeY7Ui34gNklIf8ZXL7SuDeHU/xvborgRsrp+feH12Qv7lBQanR
-         X0eu78qbcABg0BtaP9+ptf3LEGB3G0mJ3XXXk4IrwJhL+qYuvrsUWD9EL/a/S+Rd+AWt
-         oYqvVxEQVUIsAF9pEPZenjOg8D1KUJAVBwiMU=
+        bh=zPvXDuvmRAhrxvOfwR/RABZWu0CVYBLRPN9dNRxz0ZQ=;
+        b=dxkqJ/Zo4IHG6c6YmFhgu+5m28TWxFKUwGXLAWzjW+dWaarfqW2+cvVx93Q/Dq0Ne1
+         InEs4nm8o+8CiO/1vkOEGMbwDsU/bHOq5rCML7uch45uLBlTO0hRTCpPtA3zOc57r0X+
+         bgw8Sy+pvQP1Y0CXdHTT2vDfqhhwoxbWtCSCc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740227510; x=1740832310;
+        d=1e100.net; s=20230601; t=1740234478; x=1740839278;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XBQF6pBy+4ocO8lCtdZYh37OSSsL3UX8OWQxKrmEKV4=;
-        b=bPLZTkdhEwGmVAfj0q6RjdKuGSkn3OKsONNP9znUDHVZ7NxitAIvL3waoKwgsyzI/j
-         gFw+CIN9ZNTe8D50mTjp0SngwMK6ES8Fg3HKO4L6oBBc3FLt9BeC/DC7dlM97HaLd/6P
-         svB7LECllhfn9+/CmQmP5iT2uRWtLXb6la4PzbsvNsvdTF2UwAOE50yP+FqlVgXcohzF
-         a4Ki8gZEIY9pIxCyHFTaRlMf9i91BTQY1LrFeL07JCCUwltkpgwYVNxNH2plvPPtET/Z
-         9Q/J6UY1A7xvQA8NBTgQGmnMKK3VdMGkAmF9BeKSHWWdMheXsgoHNNzsfD/IVA6i1aGN
-         od8w==
-X-Forwarded-Encrypted: i=1; AJvYcCWSprlVxzbFWBIikYUT7xOCqmWmGnrrfZ6134d6JgTY/Cl+QmjnWwl4GOfkiAvn/qg7uBeSuVghu+jT5X0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyILohGVOCDE2q7zpda2ynjWLR5D2XHgyPaAD9HbyVG8REpkCYH
-	94ZT/j+M8tC0h7dqwnAtFaMeHak32WBMkYbfrmXydQfmBFUkRn++ru/+WYTBLA==
-X-Gm-Gg: ASbGncs48ZybB1hq3qB0AvJYMIxC1QmslSN7PLPyBMfvk5Ftg4g4A1Uc6eTDTG4HHF+
-	S5Czx2iyEDpFE6vEdJBfnOC51mOF+HifToMA8I4/nhNAq6IyjtA/eij+eQjJrDBq0Jfyk/mjZ5Q
-	gxpKFxAxB2DiQ1ftmJfg8OIdBFftMtaanE0lZyEQL3AzR+2LuFPgd5yq5FFTZBnvD4c4CKlzU5w
-	LO/CLH07fFt8keEfXvfCpBUsYmpcVzdiayuZ/O93wCHixPaY3cylEpDbafai2PpuX6b0S0MibFC
-	G5HlYvwl4yVe/Ta9wcRRJEW56uTC
-X-Google-Smtp-Source: AGHT+IEA15yK2MW8Tlp9hdnICyGJRc3eshaBlXjjjEiD2bra2pzxxjVvTfyZrcRJPMVj5WmDs2jqQA==
-X-Received: by 2002:a17:90b:3cc4:b0:2ee:ee77:227c with SMTP id 98e67ed59e1d1-2fce868cbb8mr9543078a91.3.1740227510563;
-        Sat, 22 Feb 2025 04:31:50 -0800 (PST)
+        bh=zPvXDuvmRAhrxvOfwR/RABZWu0CVYBLRPN9dNRxz0ZQ=;
+        b=iizuCcpElkAZDQYypoDLB8No8N9I1wsrEbKbXu3zO5kxmVpwwvG+qKvpZdCKMSDqWo
+         q6lWnrX+FOGlmQYRt9/19660hU+cJFPQQtTHIt+f+DhmruOIWWTkKzu3eCL7RF9hyjnt
+         bepWo9+q3SDlY17stIt0kN10BPtV/6OlMt/OVjzgBEAEixmad5SECPUfGZhhyu1GFc89
+         5aCIV/5OC3Nowzaa1awiiIKSjXS8cRrMx/Zw+Ljd5lLoJmIOvNFy/clD8R2oPom2uL8o
+         EYdbRw06QzH0+wls8UKCWF0r3gbCWGoyL10EkTjqPVyzGtxM2AnP8hyfhkC29Du0YK8C
+         PA5w==
+X-Forwarded-Encrypted: i=1; AJvYcCV+weGbXjnE4g/V/S2gMolnFc8+WcCXDCgR+ANwTgK3et8uBNrKGHNwsLI7uhm434ABpAs3oiIlV+dok84=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz83JoYxtNYDGhWM1M6qnBpjdWYnP8JesknI9AmPnyzNbGDE96Z
+	z9Hr3iWVNEXu52RRmzXvgNBDtoV0CJWgrbiwUKjSIsEfOZziDyfCu34l2jsHig==
+X-Gm-Gg: ASbGncuSnUXXhaT8tMcfKDqV1wxVZV+J0CzOEcyWFSHX7Wm5QA7JRhrGZwWPVVB9mOW
+	6H/t6/pcEVxuBjb9R8nTRb9YXYs1N2Lli3l7xOYNstylj65RGu2xQhsMhjRCxAP6nyG2UzdLbt0
+	hy5wcaTXPHmEASkk5e7esodvbNslNPoddSQfDuAO511rfyDXpnZ9qQktVSNIizqjESdS0BYG2sw
+	75bW5Yywrwaoq5rT9MK/Cnz4THKGUl9YwbOTAjpCnkjaPRuadcFu7G1kuXBx4aV8qE/EE6UGzvi
+	czC0kXL3IW0wrWuhu6y9ULjLddSL
+X-Google-Smtp-Source: AGHT+IFPJedH8sKLSfD18g5iptfNHmHTIVM0EgNuwafBBp4M2gx2umVIm3KLNGcBsyHiBaQenJCWGg==
+X-Received: by 2002:a05:6a21:501:b0:1d9:c615:d1e6 with SMTP id adf61e73a8af0-1eef3b1aa6dmr12909888637.0.1740234478261;
+        Sat, 22 Feb 2025 06:27:58 -0800 (PST)
 Received: from google.com ([2401:fa00:8f:203:badf:54f:bbc8:4593])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2fceb10fad0sm3094015a91.31.2025.02.22.04.31.45
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7327fa51eb9sm11016305b3a.166.2025.02.22.06.27.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 22 Feb 2025 04:31:50 -0800 (PST)
-Date: Sat, 22 Feb 2025 21:31:41 +0900
+        Sat, 22 Feb 2025 06:27:57 -0800 (PST)
+Date: Sat, 22 Feb 2025 23:27:49 +0900
 From: Sergey Senozhatsky <senozhatsky@chromium.org>
 To: Barry Song <21cnbao@gmail.com>
 Cc: Yosry Ahmed <yosry.ahmed@linux.dev>, Minchan Kim <minchan@kernel.org>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-mm@kvack.org" <linux-mm@kvack.org>, "hannes@cmpxchg.org" <hannes@cmpxchg.org>, 
-	"nphamcs@gmail.com" <nphamcs@gmail.com>, "chengming.zhou@linux.dev" <chengming.zhou@linux.dev>, 
-	"usamaarif642@gmail.com" <usamaarif642@gmail.com>, "ryan.roberts@arm.com" <ryan.roberts@arm.com>, 
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, 
-	"davem@davemloft.net" <davem@davemloft.net>, "clabbe@baylibre.com" <clabbe@baylibre.com>, 
-	"ardb@kernel.org" <ardb@kernel.org>, "ebiggers@google.com" <ebiggers@google.com>, 
-	"surenb@google.com" <surenb@google.com>, "Accardi, Kristen C" <kristen.c.accardi@intel.com>, 
-	"Feghali, Wajdi K" <wajdi.k.feghali@intel.com>, "Gopal, Vinodh" <vinodh.gopal@intel.com>
+	Herbert Xu <herbert@gondor.apana.org.au>, "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
+	"hannes@cmpxchg.org" <hannes@cmpxchg.org>, "nphamcs@gmail.com" <nphamcs@gmail.com>, 
+	"chengming.zhou@linux.dev" <chengming.zhou@linux.dev>, "usamaarif642@gmail.com" <usamaarif642@gmail.com>, 
+	"ryan.roberts@arm.com" <ryan.roberts@arm.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, 
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, "davem@davemloft.net" <davem@davemloft.net>, 
+	"clabbe@baylibre.com" <clabbe@baylibre.com>, "ardb@kernel.org" <ardb@kernel.org>, 
+	"ebiggers@google.com" <ebiggers@google.com>, "surenb@google.com" <surenb@google.com>, 
+	"Accardi, Kristen C" <kristen.c.accardi@intel.com>, "Feghali, Wajdi K" <wajdi.k.feghali@intel.com>, 
+	"Gopal, Vinodh" <vinodh.gopal@intel.com>, Sergey Senozhatsky <senozhatsky@chromium.org>
 Subject: Re: [PATCH v5 02/12] crypto: acomp - Define new interfaces for
  compress/decompress batching.
-Message-ID: <dhj6msbvbyoz7iwrjnjkvoljvkh2pgxrwzqf67gdinverixvr5@e3ld7oeketgw>
-References: <Z2_lAGctG0DDSCIH@gondor.apana.org.au>
- <SJ0PR11MB5678851E3E6BA49A99D8BAE2C9102@SJ0PR11MB5678.namprd11.prod.outlook.com>
+Message-ID: <lu3j2kr3m2b53ze2covbywh6a7vvrscbkoplwnq4ov24g2cfso@572bdcsobd4a>
+References: <SJ0PR11MB5678851E3E6BA49A99D8BAE2C9102@SJ0PR11MB5678.namprd11.prod.outlook.com>
  <CAJD7tkatpOaortT8Si5GfxprvgPR+bzxwTSOR0rsaRUstdqNMQ@mail.gmail.com>
  <SJ0PR11MB5678034533E3FAD7B16E2758C9112@SJ0PR11MB5678.namprd11.prod.outlook.com>
  <CAJD7tkbRHkb7Znzto6=RRDQA9zXZSva43GukhBEfjrgm1qOxHw@mail.gmail.com>
@@ -80,6 +79,7 @@ References: <Z2_lAGctG0DDSCIH@gondor.apana.org.au>
  <Z7F1B_blIbByYBzz@gondor.apana.org.au>
  <Z7dnPh4tPxLO1UEo@google.com>
  <CAGsJ_4yVFG-C=nJWp8xda3eLZENc4dpU-d4VyFswOitiXe+G_Q@mail.gmail.com>
+ <dhj6msbvbyoz7iwrjnjkvoljvkh2pgxrwzqf67gdinverixvr5@e3ld7oeketgw>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -88,65 +88,20 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAGsJ_4yVFG-C=nJWp8xda3eLZENc4dpU-d4VyFswOitiXe+G_Q@mail.gmail.com>
+In-Reply-To: <dhj6msbvbyoz7iwrjnjkvoljvkh2pgxrwzqf67gdinverixvr5@e3ld7oeketgw>
 
-On (25/02/22 19:26), Barry Song wrote:
-> After reviewing the zRAM code, I don't see why zram_write_page() needs
-> to rely on
-> comp_len to call write_incompressible_page().
+On (25/02/22 21:31), Sergey Senozhatsky wrote:
+> > As long as crypto drivers consistently return -ENOSP or a specific error
+> > code for dst_buf overflow, we should be able to eliminate the
+> > 2*PAGE_SIZE buffer.
+> > 
+> > My point is:
+> > 1. All drivers must be capable of handling dst_buf overflow.
+> > 2. All drivers must return a consistent and dedicated error code for
+> > dst_buf overflow.
 
-[..]
-
-> zram_write_page()
-> {
->         ret = zcomp_compress(zram->comps[ZRAM_PRIMARY_COMP], zstrm,
->                              mem, &comp_len);
->         kunmap_local(mem);
-> 
->         if (unlikely(ret && ret != -ENOSP)) {
->                 zcomp_stream_put(zstrm);
->                 pr_err("Compression failed! err=%d\n", ret);
->                 return ret;
->         }
-> 
->         if (comp_len >= huge_class_size || ret) {
->                 zcomp_stream_put(zstrm);
->                 return write_incompressible_page(zram, page, index);
->         }
-> }
-
-Sorry, I'm slower than usual now, but why should we?  Shouldn't compression
-algorithms just never fail, even on 3D videos, because otherwise they won't
-be able to validate their Weissman score or something :)
-
-On a serious note - what is the use-case here?  Is the failure here due to
-some random "cosmic rays" that taint the  compression H/W?  If so then what
-makes us believe that it's uni-directional?  What if it's decompression
-that gets busted and then you can't decompress anything previously stored
-compressed and stored in zsmalloc.  Wouldn't it be better in this case
-to turn the computer off and on again?
-
-The idea behind zram's code is that incompressible pages are not unusual,
-they are quite usual, in fact,  It's not necessarily that the data grew
-in size after compression, the data is incompressible from zsmalloc PoV.
-That is the algorithm wasn't able to compress a PAGE_SIZE buffer to an
-object smaller than zsmalloc's huge-class-watermark (around 3600 bytes,
-depending on zspage chain size).  That's why we look at the comp-len.
-Anything else is an error, perhaps a pretty catastrophic error.
-
-> As long as crypto drivers consistently return -ENOSP or a specific error
-> code for dst_buf overflow, we should be able to eliminate the
-> 2*PAGE_SIZE buffer.
-> 
-> My point is:
-> 1. All drivers must be capable of handling dst_buf overflow.
-> 2. All drivers must return a consistent and dedicated error code for
-> dst_buf overflow.
-
-Sorry, where do these rules come from?
-
-> +Minchan, Sergey,
-> Do you think we can implement this change in zRAM by using PAGE_SIZE instead
-> of 2 * PAGE_SIZE?
-
-Sorry again, what problem are you solving?
+So I didn't look at all of them, but at least S/W lzo1 doesn't even
+have a notion of max-output-len.  lzo1x_1_compress() accepts a pointer
+to out_len which tells the size of output stream (the algorithm is free
+to produce any), so there is no dst_buf overflow as far as lzo1 is
+concerned.  Unless I'm missing something or misunderstanding your points.
