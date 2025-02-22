@@ -1,110 +1,152 @@
-Received: from pv50p00im-ztdg10021801.me.com (pv50p00im-ztdg10021801.me.com [17.58.6.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77C90207A32
-	for <linux-crypto@vger.kernel.org>; Sat, 22 Feb 2025 11:00:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5605B1DC985
+	for <linux-crypto@vger.kernel.org>; Sat, 22 Feb 2025 12:31:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740222055; cv=none; b=gFx+Z68FAE9yv2sfU6gKclmIOtRzQZ9TGSVmKDSxSVBztmL2ZXtfJt3gf8yO13U8Y24BG5kNdHZV9oFRpWHn9lMQM8G8F83VvP/MjRQBaCVR/nR7npZwSeWHlrbr3zln5boDRtQkDFWTAWUUMzTtxwzMID4fgD19X11JX8EnaBg=
+	t=1740227512; cv=none; b=Uiihqf8Iq6i6Sc0kibLa+Sid0KKIO9yd+ffV96z4/dQhnC6ZBAMtN9+WkB+iVfQ5b3ppscofnSh9L+F+c4HFbui5p+DWcXWdpkH9BcC0JxyK+IESplym7Q4+o7ZjAGmWDAx62etqXIiDL2UXGxNclHa5KYZeNfY5loO6rn/61a0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740222055; c=relaxed/simple;
-	bh=s5PMq4K2vUmCJ7mWo835mcJtSukLKOG4lecc2nZmroI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qTjnA98nYQvX3BVm8uaLrFNPv06CcThv6gZjXsemvJSt5Rixsbd/g6zfCduQPa+EdyqYojzqD1InRC1EGhN3+NAVyqyeX9exR85IdmM23HLnQm/w7ykjwMR296q2jz/47NV7qtAe96vJFEPvaIicpvmXlrA/TUZ5r9YZOLj+LJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=HhStBCZN; arc=none smtp.client-ip=17.58.6.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
+	s=arc-20240116; t=1740227512; c=relaxed/simple;
+	bh=H5VZ+AzcMDDSp+rSHY7kV+abXJqzCU4+rgQjNAkzN7c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZwIsAmdtOKVA/mTPCAf+qo9/XBzXOd+DON0D2N2+jO99YCiGBdsW5W1Z8y7wcXDugWhXHpFr3CQxZyYJOWUYZi2SCegm7IrRtbSn/9czq3d9IF2mGOi9plWTqOOTCczm/50EMJttIe+eaXke1FdBmnUdsODhA6Y6QdM6P0VuIZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=hDZeE8Gy; arc=none smtp.client-ip=209.85.216.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="HhStBCZN"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
-	s=1a1hai; bh=UhO/oKP5iMw5fHjgaGRWOOpphrslB5BPutH1Bqw2Dkg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:x-icloud-hme;
-	b=HhStBCZN3rVcd9EC6oBRvG6abifGqlnPtcBVpdm6i/PmmBuQa0QJPHyLR1FLsYmXk
-	 MvvGwxnVyjgIAQUePoznfvb7VEqM2/2CzwoYBfpUQAlvZbnYih/hmf83Ex5BvNFrdQ
-	 PbfYoJ6GNXR9EuX2Q1IkypReed+wxDFG/c9O7uFQFsKRQdeX9qYk5H4Dvd9QURFidN
-	 MaOu/D4ITgbWB/BaBzseWqBas93vN7EeBu7C7tTfSVogYryn4akeV915HBecUZbsev
-	 T9vaSLH2CkX0yMcrX7poOXKdwAfoNE9h2RgWTSTlng3BI8SOCu2qBQQAo94LS+WVDT
-	 77yqa5YwGC84Q==
-Received: from [192.168.1.26] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
-	by pv50p00im-ztdg10021801.me.com (Postfix) with ESMTPSA id C1B66201011A;
-	Sat, 22 Feb 2025 11:00:33 +0000 (UTC)
-Message-ID: <8f36be7c-6052-4c5d-85ff-0eed27cf1456@icloud.com>
-Date: Sat, 22 Feb 2025 19:00:28 +0800
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="hDZeE8Gy"
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2fc32756139so4722083a91.1
+        for <linux-crypto@vger.kernel.org>; Sat, 22 Feb 2025 04:31:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1740227510; x=1740832310; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=XBQF6pBy+4ocO8lCtdZYh37OSSsL3UX8OWQxKrmEKV4=;
+        b=hDZeE8GyM7uju+bCeY7Ui34gNklIf8ZXL7SuDeHU/xvborgRsrp+feH12Qv7lBQanR
+         X0eu78qbcABg0BtaP9+ptf3LEGB3G0mJ3XXXk4IrwJhL+qYuvrsUWD9EL/a/S+Rd+AWt
+         oYqvVxEQVUIsAF9pEPZenjOg8D1KUJAVBwiMU=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740227510; x=1740832310;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XBQF6pBy+4ocO8lCtdZYh37OSSsL3UX8OWQxKrmEKV4=;
+        b=bPLZTkdhEwGmVAfj0q6RjdKuGSkn3OKsONNP9znUDHVZ7NxitAIvL3waoKwgsyzI/j
+         gFw+CIN9ZNTe8D50mTjp0SngwMK6ES8Fg3HKO4L6oBBc3FLt9BeC/DC7dlM97HaLd/6P
+         svB7LECllhfn9+/CmQmP5iT2uRWtLXb6la4PzbsvNsvdTF2UwAOE50yP+FqlVgXcohzF
+         a4Ki8gZEIY9pIxCyHFTaRlMf9i91BTQY1LrFeL07JCCUwltkpgwYVNxNH2plvPPtET/Z
+         9Q/J6UY1A7xvQA8NBTgQGmnMKK3VdMGkAmF9BeKSHWWdMheXsgoHNNzsfD/IVA6i1aGN
+         od8w==
+X-Forwarded-Encrypted: i=1; AJvYcCWSprlVxzbFWBIikYUT7xOCqmWmGnrrfZ6134d6JgTY/Cl+QmjnWwl4GOfkiAvn/qg7uBeSuVghu+jT5X0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyILohGVOCDE2q7zpda2ynjWLR5D2XHgyPaAD9HbyVG8REpkCYH
+	94ZT/j+M8tC0h7dqwnAtFaMeHak32WBMkYbfrmXydQfmBFUkRn++ru/+WYTBLA==
+X-Gm-Gg: ASbGncs48ZybB1hq3qB0AvJYMIxC1QmslSN7PLPyBMfvk5Ftg4g4A1Uc6eTDTG4HHF+
+	S5Czx2iyEDpFE6vEdJBfnOC51mOF+HifToMA8I4/nhNAq6IyjtA/eij+eQjJrDBq0Jfyk/mjZ5Q
+	gxpKFxAxB2DiQ1ftmJfg8OIdBFftMtaanE0lZyEQL3AzR+2LuFPgd5yq5FFTZBnvD4c4CKlzU5w
+	LO/CLH07fFt8keEfXvfCpBUsYmpcVzdiayuZ/O93wCHixPaY3cylEpDbafai2PpuX6b0S0MibFC
+	G5HlYvwl4yVe/Ta9wcRRJEW56uTC
+X-Google-Smtp-Source: AGHT+IEA15yK2MW8Tlp9hdnICyGJRc3eshaBlXjjjEiD2bra2pzxxjVvTfyZrcRJPMVj5WmDs2jqQA==
+X-Received: by 2002:a17:90b:3cc4:b0:2ee:ee77:227c with SMTP id 98e67ed59e1d1-2fce868cbb8mr9543078a91.3.1740227510563;
+        Sat, 22 Feb 2025 04:31:50 -0800 (PST)
+Received: from google.com ([2401:fa00:8f:203:badf:54f:bbc8:4593])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2fceb10fad0sm3094015a91.31.2025.02.22.04.31.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 22 Feb 2025 04:31:50 -0800 (PST)
+Date: Sat, 22 Feb 2025 21:31:41 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: Barry Song <21cnbao@gmail.com>
+Cc: Yosry Ahmed <yosry.ahmed@linux.dev>, Minchan Kim <minchan@kernel.org>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"linux-mm@kvack.org" <linux-mm@kvack.org>, "hannes@cmpxchg.org" <hannes@cmpxchg.org>, 
+	"nphamcs@gmail.com" <nphamcs@gmail.com>, "chengming.zhou@linux.dev" <chengming.zhou@linux.dev>, 
+	"usamaarif642@gmail.com" <usamaarif642@gmail.com>, "ryan.roberts@arm.com" <ryan.roberts@arm.com>, 
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, 
+	"davem@davemloft.net" <davem@davemloft.net>, "clabbe@baylibre.com" <clabbe@baylibre.com>, 
+	"ardb@kernel.org" <ardb@kernel.org>, "ebiggers@google.com" <ebiggers@google.com>, 
+	"surenb@google.com" <surenb@google.com>, "Accardi, Kristen C" <kristen.c.accardi@intel.com>, 
+	"Feghali, Wajdi K" <wajdi.k.feghali@intel.com>, "Gopal, Vinodh" <vinodh.gopal@intel.com>
+Subject: Re: [PATCH v5 02/12] crypto: acomp - Define new interfaces for
+ compress/decompress batching.
+Message-ID: <dhj6msbvbyoz7iwrjnjkvoljvkh2pgxrwzqf67gdinverixvr5@e3ld7oeketgw>
+References: <Z2_lAGctG0DDSCIH@gondor.apana.org.au>
+ <SJ0PR11MB5678851E3E6BA49A99D8BAE2C9102@SJ0PR11MB5678.namprd11.prod.outlook.com>
+ <CAJD7tkatpOaortT8Si5GfxprvgPR+bzxwTSOR0rsaRUstdqNMQ@mail.gmail.com>
+ <SJ0PR11MB5678034533E3FAD7B16E2758C9112@SJ0PR11MB5678.namprd11.prod.outlook.com>
+ <CAJD7tkbRHkb7Znzto6=RRDQA9zXZSva43GukhBEfjrgm1qOxHw@mail.gmail.com>
+ <Z3yMNI_DbkKBKJxO@gondor.apana.org.au>
+ <CAJD7tkaTuNWF42+CoCLruPZks3F7H9mS=6S74cmXnyWz-2tuPw@mail.gmail.com>
+ <Z7F1B_blIbByYBzz@gondor.apana.org.au>
+ <Z7dnPh4tPxLO1UEo@google.com>
+ <CAGsJ_4yVFG-C=nJWp8xda3eLZENc4dpU-d4VyFswOitiXe+G_Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH *-next 01/18] mm/mmu_gather: Remove needless return in
- void API tlb_remove_page()
-To: Peter Zijlstra <peterz@infradead.org>, Zijun Hu <quic_zijuhu@quicinc.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Will Deacon <will@kernel.org>, "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>, Nick Piggin <npiggin@gmail.com>,
- Arnd Bergmann <arnd@arndb.de>, Thomas Gleixner <tglx@linutronix.de>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>,
- "Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Johannes Berg <johannes@sipsolutions.net>,
- Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
- Jiri Pirko <jiri@resnulli.us>, Jason Gunthorpe <jgg@ziepe.ca>,
- Leon Romanovsky <leon@kernel.org>, Linus Walleij <linus.walleij@linaro.org>,
- Bartosz Golaszewski <brgl@bgdev.pl>, Lee Jones <lee@kernel.org>,
- Thomas Graf <tgraf@suug.ch>, Christoph Hellwig <hch@lst.de>,
- Marek Szyprowski <m.szyprowski@samsung.com>,
- Robin Murphy <robin.murphy@arm.com>,
- Miquel Raynal <miquel.raynal@bootlin.com>,
- Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>,
- linux-arch@vger.kernel.org, linux-mm@kvack.org,
- linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
- netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-pm@vger.kernel.org, iommu@lists.linux.dev,
- linux-mtd@lists.infradead.org
-References: <20250221-rmv_return-v1-0-cc8dff275827@quicinc.com>
- <20250221-rmv_return-v1-1-cc8dff275827@quicinc.com>
- <20250221200137.GH7373@noisy.programming.kicks-ass.net>
-Content-Language: en-US
-From: Zijun Hu <zijun_hu@icloud.com>
-In-Reply-To: <20250221200137.GH7373@noisy.programming.kicks-ass.net>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-GUID: xYMDZO87E-9u-9wzotp6QmCV6S-rGtqV
-X-Proofpoint-ORIG-GUID: xYMDZO87E-9u-9wzotp6QmCV6S-rGtqV
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-22_04,2025-02-20_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1015 adultscore=0
- suspectscore=0 spamscore=0 malwarescore=0 phishscore=0 mlxlogscore=885
- mlxscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2502220088
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAGsJ_4yVFG-C=nJWp8xda3eLZENc4dpU-d4VyFswOitiXe+G_Q@mail.gmail.com>
 
-On 2025/2/22 04:01, Peter Zijlstra wrote:
->>   */
->>  static inline void tlb_remove_page(struct mmu_gather *tlb, struct page *page)
->>  {
->> -	return tlb_remove_page_size(tlb, page, PAGE_SIZE);
->> +	tlb_remove_page_size(tlb, page, PAGE_SIZE);
->>  }
-> So I don't mind removing it, but note that that return enforces
-> tlb_remove_page_size() has void return type.
->
+On (25/02/22 19:26), Barry Song wrote:
+> After reviewing the zRAM code, I don't see why zram_write_page() needs
+> to rely on
+> comp_len to call write_incompressible_page().
 
-tlb_remove_page_size() is void function already. (^^)
+[..]
 
-> It might not be your preferred coding style, but it is not completely
-> pointless.
+> zram_write_page()
+> {
+>         ret = zcomp_compress(zram->comps[ZRAM_PRIMARY_COMP], zstrm,
+>                              mem, &comp_len);
+>         kunmap_local(mem);
+> 
+>         if (unlikely(ret && ret != -ENOSP)) {
+>                 zcomp_stream_put(zstrm);
+>                 pr_err("Compression failed! err=%d\n", ret);
+>                 return ret;
+>         }
+> 
+>         if (comp_len >= huge_class_size || ret) {
+>                 zcomp_stream_put(zstrm);
+>                 return write_incompressible_page(zram, page, index);
+>         }
+> }
 
-based on below C spec such as C17 description. i guess language C does
-not like this usage "return void function in void function";
+Sorry, I'm slower than usual now, but why should we?  Shouldn't compression
+algorithms just never fail, even on 3D videos, because otherwise they won't
+be able to validate their Weissman score or something :)
 
-C spec such as C17 have this description about return
-statement:
-6.8.6.4:
-A return statement with an expression shall not appear in a function
-whose return type is void. A return statement without an expression
-shall only appear in a function whose return type is void.
+On a serious note - what is the use-case here?  Is the failure here due to
+some random "cosmic rays" that taint the  compression H/W?  If so then what
+makes us believe that it's uni-directional?  What if it's decompression
+that gets busted and then you can't decompress anything previously stored
+compressed and stored in zsmalloc.  Wouldn't it be better in this case
+to turn the computer off and on again?
+
+The idea behind zram's code is that incompressible pages are not unusual,
+they are quite usual, in fact,  It's not necessarily that the data grew
+in size after compression, the data is incompressible from zsmalloc PoV.
+That is the algorithm wasn't able to compress a PAGE_SIZE buffer to an
+object smaller than zsmalloc's huge-class-watermark (around 3600 bytes,
+depending on zspage chain size).  That's why we look at the comp-len.
+Anything else is an error, perhaps a pretty catastrophic error.
+
+> As long as crypto drivers consistently return -ENOSP or a specific error
+> code for dst_buf overflow, we should be able to eliminate the
+> 2*PAGE_SIZE buffer.
+> 
+> My point is:
+> 1. All drivers must be capable of handling dst_buf overflow.
+> 2. All drivers must return a consistent and dedicated error code for
+> dst_buf overflow.
+
+Sorry, where do these rules come from?
+
+> +Minchan, Sergey,
+> Do you think we can implement this change in zRAM by using PAGE_SIZE instead
+> of 2 * PAGE_SIZE?
+
+Sorry again, what problem are you solving?
