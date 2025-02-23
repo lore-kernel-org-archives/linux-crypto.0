@@ -1,78 +1,65 @@
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74BA9CA4E
-	for <linux-crypto@vger.kernel.org>; Sun, 23 Feb 2025 02:09:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 013D822612;
+	Sun, 23 Feb 2025 02:53:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740276583; cv=none; b=HSi7t/o2gxz6CRButjUqxUPWqGyJ3wEmc+bUCQhxRfmTqa/KSyyALdjqxtZHPwyojKqztSW6CrVYGJACpGrK1tijQjcBsbXU5lxpxaPZkaJ1UqC/oCA+qkufrwRUX2mDzcD+FRH1Krld9UWKmLqb2zRNvG8ZE5+vjApo2kqnh0w=
+	t=1740279190; cv=none; b=a6OeV1Pi0jyws6oioWyDHmxpJDXK0cQcdMiTGqwKUF5T0WSH5mu/aPg0teqjOBmbSFkSKglqNhLcwpXuAtnyvnbIs4I+/a2GIy9hznQnGMz6VVHYnRgsRB2MOrVQ8XNivxz2cG+up4BOtPWA7tDsLozYkAIpHJYapPOGMflGOYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740276583; c=relaxed/simple;
-	bh=NuIBx3upqL9KNIxLQxy3GzF6zwII0EOXk8q7zJM9u9E=;
+	s=arc-20240116; t=1740279190; c=relaxed/simple;
+	bh=obMnHjuKzoUq/iZrkus0UZUPE91NLD1g1Z0/24mGcfA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ivtnj7Ffbhvr+6Ld970urtaPR0iatRD9AqK45wOCj1NiQLLJ/TdNsetxIoT/ANGtz1U/DL/LZ4meIfw0LnoZvR3M1KrlO+pTC1gM4CAZ2h1Oweuz1RCLc+4/fRlz7qJoJ2fCBNJPudarwR87Crs53A/wnNP9vAqsCTuuRRVTsPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=E6lbOk/q; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=AY4ONKL/S1wDg5t8CLcVEyybkcLtYR/9UOq+Fhxcyck6H9FHgHF/OqqbN1It7eWVbpfN+PtUvr+zZYsf9VSk3dGTEBxw7f/BIJ2x3sPtcT5AsJEOu/Ejykzfb6CXvIgXNrjFUgbhQZTawdfcpnsSyx5idEUSDjMITJ8v64D4jIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=Eu4l0o0p; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="E6lbOk/q"
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-220dc3831e3so68332855ad.0
-        for <linux-crypto@vger.kernel.org>; Sat, 22 Feb 2025 18:09:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1740276582; x=1740881382; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iKUNTxI3ScxWIEmge1ue/3A/mxxEuL0ykQJBIUwpXck=;
-        b=E6lbOk/qq33aBS3c39xZxUvVwJ/65j04nZa7Zia66YFKx+cUS8Sxf17rzzzaIzrxpf
-         NWktcdxEu3h9Iry3gvyQhn9aQ5WPB8xrw6cU14cfDYZ5lQtOxesYJJB1nmjB5QSNA/Lj
-         DGzdpM7M1gKr8m+j0YVZjOrcFUjlrUwscGdFg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740276582; x=1740881382;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iKUNTxI3ScxWIEmge1ue/3A/mxxEuL0ykQJBIUwpXck=;
-        b=EeArpSH5VfMBJm/+PUdc4KDF0QZ7R6zKptusbliBFfb0GiDisixW5MHjgY/3eg1ZUG
-         qeCaJsdKBxPfbJ07f2BXLA3/+UAjz0QHpEPnW3Gu479CSUZM1kxawZLGskdoLnhjf6GY
-         V0NLrP8Di8Ur+u++HKSGYiwvVbRP3Wpj5NRE3UsjL+Kb6ea37ErI+7wVDSLrhrvjXqnv
-         +2VU+Eltn99aOuItyXWBSLUH6xYyh85Uh2Dk5ZRfDekbjf0wprQ/SmovjKpTcXU+oVXx
-         4ezpfGXbjR3QjJOGr4/BYiRNksASLw3Ve69pdzE37526DP6pI0zFX0eS3znfFMIFlrve
-         rh3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWXjrnLAYV4WIryxRUOenzX8A3n7piULPEiSoJUyctr1KmP7KMcbxDwo5punu12zoOv2uNxSxw8fqGZFC0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+68HVrpbT6/Ez/8ivoO5gU/1PAKgqFsZ5nR/fLIvkzhC+KLph
-	mX5rEGX2rwAE8u5rMGt26/dsegVpvaCDS+X+l3ivh7LvmPIrnPnlSB7euEdLsw==
-X-Gm-Gg: ASbGnctssPgGY0x670W+6k/ikBdjeQr24ZvjeHH1BBNrkKgr455pTFmCcTVVSZa2K1C
-	cyOCKHDEBJc8zbU6d7ZphX4kgQE1dLT6WFA2oU3wk7zDttse2iAdsbuoqls5pgZkvSLbKZp7ano
-	HCqbxufe9LCOPl2D9OeCOc4f03wbZAVMgeY5etdIIhFdcGgsupdRUbmyBKcV8L0f79X5rrGnpKA
-	O/sb5gQWswp6mk9uADKMGCNg1pnOr0RUitQmx68EmwlJZLMQ9zLYqJ0Op3bObEnNixnh2w0aU8b
-	aswiNLvY+1BHIp5D6ktHrxk354Nh
-X-Google-Smtp-Source: AGHT+IGyOWS8SdxcnCpNXmpsnOdPgyaUof7mfUQNC5miFn8aT5EBDEvVNb2Ow5PqSGIOE2oJnFkx1w==
-X-Received: by 2002:a05:6a00:991:b0:732:6276:b46c with SMTP id d2e1a72fcca58-73425a1fab8mr14109564b3a.0.1740276581776;
-        Sat, 22 Feb 2025 18:09:41 -0800 (PST)
-Received: from google.com ([2401:fa00:8f:203:badf:54f:bbc8:4593])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-732575e055dsm16497804b3a.68.2025.02.22.18.09.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 22 Feb 2025 18:09:41 -0800 (PST)
-Date: Sun, 23 Feb 2025 11:09:32 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Barry Song <21cnbao@gmail.com>, Yosry Ahmed <yosry.ahmed@linux.dev>, 
-	Minchan Kim <minchan@kernel.org>, "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
-	"hannes@cmpxchg.org" <hannes@cmpxchg.org>, "nphamcs@gmail.com" <nphamcs@gmail.com>, 
-	"chengming.zhou@linux.dev" <chengming.zhou@linux.dev>, "usamaarif642@gmail.com" <usamaarif642@gmail.com>, 
-	"ryan.roberts@arm.com" <ryan.roberts@arm.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, 
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, "davem@davemloft.net" <davem@davemloft.net>, 
-	"clabbe@baylibre.com" <clabbe@baylibre.com>, "ardb@kernel.org" <ardb@kernel.org>, 
-	"ebiggers@google.com" <ebiggers@google.com>, "surenb@google.com" <surenb@google.com>, 
-	"Accardi, Kristen C" <kristen.c.accardi@intel.com>, "Feghali, Wajdi K" <wajdi.k.feghali@intel.com>, 
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="Eu4l0o0p"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=WsIJTTYLHxjcB204NYnG7rDohCeWBbckZrZozEyvyPk=; b=Eu4l0o0pBFvhjtYPG2ZpXhUe53
+	SGdEdleh3upbVMP49bq/03pc41Zw1b/8vHOfKR4sfsba0ZvwqltJ62Vgd1rgpdjv0JkJHMepJCbH5
+	f1QFXZiQ2iiLZv4jFuLGbNWFcS/6egCAZ1c1gA1g2ze5Tq2MjO08D8l190KaIZhcCXj2DzQxU+SrS
+	TGNSDqkhRXVHWywbqqdjVQiJEHklqzCoyQ/6lw6TU9/Y4jBc5Y75rcjEgxePWi9W4/mWvb//hkMLh
+	WMH+jxHUHrSnQWiydiLyOO1A+L0ecpIjN46Gj+iVhBSEXmr5HYnW5NB7i7r8wNowEp8CKdwJHVO4z
+	YsgvF6AQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tm26p-000xMg-16;
+	Sun, 23 Feb 2025 10:52:48 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 23 Feb 2025 10:52:47 +0800
+Date: Sun, 23 Feb 2025 10:52:47 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Barry Song <21cnbao@gmail.com>, Yosry Ahmed <yosry.ahmed@linux.dev>,
+	Minchan Kim <minchan@kernel.org>,
+	"Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"hannes@cmpxchg.org" <hannes@cmpxchg.org>,
+	"nphamcs@gmail.com" <nphamcs@gmail.com>,
+	"chengming.zhou@linux.dev" <chengming.zhou@linux.dev>,
+	"usamaarif642@gmail.com" <usamaarif642@gmail.com>,
+	"ryan.roberts@arm.com" <ryan.roberts@arm.com>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"clabbe@baylibre.com" <clabbe@baylibre.com>,
+	"ardb@kernel.org" <ardb@kernel.org>,
+	"ebiggers@google.com" <ebiggers@google.com>,
+	"surenb@google.com" <surenb@google.com>,
+	"Accardi, Kristen C" <kristen.c.accardi@intel.com>,
+	"Feghali, Wajdi K" <wajdi.k.feghali@intel.com>,
 	"Gopal, Vinodh" <vinodh.gopal@intel.com>
 Subject: Re: [PATCH v5 02/12] crypto: acomp - Define new interfaces for
  compress/decompress batching.
-Message-ID: <u7t7gibspxu3lujdl4hambr72qd6o5u33udbojihngznlyistk@gmyyhwjuiwxc>
-References: <SJ0PR11MB5678034533E3FAD7B16E2758C9112@SJ0PR11MB5678.namprd11.prod.outlook.com>
- <CAJD7tkbRHkb7Znzto6=RRDQA9zXZSva43GukhBEfjrgm1qOxHw@mail.gmail.com>
+Message-ID: <Z7qNf4NerHrflmfV@gondor.apana.org.au>
+References: <CAJD7tkbRHkb7Znzto6=RRDQA9zXZSva43GukhBEfjrgm1qOxHw@mail.gmail.com>
  <Z3yMNI_DbkKBKJxO@gondor.apana.org.au>
  <CAJD7tkaTuNWF42+CoCLruPZks3F7H9mS=6S74cmXnyWz-2tuPw@mail.gmail.com>
  <Z7F1B_blIbByYBzz@gondor.apana.org.au>
@@ -81,6 +68,7 @@ References: <SJ0PR11MB5678034533E3FAD7B16E2758C9112@SJ0PR11MB5678.namprd11.prod.
  <dhj6msbvbyoz7iwrjnjkvoljvkh2pgxrwzqf67gdinverixvr5@e3ld7oeketgw>
  <lu3j2kr3m2b53ze2covbywh6a7vvrscbkoplwnq4ov24g2cfso@572bdcsobd4a>
  <Z7poTnlv-1DStRZQ@gondor.apana.org.au>
+ <u7t7gibspxu3lujdl4hambr72qd6o5u33udbojihngznlyistk@gmyyhwjuiwxc>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -89,39 +77,49 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z7poTnlv-1DStRZQ@gondor.apana.org.au>
+In-Reply-To: <u7t7gibspxu3lujdl4hambr72qd6o5u33udbojihngznlyistk@gmyyhwjuiwxc>
 
-On (25/02/23 08:14), Herbert Xu wrote:
-> On Sat, Feb 22, 2025 at 11:27:49PM +0900, Sergey Senozhatsky wrote:
-> >
-> > So I didn't look at all of them, but at least S/W lzo1 doesn't even
-> > have a notion of max-output-len.  lzo1x_1_compress() accepts a pointer
-> > to out_len which tells the size of output stream (the algorithm is free
-> > to produce any), so there is no dst_buf overflow as far as lzo1 is
-> > concerned.  Unless I'm missing something or misunderstanding your points.
+On Sun, Feb 23, 2025 at 11:09:32AM +0900, Sergey Senozhatsky wrote:
+>
+> Right, for lzo/lzo-rle we need a safety page.
+
+We should fix it because it's a security hole for anyone who calls
+it through the Crypto API.
+
+> It also seems that there is no common way of reporting dst_but overflow.
+> Some algos return -ENOSPC immediately, some don't return anything at all,
+> and deflate does it's own thing - there are these places where they see
+> they are out of out space but they Z_OK it
 > 
-> I just looked at deflate/zstd and they seem to be doing the right
-> things.
-> 
-> But yes lzo is a gaping security hole on the compression side.
+> if (s->pending != 0) {
+> 	flush_pending(strm);
+> 	if (strm->avail_out == 0) {
+> 		/* Since avail_out is 0, deflate will be called again with
+> 		 * more output space, but possibly with both pending and
+> 		 * avail_in equal to zero. There won't be anything to do,
+> 		 * but this is not an error situation so make sure we
+> 		 * return OK instead of BUF_ERROR at next call of deflate:
+> 		 */
+> 		s->last_flush = -1;
+> 		return Z_OK;
+> 	}
+> }
 
-Right, for lzo/lzo-rle we need a safety page.
+Z_OK is actually an error, see crypto/deflate.c:
 
-It also seems that there is no common way of reporting dst_but overflow.
-Some algos return -ENOSPC immediately, some don't return anything at all,
-and deflate does it's own thing - there are these places where they see
-they are out of out space but they Z_OK it
-
-if (s->pending != 0) {
-	flush_pending(strm);
-	if (strm->avail_out == 0) {
-		/* Since avail_out is 0, deflate will be called again with
-		 * more output space, but possibly with both pending and
-		 * avail_in equal to zero. There won't be anything to do,
-		 * but this is not an error situation so make sure we
-		 * return OK instead of BUF_ERROR at next call of deflate:
-		 */
-		s->last_flush = -1;
-		return Z_OK;
+	ret = zlib_deflate(stream, Z_FINISH);
+	if (ret != Z_STREAM_END) {
+		ret = -EINVAL;
+		goto out;
 	}
-}
+
+We could change this to ENOSPC for consistency.
+
+If you do find anything that returns 0 through the Crypto API please
+let me know.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
