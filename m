@@ -1,74 +1,45 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4770C28F4;
-	Sun, 23 Feb 2025 06:04:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C99CD481A3
+	for <linux-crypto@vger.kernel.org>; Sun, 23 Feb 2025 06:27:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740290688; cv=none; b=bGz0HzZCGpjIDDnTk5zEMWx5DK8iB0COvlyPxNimeAjPyNG56kera9dn6TYjjsQNzbZrQ7KrDjCVOlLz5WjCzBftgqlu/Wix2KeucV00R8TPpC+lPzj6QuiAKKGzBtCS1C4Ow8pGP+lbZDIr7VqsRSLfOI+6qkCBEFictgS53m4=
+	t=1740292079; cv=none; b=ke442bfdwnFr6pzhK9l8oUKoAVYmPoJBRXJx+Z1uT1a8eLe+nDKI71IlVG5vLMtN5TYBaIBMb3yyOtp2+vjMIRl2dGnyqvSMKl4YNoN1ZGzT9GPEte4rg7E/Kjg+9aImXHSgVIDT1uqeof6hBYKA50Y8L4k6zyds5Rld2iy0FwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740290688; c=relaxed/simple;
-	bh=n0O1JZZjjleF6676nwLMFsaML3VzH9LfZzFJ/eiegKQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TzlledwPdI/7UfVkJm7X2bWAP18v1N/GP2qnJUO7Ik+se81vZZz6BmnDPvRi1z9Z7QejFf2NiZy7ZPZLDptm2VIu6+ESoTeFzaevukxqddMYQgG8DZ7XMrz2JZJsZ9OUNTYbiFVzHMoKxCnxtJ1zznBdBZBq+yH3HTyHt5/ZpYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=MKTy7aBm; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1740292079; c=relaxed/simple;
+	bh=uXwwjfJXJPCbq4C1qAvm5abmpxwbDT/Nyl+d6gJRV0A=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=tVCOrcU4Hg5+SEk+7EJpT42EcAf4hAV77lF35XGxCtpA5k1BJAaEQ+4rcq6mXVAxxaJuGv80wyRPQkGzPHOFsnNQ85kpZCe97GuhT1hlXJIixAGob48APxVJQxbwmTta+e2/2OF5JAQ9BPpTwZO3tmB4of5H4aNVGhGTzxymoJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=N8lMbAOW; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="MKTy7aBm"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="N8lMbAOW"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	s=formenos; h=Content-Type:MIME-Version:Message-ID:Subject:Cc:To:From:Date:
+	Sender:Reply-To:Content-Transfer-Encoding:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=3W1TQW4sSxEmiuPUJLAn0b3rBebiDRQeiRiov06/Av8=; b=MKTy7aBmtB7kQBNQV7/Q9qv6er
-	g/xNMQpxPp+ZrND/VH1Uq7EF6dk4MmdcgbwVIpYZm2WEa/rA14FFIYfQ2ouy2ePX1Ddwg4E/frzPz
-	wYxsaafZvZhllGQcbkfgSHFSxQGeGmiOcXzTPtSlBLhEFmg6QO/54OOgLYI0DRWBe46o/xdNiiIn/
-	2cAWDZ0KQx4cJH8s/OJagImw+4TaE7dT2GzkSAlKER7m3rDGpEUcsZHtfrzr4xJAd3Zn6uVuFYce4
-	ScIkQfnKyYP43o7bxZnQB3uMnPSiaZsnjh3imfHFlQ4q18ryEgpppxyToTjMDGHRIQewhWcEff8X/
-	+B3HMwzw==;
+	bh=nQQFgupXH7+Yevuq9lqCXlAaJVpJHmevAGJbPMftsgc=; b=N8lMbAOWdO0JYBddL58K1Gpw87
+	s40ps4ccVaQnXSwTHfJPzZG0JxYplg03wds9IZRZW86doasCastJeHn18t+xGUVhJW0daOGREeZqr
+	s8hdU9eVUOIihl2y2YKnjBqw6CnpACsjMg1KW1Nayc+SF+GmrUHtjDBqwCHFBKDo4ida8C598sU3B
+	uQY58i60JWy+TyrORLhqE8HhYxY3U/bBANOzBVd7+Rc8ahyIhiABXyq/o8Z3NZpFQ90VgXu/kxa3H
+	cpT3HibZGt/WkjHszoHWaXm04slUu3xfSK3BJ8oREJty3Rxbnzc0U7c/jU33RnvEZ/4jl9NNdljU7
+	kW6z/0jw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tm56K-000yJc-0D;
-	Sun, 23 Feb 2025 14:04:29 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 23 Feb 2025 14:04:28 +0800
-Date: Sun, 23 Feb 2025 14:04:28 +0800
+	id 1tm5Sx-000yRU-27;
+	Sun, 23 Feb 2025 14:27:52 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 23 Feb 2025 14:27:51 +0800
+Date: Sun, 23 Feb 2025 14:27:51 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc: Barry Song <21cnbao@gmail.com>, Yosry Ahmed <yosry.ahmed@linux.dev>,
-	Minchan Kim <minchan@kernel.org>,
-	"Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"hannes@cmpxchg.org" <hannes@cmpxchg.org>,
-	"nphamcs@gmail.com" <nphamcs@gmail.com>,
-	"chengming.zhou@linux.dev" <chengming.zhou@linux.dev>,
-	"usamaarif642@gmail.com" <usamaarif642@gmail.com>,
-	"ryan.roberts@arm.com" <ryan.roberts@arm.com>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"clabbe@baylibre.com" <clabbe@baylibre.com>,
-	"ardb@kernel.org" <ardb@kernel.org>,
-	"ebiggers@google.com" <ebiggers@google.com>,
-	"surenb@google.com" <surenb@google.com>,
-	"Accardi, Kristen C" <kristen.c.accardi@intel.com>,
-	"Feghali, Wajdi K" <wajdi.k.feghali@intel.com>,
-	"Gopal, Vinodh" <vinodh.gopal@intel.com>
-Subject: Re: [PATCH v5 02/12] crypto: acomp - Define new interfaces for
- compress/decompress batching.
-Message-ID: <Z7q6bCF-RjPXSpIx@gondor.apana.org.au>
-References: <Z7dnPh4tPxLO1UEo@google.com>
- <CAGsJ_4yVFG-C=nJWp8xda3eLZENc4dpU-d4VyFswOitiXe+G_Q@mail.gmail.com>
- <dhj6msbvbyoz7iwrjnjkvoljvkh2pgxrwzqf67gdinverixvr5@e3ld7oeketgw>
- <lu3j2kr3m2b53ze2covbywh6a7vvrscbkoplwnq4ov24g2cfso@572bdcsobd4a>
- <Z7poTnlv-1DStRZQ@gondor.apana.org.au>
- <u7t7gibspxu3lujdl4hambr72qd6o5u33udbojihngznlyistk@gmyyhwjuiwxc>
- <Z7qNf4NerHrflmfV@gondor.apana.org.au>
- <cxspxz5jeiigd34cl7x3asyx4lowefjpffj3ip4mwpxdwh34e6@xzpqbmlihbcg>
- <Z7qYUCAqh2YFQ908@gondor.apana.org.au>
- <o7qvt25dxoxcxj5ec2tbf5y5nopi4mkiuklo63rnyc7bldxwdm@2l5lkllmaynk>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Cc: Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH] crypto: skcipher - Use restrict rather than hand-rolling
+ accesses
+Message-ID: <Z7q_5wYdx6fOvsDK@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -77,28 +48,144 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <o7qvt25dxoxcxj5ec2tbf5y5nopi4mkiuklo63rnyc7bldxwdm@2l5lkllmaynk>
 
-On Sun, Feb 23, 2025 at 01:02:41PM +0900, Sergey Senozhatsky wrote:
->
-> if I understood it correctly.  Which would make it: return 0 on success
-> or -ENOSPC otherwise.  So if crypto API wants consistency and return -ENOSPC
-> for buffer overruns, then for lz4/lz4hc it also becomes binary: either 0 or
-> -ENOSCP.  Current -EINVAL return looks better to me, both for deflate and
-> for lz4/lz4hc.  -ENOSPC is an actionable error code, a user can double the
-> dst_out size and retry compression etc., while in reality it could be some
-> SW/HW issue that is misreported as -ENOSPC.
+Rather than accessing 'alg' directly to avoid the aliasing issue
+which leads to unnecessary reloads, use the __restrict keyword
+to explicitly tell the compiler that there is no aliasing.
 
-When you're compressing you're trying to make it smaller.  It's
-always better to not compress something rather than doubling the
-buffer on ENOSPC.
+This generates equivalent if not superior code on x86 with gcc 12.
 
-In any case, no software compression algorithm should ever fail
-for a reason other than ENOSPC.
+Note that in skcipher_walk_virt the alg assignment is moved after
+might_sleep_if because that function is a compiler barrier and
+forces a reload.
 
-Hardware offload devices can fail of course.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Cheers,
+diff --git a/crypto/skcipher.c b/crypto/skcipher.c
+index cdf0f11c7eaa..561aa5cc4ffa 100644
+--- a/crypto/skcipher.c
++++ b/crypto/skcipher.c
+@@ -306,14 +306,16 @@ static int skcipher_walk_first(struct skcipher_walk *walk)
+ 	return skcipher_walk_next(walk);
+ }
+ 
+-int skcipher_walk_virt(struct skcipher_walk *walk,
+-		       struct skcipher_request *req, bool atomic)
++int skcipher_walk_virt(struct skcipher_walk *__restrict walk,
++		       struct skcipher_request *__restrict req, bool atomic)
+ {
+-	const struct skcipher_alg *alg =
+-		crypto_skcipher_alg(crypto_skcipher_reqtfm(req));
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	struct skcipher_alg *alg;
+ 
+ 	might_sleep_if(req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP);
+ 
++	alg = crypto_skcipher_alg(tfm);
++
+ 	walk->total = req->cryptlen;
+ 	walk->nbytes = 0;
+ 	walk->iv = req->iv;
+@@ -329,14 +331,9 @@ int skcipher_walk_virt(struct skcipher_walk *walk,
+ 	scatterwalk_start(&walk->in, req->src);
+ 	scatterwalk_start(&walk->out, req->dst);
+ 
+-	/*
+-	 * Accessing 'alg' directly generates better code than using the
+-	 * crypto_skcipher_blocksize() and similar helper functions here, as it
+-	 * prevents the algorithm pointer from being repeatedly reloaded.
+-	 */
+-	walk->blocksize = alg->base.cra_blocksize;
+-	walk->ivsize = alg->co.ivsize;
+-	walk->alignmask = alg->base.cra_alignmask;
++	walk->blocksize = crypto_skcipher_blocksize(tfm);
++	walk->ivsize = crypto_skcipher_ivsize(tfm);
++	walk->alignmask = crypto_skcipher_alignmask(tfm);
+ 
+ 	if (alg->co.base.cra_type != &crypto_skcipher_type)
+ 		walk->stride = alg->co.chunksize;
+@@ -347,10 +344,11 @@ int skcipher_walk_virt(struct skcipher_walk *walk,
+ }
+ EXPORT_SYMBOL_GPL(skcipher_walk_virt);
+ 
+-static int skcipher_walk_aead_common(struct skcipher_walk *walk,
+-				     struct aead_request *req, bool atomic)
++static int skcipher_walk_aead_common(struct skcipher_walk *__restrict walk,
++				     struct aead_request *__restrict req,
++				     bool atomic)
+ {
+-	const struct aead_alg *alg = crypto_aead_alg(crypto_aead_reqtfm(req));
++	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
+ 
+ 	walk->nbytes = 0;
+ 	walk->iv = req->iv;
+@@ -372,21 +370,17 @@ static int skcipher_walk_aead_common(struct skcipher_walk *walk,
+ 	scatterwalk_done(&walk->in, 0, walk->total);
+ 	scatterwalk_done(&walk->out, 0, walk->total);
+ 
+-	/*
+-	 * Accessing 'alg' directly generates better code than using the
+-	 * crypto_aead_blocksize() and similar helper functions here, as it
+-	 * prevents the algorithm pointer from being repeatedly reloaded.
+-	 */
+-	walk->blocksize = alg->base.cra_blocksize;
+-	walk->stride = alg->chunksize;
+-	walk->ivsize = alg->ivsize;
+-	walk->alignmask = alg->base.cra_alignmask;
++	walk->blocksize = crypto_aead_blocksize(tfm);
++	walk->stride = crypto_aead_chunksize(tfm);
++	walk->ivsize = crypto_aead_ivsize(tfm);
++	walk->alignmask = crypto_aead_alignmask(tfm);
+ 
+ 	return skcipher_walk_first(walk);
+ }
+ 
+-int skcipher_walk_aead_encrypt(struct skcipher_walk *walk,
+-			       struct aead_request *req, bool atomic)
++int skcipher_walk_aead_encrypt(struct skcipher_walk *__restrict walk,
++			       struct aead_request *__restrict req,
++			       bool atomic)
+ {
+ 	walk->total = req->cryptlen;
+ 
+@@ -394,8 +388,9 @@ int skcipher_walk_aead_encrypt(struct skcipher_walk *walk,
+ }
+ EXPORT_SYMBOL_GPL(skcipher_walk_aead_encrypt);
+ 
+-int skcipher_walk_aead_decrypt(struct skcipher_walk *walk,
+-			       struct aead_request *req, bool atomic)
++int skcipher_walk_aead_decrypt(struct skcipher_walk *__restrict walk,
++			       struct aead_request *__restrict req,
++			       bool atomic)
+ {
+ 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
+ 
+diff --git a/include/crypto/internal/skcipher.h b/include/crypto/internal/skcipher.h
+index 4f49621d3eb6..d6ae7a86fed2 100644
+--- a/include/crypto/internal/skcipher.h
++++ b/include/crypto/internal/skcipher.h
+@@ -197,13 +197,15 @@ int lskcipher_register_instance(struct crypto_template *tmpl,
+ 				struct lskcipher_instance *inst);
+ 
+ int skcipher_walk_done(struct skcipher_walk *walk, int res);
+-int skcipher_walk_virt(struct skcipher_walk *walk,
+-		       struct skcipher_request *req,
++int skcipher_walk_virt(struct skcipher_walk *__restrict walk,
++		       struct skcipher_request *__restrict req,
+ 		       bool atomic);
+-int skcipher_walk_aead_encrypt(struct skcipher_walk *walk,
+-			       struct aead_request *req, bool atomic);
+-int skcipher_walk_aead_decrypt(struct skcipher_walk *walk,
+-			       struct aead_request *req, bool atomic);
++int skcipher_walk_aead_encrypt(struct skcipher_walk *__restrict walk,
++			       struct aead_request *__restrict req,
++			       bool atomic);
++int skcipher_walk_aead_decrypt(struct skcipher_walk *__restrict walk,
++			       struct aead_request *__restrict req,
++			       bool atomic);
+ 
+ static inline void skcipher_walk_abort(struct skcipher_walk *walk)
+ {
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
