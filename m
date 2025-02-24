@@ -1,68 +1,48 @@
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AA641FCCFA
-	for <linux-crypto@vger.kernel.org>; Sun, 23 Feb 2025 08:40:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C4781F60A;
+	Mon, 24 Feb 2025 03:28:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740300039; cv=none; b=o4UE3GRVVy+PM7n4PFGN7UPpXXZn5ZNPnQg3V2B+guPU3ZicRKxdPNqEJzQZnbXOWGUTKsP2A181I1SSWiEr+017jOlsres9GsU0IlcInTt6VGnXvlS0iIi8QJ9/TyKXTWKHnEJ11PgJg27HXAXXaLPehaJL7iIsLu4jkodGdb0=
+	t=1740367744; cv=none; b=IOOny9Mul6pr/GiMttGQBw+ErJ4CXHvkqQR9fe3kU9EHnRamKrnssE29k0xRFvM74qYQezZkXDVu2/Kq8NL5dGpJ4he+yjHyVFcnXDYsCjjqwA7y+5rGlrKdi2t/K6VMGa/WRIzjqbzCHzgRrZL6Vf7jkNiLDzwpqMMt5VeUUWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740300039; c=relaxed/simple;
-	bh=VMZP75rhMsZKP1h7w7GGsRJbBi7X8HJDlzKN8uf2Gog=;
+	s=arc-20240116; t=1740367744; c=relaxed/simple;
+	bh=2mqKbcc+CSbHaEe5AIwCO0kQq0wY33vfEcIZFDx2NrY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lgD9uFnF1Sm9l10HkEw2rWykzhGsGQiGo5d+cpZX3ZiBQgJDo4dzSgCoWJsj955dJpDlYH9YNyGRShtBU2hTr6SrZdBA+bhvp562ySXetYaiEXq/LDzuZpwYLWB3cFkOAj/MzjX1vZEspN60qL4/h8oHMXKgn6jglyspfMnaEec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=TFlyGYS/; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=CuRoaMIgcZr+xagTLSDCVjtwgNqiCh1XjhUA8FSFl+Bd8L8RzrDoYBgHoRs5RgJsVv8VkXL3YZCZp4iFmrhEGpA0wg7O0C5gvbs9HX5HD4WHHmR6T12EGcfdfUoK5TIEi+qLhZmzh/wZS5NgniejdigffF6hIvXN64hiOejRH5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=fWZi0lnb; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="TFlyGYS/"
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-219f8263ae0so71451945ad.0
-        for <linux-crypto@vger.kernel.org>; Sun, 23 Feb 2025 00:40:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1740300037; x=1740904837; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=R9gpSGM5f9xtZjGEJveZ4GrzDJH1nRyp6hOrbTNY7Eg=;
-        b=TFlyGYS/cq84tJNGn64sC1f7sOES00p4HxprGHbRt5UM8okRfDV/XbvYyBLP4v6cDN
-         sMz+Uhs2cpC6Zgzcfjx7RYayAKPm4BuVUgZgne5GK+FX23wZmabtYhGrQTwg4LeDTOSJ
-         bt9MTaIfB0fB5a/y/hUT9d66O1gLTVgtg3J9Q=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740300037; x=1740904837;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=R9gpSGM5f9xtZjGEJveZ4GrzDJH1nRyp6hOrbTNY7Eg=;
-        b=EhBbjJ//k1xbJAZp55cttCFiUKq6cMm4zGXieK8tn8HqLNY4UdB9nSuu7n7bDCm9kx
-         Lta1qkwP7H73zqSVPc/dUIADw1gDOW5yhQpHQfa/qX3gg2/u9vbC+Zq7iokQMzFAug8T
-         HZ6Jslv57TnZqDmwvgHK2DVaSjy+xaxTRvtq7IvCFaj4D5gRH5bP3DaSUwoETTYvB6YB
-         mj0oxJcx7DjS7BmCVG+rUntwWXGi4lhUT+woYfRl/SpATEoSLrwn7C8JxEom7Nao0LNT
-         woWl5rQNb5Fg7xtliaekPATIyQ09zfYrr9uLhzQLjJF2EKT6kEc8CGMGO4/E0ZlFIqWs
-         04eA==
-X-Gm-Message-State: AOJu0YwZM4Zz2CMOJVwEqKfqlCfnZdkexBbGpKBG7DuZK07WuVvmL2sE
-	iuKKyrisLSYrguRAJrCqO3S7hY8do+JNOdPWKrBtAW9KRYQ4jjX9L2TTvwzwfA==
-X-Gm-Gg: ASbGncs6LOOlo1H+MP6ojD3it+QWAauixGshyPgTqLDtosRpKd45whvlHONk4AEWyxK
-	DQqfpKcO/5IrAlnxcm5oVJmDepgURoDpCCHmufP2s4RJ6hDAiSgIF5SWdu8Db/LeRHy+osSTBQ0
-	x+QZ7zPUqOKwWkPGX0WsoUUMudT8XKBhT1Bk5k3VrEyqMlv2NmadqKh20kTg0JfBxloIzSlWreo
-	vtXIbeb0WyjHQVa9M4+wQBOP3jwuJKmlRsFvgA95O2YPy8tozj/8+YEjsuAoMTqxWC8RvkrsR4s
-	RCLfbVMjGeqJFjNcPLSn6wenWZ8acw==
-X-Google-Smtp-Source: AGHT+IHs2bEHHbTZeDzqZuSxzKMbqBVzBNfFwOrRXpSuEs7ai1npp6AoUs79mcwT90M7ZwcPaU4GMQ==
-X-Received: by 2002:a05:6a00:c81:b0:725:9f02:489a with SMTP id d2e1a72fcca58-73426d72880mr13450744b3a.17.1740300037559;
-        Sun, 23 Feb 2025 00:40:37 -0800 (PST)
-Received: from google.com ([2401:fa00:8f:203:7eae:f032:eb08:bb00])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73266fd6438sm15247420b3a.142.2025.02.23.00.40.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 23 Feb 2025 00:40:37 -0800 (PST)
-Date: Sun, 23 Feb 2025 17:40:31 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Nitin Gupta <nitingupta910@gmail.com>, 
-	Richard Purdie <rpurdie@openedhand.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Linus Torvalds <torvalds@linux-foundation.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	"Markus F.X.J. Oberhumer" <markus@oberhumer.com>, Dave Rodgman <dave.rodgman@arm.com>
-Subject: Re: [PATCH] lib/lzo: Avoid output overruns when compressing
-Message-ID: <hymyvszwshcvqngjlomeyltmpghx6gges76muaz23a6cit5oe2@eas2xjgfynnu>
-References: <Z7rGXJSX57gEfXPw@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="fWZi0lnb"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=lmP2ZYdiXnCYtSypWQcLeVaulSsOYWP7qbwMULUDULE=; b=fWZi0lnbkMqDM2dYcOzbwYPrv1
+	2RsBRX4G2HwujqYbEk7dSuTZT9XN/vt00guYYUgIILJCIoM7E7NkVcd6uyC43Fg4mwkuOAAGI48IZ
+	CX5NoX1BLMbpwYmpBJ6R/e/8GkFcelxvlnMRh8Vu76531vxPR1xEm1jfvll/xbyw4Gqm1pO+0sxZJ
+	O6vQZ8XSw4Z6kgmq93X/SDP7NqDUf9hg7ewzI7CVV8GuFDzLj17oTtdGQJeqL2yy23SfRAKC4zlpq
+	kYSzj4TpYQTgzfN2QH5abH3UJbnjruZp2TNoEgLIuZJtKjvaX9xaobo7ZEmmEalGnz7SbptUF3ezu
+	j/LxfSFw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tmP9K-0018nc-28;
+	Mon, 24 Feb 2025 11:28:55 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 24 Feb 2025 11:28:54 +0800
+Date: Mon, 24 Feb 2025 11:28:54 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: kernel test robot <lkp@intel.com>
+Cc: oe-kbuild-all@lists.linux.dev,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [PATCH] crypto: lib/Kconfig - Fix lib built-in and modular failure
+ for arm64/mips/s390
+Message-ID: <Z7vnduYJbRqcQEdm@gondor.apana.org.au>
+References: <Z6woN4vgdaywOZxm@gondor.apana.org.au>
+ <202502232152.JC84YDLp-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -71,50 +51,99 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z7rGXJSX57gEfXPw@gondor.apana.org.au>
+In-Reply-To: <202502232152.JC84YDLp-lkp@intel.com>
 
-On (25/02/23 14:55), Herbert Xu wrote:
-[..]
->  		} else if (m_off <= M3_MAX_OFFSET) {
->  			m_off -= 1;
-> +			if (!HAVE_OP(1))
-> +				return LZO_E_OUTPUT_OVERRUN;
->  			if (m_len <= M3_MAX_LEN)
->  				*op++ = (M3_MARKER | (m_len - 2));
->  			else {
-[..]
->  		} else {
->  			m_off -= 0x4000;
-> +			if (!HAVE_OP(1))
-> +				return LZO_E_OUTPUT_OVERRUN;
->  			if (m_len <= M4_MAX_LEN)
->  				*op++ = (M4_MARKER | ((m_off >> 11) & 8)
->  						| (m_len - 2));
+On Sun, Feb 23, 2025 at 09:54:55PM +0800, kernel test robot wrote:
+> 
+> kernel test robot noticed the following build errors:
+> 
+> [auto build test ERROR on herbert-cryptodev-2.6/master]
+> [also build test ERROR on herbert-crypto-2.6/master linus/master v6.14-rc3 next-20250221]
+> [If your patch is applied to the wrong git tree, kindly drop us a note.
+> And when submitting patch, we suggest to use '--base' as documented in
+> https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> 
+> url:    https://github.com/intel-lab-lkp/linux/commits/Herbert-Xu/crypto-lib-Kconfig-Fix-lib-built-in-failure-when-arch-is-modular/20250212-125048
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+> patch link:    https://lore.kernel.org/r/Z6woN4vgdaywOZxm%40gondor.apana.org.au
+> patch subject: [PATCH] crypto: lib/Kconfig - Fix lib built-in failure when arch is modular
+> config: s390-randconfig-r072-20250223 (https://download.01.org/0day-ci/archive/20250223/202502232152.JC84YDLp-lkp@intel.com/config)
+> compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
+> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250223/202502232152.JC84YDLp-lkp@intel.com/reproduce)
 
-Made me wonder if HAVE_OP() in these two cases should have been
-under if, but it covers both if and else branches, so it's all
-right.
+Thanks for the report.  I missed a few architectures in the patch:
 
-[..]
-> +++ b/lib/lzo/lzo1x_decompress_safe.c
-> @@ -21,7 +21,6 @@
->  #include "lzodefs.h"
->  
->  #define HAVE_IP(x)      ((size_t)(ip_end - ip) >= (size_t)(x))
-> -#define HAVE_OP(x)      ((size_t)(op_end - op) >= (size_t)(x))
->  #define NEED_IP(x)      if (!HAVE_IP(x)) goto input_overrun
->  #define NEED_OP(x)      if (!HAVE_OP(x)) goto output_overrun
+---8<---
+Some architectures were missed in the ARCH_MAY_HAVE patch, do
+the same for them to stop build failures involving modular arch
+code and built-in generic code.
 
-A bit of a pity that NEED_OP() with "goto output_overrun" is only
-for decompression.  It looks equally relevant to the compression
-path.  I'm not insisting on doing something similar in compression
-tho.
+Note that this isn't actually a regression since the same build
+failure was also possible on these architectures before, just with
+a different set of initial configuration options.
 
-Overall this look right, and kudos to Herbert for doing this.
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202502232152.JC84YDLp-lkp@intel.com/
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-I did some testing (using my usual zram test scripts, but modified
-zram to allocate only one physical page for comp buf and to check
-for overrun ret status).  Haven't noticed any problems.
-
-FWIW
-Reviewed-and-tested-by: Sergey Senozhatsky <senozhatsky@chromium.org>
+diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
+index 5636ab83f22a..3d90efdcf5a5 100644
+--- a/arch/arm64/crypto/Kconfig
++++ b/arch/arm64/crypto/Kconfig
+@@ -29,7 +29,7 @@ config CRYPTO_POLY1305_NEON
+ 	tristate "Hash functions: Poly1305 (NEON)"
+ 	depends on KERNEL_MODE_NEON
+ 	select CRYPTO_HASH
+-	select CRYPTO_ARCH_HAVE_LIB_POLY1305
++	select CRYPTO_ARCH_MAY_HAVE_LIB_POLY1305
+ 	help
+ 	  Poly1305 authenticator algorithm (RFC7539)
+ 
+@@ -190,7 +190,7 @@ config CRYPTO_CHACHA20_NEON
+ 	depends on KERNEL_MODE_NEON
+ 	select CRYPTO_SKCIPHER
+ 	select CRYPTO_LIB_CHACHA_GENERIC
+-	select CRYPTO_ARCH_HAVE_LIB_CHACHA
++	select CRYPTO_ARCH_MAY_HAVE_LIB_CHACHA
+ 	help
+ 	  Length-preserving ciphers: ChaCha20, XChaCha20, and XChaCha12
+ 	  stream cipher algorithms
+diff --git a/arch/mips/crypto/Kconfig b/arch/mips/crypto/Kconfig
+index 7decd40c4e20..cbeb2f62eb79 100644
+--- a/arch/mips/crypto/Kconfig
++++ b/arch/mips/crypto/Kconfig
+@@ -5,7 +5,7 @@ menu "Accelerated Cryptographic Algorithms for CPU (mips)"
+ config CRYPTO_POLY1305_MIPS
+ 	tristate "Hash functions: Poly1305"
+ 	depends on MIPS
+-	select CRYPTO_ARCH_HAVE_LIB_POLY1305
++	select CRYPTO_ARCH_MAY_HAVE_LIB_POLY1305
+ 	help
+ 	  Poly1305 authenticator algorithm (RFC7539)
+ 
+@@ -55,7 +55,7 @@ config CRYPTO_CHACHA_MIPS
+ 	tristate "Ciphers: ChaCha20, XChaCha20, XChaCha12 (MIPS32r2)"
+ 	depends on CPU_MIPS32_R2
+ 	select CRYPTO_SKCIPHER
+-	select CRYPTO_ARCH_HAVE_LIB_CHACHA
++	select CRYPTO_ARCH_MAY_HAVE_LIB_CHACHA
+ 	help
+ 	  Length-preserving ciphers: ChaCha20, XChaCha20, and XChaCha12
+ 	  stream cipher algorithms
+diff --git a/arch/s390/crypto/Kconfig b/arch/s390/crypto/Kconfig
+index b760232537f1..6f7495264943 100644
+--- a/arch/s390/crypto/Kconfig
++++ b/arch/s390/crypto/Kconfig
+@@ -112,7 +112,7 @@ config CRYPTO_CHACHA_S390
+ 	depends on S390
+ 	select CRYPTO_SKCIPHER
+ 	select CRYPTO_LIB_CHACHA_GENERIC
+-	select CRYPTO_ARCH_HAVE_LIB_CHACHA
++	select CRYPTO_ARCH_MAY_HAVE_LIB_CHACHA
+ 	help
+ 	  Length-preserving cipher: ChaCha20 stream cipher (RFC 7539)
+ 
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
