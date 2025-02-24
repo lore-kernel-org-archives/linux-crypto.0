@@ -1,117 +1,325 @@
-Received: from pv50p00im-ztdg10021801.me.com (pv50p00im-ztdg10021801.me.com [17.58.6.56])
+Received: from mail.servus.at (mail.servus.at [193.170.194.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7185E1A2393
-	for <linux-crypto@vger.kernel.org>; Mon, 24 Feb 2025 14:46:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BD3518950A;
+	Mon, 24 Feb 2025 16:26:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.170.194.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740408372; cv=none; b=Hn+PfC9nhYKGrSGVfRv37UWTOWTDIzNVEzTegYbSudI621okHry2dw5wiKngHmqshjKQFzF51o6gKXrQvnXVeRETZpxY2ed4G5TsEfw07hDAEu1cEGFk6+VVQpBaEUsuKWu7ACAu7OpQ0jZ2+ZEWjtcxrC2oQztg9c8Q9p9dehc=
+	t=1740414413; cv=none; b=YKM9sxI+lAMder/kG8vbClKhY5zxmVK8jPtZtGWJOLp9wIWzYbjEbvRt5g3YrOuuyC5gromwJlaLznyjsevI2ywLFtP4YHGHsEww2+bK0hZ9/KNfxAH0lyE7J8gxcEFQRjxp6WThPlBEiUCs8859LqzgGJY8LQGA1pvzmZsI2t8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740408372; c=relaxed/simple;
-	bh=fxHn5PpLrOvrhy3T9+DU0/Qq00yPM+Mp8t95xmMWsSI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ppREOxntXM4gV6nKSftPh4K3ywf56l/61J0pDsgXD9QSUDRp0WKVO6uh7NQfuVkJXLCLuc400wfwEvzJJj4ZtAqIYX1r8XWpEhKoHkEGKb5E1r9WsIAKmGmoFZ1GwL9dnOYj6/5wmEqfrn0QFOVyJ/aw13ZBCF4jseOwLvaI7Lw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=QlrLaWEd; arc=none smtp.client-ip=17.58.6.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
+	s=arc-20240116; t=1740414413; c=relaxed/simple;
+	bh=jCYb+d7G1reO0vaUQ96m458H4rRW2Evdk3/qIlZD0oc=;
+	h=Subject:To:References:Cc:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=h3JYVP7fwmQpMI+kStvyws/pn5elRNRB9ZRr/TbN6w+/YMG9R7fkrT4samXBnHw5Y8piAKZQMQMm+8f/BWprpPSor+KZq5tu8K5olTXHO4Wzrv3KQmYGtfoqMv/seVm2bY2tpPTIm63JE4+rbF5WqHslw3tyWak+iZx/mUraqdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=oberhumer.com; spf=none smtp.mailfrom=oberhumer.com; dkim=pass (1024-bit key) header.d=oberhumer.com header.i=@oberhumer.com header.b=kzUfOmPp; arc=none smtp.client-ip=193.170.194.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=oberhumer.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=oberhumer.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="QlrLaWEd"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
-	s=1a1hai; bh=SxARc5+mPnL0BjR2iW5rWJ4TF8233iOHpKnJbbHiSqw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:x-icloud-hme;
-	b=QlrLaWEdYFkfsu8fuz6nbUdcj79Q8tJSmKk2HA1yeaCmsuHQSOTGqxvHL7yUmSH26
-	 akU6WkcZrQNFnHq+BJaLeGPq0iB3wrn9quZ3+XX7TL6W2416KdFvIkp5eq2vQ9b1mC
-	 1W3KDPpIj0DisqfGR5RfGhPUGajT30GJk6SpSRctraMh5Bn8xJKesYr+HLgu8FHVrW
-	 5Dfwx7CMvdnY4JwcEN6gg2auvHgazI6WEAwJkihz3N6RwdjmSunhSudO5G6dDlNdEp
-	 B1QbwPUm6oUVtf0ONAKjCUdMnGgia+x/d6OTzrZdtjaV4ethm0Xnv3yRyjfFnT2Mpt
-	 tk5oRw9q9GBwg==
-Received: from [192.168.1.26] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
-	by pv50p00im-ztdg10021801.me.com (Postfix) with ESMTPSA id 01FF82010282;
-	Mon, 24 Feb 2025 14:45:49 +0000 (UTC)
-Message-ID: <a28f04e5-ccde-4a08-b8fa-a9fa685240b1@icloud.com>
-Date: Mon, 24 Feb 2025 22:45:44 +0800
+	dkim=pass (1024-bit key) header.d=oberhumer.com header.i=@oberhumer.com header.b="kzUfOmPp"
+Received: from localhost (localhost [127.0.0.1])
+	by mail.servus.at (Postfix) with ESMTP id 2A66778926;
+	Mon, 24 Feb 2025 17:21:04 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=oberhumer.com; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:mime-version:user-agent:date:date:message-id:organization:from
+	:from:references:subject:subject:received:received; s=main; t=
+	1740414058; x=1742228459; bh=jCYb+d7G1reO0vaUQ96m458H4rRW2Evdk3/
+	qIlZD0oc=; b=kzUfOmPp9OgoaAWcX1oq6cBTRWEW/ZAVBkY5I5k2GoosSyD8ICq
+	rnYGEy+ntkp3cE9zg/IFAW8s9WwdYPTMqfnrEJL29L3dMS+S0LKApQrvH8pD9S0i
+	SDw6066ix8+DU7DeUKF8F+sBVzh8eIrk+nSkSmiXVwQrMQ/sj0OjH6Tk=
+X-Virus-Scanned: amavis at servus.at
+Received: from mail.servus.at ([127.0.0.1])
+ by localhost (mail.servus.at [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id PhpXsMLSR3C6; Mon, 24 Feb 2025 17:20:58 +0100 (CET)
+Received: from [192.168.216.53] (unknown [81.10.228.128])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: oh_markus)
+	by mail.servus.at (Postfix) with ESMTPSA id F269F5A771;
+	Mon, 24 Feb 2025 17:20:56 +0100 (CET)
+Subject: Re: [PATCH] lib/lzo: Avoid output overruns when compressing
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+ Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+References: <Z7rGXJSX57gEfXPw@gondor.apana.org.au>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Nitin Gupta <nitingupta910@gmail.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Linus Torvalds <torvalds@linux-foundation.org>,
+ Sergey Senozhatsky <senozhatsky@chromium.org>,
+ Dave Rodgman <dave.rodgman@arm.com>
+From: "Markus F.X.J. Oberhumer" <markus@oberhumer.com>
+Organization: oberhumer.com
+Message-ID: <67BC9C68.5090300@oberhumer.com>
+Date: Mon, 24 Feb 2025 17:20:56 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:38.0) Gecko/20100101
+ Thunderbird/38.3.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH *-next 01/18] mm/mmu_gather: Remove needless return in
- void API tlb_remove_page()
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Zijun Hu <quic_zijuhu@quicinc.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Will Deacon <will@kernel.org>, "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>, Nick Piggin <npiggin@gmail.com>,
- Arnd Bergmann <arnd@arndb.de>, Thomas Gleixner <tglx@linutronix.de>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>,
- "Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Johannes Berg <johannes@sipsolutions.net>,
- Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
- Jiri Pirko <jiri@resnulli.us>, Jason Gunthorpe <jgg@ziepe.ca>,
- Leon Romanovsky <leon@kernel.org>, Linus Walleij <linus.walleij@linaro.org>,
- Bartosz Golaszewski <brgl@bgdev.pl>, Lee Jones <lee@kernel.org>,
- Thomas Graf <tgraf@suug.ch>, Christoph Hellwig <hch@lst.de>,
- Marek Szyprowski <m.szyprowski@samsung.com>,
- Robin Murphy <robin.murphy@arm.com>,
- Miquel Raynal <miquel.raynal@bootlin.com>,
- Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>,
- linux-arch@vger.kernel.org, linux-mm@kvack.org,
- linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
- netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-pm@vger.kernel.org, iommu@lists.linux.dev,
- linux-mtd@lists.infradead.org
-References: <20250221-rmv_return-v1-0-cc8dff275827@quicinc.com>
- <20250221-rmv_return-v1-1-cc8dff275827@quicinc.com>
- <20250221200137.GH7373@noisy.programming.kicks-ass.net>
- <8f36be7c-6052-4c5d-85ff-0eed27cf1456@icloud.com>
- <20250224132354.GC11590@noisy.programming.kicks-ass.net>
-Content-Language: en-US
-From: Zijun Hu <zijun_hu@icloud.com>
-In-Reply-To: <20250224132354.GC11590@noisy.programming.kicks-ass.net>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <Z7rGXJSX57gEfXPw@gondor.apana.org.au>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
-X-Proofpoint-ORIG-GUID: rwcKYw_iCScrLPUxt294xX4BCs8xvrO1
-X-Proofpoint-GUID: rwcKYw_iCScrLPUxt294xX4BCs8xvrO1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-24_06,2025-02-24_02,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=911 mlxscore=0 bulkscore=0
- adultscore=0 spamscore=0 malwarescore=0 phishscore=0 suspectscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2502240105
 
-On 2025/2/24 21:23, Peter Zijlstra wrote:
-> On Sat, Feb 22, 2025 at 07:00:28PM +0800, Zijun Hu wrote:
->> On 2025/2/22 04:01, Peter Zijlstra wrote:
->>>>   */
->>>>  static inline void tlb_remove_page(struct mmu_gather *tlb, struct page *page)
->>>>  {
->>>> -	return tlb_remove_page_size(tlb, page, PAGE_SIZE);
->>>> +	tlb_remove_page_size(tlb, page, PAGE_SIZE);
->>>>  }
->>> So I don't mind removing it, but note that that return enforces
->>> tlb_remove_page_size() has void return type.
->>>
->>
->> tlb_remove_page_size() is void function already. (^^)
+LZO declares "*out_len" as output parameter because
+
+  #define lzo1x_worst_compress(x) ((x) + ((x) / 16) + 64 + 3 + 2)
+
+~Markus
+
+
+On 2025-02-23 07:55, Herbert Xu wrote:
+> The compression code in LZO never checked for output overruns.
+> Fix this by checking for end of buffer before each write.
 > 
-> Yes, but if you were to change that, the above return would complain.
+> Fixes: 64c70b1cf43d ("Add LZO1X algorithm to the kernel")
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 > 
->>> It might not be your preferred coding style, but it is not completely
->>> pointless.
->>
->> based on below C spec such as C17 description. i guess language C does
->> not like this usage "return void function in void function";
+> diff --git a/lib/lzo/lzo1x_compress.c b/lib/lzo/lzo1x_compress.c
+> index 47d6d43ea957..5d2f2f851694 100644
+> --- a/lib/lzo/lzo1x_compress.c
+> +++ b/lib/lzo/lzo1x_compress.c
+> @@ -18,10 +18,10 @@
+>  #include <linux/lzo.h>
+>  #include "lzodefs.h"
+>  
+> -static noinline size_t
+> +static noinline int
+>  lzo1x_1_do_compress(const unsigned char *in, size_t in_len,
+> -		    unsigned char *out, size_t *out_len,
+> -		    size_t ti, void *wrkmem, signed char *state_offset,
+> +		    unsigned char **out, unsigned char *op_end,
+> +		    size_t *tp, void *wrkmem, signed char *state_offset,
+>  		    const unsigned char bitstream_version)
+>  {
+>  	const unsigned char *ip;
+> @@ -30,8 +30,9 @@ lzo1x_1_do_compress(const unsigned char *in, size_t in_len,
+>  	const unsigned char * const ip_end = in + in_len - 20;
+>  	const unsigned char *ii;
+>  	lzo_dict_t * const dict = (lzo_dict_t *) wrkmem;
+> +	size_t ti = *tp;
+>  
+> -	op = out;
+> +	op = *out;
+>  	ip = in;
+>  	ii = ip;
+>  	ip += ti < 4 ? 4 - ti : 0;
+> @@ -116,25 +117,41 @@ lzo1x_1_do_compress(const unsigned char *in, size_t in_len,
+>  		if (t != 0) {
+>  			if (t <= 3) {
+>  				op[*state_offset] |= t;
+> +				if (!HAVE_OP(4))
+> +					return LZO_E_OUTPUT_OVERRUN;
+>  				COPY4(op, ii);
+>  				op += t;
+>  			} else if (t <= 16) {
+> +				if (!HAVE_OP(1))
+> +					return LZO_E_OUTPUT_OVERRUN;
+>  				*op++ = (t - 3);
+> +				if (!HAVE_OP(16))
+> +					return LZO_E_OUTPUT_OVERRUN;
+>  				COPY8(op, ii);
+>  				COPY8(op + 8, ii + 8);
+>  				op += t;
+>  			} else {
+>  				if (t <= 18) {
+> +					if (!HAVE_OP(1))
+> +						return LZO_E_OUTPUT_OVERRUN;
+>  					*op++ = (t - 3);
+>  				} else {
+>  					size_t tt = t - 18;
+> +					if (!HAVE_OP(1))
+> +						return LZO_E_OUTPUT_OVERRUN;
+>  					*op++ = 0;
+>  					while (unlikely(tt > 255)) {
+>  						tt -= 255;
+> +						if (!HAVE_OP(1))
+> +							return LZO_E_OUTPUT_OVERRUN;
+>  						*op++ = 0;
+>  					}
+> +					if (!HAVE_OP(1))
+> +						return LZO_E_OUTPUT_OVERRUN;
+>  					*op++ = tt;
+>  				}
+> +				if (!HAVE_OP(t))
+> +					return LZO_E_OUTPUT_OVERRUN;
+>  				do {
+>  					COPY8(op, ii);
+>  					COPY8(op + 8, ii + 8);
+> @@ -151,6 +168,8 @@ lzo1x_1_do_compress(const unsigned char *in, size_t in_len,
+>  		if (unlikely(run_length)) {
+>  			ip += run_length;
+>  			run_length -= MIN_ZERO_RUN_LENGTH;
+> +			if (!HAVE_OP(4))
+> +				return LZO_E_OUTPUT_OVERRUN;
+>  			put_unaligned_le32((run_length << 21) | 0xfffc18
+>  					   | (run_length & 0x7), op);
+>  			op += 4;
+> @@ -243,10 +262,14 @@ lzo1x_1_do_compress(const unsigned char *in, size_t in_len,
+>  		ip += m_len;
+>  		if (m_len <= M2_MAX_LEN && m_off <= M2_MAX_OFFSET) {
+>  			m_off -= 1;
+> +			if (!HAVE_OP(2))
+> +				return LZO_E_OUTPUT_OVERRUN;
+>  			*op++ = (((m_len - 1) << 5) | ((m_off & 7) << 2));
+>  			*op++ = (m_off >> 3);
+>  		} else if (m_off <= M3_MAX_OFFSET) {
+>  			m_off -= 1;
+> +			if (!HAVE_OP(1))
+> +				return LZO_E_OUTPUT_OVERRUN;
+>  			if (m_len <= M3_MAX_LEN)
+>  				*op++ = (M3_MARKER | (m_len - 2));
+>  			else {
+> @@ -254,14 +277,22 @@ lzo1x_1_do_compress(const unsigned char *in, size_t in_len,
+>  				*op++ = M3_MARKER | 0;
+>  				while (unlikely(m_len > 255)) {
+>  					m_len -= 255;
+> +					if (!HAVE_OP(1))
+> +						return LZO_E_OUTPUT_OVERRUN;
+>  					*op++ = 0;
+>  				}
+> +				if (!HAVE_OP(1))
+> +					return LZO_E_OUTPUT_OVERRUN;
+>  				*op++ = (m_len);
+>  			}
+> +			if (!HAVE_OP(2))
+> +				return LZO_E_OUTPUT_OVERRUN;
+>  			*op++ = (m_off << 2);
+>  			*op++ = (m_off >> 6);
+>  		} else {
+>  			m_off -= 0x4000;
+> +			if (!HAVE_OP(1))
+> +				return LZO_E_OUTPUT_OVERRUN;
+>  			if (m_len <= M4_MAX_LEN)
+>  				*op++ = (M4_MARKER | ((m_off >> 11) & 8)
+>  						| (m_len - 2));
+> @@ -282,11 +313,17 @@ lzo1x_1_do_compress(const unsigned char *in, size_t in_len,
+>  				m_len -= M4_MAX_LEN;
+>  				*op++ = (M4_MARKER | ((m_off >> 11) & 8));
+>  				while (unlikely(m_len > 255)) {
+> +					if (!HAVE_OP(1))
+> +						return LZO_E_OUTPUT_OVERRUN;
+>  					m_len -= 255;
+>  					*op++ = 0;
+>  				}
+> +				if (!HAVE_OP(1))
+> +					return LZO_E_OUTPUT_OVERRUN;
+>  				*op++ = (m_len);
+>  			}
+> +			if (!HAVE_OP(2))
+> +				return LZO_E_OUTPUT_OVERRUN;
+>  			*op++ = (m_off << 2);
+>  			*op++ = (m_off >> 6);
+>  		}
+> @@ -295,14 +332,16 @@ lzo1x_1_do_compress(const unsigned char *in, size_t in_len,
+>  		ii = ip;
+>  		goto next;
+>  	}
+> -	*out_len = op - out;
+> -	return in_end - (ii - ti);
+> +	*out = op;
+> +	*tp = in_end - (ii - ti);
+> +	return LZO_E_OK;
+>  }
+>  
+>  static int lzogeneric1x_1_compress(const unsigned char *in, size_t in_len,
+>  		     unsigned char *out, size_t *out_len,
+>  		     void *wrkmem, const unsigned char bitstream_version)
+>  {
+> +	unsigned char * const op_end = out + *out_len;
+>  	const unsigned char *ip = in;
+>  	unsigned char *op = out;
+>  	unsigned char *data_start;
+> @@ -326,14 +365,17 @@ static int lzogeneric1x_1_compress(const unsigned char *in, size_t in_len,
+>  	while (l > 20) {
+>  		size_t ll = min_t(size_t, l, m4_max_offset + 1);
+>  		uintptr_t ll_end = (uintptr_t) ip + ll;
+> +		int err;
+> +
+>  		if ((ll_end + ((t + ll) >> 5)) <= ll_end)
+>  			break;
+>  		BUILD_BUG_ON(D_SIZE * sizeof(lzo_dict_t) > LZO1X_1_MEM_COMPRESS);
+>  		memset(wrkmem, 0, D_SIZE * sizeof(lzo_dict_t));
+> -		t = lzo1x_1_do_compress(ip, ll, op, out_len, t, wrkmem,
+> -					&state_offset, bitstream_version);
+> +		err = lzo1x_1_do_compress(ip, ll, &op, op_end, &t, wrkmem,
+> +					  &state_offset, bitstream_version);
+> +		if (err != LZO_E_OK)
+> +			return err;
+>  		ip += ll;
+> -		op += *out_len;
+>  		l  -= ll;
+>  	}
+>  	t += l;
+> @@ -342,20 +384,32 @@ static int lzogeneric1x_1_compress(const unsigned char *in, size_t in_len,
+>  		const unsigned char *ii = in + in_len - t;
+>  
+>  		if (op == data_start && t <= 238) {
+> +			if (!HAVE_OP(1))
+> +				return LZO_E_OUTPUT_OVERRUN;
+>  			*op++ = (17 + t);
+>  		} else if (t <= 3) {
+>  			op[state_offset] |= t;
+>  		} else if (t <= 18) {
+> +			if (!HAVE_OP(1))
+> +				return LZO_E_OUTPUT_OVERRUN;
+>  			*op++ = (t - 3);
+>  		} else {
+>  			size_t tt = t - 18;
+> +			if (!HAVE_OP(1))
+> +				return LZO_E_OUTPUT_OVERRUN;
+>  			*op++ = 0;
+>  			while (tt > 255) {
+>  				tt -= 255;
+> +				if (!HAVE_OP(1))
+> +					return LZO_E_OUTPUT_OVERRUN;
+>  				*op++ = 0;
+>  			}
+> +			if (!HAVE_OP(1))
+> +				return LZO_E_OUTPUT_OVERRUN;
+>  			*op++ = tt;
+>  		}
+> +		if (!HAVE_OP(t))
+> +			return LZO_E_OUTPUT_OVERRUN;
+>  		if (t >= 16) do {
+>  			COPY8(op, ii);
+>  			COPY8(op + 8, ii + 8);
+> @@ -368,6 +422,8 @@ static int lzogeneric1x_1_compress(const unsigned char *in, size_t in_len,
+>  		} while (--t > 0);
+>  	}
+>  
+> +	if (!HAVE_OP(3))
+> +		return LZO_E_OUTPUT_OVERRUN;
+>  	*op++ = M4_MARKER | 1;
+>  	*op++ = 0;
+>  	*op++ = 0;
+> diff --git a/lib/lzo/lzo1x_decompress_safe.c b/lib/lzo/lzo1x_decompress_safe.c
+> index c94f4928e188..4d5a1b58a4a0 100644
+> --- a/lib/lzo/lzo1x_decompress_safe.c
+> +++ b/lib/lzo/lzo1x_decompress_safe.c
+> @@ -21,7 +21,6 @@
+>  #include "lzodefs.h"
+>  
+>  #define HAVE_IP(x)      ((size_t)(ip_end - ip) >= (size_t)(x))
+> -#define HAVE_OP(x)      ((size_t)(op_end - op) >= (size_t)(x))
+>  #define NEED_IP(x)      if (!HAVE_IP(x)) goto input_overrun
+>  #define NEED_OP(x)      if (!HAVE_OP(x)) goto output_overrun
+>  #define TEST_LB(m_pos)  if ((m_pos) < out) goto lookbehind_overrun
+> diff --git a/lib/lzo/lzodefs.h b/lib/lzo/lzodefs.h
+> index b60851fcf6ce..8b1a46993acf 100644
+> --- a/lib/lzo/lzodefs.h
+> +++ b/lib/lzo/lzodefs.h
+> @@ -19,6 +19,7 @@
+>   */
+>  #define LZO_VERSION 1
+>  
+> +#define HAVE_OP(x)      ((size_t)(op_end - op) >= (size_t)(x))
+>  #define COPY4(dst, src)	\
+>  		put_unaligned(get_unaligned((const u32 *)(src)), (u32 *)(dst))
+>  #if defined(CONFIG_X86_64) || defined(CONFIG_ARM64)
 > 
-> This is GNU extension IIRC. Note kernel uses GNU11, not C11
 
-any link to share about GNU11's description for this aspect ? (^^)
-
-
-
+-- 
+Markus Oberhumer, <markus@oberhumer.com>, http://www.oberhumer.com/
