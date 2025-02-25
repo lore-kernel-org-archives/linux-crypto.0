@@ -1,126 +1,175 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 933D3267731;
-	Tue, 25 Feb 2025 12:43:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF1B2268C42
+	for <linux-crypto@vger.kernel.org>; Tue, 25 Feb 2025 12:54:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.67.36.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740487417; cv=none; b=ScxpHeq76gmWCbVMz8Aw7smIDOiD4LtSuzYojBIyoraj3HoGuOBpzoKvmd5prKuoati8mgKo1+L/RwQJtYI/tglMvKs/OhsxMS36nr9w2sWHd1jX9ZZERA88k5wT86HTfjblld6KDnbQdPdkIn5qKrpJ273r9SaOSb+My8H+KhA=
+	t=1740488077; cv=none; b=IN31AlPRG4yVwJIkgD+qLLu8tv9F9OrgY+TA/eKnKsODzAy7ujvIqtnn1/zkueIMBOoogY7Fa3jHsIo6rF3Fg0n44V9s6BDGBEL5RE6LGJKzGOxA4E0DVW2MwVbG8wsZudcfKDnaiE+1beo3WiBIkzfrQPSWRj8odOBuZdftg9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740487417; c=relaxed/simple;
-	bh=1OwfvkL6kTjgq4tN2T97ZHJ/YRpDQusij7Vrf1nZz9Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kXTZYmXnXuPMMqQwRsiBCAIlId/HmvN0p9VpjZTJ7DBcUo1swk3RyeuDDrB+FV5TaRO5f/F3V9BYvR+sUXBxFTHsNW3c2bmch5L5Ezz/0WqFv1KDnNtP2r4WcCpBHnA10cVSXW4ILrdWti4FBevIQNOGncE0F72kl8U/0E/CD2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t3Gd5dHC; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1740488077; c=relaxed/simple;
+	bh=W8LIqF7kkH6cCLj3gN0Tz1ix7jTva4xQTCeEx72fA+w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=czr7i4QQgbLLMK1HYhtXXDjKt6Gs/++7dP/wr3Is4CZMajoOg6M2nd1v2nl/EtzO4FyeAS2mEWHmbKyWyW3S7LAcMsfmGoGijde6v7YWmaSI3aM94jkcRoNnTsGHr8KtPz44sYHJI2pl2Bet1yNM9m5zQPmAwtt/+9rRG4EKTvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net; spf=pass smtp.mailfrom=posteo.net; dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b=mjILcAIk; arc=none smtp.client-ip=185.67.36.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=posteo.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=posteo.net
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t3Gd5dHC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A185C4CEE9;
-	Tue, 25 Feb 2025 12:43:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740487417;
-	bh=1OwfvkL6kTjgq4tN2T97ZHJ/YRpDQusij7Vrf1nZz9Q=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=t3Gd5dHCYOsj8f+oIw24jdtPMH/DbFHIIuaLLGlI9xFbfLcUqZjCxsOu/aWGeUl5/
-	 Sc1/wjxGrqLjt70lQBK0VDO+68XwC8P8/nU2sL30tNmag4exr4ni/u81CJKdO5gxY4
-	 d6epU7hxrf1tKuLGK8NnhE9o9v5h7R5vNge0EXPR1tCMiXL4Kg4boIdjXyshkxOh5L
-	 CpN/WUg8lRQgY1PZYaydH/8uUN2ofXZeZe8LsdtAAaP35jkPH3tRt3Yi7yvhEBo2ft
-	 YeRBgXGSstHoMz+NbS2nDlOnbVeaQ1qj5OErv8MfCaUpGz/bL87lbTcg5hQfy8FT4F
-	 2p/BihEQqLAaw==
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-abb79af88afso1021779866b.1;
-        Tue, 25 Feb 2025 04:43:37 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVlGRgP1BvN7SkK+Mv7I8VgEe6miXrPwV+CqB/BSU4R3ZmaFHK2Rr178MqIoeAFiE/aDqMGWLYBpjjZSmw2@vger.kernel.org, AJvYcCX5wxYN3TfR075nB4TfBvVSyeFc320vr2ibmJR4sbLtH+mInjihpZ41fznOApcGNGq0D6Vhqah8ghZzYEI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyxtWb2jv4LqL18Xtn9sT8ZwZXOojBqRcurM6auzIYSzDC63kSD
-	mBem/mQucLIPMdSQ0AtoN8aPDQPzbgmT1YaPVYsIZTOzQrgGwD5X7VNoCAT/TtzwjFliOG/E/Lv
-	kBm+CjqeGgPcEVHNFqt6i7S0bEJA=
-X-Google-Smtp-Source: AGHT+IF394hAK3hIpt34lqAuCiGQSZ6t5Z8w9L9Fv+knOt2/+Vcpy+pwWWagwP0ICa/lKMsf5409s9LAdi0WO8c0bEE=
-X-Received: by 2002:a17:907:1b26:b0:aaf:1183:e9be with SMTP id
- a640c23a62f3a-abc099b881cmr2114719666b.2.1740487415736; Tue, 25 Feb 2025
- 04:43:35 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=posteo.net header.i=@posteo.net header.b="mjILcAIk"
+Received: from submission (posteo.de [185.67.36.169]) 
+	by mout02.posteo.de (Postfix) with ESMTPS id 6BAB7240105
+	for <linux-crypto@vger.kernel.org>; Tue, 25 Feb 2025 13:54:33 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.net; s=2017;
+	t=1740488073; bh=W8LIqF7kkH6cCLj3gN0Tz1ix7jTva4xQTCeEx72fA+w=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:Content-Transfer-Encoding:From;
+	b=mjILcAIkXqzqNKdVJx8aNZciCsFDMgWk1hSEOtkfGbO6HFVdhu5Vy04vupoKrYvbv
+	 c6on3zliqSDojlPicjEIhjGdw22NRnh01nANE/3jRMwtf45rqgaGqjBEPbDvvOZQgg
+	 s4Jb6KbceFTD97AcdgGFKHeQkXDlrBbwG3iChrbmjhflZJIT8e5l8aV2shsyZ4sXKo
+	 6ofVmK+sYqzNywRiys2+yrDszLO59sxgwWTEXz+wqj0Y8Kj8BPrm6dHb8ttxz+aByz
+	 WtF5CLyU4itMYTueMHGswR3Km+h6T3R2kOXkZBOleO2kFLusG00NHpXaxrg6YwUFTp
+	 3ou6TTWtB7XpA==
+Received: from customer (localhost [127.0.0.1])
+	by submission (posteo.de) with ESMTPSA id 4Z2HcG3WCTz9rxG;
+	Tue, 25 Feb 2025 13:54:21 +0100 (CET)
+Date: Tue, 25 Feb 2025 12:54:21 +0000
+From: =?utf-8?Q?J=2E_Neusch=C3=A4fer?= <j.ne@posteo.net>
+To: =?utf-8?Q?J=2E_Neusch=C3=A4fer?= <j.ne@posteo.net>
+Cc: Frank Li <Frank.li@nxp.com>, devicetree@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	Krzysztof Kozlowski <krzk@kernel.org>, imx@lists.linux.dev,
+	Scott Wood <oss@buserror.net>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Naveen N Rao <naveen@kernel.org>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>, Lee Jones <lee@kernel.org>,
+	Vinod Koul <vkoul@kernel.org>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	=?utf-8?Q?J=2E_Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>,
+	Wim Van Sebroeck <wim@linux-watchdog.org>,
+	Guenter Roeck <linux@roeck-us.net>, Mark Brown <broonie@kernel.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Richard Weinberger <richard@nod.at>,
+	Vignesh Raghavendra <vigneshr@ti.com>, linux-kernel@vger.kernel.org,
+	linux-ide@vger.kernel.org, linux-crypto@vger.kernel.org,
+	dmaengine@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-watchdog@vger.kernel.org, linux-spi@vger.kernel.org,
+	linux-mtd@lists.infradead.org
+Subject: Re: [PATCH v2 05/12] dt-bindings: dma: Convert fsl,elo*-dma to YAML
+Message-ID: <Z729fRBNLAxdYD22@probook>
+References: <20250207-ppcyaml-v2-0-8137b0c42526@posteo.net>
+ <20250207-ppcyaml-v2-5-8137b0c42526@posteo.net>
+ <Z6pV4eauZj75+911@lizhi-Precision-Tower-5810>
+ <Z684nUnDX4Sb98rQ@probook>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250221113341.108063-1-xry111@xry111.site>
-In-Reply-To: <20250221113341.108063-1-xry111@xry111.site>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Tue, 25 Feb 2025 20:43:23 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H4uacrS-kgvvrTQAGxdsGDsjDeE=eb6BcdCjRdgw8HLRg@mail.gmail.com>
-X-Gm-Features: AWEUYZlMCcvWaaM-Mso7yvHa--XGcu8ZFfgMrPiYEmxO1O1X9rEvnP9j0aMUixw
-Message-ID: <CAAhV-H4uacrS-kgvvrTQAGxdsGDsjDeE=eb6BcdCjRdgw8HLRg@mail.gmail.com>
-Subject: Re: [PATCH] LoongArch: vDSO: vgetrandom-chacha: Make use of the t8 register
-To: Xi Ruoyao <xry111@xry111.site>
-Cc: WANG Xuerui <kernel@xen0n.name>, "Jason A. Donenfeld" <Jason@zx2c4.com>, linux-crypto@vger.kernel.org, 
-	loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Z684nUnDX4Sb98rQ@probook>
 
-Applied, thanks.
+On Fri, Feb 14, 2025 at 12:35:41PM +0000, J. Neuschäfer wrote:
+> On Mon, Feb 10, 2025 at 02:39:13PM -0500, Frank Li wrote:
+> > On Fri, Feb 07, 2025 at 10:30:22PM +0100, J. Neuschäfer via B4 Relay wrote:
+> > > From: "J. Neuschäfer" <j.ne@posteo.net>
+> > >
+> > > The devicetree bindings for Freescale DMA engines have so far existed as
+> > > a text file. This patch converts them to YAML, and specifies all the
+> > > compatible strings currently in use in arch/powerpc/boot/dts.
+> > >
+> > > Signed-off-by: J. Neuschäfer <j.ne@posteo.net>
+> > > ---
+[...]
+> > Need ref to dma-common.yaml?
+> 
+> Sounds good, but I'm not sure what to do about the #dma-cells property,
+> which is required by dma-common.yaml.
+> 
+> There aren't many examples of DMA channels being explicitly declared in
+> device trees. One example that I could find is the the xilinx_dma.txt
+> binding:
+> 
+> 
+> 	axi_vdma_0: axivdma@40030000 {
+> 		compatible = "xlnx,axi-vdma-1.00.a";
+> 		#dma_cells = <1>;
+> 		reg = < 0x40030000 0x10000 >;
+> 		dma-ranges = <0x00000000 0x00000000 0x40000000>;
+> 		xlnx,num-fstores = <0x8>;
+> 		xlnx,flush-fsync = <0x1>;
+> 		xlnx,addrwidth = <0x20>;
+> 		clocks = <&clk 0>, <&clk 1>, <&clk 2>, <&clk 3>, <&clk 4>;
+> 		clock-names = "s_axi_lite_aclk", "m_axi_mm2s_aclk", "m_axi_s2mm_aclk",
+> 			      "m_axis_mm2s_aclk", "s_axis_s2mm_aclk";
+> 		dma-channel@40030000 {
+> 			compatible = "xlnx,axi-vdma-mm2s-channel";
+> 			interrupts = < 0 54 4 >;
+> 			xlnx,datawidth = <0x40>;
+> 		};
+> 		dma-channel@40030030 {
+> 			compatible = "xlnx,axi-vdma-s2mm-channel";
+> 			interrupts = < 0 53 4 >;
+> 			xlnx,datawidth = <0x40>;
+> 		};
+> 	};
+> 
+> 	...
+> 
+> 	vdmatest_0: vdmatest@0 {
+> 		compatible ="xlnx,axi-vdma-test-1.00.a";
+> 		dmas = <&axi_vdma_0 0
+> 			&axi_vdma_0 1>;
+> 		dma-names = "vdma0", "vdma1";
+> 	};
+> 
+> It has #dma_cells (I'm sure #dma-cells was intended) on the controller.
+> 
+> 
+> Another example is in arch/powerpc/boot/dts/fsl/p1022si-post.dtsi:
+> 
+> 	dma@c300 {
+> 		dma00: dma-channel@0 {
+> 			compatible = "fsl,ssi-dma-channel";
+> 		};
+> 		dma01: dma-channel@80 {
+> 			compatible = "fsl,ssi-dma-channel";
+> 		};
+> 	};
+> 
+> 	...
+> 
+> 	ssi@15000 {
+> 		compatible = "fsl,mpc8610-ssi";
+> 		cell-index = <0>;
+> 		reg = <0x15000 0x100>;
+> 		interrupts = <75 2 0 0>;
+> 		fsl,playback-dma = <&dma00>;
+> 		fsl,capture-dma = <&dma01>;
+> 		fsl,fifo-depth = <15>;
+> 	};
+> 
+> 
+> There, the DMA channels are used directly and without additional
+> information (i.e. #dma-cells = <0>, althought it isn't specified).
 
-Huacai
+I had another look at dma-common.yaml and it explicitly requires
+#dma-cells to have a value of at least 1, so this second idea won't
+work.
 
-On Fri, Feb 21, 2025 at 7:34=E2=80=AFPM Xi Ruoyao <xry111@xry111.site> wrot=
-e:
->
-> So we don't need to reuse a register and rematerialize a constant.  I
-> couldn't count :(.
->
-> Signed-off-by: Xi Ruoyao <xry111@xry111.site>
-> ---
->
-> Tested with vdso_test_getrandom and vdso_test_chacha.
->
->  arch/loongarch/vdso/vgetrandom-chacha.S | 13 +++----------
->  1 file changed, 3 insertions(+), 10 deletions(-)
->
-> diff --git a/arch/loongarch/vdso/vgetrandom-chacha.S b/arch/loongarch/vds=
-o/vgetrandom-chacha.S
-> index c2733e6c3a8d..c4dd2bab8825 100644
-> --- a/arch/loongarch/vdso/vgetrandom-chacha.S
-> +++ b/arch/loongarch/vdso/vgetrandom-chacha.S
-> @@ -58,9 +58,7 @@ SYM_FUNC_START(__arch_chacha20_blocks_nostack)
->  #define copy0          t5
->  #define copy1          t6
->  #define copy2          t7
-> -
-> -/* Reuse i as copy3 */
-> -#define copy3          i
-> +#define copy3          t8
->
->  /* Packs to be used with OP_4REG */
->  #define line0          state0, state1, state2, state3
-> @@ -99,6 +97,7 @@ SYM_FUNC_START(__arch_chacha20_blocks_nostack)
->         li.w            copy0, 0x61707865
->         li.w            copy1, 0x3320646e
->         li.w            copy2, 0x79622d32
-> +       li.w            copy3, 0x6b206574
->
->         ld.w            cnt_lo, counter, 0
->         ld.w            cnt_hi, counter, 4
-> @@ -108,7 +107,7 @@ SYM_FUNC_START(__arch_chacha20_blocks_nostack)
->         move            state0, copy0
->         move            state1, copy1
->         move            state2, copy2
-> -       li.w            state3, 0x6b206574
-> +       move            state3, copy3
->
->         /* state[4,5,..,11] =3D key */
->         ld.w            state4, key, 0
-> @@ -167,12 +166,6 @@ SYM_FUNC_START(__arch_chacha20_blocks_nostack)
->         addi.w          i, i, -1
->         bnez            i, .Lpermute
->
-> -       /*
-> -        * copy[3] =3D "expa", materialize it here because copy[3] shares=
- the
-> -        * same register with i which just became dead.
-> -        */
-> -       li.w            copy3, 0x6b206574
-> -
->         /* output[0,1,2,3] =3D copy[0,1,2,3] + state[0,1,2,3] */
->         OP_4REG add.w   line0, copy
->         st.w            state0, output, 0
-> --
-> 2.48.1
->
+
+Best regards,
+J. Neuschäfer
