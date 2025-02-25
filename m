@@ -1,48 +1,80 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDD651F95C;
-	Tue, 25 Feb 2025 08:54:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E994264A96;
+	Tue, 25 Feb 2025 09:02:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740473651; cv=none; b=lSgsQfmBUVon+gehO//LQdRNcgn1U7vjHwQMXo0QMG5yC4JrTHgiK+7rU0lk7nWxKGEgSg2q7FkRva745xXTgCrUuJNIkZyhh8RIB+iY3hk50DGZcv7bbkIoiXKctxFLo9oxlMPdbKVAi9x2ak2mVRS1+0nz3/BLFlqp2/QCO4A=
+	t=1740474127; cv=none; b=sJEbHCqVzdA1Y0h6X93Z3o6qJFH0oEJDUX/APIlQW10eH6ZnkV988keDNoYp+UL3WMUbcdAXLClDR+2nJkOFqtAC/rGMzz4KHEvzVSsZd4FWTyiocigZWacefiFkHUpq6ZdDnEXbGSpl5FDIFOm5kvcbjTobjcur1CvOvmSH2r0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740473651; c=relaxed/simple;
-	bh=yaXbbybvqdIZS5sCRuYjv1ZkyvR/QGry9ofzxyYxLFE=;
+	s=arc-20240116; t=1740474127; c=relaxed/simple;
+	bh=P7wGXl6L+JiS80sbHu1yQj/GBe4Om+RVsXyVTHV9wEA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Mxt+AzGuSVeb0APKT+fK/30gfHxIImudU6bYzxMOpBXAxBBbmUqW54tSD0l+ZpmoKDpRe5JpdPAzG2WfBEWq36I7ekY7tPwlTkcHt68x3zKB26tPGAaBHG+h6pIhSGdbb6IVI1PI4oCKuOQvBdJZ/Ev2o4UBpbU1tM7QwtqRVp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=MBQ0fVm2; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=KpHD8mi6TyDIeJXTfU2yddQZWiXBcNb3sgMKdTTsZqe1z/62+xBKrYkzmbR0/AN4Fb42/dR8GEZg50W18RYK4IB97Z4AIPZtQmg93x686tKv8y3sBhJEN/1BtcXXB4ZnDhNrkwQbD/LWDVCqYr+B/301o2eEGUzXiSXlIp411DY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hfeOS8Gn; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="MBQ0fVm2"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=m/uE5AbjUgTrqaB5TvMD0hL1QbOzaO5ZccZ+IZl0Aqw=; b=MBQ0fVm2AHhupKDLf2RD8erw6D
-	89jeBLcCBDOXI4IOJH7xufAvPx8+87/YbUtM35d10R8wWycbobGy7Z/E2dHkTc/fmsmHmIwiKPtiv
-	V9TJ6jRvdd04msxpx9Df/9Fr5CJpSJt9iLh2w1EFH28KdRNSMEYdAwELY/X/WC97PTYgJw19GlTbB
-	4aS1hQXJmskPhqpPC58l/2Qdz5NZzLpmYt9W+lAnWMCZCc+HNf1mXcy9PhWd9Kf0lTFJFT3RM3du6
-	vMYh3Hdns/Wn5AFTWPYoiJ+2vQxnepUBEmP/KM/CbrbeH51OoKZprvyyAsBE4ZpfE3XVyKIH6tNv5
-	3wrQLmZw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tmqhS-001Xuy-0c;
-	Tue, 25 Feb 2025 16:53:59 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 25 Feb 2025 16:53:58 +0800
-Date: Tue, 25 Feb 2025 16:53:58 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: syzbot <syzbot+1a517ccfcbc6a7ab0f82@syzkaller.appspotmail.com>
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Yosry Ahmed <yosry.ahmed@linux.dev>, linux-mm@kvack.org
-Subject: mm: zswap: fix crypto_free_acomp deadlock in zswap_cpu_comp_dead
-Message-ID: <Z72FJnbA39zWh4zS@gondor.apana.org.au>
-References: <67bcea51.050a0220.bbfd1.0096.GAE@google.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hfeOS8Gn"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740474126; x=1772010126;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=P7wGXl6L+JiS80sbHu1yQj/GBe4Om+RVsXyVTHV9wEA=;
+  b=hfeOS8GnIj8WMV5Ma+uwnWIYYekbCK/DFRqvH8sSBxzHxWbyinxKw9WQ
+   RndNuqOqRuoabRdQRv1g8EegKfNsfUySKtM60Ld10epxJVyIYkRY2HM/Y
+   ypcOSZxNrpfJ76OYyAOByLHqedEofmfkyglmYmLWDPxOAjg4KZjl1gCw/
+   JIgvGjANThpBzpmRURiKwJ6irFLJscZZII4Llh4Ka0vGdeZY+RQpzYAjy
+   hGBTB3PrngSuUMTR6+NHlFDeJb3ASjbivGicNZFYrcKFV9GosNI1ud7Wg
+   o6quWR/DP7AHQ8aCPh4JqOh+whnQmoyktj9lO/7HDZ3FanRh+pBLJmnKE
+   g==;
+X-CSE-ConnectionGUID: zRj746+9RwuRGZywYtnfkQ==
+X-CSE-MsgGUID: iXeYqbBLQQmnS6zgftaoFw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11355"; a="41525380"
+X-IronPort-AV: E=Sophos;i="6.13,313,1732608000"; 
+   d="scan'208";a="41525380"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Feb 2025 01:02:05 -0800
+X-CSE-ConnectionGUID: nvV+a7ZESHqd57n+v5TJvg==
+X-CSE-MsgGUID: wv7919uFStKCA1I3Tr8raw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,313,1732608000"; 
+   d="scan'208";a="116528155"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by fmviesa008.fm.intel.com with ESMTP; 25 Feb 2025 01:01:57 -0800
+Date: Tue, 25 Feb 2025 17:00:10 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Alexey Kardashevskiy <aik@amd.com>
+Cc: x86@kernel.org, kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Ashish Kalra <ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>,
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+	Robin Murphy <robin.murphy@arm.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Christoph Hellwig <hch@lst.de>, Nikunj A Dadhania <nikunj@amd.com>,
+	Michael Roth <michael.roth@amd.com>,
+	Vasant Hegde <vasant.hegde@amd.com>,
+	Joao Martins <joao.m.martins@oracle.com>,
+	Nicolin Chen <nicolinc@nvidia.com>,
+	Lu Baolu <baolu.lu@linux.intel.com>,
+	Steve Sistare <steven.sistare@oracle.com>,
+	Lukas Wunner <lukas@wunner.de>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Dionna Glaze <dionnaglaze@google.com>, Yi Liu <yi.l.liu@intel.com>,
+	iommu@lists.linux.dev, linux-coco@lists.linux.dev,
+	Zhi Wang <zhiw@nvidia.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+Subject: Re: [RFC PATCH v2 14/22] iommufd: Add TIO calls
+Message-ID: <Z72GmixR6NkzXAl7@yilunxu-OptiPlex-7050>
+References: <20250218111017.491719-1-aik@amd.com>
+ <20250218111017.491719-15-aik@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -51,76 +83,50 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <67bcea51.050a0220.bbfd1.0096.GAE@google.com>
+In-Reply-To: <20250218111017.491719-15-aik@amd.com>
 
-On Mon, Feb 24, 2025 at 01:53:21PM -0800, syzbot wrote:
+On Tue, Feb 18, 2025 at 10:10:01PM +1100, Alexey Kardashevskiy wrote:
+> When a TDISP-capable device is passed through, it is configured as
+> a shared device to begin with. Later on when a VM probes the device,
+> detects its TDISP capability (reported via the PCIe ExtCap bit
+> called "TEE-IO"), performs the device attestation and transitions it
+> to a secure state when the device can run encrypted DMA and respond
+> to encrypted MMIO accesses.
 > 
-> syzbot found the following issue on:
+> Since KVM is out of the TCB, secure enablement is done in the secure
+> firmware. The API requires PCI host/guest BDFns, a KVM id hence such
+> calls are routed via IOMMUFD, primarily because allowing secure DMA
+> is the major performance bottleneck and it is a function of IOMMU.
+
+I still have concern about the vdevice interface for bind. Bind put the
+device to LOCKED state, so is more of a device configuration rather
+than an iommu configuration. So seems more reasonable put the API in VFIO?
+
 > 
-> HEAD commit:    e9a8cac0bf89 Merge tag 'v6.14-rc3-smb3-client-fixes' of gi..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=17b667f8580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=61cbf5ac8a063ad4
-> dashboard link: https://syzkaller.appspot.com/bug?extid=1a517ccfcbc6a7ab0f82
-> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+> Add TDI bind to do the initial binding of a passed through PCI
+> function to a VM. Add a forwarder for TIO GUEST REQUEST. These two
+> call into the TSM which forwards the calls to the PSP.
 > 
-> Unfortunately, I don't have any reproducer for this issue yet.
+> Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
+> ---
 > 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/8441f1b50402/disk-e9a8cac0.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/65b1f8d2f790/vmlinux-e9a8cac0.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/1d6f6d8c3d6b/bzImage-e9a8cac0.xz
+> Both enabling secure DMA (== "SDTE Write") and secure MMIO (== "MMIO
+> validate") are TIO GUEST REQUEST messages. These are encrypted and
+> the HV (==IOMMUFD or KVM or VFIO) cannot see them unless the guest
+> shares some via kvm_run::kvm_user_vmgexit (and then QEMU passes those
+> via ioctls).
+> 
+> This RFC routes all TIO GUEST REQUESTs via IOMMUFD which arguably should
+> only do so only for "SDTE Write" and leave "MMIO validate" for VFIO.
 
----8<---
-Call crypto_free_acomp outside of the mutex in zswap_cpu_comp_dead
-as otherwise this could dead-lock as the allocation path may lead
-back into zswap while holding the same lock.  Zap the pointers to
-acomp and buffer after freeing.
+The fact is HV cannot see the guest requests, even I think HV never have
+to care about the guest requests. HV cares until bind, then no HV side
+MMIO & DMA access is possible, any operation/state after bind won't
+affect HV more. And HV could always unbind to rollback guest side thing.
 
-Also move the NULL check on acomp_ctx so that it takes place before
-the mutex dereference.
+That said guest requests are nothing to do with any host side component,
+iommu or vfio. It is just the message posting between VM & firmware. I
+suppose KVM could directly do it by calling TSM driver API.
 
-Fixes: 12dcb0ef5406 ("mm: zswap: properly synchronize freeing resources during CPU hotunplug")
-Reported-by: syzbot+1a517ccfcbc6a7ab0f82@syzkaller.appspotmail.com
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/mm/zswap.c b/mm/zswap.c
-index 6504174fbc6a..24d36266a791 100644
---- a/mm/zswap.c
-+++ b/mm/zswap.c
-@@ -881,18 +881,23 @@ static int zswap_cpu_comp_dead(unsigned int cpu, struct hlist_node *node)
- {
- 	struct zswap_pool *pool = hlist_entry(node, struct zswap_pool, node);
- 	struct crypto_acomp_ctx *acomp_ctx = per_cpu_ptr(pool->acomp_ctx, cpu);
-+	struct crypto_acomp *acomp = NULL;
-+
-+	if (IS_ERR_OR_NULL(acomp_ctx))
-+		return 0;
- 
- 	mutex_lock(&acomp_ctx->mutex);
--	if (!IS_ERR_OR_NULL(acomp_ctx)) {
--		if (!IS_ERR_OR_NULL(acomp_ctx->req))
--			acomp_request_free(acomp_ctx->req);
--		acomp_ctx->req = NULL;
--		if (!IS_ERR_OR_NULL(acomp_ctx->acomp))
--			crypto_free_acomp(acomp_ctx->acomp);
--		kfree(acomp_ctx->buffer);
--	}
-+	if (!IS_ERR_OR_NULL(acomp_ctx->req))
-+		acomp_request_free(acomp_ctx->req);
-+	acomp_ctx->req = NULL;
-+	acomp = acomp_ctx->acomp;
-+	acomp_ctx->acomp = NULL;
-+	kfree(acomp_ctx->buffer);
-+	acomp_ctx->buffer = NULL;
- 	mutex_unlock(&acomp_ctx->mutex);
- 
-+	crypto_free_acomp(acomp);
-+
- 	return 0;
- }
- 
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Thanks,
+Yilun
