@@ -1,228 +1,241 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2075.outbound.protection.outlook.com [40.107.94.75])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 875A5198A19;
-	Tue, 25 Feb 2025 16:42:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740501743; cv=none; b=IMLVQZswWkt6HihikbS+dWwlQN8Y7gWVX/OM0kJeYVwDFhlR93OYBkTxb4rg0al9tW0f8rZ7I3Uj+q8d6JLYM7eir02aGM8gyBI/rQFD0lIK/onCjcg2l7TqxeyvFMHiqb3UIY2B0KV6+Oqb02Dryg29dHYhMEptHzo1LgNbTEc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740501743; c=relaxed/simple;
-	bh=E1I+A2ijUQsaJXZ97m6qRzEkqsAgeCC2zPqldsjqxWo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=aS7pRMH9DUlGVqk51pQ7qyIiDPCoZM+ENANRaOQhMADtyxv51SXE5bdWyEcAA6TRXbcaVaq4yqmxzUNNxIQd7Ptd6UgiG7I1e7LtR15p5R7LPfc1w/zUwOWrTbYFMDtNaCFu1fO2DP+ftLAXW/WMlU6u5Rs4Hm9XlwwbMC6CIc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gMVjLfi8; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DADB2440C;
+	Tue, 25 Feb 2025 16:50:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.75
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740502220; cv=fail; b=fZQap5BJ9hlQfJqeKUjuOf3hCpi77cQ2JbCr6EjYL51MIa3XlF/C20thxXD3qWMOh5FxPYdZvfv5bZW2fcOQ2JfWNgrGJ8VBWZxxJqig7bF3z5wT1tYYScoTpC4rx06byy4Wjh+VhEpjANrFYkI/ljJu2IpSTUcirt9hYc6qSJ8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740502220; c=relaxed/simple;
+	bh=XQQsODO8wZWerJBF31WxiewZg16STYQqqKXs1zqpbM0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=dWKZmIXsZ2ABMBsH01AG4H8nJ+gEBSibKC9RujUw5RYc2rzli7u2LdUuKt6QbNLHhy1w7jigHcwatmadvKm/uQvs4hxckZfLDfNOII9kKeREyBzAV2EvlfoJy7BgX7+f314F8aRH5S3aozQb4QSR/WgjEbK/KEXIg28S4aDAxcY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=4JtFQ2m0; arc=fail smtp.client-ip=40.107.94.75
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gMVjLfi8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D075BC4CEE6;
-	Tue, 25 Feb 2025 16:42:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740501743;
-	bh=E1I+A2ijUQsaJXZ97m6qRzEkqsAgeCC2zPqldsjqxWo=;
-	h=From:To:Cc:Subject:Date:From;
-	b=gMVjLfi8RUbNJ1VSvtuyy71POodgGy0/kNnREyvDNg64smohUM2ALzQWrZi8w3f9I
-	 4LVmOLgrARJol4lLYOoUiobbX7Y3aQFL3sOxabO6oTV7550ZjxQ2xUAMdZ3szOUVhj
-	 CUPx79Br1nHmlgNXnJu7UF5b1ZfWSFhb6beB0/4BpMk6aGhwJT296Nyz+zHxGSZc1o
-	 ZGDGCza9K9x6n7zMHowk721uOxmBPdUDnEEby16e1qkZLrvjqigseSzNQa6PhG7Len
-	 hbONMGfxrM3RqDXrhZO0vN+dvny2/0bRrL91EkMBKKZR9FqYZPeEStSR4wYc9ujzIi
-	 5EtkuYflCfmHA==
-From: Arnd Bergmann <arnd@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Harald Freudenberger <freude@linux.ibm.com>,
-	Holger Dengler <dengler@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Eric Biggers <ebiggers@google.com>,
-	James Bottomley <James.Bottomley@HansenPartnership.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-mips@vger.kernel.org,
-	linux-s390@vger.kernel.org
-Subject: [PATCH] crypto: lib/Kconfig - fix chacha/poly1305 dependencies more more
-Date: Tue, 25 Feb 2025 17:42:07 +0100
-Message-Id: <20250225164216.4807-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.5
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="4JtFQ2m0"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=GmNSscw8ModOJtl+jL/jWd8vTwAp0HJ3cGKax7FOHvlyXL+1xFl86496Usbin1ERNvP3kLtOzNW25R39ezGBt4uAEScPaehsW6YkkUEpxN+lEcpgi764/1s+j+aoizzNtesKMeir9HZpeUj/hueksEZAFMjTJ0/SoOUT1vDUTrhgcFp5DFRklaHMPmWdshd4o5Pray4ikoBvzCvD4kguTt7cQ+vagzDrKNgB1Za7aU4f5ff5KCgDLj2Tg26NOQ2d8dOUUn0K4taghiOqHcH8uVF97FNzrnscdzH+Hd2DE1nKlPQnhPvQzv9TSX8j55wgC9Sv9NEij6YhEdNgurS1fw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CUsFI2J7KQTplpsnCqkn6dN5Y6psR3kEJbYFpTXAnVg=;
+ b=fqYUek4dyugd51kyU2DbzhNkgX8BYzFofvcMW9tfXa8kgT+SBhTfanj5y3U2+JyFNTVCAhMQOwZP3N/RM6LCZPCKWNi+1UM7YUuQ1odYsz28ZVP/Q8qPVQSYPf6XG0tGWKJiLrDEfMSUQNePjIDvzZGQJqqQu4c5tLyU83QzJ0aFl2FA4neW/B9pBa5WDlIpKz/FV5/iC1ZERhRVc1Bp2VYOpomlVDaO4Pdqy7RQNOnVTzMhbRECH0SFuC3iX0qTw+I2gsmyFA2V6CGq4dW34AvDxKYdsEDvNaJ4La11uqeLkdJ8OQNdT/IH5ljYBvNJ7MThq0tdveiacow8PhlEZw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=oracle.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CUsFI2J7KQTplpsnCqkn6dN5Y6psR3kEJbYFpTXAnVg=;
+ b=4JtFQ2m0IYnBgrkTrAzaKbkHIyuPxo0U3ZDAiMuYhjuXsTboCJMDLQQoEYRalJ6U8jpR8bKqU5wOqquPqQz4A/+NgFEVnSG/xaY1/0Y55bzMFqx0HsZIP71sNHJdGqW5MmprznEM0/kJbSQX4rkuRSWAyZSwZXk6ULJshm/lh6M=
+Received: from BN9PR03CA0928.namprd03.prod.outlook.com (2603:10b6:408:107::33)
+ by CH3PR12MB8709.namprd12.prod.outlook.com (2603:10b6:610:17c::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.18; Tue, 25 Feb
+ 2025 16:50:16 +0000
+Received: from BL6PEPF0001AB51.namprd04.prod.outlook.com
+ (2603:10b6:408:107:cafe::5d) by BN9PR03CA0928.outlook.office365.com
+ (2603:10b6:408:107::33) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8466.21 via Frontend Transport; Tue,
+ 25 Feb 2025 16:50:16 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BL6PEPF0001AB51.mail.protection.outlook.com (10.167.242.75) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.8489.16 via Frontend Transport; Tue, 25 Feb 2025 16:50:16 +0000
+Received: from [10.236.185.178] (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 25 Feb
+ 2025 10:50:13 -0600
+Message-ID: <f66c47d0-d111-45a8-8cf5-bd4577bbe6e5@amd.com>
+Date: Tue, 25 Feb 2025 10:50:13 -0600
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 01/10] KVM: SEV: Disable SEV-SNP support on
+ initialization failure
+To: Liam Merwick <liam.merwick@oracle.com>, <linux-kernel@vger.kernel.org>,
+	<x86@kernel.org>, <kvm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>
+CC: <seanjc@google.com>, <pbonzini@redhat.com>, <thomas.lendacky@amd.com>,
+	<tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
+	<dave.hansen@linux.intel.com>, <shuah@kernel.org>, <pgonda@google.com>,
+	<ashish.kalra@amd.com>, <nikunj@amd.com>, <pankaj.gupta@amd.com>,
+	<michael.roth@amd.com>, <sraithal@amd.com>
+References: <20250221210200.244405-1-prsampat@amd.com>
+ <20250221210200.244405-2-prsampat@amd.com>
+ <593571c4-39c5-4647-82f2-98094ec9f437@oracle.com>
+Content-Language: en-US
+From: "Pratik R. Sampat" <prsampat@amd.com>
+In-Reply-To: <593571c4-39c5-4647-82f2-98094ec9f437@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB51:EE_|CH3PR12MB8709:EE_
+X-MS-Office365-Filtering-Correlation-Id: 82c93964-b002-4a24-f11e-08dd55bc7ae8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?enMxS2FRbXNnNVJ4NzVNaEx5S3Y2b2h5a3FFRzZWdHpNUFBWWEo0RGxJVzNs?=
+ =?utf-8?B?Q3ZSejdwOFZtMGp5Nzlhenl1T1VCeWgrRlJ6Z0kvcjVyZkNnWHY4Z0hpcXd5?=
+ =?utf-8?B?aERDQ1psVnEyNXRDMHhpQU5EaUlJYXYyOTFZaENDd3hiQUkxVzJYTUN1MlpC?=
+ =?utf-8?B?cllXekk3eVhJSmJ1cUVEMnNjWmN0Q0NBVnRZOW4zY3FYVHhOeVlRZHlDbERo?=
+ =?utf-8?B?SU1ONjJydDQyM2JzMG1oTElzd0U3aWdCN1JWT01TaGxLSXJYNDZZcDRmcXZw?=
+ =?utf-8?B?Ulpqa2oxdExEbnBqYjN6UXRtZS9XVUtpcEFzK1puRTdFR2RwQ3B1NHdRSDYy?=
+ =?utf-8?B?ekpKN09uZmFQcjA2QnJkVTlySzhhQ3VscUtZZG1sNGFJTkJQVWc3TWo5UTRW?=
+ =?utf-8?B?NWpwVXVPekZGODhZNkZPVktzNmp3TElWNEoxaGF0dWdHM1lhM1g4djFjRjlK?=
+ =?utf-8?B?OVFPMitBVmRXdGxHa2xwUVRidEtvd2pmNUh5bW1wazZZV3g4NlhxUWxpeFhQ?=
+ =?utf-8?B?QzBtdUZJMkxKQTJ2YjJhWUtpTUlBVmhKL2VuZXUvY1hSb3FoRUI4YVpKMWEy?=
+ =?utf-8?B?V1pYc2hPanluNDFWaFdnSzdBUnNHMy9uTCtNV0JxVk5TS1Rvbk1SSVBEVVpu?=
+ =?utf-8?B?MG02K25GNldHcWl6NXRhdHlnVjE3MkcyUnlNWmhWTCs3S1plbFpNZXpQOXh1?=
+ =?utf-8?B?UHBISjk5aTdJczlmUzRLMTB6c0piUXUzeE9CYURjSjFyWFd5bHNVVzRHRXQ2?=
+ =?utf-8?B?TnA3d1lFRldJRS9EWVNVM3kxeHEwRFRrNWVQMk93SmVlQW5VMm1ja0FRNGJi?=
+ =?utf-8?B?UVZ0bnpYQ0o0NWlPS3lVNHZHU0hNOENWTmVVYVlQOVg4MHR3R3VQNXVRWUlH?=
+ =?utf-8?B?V01EOFR5b3BOcjNXVklCSkJHTzIzeTNJSDh4R3FxZGxCL2l1bFdCMCtnTnZM?=
+ =?utf-8?B?TjNNTVRJLytNbDR1OU92NWhyQVFZUGN6TWU0TE4rOWFLc3pUMFpidDRVRVV3?=
+ =?utf-8?B?SkxXeFVwWnB6TFhPRFRzWkdPRFErSkg2K3FUM285UmNFMVVWK1hkNmdTQldR?=
+ =?utf-8?B?V2FmUEtBR0xsUzg3elJHV0dQbU5hWmwvRExWcDlta2NDZlZleXpBZklBVW5J?=
+ =?utf-8?B?akxtZUdzRGRPWldJUmUwSTJ6UEtENTFJYm1GM1R3YjZXNkp6dDNhNlBBTEJP?=
+ =?utf-8?B?cC8rK0c3UlhqUTlNclpOVGl0WWpSbjl6L3I4aDk5eU91TllTMTVrVmxwVWhR?=
+ =?utf-8?B?OWI3REpWdjF1dlU5SmFXUnhsZnB1TzVmbDkyMk9aRGErTkJpa0xEamZqTCtk?=
+ =?utf-8?B?VE8weTVaMURxZmVkcUVmVU83TWlPUGErYjJSUXBZdFJJazZHbkNWQWNBYk4r?=
+ =?utf-8?B?ZTY4WXZuQ00veXpCWS9xMmQwbFg3S3V5bXBPVVUxOHFXVWF6U2k2NGF5YTk1?=
+ =?utf-8?B?Ukg2UEdmdFlDS3ZVdXFZYVM1UDNCZXBDRFBxWnk4S1crS2kwT042NDdJcVh4?=
+ =?utf-8?B?UVQ5R3BxZ1dJcXFoWmx4VTNGZzhGTjdKMzJPRjRXNzhOcldXVFRtSG1zVzlK?=
+ =?utf-8?B?VWxCLzJUTjJXOGRuTlBvcEZYZWVFdnJDN0ZDd2xDNkxPOFcyY3ROWHdZbVkx?=
+ =?utf-8?B?VzRtaFp6TnNKSzRGWW1mM0pqbHJIR3pCREpzSi8wMklCTmFlek5zRCttaFlI?=
+ =?utf-8?B?bEt3aC84VFNmSHBRN283ZGVWR0VPdkZmRmZ5cytDRXQrMmN0L25GWjd3ZitR?=
+ =?utf-8?B?eVIvdGovU2N0bGxUTWc5QVA2UDBwYXlpZURGZWtFdnJqYjFuZk4xMG8zMnVF?=
+ =?utf-8?B?UjJtUllUR1hLNW1YZ0M0YjhRZitsOEpZVFQ1M2FDNWgrbXZnaGRSVExoajhy?=
+ =?utf-8?B?aTVERitHYXZKd1Fjd3JxdjNmTmZSeC9NbHNPSWQ5Z1FwcGFqNkFseHVrRWVF?=
+ =?utf-8?B?MDZGRUVQSjd0Tkd5aXMzS0F4WGcxd2hOUVo4UVBIK0xNVzBpYjA2T0lObndt?=
+ =?utf-8?Q?rykh8LPAaqu2UOCrXgU1PjaER/0yzs=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(7416014)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2025 16:50:16.0308
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 82c93964-b002-4a24-f11e-08dd55bc7ae8
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL6PEPF0001AB51.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8709
 
-From: Arnd Bergmann <arnd@arndb.de>
+Hi Liam,
 
-A recent change tries to fix Kconfig dependencies, but introduced
-two problems in the process:
+Thanks for review!
 
- - only arm, powerpc and x86 are changed, while mips, arm64 and s390
-   are now broken
+On 2/24/2025 1:01 PM, Liam Merwick wrote:
+> 
+> 
+> On 21/02/2025 21:01, Pratik R. Sampat wrote:
+>> During platform init, SNP initialization may fail for several reasons,
+>> such as firmware command failures and incompatible versions. However,
+>> the KVM capability may continue to advertise support for it. Export this
+>> information to KVM and withdraw SEV-SNP support if has not been
+>> successfully initialized.
+>>
+>> Fixes: 1dfe571c12cf ("KVM: SEV: Add initial SEV-SNP support")
+>> Suggested-by: Sean Christopherson <seanjc@google.com>
+>> Signed-off-by: Pratik R. Sampat <prsampat@amd.com>
+>> ---
+>> v6..v7:
+>>
+>> * Replace FW version check with sev->snp_initialized (Sean)
+>> ---
+>>   arch/x86/kvm/svm/sev.c       | 4 +++-
+>>   drivers/crypto/ccp/sev-dev.c | 8 ++++++++
+>>   include/linux/psp-sev.h      | 3 +++
+>>   3 files changed, 14 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+>> index 0dbb25442ec1..87b5d63a5817 100644
+>> --- a/arch/x86/kvm/svm/sev.c
+>> +++ b/arch/x86/kvm/svm/sev.c
+>> @@ -3050,7 +3050,9 @@ void __init sev_hardware_setup(void)
+>>       sev_es_asid_count = min_sev_asid - 1;
+>>       WARN_ON_ONCE(misc_cg_set_capacity(MISC_CG_RES_SEV_ES,
+>> sev_es_asid_count));
+>>       sev_es_supported = true;
+>> -    sev_snp_supported = sev_snp_enabled &&
+>> cc_platform_has(CC_ATTR_HOST_SEV_SNP);
+>> +    sev_snp_supported = (sev_snp_enabled &&
+>> +                cc_platform_has(CC_ATTR_HOST_SEV_SNP) &&
+>> +                snp_initialized());
+>>     out:
+>>       if (boot_cpu_has(X86_FEATURE_SEV))
+>> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+>> index 2e87ca0e292a..8d2cf8552bc2 100644
+>> --- a/drivers/crypto/ccp/sev-dev.c
+>> +++ b/drivers/crypto/ccp/sev-dev.c
+>> @@ -1352,6 +1352,14 @@ int sev_platform_init(struct
+>> sev_platform_init_args *args)
+>>   }
+>>   EXPORT_SYMBOL_GPL(sev_platform_init);
+>>   +bool snp_initialized(void)
+>> +{
+>> +    struct sev_device *sev = psp_master->sev_data;
+> 
+> 
+> Should check psp_master isn't NULL before accessing just in case
+> (particularly for future potential callers).
+> 
+> (e.g. see ccb88e9549e7 ("crypto: ccp - Fix null pointer dereference in
+> __sev_platform_shutdown_locked")
+> 
 
- - there are now configurations where the architecture enables its
-   own helper functions as loadable modules, but they remain silently
-   unused because CRYPTO_LIB_* falls back to the generic helpers
+Thanks for pointing this out, if I end up using this interface, I'll put
+the NULL check in.
 
-Address both by changing the logic again: the architecture functions
-select CRYPTO_ARCH_MAY_HAVE_LIB_CHACHA, which may be a loadable
-module or built-in, and this controls whether the library is
-also built-in.
-
-Fixes: 04f9ccc955c7 ("crypto: lib/Kconfig - Fix lib built-in failure when arch is modular")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
-I did not quite understand what problem the 04f9ccc955c7 patch
-actually tried to solve, so there is a chance that my version
-undoes it. I tested this on randconfig builds across, arm,
-arm64 and x86 and found no other dependency problems with these
-libraries.
----
- arch/arm64/crypto/Kconfig |  4 ++--
- arch/mips/crypto/Kconfig  |  4 ++--
- arch/s390/crypto/Kconfig  |  2 +-
- lib/crypto/Kconfig        | 20 +++++++++++---------
- 4 files changed, 16 insertions(+), 14 deletions(-)
-
-diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
-index 5636ab83f22a..3d90efdcf5a5 100644
---- a/arch/arm64/crypto/Kconfig
-+++ b/arch/arm64/crypto/Kconfig
-@@ -29,7 +29,7 @@ config CRYPTO_POLY1305_NEON
- 	tristate "Hash functions: Poly1305 (NEON)"
- 	depends on KERNEL_MODE_NEON
- 	select CRYPTO_HASH
--	select CRYPTO_ARCH_HAVE_LIB_POLY1305
-+	select CRYPTO_ARCH_MAY_HAVE_LIB_POLY1305
- 	help
- 	  Poly1305 authenticator algorithm (RFC7539)
- 
-@@ -190,7 +190,7 @@ config CRYPTO_CHACHA20_NEON
- 	depends on KERNEL_MODE_NEON
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_LIB_CHACHA_GENERIC
--	select CRYPTO_ARCH_HAVE_LIB_CHACHA
-+	select CRYPTO_ARCH_MAY_HAVE_LIB_CHACHA
- 	help
- 	  Length-preserving ciphers: ChaCha20, XChaCha20, and XChaCha12
- 	  stream cipher algorithms
-diff --git a/arch/mips/crypto/Kconfig b/arch/mips/crypto/Kconfig
-index 7decd40c4e20..cbeb2f62eb79 100644
---- a/arch/mips/crypto/Kconfig
-+++ b/arch/mips/crypto/Kconfig
-@@ -5,7 +5,7 @@ menu "Accelerated Cryptographic Algorithms for CPU (mips)"
- config CRYPTO_POLY1305_MIPS
- 	tristate "Hash functions: Poly1305"
- 	depends on MIPS
--	select CRYPTO_ARCH_HAVE_LIB_POLY1305
-+	select CRYPTO_ARCH_MAY_HAVE_LIB_POLY1305
- 	help
- 	  Poly1305 authenticator algorithm (RFC7539)
- 
-@@ -55,7 +55,7 @@ config CRYPTO_CHACHA_MIPS
- 	tristate "Ciphers: ChaCha20, XChaCha20, XChaCha12 (MIPS32r2)"
- 	depends on CPU_MIPS32_R2
- 	select CRYPTO_SKCIPHER
--	select CRYPTO_ARCH_HAVE_LIB_CHACHA
-+	select CRYPTO_ARCH_MAY_HAVE_LIB_CHACHA
- 	help
- 	  Length-preserving ciphers: ChaCha20, XChaCha20, and XChaCha12
- 	  stream cipher algorithms
-diff --git a/arch/s390/crypto/Kconfig b/arch/s390/crypto/Kconfig
-index b760232537f1..6f7495264943 100644
---- a/arch/s390/crypto/Kconfig
-+++ b/arch/s390/crypto/Kconfig
-@@ -112,7 +112,7 @@ config CRYPTO_CHACHA_S390
- 	depends on S390
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_LIB_CHACHA_GENERIC
--	select CRYPTO_ARCH_HAVE_LIB_CHACHA
-+	select CRYPTO_ARCH_MAY_HAVE_LIB_CHACHA
- 	help
- 	  Length-preserving cipher: ChaCha20 stream cipher (RFC 7539)
- 
-diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
-index c542ef1d64d0..6b45bd634cd9 100644
---- a/lib/crypto/Kconfig
-+++ b/lib/crypto/Kconfig
-@@ -50,8 +50,6 @@ config CRYPTO_ARCH_HAVE_LIB_CHACHA
- 
- config CRYPTO_ARCH_MAY_HAVE_LIB_CHACHA
- 	tristate
--	select CRYPTO_ARCH_HAVE_LIB_CHACHA if CRYPTO_LIB_CHACHA=m
--	select CRYPTO_ARCH_HAVE_LIB_CHACHA if CRYPTO_ARCH_MAY_HAVE_LIB_CHACHA=y
- 
- config CRYPTO_LIB_CHACHA_GENERIC
- 	tristate
-@@ -65,7 +63,9 @@ config CRYPTO_LIB_CHACHA_GENERIC
- 
- config CRYPTO_LIB_CHACHA
- 	tristate "ChaCha library interface"
--	select CRYPTO_LIB_CHACHA_GENERIC if CRYPTO_ARCH_HAVE_LIB_CHACHA=n
-+	select CRYPTO_LIB_CHACHA_GENERIC if CRYPTO_ARCH_MAY_HAVE_LIB_CHACHA=n
-+	select CRYPTO_ARCH_HAVE_LIB_CHACHA if CRYPTO_ARCH_MAY_HAVE_LIB_CHACHA!=n
-+	depends on CRYPTO_ARCH_MAY_HAVE_LIB_CHACHA || !CRYPTO_ARCH_MAY_HAVE_LIB_CHACHA
- 	help
- 	  Enable the ChaCha library interface. This interface may be fulfilled
- 	  by either the generic implementation or an arch-specific one, if one
-@@ -80,8 +80,6 @@ config CRYPTO_ARCH_HAVE_LIB_CURVE25519
- 
- config CRYPTO_ARCH_MAY_HAVE_LIB_CURVE25519
- 	tristate
--	select CRYPTO_ARCH_HAVE_LIB_CURVE25519 if CRYPTO_LIB_CURVE25519=m
--	select CRYPTO_ARCH_HAVE_LIB_CURVE25519 if CRYPTO_ARCH_MAY_HAVE_LIB_CURVE25519=y
- 
- config CRYPTO_LIB_CURVE25519_GENERIC
- 	tristate
-@@ -94,7 +92,9 @@ config CRYPTO_LIB_CURVE25519_GENERIC
- 
- config CRYPTO_LIB_CURVE25519
- 	tristate "Curve25519 scalar multiplication library"
--	select CRYPTO_LIB_CURVE25519_GENERIC if CRYPTO_ARCH_HAVE_LIB_CURVE25519=n
-+	select CRYPTO_LIB_CURVE25519_GENERIC if CRYPTO_ARCH_MAY_HAVE_LIB_CURVE25519=n
-+	select CRYPTO_ARCH_HAVE_LIB_CURVE25519 if CRYPTO_ARCH_MAY_HAVE_LIB_CURVE25519!=n
-+	depends on CRYPTO_ARCH_MAY_HAVE_LIB_CURVE25519 || !CRYPTO_ARCH_MAY_HAVE_LIB_CURVE25519
- 	select CRYPTO_LIB_UTILS
- 	help
- 	  Enable the Curve25519 library interface. This interface may be
-@@ -120,8 +120,6 @@ config CRYPTO_ARCH_HAVE_LIB_POLY1305
- 
- config CRYPTO_ARCH_MAY_HAVE_LIB_POLY1305
- 	tristate
--	select CRYPTO_ARCH_HAVE_LIB_POLY1305 if CRYPTO_LIB_POLY1305=m
--	select CRYPTO_ARCH_HAVE_LIB_POLY1305 if CRYPTO_ARCH_MAY_HAVE_LIB_POLY1305=y
- 
- config CRYPTO_LIB_POLY1305_GENERIC
- 	tristate
-@@ -134,7 +132,9 @@ config CRYPTO_LIB_POLY1305_GENERIC
- 
- config CRYPTO_LIB_POLY1305
- 	tristate "Poly1305 library interface"
--	select CRYPTO_LIB_POLY1305_GENERIC if CRYPTO_ARCH_HAVE_LIB_POLY1305=n
-+	select CRYPTO_LIB_POLY1305_GENERIC if CRYPTO_ARCH_MAY_HAVE_LIB_POLY1305=n
-+	select CRYPTO_ARCH_HAVE_LIB_POLY1305 if CRYPTO_ARCH_MAY_HAVE_LIB_POLY1305!=n
-+	depends on CRYPTO_ARCH_MAY_HAVE_LIB_POLY1305 || !CRYPTO_ARCH_MAY_HAVE_LIB_POLY1305
- 	help
- 	  Enable the Poly1305 library interface. This interface may be fulfilled
- 	  by either the generic implementation or an arch-specific one, if one
-@@ -143,6 +143,8 @@ config CRYPTO_LIB_POLY1305
- config CRYPTO_LIB_CHACHA20POLY1305
- 	tristate "ChaCha20-Poly1305 AEAD support (8-byte nonce library version)"
- 	depends on CRYPTO
-+	depends on CRYPTO_ARCH_MAY_HAVE_LIB_POLY1305 || !CRYPTO_ARCH_MAY_HAVE_LIB_POLY1305
-+	depends on CRYPTO_ARCH_MAY_HAVE_LIB_CHACHA || !CRYPTO_ARCH_MAY_HAVE_LIB_CHACHA
- 	select CRYPTO_LIB_CHACHA
- 	select CRYPTO_LIB_POLY1305
- 	select CRYPTO_ALGAPI
--- 
-2.39.5
+Thanks!
+Pratik
+> 
+> 
+> 
+>> +
+>> +    return sev->snp_initialized;
+>> +}
+>> +EXPORT_SYMBOL_GPL(snp_initialized);
+>> +
+>>   static int __sev_platform_shutdown_locked(int *error)
+>>   {
+>>       struct psp_device *psp = psp_master;
+>> diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
+>> index f3cad182d4ef..d34068c87a28 100644
+>> --- a/include/linux/psp-sev.h
+>> +++ b/include/linux/psp-sev.h
+>> @@ -954,6 +954,7 @@ int sev_do_cmd(int cmd, void *data, int *psp_ret);
+>>   void *psp_copy_user_blob(u64 uaddr, u32 len);
+>>   void *snp_alloc_firmware_page(gfp_t mask);
+>>   void snp_free_firmware_page(void *addr);
+>> +bool snp_initialized(void);
+>>     #else    /* !CONFIG_CRYPTO_DEV_SP_PSP */
+>>   @@ -988,6 +989,8 @@ static inline void
+>> *snp_alloc_firmware_page(gfp_t mask)
+>>     static inline void snp_free_firmware_page(void *addr) { }
+>>   +static inline bool snp_initialized(void) { return false; }
+>> +
+>>   #endif    /* CONFIG_CRYPTO_DEV_SP_PSP */
+>>     #endif    /* __PSP_SEV_H__ */
+> 
 
