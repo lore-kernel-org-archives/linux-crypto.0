@@ -1,130 +1,117 @@
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7C5826AA92
-	for <linux-crypto@vger.kernel.org>; Tue, 25 Feb 2025 13:53:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0108542A92
+	for <linux-crypto@vger.kernel.org>; Tue, 25 Feb 2025 15:17:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740491613; cv=none; b=day0TiN1Oe8ZbxOC4hsY72MZ42UC/aa3vAzFHdPc7TlXjkVcQEukLA2JrfrkwqpeFc8geK6TVac+DBNGYgms1FJtpci3d3rGHfZOKhenVgKsCPBlyO871C/37MvGldyvAq1sSPcjrFNMqQron0FKYSO/28daoRMHGFwe2xrkyd4=
+	t=1740496681; cv=none; b=aOEyEnnlQhx0EHOex6jH6JzeHGq5/dxAvgSItSPrXMFwzdzQQZhyZOxNwYDb8KnASx6TJaN8MnNphvZiQhBf0cBEeC5oU/fMLge5KScCfcqVJueWPpkuq3kCv9/3+m34kFjx6CfRZjC/iPHmxE83IBogcYK1CY2H7/zyA4YEtrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740491613; c=relaxed/simple;
-	bh=0fm8dD2GSkal7pX6wfp5ldr/EGe8/x09E5/sp8nkiRw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WRB+a2UeRr88cUu+vQbz59PlPVTkA6Mv0Va30h6x7BVRgn2expwOj0b9q6mF0oatbH7MPrlif6HCOcnvlfL/G+/ZiDmcgOrT/Kn1gEqV+wJzq3anwt56UC0noJYnL8p66CK06Sbwf4PQEpt1O/IQtIUIiKLJeYSjDrsLm3HkxSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=G1mPuaKt; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+	s=arc-20240116; t=1740496681; c=relaxed/simple;
+	bh=rALszVeWffksEsP/Rrj6WAtB7agsaUXOmR/msDwji8U=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=aKqXfs13OxAFWtMhnqn55yGsZsFNrk2Lv0pkWtRKsy5pa3y/M/Rojr6jjWYcXNDWCERIvlUq1P856tRJOQNRus0/TQqAmOsJ6kYHkMr6X0yvRS82A+b5Xd6LRDd8jjKiNfAIDrn4qI1m6UtFOFa3KCRGCKlq1nknftRQ0fCLNdo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AwmSELce; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="G1mPuaKt"
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51P8160h009083
-	for <linux-crypto@vger.kernel.org>; Tue, 25 Feb 2025 13:53:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	7+T0FemeMk1vQ5gyh6YIRlKas8xebx73MY0rmeqa9fo=; b=G1mPuaKtVzc6rcuV
-	CU+lzck6KziTNtt/ZgpmsArrjlHL+NEMOTTaeNr/IPFeGriD11MDKpbekFXtI4OL
-	YNjCet3WyBgSK+JkvsCbU7+trRI7JcSbt+xM14QE+tsT6WNkLqVxT7VWdVh8lBbj
-	fvoFwhHXrJOw6XPONF0k+fpDz3vE7HOV60c1f4J+CRdyuud4wCYfTEXyJVVuj2Pt
-	rnxxZLpd/T9Uw0l/4RgBWB8vuFKa23ZZQmBu3ASB7GO+tVe0TIlSsRsT+ZFnl8We
-	cE7SCbU8+4Yvvpq6pszcklsQcCs0JH7Yz2/cJ6UbCc1KAN3CDyb0cfluxNblP3B+
-	GyzvTg==
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com [209.85.219.72])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44y6y6s1mb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <linux-crypto@vger.kernel.org>; Tue, 25 Feb 2025 13:53:30 +0000 (GMT)
-Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-6e249d117b7so5365216d6.2
-        for <linux-crypto@vger.kernel.org>; Tue, 25 Feb 2025 05:53:30 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740491610; x=1741096410;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7+T0FemeMk1vQ5gyh6YIRlKas8xebx73MY0rmeqa9fo=;
-        b=tUVlw6PqUk7+YU6r96S1VFxkWQZDz2cQNS3uC6a63N1oxFqtJMjtxGz8G0S0a/JzgD
-         84f1zH/EH46GM58g8vLPKqLVr+UMD7DsGl+4eCYVYeuC6OPY1jwTEBrgPudPaFJd+FJY
-         o3AJBmOc/s7TssMbzx3Zr3Rz9E/BK/rtKUhFv2vwNTbaOZVmv19Cx/n6Dq5VQi1M+UT4
-         5GU5/rENXww+pdUFhBkzUDrQbd39L/KhbwrChquxvVJebOjKMKDE0RuLIGxjrHnnfEDv
-         oWsIE7GBQKwFEN2pkGvzjQBFXRumfqe9sViVI3uifhFW4a8hHJQmqleDUPHNOc3mbufY
-         W/qA==
-X-Forwarded-Encrypted: i=1; AJvYcCUetb0kz4gIJNXAsIBye8PWzb2tpicQ2j7ppfRukmAghlgZ0AfnILXC2S/s8i9IZBgc4+fZsKD3x0EkHZs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZ8eLRDGmw/GXmwBirPMLAaeHa/xtAopLCg5cicYJWFEds9oMp
-	G4UY7utf0Kt+Ls8OXNEmsJVBok15fv0GCCZjIef02rKgkg5kB7KotDrfCoKHwEeQ+NAjrtXXJb2
-	dNQ9ok/5pOEyfPVnEUtMJwEyTVUToMJbbPsapzY9HWh8vlipKhdVrpJJC7EriA0M=
-X-Gm-Gg: ASbGncsdy4NGeQMgCBn4uBijBz25C6G8Om40o1s4L+WHGVc/kk0dO4iWf0iaf0sdlYa
-	9z9xSI3mm7lgw42Du123+115GPTj3yHbPjoBuL+HSvUo8QVnxxQ6yniqjn7co+SR2MAlf3GyIVh
-	RTOwSA3llUsdvvenXlfPXzH9ocK6+nxi9FrK4cdmAvC2PLL1dohEq+W1cPlORhiR7MFFZd+Xvy/
-	GiDJpzoqx1RZqt4Ms+Dqd8jl7nnNL+zKr8FxPtsdAH31F+YKoBaXB1riXMtz7Aw4ZVgAeHCgzT3
-	okx7VzswENcP/vVmiVNz62An740zpDWq1oliNc9T93KzOoOJHvMVFf6dg+aZhKpk6ZpA3A==
-X-Received: by 2002:ad4:5b8d:0:b0:6e6:60f6:56db with SMTP id 6a1803df08f44-6e6ae96757cmr86033986d6.6.1740491609839;
-        Tue, 25 Feb 2025 05:53:29 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFpLsxtECdHESHTNPzz/+xdF8LEgDeZCxkFo9jJSwp7RyqzIE6McvZorZtxRBNonQfFw/rxRg==
-X-Received: by 2002:ad4:5b8d:0:b0:6e6:60f6:56db with SMTP id 6a1803df08f44-6e6ae96757cmr86033856d6.6.1740491609479;
-        Tue, 25 Feb 2025 05:53:29 -0800 (PST)
-Received: from [192.168.65.90] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-abee2fe29fcsm45391666b.123.2025.02.25.05.53.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 25 Feb 2025 05:53:28 -0800 (PST)
-Message-ID: <be947420-f37d-40e5-aedc-01acfaf25060@oss.qualcomm.com>
-Date: Tue, 25 Feb 2025 14:53:26 +0100
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AwmSELce"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1740496679;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+QyH+Q7MigOrd7puvdyRTTPCeyR6wog0WvQSvTNgWAg=;
+	b=AwmSELce/se5XCG6C4yYekqzrZR8iqgqdc5M+hHw6o4/TVpFVFgpnelVQ1gfK6pOYZo0Ri
+	JlWeCBqJ2Rd0xw2inIefQyk3uYU+biEeUsMdFzQ4ih85kaMg7mxlQ78cA02Dw1jmyOrxrp
+	tLlAgYAIjV/MOKxLO1Vtt26jQ89ZbPQ=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-184-q8YtqpU0OC6xToOGXJ3YDQ-1; Tue,
+ 25 Feb 2025 10:17:53 -0500
+X-MC-Unique: q8YtqpU0OC6xToOGXJ3YDQ-1
+X-Mimecast-MFC-AGG-ID: q8YtqpU0OC6xToOGXJ3YDQ_1740496667
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1840F1A24789;
+	Tue, 25 Feb 2025 15:16:53 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.9])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A8A29180194B;
+	Tue, 25 Feb 2025 15:16:37 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <8f36be7c-6052-4c5d-85ff-0eed27cf1456@icloud.com>
+References: <8f36be7c-6052-4c5d-85ff-0eed27cf1456@icloud.com> <20250221-rmv_return-v1-0-cc8dff275827@quicinc.com> <20250221-rmv_return-v1-1-cc8dff275827@quicinc.com> <20250221200137.GH7373@noisy.programming.kicks-ass.net>
+To: Zijun Hu <zijun_hu@icloud.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+    Will Deacon <will@kernel.org>,
+    "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
+    Andrew Morton <akpm@linux-foundation.org>,
+    Nick Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>,
+    Thomas Gleixner <tglx@linutronix.de>,
+    Herbert Xu <herbert@gondor.apana.org.au>,
+    "David S. Miller" <davem@davemloft.net>,
+    "Rafael J. Wysocki" <rafael@kernel.org>,
+    Danilo Krummrich <dakr@kernel.org>,
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+    Johannes Berg <johannes@sipsolutions.net>,
+    Jamal Hadi Salim <jhs@mojatatu.com>,
+    Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+    Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+    Linus Walleij <linus.walleij@linaro.org>,
+    Bartosz Golaszewski <brgl@bgdev.pl>, Lee Jones <lee@kernel.org>,
+    Thomas Graf <tgraf@suug.ch>, Christoph Hellwig <hch@lst.de>,
+    Marek Szyprowski <m.szyprowski@samsung.com>,
+    Robin Murphy <robin.murphy@arm.com>,
+    Miquel Raynal <miquel.raynal@bootlin.com>,
+    Richard Weinberger <richard@nod.at>,
+    Vignesh Raghavendra <vigneshr@ti.com>, linux-arch@vger.kernel.org,
+    linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+    linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+    linux-wireless@vger.kernel.org, linux-rdma@vger.kernel.org,
+    linux-gpio@vger.kernel.org, linux-pm@vger.kernel.org,
+    iommu@lists.linux.dev, linux-mtd@lists.infradead.org
+Subject: Re: [PATCH *-next 01/18] mm/mmu_gather: Remove needless return in void API tlb_remove_page()
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] arm64: dts: qcom: qcs615: add TRNG node
-To: Abhinaba Rakshit <quic_arakshit@quicinc.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
- <conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>
-Cc: linux-arm-msm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250224-enable-trng-for-qcs615-v1-0-3243eb7d345a@quicinc.com>
- <20250224-enable-trng-for-qcs615-v1-2-3243eb7d345a@quicinc.com>
-Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <20250224-enable-trng-for-qcs615-v1-2-3243eb7d345a@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-ORIG-GUID: wAuxnBzyhOn2LZGAJ0pNvWr64BOsJhcN
-X-Proofpoint-GUID: wAuxnBzyhOn2LZGAJ0pNvWr64BOsJhcN
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-25_04,2025-02-25_03,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 spamscore=0
- malwarescore=0 phishscore=0 adultscore=0 lowpriorityscore=0
- mlxlogscore=987 impostorscore=0 priorityscore=1501 bulkscore=0 mlxscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2502100000 definitions=main-2502250095
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2298250.1740496596.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 25 Feb 2025 15:16:36 +0000
+Message-ID: <2298251.1740496596@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On 24.02.2025 10:50 AM, Abhinaba Rakshit wrote:
-> The qcs615 SoC has a True Random Number Generator, add the node
-> with the correct compatible set.
-> 
-> Signed-off-by: Abhinaba Rakshit <quic_arakshit@quicinc.com>
-> ---
->  arch/arm64/boot/dts/qcom/qcs615.dtsi | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/arch/arm64/boot/dts/qcom/qcs615.dtsi b/arch/arm64/boot/dts/qcom/qcs615.dtsi
-> index f4abfad474ea62dea13d05eb874530947e1e8d3e..ab0bf68fdd8c2e223c242f70e779a3d9374292ea 100644
-> --- a/arch/arm64/boot/dts/qcom/qcs615.dtsi
-> +++ b/arch/arm64/boot/dts/qcom/qcs615.dtsi
-> @@ -973,6 +973,11 @@ &mc_virt SLAVE_EBI1 QCOM_ICC_TAG_ALWAYS>,
->  			};
->  		};
->  
-> +		rng@793000 {
-> +			compatible = "qcom,qcs615-trng", "qcom,trng";
-> +			reg = <0x0 0x00793000 0x0 0x1000>;
-> +		};
+Zijun Hu <zijun_hu@icloud.com> wrote:
 
-Please move it so that the nodes are sorted address-wise
+> >>  static inline void tlb_remove_page(struct mmu_gather *tlb, struct pa=
+ge *page)
+> >>  {
+> >> -	return tlb_remove_page_size(tlb, page, PAGE_SIZE);
+> >> +	tlb_remove_page_size(tlb, page, PAGE_SIZE);
+> >>  }
+> > So I don't mind removing it, but note that that return enforces
+> > tlb_remove_page_size() has void return type.
+> >
+> =
 
-Konrad
+> tlb_remove_page_size() is void function already. (^^)
+
+That may be true... for now.  But if that is changed in the future, then y=
+ou
+will get an error indicating something you need to go and look at... so in
+that regard, it's *better* to do this ;-)
+
+David
+
