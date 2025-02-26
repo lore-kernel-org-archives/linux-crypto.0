@@ -1,67 +1,82 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE790224220;
-	Wed, 26 Feb 2025 09:09:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F6661E1E06;
+	Wed, 26 Feb 2025 10:51:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740560955; cv=none; b=i+EKYgWbm7KQdNqrZuObKMAxcldMvkkF+2qtEeSvGdsC2SwhOvl0cnydD8WUr7KsOX83tGxpIqrPnxCj2h85kKQ26H/Zkvci+VYKPYTaNx9pwxSlQop/ZrN7GfUdzWRZVuU0qkDrHhr43DjKVSjG4Z7yctmU51p0tubvV82sle8=
+	t=1740567081; cv=none; b=CGp7vPlQ30eR1u/iq+eusSl++KY/YcJSibu17LZZ0dswyYIov2IB6AjEJIeRHYMVmg0YQAbDRmr5vo4EB4b3iT4hA0JWoF88HRmMbTbs4eMVsfSZUPjUH9ryvSQ4+J07R4CzJtV7D+PO4p13yEK/qszFp2jsc2eAvquKbxBztKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740560955; c=relaxed/simple;
-	bh=mWtuE0d+HNUmp/zyolAa21VUgkJzuk9wG7mXxuiq3eQ=;
+	s=arc-20240116; t=1740567081; c=relaxed/simple;
+	bh=EJRmzJTFJ8NjApj/tf5SNaCRDGeunDMttv5+CnuEb8g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O5sReh7MkwDOcyeQLL6ukGoJsMCnmPIN20sZC/5L8/Udg3UOcQwk3RgxDIX+axkFw9N+2brctvPfXobqM6a2N69aJK9+GjE4kZvDun/1l/pngLoed2M6qGG0f3M5z6Joz74XKdnk5u/V3ZbbzqiJpKAGwqWLiC6lAco017f8Sz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=FSQXFrRc; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=o18l93/Cw/mGvg/pEFfcHJIfhrAVEE3FSVVIJjbDCxA1VNY8uevD0HGuMAS53ghr2ddy1PiMRHtKvR9NJXfvbB3e2ALL5xZkn14TzZ7UaHSt3HZJSH1vfA5O06+xQFbnHOKd/21TCvfXduPQTBoWyrA2thGPHjwt+e/1dCGUi8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UlE9sQot; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="FSQXFrRc"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=CBgt3Q2RUqu1G3RGyPq/Cq1jOTSZdtLEOZ0UeAUsMNE=; b=FSQXFrRcX+ZC4u1vlsZA2JZI+p
-	RtWeDBIgjL37PoUBF587B4eF3K1ojR0emEMTmENuCHy0NPIMupAj9u/fZIPutFqGUcj02bcXQbrbc
-	Q3OZZymwZhSPwhJaaold2D8C4zFhSsQDj/BATPgfSa3SNOwTpRHYrpLPVpvR5TPc3Ff3M6eLL/zij
-	f6WYQel7+0ktoop8T9iNg8b9zN4PGQQ1pZ4gP6g0AXRwF+InKGfyuOJxlt1kViEdoCg5f7UMsmY3H
-	Zk3w8FtgSCL9x4li1/vq3X8jlCnC4WFN6UMrycAxY0ecyKZ1P1uhMq+UTlmv+RGmIdvtIVE1S5P95
-	1sNDxYkw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tnDPA-001suY-18;
-	Wed, 26 Feb 2025 17:08:37 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 26 Feb 2025 17:08:36 +0800
-Date: Wed, 26 Feb 2025 17:08:36 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: Arnd Bergmann <arnd@arndb.de>, Will Deacon <will@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Harald Freudenberger <freude@linux.ibm.com>,
-	Holger Dengler <dengler@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Eric Biggers <ebiggers@google.com>,
-	"James E . J . Bottomley" <James.Bottomley@hansenpartnership.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>, linux-crypto@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-mips@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: [v2 PATCH] crypto: lib/Kconfig - Hide arch options from user
-Message-ID: <Z77aFJCVuXeDXRrs@gondor.apana.org.au>
-References: <20250225164216.4807-1-arnd@kernel.org>
- <20250225213344.GA23792@willie-the-truck>
- <f7c298b8-7989-49e7-90a2-5356029a6283@app.fastmail.com>
- <c4896a12-8abe-4fe6-b381-86b23d32b332@app.fastmail.com>
- <Z75xKexTUNm_FnSK@gondor.apana.org.au>
- <Z76aUfPIbhPAsHbv@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UlE9sQot"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740567080; x=1772103080;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=EJRmzJTFJ8NjApj/tf5SNaCRDGeunDMttv5+CnuEb8g=;
+  b=UlE9sQotNuJP83URwUVTRDNCrtJ0cn8w3IYzUFK/t0XbwkygwmzMFLKQ
+   Lg6I52zLO9O48c/I+bZE/PnTB1I+dtfJNyhL/U6PVIn5NLWNrisnIRbiN
+   TnG9QGYkQYk5cyQPysaGPITigr/3PPe69ytVObfWqs9eKHb64cDD3Iaim
+   PU2gWWERqUYrtEUbkoSwsDAjZvEeHTR8UuUyAqZVCTSLA6Kc4AripAYXC
+   7RBmionF/lhRXpi+1obxhMQry+7mkXrhqmzHNPpfOEPcCE1lW5EoNHDXo
+   aw4cPHXwRrigGXbQZEBHxBLlS5oKiz9teAWJ7udxzFIfwF74W1/m52DNM
+   g==;
+X-CSE-ConnectionGUID: SNaOmWMVRH+D9KDR6a6Dcg==
+X-CSE-MsgGUID: 91xqQ0xKQA63LOhGDqCOkQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="41603139"
+X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
+   d="scan'208";a="41603139"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 02:51:18 -0800
+X-CSE-ConnectionGUID: Sp/DqdCSR8Glw85ZGwduvg==
+X-CSE-MsgGUID: ixcL/gLGQqim/7ZZJYfvsQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,316,1732608000"; 
+   d="scan'208";a="147490774"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by orviesa002.jf.intel.com with ESMTP; 26 Feb 2025 02:51:09 -0800
+Date: Wed, 26 Feb 2025 18:49:18 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Alexey Kardashevskiy <aik@amd.com>
+Cc: x86@kernel.org, kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Ashish Kalra <ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>,
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+	Robin Murphy <robin.murphy@arm.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Christoph Hellwig <hch@lst.de>, Nikunj A Dadhania <nikunj@amd.com>,
+	Michael Roth <michael.roth@amd.com>,
+	Vasant Hegde <vasant.hegde@amd.com>,
+	Joao Martins <joao.m.martins@oracle.com>,
+	Nicolin Chen <nicolinc@nvidia.com>,
+	Lu Baolu <baolu.lu@linux.intel.com>,
+	Steve Sistare <steven.sistare@oracle.com>,
+	Lukas Wunner <lukas@wunner.de>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Dionna Glaze <dionnaglaze@google.com>, Yi Liu <yi.l.liu@intel.com>,
+	iommu@lists.linux.dev, linux-coco@lists.linux.dev,
+	Zhi Wang <zhiw@nvidia.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+Subject: Re: [RFC PATCH v2 14/22] iommufd: Add TIO calls
+Message-ID: <Z77xrqLtJfB84dJF@yilunxu-OptiPlex-7050>
+References: <20250218111017.491719-1-aik@amd.com>
+ <20250218111017.491719-15-aik@amd.com>
+ <Z72GmixR6NkzXAl7@yilunxu-OptiPlex-7050>
+ <2fe6b3c6-3eed-424d-87f0-34c4e7e1c906@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -70,386 +85,163 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z76aUfPIbhPAsHbv@gondor.apana.org.au>
+In-Reply-To: <2fe6b3c6-3eed-424d-87f0-34c4e7e1c906@amd.com>
 
-The ARCH_MAY_HAVE patch missed arm64, mips and s390.  But it may
-also lead to arch options being enabled but ineffective because
-of modular/built-in conflicts.
+On Wed, Feb 26, 2025 at 11:12:32AM +1100, Alexey Kardashevskiy wrote:
+> 
+> 
+> On 25/2/25 20:00, Xu Yilun wrote:
+> > On Tue, Feb 18, 2025 at 10:10:01PM +1100, Alexey Kardashevskiy wrote:
+> > > When a TDISP-capable device is passed through, it is configured as
+> > > a shared device to begin with. Later on when a VM probes the device,
+> > > detects its TDISP capability (reported via the PCIe ExtCap bit
+> > > called "TEE-IO"), performs the device attestation and transitions it
+> > > to a secure state when the device can run encrypted DMA and respond
+> > > to encrypted MMIO accesses.
+> > > 
+> > > Since KVM is out of the TCB, secure enablement is done in the secure
+> > > firmware. The API requires PCI host/guest BDFns, a KVM id hence such
+> > > calls are routed via IOMMUFD, primarily because allowing secure DMA
+> > > is the major performance bottleneck and it is a function of IOMMU.
+> > 
+> > I still have concern about the vdevice interface for bind. Bind put the
+> > device to LOCKED state, so is more of a device configuration rather
+> > than an iommu configuration. So seems more reasonable put the API in VFIO?
+> 
+> IOMMUFD means pretty much VFIO (in the same way "VFIO means KVM" as 95+% of
+> VFIO users use it from KVM, although VFIO works fine without KVM) so not
+> much difference where to put this API and can be done either way. VFIO is
 
-As the primary user of all these options wireguard is selecting
-the arch options anyway, make the same selections at the lib/crypto
-option level and hide the arch options from the user.
+Er... I cannot agree. There are clear responsibilities for
+VFIO/IOMMUFD/KVM each. They don't overlap each other. So I don't think
+either way is OK. VFIO still controls the overall device behavior
+and it is VFIO's decision to hand over user DMA setup to IOMMUFD. IIUC
+that's why VFIO_DEVICE_ATTACH_IOMMUFD_PT should be a VFIO API.
 
-Instead of selecting them centrally from lib/crypto, simply set
-the default of each arch option as suggested by Eric Biggers.
+E.g. I don't think VFIO driver would expect its MMIO access suddenly
+failed without knowing what happened.
 
-Change the Crypto API generic algorithms to select the top-level
-lib/crypto options instead of the generic one as otherwise there
-is no way to enable the arch options (Eric Biggers).  Introduce a
-set of INTERNAL options to work around dependency cycles on the
-CONFIG_CRYPTO symbol.
+> reasonable, the immediate problem is that IOMMUFD's vIOMMU knows the guest
+> BDFn (well, for AMD) and VFIO PCI does not.
 
-Fixes: 1047e21aecdf ("crypto: lib/Kconfig - Fix lib built-in failure when arch is modular")
-Reported-by: kernel test robot <lkp@intel.com>
-Reported-by: Arnd Bergmann <arnd@kernel.org>
-Closes: https://lore.kernel.org/oe-kbuild-all/202502232152.JC84YDLp-lkp@intel.com/
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+For Intel, it is host BDF. But I think this is TSM architecture
+difference that could be hidden in TSM framework. From TSM caller's POV,
+it could just be a magic number identifying the TDI.
 
-diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
-index 47d9cc59f254..0c19317a9ce0 100644
---- a/arch/arm/crypto/Kconfig
-+++ b/arch/arm/crypto/Kconfig
-@@ -3,10 +3,11 @@
- menu "Accelerated Cryptographic Algorithms for CPU (arm)"
- 
- config CRYPTO_CURVE25519_NEON
--	tristate "Public key crypto: Curve25519 (NEON)"
-+	tristate
- 	depends on KERNEL_MODE_NEON
--	select CRYPTO_LIB_CURVE25519_GENERIC
--	select CRYPTO_ARCH_MAY_HAVE_LIB_CURVE25519
-+	select CRYPTO_KPP
-+	select CRYPTO_ARCH_HAVE_LIB_CURVE25519
-+	default CRYPTO_LIB_CURVE25519_INTERNAL
- 	help
- 	  Curve25519 algorithm
- 
-@@ -45,9 +46,10 @@ config CRYPTO_NHPOLY1305_NEON
- 	  - NEON (Advanced SIMD) extensions
- 
- config CRYPTO_POLY1305_ARM
--	tristate "Hash functions: Poly1305 (NEON)"
-+	tristate
- 	select CRYPTO_HASH
--	select CRYPTO_ARCH_MAY_HAVE_LIB_POLY1305
-+	select CRYPTO_ARCH_HAVE_LIB_POLY1305
-+	default CRYPTO_LIB_POLY1305_INTERNAL
- 	help
- 	  Poly1305 authenticator algorithm (RFC7539)
- 
-@@ -212,9 +214,10 @@ config CRYPTO_AES_ARM_CE
- 	  - ARMv8 Crypto Extensions
- 
- config CRYPTO_CHACHA20_NEON
--	tristate "Ciphers: ChaCha20, XChaCha20, XChaCha12 (NEON)"
-+	tristate
- 	select CRYPTO_SKCIPHER
--	select CRYPTO_ARCH_MAY_HAVE_LIB_CHACHA
-+	select CRYPTO_ARCH_HAVE_LIB_CHACHA
-+	default CRYPTO_LIB_CHACHA_INTERNAL
- 	help
- 	  Length-preserving ciphers: ChaCha20, XChaCha20, and XChaCha12
- 	  stream cipher algorithms
-diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
-index 5636ab83f22a..1b14551cc301 100644
---- a/arch/arm64/crypto/Kconfig
-+++ b/arch/arm64/crypto/Kconfig
-@@ -26,10 +26,11 @@ config CRYPTO_NHPOLY1305_NEON
- 	  - NEON (Advanced SIMD) extensions
- 
- config CRYPTO_POLY1305_NEON
--	tristate "Hash functions: Poly1305 (NEON)"
-+	tristate
- 	depends on KERNEL_MODE_NEON
- 	select CRYPTO_HASH
- 	select CRYPTO_ARCH_HAVE_LIB_POLY1305
-+	default CRYPTO_LIB_POLY1305_INTERNAL
- 	help
- 	  Poly1305 authenticator algorithm (RFC7539)
- 
-@@ -186,11 +187,11 @@ config CRYPTO_AES_ARM64_NEON_BLK
- 	  - NEON (Advanced SIMD) extensions
- 
- config CRYPTO_CHACHA20_NEON
--	tristate "Ciphers: ChaCha (NEON)"
-+	tristate
- 	depends on KERNEL_MODE_NEON
- 	select CRYPTO_SKCIPHER
--	select CRYPTO_LIB_CHACHA_GENERIC
- 	select CRYPTO_ARCH_HAVE_LIB_CHACHA
-+	default CRYPTO_LIB_CHACHA_INTERNAL
- 	help
- 	  Length-preserving ciphers: ChaCha20, XChaCha20, and XChaCha12
- 	  stream cipher algorithms
-diff --git a/arch/mips/crypto/Kconfig b/arch/mips/crypto/Kconfig
-index 7decd40c4e20..545fc0e12422 100644
---- a/arch/mips/crypto/Kconfig
-+++ b/arch/mips/crypto/Kconfig
-@@ -3,9 +3,11 @@
- menu "Accelerated Cryptographic Algorithms for CPU (mips)"
- 
- config CRYPTO_POLY1305_MIPS
--	tristate "Hash functions: Poly1305"
-+	tristate
- 	depends on MIPS
-+	select CRYPTO_HASH
- 	select CRYPTO_ARCH_HAVE_LIB_POLY1305
-+	default CRYPTO_LIB_POLY1305_INTERNAL
- 	help
- 	  Poly1305 authenticator algorithm (RFC7539)
- 
-@@ -52,10 +54,11 @@ config CRYPTO_SHA512_OCTEON
- 	  Architecture: mips OCTEON using crypto instructions, when available
- 
- config CRYPTO_CHACHA_MIPS
--	tristate "Ciphers: ChaCha20, XChaCha20, XChaCha12 (MIPS32r2)"
-+	tristate
- 	depends on CPU_MIPS32_R2
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_ARCH_HAVE_LIB_CHACHA
-+	default CRYPTO_LIB_CHACHA_INTERNAL
- 	help
- 	  Length-preserving ciphers: ChaCha20, XChaCha20, and XChaCha12
- 	  stream cipher algorithms
-diff --git a/arch/powerpc/crypto/Kconfig b/arch/powerpc/crypto/Kconfig
-index e453cb0c82d2..5beed03869c9 100644
---- a/arch/powerpc/crypto/Kconfig
-+++ b/arch/powerpc/crypto/Kconfig
-@@ -3,10 +3,11 @@
- menu "Accelerated Cryptographic Algorithms for CPU (powerpc)"
- 
- config CRYPTO_CURVE25519_PPC64
--	tristate "Public key crypto: Curve25519 (PowerPC64)"
-+	tristate
- 	depends on PPC64 && CPU_LITTLE_ENDIAN
--	select CRYPTO_LIB_CURVE25519_GENERIC
--	select CRYPTO_ARCH_MAY_HAVE_LIB_CURVE25519
-+	select CRYPTO_KPP
-+	select CRYPTO_ARCH_HAVE_LIB_CURVE25519
-+	default CRYPTO_LIB_CURVE25519_INTERNAL
- 	help
- 	  Curve25519 algorithm
- 
-@@ -91,11 +92,11 @@ config CRYPTO_AES_GCM_P10
- 	  later CPU. This module supports stitched acceleration for AES/GCM.
- 
- config CRYPTO_CHACHA20_P10
--	tristate "Ciphers: ChaCha20, XChacha20, XChacha12 (P10 or later)"
-+	tristate
- 	depends on PPC64 && CPU_LITTLE_ENDIAN && VSX
- 	select CRYPTO_SKCIPHER
--	select CRYPTO_LIB_CHACHA_GENERIC
--	select CRYPTO_ARCH_MAY_HAVE_LIB_CHACHA
-+	select CRYPTO_ARCH_HAVE_LIB_CHACHA
-+	default CRYPTO_LIB_CHACHA_INTERNAL
- 	help
- 	  Length-preserving ciphers: ChaCha20, XChaCha20, and XChaCha12
- 	  stream cipher algorithms
-diff --git a/arch/riscv/crypto/Kconfig b/arch/riscv/crypto/Kconfig
-index ad58dad9a580..c67095a3d669 100644
---- a/arch/riscv/crypto/Kconfig
-+++ b/arch/riscv/crypto/Kconfig
-@@ -22,7 +22,6 @@ config CRYPTO_CHACHA_RISCV64
- 	tristate "Ciphers: ChaCha"
- 	depends on 64BIT && RISCV_ISA_V && TOOLCHAIN_HAS_VECTOR_CRYPTO
- 	select CRYPTO_SKCIPHER
--	select CRYPTO_LIB_CHACHA_GENERIC
- 	help
- 	  Length-preserving ciphers: ChaCha20 stream cipher algorithm
- 
-diff --git a/arch/s390/crypto/Kconfig b/arch/s390/crypto/Kconfig
-index b760232537f1..f6f82dab3594 100644
---- a/arch/s390/crypto/Kconfig
-+++ b/arch/s390/crypto/Kconfig
-@@ -108,11 +108,11 @@ config CRYPTO_DES_S390
- 	  As of z196 the CTR mode is hardware accelerated.
- 
- config CRYPTO_CHACHA_S390
--	tristate "Ciphers: ChaCha20"
-+	tristate
- 	depends on S390
- 	select CRYPTO_SKCIPHER
--	select CRYPTO_LIB_CHACHA_GENERIC
- 	select CRYPTO_ARCH_HAVE_LIB_CHACHA
-+	default CRYPTO_LIB_CHACHA_INTERNAL
- 	help
- 	  Length-preserving cipher: ChaCha20 stream cipher (RFC 7539)
- 
-diff --git a/arch/x86/crypto/Kconfig b/arch/x86/crypto/Kconfig
-index c189dad0969b..d3128e99bac5 100644
---- a/arch/x86/crypto/Kconfig
-+++ b/arch/x86/crypto/Kconfig
-@@ -3,10 +3,11 @@
- menu "Accelerated Cryptographic Algorithms for CPU (x86)"
- 
- config CRYPTO_CURVE25519_X86
--	tristate "Public key crypto: Curve25519 (ADX)"
-+	tristate
- 	depends on X86 && 64BIT
--	select CRYPTO_LIB_CURVE25519_GENERIC
--	select CRYPTO_ARCH_MAY_HAVE_LIB_CURVE25519
-+	select CRYPTO_KPP
-+	select CRYPTO_ARCH_HAVE_LIB_CURVE25519
-+	default CRYPTO_LIB_CURVE25519_INTERNAL
- 	help
- 	  Curve25519 algorithm
- 
-@@ -348,11 +349,11 @@ config CRYPTO_ARIA_GFNI_AVX512_X86_64
- 	  Processes 64 blocks in parallel.
- 
- config CRYPTO_CHACHA20_X86_64
--	tristate "Ciphers: ChaCha20, XChaCha20, XChaCha12 (SSSE3/AVX2/AVX-512VL)"
-+	tristate
- 	depends on X86 && 64BIT
- 	select CRYPTO_SKCIPHER
--	select CRYPTO_LIB_CHACHA_GENERIC
--	select CRYPTO_ARCH_MAY_HAVE_LIB_CHACHA
-+	select CRYPTO_ARCH_HAVE_LIB_CHACHA
-+	default CRYPTO_LIB_CHACHA_INTERNAL
- 	help
- 	  Length-preserving ciphers: ChaCha20, XChaCha20, and XChaCha12
- 	  stream cipher algorithms
-@@ -417,10 +418,11 @@ config CRYPTO_POLYVAL_CLMUL_NI
- 	  - CLMUL-NI (carry-less multiplication new instructions)
- 
- config CRYPTO_POLY1305_X86_64
--	tristate "Hash functions: Poly1305 (SSE2/AVX2)"
-+	tristate
- 	depends on X86 && 64BIT
--	select CRYPTO_LIB_POLY1305_GENERIC
--	select CRYPTO_ARCH_MAY_HAVE_LIB_POLY1305
-+	select CRYPTO_HASH
-+	select CRYPTO_ARCH_HAVE_LIB_POLY1305
-+	default CRYPTO_LIB_POLY1305_INTERNAL
- 	help
- 	  Poly1305 authenticator algorithm (RFC7539)
- 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 74ae5f52b784..b7771d7bd3b3 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -317,7 +317,7 @@ config CRYPTO_ECRDSA
- config CRYPTO_CURVE25519
- 	tristate "Curve25519"
- 	select CRYPTO_KPP
--	select CRYPTO_LIB_CURVE25519_GENERIC
-+	select CRYPTO_LIB_CURVE25519_INTERNAL
- 	help
- 	  Curve25519 elliptic curve (RFC7748)
- 
-@@ -615,7 +615,7 @@ config CRYPTO_ARC4
- 
- config CRYPTO_CHACHA20
- 	tristate "ChaCha"
--	select CRYPTO_LIB_CHACHA_GENERIC
-+	select CRYPTO_LIB_CHACHA_INTERNAL
- 	select CRYPTO_SKCIPHER
- 	help
- 	  The ChaCha20, XChaCha20, and XChaCha12 stream cipher algorithms
-@@ -936,7 +936,7 @@ config CRYPTO_POLYVAL
- config CRYPTO_POLY1305
- 	tristate "Poly1305"
- 	select CRYPTO_HASH
--	select CRYPTO_LIB_POLY1305_GENERIC
-+	select CRYPTO_LIB_POLY1305_INTERNAL
- 	help
- 	  Poly1305 authenticator algorithm (RFC7539)
- 
-diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
-index c542ef1d64d0..b09e78da959a 100644
---- a/lib/crypto/Kconfig
-+++ b/lib/crypto/Kconfig
-@@ -48,11 +48,6 @@ config CRYPTO_ARCH_HAVE_LIB_CHACHA
- 	  accelerated implementation of the ChaCha library interface,
- 	  either builtin or as a module.
- 
--config CRYPTO_ARCH_MAY_HAVE_LIB_CHACHA
--	tristate
--	select CRYPTO_ARCH_HAVE_LIB_CHACHA if CRYPTO_LIB_CHACHA=m
--	select CRYPTO_ARCH_HAVE_LIB_CHACHA if CRYPTO_ARCH_MAY_HAVE_LIB_CHACHA=y
--
- config CRYPTO_LIB_CHACHA_GENERIC
- 	tristate
- 	select CRYPTO_LIB_UTILS
-@@ -63,9 +58,14 @@ config CRYPTO_LIB_CHACHA_GENERIC
- 	  implementation is enabled, this implementation serves the users
- 	  of CRYPTO_LIB_CHACHA.
- 
-+config CRYPTO_LIB_CHACHA_INTERNAL
-+	tristate
-+	select CRYPTO_LIB_CHACHA_GENERIC if CRYPTO_ARCH_HAVE_LIB_CHACHA=n
-+
- config CRYPTO_LIB_CHACHA
- 	tristate "ChaCha library interface"
--	select CRYPTO_LIB_CHACHA_GENERIC if CRYPTO_ARCH_HAVE_LIB_CHACHA=n
-+	select CRYPTO
-+	select CRYPTO_LIB_CHACHA_INTERNAL
- 	help
- 	  Enable the ChaCha library interface. This interface may be fulfilled
- 	  by either the generic implementation or an arch-specific one, if one
-@@ -78,13 +78,9 @@ config CRYPTO_ARCH_HAVE_LIB_CURVE25519
- 	  accelerated implementation of the Curve25519 library interface,
- 	  either builtin or as a module.
- 
--config CRYPTO_ARCH_MAY_HAVE_LIB_CURVE25519
--	tristate
--	select CRYPTO_ARCH_HAVE_LIB_CURVE25519 if CRYPTO_LIB_CURVE25519=m
--	select CRYPTO_ARCH_HAVE_LIB_CURVE25519 if CRYPTO_ARCH_MAY_HAVE_LIB_CURVE25519=y
--
- config CRYPTO_LIB_CURVE25519_GENERIC
- 	tristate
-+	select CRYPTO_LIB_UTILS
- 	help
- 	  This symbol can be depended upon by arch implementations of the
- 	  Curve25519 library interface that require the generic code as a
-@@ -92,10 +88,14 @@ config CRYPTO_LIB_CURVE25519_GENERIC
- 	  implementation is enabled, this implementation serves the users
- 	  of CRYPTO_LIB_CURVE25519.
- 
-+config CRYPTO_LIB_CURVE25519_INTERNAL
-+	tristate
-+	select CRYPTO_LIB_CURVE25519_GENERIC if CRYPTO_ARCH_HAVE_LIB_CURVE25519=n
-+
- config CRYPTO_LIB_CURVE25519
- 	tristate "Curve25519 scalar multiplication library"
--	select CRYPTO_LIB_CURVE25519_GENERIC if CRYPTO_ARCH_HAVE_LIB_CURVE25519=n
--	select CRYPTO_LIB_UTILS
-+	select CRYPTO
-+	select CRYPTO_LIB_CURVE25519_INTERNAL
- 	help
- 	  Enable the Curve25519 library interface. This interface may be
- 	  fulfilled by either the generic implementation or an arch-specific
-@@ -118,11 +118,6 @@ config CRYPTO_ARCH_HAVE_LIB_POLY1305
- 	  accelerated implementation of the Poly1305 library interface,
- 	  either builtin or as a module.
- 
--config CRYPTO_ARCH_MAY_HAVE_LIB_POLY1305
--	tristate
--	select CRYPTO_ARCH_HAVE_LIB_POLY1305 if CRYPTO_LIB_POLY1305=m
--	select CRYPTO_ARCH_HAVE_LIB_POLY1305 if CRYPTO_ARCH_MAY_HAVE_LIB_POLY1305=y
--
- config CRYPTO_LIB_POLY1305_GENERIC
- 	tristate
- 	help
-@@ -132,9 +127,14 @@ config CRYPTO_LIB_POLY1305_GENERIC
- 	  implementation is enabled, this implementation serves the users
- 	  of CRYPTO_LIB_POLY1305.
- 
-+config CRYPTO_LIB_POLY1305_INTERNAL
-+	tristate
-+	select CRYPTO_LIB_POLY1305_GENERIC if CRYPTO_ARCH_HAVE_LIB_POLY1305=n
-+
- config CRYPTO_LIB_POLY1305
- 	tristate "Poly1305 library interface"
--	select CRYPTO_LIB_POLY1305_GENERIC if CRYPTO_ARCH_HAVE_LIB_POLY1305=n
-+	select CRYPTO
-+	select CRYPTO_LIB_POLY1305_INTERNAL
- 	help
- 	  Enable the Poly1305 library interface. This interface may be fulfilled
- 	  by either the generic implementation or an arch-specific one, if one
-@@ -142,9 +142,10 @@ config CRYPTO_LIB_POLY1305
- 
- config CRYPTO_LIB_CHACHA20POLY1305
- 	tristate "ChaCha20-Poly1305 AEAD support (8-byte nonce library version)"
--	depends on CRYPTO
-+	select CRYPTO
- 	select CRYPTO_LIB_CHACHA
- 	select CRYPTO_LIB_POLY1305
-+	select CRYPTO_LIB_UTILS
- 	select CRYPTO_ALGAPI
- 
- config CRYPTO_LIB_SHA1
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Back to your concern, I don't think it is a problem. From your patch,
+vIOMMU doesn't know the guest BDFn by nature, it is just the user
+stores the id in vdevice via iommufd_vdevice_alloc_ioctl(). A proper
+VFIO API could also do this work.
+
+I'm suggesting a VFIO API:
+
+/*
+ * @tdi_id: A TSM recognizable TDI identifier
+ *	    On input, user suggests the TDI identifier number for TSM.
+ *	    On output, TSM's decision of the TDI identifier number.
+ */
+struct vfio_pci_tsm_bind {
+	__u32 argsz;
+	__u32 flags;
+	__u32 tdi_id;
+	__u32 pad;
+};
+
+#define VFIO_DEVICE_TSM_BIND		_IO(VFIO_TYPE, VFIO_BASE + 22)
+
+I need the tdi_id as output cause I don't want any outside TSM user and
+Guest to assume what the TDI id should be.
+
+static int vfio_pci_ioctl_tsm_bind(struct vfio_pci_core_device *vdev,
+				   void __user *arg)
+{
+	unsigned long minsz = offsetofend(struct vfio_pci_tsm_bind, tdi_id);
+	struct pci_dev *pdev = vdev->pdev;
+	struct kvm *kvm = vdev->vdev.kvm;
+	struct vfio_pci_tsm_bind bind;
+
+	if (copy_from_user(&bind, arg, minsz))
+		return -EFAULT;
+
+	ret = pci_tsm_dev_bind(pdev, kvm, &bind.tdi_id);
+
+}
+
+A call to TSM makes TSM driver know the tdi_id and could find the real
+device inside TSM via tdi_id. Following TSM call could directly use
+tdi_id as parameter.
+
+The implementation is basically no difference from:
+
++       vdev = container_of(iommufd_get_object(ucmd->ictx, cmd->vdevice_id,
++                                              IOMMUFD_OBJ_VDEVICE),
+
+The real concern is the device owner, VFIO, should initiate the bind.
+
+> 
+> 
+> > > Add TDI bind to do the initial binding of a passed through PCI
+> > > function to a VM. Add a forwarder for TIO GUEST REQUEST. These two
+> > > call into the TSM which forwards the calls to the PSP.
+> > > 
+> > > Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
+> > > ---
+> > > 
+> > > Both enabling secure DMA (== "SDTE Write") and secure MMIO (== "MMIO
+> > > validate") are TIO GUEST REQUEST messages. These are encrypted and
+> > > the HV (==IOMMUFD or KVM or VFIO) cannot see them unless the guest
+> > > shares some via kvm_run::kvm_user_vmgexit (and then QEMU passes those
+> > > via ioctls).
+> > > 
+> > > This RFC routes all TIO GUEST REQUESTs via IOMMUFD which arguably should
+> > > only do so only for "SDTE Write" and leave "MMIO validate" for VFIO.
+> > 
+> > The fact is HV cannot see the guest requests, even I think HV never have
+> > to care about the guest requests. HV cares until bind, then no HV side
+> > MMIO & DMA access is possible, any operation/state after bind won't
+> > affect HV more. And HV could always unbind to rollback guest side thing.
+> > 
+> > That said guest requests are nothing to do with any host side component,
+> > iommu or vfio. It is just the message posting between VM & firmware. I
+> > suppose KVM could directly do it by calling TSM driver API.
+> 
+> No, it could not as the HV needs to add the host BDFn to the guest's request
+> before calling the firmware and KVM does not have that knowledge.
+
+I think if TSM has knowledge about tdi_id, KVM doesn't have to know host BDFn.
+Just let TSM handle the vendor difference. Not sure if this solves all
+the problem.
+
+> 
+> These guest requests are only partly encrypted as the guest needs
+> cooperation from the HV. The guest BDFn comes unencrypted from the VM to let
+> the HV find the host BDFn and do the bind.
+
+It is not about HV never touch any message content. It is about HV
+doesn't (and shouldn't, since some info is encrypted) influence any host
+behavior by executing guest request, so no need to route to any other
+component.
+
+Thanks,
+Yilun
+
+> 
+> Also, say, in order to enable MMIO range, the host needs to "rmpupdate"
+> MMIOs first (and then the firmware does "pvalidate") so it needs to know the
+> range which is in unencrypted part of guest request.
+> 
+> Here is a rough idea: https://github.com/aik/qemu/commit/f804b65aff5b
+> 
+> A TIO Guest request is made of:
+> - guest page with unencrypted header (msg type is essential) and encrypted
+> body for consumption by the firmware;
+> - a couple of 64bit bit fields and RAX/RBX/... in shared GHCB page.
+> 
+> Thanks,
+> 
+> > Thanks,
+> > Yilun
+> 
+> -- 
+> Alexey
+> 
