@@ -1,121 +1,142 @@
-Received: from pv50p00im-ztdg10011301.me.com (pv50p00im-ztdg10011301.me.com [17.58.6.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15911218AD2
-	for <linux-crypto@vger.kernel.org>; Wed, 26 Feb 2025 11:45:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.40
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38E7418027
+	for <linux-crypto@vger.kernel.org>; Wed, 26 Feb 2025 13:00:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740570352; cv=none; b=Ec4JVy73scdWIifLT++EwLI6CFMth4lNTynX6bDZdUzElTLandZZaUwrPg8ZKObEHxfE8QyuXG1QlhCHTIbMCVJ5dj7CVs9C8aAwcmBoJhl/H6RHUBukmOcZoj/tOfKST61lskKVU5VYky6f3xVRzkGia5ZpUL/TARiqjo9DzgE=
+	t=1740574846; cv=none; b=VYVPtAhyVBBl0CiV7cYVR0dM/TARQsQ/uTat3aj+vXp3Ekb+ziZPjPISUbSGjzz/YWuOLR62LUvLaefufwf3fd2V4gBH1po3C4miW5nrewrAgEe8cdYOmf7QB8sW8XBiD6ba28jPINh711x/sy+Ar1M+ZMmrVxKCA1eVv+WWxP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740570352; c=relaxed/simple;
-	bh=C0kSWoh3LIV+HuMudMUFcqmX7KtzIL+dLkLS0LuQI+w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QsKUqtVIXtWmp1ohXb4gQJgO+Cy24MPZPYuRtCvg46J6Aht4vKD/ccVRmjg5dr1F0rEwItpZNwRNbTLCdMviGOd4tBu6amQxULSzRBz8bZrFc8dmgw9oxVO47O6Ry5hWjO/V1ut2fLUj/4Lggb5f6fAGFYGKd2q80WYjQpCkImc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=f8lZWyvS; arc=none smtp.client-ip=17.58.6.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
+	s=arc-20240116; t=1740574846; c=relaxed/simple;
+	bh=cmPP7rNbCximwGs872LU4eZs95Az1ZrkABW5lOKn0Nw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lqR/sipA5KVfViRfZBhj1u9yiRDTtXhf0lQqQhEomolc6YWbw1oFzeKEfI48GbzT2JqcF3UPx68d3psOwvRqMgK4zg9WUd5Gmmhyy0VRBZ6HqjJVJ0Dn7x2kpBkoJN1hlAF3X3kgvtovyym31Rq/oOg30FlfTMTgPKF28wGDA0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=IBE/FoPc; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=TxLBR8Dq; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=IBE/FoPc; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=TxLBR8Dq; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="f8lZWyvS"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
-	s=1a1hai; bh=UlmH7lnQ/SSIrKM5aMl2BHpkT+fwdodZZLv8W8GXIsc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:x-icloud-hme;
-	b=f8lZWyvSDPQwKr7SDXIE6VdW5kZrI22cRU+v86cMZBg8M63ib8K+MKQDsZPYVZ+Mz
-	 VIc01nNZYPIWEtaq9AznMiQTF7n48OFpxRM5YhSgpY2okVb9cwuvzP1KIikiB+2fRu
-	 d+7AduZcNoirLHLK7K4h8pgvS0d1L0tQbLrFrF/Od88tDX/EZXod457QB5bg4qbmFp
-	 DbogBPgs3Q7iQQ0mZfmhQRiw2/P900rSG5OeZM5GDf/tYeCwP0bcGCpZ97ZFFl8n8G
-	 biW93Aup+84jC3T2ck5W5lDGV0KXW+sjwetmqndyZG8OIOv24PsphQXGiGBlN7Elxi
-	 r4aI2TycTa3Rw==
-Received: from [192.168.1.26] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
-	by pv50p00im-ztdg10011301.me.com (Postfix) with ESMTPSA id 5CEAB180350;
-	Wed, 26 Feb 2025 11:45:37 +0000 (UTC)
-Message-ID: <a6dfff9c-ab0e-4308-81e7-62d8ea04d62b@icloud.com>
-Date: Wed, 26 Feb 2025 19:45:34 +0800
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="IBE/FoPc";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="TxLBR8Dq";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="IBE/FoPc";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="TxLBR8Dq"
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 4DD251F387;
+	Wed, 26 Feb 2025 13:00:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1740574843;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eV1PgXSxgT3EJSl3MlbGDNhaKizGJ7yoBU7RQU64dDI=;
+	b=IBE/FoPcA/gW5xjiX92g22JWyYaJXtRFRoEqx5mNIwqxpbPhTXugWbXjDE84vSnrTs4fqh
+	F/DdsCJFilNE3uHs6QXFBUK1cPmBdceIxY65VA1UM837uRfW2rk1zLO4kXAjibHPio7KYs
+	o04aTzo3y9TJYvcWdnSUoRWp8DjAVHk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1740574843;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eV1PgXSxgT3EJSl3MlbGDNhaKizGJ7yoBU7RQU64dDI=;
+	b=TxLBR8DqEWDb6ejWvQraRoXkCq6CurcCa/9gjCfO/sMx+s6fnJfruCMOAAjOk8uF5defJ5
+	3gvx3SlVZPk5p2CA==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1740574843;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eV1PgXSxgT3EJSl3MlbGDNhaKizGJ7yoBU7RQU64dDI=;
+	b=IBE/FoPcA/gW5xjiX92g22JWyYaJXtRFRoEqx5mNIwqxpbPhTXugWbXjDE84vSnrTs4fqh
+	F/DdsCJFilNE3uHs6QXFBUK1cPmBdceIxY65VA1UM837uRfW2rk1zLO4kXAjibHPio7KYs
+	o04aTzo3y9TJYvcWdnSUoRWp8DjAVHk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1740574843;
+	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+	 cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eV1PgXSxgT3EJSl3MlbGDNhaKizGJ7yoBU7RQU64dDI=;
+	b=TxLBR8DqEWDb6ejWvQraRoXkCq6CurcCa/9gjCfO/sMx+s6fnJfruCMOAAjOk8uF5defJ5
+	3gvx3SlVZPk5p2CA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2CE051377F;
+	Wed, 26 Feb 2025 13:00:43 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id Qyq5CnsQv2ePJQAAD6G6ig
+	(envelope-from <dsterba@suse.cz>); Wed, 26 Feb 2025 13:00:43 +0000
+Date: Wed, 26 Feb 2025 14:00:37 +0100
+From: David Sterba <dsterba@suse.cz>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Nitin Gupta <nitingupta910@gmail.com>,
+	Richard Purdie <rpurdie@openedhand.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	"Markus F.X.J. Oberhumer" <markus@oberhumer.com>,
+	Dave Rodgman <dave.rodgman@arm.com>
+Subject: Re: [PATCH] lib/lzo: Avoid output overruns when compressing
+Message-ID: <20250226130037.GS5777@twin.jikos.cz>
+Reply-To: dsterba@suse.cz
+References: <Z7rGXJSX57gEfXPw@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH *-next 01/18] mm/mmu_gather: Remove needless return in
- void API tlb_remove_page()
-To: David Howells <dhowells@redhat.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Will Deacon <will@kernel.org>, "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>, Nick Piggin <npiggin@gmail.com>,
- Arnd Bergmann <arnd@arndb.de>, Thomas Gleixner <tglx@linutronix.de>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- "David S. Miller" <davem@davemloft.net>,
- "Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Johannes Berg <johannes@sipsolutions.net>,
- Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
- Jiri Pirko <jiri@resnulli.us>, Jason Gunthorpe <jgg@ziepe.ca>,
- Leon Romanovsky <leon@kernel.org>, Linus Walleij <linus.walleij@linaro.org>,
- Bartosz Golaszewski <brgl@bgdev.pl>, Lee Jones <lee@kernel.org>,
- Thomas Graf <tgraf@suug.ch>, Christoph Hellwig <hch@lst.de>,
- Marek Szyprowski <m.szyprowski@samsung.com>,
- Robin Murphy <robin.murphy@arm.com>,
- Miquel Raynal <miquel.raynal@bootlin.com>,
- Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>,
- linux-arch@vger.kernel.org, linux-mm@kvack.org,
- linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
- netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-pm@vger.kernel.org, iommu@lists.linux.dev,
- linux-mtd@lists.infradead.org
-References: <8f36be7c-6052-4c5d-85ff-0eed27cf1456@icloud.com>
- <20250221-rmv_return-v1-0-cc8dff275827@quicinc.com>
- <20250221-rmv_return-v1-1-cc8dff275827@quicinc.com>
- <20250221200137.GH7373@noisy.programming.kicks-ass.net>
- <2298251.1740496596@warthog.procyon.org.uk>
-Content-Language: en-US
-From: Zijun Hu <zijun_hu@icloud.com>
-In-Reply-To: <2298251.1740496596@warthog.procyon.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-GUID: iqw5w_RmeMXu0iJloMXtrzoP0X8vVIzf
-X-Proofpoint-ORIG-GUID: iqw5w_RmeMXu0iJloMXtrzoP0X8vVIzf
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-26_02,2025-02-26_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 mlxlogscore=985
- malwarescore=0 clxscore=1011 phishscore=0 bulkscore=0 adultscore=0
- spamscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2502260094
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z7rGXJSX57gEfXPw@gondor.apana.org.au>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
+X-Spam-Score: -4.00
+X-Spamd-Result: default: False [-4.00 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	HAS_REPLYTO(0.30)[dsterba@suse.cz];
+	NEURAL_HAM_SHORT(-0.20)[-0.996];
+	MIME_GOOD(-0.10)[text/plain];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_SEVEN(0.00)[10];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	TO_DN_ALL(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,gmail.com,openedhand.com,linux-foundation.org,chromium.org,oberhumer.com,arm.com];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	REPLYTO_ADDR_EQ_FROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:replyto];
+	RCVD_COUNT_TWO(0.00)[2];
+	REPLYTO_DOM_NEQ_TO_DOM(0.00)[]
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-On 2025/2/25 23:16, David Howells wrote:
-> Zijun Hu <zijun_hu@icloud.com> wrote:
-> 
->>>>  static inline void tlb_remove_page(struct mmu_gather *tlb, struct page *page)
->>>>  {
->>>> -	return tlb_remove_page_size(tlb, page, PAGE_SIZE);
->>>> +	tlb_remove_page_size(tlb, page, PAGE_SIZE);
->>>>  }
->>> So I don't mind removing it, but note that that return enforces
->>> tlb_remove_page_size() has void return type.
->>>
->>
->> tlb_remove_page_size() is void function already. (^^)
-> 
-> That may be true... for now.  But if that is changed in the future, then you
-> will get an error indicating something you need to go and look at... so in
-> that regard, it's *better* to do this ;-)
-> 
+On Sun, Feb 23, 2025 at 02:55:24PM +0800, Herbert Xu wrote:
+> The compression code in LZO never checked for output overruns.
+> Fix this by checking for end of buffer before each write.
 
-i understand your point.
+Does it have to check for the overruns? The worst case compression
+result size is known and can be calculated by the formula. Using big
+enough buffer is part of the correct usage of LZO. All in-kernel users
+of lzo1x_1_compress() seem to provide the target buffer calculated by
+lzo1x_worst_compress(). F2FS, JFFS2, BTRFS. Not sure about ZRAM.
 
-if the callee tlb_remove_page_size() is in the same module with the
-caller tlb_remove_page. it is meaningless to watch the callee's return type.
+What strikes me as alarming that you insert about 20 branches into a
+realtime compression algorithm, where everything is basically a hot
+path.  Branches that almost never happen, and never if the output buffer
+is big enough.
 
-otherwise, provided the callee is a API which is provided by other
-module author. once the author changes the API's return type, he/she
-must take effort to cleanup this weird and lots of usages, that is not
-nice for API provider.
-
-this is a common issue. i will list my reasons why this usage is not
-good in cover letter of this series
-> David
-> 
-
+Please drop the patch.
