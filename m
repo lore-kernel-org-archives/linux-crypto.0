@@ -1,141 +1,124 @@
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDAE521C19B
-	for <linux-crypto@vger.kernel.org>; Wed, 26 Feb 2025 13:12:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70B4E221DA1;
+	Wed, 26 Feb 2025 17:06:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740575526; cv=none; b=cAD9VVjwcz3eNui79OIHAjnoNCttLYM6Lm3FaY+Z7c+jq+vzKRJBKtORMQegGQg8r7pln/sV1tneO/4hhhJtq4jjycuDxwHzEyMahdHk+fYEDvrlDWg+wBVz2WqXcP3Ey/YAE2L0wAIAgA8j9w8uRZGSCg8gV//uGKUBysdb87c=
+	t=1740589599; cv=none; b=CaEeYgcns8BONft+EgJNvRfBAfjeDwKA8KD8rJbgYjpVxbuNK2kfV3xAxbRsWoB7yEAV/IUO43e2u9Acv3Lgja47HgHI/z+iWtP9VHhJs23tNiZC8xmFMCxehYwdZAjtKlwTRUSKeQQUFA1GnP/Sy9fIbA2Gb4IrS2/+3SjC9pY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740575526; c=relaxed/simple;
-	bh=UcN+Yc8/BXf/BDVbG/QiIbLhSfNGYB+VDmHOpxILJEU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FKrkVN+UWjyv1fM5r98sIYRG+wowCsoR5c2fdT9Q0ALi7I83MYmJPtOM63goIP1z/6QrVqnZkX/YmLhYuA6bGsWmy8NLqtkzEvTAfOfWPsbh6tYRvols2pZUA2n+BCqmuf7ciMCaHvTrbSiMpwi9h7kanok0mMviVI0Ad9xtZA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=gmth0zxt; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	s=arc-20240116; t=1740589599; c=relaxed/simple;
+	bh=2R180IJ7APaALd1g+yyfkVhGYnf3hIvGDgk8lsKLG8A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=m8TRhcxJ8E3aPz7bLSpfkPrnIcocCIott6ZVLDDO4z+gY8rni9T+BvmmjRIctFzF+QofmMWLcAbFzwExQjXQKv+VdbrC7nG5puN8Tlh/W1fTC0RneefW5rLhcyxMzR4OaDhIurtyCinpqBw8CK1ldNMHBnFs7mFA3Ih+1KSupnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a/8x3DgJ; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="gmth0zxt"
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-471eb0e3536so106012391cf.3
-        for <linux-crypto@vger.kernel.org>; Wed, 26 Feb 2025 05:12:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1740575524; x=1741180324; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=m6Xk4LHq+vuxMrWb9QEhIjcrWUMHuvgAEq1BuTfNkWI=;
-        b=gmth0zxtEmjcsNxhBouoEvOu6qEY7rYm3pbfVqVxZNY4Ii5Y7msKJbC1NsvZynHU5R
-         Pj8JH1hsT/VZ2W77VKd3PwwUxgWVNV/ip6dmtM4btdxUBO3oIxNTQYrQcaZ9RQ85KLc2
-         ekFyj+uNmcQnZu1aTxpm36sszGsbpiDSaWzqFYDeT7VD++qMH8/w9/dkASEjWY8vR0s8
-         UWGf52ZsR1ROQS6uqAfFwSnR0OdudCeR0Gb06DOGGTrrLWZJvA8QZ2hMSnY0Dou/yEAZ
-         MKOSXAI6ZxkjfOxw2RoK2mO/BwnFfQiepLvqACzK3aUibTLaW3EZarLFBvvn7sqhaX+z
-         s1Qw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740575524; x=1741180324;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=m6Xk4LHq+vuxMrWb9QEhIjcrWUMHuvgAEq1BuTfNkWI=;
-        b=hd486o/byKTrciD/iRXgyEk2j+89GpoDurqXfHsZaqYJELehjsYBXKdKNc1wtbWMOJ
-         JlyXXtaiTWfcFyifqC2+TpkKPnEt0N1Z+o0LmERyfbeyL+yvGJtxFguTWdNujaes8MC6
-         W/sjROkTq6C84SUlFFQheo8b3UrH5hW/nsxOReHto5idf8T96U5jrSpcxVOl156mWV+X
-         xxlYNgKkgJggogJh6klntO3ATzBg5KYrpLd3uZF6finik/7Hymzn6PIssiclM89wLQXE
-         6Hd3XIsog3S9TAYBjxe7voWtJmaPzgGCUuHaXzdixIw7An3PAYW7PYfhFGht3eMt+EbD
-         kncw==
-X-Forwarded-Encrypted: i=1; AJvYcCWKA50EX9WWsE39tG43gyTbXikzcmdJb8+88+xKUYL/8Z1PRkAF4XpWbkjm0F9ugYlHeEmVDtIVNgESXv0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyl97JSGMjGWHMC/iZt4HzUEBm0yUxsz4v0ypiVZRoaZwdTVeyU
-	Sp7p0utbctlS0r9b9bd8yx/Perr5QUeLSFfIwVeT3pC8GDLcKLrkXQbYy0MX7TM=
-X-Gm-Gg: ASbGncsSkUHt6hlZ905LiheUuTt08v3YmEEL6EMiwotIrWSVqIDOgXHfE6Bj7qYOX5u
-	OK1TIaeXPRdG6iHtlVXJ3pdGlvqYwGtzFSGtN1d46BxQmyIe/Q5mrPbacDiABv70Hsud3960d4Y
-	HKfY7/ONMRbMQ6bVajVP37sl/tJ44D8EyIqGlTUAYNDSmFjwRxdifKCH4qZhAE01OHF8f2W9YtA
-	JAcdZavzP+Bni8bPtWFivA13HEiu06JA/bL9cnAOiYBOlfaBUAaN5auzMD2D4gs6lXkR+u20ziD
-	cs+ZzBRbjBo7n5Wu0nacYCcQP7y5sCxJqgI/z4Mec+cL0zK95/I3BOgWNNKm2m3aCukL7UZpOeo
-	=
-X-Google-Smtp-Source: AGHT+IEEfwlXAvWZ2xNGVxvzUGP6nDfT13h++oyNBWTrRPp0M1zvh40QuIYqQQDMaC1/myckxEJxtw==
-X-Received: by 2002:a05:622a:13ce:b0:471:f619:db45 with SMTP id d75a77b69052e-4737725caa7mr88331981cf.42.1740575523795;
-        Wed, 26 Feb 2025 05:12:03 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-47377e21fcdsm23423041cf.39.2025.02.26.05.12.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Feb 2025 05:12:02 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1tnHCk-000000007O6-0KPx;
-	Wed, 26 Feb 2025 09:12:02 -0400
-Date: Wed, 26 Feb 2025 09:12:02 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Xu Yilun <yilun.xu@linux.intel.com>
-Cc: Alexey Kardashevskiy <aik@amd.com>, x86@kernel.org, kvm@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-arch@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Ashish Kalra <ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Christoph Hellwig <hch@lst.de>, Nikunj A Dadhania <nikunj@amd.com>,
-	Michael Roth <michael.roth@amd.com>,
-	Vasant Hegde <vasant.hegde@amd.com>,
-	Joao Martins <joao.m.martins@oracle.com>,
-	Nicolin Chen <nicolinc@nvidia.com>,
-	Lu Baolu <baolu.lu@linux.intel.com>,
-	Steve Sistare <steven.sistare@oracle.com>,
-	Lukas Wunner <lukas@wunner.de>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Dionna Glaze <dionnaglaze@google.com>, Yi Liu <yi.l.liu@intel.com>,
-	iommu@lists.linux.dev, linux-coco@lists.linux.dev,
-	Zhi Wang <zhiw@nvidia.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-Subject: Re: [RFC PATCH v2 14/22] iommufd: Add TIO calls
-Message-ID: <20250226131202.GH5011@ziepe.ca>
-References: <20250218111017.491719-1-aik@amd.com>
- <20250218111017.491719-15-aik@amd.com>
- <Z72GmixR6NkzXAl7@yilunxu-OptiPlex-7050>
- <2fe6b3c6-3eed-424d-87f0-34c4e7e1c906@amd.com>
- <Z77xrqLtJfB84dJF@yilunxu-OptiPlex-7050>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a/8x3DgJ"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC56BC116B1;
+	Wed, 26 Feb 2025 17:06:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740589599;
+	bh=2R180IJ7APaALd1g+yyfkVhGYnf3hIvGDgk8lsKLG8A=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=a/8x3DgJgskglabgyo16PGJtzrAVaL3wlI4GWiUa2t3h6Arsj1fdxCDGHHUKE1qz+
+	 MkWqGYj4HEBPBct7yYViRQUjlal1IbYHMnBCcmswporwMRHlB0Nx9dMjqXBPC9R6BF
+	 4qXyHcAPiRTt8nxgOwp7kjYrgjhT3u1JQIevs3oxA6uy6x3/jSFm7QuEaI+C811iY+
+	 4AL2jhdvnuhR4d5R91R5M0A3eER7PnxdjHvqOLqUclMX+1F16ZGFfW+dcq/tsjnLMP
+	 kSGz3A674HrBV9uFQqMNpCDNbxrVVIxuFXU3Ie1gj1RsPLiIjEfUxTtzaPunB5VN6E
+	 gP899WOFULZWA==
+Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-5fcd811d939so580383eaf.0;
+        Wed, 26 Feb 2025 09:06:38 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCU1vPJFgkoyBTCdNw1rIiYiW8YUNF9HhM9VaqAZ4B4yEPdqoAAbEIDZ0o0Q6Rg5rux9WYh+meLb8lRKx12/@vger.kernel.org, AJvYcCUSDPE2Kl8M+7tbz7bCGjoKzqd1onjZylURVRI7FCYD6YzZyFNz6OdTPv/yOB0vjrMYKxRtBtjs5iD/hQ==@vger.kernel.org, AJvYcCUe+0MrzgLg5q81ot+3P7kXDFDDpCqjtquPJiLom3G8IZ/8+eEHtpmsu/JMEky5b95OP+iinJOa40YGBQ==@vger.kernel.org, AJvYcCV4bSwqvhjKgmoG7xQK1fRFqHrNEzNyFrQKgf8A3P/jZ7IA907+RNDZvJBWZJ6Bpirf5av6EhxOGc/4pd4ID/0=@vger.kernel.org, AJvYcCVPbHi1at06YwsIaMt0Yofh9Iwv1VohDT4wWsmGIcx4EpBCu4T/tD7p9UEfYG9rlvSwSAoVlLHREZrQFlwV@vger.kernel.org, AJvYcCVTiZbwv8Bom8+ndrw4bl9f5hnk6gLmH0fayyhA5BVKbndv4YgviLbEX6DI8qlpCDqPcjsvG5kv@vger.kernel.org, AJvYcCXMHLoZc61wf+WW7M961lIzX55prjUjgLz7iTtu4ijfS77SVyJYe4v5UlPajl+1kFx25VCrojkxJ0Oz@vger.kernel.org, AJvYcCXZPGPzuoeF0XjVRL9NSA/jtSnHijtGwqtGUeFEJ6VjYlVg8dhoxntEjp6qhuAJqrAI7eQ0MD8Nyrs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUiLgECOSOV+P096p4zKi6lxpj31zoCwRXzUM5tyAHOu1AF5mD
+	ZW3hbalWNlyMwAQpTLuHY8M5UEb3cCkCAJm1MCd6JNjTztaTELU4KRvgfYXrI+t+qzqkEFYJi52
+	bSGcfhHiGLdpvzdJFsVkC6RobjMc=
+X-Google-Smtp-Source: AGHT+IHyPLVjXp7kw5kgInAMNb4jd7h5cWQZCWKEZs0yMGYHKslrekdKrqf86zX892n/fj3IchT6bMpb2Dem6Q8+U3o=
+X-Received: by 2002:a05:6871:d20d:b0:2bd:286:d713 with SMTP id
+ 586e51a60fabf-2c155700434mr67466fac.11.1740589597661; Wed, 26 Feb 2025
+ 09:06:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z77xrqLtJfB84dJF@yilunxu-OptiPlex-7050>
+References: <20250221-rmv_return-v1-0-cc8dff275827@quicinc.com> <20250221-rmv_return-v1-14-cc8dff275827@quicinc.com>
+In-Reply-To: <20250221-rmv_return-v1-14-cc8dff275827@quicinc.com>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Date: Wed, 26 Feb 2025 18:06:26 +0100
+X-Gmail-Original-Message-ID: <CAJZ5v0i-_08mhOpsecuU+XzS8rKbk9mtgr_Kwx-QGRPh9jumKw@mail.gmail.com>
+X-Gm-Features: AQ5f1Jo18T3Py72uAV75_Jf5fdQvWu4rZ8JYWNQWcMOGXjnJR1QY3tpi4Yj9mbE
+Message-ID: <CAJZ5v0i-_08mhOpsecuU+XzS8rKbk9mtgr_Kwx-QGRPh9jumKw@mail.gmail.com>
+Subject: Re: [PATCH *-next 14/18] PM: wakeup: Remove needless return in three
+ void APIs
+To: Zijun Hu <quic_zijuhu@quicinc.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Will Deacon <will@kernel.org>, 
+	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	Nick Piggin <npiggin@gmail.com>, Peter Zijlstra <peterz@infradead.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Thomas Gleixner <tglx@linutronix.de>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Danilo Krummrich <dakr@kernel.org>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Johannes Berg <johannes@sipsolutions.net>, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, 
+	Bartosz Golaszewski <brgl@bgdev.pl>, Lee Jones <lee@kernel.org>, Thomas Graf <tgraf@suug.ch>, 
+	Christoph Hellwig <hch@lst.de>, Marek Szyprowski <m.szyprowski@samsung.com>, 
+	Robin Murphy <robin.murphy@arm.com>, Miquel Raynal <miquel.raynal@bootlin.com>, 
+	Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>, Zijun Hu <zijun_hu@icloud.com>, 
+	linux-arch@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, linux-pm@vger.kernel.org, iommu@lists.linux.dev, 
+	linux-mtd@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 26, 2025 at 06:49:18PM +0800, Xu Yilun wrote:
+On Fri, Feb 21, 2025 at 2:03=E2=80=AFPM Zijun Hu <quic_zijuhu@quicinc.com> =
+wrote:
+>
+> Remove needless 'return' in the following void APIs:
+>
+>  __pm_wakeup_event()
+>  pm_wakeup_event()
+>  pm_wakeup_hard_event()
+>
+> Since both the API and callee involved are void functions.
+>
+> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+> ---
+>  include/linux/pm_wakeup.h | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/include/linux/pm_wakeup.h b/include/linux/pm_wakeup.h
+> index d501c09c60cd..51e0e8dd5f9e 100644
+> --- a/include/linux/pm_wakeup.h
+> +++ b/include/linux/pm_wakeup.h
+> @@ -205,17 +205,17 @@ static inline void device_set_awake_path(struct dev=
+ice *dev)
+>
+>  static inline void __pm_wakeup_event(struct wakeup_source *ws, unsigned =
+int msec)
+>  {
+> -       return pm_wakeup_ws_event(ws, msec, false);
+> +       pm_wakeup_ws_event(ws, msec, false);
+>  }
+>
+>  static inline void pm_wakeup_event(struct device *dev, unsigned int msec=
+)
+>  {
+> -       return pm_wakeup_dev_event(dev, msec, false);
+> +       pm_wakeup_dev_event(dev, msec, false);
+>  }
+>
+>  static inline void pm_wakeup_hard_event(struct device *dev)
+>  {
+> -       return pm_wakeup_dev_event(dev, 0, true);
+> +       pm_wakeup_dev_event(dev, 0, true);
+>  }
+>
+>  /**
+>
+> --
 
-> E.g. I don't think VFIO driver would expect its MMIO access suddenly
-> failed without knowing what happened.
-
-What do people expect to happen here anyhow? Do you still intend to
-mmap any of the MMIO into the hypervisor? No, right? It is all locked
-down?
-
-So perhaps the answer is that the VFIO side has to put the device into
-CC mode which disables MMAP/etc, then the viommu/vdevice iommufd
-object can control it.
-
-> Back to your concern, I don't think it is a problem. From your patch,
-> vIOMMU doesn't know the guest BDFn by nature, it is just the user
-> stores the id in vdevice via iommufd_vdevice_alloc_ioctl(). A proper
-> VFIO API could also do this work.
-
-We don't want duplication though. If the viommu/vdevice/vbdf are owned
-and lifecycle controlled by iommufd then the operations against them
-must go through iommufd and through it's locking regime.
-> 
-> The implementation is basically no difference from:
-> 
-> +       vdev = container_of(iommufd_get_object(ucmd->ictx, cmd->vdevice_id,
-> +                                              IOMMUFD_OBJ_VDEVICE),
-> 
-> The real concern is the device owner, VFIO, should initiate the bind.
-
-There is a big different, the above has correct locking, the other
-does not :)
-
-Jason
+Applied as 6.15 material, thanks!
