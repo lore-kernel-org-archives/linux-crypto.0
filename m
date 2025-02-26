@@ -1,50 +1,66 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B5EBE56A;
-	Wed, 26 Feb 2025 01:25:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 157B018801A;
+	Wed, 26 Feb 2025 01:41:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740533144; cv=none; b=MxOR2QgY1YHQDa+BS8JYk77uIEvL0H2NW2TTWhx7h9er4QQobL99VUQyx7NWwwxghxoOMkQ3RNqEtz3ccXINUJXbAyZ7TnLShtC3GakAjIPu/atBT1901xmRTrshvbMuvAmrDc9ui4nglFJjssiLHnakKTMB/689ZGwjKjmQimw=
+	t=1740534098; cv=none; b=OHFDF8ISjo0+1c30r+cEFs5m4hj1l4yv/7DWUv8C1DOY+JK9VaPwl6H6puC/ZNHzeC14bak0NjQuPRwb4L3Vl52XBp7CSVDM+es46JvpCrj2WBUPCi9+lFsyK1ec09P69hm0bBULt7ODwh7SmbMszQ3giu7UI4qqUynDSNTWJ98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740533144; c=relaxed/simple;
-	bh=vnzgAuai+PqDRJ448BD5D7BjFjsFitxstzThcRWOnvs=;
+	s=arc-20240116; t=1740534098; c=relaxed/simple;
+	bh=58ZMG8/1/Uh1xkS5yKwRQCg82oBoxBK2uJYcSHkp4rw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iHvf+LpGEKSwrH2/jWc0xzUK6aiGE2lSpDVaHQ56fe8+s0J5VeqLjPATem01i1O8Jtqwg+sOiFqYhhibcGWVXnSphyM8PamCLQxS818TIbLp7yux+q/tOEeSLzEgZ0tWpYWhbYl2iURljIKp7srWjk5jz/ZW1fZZkOlwXLXJqEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=hzo57jvN; arc=none smtp.client-ip=144.6.53.87
+	 Content-Type:Content-Disposition:In-Reply-To; b=SLOsXc77hwhzFJV7vbWYxOA3ZrfGnanKdx9DptQmxPCLNwbKBIhFpRfqXBjClTdWGCQG0CEC+41Udpkh+CGKGQ+GOxSIV/mg38qLzBxQ0+qmhQSE8PLYLHvFOiZUxKOV+UyzltFg3GPT4Dq6heATUUV8UUo5aBFiNhD4YQ3whpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=CvN5XUDJ; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="hzo57jvN"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="CvN5XUDJ"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
 	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=u6gjY0GvWz0cVjCLNjZik1ey32U4+7GO7hXOEyOYVlI=; b=hzo57jvN/49WD2nfGGCFbgsRSk
-	PcrzaiZeZXiOoog5+EFpmrRY0gstm1NYesYMJ4jTRGgENptDSllijGjPabXAD2eBHun6oPKgbBvz6
-	QywVuZQazdwChoay34Esf8tHHLNyXoA3fnmzX6CjajsMg4KV+C+bSVP/jT2Wxw6y/yp/UforDTRSh
-	inclI03KaMGAehbCCBMC62wNDc8xPJRIsfiNSTQJb52P9hpfKsnIMDDUjAnIImnyKGTckNOhRgiOZ
-	Z7TOSrTPl/7Wt2YfMm2O9crOXW0FYCpeCoCxkbbz8SxqKzczJZKO37lfu7V8ovGKTirTRx0xx9OC5
-	psgW+/Xg==;
+	bh=jdo3/IxMwB8Q6RAm8ZwQFpjzIGffxAXyzhXHZ3RcNYQ=; b=CvN5XUDJLLlwrhy2yvZ3JOn+mA
+	66llyxU9BmPbO5yXQyiku1NmjCiS1kuS9BFF8Yp06Eqq24WFuOy39micBVHNgX3ViXpXs19PthvR/
+	Wn9fLbmpxq9kdrF/dni3e0lPtym++ScEocHEK8MLciUAsI6lsVqr//2bFdZX5STFbLXwXndIoKsVO
+	PZQ6MhZXoT/BiTrKcnlI/OL350i3vgAWwJmB8o8De+KtnrV2a6lTFKQ/ouDwLkRElW691cwJl0YRk
+	/SiR5VaATjvDIh1KOZqglSm6ktFZm7wqGo36ulqjhlizNZB/3F21vRn8vd7OKxW/bwYZ5ZOJXuLL1
+	sUyRl2ag==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tn6At-001n78-0X;
-	Wed, 26 Feb 2025 09:25:24 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 26 Feb 2025 09:25:23 +0800
-Date: Wed, 26 Feb 2025 09:25:23 +0800
+	id 1tn6Px-001nh1-2C;
+	Wed, 26 Feb 2025 09:40:58 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 26 Feb 2025 09:40:57 +0800
+Date: Wed, 26 Feb 2025 09:40:57 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: syzbot <syzbot+1a517ccfcbc6a7ab0f82@syzkaller.appspotmail.com>,
-	davem@davemloft.net, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org
-Subject: Re: mm: zswap: fix crypto_free_acomp deadlock in zswap_cpu_comp_dead
-Message-ID: <Z75tg3wXoDnGtLis@gondor.apana.org.au>
-References: <67bcea51.050a0220.bbfd1.0096.GAE@google.com>
- <Z72FJnbA39zWh4zS@gondor.apana.org.au>
- <3482501981b13aedda3c1c6b54d83d496bd05922@linux.dev>
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: Arnd Bergmann <arnd@arndb.de>, Will Deacon <will@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Harald Freudenberger <freude@linux.ibm.com>,
+	Holger Dengler <dengler@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Eric Biggers <ebiggers@google.com>,
+	"James E . J . Bottomley" <James.Bottomley@hansenpartnership.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>, linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-mips@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: Re: [PATCH] crypto: lib/Kconfig - fix chacha/poly1305 dependencies
+ more more
+Message-ID: <Z75xKexTUNm_FnSK@gondor.apana.org.au>
+References: <20250225164216.4807-1-arnd@kernel.org>
+ <20250225213344.GA23792@willie-the-truck>
+ <f7c298b8-7989-49e7-90a2-5356029a6283@app.fastmail.com>
+ <c4896a12-8abe-4fe6-b381-86b23d32b332@app.fastmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -53,20 +69,30 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3482501981b13aedda3c1c6b54d83d496bd05922@linux.dev>
+In-Reply-To: <c4896a12-8abe-4fe6-b381-86b23d32b332@app.fastmail.com>
 
-On Tue, Feb 25, 2025 at 01:43:41PM +0000, Yosry Ahmed wrote:
+On Tue, Feb 25, 2025 at 10:50:10PM +0100, Arnd Bergmann wrote:
 >
-> Interesting, it's weird that crypto_free_acomp() allocates memory. Do you have the specific call path?
+> After looking at the original 0day report, I think the fix for
+> that problem would have been
+> 
+> --- a/drivers/net/Kconfig
+> +++ b/drivers/net/Kconfig
+> @@ -94,6 +94,7 @@ config WIREGUARD
+>         select CRYPTO_CHACHA_MIPS if CPU_MIPS32_R2
+>         select CRYPTO_POLY1305_MIPS if MIPS
+>         select CRYPTO_CHACHA_S390 if S390
+> +       select CRYPTO_CURVE25519_PPC64 if PPC64 && CPU_LITTLE_ENDIAN
+>         help
+>           WireGuard is a secure, fast, and easy to use replacement for IPSec
+>           that uses modern cryptography and clever networking tricks. It's
 
-crypto_free_acomp does not allocate memory.  However, it takes
-the same mutex that is also taken on the allocation path.
+Thanks.  I wasn't aware wireguard was doing this.
 
-The specific call path can be seen in the original report:
+Let me see if I can replicate this select matrix in lib/crypto
+instead.
 
-https://syzkaller.appspot.com/bug?extid=1a517ccfcbc6a7ab0f82
-
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
