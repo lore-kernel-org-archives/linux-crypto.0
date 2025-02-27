@@ -1,150 +1,147 @@
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A0ED19C57C;
-	Thu, 27 Feb 2025 16:02:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C2571ADFE4;
+	Thu, 27 Feb 2025 16:26:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740672166; cv=none; b=kotlZfeUl12C+/ivOk3dnUamD3vZyH/eiKu7ZFvT21iYHP/QydUuVV5mPLpcCBeKLTDVkiqI7CPCvaD9ZVZV/V/8xSSHUoRwrUE2VdTcLihTH+aRX1D6pexHLF38KDStkaLE8PE2Y/yQKHI5w2Ts15fL6ALf3e3YTaeJ4GfP1Gg=
+	t=1740673592; cv=none; b=ePRWOCJRqZEhtqsHvWbUUADAUobsDtLLw4OAUTZbMK5Z6EdRCJqwQQ/JLP/Q6juMhNjo/AKZ9gVcL+K0Z10/KITs2+2yj4UHwypqMUQmwC0XwS+7bxrXx7+oa4mugyZn+lChp2384LPtiWdfDy10mD/oeffu38T4KDOQdl3kvCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740672166; c=relaxed/simple;
-	bh=RFl2o37WVKCpXjjZioydmxS1a7oCxw26tEAC3SJ6bFA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LuksfX4ygY6Xf98QM5EWF3fj2I82E6qbtP/UfUgacnPYfAc2Fj9+H080WRwsR/TVWx7wJXfWL+ClSkq7UCELsRBDdY60k3bE+4lrx0mCiud3gVetL82Xamt24ZaxvaA4UyVvpI2ouO/XhumQkQ22UEJMzroVL80e9S6r0PJOgBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=YDmBIf3V; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+	s=arc-20240116; t=1740673592; c=relaxed/simple;
+	bh=aOEtGrd0ha6dFMRcsDJl3/p9JPpM9nkTTOP3TzlLibw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VlEENY5xPk/SV+FP86yTQl4h8jH7R8RAGLFnsiZuRSRJL2Zt7fHko35ykrUQSEqPwTABpHiefEqzp/RPfBhNI5699trAMK0eVCl9HX2orvUSyGWSSqbBksvF4+gXjr6AgqSFJsR38vUGtFDxwTU6cSfDbBKn7YqCGuPZSP/7fic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=d13d2kOe; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="YDmBIf3V"
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id ECDEB40E0202;
-	Thu, 27 Feb 2025 16:02:40 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id 7vNDSrtYzXsR; Thu, 27 Feb 2025 16:02:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1740672156; bh=FUZpHDr4StgHr+/B0BvhYI7K2GkGl5sit6N8LUylnSA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YDmBIf3VPJ/AzvjLAt7ulTJSyvWP3TrND3nM3FTp8uM3qLAs2bIl8ejzn5OaWXpxa
-	 YLDt4O4V8ilXogR6DZlzQKbkRCy5OvqRms/DgGRubj3SCIXG+NDrtGjmAdztORJ76o
-	 jnTo3q7a3j+1YsPyAWh396spuDhLMoraz8hICqSiVxpXv//tdyscstmlX4K5ElCyUC
-	 Fo5wXtgzT2Gcogpirx0i6zn+JJ4OVUFCh+xs/ssOG1WmVNaSLEyCw+ukiO7C9BYR/U
-	 k0RNsQy8gzN9FuFb9ogOTLp6XlVDnYTAqTdxD6i2Rcvl7S+ElZ8fnXQpvdHwc8Yuz6
-	 7OhoP5y0nN6SNR4qzLOQgoZO/8da+r6rH02HIj334MvqkfPbIq33QogIrhpX2J2pI+
-	 cBQ0wMg/l3zy6OmK+3fUYri3TpAqGzhksTsprK5NoYgEKfoSzQb2DAa6yjc8sxHN8a
-	 i0cftrHa8BLifDvDIFfSqikRd/4i1DFBqgVM0WmR/Pas6XyYIFd53elX0/WnlrxgPt
-	 jy4H+dAXmy2cJyuCkHjAEfafgAmmJvYCKPqnqd7MjlGbzPJYMcyZ7HqaBsH3YbiCFg
-	 U2PuqxLAkp49Qig8WQuZKqfCLnpFVRLIBRCJK9s8dsnrR/9Qu7ad1uB5gu1MISGABz
-	 Juk4iWe2stm872WWu6WazSDw=
-Received: from zn.tnic (pd95303ce.dip0.t-ipconnect.de [217.83.3.206])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 1B97E40E0200;
-	Thu, 27 Feb 2025 16:02:01 +0000 (UTC)
-Date: Thu, 27 Feb 2025 17:01:55 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Alexey Kardashevskiy <aik@amd.com>
-Cc: x86@kernel.org, kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Ashish Kalra <ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	Robin Murphy <robin.murphy@arm.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Christoph Hellwig <hch@lst.de>, Nikunj A Dadhania <nikunj@amd.com>,
-	Michael Roth <michael.roth@amd.com>,
-	Vasant Hegde <vasant.hegde@amd.com>,
-	Joao Martins <joao.m.martins@oracle.com>,
-	Nicolin Chen <nicolinc@nvidia.com>,
-	Lu Baolu <baolu.lu@linux.intel.com>,
-	Steve Sistare <steven.sistare@oracle.com>,
-	Lukas Wunner <lukas@wunner.de>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Dionna Glaze <dionnaglaze@google.com>, Yi Liu <yi.l.liu@intel.com>,
-	iommu@lists.linux.dev, linux-coco@lists.linux.dev,
-	Zhi Wang <zhiw@nvidia.com>, AXu Yilun <yilun.xu@linux.intel.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-Subject: Re: [RFC PATCH v2 20/22] sev-guest: Stop changing encrypted page
- state for TDISP devices
-Message-ID: <20250227160155.GCZ8CMcz5sQnKotIME@fat_crate.local>
-References: <20250218111017.491719-1-aik@amd.com>
- <20250218111017.491719-21-aik@amd.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d13d2kOe"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740673591; x=1772209591;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=aOEtGrd0ha6dFMRcsDJl3/p9JPpM9nkTTOP3TzlLibw=;
+  b=d13d2kOe/JKXGsQrXEYjzBdQ9nIrvKAtAtdbdFAhHStGZaEjlfN2vEqv
+   T7oBxv9QlNvXH1JUMB3RPI+23ygv3iYROLHDzDMQIIEDhO+vMF7QoeRW0
+   rx1tEjj33yNCgUcB/rplzdC+6NlumhG/JXpvAygM0iwBGkgAyCE1NT4Yi
+   tu9J42vGMGU0oxDuKdAFpQj+KtPTyj7/yTxmtqxv8l1jTK8JnzP/N98qG
+   p9AGUOQreJ4SO/DeneSxwRFdgXGAoUX4LlRwRJT1Nw866HetHn+MNfrW0
+   K7fNCV5rnCNZxoNOyh+qVb/MAO6VK1FUBfvCYaF6dRc07SmDMOy0KMPTK
+   g==;
+X-CSE-ConnectionGUID: ARz/swlaQDmwryO/T9ZySA==
+X-CSE-MsgGUID: QG+oOwCNTJiWerMKERZoTg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11358"; a="52216686"
+X-IronPort-AV: E=Sophos;i="6.13,320,1732608000"; 
+   d="scan'208";a="52216686"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2025 08:26:30 -0800
+X-CSE-ConnectionGUID: sxRArCenSIipebFcB0lrGg==
+X-CSE-MsgGUID: V+OXs52SQ168w8Yj9uV8Ag==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="117595889"
+Received: from kcaccard-desk.amr.corp.intel.com (HELO [10.125.108.72]) ([10.125.108.72])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Feb 2025 08:26:30 -0800
+Message-ID: <d20da175-2102-4ac0-bf91-0ab8f6b6b317@intel.com>
+Date: Thu, 27 Feb 2025 08:26:31 -0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250218111017.491719-21-aik@amd.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] x86/crc32: use builtins to improve code generation
+To: Bill Wendling <morbo@google.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+ "H. Peter Anvin" <hpa@zytor.com>, Eric Biggers <ebiggers@kernel.org>,
+ Ard Biesheuvel <ardb@kernel.org>, Nathan Chancellor <nathan@kernel.org>,
+ Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
+ Justin Stitt <justinstitt@google.com>, LKML <linux-kernel@vger.kernel.org>,
+ linux-crypto@vger.kernel.org, clang-built-linux <llvm@lists.linux.dev>
+References: <CAGG=3QVi27WRYVxmsk9+HLpJw9ZJrpfLjU8G4exuXm-vUA-KqQ@mail.gmail.com>
+From: Dave Hansen <dave.hansen@intel.com>
+Content-Language: en-US
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+In-Reply-To: <CAGG=3QVi27WRYVxmsk9+HLpJw9ZJrpfLjU8G4exuXm-vUA-KqQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Feb 18, 2025 at 10:10:07PM +1100, Alexey Kardashevskiy wrote:
-> diff --git a/include/linux/dma-direct.h b/include/linux/dma-direct.h
-> index d7e30d4f7503..3bd533d2e65d 100644
-> --- a/include/linux/dma-direct.h
-> +++ b/include/linux/dma-direct.h
-> @@ -94,6 +94,14 @@ static inline dma_addr_t phys_to_dma_unencrypted(struct device *dev,
->   */
->  static inline dma_addr_t phys_to_dma(struct device *dev, phys_addr_t paddr)
->  {
-> +#if defined(CONFIG_TSM_GUEST) || defined(CONFIG_TSM_GUEST_MODULE)
-> +	if (dev->tdi_enabled) {
-> +		dev_warn_once(dev, "(TIO) Disable SME");
-> +		if (!dev->tdi_validated)
-> +			dev_warn(dev, "TDI is not validated, DMA @%llx will fail", paddr);
-> +		return phys_to_dma_unencrypted(dev, paddr);
-> +	}
-> +#endif
->  	return __sme_set(phys_to_dma_unencrypted(dev, paddr));
->  }
->  
-> diff --git a/include/linux/swiotlb.h b/include/linux/swiotlb.h
-> index 3dae0f592063..67bea31fa42a 100644
-> --- a/include/linux/swiotlb.h
-> +++ b/include/linux/swiotlb.h
-> @@ -173,6 +173,14 @@ static inline bool is_swiotlb_force_bounce(struct device *dev)
->  {
->  	struct io_tlb_mem *mem = dev->dma_io_tlb_mem;
->  
-> +#if defined(CONFIG_TSM_GUEST) || defined(CONFIG_TSM_GUEST_MODULE)
-> +	if (dev->tdi_enabled) {
-> +		dev_warn_once(dev, "(TIO) Disable SWIOTLB");
-> +		if (!dev->tdi_validated)
-> +			dev_warn(dev, "TDI is not validated");
-> +		return false;
-> +	}
-> +#endif
->  	return mem && mem->force_bounce;
->  }
->  
-> diff --git a/arch/x86/mm/mem_encrypt.c b/arch/x86/mm/mem_encrypt.c
-> index 95bae74fdab2..c9c99154bec9 100644
-> --- a/arch/x86/mm/mem_encrypt.c
-> +++ b/arch/x86/mm/mem_encrypt.c
-> @@ -19,6 +19,12 @@
->  /* Override for DMA direct allocation check - ARCH_HAS_FORCE_DMA_UNENCRYPTED */
->  bool force_dma_unencrypted(struct device *dev)
->  {
-> +#if defined(CONFIG_TSM_GUEST) || defined(CONFIG_TSM_GUEST_MODULE)
-> +	if (dev->tdi_enabled) {
-> +		dev_warn_once(dev, "(TIO) Disable decryption");
-> +		return false;
-> +	}
-> +#endif
+On 2/26/25 22:12, Bill Wendling wrote:
+>  #ifdef CONFIG_X86_64
+> -#define CRC32_INST "crc32q %1, %q0"
+> +#define CRC32_INST __builtin_ia32_crc32di
+>  #else
+> -#define CRC32_INST "crc32l %1, %0"
+> +#define CRC32_INST __builtin_ia32_crc32si
+>  #endif
+> 
+>  /*
+> @@ -78,10 +78,10 @@ u32 crc32c_le_arch(u32 crc, const u8 *p, size_t len)
+> 
+>         for (num_longs = len / sizeof(unsigned long);
+>              num_longs != 0; num_longs--, p += sizeof(unsigned long))
+> -               asm(CRC32_INST : "+r" (crc) : "rm" (*(unsigned long *)p));
+> +               crc = CRC32_INST(crc,  *(unsigned long *)p);
 
-Duplicated code with ugly ifdeffery. Perhaps do a helper which you call
-everywhere instead?
+Could we get rid of the macros, please?
 
--- 
-Regards/Gruss,
-    Boris.
+unsigned long crc32_ul(unsigned long crc, unsigned long data)
+{
+	if (IS_DEFINED(CONFIG_X86_64))
+		return __builtin_ia32_crc32di(crc, data)
+	else
+		return __builtin_ia32_crc32si(crc, data)
+}
 
-https://people.kernel.org/tglx/notes-about-netiquette
+I guess it could also do some check like:
+
+	if (sizeof(int) == sizeof(long))
+
+instead of CONFIG_X86_64, but the CONFIG_X86_64 will make it more
+obvious when someone comes through to rip out 32-bit support some day.
