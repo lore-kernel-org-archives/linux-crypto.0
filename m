@@ -1,129 +1,159 @@
-Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f46.google.com (mail-ua1-f46.google.com [209.85.222.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B85FA14D43D
-	for <linux-crypto@vger.kernel.org>; Thu, 27 Feb 2025 02:30:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D01AC2B9B7;
+	Thu, 27 Feb 2025 03:05:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740623426; cv=none; b=q59cU4c66tEsDSywqbbbHYdyufpg6DsHL/3zXQOIFQ9xtmci62Cf/Sf9VFpWabq+qyruEFfiTFryzKb6IGHK2n0hNlpta05AHHLVDqsNm/NbOBbcQewY5JYgx9iuNA5HyN/ngD0G5IPOHPtY0bMXZZAlqYItABItVK7ooTDFYMA=
+	t=1740625528; cv=none; b=D3m9aGtIbLyfj3E56HRL/JRu0V52asIL07L7lg346ieBR9FeclWisG7ziU+9nZdPLoclW9Re+m4Buc1gEhoyXEKJUSy+OctdG0in5fJJpQpce1atsnDq2/O7+CMJxiCzgUKYvgv+OHoyoFBO4RgtVN0p894/laSG1st/NguZfnA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740623426; c=relaxed/simple;
-	bh=eFPNjbqeh7Zfliv2plXYbO6k4fkvgOaHAVfhYBRDa6Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cIuSADOLEQp9kx2xy52gASLZSs5kkQRckRKf0tSD8eWhxLfXlQPEPOKDzc+l3pWUtLvI329fnWKNTd1wN7V2Kt6H2JP+mvU0CtxN50Ld3akHVUZFAv2ugi/pK1UGDZonIIOtiR3/vcM/vRX+ibjFzH65QaUjBYHyFfl/JCvznu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NWnE91Al; arc=none smtp.client-ip=91.218.175.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1740625528; c=relaxed/simple;
+	bh=7WtL4nedANVT2iqljZ7s77zwDOpB0DfKNNT/4bjqozA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YE77emM19vq82zWOIKT/9Pv5t12UZLHLHhgcf8Es4BlRoU2em7dBeIFBa/zJHMJcQI08rY2waPIrYf8y+jlo5H/5czFIGJJtcCYKbVRzasU2ZtulL2Q/DnMFrOA1ZJPRzvms60AY7HyzXayboLFAb4LTfZEXN3gtksAuAlXhtn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DjqkmrNx; arc=none smtp.client-ip=209.85.222.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NWnE91Al"
-Message-ID: <7486a582-5143-4b4f-ae97-3a06089b630c@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1740623422;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sbOYPimeqO3tk023X9SrOfwdCZQmqLyKIJkaK9p9QJE=;
-	b=NWnE91AlMZmfwO4cduShqKb8KSd5wIDIOmzp5Yqy9P8th8GFxZiVDZHkTJzPXwBVIuBsEb
-	wYP06zvgyKCw3v1MDEGBDamqyMG7CqCVdmGguIvWvQv3Ap20oSgns5xuHmfl/fHi0yTBqy
-	2hRf/OtuhD7fOAqrXQwl7NikHodjg2U=
-Date: Thu, 27 Feb 2025 10:30:15 +0800
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DjqkmrNx"
+Received: by mail-ua1-f46.google.com with SMTP id a1e0cc1a2514c-869440f201eso379744241.3;
+        Wed, 26 Feb 2025 19:05:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1740625525; x=1741230325; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IXVx49eJQBLxbCrIlxbeeYi4KBlOK0BbrpMyI4DO0vk=;
+        b=DjqkmrNxFaKt8dsM23JihGHZTQg7KqFSX6yH7ifGmfzWuTVjfpc0Ed6D5lLQGcgq+f
+         SClY4Q3spGIx3nFocDMywIrigjHZD2gR1OZBz6L1bVXICvSeiq9oEwIyBXmoU/p2N9Mb
+         wEi5xTDdolbuCDn31Y+gHFjWMF18r+cSyKqSC0bq0IEeO3iM1+fdzru98uwPknwiMOzM
+         L9PCZeOd2OwtiJzrXSU6w5glWCh/bPYCrr87IFKuRI+ZuvR6pXFSCphC3QmQQgB7hbcO
+         5pLbRiCI7wUvNpzdLu4dzCBs4eSFVUAjYkim6hvJM7Jc5LLKN0jFoN5rohs+n8x3nN+J
+         rukA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740625525; x=1741230325;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IXVx49eJQBLxbCrIlxbeeYi4KBlOK0BbrpMyI4DO0vk=;
+        b=QO4ITxiC53fOIjSgIUD5ZJrRXTpe0b1Ycj9397O4b5mS0RiMiAnGr+GgzuIXms8TIa
+         DCaHRlFrngfLB9x8FbgkDhBo3GuO5fLb454DDSQj5z+RNJ2AgNzs0ytzgOeinxJ4eeod
+         kZI4ZFcy5pesT2iu/9nuN/MJl+TwbhrrpxfLn2TAvhsbq9aBXhnMLWMOCofm8cTbaEWv
+         ndFHqOrJlFeqru96btm2dZ1UeZ/nFEMsADP5WC9apEsEZZNr1JrB1bNwD+zt/IXKKrkE
+         9HCXGBEaLSnn+ZaR96dHxROGbjVYmEWPYrna3P2QoaCqaVs5U5jh7p4gZBMiSBKwfHt/
+         W1+A==
+X-Forwarded-Encrypted: i=1; AJvYcCUAgz+DkcV7FYVusPt+vvTLAdUgw+erqF1MKfyrX10WASQYhwTTxlNY8kykslj3f1Ut6NcNVWYgQk9/dWv9@vger.kernel.org, AJvYcCUm4CQBa7pNFE/4OEQq6ffsZweeRvrA0rAv45iDI0izocO+OYeM7cxE4f2pX4/P+MmQNvHHEDACZEkaKX8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyxYTWErltNpk+tJBVBq8Ogiyr2HgWMWzJixRhIAZK3p2wVvSXb
+	RKjKTg67aexZb0PVO88GGPW/1VTyugqs9w8XNXBJAKQIHoyuj4NlK9YYAnYHTonekEv/LgYiQkf
+	iivxRVLtYUdqJ9411prUkPKLWloo=
+X-Gm-Gg: ASbGnct9Ec/DACfjcPl2x5b0fYimgQWtpSfdZamWgjitfQdQwKR0CT6kpzCzD8w9QD2
+	YexsLtglUQJs7hUM0qLpEE0fCOw4puMiCnPL+IKMthHGm7aOYBrk12qS2PEk8id67fxqkczeTtv
+	/AltuH3ew=
+X-Google-Smtp-Source: AGHT+IFyyL3QwKMRRIxrajlGaeKqkP2l4r4cTYgFE9XLJOhNICubo3hunk6zTvETFEecuXEDORjBfHeBIuyCQFpuRBM=
+X-Received: by 2002:a05:6102:1614:b0:4bb:9b46:3f6f with SMTP id
+ ada2fe7eead31-4bfc27aed9fmr12833741137.1.1740625525584; Wed, 26 Feb 2025
+ 19:05:25 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2] mm: zswap: fix crypto_free_acomp() deadlock in
- zswap_cpu_comp_dead()
-To: Nhat Pham <nphamcs@gmail.com>, Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: Eric Biggers <ebiggers@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>,
- Johannes Weiner <hannes@cmpxchg.org>, "David S. Miller"
- <davem@davemloft.net>, Herbert Xu <herbert@gondor.apana.org.au>,
- linux-mm@kvack.org, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
- syzbot+1a517ccfcbc6a7ab0f82@syzkaller.appspotmail.com, stable@vger.kernel.org
-References: <20250226185625.2672936-1-yosry.ahmed@linux.dev>
- <20250226200016.GB3949421@google.com> <Z796VjPjno2PLTut@google.com>
- <20250226211628.GD3949421@google.com> <Z7-GaVJHC_1ynigx@google.com>
- <CAKEwX=O8zQj3Vj=2G6aCjK7e2DDs+VBUhRd25AefTdcvFOT-=A@mail.gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Chengming Zhou <chengming.zhou@linux.dev>
-In-Reply-To: <CAKEwX=O8zQj3Vj=2G6aCjK7e2DDs+VBUhRd25AefTdcvFOT-=A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <CAJD7tkbRHkb7Znzto6=RRDQA9zXZSva43GukhBEfjrgm1qOxHw@mail.gmail.com>
+ <Z3yMNI_DbkKBKJxO@gondor.apana.org.au> <CAJD7tkaTuNWF42+CoCLruPZks3F7H9mS=6S74cmXnyWz-2tuPw@mail.gmail.com>
+ <Z7F1B_blIbByYBzz@gondor.apana.org.au> <Z7dnPh4tPxLO1UEo@google.com>
+ <CAGsJ_4yVFG-C=nJWp8xda3eLZENc4dpU-d4VyFswOitiXe+G_Q@mail.gmail.com>
+ <Z7lv6JLax4S8vTtD@gondor.apana.org.au> <CAGsJ_4yAQxjTnSALZHAJZDdUnXKAYFvQCcjQjHiQSUip6cJGKg@mail.gmail.com>
+ <Z7l0Hf-CFFjeKaZY@gondor.apana.org.au> <CAGsJ_4zFdHUPELSYDkrN4ie2c73L6e=FEdQbDL3JckS4unKFpg@mail.gmail.com>
+ <Z7zpZlWmSV15EUVV@google.com>
+In-Reply-To: <Z7zpZlWmSV15EUVV@google.com>
+From: Barry Song <21cnbao@gmail.com>
+Date: Thu, 27 Feb 2025 16:05:14 +1300
+X-Gm-Features: AQ5f1JqXTKth9otrpj1zvCFqiq4wqPtE2SBEWuDVtOaMhsKlJKNsoIq3Jx_5obQ
+Message-ID: <CAGsJ_4wr3aT7zxn1MTjUjvQV9jeCGn=xi6VZz0qPm=xEBM6Qdg@mail.gmail.com>
+Subject: Re: [PATCH v5 02/12] crypto: acomp - Define new interfaces for
+ compress/decompress batching.
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, Minchan Kim <minchan@kernel.org>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	"Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>, 
+	"hannes@cmpxchg.org" <hannes@cmpxchg.org>, "nphamcs@gmail.com" <nphamcs@gmail.com>, 
+	"chengming.zhou@linux.dev" <chengming.zhou@linux.dev>, 
+	"usamaarif642@gmail.com" <usamaarif642@gmail.com>, "ryan.roberts@arm.com" <ryan.roberts@arm.com>, 
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>, 
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, "davem@davemloft.net" <davem@davemloft.net>, 
+	"clabbe@baylibre.com" <clabbe@baylibre.com>, "ardb@kernel.org" <ardb@kernel.org>, 
+	"ebiggers@google.com" <ebiggers@google.com>, "surenb@google.com" <surenb@google.com>, 
+	"Accardi, Kristen C" <kristen.c.accardi@intel.com>, 
+	"Feghali, Wajdi K" <wajdi.k.feghali@intel.com>, "Gopal, Vinodh" <vinodh.gopal@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2025/2/27 07:47, Nhat Pham wrote:
-> On Wed, Feb 26, 2025 at 1:23 PM Yosry Ahmed <yosry.ahmed@linux.dev> wrote:
->>
->> On Wed, Feb 26, 2025 at 09:16:28PM +0000, Eric Biggers wrote:
->>> On Wed, Feb 26, 2025 at 08:32:22PM +0000, Yosry Ahmed wrote:
->>>> On Wed, Feb 26, 2025 at 08:00:16PM +0000, Eric Biggers wrote:
->>>>> On Wed, Feb 26, 2025 at 06:56:25PM +0000, Yosry Ahmed wrote:
->>>>>> Currently, zswap_cpu_comp_dead() calls crypto_free_acomp() while holding
->>>>>> the per-CPU acomp_ctx mutex. crypto_free_acomp() then holds scomp_lock
->>>>>> (through crypto_exit_scomp_ops_async()).
->>>>>>
->>>>>> On the other hand, crypto_alloc_acomp_node() holds the scomp_lock
->>>>>> (through crypto_scomp_init_tfm()), and then allocates memory.
->>>>>> If the allocation results in reclaim, we may attempt to hold the per-CPU
->>>>>> acomp_ctx mutex.
->>>>>
->>>>> The bug is in acomp.  crypto_free_acomp() should never have to wait for a memory
->>>>> allocation.  That is what needs to be fixed.
->>>>
->>>> crypto_free_acomp() does not explicitly wait for an allocation, but it
->>>> waits for scomp_lock (in crypto_exit_scomp_ops_async()), which may be
->>>> held while allocating memory from crypto_scomp_init_tfm().
->>>>
->>>> Are you suggesting that crypto_exit_scomp_ops_async() should not be
->>>> holding scomp_lock?
->>>
->>> I think the solution while keeping the bounce buffer in place would be to do
->>> what the patch
->>> https://lore.kernel.org/linux-crypto/Z6w7Pz8jBeqhijut@gondor.apana.org.au/ does,
->>> i.e. make the actual allocation and free happen outside the lock.
->>
->> I am fine with a solution like that if Herbert is fine with it. Although
->> as I mentioned, I think this patch is nice to have anyway.
->>
->>>
->>>>> But really the bounce buffering in acomp (which is what is causing this problem)
->>>>> should not exist at all.  There is really no practical use case for it; it's
->>>>> just there because of the Crypto API's insistence on shoehorning everything into
->>>>> scatterlists for no reason...
->>>>
->>>> I am assuming this about scomp_scratch logic, which is what we need to
->>>> hold the scomp_lock for, resulting in this problem.
->>>
->>> Yes.
->>>
->>>> If this is something that can be done right away I am fine with dropping
->>>> this patch for an alternative fix, although it may be nice to reduce the
->>>> lock critical section in zswap_cpu_comp_dead() to the bare minimum
->>>> anyway.
->>>
->>> Well, unfortunately the whole Crypto API philosophy of having a single interface
->>> for software and for hardware offload doesn't really work.  This is just yet
->>> another example of that; it's a problem caused by shoehorning software
->>> compression into an interface designed for hardware offload.  zcomp really
->>> should just use the compression libs directly (like most users of compression in
->>> the kernel already do), and have an alternate code path specifically for
->>> hardware offload (using acomp) for the few people who really want that.
->>
->> zcomp is for zram, zswap does not use it. If zswap is not going to use
->> the crypto API we'll want something like zcomp or maybe reuse zcomp
->> itself. That's a problem for another day :)
-> 
-> I'm actually thinking whether we should expose the zcomp API and use
-> it for zswap. There are a couple of parameters for zstd I wanna play
-> with, which zcomp/zram seems to already support, but not the crypto
-> API (zstd level, dictionary, etc.).
+On Tue, Feb 25, 2025 at 10:49=E2=80=AFAM Yosry Ahmed <yosry.ahmed@linux.dev=
+> wrote:
+>
+> On Sat, Feb 22, 2025 at 08:13:13PM +1300, Barry Song wrote:
+> > On Sat, Feb 22, 2025 at 7:52=E2=80=AFPM Herbert Xu <herbert@gondor.apan=
+a.org.au> wrote:
+> > >
+> > > On Sat, Feb 22, 2025 at 07:41:54PM +1300, Barry Song wrote:
+> > > >
+> > > > probably no, as an incompressible page might become compressible
+> > > > after changing an algorithm. This is possible, users may swith an
+> > > > algorithm to compress an incompressible page in the background.
+> > >
+> > > I don't understand the difference.  If something is wrong with
+> > > the system causing the compression algorithm to fail, shouldn't
+> > > zswap just hobble along as if the page was incompressible?
+> > >
+> > > In fact it would be quite reasonble to try to recompress it if
+> > > the admin did change the algorithm later because the error may
+> > > have been specific to the previous algorithm implementation.
+> > >
+> >
+> > Somehow, I find your comment reasonable. Another point I want
+> > to mention is the semantic difference. For example, in a system
+> > with only one algorithm, a dst_buf overflow still means a successful
+> > swap-out. However, other errors actually indicate an I/O failure.
+> > In such cases, vmscan.c will log the relevant error in pageout() to
+> > notify the user.
+> >
+> > Anyway, I'm not an authority on this, so I=E2=80=99d like to see commen=
+ts
+> > from Minchan, Sergey, and Yosry.
+>
+> From a zswap perspective, things are a bit simpler. Currently zswap
+> handles compression errors and pages compressing to above PAGE_SIZE in
+> the same way (because zs_pool_malloc() will fail for sizes larger than
+> PAGE_SIZE). In both cases, zswap_store() will err out, and the page will
+> either go to the underlying swap disk or reclaim of that page will fail
+> if writeback is disabled for this cgroup.
+>
+> Zswap currently does not do anything special about incompressible pages,
+> it just passes them along to disk. So if the Crypto API can guarantee
+> that compression nevers writes past PAGE_SIZE, the main benefit for
+> zswap would be reducing the buffer size from PAGE_SIZE*2 to PAGE_SIZE.
+>
+> If/when zswap develops handling of incompressible memory (to avoid LRU
+> inversion), I imagine we would handle compression errors and
+> incompressible pages similarly. In both cases we'd store the page as-is
+> and move th LRU along to write more pages to disk. There is no point to
+> fail the reclaim operation in this case, because unlike zram we do have
+> a choice :)
 
-Ah, agree! Actually I also think we should use the zcomp API in zswap,
-if its API meets our requirements.
+Yes. For zswap, I suppose we just need to wait until all driver issues are
+resolved, such as:
+crypto: lzo - Fix compression buffer overrun
+https://lore.kernel.org/lkml/Z7_JOAgi-Ej3CCic@gondor.apana.org.au/
 
-> 
-> But yes, a different problem for another day :)
+for zswap, we just need to address point 1, which is not the case yet.
+
+"
+> 1. All drivers must be capable of handling dst_buf overflow.
+
+-Not the case.
+"
+
+Thanks
+Barry
