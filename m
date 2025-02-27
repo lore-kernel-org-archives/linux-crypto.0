@@ -1,149 +1,135 @@
-Received: from mail.zytor.com (terminus.zytor.com [198.137.202.136])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 588C92288EA;
-	Thu, 27 Feb 2025 10:53:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 152E3228CBA
+	for <linux-crypto@vger.kernel.org>; Thu, 27 Feb 2025 11:33:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740653621; cv=none; b=pJUzI+GjGwKbOUY5rvD1Gd6lu9wx1Dlaku1wvnQ0Rj1+MIt/YH/vUp1I/4lOq3JlZNoKjnAekuBMQ4wyeM51xwerCatPFL34c2/v4av4AGs73dYS4EVWJfHaG/aRQt6DTdrcq/sTQ6OXOtUoFwFf2Ma4r6tR4VlLeINYTMGaWy8=
+	t=1740655997; cv=none; b=eAIZbtVcjOwE4pCXZg/MXPBr5V06IokgAHfQVXtZGhe7kjYAPQMsdepF83MvzQP9sRG356vWa3xavekShdOYY5dBwa4ma814nFoIFKtVh8JmGDbZ73OEcThfLL0NVU3qPzDEMMvKuituDiHaOTWlPcoVOlTWRN7U/7Nl5497RUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740653621; c=relaxed/simple;
-	bh=xMvaPdRrcmL6BJCVKZgOG4AoFPDlvs5iEvJIZcGu+rU=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=l/SufJt4V+6OrYzXJ+SUJ7pCzmHZj9gXX1P6EC+kToOaKnzvp3SQLFlruHmfA86Q9zKXsKAnLbCXV/8+bxv8gxlR71/2vKGDYZZSFULFZvZPTX8+LJzTzyqh+cKGMRY+ia9UGxFcPbbNxqlUCV4VzG8s3COVsVJMXOOD1HOr0Pc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com; spf=pass smtp.mailfrom=zytor.com; dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b=iGSJl3Gp; arc=none smtp.client-ip=198.137.202.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zytor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zytor.com
+	s=arc-20240116; t=1740655997; c=relaxed/simple;
+	bh=LO2N9vciU7HB99mtlW3h5ysZsPTzOm1mscKvDNw90XU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hxLbRSL/Qtsi+L+H0SM7bY2okfDY11DJDkLfVLDcc4Vk4hqjxlrlas6AV6IICZd2rE/3Wm7LBB4gw4MSn7DOqFAQo8JhtBprLE4hSJDZvrbaB+E6RfGfJvSS9vaFbXlGnKHBVWqn8KLTMsMMRb4HnF01Idr7rsP+vRZl9Z26L2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=D5aJlq2F; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=zytor.com header.i=@zytor.com header.b="iGSJl3Gp"
-Received: from [127.0.0.1] ([76.133.66.138])
-	(authenticated bits=0)
-	by mail.zytor.com (8.18.1/8.17.1) with ESMTPSA id 51RAqjb62113557
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Thu, 27 Feb 2025 02:52:45 -0800
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 51RAqjb62113557
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-	s=2025021701; t=1740653566;
-	bh=iYupelTJBZZSq7J8xhubWxdcLgejcAwSGpM6xMwz/24=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=iGSJl3GpZfFHJfjC+qMd2hf6ogdMv31YGNOE9B41XjmDAgij9l907e6ct3SkC87Co
-	 K6OMb2OvJ9QloQe6swe+6fArWUCi7LLTg7Wo27N5JutC1yrYbtqZarM5Grp1eoFl/J
-	 GwzRD8nzaHtZQpvj/O6dMjaWv86Gf9T9MZFKvs7+utHTMyMnadrNxUpgInZcO51gXD
-	 yKYSUIcFhcwQ7e+M27Dx8jl4o21Uh/7qh95lGx4ObnXUBpyhIqzLnHXqXf7PoecYuk
-	 iiEURvK109zM5c5nViWCvUOQ+3+lJ+h0fvkz6w06EIn5Evwcp/0XM3vpWaYwPfsfK/
-	 9XWDNckbNowrg==
-Date: Thu, 27 Feb 2025 02:52:44 -0800
-From: "H. Peter Anvin" <hpa@zytor.com>
-To: Eric Biggers <ebiggers@kernel.org>, Bill Wendling <morbo@google.com>
-CC: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-        Justin Stitt <justinstitt@google.com>,
-        LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org,
-        clang-built-linux <llvm@lists.linux.dev>
-Subject: Re: [PATCH] x86/crc32: use builtins to improve code generation
-User-Agent: K-9 Mail for Android
-In-Reply-To: <20250227062859.GA2506@sol.localdomain>
-References: <CAGG=3QVi27WRYVxmsk9+HLpJw9ZJrpfLjU8G4exuXm-vUA-KqQ@mail.gmail.com> <20250227062859.GA2506@sol.localdomain>
-Message-ID: <68F134A3-5371-4E74-9942-2BC66984C18A@zytor.com>
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="D5aJlq2F"
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2211acda7f6so16461975ad.3
+        for <linux-crypto@vger.kernel.org>; Thu, 27 Feb 2025 03:33:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1740655995; x=1741260795; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=cg8yMwZ72Jlc0r5z1N3IiuaraHv4s6b2xThN5W01Djk=;
+        b=D5aJlq2F6R3GUVFt9YVYvhZSbEIyrGG1WMu63jw39i9UyiEW8h3xQDgfWN5Pycnn8P
+         beqrTO3UYTF8846iPQOltFhA1dkAD6wN6puK4jcojLYSt2ztSzGi9i2tx3dMkFy8F7Y8
+         3P9XUvlZfrALUIckJ3n71tffqsz1+ZFWZbAMasuiVZQ3Gy7K1ceewuk3Z8DOIU6Nricn
+         HKI1frdmWR289oCt0FpSOlm4NMj0HnV1FFhyvdPGR1hYfOyyT45CDAmLcC4VQhbRhJIZ
+         jJGWvxdM7sF3f+YSy4oeDBoDeCdtPGkLeFXR2pwUJ8mafwT3f8hiUkKPJhpxeUYviKDT
+         NCdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740655995; x=1741260795;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cg8yMwZ72Jlc0r5z1N3IiuaraHv4s6b2xThN5W01Djk=;
+        b=KOLnHbfi5/lr1UqPeXeC/ASi4gngyBBPWZradnN2DBEaYw8daRPXCZps2wmsxlJu/5
+         RAktOFq+66fqDYXqpbMmJS+SM7AHYeukrWBsltQEHJdpztj6hZb+9kFKKxQbmY3FBf6l
+         vt1bwk0BhrgnpKF2N9JWGFcGM6ef2yUk8xzOqK1V53oWNzjmV72MTVYZohJWkp9W3txd
+         LXJvlcu2ZC37AakqW/3qhhI5nxtG5TL6yIF2uIsr83rrVISDn9CWcv9FCRvW5Q+JPJc0
+         cB1zoUG6/R17oF+qMWfjWsn9mRZcnBU1J4kd0k+QjVGD7e5m1Icjk7pQ2P979WEkvw38
+         TOLw==
+X-Forwarded-Encrypted: i=1; AJvYcCWk43WX4k+E6j4dey2D8vtW1Ue+Qvfva8xYvUq7jKK++3QbGlak2v1q9FED2N5o1dMRANFhaXkKjvXjaqI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyzyfvsPytLIJ4HC37PbiA7F5050ajPQ2VuQ80c5jA187Kw1zVn
+	iM5vbz3Ppk+e2sd0dZbwkJjycGwlYUL2qvaPAkamzcesLeeOMHo7rblGZBO1O/o=
+X-Gm-Gg: ASbGnctqB4zyAJxAlfFZmrx2NWUs7Seyk6vl9eiRwQDfrAXIw6Fpu9VH3JdvSTWL59s
+	TNdC/P51ky80UD6RGLtOHZ9UAGBhEs+NoNkRn6yYTo67eEFDgF1kJzknUanYfj1/z+0QXzMwmyt
+	7JLBcmZFpA1ozLlC9JTKzfmaJOM+LfQX0FLVomvXQS1d7M/d/BNjdMOplrUWjaj6sYrMKDX6WDy
+	W1EhVIJ0SNIWdkdedjGyW0tlTqcNNrqBHdQWOwXQkEQ4GtDbbsVx5QnnFYftQbGhu2V5izIRQV3
+	IOCKC5Z/hUnynJdPnff4K/inMhQO
+X-Google-Smtp-Source: AGHT+IG4VU2x6YDtNodsc0R4UfSHlwxikIm91sBEmZvthobIJS1xQjZsA9eqGdyUlDUdvBKd735Xuw==
+X-Received: by 2002:a05:6a00:4614:b0:732:13fd:3f1f with SMTP id d2e1a72fcca58-7348be7eeb2mr12060717b3a.24.1740655995332;
+        Thu, 27 Feb 2025 03:33:15 -0800 (PST)
+Received: from sumit-X1.. ([223.178.212.145])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7349fe48858sm1343733b3a.51.2025.02.27.03.33.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Feb 2025 03:33:14 -0800 (PST)
+From: Sumit Garg <sumit.garg@linaro.org>
+To: akpm@linux-foundation.org,
+	herbert@gondor.apana.org.au,
+	jarkko@kernel.org,
+	jens.wiklander@linaro.org
+Cc: sumit.garg@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-integrity@vger.kernel.org,
+	keyrings@vger.kernel.org,
+	op-tee@lists.trustedfirmware.org,
+	linux-crypto@vger.kernel.org,
+	Sumit Garg <sumit.garg@linaro.org>
+Subject: [PATCH] MAINTAINERS: .mailmap: Update Sumit Garg's email address
+Date: Thu, 27 Feb 2025 17:02:28 +0530
+Message-ID: <20250227113228.1809449-1-sumit.garg@linaro.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On February 26, 2025 10:28:59 PM PST, Eric Biggers <ebiggers@kernel=2Eorg> =
-wrote:
->On Wed, Feb 26, 2025 at 10:12:47PM -0800, Bill Wendling wrote:
->> For both gcc and clang, crc32 builtins generate better code than the
->> inline asm=2E GCC improves, removing unneeded "mov" instructions=2E Cla=
-ng
->> does the same and unrolls the loops=2E GCC has no changes on i386, but
->> Clang's code generation is vastly improved, due to Clang's "rm"
->> constraint issue=2E
->>=20
->> The number of cycles improved by ~0=2E1% for GCC and ~1% for Clang, whi=
-ch
->> is expected because of the "rm" issue=2E However, Clang's performance i=
-s
->> better than GCC's by ~1=2E5%, most likely due to loop unrolling=2E
->>=20
->> Link: https://github=2Ecom/llvm/llvm-project/issues/20571#issuecomment-=
-2649330009
->> Cc: Thomas Gleixner <tglx@linutronix=2Ede>
->> Cc: Ingo Molnar <mingo@redhat=2Ecom>
->> Cc: Borislav Petkov <bp@alien8=2Ede>
->> Cc: Dave Hansen <dave=2Ehansen@linux=2Eintel=2Ecom>
->> Cc: x86@kernel=2Eorg
->> Cc: "H=2E Peter Anvin" <hpa@zytor=2Ecom>
->> Cc: Eric Biggers <ebiggers@kernel=2Eorg>
->> Cc: Ard Biesheuvel <ardb@kernel=2Eorg>
->> Cc: Nathan Chancellor <nathan@kernel=2Eorg>
->> Cc: Nick Desaulniers <nick=2Edesaulniers+lkml@gmail=2Ecom>
->> Cc: Justin Stitt <justinstitt@google=2Ecom>
->> Cc: linux-kernel@vger=2Ekernel=2Eorg
->> Cc: linux-crypto@vger=2Ekernel=2Eorg
->> Cc: llvm@lists=2Elinux=2Edev
->> Signed-off-by: Bill Wendling <morbo@google=2Ecom>
->> ---
->>  arch/x86/Makefile         | 3 +++
->>  arch/x86/lib/crc32-glue=2Ec | 8 ++++----
->>  2 files changed, 7 insertions(+), 4 deletions(-)
->
->Thanks!  A couple concerns, though:
->
->> diff --git a/arch/x86/Makefile b/arch/x86/Makefile
->> index 5b773b34768d=2E=2E241436da1473 100644
->> --- a/arch/x86/Makefile
->> +++ b/arch/x86/Makefile
->> @@ -114,6 +114,9 @@ else
->>  KBUILD_CFLAGS +=3D $(call cc-option,-fcf-protection=3Dnone)
->>  endif
->>=20
->> +# Enables the use of CRC32 builtins=2E
->> +KBUILD_CFLAGS +=3D -mcrc32
->
->Doesn't this technically allow the compiler to insert CRC32 instructions
->anywhere in arch/x86/ without the needed runtime CPU feature check?  Norm=
-ally
->when using intrinsics it's necessary to limit the scope of the feature
->enablement to match the runtime CPU feature check that is done, e=2Eg=2E =
-by using
->the target function attribute=2E
->
->> diff --git a/arch/x86/lib/crc32-glue=2Ec b/arch/x86/lib/crc32-glue=2Ec
->> index 2dd18a886ded=2E=2Efdb94bff25f4 100644
->> --- a/arch/x86/lib/crc32-glue=2Ec
->> +++ b/arch/x86/lib/crc32-glue=2Ec
->> @@ -48,9 +48,9 @@ u32 crc32_le_arch(u32 crc, const u8 *p, size_t len)
->>  EXPORT_SYMBOL(crc32_le_arch);
->>=20
->>  #ifdef CONFIG_X86_64
->> -#define CRC32_INST "crc32q %1, %q0"
->> +#define CRC32_INST __builtin_ia32_crc32di
->>  #else
->> -#define CRC32_INST "crc32l %1, %0"
->> +#define CRC32_INST __builtin_ia32_crc32si
->>  #endif
->
->Do both gcc and clang consider these builtins to be a stable API, or do t=
-hey
->only guarantee the stability of _mm_crc32_*() from immintrin=2Eh?  At lea=
-st for
->the rest of the SSE and AVX stuff, I thought that only the immintrin=2Eh =
-functions
->are actually considered stable=2E
->
->- Eric
+Update Sumit Garg's email address to @kernel.org.
 
-There is that=2E=2E=2E also are there compiler versions that we support th=
-at do not have -mcrc32 support?=20
+Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
+---
+ .mailmap    | 1 +
+ MAINTAINERS | 6 +++---
+ 2 files changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/.mailmap b/.mailmap
+index a897c16d3bae..4a93909286d8 100644
+--- a/.mailmap
++++ b/.mailmap
+@@ -689,6 +689,7 @@ Subbaraman Narayanamurthy <quic_subbaram@quicinc.com> <subbaram@codeaurora.org>
+ Subhash Jadavani <subhashj@codeaurora.org>
+ Sudarshan Rajagopalan <quic_sudaraja@quicinc.com> <sudaraja@codeaurora.org>
+ Sudeep Holla <sudeep.holla@arm.com> Sudeep KarkadaNagesha <sudeep.karkadanagesha@arm.com>
++Sumit Garg <sumit.garg@kernel.org> <sumit.garg@linaro.org>
+ Sumit Semwal <sumit.semwal@ti.com>
+ Surabhi Vishnoi <quic_svishnoi@quicinc.com> <svishnoi@codeaurora.org>
+ Sven Eckelmann <sven@narfation.org> <seckelmann@datto.com>
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 1b0cc181db74..616f859c5f92 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -12861,7 +12861,7 @@ F:	include/keys/trusted_dcp.h
+ F:	security/keys/trusted-keys/trusted_dcp.c
+ 
+ KEYS-TRUSTED-TEE
+-M:	Sumit Garg <sumit.garg@linaro.org>
++M:	Sumit Garg <sumit.garg@kernel.org>
+ L:	linux-integrity@vger.kernel.org
+ L:	keyrings@vger.kernel.org
+ S:	Supported
+@@ -17661,7 +17661,7 @@ F:	Documentation/ABI/testing/sysfs-bus-optee-devices
+ F:	drivers/tee/optee/
+ 
+ OP-TEE RANDOM NUMBER GENERATOR (RNG) DRIVER
+-M:	Sumit Garg <sumit.garg@linaro.org>
++M:	Sumit Garg <sumit.garg@kernel.org>
+ L:	op-tee@lists.trustedfirmware.org
+ S:	Maintained
+ F:	drivers/char/hw_random/optee-rng.c
+@@ -23272,7 +23272,7 @@ F:	include/media/i2c/tw9910.h
+ 
+ TEE SUBSYSTEM
+ M:	Jens Wiklander <jens.wiklander@linaro.org>
+-R:	Sumit Garg <sumit.garg@linaro.org>
++R:	Sumit Garg <sumit.garg@kernel.org>
+ L:	op-tee@lists.trustedfirmware.org
+ S:	Maintained
+ F:	Documentation/ABI/testing/sysfs-class-tee
+-- 
+2.43.0
 
