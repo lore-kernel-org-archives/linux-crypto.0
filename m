@@ -1,425 +1,170 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D760156F28;
-	Thu, 27 Feb 2025 02:09:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C8331A8F63
+	for <linux-crypto@vger.kernel.org>; Thu, 27 Feb 2025 02:24:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740622144; cv=none; b=pMwK/HvSGOp1TM1zkWhYGsSYMVdrx6kSPLSFM+7TgLXQDe76Oh65qV+2BJZ12bzmXfJbnCd8GPRIp9cG1+aXgDEoiHnjb2YTM55aZRopcsNcBIN2V+LL7bwjD3WKSK//R+tBzlhB7kkOuFcIlykos4hzFBBGrAezliqVZ+7waKg=
+	t=1740623095; cv=none; b=LmnKbbS90O9HJqV+GfyF5ztxaDCN2ep35psA2NzmZ6Mz7QD3JwVUMACohZnfT7foYXjzHlbTj1uZc87NvvAgG5fQy3rVPzInCzgDJQhFA0VqNWjuGFMTQKUJxMLA8/h7XY1rZ4SAqeJDjUUo2s3g8H1+YviFmTI8GFVHGIV6v4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740622144; c=relaxed/simple;
-	bh=bf/XeIMdTAtmnI/9KSoJMzut1BWK5buVLRcUwxQ/iMo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZkZLJNx3iXUJC2kI/4d1rJ8NIcCDoSmJ9/KYHgQELHIT40XQJyl5L8eusZfu7l94Pm0pFcsWgJdGiL73a/h7/kSjobr9A73y/fhJvrAKNVVgoBcZeoXzEABp+dqBDaUa45o1hXqwhsTdQ/2g36o/w2VDMDIQzIkoFRFgjle+RFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=OUTyybaw; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1740623095; c=relaxed/simple;
+	bh=TQZmTPuXrWsBWP0UxIH5CePpJDuK/lT0ld31ANrFZnk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QZaivNgSezt3UNmVUz0c0aUmfUZHxOWfuYBx0Lko2WoOVLrf1cP1LEAgXnlUdIDfktxuDzwp3OTRjXlmd9rmqrz5rzElqTiDCNSi2Z0BTlY4rSbvoUNDUYXD2JGOGm8JvmekCuGvqybRC2+NW41bc2+jjBu6atGWe7bwqR4U5Zk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tKpN6NKg; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="OUTyybaw"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=4qRigQ7XX02JFNaadjJDRp50X+7DY+xm7FhkNR3X6hY=; b=OUTyybawnu2GU6l4DTMRkjrwWr
-	pGMDbUYp+6UVb3KThrI2RjKGwXGIaOL540EDlNsTDaFpqJ3IzvhX0pTZRkBwkx+iCdF+3hbbJKCmP
-	DwDsdBy6kPY52ojOOsuu9nRhT9lU+yjfvjySuRoGaRPFiPyYXy98icX/xmKx2ccnFuK3rHZiyb7b3
-	yEaRG+3IMjfjWUhLqYQ4M8ky69/131PKbzTW8MrOvSf8wciA2eCZORg7M1Y+15R/fKcvqzustPpdt
-	MlJfICCiVTjCX8wzUM8w15zTHPJxiqoR0O7fDNb8+XeJ76sFMQmsXH9kCaqbz7tl06Qoz9kzhorSA
-	D/jnbDCA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tnTKa-0028WH-0i;
-	Thu, 27 Feb 2025 10:08:57 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 27 Feb 2025 10:08:56 +0800
-Date: Thu, 27 Feb 2025 10:08:56 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: David Sterba <dsterba@suse.cz>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Nitin Gupta <nitingupta910@gmail.com>,
-	Richard Purdie <rpurdie@openedhand.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	"Markus F.X.J. Oberhumer" <markus@oberhumer.com>,
-	Dave Rodgman <dave.rodgman@arm.com>
-Subject: [v2 PATCH] crypto: lzo - Fix compression buffer overrun
-Message-ID: <Z7_JOAgi-Ej3CCic@gondor.apana.org.au>
-References: <Z7rGXJSX57gEfXPw@gondor.apana.org.au>
- <20250226130037.GS5777@twin.jikos.cz>
- <Z7_D4i5yifwdXjwZ@gondor.apana.org.au>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tKpN6NKg"
+Message-ID: <08e2e50a-f289-4019-9d74-62ecc45473e3@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1740623089;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GKRxFCKu4oxfV1QzoclFLAwqr7hAo95BPBl9HIQDinE=;
+	b=tKpN6NKg6sJnT/SzcNzMIeFUIPKyWoXRe0iH44xHowIwU/Ny37tt8fimJE5m7BcPcOtea2
+	qc6c81VOr1vWbV++NsLtU0KJFDBgbiE/kgExIxSUb3sKf9/r5uoC336vrmADpaCL9ITq/B
+	k7Sgu+7h80pHH5nZi8V9RtUTEtnKBu4=
+Date: Thu, 27 Feb 2025 10:24:40 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z7_D4i5yifwdXjwZ@gondor.apana.org.au>
+Subject: Re: [PATCH v2] mm: zswap: fix crypto_free_acomp() deadlock in
+ zswap_cpu_comp_dead()
+To: Yosry Ahmed <yosry.ahmed@linux.dev>,
+ Andrew Morton <akpm@linux-foundation.org>
+Cc: Johannes Weiner <hannes@cmpxchg.org>, Nhat Pham <nphamcs@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Herbert Xu <herbert@gondor.apana.org.au>, linux-mm@kvack.org,
+ linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+ syzkaller-bugs@googlegroups.com,
+ syzbot+1a517ccfcbc6a7ab0f82@syzkaller.appspotmail.com, stable@vger.kernel.org
+References: <20250226185625.2672936-1-yosry.ahmed@linux.dev>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Chengming Zhou <chengming.zhou@linux.dev>
+In-Reply-To: <20250226185625.2672936-1-yosry.ahmed@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Unlike the decompression code, the compression code in LZO never
-checked for output overruns.  It instead assumes that the caller
-always provides enough buffer space, disregarding the buffer length
-provided by the caller.
+On 2025/2/27 02:56, Yosry Ahmed wrote:
+> Currently, zswap_cpu_comp_dead() calls crypto_free_acomp() while holding
+> the per-CPU acomp_ctx mutex. crypto_free_acomp() then holds scomp_lock
+> (through crypto_exit_scomp_ops_async()).
+> 
+> On the other hand, crypto_alloc_acomp_node() holds the scomp_lock
+> (through crypto_scomp_init_tfm()), and then allocates memory.
+> If the allocation results in reclaim, we may attempt to hold the per-CPU
+> acomp_ctx mutex.
+> 
+> The above dependencies can cause an ABBA deadlock. For example in the
+> following scenario:
+> 
+> (1) Task A running on CPU #1:
+>      crypto_alloc_acomp_node()
+>        Holds scomp_lock
+>        Enters reclaim
+>        Reads per_cpu_ptr(pool->acomp_ctx, 1)
+> 
+> (2) Task A is descheduled
+> 
+> (3) CPU #1 goes offline
+>      zswap_cpu_comp_dead(CPU #1)
+>        Holds per_cpu_ptr(pool->acomp_ctx, 1))
+>        Calls crypto_free_acomp()
+>        Waits for scomp_lock
+> 
+> (4) Task A running on CPU #2:
+>        Waits for per_cpu_ptr(pool->acomp_ctx, 1) // Read on CPU #1
+>        DEADLOCK
+> 
+> Since there is no requirement to call crypto_free_acomp() with the
+> per-CPU acomp_ctx mutex held in zswap_cpu_comp_dead(), move it after the
+> mutex is unlocked. Also move the acomp_request_free() and kfree() calls
+> for consistency and to avoid any potential sublte locking dependencies
+> in the future.
+> 
+> With this, only setting acomp_ctx fields to NULL occurs with the mutex
+> held. This is similar to how zswap_cpu_comp_prepare() only initializes
+> acomp_ctx fields with the mutex held, after performing all allocations
+> before holding the mutex.
+> 
+> Opportunistically, move the NULL check on acomp_ctx so that it takes
+> place before the mutex dereference.
+> 
+> Fixes: 12dcb0ef5406 ("mm: zswap: properly synchronize freeing resources during CPU hotunplug")
+> Reported-by: syzbot+1a517ccfcbc6a7ab0f82@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/all/67bcea51.050a0220.bbfd1.0096.GAE@google.com/
+> Cc: <stable@vger.kernel.org>
+> Co-developed-by: Herbert Xu <herbert@gondor.apana.org.au>
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Add a safe compression interface that checks for the end of buffer
-before each write.  Use the safe interface in crypto/lzo.
+Looks good to me:
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
- crypto/lzo-rle.c              |  2 +-
- crypto/lzo.c                  |  2 +-
- include/linux/lzo.h           |  8 +++
- lib/lzo/Makefile              |  2 +-
- lib/lzo/lzo1x_compress.c      | 99 ++++++++++++++++++++++++++---------
- lib/lzo/lzo1x_compress_safe.c | 18 +++++++
- 6 files changed, 103 insertions(+), 28 deletions(-)
- create mode 100644 lib/lzo/lzo1x_compress_safe.c
+Reviewed-by: Chengming Zhou <chengming.zhou@linux.dev>
 
-diff --git a/crypto/lzo-rle.c b/crypto/lzo-rle.c
-index 0631d975bfac..0abc2d87f042 100644
---- a/crypto/lzo-rle.c
-+++ b/crypto/lzo-rle.c
-@@ -55,7 +55,7 @@ static int __lzorle_compress(const u8 *src, unsigned int slen,
- 	size_t tmp_len = *dlen; /* size_t(ulong) <-> uint on 64 bit */
- 	int err;
- 
--	err = lzorle1x_1_compress(src, slen, dst, &tmp_len, ctx);
-+	err = lzorle1x_1_compress_safe(src, slen, dst, &tmp_len, ctx);
- 
- 	if (err != LZO_E_OK)
- 		return -EINVAL;
-diff --git a/crypto/lzo.c b/crypto/lzo.c
-index ebda132dd22b..8338851c7406 100644
---- a/crypto/lzo.c
-+++ b/crypto/lzo.c
-@@ -55,7 +55,7 @@ static int __lzo_compress(const u8 *src, unsigned int slen,
- 	size_t tmp_len = *dlen; /* size_t(ulong) <-> uint on 64 bit */
- 	int err;
- 
--	err = lzo1x_1_compress(src, slen, dst, &tmp_len, ctx);
-+	err = lzo1x_1_compress_safe(src, slen, dst, &tmp_len, ctx);
- 
- 	if (err != LZO_E_OK)
- 		return -EINVAL;
-diff --git a/include/linux/lzo.h b/include/linux/lzo.h
-index e95c7d1092b2..4d30e3624acd 100644
---- a/include/linux/lzo.h
-+++ b/include/linux/lzo.h
-@@ -24,10 +24,18 @@
- int lzo1x_1_compress(const unsigned char *src, size_t src_len,
- 		     unsigned char *dst, size_t *dst_len, void *wrkmem);
- 
-+/* Same as above but does not write more than dst_len to dst. */
-+int lzo1x_1_compress_safe(const unsigned char *src, size_t src_len,
-+			  unsigned char *dst, size_t *dst_len, void *wrkmem);
-+
- /* This requires 'wrkmem' of size LZO1X_1_MEM_COMPRESS */
- int lzorle1x_1_compress(const unsigned char *src, size_t src_len,
- 		     unsigned char *dst, size_t *dst_len, void *wrkmem);
- 
-+/* Same as above but does not write more than dst_len to dst. */
-+int lzorle1x_1_compress_safe(const unsigned char *src, size_t src_len,
-+			     unsigned char *dst, size_t *dst_len, void *wrkmem);
-+
- /* safe decompression with overrun testing */
- int lzo1x_decompress_safe(const unsigned char *src, size_t src_len,
- 			  unsigned char *dst, size_t *dst_len);
-diff --git a/lib/lzo/Makefile b/lib/lzo/Makefile
-index 2f58fafbbddd..fc7b2b7ef4b2 100644
---- a/lib/lzo/Makefile
-+++ b/lib/lzo/Makefile
-@@ -1,5 +1,5 @@
- # SPDX-License-Identifier: GPL-2.0-only
--lzo_compress-objs := lzo1x_compress.o
-+lzo_compress-objs := lzo1x_compress.o lzo1x_compress_safe.o
- lzo_decompress-objs := lzo1x_decompress_safe.o
- 
- obj-$(CONFIG_LZO_COMPRESS) += lzo_compress.o
-diff --git a/lib/lzo/lzo1x_compress.c b/lib/lzo/lzo1x_compress.c
-index 47d6d43ea957..c89d97bf9693 100644
---- a/lib/lzo/lzo1x_compress.c
-+++ b/lib/lzo/lzo1x_compress.c
-@@ -18,11 +18,19 @@
- #include <linux/lzo.h>
- #include "lzodefs.h"
- 
--static noinline size_t
--lzo1x_1_do_compress(const unsigned char *in, size_t in_len,
--		    unsigned char *out, size_t *out_len,
--		    size_t ti, void *wrkmem, signed char *state_offset,
--		    const unsigned char bitstream_version)
-+#ifndef LZO_SAFE
-+#define LZO_SAFE(name) name
-+#define HAVE_OP(x) 1
-+#endif
-+
-+#define NEED_OP(x) if (!HAVE_OP(x)) goto output_overrun
-+
-+static noinline int
-+LZO_SAFE(lzo1x_1_do_compress)(const unsigned char *in, size_t in_len,
-+			      unsigned char **out, unsigned char *op_end,
-+			      size_t *tp, void *wrkmem,
-+			      signed char *state_offset,
-+			      const unsigned char bitstream_version)
- {
- 	const unsigned char *ip;
- 	unsigned char *op;
-@@ -30,8 +38,9 @@ lzo1x_1_do_compress(const unsigned char *in, size_t in_len,
- 	const unsigned char * const ip_end = in + in_len - 20;
- 	const unsigned char *ii;
- 	lzo_dict_t * const dict = (lzo_dict_t *) wrkmem;
-+	size_t ti = *tp;
- 
--	op = out;
-+	op = *out;
- 	ip = in;
- 	ii = ip;
- 	ip += ti < 4 ? 4 - ti : 0;
-@@ -116,25 +125,32 @@ lzo1x_1_do_compress(const unsigned char *in, size_t in_len,
- 		if (t != 0) {
- 			if (t <= 3) {
- 				op[*state_offset] |= t;
-+				NEED_OP(4);
- 				COPY4(op, ii);
- 				op += t;
- 			} else if (t <= 16) {
-+				NEED_OP(17);
- 				*op++ = (t - 3);
- 				COPY8(op, ii);
- 				COPY8(op + 8, ii + 8);
- 				op += t;
- 			} else {
- 				if (t <= 18) {
-+					NEED_OP(1);
- 					*op++ = (t - 3);
- 				} else {
- 					size_t tt = t - 18;
-+					NEED_OP(1);
- 					*op++ = 0;
- 					while (unlikely(tt > 255)) {
- 						tt -= 255;
-+						NEED_OP(1);
- 						*op++ = 0;
- 					}
-+					NEED_OP(1);
- 					*op++ = tt;
- 				}
-+				NEED_OP(t);
- 				do {
- 					COPY8(op, ii);
- 					COPY8(op + 8, ii + 8);
-@@ -151,6 +167,7 @@ lzo1x_1_do_compress(const unsigned char *in, size_t in_len,
- 		if (unlikely(run_length)) {
- 			ip += run_length;
- 			run_length -= MIN_ZERO_RUN_LENGTH;
-+			NEED_OP(4);
- 			put_unaligned_le32((run_length << 21) | 0xfffc18
- 					   | (run_length & 0x7), op);
- 			op += 4;
-@@ -243,10 +260,12 @@ lzo1x_1_do_compress(const unsigned char *in, size_t in_len,
- 		ip += m_len;
- 		if (m_len <= M2_MAX_LEN && m_off <= M2_MAX_OFFSET) {
- 			m_off -= 1;
-+			NEED_OP(2);
- 			*op++ = (((m_len - 1) << 5) | ((m_off & 7) << 2));
- 			*op++ = (m_off >> 3);
- 		} else if (m_off <= M3_MAX_OFFSET) {
- 			m_off -= 1;
-+			NEED_OP(1);
- 			if (m_len <= M3_MAX_LEN)
- 				*op++ = (M3_MARKER | (m_len - 2));
- 			else {
-@@ -254,14 +273,18 @@ lzo1x_1_do_compress(const unsigned char *in, size_t in_len,
- 				*op++ = M3_MARKER | 0;
- 				while (unlikely(m_len > 255)) {
- 					m_len -= 255;
-+					NEED_OP(1);
- 					*op++ = 0;
- 				}
-+				NEED_OP(1);
- 				*op++ = (m_len);
- 			}
-+			NEED_OP(2);
- 			*op++ = (m_off << 2);
- 			*op++ = (m_off >> 6);
- 		} else {
- 			m_off -= 0x4000;
-+			NEED_OP(1);
- 			if (m_len <= M4_MAX_LEN)
- 				*op++ = (M4_MARKER | ((m_off >> 11) & 8)
- 						| (m_len - 2));
-@@ -282,11 +305,14 @@ lzo1x_1_do_compress(const unsigned char *in, size_t in_len,
- 				m_len -= M4_MAX_LEN;
- 				*op++ = (M4_MARKER | ((m_off >> 11) & 8));
- 				while (unlikely(m_len > 255)) {
-+					NEED_OP(1);
- 					m_len -= 255;
- 					*op++ = 0;
- 				}
-+				NEED_OP(1);
- 				*op++ = (m_len);
- 			}
-+			NEED_OP(2);
- 			*op++ = (m_off << 2);
- 			*op++ = (m_off >> 6);
- 		}
-@@ -295,14 +321,20 @@ lzo1x_1_do_compress(const unsigned char *in, size_t in_len,
- 		ii = ip;
- 		goto next;
- 	}
--	*out_len = op - out;
--	return in_end - (ii - ti);
-+	*out = op;
-+	*tp = in_end - (ii - ti);
-+	return LZO_E_OK;
-+
-+output_overrun:
-+	return LZO_E_OUTPUT_OVERRUN;
- }
- 
--static int lzogeneric1x_1_compress(const unsigned char *in, size_t in_len,
--		     unsigned char *out, size_t *out_len,
--		     void *wrkmem, const unsigned char bitstream_version)
-+static int LZO_SAFE(lzogeneric1x_1_compress)(
-+	const unsigned char *in, size_t in_len,
-+	unsigned char *out, size_t *out_len,
-+	void *wrkmem, const unsigned char bitstream_version)
- {
-+	unsigned char * const op_end = out + *out_len;
- 	const unsigned char *ip = in;
- 	unsigned char *op = out;
- 	unsigned char *data_start;
-@@ -326,14 +358,18 @@ static int lzogeneric1x_1_compress(const unsigned char *in, size_t in_len,
- 	while (l > 20) {
- 		size_t ll = min_t(size_t, l, m4_max_offset + 1);
- 		uintptr_t ll_end = (uintptr_t) ip + ll;
-+		int err;
-+
- 		if ((ll_end + ((t + ll) >> 5)) <= ll_end)
- 			break;
- 		BUILD_BUG_ON(D_SIZE * sizeof(lzo_dict_t) > LZO1X_1_MEM_COMPRESS);
- 		memset(wrkmem, 0, D_SIZE * sizeof(lzo_dict_t));
--		t = lzo1x_1_do_compress(ip, ll, op, out_len, t, wrkmem,
--					&state_offset, bitstream_version);
-+		err = LZO_SAFE(lzo1x_1_do_compress)(
-+			ip, ll, &op, op_end, &t, wrkmem,
-+			&state_offset, bitstream_version);
-+		if (err != LZO_E_OK)
-+			return err;
- 		ip += ll;
--		op += *out_len;
- 		l  -= ll;
- 	}
- 	t += l;
-@@ -342,20 +378,26 @@ static int lzogeneric1x_1_compress(const unsigned char *in, size_t in_len,
- 		const unsigned char *ii = in + in_len - t;
- 
- 		if (op == data_start && t <= 238) {
-+			NEED_OP(1);
- 			*op++ = (17 + t);
- 		} else if (t <= 3) {
- 			op[state_offset] |= t;
- 		} else if (t <= 18) {
-+			NEED_OP(1);
- 			*op++ = (t - 3);
- 		} else {
- 			size_t tt = t - 18;
-+			NEED_OP(1);
- 			*op++ = 0;
- 			while (tt > 255) {
- 				tt -= 255;
-+				NEED_OP(1);
- 				*op++ = 0;
- 			}
-+			NEED_OP(1);
- 			*op++ = tt;
- 		}
-+		NEED_OP(t);
- 		if (t >= 16) do {
- 			COPY8(op, ii);
- 			COPY8(op + 8, ii + 8);
-@@ -368,31 +410,38 @@ static int lzogeneric1x_1_compress(const unsigned char *in, size_t in_len,
- 		} while (--t > 0);
- 	}
- 
-+	NEED_OP(3);
- 	*op++ = M4_MARKER | 1;
- 	*op++ = 0;
- 	*op++ = 0;
- 
- 	*out_len = op - out;
- 	return LZO_E_OK;
-+
-+output_overrun:
-+	return LZO_E_OUTPUT_OVERRUN;
- }
- 
--int lzo1x_1_compress(const unsigned char *in, size_t in_len,
--		     unsigned char *out, size_t *out_len,
--		     void *wrkmem)
-+int LZO_SAFE(lzo1x_1_compress)(const unsigned char *in, size_t in_len,
-+			       unsigned char *out, size_t *out_len,
-+			       void *wrkmem)
- {
--	return lzogeneric1x_1_compress(in, in_len, out, out_len, wrkmem, 0);
-+	return LZO_SAFE(lzogeneric1x_1_compress)(
-+		in, in_len, out, out_len, wrkmem, 0);
- }
- 
--int lzorle1x_1_compress(const unsigned char *in, size_t in_len,
--		     unsigned char *out, size_t *out_len,
--		     void *wrkmem)
-+int LZO_SAFE(lzorle1x_1_compress)(const unsigned char *in, size_t in_len,
-+				  unsigned char *out, size_t *out_len,
-+				  void *wrkmem)
- {
--	return lzogeneric1x_1_compress(in, in_len, out, out_len,
--				       wrkmem, LZO_VERSION);
-+	return LZO_SAFE(lzogeneric1x_1_compress)(
-+		in, in_len, out, out_len, wrkmem, LZO_VERSION);
- }
- 
--EXPORT_SYMBOL_GPL(lzo1x_1_compress);
--EXPORT_SYMBOL_GPL(lzorle1x_1_compress);
-+EXPORT_SYMBOL_GPL(LZO_SAFE(lzo1x_1_compress));
-+EXPORT_SYMBOL_GPL(LZO_SAFE(lzorle1x_1_compress));
- 
-+#ifndef LZO_SAFE
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("LZO1X-1 Compressor");
-+#endif
-diff --git a/lib/lzo/lzo1x_compress_safe.c b/lib/lzo/lzo1x_compress_safe.c
-new file mode 100644
-index 000000000000..371c9f849492
---- /dev/null
-+++ b/lib/lzo/lzo1x_compress_safe.c
-@@ -0,0 +1,18 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ *  LZO1X Compressor from LZO
-+ *
-+ *  Copyright (C) 1996-2012 Markus F.X.J. Oberhumer <markus@oberhumer.com>
-+ *
-+ *  The full LZO package can be found at:
-+ *  http://www.oberhumer.com/opensource/lzo/
-+ *
-+ *  Changed for Linux kernel use by:
-+ *  Nitin Gupta <nitingupta910@gmail.com>
-+ *  Richard Purdie <rpurdie@openedhand.com>
-+ */
-+
-+#define LZO_SAFE(name) name##_safe
-+#define HAVE_OP(x) ((size_t)(op_end - op) >= (size_t)(x))
-+
-+#include "lzo1x_compress.c"
--- 
-2.39.5
+Thanks!
 
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> ---
+> 
+> v1 -> v2:
+> - Explained the problem more clearly in the commit message.
+> - Moved all freeing calls outside the lock critical section.
+> v1: https://lore.kernel.org/all/Z72FJnbA39zWh4zS@gondor.apana.org.au/
+> 
+> ---
+>   mm/zswap.c | 30 ++++++++++++++++++++++--------
+>   1 file changed, 22 insertions(+), 8 deletions(-)
+> 
+> diff --git a/mm/zswap.c b/mm/zswap.c
+> index ac9d299e7d0c1..adf745c66aa1d 100644
+> --- a/mm/zswap.c
+> +++ b/mm/zswap.c
+> @@ -881,18 +881,32 @@ static int zswap_cpu_comp_dead(unsigned int cpu, struct hlist_node *node)
+>   {
+>   	struct zswap_pool *pool = hlist_entry(node, struct zswap_pool, node);
+>   	struct crypto_acomp_ctx *acomp_ctx = per_cpu_ptr(pool->acomp_ctx, cpu);
+> +	struct acomp_req *req;
+> +	struct crypto_acomp *acomp;
+> +	u8 *buffer;
+> +
+> +	if (IS_ERR_OR_NULL(acomp_ctx))
+> +		return 0;
+>   
+>   	mutex_lock(&acomp_ctx->mutex);
+> -	if (!IS_ERR_OR_NULL(acomp_ctx)) {
+> -		if (!IS_ERR_OR_NULL(acomp_ctx->req))
+> -			acomp_request_free(acomp_ctx->req);
+> -		acomp_ctx->req = NULL;
+> -		if (!IS_ERR_OR_NULL(acomp_ctx->acomp))
+> -			crypto_free_acomp(acomp_ctx->acomp);
+> -		kfree(acomp_ctx->buffer);
+> -	}
+> +	req = acomp_ctx->req;
+> +	acomp = acomp_ctx->acomp;
+> +	buffer = acomp_ctx->buffer;
+> +	acomp_ctx->req = NULL;
+> +	acomp_ctx->acomp = NULL;
+> +	acomp_ctx->buffer = NULL;
+>   	mutex_unlock(&acomp_ctx->mutex);
+>   
+> +	/*
+> +	 * Do the actual freeing after releasing the mutex to avoid subtle
+> +	 * locking dependencies causing deadlocks.
+> +	 */
+> +	if (!IS_ERR_OR_NULL(req))
+> +		acomp_request_free(req);
+> +	if (!IS_ERR_OR_NULL(acomp))
+> +		crypto_free_acomp(acomp);
+> +	kfree(buffer);
+> +
+>   	return 0;
+>   }
+>   
