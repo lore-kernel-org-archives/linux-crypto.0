@@ -1,135 +1,462 @@
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a7-smtp.messagingengine.com (fout-a7-smtp.messagingengine.com [103.168.172.150])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 152E3228CBA
-	for <linux-crypto@vger.kernel.org>; Thu, 27 Feb 2025 11:33:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6A1F1662EF;
+	Thu, 27 Feb 2025 11:57:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740655997; cv=none; b=eAIZbtVcjOwE4pCXZg/MXPBr5V06IokgAHfQVXtZGhe7kjYAPQMsdepF83MvzQP9sRG356vWa3xavekShdOYY5dBwa4ma814nFoIFKtVh8JmGDbZ73OEcThfLL0NVU3qPzDEMMvKuituDiHaOTWlPcoVOlTWRN7U/7Nl5497RUI=
+	t=1740657427; cv=none; b=BesKwny7MeiBsXS7B8apX1xW/3m45Mq6eOKEaNTHzF9KMqzrl13JLctJFVW1l0Yst9tuM1+k6D1MY9nH8RqxYYJs1i+TU9wN8e2LS5tnRR8aa9bupjly9F8RdA15LHX7glLXc5Fv0VtaoJKmgS8IhB6K5bzn0Q2k6Rd8iXyZKH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740655997; c=relaxed/simple;
-	bh=LO2N9vciU7HB99mtlW3h5ysZsPTzOm1mscKvDNw90XU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hxLbRSL/Qtsi+L+H0SM7bY2okfDY11DJDkLfVLDcc4Vk4hqjxlrlas6AV6IICZd2rE/3Wm7LBB4gw4MSn7DOqFAQo8JhtBprLE4hSJDZvrbaB+E6RfGfJvSS9vaFbXlGnKHBVWqn8KLTMsMMRb4HnF01Idr7rsP+vRZl9Z26L2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=D5aJlq2F; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+	s=arc-20240116; t=1740657427; c=relaxed/simple;
+	bh=aMcbCUyIH0LdhPXZy489NqCaUbzMbAkTVRt4OmfaGLg=;
+	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
+	 Subject:Content-Type; b=ln30RPJIMZn4KwVFT6k+udAB45gM9bkBTced5RFor0M2ZOnxP62CZKnt2FjWarxHx0KnSwhXgWG+7PDAsCQlbL6Y2tIeU7lyrXVFHzC8QnJlGNXxv79uNhB1mtBNBrdgneL3XGpIBxpFzgFqmu48xqgSJFvKYSqE3xW3DN+xAVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=DoV6UI/n; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=wrCaUkxd; arc=none smtp.client-ip=103.168.172.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="D5aJlq2F"
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2211acda7f6so16461975ad.3
-        for <linux-crypto@vger.kernel.org>; Thu, 27 Feb 2025 03:33:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1740655995; x=1741260795; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=cg8yMwZ72Jlc0r5z1N3IiuaraHv4s6b2xThN5W01Djk=;
-        b=D5aJlq2F6R3GUVFt9YVYvhZSbEIyrGG1WMu63jw39i9UyiEW8h3xQDgfWN5Pycnn8P
-         beqrTO3UYTF8846iPQOltFhA1dkAD6wN6puK4jcojLYSt2ztSzGi9i2tx3dMkFy8F7Y8
-         3P9XUvlZfrALUIckJ3n71tffqsz1+ZFWZbAMasuiVZQ3Gy7K1ceewuk3Z8DOIU6Nricn
-         HKI1frdmWR289oCt0FpSOlm4NMj0HnV1FFhyvdPGR1hYfOyyT45CDAmLcC4VQhbRhJIZ
-         jJGWvxdM7sF3f+YSy4oeDBoDeCdtPGkLeFXR2pwUJ8mafwT3f8hiUkKPJhpxeUYviKDT
-         NCdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740655995; x=1741260795;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=cg8yMwZ72Jlc0r5z1N3IiuaraHv4s6b2xThN5W01Djk=;
-        b=KOLnHbfi5/lr1UqPeXeC/ASi4gngyBBPWZradnN2DBEaYw8daRPXCZps2wmsxlJu/5
-         RAktOFq+66fqDYXqpbMmJS+SM7AHYeukrWBsltQEHJdpztj6hZb+9kFKKxQbmY3FBf6l
-         vt1bwk0BhrgnpKF2N9JWGFcGM6ef2yUk8xzOqK1V53oWNzjmV72MTVYZohJWkp9W3txd
-         LXJvlcu2ZC37AakqW/3qhhI5nxtG5TL6yIF2uIsr83rrVISDn9CWcv9FCRvW5Q+JPJc0
-         cB1zoUG6/R17oF+qMWfjWsn9mRZcnBU1J4kd0k+QjVGD7e5m1Icjk7pQ2P979WEkvw38
-         TOLw==
-X-Forwarded-Encrypted: i=1; AJvYcCWk43WX4k+E6j4dey2D8vtW1Ue+Qvfva8xYvUq7jKK++3QbGlak2v1q9FED2N5o1dMRANFhaXkKjvXjaqI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyzyfvsPytLIJ4HC37PbiA7F5050ajPQ2VuQ80c5jA187Kw1zVn
-	iM5vbz3Ppk+e2sd0dZbwkJjycGwlYUL2qvaPAkamzcesLeeOMHo7rblGZBO1O/o=
-X-Gm-Gg: ASbGnctqB4zyAJxAlfFZmrx2NWUs7Seyk6vl9eiRwQDfrAXIw6Fpu9VH3JdvSTWL59s
-	TNdC/P51ky80UD6RGLtOHZ9UAGBhEs+NoNkRn6yYTo67eEFDgF1kJzknUanYfj1/z+0QXzMwmyt
-	7JLBcmZFpA1ozLlC9JTKzfmaJOM+LfQX0FLVomvXQS1d7M/d/BNjdMOplrUWjaj6sYrMKDX6WDy
-	W1EhVIJ0SNIWdkdedjGyW0tlTqcNNrqBHdQWOwXQkEQ4GtDbbsVx5QnnFYftQbGhu2V5izIRQV3
-	IOCKC5Z/hUnynJdPnff4K/inMhQO
-X-Google-Smtp-Source: AGHT+IG4VU2x6YDtNodsc0R4UfSHlwxikIm91sBEmZvthobIJS1xQjZsA9eqGdyUlDUdvBKd735Xuw==
-X-Received: by 2002:a05:6a00:4614:b0:732:13fd:3f1f with SMTP id d2e1a72fcca58-7348be7eeb2mr12060717b3a.24.1740655995332;
-        Thu, 27 Feb 2025 03:33:15 -0800 (PST)
-Received: from sumit-X1.. ([223.178.212.145])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7349fe48858sm1343733b3a.51.2025.02.27.03.33.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Feb 2025 03:33:14 -0800 (PST)
-From: Sumit Garg <sumit.garg@linaro.org>
-To: akpm@linux-foundation.org,
-	herbert@gondor.apana.org.au,
-	jarkko@kernel.org,
-	jens.wiklander@linaro.org
-Cc: sumit.garg@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-integrity@vger.kernel.org,
-	keyrings@vger.kernel.org,
-	op-tee@lists.trustedfirmware.org,
-	linux-crypto@vger.kernel.org,
-	Sumit Garg <sumit.garg@linaro.org>
-Subject: [PATCH] MAINTAINERS: .mailmap: Update Sumit Garg's email address
-Date: Thu, 27 Feb 2025 17:02:28 +0530
-Message-ID: <20250227113228.1809449-1-sumit.garg@linaro.org>
-X-Mailer: git-send-email 2.43.0
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="DoV6UI/n";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="wrCaUkxd"
+Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
+	by mailfout.phl.internal (Postfix) with ESMTP id 7C4F51382D43;
+	Thu, 27 Feb 2025 06:57:03 -0500 (EST)
+Received: from phl-imap-11 ([10.202.2.101])
+  by phl-compute-11.internal (MEProxy); Thu, 27 Feb 2025 06:57:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1740657423;
+	 x=1740743823; bh=aJKPkC1SVbHcQfArtN7jy51GLZ3HD2OHCzJzLYvRUEw=; b=
+	DoV6UI/naig9BSabGeoNIsRIpTRCuNoe+mx/a9YK0cyJadJW2ItzOfaVuyAzexFI
+	NZqGvWvq1S+J23s02J5WkViB2tN0R6zwfh9i4PleihgBwcmQV+OKit6x9iaaDccY
+	JVa8VyYJRpQ+HmFUdir3959PYZzVO39wQIv5r4OVeA3DYF8v31Z40AmywR4uc8pk
+	8oTjOqoIQXbAA6EUb3667+8E18W4jMphoNOQF+bhcuOcg8pGOsvwT0+LxwQkxsef
+	vkytNRDa/NmhNwBeGAX+FYthf6ZALXcj5Fch+wxP0dZ3Muvh5lxxLYIZe1hOUdz7
+	LHjgV2PFE4yCTiIdDQQ2bQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1740657423; x=
+	1740743823; bh=aJKPkC1SVbHcQfArtN7jy51GLZ3HD2OHCzJzLYvRUEw=; b=w
+	rCaUkxdyW8REeIBS0h9XKI7JFXRz4qNDuhgNgCxhRQgHB0aAJ04OqeqYDXRtyacQ
+	dTqQAA1SUiTQxqz74DNZp1nkm72rON6r1TKNR0kNSmpHoTRzzqWMe6BWnd85Y/Gh
+	9CLWF/YZReqZtGtbnkA1j+PHRI4goSxlgRix1NdpVLTB7xQI/L5i8z1na2ybqL1m
+	8g+YYi1BMvmk55wqyjIpXSf7o7u5ztbjkpTX2rjJuY/Qk78hI9ESg4oNZOvZPskZ
+	waGb/mLnXvIBM+M3Ju0Pu+PmTeYrp7cj6A3mF2goyT0NCGyN9lEJNhoX07g//bpG
+	iusT245dsE1+EPRkcVC6g==
+X-ME-Sender: <xms:DVPAZxVNXxIgHuoAEv3H98vRTkmQL-M_q3WJ376NbiH8H-CPT0MV3Q>
+    <xme:DVPAZxnMJv-LmiL-MV_RR594lDx97AMLZEZhOcBSLsJhJJpSzhXmTFp-0r1GURdAE
+    HdRKezdKj5wEXH6pi8>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdekjeeflecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpefoggffhffvvefkjghfufgtgfesthejredtredt
+    tdenucfhrhhomhepfdetrhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusg
+    druggvqeenucggtffrrghtthgvrhhnpefhtdfhvddtfeehudekteeggffghfejgeegteef
+    gffgvedugeduveelvdekhfdvieenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
+    epmhgrihhlfhhrohhmpegrrhhnugesrghrnhgusgdruggvpdhnsggprhgtphhtthhopedv
+    fedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepthhssghoghgvnhgusegrlhhphh
+    grrdhfrhgrnhhkvghnrdguvgdprhgtphhtthhopegtrghtrghlihhnrdhmrghrihhnrghs
+    segrrhhmrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvth
+    dprhgtphhtthhopehhvghrsggvrhhtsehgohhnughorhdrrghprghnrgdrohhrghdrrghu
+    pdhrtghpthhtohepvggsihhgghgvrhhssehgohhoghhlvgdrtghomhdprhgtphhtthhope
+    hjrghmvghsrdgsohhtthhomhhlvgihsehhrghnshgvnhhprghrthhnvghrshhhihhprdgt
+    ohhmpdhrtghpthhtoheprghruggssehkvghrnhgvlhdrohhrghdprhgtphhtthhopegrrh
+    hnugeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepjhgrrhhkkhhosehkvghrnhgvlhdr
+    ohhrgh
+X-ME-Proxy: <xmx:DVPAZ9a0T0sNxKcnP1Ahd3eGoyei5KF2Q4cq6K7LT8drEQmX98VW9A>
+    <xmx:DVPAZ0WvkzvLzKr2bAKfDoj0SOQSKd_Z7WTfN4Wn_QSWMjfsSNt2yg>
+    <xmx:DVPAZ7liObMsY4CAH-LOssq-fNi4_T8QoMpzLbspplivwsK8bsFYFw>
+    <xmx:DVPAZxfbk88XyltpU7eAEl-QSgn-Gpp3zTqRyVqjLfr8pEXnKuDywQ>
+    <xmx:D1PAZ9WVcS6szVJNbb177L1ZeSDVjGXYO_CI7fV9X5Gfa1J__jGCCCDG>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.phl.internal (Postfix, from userid 501)
+	id AD8542220077; Thu, 27 Feb 2025 06:57:01 -0500 (EST)
+X-Mailer: MessagingEngine.com Webmail Interface
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Date: Thu, 27 Feb 2025 12:56:30 +0100
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Herbert Xu" <herbert@gondor.apana.org.au>
+Cc: "Arnd Bergmann" <arnd@kernel.org>, "Will Deacon" <will@kernel.org>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Catalin Marinas" <catalin.marinas@arm.com>,
+ "Thomas Bogendoerfer" <tsbogend@alpha.franken.de>,
+ "Harald Freudenberger" <freude@linux.ibm.com>,
+ "Holger Dengler" <dengler@linux.ibm.com>,
+ "Heiko Carstens" <hca@linux.ibm.com>, "Vasily Gorbik" <gor@linux.ibm.com>,
+ "Alexander Gordeev" <agordeev@linux.ibm.com>,
+ "Christian Borntraeger" <borntraeger@linux.ibm.com>,
+ "Sven Schnelle" <svens@linux.ibm.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ "Ard Biesheuvel" <ardb@kernel.org>, "Eric Biggers" <ebiggers@google.com>,
+ "James E . J . Bottomley" <James.Bottomley@hansenpartnership.com>,
+ "Jarkko Sakkinen" <jarkko@kernel.org>, linux-crypto@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-s390@vger.kernel.org
+Message-Id: <9f4e5f41-e553-4f2a-88fe-478f074b62cb@app.fastmail.com>
+In-Reply-To: <Z8All3G80gGXzfaU@gondor.apana.org.au>
+References: <20250225164216.4807-1-arnd@kernel.org>
+ <20250225213344.GA23792@willie-the-truck>
+ <f7c298b8-7989-49e7-90a2-5356029a6283@app.fastmail.com>
+ <c4896a12-8abe-4fe6-b381-86b23d32b332@app.fastmail.com>
+ <Z75xKexTUNm_FnSK@gondor.apana.org.au> <Z76aUfPIbhPAsHbv@gondor.apana.org.au>
+ <Z77aFJCVuXeDXRrs@gondor.apana.org.au> <Z8AY16EIqAYpfmRI@gondor.apana.org.au>
+ <134f64aa-65bd-4de0-9ac6-52326e35d6d6@app.fastmail.com>
+ <Z8All3G80gGXzfaU@gondor.apana.org.au>
+Subject: Re: [v3 PATCH] crypto: lib/Kconfig - Hide arch options from user
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 
-Update Sumit Garg's email address to @kernel.org.
+On Thu, Feb 27, 2025, at 09:43, Herbert Xu wrote:
+> On Thu, Feb 27, 2025 at 09:32:51AM +0100, Arnd Bergmann wrote:
+>> It appears that the two above are missing a
+>> 'depends on KERNEL_MODE_NEON' line. There is still
+>> a runtime check that prevents it from being used on
+>> non-neon machines, but I think you should add these
+>> lines here since it's no longer possible to turn
+>> them off individually when building a kernel for a
+>> non-NEON target.
+>
+> Good catch.  But I think this was deliberate as it also includes
+> a non-NEON implementation:
+>
+> commit b36d8c09e710c71f6a9690b6586fea2d1c9e1e27
+> Author: Ard Biesheuvel <ardb@kernel.org>
+> Date:   Fri Nov 8 13:22:14 2019 +0100
+>
+>     crypto: arm/chacha - remove dependency on generic ChaCha driver
 
-Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
----
- .mailmap    | 1 +
- MAINTAINERS | 6 +++---
- 2 files changed, 4 insertions(+), 3 deletions(-)
+Ah, I see. That's fine then.
 
-diff --git a/.mailmap b/.mailmap
-index a897c16d3bae..4a93909286d8 100644
---- a/.mailmap
-+++ b/.mailmap
-@@ -689,6 +689,7 @@ Subbaraman Narayanamurthy <quic_subbaram@quicinc.com> <subbaram@codeaurora.org>
- Subhash Jadavani <subhashj@codeaurora.org>
- Sudarshan Rajagopalan <quic_sudaraja@quicinc.com> <sudaraja@codeaurora.org>
- Sudeep Holla <sudeep.holla@arm.com> Sudeep KarkadaNagesha <sudeep.karkadanagesha@arm.com>
-+Sumit Garg <sumit.garg@kernel.org> <sumit.garg@linaro.org>
- Sumit Semwal <sumit.semwal@ti.com>
- Surabhi Vishnoi <quic_svishnoi@quicinc.com> <svishnoi@codeaurora.org>
- Sven Eckelmann <sven@narfation.org> <seckelmann@datto.com>
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 1b0cc181db74..616f859c5f92 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -12861,7 +12861,7 @@ F:	include/keys/trusted_dcp.h
- F:	security/keys/trusted-keys/trusted_dcp.c
+>     Instead of falling back to the generic ChaCha skcipher driver for
+>     non-SIMD cases, use a fast scalar implementation for ARM authored
+>     by Eric Biggers. This removes the module dependency on chacha-generic
+>     altogether, which also simplifies things when we expose the ChaCha
+>     library interface from this module.
+>    
+>     Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+>     Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> 
+>> I'm not sure why we need the extra "_INTERNAL" symbols, but I
+>> may be missing something here. What problem does this solve
+>> for you?
+>
+> Without them Kconfig will bomb out because of a loop centering
+> on CONFIG_CRYPTO.
+
+I've tried to undo that portion here and don't run into a
+dependency loop so far with the patch below on top of yours
+(around 100 randconfigs in). I'll keep testing and will let
+you know when something goes wrong.
+
+One issue I've already found in your version is that removing
+the  'select CRYPTO_LIB_CHACHA_GENERIC' is broken in the majority
+of the cases where an architecture specific implementation
+is enabled, because the architecture code typically contains
+a fallback to the generic version for the case where the
+custom CPU instructions are not present.
+
+I've added the 'select' lines to the architecture versions
+here, but since it's almost always needed, we could decide
+to just leave the generic version built-in anyway to
+make it less error-prone at the cost of kernel bloat
+in the few cases where it's not used.
+
+An unrelated issue I noticed is that CRYPTO_LIB_CHACHA20POLY1305
+depends on CRYPTO in order to pull in CRYPTO_ALGAPI, this
+looks like a mistake and could be resolved by moving
+crypto/scatterwalk.c into lib/crypto/ with its own symbol.
+That should be a separate patch of course.
+
+      Arnd
+
+diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
+index 0c19317a9ce0..f2e3b62c1379 100644
+--- a/arch/arm/crypto/Kconfig
++++ b/arch/arm/crypto/Kconfig
+@@ -7,7 +7,8 @@ config CRYPTO_CURVE25519_NEON
+ 	depends on KERNEL_MODE_NEON
+ 	select CRYPTO_KPP
+ 	select CRYPTO_ARCH_HAVE_LIB_CURVE25519
+-	default CRYPTO_LIB_CURVE25519_INTERNAL
++	select CRYPTO_LIB_CURVE25519_GENERIC
++	default CRYPTO_LIB_CURVE25519
+ 	help
+ 	  Curve25519 algorithm
  
- KEYS-TRUSTED-TEE
--M:	Sumit Garg <sumit.garg@linaro.org>
-+M:	Sumit Garg <sumit.garg@kernel.org>
- L:	linux-integrity@vger.kernel.org
- L:	keyrings@vger.kernel.org
- S:	Supported
-@@ -17661,7 +17661,7 @@ F:	Documentation/ABI/testing/sysfs-bus-optee-devices
- F:	drivers/tee/optee/
+@@ -49,7 +50,8 @@ config CRYPTO_POLY1305_ARM
+ 	tristate
+ 	select CRYPTO_HASH
+ 	select CRYPTO_ARCH_HAVE_LIB_POLY1305
+-	default CRYPTO_LIB_POLY1305_INTERNAL
++	select CRYPTO_LIB_POLY1305_GENERIC
++	default CRYPTO_LIB_POLY1305
+ 	help
+ 	  Poly1305 authenticator algorithm (RFC7539)
  
- OP-TEE RANDOM NUMBER GENERATOR (RNG) DRIVER
--M:	Sumit Garg <sumit.garg@linaro.org>
-+M:	Sumit Garg <sumit.garg@kernel.org>
- L:	op-tee@lists.trustedfirmware.org
- S:	Maintained
- F:	drivers/char/hw_random/optee-rng.c
-@@ -23272,7 +23272,7 @@ F:	include/media/i2c/tw9910.h
+@@ -217,7 +219,8 @@ config CRYPTO_CHACHA20_NEON
+ 	tristate
+ 	select CRYPTO_SKCIPHER
+ 	select CRYPTO_ARCH_HAVE_LIB_CHACHA
+-	default CRYPTO_LIB_CHACHA_INTERNAL
++	select CRYPTO_LIB_CHACHA_GENERIC
++	default CRYPTO_LIB_CHACHA
+ 	help
+ 	  Length-preserving ciphers: ChaCha20, XChaCha20, and XChaCha12
+ 	  stream cipher algorithms
+diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
+index 1b14551cc301..17f447240f9a 100644
+--- a/arch/arm64/crypto/Kconfig
++++ b/arch/arm64/crypto/Kconfig
+@@ -30,7 +30,7 @@ config CRYPTO_POLY1305_NEON
+ 	depends on KERNEL_MODE_NEON
+ 	select CRYPTO_HASH
+ 	select CRYPTO_ARCH_HAVE_LIB_POLY1305
+-	default CRYPTO_LIB_POLY1305_INTERNAL
++	default CRYPTO_LIB_POLY1305
+ 	help
+ 	  Poly1305 authenticator algorithm (RFC7539)
  
- TEE SUBSYSTEM
- M:	Jens Wiklander <jens.wiklander@linaro.org>
--R:	Sumit Garg <sumit.garg@linaro.org>
-+R:	Sumit Garg <sumit.garg@kernel.org>
- L:	op-tee@lists.trustedfirmware.org
- S:	Maintained
- F:	Documentation/ABI/testing/sysfs-class-tee
--- 
-2.43.0
-
+@@ -191,7 +191,8 @@ config CRYPTO_CHACHA20_NEON
+ 	depends on KERNEL_MODE_NEON
+ 	select CRYPTO_SKCIPHER
+ 	select CRYPTO_ARCH_HAVE_LIB_CHACHA
+-	default CRYPTO_LIB_CHACHA_INTERNAL
++	select CRYPTO_LIB_CHACHA_GENERIC
++	default CRYPTO_LIB_CHACHA
+ 	help
+ 	  Length-preserving ciphers: ChaCha20, XChaCha20, and XChaCha12
+ 	  stream cipher algorithms
+diff --git a/arch/mips/crypto/Kconfig b/arch/mips/crypto/Kconfig
+index 545fc0e12422..e0d8ee2677df 100644
+--- a/arch/mips/crypto/Kconfig
++++ b/arch/mips/crypto/Kconfig
+@@ -7,7 +7,7 @@ config CRYPTO_POLY1305_MIPS
+ 	depends on MIPS
+ 	select CRYPTO_HASH
+ 	select CRYPTO_ARCH_HAVE_LIB_POLY1305
+-	default CRYPTO_LIB_POLY1305_INTERNAL
++	default CRYPTO_LIB_POLY1305
+ 	help
+ 	  Poly1305 authenticator algorithm (RFC7539)
+ 
+@@ -58,7 +58,7 @@ config CRYPTO_CHACHA_MIPS
+ 	depends on CPU_MIPS32_R2
+ 	select CRYPTO_SKCIPHER
+ 	select CRYPTO_ARCH_HAVE_LIB_CHACHA
+-	default CRYPTO_LIB_CHACHA_INTERNAL
++	default CRYPTO_LIB_CHACHA
+ 	help
+ 	  Length-preserving ciphers: ChaCha20, XChaCha20, and XChaCha12
+ 	  stream cipher algorithms
+diff --git a/arch/powerpc/crypto/Kconfig b/arch/powerpc/crypto/Kconfig
+index 5beed03869c9..49f929f49e45 100644
+--- a/arch/powerpc/crypto/Kconfig
++++ b/arch/powerpc/crypto/Kconfig
+@@ -7,7 +7,8 @@ config CRYPTO_CURVE25519_PPC64
+ 	depends on PPC64 && CPU_LITTLE_ENDIAN
+ 	select CRYPTO_KPP
+ 	select CRYPTO_ARCH_HAVE_LIB_CURVE25519
+-	default CRYPTO_LIB_CURVE25519_INTERNAL
++	select CRYPTO_LIB_CURVE25519_GENERIC
++	default CRYPTO_LIB_CURVE25519
+ 	help
+ 	  Curve25519 algorithm
+ 
+@@ -96,7 +97,8 @@ config CRYPTO_CHACHA20_P10
+ 	depends on PPC64 && CPU_LITTLE_ENDIAN && VSX
+ 	select CRYPTO_SKCIPHER
+ 	select CRYPTO_ARCH_HAVE_LIB_CHACHA
+-	default CRYPTO_LIB_CHACHA_INTERNAL
++	select CRYPTO_LIB_CHACHA_GENERIC
++	default CRYPTO_LIB_CHACHA
+ 	help
+ 	  Length-preserving ciphers: ChaCha20, XChaCha20, and XChaCha12
+ 	  stream cipher algorithms
+diff --git a/arch/s390/crypto/Kconfig b/arch/s390/crypto/Kconfig
+index f6f82dab3594..13245d569d4d 100644
+--- a/arch/s390/crypto/Kconfig
++++ b/arch/s390/crypto/Kconfig
+@@ -112,7 +112,8 @@ config CRYPTO_CHACHA_S390
+ 	depends on S390
+ 	select CRYPTO_SKCIPHER
+ 	select CRYPTO_ARCH_HAVE_LIB_CHACHA
+-	default CRYPTO_LIB_CHACHA_INTERNAL
++	select CRYPTO_LIB_CHACHA_GENERIC
++	default CRYPTO_LIB_CHACHA
+ 	help
+ 	  Length-preserving cipher: ChaCha20 stream cipher (RFC 7539)
+ 
+diff --git a/arch/x86/crypto/Kconfig b/arch/x86/crypto/Kconfig
+index d3128e99bac5..1f20425f6c87 100644
+--- a/arch/x86/crypto/Kconfig
++++ b/arch/x86/crypto/Kconfig
+@@ -7,7 +7,8 @@ config CRYPTO_CURVE25519_X86
+ 	depends on X86 && 64BIT
+ 	select CRYPTO_KPP
+ 	select CRYPTO_ARCH_HAVE_LIB_CURVE25519
+-	default CRYPTO_LIB_CURVE25519_INTERNAL
++	select CRYPTO_LIB_CURVE25519_GENERIC
++	default CRYPTO_LIB_CURVE25519
+ 	help
+ 	  Curve25519 algorithm
+ 
+@@ -353,7 +354,8 @@ config CRYPTO_CHACHA20_X86_64
+ 	depends on X86 && 64BIT
+ 	select CRYPTO_SKCIPHER
+ 	select CRYPTO_ARCH_HAVE_LIB_CHACHA
+-	default CRYPTO_LIB_CHACHA_INTERNAL
++	select CRYPTO_LIB_CHACHA_GENERIC
++	default CRYPTO_LIB_CHACHA
+ 	help
+ 	  Length-preserving ciphers: ChaCha20, XChaCha20, and XChaCha12
+ 	  stream cipher algorithms
+@@ -422,7 +424,8 @@ config CRYPTO_POLY1305_X86_64
+ 	depends on X86 && 64BIT
+ 	select CRYPTO_HASH
+ 	select CRYPTO_ARCH_HAVE_LIB_POLY1305
+-	default CRYPTO_LIB_POLY1305_INTERNAL
++	select CRYPTO_LIB_POLY1305_GENERIC
++	default CRYPTO_LIB_POLY1305
+ 	help
+ 	  Poly1305 authenticator algorithm (RFC7539)
+ 
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index aac27a4668fd..6013850c114c 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -317,7 +317,7 @@ config CRYPTO_ECRDSA
+ config CRYPTO_CURVE25519
+ 	tristate "Curve25519"
+ 	select CRYPTO_KPP
+-	select CRYPTO_LIB_CURVE25519_INTERNAL
++	select CRYPTO_LIB_CURVE25519
+ 	help
+ 	  Curve25519 elliptic curve (RFC7748)
+ 
+@@ -615,7 +615,7 @@ config CRYPTO_ARC4
+ 
+ config CRYPTO_CHACHA20
+ 	tristate "ChaCha"
+-	select CRYPTO_LIB_CHACHA_INTERNAL
++	select CRYPTO_LIB_CHACHA
+ 	select CRYPTO_SKCIPHER
+ 	help
+ 	  The ChaCha20, XChaCha20, and XChaCha12 stream cipher algorithms
+@@ -936,7 +936,7 @@ config CRYPTO_POLYVAL
+ config CRYPTO_POLY1305
+ 	tristate "Poly1305"
+ 	select CRYPTO_HASH
+-	select CRYPTO_LIB_POLY1305_INTERNAL
++	select CRYPTO_LIB_POLY1305_GENERIC
+ 	help
+ 	  Poly1305 authenticator algorithm (RFC7539)
+ 
+diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
+index 1fd5acdc73c6..417b691c7c53 100644
+--- a/drivers/net/Kconfig
++++ b/drivers/net/Kconfig
+@@ -82,18 +82,6 @@ config WIREGUARD
+ 	select CRYPTO
+ 	select CRYPTO_LIB_CURVE25519
+ 	select CRYPTO_LIB_CHACHA20POLY1305
+-	select CRYPTO_CHACHA20_X86_64 if X86 && 64BIT
+-	select CRYPTO_POLY1305_X86_64 if X86 && 64BIT
+-	select CRYPTO_BLAKE2S_X86 if X86 && 64BIT
+-	select CRYPTO_CURVE25519_X86 if X86 && 64BIT
+-	select CRYPTO_CHACHA20_NEON if ARM || (ARM64 && KERNEL_MODE_NEON)
+-	select CRYPTO_POLY1305_NEON if ARM64 && KERNEL_MODE_NEON
+-	select CRYPTO_POLY1305_ARM if ARM
+-	select CRYPTO_BLAKE2S_ARM if ARM
+-	select CRYPTO_CURVE25519_NEON if ARM && KERNEL_MODE_NEON
+-	select CRYPTO_CHACHA_MIPS if CPU_MIPS32_R2
+-	select CRYPTO_POLY1305_MIPS if MIPS
+-	select CRYPTO_CHACHA_S390 if S390
+ 	help
+ 	  WireGuard is a secure, fast, and easy to use replacement for IPSec
+ 	  that uses modern cryptography and clever networking tricks. It's
+diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
+index b09e78da959a..8fdb1a5de909 100644
+--- a/lib/crypto/Kconfig
++++ b/lib/crypto/Kconfig
+@@ -42,7 +42,7 @@ config CRYPTO_LIB_BLAKE2S_GENERIC
+ 	  of CRYPTO_LIB_BLAKE2S.
+ 
+ config CRYPTO_ARCH_HAVE_LIB_CHACHA
+-	bool
++	tristate
+ 	help
+ 	  Declares whether the architecture provides an arch-specific
+ 	  accelerated implementation of the ChaCha library interface,
+@@ -58,21 +58,16 @@ config CRYPTO_LIB_CHACHA_GENERIC
+ 	  implementation is enabled, this implementation serves the users
+ 	  of CRYPTO_LIB_CHACHA.
+ 
+-config CRYPTO_LIB_CHACHA_INTERNAL
+-	tristate
+-	select CRYPTO_LIB_CHACHA_GENERIC if CRYPTO_ARCH_HAVE_LIB_CHACHA=n
+-
+ config CRYPTO_LIB_CHACHA
+ 	tristate "ChaCha library interface"
+-	select CRYPTO
+-	select CRYPTO_LIB_CHACHA_INTERNAL
++	select CRYPTO_LIB_CHACHA_GENERIC if CRYPTO_ARCH_HAVE_LIB_CHACHA=n
+ 	help
+ 	  Enable the ChaCha library interface. This interface may be fulfilled
+ 	  by either the generic implementation or an arch-specific one, if one
+ 	  is available and enabled.
+ 
+ config CRYPTO_ARCH_HAVE_LIB_CURVE25519
+-	bool
++	tristate
+ 	help
+ 	  Declares whether the architecture provides an arch-specific
+ 	  accelerated implementation of the Curve25519 library interface,
+@@ -88,14 +83,9 @@ config CRYPTO_LIB_CURVE25519_GENERIC
+ 	  implementation is enabled, this implementation serves the users
+ 	  of CRYPTO_LIB_CURVE25519.
+ 
+-config CRYPTO_LIB_CURVE25519_INTERNAL
+-	tristate
+-	select CRYPTO_LIB_CURVE25519_GENERIC if CRYPTO_ARCH_HAVE_LIB_CURVE25519=n
+-
+ config CRYPTO_LIB_CURVE25519
+ 	tristate "Curve25519 scalar multiplication library"
+-	select CRYPTO
+-	select CRYPTO_LIB_CURVE25519_INTERNAL
++	select CRYPTO_LIB_CURVE25519_GENERIC if CRYPTO_ARCH_HAVE_LIB_CURVE25519=n
+ 	help
+ 	  Enable the Curve25519 library interface. This interface may be
+ 	  fulfilled by either the generic implementation or an arch-specific
+@@ -112,7 +102,7 @@ config CRYPTO_LIB_POLY1305_RSIZE
+ 	default 1
+ 
+ config CRYPTO_ARCH_HAVE_LIB_POLY1305
+-	bool
++	tristate
+ 	help
+ 	  Declares whether the architecture provides an arch-specific
+ 	  accelerated implementation of the Poly1305 library interface,
+@@ -127,14 +117,9 @@ config CRYPTO_LIB_POLY1305_GENERIC
+ 	  implementation is enabled, this implementation serves the users
+ 	  of CRYPTO_LIB_POLY1305.
+ 
+-config CRYPTO_LIB_POLY1305_INTERNAL
+-	tristate
+-	select CRYPTO_LIB_POLY1305_GENERIC if CRYPTO_ARCH_HAVE_LIB_POLY1305=n
+-
+ config CRYPTO_LIB_POLY1305
+ 	tristate "Poly1305 library interface"
+-	select CRYPTO
+-	select CRYPTO_LIB_POLY1305_INTERNAL
++	select CRYPTO_LIB_POLY1305_GENERIC if CRYPTO_ARCH_HAVE_LIB_POLY1305=n
+ 	help
+ 	  Enable the Poly1305 library interface. This interface may be fulfilled
+ 	  by either the generic implementation or an arch-specific one, if one
