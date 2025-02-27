@@ -1,137 +1,109 @@
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7E43272901
-	for <linux-crypto@vger.kernel.org>; Thu, 27 Feb 2025 22:22:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E178F272912
+	for <linux-crypto@vger.kernel.org>; Thu, 27 Feb 2025 23:13:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740694955; cv=none; b=sHwOHqGzNVuss3xT9p+sMFrzsgefYriwTPp/zp0rs7Zpwk/EJS9guhJjiaivhxhe89uCZMGeeCL4X2tO+l9yZ6sa+HWWS16OeeP6RRWNbHMlEGZVm260A86Cj6ssim4qw9tE9kH7N3OHQi8gUMGMzn6+CzsLEdieYsIG6JD+Qew=
+	t=1740697986; cv=none; b=dlk9waplsDIemUQMboyL4E5PRjoSNhC5c/F/SbYOFRPUqBp3up8VRy5lynqJFX0qKAGXntJCe0wYfqySm4OiNj8hgKWUzA7D14auZje+oYgv2Ggo63XrcnkCaR4PLwtkBRz7r1QFIr200mlq/wnwzzxFJnksyYJ1e813CVrHFHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740694955; c=relaxed/simple;
-	bh=Le3t4kyiotBAGEeTNlkwGJJUb6SlwUJPq/9Ayw35DTE=;
+	s=arc-20240116; t=1740697986; c=relaxed/simple;
+	bh=VrMyULN9yRhX0362jZvsXqzL/blFpYThDTo1AkO/c30=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GLSabvQDoUD0TB5tPoouEiVkEsD6SA8tWWm3fYPLx8pQsSTp0yji0fmHQA30Ia5I+vY65FK0QCnO7ufUCETI9RzysXK2+hkVNsSc8o082xA5TQuqUqVaqoswhOodhYoIUEJAUCMaGNZ15aNpi5yRzOlNfQSADrimjt+QNhAKVxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=On8udIuW; arc=none smtp.client-ip=209.85.128.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+	 To:Cc:Content-Type; b=b+vhy4TvPxMvM9EZx1g61Vg2CqrxAj4GkyQE2b0gTqWrQAm2CsqBQokE2jVeyGEp5s9UGuTluZ5WOo7J7xP4v0ISzQX7m8w0clm1oMUnfjHzaR3KDjRjeJ2/KdfmdYj9OGJFs2+AFilxquT9fGxW6nq2M2LrTrJ+BPi1Qr8FJBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=XipCgQP5; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="On8udIuW"
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-6f47ed1f40dso11516747b3.1
-        for <linux-crypto@vger.kernel.org>; Thu, 27 Feb 2025 14:22:33 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XipCgQP5"
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5452ca02bdbso1548511e87.1
+        for <linux-crypto@vger.kernel.org>; Thu, 27 Feb 2025 15:13:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1740694953; x=1741299753; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1740697981; x=1741302781; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ScakE+ivXVszoVLy+xVwqAkmsKVwP1/+ubR/2bsYhJk=;
-        b=On8udIuWbca6dQrFAq6FYI9z1Rs+p3fyKu5wcC7uJ6XcJyM4o6VP2km9c3pkTD3cTP
-         722I+VKEQtfPHd1MJlkEPa+4iJ4c0JbrMEa5f7ojlzB/DAotMlRJ5J+atJZCPqyx5ACM
-         /pVS6qXjVHQ8IOuNEmA75zGVS6hD1Qy80pxvKkTquK1q7mtOXo/5BIJVD2xkY78i5gDr
-         8MzlxWWjG5q5lDZG5wkL+94XpEhKVh++Lx2j31iAg934zMXNXwQEJOl7WVyERRfbRXov
-         I5G+NURaWU0MHbRFlzheUtF+iZGWOrOJlpoXhuMlE7HAJusnJUeS+pCEiXWkngqyTza/
-         TyEQ==
+        bh=YmkybCOSFne6yK3kY+Du84AtHtcKYiWZlsF8gbRhEyU=;
+        b=XipCgQP5AMF9HQZrYR98rzjGwiwORxjbfuqc08WQYkF5sJfbva3dXBMA18/bZAYruq
+         lYzFIm066i1nKA/I7Wzwj6MRBy+0n/39lK+vm6FC6CVRgGDu7WVqIrB8ipuDCvhsn2zX
+         gv0fpICwmOY5QulyxYLrcoOFj5IBGXjw4THDC8H5KzFtAVKQ4BSA0oM7EMfJbsaTTsxD
+         VZVNpjtUVnbHGmSynxMcIgz16aEeDQ4C2vuh5WGjDtLxJlH3J37QUF3px8FPH2CV6ejF
+         XHzz6NQx80JJCWwT0F7ydmGCbLFt4WTzVd+9gutJtxv6qDO2V0i8yvXAaddp2Q2ZPUFr
+         Z/gA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740694953; x=1741299753;
+        d=1e100.net; s=20230601; t=1740697981; x=1741302781;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ScakE+ivXVszoVLy+xVwqAkmsKVwP1/+ubR/2bsYhJk=;
-        b=Wp630SdzxUTHVRzUmQ8dynA5c1JJJxklJzKjo5LHNunJWcrE/ZWLDL2z8iH6BnL4V1
-         ELenEas7rJwt43ULWzNrRuQYnqZfCHfgx4Mh5A7mgxgzhhsYze/bYmO+N+vg1zwRCeYE
-         S6sJ4RlS3rDm5nzWq1UKyIh/JFGil0VJMaJFfYEn7CC0bpw+noqHYdKtuIa19COTfhbZ
-         nsbbGsPDfB0S8nJg0eYTtF+xCFyBQmRcbXu4He7ylXnKOMIb0q68EH3/HUjRlOSSgHPb
-         qSriWHfovwB3RbSIdNGRxKf93uFnO+CoP777hy+DAvAvrt7fenRkCWI9I47JiKJy18RC
-         mnnw==
-X-Forwarded-Encrypted: i=1; AJvYcCWL7gb77LWGgttomFTO2cYoo7/xMseCds+0VZSny9dxsTCGHMOog7pU11TfhWy1D2eUnQSA1nM2K088qXQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzsVbYCTQLcu5fD50mcN/pYR8eKgwua4RkAfp7TtNJAxkq7htnu
-	ahMRi+rSkG/P17n2KCRCGfMpw5vn+V9kCDCxwCZ3WffisiVIWmR7xLM/4DfjDJ2zJUBe6T9DEk3
-	XykTf8hMBQISIhTdGQ9SApjz3PXNbnnWI6ASo
-X-Gm-Gg: ASbGncslBqGHsrQl4xVtcXZnAbvCfzMosCaEfnQ5IUbyxyo/YjGG42VQr7cXgqjAobS
-	DPUKy5yIUUh56enGijmVEVdleCiDcSB/dfbVC4sWcDBd7n+pIEVzPzQ/CgYIiZLqHbKOFPA1zRS
-	ec4B0Ilto=
-X-Google-Smtp-Source: AGHT+IGKPvb6uJOvINeQsM+iSOmGVr/Q+rN9nHiUXllkoj79N4+6rGnhZ88M/fTJmoa1TMKM7/1/9ZyZ0+zbdTUHg4o=
-X-Received: by 2002:a05:690c:4b8c:b0:6fd:3f9e:b7d6 with SMTP id
- 00721157ae682-6fd4a074751mr20138727b3.19.1740694952817; Thu, 27 Feb 2025
- 14:22:32 -0800 (PST)
+        bh=YmkybCOSFne6yK3kY+Du84AtHtcKYiWZlsF8gbRhEyU=;
+        b=q+d+u1awsgGNX4nxkiNKRy8qn1OdDQzG2CUY14qMkMK9EVjbGuSOfSlCWqQmT97UAf
+         /sBLnIeyIylxbzOAQSd12VWOO3IPf37yQ0v35ahVrRbUjzeSc894MYuss8g/+HPDKG2x
+         UNrgc8/5SysRd/WkC6E+iTvQ8EA/HrenHiV7jN1gN28opNe59MUfFHg4/6hkeivL3LdE
+         lbwl64m3vKC+A97mTdeTAeernqd6KhxdKJoej7o2Tx8oO6eyxIiFi/pA2YZj/mnCtn0B
+         ezQvvEbzaeBwgboHSxbIIfpRfp0pK3dhBQov9fFSU5IgTmtArynWOwlR+DJRzmAXpYgB
+         8gpg==
+X-Forwarded-Encrypted: i=1; AJvYcCWyZKWGwzlkNIahQz/0Ij2+yMxMNLYktlYnf3JyqO0Zll/MEgsr4el9dlnWal8SXtxieyoZObFmok0ThDY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxTRkZFbX/1NH1H+uMS2xXs8zuZ9aFPDFgCYvLccRcfNa5ydCm0
+	u1X/uyxV5xYRQNA3vMTYIjwKjf3by0i2kM5ukvuaFgLImwdfAT+RfvHfdB6dKjiyE5CRnASpfFz
+	M/Rua/M6a9Vh7az5OqBDm9WkVOzRLbUw9eQWEkA==
+X-Gm-Gg: ASbGncs2lP1RR09eX1pFnDgcFkZWU18dWU8EpzzkGa5+h7/CWghlXstEmwDFVqbgOij
+	QBnyL4w1n5Go6cSDScp9mKWGttZ8AV9vJwKfz/nzn6UVBz5wXKziI48//xqCt5CYaVQjmGKuYDt
+	YTU/9kof0=
+X-Google-Smtp-Source: AGHT+IHLcUchRQ5RHejMZKQOgPdGa2RgldlYInULBrGmDbyHiaxGOnJDGcYbTPdwNuvGN5wuzKGCGgT0iWuzwLntJq0=
+X-Received: by 2002:ac2:4e0e:0:b0:545:2fa9:8cf5 with SMTP id
+ 2adb3069b0e04-5494c354e58mr578980e87.49.1740697980909; Thu, 27 Feb 2025
+ 15:13:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241017155516.2582369-1-eric.snowberg@oracle.com>
- <c490397315c2704e9ef65c8ad3fefedb239f1997.camel@linux.ibm.com>
- <72F52F71-C7F3-402D-8441-3D636A093FE8@oracle.com> <CAHC9VhRHEw5c+drC=aX4xTqWoQJJZ+qkJ7aHUT5dcu+Q5f7BqA@mail.gmail.com>
- <CAHC9VhSJpnaAK1efgs1Uk0Tr3CaDNR1LiDU-t_yDKDQG6J-74Q@mail.gmail.com>
- <E20C617B-EA01-4E69-B5E2-31E9AAD6F7A2@oracle.com> <506e8e58e5236a4525b18d84bafa9aae80b24452.camel@linux.ibm.com>
-In-Reply-To: <506e8e58e5236a4525b18d84bafa9aae80b24452.camel@linux.ibm.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Thu, 27 Feb 2025 17:22:22 -0500
-X-Gm-Features: AQ5f1JpGHD9sDTEfCNGPaQVwEKRNBeWrx8Lfv7PT8-K9hixoVfU0bPOCCzjhhe8
-Message-ID: <CAHC9VhTsZntLdGBV7=4suauS+rzSQv1O4UAoGcy2vEB02wRkoA@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 00/13] Clavis LSM
-To: Mimi Zohar <zohar@linux.ibm.com>
-Cc: Eric Snowberg <eric.snowberg@oracle.com>, David Howells <dhowells@redhat.com>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, 
-	"open list:SECURITY SUBSYSTEM" <linux-security-module@vger.kernel.org>, 
-	David Woodhouse <dwmw2@infradead.org>, 
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>, "davem@davemloft.net" <davem@davemloft.net>, 
-	Ard Biesheuvel <ardb@kernel.org>, James Morris <jmorris@namei.org>, 
-	"Serge E. Hallyn" <serge@hallyn.com>, Roberto Sassu <roberto.sassu@huawei.com>, 
-	Dmitry Kasatkin <dmitry.kasatkin@gmail.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
-	"casey@schaufler-ca.com" <casey@schaufler-ca.com>, Stefan Berger <stefanb@linux.ibm.com>, 
-	"ebiggers@kernel.org" <ebiggers@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, 
-	open list <linux-kernel@vger.kernel.org>, 
-	"keyrings@vger.kernel.org" <keyrings@vger.kernel.org>, 
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, 
-	"linux-efi@vger.kernel.org" <linux-efi@vger.kernel.org>, 
-	"linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>
+References: <20250221-rmv_return-v1-0-cc8dff275827@quicinc.com> <20250221-rmv_return-v1-15-cc8dff275827@quicinc.com>
+In-Reply-To: <20250221-rmv_return-v1-15-cc8dff275827@quicinc.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Fri, 28 Feb 2025 00:12:48 +0100
+X-Gm-Features: AQ5f1Jra6Y1TNly1NYmSkFPtENvNIwlGHtsux17X3bXg-g3qhlo7h9G9hMQoxr8
+Message-ID: <CACRpkdZV4EHGxYrX77FgsZvPrHohCEixXX6dkEoVSYSsaAzbYg@mail.gmail.com>
+Subject: Re: [PATCH *-next 15/18] mfd: db8500-prcmu: Remove needless return in
+ three void APIs
+To: Zijun Hu <quic_zijuhu@quicinc.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Will Deacon <will@kernel.org>, 
+	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	Nick Piggin <npiggin@gmail.com>, Peter Zijlstra <peterz@infradead.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Thomas Gleixner <tglx@linutronix.de>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, "Rafael J. Wysocki" <rafael@kernel.org>, 
+	Danilo Krummrich <dakr@kernel.org>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Johannes Berg <johannes@sipsolutions.net>, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
+	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, Bartosz Golaszewski <brgl@bgdev.pl>, 
+	Lee Jones <lee@kernel.org>, Thomas Graf <tgraf@suug.ch>, Christoph Hellwig <hch@lst.de>, 
+	Marek Szyprowski <m.szyprowski@samsung.com>, Robin Murphy <robin.murphy@arm.com>, 
+	Miquel Raynal <miquel.raynal@bootlin.com>, Richard Weinberger <richard@nod.at>, 
+	Vignesh Raghavendra <vigneshr@ti.com>, Zijun Hu <zijun_hu@icloud.com>, linux-arch@vger.kernel.org, 
+	linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, linux-pm@vger.kernel.org, iommu@lists.linux.dev, 
+	linux-mtd@lists.infradead.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 27, 2025 at 3:41=E2=80=AFPM Mimi Zohar <zohar@linux.ibm.com> wr=
-ote:
-> On Mon, 2025-01-06 at 17:15 +0000, Eric Snowberg wrote:
-> > > On Jan 5, 2025, at 8:40=E2=80=AFPM, Paul Moore <paul@paul-moore.com> =
+On Fri, Feb 21, 2025 at 2:03=E2=80=AFPM Zijun Hu <quic_zijuhu@quicinc.com> =
 wrote:
-> > > On Fri, Jan 3, 2025 at 11:48=E2=80=AFPM Paul Moore <paul@paul-moore.c=
-om> wrote:
-> > > >
-> > > > Regardless, back to Clavis ... reading quickly through the cover
-> > > > letter again, I do somewhat wonder if this isn't better integrated
-> > > > into the keyring proper; have you talked to both David and Jarkko
-> > > > about this?
-> > >
-> > > I realize I should probably expand on my thinking a bit, especially
-> > > since my comment a while regarding LSMs dedicated to enforcing access
-> > > control on keys is what was given as a reason for making Clavis a LSM=
-.
-> > >
-> > > I still stand by my comment from over a year ago that I see no reason
-> > > why we couldn't support a LSM that enforces access controls on
-> > > keyrings/keys.  What gives me pause with the Clavis LSM is that so
-> > > much of Clavis is resident in the keyrings themselves, e.g. Clavis
-> > > policy ACLs and authorization keys, that it really feels like it
-> > > should be part of the keys subsystem and not a LSM.  Yes, existing
-> > > LSMs do have LSM specific data that resides outside of the LSM and in
-> > > an object's subsystem, but that is usually limited to security
-> > > identifiers and similar things, not the LSM's security policy.
->
-> Hi Jarkko, David,
->
-> Both Paul's and my main concerns with this patch set is storing policy in=
- the
-> keyring.  We would appreciate your chiming in here about storing key poli=
-cy in
-> the keyring itself.
 
-I'd still also like to see some discussion about moving towards the
-addition of keyrings oriented towards usage instead of limiting
-ourselves to keyrings that are oriented on the source of the keys.
-Perhaps I'm missing some important detail which makes this
-impractical, but it seems like an obvious improvement to me and would
-go a long way towards solving some of the problems that we typically
-see with kernel keys.
+> Remove needless 'return' in the following void APIs:
+>
+>  prcmu_early_init()
+>  prcmu_system_reset()
+>  prcmu_modem_reset()
+>
+> Since both the API and callee involved are void functions.
+>
+> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
 
---=20
-paul-moore.com
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+
+Yours,
+Linus Walleij
