@@ -1,47 +1,78 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5FF41DDD1;
-	Thu, 27 Feb 2025 06:29:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D683BE65;
+	Thu, 27 Feb 2025 06:30:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740637741; cv=none; b=ARJrqcIeltP6y5GBy5Kmx1DG8yIe7Xq+afCt0JK6fK0qm4M81RocfO7nGdvpEjJCYJP2jaS+KwIN3Cstukt5WvwElpOd1M3PSd63Rahw87z4Zwa4qnAxijzHvBGOs6l4ZD0q0NK0e1yv+fEzYK4aUcPykFmIvJ6sGrTBun6R/s4=
+	t=1740637840; cv=none; b=iIT4vl1KxD1QI1kQGbYnp+O8Ox5S57xgjwNadC0hDEU1CfdLZqBHGg+KS4U5tDHPVd0Q6keKDv9LdH3onCuQ06ru2hCTOVv/cVvUq4Bo6n7GKWWS4/za3ewqw8xYcUAOv3AiWwqeUHFxVjXeJXUXAKVg6pdB/Lg+tXPc4PaNVc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740637741; c=relaxed/simple;
-	bh=QBDFXX+2NJk1bzymlEzaxP+sRTrLVruQgJ8E8hJbcW0=;
+	s=arc-20240116; t=1740637840; c=relaxed/simple;
+	bh=cDXogVH7qIKQIn5aWp/tZGtaiEXuiVz5z4jfmzCT9t8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VzNyVLepKxDYLLy6nd21MEC/fZU2thrLDYljd9pXHi9R8C6V096RY2QXS7oiNz/3v1aGWYkEKevIlcKQj6Op+hRM3o7FGQmjwsfkJoACOwhJfdquikL3KDsaWoZqICX42DtUK3n3QwlpJFBb2PWc329aBix6GzLwwzW8gPf5Np4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TTgJLigd; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=fF2nGk9bfE74ARUvNONxrw1jKjvkwVt787x3afxRqNb4ls7cC02Sz1xlggDpTtrbgen1YyT7OSqbPY++lTIPQ9ftOX1e1Y8UDhkGvrAR/JUvMKPekTOoT0F3TAEwA7fIfKQ9F0NTXtkDFNBbxyutm7zREEYHAeaNej8xVHjkHZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BLcK+e0G; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TTgJLigd"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6886C4CEDD;
-	Thu, 27 Feb 2025 06:29:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740637741;
-	bh=QBDFXX+2NJk1bzymlEzaxP+sRTrLVruQgJ8E8hJbcW0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TTgJLigdjKKMH+/1gJ9LbifYx8vzJYelp5fs4bj+EwNfboVlPiY3tefGRXxkhS3Ft
-	 bMtWTkKI4aR7unN/SaBkrk2P9JfOJmJd7ySEgqJ6PVuORXtCPgO0q4BpVmAZZ/io0E
-	 U7XTboTQUgulb7GH2AUnM/PT+/lNkKXUm+x7z7LXsP3ZUwO34GiFNqU6i8Wlp4dUct
-	 eRuoxdf1LuUs6Lk9JbFOvnqGtJls2BdWMnIJmcYl2woUdkoHk/EvGPzWh0+P7qzZPC
-	 +EfK8j6lTN0XUHhWYRWzBToNpP8RihSrYpKx16HntlDLMzY2I4/c7n2+g0kT10QqnS
-	 s7tlXPcTa2CQg==
-Date: Wed, 26 Feb 2025 22:28:59 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Bill Wendling <morbo@google.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-	"H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Justin Stitt <justinstitt@google.com>,
-	LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org,
-	clang-built-linux <llvm@lists.linux.dev>
-Subject: Re: [PATCH] x86/crc32: use builtins to improve code generation
-Message-ID: <20250227062859.GA2506@sol.localdomain>
-References: <CAGG=3QVi27WRYVxmsk9+HLpJw9ZJrpfLjU8G4exuXm-vUA-KqQ@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BLcK+e0G"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740637839; x=1772173839;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=cDXogVH7qIKQIn5aWp/tZGtaiEXuiVz5z4jfmzCT9t8=;
+  b=BLcK+e0GbQtcytAr9YBPdYhXUwpnVdxZtlISZQVvlvzEjiiXNv1jL+4W
+   PlS2QSY5d77/q4ZmKVZqHkhm1+DpLzr2zgabFNQ878x1c69He3btGanLR
+   mKj9ShXYO1ZvcJScSpPmdOIdIjfd/dzE6VyUngRvtohhA7Qc16tkWz54R
+   80Luxh/8Afy91bl995iatc5b7AwSVaUVDG8Y5ZZ6JUTsTWgi8m8VP6A3E
+   2L7CwGy2Td1ykgl2R+RLtwSBVeYy7QDoAnVHO8HQ6HtLYlTVoozve62tC
+   PXO3oFX77NZjvrJUeLTWipJX8h6PUZQHSsuskTn81CeCkQ9AJn6V1XWe2
+   w==;
+X-CSE-ConnectionGUID: h6uy7IHQRj6/Y2czrMuw8A==
+X-CSE-MsgGUID: sRlJpZL3S4a0BrJa6e2pmA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11357"; a="29116578"
+X-IronPort-AV: E=Sophos;i="6.13,319,1732608000"; 
+   d="scan'208";a="29116578"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Feb 2025 22:30:38 -0800
+X-CSE-ConnectionGUID: gI0PRdtTSVu6czkCzvpurA==
+X-CSE-MsgGUID: +Fof8z9QS42eu8Wf1ufG6A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,319,1732608000"; 
+   d="scan'208";a="116959206"
+Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
+  by orviesa006.jf.intel.com with ESMTP; 26 Feb 2025 22:30:33 -0800
+Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tnXP7-000Cxq-2t;
+	Thu, 27 Feb 2025 06:30:23 +0000
+Date: Thu, 27 Feb 2025 14:29:47 +0800
+From: kernel test robot <lkp@intel.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+	Arnd Bergmann <arnd@kernel.org>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Will Deacon <will@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Harald Freudenberger <freude@linux.ibm.com>,
+	Holger Dengler <dengler@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Eric Biggers <ebiggers@google.com>,
+	"James E . J . Bottomley" <James.Bottomley@hansenpartnership.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>, linux-crypto@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	linux-mips@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: Re: [PATCH] crypto: lib/Kconfig - Select and hide arch options
+Message-ID: <202502271449.k2LZdEgF-lkp@intel.com>
+References: <Z76aUfPIbhPAsHbv@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -50,77 +81,42 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAGG=3QVi27WRYVxmsk9+HLpJw9ZJrpfLjU8G4exuXm-vUA-KqQ@mail.gmail.com>
+In-Reply-To: <Z76aUfPIbhPAsHbv@gondor.apana.org.au>
 
-On Wed, Feb 26, 2025 at 10:12:47PM -0800, Bill Wendling wrote:
-> For both gcc and clang, crc32 builtins generate better code than the
-> inline asm. GCC improves, removing unneeded "mov" instructions. Clang
-> does the same and unrolls the loops. GCC has no changes on i386, but
-> Clang's code generation is vastly improved, due to Clang's "rm"
-> constraint issue.
-> 
-> The number of cycles improved by ~0.1% for GCC and ~1% for Clang, which
-> is expected because of the "rm" issue. However, Clang's performance is
-> better than GCC's by ~1.5%, most likely due to loop unrolling.
-> 
-> Link: https://github.com/llvm/llvm-project/issues/20571#issuecomment-2649330009
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Ingo Molnar <mingo@redhat.com>
-> Cc: Borislav Petkov <bp@alien8.de>
-> Cc: Dave Hansen <dave.hansen@linux.intel.com>
-> Cc: x86@kernel.org
-> Cc: "H. Peter Anvin" <hpa@zytor.com>
-> Cc: Eric Biggers <ebiggers@kernel.org>
-> Cc: Ard Biesheuvel <ardb@kernel.org>
-> Cc: Nathan Chancellor <nathan@kernel.org>
-> Cc: Nick Desaulniers <nick.desaulniers+lkml@gmail.com>
-> Cc: Justin Stitt <justinstitt@google.com>
-> Cc: linux-kernel@vger.kernel.org
-> Cc: linux-crypto@vger.kernel.org
-> Cc: llvm@lists.linux.dev
-> Signed-off-by: Bill Wendling <morbo@google.com>
-> ---
->  arch/x86/Makefile         | 3 +++
->  arch/x86/lib/crc32-glue.c | 8 ++++----
->  2 files changed, 7 insertions(+), 4 deletions(-)
+Hi Herbert,
 
-Thanks!  A couple concerns, though:
+kernel test robot noticed the following build errors:
 
-> diff --git a/arch/x86/Makefile b/arch/x86/Makefile
-> index 5b773b34768d..241436da1473 100644
-> --- a/arch/x86/Makefile
-> +++ b/arch/x86/Makefile
-> @@ -114,6 +114,9 @@ else
->  KBUILD_CFLAGS += $(call cc-option,-fcf-protection=none)
->  endif
-> 
-> +# Enables the use of CRC32 builtins.
-> +KBUILD_CFLAGS += -mcrc32
+[auto build test ERROR on herbert-cryptodev-2.6/master]
+[cannot apply to soc/for-next linus/master v6.14-rc4]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Doesn't this technically allow the compiler to insert CRC32 instructions
-anywhere in arch/x86/ without the needed runtime CPU feature check?  Normally
-when using intrinsics it's necessary to limit the scope of the feature
-enablement to match the runtime CPU feature check that is done, e.g. by using
-the target function attribute.
+url:    https://github.com/intel-lab-lkp/linux/commits/Herbert-Xu/crypto-lib-Kconfig-Select-and-hide-arch-options/20250226-125220
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+patch link:    https://lore.kernel.org/r/Z76aUfPIbhPAsHbv%40gondor.apana.org.au
+patch subject: [PATCH] crypto: lib/Kconfig - Select and hide arch options
+config: x86_64-buildonly-randconfig-002-20250227 (https://download.01.org/0day-ci/archive/20250227/202502271449.k2LZdEgF-lkp@intel.com/config)
+compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd708029e0b2869e80abe31ddb175f7c35361f90)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250227/202502271449.k2LZdEgF-lkp@intel.com/reproduce)
 
-> diff --git a/arch/x86/lib/crc32-glue.c b/arch/x86/lib/crc32-glue.c
-> index 2dd18a886ded..fdb94bff25f4 100644
-> --- a/arch/x86/lib/crc32-glue.c
-> +++ b/arch/x86/lib/crc32-glue.c
-> @@ -48,9 +48,9 @@ u32 crc32_le_arch(u32 crc, const u8 *p, size_t len)
->  EXPORT_SYMBOL(crc32_le_arch);
-> 
->  #ifdef CONFIG_X86_64
-> -#define CRC32_INST "crc32q %1, %q0"
-> +#define CRC32_INST __builtin_ia32_crc32di
->  #else
-> -#define CRC32_INST "crc32l %1, %0"
-> +#define CRC32_INST __builtin_ia32_crc32si
->  #endif
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202502271449.k2LZdEgF-lkp@intel.com/
 
-Do both gcc and clang consider these builtins to be a stable API, or do they
-only guarantee the stability of _mm_crc32_*() from immintrin.h?  At least for
-the rest of the SSE and AVX stuff, I thought that only the immintrin.h functions
-are actually considered stable.
+All errors (new ones prefixed by >>, old ones prefixed by <<):
 
-- Eric
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/fpga/tests/fpga-mgr-test.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/fpga/tests/fpga-bridge-test.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/fpga/tests/fpga-region-test.o
+>> ERROR: modpost: "curve25519_generic" [arch/x86/crypto/curve25519-x86_64.ko] undefined!
+>> ERROR: modpost: "curve25519_base_point" [arch/x86/crypto/curve25519-x86_64.ko] undefined!
+>> ERROR: modpost: "curve25519_null_point" [arch/x86/crypto/curve25519-x86_64.ko] undefined!
+>> ERROR: modpost: "curve25519_null_point" [lib/crypto/libcurve25519.ko] undefined!
+>> ERROR: modpost: "curve25519_generic" [lib/crypto/libcurve25519.ko] undefined!
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
