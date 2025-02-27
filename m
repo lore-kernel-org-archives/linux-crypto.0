@@ -1,132 +1,134 @@
-Received: from fout-b3-smtp.messagingengine.com (fout-b3-smtp.messagingengine.com [202.12.124.146])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA75222D4FA
-	for <linux-crypto@vger.kernel.org>; Thu, 27 Feb 2025 13:00:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B3111EB5ED;
+	Thu, 27 Feb 2025 13:04:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740661208; cv=none; b=EQmMdiGwl5Y9UPsk7PUIH1J0XmGtb5jdL+T4CNTcRr40Eg/lDYCM/0Wf+bHL3nd/Ov+kcWsXqJSwiJ7FTX4mUnG+yK70/jZD5apulrfmUJmQnipXcXVRxuREKJ+rHw+wLh5LrrmItOII9d1rO9kxXHo/mqgmgsrM32lZ4Y2GXZ0=
+	t=1740661469; cv=none; b=C5ITfpT4jcwVHPphaBwnLNLxsBkWZHknJf27p7kLafZYNzsQER/8cbATXfJsQxWxRP/npSOGDLcCO5/bLgmvkUnLpvlmWGW3/ENqC6AsLofmqOyBFVXt0Ajxu0L+/fFxJjbo8K8zyDG/dLPRB0tDdypV7v1CnzhT1G7feaUyEvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740661208; c=relaxed/simple;
-	bh=mnBUHzltagblEitbUoVb0HA3aYVS8Ooboc5YSTNBnys=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=tHjDckH0O6oaDUO2SJ7WqiYAHpINfoR03H7OqPH+JoDyF+rPWBnvk6A5oofaSoTefqD2vhl3F8MUqqrMO+PXfIRSpAb33qwDc7B41FbPL8vlhVpOiqq5teWQ7PfXCFh5ozRaL1sa7Pqv3RUgMO79fYg0O+cLABJ+S1GU83rsDpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=qvIJuwp5; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=uTBFUJob; arc=none smtp.client-ip=202.12.124.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	s=arc-20240116; t=1740661469; c=relaxed/simple;
+	bh=RhAn648KZjGR1zL9fk7lBgC1kuhesOSbeueMHlrV+FQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=h3fhmBk9yNtZedd0uJfc6NMuRGpGM6oJBgaLn6l9YyJbMAPgyUga06ncKCQdauJ7mN5K9jc3/6wZd4tpACP54NvLTeDhZdJ4sfAKyhZ4b9DIjjshdPzL99wzFGw3EedNmfPBQQis/Uj4MELnRO0Ozx9ytmCHG+sOgLxtS5hvPzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Dpw3udR3; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="qvIJuwp5";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="uTBFUJob"
-Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
-	by mailfout.stl.internal (Postfix) with ESMTP id A8A69114017C;
-	Thu, 27 Feb 2025 08:00:04 -0500 (EST)
-Received: from phl-imap-11 ([10.202.2.101])
-  by phl-compute-11.internal (MEProxy); Thu, 27 Feb 2025 08:00:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1740661204;
-	 x=1740747604; bh=SiqToDuurU/KwaGIorSxKLL//+SzSxWT1VcljdaRjVA=; b=
-	qvIJuwp5YsYtOLVNz+OVVJaCqsZtHcg7NMklJc+0aVtVDyTxFun0dhV8GPMjqajZ
-	X82c0t7BrKwfvmRP2U4SJQ4QJB5AUNIs34t2/byTamtAoiSflEBUOc6gT/+zBAQD
-	erjjEWx5NlGAOgX1Z1lZ3oZXBge2IlwI5WCA1aN9mksZl9AdyOjE1qCwiTDusju2
-	dBctgkcFF+gjRqLkc8UqD8P7bkGAa60o0rqXa85Vb2WoW1S1YtFGLCfEoMftXS6u
-	g3uFLZetZnBt5Wu+us/MkHu9gnpXB6oBhIr3acG45UC94YZnlyvumAXjs9WD7yZa
-	Ar8paYjbQNuPHXRz4PTXIQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1740661204; x=
-	1740747604; bh=SiqToDuurU/KwaGIorSxKLL//+SzSxWT1VcljdaRjVA=; b=u
-	TBFUJobLpVrCb5puRjONQ7xevO9klSC07GY9Z3FGo8/w3vbtObMnfg1L41aX3+Wn
-	ZI6kDbzpU1NFaQ46pIOKh0zCoHxW1OUCpccspEXOapV2F48EMGn2NLil/QhLnN28
-	fDtmOpd4ODugGa7C/K+3fEnOPpLNJUq3Ytd0QPazoYSX1TJ9bMwM6ZUdR7tLJRqs
-	UONSWE+ulbPRm+bYwsSGd0gaJHkA2BjtuD6DYbk8U987sPT+h7n5PfuCq7k5rUCC
-	UZJA06Os4YsaBfP9sjWszYFFuYDxBMDjcrIbJ7+QMZLhxLLNBIgdHhkInqaRwNn4
-	3MpeIM3VTzd0pISUsKHAQ==
-X-ME-Sender: <xms:02HAZ1Ld9PTCfymYN7axwERUUOTGo8IEzwWFEtK0l6qSxPzU_LvtgQ>
-    <xme:02HAZxIEqLZuawMYzycLIwJijE2Jd49UmcxT_qf2FFp8oqyf4sHzXI2DTYuT4-FDb
-    WpLhxh5uMSn2jT6aZc>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdekjeehvdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenucfjughrpefoggffhffvvefkjghfufgtgfesthejredtredt
-    tdenucfhrhhomhepfdetrhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusg
-    druggvqeenucggtffrrghtthgvrhhnpefhtdfhvddtfeehudekteeggffghfejgeegteef
-    gffgvedugeduveelvdekhfdvieenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
-    epmhgrihhlfhhrohhmpegrrhhnugesrghrnhgusgdruggvpdhnsggprhgtphhtthhopeeg
-    pdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehhvghrsggvrhhtsehgohhnughorh
-    drrghprghnrgdrohhrghdrrghupdhrtghpthhtoheprghruggsodhgihhtsehgohhoghhl
-    vgdrtghomhdprhgtphhtthhopegrrhgusgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
-    eplhhinhhugidqtghrhihpthhosehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:02HAZ9s_Kg2-p1uAvdRT41ao0o8DCd4wbIjrfRcaVxgxmftgXs9d3A>
-    <xmx:02HAZ2ZeI51_JSCjnSsbI6x0RAvx_n7pc-zchdONXxYgGgY_gN1esw>
-    <xmx:02HAZ8aZKmVD-YDFL22vciQ_b2tKVgINmatuR8S-bsflHqrn7NSo7g>
-    <xmx:02HAZ6D5uVBUDh0ZXue9rXZEVTCRAb-l6DpjvRvdcL9GHt6y_T9bRg>
-    <xmx:1GHAZ0Hzy0PvP9Lmm7ch5ukz1Hsa9yUZhUSuo8aPo4xy7Sqmv15tww4G>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id A52112220077; Thu, 27 Feb 2025 08:00:03 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Dpw3udR3"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=C4NTJOJ3dCAJ9+vpvzEprQrWJrpsHSJFBRqUQ8todYw=; b=Dpw3udR3BJAFq9SyV4WrEEtnAj
+	4AK/f2BJmM2iCspBbFHcvyAYokish3HnL+MnOj7JlEsRpxTpwaGNuOZ0GjF1xl2kJOx4qt3J2ahuW
+	az6fb102wILROrGzFvXwJPaH58zNpMOOcrCBc343TieQO3/CDGnn7X1+s/6kO95pgHKXAnEejIoZr
+	eB7TVgWCB6dlZRGlAflwAymbuHq47SCX9B61CP43qWtZ2O6ijiX7nvvVtATjJJOXC5cOJJTTKtd0a
+	0oXIb31u03yt/F+rw+NDupYNgVgy0IBHz3v3ZGkJAqcax4tYjHYegxiTUmQ4/XbT5eUfHjXU340Lp
+	d0XLYfiw==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1tndYL-0000000Hb1D-0gW6;
+	Thu, 27 Feb 2025 13:03:49 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 45472300472; Thu, 27 Feb 2025 14:03:47 +0100 (CET)
+Date: Thu, 27 Feb 2025 14:03:47 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Zijun Hu <zijun_hu@icloud.com>
+Cc: Zijun Hu <quic_zijuhu@quicinc.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Will Deacon <will@kernel.org>,
+	"Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Nick Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Danilo Krummrich <dakr@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Bartosz Golaszewski <brgl@bgdev.pl>, Lee Jones <lee@kernel.org>,
+	Thomas Graf <tgraf@suug.ch>, Christoph Hellwig <hch@lst.de>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Richard Weinberger <richard@nod.at>,
+	Vignesh Raghavendra <vigneshr@ti.com>, linux-arch@vger.kernel.org,
+	linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+	linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org, linux-rdma@vger.kernel.org,
+	linux-gpio@vger.kernel.org, linux-pm@vger.kernel.org,
+	iommu@lists.linux.dev, linux-mtd@lists.infradead.org
+Subject: Re: [PATCH *-next 00/18] Remove weird and needless 'return' for void
+ APIs
+Message-ID: <20250227130347.GA5880@noisy.programming.kicks-ass.net>
+References: <20250221-rmv_return-v1-0-cc8dff275827@quicinc.com>
+ <46d17d84-5298-4460-96b0-9c62672167a0@icloud.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Thu, 27 Feb 2025 13:59:42 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Ard Biesheuvel" <ardb+git@google.com>, linux-crypto@vger.kernel.org
-Cc: "Herbert Xu" <herbert@gondor.apana.org.au>,
- "Ard Biesheuvel" <ardb@kernel.org>
-Message-Id: <89944059-872e-4013-a025-f01d6d2f51cd@app.fastmail.com>
-In-Reply-To: <20250227123338.3033402-1-ardb+git@google.com>
-References: <20250227123338.3033402-1-ardb+git@google.com>
-Subject: Re: [PATCH] crypto: lib/chachapoly - Drop dependency on CRYPTO_ALGAPI
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <46d17d84-5298-4460-96b0-9c62672167a0@icloud.com>
 
-On Thu, Feb 27, 2025, at 13:33, Ard Biesheuvel wrote:
-> From: Ard Biesheuvel <ardb@kernel.org>
->
-> The ChaCha20-Poly1305 library code uses the sg_miter API to process
-> input presented via scatterlists, except for the special case where the
-> digest buffer is not covered entirely by the same scatterlist entry as
-> the last byte of input. In that case, it uses scatterwalk_map_and_copy()
-> to access the memory in the input scatterlist where the digest is stored.
->
-> This results in a dependency on crypto/scatterwalk.c and therefore on
-> CONFIG_CRYPTO_ALGAPI, which is unnecessary, as the sg_miter API already
-> provides this functionality via sg_copy_to_buffer(). So use that
-> instead, and drop the CRYPTO_ALGAPI dependency.
->
-> Reported-by: Arnd Bergmann <arnd@arndb.de>
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+On Thu, Feb 27, 2025 at 08:48:19PM +0800, Zijun Hu wrote:
+> On 2025/2/21 21:02, Zijun Hu wrote:
+> > void api_func_a(...);
+> > 
+> > static inline void api_func_b(...)
+> > {
+> > 	return api_func_a(...);
+> > }
+> 
+> The Usage : Return void function in void function
+> 
+> IMO, perhaps, the usage is not good since:
+> 
+> A) STD C does not like the usage, and i find GCC has no description
+> about the usage.
+>    C11/C17: 6.8.6.4 The return statement
+>    "A return statement with an expression shall not appear in a
+> function whose return type is void"
 
-Thanks for the fixup!
+We really don't use STD C, the kernel is littered with extensions.
 
-> ---
->  lib/crypto/Kconfig            | 1 -
->  lib/crypto/chacha20poly1305.c | 5 ++---
->  2 files changed, 2 insertions(+), 4 deletions(-)
->
-> diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
-> index b01253cac70a..a759e6f6a939 100644
-> --- a/lib/crypto/Kconfig
-> +++ b/lib/crypto/Kconfig
-> @@ -135,7 +135,6 @@ config CRYPTO_LIB_CHACHA20POLY1305
->  	depends on CRYPTO
->  	select CRYPTO_LIB_CHACHA
->  	select CRYPTO_LIB_POLY1305
-> -	select CRYPTO_ALGAPI
+> B) According to discussion, the usage have function that return type
+>    of the callee api_func_a() is monitored. but this function has below
+> shortcoming as well:
+> 
+> the monitor is not needed if the caller api_func_b() is in the same
+> module with the callee api_func_a(), otherwise, provided the callee is
+> a API and provided by author of other module. the author needs to clean
+> up lot of usages of the API if he/she changes the API's return type from
+> void to any other type, so it is not nice to API provider.
+> 
+> C) perhaps, most ordinary developers don't known the function mentioned
+>    by B), and also feel strange for the usage
 
-I think importantly, dropping the 'select CRYPTO_ALGAPI'
-means that the 'depends on CRYPTO' here can also be dropped:
-CRYPTO_LIB_CHACHA20POLY1305 needs nothing else from the
-crypto subsystem. Moreover, CONFIG_WIREGUARD can now drop the
-'select CRYPTO' because it seems to only need this in
-order to 'select CRYPTO_LIB_CHACHA20POLY1305'.
+It is quite common to do kernel wide updates using scripts / cocinelle.
 
-    Arnd
+If you have a specialization that wraps a function to fill out a default
+value, then you want the return types to keep matching.
+
+Ex.
+
+return_type foo(type1 a1, type2 a2);
+
+return_type my_foo(type1 a1)
+{
+	return foo(a1, value);
+}
+
+is a normal thing to do. The whole STD C cannot return void bollocks
+breaks that when return_type := void, so in that regards I would call
+this a STD C defect.
