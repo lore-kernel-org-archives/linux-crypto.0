@@ -1,41 +1,43 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3314C13A3F2
-	for <linux-crypto@vger.kernel.org>; Thu, 27 Feb 2025 10:14:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A2C227E95
+	for <linux-crypto@vger.kernel.org>; Thu, 27 Feb 2025 10:14:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740651301; cv=none; b=ugsQHzOHKUHgVCkbf+E5pgUkSKDusG9PcYhUP6JEw5JxO/RfFPOk5UyE8eZTNzSAK+2ebElqPRPhSG8tGYEJZJK8V4e7RfijCJbMe5LIAUmVYJaExLvEA2ylpCppd2AqxLpfzDK2acbax2vhgyKceWVd0OQSypbcU8Qz3Y6JBGk=
+	t=1740651302; cv=none; b=iLEhO3KPa5IqPQja0Uh0Pf2nYTj7W393Gb8LRUlK+aSBm8FNpGGgvd+lkkmRL/aG6/EJUrp+shdioyNP66U+JecUoUV1SQIXb3Us2SYzE3S94lK4q81Yii3otoe3uVNcPQwbueKWj+Z7Hryv3K2tRL0Bu0pES9OwV83MDt2Yxp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740651301; c=relaxed/simple;
-	bh=f0PsmDzrPlbHPzEm4kYRnL2PeiUy82YgFqzdylQmmOc=;
-	h=Date:Message-Id:From:Subject:To:Cc; b=omLB6R0m9CfLkCMn72KKiTk8F9mG9Yi3eg1kQ7VeAWKlMZiPrtNhwlkadXkNN8+RuF62Jiue3PPw1o4VPs56qPfSEA5HyiFyfMR3m/3u8V7t02O0U1jaM2hN2dOoC8XYqCm64RTxZm4TUwvM2SakM2oNFgIUgWw7gJS2E3ClOiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=FzCF0F3V; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1740651302; c=relaxed/simple;
+	bh=K7VNYRDV1yfJVKgFsqppm610jih+a7OPEQ+mKbsc+N0=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To:Cc; b=JAVycvcyfmyVtATRykQVhBmjD4Un9OdZiOAkFxSwDoU2B1GNZvnQweqHwrp1IiwzixClJmLxnweXPnuWIGQqGqquIB14Z5MvnGiJZ8MrFhoJFF7WiI7om1Aj2oqxHnasOsuSfCjelohRgrdIkcG3hNWyc5asZCmfH1rZynIHjak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=dTTXozfv; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="FzCF0F3V"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="dTTXozfv"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=Cc:To:Subject:From:Message-Id:Date:Sender:Reply-To:MIME-Version
-	:Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=OUqLYkxIvjh8nd/Otc2gCbSQQSabj9ja5wdytCsUyy0=; b=FzCF0F3VkiTI7GKWP8/By1xmYm
-	q7DsAsg62J5VmZhDPgb0zva7wCk946gvO8G7ehHK+dkIcZmutxxL1A2f+iJv6kgzVdkCEIXNpDSPq
-	InKsoh1uUnc4KmecQj00o88JLxQSoIHvcSHoGaZ53YYVJ+W7j8n7llORnOs5KtzoSLbHs0PQCuNhH
-	gCL0Ng9Uita9OJ0Wl1mgVzAwu6912uQ5FuRYd93968ME+wp0kvbE8QN3uXu4eM1FkxHHrbfaUp6Af
-	9UF4grimvhlm5LEzxnmQ6HHjjNu4F426KBbo74sH/IXm5VLeCYIzKiq0lSjTa1Yh2FW4v9cC0/u2K
-	zU4eCwUA==;
+	s=formenos; h=Cc:To:Subject:From:References:In-Reply-To:Message-Id:Date:
+	Sender:Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=B0mE1hvDwybCOi8Ma7SncwsCTkexIE9OZoKz2lEpXNE=; b=dTTXozfvVo/hJt1WOaRBEC3ouX
+	lqowE/dGvjahetzBhkorXNlmG//rfv/fUaxwOgjcg8clQPZBqs+/m+5/i1PCqQYnvPUGtL4oPi1e3
+	JQJF+4/Z5RfUzxOoN6ihJZrfe3cppEbpToVSRGkFvPU4jLvtdQYvWa0Uz75B9YH/Eic0wVqA9lt1r
+	2FanPtFLMIK6B2e12+dtkq4ah3sK4phQfNrZvGghq/QbpuRHguDdsA3fGPDxZL5Ey7Ja/c/CsAY83
+	a17cAj0AS4spz8/cIssGRzF/mOWpfwXYjk/ngmwWTgMpOd2SJOBgvoDBzM4/QsjEOZh2E0OZ+uhX+
+	jxRUidLA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tnaur-002DqT-1G;
-	Thu, 27 Feb 2025 18:14:54 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 27 Feb 2025 18:14:53 +0800
-Date: Thu, 27 Feb 2025 18:14:53 +0800
-Message-Id: <cover.1740651138.git.herbert@gondor.apana.org.au>
+	id 1tnaut-002Dqc-2J;
+	Thu, 27 Feb 2025 18:14:56 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 27 Feb 2025 18:14:55 +0800
+Date: Thu, 27 Feb 2025 18:14:55 +0800
+Message-Id: <aa2a2230a135b79b6f128d3a8beb21b49800e812.1740651138.git.herbert@gondor.apana.org.au>
+In-Reply-To: <cover.1740651138.git.herbert@gondor.apana.org.au>
+References: <cover.1740651138.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 0/7] crypto: acomp - Add request chaining and virtual address support
+Subject: [PATCH 1/7] crypto: iaa - Test the correct request flag
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Cc: linux-mm@kvack.org, Yosry Ahmed <yosry.ahmed@linux.dev>
 Precedence: bulk
@@ -44,29 +46,36 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
-This patch series adds reqeust chaining and virtual address support
-to the crypto_acomp interface.  The last patch is a demo of what
-it looks like to the user.  It will not be applied.
+Test the correct flags for the MAY_SLEEP bit.
 
-Herbert Xu (7):
-  crypto: iaa - Test the correct request flag
-  crypto: acomp - Remove acomp request flags
-  crypto: acomp - Add request chaining and virtual addresses
-  crypto: testmgr - Remove NULL dst acomp tests
-  crypto: scomp - Remove support for non-trivial SG lists
-  crypto: scomp - Add chaining and virtual address support
-  mm: zswap: Use acomp virtual address interface
+Fixes: 2ec6761df889 ("crypto: iaa - Add support for deflate-iaa compression algorithm")
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
+ drivers/crypto/intel/iaa/iaa_crypto_main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
- crypto/acompress.c                         | 207 ++++++++++++++++++++-
- crypto/scompress.c                         | 175 ++++++-----------
- crypto/testmgr.c                           |  29 ---
- drivers/crypto/intel/iaa/iaa_crypto_main.c |   4 +-
- include/crypto/acompress.h                 |  95 +++++++---
- include/crypto/internal/acompress.h        |  22 +++
- include/crypto/internal/scompress.h        |   2 -
- mm/zswap.c                                 |  23 +--
- 8 files changed, 365 insertions(+), 192 deletions(-)
-
+diff --git a/drivers/crypto/intel/iaa/iaa_crypto_main.c b/drivers/crypto/intel/iaa/iaa_crypto_main.c
+index c3776b0de51d..990ea46955bb 100644
+--- a/drivers/crypto/intel/iaa/iaa_crypto_main.c
++++ b/drivers/crypto/intel/iaa/iaa_crypto_main.c
+@@ -1537,7 +1537,7 @@ static int iaa_comp_acompress(struct acomp_req *req)
+ 	iaa_wq = idxd_wq_get_private(wq);
+ 
+ 	if (!req->dst) {
+-		gfp_t flags = req->flags & CRYPTO_TFM_REQ_MAY_SLEEP ? GFP_KERNEL : GFP_ATOMIC;
++		gfp_t flags = req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP ? GFP_KERNEL : GFP_ATOMIC;
+ 
+ 		/* incompressible data will always be < 2 * slen */
+ 		req->dlen = 2 * req->slen;
+@@ -1619,7 +1619,7 @@ static int iaa_comp_acompress(struct acomp_req *req)
+ 
+ static int iaa_comp_adecompress_alloc_dest(struct acomp_req *req)
+ {
+-	gfp_t flags = req->flags & CRYPTO_TFM_REQ_MAY_SLEEP ?
++	gfp_t flags = req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP ?
+ 		GFP_KERNEL : GFP_ATOMIC;
+ 	struct crypto_tfm *tfm = req->base.tfm;
+ 	dma_addr_t src_addr, dst_addr;
 -- 
 2.39.5
 
