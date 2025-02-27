@@ -1,124 +1,114 @@
-Received: from mail-wr1-f73.google.com (mail-wr1-f73.google.com [209.85.221.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pv50p00im-ztdg10022001.me.com (pv50p00im-ztdg10022001.me.com [17.58.6.58])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 554A627003F
-	for <linux-crypto@vger.kernel.org>; Thu, 27 Feb 2025 12:33:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D122B22CBF5
+	for <linux-crypto@vger.kernel.org>; Thu, 27 Feb 2025 12:48:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.58
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740659625; cv=none; b=ZO3HLrOJgSLlWPD2NtJgfLtPNFhbiJe4+ViuufvH86btsi4av9sYhYz4QkhzWZlqwsnK1JHCTk5fF/JA74X23PQbe5BENXa3ixtUmLVvtryDT/mW0CBon5KWY2ocba1/PFhGB+MuUepO4VY/orAHPomt0fYOLdZUIn4T8Eq1bvw=
+	t=1740660525; cv=none; b=e45o0I3YrYcLqPCbHzpym7V1lMhDuSihQ0TbLyGtoe6kTVjztxvw8h5YQiGcNJ1Ws8Z3FkuNFvJ++GqCJOiEPZpzWN2dP3lJTyPLukHl8rYM1hklMEGeFLku8zkba4ik07LB0G4JSgkFatte/+MaH5nZX7PSk9oJKB49E+VJHFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740659625; c=relaxed/simple;
-	bh=EdLDjkeSr54IWa5pKDb8TuhcBJrbeBl8E6TTNThf/QE=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=KJ0t4m0SuAG4CNbVVkV6l37jViRcz4QFr5O0rXuTfqeLN2AIQu9pq8w1rx7izZvYZStNvpPVJmy3SyJ2cOYYOdLMsFXGsYnfYnUPM2iHlaLwwSyhDrhUeS+LUYekMqWTh0fgDJkx+m1zOMJkCmV7yWDx8qRRjCCspEQLb1SqiEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DC+DrI4j; arc=none smtp.client-ip=209.85.221.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com
+	s=arc-20240116; t=1740660525; c=relaxed/simple;
+	bh=yX9IP9tWJLI9/Byl8rHeAtn/q4pN2nne6lrg8q8ydYA=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=oyzYrSYF6mpnxiThWWFSb1emRFLr98T9uPqIupeiZxjnnErR8ljVmXLbvNfiAhKGV/AEpfKuR2mNTqm32i9nnDTyBSzhXIWnYwDcz5cV9nKGOCsBxwE9PI4aoYVCoG6oPmJxxd9igKVTMwvcexih7w6DpUgc/YGpkQ0Kpz0jpCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=GLbbhl50; arc=none smtp.client-ip=17.58.6.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DC+DrI4j"
-Received: by mail-wr1-f73.google.com with SMTP id ffacd0b85a97d-38f4e47d0b2so366182f8f.2
-        for <linux-crypto@vger.kernel.org>; Thu, 27 Feb 2025 04:33:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740659621; x=1741264421; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=1YZ7z55/PPSZi/CSu9v5KnREgk6+KNnZT6kxrAUgPpQ=;
-        b=DC+DrI4jqFc/AzryCWDAsu52QHstQQxrccRY7GkgolRWH8O4Rb/UD9huIKjFle2KC3
-         A22mJSpHDlggYdfFDvZ0Fnzww9ShAP6c5TuAcwOVG61/NXtp45UwYX5rZasHk3V6kvVO
-         x5TV5DEXNmvealk8OsRn31Dw+QmYw3vnNRY3byv4OqQbHGMA/3knhCalqsYVUsb/HteM
-         IeLjuLES4uNwPXppmrlZ45qAwE9SU0fMBxgyyeD5D55zJPXtG/3i0jpMAqpfqLI7z8mp
-         Rr5foMlhXgf0arARW7BL3lciKbqls4/qHDfEbQaoM/4xF4vaMVIm9D5giaTFI3/awskx
-         MW1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740659621; x=1741264421;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1YZ7z55/PPSZi/CSu9v5KnREgk6+KNnZT6kxrAUgPpQ=;
-        b=w9Kg/MPHkLupJtKhz+iAoBDp5YKEVMY71h5mWG4gKHsw9rs6qNeL2x6fZe8/Z3BEzp
-         L5NEFT8e1fKiHe0WpAddOkVxLW3lar9nLz2Wd7KT3IIlxaIAgdgGajdFCEhLwjwuAxML
-         9bw2FBkP94Da4+84KKIFfSNraJa1P8HUY9ysjzEgISJXgB3HFWzb9hAujUSbeX84Zv8q
-         lyPHH7TXHrD463WsIsSMBZ7A01BLwmqH+3UaZOBdZ+4XLQLofQ+X2NNZsN5L6fhws70j
-         LeAnT7+XmpBm3ve8BjcBMFU2rR5jWfWnV14w13Bm1Uh5l5syZ9Gue8UITmCQVzLIkgEQ
-         +n4A==
-X-Gm-Message-State: AOJu0YwcVVJARnNEnrL64di1a3EYWiiWd2piDfM25szeTY0xdrm+xDXr
-	6TiQ9fA9ko7M47Rx1gOVSpGLilAnAWjMX+/qcsbURp4TZTexO2WxPJ3Qdef/lDmCBY7/phY5tg5
-	og6BMT3AUN+feq4tpoJjq28u493O6ZyGd4PlbgYby1s30BJeBLs9n4HsW19UjxI1Otb++wvN97D
-	lloif8jhE+yyNZkv1Yov/TA1X6ASb1Gw==
-X-Google-Smtp-Source: AGHT+IHupwJTmB9Ch9XG+DJU0fl1g/wMPBjVQf4rJuby5bJtQM/3o3mPObYTMbKCQZNK+4FWtf1IV560
-X-Received: from wmbbh16.prod.google.com ([2002:a05:600c:3d10:b0:439:80fc:8bce])
- (user=ardb job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:1843:b0:38d:e078:43a0
- with SMTP id ffacd0b85a97d-390d4f84922mr7850556f8f.38.1740659621742; Thu, 27
- Feb 2025 04:33:41 -0800 (PST)
-Date: Thu, 27 Feb 2025 13:33:38 +0100
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="GLbbhl50"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
+	s=1a1hai; bh=3a4gDmWNcm/PN/PkyXMAH7J982HJ/SWLRPrRdcNbL0I=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Content-Type:x-icloud-hme;
+	b=GLbbhl50/6s4XSz2hWsI2pBZw9mNkyoy4mfVS3ceyWFxtT2IXAgPw4vR2c4niyC8z
+	 Cn2HmQiD1m50m37YfMI08jjxHRfhEn42+FHcXSScomZlHKDtu+Wp54dOblB3imAZgA
+	 8Sh5FnBSf63pOv7KKwz4PnuK53+FcygvCr7GQVeYyjKkuNNU3G7hg7+mVfYTDQsuYn
+	 V/LofsjZFEnKZpfyRxF2x9XD81VAonZ5IWIEsKoP+zCePc8L+vIyjsVPd78Yr1B3dG
+	 y7y+n4035LJBFthLQyoBxgdJQehrL+qDmYWtQI5x+p4yNMchSmlhXEXKe5LinKs/Im
+	 ZmDofqUPOnkdw==
+Received: from [192.168.1.26] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
+	by pv50p00im-ztdg10022001.me.com (Postfix) with ESMTPSA id 9DDEC3E1E07;
+	Thu, 27 Feb 2025 12:48:23 +0000 (UTC)
+Message-ID: <46d17d84-5298-4460-96b0-9c62672167a0@icloud.com>
+Date: Thu, 27 Feb 2025 20:48:19 +0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.48.1.658.g4767266eb4-goog
-Message-ID: <20250227123338.3033402-1-ardb+git@google.com>
-Subject: [PATCH] crypto: lib/chachapoly - Drop dependency on CRYPTO_ALGAPI
-From: Ard Biesheuvel <ardb+git@google.com>
-To: linux-crypto@vger.kernel.org
-Cc: herbert@gondor.apana.org.au, Ard Biesheuvel <ardb@kernel.org>, 
-	Arnd Bergmann <arnd@arndb.de>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+From: Zijun Hu <zijun_hu@icloud.com>
+Subject: Re: [PATCH *-next 00/18] Remove weird and needless 'return' for void
+ APIs
+To: Zijun Hu <quic_zijuhu@quicinc.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Will Deacon <will@kernel.org>, "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
+ Andrew Morton <akpm@linux-foundation.org>, Nick Piggin <npiggin@gmail.com>,
+ Peter Zijlstra <peterz@infradead.org>, Arnd Bergmann <arnd@arndb.de>,
+ Thomas Gleixner <tglx@linutronix.de>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ "David S. Miller" <davem@davemloft.net>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
+ Jiri Pirko <jiri@resnulli.us>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Leon Romanovsky <leon@kernel.org>, Linus Walleij <linus.walleij@linaro.org>,
+ Bartosz Golaszewski <brgl@bgdev.pl>, Lee Jones <lee@kernel.org>,
+ Thomas Graf <tgraf@suug.ch>, Christoph Hellwig <hch@lst.de>,
+ Marek Szyprowski <m.szyprowski@samsung.com>,
+ Robin Murphy <robin.murphy@arm.com>,
+ Miquel Raynal <miquel.raynal@bootlin.com>,
+ Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>
+Cc: linux-arch@vger.kernel.org, linux-mm@kvack.org,
+ linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+ netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-gpio@vger.kernel.org,
+ linux-pm@vger.kernel.org, iommu@lists.linux.dev,
+ linux-mtd@lists.infradead.org
+References: <20250221-rmv_return-v1-0-cc8dff275827@quicinc.com>
+Content-Language: en-US
+In-Reply-To: <20250221-rmv_return-v1-0-cc8dff275827@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-GUID: dWcj_ItTiibsX6WGOwhQtepLygIMQOy8
+X-Proofpoint-ORIG-GUID: dWcj_ItTiibsX6WGOwhQtepLygIMQOy8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-27_06,2025-02-27_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 phishscore=0 bulkscore=0
+ clxscore=1015 malwarescore=0 adultscore=0 mlxlogscore=999 mlxscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2411120000 definitions=main-2502270097
 
-From: Ard Biesheuvel <ardb@kernel.org>
+On 2025/2/21 21:02, Zijun Hu wrote:
+> void api_func_a(...);
+> 
+> static inline void api_func_b(...)
+> {
+> 	return api_func_a(...);
+> }
 
-The ChaCha20-Poly1305 library code uses the sg_miter API to process
-input presented via scatterlists, except for the special case where the
-digest buffer is not covered entirely by the same scatterlist entry as
-the last byte of input. In that case, it uses scatterwalk_map_and_copy()
-to access the memory in the input scatterlist where the digest is stored.
+The Usage : Return void function in void function
 
-This results in a dependency on crypto/scatterwalk.c and therefore on
-CONFIG_CRYPTO_ALGAPI, which is unnecessary, as the sg_miter API already
-provides this functionality via sg_copy_to_buffer(). So use that
-instead, and drop the CRYPTO_ALGAPI dependency.
+IMO, perhaps, the usage is not good since:
 
-Reported-by: Arnd Bergmann <arnd@arndb.de>
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
----
- lib/crypto/Kconfig            | 1 -
- lib/crypto/chacha20poly1305.c | 5 ++---
- 2 files changed, 2 insertions(+), 4 deletions(-)
+A) STD C does not like the usage, and i find GCC has no description
+about the usage.
+   C11/C17: 6.8.6.4 The return statement
+   "A return statement with an expression shall not appear in a
+function whose return type is void"
 
-diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
-index b01253cac70a..a759e6f6a939 100644
---- a/lib/crypto/Kconfig
-+++ b/lib/crypto/Kconfig
-@@ -135,7 +135,6 @@ config CRYPTO_LIB_CHACHA20POLY1305
- 	depends on CRYPTO
- 	select CRYPTO_LIB_CHACHA
- 	select CRYPTO_LIB_POLY1305
--	select CRYPTO_ALGAPI
- 
- config CRYPTO_LIB_SHA1
- 	tristate
-diff --git a/lib/crypto/chacha20poly1305.c b/lib/crypto/chacha20poly1305.c
-index a839c0ac60b2..280a4925dd17 100644
---- a/lib/crypto/chacha20poly1305.c
-+++ b/lib/crypto/chacha20poly1305.c
-@@ -11,7 +11,6 @@
- #include <crypto/chacha20poly1305.h>
- #include <crypto/chacha.h>
- #include <crypto/poly1305.h>
--#include <crypto/scatterwalk.h>
- 
- #include <linux/unaligned.h>
- #include <linux/kernel.h>
-@@ -318,8 +317,8 @@ bool chacha20poly1305_crypt_sg_inplace(struct scatterlist *src,
- 
- 	if (unlikely(sl > -POLY1305_DIGEST_SIZE)) {
- 		poly1305_final(&poly1305_state, b.mac[1]);
--		scatterwalk_map_and_copy(b.mac[encrypt], src, src_len,
--					 sizeof(b.mac[1]), encrypt);
-+		sg_copy_buffer(src, sg_nents(src), b.mac[encrypt],
-+			       sizeof(b.mac[1]), src_len, !encrypt);
- 		ret = encrypt ||
- 		      !crypto_memneq(b.mac[0], b.mac[1], POLY1305_DIGEST_SIZE);
- 	}
--- 
-2.48.1.711.g2feabab25a-goog
+B) According to discussion, the usage have function that return type
+   of the callee api_func_a() is monitored. but this function has below
+shortcoming as well:
 
+the monitor is not needed if the caller api_func_b() is in the same
+module with the callee api_func_a(), otherwise, provided the callee is
+a API and provided by author of other module. the author needs to clean
+up lot of usages of the API if he/she changes the API's return type from
+void to any other type, so it is not nice to API provider.
+
+C) perhaps, most ordinary developers don't known the function mentioned
+   by B), and also feel strange for the usage
