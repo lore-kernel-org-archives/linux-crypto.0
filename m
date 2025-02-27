@@ -1,70 +1,137 @@
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFA21271277
-	for <linux-crypto@vger.kernel.org>; Thu, 27 Feb 2025 21:44:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7E43272901
+	for <linux-crypto@vger.kernel.org>; Thu, 27 Feb 2025 22:22:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740692646; cv=none; b=tJddYcZZcvGcU0HhsJV4z9OhlHVXg4HAKvqJwo57guN/3GDDLuihHy4lIIXUyeBG958NjLbYuXLUkPmEQpgStJXOxFx9VmvzC/KCnm8nFjpt4ehiCFKN487u3a3fXPP45lBz9KNOezgII7FVwz9jlbw8Gx+2FSgdjsz6nY3hD4s=
+	t=1740694955; cv=none; b=sHwOHqGzNVuss3xT9p+sMFrzsgefYriwTPp/zp0rs7Zpwk/EJS9guhJjiaivhxhe89uCZMGeeCL4X2tO+l9yZ6sa+HWWS16OeeP6RRWNbHMlEGZVm260A86Cj6ssim4qw9tE9kH7N3OHQi8gUMGMzn6+CzsLEdieYsIG6JD+Qew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740692646; c=relaxed/simple;
-	bh=/5Y+LBE7DbFotVpy4NBgQuM8l1BqDrgKvNToULil20I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sWo7YwpvVP8idScFgtaq5JgqWmhg7wjdSc4eHA5QatuuK3zu+sT4HZ82k/cO1guR+s3fW7IpJ1Q/uZmSQ2BDPcS26+YrijbDxbPXuGHF2kk/1XGC99rHWerwtCnIrkzhDOCcTIGtbwHLP1uX3D8XCRRPmPgL1eBkglxX9zwDJx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pF3jnskV; arc=none smtp.client-ip=95.215.58.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1740694955; c=relaxed/simple;
+	bh=Le3t4kyiotBAGEeTNlkwGJJUb6SlwUJPq/9Ayw35DTE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GLSabvQDoUD0TB5tPoouEiVkEsD6SA8tWWm3fYPLx8pQsSTp0yji0fmHQA30Ia5I+vY65FK0QCnO7ufUCETI9RzysXK2+hkVNsSc8o082xA5TQuqUqVaqoswhOodhYoIUEJAUCMaGNZ15aNpi5yRzOlNfQSADrimjt+QNhAKVxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=On8udIuW; arc=none smtp.client-ip=209.85.128.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pF3jnskV"
-Date: Thu, 27 Feb 2025 21:43:52 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1740692639;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=R3J/jMHXhUSZzVKv3voPrDtYcA94hPCQdrj69IWAc58=;
-	b=pF3jnskVNlupMHwT1GaoMwwvwrdHsBCXLLiVSV7eohPN0OG6HXf07ruESq4ZkqQ3p8fhoi
-	QQ3SLdMZRhU5RrTDEp578wvwt8XWUYSR20NqlMBRuN/3WesC1mxhHmfuZpUnxTN/2GsAR5
-	rz2qe4/W5LxlXq/LOaEBPZA8DrNrhqA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yosry Ahmed <yosry.ahmed@linux.dev>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	linux-mm@kvack.org
-Subject: Re: [RFC PATCH 7/7] mm: zswap: Use acomp virtual address interface
-Message-ID: <Z8DcmK4eECXp3aws@google.com>
-References: <cover.1740651138.git.herbert@gondor.apana.org.au>
- <153c340a52090f2ff82f8f066203186a932d3f99.1740651138.git.herbert@gondor.apana.org.au>
- <Z8CquB-BZrP5JFYg@google.com>
- <20250227183847.GB1613@sol.localdomain>
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="On8udIuW"
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-6f47ed1f40dso11516747b3.1
+        for <linux-crypto@vger.kernel.org>; Thu, 27 Feb 2025 14:22:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1740694953; x=1741299753; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ScakE+ivXVszoVLy+xVwqAkmsKVwP1/+ubR/2bsYhJk=;
+        b=On8udIuWbca6dQrFAq6FYI9z1Rs+p3fyKu5wcC7uJ6XcJyM4o6VP2km9c3pkTD3cTP
+         722I+VKEQtfPHd1MJlkEPa+4iJ4c0JbrMEa5f7ojlzB/DAotMlRJ5J+atJZCPqyx5ACM
+         /pVS6qXjVHQ8IOuNEmA75zGVS6hD1Qy80pxvKkTquK1q7mtOXo/5BIJVD2xkY78i5gDr
+         8MzlxWWjG5q5lDZG5wkL+94XpEhKVh++Lx2j31iAg934zMXNXwQEJOl7WVyERRfbRXov
+         I5G+NURaWU0MHbRFlzheUtF+iZGWOrOJlpoXhuMlE7HAJusnJUeS+pCEiXWkngqyTza/
+         TyEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740694953; x=1741299753;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ScakE+ivXVszoVLy+xVwqAkmsKVwP1/+ubR/2bsYhJk=;
+        b=Wp630SdzxUTHVRzUmQ8dynA5c1JJJxklJzKjo5LHNunJWcrE/ZWLDL2z8iH6BnL4V1
+         ELenEas7rJwt43ULWzNrRuQYnqZfCHfgx4Mh5A7mgxgzhhsYze/bYmO+N+vg1zwRCeYE
+         S6sJ4RlS3rDm5nzWq1UKyIh/JFGil0VJMaJFfYEn7CC0bpw+noqHYdKtuIa19COTfhbZ
+         nsbbGsPDfB0S8nJg0eYTtF+xCFyBQmRcbXu4He7ylXnKOMIb0q68EH3/HUjRlOSSgHPb
+         qSriWHfovwB3RbSIdNGRxKf93uFnO+CoP777hy+DAvAvrt7fenRkCWI9I47JiKJy18RC
+         mnnw==
+X-Forwarded-Encrypted: i=1; AJvYcCWL7gb77LWGgttomFTO2cYoo7/xMseCds+0VZSny9dxsTCGHMOog7pU11TfhWy1D2eUnQSA1nM2K088qXQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzsVbYCTQLcu5fD50mcN/pYR8eKgwua4RkAfp7TtNJAxkq7htnu
+	ahMRi+rSkG/P17n2KCRCGfMpw5vn+V9kCDCxwCZ3WffisiVIWmR7xLM/4DfjDJ2zJUBe6T9DEk3
+	XykTf8hMBQISIhTdGQ9SApjz3PXNbnnWI6ASo
+X-Gm-Gg: ASbGncslBqGHsrQl4xVtcXZnAbvCfzMosCaEfnQ5IUbyxyo/YjGG42VQr7cXgqjAobS
+	DPUKy5yIUUh56enGijmVEVdleCiDcSB/dfbVC4sWcDBd7n+pIEVzPzQ/CgYIiZLqHbKOFPA1zRS
+	ec4B0Ilto=
+X-Google-Smtp-Source: AGHT+IGKPvb6uJOvINeQsM+iSOmGVr/Q+rN9nHiUXllkoj79N4+6rGnhZ88M/fTJmoa1TMKM7/1/9ZyZ0+zbdTUHg4o=
+X-Received: by 2002:a05:690c:4b8c:b0:6fd:3f9e:b7d6 with SMTP id
+ 00721157ae682-6fd4a074751mr20138727b3.19.1740694952817; Thu, 27 Feb 2025
+ 14:22:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250227183847.GB1613@sol.localdomain>
-X-Migadu-Flow: FLOW_OUT
+References: <20241017155516.2582369-1-eric.snowberg@oracle.com>
+ <c490397315c2704e9ef65c8ad3fefedb239f1997.camel@linux.ibm.com>
+ <72F52F71-C7F3-402D-8441-3D636A093FE8@oracle.com> <CAHC9VhRHEw5c+drC=aX4xTqWoQJJZ+qkJ7aHUT5dcu+Q5f7BqA@mail.gmail.com>
+ <CAHC9VhSJpnaAK1efgs1Uk0Tr3CaDNR1LiDU-t_yDKDQG6J-74Q@mail.gmail.com>
+ <E20C617B-EA01-4E69-B5E2-31E9AAD6F7A2@oracle.com> <506e8e58e5236a4525b18d84bafa9aae80b24452.camel@linux.ibm.com>
+In-Reply-To: <506e8e58e5236a4525b18d84bafa9aae80b24452.camel@linux.ibm.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Thu, 27 Feb 2025 17:22:22 -0500
+X-Gm-Features: AQ5f1JpGHD9sDTEfCNGPaQVwEKRNBeWrx8Lfv7PT8-K9hixoVfU0bPOCCzjhhe8
+Message-ID: <CAHC9VhTsZntLdGBV7=4suauS+rzSQv1O4UAoGcy2vEB02wRkoA@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 00/13] Clavis LSM
+To: Mimi Zohar <zohar@linux.ibm.com>
+Cc: Eric Snowberg <eric.snowberg@oracle.com>, David Howells <dhowells@redhat.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, 
+	"open list:SECURITY SUBSYSTEM" <linux-security-module@vger.kernel.org>, 
+	David Woodhouse <dwmw2@infradead.org>, 
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>, "davem@davemloft.net" <davem@davemloft.net>, 
+	Ard Biesheuvel <ardb@kernel.org>, James Morris <jmorris@namei.org>, 
+	"Serge E. Hallyn" <serge@hallyn.com>, Roberto Sassu <roberto.sassu@huawei.com>, 
+	Dmitry Kasatkin <dmitry.kasatkin@gmail.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	"casey@schaufler-ca.com" <casey@schaufler-ca.com>, Stefan Berger <stefanb@linux.ibm.com>, 
+	"ebiggers@kernel.org" <ebiggers@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, 
+	open list <linux-kernel@vger.kernel.org>, 
+	"keyrings@vger.kernel.org" <keyrings@vger.kernel.org>, 
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, 
+	"linux-efi@vger.kernel.org" <linux-efi@vger.kernel.org>, 
+	"linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 27, 2025 at 10:38:47AM -0800, Eric Biggers wrote:
-> On Thu, Feb 27, 2025 at 06:11:04PM +0000, Yosry Ahmed wrote:
-> > On Thu, Feb 27, 2025 at 06:15:09PM +0800, Herbert Xu wrote:
-> > > Use the acomp virtual address interface.
-> > > 
-> > > Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> > 
-> > I can't speak to the rest of the series, but I like what this patch is
-> > doing in zswap. Together with the recent zsmalloc changes, we should be
-> > able to drop the alternative memcpy path completely, without needing to
-> > use kmap_to_page() or removing the warning the highmem code.
-> > 
-> > Thanks for doing this!
-> 
-> Well, unfortunately this patchset still uses sg_init_one() on the virtual
-> address, so AFAICS it doesn't work with arbitrary virtual addresses.
+On Thu, Feb 27, 2025 at 3:41=E2=80=AFPM Mimi Zohar <zohar@linux.ibm.com> wr=
+ote:
+> On Mon, 2025-01-06 at 17:15 +0000, Eric Snowberg wrote:
+> > > On Jan 5, 2025, at 8:40=E2=80=AFPM, Paul Moore <paul@paul-moore.com> =
+wrote:
+> > > On Fri, Jan 3, 2025 at 11:48=E2=80=AFPM Paul Moore <paul@paul-moore.c=
+om> wrote:
+> > > >
+> > > > Regardless, back to Clavis ... reading quickly through the cover
+> > > > letter again, I do somewhat wonder if this isn't better integrated
+> > > > into the keyring proper; have you talked to both David and Jarkko
+> > > > about this?
+> > >
+> > > I realize I should probably expand on my thinking a bit, especially
+> > > since my comment a while regarding LSMs dedicated to enforcing access
+> > > control on keys is what was given as a reason for making Clavis a LSM=
+.
+> > >
+> > > I still stand by my comment from over a year ago that I see no reason
+> > > why we couldn't support a LSM that enforces access controls on
+> > > keyrings/keys.  What gives me pause with the Clavis LSM is that so
+> > > much of Clavis is resident in the keyrings themselves, e.g. Clavis
+> > > policy ACLs and authorization keys, that it really feels like it
+> > > should be part of the keys subsystem and not a LSM.  Yes, existing
+> > > LSMs do have LSM specific data that resides outside of the LSM and in
+> > > an object's subsystem, but that is usually limited to security
+> > > identifiers and similar things, not the LSM's security policy.
+>
+> Hi Jarkko, David,
+>
+> Both Paul's and my main concerns with this patch set is storing policy in=
+ the
+> keyring.  We would appreciate your chiming in here about storing key poli=
+cy in
+> the keyring itself.
 
-If we cannot pass in highmem addresses then the problem is not solved.
-Thanks for pointing this out.
+I'd still also like to see some discussion about moving towards the
+addition of keyrings oriented towards usage instead of limiting
+ourselves to keyrings that are oriented on the source of the keys.
+Perhaps I'm missing some important detail which makes this
+impractical, but it seems like an obvious improvement to me and would
+go a long way towards solving some of the problems that we typically
+see with kernel keys.
+
+--=20
+paul-moore.com
