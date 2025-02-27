@@ -1,178 +1,209 @@
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E801A26F465;
-	Thu, 27 Feb 2025 20:41:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FBBA26E96A
+	for <linux-crypto@vger.kernel.org>; Thu, 27 Feb 2025 20:56:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740688919; cv=none; b=R44srOwG/6hGI6MFdizhcfzPUdHT8B4w5FL0Y4MAh5+0VovjHS7HFSlDZLVpNv12RBuZFtBM5ZQRF0KpmMMHpqKHtFxFU2UjTsBwx2HR2njmO2nM178qD8gPeFBo+ZnxdllHWIXz5b2Gmj9wXzFnsUgsTD+/m7GtWr/dTCTYQ14=
+	t=1740689785; cv=none; b=qjnhLhxxqkOtQzyOuI6MOCshTYyPcTu7ck2fsgLPF6nxy2/ENKlGWpk12A4NzDOmZgBkliPU4khBkkcjc8JTBhT1m+p78b1ySWDELk4tqjE19upjaSLof3W5AgkO0/TKZwwFLq7Dl+X61/7ugnlW8zRe9oQrLlfd5c1EHpVetA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740688919; c=relaxed/simple;
-	bh=toTm+VBOYQ59OnGvbnbG9hh7ctRpGyripY+1Kc9tK+0=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=uynv1scFdh1DjZBMjlgPQdk+78gy9OTJKrGo4z1XvXaDU0kZvyG+OvK3xDbSlIcyUJ61mdsx3CH5whly/qi7w7ps4Oo85u2mYHBoQBJEpA8FE7WFwaD3I0sZ8gSROqyoUspL9GzIBYbc/xuQa7ROiOH3yVgbIJ5KUCPDQuEBZj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=GlRhrY3C; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1740689785; c=relaxed/simple;
+	bh=jBzl2J3X4B4GartkmlPP24UWJcRsK01w6K+luSD1Gj0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GTva+ATuL7KtblmJjaAh5P0xlWN2bQtXiuIZ+qPIKmZVHIqjQwjFU7egJF5/GCPN9wp4SEisnZZ4Y6izvg1rY9/Avh7y3aqGBavx71WTBOBtHIISOIb16grTvk5FYpqyl7juowgUnKlPAk1j0AlbsnAo/AeK2ZDBF3QsjgqGPS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GN6JtJsd; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="GlRhrY3C"
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51RJs6lB027755;
-	Thu, 27 Feb 2025 20:41:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=5gf2oW
-	EChCVKSlevRHGAWCIEoWOv/4y51kS80LfNMGo=; b=GlRhrY3ClvIbJpQ+8vn42U
-	Bgq1QaiBUslQJ6QGTlybaFjewOovxoNI2qrtV0DNhz2OV/YeItP8NgVaoXKGkbtw
-	mWK6OGK7Cqz1TPmz3WbW6wPcTHuDPMu8b5g7n7ZUXTajUER1w5gkpJKEAjzePM94
-	GcK04PuLH2YLhT/SO22nD2TmcwX7knx29hCXN9irHwEjKYjWx+SNXuq+kNduynAW
-	gJyXPZpGItpRO4xTQU4OZRNM170m+uzi2SJ5BILYIBV1O0JKImSpxl5QQ+CW3f0K
-	m+zDnSohvPBt1HHoSi8KN3QOFGg7fEZ5PJPp5B11TtUd80FbFnHSzIHoJnOezXNw
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 452e4a5kgu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 27 Feb 2025 20:41:23 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 51RKfNro026549;
-	Thu, 27 Feb 2025 20:41:23 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 452e4a5kgr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 27 Feb 2025 20:41:22 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51RI5BTv012741;
-	Thu, 27 Feb 2025 20:41:21 GMT
-Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 44yrwt32sa-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 27 Feb 2025 20:41:21 +0000
-Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
-	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51RKfLiT32637492
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 27 Feb 2025 20:41:21 GMT
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id F249858053;
-	Thu, 27 Feb 2025 20:41:20 +0000 (GMT)
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 36D6058043;
-	Thu, 27 Feb 2025 20:41:19 +0000 (GMT)
-Received: from li-43857255-d5e6-4659-90f1-fc5cee4750ad.ibm.com (unknown [9.31.103.152])
-	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 27 Feb 2025 20:41:19 +0000 (GMT)
-Message-ID: <506e8e58e5236a4525b18d84bafa9aae80b24452.camel@linux.ibm.com>
-Subject: Re: [RFC PATCH v3 00/13] Clavis LSM
-From: Mimi Zohar <zohar@linux.ibm.com>
-To: Eric Snowberg <eric.snowberg@oracle.com>,
-        Paul Moore
- <paul@paul-moore.com>, David Howells <dhowells@redhat.com>,
-        Jarkko
- Sakkinen <jarkko@kernel.org>
-Cc: "open list:SECURITY SUBSYSTEM" <linux-security-module@vger.kernel.org>,
-        David Woodhouse <dwmw2@infradead.org>,
-        "herbert@gondor.apana.org.au"
- <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net"
- <davem@davemloft.net>,
-        Ard Biesheuvel <ardb@kernel.org>, James Morris
- <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Roberto Sassu
- <roberto.sassu@huawei.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        =?ISO-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
-        "casey@schaufler-ca.com" <casey@schaufler-ca.com>,
-        Stefan Berger
- <stefanb@linux.ibm.com>,
-        "ebiggers@kernel.org" <ebiggers@kernel.org>,
-        Randy
- Dunlap <rdunlap@infradead.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-efi@vger.kernel.org" <linux-efi@vger.kernel.org>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>
-Date: Thu, 27 Feb 2025 15:41:18 -0500
-In-Reply-To: <E20C617B-EA01-4E69-B5E2-31E9AAD6F7A2@oracle.com>
-References: <20241017155516.2582369-1-eric.snowberg@oracle.com>
-	 <c490397315c2704e9ef65c8ad3fefedb239f1997.camel@linux.ibm.com>
-	 <72F52F71-C7F3-402D-8441-3D636A093FE8@oracle.com>
-	 <CAHC9VhRHEw5c+drC=aX4xTqWoQJJZ+qkJ7aHUT5dcu+Q5f7BqA@mail.gmail.com>
-	 <CAHC9VhSJpnaAK1efgs1Uk0Tr3CaDNR1LiDU-t_yDKDQG6J-74Q@mail.gmail.com>
-	 <E20C617B-EA01-4E69-B5E2-31E9AAD6F7A2@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-2.fc40) 
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GN6JtJsd"
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-abf178f4cf1so127700066b.1
+        for <linux-crypto@vger.kernel.org>; Thu, 27 Feb 2025 12:56:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1740689782; x=1741294582; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aNfLsJ5M5Y46Pe7a1sd55cuuZyArFmPaDQMk3VExmOc=;
+        b=GN6JtJsd7bebkrKT2R1y8iMdYQhlc3mQ1NH6dM+dCbLq0WQ2n9j2osE9FO3S7G1A26
+         g3iJYZ3Sl7pkEersURBid7Aj+4YdKl1ejfanlYrVb3LyWhlbA6me5kTbUAdI6ZnrnPX5
+         iPWLbMG6+de9QkG8uItE1hiu7jQaRmxrhWEM2eIBNTFOjXMJTLOqDY7YI5MvZioN1eQ8
+         VaaZj4ZkRN+Bd/+ESTVp2r7fpPAWmJf0VvH5y1TBG8Gg+qRuac3enz3LmPyZZ7YRqA+H
+         6M5g44eNYtJr7xrFZg84l1OnWSVBz7ywuhYAAf/E56YVyEAUyIFHp8rtM0TtkRTLYR2R
+         aKLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740689782; x=1741294582;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aNfLsJ5M5Y46Pe7a1sd55cuuZyArFmPaDQMk3VExmOc=;
+        b=EwakNKItkc9ac1AHdC+DD4cSJRJOQTeeqb2om/kt8O953igIxmDUe3cEDGo8dl/oeF
+         S0/DHGti2UCy+akNqaB7hsQhkO+CLJiskvdLBRcUOwvZ3tWEnoH1dvVKL1JampMH9RoK
+         PLB+Iy83+Qb90+TufHaRoWeGnodHjUFXzelR2O2GaoOm+HQYRH31tp5ZJUDwSmcSolpL
+         3M4N+WR9K6Qed5n4VYq/LMjnH47YfNw7Zr73QxtUp3dgqvph7BctYJdX2D2f+mxXm4QN
+         eT2us4Qx/XB6BG8393b2sNM1PdvKEiS2do9XJnkDXZdYNE86qYMrifJQvnCmix+Sfskr
+         IZHw==
+X-Forwarded-Encrypted: i=1; AJvYcCV3551W6JDcwca6oECvg9CLEXeAcEfPF/ksPZy6isLjhZtjwDkav/kZ5ippYbSjkvtAJzx7Kpy8FD0W3BQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4npFqDxVl08T0sA28K821h1p0mjT7lHjcmn5vOQr7VhbPunUW
+	E0i6n/CkFx14dBhOI9C9TMKlU+qsYnYNmpGY1wq/2bNkLH0hxHMuCLrvuWRqiv6X14QsH38042b
+	VXwSwVnFuz0awqrp5ISco9qIXXTIrxduBaMM=
+X-Gm-Gg: ASbGncvUhpOPzGMQbGRfF8QUcpVzmZy5kebU2IJAA+C+ENOudX2WEottbO0C6HdKCdl
+	6sHytrXJvdTDHy6q2Wmtw1kVUoYqAyjueEKpfU2/xHrNboy7R1Sr/x4ecMyoHD+P51gMTTtG4Z0
+	YM99ya
+X-Google-Smtp-Source: AGHT+IHk5c57x/1P/u8YmnoLziTvu7e5VlZk0I6I5E3FRkSAuORsqywFgx8cMDueTEhgLiA7uQm4XpQbmgxjR0DQ3f4=
+X-Received: by 2002:a17:906:d542:b0:abb:e7b0:5442 with SMTP id
+ a640c23a62f3a-abf2656040dmr96674466b.26.1740689781707; Thu, 27 Feb 2025
+ 12:56:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: qFjwsqYvnSasWmeKwDVF9xETelCqQs7K
-X-Proofpoint-GUID: h6W6984XJjO07a7_N3AGcB_gqnHG76Tk
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-27_07,2025-02-27_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- suspectscore=0 phishscore=0 mlxlogscore=992 spamscore=0 adultscore=0
- clxscore=1015 priorityscore=1501 bulkscore=0 impostorscore=0
- malwarescore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2502100000 definitions=main-2502270152
+References: <CAGG=3QVi27WRYVxmsk9+HLpJw9ZJrpfLjU8G4exuXm-vUA-KqQ@mail.gmail.com>
+ <20250227062859.GA2506@sol.localdomain> <68F134A3-5371-4E74-9942-2BC66984C18A@zytor.com>
+ <CAGG=3QX2WX5U-uNp3VWSbQCN9fPVAirOBn5KcaWn8m-87RhWfg@mail.gmail.com>
+In-Reply-To: <CAGG=3QX2WX5U-uNp3VWSbQCN9fPVAirOBn5KcaWn8m-87RhWfg@mail.gmail.com>
+From: Bill Wendling <morbo@google.com>
+Date: Thu, 27 Feb 2025 12:56:05 -0800
+X-Gm-Features: AQ5f1JoI25GyQvAEVKfSMmNTlt_ej9Rh4DM5IVbp89PFTHlpQT8k9zCeJA-W2l4
+Message-ID: <CAGG=3QW4jo9RKtVxD2b3ZBjPhnAUYeUf_GPVh13e7gZkLFtuUQ@mail.gmail.com>
+Subject: Re: [PATCH] x86/crc32: use builtins to improve code generation
+To: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Eric Biggers <ebiggers@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, 
+	"maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>, Ard Biesheuvel <ardb@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, Justin Stitt <justinstitt@google.com>, 
+	LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org, 
+	clang-built-linux <llvm@lists.linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2025-01-06 at 17:15 +0000, Eric Snowberg wrote:
->=20
-> > On Jan 5, 2025, at 8:40=E2=80=AFPM, Paul Moore <paul@paul-moore.com> wr=
+On Thu, Feb 27, 2025 at 4:17=E2=80=AFAM Bill Wendling <morbo@google.com> wr=
 ote:
-> >=20
-> > On Fri, Jan 3, 2025 at 11:48=E2=80=AFPM Paul Moore <paul@paul-moore.com=
+> On Thu, Feb 27, 2025 at 2:53=E2=80=AFAM H. Peter Anvin <hpa@zytor.com> wr=
+ote:
+> > On February 26, 2025 10:28:59 PM PST, Eric Biggers <ebiggers@kernel.org=
 > wrote:
-> > >=20
-> > > Regardless, back to Clavis ... reading quickly through the cover
-> > > letter again, I do somewhat wonder if this isn't better integrated
-> > > into the keyring proper; have you talked to both David and Jarkko
-> > > about this?
-> >=20
-> > I realize I should probably expand on my thinking a bit, especially
-> > since my comment a while regarding LSMs dedicated to enforcing access
-> > control on keys is what was given as a reason for making Clavis a LSM.
-> >=20
-> > I still stand by my comment from over a year ago that I see no reason
-> > why we couldn't support a LSM that enforces access controls on
-> > keyrings/keys.  What gives me pause with the Clavis LSM is that so
-> > much of Clavis is resident in the keyrings themselves, e.g. Clavis
-> > policy ACLs and authorization keys, that it really feels like it
-> > should be part of the keys subsystem and not a LSM.  Yes, existing
-> > LSMs do have LSM specific data that resides outside of the LSM and in
-> > an object's subsystem, but that is usually limited to security
-> > identifiers and similar things, not the LSM's security policy.
+> > >On Wed, Feb 26, 2025 at 10:12:47PM -0800, Bill Wendling wrote:
+> > >> For both gcc and clang, crc32 builtins generate better code than the
+> > >> inline asm. GCC improves, removing unneeded "mov" instructions. Clan=
+g
+> > >> does the same and unrolls the loops. GCC has no changes on i386, but
+> > >> Clang's code generation is vastly improved, due to Clang's "rm"
+> > >> constraint issue.
+> > >>
+> > >> The number of cycles improved by ~0.1% for GCC and ~1% for Clang, wh=
+ich
+> > >> is expected because of the "rm" issue. However, Clang's performance =
+is
+> > >> better than GCC's by ~1.5%, most likely due to loop unrolling.
+> > >>
+> > >> Link: https://github.com/llvm/llvm-project/issues/20571#issuecomment=
+-2649330009
+> > >> Cc: Thomas Gleixner <tglx@linutronix.de>
+> > >> Cc: Ingo Molnar <mingo@redhat.com>
+> > >> Cc: Borislav Petkov <bp@alien8.de>
+> > >> Cc: Dave Hansen <dave.hansen@linux.intel.com>
+> > >> Cc: x86@kernel.org
+> > >> Cc: "H. Peter Anvin" <hpa@zytor.com>
+> > >> Cc: Eric Biggers <ebiggers@kernel.org>
+> > >> Cc: Ard Biesheuvel <ardb@kernel.org>
+> > >> Cc: Nathan Chancellor <nathan@kernel.org>
+> > >> Cc: Nick Desaulniers <nick.desaulniers+lkml@gmail.com>
+> > >> Cc: Justin Stitt <justinstitt@google.com>
+> > >> Cc: linux-kernel@vger.kernel.org
+> > >> Cc: linux-crypto@vger.kernel.org
+> > >> Cc: llvm@lists.linux.dev
+> > >> Signed-off-by: Bill Wendling <morbo@google.com>
+> > >> ---
+> > >>  arch/x86/Makefile         | 3 +++
+> > >>  arch/x86/lib/crc32-glue.c | 8 ++++----
+> > >>  2 files changed, 7 insertions(+), 4 deletions(-)
+> > >
+> > >Thanks!  A couple concerns, though:
+> > >
+> > >> diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+> > >> index 5b773b34768d..241436da1473 100644
+> > >> --- a/arch/x86/Makefile
+> > >> +++ b/arch/x86/Makefile
+> > >> @@ -114,6 +114,9 @@ else
+> > >>  KBUILD_CFLAGS +=3D $(call cc-option,-fcf-protection=3Dnone)
+> > >>  endif
+> > >>
+> > >> +# Enables the use of CRC32 builtins.
+> > >> +KBUILD_CFLAGS +=3D -mcrc32
+> > >
+> > >Doesn't this technically allow the compiler to insert CRC32 instructio=
+ns
+> > >anywhere in arch/x86/ without the needed runtime CPU feature check?  N=
+ormally
+> > >when using intrinsics it's necessary to limit the scope of the feature
+> > >enablement to match the runtime CPU feature check that is done, e.g. b=
+y using
+> > >the target function attribute.
+> > >
+> > >> diff --git a/arch/x86/lib/crc32-glue.c b/arch/x86/lib/crc32-glue.c
+> > >> index 2dd18a886ded..fdb94bff25f4 100644
+> > >> --- a/arch/x86/lib/crc32-glue.c
+> > >> +++ b/arch/x86/lib/crc32-glue.c
+> > >> @@ -48,9 +48,9 @@ u32 crc32_le_arch(u32 crc, const u8 *p, size_t len=
+)
+> > >>  EXPORT_SYMBOL(crc32_le_arch);
+> > >>
+> > >>  #ifdef CONFIG_X86_64
+> > >> -#define CRC32_INST "crc32q %1, %q0"
+> > >> +#define CRC32_INST __builtin_ia32_crc32di
+> > >>  #else
+> > >> -#define CRC32_INST "crc32l %1, %0"
+> > >> +#define CRC32_INST __builtin_ia32_crc32si
+> > >>  #endif
+> > >
+> > >Do both gcc and clang consider these builtins to be a stable API, or d=
+o they
+> > >only guarantee the stability of _mm_crc32_*() from immintrin.h?  At le=
+ast for
+> > >the rest of the SSE and AVX stuff, I thought that only the immintrin.h=
+ functions
+> > >are actually considered stable.
+> > >
+> > >- Eric
+> >
+> > There is that... also are there compiler versions that we support that =
+do not have -mcrc32 support?
+> >
+> Checking GCC 5.1.0 and Clang 13.0.1, it seems that both support '-mcrc32'=
+.
+>
+I just checked and GCC 5.1.0 doesn't appear to be able to compile the
+kernel anymore, at least not with "defconfig". It doesn't have
+retpoline support for one and then can't compile lib/zstd:
 
-Hi Jarkko, David,
+lib/zstd/decompress/zstd_decompress_block.c: In function
+=E2=80=98ZSTD_decompressSequences_default=E2=80=99:
+lib/zstd/decompress/zstd_decompress_block.c:1539:1: error: inlining
+failed in call to always_inline =E2=80=98ZSTD_decompressSequences_body=E2=
+=80=99:
+optimization level attribute mismatch
+ ZSTD_decompressSequences_body(ZSTD_DCtx* dctx,
+ ^
+lib/zstd/decompress/zstd_decompress_block.c:1633:12: error: called from her=
+e
+     return ZSTD_decompressSequences_body(dctx, dst, maxDstSize,
+seqStart, seqSize, nbSeq, isLongOffset, frame);
+            ^
 
-Both Paul's and my main concerns with this patch set is storing policy in t=
-he
-keyring.  We would appreciate your chiming in here about storing key policy=
- in
-the keyring itself.
+GCC 6.1.0 gets further, but also doesn't have retpoline support. Maybe
+the minimal version should be changed?
 
-thanks,
+Anyway, GCC 5.1.0 doesn't support
+__attribute__((__target__("crc32"))), so I'd have to use the flag. I
+know I can conditionally add the flag with:
 
-Mimi
+CFLAGS_crc32-glue.o :=3D -mcrc32
 
-> >=20
-> > That's my current thinking, and why I asked about locating Clavis in
-> > the keys subsystem directly (although I still think better keyring
-> > granularity and a shift towards usage based keyrings is the better
-> > option).  If David and Jarkko are opposed to integrating Clavis into
-> > the keys subsystem we can consider this as a LSM, I'm just not sure
-> > it's the best first option.  Does that make sense?
->=20
-> Thanks for your feedback Paul.  I have no preference if it is a new LSM=
-=20
-> or not.  My interest is finding the path of least resistance to get this =
-type=20
-> of capability added to mainline code.  Hopefully David and Jarkko will=
-=20
-> provide their opinions.
+But like I said, the file is compiled twice (why?), but only once with
+the arch/x86/lib/Makefile. If anyone has any suggestions on how to
+solve this, please let me know.
 
+-bw
