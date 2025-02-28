@@ -1,143 +1,97 @@
-Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A87425DAE8
-	for <linux-crypto@vger.kernel.org>; Fri, 28 Feb 2025 12:11:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 017BF26738F;
+	Fri, 28 Feb 2025 12:40:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740744711; cv=none; b=Oj8ZkXGQ4eCRVaF2U8ha+4qciP5kCotOJwNWl4CEnz5QxAP33qgeT/AxJfJeKkVhe7kaoiliLGgxmc3WQSQLQ7HkW53PpF3yRIl1BWshOUgAooQ9R2TUjKOETidfev5aqN3ZTMSyF1tL8gL2Ihs3eChfLLuHStby44eW5qaiGMI=
+	t=1740746402; cv=none; b=e6yIRIZYiCSLYspWTSdk2jrwr57cmmDtui6pIvDG+nPdX7TDgxIq4ybUfduIfwZ0sN0Nk1Uo5P/A8tYeCr8qpkJeeH9bmv+J1QBOyyx4qg6A8988xpaQ+Y+f/bwezPluwY4QjU4hvAwS441+H2P5W4gC7wijuvFDdDQ2ZEbycHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740744711; c=relaxed/simple;
-	bh=B5I575Vc1ATQO2Jz0oPzcz0NKdEn/Dgu9+qvru1Xxi4=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=We0KgQVtfFWWJ6BPJQMMNeJKUNBciijikx814w6t4oOMaA+dgVINGsB/dd1IVOQf+MwBLtAiklOQsf5ytm2XvksjeGiHm17jXddiSksqLgitkUpimftbhOYBnZaJ+mvoyJ/59ycCN8x5pygBfXI2EGudN4z2a3BVZsCS5yIX0pE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qkzwqVam; arc=none smtp.client-ip=209.85.128.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ardb.bounces.google.com
+	s=arc-20240116; t=1740746402; c=relaxed/simple;
+	bh=vQmR1kpc/qeDZMF/Qgq52tU76GCNr7vw1s/819f3YJ8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=p+LczzPFYJZNuzq8waDFJzs+iazrKeephcEFwkEDhGKb+bC0xbSZLwW0NT1VuirY1LwjLYgzZcHWQ7hRwXeq4/+GPblcJif8Vq+FL3W1E1XsHIBf3QQtK5AEwKqMMvVyyB4zzkGrdMLd+zB97v9kzxphJsdx9Z1zUvavXBRoycQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P0P478oK; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qkzwqVam"
-Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-438e4e9a53fso13162825e9.1
-        for <linux-crypto@vger.kernel.org>; Fri, 28 Feb 2025 04:11:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1740744708; x=1741349508; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=iBVP6QnHpqsjT767GF3tcrtREbTQ/KQgzFjFPBBWg+c=;
-        b=qkzwqVamZnoQ5dfJOVZ6r3Jb9jhV3qCq+Go3Q0wnsLfP4FcFwrDmZt95Pw+9wkASla
-         xBD+ufJM+FP2RfKrcJ8ZaH1+YKoh2C60cS2JZIm4edTqgUzrAMJmSmZqV/373UleiRnq
-         fgmZNr93CZ1sMFbzfyNphq7VZq8UhSwXkJZoTgygY5pOksU8RX0HQn2XQFiKvJH5aHA7
-         /HC5GWwtuIUDE777wUHNebfOYPNppQFMAj6HAhf59HLYzOiOqdGgmuxBHknGyFCMo42U
-         hDp4fXfRU2Wn0pVw3FvnEoooNGR3nftmYYcfbbDmuzO1tcHD0099lPV6u6ygf14Hsyrx
-         fDHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740744708; x=1741349508;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=iBVP6QnHpqsjT767GF3tcrtREbTQ/KQgzFjFPBBWg+c=;
-        b=dPprOLTm3d9V0hMwkrz4jkh5gvzBuvaNWjixp22KF1o0GjUcmgd1GUxjUhoc7Xb/eS
-         b6C/rmqtU6XSBcmW8wg/fYEgFOwsDF+4p0fW/KOIU3B7Jaqdpj2PWXVqKU4u/pp6MWqi
-         cIfKkNuiB7LD8IONcu5qsU1XYgWv1frSUHI/tC7GTUQVl5/872XCAH9X+6waiKqJHaFZ
-         iQmJCWdtYtUM2QGnfHG2Dks0ujO4KXPyA12hdwdbyeXS4FIBeGpCQVYfABvrumFRAGa3
-         suwWFMZUdzVMCjlTjmZKjim8NOMZ9t0IV54yZ+Q8YhFMmAv+zYW8bVHV3uS3+thNYHTQ
-         eE1Q==
-X-Gm-Message-State: AOJu0Yz5tSi0+hmCEf8fCFHGY6LP6qr0w9gfAMDUvrOtPH6nPjXSLEaX
-	AUT1O2h8q2AgmmWgyxg7Idf6CK+vDePDRV0Mcz/ZUB/8i+UM1rMDAAconzfqaYvI87n1BJGm22w
-	0PqoosQLAc4vycMpnCKtC94Orml2EwzozBsKQHHjrY9++bfJaOpXnVdM0+ENpglRs1DdXe1LiYo
-	UjlZ5Z0F701fnMJ4zxAzyvIXClvNQIFQ==
-X-Google-Smtp-Source: AGHT+IH5ksx6P9s5tCTO/Ze6G7x7UgZ5LoGCbfPmceDbi278RWaaX4A5DUNOkVr8oWcP34ruqynlicTg
-X-Received: from wmgg5.prod.google.com ([2002:a05:600d:5:b0:439:7db5:29bb])
- (user=ardb job=prod-delivery.src-stubby-dispatcher) by 2002:a05:600c:3ba5:b0:439:9361:13d3
- with SMTP id 5b1f17b1804b1-43ba670b6ebmr26717665e9.18.1740744708036; Fri, 28
- Feb 2025 04:11:48 -0800 (PST)
-Date: Fri, 28 Feb 2025 13:11:38 +0100
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P0P478oK"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74A5EC4CEEA;
+	Fri, 28 Feb 2025 12:40:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1740746401;
+	bh=vQmR1kpc/qeDZMF/Qgq52tU76GCNr7vw1s/819f3YJ8=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=P0P478oKnNX0vF0r/Dz3i2lQPKeh2FLm4qR+IsZBZdIuB2eEjuMnXP5nEKFH+NIKb
+	 TninQHZ8IqhPwtqOBJsFO1rRqfdvisrpst/dh5orZWTDVhXw9yVUL3xSJ6Bjau/YIJ
+	 L0zjHHxf0N912hEupe/gradMfOa8RRVeR9F2unZqCY/xvbsRSv26oAaYlxho1ogsv3
+	 2PThsP1+rRDr+3H1lhEdXGWVFJuFKJuW8OW2tRCw0DEWFHQF6ASg+r7X88iA6xQf7v
+	 vN24m7g8CrClYdGkjI81XCfDoFFunj0Xcq6MMqUeSKZfgxChraEhOAeJi8DgLjBqTz
+	 6odqAeTJOYmtA==
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-546267ed92fso2124200e87.2;
+        Fri, 28 Feb 2025 04:40:01 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUcozMUOnJQjIxqZkCelxwKx3WedRDTiYOFk84IelJ2XdkwCjwqTau96t5e05HVjn5GgjAhsXVWiopeRP7D@vger.kernel.org, AJvYcCWqTd0c+/O840VhiuD10hkBVWGhSAO8lKw9ZZUmDv+855O1OX7mNql9YOzj/1SstHZrL3IrAmJ4MUy4OD4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxmZ8vIC+4Vszdd17U+9LTh0mE+vx3nQvpPmLStaG1ddfx/Qkol
+	S8WrkcgEHkb9oF0OpwKb9hCNnwkbG89/0YxiavT8TL3o0XMM63jeRX5qvurbkuPz1HtI5IY9j+U
+	E8o3p6rBvbgbVII8OchApzfj+3sM=
+X-Google-Smtp-Source: AGHT+IG1ZhXMEhiYTjOCy0NzI7Eb0423hxYrdNajNkC8iWc1KAxbwLCjMNn15VYnBbRNLIqmRn5bAJaivZh1pqlAcgk=
+X-Received: by 2002:a05:6512:31c1:b0:545:22fe:616f with SMTP id
+ 2adb3069b0e04-5494c3319e0mr1384091e87.24.1740746399751; Fri, 28 Feb 2025
+ 04:39:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Developer-Key: i=ardb@kernel.org; a=openpgp; fpr=F43D03328115A198C90016883D200E9CA6329909
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2531; i=ardb@kernel.org;
- h=from:subject; bh=VHYF4u9LG0X82kJsM0ALRJErMXeMCLbRoWWbvWPKiSw=;
- b=owGbwMvMwCFmkMcZplerG8N4Wi2JIf3g8l+xzPHmXQvD/1qfmuqswciosfTPGs9XB4O+/1OT+
- +5Qv5e/o5SFQYyDQVZMkUVg9t93O09PlKp1niULM4eVCWQIAxenAEzk1A5GhunzLyp9uJuVOtc+
- 8NtKvU+pjzeIvze89PTbyanPSj8WZOkx/A/8eby32rNpu1VY8KfmxVEf/Q9cDKq0Nnf7IfP0M/f UMywA
-X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
-Message-ID: <20250228121137.3534964-2-ardb+git@google.com>
-Subject: [PATCH v2] crypto: lib/chachapoly - Drop dependency on CRYPTO_ALGAPI
-From: Ard Biesheuvel <ardb+git@google.com>
-To: linux-crypto@vger.kernel.org
-Cc: herbert@gondor.apana.org.au, Ard Biesheuvel <ardb@kernel.org>, 
-	Arnd Bergmann <arnd@arndb.de>, Eric Biggers <ebiggers@kernel.org>
+MIME-Version: 1.0
+References: <20250220051325.340691-1-ebiggers@kernel.org> <20250220051325.340691-2-ebiggers@kernel.org>
+ <20250228035924.GC5588@sol.localdomain>
+In-Reply-To: <20250228035924.GC5588@sol.localdomain>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Fri, 28 Feb 2025 13:39:48 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXH8ABcuUzPfAC=A6hzUvo+jPvWfphTtJqgGCTpbegAi0g@mail.gmail.com>
+X-Gm-Features: AQ5f1Jpq11pDce8xKZ2gG0kJTVyocjGzLRmCUoN8VY_MzT-ld0oY95pvBRNWnqU
+Message-ID: <CAMj1kXH8ABcuUzPfAC=A6hzUvo+jPvWfphTtJqgGCTpbegAi0g@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/2] x86/fpu: make kernel-mode FPU reliably usable in softirqs
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: x86@kernel.org, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Ben Greear <greearb@candelatech.com>, Xiao Liang <shaw.leon@gmail.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, Andy Lutomirski <luto@kernel.org>, 
+	"Jason A . Donenfeld" <Jason@zx2c4.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Ard Biesheuvel <ardb@kernel.org>
+On Fri, 28 Feb 2025 at 04:59, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> On Wed, Feb 19, 2025 at 09:13:24PM -0800, Eric Biggers wrote:
+> > To comply with the requirements of local_bh_disable and local_bh_enable,
+> > this change also removes support for kernel-mode FPU in hardirq context
+> > or with hardirqs disabled.  This should not be a problem, though.  There
+> > does not appear to be any use case for kernel-mode FPU in such contexts,
+> > and notably arm64 and riscv already have these same conditions.
+>
+> I found a problem with this assumption: the system suspend and resume code calls
+> kernel_fpu_begin() and kernel_fpu_end() with hardirqs disabled.  See
+> __save_processor_state() and __restore_processor_state() in
+> arch/x86/power/cpu.c.  That triggers the WARN_ON_FPU(!irq_fpu_usable()).
+>
+> I think there are two directions we could go with this: either choose a solution
+> that keeps kernel_fpu_begin() usable with hardirqs disabled;
 
-The ChaCha20-Poly1305 library code uses the sg_miter API to process
-input presented via scatterlists, except for the special case where the
-digest buffer is not covered entirely by the same scatterlist entry as
-the last byte of input. In that case, it uses scatterwalk_map_and_copy()
-to access the memory in the input scatterlist where the digest is stored.
+I still owe you an investigation into how this interoperates with EFI
+runtime services, but it appears there are cases (efi-pstore on an
+OOPS) where EFI SetVariable() might be invoked with IRQs disabled.
+arm64 has a special case for EFI runtime calls made under conditions
+where SIMD may not be used, and essentially just preserves and
+restores the entire state.
 
-This results in a dependency on crypto/scatterwalk.c and therefore on
-CONFIG_CRYPTO_ALGAPI, which is unnecessary, as the sg_miter API already
-provides this functionality via sg_copy_to_buffer(). So use that
-instead, and drop the dependencies on CONFIG_CRYPTO_ALGAPI and
-CONFIG_CRYPTO.
+It is rather unfortunate that this is needed, but the UEFI spec
+permits runtime service implementations to use XMM registers so there
+is no way around this AFAIK.
 
-Reported-by: Arnd Bergmann <arnd@arndb.de>
-Acked-by: Eric Biggers <ebiggers@kernel.org>
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
----
-v2: - replace include of crypto/algapi.h with crypto/utils.h
-    - drop dependency on CONFIG_CRYPTO
 
- lib/crypto/Kconfig            | 2 --
- lib/crypto/chacha20poly1305.c | 7 +++----
- 2 files changed, 3 insertions(+), 6 deletions(-)
-
-diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
-index c542ef1d64d0..562906be4f93 100644
---- a/lib/crypto/Kconfig
-+++ b/lib/crypto/Kconfig
-@@ -142,10 +142,8 @@ config CRYPTO_LIB_POLY1305
- 
- config CRYPTO_LIB_CHACHA20POLY1305
- 	tristate "ChaCha20-Poly1305 AEAD support (8-byte nonce library version)"
--	depends on CRYPTO
- 	select CRYPTO_LIB_CHACHA
- 	select CRYPTO_LIB_POLY1305
--	select CRYPTO_ALGAPI
- 
- config CRYPTO_LIB_SHA1
- 	tristate
-diff --git a/lib/crypto/chacha20poly1305.c b/lib/crypto/chacha20poly1305.c
-index a839c0ac60b2..9cfa886f1f89 100644
---- a/lib/crypto/chacha20poly1305.c
-+++ b/lib/crypto/chacha20poly1305.c
-@@ -7,11 +7,10 @@
-  * Information: https://tools.ietf.org/html/rfc8439
-  */
- 
--#include <crypto/algapi.h>
- #include <crypto/chacha20poly1305.h>
- #include <crypto/chacha.h>
- #include <crypto/poly1305.h>
--#include <crypto/scatterwalk.h>
-+#include <crypto/utils.h>
- 
- #include <linux/unaligned.h>
- #include <linux/kernel.h>
-@@ -318,8 +317,8 @@ bool chacha20poly1305_crypt_sg_inplace(struct scatterlist *src,
- 
- 	if (unlikely(sl > -POLY1305_DIGEST_SIZE)) {
- 		poly1305_final(&poly1305_state, b.mac[1]);
--		scatterwalk_map_and_copy(b.mac[encrypt], src, src_len,
--					 sizeof(b.mac[1]), encrypt);
-+		sg_copy_buffer(src, sg_nents(src), b.mac[encrypt],
-+			       sizeof(b.mac[1]), src_len, !encrypt);
- 		ret = encrypt ||
- 		      !crypto_memneq(b.mac[0], b.mac[1], POLY1305_DIGEST_SIZE);
- 	}
--- 
-2.48.1.711.g2feabab25a-goog
-
+> or change
+> __save_processor_state() and __restore_processor_state() to save/restore the FPU
+> registers directly, e.g. via save_fpregs_to_fpstate() and
+> restore_fpregs_from_fpstate().  (Kernel-mode FPU isn't actually being used in
+> this case, so a more direct save/restore might make sense here.)
+>
+> - Eric
