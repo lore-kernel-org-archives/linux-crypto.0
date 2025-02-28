@@ -1,71 +1,51 @@
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1E171A4F22
-	for <linux-crypto@vger.kernel.org>; Fri, 28 Feb 2025 05:24:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B86D1F3BB7
+	for <linux-crypto@vger.kernel.org>; Fri, 28 Feb 2025 08:13:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740720267; cv=none; b=rRMRyNc/wIAw33POW2Z/WptZ3hfYzxlvUFG5n8ulYM645L0x5AA+zrMBgGy7SF1daBEU9KoF3TekwqzNeAJresgNqvpvcL0BHQW4TI9s/+Ba5gmHYLhy/MWp+r7EAVnESkMJU2TIYXEy+oefiil+zTkKSroBSNR4l51LJClu6R8=
+	t=1740730401; cv=none; b=ujRCkpmITA1PZstInAlJbomnvBPxr+bzc5TbqZ4p7REBbddIKSw2BVLElnq5QkgfqSW/KgefKcdLD+uLTnSzoKQmVoGR+b9Usj/6+PgdhRHN55MhVBZNrFX9vc7HZClnZprCo94PyB9e1xR3MWj2DZhITtu3ph7FgU/Uk/oTZZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740720267; c=relaxed/simple;
-	bh=x9cRC7ppLMjJrTR1Lidy22LGkBVHgDO8qtmxXgLJn4Q=;
+	s=arc-20240116; t=1740730401; c=relaxed/simple;
+	bh=he1Qodgc0ftkVGsAlTlGKPXEwxyRbmgGHQaLbNMp2OY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FdjIJtuJlleyaC2bDkKQm3ZXrBep83Ky9k1tkYj9zfnxk/JkKoKKVIpgDJzWhXTlVlgub5zO/1G4FeX+gZdDRA570Yu68da/rQUVKGedNuStCO/P2BueixwLrVESu+xyLlUO8UsS6QJiY1BRWqLcz4FOatoSswHdCDioc8UcOa8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=dM7TKk/6; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=P58/g6XPWYkoinbAsw/bFKEaXigCvvWU+1RwHJW69EuxgcIrwLnHKccg4pWbcG5XfOwFNu4YJnO1K4pOnfvOX+mj+XZKTZ5iEoeBw+UG4/mJpPUEgs2xXoE4gDj0Oo1YCzxWJ/QjZUWyaxMbzE0C3ZDuBw7Fi4Dg9Ymu8wSViEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=rm92Syh7; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="dM7TKk/6"
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2232b12cd36so24584445ad.0
-        for <linux-crypto@vger.kernel.org>; Thu, 27 Feb 2025 21:24:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1740720265; x=1741325065; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JzpLqfQwDJ7jyiE79QfQ/fOYIxdjWxJGEJ/bicFu6Ck=;
-        b=dM7TKk/6Id+qDj7FFPz4lMyCH1uIcIO8NC//1ed5QIN+xtSSPYVsbWWBxwZaL/DDgI
-         evofiBMlwSn9Unr/XJgqQPysLdEBY+AUg/7dscjAe4Csy8albxh1ijzJ28OPdkzMSyy6
-         aCMe5CEH8Ag7+H0wOZhX6imT70NwVK7qwIvV8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1740720265; x=1741325065;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JzpLqfQwDJ7jyiE79QfQ/fOYIxdjWxJGEJ/bicFu6Ck=;
-        b=PBHPHHi8dnrRwfEsYklkhNY4Nr4EdcU30A3VP+l5Ksdzg5Uw88NG6OZGXIIJS43QCk
-         YtdYrTrqn0cFpRU9YVrFAqDzNLAZL3RYBaJOAcQ2/T+7dl5KEe8YZHgd3avrB4/5TH9w
-         laRNitgomMr2UoMqePwkJqD4/JX0CmACwYfEynBsm4NsQjSFOmO+D07vVBDi4ZXVGogW
-         QEjxCFVEwc2vGul+JBl8FqpYCEExSa3ZvE43fGx/f63WbyG9wmyZoCyJx8DsYVLWq/+y
-         CbC6kUeiyvyqrLLipzohjCbdUYb8zAT51faWRwWqOfBn9HA8Yb4U/0DyMx7t9EdS6jKj
-         FkNA==
-X-Forwarded-Encrypted: i=1; AJvYcCVLbOJo14/FgjFommwNFVane3A6gJbjKFkuLQ/ijxgJTtn10jGoUhJlXlS69ywG/dzEMIhlRD6VHIrOfTs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyi2T3wkOZykPSfGnZPTIbGuKjmREEtJoCxc5wu6kCbkvVdP1wB
-	HYyXGTNNa1xMZn7anyzTRTqG91xjk5v+c9rqSUEw1AP1dOC3LRhA50edyuXMWQ==
-X-Gm-Gg: ASbGncuqTDaCceQu/W4fdILDI/BC2dBS291LG2jqMnTDpLcy7uyYqkGxIi/eWyclEle
-	hzevpT+iAuL6a1VkSnlSh4oP+mcFE8DF00meSveveHWXwQyFeK89aTZ5BfKAC+WP0yT40tTiqdO
-	0yHM/t1Um29pwZ1jupQrkT0rf1XfMPDXwV2n2n3GB5oqcPw4IERhIaMAqeJEeWyY9TkrzwxuVAn
-	nDLJpMPWtJ2UYlRIHhOlRqTiSEFQLc9EPIp5aO9BXFqN1poole/JY5IweUHnBEXm9npvKq6C66l
-	Xx4bq1YoZ8DjJpBKWmJ6m1VOj5NBvQ==
-X-Google-Smtp-Source: AGHT+IHXCM2oCqgzhkwLo+956UUpwtag8tM8m0CdPHYgDQClhrhMVkzcGgl7jqpntegvZ/SQHl9AeQ==
-X-Received: by 2002:a17:902:ea0c:b0:223:54aa:6d15 with SMTP id d9443c01a7336-22368f7b08fmr34672055ad.12.1740720265138;
-        Thu, 27 Feb 2025 21:24:25 -0800 (PST)
-Received: from google.com ([2401:fa00:8f:203:2495:cd50:81fd:f0a1])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-223501d2823sm25189645ad.15.2025.02.27.21.24.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Feb 2025 21:24:24 -0800 (PST)
-Date: Fri, 28 Feb 2025 14:24:18 +0900
-From: Sergey Senozhatsky <senozhatsky@chromium.org>
-To: David Sterba <dsterba@suse.cz>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>, 
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	Nitin Gupta <nitingupta910@gmail.com>, Richard Purdie <rpurdie@openedhand.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, "Markus F.X.J. Oberhumer" <markus@oberhumer.com>, 
-	Dave Rodgman <dave.rodgman@arm.com>
-Subject: Re: [PATCH] lib/lzo: Avoid output overruns when compressing
-Message-ID: <qahmi4ozfatd4q5h4qiykinucdry6jcbee6eg4rzelyge2zmlg@norwskwechx6>
-References: <Z7rGXJSX57gEfXPw@gondor.apana.org.au>
- <20250226130037.GS5777@twin.jikos.cz>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="rm92Syh7"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=WhLoH34A/flsVGOIlPLZ59ie9UdXcSnOeKV2LDW9aUw=; b=rm92Syh7FyZHE+LKh+u8uRYVAx
+	fCGNRNRqBoFskaC5kKSEfv2bdehKFqTgpgTgRMJfcjz44xB/GzMsU6rYkpdzQfN3HB3ueNA8jf6uh
+	OqXQ7fRfjotEbQDPYpmsdmKsHph+UB+5mIpbkdZodALPHT+H3beqn4AC8WB+Ch48BJsGxjiU7p+Uv
+	Jy01fBBLu5kKYxOfE1Qjo31MMyFUXzPjm01CnL7CEGThI8fEc8pEicKwRIw6LJ/EMIMkRoprnBaMh
+	9430KxbywNQNyxIEtJtAXP81YUKVmdSJzez/CnPCbJFujSPRl3S+h+gWcCSeIm7KtM4zDdPkTB1V1
+	QXDICdDA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tnvUa-002VcO-2J;
+	Fri, 28 Feb 2025 16:13:09 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 28 Feb 2025 16:13:08 +0800
+Date: Fri, 28 Feb 2025 16:13:08 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Eric Biggers <ebiggers@kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	linux-mm@kvack.org
+Subject: Re: [RFC PATCH 7/7] mm: zswap: Use acomp virtual address interface
+Message-ID: <Z8FwFJ4iMLuvo3Jj@gondor.apana.org.au>
+References: <cover.1740651138.git.herbert@gondor.apana.org.au>
+ <153c340a52090f2ff82f8f066203186a932d3f99.1740651138.git.herbert@gondor.apana.org.au>
+ <Z8CquB-BZrP5JFYg@google.com>
+ <20250227183847.GB1613@sol.localdomain>
+ <Z8DcmK4eECXp3aws@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -74,18 +54,22 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250226130037.GS5777@twin.jikos.cz>
+In-Reply-To: <Z8DcmK4eECXp3aws@google.com>
 
-On (25/02/26 14:00), David Sterba wrote:
-> What strikes me as alarming that you insert about 20 branches into a
-> realtime compression algorithm, where everything is basically a hot
-> path.  Branches that almost never happen, and never if the output buffer
-> is big enough.
-> 
-> Please drop the patch.
+On Thu, Feb 27, 2025 at 09:43:52PM +0000, Yosry Ahmed wrote:
+>
+> If we cannot pass in highmem addresses then the problem is not solved.
+> Thanks for pointing this out.
 
-David, just for educational purposes, there's only safe variant of lzo
-decompression, which seems to be doing a lot of NEED_OP (HAVE_OP) adding
-branches and so on, basically what Herbert is adding to the compression
-path.  So my question is - why NEED_OP (if (!HAVE_OP(x)) goto output_overrun)
-is a no go for compression, but appears to be fine for decompression?
+Oh I didn't realise this even existed.
+
+It's much better to handle this in the Crypto API where the copy
+and be done only when it's needed for DMA.
+
+I'll respin this.
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
