@@ -1,46 +1,71 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9609F819
-	for <linux-crypto@vger.kernel.org>; Fri, 28 Feb 2025 04:19:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1E171A4F22
+	for <linux-crypto@vger.kernel.org>; Fri, 28 Feb 2025 05:24:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740716354; cv=none; b=LdFMyoH13s3UhbYHM6miYzaVueilbnXDo7YVgCUEgT4z0TmTVG91FL1wiChCmf3LpdZze/863iSOlMfL8f53Ea2cFOg7NMXIIXGvSzX0W2I9SbFkrPmJXuwtjnboINMPT5RAbpt2PbXtLdNb8Jl88G0P+T/vYSh26yojcubsmPs=
+	t=1740720267; cv=none; b=rRMRyNc/wIAw33POW2Z/WptZ3hfYzxlvUFG5n8ulYM645L0x5AA+zrMBgGy7SF1daBEU9KoF3TekwqzNeAJresgNqvpvcL0BHQW4TI9s/+Ba5gmHYLhy/MWp+r7EAVnESkMJU2TIYXEy+oefiil+zTkKSroBSNR4l51LJClu6R8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740716354; c=relaxed/simple;
-	bh=w8h+xEkaW0uSwgTMdyVntu7KhetHqWXFqXmY56tbe9E=;
+	s=arc-20240116; t=1740720267; c=relaxed/simple;
+	bh=x9cRC7ppLMjJrTR1Lidy22LGkBVHgDO8qtmxXgLJn4Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Jfj31FWCjpU6MJ5RawxBxTK6DfmycV7++e2TaTfkg+ksFfv37hAZG3+Hql20bxCy6o75tw4rHWNnEbRvEoDl9vZwpg8+FFBcC39jTR00Z2xM3iIjrxvmGyXXSBg6C6geVrHjouG3V3TLv7dl3T9L3uX3QkiKN3SGJ0aO2H6kkP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=qe8Eleha; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=FdjIJtuJlleyaC2bDkKQm3ZXrBep83Ky9k1tkYj9zfnxk/JkKoKKVIpgDJzWhXTlVlgub5zO/1G4FeX+gZdDRA570Yu68da/rQUVKGedNuStCO/P2BueixwLrVESu+xyLlUO8UsS6QJiY1BRWqLcz4FOatoSswHdCDioc8UcOa8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=dM7TKk/6; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="qe8Eleha"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=TDS6xnEYeLYUp8c4YAbIZWR3bs6fZ/X4v41XqrujLZM=; b=qe8ElehazZK1neXWRtJ/q/Jg3t
-	qzg7OlSgdU5PwjgfrXDvqE3j1drvi+FZSAuYQh2Y0ju7E0RuVcYTZTOjrMFhjg/tKrjazir4eXZbK
-	chIL/l4ULPzenmQlhU97D6Ryb6fBr0yUzuCtnCWw6INplGh2TQLQE9sSAb+gkqr2U9zht/s+DgjQ2
-	p+LdlKC6J/yzJ1/eAQCk4Dd8MT8xkhpOwT12ng8Ls1GBK1EAZjLhM68+JZczYloKqj5v9XcUJdyF8
-	Ddaa/KdxY1TP49su5dupuqlDAzSiiC+Y1L8yqZNnD76gSjX8mWtFLeaN2VGdsptgAT6m8C7iYDYLI
-	ZLauWgpQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tnrq6-002TMQ-2s;
-	Fri, 28 Feb 2025 12:19:07 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 28 Feb 2025 12:19:06 +0800
-Date: Fri, 28 Feb 2025 12:19:06 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Ard Biesheuvel <ardb+git@google.com>
-Cc: linux-crypto@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH] crypto: lib/chachapoly - Drop dependency on CRYPTO_ALGAPI
-Message-ID: <Z8E5Osowgnheq19L@gondor.apana.org.au>
-References: <20250227123338.3033402-1-ardb+git@google.com>
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="dM7TKk/6"
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2232b12cd36so24584445ad.0
+        for <linux-crypto@vger.kernel.org>; Thu, 27 Feb 2025 21:24:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1740720265; x=1741325065; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=JzpLqfQwDJ7jyiE79QfQ/fOYIxdjWxJGEJ/bicFu6Ck=;
+        b=dM7TKk/6Id+qDj7FFPz4lMyCH1uIcIO8NC//1ed5QIN+xtSSPYVsbWWBxwZaL/DDgI
+         evofiBMlwSn9Unr/XJgqQPysLdEBY+AUg/7dscjAe4Csy8albxh1ijzJ28OPdkzMSyy6
+         aCMe5CEH8Ag7+H0wOZhX6imT70NwVK7qwIvV8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1740720265; x=1741325065;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JzpLqfQwDJ7jyiE79QfQ/fOYIxdjWxJGEJ/bicFu6Ck=;
+        b=PBHPHHi8dnrRwfEsYklkhNY4Nr4EdcU30A3VP+l5Ksdzg5Uw88NG6OZGXIIJS43QCk
+         YtdYrTrqn0cFpRU9YVrFAqDzNLAZL3RYBaJOAcQ2/T+7dl5KEe8YZHgd3avrB4/5TH9w
+         laRNitgomMr2UoMqePwkJqD4/JX0CmACwYfEynBsm4NsQjSFOmO+D07vVBDi4ZXVGogW
+         QEjxCFVEwc2vGul+JBl8FqpYCEExSa3ZvE43fGx/f63WbyG9wmyZoCyJx8DsYVLWq/+y
+         CbC6kUeiyvyqrLLipzohjCbdUYb8zAT51faWRwWqOfBn9HA8Yb4U/0DyMx7t9EdS6jKj
+         FkNA==
+X-Forwarded-Encrypted: i=1; AJvYcCVLbOJo14/FgjFommwNFVane3A6gJbjKFkuLQ/ijxgJTtn10jGoUhJlXlS69ywG/dzEMIhlRD6VHIrOfTs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyi2T3wkOZykPSfGnZPTIbGuKjmREEtJoCxc5wu6kCbkvVdP1wB
+	HYyXGTNNa1xMZn7anyzTRTqG91xjk5v+c9rqSUEw1AP1dOC3LRhA50edyuXMWQ==
+X-Gm-Gg: ASbGncuqTDaCceQu/W4fdILDI/BC2dBS291LG2jqMnTDpLcy7uyYqkGxIi/eWyclEle
+	hzevpT+iAuL6a1VkSnlSh4oP+mcFE8DF00meSveveHWXwQyFeK89aTZ5BfKAC+WP0yT40tTiqdO
+	0yHM/t1Um29pwZ1jupQrkT0rf1XfMPDXwV2n2n3GB5oqcPw4IERhIaMAqeJEeWyY9TkrzwxuVAn
+	nDLJpMPWtJ2UYlRIHhOlRqTiSEFQLc9EPIp5aO9BXFqN1poole/JY5IweUHnBEXm9npvKq6C66l
+	Xx4bq1YoZ8DjJpBKWmJ6m1VOj5NBvQ==
+X-Google-Smtp-Source: AGHT+IHXCM2oCqgzhkwLo+956UUpwtag8tM8m0CdPHYgDQClhrhMVkzcGgl7jqpntegvZ/SQHl9AeQ==
+X-Received: by 2002:a17:902:ea0c:b0:223:54aa:6d15 with SMTP id d9443c01a7336-22368f7b08fmr34672055ad.12.1740720265138;
+        Thu, 27 Feb 2025 21:24:25 -0800 (PST)
+Received: from google.com ([2401:fa00:8f:203:2495:cd50:81fd:f0a1])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-223501d2823sm25189645ad.15.2025.02.27.21.24.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Feb 2025 21:24:24 -0800 (PST)
+Date: Fri, 28 Feb 2025 14:24:18 +0900
+From: Sergey Senozhatsky <senozhatsky@chromium.org>
+To: David Sterba <dsterba@suse.cz>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>, 
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
+	Nitin Gupta <nitingupta910@gmail.com>, Richard Purdie <rpurdie@openedhand.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, "Markus F.X.J. Oberhumer" <markus@oberhumer.com>, 
+	Dave Rodgman <dave.rodgman@arm.com>
+Subject: Re: [PATCH] lib/lzo: Avoid output overruns when compressing
+Message-ID: <qahmi4ozfatd4q5h4qiykinucdry6jcbee6eg4rzelyge2zmlg@norwskwechx6>
+References: <Z7rGXJSX57gEfXPw@gondor.apana.org.au>
+ <20250226130037.GS5777@twin.jikos.cz>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -49,37 +74,18 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250227123338.3033402-1-ardb+git@google.com>
+In-Reply-To: <20250226130037.GS5777@twin.jikos.cz>
 
-On Thu, Feb 27, 2025 at 01:33:38PM +0100, Ard Biesheuvel wrote:
->
-> diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
-> index b01253cac70a..a759e6f6a939 100644
-> --- a/lib/crypto/Kconfig
-> +++ b/lib/crypto/Kconfig
-> @@ -135,7 +135,6 @@ config CRYPTO_LIB_CHACHA20POLY1305
->  	depends on CRYPTO
->  	select CRYPTO_LIB_CHACHA
->  	select CRYPTO_LIB_POLY1305
-> -	select CRYPTO_ALGAPI
+On (25/02/26 14:00), David Sterba wrote:
+> What strikes me as alarming that you insert about 20 branches into a
+> realtime compression algorithm, where everything is basically a hot
+> path.  Branches that almost never happen, and never if the output buffer
+> is big enough.
+> 
+> Please drop the patch.
 
-You should add CRYPTO_LIB_UTILS.  It's coming indirectly through
-CRYPTO but as Arnd suggested that can now be removed.
-
-> diff --git a/lib/crypto/chacha20poly1305.c b/lib/crypto/chacha20poly1305.c
-> index a839c0ac60b2..280a4925dd17 100644
-> --- a/lib/crypto/chacha20poly1305.c
-> +++ b/lib/crypto/chacha20poly1305.c
-> @@ -11,7 +11,6 @@
->  #include <crypto/chacha20poly1305.h>
->  #include <crypto/chacha.h>
->  #include <crypto/poly1305.h>
-> -#include <crypto/scatterwalk.h>
-
-Please also replace algapi.h with utils.h.
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+David, just for educational purposes, there's only safe variant of lzo
+decompression, which seems to be doing a lot of NEED_OP (HAVE_OP) adding
+branches and so on, basically what Herbert is adding to the compression
+path.  So my question is - why NEED_OP (if (!HAVE_OP(x)) goto output_overrun)
+is a no go for compression, but appears to be fine for decompression?
