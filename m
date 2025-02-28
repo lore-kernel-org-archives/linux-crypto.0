@@ -1,650 +1,352 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F927256C74;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8C07256C7C;
 	Fri, 28 Feb 2025 10:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740736829; cv=none; b=Gp7UrVpqupKRb09WX4pfj8GcrcQKrninBOTwnTO9swnZQPtXbQRraSAMuh21qiXBPALciH32bvNdvIrvDIaKiAuNtnFmuU3PLhuXmhG/VAL6yRiG3AWi1z0/LJB6rD4HyBI5Dnf9IGQrVkwZ2GGXMRIlFi2FBqAfBqPJiE+DXrw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740736829; cv=fail; b=sBewtpYnMkQgKhxgAGvTWdoPWdVNpQWiCMH+lidJXE/pcRVFeQdZCG5stZlfYq5oY4zG6H6Ir5Sw4NokqGq8kXEgvwfM7TIG4BlsM0MpYDo5rvvHzcUzQoVItDfRSyER4XyuG/qSnLOdC1kcrExVG5dhqtPxO4Bz/18PcwUdYd4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1740736829; c=relaxed/simple;
-	bh=5xvVgcGbsVS3XOQngdpBodjWDsRWeoD2A/h2JxKzioc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=CV174jTIfMYk+6hPS34VVi61Cu+5XE9RPKFGiB0KWS4Q8amoUdKHb5KmmCkPDvP7yEgPpyUHzZdNEBHJOVlp1OUJjB75BwOVYiVfxRBfqL1Sy3OBdMjqwy3Ix1FSwOhpthzj0x4ocGqXD+EaGkPsLtuFbNxnjZq0mSndUOmlREw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WUyf/C28; arc=none smtp.client-ip=192.198.163.18
+	bh=FR7VXhq7kJJhnDdXogb0kbltGNxPbQG5i1EfEqzgX2g=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=QsJSx2qCt5EsQDuebmEJY5Jko1p39/g8Uq3Kw3sW49YHwmXB64QonEmafat+Co1GGZDE//OjB3yipYyYr5qilQ0uu47JBlAPvY2UjR1Jg/hGIHdtLaLF+p9sWasUjuP3y06LO2kfLlENSz5GkT+1eLcFnrqMHybv72Hp8bjf2iw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=i47JWgpf; arc=fail smtp.client-ip=192.198.163.14
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WUyf/C28"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="i47JWgpf"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1740736827; x=1772272827;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=5xvVgcGbsVS3XOQngdpBodjWDsRWeoD2A/h2JxKzioc=;
-  b=WUyf/C286sQhOVRBBKhKRWPSGsYEGiE4r42cTQMdXh9Rs0bT7gGpStvr
-   6Mb8RatAfgNtwsGFC9u+ky+7a6zBJVmOSBUSPyqO71xgJUk00wVbGZyZp
-   AaIQvxRRvrqx4ArhsMIMQJbSEQ3s5R562vGSHz59ny/grjBtHnlwoT6pE
-   Uj86h0X21KJd4FZja2ItVMtinovxx7httAXGQm9SGWrFWKPNi1PI0WWFt
-   MF6rEiAwxuHk7/G7aY1JMpAmIvoEpdc6WNqPxuRljGgPNAjIFaXhEbbCN
-   ArJryowgERimlHqyOoAAWChhfssj4JkwzGdaQUIarZqIV1m1tdlmnmnUN
+  t=1740736828; x=1772272828;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=FR7VXhq7kJJhnDdXogb0kbltGNxPbQG5i1EfEqzgX2g=;
+  b=i47JWgpfHBGqP2h8m71QZdoRQNt0I64MpBLV2iamDX17XzyjuTwLxAhe
+   H7+7aJc+4+vquWfhUt5MPYNH1CXx9d6pxmFKtMGr+wk745mWXqempb3Tz
+   4A+gzn3gjadsxSYBpCLzSNQM8uNPhVvBTLXCNodN49HAdYSwwuBBKoibr
+   ZAdOhGA42ZnWwFleiXBvZvpWq5815o5pcxp57T1nlS917sE6PZ2/Sou9I
+   eWfQy4Xu1zIVomZeDvGbFC+/0TR5ODw7tIZOwakzCYk5SasZJEBIAkMeO
+   vmhl6uBHMyRfu7DwlDCobfxmoCzYnCQGUguTjhbU17m/6lmcdcf5Z/ylj
    g==;
-X-CSE-ConnectionGUID: 0G94Y03NTD27BXk7aHKwaQ==
-X-CSE-MsgGUID: zjA4qFZZSqucPmtnT8duFw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11358"; a="40902561"
+X-CSE-ConnectionGUID: f+q/mnYhQnyv5Fa9MdY31Q==
+X-CSE-MsgGUID: GRFIhvBoSEyxuiHYOAQzGA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11358"; a="41911938"
 X-IronPort-AV: E=Sophos;i="6.13,322,1732608000"; 
-   d="scan'208";a="40902561"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2025 02:00:25 -0800
-X-CSE-ConnectionGUID: BN2lmjiZSoC4tJ7eYm7eeg==
-X-CSE-MsgGUID: vEWfnqsCQWC/9TEbN1FKhA==
+   d="scan'208";a="41911938"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2025 02:00:27 -0800
+X-CSE-ConnectionGUID: m47WACJ4Q/WYy0gale5nxw==
+X-CSE-MsgGUID: 97+XO8wJRMavJVwY0pznGg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.13,322,1732608000"; 
-   d="scan'208";a="117325690"
-Received: from jf5300-b11a338t.jf.intel.com ([10.242.51.115])
-  by orviesa006.jf.intel.com with ESMTP; 28 Feb 2025 02:00:25 -0800
-From: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
-To: linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org,
-	hannes@cmpxchg.org,
-	yosry.ahmed@linux.dev,
-	nphamcs@gmail.com,
-	chengming.zhou@linux.dev,
-	usamaarif642@gmail.com,
-	ryan.roberts@arm.com,
-	21cnbao@gmail.com,
-	ying.huang@linux.alibaba.com,
-	akpm@linux-foundation.org,
-	linux-crypto@vger.kernel.org,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	clabbe@baylibre.com,
-	ardb@kernel.org,
-	ebiggers@google.com,
-	surenb@google.com,
-	kristen.c.accardi@intel.com
-Cc: wajdi.k.feghali@intel.com,
-	vinodh.gopal@intel.com,
-	kanchana.p.sridhar@intel.com
-Subject: [PATCH v7 01/15] crypto: acomp - Add synchronous/asynchronous acomp request chaining.
-Date: Fri, 28 Feb 2025 02:00:10 -0800
-Message-Id: <20250228100024.332528-2-kanchana.p.sridhar@intel.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20250228100024.332528-1-kanchana.p.sridhar@intel.com>
-References: <20250228100024.332528-1-kanchana.p.sridhar@intel.com>
+   d="scan'208";a="122238626"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 28 Feb 2025 02:00:27 -0800
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Fri, 28 Feb 2025 02:00:26 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Fri, 28 Feb 2025 02:00:26 -0800
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.172)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Fri, 28 Feb 2025 02:00:25 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=o0e5B5H6WNVQhyyoWO8jFainmurqs2pgvow4Zf/WI5PUxE8xQ1B1wvnx+hVtxrdJ2R2bgYx9vHsWIJcB2i57U42s3iYufUJLRTlQpFh1ELpGi9a/6HcRKDUXuFBnrLD2kFSPBjQhVM75xqZ62aqmauw3U/eJSJvIRasxr2zugM3IjPT5CFcw9a0QGCFf6bRD5ZkHg1rzVnseTtUxNVrKTwC8B3/UzrMq1nCTgJJ0AXEOhpuwhs3iX4oK3y1dsUyZKtG+SfhcCAJs/yAxxU/ThraBaW7Ppk92F1CVZbOzirndDZcfcWtCzHa8OPu4RlR9AI3aNfEn1JHdKdEj3aHi3Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LjFXpprxqMosk4BcvHyPTQhgah+sYbjBFVf6UOk6mfA=;
+ b=sR2Ity9OeSx+PJlpDcHNvVkrK1T0Z3ad+Cf9EQFcHKH2BhJTChesCnx4AQTOHZlC+ehWhpG4gOUsYqEBhhv0cbk78SGozvZZqlLVcJzHiBIpcEP9vmcMie3dxpropgbvwGrjLRiIvapnA1xGLbu0Lf1SiaN9PZuL3+0+4f9GwEKfiFTMB3PmYPgc+w3mcuuM1Vtbtgy+frl0Jf5J+DMTOSud0BOHiskU9G3DCjrfy4coWLB6InUZhxM6QMypFHrbBglnzHBOFfSOPVOOTl45zhkbLC4nkLPApcfPCJuvdCK4ieNljG9hkOss2r73CMaf6ObZOFnVcthfH3593WWqOQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from SA3PR11MB8120.namprd11.prod.outlook.com (2603:10b6:806:2f3::7)
+ by PH8PR11MB8287.namprd11.prod.outlook.com (2603:10b6:510:1c7::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.23; Fri, 28 Feb
+ 2025 10:00:14 +0000
+Received: from SA3PR11MB8120.namprd11.prod.outlook.com
+ ([fe80::3597:77d7:f969:142c]) by SA3PR11MB8120.namprd11.prod.outlook.com
+ ([fe80::3597:77d7:f969:142c%5]) with mapi id 15.20.8489.021; Fri, 28 Feb 2025
+ 10:00:14 +0000
+From: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>, "hannes@cmpxchg.org"
+	<hannes@cmpxchg.org>, "nphamcs@gmail.com" <nphamcs@gmail.com>,
+	"chengming.zhou@linux.dev" <chengming.zhou@linux.dev>,
+	"usamaarif642@gmail.com" <usamaarif642@gmail.com>, "ryan.roberts@arm.com"
+	<ryan.roberts@arm.com>, "21cnbao@gmail.com" <21cnbao@gmail.com>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	"davem@davemloft.net" <davem@davemloft.net>, "clabbe@baylibre.com"
+	<clabbe@baylibre.com>, "ardb@kernel.org" <ardb@kernel.org>,
+	"ebiggers@google.com" <ebiggers@google.com>, "surenb@google.com"
+	<surenb@google.com>, "Accardi, Kristen C" <kristen.c.accardi@intel.com>,
+	"Feghali, Wajdi K" <wajdi.k.feghali@intel.com>, "Gopal, Vinodh"
+	<vinodh.gopal@intel.com>, "Sridhar, Kanchana P"
+	<kanchana.p.sridhar@intel.com>
+Subject: RE: [PATCH v6 16/16] mm: zswap: Fix for zstd performance regression
+ with 2M folios.
+Thread-Topic: [PATCH v6 16/16] mm: zswap: Fix for zstd performance regression
+ with 2M folios.
+Thread-Index: AQHbeGfFTl/pqIzrhU2kP7T9pgXuirM6pheAgCGsBRA=
+Date: Fri, 28 Feb 2025 10:00:13 +0000
+Message-ID: <SA3PR11MB81204A08DD5F8E5C58EB526AC9CC2@SA3PR11MB8120.namprd11.prod.outlook.com>
+References: <20250206072102.29045-1-kanchana.p.sridhar@intel.com>
+ <20250206072102.29045-17-kanchana.p.sridhar@intel.com>
+ <Z6UKQ04ClABSePLZ@google.com>
+In-Reply-To: <Z6UKQ04ClABSePLZ@google.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA3PR11MB8120:EE_|PH8PR11MB8287:EE_
+x-ms-office365-filtering-correlation-id: 4157f54f-9cd1-435e-b8c1-08dd57deb21d
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?l0Ugx6I96E6w/QVrn0wJqbqmkBTFJmzgfgGr0yVWEC88DPhY1LkQrV3tSAY9?=
+ =?us-ascii?Q?/nNGYnVftT4GOZN7EoWTk4/b77OcOcmuz7i5gffHv4rCOQVRTkmEdPqJg89f?=
+ =?us-ascii?Q?kT3RU8jnxX1KyIm2fvISYiZ1rM5IEd2WIuI5H48p1Kiqw3c76Puf6hI8OP5n?=
+ =?us-ascii?Q?TNsLF1WWpowljSZI6HV/WRcjjvNTdmY7oyGGN0+3yFaj0CkOoy2W3hvXdaZG?=
+ =?us-ascii?Q?uMkT0y028eQk1iMZybaaLaBx2KxR93Dn+WyA9AfblhoXrhSbegpjHUA5xoJ0?=
+ =?us-ascii?Q?R3eS596h3/Wce9kHiWqYxj5H6JnMmo+SALcHaktj6NaKJ2ZQYP/QHeePjfgR?=
+ =?us-ascii?Q?DNBh0knB+HBmVDHMgfoBCyW6qMZOZlA9iG52D7iXFApZA3pNwxLk73N/6qr+?=
+ =?us-ascii?Q?47mOtMQyW1w5As8FDU8lr3x/ed8m1aCGPzf+QLFn/UT5w95tzhpPs43qw7OA?=
+ =?us-ascii?Q?gnXokm3jvr1i4dLDzq+VYyDoto8N+8mEFC12Ub3uoDCv16WvI3zmxItKTX7h?=
+ =?us-ascii?Q?PyvPXRp8Qjfr+zNWXGCUzRPfl5a0A6oFsEBdXxVJ/koIHgrpIhiew76UNN8n?=
+ =?us-ascii?Q?Z7ymGwZAcJ5Dg+sQ+CTixaKHRnRwUdZ0jRQqhQijAG/c29D+VZsZJxAobI4p?=
+ =?us-ascii?Q?yHA12eqqkkh9Z73KNDJH7s5Z463Z7R/lFTKxIJdV/Lm8P4u4JlHMwwKGv2wK?=
+ =?us-ascii?Q?fCfEpFX6ESjvQ4I745/1H/YmxFnrzg65gEAK7qt5rmTdp8Uhw5bLyG+IUS8E?=
+ =?us-ascii?Q?gEFQNVf5CS+WAjdnA1zQDA2Qi4Nc4RH26MzVWwdjsCkV2NTWrHoldCriuevO?=
+ =?us-ascii?Q?qHHjLp2i8B9HA3wgTAuq8AcCNhN3P9pIWUN7s99T8BphAgFsAYkxATHa3JXb?=
+ =?us-ascii?Q?gf+9l4n+rFmtRITzfDhiasFPPnTntcCwh9HVwZBEBxpccR+Bk5UXkxnQhDyX?=
+ =?us-ascii?Q?pjQAHqsgOYmgm2tm8XpkYU9pasFr/Nan36wtzOSB9AwTmH0jhxUruYsAWj2t?=
+ =?us-ascii?Q?EHZGzIWcQisM4Dmutwt9D82oGjHFJNmL+1J457zrlPOYvCFppq/duVVtFeKH?=
+ =?us-ascii?Q?br+kG4yiaSJMxx+kppHcuUnXZvyObOebdBumSCNVFdeLJrg4kNM5dNOQbPC2?=
+ =?us-ascii?Q?fTZMOG/maipYoAehD7uj3BKhhTaluPGRB9fGtXrWvlBFNFkm8ww7PO5RTwHP?=
+ =?us-ascii?Q?FBWN7VidcVXh5dhYeBI7KmUgBriUuA2wYDb/esmUOqTHDAKscdxtaXCfEl1y?=
+ =?us-ascii?Q?SWVqywGgDd0SkRgZrcWVGuwa+QIWG3WzdQcLz7Y8a+8azZWtEruMsn+s54B4?=
+ =?us-ascii?Q?EgNmnd8p17hTqFiLZbRzvLufXB7JJE0ME+kvkVrNWChmZXi8ACGrSgfdh2rf?=
+ =?us-ascii?Q?B7CTF8w5FZspK4kBIxLBMmULSroK7lfn95Hvqkqt8cC5hJkR4y7cS1kqDZrk?=
+ =?us-ascii?Q?rqR35agjLQMamrqCXeFvBW/k7aGXnyIl?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR11MB8120.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?/F/6WACLYUQJaQp+R7/4NbDlLZpi52ozo18l17+Z0ZXwDVMs0RaIB2fhnO5Y?=
+ =?us-ascii?Q?yURW8BRnCycuRmoZpwVYOaBDtgPYNig9lwZKxYWwBjiFK4PODJPcfvEqLm4c?=
+ =?us-ascii?Q?BVJFWloojnMiPy0R/ScVqQPskA/u2zdJyoyRSAFvWFSS4aNc4rNIe3URkkna?=
+ =?us-ascii?Q?TkT0VRvAQfcPqscCQvAW4+pUaeJ6mqqjy4foumCmxwVuLwXAoEC/GxkzjFAQ?=
+ =?us-ascii?Q?o7BGWgfky0SvlXSIFuuxNp1dtu8yYYG/nVhdPTj+lPpgoeXeRhxOZ7KZDqxS?=
+ =?us-ascii?Q?ADlDqRFessDL/zt60mrv7k0DWm6Barnbul9ikr+FHvjrYm3omc4k7FREnNN/?=
+ =?us-ascii?Q?PBRzCSutUZq1MtYXilQgCMJBTSkYh0vdiUThnQEcVeU2X6BQGcUEvi4q3nxm?=
+ =?us-ascii?Q?BkrRcEq7+K3WGiW34NXkYzPKC+LtUQ/zpgQzdg4KLs6JQvJxDwvC2M+AFVPz?=
+ =?us-ascii?Q?J9Kxlp8kBmlcA6bB9IDW/N7zMH8dhziibnjTnPGje39c1i2LB5VmjeEOWU7L?=
+ =?us-ascii?Q?iWst5aYp/SRD2x4mjtLU5O6/smOgypKwPk7VmKNCZfcE3sSyshfr67Yc0H1k?=
+ =?us-ascii?Q?UulaDvsrYJjDX3jfxu0ZgKnlStCj8SCLho811dfR3O4r+P58ft0TyvbHhVkf?=
+ =?us-ascii?Q?Gpn7irzs8Z38Pz5CAsmFuB3zffhtjZhWjQKd8ty7Gro+gTIaa3zgmHDENnfA?=
+ =?us-ascii?Q?kEm/8c6LJqMy2owFvlcHe5in5T2/LcE0WH62oCwalxnbM7oDR7Rpv5O9L9sr?=
+ =?us-ascii?Q?qqrxAnq5wUJVTwZ0+4BD+COqrWxveyEgXbeYZRPjSXNLxxRV4Ar4XJ49pZfF?=
+ =?us-ascii?Q?Tin0Mnmy3zjdH4W1JzGonX6Lq5oMwNppp+LnA/gDVVulVYVrBg+HGxla6mvN?=
+ =?us-ascii?Q?aRz8syWRNr6AVKWw97y8QDPrn3XLqZ1WSSuydNUGDJi15AboW+V17SYb4fKa?=
+ =?us-ascii?Q?GcNSlXBInu6yBSEVxSzTOlhgSpPWxdBGoPq+mW829FSYjSe+12XqXoQZ27/F?=
+ =?us-ascii?Q?ivQR2A1hCTbV4/t0toGoAwY6t6G0KroxnRbv6XyrDVviuOoXrv1bbEuMYPtY?=
+ =?us-ascii?Q?o67NTljeGStxqZL39vzBSbAVxvSAiSX2jKgtOwAIK8f/zSgRmJLDsQzHLqVJ?=
+ =?us-ascii?Q?rVmCMu419pvSAMYpUxgGgYcbLii3hPZde47ZMk4H/gIsDvJwx+/dsotVudqo?=
+ =?us-ascii?Q?KdHnmq7d3pBs7uJdio7ZQc3b9EpgBPXXlugT8VNLZQtWY06MeyT55VkdGVvv?=
+ =?us-ascii?Q?gdv9v5AuBDJZXlqdDzCPX0DkoJd5GQOJGc5rdfM+S1CZaNl+kwOBsK8f7ZgT?=
+ =?us-ascii?Q?AuauKltgOo+SRSMg0GZDpvpYCd3rmnvCg7Y4kGKizoQbsgcajuVDeJ/uDaX2?=
+ =?us-ascii?Q?7e6Z4Or4qdKbtV1tTFMb97IFJ9IT+s0XbRgHEvNF1FG4mASQLJfc/rxxUN1N?=
+ =?us-ascii?Q?K2Hb7o3zNOi5bxbRGkrAur+xdobfwwyEApA8rA2MzYBZ/5ME9TB1yKNnUfmI?=
+ =?us-ascii?Q?KbvaNfeI2aHSRCUO/XAdzp6iIzMtLyKVXgcrUpIGrhiW18qLOVkLwLTgHxyz?=
+ =?us-ascii?Q?gvk4GgNXJvomvPw7hdAJfPWPtWP68NNTH3CPYdXTjvecNYg/0V7iT7kgRIAs?=
+ =?us-ascii?Q?Mw=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR11MB8120.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4157f54f-9cd1-435e-b8c1-08dd57deb21d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Feb 2025 10:00:13.9023
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: PR9k3d2hwB/7oOFK52THJXKNOvWmUmwjOfPwkfoWsNhiDRR2OZo/b8uWuzgKvGLq7U6uD9oiMae/c+eMxyktPDz1GOuKkCZlJxWJo+sYS7k=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB8287
+X-OriginatorOrg: intel.com
 
-This patch is based on Herbert Xu's request chaining for ahash
-("[PATCH 2/6] crypto: hash - Add request chaining API") [1]. The generic
-framework for request chaining that's provided in the ahash implementation
-has been used as reference to develop a similar synchronous request
-chaining framework for crypto_acomp.
+Hi Yosry, Nhat,
 
-Furthermore, this commit develops an asynchronous request chaining
-framework and API that iaa_crypto can use for request chaining with
-parallelism, in order to fully benefit from Intel IAA's multiple
-compress/decompress engines in hardware. This allows us to gain significant
-latency improvements with IAA batching as compared to synchronous request
-chaining.
+> -----Original Message-----
+> From: Yosry Ahmed <yosry.ahmed@linux.dev>
+> Sent: Thursday, February 6, 2025 11:15 AM
+> To: Sridhar, Kanchana P <kanchana.p.sridhar@intel.com>
+> Cc: linux-kernel@vger.kernel.org; linux-mm@kvack.org;
+> hannes@cmpxchg.org; nphamcs@gmail.com; chengming.zhou@linux.dev;
+> usamaarif642@gmail.com; ryan.roberts@arm.com; 21cnbao@gmail.com;
+> akpm@linux-foundation.org; linux-crypto@vger.kernel.org;
+> herbert@gondor.apana.org.au; davem@davemloft.net;
+> clabbe@baylibre.com; ardb@kernel.org; ebiggers@google.com;
+> surenb@google.com; Accardi, Kristen C <kristen.c.accardi@intel.com>;
+> Feghali, Wajdi K <wajdi.k.feghali@intel.com>; Gopal, Vinodh
+> <vinodh.gopal@intel.com>
+> Subject: Re: [PATCH v6 16/16] mm: zswap: Fix for zstd performance
+> regression with 2M folios.
+>=20
+> On Wed, Feb 05, 2025 at 11:21:02PM -0800, Kanchana P Sridhar wrote:
+> > With the previous patch that enables support for batch compressions in
+> > zswap_compress_folio(), a 6.2% throughput regression was seen with zstd
+> and
+> > 2M folios, using vm-scalability/usemem.
+> >
+> > For compressors that don't support batching, this was root-caused to th=
+e
+> > following zswap_store_folio() structure:
+> >
+> >  Batched stores:
+> >  ---------------
+> >  - Allocate all entries,
+> >  - Compress all entries,
+> >  - Store all entries in xarray/LRU.
+> >
+> > Hence, the above structure is maintained only for batched stores, and t=
+he
+> > following structure is implemented for sequential stores of large folio=
+ pages,
+> > that fixes the zstd regression, while preserving common code paths for
+> batched
+> > and sequential stores of a folio:
+> >
+> >  Sequential stores:
+> >  ------------------
+> >  For each page in folio:
+> >   - allocate an entry,
+> >   - compress the page,
+> >   - store the entry in xarray/LRU.
+> >
+> > This is submitted as a separate patch only for code review purposes. I =
+will
+> > squash this with the previous commit in subsequent versions of this
+> > patch-series.
+>=20
+> Could it be the cache locality?
 
- Usage of acomp request chaining API:
- ====================================
+It is possible, since there are more LLC-store-misses in v6, patch 15 (that=
+ has
+the regression) as compared to patch v6 16 (that fixes the regression).
 
- Any crypto_acomp compressor can avail of request chaining as follows:
+>=20
+> I wonder if we should do what Chengming initially suggested and batch
+> everything at ZSWAP_MAX_BATCH_SIZE instead. Instead of
+> zswap_compress_folio() operating on the entire folio, we can operate on
+> batches of size ZSWAP_MAX_BATCH_SIZE, regardless of whether the
+> underlying compressor supports batching.
+>=20
+> If we do this, instead of:
+> - Allocate all entries
+> - Compress all entries
+> - Store all entries
+>=20
+> We can do:
+>   - For each batch (8 entries)
+>   	- Allocate all entries
+> 	- Compress all entries
+> 	- Store all entries
+>=20
+> This should help unify the code, and I suspect it may also fix the zstd
+> regression. We can also skip the entries array allocation and use one on
+> the stack.
 
- Step 1: Create request chain:
+I tried the above, and additional approaches to unify the code, and all of
+them cause a regression in zstd throughput and latency in the usemem 30
+processes experiments:
 
-  Request 0 (the first req in the chain):
+1) Operate on batches of size ZSWAP_MAX_BATCH_SIZE, regardless of
+     whether the underlying compressor supports batching. I tried this with=
+out
+     and with upfront allocation of all entries.
+2) Unify post-compression zpool malloc, map handle, memcpy computes
+    done in zswap_compress() and zswap_batch_compress() by moving them
+    to a procedure and calling this from both these functions. Tried withou=
+t
+    and with inlining this procedure.
+3) With the v7 changes to make the acomp_ctx resources' lifetime be from
+    pool creation to pool deletion, I wanted to make another functional cha=
+nge in
+    acomp_ctx_get_cpu_lock(), as described in the code comments in v7.
+    However, I found that making just this change in zswap_decompress() cau=
+sed
+    zstd regression:
 
-  void acomp_reqchain_init(struct acomp_req *req,
-                           u32 flags, crypto_completion_t compl,
-                           void *data);
+     do {=20
+                   acomp_ctx =3D acomp_ctx_get_cpu_lock(entry->pool);
+     } while (!acomp_ctx);
 
-  Subsequent requests:
+		/*
+		 * If the CPU onlining code successfully allocates acomp_ctx resources,
+		 * it sets acomp_ctx->initialized to true. Until this happens, we have
+		 * two options:
+		 *
+		 * 1. Return NULL and fail all stores on this CPU.
+		 * 2. Retry, until onlining has finished allocating resources.
+		 *
+		 * In theory, option 1 could be more appropriate, because it
+		 * allows the calling procedure to decide how it wants to handle
+		 * reclaim racing with CPU hotplug. For instance, it might be Ok
+		 * for compress to return an error for the backing swap device
+		 * to store the folio. Decompress could wait until we get a
+		 * valid and locked mutex after onlining has completed. For now,
+		 * we go with option 2 because adding a do-while in
+		 * zswap_decompress() adds latency for software compressors.
+		*/=20
 
-  void acomp_request_chain(struct acomp_req *req,
-                           struct acomp_req *head);
+My main learning from these attempts to try alternate approaches to resolve
+the zstd regression and to unify common computes into distinct procedures
+that zswap_compress() and zswap_batch_compress() will each call, is this:
+zstd is extremely sensitive to any and all compute overheads. The above
+approaches yield approx.. these zstd latencies with 64K folios quite consis=
+tently
+(I will summarize the mm-unstable data in v7):
 
- Step 2: Process the request chain using the specified compress/decompress
-         "op":
+Total throughput (KB/s)              6,909,838      =20
+Average throughput (KB/s)        230,327
+elapsed time (sec)                       94.58
+sys time (sec)                               2,358.36
 
-  2.a) Synchronous: the chain of requests is processed in series:
+The v7 implementation of zswap_store_folios() consistently gives better lat=
+ency:
 
-       int acomp_do_req_chain(struct acomp_req *req,
-                              int (*op)(struct acomp_req *req));
+Total throughput (KB/s)              6,939,253     =20
+Average throughput (KB/s)        231,308
+elapsed time (sec)                       88.64
+sys time (sec)                               2,197.54
 
-  2.b) Asynchronous: the chain of requests is processed in parallel using a
-       submit-poll paradigm:
+My main goal in v7 has been to not regress zstd by introducing compute
+overheads, while deriving the benefits of batching with request chaining,
+while trying to preserve the v6 structure of zswap_store_folio() that aims
+to strike a balance between:
 
-       int acomp_do_async_req_chain(struct acomp_req *req,
-                                    int (*op_submit)(struct acomp_req *req),
-                                    int (*op_poll)(struct acomp_req *req));
+1) Common code for batching and sequential.
+2) Making that common code "behave" sequentially so that zstd does not
+    see a latency regression.
 
-Request chaining will be used in subsequent patches to implement
-compress/decompress batching in the iaa_crypto driver for the two supported
-IAA driver sync_modes:
+I would appreciate it if you can review the v7 implementation and let me
+know if this would be acceptable.
 
-  sync_mode = 'sync' will use (2.a),
-  sync_mode = 'async' will use (2.b).
-
-These files are directly re-used from [1] which is not yet merged:
-
-include/crypto/algapi.h
-include/linux/crypto.h
-
-Hence, I am adding Herbert as the co-developer of this acomp request
-chaining patch.
-
-[1]: https://lore.kernel.org/linux-crypto/677614fbdc70b31df2e26483c8d2cd1510c8af91.1730021644.git.herbert@gondor.apana.org.au/
-
-Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
-Co-developed-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by:
----
- crypto/acompress.c                  | 284 ++++++++++++++++++++++++++++
- include/crypto/acompress.h          |  46 +++++
- include/crypto/algapi.h             |  10 +
- include/crypto/internal/acompress.h |  10 +
- include/linux/crypto.h              |  39 ++++
- 5 files changed, 389 insertions(+)
-
-diff --git a/crypto/acompress.c b/crypto/acompress.c
-index 6fdf0ff9f3c0..cb6444d09dd7 100644
---- a/crypto/acompress.c
-+++ b/crypto/acompress.c
-@@ -23,6 +23,19 @@ struct crypto_scomp;
- 
- static const struct crypto_type crypto_acomp_type;
- 
-+struct acomp_save_req_state {
-+	struct list_head head;
-+	struct acomp_req *req0;
-+	struct acomp_req *cur;
-+	int (*op)(struct acomp_req *req);
-+	crypto_completion_t compl;
-+	void *data;
-+};
-+
-+static void acomp_reqchain_done(void *data, int err);
-+static int acomp_save_req(struct acomp_req *req, crypto_completion_t cplt);
-+static void acomp_restore_req(struct acomp_req *req);
-+
- static inline struct acomp_alg *__crypto_acomp_alg(struct crypto_alg *alg)
- {
- 	return container_of(alg, struct acomp_alg, calg.base);
-@@ -123,6 +136,277 @@ struct crypto_acomp *crypto_alloc_acomp_node(const char *alg_name, u32 type,
- }
- EXPORT_SYMBOL_GPL(crypto_alloc_acomp_node);
- 
-+static int acomp_save_req(struct acomp_req *req, crypto_completion_t cplt)
-+{
-+	struct crypto_acomp *tfm = crypto_acomp_reqtfm(req);
-+	struct acomp_save_req_state *state;
-+	gfp_t gfp;
-+	u32 flags;
-+
-+	if (!acomp_is_async(tfm))
-+		return 0;
-+
-+	flags = acomp_request_flags(req);
-+	gfp = (flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?  GFP_KERNEL : GFP_ATOMIC;
-+	state = kmalloc(sizeof(*state), gfp);
-+	if (!state)
-+		return -ENOMEM;
-+
-+	state->compl = req->base.complete;
-+	state->data = req->base.data;
-+	state->req0 = req;
-+
-+	req->base.complete = cplt;
-+	req->base.data = state;
-+
-+	return 0;
-+}
-+
-+static void acomp_restore_req(struct acomp_req *req)
-+{
-+	struct crypto_acomp *tfm = crypto_acomp_reqtfm(req);
-+	struct acomp_save_req_state *state;
-+
-+	if (!acomp_is_async(tfm))
-+		return;
-+
-+	state = req->base.data;
-+
-+	req->base.complete = state->compl;
-+	req->base.data = state->data;
-+	kfree(state);
-+}
-+
-+static int acomp_reqchain_finish(struct acomp_save_req_state *state,
-+				 int err, u32 mask)
-+{
-+	struct acomp_req *req0 = state->req0;
-+	struct acomp_req *req = state->cur;
-+	struct acomp_req *n;
-+
-+	req->base.err = err;
-+
-+	if (req == req0)
-+		INIT_LIST_HEAD(&req->base.list);
-+	else
-+		list_add_tail(&req->base.list, &req0->base.list);
-+
-+	list_for_each_entry_safe(req, n, &state->head, base.list) {
-+		list_del_init(&req->base.list);
-+
-+		req->base.flags &= mask;
-+		req->base.complete = acomp_reqchain_done;
-+		req->base.data = state;
-+		state->cur = req;
-+		err = state->op(req);
-+
-+		if (err == -EINPROGRESS) {
-+			if (!list_empty(&state->head))
-+				err = -EBUSY;
-+			goto out;
-+		}
-+
-+		if (err == -EBUSY)
-+			goto out;
-+
-+		req->base.err = err;
-+		list_add_tail(&req->base.list, &req0->base.list);
-+	}
-+
-+	acomp_restore_req(req0);
-+
-+out:
-+	return err;
-+}
-+
-+static void acomp_reqchain_done(void *data, int err)
-+{
-+	struct acomp_save_req_state *state = data;
-+	crypto_completion_t compl = state->compl;
-+
-+	data = state->data;
-+
-+	if (err == -EINPROGRESS) {
-+		if (!list_empty(&state->head))
-+			return;
-+		goto notify;
-+	}
-+
-+	err = acomp_reqchain_finish(state, err, CRYPTO_TFM_REQ_MAY_BACKLOG);
-+	if (err == -EBUSY)
-+		return;
-+
-+notify:
-+	compl(data, err);
-+}
-+
-+int acomp_do_req_chain(struct acomp_req *req,
-+		       int (*op)(struct acomp_req *req))
-+{
-+	struct crypto_acomp *tfm = crypto_acomp_reqtfm(req);
-+	struct acomp_save_req_state *state;
-+	struct acomp_save_req_state state0;
-+	int err = 0;
-+
-+	if (!acomp_request_chained(req) || list_empty(&req->base.list) ||
-+	    !crypto_acomp_req_chain(tfm))
-+		return op(req);
-+
-+	state = &state0;
-+
-+	if (acomp_is_async(tfm)) {
-+		err = acomp_save_req(req, acomp_reqchain_done);
-+		if (err) {
-+			struct acomp_req *r2;
-+
-+			req->base.err = err;
-+			list_for_each_entry(r2, &req->base.list, base.list)
-+				r2->base.err = err;
-+
-+			return err;
-+		}
-+
-+		state = req->base.data;
-+	}
-+
-+	state->op = op;
-+	state->cur = req;
-+	INIT_LIST_HEAD(&state->head);
-+	list_splice(&req->base.list, &state->head);
-+
-+	err = op(req);
-+	if (err == -EBUSY || err == -EINPROGRESS)
-+		return -EBUSY;
-+
-+	return acomp_reqchain_finish(state, err, ~0);
-+}
-+EXPORT_SYMBOL_GPL(acomp_do_req_chain);
-+
-+static void acomp_async_reqchain_done(struct acomp_req *req0,
-+				      struct list_head *state,
-+				      int (*op_poll)(struct acomp_req *req))
-+{
-+	struct acomp_req *req, *n;
-+	bool req0_done = false;
-+	int err;
-+
-+	while (!list_empty(state)) {
-+
-+		if (!req0_done) {
-+			err = op_poll(req0);
-+			if (!(err == -EAGAIN || err == -EINPROGRESS || err == -EBUSY)) {
-+				req0->base.err = err;
-+				req0_done = true;
-+			}
-+		}
-+
-+		list_for_each_entry_safe(req, n, state, base.list) {
-+			err = op_poll(req);
-+
-+			if (err == -EAGAIN || err == -EINPROGRESS || err == -EBUSY)
-+				continue;
-+
-+			req->base.err = err;
-+			list_del_init(&req->base.list);
-+			list_add_tail(&req->base.list, &req0->base.list);
-+		}
-+	}
-+
-+	while (!req0_done) {
-+		err = op_poll(req0);
-+		if (!(err == -EAGAIN || err == -EINPROGRESS || err == -EBUSY)) {
-+			req0->base.err = err;
-+			break;
-+		}
-+	}
-+}
-+
-+static int acomp_async_reqchain_finish(struct acomp_req *req0,
-+				       struct list_head *state,
-+				       int (*op_submit)(struct acomp_req *req),
-+				       int (*op_poll)(struct acomp_req *req))
-+{
-+	struct acomp_req *req, *n;
-+	int err = 0;
-+
-+	INIT_LIST_HEAD(&req0->base.list);
-+
-+	list_for_each_entry_safe(req, n, state, base.list) {
-+		BUG_ON(req == req0);
-+
-+		err = op_submit(req);
-+
-+		if (!(err == -EINPROGRESS || err == -EBUSY)) {
-+			req->base.err = err;
-+			list_del_init(&req->base.list);
-+			list_add_tail(&req->base.list, &req0->base.list);
-+		}
-+	}
-+
-+	acomp_async_reqchain_done(req0, state, op_poll);
-+
-+	return req0->base.err;
-+}
-+
-+int acomp_do_async_req_chain(struct acomp_req *req,
-+			     int (*op_submit)(struct acomp_req *req),
-+			     int (*op_poll)(struct acomp_req *req))
-+{
-+	struct crypto_acomp *tfm = crypto_acomp_reqtfm(req);
-+	struct list_head state;
-+	struct acomp_req *r2;
-+	int err = 0;
-+	void *req0_data = req->base.data;
-+
-+	if (!acomp_request_chained(req) || list_empty(&req->base.list) ||
-+		!acomp_is_async(tfm) || !crypto_acomp_req_chain(tfm)) {
-+
-+		err = op_submit(req);
-+
-+		if (err == -EINPROGRESS || err == -EBUSY) {
-+			bool req0_done = false;
-+
-+			while (!req0_done) {
-+				err = op_poll(req);
-+				if (!(err == -EAGAIN || err == -EINPROGRESS || err == -EBUSY)) {
-+					req->base.err = err;
-+					break;
-+				}
-+			}
-+		} else {
-+			req->base.err = err;
-+		}
-+
-+		req->base.data = req0_data;
-+		if (acomp_is_async(tfm))
-+			req->base.complete(req->base.data, req->base.err);
-+
-+		return err;
-+	}
-+
-+	err = op_submit(req);
-+	req->base.err = err;
-+
-+	if (err && !(err == -EINPROGRESS || err == -EBUSY))
-+		goto err_prop;
-+
-+	INIT_LIST_HEAD(&state);
-+	list_splice(&req->base.list, &state);
-+
-+	err = acomp_async_reqchain_finish(req, &state, op_submit, op_poll);
-+	req->base.data = req0_data;
-+	req->base.complete(req->base.data, req->base.err);
-+
-+	return err;
-+
-+err_prop:
-+	list_for_each_entry(r2, &req->base.list, base.list)
-+		r2->base.err = err;
-+
-+	return err;
-+}
-+EXPORT_SYMBOL_GPL(acomp_do_async_req_chain);
-+
- struct acomp_req *acomp_request_alloc(struct crypto_acomp *acomp)
- {
- 	struct crypto_tfm *tfm = crypto_acomp_tfm(acomp);
-diff --git a/include/crypto/acompress.h b/include/crypto/acompress.h
-index 54937b615239..e6783deba3ac 100644
---- a/include/crypto/acompress.h
-+++ b/include/crypto/acompress.h
-@@ -206,6 +206,7 @@ static inline void acomp_request_set_callback(struct acomp_req *req,
- 	req->base.data = data;
- 	req->base.flags &= CRYPTO_ACOMP_ALLOC_OUTPUT;
- 	req->base.flags |= flgs & ~CRYPTO_ACOMP_ALLOC_OUTPUT;
-+	req->base.flags &= ~CRYPTO_TFM_REQ_CHAIN;
- }
- 
- /**
-@@ -237,6 +238,51 @@ static inline void acomp_request_set_params(struct acomp_req *req,
- 		req->flags |= CRYPTO_ACOMP_ALLOC_OUTPUT;
- }
- 
-+static inline u32 acomp_request_flags(struct acomp_req *req)
-+{
-+	return req->base.flags;
-+}
-+
-+static inline void acomp_reqchain_init(struct acomp_req *req,
-+				       u32 flags, crypto_completion_t compl,
-+				       void *data)
-+{
-+	acomp_request_set_callback(req, flags, compl, data);
-+	crypto_reqchain_init(&req->base);
-+}
-+
-+static inline bool acomp_is_reqchain(struct acomp_req *req)
-+{
-+	return crypto_is_reqchain(&req->base);
-+}
-+
-+static inline void acomp_reqchain_clear(struct acomp_req *req, void *data)
-+{
-+	struct crypto_wait *wait = (struct crypto_wait *)data;
-+	reinit_completion(&wait->completion);
-+	crypto_reqchain_clear(&req->base);
-+	acomp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-+				   crypto_req_done, data);
-+}
-+
-+static inline void acomp_request_chain(struct acomp_req *req,
-+				       struct acomp_req *head)
-+{
-+	crypto_request_chain(&req->base, &head->base);
-+}
-+
-+int acomp_do_req_chain(struct acomp_req *req,
-+		       int (*op)(struct acomp_req *req));
-+
-+int acomp_do_async_req_chain(struct acomp_req *req,
-+			     int (*op_submit)(struct acomp_req *req),
-+			     int (*op_poll)(struct acomp_req *req));
-+
-+static inline int acomp_request_err(struct acomp_req *req)
-+{
-+	return req->base.err;
-+}
-+
- /**
-  * crypto_acomp_compress() -- Invoke asynchronous compress operation
-  *
-diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-index 156de41ca760..c5df380c7d08 100644
---- a/include/crypto/algapi.h
-+++ b/include/crypto/algapi.h
-@@ -271,4 +271,14 @@ static inline u32 crypto_tfm_alg_type(struct crypto_tfm *tfm)
- 	return tfm->__crt_alg->cra_flags & CRYPTO_ALG_TYPE_MASK;
- }
- 
-+static inline bool crypto_request_chained(struct crypto_async_request *req)
-+{
-+	return req->flags & CRYPTO_TFM_REQ_CHAIN;
-+}
-+
-+static inline bool crypto_tfm_req_chain(struct crypto_tfm *tfm)
-+{
-+	return tfm->__crt_alg->cra_flags & CRYPTO_ALG_REQ_CHAIN;
-+}
-+
- #endif	/* _CRYPTO_ALGAPI_H */
-diff --git a/include/crypto/internal/acompress.h b/include/crypto/internal/acompress.h
-index 8831edaafc05..53b4ef59b48c 100644
---- a/include/crypto/internal/acompress.h
-+++ b/include/crypto/internal/acompress.h
-@@ -84,6 +84,16 @@ static inline void __acomp_request_free(struct acomp_req *req)
- 	kfree_sensitive(req);
- }
- 
-+static inline bool acomp_request_chained(struct acomp_req *req)
-+{
-+	return crypto_request_chained(&req->base);
-+}
-+
-+static inline bool crypto_acomp_req_chain(struct crypto_acomp *tfm)
-+{
-+	return crypto_tfm_req_chain(&tfm->base);
-+}
-+
- /**
-  * crypto_register_acomp() -- Register asynchronous compression algorithm
-  *
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index b164da5e129e..f1bc282e1ed6 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -13,6 +13,8 @@
- #define _LINUX_CRYPTO_H
- 
- #include <linux/completion.h>
-+#include <linux/errno.h>
-+#include <linux/list.h>
- #include <linux/refcount.h>
- #include <linux/slab.h>
- #include <linux/types.h>
-@@ -124,6 +126,9 @@
-  */
- #define CRYPTO_ALG_FIPS_INTERNAL	0x00020000
- 
-+/* Set if the algorithm supports request chains. */
-+#define CRYPTO_ALG_REQ_CHAIN		0x00040000
-+
- /*
-  * Transform masks and values (for crt_flags).
-  */
-@@ -133,6 +138,7 @@
- #define CRYPTO_TFM_REQ_FORBID_WEAK_KEYS	0x00000100
- #define CRYPTO_TFM_REQ_MAY_SLEEP	0x00000200
- #define CRYPTO_TFM_REQ_MAY_BACKLOG	0x00000400
-+#define CRYPTO_TFM_REQ_CHAIN		0x00000800
- 
- /*
-  * Miscellaneous stuff.
-@@ -174,6 +180,7 @@ struct crypto_async_request {
- 	struct crypto_tfm *tfm;
- 
- 	u32 flags;
-+	int err;
- };
- 
- /**
-@@ -391,6 +398,9 @@ void crypto_req_done(void *req, int err);
- 
- static inline int crypto_wait_req(int err, struct crypto_wait *wait)
- {
-+	if (!wait)
-+		return err;
-+
- 	switch (err) {
- 	case -EINPROGRESS:
- 	case -EBUSY:
-@@ -540,5 +550,34 @@ int crypto_comp_decompress(struct crypto_comp *tfm,
- 			   const u8 *src, unsigned int slen,
- 			   u8 *dst, unsigned int *dlen);
- 
-+static inline void crypto_reqchain_init(struct crypto_async_request *req)
-+{
-+	req->err = -EINPROGRESS;
-+	req->flags |= CRYPTO_TFM_REQ_CHAIN;
-+	INIT_LIST_HEAD(&req->list);
-+}
-+
-+static inline bool crypto_is_reqchain(struct crypto_async_request *req)
-+{
-+	return req->flags & CRYPTO_TFM_REQ_CHAIN;
-+}
-+
-+static inline void crypto_reqchain_clear(struct crypto_async_request *req)
-+{
-+	req->flags &= ~CRYPTO_TFM_REQ_CHAIN;
-+}
-+
-+static inline void crypto_request_chain(struct crypto_async_request *req,
-+					struct crypto_async_request *head)
-+{
-+	req->err = -EINPROGRESS;
-+	list_add_tail(&req->list, &head->list);
-+}
-+
-+static inline bool crypto_tfm_is_async(struct crypto_tfm *tfm)
-+{
-+	return tfm->__crt_alg->cra_flags & CRYPTO_ALG_ASYNC;
-+}
-+
- #endif	/* _LINUX_CRYPTO_H */
- 
--- 
-2.27.0
-
+Thanks,
+Kanchana
