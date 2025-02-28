@@ -1,122 +1,117 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB3FC26E169;
-	Fri, 28 Feb 2025 14:13:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71E5D1B4250
+	for <linux-crypto@vger.kernel.org>; Fri, 28 Feb 2025 15:56:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740752006; cv=none; b=a63vL8xOR1mVtzn3uCHorprDqCRZcqMEccTdnNXWX0Vsll2UGmE9LRA7kimwqC8iT6Iiz8EtkYrFPU7+IsfBZ3qXrvGK0ITktaoUR4PLzmNtxQO0M71gEDIrADdclbzyUkwVHSWS+5/6umEdPpLLzYjYmqQG5h7n1jLpF1O88PM=
+	t=1740758217; cv=none; b=U6gmpOPTVG9lLdpUe5rLj2n3zdCamiMPSAKuPg1C8mKU/xEYM+urZA51PmBCUGnP4pAqUCdJ0uMPsv0kOCk+WsyUVGAgquxyOaN3udm4elXSMKmywopJ/qDKBueGEoIugyZ2rOyf4kAHa7CDDNwjeoA4rgXkGBqFzIbqpJaPvQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740752006; c=relaxed/simple;
-	bh=VVIDcMnoH7hPbhberNOLlP1qoZPeOV5SLRdCSsFHrj4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ScqrhKKBNv3kx+fMTZGh7TqQH3N5YFcg1coacSJ/kWopCZlJG+8GcyeK15s8wz7+sKN+zTxLqAmLhtmjNg+B3+igEAsqK2qD9vNWZ87ULtHjHvWIgiWsd82vJI+Ys1eezwb/YFMoUIx8yyOQiatgQkx0m3luhF2EXXwDeRG0Q6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YPGtgMHV; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1740758217; c=relaxed/simple;
+	bh=poWNCj5xMSlpbSrDe5ZEIFaXwVdfgabe4T/iGvOcgII=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ifRi1TtG5rg7vQGGeTByiID+LTL/J8zvfnV5kmliM4PVb4WgVZfhFVnoR2msV3lU5CECBjA9yBWgH9X5BQbYyJ39hPXqyYEiIan5JgngOl998tpMgMdKW0tKXeqXqnbgCSxfzit26AGjRu9X2k7jHe+LJmdtapGHc8b1Pe/QC6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UTN4PPD9; arc=none smtp.client-ip=95.215.58.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YPGtgMHV"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74170C4CEE9;
-	Fri, 28 Feb 2025 14:13:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1740752005;
-	bh=VVIDcMnoH7hPbhberNOLlP1qoZPeOV5SLRdCSsFHrj4=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=YPGtgMHVnFo6x/h0FPQLBRnMNZB6FnypZxZR3uZI1gWQ6UNlGANox19PF8DYna/O0
-	 qobyT3f4YyyjwvTdh72X+kWeXt1sNVR7WVo6qakTEuRHLI1LGURjtO+plFbW5sZspv
-	 9MvVh7j9WxEjv9uHwN9HC0SCokPuu+m9KXhEecjsubF2d60EO28GzJKjWJjjlRc6Ps
-	 6/INyLqxvwpOjwY4YSWqd83+3m+JcJX5Bl5jDxC11DEpUeEfN30BqrpSIkRNf9cnLS
-	 uIvEUfzNSFwmrrq15l1TMcPZW6oCfUv7cITz01NGRBEQ+f173t+DRILYGiD+vEdx35
-	 bwJS3EPjuo33Q==
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-abf06950db5so328397866b.1;
-        Fri, 28 Feb 2025 06:13:25 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUEwVDA6KMUumZfn5kbcIMI2JfVaWRSyDTHwX6pQ4aLnJNcfQCHqI0c4e6rN7JI5sWqveTCZXcEfa9FXnM=@vger.kernel.org, AJvYcCUisode25H1VqtO8EkvaUprHR9bhqV0KJ8gsea8RtWVEqDodVdbjMJfZVhnpVEOisgh8qZvNyaTq0qZAIlTnlQG@vger.kernel.org, AJvYcCW++n9yGYl/VElpXnHW11ghn/bqItZJYjAHjsuUx3P/XVPX5p2hZzDpXp3WhT8y7wGbr+3UFFWa2ZrgRoQI@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLTNQ05l8DTznhmqUCO1d/T2z602sTyUHRj8CYlAg2g57lPfNR
-	LwQw+bluBqDX1soCMIem3xmpY6CDEmZXgRMxW1zCZj7bGDboxW0WUuezXLz9a/BZOj6qarpJXqP
-	BUd1eNllOyW2OfP0tvFg7WBlv9Qo=
-X-Google-Smtp-Source: AGHT+IHQV0/AoJbVv8/kktbul8lIZMTIcX8dgu+kgyS+lgEw8A+QnIjYp0ZnMf504B6etDxi6Jc/pi7Nqua0hYQXf8c=
-X-Received: by 2002:a17:907:7f91:b0:abf:24c7:f81b with SMTP id
- a640c23a62f3a-abf25f8db0amr324317566b.6.1740752003900; Fri, 28 Feb 2025
- 06:13:23 -0800 (PST)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UTN4PPD9"
+Date: Fri, 28 Feb 2025 15:56:42 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1740758212;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=w32+r2cAmTHBJrdauH2LehW60U9RaeZZJ4Z4Qx1e26c=;
+	b=UTN4PPD9K6cdNA/dBhCcBrpZof1Zqc7KlN7i3SuhOuwZftLiV+lsdhBvtet/SU8Sdn9AAy
+	+TpHF4BS9yWckHz+3LBj31fOavq0ph1JB7e6vCiMQIOMnXhrcmgl+dnR4PTiRkNK7AHn3n
+	400MXHtEuv0R4MteybvvfflrQv7Vufk=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Eric Biggers <ebiggers@kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	linux-mm@kvack.org
+Subject: Re: [RFC PATCH 7/7] mm: zswap: Use acomp virtual address interface
+Message-ID: <Z8Hcur3T82_FiONj@google.com>
+References: <cover.1740651138.git.herbert@gondor.apana.org.au>
+ <153c340a52090f2ff82f8f066203186a932d3f99.1740651138.git.herbert@gondor.apana.org.au>
+ <Z8CquB-BZrP5JFYg@google.com>
+ <20250227183847.GB1613@sol.localdomain>
+ <Z8DcmK4eECXp3aws@google.com>
+ <Z8FwFJ4iMLuvo3Jj@gondor.apana.org.au>
+ <Z8GH7VssQGR1ujHV@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250226030358.15924-1-zhaoqunqin@loongson.cn>
-In-Reply-To: <20250226030358.15924-1-zhaoqunqin@loongson.cn>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Fri, 28 Feb 2025 22:13:12 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H5xyRrF1_=E7rLM3dHeYAEBdMufYQvgoxAq6+d6s5U4Eg@mail.gmail.com>
-X-Gm-Features: AQ5f1JrCZ9bfAhFSbtUzVcSFF_xizdCX_Qw-twqvCYIPSVnkRJ_jehWs1iBzR1U
-Message-ID: <CAAhV-H5xyRrF1_=E7rLM3dHeYAEBdMufYQvgoxAq6+d6s5U4Eg@mail.gmail.com>
-Subject: Re: [PATCH v4 0/6] Drivers for Loongson security engine
-To: Qunqin Zhao <zhaoqunqin@loongson.cn>
-Cc: lee@kernel.org, herbert@gondor.apana.org.au, davem@davemloft.net, 
-	peterhuewe@gmx.de, jarkko@kernel.org, linux-kernel@vger.kernel.org, 
-	loongarch@lists.linux.dev, linux-crypto@vger.kernel.org, jgg@ziepe.ca, 
-	linux-integrity@vger.kernel.org, pmenzel@molgen.mpg.de
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z8GH7VssQGR1ujHV@gondor.apana.org.au>
+X-Migadu-Flow: FLOW_OUT
 
-Hi, Qunqin,
+On Fri, Feb 28, 2025 at 05:54:53PM +0800, Herbert Xu wrote:
+> On Fri, Feb 28, 2025 at 04:13:08PM +0800, Herbert Xu wrote:
+> >
+> > I'll respin this.
+> 
+> FWIW this is what the interface looks like.  Does it look OK?
+> Longer term hardware offload drivers should handle these non-DMA
+> pointers directly by having their own buffers.  For the time being
+> I'm simply redirecting these to a software fallback.
+> 
+> diff --git a/mm/zswap.c b/mm/zswap.c
+> index 2b5a2398a9be..2fd241c65f80 100644
+> --- a/mm/zswap.c
+> +++ b/mm/zswap.c
+> @@ -994,30 +994,16 @@ static void zswap_decompress(struct zswap_entry *entry, struct folio *folio)
+>  
+>  	acomp_ctx = acomp_ctx_get_cpu_lock(entry->pool);
+>  	src = zpool_map_handle(zpool, entry->handle, ZPOOL_MM_RO);
+> -	/*
+> -	 * If zpool_map_handle is atomic, we cannot reliably utilize its mapped buffer
+> -	 * to do crypto_acomp_decompress() which might sleep. In such cases, we must
+> -	 * resort to copying the buffer to a temporary one.
+> -	 * Meanwhile, zpool_map_handle() might return a non-linearly mapped buffer,
+> -	 * such as a kmap address of high memory or even ever a vmap address.
+> -	 * However, sg_init_one is only equipped to handle linearly mapped low memory.
+> -	 * In such cases, we also must copy the buffer to a temporary and lowmem one.
+> -	 */
+> -	if ((acomp_ctx->is_sleepable && !zpool_can_sleep_mapped(zpool)) ||
+> -	    !virt_addr_valid(src)) {
+> -		memcpy(acomp_ctx->buffer, src, entry->length);
+> -		src = acomp_ctx->buffer;
+> -		zpool_unmap_handle(zpool, entry->handle);
+> -	}
+> -
+>  	dst = kmap_local_folio(folio, 0);
+> -	acomp_request_set_virt(acomp_ctx->req, src, dst, entry->length, PAGE_SIZE);
+> +	if (!zpool_can_sleep_mapped(zpool) || !virt_addr_valid(src))
 
-On Wed, Feb 26, 2025 at 11:04=E2=80=AFAM Qunqin Zhao <zhaoqunqin@loongson.c=
-n> wrote:
->
-> Loongson security engine supports random number generation, hash,
-> symmetric encryption and asymmetric encryption. Based on these
-> encryption functions, TPM2 have been implemented in it.
->
-> mfd is the baser driver, crypto and tpm are users.
-Loongson SE should not strongly bound to LS6000, so the naming can be impro=
-ved:
+Why is the acomp_ctx->is_sleepable check no longer needed?
 
-MFD_LS6000SE -> MFD_LOONGSON_SE,  ls6000se.c -> loongson-se.c
-CRYPTO_DEV_LS6000SE_RNG -> CRYPTO_DEV_LOONGSON_RNG,  ls6000se-rng.c ->
-loongson-rng.c
-TCG_LSSE -> TCG_LOONGSON, tpm_lsse.c ->tpm_loongson.c
+Also, the zpool_can_sleep_mapped() cases will go away soon-ish, so I was
+kinda hoping that the !virt_addr_valid() case goes away too and is
+handled internally in the crypto library. Right now the problem is that
+virt_to_page() is used to get the underlying page, which doesn't work
+for kmap addresses.
 
-
-Huacai
-
->
-> v4: Please look at changelog in tpm and MAINTAINERS. No changes to tpm
->     and crypto.
-> v3: Put the updates to the MAINTAINERS in a separate patch.
-> v2: Removed misc driver. Added tpm driver.
->
-> Qunqin Zhao (6):
->   mfd: Add support for Loongson Security Module
->   MAINTAINERS: Add entry for Loongson Security Module driver
->   crypto: loongson - add Loongson RNG driver support
->   MAINTAINERS: Add entry for Loongson RNG driver
->   tpm: Add a driver for Loongson TPM device
->   MAINTAINERS: Add tpm_lsse.c to LOONGSON CRYPTO DRIVER entry
->
->  MAINTAINERS                            |  14 +
->  drivers/char/tpm/Kconfig               |   9 +
->  drivers/char/tpm/Makefile              |   1 +
->  drivers/char/tpm/tpm_lsse.c            | 103 +++++++
->  drivers/crypto/Kconfig                 |   1 +
->  drivers/crypto/Makefile                |   1 +
->  drivers/crypto/loongson/Kconfig        |   6 +
->  drivers/crypto/loongson/Makefile       |   2 +
->  drivers/crypto/loongson/ls6000se-rng.c | 190 +++++++++++++
->  drivers/mfd/Kconfig                    |  10 +
->  drivers/mfd/Makefile                   |   2 +
->  drivers/mfd/ls6000se.c                 | 374 +++++++++++++++++++++++++
->  include/linux/mfd/ls6000se.h           |  75 +++++
->  13 files changed, 788 insertions(+)
->  create mode 100644 drivers/char/tpm/tpm_lsse.c
->  create mode 100644 drivers/crypto/loongson/Kconfig
->  create mode 100644 drivers/crypto/loongson/Makefile
->  create mode 100644 drivers/crypto/loongson/ls6000se-rng.c
->  create mode 100644 drivers/mfd/ls6000se.c
->  create mode 100644 include/linux/mfd/ls6000se.h
->
->
-> base-commit: bd315242821784e9384abae911a70d5fda9a3298
-> --
-> 2.43.0
->
->
+> +		acomp_request_set_nondma(acomp_ctx->req, src, dst, entry->length, PAGE_SIZE);
+> +	else
+> +		acomp_request_set_virt(acomp_ctx->req, src, dst, entry->length, PAGE_SIZE);
+>  	BUG_ON(crypto_wait_req(crypto_acomp_decompress(acomp_ctx->req), &acomp_ctx->wait));
+>  	kunmap_local(dst);
+>  	BUG_ON(acomp_ctx->req->dlen != PAGE_SIZE);
+>  
+> -	if (src != acomp_ctx->buffer)
+> -		zpool_unmap_handle(zpool, entry->handle);
+> +	zpool_unmap_handle(zpool, entry->handle);
+>  	acomp_ctx_put_unlock(acomp_ctx);
+>  }
+> 
+> -- 
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
