@@ -1,508 +1,736 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 916DA2561DE;
-	Fri, 28 Feb 2025 10:00:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740736827; cv=fail; b=m+HnhimBpkP09VyO6J+sSnSzzp4JNuifVmbhuV2UX74iNyy/23VQeFVZ/tvuK+sb7wzyFIGSi+kCZ3+ZKGLTMpdWdvQsgSXxkdDy1Ij0IrO/EkblQuw5AM8b30XNwq2Big/0Hy55PDjGGYuTLrgiXh2z4+QbjF0R4pof5eOZz0Q=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740736827; c=relaxed/simple;
-	bh=moQnzUPUYfWjf2y6Tw4lbP6uS/eXrfnBDjtj4RCOLp0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=GYXWH6UbosY2JcmqCMb/1Zdky5Kev5J+jSrJAxLIgiGS6WILUjmNAYM9opRH/LFQfJQIG1Rl8kJzt3OOcaHnWXm19EIdUWnOFwtKPWR9N8WkhodOwo5NNK5ld6FUuSy02R3Ywl6/QtNEWN0OMClwdnL2xEc2qmJe2YVSvClERj4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HTt2BWdn; arc=fail smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F0951C4A3D;
+	Fri, 28 Feb 2025 10:00:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740736828; cv=none; b=JaHy3if+4lctE4a1u+kPaqQtS3ykaXUgZW1X+AVqZGxux7sxdMPtrKc0edrB3HspabXkxJxv28tccK8a4z2UDvcrNhE9LMwBjyqifMxrMirkVxjGbcZcGptXqIwT8qpSs5NR5sWERCW1i5U+ttbLaGlhFG1wNZFstOPLuO2Pd9I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740736828; c=relaxed/simple;
+	bh=wnL3/GEbkOjaIqLUyvC6m21CR6e5xna3inhd7d7WuRQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FISbpVZfx6Bay+wyMPH/grN75+tX9N4FvIEoQdj33PcRswGzK4pegbMfY3pmDlGGvMFK7DKoOpEYqgT/11I4cFkf5qx0HgjbrFvXhccIXhrpoqbhkozQpHD3758pYl/CWO6vpbwMmgFmEJ2wUjIqKvamr0D/OS4dtSqdo7bi5+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bZBE7A5Q; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HTt2BWdn"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bZBE7A5Q"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1740736826; x=1772272826;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=moQnzUPUYfWjf2y6Tw4lbP6uS/eXrfnBDjtj4RCOLp0=;
-  b=HTt2BWdnKumDlrAc2d9t0pVYlIUoU0M/WKCT9PMNWgm8j5+bAm6Uf6hh
-   yuS55dbtaSTrDpra+v8Z/DOrhVL9y1HveIy6bkFdF78Y6+VWTPZ9HDa1a
-   LBWwTxUy8mNArPAMgF04VvSxM/qEpKsG3Gy6k2zIaNKtNGaHpymCpx4tW
-   5NVuxhpuejBoXcu5Fz+yvCQVYFxNkk2CkU2xEkbE7V2n3razB14FIhuGp
-   9BC7eHmP+DT9ZuqdZ7JScLN6O+qDT2/Ua4EOD329msaVI0qq8h44gsdUA
-   K1x3QbTDVRnifB9vBD0HbtiJyc/AnD9SIluozcjc8hAXeNTuPuOPaMTWy
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=wnL3/GEbkOjaIqLUyvC6m21CR6e5xna3inhd7d7WuRQ=;
+  b=bZBE7A5QTRhfkhatjRzDgEyZLaSQlaGR/32F1luAm5ma5BPcgIxYdh4u
+   3RkJmwLrbsiSJpWbA3w5zYWzxNiijqfZlU9cu2O8sOLdTTZIqF5Wbk1jg
+   eMWxi2O1fMtknPqQp4XkXnYzQK5YgGkD5qnp1cqY+vvWqY+z4yBklNaq9
+   apmnbtAxL65CqseLjigiTnLpqWdyHk06UdQtRS5KFHj9xI2tP++j9j9Vh
+   dDNaXAF9Gq8fOsKtKKja3+T5ElN9VUDEuo19guEh1/6ITHARkGtxawzb6
+   fylaemeqMjaMfEIFTCVSlDfDQYgjOpqeV2YfLVHMbzuvCQlfwllAi2gMI
    A==;
-X-CSE-ConnectionGUID: ajtzroomQDmpSPaJQw2NAg==
-X-CSE-MsgGUID: AuD/WhsqSyKZVCoUGjm0jw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11358"; a="41783648"
+X-CSE-ConnectionGUID: XkUyFPV/QDeYPFV8zbh2lQ==
+X-CSE-MsgGUID: v8zzWHe6S8eta23YCykxUQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11358"; a="40902549"
 X-IronPort-AV: E=Sophos;i="6.13,322,1732608000"; 
-   d="scan'208";a="41783648"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2025 02:00:25 -0800
-X-CSE-ConnectionGUID: qQbo3LJOSEaNJTj2MZ6NIA==
-X-CSE-MsgGUID: 0FhQQ85WTI6zSV6azKfccQ==
+   d="scan'208";a="40902549"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2025 02:00:25 -0800
+X-CSE-ConnectionGUID: 8xXoEtFuQIa/5RDezMW42Q==
+X-CSE-MsgGUID: uFNPoafiTKaWKNJX/LKIAA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.13,322,1732608000"; 
-   d="scan'208";a="117962393"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa009.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2025 02:00:24 -0800
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Fri, 28 Feb 2025 02:00:23 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14 via Frontend Transport; Fri, 28 Feb 2025 02:00:23 -0800
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.172)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Fri, 28 Feb 2025 02:00:22 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LrTs0GnP1sm2CylGytVTfYTiRRNDDpIlfAAXZBrdUtmlxLATh/DxkbutNFwFy+dkIkVBvmanqj1KfwBfMjfb4Gw+kQpbg/rldBTk1CcL4pw9gOv2TNhaRU+vobsthW0h0h7tV/jnpJMG/jaS7bdT0612gQzSxkiogX3ke3r7loA6fxHTIoUc3ThWKxpx4bk3JI7LJws9WiS9Wy6neLpeA7+GHyrA5dFBao6q9CLvNfUOI4uaV/039gwisIcCS4oZKSQE/gpN1/yomBqm2jeSo6bxTDXXPuelDtKJ+ilcXb99mcS2xNeHYahW42ng0rSNdWAuiaD6aHhivIojUl+SRw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KRSJ+XS/sG1o8PJ9CL9grBfCdpGiioonYfGbPjKLQtM=;
- b=pvMbXSZ6DqDWDSJvRQghg80QWDZo8lTw06oWg+aJSuxDEV3Z1wuB1E6YmFOVsahbuqTod4Xwg8W2Z6jhvWyK677BqKPW2O4QiCwX9z1kSyfWjGS+AqgnpitXE5K6nuuQeSQ/BpbWMyZeDRYIThZtRZ61aSjXvFDXhYghwX3jiltHJZTnHiqONP3dvS6mtJcGU0KTULcy0v6/5B+k4BWLreEBIIW9kat1rvULvWrHRnpQoEIBwkAmNbA5q2kBn4CVlt5YOSx+ft8wPL2sncxM+4YxgxBAmH6jpuIzYTqMRwYId32+cFu04oVw6oZklNsvgMs62+NESjt3CIL7dexQjg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from SA3PR11MB8120.namprd11.prod.outlook.com (2603:10b6:806:2f3::7)
- by PH8PR11MB8287.namprd11.prod.outlook.com (2603:10b6:510:1c7::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.23; Fri, 28 Feb
- 2025 10:00:09 +0000
-Received: from SA3PR11MB8120.namprd11.prod.outlook.com
- ([fe80::3597:77d7:f969:142c]) by SA3PR11MB8120.namprd11.prod.outlook.com
- ([fe80::3597:77d7:f969:142c%5]) with mapi id 15.20.8489.021; Fri, 28 Feb 2025
- 10:00:08 +0000
-From: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
-To: Yosry Ahmed <yosry.ahmed@linux.dev>
-CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>, "hannes@cmpxchg.org"
-	<hannes@cmpxchg.org>, "nphamcs@gmail.com" <nphamcs@gmail.com>,
-	"chengming.zhou@linux.dev" <chengming.zhou@linux.dev>,
-	"usamaarif642@gmail.com" <usamaarif642@gmail.com>, "ryan.roberts@arm.com"
-	<ryan.roberts@arm.com>, "21cnbao@gmail.com" <21cnbao@gmail.com>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"davem@davemloft.net" <davem@davemloft.net>, "clabbe@baylibre.com"
-	<clabbe@baylibre.com>, "ardb@kernel.org" <ardb@kernel.org>,
-	"ebiggers@google.com" <ebiggers@google.com>, "surenb@google.com"
-	<surenb@google.com>, "Accardi, Kristen C" <kristen.c.accardi@intel.com>,
-	"Feghali, Wajdi K" <wajdi.k.feghali@intel.com>, "Gopal, Vinodh"
-	<vinodh.gopal@intel.com>, "Sridhar, Kanchana P"
-	<kanchana.p.sridhar@intel.com>
-Subject: RE: [PATCH v6 15/16] mm: zswap: Compress batching with Intel IAA in
- zswap_store() of large folios.
-Thread-Topic: [PATCH v6 15/16] mm: zswap: Compress batching with Intel IAA in
- zswap_store() of large folios.
-Thread-Index: AQHbeGfAjZbrwpkGjEqL/QTV2aedp7M6pMeAgAABk4CAIaljMA==
-Date: Fri, 28 Feb 2025 10:00:08 +0000
-Message-ID: <SA3PR11MB8120D8E04F55FB803004E3CCC9CC2@SA3PR11MB8120.namprd11.prod.outlook.com>
-References: <20250206072102.29045-1-kanchana.p.sridhar@intel.com>
- <20250206072102.29045-16-kanchana.p.sridhar@intel.com>
- <Z6UJKTCkffZ93us5@google.com>
- <SA3PR11MB81203800298A246D7D6CB75EC9F62@SA3PR11MB8120.namprd11.prod.outlook.com>
-In-Reply-To: <SA3PR11MB81203800298A246D7D6CB75EC9F62@SA3PR11MB8120.namprd11.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA3PR11MB8120:EE_|PH8PR11MB8287:EE_
-x-ms-office365-filtering-correlation-id: a3773e24-f577-4c61-2955-08dd57deaf25
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?wz1eVAgHpRgTJ5L0hEFgMO7ih2YG5ENb4d5EruNzTsrbnUMons/g/0tMEF6C?=
- =?us-ascii?Q?3ziE+tPQ7OtYWSFjy0FOvNPr5bFmpRiNoz49BsfToaI6EM9GK7fuF5JfQu8e?=
- =?us-ascii?Q?Fxl7HgMjYWi8jnIXR6eq2AWO/LQCsEaAfvDXJwblaaq4VQ7R/hLfAT65zXFA?=
- =?us-ascii?Q?GQ95nAWqg8+HiGRTz2k4muUwMK8E/10HTkdazeg+U//O/eZZfiTZw7La7P0v?=
- =?us-ascii?Q?DDt/9B0IFZsjLLWW7nx/O7Nbh4M60D7idiSYFNVdNfCTFQPoMfc6D6ZMyCdh?=
- =?us-ascii?Q?tIC4/JFzoVeSbeN3FsdVEcenquGW3EhoPoYr5liyP7+9/qCzTEeLRfDLD/wA?=
- =?us-ascii?Q?yrVWJOF20w0yOFrWAdks54WgPqtbZnB9hNXEEYh0hESejzqbGrcou4QCZ2ir?=
- =?us-ascii?Q?zd4swKRtj687ZXenxYBiK3/a6ESZuA8mE4kkNt4NqH3AI5ma9aUo+bo17SPx?=
- =?us-ascii?Q?91zDxq5hw0zl9Oq300vYBRnS+w2dpI0TPKLK3MX1Kphmw68tyM5tBlhf/i63?=
- =?us-ascii?Q?SFz3yuXqndOEfLBPIp8EbtTdc2heAbAcZkO694vvaMJLlVNIMrZtAdAiU8+w?=
- =?us-ascii?Q?Y79sP92ggU642DMDT2p+5g8ifnaNDsDDThrJwAAvypPIEHb6XcjzluEaJ2mV?=
- =?us-ascii?Q?tquofGuTJiMB8fSI/U/0wkPBvroe+BIdrKzQeavYlC+47yLTLxuF5MHykzW3?=
- =?us-ascii?Q?N0muUvlI3b6E0plq7nGKmVBD58RbJWesJH6FSbnhv1BoGGe+nRScDQQCy540?=
- =?us-ascii?Q?KEN6R+8jnLGu3jxxGs2FpW1HfaHxtyB2efDhZUDEjZHN1Zuwwl46E5lqikAr?=
- =?us-ascii?Q?qCscioRXICIOgmcAYj49BIfhNxEgBjeQuH0P9mKsyURbqY1vSJvv8Cr44ij/?=
- =?us-ascii?Q?XbADDw3jorSdjFXc0/PqDc2sfwLXEzsDWR53rnLKwcErgnfFjNQplAq5yWHf?=
- =?us-ascii?Q?BWW6yqaEzefmu/WIa8v/Mj0uHUPy/K2LI87zeGH0mAi/GDa4rl019xgGoL2A?=
- =?us-ascii?Q?JCWzYdZuk3/wHwHu8KZvbdJBSin2VWS+u3TWHpMOkiUeEQNPgbTQXDzkU2m5?=
- =?us-ascii?Q?/zkG+pa1zWRuz7tQ674tdLXwqOQESEVvbH4MmNPyh4QO+B34A+OnWzeQUERl?=
- =?us-ascii?Q?gbyV2E2FcEzrO6Kc9dELDR4AuLMFAqKiyKtKaaXYO6Nz17061xTjgDBzDmbK?=
- =?us-ascii?Q?o/wG1/9Ostm/7plqBKWkN0A9QpJdNio4caCOOKwOpzRNvp0BDDXDSa3V2ALZ?=
- =?us-ascii?Q?TITDE0NJwadbHjQCQsBWwy+YYVx3xasesXux/SdEKnZ0cQl2QT81KVPATN1T?=
- =?us-ascii?Q?rPyN/FQmKIdJwZgSeViNx4YvJvUmS4AcM33u3ysEgClP1PtAsQu5F60hTbLu?=
- =?us-ascii?Q?zWXGb23X9viNLDzk2qDUMJS3facU+kdRP68wVmnl4RmC6zfMRMYORltzuEvD?=
- =?us-ascii?Q?rZjY0NZrqUsB8uspFF1tbtsrVgwlBEV0?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR11MB8120.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Y4iFa+MhiYalkUnLnh6BztyXYib78UVipK5XZ2ZYUIiBye6nBN89kdmuFJ3S?=
- =?us-ascii?Q?/3U2wfyeSXPUWpDgCj8/aHXJCVbtjnKocaNU/0pcHPd1dZjj76TwPaG5TNQ/?=
- =?us-ascii?Q?0Zj+mwWoW1HL0B7wEqt+3hXFn2qmivlvOLzrddNDESHNI7fVkN4iFCFJGQAU?=
- =?us-ascii?Q?yAjpuwCvFEiiF8kmgJfHFFOeeUBUhESuMWp2nfWLif06oCRBxsR5Pufop4ev?=
- =?us-ascii?Q?MKhzDe10j4zoU9sWS5QZWlfb0lzSW95rZH/YHWHLJMHXfzGVLUjfJA8Sxk82?=
- =?us-ascii?Q?FaoU7aFb8WW+yJ05GaEHS705Blsip2pgUfFL2JfyV2G7Dts0oJkbkhtZ+wie?=
- =?us-ascii?Q?eJFXRF0+MQT9gi1wTO39y7HKunpZLsIVTiYRVTy0sQOKVDBKmgToUj8+DQTi?=
- =?us-ascii?Q?BuV1SWYAqBzEXvLfDg/eVhOpniNYisg74jljH8e+bM+zp5/w87Lh1QIhU6UL?=
- =?us-ascii?Q?zomSrhOjUMXUZwMK16zMD1CLraqUZGz54uCBtYkMiXFZYWSQqcyk5LptrTM4?=
- =?us-ascii?Q?1VHbde6Zl+/c4qGLfv7cqPgl+WFFwaW7hckNXiggFERAKvDalJx0/RIcljgg?=
- =?us-ascii?Q?NdaVgPNM862GIUQGq8i8WZaXyaVkxhWdnBgMC2HlSZSuc28Hgmso467DL/5D?=
- =?us-ascii?Q?bRERP5Jnaz9yK/T3SS0dHkoWfwT30RBN4PN+01yLSBnmJFlamf9sI8064Etp?=
- =?us-ascii?Q?4QgY8Y3urGOJgkyNkqbswxF7CDRPXmhql5pPakZVXKXa7f2y9eMLv1sVH6EK?=
- =?us-ascii?Q?WZykCX4Kxll+pOMVgzfZ+Ys5/jRbmMdtIYHsOlGscriN1uRk8zwrfWpSFDcB?=
- =?us-ascii?Q?G6IRtMaZWuWbQFJQAhNZqlY997fkqZGbw3euPeF2+v0p190vjWaVTDu+UKJY?=
- =?us-ascii?Q?/pr70+hgaUOp3LzXQNrai1rLGq8O6EpPWffS/pDhJFWhZifdIoqnHpGUO/QL?=
- =?us-ascii?Q?ENnmNZS7+2/XXNud5DEnD3TYP0xFUg0GaitOWRVmQOtZaMBZsAh9xr4aFzn9?=
- =?us-ascii?Q?IzzkU2nEk1dIEbm2xmy+IfFT5pu8o86cM+Yeiecw37iohHTxazFQI4fh5rPS?=
- =?us-ascii?Q?TaJ8XyKGg3F9p6C+ByVAwOOeNzGOUctpy54PsBsjlg8E64P2oCGu8F9a2Ucz?=
- =?us-ascii?Q?yPKUHSJm+9nETyLEjLOvlNFXIc9a9XGPXK9UBf78t/8DAGrkhMi0YCEeYAA5?=
- =?us-ascii?Q?ht4CdRCkyICfuP8ERtWHDMdt2aCr9VCeaq2JPY5uQbwq+r05ZnpI7y7Z3Qnf?=
- =?us-ascii?Q?Jvl+oTM/j/X+v0nsEZQgazG9hQ8xdxdtL/EnT57YMnZegBcQHtikmhYyg35C?=
- =?us-ascii?Q?HrzuZKIur9r9uYk6Xzc+5GFn8IRxGfqrPqOhNm/Qv9FzKPs8hvKAeeVE8rJE?=
- =?us-ascii?Q?1ChioMZSma0iHr20xUcUK7UxacDgFrfjGV9EaM+BYHo60J+A63CueUE+hvnk?=
- =?us-ascii?Q?gFV6d+HkZ5l0MIQ5/IHJdQ+8lMu+xh6W+TO8Z4bzxp+KeYuMZxFz+SfA1bwc?=
- =?us-ascii?Q?nlDFq+ga3F4ITtUNGi2kT6kumPfjUjPUziUXz+3xzVmikdq77HjDqqr3TfCP?=
- =?us-ascii?Q?5+TuGByIiE55AtngwGkclWHI70CI+kXurI9isHNYN7d0P0Z6BDQ9WXQg4xv5?=
- =?us-ascii?Q?GA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+   d="scan'208";a="117325684"
+Received: from jf5300-b11a338t.jf.intel.com ([10.242.51.115])
+  by orviesa006.jf.intel.com with ESMTP; 28 Feb 2025 02:00:25 -0800
+From: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
+To: linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	hannes@cmpxchg.org,
+	yosry.ahmed@linux.dev,
+	nphamcs@gmail.com,
+	chengming.zhou@linux.dev,
+	usamaarif642@gmail.com,
+	ryan.roberts@arm.com,
+	21cnbao@gmail.com,
+	ying.huang@linux.alibaba.com,
+	akpm@linux-foundation.org,
+	linux-crypto@vger.kernel.org,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	clabbe@baylibre.com,
+	ardb@kernel.org,
+	ebiggers@google.com,
+	surenb@google.com,
+	kristen.c.accardi@intel.com
+Cc: wajdi.k.feghali@intel.com,
+	vinodh.gopal@intel.com,
+	kanchana.p.sridhar@intel.com
+Subject: [PATCH v7 00/15] zswap IAA compress batching
+Date: Fri, 28 Feb 2025 02:00:09 -0800
+Message-Id: <20250228100024.332528-1-kanchana.p.sridhar@intel.com>
+X-Mailer: git-send-email 2.27.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA3PR11MB8120.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a3773e24-f577-4c61-2955-08dd57deaf25
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Feb 2025 10:00:08.9208
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: rQ54mPgZHym+K7Be0HOET+oi8Ek0JLZNUs01N8V3ZGotSjpwBDd6X/SZdqsmsPMBP5IEaerONjeE0yjQyighxYJ3Uzii7dGNcHxKwahVEH8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB8287
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 
 
-> -----Original Message-----
-> From: Sridhar, Kanchana P <kanchana.p.sridhar@intel.com>
-> Sent: Thursday, February 6, 2025 11:24 AM
-> To: Yosry Ahmed <yosry.ahmed@linux.dev>
-> Cc: linux-kernel@vger.kernel.org; linux-mm@kvack.org;
-> hannes@cmpxchg.org; nphamcs@gmail.com; chengming.zhou@linux.dev;
-> usamaarif642@gmail.com; ryan.roberts@arm.com; 21cnbao@gmail.com;
-> akpm@linux-foundation.org; linux-crypto@vger.kernel.org;
-> herbert@gondor.apana.org.au; davem@davemloft.net;
-> clabbe@baylibre.com; ardb@kernel.org; ebiggers@google.com;
-> surenb@google.com; Accardi, Kristen C <kristen.c.accardi@intel.com>;
-> Feghali, Wajdi K <wajdi.k.feghali@intel.com>; Gopal, Vinodh
-> <vinodh.gopal@intel.com>; Sridhar, Kanchana P
-> <kanchana.p.sridhar@intel.com>
-> Subject: RE: [PATCH v6 15/16] mm: zswap: Compress batching with Intel IAA
-> in zswap_store() of large folios.
->=20
->=20
-> > -----Original Message-----
-> > From: Yosry Ahmed <yosry.ahmed@linux.dev>
-> > Sent: Thursday, February 6, 2025 11:11 AM
-> > To: Sridhar, Kanchana P <kanchana.p.sridhar@intel.com>
-> > Cc: linux-kernel@vger.kernel.org; linux-mm@kvack.org;
-> > hannes@cmpxchg.org; nphamcs@gmail.com; chengming.zhou@linux.dev;
-> > usamaarif642@gmail.com; ryan.roberts@arm.com; 21cnbao@gmail.com;
-> > akpm@linux-foundation.org; linux-crypto@vger.kernel.org;
-> > herbert@gondor.apana.org.au; davem@davemloft.net;
-> > clabbe@baylibre.com; ardb@kernel.org; ebiggers@google.com;
-> > surenb@google.com; Accardi, Kristen C <kristen.c.accardi@intel.com>;
-> > Feghali, Wajdi K <wajdi.k.feghali@intel.com>; Gopal, Vinodh
-> > <vinodh.gopal@intel.com>
-> > Subject: Re: [PATCH v6 15/16] mm: zswap: Compress batching with Intel
-> IAA
-> > in zswap_store() of large folios.
-> >
-> > On Wed, Feb 05, 2025 at 11:21:01PM -0800, Kanchana P Sridhar wrote:
-> > > zswap_compress_folio() is modified to detect if the pool's acomp_ctx =
-has
-> > > more than one "nr_reqs", which will be the case if the cpu onlining c=
-ode
-> > > has allocated multiple batching resources in the acomp_ctx. If so, it=
- means
-> > > compress batching can be used with a batch-size of "acomp_ctx-
-> >nr_reqs".
-> > >
-> > > If compress batching can be used, zswap_compress_folio() will invoke =
-the
-> > > newly added zswap_batch_compress() procedure to compress and store
-> the
-> > > folio in batches of "acomp_ctx->nr_reqs" pages.
-> > >
-> > > With Intel IAA, the iaa_crypto driver will compress each batch of pag=
-es in
-> > > parallel in hardware.
-> > >
-> > > Hence, zswap_batch_compress() does the same computes for a batch, as
-> > > zswap_compress() does for a page; and returns true if the batch was
-> > > successfully compressed/stored, and false otherwise.
-> > >
-> > > If the pool does not support compress batching, or the folio has only=
- one
-> > > page, zswap_compress_folio() calls zswap_compress() for each individu=
-al
-> > > page in the folio, as before.
-> > >
-> > > Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
-> > > ---
-> > >  mm/zswap.c | 122
-> > +++++++++++++++++++++++++++++++++++++++++++++++++----
-> > >  1 file changed, 113 insertions(+), 9 deletions(-)
-> > >
-> > > diff --git a/mm/zswap.c b/mm/zswap.c
-> > > index 6563d12e907b..f1cba77eda62 100644
-> > > --- a/mm/zswap.c
-> > > +++ b/mm/zswap.c
-> > > @@ -985,10 +985,11 @@ static void acomp_ctx_put_unlock(struct
-> > crypto_acomp_ctx *acomp_ctx)
-> > >  	mutex_unlock(&acomp_ctx->mutex);
-> > >  }
-> > >
-> > > +/* The per-cpu @acomp_ctx mutex should be locked/unlocked in the
-> > caller. */
-> >
-> > Please use lockdep assertions rather than comments for internal locking
-> rules.
->=20
-> Sure. Thanks for the suggestion.
->=20
-> >
-> > >  static bool zswap_compress(struct page *page, struct zswap_entry
-> *entry,
-> > > -			   struct zswap_pool *pool)
-> > > +			   struct zswap_pool *pool,
-> > > +			   struct crypto_acomp_ctx *acomp_ctx)
-> > >  {
-> > > -	struct crypto_acomp_ctx *acomp_ctx;
-> > >  	struct scatterlist input, output;
-> > >  	int comp_ret =3D 0, alloc_ret =3D 0;
-> > >  	unsigned int dlen =3D PAGE_SIZE;
-> > > @@ -998,7 +999,6 @@ static bool zswap_compress(struct page *page,
-> > struct zswap_entry *entry,
-> > >  	gfp_t gfp;
-> > >  	u8 *dst;
-> > >
-> > > -	acomp_ctx =3D acomp_ctx_get_cpu_lock(pool);
-> > >  	dst =3D acomp_ctx->buffers[0];
-> > >  	sg_init_table(&input, 1);
-> > >  	sg_set_page(&input, page, PAGE_SIZE, 0);
-> > > @@ -1051,7 +1051,6 @@ static bool zswap_compress(struct page *page,
-> > struct zswap_entry *entry,
-> > >  	else if (alloc_ret)
-> > >  		zswap_reject_alloc_fail++;
-> > >
-> > > -	acomp_ctx_put_unlock(acomp_ctx);
-> > >  	return comp_ret =3D=3D 0 && alloc_ret =3D=3D 0;
-> > >  }
-> > >
-> > > @@ -1509,20 +1508,125 @@ static void shrink_worker(struct
-> work_struct
-> > *w)
-> > >  * main API
-> > >  **********************************/
-> > >
-> > > +/* The per-cpu @acomp_ctx mutex should be locked/unlocked in the
-> > caller. */
-> > > +static bool zswap_batch_compress(struct folio *folio,
-> > > +				 long index,
-> > > +				 unsigned int batch_size,
-> > > +				 struct zswap_entry *entries[],
-> > > +				 struct zswap_pool *pool,
-> > > +				 struct crypto_acomp_ctx *acomp_ctx)
-> > > +{
-> > > +	int comp_errors[ZSWAP_MAX_BATCH_SIZE] =3D { 0 };
-> > > +	unsigned int dlens[ZSWAP_MAX_BATCH_SIZE];
-> > > +	struct page *pages[ZSWAP_MAX_BATCH_SIZE];
-> > > +	unsigned int i, nr_batch_pages;
-> > > +	bool ret =3D true;
-> > > +
-> > > +	nr_batch_pages =3D min((unsigned int)(folio_nr_pages(folio) - index=
-),
-> > batch_size);
-> > > +
-> > > +	for (i =3D 0; i < nr_batch_pages; ++i) {
-> > > +		pages[i] =3D folio_page(folio, index + i);
-> > > +		dlens[i] =3D PAGE_SIZE;
-> > > +	}
-> > > +
-> > > +	/*
-> > > +	 * Batch compress @nr_batch_pages. If IAA is the compressor, the
-> > > +	 * hardware will compress @nr_batch_pages in parallel.
-> > > +	 */
-> >
-> > Please do not specifically mention IAA in zswap.c, as batching could be
-> > supported in the future by other compressors.
->=20
-> Ok.
->=20
-> >
-> > > +	ret =3D crypto_acomp_batch_compress(
-> > > +		acomp_ctx->reqs,
-> > > +		NULL,
-> > > +		pages,
-> > > +		acomp_ctx->buffers,
-> > > +		dlens,
-> > > +		comp_errors,
-> > > +		nr_batch_pages);
-> >
-> > Does crypto_acomp_batch_compress() not require calling
-> > crypto_wait_req()?
->=20
-> It actually doesn't. If the crypto_wait parameter is NULL, the API requir=
-es
-> the driver to provide a way to process request completions asynchronously=
-,
-> as described in patch 2 that adds the crypto batching API.
->=20
-> >
-> > > +
-> > > +	if (ret) {
-> > > +		/*
-> > > +		 * All batch pages were successfully compressed.
-> > > +		 * Store the pages in zpool.
-> > > +		 */
-> > > +		struct zpool *zpool =3D pool->zpool;
-> > > +		gfp_t gfp =3D __GFP_NORETRY | __GFP_NOWARN |
-> > __GFP_KSWAPD_RECLAIM;
-> > > +
-> > > +		if (zpool_malloc_support_movable(zpool))
-> > > +			gfp |=3D __GFP_HIGHMEM | __GFP_MOVABLE;
-> > > +
-> > > +		for (i =3D 0; i < nr_batch_pages; ++i) {
-> > > +			unsigned long handle;
-> > > +			char *buf;
-> > > +			int err;
-> > > +
-> > > +			err =3D zpool_malloc(zpool, dlens[i], gfp, &handle);
-> > > +
-> > > +			if (err) {
-> > > +				if (err =3D=3D -ENOSPC)
-> > > +					zswap_reject_compress_poor++;
-> > > +				else
-> > > +					zswap_reject_alloc_fail++;
-> > > +
-> > > +				ret =3D false;
-> > > +				break;
-> > > +			}
-> > > +
-> > > +			buf =3D zpool_map_handle(zpool, handle,
-> > ZPOOL_MM_WO);
-> > > +			memcpy(buf, acomp_ctx->buffers[i], dlens[i]);
-> > > +			zpool_unmap_handle(zpool, handle);
-> > > +
-> > > +			entries[i]->handle =3D handle;
-> > > +			entries[i]->length =3D dlens[i];
-> > > +		}
-> > > +	} else {
-> > > +		/* Some batch pages had compression errors. */
-> > > +		for (i =3D 0; i < nr_batch_pages; ++i) {
-> > > +			if (comp_errors[i]) {
-> > > +				if (comp_errors[i] =3D=3D -ENOSPC)
-> > > +					zswap_reject_compress_poor++;
-> > > +				else
-> > > +					zswap_reject_compress_fail++;
-> > > +			}
-> > > +		}
-> > > +	}
-> >
-> > This function is awfully close to zswap_compress(). It's essentially a
-> > vectorized version and uses crypto_acomp_batch_compress() instead of
-> > crypto_acomp_compress().
-> >
-> > My questions are:
-> > - Can we use crypto_acomp_batch_compress() for the non-batched case as
-> >   well to unify the code? Does it cause any regressions?
-> >
-> > - If we have to use different compressions APIs, can we at least reuse
-> >   the rest of the code? We can abstract the compression call into a
-> >   helper that chooses the appropriate API based on the batch size. The
-> >   rest should be the same AFAICT.
->=20
-> All good ideas. Let me think about this some more, and gather some data.
+IAA Compression Batching with crypto_acomp Request Chaining:
+============================================================
 
-Based on Herbert's suggestion, in v7, I have separated out the compress bat=
-ching
-API to a new zswap_batch_compress() that uses request chaining.
-zswap_compress() exists in its current form with the only difference being =
-that
-I get the mutex lock once, in zswap_store_folio() to decide whether or not =
-to
-batch.
+This patch-series introduces the use of the Intel Analytics Accelerator
+(IAA) for parallel batch compression of pages in large folios to improve
+zswap swapout latency. It does this by first creating a generic batching
+framework in crypto_acomp using request chaining, followed by invoking
+request chaining API to compress/decompress a batch in the iaa_crypto
+driver.
 
-I will provide more details in response to your comments about exploring
-smaller batches to address the zstd regression seen in v5 and fixed in v6.
+From zswap's perspective, the notable changes are:
+
+1) New zswap_batch_compress() API that constructs a chain of requests
+   corresponding to multiple pages in a folio that need to be compressed as
+   a batch. It proceeds to call crypto_acomp_compress() with the head
+   request in the chain. Thus, the calls to crypto in
+   zswap_batch_compress() and zswap_compress() are exactly the same.
+
+   crypto_wait_req(crypto_acomp_compress(acomp_ctx->reqs[0]), &acomp_ctx->wait);
+
+2) A "unified" zswap_store_folio() that compresses a folio in batches or
+   one page at a time; by calling zswap_batch_compress() or
+   zswap_compress(), respectively.
+3) A simplification of the acomp_ctx resources allocation/deletion
+   vis-a-vis CPU hot[un]plug. v7 of this patch-series proposes that these
+   resources are not destroyed during CPU offlining, rather have a lifespan
+   that tracks the zswap_pool's: from pool creation to pool deletion. This
+   is in response to Yosry's comments in v6 with regards to exploring mutex
+   locking options in zswap_cpu_comp_prepare().
+
+Improvements seen with v7's IAA compress batching with request chaining
+vs. IAA sequential:
+
+usemem30 with 64K folios:
+  61% higher throughput
+  32% lower elapsed time
+  37% lower sys time 
+
+usemem30 with 2M folios:
+  73% higher throughput
+  27% lower elapsed time
+  27% lower sys time 
+
+
+The patch-series is organized as follows:
+
+ 1) crypto acomp & iaa_crypto driver enablers for batching: Relevant
+    patches are tagged with "crypto:" in the subject:
+
+    Patch 1) Adds new acomp request chaining framework and interface based
+             on Herbert Xu's ahash reference implementation in "[PATCH 2/6]
+             crypto: hash - Add request chaining API" [1]. acomp algorithms
+             can use request chaining through these interfaces:
+
+             Setup the request chain:
+               acomp_reqchain_init()
+               acomp_request_chain()
+
+             Process the request chain:
+               acomp_do_req_chain(): synchronously (sequentially)
+               acomp_do_async_req_chain(): asynchronously using submit/poll
+                                           ops (in parallel)
+
+             Query if a request has a chain of requests that need to be
+             processed with it, as a batch:
+
+             acomp_is_reqchain()
+
+    Patch 2) Adds acomp_alg/crypto_acomp interfaces for get_batch_size(),
+             that swap modules can invoke using the new
+             crypto_acomp_batch_size() API, to get the maximum batch size
+             supported by a compressor before allocating batching
+             resources.
+
+    Patch 3) New CRYPTO_ACOMP_REQ_POLL acomp_req flag to act as a gate for
+             async poll mode in iaa_crypto.
+
+    Patch 4) iaa-crypto driver implementations for async and sync compress
+             and decompress batching using request chaining. The driver's
+             compress() and decompress() interface implementations will
+             query acomp_is_reqchain() to do batched vs. sequential
+             compression/decompression. If the iaa_crypto driver is set up
+             for 'async' sync_mode, these batching implementations deploy
+             the asynchronous request chaining framework provided via
+             acomp_do_async_req_chain() in patch 1. 'async' is the
+             recommended mode for realizing the benefits of IAA
+             parallelism. If iaa_crypto is set up for 'sync' sync_mode, the
+             synchronous version of the request chaining API is used, i.e.,
+             acomp_do_req_chain() - this will process the chain in series.
+             
+             The "iaa_acomp_fixed_deflate" algorithm opts in to request
+             chaining with CRYPTO_ALG_REQ_CHAIN, and registers the
+             get_batch_size() interface, which returns the
+             IAA_CRYPTO_MAX_BATCH_SIZE constant that iaa_crypto defines
+             currently as 8U for IAA compression algorithms (iaa_crypto can
+             change this if needed as we optimize our batching algorithm). 
+
+    Patch 5) Modifies the default iaa_crypto driver mode to async, now that
+             iaa_crypto provides a truly async mode that gives
+             significantly better latency than sync mode for the batching
+             use case.
+
+    Patch 6) Disables verify_compress by default, to facilitate users to
+             run IAA easily for comparison with software compressors.
+
+    Patch 7) Reorganizes the iaa_crypto driver code into logically related
+             sections and avoids forward declarations, in order to facilitate
+             Patch 8. This patch makes no functional changes.
+
+    Patch 8) Makes a major infrastructure change in the iaa_crypto driver,
+             to map IAA devices/work-queues to cores based on packages
+             instead of NUMA nodes. This doesn't impact performance on
+             the Sapphire Rapids system used for performance
+             testing. However, this change fixes functional problems we
+             found on Granite Rapids in internal validation, where the
+             number of NUMA nodes is greater than the number of packages,
+             which was resulting in over-utilization of some IAA devices
+             and non-usage of other IAA devices as per the current NUMA
+             based mapping infrastructure.
+             This patch also eliminates duplication of device wqs in
+             per-cpu wq_tables, thereby saving 140MiB on a 384 cores
+             Granite Rapids server with 8 IAAs. Submitting this change now
+             so that it can go through code reviews before it can be merged.
+
+    Patch 9) Builds upon the new infrastructure for mapping IAAs to cores
+             based on packages, and enables configuring a "global_wq" per
+             IAA, which can be used as a global resource for compress jobs
+             for the package. If the user configures 2WQs per IAA device,
+             the driver will distribute compress jobs from all cores on the
+             package to the "global_wqs" of all the IAA devices on that
+             package, in a round-robin manner. This can be used to improve
+             compression throughput for workloads that see a lot of swapout
+             activity.
+
+   Patch 10) Makes an important change to iaa_crypto driver's descriptor
+             allocation, from blocking to non-blocking with
+             retries/timeouts and mitigations in case of timeouts during
+             compress/decompress ops. This prevents tasks getting blocked
+             indefinitely, which was observed when testing 30 cores running
+             workloads, with only 1 IAA enabled on Sapphire Rapids (out of
+             4). These timeouts are typically only encountered, and
+             associated mitigations exercised, only in configurations with
+             1 IAA device shared by 30+ cores.
+
+   Patch 11) Fixes a bug with the "deflate_generic_tfm" global being
+             accessed without locks in the software decomp fallback code.
+
+ 2) zswap modifications to enable compress batching in zswap_store()
+    of large folios (including pmd-mappable folios):
+
+   Patch 12) Simplifies acomp_ctx resources to have a lifespan from pool
+             creation to pool deletion, persisting through CPU hot[un]plugs
+             after initial allocation.
+
+   Patch 13) Defines a zswap-specific ZSWAP_MAX_BATCH_SIZE (currently set
+             as 8U) to denote the maximum number of acomp_ctx batching
+             resources. Further, the "struct crypto_acomp_ctx" is modified
+             to contain a configurable number of acomp_reqs and buffers.
+             The cpu hotplug onlining code will allocate up to
+             ZSWAP_MAX_BATCH_SIZE requests/buffers in the per-cpu
+             acomp_ctx, thereby limiting the memory usage in zswap, and
+             ensuring that non-batching compressors incur no memory penalty
+             except for minimal overhead.
+
+   Patch 14) Restructures & simplifies zswap_store() to make it amenable
+             for batching. Moves the loop over the folio's pages to a new
+             zswap_store_folio(), which in turn allocates zswap entries
+             for all folio pages upfront, then calls zswap_compress() for
+             each folio page.
+
+   Patch 15) Introduces zswap_batch_compress(). We modify
+             zswap_store_folio() to detect if the compressor supports
+             batching. If so, the "acomp_ctx->nr_reqs" becomes the batch
+             size and the folio is compressed in batches with
+             zswap_batch_compress(). With IAA, up to 8 pages will be
+             compressed in parallel in hardware.
+
+             For non-batching compressors, or if the folio has only one
+             page, zswap_compress() is invoked per page in the folio.
+
+             The conditional "if (batching) {..} else {..}" in
+             zswap_store_folio() inlines the code that calls
+             zswap_batch_compress() by iterating over the folio pages in
+             batch_size chunks. Moving this into a separate procedure adds
+             latency to IAA batching of 2M folios.
+
+             zstd performance is on par with mm-unstable. We see impressive
+             throughput/performance improvements with IAA batching
+             vs. no-batching.
+
+
+With v7 of this patch series, the IAA compress batching feature will be
+enabled seamlessly on Intel platforms that have IAA by selecting
+'deflate-iaa' as the zswap compressor, and using the iaa_crypto 'async'
+sync_mode driver attribute.
+
+[1]: https://lore.kernel.org/linux-crypto/677614fbdc70b31df2e26483c8d2cd1510c8af91.1730021644.git.herbert@gondor.apana.org.au/
+[2]: https://patchwork.kernel.org/project/linux-mm/patch/20241221063119.29140-3-kanchana.p.sridhar@intel.com/
+
+
+System setup for testing:
+=========================
+Testing of this patch-series was done with mm-unstable as of 2-27-2025,
+commit d58172d128ac, without and with this patch-series.
+Data was gathered on an Intel Sapphire Rapids (SPR) server, dual-socket
+56 cores per socket, 4 IAA devices per socket, 503 GiB RAM and 525G SSD
+disk partition swap. Core frequency was fixed at 2500MHz.
+
+Other kernel configuration parameters:
+
+    zswap compressor  : zstd, deflate-iaa
+    zswap allocator   : zsmalloc
+    vm.page-cluster   : 0
+
+IAA "compression verification" is disabled and IAA is run in the async
+mode (the defaults with this series).
+
+I ran experiments with these workloads:
+
+1) usemem 30 processes with these large folios enabled to "always":
+   - 64k
+   - 2048k
+
+2) Kernel compilation allmodconfig with 2G max memory, 32 threads, run in
+   tmpfs with these large folios enabled to "always":
+   - 64k
+
+
+Performance testing (usemem30):
+===============================
+The vm-scalability "usemem" test was run in a cgroup whose memory.high
+was fixed at 150G. The is no swap limit set for the cgroup. 30 usemem
+processes were run, each allocating and writing 10G of memory, and sleeping
+for 10 sec before exiting:
+
+usemem --init-time -w -O -b 1 -s 10 -n 30 10g
+
+
+ 64K folios: usemem30: deflate-iaa:
+ ==================================
+
+ -------------------------------------------------------------------------------
+                 mm-unstable-2-27-2025             v7
+ -------------------------------------------------------------------------------
+ zswap compressor         deflate-iaa     deflate-iaa    IAA Batching
+                                                             vs.
+                                                           Sequential
+ -------------------------------------------------------------------------------
+ Total throughput (KB/s)    6,025,001       9,674,460         61%      
+ Avg throughput (KB/s)        200,833         322,482                    
+ elapsed time (sec)            100.25           68.35        -32%      
+ sys time (sec)              2,414.12        1,517.49        -37%      
+                                                                         
+ -------------------------------------------------------------------------------
+ memcg_high                   909,501         964,110                    
+ memcg_swap_fail                1,580           2,398                    
+ zswpout                   58,342,295      61,715,859                    
+ zswpin                           425             415                    
+ pswpout                            0               0                    
+ pswpin                             0               0                    
+ thp_swpout                         0               0                    
+ thp_swpout_fallback                0               0                    
+ 64kB_swpout_fallback           1,580           2,398                    
+ pgmajfault                     3,311           3,190                    
+ anon_fault_alloc_64kB      4,924,571       4,923,764                   
+ ZSWPOUT-64kB               3,644,769       3,854,809   
+ SWPOUT-64kB                        0               0   
+ -------------------------------------------------------------------------------
+
+
+ 2M folios: usemem30: deflate-iaa:
+ =================================
+
+
+ -------------------------------------------------------------------------------
+                 mm-unstable-2-27-2025              v7
+ -------------------------------------------------------------------------------
+ zswap compressor          deflate-iaa     deflate-iaa     IAA Batching
+                                                               vs.
+                                                            Sequential
+ -------------------------------------------------------------------------------
+ Total throughput (KB/s)     6,374,303      11,094,182         73%     
+ Avg throughput (KB/s)         212,476         369,806                
+ elapsed time (sec)              87.04           63.44        -27%     
+ sys time (sec)               2,012.30        1,458.23        -27%     
+                                                                      
+ -------------------------------------------------------------------------------
+ memcg_high                    115,322         125,099                
+ memcg_swap_fail                   568               5                
+ zswpout                   559,323,303      64,510,976                
+ zswpin                            518               0                
+ pswpout                             0               0                
+ pswpin                              0               0                
+ thp_swpout                          0               0                
+ thp_swpout_fallback               568               5                
+ pgmajfault                      3,298           2,755                
+ anon_fault_alloc_2048kB       153,734         153,737               
+ ZSWPOUT-2048kB                115,321         125,993           
+ SWPOUT-2048kB                       0               0           
+ -------------------------------------------------------------------------------
+
+
+ 64K folios: usemem30: zstd:
+ ===========================
+
+ -------------------------------------------------------------------------------
+                mm-unstable-2-27-2025           v7
+
+ -------------------------------------------------------------------------------
+ zswap compressor               zstd          zstd
+ -------------------------------------------------------------------------------
+ Total throughput (KB/s)   6,920,374     6,939,253
+ Avg throughput (KB/s)       230,679       231,308
+ elapsed time (sec)            94.62         88.64
+ sys time (sec)             2,387.50      2,197.54
+                                                  
+ -------------------------------------------------------------------------------
+ memcg_high                  764,423       764,477
+ memcg_swap_fail               1,236             9
+ zswpout                  48,928,758    48,928,583
+ zswpin                          421            69
+ pswpout                           0             0
+ pswpin                            0             0
+ thp_swpout                        0             0
+ thp_swpout_fallback               0             0
+ 64kB_swpout_fallback          1,236             9
+ pgmajfault                    3,196         2,857
+ anon_fault_alloc_64kB     4,924,288     4,924,102
+ ZSWPOUT-64kB              3,056,753     3,057,986
+ SWPOUT-64kB                       0             0
+ -------------------------------------------------------------------------------
+
+
+ 2M folios: usemem30: zstd:
+ ==========================
+
+ -------------------------------------------------------------------------------
+                mm-unstable-2-27-2025           v7
+ -------------------------------------------------------------------------------
+ zswap compressor               zstd          zstd
+ -------------------------------------------------------------------------------
+ Total throughput (KB/s)   7,655,965     7,808,124
+ Avg throughput (KB/s)       255,198       260,270
+ elapsed time (sec)            86.52         79.94
+ sys time (sec)             2,030.63      1,862.74
+                                                  
+ -------------------------------------------------------------------------------
+ memcg_high                   93,036        93,008
+ memcg_swap_fail                 143           165
+ zswpout                  48,062,240    48,064,321
+ zswpin                          439           428
+ pswpout                           0             0
+ pswpin                            0             0
+ thp_swpout                        0             0
+ thp_swpout_fallback             143           165
+ pgmajfault                    3,246         3,254
+ anon_fault_alloc_2048kB     153,739       153,737
+ ZSWPOUT-2048kB               93,726        93,712
+ SWPOUT-2048kB                     0             0
+ -------------------------------------------------------------------------------
+
+
+
+Performance testing (Kernel compilation, allmodconfig):
+=======================================================
+
+The experiments with kernel compilation test, 32 threads, in tmpfs use the
+"allmodconfig" that takes ~12 minutes, and has considerable swapout/swapin
+activity. The cgroup's memory.max is set to 2G.
+
+
+ 64K folios: Kernel compilation/allmodconfig:
+ ============================================
+
+ -------------------------------------------------------------------------------
+                     mm-unstable               v7   mm-unstable            v7
+ -------------------------------------------------------------------------------
+ zswap compressor    deflate-iaa      deflate-iaa          zstd          zstd   
+ -------------------------------------------------------------------------------
+ real_sec                 775.83           765.90        769.39        772.63 
+ user_sec              15,659.10        15,659.14     15,666.28     15,665.98 
+ sys_sec                4,209.69         4,040.44      5,277.86      5,358.61 
+ -------------------------------------------------------------------------------
+ Max_Res_Set_Size_KB   1,871,116        1,874,128     1,873,200     1,873,488 
+ -------------------------------------------------------------------------------
+ memcg_high                    0                0             0             0 
+ memcg_swap_fail               0                0             0             0 
+ zswpout             107,305,181      106,985,511    86,621,912    89,355,274 
+ zswpin               32,418,991       32,184,517    25,337,514    26,522,042 
+ pswpout                     272               80            94            16 
+ pswpin                      274               69            54            16 
+ thp_swpout                    0                0             0             0 
+ thp_swpout_fallback           0                0             0             0 
+ 64kB_swpout_fallback        494                0             0             0 
+ pgmajfault           34,577,545       34,333,290    26,892,991    28,132,682 
+ ZSWPOUT-64kB          3,498,796        3,460,751     2,737,544     2,823,211 
+ SWPOUT-64kB                  17                4             4             1 
+ -------------------------------------------------------------------------------
+
+
+With the iaa_crypto driver changes for non-blocking descriptor allocations,
+no timeouts-with-mitigations were seen in compress/decompress jobs, for all
+of the above experiments.
+
+
+Summary:
+========
+The performance testing data with usemem 30 processes and kernel
+compilation test show 61%-73% throughput gains and 27%-37% sys time
+reduction (usemem30) and 4% sys time reduction (kernel compilation) with
+zswap_store() large folios using IAA compress batching as compared to
+IAA sequential. There is no performance regression for zstd/usemem30 and a
+slight 1.5% sys time zstd regression with kernel compilation allmod
+config.
+
+We can expect to see even more significant performance and throughput
+improvements if we use the parallelism offered by IAA to do reclaim
+batching of 4K/large folios (really any-order folios), and using the
+zswap_store() high throughput compression to batch-compress pages
+comprising these folios, not just batching within large folios. This is the
+reclaim batching patch 13 in v1, which will be submitted in a separate
+patch-series.
+
+Our internal validation of IAA compress/decompress batching in highly
+contended Sapphire Rapids server setups with workloads running on 72 cores
+for ~25 minutes under stringent memory limit constraints have shown up to
+50% reduction in sys time and 21.3% more memory savings with IAA, as
+compared to zstd, for same performance. IAA batching demonstrates more than
+2X the memory savings obtained by zstd for same performance.
+
+
+Changes since v6:
+=================
+1) Rebased to mm-unstable as of 2-27-2025, commit d58172d128ac.
+
+2) Deleted crypto_acomp_batch_compress() and
+   crypto_acomp_batch_decompress() interfaces, as per Herbert's
+   suggestion. Batching is instead enabled by chaining the requests. For
+   non-batching compressors, there is no request chaining involved. Both,
+   batching and non-batching compressions are accomplished by zswap by
+   calling:
+
+   crypto_wait_req(crypto_acomp_compress(acomp_ctx->reqs[0]), &acomp_ctx->wait);
+
+3) iaa_crypto implementation of batch compressions/decompressions using
+   request chaining, as per Herbert's suggestions.
+4) Simplification of the acomp_ctx resource allocation/deletion with
+   respect to CPU hot[un]plug, to address Yosry's suggestions to explore the
+   mutex options in zswap_cpu_comp_prepare(). Yosry, please let me know if
+   the per-cpu memory cost of this proposed change is acceptable (IAA:
+   64.8KB, Software compressors: 8.2KB). On the positive side, I believe
+   restarting reclaim on a CPU after it has been through an offline-online
+   transition, will be much faster by not deleting the acomp_ctx resources
+   when the CPU gets offlined.
+5) Use of lockdep assertions rather than comments for internal locking
+   rules, as per Yosry's suggestion.
+6) No specific references to IAA in zswap.c, as suggested by Yosry.
+7) Explored various solutions other than the v6 zswap_store_folio()
+   implementation, to fix the zstd regression seen in v5, to attempt to
+   unify common code paths, and to allocate smaller arrays for the zswap
+   entries on the stack. All these options were found to cause usemem30
+   latency regression with zstd. The v6 version of zswap_store_folio() is
+   the only implementation that does not cause zstd regression, confirmed
+   by 10 consecutive runs, each giving quite consistent latency
+   numbers. Hence, the v6 implementation is carried forward to v7, with
+   changes for branching for batching vs. sequential compression API
+   calls.
+
+
+Changes since v5:
+=================
+1) Rebased to mm-unstable as of 2-1-2025, commit 7de6fd8ab650.
+
+Several improvements, regression fixes and bug fixes, based on Yosry's
+v5 comments (Thanks Yosry!):
+
+2) Fix for zstd performance regression in v5.
+3) Performance debug and fix for marginal improvements with IAA batching
+   vs. sequential.
+4) Performance testing data compares IAA with and without batching, instead
+   of IAA batching against zstd.
+5) Commit logs/zswap comments not mentioning crypto_acomp implementation
+   details.
+6) Delete the pr_info_once() when batching resources are allocated in
+   zswap_cpu_comp_prepare().
+7) Use kcalloc_node() for the multiple acomp_ctx buffers/reqs in
+   zswap_cpu_comp_prepare().
+8) Simplify and consolidate error handling cleanup code in
+   zswap_cpu_comp_prepare().
+9) Introduce zswap_compress_folio() in a separate patch.
+10) Bug fix in zswap_store_folio() when xa_store() failure can cause all
+    compressed objects and entries to be freed, and UAF when zswap_store()
+    tries to free the entries that were already added to the xarray prior
+    to the failure.
+11) Deleting compressed_bytes/bytes. zswap_store_folio() also comprehends
+    the recent fixes in commit bf5eaaaf7941 ("mm/zswap: fix inconsistency
+    when zswap_store_page() fails") by Hyeonggon Yoo.
+
+iaa_crypto improvements/fixes/changes:
+
+12) Enables asynchronous mode and makes it the default. With commit
+    4ebd9a5ca478 ("crypto: iaa - Fix IAA disabling that occurs when
+    sync_mode is set to 'async'"), async mode was previously just sync. We
+    now have true async support.
+13) Change idxd descriptor allocations from blocking to non-blocking with
+    timeouts, and mitigations for compress/decompress ops that fail to
+    obtain a descriptor. This is a fix for tasks blocked errors seen in
+    configurations where 30+ cores are running workloads under high memory
+    pressure, and sending comps/decomps to 1 IAA device.
+14) Fixes a bug with unprotected access of "deflate_generic_tfm" in
+    deflate_generic_decompress(), which can cause data corruption and
+    zswap_decompress() kernel crash.
+15) zswap uses crypto_acomp_batch_compress() with async polling instead of
+    request chaining for slightly better latency. However, the request
+    chaining framework itself is unchanged, preserved from v5.
+
+
+Changes since v4:
+=================
+1) Rebased to mm-unstable as of 12-20-2024, commit 5555a83c82d6.
+2) Added acomp request chaining, as suggested by Herbert. Thanks Herbert!
+3) Implemented IAA compress batching using request chaining.
+4) zswap_store() batching simplifications suggested by Chengming, Yosry and
+   Nhat, thanks to all!
+   - New zswap_compress_folio() that is called by zswap_store().
+   - Move the loop over folio's pages out of zswap_store() and into a
+     zswap_store_folio() that stores all pages.
+   - Allocate all zswap entries for the folio upfront.
+   - Added zswap_batch_compress().
+   - Branch to call zswap_compress() or zswap_batch_compress() inside
+     zswap_compress_folio().
+   - All iterations over pages kept in same function level.
+   - No helpers other than the newly added zswap_store_folio() and
+     zswap_compress_folio().
+
+
+Changes since v3:
+=================
+1) Rebased to mm-unstable as of 11-18-2024, commit 5a7056135bb6.
+2) Major re-write of iaa_crypto driver's mapping of IAA devices to cores,
+   based on packages instead of NUMA nodes.
+3) Added acomp_has_async_batching() API to crypto acomp, that allows
+   zswap/zram to query if a crypto_acomp has registered batch_compress and
+   batch_decompress interfaces.
+4) Clear the poll bits on the acomp_reqs passed to
+   iaa_comp_a[de]compress_batch() so that a module like zswap can be
+   confident about the acomp_reqs[0] not having the poll bit set before
+   calling the fully synchronous API crypto_acomp_[de]compress().
+   Herbert, I would appreciate it if you can review changes 2-4; in patches
+   1-8 in v4. I did not want to introduce too many iaa_crypto changes in
+   v4, given that patch 7 is already making a major change. I plan to work
+   on incorporating the request chaining using the ahash interface in v5
+   (I need to understand the basic crypto ahash better). Thanks Herbert!
+5) Incorporated Johannes' suggestion to not have a sysctl to enable
+   compress batching.
+6) Incorporated Yosry's suggestion to allocate batching resources in the
+   cpu hotplug onlining code, since there is no longer a sysctl to control
+   batching. Thanks Yosry!
+7) Incorporated Johannes' suggestions related to making the overall
+   sequence of events between zswap_store() and zswap_batch_store() similar
+   as much as possible for readability and control flow, better naming of
+   procedures, avoiding forward declarations, not inlining error path
+   procedures, deleting zswap internal details from zswap.h, etc. Thanks
+   Johannes, really appreciate the direction!
+   I have tried to explain the minimal future-proofing in terms of the
+   zswap_batch_store() signature and the definition of "struct
+   zswap_batch_store_sub_batch" in the comments for this struct. I hope the
+   new code explains the control flow a bit better.
+
+
+Changes since v2:
+=================
+1) Rebased to mm-unstable as of 11-5-2024, commit 7994b7ea6ac8.
+2) Fixed an issue in zswap_create_acomp_ctx() with checking for NULL
+   returned by kmalloc_node() for acomp_ctx->buffers and for
+   acomp_ctx->reqs.
+3) Fixed a bug in zswap_pool_can_batch() for returning true if
+   pool->can_batch_comp is found to be equal to BATCH_COMP_ENABLED, and if
+   the per-cpu acomp_batch_ctx tests true for batching resources having
+   been allocated on this cpu. Also, changed from per_cpu_ptr() to
+   raw_cpu_ptr().
+4) Incorporated the zswap_store_propagate_errors() compilation warning fix
+   suggested by Dan Carpenter. Thanks Dan!
+5) Replaced the references to SWAP_CRYPTO_SUB_BATCH_SIZE in comments in
+   zswap.h, with SWAP_CRYPTO_BATCH_SIZE.
+
+Changes since v1:
+=================
+1) Rebased to mm-unstable as of 11-1-2024, commit 5c4cf96cd702.
+2) Incorporated Herbert's suggestions to use an acomp_req flag to indicate
+   async/poll mode, and to encapsulate the polling functionality in the
+   iaa_crypto driver. Thanks Herbert!
+3) Incorporated Herbert's and Yosry's suggestions to implement the batching
+   API in iaa_crypto and to make its use seamless from zswap's
+   perspective. Thanks Herbert and Yosry!
+4) Incorporated Yosry's suggestion to make it more convenient for the user
+   to enable compress batching, while minimizing the memory footprint
+   cost. Thanks Yosry!
+5) Incorporated Yosry's suggestion to de-couple the shrink_folio_list()
+   reclaim batching patch from this series, since it requires a broader
+   discussion.
+
+
+I would greatly appreciate code review comments for the iaa_crypto driver
+and mm patches included in this series!
 
 Thanks,
 Kanchana
 
->=20
-> Thanks,
-> Kanchana
->=20
-> >
-> > > +
-> > > +	return ret;
-> > > +}
-> > > +
-> > >  static bool zswap_compress_folio(struct folio *folio,
-> > >  				 struct zswap_entry *entries[],
-> > >  				 struct zswap_pool *pool)
-> > >  {
-> > >  	long index, nr_pages =3D folio_nr_pages(folio);
-> > > +	struct crypto_acomp_ctx *acomp_ctx;
-> > > +	unsigned int batch_size;
-> > > +	bool ret =3D true;
-> > >
-> > > -	for (index =3D 0; index < nr_pages; ++index) {
-> > > -		struct page *page =3D folio_page(folio, index);
-> > > +	acomp_ctx =3D acomp_ctx_get_cpu_lock(pool);
-> > > +	batch_size =3D acomp_ctx->nr_reqs;
-> > > +
-> > > +	if ((batch_size > 1) && (nr_pages > 1)) {
-> > > +		for (index =3D 0; index < nr_pages; index +=3D batch_size) {
-> > > +
-> > > +			if (!zswap_batch_compress(folio, index, batch_size,
-> > > +						  &entries[index], pool,
-> > acomp_ctx)) {
-> > > +				ret =3D false;
-> > > +				goto unlock_acomp_ctx;
-> > > +			}
-> > > +		}
-> > > +	} else {
-> > > +		for (index =3D 0; index < nr_pages; ++index) {
-> > > +			struct page *page =3D folio_page(folio, index);
-> > >
-> > > -		if (!zswap_compress(page, entries[index], pool))
-> > > -			return false;
-> > > +			if (!zswap_compress(page, entries[index], pool,
-> > acomp_ctx)) {
-> > > +				ret =3D false;
-> > > +				goto unlock_acomp_ctx;
-> > > +			}
-> > > +		}
-> > >  	}
-> > >
-> > > -	return true;
-> > > +unlock_acomp_ctx:
-> > > +	acomp_ctx_put_unlock(acomp_ctx);
-> > > +	return ret;
-> > >  }
-> > >
-> > >  /*
-> > > --
-> > > 2.27.0
-> > >
+
+
+
+Kanchana P Sridhar (15):
+  crypto: acomp - Add synchronous/asynchronous acomp request chaining.
+  crypto: acomp - New interfaces to facilitate batching support in acomp
+    & drivers.
+  crypto: iaa - Add an acomp_req flag CRYPTO_ACOMP_REQ_POLL to enable
+    async mode.
+  crypto: iaa - Implement batch compression/decompression with request
+    chaining.
+  crypto: iaa - Enable async mode and make it the default.
+  crypto: iaa - Disable iaa_verify_compress by default.
+  crypto: iaa - Re-organize the iaa_crypto driver code.
+  crypto: iaa - Map IAA devices/wqs to cores based on packages instead
+    of NUMA.
+  crypto: iaa - Distribute compress jobs from all cores to all IAAs on a
+    package.
+  crypto: iaa - Descriptor allocation timeouts with mitigations in
+    iaa_crypto.
+  crypto: iaa - Fix for "deflate_generic_tfm" global being accessed
+    without locks.
+  mm: zswap: Simplify acomp_ctx resource allocation/deletion and mutex
+    lock usage.
+  mm: zswap: Allocate pool batching resources if the compressor supports
+    batching.
+  mm: zswap: Restructure & simplify zswap_store() to make it amenable
+    for batching.
+  mm: zswap: Compress batching with request chaining in zswap_store() of
+    large folios.
+
+ .../driver-api/crypto/iaa/iaa-crypto.rst      |   11 +-
+ crypto/acompress.c                            |  285 +++
+ drivers/crypto/intel/iaa/iaa_crypto.h         |   30 +-
+ drivers/crypto/intel/iaa/iaa_crypto_main.c    | 1556 ++++++++++++-----
+ include/crypto/acompress.h                    |   79 +
+ include/crypto/algapi.h                       |   10 +
+ include/crypto/internal/acompress.h           |   14 +
+ include/linux/crypto.h                        |   39 +
+ mm/zswap.c                                    |  655 +++++--
+ 9 files changed, 2028 insertions(+), 651 deletions(-)
+
+
+base-commit: d58172d128acbafa2295aa17cc96e28260da9a86
+-- 
+2.27.0
+
