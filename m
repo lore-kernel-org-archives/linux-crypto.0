@@ -1,72 +1,93 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.gentoo.org (woodpecker.gentoo.org [140.211.166.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F206728F5
-	for <linux-crypto@vger.kernel.org>; Sat,  1 Mar 2025 07:38:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C171F3594D
+	for <linux-crypto@vger.kernel.org>; Sat,  1 Mar 2025 14:38:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.211.166.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740814740; cv=none; b=ZOGNmhrMtelvVa9jQC8ZfSPVQNRCwtLXWR//Yovlod7+t4ZFMN8tpzB/Q5L6eZaaENWBEL9H9PX0XTjKDZWQC+K8zjzi87uObYEUf/fl921g7YcxqrVGYC9v3GiOMXVEm2ROSo6efDXpKp4C1Gy+fncf7ecqwh7WjK2s980DVfY=
+	t=1740839933; cv=none; b=MNAlt2r1rf0pPS0Q3BiUyBSsCo8KGzvJ+2G9fGirlOYpaeAf4UXfNhYMYZNS6UUFyDykQsQsXkmct7RngZd2IQtYDLSY2dyyFTUwjfrHk+aAw3P8IgS1jjv5hywgQxn75a2p/z8NtuqpwP7h7w4ahiYWP4RYSkOLLL4rxmuyoNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740814740; c=relaxed/simple;
-	bh=JnghmmWyzPl5/ruQzqxxTBr1/2h0S7DnIHHq5v5TNoU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gSuHGuDtTko31GSugZudXLdD2z9LsfsWuylJsnjaPduNt3Si8m37qea2gJDpDx5XG01cIxW4nnAEWaVf5Tk9HeuEjVggU066aXHnx1HpStJssHSoXQ33qUKx1Z2xf93y/RNKUmlT1dN/SlW0sg32FsfgIJy2uquTv4DRjnffxDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=h+wJVuyG; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="h+wJVuyG"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=L71zF+y7ql/yI9YZsnxpiUc90jcPNYGBSwMdLjupP+Y=; b=h+wJVuyGc07vOtHMeCGPYyWym8
-	BAGuSRYxONoF7tt7TcKHoOoe0/0Irz2ImVvkAlWKi+LBHq5+dV+W0ES4aq5r8zz0+E7GzvFu2OUei
-	hZO9e9hCd4qXIz7EQiEqz8YOzrYDOFv7GKOjv1gSRUJW/nmAYNfcq87P1huO8pLIOFe518XS4f5Yy
-	EPUFlJupYEk+0agyxWBHiLH9cPgEZ6d5wcCeKg8ICYx9WGQbZks9IInqJnx1oMqjsi75lanExYocX
-	V41oTghqRefmx3g0mXE7JoNJOcVFbtXiPia2MUdhH2GNxnBDkAFqjfzgw0zwqGWe5KG4JzceXRi37
-	vS6MdMpA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1toHQv-002mdZ-2e;
-	Sat, 01 Mar 2025 15:38:50 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 01 Mar 2025 15:38:49 +0800
-Date: Sat, 1 Mar 2025 15:38:49 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Yosry Ahmed <yosry.ahmed@linux.dev>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	linux-mm@kvack.org, Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: Re: [RFC PATCH 7/7] mm: zswap: Use acomp virtual address interface
-Message-ID: <Z8K5iWSH2FqyIvML@gondor.apana.org.au>
-References: <cover.1740651138.git.herbert@gondor.apana.org.au>
- <153c340a52090f2ff82f8f066203186a932d3f99.1740651138.git.herbert@gondor.apana.org.au>
- <Z8CquB-BZrP5JFYg@google.com>
- <20250227183847.GB1613@sol.localdomain>
- <Z8K4ibtteV3_hs7e@gondor.apana.org.au>
+	s=arc-20240116; t=1740839933; c=relaxed/simple;
+	bh=YU/capnsEz8eugDzdWDgZph/rkx5rRKO+yfVDcr36ic=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=oNoS+tl3cbinn/4nAWkf6aLkqh2OMF/v0axcYI/na0CuBpac1JvJFKGSPcGP1IPiu86gM/HiLazNv08BYItu0u6gjQoWzAqv7QSqJNENgZS2+wDK8d7Aut1js15fbxJIKf+EOhzmH5152hbNWh/3ouKOROOrxtBcSVJg1MezQjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org; spf=pass smtp.mailfrom=gentoo.org; arc=none smtp.client-ip=140.211.166.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gentoo.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gentoo.org
+Received: from bozeman.lan (pool-96-240-17-61.nwrknj.fios.verizon.net [96.240.17.61])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: mpagano)
+	by smtp.gentoo.org (Postfix) with ESMTPSA id B6674342FEA;
+	Sat, 01 Mar 2025 14:38:50 +0000 (UTC)
+From: mpagano@gentoo.org
+To: linux-crypto@vger.kernel.org
+Cc: herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	mpagano@gentoo.org
+Subject: [PATCH] crypto: lib/aescfb - fix build with GCC 15 due to -Werror=unterminated-string-initialization
+Date: Sat,  1 Mar 2025 09:38:42 -0500
+Message-ID: <20250301143842.173872-1-mpagano@gentoo.org>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z8K4ibtteV3_hs7e@gondor.apana.org.au>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Sat, Mar 01, 2025 at 03:34:33PM +0800, Herbert Xu wrote:
->
-> So I'm withdrawing my acomp patch-set because the premise was wrong.
-> The only user for acomp actually wants SG lists.
+Fix char length error which appears when compiling with GCC 15:
 
-For a laugh I'm going to rewrite the LZO decomp code to take
-an SG list as input.  That would then allow the decompression
-path to run with zero copies even when the data spans two pages.
+CC      lib/crypto/aescfb.o
+lib/crypto/aescfb.c:124:27: error: initializer-string for array of ‘unsigned char’ is too long [-Werror=unterminated-string-initialization]
+124 |                 .ptext  = "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96"
+    |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+lib/crypto/aescfb.c:132:27: error: initializer-string for array of ‘unsigned char’ is too long [-Werror=unterminated-string-initialization]
+132 |                 .ctext  = "\x3b\x3f\xd9\x2e\xb7\x2d\xad\x20"
+    |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+lib/crypto/aescfb.c:148:27: error: initializer-string for array of ‘unsigned char’ is too long [-Werror=unterminated-string-initialization]
+148 |                 .ptext  = "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96"
+    |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+lib/crypto/aescfb.c:156:27: error: initializer-string for array of ‘unsigned char’ is too long [-Werror=unterminated-string-initialization]
+156 |                 .ctext  = "\xcd\xc8\x0d\x6f\xdd\xf1\x8c\xab"
+    |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+lib/crypto/aescfb.c:166:27: error: initializer-string for array of ‘unsigned char’ is too long [-Werror=unterminated-string-initialization]
+166 |                 .key    = "\x60\x3d\xeb\x10\x15\xca\x71\xbe"
+    |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+lib/crypto/aescfb.c:173:27: error: initializer-string for array of ‘unsigned char’ is too long [-Werror=unterminated-string-initialization]
+173 |                 .ptext  = "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96"
+    |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+lib/crypto/aescfb.c:181:27: error: initializer-string for array of ‘unsigned char’ is too long [-Werror=unterminated-string-initialization]
+181 |                 .ctext  = "\xdc\x7e\x84\xbf\xda\x79\x16\x4b"
+    |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Cheers,
+Signed-off-by: Mike Pagano <mpagano@gentoo.org>
+---
+ lib/crypto/aescfb.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/lib/crypto/aescfb.c b/lib/crypto/aescfb.c
+index 749dc1258..9db2ef86d 100644
+--- a/lib/crypto/aescfb.c
++++ b/lib/crypto/aescfb.c
+@@ -106,11 +106,11 @@ MODULE_LICENSE("GPL");
+  */
+ 
+ static struct {
+-	u8	ptext[64];
+-	u8	ctext[64];
++	u8	ptext[65];
++	u8	ctext[65];
+ 
+-	u8	key[AES_MAX_KEY_SIZE];
+-	u8	iv[AES_BLOCK_SIZE];
++	u8	key[AES_MAX_KEY_SIZE+1];
++	u8	iv[AES_BLOCK_SIZE+1];
+ 
+ 	int	klen;
+ 	int	len;
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.48.1
+
