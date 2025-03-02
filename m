@@ -1,96 +1,106 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 768915661
-	for <linux-crypto@vger.kernel.org>; Sun,  2 Mar 2025 03:53:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6662315A8;
+	Sun,  2 Mar 2025 06:10:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740887589; cv=none; b=fJyp1Yw7yaL1gpIoZcV1QR9ixuy3gtVLyb1bswXpxxvMa3oR3+jK/XLqm2RGn/UrjOoqr4+fcbjp4/586hVBuojBfVomIPhkaccAGSUTtZAXHSobdtd4/f5zGejrc6GXAOxUHAlXYgn5Up5za3+yXdHpP984fGjn2DnHF5ez3NU=
+	t=1740895834; cv=none; b=jqyEEcDHxJz3fn/HDfcXSTki6ZwVFNK8EshpZo25nZMc8dksmfm3MKzbwHc1kyEfxNrj0Rox0bUqm6tfPn6jq4Nzueo2GZTdKZBCfcZXDWJ6d1N+1YcIRqEjy5pnZUpq/USYTipcKH58hQZ/hDQ74rW7pwKBx+MUrx93CDNvAOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740887589; c=relaxed/simple;
-	bh=BydKwClDB7Fj6VIb+ReT1dt0BYOFeIHFjnfjvRLt2U0=;
+	s=arc-20240116; t=1740895834; c=relaxed/simple;
+	bh=JoCwhW2kedYhm5VZxvqYJTAzDu/galJk+5XSV8Q/EsU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MGvIwxkhURbb37S53Ph2bndsvOzF+25Wu1UqjQggDYpgWebszUx8hmfYtj2yq7nxTmSit25nPnkVRqjvRItnfo7JDyeTPqj8vNCHz1U+R6HZqMr+01xc4NGwKUDUeXkQuUbDpICKsd3E363bJjzQbWtV7M/JiHSrzMgSpY2s4OA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=sbhRNPoH; arc=none smtp.client-ip=144.6.53.87
+	 Content-Type:Content-Disposition:In-Reply-To; b=mvPFOu6v9u1vPZSl74EFa57x9bRviwHJ8kXN9hwkRDVjJ0yC4KlNsA2XnpBlAI8f8exdVxKygmSgruitbrhhs5Fy7IthHm3nXszoVzP0l2w/gSTDpEIrWT3r2gd7f3zvYmMWFSRKT8ibsHMTwHeFSfNGGQ2e+srp1XZchFB6eB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=ER9PnGbj; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="sbhRNPoH"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="ER9PnGbj"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Transfer-Encoding:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-ID:
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=bVA4c2z78Mx6tq5s4Ps60yndhOQS8WKqzyEM8Zh98Hk=; b=sbhRNPoHReIMmMX8GjwtY3KzIQ
-	3wt2LVtTIpzPTuz0wK6ysfhvSqbRCBjMW1pRi3HrifndUwlnqDhP4e9hu7TTKenQXhcrTKAMg3z6V
-	VfiCYHJUdl633mU6I8WhhN3SalMfZJclfDCo7fhTf07g8x28Vry3t29qVcArFESwdbBB0722iaqst
-	HiKENwawHZjNqFHXME1SKSy7Vl1Xd4sN7OpiTsCRPqLCxhybxkr7hQthUXGku8NItO5ODbolcVdBH
-	ReXAOi5+FbclWuH7So9Z2d/+IZZ+pzFUWiZU4E4E8Hx7PWFcXfSWs95EpzkARz1bQGQNPX3wQoAxt
-	kcHb9k7w==;
+	bh=4JDdLgOIRKP6MkDwL0d2OG9t1NrXyqQHEitlHLvr074=; b=ER9PnGbjfRxn1mAt7YKFNq8TmC
+	orXqJlek/iL3VRobrFCqBXwW9DvB3DORKVURCZ8VI4u1M7CZ7MZ1jSZgP3I5JLpcOU6uc9e3VLPqn
+	f5QrUwu8LVaxvFub0uNGhuIjnAo5Q6IAVUe5JnaxHOAe1Zk5ZvgWoLavvejX28kg5dsf8uIkIRqBr
+	3rfwraq9sBcRmfhQY0J1qA8dTtlgW2CBued7o2KKMCzckQZyneO0XfgxtS2QEV2tq3qg435eUWpdZ
+	UdwMKnf+Tmh2ONUorVluZRyoIIbJG4ryJog6cyqs2vQ8ex1xerrL1QnuY4RleK/x+iHDCCqvN/jvH
+	LvtlOnmA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1toaNp-002yYu-2F;
-	Sun, 02 Mar 2025 11:52:54 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 02 Mar 2025 11:52:53 +0800
-Date: Sun, 2 Mar 2025 11:52:53 +0800
+	id 1tocWN-002zOO-0v;
+	Sun, 02 Mar 2025 14:09:52 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 02 Mar 2025 14:09:51 +0800
+Date: Sun, 2 Mar 2025 14:09:51 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: mpagano@gentoo.org
-Cc: linux-crypto@vger.kernel.org, davem@davemloft.net,
-	Ard Biesheuvel <ardb@kernel.org>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	Jarkko Sakkinen <jarkko@kernel.org>
-Subject: Re: [PATCH] crypto: lib/aescfb - fix build with GCC 15 due to
- -Werror=unterminated-string-initialization
-Message-ID: <Z8PWFaeE7znrSjlV@gondor.apana.org.au>
-References: <20250301143842.173872-1-mpagano@gentoo.org>
+To: David Howells <dhowells@redhat.com>
+Cc: Marc Dionne <marc.dionne@auristor.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Trond Myklebust <trond.myklebust@hammerspace.com>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
+	linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
+	netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [GIT PULL] crypto: Add Kerberos crypto lib
+Message-ID: <Z8P2L6nZGUEUiNwS@gondor.apana.org.au>
+References: <3193936.1740736547@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250301143842.173872-1-mpagano@gentoo.org>
+In-Reply-To: <3193936.1740736547@warthog.procyon.org.uk>
 
-On Sat, Mar 01, 2025 at 09:38:42AM -0500, mpagano@gentoo.org wrote:
-> Fix char length error which appears when compiling with GCC 15:
+On Fri, Feb 28, 2025 at 09:55:47AM +0000, David Howells wrote:
+> Hi Herbert,
 > 
-> CC      lib/crypto/aescfb.o
-> lib/crypto/aescfb.c:124:27: error: initializer-string for array of ‘unsigned char’ is too long [-Werror=unterminated-string-initialization]
-> 124 |                 .ptext  = "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96"
->     |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> lib/crypto/aescfb.c:132:27: error: initializer-string for array of ‘unsigned char’ is too long [-Werror=unterminated-string-initialization]
-> 132 |                 .ctext  = "\x3b\x3f\xd9\x2e\xb7\x2d\xad\x20"
->     |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> lib/crypto/aescfb.c:148:27: error: initializer-string for array of ‘unsigned char’ is too long [-Werror=unterminated-string-initialization]
-> 148 |                 .ptext  = "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96"
->     |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> lib/crypto/aescfb.c:156:27: error: initializer-string for array of ‘unsigned char’ is too long [-Werror=unterminated-string-initialization]
-> 156 |                 .ctext  = "\xcd\xc8\x0d\x6f\xdd\xf1\x8c\xab"
->     |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> lib/crypto/aescfb.c:166:27: error: initializer-string for array of ‘unsigned char’ is too long [-Werror=unterminated-string-initialization]
-> 166 |                 .key    = "\x60\x3d\xeb\x10\x15\xca\x71\xbe"
->     |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> lib/crypto/aescfb.c:173:27: error: initializer-string for array of ‘unsigned char’ is too long [-Werror=unterminated-string-initialization]
-> 173 |                 .ptext  = "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96"
->     |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> lib/crypto/aescfb.c:181:27: error: initializer-string for array of ‘unsigned char’ is too long [-Werror=unterminated-string-initialization]
-> 181 |                 .ctext  = "\xdc\x7e\x84\xbf\xda\x79\x16\x4b"
->     |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> Could you pull this into the crypto tree please?  It does a couple of
+> things:
 > 
-> Signed-off-by: Mike Pagano <mpagano@gentoo.org>
-> ---
->  lib/crypto/aescfb.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+>  (1) Provide an AEAD crypto driver, krb5enc, that mirrors the authenc
+>      driver, but that hashes the plaintext, not the ciphertext.  This was
+>      made a separate module rather than just being a part of the authenc
+>      driver because it has to do all of the constituent operations in the
+>      opposite order - which impacts the async op handling.
+> 
+>      Testmgr data is provided for AES+SHA2 and Camellia combinations of
+>      authenc and krb5enc used by the krb5 library.  AES+SHA1 is not
+>      provided as the RFCs don't contain usable test vectors.
+> 
+>  (2) Provide a Kerberos 5 crypto library.  This is an extract from the
+>      sunrpc driver as that code can be shared between sunrpc/nfs and
+>      rxrpc/afs.  This provides encryption, decryption, get MIC and verify
+>      MIC routines that use and wrap the crypto functions, along with some
+>      functions to provide layout management.
+> 
+>      This supports AES+SHA1, AES+SHA2 and Camellia encryption types.
+> 
+>      Self-testing is provided that goes further than is possible with
+>      testmgr, doing subkey derivation as well.
+> 
+> The patches were previously posted here:
+> 
+>     https://lore.kernel.org/r/20250203142343.248839-1-dhowells@redhat.com/
+> 
+> as part of a larger series, but the networking guys would prefer these to
+> go through the crypto tree.  If you want them reposting independently, I
+> can do that.
 
-Perhaps convert the vectors to a char array instead?
+I tried pulling it but it's not based on the cryptodev tree so
+it will create a mess when I push this upstream.  If you want me
+to pull it through cryptodev please rebase it on my tree.
 
-	.ptext = { 0x6b, 0xc1, ... }
-
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
