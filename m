@@ -1,84 +1,71 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18A5717991;
-	Sun,  2 Mar 2025 10:11:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E133C1E0E0C
+	for <linux-crypto@vger.kernel.org>; Sun,  2 Mar 2025 11:40:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740910285; cv=none; b=KgZB/W8UddLUHVAic4eGsaNMn+BL2t7HuTcjIetJwZRrLmCuCrM6zyJm6rRoM3cYhRR+QiJoeiJVFl436T84XZVJjBSUWa+THc6RRXPq+yQEAijgBWwJvLGXD5M5XUfXceeLIfGqZ1m3Yt1We6pXw2ncHUglRNp/lGeh8bRrctc=
+	t=1740915645; cv=none; b=XOPG+lK28CG+9LmGGEN7Kv1Z35W7sc5c/fV5K4As8CrZNGfP7QpckRbCFznYuAu8/V6QGGdD+e7RZEOohpvtmPguYdXscJoNiSwUOFypTzZQ1mcJbwiIqMpvjY0WCTzZmb2oneQS2V9HtUSpu+M7BAUoAA5qHGX1Lnd/Nk8xO3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740910285; c=relaxed/simple;
-	bh=X+dG4A9QnQTFqJvV+suXtjWyt578KH9A4EQ7Tz+tNsc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L840ITJLwdfxqbyOnJKmSv9EPEKgRkOkveiYjlc1DrvXe3wp1YsFm+2DQjLWbGv8fPpzUS6/4JwjEobca2BJbTG9TpX6TVGxxwmEp/iaUUjk5pLC3xmrpGlVe1LVNxoEImWbaulYpHl5pMK70dsQgyNzfuMFOv/e/1H2wcvfEZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=TW8KGRpB; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1740915645; c=relaxed/simple;
+	bh=ibJpnIMBMfwg+wEixIQ9dxHR74HBmtgjULFkQgeW35E=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=l3rqtyInZTAYd5Xk1+yulAwLPdGfdF1coN2hWvLiGDk32VHj465lgQeVZzrLKR1X/WR8Rs72WHzDTLPAhPloXv2jXJx6auYrt73G0JffjmwfgAvdW8Dw5KfgU3xy7J4gPIJ1OcAAdxoFmtL9SO0u+wEY/tUdRh1TEMPeT+QKAhw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tf3QsNhE; arc=none smtp.client-ip=91.218.175.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="TW8KGRpB"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=LZ1kzoItTIfgSfeyOMWuRUU3nz3iZo3LIJaz2feGi6E=; b=TW8KGRpBY4YITNZ0ZpfDPpj1Z2
-	60Qm2B0Vt8eQVi+mnuVXeEv+oNJVjpOU25y/OEFTzcPe1gVbf9MNymDVV7TBPzMoZrB2e2We8Ko3v
-	PUXJ1mxNH6PF8MtRItdj5e0zhh7jwbwY8d+n3RSkLEDKCRur3IOIsSG1cmWrhZBY2ujMttnxifb4+
-	Pu1qKmvIVNfEDCE4rU+WtGEWReii8PI/9PQphSMPtER0u5vqcPn0sl+elavGFRjoSQA9PXfn346p+
-	NhvSiFqye3sIemUQ8cRGXcs+ilk8X11qoRgESJw31fSJUS34mk/JMvM6UI+IFcXHMah/U4wJt7R7l
-	GUP6X+Og==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1togHm-0031hy-2d;
-	Sun, 02 Mar 2025 18:11:03 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 02 Mar 2025 18:11:02 +0800
-Date: Sun, 2 Mar 2025 18:11:02 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Lukas Wunner <lukas@wunner.de>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Stefan Berger <stefanb@linux.ibm.com>,
-	Vitaly Chikunov <vt@altlinux.org>,
-	David Howells <dhowells@redhat.com>,
-	Ignat Korchagin <ignat@cloudflare.com>,
-	linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
-	Eric Biggers <ebiggers@google.com>
-Subject: Re: [PATCH v2 3/4] crypto: ecdsa - Fix enc/dec size reported by
- KEYCTL_PKEY_QUERY
-Message-ID: <Z8Qutq61oFm9FFpY@gondor.apana.org.au>
-References: <cover.1738521533.git.lukas@wunner.de>
- <3d74d6134f4f87a90ebe0a37cb06c6ec144ceef7.1738521533.git.lukas@wunner.de>
- <Z6h8L0D-CBhZUiVR@gondor.apana.org.au>
- <Z6iRssS26IOjWbfx@wunner.de>
- <Z6mwxUaS33EastB3@gondor.apana.org.au>
- <Z6pLRRJFOml8w61S@wunner.de>
- <Z7FnYEN-OnR_-7sP@gondor.apana.org.au>
- <Z7HBsONxj_q0BkJU@wunner.de>
- <Z8QNJqQKhyyft_gz@gondor.apana.org.au>
- <Z8QkDi79zO-PIaVV@wunner.de>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tf3QsNhE"
+Content-Type: text/plain;
+	charset=us-ascii
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1740915630;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=koGqmzgxJVr+i3JPI4Z8o/wAMh9GbzaZsxUAoedZwe0=;
+	b=tf3QsNhEJxFXSLuxp70QnWiRq6yh1U1ASF+RlVj1S6mRnM7tCLnLrogfBusKSCKzIvQARX
+	67apWnDIijARy09gfyY9L21UIacEz9plULsiytDUpvHfhknuii1Tn3BamsZnoKhr7i3LEt
+	p7dqKcsPjLF59RfbqKSGTnfZuz11P2w=
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z8QkDi79zO-PIaVV@wunner.de>
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3776.700.51.11.1\))
+Subject: Re: [RESEND PATCH] crypto: bcm - set memory to zero only once
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Thorsten Blum <thorsten.blum@linux.dev>
+In-Reply-To: <Z8P3DdA9d4nqTJVv@gondor.apana.org.au>
+Date: Sun, 2 Mar 2025 12:40:17 +0100
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Chen Ridong <chenridong@huawei.com>,
+ =?utf-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
+ linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <91117BEC-B6FC-4FC7-9073-10FAAC13E2FF@linux.dev>
+References: <20250219111254.2654-2-thorsten.blum@linux.dev>
+ <Z8P3DdA9d4nqTJVv@gondor.apana.org.au>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+X-Migadu-Flow: FLOW_OUT
 
-On Sun, Mar 02, 2025 at 10:25:34AM +0100, Lukas Wunner wrote:
->
-> In principle, yes.
+On 2. Mar 2025, at 07:13, Herbert Xu wrote:
+> On Wed, Feb 19, 2025 at 12:12:53PM +0100, Thorsten Blum wrote:
+>> Use kmalloc_array() instead of kcalloc() because sg_init_table() already
+>> sets the memory to zero. This avoids zeroing the memory twice.
+>> 
+>> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+>> ---
+>> drivers/crypto/bcm/cipher.c | 24 ++++++++++++------------
+>> 1 file changed, 12 insertions(+), 12 deletions(-)
+> 
+> This patch has already been applied.  Please check whether there
+> is any discrepancy between the applied version and this resend.
 
-Great!
+My bad, I must have missed it in -next. The patches are identical.
 
-> Which files are we talking about exactly?
+Thanks,
+Thorsten
 
-So it's basically everything under crypto/asymmetric_keys + the
-algorithms that they use.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
