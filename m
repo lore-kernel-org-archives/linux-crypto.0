@@ -1,47 +1,59 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 383C323F36D;
-	Sun,  2 Mar 2025 06:40:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D03C1CAA80;
+	Sun,  2 Mar 2025 07:48:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1740897663; cv=none; b=asCB3MflncCyLdpci124twkKaVtjR+NVp1/ASLgzxynqHqM47DG0k60X3imvt6mAUUH+JPcx6SK0Wos+uVu/qeFnqNI9CQF/llEjoALT+PqvGFsQfI7UnHoeTa4xTGDLPF4EVpPNMSHJnX5F12vMGmGhOH4Bq92035TZCr8UPac=
+	t=1740901701; cv=none; b=qnz3TIUgNHKnNzaGIB6Kf5L0+dRww7KJCGw+qWnQytMmCiL/RGA7TQ42QYonPGDl7Rx2QVz6i1myTw0RYOthFrwOb7xrcs5Jq5GzCL/fsOqWk9gcLtto4DAOHjdkplnlk2fcTZH8PPjFx9i0BQaO/nJAHNEKyhRLZryXhkW1jfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1740897663; c=relaxed/simple;
-	bh=yxq4X3IfJINbbbYLJR6PKFBSfpb5xyESOM5xNISaKZE=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=dz0TNH/MYShN1oq9wIYJjmuO2eDJkg51Wx19X4DngMfohoylrV4mkzEvDdcQqrBRZKD9KC7Ud8XHDmGQ5ANjSQJO4aiVgN0nknyGMFVsE71Bx7cObgdI5s5CdZT3LhWDLxVEXhFILMiYRtu+3w4bXiB1Gwa7urTUny4sQuEBDZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=f/oMS9Qc; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1740901701; c=relaxed/simple;
+	bh=gxcNzhUAbbMnadRwLKmsEqwOeLEf+LcbPnXXmHY9DeE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PMtpXW2AscZnzC+qzF0nxxKNG727dGWDFFjQDGRSSnN1j4s84Yawb8H7OmciUDO74gmTrYBGdWB3EC0joq38LlKvIg6t7Qhsf98Pjz54J40zo8agAxPUrCaTBYX+pHnkKUDTljNbAsn6Wk7+phtzIbWvw21mePaESIxzqCClzBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=H7UPu291; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="f/oMS9Qc"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="H7UPu291"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:Message-ID:Subject:Cc:To:
-	From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=oJ6rtl0wk9Sb31dv82nKyLaT80n6BvewvPmU67I/T9A=; b=f/oMS9QcItfgmEptN+PliM+xk8
-	iUoZA2+Fp5cVMNLb1sipyBxkuqgfRUudFsszwQ76woXKTtjwrKUftDTo7kP8/eEYRiQplU63db0sD
-	AzK38m4Kvc/sjQKX+uMMe2VgM1RkALHjm4OzJuXqha79ifg1eHdkGU3BOp3qUp/K98UrOOSOXQ/fB
-	I9HxTOdm1NIcqn88KRZiwXaU7FXiixzAJudn75HHqVCT64sf15hIbp7t9qc8VK8UhQjXPy09kV221
-	/8oWe+HF3pjCK6z8pfCv+8o67/g0n/1S37teA/F/fJJal9RIzLgqrlalWQfe/NQ0TtHS3jHlHosgj
-	QZd1PgVg==;
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=q4tMciyVQqcFrGw/27BWcTPClf6ozhyVrTYo1K7XZb8=; b=H7UPu291m3DmwdR1kwW/YEy4jP
+	jjMtFCFm5lKXOl9sB5FfTkvHv4n9vpg7KKqX8ej4uohjgBTfls6nYfo9e/Ybx0goaB1+DrSRDgwPP
+	XP+CbGWB2SPriQU6GiU4JIIhpHonnmxNzPs6vR+w6/dut+ZRI6aP1drhM6FD4dn75Gru1nHBbionS
+	aO4tzt4aqad7WWdfxzLSh+a7+D4RXx4c3kmjK8HaJ8Yq6GrKhN0CVkZQ8vzJllSnZizs0UpvNV8Hf
+	rVIbKqG8ZVpVVfOkCyhHDwsokpMxBEXL3MSXyyztM1vUGwVgcZj4m6CK7Zd0FmUYZgY3BBz5B2mcM
+	JQwrTcpQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tod0S-002zYy-0G;
-	Sun, 02 Mar 2025 14:40:57 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 02 Mar 2025 14:40:56 +0800
-Date: Sun, 2 Mar 2025 14:40:56 +0800
+	id 1toe3C-0030fO-0Q;
+	Sun, 02 Mar 2025 15:47:51 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 02 Mar 2025 15:47:50 +0800
+Date: Sun, 2 Mar 2025 15:47:50 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, David Howells <dhowells@redhat.com>,
-	Akinobu Mita <akinobu.mita@gmail.com>, Tejun Heo <htejun@gmail.com>
-Subject: Re: [PATCH v3 04/19] crypto: scatterwalk - add new functions for
- copying data
-Message-ID: <Z8P9eIGDlT3fs1gS@gondor.apana.org.au>
+To: Lukas Wunner <lukas@wunner.de>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Stefan Berger <stefanb@linux.ibm.com>,
+	Vitaly Chikunov <vt@altlinux.org>,
+	David Howells <dhowells@redhat.com>,
+	Ignat Korchagin <ignat@cloudflare.com>,
+	linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
+	Eric Biggers <ebiggers@google.com>
+Subject: Re: [PATCH v2 3/4] crypto: ecdsa - Fix enc/dec size reported by
+ KEYCTL_PKEY_QUERY
+Message-ID: <Z8QNJqQKhyyft_gz@gondor.apana.org.au>
+References: <cover.1738521533.git.lukas@wunner.de>
+ <3d74d6134f4f87a90ebe0a37cb06c6ec144ceef7.1738521533.git.lukas@wunner.de>
+ <Z6h8L0D-CBhZUiVR@gondor.apana.org.au>
+ <Z6iRssS26IOjWbfx@wunner.de>
+ <Z6mwxUaS33EastB3@gondor.apana.org.au>
+ <Z6pLRRJFOml8w61S@wunner.de>
+ <Z7FnYEN-OnR_-7sP@gondor.apana.org.au>
+ <Z7HBsONxj_q0BkJU@wunner.de>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -50,36 +62,19 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250219182341.43961-5-ebiggers@kernel.org>
-X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel,apana.lists.os.linux.netdev
+In-Reply-To: <Z7HBsONxj_q0BkJU@wunner.de>
 
-Eric Biggers <ebiggers@kernel.org> wrote:
+On Sun, Feb 16, 2025 at 11:45:04AM +0100, Lukas Wunner wrote:
 >
-> +void memcpy_from_sglist(void *buf, struct scatterlist *sg,
-> +                       unsigned int start, unsigned int nbytes)
-> {
->        struct scatter_walk walk;
-> -       struct scatterlist tmp[2];
-> 
-> -       if (!nbytes)
-> +       if (unlikely(nbytes == 0)) /* in case sg == NULL */
->                return;
-> 
-> -       sg = scatterwalk_ffwd(tmp, sg, start);
-> +       scatterwalk_start_at_pos(&walk, sg, start);
-> +       memcpy_from_scatterwalk(buf, &walk, nbytes);
-> +}
-> +EXPORT_SYMBOL_GPL(memcpy_from_sglist);
-> +
-> +void memcpy_to_sglist(struct scatterlist *sg, unsigned int start,
-> +                     const void *buf, unsigned int nbytes)
+> I think the best option at this point isn't to aim for removal
+> but to wait for Cloudflare to beat their out-of-tree implementation
+> (which apparently isn't susceptible to side channel attacks)
+> into shape so that it can be upstreamed.
 
-These functions duplicate sg_copy_buffer.  Of course scatterwalk
-in general duplicates SG miter which came later IIRC.
+I don't think having a one-off fix is sufficient.  We need someone
+who can maintain this for the long term.  Are you willing to do this?
 
-What's your plan for eliminating this duplication?
-
-Thanks,
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
