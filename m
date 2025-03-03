@@ -1,115 +1,172 @@
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from beeline2.cc.itu.edu.tr (beeline2.cc.itu.edu.tr [160.75.25.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2102A25F996
-	for <linux-crypto@vger.kernel.org>; Tue,  4 Mar 2025 16:06:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741104373; cv=none; b=U/N1oZSQoHbJ3LtBoKQYbnrcAYyfNtwhvUpclraAJPuBUCUMXgP1EzLDlp5jnE1XJ66OaJQttjh3t8e6YyqvgqOCPQ1IB5fMSkPoS9pZ6twgwYAMVSnCT5U3V4+2nZazd3lU0TosQPy/QvK56AppTEV1cM/V3uOPChhhZ5WIOTM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741104373; c=relaxed/simple;
-	bh=WWkPvNPAsAK/o9BV1/7oCW3olPK1i28GTmpPd97Esgc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GfDjzc3Hpgg1oeDEULX9Zk5H+ks3JExjGJ1FjvB9+mQAa6dMwhwoDSJEuR6BeEl26xENC+BSo8rOafuH1uPGf/rjFqQXrrCDTQGCZC/nybXndKUqsEJHvg0DXGd+gMizM2SZTBIWBKKVCPAbOnosOBwB5BkuhVQwUY6YAUlQpSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Z9HOCrOx; arc=none smtp.client-ip=209.85.216.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5321F29CB4E
+	for <linux-crypto@vger.kernel.org>; Tue,  4 Mar 2025 16:08:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=160.75.25.116
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741104507; cv=fail; b=ueMSauF7SMCs4XM7krU7O27adTtxYJQHErFALZciKdwuR7K4nK80guaTzPeVyP1Z5CiadfyEoE5ICMOynswDJDdXjA8EWLVeaMb3T5bGcApnjUNbfVkJCvWeQVxyymLovJ+5H5u4M0kxfM1B1v4fTPmnjgpVYWS/k6j4U1TV/pM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741104507; c=relaxed/simple;
+	bh=7FLVy+mHazqBRLUwwxAKIUKPJl1FViNyB85b6akzRXM=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=bm4r0xG5ji2qQoTVNNHLWgMaZyeYsjpc2+0Q+dUy1OI+PL0GqC5jPPAxt4geJ4oAuO6FSpJ46XRl9IeOFor59uJr26ksjppA078j6IECCeAjtZ3vcN06P0fgn8HRacjOB7QdLLtimAK1HKU0Tb49PCBtJ29IFFJ1MEFfP7N2pyo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com; spf=none smtp.mailfrom=cc.itu.edu.tr; dkim=fail (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Gt1dw67V reason="signature verification failed"; arc=none smtp.client-ip=192.198.163.14; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; arc=fail smtp.client-ip=160.75.25.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=cc.itu.edu.tr
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Z9HOCrOx"
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2f9d3d0f55dso9420622a91.1
-        for <linux-crypto@vger.kernel.org>; Tue, 04 Mar 2025 08:06:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741104371; x=1741709171; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=1t6ivLIoIuftK2f6E0pPM+6bkcWx6f6OEyc75s3kSwQ=;
-        b=Z9HOCrOxgbWushjjjNNkwcx9LKZumjOrDWDWYrSFZVwByCC3MPD1pvISqu/wDAtyuc
-         YMBhbv2R70SVZXOnu0MOtBL7Og0Z6dSY6mY5QaE1TjYTghl3t2/dcgtWi07T677SBW6y
-         F++hDWUDhN1nYsEmn/8vGVpeNrT3JT7aG6de1v2wxpVL8Qm9MCWfZf7Wp6dcqdEUUFNZ
-         zlvekDTGvU+NRADexTCVCpEpKjLhuXeXSkjFKtzq2oS/M5hovCbfMqHd19CCWAkR3lzX
-         XUl22CFKGBH0G2aZKmOAxQWQdcT8KLcHcahH7sgWn0gvzlODtN896EyrQCvU9Cj/bTW9
-         q3Og==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741104371; x=1741709171;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1t6ivLIoIuftK2f6E0pPM+6bkcWx6f6OEyc75s3kSwQ=;
-        b=ZWWIto8WBAdtcqLlpQ7f8PAaEfCvrg0cns68p8+BNNGy5K9Gsfk9GvbDy1c31LZrEP
-         r3wVA1LnYdWM+RWHRDmeMsrznmII3KprX07+tE0GwSTwuje2nlT+UMy02LWLys4VMePQ
-         +HGx01ARvMfhRd3Tspq2Igd2+1cgWVLsBzwiuU4yp31lpbVTo2WaHmI8lc0mF+46V9YW
-         d7jS1aNuljJe1jDdQWIOfgEemMsHJf7RSeOgBcdUg0d+sZSeEGX9U8x3YMeYnox+ARwA
-         BMXQ3UykVQ1PjB4pqpWLNGhJUQEHIUoDl7qovyhDBFL9BLVjw7RuIxekjnL1gD9yYcFA
-         RFcA==
-X-Forwarded-Encrypted: i=1; AJvYcCU6Y0sk9hB5TTM/1e++xZvEjiqI5j69UyDLcHAzpecPBYcgXwoTLerXumK4j+SVU4k4b28W07WvkUZBpxk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWU5jkpdTeIigsOnD4WorNl2ESboSNCZ9BH2zusLQfBviNxGjU
-	ty2Klh4u6fpaD/DUed0/HF2c7c7mM3zEgaT63k8LxlFojU6zL1+HlCSgajNp7PGhERfhlUcbeQl
-	8BkiBmz3EZbu1S4ysHoVjrNbwKBHprLDqkdSA
-X-Gm-Gg: ASbGncvEbjzuVQUIH38FNzFyUOe3gpLRrCcVLofp4zCEqkR210WzP2+bwydShL8f8kv
-	4KIi6K5eMXetZ9QvC3Ndgj9ZqrJFPoED2c8TFvMFMQZS5upGBrY0VcKvWDDbjiBWXBC8AsKVI3e
-	xWs6ae5wXZjlgt3TPhI8CVcD3x42wr7f2vK4ltvYxi4U34uFigtORLrLwY
-X-Google-Smtp-Source: AGHT+IGC++S0t8n6ETtzwl720fo704PFOyUfTbjjLTjxsG9B6ISbxU7AjY+lsYqZ8bJrf6DliVj8kaBM3qPLyBgfJME=
-X-Received: by 2002:a17:90b:1ccd:b0:2ee:c918:cd60 with SMTP id
- 98e67ed59e1d1-2febab78da2mr27444913a91.20.1741104371050; Tue, 04 Mar 2025
- 08:06:11 -0800 (PST)
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Gt1dw67V"
+Received: from lesvatest1.cc.itu.edu.tr (lesvatest1.cc.itu.edu.tr [10.146.128.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits))
+	(No client certificate requested)
+	by beeline2.cc.itu.edu.tr (Postfix) with ESMTPS id CB5BE40F1CF3
+	for <linux-crypto@vger.kernel.org>; Tue,  4 Mar 2025 19:08:24 +0300 (+03)
+X-Envelope-From: <root@cc.itu.edu.tr>
+Received: from lesva1.cc.itu.edu.tr (unknown [160.75.70.79])
+	by lesvatest1.cc.itu.edu.tr (Postfix) with ESMTP id 4Z6gNB47yfzG1rC
+	for <linux-crypto@vger.kernel.org>; Tue,  4 Mar 2025 18:59:06 +0300 (+03)
+Received: by le1 (Postfix, from userid 0)
+	id B112541898; Tue,  4 Mar 2025 18:58:44 +0300 (+03)
+Authentication-Results: lesva1.cc.itu.edu.tr;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Gt1dw67V
+X-Envelope-From: <linux-kernel+bounces-541185-bozkiru=itu.edu.tr@vger.kernel.org>
+Authentication-Results: lesva2.cc.itu.edu.tr;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Gt1dw67V
+Received: from fgw1.itu.edu.tr (fgw1.itu.edu.tr [160.75.25.103])
+	by le2 (Postfix) with ESMTP id A5FA341E61
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 11:49:06 +0300 (+03)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by fgw1.itu.edu.tr (Postfix) with SMTP id 42F723064C07
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 11:49:06 +0300 (+03)
+Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0AF933A94CF
+	for <bozkiru@itu.edu.tr>; Mon,  3 Mar 2025 08:48:55 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B6F51F12F4;
+	Mon,  3 Mar 2025 08:47:37 +0000 (UTC)
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 747231EE014;
+	Mon,  3 Mar 2025 08:47:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1740991653; cv=none; b=Mew+Bz+5CcBzzPfCcKuSKG22Vn4YTxmGZ15l7J52G5LgtBG50rJJeXqh4AoMaqi7MFi5nat6heR2DAdzEEI9kxkQdYb8EW0cO7oaJqApWRHraAcwSKfm2DvmnuxoA5V/xi5NURSBI+uENo8qavBzWUzPChDtlI/wsRabvNUsokc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1740991653; c=relaxed/simple;
+	bh=LJoG0hwzy11IwSS0GA7f2KkCoIWMhfdeKs7bZI/C2Jg=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=M5TnE/OvlApkDBfIpnZhDBQL6N/jVoJQW6cCDGnxZ/VGUznWIHLeYMDL8NdnN1F1C9Eu1IJqV5EAYfnzzmZGqbOAzCGtJsYjXSFVKQA/oJCkxo28K0M49rSHCmhN/nit+Gylur1DQpyCpygGJgkp7XctYQImVX2K6NqzrQWpWkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Gt1dw67V; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1740991652; x=1772527652;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=LJoG0hwzy11IwSS0GA7f2KkCoIWMhfdeKs7bZI/C2Jg=;
+  b=Gt1dw67VHBl2jicCy4GNgKflZmGKwdh2AK22+0oGcmxWeAzBAUD+aoc9
+   HFrVu1k8bXmTMvX5Jo//HZ3WPopJJTb1/U2TuvU1C14T84eUZOTusSoso
+   4GNJVIJyyyZa+qOr7IyfXsaEQwi70zyHkcW7/iWsIBsuRNpM3v/P4OrF0
+   9C2CH/E58A2Dn5Q0dXegFX0ePqS0O4Uas2GScumwxLW3IBEFAQ3gy8z5f
+   g+XUYMXyfkoJ4EaEwOu+2EF73V9mCGgXWMMxpfCaEykZ4F98WxnNp5JHs
+   B2QuhAqg+t63fi7KQvMvRsUXvuA2Go5wOhKyLifuBttJONVlvCmi42/jg
+   A==;
+X-CSE-ConnectionGUID: dMwp9FegRd2dXB1nZxp7pQ==
+X-CSE-MsgGUID: nVk5gWsbRN+neeYt63zuaw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11361"; a="42111867"
+X-IronPort-AV: E=Sophos;i="6.13,329,1732608000"; 
+   d="scan'208";a="42111867"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 00:47:28 -0800
+X-CSE-ConnectionGUID: BqnvijDaScOzKITX7vs36w==
+X-CSE-MsgGUID: yCwbwk1qQtu2vMCztNB7sg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,329,1732608000"; 
+   d="scan'208";a="118426765"
+Received: from jf5300-b11a338t.jf.intel.com ([10.242.51.115])
+  by fmviesa010.fm.intel.com with ESMTP; 03 Mar 2025 00:47:26 -0800
+From: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
+To: linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	hannes@cmpxchg.org,
+	yosry.ahmed@linux.dev,
+	nphamcs@gmail.com,
+	chengming.zhou@linux.dev,
+	usamaarif642@gmail.com,
+	ryan.roberts@arm.com,
+	21cnbao@gmail.com,
+	ying.huang@linux.alibaba.com,
+	akpm@linux-foundation.org,
+	linux-crypto@vger.kernel.org,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	clabbe@baylibre.com,
+	ardb@kernel.org,
+	ebiggers@google.com,
+	surenb@google.com,
+	kristen.c.accardi@intel.com
+Cc: wajdi.k.feghali@intel.com,
+	vinodh.gopal@intel.com,
+	kanchana.p.sridhar@intel.com
+Subject: [PATCH v8 02/14] crypto: acomp - New interfaces to facilitate batching support in acomp & drivers.
+Date: Mon,  3 Mar 2025 00:47:12 -0800
+Message-ID: <20250303084724.6490-3-kanchana.p.sridhar@intel.com>
+X-Mailer: git-send-email 2.27.0
+In-Reply-To: <20250303084724.6490-1-kanchana.p.sridhar@intel.com>
+References: <20250303084724.6490-1-kanchana.p.sridhar@intel.com>
+Precedence: bulk
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250304092417.2873893-1-elver@google.com> <20250304092417.2873893-3-elver@google.com>
- <20250304152909.GH11590@noisy.programming.kicks-ass.net>
-In-Reply-To: <20250304152909.GH11590@noisy.programming.kicks-ass.net>
-From: Marco Elver <elver@google.com>
-Date: Tue, 4 Mar 2025 17:05:34 +0100
-X-Gm-Features: AQ5f1JrbHN1FRthi_aRGgJ-kY7WYoWmU4g-pqTmD_Y1oCMFum9IakZQE8Yg9HXM
-Message-ID: <CANpmjNOR=EaPPhnkj+WwV8mDYNuM7fY2r_xdjORv2MGGxxH_0g@mail.gmail.com>
-Subject: Re: [PATCH v2 02/34] compiler-capability-analysis: Add infrastructure
- for Clang's capability analysis
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, 
-	"Paul E. McKenney" <paulmck@kernel.org>, Alexander Potapenko <glider@google.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Bart Van Assche <bvanassche@acm.org>, Bill Wendling <morbo@google.com>, Boqun Feng <boqun.feng@gmail.com>, 
-	Dmitry Vyukov <dvyukov@google.com>, Eric Dumazet <edumazet@google.com>, 
-	Frederic Weisbecker <frederic@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Ingo Molnar <mingo@kernel.org>, 
-	Jann Horn <jannh@google.com>, Jiri Slaby <jirislaby@kernel.org>, 
-	Joel Fernandes <joel@joelfernandes.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Josh Triplett <josh@joshtriplett.org>, Justin Stitt <justinstitt@google.com>, 
-	Kees Cook <kees@kernel.org>, Kentaro Takeda <takedakn@nttdata.co.jp>, 
-	Mark Rutland <mark.rutland@arm.com>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>, Thomas Gleixner <tglx@linutronix.de>, 
-	Uladzislau Rezki <urezki@gmail.com>, Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>, 
-	kasan-dev@googlegroups.com, linux-kernel@vger.kernel.org, 
-	llvm@lists.linux.dev, rcu@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	linux-serial@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-ITU-Libra-ESVA-Information: Please contact Istanbul Teknik Universitesi for more information
+X-ITU-Libra-ESVA-ID: 4Z6gNB47yfzG1rC
+X-ITU-Libra-ESVA: No virus found
+X-ITU-Libra-ESVA-From: root@cc.itu.edu.tr
+X-ITU-Libra-ESVA-Watermark: 1741708757.88452@pF3aoQ+MwgGmg/K3IoaCGw
+X-ITU-MailScanner-SpamCheck: not spam
+Message-ID: <20250303084712.KEW_jACUMRP6SvSWswXI1zr5mrcxAO0gV_66zRyIwZI@z>
 
-On Tue, 4 Mar 2025 at 16:29, Peter Zijlstra <peterz@infradead.org> wrote:
->
-> On Tue, Mar 04, 2025 at 10:21:01AM +0100, Marco Elver wrote:
->
-> > +# define __asserts_cap(var)                  __attribute__((assert_capability(var)))
-> > +# define __asserts_shared_cap(var)           __attribute__((assert_shared_capability(var)))
->
-> > +     static __always_inline void __assert_cap(const struct name *var)                                \
-> > +             __attribute__((overloadable)) __asserts_cap(var) { }                                    \
-> > +     static __always_inline void __assert_shared_cap(const struct name *var)                         \
-> > +             __attribute__((overloadable)) __asserts_shared_cap(var) { }                             \
->
-> Since this does not in fact check -- that's __must_hold(), I would
-> suggest renaming these like s/assert/assume/.
+This commit adds a get_batch_size() interface to:
 
-Yeah, that's better.
+  struct acomp_alg
+  struct crypto_acomp
 
-FTR - the "asserts_capability" attribute was originally meant to be
-used on runtime functions that check that a lock is held at runtime;
-what Clang does underneath is simply adding the given capability/lock
-to the held lockset, so no real checking is enforced. In this series
-it's used for a lot more than just our lockdep_assert*() helpers, so
-the "assert" naming is indeed confusing.
+A crypto_acomp compression algorithm that supports batching of compressio=
+ns
+and decompressions must register and provide an implementation for this
+API, so that higher level modules such as zswap and zram can allocate
+resources for submitting multiple compress/decompress jobs that can be
+batched. In addition, the compression algorithm must register itself
+to use request chaining (cra_flags |=3D CRYPTO_ALG_REQ_CHAIN).
 
-Thanks!
+A new helper function acomp_has_async_batching() can be invoked to query =
+if
+a crypto_acomp has registered this API. Further, the newly added
+crypto_acomp API "crypto_acomp_batch_size()" is provided for use by highe=
+r
+level modules like zswap and zram. crypto_acomp_batch_size() returns 1 if
+the acomp has not provided an implementation for get_batch_size().
+
+For instance, zswap can call crypto_acomp_batch_size() to get the maximum
+batch-size supported by the compressor. Based on this, zswap can use the
+minimum of any zswap-specific upper limits for batch-size and the
+compressor's max batch-size, to allocate batching resources. Further,
+the way that zswap can avail of the compressor's batching capability is b=
+y
+using request chaining to create a list requests chained to a head reques=
+t.
+zswap can call crypto_acomp_compress() or crypto_acomp_decompress() with
+the head request in the chain for processing the chain as a batch. The ca=
+ll
+into crypto for compress/decompress will thus remain the same from zswap'=
+s
+perspective for both, batching and sequential compressions/decompressions=
