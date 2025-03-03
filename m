@@ -1,53 +1,53 @@
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 646B81F8734;
-	Mon,  3 Mar 2025 11:07:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 654091F4619;
+	Mon,  3 Mar 2025 11:07:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741000071; cv=none; b=IfMP1uQMO8anfR4Bozrl2uCr0RN6juidmkeVY9hm2iZSb3f+QMc6/u0Jse4Fci7qXzXNSOebxzMTvXjFjUKdQmX1uY1ypK8sfIUisNLVxa0TiFvocLvqDvywrptZi4LICzN9ENojQxmnaLWkuW4UJMfCqdQnG30C34ICCfVXdis=
+	t=1741000074; cv=none; b=b/HgmEQe3S8GTgPNiGcQJmVixMDnevDxtv2aFz+B+4U0jIqq2uvzrtlX7oV39gRPeqGIgSsQGquN6O7MCiLo3Lqv4rTJfIoqByiyhUrv93PSGu2S1sfoY+cP9oiPVKO+xrYbSP8dtOSGyYr0xyV0ErCpaZRDtIPakRmjeYlPtFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741000071; c=relaxed/simple;
-	bh=/QzomCTIFsL8+Zge4gSHgukORn6rUTkJqZQWdz6RUAM=;
+	s=arc-20240116; t=1741000074; c=relaxed/simple;
+	bh=DJ2wnRWfHhmjvv6CL+4i9zBDgCl/ENX8yayea55YkkI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ofVWXQYq153Mi3ZrjRuoDXjznwdq31ZOmBbn5ZDn3JkFKYdbxu/RwdsvqJp+u5MvZuWKGYgJeYEfWCb+ffTjBPPBRu1sZK8zd055lyk0NZM/b0vV+ZPhekZDHl6lKY2VSUZDUGgA/v87g3Taxo8QWAS/0YcCiybD/S1gp3VpleU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=do/gsAo4; arc=none smtp.client-ip=198.175.65.18
+	 Content-Type:Content-Disposition:In-Reply-To; b=MhIY02TyBvHTK6MlFc6egA8N3dVQrgtklLCjK8hi5YdjXAJNWUvOKNyYeZXWk9PRzGbAZ56bkVEC8gkfmb0XaRtSz34+urftSA6HaZUsNP1AsqkMLt4dkGzjBTO+rByYH3NQTeE13/Zrb9noWlykVVLlgYdeZtf1f49K3R5nMrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UctT2fIg; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="do/gsAo4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UctT2fIg"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741000069; x=1772536069;
+  t=1741000072; x=1772536072;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=/QzomCTIFsL8+Zge4gSHgukORn6rUTkJqZQWdz6RUAM=;
-  b=do/gsAo47ThmKfqaqDN/r2/5wrRXerOY/oNQk7PTGp2HmEE2acgsiCKC
-   kCqNAucF0nnriCC292xRgiueYuxW0/Hh83UqCuLP1mrtslCWzWrjCY1ox
-   hbEBjjg/2SIYTh+LsiUSwH+D2qiuuNf45SkLyst1Z5LcgRGBaO6afJ4nn
-   xiIVmVEYW3KkeqoHSOvi5lIUEvKdomDs+Q2qGn4OL5dwVy+yX8QGFx2NI
-   RuwdDmiiRPdvI1mip087s1VEGjoBjRC+RiJY3mC8wiiU+LMuIcStB6IsX
-   9QtJT+92j3lr5WQc5Q5wIDpczceO4iHwGXujkk9jo6XxwiR94AqTuM6tV
-   g==;
-X-CSE-ConnectionGUID: 4Zp1/VKKQjuyPp6tFIlwqg==
-X-CSE-MsgGUID: PempWpmyTV+ILp7DKv47PA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11361"; a="42062425"
+  bh=DJ2wnRWfHhmjvv6CL+4i9zBDgCl/ENX8yayea55YkkI=;
+  b=UctT2fIghMFvD6SygEh01AL+mS07biyzG/f0cvD85JYiKSN4ZX/MMLVB
+   iAsm3E5BR78JBTpsGarQI+dAHqwt3CKXcT7tPCk5/dVGp0719L9cxdbln
+   WAX62WfbKSbmYngQvM+uFRyjL8IaRdMMQ2YQYYSTbzoeHCxvOZxxvegNu
+   WBZXfJsNLA1PqP+acCLn68OYvwAmjrLBPlwj809BY1N1ZlQ/jTm6853Ut
+   mcvOwv7HcD3eQhT+IobpH7joLPdPvlPBoAzE9Y7DavxhPmKXFFLs8Y+rA
+   w/YizZOlJUsTBL3kTrvg2sMOaDFYTLmKP68nWuYaL2tBRoW/y2PxqTmIn
+   A==;
+X-CSE-ConnectionGUID: 98laiCvLTiuRRg/D5/OlIQ==
+X-CSE-MsgGUID: gdQbMMeNRGqeK0yHBmZMIg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11361"; a="42062437"
 X-IronPort-AV: E=Sophos;i="6.13,329,1732608000"; 
-   d="scan'208";a="42062425"
+   d="scan'208";a="42062437"
 Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 03:07:49 -0800
-X-CSE-ConnectionGUID: 6k/F+HPPRtCI9ZSXx6xyUw==
-X-CSE-MsgGUID: gY5rBCG/Qlu3+iNtxoMw/w==
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2025 03:07:52 -0800
+X-CSE-ConnectionGUID: AYxTZ/JERWm2mJzhMfMIAQ==
+X-CSE-MsgGUID: 2DISxNRkSCeBfeF8JX8vRw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.13,329,1732608000"; 
-   d="scan'208";a="141190252"
+   d="scan'208";a="141190254"
 Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
-  by fmviesa002.fm.intel.com with ESMTP; 03 Mar 2025 03:07:43 -0800
+  by fmviesa002.fm.intel.com with ESMTP; 03 Mar 2025 03:07:47 -0800
 Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
 	(envelope-from <lkp@intel.com>)
-	id 1tp3e9-000IOB-07;
-	Mon, 03 Mar 2025 11:07:41 +0000
-Date: Mon, 3 Mar 2025 19:07:20 +0800
+	id 1tp3eC-000IOE-27;
+	Mon, 03 Mar 2025 11:07:44 +0000
+Date: Mon, 3 Mar 2025 19:07:21 +0800
 From: kernel test robot <lkp@intel.com>
 To: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>,
 	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
@@ -58,12 +58,11 @@ To: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>,
 	linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
 	davem@davemloft.net, clabbe@baylibre.com, ardb@kernel.org,
 	ebiggers@google.com, surenb@google.com, kristen.c.accardi@intel.com
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	wajdi.k.feghali@intel.com, vinodh.gopal@intel.com,
-	kanchana.p.sridhar@intel.com
+Cc: oe-kbuild-all@lists.linux.dev, wajdi.k.feghali@intel.com,
+	vinodh.gopal@intel.com, kanchana.p.sridhar@intel.com
 Subject: Re: [PATCH v8 14/14] mm: zswap: Compress batching with request
  chaining in zswap_store() of large folios.
-Message-ID: <202503031847.j1iReOtf-lkp@intel.com>
+Message-ID: <202503031843.GyX5ZVrC-lkp@intel.com>
 References: <20250303084724.6490-15-kanchana.p.sridhar@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -85,21 +84,21 @@ url:    https://github.com/intel-lab-lkp/linux/commits/Kanchana-P-Sridhar/crypto
 base:   5f089a9aa987ccf72df0c6955e168e865f280603
 patch link:    https://lore.kernel.org/r/20250303084724.6490-15-kanchana.p.sridhar%40intel.com
 patch subject: [PATCH v8 14/14] mm: zswap: Compress batching with request chaining in zswap_store() of large folios.
-config: s390-randconfig-001-20250303 (https://download.01.org/0day-ci/archive/20250303/202503031847.j1iReOtf-lkp@intel.com/config)
-compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250303/202503031847.j1iReOtf-lkp@intel.com/reproduce)
+config: csky-randconfig-002-20250303 (https://download.01.org/0day-ci/archive/20250303/202503031843.GyX5ZVrC-lkp@intel.com/config)
+compiler: csky-linux-gcc (GCC) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250303/202503031843.GyX5ZVrC-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202503031847.j1iReOtf-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202503031843.GyX5ZVrC-lkp@intel.com/
 
 All errors (new ones prefixed by >>):
 
->> mm/zswap.c:1166:4: error: call to undeclared function 'prefetchw'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+   mm/zswap.c: In function 'zswap_batch_compress':
+>> mm/zswap.c:1166:25: error: implicit declaration of function 'prefetchw' [-Wimplicit-function-declaration]
     1166 |                         prefetchw(entries[j]);
-         |                         ^
-   1 error generated.
+         |                         ^~~~~~~~~
 
 
 vim +/prefetchw +1166 mm/zswap.c
