@@ -1,114 +1,94 @@
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-184.mta1.migadu.com (out-184.mta1.migadu.com [95.215.58.184])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C24C1DFD83;
-	Mon,  3 Mar 2025 20:15:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 246A52B9AA
+	for <linux-crypto@vger.kernel.org>; Mon,  3 Mar 2025 20:17:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741032914; cv=none; b=I59LKldy1YARXOl5YeNM7heQVAXApV6r3PAB1t+yWJaaFMEa8oIC0Cf0NgF2GZeCN7Hul5P5/1YJ+9kJ42l1f4X1TE+DnUm3gsuskN1/pXvOeGQzAkA+GuN1y2YzCGCahwxLtjVqCgYk+qb7CexWEMiusFw53Uy5WVshqU7KdTo=
+	t=1741033056; cv=none; b=ffS7dWsi1HehM4EPMaeQSpyzEfhqkcM2FCe1nUlhK4zGw1umdRiYx4O63cTH6M7MkrPamkMYMZE5nxsrzd47tepIatv32FXyXwcF14ePfFNu+y3I9EPb0cymQTTdKKppf6haJsrhX0S1DG2KUC1prFUElHdkNdfty2wEQzhx9XI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741032914; c=relaxed/simple;
-	bh=a7tjVGX/fWg7trjOFWAiSMlw93q/R3mkYEIjqIsDTq4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=l23kRd3yBbShUFBJmk3qRK11gE/teBPr/mztiN7YrXezGlBFANh4To8htxH9bGGVySsoO3yAueQwx677RMDZ4vt5ZNM5v/eDc9ce8TFNq+7N5l5u4uIj4jMpzL4ggjQYSneA+EgcEDf60WCyFXB9N97M6G+yH8qNvcxm/dQCvqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nKmVwFwo; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1741033056; c=relaxed/simple;
+	bh=joR9r3/L3DIq5W5SywDWUZLI3xXOOlpfc6pwS+Vpf+Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UWpVBRluOgedP6Lc1bmWfStrOf8fEPgn6f526ZNvaoOBKYAZNZ6EaWB1gtTVT+IPYcmDJrTl9mRsjzemro9lXkNFRFncyPUBpToqSjLgCQC0X0mcBTvYc/+OrwjbviohRatcjwSKTDm7yr5vmwchJCEPWZgenGHdA1ruwdFS2XA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xIGkQl6y; arc=none smtp.client-ip=95.215.58.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nKmVwFwo"
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-390e88caa4dso2249139f8f.1;
-        Mon, 03 Mar 2025 12:15:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741032911; x=1741637711; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6HISwtThj2ckJiw/oP+EKb6mnu3LLOXUZTz/QPS9xm0=;
-        b=nKmVwFwoFnvJVOKfhEML9dWXRlWkI4KpIqfJBkbXlahQrB2LrMltddwLQMe656ldgo
-         GULDgn3T4RVnikSOdqp18++YXoM+IuTw+dfOekKYxJgEe/sYr3V/l935EU6tNkcYAjxD
-         CxdMUK6jtbPL6/5M+dUSMLTw8r9SdttPiPsK98h/aWDJ2j/ZjaaxyNQkmdo4KvFZzyHM
-         cXRa+AXvN9PuQ9WPO4wI5ka7KNoyAodQPYoEz2WMsviQ93EyxNLnSsG4qgYs/Ig6arah
-         P8Hx/NMUJI0uBf8XRRI0selBKQnpBl6zPKWBHoAJD0QKlnKhvUb8BMvysqIHdqUMa9tV
-         moYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741032911; x=1741637711;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6HISwtThj2ckJiw/oP+EKb6mnu3LLOXUZTz/QPS9xm0=;
-        b=sTbQx6KTx4fxCB0r1X/JqQK3gNUSxI7b60JcvlHeoJLCZCHaqj0lmUQH7lSrBPfqpO
-         cM+YZtSQCIodRNDDoa7ZuMKuoUQQY3S2UhSjbyD4TDC/Y0weg0+ewWV7e4qvTw8+Nu5G
-         xNCcK1RsAKNOAuRR+Ih0H1sbo70+C3Suh1LxnbcpIOKl4f7PxjzxhHPwyN4ahGoP5eLv
-         KhcbI7LOPMXUCX4TN5J4hm4X3C0KLrLXs8TzZtySF0IwyEV8EcIZ2YtrBcYP3PuRkRHW
-         YquSqe4qiLSPbegFUhmhdl5/5MHjrnZytxXn6OGkgqmrelVgXeVFxcNDvdViDRuBeLOA
-         jpuA==
-X-Forwarded-Encrypted: i=1; AJvYcCWte//7wz0qQ1sYYCzaqQQwE25nCaXaSWNCMS285/Zh4Gd7xkvV3jf2rDTifM4tYll3ayb1t7Jha6CeqIY=@vger.kernel.org, AJvYcCXycBb2pTvz/AdkvY/ggRODC4Q/ZTMMR6TEv+rbeSqKsRhOekbxJ+P2oS/CWbWYDIaoJJZjNplla0inN6iT@vger.kernel.org
-X-Gm-Message-State: AOJu0YzsBfIH0w5H2HmVU5AsvDx3EexWWvXJSi1bBx/aOvHUa7ctirWE
-	BrAQs7qtX1PUfvnMm0+CFQlyjGy+0zQ55I1/BhDU22ozh9Hg3fSr
-X-Gm-Gg: ASbGncumYC/MBjDGtSLLeWlLP3ooOYMA+8dHHSVJ2x+0dP01WllXyodkQalI38lMhXB
-	D75QSMFCdWNZccX1tdBinj4bPRaPJdQPVXj/MiYIiiSrtUD5g+G4chlPOhpNhlNOtn3z6IidgJi
-	i1XLKA/unWgTAuh1G7CRd35R06HzCiYxfWc7Tyz0GdoV8cxtA3hYh86DtB5xmcXYbCsEzEnh91P
-	9ShIez0jQ8m9+RqNelXhJXMZ7y5zemuKYDuSY0YyTjW0WXqEo8oImcIG5t4g8jjv6VY5qncmON0
-	I8SX/IrbNpQyENvsC2rLkwYySJerYmg1TPd0x5bdXP5csn8XPqFBzFYEHmNVGiCHKIu4wgiyXl3
-	+ZLCQS/s=
-X-Google-Smtp-Source: AGHT+IEZcFcEwop42cS1sSfMsNTzvj2OjK7gTdBaNBV75eJDj3qnhXXQFC1+gCRjILig9VtED+gPKg==
-X-Received: by 2002:a05:6000:4188:b0:390:ea4b:e89 with SMTP id ffacd0b85a97d-390eca26303mr11107065f8f.48.1741032910822;
-        Mon, 03 Mar 2025 12:15:10 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43bbbff18b3sm62631025e9.24.2025.03.03.12.15.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Mar 2025 12:15:10 -0800 (PST)
-Date: Mon, 3 Mar 2025 20:15:09 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Bill Wendling <morbo@google.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>, "H.
- Peter Anvin" <hpa@zytor.com>, Eric Biggers <ebiggers@kernel.org>, Ard
- Biesheuvel <ardb@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nick
- Desaulniers <nick.desaulniers+lkml@gmail.com>, Justin Stitt
- <justinstitt@google.com>, LKML <linux-kernel@vger.kernel.org>,
- linux-crypto@vger.kernel.org, clang-built-linux <llvm@lists.linux.dev>
-Subject: Re: [PATCH v2] x86/crc32: use builtins to improve code generation
-Message-ID: <20250303201509.32f6f062@pumpkin>
-In-Reply-To: <CAGG=3QVkd9Vb9a=pQ=KwhKzGJXaS+6Mk5K+JtBqamj15MzT9mQ@mail.gmail.com>
-References: <CAGG=3QVi27WRYVxmsk9+HLpJw9ZJrpfLjU8G4exuXm-vUA-KqQ@mail.gmail.com>
-	<CAGG=3QVkd9Vb9a=pQ=KwhKzGJXaS+6Mk5K+JtBqamj15MzT9mQ@mail.gmail.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xIGkQl6y"
+Date: Mon, 3 Mar 2025 20:17:27 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1741033052;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tBrtmBoSs2rTsZ8Uol/MTGHwyc4e+wo/BgpFbOP6EXI=;
+	b=xIGkQl6ynHXDrCowub/aY1FH5hJSjlHZzahywTBaF8ZAkVJOcQqNZxdcmyEbOspNh1cBtn
+	BgalJI8tnkuWX9BQ5zyHqXnVv/Ux6RK1II3181QH3q/UhMqJRU6t3wd5QydlLCDQt3Z2Z1
+	cgv+D+Y13riS0qeLfUm42dC1Z1NC9Ks=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Eric Biggers <ebiggers@kernel.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	linux-mm@kvack.org
+Subject: Re: [RFC PATCH 7/7] mm: zswap: Use acomp virtual address interface
+Message-ID: <Z8YOVyGugHwAsvmO@google.com>
+References: <cover.1740651138.git.herbert@gondor.apana.org.au>
+ <153c340a52090f2ff82f8f066203186a932d3f99.1740651138.git.herbert@gondor.apana.org.au>
+ <Z8CquB-BZrP5JFYg@google.com>
+ <20250227183847.GB1613@sol.localdomain>
+ <Z8DcmK4eECXp3aws@google.com>
+ <Z8FwFJ4iMLuvo3Jj@gondor.apana.org.au>
+ <Z8GH7VssQGR1ujHV@gondor.apana.org.au>
+ <Z8Hcur3T82_FiONj@google.com>
+ <Z8KrAk9Y52RDox2U@gondor.apana.org.au>
+ <Z8KxVC1RBeh8DTKI@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z8KxVC1RBeh8DTKI@gondor.apana.org.au>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 27 Feb 2025 15:47:03 -0800
-Bill Wendling <morbo@google.com> wrote:
-
-> For both gcc and clang, crc32 builtins generate better code than the
-> inline asm. GCC improves, removing unneeded "mov" instructions. Clang
-> does the same and unrolls the loops. GCC has no changes on i386, but
-> Clang's code generation is vastly improved, due to Clang's "rm"
-> constraint issue.
+On Sat, Mar 01, 2025 at 03:03:48PM +0800, Herbert Xu wrote:
+> On Sat, Mar 01, 2025 at 02:36:50PM +0800, Herbert Xu wrote:
+> >
+> > I thought this was a lot more complicated and you had some weird
+> > arbtirary pointer from an unknown source.  But if it's just highmem
+> > I can get rid of the memcpy for you right now.
 > 
-> The number of cycles improved by ~0.1% for GCC and ~1% for Clang, which
-> is expected because of the "rm" issue. However, Clang's performance is
-> better than GCC's by ~1.5%, most likely due to loop unrolling.
+> So it appears that your highmem usage is coming from zsmalloc.  In
+> that case you don't want virtual addresses at all, you want an SG
+> list.
+> 
+> In fact you've already gone through a totally unnecessary copy
+> in _zs_map_object.  Had it simply given us a 2-entry SG list,
+> the Crypto API can process the data directly with no copies at
+> all.
+> 
+> The whole point of SG lists is to deal with memory fragmentation.
+> When your object is too big to fit in a single page, you need an
+> SG list to describe it.  Forcing virtual addresses just leads to
+> an unnecessary copy.
 
-How much does it unroll?
-How much you need depends on the latency of the crc32 instruction.
-The copy of Agner's tables I have gives it a latency of 3 on
-pretty much everything.
-If you can only do one chained crc instruction every three clocks
-it is hard to see how unrolling the loop will help.
-Intel cpu (since sandy bridge) will run a two clock loop.
-With three clocks to play with it should be easy (even for a compiler)
-to generate a loop with no extra clock stalls.
+I have seen the other thread with Sergey, I believe the conclusion is
+that zsmalloc will be updated to use SG lists, at which point zswap can
+just pass this as-is to the crypto API, and we don't need any copies in
+either zsmalloc or zswap.
 
-Clearly if Clang decides to copy arguments to the stack an extra time
-that will kill things. But in this case you want the "m" constraint
-to directly read from the buffer (with a (reg,reg,8) addressing mode).
+Is this correct?
 
-	David
+Will this patch series be dropped?
+
+> 
+> Chers,
+> -- 
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
