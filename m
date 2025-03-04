@@ -1,222 +1,131 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E193C1EA7CE;
-	Tue,  4 Mar 2025 12:54:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29478202960;
+	Tue,  4 Mar 2025 12:55:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741092874; cv=none; b=sbHsYXSF6bYxIE7Th1em/QoRiIFUu5oN/RDsDrdWl4DGLpATy67DeRXw+WC43lTIwQAyt3qiz3GDPIbOn9BD3zvRglTA74OgFi3VlAvFLcyP99wAI2scq9Ib8GDfwuUdEgF8QDj9Z4TWdUkRysefQbKFDkoMY6a0icx9xy/clDs=
+	t=1741092939; cv=none; b=iDQJzYu13zyWJ9oyNOulFTPptnhmOHKgNGTw6SnD6r2XoJSbVvhCNLx6a7XRWG4nGC/yXe8lfW8LH/2peI9STugjtt9hUQkDCq/GNgiqCYZ2MvaPTi1egXboqHFh05fY4XYyUoo77OeQy7A5BKLfi7qNMsx7Lmv3GSqtvb59N2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741092874; c=relaxed/simple;
-	bh=HyinxsF89BDo1NSbgsVB0G53ZZrA9ZNM5huh2XiqTQo=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=KWBlqjWVILEOeRIckrCCPDkBgtw6XarIyJRZpiaKfZiuBUkkqyaybEm3gr1MS6O/QP32pi7/1qmTSq7FUQjnwJFj7IuGn6jXlg8MsaliyLhSVyydvPzDZfBsyQGFE37mCw7msPv+ZqQxvI3kMAdVhnioNvlRv1NcgE9gSmudTwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=O5lhTMDA; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1741092939; c=relaxed/simple;
+	bh=DmjwCKwsD93HO73VrBgBAQWDy8GDmDWgK3GfYhS4AJ8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HDAxWGlruGLvIlbsZt8yLCF9LgpopZVCjjPLcMv2kTTFNfkl5E4ls3ou1fTIHfQHIpRQlHIms80MTGl1qnsgOqaLE9YLErGZV/8Ur3K4as6VMCR3ZOHikVnoptMUrAUOcAb7rkA9vak3a/aWol5e8FkkOVhVpLutJgzMg/JsZhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=NRcGU9tD; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="O5lhTMDA"
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5249iOol022691;
-	Tue, 4 Mar 2025 12:53:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=Lav0QD
-	Qn3uzKDyq4Ig1kWXcr+7nIByvHXWzRPJRorA0=; b=O5lhTMDAUDbCKgM9h+X2Kl
-	v9OiUDth8TCYYGw4mmx5UnSZXTowT2eZKpor9AnZiJBJBFbyt1t9z4BL2OV73yhy
-	QyTsP5Lgh94O+EzAmpp9ZDL6I8BiBSSge4q8JVvLqc2YWHl9E4u+SKQclQN6pKOC
-	feLBTiUfbfsbLT8W8lUGk4EXaGr7BqCyyMnHRrF6mnry4U07USs1MkmiuxE5nYDt
-	GJezwxB8meFs2CgnTYQ6ecKd4Nntji+DGpydk3REjL3XIn1fxYmdQeXNhGV/XvV4
-	tY0EqFXvi7D7K+UcJwBlNePcD0uU1UGcECJrqE5hsvj5J0UUnrtmXnvXg0PVPlKQ
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 455ku53x3k-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 04 Mar 2025 12:53:24 +0000 (GMT)
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 524CHkpg004153;
-	Tue, 4 Mar 2025 12:53:24 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 455ku53x3e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 04 Mar 2025 12:53:24 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5249WBQU025031;
-	Tue, 4 Mar 2025 12:53:23 GMT
-Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 454f91vyjr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 04 Mar 2025 12:53:23 +0000
-Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
-	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 524CrM7x24248876
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 4 Mar 2025 12:53:22 GMT
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7575B5805B;
-	Tue,  4 Mar 2025 12:53:22 +0000 (GMT)
-Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4D51D5804B;
-	Tue,  4 Mar 2025 12:53:20 +0000 (GMT)
-Received: from li-43857255-d5e6-4659-90f1-fc5cee4750ad.ibm.com (unknown [9.61.57.16])
-	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  4 Mar 2025 12:53:20 +0000 (GMT)
-Message-ID: <a1d6ce786256bbade459f98e0b4074e449048fee.camel@linux.ibm.com>
-Subject: Re: [RFC PATCH v3 00/13] Clavis LSM
-From: Mimi Zohar <zohar@linux.ibm.com>
-To: Paul Moore <paul@paul-moore.com>
-Cc: Eric Snowberg <eric.snowberg@oracle.com>,
-        David Howells
- <dhowells@redhat.com>,
-        Jarkko Sakkinen <jarkko@kernel.org>,
-        "open
- list:SECURITY SUBSYSTEM" <linux-security-module@vger.kernel.org>,
-        David
- Woodhouse <dwmw2@infradead.org>,
-        "herbert@gondor.apana.org.au"
- <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        Ard Biesheuvel <ardb@kernel.org>, James Morris <jmorris@namei.org>,
-        "Serge
- E. Hallyn" <serge@hallyn.com>,
-        Roberto Sassu <roberto.sassu@huawei.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        =?ISO-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
-        "casey@schaufler-ca.com" <casey@schaufler-ca.com>,
-        Stefan Berger
- <stefanb@linux.ibm.com>,
-        "ebiggers@kernel.org" <ebiggers@kernel.org>,
-        Randy
- Dunlap <rdunlap@infradead.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-efi@vger.kernel.org" <linux-efi@vger.kernel.org>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>
-Date: Tue, 04 Mar 2025 07:53:19 -0500
-In-Reply-To: <CAHC9VhSzc6N0oBesT8V21xuwB11T7e6V9r0UmiqHXvCg5erkVA@mail.gmail.com>
-References: <20241017155516.2582369-1-eric.snowberg@oracle.com>
-	 <c490397315c2704e9ef65c8ad3fefedb239f1997.camel@linux.ibm.com>
-	 <72F52F71-C7F3-402D-8441-3D636A093FE8@oracle.com>
-	 <CAHC9VhRHEw5c+drC=aX4xTqWoQJJZ+qkJ7aHUT5dcu+Q5f7BqA@mail.gmail.com>
-	 <CAHC9VhSJpnaAK1efgs1Uk0Tr3CaDNR1LiDU-t_yDKDQG6J-74Q@mail.gmail.com>
-	 <E20C617B-EA01-4E69-B5E2-31E9AAD6F7A2@oracle.com>
-	 <506e8e58e5236a4525b18d84bafa9aae80b24452.camel@linux.ibm.com>
-	 <CAHC9VhTsZntLdGBV7=4suauS+rzSQv1O4UAoGcy2vEB02wRkoA@mail.gmail.com>
-	 <c580811716f550ed5d6777db5e143afe4ad06edc.camel@linux.ibm.com>
-	 <CAHC9VhTz6U5rRdbJBWq0_U4BSKTsiGCsaX=LTgisNNoZXZokOA@mail.gmail.com>
-	 <e0e7c0971d42e45c7b4641bd58cb7ea20b36e2e1.camel@linux.ibm.com>
-	 <CAHC9VhSzc6N0oBesT8V21xuwB11T7e6V9r0UmiqHXvCg5erkVA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-2.fc40) 
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="NRcGU9tD"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=ZOOYa20v84BFJHD1ayfwn3RBGuxwB4d68Xr0Wae/NAo=; b=NRcGU9tDBhoqGCIPbQGfFWXxKw
+	RWjX7cPHBFk715BfPa7+c4U0pkvE2rlQvhrS5bwrgs6nXifwyYdsAyGI7UZ6kyLR9Ljx68sBkonBF
+	dKdqrkAFi9nGHT5oQDFToz1VDbU5JNvHXZZ6Kzj8q6oy91t+BUKIvBbsXwVBmIlfc63kXhiOlYN0V
+	4L4Px2wPqvym2Icjfet6mKLyn3t8Buzxg825uarwxAg2f27pqaQJpHSRifnuT6BIZtLDrAXCQvlX0
+	4fXl8ITe0RdCSeDq3ofNrMlIGpeo1g5vpp6QVAJhsBjf7N9aSjC4Ez69+RHslFlbri5YYzDKwx1Rv
+	GILKGJug==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1tpRnp-000000002P6-1xXA;
+	Tue, 04 Mar 2025 12:55:17 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id B29BB30057E; Tue,  4 Mar 2025 13:55:16 +0100 (CET)
+Date: Tue, 4 Mar 2025 13:55:16 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Marco Elver <elver@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Alexander Potapenko <glider@google.com>,
+	Arnd Bergmann <arnd@arndb.de>, Bart Van Assche <bvanassche@acm.org>,
+	Bill Wendling <morbo@google.com>, Boqun Feng <boqun.feng@gmail.com>,
+	Dmitry Vyukov <dvyukov@google.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Ingo Molnar <mingo@kernel.org>, Jann Horn <jannh@google.com>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	Joel Fernandes <joel@joelfernandes.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
+	Kentaro Takeda <takedakn@nttdata.co.jp>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>,
+	kasan-dev@googlegroups.com, linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev, rcu@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-serial@vger.kernel.org
+Subject: Re: [PATCH v2 06/34] cleanup: Basic compatibility with capability
+ analysis
+Message-ID: <20250304125516.GF11590@noisy.programming.kicks-ass.net>
+References: <20250304092417.2873893-1-elver@google.com>
+ <20250304092417.2873893-7-elver@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: P-IbRL-M3d-yxwOmiVwyy_AGpbk01k41
-X-Proofpoint-GUID: P5z29jqVGSnxacVJavhV21wsnAx8KUBc
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-04_05,2025-03-03_04,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
- clxscore=1015 mlxscore=0 suspectscore=0 impostorscore=0 bulkscore=0
- mlxlogscore=999 lowpriorityscore=0 spamscore=0 phishscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2502100000 definitions=main-2503040102
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250304092417.2873893-7-elver@google.com>
 
-On Mon, 2025-03-03 at 17:38 -0500, Paul Moore wrote:
-> On Fri, Feb 28, 2025 at 12:19=E2=80=AFPM Mimi Zohar <zohar@linux.ibm.com>=
- wrote:
-> > On Fri, 2025-02-28 at 11:14 -0500, Paul Moore wrote:
-> > > On Fri, Feb 28, 2025 at 9:09=E2=80=AFAM Mimi Zohar <zohar@linux.ibm.c=
-om> wrote:
-> > > > On Thu, 2025-02-27 at 17:22 -0500, Paul Moore wrote:
->=20
-> ...
->=20
-> > Ok, let's go through different scenarios to see if it would scale.
-> >=20
-> > Scenario 1: Mostly distro signed userspace applications, minimum number=
- of
-> > developer, customer, 3rd party applications.
-> >=20
-> > Scenario 2: Multiple developer, customer, 3rd party applications, signe=
-d by the
-> > same party.
-> >=20
-> > Scenario 3: extreme case - every application signed by different party.
-> >=20
-> > With the minimum case, there would probably be a default key or sets of
-> > permissible keys.  In the extreme case, the number of keyrings would be
-> > equivalent to the number of application/software packages.
->=20
-> Perhaps we're not understanding each other, but my understanding of
-> the above three scenarios is that they are all examples of signed
-> applications where something (likely something in the kernel like IMA)
-> verifies the signature on the application.  While there are going to
-> be differing numbers of keys in each of the three scenarios, I believe
-> they would all be on/linked-to the same usage oriented keyring as they
-> all share the same usage: application signatures.
+On Tue, Mar 04, 2025 at 10:21:05AM +0100, Marco Elver wrote:
+> Due to the scoped cleanup helpers used for lock guards wrapping
+> acquire/release around their own constructors/destructors that store
+> pointers to the passed locks in a separate struct, we currently cannot
+> accurately annotate *destructors* which lock was released. While it's
+> possible to annotate the constructor to say which lock was acquired,
+> that alone would result in false positives claiming the lock was not
+> released on function return.
+> 
+> Instead, to avoid false positives, we can claim that the constructor
+> "asserts" that the taken lock is held. This will ensure we can still
+> benefit from the analysis where scoped guards are used to protect access
+> to guarded variables, while avoiding false positives. The only downside
+> are false negatives where we might accidentally lock the same lock
+> again:
+> 
+> 	raw_spin_lock(&my_lock);
+> 	...
+> 	guard(raw_spinlock)(&my_lock);  // no warning
+> 
+> Arguably, lockdep will immediately catch issues like this.
+> 
+> While Clang's analysis supports scoped guards in C++ [1], there's no way
+> to apply this to C right now. Better support for Linux's scoped guard
+> design could be added in future if deemed critical.
 
-Yes they're all verifying file signatures, but the software packages are fr=
-om
-different sources (e.g. distro, chrome), signed by different keys.  Only a
-particular key should be used to verify the file signatures for a particula=
-r
-application.  The scenarios, described above, are the ratio of distro/singl=
-e
-entity vs. non distro/single entity signed packages, which would correspond=
- to
-the number of keyrings.
+Would definitely be nice to have.
 
-Clavis limits key usage based on LSM hooks (e.g. kernel modules, kernel ima=
-ge,
-firmware, etc).  It's a good start, but even this probably is not fine enou=
-gh
-granularity.
 
->=20
-> > > My takeaway from Clavis was that it was more about establishing a set
-> > > of access controls around keys already present in the keyrings and my
-> > > comments about usage/spplication oriented keyrings have been in that
-> > > context.  While the access control policy, regardless of how it is
-> > > implemented, should no doubt incorporate the trust placed in the
-> > > individual keys, how that trust is established is a separate issue
-> > > from access control as far as I'm concerned.
-> >=20
-> > Clavis defined both a mechanism for establishing trust and access contr=
-ol rules.
-> >=20
-> > Clavis defined a single Clavis key to establish trust.  The Clavis poli=
-cy rules
-> > were signed by the Clavis key.  The Clavis policy rules defined the acc=
-ess
-> > control.
->=20
-> Unfortunately I think we're getting a little ambiguous with how we are
-> using the word "trust".  Just as "security" can mean different things
-> depending on context, so can "trust" as the qualities we are trusting
-> will vary depending on context.  I'll leave it at that for now as I
-> believe we are talking about different things in the paragraphs above.
->=20
-> Regardless, I'll also say this regarding Clavis and key/keyring access
-> controls - as implemented, Clavis doesn't look like a LSM to me for
-> the reasons already given.  If all of the various keys subsystem
-> maintainers believe it is the Right Thing To Do inside the keys
-> subsystem then it isn't my place to have a say in that.  I personally
-> believe that doing the work to support usage oriented keyrings before,
-> or while, implementing a Clavis-like mechanism is the better option,
-> but that is a decision for you and the other key maintainers.
+> @@ -383,6 +387,7 @@ static inline void *class_##_name##_lock_ptr(class_##_name##_t *_T)	\
+>  
+>  #define __DEFINE_LOCK_GUARD_1(_name, _type, _lock)			\
+>  static inline class_##_name##_t class_##_name##_constructor(_type *l)	\
+> +	__no_capability_analysis __asserts_cap(l)			\
+>  {									\
+>  	class_##_name##_t _t = { .lock = l }, *_T = &_t;		\
+>  	_lock;								\
+> @@ -391,6 +396,7 @@ static inline class_##_name##_t class_##_name##_constructor(_type *l)	\
+>  
+>  #define __DEFINE_LOCK_GUARD_0(_name, _lock)				\
+>  static inline class_##_name##_t class_##_name##_constructor(void)	\
+> +	__no_capability_analysis					\
 
-"Usage oriented keyrings" similarly implies any key on a particular keyring=
- is
-acceptable.  Without understanding what you mean by "usage oriented keyring=
-s", I
-would assume it would work initially, but eventually it too will not be fin=
-e
-enough granularity.
+Does this not need __asserts_cal(_lock) or somesuch?
 
-Mimi
+GUARD_0 is the one used for RCU and preempt, rather sad if it doesn't
+have annotations at all.
+
