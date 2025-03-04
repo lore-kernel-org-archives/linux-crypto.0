@@ -1,239 +1,220 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23B6C25FA14;
-	Tue,  4 Mar 2025 20:51:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8CE5204F60;
+	Tue,  4 Mar 2025 20:52:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741121491; cv=none; b=lq7AO9FZNiUMMdY0SvZjI0cNpy7AfcgBCvtZwAA1Jz+crbA0eZAWfqck9cq9uv5RDGvDTOJbgbGjHycpxumdQ+XjghGlHgsa3T3mmORhnex+LySBB9bPKMfF96pnVaI+Fro9l/D49Mlhk2+7KKGMN8wo1kFc+7nyeyy7gRuwBBo=
+	t=1741121578; cv=none; b=cgq+ZN7ndG867cxr3DLqYQd7vvrqX7KdTzu78mSC8kW3HU/ad3wsI8+9pAJiaADKiUT48m9lcB2VPji1l13wuS4zYFJ1YkFjnOB5NbCI75LtXsMvzD/hYrCXfY1lBqtcHPndZu30pKsCB0HRnAlnx8AIW0mnTP7sF+34uenBBqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741121491; c=relaxed/simple;
-	bh=zEuJDSdpagweCAj4noxSIPPno5NwiCCQ7YIhPEIpUBQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ht3Pl/kVQyb/ApGJ5hJubBmz3Wv7sFeo1NCl866Ut8ex6iMJXkqAYrPwKzXbMDaZVOJD3Wpq0bimucXctYG3hAOv3DsXpcEFUFcrm3/Qy8KZlGZhlkYOgLkxbm1ICy4GfFOgoueUiWSgI00hIHz0DejPvYn/cInVLWExYEUB7P4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U2gC63my; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1741121578; c=relaxed/simple;
+	bh=8TGIq1q44b+qp3FLCmZL7K9wxstC6+u4YmdJY/0I/fY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tNyrRMNwfsiFsw6+mRKkcwFFJym0Dfo7eZgEYeAMkCT3KINbFdoTH3ro81lsbmmju6HyYNG1ypyyXH7Nl89uaTwGQNH5uTrSr3t3QI8QtHUkKggMDFUpMSr9AIeLHMuj2EaPFfIdfHr4QbdxTedbgvAP5N9UlYEumRAua70UDhg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E/4Uy41T; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U2gC63my"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A1FAC4CEE9;
-	Tue,  4 Mar 2025 20:51:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741121490;
-	bh=zEuJDSdpagweCAj4noxSIPPno5NwiCCQ7YIhPEIpUBQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=U2gC63myUGZYLS5xD7W1svkHmz81fCSW4LR5miX5cTLQp0UZIGQxSuDHxBRuXvkvT
-	 WoTJS+3CM3V3FmemOWYNyjbsZkqmqd8+a1LPUpuSWfkWIJUpQBLlpX3i643MzPdVka
-	 dHME1B3ULfngXsg0Cued2tq964veSWIMy6iJ4aXzLIrdkkJmrvJuXlD7fmaYUQa7of
-	 yOozumFrP2rNSYc9HO8YrNcF/vplYcyhaE8Ds+J6Rg6YfC/BNTLdxsFsa1LKrUC21U
-	 CFDc1o9Yh4SUrDVpdPb7x0UFBsais9a2IU0HgMGoYLE3zVDZx1nCkR3Jyy4rhLbOMG
-	 2gY/rCp3lZjLQ==
-From: Eric Biggers <ebiggers@kernel.org>
-To: x86@kernel.org
-Cc: linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Ben Greear <greearb@candelatech.com>,
-	Xiao Liang <shaw.leon@gmail.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>
-Subject: [RFC PATCH v2] x86/fpu: make kernel-mode FPU reliably usable in softirqs
-Date: Tue,  4 Mar 2025 12:49:54 -0800
-Message-ID: <20250304204954.3901-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.48.1
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E/4Uy41T"
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-439ac3216dcso41680065e9.1;
+        Tue, 04 Mar 2025 12:52:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741121575; x=1741726375; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=V+Cr75GHycePdmToZOthHca+hof6tEcpP1zkSAQCixM=;
+        b=E/4Uy41T88NaW8UUrOoVbqEcIfG4+XY0IHIn2UbYyoae4GIk1nfEzOzVWSW34QPHrq
+         1oybcAvglV5AurypYIryt0mUcBSi6ANfvUy2FgmdK8swDyhV+72pKmyXJfYaAlvJEQ8+
+         rRVSGA1G36xgxCOovxpsV1Wk9WDnS72x2U1QOYM/o+w80Kmzbrl4ocJ5HGz0YSe6vy/y
+         7+kIEg5/GcmH1JoTyeVPv7Ih9c2aCj3iMVkxH8vWZdTxAy8s+8LYQIYNZFiOSmXK63fW
+         gA5Z2ssKxPbMz7DUpJM9cQmLT30+sHXautK8iymtTc+v+6xGYuMMdIY2z06FXl9STanM
+         +Uwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741121575; x=1741726375;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=V+Cr75GHycePdmToZOthHca+hof6tEcpP1zkSAQCixM=;
+        b=TeEG3Lo3XCCzbXERxaXwFWjYsxe2pKAcXeRx+XEIlsNDHHsutUfeVFmf0aqx4fOO/E
+         mmrdRnsVngLgK9OFWVTPzy9pZuttMK9bpQRuBXq4BplPDcG8CBEsPPU45cJ2GadLAhlv
+         V2WgUwC2+9dxDpEwrjeN+lcpNc1bcWSFViXYwZiFHQ2oUtN5/OoyoUPnMU7KxEGbcasI
+         7dODAuT4LKH0Hx5gTDSlrKpDWW6QCBV3po21P7/SWODgLKGVOQRy1f5cy/haAUXIX0mG
+         0Cp8V+f907H0o6LM3zHt941IqbvEQDH/JWlRQb0kOFy7JxEE+6TQRcgU4muX8/89bt8t
+         P5FA==
+X-Forwarded-Encrypted: i=1; AJvYcCUk3IuddJQ+aIWJpZ6n3fRPDoxITxIpIUy9l0e3XESmyZZlvGG1H+6gtSvlIm2b4tLDvMXTlPxCLS2pubG+@vger.kernel.org, AJvYcCXSCnoZ6xsHb94yzvA3NtdXL9QPXWwfTEvxstbqQY5hmiS7cEMoCgetweu/Ux6gplqr42iMVCkrWH2DLy8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwmJqMBMR1GK4dXUe5+YIGwrZW8LsZaSg9nhr/IasG+e6fDIFbl
+	AdUeKSni+gyntcIJlZWso1oq2c/8aPJpFDiP7Qwnq1WtPFlr+SRG
+X-Gm-Gg: ASbGnct70f4I3uAfvI2Js3BeB5s3cV94Bu2tfYygwRBnJD/AD0t1X0mF5Y40NSmzkpq
+	CMvX2JYUZHrK0ulbCAOE+b4oaHC2H/2G1YsDAwko3TKwGeC2RTHZI4cXSnzh1wRAKXLRplZpi98
+	QBBD5LAW5NlGIWgngbYHPgSGE6aSmK04NU6SGywIco5f4YRnVUBk9hG5MCipMWRU2RC2eufhRfc
+	woE/kVIyzXmd3mfvrkcmXoT5tJK65YtlrSu9R5YmPhA4Ao8+KZLCXu6yr6nx42M3HyGK/KkfYhK
+	9IV6iOB01gzqDJuzRYbirajb3ZM3EfvtpjsFpK8OEglQstMztLoAu6RlqaQheEgG1eq7ZpMfU9c
+	PHley4xM=
+X-Google-Smtp-Source: AGHT+IG4gl9/y2mSBBQeEvhJ/k5Q2wNPs8UzTb/dxy71zQ14qKO+eanVQBwO22bXET0n7B3/dGWkVw==
+X-Received: by 2002:a05:600c:4f84:b0:439:a138:1d with SMTP id 5b1f17b1804b1-43bd29b8545mr1955695e9.22.1741121574529;
+        Tue, 04 Mar 2025 12:52:54 -0800 (PST)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43b736f990esm217040815e9.5.2025.03.04.12.52.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Mar 2025 12:52:53 -0800 (PST)
+Date: Tue, 4 Mar 2025 20:52:52 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Bill Wendling <morbo@google.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+ <dave.hansen@linux.intel.com>, "maintainer:X86 ARCHITECTURE (32-BIT AND
+ 64-BIT)" <x86@kernel.org>, Eric Biggers <ebiggers@kernel.org>, Ard
+ Biesheuvel <ardb@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nick
+ Desaulniers <nick.desaulniers+lkml@gmail.com>, Justin Stitt
+ <justinstitt@google.com>, LKML <linux-kernel@vger.kernel.org>,
+ linux-crypto@vger.kernel.org, clang-built-linux <llvm@lists.linux.dev>
+Subject: Re: [PATCH v2] x86/crc32: use builtins to improve code generation
+Message-ID: <20250304205252.59a04955@pumpkin>
+In-Reply-To: <20250304043223.68ed310f@pumpkin>
+References: <CAGG=3QVi27WRYVxmsk9+HLpJw9ZJrpfLjU8G4exuXm-vUA-KqQ@mail.gmail.com>
+	<CAGG=3QVkd9Vb9a=pQ=KwhKzGJXaS+6Mk5K+JtBqamj15MzT9mQ@mail.gmail.com>
+	<20250303201509.32f6f062@pumpkin>
+	<CAGG=3QV1iDn2r39v5eroO+kCvpbmJNtSeqJS+fpwb4vBG67z=w@mail.gmail.com>
+	<20250303224216.30431b1d@pumpkin>
+	<7BC89461-A060-462A-9B42-7C0138AA0307@zytor.com>
+	<CAGG=3QUnUQL2=YxN2ozwSba2A_x-S7sAEUP5oGhCWOzu4Q9SQA@mail.gmail.com>
+	<20250304043223.68ed310f@pumpkin>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Eric Biggers <ebiggers@google.com>
+On Tue, 4 Mar 2025 04:32:23 +0000
+David Laight <david.laight.linux@gmail.com> wrote:
 
-Currently kernel-mode FPU is not always usable in softirq context on
-x86, since softirqs can nest inside a kernel-mode FPU section in task
-context, and nested use of kernel-mode FPU is not supported.
+....
+> > For reference, GCC does much better with code gen, but only with the builtin:
+> > 
+> > .L39:
+> >         crc32q  (%rax), %rbx    # MEM[(long unsigned int *)p_40], tmp120
+> >         addq    $8, %rax        #, p
+> >         cmpq    %rcx, %rax      # _37, p
+> >         jne     .L39    #,  
+> 
+> That looks reasonable, if Clang's 8 unrolled crc32q is faster per byte
+> then you either need to unroll once (no point doing any more) or use
+> the loop that does negative offsets from the end.
 
-Therefore, x86 SIMD-optimized code that can be called in softirq context
-has to sometimes fall back to non-SIMD code.  There are two options for
-the fallback, both of which are pretty terrible:
+Thinking while properly awake the 1% difference isn't going to be a
+difference between the above and Clang's unrolled loop.
+Clang's loop will do 8 bytes every three clocks, if the above is slower
+it'll be doing 8 bytes in 4 clocks (ok, you can get 3.5 - but unlikely)
+which would be either 25% or 33% depending which way you measure it.
 
-  (a) Use a scalar fallback.  This can be 10-100x slower than vectorized
-      code because it cannot use specialized instructions like AES, SHA,
-      or carryless multiplication.
+...
+> I'll find the code loop I use - machine isn't powered on at the moment.
 
-  (b) Execute the request asynchronously using a kworker.  In other
-      words, use the "crypto SIMD helper" in crypto/simd.c.
+#include <linux/perf_event.h>
+#include <sys/mman.h>
+#include <sys/syscall.h>
 
-Currently most of the x86 en/decryption code (skcipher and aead
-algorithms) uses option (b), since this avoids the slow scalar fallback
-and it is easier to wire up.  But option (b) is still really bad for its
-own reasons:
+static int pmc_id;
+static void init_pmc(void)
+{
+        static struct perf_event_attr perf_attr = {
+                .type = PERF_TYPE_HARDWARE,
+                .config = PERF_COUNT_HW_CPU_CYCLES,
+                .pinned = 1,
+        };
+        struct perf_event_mmap_page *pc;
 
-  - Punting the request to a kworker is bad for performance too.
+        int perf_fd;
+        perf_fd = syscall(__NR_perf_event_open, &perf_attr, 0, -1, -1, 0);
+        if (perf_fd < 0) {
+                fprintf(stderr, "perf_event_open failed: errno %d\n", errno);
+                exit(1);
+        }
+        pc = mmap(NULL, 4096, PROT_READ, MAP_SHARED, perf_fd, 0);
+        if (pc == MAP_FAILED) {
+                fprintf(stderr, "perf_event mmap() failed: errno %d\n", errno);
+                exit(1);
+        }
+        pmc_id = pc->index - 1;
+}
 
-  - It forces the algorithm to be marked as asynchronous
-    (CRYPTO_ALG_ASYNC), preventing it from being used by crypto API
-    users who request a synchronous algorithm.  That's another huge
-    performance problem, which is especially unfortunate for users who
-    don't even do en/decryption in softirq context.
+static inline unsigned int rdpmc(id)
+{
+        unsigned int low, high;
 
-  - It makes all en/decryption operations take a detour through
-    crypto/simd.c.  That involves additional checks and an additional
-    indirect call, which slow down en/decryption for *everyone*.
+// You need something to force the instruction pipeline to finish.
+// lfence might be enough.
+#ifndef NOFENCE
+        asm volatile("mfence");
+#endif
+        asm volatile("rdpmc" : "=a" (low), "=d" (high) : "c" (id));
+#ifndef NOFENCE
+        asm volatile("mfence");
+#endif
 
-Fortunately, the skcipher and aead APIs are only usable in task and
-softirq context in the first place.  Thus, if kernel-mode FPU were to be
-reliably usable in softirq context, no fallback would be needed.
-Indeed, other architectures such as arm, arm64, and riscv have already
-done this.
+        // return low bits, counter might to 32 or 40 bits wide.
+        return low;
+}
 
-Therefore, this patch updates x86 accordingly to reliably support
-kernel-mode FPU in softirqs.
+The test code is then something like:
+#define PASSES 10
+        unsigned int ticks[PASSES];
+        unsigned int tick;
+        unsigned int i;
 
-This is done by just disabling softirq processing in kernel-mode FPU
-sections (when hardirqs are not already disabled), as that prevents the
-nesting that was problematic.
+        for (i = 0; i < PASSES; i++) {
+                tick = rdpmc(pmc_id);
+                test_fn(buf, len);
+                ticks[i] = rdpmc(pmc_id) - tick;
+        }
 
-This will delay some softirqs slightly, but only ones that would have
-otherwise been nested inside a task context kernel-mode FPU section.
-Any such softirqs would have taken the slow fallback path before if they
-tried to do any en/decryption.  Now these softirqs will just run at the
-end of the task context kernel-mode FPU section (since local_bh_enable()
-runs pending softirqs) and will no longer take the slow fallback path.
+        for (i = 0; i < PASSES; i++)
+                printf(" %5d", ticks[i]);
 
-Alternatives considered:
+Make sure the data is in the l1-cache (or that dominates).
+The values output for passes 2-10 are likely to be the same to within
+a clock or two.
+I probably tried to subtract an offset for an empty test_fn().
+But you can easily work out the 'clocks per loop iteration'
+(which is what you are trying to measure) by measuring two separate
+loop lengths.
 
-- Make kernel-mode FPU sections fully preemptible.  This would require
-  growing task_struct by another struct fpstate which is more than 2K.
+I did find that sometimes running the program gave slow results.
+But it is usually very consistent.
+Needs to be run as root.
+Clearly a hardware interrupt will generate a very big number.
+But they don't happen.
 
-- Make softirqs save/restore the kernel-mode FPU state to a per-CPU
-  struct fpstate when nested use is detected.  Somewhat interesting, but
-  seems unnecessary when a simpler solution exists.
+The copy I found was used for measuring ip checksum algorithms.
+Seems to output:
+$ sudo ./ipcsum 
+                0     0   160   160   160   160   160   160   160   160   160   160  overhead
+ 3637b4f0b942c3c4  682f   316    25    26    26    26    26    26    26    26    26  csum_partial
+ 3637b4f0b942c3c4  682f   124    79    43    25    25    25    24    26    25    24  csum_partial_1
+ 3637b4f0b942c3c4  682f   166    43    25    25    24    24    24    24    24    24  csum_new adc pair
+ 3637b4f0b942c3c4  682f   115    21    21    21    21    21    21    21    21    21  adc_dec_2
+ 3637b4f0b942c3c4  682f    97    34    31    23    24    24    24    24    24    23  adc_dec_4
+ 3637b4f0b942c3c4  682f    39    33    34    21    21    21    21    21    21    21  adc_dec_8
+ 3637b4f0b942c3c4  682f    81    52    49    52    49    26    25    27    25    26  adc_jcxz_2
+ 3637b4f0b942c3c4  682f    62    46    24    24    24    24    24    24    24    24  adc_jcxz_4
+ 3637b4f0b942c3c4  682f   224    40    21    21    23    23    23    23    23    23  adc_2_pair
+ 3637b4f0b942c3c4  682f    42    36    37    22    22    22    22    22    22    22  adc_4_pair_old
+ 3637b4f0b942c3c4  682f    42    37    34    41    23    23    23    23    23    23  adc_4_pair
+ 3637b4f0b942c3c4  682f   122    19    20    19    18    19    18    19    18    19  adcx_adox
+        bef7a78a9  682f   104    51    30    30    30    30    30    30    30    30  add_c_16
+        bef7a78a9  682f   143    50    50    27    27    27    27    27    27    27  add_c_32
+        6ef7a78ae  682f   103    91    45    34    34    34    35    34    34    34  add_c_high
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
+I don't think the current one is in there - IIRC it is as fast as the adcx_adox one
+but more portable.
 
-Changed in v2:
-    - Retain support for kernel-mode FPU when hardirqs are disabled
-      (needed for system suspend and resume)
-    - Send the x86 patch as a standalone patch.
 
- arch/x86/include/asm/fpu/api.h | 17 +++++++----------
- arch/x86/kernel/fpu/core.c     | 17 +++++++++++++----
- 2 files changed, 20 insertions(+), 14 deletions(-)
-
-diff --git a/arch/x86/include/asm/fpu/api.h b/arch/x86/include/asm/fpu/api.h
-index f86ad3335529d..f42de5f05e7eb 100644
---- a/arch/x86/include/asm/fpu/api.h
-+++ b/arch/x86/include/asm/fpu/api.h
-@@ -14,14 +14,13 @@
+	David
  
- #include <asm/fpu/types.h>
- 
- /*
-  * Use kernel_fpu_begin/end() if you intend to use FPU in kernel context. It
-- * disables preemption so be careful if you intend to use it for long periods
-- * of time.
-- * If you intend to use the FPU in irq/softirq you need to check first with
-- * irq_fpu_usable() if it is possible.
-+ * disables preemption and softirq processing, so be careful if you intend to
-+ * use it for long periods of time.  Kernel-mode FPU cannot be used in all
-+ * contexts -- see irq_fpu_usable() for details.
-  */
- 
- /* Kernel FPU states to initialize in kernel_fpu_begin_mask() */
- #define KFPU_387	_BITUL(0)	/* 387 state will be initialized */
- #define KFPU_MXCSR	_BITUL(1)	/* MXCSR will be initialized */
-@@ -48,25 +47,23 @@ static inline void kernel_fpu_begin(void)
- 	kernel_fpu_begin_mask(KFPU_387 | KFPU_MXCSR);
- #endif
- }
- 
- /*
-- * Use fpregs_lock() while editing CPU's FPU registers or fpu->fpstate.
-- * A context switch will (and softirq might) save CPU's FPU registers to
-- * fpu->fpstate.regs and set TIF_NEED_FPU_LOAD leaving CPU's FPU registers in
-- * a random state.
-+ * Use fpregs_lock() while editing CPU's FPU registers or fpu->fpstate, or while
-+ * using the FPU in kernel mode.  A context switch will (and softirq might) save
-+ * CPU's FPU registers to fpu->fpstate.regs and set TIF_NEED_FPU_LOAD leaving
-+ * CPU's FPU registers in a random state.
-  *
-  * local_bh_disable() protects against both preemption and soft interrupts
-  * on !RT kernels.
-  *
-  * On RT kernels local_bh_disable() is not sufficient because it only
-  * serializes soft interrupt related sections via a local lock, but stays
-  * preemptible. Disabling preemption is the right choice here as bottom
-  * half processing is always in thread context on RT kernels so it
-  * implicitly prevents bottom half processing as well.
-- *
-- * Disabling preemption also serializes against kernel_fpu_begin().
-  */
- static inline void fpregs_lock(void)
- {
- 	if (!IS_ENABLED(CONFIG_PREEMPT_RT))
- 		local_bh_disable();
-diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
-index 1209c7aebb211..f937329d1aa9c 100644
---- a/arch/x86/kernel/fpu/core.c
-+++ b/arch/x86/kernel/fpu/core.c
-@@ -58,13 +58,20 @@ DEFINE_PER_CPU(struct fpu *, fpu_fpregs_owner_ctx);
- bool irq_fpu_usable(void)
- {
- 	if (WARN_ON_ONCE(in_nmi()))
- 		return false;
- 
--	/* In kernel FPU usage already active? */
--	if (this_cpu_read(in_kernel_fpu))
-+	/*
-+	 * In kernel FPU usage already active?  This detects any explicitly
-+	 * nested usage in task or softirq context, which is unsupported.  It
-+	 * also detects attempted usage in a hardirq that has interrupted a
-+	 * kernel-mode FPU section.
-+	 */
-+	if (this_cpu_read(in_kernel_fpu)) {
-+		WARN_ON_FPU(!in_hardirq());
- 		return false;
-+	}
- 
- 	/*
- 	 * When not in NMI or hard interrupt context, FPU can be used in:
- 	 *
- 	 * - Task context except from within fpregs_lock()'ed critical
-@@ -418,11 +425,12 @@ int fpu_copy_uabi_to_guest_fpstate(struct fpu_guest *gfpu, const void *buf,
- EXPORT_SYMBOL_GPL(fpu_copy_uabi_to_guest_fpstate);
- #endif /* CONFIG_KVM */
- 
- void kernel_fpu_begin_mask(unsigned int kfpu_mask)
- {
--	preempt_disable();
-+	if (!irqs_disabled())
-+		fpregs_lock();
- 
- 	WARN_ON_FPU(!irq_fpu_usable());
- 	WARN_ON_FPU(this_cpu_read(in_kernel_fpu));
- 
- 	this_cpu_write(in_kernel_fpu, true);
-@@ -446,11 +454,12 @@ EXPORT_SYMBOL_GPL(kernel_fpu_begin_mask);
- void kernel_fpu_end(void)
- {
- 	WARN_ON_FPU(!this_cpu_read(in_kernel_fpu));
- 
- 	this_cpu_write(in_kernel_fpu, false);
--	preempt_enable();
-+	if (!irqs_disabled())
-+		fpregs_unlock();
- }
- EXPORT_SYMBOL_GPL(kernel_fpu_end);
- 
- /*
-  * Sync the FPU register state to current's memory register state when the
 
-base-commit: 0ad2507d5d93f39619fc42372c347d6006b64319
--- 
-2.48.1
 
