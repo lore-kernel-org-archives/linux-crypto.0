@@ -1,338 +1,162 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 177331FDA9C
-	for <linux-crypto@vger.kernel.org>; Tue,  4 Mar 2025 09:25:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8272D1FDE20
+	for <linux-crypto@vger.kernel.org>; Tue,  4 Mar 2025 09:25:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741080319; cv=none; b=F+Nw9n/zjkcwplG0bJHH/+qS0Xum95uOR09AjBwv8sdfHlZnRWc3I1AINCjqszkVbZln1ILIDMOyn6c/TIlrtDFFs4G7vWtXW9X/4DlTr/Hk8l5hQBTrhnX/QjWgYyeNLCKBUms4fu6ZwD1krd2G6SLqHUeJDRGUYJiRfYMEqzM=
+	t=1741080321; cv=none; b=hTEedRhjZ8v1tkKvNpnsvO0zQmOBslt/LcE0zbdj9DbObJuzhIKUjwh9df4Zalf4JDpRXHoajgOh//qqEIblAVb/TRm21Nx+5duImt1Wmv6GLprUJS7UAIbf5kyaThzvqUhS1xVcX7Z2TQfLi9NLt/C73FQkJWClAm9zBqbNxUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741080319; c=relaxed/simple;
-	bh=pEoYCzAC5W9nR3RIs8GDOdWzFQpTbf5KW3yU6400ZAY=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To:Cc; b=Jn3ivSVIkmSdZ2PHI9E5URDrIbDIHy6isV+K8CVpFwiFejsmBH/EDl96w/GYHvvRGCK5WrGnOwAYlq+KA8AWofRaQknTbHQVCmJZ1J1I0XY6PKBYXpHWKiC9f3eUEZ2582oCUtcrlEiR0v4/jat4RfsRX+I3nBItQf6GozT+bFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=gIOw3RLP; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1741080321; c=relaxed/simple;
+	bh=D2pcj7eNNhKsXgn3XF0f/0vqaucKJ4Nfaio7BEZzV6o=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=EeMSVlOi9DduwyjppWR/pMzI+D4UFDSvhZbi3OgCiLG/pqtpxCUR5nw2IpgHM8foKKQ1sNg4ZuYU8AzXFSRkxVyUcY2vXiigo8EDs0eDX6Hx5Mz2XCEsy1nl5tTO5zAhnVv28LK5iXIkrKcgc4JfxUEGjREwGkwC9hRlsKslOeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--elver.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vs8i/HV6; arc=none smtp.client-ip=209.85.221.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--elver.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="gIOw3RLP"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=Cc:To:Subject:From:References:In-Reply-To:Message-Id:Date:
-	Sender:Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ohyCghcONkkI1RQ7lYU6pSsY7Vt9ONamE1WQpUNPRNg=; b=gIOw3RLP35QeN9c7IznxuMqEjl
-	b17BqBR9VjCgO0eTaqJq/aQTJslrifTKl5hU8kqIcajROrf0Zjmlhupgyk3aI6iENCEKtDSuOpadw
-	U1zzENGex2x+qyM8DCwhjkzNbrfFHiroKDwv8oG8GXZ4gv33VU5DomR8BDzxKXXXtDaUMSMEkG+Cc
-	+eguvTGwFvKLsQe8AODHJRADUKAc1+h8i95V/AqpXKCnajv2xeCxZRDuJq8CdLaWnl73IJ6Y8K8SI
-	fsf/iKW1Nmy/qSV2HTeNn0jbq5GLAKIwvnbYi1GmLR/9WGUF7TQhL+Zz0URYDLEUSk7/rUtvOek8M
-	GQHEwmhQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tpOWX-003a39-09;
-	Tue, 04 Mar 2025 17:25:14 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 04 Mar 2025 17:25:13 +0800
-Date: Tue, 04 Mar 2025 17:25:13 +0800
-Message-Id: <840b89f0c8a11c691ea827a7ce620a6931e434d4.1741080140.git.herbert@gondor.apana.org.au>
-In-Reply-To: <cover.1741080140.git.herbert@gondor.apana.org.au>
-References: <cover.1741080140.git.herbert@gondor.apana.org.au>
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v2 PATCH 5/7] crypto: scomp - Remove support for most non-trivial
- destination SG lists
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Cc: linux-mm@kvack.org, Yosry Ahmed <yosry.ahmed@linux.dev>, Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vs8i/HV6"
+Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-39101511442so1075827f8f.1
+        for <linux-crypto@vger.kernel.org>; Tue, 04 Mar 2025 01:25:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1741080317; x=1741685117; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=pBc/zi9P1R3Zwtykno3mWYwrt7ORJZX5qCpzJBRDBb8=;
+        b=vs8i/HV6DjeHWQAQxEQCNitaVYS8XL9+trpbOHP1l4G/my82PKizypDOWhD/EgaXqc
+         0Hv33SmCakD1i6cHlzoK8Yn7WvrMaaIkN2PMzPNNHBXVWIJK3xkk7h2jmxM7dmPFzjC0
+         caWTr6DUwaCVPNegfLSC+pZIR546MFC1tX1MNwmUMOUeShMUlskTlTwTVKibldL11QN2
+         WNsd8wjtP7TpVaHFIWP3ktrz/KR+6HvqpaAJTzg+2IqG/h1RiB8TtjUT06o0O6X8lohU
+         KA4KZ9F7ML3czkQk2twoOEfRLhVUEs10pKfabJzKEIVXaQ5LE9fsvHDAls9+qXN2qF45
+         JNfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741080317; x=1741685117;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pBc/zi9P1R3Zwtykno3mWYwrt7ORJZX5qCpzJBRDBb8=;
+        b=veetX+CCQF6acEj4XUkleh1+UoeASo7y7P2itaGJ1BsL8oVgpGJulUfH0B/biLy7Qa
+         6GlIOOzTnUMyIfzzmZ+5tDsQ+uJ5uGcxHdk77ARSgxs56arcgDI50CqME53YiRFJTQQB
+         sil7KVNnErzTdqHjAZirRel6QF960SHEBjU90QvGs31VEw+Ns/4xrvYeBBtes8L1wGmA
+         S7kUVEHhg3HnnVIzW5V4xk00+DrYhwI1PU7D5y0Wuq6YpVh2jFLINkLIIWHLAqZK54nm
+         W1+Bb3B0unMWOIlVDfhJ/GIm5JyBDk9Rdz52BToRPhx/s8FHp0u5/1zIAdXY0DYva1uT
+         O6Bw==
+X-Forwarded-Encrypted: i=1; AJvYcCUkpN5dZ2l2XQV9Ys6EZzjU7djxoug2M7GYXUa5Dm7CcfMVavPcvSWLXdIPTo6+K+g5v1LHg7fF40ezC/c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCEilxZFeXtoOmr++HyX/6PHMtG9DoPBNxUdpfoJt5lebQ1GoI
+	tPsTKB1eVzg2cRH4gPVbtGP/SEvpyPX8yN0k0NNSkO0ENpqTSGq9pWMowPcr5VgOQUXk5So83Q=
+	=
+X-Google-Smtp-Source: AGHT+IGQB/YIYjs3mcCeFc0d30zRBIg9YuV3qxz71mKDL9Wrd0L0zSrw4Y93Il/Zy6Ca4Q/8RxD18WTRwQ==
+X-Received: from wmbfp9.prod.google.com ([2002:a05:600c:6989:b0:43b:c927:5a4d])
+ (user=elver job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6000:186c:b0:390:f0ff:2c10
+ with SMTP id ffacd0b85a97d-3911561abacmr1839931f8f.19.1741080316822; Tue, 04
+ Mar 2025 01:25:16 -0800 (PST)
+Date: Tue,  4 Mar 2025 10:21:02 +0100
+In-Reply-To: <20250304092417.2873893-1-elver@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+Mime-Version: 1.0
+References: <20250304092417.2873893-1-elver@google.com>
+X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
+Message-ID: <20250304092417.2873893-4-elver@google.com>
+Subject: [PATCH v2 03/34] compiler-capability-analysis: Add test stub
+From: Marco Elver <elver@google.com>
+To: elver@google.com
+Cc: "David S. Miller" <davem@davemloft.net>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, 
+	"Paul E. McKenney" <paulmck@kernel.org>, Alexander Potapenko <glider@google.com>, Arnd Bergmann <arnd@arndb.de>, 
+	Bart Van Assche <bvanassche@acm.org>, Bill Wendling <morbo@google.com>, Boqun Feng <boqun.feng@gmail.com>, 
+	Dmitry Vyukov <dvyukov@google.com>, Eric Dumazet <edumazet@google.com>, 
+	Frederic Weisbecker <frederic@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, Ingo Molnar <mingo@kernel.org>, 
+	Jann Horn <jannh@google.com>, Jiri Slaby <jirislaby@kernel.org>, 
+	Joel Fernandes <joel@joelfernandes.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Josh Triplett <josh@joshtriplett.org>, Justin Stitt <justinstitt@google.com>, 
+	Kees Cook <kees@kernel.org>, Kentaro Takeda <takedakn@nttdata.co.jp>, 
+	Mark Rutland <mark.rutland@arm.com>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
+	Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
+	Steven Rostedt <rostedt@goodmis.org>, Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>, 
+	Thomas Gleixner <tglx@linutronix.de>, Uladzislau Rezki <urezki@gmail.com>, Waiman Long <longman@redhat.com>, 
+	Will Deacon <will@kernel.org>, kasan-dev@googlegroups.com, linux-kernel@vger.kernel.org, 
+	llvm@lists.linux.dev, rcu@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	linux-serial@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-As the only user of acomp/scomp uses a trivial single-page SG
-list, remove support for everything else in preprataion for the
-addition of virtual address support.
+Add a simple test stub where we will add common supported patterns that
+should not generate false positive of each new supported capability.
 
-However, keep support for non-trivial source SG lists as that
-user is currently jumping through hoops in order to linearise
-the source data.
-
-Limit the source SG linearisation buffer to a single page as
-that user never goes over that.  The only other potential user
-is also unlikely to exceed that (IPComp) and it can easily do
-its own linearisation if necessary.
-
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Marco Elver <elver@google.com>
 ---
- crypto/acompress.c                  |  6 --
- crypto/scompress.c                  | 98 ++++++++++++-----------------
- include/crypto/acompress.h          | 12 +---
- include/crypto/internal/scompress.h |  2 -
- 4 files changed, 42 insertions(+), 76 deletions(-)
+ lib/Kconfig.debug              | 14 ++++++++++++++
+ lib/Makefile                   |  3 +++
+ lib/test_capability-analysis.c | 18 ++++++++++++++++++
+ 3 files changed, 35 insertions(+)
+ create mode 100644 lib/test_capability-analysis.c
 
-diff --git a/crypto/acompress.c b/crypto/acompress.c
-index d2103d4e42cc..8914d0c4cc75 100644
---- a/crypto/acompress.c
-+++ b/crypto/acompress.c
-@@ -73,7 +73,6 @@ static int crypto_acomp_init_tfm(struct crypto_tfm *tfm)
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index f30099051294..8abaf7dab3f8 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -2764,6 +2764,20 @@ config LINEAR_RANGES_TEST
  
- 	acomp->compress = alg->compress;
- 	acomp->decompress = alg->decompress;
--	acomp->dst_free = alg->dst_free;
- 	acomp->reqsize = alg->reqsize;
+ 	  If unsure, say N.
  
- 	if (alg->exit)
-@@ -146,11 +145,6 @@ void acomp_request_free(struct acomp_req *req)
- 	if (tfm->__crt_alg->cra_type != &crypto_acomp_type)
- 		crypto_acomp_scomp_free_ctx(req);
- 
--	if (req->base.flags & CRYPTO_ACOMP_ALLOC_OUTPUT) {
--		acomp->dst_free(req->dst);
--		req->dst = NULL;
--	}
--
- 	__acomp_request_free(req);
- }
- EXPORT_SYMBOL_GPL(acomp_request_free);
-diff --git a/crypto/scompress.c b/crypto/scompress.c
-index 1cef6bb06a81..d78f307343ac 100644
---- a/crypto/scompress.c
-+++ b/crypto/scompress.c
-@@ -18,15 +18,18 @@
- #include <linux/seq_file.h>
- #include <linux/slab.h>
- #include <linux/string.h>
--#include <linux/vmalloc.h>
- #include <net/netlink.h>
- 
- #include "compress.h"
- 
-+#define SCOMP_SCRATCH_SIZE	PAGE_SIZE
++config CAPABILITY_ANALYSIS_TEST
++	bool "Compiler capability-analysis warnings test"
++	depends on EXPERT
++	help
++	  This builds the test for compiler-based capability analysis. The test
++	  does not add executable code to the kernel, but is meant to test that
++	  common patterns supported by the analysis do not result in false
++	  positive warnings.
 +
- struct scomp_scratch {
- 	spinlock_t	lock;
--	void		*src;
--	void		*dst;
-+	union {
-+		void *src;
-+		unsigned long saddr;
-+	};
- };
- 
- static DEFINE_PER_CPU(struct scomp_scratch, scomp_scratch) = {
-@@ -66,10 +69,8 @@ static void crypto_scomp_free_scratches(void)
- 	for_each_possible_cpu(i) {
- 		scratch = per_cpu_ptr(&scomp_scratch, i);
- 
--		vfree(scratch->src);
--		vfree(scratch->dst);
-+		free_page(scratch->saddr);
- 		scratch->src = NULL;
--		scratch->dst = NULL;
- 	}
- }
- 
-@@ -79,18 +80,14 @@ static int crypto_scomp_alloc_scratches(void)
- 	int i;
- 
- 	for_each_possible_cpu(i) {
--		void *mem;
-+		unsigned long mem;
- 
- 		scratch = per_cpu_ptr(&scomp_scratch, i);
- 
--		mem = vmalloc_node(SCOMP_SCRATCH_SIZE, cpu_to_node(i));
-+		mem = __get_free_page(GFP_KERNEL);
- 		if (!mem)
- 			goto error;
--		scratch->src = mem;
--		mem = vmalloc_node(SCOMP_SCRATCH_SIZE, cpu_to_node(i));
--		if (!mem)
--			goto error;
--		scratch->dst = mem;
-+		scratch->saddr = mem;
- 	}
- 	return 0;
- error:
-@@ -113,72 +110,58 @@ static int crypto_scomp_init_tfm(struct crypto_tfm *tfm)
- static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
- {
- 	struct crypto_acomp *tfm = crypto_acomp_reqtfm(req);
--	void **tfm_ctx = acomp_tfm_ctx(tfm);
-+	struct crypto_scomp **tfm_ctx = acomp_tfm_ctx(tfm);
- 	struct crypto_scomp *scomp = *tfm_ctx;
- 	void **ctx = acomp_request_ctx(req);
- 	struct scomp_scratch *scratch;
-+	unsigned int slen = req->slen;
-+	unsigned int dlen = req->dlen;
- 	void *src, *dst;
--	unsigned int dlen;
- 	int ret;
- 
--	if (!req->src || !req->slen || req->slen > SCOMP_SCRATCH_SIZE)
-+	if (!req->src || !slen)
- 		return -EINVAL;
- 
--	if (req->dst && !req->dlen)
-+	if (req->dst && !dlen)
- 		return -EINVAL;
- 
--	if (!req->dlen || req->dlen > SCOMP_SCRATCH_SIZE)
--		req->dlen = SCOMP_SCRATCH_SIZE;
-+	if (sg_nents(req->dst) > 1)
-+		return -ENOSYS;
- 
--	dlen = req->dlen;
-+	if (req->dst->offset >= PAGE_SIZE)
-+		return -ENOSYS;
++	  When adding support for new capabilities, it is strongly recommended
++	  to add supported patterns to this test.
 +
-+	if (req->dst->offset + dlen > PAGE_SIZE)
-+		dlen = PAGE_SIZE - req->dst->offset;
++	  If unsure, say N.
 +
-+	if (sg_nents(req->src) == 1 && (!PageHighMem(sg_page(req->src)) ||
-+					req->src->offset + slen <= PAGE_SIZE))
-+		src = kmap_local_page(sg_page(req->src)) + req->src->offset;
-+	else
-+		src = scratch->src;
+ config CMDLINE_KUNIT_TEST
+ 	tristate "KUnit test for cmdline API" if !KUNIT_ALL_TESTS
+ 	depends on KUNIT
+diff --git a/lib/Makefile b/lib/Makefile
+index d5cfc7afbbb8..1dbb59175eb0 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -394,6 +394,9 @@ obj-$(CONFIG_CRC_KUNIT_TEST) += crc_kunit.o
+ obj-$(CONFIG_SIPHASH_KUNIT_TEST) += siphash_kunit.o
+ obj-$(CONFIG_USERCOPY_KUNIT_TEST) += usercopy_kunit.o
+ 
++CAPABILITY_ANALYSIS_test_capability-analysis.o := y
++obj-$(CONFIG_CAPABILITY_ANALYSIS_TEST) += test_capability-analysis.o
 +
-+	dst = kmap_local_page(sg_page(req->dst)) + req->dst->offset;
+ obj-$(CONFIG_GENERIC_LIB_DEVMEM_IS_ALLOWED) += devmem_is_allowed.o
  
- 	scratch = raw_cpu_ptr(&scomp_scratch);
- 	spin_lock(&scratch->lock);
- 
--	if (sg_nents(req->src) == 1 && !PageHighMem(sg_page(req->src))) {
--		src = page_to_virt(sg_page(req->src)) + req->src->offset;
--	} else {
--		scatterwalk_map_and_copy(scratch->src, req->src, 0,
--					 req->slen, 0);
--		src = scratch->src;
--	}
--
--	if (req->dst && sg_nents(req->dst) == 1 && !PageHighMem(sg_page(req->dst)))
--		dst = page_to_virt(sg_page(req->dst)) + req->dst->offset;
--	else
--		dst = scratch->dst;
-+	if (src == scratch->src)
-+		memcpy_from_sglist(src, req->src, 0, req->slen);
- 
- 	if (dir)
--		ret = crypto_scomp_compress(scomp, src, req->slen,
-+		ret = crypto_scomp_compress(scomp, src, slen,
- 					    dst, &req->dlen, *ctx);
- 	else
--		ret = crypto_scomp_decompress(scomp, src, req->slen,
-+		ret = crypto_scomp_decompress(scomp, src, slen,
- 					      dst, &req->dlen, *ctx);
--	if (!ret) {
--		if (!req->dst) {
--			req->dst = sgl_alloc(req->dlen, GFP_ATOMIC, NULL);
--			if (!req->dst) {
--				ret = -ENOMEM;
--				goto out;
--			}
--		} else if (req->dlen > dlen) {
--			ret = -ENOSPC;
--			goto out;
--		}
--		if (dst == scratch->dst) {
--			scatterwalk_map_and_copy(scratch->dst, req->dst, 0,
--						 req->dlen, 1);
--		} else {
--			int nr_pages = DIV_ROUND_UP(req->dst->offset + req->dlen, PAGE_SIZE);
--			int i;
--			struct page *dst_page = sg_page(req->dst);
- 
--			for (i = 0; i < nr_pages; i++)
--				flush_dcache_page(dst_page + i);
--		}
--	}
--out:
- 	spin_unlock(&scratch->lock);
+ obj-$(CONFIG_FIRMWARE_TABLE) += fw_table.o
+diff --git a/lib/test_capability-analysis.c b/lib/test_capability-analysis.c
+new file mode 100644
+index 000000000000..a0adacce30ff
+--- /dev/null
++++ b/lib/test_capability-analysis.c
+@@ -0,0 +1,18 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Compile-only tests for common patterns that should not generate false
++ * positive errors when compiled with Clang's capability analysis.
++ */
 +
-+	if (src != scratch->src)
-+		kunmap_local(src);
-+	kunmap_local(dst);
-+	flush_dcache_page(sg_page(req->dst));
++#include <linux/build_bug.h>
 +
- 	return ret;
- }
- 
-@@ -225,7 +208,6 @@ int crypto_init_scomp_ops_async(struct crypto_tfm *tfm)
- 
- 	crt->compress = scomp_acomp_compress;
- 	crt->decompress = scomp_acomp_decompress;
--	crt->dst_free = sgl_free;
- 	crt->reqsize = sizeof(void *);
- 
- 	return 0;
-diff --git a/include/crypto/acompress.h b/include/crypto/acompress.h
-index 15bb13e47f8b..25e193b0b8b4 100644
---- a/include/crypto/acompress.h
-+++ b/include/crypto/acompress.h
-@@ -15,8 +15,6 @@
- #include <linux/scatterlist.h>
- #include <linux/types.h>
- 
--#define CRYPTO_ACOMP_ALLOC_OUTPUT	0x00000001
--
- /* Set this bit for virtual address instead of SG list. */
- #define CRYPTO_ACOMP_REQ_VIRT		0x00000002
- 
-@@ -75,15 +73,12 @@ struct acomp_req {
-  *
-  * @compress:		Function performs a compress operation
-  * @decompress:		Function performs a de-compress operation
-- * @dst_free:		Frees destination buffer if allocated inside the
-- *			algorithm
-  * @reqsize:		Context size for (de)compression requests
-  * @base:		Common crypto API algorithm data structure
-  */
- struct crypto_acomp {
- 	int (*compress)(struct acomp_req *req);
- 	int (*decompress)(struct acomp_req *req);
--	void (*dst_free)(struct scatterlist *dst);
- 	unsigned int reqsize;
- 	struct crypto_tfm base;
- };
-@@ -234,7 +229,7 @@ static inline void acomp_request_set_callback(struct acomp_req *req,
- 					      crypto_completion_t cmpl,
- 					      void *data)
- {
--	u32 keep = CRYPTO_ACOMP_ALLOC_OUTPUT | CRYPTO_ACOMP_REQ_VIRT;
-+	u32 keep = CRYPTO_ACOMP_REQ_VIRT;
- 
- 	req->base.complete = cmpl;
- 	req->base.data = data;
-@@ -268,9 +263,7 @@ static inline void acomp_request_set_params(struct acomp_req *req,
- 	req->slen = slen;
- 	req->dlen = dlen;
- 
--	req->base.flags &= ~(CRYPTO_ACOMP_ALLOC_OUTPUT | CRYPTO_ACOMP_REQ_VIRT);
--	if (!req->dst)
--		req->base.flags |= CRYPTO_ACOMP_ALLOC_OUTPUT;
-+	req->base.flags &= ~CRYPTO_ACOMP_REQ_VIRT;
- }
- 
- /**
-@@ -294,7 +287,6 @@ static inline void acomp_request_set_virt(struct acomp_req *req,
- 	req->slen = slen;
- 	req->dlen = dlen;
- 
--	req->base.flags &= ~CRYPTO_ACOMP_ALLOC_OUTPUT;
- 	req->base.flags |= CRYPTO_ACOMP_REQ_VIRT;
- }
- 
-diff --git a/include/crypto/internal/scompress.h b/include/crypto/internal/scompress.h
-index 6ba9974df7d3..2a6b15c0a32d 100644
---- a/include/crypto/internal/scompress.h
-+++ b/include/crypto/internal/scompress.h
-@@ -12,8 +12,6 @@
- #include <crypto/acompress.h>
- #include <crypto/algapi.h>
- 
--#define SCOMP_SCRATCH_SIZE	131072
--
- struct acomp_req;
- 
- struct crypto_scomp {
++/*
++ * Test that helper macros work as expected.
++ */
++static void __used test_common_helpers(void)
++{
++	BUILD_BUG_ON(capability_unsafe(3) != 3); /* plain expression */
++	BUILD_BUG_ON(capability_unsafe((void)2; 3;) != 3); /* does not swallow semi-colon */
++	BUILD_BUG_ON(capability_unsafe((void)2, 3) != 3); /* does not swallow commas */
++	capability_unsafe(do { } while (0)); /* works with void statements */
++}
 -- 
-2.39.5
+2.48.1.711.g2feabab25a-goog
 
