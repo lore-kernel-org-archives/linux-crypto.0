@@ -1,135 +1,107 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47A98157493
-	for <linux-crypto@vger.kernel.org>; Tue,  4 Mar 2025 02:00:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 503421C9EB1
+	for <linux-crypto@vger.kernel.org>; Tue,  4 Mar 2025 03:30:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741053621; cv=none; b=UeqNmBvfAUAKiwqTdnMDYaJN/H9xQrxAyZFMFU+jJMRuho/1TcL3rS1A9VGllTPSQNbotN2Ai1XJ+EswUvfN6dPun72akCh4L8uuviiYnz9Us4eYV/Q5dejpzZye1k2fThVcut8JJt8VWD2aPzB6oJ5HzaSw9TGgjqX4y7tJ9is=
+	t=1741059009; cv=none; b=er2oc7PDjAa52VV1iYW4Pe2zib+rY4yBirRUofjjpj6V/csTkdy/6sm+dMz5gUJLJPN/gIng1FtLCmooo0qls8HZTVXdOkGpPr9ws7fgEF1ss02olOaGAoToUkBTP7vrVhutmUUsivKdan1nitlJ4mR4tr8I41SKGVYTifRZosY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741053621; c=relaxed/simple;
-	bh=JHk4X3vZ8MFvsUzR7DvpEVGisQVp8HYBRZBRGMOySDg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PuGnsWe4jMKwZOFSsKPP4VFxfPWwtRIZjibala+ffZ5h9b/01RWDtVsMwsIGdIUUXdSkObPRop+7TqnWIH2NJNXlVq8spW06oy6v7xrciWDkvoenMFugL/BLPpRUxnhQLKPMJb39zEgAZL4fKz82zrJ853crG03uzSaRLRiRhyU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XcxxmSdh; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1741059009; c=relaxed/simple;
+	bh=3e6jqH7NXm0/hAsWkBGzbMzTHc/sjtQSGJVmRHs2HW8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FhyLevz1+Z5/Bot/XdMGvCLL0vBscDjwRARCys/gaeKKRP0mXcyiBV5L0+Jx5BxAUUJRNgAd2s881HciOnAbqa+U2IcE+p+n3FqO4yESlaJz8QPMsdIeKBvP6UCaKqWddPCuSndD/O32QF8k4fuyVS8u+cN6RLfMkY/E6ny/Row=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=g+DS0Bp7; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XcxxmSdh"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741053618;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=m6ne55QwhftFYTm3pAMElTqpEZ/LORaNN0Mq/z5tJ9c=;
-	b=XcxxmSdhYA+QsDzP8BKPqM+WnyNGQTSnQJvZ10UjR9X/3AAHuTBbnLsv7+VcHmhPPWp1gZ
-	2bii9VAs6d9u41lsRHqglYvB72kTPm9haJ/IUagA7N16oaNW0SaI8vkga0nTvXvkr226mY
-	DMZFdmJlM4SdTwK7bX5Wd9mA3YVH1jQ=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-642-hVR7aVIoNcOhDcpB2Nxxfw-1; Mon, 03 Mar 2025 21:00:11 -0500
-X-MC-Unique: hVR7aVIoNcOhDcpB2Nxxfw-1
-X-Mimecast-MFC-AGG-ID: hVR7aVIoNcOhDcpB2Nxxfw_1741053611
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-5e4b3da6b49so4452552a12.2
-        for <linux-crypto@vger.kernel.org>; Mon, 03 Mar 2025 18:00:11 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741053610; x=1741658410;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=m6ne55QwhftFYTm3pAMElTqpEZ/LORaNN0Mq/z5tJ9c=;
-        b=DMLcX1ib4oDc7V1CUqpKjzQW44CoE8OS6m2JPJx0SDIHX7a2N5Gv8L731EYuzvGT2b
-         t0dtGfD440bc5/gLtdWGBugo0QJXzNUb49PJryz5bl7PBJryVmLeZ4l758NpB3UYRy2z
-         iQXk3dxLGVPR+lxkwDlvzdTrQf9LfXnpwMXixSgbseeE4RoRUQ/4Qnu9nGt9DvaaL5aP
-         e+RLZULKeJVzN26CsXGs/0rrozEer9bYFBh0kDjFVBGwfKkIdyi16YRQ5n7zb6Ott9xe
-         2eJCR4ZAnEtcYyQZoGQY+SjqZPSdFPwl1oleFRoSmxyWAqxFH+zt5FZzQV5suy+es3zb
-         HVpg==
-X-Forwarded-Encrypted: i=1; AJvYcCVvgRLGo4xgRMZ05+42tskQ6qIUEe1WzbrtdbDk2+9pg1s5htrh3dAwYiw19w9VP6DMjurOlGz6I/JYxvg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwimyhRLXoyaqZ0EvGlOb4SYV3YWloNOTspPbsSU4QPnROP/obG
-	k9USUM4sGVg+hT/97f68GLzUHXsRSsTi2yRUm8S/Uq54L6+JIC4K8kK8ClYHA+xIqsfl8SQR/5v
-	SJQ8gUoKao05LX1XJZd0TxcHPlYxCijd4vuf7pbiQvyVV5LPbdByIFR5yRzFlqyZbIJoUYcB3Rr
-	R9U3/rT53HSn+Ek+0S58suK87WoxSzBkm4ToU9
-X-Gm-Gg: ASbGncvGb/fCKPino1u04l/5ceURY//tqiZEP1uF8XohwABUxIsM9E8NIa03ejFwVPH
-	Y2sfa9g+fMsZdeK2KxoAmXeX2FBjIr6zbcaJA/9ePgrbLqFV4vNCoJ7DUaRw+rNLFlqE5yu+Qeg
-	==
-X-Received: by 2002:a05:6402:2714:b0:5e0:922e:527a with SMTP id 4fb4d7f45d1cf-5e4d6908f02mr43147290a12.0.1741053610610;
-        Mon, 03 Mar 2025 18:00:10 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGotofsTvb2AxtGxiUYRTOJP55UijhwSHRdhPuwJsFglP+Wr3zMaapIUvoTk6CdgEnWdU6MOBQ50VkHbyyuLfo=
-X-Received: by 2002:a05:6402:2714:b0:5e0:922e:527a with SMTP id
- 4fb4d7f45d1cf-5e4d6908f02mr43147246a12.0.1741053610281; Mon, 03 Mar 2025
- 18:00:10 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="g+DS0Bp7"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=rFsTboUj7sEp6BL834xzymGgVd/XeRc58hzpRPIhZ0w=; b=g+DS0Bp7LvVDaRN0qQhnkYFANZ
+	twrjf7sKijWCRHuAlHW8q9y3kGIdflwU9/qUr7+NEXfFkdyY0lL2iEysanhOPJEar3Pepd0Nv1ouv
+	er0nZAwA+9gSpf8ERjqgUfHryaoNsjDTqE4VoXhWc4RKcq+PUZTWFeOI+spKK7V96aYN9OdtOGY7Y
+	RRaFFi5ULsVG5xnz+IkSITRJkiBt+pn0dCHMzV8ybNxi80KEqCS7TW6jiEyxvWJertxtxdw2Fuq7A
+	C16j4nkz4ZdxmVEq4NVRT4fMyDoQ/c10r0x/eB2Dh0Li/E3AfHpmfWVxb21KSnb8R2Ak5161Uv++w
+	wao38rSA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tpIyW-003USb-0o;
+	Tue, 04 Mar 2025 11:29:45 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 04 Mar 2025 11:29:44 +0800
+Date: Tue, 4 Mar 2025 11:29:44 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Eric Biggers <ebiggers@kernel.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	linux-mm@kvack.org
+Subject: Re: [RFC PATCH 7/7] mm: zswap: Use acomp virtual address interface
+Message-ID: <Z8ZzqOw9veZ2HGkk@gondor.apana.org.au>
+References: <153c340a52090f2ff82f8f066203186a932d3f99.1740651138.git.herbert@gondor.apana.org.au>
+ <Z8CquB-BZrP5JFYg@google.com>
+ <20250227183847.GB1613@sol.localdomain>
+ <Z8DcmK4eECXp3aws@google.com>
+ <Z8FwFJ4iMLuvo3Jj@gondor.apana.org.au>
+ <Z8GH7VssQGR1ujHV@gondor.apana.org.au>
+ <Z8Hcur3T82_FiONj@google.com>
+ <Z8KrAk9Y52RDox2U@gondor.apana.org.au>
+ <Z8KxVC1RBeh8DTKI@gondor.apana.org.au>
+ <Z8YOVyGugHwAsvmO@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <a18fc6cf356bc338c69b3cc44d7be8bd35c6d7d0.1741028854.git.christophe.jaillet@wanadoo.fr>
-In-Reply-To: <a18fc6cf356bc338c69b3cc44d7be8bd35c6d7d0.1741028854.git.christophe.jaillet@wanadoo.fr>
-From: Lei Yang <leiyang@redhat.com>
-Date: Tue, 4 Mar 2025 09:59:33 +0800
-X-Gm-Features: AQ5f1Jqo2O4hK3oJkjenR9LxQveC5GRpuyXs2Lm3CfD0L_mhdi24D2upTktGsNA
-Message-ID: <CAPpAL=wW6szqfPm8goUfM=c2cat9-tyuB-UgwRdtx7s23xe81g@mail.gmail.com>
-Subject: Re: [PATCH] crypto: virtio - Erase some sensitive memory when it is freed
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Gonglei <arei.gonglei@huawei.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	"David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org, 
-	kernel-janitors@vger.kernel.org, virtualization@lists.linux.dev, 
-	linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z8YOVyGugHwAsvmO@google.com>
 
-QE tested this patch with virtio-net regression tests, everything works fin=
-e.
+On Mon, Mar 03, 2025 at 08:17:27PM +0000, Yosry Ahmed wrote:
+>
+> I have seen the other thread with Sergey, I believe the conclusion is
+> that zsmalloc will be updated to use SG lists, at which point zswap can
+> just pass this as-is to the crypto API, and we don't need any copies in
+> either zsmalloc or zswap.
+> 
+> Is this correct?
 
-Tested-by: Lei Yang <leiyang@redhat.com>
+That is my hope yes.
 
-On Tue, Mar 4, 2025 at 3:08=E2=80=AFAM Christophe JAILLET
-<christophe.jaillet@wanadoo.fr> wrote:
->
-> virtcrypto_clear_request() does the same as the code here, but uses
-> kfree_sensitive() for one of the free operation.
->
-> So, better safe than sorry, use virtcrypto_clear_request() directly to
-> save a few lines of code and cleanly free the memory.
->
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> ---
-> I've no idea if this is needed or not, but it looks not consistent to me.
->
-> If safe as-is, maybe the kfree_sensitive() in virtcrypto_clear_request()
-> should be removed instead.
-> ---
->  drivers/crypto/virtio/virtio_crypto_core.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
->
-> diff --git a/drivers/crypto/virtio/virtio_crypto_core.c b/drivers/crypto/=
-virtio/virtio_crypto_core.c
-> index d0278eb568b9..0d522049f595 100644
-> --- a/drivers/crypto/virtio/virtio_crypto_core.c
-> +++ b/drivers/crypto/virtio/virtio_crypto_core.c
-> @@ -480,10 +480,8 @@ static void virtcrypto_free_unused_reqs(struct virti=
-o_crypto *vcrypto)
->
->         for (i =3D 0; i < vcrypto->max_data_queues; i++) {
->                 vq =3D vcrypto->data_vq[i].vq;
-> -               while ((vc_req =3D virtqueue_detach_unused_buf(vq)) !=3D =
-NULL) {
-> -                       kfree(vc_req->req_data);
-> -                       kfree(vc_req->sgs);
-> -               }
-> +               while ((vc_req =3D virtqueue_detach_unused_buf(vq)) !=3D =
-NULL)
-> +                       virtcrypto_clear_request(vc_req);
->                 cond_resched();
->         }
->  }
-> --
-> 2.48.1
->
->
+So there are two reasons why zswap should be using SG lists:
 
+1) Non-linear memory because compressed object spans two pages;
+2) Highmem.
+
+> Will this patch series be dropped?
+
+Not comletely, I rather liked the simplification of the scomp scratch
+code.  And the chaining functionality is still needed for the batching
+work.  The virtual address support will disappear for now but could
+always come back if someone wants to do that.
+
+However, I will reinstate the scomp scratch buffer in a more limited
+form just to cater for the need to linearise things if the algorithm
+does not support non-linear input (I hope to modify the algorithms
+we care about to support non-linear input but that's going to be a
+long-term project apart from LZO which I've already completed).
+
+Right now there is a proliferation of per-cpu buffers throughout the
+zswap/acomp call-stack.  I'm going to consolidate them so that there
+is a single per-cpu buffer for everything (the stream memory, and
+the linearisation buffer), and that it only comes into play when
+needed (so hopefully LZO decompression will become completely
+preemptible and not use any per-cpu buffers at all).
+
+Once that is done I will repost this.
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
