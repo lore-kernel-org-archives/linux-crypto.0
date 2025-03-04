@@ -1,220 +1,303 @@
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8CE5204F60;
-	Tue,  4 Mar 2025 20:52:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741121578; cv=none; b=cgq+ZN7ndG867cxr3DLqYQd7vvrqX7KdTzu78mSC8kW3HU/ad3wsI8+9pAJiaADKiUT48m9lcB2VPji1l13wuS4zYFJ1YkFjnOB5NbCI75LtXsMvzD/hYrCXfY1lBqtcHPndZu30pKsCB0HRnAlnx8AIW0mnTP7sF+34uenBBqo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741121578; c=relaxed/simple;
-	bh=8TGIq1q44b+qp3FLCmZL7K9wxstC6+u4YmdJY/0I/fY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tNyrRMNwfsiFsw6+mRKkcwFFJym0Dfo7eZgEYeAMkCT3KINbFdoTH3ro81lsbmmju6HyYNG1ypyyXH7Nl89uaTwGQNH5uTrSr3t3QI8QtHUkKggMDFUpMSr9AIeLHMuj2EaPFfIdfHr4QbdxTedbgvAP5N9UlYEumRAua70UDhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E/4Uy41T; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0947324DFE1;
+	Tue,  4 Mar 2025 21:14:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741122901; cv=fail; b=fThslk9IruE9YjHiJ883UMusVfGlgp4i4H2i0jdHTpmwhwvTQkrIPGF4J+zvR7SmRUAov5xTv4tYV58+HkQInWp4ONqHrPWXuIMAjwVF+363uqjOTPY0Ag4QgwgTOHPl5l61XeO+jiyEuWw+a2nvudT/MJgsdmDIeAnxREB7eJM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741122901; c=relaxed/simple;
+	bh=2c9T0m0Gf6sY4ejPh7DEwJA2ghf3mxtt0qC6ml/EF/A=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=cTjdixaSAmz/6EzLcN7gLTE7LOCnvL55XhFV6prvx+9iNnh43oKL7EuQgJrlOB5VH6sJ3rxnZ2717hKnlJmBKXeS6zSzGQuGIZCIlGDffkBKKuje32UCguxaF54zBfR8bwA7j2VQAzpAcvKyqnsxd4NVfAEDtP2lSp0x3dH71p8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lZVbiJ2V; arc=fail smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E/4Uy41T"
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-439ac3216dcso41680065e9.1;
-        Tue, 04 Mar 2025 12:52:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741121575; x=1741726375; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=V+Cr75GHycePdmToZOthHca+hof6tEcpP1zkSAQCixM=;
-        b=E/4Uy41T88NaW8UUrOoVbqEcIfG4+XY0IHIn2UbYyoae4GIk1nfEzOzVWSW34QPHrq
-         1oybcAvglV5AurypYIryt0mUcBSi6ANfvUy2FgmdK8swDyhV+72pKmyXJfYaAlvJEQ8+
-         rRVSGA1G36xgxCOovxpsV1Wk9WDnS72x2U1QOYM/o+w80Kmzbrl4ocJ5HGz0YSe6vy/y
-         7+kIEg5/GcmH1JoTyeVPv7Ih9c2aCj3iMVkxH8vWZdTxAy8s+8LYQIYNZFiOSmXK63fW
-         gA5Z2ssKxPbMz7DUpJM9cQmLT30+sHXautK8iymtTc+v+6xGYuMMdIY2z06FXl9STanM
-         +Uwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741121575; x=1741726375;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=V+Cr75GHycePdmToZOthHca+hof6tEcpP1zkSAQCixM=;
-        b=TeEG3Lo3XCCzbXERxaXwFWjYsxe2pKAcXeRx+XEIlsNDHHsutUfeVFmf0aqx4fOO/E
-         mmrdRnsVngLgK9OFWVTPzy9pZuttMK9bpQRuBXq4BplPDcG8CBEsPPU45cJ2GadLAhlv
-         V2WgUwC2+9dxDpEwrjeN+lcpNc1bcWSFViXYwZiFHQ2oUtN5/OoyoUPnMU7KxEGbcasI
-         7dODAuT4LKH0Hx5gTDSlrKpDWW6QCBV3po21P7/SWODgLKGVOQRy1f5cy/haAUXIX0mG
-         0Cp8V+f907H0o6LM3zHt941IqbvEQDH/JWlRQb0kOFy7JxEE+6TQRcgU4muX8/89bt8t
-         P5FA==
-X-Forwarded-Encrypted: i=1; AJvYcCUk3IuddJQ+aIWJpZ6n3fRPDoxITxIpIUy9l0e3XESmyZZlvGG1H+6gtSvlIm2b4tLDvMXTlPxCLS2pubG+@vger.kernel.org, AJvYcCXSCnoZ6xsHb94yzvA3NtdXL9QPXWwfTEvxstbqQY5hmiS7cEMoCgetweu/Ux6gplqr42iMVCkrWH2DLy8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmJqMBMR1GK4dXUe5+YIGwrZW8LsZaSg9nhr/IasG+e6fDIFbl
-	AdUeKSni+gyntcIJlZWso1oq2c/8aPJpFDiP7Qwnq1WtPFlr+SRG
-X-Gm-Gg: ASbGnct70f4I3uAfvI2Js3BeB5s3cV94Bu2tfYygwRBnJD/AD0t1X0mF5Y40NSmzkpq
-	CMvX2JYUZHrK0ulbCAOE+b4oaHC2H/2G1YsDAwko3TKwGeC2RTHZI4cXSnzh1wRAKXLRplZpi98
-	QBBD5LAW5NlGIWgngbYHPgSGE6aSmK04NU6SGywIco5f4YRnVUBk9hG5MCipMWRU2RC2eufhRfc
-	woE/kVIyzXmd3mfvrkcmXoT5tJK65YtlrSu9R5YmPhA4Ao8+KZLCXu6yr6nx42M3HyGK/KkfYhK
-	9IV6iOB01gzqDJuzRYbirajb3ZM3EfvtpjsFpK8OEglQstMztLoAu6RlqaQheEgG1eq7ZpMfU9c
-	PHley4xM=
-X-Google-Smtp-Source: AGHT+IG4gl9/y2mSBBQeEvhJ/k5Q2wNPs8UzTb/dxy71zQ14qKO+eanVQBwO22bXET0n7B3/dGWkVw==
-X-Received: by 2002:a05:600c:4f84:b0:439:a138:1d with SMTP id 5b1f17b1804b1-43bd29b8545mr1955695e9.22.1741121574529;
-        Tue, 04 Mar 2025 12:52:54 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43b736f990esm217040815e9.5.2025.03.04.12.52.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Mar 2025 12:52:53 -0800 (PST)
-Date: Tue, 4 Mar 2025 20:52:52 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Bill Wendling <morbo@google.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
- <dave.hansen@linux.intel.com>, "maintainer:X86 ARCHITECTURE (32-BIT AND
- 64-BIT)" <x86@kernel.org>, Eric Biggers <ebiggers@kernel.org>, Ard
- Biesheuvel <ardb@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nick
- Desaulniers <nick.desaulniers+lkml@gmail.com>, Justin Stitt
- <justinstitt@google.com>, LKML <linux-kernel@vger.kernel.org>,
- linux-crypto@vger.kernel.org, clang-built-linux <llvm@lists.linux.dev>
-Subject: Re: [PATCH v2] x86/crc32: use builtins to improve code generation
-Message-ID: <20250304205252.59a04955@pumpkin>
-In-Reply-To: <20250304043223.68ed310f@pumpkin>
-References: <CAGG=3QVi27WRYVxmsk9+HLpJw9ZJrpfLjU8G4exuXm-vUA-KqQ@mail.gmail.com>
-	<CAGG=3QVkd9Vb9a=pQ=KwhKzGJXaS+6Mk5K+JtBqamj15MzT9mQ@mail.gmail.com>
-	<20250303201509.32f6f062@pumpkin>
-	<CAGG=3QV1iDn2r39v5eroO+kCvpbmJNtSeqJS+fpwb4vBG67z=w@mail.gmail.com>
-	<20250303224216.30431b1d@pumpkin>
-	<7BC89461-A060-462A-9B42-7C0138AA0307@zytor.com>
-	<CAGG=3QUnUQL2=YxN2ozwSba2A_x-S7sAEUP5oGhCWOzu4Q9SQA@mail.gmail.com>
-	<20250304043223.68ed310f@pumpkin>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lZVbiJ2V"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741122900; x=1772658900;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=2c9T0m0Gf6sY4ejPh7DEwJA2ghf3mxtt0qC6ml/EF/A=;
+  b=lZVbiJ2VEnaf/X1TKJY1fgERtbdzOLbBKUh04P28LseG008lszF2USIq
+   oCbYo7grjKHawLvvHtd8bRZ4AcycgSRTVJ/Smz7adbDqg58jMr1LaHH39
+   l73BXw9oeMQNbeUvnmBnEAePM9x6/h/NowFqZBwmINcz4+zuMg05l1Q99
+   IJGg2wlQHCecOAIxVO+sjZayXO9SkoGJBUADThAwWozVTWeOKvHPoLbY0
+   5+Y7g6gTHgBNZiYymkJYLrcNFopRYAiIImc1xHByMQQJ6lLO9LIq1CojD
+   jD5oq/ki0UHEATKY4CCLmEl5Sl2r2PmUEh0LoIMuMCOxuGwK6LzXwzJMT
+   w==;
+X-CSE-ConnectionGUID: MAaAL1V8TR22pZKrSRlw6g==
+X-CSE-MsgGUID: gI70i1VpSdyOFESmGUXGNQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11363"; a="44872928"
+X-IronPort-AV: E=Sophos;i="6.14,221,1736841600"; 
+   d="scan'208";a="44872928"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 13:14:59 -0800
+X-CSE-ConnectionGUID: hCGssvDiQz+ISpr+0qw6Cg==
+X-CSE-MsgGUID: DMey8MszQQOT2Q2fRTzgeA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,221,1736841600"; 
+   d="scan'208";a="118491993"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa007.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Mar 2025 13:14:58 -0800
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Tue, 4 Mar 2025 13:14:57 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Tue, 4 Mar 2025 13:14:57 -0800
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.41) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Tue, 4 Mar 2025 13:14:57 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=CMCVP7OPtW8cqj1uUeJ32p+7/dP6A4HiqCQog0cekC1DD2J6cUrwluH5+e3dIxe4B2ww+AATBmb2MsZJ/cIj3hVLqq19aMj9xBZwnOLZceEByLrsaMs8NJto6GJL6BhjorJRtrshgY7Kj/CAXFOmItOdb1TflWFtkwiy0EHBnJpCkexaj5zZA4CwqKHcSHS0Y3rUvrjm4xkeWP2QUunaW4WvTMynaPh0tiZHxdOyZU2hN4sxgEgxlN7ozF6RRG+q7SNVmyXpTe2qVvIQNfVDY3uZG8wKS0moRvPznRYtn7XOSkdx5vBZA/29VgTWDO6wO0/rC803mbBHFS5k8Vk8PA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/zIovk2SEcfyV4cpMNdJ89aCez+KbNEU6xgYCHdvakI=;
+ b=Al05E8FVtBPzzbSrkiKinnyvGA6MlWOVfwJoSO6+HfrqtX9IHIEdRcEHGIz0cbtbswik6Kj1lCm49RhufzvaTl7+vKmF/ji4ZfPd6gsUDSwAki+GY2tPqpNQxJzSk5A3hzYpbkqj8JHz3k25FkfOgxdUfms3v6DfBGC3Muo+td7eElj5xQcaKVhuKhuYHbv4VZU/DBa7Aoetn6B2LNchq3cQN0Ez2hkJSI+UIHXuyMaiX9ymwP7OFL70c6ScAaVMQxxbk/Xr6A8YIgrt+49A6wX/WTaTwJVpPzCoIxMUTZQl9BqEtHQwu8PdOrvWSwCpsRQD6UHdF23AUX17ppH//w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from SA3PR11MB8120.namprd11.prod.outlook.com (2603:10b6:806:2f3::7)
+ by MN0PR11MB6183.namprd11.prod.outlook.com (2603:10b6:208:3c5::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.28; Tue, 4 Mar
+ 2025 21:14:40 +0000
+Received: from SA3PR11MB8120.namprd11.prod.outlook.com
+ ([fe80::3597:77d7:f969:142c]) by SA3PR11MB8120.namprd11.prod.outlook.com
+ ([fe80::3597:77d7:f969:142c%5]) with mapi id 15.20.8489.025; Tue, 4 Mar 2025
+ 21:14:40 +0000
+From: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+CC: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>, "hannes@cmpxchg.org"
+	<hannes@cmpxchg.org>, "yosry.ahmed@linux.dev" <yosry.ahmed@linux.dev>,
+	"nphamcs@gmail.com" <nphamcs@gmail.com>, "chengming.zhou@linux.dev"
+	<chengming.zhou@linux.dev>, "usamaarif642@gmail.com"
+	<usamaarif642@gmail.com>, "ryan.roberts@arm.com" <ryan.roberts@arm.com>,
+	"21cnbao@gmail.com" <21cnbao@gmail.com>, "ying.huang@linux.alibaba.com"
+	<ying.huang@linux.alibaba.com>, "akpm@linux-foundation.org"
+	<akpm@linux-foundation.org>, "linux-crypto@vger.kernel.org"
+	<linux-crypto@vger.kernel.org>, "davem@davemloft.net" <davem@davemloft.net>,
+	"clabbe@baylibre.com" <clabbe@baylibre.com>, "ardb@kernel.org"
+	<ardb@kernel.org>, "ebiggers@google.com" <ebiggers@google.com>,
+	"surenb@google.com" <surenb@google.com>, "Accardi, Kristen C"
+	<kristen.c.accardi@intel.com>, "Feghali, Wajdi K"
+	<wajdi.k.feghali@intel.com>, "Gopal, Vinodh" <vinodh.gopal@intel.com>,
+	"Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
+Subject: RE: [PATCH v7 01/15] crypto: acomp - Add synchronous/asynchronous
+ acomp request chaining.
+Thread-Topic: [PATCH v7 01/15] crypto: acomp - Add synchronous/asynchronous
+ acomp request chaining.
+Thread-Index: AQHbiceipagPZZbS/Eew6cUUvSsjl7NidnWAgAEFWEA=
+Date: Tue, 4 Mar 2025 21:14:40 +0000
+Message-ID: <SA3PR11MB812018111A1903EC4889523EC9C82@SA3PR11MB8120.namprd11.prod.outlook.com>
+References: <20250228100024.332528-1-kanchana.p.sridhar@intel.com>
+ <20250228100024.332528-2-kanchana.p.sridhar@intel.com>
+ <Z8aNY5TFj_-os4Fd@gondor.apana.org.au>
+In-Reply-To: <Z8aNY5TFj_-os4Fd@gondor.apana.org.au>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA3PR11MB8120:EE_|MN0PR11MB6183:EE_
+x-ms-office365-filtering-correlation-id: 27ac08ab-edd2-4b8d-3c84-08dd5b6193bc
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?MJjvCsVeZlDhSCgfH5aOBZN330P5L2FFXekk/NVDfM81OkFFdXL4MeENs3A4?=
+ =?us-ascii?Q?fc56TU9yIKYEEwI3vRgyNVSkHTxe4tLy2X8x8l5y2Ae/crvpMNLmbIHGYwfy?=
+ =?us-ascii?Q?oM5ABxdZJU9XWUk+FJnl+29lqZCQeG96d0k5uGuSxyZGXjQlu6sGKmVISrBg?=
+ =?us-ascii?Q?MTLRv7GZX/YOcmfr24pEQOcR7ANi4PJ/iQ7H7aJjqIMUgyN/764eFv8XCnP+?=
+ =?us-ascii?Q?FzqLpWWhaKamoTBUUK8ETeeNak8Dv4iu6Rlvk0Kx1agexRctNHycCkDYExx9?=
+ =?us-ascii?Q?cNbRIwwaoFkv8N5ZeSSOBhcK0W7Cnz2XTBBxxqTJcZTindXjbT+gCKXcizh4?=
+ =?us-ascii?Q?7aJRxqdsafTa/5SZ2ENlSGRNOnZGOohoT5g9hyYmSMrb49CAjxB1V8E52E5W?=
+ =?us-ascii?Q?tEszlPkHmjME9MJoHSGvNgL2SgffzCWVaWiETDV9HkW7Sqsi5FQyrzP486Yz?=
+ =?us-ascii?Q?sCp2RI3T+H74Unl5k0g/1WvREHsta32x8fOBLYAG8B688B0GnPJ3gQDTLQr8?=
+ =?us-ascii?Q?O51ydQBC+MxdseQkii09z1SokA5VCoub+Oy2aCKZn+2D7kWalBLuny9YUboi?=
+ =?us-ascii?Q?nSAi+0KnqkYsyqMJ1CDfJ18AFVkQ+sw6ZSMXtprKIEvqXqadFK4IVZ7f3MnS?=
+ =?us-ascii?Q?pqjN4CeAPmKANqo2TJ4QeHk5oVdQ4BqdrIfaIBKKRgDKQCt91LIKAHh+re81?=
+ =?us-ascii?Q?Hv3/+AlSl0hU0nnOzjHjRZ9g2Z/BJjzxA6YuqjKwqFcw/2vQ2OYdeFi29/pH?=
+ =?us-ascii?Q?oZr4zs25kPbk78/hkqhr7HQQxhlg45RfnyftdpaC8BrAkebJmJRYZeOcEZjS?=
+ =?us-ascii?Q?DAmBzcU098zGBUW3V8tKUqOgHfTt14qHUkvu+itAIDUSA0wn9O9z3aDeLrXr?=
+ =?us-ascii?Q?QH/vIHYaj4WLFO7D1pLpMh1BHNpvfFeofKMolXkmIeVp5K7+3qyDGG4DlogO?=
+ =?us-ascii?Q?NQWJAtNDFDqO16atWXYkxy3ohCwipXJW7SCaotSrAHMH+3XAyqXG0xoxjOmF?=
+ =?us-ascii?Q?QokaHgg+6yTBrJQs1DrFLeclu1OXTrMbNzv5f31LGAn+FgbQFegYIw3u6bfU?=
+ =?us-ascii?Q?0j9g4sYC7HthFxv+CSLJTlkLIK21MUK4NSBLXjoIGSUlwCHo0KTGHQPI2nXp?=
+ =?us-ascii?Q?wWz1ndCt3WXHTTrO5M9hSGqOF2hvYe9h4a8UkAF2FO82xomIlHbmp/V9P2IB?=
+ =?us-ascii?Q?zM1AuMMfWMuybQ9w6ebmeGASThdAlvlrbili8qmHjkGcDVso65+3L9aq7wFe?=
+ =?us-ascii?Q?P2yc/MFlgROoJMfC7HxrWHuNCa2vs4murME71fl6qujmcr8k0XS/8ujir2Oo?=
+ =?us-ascii?Q?F7qAJOMH82KQGH9tkkZJQ1exKCEg5DGVZi2AEi/HLW/Ri/9Cs2Hc8pjvGTbU?=
+ =?us-ascii?Q?9TsFQ5qlE8z9+lxosRwf32sOlJlJxWA2vdySGmEtTbCoSuWSBA=3D=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR11MB8120.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?voMAy/gfSENYWqrcwhrKKllXRIveYNSKQW7ewzXiRNRm9QFY7D737GG0Oheu?=
+ =?us-ascii?Q?GvxreN7t36qO4KXWwE6sbn3JZ1BgbLExesATpMi7rwqpCFsg61EeKH7DYIzm?=
+ =?us-ascii?Q?DqNYYHzlV1Pnz8A5pypDu3an4fybukwOx2+drB/uSfi+zE4pKei99yjGNs6m?=
+ =?us-ascii?Q?Tb1wthwB1h4D346ZSoWWT7YG3N0lFUxuyCKfey90wM46X/nDiv+A+vVJf/+Z?=
+ =?us-ascii?Q?TpVp4jBYc3IjnAwUzz9YvWnK0cuIKwcWkQiSjIcmH84FFo/r4q3PjjnMexoH?=
+ =?us-ascii?Q?wa+Fsdh7TCHIutr1D2RYIXcq9vPsVrkQRcZKQXmK7QlFPYy6HH+IlDcHWjPK?=
+ =?us-ascii?Q?Fe1V2F0aQX1SN/Is0BVQ21DshCLgp4ADMN0I1kL7jn+1bNgarZk9SCB2cvIb?=
+ =?us-ascii?Q?TKfbqBxS2kOsCt82ZczgMoP3F+Q0iNmvGcLAOy7z1GEwP44x11LQ1Bbe6cpy?=
+ =?us-ascii?Q?MuSR2S7JurUIwcypo6Yw0Ih55ZnCNjvqroY0dJU+eIvoFjRq796tH7bVYO/v?=
+ =?us-ascii?Q?jTULPanwQgc7UtjKrwt0H/rs2v0Lr4De6lsosMk6eCUsAIxFRQbWO2tabxbO?=
+ =?us-ascii?Q?ZyKd78ppEQ2gC82sOE+pg2V5+jfi1w8y4zI7woySmxiuX7TmD9J/uJ1lTsqV?=
+ =?us-ascii?Q?6gMGiNptxRnuJGalzo+kP2ciGOSL3x+U/xiPQbW9YQXVJK2vbtOmI+QYjvdN?=
+ =?us-ascii?Q?Aw0XHY5dAptA8q82suLYISEUXDezVxCsz83Om2N65ai6O19FMJfKSy9NTk7u?=
+ =?us-ascii?Q?TZvr043mdpd18e2ePMZAYwRiMgnIizrS8vt72IjJF7noKv3jPeFk+rD0kInx?=
+ =?us-ascii?Q?Q2zW7+HE5EJrppWDdAQ17LhbFpVPGD3CFLCQlj+pKin+bHuD5zICokRcGKTO?=
+ =?us-ascii?Q?M8HHAl3CCP8vRsavO1ilu4UKXIhkCtQgEWlym4Y3C+CkPfv8MFf/HsBFuMRN?=
+ =?us-ascii?Q?ut+fbB6qwZIO2EHGuswQLBm0FnJI68UacCvd9vpuKekakTNYFDrJCep3JoI7?=
+ =?us-ascii?Q?wJAhKGg7HyHu4Dimlhh43m0uFKLnyHBYhSO2YYDpt6MuHRJPb7r3SS+llRx0?=
+ =?us-ascii?Q?odP2fXP8KvVBpdo/pStCn+EDMkxm/C1PqDCFPlTf9UjDnzNfp+Je6XbOVPiT?=
+ =?us-ascii?Q?pbhC62TR8PCwc7EbY6IobxiiCMzKFNSrIHKXtNgDv7ptclg3GfRZjg4Ku3JV?=
+ =?us-ascii?Q?P10qhiHfL/Z1utNR/Dtbt01oha6azQmBfPMfrRCIX/fgBoGIuWyMraHrlTjE?=
+ =?us-ascii?Q?ohBV2zg+OMiB9a0jTiiXLQ+dnvK/IpKsvTTRwucLOBP1K8gIlthGvZjdgYov?=
+ =?us-ascii?Q?+e3GOaBHS40SV04VDl/FUSHBRrbVNGfeaLGp0kw14vD9XB4Eiu4TedJgi7jI?=
+ =?us-ascii?Q?OpEimgJppoVhnpaNcuNoOgdLzyBQYCPCiAa/zLCiI/6FnU/l9LSZaMYGK/Hp?=
+ =?us-ascii?Q?vxq60hhu9ujpeA3hlKQeJDUa2l/AMWZ4W4JfgYrzvGIMXqHOmm634W+ec7gq?=
+ =?us-ascii?Q?D1HxOAHw1nTyrm+Kg1/pDtnMS4dHeLYW1JeLnPBtPImhYe45sDam/eCsj/Vb?=
+ =?us-ascii?Q?vc7gGKDcqHdbgEJaldLYy8fLIMZnug1PZyBqchWYj8wxj/7KSsob0/hsTHgi?=
+ =?us-ascii?Q?tg=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-
-On Tue, 4 Mar 2025 04:32:23 +0000
-David Laight <david.laight.linux@gmail.com> wrote:
-
-....
-> > For reference, GCC does much better with code gen, but only with the builtin:
-> > 
-> > .L39:
-> >         crc32q  (%rax), %rbx    # MEM[(long unsigned int *)p_40], tmp120
-> >         addq    $8, %rax        #, p
-> >         cmpq    %rcx, %rax      # _37, p
-> >         jne     .L39    #,  
-> 
-> That looks reasonable, if Clang's 8 unrolled crc32q is faster per byte
-> then you either need to unroll once (no point doing any more) or use
-> the loop that does negative offsets from the end.
-
-Thinking while properly awake the 1% difference isn't going to be a
-difference between the above and Clang's unrolled loop.
-Clang's loop will do 8 bytes every three clocks, if the above is slower
-it'll be doing 8 bytes in 4 clocks (ok, you can get 3.5 - but unlikely)
-which would be either 25% or 33% depending which way you measure it.
-
-...
-> I'll find the code loop I use - machine isn't powered on at the moment.
-
-#include <linux/perf_event.h>
-#include <sys/mman.h>
-#include <sys/syscall.h>
-
-static int pmc_id;
-static void init_pmc(void)
-{
-        static struct perf_event_attr perf_attr = {
-                .type = PERF_TYPE_HARDWARE,
-                .config = PERF_COUNT_HW_CPU_CYCLES,
-                .pinned = 1,
-        };
-        struct perf_event_mmap_page *pc;
-
-        int perf_fd;
-        perf_fd = syscall(__NR_perf_event_open, &perf_attr, 0, -1, -1, 0);
-        if (perf_fd < 0) {
-                fprintf(stderr, "perf_event_open failed: errno %d\n", errno);
-                exit(1);
-        }
-        pc = mmap(NULL, 4096, PROT_READ, MAP_SHARED, perf_fd, 0);
-        if (pc == MAP_FAILED) {
-                fprintf(stderr, "perf_event mmap() failed: errno %d\n", errno);
-                exit(1);
-        }
-        pmc_id = pc->index - 1;
-}
-
-static inline unsigned int rdpmc(id)
-{
-        unsigned int low, high;
-
-// You need something to force the instruction pipeline to finish.
-// lfence might be enough.
-#ifndef NOFENCE
-        asm volatile("mfence");
-#endif
-        asm volatile("rdpmc" : "=a" (low), "=d" (high) : "c" (id));
-#ifndef NOFENCE
-        asm volatile("mfence");
-#endif
-
-        // return low bits, counter might to 32 or 40 bits wide.
-        return low;
-}
-
-The test code is then something like:
-#define PASSES 10
-        unsigned int ticks[PASSES];
-        unsigned int tick;
-        unsigned int i;
-
-        for (i = 0; i < PASSES; i++) {
-                tick = rdpmc(pmc_id);
-                test_fn(buf, len);
-                ticks[i] = rdpmc(pmc_id) - tick;
-        }
-
-        for (i = 0; i < PASSES; i++)
-                printf(" %5d", ticks[i]);
-
-Make sure the data is in the l1-cache (or that dominates).
-The values output for passes 2-10 are likely to be the same to within
-a clock or two.
-I probably tried to subtract an offset for an empty test_fn().
-But you can easily work out the 'clocks per loop iteration'
-(which is what you are trying to measure) by measuring two separate
-loop lengths.
-
-I did find that sometimes running the program gave slow results.
-But it is usually very consistent.
-Needs to be run as root.
-Clearly a hardware interrupt will generate a very big number.
-But they don't happen.
-
-The copy I found was used for measuring ip checksum algorithms.
-Seems to output:
-$ sudo ./ipcsum 
-                0     0   160   160   160   160   160   160   160   160   160   160  overhead
- 3637b4f0b942c3c4  682f   316    25    26    26    26    26    26    26    26    26  csum_partial
- 3637b4f0b942c3c4  682f   124    79    43    25    25    25    24    26    25    24  csum_partial_1
- 3637b4f0b942c3c4  682f   166    43    25    25    24    24    24    24    24    24  csum_new adc pair
- 3637b4f0b942c3c4  682f   115    21    21    21    21    21    21    21    21    21  adc_dec_2
- 3637b4f0b942c3c4  682f    97    34    31    23    24    24    24    24    24    23  adc_dec_4
- 3637b4f0b942c3c4  682f    39    33    34    21    21    21    21    21    21    21  adc_dec_8
- 3637b4f0b942c3c4  682f    81    52    49    52    49    26    25    27    25    26  adc_jcxz_2
- 3637b4f0b942c3c4  682f    62    46    24    24    24    24    24    24    24    24  adc_jcxz_4
- 3637b4f0b942c3c4  682f   224    40    21    21    23    23    23    23    23    23  adc_2_pair
- 3637b4f0b942c3c4  682f    42    36    37    22    22    22    22    22    22    22  adc_4_pair_old
- 3637b4f0b942c3c4  682f    42    37    34    41    23    23    23    23    23    23  adc_4_pair
- 3637b4f0b942c3c4  682f   122    19    20    19    18    19    18    19    18    19  adcx_adox
-        bef7a78a9  682f   104    51    30    30    30    30    30    30    30    30  add_c_16
-        bef7a78a9  682f   143    50    50    27    27    27    27    27    27    27  add_c_32
-        6ef7a78ae  682f   103    91    45    34    34    34    35    34    34    34  add_c_high
-
-I don't think the current one is in there - IIRC it is as fast as the adcx_adox one
-but more portable.
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR11MB8120.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 27ac08ab-edd2-4b8d-3c84-08dd5b6193bc
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Mar 2025 21:14:40.4764
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 4iEYcJUc0azARWz45kmgrxCqViEKBBnorqcY5tFpQEDrMlXXLDU3+ZS1lwgFCaAfIJLXgvH+0SQewGJUQUC7axN5avCY5CzonadJbTMz+/A=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR11MB6183
+X-OriginatorOrg: intel.com
 
 
-	David
- 
+> -----Original Message-----
+> From: Herbert Xu <herbert@gondor.apana.org.au>
+> Sent: Monday, March 3, 2025 9:20 PM
+> To: Sridhar, Kanchana P <kanchana.p.sridhar@intel.com>
+> Cc: linux-kernel@vger.kernel.org; linux-mm@kvack.org;
+> hannes@cmpxchg.org; yosry.ahmed@linux.dev; nphamcs@gmail.com;
+> chengming.zhou@linux.dev; usamaarif642@gmail.com;
+> ryan.roberts@arm.com; 21cnbao@gmail.com;
+> ying.huang@linux.alibaba.com; akpm@linux-foundation.org; linux-
+> crypto@vger.kernel.org; davem@davemloft.net; clabbe@baylibre.com;
+> ardb@kernel.org; ebiggers@google.com; surenb@google.com; Accardi,
+> Kristen C <kristen.c.accardi@intel.com>; Feghali, Wajdi K
+> <wajdi.k.feghali@intel.com>; Gopal, Vinodh <vinodh.gopal@intel.com>
+> Subject: Re: [PATCH v7 01/15] crypto: acomp - Add
+> synchronous/asynchronous acomp request chaining.
+>=20
+> On Fri, Feb 28, 2025 at 02:00:10AM -0800, Kanchana P Sridhar wrote:
+> >
+> >  Step 2: Process the request chain using the specified compress/decompr=
+ess
+> >          "op":
+> >
+> >   2.a) Synchronous: the chain of requests is processed in series:
+> >
+> >        int acomp_do_req_chain(struct acomp_req *req,
+> >                               int (*op)(struct acomp_req *req));
+> >
+> >   2.b) Asynchronous: the chain of requests is processed in parallel usi=
+ng a
+> >        submit-poll paradigm:
+> >
+> >        int acomp_do_async_req_chain(struct acomp_req *req,
+> >                                     int (*op_submit)(struct acomp_req *=
+req),
+> >                                     int (*op_poll)(struct acomp_req *re=
+q));
+> >
+> > Request chaining will be used in subsequent patches to implement
+> > compress/decompress batching in the iaa_crypto driver for the two
+> supported
+> > IAA driver sync_modes:
+> >
+> >   sync_mode =3D 'sync' will use (2.a),
+> >   sync_mode =3D 'async' will use (2.b).
+>=20
+> There shouldn't be any sync/async toggle.  The whole zswap code is
+> synchronous only and it makes zero sense to expose this to the user.
+> Just do whatever is the fastest from the driver's point of view.
+
+These sync/async modes are mentioned here to distinguish between how=20
+request chaining will be supported from the iaa_crypto driver's perspective=
+.
+As you are aware, the iaa_crypto driver supports a fully synchronous mode
+(sync_mode =3D 'sync') and a fully asynchronous, non-irq mode (sync_mode =
+=3D 'async').
+
+As mentioned in the cover letter, from zswap's perspective, the calls to cr=
+ypto
+are exactly the same whether or not batching (with request chaining) or seq=
+uential
+compressions are used:
+
+crypto_wait_req(crypto_acomp_compress(acomp_ctx->reqs[0]), &acomp_ctx->wait=
+);
 
 
+>=20
+> I've actually implemented acomp chaining in my tree and I will be
+> reposting soon.
+
+Thanks for the update. I took at look at your v2 [1], and will provide some
+code review comments in [1]. My main open question is, how is this supposed
+to work for iaa_crypto's submit-poll paradigm which is crucial to derive th=
+e=20
+benefits of hardware parallelism? IIUC, your v2 acomp request chaining only
+works in fully synchronous mode, correct me if I am wrong.
+
+In fact, at the start of "acomp_do_req_chain()", if the algorithm has opted=
+ in to
+request chaining, it returns after processing the first request, without pr=
+ocessing
+the chained requests. These are some of the issues I had to resolve when us=
+ing
+the ahash reference implementation you provided, to develop my version of
+acomp_do_request_chain() and acomp_do_async_request_chain() in patch 1
+of my series.
+
+I see that in your v2, you have introduced support for virtual addresses. O=
+ne
+suggestion I have is, can you please incorporate my implementation of acomp
+request chaining (for both the above APIs) in a v3 of your patch-series tha=
+t
+enables both, acomp_do_async_request_chain() and acomp_do_request_chain(),
+fixes some of the issues I pointed out above, and adds in the virtual addre=
+ss
+support. Please let me know if this would be a good way for us to proceed i=
+n
+getting zswap to realize the benefits of IAA batch compressions.
+
+[1] https://patchwork.kernel.org/project/linux-mm/patch/a11883ded326c4f4f80=
+dcf0307ad05fd8e31abc7.1741080140.git.herbert@gondor.apana.org.au/
+
+Thanks,
+Kanchana
+
+>=20
+> Cheers,
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
