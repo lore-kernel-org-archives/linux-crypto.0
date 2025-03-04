@@ -1,48 +1,48 @@
 Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19130BA2D;
-	Tue,  4 Mar 2025 23:52:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58E762780F3;
+	Tue,  4 Mar 2025 23:57:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741132367; cv=none; b=cUmgiM7hA9VVPUnBzikhFxZPtOYR9/MqDUiXiArkhrfTsmxrCYky+ZzsukjADT2OEZlSuhIh4TKhhSZCYKt6m+8NHIX6P0vRYOOmzY9xLWpg7oWQGZcjwmVmcaRY3mup3omnogd+aYj+6wc9KfooOCWcBY5wHNM2dKvCGNPzqUM=
+	t=1741132678; cv=none; b=Uj0kugWEbX2Kd40rarLDgnQm5p3ZxuyHzTK6DJNx/yvqhf2S1JdYVe3jIqXMhohyg/jQBSpGjGXSCURvzDxS3rbZAKSC90+uLzgHNaaa9NttNK7Ps2PxszfWhp1y8d9p4Qe9jRwpQnKl0G7YeSdhAGaf/U78Y1yghqyVep52eec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741132367; c=relaxed/simple;
-	bh=GzAWcRX8mnhoy6yRVM2yOlxSf1S1oVBL6EeNjpBBZXg=;
+	s=arc-20240116; t=1741132678; c=relaxed/simple;
+	bh=4McxKMF62VjEK3ut4lduNqPf3C1DP3PVLOXSXMdGbfk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YjGocBPxpAG8rOqyC6jwNmWKW6awpIvjaaWbRjf1uJwpgwEt034jVK9VngWpqyvHDdzIKDF5Hynsx102LjK3fvNK3JDWmChi+hiGfe6wJYHhJSZNqAB1StLqcE+DQuD2riWAmASaIexNkhyHhk7c2SfMSxHSuCz1CYlMRWKiHus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=4sw8nYkh; arc=none smtp.client-ip=199.89.3.6
+	 In-Reply-To:Content-Type; b=siSYMKWO9GksCwS0+x755bgtFwNcXHlNbcCAgw+Av/sNh+eS+dSXtHOalneWk7ibhi4pga0BXr/nIxRKA5PZaKpacUwS9U9JqTopDO41S7YqLCCw+YooOB4bc3qRNXXuzPjJkyg8kcl/EyKYbsojtP79SSa0GwI5ghq3NCbZULk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=qqoYoMyB; arc=none smtp.client-ip=199.89.3.6
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="4sw8nYkh"
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="qqoYoMyB"
 Received: from localhost (localhost [127.0.0.1])
-	by 003.mia.mailroute.net (Postfix) with ESMTP id 4Z6stj0T4SzlgrvY;
-	Tue,  4 Mar 2025 23:52:45 +0000 (UTC)
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4Z6t0h0vB0zlgrvY;
+	Tue,  4 Mar 2025 23:57:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
 	content-transfer-encoding:content-type:content-type:in-reply-to
 	:from:from:content-language:references:subject:subject
 	:user-agent:mime-version:date:date:message-id:received:received;
-	 s=mr01; t=1741132359; x=1743724360; bh=GMUyDP6N1T2OZYC0PjNUXiLu
-	v++Na4Olt6GZl9AIPwU=; b=4sw8nYkhaUEoGORzhJxVvAjHU1kyb2RGNRxtDfQw
-	c+G7yier0o5K0TbZh73+BUqMRzG397oIgrZTzi0NmPRT96cSuBn4yKGGihJQp3BF
-	tKPlSFgLHNERJ53xf9piyxjULnOXdrbJgMDbCTu+/JoBDxNfs9L5WavRIfQ5VLWU
-	a6HM5S1iFwFXqwgn2f9s98tdd3GRKkHHcTu94WJVQJguR77pEkSwuh0lsD6kuz8T
-	CEMVlwLJOjwbc5F52M0pQ8SKtnAX5qYTjGvxj9wS9xF5Jfuq6pN83z3fOIYe2aAN
-	I/8Pqi23m9B/8+ScDhKPflojL8YU8I0FetyfvYvWIlf42g==
+	 s=mr01; t=1741132670; x=1743724671; bh=4McxKMF62VjEK3ut4lduNqPf
+	3C1DP3PVLOXSXMdGbfk=; b=qqoYoMyBHVEcDMNVTCouq3hF+nsCT48DBMIz5Baq
+	VCDAEXiCU9AbPaEls8Hm3Na6O6ym50iawu3rOkOFIgtdroAZiqUEi+vSrmZPizXK
+	gIxo7Hllokqnl2QlNNTtcxO7EltAFZKC1C4QpbdC+v2dPOgczJON3NvQTrjPiTEl
+	XCCJx1zRFBPhIaRCiFY0LHQO+N5+vr7nBL0nJZKDfhdueg1jeb7PERp3gNolegYO
+	DGMdm3Cgwnkyg+r+p1JHe2QHkoec+2x4IJIQ/S1nI76AbB3zqRgbr2wyE7rIqHki
+	bqF0RNrXbcGkIP6FH3aOi0npqneFCOAjnqNAcBhPQh1jbg==
 X-Virus-Scanned: by MailRoute
 Received: from 003.mia.mailroute.net ([127.0.0.1])
  by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
- id f2biFBQdsyo0; Tue,  4 Mar 2025 23:52:39 +0000 (UTC)
+ id KN14XilGcEh4; Tue,  4 Mar 2025 23:57:50 +0000 (UTC)
 Received: from [172.20.1.83] (unknown [192.80.0.138])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: bvanassche@acm.org)
-	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4Z6st14hQLzlgrtN;
-	Tue,  4 Mar 2025 23:52:08 +0000 (UTC)
-Message-ID: <41a14b09-9f09-4abe-8caa-89cfe2687562@acm.org>
-Date: Tue, 4 Mar 2025 15:52:07 -0800
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4Z6t010HfGzlgrvV;
+	Tue,  4 Mar 2025 23:57:19 +0000 (UTC)
+Message-ID: <3d18d4cf-65bd-4623-bc23-1a0ae350e29b@acm.org>
+Date: Tue, 4 Mar 2025 15:57:18 -0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -50,7 +50,8 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 03/34] compiler-capability-analysis: Add test stub
+Subject: Re: [PATCH v2 06/34] cleanup: Basic compatibility with capability
+ analysis
 To: Marco Elver <elver@google.com>
 Cc: "David S. Miller" <davem@davemloft.net>,
  Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
@@ -77,31 +78,23 @@ Cc: "David S. Miller" <davem@davemloft.net>,
  llvm@lists.linux.dev, rcu@vger.kernel.org, linux-crypto@vger.kernel.org,
  linux-serial@vger.kernel.org
 References: <20250304092417.2873893-1-elver@google.com>
- <20250304092417.2873893-4-elver@google.com>
+ <20250304092417.2873893-7-elver@google.com>
 Content-Language: en-US
 From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20250304092417.2873893-4-elver@google.com>
+In-Reply-To: <20250304092417.2873893-7-elver@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 3/4/25 1:21 AM, Marco Elver wrote:
-> +#include <linux/build_bug.h>
-> +
-> +/*
-> + * Test that helper macros work as expected.
-> + */
-> +static void __used test_common_helpers(void)
-> +{
-> +	BUILD_BUG_ON(capability_unsafe(3) != 3); /* plain expression */
-> +	BUILD_BUG_ON(capability_unsafe((void)2; 3;) != 3); /* does not swallow semi-colon */
-> +	BUILD_BUG_ON(capability_unsafe((void)2, 3) != 3); /* does not swallow commas */
-> +	capability_unsafe(do { } while (0)); /* works with void statements */
-> +}
+> Due to the scoped cleanup helpers used for lock guards wrapping
+> acquire/release around their own constructors/destructors that store
+> pointers to the passed locks in a separate struct, we currently cannot
+> accurately annotate *destructors* which lock was released. While it's
+> possible to annotate the constructor to say which lock was acquired,
+> that alone would result in false positives claiming the lock was not
+> released on function return.
 
-Is it guaranteed that <linux/build_bug.h> includes the header file that
-defines capability_unsafe() or should that header file perhaps be
-included explicitly?
+It may be worth mentioning that Clang's thread-safety analyzer not
+supporting alias analysis plays a role here. Anyway:
 
-Thanks,
-
-Bart.
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
