@@ -1,137 +1,121 @@
-Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AAD8278116;
-	Tue,  4 Mar 2025 23:20:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
+Received: from 003.mia.mailroute.net (003.mia.mailroute.net [199.89.3.6])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54410251791;
+	Tue,  4 Mar 2025 23:25:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=199.89.3.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741130406; cv=none; b=e/wGhPN14cDGRhe2SFZeEeUXQAbh7+e8v6sOeR5vI5YPeyvX4CcHGPiyNBZXWfe6jUqgrB5TXNTaP+LRtoZNHiK78vwO6sW76GEP4TQ7irlxSiywfcMGDmNEL+maOuz0F2esHyIf5h2aS71TuHCQ70d4++xInttS5K54GQkGqfM=
+	t=1741130756; cv=none; b=cNiBWrjA6657SupUSarNYzsbhK2Rq37gXUQwpzZK8ZT2o83DYcDrSEehEbbufIXDtOPsIgKdBqR2F0Kq5mbis5n0ANulfxAVlUbdJS0SI2bX7ZUJR0i7L6JSdW69asOfBniMLcokeQki4jAWfkxaR4HzSnYK1OfWm12qwd42Guo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741130406; c=relaxed/simple;
-	bh=rxbY0OYKeF/ruyA697I5bCATkY6ZUvEuwEmFs1kOfUM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=m/Dt1v8rKWmhGjDEDHr/67xSbWSFFTx5v+9LFLF4UsfmPkom4hv1+5Aq/tu3g7VdIKEAJBGKoE5lJUCrjOpVw6Uj0D1wbHYGU0RowoAgzmBkoeao+VB4X3RNIiFdmqAdnX6XykvzRlkF+6T/JObSqu7EXcr+CfvIXZt4k9TFRj8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
-Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4Z6rn82bvXz9stM;
-	Wed,  5 Mar 2025 00:02:52 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id wPfy1sCZaY9s; Wed,  5 Mar 2025 00:02:52 +0100 (CET)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4Z6rn81Bh0z9stL;
-	Wed,  5 Mar 2025 00:02:52 +0100 (CET)
+	s=arc-20240116; t=1741130756; c=relaxed/simple;
+	bh=Kn7qVp0mzd6dkXGA461Q0CC0Zi+WOQy1ejDrsM+Tp0c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PY0Lu2pVBldCzsg8rcJjVSuswQWUoNAHkuCJXZYJ/UWrcGOcoJoW5olw8d8uZizi5+YMbm97iflV5TWa9SmftpyxP+lcojkILeoplWveIcHMbay5uAftdx5zE1ZyponChc8r2z54ruO7UgosyKCq+agcEvoEwzXq6DXxqsGL32g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org; spf=pass smtp.mailfrom=acm.org; dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b=oB13Sa1K; arc=none smtp.client-ip=199.89.3.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=acm.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=acm.org
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=acm.org header.i=@acm.org header.b="oB13Sa1K"
 Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id E81738B776;
-	Wed,  5 Mar 2025 00:02:51 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id qWXKjmuiIl6W; Wed,  5 Mar 2025 00:02:51 +0100 (CET)
-Received: from PO20335.idsi0.si.c-s.fr (unknown [192.168.202.221])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 168D68B763;
-	Wed,  5 Mar 2025 00:02:50 +0100 (CET)
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Danny Tsen <dtsen@linux.ibm.com>
-Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
-	"Breno Leitao" <leitao@debian.org>,
-	Nayna Jain <nayna@linux.ibm.com>,
-	Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Naveen N Rao <naveen@kernel.org>,
-	linux-crypto@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org,
-	Venkat Rao Bagalkote <venkat88@linux.ibm.com>
-Subject: [PATCH] crypto: powerpc: Mark ghashp8-ppc.o as an OBJECT_FILES_NON_STANDARD
-Date: Wed,  5 Mar 2025 00:02:39 +0100
-Message-ID: <7aa7eb73fe6bc95ac210510e22394ca0ae227b69.1741128786.git.christophe.leroy@csgroup.eu>
-X-Mailer: git-send-email 2.47.0
+	by 003.mia.mailroute.net (Postfix) with ESMTP id 4Z6sHh0zQFzlgrvY;
+	Tue,  4 Mar 2025 23:25:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=acm.org; h=
+	content-transfer-encoding:content-type:content-type:in-reply-to
+	:from:from:content-language:references:subject:subject
+	:user-agent:mime-version:date:date:message-id:received:received;
+	 s=mr01; t=1741130746; x=1743722747; bh=3qsqsr/Fl+QQduWnOktKAK2C
+	k7TNKvdm5JbhbYHImYI=; b=oB13Sa1K9Rm2wdjBfxycPG2tV03DAhLPL+CvoUe6
+	iprleQ2kUbK1xtasWsfBz/B8dSDtnwVmd+8j5gfKxLSCjdca5E0Wei5+3saURawR
+	5RstFsFSkaUP4iIGbEpxfkbweaCAgs9PD7Ak5+VeZ4kSVzIxC7P5H6qyypirNQfe
+	o4c8IEMBwjlMjQDAJwWJZV4b6hooN3lCFD24D3gSIARuOJvSoOOPjkYVlRWPcZ0l
+	S4lpbqtIWkU3mt9SgtgoPneUXgwq80FiJ1yLnPdko/HE7v5GR54pCX3HzbvnyhM3
+	BgGRV9afkFPNYJsCZsm9e+SBOMqq0KCW4qmsJcxVqPS5KA==
+X-Virus-Scanned: by MailRoute
+Received: from 003.mia.mailroute.net ([127.0.0.1])
+ by localhost (003.mia [127.0.0.1]) (mroute_mailscanner, port 10029) with LMTP
+ id 7g_uA6NodYDz; Tue,  4 Mar 2025 23:25:46 +0000 (UTC)
+Received: from [172.20.1.83] (unknown [192.80.0.138])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: bvanassche@acm.org)
+	by 003.mia.mailroute.net (Postfix) with ESMTPSA id 4Z6sH14gHwzlgrv9;
+	Tue,  4 Mar 2025 23:25:15 +0000 (UTC)
+Message-ID: <8a894ff8-8707-4601-b67d-7bf0496e36ce@acm.org>
+Date: Tue, 4 Mar 2025 15:25:15 -0800
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1741129359; l=2686; i=christophe.leroy@csgroup.eu; s=20211009; h=from:subject:message-id; bh=rxbY0OYKeF/ruyA697I5bCATkY6ZUvEuwEmFs1kOfUM=; b=QegfBkLIMtIn2pXyrwu9vHSHXI1g41Q0dNFUgkY3G903IcJVCl4645/HlUnQUPo95ItBmd33F HV13MubBCESC5ol+ngCq5l7/E9HpbAJBINPc6EkQXB1p97B+QaF8T8m
-X-Developer-Key: i=christophe.leroy@csgroup.eu; a=ed25519; pk=HIzTzUj91asvincQGOFx6+ZF5AoUuP9GdOtQChs7Mm0=
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 23/34] compiler-capability-analysis: Remove
+ __cond_lock() function-like helper
+To: Marco Elver <elver@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+ "Paul E. McKenney" <paulmck@kernel.org>,
+ Alexander Potapenko <glider@google.com>, Arnd Bergmann <arnd@arndb.de>,
+ Bill Wendling <morbo@google.com>, Boqun Feng <boqun.feng@gmail.com>,
+ Dmitry Vyukov <dvyukov@google.com>, Eric Dumazet <edumazet@google.com>,
+ Frederic Weisbecker <frederic@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Ingo Molnar <mingo@kernel.org>,
+ Jann Horn <jannh@google.com>, Jiri Slaby <jirislaby@kernel.org>,
+ Joel Fernandes <joel@joelfernandes.org>, Jonathan Corbet <corbet@lwn.net>,
+ Josh Triplett <josh@joshtriplett.org>, Justin Stitt
+ <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
+ Kentaro Takeda <takedakn@nttdata.co.jp>, Mark Rutland
+ <mark.rutland@arm.com>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>,
+ Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+ Peter Zijlstra <peterz@infradead.org>, Steven Rostedt <rostedt@goodmis.org>,
+ Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+ Thomas Gleixner <tglx@linutronix.de>, Uladzislau Rezki <urezki@gmail.com>,
+ Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>,
+ kasan-dev@googlegroups.com, linux-kernel@vger.kernel.org,
+ llvm@lists.linux.dev, rcu@vger.kernel.org, linux-crypto@vger.kernel.org,
+ linux-serial@vger.kernel.org
+References: <20250304092417.2873893-1-elver@google.com>
+ <20250304092417.2873893-24-elver@google.com>
+Content-Language: en-US
+From: Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20250304092417.2873893-24-elver@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The following build warning has been reported:
+On 3/4/25 1:21 AM, Marco Elver wrote:
+>   .../dev-tools/capability-analysis.rst         |  2 -
+>   Documentation/mm/process_addrs.rst            |  6 +-
+>   .../net/wireless/intel/iwlwifi/iwl-trans.c    |  4 +-
+>   .../net/wireless/intel/iwlwifi/iwl-trans.h    |  6 +-
+>   .../wireless/intel/iwlwifi/pcie/internal.h    |  5 +-
+>   .../net/wireless/intel/iwlwifi/pcie/trans.c   |  4 +-
+>   include/linux/compiler-capability-analysis.h  | 41 -------------
+>   include/linux/mm.h                            | 33 ++--------
+>   include/linux/rwlock.h                        | 11 +---
+>   include/linux/rwlock_api_smp.h                | 14 ++++-
+>   include/linux/rwlock_rt.h                     | 21 ++++---
+>   include/linux/sched/signal.h                  | 14 +----
+>   include/linux/spinlock.h                      | 45 +++++---------
+>   include/linux/spinlock_api_smp.h              | 20 ++++++
+>   include/linux/spinlock_api_up.h               | 61 ++++++++++++++++---
+>   include/linux/spinlock_rt.h                   | 26 ++++----
+>   kernel/signal.c                               |  4 +-
+>   kernel/time/posix-timers.c                    | 10 +--
+>   lib/dec_and_lock.c                            |  8 +--
+>   mm/memory.c                                   |  4 +-
+>   mm/pgtable-generic.c                          | 19 +++---
+>   tools/include/linux/compiler_types.h          |  2 -
+>   22 files changed, 160 insertions(+), 200 deletions(-)
 
-  arch/powerpc/crypto/ghashp8-ppc.o: warning: objtool: .text+0x22c: unannotated intra-function call
+Should this patch perhaps be split in one patch per subsystem (mm, 
+iwlwifi, rwlock, signal, spinlock, time)? Would that make it more likely
+that subsystem maintainers review this work? Can this patch be moved to
+the start of this series? Anyway, if others are fine with this patch and 
+its position in this patch series I'm also fine with this patch.
 
-This happens due to commit bb7f054f4de2 ("objtool/powerpc: Add support
-for decoding all types of uncond branches")
+Thanks,
 
-Disassembly of arch/powerpc/crypto/ghashp8-ppc.o shows:
-
- arch/powerpc/crypto/ghashp8-ppc.o:     file format elf64-powerpcle
-
- Disassembly of section .text:
-
- 0000000000000140 <gcm_ghash_p8>:
-   140:    f8 ff 00 3c     lis     r0,-8
- ...
-   20c:    20 00 80 4e     blr
-   210:    00 00 00 00     .long 0x0
-   214:    00 0c 14 00     .long 0x140c00
-   218:    00 00 04 00     .long 0x40000
-   21c:    00 00 00 00     .long 0x0
-   220:    47 48 41 53     rlwimi. r1,r26,9,1,3
-   224:    48 20 66 6f     xoris   r6,r27,8264
-   228:    72 20 50 6f     xoris   r16,r26,8306
-   22c:    77 65 72 49     bla     1726574 <gcm_ghash_p8+0x1726434>      <==
- ...
-
-It corresponds to the following code in ghashp8-ppc.o :
-
- _GLOBAL(gcm_ghash_p8)
-    lis    0,0xfff8
- ...
-    blr
- .long    0
- .byte    0,12,0x14,0,0,0,4,0
- .long    0
- .size    gcm_ghash_p8,.-gcm_ghash_p8
-
- .byte 71,72,65,83,72,32,102,111,114,32,80,111,119,101,114,73,83,65,32,50,46,48,55,44,32,67,82,89,80,84,79,71,65,77,83,32,98,121,32,60,97,112,112,114,111,64,111,112,101,110,115,115,108,46,111,114,103,62,0
- .align    2
- .align    2
-
-In fact this is raw data that is after the function end and that is
-not text so shouldn't be disassembled as text. But ghashp8-ppc.S is
-generated by a perl script and should have been marked as
-OBJECT_FILES_NON_STANDARD.
-
-Now that 'bla' is understood as a call instruction, that raw data
-is mis-interpreted as an infra-function call.
-
-Mark ghashp8-ppc.o as a OBJECT_FILES_NON_STANDARD to avoid this
-warning.
-
-Reported-by: Venkat Rao Bagalkote <venkat88@linux.ibm.com>
-Closes: https://lore.kernel.org/all/8c4c3fc2-2bd7-4148-af68-2f504d6119e0@linux.ibm.com
-Cc: Danny Tsen <dtsen@linux.ibm.com>
-Fixes: 109303336a0c ("crypto: vmx - Move to arch/powerpc/crypto")
-Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
----
- arch/powerpc/crypto/Makefile | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/arch/powerpc/crypto/Makefile b/arch/powerpc/crypto/Makefile
-index 9b38f4a7bc15..2f00b22b0823 100644
---- a/arch/powerpc/crypto/Makefile
-+++ b/arch/powerpc/crypto/Makefile
-@@ -51,3 +51,4 @@ $(obj)/aesp8-ppc.S $(obj)/ghashp8-ppc.S: $(obj)/%.S: $(src)/%.pl FORCE
- OBJECT_FILES_NON_STANDARD_aesp10-ppc.o := y
- OBJECT_FILES_NON_STANDARD_ghashp10-ppc.o := y
- OBJECT_FILES_NON_STANDARD_aesp8-ppc.o := y
-+OBJECT_FILES_NON_STANDARD_ghashp8-ppc.o := y
--- 
-2.47.0
-
+Bart.
