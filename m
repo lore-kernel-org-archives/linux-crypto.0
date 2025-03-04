@@ -1,118 +1,121 @@
-Received: from mail-ej1-f73.google.com (mail-ej1-f73.google.com [209.85.218.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AD412066CC
-	for <linux-crypto@vger.kernel.org>; Tue,  4 Mar 2025 09:26:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 817411FC7F8;
+	Tue,  4 Mar 2025 11:21:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741080404; cv=none; b=bQ3LHy3oGjLPQZA50NUF0HsH+2pe5bEK+F3mRc2uTcvCT5m89U6ecb8PqwxdLLOW4TucLFtKvQoL2HAeweurjJdQDSeEpC9GU/DPG7XnvP8XZf1HATwO4p6VtWBVYWD7QJMRjC4nTkDGPpKPJybWoyT+rlVfODCI8Yh2Hk8UR0s=
+	t=1741087304; cv=none; b=lj6DnEhyhZ1VRJ1JdWdSlVfF9dw5pDrx3FWWCzP8iQYde88+dHaCSyPkOcJBNTfciMqs8GvR2xykoM4iTLFm5XTWDqs73zWyUsfU7YaOHIFW7IU52aiNunYfOYfo12Y6gs4ombQNk1s/Pa1aWW576RfO5lNSAxaYkkL8F5K0vY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741080404; c=relaxed/simple;
-	bh=Pb5v8XeAHlUAdU8teJGT/joxk1D2UYCLbNbcthK7dEs=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PgVOvvKiGrU/NXD99AUyVy/YuSrIIrDxon0e56YRMmzAr/+xr07QxjcBL7lhHzgTEimR3w128aa2i2WavObHuxeA+bbE4nOEU4gXLBdhYBH7xOMWbhQ1Lr0Aae61aTDZddQ3X6IFLSVvBLOUWmyyvqIV9NatQOBkhsRtgupdZ7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--elver.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eqTUwK1o; arc=none smtp.client-ip=209.85.218.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--elver.bounces.google.com
+	s=arc-20240116; t=1741087304; c=relaxed/simple;
+	bh=G4rIjTvAN3MSAYInYwgzNgQTNoCcPC635BrmCLwJ9OI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z3fv5s7QCjQX/4vby1nQoJW30fyz75HroLo6744m57uPRU958hTs0V5us0xyhWbo0vsCrR1212P1J8mZ/68IZkax7DEvowtErEZIBlMJJzlhL9v/VSj4ufAMHKxFrUeXoH6wB/8NUmJUcyi0wypnd1bd5xAFdis45iCtSf4nrbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=NLhOclrZ; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eqTUwK1o"
-Received: by mail-ej1-f73.google.com with SMTP id a640c23a62f3a-abec83a498cso522432366b.1
-        for <linux-crypto@vger.kernel.org>; Tue, 04 Mar 2025 01:26:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741080401; x=1741685201; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vumk0HTnchdldWRc8wT0cAdQjFLn1MfJ3/QC5i3Nw5Q=;
-        b=eqTUwK1ozQnv7PEsQryrxWFaC4V9xB/TW/o9zIGwNoOmqD1aqBzj1JC3drB8erfo5p
-         wb9Hcya48YEnC3EHpitzfauyVpJiyDwAjTkW/daucl+eHEuIIjalwWsm1eHbGLG41iBY
-         fgOLwF1PUiBtNADhsW4nt4zwl4L9fZK7mVDl2u6cvVDikqbjK7EUyQ0urMTCNYbdQO/l
-         mqJ3HSFwjdr5aYOsP9rBFQ2aUmj501MaDcxZzEinBfz8cG3OCcxAQ+XprkSAo44oY9iX
-         hKf8OutnsPysfeip7QE/2XGG68KKvnfkU3eHfiHBF4Po/OzNJeU0hNWIO8btMtdG4k+R
-         Li9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741080401; x=1741685201;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vumk0HTnchdldWRc8wT0cAdQjFLn1MfJ3/QC5i3Nw5Q=;
-        b=sRBrN3WCiZ7pPBp9Gn+5qMFbYpBwQK57xvrQQNeKvJ0knejHBeFKJfu5jHonfHcqxb
-         /H1XagZFkEJXFwCuiKfta3Q3PWY9qFZN9oI3RFl/WxxCQmZq0wtaECJ9m1j0yzu4jaMh
-         A6nPVC9ATWBcedajSLaiudIfXvFnFXRDl2oSymANMk1XodAJX9/OAcYxQvrEXbuQN3Dc
-         3+f0uzlSpVHBphRJAbx6/xl5j9Lw+2Lg7XSqNWCJXHF8ZKkoJjW1csx9KoFLKzBgzGLy
-         O8SY+0ieGYKpnNYMSsfqZAT5LvJ83muSiIfgEfsWa75nJfBcEgdA8Cp/rUxQpokrWF9n
-         GLZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCViyiKg3Ef5AcuJ6hB9FG39Pcj69/pKxxYKTUDDYHUCbzIy94VfjrVxcQQa6GaxVa+g8CZFZnV1w9Btw38=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzcX25VV5yswGQrhpKRpvZ4+w71CecWmoMdWrq5ugnQ2N/XP2su
-	sq93iDM2jwa5S8l1Un1caE9u7Y2NmpGgbu7MXghKYHiAKEDEb33x6Tbu/NXiR2A/obpUSxqtbw=
-	=
-X-Google-Smtp-Source: AGHT+IHe+2tTUNkWh4sjbCTVRn346FQZX3D8pl7o+PzR8CFWDsL38sKG72bCeLReMhyKEWhXvddJVO8sWw==
-X-Received: from ejckt25.prod.google.com ([2002:a17:907:9d19:b0:ac1:ed2c:ab54])
- (user=elver job=prod-delivery.src-stubby-dispatcher) by 2002:a17:906:7fd6:b0:abf:46cd:5e3f
- with SMTP id a640c23a62f3a-abf46cd7414mr1245962366b.16.1741080400857; Tue, 04
- Mar 2025 01:26:40 -0800 (PST)
-Date: Tue,  4 Mar 2025 10:21:33 +0100
-In-Reply-To: <20250304092417.2873893-1-elver@google.com>
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="NLhOclrZ"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=TnqWbk5+EzTofNzXNZf/lQYyzC/wnfe6I/8xtsT0bhY=; b=NLhOclrZC0zl92yrjEf3oFJWig
+	kr8Ss/TwDTcr86gvSMjVEKVQmk6rFv6TL88NINFYDRp3DYj73/4yoejRdIMDBYn3O6cBnWD5VjvuK
+	t5ZtFoYjSAW7g0zMwW0XfYD28WCsjHtUlFlIlpWp4mmrThbsVnSvY1UGwm1nG6fVNx+anNNlCiaLM
+	BwHn820XzhDRHyhtfXFvy8YKeJyR/angRWzevLLxwGIDgmN6AD3PavlhiVPfFPqc6XEUOd0It5am5
+	JPjv9ZOH0zGYKN+nN+2aq/dFxeLpeUZ3+ELTCyxbFrMeNn6a7DdP0V7qLCfqOLV1+E3UI+FadMsbt
+	xxD4prkg==;
+Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1tpQKp-000000000gA-3GAm;
+	Tue, 04 Mar 2025 11:21:16 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id CCF5430049D; Tue,  4 Mar 2025 12:21:14 +0100 (CET)
+Date: Tue, 4 Mar 2025 12:21:14 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: Marco Elver <elver@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Alexander Potapenko <glider@google.com>,
+	Arnd Bergmann <arnd@arndb.de>, Bart Van Assche <bvanassche@acm.org>,
+	Bill Wendling <morbo@google.com>, Boqun Feng <boqun.feng@gmail.com>,
+	Dmitry Vyukov <dvyukov@google.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Ingo Molnar <mingo@kernel.org>, Jann Horn <jannh@google.com>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	Joel Fernandes <joel@joelfernandes.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
+	Kentaro Takeda <takedakn@nttdata.co.jp>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>,
+	kasan-dev@googlegroups.com, linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev, rcu@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-serial@vger.kernel.org
+Subject: Re: [PATCH v2 00/34] Compiler-Based Capability- and Locking-Analysis
+Message-ID: <20250304112114.GE11590@noisy.programming.kicks-ass.net>
+References: <20250304092417.2873893-1-elver@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250304092417.2873893-1-elver@google.com>
-X-Mailer: git-send-email 2.48.1.711.g2feabab25a-goog
-Message-ID: <20250304092417.2873893-35-elver@google.com>
-Subject: [PATCH v2 34/34] MAINTAINERS: Add entry for Capability Analysis
-From: Marco Elver <elver@google.com>
-To: elver@google.com
-Cc: "David S. Miller" <davem@davemloft.net>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, 
-	"Paul E. McKenney" <paulmck@kernel.org>, Alexander Potapenko <glider@google.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Bart Van Assche <bvanassche@acm.org>, Bill Wendling <morbo@google.com>, Boqun Feng <boqun.feng@gmail.com>, 
-	Dmitry Vyukov <dvyukov@google.com>, Eric Dumazet <edumazet@google.com>, 
-	Frederic Weisbecker <frederic@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Ingo Molnar <mingo@kernel.org>, 
-	Jann Horn <jannh@google.com>, Jiri Slaby <jirislaby@kernel.org>, 
-	Joel Fernandes <joel@joelfernandes.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Josh Triplett <josh@joshtriplett.org>, Justin Stitt <justinstitt@google.com>, 
-	Kees Cook <kees@kernel.org>, Kentaro Takeda <takedakn@nttdata.co.jp>, 
-	Mark Rutland <mark.rutland@arm.com>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
-	Steven Rostedt <rostedt@goodmis.org>, Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>, 
-	Thomas Gleixner <tglx@linutronix.de>, Uladzislau Rezki <urezki@gmail.com>, Waiman Long <longman@redhat.com>, 
-	Will Deacon <will@kernel.org>, kasan-dev@googlegroups.com, linux-kernel@vger.kernel.org, 
-	llvm@lists.linux.dev, rcu@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	linux-serial@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250304092417.2873893-1-elver@google.com>
 
-Add entry for all new files added for Clang's capability analysis.
+On Tue, Mar 04, 2025 at 10:20:59AM +0100, Marco Elver wrote:
 
-Signed-off-by: Marco Elver <elver@google.com>
-Cc: Bart Van Assche <bvanassche@acm.org>
----
- MAINTAINERS | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+> === Initial Uses ===
+> 
+> With this initial series, the following synchronization primitives are
+> supported: `raw_spinlock_t`, `spinlock_t`, `rwlock_t`, `mutex`,
+> `seqlock_t`, `bit_spinlock`, RCU, SRCU (`srcu_struct`), `rw_semaphore`,
+> `local_lock_t`, `ww_mutex`.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 8e0736dc2ee0..cf9bf14f99b9 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -5638,6 +5638,17 @@ M:	Nelson Escobar <neescoba@cisco.com>
- S:	Supported
- F:	drivers/infiniband/hw/usnic/
- 
-+CLANG CAPABILITY ANALYSIS
-+M:	Marco Elver <elver@google.com>
-+R:	Bart Van Assche <bvanassche@acm.org>
-+L:	llvm@lists.linux.dev
-+S:	Maintained
-+F:	Documentation/dev-tools/capability-analysis.rst
-+F:	include/linux/compiler-capability-analysis.h
-+F:	lib/test_capability-analysis.c
-+F:	scripts/Makefile.capability-analysis
-+F:	scripts/capability-analysis-suppression.txt
-+
- CLANG CONTROL FLOW INTEGRITY SUPPORT
- M:	Sami Tolvanen <samitolvanen@google.com>
- M:	Kees Cook <kees@kernel.org>
--- 
-2.48.1.711.g2feabab25a-goog
+Wasn't there a limitation wrt recursion -- specifically RCU is very much
+a recursive lock and TS didn't really fancy that?
 
+
+>   - Rename __var_guarded_by to simply __guarded_by. Initially the idea
+>     was to be explicit about if the variable itself or the pointed-to
+>     data is guarded, but in the long-term, making this shorter might be
+>     better.
+> 
+>   - Likewise rename __ref_guarded_by to __pt_guarded_by.
+
+Shorter is better :-)
+
+Anyway; I think I would like to start talking about extensions for these
+asap.
+
+Notably I feel like we should have a means to annotate the rules for
+access/read vs modify/write to a variable.
+
+The obvious case is RCU; where holding RCU is sufficient to read, but
+modification requires a 'real' lock. This is not something that can be
+currently expressed.
+
+The other is the lock pattern I touched upon the other day, where
+reading is permitted when holding one of two locks, while writing
+requires holding both locks.
+
+Being able to explicitly write that in the __guarded_by() annotations is
+the cleanest way I think.
+
+Anyway, let me go stare at the actual patches :-)
