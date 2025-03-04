@@ -1,218 +1,161 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77BC41DB125;
-	Tue,  4 Mar 2025 21:52:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CDC727816C
+	for <linux-crypto@vger.kernel.org>; Tue,  4 Mar 2025 21:58:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741125175; cv=none; b=LimzES2M05pRzMvauzyYOhCBG20CEswUUnJkp0auoB1i0eL7nIEiZ7T50Z6T24g+X12Ztz1JNHtjTM+nJJPh0xx9q4mnk4jdXBdW0SP9/wsKssM6H+73cH7kVF6yfkAoqdogFHXSnZIPjjIvJCNRpqhSwuND+ZAk1wi9DJdUP+o=
+	t=1741125528; cv=none; b=QfOzm10gdWVpWB9SmuuB4x7a0yA81665YgOCYLE8UxvLc1CYyDjWUXTlXSiehngwyDuzcXrKncSNw/kr3S5RlusQV9RnQt6VJ9Iu/Vp5ZUCy1i2IqSbJZ+Ej6QCagKIo+nU6fDvhhqUX86YQhR9CQBD1csoY01vR5IkuR0RP/6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741125175; c=relaxed/simple;
-	bh=ky/RX2jDTL4rFuAVxJO8stmYSrRCdXIUOD55plGiwSw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aWkKW0bL+y2Q2DURgcXMi78L//lG6tbKTZsNgX3CT4MxeoBv2s98SL7YOnwJeJwHoGBiubJ6A/azAo5ib0ZO6x3s4+548gdBu+Yy03gA3uLpyiT0ohDTtbmFDmtl399RMX2D34FO43HvvMJVsUFxrS6adFRDu63tXpz/QX8qU+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cF3rM1cB; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1741125528; c=relaxed/simple;
+	bh=oSozo7BznZq14l5z/ZoFH+lJ1JJjswQ4w2zFnLW19RQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=GAD1jL7Jwu6NqmLDCj046SuBbmdpdfMCju2jzBKkc65o0oOi4s5oZ9XM3jdUeV4SWzG+tSaaAhmsTONxOEkyqPdT8Zvvv8WHypBQ11pnMyNMj/fI2W0s5VAbuC7zMmTzliGg0BUV+ag7ERMbwgk3f89QR3D5gsEXTvsXcpBpKqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g3WsuEdo; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cF3rM1cB"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6278CC4CEE5;
-	Tue,  4 Mar 2025 21:52:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741125174;
-	bh=ky/RX2jDTL4rFuAVxJO8stmYSrRCdXIUOD55plGiwSw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cF3rM1cBFoEMvjh5TL+Fl+KtQndXFNhsyL+OHetx0ROyNvpY9jFsFAv8pgNm/mpnF
-	 3QYYay0r/FWbE849OUrYv3PhEi36KZDXgZZigSmfgmDDjip8A3n0apV/4wt6TzJKFn
-	 7LgYvjOhPaF7NGAhUV6IHPaeJSnDvqxkf+9pHpVeRX5fWC051Bi1ME5Lmlb1aIJ6KE
-	 UmyFcxCbX6sIcWOzKP1LIIEbKrtr7q/PhDRmTMQWjR779EqF9L4KRZfGf3iM1lRhY7
-	 LRph+6mh9CJakKzGuR9+mvfteWQzX3+/+ZB/woVKmXYF3NeaeR8VuENcEKsApY3KFt
-	 5a3Fqg5cW9sCg==
-Date: Tue, 4 Mar 2025 13:52:52 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: David Laight <david.laight.linux@gmail.com>
-Cc: Bill Wendling <morbo@google.com>, "H. Peter Anvin" <hpa@zytor.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Justin Stitt <justinstitt@google.com>,
-	LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org,
-	clang-built-linux <llvm@lists.linux.dev>
-Subject: Re: [PATCH v2] x86/crc32: use builtins to improve code generation
-Message-ID: <20250304215252.GA15066@sol.localdomain>
-References: <CAGG=3QVi27WRYVxmsk9+HLpJw9ZJrpfLjU8G4exuXm-vUA-KqQ@mail.gmail.com>
- <CAGG=3QVkd9Vb9a=pQ=KwhKzGJXaS+6Mk5K+JtBqamj15MzT9mQ@mail.gmail.com>
- <20250303201509.32f6f062@pumpkin>
- <CAGG=3QV1iDn2r39v5eroO+kCvpbmJNtSeqJS+fpwb4vBG67z=w@mail.gmail.com>
- <20250303224216.30431b1d@pumpkin>
- <7BC89461-A060-462A-9B42-7C0138AA0307@zytor.com>
- <CAGG=3QUnUQL2=YxN2ozwSba2A_x-S7sAEUP5oGhCWOzu4Q9SQA@mail.gmail.com>
- <20250304043223.68ed310f@pumpkin>
- <20250304205252.59a04955@pumpkin>
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g3WsuEdo"
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fe8fdfdd94so11850933a91.0
+        for <linux-crypto@vger.kernel.org>; Tue, 04 Mar 2025 13:58:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1741125526; x=1741730326; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=rU2M9OXwTVnYbkbyQeQ/NuCDqqxkxOkVZk19DIvCT9w=;
+        b=g3WsuEdozEidoSVszolMaen8FvQEIjHsWRG69thS7oOYHL6Z1Bv80d918x9L/dl6tK
+         b5TU+5OwqOnnu2hn9kuWl1pDg1uSN2KtbMSZnR9ClVM8BZbIiYf7ottjgm2Ig9yLX5nP
+         XxxizzBkk0Ywvn8hBEhDBgCgNZG6T+mYFDJu+O/VOWbBeAqSD6goc36TT+8Z6gISzTjz
+         9l03TloDOkr0FU0QhosipemWhEDlohpE81zyK9LFfISSaZ8xvbIVDzQWq0jhRE3TJ29Q
+         YcWarntqDXltkQwFw1plHRPwRXInysOuxbCQKK+ytD4DttgrNWFCox5IBU9J/0GTRQZM
+         SA+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741125526; x=1741730326;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rU2M9OXwTVnYbkbyQeQ/NuCDqqxkxOkVZk19DIvCT9w=;
+        b=tDLS28m9Ds891rXNUxekAkzt199LK7dKNJeF/PciApTmaSNlPTVNrcQvP6ChnFpYDV
+         2lRh48WxJIRxaK4jeeFr4q0/7Qdvc4Ead++QUcL0oNUDna1dCCB2cDYVbj1x89Y/OdjF
+         9vp+eWO3vt6m1LJwWzSfSJM0/mWmsfpL5HRQL3/P0ZYZCUOIGWSBJ8E5q1II14aF7nRC
+         VPazL5GmCKw/Xavae8n/CKZaH+WlUkX31w2KXb/Z698XMUDDzTtSSvNRXQslshq0STHj
+         XPAmGZeqXfhw1vnipl1hEwiabkTyHUKoySsDM6Rysw3lOLIO9ucKLBmrD5ekkXps2slM
+         hBug==
+X-Forwarded-Encrypted: i=1; AJvYcCXEH7Z0ttiuG/nuk3//dhQDKBzAFSqx0JzW/nbyKXfjsvfpl9o1AbKqtBJ2XdtHxGm2h4nZ/1jw66Mu8E8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyR3F+dE22WmNeMtdlUzrE5naSLUIWbTmWKlkMCcjv4KmiKPgZ3
+	mOYKrNxpMTjv0IFoAEQ6JYXcMXvkycyegxrJKv8fam5XtpLGG+5QiXsVNsR77XzJZfqR/39BTKa
+	87A==
+X-Google-Smtp-Source: AGHT+IFwhJrFtcLOUPHJp0NCI/99GBs81nXEXvmHLfhsmwGYjVBAdZr5LyhZb46FaL0Cxv1fDqlkY4W/+pM=
+X-Received: from pjbrr3.prod.google.com ([2002:a17:90b:2b43:b0:2fc:1eb0:5743])
+ (user=seanjc job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:2643:b0:2ee:d7d3:3019
+ with SMTP id 98e67ed59e1d1-2ff49728419mr1782201a91.12.1741125526427; Tue, 04
+ Mar 2025 13:58:46 -0800 (PST)
+Date: Tue, 4 Mar 2025 13:58:44 -0800
+In-Reply-To: <217bc786-4c81-4a7a-9c66-71f971c2e8fd@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250304205252.59a04955@pumpkin>
+Mime-Version: 1.0
+References: <cover.1740512583.git.ashish.kalra@amd.com> <27a491ee16015824b416e72921b02a02c27433f7.1740512583.git.ashish.kalra@amd.com>
+ <Z8IBHuSc3apsxePN@google.com> <cf34c479-c741-4173-8a94-b2e69e89810b@amd.com>
+ <Z8I5cwDFFQZ-_wqI@google.com> <8dc83535-a594-4447-a112-22b25aea26f9@amd.com>
+ <Z8YV64JanLqzo-DS@google.com> <217bc786-4c81-4a7a-9c66-71f971c2e8fd@amd.com>
+Message-ID: <Z8d3lDKfN1ffZbt5@google.com>
+Subject: Re: [PATCH v5 6/7] KVM: SVM: Add support to initialize SEV/SNP
+ functionality in KVM
+From: Sean Christopherson <seanjc@google.com>
+To: Ashish Kalra <ashish.kalra@amd.com>
+Cc: pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, 
+	thomas.lendacky@amd.com, john.allen@amd.com, herbert@gondor.apana.org.au, 
+	michael.roth@amd.com, dionnaglaze@google.com, nikunj@amd.com, ardb@kernel.org, 
+	kevinloughlin@google.com, Neeraj.Upadhyay@amd.com, aik@amd.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, linux-coco@lists.linux.dev
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Mar 04, 2025 at 08:52:52PM +0000, David Laight wrote:
-> On Tue, 4 Mar 2025 04:32:23 +0000
-> David Laight <david.laight.linux@gmail.com> wrote:
-> 
-> ....
-> > > For reference, GCC does much better with code gen, but only with the builtin:
-> > > 
-> > > .L39:
-> > >         crc32q  (%rax), %rbx    # MEM[(long unsigned int *)p_40], tmp120
-> > >         addq    $8, %rax        #, p
-> > >         cmpq    %rcx, %rax      # _37, p
-> > >         jne     .L39    #,  
+On Mon, Mar 03, 2025, Ashish Kalra wrote:
+> On 3/3/2025 2:49 PM, Sean Christopherson wrote:
+> > On Mon, Mar 03, 2025, Ashish Kalra wrote:
+> >> On 2/28/2025 4:32 PM, Sean Christopherson wrote:
+> >>> On Fri, Feb 28, 2025, Ashish Kalra wrote:
+> >>>> And the other consideration is that runtime setup of especially SEV-ES VMs will not
+> >>>> work if/when first SEV-ES VM is launched, if SEV INIT has not been issued at 
+> >>>> KVM setup time.
+> >>>>
+> >>>> This is because qemu has a check for SEV INIT to have been done (via SEV platform
+> >>>> status command) prior to launching SEV-ES VMs via KVM_SEV_INIT2 ioctl. 
+> >>>>
+> >>>> So effectively, __sev_guest_init() does not get invoked in case of launching 
+> >>>> SEV_ES VMs, if sev_platform_init() has not been done to issue SEV INIT in 
+> >>>> sev_hardware_setup().
+> >>>>
+> >>>> In other words the deferred initialization only works for SEV VMs and not SEV-ES VMs.
+> >>>
+> >>> In that case, I vote to kill off deferred initialization entirely, and commit to
+> >>> enabling all of SEV+ when KVM loads (which we should have done from day one).
+> >>> Assuming we can do that in a way that's compatible with the /dev/sev ioctls.
+> >>
+> >> Yes, that's what seems to be the right approach to enabling all SEV+ when KVM loads. 
+> >>
+> >> For SEV firmware hotloading we will do implicit SEV Shutdown prior to DLFW_EX
+> >> and SEV (re)INIT after that to ensure that SEV is in UNINIT state before
+> >> DLFW_EX.
+> >>
+> >> We still probably want to keep the deferred initialization for SEV in 
+> >> __sev_guest_init() by calling sev_platform_init() to support the SEV INIT_EX
+> >> case.
 > > 
-> > That looks reasonable, if Clang's 8 unrolled crc32q is faster per byte
-> > then you either need to unroll once (no point doing any more) or use
-> > the loop that does negative offsets from the end.
+> > Refresh me, how does INIT_EX fit into all of this?  I.e. why does it need special
+> > casing?
 > 
-> Thinking while properly awake the 1% difference isn't going to be a
-> difference between the above and Clang's unrolled loop.
-> Clang's loop will do 8 bytes every three clocks, if the above is slower
-> it'll be doing 8 bytes in 4 clocks (ok, you can get 3.5 - but unlikely)
-> which would be either 25% or 33% depending which way you measure it.
+> For SEV INIT_EX, we need the filesystem to be up and running as the user-supplied
+> SEV related persistent data is read from a regular file and provided to the
+> INIT_EX command.
 > 
-> ...
-> > I'll find the code loop I use - machine isn't powered on at the moment.
+> Now, with the modified SEV/SNP init flow, when SEV/SNP initialization is 
+> performed during KVM module load, then as i believe the filesystem will be
+> mounted before KVM module loads, so SEV INIT_EX can be supported without
+> any issues.
 > 
-> #include <linux/perf_event.h>
-> #include <sys/mman.h>
-> #include <sys/syscall.h>
+> Therefore, we don't need deferred initialization support for SEV INIT_EX
+> in case of KVM being loaded as a module.
 > 
-> static int pmc_id;
-> static void init_pmc(void)
-> {
->         static struct perf_event_attr perf_attr = {
->                 .type = PERF_TYPE_HARDWARE,
->                 .config = PERF_COUNT_HW_CPU_CYCLES,
->                 .pinned = 1,
->         };
->         struct perf_event_mmap_page *pc;
+> But if KVM module is built-in, then filesystem will not be mounted when 
+> SEV/SNP initialization is done during KVM initialization and in that case
+> SEV INIT_EX cannot be supported. 
 > 
->         int perf_fd;
->         perf_fd = syscall(__NR_perf_event_open, &perf_attr, 0, -1, -1, 0);
->         if (perf_fd < 0) {
->                 fprintf(stderr, "perf_event_open failed: errno %d\n", errno);
->                 exit(1);
->         }
->         pc = mmap(NULL, 4096, PROT_READ, MAP_SHARED, perf_fd, 0);
->         if (pc == MAP_FAILED) {
->                 fprintf(stderr, "perf_event mmap() failed: errno %d\n", errno);
->                 exit(1);
->         }
->         pmc_id = pc->index - 1;
-> }
+> Therefore to support SEV INIT_EX when KVM module is built-in, the following
+> will need to be done:
 > 
-> static inline unsigned int rdpmc(id)
-> {
->         unsigned int low, high;
+> - Boot kernel with psp_init_on_probe=false command line.
+> - This ensures that during KVM initialization, only SNP INIT is done.
+> - Later at runtime, when filesystem has already been mounted, 
+> SEV VM launch will trigger deferred SEV (INIT_EX) initialization
+> (via the __sev_guest_init() -> sev_platform_init() code path).
 > 
-> // You need something to force the instruction pipeline to finish.
-> // lfence might be enough.
-> #ifndef NOFENCE
->         asm volatile("mfence");
-> #endif
->         asm volatile("rdpmc" : "=a" (low), "=d" (high) : "c" (id));
-> #ifndef NOFENCE
->         asm volatile("mfence");
-> #endif
-> 
->         // return low bits, counter might to 32 or 40 bits wide.
->         return low;
-> }
-> 
-> The test code is then something like:
-> #define PASSES 10
->         unsigned int ticks[PASSES];
->         unsigned int tick;
->         unsigned int i;
-> 
->         for (i = 0; i < PASSES; i++) {
->                 tick = rdpmc(pmc_id);
->                 test_fn(buf, len);
->                 ticks[i] = rdpmc(pmc_id) - tick;
->         }
-> 
->         for (i = 0; i < PASSES; i++)
->                 printf(" %5d", ticks[i]);
-> 
-> Make sure the data is in the l1-cache (or that dominates).
-> The values output for passes 2-10 are likely to be the same to within
-> a clock or two.
-> I probably tried to subtract an offset for an empty test_fn().
-> But you can easily work out the 'clocks per loop iteration'
-> (which is what you are trying to measure) by measuring two separate
-> loop lengths.
-> 
-> I did find that sometimes running the program gave slow results.
-> But it is usually very consistent.
-> Needs to be run as root.
-> Clearly a hardware interrupt will generate a very big number.
-> But they don't happen.
-> 
-> The copy I found was used for measuring ip checksum algorithms.
-> Seems to output:
-> $ sudo ./ipcsum 
->                 0     0   160   160   160   160   160   160   160   160   160   160  overhead
->  3637b4f0b942c3c4  682f   316    25    26    26    26    26    26    26    26    26  csum_partial
->  3637b4f0b942c3c4  682f   124    79    43    25    25    25    24    26    25    24  csum_partial_1
->  3637b4f0b942c3c4  682f   166    43    25    25    24    24    24    24    24    24  csum_new adc pair
->  3637b4f0b942c3c4  682f   115    21    21    21    21    21    21    21    21    21  adc_dec_2
->  3637b4f0b942c3c4  682f    97    34    31    23    24    24    24    24    24    23  adc_dec_4
->  3637b4f0b942c3c4  682f    39    33    34    21    21    21    21    21    21    21  adc_dec_8
->  3637b4f0b942c3c4  682f    81    52    49    52    49    26    25    27    25    26  adc_jcxz_2
->  3637b4f0b942c3c4  682f    62    46    24    24    24    24    24    24    24    24  adc_jcxz_4
->  3637b4f0b942c3c4  682f   224    40    21    21    23    23    23    23    23    23  adc_2_pair
->  3637b4f0b942c3c4  682f    42    36    37    22    22    22    22    22    22    22  adc_4_pair_old
->  3637b4f0b942c3c4  682f    42    37    34    41    23    23    23    23    23    23  adc_4_pair
->  3637b4f0b942c3c4  682f   122    19    20    19    18    19    18    19    18    19  adcx_adox
->         bef7a78a9  682f   104    51    30    30    30    30    30    30    30    30  add_c_16
->         bef7a78a9  682f   143    50    50    27    27    27    27    27    27    27  add_c_32
->         6ef7a78ae  682f   103    91    45    34    34    34    35    34    34    34  add_c_high
-> 
-> I don't think the current one is in there - IIRC it is as fast as the adcx_adox one
-> but more portable.
+> NOTE: psp_init_on_probe module parameter and deferred SEV initialization
+> during SEV VM launch (__sev_guest_init()->sev_platform_init()) was added
+> specifically to support SEV INIT_EX case.
 
-I guess this thread has turned into one where everyone has to weigh in :-)
+Ugh.  That's quite the unworkable mess.  sev_hardware_setup() can't determine
+if SEV/SEV-ES is fully supported without initializing the platform, but userspace
+needs KVM to do initialization so that SEV platform status reads out correctly.
 
-Just to summarize my thoughts on the whole thread:
+Aha!
 
-- IMO we should not use the crc32 intrinsics yet, as there are too many issues
-  including no stability guarantee for the builtins (or else having to figure
-  out how to include immintrin.h in the kernel to get the stable functions),
-  having to set the crc32 target with the correct scope, dealing with old
-  compiler versions that don't support crc32, and unhelpful loop unrolling.
+Isn't that a Google problem?  And one that resolves itself if initialization is
+done on kvm-amd.ko load?
 
-- https://lore.kernel.org/r/20250210210741.471725-1-ebiggers@kernel.org already
-  fixed the spilling to the stack with clang.  It does result in a separate mov
-  from memory instead of taking advantage of the mem operand support.  But that
-  should not make much of a difference.
+A system/kernel _could_ be configured to use a path during initcalls, with the
+approproate initramfs magic.  So there's no hard requirement that makes init_ex_path
+incompatible with CRYPTO_DEV_CCP_DD=y or CONFIG_KVM_AMD=y.  Google's environment
+simply doesn't jump through those hoops.
 
-- crc_kunit already includes a benchmark.  I recommend using that for
-  benchmarking the kernel's CRC code.  Sure, one can do a more precise analysis
-  with performance counters, but IMO it's generally unnecessary.
+But Google _does_ build kvm-amd.ko as a module.
 
-- The 4-2-1 step-down is a good idea, and in fact crc32c-3way.S (which handles
-  lengths >= 512 bytes) already does exactly that for tail handling.  I sent out
-  https://lore.kernel.org/r/20250304213216.108925-1-ebiggers@kernel.org which
-  adds it to the C code (which handles lengths < 512 bytes) too.
-
-- Moving all this to assembly is still attractive, especially considering that
-  lengths >= 512 bytes are already handled in assembly in crc32c-3way.S, and
-  essentially the exact code we want is already in that file (it's used to
-  handle anything left over from the 3-way processing).  But, I think we'll keep
-  the C (with inline asm for just the crc32 instructions) version too for now.
-  It's a bit more approachable, and it's nice to avoid an extra function call to
-  a .S file.
+So rather than carry a bunch of hard-to-follow code (and potentially impossible
+constraints), always do initialization at kvm-amd.ko load, and require the platform
+owner to ensure init_ex_path can be resolved when sev_hardware_setup() runs, i.e.
+when kvm-amd.ko is loaded or its initcall runs.
