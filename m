@@ -1,93 +1,109 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A050024BBFD
-	for <linux-crypto@vger.kernel.org>; Wed,  5 Mar 2025 14:11:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14FE724A077;
+	Wed,  5 Mar 2025 14:26:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741183867; cv=none; b=WwuxF90fQiDilZ+FZuGyAuQHRRC06pxc5akYQ++OiK0GUzrGFFZkZLaotxavEUczocKJZkh31/zjRN36u3YG8Wyusth1O0xdBfea8KCb+Pefn56+d68ZIHUSZoPqbnPHl2MAjIekoLDaKMkfBVAtM64eeg1V0YaTlEh7erF1T1M=
+	t=1741184818; cv=none; b=uCN7JUg8Z/0kvO/2zizBqtA+fHVD9HVEFUZDuinlVVeHkADsTmoAGRi0Wxs3BwyxLsfCs3hxCoLxhRah5zmeljS9zU18Fhr1t3RTYsM7sXI94XRA2xzqXy922Yxx0RHrjxFrtl09eJS+mcpc3Z1/wOHhGYEG0/Kk8vm5IC9bCa8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741183867; c=relaxed/simple;
-	bh=RjZZ5AhcRc1kQ01+zIiXLQvInXoLTVCWoxuL7r5VZNI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GvQE85DKBIoZAz9Jw4eOBzmQEJEIbUec3Su3lDKoBsbzDG5W1MBAB3rx0pQb9nOXHw3jIZXlhGBVMDLZUpQsmTz7w1VHugSwsJJ5gU95MDSh65UsQG8o2MLO9+SY8bryn52vtPVykPrkDQB3wN37l/+/05INuckndDioeImIz90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=aCExl2NM; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1741184818; c=relaxed/simple;
+	bh=eUK2lpiP1FoSgc9h1gORMk92bbuPc9yvLgGu1Z6Qwhk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=awyAYf9eC5X0ofKwZOfpw2stFOKmLglGE0XteYt/vHuYr4Y8rafvHeNMKaoxKMU6sBNWZkk1Ku8q0kcO4muOZObn3igeNmvXGiIlP6FvYMlLzttCddwtJwOQNs0NqAEExaLXAcl5YVRa2jIVgXuVwUutYJlE/8xEt4j/UGsWPqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jDfRs4YW; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="aCExl2NM"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=AToyKnOnD1v+SUQPd1Fd3I6aomA1OJw/wBfqmGsPzWw=; b=aCExl2NMBzWUF69P81jOvU4kZr
-	nLZGYt305ctQgnTzaKWUsBISvq9QAmNMl2hV3t/wyfj9enEDfbCHz3yKQeAXLMoLSdcVukekJJyLh
-	AwgbhsKTa1GzAJ8Mncha0FrU8JSSkjQp3pPKdu9anORPCS0oOZ7CTmGu1EjLU5LLSJlA/44I2Rf+o
-	pHk76oxVgfe3SOJRwzucCF/Ji9kkn4g0QdL9kHinszpW0XFVQI6c9EWKhYTpI50COVtc+vykRIhlH
-	jizw3rYvkY9WFCGEaJcit2xbHJudw+madT1ho5GMzw/8pXScAGAQQovaCNFYQ8EGCedvlQ+CdJSRr
-	ZVvP1HQQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tppSQ-003zix-26;
-	Wed, 05 Mar 2025 22:10:47 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 05 Mar 2025 22:10:46 +0800
-Date: Wed, 5 Mar 2025 22:10:46 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	linux-mm@kvack.org
-Subject: Re: [RFC PATCH 7/7] mm: zswap: Use acomp virtual address interface
-Message-ID: <Z8hbZlCY-esYktJe@gondor.apana.org.au>
-References: <Z8KrAk9Y52RDox2U@gondor.apana.org.au>
- <Z8KxVC1RBeh8DTKI@gondor.apana.org.au>
- <Z8YOVyGugHwAsvmO@google.com>
- <Z8ZzqOw9veZ2HGkk@gondor.apana.org.au>
- <Z8aByQ5kJZf47wzW@google.com>
- <Z8aZPcgzuaNR6N8L@gondor.apana.org.au>
- <dawjvaf3nbfd6hnaclhcih6sfjzeuusu6kwhklv3bpptwwjzsd@t4ln7cwu74lh>
- <Z8fHyvF3GNKeVw0k@gondor.apana.org.au>
- <Z8fsXZNgEbVkZrJP@google.com>
- <Z8gBSgasXlu_0_s2@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jDfRs4YW"
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-43bc0b8520cso22445615e9.1;
+        Wed, 05 Mar 2025 06:26:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741184815; x=1741789615; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5w41DRiJ/9J1ZtMFKS35HZz81JTi9tqzjEpSgeekIgk=;
+        b=jDfRs4YWY9ZTDNq0IjY8oATG3naABg7HWzf/ZLoyifBgDNsRmW2/GBhqaOAOc+0ByG
+         V7O6XIWaNbH+M/5mzQ1aZC+Ui7crxaH3J3WepzjCKN3atJWrIVGXDwMqbnT/Knvtq3GI
+         fEkC2+bobNkcH5SkOJ2MHHxGiL/usyx+6MIrf2uplgBpI98VPYl7SYQNaz56RoskZC0W
+         QHtIX8TnHM6qxCU7sARlMbtsmIse/4QdFa40nr0Sn2FLPGeRyvoMGxdAoyWtqy/dy5xR
+         dq6Szkqjb8DOW/Psl4ArOMNuZyMoixvAO1XJXoUPfmo9Ldo520K+Lkc1vyE6o18/UsSY
+         Oj7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741184815; x=1741789615;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5w41DRiJ/9J1ZtMFKS35HZz81JTi9tqzjEpSgeekIgk=;
+        b=iEEndm8YSaicMgEoxox4y+h+QH+d9yR4g2C2XtYj3heX9x7CHez0JozHp8YxnjziJo
+         Rvy+1BgbhiMkA3lRkDVMOJoQnpLC+HTIsgeIXYizRKvdgPdSHejVH2gwpShYI7FEUIFv
+         z0e/XX3TzPd+En71uDBtXcMTONA8bfU2p6FcbNR58UGHNQC01gcGAUETfm3WZyVM4q6F
+         AqEz5h4V9vhQodxuPvFhJfWf3jMJ4rE1ewsoC2OVMci+T/soqlW84S8sPKivjI0rmHoq
+         2tsESewF5JuX/OyvIIQAFrKhD7sXE4lacosqa4dX3xGsGMMeK6+e8rzVhHKWxl6bWoVd
+         c+iw==
+X-Forwarded-Encrypted: i=1; AJvYcCUyeC3sWqbVjjMIb8Yan2H9Esyhp094n9TuaL1NvJuk2tbGIcmPRJkJvjQEiwzY2Bb2xVGbcwie8kJkFUw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxxmmnPR7daN49yTiTRD+4pW9z8T0uXbn6H4aS8OYQ3KVZGtvrl
+	Knekn0UY3RmdGMN8j/8Rkxv83ZxTXE+Phk9J6Zf4LRCYWty64toT6rHwFg==
+X-Gm-Gg: ASbGncuWNB33+zmaQDxKlrPyNNgyFOOgXxQR0uBBeMDPTSIqf6qW20e/sJfS2boadvP
+	d0YBlwiP3inobZcPGwyXroQKjx5egvc1us9U9rRwahGwF5x2Wq/IOehJqGs1jIcfS2Ju68evb6v
+	Y+9N+R9l8wl7EI4c/iEjYzikUKgyhf2uvUdNnaumwz/b0jpxuhRKimrk1XS3/xM9xEqF7izLapT
+	Y2UliPT0jSeD4Oa3wra5bCnCWDPucHZ4NrsiwS+HO0dCTXEBIsaKcUyzEAyG0cOJfbZBo1zdO0+
+	itFNVnUMIqpPLO6pniEKTyOwej6BJl7x70Wel17C45i26FoQUorK7QiPFXG4E6fN/zaUVLzAezo
+	5grRSL0c=
+X-Google-Smtp-Source: AGHT+IF0B41RHaO5k5y1Clubg7F9JL3YEVmmZXW9Ppx3hJLmnuQaUQzgcDjx+6PEq+4SMBuJY10G4w==
+X-Received: by 2002:a05:6000:4007:b0:390:f45e:c84a with SMTP id ffacd0b85a97d-3911f7cb10fmr3522154f8f.48.1741184814990;
+        Wed, 05 Mar 2025 06:26:54 -0800 (PST)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-390e4848252sm21356612f8f.69.2025.03.05.06.26.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Mar 2025 06:26:54 -0800 (PST)
+Date: Wed, 5 Mar 2025 14:26:53 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-kernel@vger.kernel.org, Bill Wendling <morbo@google.com>, Thomas
+ Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav
+ Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel
+ <ardb@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers
+ <nick.desaulniers+lkml@gmail.com>, Justin Stitt <justinstitt@google.com>,
+ linux-crypto@vger.kernel.org, llvm@lists.linux.dev
+Subject: Re: [PATCH] x86/crc32: optimize tail handling for crc32c short
+ inputs
+Message-ID: <20250305142653.751d9840@pumpkin>
+In-Reply-To: <20250304213216.108925-1-ebiggers@kernel.org>
+References: <20250304213216.108925-1-ebiggers@kernel.org>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z8gBSgasXlu_0_s2@gondor.apana.org.au>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Mar 05, 2025 at 03:46:18PM +0800, Herbert Xu wrote:
->
-> > Also, please take a look at patch 2 in this series for another reason, I
-> > want to make sure if your virtual address series can be used to remove
-> > the !virt_addr_valid() memcpy() case completely.
+On Tue,  4 Mar 2025 13:32:16 -0800
+Eric Biggers <ebiggers@kernel.org> wrote:
+
+> From: Eric Biggers <ebiggers@google.com>
 > 
-> Yes it should work provided that you specify the memory as nondma.
+> For handling the 0 <= len < sizeof(unsigned long) bytes left at the end,
+> do a 4-2-1 step-down instead of a byte-at-a-time loop.  This allows
+> taking advantage of wider CRC instructions.  Note that crc32c-3way.S
+> already uses this same optimization too.
 
-Actually you can do better than that, specify the memory as nondma
-if IS_ENABLED(CONFIG_HIGHMEM), and otherwise as virt.
+An alternative is to add extra zero bytes at the start of the buffer.
+They don't affect the crc and just need the first 8 bytes shifted left.
 
-The idea is that we only have two hardware offload drivers, both
-from Intel and they're probably not going to be used on platforms
-with HIGHMEM.
+I think any non-zero 'crc-in' just needs to be xor'ed over the first
+4 actual data bytes.
+(It's over 40 years since I did the maths of CRC.)
 
-So something like:
+You won't notice the misaligned accesses all down the buffer.
+When I was testing different ipcsum code misaligned buffers
+cost less than 1 clock per cache line.
+I think that was even true for the versions that managed 12 bytes
+per clock (including the one Linus committed).
 
-	if (IS_ENABLED(CONFIG_HIGHMEM))
-		acomp_request_set_nondma(acomp_ctx->req, src, dst, entry->length, PAGE_SIZE);
-	else
-		acomp_request_set_virt(acomp_ctx->req, src, dst, entry->length, PAGE_SIZE);
-
-Of course all this would disappear if we used SG lists properly.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+	David
