@@ -1,131 +1,103 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A958119F121;
-	Wed,  5 Mar 2025 16:54:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA45C1C6FEB
+	for <linux-crypto@vger.kernel.org>; Wed,  5 Mar 2025 17:07:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741193695; cv=none; b=oVtsXSMHDaoIsaNTnWPs9ACYrX5CnJbI6ClSz9Xza0PAX2U/8cxgZFLJ3DcxX9Oe+ctxFB44EcaPkN1WXlmPoBAInsT3Ciez2AVUDeoyMtJLVTS/gukUMvwIokyc/pfk2ErutFUDVI3zuACSNZLbl2HhYmS12aDp7+JrbsRGm5U=
+	t=1741194450; cv=none; b=tFeJKi0j+wb78d0+fd0MYZoVxixOYf4Il1eDjoI2/l5B67nEt3jbyHDe8SMi0fOnoCmbfySclF+K78IYUX3iWfhnjqS2vjitPMEC7WZzMECR5ikMkNBSNsU76JXy6EfWMGinfue0WeyShePWIT7Y9G7eE0irboRIMmOF3MH10XQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741193695; c=relaxed/simple;
-	bh=by9CUytUjedo8xlzZB67O5RkiEv4zNflkG0tNZJ7ezw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nCQtGsPOorYH4z8USWrfYXE87ejbNDiKpK+PnlBufdcpQmIfoC5DeuRqCbk11Yqq3n68PHcYL7gsluJoBtSlcMLQnWgf7QAt8hp4zcrHWHJr0LgrtQnNx7RTx/qwWKUIbOyvE8qHheluZAdQYYk1A1TF2CdbgjdYFABRE14R7q8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cW2L5KRv; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	s=arc-20240116; t=1741194450; c=relaxed/simple;
+	bh=IrDAdDeLwUuVeMKM0cQi7AzhOD4W0udt5kGWGBqKvzg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cfFSS+huqdZdMLuMONXRR1BAk/hG3rs96TCmhgqqEeQzKWuKNjBgoMuGkFZ4EiFTQ8HPVnTQrIxN+8yeO6Fw2hTJaGKBtKrzyS+PI55ffmvFaPzBjhLj/Nf+JOB+dHpeqJuZKa8bEQC+OXty96OESytB1vDC1eK7/KiVFfMbPTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a9W2Hpgw; arc=none smtp.client-ip=209.85.219.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cW2L5KRv"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741193694; x=1772729694;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=by9CUytUjedo8xlzZB67O5RkiEv4zNflkG0tNZJ7ezw=;
-  b=cW2L5KRv/A05P8JFQUfOoy0fYYEungEcmyO6QXqSoyLiFCadkaGsl8cu
-   nJsJSaMchQ66drlQfdGTVcjTtPyRfhVN5Sa1mG9aH49a5Wz1k+L8Epy7I
-   fl3CszXYtkegcIxENdcAAo+/6d2tQAPfsgH3qxCgMcsJu+n9dnlXKDEDp
-   p0oLuc1Qha6greIuUv+SYWeQlS2+jgsRZOrty0B+dGXuU8i1+bDYCE1Xp
-   4I23OHw427w3Sj62tQVTDWk7JwzRTQtXnOq84EK9I1sdMtHCis9kon4fc
-   ipeUT6t7VqymoTZ2Fp+DyhmbQda7L9gIkPzVh2BibDSN2j1AEZqZwjhov
-   Q==;
-X-CSE-ConnectionGUID: uvq4lCxGSmK3pXGcgtyRkw==
-X-CSE-MsgGUID: F/tkcDIsTwuJ3IZ1vtSEfg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11363"; a="52806738"
-X-IronPort-AV: E=Sophos;i="6.14,223,1736841600"; 
-   d="scan'208";a="52806738"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2025 08:54:53 -0800
-X-CSE-ConnectionGUID: 4bY42/ZWT3mud0h6ff0LEg==
-X-CSE-MsgGUID: pe0aydXnQTmUdrIQGld36g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="155958796"
-Received: from kcaccard-desk.amr.corp.intel.com (HELO [10.125.109.196]) ([10.125.109.196])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2025 08:54:53 -0800
-Message-ID: <b6a80f6d-8469-429d-b03a-8fa71a33046b@intel.com>
-Date: Wed, 5 Mar 2025 08:55:12 -0800
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a9W2Hpgw"
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6dd049b5428so62693416d6.2
+        for <linux-crypto@vger.kernel.org>; Wed, 05 Mar 2025 09:07:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741194447; x=1741799247; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IrDAdDeLwUuVeMKM0cQi7AzhOD4W0udt5kGWGBqKvzg=;
+        b=a9W2Hpgw5AcgjqDdTelM4E2uONYflCcC1isOvniVPUegIPnErH01oJVRnGroxa/CpB
+         9bBHKFC6Ezv8fO352CZzEguCyPnWvvytYlu7j/pzmf16FeKUmtSc1bnThqnN1sUnqRdv
+         Bu6C7sEkjmjrRbR7T9M6xm/lqMOxVFRuviAMHwWBkOPAfWEjj4cBwI26ynAXWbwbaW0n
+         rZpgYZumaKqyGBQPJlT+QBrZorsArDZeMUYAmUgu05c1CqBsp378qey6k+NNa2Myu6ML
+         JPomwezZUz7ewDvf1LQQNPtJz9CdzjTYCdymziErC7PQSwXdPGmFF7PX8ei4leD2lgyL
+         xusw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741194447; x=1741799247;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IrDAdDeLwUuVeMKM0cQi7AzhOD4W0udt5kGWGBqKvzg=;
+        b=Up2utAx+wnbCxDEv8OnqE6QminyfEHgOPDjd+v4iyr88PA8gpKy34qWEJBHy6TrKBM
+         Xpb2ISOxcGiwNr3PR4YqK4NqXQXoqt5jt11tJThmmcCOHLxjy56Al0l/oECOLfKzJm9t
+         eLvO6o6/BRV09KQiUvQya02oqrFlgrRMJ+jeYjgsvmnPgFvIcEhEenUVIAL3lfMzEl2/
+         Y9ZhfyqMvKMBKZAYNfa3JR+yWyuK5CnM9MlmFSoyguMq8KF631EOeqScIkFKcfVJzswB
+         xLQpV+z4IDuK4DsWpt8EMmKVKQ2uBUQVqlpPrFxFne5NBBJNwhtDRgmUtf/Q2iJt1WPP
+         raYA==
+X-Forwarded-Encrypted: i=1; AJvYcCWkT9HSRiMwdgHbaEfQBUiu7XfWocX0Qg0AFMf1Z6w8JdHuDXUkbHA2D43zERUQP6ZFoTeoeXqaS/M3O/s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwFqy/G658ciplZrBpO3Cofon6ZOJV3UG6QX7AW0ki6jZDbts1X
+	gHVXtgo4E6LnSCxr1uWdPUtFIyrwGRj6Io/REYI6eJI6MT77iOUCjSl2x2BSbY9Cw7hZxSF3AuU
+	JM0VN3SYlOREveGNilwnNKHCcXFhZxQMc
+X-Gm-Gg: ASbGncvOOCHJmMs4/yQLUgYhE6kEy42FkD0HdPmmrTiZpg9W9VPZReJv51o+47sA85Z
+	NzGgfbQjtspShs/cZYYFShpefKPnhYnUbxWutwy7rfCsunsGHsFPLi3ppNfRf5hvQ0yMkmIZysU
+	RjM3QOlTnzZkWrf2luxlDsmSDD3Cby4EnDcCX81BIKiV+c4LqBYp9OXqbr3A==
+X-Google-Smtp-Source: AGHT+IHlGvKj30q2ZD6D1kyBWgqCsWE7vSW6M9vMSiVPKsTE+7Hv+cxY7wDuZ60gtMIkmMT2a0TwPz+VQM/eRw9aB0c=
+X-Received: by 2002:a05:6214:2241:b0:6e6:602f:ef68 with SMTP id
+ 6a1803df08f44-6e8e6d1065cmr51868466d6.10.1741194447552; Wed, 05 Mar 2025
+ 09:07:27 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2] x86/fpu: make kernel-mode FPU reliably usable in
- softirqs
-To: Ingo Molnar <mingo@kernel.org>, Eric Biggers <ebiggers@kernel.org>
-Cc: x86@kernel.org, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
- Ben Greear <greearb@candelatech.com>, Xiao Liang <shaw.leon@gmail.com>,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- Andy Lutomirski <luto@kernel.org>, "Jason A . Donenfeld" <Jason@zx2c4.com>,
- "Bae, Chang Seok" <chang.seok.bae@intel.com>
-References: <20250304204954.3901-1-ebiggers@kernel.org>
- <Z8gUYamgBr4M5ZaB@gmail.com>
-Content-Language: en-US
-From: Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <Z8gUYamgBr4M5ZaB@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <Z8KrAk9Y52RDox2U@gondor.apana.org.au> <Z8KxVC1RBeh8DTKI@gondor.apana.org.au>
+ <Z8YOVyGugHwAsvmO@google.com> <Z8ZzqOw9veZ2HGkk@gondor.apana.org.au>
+ <Z8aByQ5kJZf47wzW@google.com> <Z8aZPcgzuaNR6N8L@gondor.apana.org.au>
+ <dawjvaf3nbfd6hnaclhcih6sfjzeuusu6kwhklv3bpptwwjzsd@t4ln7cwu74lh>
+ <Z8dm9HF9tm0sDfpt@google.com> <Z8fI1zdqBNGmqW2d@gondor.apana.org.au>
+ <Z8fssWOSw0kfggsM@google.com> <Z8gAHrXYc52EPsqH@gondor.apana.org.au>
+In-Reply-To: <Z8gAHrXYc52EPsqH@gondor.apana.org.au>
+From: Nhat Pham <nphamcs@gmail.com>
+Date: Wed, 5 Mar 2025 09:07:16 -0800
+X-Gm-Features: AQ5f1JpUxMxJTN0qiM9PWOcfL5HuHUGuSk3KYsWuMOncT2xkIkYFnpZEKpYKz1c
+Message-ID: <CAKEwX=MoiqOCDt=4Y-82PKUg92RtFxR1bOXOottSC2i1G7Bekw@mail.gmail.com>
+Subject: Re: [RFC PATCH 7/7] mm: zswap: Use acomp virtual address interface
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Yosry Ahmed <yosry.ahmed@linux.dev>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Eric Biggers <ebiggers@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 3/5/25 01:07, Ingo Molnar wrote:>> Alternatives considered:
->> - Make kernel-mode FPU sections fully preemptible.  This would require
->>   growing task_struct by another struct fpstate which is more than 2K.
-> 
-> So that's something that will probably happen once the kernel is built 
-> using APX anyway?
+On Tue, Mar 4, 2025 at 11:41=E2=80=AFPM Herbert Xu <herbert@gondor.apana.or=
+g.au> wrote:
+>
+> On Wed, Mar 05, 2025 at 06:18:25AM +0000, Yosry Ahmed wrote:
+> >
+> > I think there are other motivations for zcomp. Nhat was actually talkin=
+g
+> > about switch zswap to use zcomp for other reasons. Please see this
+> > thread:
+> > https://lore.kernel.org/lkml/CAKEwX=3DO8zQj3Vj=3D2G6aCjK7e2DDs+VBUhRd25=
+AefTdcvFOT-=3DA@mail.gmail.com/.
+>
+> The only reason I saw was the support for algorithm parameters.
+> Yes that will of course be added to crypto_acomp before I attempt
+> to replace zcomp.
 
-I was expecting that building the kernel with APX would be very
-different than a kernel_fpu_begin(). We don't just need *one* more save
-area for APX registers: we need a stack, just like normal GPRs.
+For the record, that's also the only reason why I was thinking about
+it. :) I have no passion for zcomp or anything - as long as we support
+all the cases (hardware acceleration/offloading, algorithms
+parameters, etc.), I'm happy :)
 
-We'd effectively need to enlarge pt_regs and fix up things like
-PUSH_AND_CLEAR_REGS to save the APX registers in addition to the good
-old GPRs before calling C code.
-
-That's what I was thinking at least. Did folks have more clever ideas?
+Thanks for the hard work, Herbert, and I look forward to seeing all of
+this work.
