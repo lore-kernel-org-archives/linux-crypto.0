@@ -1,47 +1,106 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5905324CEE3;
-	Wed,  5 Mar 2025 19:16:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BEE4250BFB
+	for <linux-crypto@vger.kernel.org>; Wed,  5 Mar 2025 19:18:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741202171; cv=none; b=c5HtRBr7rC8Dn6owXdNybh+ikp4w/xOXKbFDgN9hqHJgCzs59IrTJVM3623ozsnGyKaRk/7jfzPdy3xYdvb4eZsYZ5ue4zxpN9Ijs/UCIghULLabkXEXHwShT5JQdR+0VYnipxiPiiaEyv1nDAEq8VV67Em+K38Vy7Eyiq/IqCc=
+	t=1741202313; cv=none; b=fg0n7zJLkTE6fW8nCJhrWVntoyOgHXr6LJgjRlpC+azpUWSuBp53wNAYAGAYJFq6RZPNGFupRHo8KDvOYoeEACUVTLrE34n/KSiQ8/i5PbZENJENBjNakz1YiJT5gVUjaAW2inxoC2i+N5hrnX5aOmuSfyhotnQhg2d6LOfRYXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741202171; c=relaxed/simple;
-	bh=fubuqMlM2Oo+8Icg3TWKdYQa/lCj0hx58ocM+KyVbgk=;
+	s=arc-20240116; t=1741202313; c=relaxed/simple;
+	bh=3SzijABCo7L0oRCqEvdXZEB88jTL2x7bJ6AOPFFhYh4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GAILJq7RyW0w1OniMfdNwdAWRki3yDzrCdf8aBhBUXp+gNva3Qj8WWx7WSP131HAvRoAUplEBR+JmYUQeQ6X+P2lZeEnLVdV1vpOE96CIywOoXF4RYyM0rNKuDKkW1sFBxWExeUKeFvks3w/Q3S/gEelIOiIt9fh77a/a/gKu4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kQ9Q1udn; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=M/D/VXwuoYPGJmi+TrOIyS7e8MeYY/hXSI4ttu7vLIRoGsL68CON5PRoYbFwA5yD3qWgFxAia5tJCUqHNrDhIZQsSFU68JOR5IPrBB4t/Twfc8M7bZ4AFe316X1a9VeYSJvYqoa6yziPhhb93e4HeVHVTEQnakrbDkjCSHVkYEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=Ri5MkLza; arc=none smtp.client-ip=209.85.222.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kQ9Q1udn"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72E83C4CED1;
-	Wed,  5 Mar 2025 19:16:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741202170;
-	bh=fubuqMlM2Oo+8Icg3TWKdYQa/lCj0hx58ocM+KyVbgk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kQ9Q1udnJ68GCD1jFiiTzPgeSSS5VMfZveMn/1zpJQBDvv5yc70hyqvAsnij9q52k
-	 KOxrgKUB3LNd7KdtwOtwvRJ+EhMWg5K+9h1zKPnkUlQ3siibjMWiiMPuESXNt4CimP
-	 s+14lE1XgnOq06UG1O7u4a80DMc5NQFGLrW68tV+HAnA1erm7Pbh56IeslO7sUiaPU
-	 Btsjp5hQ9N4nBR2LcqHZk3jQ5KoTaeQJdDoejoRJVjWQW8o8r1mqTZ9OU0jJCZAD1v
-	 ZkW1F8mlax5weiwXLKout3xc0phW0pziQEYKzlXaZwJS4zOq758M9tWm/tprfN6MWO
-	 bvcPzpYqGSECA==
-Date: Wed, 5 Mar 2025 11:16:08 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: David Laight <david.laight.linux@gmail.com>
-Cc: linux-kernel@vger.kernel.org, Bill Wendling <morbo@google.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H . Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Justin Stitt <justinstitt@google.com>, linux-crypto@vger.kernel.org,
-	llvm@lists.linux.dev
-Subject: Re: [PATCH] x86/crc32: optimize tail handling for crc32c short inputs
-Message-ID: <20250305191608.GA19889@sol.localdomain>
-References: <20250304213216.108925-1-ebiggers@kernel.org>
- <20250305142653.751d9840@pumpkin>
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="Ri5MkLza"
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7c07cd527e4so635351685a.3
+        for <linux-crypto@vger.kernel.org>; Wed, 05 Mar 2025 11:18:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1741202310; x=1741807110; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=C7y/oLdinpDpvBC2aTZl0N56MEM+KgeXEJqvXNG5yTE=;
+        b=Ri5MkLzaGreAbObP73Bg0DUXzSzTK6q/AiY/Qa6v6PeP7iAXQpiD8TsWAceA6vex1W
+         ZBne8M5S7QeyS1lAJrLeL/NHUiLL2cbx2ytZc02wOOxFm5jtxDwmpNXnjMEw5RTBAYwH
+         HU7E6CDaRtRYNyEJI2naFRsz0LoDyP3H37eS+JFqTcjNbBrYcyyl5CbnakIT/l/oyZwQ
+         bbYNBDepJcuWmmx6z06u4SrMjCXnZUHqIsw21E/W+YRUHy3IR8aXhbE4Vr9pXf+NEHO7
+         6rTGw9W3SpnjoO5kIhkjo6sAWEWCzWU5Nbvy5iKrLHt8blHyqJ6NPT/96U81+MqS8I5B
+         Rnag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741202310; x=1741807110;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=C7y/oLdinpDpvBC2aTZl0N56MEM+KgeXEJqvXNG5yTE=;
+        b=BpXlyaG8cFECiKjePmDjiP3nee7iNTDQhKMtcg+PLbpCKE73JGMbp3PQAXXD81UmOm
+         FKXXynArYybUJKmwi5ut2123q0o8CSPsN8RiLoEvuSWdGKsilJitij9+0i45ZuirXEBz
+         3tl9/FCl3XtkNPwWMBRRrpz6My+6dAnU7d0XIYnQIEmFuKsHr6NlKqGcT2LnM1ggpl/f
+         CBY+TZyCcC4EmE1SK7VcRTusT8OiYxhI1UydPfkzjaf2jGp9qG/+ir4M8P3IJTC/GPNA
+         XJKr15R6hMx+xfCRJSWtjvDcBQ84MzE/RaMMkQ39aBQ3OK13ATpRokfT656ZGbDXIeDh
+         mLNw==
+X-Forwarded-Encrypted: i=1; AJvYcCUsHLfJWn792AUr5UV1CfEkcYQ4vn5bATz72CLCWlrAu8+zinxe453niZ3YtlCGf1U+/jMSWmx8zQ+dJB8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywz13p1/+4ixVnnYMBeye13w+B16GFThjS9s8tWsNohSzdPFIva
+	uw2gy8N/O5a+CUxS2utpmo5rWmrrUC4kB608GrH/JYr2D1kqGGbqzx2Wi509fVM=
+X-Gm-Gg: ASbGncv3oZVn9wnJQBs5d4e6XAAfAKydoGdPxqDT/xAssIkgbkIlcn+DX4tJ4u/cOOT
+	kQTq0ffS9uLpp3G8Oc0dBeVsNU5cLl4kvuWSBOrQGTw/jAXYviVJ+1w1heyLPaK1LUV23yvmucp
+	kPWGqiwv757Z+YtQLDbWVV+t9hAV9PsWgaTN4vdY5Otm1Bt9lA6xgFGWlJAM+2A897HjOIR0IOh
+	IM0pkYOM0doCaNB3b0xODbd5z4VSveVidw1wJaQqxdHTu3trd2LP847Iy54ADxxoH/xleA8FfxS
+	ms5VPu6tPJDAFWUrwEQMIwiWRjaBkB/REg/VLzj34icyPQ15/6DVAU+15wWLwC0ZskcB2v2JArf
+	e44zp0xupgrCcd2woww==
+X-Google-Smtp-Source: AGHT+IFwvrtrBNb8MOcl/UiqO1Z26YCuhB0icUQG2aJEfrzqQ/D1xCWD+/mL64bShsE0pSsh+4l3sg==
+X-Received: by 2002:a05:620a:6285:b0:7c3:cd78:df38 with SMTP id af79cd13be357-7c3d8e465a9mr663299885a.10.1741202310279;
+        Wed, 05 Mar 2025 11:18:30 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c378d9f917sm915979885a.78.2025.03.05.11.18.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Mar 2025 11:18:29 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1tpuGC-00000001V2T-3xgf;
+	Wed, 05 Mar 2025 15:18:28 -0400
+Date: Wed, 5 Mar 2025 15:18:28 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Alexey Kardashevskiy <aik@amd.com>
+Cc: Xu Yilun <yilun.xu@linux.intel.com>, x86@kernel.org,
+	kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Ashish Kalra <ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>,
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Christoph Hellwig <hch@lst.de>, Nikunj A Dadhania <nikunj@amd.com>,
+	Michael Roth <michael.roth@amd.com>,
+	Vasant Hegde <vasant.hegde@amd.com>,
+	Joao Martins <joao.m.martins@oracle.com>,
+	Nicolin Chen <nicolinc@nvidia.com>,
+	Lu Baolu <baolu.lu@linux.intel.com>,
+	Steve Sistare <steven.sistare@oracle.com>,
+	Lukas Wunner <lukas@wunner.de>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Dionna Glaze <dionnaglaze@google.com>, Yi Liu <yi.l.liu@intel.com>,
+	iommu@lists.linux.dev, linux-coco@lists.linux.dev,
+	Zhi Wang <zhiw@nvidia.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+Subject: Re: [RFC PATCH v2 14/22] iommufd: Add TIO calls
+Message-ID: <20250305191828.GD354403@ziepe.ca>
+References: <20250218111017.491719-1-aik@amd.com>
+ <20250218111017.491719-15-aik@amd.com>
+ <Z72GmixR6NkzXAl7@yilunxu-OptiPlex-7050>
+ <2fe6b3c6-3eed-424d-87f0-34c4e7e1c906@amd.com>
+ <Z77xrqLtJfB84dJF@yilunxu-OptiPlex-7050>
+ <20250226131202.GH5011@ziepe.ca>
+ <433217be-55e3-477b-bc10-cf81f02ab21e@amd.com>
+ <20250301003200.GQ5011@ziepe.ca>
+ <4ae5eda3-824a-4bb5-b763-19083c085575@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -50,93 +109,45 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250305142653.751d9840@pumpkin>
+In-Reply-To: <4ae5eda3-824a-4bb5-b763-19083c085575@amd.com>
 
-On Wed, Mar 05, 2025 at 02:26:53PM +0000, David Laight wrote:
-> On Tue,  4 Mar 2025 13:32:16 -0800
-> Eric Biggers <ebiggers@kernel.org> wrote:
+On Wed, Mar 05, 2025 at 02:09:09PM +1100, Alexey Kardashevskiy wrote:
 > 
-> > From: Eric Biggers <ebiggers@google.com>
+> 
+> On 1/3/25 11:32, Jason Gunthorpe wrote:
+> > On Thu, Feb 27, 2025 at 11:33:31AM +1100, Alexey Kardashevskiy wrote:
+> > > 
+> > > 
+> > > On 27/2/25 00:12, Jason Gunthorpe wrote:
+> > > > On Wed, Feb 26, 2025 at 06:49:18PM +0800, Xu Yilun wrote:
+> > > > 
+> > > > > E.g. I don't think VFIO driver would expect its MMIO access suddenly
+> > > > > failed without knowing what happened.
+> > > > 
+> > > > What do people expect to happen here anyhow? Do you still intend to
+> > > > mmap any of the MMIO into the hypervisor? No, right? It is all locked
+> > > > down?
+> > > 
+> > > This patchset expects it to be mmap'able as this is how MMIO gets mapped in
+> > > the NPT and SEV-SNP still works with that (and updates the RMPs on top), the
+> > > host os is not expected to access these though. TDX will handle this somehow
+> > > different. Thanks,
 > > 
-> > For handling the 0 <= len < sizeof(unsigned long) bytes left at the end,
-> > do a 4-2-1 step-down instead of a byte-at-a-time loop.  This allows
-> > taking advantage of wider CRC instructions.  Note that crc32c-3way.S
-> > already uses this same optimization too.
+> > I'm expecting you'll wrap that in a FD,
 > 
-> An alternative is to add extra zero bytes at the start of the buffer.
-> They don't affect the crc and just need the first 8 bytes shifted left.
+> A KVM memslot from VFIO's fd similar to gmemfd's fd, and skip VMA? Doable
+> but 1) creates a KVM->VFIO dependency to do gpa->hpa translation 2) is not
+> necessary in the AMD case (although host-mmap of guest-assigned private BAR
+> is way too easy way of shooting yourself in the foot).
+
+But since it is necessary in other cases, the code will be there and
+everyone should just use it..
+
+> > since iommufd will not be accessing MMIO through mmaps.
 > 
-> I think any non-zero 'crc-in' just needs to be xor'ed over the first
-> 4 actual data bytes.
-> (It's over 40 years since I did the maths of CRC.)
-> 
-> You won't notice the misaligned accesses all down the buffer.
-> When I was testing different ipcsum code misaligned buffers
-> cost less than 1 clock per cache line.
-> I think that was even true for the versions that managed 12 bytes
-> per clock (including the one Linus committed).
-> 
-> 	David
+> here I do not follow, why would iommufd care about MMIO? or it is about p2p
+> DMA? Thanks,
 
-Sure, but that only works when len >= sizeof(unsigned long).  Also, the initial
-CRC sometimes has to be divided between two unsigned longs.
+Yes, p2p dma
 
-The following implements this, and you can play around with it a bit if you
-want.  There may be a way to optimize it a bit more.
-
-But I think you'll find it's a bit more complex than you thought.
-
-I think I'd like to stay with the shorter and simpler 4-2-1 step-down.
-
-u32 crc32c_arch(u32 crc, const u8 *p, size_t len)
-{
-	if (!static_branch_likely(&have_crc32))
-		return crc32c_base(crc, p, len);
-
-	if (IS_ENABLED(CONFIG_X86_64) && len >= CRC32C_PCLMUL_BREAKEVEN &&
-	    static_branch_likely(&have_pclmulqdq) && crypto_simd_usable()) {
-		kernel_fpu_begin();
-		crc = crc32c_x86_3way(crc, p, len);
-		kernel_fpu_end();
-		return crc;
-	}
-
-	if (len % sizeof(unsigned long) != 0) {
-		unsigned long msgpoly;
-		u32 orig_crc = crc;
-
-		if (len < sizeof(unsigned long)) {
-			if (sizeof(unsigned long) > 4 && (len & 4)) {
-				asm("crc32l %1, %0"
-				    : "+r" (crc) : ASM_INPUT_RM (*(u32 *)p));
-				p += 4;
-			}
-			if (len & 2) {
-				asm("crc32w %1, %0"
-				    : "+r" (crc) : ASM_INPUT_RM (*(u16 *)p));
-				p += 2;
-			}
-			if (len & 1)
-				asm("crc32b %1, %0"
-				    : "+r" (crc) : ASM_INPUT_RM (*p));
-			return crc;
-		}
-		msgpoly = (get_unaligned((unsigned long *)p) ^ orig_crc) <<
-			  (8 * (-len % sizeof(unsigned long)));
-		p += len % sizeof(unsigned long);
-		crc = 0;
-		asm(CRC32_INST : "+r" (crc) : "r" (msgpoly));
-
-		msgpoly = get_unaligned((unsigned long *)p) ^
-			  (orig_crc >> (8 * (len % sizeof(unsigned long))));
-		p += sizeof(unsigned long);
-		len -= (len % sizeof(unsigned long)) + sizeof(unsigned long);
-		asm(CRC32_INST : "+r" (crc) : "r" (msgpoly));
-	}
-
-	for (len /= sizeof(unsigned long); len != 0;
-	     len--, p += sizeof(unsigned long))
-		asm(CRC32_INST : "+r" (crc) : ASM_INPUT_RM (*(unsigned long *)p));
-
-	return crc;
-}
+Jason
