@@ -1,92 +1,108 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 792E82E338C
-	for <linux-crypto@vger.kernel.org>; Wed,  5 Mar 2025 07:46:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C93571547E2;
+	Wed,  5 Mar 2025 07:58:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741160787; cv=none; b=UNlEtPvWr9MyHu2zRXqF7o3IvfvoPj35KJsDu9y9i/ZMLjjUlKgv7+faBPtbmx+HEob+bRF3SMzNWZRYhdIRcgGUsIS3cVnXVmI0C5fBRiYD3VddHITseC3Tfx/v1yetE/ZrlOw8p/MRfYTCvKnTby5G/r4g5TfQGWiCz4+2QIY=
+	t=1741161502; cv=none; b=r5iKSBo7AJys5ugnWv5A5ihN9d7+g6hYFA/eEngtJn3cosndefQWSkOjN6vw8P+mu7Zfd39DPcxXlrWcpFCEpIhG5y+pQQO5E/TwbEJo2h31fpQVJQp2NoAWOFZDrMZL1gfnAI2bvrUXsE2684zIHFzC8mVHdgzHMkmwC8EagR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741160787; c=relaxed/simple;
-	bh=8SbhBn5bz1P/2lEiCttUgjOafkwRhOKxUE7b5/p/6mw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G7VoAk5cKVcvg0KKII3aJ+5RMEx9QKEXoohR0nGWqhonNOW8H5N5cMlYiUNKq4aABMHIFrl0cZxxg4ge/TpK9Pm6sdySp1pw+WzIEM7jQ/jRVLSqHfHHnaLs6d4r2l2J7LwvalApLB42UyGe3idpEOe0sN4Z5g7BjLNwch7yqyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=qe+eWC4f; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1741161502; c=relaxed/simple;
+	bh=X5XQrDXEPciRuX9iq2hVuzW/+FG66YoJJMIz1n0bFZQ=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=SldgZYtNWmoLHgabxr42dZawtKFMv9fB4ZNAOt5KWQTF0aBaDMxr9/ai/B1QpGK2irAGAewzOsI9huVUBEqO1e6bbClzTgxaqYoP0zAjRLrmYDv+TJRpArzAtCcBFhXMpp5zwfLT2gAZSwQ9NYBXL7gZ2iBXVQFLo1P6Gtz36Ec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=iQFKH6n3; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="qe+eWC4f"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=7lxQGJWnptYN6UJuItgLOi8alFXoRtXtR7MzeGJQRmg=; b=qe+eWC4f6x2IYkKkc+nU+IYq/k
-	pzd31Tex4VcnHP0W5MTbJxjFiALMM9PlcJPtU5bu1iBRjKfHFpePibNeNKDMLbWTKqjhcKeY4Cwa/
-	L6ILmIRrjd5gB9Go1bL3qJH+QcKdw7yGPByPA5wi5VUnJSU2ybc0VDxfZ2fbDI/nk2WewAv9Q4klx
-	h32bSitkn1/otCUcy0PvC8RStgIrABoupRZkl94hXpI7AoahRMGdLM2Uvj9I7Fjc5c3zRPN5OvqKU
-	oPGTuCB4KW+G8C8h4vD10HXBu323DYLYH2P/8HH1iYcasd0EZ2pn11dxbHz8QTYKpt2Zyo94qlvkB
-	S45N+g7g==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tpjSM-003tvh-0I;
-	Wed, 05 Mar 2025 15:46:19 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 05 Mar 2025 15:46:18 +0800
-Date: Wed, 5 Mar 2025 15:46:18 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	linux-mm@kvack.org
-Subject: Re: [RFC PATCH 7/7] mm: zswap: Use acomp virtual address interface
-Message-ID: <Z8gBSgasXlu_0_s2@gondor.apana.org.au>
-References: <Z8Hcur3T82_FiONj@google.com>
- <Z8KrAk9Y52RDox2U@gondor.apana.org.au>
- <Z8KxVC1RBeh8DTKI@gondor.apana.org.au>
- <Z8YOVyGugHwAsvmO@google.com>
- <Z8ZzqOw9veZ2HGkk@gondor.apana.org.au>
- <Z8aByQ5kJZf47wzW@google.com>
- <Z8aZPcgzuaNR6N8L@gondor.apana.org.au>
- <dawjvaf3nbfd6hnaclhcih6sfjzeuusu6kwhklv3bpptwwjzsd@t4ln7cwu74lh>
- <Z8fHyvF3GNKeVw0k@gondor.apana.org.au>
- <Z8fsXZNgEbVkZrJP@google.com>
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="iQFKH6n3"
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5253vdEs028481;
+	Tue, 4 Mar 2025 23:58:02 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=JIWQDFjaDYN/Y8wWU8cKql+
+	4eIYuROMtD9vaIXBcFaE=; b=iQFKH6n3XXY65uasOFaTQ+xhBkAWPzMBl4eWONO
+	FiocZ9c51uuwkEI3noL+ilIQluuhysxuIdmW3MCelNmSHMHRUsC4TjV4Om7s6SSf
+	W/8d8DtxII5VG/XS0SXQijxEH5Ae+yJ3bJ8AIlf8vOd7Wn2b2nwwUPMzEVOG6THi
+	bKb+2Y+byvQbmfIk0QZ7ikVu6U7DxO2YsCLk8wYUhqJMcpXdU8iNWvRT3kzyQZIz
+	HAd8nX/NKVC4wdy9iyjKlQxA70hKZInokF7hU/ngu3esSmBfrGpWmXTWuaZePR1o
+	Eza8roAzmtPBLghV/+uNV0FAKuh6qa/9yxSfZ09CCNM6HiA==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 456f5tgcr9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 04 Mar 2025 23:58:02 -0800 (PST)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Tue, 4 Mar 2025 23:58:01 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Tue, 4 Mar 2025 23:58:01 -0800
+Received: from bharat-OptiPlex-3070.marvell.com (bharat-OptiPlex-3070.marvell.com [10.28.8.24])
+	by maili.marvell.com (Postfix) with ESMTP id E7D853F703F;
+	Tue,  4 Mar 2025 23:57:57 -0800 (PST)
+From: Shashank Gupta <shashankg@marvell.com>
+To: Boris Brezillon <bbrezillon@kernel.org>,
+        Arnaud Ebalard
+	<arno@natisbad.org>,
+        Srujana Challa <schalla@marvell.com>,
+        Herbert Xu
+	<herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Bharat Bhushan <bbhushan2@marvell.com>,
+        Amit Singh Tomar
+	<amitsinght@marvell.com>,
+        Shashank Gupta <shashankg@marvell.com>,
+        "Sunil
+ Kovvuri Goutham" <sgoutham@marvell.com>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH] crypto: octeontx2: suppress auth failure screaming due to negative tests
+Date: Wed, 5 Mar 2025 13:27:05 +0530
+Message-ID: <20250305075704.2987579-1-shashankg@marvell.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z8fsXZNgEbVkZrJP@google.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: rV9ak91RPM_aGl2NilWDy29WqeqvyyS7
+X-Authority-Analysis: v=2.4 cv=JtULrN4C c=1 sm=1 tr=0 ts=67c8040a cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=Vs1iUdzkB0EA:10 a=M5GUcnROAAAA:8 a=y9R9rvgWzFRaf_s37dAA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
+X-Proofpoint-ORIG-GUID: rV9ak91RPM_aGl2NilWDy29WqeqvyyS7
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-05_03,2025-03-05_01,2024-11-22_01
 
-On Wed, Mar 05, 2025 at 06:17:01AM +0000, Yosry Ahmed wrote:
->
-> Actually I just sent out a series that I had sitting in my local tree
-> for a bit to complete Sergey's work and completely remove the map/unmap
-> APIs:
-> https://lore.kernel.org/lkml/20250305061134.4105762-1-yosry.ahmed@linux.dev/.
+This patch addresses an issue where authentication failures were being
+erroneously reported due to negative test failures in the "ccm(aes)"
+selftest.
+pr_debug suppress unnecessary screaming of these tests.
 
-Looks good to me!
+Signed-off-by: Shashank Gupta <shashankg@marvell.com>
+---
+ drivers/crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c b/drivers/crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c
+index b89e245c9aa4..835a2a2de477 100644
+--- a/drivers/crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c
++++ b/drivers/crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c
+@@ -276,9 +276,10 @@ static int cpt_process_ccode(struct otx2_cptlfs_info *lfs,
+ 				break;
+ 			}
  
-> I am not objecting to switch the API to use SG lists if we intend to
-> switch multiple compression algorithms to use them and will completely
-> switch to using SG-based APIs in both zswap and zram. But I don't want
-> us to have two separate interfaces please.
-
-Fair enough.  I will wait until crypto_acomp can replace zcomp
-before posting more SG list changes to zswap.
-
-> Also, please take a look at patch 2 in this series for another reason, I
-> want to make sure if your virtual address series can be used to remove
-> the !virt_addr_valid() memcpy() case completely.
-
-Yes it should work provided that you specify the memory as nondma.
-
-Cheers,
+-			dev_err(&pdev->dev,
+-				"Request failed with software error code 0x%x\n",
+-				cpt_status->s.uc_compcode);
++			pr_debug("Request failed with software error code 0x%x: algo = %s driver = %s\n",
++				 cpt_status->s.uc_compcode,
++				 info->req->areq->tfm->__crt_alg->cra_name,
++				 info->req->areq->tfm->__crt_alg->cra_driver_name);
+ 			otx2_cpt_dump_sg_list(pdev, info->req);
+ 			if (uc_ccode == 0x4C)
+ 				*res_code = -EBADMSG;
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.34.1
+
