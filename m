@@ -1,124 +1,86 @@
-Received: from bmailout1.hostsharing.net (bmailout1.hostsharing.net [83.223.95.100])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 859A2567D;
-	Wed,  5 Mar 2025 17:16:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C143119C569;
+	Wed,  5 Mar 2025 17:37:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741195026; cv=none; b=qEe8fGhU2heM6bsb3iFuWycRXrZ2a9b0vgm6so2LfU9JKrFQy9xHTeug+1esDG+6g51uhWaYyQGxg3qYyF6ihf5nVFgATepgCwvuMwojiHKY5Ym7Jjohn9n6lHCnODmoK2XK/hCr8TLytCdImX1lKMZZBVOuuFc3unLldGrBDv0=
+	t=1741196252; cv=none; b=EWmxzk3IHY8Rcfm9w+gly7ID7EjS2bQaIzre+OB1p7LeIJacUm+VnKx+batrbS6yhd+My27alZKeT/z8SB3xT/CgiPPY/vpBYslQknPJsEsWIHAtV6TYd8653m13lqXIAAATy2Ob37NX4hRH1AMyTG5mloVGhP0J81k/qkcekno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741195026; c=relaxed/simple;
-	bh=3XbN8qRobWrAztvAkHqAPv4HcVw1mR5SEU8MQNSX7ls=;
-	h=Message-Id:From:Date:Subject:MIME-Version:Content-Type:To:Cc; b=P8XK6nW7Xovk0PvKOFa2fxzioGEkaLf+tqYfTSoU760dgwtWUvOlghsGjlVpUwzwkIvHowsiWUJwa7rLSyNJyR9huQ8JaNv++S8CBMGGsPixt7mjhUZG8oVICgH0P6wpQhKZSzp46i77kK8wfsCMSolFxQLAZ9qZIsV0uaQBMsA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=pass smtp.mailfrom=wunner.de; arc=none smtp.client-ip=83.223.95.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wunner.de
-Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout1.hostsharing.net (Postfix) with ESMTPS id E3A433000A3A4;
-	Wed,  5 Mar 2025 18:16:51 +0100 (CET)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id CC7731BCE7; Wed,  5 Mar 2025 18:16:51 +0100 (CET)
-Message-Id: <90c171d5beed08bcf65ec2df6357a7ac97520b91.1741194399.git.lukas@wunner.de>
-From: Lukas Wunner <lukas@wunner.de>
-Date: Wed, 5 Mar 2025 18:14:32 +0100
-Subject: [PATCH] MAINTAINERS: Add Lukas & Ignat & Stefan for asymmetric keys
+	s=arc-20240116; t=1741196252; c=relaxed/simple;
+	bh=nKyUdYFJ7Cfv/I2R2NfHVbnwb9rPPNSVBNlTXVcu1GE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uNf5LwZslPb/OHzHkW7fRqTvhGQYSm/CsH3WCO2vvv99C6ekfabF179IAvTFfAwMpqReo99mmdhkWhcLkIvu+suAvpDMg8iaf+RjRGzdChgmSI/5kSCfz9DnhAOvc4Syzy6kmbGYjWz5XgZJr+Zz4LtZufC3QISeJ31gGwxUWu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hX5kWA7d; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hX5kWA7d"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF974C4CED1;
+	Wed,  5 Mar 2025 17:37:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741196251;
+	bh=nKyUdYFJ7Cfv/I2R2NfHVbnwb9rPPNSVBNlTXVcu1GE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hX5kWA7d4RNwD69CzyIpBnf9ZRw5YfmiJj9H60j/H+HU+JN+PkEkHIioX8/TnBj1o
+	 NcdSTSeHDUghVgasZkKAYpcCgfKux3GNkijjbxZMF9iY8geKtudMdLwozMWmK2BPwy
+	 2tsGKjqIh2go4Sk1Ez2iO+DaSfMLrFa2X9PsfUFC0uTyajnKJk/7qgeC0ARjwtdFbL
+	 0o0KRKWTS2dZxuYIw0DdWUnvVrzwfXFbDsuE6zqNjkq+YjJdTB7yln+EF8POygI1Ra
+	 BOTAOeNEl2YokMsKREMDduyYEYqCcQPm0FIW2yOxAfWT7a2LsEq7QKhV4rJbci+XKX
+	 VdRZkYSiEvdiA==
+Date: Wed, 5 Mar 2025 18:37:25 +0100
+From: Ingo Molnar <mingo@kernel.org>
+To: Dave Hansen <dave.hansen@intel.com>
+Cc: Eric Biggers <ebiggers@kernel.org>, x86@kernel.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
+	Ben Greear <greearb@candelatech.com>,
+	Xiao Liang <shaw.leon@gmail.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Andy Lutomirski <luto@kernel.org>,
+	"Jason A . Donenfeld" <Jason@zx2c4.com>,
+	"Bae, Chang Seok" <chang.seok.bae@intel.com>
+Subject: Re: [RFC PATCH v2] x86/fpu: make kernel-mode FPU reliably usable in
+ softirqs
+Message-ID: <Z8iL1dY3o9OxQgBy@gmail.com>
+References: <20250304204954.3901-1-ebiggers@kernel.org>
+ <Z8gUYamgBr4M5ZaB@gmail.com>
+ <b6a80f6d-8469-429d-b03a-8fa71a33046b@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-To: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, David Howells <dhowells@redhat.com>, Ignat Korchagin <ignat@cloudflare.com>, Stefan Berger <stefanb@linux.ibm.com>
-Cc: Tadeusz Struk <tstruk@gmail.com>, Tadeusz Struk <tstruk@gigaio.com>, Vitaly Chikunov <vt@altlinux.org>, linux-crypto@vger.kernel.org, keyrings@vger.kernel.org, Eric Biggers <ebiggers@google.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b6a80f6d-8469-429d-b03a-8fa71a33046b@intel.com>
 
-Herbert asks for long-term maintenance of everything under
-crypto/asymmetric_keys/ and associated algorithms (ECDSA, GOST, RSA) [1].
 
-Ignat has kindly agreed to co-maintain this with me going forward.
+* Dave Hansen <dave.hansen@intel.com> wrote:
 
-Stefan has agreed to be added as reviewer for ECDSA.  He introduced it
-in 2021 and has been meticulously providing reviews for 3rd party
-patches anyway.
+> On 3/5/25 01:07, Ingo Molnar wrote:>> Alternatives considered:
+> >> - Make kernel-mode FPU sections fully preemptible.  This would require
+> >>   growing task_struct by another struct fpstate which is more than 2K.
+> > 
+> > So that's something that will probably happen once the kernel is built 
+> > using APX anyway?
+> 
+> I was expecting that building the kernel with APX would be very 
+> different than a kernel_fpu_begin(). We don't just need *one* more 
+> save area for APX registers: we need a stack, just like normal GPRs.
 
-Retain David Howells' maintainer entry until he explicitly requests to
-be removed.  He originally introduced asymmetric keys in 2012.
+Yes - but my point is: with any APX build we'd probably be saving 
+FPU(-ish) registers at entry points, into a separate context area. If 
+that includes FPU registers then we'd not have to do 
+kernel_fpu_begin()/end().
 
-RSA was introduced by Tadeusz Struk as an employee of Intel in 2015,
-but he's changed jobs and last contributed to the implementation in 2016.
+In other words, we'd be doing something close to 'growing task_struct 
+by another struct fpstate', or so - regardless of whether it's in 
+task_struct or some sort of extended pt_regs. The kernel would also be 
+close to 'FPU-safe', i.e. there likely wouldn't be a need for 
+kernel_fpu_begin()/end().
 
-GOST was introduced by Vitaly Chikunov as an employee of Basealt LLC [2]
-(Базальт СПО [3]) in 2019.  This company is an OFAC sanctioned entity
-[4][5], which makes employees ineligible as maintainer [6].  It's not
-clear if Vitaly is still working for Basealt, he did not immediately
-respond to my e-mail.  Since knowledge and use of GOST algorithms is
-relatively limited outside the Russian Federation, assign "Odd fixes"
-status for now.
+Thanks,
 
-[1] https://lore.kernel.org/r/Z8QNJqQKhyyft_gz@gondor.apana.org.au/
-[2] https://prohoster.info/ru/blog/novosti-interneta/reliz-yadra-linux-5-2
-[3] https://www.basealt.ru/
-[4] https://ofac.treasury.gov/recent-actions/20240823
-[5] https://sanctionssearch.ofac.treas.gov/Details.aspx?id=50178
-[6] https://lore.kernel.org/r/7ee74c1b5b589619a13c6318c9fbd0d6ac7c334a.camel@HansenPartnership.com/
-
-Signed-off-by: Lukas Wunner <lukas@wunner.de>
----
- MAINTAINERS | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 8e0736d..b16a1cc 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3595,14 +3595,42 @@ F:	drivers/hwmon/asus_wmi_sensors.c
- 
- ASYMMETRIC KEYS
- M:	David Howells <dhowells@redhat.com>
-+M:	Lukas Wunner <lukas@wunner.de>
-+M:	Ignat Korchagin <ignat@cloudflare.com>
- L:	keyrings@vger.kernel.org
-+L:	linux-crypto@vger.kernel.org
- S:	Maintained
- F:	Documentation/crypto/asymmetric-keys.rst
- F:	crypto/asymmetric_keys/
- F:	include/crypto/pkcs7.h
- F:	include/crypto/public_key.h
-+F:	include/keys/asymmetric-*.h
- F:	include/linux/verification.h
- 
-+ASYMMETRIC KEYS - ECDSA
-+M:	Lukas Wunner <lukas@wunner.de>
-+M:	Ignat Korchagin <ignat@cloudflare.com>
-+R:	Stefan Berger <stefanb@linux.ibm.com>
-+L:	linux-crypto@vger.kernel.org
-+S:	Maintained
-+F:	crypto/ecc*
-+F:	crypto/ecdsa*
-+F:	include/crypto/ecc*
-+
-+ASYMMETRIC KEYS - GOST
-+M:	Lukas Wunner <lukas@wunner.de>
-+M:	Ignat Korchagin <ignat@cloudflare.com>
-+L:	linux-crypto@vger.kernel.org
-+S:	Odd fixes
-+F:	crypto/ecrdsa*
-+
-+ASYMMETRIC KEYS - RSA
-+M:	Lukas Wunner <lukas@wunner.de>
-+M:	Ignat Korchagin <ignat@cloudflare.com>
-+L:	linux-crypto@vger.kernel.org
-+S:	Maintained
-+F:	crypto/rsa*
-+
- ASYNCHRONOUS TRANSFERS/TRANSFORMS (IOAT) API
- R:	Dan Williams <dan.j.williams@intel.com>
- S:	Odd fixes
--- 
-2.43.0
-
+	Ingo
