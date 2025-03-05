@@ -1,516 +1,190 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FB632111
-	for <linux-crypto@vger.kernel.org>; Wed,  5 Mar 2025 03:45:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15AEE45C18;
+	Wed,  5 Mar 2025 04:02:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741146341; cv=none; b=hxpBhFgKPTvDOL6k9t3FoiEAhjid51XiRDK3doksiFmO94roIrHLA4fqa6Zo0hFESGVAoS3ZuiRxQltUUDMy9/8eIgZSHJ2+roM+gyryrJQ1FZWKyQKzL+5Hurcdl4uwRsPphbxTgVj2r+NQVPi8Idm5t5zImB9vbqjD+3Krjhs=
+	t=1741147380; cv=none; b=V5tUZyWQk/FamZOYwhXSdHrm3RJnCeL5LWEiWaHk1UIdpWpBGExZ2t+y39MZbV2djq3ZZcUSmOjhsRH2yEqhSa06Eafb/pHGcKDNY4hS4/rSz/I8mvqHIaV9LnhbXU4E+n9bx6SHJbYeY2uXP4WRm6w+0h8KMBhBGrFKZfsNVEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741146341; c=relaxed/simple;
-	bh=Rf46o17AZVCbynKh8/lXJGw/SEfPC2qsuAgiGx5xhY8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Nzt5roJwUHv6CtARc5TIfXHm/+hNlj7ugf7Rgf/xUcDs+QZIey5mP/wMojxoo/FQDNaDdPF+xDPrHqZbxbPtxutnOxEg4R8wJhDdjRbzoCQ6ErMVshWtv4LUCh27dcGafYh7qbWRKQcQ6z9urj/Wz678bp8085wLxN0JvoabKVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=tTaNxniR; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1741147380; c=relaxed/simple;
+	bh=dXEoI1yxWB3x3Bx4nI5/DZjGbdH8LqtcStMlpibthlU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=l9IjEWL1LUyUlZB3OOFECWEZDbmBO8B9s2MvSbWLqmtQoS/73ko4CMPgAoCYN/w5/N+WE4j1sCx4dG0hwiJiGO8aGJwqBEpkAguMAJTDYDDNKcK6v59qWUw1siUmai3QACxSrznH1LeJoVr5rTh5PZL+juRCUEZGq1Vlcd+vrNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=YRUfquxi; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="tTaNxniR"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=jRSbvlablJfGLKAJj0k0iPLsuWCK+JRDmY8QFewWCUA=; b=tTaNxniRAnlpMgLXP4J2bBIfqU
-	baEuu26kxCSFrqpecZLx6JUubBDhxG8B7fZa4IvRXMuD1WZw3z5DGRAAPkOZXPV/VWJEzFSnxuagq
-	LcyKSfHTKCQlIPi38ZM+B66jTAmjHZUVNvKx5tDmPQTaHIxDYIJvd/aNjEe+V7XzA0SME3c5v4Vib
-	NxQKvRmVraUraOkS2F5EiEFMjDvvwo9Db2bfX+0gBC7PoMFTICc5BpX8nEB3D163k4JkaODv1xmpN
-	hYUgqQmoKXmSBqDH4S1NMQg4sMmgyWZlJljXsgk7eZ+gEIa2lqeyj6ZV8rXNOFl2wBZHmWu2YGsEL
-	DyWW9XdA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tpfhH-003rk4-1O;
-	Wed, 05 Mar 2025 11:45:28 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 05 Mar 2025 11:45:27 +0800
-Date: Wed, 5 Mar 2025 11:45:27 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Yosry Ahmed <yosry.ahmed@linux.dev>
-Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	linux-mm@kvack.org
-Subject: Re: [RFC PATCH 7/7] mm: zswap: Use acomp virtual address interface
-Message-ID: <Z8fI1zdqBNGmqW2d@gondor.apana.org.au>
-References: <Z8GH7VssQGR1ujHV@gondor.apana.org.au>
- <Z8Hcur3T82_FiONj@google.com>
- <Z8KrAk9Y52RDox2U@gondor.apana.org.au>
- <Z8KxVC1RBeh8DTKI@gondor.apana.org.au>
- <Z8YOVyGugHwAsvmO@google.com>
- <Z8ZzqOw9veZ2HGkk@gondor.apana.org.au>
- <Z8aByQ5kJZf47wzW@google.com>
- <Z8aZPcgzuaNR6N8L@gondor.apana.org.au>
- <dawjvaf3nbfd6hnaclhcih6sfjzeuusu6kwhklv3bpptwwjzsd@t4ln7cwu74lh>
- <Z8dm9HF9tm0sDfpt@google.com>
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="YRUfquxi"
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 524KqSHT027529;
+	Wed, 5 Mar 2025 04:02:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=Ae213P
+	QRzf9waOgXH5DVaQsydxVBpE8KDSh9X9D337U=; b=YRUfquxi5EhVWe0PQR/gRL
+	3AfulRJu+eoNuxcDZgNe9eIl+wTkgWNQ3xF8pq99YziDUN5IdqqUHx1zOxl5n+1E
+	ASyuER6qOQDyruqVnd2ipL+BNwyK+FA0dBR1hs2uXaQCNkuYbxYvRfwKEX5+iYmS
+	QiX0NKtWLRhwdzCuuYsqmXWneMOObVXw+CO2J9w9Y3nJhzFOEYkRewHLgqbySVb5
+	Z1xpLr+FN6uu7cjDn1bkRfnLKU79dkhuge+/YYK0wRqCi5haycF5VTQk9RVg25TG
+	s39qo+lG1jP6Tw1YzNh2y2+B8ohKNu83Q6Ro3Q8COrkgAXxjtNUdDD6rDvo7oP1Q
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4568x51ab7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 05 Mar 2025 04:02:30 +0000 (GMT)
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 5253srOD022974;
+	Wed, 5 Mar 2025 04:02:29 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4568x51ab5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 05 Mar 2025 04:02:29 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 52532H2Q020846;
+	Wed, 5 Mar 2025 04:02:29 GMT
+Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 454djngw54-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 05 Mar 2025 04:02:29 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 52542RYP27460224
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 5 Mar 2025 04:02:27 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9721558064;
+	Wed,  5 Mar 2025 04:02:27 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id DA97A58058;
+	Wed,  5 Mar 2025 04:02:22 +0000 (GMT)
+Received: from [9.204.204.161] (unknown [9.204.204.161])
+	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  5 Mar 2025 04:02:22 +0000 (GMT)
+Message-ID: <78a983a2-d6b4-4a46-9d63-345da92f1bf4@linux.ibm.com>
+Date: Wed, 5 Mar 2025 09:32:21 +0530
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z8dm9HF9tm0sDfpt@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] crypto: powerpc: Mark ghashp8-ppc.o as an
+ OBJECT_FILES_NON_STANDARD
+Content-Language: en-GB
+To: Christophe Leroy <christophe.leroy@csgroup.eu>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Danny Tsen <dtsen@linux.ibm.com>
+Cc: Breno Leitao <leitao@debian.org>, Nayna Jain <nayna@linux.ibm.com>,
+        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Madhavan Srinivasan <maddy@linux.ibm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nicholas Piggin <npiggin@gmail.com>, Naveen N Rao <naveen@kernel.org>,
+        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-kernel@vger.kernel.org
+References: <7aa7eb73fe6bc95ac210510e22394ca0ae227b69.1741128786.git.christophe.leroy@csgroup.eu>
+From: Venkat Rao Bagalkote <venkat88@linux.ibm.com>
+In-Reply-To: <7aa7eb73fe6bc95ac210510e22394ca0ae227b69.1741128786.git.christophe.leroy@csgroup.eu>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: AwMebvO9FkBBwqx8fMJ3viKWv-3YaBf9
+X-Proofpoint-ORIG-GUID: mP_YQJ2YvnGx3gK7AHJsfI6Qa3yxfbCC
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-05_02,2025-03-04_02,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 spamscore=0
+ lowpriorityscore=0 adultscore=0 phishscore=0 mlxlogscore=999
+ suspectscore=0 impostorscore=0 priorityscore=1501 malwarescore=0
+ bulkscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2502100000 definitions=main-2503050028
 
-On Tue, Mar 04, 2025 at 08:47:48PM +0000, Yosry Ahmed wrote:
+Hello Christophe,
+
+On 05/03/25 4:32 am, Christophe Leroy wrote:
+> The following build warning has been reported:
 >
-> Yeah I have the same feeling that the handling is all over the place.
-> Also, we don't want to introduce new map APIs, so anything we do for
-> zswap should ideally work for zram.
+>    arch/powerpc/crypto/ghashp8-ppc.o: warning: objtool: .text+0x22c: unannotated intra-function call
+>
+> This happens due to commit bb7f054f4de2 ("objtool/powerpc: Add support
+> for decoding all types of uncond branches")
+>
+> Disassembly of arch/powerpc/crypto/ghashp8-ppc.o shows:
+>
+>   arch/powerpc/crypto/ghashp8-ppc.o:     file format elf64-powerpcle
+>
+>   Disassembly of section .text:
+>
+>   0000000000000140 <gcm_ghash_p8>:
+>     140:    f8 ff 00 3c     lis     r0,-8
+>   ...
+>     20c:    20 00 80 4e     blr
+>     210:    00 00 00 00     .long 0x0
+>     214:    00 0c 14 00     .long 0x140c00
+>     218:    00 00 04 00     .long 0x40000
+>     21c:    00 00 00 00     .long 0x0
+>     220:    47 48 41 53     rlwimi. r1,r26,9,1,3
+>     224:    48 20 66 6f     xoris   r6,r27,8264
+>     228:    72 20 50 6f     xoris   r16,r26,8306
+>     22c:    77 65 72 49     bla     1726574 <gcm_ghash_p8+0x1726434>      <==
+>   ...
+>
+> It corresponds to the following code in ghashp8-ppc.o :
+>
+>   _GLOBAL(gcm_ghash_p8)
+>      lis    0,0xfff8
+>   ...
+>      blr
+>   .long    0
+>   .byte    0,12,0x14,0,0,0,4,0
+>   .long    0
+>   .size    gcm_ghash_p8,.-gcm_ghash_p8
+>
+>   .byte 71,72,65,83,72,32,102,111,114,32,80,111,119,101,114,73,83,65,32,50,46,48,55,44,32,67,82,89,80,84,79,71,65,77,83,32,98,121,32,60,97,112,112,114,111,64,111,112,101,110,115,115,108,46,111,114,103,62,0
+>   .align    2
+>   .align    2
+>
+> In fact this is raw data that is after the function end and that is
+> not text so shouldn't be disassembled as text. But ghashp8-ppc.S is
+> generated by a perl script and should have been marked as
+> OBJECT_FILES_NON_STANDARD.
+>
+> Now that 'bla' is understood as a call instruction, that raw data
+> is mis-interpreted as an infra-function call.
+>
+> Mark ghashp8-ppc.o as a OBJECT_FILES_NON_STANDARD to avoid this
+> warning.
+>
+> Reported-by: Venkat Rao Bagalkote <venkat88@linux.ibm.com>
+> Closes: https://lore.kernel.org/all/8c4c3fc2-2bd7-4148-af68-2f504d6119e0@linux.ibm.com
+> Cc: Danny Tsen <dtsen@linux.ibm.com>
+> Fixes: 109303336a0c ("crypto: vmx - Move to arch/powerpc/crypto")
+> Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+> ---
+>   arch/powerpc/crypto/Makefile | 1 +
+>   1 file changed, 1 insertion(+)
+>
+> diff --git a/arch/powerpc/crypto/Makefile b/arch/powerpc/crypto/Makefile
+> index 9b38f4a7bc15..2f00b22b0823 100644
+> --- a/arch/powerpc/crypto/Makefile
+> +++ b/arch/powerpc/crypto/Makefile
+> @@ -51,3 +51,4 @@ $(obj)/aesp8-ppc.S $(obj)/ghashp8-ppc.S: $(obj)/%.S: $(src)/%.pl FORCE
+>   OBJECT_FILES_NON_STANDARD_aesp10-ppc.o := y
+>   OBJECT_FILES_NON_STANDARD_ghashp10-ppc.o := y
+>   OBJECT_FILES_NON_STANDARD_aesp8-ppc.o := y
+> +OBJECT_FILES_NON_STANDARD_ghashp8-ppc.o := y
 
-I will be getting to zram next.  AFAIK all that's missing from
-acomp is parameter support.  Once that is added we can convert
-zram over to acomp and get rid of zcomp altogether.
 
-> IIUC, what Herbert is suggesting is that we rework all of this to use SG
-> lists to reduce copies, but I am not sure which copies can go away? We
-> have one copy in the compression path that probably cannot go away.
-> After the zsmalloc changes (and ignoring highmem), we have one copy in
-> the decompression path for when objects span two pages. I think this
-> will still happen with SG lists, except internally in the crypto API.
+Applied this patch on top of linux-next 20250303, and it fixes the below 
+reported warning.
 
-It's the decompression copy when the object spans two pages that
-will disappear.  Because I have added SG support to LZO:
+   arch/powerpc/crypto/ghashp8-ppc.o: warning: objtool: .text+0x22c: unannotated intra-function call.
 
-commit a81b9ed5287424aa7d6c191fca7019820fc1d130
-Author: Herbert Xu <herbert@gondor.apana.org.au>
-Date:   Sun Mar 2 13:56:22 2025 +0800
+Please add below tag:
 
-    crypto: lib/lzo - Add decompression scatterlist support
-    
-    Add lzo1x_decompress_safe_sg which handles a scatterlist as its
-    input.  This is useful as pages often compress into large objects
-    that straddle page boundaries so it takes extra effort to linearise
-    them in the face of memory fragmentation.
-    
-    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Tested-By: Venkat Rao Bagalkote <venkat88@linux.ibm.com>
 
-diff --git a/include/linux/lzo.h b/include/linux/lzo.h
-index 4d30e3624acd..f3686ec4aa84 100644
---- a/include/linux/lzo.h
-+++ b/include/linux/lzo.h
-@@ -1,6 +1,11 @@
- /* SPDX-License-Identifier: GPL-2.0 */
- #ifndef __LZO_H__
- #define __LZO_H__
-+
-+#include <linux/types.h>
-+
-+struct scatterlist;
-+
- /*
-  *  LZO Public Kernel Interface
-  *  A mini subset of the LZO real-time data compression library
-@@ -40,6 +45,10 @@ int lzorle1x_1_compress_safe(const unsigned char *src, size_t src_len,
- int lzo1x_decompress_safe(const unsigned char *src, size_t src_len,
- 			  unsigned char *dst, size_t *dst_len);
- 
-+/* decompression with source SG list */
-+int lzo1x_decompress_safe_sg(struct scatterlist *src, size_t src_len,
-+			     unsigned char *dst, size_t *dst_len);
-+
- /*
-  * Return values (< 0 = Error)
-  */
-diff --git a/lib/lzo/Makefile b/lib/lzo/Makefile
-index fc7b2b7ef4b2..276a7246af72 100644
---- a/lib/lzo/Makefile
-+++ b/lib/lzo/Makefile
-@@ -1,6 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0-only
- lzo_compress-objs := lzo1x_compress.o lzo1x_compress_safe.o
--lzo_decompress-objs := lzo1x_decompress_safe.o
-+lzo_decompress-objs := lzo1x_decompress_safe.o lzo1x_decompress_safe_sg.o
- 
- obj-$(CONFIG_LZO_COMPRESS) += lzo_compress.o
- obj-$(CONFIG_LZO_DECOMPRESS) += lzo_decompress.o
-diff --git a/lib/lzo/lzo1x_decompress_safe.c b/lib/lzo/lzo1x_decompress_safe.c
-index c94f4928e188..e1da9725e33b 100644
---- a/lib/lzo/lzo1x_decompress_safe.c
-+++ b/lib/lzo/lzo1x_decompress_safe.c
-@@ -12,17 +12,26 @@
-  *  Richard Purdie <rpurdie@openedhand.com>
-  */
- 
--#ifndef STATIC
-+#include <linux/lzo.h>
- #include <linux/module.h>
- #include <linux/kernel.h>
--#endif
--#include <linux/unaligned.h>
--#include <linux/lzo.h>
-+#include <linux/scatterlist.h>
- #include "lzodefs.h"
- 
--#define HAVE_IP(x)      ((size_t)(ip_end - ip) >= (size_t)(x))
--#define HAVE_OP(x)      ((size_t)(op_end - op) >= (size_t)(x))
-+#undef INPUT_IS_LINEAR
-+#ifndef HAVE_IP
-+#define IP_LEFT()	(in + in_len - ip)
-+#define HAVE_IP(x)      ((size_t)(in + in_len - ip) >= (size_t)(x))
- #define NEED_IP(x)      if (!HAVE_IP(x)) goto input_overrun
-+#define GET_IP()	ip = in
-+#define CHECK_IP()	NEED_IP(1)
-+#define PUT_IP()	do {} while (0)
-+#define INPUT		const unsigned char *in
-+#define LZO_SG(name)	name
-+#define INPUT_IS_LINEAR	1
-+#endif
-+
-+#define HAVE_OP(x)      ((size_t)(op_end - op) >= (size_t)(x))
- #define NEED_OP(x)      if (!HAVE_OP(x)) goto output_overrun
- #define TEST_LB(m_pos)  if ((m_pos) < out) goto lookbehind_overrun
- 
-@@ -36,34 +45,34 @@
-  */
- #define MAX_255_COUNT      ((((size_t)~0) / 255) - 2)
- 
--int lzo1x_decompress_safe(const unsigned char *in, size_t in_len,
--			  unsigned char *out, size_t *out_len)
-+int LZO_SG(lzo1x_decompress_safe)(INPUT, size_t in_len,
-+				  unsigned char *out, size_t *out_len)
- {
-+	struct sg_mapping_iter miter __maybe_unused;
- 	unsigned char *op;
- 	const unsigned char *ip;
- 	size_t t, next;
- 	size_t state = 0;
- 	const unsigned char *m_pos;
--	const unsigned char * const ip_end = in + in_len;
- 	unsigned char * const op_end = out + *out_len;
--
- 	unsigned char bitstream_version;
-+	int err;
- 
- 	op = out;
--	ip = in;
--
--	if (unlikely(in_len < 3))
--		goto input_overrun;
-+	GET_IP();
- 
- 	if (likely(in_len >= 5) && likely(*ip == 17)) {
--		bitstream_version = ip[1];
--		ip += 2;
-+		ip++;
-+		CHECK_IP();
-+		bitstream_version = *ip++;
-+		CHECK_IP();
- 	} else {
- 		bitstream_version = 0;
- 	}
- 
- 	if (*ip > 17) {
- 		t = *ip++ - 17;
-+		CHECK_IP();
- 		if (t < 4) {
- 			next = t;
- 			goto match_next;
-@@ -73,22 +82,23 @@ int lzo1x_decompress_safe(const unsigned char *in, size_t in_len,
- 
- 	for (;;) {
- 		t = *ip++;
-+		CHECK_IP();
- 		if (t < 16) {
- 			if (likely(state == 0)) {
- 				if (unlikely(t == 0)) {
--					size_t offset;
--					const unsigned char *ip_last = ip;
-+					size_t offset = 0;
- 
- 					while (unlikely(*ip == 0)) {
- 						ip++;
--						NEED_IP(1);
-+						CHECK_IP();
-+						offset++;
- 					}
--					offset = ip - ip_last;
- 					if (unlikely(offset > MAX_255_COUNT))
- 						return LZO_E_ERROR;
- 
- 					offset = (offset << 8) - offset;
- 					t += offset + 15 + *ip++;
-+					CHECK_IP();
- 				}
- 				t += 3;
- copy_literal_run:
-@@ -110,9 +120,9 @@ int lzo1x_decompress_safe(const unsigned char *in, size_t in_len,
- #endif
- 				{
- 					NEED_OP(t);
--					NEED_IP(t + 3);
- 					do {
- 						*op++ = *ip++;
-+						CHECK_IP();
- 					} while (--t > 0);
- 				}
- 				state = 4;
-@@ -122,6 +132,7 @@ int lzo1x_decompress_safe(const unsigned char *in, size_t in_len,
- 				m_pos = op - 1;
- 				m_pos -= t >> 2;
- 				m_pos -= *ip++ << 2;
-+				CHECK_IP();
- 				TEST_LB(m_pos);
- 				NEED_OP(2);
- 				op[0] = m_pos[0];
-@@ -133,6 +144,7 @@ int lzo1x_decompress_safe(const unsigned char *in, size_t in_len,
- 				m_pos = op - (1 + M2_MAX_OFFSET);
- 				m_pos -= t >> 2;
- 				m_pos -= *ip++ << 2;
-+				CHECK_IP();
- 				t = 3;
- 			}
- 		} else if (t >= 64) {
-@@ -140,45 +152,48 @@ int lzo1x_decompress_safe(const unsigned char *in, size_t in_len,
- 			m_pos = op - 1;
- 			m_pos -= (t >> 2) & 7;
- 			m_pos -= *ip++ << 3;
-+			CHECK_IP();
- 			t = (t >> 5) - 1 + (3 - 1);
- 		} else if (t >= 32) {
- 			t = (t & 31) + (3 - 1);
- 			if (unlikely(t == 2)) {
--				size_t offset;
--				const unsigned char *ip_last = ip;
-+				size_t offset = 0;
- 
- 				while (unlikely(*ip == 0)) {
- 					ip++;
--					NEED_IP(1);
-+					CHECK_IP();
-+					offset++;
- 				}
--				offset = ip - ip_last;
- 				if (unlikely(offset > MAX_255_COUNT))
- 					return LZO_E_ERROR;
- 
- 				offset = (offset << 8) - offset;
- 				t += offset + 31 + *ip++;
--				NEED_IP(2);
-+				CHECK_IP();
- 			}
- 			m_pos = op - 1;
--			next = get_unaligned_le16(ip);
--			ip += 2;
-+			next = *ip++;
-+			CHECK_IP();
-+			next += *ip++ << 8;
-+			CHECK_IP();
- 			m_pos -= next >> 2;
- 			next &= 3;
- 		} else {
--			NEED_IP(2);
--			next = get_unaligned_le16(ip);
-+			next = *ip++;
-+			CHECK_IP();
-+			next += *ip++ << 8;
- 			if (((next & 0xfffc) == 0xfffc) &&
- 			    ((t & 0xf8) == 0x18) &&
- 			    likely(bitstream_version)) {
--				NEED_IP(3);
- 				t &= 7;
--				t |= ip[2] << 3;
-+				CHECK_IP();
-+				t |= *ip++ << 3;
-+				CHECK_IP();
- 				t += MIN_ZERO_RUN_LENGTH;
- 				NEED_OP(t);
- 				memset(op, 0, t);
- 				op += t;
- 				next &= 3;
--				ip += 3;
- 				goto match_next;
- 			} else {
- 				m_pos = op;
-@@ -186,26 +201,43 @@ int lzo1x_decompress_safe(const unsigned char *in, size_t in_len,
- 				t = (t & 7) + (3 - 1);
- 				if (unlikely(t == 2)) {
- 					size_t offset;
--					const unsigned char *ip_last = ip;
-+					size_t tip;
- 
--					while (unlikely(*ip == 0)) {
--						ip++;
--						NEED_IP(1);
-+					CHECK_IP();
-+					if (!next) {
-+						offset = 2;
-+						while (unlikely(*ip == 0)) {
-+							ip++;
-+							CHECK_IP();
-+							offset++;
-+						}
-+
-+						tip = *ip++;
-+						CHECK_IP();
-+						next = *ip++;
-+						CHECK_IP();
-+					} else if (!(next & 0xff)) {
-+						offset = 1;
-+						tip = next >> 8;
-+						next = *ip++;
-+						CHECK_IP();
-+					} else {
-+						offset = 0;
-+						tip = next & 0xff;
-+						next >>= 8;
- 					}
--					offset = ip - ip_last;
- 					if (unlikely(offset > MAX_255_COUNT))
- 						return LZO_E_ERROR;
- 
- 					offset = (offset << 8) - offset;
--					t += offset + 7 + *ip++;
--					NEED_IP(2);
--					next = get_unaligned_le16(ip);
-+					t += offset + 7 + tip;
-+					next += *ip++ << 8;
- 				}
--				ip += 2;
- 				m_pos -= next >> 2;
- 				next &= 3;
- 				if (m_pos == op)
- 					goto eof_found;
-+				CHECK_IP();
- 				m_pos -= 0x4000;
- 			}
- 		}
-@@ -260,36 +292,42 @@ int lzo1x_decompress_safe(const unsigned char *in, size_t in_len,
- 		} else
- #endif
- 		{
--			NEED_IP(t + 3);
- 			NEED_OP(t);
- 			while (t > 0) {
- 				*op++ = *ip++;
-+				CHECK_IP();
- 				t--;
- 			}
- 		}
- 	}
- 
- eof_found:
--	*out_len = op - out;
--	return (t != 3       ? LZO_E_ERROR :
--		ip == ip_end ? LZO_E_OK :
--		ip <  ip_end ? LZO_E_INPUT_NOT_CONSUMED : LZO_E_INPUT_OVERRUN);
-+	err = t != 3		? LZO_E_ERROR :
-+	      !IP_LEFT()	? LZO_E_OK :
-+	      IP_LEFT() > 0	? LZO_E_INPUT_NOT_CONSUMED :
-+				  LZO_E_INPUT_OVERRUN;
-+	goto out;
- 
- input_overrun:
--	*out_len = op - out;
--	return LZO_E_INPUT_OVERRUN;
-+	err = LZO_E_INPUT_OVERRUN;
-+	goto out;
- 
- output_overrun:
--	*out_len = op - out;
--	return LZO_E_OUTPUT_OVERRUN;
-+	err = LZO_E_OUTPUT_OVERRUN;
-+	goto out;
- 
- lookbehind_overrun:
--	*out_len = op - out;
--	return LZO_E_LOOKBEHIND_OVERRUN;
--}
--#ifndef STATIC
--EXPORT_SYMBOL_GPL(lzo1x_decompress_safe);
-+	err = LZO_E_LOOKBEHIND_OVERRUN;
-+	goto out;
- 
-+out:
-+	PUT_IP();
-+	*out_len = op - out;
-+	return err;
-+}
-+EXPORT_SYMBOL_GPL(LZO_SG(lzo1x_decompress_safe));
-+
-+#ifdef INPUT_IS_LINEAR
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("LZO1X Decompressor");
- 
-diff --git a/lib/lzo/lzo1x_decompress_safe_sg.c b/lib/lzo/lzo1x_decompress_safe_sg.c
-new file mode 100644
-index 000000000000..7312ac1b9412
---- /dev/null
-+++ b/lib/lzo/lzo1x_decompress_safe_sg.c
-@@ -0,0 +1,48 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ *  LZO1X Decompressor from LZO
-+ *
-+ *  Copyright (C) 1996-2012 Markus F.X.J. Oberhumer <markus@oberhumer.com>
-+ *
-+ *  The full LZO package can be found at:
-+ *  http://www.oberhumer.com/opensource/lzo/
-+ *
-+ *  Changed for Linux kernel use by:
-+ *  Nitin Gupta <nitingupta910@gmail.com>
-+ *  Richard Purdie <rpurdie@openedhand.com>
-+ */
-+
-+#include <linux/scatterlist.h>
-+#include <linux/types.h>
-+
-+#define IP_LEFT()	((u8 *)miter.addr + miter.length - ip)
-+#define HAVE_IP(x)	((size_t)((u8 *)miter.addr + miter.length - ip) >= (size_t)(x))
-+#define GET_IP()	do { \
-+				sg_miter_start(&miter, sg, sg_nents(sg), SG_MITER_ATOMIC); \
-+				if (!lzo_sg_miter_next(&miter)) \
-+					goto input_overrun; \
-+				ip = miter.addr; \
-+			} while (0)
-+#define PUT_IP()	sg_miter_stop(&miter)
-+#define CHECK_IP()	do { \
-+				if (!HAVE_IP(1)) { \
-+					if (!lzo_sg_miter_next(&miter)) \
-+						goto input_overrun; \
-+					ip = miter.addr; \
-+				} \
-+			} while (0)
-+
-+#define INPUT		struct scatterlist *sg
-+#define LZO_SG(name)	name##_sg
-+
-+static bool lzo_sg_miter_next(struct sg_mapping_iter *miter)
-+{
-+	do {
-+		if (!sg_miter_next(miter))
-+			return false;
-+	} while (!miter->length);
-+
-+	return true;
-+}
-+
-+#include "lzo1x_decompress_safe.c"
-diff --git a/lib/lzo/lzodefs.h b/lib/lzo/lzodefs.h
-index b60851fcf6ce..5d5a029983e6 100644
---- a/lib/lzo/lzodefs.h
-+++ b/lib/lzo/lzodefs.h
-@@ -12,6 +12,7 @@
-  *  Richard Purdie <rpurdie@openedhand.com>
-  */
- 
-+#include <linux/unaligned.h>
- 
- /* Version
-  * 0: original lzo version
+Regards,
+Venkat.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
