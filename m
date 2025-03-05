@@ -1,103 +1,124 @@
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bmailout1.hostsharing.net (bmailout1.hostsharing.net [83.223.95.100])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA45C1C6FEB
-	for <linux-crypto@vger.kernel.org>; Wed,  5 Mar 2025 17:07:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 859A2567D;
+	Wed,  5 Mar 2025 17:16:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741194450; cv=none; b=tFeJKi0j+wb78d0+fd0MYZoVxixOYf4Il1eDjoI2/l5B67nEt3jbyHDe8SMi0fOnoCmbfySclF+K78IYUX3iWfhnjqS2vjitPMEC7WZzMECR5ikMkNBSNsU76JXy6EfWMGinfue0WeyShePWIT7Y9G7eE0irboRIMmOF3MH10XQ=
+	t=1741195026; cv=none; b=qEe8fGhU2heM6bsb3iFuWycRXrZ2a9b0vgm6so2LfU9JKrFQy9xHTeug+1esDG+6g51uhWaYyQGxg3qYyF6ihf5nVFgATepgCwvuMwojiHKY5Ym7Jjohn9n6lHCnODmoK2XK/hCr8TLytCdImX1lKMZZBVOuuFc3unLldGrBDv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741194450; c=relaxed/simple;
-	bh=IrDAdDeLwUuVeMKM0cQi7AzhOD4W0udt5kGWGBqKvzg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cfFSS+huqdZdMLuMONXRR1BAk/hG3rs96TCmhgqqEeQzKWuKNjBgoMuGkFZ4EiFTQ8HPVnTQrIxN+8yeO6Fw2hTJaGKBtKrzyS+PI55ffmvFaPzBjhLj/Nf+JOB+dHpeqJuZKa8bEQC+OXty96OESytB1vDC1eK7/KiVFfMbPTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a9W2Hpgw; arc=none smtp.client-ip=209.85.219.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a9W2Hpgw"
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6dd049b5428so62693416d6.2
-        for <linux-crypto@vger.kernel.org>; Wed, 05 Mar 2025 09:07:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741194447; x=1741799247; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IrDAdDeLwUuVeMKM0cQi7AzhOD4W0udt5kGWGBqKvzg=;
-        b=a9W2Hpgw5AcgjqDdTelM4E2uONYflCcC1isOvniVPUegIPnErH01oJVRnGroxa/CpB
-         9bBHKFC6Ezv8fO352CZzEguCyPnWvvytYlu7j/pzmf16FeKUmtSc1bnThqnN1sUnqRdv
-         Bu6C7sEkjmjrRbR7T9M6xm/lqMOxVFRuviAMHwWBkOPAfWEjj4cBwI26ynAXWbwbaW0n
-         rZpgYZumaKqyGBQPJlT+QBrZorsArDZeMUYAmUgu05c1CqBsp378qey6k+NNa2Myu6ML
-         JPomwezZUz7ewDvf1LQQNPtJz9CdzjTYCdymziErC7PQSwXdPGmFF7PX8ei4leD2lgyL
-         xusw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741194447; x=1741799247;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IrDAdDeLwUuVeMKM0cQi7AzhOD4W0udt5kGWGBqKvzg=;
-        b=Up2utAx+wnbCxDEv8OnqE6QminyfEHgOPDjd+v4iyr88PA8gpKy34qWEJBHy6TrKBM
-         Xpb2ISOxcGiwNr3PR4YqK4NqXQXoqt5jt11tJThmmcCOHLxjy56Al0l/oECOLfKzJm9t
-         eLvO6o6/BRV09KQiUvQya02oqrFlgrRMJ+jeYjgsvmnPgFvIcEhEenUVIAL3lfMzEl2/
-         Y9ZhfyqMvKMBKZAYNfa3JR+yWyuK5CnM9MlmFSoyguMq8KF631EOeqScIkFKcfVJzswB
-         xLQpV+z4IDuK4DsWpt8EMmKVKQ2uBUQVqlpPrFxFne5NBBJNwhtDRgmUtf/Q2iJt1WPP
-         raYA==
-X-Forwarded-Encrypted: i=1; AJvYcCWkT9HSRiMwdgHbaEfQBUiu7XfWocX0Qg0AFMf1Z6w8JdHuDXUkbHA2D43zERUQP6ZFoTeoeXqaS/M3O/s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFqy/G658ciplZrBpO3Cofon6ZOJV3UG6QX7AW0ki6jZDbts1X
-	gHVXtgo4E6LnSCxr1uWdPUtFIyrwGRj6Io/REYI6eJI6MT77iOUCjSl2x2BSbY9Cw7hZxSF3AuU
-	JM0VN3SYlOREveGNilwnNKHCcXFhZxQMc
-X-Gm-Gg: ASbGncvOOCHJmMs4/yQLUgYhE6kEy42FkD0HdPmmrTiZpg9W9VPZReJv51o+47sA85Z
-	NzGgfbQjtspShs/cZYYFShpefKPnhYnUbxWutwy7rfCsunsGHsFPLi3ppNfRf5hvQ0yMkmIZysU
-	RjM3QOlTnzZkWrf2luxlDsmSDD3Cby4EnDcCX81BIKiV+c4LqBYp9OXqbr3A==
-X-Google-Smtp-Source: AGHT+IHlGvKj30q2ZD6D1kyBWgqCsWE7vSW6M9vMSiVPKsTE+7Hv+cxY7wDuZ60gtMIkmMT2a0TwPz+VQM/eRw9aB0c=
-X-Received: by 2002:a05:6214:2241:b0:6e6:602f:ef68 with SMTP id
- 6a1803df08f44-6e8e6d1065cmr51868466d6.10.1741194447552; Wed, 05 Mar 2025
- 09:07:27 -0800 (PST)
+	s=arc-20240116; t=1741195026; c=relaxed/simple;
+	bh=3XbN8qRobWrAztvAkHqAPv4HcVw1mR5SEU8MQNSX7ls=;
+	h=Message-Id:From:Date:Subject:MIME-Version:Content-Type:To:Cc; b=P8XK6nW7Xovk0PvKOFa2fxzioGEkaLf+tqYfTSoU760dgwtWUvOlghsGjlVpUwzwkIvHowsiWUJwa7rLSyNJyR9huQ8JaNv++S8CBMGGsPixt7mjhUZG8oVICgH0P6wpQhKZSzp46i77kK8wfsCMSolFxQLAZ9qZIsV0uaQBMsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=pass smtp.mailfrom=wunner.de; arc=none smtp.client-ip=83.223.95.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wunner.de
+Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by bmailout1.hostsharing.net (Postfix) with ESMTPS id E3A433000A3A4;
+	Wed,  5 Mar 2025 18:16:51 +0100 (CET)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id CC7731BCE7; Wed,  5 Mar 2025 18:16:51 +0100 (CET)
+Message-Id: <90c171d5beed08bcf65ec2df6357a7ac97520b91.1741194399.git.lukas@wunner.de>
+From: Lukas Wunner <lukas@wunner.de>
+Date: Wed, 5 Mar 2025 18:14:32 +0100
+Subject: [PATCH] MAINTAINERS: Add Lukas & Ignat & Stefan for asymmetric keys
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <Z8KrAk9Y52RDox2U@gondor.apana.org.au> <Z8KxVC1RBeh8DTKI@gondor.apana.org.au>
- <Z8YOVyGugHwAsvmO@google.com> <Z8ZzqOw9veZ2HGkk@gondor.apana.org.au>
- <Z8aByQ5kJZf47wzW@google.com> <Z8aZPcgzuaNR6N8L@gondor.apana.org.au>
- <dawjvaf3nbfd6hnaclhcih6sfjzeuusu6kwhklv3bpptwwjzsd@t4ln7cwu74lh>
- <Z8dm9HF9tm0sDfpt@google.com> <Z8fI1zdqBNGmqW2d@gondor.apana.org.au>
- <Z8fssWOSw0kfggsM@google.com> <Z8gAHrXYc52EPsqH@gondor.apana.org.au>
-In-Reply-To: <Z8gAHrXYc52EPsqH@gondor.apana.org.au>
-From: Nhat Pham <nphamcs@gmail.com>
-Date: Wed, 5 Mar 2025 09:07:16 -0800
-X-Gm-Features: AQ5f1JpUxMxJTN0qiM9PWOcfL5HuHUGuSk3KYsWuMOncT2xkIkYFnpZEKpYKz1c
-Message-ID: <CAKEwX=MoiqOCDt=4Y-82PKUg92RtFxR1bOXOottSC2i1G7Bekw@mail.gmail.com>
-Subject: Re: [RFC PATCH 7/7] mm: zswap: Use acomp virtual address interface
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Yosry Ahmed <yosry.ahmed@linux.dev>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Eric Biggers <ebiggers@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+To: Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, David Howells <dhowells@redhat.com>, Ignat Korchagin <ignat@cloudflare.com>, Stefan Berger <stefanb@linux.ibm.com>
+Cc: Tadeusz Struk <tstruk@gmail.com>, Tadeusz Struk <tstruk@gigaio.com>, Vitaly Chikunov <vt@altlinux.org>, linux-crypto@vger.kernel.org, keyrings@vger.kernel.org, Eric Biggers <ebiggers@google.com>
 
-On Tue, Mar 4, 2025 at 11:41=E2=80=AFPM Herbert Xu <herbert@gondor.apana.or=
-g.au> wrote:
->
-> On Wed, Mar 05, 2025 at 06:18:25AM +0000, Yosry Ahmed wrote:
-> >
-> > I think there are other motivations for zcomp. Nhat was actually talkin=
-g
-> > about switch zswap to use zcomp for other reasons. Please see this
-> > thread:
-> > https://lore.kernel.org/lkml/CAKEwX=3DO8zQj3Vj=3D2G6aCjK7e2DDs+VBUhRd25=
-AefTdcvFOT-=3DA@mail.gmail.com/.
->
-> The only reason I saw was the support for algorithm parameters.
-> Yes that will of course be added to crypto_acomp before I attempt
-> to replace zcomp.
+Herbert asks for long-term maintenance of everything under
+crypto/asymmetric_keys/ and associated algorithms (ECDSA, GOST, RSA) [1].
 
-For the record, that's also the only reason why I was thinking about
-it. :) I have no passion for zcomp or anything - as long as we support
-all the cases (hardware acceleration/offloading, algorithms
-parameters, etc.), I'm happy :)
+Ignat has kindly agreed to co-maintain this with me going forward.
 
-Thanks for the hard work, Herbert, and I look forward to seeing all of
-this work.
+Stefan has agreed to be added as reviewer for ECDSA.  He introduced it
+in 2021 and has been meticulously providing reviews for 3rd party
+patches anyway.
+
+Retain David Howells' maintainer entry until he explicitly requests to
+be removed.  He originally introduced asymmetric keys in 2012.
+
+RSA was introduced by Tadeusz Struk as an employee of Intel in 2015,
+but he's changed jobs and last contributed to the implementation in 2016.
+
+GOST was introduced by Vitaly Chikunov as an employee of Basealt LLC [2]
+(Базальт СПО [3]) in 2019.  This company is an OFAC sanctioned entity
+[4][5], which makes employees ineligible as maintainer [6].  It's not
+clear if Vitaly is still working for Basealt, he did not immediately
+respond to my e-mail.  Since knowledge and use of GOST algorithms is
+relatively limited outside the Russian Federation, assign "Odd fixes"
+status for now.
+
+[1] https://lore.kernel.org/r/Z8QNJqQKhyyft_gz@gondor.apana.org.au/
+[2] https://prohoster.info/ru/blog/novosti-interneta/reliz-yadra-linux-5-2
+[3] https://www.basealt.ru/
+[4] https://ofac.treasury.gov/recent-actions/20240823
+[5] https://sanctionssearch.ofac.treas.gov/Details.aspx?id=50178
+[6] https://lore.kernel.org/r/7ee74c1b5b589619a13c6318c9fbd0d6ac7c334a.camel@HansenPartnership.com/
+
+Signed-off-by: Lukas Wunner <lukas@wunner.de>
+---
+ MAINTAINERS | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 8e0736d..b16a1cc 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -3595,14 +3595,42 @@ F:	drivers/hwmon/asus_wmi_sensors.c
+ 
+ ASYMMETRIC KEYS
+ M:	David Howells <dhowells@redhat.com>
++M:	Lukas Wunner <lukas@wunner.de>
++M:	Ignat Korchagin <ignat@cloudflare.com>
+ L:	keyrings@vger.kernel.org
++L:	linux-crypto@vger.kernel.org
+ S:	Maintained
+ F:	Documentation/crypto/asymmetric-keys.rst
+ F:	crypto/asymmetric_keys/
+ F:	include/crypto/pkcs7.h
+ F:	include/crypto/public_key.h
++F:	include/keys/asymmetric-*.h
+ F:	include/linux/verification.h
+ 
++ASYMMETRIC KEYS - ECDSA
++M:	Lukas Wunner <lukas@wunner.de>
++M:	Ignat Korchagin <ignat@cloudflare.com>
++R:	Stefan Berger <stefanb@linux.ibm.com>
++L:	linux-crypto@vger.kernel.org
++S:	Maintained
++F:	crypto/ecc*
++F:	crypto/ecdsa*
++F:	include/crypto/ecc*
++
++ASYMMETRIC KEYS - GOST
++M:	Lukas Wunner <lukas@wunner.de>
++M:	Ignat Korchagin <ignat@cloudflare.com>
++L:	linux-crypto@vger.kernel.org
++S:	Odd fixes
++F:	crypto/ecrdsa*
++
++ASYMMETRIC KEYS - RSA
++M:	Lukas Wunner <lukas@wunner.de>
++M:	Ignat Korchagin <ignat@cloudflare.com>
++L:	linux-crypto@vger.kernel.org
++S:	Maintained
++F:	crypto/rsa*
++
+ ASYNCHRONOUS TRANSFERS/TRANSFORMS (IOAT) API
+ R:	Dan Williams <dan.j.williams@intel.com>
+ S:	Odd fixes
+-- 
+2.43.0
+
