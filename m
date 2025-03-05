@@ -1,127 +1,142 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17AA617548;
-	Wed,  5 Mar 2025 00:29:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D268C2ED;
+	Wed,  5 Mar 2025 01:14:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741134558; cv=none; b=MnB5Jm4fpOkZjB4nFMALUKC5Bq9QHRCmva37dFHMfxaM5Q0/lfWEsbFyWKW4rKzYlL3berhBmnntcVbyR2ABQnnVQSMVgDgeqCeG3hPqyia/EZdNTWGcQIZhmAeiL3zHkMxCRzKbHL2xeHDAF/TXOtRfPVSM+4hkWzr8BT0e7U0=
+	t=1741137291; cv=none; b=HgAhTT95SpSBTPk9dBui98tX3wGLtB4ldHVkPGAL/rX44pgioWoOnUINx/IZXhrocsRZCdGRio9eLQlmdlKSCaKIAS23qJ7r736RmnCLT4LMSa6wkXuFxDbn0w3YKXgJspaPM65Vp/s+2xzQuLDHMbE4ByN2sMPb9jTFJEq9NEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741134558; c=relaxed/simple;
-	bh=v4LFSDcbSZvz0tDH0vbM1o3jV3dG7EspXAJxw8uUJk0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WpaPTFU+SV6Jr9LAdZjxEW0JkA+DsOOlgE3V2sC27Cx7tTrwA0Z6wiNdE6hZIMgo345aKHYZDOvqN5otA/OI779SqTMX+NkMtZf3eSVgR5x9bwFGhroeOq5wQv2LH3XByJ8aYTFYbFqnBNFNbX8odTOlwVwdp9H9kvZT2U53hO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TPwVJp3g; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1741137291; c=relaxed/simple;
+	bh=RYGnwl0rJHRwUNOO5HnlCMGwVLqQ3fc/hS1Slq7f99c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tnqNKfHOYrthV1kDPtKCNR9sDD2En03FV+1rMpyF86NS8qcex2pl1SaR7FpPiue6txmWPbS40zBlvoSpJRN+utI54WCnxzQDhmxAu/5WThONXcWong1NX/Axo7RUfr90Qvo14b92P1+ahsrLcQmyKcq0/3HoZYhVAgrhdARHq5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jM+ikE04; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TPwVJp3g"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18355C4CEE5;
-	Wed,  5 Mar 2025 00:29:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741134557;
-	bh=v4LFSDcbSZvz0tDH0vbM1o3jV3dG7EspXAJxw8uUJk0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TPwVJp3gVOxr5vkeZvGhr+JufYiRWINOpBadU50KWF9Cb0DE1wDsXvRj3BV3ReSwq
-	 SD8gMy8hB/fvCjRq3rOA1+Dneetww9tJQDik2OxWFE9D5fWTPCU9vcWHz01MkAx4s0
-	 89RmGTtmHEfLoEnuy//texnkqd3I6gg5zh8epMmC85dxxT8vd94GjPAv1hLrycAE1N
-	 IqS710KEJi3BJqkaWGBgWC0uKhv7W/cJgaCtxvf+zvSh3yPYZwgZ7fw8MspFExGVzO
-	 07MoSlxTfPFwcqC3fvkKnXTCCbtqkwReZDOfEL6wDEQTocPWw0dqevsJ2TW/NTEyLV
-	 kXPnWtVFyNCZg==
-Date: Wed, 5 Mar 2025 02:29:13 +0200
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: Paul Moore <paul@paul-moore.com>
-Cc: Eric Snowberg <eric.snowberg@oracle.com>,
-	Mimi Zohar <zohar@linux.ibm.com>,
-	David Howells <dhowells@redhat.com>,
-	"open list:SECURITY SUBSYSTEM" <linux-security-module@vger.kernel.org>,
-	David Woodhouse <dwmw2@infradead.org>,
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	Ard Biesheuvel <ardb@kernel.org>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Roberto Sassu <roberto.sassu@huawei.com>,
-	Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-	=?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
-	"casey@schaufler-ca.com" <casey@schaufler-ca.com>,
-	Stefan Berger <stefanb@linux.ibm.com>,
-	"ebiggers@kernel.org" <ebiggers@kernel.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-efi@vger.kernel.org" <linux-efi@vger.kernel.org>,
-	"linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>
-Subject: Re: [RFC PATCH v3 00/13] Clavis LSM
-Message-ID: <Z8ea2TRPS6uMgXxG@kernel.org>
-References: <CAHC9VhSJpnaAK1efgs1Uk0Tr3CaDNR1LiDU-t_yDKDQG6J-74Q@mail.gmail.com>
- <E20C617B-EA01-4E69-B5E2-31E9AAD6F7A2@oracle.com>
- <506e8e58e5236a4525b18d84bafa9aae80b24452.camel@linux.ibm.com>
- <CAHC9VhTsZntLdGBV7=4suauS+rzSQv1O4UAoGcy2vEB02wRkoA@mail.gmail.com>
- <c580811716f550ed5d6777db5e143afe4ad06edc.camel@linux.ibm.com>
- <CAHC9VhTz6U5rRdbJBWq0_U4BSKTsiGCsaX=LTgisNNoZXZokOA@mail.gmail.com>
- <FD501FB8-72D2-4B10-A03A-F52FC5B67646@oracle.com>
- <CAHC9VhR961uTFueovLXXaOf-3ZAnvQCWOTfw-wCRuAKOKPAOKw@mail.gmail.com>
- <Z8d9ulOirAeHmFJV@kernel.org>
- <CAHC9VhQC_bqZAFiABMUhTO6jTUFgHB8vjpb6-Eo7SA-2-5xfuQ@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jM+ikE04"
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7c3bf231660so252695085a.0;
+        Tue, 04 Mar 2025 17:14:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741137289; x=1741742089; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=suOTOr25WB6SV8l48qDy7pW0uKJWJLMiY0MiityYTyU=;
+        b=jM+ikE046OgVNhtIyvSscobsAfTLvL4QavyRuaafitKaXXRKwikn1amxWR8sK82/zD
+         wJyZvihq0MpNScTEupob4F64Wup7CfcSvKYnBvruIS5HE6PJ7R6sMxpmByHtWXRzao6J
+         TBQfeQVVW/3+y2acu7gzYVlktwMS9DFGu6NK2EfXWElQlvnDRwp2kI3xru/rPQiCXvZ2
+         AWtL5ZPR8usl88hZp4uDh1Z8IxGuchPPkfnMiFvUc5mth+qhfewWUNmWknApmQmDyOqb
+         Bn5TefUqVqo1XTTpgHB4CCywmSeYI5jeUnD+HQbz8t9yyRnb0Qu9BEBmXK8OXafMJGZG
+         ph8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741137289; x=1741742089;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=suOTOr25WB6SV8l48qDy7pW0uKJWJLMiY0MiityYTyU=;
+        b=SgrG3maHS14+VDb3GFHthZQLTTPFPtgf5FyBCtIFAdVGe+hdUYZ0iRmS64+4FgjzQ/
+         pAlfPC92Tqex2EUXUkBYZjWoXQqybdVdyshbED+evvA0u2co8/E2qBkJnlTzdjbHDQJF
+         JVmop8DwEJTY+HTaS1fGS8rbjCOoDA75vVq0IfEMzcbN1tDaB/wy2sHLD3CTlQ/QNCOK
+         gR4gqvfdKUeuyPxPGHAgwsjvXyTwadnarRNETsv1ct8dLQ7mz1kekSHf7TzTANfXbeb5
+         KXuNzxUxaJOKgyBhQQP3gZx0ACoJiL1kjGGUp99UOiPDaCfAyZshbt8Ze9var0U6gY53
+         wPZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWTAWv7Os2rd+LALkWZKFQJ7VRUIh59PXgk65iP8j0z5dcvYGgbT7zj5OIGBezFH9NP+EQgc3O2@vger.kernel.org, AJvYcCX6jPL14hgZQ2/qHBSRmnfaJZq0A6IwIXCOBX74XoNKZ82U2Pl09zLfUvbyALDFBeCniuHgSP6fyV/eUoMW@vger.kernel.org, AJvYcCXDYwA2lhyijl6sQbicXnM3pswgYBUNCzB5srk1U1xMTUJizvskjZUfUsqOxwlS2aBKkdhcNw5x/xshrCA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZBCnXEIONyjonftt77u9q/XhRvAawksI4P6y7pCzpMRw7G5it
+	mZd9DeLwNRwCenUQ2GUPs/veib5+j8myE495WPtC5N3cCWnyEkaGchff24GcjlTb+8Q5Amq72nS
+	8PWdVIZBWHTMrlgEsRIGeJ61lFIk=
+X-Gm-Gg: ASbGnctzllRduHC+IaSbPuPtf2rNGvCULvQb3hqZEjkbBRQal9ElqlW6YeSVe/9F8Ig
+	1Br2nIj1FF9v2tpAdocwfv66ToLKHsrypZGvCDmSh25fBgFTDEFY6MxIKzp+B0R9gE2oBHUW0+h
+	fqaVvoSSSNit20+wJ+vOa1BXwK7Js/TQWmnoPiN9c9Gwuds4HS+1YjRxajBg==
+X-Google-Smtp-Source: AGHT+IHd0Ik8MKlGNyWY5VodmCLxXOCOIs1Z8pMpdK53XKeHhyQPI3Gd2CyTe/JDWIfbt+6my10FhpnMdStAu91BGEo=
+X-Received: by 2002:a05:620a:4899:b0:7c3:d21a:4c38 with SMTP id
+ af79cd13be357-7c3d8eacc17mr270289085a.40.1741137288766; Tue, 04 Mar 2025
+ 17:14:48 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHC9VhQC_bqZAFiABMUhTO6jTUFgHB8vjpb6-Eo7SA-2-5xfuQ@mail.gmail.com>
+References: <20250226185625.2672936-1-yosry.ahmed@linux.dev>
+In-Reply-To: <20250226185625.2672936-1-yosry.ahmed@linux.dev>
+From: Nhat Pham <nphamcs@gmail.com>
+Date: Tue, 4 Mar 2025 17:14:37 -0800
+X-Gm-Features: AQ5f1JqLiz20AwoTsOju7OJR_duk5wrvJnvDyIN--P9eMfe9lSeJ5T9ZsfyKkqA
+Message-ID: <CAKEwX=MtmHKnN2Frrny7dZ6=B6d_nzAKeUCwKcMs2zhoDwb3jg@mail.gmail.com>
+Subject: Re: [PATCH v2] mm: zswap: fix crypto_free_acomp() deadlock in zswap_cpu_comp_dead()
+To: Yosry Ahmed <yosry.ahmed@linux.dev>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Chengming Zhou <chengming.zhou@linux.dev>, "David S. Miller" <davem@davemloft.net>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, linux-mm@kvack.org, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com, 
+	syzbot+1a517ccfcbc6a7ab0f82@syzkaller.appspotmail.com, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 04, 2025 at 07:25:13PM -0500, Paul Moore wrote:
-> On Tue, Mar 4, 2025 at 5:25 PM Jarkko Sakkinen <jarkko@kernel.org> wrote:
-> > On Mon, Mar 03, 2025 at 05:40:54PM -0500, Paul Moore wrote:
-> > > On Fri, Feb 28, 2025 at 12:52 PM Eric Snowberg <eric.snowberg@oracle.com> wrote:
-> > > > > On Feb 28, 2025, at 9:14 AM, Paul Moore <paul@paul-moore.com> wrote:
-> > > > > On Fri, Feb 28, 2025 at 9:09 AM Mimi Zohar <zohar@linux.ibm.com> wrote:
-> > > > >> On Thu, 2025-02-27 at 17:22 -0500, Paul Moore wrote:
-> > > > >>>
-> > > > >>> I'd still also like to see some discussion about moving towards the
-> > > > >>> addition of keyrings oriented towards usage instead of limiting
-> > > > >>> ourselves to keyrings that are oriented on the source of the keys.
-> > > > >>> Perhaps I'm missing some important detail which makes this
-> > > > >>> impractical, but it seems like an obvious improvement to me and would
-> > > > >>> go a long way towards solving some of the problems that we typically
-> > > > >>> see with kernel keys.
-> > > >
-> > > > The intent is not to limit ourselves to the source of the key.  The main
-> > > > point of Clavis is to allow the end-user to determine what kernel keys
-> > > > they want to trust and for what purpose, irrespective of the originating
-> > > > source (.builtin_trusted, .secondary, .machine, or .platform). If we could
-> > > > go back in time, individual keyrings could be created that are oriented
-> > > > toward usage.   The idea for introducing Clavis is to bridge what we
-> > > > have today with kernel keys and allow them to be usage based.
-> > >
-> > > While it is unlikely that the current well known keyrings could be
-> > > removed, I see no reason why new usage oriented keyrings could not be
-> > > introduced.  We've seen far more significant shifts in the kernel over
-> > > the years.
-> >
-> > Could we implement such change in a way that these new imaginary
-> > (at this point) usage oriented keyrings would be used to create
-> > the "legacy" keyrings?
-> 
-> I think it would be easier for them to coexist so that one could have
-> an easier migration.  It's possible that even once everything was
-> migrated to the new usage oriented keyrings it would still make sense
-> to keep the existing keyrings in place and always link keys from there
-> to the newer usage keyrings.
+On Wed, Feb 26, 2025 at 10:56=E2=80=AFAM Yosry Ahmed <yosry.ahmed@linux.dev=
+> wrote:
+>
+> Currently, zswap_cpu_comp_dead() calls crypto_free_acomp() while holding
+> the per-CPU acomp_ctx mutex. crypto_free_acomp() then holds scomp_lock
+> (through crypto_exit_scomp_ops_async()).
+>
+> On the other hand, crypto_alloc_acomp_node() holds the scomp_lock
+> (through crypto_scomp_init_tfm()), and then allocates memory.
+> If the allocation results in reclaim, we may attempt to hold the per-CPU
+> acomp_ctx mutex.
+>
+> The above dependencies can cause an ABBA deadlock. For example in the
+> following scenario:
+>
+> (1) Task A running on CPU #1:
+>     crypto_alloc_acomp_node()
+>       Holds scomp_lock
+>       Enters reclaim
+>       Reads per_cpu_ptr(pool->acomp_ctx, 1)
+>
+> (2) Task A is descheduled
+>
+> (3) CPU #1 goes offline
+>     zswap_cpu_comp_dead(CPU #1)
+>       Holds per_cpu_ptr(pool->acomp_ctx, 1))
+>       Calls crypto_free_acomp()
+>       Waits for scomp_lock
+>
+> (4) Task A running on CPU #2:
+>       Waits for per_cpu_ptr(pool->acomp_ctx, 1) // Read on CPU #1
+>       DEADLOCK
 
-OK, so here I agree and disagree:
+Lolll I was scratching my head with this issue while stress-testing
+some of my zswap patches. Beat me to it :)
 
-1. It probably does not port everything.
-2. Still, we need to be sure that "can be done" condition is satisfied
-   for the sake of robustness.
+>
+> Since there is no requirement to call crypto_free_acomp() with the
+> per-CPU acomp_ctx mutex held in zswap_cpu_comp_dead(), move it after the
+> mutex is unlocked. Also move the acomp_request_free() and kfree() calls
+> for consistency and to avoid any potential sublte locking dependencies
+> in the future.
+>
+> With this, only setting acomp_ctx fields to NULL occurs with the mutex
+> held. This is similar to how zswap_cpu_comp_prepare() only initializes
+> acomp_ctx fields with the mutex held, after performing all allocations
+> before holding the mutex.
+>
+> Opportunistically, move the NULL check on acomp_ctx so that it takes
+> place before the mutex dereference.
+>
+> Fixes: 12dcb0ef5406 ("mm: zswap: properly synchronize freeing resources d=
+uring CPU hotunplug")
+> Reported-by: syzbot+1a517ccfcbc6a7ab0f82@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/all/67bcea51.050a0220.bbfd1.0096.GAE@goog=
+le.com/
+> Cc: <stable@vger.kernel.org>
+> Co-developed-by: Herbert Xu <herbert@gondor.apana.org.au>
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> Signed-off-by: Yosry Ahmed <yosry.ahmed@linux.dev>
+> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-
-> 
-> -- 
-> paul-moore.com
-> 
-
-BR, Jarkko
+LGTM! Thanks for fixing it.
+Reviewed-by: Nhat Pham <nphamcs@gmail.com>
