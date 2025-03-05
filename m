@@ -1,117 +1,218 @@
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D0A4623
-	for <linux-crypto@vger.kernel.org>; Wed,  5 Mar 2025 00:04:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A6C0134AB
+	for <linux-crypto@vger.kernel.org>; Wed,  5 Mar 2025 00:19:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741133070; cv=none; b=dLuWjNl6IpgheJTo7UfBpJk85KOPCylGWh7n+cGxq6tlRVZ8nla+43X68fqa1lkTWQyE/Pj6/1/fBK0zsuPQGaKp0xPri7Wam/MyQXCohOKCKIT0A2t/o1WrYBqmLD15Qrbw2hlbDr2b7GpkDqN1turjEdD9z22Sya7C7SFAoeI=
+	t=1741134001; cv=none; b=dGPnx05thSqJrTm48CyvG1mEB9bOh2/YjmkeXBPRLafpAiBMj/Tvsuznp7rEtczrNHNNYOvfVDCLGsIOu8z5Nh/B9VM6kVbcC9WKPAuBMOI/0fhkERB6nx7S0BtI5ukAfV1lsKr2CYn+jNtIrtwEcHWc8ogWKfyoSkpPftwSD4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741133070; c=relaxed/simple;
-	bh=obB0h8AHDTv9/LrRGXUTQqWYXLHGR7G5bwHes9VJzA0=;
+	s=arc-20240116; t=1741134001; c=relaxed/simple;
+	bh=nFmPFrquQ5bomrKpIAorl2f7SP/HswO2qcap7S1MciA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aGgIy/CW6l5cpEdbk6Rr2z3fonyKPg1ZBzHIfWD8vFl0z0JJlshAxR/uHUMPVsgtDwK9RyNrmuvGK7ajV6YNd/R9ureYX2l+qcLLzYj/Da76r2pq2JBF7P7FtLCyocoWB8lcXesOyY29GHO1/VGIWihpqP882ksSmIkwyK64gaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gm6eIZ0T; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+	 To:Cc:Content-Type; b=MQtVAGc9LV5ZtrpsV9NW9737QnisTWuh2LDCYc/AlIi8NQwTO0Jale+5DmSwr4Ux89aRgOqzacLjIxvSRVOhxT76y1g/2TZn3Tl5PX/SaqKZZV5WKghm80m7kgNDNwDOPpgWFYirAn4ZqaSpg8AixFEClgdPFK1x2Myz4NeeJro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=VpPwhOjF; arc=none smtp.client-ip=209.85.219.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gm6eIZ0T"
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2febaaf175fso7916681a91.3
-        for <linux-crypto@vger.kernel.org>; Tue, 04 Mar 2025 16:04:29 -0800 (PST)
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="VpPwhOjF"
+Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-e609cff9927so4100762276.3
+        for <linux-crypto@vger.kernel.org>; Tue, 04 Mar 2025 16:19:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1741133069; x=1741737869; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=LM4+VbDeQgzb/55NI3t+9R4dHqP/5jKcZhBFBtOBqBA=;
-        b=gm6eIZ0Tz5znH7+Y+X9dk2eBqkHgynYAWQfqsjqVyBF8ETXt8cfDR5xgZFJguu+liJ
-         8UrZjVBOhKjFgaGTiE+fgb4SQaOud+QtD4LgHwdAiGikppuFoTcKHFMfO7FErBFvaOU3
-         k7sjNIM6Uvw7qe3QlkyhhLQJ2lwbReohwIgL/nuslOM2fdpVaDluJvOh/xKa0L+TxjTV
-         Pso6g6MXXTeFjIF3p7rkDHtr/bXIdwR+4YgGLM5Eku29aAb4yxRgjWxEaz4qSFq1NmKI
-         USzp48uboOzSHTV5WDm5h6VFxJ65E5qX4Z/cChJ/SLJ2Eine6Bnymdhnynz0ryQFnLOU
-         SWWw==
+        d=paul-moore.com; s=google; t=1741133998; x=1741738798; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ocfBqfPEo/ZGjFNCT7umNcOBhbM/4xfpitCEs7MgftA=;
+        b=VpPwhOjFNxiBiMmvGTcObTttOW5Dj7bBG+a7vtg2EjkoHTunEEoFT0g+jruYi+R4YD
+         6VXDfklPzlOtM5XODG2rL77Z2kGosFeXNIw12gB2XQ2FOBD5m9EY9AeLrqpXr4osauDK
+         d/Yn4JombAnuBPvbluRvv30nqtxEJ8ZspBhQG7GAMgsmn3cONHz1EON5JJ58i9Ld6j6J
+         BSmpPQx+AqFn20PbH4S/CiBuCWpzSZVQCVBeWbbaJXA47gSa2lbTaBiZ3p8vEsCblzAq
+         jZsb0hD/36mutqj6w8N0llaNorUBnHCrXNhYcxs5GY1wdpYmcyKmtl+1CVxBTyGBKYSB
+         Jo0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741133069; x=1741737869;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LM4+VbDeQgzb/55NI3t+9R4dHqP/5jKcZhBFBtOBqBA=;
-        b=mLdzCGLHDBoQ3eaLmaY9YCjmR9lgX5H1myLMApa46awmXOQI4YWQAIFblgg9LdHrcT
-         zC2wkHIi5WbvPJHB7ZWAY6AJWXqydpoXQbxoqWHLSZgiiGbSC7o+Nu7GQB+ksMHXR7in
-         6NiTw5AC8YVC2WfhfMhsu2alAK7bp3aCfqkSrAeIsnri/RdSlv//J/FlWTyPLVyqIc9X
-         A068hGcGzwdWVtQOP6KCiLApFrN4ec050FOcFytwpmT2u/hclRkKZ9eofOZqXePwtxhK
-         n9aujb/uDeiNGQHC8AXqnjddEQCKo5WlvK7cICpFioIpI9jdU0zEAalIK6C/PjN+h2m0
-         F68A==
-X-Forwarded-Encrypted: i=1; AJvYcCV9ITmzCzt+nUxBj2wX2TpBtE+sOuhpxffnDLMVvqBHl1s+bJ8e/pUNSXRJ2HbsaVh5tfmD/JgtfZdZgkc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxeiNrJDIWIka4OV/9ckHSrBuqP+WBb/Yw0/AC44yJHPd7K6zQn
-	aZ4hEzh3D8mD1iFPKsR4qmPhMQa/tvZlYv8PCCzzj9eXZ/W5Pe9sX9uxa9dGTQr8Rn1fpBLLxed
-	w7eCyNS5qCpP1MVLtpGTG989zR3aSfQN8AQs1
-X-Gm-Gg: ASbGnctCLOuvtMNKX+y01G7p9Ps8P4wQ5GbRgQXfY43KdBQ3v+DCzUIbKm+wc5UPYx9
-	c7zQMqQLeA8RKAacrm0gEiHPy9R68F3QJ2LcMfPH2EFu0NDR5A3G8bnyR779YzhgJSCZqWHHIHQ
-	nYjVuxTb1DZSoNP3MQmmSViqgL3jaWG2S+C+JiHflSx8OqWabyu9vESLAv
-X-Google-Smtp-Source: AGHT+IEtISi7Tlt5kX4zmOO9FEZtWXEEe9J/QPKTHvSqVUkwchS3k7u+aPOlcVNfd6t4Doh8lMUn/x9+fE5ZVoRcpzI=
-X-Received: by 2002:a17:90b:4ad1:b0:2f4:423a:8fb2 with SMTP id
- 98e67ed59e1d1-2ff497cce8emr1999183a91.20.1741133068525; Tue, 04 Mar 2025
- 16:04:28 -0800 (PST)
+        d=1e100.net; s=20230601; t=1741133998; x=1741738798;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ocfBqfPEo/ZGjFNCT7umNcOBhbM/4xfpitCEs7MgftA=;
+        b=VIqJKn+IFj+BB2eDPCvJvHYf9zvAUM8uHjoqDSFjbErQcGYpB1Xc/E8W/XiXhTPCbi
+         mn9mnV4fW4AToQyDSRTLXwspBjHsMGfoemeI8ZLacXdX9j3+mJXSDnvdKsNbf+jCAvID
+         XrbkBqmVpxL2kqPBAi1sk5hkMfdcLjWKBd+o01osR8BWEk0XTczQuTdnbUhoOG583dXx
+         EZYlQ43MxbdfinTygqmxFZRMIonelUxgny8IYEy7To1dKlIadKRg9h5+VT9JTUZ+j4lQ
+         v4OLn+mx9um2vjNoFhBDQcsjrPibE2pNO2RTzwBV30r8mc1/0FASsXLFF5lfWtTXcKp9
+         4Lnw==
+X-Forwarded-Encrypted: i=1; AJvYcCV+s1L83o+Isfcs/JsU25iGEi3uQtr9zh3PF0jqsI1iWcbFSnxfzOFC7zyvv6HE2NLDUEmRg7DHyBiHias=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwTp0XHGDaO4gL7fFxExW0pFXYi88e4mP8XYllMfAqDuWtL1xxW
+	6u4vsH4qSYSHn6qTmT0XavYN4ZwTdoLHptYtEL0VXvwDVC3RT+81N62KJSmm/ma6Zn2cQBQGtrp
+	T/V6wJ9Vp+HnncBDKAj65E8SDYHalqgHuEEut
+X-Gm-Gg: ASbGncvHkWcrlMN83G6GUEpCmRpnz/Wj5ePLUhtsVsLdORGFgkeyHE6K/2aSP8u+mER
+	Td4RwUIEnikyaW94LzKSi5YKr06ai+okjOdBHZF5QTM/jh4+0Zu3SPEsoXxwrdEV0Ta9Z3c/b9Q
+	C0foedsKU0wKRxzlIbHd3WATJxlg==
+X-Google-Smtp-Source: AGHT+IGF/y0geooCPtJRjqZPvENGrM6G/jIaXoX7kcX22U7OqoXPhdA0YA3220WyCrgUujmfozkdhji7akGtDiTRuzs=
+X-Received: by 2002:a05:6902:108f:b0:e60:a2e2:9359 with SMTP id
+ 3f1490d57ef6-e611e19a0bfmr1796526276.3.1741133997973; Tue, 04 Mar 2025
+ 16:19:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250304092417.2873893-1-elver@google.com> <20250304092417.2873893-4-elver@google.com>
- <41a14b09-9f09-4abe-8caa-89cfe2687562@acm.org>
-In-Reply-To: <41a14b09-9f09-4abe-8caa-89cfe2687562@acm.org>
-From: Marco Elver <elver@google.com>
-Date: Wed, 5 Mar 2025 01:03:51 +0100
-X-Gm-Features: AQ5f1Jpv14gcn7aAs4yWXHhRLBF4i5EQTdXxL-iYYKY2gY0B-tX3E5j-KtDZzBU
-Message-ID: <CANpmjNMYoRTj3F1L9UCp2gHVbVZw0ieNnk0xPZ8Q--BhFCy7Ww@mail.gmail.com>
-Subject: Re: [PATCH v2 03/34] compiler-capability-analysis: Add test stub
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Luc Van Oostenryck <luc.vanoostenryck@gmail.com>, 
-	"Paul E. McKenney" <paulmck@kernel.org>, Alexander Potapenko <glider@google.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Bill Wendling <morbo@google.com>, Boqun Feng <boqun.feng@gmail.com>, 
-	Dmitry Vyukov <dvyukov@google.com>, Eric Dumazet <edumazet@google.com>, 
-	Frederic Weisbecker <frederic@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, Ingo Molnar <mingo@kernel.org>, 
-	Jann Horn <jannh@google.com>, Jiri Slaby <jirislaby@kernel.org>, 
-	Joel Fernandes <joel@joelfernandes.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Josh Triplett <josh@joshtriplett.org>, Justin Stitt <justinstitt@google.com>, 
-	Kees Cook <kees@kernel.org>, Kentaro Takeda <takedakn@nttdata.co.jp>, 
-	Mark Rutland <mark.rutland@arm.com>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>, Peter Zijlstra <peterz@infradead.org>, 
-	Steven Rostedt <rostedt@goodmis.org>, Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>, 
-	Thomas Gleixner <tglx@linutronix.de>, Uladzislau Rezki <urezki@gmail.com>, Waiman Long <longman@redhat.com>, 
-	Will Deacon <will@kernel.org>, kasan-dev@googlegroups.com, linux-kernel@vger.kernel.org, 
-	llvm@lists.linux.dev, rcu@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	linux-serial@vger.kernel.org
+References: <20241017155516.2582369-1-eric.snowberg@oracle.com>
+ <c490397315c2704e9ef65c8ad3fefedb239f1997.camel@linux.ibm.com>
+ <72F52F71-C7F3-402D-8441-3D636A093FE8@oracle.com> <CAHC9VhRHEw5c+drC=aX4xTqWoQJJZ+qkJ7aHUT5dcu+Q5f7BqA@mail.gmail.com>
+ <CAHC9VhSJpnaAK1efgs1Uk0Tr3CaDNR1LiDU-t_yDKDQG6J-74Q@mail.gmail.com>
+ <E20C617B-EA01-4E69-B5E2-31E9AAD6F7A2@oracle.com> <506e8e58e5236a4525b18d84bafa9aae80b24452.camel@linux.ibm.com>
+ <CAHC9VhTsZntLdGBV7=4suauS+rzSQv1O4UAoGcy2vEB02wRkoA@mail.gmail.com>
+ <c580811716f550ed5d6777db5e143afe4ad06edc.camel@linux.ibm.com>
+ <CAHC9VhTz6U5rRdbJBWq0_U4BSKTsiGCsaX=LTgisNNoZXZokOA@mail.gmail.com>
+ <e0e7c0971d42e45c7b4641bd58cb7ea20b36e2e1.camel@linux.ibm.com>
+ <CAHC9VhSzc6N0oBesT8V21xuwB11T7e6V9r0UmiqHXvCg5erkVA@mail.gmail.com> <a1d6ce786256bbade459f98e0b4074e449048fee.camel@linux.ibm.com>
+In-Reply-To: <a1d6ce786256bbade459f98e0b4074e449048fee.camel@linux.ibm.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Tue, 4 Mar 2025 19:19:46 -0500
+X-Gm-Features: AQ5f1Jow_JKN5Wb5BydtWrN3W2PF1ZW0sHwsGmKXbhetUZR51OWtnJRtrsmPv-Q
+Message-ID: <CAHC9VhT27Ge6woKbBExu2nT_cQE79rG+rrgp3nDYjvjcztVQXg@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 00/13] Clavis LSM
+To: Mimi Zohar <zohar@linux.ibm.com>
+Cc: Eric Snowberg <eric.snowberg@oracle.com>, David Howells <dhowells@redhat.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, 
+	"open list:SECURITY SUBSYSTEM" <linux-security-module@vger.kernel.org>, 
+	David Woodhouse <dwmw2@infradead.org>, 
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>, "davem@davemloft.net" <davem@davemloft.net>, 
+	Ard Biesheuvel <ardb@kernel.org>, James Morris <jmorris@namei.org>, 
+	"Serge E. Hallyn" <serge@hallyn.com>, Roberto Sassu <roberto.sassu@huawei.com>, 
+	Dmitry Kasatkin <dmitry.kasatkin@gmail.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	"casey@schaufler-ca.com" <casey@schaufler-ca.com>, Stefan Berger <stefanb@linux.ibm.com>, 
+	"ebiggers@kernel.org" <ebiggers@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, 
+	open list <linux-kernel@vger.kernel.org>, 
+	"keyrings@vger.kernel.org" <keyrings@vger.kernel.org>, 
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, 
+	"linux-efi@vger.kernel.org" <linux-efi@vger.kernel.org>, 
+	"linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 5 Mar 2025 at 00:52, Bart Van Assche <bvanassche@acm.org> wrote:
+On Tue, Mar 4, 2025 at 7:54=E2=80=AFAM Mimi Zohar <zohar@linux.ibm.com> wro=
+te:
+> On Mon, 2025-03-03 at 17:38 -0500, Paul Moore wrote:
+> > On Fri, Feb 28, 2025 at 12:19=E2=80=AFPM Mimi Zohar <zohar@linux.ibm.co=
+m> wrote:
+> > > On Fri, 2025-02-28 at 11:14 -0500, Paul Moore wrote:
+> > > > On Fri, Feb 28, 2025 at 9:09=E2=80=AFAM Mimi Zohar <zohar@linux.ibm=
+.com> wrote:
+> > > > > On Thu, 2025-02-27 at 17:22 -0500, Paul Moore wrote:
+> >
+> > ...
+> >
+> > > Ok, let's go through different scenarios to see if it would scale.
+> > >
+> > > Scenario 1: Mostly distro signed userspace applications, minimum numb=
+er of
+> > > developer, customer, 3rd party applications.
+> > >
+> > > Scenario 2: Multiple developer, customer, 3rd party applications, sig=
+ned by the
+> > > same party.
+> > >
+> > > Scenario 3: extreme case - every application signed by different part=
+y.
+> > >
+> > > With the minimum case, there would probably be a default key or sets =
+of
+> > > permissible keys.  In the extreme case, the number of keyrings would =
+be
+> > > equivalent to the number of application/software packages.
+> >
+> > Perhaps we're not understanding each other, but my understanding of
+> > the above three scenarios is that they are all examples of signed
+> > applications where something (likely something in the kernel like IMA)
+> > verifies the signature on the application.  While there are going to
+> > be differing numbers of keys in each of the three scenarios, I believe
+> > they would all be on/linked-to the same usage oriented keyring as they
+> > all share the same usage: application signatures.
 >
-> On 3/4/25 1:21 AM, Marco Elver wrote:
-> > +#include <linux/build_bug.h>
-> > +
-> > +/*
-> > + * Test that helper macros work as expected.
-> > + */
-> > +static void __used test_common_helpers(void)
-> > +{
-> > +     BUILD_BUG_ON(capability_unsafe(3) != 3); /* plain expression */
-> > +     BUILD_BUG_ON(capability_unsafe((void)2; 3;) != 3); /* does not swallow semi-colon */
-> > +     BUILD_BUG_ON(capability_unsafe((void)2, 3) != 3); /* does not swallow commas */
-> > +     capability_unsafe(do { } while (0)); /* works with void statements */
-> > +}
+> Yes they're all verifying file signatures, but the software packages are =
+from
+> different sources (e.g. distro, chrome), signed by different keys.
+
+Yep.
+
+> Only a
+> particular key should be used to verify the file signatures for a particu=
+lar
+> application.
+
+That's definitely one access control policy, but I can also envision a
+scenario where I have just one keyring for application signatures with
+multiple keys from multiple vendors.
+
+> Clavis limits key usage based on LSM hooks (e.g. kernel modules, kernel i=
+mage,
+> firmware, etc).  It's a good start, but even this probably is not fine en=
+ough
+> granularity.
+
+Which is fine, but like I said earlier, it makes far more sense to me
+to move towards usage oriented keyrings and then apply whatever
+additional access control granularity is required to meet a given
+scenario.
+
+It's also worth (re)mentioning that what makes Clavis not-a-LSM in my
+mind is how it is implemented, not necessarily its security goals.  If
+Clavis were to be implemented in such a way that it only relied on
+security/LSM blobs and not keys/keyrings it might be more suitable.
+
+> > > > My takeaway from Clavis was that it was more about establishing a s=
+et
+> > > > of access controls around keys already present in the keyrings and =
+my
+> > > > comments about usage/spplication oriented keyrings have been in tha=
+t
+> > > > context.  While the access control policy, regardless of how it is
+> > > > implemented, should no doubt incorporate the trust placed in the
+> > > > individual keys, how that trust is established is a separate issue
+> > > > from access control as far as I'm concerned.
+> > >
+> > > Clavis defined both a mechanism for establishing trust and access con=
+trol rules.
+> > >
+> > > Clavis defined a single Clavis key to establish trust.  The Clavis po=
+licy rules
+> > > were signed by the Clavis key.  The Clavis policy rules defined the a=
+ccess
+> > > control.
+> >
+> > Unfortunately I think we're getting a little ambiguous with how we are
+> > using the word "trust".  Just as "security" can mean different things
+> > depending on context, so can "trust" as the qualities we are trusting
+> > will vary depending on context.  I'll leave it at that for now as I
+> > believe we are talking about different things in the paragraphs above.
+> >
+> > Regardless, I'll also say this regarding Clavis and key/keyring access
+> > controls - as implemented, Clavis doesn't look like a LSM to me for
+> > the reasons already given.  If all of the various keys subsystem
+> > maintainers believe it is the Right Thing To Do inside the keys
+> > subsystem then it isn't my place to have a say in that.  I personally
+> > believe that doing the work to support usage oriented keyrings before,
+> > or while, implementing a Clavis-like mechanism is the better option,
+> > but that is a decision for you and the other key maintainers.
 >
-> Is it guaranteed that <linux/build_bug.h> includes the header file that
-> defines capability_unsafe() or should that header file perhaps be
-> included explicitly?
+> "Usage oriented keyrings" similarly implies any key on a particular keyri=
+ng is
+> acceptable.
 
-It doesn't come in via build_bug.h, but via:
+Yep.
 
-  scripts/Makefile.lib -> "-include
-$(srctree)/include/linux/compiler_types.h" (all TUs) ->
-compiler-capability-analysis.h.
+> Without understanding what you mean by "usage oriented keyrings", I
+> would assume it would work initially, but eventually it too will not be f=
+ine
+> enough granularity.
 
-The things pulled in via compiler_types.h are treated a bit like
-builtins available everywhere implicitly.
+It all depends on what your goals are, but like I said above, it
+really seems to me like this is a good first step which can be
+followed up with additional granularity.
+
+--=20
+paul-moore.com
