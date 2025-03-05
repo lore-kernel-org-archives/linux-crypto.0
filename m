@@ -1,108 +1,131 @@
-Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C93571547E2;
-	Wed,  5 Mar 2025 07:58:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDD9A2E3385
+	for <linux-crypto@vger.kernel.org>; Wed,  5 Mar 2025 08:36:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741161502; cv=none; b=r5iKSBo7AJys5ugnWv5A5ihN9d7+g6hYFA/eEngtJn3cosndefQWSkOjN6vw8P+mu7Zfd39DPcxXlrWcpFCEpIhG5y+pQQO5E/TwbEJo2h31fpQVJQp2NoAWOFZDrMZL1gfnAI2bvrUXsE2684zIHFzC8mVHdgzHMkmwC8EagR4=
+	t=1741163777; cv=none; b=qeNOabnXydeFnITlIC9jZDSvc+Dw9y+Ojrw8LFqZHt6ueQK5zfAgEk7t48e32U0ct2DPVYWiqvxcV/TbI7iSYLjFy6IN9FuAiYHkLh0xG0Nj7ClyoacGRX0XK31HiI10DK+JA/tMER12Pb39c5VSGLHSfAzEMqcVIDkAFD+o5MU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741161502; c=relaxed/simple;
-	bh=X5XQrDXEPciRuX9iq2hVuzW/+FG66YoJJMIz1n0bFZQ=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=SldgZYtNWmoLHgabxr42dZawtKFMv9fB4ZNAOt5KWQTF0aBaDMxr9/ai/B1QpGK2irAGAewzOsI9huVUBEqO1e6bbClzTgxaqYoP0zAjRLrmYDv+TJRpArzAtCcBFhXMpp5zwfLT2gAZSwQ9NYBXL7gZ2iBXVQFLo1P6Gtz36Ec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=iQFKH6n3; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+	s=arc-20240116; t=1741163777; c=relaxed/simple;
+	bh=tclfnaQ+78uJUqE4m2J8GwrNwDst3SKOWGjXQTac2LE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C6ITxUPma2Wo6XpGatgrQawAJulbaCyRjMzqLUF6D+dIgLDpHqW5VubWf0BFd0KZNUjQVHN2XhhRGw/TepMoF7PVtePVdGLNgqnDt91taLAVQ0pm7afQ8lWXZY95w3OJBwSW/pTJP+keUmHH1nhy1yUS2CydAjohHjfG6a1HeT0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=mRucgZbg; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="iQFKH6n3"
-Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5253vdEs028481;
-	Tue, 4 Mar 2025 23:58:02 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=JIWQDFjaDYN/Y8wWU8cKql+
-	4eIYuROMtD9vaIXBcFaE=; b=iQFKH6n3XXY65uasOFaTQ+xhBkAWPzMBl4eWONO
-	FiocZ9c51uuwkEI3noL+ilIQluuhysxuIdmW3MCelNmSHMHRUsC4TjV4Om7s6SSf
-	W/8d8DtxII5VG/XS0SXQijxEH5Ae+yJ3bJ8AIlf8vOd7Wn2b2nwwUPMzEVOG6THi
-	bKb+2Y+byvQbmfIk0QZ7ikVu6U7DxO2YsCLk8wYUhqJMcpXdU8iNWvRT3kzyQZIz
-	HAd8nX/NKVC4wdy9iyjKlQxA70hKZInokF7hU/ngu3esSmBfrGpWmXTWuaZePR1o
-	Eza8roAzmtPBLghV/+uNV0FAKuh6qa/9yxSfZ09CCNM6HiA==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 456f5tgcr9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 04 Mar 2025 23:58:02 -0800 (PST)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Tue, 4 Mar 2025 23:58:01 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Tue, 4 Mar 2025 23:58:01 -0800
-Received: from bharat-OptiPlex-3070.marvell.com (bharat-OptiPlex-3070.marvell.com [10.28.8.24])
-	by maili.marvell.com (Postfix) with ESMTP id E7D853F703F;
-	Tue,  4 Mar 2025 23:57:57 -0800 (PST)
-From: Shashank Gupta <shashankg@marvell.com>
-To: Boris Brezillon <bbrezillon@kernel.org>,
-        Arnaud Ebalard
-	<arno@natisbad.org>,
-        Srujana Challa <schalla@marvell.com>,
-        Herbert Xu
-	<herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Bharat Bhushan <bbhushan2@marvell.com>,
-        Amit Singh Tomar
-	<amitsinght@marvell.com>,
-        Shashank Gupta <shashankg@marvell.com>,
-        "Sunil
- Kovvuri Goutham" <sgoutham@marvell.com>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH] crypto: octeontx2: suppress auth failure screaming due to negative tests
-Date: Wed, 5 Mar 2025 13:27:05 +0530
-Message-ID: <20250305075704.2987579-1-shashankg@marvell.com>
-X-Mailer: git-send-email 2.34.1
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mRucgZbg"
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-43bc38bb6baso18593295e9.3
+        for <linux-crypto@vger.kernel.org>; Wed, 05 Mar 2025 00:36:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1741163774; x=1741768574; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZfQXwUL3Ydz7mR+cjRUeO/xqWRGS7uJqxxJMkaNfgT0=;
+        b=mRucgZbgodwpnJ/LEwx6AquTZQHVsPy5Wt7PkYj3/3iuVXlzlfYtpsV5C2wYRBmbjw
+         3EoNk2BCWG1GAhSntBmEettOHYWTw2qcwjQFFgUL1MBd4YosDoTysLdpXDjaGw4dS5/N
+         Afz6ZJnF3JarVvhJSD/cRh7RFuYL7ulENxsauISFdD0pBKnaBVNiVDZ1LdAb5/NKn++B
+         5iWGnQFlmfBbr4Dr/jZayWeKdN15hWB7yQvny/iE3hdmhtMSsRKqZKIQU6aD7hHmimWU
+         5BgNaV21Aa7Kck9JS9G6E/zL3yh/A8g5Gr1dvG6j87h9dCZniNs542brkWusvVD9JHQo
+         W0fw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741163774; x=1741768574;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZfQXwUL3Ydz7mR+cjRUeO/xqWRGS7uJqxxJMkaNfgT0=;
+        b=c6koyMeHwVoxCEJuGDz7p/tQys1R2LDuIDYYosdTdla+brHrdh/uExdPtgu731HyVL
+         2+2xfx+2wdpQlQnJdVnMYP7PCQHO/UscwwFM8pZ4tepDRjKZ2aeV2O3G7dXpiDdrqIeg
+         7lcAjtxWoMZ70RjacnMn5jTkFlkDk0zBumbuoEdECYd5V6LPvyhDsjxeol6rMlv66kML
+         gfNrCdh7/bAj4O1bexksnG65h1IyniZFb/+KeLHjoH/Qp/ByUpjfS/7L0cFx8rCfn4qk
+         WhhYac7lYtIo7QHKLSU5lQyII7lPKxuV47hl8VqLbUyZbp7nam/asdsuOUF8gc7A2IlY
+         t57A==
+X-Forwarded-Encrypted: i=1; AJvYcCUx3g4H06Y6B7J9GfX2M34GzGcYBxWB3i6zY16Yyb8VS5NAgdmoRymNsybCf+H6C+5PeqPtAV0SlV71B6Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxRdlMsU11HJ8z8oMM9NL4SkdlM4BMyZSvFgOZvuGsfG+N/HGwK
+	F1C8mzRxgOJBsSt8OrXFjPA5z4SzR1kkTsEnBAzk8JxFyT9QVIFpIbja0gql7C8=
+X-Gm-Gg: ASbGncvuDWc6TWyltevRLtEeGiqBPYvmlzqxyA1MQUyFjDQfGIpYoN2rayCPvssw1i4
+	s4n//e6WakhPM7cNBiI7/VhStTWpWocfd11jRBxIcIBhPIJAvV3shOk5xU/BjRP8Z3mUzeu6yvs
+	A25zPqdWnQ6P76gLHoj62B/k5troZz4vSgY2WWgIKi99WNvOJQPFQVuoN0IhvWjK8okuVoPSr09
+	dq2Aiov6H4J+RhYEAvc8LwFGB1n04vivHaiKduvuy5QTY1shBAuHvIY7czpiyWcsdVWJyLmal9W
+	C16oVIC9FA1PTMJ+ATg/fQWlpu4Em/bOHTWQ9jCtFmGce1P+rQ==
+X-Google-Smtp-Source: AGHT+IG1TdRy5Kvu8p1cmT5U4TYJbrUoCcVGa1tX1dkQIqW9WiR2lgUQPgvjP/3zB9IzHIHCvQwYww==
+X-Received: by 2002:a05:6000:184c:b0:391:23de:b1b4 with SMTP id ffacd0b85a97d-39123deb51dmr497486f8f.45.1741163774150;
+        Wed, 05 Mar 2025 00:36:14 -0800 (PST)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-390e479608fsm20564933f8f.14.2025.03.05.00.36.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Mar 2025 00:36:13 -0800 (PST)
+Date: Wed, 5 Mar 2025 11:36:10 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Marco Elver <elver@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Alexander Potapenko <glider@google.com>,
+	Arnd Bergmann <arnd@arndb.de>, Bart Van Assche <bvanassche@acm.org>,
+	Bill Wendling <morbo@google.com>, Boqun Feng <boqun.feng@gmail.com>,
+	Dmitry Vyukov <dvyukov@google.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Ingo Molnar <mingo@kernel.org>, Jann Horn <jannh@google.com>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	Joel Fernandes <joel@joelfernandes.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Josh Triplett <josh@joshtriplett.org>,
+	Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
+	Kentaro Takeda <takedakn@nttdata.co.jp>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Uladzislau Rezki <urezki@gmail.com>,
+	Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>,
+	kasan-dev@googlegroups.com, linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev, rcu@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-serial@vger.kernel.org
+Subject: Re: [PATCH v2 01/34] compiler_types: Move lock checking attributes
+ to compiler-capability-analysis.h
+Message-ID: <f76a48fe-09da-41e0-be2e-e7f1b939b7e3@stanley.mountain>
+References: <20250304092417.2873893-1-elver@google.com>
+ <20250304092417.2873893-2-elver@google.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: rV9ak91RPM_aGl2NilWDy29WqeqvyyS7
-X-Authority-Analysis: v=2.4 cv=JtULrN4C c=1 sm=1 tr=0 ts=67c8040a cx=c_pps a=rEv8fa4AjpPjGxpoe8rlIQ==:117 a=rEv8fa4AjpPjGxpoe8rlIQ==:17 a=Vs1iUdzkB0EA:10 a=M5GUcnROAAAA:8 a=y9R9rvgWzFRaf_s37dAA:9 a=OBjm3rFKGHvpk9ecZwUJ:22
-X-Proofpoint-ORIG-GUID: rV9ak91RPM_aGl2NilWDy29WqeqvyyS7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-05_03,2025-03-05_01,2024-11-22_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250304092417.2873893-2-elver@google.com>
 
-This patch addresses an issue where authentication failures were being
-erroneously reported due to negative test failures in the "ccm(aes)"
-selftest.
-pr_debug suppress unnecessary screaming of these tests.
+On Tue, Mar 04, 2025 at 10:21:00AM +0100, Marco Elver wrote:
+> +#ifndef _LINUX_COMPILER_CAPABILITY_ANALYSIS_H
+> +#define _LINUX_COMPILER_CAPABILITY_ANALYSIS_H
+> +
+> +#ifdef __CHECKER__
+> +
+> +/* Sparse context/lock checking support. */
+> +# define __must_hold(x)		__attribute__((context(x,1,1)))
+> +# define __acquires(x)		__attribute__((context(x,0,1)))
+> +# define __cond_acquires(x)	__attribute__((context(x,0,-1)))
+> +# define __releases(x)		__attribute__((context(x,1,0)))
+> +# define __acquire(x)		__context__(x,1)
+> +# define __release(x)		__context__(x,-1)
+> +# define __cond_lock(x, c)	((c) ? ({ __acquire(x); 1; }) : 0)
+> +
 
-Signed-off-by: Shashank Gupta <shashankg@marvell.com>
----
- drivers/crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+The other thing you might want to annotate is ww_mutex_destroy().
 
-diff --git a/drivers/crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c b/drivers/crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c
-index b89e245c9aa4..835a2a2de477 100644
---- a/drivers/crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c
-+++ b/drivers/crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c
-@@ -276,9 +276,10 @@ static int cpt_process_ccode(struct otx2_cptlfs_info *lfs,
- 				break;
- 			}
- 
--			dev_err(&pdev->dev,
--				"Request failed with software error code 0x%x\n",
--				cpt_status->s.uc_compcode);
-+			pr_debug("Request failed with software error code 0x%x: algo = %s driver = %s\n",
-+				 cpt_status->s.uc_compcode,
-+				 info->req->areq->tfm->__crt_alg->cra_name,
-+				 info->req->areq->tfm->__crt_alg->cra_driver_name);
- 			otx2_cpt_dump_sg_list(pdev, info->req);
- 			if (uc_ccode == 0x4C)
- 				*res_code = -EBADMSG;
--- 
-2.34.1
+I'm happy about the new __guarded_by annotation.
+
+regards,
+dan carpenter
 
