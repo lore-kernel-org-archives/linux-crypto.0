@@ -1,76 +1,50 @@
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 913B72D05E;
-	Wed,  5 Mar 2025 16:17:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA35F18A6D2
+	for <linux-crypto@vger.kernel.org>; Wed,  5 Mar 2025 16:25:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741191440; cv=none; b=Z31ylmkQQohV8NRB0swfnR/jvy9wwuaIQnwouhKBm9FNvJDNSoipxTEJnNeJFBL+NZl7U4SmUleI2agWJjA8h3fLagTuQFqsGdDvrwWRsK3k/vJSaS7jXJnKaDLV687r59MyZAv/C4N8m5RLpI78ZeRXiL3O8t2P9pYTgLG9Np8=
+	t=1741191953; cv=none; b=cYvtusclnCE5MUbvxOJ1YbtG9WE0LM24z1mybShWN2eDe4+Kz0Aeh3Y9pUBQWJ7W/PCY4Nu+CMhnVN1jX/iip0GGlGI45gRU602QxiFzerGDGDyVgcHoM0HLWVE6Y7EKeRyJbhlvuTCKKDXv+qZZhTMJqZ1ch2GbqvN0OA0pdQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741191440; c=relaxed/simple;
-	bh=CbTXzzl88Ktw/wWR5/ra95x9JfLO3RWPe1jQjpC7yEY=;
+	s=arc-20240116; t=1741191953; c=relaxed/simple;
+	bh=fY2sA34oLrYjoyqVrb8CHTxjuhRSaZEbtm2ZWmy53oI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p+fISIdtGv4MBTMmoQQtSBj359sgaTcg8Uy1vpeKrlAcx3Z9C9478UAw/pwmKZMHTV/oevWo5ivIv1L/4f09YaBmoDeo49BwD/VHrkzA52LscEgWHbUj7H7epfbtM6dFkT3f5jJJJDfwDExsi0QTX1w0L1aLkj8NOmhU4CQIkkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=oK6Ax3Bf; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=K/rVfE1k3XNSmVDqfQP/qYl7vgYSvMzy+3uOvwoIa9FURykPsbNj0oP0RTVCfDcoYSioM0GCQ1tTcU5Da8hKTFDDN0do4xiiTqwI5TDMYjTxyPTsCxOhd3dTpP6cY9NJchv0mnGW/lSfRsHChHmSJN1rlnDTc9cY7YCdvEXTZiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iZHQl6Vy; arc=none smtp.client-ip=91.218.175.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="oK6Ax3Bf"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=3jN1+xJ/BcC8IjBdHqdwVy40EWJGNjtffvW7aUuKF40=; b=oK6Ax3BfZA/yGM1I2bGbwg/+7L
-	7DoHVzMrKWZSVWODvVnu043ZuRCUkEtnyWZpFpC9ACAfR5w0d+m50zvWUl0IxIViVKGMhwqUyBEPl
-	H8zJW/t82dDsAJSQpjC1XAfDGplcCxLlCL3rpV8UALi8s2vKi21L9ifSnbcdAitxEhO8qH2VRTrzL
-	6jfMXB/HmpmJg3yOELu0OyY7CYSE805iw7EHbUiPhQXIukDgKHf3dR7hNRUMB0HFx7Yd1mUBF39+N
-	EmksIGdewmK97ldh89ukpJ4Q9q/3Ajurv5egf3BVUsdALPYckRL5poS1YWW7/fvch9uPYQ3+j2A6D
-	mjFjZYug==;
-Received: from 77-249-17-252.cable.dynamic.v4.ziggo.nl ([77.249.17.252] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
-	id 1tprQT-00000000coL-1dqW;
-	Wed, 05 Mar 2025 16:16:53 +0000
-Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 79D7430031C; Wed,  5 Mar 2025 17:16:52 +0100 (CET)
-Date: Wed, 5 Mar 2025 17:16:52 +0100
-From: Peter Zijlstra <peterz@infradead.org>
-To: Bart Van Assche <bvanassche@acm.org>
-Cc: Marco Elver <elver@google.com>, "David S. Miller" <davem@davemloft.net>,
-	Luc Van Oostenryck <luc.vanoostenryck@gmail.com>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Alexander Potapenko <glider@google.com>,
-	Arnd Bergmann <arnd@arndb.de>, Bill Wendling <morbo@google.com>,
-	Boqun Feng <boqun.feng@gmail.com>,
-	Dmitry Vyukov <dvyukov@google.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Ingo Molnar <mingo@kernel.org>, Jann Horn <jannh@google.com>,
-	Jiri Slaby <jirislaby@kernel.org>,
-	Joel Fernandes <joel@joelfernandes.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Josh Triplett <josh@joshtriplett.org>,
-	Justin Stitt <justinstitt@google.com>, Kees Cook <kees@kernel.org>,
-	Kentaro Takeda <takedakn@nttdata.co.jp>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Neeraj Upadhyay <neeraj.upadhyay@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Uladzislau Rezki <urezki@gmail.com>,
-	Waiman Long <longman@redhat.com>, Will Deacon <will@kernel.org>,
-	kasan-dev@googlegroups.com, linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev, rcu@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-serial@vger.kernel.org
-Subject: Re: [PATCH v2 00/34] Compiler-Based Capability- and Locking-Analysis
-Message-ID: <20250305161652.GA18280@noisy.programming.kicks-ass.net>
-References: <20250304092417.2873893-1-elver@google.com>
- <20250305112041.GA16878@noisy.programming.kicks-ass.net>
- <76f8c8e1-5f32-4f31-a960-9285a15340e3@acm.org>
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iZHQl6Vy"
+Date: Wed, 5 Mar 2025 16:25:44 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1741191948;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BvzCwylmaHDh0dH7GwicN8+TVMfSuvEGvsOBD/vsXco=;
+	b=iZHQl6VySrCKvj/CpQVbXv35cw0/uaPgAFE8E9uNu4117Vwv3YHP/hHCo+NWQ6sUM5j6Y5
+	pNd80Mv8L6Q9zNTvcJV9lpP9BYtTNLTcLkdlb44pDq76vhNVf5sueV9xkNTz1p8QAEWG8J
+	tByHf2tlTOecQq+ZpnO9katFgT6Xw5Q=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Eric Biggers <ebiggers@kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	linux-mm@kvack.org
+Subject: Re: [RFC PATCH 7/7] mm: zswap: Use acomp virtual address interface
+Message-ID: <Z8h7CJYO6OxkVXhy@google.com>
+References: <Z8KxVC1RBeh8DTKI@gondor.apana.org.au>
+ <Z8YOVyGugHwAsvmO@google.com>
+ <Z8ZzqOw9veZ2HGkk@gondor.apana.org.au>
+ <Z8aByQ5kJZf47wzW@google.com>
+ <Z8aZPcgzuaNR6N8L@gondor.apana.org.au>
+ <dawjvaf3nbfd6hnaclhcih6sfjzeuusu6kwhklv3bpptwwjzsd@t4ln7cwu74lh>
+ <Z8fHyvF3GNKeVw0k@gondor.apana.org.au>
+ <Z8fsXZNgEbVkZrJP@google.com>
+ <Z8gBSgasXlu_0_s2@gondor.apana.org.au>
+ <Z8hbZlCY-esYktJe@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -79,88 +53,44 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <76f8c8e1-5f32-4f31-a960-9285a15340e3@acm.org>
+In-Reply-To: <Z8hbZlCY-esYktJe@gondor.apana.org.au>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Mar 05, 2025 at 07:27:32AM -0800, Bart Van Assche wrote:
-> On 3/5/25 3:20 AM, Peter Zijlstra wrote:
-> > diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> > index 248416ecd01c..d27607d9c2dc 100644
-> > --- a/include/linux/blkdev.h
-> > +++ b/include/linux/blkdev.h
-> > @@ -945,6 +945,7 @@ static inline unsigned int blk_boundary_sectors_left(sector_t offset,
-> >    */
-> >   static inline struct queue_limits
-> >   queue_limits_start_update(struct request_queue *q)
-> > +	__acquires(q->limits_lock)
-> >   {
-> >   	mutex_lock(&q->limits_lock);
-> >   	return q->limits;
-> > @@ -965,6 +966,7 @@ int blk_validate_limits(struct queue_limits *lim);
-> >    * starting update.
-> >    */
-> >   static inline void queue_limits_cancel_update(struct request_queue *q)
-> > +	__releases(q->limits_lock)
-> >   {
-> >   	mutex_unlock(&q->limits_lock);
-> >   }
+On Wed, Mar 05, 2025 at 10:10:46PM +0800, Herbert Xu wrote:
+> On Wed, Mar 05, 2025 at 03:46:18PM +0800, Herbert Xu wrote:
+> >
+> > > Also, please take a look at patch 2 in this series for another reason, I
+> > > want to make sure if your virtual address series can be used to remove
+> > > the !virt_addr_valid() memcpy() case completely.
+> > 
+> > Yes it should work provided that you specify the memory as nondma.
 > 
-> The above is incomplete. Here is what I came up with myself:
-
-Oh, I'm sure. I simply fixed whatever was topmost in the compile output
-when trying to build kernel/sched/. After fixing these two, it stopped
-complaining about blkdev.
-
-I think it complains about these because they're inline, even though
-they're otherwise unused.
-
-> > diff --git a/include/linux/device.h b/include/linux/device.h
-> > index 80a5b3268986..283fb85d96c8 100644
-> > --- a/include/linux/device.h
-> > +++ b/include/linux/device.h
-> > @@ -1026,21 +1026,25 @@ static inline bool dev_pm_test_driver_flags(struct device *dev, u32 flags)
-> >   }
-> >   static inline void device_lock(struct device *dev)
-> > +	__acquires(dev->mutex)
-> >   {
-> >   	mutex_lock(&dev->mutex);
-> >   }
-> >   static inline int device_lock_interruptible(struct device *dev)
-> > +	__cond_acquires(0, dev->mutex)
-> >   {
-> >   	return mutex_lock_interruptible(&dev->mutex);
-> >   }
-> >   static inline int device_trylock(struct device *dev)
-> > +	__cond_acquires(true, dev->mutex)
-> >   {
-> >   	return mutex_trylock(&dev->mutex);
-> >   }
-> >   static inline void device_unlock(struct device *dev)
-> > +	__releases(dev->mutex)
-> >   {
-> >   	mutex_unlock(&dev->mutex);
-> >   }
+> Actually you can do better than that, specify the memory as nondma
+> if IS_ENABLED(CONFIG_HIGHMEM), and otherwise as virt.
 > 
-> I propose to annotate these functions with __no_capability_analysis as a
-> first step. Review of all callers of these functions in the entire
-> kernel tree learned me that annotating these functions results in a
-> significant number of false positives and not to the discovery of any
-> bugs. The false positives are triggered by conditional locking. An
-> example of code that triggers false positive thread-safety warnings:
+> The idea is that we only have two hardware offload drivers, both
+> from Intel and they're probably not going to be used on platforms
+> with HIGHMEM.
+> 
+> So something like:
+> 
+> 	if (IS_ENABLED(CONFIG_HIGHMEM))
+> 		acomp_request_set_nondma(acomp_ctx->req, src, dst, entry->length, PAGE_SIZE);
+> 	else
+> 		acomp_request_set_virt(acomp_ctx->req, src, dst, entry->length, PAGE_SIZE);
 
-Yeah, I've ran into this as well. The thing is entirely stupid when it
-sees a branch. This is really unfortunate. But I disagree, I would
-annotate those functions that have conditional locking with
-__no_capability_analysis, or possibly:
+Well, ideally it would be based on whether the address itself is a
+highmem address or not, it may not be, even if CONFIG_HIGHMEM is
+enabled.
 
-#define __confused_by_conditionals __no_capability_analysis
+> 
+> Of course all this would disappear if we used SG lists properly.
 
-I'm also not quite sure how to annotate things like pte_lockptr().
+Zswap is already using an SG list when calling into the crypto API. The
+problem is that SGs (i.e. sg_init_one()) does not support kmap highmem
+addresses. Is there a fundamental reason this can't happen, or is it
+just sg_set_bug() using virt_to_page().
 
-
-Anyway, this thing has some promise, however it is *really*, as in
-*really* *REALLY* simple. Anything remotely interesting, where you
-actually want the help, it falls over.
-
-But you gotta start somewhere I suppose. I think the thing that is
-important here is how receptive the clang folks are to working on this
--- because it definitely needs work.
+Also, since the crypto API is using SG lists internally as far as I can
+tell, how does acomp_request_set_nondma() essentially deal with this? I
+don't understand why we need to use a separate nondma API for highmem.
