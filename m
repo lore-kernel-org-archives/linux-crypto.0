@@ -1,36 +1,37 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C590250BFB;
-	Wed,  5 Mar 2025 18:09:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 712851D6DB4;
+	Wed,  5 Mar 2025 18:13:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741198161; cv=none; b=bc0jB4MYWkueolZ1uHroOAs0fFfhMlVMxBKkMOKJlE9rz7Mr6xrzRqm+YOjLIqw01+t6srdgq5zGhSiFaST6wjBNt6QPhhBe3RoQtW8o+1oknZQdvHT6NuypXwHPsYxL5VlL/XPIij756cjzWd5F3eQ3fBFSvXYK13OBjUiszPY=
+	t=1741198406; cv=none; b=JrY+lydZwFdY1YDlrl79gm1txu8tR5/qPnjCDtsgZdjJZ2QXBGau7hGXEMoOqbPpQedHOQlLmgcn5qbtPBWBYR4zDiyULORExfgVEXdOyAno8JeG9p2cF8fjrlGXdLoza09zxsSt5FMt5DUyNxWioveYVvmwWdFOohmAwo0i9Yw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741198161; c=relaxed/simple;
-	bh=oeVPPtAkF5XsxcuqQq+IuEcBjTXTE3uXU50UnbyM9ZE=;
+	s=arc-20240116; t=1741198406; c=relaxed/simple;
+	bh=TCsk+sBiPB8l6Kt6oCdcWaTfve6D/4S6zhOFktjB3ds=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Auhqx0YHJNpd5kTeeF7/x8uZTN3Z7cESuPgfhRjWNHKhnBOy4Z/g7zrl8geCVP5wAQOXTUdvOvyOvuwQqL3UuH4Xh7h3HqlryuT0936MMfGYTo5geDeHRCY0sJZ1T+yzwt7bFPKSyNp1LsFym42JjDzJgkzduWm287N39Gjkyak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pPyBRyDA; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=Nsm4uTYI8yDQZNbcQUtwFQ87D24Qv8Y/mBuKDlE33wvndndmN7Pwz5BNdGJtmz0+zFbSwwU3OcsQtnJfbDiJXWFeA0A/G4SHu4CsNxVUFCbPhetR4iiEWEdu46ZfMNP7oKmxwR0iOCwaoBeaZIIyk80i7FWOBjxHZuue6IMZ9EI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LfHD2vta; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pPyBRyDA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0DDDC4CED1;
-	Wed,  5 Mar 2025 18:09:17 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LfHD2vta"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF09BC4CEE2;
+	Wed,  5 Mar 2025 18:13:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741198160;
-	bh=oeVPPtAkF5XsxcuqQq+IuEcBjTXTE3uXU50UnbyM9ZE=;
+	s=k20201202; t=1741198406;
+	bh=TCsk+sBiPB8l6Kt6oCdcWaTfve6D/4S6zhOFktjB3ds=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pPyBRyDAkIXQXhpUBf+hyVx/3dIAPIu53PddmdMpJfpA8TpYA1mYCXKwVOzouZqS0
-	 Rhj3BvnXmbNPU/Ha7bDhOgsRUdBX5OH7NRyzz45fVjFD35EPprEYeif46cFKU3TKtv
-	 QsnNzQbMrLHAznnvczT1p465mc/2RdteLniTtfrn5VjlVX4go9sCopNg2PfzVL2Hft
-	 u2LxmEnUxe9J56lHGEauJIFoa6VQH1klXwG3MfpzZ/BaD7jTo2w/qFWA1EevTz49e0
-	 kAOjqWL3BR96Yw5T9fTBxcDGYuqfxB/lop6DEIa13BCnr+kioNykXeVm0hCQ29+ndy
-	 uaiDqRQ3TPifg==
-Date: Wed, 5 Mar 2025 19:09:15 +0100
+	b=LfHD2vta12yJo6VPpZ94vmo6B23JGndyWHz3gVEBGHoW60ZE50AE8joWkr9xT39YO
+	 GAj3/+fvbsX6kuGKljAGy8mg2sHBntML16sy5gh8t8x9kRNwwQ9joQQTqyV/4TDhoi
+	 cM+pfM0AmoLqmK9lLiIm55fBPP4eB9oAhoChVAH2qyF14qAhK3KbfHhzvpkAq6vgtE
+	 KcREGNGt5IIiYFtdtcV+gEyt3OkhVd7qUROjrBXv3V5kcFhHaneeSkPBZGVHAloBnF
+	 tSqSglYZOyGqZ2F6oVDfizGj8bLoX0ExecASlDDwgrz6xGriGpxKGdroXe+5mZACMV
+	 s51xMQ8GKQbnw==
+Date: Wed, 5 Mar 2025 19:13:05 +0100
 From: Ingo Molnar <mingo@kernel.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: x86@kernel.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+To: Dave Hansen <dave.hansen@intel.com>
+Cc: Eric Biggers <ebiggers@kernel.org>, x86@kernel.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Ard Biesheuvel <ardb@kernel.org>,
 	Ben Greear <greearb@candelatech.com>,
 	Xiao Liang <shaw.leon@gmail.com>,
 	Thomas Gleixner <tglx@linutronix.de>,
@@ -38,13 +39,15 @@ Cc: x86@kernel.org, linux-crypto@vger.kernel.org,
 	Dave Hansen <dave.hansen@linux.intel.com>,
 	Andy Lutomirski <luto@kernel.org>,
 	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>
+	"Bae, Chang Seok" <chang.seok.bae@intel.com>
 Subject: Re: [RFC PATCH v2] x86/fpu: make kernel-mode FPU reliably usable in
  softirqs
-Message-ID: <Z8iTSzfzrFLv-JBL@gmail.com>
+Message-ID: <Z8iUMRGyUpgisuc_@gmail.com>
 References: <20250304204954.3901-1-ebiggers@kernel.org>
  <Z8gUYamgBr4M5ZaB@gmail.com>
- <20250305173925.GA4014401@google.com>
+ <b6a80f6d-8469-429d-b03a-8fa71a33046b@intel.com>
+ <Z8iL1dY3o9OxQgBy@gmail.com>
+ <65c29e20-8d63-4323-b2e5-09e2e7bf3c1c@intel.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -53,56 +56,39 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250305173925.GA4014401@google.com>
+In-Reply-To: <65c29e20-8d63-4323-b2e5-09e2e7bf3c1c@intel.com>
 
 
-* Eric Biggers <ebiggers@kernel.org> wrote:
+* Dave Hansen <dave.hansen@intel.com> wrote:
 
-> [...] To avoid irqs_disabled() entirely, we'd need to avoid disabling 
-> softirqs, which would mean supporting nested kernel-mode FPU in 
-> softirqs.  I can sent out a patch that does that using a per-CPU 
-> buffer, if you'd like to see that.  I wasn't super happy with the 
-> extra edge cases and memory usage, but we could go in that direction.
+> On 3/5/25 09:37, Ingo Molnar wrote:
+> > 
+> > * Dave Hansen <dave.hansen@intel.com> wrote:
+> > 
+> >> On 3/5/25 01:07, Ingo Molnar wrote:>> Alternatives considered:
+> >>>> - Make kernel-mode FPU sections fully preemptible.  This would require
+> >>>>   growing task_struct by another struct fpstate which is more than 2K.
+> >>>
+> >>> So that's something that will probably happen once the kernel is built 
+> >>> using APX anyway?
+> >>
+> >> I was expecting that building the kernel with APX would be very 
+> >> different than a kernel_fpu_begin(). We don't just need *one* more 
+> >> save area for APX registers: we need a stack, just like normal GPRs.
+> > 
+> > Yes - but my point is: with any APX build we'd probably be saving 
+> > FPU(-ish) registers at entry points, into a separate context area. If 
+> > that includes FPU registers then we'd not have to do 
+> > kernel_fpu_begin()/end().
+> 
+> That's true. But wouldn't it be a bit silly to include _all_ FPU
+> registers? If the kernel isn't using AVX512, why bother saving and
+> restoring AVX512?
 
-Meh: so I just checked, and local_bh_disable()/enable() are pretty 
-heavy these days - it's not just a simple preempt-count twiddle and a 
-check anymore. :-/ I don't think my initial argument of irqs_disabled() 
-overhead is really valid - and if we really cared we could halve it by 
-saving the irqs_disabled() status at kernel_fpu_begin() time and 
-reading it at kernel_fpu_end() time.
-
-And the alternative of having nested FPU usage and extra per-CPU FPU 
-save areas for the kernel feels a bit fragile, even without having seen 
-the patch.
-
-So I think I'll commit your patch to tip:x86/fpu as-is, unless someone 
-objects.
-
-
-BTW., a side note, I was also reviewing the kernel_fpu_begin()/end() 
-codepaths, and we have gems like:
-
-        /* Put sane initial values into the control registers. */
-        if (likely(kfpu_mask & KFPU_MXCSR) && boot_cpu_has(X86_FEATURE_XMM))
-                ldmxcsr(MXCSR_DEFAULT);
-
-        if (unlikely(kfpu_mask & KFPU_387) && boot_cpu_has(X86_FEATURE_FPU))
-                asm volatile ("fninit");
-
-has the LDMXCSR instruction, or its effects, ever shown up in profiles?
-
-Because AFAICS these will execute all the time on x86-64, because:
-
-static inline void kernel_fpu_begin(void)
-{
-#ifdef CONFIG_X86_64
-        /*
-         * Any 64-bit code that uses 387 instructions must explicitly request
-         * KFPU_387.
-         */
-        kernel_fpu_begin_mask(KFPU_MXCSR);
-
-And X86_FEATURE_XMM is set in pretty much every x86 CPU.
+Fair enough - although I bet the execution time difference between a 
+partial and a full FPU context save isn't as large as the buffer size 
+would suggest... There's a lot of setup cost in XSAVE* instructions 
+last I checked.
 
 Thanks,
 
