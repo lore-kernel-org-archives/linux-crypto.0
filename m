@@ -1,424 +1,136 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B98791D88B4;
-	Wed,  5 Mar 2025 20:30:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2E384A33;
+	Wed,  5 Mar 2025 21:22:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741206620; cv=none; b=Di32TUwBMJzAkSiXGW4taA7r0XJB4EMFlk6Iq1J9oulxGlWX9TmJqsTtI/QMPGw7lm008V8yRFW6JyYE6ykQs2NcwIh6tHdmQmtUEeYTYb50tZgVClC9NACpeFKbUKBHTiCtxltFonqUOUq+QCb4dPGMZB38GFatS5IG2vRb68Y=
+	t=1741209781; cv=none; b=hQ/ERzMFwVd2eXhUC/FMQwJ73C/p76I4UGsNZTX12MsJ+8TnzYyGh2TfqMyZRnHnB00PXe+5p0bDBnmoM29yJp96QjudSyJhvUcf/KSONCIHafKL0JgsBOV0umk+SWGzUJiHffxEVEiNGrcbXojAzzzzzXa0DnbYhSycogJG8fk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741206620; c=relaxed/simple;
-	bh=GbhzyluVu633CKrXby+h6BUEFw6bxcHR/enWjNtEtnc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rz4yrYoy7NY/W0Ize5tamwCQn8MPeYMqjEfGue1EG0kwU8KDq7MFDdkNcvuPqmcFieoxO0y6wQM6eRcVsn3s4MQniYzyjD4E/E4yKvs7qqblYEd2atCQvX4XkTnZsiBg6x7vdq7fELtjMv3xfYT0kNtkXuqBKiYaPOuKq93cZdc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XqGxMnv2; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1741209781; c=relaxed/simple;
+	bh=71PXLAgsUFwMvAk7XFPttIHq5FqJ5Bzimw8zOdx56eg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TLQxV2f4hPVL4c5eOIyZxvBYNgdj+iEkw9bakb8adMRiAlnhYDi3nXzFMLwzvoSYC2Avvi8LG8A/ayCx0vw4M1/svKd/YlHJbJxBoYLCVXKk7jsebiyjsIlT8YHflOFQPymgDUSstDRYh1W0sNH9j6NdP5ZoJ+Rv0QxMYg6nEeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VWp5Mjaw; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XqGxMnv2"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEA36C4CED1;
-	Wed,  5 Mar 2025 20:30:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741206620;
-	bh=GbhzyluVu633CKrXby+h6BUEFw6bxcHR/enWjNtEtnc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XqGxMnv2A8nPgiu+BofQN/uHdf3S2S6dxg9lXmhlJn6z9FGje3Uqc8t+JJCfAMyIh
-	 uUdqz1aqKCS8DwP+p+ObIlvSx2N3MbKepiLv8ezu3CCj1vFrvVzWqgySGwM6spH5iP
-	 yJGMVN0RGKCG7zm7XAjD9c6ckMcbqF65bkSuZaGF0sES3fsfv4kSVCtZOKr1DdFIlW
-	 hTwz/new8iXjtcOyTXpVvaqbb3VVRXH25A6TumI3aPajz60zBOHLr//uweXrJEGH5f
-	 rcU1i8Zwu3CqXE260Ry7iMSw2U1FCUKbitCrY8/lqMgEmOJPVbDNwrF5Fh0JvmoJi0
-	 00s5av0FyP9qw==
-Date: Wed, 5 Mar 2025 12:30:18 -0800
-From: Eric Biggers <ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VWp5Mjaw"
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-43bc30adad5so25470145e9.1;
+        Wed, 05 Mar 2025 13:22:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1741209778; x=1741814578; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/QKdrZ9vRb4sWOyQt+BSoKpXoFWTF3y3wSrzqtJFv0s=;
+        b=VWp5Mjaw/L8MxD10+azWvfmQdmMAZl0jYn7/9KiABbhMtzxmZrg2cayHrxPRKhA3Y/
+         14jz0RlxJO9/OiPjFnDz4kQFtPAReXvmu661MBp04iEpUi+JiYOB2u9aA24kVkPRuAp7
+         OZqdbMQ5HRHQBivs53U9XTf5Tc86m5CL7thHEIdy1H8WMWKoawejccCcJrOsffbgBvCJ
+         vLuxDxRYlKwvqA5c0bjU5JPwH3LV+m+9VcPqPoaWWi4GBmSWdPW0zklrslfxrOGID5DD
+         GJhGv99+rL80cG012JVn+UcfaZXipWmsWeYUit6+7T16n/oetsaAWicTllISGQNF2ke4
+         XbJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741209778; x=1741814578;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/QKdrZ9vRb4sWOyQt+BSoKpXoFWTF3y3wSrzqtJFv0s=;
+        b=kEuEG6cXphEbopw9Yfb479leaeLLaXzg3j6zWX6grkY75iBT+rYnjvEm4LS8DaoIYI
+         9Jqz2RUAw5gAgZRQ29pg8cEkBtf28mDvUEcuy8Xu8SyIoIQSDOls9sJF51phERJfZHXT
+         LZv0R3xoNOMOQ3hWae+N5GAACMNKObb2pmAvM7Uc/DfqidtEeKtVvMLpNhH5cn0+Qqh+
+         R/3iULOH7QQ5rntoZFr9lcPDPuerB9wAarTT9WIJNrnC9U9VyN5a2h1tM8TzYXipzC/a
+         vAkKNyLY/vRXbpAML6Osj2Y51PaPY2AcQuNnDHANHe8pMsYmwvn1h3AFITwrCVnwHXzF
+         2ecQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW7tWK7M8ie2wqSPL6wIXRa5v6H6HFcJ/cGusJ56S4I9UtzB1tIl9HzJM9Q9iuH75Mf0DLAV0sIsdGGjEw=@vger.kernel.org, AJvYcCWi50BZJMLOTD9aaY3k+ZNoxuLB0jIPDU121y0z//y3MjhXMMTobx3lg3eiFsLJZomyW/Gf5AJzEnerRXoU@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+X99bjnch5du6NrOPyhGaEZdBat1r1Z9pFSR6LQm3bX/MpQjn
+	5Bkov338gOEap3CzS7e7SFp9vxyAoZDuks5DvhxYtWEOBRX/ZR7E
+X-Gm-Gg: ASbGncvs/RVEKhjBgeqrABxHq5mwQaQYvFWGRKJrA40+169/mlA5rQzql1//tNypo7E
+	W7YWa8qY/m/4RWdzpmOZwn1NrfYA5eqnXNa7xd2iYjmoWW0bD7/hDCd9KP4UBUDZS3cg9WXul8B
+	tWxu/Eogz3QbW6SJsY1e/96aEXeGNwPZI27KksL2aYNSJmuaDNV2eo01N4NR6MecOp+5Ym/xE+m
+	YRQ1iJ8IPd2OMJ7fGeoK2ETE/2Nq05E8nT9bpXoN8nVZ/CrQ34txXhjayisy6fN/Lu+gD7s/xxZ
+	7vkjKgwYbE40+5+dPSc2v7B/U3V+je9q4vARNYjO64unWxsScs9K0cd0Zwim+a29a2E037Hf7t8
+	lLt4ptoA=
+X-Google-Smtp-Source: AGHT+IHf5G/WjTQU5XVggDdiHajuyOu5oqXpSdTcEFetMzqEdhVou5+ChNTWSOmXWX7SGwY1vuK8Xw==
+X-Received: by 2002:a05:600c:190d:b0:43b:c309:da4c with SMTP id 5b1f17b1804b1-43bd2951c4fmr42734125e9.10.1741209777613;
+        Wed, 05 Mar 2025 13:22:57 -0800 (PST)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43bcc136f5dsm38873525e9.1.2025.03.05.13.22.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Mar 2025 13:22:57 -0800 (PST)
+Date: Wed, 5 Mar 2025 21:22:55 +0000
+From: David Laight <david.laight.linux@gmail.com>
 To: Ingo Molnar <mingo@kernel.org>
-Cc: x86@kernel.org, linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-	Ben Greear <greearb@candelatech.com>,
-	Xiao Liang <shaw.leon@gmail.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Andy Lutomirski <luto@kernel.org>,
-	"Jason A . Donenfeld" <Jason@zx2c4.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Dave Hansen <dave.hansen@intel.com>, Eric Biggers <ebiggers@kernel.org>,
+ x86@kernel.org, linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Ard Biesheuvel <ardb@kernel.org>, Ben Greear <greearb@candelatech.com>,
+ Xiao Liang <shaw.leon@gmail.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+ <dave.hansen@linux.intel.com>, Andy Lutomirski <luto@kernel.org>, "Jason A
+ . Donenfeld" <Jason@zx2c4.com>, "Bae, Chang Seok"
+ <chang.seok.bae@intel.com>
 Subject: Re: [RFC PATCH v2] x86/fpu: make kernel-mode FPU reliably usable in
  softirqs
-Message-ID: <20250305203018.GB19889@sol.localdomain>
+Message-ID: <20250305212255.4989a8ab@pumpkin>
+In-Reply-To: <Z8iL1dY3o9OxQgBy@gmail.com>
 References: <20250304204954.3901-1-ebiggers@kernel.org>
- <Z8gUYamgBr4M5ZaB@gmail.com>
- <20250305173925.GA4014401@google.com>
- <Z8iTSzfzrFLv-JBL@gmail.com>
+	<Z8gUYamgBr4M5ZaB@gmail.com>
+	<b6a80f6d-8469-429d-b03a-8fa71a33046b@intel.com>
+	<Z8iL1dY3o9OxQgBy@gmail.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z8iTSzfzrFLv-JBL@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Mar 05, 2025 at 07:09:15PM +0100, Ingo Molnar wrote:
-> 
-> * Eric Biggers <ebiggers@kernel.org> wrote:
-> 
-> > [...] To avoid irqs_disabled() entirely, we'd need to avoid disabling 
-> > softirqs, which would mean supporting nested kernel-mode FPU in 
-> > softirqs.  I can sent out a patch that does that using a per-CPU 
-> > buffer, if you'd like to see that.  I wasn't super happy with the 
-> > extra edge cases and memory usage, but we could go in that direction.
-> 
-> Meh: so I just checked, and local_bh_disable()/enable() are pretty 
-> heavy these days - it's not just a simple preempt-count twiddle and a 
-> check anymore. :-/ I don't think my initial argument of irqs_disabled() 
-> overhead is really valid - and if we really cared we could halve it by 
-> saving the irqs_disabled() status at kernel_fpu_begin() time and 
-> reading it at kernel_fpu_end() time.
-> 
-> And the alternative of having nested FPU usage and extra per-CPU FPU 
-> save areas for the kernel feels a bit fragile, even without having seen 
-> the patch.
-> 
-> So I think I'll commit your patch to tip:x86/fpu as-is, unless someone 
-> objects.
-> 
-> 
-> BTW., a side note, I was also reviewing the kernel_fpu_begin()/end() 
-> codepaths, and we have gems like:
-> 
->         /* Put sane initial values into the control registers. */
->         if (likely(kfpu_mask & KFPU_MXCSR) && boot_cpu_has(X86_FEATURE_XMM))
->                 ldmxcsr(MXCSR_DEFAULT);
-> 
->         if (unlikely(kfpu_mask & KFPU_387) && boot_cpu_has(X86_FEATURE_FPU))
->                 asm volatile ("fninit");
-> 
-> has the LDMXCSR instruction, or its effects, ever shown up in profiles?
-> 
-> Because AFAICS these will execute all the time on x86-64, because:
-> 
-> static inline void kernel_fpu_begin(void)
-> {
-> #ifdef CONFIG_X86_64
->         /*
->          * Any 64-bit code that uses 387 instructions must explicitly request
->          * KFPU_387.
->          */
->         kernel_fpu_begin_mask(KFPU_MXCSR);
-> 
-> And X86_FEATURE_XMM is set in pretty much every x86 CPU.
+On Wed, 5 Mar 2025 18:37:25 +0100
+Ingo Molnar <mingo@kernel.org> wrote:
 
-I did some benchmarks with AES-XTS encryption of 16-byte messages (which is
-unrealistically small, but this makes it easier to see the overhead of
-kernel-mode FPU...).  The baseline was 384 MB/s.  Removing the use of
-crypto/simd.c, which this work makes possible, increases it to 487 MB/s.  v1 of
-this patch decreases it to 479 MB/s, and v2 (which added irqs_disabled() checks
-to kernel_fpu_begin() and kernel_fpu_end()) decreases it to 461 MB/s.  An
-experimental patch that I have that supports nested kernel-mode FPU in softirqs
-by using per-CPU areas maintains 480 MB/s.
+> * Dave Hansen <dave.hansen@intel.com> wrote:
+> 
+> > On 3/5/25 01:07, Ingo Molnar wrote:>> Alternatives considered:  
+> > >> - Make kernel-mode FPU sections fully preemptible.  This would require
+> > >>   growing task_struct by another struct fpstate which is more than 2K.  
+> > > 
+> > > So that's something that will probably happen once the kernel is built 
+> > > using APX anyway?  
+> > 
+> > I was expecting that building the kernel with APX would be very 
+> > different than a kernel_fpu_begin(). We don't just need *one* more 
+> > save area for APX registers: we need a stack, just like normal GPRs.  
+> 
+> Yes - but my point is: with any APX build we'd probably be saving 
+> FPU(-ish) registers at entry points, into a separate context area. If 
+> that includes FPU registers then we'd not have to do 
+> kernel_fpu_begin()/end().
 
-CPU was AMD Ryzen 9 9950X (Zen 5).  No debugging options were enabled.
+Since the registers are caller saved (like the SSE onwards ones)
+none of them really need to be saved on syscall entry
+(just zeroed on return).
+They do need saving on interrupt entry.
 
-Deleting the ldmxcsr(MXCSR_DEFAULT) adds about 14 MB/s.
+For some unknown reason the kernel saves the xyzmm ones on syscall entry.
+For normal programs they won't be live - because of the asm syscall
+wrapper is called from C.
+So I think they can only be live if a system call is directly inlined
+into the C function. Just marking them all 'clobbered' would have done.
+But it now all too late to change.
 
-But given the large improvement from no longer using crypto/simd.c, the other
-overheads seem much smaller and maybe are not worth worrying too much about.
+	David
 
-In case you're interested, the following is my experimental patch for supporting
-nested use in softirqs:
+> 
+> In other words, we'd be doing something close to 'growing task_struct 
+> by another struct fpstate', or so - regardless of whether it's in 
+> task_struct or some sort of extended pt_regs. The kernel would also be 
+> close to 'FPU-safe', i.e. there likely wouldn't be a need for 
+> kernel_fpu_begin()/end().
+> 
+> Thanks,
+> 
+> 	Ingo
+> 
 
-diff --git a/arch/x86/include/asm/fpu/api.h b/arch/x86/include/asm/fpu/api.h
-index f86ad3335529..70729d2bd64f 100644
---- a/arch/x86/include/asm/fpu/api.h
-+++ b/arch/x86/include/asm/fpu/api.h
-@@ -16,11 +16,11 @@
- 
- /*
-  * Use kernel_fpu_begin/end() if you intend to use FPU in kernel context. It
-  * disables preemption so be careful if you intend to use it for long periods
-  * of time.
-- * If you intend to use the FPU in irq/softirq you need to check first with
-+ * If you intend to use the FPU in hardirq you need to check first with
-  * irq_fpu_usable() if it is possible.
-  */
- 
- /* Kernel FPU states to initialize in kernel_fpu_begin_mask() */
- #define KFPU_387	_BITUL(0)	/* 387 state will be initialized */
-diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
-index 1209c7aebb21..a524260a0fa6 100644
---- a/arch/x86/kernel/fpu/core.c
-+++ b/arch/x86/kernel/fpu/core.c
-@@ -42,11 +42,13 @@ struct fpu_state_config fpu_user_cfg __ro_after_init;
-  * depending on the FPU hardware format:
-  */
- struct fpstate init_fpstate __ro_after_init;
- 
- /* Track in-kernel FPU usage */
--static DEFINE_PER_CPU(bool, in_kernel_fpu);
-+static DEFINE_PER_CPU(unsigned int, kernel_fpu_depth);
-+
-+DEFINE_PER_CPU(struct fpstate *, saved_kernel_fpstate);
- 
- /*
-  * Track which context is using the FPU on the CPU:
-  */
- DEFINE_PER_CPU(struct fpu *, fpu_fpregs_owner_ctx);
-@@ -58,14 +60,10 @@ DEFINE_PER_CPU(struct fpu *, fpu_fpregs_owner_ctx);
- bool irq_fpu_usable(void)
- {
- 	if (WARN_ON_ONCE(in_nmi()))
- 		return false;
- 
--	/* In kernel FPU usage already active? */
--	if (this_cpu_read(in_kernel_fpu))
--		return false;
--
- 	/*
- 	 * When not in NMI or hard interrupt context, FPU can be used in:
- 	 *
- 	 * - Task context except from within fpregs_lock()'ed critical
- 	 *   regions.
-@@ -75,13 +73,14 @@ bool irq_fpu_usable(void)
- 	 */
- 	if (!in_hardirq())
- 		return true;
- 
- 	/*
--	 * In hard interrupt context it's safe when soft interrupts
--	 * are enabled, which means the interrupt did not hit in
--	 * a fpregs_lock()'ed critical region.
-+	 * In hard interrupt context it's safe when soft interrupts are enabled,
-+	 * which means the interrupt did not hit in a fpregs_lock()'ed critical
-+	 * region, nor did it hit while serving a softirq (which could have
-+	 * already been using nested kernel-mode FPU).
- 	 */
- 	return !softirq_count();
- }
- EXPORT_SYMBOL(irq_fpu_usable);
- 
-@@ -96,10 +95,34 @@ static void update_avx_timestamp(struct fpu *fpu)
- 
- 	if (fpu->fpstate->regs.xsave.header.xfeatures & AVX512_TRACKING_MASK)
- 		fpu->avx512_timestamp = jiffies;
- }
- 
-+static __always_inline void
-+__save_fpregs_to_fpstate(struct fpstate *fpstate,
-+			 struct fpu *fpu, bool have_fpu)
-+{
-+	if (likely(use_xsave())) {
-+		os_xsave(fpstate);
-+		if (have_fpu)
-+			update_avx_timestamp(fpu);
-+		return;
-+	}
-+
-+	if (likely(use_fxsr())) {
-+		fxsave(&fpstate->regs.fxsave);
-+		return;
-+	}
-+
-+	/*
-+	 * Legacy FPU register saving, FNSAVE always clears FPU registers,
-+	 * so we have to reload them from the memory state.
-+	 */
-+	asm volatile("fnsave %[fp]; fwait" : [fp] "=m" (fpstate->regs.fsave));
-+	frstor(&fpstate->regs.fsave);
-+}
-+
- /*
-  * Save the FPU register state in fpu->fpstate->regs. The register state is
-  * preserved.
-  *
-  * Must be called with fpregs_lock() held.
-@@ -112,27 +135,11 @@ static void update_avx_timestamp(struct fpu *fpu)
-  *
-  * FXSAVE and all XSAVE variants preserve the FPU register state.
-  */
- void save_fpregs_to_fpstate(struct fpu *fpu)
- {
--	if (likely(use_xsave())) {
--		os_xsave(fpu->fpstate);
--		update_avx_timestamp(fpu);
--		return;
--	}
--
--	if (likely(use_fxsr())) {
--		fxsave(&fpu->fpstate->regs.fxsave);
--		return;
--	}
--
--	/*
--	 * Legacy FPU register saving, FNSAVE always clears FPU registers,
--	 * so we have to reload them from the memory state.
--	 */
--	asm volatile("fnsave %[fp]; fwait" : [fp] "=m" (fpu->fpstate->regs.fsave));
--	frstor(&fpu->fpstate->regs.fsave);
-+	__save_fpregs_to_fpstate(fpu->fpstate, fpu, true);
- }
- 
- void restore_fpregs_from_fpstate(struct fpstate *fpstate, u64 mask)
- {
- 	/*
-@@ -418,23 +425,31 @@ int fpu_copy_uabi_to_guest_fpstate(struct fpu_guest *gfpu, const void *buf,
- EXPORT_SYMBOL_GPL(fpu_copy_uabi_to_guest_fpstate);
- #endif /* CONFIG_KVM */
- 
- void kernel_fpu_begin_mask(unsigned int kfpu_mask)
- {
-+	unsigned int prev_depth;
-+
- 	preempt_disable();
- 
- 	WARN_ON_FPU(!irq_fpu_usable());
--	WARN_ON_FPU(this_cpu_read(in_kernel_fpu));
--
--	this_cpu_write(in_kernel_fpu, true);
--
--	if (!(current->flags & (PF_KTHREAD | PF_USER_WORKER)) &&
--	    !test_thread_flag(TIF_NEED_FPU_LOAD)) {
--		set_thread_flag(TIF_NEED_FPU_LOAD);
--		save_fpregs_to_fpstate(&current->thread.fpu);
-+	prev_depth = __this_cpu_read(kernel_fpu_depth);
-+	__this_cpu_write(kernel_fpu_depth, prev_depth + 1);
-+
-+	if (prev_depth != 0) {
-+		WARN_ON_FPU(in_task());
-+		WARN_ON_FPU(prev_depth != 1);
-+		__save_fpregs_to_fpstate(__this_cpu_read(saved_kernel_fpstate),
-+					 NULL, false);
-+	} else {
-+		if (!(current->flags & (PF_KTHREAD | PF_USER_WORKER)) &&
-+		    !test_thread_flag(TIF_NEED_FPU_LOAD)) {
-+			set_thread_flag(TIF_NEED_FPU_LOAD);
-+			save_fpregs_to_fpstate(&current->thread.fpu);
-+		}
-+		__cpu_invalidate_fpregs_state();
- 	}
--	__cpu_invalidate_fpregs_state();
- 
- 	/* Put sane initial values into the control registers. */
- 	if (likely(kfpu_mask & KFPU_MXCSR) && boot_cpu_has(X86_FEATURE_XMM))
- 		ldmxcsr(MXCSR_DEFAULT);
- 
-@@ -443,13 +458,18 @@ void kernel_fpu_begin_mask(unsigned int kfpu_mask)
- }
- EXPORT_SYMBOL_GPL(kernel_fpu_begin_mask);
- 
- void kernel_fpu_end(void)
- {
--	WARN_ON_FPU(!this_cpu_read(in_kernel_fpu));
-+	unsigned int depth = __this_cpu_read(kernel_fpu_depth);
- 
--	this_cpu_write(in_kernel_fpu, false);
-+	if (depth > 1)
-+		restore_fpregs_from_fpstate(__this_cpu_read(saved_kernel_fpstate),
-+					    XFEATURE_MASK_FPSTATE);
-+	else if (WARN_ON_ONCE(depth == 0))
-+		depth = 1;
-+	__this_cpu_write(kernel_fpu_depth, depth - 1);
- 	preempt_enable();
- }
- EXPORT_SYMBOL_GPL(kernel_fpu_end);
- 
- /*
-@@ -468,19 +488,10 @@ void fpu_sync_fpstate(struct fpu *fpu)
- 
- 	trace_x86_fpu_after_save(fpu);
- 	fpregs_unlock();
- }
- 
--static inline unsigned int init_fpstate_copy_size(void)
--{
--	if (!use_xsave())
--		return fpu_kernel_cfg.default_size;
--
--	/* XSAVE(S) just needs the legacy and the xstate header part */
--	return sizeof(init_fpstate.regs.xsave);
--}
--
- static inline void fpstate_init_fxstate(struct fpstate *fpstate)
- {
- 	fpstate->regs.fxsave.cwd = 0x37f;
- 	fpstate->regs.fxsave.mxcsr = MXCSR_DEFAULT;
- }
-diff --git a/arch/x86/kernel/fpu/init.c b/arch/x86/kernel/fpu/init.c
-index 998a08f17e33..549852552f51 100644
---- a/arch/x86/kernel/fpu/init.c
-+++ b/arch/x86/kernel/fpu/init.c
-@@ -7,10 +7,11 @@
- #include <asm/setup.h>
- 
- #include <linux/sched.h>
- #include <linux/sched/task.h>
- #include <linux/init.h>
-+#include <linux/slab.h>
- 
- #include "internal.h"
- #include "legacy.h"
- #include "xstate.h"
- 
-@@ -205,10 +206,35 @@ static void __init fpu__init_system_xstate_size_legacy(void)
- 	fpu_user_cfg.max_size = size;
- 	fpu_user_cfg.default_size = size;
- 	fpstate_reset(&current->thread.fpu);
- }
- 
-+/*
-+ * Allocate per-CPU areas for saving the kernel-mode FPU registers.  This is
-+ * needed to reliably support use of kernel-mode FPU in softirqs:
-+ */
-+static void __init fpu__init_saved_kernel_fpstates(void)
-+{
-+	size_t size;
-+	void *p;
-+	struct fpstate *fpstate;
-+	int cpu;
-+
-+	size = arch_task_struct_size;
-+	size -= offsetof(struct task_struct, thread.fpu.__fpstate);
-+	size += (__alignof__(struct fpstate) - 1) & ~(ARCH_KMALLOC_MINALIGN - 1);
-+	for_each_possible_cpu(cpu) {
-+		p = kmalloc(size, GFP_KERNEL);
-+		if (!p)
-+			panic("Out of memory");
-+		fpstate = PTR_ALIGN(p, __alignof__(struct fpstate));
-+		memcpy(&fpstate->regs, &init_fpstate.regs,
-+		       init_fpstate_copy_size());
-+		per_cpu(saved_kernel_fpstate, cpu) = fpstate;
-+	}
-+}
-+
- /*
-  * Called on the boot CPU once per system bootup, to set up the initial
-  * FPU state that is later cloned into all processes:
-  */
- void __init fpu__init_system(void)
-@@ -224,6 +250,7 @@ void __init fpu__init_system(void)
- 
- 	fpu__init_system_generic();
- 	fpu__init_system_xstate_size_legacy();
- 	fpu__init_system_xstate(fpu_kernel_cfg.max_size);
- 	fpu__init_task_struct_size();
-+	fpu__init_saved_kernel_fpstates();
- }
-diff --git a/arch/x86/kernel/fpu/internal.h b/arch/x86/kernel/fpu/internal.h
-index dbdb31f55fc7..24f5f6d238b9 100644
---- a/arch/x86/kernel/fpu/internal.h
-+++ b/arch/x86/kernel/fpu/internal.h
-@@ -23,6 +23,17 @@ static __always_inline __pure bool use_fxsr(void)
- 
- /* Used in init.c */
- extern void fpstate_init_user(struct fpstate *fpstate);
- extern void fpstate_reset(struct fpu *fpu);
- 
-+DECLARE_PER_CPU(struct fpstate *, saved_kernel_fpstate);
-+
-+static inline unsigned int init_fpstate_copy_size(void)
-+{
-+	if (!use_xsave())
-+		return fpu_kernel_cfg.default_size;
-+
-+	/* XSAVE(S) just needs the legacy and the xstate header part */
-+	return sizeof(init_fpstate.regs.xsave);
-+}
-+
- #endif
