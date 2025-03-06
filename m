@@ -1,67 +1,152 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A60F1F95A
-	for <linux-crypto@vger.kernel.org>; Thu,  6 Mar 2025 00:42:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98260376;
+	Thu,  6 Mar 2025 00:46:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741221746; cv=none; b=elD3K3iTlVQL76quZQ2eeCcbPLjVjQbUf7B57XHsc1Ec16THkeInrFhg3FAAM+QH0xVri4C9Cj0LcrloYBos3VrKASLL8gzBaSutLHiPnJfBTZXjChZBseai8ao4j3cHYjJbwGbQ/wP4oKsqfVNnNXo5/i2SxUP1w4ny/Ypsv+8=
+	t=1741221985; cv=none; b=cBZ8wQnPjM0EHKd7ibA1IXDhiEVzKGN6+tyBdpvbjbEeyGnKFX+UwKGLL29ngarPAO9yWSty1cA2FLEa4ESfmpHf4y5U1xdFEu4YLAGQkAWMb+cxlBhcOEkvUbVvojVFmVYWj6PGy8FHa/93eEXAHPfDg1t1c5bLDli2TfvoLDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741221746; c=relaxed/simple;
-	bh=grbNMNIVFjgrEnLK2g8m1d27z94ZLqPqw3OSIguVLzY=;
+	s=arc-20240116; t=1741221985; c=relaxed/simple;
+	bh=bdHiGmQCW+jIfwEFWXAePVnE6Zh5EwQEOmLh1i+TniU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hw8gvjfYqprU5ulU6eneyGwQth9oKuWvrB3L1JnuCeQPb/ylUNqkAD9OlEkWa7UEEyIdXMQYBJnvd9/HCKQglZ+Y6VM2/b7Sra+rxbWDx2IyLi1EJp0jQVw7cCla5XOBnjPAbExI9PyWEcvjHx42yhyiWliD0Hr1cJPTR/TI2lA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=sfDPtm7K; arc=none smtp.client-ip=144.6.53.87
+	 Content-Type:Content-Disposition:In-Reply-To; b=jNUJGbowPI9yAmHNlDtlDolEBKzYZq1sfuiuhETY/NXgNY7bivQblBb9LYzETM2E6cZuzr6YOdbLIrRlUoXrrogi3U0sdILiExaW8JarnkawLcDpPgBk5BPQjDr+KVzZs7VDiryoIUs00HbZZGYhg2TMRRAyZBAnlfLdumN4wIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=HZmO2wUE; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="sfDPtm7K"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="HZmO2wUE"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	s=formenos; h=In-Reply-To:Content-Transfer-Encoding:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=ABnUmf5L52AWIvD/O6e2rE3RUAaN0V6pvGaEQN32yPI=; b=sfDPtm7Kiru3KZV3CqcTfRSpV+
-	IlBigfskW0dS7jGtQxTDtcEE2itE/C3sPjWX5otnjKJLkgC+YwNcHem/wO8Lxige9gpxzp+gTnSpH
-	uVMRIs8j5mfm2Tn9NRbZlledc5axjFMsa2VzH5xwzXb0FG8tsZFUINxkexjAVTA/44z06AzZwv12C
-	0TZVwaK0zbRzRPD/vn29h+BWI3f779hbh5uhMRH4SnhW1OR++bHJQGUUTckkHnuAg5Xb8rQB//hX4
-	JoRO+x1Rt3lIPvWziaWiD2x5q69CiXzEhaxKgnZ5ry15NvHHbVeRqiftfr69e5dX8Dg18KVm8Tl2N
-	KKe24vCg==;
+	bh=6yqrLKAlALHmSW2F1YLkpltivONOHD+rr+GiBiB4O/4=; b=HZmO2wUEsPHehGXtyKG2XKbyVx
+	7FFv/baK50YvkjaDfunG677O3VDdq3YUjwajZUt3un9vXdmvDkKnNTXd+QvoaVqtH3Ee5P+Y5wFxw
+	LkVz71wddgy+t/24VLQUpcIV67D2cNsbguccMf0t0KrG5IxeEAtvIu/yu3ZtKkVle8N99IOQpR4Xt
+	6l9FiJvTF6RnC+A2D5oNwENoVWdgQYZ44lrDZGkAWtYyyKN0UYU4HbNhrbYe7DpMZ960YwTzGveDO
+	Ej1fTHgISfixmDUBvLmDrayVIiBO4Hqqr1AuMgUg5w6NTonD4G5xm+cEXyQcLc8eaY7C1YmmrZwG0
+	4byQow/Q==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tpzJc-0048tl-0w;
-	Thu, 06 Mar 2025 08:42:21 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 06 Mar 2025 08:42:20 +0800
-Date: Thu, 6 Mar 2025 08:42:20 +0800
+	id 1tpzNC-0048x1-0a;
+	Thu, 06 Mar 2025 08:46:03 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 06 Mar 2025 08:46:02 +0800
+Date: Thu, 6 Mar 2025 08:46:02 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	linux-mm@kvack.org, Yosry Ahmed <yosry.ahmed@linux.dev>,
-	Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
-Subject: Re: [v2 PATCH 0/7] crypto: acomp - Add request chaining and virtual
- address support
-Message-ID: <Z8jvbL8dbjsx83g1@gondor.apana.org.au>
-References: <cover.1741080140.git.herbert@gondor.apana.org.au>
- <Z8jEJ1YVRU0K1N8/@gcabiddu-mobl.ger.corp.intel.com>
+To: Lukas Wunner <lukas@wunner.de>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	David Howells <dhowells@redhat.com>,
+	Ignat Korchagin <ignat@cloudflare.com>,
+	Stefan Berger <stefanb@linux.ibm.com>,
+	Tadeusz Struk <tstruk@gmail.com>, Tadeusz Struk <tstruk@gigaio.com>,
+	Vitaly Chikunov <vt@altlinux.org>, linux-crypto@vger.kernel.org,
+	keyrings@vger.kernel.org, Eric Biggers <ebiggers@google.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>
+Subject: Re: [PATCH] MAINTAINERS: Add Lukas & Ignat & Stefan for asymmetric
+ keys
+Message-ID: <Z8jwSmRA45tMlUKI@gondor.apana.org.au>
+References: <90c171d5beed08bcf65ec2df6357a7ac97520b91.1741194399.git.lukas@wunner.de>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Z8jEJ1YVRU0K1N8/@gcabiddu-mobl.ger.corp.intel.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <90c171d5beed08bcf65ec2df6357a7ac97520b91.1741194399.git.lukas@wunner.de>
 
-On Wed, Mar 05, 2025 at 09:37:43PM +0000, Cabiddu, Giovanni wrote:
+On Wed, Mar 05, 2025 at 06:14:32PM +0100, Lukas Wunner wrote:
+> Herbert asks for long-term maintenance of everything under
+> crypto/asymmetric_keys/ and associated algorithms (ECDSA, GOST, RSA) [1].
 > 
-> What is the target tree for this set? It doesn't cleanly apply to
-> cryptodev.
+> Ignat has kindly agreed to co-maintain this with me going forward.
+> 
+> Stefan has agreed to be added as reviewer for ECDSA.  He introduced it
+> in 2021 and has been meticulously providing reviews for 3rd party
+> patches anyway.
+> 
+> Retain David Howells' maintainer entry until he explicitly requests to
+> be removed.  He originally introduced asymmetric keys in 2012.
+> 
+> RSA was introduced by Tadeusz Struk as an employee of Intel in 2015,
+> but he's changed jobs and last contributed to the implementation in 2016.
+> 
+> GOST was introduced by Vitaly Chikunov as an employee of Basealt LLC [2]
+> (Базальт СПО [3]) in 2019.  This company is an OFAC sanctioned entity
+> [4][5], which makes employees ineligible as maintainer [6].  It's not
+> clear if Vitaly is still working for Basealt, he did not immediately
+> respond to my e-mail.  Since knowledge and use of GOST algorithms is
+> relatively limited outside the Russian Federation, assign "Odd fixes"
+> status for now.
+> 
+> [1] https://lore.kernel.org/r/Z8QNJqQKhyyft_gz@gondor.apana.org.au/
+> [2] https://prohoster.info/ru/blog/novosti-interneta/reliz-yadra-linux-5-2
+> [3] https://www.basealt.ru/
+> [4] https://ofac.treasury.gov/recent-actions/20240823
+> [5] https://sanctionssearch.ofac.treas.gov/Details.aspx?id=50178
+> [6] https://lore.kernel.org/r/7ee74c1b5b589619a13c6318c9fbd0d6ac7c334a.camel@HansenPartnership.com/
+> 
+> Signed-off-by: Lukas Wunner <lukas@wunner.de>
+> ---
+>  MAINTAINERS | 28 ++++++++++++++++++++++++++++
+>  1 file changed, 28 insertions(+)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 8e0736d..b16a1cc 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -3595,14 +3595,42 @@ F:	drivers/hwmon/asus_wmi_sensors.c
+>  
+>  ASYMMETRIC KEYS
+>  M:	David Howells <dhowells@redhat.com>
+> +M:	Lukas Wunner <lukas@wunner.de>
+> +M:	Ignat Korchagin <ignat@cloudflare.com>
+>  L:	keyrings@vger.kernel.org
+> +L:	linux-crypto@vger.kernel.org
+>  S:	Maintained
+>  F:	Documentation/crypto/asymmetric-keys.rst
+>  F:	crypto/asymmetric_keys/
+>  F:	include/crypto/pkcs7.h
+>  F:	include/crypto/public_key.h
+> +F:	include/keys/asymmetric-*.h
+>  F:	include/linux/verification.h
+>  
+> +ASYMMETRIC KEYS - ECDSA
+> +M:	Lukas Wunner <lukas@wunner.de>
+> +M:	Ignat Korchagin <ignat@cloudflare.com>
+> +R:	Stefan Berger <stefanb@linux.ibm.com>
+> +L:	linux-crypto@vger.kernel.org
+> +S:	Maintained
+> +F:	crypto/ecc*
+> +F:	crypto/ecdsa*
+> +F:	include/crypto/ecc*
+> +
+> +ASYMMETRIC KEYS - GOST
+> +M:	Lukas Wunner <lukas@wunner.de>
+> +M:	Ignat Korchagin <ignat@cloudflare.com>
+> +L:	linux-crypto@vger.kernel.org
+> +S:	Odd fixes
+> +F:	crypto/ecrdsa*
+> +
+> +ASYMMETRIC KEYS - RSA
+> +M:	Lukas Wunner <lukas@wunner.de>
+> +M:	Ignat Korchagin <ignat@cloudflare.com>
+> +L:	linux-crypto@vger.kernel.org
+> +S:	Maintained
+> +F:	crypto/rsa*
+> +
+>  ASYNCHRONOUS TRANSFERS/TRANSFORMS (IOAT) API
+>  R:	Dan Williams <dan.j.williams@intel.com>
+>  S:	Odd fixes
+> -- 
+> 2.43.0
 
-It's based on the other two acomp patches in my queue:
-
-https://patchwork.kernel.org/project/linux-crypto/list/
+Thank you for stepping up to do this! I'll just add Jarkko to
+the cc list so that he is aware of this.
 
 Cheers,
 -- 
