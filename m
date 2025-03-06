@@ -1,50 +1,88 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36E4A199E88
-	for <linux-crypto@vger.kernel.org>; Thu,  6 Mar 2025 06:07:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05D7619C556;
+	Thu,  6 Mar 2025 06:49:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741241278; cv=none; b=cp0ytd90BfCGJKsmpXbbyxdT8S47aZu0CkIggMgA4gboc6fuuMlzAZxsUZIYqupQJyc4A7w3MAPmPHOUypdNv9an8+xu+h/FIR1kgNb6cJlBuJgno2PsnLg4SQkE3t0HzhmD7NKFrl1oJLeWv/ehQjz9qz887+nPij+Fv3OH+YM=
+	t=1741243787; cv=none; b=JjAsez+ZEfT62mXQeI4W9UnPdfvw/7it1QFaVmI978TKRWU4p/W2cQ/+duZhRaQy58ms3McI09zrbZFR0ANwncJxP///mCIDADD30r9McFTK/Uif1QZKP5Pp0N3ucAqhhPv0SJ7sxJRWAGF13+Xz45nxpU6XeSFiZXE9az+V5AU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741241278; c=relaxed/simple;
-	bh=DkhfeFLHsV8fbjSZHedkDY98bbqzTOiXHxWB3YLTSjA=;
+	s=arc-20240116; t=1741243787; c=relaxed/simple;
+	bh=nihPbFWpYPqsBosZAhoIw4NpSVYZ7ujfvelE5cg2qlQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ePSfZ8yCOyWlWsg7xOpfiL3uTp6e2VNEBxx3lWxD46U8MJV/H0Y1qjLpkUBUC/bChT23B+Lx/hE5TM3GHSZ9ZGFvMzYYSV9uE4C2YOqDAjfmp5w+eQbUBqcuVrhYvIDdXoFuYEc6FQ4HYhX3yxH5blGl6hCweYshy+CA0uFbVGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=HHZ8Xw+6; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=lSK/mmRjUfX+psHW+FPPQ9FW/ppqceTvMRA79uGjWAhiQOl4R2QawoWzztRkayvdk2xDCCszLFDw/zuA3T4JKSNMq+5TluIYgGpUXy9wUXgEsnpZS77oibaB9zEo1lutLEew56vub1lCpGj92ZcTDaCfishNqmEReebvloXSavE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l8cJypSN; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="HHZ8Xw+6"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=1sehrQsheJ8zaitYN+gmeL6uVPU0ZvErNNK57LYQ8Rg=; b=HHZ8Xw+61QHnWO8UztIUl0Y+qY
-	L7Soj5Ls07MGL+H1tTShMF80tgsg2pkTkBK9VxC/NlYC3QofgW1z9DETtBRIkreQqGTMisNWKibg5
-	g8lPHAu1cs0zvycyR2tKUMuIO+RIcMQe/K1zpI9GnNRpwl/TV+wfRVSqviVWzAdRBEFNOJjUYKA4f
-	EC7isK1/E1LgBs5QJPtQ+G9MhmOWXNWXiY+foVykTBmL/1pxNEM3emLnkx96hw15KiuV+8Tbr/5LR
-	LrVu5eqmgNV6LSdGO/8p6HJShDSwd5urZ0ZIpi/gejkJwRBbToYSM46mbMdbf+Z5LqpFYQPIaaGJ0
-	s/AYj+Tg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tq4Od-004BjW-00;
-	Thu, 06 Mar 2025 14:07:52 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 06 Mar 2025 14:07:50 +0800
-Date: Thu, 6 Mar 2025 14:07:50 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [PATCH] crypto: skcipher - Elinimate duplicate virt.addr field
-Message-ID: <Z8k7ttZ7PwjBC-AS@gondor.apana.org.au>
-References: <Z8kOABHrceBW7EiK@gondor.apana.org.au>
- <20250306031005.GB1592@sol.localdomain>
- <Z8kT90qXaTo15271@gondor.apana.org.au>
- <20250306033658.GD1592@sol.localdomain>
- <Z8kZL2WlWX-KhkqR@gondor.apana.org.au>
- <20250306035937.GA1153@sol.localdomain>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l8cJypSN"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741243786; x=1772779786;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=nihPbFWpYPqsBosZAhoIw4NpSVYZ7ujfvelE5cg2qlQ=;
+  b=l8cJypSNKs+Tt3tSJtZPaE1YYYsmzOBytiKizccEkjQFmDJHR/rjR9SL
+   71G4THNnbki4NNOPFeHrJW5UAjNwbSC53xOhvIaHeTcKdhwgTbTHGHYnD
+   JQs3IMrVqcDB4TVDr51aKKLSgdR8BeZ1vAbLKL3E1YXXlAmHIbcLTkHMN
+   Z6aVq3pr/UpzhYnJsbieCcAuknUNmPARYLjCLVy9XAzHL24OrP0Re7OdJ
+   4u3b62gbTbqutW7A1r8O65HGaMZh47gUX16DaHSCK+x4QNuFvdMfzNYeS
+   I09Piene9hR96XNdARYyTLqxcqubMici7vMo6r5HZ95NFa4asf6lUQ41E
+   A==;
+X-CSE-ConnectionGUID: iJDp6BPvS+qJyim822jdFw==
+X-CSE-MsgGUID: 3arLx5d1RYWyHY1EScb8Rw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11363"; a="41488707"
+X-IronPort-AV: E=Sophos;i="6.14,225,1736841600"; 
+   d="scan'208";a="41488707"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Mar 2025 22:49:45 -0800
+X-CSE-ConnectionGUID: 0YQ+ToHsQFqTfy8LYBXmaA==
+X-CSE-MsgGUID: eXWNYvDpQmebOFbpoNF84w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,225,1736841600"; 
+   d="scan'208";a="123948108"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by orviesa004.jf.intel.com with ESMTP; 05 Mar 2025 22:49:37 -0800
+Date: Thu, 6 Mar 2025 14:47:23 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Alexey Kardashevskiy <aik@amd.com>, x86@kernel.org, kvm@vger.kernel.org,
+	linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-arch@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Ashish Kalra <ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>,
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Christoph Hellwig <hch@lst.de>, Nikunj A Dadhania <nikunj@amd.com>,
+	Michael Roth <michael.roth@amd.com>,
+	Vasant Hegde <vasant.hegde@amd.com>,
+	Joao Martins <joao.m.martins@oracle.com>,
+	Nicolin Chen <nicolinc@nvidia.com>,
+	Lu Baolu <baolu.lu@linux.intel.com>,
+	Steve Sistare <steven.sistare@oracle.com>,
+	Lukas Wunner <lukas@wunner.de>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Dionna Glaze <dionnaglaze@google.com>, Yi Liu <yi.l.liu@intel.com>,
+	iommu@lists.linux.dev, linux-coco@lists.linux.dev,
+	Zhi Wang <zhiw@nvidia.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+Subject: Re: [RFC PATCH v2 14/22] iommufd: Add TIO calls
+Message-ID: <Z8lE+5OpqZc746mT@yilunxu-OptiPlex-7050>
+References: <20250218111017.491719-1-aik@amd.com>
+ <20250218111017.491719-15-aik@amd.com>
+ <Z72GmixR6NkzXAl7@yilunxu-OptiPlex-7050>
+ <2fe6b3c6-3eed-424d-87f0-34c4e7e1c906@amd.com>
+ <Z77xrqLtJfB84dJF@yilunxu-OptiPlex-7050>
+ <20250226131202.GH5011@ziepe.ca>
+ <Z7/jFhlsBrbrloia@yilunxu-OptiPlex-7050>
+ <20250301003711.GR5011@ziepe.ca>
+ <Z8U+/0IYyn7XX3ao@yilunxu-OptiPlex-7050>
+ <20250305192842.GE354403@ziepe.ca>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -53,170 +91,90 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250306035937.GA1153@sol.localdomain>
+In-Reply-To: <20250305192842.GE354403@ziepe.ca>
 
-On Wed, Mar 05, 2025 at 07:59:37PM -0800, Eric Biggers wrote:
->
-> I don't think it will be quite that simple, since the skcipher_walk code relies
-> on the different parts being split up so that it can do things like calculate
-> the length before it starts mapping anything.  If you can make it work, we can
-> do that.  But until that additional patch is ready I don't think it makes sense
-> to merge this one, as it leaves things half-baked with the redundant pointers.
+On Wed, Mar 05, 2025 at 03:28:42PM -0400, Jason Gunthorpe wrote:
+> On Mon, Mar 03, 2025 at 01:32:47PM +0800, Xu Yilun wrote:
+> > All these settings cannot really take function until guest verifies them
+> > and does TDISP start. Guest verification does not (should not) need host
+> > awareness.
+> > 
+> > Our solution is, separate the secure DMA setting and secure device setting
+> > in different components, iommufd & vfio.
+> > 
+> > Guest require bind:
+> >   - ioctl(iommufd, IOMMU_VIOMMU_ALLOC, {.type = IOMMU_VIOMMU_TYPE_KVM_VALID,
+> > 					.kvm_fd = kvm_fd,
+> > 					.out_viommu_id = &viommu_id});
+> >   - ioctl(iommufd, IOMMU_HWPT_ALLOC, {.flag = IOMMU_HWPT_ALLOC_TRUSTED,
+> > 				      .pt_id = viommu_id,
+> > 				      .out_hwpt_id = &hwpt_id});
+> >   - ioctl(vfio_fd, VFIO_DEVICE_ATTACH_IOMMUFD_PT, {.pt_id = hwpt_id})
+> >     - do secure DMA setting in Intel iommu driver.
+> > 
+> >   - ioctl(vfio_fd, VFIO_DEVICE_TSM_BIND, ...)
+> >     - do bind in Intel TSM driver.
+> 
+> Except what do command do you issue to the secure world for TSM_BIND
+> and what are it's argument? Again you can't include the vBDF or vIOMMU
+> ID here.
 
-Sure, fixing it might not be easy, partly because the new interface
-wasn't designed for its needs.
+Bind for TDX doesn't require vBDF or vIOMMU ID. The seamcall is like:
 
-But getting rid of the duplicate field isn't hard, because we're
-already assuming that the user does not modify walk->XXX.virt.addr,
-at least not far enough to break the unmap (see the WALK_DIFF
-clause).  In fact, grepping through the arch code seems to show
-that nobody actually modifies them at all.  So we could even
-simplify the WALK_SLOW done path.
+u64 tdh_devif_create(u64 stream_id,     // IDE stream ID, PF0 stuff
+                     u64 devif_id,      // TDI ID, it is the host BDF
+                     u64 tdr_pa,        // TDX VM core metadate page, TDX Connect uses it as CoCo-VM ID
+                     u64 devifcs_pa)    // metadate page provide to firmware
 
----8<---
-Reuse the addr field from struct scatter_walk for skcipher_walk.
-In order to maintain backwards compatibility with existing users,
-retain the original virt.addr fields through unions.
+While for AMD:
+        ...
+        b.guest_device_id = guest_rid;  //TDI ID, it is the vBDF
+        b.gctx_paddr = gctx_paddr;      //AMDs CoCo-VM ID
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
- crypto/skcipher.c                  | 25 ++++++++++---------------
- include/crypto/algapi.h            |  3 ++-
- include/crypto/internal/skcipher.h | 20 +++++++++++++++-----
- 3 files changed, 27 insertions(+), 21 deletions(-)
+        ret = sev_tio_do_cmd(SEV_CMD_TIO_TDI_BIND, &b, ...
 
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index d321c8746950..f770307abb8e 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -43,14 +43,12 @@ static inline void skcipher_map_src(struct skcipher_walk *walk)
- {
- 	/* XXX */
- 	walk->in.addr = scatterwalk_map(&walk->in);
--	walk->src.virt.addr = walk->in.addr;
- }
- 
- static inline void skcipher_map_dst(struct skcipher_walk *walk)
- {
- 	/* XXX */
- 	walk->out.addr = scatterwalk_map(&walk->out);
--	walk->dst.virt.addr = walk->out.addr;
- }
- 
- static inline gfp_t skcipher_walk_gfp(struct skcipher_walk *walk)
-@@ -100,8 +98,7 @@ int skcipher_walk_done(struct skcipher_walk *walk, int res)
- 				    SKCIPHER_WALK_DIFF)))) {
- 		scatterwalk_advance(&walk->in, n);
- 	} else if (walk->flags & SKCIPHER_WALK_DIFF) {
--		scatterwalk_unmap(walk->src.virt.addr);
--		scatterwalk_advance(&walk->in, n);
-+		scatterwalk_done_src(&walk->in, n);
- 	} else if (walk->flags & SKCIPHER_WALK_COPY) {
- 		scatterwalk_advance(&walk->in, n);
- 		skcipher_map_dst(walk);
-@@ -116,11 +113,8 @@ int skcipher_walk_done(struct skcipher_walk *walk, int res)
- 			 */
- 			res = -EINVAL;
- 			total = 0;
--		} else {
--			u8 *buf = PTR_ALIGN(walk->buffer, walk->alignmask + 1);
--
--			memcpy_to_scatterwalk(&walk->out, buf, n);
--		}
-+		} else
-+			memcpy_to_scatterwalk(&walk->out, walk->out.addr, n);
- 		goto dst_done;
- 	}
- 
-@@ -176,10 +170,11 @@ static int skcipher_next_slow(struct skcipher_walk *walk, unsigned int bsize)
- 			return skcipher_walk_done(walk, -ENOMEM);
- 		walk->buffer = buffer;
- 	}
--	walk->dst.virt.addr = PTR_ALIGN(buffer, alignmask + 1);
--	walk->src.virt.addr = walk->dst.virt.addr;
- 
--	memcpy_from_scatterwalk(walk->src.virt.addr, &walk->in, bsize);
-+	buffer = PTR_ALIGN(buffer, alignmask + 1);
-+	memcpy_from_scatterwalk(buffer, &walk->in, bsize);
-+	walk->out.addr = buffer;
-+	walk->in.addr = walk->out.addr;
- 
- 	walk->nbytes = bsize;
- 	walk->flags |= SKCIPHER_WALK_SLOW;
-@@ -199,8 +194,8 @@ static int skcipher_next_copy(struct skcipher_walk *walk)
- 	 * processed (which might be less than walk->nbytes) is known.
- 	 */
- 
--	walk->src.virt.addr = tmp;
--	walk->dst.virt.addr = tmp;
-+	walk->in.addr = tmp;
-+	walk->out.addr = tmp;
- 	return 0;
- }
- 
-@@ -214,7 +209,7 @@ static int skcipher_next_fast(struct skcipher_walk *walk)
- 		(u8 *)(sg_page(walk->out.sg) + (walk->out.offset >> PAGE_SHIFT));
- 
- 	skcipher_map_src(walk);
--	walk->dst.virt.addr = walk->src.virt.addr;
-+	walk->out.addr = walk->in.addr;
- 
- 	if (diff) {
- 		walk->flags |= SKCIPHER_WALK_DIFF;
-diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-index 41733a0b45dd..94147ea8c14d 100644
---- a/include/crypto/algapi.h
-+++ b/include/crypto/algapi.h
-@@ -120,9 +120,10 @@ struct crypto_queue {
- };
- 
- struct scatter_walk {
-+	/* Must be the first member, see struct skcipher_walk. */
-+	void *addr;
- 	struct scatterlist *sg;
- 	unsigned int offset;
--	void *addr;
- };
- 
- struct crypto_attr_alg {
-diff --git a/include/crypto/internal/skcipher.h b/include/crypto/internal/skcipher.h
-index d6ae7a86fed2..357441b56c1e 100644
---- a/include/crypto/internal/skcipher.h
-+++ b/include/crypto/internal/skcipher.h
-@@ -57,14 +57,24 @@ struct crypto_lskcipher_spawn {
- struct skcipher_walk {
- 	union {
- 		struct {
--			void *addr;
--		} virt;
--	} src, dst;
-+			struct {
-+				void *const addr;
-+			} virt;
-+		} src;
-+		struct scatter_walk in;
-+	};
- 
--	struct scatter_walk in;
- 	unsigned int nbytes;
- 
--	struct scatter_walk out;
-+	union {
-+		struct {
-+			struct {
-+				void *const addr;
-+			} virt;
-+		} dst;
-+		struct scatter_walk out;
-+	};
-+
- 	unsigned int total;
- 
- 	u8 *page;
--- 
-2.39.5
 
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Neither of them use vIOMMU ID or any IOMMU info, so the only concern is
+vBDF.
+
+Basically from host POV the two interfaces does the same thing, connect
+the CoCo-VM ID with the TDI ID, for which Intel uses host BDF while AMD
+uses vBDF. But AMD firmware cannot know anything meaningful about the
+vBDF, it is just a magic number to index TDI metadata.
+
+So I don't think we have to introduce vBDF concept in kernel. AMD uses
+QEMU created vBDF as TDI ID, that's fine, QEMU should ensure the
+validity of the vBDF.
+
+> 
+> vfio also can't validate that the hwpt is in the right state when it
+> executes this function.
+
+Not sure if VFIO has to validate, or is there a requirement that
+secure DMA should be in right state before bind. TDX doesn't require
+this, and I didn't see the requirement in SEV-TIO spec. I.e. the
+bind firmware calls don't check DMA state.
+
+In my opinion, TDI bind means put device in LOCKED state and related
+metadate management in firmware. After bind the DMA cannot work. It
+is the guest's resposibility to validate everything (including DMA)
+is in the right state, then issues RUN, then DMA works. I.e. guest tsm
+calls check DMA state.  That's why I think Secure DMA configuration
+on host could be in a separated flow from bind.
+
+> 
+> You could also issue the TSM bind against the idev on the iommufd
+> side..
+
+But I cannot figure out how idev could ensure no mmap on VFIO, and how
+idev could call dma_buf_move_notify.
+
+Thanks,
+Yilun
+
+> 
+> Part of my problem here is I don't see anyone who seems to have read
+> all three specs and is trying to mush them together. Everyone is
+> focused on their own spec. I know there are subtle differences :\
+> 
+> Jason
