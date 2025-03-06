@@ -1,49 +1,43 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A67A6191484;
-	Thu,  6 Mar 2025 02:56:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8B8A1519A8
+	for <linux-crypto@vger.kernel.org>; Thu,  6 Mar 2025 03:03:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741229806; cv=none; b=MVhQDIDW/TJV40s+7QVNqnIvd0W0Ao/fr2UMCEpAEBzZTO1FCMzgtRvOgIEQ3k6HMsuEAfcM+AXERNpligaEZ/ZwiHnrzmtZE3CoB2+ctQXioo1Q3MwM2+G79lqqz4uFX8r4nhcHKee+aMXX6NaCN95abVbyhMMIDYWAOvQ7gCc=
+	t=1741230209; cv=none; b=VsAKS0dI2yIu+2zItHVOLRnNndENtFkzA1hxhYy9utyOeLs4mhM5usuX8eDposrulOhVgyInUufphNjohQ3ZCyIVt9sxueT7VtGXX4CowXy6htIP5Vy6dPMXXiEeLKVUkOK1DDLX+e6hD8Vys2gdeW0K879jIBe8htfWjvorvAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741229806; c=relaxed/simple;
-	bh=8DeWfzCxrqel0/a7+qeFa55jA1XHeM+A8wMYrayk/U8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s8VX/5utz1FQQrXm2Y3ZVjcl2VQLdBBigHDqeHOd2O8Bpq3MgLFu+xW4P1/mcwXNpDKbB/iFBlf99KP1aN0NufNlPiIsfn1Lrk1rlJmtvv1pGOmCfUqzbxSK6X5bq7d8i6VWtM7ydVo4Ov86K6IhueqH2I9E8ve4Ev/xnxlUznw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CW9jEJvf; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1741230209; c=relaxed/simple;
+	bh=9Cpkj3eXLMyc/xrDjQcsFbLAi/ppJEj5kEar3a7EMs8=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=sttVuKxVKNCA0nE7NIfnmkSvWLBN2fDNUGZGrcHHfAU6CanEQDZedfEr+3pI4iW9c2N24QC87oK8UMBHmuNoYRUyeB7wkB+sZHWMiY+QWEf2IVIsrNg6/+70WtKBKGxzMBMP/KvQ0hXTQbjxQjyiW+IVtz/WSqrWujDkQMOKS8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=ETuk8ZOY; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CW9jEJvf"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87F43C4CED1;
-	Thu,  6 Mar 2025 02:56:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741229805;
-	bh=8DeWfzCxrqel0/a7+qeFa55jA1XHeM+A8wMYrayk/U8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CW9jEJvfczPFw6j9/0McknStDTMBFz1KTucb6dKvDCc0zaL1eTb2kHQNJCIR+DlzV
-	 Bv7gzJXXnQHzlLbylnKsV+sEYTbcREaDrv9m+X6fbXil6ccqgkenc9gRgo19OshVDO
-	 GgEyIfXjOxM1mV1Jn/3xlYF1m1+e4kxJ8DcTSPtxGOSP1t6u7fDOYdRTEPBSmRwoJx
-	 hOF5PueZbmDztYOFSZ85wV1dKtDqtDhRmLb5SZsHDCPHRPh67ltmvThYPACTuCh9B3
-	 mMZ9h0ECnkTac85q2TaO3uXCRol+iyUHjhJ4O83CiKnVJ9wnFogXH/sEhDo2EqMdn3
-	 2EoupNof6gtcw==
-Date: Wed, 5 Mar 2025 18:56:43 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: David Laight <david.laight.linux@gmail.com>
-Cc: linux-kernel@vger.kernel.org, Bill Wendling <morbo@google.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H . Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Justin Stitt <justinstitt@google.com>, linux-crypto@vger.kernel.org,
-	llvm@lists.linux.dev
-Subject: Re: [PATCH] x86/crc32: optimize tail handling for crc32c short inputs
-Message-ID: <20250306025643.GA1592@sol.localdomain>
-References: <20250304213216.108925-1-ebiggers@kernel.org>
- <20250305142653.751d9840@pumpkin>
- <20250305191608.GA19889@sol.localdomain>
- <20250305220739.1cb4b61e@pumpkin>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="ETuk8ZOY"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=Content-Type:MIME-Version:Message-ID:Subject:To:From:Date:
+	Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=rRVH8LYv4TwbtLOSq7Dzij3icVQZEcT1/Zu36x+TJvM=; b=ETuk8ZOYjhniOYhXacVhB8wNri
+	vAm6O5FU4rP4kyqs4fyq6sN1vXXAeTPmBIwhnLZ/eMuUJC/Pt5vY4lNXTgbFrKryS5tQlPMPy+CAK
+	GAX5F62S3hhx8R55M8ibXqeF2/qpFuo1YPBVhfPIZ0Y7XV72qmIOVkY775JdNdycLz8kb3FvD46SS
+	d9m/yj7KK4BZSA85XfM3fVDBvm9HV87Np+J5MfEnLnU8NVmFR+Rf1vCdngQNHRn7B94LmFX8vCWcu
+	rtx7LFhPzvt73csmDZZTxQmtiSf6dfgkLgvlHhJDerPi75o7D4JN6QhnBWSZnLnRhPS4jaxRlz6uc
+	75dyOvog==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tq1W6-004A7X-2f;
+	Thu, 06 Mar 2025 11:03:23 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 06 Mar 2025 11:03:22 +0800
+Date: Thu, 6 Mar 2025 11:03:22 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [PATCH] crypto: scatterwalk - Add memcpy_sglist
+Message-ID: <Z8kQejXQqMhc3X8x@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,67 +46,71 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250305220739.1cb4b61e@pumpkin>
 
-On Wed, Mar 05, 2025 at 10:07:39PM +0000, David Laight wrote:
-> On Wed, 5 Mar 2025 11:16:08 -0800
-> Eric Biggers <ebiggers@kernel.org> wrote:
-> 
-> > On Wed, Mar 05, 2025 at 02:26:53PM +0000, David Laight wrote:
-> > > On Tue,  4 Mar 2025 13:32:16 -0800
-> > > Eric Biggers <ebiggers@kernel.org> wrote:
-> > >   
-> > > > From: Eric Biggers <ebiggers@google.com>
-> > > > 
-> > > > For handling the 0 <= len < sizeof(unsigned long) bytes left at the end,
-> > > > do a 4-2-1 step-down instead of a byte-at-a-time loop.  This allows
-> > > > taking advantage of wider CRC instructions.  Note that crc32c-3way.S
-> > > > already uses this same optimization too.  
-> > > 
-> > > An alternative is to add extra zero bytes at the start of the buffer.
-> > > They don't affect the crc and just need the first 8 bytes shifted left.
-> > > 
-> > > I think any non-zero 'crc-in' just needs to be xor'ed over the first
-> > > 4 actual data bytes.
-> > > (It's over 40 years since I did the maths of CRC.)
-> ...
-> > > 	David  
-> > 
-> > Sure, but that only works when len >= sizeof(unsigned long).  Also, the initial
-> > CRC sometimes has to be divided between two unsigned longs.
-> 
-> Yes, I was thinking that might make it a bit more tricky.
-> I need to find some spare time :-)
-> 
-> I wasn't taught anything about using non-carry multiplies either.
-> And I can't remember the relevant 'number field' stuff either.
-> But (with no-carry maths) I think you have:
-> 	crc(n + 1) = (crc(n) + data(n)) * poly
-> If data(n+1) and data(n+2) are zero (handled elsewhere) you have:
-> 	crc(n + 3) = (((crc(n) + data(n)) * poly) * poly) * poly
-> I think that because it is a field this is the same as
-> 	crc(n + 3) = (crc(n) + data(n)) * (poly * poly * poly)
-> which is just a different crc polynomial.
-> If true your '3-way' cpu doesn't have to use big blocks.
+Add memcpy_sglist which copies one SG list to another.
 
-Well, to extend by some constant number of bits 'n', you can carryless-multiply
-by the polynomial x^n, pre-reduced by the CRC's generator polynomial.  That's
-basically how all the CRC implementations using carryless multiplication work.
-Take a look at the x86 and riscv optimized code, for example -- especially my
-new versions in the crc-next tree at
-https://web.git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=crc-next.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
+ crypto/scatterwalk.c         | 27 +++++++++++++++++++++++++++
+ include/crypto/scatterwalk.h |  3 +++
+ 2 files changed, 30 insertions(+)
 
-But x86 does not have a scalar carryless multiplication instruction, only vector
-(PCLMULQDQ).  It does have a scalar CRC instruction, for crc32c *specifically*,
-and that is what the code we're discussing is taking advantage of.  Given that
-there is overhead associated with using kernel-mode FPU (i.e. vector), it makes
-sense to do that, at least on short messages.
+diff --git a/crypto/scatterwalk.c b/crypto/scatterwalk.c
+index 20a28c6d94da..e57ce08e0d8d 100644
+--- a/crypto/scatterwalk.c
++++ b/crypto/scatterwalk.c
+@@ -86,6 +86,33 @@ void memcpy_to_sglist(struct scatterlist *sg, unsigned int start,
+ }
+ EXPORT_SYMBOL_GPL(memcpy_to_sglist);
+ 
++void memcpy_sglist(struct scatterlist *dst, struct scatterlist *src,
++		   unsigned int nbytes)
++{
++	struct scatter_walk swalk;
++	struct scatter_walk dwalk;
++
++	if (unlikely(nbytes == 0)) /* in case sg == NULL */
++		return;
++
++	scatterwalk_start(&swalk, src);
++	scatterwalk_start(&dwalk, dst);
++
++	do {
++		unsigned int slen, dlen;
++		unsigned int len;
++
++		slen = scatterwalk_next(&swalk, nbytes);
++		dlen = scatterwalk_next(&dwalk, nbytes);
++		len = min(slen, dlen);
++		memcpy(dwalk.addr, swalk.addr, len);
++		scatterwalk_done_src(&swalk, len);
++		scatterwalk_done_dst(&dwalk, len);
++		nbytes -= len;
++	} while (nbytes);
++}
++EXPORT_SYMBOL_GPL(memcpy_sglist);
++
+ struct scatterlist *scatterwalk_ffwd(struct scatterlist dst[2],
+ 				     struct scatterlist *src,
+ 				     unsigned int len)
+diff --git a/include/crypto/scatterwalk.h b/include/crypto/scatterwalk.h
+index 40c3c629e27f..1201543295f9 100644
+--- a/include/crypto/scatterwalk.h
++++ b/include/crypto/scatterwalk.h
+@@ -208,6 +208,9 @@ void memcpy_from_sglist(void *buf, struct scatterlist *sg,
+ void memcpy_to_sglist(struct scatterlist *sg, unsigned int start,
+ 		      const void *buf, unsigned int nbytes);
+ 
++void memcpy_sglist(struct scatterlist *dst, struct scatterlist *src,
++		   unsigned int nbytes);
++
+ /* In new code, please use memcpy_{from,to}_sglist() directly instead. */
+ static inline void scatterwalk_map_and_copy(void *buf, struct scatterlist *sg,
+ 					    unsigned int start,
+-- 
+2.39.5
 
-On longer messages a PCLMULQDQ-only implementation would work well, but so does
-interleaving the crc32c scalar instruction on multiple chunks, which is what is
-currently wired up in the kernel via crc32c-3way.S.  And yes, the chunks for
-that do not *have* to be long, but you still need to use pclmulqdq instructions
-to combine them (unless you do a really slow bit-at-a-time carryless
-multiplication), and you have to enter a kernel-mode FPU section to do that.
-
-- Eric
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
