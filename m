@@ -1,72 +1,100 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AD881F3FF8;
-	Thu,  6 Mar 2025 08:12:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E26779450
+	for <linux-crypto@vger.kernel.org>; Thu,  6 Mar 2025 08:15:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741248754; cv=none; b=IT8c3N+qhhoFUHTp5qhLjHOOu9J+QWNPMpiY2op0WPUAWxJfWZb9ohmZauOwbWQcGegjfTH3iMyBILf91rkHnefGXLUlel3lWJCTtIp0KqRolC9ysPAXbefyrjNejF1Pn/nZtq8uo8YxMGlvSMRcTrK+G0/3v1kzuif5vgqFbAo=
+	t=1741248947; cv=none; b=Vrniz3UCZhBfYqpyiVrJEx14yoqiawvJQ2aTCQPqo0elZ190gAoB06HGSEXB9da9F3v/E0mJ/huB6PMBFQDv0uDSi5RaWd0kiLXpyljgMzgIUjF1IIzN4/AmudHwlbOyrCfV7oyorSCEaYvN7fzBzSwvtFYjAOWFTQPnzFRmtMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741248754; c=relaxed/simple;
-	bh=wl2BDLiRBF6hoKXY6axrcQy8DYsjUmOVVI7P/s2cE1k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tREu7I4fH8/7ORIcwRjqyk1qhJWOOScvvC6MPAeVKjVmOu8vJngGS56dZY7jNrZcRGR4bedrBm1kRaAldx8iGRwoZRrTGl/kjN4ggCVefy4tXH3n+dTmsSKkfCItIHfDSdFIVs7TXEcnLVgJ3+zfukV5AAgmNTZIUuJn68YW+6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=N2Z4VPpn; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1741248947; c=relaxed/simple;
+	bh=ANwq88u975BdIIs07u8qtA3KbLF0jq+BOZtMd8DrZw4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Yrg1Yo51NoyIfFVYwu3e2FQOP4BL1odZmFXkXucSNJruv82JgUTpGUE6CW87DE/Q99FpsbaesZKqREeSi3OoH1Fb8hcVNp7Nf1jU8a29M+qX0qSrPARyU+pZdcvVWOEtf0OAkfsx3UqdpUP2nLdaC93I9kp/KJ0tsHK97pD0zGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nKwm5Z2N; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="N2Z4VPpn"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=/9lsyVw/jLL6PgCYLWqutBR3oMdvMfXAvoJtnAK45Do=; b=N2Z4VPpn/+sXJ/OvgU9GgY+ZUj
-	uvaxUzXZQsf5WCP6hxVswH6hia1WFb3T3XUCs/Nq4XXrWTxcl1u1m1qZbqm7tMEfaDdIIqCMycmlb
-	CoX1syO69gChTmRaC/BKPeYHC24bvg23a6lRKPdY8sGTR7Yv73IX/SeZp7cc0g+lviZMcHja4fJjS
-	XixyyY0JXWOnsaUowgbk7BxnNV1aG8szWyhKNp2UgCOW/5fB+dfauAN8u8kTP9hgkJL16UbQ9HmOb
-	o26gjtwCi7md86nfKxqfvZkENi4C8+aNOJ7qG8Z/c6VgXtokFP2Jfxpek82AUr5+usvsNk+26BRDC
-	jRMcn6pw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tq6L7-004D90-1i;
-	Thu, 06 Mar 2025 16:12:22 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 06 Mar 2025 16:12:21 +0800
-Date: Thu, 6 Mar 2025 16:12:21 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Akhil R <akhilrajeev@nvidia.com>
-Cc: "davem@davemloft.net" <davem@davemloft.net>,
-	"thierry.reding@gmail.com" <thierry.reding@gmail.com>,
-	Jon Hunter <jonathanh@nvidia.com>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v3 09/10] crypto: tegra: Reserve keyslots to allocate
- dynamically
-Message-ID: <Z8lY5Qd4g5eMDMnu@gondor.apana.org.au>
-References: <20250224091610.49683-1-akhilrajeev@nvidia.com>
- <20250224091610.49683-10-akhilrajeev@nvidia.com>
- <PH7PR12MB8178B92B6ED11B891AAFCE0BC0CB2@PH7PR12MB8178.namprd12.prod.outlook.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nKwm5Z2N"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 683EAC4AF0B
+	for <linux-crypto@vger.kernel.org>; Thu,  6 Mar 2025 08:15:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741248946;
+	bh=ANwq88u975BdIIs07u8qtA3KbLF0jq+BOZtMd8DrZw4=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=nKwm5Z2NQ+C5eXXXc8IsZXiOEe7mjHRiSdmcA4iTAdT89n5WTlsG35NaPTGmg8AxK
+	 bEB6JUucve3FWsmTTljEtGLj6SHXYOuNKFRLaVsIKzzFtUMS9ENuw/T55WU7/8PynA
+	 Un4DEHmRA11uoxFiKSx7Ekgq52HDJ1QyLx5wZDKyHPL0doM3cgYKSYlKCK+SYNSBng
+	 dHelPsdkEKtx3Lju3wrP3uG0udkOTpnmwcyr8afWRxfLBqQv7IZ88ChhnWp323uIjI
+	 2oi2wvZSn6i4Xg5pVQfOJBljfSJvy8Ml5mHTGqx1Fn8sBq2zHOIzDcKz93n593jNml
+	 bUZ6zUm0bkF6g==
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-307d1ab59c6so3500121fa.1
+        for <linux-crypto@vger.kernel.org>; Thu, 06 Mar 2025 00:15:46 -0800 (PST)
+X-Gm-Message-State: AOJu0Ywd7n34QdOF5sHunXxx9gte+S4TWsaMuC3t3f8kpOW/sjDtorLl
+	tyuj5vivsoVcaTQcVKSVmhY7qKvDEJonMYqdD4MsZCqxx1iafo/v+Rx4DOkeZOPIdkNUOOBaSzp
+	TMY8KxqV0l6w/4G2fDe+v+Y+zh10=
+X-Google-Smtp-Source: AGHT+IHUkvJ9lB5Q1YIiX2hdmqsu49fzlm0P+cWPvvvulbO09jPMU6IrIQISBzi4TGQwAFV2qSgikTh+leaJMl+EiMM=
+X-Received: by 2002:a2e:7a1a:0:b0:308:fa1d:1fed with SMTP id
+ 38308e7fff4ca-30bd7b1376emr21363181fa.34.1741248944648; Thu, 06 Mar 2025
+ 00:15:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <PH7PR12MB8178B92B6ED11B891AAFCE0BC0CB2@PH7PR12MB8178.namprd12.prod.outlook.com>
+References: <cover.1741080140.git.herbert@gondor.apana.org.au>
+In-Reply-To: <cover.1741080140.git.herbert@gondor.apana.org.au>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Thu, 6 Mar 2025 09:15:33 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXFfrXFuA-jrH6hiZe8kSoCrfRfUuhPDzw_nihPFLnNf=g@mail.gmail.com>
+X-Gm-Features: AQ5f1JrS5R4mlZ7i0vWcHXVM01QXrbOPQiHnQki-ffslO7XW-LHPM4eaFwegfPg
+Message-ID: <CAMj1kXFfrXFuA-jrH6hiZe8kSoCrfRfUuhPDzw_nihPFLnNf=g@mail.gmail.com>
+Subject: Re: [v2 PATCH 0/7] crypto: acomp - Add request chaining and virtual
+ address support
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, linux-mm@kvack.org, 
+	Yosry Ahmed <yosry.ahmed@linux.dev>, Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Mar 05, 2025 at 07:05:25AM +0000, Akhil R wrote:
+On Tue, 4 Mar 2025 at 10:25, Herbert Xu <herbert@gondor.apana.org.au> wrote:
 >
-> Do we have any other concerns with the patches in this series.
-> If all those look good, I can push a new version with this change included.
+> This patch series adds reqeust chaining and virtual address support
+> to the crypto_acomp interface.
+>
+> Herbert Xu (7):
+>   crypto: api - Add cra_type->destroy hook
+>   crypto: scomp - Remove tfm argument from alloc/free_ctx
+>   crypto: acomp - Add request chaining and virtual addresses
+>   crypto: testmgr - Remove NULL dst acomp tests
+>   crypto: scomp - Remove support for most non-trivial destination SG
+>     lists
+>   crypto: scomp - Add chaining and virtual address support
+>   crypto: acomp - Move stream management into scomp layer
+>
 
-I have no other concerns.  I can fold this change in if you want.
+How does this v2 differ from the previous version?
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+>  crypto/842.c                           |   8 +-
+>  crypto/acompress.c                     | 208 ++++++++++++++++++++---
+>  crypto/algapi.c                        |   9 +
+>  crypto/compress.h                      |   2 -
+>  crypto/deflate.c                       |   4 +-
+>  crypto/internal.h                      |   6 +-
+>  crypto/lz4.c                           |   8 +-
+>  crypto/lz4hc.c                         |   8 +-
+>  crypto/lzo-rle.c                       |   8 +-
+>  crypto/lzo.c                           |   8 +-
+>  crypto/scompress.c                     | 226 +++++++++++++++----------
+>  crypto/testmgr.c                       |  29 ----
+>  crypto/zstd.c                          |   4 +-
+>  drivers/crypto/cavium/zip/zip_crypto.c |   6 +-
+>  drivers/crypto/cavium/zip/zip_crypto.h |   6 +-
+>  include/crypto/acompress.h             | 118 ++++++++++---
+>  include/crypto/internal/acompress.h    |  39 +++--
+>  include/crypto/internal/scompress.h    |  18 +-
+>  18 files changed, 488 insertions(+), 227 deletions(-)
+>
+> --
+> 2.39.5
+>
+>
