@@ -1,112 +1,72 @@
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFDC81A5BA1
-	for <linux-crypto@vger.kernel.org>; Thu,  6 Mar 2025 07:06:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AD881F3FF8;
+	Thu,  6 Mar 2025 08:12:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741244763; cv=none; b=pVNk6DzYB2a0NEUwLLGOWH2Tcz207xMMwY9pNgvjnttj4gDA4Ple7C1XObNJvGlO3xHo4ELNSYGy7BfGfexn4BOXj7wghcaajMiJkFrVpv1yY0R6n83hhZ9wegxHswf5WBkUQ3l82ZJKHYxCNh4Eb7KNhdKA7QRJQ1vdGSwcuCU=
+	t=1741248754; cv=none; b=IT8c3N+qhhoFUHTp5qhLjHOOu9J+QWNPMpiY2op0WPUAWxJfWZb9ohmZauOwbWQcGegjfTH3iMyBILf91rkHnefGXLUlel3lWJCTtIp0KqRolC9ysPAXbefyrjNejF1Pn/nZtq8uo8YxMGlvSMRcTrK+G0/3v1kzuif5vgqFbAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741244763; c=relaxed/simple;
-	bh=jhWOcXyD54EKw7A/5hxlnKy9KlURAGCKN9CTet3a/6c=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=PD1j88IXN6yA8AA+hjmsu0RKA1QghI5wOWYKuC4wbbiX7iGwQ+0ne//Z+WA86BrnM2DzIpGjsRlp4wPtzS2RHury2J8ug0wbvQTdgvlWUpi0b1IWm7DDDhSM8KOuVxG7NInyaKElnWZP9P1BdJ7oH3tL8s1OXSFUQcV6YOiGSVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aNf0m7ma; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+	s=arc-20240116; t=1741248754; c=relaxed/simple;
+	bh=wl2BDLiRBF6hoKXY6axrcQy8DYsjUmOVVI7P/s2cE1k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tREu7I4fH8/7ORIcwRjqyk1qhJWOOScvvC6MPAeVKjVmOu8vJngGS56dZY7jNrZcRGR4bedrBm1kRaAldx8iGRwoZRrTGl/kjN4ggCVefy4tXH3n+dTmsSKkfCItIHfDSdFIVs7TXEcnLVgJ3+zfukV5AAgmNTZIUuJn68YW+6Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=N2Z4VPpn; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aNf0m7ma"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1741244760;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uZmNayth8nNV8L3lfDhYpOawH7iYgqiELXF3kNzD034=;
-	b=aNf0m7ma3IH1ygH+yBFQGJdZTYWKRdyWaqU0ozZN/VR5SJ8z+7ht7M9vW1R9FRdx0J96a9
-	aAwV2JOVPUvDDkzrof8IIlhVtTRQMBCKTg/3+1Y1kH+Wr/+04enxeiVCRi08xx864rPlGc
-	kNl9h9eHpzmictYe2/cMuJbhWzoBeyQ=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-687-0POG-HYEP6GSjrjCx2fTEQ-1; Thu,
- 06 Mar 2025 02:05:41 -0500
-X-MC-Unique: 0POG-HYEP6GSjrjCx2fTEQ-1
-X-Mimecast-MFC-AGG-ID: 0POG-HYEP6GSjrjCx2fTEQ_1741244740
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 95D5D18001F8;
-	Thu,  6 Mar 2025 07:05:39 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.44.32.200])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3B8ED180AF7C;
-	Thu,  6 Mar 2025 07:05:34 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <90c171d5beed08bcf65ec2df6357a7ac97520b91.1741194399.git.lukas@wunner.de>
-References: <90c171d5beed08bcf65ec2df6357a7ac97520b91.1741194399.git.lukas@wunner.de>
-To: Lukas Wunner <lukas@wunner.de>
-Cc: dhowells@redhat.com, Herbert Xu <herbert@gondor.apana.org.au>,
-    "David S. Miller" <davem@davemloft.net>,
-    Ignat Korchagin <ignat@cloudflare.com>,
-    Stefan Berger <stefanb@linux.ibm.com>,
-    Tadeusz Struk <tstruk@gmail.com>, Tadeusz Struk <tstruk@gigaio.com>,
-    Vitaly Chikunov <vt@altlinux.org>, linux-crypto@vger.kernel.org,
-    keyrings@vger.kernel.org, Eric Biggers <ebiggers@google.com>
-Subject: Re: [PATCH] MAINTAINERS: Add Lukas & Ignat & Stefan for asymmetric keys
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="N2Z4VPpn"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=/9lsyVw/jLL6PgCYLWqutBR3oMdvMfXAvoJtnAK45Do=; b=N2Z4VPpn/+sXJ/OvgU9GgY+ZUj
+	uvaxUzXZQsf5WCP6hxVswH6hia1WFb3T3XUCs/Nq4XXrWTxcl1u1m1qZbqm7tMEfaDdIIqCMycmlb
+	CoX1syO69gChTmRaC/BKPeYHC24bvg23a6lRKPdY8sGTR7Yv73IX/SeZp7cc0g+lviZMcHja4fJjS
+	XixyyY0JXWOnsaUowgbk7BxnNV1aG8szWyhKNp2UgCOW/5fB+dfauAN8u8kTP9hgkJL16UbQ9HmOb
+	o26gjtwCi7md86nfKxqfvZkENi4C8+aNOJ7qG8Z/c6VgXtokFP2Jfxpek82AUr5+usvsNk+26BRDC
+	jRMcn6pw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tq6L7-004D90-1i;
+	Thu, 06 Mar 2025 16:12:22 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 06 Mar 2025 16:12:21 +0800
+Date: Thu, 6 Mar 2025 16:12:21 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Akhil R <akhilrajeev@nvidia.com>
+Cc: "davem@davemloft.net" <davem@davemloft.net>,
+	"thierry.reding@gmail.com" <thierry.reding@gmail.com>,
+	Jon Hunter <jonathanh@nvidia.com>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3 09/10] crypto: tegra: Reserve keyslots to allocate
+ dynamically
+Message-ID: <Z8lY5Qd4g5eMDMnu@gondor.apana.org.au>
+References: <20250224091610.49683-1-akhilrajeev@nvidia.com>
+ <20250224091610.49683-10-akhilrajeev@nvidia.com>
+ <PH7PR12MB8178B92B6ED11B891AAFCE0BC0CB2@PH7PR12MB8178.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 06 Mar 2025 07:05:33 +0000
-Message-ID: <666.1741244733@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <PH7PR12MB8178B92B6ED11B891AAFCE0BC0CB2@PH7PR12MB8178.namprd12.prod.outlook.com>
 
-Lukas Wunner <lukas@wunner.de> wrote:
+On Wed, Mar 05, 2025 at 07:05:25AM +0000, Akhil R wrote:
+>
+> Do we have any other concerns with the patches in this series.
+> If all those look good, I can push a new version with this change included.
 
-> Herbert asks for long-term maintenance of everything under
-> crypto/asymmetric_keys/ and associated algorithms (ECDSA, GOST, RSA) [1].
->=20
-> Ignat has kindly agreed to co-maintain this with me going forward.
->=20
-> Stefan has agreed to be added as reviewer for ECDSA.  He introduced it
-> in 2021 and has been meticulously providing reviews for 3rd party
-> patches anyway.
->=20
-> Retain David Howells' maintainer entry until he explicitly requests to
-> be removed.  He originally introduced asymmetric keys in 2012.
->=20
-> RSA was introduced by Tadeusz Struk as an employee of Intel in 2015,
-> but he's changed jobs and last contributed to the implementation in 2016.
->=20
-> GOST was introduced by Vitaly Chikunov as an employee of Basealt LLC [2]
-> (=D0=91=D0=B0=D0=B7=D0=B0=D0=BB=D1=8C=D1=82 =D0=A1=D0=9F=D0=9E [3]) in 20=
-19.  This company is an OFAC sanctioned entity
-> [4][5], which makes employees ineligible as maintainer [6].  It's not
-> clear if Vitaly is still working for Basealt, he did not immediately
-> respond to my e-mail.  Since knowledge and use of GOST algorithms is
-> relatively limited outside the Russian Federation, assign "Odd fixes"
-> status for now.
->=20
-> [1] https://lore.kernel.org/r/Z8QNJqQKhyyft_gz@gondor.apana.org.au/
-> [2] https://prohoster.info/ru/blog/novosti-interneta/reliz-yadra-linux-5-2
-> [3] https://www.basealt.ru/
-> [4] https://ofac.treasury.gov/recent-actions/20240823
-> [5] https://sanctionssearch.ofac.treas.gov/Details.aspx?id=3D50178
-> [6] https://lore.kernel.org/r/7ee74c1b5b589619a13c6318c9fbd0d6ac7c334a.ca=
-mel@HansenPartnership.com/
->=20
-> Signed-off-by: Lukas Wunner <lukas@wunner.de>
+I have no other concerns.  I can fold this change in if you want.
 
-Seems reasonable.  Unfortunately, I find myself a bit strapped for time.
-
-Signed-off-by: David Howells <dhowells@redhat.com>
-
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
