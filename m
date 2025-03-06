@@ -1,169 +1,222 @@
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B8931CD2B;
-	Thu,  6 Mar 2025 05:17:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36E4A199E88
+	for <linux-crypto@vger.kernel.org>; Thu,  6 Mar 2025 06:07:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741238268; cv=none; b=qff6djZCF2YVOahwnQTEZAWwGhMJ5r5ndr5/GInOaADZBo5Uj7i7NKI9ni4YPoqeemBbETKbU305BJI8RHApWBkhv/eVG69mDSevXUivFqVcYN85+W6LLvzSV1JTXETe0NifLBNp0ASVYb+q+OCLw5BZ3Lh39XNRa9sQwpOVpiw=
+	t=1741241278; cv=none; b=cp0ytd90BfCGJKsmpXbbyxdT8S47aZu0CkIggMgA4gboc6fuuMlzAZxsUZIYqupQJyc4A7w3MAPmPHOUypdNv9an8+xu+h/FIR1kgNb6cJlBuJgno2PsnLg4SQkE3t0HzhmD7NKFrl1oJLeWv/ehQjz9qz887+nPij+Fv3OH+YM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741238268; c=relaxed/simple;
-	bh=WYFWuMsvQGQ7/YrFeFoyl61Xj9FhjYRgqlpD086BI+I=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=K0tdjwE3xWJ/7vYUJNLPH+fkUb3MKfhoPgDsn859CjfHicDyyoRVx60W826j2UhPm6yh1sOpvUYFkFkP7DgYazARXh7Fk9HV1OFe7O3zAGfJrw4DWXcUmHpY6/APoMGEFtemFsp1sh7xIrO4WQ5+vamwC77EpwAgYgy41rtTHZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mew+9OEY; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+	s=arc-20240116; t=1741241278; c=relaxed/simple;
+	bh=DkhfeFLHsV8fbjSZHedkDY98bbqzTOiXHxWB3YLTSjA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ePSfZ8yCOyWlWsg7xOpfiL3uTp6e2VNEBxx3lWxD46U8MJV/H0Y1qjLpkUBUC/bChT23B+Lx/hE5TM3GHSZ9ZGFvMzYYSV9uE4C2YOqDAjfmp5w+eQbUBqcuVrhYvIDdXoFuYEc6FQ4HYhX3yxH5blGl6hCweYshy+CA0uFbVGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=HHZ8Xw+6; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mew+9OEY"
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3911748893aso164343f8f.3;
-        Wed, 05 Mar 2025 21:17:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1741238265; x=1741843065; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/XTve7yZUkpJ6I7Ayk3GGXKo8U7zE5G1KYgy4s9AqZw=;
-        b=mew+9OEYgXvAw57igyaKcaKPnlKby8eH6pZtokWnRTYyIzNuUeCTi6mUOQDAg+ZPGW
-         HRx+ODg+YhUYWkeeAe7z9PxdGL6gVdbK8VqGPR22q+I9mxREgIUe1MG/39rVwQWerF0j
-         Mf2ienwLpz0U8X8vvDVVJdo6BsMypbj42xUsKbNu4RroYRspjQ3Bo/ujPRmSVvUd6V2G
-         4oLRDJyskNYhfdV8IjyYBrXI7ZiTPEBorUcqsfU0nUC4zPlc/VCCV/N2gMDFxGpyzdT8
-         u85QrCCHTpQgN0aUssBNXjIoQBoQtECVVbW/al6ABwogtu7fU12zchiLsS5nrb66wB6q
-         b9gA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741238265; x=1741843065;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/XTve7yZUkpJ6I7Ayk3GGXKo8U7zE5G1KYgy4s9AqZw=;
-        b=uYtU8dFFLSSvTWkqh86CwQ9mB83TkCMcUt+jw8VBkA6OiPoIHUKCoC89ZSEKK2ngf5
-         ZSVo/7X6iy1vhOE0OjVnmE7CXLioyPH1nvh/+N7tpvIXKXro/e/EAOVmCwdG1zO4+yVq
-         AItsFkZ3zfVFeUPnUv7oXk1DQiTlqYV4h639fhFysaO7009OLxSSbVngDXuvjZXwqiT4
-         USRfYnoQFlDDKXzjFAOkOEgM38/LZu9Q7HoQxfvwEh8AaDLm/AbEy4knvUCMZLlP8auk
-         c/3B3jyspk4dVedvCFg/b2ye9Bqs6P1uiQbE/B3EWka+QF2bn0EaKEJgZ7+idl5Q5yCM
-         Bv/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVx6N3HqOroan/xMWrlZSBNRsOf2Dym8Im1+XdCdpV7BdvhBe/TxgYFGmnOF9HP+awXZiRzEPGUwB+wx8A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYxe9NUjnUOHOls0wVWYp9uxwRYWjx+QQQMo9dwMeUazitXy3W
-	Gwbjv/UcccUvV09pMZk6+C1MZyeK0PF9yiQ0eY2vYwihmhh1iyGy
-X-Gm-Gg: ASbGncuemBH+0Y+lMbN9+jVMBtN5JHxE22GSCnAcifwXoaWX+jQ6Tmuc88JAo+2mbkX
-	MeDRB1pCjNp/Saa6l7eUuMGz62AxVXC8MdJmL9w468RDoh4Yy4yUHNjNTZpyNmuNtNhJ8gAeQP4
-	a2SWDAHdKR/7CwG/qey0mRr1ScXgJrpXuWWsNCj4CF71iWvsV9gsAKYqKp8Q+zDzMhZjhx9U3S3
-	WOWl4F7hqeaqjsIp3/X6MMdziWsCT2Ox42yviIRhMkW1Rg/6qVMHEE/6l2a7DXrNz6SrfuXGwqs
-	s7n7Nce/SK44WKsspSbKoASDBI636/8zJsCrqsrEwkYD+O/tSpkPepS9JVHlVXtru2c4kLKSa03
-	Wus626I0=
-X-Google-Smtp-Source: AGHT+IHpz5lBCH2fwxlrTq59pWzTqiDyJY2lKmLmc1eX8A6erOeXEL+wiJGEzur2GcgaqjZkCdZM0g==
-X-Received: by 2002:a5d:5984:0:b0:391:1f9:c59a with SMTP id ffacd0b85a97d-3911f7c4cf6mr4482893f8f.46.1741238264481;
-        Wed, 05 Mar 2025 21:17:44 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43bd4352eccsm37431535e9.27.2025.03.05.21.17.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Mar 2025 21:17:43 -0800 (PST)
-Date: Thu, 6 Mar 2025 05:17:40 +0000
-From: David Laight <david.laight.linux@gmail.com>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="HHZ8Xw+6"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=1sehrQsheJ8zaitYN+gmeL6uVPU0ZvErNNK57LYQ8Rg=; b=HHZ8Xw+61QHnWO8UztIUl0Y+qY
+	L7Soj5Ls07MGL+H1tTShMF80tgsg2pkTkBK9VxC/NlYC3QofgW1z9DETtBRIkreQqGTMisNWKibg5
+	g8lPHAu1cs0zvycyR2tKUMuIO+RIcMQe/K1zpI9GnNRpwl/TV+wfRVSqviVWzAdRBEFNOJjUYKA4f
+	EC7isK1/E1LgBs5QJPtQ+G9MhmOWXNWXiY+foVykTBmL/1pxNEM3emLnkx96hw15KiuV+8Tbr/5LR
+	LrVu5eqmgNV6LSdGO/8p6HJShDSwd5urZ0ZIpi/gejkJwRBbToYSM46mbMdbf+Z5LqpFYQPIaaGJ0
+	s/AYj+Tg==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tq4Od-004BjW-00;
+	Thu, 06 Mar 2025 14:07:52 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 06 Mar 2025 14:07:50 +0800
+Date: Thu, 6 Mar 2025 14:07:50 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
 To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-kernel@vger.kernel.org, Bill Wendling <morbo@google.com>, Thomas
- Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav
- Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel
- <ardb@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers
- <nick.desaulniers+lkml@gmail.com>, Justin Stitt <justinstitt@google.com>,
- linux-crypto@vger.kernel.org, llvm@lists.linux.dev
-Subject: Re: [PATCH] x86/crc32: optimize tail handling for crc32c short
- inputs
-Message-ID: <20250306051740.6f454cac@pumpkin>
-In-Reply-To: <20250306025643.GA1592@sol.localdomain>
-References: <20250304213216.108925-1-ebiggers@kernel.org>
-	<20250305142653.751d9840@pumpkin>
-	<20250305191608.GA19889@sol.localdomain>
-	<20250305220739.1cb4b61e@pumpkin>
-	<20250306025643.GA1592@sol.localdomain>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [PATCH] crypto: skcipher - Elinimate duplicate virt.addr field
+Message-ID: <Z8k7ttZ7PwjBC-AS@gondor.apana.org.au>
+References: <Z8kOABHrceBW7EiK@gondor.apana.org.au>
+ <20250306031005.GB1592@sol.localdomain>
+ <Z8kT90qXaTo15271@gondor.apana.org.au>
+ <20250306033658.GD1592@sol.localdomain>
+ <Z8kZL2WlWX-KhkqR@gondor.apana.org.au>
+ <20250306035937.GA1153@sol.localdomain>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250306035937.GA1153@sol.localdomain>
 
-On Wed, 5 Mar 2025 18:56:43 -0800
-Eric Biggers <ebiggers@kernel.org> wrote:
+On Wed, Mar 05, 2025 at 07:59:37PM -0800, Eric Biggers wrote:
+>
+> I don't think it will be quite that simple, since the skcipher_walk code relies
+> on the different parts being split up so that it can do things like calculate
+> the length before it starts mapping anything.  If you can make it work, we can
+> do that.  But until that additional patch is ready I don't think it makes sense
+> to merge this one, as it leaves things half-baked with the redundant pointers.
 
-> On Wed, Mar 05, 2025 at 10:07:39PM +0000, David Laight wrote:
-> > On Wed, 5 Mar 2025 11:16:08 -0800
-> > Eric Biggers <ebiggers@kernel.org> wrote:
-> >   
-> > > On Wed, Mar 05, 2025 at 02:26:53PM +0000, David Laight wrote:  
-> > > > On Tue,  4 Mar 2025 13:32:16 -0800
-> > > > Eric Biggers <ebiggers@kernel.org> wrote:
-> > > >     
-> > > > > From: Eric Biggers <ebiggers@google.com>
-> > > > > 
-> > > > > For handling the 0 <= len < sizeof(unsigned long) bytes left at the end,
-> > > > > do a 4-2-1 step-down instead of a byte-at-a-time loop.  This allows
-> > > > > taking advantage of wider CRC instructions.  Note that crc32c-3way.S
-> > > > > already uses this same optimization too.    
-> > > > 
-> > > > An alternative is to add extra zero bytes at the start of the buffer.
-> > > > They don't affect the crc and just need the first 8 bytes shifted left.
-> > > > 
-> > > > I think any non-zero 'crc-in' just needs to be xor'ed over the first
-> > > > 4 actual data bytes.
-> > > > (It's over 40 years since I did the maths of CRC.)  
-> > ...  
-> > > > 	David    
-> > > 
-> > > Sure, but that only works when len >= sizeof(unsigned long).  Also, the initial
-> > > CRC sometimes has to be divided between two unsigned longs.  
-> > 
-> > Yes, I was thinking that might make it a bit more tricky.
-> > I need to find some spare time :-)
-> > 
-> > I wasn't taught anything about using non-carry multiplies either.
-> > And I can't remember the relevant 'number field' stuff either.
-> > But (with no-carry maths) I think you have:
-> > 	crc(n + 1) = (crc(n) + data(n)) * poly
-> > If data(n+1) and data(n+2) are zero (handled elsewhere) you have:
-> > 	crc(n + 3) = (((crc(n) + data(n)) * poly) * poly) * poly
-> > I think that because it is a field this is the same as
-> > 	crc(n + 3) = (crc(n) + data(n)) * (poly * poly * poly)
-> > which is just a different crc polynomial.
-> > If true your '3-way' cpu doesn't have to use big blocks.  
-> 
-> Well, to extend by some constant number of bits 'n', you can carryless-multiply
-> by the polynomial x^n, pre-reduced by the CRC's generator polynomial.  That's
-> basically how all the CRC implementations using carryless multiplication work.
-> Take a look at the x86 and riscv optimized code, for example -- especially my
-> new versions in the crc-next tree at
-> https://web.git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git/log/?h=crc-next.
-> 
-> But x86 does not have a scalar carryless multiplication instruction, only vector
-> (PCLMULQDQ).  It does have a scalar CRC instruction, for crc32c *specifically*,
-> and that is what the code we're discussing is taking advantage of.  Given that
-> there is overhead associated with using kernel-mode FPU (i.e. vector), it makes
-> sense to do that, at least on short messages.
-> 
-> On longer messages a PCLMULQDQ-only implementation would work well, but so does
-> interleaving the crc32c scalar instruction on multiple chunks, which is what is
-> currently wired up in the kernel via crc32c-3way.S.  And yes, the chunks for
-> that do not *have* to be long, but you still need to use pclmulqdq instructions
-> to combine them
+Sure, fixing it might not be easy, partly because the new interface
+wasn't designed for its needs.
 
-You should be able to use lookup tables to jump over the other chunks
-(so processing a block of zero bytes).
-Possibly 8 lookup tables of 16 entries each for each nibble (512 bytes).
-Not nice for the d-cache though.
+But getting rid of the duplicate field isn't hard, because we're
+already assuming that the user does not modify walk->XXX.virt.addr,
+at least not far enough to break the unmap (see the WALK_DIFF
+clause).  In fact, grepping through the arch code seems to show
+that nobody actually modifies them at all.  So we could even
+simplify the WALK_SLOW done path.
 
-> (unless you do a really slow bit-at-a-time carryless
-> multiplication), and you have to enter a kernel-mode FPU section to do that.
+---8<---
+Reuse the addr field from struct scatter_walk for skcipher_walk.
+In order to maintain backwards compatibility with existing users,
+retain the original virt.addr fields through unions.
 
-That pseudo-code is probably completely wrong.
-I suspect that since it is 'just' doing 'data % poly' it relies on the fact that
-	327 % 7 == 3 * (100 % 7) + 27
-and reduces the length by one digit.
-(Where a 'digit' could be 64 bits)
-I need to look up pclmulqdq.
-Trying to do anything with the simd instructions makes my head hurt.
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
+ crypto/skcipher.c                  | 25 ++++++++++---------------
+ include/crypto/algapi.h            |  3 ++-
+ include/crypto/internal/skcipher.h | 20 +++++++++++++++-----
+ 3 files changed, 27 insertions(+), 21 deletions(-)
 
-	David
+diff --git a/crypto/skcipher.c b/crypto/skcipher.c
+index d321c8746950..f770307abb8e 100644
+--- a/crypto/skcipher.c
++++ b/crypto/skcipher.c
+@@ -43,14 +43,12 @@ static inline void skcipher_map_src(struct skcipher_walk *walk)
+ {
+ 	/* XXX */
+ 	walk->in.addr = scatterwalk_map(&walk->in);
+-	walk->src.virt.addr = walk->in.addr;
+ }
+ 
+ static inline void skcipher_map_dst(struct skcipher_walk *walk)
+ {
+ 	/* XXX */
+ 	walk->out.addr = scatterwalk_map(&walk->out);
+-	walk->dst.virt.addr = walk->out.addr;
+ }
+ 
+ static inline gfp_t skcipher_walk_gfp(struct skcipher_walk *walk)
+@@ -100,8 +98,7 @@ int skcipher_walk_done(struct skcipher_walk *walk, int res)
+ 				    SKCIPHER_WALK_DIFF)))) {
+ 		scatterwalk_advance(&walk->in, n);
+ 	} else if (walk->flags & SKCIPHER_WALK_DIFF) {
+-		scatterwalk_unmap(walk->src.virt.addr);
+-		scatterwalk_advance(&walk->in, n);
++		scatterwalk_done_src(&walk->in, n);
+ 	} else if (walk->flags & SKCIPHER_WALK_COPY) {
+ 		scatterwalk_advance(&walk->in, n);
+ 		skcipher_map_dst(walk);
+@@ -116,11 +113,8 @@ int skcipher_walk_done(struct skcipher_walk *walk, int res)
+ 			 */
+ 			res = -EINVAL;
+ 			total = 0;
+-		} else {
+-			u8 *buf = PTR_ALIGN(walk->buffer, walk->alignmask + 1);
+-
+-			memcpy_to_scatterwalk(&walk->out, buf, n);
+-		}
++		} else
++			memcpy_to_scatterwalk(&walk->out, walk->out.addr, n);
+ 		goto dst_done;
+ 	}
+ 
+@@ -176,10 +170,11 @@ static int skcipher_next_slow(struct skcipher_walk *walk, unsigned int bsize)
+ 			return skcipher_walk_done(walk, -ENOMEM);
+ 		walk->buffer = buffer;
+ 	}
+-	walk->dst.virt.addr = PTR_ALIGN(buffer, alignmask + 1);
+-	walk->src.virt.addr = walk->dst.virt.addr;
+ 
+-	memcpy_from_scatterwalk(walk->src.virt.addr, &walk->in, bsize);
++	buffer = PTR_ALIGN(buffer, alignmask + 1);
++	memcpy_from_scatterwalk(buffer, &walk->in, bsize);
++	walk->out.addr = buffer;
++	walk->in.addr = walk->out.addr;
+ 
+ 	walk->nbytes = bsize;
+ 	walk->flags |= SKCIPHER_WALK_SLOW;
+@@ -199,8 +194,8 @@ static int skcipher_next_copy(struct skcipher_walk *walk)
+ 	 * processed (which might be less than walk->nbytes) is known.
+ 	 */
+ 
+-	walk->src.virt.addr = tmp;
+-	walk->dst.virt.addr = tmp;
++	walk->in.addr = tmp;
++	walk->out.addr = tmp;
+ 	return 0;
+ }
+ 
+@@ -214,7 +209,7 @@ static int skcipher_next_fast(struct skcipher_walk *walk)
+ 		(u8 *)(sg_page(walk->out.sg) + (walk->out.offset >> PAGE_SHIFT));
+ 
+ 	skcipher_map_src(walk);
+-	walk->dst.virt.addr = walk->src.virt.addr;
++	walk->out.addr = walk->in.addr;
+ 
+ 	if (diff) {
+ 		walk->flags |= SKCIPHER_WALK_DIFF;
+diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
+index 41733a0b45dd..94147ea8c14d 100644
+--- a/include/crypto/algapi.h
++++ b/include/crypto/algapi.h
+@@ -120,9 +120,10 @@ struct crypto_queue {
+ };
+ 
+ struct scatter_walk {
++	/* Must be the first member, see struct skcipher_walk. */
++	void *addr;
+ 	struct scatterlist *sg;
+ 	unsigned int offset;
+-	void *addr;
+ };
+ 
+ struct crypto_attr_alg {
+diff --git a/include/crypto/internal/skcipher.h b/include/crypto/internal/skcipher.h
+index d6ae7a86fed2..357441b56c1e 100644
+--- a/include/crypto/internal/skcipher.h
++++ b/include/crypto/internal/skcipher.h
+@@ -57,14 +57,24 @@ struct crypto_lskcipher_spawn {
+ struct skcipher_walk {
+ 	union {
+ 		struct {
+-			void *addr;
+-		} virt;
+-	} src, dst;
++			struct {
++				void *const addr;
++			} virt;
++		} src;
++		struct scatter_walk in;
++	};
+ 
+-	struct scatter_walk in;
+ 	unsigned int nbytes;
+ 
+-	struct scatter_walk out;
++	union {
++		struct {
++			struct {
++				void *const addr;
++			} virt;
++		} dst;
++		struct scatter_walk out;
++	};
++
+ 	unsigned int total;
+ 
+ 	u8 *page;
+-- 
+2.39.5
+
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
