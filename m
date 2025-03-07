@@ -1,111 +1,127 @@
-Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6C8518DF65;
-	Fri,  7 Mar 2025 14:06:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741356396; cv=pass; b=pBgaS9tSPdH5zs3qjs72FkBI1qUTINcjK6a3w+DZSI1ZxNdLRNQsn00zKep1JBNzUneyGf2h0nXgWPsHd1t+tJqeXp6Vcuer8uhHFmfeoHzsU/UQ1O22qyMT2jKzuEVGpZu3qwJqqWgBI3i7JHhNxhAz1kHtCcYl8MfrDz60CFM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741356396; c=relaxed/simple;
-	bh=ykdhXmylYh6z/rNdao/fGKzQPI3z2XmS1ESDJTS7TYQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QGQiIX2zO3ezoyJiUS/o1x6WiTTwwug645zoFo+5NrKnCaJMCPE5xBMQBjEeiNTa2/JO7/JWo9vVpDMjHMe+FFlcYeJeEgqW/AvP1PT5zI3IGIWGMoKp5rvv5qerUXiperkO40i6p4BboCeBcK1FwfjWezQQDXXRCUHC0AiR2OU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=nicolas.frattaroli@collabora.com header.b=k4LLpH1x; arc=pass smtp.client-ip=136.143.188.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 691A321D3D9
+	for <linux-crypto@vger.kernel.org>; Fri,  7 Mar 2025 15:17:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741360670; cv=none; b=EEuqxcmOUfPi7NDgiJqE3M/ZHwh5CFHsOEtebu4Oslj6VragevMykbO9ZJ9Q1wJbAlxpt9O+l7vRb3H+gUgOqrX1JN9JSa5055PIa9lzCSD2ENO4bqLBJ+U1N5C+rxbKti5gfGr7ec6VXDkY/cpxtWqoK/FiZIbny7JRZkZRwVU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741360670; c=relaxed/simple;
+	bh=rX0uMtq0RVZw5cLocHPJ4iQ1QgIw8r0WsZ5PnIUFg/k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oT4/yZrihuJc2++bjOzdKvM1cUgYt0LLNaMtd9e1fGn7XzK+fWSauYRZsiWIX6FdgztY23v5AQKxS/Kbu6KGi/Utg0hxlp02oGkZhxpYz4JXQoBHa8z3ew0kmeH6uQsjVPIFzzkoMswoQD22H8ntmq6m70r6g7efhn24eNMk3PY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=mYAdAwxv; arc=none smtp.client-ip=209.85.222.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=nicolas.frattaroli@collabora.com header.b="k4LLpH1x"
-ARC-Seal: i=1; a=rsa-sha256; t=1741356358; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=RUSqeTjX0/f+vSCIJFG7Ivi/H9ExZZOTIGsH8b/7NgnDNY+UPVZ7ECjWzwOuDI3RzpTfQqmbZSAsfna/nJrzgxqNHi9CItEF9nS40fA67K5OyjyabwmfpK9um35EBQjHtXoOmHIdnjUaDBCCDMC8yAzHg++9XIkIh6wtiClIxik=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1741356358; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=FP+ifasHniIC8neSq6VwSq5ZsIenCwU36aCvQ3EbV9k=; 
-	b=M4EErEyApvaCAnFL5c92n1M0wMYZ4/LNdYQL/JjFfVIWr1+oWZ7LWHG91M7LH/wdakw0O6B/Z6DdW1CFhUYSU8YrcdcDdi/S/B33oM+ZFqVbEURJgvl8Ve4JwYi+DVhf5OMbdwCpJiS1Sj2d8rpDnz9ZN6y3eCQFi/Cx2aen930=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=nicolas.frattaroli@collabora.com;
-	dmarc=pass header.from=<nicolas.frattaroli@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1741356358;
-	s=zohomail; d=collabora.com; i=nicolas.frattaroli@collabora.com;
-	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-ID:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:Content-Type:Message-Id:Reply-To;
-	bh=FP+ifasHniIC8neSq6VwSq5ZsIenCwU36aCvQ3EbV9k=;
-	b=k4LLpH1xLhH5D3H7h2upAramGsfkMWDuPKZ9FZ0XGVS9QKMQsdQP0bKN4azcuUGk
-	pMfBCbFEZtyQaxyMl/XEFyBtH0id4McTIUQZz/KeSYcNbJQotbnjO7wP5JrTi+oGXgB
-	95fO8bj46v0ezvai2ZHpniitwdl6VAtoA17B70u4=
-Received: by mx.zohomail.com with SMTPS id 1741356356876241.9419093370691;
-	Fri, 7 Mar 2025 06:05:56 -0800 (PST)
-From: Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
-To: Daniel Golle <daniel@makrotopia.org>,
- Aurelien Jarno <aurelien@aurel32.net>, Olivia Mackall <olivia@selenic.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
- Heiko Stuebner <heiko@sntech.de>, linux-crypto@vger.kernel.org,
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org,
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject:
- Re: [PATCH v2] dt-bindings: rng: rockchip,rk3588-rng: Drop unnecessary status
- from example
-Date: Fri, 07 Mar 2025 15:05:50 +0100
-Message-ID: <5417098.31r3eYUQgx@workhorse>
-In-Reply-To: <20250307093309.44950-1-krzysztof.kozlowski@linaro.org>
-References: <20250307093309.44950-1-krzysztof.kozlowski@linaro.org>
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="mYAdAwxv"
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-7c3d0e90c4eso309227585a.1
+        for <linux-crypto@vger.kernel.org>; Fri, 07 Mar 2025 07:17:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1741360667; x=1741965467; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kCAKy1MLCn9h59tEwZqypamw7ZoTBGTa4RgpePYYALo=;
+        b=mYAdAwxvOF/FNKH8ghHWZmZmVqxewrCco3QLKzVoay/uP2SagsmrLgck+MK8C0BE9M
+         p5Iv5tc49YScJNaj2Rnv6egDmCWLi+kHBxIkpweWKabbqDPoKWhkMgldw/0J38gj0jz2
+         vufiHwYAYMsmehRUDGr3bVI4NVAFoJjrMF8dluSvVHBRKg6OAeDG4tsWs3SwHWrmeRlS
+         oDfDvpIUpL18c4PqDn8Yro63tRRKk6tB3iE7Ej05DoCLsVj++pVTQ0uY94K20MPW5zUv
+         IgmJhXjzv5XvU83qktfr42Pl7vbpw5veI6GpaXuB15HnnHqLdUOclLw9uMDN9vK9PVQs
+         WK8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741360667; x=1741965467;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kCAKy1MLCn9h59tEwZqypamw7ZoTBGTa4RgpePYYALo=;
+        b=ce+478T4MCNe7+HVtWQJp0bG23pVQvzjG47Axzc+v+Kxi5SiDAICUATVYmVWGy9she
+         cmhK0OQCMCLdvC5bqGlCivGxObRn/P1E0pB6qNZ3a+Kwt7M2PNinCGIUF/8NZ9HZHKk8
+         0fgvvWjY0yOUvG0njuy7GV09pt2WNnHapFTtHojjnYe/1QF9Dpkjbrfbw8tqPpYpBA07
+         hKNY4u5Bg/O0Kfr0bsDRp7Z+RaMFWo6W+NFHd+B62CV8w0z3Zm7u/++eXUTn+0E3YC0Q
+         55wVEMril9zxsogAp0tpClhTWN4T66C084i+bSnyqc/rSdGc0L3Lq9wJoUJ/NW5s/2UQ
+         ADGA==
+X-Forwarded-Encrypted: i=1; AJvYcCVnSU7qKsKOhcWv1lQTnH73pHyBBk85gtD6L3gM8rdeAxxIWSdcTfy7nS4ad+c2mCUCfx0DC98HowQFoJk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyvxZ6XfFDddtQn7qXsDdpUVVWxaV/rTTtztS9hTkXTCKgDl8eU
+	t/pweQxV+LK7HzuI1jgQo7YUsDlN526uoJXS2K7WvlTU8e+xla2X9+3b3ywkqEQ=
+X-Gm-Gg: ASbGncvJ6MW36G3H50iiHer+LeBplVApCwsGb0Vow1Ly9hzDI7Jed42sfYGUV8USjNo
+	zprGbqfYkrkMHjsD2M2qFrzOHD5HgJ+PvKf2qbyth7zdVc8qDBUawP8Bc9D7uR3nVyaGZ6gOtbH
+	RnExm1SuFR1ThFOrhLyK/az6JXeCGpLuNRwFf4UXMfeNAX0aKiUBNRJRcMogUiQDlxb5uuGZn+V
+	3m0MDzf7Idgb/lG57Wy99jWhR5rUxwkxW+z7yRyzSL2nLPRmkJtkMabpbZjK9cZxG8FVN6QHHkG
+	RhTDI4GmlS6TUEA1Mh26PN58NL/UNLHbI0vuBYluKEXeuBXm2zeihsaUts95ncFQmWFbE2RcfbZ
+	tQvihR0SFX/9Cz2Lg9g==
+X-Google-Smtp-Source: AGHT+IGPtlWnpTlq97dHBsYv9Qj2zzhftXBWiYKJa7fQGbPL61VR64KLpfRR/UmiZXjz25h9+jNuNw==
+X-Received: by 2002:a05:620a:27ce:b0:7c3:cbad:5735 with SMTP id af79cd13be357-7c499d46c20mr545047685a.28.1741360667128;
+        Fri, 07 Mar 2025 07:17:47 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c3e5511328sm252963085a.105.2025.03.07.07.17.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Mar 2025 07:17:46 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1tqZSL-00000001ljV-3gSE;
+	Fri, 07 Mar 2025 11:17:45 -0400
+Date: Fri, 7 Mar 2025 11:17:45 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Alexey Kardashevskiy <aik@amd.com>
+Cc: Xu Yilun <yilun.xu@linux.intel.com>, x86@kernel.org,
+	kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Ashish Kalra <ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>,
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Christoph Hellwig <hch@lst.de>, Nikunj A Dadhania <nikunj@amd.com>,
+	Michael Roth <michael.roth@amd.com>,
+	Vasant Hegde <vasant.hegde@amd.com>,
+	Joao Martins <joao.m.martins@oracle.com>,
+	Nicolin Chen <nicolinc@nvidia.com>,
+	Lu Baolu <baolu.lu@linux.intel.com>,
+	Steve Sistare <steven.sistare@oracle.com>,
+	Lukas Wunner <lukas@wunner.de>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Dionna Glaze <dionnaglaze@google.com>, Yi Liu <yi.l.liu@intel.com>,
+	iommu@lists.linux.dev, linux-coco@lists.linux.dev,
+	Zhi Wang <zhiw@nvidia.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+Subject: Re: [RFC PATCH v2 14/22] iommufd: Add TIO calls
+Message-ID: <20250307151745.GH354403@ziepe.ca>
+References: <Z72GmixR6NkzXAl7@yilunxu-OptiPlex-7050>
+ <2fe6b3c6-3eed-424d-87f0-34c4e7e1c906@amd.com>
+ <Z77xrqLtJfB84dJF@yilunxu-OptiPlex-7050>
+ <20250226131202.GH5011@ziepe.ca>
+ <Z7/jFhlsBrbrloia@yilunxu-OptiPlex-7050>
+ <20250301003711.GR5011@ziepe.ca>
+ <Z8U+/0IYyn7XX3ao@yilunxu-OptiPlex-7050>
+ <20250305192842.GE354403@ziepe.ca>
+ <Z8lE+5OpqZc746mT@yilunxu-OptiPlex-7050>
+ <c5c31890-14fc-4fab-8cd4-d4dcfdecdd2d@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c5c31890-14fc-4fab-8cd4-d4dcfdecdd2d@amd.com>
 
-On Friday, 7 March 2025 10:33:09 Central European Standard Time Krzysztof 
-Kozlowski wrote:
-> Device nodes are enabled by default, so no need for 'status = "okay"' in
-> the DTS example.
+On Fri, Mar 07, 2025 at 01:19:11PM +1100, Alexey Kardashevskiy wrote:
+> > > Part of my problem here is I don't see anyone who seems to have read
+> > > all three specs and is trying to mush them together. Everyone is
+> > > focused on their own spec. I know there are subtle differences :\
 > 
-> Reviewed-by: Heiko Stuebner <heiko@sntech.de>
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> 
-> ---
-> 
-> Changes in v2:
-> 1. Drop unnecessary full stop in subject prefix after ':'.
-> 2. Add Rb tag.
-> ---
->  Documentation/devicetree/bindings/rng/rockchip,rk3588-rng.yaml | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/rng/rockchip,rk3588-rng.yaml
-> b/Documentation/devicetree/bindings/rng/rockchip,rk3588-rng.yaml index
-> 757967212f55..ca71b400bcae 100644
-> --- a/Documentation/devicetree/bindings/rng/rockchip,rk3588-rng.yaml
-> +++ b/Documentation/devicetree/bindings/rng/rockchip,rk3588-rng.yaml
-> @@ -53,7 +53,6 @@ examples:
->          interrupts = <GIC_SPI 400 IRQ_TYPE_LEVEL_HIGH 0>;
->          clocks = <&scmi_clk SCMI_HCLK_SECURE_NS>;
->          resets = <&scmi_reset SCMI_SRST_H_TRNG_NS>;
-> -        status = "okay";
->        };
->      };
+> One is SEV TIO (earlier version published), another one TDX Connect (which I
+> do not have and asked above) and what is the third one here? Or is it 4 as
+> ARM and RiscV both doing this now? Thanks,
 
-Hi,
+ARM will come with a spec someday, I don't know about RISCV. Maybe it
+is 4..
 
-is there the possibility we could make dtschema as invoked by `make 
-dt_binding_check W=1` (or W=2) add a warning for examples that have disabled 
-or explicitly listed status properties when not needed? Or is this something 
-better handled in, say, checkpatch.pl?
-
-The question arises because dumb mistakes by me like this should ideally be 
-caught before they waste precious maintainer time.
-
-If it's best handled in dtschema, I can look into working on that so you guys 
-don't have to do even more work due to me.
-
-Cheers,
-Nicolas Frattaroli
-
-
+Jason
