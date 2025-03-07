@@ -1,108 +1,77 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D64871F94C
-	for <linux-crypto@vger.kernel.org>; Fri,  7 Mar 2025 03:05:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 793B513C682
+	for <linux-crypto@vger.kernel.org>; Fri,  7 Mar 2025 03:36:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741316725; cv=none; b=Nqo5A7Uk0iVbW+qe9Llnc79IYrE16RrqgT5u7jf2XZYWVoiVfBj/35SurtbY8l8P59q1WbxhwQZJGNwQ7ikViaBURLcTPCojb0Ay+ujlbqLf84ALr0e8wg8ddHrP21/KdPQWhZM2ZOy8HM18QtT1PgZypv8c47bzgL7AEELiOCY=
+	t=1741318582; cv=none; b=RO+AOgs+vYqVwTBHEZxYWK/cdEr8v9MOmshTY/k+q26OsQi0iO3ngLeyUZaiuC3c4PVKgwLIZ0d9TgxZJpgPKW++DHczzeVVhyXVqjiQE1ak2amR0qA6rAjCMgc4nZw0PrRRM9fn/UJM9upqMTWLdcqP5Wb7vJ4vtuJXdgE5i8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741316725; c=relaxed/simple;
-	bh=Q6pnfOmGg2RVloSZEHvPcehxhgOF/ZjTBSJxScwj2iU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N3aCtZMBw94uF2GSnVgCUmNx69ZO6I9vQxFD0F9MUPW6pfkLJYh07VgkNE/RbWgXvG9YePpJAqcM9ejMAGNRVi3TUgGhQdXXxGEUSML38fCOfH4lIRAIY5fIhIFbwmI472tF++c8gEQq5FSoFxDcmwHQv/wYwEPFxLBvZ4NlJUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=OkbFdZIV; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1741318582; c=relaxed/simple;
+	bh=4r2Y3oM34Ko8M3PBjd4AQF5vsG5hCVANy0OL0lSNh7Q=;
+	h=Date:Message-Id:From:Subject:To:Cc; b=nTbS/9v5qJk5OKu+2tYq97JUm2h6dO4LBWjlzcCwSJe0gheSQX7KfIYT4zTmhfzzAqy45icKGqxpzPKwoj7JEDWByT7Jedy62kpo0+kIZ98rzw9DGlFBs1efWQLSJ8xVklkvZOjJgm+AjUlS4zF9JiZglyAi1P2umJMq7v9eO18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=JegJ2HZk; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="OkbFdZIV"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="JegJ2HZk"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	s=formenos; h=Cc:To:Subject:From:Message-Id:Date:Sender:Reply-To:MIME-Version
+	:Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=QT9Xryk0jX3dlSR1/PkYJGf+tXe1W6xaLCeDjqUqhO4=; b=OkbFdZIV5cOllYsrSh/ag30VDH
-	4W8d/04jnMsDeO0oLTyT3xTCAauHhCKGFObG8j3lfjecfT8N7c4IP35ekZM7aCtpJ1yIzJIYeziUq
-	j8d0sn8JOMzQeUGV4D7i6f0DlIx8VrKUIufkkiP7WagVpFSS+xaT7fCa8eq3YxHF6eDk1rdEL2V0L
-	Q1MuhNnok1zQXy7J+qayH68hyGNmA3AmCcN0qS9ufnJyZJKbZVmGgSPP9WJkHS4QCbkLd74FgZABG
-	V5QeyrQAc0IhQ7SoTB4A+Qa55weqetCkHkRjrLI+d5SDWhvSccuwM9jKgPsbFN+d4lUcWwh6Ds3EE
-	WdBFQUlQ==;
+	bh=8YNc4xETYsgqJ8/G9F9hIYKacUXhxJf9zfaXeZ9XCsI=; b=JegJ2HZk/YW2wPOrB8jVUZWrg9
+	JwHNRpg4Phtr+BdNV9ds6TzNkw3ALGRFXnfMAhxZ4QQECnH0KAaTWUZ87Tfl6ji1FeyDgPb8aK47w
+	3AqJmPdkjkrySz7TAQ4cPzxAVmkgfGLeQS2MD0u0xIZIALblc00nxXKuXrKEJUNtVPAGQyswIbO7x
+	KSeZ7/GiqNzy9+dGFsqhdmntQ6oPpnAuIA+aswAQ4kOvpJvXv3tSaTpSq6xm497jrk6bItIz3nYE3
+	pQbypHkizQIbOO6Hb8n6ZxgpaSGrna1YNxldP2TCJSCUPeOVW18G7gEgJhYde0hUHOr5w3cYdG1YQ
+	Yjcvg6nA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tqO1X-004UEs-2H;
-	Fri, 07 Mar 2025 11:05:20 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 07 Mar 2025 11:05:19 +0800
-Date: Fri, 7 Mar 2025 11:05:19 +0800
+	id 1tqOVS-004UaA-1T;
+	Fri, 07 Mar 2025 11:36:15 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 07 Mar 2025 11:36:14 +0800
+Date: Fri, 07 Mar 2025 11:36:14 +0800
+Message-Id: <cover.1741318360.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH] crypto: scatterwalk - Change scatterwalk_next calling
- convention
-Message-ID: <Z8pib5_aZ61Z131Z@gondor.apana.org.au>
-References: <Z8kOABHrceBW7EiK@gondor.apana.org.au>
- <20250306173438.GG1796@sol.localdomain>
+Subject: [v2 PATCH 0/3] crypto: scatterwalk - scatterwalk_next and memcpy_sglist
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Cc: Eric Biggers <ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250306173438.GG1796@sol.localdomain>
 
-On Thu, Mar 06, 2025 at 09:34:38AM -0800, Eric Biggers wrote:
-> On Thu, Mar 06, 2025 at 10:52:48AM +0800, Herbert Xu wrote:
-> > +static inline unsigned int scatterwalk_next(struct scatter_walk *walk,
-> > +					    unsigned int total)
-> >  {
-> > -	*nbytes_ret = scatterwalk_clamp(walk, total);
-> > -	return scatterwalk_map(walk);
-> > +	total = scatterwalk_clamp(walk, total);
-> > +	walk->addr = scatterwalk_map(walk);
-> > +	return total;
-> >  }
-> 
-> Maybe do:
-> 
->     unsigned int nbytes = scatterwalk_clamp(walk, total);
-> 
->     walk->addr = scatterwalk_map(walk);
->     return nbytes;
-> 
-> Otherwise 'total' is being reused for something that is not the total length,
-> which might be confusing.
-> 
-> > @@ -149,32 +150,30 @@ static inline void scatterwalk_advance(struct scatter_walk *walk,
-> >  /**
-> >   * scatterwalk_done_src() - Finish one step of a walk of source scatterlist
-> >   * @walk: the scatter_walk
-> > - * @vaddr: the address returned by scatterwalk_next()
-> >   * @nbytes: the number of bytes processed this step, less than or equal to the
-> >   *	    number of bytes that scatterwalk_next() returned.
-> >   *
-> >   * Use this if the @vaddr was not written to, i.e. it is source data.
-> >   */
-> 
-> The comment above still mentions @vaddr.
-> 
-> >  /**
-> >   * scatterwalk_done_dst() - Finish one step of a walk of destination scatterlist
-> >   * @walk: the scatter_walk
-> > - * @vaddr: the address returned by scatterwalk_next()
-> >   * @nbytes: the number of bytes processed this step, less than or equal to the
-> >   *	    number of bytes that scatterwalk_next() returned.
-> >   *
-> >   * Use this if the @vaddr may have been written to, i.e. it is destination data.
-> >   */
-> 
-> The comment above still mentions @vaddr.
+v2 incorporates suggestions by Eric Biggers, and makes the addr field
+const in struct scatter_walk.
 
-OK I will fix these issues.
+This patch series changes the calling convention of scatterwalk_next
+and adds a new helper memcpy_sglist.
 
-Thanks,
+Herbert Xu (3):
+  crypto: scatterwalk - Change scatterwalk_next calling convention
+  crypto: scatterwalk - Add memcpy_sglist
+  crypto: skcipher - Eliminate duplicate virt.addr field
+
+ arch/arm/crypto/ghash-ce-glue.c       |  7 ++---
+ arch/arm64/crypto/aes-ce-ccm-glue.c   |  9 +++---
+ arch/arm64/crypto/ghash-ce-glue.c     |  7 ++---
+ arch/arm64/crypto/sm4-ce-ccm-glue.c   |  8 +++---
+ arch/arm64/crypto/sm4-ce-gcm-glue.c   |  8 +++---
+ arch/s390/crypto/aes_s390.c           | 21 ++++++--------
+ arch/x86/crypto/aegis128-aesni-glue.c |  7 ++---
+ arch/x86/crypto/aesni-intel_glue.c    |  9 +++---
+ crypto/aegis128-core.c                |  7 ++---
+ crypto/scatterwalk.c                  | 41 +++++++++++++++++++++------
+ crypto/skcipher.c                     | 35 +++++++++++------------
+ drivers/crypto/nx/nx.c                |  7 ++---
+ include/crypto/algapi.h               |  8 ++++++
+ include/crypto/internal/skcipher.h    | 26 +++++++++++++----
+ include/crypto/scatterwalk.h          | 38 ++++++++++++++-----------
+ 15 files changed, 140 insertions(+), 98 deletions(-)
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.39.5
+
