@@ -1,48 +1,52 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 693D1DF71;
-	Fri,  7 Mar 2025 03:01:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82FBE1F94C
+	for <linux-crypto@vger.kernel.org>; Fri,  7 Mar 2025 03:04:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741316519; cv=none; b=chUZ/lbE/yKfe2g17dDAp9YFx4OxBv+SBQ9GtWe0Lbp/JTleGJKlkuB1S1Tav8eI8WNd8F7vnMD5q985gP3T+3mup19afsZOnr/rwe92jDwjn7eJ+qBJk4hlz5CJQY+iem6GTgygmu4x7VzMWoPm0CouU8JM98IQWaw5Rc6B+DI=
+	t=1741316697; cv=none; b=ljTL6aXi/lf9IJq71sF4XC6xmCvDIExZFGNe7ZPnTx/l78otzdE5FjFu5Q+fizxwTHk0sTms4o7+e3SZg0DPcNLOyieBqO69uumlU04R4PHMLKbPpJI0ncO+cLSGu8PXIxUfVOVLlZsW+JpiNGI2mlRiLKmgggHUHsQhy1IrxK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741316519; c=relaxed/simple;
-	bh=P3FrZyJOxGE17ZwJGvmque3rDknFqX6vTONmj35VY/k=;
+	s=arc-20240116; t=1741316697; c=relaxed/simple;
+	bh=vxVBlmIfQUhQC8V2ezyuCk06Lje/Q8Nx53IgVLzZlkc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uLz+G/0+ABpTBbWcK6svNbrucNK5mIGilfUjQiddW+BbLjTcXAK8EfkrNeSLL8kAWdcAKlwzWilfz0dHIIcSbWm5AUn9PeXfTVn64V6rZjPgyZEQtS6LqDGRNaIlzU1rr9obBmgbYnpPIqkhPpVGkT9M4BfWgilOF/9iU9wDcYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=FRu6/yor; arc=none smtp.client-ip=144.6.53.87
+	 Content-Type:Content-Disposition:In-Reply-To; b=EL0fpODoUym7i0umoNS2aQ4D/LiRG6iFPBemymfJi1bdZ5GJJqH3nP6sjEQz0l841a47N2j+C5Seagaut8cp2FeHCon7TzuZiNKOGmZ3RBVwEJfy5D05DRSP2svPGaqOHG0NIp2uPRw8eVxeIV4Jgm+1AVpLefibF1mP0H1yucs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=Q9QkXarl; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="FRu6/yor"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="Q9QkXarl"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
 	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=8p6H1XRld9I1UNikHiaJ/Tj0ya1eXUwPLH8GvVhGTzA=; b=FRu6/yor+L+rOuqtIbwRQSxdaO
-	jP4lSp7oclW22qanqsKm+qG8skbF4WdIXYCLHKQVD2btcac+rEZUbW8lX+0MmqTTaZ+uYlDrqszsm
-	ozqIXOoyMQgtO8EIMlbEh2e9uvLdExZr/G98noPv2f3SOa+0SRpG58fI+kaF/q0xgwGybOIWpahj1
-	iiuM57Qx2eWtw87sNn8FnhFnOuYEktkK1W1U1riwOdwgOhsqK+UNNi9a/5uHdWe0AzhRsCNoVtLvK
-	o769sDUSF2+0tMn4gFf4yWAyQsC7PdBH6JVXIN4TSbRrLKs0VKO/exTDs6Cjd6x74idbsLYVaeByz
-	2tl5qvnA==;
+	bh=L/H0+n14T3y48lvuyS9qixXyVf8pdohivRtADTP+dls=; b=Q9QkXarlL4WbnrmLfnyuZxvm0a
+	l0MeF4YUaI9HB3vkyRAlkTT2cFtWJEBpwkLMlkhHwvgSP3Fn+yneOSYBYlboNwmcnf6RFTzalUGj8
+	AVAEjidnWCrBnhGM6ZXRX0PbI+oNtNLLCimINq+r8qzeg1RuMbOPsmbJvumANLffPVvYeNovYg7Oa
+	th2jS0W1dUpzMwkvcrFQQnixFiXcUR44Fo8EApysaEZmnSAnOlHlydJJXDpHWDPc8u4xO0xI3o426
+	bK/Q0b1QWsrgEjxq+C5p02kjJhgXEY+oY2X7aibDhnhdxydpSqkj/t2NV3mNiJy4tE2tLr1cf3FO8
+	8ZwWpXFg==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tqNyB-004UBD-1T;
-	Fri, 07 Mar 2025 11:01:52 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 07 Mar 2025 11:01:51 +0800
-Date: Fri, 7 Mar 2025 11:01:51 +0800
+	id 1tqO15-004UEO-2G;
+	Fri, 07 Mar 2025 11:04:52 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 07 Mar 2025 11:04:51 +0800
+Date: Fri, 7 Mar 2025 11:04:51 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Harald Freudenberger <freude@linux.ibm.com>
-Cc: dengler@linux.ibm.com, ifranzki@linux.ibm.com, fcallies@linux.ibm.com,
-	linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: Re: [PATCH v1 1/1] s390/crypto: Rework protected key AES for true
- asynch support
-Message-ID: <Z8phn5Ddk5ZBvyzY@gondor.apana.org.au>
-References: <20250306171201.17961-1-freude@linux.ibm.com>
- <20250306171201.17961-2-freude@linux.ibm.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH] crypto: skcipher - Elinimate duplicate virt.addr field
+Message-ID: <Z8piU4Sy3ErUlXPP@gondor.apana.org.au>
+References: <Z8kOABHrceBW7EiK@gondor.apana.org.au>
+ <20250306031005.GB1592@sol.localdomain>
+ <Z8kT90qXaTo15271@gondor.apana.org.au>
+ <20250306033658.GD1592@sol.localdomain>
+ <Z8kZL2WlWX-KhkqR@gondor.apana.org.au>
+ <20250306035937.GA1153@sol.localdomain>
+ <Z8k7ttZ7PwjBC-AS@gondor.apana.org.au>
+ <20250306172942.GF1796@sol.localdomain>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -51,78 +55,22 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250306171201.17961-2-freude@linux.ibm.com>
+In-Reply-To: <20250306172942.GF1796@sol.localdomain>
 
-On Thu, Mar 06, 2025 at 06:12:01PM +0100, Harald Freudenberger wrote:
+On Thu, Mar 06, 2025 at 09:29:42AM -0800, Eric Biggers wrote:
 >
-> +	/* fetch and check protected key state */
->  	spin_lock_bh(&ctx->pk_lock);
-> +	pk_state = ctx->pk_state;
->  	memcpy(param.key, ctx->pk.protkey, PAES_256_PROTKEY_SIZE);
->  	spin_unlock_bh(&ctx->pk_lock);
-> +	switch (pk_state) {
-> +	case PK_STATE_NO_KEY:
-> +		rc = -ENOKEY;
-> +		goto out;
-> +	case PK_STATE_CONVERT_IN_PROGRESS:
-> +		rc = -EKEYEXPIRED;
-> +		goto out;
+> Those unions are ugly, but I guess this is good enough.  Please also delete the
+> /* XXX */ comments, fix the typo in the title, and resend this as a real patch.
 
-Shouldn't this go async rather than failing?
+I'm going to keep the XXX comments, which is more about the fact
+that we're mixing skcipher_map/unmap with skcipher_next and
+skcipher_done_src/dst.
 
-> +	case PK_STATE_VALID:
-> +		break;
-> +	default:
-> +		rc = pk_state < 0 ? pk_state : -EIO;
-> +		goto out;
-> +	}
-> +
-> +	/* setkey() should have updated the function code */
-> +	if (!ctx->fc) {
+But I will add a new comment to skcipher_walk to make the virt
+fields the official way of accessing the pointer.  That way the
+user is guaranteed to not change it from under us.
 
-The locking is wrong for this field.  It gets written to without
-any locks in cbc_paes_wq_setkey_fn, and here you're reading it
-without any locking.
-
-In fact the whole switch statement smells fishy.  One tfm could
-be used by any number of encryption requests in parallel.  So
-your pk_state could change from right under your nose as soon as
-you let go of the pk_lock.
-
-Please describe the high-level picture of how pk_lock and its
-protected fields are meant to work in the face of requests being
-issued in parallel on one tfm.
-  
-> -static int cbc_paes_set_key(struct crypto_skcipher *tfm, const u8 *in_key,
-> -			    unsigned int key_len)
-> +static int cbc_paes_setkey(struct crypto_skcipher *tfm, const u8 *in_key,
-> +			   unsigned int key_len)
->  {
->  	struct s390_paes_ctx *ctx = crypto_skcipher_ctx(tfm);
->  	int rc;
->  
-> -	_free_kb_keybuf(&ctx->kb);
-> -	rc = _key_to_kb(&ctx->kb, in_key, key_len);
-> +	rc = key_to_ctx(ctx, in_key, key_len);
->  	if (rc)
->  		return rc;
->  
-> -	return __cbc_paes_set_key(ctx);
-> +	/* Always trigger an asynch key convert */
-> +	spin_lock_bh(&ctx->pk_lock);
-> +	ctx->pk_state = PK_STATE_CONVERT_IN_PROGRESS;
-> +	spin_unlock_bh(&ctx->pk_lock);
-> +	queue_work(paes_wq, &ctx->work);
-
-Why does this need to be async? The setkey function is the one
-part of the API that is competely synchronous.  It is not allowed
-to occur while any encryption is still incomplete.
-
-By making it asynchronous, you risk creating new issues.  For example,
-what is supposed to happen when a second setkey occurs while the first
-setkey's scheduled work is yet to complete?
-
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
