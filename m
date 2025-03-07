@@ -1,229 +1,454 @@
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3011E2561BC;
-	Fri,  7 Mar 2025 19:30:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741375815; cv=fail; b=qMxl2GEMVXlU9oHfLMBNa9eFpYrsvYUtIBBTCKSjUWlYRHqccfrQEdZWEDB2Q8oLRGewgmlfQUnRmGsfoZonh5HHEJ7I4uSB+HfLwfWV97Bd8D9THaBWDiWqXRgey2WkY4ilpS3SC6U88DPK0CttXXfJY1UXqAyql9f00HR7qVw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741375815; c=relaxed/simple;
-	bh=HGgzvf8uBIPe+gRod3Ep3QkiR045CNmolTk+M2SGEn0=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=QrDz7/PDfcSVCMV+0U+7pLedNJzFFY9yjqRQqV7RGEmG8QGT1eZjn9TKD8Un9azpmVayiPf1H1Az952Tnm6cvByXl9V6fYKqWLkk7vaj0O8TSaHig+nScN/zHh6PYsDnTSjvnrynjDtut02os/dbJo2D0uAYPL9nD4ywdl4Lcas=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=GlZNYQl+; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=sAjSzOFk; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63B0B254B10
+	for <linux-crypto@vger.kernel.org>; Fri,  7 Mar 2025 19:30:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741375817; cv=none; b=IrlsaN7x0IRQyfvkpPF1obi/ipMKtWyjbLAPPeHtwpVdwhlIy0hToiVqe8LP7S+m4fxcHO+ybRXAMM74Z/1W1o3zagHgAQsS/D+jvQM/k7cOMBRASv6lWfvroGs9PgrUhACfkGYVgFjbKjtLkWBQrgO3SlVYf7I55zio0KBGoho=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741375817; c=relaxed/simple;
+	bh=3vW18F9KA0DlaUPaJs/96zZMEZ9Knby9T7Tl3QR1unw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=K1VHEKOREryi6pBOiyxy681RfkfUUhCXvg5gCDn2mEN2umc33DuRav/hqsgQt96wgHuMrJo0p9X+GIJccfvdgfZ7B3/gg6484PIVVjBxZoXUyKncWtwzqA93la536mjka5C/iWP4kYYPADjpgGeu3J2T27B+q5Gswe/QRHgc2+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TDhd8WCK; arc=none smtp.client-ip=91.218.175.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="GlZNYQl+";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="sAjSzOFk"
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 527Itehc022209;
-	Fri, 7 Mar 2025 19:29:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=
-	corp-2023-11-20; bh=N1IbY+hrEN6y5pCCKZexEF3YsC445jjFacTpW3jDs1w=; b=
-	GlZNYQl+9mqx4Tkf4QHnaaxXgyMfOH8sqTJYneXigbZcbBHDmhVy/xKSNgE+sPbH
-	C60gU3hs2N8p7/e/iYesVc434kcGVyMBMig06jGxBwLJTYhZ1PxqCNTiUdT4/BSp
-	tnwO2ZKO2Ve9xEtZP0ikvLCGafIa5w1aeMJSsfYS77cR54vAj4/QLUoj9IRgmCdl
-	0Auyp9vT1BAlKOzL6qFpJAPKR3kKvvwBB8Jwb/3MjZqMhCfVYsm5yS3u4suRQStc
-	sXQiCULXbsctSR73PH0Kqp4UaeuHvndy4Db9TJD+Nd0UprmjMvCABhfnxcBnmjQQ
-	2zBjjfXiFOSm+vDUFR2XZQ==
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 453u86vtw2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 07 Mar 2025 19:29:34 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 527JBjH4003162;
-	Fri, 7 Mar 2025 19:29:33 GMT
-Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2042.outbound.protection.outlook.com [104.47.55.42])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 453rpdx5ef-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 07 Mar 2025 19:29:33 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=cubLZAq4tT9hPJbbbgPaS1y+DVyJWvrE4K7QoF5MiJgoLDWPcFVW11m2XCIQwhK0ZzXhU6wAPzjWAdoUvBJb18/3/mY5HY5eCMl57xNepwJmGStjidL0JPPv5IDkLD3waT52O3lA33dlQ6h7ix/A2KzOLB+7T3bFt8Utj4g4KeCBEWWEO0/i1KBfX115s3ii7+7Qvdi+cX/Bpx/8NMtZqHa3hswfRUoU/+EkOB6jFP98C9Cnh2Ur5zTG9wugN2e0ONQocty6rEFc4zLR3fUpB2M9RjMeI/xkOdaUDnu5MQ+DMGCdRJZlF/ThFmWCWMpJZKCnDjx376qgVGJShJNfcA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=N1IbY+hrEN6y5pCCKZexEF3YsC445jjFacTpW3jDs1w=;
- b=NrhR4Xh0Rh5xUhM6XKCqA98bl3q5rdyipEx45T+RhzwfCvIgUsNs7+k74tLzwIk37bnESkMCCulHyzWyt2CF2OjpQbk2hwDCD2TspMj4tmfsS2Vh+mAx8wYjGzGpobWGauRNX/VQigRMfid67Ro5wbU9Z4scNomWiqd3EFGnEURYcTvaQsS3Bh1i3pepFtaicNt49Ir/vXq34AdpkWMArNQEdSSqmwPj5cvhPA0y5YW4ToPBDGcZid/YqqwLvCdcEoIE0PmtcBikFEvqZMgHOFZ57xBnhfmbkLdbU9MKPwlP4iXxMQkU8LByb7uTVQUnmQFdH4gl0qsii3AMYR7KDw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=N1IbY+hrEN6y5pCCKZexEF3YsC445jjFacTpW3jDs1w=;
- b=sAjSzOFkJwb3D251Y7NRBbZhoSoYXoxs08Vp972uEP1LycN6SelkUMgnLuQqrgdNDaE01F+FY/8i7CAipSLkeWTXbTXTkZMzNIJ7VO+pB4aP2PACsHvbShLZDX7Y8/yycWnGOd174IhmsTgzgpnwjorfvl/RYG1KOI6Uqdd3vvY=
-Received: from DS0PR10MB7224.namprd10.prod.outlook.com (2603:10b6:8:f5::14) by
- DM4PR10MB6160.namprd10.prod.outlook.com (2603:10b6:8:bc::15) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8511.19; Fri, 7 Mar 2025 19:29:30 +0000
-Received: from DS0PR10MB7224.namprd10.prod.outlook.com
- ([fe80::c57:383f:cfb2:47f8]) by DS0PR10MB7224.namprd10.prod.outlook.com
- ([fe80::c57:383f:cfb2:47f8%4]) with mapi id 15.20.8511.017; Fri, 7 Mar 2025
- 19:29:30 +0000
-Message-ID: <4ac5aa09-81c2-4f12-87a7-5ac7799a8d98@oracle.com>
-Date: Fri, 7 Mar 2025 11:29:27 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 07/19] x86/msr: Add variable MTRR base/mask and x2apic
- ID registers
-To: Jarkko Sakkinen <jarkko@kernel.org>
-Cc: linux-kernel@vger.kernel.org, x86@kernel.org,
-        linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
-        linux-efi@vger.kernel.org, iommu@lists.linux-foundation.org,
-        dpsmith@apertussolutions.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com,
-        ardb@kernel.org, mjg59@srcf.ucam.org,
-        James.Bottomley@hansenpartnership.com, peterhuewe@gmx.de, jgg@ziepe.ca,
-        luto@amacapital.net, nivedita@alum.mit.edu,
-        herbert@gondor.apana.org.au, davem@davemloft.net, corbet@lwn.net,
-        ebiederm@xmission.com, dwmw2@infradead.org, baolu.lu@linux.intel.com,
-        kanth.ghatraju@oracle.com, andrew.cooper3@citrix.com,
-        trenchboot-devel@googlegroups.com
-References: <20241219194216.152839-1-ross.philipson@oracle.com>
- <20241219194216.152839-8-ross.philipson@oracle.com>
- <Z8qKStnfCBvSw_yI@kernel.org>
-Content-Language: en-US
-From: ross.philipson@oracle.com
-In-Reply-To: <Z8qKStnfCBvSw_yI@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BY3PR05CA0047.namprd05.prod.outlook.com
- (2603:10b6:a03:39b::22) To DS0PR10MB7224.namprd10.prod.outlook.com
- (2603:10b6:8:f5::14)
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TDhd8WCK"
+Date: Fri, 7 Mar 2025 19:30:02 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1741375811;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=32UydvvKm24N62XCJuTHKuLYGf2FbfzgJt9XuXJNV5s=;
+	b=TDhd8WCKICQJYLGnn6HPZ+QXzcj3RRfS4vjR1P/MXJZ4rYirJOWZQ/tdQhKfONZS3aUKgX
+	QWewGeEcssJEKALN/G4kWls9uKxRPBL4z/NNGk1/F3O8Ea6vd3YwksMC5cyZMS6YGwHsTN
+	t3oI5msH4Gk4bqUAXwGLLx4EKLFyEZI=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yosry Ahmed <yosry.ahmed@linux.dev>
+To: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"hannes@cmpxchg.org" <hannes@cmpxchg.org>,
+	"nphamcs@gmail.com" <nphamcs@gmail.com>,
+	"chengming.zhou@linux.dev" <chengming.zhou@linux.dev>,
+	"usamaarif642@gmail.com" <usamaarif642@gmail.com>,
+	"ryan.roberts@arm.com" <ryan.roberts@arm.com>,
+	"21cnbao@gmail.com" <21cnbao@gmail.com>,
+	"ying.huang@linux.alibaba.com" <ying.huang@linux.alibaba.com>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"clabbe@baylibre.com" <clabbe@baylibre.com>,
+	"ardb@kernel.org" <ardb@kernel.org>,
+	"ebiggers@google.com" <ebiggers@google.com>,
+	"surenb@google.com" <surenb@google.com>,
+	"Accardi, Kristen C" <kristen.c.accardi@intel.com>,
+	"Feghali, Wajdi K" <wajdi.k.feghali@intel.com>,
+	"Gopal, Vinodh" <vinodh.gopal@intel.com>
+Subject: Re: [PATCH v8 12/14] mm: zswap: Simplify acomp_ctx resource
+ allocation/deletion and mutex lock usage.
+Message-ID: <Z8tJOi5G_3dpK31v@google.com>
+References: <20250303084724.6490-1-kanchana.p.sridhar@intel.com>
+ <20250303084724.6490-13-kanchana.p.sridhar@intel.com>
+ <Z8n5CCmELvpUwi3B@google.com>
+ <PH8SPRMB004414B5E1E0765C18F9A89DC9D52@PH8SPRMB0044.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR10MB7224:EE_|DM4PR10MB6160:EE_
-X-MS-Office365-Filtering-Correlation-Id: d7ebb774-759b-44a9-ac94-08dd5dae61d6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?MWZ4NUVEWHFmaGpzamZod1gyUmpnYm9sN1lFOHB4RVk5RE9VMUdWRWYxam5Y?=
- =?utf-8?B?OGk1anpRQmdxV0psSTFoa1BlZzF3MjRUa2txNllZUFVEbGR5eXVEQ0ROdG5u?=
- =?utf-8?B?Y2cwVzJZUk8xSE5sclR3cENyYUtYbndSL2ZaSC9DTUlCb2Zza0pBVVZUai9R?=
- =?utf-8?B?SkpmeTUzSTh4cUlSbVdMWkRlQXVQc2dLZ0YvS2M0S2pYYXluV3ZEbGxlYnQw?=
- =?utf-8?B?UklCUVpmK0JzMkJkZzlSTkZRMzk1QTF4OUV5STQrTERKdDhNQmtPQTN2S3Vn?=
- =?utf-8?B?NnhmUHQwYjVmQlNSWE1pem1QZHNUZ2RBWWhzc1RMYUlFelhLWk5UQXpWQzk2?=
- =?utf-8?B?a1VNazMvMS95Vnp6b1NqRS9uQ2NUWlB0ZnJYaElvYWpxYzVQWFY4NUpTT3pK?=
- =?utf-8?B?WHpxV0JjZ3F5Y3VEay9VeUpwU0Z6cHlZVzhpM0s1djZUOTZLZER0WGlJMTE5?=
- =?utf-8?B?ZkZuNytISmh1QXJTV3ZmL1VlWlVHWVdyQ0l3NWhnSkhoaDhvS1podlFOT2Ny?=
- =?utf-8?B?ZWluNkgwRldUQXlmS2lxUzNhSUQyMDNXbXRlK243U1FTU1dmbGJ5Mk9HNU5t?=
- =?utf-8?B?aW1nODNvcWszUkxEY09DSzRQZ251ZjBNWVBmK0NtUFJMY0JwSk9mNWVwQVJ4?=
- =?utf-8?B?eDFSTzVMMTRpMzJTNit5OUZhYzl1TDh4SjdvaFNNcS9ZbU9UcGdod054N25l?=
- =?utf-8?B?VytBMi9WbmUwdGJpL3cyZ1RDQ2kzSmsvQ2w2WlVnVlZ2bGE3VndnQlNhTFpP?=
- =?utf-8?B?eXI2ZHB3K085UzdYYkFuRW53enpINWkxZ3IwVTJBS01oc0RzekVkelVrcjYr?=
- =?utf-8?B?VmN0VVdlTk1TSklLRmh1V0Y5Qld3blBEajBseEZIeWluUG8xZ0Fzc3F5RjBO?=
- =?utf-8?B?N3BlN3V5TDcvZmFyT2dicmZRTTJTdUx2L05RYUwrK1RjcytrSUs2djZ6cmpy?=
- =?utf-8?B?aG9qUnE1VU9ZODdES2J6S1BPQUhiWVk3NmJnUDFRbHEvUHF5dEdZdmRFUm9L?=
- =?utf-8?B?Rjd0dlFzeTVQNk5DZjEzb2YyTk1pb0FqR1ZLWmNIQWRnQ3hYM05QS3I2Mk5Y?=
- =?utf-8?B?L2gvVVpZVVRyQjRaNk44S3ZSTlBneDN5MEFBR1lPMG0wbHA0TzJPbkkyTWd0?=
- =?utf-8?B?bWRMeDdlQ3IyNXQvU2tBYmVad0tMTnQyS0dqSjJoaGxTUXpxeFFrVVhzQWsv?=
- =?utf-8?B?ZlFsMlUxWUJSa2wzdmRLR2Rwc2gxenFyYitNRGhadmdaNHl6WHZyVWVQWmVa?=
- =?utf-8?B?dnhmaVQ1eGZhcmt5eWhOT0ZDZWhXUlJtN2dEZXNzajlyTTdaQWtDWDdVTzll?=
- =?utf-8?B?cFZiWVVGd2ZwTUEwOHplRjBKWDBJY2JnTnZlSmZUREtaelU1c2hEOFpTSnNW?=
- =?utf-8?B?OUpaVVdIaFp3b3hDTVR2SEVFYlNPTmY5eXVRK0pHNWxoK1M4cThCVnk2di93?=
- =?utf-8?B?aEhTdE5LK24raldJTzJKZ0h6U01TYk4wVWhuODgzamlrcHFuZXNxQjUxWHJG?=
- =?utf-8?B?bnV3WGtrZDFZMVBxQkFPZHBJQnYvN2ZzZ01RRUw2ZWllbUJYeUVDT1NBOUlV?=
- =?utf-8?B?enJmUlNDcVlDTm16ZWFWOWYxajg0cG9uUlh6Y2hGc2JOd29UengxVzJiN1FO?=
- =?utf-8?B?WmxTNGg5M2NsZnJLaVNOMjRtaTRZbHVaVEFreFpHcjl1aVA3SVRNdHpIQkNZ?=
- =?utf-8?B?b0wyK0FEOTJ0Q0p5Vm8rTFRXYTZQalY1dkVTaVlrRyt6V0g5bm5qRjlqdXJn?=
- =?utf-8?B?aWlIMzlzejloZzZsaE1lWEIxcVoxRUw3ZEw3NXFjZWpnYTdkNklITmtuaXpu?=
- =?utf-8?B?Z3VmWDduQTV0SDVIWVU3ZnlpRHVpU1FlYnhSS2FZd3o4NzhFd0I3TzY1RXF3?=
- =?utf-8?Q?I4Axx4O9ALNtd?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR10MB7224.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?cTB6NEpRcVFUcTVybW45ck9vcjA2KzVreXBkNG14ektiQU51YWdueEVwYnZX?=
- =?utf-8?B?aVI1WEtJQ05JSmxRRGIzbWFZU052bEJEOFdkRWk5Sjk1ZE5scThCdDlhcHlx?=
- =?utf-8?B?c29IdTNXTDM0Z2MrQ3c5Zk9lQTJBVWxRT1R5bGJnbjZsUzNjUVhubDZWbG8z?=
- =?utf-8?B?bk53WGRDSEVRTlpoa09ML1QvaTRkcjhYWTF6Y2RGZ0pjM1dYOG1tWU93OEpM?=
- =?utf-8?B?NTdIMUVRNWlNanB3TTF0bExwcUxyYXpId1ZBV1liZ1FzSk9ETU4xbGJ4V1VH?=
- =?utf-8?B?TzBoMENlWTFCczAzSWpGY25hY1E0YVNXK0I1bGRJd0xnSTF6K29qOWkyNE8y?=
- =?utf-8?B?VnMyS0dPbGxNMTV5M01WOWswMGplWHJoM2ZXNE90SUFKbGo4SE5uUVVOdGFB?=
- =?utf-8?B?UjRDdTRiZlI2VUU1aHJZcnBTanp1Vm9sMHZyWUpEYkVLMmpuZGYwUjREWUY2?=
- =?utf-8?B?eWdGb1I1d2xQbkhVV2t4eE9JRDVieVROalErelkyZjl1RG40eGM1N0tacWJF?=
- =?utf-8?B?VHh2Uno0cVhmWXkwUmoyaXhOSHJzOHhGWUR6WjVvdnNieW1tbGFIbmVMR1hT?=
- =?utf-8?B?Y2hPQ3BKQ1o2VUhoQ1NJTW11OUo4UythbjYra0dMTVpUUTArOFdQdFFuWVp5?=
- =?utf-8?B?dWRwUkJPUXBVeGg1MnRVQjJ0QktQbUJycXlzdG9RN0U4WEtXMC9MclNkRWJO?=
- =?utf-8?B?cjZHVStlYVpaSE9VZzYyaTR4YmFJZk9sWnljYWFxNTRiNDlKTU4zTTBlNU1n?=
- =?utf-8?B?MzRwL1hjOFgxc3NYbmdwRm0zU0Q3Y1JUQlphNDVUR2wrY1RzdmdWYUxSU2FH?=
- =?utf-8?B?TjZzblgwSmNZeDJZS0Z4UlBxaTUzOUNUby9ZdFJjbHpBRWxLZzBINHRkZXBV?=
- =?utf-8?B?ZDIxS29yNFM4YnRIOXdzdVNPdTQxYnpvdFc4RXk1QzdHN0ptOG9lK1NvdXJE?=
- =?utf-8?B?aHV3RThTeDhHZEQzZDRJWlB4N09iZ2NQdzNxbnJPakVxNGk4d1luUjFmUXZx?=
- =?utf-8?B?Zk41UGI4UW5aK2hEK0xuN1hoQ1gwcjJycmhMWDRvTFVIb1VwUXpReE9QSVZW?=
- =?utf-8?B?eHhaTnBOYTJqUDJjb3RiL0FKY05VL2tFejhRR1lVNHRmaHhETXYzZERCTjVz?=
- =?utf-8?B?TDU3YkhLNmRzc01wQjZWN1V6R3gxNnVWdGpZd2FTV200bEU1bG82YkQ5Yko1?=
- =?utf-8?B?MTgxbGlYVVBkcTlReHFLRHJhOEE1dklKclNwelJ2N0pmdTVSdDB3TFBISGFW?=
- =?utf-8?B?L080djgrR0UxZzFndVpDWTFreVJnV2xQUFlZMEpFbnlQS3J2RWhWdzl6ZVNu?=
- =?utf-8?B?L2NlS295K3oydlNSQk5tQ1N3VW5XNjcxUFp0V0VSV1hqWWJLQVZUYklTYWkz?=
- =?utf-8?B?Q01tc1I5bTJsemo5eks2WVVpaFRlVnB4S1NodkZZL3NpbkJIeVpSeHZScGpo?=
- =?utf-8?B?V1FsTTNrZUZ5eW0vT0JYeWFDcHBRdG5mZHRpb0lTM1JuSm5lUlFjSUM2MXAy?=
- =?utf-8?B?VDZ5SUJZQUlTTjYyUHl1K2N0cDY5VnloZnpoTHRzck1oaGxZdmVlcjNKOHJ6?=
- =?utf-8?B?d2pkWE5ia2lMck81Ull0Rm9LNlhZdG41bEx0eTlGOHEwOFVVOThhVUVpYkt4?=
- =?utf-8?B?TmE1ellwYXFqRnlDOHc1YTVIenMvWkdBUkkzTTAxUkJ0WVBRRENjbW1kTnpq?=
- =?utf-8?B?VEpLYnJPYnEwcURpeEF5eWw2d05qVGpYdUJGWDJiWFFBSFNSZkladG1ycFgv?=
- =?utf-8?B?d3JSTHc5aFQ0bHBacEZLUVIwVU9oSjRFK1VzbkJNalJqSDBFNVUwSXZaT1pQ?=
- =?utf-8?B?RzcwdmNJQm40SmpwME9mOEk2MUlyMExMcnFMbnhWUE52d0ZtV0hybmoxSlVM?=
- =?utf-8?B?K1FXNHlJZzJ4QVRnNGl0ZTBma3ZETGxSYjdQellTV2o3ME1wajFtaURvQlR0?=
- =?utf-8?B?SkFLK2ZBQ2R3dHFibmNaTkhHelVSaGFoZVB3U2hhcnd0TTh1dEdscElTOTBV?=
- =?utf-8?B?UGVEOW9CdHZzMDVXZnVvTzh2bEprWDBEMHpzVWhuWWtPbjNyNDY4Um1MWE9Z?=
- =?utf-8?B?ZGJET0p1N1ErT3NPeDQ3K3d2U0xQRGIvWDdZVmJQcTF6ZWJjOUV2N1h1dnRj?=
- =?utf-8?B?cGZtbWZ4eUdrQUsvcFBCS2RhQzZrZGRXZE1hKytGa29CTUFxU2JiNXZRM0xi?=
- =?utf-8?B?dWc9PQ==?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	LgyKQ0swRL+R1BmzrL+lIPIxaBEbrD/EiE3Y9lLEalByKEkcfU7U91+B5xzmU4LsnC6tTwnQPlillYpKnNjvaT5M4tX1NCpoSXyfrZ2uRoBrpMgj0sqInhBLgFxFvhUquZjnZo29lrmeOrd8F1z57QjWrEBu8ktYctJnEkKgst0AErayYUyoCM1/ta/xBNcjAtI458YV0kEV20r3pBGJF72oENdrx80gUTamRFt8u74Ah5Bn6Ot5vC7zHetT7aC9YQktvjL28V3ZZv0EdPie0H3dzx42v03Fkm2arqmN/Rv/mqulGyt5ka+id7e1Nv01p98Hw6dL2ExyBgR0qggLe1wukdWmRxaIa/+uimbXGzBrqjIM7g2Ny09f53FL8PkUu1vIzC4pR+7oFsbqdq33L8Dts5/nVUe9s1vCAcZ9BSPVGvjVBMQtmddeOnpcL+4mQwwuzOmxkNop8o4cVYK5MHJoUsSjD7ACQgF5VSd742GDyvMjbS2nmdnTdkNitoDCq/zhKEBs7aFu9cHfW83pAvSHL8goTYR+xRp5YcsJreZ0q+GsUEyc2enVc9Lra5IsxC/mONOJVFdkghnB/BZEA8ETS/pBpZqSSyM18KyAxys=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d7ebb774-759b-44a9-ac94-08dd5dae61d6
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR10MB7224.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Mar 2025 19:29:30.5580
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: nsmNZyYzieXOyZD2RXdUJXrnNCuoo2+VQDqK/AYLYwmTWaP4gKxKwC3GIhEn5rDM6ujj/YfBoDLZ/oIueU1yQYlU2vQWiTCuJCKgiv4TZEI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR10MB6160
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-07_06,2025-03-07_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 adultscore=0 bulkscore=0
- mlxlogscore=999 malwarescore=0 spamscore=0 phishscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2502100000
- definitions=main-2503070146
-X-Proofpoint-ORIG-GUID: m9rjCE7fMTXDE--ObnEGLkTkzSD-IoWw
-X-Proofpoint-GUID: m9rjCE7fMTXDE--ObnEGLkTkzSD-IoWw
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <PH8SPRMB004414B5E1E0765C18F9A89DC9D52@PH8SPRMB0044.namprd11.prod.outlook.com>
+X-Migadu-Flow: FLOW_OUT
 
-On 3/6/25 9:55 PM, Jarkko Sakkinen wrote:
-> On Thu, Dec 19, 2024 at 11:42:04AM -0800, Ross Philipson wrote:
->> These values are needed by Secure Launch to locate particular CPUs
->> during AP startup and to restore the MTRR state after a TXT launch.
+On Fri, Mar 07, 2025 at 12:01:14AM +0000, Sridhar, Kanchana P wrote:
 > 
-> Hmm... does the first part with like locating particular CPU cores?
+> > -----Original Message-----
+> > From: Yosry Ahmed <yosry.ahmed@linux.dev>
+> > Sent: Thursday, March 6, 2025 11:36 AM
+> > To: Sridhar, Kanchana P <kanchana.p.sridhar@intel.com>
+> > Cc: linux-kernel@vger.kernel.org; linux-mm@kvack.org;
+> > hannes@cmpxchg.org; nphamcs@gmail.com; chengming.zhou@linux.dev;
+> > usamaarif642@gmail.com; ryan.roberts@arm.com; 21cnbao@gmail.com;
+> > ying.huang@linux.alibaba.com; akpm@linux-foundation.org; linux-
+> > crypto@vger.kernel.org; herbert@gondor.apana.org.au;
+> > davem@davemloft.net; clabbe@baylibre.com; ardb@kernel.org;
+> > ebiggers@google.com; surenb@google.com; Accardi, Kristen C
+> > <kristen.c.accardi@intel.com>; Feghali, Wajdi K <wajdi.k.feghali@intel.com>;
+> > Gopal, Vinodh <vinodh.gopal@intel.com>
+> > Subject: Re: [PATCH v8 12/14] mm: zswap: Simplify acomp_ctx resource
+> > allocation/deletion and mutex lock usage.
+> > 
+> > On Mon, Mar 03, 2025 at 12:47:22AM -0800, Kanchana P Sridhar wrote:
+> > > This patch modifies the acomp_ctx resources' lifetime to be from pool
+> > > creation to deletion. A "bool __online" and "u8 nr_reqs" are added to
+> > > "struct crypto_acomp_ctx" which simplify a few things:
+> > >
+> > > 1) zswap_pool_create() will initialize all members of each percpu
+> > acomp_ctx
+> > >    to 0 or NULL and only then initialize the mutex.
+> > > 2) CPU hotplug will set nr_reqs to 1, allocate resources and set __online
+> > >    to true, without locking the mutex.
+> > > 3) CPU hotunplug will lock the mutex before setting __online to false. It
+> > >    will not delete any resources.
+> > > 4) acomp_ctx_get_cpu_lock() will lock the mutex, then check if __online
+> > >    is true, and if so, return the mutex for use in zswap compress and
+> > >    decompress ops.
+> > > 5) CPU onlining after offlining will simply check if either __online or
+> > >    nr_reqs are non-0, and return 0 if so, without re-allocating the
+> > >    resources.
+> > > 6) zswap_pool_destroy() will call a newly added zswap_cpu_comp_dealloc()
+> > to
+> > >    delete the acomp_ctx resources.
+> > > 7) Common resource deletion code in case of zswap_cpu_comp_prepare()
+> > >    errors, and for use in zswap_cpu_comp_dealloc(), is factored into a new
+> > >    acomp_ctx_dealloc().
+> > >
+> > > The CPU hot[un]plug callback functions are moved to "pool functions"
+> > > accordingly.
+> > >
+> > > The per-cpu memory cost of not deleting the acomp_ctx resources upon
+> > CPU
+> > > offlining, and only deleting them when the pool is destroyed, is as follows:
+> > >
+> > >     IAA with batching: 64.8 KB
+> > >     Software compressors: 8.2 KB
+> > >
+> > > I would appreciate code review comments on whether this memory cost is
+> > > acceptable, for the latency improvement that it provides due to a faster
+> > > reclaim restart after a CPU hotunplug-hotplug sequence - all that the
+> > > hotplug code needs to do is to check if acomp_ctx->nr_reqs is non-0, and
+> > > if so, set __online to true and return, and reclaim can proceed.
+> > 
+> > I like the idea of allocating the resources on memory hotplug but
+> > leaving them allocated until the pool is torn down. It avoids allocating
+> > unnecessary memory if some CPUs are never onlined, but it simplifies
+> > things because we don't have to synchronize against the resources being
+> > freed in CPU offline.
+> > 
+> > The only case that would suffer from this AFAICT is if someone onlines
+> > many CPUs, uses them once, and then offline them and not use them again.
+> > I am not familiar with CPU hotplug use cases so I can't tell if that's
+> > something people do, but I am inclined to agree with this
+> > simplification.
 > 
-> I'd start also the sentence with the action taken except assuring
-> why the undefined action is taken.
+> Thanks Yosry, for your code review comments! Good to know that this
+> simplification is acceptable.
 > 
-> "Add the MSR values required by Secure Launch (SL) to locate particular
-> CPU cores during application processor (AP) startup, and restore the
-> MTRR state after a Intel TXT launch."
+> > 
+> > >
+> > > Signed-off-by: Kanchana P Sridhar <kanchana.p.sridhar@intel.com>
+> > > ---
+> > >  mm/zswap.c | 273 +++++++++++++++++++++++++++++++++++--------------
+> > ----
+> > >  1 file changed, 182 insertions(+), 91 deletions(-)
+> > >
+> > > diff --git a/mm/zswap.c b/mm/zswap.c
+> > > index 10f2a16e7586..cff96df1df8b 100644
+> > > --- a/mm/zswap.c
+> > > +++ b/mm/zswap.c
+> > > @@ -144,10 +144,12 @@ bool zswap_never_enabled(void)
+> > >  struct crypto_acomp_ctx {
+> > >  	struct crypto_acomp *acomp;
+> > >  	struct acomp_req *req;
+> > > -	struct crypto_wait wait;
+> > 
+> > Is there a reason for moving this? If not please avoid unrelated changes.
+> 
+> The reason is so that req/buffer, and reqs/buffers with batching, go together
+> logically, hence I found this easier to understand. I can restore this to the
+> original order, if that's preferable.
 
-Yes we can adopt something like that. Thanks for the suggestion.
-
-Ross
+I see. In that case, this fits better in the patch that actually adds
+support for having multiple requests and buffers, and please call it out
+explicitly in the commit message.
 
 > 
-> Along the lines would be more informative...
+> > 
+> > >  	u8 *buffer;
+> > > +	u8 nr_reqs;
+> > > +	struct crypto_wait wait;
+> > >  	struct mutex mutex;
+> > >  	bool is_sleepable;
+> > > +	bool __online;
+> > 
+> > I don't believe we need this.
+> > 
+> > If we are not freeing resources during CPU offlining, then we do not
+> > need a CPU offline callback and acomp_ctx->__online serves no purpose.
+> > 
+> > The whole point of synchronizing between offlining and
+> > compress/decompress operations is to avoid UAF. If offlining does not
+> > free resources, then we can hold the mutex directly in the
+> > compress/decompress path and drop the hotunplug callback completely.
+> > 
+> > I also believe nr_reqs can be dropped from this patch, as it seems like
+> > it's only used know when to set __online.
 > 
-> BR, Jarkko
+> All great points! In fact, that was the original solution I had implemented
+> (not having an offline callback). But then, I spent some time understanding
+> the v6.13 hotfix for synchronizing freeing of resources, and this comment
+> in zswap_cpu_comp_prepare():
+> 
+> 	/*
+> 	 * Only hold the mutex after completing allocations, otherwise we may
+> 	 * recurse into zswap through reclaim and attempt to hold the mutex
+> 	 * again resulting in a deadlock.
+> 	 */
+> 
+> Hence, I figured the constraint of "recurse into zswap through reclaim" was
+> something to comprehend in the simplification (even though I had a tough
+> time imagining how this could happen).
 
+The constraint here is about zswap_cpu_comp_prepare() holding the mutex,
+making an allocation which internally triggers reclaim, then recursing
+into zswap and trying to hold the same mutex again causing a deadlock.
+
+If zswap_cpu_comp_prepare() does not need to hold the mutex to begin
+with, the constraint naturally goes away.
+
+> 
+> Hence, I added the "bool __online" because zswap_cpu_comp_prepare()
+> does not acquire the mutex lock while allocating resources. We have already
+> initialized the mutex, so in theory, it is possible for compress/decompress
+> to acquire the mutex lock. The __online acts as a way to indicate whether
+> compress/decompress can proceed reliably to use the resources.
+
+For compress/decompress to acquire the mutex they need to run on that
+CPU, and I don't think that's possible before onlining completes, so
+zswap_cpu_comp_prepare() must have already completed before
+compress/decompress can use that CPU IIUC.
+
+> 
+> The "nr_reqs" was needed as a way to distinguish between initial and
+> subsequent calls into zswap_cpu_comp_prepare(), for e.g., on a CPU that
+> goes through an online-offline-online sequence. In the initial onlining,
+> we need to allocate resources because nr_reqs=0. If resources are to
+> be allocated, we set acomp_ctx->nr_reqs and proceed to allocate
+> reqs/buffers/etc. In the subsequent onlining, we can quickly inspect
+> nr_reqs as being greater than 0 and return, thus avoiding any latency
+> delays before reclaim/page-faults can be handled on that CPU.
+> 
+> Please let me know if this rationale seems reasonable for why
+> __online and nr_reqs were introduced.
+
+Based on what I said, I still don't believe they are needed, but please
+correct me if I am wrong.
+
+[..]
+> > I also see some ordering changes inside the function (e.g. we now
+> > allocate the request before the buffer). Not sure if these are
+> > intentional. If not, please keep the diff to the required changes only.
+> 
+> The reason for this was, I am trying to organize the allocations based
+> on dependencies. Unless requests are allocated, there is no point in
+> allocating buffers. Please let me know if this is Ok.
+
+Please separate refactoring changes in general from functional changes
+because it makes code review harder.
+
+In this specific instance, I think moving the code is probably not worth
+it, as there's also no point in allocating requests if we cannot
+allocate buffers. In fact, since the buffers are larger, in theory their
+allocation is more likely to fail, so it makes since to do it first.
+
+Anyway, please propose such refactoring changes separately and they can
+be discussed as such.
+
+[..]
+> > > +static void zswap_cpu_comp_dealloc(unsigned int cpu, struct hlist_node
+> > *node)
+> > > +{
+> > > +	struct zswap_pool *pool = hlist_entry(node, struct zswap_pool,
+> > node);
+> > > +	struct crypto_acomp_ctx *acomp_ctx = per_cpu_ptr(pool-
+> > >acomp_ctx, cpu);
+> > > +
+> > > +	/*
+> > > +	 * The lifetime of acomp_ctx resources is from pool creation to
+> > > +	 * pool deletion.
+> > > +	 *
+> > > +	 * Reclaims should not be happening because, we get to this routine
+> > only
+> > > +	 * in two scenarios:
+> > > +	 *
+> > > +	 * 1) pool creation failures before/during the pool ref initialization.
+> > > +	 * 2) we are in the process of releasing the pool, it is off the
+> > > +	 *    zswap_pools list and has no references.
+> > > +	 *
+> > > +	 * Hence, there is no need for locks.
+> > > +	 */
+> > > +	acomp_ctx->__online = false;
+> > > +	acomp_ctx_dealloc(acomp_ctx);
+> > 
+> > Since __online can be dropped, we can probably drop
+> > zswap_cpu_comp_dealloc() and call acomp_ctx_dealloc() directly?
+> 
+> I suppose there is value in having a way in zswap to know for sure, that
+> resource allocation has completed, and it is safe for compress/decompress
+> to proceed. Especially because the mutex has been initialized before we
+> get to resource allocation. Would you agree?
+
+As I mentioned above, I believe compress/decompress cannot run on a CPU
+before the onlining completes. Please correct me if I am wrong.
+
+> 
+> > 
+> > > +}
+> > > +
+> > >  static struct zswap_pool *zswap_pool_create(char *type, char
+> > *compressor)
+> > >  {
+> > >  	struct zswap_pool *pool;
+> > > @@ -285,13 +403,21 @@ static struct zswap_pool
+> > *zswap_pool_create(char *type, char *compressor)
+> > >  		goto error;
+> > >  	}
+> > >
+> > > -	for_each_possible_cpu(cpu)
+> > > -		mutex_init(&per_cpu_ptr(pool->acomp_ctx, cpu)->mutex);
+> > > +	for_each_possible_cpu(cpu) {
+> > > +		struct crypto_acomp_ctx *acomp_ctx = per_cpu_ptr(pool-
+> > >acomp_ctx, cpu);
+> > > +
+> > > +		acomp_ctx->acomp = NULL;
+> > > +		acomp_ctx->req = NULL;
+> > > +		acomp_ctx->buffer = NULL;
+> > > +		acomp_ctx->__online = false;
+> > > +		acomp_ctx->nr_reqs = 0;
+> > 
+> > Why is this needed? Wouldn't zswap_cpu_comp_prepare() initialize them
+> > right away?
+> 
+> Yes, I figured this is needed for two reasons:
+> 
+> 1) For the error handling in zswap_cpu_comp_prepare() and calls into
+>     zswap_cpu_comp_dealloc() to be handled by the common procedure
+>     "acomp_ctx_dealloc()" unambiguously.
+
+This makes sense. When you move the refactoring to create
+acomp_ctx_dealloc() to a separate patch, please include this change in
+it and call it out explicitly in the commit message.
+
+> 2) The second scenario I thought of that would need this, is let's say
+>      the zswap compressor is switched immediately after setting the
+>      compressor. Some cores have executed the onlining code and
+>      some haven't. Because there are no pool refs held,
+>      zswap_cpu_comp_dealloc() would be called per-CPU. Hence, I figured
+>      it would help to initialize these acomp_ctx members before the
+>      hand-off to "cpuhp_state_add_instance()" in zswap_pool_create().
+
+I believe cpuhp_state_add_instance() calls the onlining function
+synchronously on all present CPUs, so I don't think it's possible to end
+up in a state where the pool is being destroyed and some CPU executed
+zswap_cpu_comp_prepare() while others haven't.
+
+That being said, this made me think of a different problem. If pool
+destruction races with CPU onlining, there could be a race between
+zswap_cpu_comp_prepare() allocating resources and
+zswap_cpu_comp_dealloc() (or acomp_ctx_dealloc()) freeing them.
+
+I believe we must always call cpuhp_state_remove_instance() *before*
+freeing the resources to prevent this race from happening. This needs to
+be documented with a comment.
+
+Let me know if I missed something.
+
+> 
+> Please let me know if these are valid considerations.
+> 
+> > 
+> > If it is in fact needed we should probably just use __GFP_ZERO.
+> 
+> Sure. Are you suggesting I use "alloc_percpu_gfp()" instead of "alloc_percpu()"
+> for the acomp_ctx?
+
+Yeah if we need to initialize all/most fields to 0 let's use
+alloc_percpu_gfp() and pass GFP_KERNEL | __GFP_ZERO.
+
+[..]
+> > > @@ -902,16 +957,52 @@ static struct crypto_acomp_ctx
+> > *acomp_ctx_get_cpu_lock(struct zswap_pool *pool)
+> > >
+> > >  	for (;;) {
+> > >  		acomp_ctx = raw_cpu_ptr(pool->acomp_ctx);
+> > > -		mutex_lock(&acomp_ctx->mutex);
+> > > -		if (likely(acomp_ctx->req))
+> > > -			return acomp_ctx;
+> > >  		/*
+> > > -		 * It is possible that we were migrated to a different CPU
+> > after
+> > > -		 * getting the per-CPU ctx but before the mutex was
+> > acquired. If
+> > > -		 * the old CPU got offlined, zswap_cpu_comp_dead() could
+> > have
+> > > -		 * already freed ctx->req (among other things) and set it to
+> > > -		 * NULL. Just try again on the new CPU that we ended up on.
+> > > +		 * If the CPU onlining code successfully allocates acomp_ctx
+> > resources,
+> > > +		 * it sets acomp_ctx->__online to true. Until this happens, we
+> > have
+> > > +		 * two options:
+> > > +		 *
+> > > +		 * 1. Return NULL and fail all stores on this CPU.
+> > > +		 * 2. Retry, until onlining has finished allocating resources.
+> > > +		 *
+> > > +		 * In theory, option 1 could be more appropriate, because it
+> > > +		 * allows the calling procedure to decide how it wants to
+> > handle
+> > > +		 * reclaim racing with CPU hotplug. For instance, it might be
+> > Ok
+> > > +		 * for compress to return an error for the backing swap device
+> > > +		 * to store the folio. Decompress could wait until we get a
+> > > +		 * valid and locked mutex after onlining has completed. For
+> > now,
+> > > +		 * we go with option 2 because adding a do-while in
+> > > +		 * zswap_decompress() adds latency for software
+> > compressors.
+> > > +		 *
+> > > +		 * Once initialized, the resources will be de-allocated only
+> > > +		 * when the pool is destroyed. The acomp_ctx will hold on to
+> > the
+> > > +		 * resources through CPU offlining/onlining at any time until
+> > > +		 * the pool is destroyed.
+> > > +		 *
+> > > +		 * This prevents races/deadlocks between reclaim and CPU
+> > acomp_ctx
+> > > +		 * resource allocation that are a dependency for reclaim.
+> > > +		 * It further simplifies the interaction with CPU onlining and
+> > > +		 * offlining:
+> > > +		 *
+> > > +		 * - CPU onlining does not take the mutex. It only allocates
+> > > +		 *   resources and sets __online to true.
+> > > +		 * - CPU offlining acquires the mutex before setting
+> > > +		 *   __online to false. If reclaim has acquired the mutex,
+> > > +		 *   offlining will have to wait for reclaim to complete before
+> > > +		 *   hotunplug can proceed. Further, hotplug merely sets
+> > > +		 *   __online to false. It does not delete the acomp_ctx
+> > > +		 *   resources.
+> > > +		 *
+> > > +		 * Option 1 is better than potentially not exiting the earlier
+> > > +		 * for (;;) loop because the system is running low on memory
+> > > +		 * and/or CPUs are getting offlined for whatever reason. At
+> > > +		 * least failing this store will prevent data loss by failing
+> > > +		 * zswap_store(), and saving the data in the backing swap
+> > device.
+> > >  		 */
+> > 
+> > I believe we can dropped. I don't think we can have any store/load
+> > operations on a CPU before it's fully onlined, and we should always have
+> > a reference on the pool here, so the resources cannot go away.
+> > 
+> > So unless I missed something we can drop this completely now and just
+> > hold the mutex directly in the load/store paths.
+> 
+> Based on the above explanations, please let me know if it is a good idea
+> to keep the __online, or if you think further simplification is possible.
+
+I still think it's not needed. Let me know if I missed anything.
