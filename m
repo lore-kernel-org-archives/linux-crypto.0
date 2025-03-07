@@ -1,88 +1,51 @@
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E57E819DFA7;
-	Fri,  7 Mar 2025 06:52:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8619738382;
+	Fri,  7 Mar 2025 07:00:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741330329; cv=none; b=a45OsXWJytHK2SmAPF8nWxKuszscPtkz/SYmhIlctA6FPMj/LqkozImElRHLed22ceP8eoN2wPdHcCk9yA34ysCSiXccegsaQNDj1I/EmANWNxLJoT2AADCv3LGHxZKb/MxK4AcqPnLqbwjpR/NZMPY+WwLsS9C2zmdckB/iEQE=
+	t=1741330846; cv=none; b=uvf0RfKq7U/+9+ahSlO4Zhpp30U5kXfzWQMgM9HGnnIvOK1dxPX4wcz/0uhf6DYXQpypjxAR9RkJKuBjdjLpNIYHidHwx0eQxB48u6FRTnwra9MuPdKmtCiuyaWk5DBncJvDHPZLwt8Io203Ycc7S2t5VYoBd7WCAUH1mZc6pIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741330329; c=relaxed/simple;
-	bh=0FboRi4T5lRhBpOLmxfTGg8DNG9FS+J/OvKiP4g1uVM=;
+	s=arc-20240116; t=1741330846; c=relaxed/simple;
+	bh=LonDAILnsW0FisfkrmXT+YWTMRZbfLb6bNdSOs+YmcA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FzRlJLFGhFTksWNeuIl12MmiEP3ZBrB/sZWwwW/cJwFbitPkVAp68lqD3/9jervXGvzb0SBExouqTYRTJDmRwu/39VwISNe0m5cx3uBe1yWItN5XdOaPc2BL5L+XkRF8L+1bauBjdXySbpg7DAsBeDz0qOpAKNmp5Eh9fcPETpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Z4Kfm9ma; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=inCVRe4alSU5eQbpSzlqTULrG4dlYvVP69ZjTQd+4M/Ja/9fAjn7RY1o1ADI8VaDj0Fca0jltkBew7sVHpuFPDXKWoBxjX9DBHr8EvpqS1ag7rWPo/P6a1LijVKlfoYbMdzx2kzM6T+FbprJIavhIZc/CgCdtH++DERpK/rEIpc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bJcamyGR; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Z4Kfm9ma"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741330328; x=1772866328;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=0FboRi4T5lRhBpOLmxfTGg8DNG9FS+J/OvKiP4g1uVM=;
-  b=Z4Kfm9makxyVipxRXMcPGI4emlaIPxZqFUh8PAWEzx8OQ+K9DEcmoP6u
-   Ekt2QKkJ8pkNE76WmBG/QM31ah7zfqrGV2JNMvtQB1qwiA8smhUI4CwmC
-   p/y96BkgrGoimVQ1tZtju2INIvV3qx0UcRz6Dlz+X+gUjo98e0xo4JsLn
-   WDcksOu637MJXlwO/XHesSdmaBvsNypVIBTyJiGd9NsSzssQcPDiRFMOR
-   BXKbsjSMmyvvJLzLVS7Z2XVLQim+Idxgg9bqs26/dNvpB4xiUDzXIuFEE
-   VlNcUnGFlNPDnyh5mBSaHABi+Y/7vcGYhEvp97vXbsGIBdt/ZcQMNNrIG
-   A==;
-X-CSE-ConnectionGUID: 7bYbQ2y5Rryz5wQ4o7dKzA==
-X-CSE-MsgGUID: kcLRTQY8TReadBGDPm66Bw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11365"; a="53769939"
-X-IronPort-AV: E=Sophos;i="6.14,228,1736841600"; 
-   d="scan'208";a="53769939"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2025 22:52:07 -0800
-X-CSE-ConnectionGUID: fMKAQkc6S7ifR+dbATnnfQ==
-X-CSE-MsgGUID: 7tBYnb24QYOZP5v4PpdyhQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="123425163"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by fmviesa003.fm.intel.com with ESMTP; 06 Mar 2025 22:52:00 -0800
-Date: Fri, 7 Mar 2025 14:49:44 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Alexey Kardashevskiy <aik@amd.com>, x86@kernel.org, kvm@vger.kernel.org,
-	linux-crypto@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-arch@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Ashish Kalra <ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Christoph Hellwig <hch@lst.de>, Nikunj A Dadhania <nikunj@amd.com>,
-	Michael Roth <michael.roth@amd.com>,
-	Vasant Hegde <vasant.hegde@amd.com>,
-	Joao Martins <joao.m.martins@oracle.com>,
-	Nicolin Chen <nicolinc@nvidia.com>,
-	Lu Baolu <baolu.lu@linux.intel.com>,
-	Steve Sistare <steven.sistare@oracle.com>,
-	Lukas Wunner <lukas@wunner.de>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Dionna Glaze <dionnaglaze@google.com>, Yi Liu <yi.l.liu@intel.com>,
-	iommu@lists.linux.dev, linux-coco@lists.linux.dev,
-	Zhi Wang <zhiw@nvidia.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-Subject: Re: [RFC PATCH v2 14/22] iommufd: Add TIO calls
-Message-ID: <Z8qXCI6Wwygvwhya@yilunxu-OptiPlex-7050>
-References: <Z72GmixR6NkzXAl7@yilunxu-OptiPlex-7050>
- <2fe6b3c6-3eed-424d-87f0-34c4e7e1c906@amd.com>
- <Z77xrqLtJfB84dJF@yilunxu-OptiPlex-7050>
- <20250226131202.GH5011@ziepe.ca>
- <Z7/jFhlsBrbrloia@yilunxu-OptiPlex-7050>
- <20250301003711.GR5011@ziepe.ca>
- <Z8U+/0IYyn7XX3ao@yilunxu-OptiPlex-7050>
- <20250305192842.GE354403@ziepe.ca>
- <Z8lE+5OpqZc746mT@yilunxu-OptiPlex-7050>
- <20250306182614.GF354403@ziepe.ca>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bJcamyGR"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 255A1C4CED1;
+	Fri,  7 Mar 2025 07:00:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741330846;
+	bh=LonDAILnsW0FisfkrmXT+YWTMRZbfLb6bNdSOs+YmcA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bJcamyGRemF0nmD8ymN/7Y76ADOIlDMzFsQvf/RbLxCFkNDBbwzLL7gwQSzQYhz/b
+	 DuH0/iIzKBIk6ldssluyh22o9Bb7ULvWEeRIVSIV8wNcAjSrNCabfw1LD4fcDs/F+4
+	 gP1lDV4rmDl2fxdGD8+FpVL8ZdzEVHV6qLkfZVRtTaFc7+AIR59RTTYyuEO0ia1yWV
+	 n1FhoeoRAS976Ien+z3ar3FBpDMz1SZLtXbf+L1BxwI6oEbFp07NmTP5kimS/7JwUI
+	 AZDvPvRvpWX2K6SPkp5ah1aDgdrGthBUgPOhCgIQeo8krlHtZZn/VJG59ONJceYdL6
+	 NnLoSgYOr+vMA==
+Date: Fri, 7 Mar 2025 09:00:41 +0200
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: Ross Philipson <ross.philipson@oracle.com>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org,
+	linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
+	linux-efi@vger.kernel.org, iommu@lists.linux-foundation.org,
+	dpsmith@apertussolutions.com, tglx@linutronix.de, mingo@redhat.com,
+	bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com,
+	ardb@kernel.org, mjg59@srcf.ucam.org,
+	James.Bottomley@hansenpartnership.com, peterhuewe@gmx.de,
+	jgg@ziepe.ca, luto@amacapital.net, nivedita@alum.mit.edu,
+	herbert@gondor.apana.org.au, davem@davemloft.net, corbet@lwn.net,
+	ebiederm@xmission.com, dwmw2@infradead.org,
+	baolu.lu@linux.intel.com, kanth.ghatraju@oracle.com,
+	andrew.cooper3@citrix.com, trenchboot-devel@googlegroups.com
+Subject: Re: [PATCH v12 09/19] x86: Secure Launch kernel early boot stub
+Message-ID: <Z8qZmWhSdxCCU_Fm@kernel.org>
+References: <20241219194216.152839-1-ross.philipson@oracle.com>
+ <20241219194216.152839-10-ross.philipson@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -91,53 +54,33 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250306182614.GF354403@ziepe.ca>
+In-Reply-To: <20241219194216.152839-10-ross.philipson@oracle.com>
 
-On Thu, Mar 06, 2025 at 02:26:14PM -0400, Jason Gunthorpe wrote:
-> On Thu, Mar 06, 2025 at 02:47:23PM +0800, Xu Yilun wrote:
+On Thu, Dec 19, 2024 at 11:42:06AM -0800, Ross Philipson wrote:
+> The Secure Launch (SL) stub provides the entry point for Intel TXT (and
+> later AMD SKINIT) to vector to during the late launch. The symbol
+
+Does "to vector to" translate into to jump into during late launch? :-)
+
+Given the complicated topic in the first place I'd use as down to
+earth language as I possibly could where it can be used.
+
+
+
+> sl_stub_entry is that entry point and its offset into the kernel is
+> conveyed to the launching code using the MLE (Measured Launch
+> Environment) header in the structure named mle_header. The offset of the
+> MLE header is set in the kernel_info. The routine sl_stub contains the
+> very early late launch setup code responsible for setting up the basic
+> environment to allow the normal kernel startup_32 code to proceed. It is
+> also responsible for properly waking and handling the APs on Intel
+> platforms. The routine sl_main which runs after entering 64b mode is
+> responsible for measuring configuration and module information before
+> it is used like the boot params, the kernel command line, the TXT heap,
+> an external initramfs, etc.
 > 
-> > While for AMD:
-> >         ...
-> >         b.guest_device_id = guest_rid;  //TDI ID, it is the vBDF
-> >         b.gctx_paddr = gctx_paddr;      //AMDs CoCo-VM ID
-> > 
-> >         ret = sev_tio_do_cmd(SEV_CMD_TIO_TDI_BIND, &b, ...
-> > 
-> > 
-> > Neither of them use vIOMMU ID or any IOMMU info, so the only concern is
-> > vBDF.
-> 
-> I think that is enough, we should not be putting this in VFIO if it
-> cannot execute it for AMD :\
+> Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
 
-OK. With these discussion, my understanding is it can execute for AMD
-but we don't duplicate the effort for vdevice->id.
+Otherwise this is looking somewhat decent!
 
-We can swtich to vdevice and try to solve the rest problems.
-
-> 
-> > > You could also issue the TSM bind against the idev on the iommufd
-> > > side..
-> > 
-> > But I cannot figure out how idev could ensure no mmap on VFIO, and how
-> > idev could call dma_buf_move_notify.
-> 
-> I suggest you start out this way from the VFIO. Put the device in a CC
-> mode which bans the mmap entirely and pass that CC capable as a flag
-> into iommufd when creating the idev.
-
-IIUC, it basically switches back to my previous implementation for mmap.
-
-https://lore.kernel.org/kvm/20250107142719.179636-9-yilun.xu@linux.intel.com/
-
-I can do that.
-
-Thanks,
-yilun
-
-> 
-> If it really needs to be dyanmic a VFIO feature could change the CC
-> mode and that could call back to iommufd to synchronize if that is
-> allowed.
-> 
-> Jason
+BR, Jarkko
