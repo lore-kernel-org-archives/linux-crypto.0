@@ -1,61 +1,52 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6E1718FDD0
-	for <linux-crypto@vger.kernel.org>; Fri,  7 Mar 2025 04:22:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B014F29408;
+	Fri,  7 Mar 2025 05:10:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741321346; cv=none; b=n0OyEAifANkF9D+1Rb+08pDbhzkafXjhfOKMgxOct1o99HHaWZ2j01dBIFeBxGDdm5RTLaw2XCPLVIywqZ7b+Td4TyCuoh1wxZZPteYQoYJxiy0h/PEtwYvf5VQXBzpnCdL4xlZBIaKM6dLs+Rw7Zu0xBdz9bvKPGH1eDRma/9k=
+	t=1741324246; cv=none; b=YT7tRSko+i1NVimVGHrUWBsMdy6xVTNM+mNxS9pFAHdCryYHMXFBpIMxYig5Xh3M0UYvLbFDEWP+grNjdwl4pAo44i1dg5O5EZd68X0A8e4p2/2+5JwGjMJQJiQnc67gSic70AmL8Yf9v75YdsD0+mZmjYBu7ZTH/uOopHWmJO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741321346; c=relaxed/simple;
-	bh=m+ROzqCnsIhNSSEgKIVlT1Q2MkFdsMclfp8A9cDGgck=;
+	s=arc-20240116; t=1741324246; c=relaxed/simple;
+	bh=VcUVlFIitotGE0i9+kH0vpVYTvtPQGTwCoxsoWlqZYQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IFembQ5/DuWtkE4hPDsyea6KySO+7dx9GmKA7QeC7sx8JrY7C4bPhu3uDgQabb3Jiy/smtRHb+rpkYF0C4t+jMYoDl5AeqK+IIQeFBCzHPFJTE34hwjoPMreUeJljWXCwGRXpJva/X9Cqulp21+OQf21mS2RLc400UxKKQgZCBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=T/pxryzx; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=oYIXWlT38ID/QPaZuqEF0n83zxyLlIGdKxLZMoN4PYcwXobKz/+VbMBCg/4PwZ7oSv639QwjR4cqhIzVn0R+YGigGQ7Giy/t0PySpak8alsaOyjMtZZy5LVJqaFyf4eyddXmA+bbXl/MYiuyNLYkPXTSd6q9SOTjG2yOME3lWdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sz9AmOC/; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="T/pxryzx"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741321345; x=1772857345;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=m+ROzqCnsIhNSSEgKIVlT1Q2MkFdsMclfp8A9cDGgck=;
-  b=T/pxryzx1ZIu230OgKDrluV+qBmkjzx9x+Zj1qA6XWn2+zml1p4RjYuN
-   5tuioR/JPDfxirRxSDz4e1/FBU6n9vue0vGIhG4/Y6adhnSaYUypTY2i+
-   +jhK2fHq6Bx3euOREdJ1Vix2p6GLPxM05sLVkqCCDM2dCOslwEnzYXWuz
-   IuCgUJP2Ia4KuXpmGSZGl6H9bLKL3DcRcbqbnkVyy5hdpZxoCUZ3JQu8y
-   B/UzgLRSVXvMtDyUcS5r2sWUj/QKP3hL1uonouaQgFj3iA/2g3PweUB/k
-   Acz8kxxVtEcpkhLfDnfih2f991XvjfhF5I6j+3+kFJF6JXyi1EnZZ8sie
-   Q==;
-X-CSE-ConnectionGUID: BA2G8UZ9QYiRlHXdNg2UbA==
-X-CSE-MsgGUID: DPIDTyt0TKyY4krzfOrWww==
-X-IronPort-AV: E=McAfee;i="6700,10204,11365"; a="42070767"
-X-IronPort-AV: E=Sophos;i="6.14,228,1736841600"; 
-   d="scan'208";a="42070767"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Mar 2025 20:22:24 -0800
-X-CSE-ConnectionGUID: 0/kVoPrVSYmQSGBzVMYHaw==
-X-CSE-MsgGUID: i5xedAAkSOC2yawenDI2NQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,228,1736841600"; 
-   d="scan'208";a="119046894"
-Received: from lkp-server02.sh.intel.com (HELO 76cde6cc1f07) ([10.239.97.151])
-  by fmviesa006.fm.intel.com with ESMTP; 06 Mar 2025 20:22:22 -0800
-Received: from kbuild by 76cde6cc1f07 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tqPE4-000ONo-17;
-	Fri, 07 Mar 2025 04:22:20 +0000
-Date: Fri, 7 Mar 2025 12:22:09 +0800
-From: kernel test robot <lkp@intel.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	Eric Biggers <ebiggers@kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [v3 PATCH] crypto: scatterwalk - Add memcpy_sglist
-Message-ID: <202503071259.oCOdlrcI-lkp@intel.com>
-References: <Z8kXhLb681E_FLzs@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sz9AmOC/"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39949C4CEE3;
+	Fri,  7 Mar 2025 05:10:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741324246;
+	bh=VcUVlFIitotGE0i9+kH0vpVYTvtPQGTwCoxsoWlqZYQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Sz9AmOC/0FvKvhT31zFnCJzvgv0W8jNaph+1VbsfE4p27+b2BCgpTwevfLQRxGAw9
+	 faosXIp5bn0xPabPqe093AbqpIp/j9AyBM/EozwEMMDEZuuDs2MWhQVJ6IYvMk2lLs
+	 uETJ5RJ5paej3TvE8rdDWh66LyE+3yMbEJP5DdJVCtOv5i4ZUqLiLRdJ405rx1mbyU
+	 aqyC7wigemvLP/Rta/5U46UQMi3HyoneaRc5N2S/4ytLxgK0cTs1bokaayy5vOMoPH
+	 v0uXkw/mPxlHdS62MW/sJ/LqIG9ONM/tBfopTal0KiWM+7LP/bbM6W2HBtU1FRbOnu
+	 5ZKwutMSQpEtw==
+Date: Fri, 7 Mar 2025 07:10:41 +0200
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: Ross Philipson <ross.philipson@oracle.com>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org,
+	linux-integrity@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-crypto@vger.kernel.org, kexec@lists.infradead.org,
+	linux-efi@vger.kernel.org, iommu@lists.linux-foundation.org,
+	dpsmith@apertussolutions.com, tglx@linutronix.de, mingo@redhat.com,
+	bp@alien8.de, hpa@zytor.com, dave.hansen@linux.intel.com,
+	ardb@kernel.org, mjg59@srcf.ucam.org,
+	James.Bottomley@hansenpartnership.com, peterhuewe@gmx.de,
+	jgg@ziepe.ca, luto@amacapital.net, nivedita@alum.mit.edu,
+	herbert@gondor.apana.org.au, davem@davemloft.net, corbet@lwn.net,
+	ebiederm@xmission.com, dwmw2@infradead.org,
+	baolu.lu@linux.intel.com, kanth.ghatraju@oracle.com,
+	andrew.cooper3@citrix.com, trenchboot-devel@googlegroups.com
+Subject: Re: [PATCH v12 01/19] Documentation/x86: Secure Launch kernel
+ documentation
+Message-ID: <Z8p_0UfZ3ByzmPfK@kernel.org>
+References: <20241219194216.152839-1-ross.philipson@oracle.com>
+ <20241219194216.152839-2-ross.philipson@oracle.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -64,217 +55,352 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z8kXhLb681E_FLzs@gondor.apana.org.au>
+In-Reply-To: <20241219194216.152839-2-ross.philipson@oracle.com>
 
-Hi Herbert,
+ On Thu, Dec 19, 2024 at 11:41:58AM -0800, Ross Philipson wrote:
+> From: "Daniel P. Smith" <dpsmith@apertussolutions.com>
+> 
+> Introduce background, overview and configuration/ABI information
+> for the Secure Launch kernel feature.
+> 
+> Signed-off-by: Daniel P. Smith <dpsmith@apertussolutions.com>
+> Signed-off-by: Ross Philipson <ross.philipson@oracle.com>
+> Reviewed-by: Bagas Sanjaya <bagasdotme@gmail.com>
+> ---
+>  Documentation/security/index.rst              |   1 +
+>  .../security/launch-integrity/index.rst       |  11 +
+>  .../security/launch-integrity/principles.rst  | 317 ++++++++++
+>  .../secure_launch_details.rst                 | 587 ++++++++++++++++++
+>  .../secure_launch_overview.rst                | 252 ++++++++
+>  5 files changed, 1168 insertions(+)
+>  create mode 100644 Documentation/security/launch-integrity/index.rst
+>  create mode 100644 Documentation/security/launch-integrity/principles.rst
+>  create mode 100644 Documentation/security/launch-integrity/secure_launch_details.rst
+>  create mode 100644 Documentation/security/launch-integrity/secure_launch_overview.rst
+> 
+> diff --git a/Documentation/security/index.rst b/Documentation/security/index.rst
+> index 3e0a7114a862..f89741271ed0 100644
+> --- a/Documentation/security/index.rst
+> +++ b/Documentation/security/index.rst
+> @@ -20,3 +20,4 @@ Security Documentation
+>     landlock
+>     secrets/index
+>     ipe
+> +   launch-integrity/index
+> diff --git a/Documentation/security/launch-integrity/index.rst b/Documentation/security/launch-integrity/index.rst
+> new file mode 100644
+> index 000000000000..838328186dd2
+> --- /dev/null
+> +++ b/Documentation/security/launch-integrity/index.rst
+> @@ -0,0 +1,11 @@
+> +=====================================
+> +System Launch Integrity documentation
+> +=====================================
+> +
+> +.. toctree::
+> +   :maxdepth: 1
+> +
+> +   principles
+> +   secure_launch_overview
+> +   secure_launch_details
+> +
+> diff --git a/Documentation/security/launch-integrity/principles.rst b/Documentation/security/launch-integrity/principles.rst
+> new file mode 100644
+> index 000000000000..a0553d1d93c2
+> --- /dev/null
+> +++ b/Documentation/security/launch-integrity/principles.rst
+> @@ -0,0 +1,317 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +.. Copyright (c) 2019-2024 Daniel P. Smith <dpsmith@apertussolutions.com>
+> +
+> +=======================
+> +System Launch Integrity
+> +=======================
+> +
+> +:Author: Daniel P. Smith
+> +:Date: August 2024
+> +
+> +This document serves to establish a common understanding of what a system
+> +launch is, the integrity concern for system launch, and why using a Root of Trust
+> +(RoT) from a Dynamic Launch may be desirable. Throughout this document,
+> +terminology from the Trusted Computing Group (TCG) and National Institute for
+> +Standards and Technology (NIST) is used to ensure that vendor natural language is
+> +used to describe and reference security-related concepts.
+> +
+> +System Launch
+> +=============
+> +
+> +There is a tendency to only consider the classical power-on boot as the only
+> +means to launch an Operating System (OS) on a computer system. In fact, most
+> +modern processors support two system launch methods. To provide clarity,
+> +it is important to establish a common definition of a system launch: during
+> +a single power life cycle of a system, a system launch consists of an initialization
+> +event, typically in hardware, that is followed by an executing software payload
+> +that takes the system from the initialized state to a running state. Driven by
+> +the Trusted Computing Group (TCG) architecture, modern processors are able to
+> +support two methods of system launch. These two methods of system launch are known
+> +as Static Launch and Dynamic Launch.
+> +
+> +Static Launch
+> +-------------
+> +
+> +Static launch is the system launch associated with the power cycle of the CPU.
+> +Thus, static launch refers to the classical power-on boot where the
+> +initialization event is the release of the CPU from reset and the system
+> +firmware is the software payload that brings the system up to a running state.
+> +Since static launch is the system launch associated with the beginning of the
+> +power lifecycle of a system, it is therefore a fixed, one-time system launch.
+> +It is because of this that static launch is referred to and thought of as being
+> +"static".
+> +
+> +Dynamic Launch
+> +--------------
+> +
+> +Modern CPUs architectures provides a mechanism to re-initialize the system to a
+> +"known good" state without requiring a power event. This re-initialization
+> +event is the event for a dynamic launch and is referred to as the Dynamic
+> +Launch Event (DLE). The DLE functions by accepting a software payload, referred
+> +to as the Dynamic Configuration Environment (DCE), that execution is handed to
+> +after the DLE is invoked. The DCE is responsible for bringing the system back
+> +to a running state. Since the dynamic launch is not tied to a power event like
+> +the static launch, this enables a dynamic launch to be initiated at any time
+> +and multiple times during a single power life cycle. This dynamism is the
+> +reasoning behind referring to this system launch as "dynamic".
+> +
+> +Because a dynamic launch can be conducted at any time during a single power
+> +life cycle, they are classified into one of two types: an early launch or a
+> +late launch.
+> +
+> +:Early Launch: When a dynamic launch is used as a transition from a static
+> +   launch chain to the final Operating System.
+> +
+> +:Late Launch: The usage of a dynamic launch by an executing Operating System to
+> +   transition to a "known good" state to perform one or more operations, e.g. to
+> +   launch into a new Operating System.
+> +
+> +System Integrity
+> +================
+> +
+> +A computer system can be considered a collection of mechanisms that work
+> +together to produce a result. The assurance that the mechanisms are functioning
+> +correctly and producing the expected result is the integrity of the system. To
+> +ensure a system's integrity, there is a subset of these mechanisms, commonly
+> +referred to as security mechanisms, that is present to help ensure the system
+> +produces the expected result or at least detects the potential of an unexpected
+> +result. Since the security mechanisms are relied upon to ensue the integrity of
+> +the system, these mechanisms are trusted. Upon inspection, these security
+> +mechanisms each have a set of properties and these properties can be evaluated
+> +to determine how susceptible a mechanism might be to failure. This assessment is
+> +referred to as the Strength of Mechanism, which allows the trustworthiness of
+> +that mechanism to be quantified.
+> +
+> +For software systems, there are two system states for which the integrity is
+> +critical: when the software is loaded into memory and when the software is
+> +executing on the hardware. Ensuring that the expected software is loaded into
+> +memory is referred to as load-time integrity while ensuring that the software
+> +executing is the expected software is the runtime integrity of that software.
 
-kernel test robot noticed the following build errors:
+I'd consider deleting the first paragraph. It really does not provide
+anything useful. The 2nd paragraph is totally sufficient introduction to
+the topic, and makes factors more sense.
 
-[auto build test ERROR on herbert-cryptodev-2.6/master]
-[also build test ERROR on next-20250306]
-[cannot apply to linus/master v6.14-rc5]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+We don't need a phrase in kernel documentation stating that computer is
+a system that produces a result :-)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Herbert-Xu/crypto-scatterwalk-Add-memcpy_sglist/20250306-113457
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-patch link:    https://lore.kernel.org/r/Z8kXhLb681E_FLzs%40gondor.apana.org.au
-patch subject: [v3 PATCH] crypto: scatterwalk - Add memcpy_sglist
-config: i386-buildonly-randconfig-003-20250307 (https://download.01.org/0day-ci/archive/20250307/202503071259.oCOdlrcI-lkp@intel.com/config)
-compiler: gcc-11 (Debian 11.3.0-12) 11.3.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250307/202503071259.oCOdlrcI-lkp@intel.com/reproduce)
+Should be at least easy enough change to make. I don't think it even
+needs any refined version as the text below provides more than enough
+(in many places useful) detail to the topic.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202503071259.oCOdlrcI-lkp@intel.com/
+> +
+> +Load-time Integrity
+> +-------------------
+> +
+> +It is critical to understand what load-time integrity establishes about a
+> +system and what is assumed, i.e. what is being trusted. Load-time integrity is
 
-All error/warnings (new ones prefixed by >>):
+I'd delete the very first sentence completely. It serves zero purpose.
+This would be so much less exhausting read if I could just start on
+getting the information what load-time integrity is.
 
-   crypto/scatterwalk.c: In function 'memcpy_sglist':
->> crypto/scatterwalk.c:107:24: error: too few arguments to function 'scatterwalk_next'
-     107 |                 slen = scatterwalk_next(&swalk, nbytes);
-         |                        ^~~~~~~~~~~~~~~~
-   In file included from crypto/scatterwalk.c:12:
-   include/crypto/scatterwalk.h:129:21: note: declared here
-     129 | static inline void *scatterwalk_next(struct scatter_walk *walk,
-         |                     ^~~~~~~~~~~~~~~~
-   crypto/scatterwalk.c:108:24: error: too few arguments to function 'scatterwalk_next'
-     108 |                 dlen = scatterwalk_next(&dwalk, nbytes);
-         |                        ^~~~~~~~~~~~~~~~
-   In file included from crypto/scatterwalk.c:12:
-   include/crypto/scatterwalk.h:129:21: note: declared here
-     129 | static inline void *scatterwalk_next(struct scatter_walk *walk,
-         |                     ^~~~~~~~~~~~~~~~
-   In file included from arch/x86/include/asm/string.h:3,
-                    from include/linux/string.h:65,
-                    from arch/x86/include/asm/page_32.h:18,
-                    from arch/x86/include/asm/page.h:14,
-                    from arch/x86/include/asm/thread_info.h:12,
-                    from include/linux/thread_info.h:60,
-                    from include/linux/spinlock.h:60,
-                    from include/linux/swait.h:7,
-                    from include/linux/completion.h:12,
-                    from include/linux/crypto.h:15,
-                    from include/crypto/algapi.h:13,
-                    from include/crypto/scatterwalk.h:14,
-                    from crypto/scatterwalk.c:12:
->> crypto/scatterwalk.c:110:29: error: 'struct scatter_walk' has no member named 'addr'
-     110 |                 memcpy(dwalk.addr, swalk.addr, len);
-         |                             ^
-   arch/x86/include/asm/string_32.h:150:42: note: in definition of macro 'memcpy'
-     150 | #define memcpy(t, f, n) __builtin_memcpy(t, f, n)
-         |                                          ^
-   crypto/scatterwalk.c:110:41: error: 'struct scatter_walk' has no member named 'addr'
-     110 |                 memcpy(dwalk.addr, swalk.addr, len);
-         |                                         ^
-   arch/x86/include/asm/string_32.h:150:45: note: in definition of macro 'memcpy'
-     150 | #define memcpy(t, f, n) __builtin_memcpy(t, f, n)
-         |                                             ^
->> crypto/scatterwalk.c:111:46: warning: passing argument 2 of 'scatterwalk_done_dst' makes pointer from integer without a cast [-Wint-conversion]
-     111 |                 scatterwalk_done_dst(&dwalk, len);
-         |                                              ^~~
-         |                                              |
-         |                                              unsigned int
-   In file included from crypto/scatterwalk.c:12:
-   include/crypto/scatterwalk.h:175:47: note: expected 'void *' but argument is of type 'unsigned int'
-     175 |                                         void *vaddr, unsigned int nbytes)
-         |                                         ~~~~~~^~~~~
->> crypto/scatterwalk.c:111:17: error: too few arguments to function 'scatterwalk_done_dst'
-     111 |                 scatterwalk_done_dst(&dwalk, len);
-         |                 ^~~~~~~~~~~~~~~~~~~~
-   In file included from crypto/scatterwalk.c:12:
-   include/crypto/scatterwalk.h:174:20: note: declared here
-     174 | static inline void scatterwalk_done_dst(struct scatter_walk *walk,
-         |                    ^~~~~~~~~~~~~~~~~~~~
->> crypto/scatterwalk.c:112:46: warning: passing argument 2 of 'scatterwalk_done_src' makes pointer from integer without a cast [-Wint-conversion]
-     112 |                 scatterwalk_done_src(&swalk, len);
-         |                                              ^~~
-         |                                              |
-         |                                              unsigned int
-   In file included from crypto/scatterwalk.c:12:
-   include/crypto/scatterwalk.h:159:53: note: expected 'const void *' but argument is of type 'unsigned int'
-     159 |                                         const void *vaddr, unsigned int nbytes)
-         |                                         ~~~~~~~~~~~~^~~~~
->> crypto/scatterwalk.c:112:17: error: too few arguments to function 'scatterwalk_done_src'
-     112 |                 scatterwalk_done_src(&swalk, len);
-         |                 ^~~~~~~~~~~~~~~~~~~~
-   In file included from crypto/scatterwalk.c:12:
-   include/crypto/scatterwalk.h:158:20: note: declared here
-     158 | static inline void scatterwalk_done_src(struct scatter_walk *walk,
-         |                    ^~~~~~~~~~~~~~~~~~~~
+Reassurance serves zero purpose. It is up to the read of kernel
+documentation to make such evaluation.
+
+> +when a trusted entity, i.e. an entity with an assumed integrity, takes an
+> +action to assess an entity being loaded into memory before it is used. A
+> +variety of mechanisms may be used to conduct the assessment, each with
+> +different properties. A particular property is whether the mechanism creates an
+> +evidence of the assessment. Often either cryptographic signature checking or
+> +hashing are the common assessment operations used.
+> +
+> +A signature checking assessment functions by requiring a representation of the
+> +accepted authorities and uses those representations to assess if the entity has
+> +been signed by an accepted authority. The benefit to this process is that
+> +assessment process includes an adjudication of the assessment. The drawbacks
+> +are that 1) the adjudication is susceptible to tampering by the Trusted
+> +Computing Base (TCB), 2) there is no evidence to assert that an untampered
+> +adjudication was completed, and 3) the system must be an active participant in
+> +the key management infrastructure.
+> +
+> +A cryptographic hashing assessment does not adjudicate the assessment, but
+
+This is actually language barrier: is "cryptographic hashing assesment"
+same as "cryptographic measurement"? I'd consider using latter as it has
+wider reach. Most people know what measurement means if they know any of
+cryptography.
+
+> +instead generates evidence of the assessment to be adjudicated independently.
+> +The benefits to this approach is that the assessment may be simple such that it
+> +may be implemented in an immutable mechanism, e.g. in hardware.  Additionally,
+> +it is possible for the adjudication to be conducted where it cannot be tampered
+> +with by the TCB. The drawback is that a compromised environment will be allowed
+> +to execute until an adjudication can be completed.
+> +
+> +Ultimately, load-time integrity provides confidence that the correct entity was
+> +loaded and in the absence of a run-time integrity mechanism assumes, i.e.
+> +trusts, that the entity will never become corrupted.
+> +
+> +Runtime Integrity
+> +-----------------
+> +
+> +Runtime integrity in the general sense is when a trusted entity makes an
+> +assessment of an entity at any point in time during the assessed entity's
+> +execution. A more concrete explanation is the taking of an integrity assessment
+
+Great, this is better than the last subsection as it gets straight into
+the topic! No reassurance part ;-)
+
+> +of an active process executing on the system at any point during the process'
+> +execution. Often the load-time integrity of an operating system's user-space,
+> +i.e. the operating environment, is confused with the runtime integrity of the
+> +system, since it is an integrity assessment of the "runtime" software. The
+> +reality is that actual runtime integrity is a very difficult problem and thus
+> +not very many solutions are public and/or available. One example of a runtime
+> +integrity solution would be Johns Hopkins Advanced Physics Laboratory's (APL)
+> +Linux Kernel Integrity Module (LKIM).
+> +
+> +Trust Chains
+> +============
+> +
+> +Building upon the understanding of security mechanisms to establish load-time
+> +integrity of an entity, it is possible to chain together load-time integrity
+> +assessments to establish the integrity of the whole system. This process is
+> +known as transitive trust and provides the concept of building a chain of
+> +load-time integrity assessments, commonly referred to as a trust chain. These
+> +assessments may be used to adjudicate the load-time integrity of the whole
+> +system. This trust chain is started by a trusted entity that does the first
+> +assessment. This first entity is referred to as the Root of Trust(RoT) with the
+> +entities name being derived from the mechanism used for the assessment, i.e.
+> +RoT for Verification (RTV) and RoT for Measurement (RTM).
+> +
+> +A trust chain is itself a mechanism, specifically a mechanism of mechanisms,
+> +and therefore it also has a Strength of Mechanism. The factors that contribute
+> +to the strength of a trust chain are:
+> +
+> +  - The strength of the chain's RoT
+> +  - The strength of each member of the trust chain
+> +  - The length, i.e. the number of members, of the chain
+> +
+> +Therefore, the strongest trust chains should start with a strong RoT and should
+> +consist of members being of low complexity and minimize the number of members
+> +participating. In a more colloquial sense, a trust chain is only as strong as its
+> +weakest link, thus more links increase the probability of a weak link.
+> +
+> +Dynamic Launch Components
+> +=========================
+> +
+> +The TCG architecture for dynamic launch is composed of a component series
+> +used to set up and then carry out the launch. These components work together to
+> +construct an RTM trust chain that is rooted in the dynamic launch and thus commonly
+> +referred to as the Dynamic Root of Trust for Measurement (DRTM) chain.
+> +
+> +What follows is a brief explanation of each component in execution order. A
+> +subset of these components are what establishes the dynamic launch's trust
+> +chain.
+> +
+> +Dynamic Configuration Environment Preamble
+> +------------------------------------------
+> +
+> +The Dynamic Configuration Environment (DCE) Preamble is responsible for setting
+> +up the system environment in preparation for a dynamic launch. The DCE Preamble
+> +is not a part of the DRTM trust chain.
+> +
+> +Dynamic Launch Event
+> +--------------------
+> +
+> +The dynamic launch event is the event, typically a CPU instruction, that
+> +triggers the system's dynamic launch mechanism to begin the launch process. The
+> +dynamic launch mechanism is also the RoT for the DRTM trust chain.
+> +
+> +Dynamic Configuration Environment
+> +---------------------------------
+> +
+> +The dynamic launch mechanism may have resulted in a reset of a portion of the
+> +system. To bring the system back to an adequate state for system software, the
+> +dynamic launch will hand over control to the DCE. Prior to handing over this
+> +control, the dynamic launch will measure the DCE. Once the DCE is complete, it
+> +will proceed to measure and then execute the Dynamic Launch Measured
+> +Environment (DLME).
+> +
+> +Dynamic Launch Measured Environment
+> +-----------------------------------
+> +
+> +The DLME is the first system kernel to have control of the system, but may not
+> +be the last. Depending on the usage and configuration, the DLME may be the
+> +final/target operating system, or it may be a bootloader that will load the
+> +final/target operating system.
+> +
+> +Why DRTM
+> +========
+
+Nit: maybe 
+
+Why DTRM?
+=========
 
 
-vim +/scatterwalk_next +107 crypto/scatterwalk.c
+> +
+> +It is a fact that DRTM increases the load-time integrity of the system by
+> +providing a trust chain that has an immutable hardware RoT, uses a limited
+> +number of small, special purpose code to establish the trust chain that starts
+> +the target operating system. As mentioned in the Trust Chain section, these are
+> +the main three factors in driving up the strength of a trust chain. As has been
+> +seen with the BootHole exploit, which in fact did not affect the integrity of
+> +DRTM solutions, the sophistication of attacks targeting system launch is at an
+> +all-time high. There is no reason a system should not employ every available
+> +hardware integrity measure. This is the crux of a defense-in-depth
+> +approach to system security. In the past, the now closed SMI gap was often
+> +pointed to as invalidating DRTM, which in fact was nothing but a straw man
+> +argument. As has continued to be demonstrated, if/when SMM is corrupted, it can
+> +always circumvent all load-time integrity (SRTM and DRTM) because it is a
+> +run-time integrity problem. Regardless, Intel and AMD have both deployed
+> +runtime integrity for SMI and SMM which is tied directly to DRTM such that this
+> +perceived deficiency is now non-existent and the world is moving forward with
+> +an expectation that DRTM must be present.
 
-  > 12	#include <crypto/scatterwalk.h>
-    13	#include <linux/kernel.h>
-    14	#include <linux/mm.h>
-    15	#include <linux/module.h>
-    16	#include <linux/scatterlist.h>
-    17	
-    18	void scatterwalk_skip(struct scatter_walk *walk, unsigned int nbytes)
-    19	{
-    20		struct scatterlist *sg = walk->sg;
-    21	
-    22		nbytes += walk->offset - sg->offset;
-    23	
-    24		while (nbytes > sg->length) {
-    25			nbytes -= sg->length;
-    26			sg = sg_next(sg);
-    27		}
-    28		walk->sg = sg;
-    29		walk->offset = sg->offset + nbytes;
-    30	}
-    31	EXPORT_SYMBOL_GPL(scatterwalk_skip);
-    32	
-    33	inline void memcpy_from_scatterwalk(void *buf, struct scatter_walk *walk,
-    34					    unsigned int nbytes)
-    35	{
-    36		do {
-    37			const void *src_addr;
-    38			unsigned int to_copy;
-    39	
-    40			src_addr = scatterwalk_next(walk, nbytes, &to_copy);
-    41			memcpy(buf, src_addr, to_copy);
-    42			scatterwalk_done_src(walk, src_addr, to_copy);
-    43			buf += to_copy;
-    44			nbytes -= to_copy;
-    45		} while (nbytes);
-    46	}
-    47	EXPORT_SYMBOL_GPL(memcpy_from_scatterwalk);
-    48	
-    49	inline void memcpy_to_scatterwalk(struct scatter_walk *walk, const void *buf,
-    50					  unsigned int nbytes)
-    51	{
-    52		do {
-    53			void *dst_addr;
-    54			unsigned int to_copy;
-    55	
-    56			dst_addr = scatterwalk_next(walk, nbytes, &to_copy);
-    57			memcpy(dst_addr, buf, to_copy);
-    58			scatterwalk_done_dst(walk, dst_addr, to_copy);
-    59			buf += to_copy;
-    60			nbytes -= to_copy;
-    61		} while (nbytes);
-    62	}
-    63	EXPORT_SYMBOL_GPL(memcpy_to_scatterwalk);
-    64	
-    65	void memcpy_from_sglist(void *buf, struct scatterlist *sg,
-    66				unsigned int start, unsigned int nbytes)
-    67	{
-    68		struct scatter_walk walk;
-    69	
-    70		if (unlikely(nbytes == 0)) /* in case sg == NULL */
-    71			return;
-    72	
-    73		scatterwalk_start_at_pos(&walk, sg, start);
-    74		memcpy_from_scatterwalk(buf, &walk, nbytes);
-    75	}
-    76	EXPORT_SYMBOL_GPL(memcpy_from_sglist);
-    77	
-    78	void memcpy_to_sglist(struct scatterlist *sg, unsigned int start,
-    79			      const void *buf, unsigned int nbytes)
-    80	{
-    81		struct scatter_walk walk;
-    82	
-    83		if (unlikely(nbytes == 0)) /* in case sg == NULL */
-    84			return;
-    85	
-    86		scatterwalk_start_at_pos(&walk, sg, start);
-    87		memcpy_to_scatterwalk(&walk, buf, nbytes);
-    88	}
-    89	EXPORT_SYMBOL_GPL(memcpy_to_sglist);
-    90	
-    91	void memcpy_sglist(struct scatterlist *dst, struct scatterlist *src,
-    92			   unsigned int nbytes)
-    93	{
-    94		struct scatter_walk swalk;
-    95		struct scatter_walk dwalk;
-    96	
-    97		if (unlikely(nbytes == 0)) /* in case sg == NULL */
-    98			return;
-    99	
-   100		scatterwalk_start(&swalk, src);
-   101		scatterwalk_start(&dwalk, dst);
-   102	
-   103		do {
-   104			unsigned int slen, dlen;
-   105			unsigned int len;
-   106	
- > 107			slen = scatterwalk_next(&swalk, nbytes);
-   108			dlen = scatterwalk_next(&dwalk, nbytes);
-   109			len = min(slen, dlen);
- > 110			memcpy(dwalk.addr, swalk.addr, len);
- > 111			scatterwalk_done_dst(&dwalk, len);
- > 112			scatterwalk_done_src(&swalk, len);
-   113			nbytes -= len;
-   114		} while (nbytes);
-   115	}
-   116	EXPORT_SYMBOL_GPL(memcpy_sglist);
-   117	
+Here's my general feeling about text up to this point. It's way too
+verbose and has bad reach especially for non-native speakers.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+I don't want nitpick every possible sentence that I think could be
+made for punctual.
+
+What I'd suggest instead would be to go through this internalla at
+Oracle with some group of people couple of times and try to cut out
+all the extra fat.
+
+I gave those review comments in order to give an idea what kind of
+stuff look up for. The benefit is that if you get this document more
+readable that also as a side-effect lowers the barrier to review the
+patch series. Right now this is more exhausting to read than some of
+the actualy science papers I've read.
+
+Hope no one takes this personally. What comes after this is much better
+fit but I'd still do similar assessment.
+
+Roughly estimated you could have a document 50% of the current length
+without loss of information content just by being a factor more
+punctual. I'm worried that the series gets ignored partly because
+the documentation is already like climbing to a mountain.
+
+BR, Jarkko
+
+ 
