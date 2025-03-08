@@ -1,222 +1,361 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3F092744E
-	for <linux-crypto@vger.kernel.org>; Sat,  8 Mar 2025 12:45:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55D221DFF0
+	for <linux-crypto@vger.kernel.org>; Sat,  8 Mar 2025 12:53:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741437932; cv=none; b=bpUvhbLhgb2bredxQHfOYPW+AXWOwlHwrJMFJs+wKOsEJeP3RtGTzc5mVWF1PqWhz8aoGySVd9VerAP6krtZMGaXwHS3GTh7RgMUMAKTdQarDJNEVQCPFofSdr+BRda+JPZYKpOOn+J/4UgVLHkrw9f1iUlB1ZlFlUaDSFhpmWY=
+	t=1741438400; cv=none; b=Ls20kJU+Sop83oyD/RwTRxFetUBTJTGCQBVtZcDRzMRvMlMIXzgaXe/ZIxfdJlP2hnEBpCwV/JloDZZuI/mSWPExYBPNnRmyaTgGzvCXKlA+c6B5Z0OrcOPeJM6cdPd30XuzPi3f4bcZFfKoaOqgIann5c6CiNoXzlQMcjDlhgc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741437932; c=relaxed/simple;
-	bh=xRshCf8PFBCO3ICdDD2AsCHtTzpqNbuTyYBGBytJCwg=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To:Cc; b=TyVkSSJMJxv2wVggtGeRb6jW5rSxJAm0+3I6fd7KTMlYo44QKLV0x2E4kB+ASJUsGPjlVI1Znmh42e8gRfhZa5jKB3IWBcfmNT+T0FCIbHIBJ6UzmD8j1vlcGfl49RVVTvTaAsjSRHR0VUzX9qSk6dyqDlfAFaPh4EA1HYCxB+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=mmI/rDDi; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1741438400; c=relaxed/simple;
+	bh=vZWVifJRjH/Lc96YeyJLRPfqffDQB7o7/HzGrIXBYu8=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=I4fcv++KXqL22ZqOX7eWv+JIdkrHA6MaVv1kICrVu/Ekx7D/Tfdpj9Kny7ua0qu2N6mVOqvDfoqJqbTZgsD9ihvGUbcmMeeSGB3YXCmDvJptJBssACsXuhx+U4kQm2MNZwzIvppblkSNLB9sBNQ2rwqEOw6LyeZrU4Q0brAbiQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=cyXVlVoF; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="mmI/rDDi"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="cyXVlVoF"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=Cc:To:Subject:From:References:In-Reply-To:Message-Id:Date:
-	Sender:Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=gASeNtoVmJKfH5nKl9sImiPVqn7xXssmbul7QTdgQ5s=; b=mmI/rDDiDoQWr8iIzEBNLxRra/
-	8Sc/dwEMEYh5D66pclLvNu7lM5C1C5HKLso5kxGozl+qQPdepoetEFUMnuJ6WCQ3Ct22DlgDgthlc
-	n80V/VlDNFVvrjGQirupwT2wAMV6+lPX9I4TI4VOy5/WPiYgTD4buVW6vVNNJ9fGdH89ns2TEPtwk
-	GUJWamkv2V0Vbt404JTZK6b9KiX0lS38Rmg39HueMVZxpOyxw8fF9ObfdUXdeiUYzejVagrNAQdA/
-	enBLz0ps5ZTEOHE2OHdSGGJSQCN54RdJsz0YXnOBn4/QAWv+jUF+Db3Is+05e+ft9kfs0gYcpUR4p
-	x58M7enw==;
+	s=formenos; h=Content-Type:MIME-Version:Message-ID:Subject:To:From:Date:
+	Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=Vx5OmdqE/Wrunz3calnSQTGYvEKbuDnLHokWU41W/e0=; b=cyXVlVoFRv/Kqwv1PxbxegGQX1
+	RGAxwLcW/zLs0t4iFrmW9bbFiLKt5CsHJF5OVvzQLfGx0cBDcAfns2L07RAczp3hSvhMvabGujTsw
+	4OC/an99f5VuFRja51EQ87J9jRytODI4A2E+HaYwmGVzP1II069c4pTM9ch9UBk2510iRda9FHPkj
+	r8LUDv7wY8RVMNFCVFQ7Kb+ns1CqUPaGejPoloxrZKd5LCAgz3tBUE1RwgWRhitwyF0EXyoavKxHq
+	XGXviK4WeDw8632BkHQjs+KjRwpJu6+xIDw0ubosUwBtc61gztL5yLHWPAZlFq1qFwEXF/+QuNZw9
+	lftjrv6w==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tqtYT-004r9S-2r;
-	Sat, 08 Mar 2025 20:45:26 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 08 Mar 2025 20:45:25 +0800
-Date: Sat, 08 Mar 2025 20:45:25 +0800
-Message-Id: <3fd9a16e66e9c708b9b75019251b8bb241597ccd.1741437826.git.herbert@gondor.apana.org.au>
-In-Reply-To: <cover.1741437826.git.herbert@gondor.apana.org.au>
-References: <cover.1741437826.git.herbert@gondor.apana.org.au>
+	id 1tqtg1-004rCY-1m;
+	Sat, 08 Mar 2025 20:53:14 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 08 Mar 2025 20:53:13 +0800
+Date: Sat, 8 Mar 2025 20:53:13 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v3 PATCH 3/3] crypto: skcipher - Eliminate duplicate virt.addr field
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Cc: Eric Biggers <ebiggers@kernel.org>
+Subject: [PATCH] crypto: skcipher - Make skcipher_walk src.virt.addr const
+Message-ID: <Z8w9uScE4PHqL2Vr@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Reuse the addr field from struct scatter_walk for skcipher_walk.
+This patch is based on the scatterwalk_next/memcpy_sglist patch
+series.
 
-Keep the existing virt.addr fields but make them const for the
-user to access the mapped address.
+---8<---
+Mark the src.virt.addr field in struct skcipher_walk as a pointer
+to const data.  This guarantees that the user won't modify the data
+which should be done through dst.virt.addr to ensure that flushing
+is done when necessary.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- crypto/skcipher.c                  | 29 ++++++++++++-----------------
- include/crypto/algapi.h            |  5 +++--
- include/crypto/internal/skcipher.h | 26 +++++++++++++++++++++-----
- 3 files changed, 36 insertions(+), 24 deletions(-)
+ arch/arm/crypto/aes-ce-glue.c          |  2 +-
+ arch/arm64/crypto/aes-neonbs-glue.c    |  3 ++-
+ arch/powerpc/crypto/aes-gcm-p10-glue.c |  6 +++---
+ arch/powerpc/crypto/aes_ctr.c          |  2 +-
+ arch/sparc/crypto/aes_glue.c           |  2 +-
+ arch/x86/crypto/des3_ede_glue.c        |  2 +-
+ crypto/ctr.c                           | 10 ++++-----
+ crypto/lrw.c                           |  2 +-
+ crypto/pcbc.c                          | 28 +++++++++++++-------------
+ crypto/xctr.c                          |  2 +-
+ crypto/xts.c                           |  2 +-
+ include/crypto/ctr.h                   |  2 +-
+ include/crypto/internal/skcipher.h     |  2 +-
+ 13 files changed, 33 insertions(+), 32 deletions(-)
 
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index 0c6911154241..ab5d852febcd 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -43,14 +43,12 @@ static inline void skcipher_map_src(struct skcipher_walk *walk)
- {
- 	/* XXX */
- 	walk->in.__addr = scatterwalk_map(&walk->in);
--	walk->src.virt.addr = walk->in.addr;
- }
- 
- static inline void skcipher_map_dst(struct skcipher_walk *walk)
- {
- 	/* XXX */
- 	walk->out.__addr = scatterwalk_map(&walk->out);
--	walk->dst.virt.addr = walk->out.addr;
- }
- 
- static inline gfp_t skcipher_walk_gfp(struct skcipher_walk *walk)
-@@ -100,8 +98,7 @@ int skcipher_walk_done(struct skcipher_walk *walk, int res)
- 				    SKCIPHER_WALK_DIFF)))) {
- 		scatterwalk_advance(&walk->in, n);
- 	} else if (walk->flags & SKCIPHER_WALK_DIFF) {
--		scatterwalk_unmap(walk->src.virt.addr);
--		scatterwalk_advance(&walk->in, n);
-+		scatterwalk_done_src(&walk->in, n);
- 	} else if (walk->flags & SKCIPHER_WALK_COPY) {
- 		scatterwalk_advance(&walk->in, n);
- 		skcipher_map_dst(walk);
-@@ -116,11 +113,8 @@ int skcipher_walk_done(struct skcipher_walk *walk, int res)
- 			 */
- 			res = -EINVAL;
- 			total = 0;
--		} else {
--			u8 *buf = PTR_ALIGN(walk->buffer, walk->alignmask + 1);
--
--			memcpy_to_scatterwalk(&walk->out, buf, n);
--		}
-+		} else
-+			memcpy_to_scatterwalk(&walk->out, walk->out.addr, n);
- 		goto dst_done;
+diff --git a/arch/arm/crypto/aes-ce-glue.c b/arch/arm/crypto/aes-ce-glue.c
+index 21df5e7f51f9..1cf61f51e766 100644
+--- a/arch/arm/crypto/aes-ce-glue.c
++++ b/arch/arm/crypto/aes-ce-glue.c
+@@ -399,9 +399,9 @@ static int ctr_encrypt(struct skcipher_request *req)
  	}
+ 	if (walk.nbytes) {
+ 		u8 __aligned(8) tail[AES_BLOCK_SIZE];
++		const u8 *tsrc = walk.src.virt.addr;
+ 		unsigned int nbytes = walk.nbytes;
+ 		u8 *tdst = walk.dst.virt.addr;
+-		u8 *tsrc = walk.src.virt.addr;
  
-@@ -162,7 +156,7 @@ static int skcipher_next_slow(struct skcipher_walk *walk, unsigned int bsize)
+ 		/*
+ 		 * Tell aes_ctr_encrypt() to process a tail block.
+diff --git a/arch/arm64/crypto/aes-neonbs-glue.c b/arch/arm64/crypto/aes-neonbs-glue.c
+index 46425e7b9755..c4a623e86593 100644
+--- a/arch/arm64/crypto/aes-neonbs-glue.c
++++ b/arch/arm64/crypto/aes-neonbs-glue.c
+@@ -287,7 +287,8 @@ static int __xts_crypt(struct skcipher_request *req, bool encrypt,
+ 	struct skcipher_walk walk;
+ 	int nbytes, err;
+ 	int first = 1;
+-	u8 *out, *in;
++	const u8 *in;
++	u8 *out;
+ 
+ 	if (req->cryptlen < AES_BLOCK_SIZE)
+ 		return -EINVAL;
+diff --git a/arch/powerpc/crypto/aes-gcm-p10-glue.c b/arch/powerpc/crypto/aes-gcm-p10-glue.c
+index 679f52794baf..85f4fd4b1bdc 100644
+--- a/arch/powerpc/crypto/aes-gcm-p10-glue.c
++++ b/arch/powerpc/crypto/aes-gcm-p10-glue.c
+@@ -35,9 +35,9 @@ MODULE_ALIAS_CRYPTO("aes");
+ asmlinkage int aes_p10_set_encrypt_key(const u8 *userKey, const int bits,
+ 				       void *key);
+ asmlinkage void aes_p10_encrypt(const u8 *in, u8 *out, const void *key);
+-asmlinkage void aes_p10_gcm_encrypt(u8 *in, u8 *out, size_t len,
++asmlinkage void aes_p10_gcm_encrypt(const u8 *in, u8 *out, size_t len,
+ 				    void *rkey, u8 *iv, void *Xi);
+-asmlinkage void aes_p10_gcm_decrypt(u8 *in, u8 *out, size_t len,
++asmlinkage void aes_p10_gcm_decrypt(const u8 *in, u8 *out, size_t len,
+ 				    void *rkey, u8 *iv, void *Xi);
+ asmlinkage void gcm_init_htable(unsigned char htable[], unsigned char Xi[]);
+ asmlinkage void gcm_ghash_p10(unsigned char *Xi, unsigned char *Htable,
+@@ -261,7 +261,7 @@ static int p10_aes_gcm_crypt(struct aead_request *req, u8 *riv,
+ 		return ret;
+ 
+ 	while ((nbytes = walk.nbytes) > 0 && ret == 0) {
+-		u8 *src = walk.src.virt.addr;
++		const u8 *src = walk.src.virt.addr;
+ 		u8 *dst = walk.dst.virt.addr;
+ 		u8 buf[AES_BLOCK_SIZE];
+ 
+diff --git a/arch/powerpc/crypto/aes_ctr.c b/arch/powerpc/crypto/aes_ctr.c
+index 9a3da8cd62f3..3da75f42529a 100644
+--- a/arch/powerpc/crypto/aes_ctr.c
++++ b/arch/powerpc/crypto/aes_ctr.c
+@@ -69,9 +69,9 @@ static int p8_aes_ctr_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ static void p8_aes_ctr_final(const struct p8_aes_ctr_ctx *ctx,
+ 			     struct skcipher_walk *walk)
  {
- 	unsigned alignmask = walk->alignmask;
- 	unsigned n;
--	u8 *buffer;
-+	void *buffer;
++	const u8 *src = walk->src.virt.addr;
+ 	u8 *ctrblk = walk->iv;
+ 	u8 keystream[AES_BLOCK_SIZE];
+-	u8 *src = walk->src.virt.addr;
+ 	u8 *dst = walk->dst.virt.addr;
+ 	unsigned int nbytes = walk->nbytes;
  
- 	if (!walk->buffer)
- 		walk->buffer = walk->page;
-@@ -176,10 +170,11 @@ static int skcipher_next_slow(struct skcipher_walk *walk, unsigned int bsize)
- 			return skcipher_walk_done(walk, -ENOMEM);
- 		walk->buffer = buffer;
- 	}
--	walk->dst.virt.addr = PTR_ALIGN(buffer, alignmask + 1);
--	walk->src.virt.addr = walk->dst.virt.addr;
- 
--	memcpy_from_scatterwalk(walk->src.virt.addr, &walk->in, bsize);
-+	buffer = PTR_ALIGN(buffer, alignmask + 1);
-+	memcpy_from_scatterwalk(buffer, &walk->in, bsize);
-+	walk->out.__addr = buffer;
-+	walk->in.__addr = walk->out.addr;
- 
- 	walk->nbytes = bsize;
- 	walk->flags |= SKCIPHER_WALK_SLOW;
-@@ -189,7 +184,7 @@ static int skcipher_next_slow(struct skcipher_walk *walk, unsigned int bsize)
- 
- static int skcipher_next_copy(struct skcipher_walk *walk)
+diff --git a/arch/sparc/crypto/aes_glue.c b/arch/sparc/crypto/aes_glue.c
+index e3d2138ff9e2..683150830356 100644
+--- a/arch/sparc/crypto/aes_glue.c
++++ b/arch/sparc/crypto/aes_glue.c
+@@ -321,7 +321,7 @@ static void ctr_crypt_final(const struct crypto_sparc64_aes_ctx *ctx,
  {
--	u8 *tmp = walk->page;
-+	void *tmp = walk->page;
+ 	u8 *ctrblk = walk->iv;
+ 	u64 keystream[AES_BLOCK_SIZE / sizeof(u64)];
+-	u8 *src = walk->src.virt.addr;
++	const u8 *src = walk->src.virt.addr;
+ 	u8 *dst = walk->dst.virt.addr;
+ 	unsigned int nbytes = walk->nbytes;
  
- 	skcipher_map_src(walk);
- 	memcpy(tmp, walk->src.virt.addr, walk->nbytes);
-@@ -199,8 +194,8 @@ static int skcipher_next_copy(struct skcipher_walk *walk)
- 	 * processed (which might be less than walk->nbytes) is known.
- 	 */
+diff --git a/arch/x86/crypto/des3_ede_glue.c b/arch/x86/crypto/des3_ede_glue.c
+index e88439d3828e..34600f90d8a6 100644
+--- a/arch/x86/crypto/des3_ede_glue.c
++++ b/arch/x86/crypto/des3_ede_glue.c
+@@ -73,7 +73,7 @@ static int ecb_crypt(struct skcipher_request *req, const u32 *expkey)
+ 	err = skcipher_walk_virt(&walk, req, false);
  
--	walk->src.virt.addr = tmp;
--	walk->dst.virt.addr = tmp;
-+	walk->in.__addr = tmp;
-+	walk->out.__addr = tmp;
- 	return 0;
- }
+ 	while ((nbytes = walk.nbytes)) {
+-		u8 *wsrc = walk.src.virt.addr;
++		const u8 *wsrc = walk.src.virt.addr;
+ 		u8 *wdst = walk.dst.virt.addr;
  
-@@ -214,7 +209,7 @@ static int skcipher_next_fast(struct skcipher_walk *walk)
- 		(u8 *)(sg_page(walk->out.sg) + (walk->out.offset >> PAGE_SHIFT));
+ 		/* Process four block batch */
+diff --git a/crypto/ctr.c b/crypto/ctr.c
+index 73c0d6e53b2f..97a947b0a876 100644
+--- a/crypto/ctr.c
++++ b/crypto/ctr.c
+@@ -33,7 +33,7 @@ static void crypto_ctr_crypt_final(struct skcipher_walk *walk,
+ 	u8 *ctrblk = walk->iv;
+ 	u8 tmp[MAX_CIPHER_BLOCKSIZE + MAX_CIPHER_ALIGNMASK];
+ 	u8 *keystream = PTR_ALIGN(tmp + 0, alignmask + 1);
+-	u8 *src = walk->src.virt.addr;
++	const u8 *src = walk->src.virt.addr;
+ 	u8 *dst = walk->dst.virt.addr;
+ 	unsigned int nbytes = walk->nbytes;
  
- 	skcipher_map_dst(walk);
--	walk->src.virt.addr = walk->dst.virt.addr;
-+	walk->in.__addr = walk->dst.virt.addr;
+@@ -50,7 +50,7 @@ static int crypto_ctr_crypt_segment(struct skcipher_walk *walk,
+ 		   crypto_cipher_alg(tfm)->cia_encrypt;
+ 	unsigned int bsize = crypto_cipher_blocksize(tfm);
+ 	u8 *ctrblk = walk->iv;
+-	u8 *src = walk->src.virt.addr;
++	const u8 *src = walk->src.virt.addr;
+ 	u8 *dst = walk->dst.virt.addr;
+ 	unsigned int nbytes = walk->nbytes;
  
- 	if (diff) {
- 		walk->flags |= SKCIPHER_WALK_DIFF;
-diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-index f92e22686a68..6e07bbc04089 100644
---- a/include/crypto/algapi.h
-+++ b/include/crypto/algapi.h
-@@ -107,14 +107,15 @@ struct crypto_queue {
- };
+@@ -77,20 +77,20 @@ static int crypto_ctr_crypt_inplace(struct skcipher_walk *walk,
+ 	unsigned int bsize = crypto_cipher_blocksize(tfm);
+ 	unsigned long alignmask = crypto_cipher_alignmask(tfm);
+ 	unsigned int nbytes = walk->nbytes;
++	u8 *dst = walk->dst.virt.addr;
+ 	u8 *ctrblk = walk->iv;
+-	u8 *src = walk->src.virt.addr;
+ 	u8 tmp[MAX_CIPHER_BLOCKSIZE + MAX_CIPHER_ALIGNMASK];
+ 	u8 *keystream = PTR_ALIGN(tmp + 0, alignmask + 1);
  
- struct scatter_walk {
--	struct scatterlist *sg;
--	unsigned int offset;
-+	/* Must be the first member, see struct skcipher_walk. */
- 	union {
- 		void *const addr;
+ 	do {
+ 		/* create keystream */
+ 		fn(crypto_cipher_tfm(tfm), keystream, ctrblk);
+-		crypto_xor(src, keystream, bsize);
++		crypto_xor(dst, keystream, bsize);
  
- 		/* Private API field, do not touch. */
- 		union crypto_no_such_thing *__addr;
- 	};
-+	struct scatterlist *sg;
-+	unsigned int offset;
- };
+ 		/* increment counter in counterblock */
+ 		crypto_inc(ctrblk, bsize);
  
- struct crypto_attr_alg {
+-		src += bsize;
++		dst += bsize;
+ 	} while ((nbytes -= bsize) >= bsize);
+ 
+ 	return nbytes;
+diff --git a/crypto/lrw.c b/crypto/lrw.c
+index e216fbf2b786..391ae0f7641f 100644
+--- a/crypto/lrw.c
++++ b/crypto/lrw.c
+@@ -167,7 +167,7 @@ static int lrw_xor_tweak(struct skcipher_request *req, bool second_pass)
+ 
+ 	while (w.nbytes) {
+ 		unsigned int avail = w.nbytes;
+-		be128 *wsrc;
++		const be128 *wsrc;
+ 		be128 *wdst;
+ 
+ 		wsrc = w.src.virt.addr;
+diff --git a/crypto/pcbc.c b/crypto/pcbc.c
+index cbfb3ac14b3a..9d2e56d6744a 100644
+--- a/crypto/pcbc.c
++++ b/crypto/pcbc.c
+@@ -22,8 +22,8 @@ static int crypto_pcbc_encrypt_segment(struct skcipher_request *req,
+ 				       struct crypto_cipher *tfm)
+ {
+ 	int bsize = crypto_cipher_blocksize(tfm);
++	const u8 *src = walk->src.virt.addr;
+ 	unsigned int nbytes = walk->nbytes;
+-	u8 *src = walk->src.virt.addr;
+ 	u8 *dst = walk->dst.virt.addr;
+ 	u8 * const iv = walk->iv;
+ 
+@@ -45,17 +45,17 @@ static int crypto_pcbc_encrypt_inplace(struct skcipher_request *req,
+ {
+ 	int bsize = crypto_cipher_blocksize(tfm);
+ 	unsigned int nbytes = walk->nbytes;
+-	u8 *src = walk->src.virt.addr;
++	u8 *dst = walk->dst.virt.addr;
+ 	u8 * const iv = walk->iv;
+ 	u8 tmpbuf[MAX_CIPHER_BLOCKSIZE];
+ 
+ 	do {
+-		memcpy(tmpbuf, src, bsize);
+-		crypto_xor(iv, src, bsize);
+-		crypto_cipher_encrypt_one(tfm, src, iv);
+-		crypto_xor_cpy(iv, tmpbuf, src, bsize);
++		memcpy(tmpbuf, dst, bsize);
++		crypto_xor(iv, dst, bsize);
++		crypto_cipher_encrypt_one(tfm, dst, iv);
++		crypto_xor_cpy(iv, tmpbuf, dst, bsize);
+ 
+-		src += bsize;
++		dst += bsize;
+ 	} while ((nbytes -= bsize) >= bsize);
+ 
+ 	return nbytes;
+@@ -89,8 +89,8 @@ static int crypto_pcbc_decrypt_segment(struct skcipher_request *req,
+ 				       struct crypto_cipher *tfm)
+ {
+ 	int bsize = crypto_cipher_blocksize(tfm);
++	const u8 *src = walk->src.virt.addr;
+ 	unsigned int nbytes = walk->nbytes;
+-	u8 *src = walk->src.virt.addr;
+ 	u8 *dst = walk->dst.virt.addr;
+ 	u8 * const iv = walk->iv;
+ 
+@@ -112,17 +112,17 @@ static int crypto_pcbc_decrypt_inplace(struct skcipher_request *req,
+ {
+ 	int bsize = crypto_cipher_blocksize(tfm);
+ 	unsigned int nbytes = walk->nbytes;
+-	u8 *src = walk->src.virt.addr;
++	u8 *dst = walk->dst.virt.addr;
+ 	u8 * const iv = walk->iv;
+ 	u8 tmpbuf[MAX_CIPHER_BLOCKSIZE] __aligned(__alignof__(u32));
+ 
+ 	do {
+-		memcpy(tmpbuf, src, bsize);
+-		crypto_cipher_decrypt_one(tfm, src, src);
+-		crypto_xor(src, iv, bsize);
+-		crypto_xor_cpy(iv, src, tmpbuf, bsize);
++		memcpy(tmpbuf, dst, bsize);
++		crypto_cipher_decrypt_one(tfm, dst, dst);
++		crypto_xor(dst, iv, bsize);
++		crypto_xor_cpy(iv, dst, tmpbuf, bsize);
+ 
+-		src += bsize;
++		dst += bsize;
+ 	} while ((nbytes -= bsize) >= bsize);
+ 
+ 	return nbytes;
+diff --git a/crypto/xctr.c b/crypto/xctr.c
+index 6ed9c85ededa..9c536ab6d2e5 100644
+--- a/crypto/xctr.c
++++ b/crypto/xctr.c
+@@ -78,7 +78,7 @@ static int crypto_xctr_crypt_inplace(struct skcipher_walk *walk,
+ 		   crypto_cipher_alg(tfm)->cia_encrypt;
+ 	unsigned long alignmask = crypto_cipher_alignmask(tfm);
+ 	unsigned int nbytes = walk->nbytes;
+-	u8 *data = walk->src.virt.addr;
++	u8 *data = walk->dst.virt.addr;
+ 	u8 tmp[XCTR_BLOCKSIZE + MAX_CIPHER_ALIGNMASK];
+ 	u8 *keystream = PTR_ALIGN(tmp + 0, alignmask + 1);
+ 	__le32 ctr32 = cpu_to_le32(byte_ctr / XCTR_BLOCKSIZE + 1);
+diff --git a/crypto/xts.c b/crypto/xts.c
+index 821060ede2cf..31529c9ef08f 100644
+--- a/crypto/xts.c
++++ b/crypto/xts.c
+@@ -99,7 +99,7 @@ static int xts_xor_tweak(struct skcipher_request *req, bool second_pass,
+ 
+ 	while (w.nbytes) {
+ 		unsigned int avail = w.nbytes;
+-		le128 *wsrc;
++		const le128 *wsrc;
+ 		le128 *wdst;
+ 
+ 		wsrc = w.src.virt.addr;
+diff --git a/include/crypto/ctr.h b/include/crypto/ctr.h
+index a1c66d1001af..da1ee73e9ce9 100644
+--- a/include/crypto/ctr.h
++++ b/include/crypto/ctr.h
+@@ -34,8 +34,8 @@ static inline int crypto_ctr_encrypt_walk(struct skcipher_request *req,
+ 	err = skcipher_walk_virt(&walk, req, false);
+ 
+ 	while (walk.nbytes > 0) {
++		const u8 *src = walk.src.virt.addr;
+ 		u8 *dst = walk.dst.virt.addr;
+-		u8 *src = walk.src.virt.addr;
+ 		int nbytes = walk.nbytes;
+ 		int tail = 0;
+ 
 diff --git a/include/crypto/internal/skcipher.h b/include/crypto/internal/skcipher.h
-index d6ae7a86fed2..c705124432c5 100644
+index c705124432c5..a958ab0636ad 100644
 --- a/include/crypto/internal/skcipher.h
 +++ b/include/crypto/internal/skcipher.h
-@@ -56,15 +56,31 @@ struct crypto_lskcipher_spawn {
- 
- struct skcipher_walk {
- 	union {
-+		/* Virtual address of the source. */
+@@ -59,7 +59,7 @@ struct skcipher_walk {
+ 		/* Virtual address of the source. */
  		struct {
--			void *addr;
--		} virt;
--	} src, dst;
-+			struct {
-+				void *const addr;
-+			} virt;
-+		} src;
-+
-+		/* Private field for the API, do not use. */
-+		struct scatter_walk in;
-+	};
+ 			struct {
+-				void *const addr;
++				const void *const addr;
+ 			} virt;
+ 		} src;
  
--	struct scatter_walk in;
- 	unsigned int nbytes;
- 
--	struct scatter_walk out;
-+	union {
-+		/* Virtual address of the destination. */
-+		struct {
-+			struct {
-+				void *const addr;
-+			} virt;
-+		} dst;
-+
-+		/* Private field for the API, do not use. */
-+		struct scatter_walk out;
-+	};
-+
- 	unsigned int total;
- 
- 	u8 *page;
 -- 
 2.39.5
 
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
