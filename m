@@ -1,43 +1,41 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD6907482
-	for <linux-crypto@vger.kernel.org>; Sun,  9 Mar 2025 02:43:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD6C717BA5
+	for <linux-crypto@vger.kernel.org>; Sun,  9 Mar 2025 02:43:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741488200; cv=none; b=Unz2Qzqb2OJy8XBgMrOHOTNDlw6IVgz5o+B8NN05u1Df/DK7rDvttqz4FNJ6V90+NKZJrPPTevy+EmS2qar/eqRUxh9f/MiS5JDZLEPemu014zcrdGg5lXgrbn5DCuovf+7fmAfKvaECfHYfAVYP4X/YG4WpyfFF1+jK7hkPSUM=
+	t=1741488200; cv=none; b=ssThHCSOI7tWQZ8oVBrCxoezVikUoRQSdslthZBAZ8nS2vdNdxeqnUb+XmUYAe7cpt1bi5+QiF0Rtl1tV8SoEJnGcSmHTjAVbgtT+T1zzWXGTjOpiFQvWYpYhmePSgfOm5knWqCcQPPt4Tfwrglh/mD6Li0VkXmru9vx8yMlQ9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1741488200; c=relaxed/simple;
-	bh=JqT3luKWkHDtKFuAPg5vbVht2HgXC3ny+6tJyRfcRjw=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To:Cc; b=I3JFjT+RLa4GdXaMtnHG6na+P6ifcAsFsDKNIjlxPDhOWeYAYa6GKdlqn9JOqsKDaQLAHqkNHoPcNR+waoFBGxsVf/PW5oSycutXrNW6TpDfPEpYrCFuVDolYbtGhcTH2RRcA5HMa9Yv+G7449IVRLCoGztm9+8NGRAWcjxS0YY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=DQ7P9bVW; arc=none smtp.client-ip=144.6.53.87
+	bh=tmLysB9Khp1iYmMoyw5NJISthFKCFcw4TBvLLR6uQk4=;
+	h=Date:Message-Id:From:Subject:To:Cc; b=HfxEzh4NOSk4o29LsujTqCVg8VUYQw7PMGMTN3ql4pmhSJ4qeaninY3qGzGhgthXvSO+bEWtIG7czxpw5Ov2yfiCQcpctBjVmh//YMB7f5YQuBWJa0gmPQblGgMGHhzqFpqwblVYNXHBOBVRYPr6Lcs85yO9un0dEbn7LzZn0lo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=OIILnKm8; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="DQ7P9bVW"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="OIILnKm8"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=Cc:To:Subject:From:References:In-Reply-To:Message-Id:Date:
-	Sender:Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=1jO9xadjqBiVEi8B/sfCDao+tK2caka5a7BaYtwhA+w=; b=DQ7P9bVWQL/3PMFd6enfEstzu+
-	hpu3I5O/vNp64BAoDCvSZgjbVoADsY57LVOyUJ1XoNwreSDt6OpqtXfSaD6kRPd+7ZcBabQtPEQ2O
-	Na0oxDoEn47BeaOa/zvR+UpE9LUXK8V4IdwEOpaB8moMfHnbbpsEid2AlH+NSXEYCADiVVWNBw8EB
-	qgyC25CVvsKqmmDq/omrTua+aETMWuy0+QWmsBogGDYFD9ZKsKiR9ytKogoywUwUe5oC/UEPYzlgs
-	/rKpL5gSglT+nonluOZtYg85SGGp8z7VVX5cpf9Tzsz3dK6TkIgyXSU1vjcSddOXCEf4fkjShclXq
-	Xw22YJkw==;
+	s=formenos; h=Cc:To:Subject:From:Message-Id:Date:Sender:Reply-To:MIME-Version
+	:Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=wmmkOpiVwPDJW+36ScQPJAsuKUZhZI4DO4YY8RoHQ7s=; b=OIILnKm8dFDzsi/XIkoyJio2tu
+	LeU0SYlIXMm/SueRQ1tFIhC5qRb+Ow/OYfkQDgw7OpHF2k+Fe7CHwggj3CEbc8Ul4ZplH76Uld8qj
+	yvXVl+4G2RpO7PahXPdwm1rqknhAkagIXrcDeyhSQmARsav1zg0fV4mDo4tQB9YGbONgsedVcxcd2
+	bT7/EehWScpry75qHRXauHzhCTo7a9TLkhWpmHRJ4xFF+v/AHa5UM0AQr8OphLUggTsp9po7Kl6Bi
+	R36b1BeuX8TNyMCmOIUABFyyPshiqOxow1a04ZRSdv86s2q/aFDSJcaUjHcdYAqIFzw2ipwH+dDC9
+	Pc80Dy3A==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tr6dE-004zHK-1L;
-	Sun, 09 Mar 2025 10:43:13 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 09 Mar 2025 10:43:12 +0800
-Date: Sun, 09 Mar 2025 10:43:12 +0800
-Message-Id: <e9541bcd5960c6113ca60bfc9d6bbe9413e89eb3.1741488107.git.herbert@gondor.apana.org.au>
-In-Reply-To: <cover.1741488107.git.herbert@gondor.apana.org.au>
-References: <cover.1741488107.git.herbert@gondor.apana.org.au>
+	id 1tr6dC-004zHG-0M;
+	Sun, 09 Mar 2025 10:43:11 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 09 Mar 2025 10:43:10 +0800
+Date: Sun, 09 Mar 2025 10:43:10 +0800
+Message-Id: <cover.1741488107.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v3 PATCH 1/8] crypto: api - Add cra_type->destroy hook
+Subject: [v3 PATCH 0/8] crypto: acomp - Add request chaining and virtual address support
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Cc: Yosry Ahmed <yosry.ahmed@linux.dev>, Kanchana P Sridhar <kanchana.p.sridhar@intel.com>, Sergey Senozhatsky <senozhatsky@chromium.org>
 Precedence: bulk
@@ -46,66 +44,42 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
-Add a cra_type->destroy hook so that resources can be freed after
-the last user of a registered algorithm is gone.
+v3 adds mixing SG with virtual, e.g., SG src with virtual dst.
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
- crypto/api.c      | 10 ++++++++++
- crypto/internal.h |  6 ++++--
- 2 files changed, 14 insertions(+), 2 deletions(-)
+This patch series adds reqeust chaining and virtual address support
+to the crypto_acomp interface.
 
-diff --git a/crypto/api.c b/crypto/api.c
-index c2c4eb14ef95..91957bb52f3f 100644
---- a/crypto/api.c
-+++ b/crypto/api.c
-@@ -707,5 +707,15 @@ void crypto_req_done(void *data, int err)
- }
- EXPORT_SYMBOL_GPL(crypto_req_done);
- 
-+void crypto_destroy_alg(struct crypto_alg *alg)
-+{
-+	if (alg->cra_type && alg->cra_type->destroy)
-+		alg->cra_type->destroy(alg);
-+
-+	if (alg->cra_destroy)
-+		alg->cra_destroy(alg);
-+}
-+EXPORT_SYMBOL_GPL(crypto_destroy_alg);
-+
- MODULE_DESCRIPTION("Cryptographic core API");
- MODULE_LICENSE("GPL");
-diff --git a/crypto/internal.h b/crypto/internal.h
-index 08d43b40e7db..11567ea24fc3 100644
---- a/crypto/internal.h
-+++ b/crypto/internal.h
-@@ -40,6 +40,7 @@ struct crypto_type {
- 	void (*show)(struct seq_file *m, struct crypto_alg *alg);
- 	int (*report)(struct sk_buff *skb, struct crypto_alg *alg);
- 	void (*free)(struct crypto_instance *inst);
-+	void (*destroy)(struct crypto_alg *alg);
- 
- 	unsigned int type;
- 	unsigned int maskclear;
-@@ -127,6 +128,7 @@ void *crypto_create_tfm_node(struct crypto_alg *alg,
- 			const struct crypto_type *frontend, int node);
- void *crypto_clone_tfm(const struct crypto_type *frontend,
- 		       struct crypto_tfm *otfm);
-+void crypto_destroy_alg(struct crypto_alg *alg);
- 
- static inline void *crypto_create_tfm(struct crypto_alg *alg,
- 			const struct crypto_type *frontend)
-@@ -163,8 +165,8 @@ static inline struct crypto_alg *crypto_alg_get(struct crypto_alg *alg)
- 
- static inline void crypto_alg_put(struct crypto_alg *alg)
- {
--	if (refcount_dec_and_test(&alg->cra_refcnt) && alg->cra_destroy)
--		alg->cra_destroy(alg);
-+	if (refcount_dec_and_test(&alg->cra_refcnt))
-+		crypto_destroy_alg(alg);
- }
- 
- static inline int crypto_tmpl_get(struct crypto_template *tmpl)
+Herbert Xu (8):
+  crypto: api - Add cra_type->destroy hook
+  crypto: scomp - Remove tfm argument from alloc/free_ctx
+  crypto: acomp - Move stream management into scomp layer
+  crypto: scomp - Disable BH when taking per-cpu spin lock
+  crypto: acomp - Add request chaining and virtual addresses
+  crypto: testmgr - Remove NULL dst acomp tests
+  crypto: scomp - Remove support for most non-trivial destination SG
+    lists
+  crypto: scomp - Add chaining and virtual address support
+
+ crypto/842.c                           |   8 +-
+ crypto/acompress.c                     | 204 +++++++++++++++++++---
+ crypto/api.c                           |  10 ++
+ crypto/compress.h                      |   2 -
+ crypto/deflate.c                       |   4 +-
+ crypto/internal.h                      |   6 +-
+ crypto/lz4.c                           |   8 +-
+ crypto/lz4hc.c                         |   8 +-
+ crypto/lzo-rle.c                       |   8 +-
+ crypto/lzo.c                           |   8 +-
+ crypto/scompress.c                     | 225 +++++++++++++++----------
+ crypto/testmgr.c                       |  29 ----
+ crypto/zstd.c                          |   4 +-
+ drivers/crypto/cavium/zip/zip_crypto.c |   6 +-
+ drivers/crypto/cavium/zip/zip_crypto.h |   6 +-
+ include/crypto/acompress.h             | 225 ++++++++++++++++++++++---
+ include/crypto/internal/acompress.h    |  59 +++++--
+ include/crypto/internal/scompress.h    |  18 +-
+ 18 files changed, 611 insertions(+), 227 deletions(-)
+
 -- 
 2.39.5
 
