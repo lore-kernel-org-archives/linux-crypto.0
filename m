@@ -1,109 +1,113 @@
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CA651BC41;
-	Sat,  8 Mar 2025 13:33:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23F962914;
+	Sun,  9 Mar 2025 00:31:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741440808; cv=none; b=L/ihbVKC1ezTRGDx3HaSAMp3WO5N5Tius7IftNhJKB/HWxjz9NIn/pksAJpXbAL7/0GbnHz+SjdPEiu/CBWsbXM7HP+dVujvYOtzBCYnfx1Ru2mbyrkf4jq6GfKVKcaw3GczsykUvyUbsI321ChynhzrA1/IIPLQKdgqMnCjelA=
+	t=1741480269; cv=none; b=KT35mMRwvGP5ujGCapTzYaJ7/9F6cKifshEwbvh5lswZ18+Hr0UU7vDxk5as4q0Dow+UUYVgs1iMnRmtKEWd3KzYVtpqA4Ud8NIjeS/iFggeCQmy+d+SFBkAa9h1wLdf0rCzEGr9h0iloki9d+mPqM6pavmtxOtTOvfSfj2keQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741440808; c=relaxed/simple;
-	bh=115Ze+IxI3/vfEm4pnf9cpZTmUZlkDAqgkOYFm8bgM0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aLLPPUnZm9Z6KDpe6c+05SQnWP8sQ3EHuepSHQjng0wt72l+0l2kFTSqEF0KviE6rr9muUxvDlS1J53fOXnvYd/rSlzNvoLoYgqZP3uvDhNYD6u0328gOI4wt31Oac3anelbQyMx6WEF5Ke+fBjV+zNh72GbreG0I/HbwwSLSGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=fail (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=CAuEjA+o reason="signature verification failed"; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+	s=arc-20240116; t=1741480269; c=relaxed/simple;
+	bh=HnksT8mSXFPdsYEwYEbQasBkNVX/yh2ujjHTAjEraco=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=dvhM1Z/2+UFMC3ne4+Vld0oiQnTcCae+TDGJd5yHbQ33dGHktFsqCpJKyIupajWziV7NngJwM1DixgfjoWuXIhf+bbroCGu66B62x3AaPBRBghzOcznwAuzykEsogRr9LIfcSOmwIpQipJKa5eMx3mBRIXE/boXJlnumJvXS8nM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ethancedwards.com; spf=pass smtp.mailfrom=ethancedwards.com; dkim=pass (2048-bit key) header.d=ethancedwards.com header.i=@ethancedwards.com header.b=sQYvBX8c; arc=none smtp.client-ip=80.241.56.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ethancedwards.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ethancedwards.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="CAuEjA+o"
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id B3CF040E015E;
-	Sat,  8 Mar 2025 13:33:23 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=fail (4096-bit key)
-	reason="fail (body has been altered)" header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id fUOTjdyFzZYW; Sat,  8 Mar 2025 13:33:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1741440798; bh=mGUnWVGEljwRD/vFW5lzAbLtqCZsrT5Mor9RAoXgYyQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CAuEjA+oufa4li9tDQ0w1Tt+g9NQ2+DCEOZiizHP92xumN76F16HsASw9+eAtvZ4D
-	 ZzSxv0mg09iZzSTaTycYd7JYASUXK9G05+DQmRpC3AXHoaSIEmHBY9bfSzzuBkHyit
-	 SA03K8Egc2lDY/c1OiPBemVPYZTX5z/XNRji4bWoAZhcstXdrN523dAZVtK0pEV9MB
-	 aTlGOguhVs8N2mRdotkvuBYybKADKYpLGE6QSpTc92cJ9M0dRwXCfJ8lg7GzmlvPMK
-	 wfuLdvFDWVRbuRWq3rU3xmPk4GK63QtoZDM3e0r1nhhuUR3KhT7/cPErryvt7kIWWM
-	 OB0AJROTpv1oFRLdxPsmZaV6tVilTndruIzlv3lQyVfydgymZWdi7OwV1UQxJmmWEK
-	 LLBP7taxoDK5WcaobNlt1TQyiNPJ3JA9jZmtN6iqf7nCX9YStC0TyyHxJhRmK/hPxm
-	 59sFO6Q55TkKduj+/y0FwKNUC256t3K5aGxn0BsbcfoK4bAHhJlYD93JPbEOUa2DgD
-	 lyxT4i3Il8cE2BtKLyH1T2Pn+8MW4YGHl7f33Y/PmWqcU0Sj/il3aqsjJ5OsHItkGK
-	 toJnZrFTyqwqMGvB95oJzz2vtUiWycr3MCTTDds63z4cnAF90Q2xpohgqHfYW16mDL
-	 7j5l97NE3JinsBfG0j9RDWYA=
-Received: from zn.tnic (pd95303ce.dip0.t-ipconnect.de [217.83.3.206])
+	dkim=pass (2048-bit key) header.d=ethancedwards.com header.i=@ethancedwards.com header.b="sQYvBX8c"
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 8105740E015D;
-	Sat,  8 Mar 2025 13:33:09 +0000 (UTC)
-Date: Sat, 8 Mar 2025 14:33:08 +0100
-From: Borislav Petkov <bp@alien8.de>
-To: Dionna Amalie Glaze <dionnaglaze@google.com>,
-	Alexey Kardashevskiy <aik@amd.com>
-Cc: linux-crypto@vger.kernel.org, linux-coco@lists.linux.dev,
-	linux-kernel@vger.kernel.org, Ashish Kalra <ashish.kalra@amd.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, stable@vger.kernel.org
-Subject: Re: [PATCH] crypto: ccp: Fix uAPI definitions of PSP errors
-Message-ID: <20250308133308.GCZ8xHFOX4JKRG1Mpk@fat_crate.local>
-References: <20250308011028.719002-1-aik@amd.com>
- <CAAH4kHaK3Z-_aYizZM0Kvmsjvs_RT88tKG5aefm2_9GTUsU4bg@mail.gmail.com>
+	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4Z9LXy6Tjcz9scd;
+	Sun,  9 Mar 2025 01:30:58 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ethancedwards.com;
+	s=MBO0001; t=1741480259;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=nw5BrMpWLwOkdKLfm5BC4XDDbHFMMDfyo9rI+ZmiLnU=;
+	b=sQYvBX8cQof5sXBhThSn//SbOyGSP2UipkdG50cAyiygr8+EkF5bIk2pI/CFs0wMNygbef
+	vtX8O5XfMt+SxzCifOihxzZBwOjjlTQ4KlG0AvxQlNFPAOPKg8xi6aVSVVRcTaJ5NkqSKs
+	L14Fnd7VkeJgLqE6SO1j9lhvN3GbZEYivTQiHEj5MqgApFXdfQ/dC8+occdUmjb9uy4TM5
+	odzw00vTGX6bH3zFaQMDJp0m0t+SHmfw6bYZbtkowvldlRjyWNYtWC0rzdali6DiIy1omy
+	7jxgp8tZApggohf7ZlofFh1g4vLJDbZaH1b/9snfGruiCPMjv14zQnYTJur74A==
+From: Ethan Carter Edwards <ethan@ethancedwards.com>
+Date: Sat, 08 Mar 2025 19:30:52 -0500
+Subject: [PATCH] crypto: axis/artpec6: change from kzalloc to kcalloc in
+ artpec6_crypto_probe()
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAAH4kHaK3Z-_aYizZM0Kvmsjvs_RT88tKG5aefm2_9GTUsU4bg@mail.gmail.com>
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250308-artpec6-devm_kcalloc-v1-1-37886eaebd16@ethancedwards.com>
+X-B4-Tracking: v=1; b=H4sIADvhzGcC/x3MSQqAMAxA0atI1hZaJ9SriEiMUYNTaUUE8e4Wl
+ 2/x/wOenbCHOnrA8SVejj3AxBHQjPvESoZgSHSS61SXCt1pmQo18LV1C+G6HqQqNIaoQOrLDEJ
+ qHY9y/9umfd8PyZ7im2YAAAA=
+X-Change-ID: 20250308-artpec6-devm_kcalloc-9a11cc6acb84
+To: Jesper Nilsson <jesper.nilsson@axis.com>, 
+ Lars Persson <lars.persson@axis.com>, 
+ Herbert Xu <herbert@gondor.apana.org.au>, 
+ "David S. Miller" <davem@davemloft.net>
+Cc: linux-arm-kernel@axis.com, linux-crypto@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, 
+ Ethan Carter Edwards <ethan@ethancedwards.com>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1739;
+ i=ethan@ethancedwards.com; h=from:subject:message-id;
+ bh=HnksT8mSXFPdsYEwYEbQasBkNVX/yh2ujjHTAjEraco=;
+ b=LS0tLS1CRUdJTiBQR1AgTUVTU0FHRS0tLS0tCgpvd0o0bkp2QXk4ekFKWGJEOXFoNThlVGp6e
+ GhQcXlVeHBKOTVhSnZlVXhEek52UGMzRlc3RGxxdk1lSW9rdWFvCnpPSFcrVy80UDJUU0NqNkgr
+ M3M3U2xrWXhMZ1laTVVVV2Y3bktLYzkxSnloc1BPdlN4UE1IRllta0NFTVhKd0MKTUpFSnJZd01
+ wMzBaNUthY21zdHJYSGQ3NVZrRDlyTWNHc2ZZOWUxdVBiTHFPTFcxY3Z2TElvYi9EcHZuSG52eg
+ phZTlxdzhubkZGaG1mYjl2ZEQvaDg0TFZWdzY5UC9IR2JVSERUVDRBZ1A1Uk9BPT0KPVBpSFAKL
+ S0tLS1FTkQgUEdQIE1FU1NBR0UtLS0tLQo=
+X-Developer-Key: i=ethan@ethancedwards.com; a=openpgp;
+ fpr=2E51F61839D1FA947A7300C234C04305D581DBFE
 
-On Fri, Mar 07, 2025 at 09:40:52PM -0800, Dionna Amalie Glaze wrote:
-> On Fri, Mar 7, 2025 at 5:10=E2=80=AFPM Alexey Kardashevskiy <aik@amd.co=
-m> wrote:
-> >
-> > Additions to the error enum after explicit 0x27 setting for
-> > SEV_RET_INVALID_KEY leads to incorrect value assignments.
-> >
-> > Use explicit values to match the manufacturer specifications more
-> > clearly.
-> >
-> > Fixes: 3a45dc2b419e ("crypto: ccp: Define the SEV-SNP commands")
-> > CC: stable@vger.kernel.org
-> > Signed-off-by: Dionna Glaze <dionnaglaze@google.com>
-> > Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
-> > Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
-> > ---
-> >
-> > Reposting as requested in
-> > https://lore.kernel.org/r/Z7f2S3MigLEY80P2@gondor.apana.org.au
-> >
-> > I wrote it in the first place but since then it travelled a lot,
-> > feel free to correct the chain of SOBs and RB :)
->=20
-> It's all good. Thanks for seeing this through to the end.
+We are trying to get rid of all multiplications from allocation
+functions to prevent potential integer overflows. Here the
+multiplication is probably safe, but using kcalloc() is more
+appropriate and improves readability. This patch has no effect
+on runtime behavior.
 
-It should be corrected because the current SOB chain says that Dionna is =
-the
-author but From is yours, making you the author when it gets applied.
+Link: https://github.com/KSPP/linux/issues/162 [1]
+Link: https://www.kernel.org/doc/html/next/process/deprecated.html#open-coded-arithmetic-in-allocator-arguments
 
-All is documented here and in the following sections:
+Signed-off-by: Ethan Carter Edwards <ethan@ethancedwards.com>
+---
+ drivers/crypto/axis/artpec6_crypto.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-https://kernel.org/doc/html/latest/process/submitting-patches.html#sign-y=
-our-work-the-developer-s-certificate-of-origin
+diff --git a/drivers/crypto/axis/artpec6_crypto.c b/drivers/crypto/axis/artpec6_crypto.c
+index 1c1f57baef0ea9f4ecf7ab39f2c0e9e4327ef568..500b08e42282608348481b759e0b79d25f0b5db0 100644
+--- a/drivers/crypto/axis/artpec6_crypto.c
++++ b/drivers/crypto/axis/artpec6_crypto.c
+@@ -2897,13 +2897,13 @@ static int artpec6_crypto_probe(struct platform_device *pdev)
+ 	tasklet_init(&ac->task, artpec6_crypto_task,
+ 		     (unsigned long)ac);
+ 
+-	ac->pad_buffer = devm_kzalloc(&pdev->dev, 2 * ARTPEC_CACHE_LINE_MAX,
++	ac->pad_buffer = devm_kcalloc(&pdev->dev, 2, ARTPEC_CACHE_LINE_MAX,
+ 				      GFP_KERNEL);
+ 	if (!ac->pad_buffer)
+ 		return -ENOMEM;
+ 	ac->pad_buffer = PTR_ALIGN(ac->pad_buffer, ARTPEC_CACHE_LINE_MAX);
+ 
+-	ac->zero_buffer = devm_kzalloc(&pdev->dev, 2 * ARTPEC_CACHE_LINE_MAX,
++	ac->zero_buffer = devm_kcalloc(&pdev->dev, 2, ARTPEC_CACHE_LINE_MAX,
+ 				      GFP_KERNEL);
+ 	if (!ac->zero_buffer)
+ 		return -ENOMEM;
 
---=20
-Regards/Gruss,
-    Boris.
+---
+base-commit: 0a2f889128969dab41861b6e40111aa03dc57014
+change-id: 20250308-artpec6-devm_kcalloc-9a11cc6acb84
 
-https://people.kernel.org/tglx/notes-about-netiquette
+Best regards,
+-- 
+Ethan Carter Edwards <ethan@ethancedwards.com>
+
