@@ -1,44 +1,44 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE57022301
-	for <linux-crypto@vger.kernel.org>; Sun,  9 Mar 2025 02:43:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC4767482
+	for <linux-crypto@vger.kernel.org>; Sun,  9 Mar 2025 02:43:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741488201; cv=none; b=u8tNhmpAXc+n9wzW8Z7eXRpvkkR1rphW8v7IW6QH/QOkcpsxvtJzqrulMbdQC+MXS3j9At2ifJcfahLg/Z7PiT4oM+h+O8YAVvZPv0P86Ks1BAPcizNY3WcFKdWzxERlr3H75ciag32T7M4rGK27LYWUd1Q+/JzBdmUbGdcSwY4=
+	t=1741488203; cv=none; b=fy0ocLJhkydE5oHzpNu3FJfNxUbxB2K8b45A/mBGPkYcSghNt8Xv5hYi231A5JEKZUNDAKPUfu1wiP7DpcttS65mbXMR1uYRtmIG7h4IinlmSQcWC6HibcFCwKN3/TsfkzBV22QTRbE1ZiCLpe5wwPgguccmKCM1FEnrEok5/v4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741488201; c=relaxed/simple;
-	bh=yA1PMgcpyIavX/uDGlsAgc/uw6aPGrEk7H2GHeqglPo=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To:Cc; b=rUFMhER8/E847N9obGG7F9Fm5vlktw2INbi0OcO7YoqSwjDnGKM7gtlFwbt4GWFtMBLhjm/bGvQdY43ZKU/4sArMaPiijmIMqhZcxLREgq9WvAX/8CSIBCxPIlt1qR1tu1nF6NIGqc9njqr23pbEJ3YY7C/oNErR5i9RZAHQ06o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=STwswDA7; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1741488203; c=relaxed/simple;
+	bh=1m3G0ekhKdgTLqZ4bCCoIXFlBcICB6TyyBOzL8WDhcU=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To:Cc; b=MDyc7woG5r3G20iEVxNxQDtyFHuItfkvHvE5LBZuHmADk0EU4dicSDbkqQ25qJINMcMcDfifbKSURxjaoPK0/giiyH2mVIJFd4GyS3X/ku4DdZT63i7T/ho805kTuTy7zky4RM5w/r5ulXfpPHlwHU7CngOad/k9rpYMawnVUhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=Tmqycsbx; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="STwswDA7"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="Tmqycsbx"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=Cc:To:Subject:From:References:In-Reply-To:Message-Id:Date:
 	Sender:Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
 	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
 	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=vUZ1xah0Y1qdQ3OhSRGhNKU3gwcbkAMcP7wK/CvqsBo=; b=STwswDA7v4JJQRLbyghs6QM4tO
-	FcXn7J1hvymF1zh27idSX+KGtS85HunGT0nGHL957aU1O9H2EYb17hcYsO47RNdUnUtNOAlL3YYGS
-	KD4v/BfQ3YNcVfZ64GpYk8JQBKIPbDZET5LM3rtrDb3tqLdLf3I1ycCoXpTquEZkjpkBWHnqLHj0Z
-	LBRXItJycsF4Pvu5T0kbtZhgxxXq8lEZLpHZT0XXNed5OrKZ+TDl10MBG9lc+qeaoF/AJ8zWhNncU
-	IvP5g6F96IkfpIFppR4D777KXZDDfKU4nh1GzOS2VSokU+JoHDi3ORS0IJmxPKzhsUshT8NReFyS7
-	iKxlOKyQ==;
+	bh=zlbv7O+ARLzX3gL2oqcjQubEJe/VuJiOda+HRxvqcIg=; b=Tmqycsbxv6pCDTcqBj6a25QGLO
+	WnQtkr9nDAP08Oa+CUdK5dOcnHXhhB1E2kePqG5cLe9b7ABb7KcDkBMiliylwQSFeFJG2ierJP3JH
+	doxzNubIpY091lFEV18/ngb4adDtEEYmmtcM8OZrIBhr1o9dNgz4HwNGgWkoPsTBZgLxyqMcIspHm
+	3RiUBmodV3h8ct2yBbt0GpjEOekCq9CcXB224iPX8VOz6wxWLp9p9ry53vskHqHx/Dbcuom9yn7VX
+	6rpaa/DclqFLtY3kmYzggJtXXLrLlIUcWc6T44Yz2X8H6Ex2+2lamFYaQVJRWFADXorvQpOwjmthy
+	Lf73vQdQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tr6dG-004zHO-2R;
-	Sun, 09 Mar 2025 10:43:15 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 09 Mar 2025 10:43:14 +0800
-Date: Sun, 09 Mar 2025 10:43:14 +0800
-Message-Id: <efd97117f90d2523a8af9d0f2b4510679708d7d1.1741488107.git.herbert@gondor.apana.org.au>
+	id 1tr6dJ-004zHS-0B;
+	Sun, 09 Mar 2025 10:43:18 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 09 Mar 2025 10:43:17 +0800
+Date: Sun, 09 Mar 2025 10:43:17 +0800
+Message-Id: <25f96a0e0e642e9d1c6014b12b00fd21b9f9c785.1741488107.git.herbert@gondor.apana.org.au>
 In-Reply-To: <cover.1741488107.git.herbert@gondor.apana.org.au>
 References: <cover.1741488107.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v3 PATCH 2/8] crypto: scomp - Remove tfm argument from
- alloc/free_ctx
+Subject: [v3 PATCH 3/8] crypto: acomp - Move stream management into scomp
+ layer
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Cc: Yosry Ahmed <yosry.ahmed@linux.dev>, Kanchana P Sridhar <kanchana.p.sridhar@intel.com>, Sergey Senozhatsky <senozhatsky@chromium.org>
 Precedence: bulk
@@ -47,342 +47,345 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
-The tfm argument is completely unused and meaningless as the
-same stream object is identical over all transforms of a given
-algorithm.  Remove it.
+Rather than allocating the stream memory in the request object,
+move it into a per-cpu buffer managed by scomp.  This takes the
+stress off the user from having to manage large request objects
+and setting up their own per-cpu buffers in order to do so.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- crypto/842.c                           | 8 ++++----
- crypto/deflate.c                       | 4 ++--
- crypto/lz4.c                           | 8 ++++----
- crypto/lz4hc.c                         | 8 ++++----
- crypto/lzo-rle.c                       | 8 ++++----
- crypto/lzo.c                           | 8 ++++----
- crypto/zstd.c                          | 4 ++--
- drivers/crypto/cavium/zip/zip_crypto.c | 6 +++---
- drivers/crypto/cavium/zip/zip_crypto.h | 6 +++---
- include/crypto/internal/scompress.h    | 8 ++++----
- 10 files changed, 34 insertions(+), 34 deletions(-)
+ crypto/acompress.c                  | 30 ----------
+ crypto/compress.h                   |  2 -
+ crypto/scompress.c                  | 90 +++++++++++++++++++----------
+ include/crypto/acompress.h          | 26 ++++++++-
+ include/crypto/internal/acompress.h | 17 +-----
+ include/crypto/internal/scompress.h | 12 +---
+ 6 files changed, 84 insertions(+), 93 deletions(-)
 
-diff --git a/crypto/842.c b/crypto/842.c
-index e59e54d76960..2238478c3493 100644
---- a/crypto/842.c
-+++ b/crypto/842.c
-@@ -28,7 +28,7 @@ struct crypto842_ctx {
- 	void *wmem;	/* working memory for compress */
- };
+diff --git a/crypto/acompress.c b/crypto/acompress.c
+index 30176316140a..ef36ec31d73d 100644
+--- a/crypto/acompress.c
++++ b/crypto/acompress.c
+@@ -123,36 +123,6 @@ struct crypto_acomp *crypto_alloc_acomp_node(const char *alg_name, u32 type,
+ }
+ EXPORT_SYMBOL_GPL(crypto_alloc_acomp_node);
  
--static void *crypto842_alloc_ctx(struct crypto_scomp *tfm)
-+static void *crypto842_alloc_ctx(void)
+-struct acomp_req *acomp_request_alloc(struct crypto_acomp *acomp)
+-{
+-	struct crypto_tfm *tfm = crypto_acomp_tfm(acomp);
+-	struct acomp_req *req;
+-
+-	req = __acomp_request_alloc(acomp);
+-	if (req && (tfm->__crt_alg->cra_type != &crypto_acomp_type))
+-		return crypto_acomp_scomp_alloc_ctx(req);
+-
+-	return req;
+-}
+-EXPORT_SYMBOL_GPL(acomp_request_alloc);
+-
+-void acomp_request_free(struct acomp_req *req)
+-{
+-	struct crypto_acomp *acomp = crypto_acomp_reqtfm(req);
+-	struct crypto_tfm *tfm = crypto_acomp_tfm(acomp);
+-
+-	if (tfm->__crt_alg->cra_type != &crypto_acomp_type)
+-		crypto_acomp_scomp_free_ctx(req);
+-
+-	if (req->base.flags & CRYPTO_ACOMP_ALLOC_OUTPUT) {
+-		acomp->dst_free(req->dst);
+-		req->dst = NULL;
+-	}
+-
+-	__acomp_request_free(req);
+-}
+-EXPORT_SYMBOL_GPL(acomp_request_free);
+-
+ void comp_prepare_alg(struct comp_alg_common *alg)
  {
- 	void *ctx;
+ 	struct crypto_alg *base = &alg->base;
+diff --git a/crypto/compress.h b/crypto/compress.h
+index c3cedfb5e606..f7737a1fcbbd 100644
+--- a/crypto/compress.h
++++ b/crypto/compress.h
+@@ -15,8 +15,6 @@ struct acomp_req;
+ struct comp_alg_common;
  
-@@ -43,14 +43,14 @@ static int crypto842_init(struct crypto_tfm *tfm)
- {
- 	struct crypto842_ctx *ctx = crypto_tfm_ctx(tfm);
+ int crypto_init_scomp_ops_async(struct crypto_tfm *tfm);
+-struct acomp_req *crypto_acomp_scomp_alloc_ctx(struct acomp_req *req);
+-void crypto_acomp_scomp_free_ctx(struct acomp_req *req);
  
--	ctx->wmem = crypto842_alloc_ctx(NULL);
-+	ctx->wmem = crypto842_alloc_ctx();
- 	if (IS_ERR(ctx->wmem))
- 		return -ENOMEM;
+ void comp_prepare_alg(struct comp_alg_common *alg);
  
- 	return 0;
+diff --git a/crypto/scompress.c b/crypto/scompress.c
+index 1cef6bb06a81..9b6d9bbbc73a 100644
+--- a/crypto/scompress.c
++++ b/crypto/scompress.c
+@@ -98,13 +98,62 @@ static int crypto_scomp_alloc_scratches(void)
+ 	return -ENOMEM;
  }
  
--static void crypto842_free_ctx(struct crypto_scomp *tfm, void *ctx)
-+static void crypto842_free_ctx(void *ctx)
++static void scomp_free_streams(struct scomp_alg *alg)
++{
++	struct crypto_acomp_stream __percpu *stream = alg->stream;
++	int i;
++
++	for_each_possible_cpu(i) {
++		struct crypto_acomp_stream *ps = per_cpu_ptr(stream, i);
++
++		if (!ps->ctx)
++			break;
++
++		alg->free_ctx(ps);
++	}
++
++	free_percpu(stream);
++}
++
++static int scomp_alloc_streams(struct scomp_alg *alg)
++{
++	struct crypto_acomp_stream __percpu *stream;
++	int i;
++
++	stream = alloc_percpu(struct crypto_acomp_stream);
++	if (!stream)
++		return -ENOMEM;
++
++	for_each_possible_cpu(i) {
++		struct crypto_acomp_stream *ps = per_cpu_ptr(stream, i);
++
++		ps->ctx = alg->alloc_ctx();
++		if (IS_ERR(ps->ctx)) {
++			scomp_free_streams(alg);
++			return PTR_ERR(ps->ctx);
++		}
++
++		spin_lock_init(&ps->lock);
++	}
++
++	alg->stream = stream;
++	return 0;
++}
++
+ static int crypto_scomp_init_tfm(struct crypto_tfm *tfm)
  {
- 	kfree(ctx);
- }
-@@ -59,7 +59,7 @@ static void crypto842_exit(struct crypto_tfm *tfm)
- {
- 	struct crypto842_ctx *ctx = crypto_tfm_ctx(tfm);
++	struct scomp_alg *alg = crypto_scomp_alg(__crypto_scomp_tfm(tfm));
+ 	int ret = 0;
  
--	crypto842_free_ctx(NULL, ctx->wmem);
-+	crypto842_free_ctx(ctx->wmem);
- }
+ 	mutex_lock(&scomp_lock);
++	if (!alg->stream) {
++		ret = scomp_alloc_streams(alg);
++		if (ret)
++			goto unlock;
++	}
+ 	if (!scomp_scratch_users++)
+ 		ret = crypto_scomp_alloc_scratches();
++unlock:
+ 	mutex_unlock(&scomp_lock);
  
- static int crypto842_compress(struct crypto_tfm *tfm,
-diff --git a/crypto/deflate.c b/crypto/deflate.c
-index 98e8bcb81a6a..1bf7184ad670 100644
---- a/crypto/deflate.c
-+++ b/crypto/deflate.c
-@@ -112,7 +112,7 @@ static int __deflate_init(void *ctx)
  	return ret;
- }
+@@ -115,7 +164,7 @@ static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
+ 	struct crypto_acomp *tfm = crypto_acomp_reqtfm(req);
+ 	void **tfm_ctx = acomp_tfm_ctx(tfm);
+ 	struct crypto_scomp *scomp = *tfm_ctx;
+-	void **ctx = acomp_request_ctx(req);
++	struct crypto_acomp_stream *stream;
+ 	struct scomp_scratch *scratch;
+ 	void *src, *dst;
+ 	unsigned int dlen;
+@@ -148,12 +197,15 @@ static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
+ 	else
+ 		dst = scratch->dst;
  
--static void *deflate_alloc_ctx(struct crypto_scomp *tfm)
-+static void *deflate_alloc_ctx(void)
- {
- 	struct deflate_ctx *ctx;
- 	int ret;
-@@ -143,7 +143,7 @@ static void __deflate_exit(void *ctx)
- 	deflate_decomp_exit(ctx);
- }
- 
--static void deflate_free_ctx(struct crypto_scomp *tfm, void *ctx)
-+static void deflate_free_ctx(void *ctx)
- {
- 	__deflate_exit(ctx);
- 	kfree_sensitive(ctx);
-diff --git a/crypto/lz4.c b/crypto/lz4.c
-index 0606f8862e78..e66c6d1ba34f 100644
---- a/crypto/lz4.c
-+++ b/crypto/lz4.c
-@@ -16,7 +16,7 @@ struct lz4_ctx {
- 	void *lz4_comp_mem;
- };
- 
--static void *lz4_alloc_ctx(struct crypto_scomp *tfm)
-+static void *lz4_alloc_ctx(void)
- {
- 	void *ctx;
- 
-@@ -31,14 +31,14 @@ static int lz4_init(struct crypto_tfm *tfm)
- {
- 	struct lz4_ctx *ctx = crypto_tfm_ctx(tfm);
- 
--	ctx->lz4_comp_mem = lz4_alloc_ctx(NULL);
-+	ctx->lz4_comp_mem = lz4_alloc_ctx();
- 	if (IS_ERR(ctx->lz4_comp_mem))
- 		return -ENOMEM;
++	stream = raw_cpu_ptr(crypto_scomp_alg(scomp)->stream);
++	spin_lock(&stream->lock);
+ 	if (dir)
+ 		ret = crypto_scomp_compress(scomp, src, req->slen,
+-					    dst, &req->dlen, *ctx);
++					    dst, &req->dlen, stream->ctx);
+ 	else
+ 		ret = crypto_scomp_decompress(scomp, src, req->slen,
+-					      dst, &req->dlen, *ctx);
++					      dst, &req->dlen, stream->ctx);
++	spin_unlock(&stream->lock);
+ 	if (!ret) {
+ 		if (!req->dst) {
+ 			req->dst = sgl_alloc(req->dlen, GFP_ATOMIC, NULL);
+@@ -226,45 +278,19 @@ int crypto_init_scomp_ops_async(struct crypto_tfm *tfm)
+ 	crt->compress = scomp_acomp_compress;
+ 	crt->decompress = scomp_acomp_decompress;
+ 	crt->dst_free = sgl_free;
+-	crt->reqsize = sizeof(void *);
  
  	return 0;
  }
  
--static void lz4_free_ctx(struct crypto_scomp *tfm, void *ctx)
-+static void lz4_free_ctx(void *ctx)
+-struct acomp_req *crypto_acomp_scomp_alloc_ctx(struct acomp_req *req)
++static void crypto_scomp_destroy(struct crypto_alg *alg)
  {
- 	vfree(ctx);
+-	struct crypto_acomp *acomp = crypto_acomp_reqtfm(req);
+-	struct crypto_tfm *tfm = crypto_acomp_tfm(acomp);
+-	struct crypto_scomp **tfm_ctx = crypto_tfm_ctx(tfm);
+-	struct crypto_scomp *scomp = *tfm_ctx;
+-	void *ctx;
+-
+-	ctx = crypto_scomp_alloc_ctx(scomp);
+-	if (IS_ERR(ctx)) {
+-		kfree(req);
+-		return NULL;
+-	}
+-
+-	*req->__ctx = ctx;
+-
+-	return req;
+-}
+-
+-void crypto_acomp_scomp_free_ctx(struct acomp_req *req)
+-{
+-	struct crypto_acomp *acomp = crypto_acomp_reqtfm(req);
+-	struct crypto_tfm *tfm = crypto_acomp_tfm(acomp);
+-	struct crypto_scomp **tfm_ctx = crypto_tfm_ctx(tfm);
+-	struct crypto_scomp *scomp = *tfm_ctx;
+-	void *ctx = *req->__ctx;
+-
+-	if (ctx)
+-		crypto_scomp_free_ctx(scomp, ctx);
++	scomp_free_streams(__crypto_scomp_alg(alg));
  }
-@@ -47,7 +47,7 @@ static void lz4_exit(struct crypto_tfm *tfm)
- {
- 	struct lz4_ctx *ctx = crypto_tfm_ctx(tfm);
  
--	lz4_free_ctx(NULL, ctx->lz4_comp_mem);
-+	lz4_free_ctx(ctx->lz4_comp_mem);
- }
+ static const struct crypto_type crypto_scomp_type = {
+ 	.extsize = crypto_alg_extsize,
+ 	.init_tfm = crypto_scomp_init_tfm,
++	.destroy = crypto_scomp_destroy,
+ #ifdef CONFIG_PROC_FS
+ 	.show = crypto_scomp_show,
+ #endif
+diff --git a/include/crypto/acompress.h b/include/crypto/acompress.h
+index b6d5136e689d..c4937709ad0e 100644
+--- a/include/crypto/acompress.h
++++ b/include/crypto/acompress.h
+@@ -10,8 +10,12 @@
+ #define _CRYPTO_ACOMP_H
  
- static int __lz4_compress_crypto(const u8 *src, unsigned int slen,
-diff --git a/crypto/lz4hc.c b/crypto/lz4hc.c
-index d7cc94aa2fcf..25a95b65aca5 100644
---- a/crypto/lz4hc.c
-+++ b/crypto/lz4hc.c
-@@ -15,7 +15,7 @@ struct lz4hc_ctx {
- 	void *lz4hc_comp_mem;
+ #include <linux/atomic.h>
++#include <linux/compiler_types.h>
+ #include <linux/container_of.h>
+ #include <linux/crypto.h>
++#include <linux/slab.h>
++#include <linux/spinlock_types.h>
++#include <linux/types.h>
+ 
+ #define CRYPTO_ACOMP_ALLOC_OUTPUT	0x00000001
+ #define CRYPTO_ACOMP_DST_MAX		131072
+@@ -54,8 +58,14 @@ struct crypto_acomp {
+ 	struct crypto_tfm base;
  };
  
--static void *lz4hc_alloc_ctx(struct crypto_scomp *tfm)
-+static void *lz4hc_alloc_ctx(void)
- {
- 	void *ctx;
++struct crypto_acomp_stream {
++	spinlock_t lock;
++	void *ctx;
++};
++
+ #define COMP_ALG_COMMON {			\
+ 	struct crypto_alg base;			\
++	struct crypto_acomp_stream __percpu *stream;	\
+ }
+ struct comp_alg_common COMP_ALG_COMMON;
  
-@@ -30,14 +30,14 @@ static int lz4hc_init(struct crypto_tfm *tfm)
- {
- 	struct lz4hc_ctx *ctx = crypto_tfm_ctx(tfm);
+@@ -173,7 +183,16 @@ static inline int crypto_has_acomp(const char *alg_name, u32 type, u32 mask)
+  *
+  * Return:	allocated handle in case of success or NULL in case of an error
+  */
+-struct acomp_req *acomp_request_alloc(struct crypto_acomp *tfm);
++static inline struct acomp_req *acomp_request_alloc_noprof(struct crypto_acomp *tfm)
++{
++	struct acomp_req *req;
++
++	req = kzalloc_noprof(sizeof(*req) + crypto_acomp_reqsize(tfm), GFP_KERNEL);
++	if (likely(req))
++		acomp_request_set_tfm(req, tfm);
++	return req;
++}
++#define acomp_request_alloc(...)	alloc_hooks(acomp_request_alloc_noprof(__VA_ARGS__))
  
--	ctx->lz4hc_comp_mem = lz4hc_alloc_ctx(NULL);
-+	ctx->lz4hc_comp_mem = lz4hc_alloc_ctx();
- 	if (IS_ERR(ctx->lz4hc_comp_mem))
- 		return -ENOMEM;
+ /**
+  * acomp_request_free() -- zeroize and free asynchronous (de)compression
+@@ -182,7 +201,10 @@ struct acomp_req *acomp_request_alloc(struct crypto_acomp *tfm);
+  *
+  * @req:	request to free
+  */
+-void acomp_request_free(struct acomp_req *req);
++static inline void acomp_request_free(struct acomp_req *req)
++{
++	kfree_sensitive(req);
++}
  
- 	return 0;
+ /**
+  * acomp_request_set_callback() -- Sets an asynchronous callback
+diff --git a/include/crypto/internal/acompress.h b/include/crypto/internal/acompress.h
+index 8831edaafc05..4a8f7e3beaa1 100644
+--- a/include/crypto/internal/acompress.h
++++ b/include/crypto/internal/acompress.h
+@@ -32,6 +32,7 @@
+  *
+  * @reqsize:	Context size for (de)compression requests
+  * @base:	Common crypto API algorithm data structure
++ * @stream:	Per-cpu memory for algorithm
+  * @calg:	Cmonn algorithm data structure shared with scomp
+  */
+ struct acomp_alg {
+@@ -68,22 +69,6 @@ static inline void acomp_request_complete(struct acomp_req *req,
+ 	crypto_request_complete(&req->base, err);
  }
  
--static void lz4hc_free_ctx(struct crypto_scomp *tfm, void *ctx)
-+static void lz4hc_free_ctx(void *ctx)
- {
- 	vfree(ctx);
- }
-@@ -46,7 +46,7 @@ static void lz4hc_exit(struct crypto_tfm *tfm)
- {
- 	struct lz4hc_ctx *ctx = crypto_tfm_ctx(tfm);
- 
--	lz4hc_free_ctx(NULL, ctx->lz4hc_comp_mem);
-+	lz4hc_free_ctx(ctx->lz4hc_comp_mem);
- }
- 
- static int __lz4hc_compress_crypto(const u8 *src, unsigned int slen,
-diff --git a/crypto/lzo-rle.c b/crypto/lzo-rle.c
-index 0abc2d87f042..6c845e7d32f5 100644
---- a/crypto/lzo-rle.c
-+++ b/crypto/lzo-rle.c
-@@ -15,7 +15,7 @@ struct lzorle_ctx {
- 	void *lzorle_comp_mem;
- };
- 
--static void *lzorle_alloc_ctx(struct crypto_scomp *tfm)
-+static void *lzorle_alloc_ctx(void)
- {
- 	void *ctx;
- 
-@@ -30,14 +30,14 @@ static int lzorle_init(struct crypto_tfm *tfm)
- {
- 	struct lzorle_ctx *ctx = crypto_tfm_ctx(tfm);
- 
--	ctx->lzorle_comp_mem = lzorle_alloc_ctx(NULL);
-+	ctx->lzorle_comp_mem = lzorle_alloc_ctx();
- 	if (IS_ERR(ctx->lzorle_comp_mem))
- 		return -ENOMEM;
- 
- 	return 0;
- }
- 
--static void lzorle_free_ctx(struct crypto_scomp *tfm, void *ctx)
-+static void lzorle_free_ctx(void *ctx)
- {
- 	kvfree(ctx);
- }
-@@ -46,7 +46,7 @@ static void lzorle_exit(struct crypto_tfm *tfm)
- {
- 	struct lzorle_ctx *ctx = crypto_tfm_ctx(tfm);
- 
--	lzorle_free_ctx(NULL, ctx->lzorle_comp_mem);
-+	lzorle_free_ctx(ctx->lzorle_comp_mem);
- }
- 
- static int __lzorle_compress(const u8 *src, unsigned int slen,
-diff --git a/crypto/lzo.c b/crypto/lzo.c
-index 8338851c7406..035d62e2afe0 100644
---- a/crypto/lzo.c
-+++ b/crypto/lzo.c
-@@ -15,7 +15,7 @@ struct lzo_ctx {
- 	void *lzo_comp_mem;
- };
- 
--static void *lzo_alloc_ctx(struct crypto_scomp *tfm)
-+static void *lzo_alloc_ctx(void)
- {
- 	void *ctx;
- 
-@@ -30,14 +30,14 @@ static int lzo_init(struct crypto_tfm *tfm)
- {
- 	struct lzo_ctx *ctx = crypto_tfm_ctx(tfm);
- 
--	ctx->lzo_comp_mem = lzo_alloc_ctx(NULL);
-+	ctx->lzo_comp_mem = lzo_alloc_ctx();
- 	if (IS_ERR(ctx->lzo_comp_mem))
- 		return -ENOMEM;
- 
- 	return 0;
- }
- 
--static void lzo_free_ctx(struct crypto_scomp *tfm, void *ctx)
-+static void lzo_free_ctx(void *ctx)
- {
- 	kvfree(ctx);
- }
-@@ -46,7 +46,7 @@ static void lzo_exit(struct crypto_tfm *tfm)
- {
- 	struct lzo_ctx *ctx = crypto_tfm_ctx(tfm);
- 
--	lzo_free_ctx(NULL, ctx->lzo_comp_mem);
-+	lzo_free_ctx(ctx->lzo_comp_mem);
- }
- 
- static int __lzo_compress(const u8 *src, unsigned int slen,
-diff --git a/crypto/zstd.c b/crypto/zstd.c
-index 154a969c83a8..68a093427944 100644
---- a/crypto/zstd.c
-+++ b/crypto/zstd.c
-@@ -103,7 +103,7 @@ static int __zstd_init(void *ctx)
- 	return ret;
- }
- 
--static void *zstd_alloc_ctx(struct crypto_scomp *tfm)
-+static void *zstd_alloc_ctx(void)
- {
- 	int ret;
- 	struct zstd_ctx *ctx;
-@@ -134,7 +134,7 @@ static void __zstd_exit(void *ctx)
- 	zstd_decomp_exit(ctx);
- }
- 
--static void zstd_free_ctx(struct crypto_scomp *tfm, void *ctx)
-+static void zstd_free_ctx(void *ctx)
- {
- 	__zstd_exit(ctx);
- 	kfree_sensitive(ctx);
-diff --git a/drivers/crypto/cavium/zip/zip_crypto.c b/drivers/crypto/cavium/zip/zip_crypto.c
-index 1046a746d36f..a9c3efce8f2d 100644
---- a/drivers/crypto/cavium/zip/zip_crypto.c
-+++ b/drivers/crypto/cavium/zip/zip_crypto.c
-@@ -236,7 +236,7 @@ int  zip_comp_decompress(struct crypto_tfm *tfm,
- } /* Legacy compress framework end */
- 
- /* SCOMP framework start */
--void *zip_alloc_scomp_ctx_deflate(struct crypto_scomp *tfm)
-+void *zip_alloc_scomp_ctx_deflate(void)
- {
- 	int ret;
- 	struct zip_kernel_ctx *zip_ctx;
-@@ -255,7 +255,7 @@ void *zip_alloc_scomp_ctx_deflate(struct crypto_scomp *tfm)
- 	return zip_ctx;
- }
- 
--void *zip_alloc_scomp_ctx_lzs(struct crypto_scomp *tfm)
-+void *zip_alloc_scomp_ctx_lzs(void)
- {
- 	int ret;
- 	struct zip_kernel_ctx *zip_ctx;
-@@ -274,7 +274,7 @@ void *zip_alloc_scomp_ctx_lzs(struct crypto_scomp *tfm)
- 	return zip_ctx;
- }
- 
--void zip_free_scomp_ctx(struct crypto_scomp *tfm, void *ctx)
-+void zip_free_scomp_ctx(void *ctx)
- {
- 	struct zip_kernel_ctx *zip_ctx = ctx;
- 
-diff --git a/drivers/crypto/cavium/zip/zip_crypto.h b/drivers/crypto/cavium/zip/zip_crypto.h
-index b59ddfcacd34..dbe20bfeb3e9 100644
---- a/drivers/crypto/cavium/zip/zip_crypto.h
-+++ b/drivers/crypto/cavium/zip/zip_crypto.h
-@@ -67,9 +67,9 @@ int  zip_comp_decompress(struct crypto_tfm *tfm,
- 			 const u8 *src, unsigned int slen,
- 			 u8 *dst, unsigned int *dlen);
- 
--void *zip_alloc_scomp_ctx_deflate(struct crypto_scomp *tfm);
--void *zip_alloc_scomp_ctx_lzs(struct crypto_scomp *tfm);
--void  zip_free_scomp_ctx(struct crypto_scomp *tfm, void *zip_ctx);
-+void *zip_alloc_scomp_ctx_deflate(void);
-+void *zip_alloc_scomp_ctx_lzs(void);
-+void  zip_free_scomp_ctx(void *zip_ctx);
- int   zip_scomp_compress(struct crypto_scomp *tfm,
- 			 const u8 *src, unsigned int slen,
- 			 u8 *dst, unsigned int *dlen, void *ctx);
+-static inline struct acomp_req *__acomp_request_alloc_noprof(struct crypto_acomp *tfm)
+-{
+-	struct acomp_req *req;
+-
+-	req = kzalloc_noprof(sizeof(*req) + crypto_acomp_reqsize(tfm), GFP_KERNEL);
+-	if (likely(req))
+-		acomp_request_set_tfm(req, tfm);
+-	return req;
+-}
+-#define __acomp_request_alloc(...)	alloc_hooks(__acomp_request_alloc_noprof(__VA_ARGS__))
+-
+-static inline void __acomp_request_free(struct acomp_req *req)
+-{
+-	kfree_sensitive(req);
+-}
+-
+ /**
+  * crypto_register_acomp() -- Register asynchronous compression algorithm
+  *
 diff --git a/include/crypto/internal/scompress.h b/include/crypto/internal/scompress.h
-index 07a10fd2d321..6ba9974df7d3 100644
+index 6ba9974df7d3..88986ab8ce15 100644
 --- a/include/crypto/internal/scompress.h
 +++ b/include/crypto/internal/scompress.h
-@@ -31,8 +31,8 @@ struct crypto_scomp {
+@@ -28,6 +28,7 @@ struct crypto_scomp {
+  * @compress:	Function performs a compress operation
+  * @decompress:	Function performs a de-compress operation
+  * @base:	Common crypto API algorithm data structure
++ * @stream:	Per-cpu memory for algorithm
   * @calg:	Cmonn algorithm data structure shared with acomp
   */
  struct scomp_alg {
--	void *(*alloc_ctx)(struct crypto_scomp *tfm);
--	void (*free_ctx)(struct crypto_scomp *tfm, void *ctx);
-+	void *(*alloc_ctx)(void);
-+	void (*free_ctx)(void *ctx);
- 	int (*compress)(struct crypto_scomp *tfm, const u8 *src,
- 			unsigned int slen, u8 *dst, unsigned int *dlen,
- 			void *ctx);
-@@ -73,13 +73,13 @@ static inline struct scomp_alg *crypto_scomp_alg(struct crypto_scomp *tfm)
- 
- static inline void *crypto_scomp_alloc_ctx(struct crypto_scomp *tfm)
- {
--	return crypto_scomp_alg(tfm)->alloc_ctx(tfm);
-+	return crypto_scomp_alg(tfm)->alloc_ctx();
+@@ -71,17 +72,6 @@ static inline struct scomp_alg *crypto_scomp_alg(struct crypto_scomp *tfm)
+ 	return __crypto_scomp_alg(crypto_scomp_tfm(tfm)->__crt_alg);
  }
  
- static inline void crypto_scomp_free_ctx(struct crypto_scomp *tfm,
- 					 void *ctx)
- {
--	return crypto_scomp_alg(tfm)->free_ctx(tfm, ctx);
-+	return crypto_scomp_alg(tfm)->free_ctx(ctx);
- }
- 
+-static inline void *crypto_scomp_alloc_ctx(struct crypto_scomp *tfm)
+-{
+-	return crypto_scomp_alg(tfm)->alloc_ctx();
+-}
+-
+-static inline void crypto_scomp_free_ctx(struct crypto_scomp *tfm,
+-					 void *ctx)
+-{
+-	return crypto_scomp_alg(tfm)->free_ctx(ctx);
+-}
+-
  static inline int crypto_scomp_compress(struct crypto_scomp *tfm,
+ 					const u8 *src, unsigned int slen,
+ 					u8 *dst, unsigned int *dlen, void *ctx)
 -- 
 2.39.5
 
