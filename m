@@ -1,113 +1,111 @@
-Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23F962914;
-	Sun,  9 Mar 2025 00:31:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD6907482
+	for <linux-crypto@vger.kernel.org>; Sun,  9 Mar 2025 02:43:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741480269; cv=none; b=KT35mMRwvGP5ujGCapTzYaJ7/9F6cKifshEwbvh5lswZ18+Hr0UU7vDxk5as4q0Dow+UUYVgs1iMnRmtKEWd3KzYVtpqA4Ud8NIjeS/iFggeCQmy+d+SFBkAa9h1wLdf0rCzEGr9h0iloki9d+mPqM6pavmtxOtTOvfSfj2keQE=
+	t=1741488200; cv=none; b=Unz2Qzqb2OJy8XBgMrOHOTNDlw6IVgz5o+B8NN05u1Df/DK7rDvttqz4FNJ6V90+NKZJrPPTevy+EmS2qar/eqRUxh9f/MiS5JDZLEPemu014zcrdGg5lXgrbn5DCuovf+7fmAfKvaECfHYfAVYP4X/YG4WpyfFF1+jK7hkPSUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741480269; c=relaxed/simple;
-	bh=HnksT8mSXFPdsYEwYEbQasBkNVX/yh2ujjHTAjEraco=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=dvhM1Z/2+UFMC3ne4+Vld0oiQnTcCae+TDGJd5yHbQ33dGHktFsqCpJKyIupajWziV7NngJwM1DixgfjoWuXIhf+bbroCGu66B62x3AaPBRBghzOcznwAuzykEsogRr9LIfcSOmwIpQipJKa5eMx3mBRIXE/boXJlnumJvXS8nM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ethancedwards.com; spf=pass smtp.mailfrom=ethancedwards.com; dkim=pass (2048-bit key) header.d=ethancedwards.com header.i=@ethancedwards.com header.b=sQYvBX8c; arc=none smtp.client-ip=80.241.56.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ethancedwards.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ethancedwards.com
+	s=arc-20240116; t=1741488200; c=relaxed/simple;
+	bh=JqT3luKWkHDtKFuAPg5vbVht2HgXC3ny+6tJyRfcRjw=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To:Cc; b=I3JFjT+RLa4GdXaMtnHG6na+P6ifcAsFsDKNIjlxPDhOWeYAYa6GKdlqn9JOqsKDaQLAHqkNHoPcNR+waoFBGxsVf/PW5oSycutXrNW6TpDfPEpYrCFuVDolYbtGhcTH2RRcA5HMa9Yv+G7449IVRLCoGztm9+8NGRAWcjxS0YY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=DQ7P9bVW; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ethancedwards.com header.i=@ethancedwards.com header.b="sQYvBX8c"
-Received: from smtp202.mailbox.org (smtp202.mailbox.org [10.196.197.202])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4Z9LXy6Tjcz9scd;
-	Sun,  9 Mar 2025 01:30:58 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ethancedwards.com;
-	s=MBO0001; t=1741480259;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=nw5BrMpWLwOkdKLfm5BC4XDDbHFMMDfyo9rI+ZmiLnU=;
-	b=sQYvBX8cQof5sXBhThSn//SbOyGSP2UipkdG50cAyiygr8+EkF5bIk2pI/CFs0wMNygbef
-	vtX8O5XfMt+SxzCifOihxzZBwOjjlTQ4KlG0AvxQlNFPAOPKg8xi6aVSVVRcTaJ5NkqSKs
-	L14Fnd7VkeJgLqE6SO1j9lhvN3GbZEYivTQiHEj5MqgApFXdfQ/dC8+occdUmjb9uy4TM5
-	odzw00vTGX6bH3zFaQMDJp0m0t+SHmfw6bYZbtkowvldlRjyWNYtWC0rzdali6DiIy1omy
-	7jxgp8tZApggohf7ZlofFh1g4vLJDbZaH1b/9snfGruiCPMjv14zQnYTJur74A==
-From: Ethan Carter Edwards <ethan@ethancedwards.com>
-Date: Sat, 08 Mar 2025 19:30:52 -0500
-Subject: [PATCH] crypto: axis/artpec6: change from kzalloc to kcalloc in
- artpec6_crypto_probe()
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="DQ7P9bVW"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=Cc:To:Subject:From:References:In-Reply-To:Message-Id:Date:
+	Sender:Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=1jO9xadjqBiVEi8B/sfCDao+tK2caka5a7BaYtwhA+w=; b=DQ7P9bVWQL/3PMFd6enfEstzu+
+	hpu3I5O/vNp64BAoDCvSZgjbVoADsY57LVOyUJ1XoNwreSDt6OpqtXfSaD6kRPd+7ZcBabQtPEQ2O
+	Na0oxDoEn47BeaOa/zvR+UpE9LUXK8V4IdwEOpaB8moMfHnbbpsEid2AlH+NSXEYCADiVVWNBw8EB
+	qgyC25CVvsKqmmDq/omrTua+aETMWuy0+QWmsBogGDYFD9ZKsKiR9ytKogoywUwUe5oC/UEPYzlgs
+	/rKpL5gSglT+nonluOZtYg85SGGp8z7VVX5cpf9Tzsz3dK6TkIgyXSU1vjcSddOXCEf4fkjShclXq
+	Xw22YJkw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tr6dE-004zHK-1L;
+	Sun, 09 Mar 2025 10:43:13 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 09 Mar 2025 10:43:12 +0800
+Date: Sun, 09 Mar 2025 10:43:12 +0800
+Message-Id: <e9541bcd5960c6113ca60bfc9d6bbe9413e89eb3.1741488107.git.herbert@gondor.apana.org.au>
+In-Reply-To: <cover.1741488107.git.herbert@gondor.apana.org.au>
+References: <cover.1741488107.git.herbert@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [v3 PATCH 1/8] crypto: api - Add cra_type->destroy hook
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Cc: Yosry Ahmed <yosry.ahmed@linux.dev>, Kanchana P Sridhar <kanchana.p.sridhar@intel.com>, Sergey Senozhatsky <senozhatsky@chromium.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250308-artpec6-devm_kcalloc-v1-1-37886eaebd16@ethancedwards.com>
-X-B4-Tracking: v=1; b=H4sIADvhzGcC/x3MSQqAMAxA0atI1hZaJ9SriEiMUYNTaUUE8e4Wl
- 2/x/wOenbCHOnrA8SVejj3AxBHQjPvESoZgSHSS61SXCt1pmQo18LV1C+G6HqQqNIaoQOrLDEJ
- qHY9y/9umfd8PyZ7im2YAAAA=
-X-Change-ID: 20250308-artpec6-devm_kcalloc-9a11cc6acb84
-To: Jesper Nilsson <jesper.nilsson@axis.com>, 
- Lars Persson <lars.persson@axis.com>, 
- Herbert Xu <herbert@gondor.apana.org.au>, 
- "David S. Miller" <davem@davemloft.net>
-Cc: linux-arm-kernel@axis.com, linux-crypto@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, 
- Ethan Carter Edwards <ethan@ethancedwards.com>
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1739;
- i=ethan@ethancedwards.com; h=from:subject:message-id;
- bh=HnksT8mSXFPdsYEwYEbQasBkNVX/yh2ujjHTAjEraco=;
- b=LS0tLS1CRUdJTiBQR1AgTUVTU0FHRS0tLS0tCgpvd0o0bkp2QXk4ekFKWGJEOXFoNThlVGp6e
- GhQcXlVeHBKOTVhSnZlVXhEek52UGMzRlc3RGxxdk1lSW9rdWFvCnpPSFcrVy80UDJUU0NqNkgr
- M3M3U2xrWXhMZ1laTVVVV2Y3bktLYzkxSnloc1BPdlN4UE1IRllta0NFTVhKd0MKTUpFSnJZd01
- wMzBaNUthY21zdHJYSGQ3NVZrRDlyTWNHc2ZZOWUxdVBiTHFPTFcxY3Z2TElvYi9EcHZuSG52eg
- phZTlxdzhubkZGaG1mYjl2ZEQvaDg0TFZWdzY5UC9IR2JVSERUVDRBZ1A1Uk9BPT0KPVBpSFAKL
- S0tLS1FTkQgUEdQIE1FU1NBR0UtLS0tLQo=
-X-Developer-Key: i=ethan@ethancedwards.com; a=openpgp;
- fpr=2E51F61839D1FA947A7300C234C04305D581DBFE
 
-We are trying to get rid of all multiplications from allocation
-functions to prevent potential integer overflows. Here the
-multiplication is probably safe, but using kcalloc() is more
-appropriate and improves readability. This patch has no effect
-on runtime behavior.
+Add a cra_type->destroy hook so that resources can be freed after
+the last user of a registered algorithm is gone.
 
-Link: https://github.com/KSPP/linux/issues/162 [1]
-Link: https://www.kernel.org/doc/html/next/process/deprecated.html#open-coded-arithmetic-in-allocator-arguments
-
-Signed-off-by: Ethan Carter Edwards <ethan@ethancedwards.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- drivers/crypto/axis/artpec6_crypto.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ crypto/api.c      | 10 ++++++++++
+ crypto/internal.h |  6 ++++--
+ 2 files changed, 14 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/axis/artpec6_crypto.c b/drivers/crypto/axis/artpec6_crypto.c
-index 1c1f57baef0ea9f4ecf7ab39f2c0e9e4327ef568..500b08e42282608348481b759e0b79d25f0b5db0 100644
---- a/drivers/crypto/axis/artpec6_crypto.c
-+++ b/drivers/crypto/axis/artpec6_crypto.c
-@@ -2897,13 +2897,13 @@ static int artpec6_crypto_probe(struct platform_device *pdev)
- 	tasklet_init(&ac->task, artpec6_crypto_task,
- 		     (unsigned long)ac);
+diff --git a/crypto/api.c b/crypto/api.c
+index c2c4eb14ef95..91957bb52f3f 100644
+--- a/crypto/api.c
++++ b/crypto/api.c
+@@ -707,5 +707,15 @@ void crypto_req_done(void *data, int err)
+ }
+ EXPORT_SYMBOL_GPL(crypto_req_done);
  
--	ac->pad_buffer = devm_kzalloc(&pdev->dev, 2 * ARTPEC_CACHE_LINE_MAX,
-+	ac->pad_buffer = devm_kcalloc(&pdev->dev, 2, ARTPEC_CACHE_LINE_MAX,
- 				      GFP_KERNEL);
- 	if (!ac->pad_buffer)
- 		return -ENOMEM;
- 	ac->pad_buffer = PTR_ALIGN(ac->pad_buffer, ARTPEC_CACHE_LINE_MAX);
++void crypto_destroy_alg(struct crypto_alg *alg)
++{
++	if (alg->cra_type && alg->cra_type->destroy)
++		alg->cra_type->destroy(alg);
++
++	if (alg->cra_destroy)
++		alg->cra_destroy(alg);
++}
++EXPORT_SYMBOL_GPL(crypto_destroy_alg);
++
+ MODULE_DESCRIPTION("Cryptographic core API");
+ MODULE_LICENSE("GPL");
+diff --git a/crypto/internal.h b/crypto/internal.h
+index 08d43b40e7db..11567ea24fc3 100644
+--- a/crypto/internal.h
++++ b/crypto/internal.h
+@@ -40,6 +40,7 @@ struct crypto_type {
+ 	void (*show)(struct seq_file *m, struct crypto_alg *alg);
+ 	int (*report)(struct sk_buff *skb, struct crypto_alg *alg);
+ 	void (*free)(struct crypto_instance *inst);
++	void (*destroy)(struct crypto_alg *alg);
  
--	ac->zero_buffer = devm_kzalloc(&pdev->dev, 2 * ARTPEC_CACHE_LINE_MAX,
-+	ac->zero_buffer = devm_kcalloc(&pdev->dev, 2, ARTPEC_CACHE_LINE_MAX,
- 				      GFP_KERNEL);
- 	if (!ac->zero_buffer)
- 		return -ENOMEM;
-
----
-base-commit: 0a2f889128969dab41861b6e40111aa03dc57014
-change-id: 20250308-artpec6-devm_kcalloc-9a11cc6acb84
-
-Best regards,
+ 	unsigned int type;
+ 	unsigned int maskclear;
+@@ -127,6 +128,7 @@ void *crypto_create_tfm_node(struct crypto_alg *alg,
+ 			const struct crypto_type *frontend, int node);
+ void *crypto_clone_tfm(const struct crypto_type *frontend,
+ 		       struct crypto_tfm *otfm);
++void crypto_destroy_alg(struct crypto_alg *alg);
+ 
+ static inline void *crypto_create_tfm(struct crypto_alg *alg,
+ 			const struct crypto_type *frontend)
+@@ -163,8 +165,8 @@ static inline struct crypto_alg *crypto_alg_get(struct crypto_alg *alg)
+ 
+ static inline void crypto_alg_put(struct crypto_alg *alg)
+ {
+-	if (refcount_dec_and_test(&alg->cra_refcnt) && alg->cra_destroy)
+-		alg->cra_destroy(alg);
++	if (refcount_dec_and_test(&alg->cra_refcnt))
++		crypto_destroy_alg(alg);
+ }
+ 
+ static inline int crypto_tmpl_get(struct crypto_template *tmpl)
 -- 
-Ethan Carter Edwards <ethan@ethancedwards.com>
+2.39.5
 
