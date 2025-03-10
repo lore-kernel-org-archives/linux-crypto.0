@@ -1,271 +1,134 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67AF510E5
-	for <linux-crypto@vger.kernel.org>; Sun,  9 Mar 2025 07:19:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BE6A1A23BE
+	for <linux-crypto@vger.kernel.org>; Mon, 10 Mar 2025 04:55:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741504752; cv=none; b=QebtpnLfO2mwER5IIg1DJmF+Yt8vyv0TECO9klTSIpyGJyuoJ4o0iWr301LPwR1hDoNmAynfskRVylc76F1z3jn3O4m1Lqgf8SmlLANNEOSNR6C5ioM94x6L0gkG0p2Ps4oDfDFB4kGSBBeyt+1ySEOA12KLF6ountrp/a4fKEo=
+	t=1741582555; cv=none; b=mFrVJ0fXICgdHdsWLEqavLTNxvK+aQi0C4oXS80fAl9Nozf7EllArB4WKJATUMsfldghjs4ZyH10+fVTNMZz7L0QxWpn7EzlZQSyJwHNHfQIyERhc9CXKD/ES7uvdYnWh2Q8E/1h8bUszJJ6GTjKjVKTL9GfwrjdTwezuobqnYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741504752; c=relaxed/simple;
-	bh=Htai4vb1/4qrL/lW+bBE9mET//+CWzRebx133OMAyZs=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=kJSPXpH9xijtKrR2PUr0TJv6pQ2klbtJ6SQvEeJCVADLkO/0G+hYYD8tv7QzDAISeNBtDt/0JDrVzdp8JIoRuTZjmA2odlPpTTBHFt7xgGHGZciVVNBJV4P+hqN/DdzR3V0X3Rg5W6KI7N7UcCSKcYFzE4vJH8chsltZK7FKv0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=IZPHLC0O; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1741582555; c=relaxed/simple;
+	bh=s8/EMeFEWEYah/ToEcdcQneRc/EsdPCJPwOwk2JfRWA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=o95SIKUmcz3QcGE0bNBH58d5M2v65p/hdfE7gfMhMjQ+HxrTT/dF40yndc3WQPJVko8las5FupmWrZAwLRRpOxuIAmZrrqI4N3IZZWayAD4vSLkmpIVfCXTO3ej4tT90d4mjCzdaNCdZ0E7owFeKGkITzBWUwgB2YUvgn2NgfPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Txcghfbu; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="IZPHLC0O"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=Content-Type:MIME-Version:Message-ID:Subject:To:From:Date:
-	Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=kiAeAMk4p5xFk2GstCg+MmOJUvj0srrchhGsh+Ctl74=; b=IZPHLC0Oy+f9ez17eltqkQ385U
-	VkJ+USUdUn65inx1e3MON0kOka5L36qXi3e/0x00tuJsJb9DhpUK9+W1FeMWYCNrFvlHKMr/q5LUC
-	J51GV1ZTIwHBbtLwTama6vxAmXT73B6rCM3yxyGfwn/jW5in6DRw5KWINakIZ5PAkf0uCB/lVMcpT
-	pgkJ/72ObrbMKmo3rqo5IUQlpulHLq/Zvc4Pv60ybyenX82lfgx20BS+xjnfBIKYEhLlTg4zT3USn
-	PacP2XXWBIA87EVRICVgqx+/L6nRxdwdBzDJjgveqBHaqbCpiVE4kNfXprDrpoZ0w2tdAKXl/DTk0
-	Iq8aLV4Q==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1trAwD-0051ZA-1P;
-	Sun, 09 Mar 2025 15:19:06 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 09 Mar 2025 15:19:05 +0800
-Date: Sun, 9 Mar 2025 15:19:05 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [PATCH] crypto: acomp - Add ACOMP_REQUEST_ALLOC
-Message-ID: <Z81A6buvWoAWTVzH@gondor.apana.org.au>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Txcghfbu"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741582553;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AGNHJW4HHjvj/4hx7d09Bc4jJVzUfVQWIWoaRlJrRIo=;
+	b=TxcghfbuUQtUG4gamZLjBFMY+mfm+pclXStjYaxUGUGkWCIxgHP5Jd/4G+PT1mTArAve3d
+	FI5NwAI8zgp2v1P91ehfwVqmFYWzR+iXdS3PkyfCJ3W07ZHw4fROmHWp9g296eU+YzBWIX
+	CzVE86fc5A7uOqqYtTAC+H5yFh29+wc=
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
+ [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-160-pYHwA1C3Oja6c2ATkSGmIA-1; Mon, 10 Mar 2025 00:55:52 -0400
+X-MC-Unique: pYHwA1C3Oja6c2ATkSGmIA-1
+X-Mimecast-MFC-AGG-ID: pYHwA1C3Oja6c2ATkSGmIA_1741582551
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2f816a85facso6794026a91.3
+        for <linux-crypto@vger.kernel.org>; Sun, 09 Mar 2025 21:55:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1741582550; x=1742187350;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AGNHJW4HHjvj/4hx7d09Bc4jJVzUfVQWIWoaRlJrRIo=;
+        b=WmSvOJPjXqj0fSrSyCFuo6ENGOVXRIHSkww5CgVL1IzlzCB61UPoMAx+ylqtTyTXsI
+         Cp0ohPyy0g2J0uySRTj3sbBxiOKxWHeMcZE6j5ImogIO0eDOdjj2VFeMaB+eq4W3C/5m
+         dis7l8qinSL+6XPpYeuIWCQMxAGURUUKhiYhGL7Cg8MRYkWdBc3Crnnxj/5oGkQoOqqf
+         jRUt+RZd1x0H84f3qtoOGivhh4iYrfWB+pGZGB+TxCtImsK8t6S6+ZTBekdAFVAgnm1W
+         7aA44na/jcQ3x8wf9u03Kwu70zd2CfA0k5Y54H3kerTvYiwjrSOzvg48jG7PctnCAOmj
+         s/uQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXA6uVtO4eVsxPTsEROTwaX/5rj1PTwsLNyxGVxhrtawiRZHsEWDBjeGfUXWiYrX/ldSOMNF1308jAPRwE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzcnqpFEVz6vS7inOeo8zLEf3Cnj5GxnLK4lqZYEeFn5/EMpD5z
+	5TxFafXNQDnx2C+qsIBQlOqplW0SIDfZ6hUdCEqD7bwsktOYUiEsPRs4JCaMEltEjLiPl6NaS0S
+	8ma7k2yvxs+/iBvEyFSqeT3tAnLnieC+GV7sorn8WBzl79oH1ckpmX99VRitvbbixVy1ZJ5mC8u
+	tVa1q80LNTc1Nw05B0yZItIqvl+A0NZNBJHjP2luo3yQVUvAZ6BMgj
+X-Gm-Gg: ASbGncvAkuX9/vJMaSMQwtOW/QbR2HhUCnhkVJgn4gOuQyfxfPV+yj0MyscAE5yiwg7
+	zwYvSldH8Wy9lrUyzttRLhZJ3heAGUFnHdxh1z+cwNRHxLhjUhMEHtXXHZd6Thpy21EKs//bd3Q
+	==
+X-Received: by 2002:a17:90b:1dca:b0:2fc:a3b7:108e with SMTP id 98e67ed59e1d1-2ff7ce63264mr18532340a91.4.1741582550420;
+        Sun, 09 Mar 2025 21:55:50 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE9Xo0gpzEFD/TRddMKMUNDMbauhJ46adEgdxNBxtmb8EtkPrUSIh1rFd5iEsD5Yp2BE7jzIDOi/82H1hGyNkU=
+X-Received: by 2002:a17:90b:1dca:b0:2fc:a3b7:108e with SMTP id
+ 98e67ed59e1d1-2ff7ce63264mr18532310a91.4.1741582550025; Sun, 09 Mar 2025
+ 21:55:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <a18fc6cf356bc338c69b3cc44d7be8bd35c6d7d0.1741028854.git.christophe.jaillet@wanadoo.fr>
+In-Reply-To: <a18fc6cf356bc338c69b3cc44d7be8bd35c6d7d0.1741028854.git.christophe.jaillet@wanadoo.fr>
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 10 Mar 2025 12:55:38 +0800
+X-Gm-Features: AQ5f1JpXzBv8TIF6oxVj41FiZlnmi8yR2xYeZ4UVuxEvdCcbm3NW-Nyvl6onBwo
+Message-ID: <CACGkMEtRFtzb-hbt6N8YJo8nfOOvaPcaw4dLkfs5CWN+ypkLeg@mail.gmail.com>
+Subject: Re: [PATCH] crypto: virtio - Erase some sensitive memory when it is freed
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Gonglei <arei.gonglei@huawei.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	"David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org, 
+	kernel-janitors@vger.kernel.org, virtualization@lists.linux.dev, 
+	linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add ACOMP_REQUEST_ALLOC which is a wrapper around acomp_request_alloc
-that falls back to a synchronous stack reqeust if the allocation
-fails.
+On Tue, Mar 4, 2025 at 3:08=E2=80=AFAM Christophe JAILLET
+<christophe.jaillet@wanadoo.fr> wrote:
+>
+> virtcrypto_clear_request() does the same as the code here, but uses
+> kfree_sensitive() for one of the free operation.
+>
+> So, better safe than sorry, use virtcrypto_clear_request() directly to
+> save a few lines of code and cleanly free the memory.
+>
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> ---
+> I've no idea if this is needed or not, but it looks not consistent to me.
+>
+> If safe as-is, maybe the kfree_sensitive() in virtcrypto_clear_request()
+> should be removed instead.
+> ---
+>  drivers/crypto/virtio/virtio_crypto_core.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/crypto/virtio/virtio_crypto_core.c b/drivers/crypto/=
+virtio/virtio_crypto_core.c
+> index d0278eb568b9..0d522049f595 100644
+> --- a/drivers/crypto/virtio/virtio_crypto_core.c
+> +++ b/drivers/crypto/virtio/virtio_crypto_core.c
+> @@ -480,10 +480,8 @@ static void virtcrypto_free_unused_reqs(struct virti=
+o_crypto *vcrypto)
+>
+>         for (i =3D 0; i < vcrypto->max_data_queues; i++) {
+>                 vq =3D vcrypto->data_vq[i].vq;
+> -               while ((vc_req =3D virtqueue_detach_unused_buf(vq)) !=3D =
+NULL) {
+> -                       kfree(vc_req->req_data);
+> -                       kfree(vc_req->sgs);
+> -               }
+> +               while ((vc_req =3D virtqueue_detach_unused_buf(vq)) !=3D =
+NULL)
+> +                       virtcrypto_clear_request(vc_req);
+>                 cond_resched();
+>         }
+>  }
+> --
+> 2.48.1
+>
+>
 
-The request should be freed with acomp_request_free.
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
- crypto/acompress.c         | 38 +++++++++++++++++++++++----
- include/crypto/acompress.h | 53 +++++++++++++++++++++++++++++++++++---
- include/linux/crypto.h     |  1 +
- 3 files changed, 84 insertions(+), 8 deletions(-)
+Thanks
 
-diff --git a/crypto/acompress.c b/crypto/acompress.c
-index 194a4b36f97f..9da033ded193 100644
---- a/crypto/acompress.c
-+++ b/crypto/acompress.c
-@@ -60,28 +60,56 @@ static void crypto_acomp_exit_tfm(struct crypto_tfm *tfm)
- 	struct crypto_acomp *acomp = __crypto_acomp_tfm(tfm);
- 	struct acomp_alg *alg = crypto_acomp_alg(acomp);
- 
--	alg->exit(acomp);
-+	if (alg->exit)
-+		alg->exit(acomp);
-+
-+	if (acomp_is_async(acomp))
-+		crypto_free_acomp(acomp->fb);
- }
- 
- static int crypto_acomp_init_tfm(struct crypto_tfm *tfm)
- {
- 	struct crypto_acomp *acomp = __crypto_acomp_tfm(tfm);
- 	struct acomp_alg *alg = crypto_acomp_alg(acomp);
-+	struct crypto_acomp *fb = NULL;
-+	int err;
-+
-+	acomp->fb = acomp;
- 
- 	if (tfm->__crt_alg->cra_type != &crypto_acomp_type)
- 		return crypto_init_scomp_ops_async(tfm);
- 
-+	if (acomp_is_async(acomp)) {
-+		fb = crypto_alloc_acomp(crypto_acomp_alg_name(acomp), 0,
-+					CRYPTO_ALG_ASYNC);
-+		if (IS_ERR(fb))
-+			return PTR_ERR(fb);
-+
-+		err = -EINVAL;
-+		if (crypto_acomp_reqsize(fb) > MAX_SYNC_COMP_REQSIZE)
-+			goto out_free_fb;
-+
-+		acomp->fb = fb;
-+	}
-+
- 	acomp->compress = alg->compress;
- 	acomp->decompress = alg->decompress;
- 	acomp->reqsize = alg->reqsize;
- 
--	if (alg->exit)
--		acomp->base.exit = crypto_acomp_exit_tfm;
-+	acomp->base.exit = crypto_acomp_exit_tfm;
- 
--	if (alg->init)
--		return alg->init(acomp);
-+	if (!alg->init)
-+		return 0;
-+
-+	err = alg->init(acomp);
-+	if (err)
-+		goto out_free_fb;
- 
- 	return 0;
-+
-+out_free_fb:
-+	crypto_free_acomp(fb);
-+	return err;
- }
- 
- static unsigned int crypto_acomp_extsize(struct crypto_alg *alg)
-diff --git a/include/crypto/acompress.h b/include/crypto/acompress.h
-index 53c9e632862b..3d131537b1de 100644
---- a/include/crypto/acompress.h
-+++ b/include/crypto/acompress.h
-@@ -10,6 +10,7 @@
- #define _CRYPTO_ACOMP_H
- 
- #include <linux/atomic.h>
-+#include <linux/args.h>
- #include <linux/compiler_types.h>
- #include <linux/container_of.h>
- #include <linux/crypto.h>
-@@ -32,6 +33,14 @@
- 
- #define CRYPTO_ACOMP_DST_MAX		131072
- 
-+#define	MAX_SYNC_COMP_REQSIZE		0
-+
-+#define ACOMP_REQUEST_ALLOC(name, tfm, gfp) \
-+        char __##name##_req[sizeof(struct acomp_req) + \
-+                            MAX_SYNC_COMP_REQSIZE] CRYPTO_MINALIGN_ATTR; \
-+        struct acomp_req *name = acomp_request_on_stack_init( \
-+                __##name##_req, (tfm), (gfp))
-+
- struct acomp_req;
- 
- struct acomp_req_chain {
-@@ -83,12 +92,14 @@ struct acomp_req {
-  * @compress:		Function performs a compress operation
-  * @decompress:		Function performs a de-compress operation
-  * @reqsize:		Context size for (de)compression requests
-+ * @fb:			Synchronous fallback tfm
-  * @base:		Common crypto API algorithm data structure
-  */
- struct crypto_acomp {
- 	int (*compress)(struct acomp_req *req);
- 	int (*decompress)(struct acomp_req *req);
- 	unsigned int reqsize;
-+	struct crypto_acomp *fb;
- 	struct crypto_tfm base;
- };
- 
-@@ -210,22 +221,39 @@ static inline int crypto_has_acomp(const char *alg_name, u32 type, u32 mask)
- 	return crypto_has_alg(alg_name, type, mask);
- }
- 
-+static inline const char *crypto_acomp_alg_name(struct crypto_acomp *tfm)
-+{
-+	return crypto_tfm_alg_name(crypto_acomp_tfm(tfm));
-+}
-+
-+static inline const char *crypto_acomp_driver_name(struct crypto_acomp *tfm)
-+{
-+	return crypto_tfm_alg_driver_name(crypto_acomp_tfm(tfm));
-+}
-+
- /**
-  * acomp_request_alloc() -- allocates asynchronous (de)compression request
-  *
-  * @tfm:	ACOMPRESS tfm handle allocated with crypto_alloc_acomp()
-+ * @gfp:	gfp to pass to kzalloc
-  *
-  * Return:	allocated handle in case of success or NULL in case of an error
-  */
--static inline struct acomp_req *acomp_request_alloc_noprof(struct crypto_acomp *tfm)
-+static inline struct acomp_req *acomp_request_alloc_noprof_1(
-+	struct crypto_acomp *tfm, gfp_t gfp)
- {
- 	struct acomp_req *req;
- 
--	req = kzalloc_noprof(sizeof(*req) + crypto_acomp_reqsize(tfm), GFP_KERNEL);
-+	req = kzalloc_noprof(sizeof(*req) + crypto_acomp_reqsize(tfm), gfp);
- 	if (likely(req))
- 		acomp_request_set_tfm(req, tfm);
- 	return req;
- }
-+#define acomp_request_alloc_noprof(tfm, ...) \
-+	CONCATENATE(acomp_request_alloc_noprof_, COUNT_ARGS(__VA_ARGS__))( \
-+		tfm, ##__VA_ARGS__)
-+#define acomp_request_alloc_noprof_0(tfm) \
-+	acomp_request_alloc_noprof_1(tfm, GFP_KERNEL)
- #define acomp_request_alloc(...)	alloc_hooks(acomp_request_alloc_noprof(__VA_ARGS__))
- 
- /**
-@@ -237,6 +265,8 @@ static inline struct acomp_req *acomp_request_alloc_noprof(struct crypto_acomp *
-  */
- static inline void acomp_request_free(struct acomp_req *req)
- {
-+	if ((req->base.flags & CRYPTO_TFM_REQ_ON_STACK))
-+		return;
- 	kfree_sensitive(req);
- }
- 
-@@ -257,7 +287,8 @@ static inline void acomp_request_set_callback(struct acomp_req *req,
- 					      void *data)
- {
- 	u32 keep = CRYPTO_ACOMP_REQ_SRC_VIRT | CRYPTO_ACOMP_REQ_SRC_NONDMA |
--		   CRYPTO_ACOMP_REQ_DST_VIRT | CRYPTO_ACOMP_REQ_DST_NONDMA;
-+		   CRYPTO_ACOMP_REQ_DST_VIRT | CRYPTO_ACOMP_REQ_DST_NONDMA |
-+		   CRYPTO_TFM_REQ_ON_STACK;
- 
- 	req->base.complete = cmpl;
- 	req->base.data = data;
-@@ -446,4 +477,20 @@ int crypto_acomp_compress(struct acomp_req *req);
-  */
- int crypto_acomp_decompress(struct acomp_req *req);
- 
-+static inline struct acomp_req *acomp_request_on_stack_init(
-+	char *buf, struct crypto_acomp *tfm, gfp_t gfp)
-+{
-+	struct acomp_req *req;
-+
-+	req = acomp_request_alloc(tfm, gfp);
-+	if (req)
-+		return req;
-+
-+	req = (void *)buf;
-+	acomp_request_set_tfm(req, tfm->fb);
-+	req->base.flags = CRYPTO_TFM_REQ_ON_STACK;
-+
-+	return req;
-+}
-+
- #endif
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index 61ac11226638..ea3b95bdbde3 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -138,6 +138,7 @@
- #define CRYPTO_TFM_REQ_FORBID_WEAK_KEYS	0x00000100
- #define CRYPTO_TFM_REQ_MAY_SLEEP	0x00000200
- #define CRYPTO_TFM_REQ_MAY_BACKLOG	0x00000400
-+#define CRYPTO_TFM_REQ_ON_STACK		0x00000800
- 
- /*
-  * Miscellaneous stuff.
--- 
-2.39.5
-
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
