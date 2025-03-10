@@ -1,48 +1,58 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC17B22A4E0;
-	Mon, 10 Mar 2025 13:27:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0851B1BCA1B
+	for <linux-crypto@vger.kernel.org>; Mon, 10 Mar 2025 16:16:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741613224; cv=none; b=oQ/8BFwZ1/ohb0erJFX/XFY5DIYA1mhY/ogh+SE7YjdLu6VkCCo8aSm2iq1qR7zlwd3W1pYa/Z6S5/vG7pZ/sief5ioKgyoOjOWJcOvIj75ae7l4mVzJHW2DEnOlfiaeWeBuMyjlcy6HoRQW3HTxQvx69CtWtqXuUZtLzLuTZFg=
+	t=1741623405; cv=none; b=Hl4+Xuec+NF79fz8J01/tLMvj4+eNccZEBchZsKFf3T7zVRgZ7V9wSI1tuBLeZ2XNBR6dEYRhp5BmmMmbA0nkXdxGvggRdkJPeMEFqRNYj4XjiYN7JqSltk6zTyP0WXTnIOZTaXKjgOwTWVWNxxjM2406UI4Bbjcns8b4ug5ME0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741613224; c=relaxed/simple;
-	bh=mER/O8b06hjWGlK9vixTIeglGzWo83VaznuRZmQmWpE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=QyysSyxs0gxFzPH8dIV5+eCCRzrBNR1emvspzPJ6kqNvDG9F+Yqy1cfeJ1T6WkKCRKFLdaGFGaTkTHIP/z6WmN5LKZtRHKoaUJJ1rdAuSDMj6vzZQFImtFBviTYMx1TTxb0X9BLun8ue6K9e/4PXCfj3XstoaY2G4rQ265k3PGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FI9KKuA+; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1741623405; c=relaxed/simple;
+	bh=8qcXoxdiD1/XTYUcsjJUPmNwmIHfPWUFQ5lVcH9tTk4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YyvRYIIYqc5QjRTwZD5lwsNvIjxeolQcBYTj498kKIaKE1/SZCICpkJswzvzGsO5QrlkYZQSEsCCJ+FfNT1TBQWtkcJ1QRhPWvh1PkHlh+tJmk6hIqDPt2keAnRXZXl3TQSFnTGlhqkMl3/WBcqfBZ67VqsRe0aYN63da5Bh0qo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JMrQUEps; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FI9KKuA+"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 247AEC4CEE5;
-	Mon, 10 Mar 2025 13:27:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741613224;
-	bh=mER/O8b06hjWGlK9vixTIeglGzWo83VaznuRZmQmWpE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=FI9KKuA+jKkPVq7ILvzg+kXKkBHAcppO3slzbdDbQ83Gr01enW4vPt76jMSIsprSe
-	 gdSQAH8i9CeGWdI39IiQYBksup9yKVH3dmBYKKQWQSHl/OyJTDvo0W7oyD8HWrQG+5
-	 B3B/Ckj/73M/HORdNprm5SnDWeR5nk0Dnaxce6eDgYIN9XARBFUwn3JTz/hFP4jCwg
-	 vp+P2RLMTZZIKwBD7UeTq6PYiI1Ag4HJu93EI7sSeScKWsMCOXVfDjV5W1xj3a2pFU
-	 wNnA4TeeTb75czyBnnCEgmgiIrfSGAVq9ssD4ToOBqtkzHvnAGAX3AndyYX2P2uu2D
-	 zFTkoN88Q5+iw==
-From: Arnd Bergmann <arnd@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	"Justin M. Forbes" <jforbes@fedoraproject.org>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Jarkko Sakkinen <jarkko@kernel.org>,
-	James Bottomley <James.Bottomley@HansenPartnership.com>,
-	linux-crypto@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] crypto: lib/Kconfig: hide library options
-Date: Mon, 10 Mar 2025 14:26:40 +0100
-Message-Id: <20250310132647.3256818-2-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250310132647.3256818-1-arnd@kernel.org>
-References: <20250310132647.3256818-1-arnd@kernel.org>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JMrQUEps"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741623404; x=1773159404;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=8qcXoxdiD1/XTYUcsjJUPmNwmIHfPWUFQ5lVcH9tTk4=;
+  b=JMrQUEpssdVWApQtFsOmKqenwOgcq7bYWnzEyzaq9GvCrJXv7YuKx1Ou
+   AuBuisSz587G0Bg/vEfd5t1faUaoxjUl3n4bF5CkiroYbtS+P8rjfJ4VI
+   gqH3DlaKW5WrTVEtoAhoHRT0LKDPNgDzovleLxaUc3WDCCFczH0YXDLki
+   iZNjKxYdjefvTzN4xmSRWLvnTS6Itt1BKGi+kU7n2CBLEmH9+l9Gj+Scm
+   OUQB0ycewZsw9SXf0Jid7OUIcxIcp2kS8koEHwYXUZNHXxeTLd9ylox5l
+   Zgs4lrtrUfeQ+dmmZiWU6Ea4bVZ7L0ZQYgqtOM16ILNMBV6Mcnev39YNr
+   w==;
+X-CSE-ConnectionGUID: NQiqnTz1Sjmol7il2bHDaA==
+X-CSE-MsgGUID: 3IjzQqUKQ7SgeV6PIPjHKA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11369"; a="41795469"
+X-IronPort-AV: E=Sophos;i="6.14,236,1736841600"; 
+   d="scan'208";a="41795469"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Mar 2025 09:16:43 -0700
+X-CSE-ConnectionGUID: X6lfS+dIR1ayBUUtEVslrQ==
+X-CSE-MsgGUID: UkvMN+wGQmmsKTcRLrIb3A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,236,1736841600"; 
+   d="scan'208";a="143237592"
+Received: from t21-qat.iind.intel.com ([10.49.15.35])
+  by fmviesa002.fm.intel.com with ESMTP; 10 Mar 2025 09:16:32 -0700
+From: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
+To: herbert@gondor.apana.org.au
+Cc: linux-crypto@vger.kernel.org,
+	qat-linux@intel.com,
+	Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>,
+	Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: [PATCH] crypto: qat - add macro to write 64-bit values to registers
+Date: Mon, 10 Mar 2025 16:15:40 +0000
+Message-Id: <20250310161540.510166-1-suman.kumar.chakraborty@intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -51,67 +61,101 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Arnd Bergmann <arnd@arndb.de>
+Introduce the ADF_CSR_WR_LO_HI macro to simplify writing a 64-bit values
+to hardware registers.
 
-Any driver that needs these library functions should already be selecting
-the corresponding Kconfig symbols, so there is no real point in making
-these visible.
+This macro works by splitting the 64-bit value into two 32-bit segments,
+which are then written separately to the specified lower and upper
+register offsets.
 
-The original patch that made these user selectable described problems
-with drivers failing to select the code they use, but as far as I can
-tell, those were all bugs that got solved in the meantime and did not
-get solved by that patch.
+Update the adf_gen4_set_ssm_wdtimer() function to utilize this newly
+introduced macro.
 
-Fixes: e56e18985596 ("lib/crypto: add prompts back to crypto libraries")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-----
-This does not actually fix a build failure, but I noticed that the
-user visible options don't really make sense. Feel free to ignore
-this one.
+Signed-off-by: Suman Kumar Chakraborty <suman.kumar.chakraborty@intel.com>
+Reviewed-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 ---
- lib/crypto/Kconfig | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ .../intel/qat/qat_common/adf_accel_devices.h  | 10 +++++++
+ .../intel/qat/qat_common/adf_gen4_hw_data.c   | 30 ++++---------------
+ 2 files changed, 16 insertions(+), 24 deletions(-)
 
-diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
-index 17322f871586..798972b29b68 100644
---- a/lib/crypto/Kconfig
-+++ b/lib/crypto/Kconfig
-@@ -63,7 +63,7 @@ config CRYPTO_LIB_CHACHA_INTERNAL
- 	select CRYPTO_LIB_CHACHA_GENERIC if CRYPTO_ARCH_HAVE_LIB_CHACHA=n
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
+index 9c15c31ad134..0509174d6030 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
++++ b/drivers/crypto/intel/qat/qat_common/adf_accel_devices.h
+@@ -10,6 +10,7 @@
+ #include <linux/ratelimit.h>
+ #include <linux/types.h>
+ #include <linux/qat/qat_mig_dev.h>
++#include <linux/wordpart.h>
+ #include "adf_cfg_common.h"
+ #include "adf_rl.h"
+ #include "adf_telemetry.h"
+@@ -371,6 +372,15 @@ struct adf_hw_device_data {
+ /* CSR write macro */
+ #define ADF_CSR_WR(csr_base, csr_offset, val) \
+ 	__raw_writel(val, csr_base + csr_offset)
++/*
++ * CSR write macro to handle cases where the high and low
++ * offsets are sparsely located.
++ */
++#define ADF_CSR_WR64_LO_HI(csr_base, csr_low_offset, csr_high_offset, val)	\
++do {										\
++	ADF_CSR_WR(csr_base, csr_low_offset, lower_32_bits(val));		\
++	ADF_CSR_WR(csr_base, csr_high_offset, upper_32_bits(val));		\
++} while (0)
  
- config CRYPTO_LIB_CHACHA
--	tristate "ChaCha library interface"
-+	tristate
- 	select CRYPTO
- 	select CRYPTO_LIB_CHACHA_INTERNAL
- 	help
-@@ -93,7 +93,7 @@ config CRYPTO_LIB_CURVE25519_INTERNAL
- 	select CRYPTO_LIB_CURVE25519_GENERIC if CRYPTO_ARCH_HAVE_LIB_CURVE25519=n
+ /* CSR read macro */
+ #define ADF_CSR_RD(csr_base, csr_offset) __raw_readl(csr_base + csr_offset)
+diff --git a/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c
+index ade279e48010..099949a2421c 100644
+--- a/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c
++++ b/drivers/crypto/intel/qat/qat_common/adf_gen4_hw_data.c
+@@ -135,36 +135,18 @@ int adf_gen4_init_device(struct adf_accel_dev *accel_dev)
+ }
+ EXPORT_SYMBOL_GPL(adf_gen4_init_device);
  
- config CRYPTO_LIB_CURVE25519
--	tristate "Curve25519 scalar multiplication library"
-+	tristate
- 	select CRYPTO
- 	select CRYPTO_LIB_CURVE25519_INTERNAL
- 	help
-@@ -132,7 +132,7 @@ config CRYPTO_LIB_POLY1305_INTERNAL
- 	select CRYPTO_LIB_POLY1305_GENERIC if CRYPTO_ARCH_HAVE_LIB_POLY1305=n
+-static inline void adf_gen4_unpack_ssm_wdtimer(u64 value, u32 *upper,
+-					       u32 *lower)
+-{
+-	*lower = lower_32_bits(value);
+-	*upper = upper_32_bits(value);
+-}
+-
+ void adf_gen4_set_ssm_wdtimer(struct adf_accel_dev *accel_dev)
+ {
+ 	void __iomem *pmisc_addr = adf_get_pmisc_base(accel_dev);
+ 	u64 timer_val_pke = ADF_SSM_WDT_PKE_DEFAULT_VALUE;
+ 	u64 timer_val = ADF_SSM_WDT_DEFAULT_VALUE;
+-	u32 ssm_wdt_pke_high = 0;
+-	u32 ssm_wdt_pke_low = 0;
+-	u32 ssm_wdt_high = 0;
+-	u32 ssm_wdt_low = 0;
  
- config CRYPTO_LIB_POLY1305
--	tristate "Poly1305 library interface"
-+	tristate
- 	select CRYPTO
- 	select CRYPTO_LIB_POLY1305_INTERNAL
- 	help
-@@ -141,7 +141,7 @@ config CRYPTO_LIB_POLY1305
- 	  is available and enabled.
+-	/* Convert 64bit WDT timer value into 32bit values for
+-	 * mmio write to 32bit CSRs.
+-	 */
+-	adf_gen4_unpack_ssm_wdtimer(timer_val, &ssm_wdt_high, &ssm_wdt_low);
+-	adf_gen4_unpack_ssm_wdtimer(timer_val_pke, &ssm_wdt_pke_high,
+-				    &ssm_wdt_pke_low);
+-
+-	/* Enable WDT for sym and dc */
+-	ADF_CSR_WR(pmisc_addr, ADF_SSMWDTL_OFFSET, ssm_wdt_low);
+-	ADF_CSR_WR(pmisc_addr, ADF_SSMWDTH_OFFSET, ssm_wdt_high);
+-	/* Enable WDT for pke */
+-	ADF_CSR_WR(pmisc_addr, ADF_SSMWDTPKEL_OFFSET, ssm_wdt_pke_low);
+-	ADF_CSR_WR(pmisc_addr, ADF_SSMWDTPKEH_OFFSET, ssm_wdt_pke_high);
++	/* Enable watchdog timer for sym and dc */
++	ADF_CSR_WR64_LO_HI(pmisc_addr, ADF_SSMWDTL_OFFSET, ADF_SSMWDTH_OFFSET, timer_val);
++
++	/* Enable watchdog timer for pke */
++	ADF_CSR_WR64_LO_HI(pmisc_addr, ADF_SSMWDTPKEL_OFFSET, ADF_SSMWDTPKEH_OFFSET,
++			   timer_val_pke);
+ }
+ EXPORT_SYMBOL_GPL(adf_gen4_set_ssm_wdtimer);
  
- config CRYPTO_LIB_CHACHA20POLY1305
--	tristate "ChaCha20-Poly1305 AEAD support (8-byte nonce library version)"
-+	tristate
- 	select CRYPTO_LIB_CHACHA
- 	select CRYPTO_LIB_POLY1305
- 	select CRYPTO_LIB_UTILS
+
+base-commit: 4d9c16a296d6ae3931422232f35836753ddf09ef
 -- 
-2.39.5
+2.40.1
 
