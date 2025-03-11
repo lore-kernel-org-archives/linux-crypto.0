@@ -1,53 +1,39 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CB7579CD;
-	Tue, 11 Mar 2025 03:16:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF64A1DEFF3
+	for <linux-crypto@vger.kernel.org>; Tue, 11 Mar 2025 04:36:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741663023; cv=none; b=NfDO2C4q3xCwYYaDPWnsl8xx0CNqDt0Ch0kfrQAnuJ7kz++/HsH0QnMt33RSVqkerSRIgm+EkgFfRzFDP1dnK5KtPB+PCydsPnJ4SWz0gdJiaUjP04NmDrm4Q8b1G1lLVwsKYK7V6BaoN+ZJXXk0mzPqc2z2Hh6WZcRR9rH4g50=
+	t=1741667814; cv=none; b=XNbxIE0C7i8w+eZW2O8KGVAo6P6+vIuDD31lkhKvr6/HM7yOga9FkhcY05i/Wux0SAffc8gCYA7Bc28r5vi6OeSCu7ZK3MxdHqEIq9SUUB1OQoioaT8pBQtmdrg8ohNLfVMfRQM9scuLmJQs3w182nLd2qr3u2Wa88iHQSao5T4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741663023; c=relaxed/simple;
-	bh=wiHslj2vjiuXwutcRpNaYqLLvHQbhIGMFa8wKOFpTJU=;
+	s=arc-20240116; t=1741667814; c=relaxed/simple;
+	bh=c4W81ZvmYn9grfmgsES+E1br7CFkxMQFDhCQVqvxjcE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D1BupEquKVy1M3X01A4XXPPe7AbJaOc26aMJMOD43azpmN2L2ttXTFrq7Cs3KHVYBmHaOxJn7rIR/xnHTawLhHslzhf6WgrigK24+qO8NjHyFhNoP6D59r4dYsMDJ2SxE0jUYDsSlK2UbfkZW/aRENNSrp6C9uROfrN1dFlkq9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=FaEMOFmK; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=KJb/eaZumQdqqVkepin+8twJy0av3FPeG647Ts9be0m0xgm96rl1cnszzCFsKQ8HaSmEqS0SWaahMQOxDR+omj5AfBMPFVKAbMgGIKH219hzdtR7NVBSj1mIjYaZeCYu3ztmYHVQsDHrYfMXHR7UGwezn9M8Qb9SULN34metxCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=st91uS89; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="FaEMOFmK"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=467e1is8JOix9VmEjoYUFqmjDWXAeS20j6FPzgXuBZo=; b=FaEMOFmKlp37xTq3t2jZ6GFsBK
-	WUy0BdFvFvYPQEM0KSRxWdad60YYNftFHQL7mfVyu9eRSy+wR5DuI7UkeKm/QCPRLlH1i1D4CEItt
-	nkff7u30VzQ0wHsw33tpFSpV+50IRQh5abUe/ptxgg7Ite3Ul9GUEbcJRhrHD+HWjAkXEUXZYVu/j
-	TdebpSDefs8Gxrxxrt1OeXitYgGuJFSFZXvwE487FEIOUjDl/iS0cRSNQuMXhqDugOag44OFo1QUy
-	ptNJa8aOeTj0EIBEVs1wmSDpDeY9Rjo/NiJU0dBgY6EPCYc5fCDY2jj0wqMDyqCDAkjGz5cgbrsL4
-	6XyPXCdQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1trq6x-005TXu-2l;
-	Tue, 11 Mar 2025 11:16:56 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 11 Mar 2025 11:16:55 +0800
-Date: Tue, 11 Mar 2025 11:16:55 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: oe-kbuild@lists.linux.dev,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	lkp@intel.com, oe-kbuild-all@lists.linux.dev,
-	Yosry Ahmed <yosry.ahmed@linux.dev>,
-	Kanchana P Sridhar <kanchana.p.sridhar@intel.com>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: Re: [v3 PATCH 7/8] crypto: scomp - Remove support for most
- non-trivial destination SG lists
-Message-ID: <Z8-rJ5nOjqO-_kBW@gondor.apana.org.au>
-References: <205f05023b5ff0d8cf7deb6e0a5fbb4643f02e00.1741488107.git.herbert@gondor.apana.org.au>
- <914f6ea6-bb6c-4feb-a4ac-23508a8ff335@stanley.mountain>
- <Z8-qcLGAIaZXo5fc@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="st91uS89"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FD81C4CEE9;
+	Tue, 11 Mar 2025 04:36:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741667813;
+	bh=c4W81ZvmYn9grfmgsES+E1br7CFkxMQFDhCQVqvxjcE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=st91uS89oHB0qqmfaHxdvwEiYwBP9M3t5qjMKVG8Dv6MkLW3fpE4ZuvKrG6X2TNOs
+	 KLruV+J4SmveSau9gW+oHGKiRYbQX7sqxWJ4DAHkTxAVNRY6ajllnsxa3o7QGevAyC
+	 OJksXNoeLsMiBGzwLrXkUYGmvG4sDkbIOzSQeswSQz1lzwC//aqPwUXEyl3xjkivwf
+	 tXB4qqQbhRiJjwxXLUXLBSyCgJ8f4xESAoVkmC8jZkcXrbwu7XfRJ5q6mI2VEr4hi0
+	 0g7pR85ydjIQ1fL1j3BqdL7zQsCDoW+ToIjIUrIHN7Em6br55fLWtLOMSgPJKErOA4
+	 cHoDl/mf2hvYw==
+Date: Mon, 10 Mar 2025 21:36:51 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [v2 PATCH 2/3] crypto: scatterwalk - Add memcpy_sglist
+Message-ID: <20250311043651.GA1263@sol.localdomain>
+References: <cover.1741318360.git.herbert@gondor.apana.org.au>
+ <18a6df64615a10be64c3c902f8b1f36e472548d7.1741318360.git.herbert@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -56,25 +42,55 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z8-qcLGAIaZXo5fc@gondor.apana.org.au>
+In-Reply-To: <18a6df64615a10be64c3c902f8b1f36e472548d7.1741318360.git.herbert@gondor.apana.org.au>
 
-On Tue, Mar 11, 2025 at 11:13:52AM +0800, Herbert Xu wrote:
->
-> > 5b855462cc7e3f3 Herbert Xu                2025-03-09 @174  	if (req->dst && !dlen)
-> >                                                                     ^^^^^^^^
-> > Is this check necessary?
+On Fri, Mar 07, 2025 at 11:36:19AM +0800, Herbert Xu wrote:
+> Add memcpy_sglist which copies one SG list to another.
 > 
-> This is not trying to catch a null req->dst, but it's trying to
-> detect an combination of a non-null req->dst with a zero dlen.
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> ---
+>  crypto/scatterwalk.c         | 27 +++++++++++++++++++++++++++
+>  include/crypto/scatterwalk.h |  3 +++
+>  2 files changed, 30 insertions(+)
 > 
-> A zero dlen is used to allocate req->dst on demand, which would
-> conflict with a non-null req->dst.
+> diff --git a/crypto/scatterwalk.c b/crypto/scatterwalk.c
+> index 20a28c6d94da..8225801488d5 100644
+> --- a/crypto/scatterwalk.c
+> +++ b/crypto/scatterwalk.c
+> @@ -86,6 +86,33 @@ void memcpy_to_sglist(struct scatterlist *sg, unsigned int start,
+>  }
+>  EXPORT_SYMBOL_GPL(memcpy_to_sglist);
+>  
+> +void memcpy_sglist(struct scatterlist *dst, struct scatterlist *src,
+> +		   unsigned int nbytes)
+> +{
+> +	struct scatter_walk swalk;
+> +	struct scatter_walk dwalk;
+> +
+> +	if (unlikely(nbytes == 0)) /* in case sg == NULL */
+> +		return;
+> +
+> +	scatterwalk_start(&swalk, src);
+> +	scatterwalk_start(&dwalk, dst);
+> +
+> +	do {
+> +		unsigned int slen, dlen;
+> +		unsigned int len;
+> +
+> +		slen = scatterwalk_next(&swalk, nbytes);
+> +		dlen = scatterwalk_next(&dwalk, nbytes);
+> +		len = min(slen, dlen);
+> +		memcpy(dwalk.addr, swalk.addr, len);
+> +		scatterwalk_done_dst(&dwalk, len);
+> +		scatterwalk_done_src(&swalk, len);
+> +		nbytes -= len;
+> +	} while (nbytes);
+> +}
+> +EXPORT_SYMBOL_GPL(memcpy_sglist);
 
-Actually I take that back.  Yes this test should be removed as
-it's a remnant of the NULL dst code which has no users.
+Actually this new function is useless as-is, since it invokes undefined behavior
+when the source and destination coincide (which can happen even when src ==
+dst), and all the potential callers need to handle that case.  I'm working on a
+fixed version.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+- Eric
