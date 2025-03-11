@@ -1,109 +1,139 @@
-Received: from fout-b4-smtp.messagingengine.com (fout-b4-smtp.messagingengine.com [202.12.124.147])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97C972566DF;
-	Tue, 11 Mar 2025 12:32:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8194C25F79C;
+	Tue, 11 Mar 2025 16:00:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741696374; cv=none; b=sdSE50FZcZYvL98JMdRi5Scz5y0YsF9KImVqJAxmuowF5kgrsFZUxAM4uGakawKjjONO6uCxHMLHNr5ChNI8tmwL2P6WRrKRUbUq+NIF0ZRECaTZUyZtRu88B50m2PFLSPRKL6xb/+/s7ja6+WBRctitCbit5qOWMWCQaE5wupM=
+	t=1741708801; cv=none; b=l6+K8XX5ztqu+JPa+5HqM+3DiexqTFaJGo6syj+L/N40qzZqvTAZ97APA3zPZ1bxRfjSxewurlNPq/41Y7epd3Ln9in4aoi8oqD2zpggAv0krS8xhrDwT4gOx3A2MkVtiFymWfUgZ3Qw+yEWgdcyT5ybD0Ac0EFVDGsmyVjbLgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741696374; c=relaxed/simple;
-	bh=fnfUwCVpxgGFnIhUtch5ji1/4WPSF8TxZw77sXyT+W0=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=QKXEhw2KFnLDsielmo2BeK7svkpSnFmp6Paetm4L9avSyBpXjRCIX40CI6sDj7iK/x53MOxai5gDfQp96voleQYmy1KkRUsbYWhr8t1IZbwIftmvVFjS5iP4sRMi9msnHmRkLluRVB3rHKU9WXdXM1j6eofZueFgb6Nbbc/LYIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=PuR4A86a; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=iSRaSERv; arc=none smtp.client-ip=202.12.124.147
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+	s=arc-20240116; t=1741708801; c=relaxed/simple;
+	bh=frAwT789BAh4F89Qv4uDoVqmywdm58BDlCsir8WtQmY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FZc5yb4qck7NIF/QPI+f1TP4TYzmactsYD+lWJVUxHOXdxSNpaXCWlOTHCGj7XjxcKUkj+G3PDKXlbjlYZ6AQBe7JBzF++SsJbUi1zIYh9rKbpml4oADqt+5qImP6jImwoaBrbIluWzHl3HSffJMQOmFgQKTdd99BoojVzNO8Zg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uUpknmff; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="PuR4A86a";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="iSRaSERv"
-Received: from phl-compute-07.internal (phl-compute-07.phl.internal [10.202.2.47])
-	by mailfout.stl.internal (Postfix) with ESMTP id 5272E1140153;
-	Tue, 11 Mar 2025 08:32:50 -0400 (EDT)
-Received: from phl-imap-11 ([10.202.2.101])
-  by phl-compute-07.internal (MEProxy); Tue, 11 Mar 2025 08:32:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm3; t=1741696370;
-	 x=1741782770; bh=AHRUDiDL+udOA0j+pbNQc9o/g3Xg+29U5On+bEc2WEI=; b=
-	PuR4A86a2ISknob+LndBjLNMKvP7Wv2423VT1nrr9ARvYJjGaxQVBtiLRKjRLLVc
-	RC4VSu8toeGZA0AL+RgM5ohK0Oc/h2D+EslwAzHUFpsLd8ByX0LwRDiMbEOCsAkP
-	BGdgdEttwqyMzWvcR6EwM4XQnAwdKcWltgKdzSAsSBrRwCStwKVfV0laqN/5Fygb
-	YJEXxALluMepOYdmIreEkZhJc+xRm3L4Yk1WMPQVjnAProPpgfDphg0sQN8pTQZT
-	2t0bsyiK1qACK+t7dAofor1HpnnavK/vx/ABTaTiZpPw1mu3iyYN+dyJxv9yAfiI
-	tCq6QfQTosUJDD95XU4zvA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1741696370; x=
-	1741782770; bh=AHRUDiDL+udOA0j+pbNQc9o/g3Xg+29U5On+bEc2WEI=; b=i
-	SRaSERvRIUzwuvDbNKkrrLBhjDwc8ZawxUmlu8YGWw45md73Png1zy5Fvp7/PAFe
-	zQrvobhl0B08DRcrY++sCgPHtqhlEuJE5d26g2AKeXEZEv+SJm9Z14FrXOhHaZWE
-	v83OJjOD+lESGutH7fo1DeZC7xDF3nyPjwUtWGW38eCMS5n87VqQT039QN7+OCqc
-	ByUKBbJ0YA4acyJI5HGZveGC/WBhYFYgvnCmuuw7E3BUvKi/xiq8wf3/h0GWFvAo
-	wWuC4pyT9zkZzVcr5CVV0AbwHdnPQGyvJT2boVUrYDGKYHfbyu6po4ZBkCxrYn+h
-	eqVx1YZvk3GFcvuV0ofpw==
-X-ME-Sender: <xms:cC3QZ5VvmQv6af1sYcTh4L2sVCSIPb852VduAnglhAiOej0LubyVkQ>
-    <xme:cC3QZ5l85iX5kWWtvAVbgkSuVRfPtzYU9sUdn93_tkithsX7qDJDsSPrLjACv3yaS
-    HtlHNYBkvLVK0MV6GU>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduvddvvdegucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggv
-    pdfurfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpih
-    gvnhhtshculddquddttddmnecujfgurhepofggfffhvfevkfgjfhfutgfgsehtjeertder
-    tddtnecuhfhrohhmpedftehrnhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnug
-    gsrdguvgeqnecuggftrfgrthhtvghrnhepfefhheetffduvdfgieeghfejtedvkeetkeej
-    feekkeelffejteevvdeghffhiefhnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenuc
-    evlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnuges
-    rghrnhgusgdruggvpdhnsggprhgtphhtthhopeelpdhmohguvgepshhmthhpohhuthdprh
-    gtphhtthhopehsmhhuvghllhgvrhestghhrhhonhhogidruggvpdhrtghpthhtohepuggr
-    vhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehhvghrsggvrhhtsehgoh
-    hnughorhdrrghprghnrgdrohhrghdrrghupdhrtghpthhtoheprghruggssehkvghrnhgv
-    lhdrohhrghdprhgtphhtthhopegrrhhnugeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
-    epvggsihhgghgvrhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdgt
-    rhihphhtohesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqd
-    hkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehluhhkrghs
-    seifuhhnnhgvrhdruggv
-X-ME-Proxy: <xmx:cC3QZ1bbgLm91JnS19xYkrR6P8IQvD8nkfLL67KrWDqfhTo-ZLGhJQ>
-    <xmx:cC3QZ8UTGM0h1qv3E9e4tgFW8VEANX2qjYO15tDNFLOmddC8b9aihQ>
-    <xmx:cC3QZzkt40D7dGmwXby_7I4nxQYayu0p5O2G-ghRrAO3h7x1cyXaTQ>
-    <xmx:cC3QZ5cTzlqW1toGdUTeFSNyD328KlBcWTJ762bcgxCdCTOsenCrBA>
-    <xmx:ci3QZ15FFfbibcUpl4OtJIdYJjvb2Gu0ZFeNstm6CxgczfbbhVoIlhrr>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id 8BF532220071; Tue, 11 Mar 2025 08:32:48 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uUpknmff"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D39B7C4CEE9;
+	Tue, 11 Mar 2025 15:59:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741708800;
+	bh=frAwT789BAh4F89Qv4uDoVqmywdm58BDlCsir8WtQmY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uUpknmffSTA6HHE+IafTOGZOOGVoB+jEDYMG0FuJYdMnNsfHRJu26BrQYwbY1k4zd
+	 VKL35+v1HICOjsfNov8pO2+cYat9912p8htjSX+3GMLdxnPdiWZvK3Alnapfyn4T9v
+	 3nP6aqWJvyplYWgTgw/9jqXL52VGrEIfxp5RsV3TzwvlM4ypshmqr9QBQv0l5sZk4X
+	 xhvSKndUayuYpc1EVBxlldxmAFq8YfLiSRYQ6WasQYbBtWt6/t6bhFJG4j9KqRsd7+
+	 ZQISQ/gxL7BFzAnnNdHfayVrshDGBctsKyclFm0jy2iwRpvcYmERzrVU5k8cre6UwP
+	 K1ZQCjo/9dTMQ==
+Date: Tue, 11 Mar 2025 17:59:55 +0200
+From: Dmitry Baryshkov <lumag@kernel.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Thara Gopinath <thara.gopinath@gmail.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Vinod Koul <vkoul@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Md Sadre Alam <quic_mdalam@quicinc.com>, Srinivas Kandagatla <srinivas.kandagatla@linaro.org>, 
+	linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	dmaengine@vger.kernel.org, linux-doc@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH v7 1/8] dmaengine: add DMA_PREP_LOCK and DMA_PREP_UNLOCK
+ flag
+Message-ID: <ozcg3m3iwdprt4hnti473e4j6ixnwgggbdvsnxold32bigcv7i@koo3ww3wfw22>
+References: <20250311-qce-cmd-descr-v7-0-db613f5d9c9f@linaro.org>
+ <20250311-qce-cmd-descr-v7-1-db613f5d9c9f@linaro.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Tue, 11 Mar 2025 13:32:27 +0100
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Eric Biggers" <ebiggers@kernel.org>, "Arnd Bergmann" <arnd@kernel.org>
-Cc: "Herbert Xu" <herbert@gondor.apana.org.au>,
- "David S . Miller" <davem@davemloft.net>, "Ard Biesheuvel" <ardb@kernel.org>,
- "Lukas Wunner" <lukas@wunner.de>, "Stephan Mueller" <smueller@chronox.de>,
- linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-Id: <684865c2-c214-4b51-9742-a56119c83e6e@app.fastmail.com>
-In-Reply-To: <20250310172403.GD1701@sol.localdomain>
-References: <20250310132647.3256818-1-arnd@kernel.org>
- <20250310172403.GD1701@sol.localdomain>
-Subject: Re: [PATCH 1/2] crypto: fix dependencies on lib/crypto modules
-Content-Type: text/plain
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250311-qce-cmd-descr-v7-1-db613f5d9c9f@linaro.org>
 
-On Mon, Mar 10, 2025, at 18:24, Eric Biggers wrote:
-> On Mon, Mar 10, 2025 at 02:26:39PM +0100, Arnd Bergmann wrote:
->
-> Looks the same as
-> https://lore.kernel.org/linux-crypto/Z8UdUoaKtDKzgPph@gondor.apana.org.au/ which
-> was already applied.
->
+On Tue, Mar 11, 2025 at 10:25:32AM +0100, Bartosz Golaszewski wrote:
+> From: Md Sadre Alam <quic_mdalam@quicinc.com>
+> 
+> Add lock and unlock flags for the command descriptor. With the former set
+> in the requester pipe, the bam controller will lock all other pipes and
+> process the request only from requester pipe. Unlocking can only be
+> performed from the same pipe.
+> 
+> Setting the DMA_PREP_LOCK/DMA_PREP_UNLOCK flags in the command
+> descriptor means, the caller requests the BAM controller to be locked
+> for the duration of the transaction. In this case the BAM driver must
+> set the LOCK/UNLOCK bits in the HW descriptor respectively.
+> 
+> Only BAM IPs version 1.4.0 and above support the LOCK/UNLOCK feature.
 
-Right, I see it in today's linux-next. I should have waited a day...
+You are describing behaviour (and even versions) of a particular DMA
+hardware (BAM) in the commit message for a generic flag. Please drop all
+of that. Generic code should be described in generic terms.
 
-     Arnd
+> 
+> Signed-off-by: Md Sadre Alam <quic_mdalam@quicinc.com>
+> [Bartosz: reworked the commit message]
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> ---
+>  Documentation/driver-api/dmaengine/provider.rst | 15 +++++++++++++++
+>  include/linux/dmaengine.h                       |  6 ++++++
+>  2 files changed, 21 insertions(+)
+> 
+> diff --git a/Documentation/driver-api/dmaengine/provider.rst b/Documentation/driver-api/dmaengine/provider.rst
+> index 3085f8b460fa..a032e55d0a4f 100644
+> --- a/Documentation/driver-api/dmaengine/provider.rst
+> +++ b/Documentation/driver-api/dmaengine/provider.rst
+> @@ -628,6 +628,21 @@ DMA_CTRL_REUSE
+>    - This flag is only supported if the channel reports the DMA_LOAD_EOT
+>      capability.
+>  
+> +- DMA_PREP_LOCK
+> +
+> +  - If set, the DMA will lock all other pipes not related to the current
+> +    pipe group, and keep handling the current pipe only.
+> +
+> +  - All pipes not within this group will be locked by this pipe upon lock
+> +    event.
+> +
+> +  - only pipes which are in the same group and relate to the same Environment
+> +    Execution(EE) will not be locked by a certain pipe.
+> +
+> +- DMA_PREP_UNLOCK
+> +
+> +  - If set, DMA will release all locked pipes
+> +
+>  General Design Notes
+>  ====================
+>  
+> diff --git a/include/linux/dmaengine.h b/include/linux/dmaengine.h
+> index 346251bf1026..8ebd43a998a7 100644
+> --- a/include/linux/dmaengine.h
+> +++ b/include/linux/dmaengine.h
+> @@ -200,6 +200,10 @@ struct dma_vec {
+>   *  transaction is marked with DMA_PREP_REPEAT will cause the new transaction
+>   *  to never be processed and stay in the issued queue forever. The flag is
+>   *  ignored if the previous transaction is not a repeated transaction.
+> + *  @DMA_PREP_LOCK: tell the driver that there is a lock bit set on command
+> + *  descriptor.
+> + *  @DMA_PREP_UNLOCK: tell the driver that there is a un-lock bit set on command
+> + *  descriptor.
+>   */
+>  enum dma_ctrl_flags {
+>  	DMA_PREP_INTERRUPT = (1 << 0),
+> @@ -212,6 +216,8 @@ enum dma_ctrl_flags {
+>  	DMA_PREP_CMD = (1 << 7),
+>  	DMA_PREP_REPEAT = (1 << 8),
+>  	DMA_PREP_LOAD_EOT = (1 << 9),
+> +	DMA_PREP_LOCK = (1 << 10),
+> +	DMA_PREP_UNLOCK = (1 << 11),
+>  };
+>  
+>  /**
+> 
+> -- 
+> 2.45.2
+> 
+
+-- 
+With best wishes
+Dmitry
