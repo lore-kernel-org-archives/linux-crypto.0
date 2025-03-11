@@ -1,44 +1,43 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B8E623370B
-	for <linux-crypto@vger.kernel.org>; Tue, 11 Mar 2025 10:20:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CB1422FAC3
+	for <linux-crypto@vger.kernel.org>; Tue, 11 Mar 2025 10:20:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741688436; cv=none; b=JCBKwT5ZZpFSzsIM1pIpMHpo8jmAj/EZR41xJ0w+VW7FtUvK90BiE/qRGKTHjT7KYuNp6SSyqwVS5fd0E9ypvYvm7qvrSCpmOvRNP+hwWMDhFJDBxsU8ZX9Teu+ZB8mxptV4qBrvCn026lQsyMNqNREiQKOF0xUGyILPAKQFltM=
+	t=1741688437; cv=none; b=V4ub95pkS8wZqS9+D7pDlZsiXrdwaiD8Ovg2+4S+9InBWkcjfNHHSKjI653H2VbGvCDaoeYDS1CUPHR2pJEL0qnAo6Zic0TXbpF/eXdWgoKczIdzVcGOO72tcukDPQ4GoANquJVfjDW0vpLhmMjSdFyUY44hwrD1HD+KtKbcfAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741688436; c=relaxed/simple;
-	bh=V6surscDjh1JebscS+37XaCJ1GmoRVxUNwC/MTa3XPk=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=hcoo5JnDzZIqH8fTh7F0Ws6BzPcKm3GGsoOTt49BY0IPg134Go3qGE/tWoRGiSotk6icg1EHOVUNq/OI59AI9/kcejKqledlo95+guNsB+nRsRnc0Mqqutm7W8WjcxL+ahAdhXRnDc7FxWVt736MFUiT0j6Yrf2tfGifeu/8kYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=T6Ymwb29; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1741688437; c=relaxed/simple;
+	bh=oqAl44/16ogrton1crAj6AdPxyrfydmopBW4he0VS8s=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To; b=OkbWLro9WWvcczf3Fe4W9/U/RJz8VzT/t5xerSW5HlfD5zlJ8jycuOM8UI2+2/ghWcrxKw8jGlwOK1NRu0W812FCo/xcucUOkz4O+0YVV6xef80Hekx1AjFF1CuvAN0HmNZ8tsN3ogNQrB/xlYnTwiRavgQsKNQ9LWEvrAPEj6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=TaKlz7cf; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="T6Ymwb29"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="TaKlz7cf"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=To:Subject:From:References:In-Reply-To:Message-Id:Date:Sender:
 	Reply-To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=eqhI9CgBVvId/vtQHE5C/PIopPyTgezQrfR150Tcqpw=; b=T6Ymwb29zRj7tIB1dC0wvvhZ7T
-	NZ/F2p9OIgd5t71/RC9vJeZjtR7tfGBM5mVNvatFE2V01LDdv88143jU5fOf9CzrLPRGlZi6QsoXL
-	ji/F9KW+RKtLzTFeF5dBln6OE0Fpu9RqxMvDC6rvkPrke/B3x0B/lMT0Pe35cPSuxJe8h24UF3S+F
-	E/SMIBPVhah4TcSnoeXlED+B1680EcXisdKG7xAIVz4PGangfQJjCrhp/vhPAO1Se8YuFbMStLtiV
-	8+ECiRMyhXnrwWUUqtJPeEw/ZWITTu8+okj0uQDGF2KK29F5DKUbRxYm9Ul+16c83iz6aCv7LhuHM
-	rrGHTdOQ==;
+	bh=mwgnhhyUokXHbzqZLKg4QW/Np8o0K+acOG2Mbe5W3FU=; b=TaKlz7cfDjDxoGihUQjPvQA+B3
+	srlyHrzbOwUAJMS4iaa8vvKuiRxLj/msSOCRn7hlWTi+DHReU8i9ktckllbcpw5+eGAj1JvWg9vnV
+	Iete/NHH488mXU4TA2v5cYq4g+8MGC+OVgFYTAwWAeL5sSYYz1eqrf2WsV2XVWNtKz/hC7D8QRF2F
+	mUDtLxNKlTN9s9A2d46rzwAH5q2hddvBwStecDxT0TrBOeBjAo4chHypvJLK0sDlP+WzxRwvK6fRl
+	dSQivwpoEayggiLy0wvxUEJSAl/W6JGLruGWA+YncZyxn/iRroQyck4smWEEymIKzb5Q0c8BafrkE
+	Ua613JyQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1trwir-005YUd-0r;
-	Tue, 11 Mar 2025 18:20:30 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 11 Mar 2025 18:20:29 +0800
-Date: Tue, 11 Mar 2025 18:20:29 +0800
-Message-Id: <9c5624f2b3a0131e89f3e692553a55d132f50a96.1741688305.git.herbert@gondor.apana.org.au>
+	id 1trwit-005YUn-1p;
+	Tue, 11 Mar 2025 18:20:32 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 11 Mar 2025 18:20:31 +0800
+Date: Tue, 11 Mar 2025 18:20:31 +0800
+Message-Id: <e858dadf36f7fc2c12545c648dda4645f48cab22.1741688305.git.herbert@gondor.apana.org.au>
 In-Reply-To: <cover.1741688305.git.herbert@gondor.apana.org.au>
 References: <cover.1741688305.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 1/3] crypto: scatterwalk - Use nth_page instead of doing it by
- hand
+Subject: [PATCH 2/3] crypto: hash - Use nth_page instead of doing it by hand
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -46,65 +45,88 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
-Curiously, the Crypto API scatterwalk incremented pages by hand
-rather than using nth_page.  Possibly because scatterwalk predates
-nth_page (the following commit is from the history tree):
+Use nth_page instead of adding n to the page pointer.
 
-	commit 3957f2b34960d85b63e814262a8be7d5ad91444d
-	Author: James Morris <jmorris@intercode.com.au>
-	Date:   Sun Feb 2 07:35:32 2003 -0800
+This also fixes a real bug in shash_ahash_digest where the the
+check for continguous hash data may be incorrect in the presence
+of highmem.  This could result in an incorrect hash or worse.
 
-	    [CRYPTO]: in/out scatterlist support for ciphers.
-
-Fix this by using nth_page.
-
+Fixes: 5f7082ed4f48 ("crypto: hash - Export shash through hash")
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- include/crypto/scatterwalk.h | 21 +++++++++++----------
- 1 file changed, 11 insertions(+), 10 deletions(-)
+ crypto/ahash.c | 38 +++++++++++++++++++++++++-------------
+ 1 file changed, 25 insertions(+), 13 deletions(-)
 
-diff --git a/include/crypto/scatterwalk.h b/include/crypto/scatterwalk.h
-index b7e617ae4442..4fc70b8422c5 100644
---- a/include/crypto/scatterwalk.h
-+++ b/include/crypto/scatterwalk.h
-@@ -99,26 +99,27 @@ static inline void scatterwalk_get_sglist(struct scatter_walk *walk,
+diff --git a/crypto/ahash.c b/crypto/ahash.c
+index 9c26175c21a8..75d642897e36 100644
+--- a/crypto/ahash.c
++++ b/crypto/ahash.c
+@@ -16,6 +16,7 @@
+ #include <linux/cryptouser.h>
+ #include <linux/err.h>
+ #include <linux/kernel.h>
++#include <linux/mm.h>
+ #include <linux/module.h>
+ #include <linux/sched.h>
+ #include <linux/slab.h>
+@@ -79,7 +80,7 @@ static int hash_walk_new_entry(struct crypto_hash_walk *walk)
  
- static inline void scatterwalk_map(struct scatter_walk *walk)
- {
--	struct page *base_page = sg_page(walk->sg);
-+	struct page *page = sg_page(walk->sg);
-+	unsigned int offset = walk->offset;
-+	void *addr;
-+
+ 	sg = walk->sg;
+ 	walk->offset = sg->offset;
+-	walk->pg = sg_page(walk->sg) + (walk->offset >> PAGE_SHIFT);
++	walk->pg = nth_page(sg_page(walk->sg), walk->offset >> PAGE_SHIFT);
+ 	walk->offset = offset_in_page(walk->offset);
+ 	walk->entrylen = sg->length;
+ 
+@@ -201,25 +202,36 @@ int shash_ahash_digest(struct ahash_request *req, struct shash_desc *desc)
+ 	unsigned int nbytes = req->nbytes;
+ 	struct scatterlist *sg;
+ 	unsigned int offset;
++	struct page *page;
++	void *data;
+ 	int err;
+ 
+-	if (ahash_request_isvirt(req))
++	if (!nbytes || ahash_request_isvirt(req))
+ 		return crypto_shash_digest(desc, req->svirt, nbytes,
+ 					   req->result);
+ 
+-	if (nbytes &&
+-	    (sg = req->src, offset = sg->offset,
+-	     nbytes <= min(sg->length, ((unsigned int)(PAGE_SIZE)) - offset))) {
+-		void *data;
++	sg = req->src;
++	if (nbytes > sg->length)
++		return crypto_shash_init(desc) ?:
++		       shash_ahash_finup(req, desc);
+ 
+-		data = kmap_local_page(sg_page(sg));
+-		err = crypto_shash_digest(desc, data + offset, nbytes,
+-					  req->result);
+-		kunmap_local(data);
+-	} else
+-		err = crypto_shash_init(desc) ?:
+-		      shash_ahash_finup(req, desc);
++	page = sg_page(sg);
++	offset = sg->offset;
 +	page = nth_page(page, offset >> PAGE_SHIFT);
 +	offset = offset_in_page(offset);
  
- 	if (IS_ENABLED(CONFIG_HIGHMEM)) {
--		walk->__addr = kmap_local_page(base_page +
--					       (walk->offset >> PAGE_SHIFT)) +
--			       offset_in_page(walk->offset);
-+		addr = kmap_local_page(page) + offset;
- 	} else {
- 		/*
- 		 * When !HIGHMEM we allow the walker to return segments that
- 		 * span a page boundary; see scatterwalk_clamp().  To make it
- 		 * clear that in this case we're working in the linear buffer of
- 		 * the whole sg entry in the kernel's direct map rather than
--		 * within the mapped buffer of a single page, compute the
--		 * address as an offset from the page_address() of the first
--		 * page of the sg entry.  Either way the result is the address
--		 * in the direct map, but this makes it clearer what is really
--		 * going on.
-+		 * within the mapped buffer of a single page, use
-+		 * page_address() instead of going through kmap.
- 		 */
--		walk->__addr = page_address(base_page) + walk->offset;
-+		addr = page_address(page) + offset;
- 	}
-+	walk->__addr = addr;
++	if (!IS_ENABLED(CONFIG_HIGHMEM))
++		return crypto_shash_digest(desc, page_address(page) + offset,
++					   nbytes, req->result);
++
++	if (nbytes > (unsigned int)PAGE_SIZE - offset)
++		return crypto_shash_init(desc) ?:
++		       shash_ahash_finup(req, desc);
++
++	data = kmap_local_page(page);
++	err = crypto_shash_digest(desc, data + offset, nbytes,
++				  req->result);
++	kunmap_local(data);
+ 	return err;
  }
- 
- /**
+ EXPORT_SYMBOL_GPL(shash_ahash_digest);
 -- 
 2.39.5
 
