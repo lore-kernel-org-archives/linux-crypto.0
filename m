@@ -1,141 +1,157 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04FB626281B
-	for <linux-crypto@vger.kernel.org>; Tue, 11 Mar 2025 18:05:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97A84233155
+	for <linux-crypto@vger.kernel.org>; Tue, 11 Mar 2025 23:15:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741716319; cv=none; b=AWCURMb6F2+T5ybw5YGV1jcFZvXLls4s6JikT4yzMZ0xTzcOzXAVzRUkVHyEbqTJ5KDjoS62dfZ9xigBGCe0K8gyqB8FY+Wt/AmvF2Qq2LIEuKz8Zd8D9+32XMmH+WZTljyGU9Bg4L5ZDf9KpI0TfaH7AkQ3JKv5xJUKiRE/49Q=
+	t=1741734912; cv=none; b=Fu07TjJjBKFXZ+PbAWZrChQ49iolr3QfrPeuaWEzVanug8F7N3Clih5MDYlL4yFb0cmrPLhz/Ak8NUy2KZSkdllpvzHqqpvOArXVVLjQtIZRf/rMPXgDtFz6H9yu4zaeKvEP0jobdgnEGspx9zBFFtc+Pg8RaEa2nMadSPP2y74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741716319; c=relaxed/simple;
-	bh=iP0slNn6/q6DDZfVg4VJ/+gJow4iWKv0672u5As9Tek=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FlV8s513MZNitwQFC9+cEvoLodYCR6IPVMS2KsdF/Hvt1IbFne03rWw7DDJ5d9bHR00VbR8LSdQBIBuqq1CDmuao8eozjRVtUWz7lET7r4GKtF8Vacwu+bBVIRcCcxw767y3eTFszeVi9rnOwWiksetMIrdiUaZgm3k9rBbihbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nA3mi6Al; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1741734912; c=relaxed/simple;
+	bh=dn4yPhL5avHiqtNfeTaKE69bgTDdHt4EMpDz5juIA4M=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=uzhQ/j328NCR5YNSNFgLOug4v9mTeW2ARvD9Sp7QAWD04tb+pOCUTmg52Q4w1KvUqqRi0YpzVJf/nd3N2p3bdEjBjpqhNTeJx5ZuRJHqIsGvmslN7PoRir9iokkP74jwnxHROI6rKOMdQbVivpyLQxizTGDtWMIvtifXBGH5Gho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DooT6gto; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nA3mi6Al"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69A87C4CEE9;
-	Tue, 11 Mar 2025 18:05:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741716318;
-	bh=iP0slNn6/q6DDZfVg4VJ/+gJow4iWKv0672u5As9Tek=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nA3mi6AlSh6dq8AEqfsVu/jvEkGT1QBr+IVLHJDFaaV+22v23v9fTZkPkTxYfV0m3
-	 2dAQXGOTqea3X7FsIf1pNEm69m8b3GCjrsyomRe6LTKCqCgImszUm7fxVEmfUFJRto
-	 e56Lx/FYk52JUdZ5iWqoCtdRxXbBksJpUm+34M8ZWSBn1Kma3YQH4Y1dSS3z8iyejH
-	 K/vwrd9wGUBrYQlvIDQ3IwuJkpj5GDgyKoeoZ6KZ8vMp4sDVKydG8Q8YRb3aMkg6GM
-	 FIYe4av8SfWI4Xuqts5O/oVWfRh85jtLksJiUUmgmqYnQJNYTflC00t4Pe1XvmyETx
-	 UBUMpBnS5chUg==
-Date: Tue, 11 Mar 2025 18:05:16 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH 2/3] crypto: hash - Use nth_page instead of doing it by
- hand
-Message-ID: <20250311180516.GA356236@google.com>
-References: <cover.1741688305.git.herbert@gondor.apana.org.au>
- <e858dadf36f7fc2c12545c648dda4645f48cab22.1741688305.git.herbert@gondor.apana.org.au>
- <20250311174431.GB1268@sol.localdomain>
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DooT6gto"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1741734909;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YtUFGu6o0/J9RvV/h3s9K30gUjjCCkNCcQynXOmfbNQ=;
+	b=DooT6gtoegrILwo3YNxA0H7LowX+oo6wM4c3CXTSFu/CeYa35wynBsgNGhFvjsuuv+uwOT
+	YiijB/X9kTvjv76GFwCWUTbbZjRwKcUKHKS5QjmVBYn5wr9VE+BjGF+IdPED+Vs+MvK/BL
+	zAp0yBA9C/kHPfcZMhLC7AX8wvO4x8U=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-463-AgbKgPtGMVetziY0cnJATw-1; Tue,
+ 11 Mar 2025 19:15:04 -0400
+X-MC-Unique: AgbKgPtGMVetziY0cnJATw-1
+X-Mimecast-MFC-AGG-ID: AgbKgPtGMVetziY0cnJATw_1741734902
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D01361809CA3;
+	Tue, 11 Mar 2025 23:15:01 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.61])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E0F43180094A;
+	Tue, 11 Mar 2025 23:14:57 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <953587.1741611236@warthog.procyon.org.uk>
+References: <953587.1741611236@warthog.procyon.org.uk>
+To: netdev@vger.kernel.org
+Cc: dhowells@redhat.com, Herbert Xu <herbert@gondor.apana.org.au>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+    "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+    Chuck Lever <chuck.lever@oracle.com>, linux-crypto@vger.kernel.org,
+    linux-afs@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [GIT PULL net-next] crypto: Add Kerberos crypto lib
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250311174431.GB1268@sol.localdomain>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1199600.1741734896.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 11 Mar 2025 23:14:56 +0000
+Message-ID: <1199601.1741734896@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Tue, Mar 11, 2025 at 10:44:31AM -0700, Eric Biggers wrote:
-> On Tue, Mar 11, 2025 at 06:20:31PM +0800, Herbert Xu wrote:
-> > Use nth_page instead of adding n to the page pointer.
-> > 
-> > This also fixes a real bug in shash_ahash_digest where the the
-> > check for continguous hash data may be incorrect in the presence
-> > of highmem.  This could result in an incorrect hash or worse.
-> > 
-> > Fixes: 5f7082ed4f48 ("crypto: hash - Export shash through hash")
-> > Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> > ---
-> >  crypto/ahash.c | 38 +++++++++++++++++++++++++-------------
-> >  1 file changed, 25 insertions(+), 13 deletions(-)
-> > 
-> > diff --git a/crypto/ahash.c b/crypto/ahash.c
-> > index 9c26175c21a8..75d642897e36 100644
-> > --- a/crypto/ahash.c
-> > +++ b/crypto/ahash.c
-> > @@ -16,6 +16,7 @@
-> >  #include <linux/cryptouser.h>
-> >  #include <linux/err.h>
-> >  #include <linux/kernel.h>
-> > +#include <linux/mm.h>
-> >  #include <linux/module.h>
-> >  #include <linux/sched.h>
-> >  #include <linux/slab.h>
-> > @@ -79,7 +80,7 @@ static int hash_walk_new_entry(struct crypto_hash_walk *walk)
-> >  
-> >  	sg = walk->sg;
-> >  	walk->offset = sg->offset;
-> > -	walk->pg = sg_page(walk->sg) + (walk->offset >> PAGE_SHIFT);
-> > +	walk->pg = nth_page(sg_page(walk->sg), walk->offset >> PAGE_SHIFT);
-> >  	walk->offset = offset_in_page(walk->offset);
-> >  	walk->entrylen = sg->length;
-> >  
-> > @@ -201,25 +202,36 @@ int shash_ahash_digest(struct ahash_request *req, struct shash_desc *desc)
-> >  	unsigned int nbytes = req->nbytes;
-> >  	struct scatterlist *sg;
-> >  	unsigned int offset;
-> > +	struct page *page;
-> > +	void *data;
-> >  	int err;
-> >  
-> > -	if (ahash_request_isvirt(req))
-> > +	if (!nbytes || ahash_request_isvirt(req))
-> >  		return crypto_shash_digest(desc, req->svirt, nbytes,
-> >  					   req->result);
-> >  
-> > -	if (nbytes &&
-> > -	    (sg = req->src, offset = sg->offset,
-> > -	     nbytes <= min(sg->length, ((unsigned int)(PAGE_SIZE)) - offset))) {
-> > -		void *data;
-> > +	sg = req->src;
-> > +	if (nbytes > sg->length)
-> > +		return crypto_shash_init(desc) ?:
-> > +		       shash_ahash_finup(req, desc);
-> >  
-> > -		data = kmap_local_page(sg_page(sg));
-> > -		err = crypto_shash_digest(desc, data + offset, nbytes,
-> > -					  req->result);
-> > -		kunmap_local(data);
-> > -	} else
-> > -		err = crypto_shash_init(desc) ?:
-> > -		      shash_ahash_finup(req, desc);
-> > +	page = sg_page(sg);
-> > +	offset = sg->offset;
-> > +	page = nth_page(page, offset >> PAGE_SHIFT);
-> > +	offset = offset_in_page(offset);
-> >  
-> > +	if (!IS_ENABLED(CONFIG_HIGHMEM))
-> > +		return crypto_shash_digest(desc, page_address(page) + offset,
-> > +					   nbytes, req->result);
-> > +
-> > +	if (nbytes > (unsigned int)PAGE_SIZE - offset)
-> > +		return crypto_shash_init(desc) ?:
-> > +		       shash_ahash_finup(req, desc);
-> > +
-> > +	data = kmap_local_page(page);
-> > +	err = crypto_shash_digest(desc, data + offset, nbytes,
-> > +				  req->result);
-> > +	kunmap_local(data);
-> >  	return err;
-> 
-> I guess you think this is fixing a bug in the case where sg->offset > PAGE_SIZE?
-> Is that case even supported?  It is supposed to be the offset into a page.
-> 
-> Even if so, a simpler fix (1 line) would be to use:
-> 'sg->length >= nbytes && sg->offset + nbytes <= PAGE_SIZE'
+Sigh.  I used the old tag by accident.  Attached is a pull request for one
+that got pulled Herbert.  The only difference was that I rebased it on the
+cryptodev tree - no other changes were made.
 
-Or just make this optimization specific to !HIGHMEM, and use
-nbytes <= sg->length and sg_virt().
+Apologies for that.
+David
+---
+The following changes since commit 17ec3e71ba797cdb62164fea9532c81b60f4716=
+7:
 
-- Eric
+  crypto: lib/Kconfig - Hide arch options from user (2025-03-02 15:21:47 +=
+0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags=
+/crypto-krb5-20250303
+
+for you to fetch changes up to fc0cf10c04f49ddba1925b630467f49ea993569e:
+
+  crypto/krb5: Implement crypto self-testing (2025-03-02 21:56:47 +0000)
+
+----------------------------------------------------------------
+crypto: Add Kerberos crypto lib
+
+----------------------------------------------------------------
+David Howells (17):
+      crypto/krb5: Add API Documentation
+      crypto/krb5: Add some constants out of sunrpc headers
+      crypto: Add 'krb5enc' hash and cipher AEAD algorithm
+      crypto/krb5: Test manager data
+      crypto/krb5: Implement Kerberos crypto core
+      crypto/krb5: Add an API to query the layout of the crypto section
+      crypto/krb5: Add an API to alloc and prepare a crypto object
+      crypto/krb5: Add an API to perform requests
+      crypto/krb5: Provide infrastructure and key derivation
+      crypto/krb5: Implement the Kerberos5 rfc3961 key derivation
+      crypto/krb5: Provide RFC3961 setkey packaging functions
+      crypto/krb5: Implement the Kerberos5 rfc3961 encrypt and decrypt fun=
+ctions
+      crypto/krb5: Implement the Kerberos5 rfc3961 get_mic and verify_mic
+      crypto/krb5: Implement the AES enctypes from rfc3962
+      crypto/krb5: Implement the AES enctypes from rfc8009
+      crypto/krb5: Implement the Camellia enctypes from rfc6803
+      crypto/krb5: Implement crypto self-testing
+
+ Documentation/crypto/index.rst   |   1 +
+ Documentation/crypto/krb5.rst    | 262 +++++++++++++
+ crypto/Kconfig                   |  13 +
+ crypto/Makefile                  |   3 +
+ crypto/krb5/Kconfig              |  26 ++
+ crypto/krb5/Makefile             |  18 +
+ crypto/krb5/internal.h           | 247 ++++++++++++
+ crypto/krb5/krb5_api.c           | 452 ++++++++++++++++++++++
+ crypto/krb5/krb5_kdf.c           | 145 +++++++
+ crypto/krb5/rfc3961_simplified.c | 797 ++++++++++++++++++++++++++++++++++=
++++++
+ crypto/krb5/rfc3962_aes.c        | 115 ++++++
+ crypto/krb5/rfc6803_camellia.c   | 237 ++++++++++++
+ crypto/krb5/rfc8009_aes2.c       | 362 ++++++++++++++++++
+ crypto/krb5/selftest.c           | 544 ++++++++++++++++++++++++++
+ crypto/krb5/selftest_data.c      | 291 ++++++++++++++
+ crypto/krb5enc.c                 | 504 +++++++++++++++++++++++++
+ crypto/testmgr.c                 |  16 +
+ crypto/testmgr.h                 | 351 +++++++++++++++++
+ include/crypto/authenc.h         |   2 +
+ include/crypto/krb5.h            | 160 ++++++++
+ 20 files changed, 4546 insertions(+)
+ create mode 100644 Documentation/crypto/krb5.rst
+ create mode 100644 crypto/krb5/Kconfig
+ create mode 100644 crypto/krb5/Makefile
+ create mode 100644 crypto/krb5/internal.h
+ create mode 100644 crypto/krb5/krb5_api.c
+ create mode 100644 crypto/krb5/krb5_kdf.c
+ create mode 100644 crypto/krb5/rfc3961_simplified.c
+ create mode 100644 crypto/krb5/rfc3962_aes.c
+ create mode 100644 crypto/krb5/rfc6803_camellia.c
+ create mode 100644 crypto/krb5/rfc8009_aes2.c
+ create mode 100644 crypto/krb5/selftest.c
+ create mode 100644 crypto/krb5/selftest_data.c
+ create mode 100644 crypto/krb5enc.c
+ create mode 100644 include/crypto/krb5.h
+
