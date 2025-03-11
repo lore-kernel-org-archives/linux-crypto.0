@@ -1,65 +1,65 @@
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 717F022F155
-	for <linux-crypto@vger.kernel.org>; Tue, 11 Mar 2025 09:25:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9BAA22FACA
+	for <linux-crypto@vger.kernel.org>; Tue, 11 Mar 2025 09:25:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741685148; cv=none; b=cocU1V9vpvwkDphb4eJGeqBuraMn2NmiBcHbj0OncXo5OVOtpcmuYqo+351kmUd5eDaDZe3AIkW34sYS1MUmbppWzQDdw9Vabi5ACkoTWz6cyxDMAhnBjgJsY8MkznXxiEImhckewewE7WuNDgIyGMA0FNEWreuGXvGVWmQbOaA=
+	t=1741685150; cv=none; b=R7xJrcvWiM3yKI6K3r70D7jlQ/tP9p4fhmOgLeO4XSQ2dsv7TnvqlIQZYzZ972kuux6Cfe2EBYFROo60qPbei8CJwIH2BOMdFFsIepbQpocN1NAExtmy+ydKdTizGxdtjP29nKpxqqf3cqLeuKP8HyU8AKlJ/JE6+egAGbIFkHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741685148; c=relaxed/simple;
-	bh=UD83xHC/OFAOwSB+qvX6FSvB95/U7FyJrkvlFwf+cOI=;
+	s=arc-20240116; t=1741685150; c=relaxed/simple;
+	bh=3byXgp4P/O/ND2QbeLx+RU+FGOviEZdPuLQWMQhYWyc=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=c/C9oZFiJL1M1RJ3XCv4+te/6+FaFzpBHuvrkWquil1abCU/VgjBJwHXOHNelII6ymfp4KwkIcihq0LGSWnCMlSAsdZ/qQ4xq47raAgLmkA+zI7fBVpbGeopz3vt2vDO346vHYclhlceA7jIqUhgY4BjyRIftH625fmXNiAd1oA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=WNUwZmYd; arc=none smtp.client-ip=209.85.128.49
+	 In-Reply-To:To:Cc; b=JZcViRHMAuQ0lFVGRAoiBfrafTzbVCI7zOHvSNeCWpNNvZ7Q7+mRYJT0fC2XFBJPuhiw3r30IWZ2DavBmisFHK49AcgbpRS3a3Wp9IrO/tNCxZp/rc7TCQ/e+gcG5RrgLnT0aSk5hluz56b3+HPFcaRcv0x8n+/xGtJq5Xd7eII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=agggFf28; arc=none smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="WNUwZmYd"
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-43cef035a3bso15445895e9.1
-        for <linux-crypto@vger.kernel.org>; Tue, 11 Mar 2025 02:25:46 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="agggFf28"
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-43cfebc343dso8916785e9.2
+        for <linux-crypto@vger.kernel.org>; Tue, 11 Mar 2025 02:25:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1741685144; x=1742289944; darn=vger.kernel.org;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1741685146; x=1742289946; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=F5gyJf+BPkvynCiKQ4tiqU3JQCzOM6uVqE1SpUYdFf4=;
-        b=WNUwZmYdkHghb0n3Ip53/XINgRIGTb2wtZ+bZIfalI4KlMj87Pltu9GhhzttDO5tE3
-         0cHqWQ94Y51TgsA2d5/xc+AC80T/KxtibRDtDJFcwZzi8BsecwmRXwhVn99rIeei9s3M
-         FVMOF0flNLd/CS5CvvNETGFgFg1loHhRNstbk4+iVPDlKZtanjwHagJYYE/oXGNFY2kU
-         j46AzkGghvnRbHJtX8zXva7LGRqq/5ZUmvOXzBc6NXgTQNkg/aHZOQdNZmmX21KsUDQp
-         UFUua/oqx9V0aLu1CU7z9X+gmuXPXaw1bI4DKMAq261/W0BWBf96nKQkMxma/Cyly3Yh
-         sERw==
+        bh=TlP1aFnu/CDXSr/k7ULiiydiHqpcTMvKfeRj+DO5m9I=;
+        b=agggFf28mKJu2Iw1KoojJHNS5bPH9YnQ0ZKl9w73bi15l7gPrU87RxuG09PRalMfGA
+         XByG4OLfpwSRxF0fu7Ra4RUEdG/3ndVDdkmNa/kTXD/NJlgKSUZiY5W7XzNdSXzcFeTO
+         uiw8pA44eeQeDEtv8scjYbyuKhLyQEAGbIz9EbzGsTsu3bbxr6CyMTIde8OMREh23rSf
+         S/tWvppRoG2y6DEr0cxURIGcmx/ZNFzXGOI05hNUlg3ca+XjUuyOdOjm/jLOCkNgg2kO
+         dQ+y17b+mHZV9BQ+2prxu78cuH24MkCZEbjxaJ2aE5lJ8VhGwPe2011gKSeNkuCcecaf
+         84kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741685144; x=1742289944;
+        d=1e100.net; s=20230601; t=1741685146; x=1742289946;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=F5gyJf+BPkvynCiKQ4tiqU3JQCzOM6uVqE1SpUYdFf4=;
-        b=pjdM6jbDm7CmVD2zgp1HaeSPDIn77KGzsC9GGmOmqDohPf4vV2n3n6VlZ+wO5rIKLc
-         vclIrt39vvBCIIn/0pYiNHkszhARyLdHjYZbIu4SPsQ4Ymu0Ce+xxfP7l1HBUqTS7cMC
-         a7lDolc+g1/dfVWXwNqCWPJhWQB6dgbIslj/SFVeItjmKY7CK376CbUVBngjXiEdLuRF
-         6vsfT5dia0cUNY1PeqmugNDsN85gPVKTJrVvWsS1K7dl9kzBsaIj2LTarzpkNVYxWKPh
-         gr/7tkLN5aEV1SgeiEDVskZDeV3CMSalKD9OYOtkSFmAVINcvoLyx9CweqIQp2NLa+eD
-         8GAw==
-X-Gm-Message-State: AOJu0YwUe91fbD6tiZjRvK4Xuq6Et0VfOMQlF0VsVsQvsvFAhjj8gMsc
-	OrDWdxlV7U5r39Ab771ZHF0Yc+4t/HgXIXOutvE7Di4cQWmtZsmRtLh9vdOvUBQ=
-X-Gm-Gg: ASbGncvMhRORio1cS5/fb93cCY8xcLrmCjwcnym1knrE6kHloAUvahFONja/cRd0h4p
-	KXuOLj3kUiF4+H1IScevtZJSLK2JrRtDdnD7csrmCYOgScs/bT3dVNilOGBVq+poHzZk3U+3EPY
-	tVV1/ogycCc+W4J85fQNhK1EcxbG81q3pXj5eztFZMa6X/YrGYbOS/D6YhIj4ooyo+F1O9H7NlV
-	0JtfV20Fbya8btkJbZVldq0y+AdeVETK/61GaS/pI5lVqr7yjYViSEvLtu5nZZnlW/6dz0Gn7dB
-	M+HH+I27eLbp8DXjbGuALsbWDL9ATxudCy1o
-X-Google-Smtp-Source: AGHT+IHTyMRZ8iCL2pWXxScJdsm/h83C134LYTw05J5QlNSMtDGV1tUZg3DCFGmvEQ2L4hlmXhtLMQ==
-X-Received: by 2002:a05:600c:354c:b0:43d:94:cfe6 with SMTP id 5b1f17b1804b1-43d0094d42emr56383185e9.16.1741685144555;
-        Tue, 11 Mar 2025 02:25:44 -0700 (PDT)
+        bh=TlP1aFnu/CDXSr/k7ULiiydiHqpcTMvKfeRj+DO5m9I=;
+        b=MylMQS5H2fsgyoL9yP2kODeAG1dim9jZvLkzfrpdxBYFL8VSvdBPfKB/5Y8CUy3YKk
+         5QN0vUBz6+35xyaBNz5ZhC3/5k0W/9gg10hmB4hrS3ZdXzbT4teWxU0YiKP72STL2R6l
+         NZMVJK2r5zcttcZfrzMqIDH0cUFtMZ0O+ciaiBntGoL707HcvaVssEv6HBrMKbzCEmnf
+         pYX5LCllquw88bTuzJtJL9X+fIl3acffphaa8UsNbkzfLahJ1xNcjV4MgVzXuz3h02Fc
+         e7rHHwY34ejXawJoH35zWksG6PqYPpWxQht8ISo0RwJ7D7J02blZIu0mTjYLs69XVofy
+         PQVA==
+X-Gm-Message-State: AOJu0YwQjFZTZurokYJbkbiqaPGLBZeFslSzh1Mu1RU2gd9GQwWSisy/
+	/VR7Ss3D94QWL4y/lV8VP5+a0N5Y32p0WnDhGn6DN37EdSh+em+rPPq+Ao4uN1Y=
+X-Gm-Gg: ASbGncuME7V4nWQPOSLG1hPP897JjgHmFywn7XLRTTirFy2hLzyck5dyQFsRdy1XWzL
+	aDT2IUpxnEbrn/fJiNcwMR5z3jVZ0i986sFU35gvaPaiZpiwkA+kCl2DOh9d7r8tE5gBtNr7N4S
+	fzQKR4VpzVvQoDazmARw/RhSxB4zS7AzFwBwMBoGjQJAG1DAuf+bJjB1kQ79gV77vmgnVi4U8FK
+	gd5ec4rplnOgTtrNd3TnauqMWL2hUQA0H/k732mzUOswYrMr9KORRWc6jnUc3+Zxcpgua0o25Iq
+	qql4ueY8qlneHRu+FbdCsDh5ign9UmnauvUs
+X-Google-Smtp-Source: AGHT+IEFonuMUsv5t7RMkQ8iEA9Po7UEbOofnFEQRO86TnGyuTu9OQAPv+aswdukrUC/lL8XbNZzxQ==
+X-Received: by 2002:a05:6000:2a5:b0:391:489a:ce12 with SMTP id ffacd0b85a97d-392646936demr3632369f8f.26.1741685145889;
+        Tue, 11 Mar 2025 02:25:45 -0700 (PDT)
 Received: from [127.0.1.1] ([2a01:cb1d:dc:7e00:5946:3143:114d:3f3])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43cea8076fcsm107436465e9.15.2025.03.11.02.25.43
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43cea8076fcsm107436465e9.15.2025.03.11.02.25.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Mar 2025 02:25:44 -0700 (PDT)
+        Tue, 11 Mar 2025 02:25:45 -0700 (PDT)
 From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Tue, 11 Mar 2025 10:25:32 +0100
-Subject: [PATCH v7 1/8] dmaengine: add DMA_PREP_LOCK and DMA_PREP_UNLOCK
- flag
+Date: Tue, 11 Mar 2025 10:25:33 +0100
+Subject: [PATCH v7 2/8] dmaengine: qcom: bam_dma: extend the driver's
+ device match data
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -68,7 +68,7 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250311-qce-cmd-descr-v7-1-db613f5d9c9f@linaro.org>
+Message-Id: <20250311-qce-cmd-descr-v7-2-db613f5d9c9f@linaro.org>
 References: <20250311-qce-cmd-descr-v7-0-db613f5d9c9f@linaro.org>
 In-Reply-To: <20250311-qce-cmd-descr-v7-0-db613f5d9c9f@linaro.org>
 To: Thara Gopinath <thara.gopinath@gmail.com>, 
@@ -81,96 +81,125 @@ Cc: linux-crypto@vger.kernel.org, linux-arm-msm@vger.kernel.org,
  linux-doc@vger.kernel.org, 
  Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2774;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3543;
  i=bartosz.golaszewski@linaro.org; h=from:subject:message-id;
- bh=k2JNoMjqu4cYCUFiyyJ8BPrYhDNDgsHQ3cmq2EXWh1k=;
- b=kA0DAAoBEacuoBRx13IByyZiAGfQAZWh0+HkXZGtwrVkV1G+XYQw0IWSpnVma/ebtd5F7Du/S
- IkCMwQAAQoAHRYhBBad62wLw8RgE9LHnxGnLqAUcddyBQJn0AGVAAoJEBGnLqAUcddyugMQAIb2
- 9t62ThB4WAqWMp3QPQOIzKHALZYmvL4AHTh9fIp1/ow2BhYp7c/Zv+VbTeVDCy0FH2GtIK1ug6z
- FPn0S9v28+YzAsGaFkop5aGnZ9XqxKgJlRrRk+0OrXk3SWyFMGmdma+M+l5KY0eidSnPqEGbSY+
- Q+IY8XFnp4jnpUGLY+MLS/n3bP6UshcG9s/GKHuNAjR5x38vZfGztqfHWP0xN4UnMOQmNQ42w26
- ctpPVOaxlelQcJvupoTgk1hbRTPPd53OVbn7XAxQT/WkcRYSS3rwN6Llb0IOusf0e6Ai1BEzE23
- UoRwDDnxCqNjFXCBeq7sf/IaX94knSksW2xpibpnHa16eMnNrSpNhEYTGUQ7NTnGmQa60cX0p1g
- t16UQRof0YGyy0yy91dstL3fnutR9Y+KJH3XwRooqQESV/YSkN39asspgrStieDyJjGBWC5XLcU
- KhDfAqoSZaVBzVSpgcdCvk+Fecllq2DGeUuwo7lRVkJLoHbJDmCzppR+yDd+aRbff0vXPcfIq+B
- C11yi4JZ8AslaKvk7h644Y2SVg9IQE1VbNzZ+MRrg16Bd+NnFPz49qXL1l+2r55gQqkinLffep5
- 4OfN8d0viViFKkWJ8XLS8wxldDK0nXFfbw4rR5Y4jU2myRq7tpgioj5epPqEa/YVsDz4bqrTMMu
- +UG9J
+ bh=Pg4kQtSGs2f8BpuZiVEMtvVvzRRbqxcmk7ypHqWY96M=;
+ b=owEBbQKS/ZANAwAKARGnLqAUcddyAcsmYgBn0AGVl3C5lSeEdfpfP+zIBEzDJCcFCX2vmzasU
+ gOKZib0fpaJAjMEAAEKAB0WIQQWnetsC8PEYBPSx58Rpy6gFHHXcgUCZ9ABlQAKCRARpy6gFHHX
+ chhBD/wIRjW/QOjQXff90g8HVICSDdXkKD5BRJH+wautyIX+duSZp1IFDylvKfYIMy5QHl3mTXA
+ NTYdCzfKfzTze5I89ENDmJ+OsVC8tnYN7Qn+kPwfwYEZVFsMg9LOJHBAAOFV26FljVkgRCmImL6
+ WHhu6e5mJFZrqmmZLZTLGRPhO2MkzHi/QzqnFmRkILhrjaOq0rNMRtoky8jyIA10i7c98vSbUNj
+ 05A0K55UIiNCd9o+jrsZeXG3zus+Fk+BYi0ai+cTWVBdTHYBAapa9MPPc5pCXT97mH3mJ52LzQl
+ FVK+JbAYbRrs5A0OEiiTbkPtUNQIFUc7BUTOaPs6T1rde8MpuUi7b2+g2UhP0XmTIE1Pp0QKpIG
+ cH7nucGIbu6fIjTG7TG9WO/+dmbd+SheIslA0pV17/0NFf7XF2FBYsMBxT/9yKMw9TOy0JCui8I
+ Jn1jwBI3kY9AuUogPDDztpNoH5odNstKWFndGe2zgNQKEYKdyc7r7zt0ipC8e42XzsWZxU8bWXS
+ a9mrdwihu61+tkiIuBmfVBSkeY3jRvnwTHtmcnT4tgiIsaLlZ4uX2buJg8EADfrpNq57XUPZ4Pd
+ n/ybHmqcs/IEInA7ifOjGoq+bMe77cfKHL+wh2sNuSiEdcllYVbSTyx/HaAnO+JIYDCY6dPZV1p
+ at4UvxJfshZDpkA==
 X-Developer-Key: i=bartosz.golaszewski@linaro.org; a=openpgp;
  fpr=169DEB6C0BC3C46013D2C79F11A72EA01471D772
 
-From: Md Sadre Alam <quic_mdalam@quicinc.com>
+From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-Add lock and unlock flags for the command descriptor. With the former set
-in the requester pipe, the bam controller will lock all other pipes and
-process the request only from requester pipe. Unlocking can only be
-performed from the same pipe.
+In preparation for supporting the pipe locking feature flag, extend the
+amount of information we can carry in device match data: create a
+separate structure and make the register information one of its fields.
+This way, in subsequent patches, it will be just a matter of adding a
+new field to the device data.
 
-Setting the DMA_PREP_LOCK/DMA_PREP_UNLOCK flags in the command
-descriptor means, the caller requests the BAM controller to be locked
-for the duration of the transaction. In this case the BAM driver must
-set the LOCK/UNLOCK bits in the HW descriptor respectively.
-
-Only BAM IPs version 1.4.0 and above support the LOCK/UNLOCK feature.
-
-Signed-off-by: Md Sadre Alam <quic_mdalam@quicinc.com>
-[Bartosz: reworked the commit message]
 Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 ---
- Documentation/driver-api/dmaengine/provider.rst | 15 +++++++++++++++
- include/linux/dmaengine.h                       |  6 ++++++
- 2 files changed, 21 insertions(+)
+ drivers/dma/qcom/bam_dma.c | 28 ++++++++++++++++++++++------
+ 1 file changed, 22 insertions(+), 6 deletions(-)
 
-diff --git a/Documentation/driver-api/dmaengine/provider.rst b/Documentation/driver-api/dmaengine/provider.rst
-index 3085f8b460fa..a032e55d0a4f 100644
---- a/Documentation/driver-api/dmaengine/provider.rst
-+++ b/Documentation/driver-api/dmaengine/provider.rst
-@@ -628,6 +628,21 @@ DMA_CTRL_REUSE
-   - This flag is only supported if the channel reports the DMA_LOAD_EOT
-     capability.
- 
-+- DMA_PREP_LOCK
-+
-+  - If set, the DMA will lock all other pipes not related to the current
-+    pipe group, and keep handling the current pipe only.
-+
-+  - All pipes not within this group will be locked by this pipe upon lock
-+    event.
-+
-+  - only pipes which are in the same group and relate to the same Environment
-+    Execution(EE) will not be locked by a certain pipe.
-+
-+- DMA_PREP_UNLOCK
-+
-+  - If set, DMA will release all locked pipes
-+
- General Design Notes
- ====================
- 
-diff --git a/include/linux/dmaengine.h b/include/linux/dmaengine.h
-index 346251bf1026..8ebd43a998a7 100644
---- a/include/linux/dmaengine.h
-+++ b/include/linux/dmaengine.h
-@@ -200,6 +200,10 @@ struct dma_vec {
-  *  transaction is marked with DMA_PREP_REPEAT will cause the new transaction
-  *  to never be processed and stay in the issued queue forever. The flag is
-  *  ignored if the previous transaction is not a repeated transaction.
-+ *  @DMA_PREP_LOCK: tell the driver that there is a lock bit set on command
-+ *  descriptor.
-+ *  @DMA_PREP_UNLOCK: tell the driver that there is a un-lock bit set on command
-+ *  descriptor.
-  */
- enum dma_ctrl_flags {
- 	DMA_PREP_INTERRUPT = (1 << 0),
-@@ -212,6 +216,8 @@ enum dma_ctrl_flags {
- 	DMA_PREP_CMD = (1 << 7),
- 	DMA_PREP_REPEAT = (1 << 8),
- 	DMA_PREP_LOAD_EOT = (1 << 9),
-+	DMA_PREP_LOCK = (1 << 10),
-+	DMA_PREP_UNLOCK = (1 << 11),
+diff --git a/drivers/dma/qcom/bam_dma.c b/drivers/dma/qcom/bam_dma.c
+index 2cf060174795..8861245314b1 100644
+--- a/drivers/dma/qcom/bam_dma.c
++++ b/drivers/dma/qcom/bam_dma.c
+@@ -111,6 +111,10 @@ struct reg_offset_data {
+ 	unsigned int pipe_mult, evnt_mult, ee_mult;
  };
  
- /**
++struct bam_device_data {
++	const struct reg_offset_data *reg_info;
++};
++
+ static const struct reg_offset_data bam_v1_3_reg_info[] = {
+ 	[BAM_CTRL]		= { 0x0F80, 0x00, 0x00, 0x00 },
+ 	[BAM_REVISION]		= { 0x0F84, 0x00, 0x00, 0x00 },
+@@ -140,6 +144,10 @@ static const struct reg_offset_data bam_v1_3_reg_info[] = {
+ 	[BAM_P_FIFO_SIZES]	= { 0x1020, 0x00, 0x40, 0x00 },
+ };
+ 
++static const struct bam_device_data bam_v1_3_data = {
++	.reg_info = bam_v1_3_reg_info,
++};
++
+ static const struct reg_offset_data bam_v1_4_reg_info[] = {
+ 	[BAM_CTRL]		= { 0x0000, 0x00, 0x00, 0x00 },
+ 	[BAM_REVISION]		= { 0x0004, 0x00, 0x00, 0x00 },
+@@ -169,6 +177,10 @@ static const struct reg_offset_data bam_v1_4_reg_info[] = {
+ 	[BAM_P_FIFO_SIZES]	= { 0x1820, 0x00, 0x1000, 0x00 },
+ };
+ 
++static const struct bam_device_data bam_v1_4_data = {
++	.reg_info = bam_v1_4_reg_info,
++};
++
+ static const struct reg_offset_data bam_v1_7_reg_info[] = {
+ 	[BAM_CTRL]		= { 0x00000, 0x00, 0x00, 0x00 },
+ 	[BAM_REVISION]		= { 0x01000, 0x00, 0x00, 0x00 },
+@@ -198,6 +210,10 @@ static const struct reg_offset_data bam_v1_7_reg_info[] = {
+ 	[BAM_P_FIFO_SIZES]	= { 0x13820, 0x00, 0x1000, 0x00 },
+ };
+ 
++static const struct bam_device_data bam_v1_7_data = {
++	.reg_info = bam_v1_7_reg_info,
++};
++
+ /* BAM CTRL */
+ #define BAM_SW_RST			BIT(0)
+ #define BAM_EN				BIT(1)
+@@ -391,7 +407,7 @@ struct bam_device {
+ 	bool powered_remotely;
+ 	u32 active_channels;
+ 
+-	const struct reg_offset_data *layout;
++	const struct bam_device_data *dev_data;
+ 
+ 	struct clk *bamclk;
+ 	int irq;
+@@ -409,7 +425,7 @@ struct bam_device {
+ static inline void __iomem *bam_addr(struct bam_device *bdev, u32 pipe,
+ 		enum bam_reg reg)
+ {
+-	const struct reg_offset_data r = bdev->layout[reg];
++	const struct reg_offset_data r = bdev->dev_data->reg_info[reg];
+ 
+ 	return bdev->regs + r.base_offset +
+ 		r.pipe_mult * pipe +
+@@ -1225,9 +1241,9 @@ static void bam_channel_init(struct bam_device *bdev, struct bam_chan *bchan,
+ }
+ 
+ static const struct of_device_id bam_of_match[] = {
+-	{ .compatible = "qcom,bam-v1.3.0", .data = &bam_v1_3_reg_info },
+-	{ .compatible = "qcom,bam-v1.4.0", .data = &bam_v1_4_reg_info },
+-	{ .compatible = "qcom,bam-v1.7.0", .data = &bam_v1_7_reg_info },
++	{ .compatible = "qcom,bam-v1.3.0", .data = &bam_v1_3_data },
++	{ .compatible = "qcom,bam-v1.4.0", .data = &bam_v1_4_data },
++	{ .compatible = "qcom,bam-v1.7.0", .data = &bam_v1_7_data },
+ 	{}
+ };
+ 
+@@ -1251,7 +1267,7 @@ static int bam_dma_probe(struct platform_device *pdev)
+ 		return -ENODEV;
+ 	}
+ 
+-	bdev->layout = match->data;
++	bdev->dev_data = match->data;
+ 
+ 	bdev->regs = devm_platform_ioremap_resource(pdev, 0);
+ 	if (IS_ERR(bdev->regs))
 
 -- 
 2.45.2
