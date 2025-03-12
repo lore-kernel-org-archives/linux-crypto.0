@@ -1,136 +1,122 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BD2F1DB377
-	for <linux-crypto@vger.kernel.org>; Wed, 12 Mar 2025 04:30:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1656922DFBE;
+	Wed, 12 Mar 2025 08:08:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741753811; cv=none; b=X6YO1ZBN51+fcLHvtZtyFq204eeWrXaQqeKFb6BCk2EL+CoJp4LfXrC4gm8LNv5YCzM0gvAsbQnXq8KQkf+X2rimtlTW8EUwkm3eQc1g+JxyKAdMBMLlw06TaLFCK1qqRLzMaJFgRJxbZCxDmYRUXuZf6mM+LcpDWoXZYE2Oj6U=
+	t=1741766891; cv=none; b=M1Qze7gPdTWD9MhcRpC8y+BjoJkgi6W3IC5sDnzmx8LIS1TqepjHIK39xLbPzg6ghxWps+p3jg98fNpeoUvW1McrJmoZyAOOO8wuKjNxhPP3+LLXrKgIiHfpzYUuNnGeJkHFqjHLkxh94LUOpaz4D9NKhUVoLXLFmIC2jJjaQiw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741753811; c=relaxed/simple;
-	bh=Rs7keBjnbhKwshc3mzQiqKSQ+xrxExDPHpVOaSiLd60=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To:Cc; b=DQpSval4IZOxhuXNMRBv7JLOS772OazoUsKWIsc3V/LmLB1mD0sXn03DgGu01dlv+XbDiFVhGnyInuXc6MOvT2TINe/6SZezf3+Xh30Z8xS2C/h2tpcGxj2Pv6NauxSTZ/UsxYuHFjdje/omDXjiAdLVWFsnO4Rkyu/vXE3OUtc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=CbpCHe2B; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1741766891; c=relaxed/simple;
+	bh=E0YvQYkYc/gAigFg00Fo8cPNoGuGbrRbV1pMBUqk/f4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=brWLjcE4YBEOWg+i5+3yTvUzpRw0tViCh/Qa1Q6A2HSqZE14R5ItkMso0HwB/DYi/7W3Jgmhim1M0U+kogWQWFNjHieWBW+0wg4uaf0bypBoPXB6cqQGa4oRHRAU/mbUbxqizeyOgPWgve2uGnBgkDQGkxr09uD+6yg+YOnAtyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W4y9MXHq; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="CbpCHe2B"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=Cc:To:Subject:From:References:In-Reply-To:Message-Id:Date:
-	Sender:Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=i+MXSm3LGhwg0rO3pMtdxVlYRXDl42BeiQqM9NJuxZw=; b=CbpCHe2B6CpGCc0rI4aWsfS9XX
-	grbLcRW0XA0JUlyfCTdgWqQNHQidEDvZ276uCpOD/7juiF9UsDNMPVUVSAYIPHUoH1dO01BXA0hPB
-	6Dr9yZd6VsuGpzioGYznk8XCdL5Y4LZKheQRKfq9vsG8FsysZl2RkwWUEcT3MmRtky3n83J/HkaHy
-	bS6vyVmedB/lj/afG6y78As5rblDQdboXZVQzyzArbhDBh2jL1cpQQomc8nQl6bFZl5R23LRvpWVZ
-	TpQWcMt1qglLHh6T+nfcWaEZU9taXdda0ISMrbLI3MpadnUa1F8E62QwEdIWX+bz76by824/BBCiK
-	U2LhrbQQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tsDjE-005mXb-0b;
-	Wed, 12 Mar 2025 12:30:01 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 12 Mar 2025 12:30:00 +0800
-Date: Wed, 12 Mar 2025 12:30:00 +0800
-Message-Id: <a68366725ab6130fea3a5e3257e92c8109b7f86a.1741753576.git.herbert@gondor.apana.org.au>
-In-Reply-To: <cover.1741753576.git.herbert@gondor.apana.org.au>
-References: <cover.1741753576.git.herbert@gondor.apana.org.au>
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v2 PATCH 2/2] crypto: hash - Use nth_page instead of doing it by
- hand
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Cc: Eric Biggers <ebiggers@kernel.org>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W4y9MXHq"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A223C4CEE3;
+	Wed, 12 Mar 2025 08:08:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1741766890;
+	bh=E0YvQYkYc/gAigFg00Fo8cPNoGuGbrRbV1pMBUqk/f4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=W4y9MXHqoaBQp7ToS6ifvVlR/+ggAuZMRnKWoCCXzuhKAg4GCv6XM1T+34e67ne3H
+	 UWL0KsKGWflCOJ0h2Mpxq0uk/ypaL9EpyaeogH2S2uAUxrOFb7p+HwZFaNuzpHbXJQ
+	 urIj6uEdSC6nekqUg2x9yFBTcV4hUUrBuSg7gw5bo82oeg99HHPddWGsWnrrtl4ew6
+	 cOSp3ct+JvYT7aYw8nUpg+uG3/ACLR/epzlzUbHmibnsg5jpu1xVXChtdljdpfMojn
+	 E/KG4EhFyAq85xJbBFw59CyBmH8NiidLGJCD5PowNfAGK5IJtPjrZslrN70tuW0wmu
+	 oXLKrYluj2d/A==
+Date: Wed, 12 Mar 2025 08:08:05 +0000
+From: Lee Jones <lee@kernel.org>
+To: Qunqin Zhao <zhaoqunqin@loongson.cn>
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net, peterhuewe@gmx.de,
+	jarkko@kernel.org, linux-kernel@vger.kernel.org,
+	loongarch@lists.linux.dev, linux-crypto@vger.kernel.org,
+	jgg@ziepe.ca, linux-integrity@vger.kernel.org,
+	pmenzel@molgen.mpg.de, Yinggang Gu <guyinggang@loongson.cn>
+Subject: Re: [PATCH v4 1/6] mfd: Add support for Loongson Security Module
+Message-ID: <20250307200031.GG8350@google.com>
+References: <20250226030358.15924-1-zhaoqunqin@loongson.cn>
+ <20250226030358.15924-2-zhaoqunqin@loongson.cn>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250226030358.15924-2-zhaoqunqin@loongson.cn>
 
-Use nth_page instead of adding n to the page pointer.
+On Wed, 26 Feb 2025, Qunqin Zhao wrote:
 
-This also fixes a real bug in shash_ahash_digest where the the
-check for continguous hash data may be incorrect in the presence
-of highmem.  This could result in an incorrect hash or worse.
+> This driver supports Loongson Security Module, which provides the control
+> for it's hardware encryption acceleration child devices.
+> 
+> Co-developed-by: Yinggang Gu <guyinggang@loongson.cn>
+> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+> Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
+> ---
+> v3-v4: None
+> 
+> v2: Removed "ls6000se-sdf" device, added "ls6000se-tpm" device.
+>     Passed dmamem size to SE firmware in se_init_hw() function.
+> 
+>  drivers/mfd/Kconfig          |  10 +
+>  drivers/mfd/Makefile         |   2 +
+>  drivers/mfd/ls6000se.c       | 374 +++++++++++++++++++++++++++++++++++
+>  include/linux/mfd/ls6000se.h |  75 +++++++
+>  4 files changed, 461 insertions(+)
+>  create mode 100644 drivers/mfd/ls6000se.c
+>  create mode 100644 include/linux/mfd/ls6000se.h
+> 
+> diff --git a/drivers/mfd/Kconfig b/drivers/mfd/Kconfig
+> index d44c69bb3d..318fb113c1 100644
+> --- a/drivers/mfd/Kconfig
+> +++ b/drivers/mfd/Kconfig
+> @@ -2439,5 +2439,15 @@ config MFD_UPBOARD_FPGA
+>  	  To compile this driver as a module, choose M here: the module will be
+>  	  called upboard-fpga.
+>  
+> +config MFD_LS6000SE
+> +	tristate "Loongson Security Module Interface"
+> +	depends on LOONGARCH && ACPI
+> +	select MFD_CORE
+> +	help
+> +	  The Loongson security module provides the control for hardware
+> +	  encryption acceleration devices. Each device uses at least one
+> +	  channel to interact with security module, and each channel may
+> +	  have its own buffer provided by security module.
+> +
+>  endmenu
+>  endif
+> diff --git a/drivers/mfd/Makefile b/drivers/mfd/Makefile
+> index 9220eaf7cf..9556de7715 100644
+> --- a/drivers/mfd/Makefile
+> +++ b/drivers/mfd/Makefile
+> @@ -294,3 +294,5 @@ obj-$(CONFIG_MFD_RSMU_I2C)	+= rsmu_i2c.o rsmu_core.o
+>  obj-$(CONFIG_MFD_RSMU_SPI)	+= rsmu_spi.o rsmu_core.o
+>  
+>  obj-$(CONFIG_MFD_UPBOARD_FPGA)	+= upboard-fpga.o
+> +
+> +obj-$(CONFIG_MFD_LS6000SE)	+= ls6000se.o
+> diff --git a/drivers/mfd/ls6000se.c b/drivers/mfd/ls6000se.c
+> new file mode 100644
+> index 0000000000..24d76c2ffc
+> --- /dev/null
+> +++ b/drivers/mfd/ls6000se.c
 
-Fixes: 5f7082ed4f48 ("crypto: hash - Export shash through hash")
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
- crypto/ahash.c | 42 +++++++++++++++++++++++++++---------------
- 1 file changed, 27 insertions(+), 15 deletions(-)
+[...]
 
-diff --git a/crypto/ahash.c b/crypto/ahash.c
-index 9c26175c21a8..aff0d3387f3a 100644
---- a/crypto/ahash.c
-+++ b/crypto/ahash.c
-@@ -16,6 +16,7 @@
- #include <linux/cryptouser.h>
- #include <linux/err.h>
- #include <linux/kernel.h>
-+#include <linux/mm.h>
- #include <linux/module.h>
- #include <linux/sched.h>
- #include <linux/slab.h>
-@@ -79,7 +80,7 @@ static int hash_walk_new_entry(struct crypto_hash_walk *walk)
- 
- 	sg = walk->sg;
- 	walk->offset = sg->offset;
--	walk->pg = sg_page(walk->sg) + (walk->offset >> PAGE_SHIFT);
-+	walk->pg = nth_page(sg_page(walk->sg), walk->offset >> PAGE_SHIFT);
- 	walk->offset = offset_in_page(walk->offset);
- 	walk->entrylen = sg->length;
- 
-@@ -201,25 +202,36 @@ int shash_ahash_digest(struct ahash_request *req, struct shash_desc *desc)
- 	unsigned int nbytes = req->nbytes;
- 	struct scatterlist *sg;
- 	unsigned int offset;
-+	struct page *page;
-+	const u8 *data;
- 	int err;
- 
--	if (ahash_request_isvirt(req))
--		return crypto_shash_digest(desc, req->svirt, nbytes,
--					   req->result);
-+	data = req->svirt;
-+	if (!nbytes || ahash_request_isvirt(req))
-+		return crypto_shash_digest(desc, data, nbytes, req->result);
- 
--	if (nbytes &&
--	    (sg = req->src, offset = sg->offset,
--	     nbytes <= min(sg->length, ((unsigned int)(PAGE_SIZE)) - offset))) {
--		void *data;
-+	sg = req->src;
-+	if (nbytes > sg->length)
-+		return crypto_shash_init(desc) ?:
-+		       shash_ahash_finup(req, desc);
- 
--		data = kmap_local_page(sg_page(sg));
--		err = crypto_shash_digest(desc, data + offset, nbytes,
--					  req->result);
--		kunmap_local(data);
--	} else
--		err = crypto_shash_init(desc) ?:
--		      shash_ahash_finup(req, desc);
-+	page = sg_page(sg);
-+	data = lowmem_page_address(page) + offset;
-+	if (!IS_ENABLED(CONFIG_HIGHMEM))
-+		return crypto_shash_digest(desc, data, nbytes, req->result);
- 
-+	offset = sg->offset;
-+	page = nth_page(page, offset >> PAGE_SHIFT);
-+	offset = offset_in_page(offset);
-+
-+	if (nbytes > (unsigned int)PAGE_SIZE - offset)
-+		return crypto_shash_init(desc) ?:
-+		       shash_ahash_finup(req, desc);
-+
-+	data = kmap_local_page(page);
-+	err = crypto_shash_digest(desc, data + offset, nbytes,
-+				  req->result);
-+	kunmap_local(data);
- 	return err;
- }
- EXPORT_SYMBOL_GPL(shash_ahash_digest);
+> +static const struct mfd_cell se_devs[] = {
+> +	{ .name = "ls6000se-sdf" },
+> +	{ .name = "ls6000se-tpm" },
+> +};
+
+Where are the drivers for these devices?  I don't see them anywhere.
+
+I do see ls6000se-rng.  How is that registered?
+
 -- 
-2.39.5
-
+Lee Jones [李琼斯]
