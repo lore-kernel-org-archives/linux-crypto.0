@@ -1,83 +1,77 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D8B2165F13
-	for <linux-crypto@vger.kernel.org>; Wed, 12 Mar 2025 02:49:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A00F1DB366
+	for <linux-crypto@vger.kernel.org>; Wed, 12 Mar 2025 04:30:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741747797; cv=none; b=M6Em6syS/xd80kiFf4NlSuPjrWMS0cRRQ2uRGxHXQfibAEtLkGQIXZDAYetYhu3xX8pAycQSozUyFK5ZLcJVNZXw0/9CmXyu8+2kcbcoB95bb+X8WcWztDFJHqgdFBXE/4ilETPqfMPsrv5XUWQFBLzQE4AWg5tQUeyWr9XigKQ=
+	t=1741753807; cv=none; b=cvKa/DMoTDtzFYDb/7DWLMMLXtcEXgpEMh4QrXO2OmxL9Wlre2Dv5sieBUzI4kjA0shmKs+ZN65ONnvRdmxSQdUGBng7RGlfOqkrY5wV0AtjNCUAeN5Nli34gT9MCtjrgNW3kKg0s18QhubFjU/13s495QcD9vsS+nc/1/diO0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741747797; c=relaxed/simple;
-	bh=CxadmD+9jLhWFUCZzTvhntZZExSfov4A/9pv849BJmI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HWNizWWJ3qcF1pOBIw9hxpgBLRVqKF0Oh8OFEOGvD4YKfks5g9a5aMSBKH+NMcaCZqVcor8XYZDdXNrPLCZVqzYNGa9IrvUtJHnx0XBEIxuwZHJ7EoUVoOVHePEEDzBmt36jwuXyMJHYhYzUfsQcmFLf3xR1ZCRy7kkQfDs4mAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hsNeZ6PF; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1741753807; c=relaxed/simple;
+	bh=++MpVsVyuiMplNau+auUQXket0z/iwKfcWk0V0Ur0AU=;
+	h=Date:Message-Id:From:Subject:To:Cc; b=LzRcpokw0Y1PnOo78WKEfpqQWVOAqiZYJvsddQJcFXnqGmHs8syx7By6bH9HHgl2v+kWmAHytoMgMkt6TFn5ghV0b1L5CUsGX75Idnt7RgyVS2ar3MW6eRyy//jbxpyyxacznodPPy88CFY0PONbNxW73jNgtMFBmUmiXpU9ySI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=XKgl5oOA; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hsNeZ6PF"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8B3BC4CEE9;
-	Wed, 12 Mar 2025 02:49:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741747797;
-	bh=CxadmD+9jLhWFUCZzTvhntZZExSfov4A/9pv849BJmI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hsNeZ6PFoUEWBgKDB3a2HeKiMpJWWHAZw6dwRhsHqyS/jNPCahyuM9mLB78RHid3I
-	 YRcV5MtQjcsKPIdhtNh6kVpEuE2sRVUNFKiJDKk4EB7/apzzJR8pwmqVDUxCQGwMf2
-	 hePCjb+jLXd+lipRBgJsJUfuqjcC7xRU6+Z2zIEb6clOUaLfs7NoSnBRPFXYvrkP1y
-	 zBNNa9oLN2QCbMzwON6btMlT4nux33CtEAfag4NkRMVsHpBInJ5/xq3EKuBUb038tq
-	 fEQ/QCG1XGk8iuHwi5ORumPzlRkHFewVbL7irpGeOl4Sa1sIEb6ppWgEgngVtm3RpU
-	 AZ+U3meI6nZOg==
-Date: Tue, 11 Mar 2025 19:49:55 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH 2/3] crypto: hash - Use nth_page instead of doing it by
- hand
-Message-ID: <20250312024955.GA96961@sol.localdomain>
-References: <cover.1741688305.git.herbert@gondor.apana.org.au>
- <e858dadf36f7fc2c12545c648dda4645f48cab22.1741688305.git.herbert@gondor.apana.org.au>
- <20250311174431.GB1268@sol.localdomain>
- <Z9DxroRzYKSu2u6j@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="XKgl5oOA"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=Cc:To:Subject:From:Message-Id:Date:Sender:Reply-To:MIME-Version
+	:Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=rgHaTD49hLpWv3Q5PcMWVHPMm9FIa5n4OeQg+lek70I=; b=XKgl5oOAu9phkEgXUFIEq4QgDO
+	6LJnaiLZW66KLtstq90YaWh3xydsf0RkVop0BOxB58Md7TsYLvsWZV4Bn3Cv1YsuhtKclJoyJ/Oe3
+	x+6V82Y+bETfO+sbrpdDLAaCM2c7j4OYXQ+RFXNPPh+3T/gIO9EBZJdFMV8ElWaT+VBFojSLVBAwl
+	jKJpviC5jen3ihFBSNG88H7iwEkfDq+Q7rttukbmhatUt/P06HQa6o8CGHy/Hq+8yj/fcK8N4T1Au
+	w0Uujq8/7OFFQ8iW6kbS95qUIS5T+H1nvxPQnI1QaFpt4tmQ2jcJQ4Vpff1jMit4fthcyYxbwdGPK
+	FcV6irUw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tsDj9-005mXH-1o;
+	Wed, 12 Mar 2025 12:29:56 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 12 Mar 2025 12:29:55 +0800
+Date: Wed, 12 Mar 2025 12:29:55 +0800
+Message-Id: <cover.1741753576.git.herbert@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [v2 PATCH 0/2] crypto: Use nth_page instead of doing it by hand
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Cc: Eric Biggers <ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z9DxroRzYKSu2u6j@gondor.apana.org.au>
 
-On Wed, Mar 12, 2025 at 10:30:06AM +0800, Herbert Xu wrote:
-> On Tue, Mar 11, 2025 at 10:44:31AM -0700, Eric Biggers wrote:
-> >
-> > I guess you think this is fixing a bug in the case where sg->offset > PAGE_SIZE?
-> > Is that case even supported?  It is supposed to be the offset into a page.
-> 
-> Supported? Obviously not since this bug has been there since the
-> very start :)
-> 
-> But is it conceivable to create such a scatterlist, it certainly
-> seems to be.  If we were to create a scatterlist from a single
-> order-n folio, then it's quite reasonable for the offset to be
-> greater than PAGE_SIZE.
+v2 removes the krb5 patch and changes the code so that nth_page is
+only called if HIGHMEM is enabled.  Also switch to from page_address
+to lowmem_page_address.
 
-If it needs to work, then it needs to be tested.  Currently the self-tests
-always use sg_set_buf(), and thus scatterlist::offset always gets set to a value
-less than PAGE_SIZE.
+This patch series is based on top of:
 
-And this is yet more evidence that scatterlist based APIs are just a really bad
-idea.  Even 20 years later, there is still no precise definition of what a
-scatterlist even is...
+https://patchwork.kernel.org/project/linux-crypto/patch/20250310172016.153423-1-ebiggers@kernel.org/
 
-> > Even if so, a simpler fix (1 line) would be to use:
-> > 'sg->length >= nbytes && sg->offset + nbytes <= PAGE_SIZE'
-> 
-> That would just mean more use of the fallback code path.  Not
-> a big deal but I was feeling generous.
+Curiously, the Crypto API scatterwalk incremented pages by hand
+rather than using nth_page.  Possibly because scatterwalk predates
+nth_page (the following commit is from the history tree):
+    
+        commit 3957f2b34960d85b63e814262a8be7d5ad91444d
+        Author: James Morris <jmorris@intercode.com.au>
+        Date:   Sun Feb 2 07:35:32 2003 -0800
 
-My second suggestion, making it conditional on !HIGHMEM and using nbytes <=
-sg->length, would also be simple and would reduce the overhead for !HIGHMEM
-(rather than increasing it as your patch does, just like patch 1 which had the
-same problem).  !HIGHMEM is the common case (by far) these days, of course.
+            [CRYPTO]: in/out scatterlist support for ciphers.
 
-- Eric
+Fix this by using nth_page.
+
+Herbert Xu (2):
+  crypto: scatterwalk - Use nth_page instead of doing it by hand
+  crypto: hash - Use nth_page instead of doing it by hand
+
+ crypto/ahash.c               | 42 +++++++++++++++++++++++-------------
+ include/crypto/scatterwalk.h | 21 +++++++++++-------
+ 2 files changed, 40 insertions(+), 23 deletions(-)
+
+-- 
+2.39.5
+
