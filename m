@@ -1,132 +1,109 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5780B1F9428
-	for <linux-crypto@vger.kernel.org>; Thu, 13 Mar 2025 05:15:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26D8F263F25;
+	Thu, 13 Mar 2025 09:05:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741842904; cv=none; b=TVLkB5rGgDEGqn8tYFCOpu0vhr3+76L9GEfSatnlW0aE/JxD//Kb5l0ih7S6wX7PamvwhmhrplSYNV9ThFFG6xVBoW5waCklZpuKGDSq1ZWe5QycDXk2Sj+bhQrwMscNIzLsIGs4MO8leFoYQapfczow8WdBLk7TCMrZeLCRn9M=
+	t=1741856741; cv=none; b=eQYLf5oKND9s9gNyfKOiKDDmHydoPPTgdtVUQCp+z/zXwJuuXw95AgH9PyjbxZbFQZTh67mmI3clcw1M4GEfdjfzOC/xcZh0okuBnWeqeVLmCHjQP0xZckLu/MhnX+ZbKUGnemK+lbefqNGBvfpUrbH9aSNYsJHCb0qHJl+kQ/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741842904; c=relaxed/simple;
-	bh=mNLmOGghL62tzDA4JQfsxo+P9xR5NBH2CaNap5VlRjs=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To:Cc; b=iyZR98TnOhzWg25etZhlgMXOginSbjHhwfvwmwyDY9/7BYptpW2h4vl0u1BCdrIowbBMn8qQTYaTn4OgDAQdpFZdkY+tZrza9RyT0YXvMy/Tbl3vLV7a0X4wzehqXqwWXlvEEY6MsPFYh2vza0zy6+p3P52LMbuwwxnaXZ051K0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=qmcLD3p3; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="qmcLD3p3"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=Cc:To:Subject:From:References:In-Reply-To:Message-Id:Date:
-	Sender:Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=1c9yppkRtU8BSI0xx+i+Gx7RlgrGI2hBSVqONXXhRv4=; b=qmcLD3p3SPAv2ik7TbAszIpliR
-	6iOBt+h3GFDwQqw0XDqh5KJe0tRxe+voMBZ2FaKJ3sPpDIEdOJzjmUFfexk/P2GNz/zC6GmdIeq+q
-	wqKn5X5IpeEhUh8kjoK98KyYxGx3XtzhBOGIWvT+ciXi2APsC9zTqh8XcyAcpG2mhKSDcN/xLmF3f
-	5b5oLbZHPJnMRahiNjhhFVErpmooe0p9LHx2WboGEKJuWklSn5lm4KzFfMVFwjVbAYMQi/wmfOa6l
-	67LukNR45rZSdmSC2Z3krG0kASw2cElNuCiNzTD8kc3ys0xSmzOVNL+aLyrcluFe5WP+VpdC2ehL6
-	V7rNdAXg==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tsauI-0068QX-1u;
-	Thu, 13 Mar 2025 13:14:59 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 13 Mar 2025 13:14:58 +0800
-Date: Thu, 13 Mar 2025 13:14:58 +0800
-Message-Id: <b4b00e0fed2fe0e48a0d9b2270bed7e29b119f6a.1741842470.git.herbert@gondor.apana.org.au>
-In-Reply-To: <cover.1741842470.git.herbert@gondor.apana.org.au>
-References: <cover.1741842470.git.herbert@gondor.apana.org.au>
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v3 PATCH 3/3] crypto: hash - Fix test underflow in
- shash_ahash_digest
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Cc: Eric Biggers <ebiggers@kernel.org>
+	s=arc-20240116; t=1741856741; c=relaxed/simple;
+	bh=61TtN6wFDpZAdqUJIVNY9ZHfRjNQofHuMtPikcmgtZ0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uTUAyZs4t8VhRtL4RUCVbWldoB668BBedlJAoxQTDFAQI9DAhMlA6XVWY2EC9UjRJkJ3ojd97SPyzv9L4Y7UTCPoO1gmfWI7J8xCim/amr+tKAZegMDDKxugYKle48Eo2SrteDyWdd5pF0r+U5Ojri5C4Xnl994tAC4fFZSUOjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.40.54.90])
+	by gateway (Coremail) with SMTP id _____8BxXWvbn9JnrryUAA--.56513S3;
+	Thu, 13 Mar 2025 17:05:31 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.40.54.90])
+	by front1 (Coremail) with SMTP id qMiowMCx_cban9JnUDlIAA--.8065S2;
+	Thu, 13 Mar 2025 17:05:30 +0800 (CST)
+From: Qunqin Zhao <zhaoqunqin@loongson.cn>
+To: lee@kernel.org,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	peterhuewe@gmx.de,
+	jarkko@kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	linux-crypto@vger.kernel.org,
+	jgg@ziepe.ca,
+	linux-integrity@vger.kernel.org,
+	pmenzel@molgen.mpg.de,
+	Qunqin Zhao <zhaoqunqin@loongson.cn>
+Subject: [PATCH v5 0/6] Drivers for Loongson security engine
+Date: Thu, 13 Mar 2025 17:05:02 +0800
+Message-Id: <20250313090508.21252-1-zhaoqunqin@loongson.cn>
+X-Mailer: git-send-email 2.20.1
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowMCx_cban9JnUDlIAA--.8065S2
+X-CM-SenderInfo: 52kd01pxqtx0o6or00hjvr0hdfq/
+X-Coremail-Antispam: 1Uk129KBj93XoW7uF1rKw4DXFy3uw1xGF4UAwc_yoW8AFyrpF
+	45AayFkr4UJFZrGrn3Ja48CFyfXa4fXrW3Kay2qw1DWr9xAa48J3yakFyUJa9rJF18JryI
+	qFZ3Cr4UGF1UZacCm3ZEXasCq-sJn29KB7ZKAUJUUUUf529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUB0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	GcCE3s1ln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2
+	x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r126r1D
+	McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr4
+	1lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_
+	Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67
+	AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8I
+	cVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI
+	8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v2
+	6r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU4SoGDUUUU
 
-The test on PAGE_SIZE - offset in shash_ahash_digest can underflow,
-leading to execution of the fast path even if the data cannot be
-mapped into a single page.
+Loongson security engine supports random number generation, hash,
+symmetric encryption and asymmetric encryption. Based on these
+encryption functions, TPM2 have been implemented in it.
 
-Fix this by splitting the test into four cases:
+mfd is the baser driver, crypto and tpm are users.
 
-1) nbytes > sg->length: More than one SG entry, slow path.
-2) !IS_ENABLED(CONFIG_HIGHMEM): fast path.
-3) nbytes > (unsigned int)PAGE_SIZE - offset: Two highmem pages, slow path.
-4) Highmem fast path.
+v5: Registered "ls6000se-rng" device in mfd driver.
+v4: Please look at changelog in tpm and MAINTAINERS. No changes to mfd
+    and crypto.
+v3: Put the updates to the MAINTAINERS in a separate patch.
+v2: Removed misc driver. Added tpm driver.
 
-Fixes: 5f7082ed4f48 ("crypto: hash - Export shash through hash")
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
- crypto/ahash.c | 40 ++++++++++++++++++++++++++--------------
- 1 file changed, 26 insertions(+), 14 deletions(-)
+Qunqin Zhao (6):
+  mfd: Add support for Loongson Security Module
+  MAINTAINERS: Add entry for Loongson Security Module driver
+  crypto: loongson - add Loongson RNG driver support
+  MAINTAINERS: Add entry for Loongson RNG driver
+  tpm: Add a driver for Loongson TPM device
+  MAINTAINERS: Add tpm_lsse.c to LOONGSON CRYPTO DRIVER entry
 
-diff --git a/crypto/ahash.c b/crypto/ahash.c
-index 9c26175c21a8..1fe594880295 100644
---- a/crypto/ahash.c
-+++ b/crypto/ahash.c
-@@ -16,6 +16,7 @@
- #include <linux/cryptouser.h>
- #include <linux/err.h>
- #include <linux/kernel.h>
-+#include <linux/mm.h>
- #include <linux/module.h>
- #include <linux/sched.h>
- #include <linux/slab.h>
-@@ -201,25 +202,36 @@ int shash_ahash_digest(struct ahash_request *req, struct shash_desc *desc)
- 	unsigned int nbytes = req->nbytes;
- 	struct scatterlist *sg;
- 	unsigned int offset;
-+	struct page *page;
-+	const u8 *data;
- 	int err;
- 
--	if (ahash_request_isvirt(req))
--		return crypto_shash_digest(desc, req->svirt, nbytes,
--					   req->result);
-+	data = req->svirt;
-+	if (!nbytes || ahash_request_isvirt(req))
-+		return crypto_shash_digest(desc, data, nbytes, req->result);
- 
--	if (nbytes &&
--	    (sg = req->src, offset = sg->offset,
--	     nbytes <= min(sg->length, ((unsigned int)(PAGE_SIZE)) - offset))) {
--		void *data;
-+	sg = req->src;
-+	if (nbytes > sg->length)
-+		return crypto_shash_init(desc) ?:
-+		       shash_ahash_finup(req, desc);
- 
--		data = kmap_local_page(sg_page(sg));
--		err = crypto_shash_digest(desc, data + offset, nbytes,
--					  req->result);
--		kunmap_local(data);
--	} else
--		err = crypto_shash_init(desc) ?:
--		      shash_ahash_finup(req, desc);
-+	page = sg_page(sg);
-+	offset = sg->offset;
-+	data = lowmem_page_address(page) + offset;
-+	if (!IS_ENABLED(CONFIG_HIGHMEM))
-+		return crypto_shash_digest(desc, data, nbytes, req->result);
- 
-+	page += offset >> PAGE_SHIFT;
-+	offset = offset_in_page(offset);
-+
-+	if (nbytes > (unsigned int)PAGE_SIZE - offset)
-+		return crypto_shash_init(desc) ?:
-+		       shash_ahash_finup(req, desc);
-+
-+	data = kmap_local_page(page);
-+	err = crypto_shash_digest(desc, data + offset, nbytes,
-+				  req->result);
-+	kunmap_local(data);
- 	return err;
- }
- EXPORT_SYMBOL_GPL(shash_ahash_digest);
+ MAINTAINERS                            |  14 +
+ drivers/char/tpm/Kconfig               |   9 +
+ drivers/char/tpm/Makefile              |   1 +
+ drivers/char/tpm/tpm_lsse.c            | 103 +++++++
+ drivers/crypto/Kconfig                 |   1 +
+ drivers/crypto/Makefile                |   1 +
+ drivers/crypto/loongson/Kconfig        |   6 +
+ drivers/crypto/loongson/Makefile       |   2 +
+ drivers/crypto/loongson/ls6000se-rng.c | 190 +++++++++++++
+ drivers/mfd/Kconfig                    |  10 +
+ drivers/mfd/Makefile                   |   2 +
+ drivers/mfd/ls6000se.c                 | 374 +++++++++++++++++++++++++
+ include/linux/mfd/ls6000se.h           |  75 +++++
+ 13 files changed, 788 insertions(+)
+ create mode 100644 drivers/char/tpm/tpm_lsse.c
+ create mode 100644 drivers/crypto/loongson/Kconfig
+ create mode 100644 drivers/crypto/loongson/Makefile
+ create mode 100644 drivers/crypto/loongson/ls6000se-rng.c
+ create mode 100644 drivers/mfd/ls6000se.c
+ create mode 100644 include/linux/mfd/ls6000se.h
+
+
+base-commit: 6a8f122c5f073c8610c32636663f2512514b1270
 -- 
-2.39.5
+2.43.0
 
