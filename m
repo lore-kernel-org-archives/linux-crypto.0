@@ -1,199 +1,275 @@
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2072.outbound.protection.outlook.com [40.107.102.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6B18142E6F
-	for <linux-crypto@vger.kernel.org>; Thu, 13 Mar 2025 04:29:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741840144; cv=none; b=svJB7/ZA+JatKZ51esf15/HYpQeYd6JhM77x4kBw1tZXlZEPEIp0r9rkZQX0Xn1WsjxyG4cetsiXYzgJuZ2JoaQx1YihlpvZppfSuI4NZDztUoVRywLWigCsnj4s+roOHB5LVhG6XRZ1KqLM8ZwtlmEcrUDzTDpCZG0wTxvziHk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741840144; c=relaxed/simple;
-	bh=kWXr62CAog9CAGOGJRrsCFtZNEq79hFLJ3mt5laTGcw=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=DLAOsnGd6IGlDZkO+KeO/Qouau5v4evTUYDI7NNIBKiLWmEJUe78MlPzB9zo2kdAdoLFCkhcm0u1r711IkwEWkTlPWFxsQD9yza3AeDbUGwdQOiUHAh8p14h4rH4KVAFA/do4a+ItkfZGvW8xZ2Fbj17WKbFAHA7OfSb8+coeNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3d2b3882febso5183035ab.1
-        for <linux-crypto@vger.kernel.org>; Wed, 12 Mar 2025 21:29:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1741840142; x=1742444942;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0WFfvUCISmueifoL2MCy+RFGIJcBo8BpaxtswOkUKf8=;
-        b=Z+36tvNex0dbrpu4W28E6Ec5aUcvMUB0Tzaj9lvRwf/kt0HlV4p8q1c9kQPu57fQSy
-         YIdkTp4S9dmfdc+OoHRckgxJyPBayEhUC47+fSq9ksNOdMIeVR+3iKqoZeYxxAG24fAX
-         3hhUqn0VXeR/rcO+lQo+igtTe9KsG5yU86VB2/tN/nPawnlhXupz4fYIgIlhM60t8l6v
-         558l7Og/VJW+cnSkjaF0YMxmKAU7lD9qhGxusu63YrOZ2hhKKLlCAb9hSu2rRWeME8LY
-         5GeNHvmJ9mjWHAWtB+1rKKswEo+dIXs6vIFlwPRXFIFDGdXtfJ6j/lHV1XednxZIPK/L
-         Zpcw==
-X-Forwarded-Encrypted: i=1; AJvYcCXthV+JIxfUgLJcf0lXhH6UCxtmHJO8DP3pdyAPm7JD+ytDO2+bAZ9jOSGPTqTN/olNifstMrby74YlWo4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbNp4154qotfhUGCNfFgBy2IHKFkZwywZQAedNOiv83SDFxESb
-	/CzA2HUi3Cpz1bMn3CvDdXdIKVT6klNQfOfqoKCf45+9NpCKzqzsLxRqJPLqMwdEywpnU9e7i2r
-	1IACrR4eBzHgwzhMcTn6Ae9UevS2B5RwW2nqiOvNF8Ei+QcjMfw1fATo=
-X-Google-Smtp-Source: AGHT+IEvobTDZMgWNZQbo1CELljpz7OYQv02wcDWl6BG6s7X2N/8oYNpbQUE7xADNNqOMrFGqYAEE1xmgkQv/s6Y6rl1JzvJRo3/
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A5B0800;
+	Thu, 13 Mar 2025 04:32:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.72
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1741840334; cv=fail; b=KVrLku67bZHKFOYrqJeu6aNMA9tgTSkz9auWLMPO077gxovRsAaUqvwpmK6Xx8FgPS0BVMGckU4cCqQjrPh3Jnn/hrUHQFn7/5Tohwy7EBNxfiyif9ZRFCpLi5Mhsyn4XAlen5DkQs+N7L9iK0TCWqPC+XmhSmzRq6eO+vBxjpQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1741840334; c=relaxed/simple;
+	bh=xJMoGf1OCJIDq5I1xoMlZr/93Hcr5sGIdcGutgSqiPw=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=fODFH3Mgq0KwCTlR++dQcZChME+zJ0CBaHD8mK1oQRgC5OIk5OPB0W+ZhLJiihFTKvHDFg/QdgXqDpRdPeSsSKoxemCnBZ+jcXJgV60KjYilKyO1DlSO25AlKWt+tCWQlHd3YsYzslVMyuyFPxqlimhgrYsjwvofJm/fb1YNmKA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=zaddWAoM; arc=fail smtp.client-ip=40.107.102.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="zaddWAoM"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=t+/yAFIG5Kig326IV8lx461BUAuGAuUddwVQUq1WBB/LEvA57GW9JakkDRE+fYhl2Ld+R/LiTH7BEXyH928fJHr9bgK6LYIbGSMd7uxtxedSBRfly7zXc89aqPd5R6tzDUL5OH+CS6vCzVH5oPBzvL2Bu4VC+nDSCaFoxmhPFsEAj7FxTkqk3dIeSN8HTuADr0ZVKDtYQ0Zibh/1WFaYMcG0PYlpK2B7ROISh3ZNL3Pl2tA2L21cRzjsPigCWVP7Lpoz1ov63p+2kV9OeNzig7pkquFpEH+icYYVIPhSHCqYswCNFV1lyRhjsXH2jU6D1oM53Gqa+lLMbk6tsUa6EQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=EBX9yHc4qHjMeNb8rj8wwW5e5Dq91ZPwfeyuWucp870=;
+ b=f0aHUqXWV0OS80zvvfjqjyfZTG0uwfaE53/WajqAb5iUgm+9cygtOpg2DvlWAtVmS51LIRGUvWli+JzMDH43X3jqsRuFLMQY8aRJocUxQ2PtScIrjdwqwUl1kQ0a/yoeP9nk3Oet6nfYpezFNFETT/h5AxtWhUEJ65BhEEkIf9khyCyNjGzZvXaaUxSGtY5trYo7yTBazFBtM+a0eMSsdd+WXDxEwigCya4n6TDgq5ymT7Z6TymxwfcCnih2j8ttdth/mpi5TQhnQ4/kQcLKoGLpUs1TqueUQuLH26EaOHytUibcrDe0W6kCy8GuGFP3Vf3aIBkiI2EdjNJX+xHHzg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EBX9yHc4qHjMeNb8rj8wwW5e5Dq91ZPwfeyuWucp870=;
+ b=zaddWAoMM8HFHLSkbbAXzEQsjzOUlcBov6SwnuI1+0LxC/W9vw7s0yTmVfzfGTSwRjtJqdWdquP8W2pqo00b9eiD4Bpa1AymxG46lhDcrmIyaAXA3whLFjiKjqD1k1TPdqbJlZIADAzNeJsyCofUxu9B/sjSuCG94tWw+jE8v3Y=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from CH3PR12MB9194.namprd12.prod.outlook.com (2603:10b6:610:19f::7)
+ by PH0PR12MB7864.namprd12.prod.outlook.com (2603:10b6:510:26c::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8534.28; Thu, 13 Mar
+ 2025 04:32:08 +0000
+Received: from CH3PR12MB9194.namprd12.prod.outlook.com
+ ([fe80::53fb:bf76:727f:d00f]) by CH3PR12MB9194.namprd12.prod.outlook.com
+ ([fe80::53fb:bf76:727f:d00f%3]) with mapi id 15.20.8511.026; Thu, 13 Mar 2025
+ 04:32:08 +0000
+Message-ID: <7719c1ad-84b8-40e2-9ce7-93248a410ebd@amd.com>
+Date: Thu, 13 Mar 2025 15:31:54 +1100
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [RFC PATCH v2 06/22] KVM: X86: Define tsm_get_vmid
+Content-Language: en-US
+To: Dan Williams <dan.j.williams@intel.com>, x86@kernel.org
+Cc: kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
+ linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+ Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Tom Lendacky <thomas.lendacky@amd.com>,
+ Ashish Kalra <ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>,
+ Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+ Robin Murphy <robin.murphy@arm.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Kevin Tian <kevin.tian@intel.com>, Bjorn Helgaas <bhelgaas@google.com>,
+ Christoph Hellwig <hch@lst.de>, Nikunj A Dadhania <nikunj@amd.com>,
+ Michael Roth <michael.roth@amd.com>, Vasant Hegde <vasant.hegde@amd.com>,
+ Joao Martins <joao.m.martins@oracle.com>, Nicolin Chen
+ <nicolinc@nvidia.com>, Lu Baolu <baolu.lu@linux.intel.com>,
+ Steve Sistare <steven.sistare@oracle.com>, Lukas Wunner <lukas@wunner.de>,
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Dionna Glaze <dionnaglaze@google.com>, Yi Liu <yi.l.liu@intel.com>,
+ iommu@lists.linux.dev, linux-coco@lists.linux.dev, Zhi Wang
+ <zhiw@nvidia.com>, AXu Yilun <yilun.xu@linux.intel.com>,
+ "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+References: <20250218111017.491719-1-aik@amd.com>
+ <20250218111017.491719-7-aik@amd.com>
+ <67d23a3e6667_201f0294ed@dwillia2-xfh.jf.intel.com.notmuch>
+From: Alexey Kardashevskiy <aik@amd.com>
+In-Reply-To: <67d23a3e6667_201f0294ed@dwillia2-xfh.jf.intel.com.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: ME0P300CA0063.AUSP300.PROD.OUTLOOK.COM
+ (2603:10c6:220:20e::9) To CH3PR12MB9194.namprd12.prod.outlook.com
+ (2603:10b6:610:19f::7)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:c24b:0:b0:3d4:3ab3:e1c9 with SMTP id
- e9e14a558f8ab-3d441a06d8cmr265782365ab.15.1741840141998; Wed, 12 Mar 2025
- 21:29:01 -0700 (PDT)
-Date: Wed, 12 Mar 2025 21:29:01 -0700
-In-Reply-To: <1f4c7fbe-f666-45d2-911e-59fffdca905d@gmail.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67d25f0d.050a0220.14e108.002d.GAE@google.com>
-Subject: Re: [syzbot] [xfs?] KASAN: slab-out-of-bounds Read in xlog_cksum
-From: syzbot <syzbot+9f6d080dece587cfdd4c@syzkaller.appspotmail.com>
-To: ardb@kernel.org, bp@alien8.de, chandan.babu@oracle.com, 
-	dave.hansen@linux.intel.com, ebiggers@kernel.org, hpa@zytor.com, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-xfs@vger.kernel.org, mingo@redhat.com, sunjunchao2870@gmail.com, 
-	syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-
-Hello,
-
-syzbot has tested the proposed patch but the reproducer is still triggering an issue:
-KASAN: slab-out-of-bounds Read in xlog_cksum
-
-=======================================================
-XFS (loop0): Mounting V5 Filesystem bfdc47fc-10d8-4eed-a562-11a831b3f791
-==================================================================
-BUG: KASAN: slab-out-of-bounds in crc32c_le_arch+0xc7/0x1b0 arch/x86/lib/crc32-glue.c:81
-Read of size 8 at addr ffff888040eb5200 by task syz.0.16/5913
-
-CPU: 0 UID: 0 PID: 5913 Comm: syz.0.16 Not tainted 6.14.0-rc6-syzkaller-gb7f94fcf5546 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- print_address_description mm/kasan/report.c:408 [inline]
- print_report+0x16e/0x5b0 mm/kasan/report.c:521
- kasan_report+0x143/0x180 mm/kasan/report.c:634
- crc32c_le_arch+0xc7/0x1b0 arch/x86/lib/crc32-glue.c:81
- __crc32c_le include/linux/crc32.h:36 [inline]
- crc32c include/linux/crc32c.h:9 [inline]
- xlog_cksum+0x91/0xf0 fs/xfs/xfs_log.c:1588
- xlog_recover_process+0x78/0x1e0 fs/xfs/xfs_log_recover.c:2900
- xlog_do_recovery_pass+0xa01/0xdc0 fs/xfs/xfs_log_recover.c:3235
- xlog_verify_head+0x21f/0x5a0 fs/xfs/xfs_log_recover.c:1058
- xlog_find_tail+0xa04/0xdf0 fs/xfs/xfs_log_recover.c:1315
- xlog_recover+0xe1/0x540 fs/xfs/xfs_log_recover.c:3419
- xfs_log_mount+0x252/0x3e0 fs/xfs/xfs_log.c:666
- xfs_mountfs+0xfbb/0x2500 fs/xfs/xfs_mount.c:878
- xfs_fs_fill_super+0x1223/0x1550 fs/xfs/xfs_super.c:1817
- get_tree_bdev_flags+0x48c/0x5c0 fs/super.c:1636
- vfs_get_tree+0x90/0x2b0 fs/super.c:1814
- do_new_mount+0x2be/0xb40 fs/namespace.c:3560
- do_mount fs/namespace.c:3900 [inline]
- __do_sys_mount fs/namespace.c:4111 [inline]
- __se_sys_mount+0x2d6/0x3c0 fs/namespace.c:4088
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f010618e90a
-Code: d8 64 89 02 48 c7 c0 ff ff ff ff eb a6 e8 de 1a 00 00 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 49 89 ca b8 a5 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f0106f3ce68 EFLAGS: 00000246 ORIG_RAX: 00000000000000a5
-RAX: ffffffffffffffda RBX: 00007f0106f3cef0 RCX: 00007f010618e90a
-RDX: 0000400000000500 RSI: 0000400000000200 RDI: 00007f0106f3ceb0
-RBP: 0000400000000500 R08: 00007f0106f3cef0 R09: 0000000002218a5d
-R10: 0000000002218a5d R11: 0000000000000246 R12: 0000400000000200
-R13: 00007f0106f3ceb0 R14: 0000000000009706 R15: 0000400000000100
- </TASK>
-
-Allocated by task 5913:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
- poison_kmalloc_redzone mm/kasan/common.c:377 [inline]
- __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:394
- kasan_kmalloc include/linux/kasan.h:260 [inline]
- __do_kmalloc_node mm/slub.c:4294 [inline]
- __kmalloc_node_noprof+0x290/0x4d0 mm/slub.c:4300
- __kvmalloc_node_noprof+0x72/0x190 mm/util.c:662
- xlog_do_recovery_pass+0x143/0xdc0 fs/xfs/xfs_log_recover.c:3016
- xlog_verify_head+0x21f/0x5a0 fs/xfs/xfs_log_recover.c:1058
- xlog_find_tail+0xa04/0xdf0 fs/xfs/xfs_log_recover.c:1315
- xlog_recover+0xe1/0x540 fs/xfs/xfs_log_recover.c:3419
- xfs_log_mount+0x252/0x3e0 fs/xfs/xfs_log.c:666
- xfs_mountfs+0xfbb/0x2500 fs/xfs/xfs_mount.c:878
- xfs_fs_fill_super+0x1223/0x1550 fs/xfs/xfs_super.c:1817
- get_tree_bdev_flags+0x48c/0x5c0 fs/super.c:1636
- vfs_get_tree+0x90/0x2b0 fs/super.c:1814
- do_new_mount+0x2be/0xb40 fs/namespace.c:3560
- do_mount fs/namespace.c:3900 [inline]
- __do_sys_mount fs/namespace.c:4111 [inline]
- __se_sys_mount+0x2d6/0x3c0 fs/namespace.c:4088
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-The buggy address belongs to the object at ffff888040eb5000
- which belongs to the cache kmalloc-512 of size 512
-The buggy address is located 0 bytes to the right of
- allocated 512-byte region [ffff888040eb5000, ffff888040eb5200)
-
-The buggy address belongs to the physical page:
-page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x40eb4
-head: order:1 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-ksm flags: 0x4fff00000000040(head|node=1|zone=1|lastcpupid=0x7ff)
-page_type: f5(slab)
-raw: 04fff00000000040 ffff88801b041c80 ffffea0000d00580 dead000000000003
-raw: 0000000000000000 0000000080080008 00000000f5000000 0000000000000000
-head: 04fff00000000040 ffff88801b041c80 ffffea0000d00580 dead000000000003
-head: 0000000000000000 0000000080080008 00000000f5000000 0000000000000000
-head: 04fff00000000001 ffffea000103ad01 ffffffffffffffff 0000000000000000
-head: 0000000000000002 0000000000000000 00000000ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 1, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 2, tgid 2 (kthreadd), ts 23865404352, free_ts 0
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x1f4/0x240 mm/page_alloc.c:1551
- prep_new_page mm/page_alloc.c:1559 [inline]
- get_page_from_freelist+0x365c/0x37a0 mm/page_alloc.c:3477
- __alloc_frozen_pages_noprof+0x292/0x710 mm/page_alloc.c:4740
- alloc_pages_mpol+0x311/0x660 mm/mempolicy.c:2270
- alloc_slab_page mm/slub.c:2423 [inline]
- allocate_slab+0x8f/0x3a0 mm/slub.c:2587
- new_slab mm/slub.c:2640 [inline]
- ___slab_alloc+0xc27/0x14a0 mm/slub.c:3826
- __slab_alloc+0x58/0xa0 mm/slub.c:3916
- __slab_alloc_node mm/slub.c:3991 [inline]
- slab_alloc_node mm/slub.c:4152 [inline]
- __kmalloc_cache_noprof+0x27b/0x390 mm/slub.c:4320
- kmalloc_noprof include/linux/slab.h:901 [inline]
- kzalloc_noprof include/linux/slab.h:1037 [inline]
- set_kthread_struct+0xc2/0x330 kernel/kthread.c:126
- copy_process+0x1179/0x3cf0 kernel/fork.c:2331
- kernel_clone+0x226/0x8e0 kernel/fork.c:2815
- kernel_thread+0x1c0/0x250 kernel/fork.c:2877
- create_kthread kernel/kthread.c:487 [inline]
- kthreadd+0x60d/0x810 kernel/kthread.c:847
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:148
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-page_owner free stack trace missing
-
-Memory state around the buggy address:
- ffff888040eb5100: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
- ffff888040eb5180: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->ffff888040eb5200: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-                   ^
- ffff888040eb5280: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff888040eb5300: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-==================================================================
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB9194:EE_|PH0PR12MB7864:EE_
+X-MS-Office365-Filtering-Correlation-Id: e132acb5-4178-489d-9a4a-08dd61e80394
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?ZWkremF0SGVXM0RneTNSNzdOSU43eXllOUhaUU5KdXFsaEVQd05vUWJPNTc2?=
+ =?utf-8?B?U0dubGxrbXk0Tnc4dDg3QnFEa1hGOHQySWNIbVV5enhQN1lya2tQeDZiYWlX?=
+ =?utf-8?B?dFA0OGhUMDZRY0hmZk5HSnFneXlLWHg2d3JaQ3VTTk4vSUxnSFBDTGhuOVRH?=
+ =?utf-8?B?QTBsbnhKUCszekJqSHRUUWQ5aTlmdXkzRDZlQ2NEaGVyTVNaNGJnM0J1ZEY3?=
+ =?utf-8?B?bExDMVdwRytUK3oya0FpMzBwSGlDVXBEZmp6OXppeGhWNEtJcG9jTklPOThF?=
+ =?utf-8?B?cnJwa1Q1Vzd3eFRDc0xhTEkzNndEL2NyT01pOWRNZGRYTFA2SEJ2aHllajFk?=
+ =?utf-8?B?RFR3bjdkSnQ1bnBFcklBRlpOZW9lSU5sT0ZhK1RkY3p2R2Rrdit2d0ZockZR?=
+ =?utf-8?B?dk0yd0lOU1hJN2xPemxyemFSZWZ2d0hqandNUkM2SWpaRkpLSVFGZWwvdFNo?=
+ =?utf-8?B?UjdDYlpSUkVMMGtueE4zOStOMWE1R0daVDMrOVNuRzBYSDNwb2cwaWpzZlBm?=
+ =?utf-8?B?UWRkWVJjNlV3VXpZKytNbm8yZkYrZG1OR0hPWDBMVmxSbTNmTEFVQi9kVUIr?=
+ =?utf-8?B?TUgwR0dPL1kwZjhBMmxXQzFlWFptNTFZdkVnbHB4ekNjbjhhNUo5aE9iTmp5?=
+ =?utf-8?B?VTI5NnBlM2dnbzlaYzRUOWQ4SW41bTdqRnA4NTBGTkJ6NEROY1d2S3NZcHpm?=
+ =?utf-8?B?KzRVN1dTajJjclFsSzBmOVdWSVV6RitzVkhYZXRGUmRWVHBPWUFoV3JiQVdu?=
+ =?utf-8?B?ZnU0Y05WeU50WXQxUXdNWHBWVkJMb2gyNmRrZU5iTVJpWUNpOVVsbnhneFdx?=
+ =?utf-8?B?RnU1QlkrN3pzYm1pMzlNeHpIK29sdkwvSVFhSlJvM3pQaHprVkUwVk5INlVs?=
+ =?utf-8?B?YTgvY2dzRWw4Z2tiSjFvMnJENkpjRzQ0SHlZYVdqbXRhQkVhN21QWEZVR2ds?=
+ =?utf-8?B?SWdXZG5zdWVRZzhKUTdOZjNRemlpZzFKTWxkVnVoMVBSVDhkdFhrY2dyNzJO?=
+ =?utf-8?B?STRubElpYncydzVxaks3Z1FOaVQ5dGNBdkNFSHBTaEo0aFhtZTFhVWJDMDNF?=
+ =?utf-8?B?UWoxZGQrWjV3NDhQK3p0VjhnZFBudjRuekszLzRqWDdYWVdqckgyd1NuZmYy?=
+ =?utf-8?B?aC9HditQWXo0SU8vN2V0NFJQSktzYnhNM3MzblczaUZxWVVoblE0d0Y4YU9a?=
+ =?utf-8?B?S1FIam9wRWhVZXBjaGk0Z1hWdXF5OXNURUVaWnBicm41djA4VEN2MVFCRHJT?=
+ =?utf-8?B?NjBub2tZeEJGQ0N3czJVd2VBdUZ4Nk5TQnJmcG9aenBnMnRaYkpzNTg0MXNn?=
+ =?utf-8?B?MWtKdmlTcC90M0xNMzA2OFM5d0tWL3ZlS3hyMGNsaHdrS1RmZlV5RS94bTcy?=
+ =?utf-8?B?OGk3ZGJCMGduUUk5c2g1OHQxUDAzNXRkeHRPVnJWczVSYzVqZkxTY2Z1ckQ3?=
+ =?utf-8?B?WU1RcUJ0dGdYTHN6bEw5d25nVHd2Y3QyWmxmTTlRWHVnTVVuaHRtVWZSZURn?=
+ =?utf-8?B?YkJtKzg1WGorcWJFMEg5M3VrZ2hSZzVmZ1puNEpWaGdYRFM4NmtINFcvNzFG?=
+ =?utf-8?B?SmJ0c21rUWdUcExIaitlNitaeU5OM09FZHhuZktldWg1eEFEZStObGNlMVE3?=
+ =?utf-8?B?NytJaSs4L2tnL25UeThPZlZIdDd2SHhudWNpczg5ckJkMndTblEyTzRDQ0NU?=
+ =?utf-8?B?OEI0MmVjN3ZEbm1KQlJNajV0dnRjYUpPK3ZyM2dzTi95QkxtbDJST1hoSWl4?=
+ =?utf-8?B?ei9NK2tqQS9Lb0k2Nmo0R0M5MzkzeklFL2EreURqTmExWGNpeFFTZVVjbWdR?=
+ =?utf-8?B?RXQ5ZVpiZnFhaE5YWkticm56M3Awdiszb2JDZ2x2T0dadXBVK3BPMC9Iczhl?=
+ =?utf-8?Q?BDdGDGgRCgTK9?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB9194.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?alNZT1I3eFA0QjZZY00rYk8vcmlyTWxTems3T1puNTBwUDdhc1MwZG5Vdlk0?=
+ =?utf-8?B?RExKampZRGxTZEErMDROVFE1MForaktIcE1tRENmZGhydFY5V1JQTHVQWDk0?=
+ =?utf-8?B?NjRDNGRWNzhtQmJiSlY3N015UTdEeWk5YWtxSVU2eVBkMXJsMnRlb0tQTS9S?=
+ =?utf-8?B?ZVdRMFFVN0xEeWxtVjZpTmk1RUQ2K1JQbzQxa2pHRmRtV1Q2SE84THBEYzA1?=
+ =?utf-8?B?eUtjTU5kbmNVZTB4bVVLQ2pydDdGdnZObFh5a0l6S2hTbUMvbjVFK3YzSmRn?=
+ =?utf-8?B?NklCcGxCNGNQelA0N2JsN1F3SllGMVhjejB3dlN2bkpwM2l6alpyeEhFdENs?=
+ =?utf-8?B?RFUvNjRkbHNpZEJ2bEdUdHY1cExmbHdJZUp3cWpYUGdJK2JYV2R0amhXc2RN?=
+ =?utf-8?B?UlJ6SGF1Z1U0YW85MmFQczVIVFRpVHBBeG5OQ1h2Q2ozcG9HbWhNTC9CWEFz?=
+ =?utf-8?B?ZWNDQXpEZitVcHVBTjJLQzJTbTBMZnUxMXVVTXorbVIzdldMZm1SUFhZejZv?=
+ =?utf-8?B?THZSRG8rUHQzeUl5eXQySWcvMHJhd3F0ZC9RM1g4TXpyelRIdEZxeitRak9B?=
+ =?utf-8?B?U0FVd0VxRUo0ZTdyR3BTOEVGMmh2Y3dkRThub2lCNkNyZ3hmdG5sa1pDbkw1?=
+ =?utf-8?B?aDZKN2pZdTdJcm9uTHdleENjdVRWR1hmOFI3dzRNZElEV2dLWXVLeHIydkdt?=
+ =?utf-8?B?TUdsK1FDZjZGaDBGRngrNEFXUDA0c3hIZ2pTdysrMHNyTDFzWEVDbm9LUjJU?=
+ =?utf-8?B?OEJMV0FBVnNoMVQzRTJjTHhyKzVjdWpoRWFpMlMxSWJ5dDlkUklIdVFjdXRz?=
+ =?utf-8?B?MnRWWElQMnZBUmg0dHB4ZytQdnJMaXdGM25UcUZicUNoWFNXWExsRUo2bEJt?=
+ =?utf-8?B?L2QxQlhkdTFNaTdyQkZqQXZGWXNaOHNwNlpBWHBWcjlRNTVYR293RVZkNFhK?=
+ =?utf-8?B?T0pVL2dySk5LdHFyaGFCZE5ZWi9ZVjZCdEVRc1o1TzNhMnRrczdKTHcrWjNp?=
+ =?utf-8?B?ZVJEcjh4VnZJUlV6emdWSFJDbmJ4RjNpSTBUVDRyL0JmdG9oYjRkUWZVdGtK?=
+ =?utf-8?B?YmwzWVdTSlNYeWZteEtmclg2cXNiOWQ2Qm44RCsrdzNOenA0U3RJR09oeCtR?=
+ =?utf-8?B?TGtydGRrL0FzMDd5S0cySXhvQUpZRTRxNHlmV3F3cmpVS2xWcjlYQ2pweXBJ?=
+ =?utf-8?B?RGdPWVdJRkozYVhXMjhjTmVzV0Q4Vnlva2RTYXFWSWsrYSsranhLMWVpU3pX?=
+ =?utf-8?B?NmV3QktaN20rYlFEV0ZYR0w1aGFFdHNzeitNVTVtUDE1aVRlcmhleDJXTmpz?=
+ =?utf-8?B?ZDlZSmpKTzNtbkRPN0hYWTlvbkNPSmNRcCtrR3JRUGord3ZrRXlYa0JiQ2VU?=
+ =?utf-8?B?a3NqMUV1UzBQaEZoSCs2SFdBM3dDS3NQTVBEaE5PZzRWMzhmdkhNazY3N2FT?=
+ =?utf-8?B?M1gvRmZvZVRSWHVnOGlxb2ZobDI2OHM0SHNzVEUxckc0alJERWlEcXRTYXNr?=
+ =?utf-8?B?U29EQmpvRkpxaFZVTzhqTDBISHBqTWJEeGlCTHlDYXJ3bkUxanJiVlNOb0Nu?=
+ =?utf-8?B?VTRkWEtpbVptdjhMSjJTdW5sOVJEaTBOZ2hyMC83U3NWNEE2Nkl0cElJRkw3?=
+ =?utf-8?B?Y3gwR2NtWXNTNXJyOWJNeEdnYTlseE5iNGZHKzQxYmZhRGpGVGJPQXZLUUFE?=
+ =?utf-8?B?ejhxTVlFenZsWWVTczRsNzJMVytiT3p4Vm5mMGpNdmkzOFRJalBVV1ZXcU93?=
+ =?utf-8?B?RmJHZ2RjZ2xBb2NRdklZTkh3SzJGcGJ0aXBGZmpLdk5CL1hvNDNnU3NORE42?=
+ =?utf-8?B?SjZWTFVyQzFNVTVsVkpRbndQdnh3OERvTFVCaXRhOUdIYjQ2a0loL05EUm5U?=
+ =?utf-8?B?Z3B4bGdxYmpybWIxZi9vbVpuUTBNb1FwV1ZsT2JuQ2VDNHEwMjRTL0t6em0w?=
+ =?utf-8?B?UUtkSEs5R292eGVSRzR5ZFdLTWJVNnJldWgwNGY5MXl0dG5hYlRTTzJFODZq?=
+ =?utf-8?B?NWRFYU9IZHhSV1Y5WjhEZWhaZDVjSWVlN0ZQaVU2ZG9LRCtFSWEzdjhMQzdT?=
+ =?utf-8?B?NS93OFpFYnZyTDZGc0daSHdnK1VHY0lUSU1MUEZFdlc2WGNGY3dTVEtWV1kz?=
+ =?utf-8?Q?PnXQ9RWOiGzcLw9N4nWv/bUIT?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e132acb5-4178-489d-9a4a-08dd61e80394
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB9194.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Mar 2025 04:32:08.0581
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: QoEQ6fxKa+EOOxMcSpP1rsiWeuI3UXUnM3yFgT+X7+xW9hPXuVMgMhRS1bVqgMn8rmvWafDsQhhGNVa7UVv1MA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7864
 
 
-Tested on:
 
-commit:         b7f94fcf Merge tag 'sched_ext-for-6.14-rc6-fixes' of g..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=16f4cc78580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=31c94a07ddad0b00
-dashboard link: https://syzkaller.appspot.com/bug?extid=9f6d080dece587cfdd4c
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+On 13/3/25 12:51, Dan Williams wrote:
+> Alexey Kardashevskiy wrote:
+>> In order to add a PCI VF into a secure VM, the TSM module needs to
+>> perform a "TDI bind" operation. The secure module ("PSP" for AMD)
+>> reuqires a VM id to associate with a VM and KVM has it. Since
+>> KVM cannot directly bind a TDI (as it does not have all necesessary
+>> data such as host/guest PCI BDFn). QEMU and IOMMUFD do know the BDFns
+>> but they do not have a VM id recognisable by the PSP.
+>>
+>> Add get_vmid() hook to KVM. Implement it for AMD SEV to return a sum
+>> of GCTX (a private page describing secure VM context) and ASID
+>> (required on unbind for IOMMU unfencing, when needed).
+>>
+>> Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
+>> ---
+>>   arch/x86/include/asm/kvm-x86-ops.h |  1 +
+>>   arch/x86/include/asm/kvm_host.h    |  2 ++
+>>   include/linux/kvm_host.h           |  2 ++
+>>   arch/x86/kvm/svm/svm.c             | 12 ++++++++++++
+>>   virt/kvm/kvm_main.c                |  6 ++++++
+>>   5 files changed, 23 insertions(+)
+>>
+>> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+>> index c35550581da0..63102a224cd7 100644
+>> --- a/arch/x86/include/asm/kvm-x86-ops.h
+>> +++ b/arch/x86/include/asm/kvm-x86-ops.h
+>> @@ -144,6 +144,7 @@ KVM_X86_OP_OPTIONAL(alloc_apic_backing_page)
+>>   KVM_X86_OP_OPTIONAL_RET0(gmem_prepare)
+>>   KVM_X86_OP_OPTIONAL_RET0(private_max_mapping_level)
+>>   KVM_X86_OP_OPTIONAL(gmem_invalidate)
+>> +KVM_X86_OP_OPTIONAL(tsm_get_vmid)
+>>   
+>>   #undef KVM_X86_OP
+>>   #undef KVM_X86_OP_OPTIONAL
+>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+>> index b15cde0a9b5c..9330e8d4d29d 100644
+>> --- a/arch/x86/include/asm/kvm_host.h
+>> +++ b/arch/x86/include/asm/kvm_host.h
+>> @@ -1875,6 +1875,8 @@ struct kvm_x86_ops {
+>>   	int (*gmem_prepare)(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, int max_order);
+>>   	void (*gmem_invalidate)(kvm_pfn_t start, kvm_pfn_t end);
+>>   	int (*private_max_mapping_level)(struct kvm *kvm, kvm_pfn_t pfn);
+>> +
+>> +	u64 (*tsm_get_vmid)(struct kvm *kvm);
+>>   };
+>>   
+>>   struct kvm_x86_nested_ops {
+>> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+>> index f34f4cfaa513..6cd351edb956 100644
+>> --- a/include/linux/kvm_host.h
+>> +++ b/include/linux/kvm_host.h
+>> @@ -2571,4 +2571,6 @@ long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
+>>   				    struct kvm_pre_fault_memory *range);
+>>   #endif
+>>   
+>> +u64 kvm_arch_tsm_get_vmid(struct kvm *kvm);
+>> +
+>>   #endif
+>> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+>> index 7640a84e554a..0276d60c61d6 100644
+>> --- a/arch/x86/kvm/svm/svm.c
+>> +++ b/arch/x86/kvm/svm/svm.c
+>> @@ -4998,6 +4998,16 @@ static void *svm_alloc_apic_backing_page(struct kvm_vcpu *vcpu)
+>>   	return page_address(page);
+>>   }
+>>   
+>> +static u64 svm_tsm_get_vmid(struct kvm *kvm)
+>> +{
+>> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+>> +
+>> +	if (!sev->es_active)
+>> +		return 0;
+>> +
+>> +	return ((u64) sev->snp_context) | sev->asid;
+>> +}
+>> +
+> 
+> Curious why KVM needs to be bothered by a new kvm_arch_tsm_get_vmid()
+> and a vendor specific cookie "vmid" concept. In other words KVM never
+> calls kvm_arch_tsm_get_vmid(), like other kvm_arch_*() support calls.
+> 
+> Is this due to a restriction that something like tsm_tdi_bind() is
+> disallowed from doing to_kvm_svm() on an opaque @kvm pointer? Or
+> otherwise asking an arch/x86/kvm/svm/svm.c to do the same?
 
-Note: no patches were applied.
+I saw someone already doing some sort of VMID thing and thought it is a 
+good way of not spilling KVM details outside KVM.
+
+> Effectively low level TSM drivers are extensions of arch code that
+> routinely performs "container_of(kvm, struct kvm_$arch, kvm)".
+
+The arch code is CCP and so far it avoided touching KVM, KVM calls CCP 
+when it needs but not vice versa. Thanks,
+
+
+-- 
+Alexey
+
