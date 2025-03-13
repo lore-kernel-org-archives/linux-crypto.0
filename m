@@ -1,42 +1,42 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E569C2E3390
-	for <linux-crypto@vger.kernel.org>; Thu, 13 Mar 2025 03:07:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42CDC27468
+	for <linux-crypto@vger.kernel.org>; Thu, 13 Mar 2025 03:13:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741835264; cv=none; b=G1lik7mm6AzmK8cWAaH9p2HMdtBy4YtdjWeBPd7SAS0h/8UmvY+tWOa4heVQHE6mOBJxD1Dkbrtxa6xtrT7/mnyFYwblkARX516B6kWDfqdOhVohRzjI0YDALHrHbc9w6+Tt/lseQR49HeDDxpa80iAkHQbJVIWwL/ljFuaXeGA=
+	t=1741835637; cv=none; b=RSkYf83+eE5CaDOeiCUAVf4l/DXrI8fHyY8rcCmH8QlD0jlloqey+76/wHrMdbwiUobrKf5Idw65/WsMcMJPhvBng1D1LOX5sTD7F9S1TWqqEamH5GzvGCHKLCpX1TXA2teC2lXxrECvSaBictwpqKgU+5E4OoM/I0Y+Acf3COw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741835264; c=relaxed/simple;
-	bh=1DJsKTzJ4JJeYLJcg2jc70RlSM72Zti0mCoKFD1/sSs=;
+	s=arc-20240116; t=1741835637; c=relaxed/simple;
+	bh=TnnUwTAhbr3Nyv8ZJKs5YrrV2eFEnoL7N96jApUT9A4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LMDZiVXsEdBOE4wSj/Ew2TOUZLnkGtVr8W44Q48UGpfOmWIAgNoCbfYmGHHpHGSMbp+0KjgEMQ7ATeEfbgXR1yhYQtzBodjIdGuUXg9GCQOSokVJRxvJcLMXaFb7uhDkkin9Tehja7VafUhPpdAUnXlgZvQj4iJNGFlZHILOEfM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q1eaHv9W; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=k373SApXJ9QrwH7F9nUYqCXkpTLHMWoPNshcC8c2aIy8CsOWtwCh1VD+P52RePhdQeHN0q4B3SBO0g9MEyapsiRzeRKIR1e8WLxIEwgxMat6eiaayKd4dx/AUkvGWLKTHeKMAvN+CrHacbLVNd8zMowfnymg0n0c4dnZOckbWYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uax6DT+g; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q1eaHv9W"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39DE0C4CEDD;
-	Thu, 13 Mar 2025 03:07:43 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uax6DT+g"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB461C4CEDD;
+	Thu, 13 Mar 2025 03:13:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741835263;
-	bh=1DJsKTzJ4JJeYLJcg2jc70RlSM72Zti0mCoKFD1/sSs=;
+	s=k20201202; t=1741835636;
+	bh=TnnUwTAhbr3Nyv8ZJKs5YrrV2eFEnoL7N96jApUT9A4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Q1eaHv9WDJqpNMwnWFComFJ8QgslvfaeXejXJNN+B+Vhd6rHM+6Wb9bPymoLB0PV0
-	 Pmovlz7qg5QVA7gaYhlU5TKoseCiR82DzyKWkAijLFj59zPJ0glnhDzAYcFthP3ClG
-	 t9rV4GyYzEufdDgFMBvwuFla2J1WUZZIJJRXiW19kzIclWHX7n9dXBl76SgGtolAtC
-	 Jjjc9pk7UWnwPqkz8FKrOKIidGPplJcknX9HmTgygjoQNb27fWKdRrIQicY19fa1f6
-	 t70qhPd9DetFncu8ZSk2zBDFXRKXeU0LTA4JamclcQ9SS5vg1Tg6gNshYDXRnYqDys
-	 9Y4J2QI7miThg==
-Date: Thu, 13 Mar 2025 03:07:41 +0000
+	b=Uax6DT+gKco4kMCeN5BOBnV6ewST908ztC+F7+uS6Wbu1bg/DZRFaKzo1+QM26o+N
+	 NDO2AbZ2FIOuj+G7GyhxJGPhfuxTs2wy7c93j6kD3Ao3E80zmjLUjaHObd1lkzZ/cd
+	 AEel7RxOlgzjz+zf+UOQCW+G6PbEoIlaVjK0IVvu72ewxoFVuIqCEvPeFnhJhzzEfq
+	 o4gCFmd1IGwbuU5/60mEsRS6dqbkDwtCt9k7QiToXIHElbWRZxROl+Zcsj+HxhII5f
+	 HTxU3x13j6Xz5xftip4a3h5WkuyW1ZRdp94Q1PiedkWNO1Olq8m8U7Cfj8+Xy9y6pj
+	 1xvh78TbMr7Sg==
+Date: Thu, 13 Mar 2025 03:13:55 +0000
 From: Eric Biggers <ebiggers@kernel.org>
 To: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [v2 PATCH 2/2] crypto: hash - Use nth_page instead of doing it
- by hand
-Message-ID: <20250313030741.GA2806970@google.com>
+Subject: Re: [v2 PATCH 1/2] crypto: scatterwalk - Use nth_page instead of
+ doing it by hand
+Message-ID: <20250313031355.GB2806970@google.com>
 References: <cover.1741753576.git.herbert@gondor.apana.org.au>
- <a68366725ab6130fea3a5e3257e92c8109b7f86a.1741753576.git.herbert@gondor.apana.org.au>
- <20250312200908.GB1621@sol.localdomain>
- <Z9JEvCT-3Q6BUnOt@gondor.apana.org.au>
+ <03f40ecd970de816686b233bd79406768dc66bbc.1741753576.git.herbert@gondor.apana.org.au>
+ <20250312195622.GA1621@sol.localdomain>
+ <Z9I4VBZ4hTWJYFw2@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -45,42 +45,30 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z9JEvCT-3Q6BUnOt@gondor.apana.org.au>
+In-Reply-To: <Z9I4VBZ4hTWJYFw2@gondor.apana.org.au>
 
-On Thu, Mar 13, 2025 at 10:36:44AM +0800, Herbert Xu wrote:
-> On Wed, Mar 12, 2025 at 01:09:08PM -0700, Eric Biggers wrote:
+On Thu, Mar 13, 2025 at 09:43:48AM +0800, Herbert Xu wrote:
+> On Wed, Mar 12, 2025 at 12:56:22PM -0700, Eric Biggers wrote:
 > >
-> > It seems that the "real bug" mentioned above is the case of
-> > scatterlist::offset > PAGE_SIZE.  That's unrelated to the nth_page() fix, which
-> > seems to be for scatterlist elements that span physical memory sections.  Also,
+> > This change is unrelated and seems incorrect.  lowmem_page_address() is a mm
+> > implementation detail.  page_address() is the right one to use.
 > 
-> Alright I'll try to split it up.
+> lowmem_page_address is obviously linear, while page_address is not.
+> For example, arch/loongarch does something funky with kfence and
+> page->virtual so that page_address is non-linear even on 64-bit
+> without HIGHMEM.
 > 
-> > Note that there is also page arithmetic being done in scatterwalk_done_dst() and
-> > scomp_acomp_comp_decomp().  Those presumably need the nth_page() fix too.
-> 
-> Thanks, I had missed the flushing code in scatterwalk.
-> 
-> As for scomp yes that's already fixed in my acomp series which I
-> will repost soon.
-> 
-> > scomp_acomp_comp_decomp() also assumes that if the first page in a given
-> > scatterlist element is lowmem, then any additional pages are lowmem too.  That
-> 
-> Yes I've fixed that by changing it to test the last page rather than
-> the first, assuming that highmem indeed comes after lowmem.
-> 
-> > sounds like another potentially wrong assumption.  Can scatterlist elements span
-> > memory zones?  Or just physical memory sections?
-> 
-> Theoretically it can cross anything.  Check out the block merging
-> code in __blk_rq_map_sg, it tries to merge any physically contiguous
-> page.
+> Sigh, it seems that they've overridden page_to_virt too so even
+> lowmem_page_address is non-linear.  But that's probably just a
+> result of people abusing page_to_virt.
 
-Actually the block layer avoids this edge case.  See the comment above struct
-bio_vec, and the corresponding code in bvec_try_merge_page():
-
-        if (bv->bv_page + bv_end / PAGE_SIZE != page + off / PAGE_SIZE)
-                return false;
+Well, it looks like the intention of !HIGHMEM && WANT_PAGE_VIRTUAL was for
+page->virtual to contain the linear address, as an optimization for
+architectures where multiplication and division are slow and sizeof(struct page)
+is not a power of 2.  So the resulting address would be the same, just gotten in
+a different way.  __init_single_page() in mm/mm_init.c indeed sets page->virtual
+that way.  But if there are now cases where it does not actually contain the
+linear address as expected, then such configurations need to be excluded from
+the linear sg entry optimization...
 
 - Eric
