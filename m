@@ -1,44 +1,44 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34BB51F91F6
-	for <linux-crypto@vger.kernel.org>; Thu, 13 Mar 2025 05:15:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5780B1F9428
+	for <linux-crypto@vger.kernel.org>; Thu, 13 Mar 2025 05:15:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741842902; cv=none; b=bUC2jMHlcyAmhlWuMjVWm5lSR3bmBYxu+cuIQ/B/h+1PyEINWkNxRDP5ENR2o1igv6fIJzAz1uUbSvQa/wKQ6AFng2r9/9ImxN88OZlKl3mgIUAIIhu0VAL/a045gwREklVtRqP3KljDrAE0ku+sGrdpvVnmyFDV76sHK+D+4xE=
+	t=1741842904; cv=none; b=TVLkB5rGgDEGqn8tYFCOpu0vhr3+76L9GEfSatnlW0aE/JxD//Kb5l0ih7S6wX7PamvwhmhrplSYNV9ThFFG6xVBoW5waCklZpuKGDSq1ZWe5QycDXk2Sj+bhQrwMscNIzLsIGs4MO8leFoYQapfczow8WdBLk7TCMrZeLCRn9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741842902; c=relaxed/simple;
-	bh=bhhUrpDLaKZob1r+cwdrIcgRGWzZ0CD/X9TESTvCIek=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To:Cc; b=kxuJkJ8Esc1s5HhY1WpoLijqjw3zRgWcxj4/HNGCmAd6hNB8SMvx0MNRKBDzRldc4FBNf2yEktdlXcZxv4ydsvlRHJSDgmSkrhM052tP23QgN9SyLanpINo299PSGr2zCzhUPAaptCLitQaHTI2HzINnpL+0H0S7MoL42cg4aj8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=hZjr7Kn7; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1741842904; c=relaxed/simple;
+	bh=mNLmOGghL62tzDA4JQfsxo+P9xR5NBH2CaNap5VlRjs=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To:Cc; b=iyZR98TnOhzWg25etZhlgMXOginSbjHhwfvwmwyDY9/7BYptpW2h4vl0u1BCdrIowbBMn8qQTYaTn4OgDAQdpFZdkY+tZrza9RyT0YXvMy/Tbl3vLV7a0X4wzehqXqwWXlvEEY6MsPFYh2vza0zy6+p3P52LMbuwwxnaXZ051K0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=qmcLD3p3; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="hZjr7Kn7"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="qmcLD3p3"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=Cc:To:Subject:From:References:In-Reply-To:Message-Id:Date:
 	Sender:Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
 	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
 	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=uXib/CL4QVcbDIxcUpKqDi6MmvDlk4SxvAiHUAcGN/A=; b=hZjr7Kn7oWTulBgDqnfL7vqnvZ
-	+VKNbvmp8Jz/mMxlA3eaNjdKqwfG6ScLsU1DTeTA2hroIkrSzC7ZbUdY9Qx8izbNeYGEFiWoxPKHL
-	hThzQSGhczi7TIeJuL7FOsNu1Z6N+L3XbvvlOrKKzL178OAV4PvG2ypHtliUqjAWwTTYzadtdrkcu
-	9+5W13lqlcemNn58hj+659Y9OiAsWPma5IEsOYQeN9+IDyCrWfmZDh3qmK7klGPO5oyZc8Y3JUXrj
-	ZCxwiQ4ftFJ+f3sv41fwAC17G+UNpyuS/3kTG7ZWY8NV76299hc3Pq4p1MtWMWp7jbeYYqvh6GuLK
-	OgtlWUpw==;
+	bh=1c9yppkRtU8BSI0xx+i+Gx7RlgrGI2hBSVqONXXhRv4=; b=qmcLD3p3SPAv2ik7TbAszIpliR
+	6iOBt+h3GFDwQqw0XDqh5KJe0tRxe+voMBZ2FaKJ3sPpDIEdOJzjmUFfexk/P2GNz/zC6GmdIeq+q
+	wqKn5X5IpeEhUh8kjoK98KyYxGx3XtzhBOGIWvT+ciXi2APsC9zTqh8XcyAcpG2mhKSDcN/xLmF3f
+	5b5oLbZHPJnMRahiNjhhFVErpmooe0p9LHx2WboGEKJuWklSn5lm4KzFfMVFwjVbAYMQi/wmfOa6l
+	67LukNR45rZSdmSC2Z3krG0kASw2cElNuCiNzTD8kc3ys0xSmzOVNL+aLyrcluFe5WP+VpdC2ehL6
+	V7rNdAXg==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tsauG-0068QJ-0w;
-	Thu, 13 Mar 2025 13:14:57 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 13 Mar 2025 13:14:56 +0800
-Date: Thu, 13 Mar 2025 13:14:56 +0800
-Message-Id: <f6a35a818d7993565ddfe4397367e7451ac63615.1741842470.git.herbert@gondor.apana.org.au>
+	id 1tsauI-0068QX-1u;
+	Thu, 13 Mar 2025 13:14:59 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 13 Mar 2025 13:14:58 +0800
+Date: Thu, 13 Mar 2025 13:14:58 +0800
+Message-Id: <b4b00e0fed2fe0e48a0d9b2270bed7e29b119f6a.1741842470.git.herbert@gondor.apana.org.au>
 In-Reply-To: <cover.1741842470.git.herbert@gondor.apana.org.au>
 References: <cover.1741842470.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [v3 PATCH 2/3] crypto: krb5 - Use SG miter instead of doing it by
- hand
+Subject: [v3 PATCH 3/3] crypto: hash - Fix test underflow in
+ shash_ahash_digest
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Cc: Eric Biggers <ebiggers@kernel.org>
 Precedence: bulk
@@ -47,72 +47,86 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
-The function crypto_shash_update_sg iterates through an SG by
-hand.  It fails to handle corner cases such as SG entries longer
-than a page.  Fix this by using the SG iterator.
+The test on PAGE_SIZE - offset in shash_ahash_digest can underflow,
+leading to execution of the fast path even if the data cannot be
+mapped into a single page.
 
-Fixes: 348f5669d1f6 ("crypto/krb5: Implement the Kerberos5 rfc3961 get_mic and verify_mic")
+Fix this by splitting the test into four cases:
+
+1) nbytes > sg->length: More than one SG entry, slow path.
+2) !IS_ENABLED(CONFIG_HIGHMEM): fast path.
+3) nbytes > (unsigned int)PAGE_SIZE - offset: Two highmem pages, slow path.
+4) Highmem fast path.
+
+Fixes: 5f7082ed4f48 ("crypto: hash - Export shash through hash")
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- crypto/krb5/rfc3961_simplified.c | 35 ++++++++++++++------------------
- 1 file changed, 15 insertions(+), 20 deletions(-)
+ crypto/ahash.c | 40 ++++++++++++++++++++++++++--------------
+ 1 file changed, 26 insertions(+), 14 deletions(-)
 
-diff --git a/crypto/krb5/rfc3961_simplified.c b/crypto/krb5/rfc3961_simplified.c
-index c1dcb0dd3a00..79180d28baa9 100644
---- a/crypto/krb5/rfc3961_simplified.c
-+++ b/crypto/krb5/rfc3961_simplified.c
-@@ -67,9 +67,9 @@
- #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
- 
- #include <linux/random.h>
-+#include <linux/scatterlist.h>
- #include <linux/skbuff.h>
+diff --git a/crypto/ahash.c b/crypto/ahash.c
+index 9c26175c21a8..1fe594880295 100644
+--- a/crypto/ahash.c
++++ b/crypto/ahash.c
+@@ -16,6 +16,7 @@
+ #include <linux/cryptouser.h>
+ #include <linux/err.h>
+ #include <linux/kernel.h>
++#include <linux/mm.h>
+ #include <linux/module.h>
+ #include <linux/sched.h>
  #include <linux/slab.h>
--#include <linux/highmem.h>
- #include <linux/lcm.h>
- #include <linux/rtnetlink.h>
- #include <crypto/authenc.h>
-@@ -83,26 +83,21 @@
- int crypto_shash_update_sg(struct shash_desc *desc, struct scatterlist *sg,
- 			   size_t offset, size_t len)
- {
--	do {
--		int ret;
-+	struct sg_mapping_iter miter;
-+	size_t i, n;
-+	int ret = 0;
+@@ -201,25 +202,36 @@ int shash_ahash_digest(struct ahash_request *req, struct shash_desc *desc)
+ 	unsigned int nbytes = req->nbytes;
+ 	struct scatterlist *sg;
+ 	unsigned int offset;
++	struct page *page;
++	const u8 *data;
+ 	int err;
  
--		if (offset < sg->length) {
--			struct page *page = sg_page(sg);
--			void *p = kmap_local_page(page);
--			void *q = p + sg->offset + offset;
--			size_t seg = min_t(size_t, len, sg->length - offset);
--
--			ret = crypto_shash_update(desc, q, seg);
--			kunmap_local(p);
--			if (ret < 0)
--				return ret;
--			len -= seg;
--			offset = 0;
--		} else {
--			offset -= sg->length;
--		}
--	} while (len > 0 && (sg = sg_next(sg)));
--	return 0;
-+	sg_miter_start(&miter, sg, sg_nents(sg),
-+		       SG_MITER_FROM_SG | SG_MITER_LOCAL);
-+	for (i = 0; i < len; i += n) {
-+		sg_miter_next(&miter);
-+		n = min(miter.length, len - i);
-+		ret = crypto_shash_update(desc, miter.addr, n);
-+		if (ret < 0)
-+			break;
-+	}
-+	sg_miter_stop(&miter);
-+	return ret;
+-	if (ahash_request_isvirt(req))
+-		return crypto_shash_digest(desc, req->svirt, nbytes,
+-					   req->result);
++	data = req->svirt;
++	if (!nbytes || ahash_request_isvirt(req))
++		return crypto_shash_digest(desc, data, nbytes, req->result);
+ 
+-	if (nbytes &&
+-	    (sg = req->src, offset = sg->offset,
+-	     nbytes <= min(sg->length, ((unsigned int)(PAGE_SIZE)) - offset))) {
+-		void *data;
++	sg = req->src;
++	if (nbytes > sg->length)
++		return crypto_shash_init(desc) ?:
++		       shash_ahash_finup(req, desc);
+ 
+-		data = kmap_local_page(sg_page(sg));
+-		err = crypto_shash_digest(desc, data + offset, nbytes,
+-					  req->result);
+-		kunmap_local(data);
+-	} else
+-		err = crypto_shash_init(desc) ?:
+-		      shash_ahash_finup(req, desc);
++	page = sg_page(sg);
++	offset = sg->offset;
++	data = lowmem_page_address(page) + offset;
++	if (!IS_ENABLED(CONFIG_HIGHMEM))
++		return crypto_shash_digest(desc, data, nbytes, req->result);
+ 
++	page += offset >> PAGE_SHIFT;
++	offset = offset_in_page(offset);
++
++	if (nbytes > (unsigned int)PAGE_SIZE - offset)
++		return crypto_shash_init(desc) ?:
++		       shash_ahash_finup(req, desc);
++
++	data = kmap_local_page(page);
++	err = crypto_shash_digest(desc, data + offset, nbytes,
++				  req->result);
++	kunmap_local(data);
+ 	return err;
  }
- 
- static int rfc3961_do_encrypt(struct crypto_sync_skcipher *tfm, void *iv,
+ EXPORT_SYMBOL_GPL(shash_ahash_digest);
 -- 
 2.39.5
 
