@@ -1,22 +1,23 @@
 Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26D8F263F25;
-	Thu, 13 Mar 2025 09:05:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F9A6263F2F;
+	Thu, 13 Mar 2025 09:05:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741856741; cv=none; b=eQYLf5oKND9s9gNyfKOiKDDmHydoPPTgdtVUQCp+z/zXwJuuXw95AgH9PyjbxZbFQZTh67mmI3clcw1M4GEfdjfzOC/xcZh0okuBnWeqeVLmCHjQP0xZckLu/MhnX+ZbKUGnemK+lbefqNGBvfpUrbH9aSNYsJHCb0qHJl+kQ/A=
+	t=1741856742; cv=none; b=cZ8P90v7DOGOMj5be62NnqZX86SarIyFyfUpwcZU/tLrGXvS/hJgNOXfwuC57nEePgdaXOaZlaHwMzPrEZk2TQS+gOHPJE8DwhqAaKzpMIn1NhQull6n8zwQcLQKKpgTp6JgYhMhWg3967++DoATBaxYf5LYD2vP18yRLuJGeSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741856741; c=relaxed/simple;
-	bh=61TtN6wFDpZAdqUJIVNY9ZHfRjNQofHuMtPikcmgtZ0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uTUAyZs4t8VhRtL4RUCVbWldoB668BBedlJAoxQTDFAQI9DAhMlA6XVWY2EC9UjRJkJ3ojd97SPyzv9L4Y7UTCPoO1gmfWI7J8xCim/amr+tKAZegMDDKxugYKle48Eo2SrteDyWdd5pF0r+U5Ojri5C4Xnl994tAC4fFZSUOjU=
+	s=arc-20240116; t=1741856742; c=relaxed/simple;
+	bh=g/b7eR0hfxBPccyjnYKkpF/wI4QqA8EUVG7C//rTkzI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=R3gSQeAb4ApLpOnNtsmWK9cesf1T/QA7gtRuWxolKPRRo8pUeDsdZkN825BA8YP1VWv4Hr2joxJsv3gTOlRb/SC9zpqsuJ3i2WYKPlx/R/SClVzcx2KWrztA8lQ8Da2ngivxk3t3yJLCKs6gmjrOrZq1106CpwPFXM2042R/vo0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
 Received: from loongson.cn (unknown [10.40.54.90])
-	by gateway (Coremail) with SMTP id _____8BxXWvbn9JnrryUAA--.56513S3;
-	Thu, 13 Mar 2025 17:05:31 +0800 (CST)
+	by gateway (Coremail) with SMTP id _____8Bxjazin9Jny7yUAA--.23516S3;
+	Thu, 13 Mar 2025 17:05:38 +0800 (CST)
 Received: from localhost.localdomain (unknown [10.40.54.90])
-	by front1 (Coremail) with SMTP id qMiowMCx_cban9JnUDlIAA--.8065S2;
-	Thu, 13 Mar 2025 17:05:30 +0800 (CST)
+	by front1 (Coremail) with SMTP id qMiowMCx_cban9JnUDlIAA--.8065S4;
+	Thu, 13 Mar 2025 17:05:36 +0800 (CST)
 From: Qunqin Zhao <zhaoqunqin@loongson.cn>
 To: lee@kernel.org,
 	herbert@gondor.apana.org.au,
@@ -30,10 +31,12 @@ Cc: linux-kernel@vger.kernel.org,
 	linux-integrity@vger.kernel.org,
 	pmenzel@molgen.mpg.de,
 	Qunqin Zhao <zhaoqunqin@loongson.cn>
-Subject: [PATCH v5 0/6] Drivers for Loongson security engine
-Date: Thu, 13 Mar 2025 17:05:02 +0800
-Message-Id: <20250313090508.21252-1-zhaoqunqin@loongson.cn>
+Subject: [PATCH v5 2/6] MAINTAINERS: Add entry for Loongson Security Module driver
+Date: Thu, 13 Mar 2025 17:05:04 +0800
+Message-Id: <20250313090508.21252-3-zhaoqunqin@loongson.cn>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20250313090508.21252-1-zhaoqunqin@loongson.cn>
+References: <20250313090508.21252-1-zhaoqunqin@loongson.cn>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -41,69 +44,56 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowMCx_cban9JnUDlIAA--.8065S2
+X-CM-TRANSID:qMiowMCx_cban9JnUDlIAA--.8065S4
 X-CM-SenderInfo: 52kd01pxqtx0o6or00hjvr0hdfq/
-X-Coremail-Antispam: 1Uk129KBj93XoW7uF1rKw4DXFy3uw1xGF4UAwc_yoW8AFyrpF
-	45AayFkr4UJFZrGrn3Ja48CFyfXa4fXrW3Kay2qw1DWr9xAa48J3yakFyUJa9rJF18JryI
-	qFZ3Cr4UGF1UZacCm3ZEXasCq-sJn29KB7ZKAUJUUUUf529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUB0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+X-Coremail-Antispam: 1Uk129KBj9xXoW7Xw18uryDZr4fAw47Xw1xtFc_yoWfAFg_A3
+	yxG3yxXr4kJFn2k3y8ZFn3Aryagw4xXF1UA3Wktw4fZ3yqyas0yrykAF97Gw15CFWYkFsI
+	gayxGr97Cr17ZosvyTuYvTs0mTUanT9S1TB71UUUUjDqnTZGkaVYY2UrUUUUj1kv1TuYvT
+	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
+	cSsGvfJTRUUUbfkYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
+	vaj40_Wr0E3s1l1IIY67AEw4v_JFv_Jw1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
+	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
+	WxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
 	GcCE3s1ln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2
-	x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r126r1D
+	x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1q6rW5
 	McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr4
 	1lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_
 	Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67
 	AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8I
-	cVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI
+	cVAFwI0_Xr0_Ar1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI
 	8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v2
-	6r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU4SoGDUUUU
+	6r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUFwIDUUUUU
 
-Loongson security engine supports random number generation, hash,
-symmetric encryption and asymmetric encryption. Based on these
-encryption functions, TPM2 have been implemented in it.
+This patch adds an entry for Loongson Security Module driver in the list
+of maintainers.
 
-mfd is the baser driver, crypto and tpm are users.
+Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
+---
+v5: None
+v4: Changed tile to "Add entry for ....".
+    Lowcased "Maintainers" in commit message.
 
-v5: Registered "ls6000se-rng" device in mfd driver.
-v4: Please look at changelog in tpm and MAINTAINERS. No changes to mfd
-    and crypto.
-v3: Put the updates to the MAINTAINERS in a separate patch.
-v2: Removed misc driver. Added tpm driver.
+ MAINTAINERS | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-Qunqin Zhao (6):
-  mfd: Add support for Loongson Security Module
-  MAINTAINERS: Add entry for Loongson Security Module driver
-  crypto: loongson - add Loongson RNG driver support
-  MAINTAINERS: Add entry for Loongson RNG driver
-  tpm: Add a driver for Loongson TPM device
-  MAINTAINERS: Add tpm_lsse.c to LOONGSON CRYPTO DRIVER entry
-
- MAINTAINERS                            |  14 +
- drivers/char/tpm/Kconfig               |   9 +
- drivers/char/tpm/Makefile              |   1 +
- drivers/char/tpm/tpm_lsse.c            | 103 +++++++
- drivers/crypto/Kconfig                 |   1 +
- drivers/crypto/Makefile                |   1 +
- drivers/crypto/loongson/Kconfig        |   6 +
- drivers/crypto/loongson/Makefile       |   2 +
- drivers/crypto/loongson/ls6000se-rng.c | 190 +++++++++++++
- drivers/mfd/Kconfig                    |  10 +
- drivers/mfd/Makefile                   |   2 +
- drivers/mfd/ls6000se.c                 | 374 +++++++++++++++++++++++++
- include/linux/mfd/ls6000se.h           |  75 +++++
- 13 files changed, 788 insertions(+)
- create mode 100644 drivers/char/tpm/tpm_lsse.c
- create mode 100644 drivers/crypto/loongson/Kconfig
- create mode 100644 drivers/crypto/loongson/Makefile
- create mode 100644 drivers/crypto/loongson/ls6000se-rng.c
- create mode 100644 drivers/mfd/ls6000se.c
- create mode 100644 include/linux/mfd/ls6000se.h
-
-
-base-commit: 6a8f122c5f073c8610c32636663f2512514b1270
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 896a307fa0..1b741b20f8 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -13616,6 +13616,13 @@ S:	Maintained
+ F:	Documentation/devicetree/bindings/i2c/loongson,ls2x-i2c.yaml
+ F:	drivers/i2c/busses/i2c-ls2x.c
+ 
++LOONGSON SECURITY MODULE DRIVER
++M:	Qunqin Zhao <zhaoqunqin@loongson.cn>
++L:	loongarch@lists.linux.dev
++S:	Maintained
++F:	drivers/mfd/ls6000se.c
++F:	include/linux/mfd/ls6000se.h
++
+ LOONGSON-2 SOC SERIES CLOCK DRIVER
+ M:	Yinbo Zhu <zhuyinbo@loongson.cn>
+ L:	linux-clk@vger.kernel.org
 -- 
 2.43.0
 
