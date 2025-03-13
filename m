@@ -1,135 +1,174 @@
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2608714900B;
-	Thu, 13 Mar 2025 09:59:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C0DC1EF084;
+	Thu, 13 Mar 2025 11:03:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741859958; cv=none; b=D9Z4viSqwZB2y1PFj9v8zbRplhbA4okYCS+IKhepoPxr7beds9r+owMVYltGE/H8cA2aC3Iku7WHo+g/SAjl/eagdB6euBmdi6dKOZH1vuvMqLbtC7ST8kARIVfoBUVhRq9ssg7JN+bcH0N8lfyQ9/jdfc9Aoc+++0d7nNRG8W4=
+	t=1741863830; cv=none; b=F62oxT/5hpH8PA18hjOW5To0ozflX2yH+PPynBmoPS6GTGS1hdT26e6KHuxY/Biy0/zIW2IpIYU72Ot/vsIm38uKeK7MhLMFHzG68cX5OuRDBLTEok7RYphgNd0V5wfQ2dK/0gSOmjIdQmZaYKxe1usrWDBt5nQ6Y45l+qzFEXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741859958; c=relaxed/simple;
-	bh=WjRjfxpFxzqgg5E0INrZzM956AAlPjFd6i9LRa6N/58=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=rYg03kkjtVj5bMg9DQwxTbQ9i65nSQ8PyyOAB2IsHgkLNPjwNPVmjf9tTpQA8Bn8EdSmoftt2GXDJuVvI22GgwS1hEMa0pIhgSgO3O6tC0lwC4iErb2RZCueNsnu9RI4PeBXfr9DeB2ya/q4RNE/C7fuSC9k4e0Uvg+V6EJzbG0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.164])
-	by gateway (Coremail) with SMTP id _____8Axz3NvrNJnW8uUAA--.56211S3;
-	Thu, 13 Mar 2025 17:59:11 +0800 (CST)
-Received: from [10.20.42.164] (unknown [10.20.42.164])
-	by front1 (Coremail) with SMTP id qMiowMBxrMZqrNJnNlJIAA--.19194S2;
-	Thu, 13 Mar 2025 17:59:09 +0800 (CST)
-Subject: Re: [PATCH v5 0/6] Drivers for Loongson security engine
-To: Huacai Chen <chenhuacai@kernel.org>
-Cc: lee@kernel.org, herbert@gondor.apana.org.au, davem@davemloft.net,
- peterhuewe@gmx.de, jarkko@kernel.org, linux-kernel@vger.kernel.org,
- loongarch@lists.linux.dev, linux-crypto@vger.kernel.org, jgg@ziepe.ca,
- linux-integrity@vger.kernel.org, pmenzel@molgen.mpg.de
-References: <20250313090508.21252-1-zhaoqunqin@loongson.cn>
- <CAAhV-H5f1k4_bVybMcK9QXhaVxLOM=b_8n0sA+0r=gyCP4YQRA@mail.gmail.com>
-From: Qunqin Zhao <zhaoqunqin@loongson.cn>
-Message-ID: <d77a36a3-3b74-76a9-38de-1a40ffb58374@loongson.cn>
-Date: Thu, 13 Mar 2025 17:59:16 +0800
-User-Agent: Mozilla/5.0 (X11; Linux mips64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1741863830; c=relaxed/simple;
+	bh=PRm49VmHjxWTEv5l+Jj3Z5fYyVs179E0dso2MnFLV8g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uh6VOSLAjwZrRjwr7hJBv/QHuNJ4n0atLGgFH4nEEtPsWA3AM8tPOasrTIfkVD+WNcyPcz6Td1X9KdAdfcYFFrRfGp/un+i3Rafjo3Id2z9jf6TWl5TRrmJiDRDG5NVdf/L3IVzqnbNR7ilzC1g0XjLLsS6ohLopQhEx/P7+NLc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Bu+a/iHj; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Bu+a/iHj"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1741863830; x=1773399830;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=PRm49VmHjxWTEv5l+Jj3Z5fYyVs179E0dso2MnFLV8g=;
+  b=Bu+a/iHjaxv6aq/ERCMb7HUyNC8LskCA5J1Qwx43aK9CBSwz+oKPzWBI
+   lV/Tu2j5lCSfYyPW8ducbEdHtVc5mtx+tQjlj42kX3l1QYZ7+RxvL7UDu
+   N5B81yfgf5nqy54lm47fcRBptgQz4mqqUbvMoY8+8f/pnO5T/NyALzEy1
+   GpuN7i620LbVZh768CV6OAtAdFG+uo087Iy+L98K/er3Yinsgp3n2Roh3
+   szmDFo2kzr65qA4uLft/At6eewqeL6S1wUtQ1W/sm21Qav8idDst9WHxu
+   aw8cLY0WGBMz8sBNPSSO1Q1AUQM6h04SwuzpWwbE8z+FACvZdwQxp2HHo
+   Q==;
+X-CSE-ConnectionGUID: 7Tsr1VKUQu6MehpV1MvHiA==
+X-CSE-MsgGUID: +ceLFAgxR8Cjjl22rBNHug==
+X-IronPort-AV: E=McAfee;i="6700,10204,11371"; a="42880217"
+X-IronPort-AV: E=Sophos;i="6.14,244,1736841600"; 
+   d="scan'208";a="42880217"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2025 04:03:49 -0700
+X-CSE-ConnectionGUID: Qsefzw/4RSOyJmWwfTvfZQ==
+X-CSE-MsgGUID: c60qU6WUQcmlcM/iLDH6CQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,244,1736841600"; 
+   d="scan'208";a="120881485"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by orviesa010.jf.intel.com with ESMTP; 13 Mar 2025 04:03:41 -0700
+Date: Thu, 13 Mar 2025 19:01:06 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Alexey Kardashevskiy <aik@amd.com>
+Cc: x86@kernel.org, kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Ashish Kalra <ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>,
+	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+	Robin Murphy <robin.murphy@arm.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Christoph Hellwig <hch@lst.de>, Nikunj A Dadhania <nikunj@amd.com>,
+	Michael Roth <michael.roth@amd.com>,
+	Vasant Hegde <vasant.hegde@amd.com>,
+	Joao Martins <joao.m.martins@oracle.com>,
+	Nicolin Chen <nicolinc@nvidia.com>,
+	Lu Baolu <baolu.lu@linux.intel.com>,
+	Steve Sistare <steven.sistare@oracle.com>,
+	Lukas Wunner <lukas@wunner.de>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Dionna Glaze <dionnaglaze@google.com>, Yi Liu <yi.l.liu@intel.com>,
+	iommu@lists.linux.dev, linux-coco@lists.linux.dev,
+	Zhi Wang <zhiw@nvidia.com>,
+	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+Subject: Re: [RFC PATCH v2 14/22] iommufd: Add TIO calls
+Message-ID: <Z9K68m8iq3cDXShL@yilunxu-OptiPlex-7050>
+References: <20250218111017.491719-1-aik@amd.com>
+ <20250218111017.491719-15-aik@amd.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAAhV-H5f1k4_bVybMcK9QXhaVxLOM=b_8n0sA+0r=gyCP4YQRA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-CM-TRANSID:qMiowMBxrMZqrNJnNlJIAA--.19194S2
-X-CM-SenderInfo: 52kd01pxqtx0o6or00hjvr0hdfq/
-X-Coremail-Antispam: 1Uk129KBj93XoWxGFykGF47WrWUuryxXw4xGrX_yoW5GFy8pF
-	45AFyrCFWUJF47G34ftFyUCFy5Xas3Xry3Ka9Fqw13Wr9xAa47J3y7CFy7CFZrAr1fGryI
-	vFZ3Cr45CF1Yy3cCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUP2b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	GcCE3s1ln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2
-	x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r126r1D
-	McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7
-	I2V7IY0VAS07AlzVAYIcxG8wCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCF
-	x2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r
-	1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij
-	64vIr41lIxAIcVC0I7IYx2IY67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr
-	0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26F4j6r4UJwCI
-	42IY6I8E87Iv6xkF7I0E14v26r4UJVWxJrUvcSsGvfC2KfnxnUUI43ZEXa7IU8Dl1DUUUU
-	U==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250218111017.491719-15-aik@amd.com>
+
+> +int iommufd_vdevice_tsm_bind_ioctl(struct iommufd_ucmd *ucmd)
+> +{
+> +	struct iommu_vdevice_tsm_bind *cmd = ucmd->cmd;
+> +	struct iommufd_viommu *viommu;
+> +	struct iommufd_vdevice *vdev;
+> +	struct iommufd_device *idev;
+> +	struct tsm_tdi *tdi;
+> +	int rc = 0;
+> +
+> +	viommu = iommufd_get_viommu(ucmd, cmd->viommu_id);
+
+Why need user to input viommu_id? And why get viommu here?
+The viommu is always available after vdevice is allocated, is it?
+
+int iommufd_vdevice_alloc_ioctl(struct iommufd_ucmd *ucmd)
+{
+	...
+
+	vdev->viommu = viommu;
+	refcount_inc(&viommu->obj.users);
+	...
+}
+
+> +	if (IS_ERR(viommu))
+> +		return PTR_ERR(viommu);
+> +
+> +	idev = iommufd_get_device(ucmd, cmd->dev_id);
+> +	if (IS_ERR(idev)) {
+> +		rc = PTR_ERR(idev);
+> +		goto out_put_viommu;
+> +	}
+> +
+> +	vdev = container_of(iommufd_get_object(ucmd->ictx, cmd->vdevice_id,
+> +					       IOMMUFD_OBJ_VDEVICE),
+> +			    struct iommufd_vdevice, obj);
+> +	if (IS_ERR(idev)) {
+                   ^
+vdev?
+
+> +		rc = PTR_ERR(idev);
+> +		goto out_put_dev;
+> +	}
+> +
+> +	tdi = tsm_tdi_get(idev->dev);
+
+And do we still need dev_id for the struct device *? vdevice also has
+this info.
+
+int iommufd_vdevice_alloc_ioctl(struct iommufd_ucmd *ucmd)
+{
+        ...
+	vdev->dev = idev->dev;
+	get_device(idev->dev);
+        ...
+}
 
 
-在 2025/3/13 下午5:26, Huacai Chen 写道:
-> You haven't seen my comments in previous version?
->
-> https://lore.kernel.org/loongarch/CAAhV-H5xyRrF1_=E7rLM3dHeYAEBdMufYQvgoxAq6+d6s5U4Eg@mail.gmail.com/
+> +	if (!tdi) {
+> +		rc = -ENODEV;
+> +		goto out_put_vdev;
+> +	}
+> +
+> +	rc = tsm_tdi_bind(tdi, vdev->id, cmd->kvmfd);
+> +	if (rc)
+> +		goto out_put_tdi;
+> +
+> +	vdev->tsm_bound = true;
+> +
+> +	rc = iommufd_ucmd_respond(ucmd, sizeof(*cmd));
+> +out_put_tdi:
+> +	tsm_tdi_put(tdi);
+> +out_put_vdev:
+> +	iommufd_put_object(ucmd->ictx, &vdev->obj);
+> +out_put_dev:
+> +	iommufd_put_object(ucmd->ictx, &idev->obj);
+> +out_put_viommu:
+> +	iommufd_put_object(ucmd->ictx, &viommu->obj);
+> +	return rc;
+> +}
 
-I am very sorry that I didn't notice your reply.
+Another concern is do we need an unbind ioctl? We don't bind on vdevice
+create so it seems not symmetrical we only unbind on vdevice destroy.
 
-I don't think it is necessary to change the driver file name. But if you 
-insist, I will do the change below  in  next revision .
+Thanks,
+Yilun
 
-"MFD_LS6000SE -> MFD_LOONGSON_SE,  ls6000se.c -> loongson-se.c
-CRYPTO_DEV_LS6000SE_RNG -> CRYPTO_DEV_LOONGSON_RNG, ls6000se-rng.c 
-->loongson-rng.c
-TCG_LSSE -> TCG_LOONGSON, tpm_lsse.c ->tpm_loongson.c"
-
-
-BR, Qunqin.
-
->
-> Huacai
->
-> On Thu, Mar 13, 2025 at 5:05 PM Qunqin Zhao <zhaoqunqin@loongson.cn> wrote:
->> Loongson security engine supports random number generation, hash,
->> symmetric encryption and asymmetric encryption. Based on these
->> encryption functions, TPM2 have been implemented in it.
->>
->> mfd is the baser driver, crypto and tpm are users.
->>
->> v5: Registered "ls6000se-rng" device in mfd driver.
->> v4: Please look at changelog in tpm and MAINTAINERS. No changes to mfd
->>      and crypto.
->> v3: Put the updates to the MAINTAINERS in a separate patch.
->> v2: Removed misc driver. Added tpm driver.
->>
->> Qunqin Zhao (6):
->>    mfd: Add support for Loongson Security Module
->>    MAINTAINERS: Add entry for Loongson Security Module driver
->>    crypto: loongson - add Loongson RNG driver support
->>    MAINTAINERS: Add entry for Loongson RNG driver
->>    tpm: Add a driver for Loongson TPM device
->>    MAINTAINERS: Add tpm_lsse.c to LOONGSON CRYPTO DRIVER entry
->>
->>   MAINTAINERS                            |  14 +
->>   drivers/char/tpm/Kconfig               |   9 +
->>   drivers/char/tpm/Makefile              |   1 +
->>   drivers/char/tpm/tpm_lsse.c            | 103 +++++++
->>   drivers/crypto/Kconfig                 |   1 +
->>   drivers/crypto/Makefile                |   1 +
->>   drivers/crypto/loongson/Kconfig        |   6 +
->>   drivers/crypto/loongson/Makefile       |   2 +
->>   drivers/crypto/loongson/ls6000se-rng.c | 190 +++++++++++++
->>   drivers/mfd/Kconfig                    |  10 +
->>   drivers/mfd/Makefile                   |   2 +
->>   drivers/mfd/ls6000se.c                 | 374 +++++++++++++++++++++++++
->>   include/linux/mfd/ls6000se.h           |  75 +++++
->>   13 files changed, 788 insertions(+)
->>   create mode 100644 drivers/char/tpm/tpm_lsse.c
->>   create mode 100644 drivers/crypto/loongson/Kconfig
->>   create mode 100644 drivers/crypto/loongson/Makefile
->>   create mode 100644 drivers/crypto/loongson/ls6000se-rng.c
->>   create mode 100644 drivers/mfd/ls6000se.c
->>   create mode 100644 include/linux/mfd/ls6000se.h
->>
->>
->> base-commit: 6a8f122c5f073c8610c32636663f2512514b1270
->> --
->> 2.43.0
->>
->>
 
