@@ -1,50 +1,54 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEAD8211A2C;
-	Fri, 14 Mar 2025 20:01:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24D1A21518D;
+	Fri, 14 Mar 2025 20:01:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741982508; cv=none; b=uois+nEsuDkrVj8JGY7ylWPBg4tvNaTQCSbw53mfiaE6jpSNfkQ589GHyYxQkYfhhke6cK56Q7SvFtMtM8QOl1wVMQ5aZ+X7h+c8Ttw6owftzKrPK0/XhKxTd5s13MuYBg2k3613nmURrTsJVO2m0x8fTp0Nj6Fv+sySyfDC/iU=
+	t=1741982519; cv=none; b=TRbAvgOThe+QP9DDgsNxPh0kvJn/IHrIjMXXUPunw5uQTs3oiA77lVsA2cI57WIBB6mPE+gUMk/GFyCHbINfwX9Ct1XbJLW7OpudC/ILSypAg/Bpy4LBUybCEUSizJtMcFztMQg0nfRli0ayusPecywhLsq6XwAByVfj0a+V5hY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741982508; c=relaxed/simple;
-	bh=MiTmkRvoXT7GM0WL3HIQphGiXyMyCVmC8fnxQDy+M0Q=;
+	s=arc-20240116; t=1741982519; c=relaxed/simple;
+	bh=A9V0VS8Cr0Q0yklfmaDADu6APo8cQyUHgG87FTbpc9g=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HLOxw2AwxGXUaJk0ggd5UyJPuTQtB3Q8jytR5FPlPQWhKSI5k7WktIDmRFdb4D/TX5ydKGevnbZ8mdZyqpYiIvwWyaPXccIkdbIIq8rLe33uetzSAd+rTkdciFex9se74gnySqF/wSXqgLCAY5vrdKbnRfiQsIMFygsjg586hYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YF2IWeB4; arc=none smtp.client-ip=10.30.226.201
+	 MIME-Version:Content-Type; b=mQlNn5H6lkN9XBBkMR/CBLUlkETDGROEflXgCbKnTVKQFa+KBMvHZCDYas5z4kZShUybqN2/RqjkHF9tPqYK5Cqv6ZPYpjL/oIThexv+qEk7uK+nbllcI8VpKY7DA+lC6T2y2X9ZSeDdL5m94tTM9UvokXKvIGDGwOnS2slWDAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MmCTow+N; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YF2IWeB4"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1697C4CEEC;
-	Fri, 14 Mar 2025 20:01:47 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MmCTow+N"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67DE5C4CEEC;
+	Fri, 14 Mar 2025 20:01:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741982508;
-	bh=MiTmkRvoXT7GM0WL3HIQphGiXyMyCVmC8fnxQDy+M0Q=;
+	s=k20201202; t=1741982518;
+	bh=A9V0VS8Cr0Q0yklfmaDADu6APo8cQyUHgG87FTbpc9g=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=YF2IWeB4l2v/mSmIflIgDALgcw6DsPL9SLu3a/F9a5to0JdgWpQNKeiBgzQxS9jVp
-	 1csysduVhq0MrBC5puIqeiAtF9rrTJdrrT40XD1ETfPJQLCAIseCQzJA5tSgZmTMAf
-	 s3c/HKuIs/7zt4VKZ/tV7Kdfk2FPqiRxtSbQ4YngRZp4NJyFL8OnLix5kFuYDJ5C7q
-	 Rxcq3McgvRbtJbiZXmG4mwLsiy5IaZUVihbEwrQ+IYWS5mXfeSPVYkCKBgZoRSSCTt
-	 EUJVig/jFo/rTIJYRhyGUa4XDY1pfQMdFQ4/q30AK/sbu+neO5qokjowhAIEd3uxEh
-	 GPzuFEbjsBjcw==
+	b=MmCTow+NrHPEDZWEK+zs2sCvyv7sx5bsP3cI3N7oPDeurHZwl2kLaa4DRqKVrH2qh
+	 k1hWdq0vyTFxLi4G/u8yRz3sYYTHAvxUtT22fc3ZoIwWu/Uvst35NPl8rL2/bzoIWW
+	 o1EYgN/K9VxxWRrnDK5BV10tX152f+MnoVKYx13mG1PwO2ecWvQnZfplIwS0j99OoB
+	 ZtYL/TdZ/SsBqLAsHJVCwIQLpC7qIZZ1h2OgctZ0FJrIMoZOO0Cq0r/esN5G23h1Lf
+	 GHN990lyMyLI1KBjENLeuc7sT7canNTDilFtQcpTRP/NCaBX9QY2WaiLl0estNulh6
+	 I08Epf/Wz4lrg==
 From: Bjorn Andersson <andersson@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
+To: Thara Gopinath <thara.gopinath@gmail.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
 	"David S. Miller" <davem@davemloft.net>,
 	Rob Herring <robh@kernel.org>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Conor Dooley <conor+dt@kernel.org>,
-	Vinod Koul <vkoul@kernel.org>,
 	Konrad Dybcio <konradybcio@kernel.org>,
-	Abhinaba Rakshit <quic_arakshit@quicinc.com>
-Cc: linux-arm-msm@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
+	Vinod Koul <vkoul@kernel.org>,
+	Satya Durga Srinivasu Prabhala <quic_satyap@quicinc.com>,
+	Trilok Soni <quic_tsoni@quicinc.com>,
+	Melody Olvera <quic_molvera@quicinc.com>
+Cc: linux-crypto@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
 	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: (subset) [PATCH v2 0/2] Enable TRNG for QCS615 Platform
-Date: Fri, 14 Mar 2025 15:01:02 -0500
-Message-ID: <174198247881.1604753.9306123311222565541.b4-ty@kernel.org>
+	linux-kernel@vger.kernel.org,
+	Gaurav Kashyap <quic_gaurkash@quicinc.com>
+Subject: Re: (subset) [PATCH 0/6] arm64: dts: qcom: sm8750: Introduce crypto support for SM8750
+Date: Fri, 14 Mar 2025 15:01:11 -0500
+Message-ID: <174198247865.1604753.12834678540752631538.b4-ty@kernel.org>
 X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250228-enable-trng-for-qcs615-v2-0-017aa858576e@quicinc.com>
-References: <20250228-enable-trng-for-qcs615-v2-0-017aa858576e@quicinc.com>
+In-Reply-To: <20250113-sm8750_crypto_master-v1-0-d8e265729848@quicinc.com>
+References: <20250113-sm8750_crypto_master-v1-0-d8e265729848@quicinc.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -55,18 +59,20 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
 
-On Fri, 28 Feb 2025 01:45:53 +0530, Abhinaba Rakshit wrote:
-> Add device-tree nodes to enable TRNG for QCS615
-> 
-> This patch series depends on the below patch series:
-> https://lore.kernel.org/all/20241104-add_initial_support_for_qcs615-v5-0-9dde8d7b80b0@quicinc.com/ - Reviewed
+On Mon, 13 Jan 2025 13:16:20 -0800, Melody Olvera wrote:
+> Document and describe the crypto engines and random number generators
+> on the SM8750 SoC.
 > 
 > 
 
 Applied, thanks!
 
-[2/2] arm64: dts: qcom: qcs615: add TRNG node
-      commit: a3daa844ed8104617174bc1ac4554f8b88a9c878
+[2/6] arm64: dts: qcom: sm8750: Add QCrypto nodes
+      commit: eeb0f3e4ea67cb1c2dd7cacfef218bfa0ae56970
+[4/6] arm64: dts: qcom: sm8750: Add TRNG nodes
+      commit: 9f9dcac2f85e6a0641a4a4f7f3b2c35a984ed4cc
+[6/6] arm64: dts: qcom: sm8750: Add ICE nodes
+      commit: b1dac789c650a20a54d5089b23fbb800fb289b8b
 
 Best regards,
 -- 
