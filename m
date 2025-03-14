@@ -1,115 +1,95 @@
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 605E51779AE;
-	Fri, 14 Mar 2025 03:47:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DFBF1FECD7;
+	Fri, 14 Mar 2025 12:22:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741924045; cv=none; b=YBobLmOTdkJsLaUlYCBA6JRhs/FMY06tKlXWojm7CilPbDGCBbhOees37GiFA9zkC40cox9x0V6KPjdqCuF9H3FTWQJdpb0wLdpuAk2DpR7QeD7ZevAFfD6VjQYAvtzha+A6h/Blz2l3hTh3+4Toq0sB4y8KRk0SSUgmsIzDPrg=
+	t=1741954974; cv=none; b=LcoYmgyLL/26li8iCr+q3mzgmUHcjHpRrty4uaQSA1ZHl4ATeLDseukwl0u0L21DVqhWeVk4VP8xForY+HMIdefO39p0Wwtsk+xdlduZHQQJb+asHRmFs2rqSbqA7iu6QpRA8RLG5lvf7EXID15ipiQ/UacsgwrTwotfNcnncB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741924045; c=relaxed/simple;
-	bh=E8miDbWFRAarkkOftrPlxHt0dCvX1QfhfFM0L55zfwY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NRzI8LYGPe8HGfEwxdOBvbfHSob5ir/uR0v6P/S4fYzWJiI+8SiRhslttKIN2jQBk8aLrsBbxktl3jE5+bBMtElkaBZm26QYdkIm7tRNlDjqunCwDScn8ecIeknSs6HlVze7DYyS6SqYBmBGEZBfaIsatB8rDM+RTAHvQgaDm60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=BfgXg1TO; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+	s=arc-20240116; t=1741954974; c=relaxed/simple;
+	bh=1RQCqU1dZB3I7+96/ytKcOKW9uXw+y9egomPB/BMn9E=;
+	h=Date:Message-Id:From:Subject:To:Cc; b=E+ha9JVMM2gNKmvSTH2PLCckela1RcFtekuPnxEW/UKU3CUvO91DOaDe5Lfr5D7A60mTGsgala1n/Zjk+YK8r0+x6McyZFXwhn797s9fZlDxsTxGe1MzTB0+/ZHzFRFVb+n5kcn6bLhv7wRfLCEE31BVqPKe6ZMtFaS1/iDglsc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=GO8oSoAX; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="BfgXg1TO"
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52DNPih4015112;
-	Fri, 14 Mar 2025 03:46:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=jn35de
-	RvCVcgZ11e6phbQa3ao0XQUYGI0q9A1c6rtG0=; b=BfgXg1TOrWR79MFSST42tx
-	0o+2sQIf07eiwDXfZ8hbUsGyhJTHo9jrVa/wamYq9Aih2JuwwJhpEW0DoefWGG1p
-	R42MvwLMHOraOHKQ4EvXOFyyO0KWMl3hsKTOmXP3DlUfRBdmPorTcNkm6xj9x9jr
-	/JZj4qF+7hNBO2wfAwyJ5Ql/pVlZFmg+yyy1su6rFaJDRgObp5q7W+fR5Yn/IVc8
-	lHTJAY3LBdduIeg10dVcneF8RBics9YeyV++zdTkGWL4flfcENft8KZ8yzu0lYfP
-	0UuN5VGu0Bpjb3296LVX5lRoHfrOhUNOEQ4qA4u1NQVdQBqth0emNrb/BwSYWjZA
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45c6k01dd9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 14 Mar 2025 03:46:58 +0000 (GMT)
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 52E3kvKb028609;
-	Fri, 14 Mar 2025 03:46:57 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 45c6k01dd6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 14 Mar 2025 03:46:57 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 52E0F5iU003141;
-	Fri, 14 Mar 2025 03:46:57 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 45atstw3ad-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 14 Mar 2025 03:46:56 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 52E3krh432702888
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 14 Mar 2025 03:46:53 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5891820043;
-	Fri, 14 Mar 2025 03:46:53 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 14C9D20040;
-	Fri, 14 Mar 2025 03:46:50 +0000 (GMT)
-Received: from li-c439904c-24ed-11b2-a85c-b284a6847472.in.ibm.com (unknown [9.204.206.207])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 14 Mar 2025 03:46:49 +0000 (GMT)
-From: Madhavan Srinivasan <maddy@linux.ibm.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>, Danny Tsen <dtsen@linux.ibm.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: Breno Leitao <leitao@debian.org>, Nayna Jain <nayna@linux.ibm.com>,
-        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Nicholas Piggin <npiggin@gmail.com>, Naveen N Rao <naveen@kernel.org>,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org,
-        Venkat Rao Bagalkote <venkat88@linux.ibm.com>
-Subject: Re: [PATCH] crypto: powerpc: Mark ghashp8-ppc.o as an OBJECT_FILES_NON_STANDARD
-Date: Fri, 14 Mar 2025 09:16:49 +0530
-Message-ID: <174192385438.14370.17442105998926160601.b4-ty@linux.ibm.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <7aa7eb73fe6bc95ac210510e22394ca0ae227b69.1741128786.git.christophe.leroy@csgroup.eu>
-References: <7aa7eb73fe6bc95ac210510e22394ca0ae227b69.1741128786.git.christophe.leroy@csgroup.eu>
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="GO8oSoAX"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=Cc:To:Subject:From:Message-Id:Date:Sender:Reply-To:MIME-Version
+	:Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=abGE60kWy5OfZ2b7kpGtLFLGgmHvoUGWwq+9Pjo5fp0=; b=GO8oSoAX5AGdMfajMdfcr6+AQ5
+	PjgnxTyjBMRN7KNGC3MU4RITCRDuGxyw/x6G+b80isWXiaeqO6hbLyEvtPw6ElKGeIN0iXIaPLgTg
+	uFbDTL6cehX4zj+KnJxTLqpjP+ZU24ZDni2wwKMhRllBYMpxRO1dDGJG+iQTcoasZxNqGIxXgbErX
+	o44H9eDEvSRkilysSUHd2fSxMU7+TmqnID8t5pl3s3cVgcKphh12ZXJQQX/0gwX/8G1MBhf+dLDjr
+	5ecdERQs5iNIyARDmA3M5+h0zjzFvqDz420kWoYDerTTwNDk8GX11/100ooBR5WgES+1mo1wxS6nc
+	v7begvWA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tt43N-006ZlE-05;
+	Fri, 14 Mar 2025 20:22:18 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 14 Mar 2025 20:22:17 +0800
+Date: Fri, 14 Mar 2025 20:22:17 +0800
+Message-Id: <cover.1741954523.git.herbert@gondor.apana.org.au>
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [v4 PATCH 00/13] crypto: acomp - Add virtual address and folio support
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Cc: Richard Weinberger <richard@nod.at>, Zhihao Cheng <chengzhihao1@huawei.com>, linux-mtd@lists.infradead.org, "Rafael J. Wysocki" <rafael@kernel.org>, Pavel Machek <pavel@ucw.cz>, linux-pm@vger.kernel.org, Steffen Klassert <steffen.klassert@secunet.com>, netdev@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: TWCf0-zAmmg-MthTRdUY4FKpVwhV-5tA
-X-Proofpoint-ORIG-GUID: wjBXDa6-ut0NTyU-5dfrFA-wQCQyM5ej
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-14_01,2025-03-13_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- mlxlogscore=922 priorityscore=1501 impostorscore=0 lowpriorityscore=0
- bulkscore=0 phishscore=0 adultscore=0 spamscore=0 mlxscore=0
- suspectscore=0 clxscore=1011 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2502280000 definitions=main-2503140026
 
-On Wed, 05 Mar 2025 00:02:39 +0100, Christophe Leroy wrote:
-> The following build warning has been reported:
-> 
->   arch/powerpc/crypto/ghashp8-ppc.o: warning: objtool: .text+0x22c: unannotated intra-function call
-> 
-> This happens due to commit bb7f054f4de2 ("objtool/powerpc: Add support
-> for decoding all types of uncond branches")
-> 
-> [...]
+v4 adds acomp software fallback path, folio support and converts
+existing legacy crypto_comp users.
 
-Applied to powerpc/next.
+This patch series adds virtual address and folio support to acomp.
+This finally brings it to feature parity with the legacy crypto_comp,
+which enables us to convert the existing users to acomp.
 
-[1/1] crypto: powerpc: Mark ghashp8-ppc.o as an OBJECT_FILES_NON_STANDARD
-      https://git.kernel.org/powerpc/c/1e4d73d06c98f5a1af4f7591cf7c2c4eee5b94fa
+The three users are converted according to their characteristics:
+ubifs uses folio+linear, hibernate uses linear only while ipcomp
+uses SG only.
 
-Thanks
+Only ipcomp is fully asynchronous, ubifs supports asynchronous
+but will wait on it and hibernate is synchronous only.
+
+Herbert Xu (13):
+  crypto: qat - Remove dst_null support
+  crypto: iaa - Remove dst_null support
+  crypto: scomp - Remove support for some non-trivial SG lists
+  crypto: acomp - Remove dst_free
+  crypto: scomp - Add chaining and virtual address support
+  crypto: acomp - Add ACOMP_REQUEST_ALLOC and acomp_request_alloc_extra
+  crypto: iaa - Use acomp stack fallback
+  crypto: acomp - Add async nondma fallback
+  crypto: acomp - Add support for folios
+  ubifs: Use crypto_acomp interface
+  ubifs: Pass folios to acomp
+  PM: hibernate: Use crypto_acomp interface
+  xfrm: ipcomp: Use crypto_acomp interface
+
+ crypto/acompress.c                            | 148 ++++--
+ crypto/scompress.c                            | 189 ++++---
+ drivers/crypto/intel/iaa/iaa_crypto_main.c    | 164 +-----
+ .../intel/qat/qat_common/qat_comp_algs.c      |  83 ---
+ fs/ubifs/compress.c                           | 217 ++++++--
+ fs/ubifs/file.c                               |  74 +--
+ fs/ubifs/journal.c                            |  11 +-
+ fs/ubifs/ubifs.h                              |  26 +-
+ include/crypto/acompress.h                    | 184 ++++++-
+ include/crypto/internal/acompress.h           |  26 +-
+ include/crypto/internal/scompress.h           |   2 -
+ include/linux/crypto.h                        |   1 +
+ include/net/ipcomp.h                          |  13 +-
+ kernel/power/swap.c                           |  58 ++-
+ net/xfrm/xfrm_ipcomp.c                        | 477 +++++++++---------
+ 15 files changed, 932 insertions(+), 741 deletions(-)
+
+-- 
+2.39.5
+
