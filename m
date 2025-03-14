@@ -1,84 +1,84 @@
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFCEC1531C1;
-	Thu, 13 Mar 2025 19:09:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDCDF12B63;
+	Fri, 14 Mar 2025 01:14:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741892973; cv=fail; b=uIcfQO70ZCx8ns0bc+9H3MlXlmKzLffJgkDqAufvj5qCLKV+vRAITer5DQg53rcaPtWiowzQPznzPEtkh8VpXUbdTaxraUgJHFNbQCatFQw6s8fZLlS5vARPfq68SmsRORyTUA7CZWT924T01jHNdeoWDSt/EnRuHIr09bXINTk=
+	t=1741914894; cv=fail; b=uUvKPPnSL5ofP6sdsbEnMA96YXIZTv+QZMlHiFZ2SCfJMEQcZIB4g6uBGEU07sGD1FGqPMGbKXmhW0tbz0VR2HEyhHCHlLjSz/MmRHFAgPmySx8jUSaVj4w0yeVepn0KeciIt0AXPtiOwO/X4qsKNh9QranMRKYc74dV3rIVWy0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741892973; c=relaxed/simple;
-	bh=R2BfbirKiwSynoK4nD4EXCBFsqSFVW+q5yMZEg521/M=;
+	s=arc-20240116; t=1741914894; c=relaxed/simple;
+	bh=z0jvpxY+QfI8fFuHtrsPAQZ3aEJHP0+R5zId5QHgxpw=;
 	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=ouTP9dAUQN2s5YZGTfhNzobjvOnIa3Sf1ADSb46rZt3lOME9Qu5EHmXvEcmSS4OwQwzPDl7qj7NIgEhh8vMaqgovG6M8oSZR7ynoPohxHaSDGA2lZHKliaSByIPmLWShws/9DYpJbaOJhYKjqfScIXMHpJNppLiZT2e01mgP9rI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EMGYvs4G; arc=fail smtp.client-ip=198.175.65.10
+	 Content-Disposition:In-Reply-To:MIME-Version; b=JMJH7KVnBJpZxXuHwrYNphgIbfG4WDdnSyOqstbmoERYlKFENwy9lUNtvWEeHjwSbYbB1MFdE7ERNmbZPbnhFHxMEjgKV2UARc1lAZfNjyEKJnWPDu6VHJNyQVUEYXmwFx4olOHLg3ojwmwOD2kscylTZWk59NFA1c6rLpphODY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Lb2Qplbt; arc=fail smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EMGYvs4G"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Lb2Qplbt"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1741892970; x=1773428970;
+  t=1741914892; x=1773450892;
   h=date:from:to:cc:subject:message-id:references:
    in-reply-to:mime-version;
-  bh=R2BfbirKiwSynoK4nD4EXCBFsqSFVW+q5yMZEg521/M=;
-  b=EMGYvs4G8hOl5XniFHrHQYicHCogSXiQmakJ+vPdDm1EXNP7apbYwkLm
-   xwUe+Y1nagJU7cOKwlJi+KutZITPCIeaArB142umD2fllwpR3em3rcT95
-   0CuDGU3By01zVuBIpyscvaz7NCCBbHMOJ4G3JFux9M9N+aMV4OtOwRn+N
-   B2rhDqnNSOqE60NxUkzhY7R10b528jQutCNcQ3HGcuJlQJogmY/xGXf7t
-   XoIm5dtqwL4udxKtWxA2zUMG8mDCon4QkhGrfXFqdGsio1+r4qmipf660
-   ynnsvTJN7fJplvHFot1KLCYVkpvOT/s/wtGxXyuZ7kbUF6eLJhZTLJlzw
-   w==;
-X-CSE-ConnectionGUID: J0oPqjIKR2WFluDwjecYfw==
-X-CSE-MsgGUID: ig/hHz+DRMidtLnxvjQviw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11372"; a="60432641"
-X-IronPort-AV: E=Sophos;i="6.14,245,1736841600"; 
-   d="scan'208";a="60432641"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2025 12:09:29 -0700
-X-CSE-ConnectionGUID: 7A7zNTOwTeWVPiGmCmlLSw==
-X-CSE-MsgGUID: OA90VCHZQDyCbqXMPEQ8jw==
+  bh=z0jvpxY+QfI8fFuHtrsPAQZ3aEJHP0+R5zId5QHgxpw=;
+  b=Lb2Qplbtn+ayPGNRmVCfVbWGVyUV7Osf/qfsnUCvr7CzUzY+QrEXHrNw
+   3m2d27Y+Bjwv4CHtlV9RKh8MASZAk/YfxqxdU7VmHAPSZUhj3ViX3LWhq
+   hcs/BSAj56FlUU65B+RgtGoX3ev1Q3qTXJDxCb77ewOwDj2brJTupDEIa
+   lBKAUqjp0e70cQQIi0Wyv26/qT1YHWErpPsrvDDHMUodV6OAucjZ0ESU5
+   bBsUZpnaK+oYfoA/Wi++BQY3/VMQ7D90DwfeXr277/TzPNNBTMOlT20fj
+   9YVdgIe8Djb1/SI42grq0NyLnV+JvG/fxtppWPM5Tg5H9HhlB0seri23R
+   A==;
+X-CSE-ConnectionGUID: zMpdl3/uQ8eACQ0cVZQYTQ==
+X-CSE-MsgGUID: jxjXj82qRoacZZSe0h14tg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11372"; a="54430960"
+X-IronPort-AV: E=Sophos;i="6.14,246,1736841600"; 
+   d="scan'208";a="54430960"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2025 18:14:51 -0700
+X-CSE-ConnectionGUID: Jzyx+TgwS0uCT0H4MXRd0w==
+X-CSE-MsgGUID: tIAWMlOgT1u+lki2BBBnVg==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.14,245,1736841600"; 
-   d="scan'208";a="126091618"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by orviesa004.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2025 12:09:29 -0700
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1544.14; Thu, 13 Mar 2025 12:09:28 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Thu, 13 Mar 2025 12:09:28 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.170)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+X-IronPort-AV: E=Sophos;i="6.14,246,1736841600"; 
+   d="scan'208";a="121076461"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2025 18:14:51 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Thu, 13 Mar 2025 12:09:27 -0700
+ 15.2.1544.14; Thu, 13 Mar 2025 18:14:50 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Thu, 13 Mar 2025 18:14:50 -0700
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.42) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Thu, 13 Mar 2025 18:14:48 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=FCtjrDVqLfd4T/TKAyzs8CVxhjn88hZ4buG/0BAnDmO5Yzeztmci0dh+o4CkEIauxFnuaNCnL3eBr24ToqtPcxSgZ6oZWTdkOur+0xsifhVOlMVKp7qM9QpLORaOpAVqq/V5ION2WKo/SX0evJIV7J5z6kDGGq7f9fnoSHNOxSYMu2X2K/7V9AAIbi7kg/I9shiw6JgQXnEX8AGQ6lliJXka5UoLH0ASMYQ+e5nbhpTHBlnYKV9AH+2yqVZD9eiEz+gk8bP4K74uM9utu1htCSaxrSY+U0VCrCOgSGjQdeTQG8B/Sm7zkLbztuFTfAPeejylVy/5PrQc4eA7AYrmmw==
+ b=CpUtpHFm+MM4Pmju8mu57/8uVDaze5LlqYwQ4lQpxYtzA6GzsL3MeRDbadkGggmT4DRk3sgmxUH57Y1CJZRWHK9WfLdkLSPYiBAxLHlyh0Dy+XmhgbrkzBBxS2aZbaiFysRxZ57x1HXynQzMEkDN3yBfP2bJt9IZ11TOWfGtbWhaPWCbMCl2hbev/h/ZWfS7M5OCIFRun/TA9IW0clJ7I53/lvks1w2B/HknYJQwGDhquDKCP8hnWYiwPd9HF19gmkn52hQ8PO1xP2rX14gwkDXSnzBoKIezkSsZLi6VZj1AiSEGzSt0a4HDLEJ/SsMTk0c+/ogIIESB4pQnN55pYA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CHrcVssxYu1BFhUPVRywLBBc28BDEO6ZfnU4knmY8lM=;
- b=QSkhXwDHPnxn8DU+iV6TKYCKETmNs3p1DD/Sj5jCZyi01Wn4FoZYt2t40Lj/G/CP9o0kvJoIlsJI6fDK0rWQHQw0/W4hxK9ayQK50opxe6wntrltGDvTFy+JUvdRMhZKeFBmOoTcsqym+rr4gf2/MmZAu0q0OA1QmGfgBe4dKPusMcB769D6bJ23TB17Dvc1W9btoxRYoCS0FvN4BpS2kbSRi0rNPj+tPTgtl+6N85Hl/4CJcAoqgBs3jzvvsSWStqW/JnCyF/vFFCz5/vg267he3zcE3rR61zyFqPE6g18U2SS3PJDKctHsO+XYp/o2s8FPMcjciEMVDtzLxKouxQ==
+ bh=pFQ97dJksSjPk9neJIJb9zlX+rdxnq6JQ0yl3xQl8L4=;
+ b=LaUFt5vP+bVS+HJwIOSysRo0yTM5Hn3RIGFQoxB1M7sc1v/rebmVtDLypbG2epyn4dkLbdGzdL1iNuqWqqCGQicGEUZb4ASbPBqSGVSfUloqrjjazuM4LR7fS84IAEUfKKfr3HJr0XrF0SMuBu56F8zCFQaGd6EhxKwEH7YEdh0mDxKbCddK0h1mWuEm18gFHZRZdFR4nF8lfIbH5QdtwmdDo0tg6iWCUCTkXGZMT54GhXktnTDhoPvxLgC5amNcb851fFP1kxkAaZKHvdJSjDfyAj5xwvffqUQuQk5hMu9udqizXllCaKBTQ6Kf3YauTEUQs8S4fc8YW3/EqvmpWA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=intel.com;
 Received: from PH8PR11MB8107.namprd11.prod.outlook.com (2603:10b6:510:256::6)
- by DM4PR11MB6504.namprd11.prod.outlook.com (2603:10b6:8:8d::5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8511.27; Thu, 13 Mar 2025 19:09:25 +0000
+ by CO1PR11MB4932.namprd11.prod.outlook.com (2603:10b6:303:98::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8489.29; Fri, 14 Mar
+ 2025 01:14:32 +0000
 Received: from PH8PR11MB8107.namprd11.prod.outlook.com
  ([fe80::6b05:74cf:a304:ecd8]) by PH8PR11MB8107.namprd11.prod.outlook.com
- ([fe80::6b05:74cf:a304:ecd8%4]) with mapi id 15.20.8534.027; Thu, 13 Mar 2025
- 19:09:25 +0000
-Date: Thu, 13 Mar 2025 12:09:20 -0700
+ ([fe80::6b05:74cf:a304:ecd8%4]) with mapi id 15.20.8534.027; Fri, 14 Mar 2025
+ 01:14:32 +0000
+Date: Thu, 13 Mar 2025 18:14:28 -0700
 From: Dan Williams <dan.j.williams@intel.com>
-To: Alexey Kardashevskiy <aik@amd.com>, Dan Williams
-	<dan.j.williams@intel.com>, <x86@kernel.org>
+To: Alexey Kardashevskiy <aik@amd.com>, <x86@kernel.org>
 CC: <kvm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
 	<linux-pci@vger.kernel.org>, <linux-arch@vger.kernel.org>, "Sean
  Christopherson" <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
@@ -86,27 +86,26 @@ CC: <kvm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
 	<ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>, Suravee Suthikulpanit
 	<suravee.suthikulpanit@amd.com>, Robin Murphy <robin.murphy@arm.com>, "Jason
  Gunthorpe" <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>, Bjorn Helgaas
-	<bhelgaas@google.com>, Christoph Hellwig <hch@lst.de>, Nikunj A Dadhania
-	<nikunj@amd.com>, Michael Roth <michael.roth@amd.com>, Vasant Hegde
-	<vasant.hegde@amd.com>, Joao Martins <joao.m.martins@oracle.com>, "Nicolin
- Chen" <nicolinc@nvidia.com>, Lu Baolu <baolu.lu@linux.intel.com>, "Steve
- Sistare" <steven.sistare@oracle.com>, Lukas Wunner <lukas@wunner.de>,
-	"Jonathan Cameron" <Jonathan.Cameron@huawei.com>, Suzuki K Poulose
-	<suzuki.poulose@arm.com>, Dionna Glaze <dionnaglaze@google.com>, Yi Liu
-	<yi.l.liu@intel.com>, <iommu@lists.linux.dev>, <linux-coco@lists.linux.dev>,
-	Zhi Wang <zhiw@nvidia.com>, AXu Yilun <yilun.xu@linux.intel.com>, "Aneesh
- Kumar K . V" <aneesh.kumar@kernel.org>
-Subject: Re: [RFC PATCH v2 06/22] KVM: X86: Define tsm_get_vmid
-Message-ID: <67d32d60bf4f4_1198729418@dwillia2-xfh.jf.intel.com.notmuch>
+	<bhelgaas@google.com>, Dan Williams <dan.j.williams@intel.com>, "Christoph
+ Hellwig" <hch@lst.de>, Nikunj A Dadhania <nikunj@amd.com>, Michael Roth
+	<michael.roth@amd.com>, Vasant Hegde <vasant.hegde@amd.com>, Joao Martins
+	<joao.m.martins@oracle.com>, Nicolin Chen <nicolinc@nvidia.com>, Lu Baolu
+	<baolu.lu@linux.intel.com>, Steve Sistare <steven.sistare@oracle.com>, "Lukas
+ Wunner" <lukas@wunner.de>, Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Dionna Glaze
+	<dionnaglaze@google.com>, Yi Liu <yi.l.liu@intel.com>,
+	<iommu@lists.linux.dev>, <linux-coco@lists.linux.dev>, Zhi Wang
+	<zhiw@nvidia.com>, AXu Yilun <yilun.xu@linux.intel.com>, "Aneesh Kumar K . V"
+	<aneesh.kumar@kernel.org>, Alexey Kardashevskiy <aik@amd.com>
+Subject: Re: [RFC PATCH v2 07/22] coco/tsm: Add tsm and tsm-host modules
+Message-ID: <67d382f43dc5d_201f02945a@dwillia2-xfh.jf.intel.com.notmuch>
 References: <20250218111017.491719-1-aik@amd.com>
- <20250218111017.491719-7-aik@amd.com>
- <67d23a3e6667_201f0294ed@dwillia2-xfh.jf.intel.com.notmuch>
- <7719c1ad-84b8-40e2-9ce7-93248a410ebd@amd.com>
+ <20250218111017.491719-8-aik@amd.com>
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <7719c1ad-84b8-40e2-9ce7-93248a410ebd@amd.com>
-X-ClientProxiedBy: MW4PR03CA0209.namprd03.prod.outlook.com
- (2603:10b6:303:b8::34) To PH8PR11MB8107.namprd11.prod.outlook.com
+In-Reply-To: <20250218111017.491719-8-aik@amd.com>
+X-ClientProxiedBy: MW4PR04CA0347.namprd04.prod.outlook.com
+ (2603:10b6:303:8a::22) To PH8PR11MB8107.namprd11.prod.outlook.com
  (2603:10b6:510:256::6)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
@@ -115,188 +114,244 @@ List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH8PR11MB8107:EE_|DM4PR11MB6504:EE_
-X-MS-Office365-Filtering-Correlation-Id: a03ad3fd-34d6-4226-dcb7-08dd626291dd
+X-MS-TrafficTypeDiagnostic: PH8PR11MB8107:EE_|CO1PR11MB4932:EE_
+X-MS-Office365-Filtering-Correlation-Id: 69826a42-ed36-4b1c-48cf-08dd6295936b
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014|7053199007;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?8ujD0d7yD0uFS3TTf/SrIL2N4Q6TWWfRPtjKp/LsXukDbpUGbf3AljeyyyDZ?=
- =?us-ascii?Q?ZHMCmOc3/YuDfQMqCxATMMv3BIyQqv8aY7DSPQBKXduBzSaL6AEugB0K/UQp?=
- =?us-ascii?Q?cEI8DXr6HSF7MQiT4FaZaUMwgmUNW7dc643/GZvJTrBonU0JCTGi7Pplcf2g?=
- =?us-ascii?Q?mGNG27hgCs/HvUCIGH+yN4K6Gg6txepuBgHPaDPv/e/sRp+IUZSdxaaEAxFe?=
- =?us-ascii?Q?QTN1fz4Xah69AfussyCNrAAVA71GMun1yAgYwJFLmoO6qKQMd0dVpgs45L9l?=
- =?us-ascii?Q?V93sBYEbWOFIUW/P3m3ILaeFlXC6NlezBymkalmvoweHXUj2yQPmC7uXZTLd?=
- =?us-ascii?Q?+72nz4JAkxh2vq97ZpAMtVfx/aHH+y+9PoXCYyCWrPqMriX6uvNDGHejNcHd?=
- =?us-ascii?Q?t84RbSt5ZZMnEqDoABGYOIEGs8iQGuUsI+z2u2OUAYJviWT4j7rRD8jB1BSn?=
- =?us-ascii?Q?uL7ldgRvdBFe70lUCjAd+2UUbaAGLCiA3oHxNoLFfS6H7Dp8q6ZXRFE4sey8?=
- =?us-ascii?Q?hVdIJkHQRRbvjHov9YaljXlsxSd2W74K1o2wB92CnB6rdyfUuh3QRMMvH67a?=
- =?us-ascii?Q?gA5H9MppkiUAa9a3JkpHp8FHBPvnzG+RVhpMgmBcQvRWopBIhpShSir1qIC5?=
- =?us-ascii?Q?b9+YaW1/DrAi8pNNX/a9ewsE5IlAuFgnQLs8obwitZe7imDt6zNZqb0vDaXo?=
- =?us-ascii?Q?M/kz4LZWsENbV/Zqb4Wqkk7vuzfuEQCje0E7+JTr19B3PV7eSex3sZRVIy94?=
- =?us-ascii?Q?LoonBUNuKF2WqHYhj4GyFwPRt3KixWabiqA2UmsqNGAQ1R9nmew87kShs/6a?=
- =?us-ascii?Q?HBu1rhMhQcDO8BpdCUjj/tsbt+JlTzba4z5KeOW+PChtu2AScFvSyuO8FkIn?=
- =?us-ascii?Q?0WP3CyKkRksDcWCuqr3xk9HFXeiBLFf7SrI/TT9NtrLg7GEXpoh8s8o8sljr?=
- =?us-ascii?Q?zgjxHcnw5gZDeWirBdQItJ2xOAKn4LWbviA0W5amp9yWRtGSjzrGIfJ4EAP4?=
- =?us-ascii?Q?S+Ql1J++7EM+ZQK92C6Lzn7OtB8xU1Ruige1GE74gs/wRl5rsrHgPpw2YRbf?=
- =?us-ascii?Q?yn765R4h/58Yroj+s/LVJBjDOJH936QtA5mHm9ef1v7AgnUh569MufQ/RHB3?=
- =?us-ascii?Q?aHIe3fa00EE04fY24H2QLtz3D5hyIBlbkV9mqXQF9I5CLDGMcbk02yFnn8Tq?=
- =?us-ascii?Q?dncBfBqDwbPJ1kRaW+i9hV1bPlTeb64bnWeW0H0y9s33C00xx+FRUCIs2laU?=
- =?us-ascii?Q?pk5p3eug2hc6aHWZoZlEA3rzZcbCG0SD9SJtqkyUnfJqzA8La3mUQW4ytujF?=
- =?us-ascii?Q?HbFPXNTHfiok+fIL9kQeIWI+O3+rwonPv8Iavw6dWHDTtHfzg4PUq2WTCgVc?=
- =?us-ascii?Q?6eADZ54QiaaJfzZaqh6BYYaqXMLA?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB8107.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(7053199007);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?3QCWzWIcAWesL/LbHedoCwkNKrhWSekVBhSif0Hu5/Jhl8hVMKa7iZ7Ntt7W?=
+ =?us-ascii?Q?QIrp244KGqx95vDW3LduzJixKgLfJxzsvGa0m4AU1LZTksmDg7cVR2H5S68L?=
+ =?us-ascii?Q?V/GhUM82T38cPLlQ7JcPPBml2W/KhALLGtBjQaQoDuOhunDVGBD7t2elp507?=
+ =?us-ascii?Q?nR0Pk+cw2bNQ9w57ANV0ePu0AnxA4lFZuF41pp30MxuqPYl3/asCkVhq1xDE?=
+ =?us-ascii?Q?7egoRqfxyO/WFt2CoqKKzwqvLbmufb9MWq4tCnnNudFdERnm38Bo4wdn8X2Z?=
+ =?us-ascii?Q?JKu0sb1UACh9gT2I0rKkbugnFTsWpoUxFwq3ojOPGsz+d4CjkOgjmwr6Gh4u?=
+ =?us-ascii?Q?v8/Fm2lT/TlBbV4inLfbrpnsvAWFjoqMn6SmNF61t80UIln3qtaX1LcMs2W/?=
+ =?us-ascii?Q?OSCVFr8gcgZhRakERCmboQoiWEB8Qvyt8IHtrslTcEAQpWOhAR2MulHBkZC0?=
+ =?us-ascii?Q?RDXrfw9QJYiv66ER6vxJ9nD42ewhdzDNdgqPVM4aRTzUw/HpSYnV/c8xzpXg?=
+ =?us-ascii?Q?js9rwX+/xyTcvUs7k6ZxHjMc4xAH6Zgm+Nr2z+NPZfdjmrqgSH6zAou0ju6a?=
+ =?us-ascii?Q?faDlfHlEGb8f+2pxGlNQ5CgxZdCwNMoIzS4mIwJKvXN3NxhRReiiV0fq8YCj?=
+ =?us-ascii?Q?PFaVO4kmlhf7CkIqs8y9eZO5wE6bk4l4j4sDtS6MzqUR/Q6Cz+yk5mASkxI6?=
+ =?us-ascii?Q?keunR0Plj6UjSXVNWSmWa52fsUJgQNvD9pjBBDa+RJdfKBRToxIq6kaOosGb?=
+ =?us-ascii?Q?0B1kzlUBul8HQTLNaq5Qh8gWWWoXgHbxHrnLT2/qQgN+nyceH4oCWFdBGG0z?=
+ =?us-ascii?Q?DKLNOVFSUnCOH8PQI6jRYNCOA+SAb8ZG64MzdXmqgagFWqniOhGLXmw5GFPx?=
+ =?us-ascii?Q?XDJB9lrjbjxkATAPTEeeNOmQA1Khk/Uvtb5Z1/OoE3lUAjQg/UfTe0KQkyj0?=
+ =?us-ascii?Q?vumOEoI5XKGHWBPuaE9cTWG9nZO/2zT2HFonq6LnAg6c2JJXKcgt7M5YAf+i?=
+ =?us-ascii?Q?W+HUP0ST64lDw/OBnmRxVvp9dfvnYhQMLRmxWG6iBqjt6X4TM7nhBXO6UiRg?=
+ =?us-ascii?Q?ljCb0OX5N8EuoZAhrN3+Svxo2VTFydLoSf0x6Et3roRhvFdGCSWfgyOcekdR?=
+ =?us-ascii?Q?syeeQz6ADhcg2ZPpOzqrw5YoClgjoyEgVTKnyk28YqrNqyEEGn/Ksjb71/cz?=
+ =?us-ascii?Q?+PjG9a8lsYUTZqvQyUycN2q2ghvBLblYsoBeGvjNhhF2F54Hoj3kIJsFcpfS?=
+ =?us-ascii?Q?O6vnm4k5N4TnOSKzJ5EqTvVOjy9Mxi5wk8Ix81Yj1kTBea2kljm9m5TA/X8T?=
+ =?us-ascii?Q?k4Q31Z7xeJub0wNi1oMTEZlqs0wDzK27KEa3PfajwBnZMC87Zm12VWBCyo3D?=
+ =?us-ascii?Q?FTTPtKkMbM43hTrXKzdpttSBi3Dk+jLB+nNc5h+nWwN44KKVKA=3D=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB8107.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?R1A+guZrrXbEpcQx+8wKLp5fDJFl9Pu4bg8/ui6bG6lbZPKBysI8bOgRuIZc?=
- =?us-ascii?Q?R/HYc2mLosfefAuHX3ns3bB7YdeJ2phSBguC4KJ6PBg+ewlGlbma88+ukQSM?=
- =?us-ascii?Q?2Qt7rmP6xpFU1Gfzs//wdzYiqoNSxwt8B9rxGUObwGPQpXbsO/NG4r74sxdH?=
- =?us-ascii?Q?qkNvrjxoQkaf8pQfXGCF25R16xs52tAhYe0xHPg13fFcjKeiG/qHRn1/B5wp?=
- =?us-ascii?Q?WR8V3DDT5POGPRl3sxw+r2+2cnvPDQVIzj4GqhR5jdYc47NrVF5qUOHHmmit?=
- =?us-ascii?Q?5eAsN4eJ661baDVLz+FMF4mkhqMJcNleXNXcuu0ke6ppJ96+CtLc30F9f362?=
- =?us-ascii?Q?2FTsKgvZ22QxzMqwVm/AYd7xltcuKy1a5kpy3QmBYTzRr3arLpYMkPNb4slD?=
- =?us-ascii?Q?RkbT0hJ8UO8YenpSfermwB1n6+sWEfnsGW3nMj7oAEc/AJLCeVcJNyI7tK+q?=
- =?us-ascii?Q?o+miAmw72LXyl47umI00sHi6NOduf/f9UqbsEcDFETNOgmPLx+NC0accxDq9?=
- =?us-ascii?Q?MwxfaPUJLV1Ln0fvS18+e7Aa+gU7fRfjJg5GHkZuJj2Yy3fM+tU23b/GcPPk?=
- =?us-ascii?Q?jPn0HJ/oMwAb4FE8BGpkOdMA6fEo8ejinSc76JaqI/FrApJ2DTU2Cx4SMERE?=
- =?us-ascii?Q?k4fR/7IOyG7ZHH+qhY/kegnDdkfPFQHz/mXGw1IhoQJLFpQVdCQSEufwLQyz?=
- =?us-ascii?Q?PnqHWiQNhUNh6nnqYwvF1aDGq6sI0J88gBL2cubVnQL9H8lg+/CBcRq63sPR?=
- =?us-ascii?Q?ri8riqKnEcXqBTMYFJ7MMBo82YUhYVTbIKm21VUS7Nr4+/UX83s5OwY7hZa4?=
- =?us-ascii?Q?agaJLSTzpD4buRh7lJ43cO7l44OGg3CYora0mo0+WKl+u0Q/cbOmyVlLaaYy?=
- =?us-ascii?Q?/Zw0TAwG/LAx6A4oUSW/0r2wmydbUgsJNhreA7AKQ5IH0jNjM9WUrPSqQFmD?=
- =?us-ascii?Q?sP2DfWhViKJ7nxv0KC+zcOiYzN1tww4gi0/x1//3MnXaql+Wv+G6VrbCmWRD?=
- =?us-ascii?Q?nliy4PCCof1KaOrnD7BTu8jX5vFUSpSYz7m2CgHIecQWVP3NiZ+EZbVpRSlL?=
- =?us-ascii?Q?fWep/Yto2Z1mPKsohjakP0iT63Wx3BsKLtv6nS571vQ5EdGI1RMbDy9Di6CU?=
- =?us-ascii?Q?vLNbvinkRTO/vS6vXRP+CyZ6jhv+Bb1ahaNjaqcDSvcTJf7mFaaWJMsWt9Dr?=
- =?us-ascii?Q?JtT7WBPP4sVKIvsP1wTzfDLK05iWr724FGp7Ymn8SVcfna7SiMu4751JB229?=
- =?us-ascii?Q?lfcKcXVlcczVdMNsZBx/pT+jb/4sN3uiqXH2rIVJ8103ZgsG9Futw+znJhYH?=
- =?us-ascii?Q?cLx9uu6EtPICh5BSnAj9kdZkYwzRyZWAQohOLETZO0VFklr23CN4MKha/16A?=
- =?us-ascii?Q?Gb/dYbJAcQbMoRoQ0msJX/Xcat75uuHcgg457uKnYUutClrqDfxuRLTyC0hs?=
- =?us-ascii?Q?2IwQ+6FvSfMB2+3ImTKTbMwD3oHO4axXXUnIdKYCBlyHKWlbUBlVRAvsKbmD?=
- =?us-ascii?Q?9sU85UOQeF+D0XC5RPsd56XehkaqD161X36XPtKAe6EgauL+fzK10trwr6rQ?=
- =?us-ascii?Q?Uw2eYstUbzg/oEiY0s97aavJihTPF14v6JPkJ+Kq0uBw74w0GoyODviH2u+l?=
- =?us-ascii?Q?6A=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: a03ad3fd-34d6-4226-dcb7-08dd626291dd
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?yFcQk2RUCEci4M2zuWN0CN/KNZhz98rOI1KI0BZB5T7W9LBnaZuexca0etkQ?=
+ =?us-ascii?Q?ky+p1nFDisu+pLQwmCwxyRfS/2IosLbL30xZDys701GinKm54Pd+ErlB/t6o?=
+ =?us-ascii?Q?ysGxpYO1HnRbg9iEXXP5lVjkuGhxw5sA6BG0xp3qygsTgqCQvXzru46gpJbI?=
+ =?us-ascii?Q?cBdmT+MPl1VLmD+2E/T3NUbFvQaEc2yLOdlHNt99b94IDSezViumyXGQ02vl?=
+ =?us-ascii?Q?IoZv5E1ksxdjOSn7UFIxzqRpcTLfXTdjjCQB+FFn8fM/5Bwv6K6ZNkhG+dyV?=
+ =?us-ascii?Q?xR6p5HRbMThkbjziEZPVpw9G4FCMtT49LA0b9aPZjQ+l83dV+mkJmhrhOzo8?=
+ =?us-ascii?Q?OuuXeSjOr28ZLQAYr+Slw1aUIqnOSMofuv3Rzamb/yfqbv/VU8TtTgzK3K2c?=
+ =?us-ascii?Q?ouXGiNzCD+ljq9I9qmyGiS/P6CXHTAmy5Fy1OvQedYdPzvH3egdpQLSxZSjX?=
+ =?us-ascii?Q?JnN/HAEI/pEZgj5HNrHQhU58kZ1elZrGWo135dcMTvpXNO3oNmNB2suBLjgg?=
+ =?us-ascii?Q?ZgyxMnoc2h3hmuY1vJmF3H+p9bbSeHbLtdBX/0O9LE8V5nr/T6+BkvBn95en?=
+ =?us-ascii?Q?hJEdfbUh+SlZXrqgoKu1F434a5YIV7qEHvrUbgkYOo27z30BO0/r5q9ZMUlC?=
+ =?us-ascii?Q?PqYQ1XtxGrcGcpAWTNgVmKOGCgj+M+AnNao/l9wK5IiwfqushAOvvPGuyh+H?=
+ =?us-ascii?Q?Eavu6nzapsG4gNAlseWhNi/aDhNlAhKlLvcbFpYl0TnvaQr17l2YXCY76s34?=
+ =?us-ascii?Q?2s+l/RCOWdHXWKMSCX27YI4qywW/WitPCqmpA9A6lt7Wo7dlbJFOt3f5DcV+?=
+ =?us-ascii?Q?xnH4ePt70Yt3kUGL/o8SH8jQAVbk8eRc8j/O0UAJ25xTsZjGp2/kyeROGVzD?=
+ =?us-ascii?Q?/TkVlX1PezWkQzuNBs6mUbCKuk7YUnxjZRsqqET15zJs3t5YoG2Wwf7PvwVB?=
+ =?us-ascii?Q?NfijK0aKwZdXoVOp9iGyxC04RZBFaq1qXSzcJ3FqsDcrtu59arSM84hXrFK/?=
+ =?us-ascii?Q?caHvoY5OMaBgYVFXdn1nf+8T6bgoCFKWOAQ9x6di9bGzrX0QyeHWNYjDU5SE?=
+ =?us-ascii?Q?Ai5EKXDjZD3wwFiRqHwTTg2TZfs8rQc2wlByI9Iq4/8+5usOAt1uRgsnBNgR?=
+ =?us-ascii?Q?QQM6jBj52F1aUxd+C0Nt44NmG3x4kGPBlonJT3ue+N0hJIPE/7tai94IR784?=
+ =?us-ascii?Q?TpxRjQS3HIWxa4PJ4tLpiVCeOx4KjFUOIjWvgl5/MSqF22weOwDeBBnSj/y9?=
+ =?us-ascii?Q?Lfnv4l1k/H8A84QioM21quaO7CDuXrW9ThatyPv8RJpxNBEvL7so4RMN7gJx?=
+ =?us-ascii?Q?R+fm7iGeW+R8AoOeTvQRjtxt4aUhWdqapHbI/qIGb7yO/CR3rCmJPnGAh1Ya?=
+ =?us-ascii?Q?RUlejk4zFz/HjWZ1KFbIzdun5priA8wM2Zuf8JlV4PfX7S8sPX8uoEz8Jt54?=
+ =?us-ascii?Q?umQv4etk8GvUpu+ICDzRG2lLeZU6Ho9Z7ktBZGNSJP42vgP0TCzVuCfEmHGc?=
+ =?us-ascii?Q?XR6DuXO8Hk099Uwi3aJ61HLm9TCtpQXsqIrlNN8mAf4A1Fy/IF3Tkbr+m5s9?=
+ =?us-ascii?Q?TKBJ8WqqBRdseHlM+no78TY15OPamF1djFYtuCONl4m8sfrAUndJ0fu3hLJv?=
+ =?us-ascii?Q?pg=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 69826a42-ed36-4b1c-48cf-08dd6295936b
 X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB8107.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Mar 2025 19:09:25.1432
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Mar 2025 01:14:32.0617
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3BVIJv/g0yBUgH2a5dR1lHLwCJDaMupHSPUH8wqXqnS3bjH0goUic+V4IUQWCgVoIHLjG5+q3EYCBqAfMUD5b4wpLC1TU3gJcEWXJ+4NYdI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6504
+X-MS-Exchange-CrossTenant-UserPrincipalName: GzXuKrNt9LBDqmkVtFpqxEpFQiCabAsqpDXB8S7yXT9BfKgjuq9RJ3smQ6/WM8req4lbblA7QcsnUXWNW1BF0tu1rq87jkcLwcXDVppJPuI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB4932
 X-OriginatorOrg: intel.com
 
 Alexey Kardashevskiy wrote:
+> The TSM module is a library to create sysfs nodes common for hypervisors
+> and VMs. It also provides helpers to parse interface reports (required
+> by VMs, visible to HVs). It registers 3 device classes:
+> - tsm: one per platform,
+> - tsm-dev: for physical functions, ("TDEV");
+> - tdm-tdi: for PCI functions being assigned to VMs ("TDI").
 > 
+> The library adds a child device of "tsm-dev" or/and "tsm-tdi" class
+> for every capable PCI device. Note that the module is made bus-agnostic.
+
+There was some discussion on the merits of "TDEV" and "TDI" objects in
+the PCI/TSM thread [1], I will summarize the main objections here:
+
+ * PCI device security is a PCI device property. That security property is
+   not strictly limited to the platform TEE Security Manager (TSM) case.
+   The PCI device authentication enabling, mentioned as "Lukas's CMA" in
+   the cover letter, adds a TSM-independent authentication and device
+   measurement collection ABI. The PCI/TSM proposal simply aims to reuse
+   that ABI and existing PCI device object lifecycle expectations.
+
+ * PCI device security is a PCI specification [2]. The acronym soup of PCI
+   device security (TDISP, IDE, CMA, SPDM, DOE) is deeply entangled with
+   PCI specifics. If other buses grow the ability to add devices to a
+   confidential VM's TCB that future enabling need not be encumbered by
+   premature adherence to the TDEV+TDI object model, the bus can do what
+   makes sense for its specific mechanisms. The kernel can abstract common
+   attributes and ABI without the burden of a new object model.
+
+[1]: http://lore.kernel.org/67b8e5328fd41_2d2c294e5@dwillia2-xfh.jf.intel.com.notmuch
+[2]: http://lore.kernel.org/67c128dcb5c21_1a7729454@dwillia2-xfh.jf.intel.com.notmuch
+
+> New device nodes provide sysfs interface for fetching device certificates
+> and measurements and TDI interface reports.
+> Nodes with the "_user" suffix provide human-readable information, without
+> that suffix it is raw binary data to be copied to a guest.
 > 
-> On 13/3/25 12:51, Dan Williams wrote:
-> > Alexey Kardashevskiy wrote:
-> >> In order to add a PCI VF into a secure VM, the TSM module needs to
-> >> perform a "TDI bind" operation. The secure module ("PSP" for AMD)
-> >> reuqires a VM id to associate with a VM and KVM has it. Since
-> >> KVM cannot directly bind a TDI (as it does not have all necesessary
-> >> data such as host/guest PCI BDFn). QEMU and IOMMUFD do know the BDFns
-> >> but they do not have a VM id recognisable by the PSP.
-> >>
-> >> Add get_vmid() hook to KVM. Implement it for AMD SEV to return a sum
-> >> of GCTX (a private page describing secure VM context) and ASID
-> >> (required on unbind for IOMMU unfencing, when needed).
-> >>
-> >> Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
-> >> ---
-> >>   arch/x86/include/asm/kvm-x86-ops.h |  1 +
-> >>   arch/x86/include/asm/kvm_host.h    |  2 ++
-> >>   include/linux/kvm_host.h           |  2 ++
-> >>   arch/x86/kvm/svm/svm.c             | 12 ++++++++++++
-> >>   virt/kvm/kvm_main.c                |  6 ++++++
-> >>   5 files changed, 23 insertions(+)
-> >>
-> >> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-> >> index c35550581da0..63102a224cd7 100644
-> >> --- a/arch/x86/include/asm/kvm-x86-ops.h
-> >> +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> >> @@ -144,6 +144,7 @@ KVM_X86_OP_OPTIONAL(alloc_apic_backing_page)
-> >>   KVM_X86_OP_OPTIONAL_RET0(gmem_prepare)
-> >>   KVM_X86_OP_OPTIONAL_RET0(private_max_mapping_level)
-> >>   KVM_X86_OP_OPTIONAL(gmem_invalidate)
-> >> +KVM_X86_OP_OPTIONAL(tsm_get_vmid)
-> >>   
-> >>   #undef KVM_X86_OP
-> >>   #undef KVM_X86_OP_OPTIONAL
-> >> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> >> index b15cde0a9b5c..9330e8d4d29d 100644
-> >> --- a/arch/x86/include/asm/kvm_host.h
-> >> +++ b/arch/x86/include/asm/kvm_host.h
-> >> @@ -1875,6 +1875,8 @@ struct kvm_x86_ops {
-> >>   	int (*gmem_prepare)(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, int max_order);
-> >>   	void (*gmem_invalidate)(kvm_pfn_t start, kvm_pfn_t end);
-> >>   	int (*private_max_mapping_level)(struct kvm *kvm, kvm_pfn_t pfn);
-> >> +
-> >> +	u64 (*tsm_get_vmid)(struct kvm *kvm);
-> >>   };
-> >>   
-> >>   struct kvm_x86_nested_ops {
-> >> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> >> index f34f4cfaa513..6cd351edb956 100644
-> >> --- a/include/linux/kvm_host.h
-> >> +++ b/include/linux/kvm_host.h
-> >> @@ -2571,4 +2571,6 @@ long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
-> >>   				    struct kvm_pre_fault_memory *range);
-> >>   #endif
-> >>   
-> >> +u64 kvm_arch_tsm_get_vmid(struct kvm *kvm);
-> >> +
-> >>   #endif
-> >> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> >> index 7640a84e554a..0276d60c61d6 100644
-> >> --- a/arch/x86/kvm/svm/svm.c
-> >> +++ b/arch/x86/kvm/svm/svm.c
-> >> @@ -4998,6 +4998,16 @@ static void *svm_alloc_apic_backing_page(struct kvm_vcpu *vcpu)
-> >>   	return page_address(page);
-> >>   }
-> >>   
-> >> +static u64 svm_tsm_get_vmid(struct kvm *kvm)
-> >> +{
-> >> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> >> +
-> >> +	if (!sev->es_active)
-> >> +		return 0;
-> >> +
-> >> +	return ((u64) sev->snp_context) | sev->asid;
-> >> +}
-> >> +
-> > 
-> > Curious why KVM needs to be bothered by a new kvm_arch_tsm_get_vmid()
-> > and a vendor specific cookie "vmid" concept. In other words KVM never
-> > calls kvm_arch_tsm_get_vmid(), like other kvm_arch_*() support calls.
-> > 
-> > Is this due to a restriction that something like tsm_tdi_bind() is
-> > disallowed from doing to_kvm_svm() on an opaque @kvm pointer? Or
-> > otherwise asking an arch/x86/kvm/svm/svm.c to do the same?
+> The TSM-HOST module adds hypervisor-only functionality on top. At the
+> moment it is:
+> - "connect" to enable/disable IDE (a PCI link encryption);
+> - "TDI bind" to manage a PCI function passed through to a secure VM.
 > 
-> I saw someone already doing some sort of VMID thing
-
-Reference?
-
-> and thought it is a good way of not spilling KVM details outside KVM.
-
-...but it is not a KVM detail. It is an arch specific TSM cookie derived
-from arch specific data that wraps 'struct kvm'. Now if the rationale is
-some least privelege concern about what code can have a container_of()
-relationship with an opaque 'struct kvm *' pointer, let's have that
-discussion.  As it stands nothing in KVM cares about
-kvm_arch_tsm_get_vmid(), and I expect 'vmid' does not cover all the ways
-in which modular TSM drivers may interact with arch/.../kvm/ code.
-
-For example TDX Connect needs to share some data from 'struct kvm_tdx',
-and it does that with an export from arch/x86/kvm/vmx/tdx.c, not an
-indirection through virt/kvm/kvm_main.c.
-
-> > Effectively low level TSM drivers are extensions of arch code that
-> > routinely performs "container_of(kvm, struct kvm_$arch, kvm)".
+> A platform is expected to register itself in TSM-HOST and provide
+> necessary callbacks. No platform is added here, AMD SEV is coming in the
+> next patches.
 > 
-> The arch code is CCP and so far it avoided touching KVM, KVM calls CCP 
-> when it needs but not vice versa. Thanks,
+> Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
+[..]
+> diff --git a/drivers/virt/coco/host/tsm-host.c b/drivers/virt/coco/host/tsm-host.c
+> new file mode 100644
+> index 000000000000..80f3315fb195
+> --- /dev/null
+> +++ b/drivers/virt/coco/host/tsm-host.c
+[..]
+> +static ssize_t tsm_dev_status_show(struct device *dev, struct device_attribute *attr, char *buf)
+> +{
+> +	struct tsm_dev *tdev = container_of(dev, struct tsm_dev, dev);
+> +	struct tsm_dev_status s = { 0 };
+> +	int ret = tsm_dev_status(tdev, &s);
+> +	ssize_t ret1;
 
-Right, and the observation is that you don't need to touch
-virt/kvm/kvm_main.c at all to meet this data sharing requirement.
+I know this is just an RFC, but...
+
+> +
+> +	ret1 = sysfs_emit(buf, "ret=%d\n"
+
+What does "ret" mean to userspace?
+
+> +			  "ctx_state=%x\n"
+
+This violates the one property per file sysfs expectation.
+
+> +			  "tc_mask=%x\n"
+
+Is this the Link IDE traffic class?
+
+> +			  "certs_slot=%x\n"
+> +			  "device_id=%x:%x.%d\n"
+> +			  "segment_id=%x\n"
+
+These last 2 lines are all redundant information relative to the PCI
+device name, right?
+
+> +			  "no_fw_update=%x\n",
+> +			  ret,
+> +			  s.ctx_state,
+> +			  s.tc_mask,
+> +			  s.certs_slot,
+> +			  (s.device_id >> 8) & 0xff,
+> +			  (s.device_id >> 3) & 0x1f,
+> +			  s.device_id & 0x07,
+> +			  s.segment_id,
+> +			  s.no_fw_update);
+> +
+> +	tsm_dev_put(tdev);
+
+I would not expect sysfs to need to manage device references. If the
+device is registered sysfs is live and the reference is already
+elevated. If the device is unregistered, sysfs is disabled and attribute
+handlers are no longer executing.
+
+[..]
+> +static ssize_t tsm_tdi_status_user_show(struct device *dev,
+> +					struct device_attribute *attr,
+> +					char *buf)
+> +{
+> +	struct tsm_tdi *tdi = container_of(dev, struct tsm_tdi, dev);
+> +	struct tsm_dev *tdev = tdi->tdev;
+> +	struct tsm_host_subsys *hsubsys = (struct tsm_host_subsys *) tdev->tsm;
+> +	struct tsm_tdi_status ts = { 0 };
+> +	char algos[256] = "";
+> +	unsigned int n, m;
+> +	int ret;
+> +
+> +	ret = tsm_tdi_status(tdi, hsubsys->private_data, &ts);
+> +	if (ret < 0)
+> +		return sysfs_emit(buf, "ret=%d\n\n", ret);
+> +
+> +	if (!ts.valid)
+> +		return sysfs_emit(buf, "ret=%d\nstate=%d:%s\n",
+> +				  ret, ts.state, tdisp_state_to_str(ts.state));
+> +
+> +	n = snprintf(buf, PAGE_SIZE,
+> +		     "ret=%d\n"
+> +		     "state=%d:%s\n"
+> +		     "meas_digest_fresh=%x\n"
+> +		     "meas_digest_valid=%x\n"
+> +		     "all_request_redirect=%x\n"
+> +		     "bind_p2p=%x\n"
+> +		     "lock_msix=%x\n"
+> +		     "no_fw_update=%x\n"
+> +		     "cache_line_size=%d\n"
+> +		     "algos=%#llx:%s\n"
+> +		     "report_counter=%lld\n"
+> +		     ,
+> +		     ret,
+> +		     ts.state, tdisp_state_to_str(ts.state),
+> +		     ts.meas_digest_fresh,
+> +		     ts.meas_digest_valid,
+> +		     ts.all_request_redirect,
+> +		     ts.bind_p2p,
+> +		     ts.lock_msix,
+> +		     ts.no_fw_update,
+> +		     ts.cache_line_size,
+> +		     ts.spdm_algos, spdm_algos_to_str(ts.spdm_algos, algos, sizeof(algos) - 1),
+> +		     ts.intf_report_counter);
+> +
+> +	n += snprintf(buf + n, PAGE_SIZE - n, "Certs digest: ");
+> +	m = hex_dump_to_buffer(ts.certs_digest, sizeof(ts.certs_digest), 32, 1,
+> +			       buf + n, PAGE_SIZE - n, false);
+> +	n += min(PAGE_SIZE - n, m);
+> +	n += snprintf(buf + n, PAGE_SIZE - n, "...\nMeasurements digest: ");
+> +	m = hex_dump_to_buffer(ts.meas_digest, sizeof(ts.meas_digest), 32, 1,
+> +			       buf + n, PAGE_SIZE - n, false);
+> +	n += min(PAGE_SIZE - n, m);
+> +	n += snprintf(buf + n, PAGE_SIZE - n, "...\nInterface report digest: ");
+> +	m = hex_dump_to_buffer(ts.interface_report_digest, sizeof(ts.interface_report_digest),
+> +			       32, 1, buf + n, PAGE_SIZE - n, false);
+> +	n += min(PAGE_SIZE - n, m);
+> +	n += snprintf(buf + n, PAGE_SIZE - n, "...\n");
+
+More sysfs expectation violations...
+
+Let's start working on what the Plumbers feedback to Lukas on his
+attempt to export PCI CMA device evidence through sysfs means for the
+TSM side. I do not expect it will all be strictly reusable but the
+transport and some record formats should be unified. Specifically I want
+to start the discussion about collaboration and differences among
+PCI-CMA-netlink and PCI-TSM-netlink. For example, device measurements
+are ostensibly common, but interface reports are unique to the TSM flow.
