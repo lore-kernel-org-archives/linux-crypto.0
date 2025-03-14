@@ -1,253 +1,219 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98C1F200B85;
-	Fri, 14 Mar 2025 14:40:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 128A91FF5EB;
+	Fri, 14 Mar 2025 14:43:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741963249; cv=none; b=jM6EvZSyTIT9v2m3kaUNO5vozkLLj+qHN3y+4iHmyMqKRuRrz+4+TKYryxX2dQ+gC3IP5GFSp1ydu2MIkaQe3GvWfa+LjIjzeO36sd/iwDF/aU58kwhLotDDTxNAVrBsflZO4pyJmXQIgm9WoCshU5wfySajB5s+0oqkTeK1LvM=
+	t=1741963411; cv=none; b=LDHRCGmgjnVP41cAVeLq7cZu4rtko8HyeKiVnT5PdNo4T1VT5wl07xBhqDptm4xagWK2TeuS5hP6nLr94Q1k+J0v6sY75AXA6dczThUjyWp0EftHGG0NT8W7/6BdVUg//phiohxumGGBONK9+S/OXrHWbV4KaCOiJVPQHFoSb3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741963249; c=relaxed/simple;
-	bh=kOZRCfNTFAmjgM4OTQk9R9L7+HsgtiFA6mjQzji8A2U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=c4fnkC0ooqD11XcB/MxqJlTriZEbrzVSY4wNEF2Lz7gzDOd1w37s2qwr9ofm3BjOX4So3IyZTB2sBi2oOr3XJWQH57rTAKXgpRiikiVMqkV/b4GSmZCQt5EjBgmBKcZowKRMPY+x8yGxBbFXMTgBX3fg4ypsoaqpw15/M53liH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ECKRM+AR; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1741963411; c=relaxed/simple;
+	bh=OmBBejdQ6MPMCpK44mLQ8HFIWOmjQLb426wFuXj8jkM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hrJ6Jy0Rm1kN+GNbu2RpJEmhHsFYezTygQ2FUL2FJPCVY+js4GEIcvweflwFRA+PwQuD2xnMFYL3sbrI5P7AP1FeOy1f20MQhfjlV5yAiQep0Y+1nJmqfvVUyflJ0r3a4Fa6ZXDOkAZiFD1zZwEH330c2M67a7YCiz72q8KRcho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fFpQYiNn; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ECKRM+AR"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74D00C4CEF0;
-	Fri, 14 Mar 2025 14:40:49 +0000 (UTC)
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fFpQYiNn"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59AE6C4CEE3;
+	Fri, 14 Mar 2025 14:43:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1741963249;
-	bh=kOZRCfNTFAmjgM4OTQk9R9L7+HsgtiFA6mjQzji8A2U=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=ECKRM+ARs1Fyk78QojJzfsJqEi7fbp0l1nrtzMn/yCVx17sLw7XpYKaSTnGh5pIlL
-	 7tYysO+bYMvFug+wG0foiVu6p299ainK+E6JtKZ0lP2o+KzTxR/I1mTpWqAM+54eQZ
-	 Eh41mOz8OdaZb5lpxWdg39mas+LhyOFHmEgzgL6g9rnJcRYkGdgtQwF0JlIqFY49M0
-	 YkzV3ASwc2CnWXuSo3BPq86cU+xOUymvHhs2vB0RxWyeT2ngdC8FuT2sqyfi4iO0kx
-	 GUQgLvohatzXg0ln9mdL7PK0iCINcOlbYPfMEFaYxClj4DL17fR8RR/u+stangBwSU
-	 kbO56sUIHaLHQ==
-Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-7289871af1eso538238a34.1;
-        Fri, 14 Mar 2025 07:40:49 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCU7ewEuTEEhMcq18/oceroaG+KJ71LsbA7x44Pow5aK32BJmWhIs71c5e9ubW5lsKuUK/ay8hCy3w==@vger.kernel.org, AJvYcCU9miiwbZt9+k8k1cvDJpfjcH/4SCXJcKCtTNsAdCHurcLrB1efz+yIwSrFnPZF7qTILB+YLD+y@vger.kernel.org
-X-Gm-Message-State: AOJu0YxlY2OKawPlIwJJd3FqCsZhF0wH4mWp6OQeay34qBNW6JGBT/F0
-	tB6bYAKqJUCoW6GEno4cAxRkv6yOWhCSruefV/qOpYQ7Sh2Uj+UsGRmdkP6aeasQ/EHokqn+YAq
-	CUJHuv/LMsTKLGGB4HAfOrxeDOFU=
-X-Google-Smtp-Source: AGHT+IFz7bLipIK5RYmxZqH2ldz7cWhqd71OqQ4DHvt+CZwYWLt/Cy9W23k13fvkLtER/KicxAk91II+KDhySTIgeN4=
-X-Received: by 2002:a05:6870:46a7:b0:2c2:2b76:7506 with SMTP id
- 586e51a60fabf-2c69118e2fcmr1605373fac.28.1741963248488; Fri, 14 Mar 2025
- 07:40:48 -0700 (PDT)
+	s=k20201202; t=1741963410;
+	bh=OmBBejdQ6MPMCpK44mLQ8HFIWOmjQLb426wFuXj8jkM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fFpQYiNn8BK3GSRaTkmH0zb+nSODczrSo69/HHZE/fMKliEr410dXzUTJouOtgdNg
+	 xEYwcbf/tS7qU51N9IWwh0i+KWxQAYFvXNDFLRFNIAWMBLuhS3GTD+bnC2IPfrdyyO
+	 fwa3QixFnKqg26v6mucQdL2Hy5aAu3ea6Y1436znV7A8rhZfQsZq7x+IyAgCCKqOuH
+	 hmU1jikY5AWdBinYN0XvBA5S8lH8hFUbGpNZ1NO7mVou81GVSm6jDO4A+xZtMcIyD9
+	 K7mhPXySTl/kCt2LngJaYm7ocd7e5j6uTShuOy0VNdKQSNNetcGuOy/sxPDcWmFO4Q
+	 sSW7cc2XVUWUQ==
+Date: Fri, 14 Mar 2025 16:43:26 +0200
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: Qunqin Zhao <zhaoqunqin@loongson.cn>
+Cc: lee@kernel.org, herbert@gondor.apana.org.au, davem@davemloft.net,
+	peterhuewe@gmx.de, linux-kernel@vger.kernel.org,
+	loongarch@lists.linux.dev, linux-crypto@vger.kernel.org,
+	jgg@ziepe.ca, linux-integrity@vger.kernel.org,
+	pmenzel@molgen.mpg.de, Yinggang Gu <guyinggang@loongson.cn>
+Subject: Re: [PATCH v5 5/6] tpm: Add a driver for Loongson TPM device
+Message-ID: <Z9RAjuhBS62HD55L@kernel.org>
+References: <20250313090702.21300-1-zhaoqunqin@loongson.cn>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1741954523.git.herbert@gondor.apana.org.au> <785c7858e03ad03a56ffaee0e413c72e0a307a63.1741954523.git.herbert@gondor.apana.org.au>
-In-Reply-To: <785c7858e03ad03a56ffaee0e413c72e0a307a63.1741954523.git.herbert@gondor.apana.org.au>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Fri, 14 Mar 2025 15:40:37 +0100
-X-Gmail-Original-Message-ID: <CAJZ5v0gc-Juvkf65Z4bu1PDNKNY58YkPk33oNQvOJ0GXDyXyqQ@mail.gmail.com>
-X-Gm-Features: AQ5f1Jr22184Qyn86bekKuTIORGL9m-kGJL55Y-Vi2M5Km5rSK5kh8GQ-SajOvQ
-Message-ID: <CAJZ5v0gc-Juvkf65Z4bu1PDNKNY58YkPk33oNQvOJ0GXDyXyqQ@mail.gmail.com>
-Subject: Re: [v4 PATCH 12/13] PM: hibernate: Use crypto_acomp interface
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, Richard Weinberger <richard@nod.at>, 
-	Zhihao Cheng <chengzhihao1@huawei.com>, linux-mtd@lists.infradead.org, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Pavel Machek <pavel@ucw.cz>, linux-pm@vger.kernel.org, 
-	Steffen Klassert <steffen.klassert@secunet.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250313090702.21300-1-zhaoqunqin@loongson.cn>
 
-On Fri, Mar 14, 2025 at 1:23=E2=80=AFPM Herbert Xu <herbert@gondor.apana.or=
-g.au> wrote:
->
-> Replace the legacy crypto compression interface with the new acomp
-> interface.
->
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-Acked-by: Rafael J. Wysocki <rafael@kernel.org>
-
-and please feel free to route it as needed along with the rest of the serie=
-s.
-
-Thanks!
-
+On Thu, Mar 13, 2025 at 05:07:01PM +0800, Qunqin Zhao wrote:
+> Loongson security engine supports random number generation, hash,
+> symmetric encryption and asymmetric encryption. Based on these
+> encryption functions, TPM2 have been implemented in the Loongson
+> security engine firmware. This driver is responsible for copying data
+> into the memory visible to the firmware and receiving data from the firmware.
+> Co-developed-by: Yinggang Gu <guyinggang@loongson.cn>
+> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+> Signed-off-by: Qunqin Zhao <zhaoqunqin@loongson.cn>
 > ---
->  kernel/power/swap.c | 58 ++++++++++++++++++++++++++++++---------------
->  1 file changed, 39 insertions(+), 19 deletions(-)
->
-> diff --git a/kernel/power/swap.c b/kernel/power/swap.c
-> index 82b884b67152..80ff5f933a62 100644
-> --- a/kernel/power/swap.c
-> +++ b/kernel/power/swap.c
-> @@ -12,6 +12,7 @@
->
->  #define pr_fmt(fmt) "PM: " fmt
->
-> +#include <crypto/acompress.h>
->  #include <linux/module.h>
->  #include <linux/file.h>
->  #include <linux/delay.h>
-> @@ -635,7 +636,8 @@ static int crc32_threadfn(void *data)
->   */
->  struct cmp_data {
->         struct task_struct *thr;                  /* thread */
-> -       struct crypto_comp *cc;                   /* crypto compressor st=
-ream */
-> +       struct crypto_acomp *cc;                  /* crypto compressor */
-> +       struct acomp_req *cr;                     /* crypto request */
->         atomic_t ready;                           /* ready to start flag =
-*/
->         atomic_t stop;                            /* ready to stop flag *=
-/
->         int ret;                                  /* return code */
-> @@ -656,7 +658,6 @@ static atomic_t compressed_size =3D ATOMIC_INIT(0);
->  static int compress_threadfn(void *data)
->  {
->         struct cmp_data *d =3D data;
-> -       unsigned int cmp_len =3D 0;
->
->         while (1) {
->                 wait_event(d->go, atomic_read_acquire(&d->ready) ||
-> @@ -670,11 +671,13 @@ static int compress_threadfn(void *data)
->                 }
->                 atomic_set(&d->ready, 0);
->
-> -               cmp_len =3D CMP_SIZE - CMP_HEADER;
-> -               d->ret =3D crypto_comp_compress(d->cc, d->unc, d->unc_len=
-,
-> -                                             d->cmp + CMP_HEADER,
-> -                                             &cmp_len);
-> -               d->cmp_len =3D cmp_len;
-> +               acomp_request_set_callback(d->cr, CRYPTO_TFM_REQ_MAY_SLEE=
-P,
-> +                                          NULL, NULL);
-> +               acomp_request_set_src_nondma(d->cr, d->unc, d->unc_len);
-> +               acomp_request_set_dst_nondma(d->cr, d->cmp + CMP_HEADER,
-> +                                            CMP_SIZE - CMP_HEADER);
-> +               d->ret =3D crypto_acomp_compress(d->cr);
-> +               d->cmp_len =3D d->cr->dlen;
->
->                 atomic_set(&compressed_size, atomic_read(&compressed_size=
-) + d->cmp_len);
->                 atomic_set_release(&d->stop, 1);
-> @@ -745,13 +748,20 @@ static int save_compressed_image(struct swap_map_ha=
-ndle *handle,
->                 init_waitqueue_head(&data[thr].go);
->                 init_waitqueue_head(&data[thr].done);
->
-> -               data[thr].cc =3D crypto_alloc_comp(hib_comp_algo, 0, 0);
-> +               data[thr].cc =3D crypto_alloc_acomp(hib_comp_algo, 0, CRY=
-PTO_ALG_ASYNC);
->                 if (IS_ERR_OR_NULL(data[thr].cc)) {
->                         pr_err("Could not allocate comp stream %ld\n", PT=
-R_ERR(data[thr].cc));
->                         ret =3D -EFAULT;
->                         goto out_clean;
->                 }
->
-> +               data[thr].cr =3D acomp_request_alloc(data[thr].cc);
-> +               if (!data[thr].cr) {
-> +                       pr_err("Could not allocate comp request\n");
-> +                       ret =3D -ENOMEM;
-> +                       goto out_clean;
-> +               }
+> v5: None
+> v4: Prefix all with tpm_lsse instead of tpm.
+>     Removed MODULE_AUTHOR fields.
+> 
+> v3: Added reminder about Loongson security engine to git log.
+> 
+>  drivers/char/tpm/Kconfig    |   9 ++++
+>  drivers/char/tpm/Makefile   |   1 +
+>  drivers/char/tpm/tpm_lsse.c | 103 ++++++++++++++++++++++++++++++++++++
+>  3 files changed, 113 insertions(+)
+>  create mode 100644 drivers/char/tpm/tpm_lsse.c
+> 
+> diff --git a/drivers/char/tpm/Kconfig b/drivers/char/tpm/Kconfig
+> index 0fc9a510e0..56d0417065 100644
+> --- a/drivers/char/tpm/Kconfig
+> +++ b/drivers/char/tpm/Kconfig
+> @@ -225,5 +225,14 @@ config TCG_FTPM_TEE
+>  	help
+>  	  This driver proxies for firmware TPM running in TEE.
+>  
+> +config TCG_LSSE
+> +	tristate "Loongson TPM Interface"
+> +	depends on MFD_LS6000SE
+> +	help
+> +	  If you want to make Loongson TPM support available, say Yes and
+> +	  it will be accessible from within Linux. To compile this
+> +	  driver as a module, choose M here; the module will be called
+> +	  tpm_lsse.
 > +
->                 data[thr].thr =3D kthread_run(compress_threadfn,
->                                             &data[thr],
->                                             "image_compress/%u", thr);
-> @@ -899,8 +909,8 @@ static int save_compressed_image(struct swap_map_hand=
-le *handle,
->                 for (thr =3D 0; thr < nr_threads; thr++) {
->                         if (data[thr].thr)
->                                 kthread_stop(data[thr].thr);
-> -                       if (data[thr].cc)
-> -                               crypto_free_comp(data[thr].cc);
-> +                       acomp_request_free(data[thr].cr);
-> +                       crypto_free_acomp(data[thr].cc);
->                 }
->                 vfree(data);
->         }
-> @@ -1142,7 +1152,8 @@ static int load_image(struct swap_map_handle *handl=
-e,
->   */
->  struct dec_data {
->         struct task_struct *thr;                  /* thread */
-> -       struct crypto_comp *cc;                   /* crypto compressor st=
-ream */
-> +       struct crypto_acomp *cc;                  /* crypto compressor */
-> +       struct acomp_req *cr;                     /* crypto request */
->         atomic_t ready;                           /* ready to start flag =
-*/
->         atomic_t stop;                            /* ready to stop flag *=
-/
->         int ret;                                  /* return code */
-> @@ -1160,7 +1171,6 @@ struct dec_data {
->  static int decompress_threadfn(void *data)
->  {
->         struct dec_data *d =3D data;
-> -       unsigned int unc_len =3D 0;
->
->         while (1) {
->                 wait_event(d->go, atomic_read_acquire(&d->ready) ||
-> @@ -1174,10 +1184,13 @@ static int decompress_threadfn(void *data)
->                 }
->                 atomic_set(&d->ready, 0);
->
-> -               unc_len =3D UNC_SIZE;
-> -               d->ret =3D crypto_comp_decompress(d->cc, d->cmp + CMP_HEA=
-DER, d->cmp_len,
-> -                                               d->unc, &unc_len);
-> -               d->unc_len =3D unc_len;
-> +               acomp_request_set_callback(d->cr, CRYPTO_TFM_REQ_MAY_SLEE=
-P,
-> +                                          NULL, NULL);
-> +               acomp_request_set_src_nondma(d->cr, d->cmp + CMP_HEADER,
-> +                                            d->cmp_len);
-> +               acomp_request_set_dst_nondma(d->cr, d->unc, UNC_SIZE);
-> +               d->ret =3D crypto_acomp_decompress(d->cr);
-> +               d->unc_len =3D d->cr->dlen;
->
->                 if (clean_pages_on_decompress)
->                         flush_icache_range((unsigned long)d->unc,
-> @@ -1254,13 +1267,20 @@ static int load_compressed_image(struct swap_map_=
-handle *handle,
->                 init_waitqueue_head(&data[thr].go);
->                 init_waitqueue_head(&data[thr].done);
->
-> -               data[thr].cc =3D crypto_alloc_comp(hib_comp_algo, 0, 0);
-> +               data[thr].cc =3D crypto_alloc_acomp(hib_comp_algo, 0, CRY=
-PTO_ALG_ASYNC);
->                 if (IS_ERR_OR_NULL(data[thr].cc)) {
->                         pr_err("Could not allocate comp stream %ld\n", PT=
-R_ERR(data[thr].cc));
->                         ret =3D -EFAULT;
->                         goto out_clean;
->                 }
->
-> +               data[thr].cr =3D acomp_request_alloc(data[thr].cc);
-> +               if (!data[thr].cr) {
-> +                       pr_err("Could not allocate comp request\n");
-> +                       ret =3D -ENOMEM;
-> +                       goto out_clean;
-> +               }
+>  source "drivers/char/tpm/st33zp24/Kconfig"
+>  endif # TCG_TPM
+> diff --git a/drivers/char/tpm/Makefile b/drivers/char/tpm/Makefile
+> index 9bb142c752..bf2280352d 100644
+> --- a/drivers/char/tpm/Makefile
+> +++ b/drivers/char/tpm/Makefile
+> @@ -44,3 +44,4 @@ obj-$(CONFIG_TCG_XEN) += xen-tpmfront.o
+>  obj-$(CONFIG_TCG_CRB) += tpm_crb.o
+>  obj-$(CONFIG_TCG_VTPM_PROXY) += tpm_vtpm_proxy.o
+>  obj-$(CONFIG_TCG_FTPM_TEE) += tpm_ftpm_tee.o
+> +obj-$(CONFIG_TCG_LSSE) += tpm_lsse.o
+> diff --git a/drivers/char/tpm/tpm_lsse.c b/drivers/char/tpm/tpm_lsse.c
+> new file mode 100644
+> index 0000000000..b476309c97
+> --- /dev/null
+> +++ b/drivers/char/tpm/tpm_lsse.c
+> @@ -0,0 +1,103 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/* Copyright (c) 2025 Loongson Technology Corporation Limited. */
 > +
->                 data[thr].thr =3D kthread_run(decompress_threadfn,
->                                             &data[thr],
->                                             "image_decompress/%u", thr);
-> @@ -1507,8 +1527,8 @@ static int load_compressed_image(struct swap_map_ha=
-ndle *handle,
->                 for (thr =3D 0; thr < nr_threads; thr++) {
->                         if (data[thr].thr)
->                                 kthread_stop(data[thr].thr);
-> -                       if (data[thr].cc)
-> -                               crypto_free_comp(data[thr].cc);
-> +                       acomp_request_free(data[thr].cr);
-> +                       crypto_free_acomp(data[thr].cc);
->                 }
->                 vfree(data);
->         }
-> --
-> 2.39.5
->
+> +#include <linux/device.h>
+> +#include <linux/mfd/ls6000se.h>
+> +#include <linux/platform_device.h>
+> +#include <linux/wait.h>
+> +
+> +#include "tpm.h"
+> +
+> +struct tpm_lsse_msg {
+> +	u32 cmd;
+> +	u32 data_off;
+> +	u32 data_len;
+> +	u32 info[5];
+> +};
+> +
+> +struct tpm_lsse_dev {
+> +	struct lsse_ch *se_ch;
+> +	struct completion tpm_lsse_completion;
+> +};
+> +
+> +static void tpm_lsse_complete(struct lsse_ch *ch)
+> +{
+> +	struct tpm_lsse_dev *td = ch->priv;
+> +
+> +	complete(&td->tpm_lsse_completion);
+> +}
+> +
+> +static int tpm_lsse_recv(struct tpm_chip *chip, u8 *buf, size_t count)
+> +{
+> +	struct tpm_lsse_dev *td = dev_get_drvdata(&chip->dev);
+> +	struct tpm_lsse_msg *rmsg;
+> +	int sig;
+> +
+> +	sig = wait_for_completion_interruptible(&td->tpm_lsse_completion);
+> +	if (sig)
+> +		return sig;
+> +
+> +	rmsg = td->se_ch->rmsg;
+> +	memcpy(buf, td->se_ch->data_buffer, rmsg->data_len);
+> +
+> +	return rmsg->data_len;
+> +}
+> +
+> +static int tpm_lsse_send(struct tpm_chip *chip, u8 *buf, size_t count)
+> +{
+> +	struct tpm_lsse_dev *td = dev_get_drvdata(&chip->dev);
+> +	struct tpm_lsse_msg *smsg = td->se_ch->smsg;
+> +
+> +	memcpy(td->se_ch->data_buffer, buf, count);
+> +	smsg->data_len = count;
+> +
+> +	return se_send_ch_requeset(td->se_ch);
+> +}
+> +
+> +static const struct tpm_class_ops tpm_lsse_ops = {
+> +	.flags = TPM_OPS_AUTO_STARTUP,
+> +	.recv = tpm_lsse_recv,
+> +	.send = tpm_lsse_send,
+> +};
+> +
+> +static int tpm_lsse_probe(struct platform_device *pdev)
+> +{
+> +	struct device *dev = &pdev->dev;
+> +	struct tpm_lsse_msg *smsg;
+> +	struct tpm_lsse_dev *td;
+> +	struct tpm_chip *chip;
+> +
+> +	td = devm_kzalloc(dev, sizeof(struct tpm_lsse_dev), GFP_KERNEL);
+> +	if (!td)
+> +		return -ENOMEM;
+> +
+> +	init_completion(&td->tpm_lsse_completion);
+> +	td->se_ch = se_init_ch(dev->parent, SE_CH_TPM, PAGE_SIZE,
+> +			       2 * sizeof(struct tpm_lsse_msg), td,
+> +			       tpm_lsse_complete);
+> +	if (!td->se_ch)
+> +		return -ENODEV;
+> +	smsg = td->se_ch->smsg;
+> +	smsg->cmd = SE_CMD_TPM;
+> +	smsg->data_off = td->se_ch->off;
+> +
+> +	chip = tpmm_chip_alloc(dev, &tpm_lsse_ops);
+> +	if (IS_ERR(chip))
+> +		return PTR_ERR(chip);
+> +	chip->flags = TPM_CHIP_FLAG_TPM2 | TPM_CHIP_FLAG_IRQ;
+> +	dev_set_drvdata(&chip->dev, td);
+> +
+> +	return tpm_chip_register(chip);
+> +}
+> +
+> +static struct platform_driver tpm_lsse_driver = {
+> +	.probe   = tpm_lsse_probe,
+> +	.driver  = {
+> +		.name  = "ls6000se-tpm",
+> +	},
+> +};
+> +module_platform_driver(tpm_lsse_driver);
+> +
+> +MODULE_ALIAS("platform:ls6000se-tpm");
+> +MODULE_LICENSE("GPL");
+> +MODULE_DESCRIPTION("Loongson TPM driver");
+> -- 
+> 2.43.0
+> 
+> 
+
+Makes sense to me and obviously operations list is just send and
+receive, given TPM_CHIP_FLAG_IRQ.
+
+Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
+
+BR, Jarkko
