@@ -1,133 +1,104 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43ADD192B8F
-	for <linux-crypto@vger.kernel.org>; Sat, 15 Mar 2025 08:50:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 001771DC9B1;
+	Sat, 15 Mar 2025 08:58:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742028649; cv=none; b=jV5b90/vhyJpSM+HQO/iTdSU57AdGmbD+V5xnUaeXXFBPMmjqqmNsUhR/bjfJ/FAgbwfW9/pUJSqWyHBzfFsl3Q4xvUBIlWHKDhkx3GBq8oiM3FGK7JH5z7CWLYtxAcm6bDhZst2lAPASIvS4OgA0OOeY4bt1A4jcccd/HR1/1k=
+	t=1742029125; cv=none; b=TsQWiwQCjOAkIeiPSEzY/O3vU8kENaa+R37p62tWSPc+AFJKeTHlDr9EiZJeTLsBPMMEKTHLLR1rlCrv2dQSEd0w7eiOTZoOJHS4bQ9vOxagh0TioOLynZoiOcdZZolUx1ZBd8uUOta0OjuF5cQ2PbgKQ8RRwN9vnVf/PDVUSEU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742028649; c=relaxed/simple;
-	bh=Nx7gKDaqz/DACd76LjUwGeILNxxobbwHG4gpYHMrq40=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=GOjK/AZTQ6EgNMnhHK7GJSuWMOox7I87xLmQ+/Ug3WWfwwR0XwJJD6aPXdX49xzlefsfZ6O5DWog9SLNg7xFYcHdR45KiJRRqD8CBtKEX8gO8FAccpeuTuGo+EjnV/rvMVtoHcffLHAyx/SxHfevvU5DJ8fmEGJJo56173htdCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=AZoTah2s; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="AZoTah2s"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=Content-Type:MIME-Version:Message-ID:Subject:To:From:Date:
-	Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=6eYK+wBwjkxoVbgleuq0INJrlF7qXyrJeT70VtdwxJ0=; b=AZoTah2sWbMWrHGQfGuS6c1xQb
-	sPHsUdw8oOfbDeZxuZFAVPmwJ36Tqj/V8Yqd+f4LKlVqOf1kVcJa+Dd4/FXwWrxlxARwuDyxY//2a
-	RtCYpqRgcyXOOrYlhPQNA/ok+7pYXwRpgaeUm7P3LOPIvtRvvT+0o91NHWCOdtkKNJtQXNgKj0GPK
-	q1FBMe46F+8m96mUu8RvNYtEMvrufZLbgRP54Sfxx3ZF/bkeu1cHG8hEkEfVRXM0F66zAEXFokin5
-	3ouiNuVx4Ys68DTQrrkuWg4blRpDk7a4jz3nV199S+xqWaBwQy3bBDTHCmreNQ90v64811Lx+5P18
-	4HUKgMcQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1ttNEA-006nko-0t;
-	Sat, 15 Mar 2025 16:50:43 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 15 Mar 2025 16:50:42 +0800
-Date: Sat, 15 Mar 2025 16:50:42 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Haren Myneni <haren@us.ibm.com>
-Subject: [PATCH] crypto: nx - Fix uninitialised hv_nxc on error
-Message-ID: <Z9U_Yu4yWxJGTk0T@gondor.apana.org.au>
+	s=arc-20240116; t=1742029125; c=relaxed/simple;
+	bh=mhFM5wlrDVBEC0D5+YR8xY0s6jbjNsGkv4pO4QP4Fc8=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=TdIANiyzqik51BK3UG9WWzGlmIVWa4JUn9tmv6bXNAlJhSvBtHUwWNkkpmzx7iOq6Fdl4eaShSxOWSa5rdhVetrftiiYMdMxg1R53q6tnWxKMx3P33kx9ms0X4F/iyG8DjZ85KneV00NGCBVRdfUQwjXvMOpO6B4ciyIh1sWcF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4ZFFS85G52zDsqJ;
+	Sat, 15 Mar 2025 16:55:20 +0800 (CST)
+Received: from kwepemk500005.china.huawei.com (unknown [7.202.194.90])
+	by mail.maildlp.com (Postfix) with ESMTPS id 197CA1800EC;
+	Sat, 15 Mar 2025 16:58:33 +0800 (CST)
+Received: from [10.174.178.46] (10.174.178.46) by
+ kwepemk500005.china.huawei.com (7.202.194.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Sat, 15 Mar 2025 16:58:32 +0800
+Subject: Re: [v4 PATCH 10/13] ubifs: Use crypto_acomp interface
+To: Herbert Xu <herbert@gondor.apana.org.au>, Linux Crypto Mailing List
+	<linux-crypto@vger.kernel.org>
+CC: Richard Weinberger <richard@nod.at>, <linux-mtd@lists.infradead.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>, Pavel Machek <pavel@ucw.cz>,
+	<linux-pm@vger.kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>,
+	<netdev@vger.kernel.org>
+References: <cover.1741954523.git.herbert@gondor.apana.org.au>
+ <349a78bc53d3620a29cc6105b55985db51aa0a11.1741954523.git.herbert@gondor.apana.org.au>
+From: Zhihao Cheng <chengzhihao1@huawei.com>
+Message-ID: <e5792e49-588d-8dee-0e3e-9e73e4bedebf@huawei.com>
+Date: Sat, 15 Mar 2025 16:58:31 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In-Reply-To: <349a78bc53d3620a29cc6105b55985db51aa0a11.1741954523.git.herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemk500005.china.huawei.com (7.202.194.90)
 
-The compiler correctly warns that hv_nxc may be used uninitialised
-as that will occur when NX-GZIP is unavailable.
+ÔÚ 2025/3/14 20:22, Herbert Xu Ð´µÀ:
+> Replace the legacy crypto compression interface with the new acomp
+> interface.
+> 
+> Remove the compression mutexes and the overallocation for memory
+> (the offender LZO has been fixed).
+> 
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> ---
+>   fs/ubifs/compress.c | 116 ++++++++++++++++++++++++++++----------------
+>   fs/ubifs/journal.c  |   2 +-
+>   fs/ubifs/ubifs.h    |  15 +-----
+>   3 files changed, 77 insertions(+), 56 deletions(-)
+> 
 
-Fix it by rearranging the code and delay setting caps_feat until
-the final query succeeds.
+Hi, Herbert, I got some warning messages while running xfstests, it 
+looks like the compressor returns error code.
 
-Fixes: b4ba22114c78 ("crypto/nx: Get NX capabilities for GZIP coprocessor type")
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+[  397.971086] run fstests generic/103 at 2025-03-15 16:48:29
+[  398.182347] run fstests generic/104 at 2025-03-15 16:48:29
+[  398.396986] run fstests generic/105 at 2025-03-15 16:48:29
+[  398.602640] run fstests generic/106 at 2025-03-15 16:48:29
+[  398.816819] run fstests generic/107 at 2025-03-15 16:48:30
+[  399.032602] run fstests generic/108 at 2025-03-15 16:48:30
+[  399.271669] run fstests generic/109 at 2025-03-15 16:48:30
+[  399.449228] UBIFS (ubi1:0): default file-system created
+[  399.449257] UBIFS (ubi1:0): Mounting in unauthenticated mode
+[  399.449359] UBIFS (ubi1:0): background thread "ubifs_bgt1_0" started, 
+PID 1703
+[  399.449876] UBIFS (ubi1:0): UBIFS: mounted UBI device 1, volume 0, 
+name "vol_a"
+[  399.449882] UBIFS (ubi1:0): LEB size: 129024 bytes (126 KiB), 
+min./max. I/O unit sizes: 2048 bytes/2048 bytes
+[  399.449886] UBIFS (ubi1:0): FS size: 220631040 bytes (210 MiB, 1710 
+LEBs), max 1722 LEBs, journal size 11096064 bytes (10 MiB, 86 LEBs)
+[  399.449890] UBIFS (ubi1:0): reserved for root: 4952683 bytes (4836 KiB)
+[  399.449892] UBIFS (ubi1:0): media format: w5/r0 (latest is w5/r0), 
+UUID 56E8FEFD-CF25-445D-9159-BE65FC10EC9B, small LPT model
+[  399.449904] UBIFS (ubi1:0): full atime support is enabled.
+[  400.054087] UBIFS warning (ubi0:0 pid 110): ubifs_compress_req 
+[ubifs]: cannot compress 4096 bytes, compressor zstd, error -22, leave 
+data uncompressed
+[  400.055631] UBIFS warning (ubi0:0 pid 110): ubifs_compress_req 
+[ubifs]: cannot compress 4096 bytes, compressor zstd, error -22, leave 
+data uncompressed
+[  400.057137] UBIFS warning (ubi0:0 pid 110): ubifs_compress_req 
+[ubifs]: cannot compress 4096 bytes, compressor zstd, error -22, leave 
+data uncompressed
+[  400.058760] UBIFS warning (ubi0:0 pid 110): ubifs_compress_req 
+[ubifs]: cannot compress 4096 bytes, compressor zstd, error -22, leave 
+data uncompressed
 
-diff --git a/drivers/crypto/nx/nx-common-pseries.c b/drivers/crypto/nx/nx-common-pseries.c
-index 1660c5cf3641..56129bdf53ab 100644
---- a/drivers/crypto/nx/nx-common-pseries.c
-+++ b/drivers/crypto/nx/nx-common-pseries.c
-@@ -1145,6 +1145,7 @@ static void __init nxcop_get_capabilities(void)
- {
- 	struct hv_vas_all_caps *hv_caps;
- 	struct hv_nx_cop_caps *hv_nxc;
-+	u64 feat;
- 	int rc;
- 
- 	hv_caps = kmalloc(sizeof(*hv_caps), GFP_KERNEL);
-@@ -1155,27 +1156,26 @@ static void __init nxcop_get_capabilities(void)
- 	 */
- 	rc = h_query_vas_capabilities(H_QUERY_NX_CAPABILITIES, 0,
- 					  (u64)virt_to_phys(hv_caps));
-+	if (!rc)
-+		feat = be64_to_cpu(hv_caps->feat_type);
-+	kfree(hv_caps);
- 	if (rc)
--		goto out;
-+		return;
-+	if (!(feat & VAS_NX_GZIP_FEAT_BIT))
-+		return;
- 
--	caps_feat = be64_to_cpu(hv_caps->feat_type);
- 	/*
- 	 * NX-GZIP feature available
- 	 */
--	if (caps_feat & VAS_NX_GZIP_FEAT_BIT) {
--		hv_nxc = kmalloc(sizeof(*hv_nxc), GFP_KERNEL);
--		if (!hv_nxc)
--			goto out;
--		/*
--		 * Get capabilities for NX-GZIP feature
--		 */
--		rc = h_query_vas_capabilities(H_QUERY_NX_CAPABILITIES,
--						  VAS_NX_GZIP_FEAT,
--						  (u64)virt_to_phys(hv_nxc));
--	} else {
--		pr_err("NX-GZIP feature is not available\n");
--		rc = -EINVAL;
--	}
-+	hv_nxc = kmalloc(sizeof(*hv_nxc), GFP_KERNEL);
-+	if (!hv_nxc)
-+		return;
-+	/*
-+	 * Get capabilities for NX-GZIP feature
-+	 */
-+	rc = h_query_vas_capabilities(H_QUERY_NX_CAPABILITIES,
-+					  VAS_NX_GZIP_FEAT,
-+					  (u64)virt_to_phys(hv_nxc));
- 
- 	if (!rc) {
- 		nx_cop_caps.descriptor = be64_to_cpu(hv_nxc->descriptor);
-@@ -1185,13 +1185,10 @@ static void __init nxcop_get_capabilities(void)
- 				be64_to_cpu(hv_nxc->min_compress_len);
- 		nx_cop_caps.min_decompress_len =
- 				be64_to_cpu(hv_nxc->min_decompress_len);
--	} else {
--		caps_feat = 0;
-+		caps_feat = feat;
- 	}
- 
- 	kfree(hv_nxc);
--out:
--	kfree(hv_caps);
- }
- 
- static const struct vio_device_id nx842_vio_driver_ids[] = {
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
