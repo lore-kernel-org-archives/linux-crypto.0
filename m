@@ -1,79 +1,76 @@
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 064BD1DC99C;
-	Sat, 15 Mar 2025 09:08:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9888218FC9F;
+	Sat, 15 Mar 2025 09:09:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742029735; cv=none; b=lAAomQOUA22iubAveKlV8KubXi6AgEFZXzzFSXq7HzEMwxvQaKjitMMsRlIFENsDHYrLlbZbrKhS7BY0I0Fkx5RE9Vc8DmoAY/YntssKAhEbBlezNZlniFAczpIR6rktdYgibzcHRVdjW8FWI3FS+6BXXu2uop6leow6in2FhFI=
+	t=1742029755; cv=none; b=sr82IFI5nJJkqKjKqt1jKw8TX8Cpn3TqtMiWYOPjiEK53NCyiYlkKIcKecj0UWtnEruOWpfuYVOP2oAN879dtWFfAlHPMZEjd+VEvfu2/KvZLvh9UGfWIrs4FH+0o+yriaDJvH9VKF3OXo+eK5SkQwSLpsU+G3DZZ5RvNOVeWog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742029735; c=relaxed/simple;
-	bh=wNZDhXoG7gxKCl9k5tdaMabTIkWl9Utr0B+PTGM3Yck=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=NKyzwPsp2x0GVZZoT+VTIDTKrd0FP9g5cH3i8YcWKquBahiQZyaS/ZjsBSCG+/6veM91CqAE8cnHDxUEZsUWGNVawZwKrZSc061tSvwfw4L7avdwd8m/g27dg2uOUf9QhtdnYsD0V992TddBvPX3Z7d/MmNlCM+H3yE0zzd+vfs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4ZFFlY2q6Zz1cyhS;
-	Sat, 15 Mar 2025 17:08:41 +0800 (CST)
-Received: from kwepemk500005.china.huawei.com (unknown [7.202.194.90])
-	by mail.maildlp.com (Postfix) with ESMTPS id AA55E14010D;
-	Sat, 15 Mar 2025 17:08:49 +0800 (CST)
-Received: from [10.174.178.46] (10.174.178.46) by
- kwepemk500005.china.huawei.com (7.202.194.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sat, 15 Mar 2025 17:08:48 +0800
-Subject: Re: [v4 PATCH 10/13] ubifs: Use crypto_acomp interface
-To: Herbert Xu <herbert@gondor.apana.org.au>
-CC: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, Richard
- Weinberger <richard@nod.at>, <linux-mtd@lists.infradead.org>, "Rafael J.
- Wysocki" <rafael@kernel.org>, Pavel Machek <pavel@ucw.cz>,
-	<linux-pm@vger.kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>,
-	<netdev@vger.kernel.org>
-References: <cover.1741954523.git.herbert@gondor.apana.org.au>
- <349a78bc53d3620a29cc6105b55985db51aa0a11.1741954523.git.herbert@gondor.apana.org.au>
- <e5792e49-588d-8dee-0e3e-9e73e4bedebf@huawei.com>
- <Z9VCPB_pcT4ycYyt@gondor.apana.org.au>
-From: Zhihao Cheng <chengzhihao1@huawei.com>
-Message-ID: <dfa799fd-5ece-4ea4-d5d0-8c1da39a3a8d@huawei.com>
-Date: Sat, 15 Mar 2025 17:08:47 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+	s=arc-20240116; t=1742029755; c=relaxed/simple;
+	bh=RN3Hwl3SXSPYywMnKLCwBQtYEPtEJMVM73NPdQueAjE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A0eGL2RoHBPE06ZknyjN6fSPuu2fe4tw4NLQ4W8TGiLglHRFN3QqYyOUv+4/otNm1Z4v4bKe8KQW8Lq00XfEt24QOZp/3aQ47ac7ptZ1XW41lthuMQv9qompJwhPxzMlpHNYH275N69c2iIXB+WGCWLX5UoyuN8CbBdiIX6mBRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=r3yFut92; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="r3yFut92"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=veEyQwuRVSguA+tr2piVjFBLUcEH45me5MSTV8DwiYQ=; b=r3yFut92yyAn2KVbDfftR4aXnf
+	6tEyJjlMKUlmf+FouJ350/DO3SRh2hRjukWuQKJ+cqLx1dysbIjQy2hx5k3dBKUcQfguxXkrBQmZw
+	cMuJQnnu9Fni3KIWvNdU4bKKh09I2T7nDenBTNm6/etvNrWDINs7L0s9EpObw8IrF9JHFqDv28tqA
+	Qfb3ZbFM3Hg7VCZ1TcRp1I1MprWuExAwqxXqWf/zq5t/FtSIXP6OqNmYL3ENCyFyQeYnqHDeJCxzI
+	JXys836lqrBTZR80NQtSErDrIAbYme4+5EVWZ8a3x7ED52sAsgkmDQzPJfK13WJWSy4TMqgdyhLAh
+	u+b6XbWw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1ttNVs-006nz2-0x;
+	Sat, 15 Mar 2025 17:09:01 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 15 Mar 2025 17:09:00 +0800
+Date: Sat, 15 Mar 2025 17:09:00 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Shashank Gupta <shashankg@marvell.com>
+Cc: Boris Brezillon <bbrezillon@kernel.org>,
+	Arnaud Ebalard <arno@natisbad.org>,
+	Srujana Challa <schalla@marvell.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	Amit Singh Tomar <amitsinght@marvell.com>,
+	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: octeontx2: suppress auth failure screaming due
+ to negative tests
+Message-ID: <Z9VDrBJD05mKOHn_@gondor.apana.org.au>
+References: <20250305075704.2987579-1-shashankg@marvell.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <Z9VCPB_pcT4ycYyt@gondor.apana.org.au>
-Content-Type: text/plain; charset="gbk"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemk500005.china.huawei.com (7.202.194.90)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250305075704.2987579-1-shashankg@marvell.com>
 
-ÔÚ 2025/3/15 17:02, Herbert Xu Ð´µÀ:
-> On Sat, Mar 15, 2025 at 04:58:31PM +0800, Zhihao Cheng wrote:
->>
->> Hi, Herbert, I got some warning messages while running xfstests, it looks
->> like the compressor returns error code.
+On Wed, Mar 05, 2025 at 01:27:05PM +0530, Shashank Gupta wrote:
+> This patch addresses an issue where authentication failures were being
+> erroneously reported due to negative test failures in the "ccm(aes)"
+> selftest.
+> pr_debug suppress unnecessary screaming of these tests.
 > 
-> Yes this is expected as incompressible data will now show up as
-> errors since we reduced the output buffer size due to LZO getting
-> fixed.  I'll silence that warning.
+> Signed-off-by: Shashank Gupta <shashankg@marvell.com>
+> ---
+>  drivers/crypto/marvell/octeontx2/otx2_cptvf_reqmgr.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
 
-According to the warning message, current compressor is zstd. The output 
-buffer size is limited only for LZO compressor by [1].
-
-ubifs_compress_req [ubifs]: cannot compress 4096 bytes, compressor zstd, 
-error -22, leave data uncompressed
-
-[1] 
-https://web.git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git/commit/?id=cc47f07234f72cbd8e2c973cdbf2a6730660a463
-> 
-> There are no reasons why compression should fail, other than the
-> data being incompressible.
-> 
-> Thanks,
-> 
-
+Patch applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
