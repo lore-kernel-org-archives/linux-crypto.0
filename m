@@ -1,77 +1,83 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8083F192B8F;
-	Sat, 15 Mar 2025 09:17:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C60947485;
+	Sat, 15 Mar 2025 09:27:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742030268; cv=none; b=dmBrm5zwB4LVTUeoLDdgUgdVlANe+y/fT/jN+ScgEI3DCtcFQkQHi6Z1UA/oLyiLYrjJACp1zQ41TfNLnRZylotenaeb2sGTjljIiU+iEXCPwjHwxrGnmOTpwxf0g1aWTXlJ+iE4+sLFMxk/WPL+pmtp8vMvgRl2YrjSsI1CqHE=
+	t=1742030850; cv=none; b=jbtE4cm9kPLkddvjEtqdIbH/S53wmyRdhhblrungT8AM9rMwZh1odOnu10nrvkT/WOa/zpj9kqV2y2MzK5WGKkWfrVLqPsElIIv+meVQ8BUUaI5VH7dVlq7bY6Tc2gOl1FV6g81Euc/bZqmcI/PeG5zceESbCKn065Qiae65fR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742030268; c=relaxed/simple;
-	bh=uSXcwOF4OX+6FyoJVGHlnICPZ0NEobxqqLmgMlnJEnI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UwihmhAACkvi2OWrymtE1FEU6WV2XbtGhKVoqbSCFSzAWBSftTMC6pR6+f5ZlOJJLDXu0lQ4OUqSivO4Rz05eBpO2Iinh5zk4jTMHVVeosAdqVFVNAgClCtZPm7dRdNr9qu+URiPxciuACC2H9+zzTXkARiye8ns7+bzgu0x/Jw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=iyx2UdBY; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="iyx2UdBY"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=7ZKaV4wAzdHrL5lpJWveTwc7e0pa/4045fv/4FAgM+U=; b=iyx2UdBYaNjcrqKevY3u8kJAdw
-	7QCKP5Ow5whvuCI/A2vPWw3LQ18w5XtuR2GrUuYaPowyEWez4ZGaS3TAFxSt952bOiPqkjdyPj0mi
-	hgulOMYneeyV8L4Z4gSFj4ZTNzTlqZOGwuigseNoU3dERBe2ZRrblScz208t8bS2q/9sH3O7L937c
-	CO8s9rQ4CSPSlGlyQ/caj5nf5aNwm4ISaVjSnrAXFe8geFNY+wWbsjxUyceFLSRDqArmkT8H6x4GT
-	ZCh1H2IdEMMuKcDWb6OroB6yH4hvTsoP2LUZQmMPyGZXFAVF5l2OI7KUl4mYixSj1gPJch9vzaFmS
-	NhtRHLwQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1ttNe5-006o9I-1j;
-	Sat, 15 Mar 2025 17:17:30 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 15 Mar 2025 17:17:29 +0800
-Date: Sat, 15 Mar 2025 17:17:29 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Ethan Carter Edwards <ethan@ethancedwards.com>
-Cc: Jesper Nilsson <jesper.nilsson@axis.com>,
-	Lars Persson <lars.persson@axis.com>,
-	"David S. Miller" <davem@davemloft.net>, linux-arm-kernel@axis.com,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] crypto: axis/artpec6: change from kzalloc to kcalloc in
- artpec6_crypto_probe()
-Message-ID: <Z9VFqX75Uz1JOImq@gondor.apana.org.au>
-References: <20250308-artpec6-devm_kcalloc-v1-1-37886eaebd16@ethancedwards.com>
+	s=arc-20240116; t=1742030850; c=relaxed/simple;
+	bh=WvKPZmJN+aBrVxPyton3c9gvaGrdKJIaVZucaoenKW8=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=GFbZ2ilVCMS22v97pcJmi/pp7+WurJB+naHGlSKT7rkd9Z27U8nN/PB8bZGeKtlP3bYpEhQA520ZTUFZl0kk3iSWRYvzrNibbq5tjLue5Sj7j/Z8jmi1hVwSpSgVl6g3eTW2sFc7TKIt7QQ9cpwtHALmMQCj2nzKMlG3bdCnkJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4ZFG5R5vpQz2CchB;
+	Sat, 15 Mar 2025 17:24:11 +0800 (CST)
+Received: from kwepemk500005.china.huawei.com (unknown [7.202.194.90])
+	by mail.maildlp.com (Postfix) with ESMTPS id E805A1A016C;
+	Sat, 15 Mar 2025 17:27:23 +0800 (CST)
+Received: from [10.174.178.46] (10.174.178.46) by
+ kwepemk500005.china.huawei.com (7.202.194.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Sat, 15 Mar 2025 17:27:23 +0800
+Subject: Re: [v4 PATCH 10/13] ubifs: Use crypto_acomp interface
+To: Herbert Xu <herbert@gondor.apana.org.au>
+CC: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, Richard
+ Weinberger <richard@nod.at>, <linux-mtd@lists.infradead.org>, "Rafael J.
+ Wysocki" <rafael@kernel.org>, Pavel Machek <pavel@ucw.cz>,
+	<linux-pm@vger.kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>,
+	<netdev@vger.kernel.org>
+References: <cover.1741954523.git.herbert@gondor.apana.org.au>
+ <349a78bc53d3620a29cc6105b55985db51aa0a11.1741954523.git.herbert@gondor.apana.org.au>
+ <e5792e49-588d-8dee-0e3e-9e73e4bedebf@huawei.com>
+ <Z9VCPB_pcT4ycYyt@gondor.apana.org.au>
+ <dfa799fd-5ece-4ea4-d5d0-8c1da39a3a8d@huawei.com>
+ <Z9VEkEOul9bt4bc1@gondor.apana.org.au>
+From: Zhihao Cheng <chengzhihao1@huawei.com>
+Message-ID: <1b6176d7-31a8-7211-b648-a79bd25af6dc@huawei.com>
+Date: Sat, 15 Mar 2025 17:27:22 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250308-artpec6-devm_kcalloc-v1-1-37886eaebd16@ethancedwards.com>
+In-Reply-To: <Z9VEkEOul9bt4bc1@gondor.apana.org.au>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemk500005.china.huawei.com (7.202.194.90)
 
-On Sat, Mar 08, 2025 at 07:30:52PM -0500, Ethan Carter Edwards wrote:
-> We are trying to get rid of all multiplications from allocation
-> functions to prevent potential integer overflows. Here the
-> multiplication is probably safe, but using kcalloc() is more
-> appropriate and improves readability. This patch has no effect
-> on runtime behavior.
+ÔÚ 2025/3/15 17:12, Herbert Xu Ð´µÀ:
+> On Sat, Mar 15, 2025 at 05:08:47PM +0800, Zhihao Cheng wrote:
+>>
+>> According to the warning message, current compressor is zstd. The output
+>> buffer size is limited only for LZO compressor by [1].
 > 
-> Link: https://github.com/KSPP/linux/issues/162 [1]
-> Link: https://www.kernel.org/doc/html/next/process/deprecated.html#open-coded-arithmetic-in-allocator-arguments
+> Any algorithm can and will produce output longer than the input,
+> if you give it enough output buffer.
 > 
-> Signed-off-by: Ethan Carter Edwards <ethan@ethancedwards.com>
-> ---
->  drivers/crypto/axis/artpec6_crypto.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> Previously an output buffer length of 2x the input length was given
+> to all algorithms, meaning that they would all succeed no matter
+> whether the input can be compressed or not.
+> 
+> This has now been changed so that incompressible data is not
+> needlessly compressed all the way to the end.  In fact we should
+> reduce it further to eliminate the UBIFS_MIN_COMPRESS_DIFF check.
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Ah, I get it. Thanks for reminding, and I verify that the root cause is 
+the output buffer becomes smaller.
+> 
+> I will remove the warning on compression since failures are
+> expected and reduce the output buffer length further to remove
+> the post-compression length check.
+> 
+
+I think we should keep the warning, it would be better to distinguish 
+the different error types.
