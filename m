@@ -1,52 +1,46 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 391CB8828;
-	Sat, 15 Mar 2025 09:03:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FD3618CC1C;
+	Sat, 15 Mar 2025 09:06:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742029407; cv=none; b=sZ0Y7DFmSLf+JRn08tGBBzPIpS/2R9znLOrBl+66oXhq8zgTmdAWQfEhT2CQJQRXtMiN/YKXzp70K3oeQNJRKHOhYQSLWhUTK+JYFldmFeOregno+hffFAUWI89CTU5GNM1shnrGPKc+gX7i2PCX8JelzkZSGLWwLsSCsjx95h0=
+	t=1742029605; cv=none; b=oEaUGDCCqWDs9Mi2cZ9z9uj5o8JiBBG+673tmEGXOAbwMC2y3T+KN+rrIbr7wCTVrxdRyzbQM0poNG40ApPNZeP3YoxkMeLu1+dDmHB8BLEMU2mLgyF36bEKh7kckBoUvT8r3aU/ujblEDHo2UOE6VBx1vLLPkilxm1lNVw1Y1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742029407; c=relaxed/simple;
-	bh=pk3x28CXJh62Nvdajf7sWsSjA78uDqAowKmta/aJJL4=;
+	s=arc-20240116; t=1742029605; c=relaxed/simple;
+	bh=u66njXkfutMvpeLsWeSjQjOtgaxJeedtwPikncmTt+c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nCZnG4X5fhOMiqtQObOvpPozY4P8vSss83Fsul5n8z2aQJpO3I2w6M+2XlLtqTL2N38VNJxO6Z4Z5l9ObjDCWlHSfUpsx7gLgRPn8oo/6IfJuXCqNQ1lZeaIdMl+qFdCrPAW7E5F1vT+FB4yFXiODqS4yCPecz9yqAbg1a501KU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=cfYyEErN; arc=none smtp.client-ip=144.6.53.87
+	 Content-Type:Content-Disposition:In-Reply-To; b=qgsstNfOFLVOYKwgEYtcWS8MCIFPLoj6dJwOTVRWT/UO8TLi1wIBt6BrQN5eeKXfJCbq2rDCk/NieQ1OYfGzaeaqm0b/WDf+Xie8jBpeNCfafEriZJehYCws8RlYOmBGhw1cNr8NsxZ3vwnC3lGUWF1c+gXHk9js3In1lR6pbH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=d/E0WETo; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="cfYyEErN"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="d/E0WETo"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
 	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=VXIab65iMh83UMf96eE59TaztDC5JUgOcqSXpaLANZQ=; b=cfYyEErNRnCiQ8fp4LXqPl+YAq
-	unvh5ZPBJZUcURtsHcUtl7ZiDOJLaJ5ywqRfMQ+u2/luUD6AjlnMKwLMK2dDKnjWjGfE0Osp5+8np
-	oKQ1vtvqmCgwxwbTUODBb1POzjDEw+8YzGSKrkUBSAG71T1grzJnmF3/VequM6K7uNbOFEJ9/tt3r
-	x93OtwRG93hMYSd9UgUYP6vP+c/U7asFWMcW9a+yFelk7MHG6xKpKj0ruxp/SZ01dhxstIbGTc/DD
-	AfLp0GRF2nuwTnGx1gnVLg6N0Wj1r+5g0iFvoDxqugNGWgOdkjSNIq2AHQnK2NNHMtCW51Srf/9CT
-	/vv/XL5A==;
+	bh=5FEsw0Btjy0ZP8yr6Bky8g/Qzyy11CMnrty2nRXI+p0=; b=d/E0WEToHX0XhhFWpBsTnZ7LrT
+	NCP3b/bl3VHH982uswRrov8wtg6o0GmmbUbOlSO/04f85Dfsv2oPVk6C95znNBmLHJLk1aVGCj1Yu
+	8xyO+B/bjc6bBHZRcmPdMzsgkmfs1LxIcc6s97Fx4UaBl12YNyibtliT37mPe0OD1lbC4bPg9IVPP
+	WoUuhSL/bsWshIbHbg+R5TaH8GMZb8xIb0JrwxwFvs2nztuNX32zKcmRsWnCwG2EK8syJ8436CKlj
+	2GFnycJ8/bdh0lJLwzQX3Ov6eDd4x6POAAb1ddFIG6QpccXggmy+tWqKvzhYf1J4mUA0lcqOEFPRV
+	4p+T0fYw==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1ttNPx-006nth-00;
-	Sat, 15 Mar 2025 17:02:54 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 15 Mar 2025 17:02:52 +0800
-Date: Sat, 15 Mar 2025 17:02:52 +0800
+	id 1ttNTU-006nwz-0W;
+	Sat, 15 Mar 2025 17:06:33 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 15 Mar 2025 17:06:32 +0800
+Date: Sat, 15 Mar 2025 17:06:32 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Zhihao Cheng <chengzhihao1@huawei.com>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Richard Weinberger <richard@nod.at>, linux-mtd@lists.infradead.org,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Pavel Machek <pavel@ucw.cz>, linux-pm@vger.kernel.org,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	netdev@vger.kernel.org
-Subject: Re: [v4 PATCH 10/13] ubifs: Use crypto_acomp interface
-Message-ID: <Z9VCPB_pcT4ycYyt@gondor.apana.org.au>
-References: <cover.1741954523.git.herbert@gondor.apana.org.au>
- <349a78bc53d3620a29cc6105b55985db51aa0a11.1741954523.git.herbert@gondor.apana.org.au>
- <e5792e49-588d-8dee-0e3e-9e73e4bedebf@huawei.com>
+To: linux@treblig.org
+Cc: dan.j.williams@intel.com, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] async_xor: Remove unused 'async_xor_val'
+Message-ID: <Z9VDGGEWIpcyfFK_@gondor.apana.org.au>
+References: <20240929132148.44792-1-linux@treblig.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -55,21 +49,23 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e5792e49-588d-8dee-0e3e-9e73e4bedebf@huawei.com>
+In-Reply-To: <20240929132148.44792-1-linux@treblig.org>
 
-On Sat, Mar 15, 2025 at 04:58:31PM +0800, Zhihao Cheng wrote:
->
-> Hi, Herbert, I got some warning messages while running xfstests, it looks
-> like the compressor returns error code.
+On Sun, Sep 29, 2024 at 02:21:48PM +0100, linux@treblig.org wrote:
+> From: "Dr. David Alan Gilbert" <linux@treblig.org>
+> 
+> async_xor_val has been unused since commit
+> a7c224a820c3 ("md/raid5: convert to new xor compution interface")
+> 
+> Remove it.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+> ---
+>  crypto/async_tx/async_xor.c | 26 --------------------------
+>  include/linux/async_tx.h    |  5 -----
+>  2 files changed, 31 deletions(-)
 
-Yes this is expected as incompressible data will now show up as
-errors since we reduced the output buffer size due to LZO getting
-fixed.  I'll silence that warning.
-
-There are no reasons why compression should fail, other than the
-data being incompressible.
-
-Thanks,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
