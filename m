@@ -1,305 +1,218 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4F842E3377;
-	Sat, 15 Mar 2025 00:31:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1741998722; cv=none; b=YP8lTucDicdJdPn3KYVPBi8ME2q098OnsHUiFdKr/tpj78HMbIArzcx51ldzKe2JUmIpuXE1Fjvs9fG62hWSe3GR7aNNHNyU4WwQIGn12fj98zk2lP8lywrcpuFoGBbfEDAMFLssi6ZJq1VOOS1uTeaYF/PUECKzfrcLjKhQ6ug=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1741998722; c=relaxed/simple;
-	bh=Je8DBcuCNLQIuW9S+QysgJ0snPg8uIOECpzutgrWcBw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BQQkXgrlqxPqJblcy9YQ9BGJETj4XiFAMZ6aLFMTXREqYZlQ6Y9D6g5BmbgfjLOehlzvt99kHgJVpk+pnJKbS5NjFJ7YpUDVZYYP346xVBB/xrisi788n6xf2kxgYgni4eFH4mXl6WFcFj4ngB5TlLtweqNs3GxMCLiEKJz1i4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=VymMNzgT; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D700F4C8E;
+	Sat, 15 Mar 2025 01:11:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1742001072; cv=fail; b=ZoMRm1FYlBUFIcIuFGcHDpAu3zpzFllVi+woXUWdL35Po83qknCon/8OEeN+W6VEse6lp3zYTpOfIwWyD+UloeWZOnGFHHjT0jWNi9t4wW+iunIDaYhsKSBwhMLHDcouteb1yJIEqUGWm6ZfxjEc2FrkTyKc0Iesx7kvDIrSKxI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1742001072; c=relaxed/simple;
+	bh=cC/ECdImOITsEBFscO2auLmDFWYBaXffHEaYyEoq7Ws=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=qYKLsh0nLzxLBvfDm+DFGQchX0yCwhxFZAT0JUflrMgc3kXcHg0M2TSi3KSU09FgtZjH1tIA2tzUjMQGEp8ma1CQNs+KDuAuuTHL2vKGRE3/DEgswfmWSL3KPGAeE2ieyrvfIziOSg7e0As4S3FKI1TJ1nkj3DhirmC+pKndpY0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UAG+Zegz; arc=fail smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="VymMNzgT"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=t3ecUWY92S53odYjmM31lnI9pitPM2pM+xnXq3bFvsg=; b=VymMNzgTs1z8T84RIQQNiPfsqh
-	hJdYDA8EHMUIcWNmq8x1krK7oyDwo5BqKErXIYBgz2CSaGclFUAtXzw/SglY/AxHy1ZulvME7cTCl
-	bnPDFMSLw4q5kdezHuIRMQYwEiZaI6pIMQ4D5MWk6oJzNQkmuD3PHQ/Odx+A0VrZRGhhJlr3fZSRd
-	Zuj61q+lI3CiDYm8mticZaygOlDElUr/j8StYvpJ3DfKM8ECDYC+PocWHZIqsAWHGdXeG2KKQSBGs
-	wzjPHSuShtY3A5ZtW/NoQv7pAbA179WVdCuVBI/GDxS+5VOCenJqLZHc46HUsk4/aens9yLbLP7Tj
-	DoSdk3tA==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1ttFR8-006kEb-0B;
-	Sat, 15 Mar 2025 08:31:35 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 15 Mar 2025 08:31:34 +0800
-Date: Sat, 15 Mar 2025 08:31:34 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Richard Weinberger <richard@nod.at>,
-	Zhihao Cheng <chengzhihao1@huawei.com>,
-	linux-mtd@lists.infradead.org,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Pavel Machek <pavel@ucw.cz>, linux-pm@vger.kernel.org,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH] crypto: qat - Remove dead code related to null dst
-Message-ID: <Z9TKZgYaVAerVVkU@gondor.apana.org.au>
-References: <cover.1741954320.git.herbert@gondor.apana.org.au>
- <1e29b349410b0d9822c8c0b8f6e01386a3c44d66.1741954320.git.herbert@gondor.apana.org.au>
- <Z9Q1euXeBy7x8zZI@gcabiddu-mobl.ger.corp.intel.com>
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UAG+Zegz"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1742001071; x=1773537071;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=cC/ECdImOITsEBFscO2auLmDFWYBaXffHEaYyEoq7Ws=;
+  b=UAG+Zegz1caeyIUprkprUteDTn2UOuTxXZENBIYwsj6PhztGh8o2/xyB
+   QKZKAHNP2hrAb7Nk2dWbPy9BAsnfJmAE8mZp779gfeFkGTJapu/1q0Wdk
+   6bp7Xoo+mIOILkrqwZFiNGRzfZXOq1QgrZL7szg+J8NXnf9dVp1XXftVi
+   XVuBEpRXEcKO7biMgXV6BLpNfDHLPNY1sBQSPecO4fCa01Ya6CD23Cx2K
+   Gm1yj1fFytetmPXpaVs/jdCd1CQG4NVKwzYUosPgJbiPzpf4NXfe4Oh30
+   hsWPhHJIiP3VUyP7tz+TgYLdVlpJm38jGO/yZnfETjLZSauoajMRZ0tB/
+   g==;
+X-CSE-ConnectionGUID: 6JOJ4iBfQ2Oh+XxquxWXBg==
+X-CSE-MsgGUID: UmFg5MluRVGo1uDAFhJbjQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11373"; a="65626050"
+X-IronPort-AV: E=Sophos;i="6.14,246,1736841600"; 
+   d="scan'208";a="65626050"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2025 18:11:10 -0700
+X-CSE-ConnectionGUID: sBLq8/13RjatFfB6YTv2iA==
+X-CSE-MsgGUID: /EQ6jJgIQTmIyzP6sJCi+w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.14,246,1736841600"; 
+   d="scan'208";a="152374414"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmviesa001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Mar 2025 18:11:09 -0700
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Fri, 14 Mar 2025 18:11:08 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14 via Frontend Transport; Fri, 14 Mar 2025 18:11:08 -0700
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.172)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Fri, 14 Mar 2025 18:11:08 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=tQuLD/waTS/utm3rWpXY8gKjJzbFcHPLgYxGDOhGqeEyIrA6565t+zsFG3Er2sWfQi5qoG0vqZqHr79wAytYUUQ3DqbOhU1vIIWU5uVp8IoINVf2O4isEL32csnULbTkADZ3Y5R9HDzpbqmpZyVYUJg9AOOxjetS09W7122MkGXk5881TC6wgVH4nrgbQMNyqzzpuUR9/xUnoWFyz5GbpHgu3a6E6MGUB0tNmc2ooBV7LtpE5waQvm4wLd47XrQSGd9YpRXv21mO69m7xTbOPeVCngju8WEcIaFAIjw7UsJ/Pyv8sY0X8PrxvGIJZViG7zogTKKJsRl5c9Qifj+s9w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LvIpbRD/dQK0nI23gpjg6SQq0zr8DHsGVOL3p78140c=;
+ b=Uh7/Q1Et3nqyWBOlJbVeWd0QugjkC+vEX4WR/8ydzAeDOYT4cbc2gEWl+FzUN2PToHNMV7k1d17WKFENDBs0j1R7OINrryf3BmhoQnFaYcFeZASOH7tQ8V+XPduxAe6lJ47NUgHfLZNjyz9KibXp6TANlwqNPT6tIYTxL9BdbQBXzuuTP+kaXbzEgiTje3NRrFSCgDK7L6uzTE224/G9bSwSN6EnDj8+MoTLtvtTepzuSvRUcWCbWFzFq+tLXfDKwu8TkbEQA8Fjkjac8lR8rq5DrjljYafqU0iHLh2xq3nzW4rIOhonpW8UqqngsibjZE1DBSuy1klNIWMOS+TxLw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com (2603:10b6:510:256::6)
+ by DM6PR11MB4660.namprd11.prod.outlook.com (2603:10b6:5:2ad::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8511.28; Sat, 15 Mar
+ 2025 01:11:06 +0000
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::6b05:74cf:a304:ecd8]) by PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::6b05:74cf:a304:ecd8%4]) with mapi id 15.20.8534.027; Sat, 15 Mar 2025
+ 01:11:05 +0000
+Date: Fri, 14 Mar 2025 18:11:01 -0700
+From: Dan Williams <dan.j.williams@intel.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>, Alexey Kardashevskiy <aik@amd.com>
+CC: Xu Yilun <yilun.xu@linux.intel.com>, <x86@kernel.org>,
+	<kvm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+	<linux-pci@vger.kernel.org>, <linux-arch@vger.kernel.org>, "Sean
+ Christopherson" <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+	"Tom Lendacky" <thomas.lendacky@amd.com>, Ashish Kalra
+	<ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>, Suravee Suthikulpanit
+	<suravee.suthikulpanit@amd.com>, Robin Murphy <robin.murphy@arm.com>, "Kevin
+ Tian" <kevin.tian@intel.com>, Bjorn Helgaas <bhelgaas@google.com>, "Dan
+ Williams" <dan.j.williams@intel.com>, Christoph Hellwig <hch@lst.de>, "Nikunj
+ A Dadhania" <nikunj@amd.com>, Michael Roth <michael.roth@amd.com>, Vasant
+ Hegde <vasant.hegde@amd.com>, Joao Martins <joao.m.martins@oracle.com>,
+	"Nicolin Chen" <nicolinc@nvidia.com>, Lu Baolu <baolu.lu@linux.intel.com>,
+	"Steve Sistare" <steven.sistare@oracle.com>, Lukas Wunner <lukas@wunner.de>,
+	"Jonathan Cameron" <Jonathan.Cameron@huawei.com>, Suzuki K Poulose
+	<suzuki.poulose@arm.com>, Dionna Glaze <dionnaglaze@google.com>, Yi Liu
+	<yi.l.liu@intel.com>, <iommu@lists.linux.dev>, <linux-coco@lists.linux.dev>,
+	Zhi Wang <zhiw@nvidia.com>, "Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
+Subject: Re: [RFC PATCH v2 14/22] iommufd: Add TIO calls
+Message-ID: <67d4d3a5622f9_12e3129480@dwillia2-xfh.jf.intel.com.notmuch>
+References: <20250218111017.491719-1-aik@amd.com>
+ <20250218111017.491719-15-aik@amd.com>
+ <Z72GmixR6NkzXAl7@yilunxu-OptiPlex-7050>
+ <2fe6b3c6-3eed-424d-87f0-34c4e7e1c906@amd.com>
+ <20250226130804.GG5011@ziepe.ca>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250226130804.GG5011@ziepe.ca>
+X-ClientProxiedBy: MW4PR03CA0221.namprd03.prod.outlook.com
+ (2603:10b6:303:b9::16) To PH8PR11MB8107.namprd11.prod.outlook.com
+ (2603:10b6:510:256::6)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z9Q1euXeBy7x8zZI@gcabiddu-mobl.ger.corp.intel.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR11MB8107:EE_|DM6PR11MB4660:EE_
+X-MS-Office365-Filtering-Correlation-Id: 22c3414b-d3cc-4e1d-98d2-08dd635e429a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|1800799024|376014;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?qlPWKt8tRXU8pnpHWdTwJVoEKUE3sf5CaROyFAselNgrs6JdJIK1ktppVTGz?=
+ =?us-ascii?Q?FudMPmwbmQcBu/Yq2hyhVqhA4GWQJzEZ7PKfzMbUpEijWP+Ya6k9ePfz1BJA?=
+ =?us-ascii?Q?furJYkpR82+HGt6wG3JlWHilhgCZEBfomoX8M0uK7qIfeMjtth2hfj+Fr1dU?=
+ =?us-ascii?Q?4JtDiJubEJi8stgsa2+jgBPfTQzIyeO84/pZUqynFI6r4WIcTUrjTRdPxVvG?=
+ =?us-ascii?Q?SPu5vwrnJGfI5Zh8+ByrbEZ/+ZoP2zqHr6AaRNqxup96mfaef1fafXDwTa4f?=
+ =?us-ascii?Q?TjYfe1OzC6roq1q97cP6lstv7vJXIpoUp5e07wuoeooV6RpbHCY8oUnSMD15?=
+ =?us-ascii?Q?ItEBEpCB1ZrSkLtcwMMM74iNi1qctPXkULG4iW0SGATqU8NfzITwOWo2AAwe?=
+ =?us-ascii?Q?70u+gcVcxKlrCKYTbcpCyCo9VIq8QlGLX7+Mc8IJPWlpAaFNfXFDSdXgfDgc?=
+ =?us-ascii?Q?FvKgymCKSpwxXwMpu5g8GG0rYQCUjZL1WOJKGoQu6R/CqIoiq1t8am+gB2av?=
+ =?us-ascii?Q?ikTCtXk9sRNNl/RJ/L+cIo5YMOj6X2S3RcLiRVi3lWYUFf+vVxoDFtedmK+j?=
+ =?us-ascii?Q?ZQ4TY4mxrdCFyfv71aNwz+MLECZPHOq+2nOIUiJ0G3PaR/tQ/8VPWaibQ/cA?=
+ =?us-ascii?Q?qnNA1HBLFCaulqeakCOfsz4chQsA1XR4PG3tOfdVbk9Mzk/OUVlpLUEATC87?=
+ =?us-ascii?Q?PCUOWbnwfYW1u3aQMxWxgQ9pm2R8IdEjdH7ct1pdlmwxkR1SPDhyLPtOBdzZ?=
+ =?us-ascii?Q?6tY0EAowcsN8b9SGF8peYDNaaBmdBsp5f4+jZql4SXVO7HIReWkHA4uHrYvD?=
+ =?us-ascii?Q?jWkzlINXKhgwAVwOq87a0PrHOn3+IbZxG/YX2SOnNvw9ddGM5Zctz3+EiePU?=
+ =?us-ascii?Q?ds4cXeG4ziUyycwAv6d74dFwMeyN31HrsaQr79AYmtltTqVPCkauhygBpkRn?=
+ =?us-ascii?Q?c2GiziTS5LBQBVUVTgZG+1K0eHRYNzyA3SxZKUQppaJeesxerl8lpbwVm5FK?=
+ =?us-ascii?Q?Btu6WD2HeXCWhBKoX6hGJYMn+1DNqkVqNmZ7CORl8v7KJAhZkQ9uPTcN1Z9l?=
+ =?us-ascii?Q?hcO6Oo3hXfaqAnfPpO5+bR6rulpGouJeTblVajks6SIDw9Ge7DkTm6BayQPK?=
+ =?us-ascii?Q?VtCrLg3XtawtSJNEi+nVNrXiDRGR/m38FJcXPL3jJg6c4nYxSVSoduS9Fv1x?=
+ =?us-ascii?Q?7/X+FFf15Jcbo6S4T6B5jgLJIs3uwD1zpRn7thKXaHyapZaAdc7A/t1hMYBT?=
+ =?us-ascii?Q?wRmlAD2l2HrfC2uUtcSe/HooLYdX94a/Ha93rTWmzNculzWF7pF/CQ8i2Y5t?=
+ =?us-ascii?Q?D9aw6wwayzPyWkJf5FYEIuIWQ/a5WjoZJUNOBc3+nojpFq0ZafLMQcK8fL7x?=
+ =?us-ascii?Q?lt5G+EasVbF9cGqVGdlgn8TOyht8?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB8107.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?6+UPmsxEE9lsvq2DsnwL0meSkLyRzyaxtHZLTKpcA/hUcn6FDLgzoIzQ6AHi?=
+ =?us-ascii?Q?3EqtC1pUDcts7zEsOq6iNqlzdJFRQskV6it7afNZg6KHTrMxygVreoAIO+/x?=
+ =?us-ascii?Q?MAtrpiB52rFLC7agonvaKts6frzbAFFr4UuJoUtlmo1TW8UFrIdDYxuoeyj2?=
+ =?us-ascii?Q?ZN/xxJkz9O6arZSdFb5aYTHITHB34VTE8so40j0dn81ed5sbWiIyoMRr5JQI?=
+ =?us-ascii?Q?3W6aoj9fmVq8vLnfdXGdwAn/vYIS2WPR+Y9V2fatuQVx22x2wi4SdpWY4fzd?=
+ =?us-ascii?Q?R0xsMmupkvfddKqowaEW180T7+p1Oefzt5IWdrJe6nsl/6/Qg0ijWOFXDOj+?=
+ =?us-ascii?Q?5nee+YK/rT00iKDlw0QejrY66VqhgdB6QwyHr2g4zf3TxwzbqyJccSeNHGML?=
+ =?us-ascii?Q?DFy2AJRg8BwneTGfSTYvdkq8xb9kCMiDyI7A4Hf8NRVLy8pJJw9Lbfc3dMP4?=
+ =?us-ascii?Q?TKZAV21AcKKkxCEL/TTRGtAS3pM9b4YYe/ay6fQkOb7SWvLuQfj2l7h3kq6w?=
+ =?us-ascii?Q?BdS7ZQQprs7MW+h8drxsv3ipm+fzpuZvG2HbpMMIqGOaOa0fkWcqda/1p1c5?=
+ =?us-ascii?Q?lztXxym7ZOv3yccBejWna14ikQUE7v/N2g+aZinw7EUiw+pc8eXNwzTifkY0?=
+ =?us-ascii?Q?Y46u7cuCbGvHI8+rLhUcjg4mCkNRO3fYJSf5WOO8KX+pXgNbIEiijuwiHAdr?=
+ =?us-ascii?Q?oqIGDn0ox12yfcN92i5cYHasG9AK7/okI+EUmArSc38asNx6rsYvgBDrJaVj?=
+ =?us-ascii?Q?8+3bkptB6MCGeSuJi/usg4WBV5thT3q0sNyuORq1VlE+FL1TNPNoTJX5N2Bx?=
+ =?us-ascii?Q?jL4qjxNPIJoCC5QoAS6TIwAoYiQSH6Dx+mYkAH644jmtIBt6K84qjbhEcW6r?=
+ =?us-ascii?Q?8OgMf0lgLrNTUCOWrZ1vmVgNvS+oUg2O8n+d7zPuWAot8+4sFoLH1T07VBPc?=
+ =?us-ascii?Q?RUlVSVpqhICr6p867sdps3XADunsNPkfYEXFq7DE8/gm3xEEJ42Han5/HI+C?=
+ =?us-ascii?Q?+O5Ntnqt3CVai12mLj2TtsrLRgnHVPUDYw9HgYPaTJ2rdqNcrVkLxvZ5DqFG?=
+ =?us-ascii?Q?6puej3ZDfRh8Kmy90ZGw2ZcpRBQyRzBpOgEuDqbKUb597Sh2D6XpgN1GoifS?=
+ =?us-ascii?Q?NKxZroGkSGgEsrPW9X1dOyT3usi7bgBS8sBmpJIh+zhGhkn2nP9TndaJD/Ku?=
+ =?us-ascii?Q?Qsa9v5AePGxIcA387NY+8gASAZXYWkOE9gT1EHRI2vj/4nWFlt2RdWh6xw+a?=
+ =?us-ascii?Q?4LjdiAk1QVIkK5CmOvbTmnEvaSgSA7tk1YgpVBHy/lidy2UWHEVtZqmOsU34?=
+ =?us-ascii?Q?GSCL9SYQRWJrlQ7D/MLSAhtaEJX5CG0LqiivAWfDkzqtBAJgaMVEuq6yQa4T?=
+ =?us-ascii?Q?UKGU6gvnLs+9qzlQD/MEUZQ2qQtCayHp8fb8PUSGvugVatrFuWGAYtjWC4Nt?=
+ =?us-ascii?Q?vCIlYBKm2iikjIZAdSfxv2U1map2feX4WUkIkgfgqSx79VsSVuYEYt9qAcRk?=
+ =?us-ascii?Q?5QTscryAKggN2PQExPQpbugW+KPL5tIzQ+ZkJv1xK8iWk4vdrhPR2hwkX4rQ?=
+ =?us-ascii?Q?aguph4bwyGBCGG/QYwhDQ1/cBmNo/S+kfnjhB3AqrnLIAtmp0yhbVGTqWNI0?=
+ =?us-ascii?Q?DQ=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 22c3414b-d3cc-4e1d-98d2-08dd635e429a
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB8107.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Mar 2025 01:11:05.3594
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: AT0arrLSykrUNlAlatbMmm1sIPKPkJ3JdNZAENQp3SpWPmJDbTGUTDMPIMKcDzAgn52WIQb1bLLMnM0hVh64Gp4H2EC+xzRFqHIy78/AF0M=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4660
+X-OriginatorOrg: intel.com
 
-On Fri, Mar 14, 2025 at 01:56:10PM +0000, Cabiddu, Giovanni wrote:
->
-> The implementation of this function in qat/qat_common/qat_bl.c
-> should be removed as well as. After this change, it is not getting
-> called.
+Jason Gunthorpe wrote:
+> On Wed, Feb 26, 2025 at 11:12:32AM +1100, Alexey Kardashevskiy wrote:
+> > > I still have concern about the vdevice interface for bind. Bind put the
+> > > device to LOCKED state, so is more of a device configuration rather
+> > > than an iommu configuration. So seems more reasonable put the API in VFIO?
+> > 
+> > IOMMUFD means pretty much VFIO (in the same way "VFIO means KVM" as 95+% of
+> > VFIO users use it from KVM, although VFIO works fine without KVM) so not
+> > much difference where to put this API and can be done either way. VFIO is
+> > reasonable, the immediate problem is that IOMMUFD's vIOMMU knows the guest
+> > BDFn (well, for AMD) and VFIO PCI does not.
+> 
+> I would re-enforce what I said before, VFIO & iommufd alone should be
+> able to operate a TDISP device and get device encrpytion without
+> requiring KVM.
 
-Thanks.  I'll fold this patch in if a rebase is needed.
+Without requiring KVM, but still requiring a TVM context per TDISP
+expectations?
 
----8<---
-Remove dead code left behind after the dropping of null dst support.
+I.e. I am still trying to figure out if you are talking about
+device-authentication and encryption without KVM, TDISP without a
+TVM (not sure what that is), or TDISP state management relative to a
+shared concept of a "TVM context" that KVM also references.
 
-Fix the areq->dst test so that a null dst is explicitly forbidden.
+> It makes sense that if the secure firmware object handles (like the
+> viommu, vdevice, vBDF) are accessed through iommufd then iommufd will
+> relay operations against those handles.
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
- drivers/crypto/intel/qat/qat_common/qat_bl.c  | 159 ------------------
- drivers/crypto/intel/qat/qat_common/qat_bl.h  |   6 -
- .../intel/qat/qat_common/qat_comp_algs.c      |   2 +-
- .../intel/qat/qat_common/qat_comp_req.h       |  10 --
- 4 files changed, 1 insertion(+), 176 deletions(-)
-
-diff --git a/drivers/crypto/intel/qat/qat_common/qat_bl.c b/drivers/crypto/intel/qat/qat_common/qat_bl.c
-index 338acf29c487..5e4dad4693ca 100644
---- a/drivers/crypto/intel/qat/qat_common/qat_bl.c
-+++ b/drivers/crypto/intel/qat/qat_common/qat_bl.c
-@@ -251,162 +251,3 @@ int qat_bl_sgl_to_bufl(struct adf_accel_dev *accel_dev,
- 				    extra_dst_buff, sz_extra_dst_buff,
- 				    sskip, dskip, flags);
- }
--
--static void qat_bl_sgl_unmap(struct adf_accel_dev *accel_dev,
--			     struct qat_alg_buf_list *bl)
--{
--	struct device *dev = &GET_DEV(accel_dev);
--	int n = bl->num_bufs;
--	int i;
--
--	for (i = 0; i < n; i++)
--		if (!dma_mapping_error(dev, bl->buffers[i].addr))
--			dma_unmap_single(dev, bl->buffers[i].addr,
--					 bl->buffers[i].len, DMA_FROM_DEVICE);
--}
--
--static int qat_bl_sgl_map(struct adf_accel_dev *accel_dev,
--			  struct scatterlist *sgl,
--			  struct qat_alg_buf_list **bl)
--{
--	struct device *dev = &GET_DEV(accel_dev);
--	struct qat_alg_buf_list *bufl;
--	int node = dev_to_node(dev);
--	struct scatterlist *sg;
--	int n, i, sg_nctr;
--	size_t sz;
--
--	n = sg_nents(sgl);
--	sz = struct_size(bufl, buffers, n);
--	bufl = kzalloc_node(sz, GFP_KERNEL, node);
--	if (unlikely(!bufl))
--		return -ENOMEM;
--
--	for (i = 0; i < n; i++)
--		bufl->buffers[i].addr = DMA_MAPPING_ERROR;
--
--	sg_nctr = 0;
--	for_each_sg(sgl, sg, n, i) {
--		int y = sg_nctr;
--
--		if (!sg->length)
--			continue;
--
--		bufl->buffers[y].addr = dma_map_single(dev, sg_virt(sg),
--						       sg->length,
--						       DMA_FROM_DEVICE);
--		bufl->buffers[y].len = sg->length;
--		if (unlikely(dma_mapping_error(dev, bufl->buffers[y].addr)))
--			goto err_map;
--		sg_nctr++;
--	}
--	bufl->num_bufs = sg_nctr;
--	bufl->num_mapped_bufs = sg_nctr;
--
--	*bl = bufl;
--
--	return 0;
--
--err_map:
--	for (i = 0; i < n; i++)
--		if (!dma_mapping_error(dev, bufl->buffers[i].addr))
--			dma_unmap_single(dev, bufl->buffers[i].addr,
--					 bufl->buffers[i].len,
--					 DMA_FROM_DEVICE);
--	kfree(bufl);
--	*bl = NULL;
--
--	return -ENOMEM;
--}
--
--static void qat_bl_sgl_free_unmap(struct adf_accel_dev *accel_dev,
--				  struct scatterlist *sgl,
--				  struct qat_alg_buf_list *bl,
--				  bool free_bl)
--{
--	if (bl) {
--		qat_bl_sgl_unmap(accel_dev, bl);
--
--		if (free_bl)
--			kfree(bl);
--	}
--	if (sgl)
--		sgl_free(sgl);
--}
--
--static int qat_bl_sgl_alloc_map(struct adf_accel_dev *accel_dev,
--				struct scatterlist **sgl,
--				struct qat_alg_buf_list **bl,
--				unsigned int dlen,
--				gfp_t gfp)
--{
--	struct scatterlist *dst;
--	int ret;
--
--	dst = sgl_alloc(dlen, gfp, NULL);
--	if (!dst) {
--		dev_err(&GET_DEV(accel_dev), "sg_alloc failed\n");
--		return -ENOMEM;
--	}
--
--	ret = qat_bl_sgl_map(accel_dev, dst, bl);
--	if (ret)
--		goto err;
--
--	*sgl = dst;
--
--	return 0;
--
--err:
--	sgl_free(dst);
--	*sgl = NULL;
--	return ret;
--}
--
--int qat_bl_realloc_map_new_dst(struct adf_accel_dev *accel_dev,
--			       struct scatterlist **sg,
--			       unsigned int dlen,
--			       struct qat_request_buffs *qat_bufs,
--			       gfp_t gfp)
--{
--	struct device *dev = &GET_DEV(accel_dev);
--	dma_addr_t new_blp = DMA_MAPPING_ERROR;
--	struct qat_alg_buf_list *new_bl;
--	struct scatterlist *new_sg;
--	size_t new_bl_size;
--	int ret;
--
--	ret = qat_bl_sgl_alloc_map(accel_dev, &new_sg, &new_bl, dlen, gfp);
--	if (ret)
--		return ret;
--
--	new_bl_size = struct_size(new_bl, buffers, new_bl->num_bufs);
--
--	/* Map new firmware SGL descriptor */
--	new_blp = dma_map_single(dev, new_bl, new_bl_size, DMA_TO_DEVICE);
--	if (unlikely(dma_mapping_error(dev, new_blp)))
--		goto err;
--
--	/* Unmap old firmware SGL descriptor */
--	dma_unmap_single(dev, qat_bufs->bloutp, qat_bufs->sz_out, DMA_TO_DEVICE);
--
--	/* Free and unmap old scatterlist */
--	qat_bl_sgl_free_unmap(accel_dev, *sg, qat_bufs->blout,
--			      !qat_bufs->sgl_dst_valid);
--
--	qat_bufs->sgl_dst_valid = false;
--	qat_bufs->blout = new_bl;
--	qat_bufs->bloutp = new_blp;
--	qat_bufs->sz_out = new_bl_size;
--
--	*sg = new_sg;
--
--	return 0;
--err:
--	qat_bl_sgl_free_unmap(accel_dev, new_sg, new_bl, true);
--
--	if (!dma_mapping_error(dev, new_blp))
--		dma_unmap_single(dev, new_blp, new_bl_size, DMA_TO_DEVICE);
--
--	return -ENOMEM;
--}
-diff --git a/drivers/crypto/intel/qat/qat_common/qat_bl.h b/drivers/crypto/intel/qat/qat_common/qat_bl.h
-index 3f5b79015400..2827d5055d3c 100644
---- a/drivers/crypto/intel/qat/qat_common/qat_bl.h
-+++ b/drivers/crypto/intel/qat/qat_common/qat_bl.h
-@@ -65,10 +65,4 @@ static inline gfp_t qat_algs_alloc_flags(struct crypto_async_request *req)
- 	return req->flags & CRYPTO_TFM_REQ_MAY_SLEEP ? GFP_KERNEL : GFP_ATOMIC;
- }
- 
--int qat_bl_realloc_map_new_dst(struct adf_accel_dev *accel_dev,
--			       struct scatterlist **newd,
--			       unsigned int dlen,
--			       struct qat_request_buffs *qat_bufs,
--			       gfp_t gfp);
--
- #endif
-diff --git a/drivers/crypto/intel/qat/qat_common/qat_comp_algs.c b/drivers/crypto/intel/qat/qat_common/qat_comp_algs.c
-index 9d5848e28ff8..a6e02405d402 100644
---- a/drivers/crypto/intel/qat/qat_common/qat_comp_algs.c
-+++ b/drivers/crypto/intel/qat/qat_common/qat_comp_algs.c
-@@ -183,7 +183,7 @@ static int qat_comp_alg_compress_decompress(struct acomp_req *areq, enum directi
- 	if (!areq->src || !slen)
- 		return -EINVAL;
- 
--	if (areq->dst && !dlen)
-+	if (!areq->dst || !dlen)
- 		return -EINVAL;
- 
- 	if (dir == COMPRESSION) {
-diff --git a/drivers/crypto/intel/qat/qat_common/qat_comp_req.h b/drivers/crypto/intel/qat/qat_common/qat_comp_req.h
-index 404e32c5e778..18a1f33a6db9 100644
---- a/drivers/crypto/intel/qat/qat_common/qat_comp_req.h
-+++ b/drivers/crypto/intel/qat/qat_common/qat_comp_req.h
-@@ -25,16 +25,6 @@ static inline void qat_comp_create_req(void *ctx, void *req, u64 src, u32 slen,
- 	req_pars->out_buffer_sz = dlen;
- }
- 
--static inline void qat_comp_override_dst(void *req, u64 dst, u32 dlen)
--{
--	struct icp_qat_fw_comp_req *fw_req = req;
--	struct icp_qat_fw_comp_req_params *req_pars = &fw_req->comp_pars;
--
--	fw_req->comn_mid.dest_data_addr = dst;
--	fw_req->comn_mid.dst_length = dlen;
--	req_pars->out_buffer_sz = dlen;
--}
--
- static inline void qat_comp_create_compression_req(void *ctx, void *req,
- 						   u64 src, u32 slen,
- 						   u64 dst, u32 dlen,
--- 
-2.39.5
-
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Yes, that tracks.
