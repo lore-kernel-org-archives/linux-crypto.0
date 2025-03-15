@@ -1,85 +1,85 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42BFF1F9F60
-	for <linux-crypto@vger.kernel.org>; Sat, 15 Mar 2025 12:37:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5EB01DC99C;
+	Sat, 15 Mar 2025 12:44:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742042263; cv=none; b=NQIkbDlp4SWCGdPVmtzbob0Ba6a5TA2HpzNkEDLvkT8NrR+slUlXcRw53Fpz6Co57Ynuwqwn/RGt8zw1ufQHyH3csV0MkVddkNI/AdgCpWx4DSfn1P8mKiIiR8OXQuemcuPqcuQmMjHDJOTOnzeDwfW+0wHmfWcn85kMzBFNShI=
+	t=1742042690; cv=none; b=GepCO/d9Ce5LVEopZR8YitZEIlHpM8YP04ZppprkNQ4piQKlZrngpvIB9pAoVYM+QibINZHCCjXU2u9LtvwvTDO+C/3gumyvuWVcJQll+UGpLQctYejvdJzyfCkFx3+Vb1RZgPtNjh27RDqQD+xeHQXZQa2Ykk9OzMR2nj+v/hs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742042263; c=relaxed/simple;
-	bh=wRZfS2NRSlj+i11vb4axQygGLFT1xNXEH398u7U/U2w=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=IYMuKIVxOHEit8W68qZGcCLm7jm3mMHjjhctTGohjNFiaOtxzi4fUr+m+uoJQyP0wkPkNOHxUZwUWlrbpH5q1ay+SZapzGfyNG1OWN8UsmiTuFVu+FkCSO0vyHWffdwNMr8llWJB8kRoCMQKD+wXYCs7pFFIVD2PDABsqP/QRHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=NsQ+UIZl; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1742042690; c=relaxed/simple;
+	bh=0SyWWPxkh/jr9ygniD6Y/E/3DXl0dsxx5nKuuFbZfo4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uU2SyEDZ9KyMGThXhGUSwT2pwNlzFaxpQTbSub1fkEksfV2FroYZA2w1c7uFWVsnCxO3+sTB7MXoAyn6EOag4VXCV4NBt0Dqj7+2vXCjPiaiXXqaTs65E/Imq5o6xpjz1ex+d8fLInLPdTcOVshCipUAQfPVGjBe7ZDIwpVUr80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=Rk+XFRTR; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="NsQ+UIZl"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=Content-Type:MIME-Version:Message-ID:Subject:To:From:Date:
-	Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=xE4pZni37CZcaZttUIqTwqnncKlqJUC+lVwdyNng2E0=; b=NsQ+UIZlxmb9C/Swz9t6L6jRuB
-	h0ePCsEA76vRFYPAy1FF2HXdlW+R860loyicY3WR2xja2Z9pNL324yTc1fFM0nULNbS5zfuYi08bt
-	ihN90Vox1pi6oVKw7er9bZx/BMd8ovOzKQ2XEvSsO7hR5sInTgBWck/SRHPB1kEPvUTVdeVUtP9YB
-	nZtbjtOarQRSB3YWo+/AUgniOXI1Cy79yOocZOOmaHK15ZcIoZ4U5dV5U7NU6kPm2fO6MQv2qQIu8
-	wrSzo7GVVoi6Vp0+Oc3xmlnTt50orHNeUQCGq6Il55XZKq8OJ/4RjcJPHhZPl4Hf3jWzeCA69M5+D
-	JrUinQaQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1ttQlk-006qS7-0h;
-	Sat, 15 Mar 2025 20:37:37 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sat, 15 Mar 2025 20:37:36 +0800
-Date: Sat, 15 Mar 2025 20:37:36 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Ard Biesheuvel <ardb@kernel.org>
-Subject: [PATCH] crypto: scompress - Fix scratch allocation failure handling
-Message-ID: <Z9V0kBchZ8N8JG9n@gondor.apana.org.au>
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="Rk+XFRTR"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
+	:Subject; bh=dUljyzWF3S7XDnU134pGASgsA1nXAkm8pnayZWUc2RY=; b=Rk+XFRTRtt2HAGTZ
+	UqSloHe9nqoGJw5W8yIMrPobYFw6/DhMkJnGHNC8gywxhBdu+7GvoR1mGGkdG0PSccet220W/DQbc
+	RVTCIqM4z6qYuZ1EVbaaWM5jvhF5I1RHemzNepyx34KogqCdRtwI7FRvr0l95aE+lVyDcKVCgt38+
+	f9kpqJJZh5b8gcglRSHvWPNidQLz2+XMuIHV1OwSyWYqEHlHUykdNWb4HuCP2SaQKilvP10WO+v5L
+	ytZhPigM2v0NACDmQrNgy63EOKBNOm0NXFaUbJLo2/cOkxBBOXzB7y7Q0MnV4KIS8AwgfmjBye3Al
+	aP5WumRMVgEP3MkvSA==;
+Received: from dg by mx.treblig.org with local (Exim 4.96)
+	(envelope-from <dg@treblig.org>)
+	id 1ttQsX-0053bk-0F;
+	Sat, 15 Mar 2025 12:44:37 +0000
+Date: Sat, 15 Mar 2025 12:44:37 +0000
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: dan.j.williams@intel.com, linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] async_xor: Remove unused 'async_xor_val'
+Message-ID: <Z9V2NQ_QxXC63Sh8@gallifrey>
+References: <20240929132148.44792-1-linux@treblig.org>
+ <Z9VDGGEWIpcyfFK_@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
+In-Reply-To: <Z9VDGGEWIpcyfFK_@gondor.apana.org.au>
+X-Chocolate: 70 percent or better cocoa solids preferably
+X-Operating-System: Linux/6.1.0-21-amd64 (x86_64)
+X-Uptime: 12:44:28 up 310 days, 23:58,  1 user,  load average: 0.00, 0.00,
+ 0.00
+User-Agent: Mutt/2.2.12 (2023-09-09)
 
-If the scratch allocation fails, all subsequent allocations will
-silently succeed without actually allocating anything.  Fix this
-by only incrementing users when the allocation succeeds.
+* Herbert Xu (herbert@gondor.apana.org.au) wrote:
+> On Sun, Sep 29, 2024 at 02:21:48PM +0100, linux@treblig.org wrote:
+> > From: "Dr. David Alan Gilbert" <linux@treblig.org>
+> > 
+> > async_xor_val has been unused since commit
+> > a7c224a820c3 ("md/raid5: convert to new xor compution interface")
+> > 
+> > Remove it.
+> > 
+> > Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+> > ---
+> >  crypto/async_tx/async_xor.c | 26 --------------------------
+> >  include/linux/async_tx.h    |  5 -----
+> >  2 files changed, 31 deletions(-)
+> 
+> Patch applied.  Thanks.
 
-Fixes: 6a8487a1f29f ("crypto: scompress - defer allocation of scratch buffer to first use")
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
- crypto/scompress.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+Thanks!
 
-diff --git a/crypto/scompress.c b/crypto/scompress.c
-index dc239ea8a46c..57bb7353d767 100644
---- a/crypto/scompress.c
-+++ b/crypto/scompress.c
-@@ -159,8 +159,12 @@ static int crypto_scomp_init_tfm(struct crypto_tfm *tfm)
- 		if (ret)
- 			goto unlock;
- 	}
--	if (!scomp_scratch_users++)
-+	if (!scomp_scratch_users) {
- 		ret = crypto_scomp_alloc_scratches();
-+		if (ret)
-+			goto unlock;
-+		scomp_scratch_users++;
-+	}
- unlock:
- 	mutex_unlock(&scomp_lock);
- 
+Dave
+
+> -- 
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> 
 -- 
-2.39.5
-
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+ -----Open up your eyes, open up your mind, open up your code -------   
+/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
+\        dave @ treblig.org |                               | In Hex /
+ \ _________________________|_____ http://www.treblig.org   |_______/
