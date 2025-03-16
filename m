@@ -1,43 +1,43 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 166E9D517
-	for <linux-crypto@vger.kernel.org>; Sun, 16 Mar 2025 01:21:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BB3428366
+	for <linux-crypto@vger.kernel.org>; Sun, 16 Mar 2025 01:21:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742088072; cv=none; b=Woxh9VcprbW85XPLSuqQ4A0YfJB4vVIpGdZZYHFiKbnWgL82KEMvQtn2GyEWOqoRgTbie4zVZv7j7fPbm3PqJQF95i6BcvVOAnh4TdCACpxGNJbN4kvi5zRQzHkxJ3xTxgA3fXOFMMdrNpPIt/gdHqqNXKllOU3Ar5ibElFYWo4=
+	t=1742088074; cv=none; b=Ob7jpSM2OMzKvJS/lkb/MstOcoFRZCHSBzKWIIhG7gtKPJy950HmHYbIiKnGGPCARA5F1auyJwD7Pqigfe0aYhE/egacjDVDQwIykPdSs7lTTXWaqr9pkGMq9oqMuV9Yo76gYkwmmhn1IREcFhJBbwVzUqIpkTDRjj8+tpRhfB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742088072; c=relaxed/simple;
-	bh=OWxwBSs5yrJHFMESk/oWN89hrJqeBHHpgjXAwq8zFmM=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To:Cc; b=r59QD20jJscz7MG9iiVWVInYJXZj4OdyguL/Y0wRWaCTug9MzMvs7U0LOlPLOcZaiRK+jCRi/EWf+9fxrAKV5kX729PCVh33l8V4YaJMKmIQ76BEYn94EKCXn3q07ol25CVT1WtB5mTsotlqC6R2fieEFDwv/8hSvu4kFLhoDOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=Gzi6K1mn; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1742088074; c=relaxed/simple;
+	bh=0qeCDuwDjUInxtG+RLgoJAu+XUjRVqI9KVOIR6LLbMw=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To:Cc; b=IXsf8pp0iixouVrF0RRkuLdrlA+rH6b0XBuXdvV2WbPXqQBMdl0+RAQPJl5rWYmD7oYeWPAFEjSNe/6+PKUHUvaXBDvgtj4juDPNGfSDix7L+mPDpJWAbtRP5SVh3F3Sp9DSKx8xGAlrb3ijyXtrluIG/PBWmjqpvIe5L1C4o4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=DDmpUExj; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="Gzi6K1mn"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="DDmpUExj"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=Cc:To:Subject:From:References:In-Reply-To:Message-Id:Date:
 	Sender:Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
 	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
 	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=d5d5VAeCgWYD4f2Bh8b3RIyc3Yo5MgtALdWgCZRLegs=; b=Gzi6K1mn/CSTTWxLciOb96QkQS
-	kRYecWPY64XinWc8idVd31Xg1r2HOEIH8P9wegfGbhLBGDJ1Dz6eY2Z155p5+cT8H+m3x7iaqa8ZV
-	4mzb+53qPs4G/DlIswpajfWci6PkYjn1JtjQ0ugucNAHYJ42GaEfLroB03HI98a6o9wsNRFv1ES4e
-	eLT2gT8W2sYAZ9LIzwSjpT6Di+PwhsYZVvtPoOJkFXGRti/I18wZMvhV2lsPQ5I0VUkQNJYnu2FsE
-	CjYev6agcoVSEbow0DHKojBgktL9cUcIrbfiNE0mXylMQMtuevyBfQHkPKWww5TQV4KVX3BVpDDX7
-	QoNvjBVg==;
+	bh=+JGvVLBj32PYZhDS468IFfO0K4N3h+A1P3EUPvLKmSg=; b=DDmpUExjMtO3tfAQVDihZaQiXF
+	2UxEEqzWeQxCaZ4IgwiurEi2ijRJp4Jwy1KC3PMiU1ndDpmR1z8dfSt26J0wPXuFpzt01oGlu9kXf
+	S7wKDGptx16mcRfeO+O7BQkMQFoCiYCIPL9DL0+v/EGPqG8HSbo5aub790xE0+CuUnvEF4qq32oMj
+	9TtPbCy2FRfn45aiqhXKwyagHFQQmT8O5l2ei/yEtZcKWrjIvdDivnCqHXgok8RAjSudqCGxO9xi4
+	jHAObe21nwLAIj61LaNcnvwGLKzSjX5rmE8s37pqFeRiK7ccHFbdrfMe5MC2DZh/1JSjUi//UjRac
+	CFYi7Tww==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1ttcgc-006xYL-0y;
-	Sun, 16 Mar 2025 09:21:07 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 16 Mar 2025 09:21:06 +0800
-Date: Sun, 16 Mar 2025 09:21:06 +0800
-Message-Id: <b6e08614af26f82f9bedcb76f28c6c51a7728aee.1742087941.git.herbert@gondor.apana.org.au>
+	id 1ttcge-006xYY-1w;
+	Sun, 16 Mar 2025 09:21:09 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 16 Mar 2025 09:21:08 +0800
+Date: Sun, 16 Mar 2025 09:21:08 +0800
+Message-Id: <9ce438ef6ad005bf95e77916da3dc0b292faab62.1742087941.git.herbert@gondor.apana.org.au>
 In-Reply-To: <cover.1742087941.git.herbert@gondor.apana.org.au>
 References: <cover.1742087941.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 02/11] crypto: 842 - drop obsolete 'comp' implementation
+Subject: [PATCH 03/11] crypto: deflate - drop obsolete 'comp' implementation
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Cc: Ard Biesheuvel <ardb@kernel.org>
 Precedence: bulk
@@ -48,109 +48,100 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
 From: Ard Biesheuvel <ardb@kernel.org>
 
-The 'comp' API is obsolete and will be removed, so remove this comp
-implementation.
+No users of the obsolete 'comp' crypto compression API remain, so let's
+drop the software deflate version of it.
 
 Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- crypto/842.c | 66 ++--------------------------------------------------
- 1 file changed, 2 insertions(+), 64 deletions(-)
+ crypto/deflate.c | 58 +-----------------------------------------------
+ 1 file changed, 1 insertion(+), 57 deletions(-)
 
-diff --git a/crypto/842.c b/crypto/842.c
-index 2238478c3493..5fb37a925989 100644
---- a/crypto/842.c
-+++ b/crypto/842.c
-@@ -18,11 +18,10 @@
-  * drivers/crypto/nx/nx-842-crypto.c
-  */
- 
-+#include <crypto/internal/scompress.h>
- #include <linux/init.h>
- #include <linux/module.h>
--#include <linux/crypto.h>
- #include <linux/sw842.h>
--#include <crypto/internal/scompress.h>
- 
- struct crypto842_ctx {
- 	void *wmem;	/* working memory for compress */
-@@ -39,38 +38,11 @@ static void *crypto842_alloc_ctx(void)
+diff --git a/crypto/deflate.c b/crypto/deflate.c
+index 1bf7184ad670..5c346c544093 100644
+--- a/crypto/deflate.c
++++ b/crypto/deflate.c
+@@ -130,13 +130,6 @@ static void *deflate_alloc_ctx(void)
  	return ctx;
  }
  
--static int crypto842_init(struct crypto_tfm *tfm)
+-static int deflate_init(struct crypto_tfm *tfm)
 -{
--	struct crypto842_ctx *ctx = crypto_tfm_ctx(tfm);
+-	struct deflate_ctx *ctx = crypto_tfm_ctx(tfm);
 -
--	ctx->wmem = crypto842_alloc_ctx();
--	if (IS_ERR(ctx->wmem))
--		return -ENOMEM;
--
--	return 0;
+-	return __deflate_init(ctx);
 -}
 -
- static void crypto842_free_ctx(void *ctx)
+ static void __deflate_exit(void *ctx)
  {
- 	kfree(ctx);
+ 	deflate_comp_exit(ctx);
+@@ -149,13 +142,6 @@ static void deflate_free_ctx(void *ctx)
+ 	kfree_sensitive(ctx);
  }
  
--static void crypto842_exit(struct crypto_tfm *tfm)
+-static void deflate_exit(struct crypto_tfm *tfm)
 -{
--	struct crypto842_ctx *ctx = crypto_tfm_ctx(tfm);
+-	struct deflate_ctx *ctx = crypto_tfm_ctx(tfm);
 -
--	crypto842_free_ctx(ctx->wmem);
+-	__deflate_exit(ctx);
 -}
 -
--static int crypto842_compress(struct crypto_tfm *tfm,
--			      const u8 *src, unsigned int slen,
--			      u8 *dst, unsigned int *dlen)
--{
--	struct crypto842_ctx *ctx = crypto_tfm_ctx(tfm);
--
--	return sw842_compress(src, slen, dst, dlen, ctx->wmem);
--}
--
- static int crypto842_scompress(struct crypto_scomp *tfm,
- 			       const u8 *src, unsigned int slen,
- 			       u8 *dst, unsigned int *dlen, void *ctx)
-@@ -78,13 +50,6 @@ static int crypto842_scompress(struct crypto_scomp *tfm,
- 	return sw842_compress(src, slen, dst, dlen, ctx);
+ static int __deflate_compress(const u8 *src, unsigned int slen,
+ 			      u8 *dst, unsigned int *dlen, void *ctx)
+ {
+@@ -185,14 +171,6 @@ static int __deflate_compress(const u8 *src, unsigned int slen,
+ 	return ret;
  }
  
--static int crypto842_decompress(struct crypto_tfm *tfm,
--				const u8 *src, unsigned int slen,
--				u8 *dst, unsigned int *dlen)
+-static int deflate_compress(struct crypto_tfm *tfm, const u8 *src,
+-			    unsigned int slen, u8 *dst, unsigned int *dlen)
 -{
--	return sw842_decompress(src, slen, dst, dlen);
+-	struct deflate_ctx *dctx = crypto_tfm_ctx(tfm);
+-
+-	return __deflate_compress(src, slen, dst, dlen, dctx);
 -}
 -
- static int crypto842_sdecompress(struct crypto_scomp *tfm,
- 				 const u8 *src, unsigned int slen,
- 				 u8 *dst, unsigned int *dlen, void *ctx)
-@@ -92,20 +57,6 @@ static int crypto842_sdecompress(struct crypto_scomp *tfm,
- 	return sw842_decompress(src, slen, dst, dlen);
+ static int deflate_scompress(struct crypto_scomp *tfm, const u8 *src,
+ 			     unsigned int slen, u8 *dst, unsigned int *dlen,
+ 			     void *ctx)
+@@ -241,14 +219,6 @@ static int __deflate_decompress(const u8 *src, unsigned int slen,
+ 	return ret;
+ }
+ 
+-static int deflate_decompress(struct crypto_tfm *tfm, const u8 *src,
+-			      unsigned int slen, u8 *dst, unsigned int *dlen)
+-{
+-	struct deflate_ctx *dctx = crypto_tfm_ctx(tfm);
+-
+-	return __deflate_decompress(src, slen, dst, dlen, dctx);
+-}
+-
+ static int deflate_sdecompress(struct crypto_scomp *tfm, const u8 *src,
+ 			       unsigned int slen, u8 *dst, unsigned int *dlen,
+ 			       void *ctx)
+@@ -256,19 +226,6 @@ static int deflate_sdecompress(struct crypto_scomp *tfm, const u8 *src,
+ 	return __deflate_decompress(src, slen, dst, dlen, ctx);
  }
  
 -static struct crypto_alg alg = {
--	.cra_name		= "842",
--	.cra_driver_name	= "842-generic",
--	.cra_priority		= 100,
+-	.cra_name		= "deflate",
+-	.cra_driver_name	= "deflate-generic",
 -	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
--	.cra_ctxsize		= sizeof(struct crypto842_ctx),
+-	.cra_ctxsize		= sizeof(struct deflate_ctx),
 -	.cra_module		= THIS_MODULE,
--	.cra_init		= crypto842_init,
--	.cra_exit		= crypto842_exit,
+-	.cra_init		= deflate_init,
+-	.cra_exit		= deflate_exit,
 -	.cra_u			= { .compress = {
--	.coa_compress		= crypto842_compress,
--	.coa_decompress		= crypto842_decompress } }
+-	.coa_compress 		= deflate_compress,
+-	.coa_decompress  	= deflate_decompress } }
 -};
 -
  static struct scomp_alg scomp = {
- 	.alloc_ctx		= crypto842_alloc_ctx,
- 	.free_ctx		= crypto842_free_ctx,
-@@ -121,25 +72,12 @@ static struct scomp_alg scomp = {
+ 	.alloc_ctx		= deflate_alloc_ctx,
+ 	.free_ctx		= deflate_free_ctx,
+@@ -283,24 +240,11 @@ static struct scomp_alg scomp = {
  
- static int __init crypto842_mod_init(void)
+ static int __init deflate_mod_init(void)
  {
 -	int ret;
 -
@@ -167,14 +158,13 @@ index 2238478c3493..5fb37a925989 100644
 -	return ret;
 +	return crypto_register_scomp(&scomp);
  }
- subsys_initcall(crypto842_mod_init);
  
- static void __exit crypto842_mod_exit(void)
+ static void __exit deflate_mod_fini(void)
  {
 -	crypto_unregister_alg(&alg);
  	crypto_unregister_scomp(&scomp);
  }
- module_exit(crypto842_mod_exit);
+ 
 -- 
 2.39.5
 
