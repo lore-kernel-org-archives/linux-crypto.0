@@ -1,47 +1,43 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9703C3FE4
-	for <linux-crypto@vger.kernel.org>; Sun, 16 Mar 2025 04:35:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A98F93FE4
+	for <linux-crypto@vger.kernel.org>; Sun, 16 Mar 2025 04:36:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742099704; cv=none; b=tF7Yc3lXdkm7vQDCK5GOAwqGxe/OwMmkr69o9DIxsJa9//6+mVMKrnCGoxS1N+fCre/BGW9cLsTPNouCiqPH5EHzR1GszajpwoDULBg6fWA5eVlDPA1N5vcgD1+c2H8olKsKWXK1dMRxf6a73wclpvElUDZKOAYTSfFDbIERaWE=
+	t=1742099793; cv=none; b=qAf5OQLUjXSfhu2nVEG8KfjMFr2vNYP1UKbvac5bZIMz1ljOCtMrcf1bGQHfEJ5a2laf/XdRpn/oupcmNAVbOCSlel0vRzdFf93p3DqFaAmfpC3uNhvIErPeBFKGRC7zlvDWMxAZYopPs0QvqF0WUkG/YY4A1UFgdn5ILJo1bvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742099704; c=relaxed/simple;
-	bh=3zw+V45kchpT1BnNlpE2cQxVqoGPef+UI1HLnsWvxNA=;
+	s=arc-20240116; t=1742099793; c=relaxed/simple;
+	bh=SencnnOEgjallz4lIuxp4nn/vvqcLNJ1WTKcrAklLQ8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BkM/eTzMjZMoSmJ9SWXpDG7s/ScVsz3H1EEBzQfCmA4hmc5itQtUFrl0x9lP18picQqssm0cbe4mZeee1r/8tgGP3EVZNYxs5W8AR7Okhbq3sXNsMEfd74cBxEPrRQQtJbvBpTxx/lGOkFTxwF31S3vECZPpEmRObtZ6LpclGoA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=WUncfrH6; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	 Content-Type:Content-Disposition:In-Reply-To; b=JSL4saldW7T35O18nqcf4z9GmT0Pk8qZvdB/pIkJywjWxz/xTU8aezvvQ8DYqitAXXUtF5JpBCCTZzb79oO1B8uafon4XNZ21r6TBF/dF9vUbTV6c0HjO/SyN2HzHNtvzs3x2Rky4r8kvwfT5cUCzZ1WWKP9FYfOi4OS2ysWqTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=grWVnqrC; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="WUncfrH6"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=TRn9AdheWolObx3qjoaxQAXPpmlhgN1ZKk+VGaKit8c=; b=WUncfrH6Akm54zq1RI4qhinSka
-	ycsnr7XhCP8a9kAZ+iTxl0npybklDjRbV1hT275ujSvd/RahQ/BGUBFpV2/ehftkMFTFE+89fG8f3
-	Ntew0ty/PvjUsaNbK8dTgLbOGYHlFFpherfR+EQJmV802vzuVht4Q6QbMIsJWXjJI7bzrBFxxRNGd
-	qzL7tOdU6U9vdRhHPIvL12ONsyq2yVz/7jCN5j25vWqvBCMf+L1EnmGW2DZVeBSjqn1xvQzmmrdCP
-	lcigRP1ZHHUwhwzguwnNYQ2keEJeMevLMs/Rv26JvnLB3MvHBnh2kMYYPiqolTeK3tYiIXjB0kb0U
-	0DwwR3bQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1ttfiD-006yxe-2s;
-	Sun, 16 Mar 2025 12:34:58 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Sun, 16 Mar 2025 12:34:57 +0800
-Date: Sun, 16 Mar 2025 12:34:57 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [v3 PATCH 1/3] lib/scatterlist: Add SG_MITER_LOCAL and use it
-Message-ID: <Z9ZU8bB7MSg9d3yt@gondor.apana.org.au>
-References: <cover.1741842470.git.herbert@gondor.apana.org.au>
- <eee86a8ed9152a79b21c41e900a47279c09c28fe.1741842470.git.herbert@gondor.apana.org.au>
- <20250316033247.GB117195@sol.localdomain>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="grWVnqrC"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE405C4CEDD;
+	Sun, 16 Mar 2025 04:36:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742099793;
+	bh=SencnnOEgjallz4lIuxp4nn/vvqcLNJ1WTKcrAklLQ8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=grWVnqrCuVHN+WZtvYhUACt5TP+mKxzlYLelp4A7ittoi6F0D9D5el5iWA1EKgF+p
+	 hsZ7rYg1XrhR1ZqbJ26KIhvpREgEY3e+0Ea8tDErWh/S2frez2zkkRLQBpYcnWaRal
+	 IgYu+5Q9OLkMEMXU5cAzpkTmv++ZF0z6J1pDi5VAvmWmF1PZTqFqPNnEEYrDl44QeQ
+	 P1/62B/LtnKINtGy3dlQmJeiJ7H65y2bvE71uQqoYen7XK7hLIQD4V2D5EJsNpph/h
+	 k4R2HL7ZsRwyMUTQUyWSRXB3ns5SxHl7CozLwBVqWEDQG6EzkQi+Ngrk2i1ckPVkpj
+	 gygkkNx3HUaYg==
+Date: Sat, 15 Mar 2025 21:36:31 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Yosry Ahmed <yosry.ahmed@linux.dev>,
+	Kanchana P Sridhar <kanchana.p.sridhar@intel.com>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: Re: [v3 PATCH 3/8] crypto: acomp - Move stream management into scomp
+ layer
+Message-ID: <20250316043631.GC117195@sol.localdomain>
+References: <cover.1741488107.git.herbert@gondor.apana.org.au>
+ <25f96a0e0e642e9d1c6014b12b00fd21b9f9c785.1741488107.git.herbert@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -50,22 +46,27 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250316033247.GB117195@sol.localdomain>
+In-Reply-To: <25f96a0e0e642e9d1c6014b12b00fd21b9f9c785.1741488107.git.herbert@gondor.apana.org.au>
 
-On Sat, Mar 15, 2025 at 08:32:47PM -0700, Eric Biggers wrote:
-> On Thu, Mar 13, 2025 at 01:14:53PM +0800, Herbert Xu wrote:
-> >   * Context:
-> > - *   May sleep if !SG_MITER_ATOMIC.
-> > + *   May sleep if !SG_MITER_ATOMIC && !SG_MITER_LOCAL.
-> 
-> This is incorrect.  kmap_local_page() does not disable preemption.
+On Sun, Mar 09, 2025 at 10:43:17AM +0800, Herbert Xu wrote:
+> Rather than allocating the stream memoryin the request object,
+> move it into a per-cpu buffer managed by scomp.  This takes the
+> stress off the user from having to manage large request objects
+> and setting up their own per-cpu buffers in order to do so.
 
-I thought it was talking about the function itself, i.e., that
-kmap may sleep.  But on a second look yes this is ambiguous and
-it could be made clearer.
+Well, except the workspace (which you seem to be calling a "stream" for some
+reason) size depends heavily on the compression parameters, such as the maximum
+input length and compression level.  Zstd for example wants 1303288 (comp) +
+95944 (decomp) with the parameters the crypto API is currently setting, but only
+89848 + 95944 if it's properly configured with estimated_src_size=4096 which is
+what most of the users actually want.  So making this a per-algorithm property
+is insufficiently flexible.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+But of course there is also no guarantee that users want it to be per-"tfm"
+either, let alone have a full set of per-CPU buffers.  FWIW, this series makes
+the kernel use an extra 40 MB of memory on my system if I enable
+CONFIG_UBIFS_FS, which seems problematic.
+
+I don't think the crypto API model works well for compression at all, TBH.
+
+- Eric
