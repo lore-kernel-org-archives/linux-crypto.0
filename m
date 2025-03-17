@@ -1,44 +1,44 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16286218E97
-	for <linux-crypto@vger.kernel.org>; Mon, 17 Mar 2025 08:33:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFE2C21ABC8
+	for <linux-crypto@vger.kernel.org>; Mon, 17 Mar 2025 08:34:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742200443; cv=none; b=uvWXl4qLKv4ipASWmr0iRP+64SKpo6C1ST7mVPUAuN6ahtzNRjWwL51rN/nreOOCkHvn6fI7ZsjrLQ76rTglpcDu+neJiDwBj8P7x/7CMPJJfliHdK0Zg8cNcLGojS8XraNffOyCkjevm52ANI352HJeu8I+DXAK5IBNhZJ630E=
+	t=1742200443; cv=none; b=LYmFkpeduxPL28xRK6Ms5hbkqdQJ0X/B4KCmtePWyBKMuypt0Q8kwM9wP0lxr9bPHVtPygDIdf2YmAXOHESPLwwaMJ/h9X5iWoDz+plHcac8xmu4IzT7J4WnKp7igmS0GihXygvcm0O+pIfMLkd82mRNhIxliuwqzVbPA4cEKuY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1742200443; c=relaxed/simple;
-	bh=g/QrcrseuFJzplfbtCrKtwQbgaq9n94FOi3oU1oK6nI=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To:Cc; b=ruIoBJkK9cI9pCDZd0V09Ku8w18FnPekBnuTRvuJhfDk52jbaHr0yTa7Q4WYD98Bfd54GigDgu48SkRzDTCfzF7O14a5Ln5JgTWE4Fk98+p+dmpXLnuGnovLIdk18d7Ce/bVTpt8D2DoPaj8cqZgQrCn+7KJnbsrpZkXQmbCF9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=gkLTXlJw; arc=none smtp.client-ip=144.6.53.87
+	bh=ffbX1KnIF/OOwWI4YbjBxSDjexreBHyRaQWojGKsQsU=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To:Cc; b=P70KVctDTe911J2bTwVorX3IEvOe4ipM3dtWH8P32LsSQKTMLiVGLWdBpFI1NSlFg1SNJQfjEfQDP9Br50uWCrGwD4dg1bkTO19qjf4xo563X9yZoyrHfrPSsbg3Gk1gM6W6zg9P/FzpM/b7Akj/3v189/e4ibiqiRjMPKFWhR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=gzlagFtv; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="gkLTXlJw"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="gzlagFtv"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=Cc:To:Subject:From:References:In-Reply-To:Message-Id:Date:
 	Sender:Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
 	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
 	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=gAAWRQSR5MmdcU7FrfTHk4P9nefdcJJ4e5xzE60NWig=; b=gkLTXlJwEPWl52JMFSocx6u/Ym
-	G+FmWhXXqZ+db19+UlhImtxpFt1MSgQY+hNMDM3qxWu6IsMTKDxQPUKra+xX25qYb8jQW+WaSkzmK
-	AR0/tOPX3dhBUcWpY6kiAd6dHpUxAB58IegRRnBKveDG7usUNTuBe950KJUjLuCXaI0xdt9SQlDHy
-	OIKeFn3dfCQlNRxZJtIo6k7K2cTVS+fx7gF+PRCm9LtXIDA5+vjri8sWmXwM+71q6m3hkhY2OXNAw
-	h4dL7SWfdBxBfFaTKWDCCRX26ZRFSF6cDbs/+VvM/+mMKaX3AO0heY04iPngNYsbnYi235x0VmBaY
-	wuqrbgFw==;
+	bh=jIWtXz5ZyOCGLSquEkXQDSND3wfG3MzCbvAznjyXJug=; b=gzlagFtvKe9yTqh+VjUHfIAnk4
+	XVosye8tvTG53cnDSB8njjEJYTNE5XHEUEQhtxiL4USAJb114clExfnCGTVmJIlqyKibUryIQpRI1
+	/YPhlqvDGDaYImcf/t5JPWguizSuXLszs+Fd8dFzI/arJNAcp8DUaA3mmy5vUQEzfFQZejvZcGgEE
+	/iOEOLoqAQkHA7j4GxAxKQUYKuLHSxGtiVYy2y3OCG8fGKvhWf+WG1Ab6goxMpoe+xnXJbBYJq3/L
+	FTCRoaDBxqs6K+/w+EGMB4uYh3qv7tlh43adFN/FcBm88pF4dSim5g1BYQtsb007x6JcDelntyney
+	ozzI8t4g==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tu5v0-007UWH-2j;
-	Mon, 17 Mar 2025 16:33:55 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 17 Mar 2025 16:33:54 +0800
-Date: Mon, 17 Mar 2025 16:33:54 +0800
-Message-Id: <5ef9f00197b486e9c7cc4602318736b639ee143c.1742200161.git.herbert@gondor.apana.org.au>
+	id 1tu5v3-007UWS-0U;
+	Mon, 17 Mar 2025 16:33:58 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Mon, 17 Mar 2025 16:33:57 +0800
+Date: Mon, 17 Mar 2025 16:33:57 +0800
+Message-Id: <87134afb04c78b317f54b56bbcc01ea495461ce0.1742200161.git.herbert@gondor.apana.org.au>
 In-Reply-To: <cover.1742200161.git.herbert@gondor.apana.org.au>
 References: <cover.1742200161.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 1/3] crypto: api - Move alg destroy work from instance to
- template
+Subject: [PATCH 2/3] crypto: api - Ensure cra_type->destroy is done in process
+ context
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Cc: Eric Biggers <ebiggers@kernel.org>
 Precedence: bulk
@@ -47,127 +47,104 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
-Commit 9ae4577bc077 ("crypto: api - Use work queue in
-crypto_destroy_instance") introduced a work struct to free an
-instance after the last user goes away.
-
-Move the delayed work from the instance into its template so that
-when the template is unregistered it can ensure that all its
-instances have been freed before returning.
+Move the cra_type->destroy call out of crypto_alg_put and into
+crypto_unregister_alg and crypto_free_instance.  This ensures
+that it's always done in process context so calls such as flush_work
+can be done.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- crypto/algapi.c         | 35 +++++++++++++++++++++++++++--------
- include/crypto/algapi.h |  5 +++--
- 2 files changed, 30 insertions(+), 10 deletions(-)
+ crypto/algapi.c   | 13 ++++++++++---
+ crypto/api.c      | 10 ----------
+ crypto/internal.h |  3 +--
+ 3 files changed, 11 insertions(+), 15 deletions(-)
 
 diff --git a/crypto/algapi.c b/crypto/algapi.c
-index ea9ed9580aa8..22bf80aad82b 100644
+index 22bf80aad82b..5b8a4c787387 100644
 --- a/crypto/algapi.c
 +++ b/crypto/algapi.c
-@@ -71,12 +71,23 @@ static void crypto_free_instance(struct crypto_instance *inst)
+@@ -66,7 +66,13 @@ static int crypto_check_alg(struct crypto_alg *alg)
+ 
+ static void crypto_free_instance(struct crypto_instance *inst)
+ {
+-	inst->alg.cra_type->free(inst);
++	struct crypto_alg *alg = &inst->alg;
++	const struct crypto_type *type;
++
++	type = alg->cra_type;
++	if (type->destroy)
++		type->destroy(alg);
++	type->free(inst);
+ }
  
  static void crypto_destroy_instance_workfn(struct work_struct *w)
- {
--	struct crypto_instance *inst = container_of(w, struct crypto_instance,
-+	struct crypto_template *tmpl = container_of(w, struct crypto_template,
- 						    free_work);
--	struct crypto_template *tmpl = inst->tmpl;
-+	struct crypto_instance *inst;
-+	struct hlist_node *n;
-+	HLIST_HEAD(list);
- 
--	crypto_free_instance(inst);
--	crypto_tmpl_put(tmpl);
-+	down_write(&crypto_alg_sem);
-+	hlist_for_each_entry_safe(inst, n, &tmpl->dead, list) {
-+		if (refcount_read(&inst->alg.cra_refcnt) != -1)
-+			continue;
-+		hlist_del(&inst->list);
-+		hlist_add_head(&inst->list, &list);
-+	}
-+	up_write(&crypto_alg_sem);
-+
-+	hlist_for_each_entry_safe(inst, n, &list, list)
-+		crypto_free_instance(inst);
- }
- 
- static void crypto_destroy_instance(struct crypto_alg *alg)
-@@ -84,9 +95,10 @@ static void crypto_destroy_instance(struct crypto_alg *alg)
- 	struct crypto_instance *inst = container_of(alg,
- 						    struct crypto_instance,
- 						    alg);
-+	struct crypto_template *tmpl = inst->tmpl;
- 
--	INIT_WORK(&inst->free_work, crypto_destroy_instance_workfn);
--	schedule_work(&inst->free_work);
-+	refcount_set(&alg->cra_refcnt, -1);
-+	schedule_work(&tmpl->free_work);
- }
- 
- /*
-@@ -132,14 +144,17 @@ static void crypto_remove_instance(struct crypto_instance *inst,
- 
- 	inst->alg.cra_flags |= CRYPTO_ALG_DEAD;
- 
--	if (!tmpl || !crypto_tmpl_get(tmpl))
-+	if (!tmpl)
- 		return;
- 
--	list_move(&inst->alg.cra_list, list);
-+	list_del_init(&inst->alg.cra_list);
+@@ -150,7 +156,6 @@ static void crypto_remove_instance(struct crypto_instance *inst,
+ 	list_del_init(&inst->alg.cra_list);
  	hlist_del(&inst->list);
-+	hlist_add_head(&inst->list, &tmpl->dead);
- 	inst->alg.cra_destroy = crypto_destroy_instance;
+ 	hlist_add_head(&inst->list, &tmpl->dead);
+-	inst->alg.cra_destroy = crypto_destroy_instance;
  
  	BUG_ON(!list_empty(&inst->alg.cra_users));
-+
-+	crypto_alg_put(&inst->alg);
+ 
+@@ -479,7 +484,8 @@ void crypto_unregister_alg(struct crypto_alg *alg)
+ 	if (WARN_ON(refcount_read(&alg->cra_refcnt) != 1))
+ 		return;
+ 
+-	crypto_alg_put(alg);
++	if (alg->cra_type && alg->cra_type->destroy)
++		alg->cra_type->destroy(alg);
+ 
+ 	crypto_remove_final(&list);
  }
+@@ -637,6 +643,7 @@ int crypto_register_instance(struct crypto_template *tmpl,
  
- /*
-@@ -504,6 +519,8 @@ int crypto_register_template(struct crypto_template *tmpl)
- 	struct crypto_template *q;
- 	int err = -EEXIST;
+ 	inst->alg.cra_module = tmpl->module;
+ 	inst->alg.cra_flags |= CRYPTO_ALG_INSTANCE;
++	inst->alg.cra_destroy = crypto_destroy_instance;
  
-+	INIT_WORK(&tmpl->free_work, crypto_destroy_instance_workfn);
-+
  	down_write(&crypto_alg_sem);
  
- 	crypto_check_module_sig(tmpl->module);
-@@ -565,6 +582,8 @@ void crypto_unregister_template(struct crypto_template *tmpl)
- 		crypto_free_instance(inst);
- 	}
- 	crypto_remove_final(&users);
-+
-+	flush_work(&tmpl->free_work);
+diff --git a/crypto/api.c b/crypto/api.c
+index 3416e98128a0..2880aa04bb99 100644
+--- a/crypto/api.c
++++ b/crypto/api.c
+@@ -703,15 +703,5 @@ void crypto_req_done(void *data, int err)
  }
- EXPORT_SYMBOL_GPL(crypto_unregister_template);
+ EXPORT_SYMBOL_GPL(crypto_req_done);
  
-diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-index 6e07bbc04089..03b7eca8af9a 100644
---- a/include/crypto/algapi.h
-+++ b/include/crypto/algapi.h
-@@ -68,16 +68,17 @@ struct crypto_instance {
- 		struct crypto_spawn *spawns;
- 	};
- 
--	struct work_struct free_work;
+-void crypto_destroy_alg(struct crypto_alg *alg)
+-{
+-	if (alg->cra_type && alg->cra_type->destroy)
+-		alg->cra_type->destroy(alg);
 -
- 	void *__ctx[] CRYPTO_MINALIGN_ATTR;
- };
+-	if (alg->cra_destroy)
+-		alg->cra_destroy(alg);
+-}
+-EXPORT_SYMBOL_GPL(crypto_destroy_alg);
+-
+ MODULE_DESCRIPTION("Cryptographic core API");
+ MODULE_LICENSE("GPL");
+diff --git a/crypto/internal.h b/crypto/internal.h
+index 11567ea24fc3..2edefb546ad4 100644
+--- a/crypto/internal.h
++++ b/crypto/internal.h
+@@ -128,7 +128,6 @@ void *crypto_create_tfm_node(struct crypto_alg *alg,
+ 			const struct crypto_type *frontend, int node);
+ void *crypto_clone_tfm(const struct crypto_type *frontend,
+ 		       struct crypto_tfm *otfm);
+-void crypto_destroy_alg(struct crypto_alg *alg);
  
- struct crypto_template {
- 	struct list_head list;
- 	struct hlist_head instances;
-+	struct hlist_head dead;
- 	struct module *module;
+ static inline void *crypto_create_tfm(struct crypto_alg *alg,
+ 			const struct crypto_type *frontend)
+@@ -166,7 +165,7 @@ static inline struct crypto_alg *crypto_alg_get(struct crypto_alg *alg)
+ static inline void crypto_alg_put(struct crypto_alg *alg)
+ {
+ 	if (refcount_dec_and_test(&alg->cra_refcnt))
+-		crypto_destroy_alg(alg);
++		alg->cra_destroy(alg);
+ }
  
-+	struct work_struct free_work;
-+
- 	int (*create)(struct crypto_template *tmpl, struct rtattr **tb);
- 
- 	char name[CRYPTO_MAX_ALG_NAME];
+ static inline int crypto_tmpl_get(struct crypto_template *tmpl)
 -- 
 2.39.5
 
