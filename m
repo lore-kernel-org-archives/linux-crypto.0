@@ -1,52 +1,49 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3738318BC3D;
-	Mon, 17 Mar 2025 12:38:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2DD22259A;
+	Mon, 17 Mar 2025 13:03:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742215095; cv=none; b=pEjwyYJ8FEcAaSTBjxLiD3hZyECOwZurraOexCg2PfBkXcXO9RKAwJsfx4XOZKm5+YargBx0q+S5rjmGrABzpVAg5NXIKc+zlD6eO8sj8SqLhrfBp8ZCm5m6ob271nO4JnXjewDfkWjkDvMe8nmzIiKRnJElBgwrg0eHCk6WAPA=
+	t=1742216600; cv=none; b=LlouitI/yncX1Fn9yqE1H2OGkkYRES2MI95pYK1Jz6PzJtdMHdgbRE6sZn7go1sW8nfMwT3XuMrDIWzPncxj9SQogMlsOGFu967nn0H7m4d8Gd3WSZD4OFeEJuHlUkwMxwEUhtsNCXB02KKNQsyWxJmsI8mmCrB+V3iZq3Poo0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742215095; c=relaxed/simple;
-	bh=NNOOVTyWPirOiqEpb0K268B1ZkWd7p9GAsy4D2XpjfM=;
+	s=arc-20240116; t=1742216600; c=relaxed/simple;
+	bh=fEwQ0C5kR1bbzBiLEQfApgF2TVTQ7AcnbeLV+bPV28U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fhSwliFxyg2U5urXaBPX08Nx4mzJg49ltfc0VyhUe8iY97jhAQaL0xa/F1Fm6o4ZvJomfsYzR1F4NTfmPAk6IljAHjp8YlOgaCTvWJx3I22gLF5KIeTSKXVYrLqIEIogZUW7Fa7IQMRVGYc4gc8PLoGKW5VWlyQC7Smt51qZNlY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V3x4cKBH; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=MDS46XcIzMn6EHqQQBcx4ZYcs6uxd5qerjcXE9RndGSgOXog/9HCPUbq6L85TayfrcfXuiNii+AlTuMdsAmSuxJ+P//jA54Alxke8IXWvRXpJDZ116WO4kxXomevclsKroRiQ5BfwNHglqdPMYgupsNs8aRwdp/G6Ng7nl4p/d8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=goLK9Dhp; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V3x4cKBH"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02CDCC4CEE3;
-	Mon, 17 Mar 2025 12:38:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742215094;
-	bh=NNOOVTyWPirOiqEpb0K268B1ZkWd7p9GAsy4D2XpjfM=;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="goLK9Dhp"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4476C4CEE3;
+	Mon, 17 Mar 2025 13:03:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1742216599;
+	bh=fEwQ0C5kR1bbzBiLEQfApgF2TVTQ7AcnbeLV+bPV28U=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=V3x4cKBHl3uHHz0Azu5+brr25Bewu/N15j4gUBCyRubmwfKw/5mDHDTACXzC/LF/e
-	 wWUF3WIzrpbJV15wFKsPrj4ohKfTRErPmAnTzmq9p8yDsl0MOjb92r4brIeVDfWn5d
-	 3BgqWnil8sTtT20qK1pbeJ4lxSbwh3dQ5uwzJ3Nfn4Wk163gEletDvrhvepudSeNxV
-	 vT4CliY/umh+JA2LNq/mg+1dA0UbEuPGNPnPZqEz+5bFLR6n80i0aK5gN1toAXIei7
-	 IYGmAqqftshQVJ+8wpl1ZbE69pwqjFPvA9L/4P4onyBPGqYlFFR5FGRnmnjWAnly4I
-	 TlHA+FKdSGeOw==
-Date: Mon, 17 Mar 2025 14:38:10 +0200
-From: Jarkko Sakkinen <jarkko@kernel.org>
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: Boris Brezillon <bbrezillon@kernel.org>,
-	Arnaud Ebalard <arno@natisbad.org>,
-	Srujana Challa <schalla@marvell.com>,
+	b=goLK9DhpAOLTYKopLe7M3gDVmm+fXVJUIiZTmjyu5CMRgXsZlrwDJy+GSmN8k4MjP
+	 8WYiYMBl0Jo5dt7260IQmVrKiWobh6hS2rbBhEenaMs8n39NSDLYvGV1BoaIBDGDl9
+	 tXu3q/tih1qNrKApDk3wjPCkD4vUGsQ8X8DuJqHg=
+Date: Mon, 17 Mar 2025 14:01:55 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Sudeep Holla <sudeep.holla@arm.com>
+Cc: linux-kernel@vger.kernel.org, Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>,
+	linux-pm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Howells <dhowells@redhat.com>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	"Justin M. Forbes" <jforbes@fedoraproject.org>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Arnd Bergmann <arnd@arndb.de>, Rosen Penev <rosenp@gmail.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	keyrings@vger.kernel.org, linux-security-module@vger.kernel.org
-Subject: Re: [PATCH] [v2] crypto: lib/Kconfig: hide library options
-Message-ID: <Z9gXsj0D5XmC6G2B@kernel.org>
-References: <20250314160543.605055-1-arnd@kernel.org>
+	Jeff Johnson <jeff.johnson@oss.qualcomm.com>,
+	linux-crypto@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	linux-efi@vger.kernel.org,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	linux-rtc@vger.kernel.org, Mark Brown <broonie@kernel.org>,
+	Takashi Iwai <tiwai@suse.com>, linux-sound@vger.kernel.org,
+	Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+	Borislav Petkov <bp@alien8.de>, linux-acpi@vger.kernel.org,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Subject: Re: [PATCH 0/9] drivers: Transition to the faux device interface
+Message-ID: <2025031705-scouting-scolding-8ff7@gregkh>
+References: <20250317-plat2faux_dev-v1-0-5fe67c085ad5@arm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -55,113 +52,26 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250314160543.605055-1-arnd@kernel.org>
+In-Reply-To: <20250317-plat2faux_dev-v1-0-5fe67c085ad5@arm.com>
 
-On Fri, Mar 14, 2025 at 05:05:32PM +0100, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
+On Mon, Mar 17, 2025 at 10:13:12AM +0000, Sudeep Holla wrote:
+> Recently when debugging why one of the scmi platform device was not
+> showing up under /sys/devices/platform/firmware:scmi instead was
+> appearing directly under /sys/devices/platform, I noticed the new
+> faux interface /sys/devices/faux.
 > 
-> Any driver that needs these library functions should already be selecting
-> the corresponding Kconfig symbols, so there is no real point in making
-> these visible.
+> Looking through the discussion and the background, I got excited and
+> took the opportunity to clear all the platform devices under
+> /sys/devices/platform on the Arm Juno/FVP platforms that are really
+> faux devices. Only the platform devices created for the device nodes
+> from the DT remain under /sys/devices/platform after these changes.
 > 
-> The original patch that made these user selectable described problems
-> with drivers failing to select the code they use, but for consistency
-> it's better to always use 'select' on a symbol than to mix it with
-> 'depends on'.
-> 
-> Fixes: e56e18985596 ("lib/crypto: add prompts back to crypto libraries")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
-> v2: add the missing 'select' statements
-> ---
->  drivers/crypto/marvell/Kconfig | 4 ++--
->  lib/crypto/Kconfig             | 8 ++++----
->  security/keys/Kconfig          | 2 +-
->  3 files changed, 7 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/crypto/marvell/Kconfig b/drivers/crypto/marvell/Kconfig
-> index 4c25a78ab3ed..aa269abb0499 100644
-> --- a/drivers/crypto/marvell/Kconfig
-> +++ b/drivers/crypto/marvell/Kconfig
-> @@ -24,7 +24,7 @@ config CRYPTO_DEV_OCTEONTX_CPT
->  	tristate "Support for Marvell OcteonTX CPT driver"
->  	depends on ARCH_THUNDER || COMPILE_TEST
->  	depends on PCI_MSI && 64BIT
-> -	depends on CRYPTO_LIB_AES
-> +	select CRYPTO_LIB_AES
->  	select CRYPTO_SKCIPHER
->  	select CRYPTO_HASH
->  	select CRYPTO_AEAD
-> @@ -41,10 +41,10 @@ config CRYPTO_DEV_OCTEONTX2_CPT
->  	tristate "Marvell OcteonTX2 CPT driver"
->  	depends on ARCH_THUNDER2 || COMPILE_TEST
->  	depends on PCI_MSI && 64BIT
-> -	depends on CRYPTO_LIB_AES
->  	depends on NET_VENDOR_MARVELL
->  	select OCTEONTX2_MBOX
->  	select CRYPTO_DEV_MARVELL
-> +	select CRYPTO_LIB_AES
->  	select CRYPTO_SKCIPHER
->  	select CRYPTO_HASH
->  	select CRYPTO_AEAD
-> diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
-> index 17322f871586..798972b29b68 100644
-> --- a/lib/crypto/Kconfig
-> +++ b/lib/crypto/Kconfig
-> @@ -63,7 +63,7 @@ config CRYPTO_LIB_CHACHA_INTERNAL
->  	select CRYPTO_LIB_CHACHA_GENERIC if CRYPTO_ARCH_HAVE_LIB_CHACHA=n
->  
->  config CRYPTO_LIB_CHACHA
-> -	tristate "ChaCha library interface"
-> +	tristate
->  	select CRYPTO
->  	select CRYPTO_LIB_CHACHA_INTERNAL
->  	help
-> @@ -93,7 +93,7 @@ config CRYPTO_LIB_CURVE25519_INTERNAL
->  	select CRYPTO_LIB_CURVE25519_GENERIC if CRYPTO_ARCH_HAVE_LIB_CURVE25519=n
->  
->  config CRYPTO_LIB_CURVE25519
-> -	tristate "Curve25519 scalar multiplication library"
-> +	tristate
->  	select CRYPTO
->  	select CRYPTO_LIB_CURVE25519_INTERNAL
->  	help
-> @@ -132,7 +132,7 @@ config CRYPTO_LIB_POLY1305_INTERNAL
->  	select CRYPTO_LIB_POLY1305_GENERIC if CRYPTO_ARCH_HAVE_LIB_POLY1305=n
->  
->  config CRYPTO_LIB_POLY1305
-> -	tristate "Poly1305 library interface"
-> +	tristate
->  	select CRYPTO
->  	select CRYPTO_LIB_POLY1305_INTERNAL
->  	help
-> @@ -141,7 +141,7 @@ config CRYPTO_LIB_POLY1305
->  	  is available and enabled.
->  
->  config CRYPTO_LIB_CHACHA20POLY1305
-> -	tristate "ChaCha20-Poly1305 AEAD support (8-byte nonce library version)"
-> +	tristate
->  	select CRYPTO_LIB_CHACHA
->  	select CRYPTO_LIB_POLY1305
->  	select CRYPTO_LIB_UTILS
-> diff --git a/security/keys/Kconfig b/security/keys/Kconfig
-> index abb03a1b2a5c..d4f5fc1e7263 100644
-> --- a/security/keys/Kconfig
-> +++ b/security/keys/Kconfig
-> @@ -60,7 +60,7 @@ config BIG_KEYS
->  	bool "Large payload keys"
->  	depends on KEYS
->  	depends on TMPFS
-> -	depends on CRYPTO_LIB_CHACHA20POLY1305 = y
-> +	select CRYPTO_LIB_CHACHA20POLY1305
->  	help
->  	  This option provides support for holding large keys within the kernel
->  	  (for example Kerberos ticket caches).  The data may be stored out to
-> -- 
-> 2.39.5
-> 
-> 
+> All the patches are independent of each other.
 
-Acked-by: Jarkko Sakkinen <jarkko@kernel.org>
+That's great, but you need to send these all independently to each
+subsystem as needed.  Having it all in one series doesn't work for any
+of the maintainers of any of the subsystems.
 
-BR, Jarkko
+And I'm glad to see this work happening, thanks for doing that!
+
+greg k-h
