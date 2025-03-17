@@ -1,91 +1,100 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99DFF38DEC;
-	Mon, 17 Mar 2025 14:21:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6641D8F4A;
+	Mon, 17 Mar 2025 14:22:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742221265; cv=none; b=LXvr1awAGmwCgu4Kbg7BdKcg5VB7YAoC8Ayb/gs1mELLuZZY43r0QPg3R+kb6j6hKj82vRKafg/cRjr2ukHvrZyAkEMfR/Wnz0ST0Qmj/r9EuXIuBsH4jdW1YoDOs3JJp0sDn8VTXCv5BprL0VgIz4rF+Qn7/0qVSP/ppQFEToY=
+	t=1742221371; cv=none; b=HRzVCCm1+Kris0KqJfpLivn4WC5UlGss+gogKk3uHi2goOf7pBicpZMGBU+Nmqupazvk6rKRNksdmaCN2qqx2Dtp0ETS9QtNUZM/ORhwyA/XboPGoBHS1CGIZbQAGC4hQ4QH3U0FhuCvCCFGKLxQrpf4XHYfYNpyqE3I5Dr2Abg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742221265; c=relaxed/simple;
-	bh=TAMZO+Www2JXyEzVnkPyMCDlKAnsJn0Ra9/i84lCzU0=;
+	s=arc-20240116; t=1742221371; c=relaxed/simple;
+	bh=JML17x1ArQHdjXBR7PRwTnBDDRX4qykPz2U6h/tv+xQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ImGclvEXrIEZ7rmOE8UPVViltMQowzdNlkhVn5JlPE5+deyucIrSmgCtr72TtLo4rleWo8QqRC3OMFN4ncvIhRfl9c3ZyiMXZ+fkPe5Inf6Sz5iQ+qLDSsSlDEbtvt3sWlhOixwxqYAhiD6m/etlk8fKWEvJL3iRknqy+VIWYJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B5RIiOEC; arc=none smtp.client-ip=10.30.226.201
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B5RIiOEC"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF198C4CEE3;
-	Mon, 17 Mar 2025 14:21:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742221265;
-	bh=TAMZO+Www2JXyEzVnkPyMCDlKAnsJn0Ra9/i84lCzU0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=B5RIiOECnb6LikTPnK6WERMaIGdBYP74g15Dw9IDaRyga31AvzNbL9Ub6VbrItoZi
-	 AiSpVG60ZnpTuCjJjbgDO+Q/Sh8vdGcU8DQzkYISRqcZ5upfvnubcqKV2mkA9hAkDC
-	 y/6neFTYR6OFo7co4+iuLQYsmLL3aJgRya74lMmMwla7wMw4uTi7kfx+MU5ssJ/mQg
-	 9pWmyqPDk44U+Q5JiSMTAo36yKOZqHofAe2UXHEdqEuVu8O/gp0c38v/+H+dd2hLOl
-	 5NG3qq4xHnNOYhvNB6XVCOh0RCtOYhpO/+LYz5RG54S0DODRrMq9b2lXDoqVhVnGX/
-	 2/9E4tXepoZrA==
-Date: Mon, 17 Mar 2025 14:20:58 +0000
-From: Mark Brown <broonie@kernel.org>
-To: Sudeep Holla <sudeep.holla@arm.com>
-Cc: linux-kernel@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Daniel Lezcano <daniel.lezcano@linaro.org>,
-	linux-pm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=sWRY/fSPVUmv3ghUdd1ZELweByeVHxw1g5PdMFEK5cWOVcnlUw7NQZs/OnnohoP+Lzxf2U3zsfY/306Avkt4DsSw0zEXRDyaF9FvM8vdZb57gKUuMac4FwFLc65bj8fY2g+H48QIVYQ5KQijRxSx1p/MzSPIrxC6u2CchGfyEs0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com; spf=none smtp.mailfrom=foss.arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=foss.arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EB6A313D5;
+	Mon, 17 Mar 2025 07:22:58 -0700 (PDT)
+Received: from bogus (e133711.arm.com [10.1.196.55])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BFF0A3F63F;
+	Mon, 17 Mar 2025 07:22:48 -0700 (PDT)
+Date: Mon, 17 Mar 2025 14:22:45 +0000
+From: Sudeep Holla <sudeep.holla@arm.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: linux-kernel@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
+	Sudeep Holla <sudeep.holla@arm.com>,
 	Jeff Johnson <jeff.johnson@oss.qualcomm.com>,
-	linux-crypto@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-	linux-efi@vger.kernel.org,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	linux-rtc@vger.kernel.org, Takashi Iwai <tiwai@suse.com>,
-	linux-sound@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-	Borislav Petkov <bp@alien8.de>, linux-acpi@vger.kernel.org,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Subject: Re: [PATCH 0/9] drivers: Transition to the faux device interface
-Message-ID: <b13eb5b3-198e-43e3-831a-45172e9975e9@sirena.org.uk>
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 2/9] hwrng: arm-smccc-trng - transition to the faux
+ device interface
+Message-ID: <Z9gwNaUoTmqViPrh@bogus>
 References: <20250317-plat2faux_dev-v1-0-5fe67c085ad5@arm.com>
+ <20250317-plat2faux_dev-v1-2-5fe67c085ad5@arm.com>
+ <2025031748-deface-wasting-b635@gregkh>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="PFsotoYFiaefK9IS"
-Content-Disposition: inline
-In-Reply-To: <20250317-plat2faux_dev-v1-0-5fe67c085ad5@arm.com>
-X-Cookie: I know how to do SPECIAL EFFECTS!!
-
-
---PFsotoYFiaefK9IS
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <2025031748-deface-wasting-b635@gregkh>
 
-On Mon, Mar 17, 2025 at 10:13:12AM +0000, Sudeep Holla wrote:
+On Mon, Mar 17, 2025 at 02:04:27PM +0100, Greg Kroah-Hartman wrote:
+> On Mon, Mar 17, 2025 at 10:13:14AM +0000, Sudeep Holla wrote:
+> > +MODULE_ALIAS("faux:smccc_trng");
+> 
+> Why do you need a branch new alias you just made up?  Please don't add
+> that for these types of devices, that's not going to work at all (just
+> like the platform alias really doesn't work well.
+> 
 
-> All the patches are independent of each other.
+Sure I will drop all of those alias. One question I have if the idea of
+creating a macro for this is good or bad ? I need this initial condition
+flag to make use of such a macro, so I didn't go for it, but it does
+remove some boiler-plate code.
 
-If that's the case don't send them in a series, it makes things more
-complicated to apply and the CCs cause more mail.  Split independent
-things up by subsystem.
+Let me know what do you think of it ?
 
---PFsotoYFiaefK9IS
-Content-Type: application/pgp-signature; name="signature.asc"
+Regards,
+Sudeep
 
------BEGIN PGP SIGNATURE-----
+-->8 
+diff --git i/include/linux/device/faux.h w/include/linux/device/faux.h
+index 9f43c0e46aa4..8af3eaef281a 100644
+--- i/include/linux/device/faux.h
++++ w/include/linux/device/faux.h
+@@ -66,4 +66,30 @@ static inline void faux_device_set_drvdata(struct faux_device *faux_dev, void *d
+ 	dev_set_drvdata(&faux_dev->dev, data);
+ }
+ 
++#define module_faux_driver(name, tag, init_cond)			\
++static struct faux_device_ops tag##_ops = {				\
++	.probe = tag##_probe,						\
++	.remove = tag##_remove,						\
++};									\
++									\
++static struct faux_device *tag##_dev;					\
++									\
++static int __init tag##_init(void)					\
++{									\
++	if (!(init_cond))						\
++		return 0;						\
++	tag##_dev = faux_device_create(name, NULL, &tag##_ops);		\
++	if (!tag##_dev)							\
++		return -ENODEV;						\
++									\
++	return 0;							\
++}									\
++module_init(tag##_init);						\
++									\
++static void __exit tag##_exit(void)					\
++{									\
++	faux_device_destroy(tag##_dev);					\
++}									\
++module_exit(tag##_exit);						\
++
+ #endif /* _FAUX_DEVICE_H_ */
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmfYL8kACgkQJNaLcl1U
-h9Brtgf/ed8/iheDRmn5QcrxD/Fq2JDB0jFynURxgNQDHy+TfIECBMxr4+ouEvh0
-6BYWqGbAjfU+qCRpcQM+3aIA/MyFE8Ckz6XBD3PkopN9hUwfkaBifc3cZLtPeeap
-OINXiEIOTl/jV4+0xkx0PVsCUy1BXiXCgfReCECnjB3tQxMEYZM5dFxgNYHq125y
-8VIE6wPZd2RtOg12Yg8I4++7o1vI8MP03+hy3P8HEmrzubZ8P/2t52y8OmWaQekJ
-9leSB9QSiycWUZ61emRRcVl6GzExoNf4mvPBTNuWEMFrUAD8AmU7AVtjddGPnSrx
-XFpbyUiXwtvodfzzg6B0KEx5kU9WEQ==
-=ALbI
------END PGP SIGNATURE-----
-
---PFsotoYFiaefK9IS--
