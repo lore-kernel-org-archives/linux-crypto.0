@@ -1,49 +1,40 @@
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2DD22259A;
-	Mon, 17 Mar 2025 13:03:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97226E56F;
+	Mon, 17 Mar 2025 13:05:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742216600; cv=none; b=LlouitI/yncX1Fn9yqE1H2OGkkYRES2MI95pYK1Jz6PzJtdMHdgbRE6sZn7go1sW8nfMwT3XuMrDIWzPncxj9SQogMlsOGFu967nn0H7m4d8Gd3WSZD4OFeEJuHlUkwMxwEUhtsNCXB02KKNQsyWxJmsI8mmCrB+V3iZq3Poo0A=
+	t=1742216753; cv=none; b=VZ0ZkZfIxJf0AYkEdyqIpgClIecqsuDOUmJwEma5N3tMZKOfbIRrqypexRv10T6fbFJZj5cQW3/kjEAvRj5i8r6sdowk0jC33tOLnkg71u+qLBYMVVg8m0Q963VvfEOzOZyXb6KDYhTSqWYM3cpdNUbFgBLhq7Dkv9j5bN4COt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742216600; c=relaxed/simple;
-	bh=fEwQ0C5kR1bbzBiLEQfApgF2TVTQ7AcnbeLV+bPV28U=;
+	s=arc-20240116; t=1742216753; c=relaxed/simple;
+	bh=9+BayI/3W2fli9bAbhq9aYLeJiIaK+dexWqAfoA1wkc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MDS46XcIzMn6EHqQQBcx4ZYcs6uxd5qerjcXE9RndGSgOXog/9HCPUbq6L85TayfrcfXuiNii+AlTuMdsAmSuxJ+P//jA54Alxke8IXWvRXpJDZ116WO4kxXomevclsKroRiQ5BfwNHglqdPMYgupsNs8aRwdp/G6Ng7nl4p/d8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=goLK9Dhp; arc=none smtp.client-ip=10.30.226.201
+	 Content-Type:Content-Disposition:In-Reply-To; b=azJUt5TnpIkX5YiOyQJhRdH9HLYlB7qBf6UfAKH1t5sDFpuqpXpFGCdrX+0TaUycZxxzJRLqI0/d6Afbmm90TheP+QPSPdOc5v1VDPhANQQCS1IlDk7wvihDA9jJjtZl+3X/reyzyspnt7TWwegfREtYS6EACwi1L4Z1+tSqfb4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Xu0sbxoU; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="goLK9Dhp"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4476C4CEE3;
-	Mon, 17 Mar 2025 13:03:18 +0000 (UTC)
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Xu0sbxoU"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32C8AC4CEE3;
+	Mon, 17 Mar 2025 13:05:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1742216599;
-	bh=fEwQ0C5kR1bbzBiLEQfApgF2TVTQ7AcnbeLV+bPV28U=;
+	s=korg; t=1742216753;
+	bh=9+BayI/3W2fli9bAbhq9aYLeJiIaK+dexWqAfoA1wkc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=goLK9DhpAOLTYKopLe7M3gDVmm+fXVJUIiZTmjyu5CMRgXsZlrwDJy+GSmN8k4MjP
-	 8WYiYMBl0Jo5dt7260IQmVrKiWobh6hS2rbBhEenaMs8n39NSDLYvGV1BoaIBDGDl9
-	 tXu3q/tih1qNrKApDk3wjPCkD4vUGsQ8X8DuJqHg=
-Date: Mon, 17 Mar 2025 14:01:55 +0100
+	b=Xu0sbxoU17DvK07bubIAXV45lnRVYQ+ZQS+e0K1RwoyrTzGSVAN4TBBg2lwhvK1d3
+	 8ttJYl+KSfSdtRVtSJBELfSVh6DjMlMzVwugRfq3d5DKFLm2ZtswngNaCfoj2X1wa3
+	 PBuDu6VGeyULJmaVtOepfnu5yHfJsMNsRGQH+XNk=
+Date: Mon, 17 Mar 2025 14:04:27 +0100
 From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To: Sudeep Holla <sudeep.holla@arm.com>
-Cc: linux-kernel@vger.kernel.org, Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Daniel Lezcano <daniel.lezcano@linaro.org>,
-	linux-pm@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
+Cc: linux-kernel@vger.kernel.org, Andre Przywara <andre.przywara@arm.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>,
 	Jeff Johnson <jeff.johnson@oss.qualcomm.com>,
-	linux-crypto@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-	linux-efi@vger.kernel.org,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	linux-rtc@vger.kernel.org, Mark Brown <broonie@kernel.org>,
-	Takashi Iwai <tiwai@suse.com>, linux-sound@vger.kernel.org,
-	Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-	Borislav Petkov <bp@alien8.de>, linux-acpi@vger.kernel.org,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Subject: Re: [PATCH 0/9] drivers: Transition to the faux device interface
-Message-ID: <2025031705-scouting-scolding-8ff7@gregkh>
+	linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 2/9] hwrng: arm-smccc-trng - transition to the faux
+ device interface
+Message-ID: <2025031748-deface-wasting-b635@gregkh>
 References: <20250317-plat2faux_dev-v1-0-5fe67c085ad5@arm.com>
+ <20250317-plat2faux_dev-v1-2-5fe67c085ad5@arm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -52,26 +43,15 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250317-plat2faux_dev-v1-0-5fe67c085ad5@arm.com>
+In-Reply-To: <20250317-plat2faux_dev-v1-2-5fe67c085ad5@arm.com>
 
-On Mon, Mar 17, 2025 at 10:13:12AM +0000, Sudeep Holla wrote:
-> Recently when debugging why one of the scmi platform device was not
-> showing up under /sys/devices/platform/firmware:scmi instead was
-> appearing directly under /sys/devices/platform, I noticed the new
-> faux interface /sys/devices/faux.
-> 
-> Looking through the discussion and the background, I got excited and
-> took the opportunity to clear all the platform devices under
-> /sys/devices/platform on the Arm Juno/FVP platforms that are really
-> faux devices. Only the platform devices created for the device nodes
-> from the DT remain under /sys/devices/platform after these changes.
-> 
-> All the patches are independent of each other.
+On Mon, Mar 17, 2025 at 10:13:14AM +0000, Sudeep Holla wrote:
+> +MODULE_ALIAS("faux:smccc_trng");
 
-That's great, but you need to send these all independently to each
-subsystem as needed.  Having it all in one series doesn't work for any
-of the maintainers of any of the subsystems.
+Why do you need a branch new alias you just made up?  Please don't add
+that for these types of devices, that's not going to work at all (just
+like the platform alias really doesn't work well.
 
-And I'm glad to see this work happening, thanks for doing that!
+thanks,
 
 greg k-h
