@@ -1,210 +1,76 @@
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CD9523373A;
-	Mon, 17 Mar 2025 10:13:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 605CC235BF5
+	for <linux-crypto@vger.kernel.org>; Mon, 17 Mar 2025 10:49:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742206436; cv=none; b=bsk0lVOQg0TrkqxOpQud96x5zM15Hq1beCE8P5vfS6RYOj+UgE1+11SZGp8CKcn3+lpyiK7WLWSzDd0qhQUb9PdfyrwLYTp8fxrDpQhxxXG5H7KtgblLCY1G3z54vKcTE/qUy218c5Vn7JftlejbV8zMaqtMniWxIC1Pdc/xqyU=
+	t=1742208554; cv=none; b=HjM2l6LgyQ9YlLJ8kQeMFF+PkVZ+6LVxqGxq6ADEbAfj0/eBlBv62uhvq/0RbxZTY8kpJPS4yEDL/1965jF+az5alqF/+dUdf5l0zXtWYEJHrI44nPSnxKxwLrkoGQU6VNlMl6D4CDEcol2y6C+GUjS7lOvMQOE6hoGUNhdTXzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742206436; c=relaxed/simple;
-	bh=W3iR8KyjlR4HJ4ebZ4zdbJscuXyuwHmntWmxKR0MThg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=S3sAr1xmuHAMfekH9CvWg4DyfWNtJ2vtu3s8TPy4dkugMcvPc5srQs0hJJLqtIeohZat+y99SDKlz8ISk0GLcFtAbcOG7Mzwuy1vw5AnBNxyBRB4mTado3m61cdRHeVgqyUJwWaFdkL1GY9AvFi/GYeMpKf6D53s72nCf9YuhSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8C9BD2573;
-	Mon, 17 Mar 2025 03:14:03 -0700 (PDT)
-Received: from e133711.arm.com (e133711.arm.com [10.1.196.55])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 74D523F673;
-	Mon, 17 Mar 2025 03:13:53 -0700 (PDT)
-From: Sudeep Holla <sudeep.holla@arm.com>
-Date: Mon, 17 Mar 2025 10:13:14 +0000
-Subject: [PATCH 2/9] hwrng: arm-smccc-trng - transition to the faux device
- interface
+	s=arc-20240116; t=1742208554; c=relaxed/simple;
+	bh=Kp18ekQ3AfM4qDIYttsL+4agfm89UIpbN5I4b9i+xME=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=a/QvWR1JyM2dAUwF6nMD43x6TMk9c8khj9KcXS6xEck9L72FCAXG6UToVT2zHFxVFHSqzE9iV90NgdMhbEX1sP4sGYUrkewEMZJHooJgZtjpsyKN8fjJ3xlD7iLIBkNPNwDzbQ8klrcaDAIFBFcEZruLjz1kcHZz0q1sGm3Z95I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BZU7zoAf; arc=none smtp.client-ip=95.215.58.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BZU7zoAf"
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1742208538;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=EIOtecTr1V7gaL+HzDR3DlZXqtP21yGqlv128Jc8x58=;
+	b=BZU7zoAfU6RK+MPW7YLHc7etIt6k9f7fHRaHe6saXSWWtlxWvOwLP/bi3TSTrelDLcs816
+	oqwq+LOvDmYx9iYyEndZHoyEFCMSK6nZDOiZ3IuKnuNKam9CRaNdE1c2WPLEfs4YHpZARH
+	SRMKSFQryMHtP4bAhzH3bQAWU600Tv0=
+From: Thorsten Blum <thorsten.blum@linux.dev>
+To: David Howells <dhowells@redhat.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>
+Cc: Thorsten Blum <thorsten.blum@linux.dev>,
+	keyrings@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: x509 - Replace kmalloc() + NUL-termination with kzalloc()
+Date: Mon, 17 Mar 2025 11:48:41 +0100
+Message-ID: <20250317104841.54336-2-thorsten.blum@linux.dev>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250317-plat2faux_dev-v1-2-5fe67c085ad5@arm.com>
-References: <20250317-plat2faux_dev-v1-0-5fe67c085ad5@arm.com>
-In-Reply-To: <20250317-plat2faux_dev-v1-0-5fe67c085ad5@arm.com>
-To: linux-kernel@vger.kernel.org
-Cc: Sudeep Holla <sudeep.holla@arm.com>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- Andre Przywara <andre.przywara@arm.com>, 
- Herbert Xu <herbert@gondor.apana.org.au>, 
- Jeff Johnson <jeff.johnson@oss.qualcomm.com>, linux-crypto@vger.kernel.org
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4989; i=sudeep.holla@arm.com;
- h=from:subject:message-id; bh=W3iR8KyjlR4HJ4ebZ4zdbJscuXyuwHmntWmxKR0MThg=;
- b=owEBbQKS/ZANAwAIAQBBurwxfuKYAcsmYgBn1/XbzQBCOprmjqQXP8AvPYDsVkXXAwu4hW/9j
- bUHAw5iPGuJAjMEAAEIAB0WIQS6ceUSBvMeskPdk+EAQbq8MX7imAUCZ9f12wAKCRAAQbq8MX7i
- mOK4D/wJDZIpz0HVPixe2YLXS2h4mgkw4nAlBTPrkjzL+jBjHJiYBuFHBMlGheXq0rOX545pDnW
- IK63VTS+lLKoFEnWeAYG4/ue0Ypu5BULhIRnD1t2P3qOaAFcm05eh3QWzmNkM0t0vzYNAhfANKz
- g6vrHf4KCdIEcmMzxqzbEn5zUGIpJ2RR0sO5xQG3DsYq79gcvajCqrgMfy4AkFVO4G9BldljaHB
- R6piMew3fE87FLqerinW/5iWJe/9c1S04eO2p9t+6BmTQ0HoH/fEfWMdY1oGP9yB1/EfkH2nNVc
- xqoPfRu432JGKioPfMyt21cdZgfjjvngphIK9Weh4RUQK18D5P/Qvi+z6bBoKMwYQ0aN5t6/XDc
- rPAu64977zZJDa3rkonMe9TS+8PKTOlbTRn4ZFfwkQ0U67nL8vskuTENquUiE+H4Yf7ZItLEspF
- rvjwVoLNhGk+bOpeqMFkCeGUxCRXDNg7wTULBW3fs9ndhhYqONM0ia5hlYumONjgyHY0tTTond3
- D1Iz29F/jVugpAgZlEEttvSK/K/p6jBSpCEVtJd4HzjktnZs1bP28wYpuGLhLKdDxkZKOLjKi0G
- OtiQ5wJ2tY7FbgQaWvhe2AeE2YBG4pCvdf1ND9rr3lbZ8QFAhNULN2n820Hl9cTSPTTBAGF5nZI
- TxonQGwQvcTMSYw==
-X-Developer-Key: i=sudeep.holla@arm.com; a=openpgp;
- fpr=7360A21742ADF5A11767C1C139CFD4755FE2D5B4
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-The Arm SMCCC based true random number generator driver does not require
-the creation of a platform device/driver. Originally, this approach was
-chosen for simplicity when the driver was first implemented.
+Use kzalloc() to zero out the one-element array instead of using
+kmalloc() followed by a manual NUL-termination.
 
-With the introduction of the lightweight faux device interface, we now
-have a more appropriate alternative. Migrate the driver to utilize the
-faux bus, given that the platform device it previously created was not
-a real one anyway. This will simplify the code, reducing its footprint
-while maintaining functionality.
+No functional changes intended.
 
-Cc: Andre Przywara <andre.przywara@arm.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Jeff Johnson <jeff.johnson@oss.qualcomm.com>
-Cc: linux-crypto@vger.kernel.org
-Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
+Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
 ---
- drivers/char/hw_random/arm_smccc_trng.c | 40 ++++++++++++++++++++++++---------
- drivers/firmware/smccc/smccc.c          | 21 -----------------
- 2 files changed, 29 insertions(+), 32 deletions(-)
+ crypto/asymmetric_keys/x509_cert_parser.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/char/hw_random/arm_smccc_trng.c b/drivers/char/hw_random/arm_smccc_trng.c
-index dcb8e7f37f25c6b39f76050369b9f324b7fb2e33..2ceab17f6360baaee999a23f3d7370b7b5b7d246 100644
---- a/drivers/char/hw_random/arm_smccc_trng.c
-+++ b/drivers/char/hw_random/arm_smccc_trng.c
-@@ -16,9 +16,11 @@
- #include <linux/device.h>
- #include <linux/hw_random.h>
- #include <linux/module.h>
--#include <linux/platform_device.h>
-+#include <linux/device/faux.h>
- #include <linux/arm-smccc.h>
+diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
+index ee2fdab42334..2ffe4ae90bea 100644
+--- a/crypto/asymmetric_keys/x509_cert_parser.c
++++ b/crypto/asymmetric_keys/x509_cert_parser.c
+@@ -372,10 +372,9 @@ static int x509_fabricate_name(struct x509_parse_context *ctx, size_t hdrlen,
  
-+#include <asm/archrandom.h>
-+
- #ifdef CONFIG_ARM64
- #define ARM_SMCCC_TRNG_RND	ARM_SMCCC_TRNG_RND64
- #define MAX_BITS_PER_CALL	(3 * 64UL)
-@@ -33,6 +35,8 @@
- #define SMCCC_RET_TRNG_INVALID_PARAMETER	-2
- #define SMCCC_RET_TRNG_NO_ENTROPY		-3
+ 	/* Empty name string if no material */
+ 	if (!ctx->cn_size && !ctx->o_size && !ctx->email_size) {
+-		buffer = kmalloc(1, GFP_KERNEL);
++		buffer = kzalloc(1, GFP_KERNEL);
+ 		if (!buffer)
+ 			return -ENOMEM;
+-		buffer[0] = 0;
+ 		goto done;
+ 	}
  
-+bool __ro_after_init smccc_trng_available;
-+
- static int copy_from_registers(char *buf, struct arm_smccc_res *res,
- 			       size_t bytes)
- {
-@@ -94,29 +98,43 @@ static int smccc_trng_read(struct hwrng *rng, void *data, size_t max, bool wait)
- 	return copied;
- }
- 
--static int smccc_trng_probe(struct platform_device *pdev)
-+static int smccc_trng_probe(struct faux_device *fdev)
- {
- 	struct hwrng *trng;
- 
--	trng = devm_kzalloc(&pdev->dev, sizeof(*trng), GFP_KERNEL);
-+	trng = devm_kzalloc(&fdev->dev, sizeof(*trng), GFP_KERNEL);
- 	if (!trng)
- 		return -ENOMEM;
- 
- 	trng->name = "smccc_trng";
- 	trng->read = smccc_trng_read;
- 
--	return devm_hwrng_register(&pdev->dev, trng);
-+	return devm_hwrng_register(&fdev->dev, trng);
- }
- 
--static struct platform_driver smccc_trng_driver = {
--	.driver = {
--		.name		= "smccc_trng",
--	},
--	.probe		= smccc_trng_probe,
-+static struct faux_device_ops smccc_trng_ops = {
-+	.probe = smccc_trng_probe,
- };
--module_platform_driver(smccc_trng_driver);
- 
--MODULE_ALIAS("platform:smccc_trng");
-+static int __init smccc_trng_init(void)
-+{
-+	struct faux_device *fdev;
-+
-+	smccc_trng_available = smccc_probe_trng();
-+	if (!smccc_trng_available)
-+		return 0;
-+
-+	fdev = faux_device_create("smccc_trng", NULL, &smccc_trng_ops);
-+	if (!fdev) {
-+		pr_err("smccc_trng: could not create the device\n");
-+		return -ENODEV;
-+	}
-+
-+	return 0;
-+}
-+device_initcall(smccc_trng_init);
-+
-+MODULE_ALIAS("faux:smccc_trng");
- MODULE_AUTHOR("Andre Przywara");
- MODULE_DESCRIPTION("Arm SMCCC TRNG firmware interface support");
- MODULE_LICENSE("GPL");
-diff --git a/drivers/firmware/smccc/smccc.c b/drivers/firmware/smccc/smccc.c
-index a74600d9f2d72a5aa0096004f53088c255927a43..0fcd175a53eeaa957d06071b3b26f4c3a3c7116e 100644
---- a/drivers/firmware/smccc/smccc.c
-+++ b/drivers/firmware/smccc/smccc.c
-@@ -9,13 +9,10 @@
- #include <linux/init.h>
- #include <linux/arm-smccc.h>
- #include <linux/kernel.h>
--#include <linux/platform_device.h>
--#include <asm/archrandom.h>
- 
- static u32 smccc_version = ARM_SMCCC_VERSION_1_0;
- static enum arm_smccc_conduit smccc_conduit = SMCCC_CONDUIT_NONE;
- 
--bool __ro_after_init smccc_trng_available = false;
- s32 __ro_after_init smccc_soc_id_version = SMCCC_RET_NOT_SUPPORTED;
- s32 __ro_after_init smccc_soc_id_revision = SMCCC_RET_NOT_SUPPORTED;
- 
-@@ -26,8 +23,6 @@ void __init arm_smccc_version_init(u32 version, enum arm_smccc_conduit conduit)
- 	smccc_version = version;
- 	smccc_conduit = conduit;
- 
--	smccc_trng_available = smccc_probe_trng();
--
- 	if ((smccc_version >= ARM_SMCCC_VERSION_1_2) &&
- 	    (smccc_conduit != SMCCC_CONDUIT_NONE)) {
- 		arm_smccc_1_1_invoke(ARM_SMCCC_ARCH_FEATURES_FUNC_ID,
-@@ -66,19 +61,3 @@ s32 arm_smccc_get_soc_id_revision(void)
- 	return smccc_soc_id_revision;
- }
- EXPORT_SYMBOL_GPL(arm_smccc_get_soc_id_revision);
--
--static int __init smccc_devices_init(void)
--{
--	struct platform_device *pdev;
--
--	if (smccc_trng_available) {
--		pdev = platform_device_register_simple("smccc_trng", -1,
--						       NULL, 0);
--		if (IS_ERR(pdev))
--			pr_err("smccc_trng: could not register device: %ld\n",
--			       PTR_ERR(pdev));
--	}
--
--	return 0;
--}
--device_initcall(smccc_devices_init);
-
 -- 
-2.34.1
+2.48.1
 
