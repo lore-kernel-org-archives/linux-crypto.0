@@ -1,136 +1,143 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4468E207DFA;
-	Tue, 18 Mar 2025 09:44:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45662EAC6;
+	Tue, 18 Mar 2025 10:51:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742291052; cv=none; b=YTzcRx1ZQYp8dlnq82KkI7IJ8MySVpJ8x0PEhbeAj35XBGTThcJ2JXWmYDG5kdBH/KjgCOBnIJT5DUuUInwpTZF75MWZmXKjd7UWTsTySyomwnYS9pIYs+OfmW/Ypf+LTErIpSERS/2WmOtkaErvoVemmvNXw2X+StITS3T9aYc=
+	t=1742295092; cv=none; b=JshDD735LHbcEK7EUfMtP3dGWZoBA+WozgCn8CNL4RxuaKmMwNM5seUQY9awf07o2wOcVrr+Pa1+EWGM9VwuWXmNu/haqm4Qh68fwi4f+RyMeqFySsxKCcYzB8zs05yqq2/13LBxyYXlMj/iS72w4NEnPC+IVKswBgkRU1m1jh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742291052; c=relaxed/simple;
-	bh=+sIGm7SiHYfk56urSAvw5hE5y62jrH6xv9wH7xwrn4s=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=YAX02QF4DiqEyp37ztOTZAhF1k4p5rnEM5ZScYbv84dsWv4ScR9bkCXMhvP6BRwzOSJNZ0sN6o1hMrwAA1nlzRjj7QmNrrMETdIWkdil6bo9c5eOAfgcmG5RuYeOJ+9+LXzu1dgS4k+ErNVwpjmtfbFbGbw09VNe7S/uUiZome4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=okBGhs4m; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="okBGhs4m"
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52I19MWP027513;
-	Tue, 18 Mar 2025 09:44:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	Ec7mSUzuCpU2xSIyFsw66IeCPuvXHL53OlAzuGrHofc=; b=okBGhs4my4naPQmF
-	uH+0/WSCaUH29ZRDjNfp49opKOkOSR+q7boXefF/uFMZ9YBm+FusJPiwuU+OQRcL
-	/tfXaQgwPg8T74Y9r+/uEA1fnj4jv0j/C63NZp+adO6PNnfe6C/EKz+fVU5yVMZy
-	rrjm80L2IbFNPI1fEpUbpiL0Ibv0sUx9XFXPYXFAcw7g56Jw9e1P5VcpnaLLuBVO
-	Ffh68wZTyidP/h4HHpkVxn8Gd4ggpJvfyY2eOZc0M7lcCfM023Vfv2AAokX7GZge
-	a/DAQO+bNUvUyjrNQekmKvkhTBkPf1qf4DCQ8Eh4ZUYnQm7uWijqtQQ1LgqM4Dcp
-	qZ+FLw==
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 45exwth9j0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 18 Mar 2025 09:44:01 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 52I9i1ot021941
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 18 Mar 2025 09:44:01 GMT
-Received: from hu-arakshit-hyd.qualcomm.com (10.80.80.8) by
- nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Tue, 18 Mar 2025 02:43:57 -0700
-From: Abhinaba Rakshit <quic_arakshit@quicinc.com>
-Date: Tue, 18 Mar 2025 15:13:24 +0530
-Subject: [PATCH v2 2/2] arm64: dts: qcom: qcs615: add QCrypto nodes
+	s=arc-20240116; t=1742295092; c=relaxed/simple;
+	bh=4umO4f6ePd0sJ1/++/GgZoX7xLdyK7mbDiQ6/iNDCaA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aG6OvssbfjLz0W3gT+o6/sh8pJYNZtg/Ts7wYQdmt2pJnPiglAahIQfHkz5z3Hrc68xyvGIn06HWjQDt5N3rI4/2zHrEsPZxHnrf2+cMAbFbSLlPwMsZS8LLua5QU8QgNnvle95erWS07pgHf6gXEEB5E9nSSGHYijGiQdFKUGk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-51eb1823a8eso2394283e0c.3;
+        Tue, 18 Mar 2025 03:51:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742295089; x=1742899889;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qNxLDnoSRAhm1nLn1xN2OwKLhUKpRiAxSHPfWger/54=;
+        b=XAt2m6ykDB4MjVDJReOq8/HMPQnEpwp7NW6gY53wKh66kpWfIG5Jwh5wnPZ31MVwWV
+         HhbKEZgLt0LXN6iSYjsPIz55alzBS3PMRdqvEK3aBd8Wt2w7daQN4FlRO3QW3fQVH1ik
+         u4SiozVCFRs7vwnAgpSwjucBGOCMT27TVwLjL16wGIINpdASf5GdJuhYG6lDDSJ87+W3
+         CG11R/fLf1S1GHE5yvDaJqFWhNwkjffpLaY4IVriCQ0l9ZJ2/ixO3C/HOGVEliRwgaje
+         cT8wUXiz3nnjhg0okHXRkuFSSCz3MfRbjzNuC+f1b6X47F74l8QJhILxJTYIwCukiHLJ
+         TGyg==
+X-Forwarded-Encrypted: i=1; AJvYcCUeE20qxew57HOpgJgTjHP27BIlq+eLOEDsONMQJHaCTnjSIE2WsvaIMAiSLeU8jitxf2uaH2HeCablp1/zwg==@vger.kernel.org, AJvYcCVwha4Rw4dSHWxhHqfi54YDJHy/73nZpXkcKN99z7Tlw677hRC1vNhWfHbcSV5HgzsajtGQnedaI9bj@vger.kernel.org, AJvYcCWtA/sDPlHH92/Zv1mHqaNW/xJZAHMt0qxNKmznFvKti+/d7GSls9s562z6ri3NVd8IplwlfE2MchzydN0=@vger.kernel.org, AJvYcCX2hjkUXj0Stsws5M630J+4JoYT9Vb5QkXU9mjodb7uynM5TqDqaJx6VDepgMJ3J+Asl76UrDrdPOoW2rv4@vger.kernel.org
+X-Gm-Message-State: AOJu0YyPMPHtp6AH3aole9OaS60Wg0FY1e98pZocGmI4Dl0AO4iM55vB
+	ihtFZQF+ykYELnBiTPszU693rtN5f1g9ZnC/A0FuBOwsKOw2vDJrqRdGLkGi
+X-Gm-Gg: ASbGncsKn5l8mw/rCtHcpVlNfL0vt9BzRabLugNaDDbUReGRd6wvY0727jLtDr71Iqy
+	orgS92osTP0cZYf++uobUsK6c2bT6VlzD6g8IDJnQKo9CvlvZl1y2c2FWFp1oOWfA8BRrAINfXs
+	eSHWudUmPtCbD+NSnYs7jYQiJAh8zzpqivYe1HSxHVMLap53/zJdd88JDqpSE0QUUh/q1ta6mwz
+	fqyWaVWZKxNjGOkaU9lPXAQPjkEiKzGSuNVkUZJPSroBooJ43jmOr1I1pJgUNr1Z7QKSna+ecWT
+	NG3824mw+6cU2PM4Y1HSrVXE4HRTbtNXRkvE/h7zV1t/kSl7QHTLEr4URR/LxIBDM6omYhZpIKx
+	JEgB6s0k0eZY=
+X-Google-Smtp-Source: AGHT+IGK8W1ulz1rqCWNtWhzDi7y6+XmdCKftGr72HNdqdyMYPhgG5vfge5b/TrjlBcrh59H9zkW3w==
+X-Received: by 2002:a05:6102:38cf:b0:4bb:d394:46ce with SMTP id ada2fe7eead31-4c38311c3dfmr11424948137.3.1742295088753;
+        Tue, 18 Mar 2025 03:51:28 -0700 (PDT)
+Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com. [209.85.221.173])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-86d90e8c43asm2026998241.34.2025.03.18.03.51.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 18 Mar 2025 03:51:28 -0700 (PDT)
+Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-52413efd0d3so2262813e0c.2;
+        Tue, 18 Mar 2025 03:51:28 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCU9BRsrE+ro8YMqiwm9mLHwbN3cBCYVdc2Py/m5AQpJp0LtmcDpWSdoVd/i6I+SX8JV0l7k/pbRs1gqw5M=@vger.kernel.org, AJvYcCVR1Tx4Xa6lmRSwA5yjZiBywI3qitQxTOh1iDlhIwRy4gDBSE9IfB4Z96+V4nGfXZYVBEMLmbodhoK5D0QmMA==@vger.kernel.org, AJvYcCVi/JVzTfuO9JBowpV76QT7Op2r48tXj4c6S5amyfORi398b8AmXs7fg05Ef6lPSrFRunxu8b8vf8FFDb7c@vger.kernel.org, AJvYcCVi6fbeEjQfKlTuZmcDsxQyqvVNnQ6xin0Z2yUL5SsRXQQqf3pNgUHcONbZpmfFykW3jUrzL77UEd+F@vger.kernel.org
+X-Received: by 2002:a05:6122:400f:b0:520:42d3:91d2 with SMTP id
+ 71dfb90a1353d-524498ae7d1mr9420222e0c.1.1742295088389; Tue, 18 Mar 2025
+ 03:51:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20250318-enable-qce-for-qcs615-v2-2-c5e05fe22572@quicinc.com>
-References: <20250318-enable-qce-for-qcs615-v2-0-c5e05fe22572@quicinc.com>
-In-Reply-To: <20250318-enable-qce-for-qcs615-v2-0-c5e05fe22572@quicinc.com>
-To: Thara Gopinath <thara.gopinath@gmail.com>,
-        Herbert Xu
-	<herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Rob
- Herring" <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        "Conor
- Dooley" <conor+dt@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        "Konrad Dybcio" <konradybcio@kernel.org>
-CC: <linux-arm-msm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        "Abhinaba
- Rakshit" <quic_arakshit@quicinc.com>
-X-Mailer: b4 0.14.2
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: buhvS6__BJgVwwhMvSUEI6qXxy76nM1C
-X-Proofpoint-ORIG-GUID: buhvS6__BJgVwwhMvSUEI6qXxy76nM1C
-X-Authority-Analysis: v=2.4 cv=UoJjN/wB c=1 sm=1 tr=0 ts=67d94061 cx=c_pps a=ouPCqIW2jiPt+lZRy3xVPw==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17 a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=Vs1iUdzkB0EA:10 a=COk6AnOGAAAA:8 a=vPGRc2FByOJ6E0OUo5QA:9 a=QEXdDO2ut3YA:10
- a=TjNXssC_j7lpFel5tvFf:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-03-18_04,2025-03-17_03,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
- impostorscore=0 bulkscore=0 priorityscore=1501 mlxlogscore=702
- phishscore=0 adultscore=0 clxscore=1015 spamscore=0 suspectscore=0
- lowpriorityscore=0 classifier=spam authscore=0 authtc=n/a authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2502280000
- definitions=main-2503180070
+References: <20250203142343.248839-1-dhowells@redhat.com> <20250203142343.248839-4-dhowells@redhat.com>
+In-Reply-To: <20250203142343.248839-4-dhowells@redhat.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Tue, 18 Mar 2025 11:51:16 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdX0ShSafh44_D7D9GW5OzxYPx1NUc4uxpsKe1jAiTsBaA@mail.gmail.com>
+X-Gm-Features: AQ5f1JqexfcZ4Wr8wl7KhbMINkBkWsh1eamHniftlMSeRlz46aDdMofNJr-x84g
+Message-ID: <CAMuHMdX0ShSafh44_D7D9GW5OzxYPx1NUc4uxpsKe1jAiTsBaA@mail.gmail.com>
+Subject: Re: [PATCH net 03/24] crypto: Add 'krb5enc' hash and cipher AEAD algorithm
+To: David Howells <dhowells@redhat.com>
+Cc: netdev@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>, 
+	Marc Dionne <marc.dionne@auristor.com>, Jakub Kicinski <kuba@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Trond Myklebust <trond.myklebust@hammerspace.com>, Chuck Lever <chuck.lever@oracle.com>, 
+	Eric Biggers <ebiggers@kernel.org>, Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org, 
+	linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Add the QCE and Crypto BAM DMA nodes.
+Hi David,
 
-Signed-off-by: Abhinaba Rakshit <quic_arakshit@quicinc.com>
----
- arch/arm64/boot/dts/qcom/qcs615.dtsi | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+On Mon, 3 Feb 2025 at 15:25, David Howells <dhowells@redhat.com> wrote:
+> Add an AEAD template that does hash-then-cipher (unlike authenc that does
+> cipher-then-hash).  This is required for a number of Kerberos 5 encoding
+> types.
+>
+> [!] Note that the net/sunrpc/auth_gss/ implementation gets a pair of
+> ciphers, one non-CTS and one CTS, using the former to do all the aligned
+> blocks and the latter to do the last two blocks if they aren't also
+> aligned.  It may be necessary to do this here too for performance reasons -
+> but there are considerations both ways:
+>
+>  (1) firstly, there is an optimised assembly version of cts(cbc(aes)) on
+>      x86_64 that should be used instead of having two ciphers;
+>
+>  (2) secondly, none of the hardware offload drivers seem to offer CTS
+>      support (Intel QAT does not, for instance).
+>
+> However, I don't know if it's possible to query the crypto API to find out
+> whether there's an optimised CTS algorithm available.
+>
+> Signed-off-by: David Howells <dhowells@redhat.com>
 
-diff --git a/arch/arm64/boot/dts/qcom/qcs615.dtsi b/arch/arm64/boot/dts/qcom/qcs615.dtsi
-index f4abfad474ea62dea13d05eb874530947e1e8d3e..156084182318dc251c6ef06bac7128808609d3ec 100644
---- a/arch/arm64/boot/dts/qcom/qcs615.dtsi
-+++ b/arch/arm64/boot/dts/qcom/qcs615.dtsi
-@@ -1114,6 +1114,29 @@ ufs_mem_phy: phy@1d87000 {
- 			status = "disabled";
- 		};
- 
-+		cryptobam: dma-controller@1dc4000 {
-+			compatible = "qcom,bam-v1.7.4", "qcom,bam-v1.7.0";
-+			reg = <0x0 0x01dc4000 0x0 0x24000>;
-+			interrupts = <GIC_SPI 272 IRQ_TYPE_LEVEL_HIGH>;
-+			#dma-cells = <1>;
-+			qcom,ee = <0>;
-+			qcom,controlled-remotely;
-+			num-channels = <16>;
-+			qcom,num-ees = <4>;
-+			iommus = <&apps_smmu 0x0104 0x0011>;
-+		};
-+
-+		crypto: crypto@1dfa000 {
-+			compatible = "qcom,qcs615-qce", "qcom,sm8150-qce", "qcom,qce";
-+			reg = <0x0 0x01dfa000 0x0 0x6000>;
-+			dmas = <&cryptobam 4>, <&cryptobam 5>;
-+			dma-names = "rx", "tx";
-+			iommus = <&apps_smmu 0x0104 0x0011>;
-+			interconnects = <&aggre1_noc MASTER_CRYPTO QCOM_ICC_TAG_ALWAYS
-+					 &mc_virt SLAVE_EBI1 QCOM_ICC_TAG_ALWAYS>;
-+			interconnect-names = "memory";
-+		};
-+
- 		tcsr_mutex: hwlock@1f40000 {
- 			compatible = "qcom,tcsr-mutex";
- 			reg = <0x0 0x01f40000 0x0 0x20000>;
+Thanks for your patch, which is now commit d1775a177f7f3815 ("crypto:
+Add 'krb5enc' hash and cipher AEAD algorithm") in crypto/master.
 
--- 
-2.34.1
+> --- a/crypto/Kconfig
+> +++ b/crypto/Kconfig
+> @@ -228,6 +228,18 @@ config CRYPTO_AUTHENC
+>
+>           This is required for IPSec ESP (XFRM_ESP).
+>
+> +config CRYPTO_KRB5ENC
+> +       tristate "Kerberos 5 combined hash+cipher support"
+> +       select CRYPTO_AEAD
+> +       select CRYPTO_SKCIPHER
+> +       select CRYPTO_MANAGER
+> +       select CRYPTO_HASH
+> +       select CRYPTO_NULL
+> +       help
+> +         Combined hash and cipher support for Kerberos 5 RFC3961 simplified
+> +         profile.  This is required for Kerberos 5-style encryption, used by
+> +         sunrpc/NFS and rxrpc/AFS.
 
+Hence shouldn't the latter (e.g. RPCSEC_GSS_KRB5) select CRYPTO_KRB5ENC
+or CRYPTO_KRB5? Or am I missing something?
+
+Thanks!
+
+> +
+>  config CRYPTO_TEST
+>         tristate "Testing module"
+>         depends on m || EXPERT
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
