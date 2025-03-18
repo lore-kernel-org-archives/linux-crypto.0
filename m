@@ -1,49 +1,62 @@
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6285F205E1C;
-	Tue, 18 Mar 2025 08:57:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2B66224CC;
+	Tue, 18 Mar 2025 09:44:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742288265; cv=none; b=s1bNFekWyGs1nxOvpA4qs4NuRFdxODndb513/Ndb+E9PZSxxguUcelPYREJqt5Hh9cDq1FLA1MbdTdgMJWzh2pgK23o19AtTfYQCUOG9rmLPuhWJQfgprYoWlmvSGQ5IGLXJ+FaAAIWNBjvExj9XSmslBIlGdu34aFZzbBEWxPw=
+	t=1742291048; cv=none; b=CNcgfzWCnpFSXYlf5PpZWZ6JZNLWQahUB/UEaCSsfOYzMXoD+AYsqR1/qidhqHSUKkhEtzHKomeOUSNI6aTISQSGDuPvfy4NfnWi/tWco0L7H9qQZI12q7BTRPKo6CjnG192mh4TKmXiANacCjR6NdmkLQFTPx1TIdVgFPHptx4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742288265; c=relaxed/simple;
-	bh=2f1C8R0hIz6n+6W0nH3Z+GVlBTjFR1v8fu0TPpXUMTQ=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OfqwuszN9ZmFnNPVIXrkpvxk6togrsjIY/a+uXd6QrpfYpW7PeLkmyQOtlcK0aQq5tAG1LYGhMj3XQe8eMdXueejVa+tCaMYVPncn7tCW0ri9H6FsKroNEtMYd/UVQZPt/gnfpo6Yx+FIaJxPCuRsVzAGjVxxS4a4yakiI2vfaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=QgpjOeyi; arc=none smtp.client-ip=205.220.168.131
+	s=arc-20240116; t=1742291048; c=relaxed/simple;
+	bh=fO0N91sKg6UmgHAk27a8Ze+v8c8xR6a4t21eOWUbCIM=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
+	 In-Reply-To:To:CC; b=qwGSgAEEUNWhmcgYN+15Xlf3Kvq/m5Cnl0PG7A3SKcQ3UpTTXbmZMK09z2SFcqMhUG7sinibFr+Mb2X3GLturx2D9IUAqYK20iXdIpZDUjP0nACMFmZgPMAmPTgi9I1+KpHx4ZAwuWibabmOL18sp+NhLoELrNBbSVzbFF91JcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=TbAt2wxJ; arc=none smtp.client-ip=205.220.180.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="QgpjOeyi"
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52I191si027058;
-	Tue, 18 Mar 2025 08:57:33 GMT
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="TbAt2wxJ"
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52I9MOOg027250;
+	Tue, 18 Mar 2025 09:43:58 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=Lzyz/arj6w1l3DX59ZpBFxii
-	X+gCYcK7Sb4orDZoWsY=; b=QgpjOeyiKtLNxe5Hr2tbRajqpXMEE5xRciNl0AKW
-	irOM8Wi/Ekrhy4lNGiFf1CXiW/CIFyonuqCCcN/7EJ79l89yQ47woup2TjHr2/8d
-	341ebLG0kiAN1kwBACtPxO6V+hzJMLOjCF4KYzNSUHxVs39DIlspyaKgSsSS4apR
-	pTI9vunHTlWkDxs01ocgp8v0UqRIOTzXWI+eUmK+tQ4H51Bxnt/9od4wP+kwoRxe
-	dteVL8abw4ANnHWvAgwAGwCWRdMxFTCSrX8ogXTdRuAszsMgeY5TcScvQpjdM48l
-	ZvsQnpbjcqSWvBmePOsv8t219WZGTaH1/q7G0709wUU7gQ==
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 45exwth4w9-1
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	MVeIWEpBpbFCUriLBgiAOdy9BSmbWVGJyIgSh/R0Ooo=; b=TbAt2wxJWCQw5dDb
+	BnnsbA/JF5XnU2+YGuucAc1vZUGKBorhXdtlipAFltU/Jl3SKOtg5okfpDqqiaVv
+	BNnVdO9xSDUJjRoryW9uMt56hWlbF4XeENkL94mmoEpL7PFCcWQUzUMsY6gpTBB1
+	8jFmKuyTSL/lIt13r7kMmsCT5kiK/MVWLg+LLDWvQW+GxxURWhFbPJOpbjlkSTDw
+	e/Ogm9zbInPL7F+xoStFc1ko2e9NzBMZwHV/wLejT1xD90y3EVDDjrj+I4uf8w5P
+	ssVivrRb025HMKzZbNQnWCF8SWyq27cHC5QrYvl8ePWAZVn9xtwBZxDYlX5XuWAs
+	WgTufA==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 45d1sxynxc-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 18 Mar 2025 08:57:33 +0000 (GMT)
+	Tue, 18 Mar 2025 09:43:58 +0000 (GMT)
 Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 52I8vIkw013115
+	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 52I9hv5D020385
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 18 Mar 2025 08:57:18 GMT
+	Tue, 18 Mar 2025 09:43:57 GMT
 Received: from hu-arakshit-hyd.qualcomm.com (10.80.80.8) by
  nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Tue, 18 Mar 2025 01:57:14 -0700
-Date: Tue, 18 Mar 2025 14:27:10 +0530
+ 15.2.1544.9; Tue, 18 Mar 2025 02:43:52 -0700
 From: Abhinaba Rakshit <quic_arakshit@quicinc.com>
-To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-CC: Thara Gopinath <thara.gopinath@gmail.com>,
+Date: Tue, 18 Mar 2025 15:13:23 +0530
+Subject: [PATCH v2 1/2] dt-bindings: crypto: qcom-qce: document QCS615
+ crypto engine
+Precedence: bulk
+X-Mailing-List: linux-crypto@vger.kernel.org
+List-Id: <linux-crypto.vger.kernel.org>
+List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-ID: <20250318-enable-qce-for-qcs615-v2-1-c5e05fe22572@quicinc.com>
+References: <20250318-enable-qce-for-qcs615-v2-0-c5e05fe22572@quicinc.com>
+In-Reply-To: <20250318-enable-qce-for-qcs615-v2-0-c5e05fe22572@quicinc.com>
+To: Thara Gopinath <thara.gopinath@gmail.com>,
         Herbert Xu
 	<herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
@@ -53,92 +66,51 @@ CC: Thara Gopinath <thara.gopinath@gmail.com>,
         "Conor
  Dooley" <conor+dt@kernel.org>,
         Bjorn Andersson <andersson@kernel.org>,
-        "Konrad Dybcio" <konradybcio@kernel.org>,
-        <linux-arm-msm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 2/2] arm64: dts: qcom: qcs615: add QCrypto nodes
-Message-ID: <20250318085710.zna6wbawbhb7kf44@hu-arakshit-hyd.qualcomm.com>
-References: <20250224-enable-qce-for-qcs615-v1-0-e7c665347eef@quicinc.com>
- <20250224-enable-qce-for-qcs615-v1-2-e7c665347eef@quicinc.com>
- <ac161039-af36-4e6c-90ea-ef858ea31e86@oss.qualcomm.com>
-Precedence: bulk
-X-Mailing-List: linux-crypto@vger.kernel.org
-List-Id: <linux-crypto.vger.kernel.org>
-List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <ac161039-af36-4e6c-90ea-ef858ea31e86@oss.qualcomm.com>
+        "Konrad Dybcio" <konradybcio@kernel.org>
+CC: <linux-arm-msm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        "Abhinaba
+ Rakshit" <quic_arakshit@quicinc.com>
+X-Mailer: b4 0.14.2
 X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
  nalasex01c.na.qualcomm.com (10.47.97.35)
 X-QCInternal: smtphost
 X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: 81D6mkMdXjmJwurUdxsoO0UK4yiQJS4a
-X-Proofpoint-ORIG-GUID: 81D6mkMdXjmJwurUdxsoO0UK4yiQJS4a
-X-Authority-Analysis: v=2.4 cv=UoJjN/wB c=1 sm=1 tr=0 ts=67d9357d cx=c_pps a=ouPCqIW2jiPt+lZRy3xVPw==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17 a=GEpy-HfZoHoA:10 a=kj9zAlcOel0A:10 a=Vs1iUdzkB0EA:10 a=COk6AnOGAAAA:8 a=j5hbVoT8eKfuacexB9YA:9 a=CjuIK1q_8ugA:10
- a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-GUID: r_P3UKwTuuYYQwHShhyiBTqPyx_xlFdH
+X-Proofpoint-ORIG-GUID: r_P3UKwTuuYYQwHShhyiBTqPyx_xlFdH
+X-Authority-Analysis: v=2.4 cv=XKcwSRhE c=1 sm=1 tr=0 ts=67d9405e cx=c_pps a=ouPCqIW2jiPt+lZRy3xVPw==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17 a=GEpy-HfZoHoA:10 a=IkcTkHD0fZMA:10 a=Vs1iUdzkB0EA:10 a=VwQbUJbxAAAA:8 a=COk6AnOGAAAA:8 a=D6xDKhzkZE5L37BfSJYA:9
+ a=QEXdDO2ut3YA:10 a=TjNXssC_j7lpFel5tvFf:22
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
  definitions=2025-03-18_04,2025-03-17_03,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
- impostorscore=0 bulkscore=0 priorityscore=1501 mlxlogscore=553
- phishscore=0 adultscore=0 clxscore=1015 spamscore=0 suspectscore=0
- lowpriorityscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ mlxlogscore=999 priorityscore=1501 clxscore=1015 phishscore=0
+ impostorscore=0 adultscore=0 mlxscore=0 malwarescore=0 suspectscore=0
+ spamscore=0 bulkscore=0 classifier=spam authscore=0 authtc=n/a authcc=
  route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2502280000
- definitions=main-2503180064
+ definitions=main-2503180070
 
-On Tue, Feb 25, 2025 at 02:52:36PM +0100, Konrad Dybcio wrote:
-> On 24.02.2025 11:04 AM, Abhinaba Rakshit wrote:
-> > Add the QCE and Crypto BAM DMA nodes.
-> > 
-> > Signed-off-by: Abhinaba Rakshit <quic_arakshit@quicinc.com>
-> > ---
-> >  arch/arm64/boot/dts/qcom/qcs615.dtsi | 25 +++++++++++++++++++++++++
-> >  1 file changed, 25 insertions(+)
-> > 
-> > diff --git a/arch/arm64/boot/dts/qcom/qcs615.dtsi b/arch/arm64/boot/dts/qcom/qcs615.dtsi
-> > index f4abfad474ea62dea13d05eb874530947e1e8d3e..25e98d20ec1d941f0b45cc3d94f298065c9a5566 100644
-> > --- a/arch/arm64/boot/dts/qcom/qcs615.dtsi
-> > +++ b/arch/arm64/boot/dts/qcom/qcs615.dtsi
-> > @@ -1114,6 +1114,31 @@ ufs_mem_phy: phy@1d87000 {
-> >  			status = "disabled";
-> >  		};
-> >  
-> > +		cryptobam: dma-controller@1dc4000 {
-> > +			compatible = "qcom,bam-v1.7.4", "qcom,bam-v1.7.0";
-> > +			reg = <0x0 0x01dc4000 0x0 0x24000>;
-> > +			interrupts = <GIC_SPI 272 IRQ_TYPE_LEVEL_HIGH>;
-> > +			#dma-cells = <1>;
-> > +			qcom,ee = <0>;
-> > +			qcom,controlled-remotely;
-> > +			num-channels = <16>;
-> > +			qcom,num-ees = <4>;
-> > +			iommus = <&apps_smmu 0x0104 0x0011>,
-> > +				 <&apps_smmu 0x0114 0x0011>;
-> 
-> (0x0114 & ~ 0x0011) == (0x0104 & ~0x0011), try dropping the second entry
-> here and below and see if things still work
-> 
+Document the crypto engine on the QCS615 platform.
 
-With dropping the second entry, as well qcrypto is still functional,
-Will update in the patch v2
+Acked-by: Rob Herring (Arm) <robh@kernel.org>
+Signed-off-by: Abhinaba Rakshit <quic_arakshit@quicinc.com>
+---
+ Documentation/devicetree/bindings/crypto/qcom-qce.yaml | 1 +
+ 1 file changed, 1 insertion(+)
 
-> > +		};
-> > +
-> > +		crypto: crypto@1dfa000 {
-> > +			compatible = "qcom,qcs615-qce", "qcom,sm8150-qce", "qcom,qce";
-> > +			reg = <0x0 0x01dfa000 0x0 0x6000>;
-> > +			dmas = <&cryptobam 4>, <&cryptobam 5>;
-> > +			dma-names = "rx", "tx";
-> > +			iommus = <&apps_smmu 0x0104 0x0011>,
-> > +				 <&apps_smmu 0x0114 0x0011>;
-> > +			interconnects = <&aggre1_noc MASTER_CRYPTO QCOM_ICC_TAG_ALWAYS
-> > +					&mc_virt SLAVE_EBI1 QCOM_ICC_TAG_ALWAYS>;
-> 
-> Please align the '&'s
+diff --git a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
+index 3ed56d9d378e38a7ed3f5cd606c4dc20955194f0..acc1eef9d85825d0331db314dd103b8c7a8e2ab3 100644
+--- a/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
++++ b/Documentation/devicetree/bindings/crypto/qcom-qce.yaml
+@@ -45,6 +45,7 @@ properties:
+ 
+       - items:
+           - enum:
++              - qcom,qcs615-qce
+               - qcom,qcs8300-qce
+               - qcom,sa8775p-qce
+               - qcom,sc7280-qce
 
-Will update in patch v2
+-- 
+2.34.1
 
-> 
-> Konrad
