@@ -1,105 +1,144 @@
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F8A01EB5D6;
-	Mon, 17 Mar 2025 23:26:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6285F205E1C;
+	Tue, 18 Mar 2025 08:57:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742253973; cv=none; b=kALhqrT4fYGMa0VcZAIIpQhZ5Ph7dcw2LrWdBCeIF5Ohs97tPYFBg6PckAlo05s4J0ArzlnBco4IUVgClY2VV8CLmyefzAHLvPJD2vtPeR44CH7+XCgZoTI6I/RPuGsS6WyNrQYtfax35i1cRyPSnL1H+uH93FJ6Rf2AYlBykLo=
+	t=1742288265; cv=none; b=s1bNFekWyGs1nxOvpA4qs4NuRFdxODndb513/Ndb+E9PZSxxguUcelPYREJqt5Hh9cDq1FLA1MbdTdgMJWzh2pgK23o19AtTfYQCUOG9rmLPuhWJQfgprYoWlmvSGQ5IGLXJ+FaAAIWNBjvExj9XSmslBIlGdu34aFZzbBEWxPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742253973; c=relaxed/simple;
-	bh=k3TtNZTGFuLJ79v8k08kXG/em/EJur/CqUQeeA0H268=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s54/1dx6zRghzTfMPHznEfxJgq1DVPfFdjZGuLF1RQlBrcZRSmOvHPjrypcBihM/44P5uh/1DEZy+bongRr4zDHSLqjn/KoN5OlSbLpREZkiUMIuseo0F6GH1Unr6oyINk9gDb8SAg7r2vxqVUsDnG0YSj2sw9xHJFcpcWm0t7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=LxR4tR/u; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
+	s=arc-20240116; t=1742288265; c=relaxed/simple;
+	bh=2f1C8R0hIz6n+6W0nH3Z+GVlBTjFR1v8fu0TPpXUMTQ=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OfqwuszN9ZmFnNPVIXrkpvxk6togrsjIY/a+uXd6QrpfYpW7PeLkmyQOtlcK0aQq5tAG1LYGhMj3XQe8eMdXueejVa+tCaMYVPncn7tCW0ri9H6FsKroNEtMYd/UVQZPt/gnfpo6Yx+FIaJxPCuRsVzAGjVxxS4a4yakiI2vfaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=QgpjOeyi; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="LxR4tR/u"
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=17eE1Dmu5py2lzwJWpsTytuqSbm05meORUtCLNmenuY=; b=LxR4tR/uFbVtwzFem/86eO11R1
-	R13pJWrls7OqF6bq1kjyLXCFHhlDy5U2pFdcDCM1hIpPmM1nE5zsUyOcXE2Q0t5XSqI+8fomYmnSy
-	vmxweZFyQiLxAktv0zCk5MDpn5v/WpvwRjq3sU6vFLXbm5cswgB+QvpaPdLEfMD2zJIuDOyc+lAQT
-	5xgSqk5Tr/ePjbIvzn5cEOvmOIvrJKFBn1ICJDpLZ+AlRIbQzRKNesye7rXNF/Z497m3FTjNFKk+z
-	kS5rpJgbyxFEfTRAuX4RsqS+RHjShchdkCh+SiT4iChsej6X+N+LD9R2RdLxrJtZuTV3OLkVrEN8J
-	4gYTIhXQ==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tuJq0-007mdj-1P;
-	Tue, 18 Mar 2025 07:25:41 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Tue, 18 Mar 2025 07:25:40 +0800
-Date: Tue, 18 Mar 2025 07:25:40 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: "Sridhar, Kanchana P" <kanchana.p.sridhar@intel.com>
-Cc: Yosry Ahmed <yosry.ahmed@linux.dev>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"hannes@cmpxchg.org" <hannes@cmpxchg.org>,
-	"nphamcs@gmail.com" <nphamcs@gmail.com>,
-	"chengming.zhou@linux.dev" <chengming.zhou@linux.dev>,
-	"usamaarif642@gmail.com" <usamaarif642@gmail.com>,
-	"ryan.roberts@arm.com" <ryan.roberts@arm.com>,
-	"21cnbao@gmail.com" <21cnbao@gmail.com>,
-	"ying.huang@linux.alibaba.com" <ying.huang@linux.alibaba.com>,
-	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"clabbe@baylibre.com" <clabbe@baylibre.com>,
-	"ardb@kernel.org" <ardb@kernel.org>,
-	"ebiggers@google.com" <ebiggers@google.com>,
-	"surenb@google.com" <surenb@google.com>,
-	"Accardi, Kristen C" <kristen.c.accardi@intel.com>,
-	"Feghali, Wajdi K" <wajdi.k.feghali@intel.com>,
-	"Gopal, Vinodh" <vinodh.gopal@intel.com>
-Subject: Re: [PATCH v8 12/14] mm: zswap: Simplify acomp_ctx resource
- allocation/deletion and mutex lock usage.
-Message-ID: <Z9ivdJycm7v6l4LV@gondor.apana.org.au>
-References: <20250303084724.6490-1-kanchana.p.sridhar@intel.com>
- <20250303084724.6490-13-kanchana.p.sridhar@intel.com>
- <Z8n5CCmELvpUwi3B@google.com>
- <PH8SPRMB004414B5E1E0765C18F9A89DC9D52@PH8SPRMB0044.namprd11.prod.outlook.com>
- <Z8tJOi5G_3dpK31v@google.com>
- <PH8SPRMB00447B066A769C76F57F8800C9D42@PH8SPRMB0044.namprd11.prod.outlook.com>
- <Z88h1mPkYNM6yOGE@google.com>
- <SA3PR11MB812082535F1E6D63BC0F1412C9DF2@SA3PR11MB8120.namprd11.prod.outlook.com>
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="QgpjOeyi"
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 52I191si027058;
+	Tue, 18 Mar 2025 08:57:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=qcppdkim1; bh=Lzyz/arj6w1l3DX59ZpBFxii
+	X+gCYcK7Sb4orDZoWsY=; b=QgpjOeyiKtLNxe5Hr2tbRajqpXMEE5xRciNl0AKW
+	irOM8Wi/Ekrhy4lNGiFf1CXiW/CIFyonuqCCcN/7EJ79l89yQ47woup2TjHr2/8d
+	341ebLG0kiAN1kwBACtPxO6V+hzJMLOjCF4KYzNSUHxVs39DIlspyaKgSsSS4apR
+	pTI9vunHTlWkDxs01ocgp8v0UqRIOTzXWI+eUmK+tQ4H51Bxnt/9od4wP+kwoRxe
+	dteVL8abw4ANnHWvAgwAGwCWRdMxFTCSrX8ogXTdRuAszsMgeY5TcScvQpjdM48l
+	ZvsQnpbjcqSWvBmePOsv8t219WZGTaH1/q7G0709wUU7gQ==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 45exwth4w9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 18 Mar 2025 08:57:33 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 52I8vIkw013115
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 18 Mar 2025 08:57:18 GMT
+Received: from hu-arakshit-hyd.qualcomm.com (10.80.80.8) by
+ nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Tue, 18 Mar 2025 01:57:14 -0700
+Date: Tue, 18 Mar 2025 14:27:10 +0530
+From: Abhinaba Rakshit <quic_arakshit@quicinc.com>
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+CC: Thara Gopinath <thara.gopinath@gmail.com>,
+        Herbert Xu
+	<herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Rob
+ Herring" <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        "Conor
+ Dooley" <conor+dt@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        "Konrad Dybcio" <konradybcio@kernel.org>,
+        <linux-arm-msm@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 2/2] arm64: dts: qcom: qcs615: add QCrypto nodes
+Message-ID: <20250318085710.zna6wbawbhb7kf44@hu-arakshit-hyd.qualcomm.com>
+References: <20250224-enable-qce-for-qcs615-v1-0-e7c665347eef@quicinc.com>
+ <20250224-enable-qce-for-qcs615-v1-2-e7c665347eef@quicinc.com>
+ <ac161039-af36-4e6c-90ea-ef858ea31e86@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <SA3PR11MB812082535F1E6D63BC0F1412C9DF2@SA3PR11MB8120.namprd11.prod.outlook.com>
+In-Reply-To: <ac161039-af36-4e6c-90ea-ef858ea31e86@oss.qualcomm.com>
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 81D6mkMdXjmJwurUdxsoO0UK4yiQJS4a
+X-Proofpoint-ORIG-GUID: 81D6mkMdXjmJwurUdxsoO0UK4yiQJS4a
+X-Authority-Analysis: v=2.4 cv=UoJjN/wB c=1 sm=1 tr=0 ts=67d9357d cx=c_pps a=ouPCqIW2jiPt+lZRy3xVPw==:117 a=ouPCqIW2jiPt+lZRy3xVPw==:17 a=GEpy-HfZoHoA:10 a=kj9zAlcOel0A:10 a=Vs1iUdzkB0EA:10 a=COk6AnOGAAAA:8 a=j5hbVoT8eKfuacexB9YA:9 a=CjuIK1q_8ugA:10
+ a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1093,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-03-18_04,2025-03-17_03,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
+ impostorscore=0 bulkscore=0 priorityscore=1501 mlxlogscore=553
+ phishscore=0 adultscore=0 clxscore=1015 spamscore=0 suspectscore=0
+ lowpriorityscore=0 classifier=spam authscore=0 authtc=n/a authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2502280000
+ definitions=main-2503180064
 
-On Mon, Mar 17, 2025 at 09:15:09PM +0000, Sridhar, Kanchana P wrote:
->
-> The problem however is that, in the current architecture, CPU onlining/ 
-> zswap_pool creation, and CPU offlining/zswap_pool deletion have the
-> same semantics as far as these resources are concerned. Hence, although
-> zswap_cpu_comp_prepare() is run on a control CPU, the CPU for which
-> the "hotplug" code is called is in fact online. It is possible for the memory
-> allocation calls in zswap_cpu_comp_prepare() to recurse into
-> zswap_compress(), which now needs to be handled by the current pool,
-> since the new pool has not yet been added to the zswap_pools, as you
-> pointed out.
+On Tue, Feb 25, 2025 at 02:52:36PM +0100, Konrad Dybcio wrote:
+> On 24.02.2025 11:04 AM, Abhinaba Rakshit wrote:
+> > Add the QCE and Crypto BAM DMA nodes.
+> > 
+> > Signed-off-by: Abhinaba Rakshit <quic_arakshit@quicinc.com>
+> > ---
+> >  arch/arm64/boot/dts/qcom/qcs615.dtsi | 25 +++++++++++++++++++++++++
+> >  1 file changed, 25 insertions(+)
+> > 
+> > diff --git a/arch/arm64/boot/dts/qcom/qcs615.dtsi b/arch/arm64/boot/dts/qcom/qcs615.dtsi
+> > index f4abfad474ea62dea13d05eb874530947e1e8d3e..25e98d20ec1d941f0b45cc3d94f298065c9a5566 100644
+> > --- a/arch/arm64/boot/dts/qcom/qcs615.dtsi
+> > +++ b/arch/arm64/boot/dts/qcom/qcs615.dtsi
+> > @@ -1114,6 +1114,31 @@ ufs_mem_phy: phy@1d87000 {
+> >  			status = "disabled";
+> >  		};
+> >  
+> > +		cryptobam: dma-controller@1dc4000 {
+> > +			compatible = "qcom,bam-v1.7.4", "qcom,bam-v1.7.0";
+> > +			reg = <0x0 0x01dc4000 0x0 0x24000>;
+> > +			interrupts = <GIC_SPI 272 IRQ_TYPE_LEVEL_HIGH>;
+> > +			#dma-cells = <1>;
+> > +			qcom,ee = <0>;
+> > +			qcom,controlled-remotely;
+> > +			num-channels = <16>;
+> > +			qcom,num-ees = <4>;
+> > +			iommus = <&apps_smmu 0x0104 0x0011>,
+> > +				 <&apps_smmu 0x0114 0x0011>;
+> 
+> (0x0114 & ~ 0x0011) == (0x0104 & ~0x0011), try dropping the second entry
+> here and below and see if things still work
+> 
 
-Please hold onto your patch-set for a while because I intend to
-get rid of the per-cpu pool in zswap after conversion to acomp.
+With dropping the second entry, as well qcrypto is still functional,
+Will update in the patch v2
 
-There is no reason to have a per-cpu pool at all, except for the
-stream memory used by the algorithm.  Since we've already moved
-that into the Crypto API for acomp, this means zswap no longer
-needs to have any per-cpu pools.  In fact, with LZO decompression
-it could go all the way through with no per-cpu resources at all.
+> > +		};
+> > +
+> > +		crypto: crypto@1dfa000 {
+> > +			compatible = "qcom,qcs615-qce", "qcom,sm8150-qce", "qcom,qce";
+> > +			reg = <0x0 0x01dfa000 0x0 0x6000>;
+> > +			dmas = <&cryptobam 4>, <&cryptobam 5>;
+> > +			dma-names = "rx", "tx";
+> > +			iommus = <&apps_smmu 0x0104 0x0011>,
+> > +				 <&apps_smmu 0x0114 0x0011>;
+> > +			interconnects = <&aggre1_noc MASTER_CRYPTO QCOM_ICC_TAG_ALWAYS
+> > +					&mc_virt SLAVE_EBI1 QCOM_ICC_TAG_ALWAYS>;
+> 
+> Please align the '&'s
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Will update in patch v2
+
+> 
+> Konrad
