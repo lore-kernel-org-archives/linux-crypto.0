@@ -1,138 +1,197 @@
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65FC61DF747
-	for <linux-crypto@vger.kernel.org>; Wed, 19 Mar 2025 17:41:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3EB61DF747;
+	Wed, 19 Mar 2025 18:15:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742406062; cv=none; b=YLK79f4q7S1ZzAYKpt+tWUrUjATgCZlrM/aRtr3o/vdVD6gIpsu9IA0t2+sbTl0yBGHChXUqMvChCT8NZe0rUBYayOfSjIXkGdR8/waGECReSrQHGwW9RtgmUZgN1WE4HmierY5Je+XN+AIKzF9mUTxxQEqC6N5tOwHNP7/gd50=
+	t=1742408124; cv=none; b=TLgz3FOFvzm+SdT5e4K3BoNTCBUNtBEfFvRwjfjh99pAJy4fA7qhfL/1qOp6RduQrmtMGTsDwwGnGJSRSrzJVY2k9hJRPBazs1pY8Wd5AlP3F75anbRyBwUUmg++sqy41GMryD7OiMVFw+ODhr3kaFxxeN8mB4pV631McJx9pbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742406062; c=relaxed/simple;
-	bh=Uup4ij0e3QxR7P+2AXE6ojI6gZ035al5TOyCCZJD8FY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QYbyoeCmcFgrcqmNVGS10k7LMYVWz3pJNfbN1QNoXgoyh7uHPGoXf0aRFdSBpb5MJhFnLaYIgWrqcxFHPL7uzqJ0Nrv/gKPOsyxo5sanPdKp1ep5nEe/ehryfQYnX/Vc1vH1RQf9tvuXLM6UQ9ZC5j1UVyfKVkgrzYi2bJvCQ+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=nV/VpToK; arc=none smtp.client-ip=209.85.222.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+	s=arc-20240116; t=1742408124; c=relaxed/simple;
+	bh=ZXilbN9jDvTOzafQDbp86jN9E8Evbp+LsnGKHYrnZYE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bR5LkSEkycYoHaxls8z365ctf6KBDh+hYquikPiyqj8ld8rDUwu89TvJptjKQmt2wY6CxQWh9UV8MaNulJh/GrQAy050APCmy/EJMKa8smHz8w7sQelzs8Utak9QaKR9CulNQ8Puxdt/zlfHaAzhZAy6MLW/1+90gLJBnlM8L7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=as0gSA2+; arc=none smtp.client-ip=10.30.226.201
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="nV/VpToK"
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-7c597760323so240241885a.3
-        for <linux-crypto@vger.kernel.org>; Wed, 19 Mar 2025 10:41:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1742406059; x=1743010859; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=leCUW9KEkZQcVeVok9ACFyeDj4RZoftXqhcJPMWCJYU=;
-        b=nV/VpToKK1Aoc35hYasv8EBUTMZK3YWljurPD2RE8K95jFcoCmONYbBpbib1QPyFbd
-         zSv/Fnk+PNhWJ/yPZHfQrWxfNZCut2KGrxd3hZas9X5TZ7EXb7a/dokHKpxOytAT4pQ9
-         gfeyNgK4YiJtjD06hxgzxo38t1AVC0Vdkwe+i1EL1u+f4qzlchDtmyVqmWb5xb9CtAnf
-         CMt/PYJWppWD+Yuqh6qT9h2143TT+qM7QypYtCpfyJf8bTECAWu3m0vRYjgL+whCaBCP
-         +g+MkRpdKaz0uAvhepSHNFG2+jIm5/kc50U3IlZji0KHpX/QBJGLS8rOlfY0KbgUMJAR
-         wnZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1742406059; x=1743010859;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=leCUW9KEkZQcVeVok9ACFyeDj4RZoftXqhcJPMWCJYU=;
-        b=RlRheqsC3VVjerLw8hfwG0/pAxcQ02oEJ7rrWK1H4ta5VSN/dvjtzn7DqqqcDGmstR
-         gXmk2xR7qQqbs1ijeyyK+MrYdd/480EOyZCJEhz1yFgd9Eb+c5VFfGFa8VTBDM3ljHpV
-         jBTKpygfmtDw+Qa8b3+nFZvO7ggPyD0lKwlCzzy6Sidr4NXhl6rrhRNrPUqcDbbRJRFP
-         SWW2JnFukxLLmDGJExYxwLBfeqJLR69HfS6k6sLdGeEzR8SgLsYABQ13Os5H0u2UBLDJ
-         C685smlICe8xvvCsNSCEyAoeaKVBpOGxcyzpgDIOe1FzT2rSYyobqLUYE99QphHKdKeG
-         pc2g==
-X-Forwarded-Encrypted: i=1; AJvYcCXSDU2Ky4QNIMO9yhEODj2+lZFVePe834zLjt8K4hHP1aLQaF+qTf3nXUcnbVBu8wiWF++tJk0bwZ8tEd8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy9oOWcs5cloY7QHH/khfhlbMaAnwyDXyq9eN+cicCIVlAEe6yw
-	AoKuJ9/Ej0eCVAyjNxoGGSizc6cCA2qv80iSgszzIfDGDBexM7sTa4lSVsd4vaA=
-X-Gm-Gg: ASbGncvdOVYa/MDqFdXVMfjhDmUk+q3tVn+YIadcl/sF7Ub5Zyiix8MW78YrOTcUGjo
-	eHITq65wsa76ZYvjaDPmyEVuusb2b+aN8PDB2o7t2ZuXItFTuLX00kBxZtFnBPkH4l3FrPn3BCF
-	i0SYa4fyw+V70tQrZZair98lTeQf1+jQ10TxVZ7XTN7/J0TZ7In6KAyrfvkDxvU6rG4uLwzUmnv
-	In78Fqa3rb735NKKtoJnSVjn98jDfel+e1ChsqKXHGAzXJjzDlXBCkSc+JxqhH6pZiTHab9CIro
-	al4DUAFmxjVyuVmXqvXQtfnXN9ONooQiu12qyHGLqQLl3jpfTkgtSN34+qqV93Lth4QDYL7Nd4S
-	O0vsaQQV2digWXDesVN2LRy8Qx7GT
-X-Google-Smtp-Source: AGHT+IFoJAQ9bGba/Z0yZg+D8yG6xp2ytZSUuDU+bbhNp9w3ofz/kSX0XQcOY4VVJjVXQ+26hrcvHQ==
-X-Received: by 2002:a05:620a:57b:b0:7c5:6ba5:dd65 with SMTP id af79cd13be357-7c5a84a3654mr479964285a.55.1742406059344;
-        Wed, 19 Mar 2025 10:40:59 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c573c4dd2bsm884915085a.14.2025.03.19.10.40.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Mar 2025 10:40:58 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1tuxPW-00000000WcK-0irF;
-	Wed, 19 Mar 2025 14:40:58 -0300
-Date: Wed, 19 Mar 2025 14:40:58 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Alexey Kardashevskiy <aik@amd.com>
-Cc: Michael Roth <michael.roth@amd.com>, x86@kernel.org,
-	kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
-	linux-pci@vger.kernel.org, linux-arch@vger.kernel.org,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>,
-	Ashish Kalra <ashish.kalra@amd.com>, Joerg Roedel <joro@8bytes.org>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	Robin Murphy <robin.murphy@arm.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Christoph Hellwig <hch@lst.de>, Nikunj A Dadhania <nikunj@amd.com>,
-	Vasant Hegde <vasant.hegde@amd.com>,
-	Joao Martins <joao.m.martins@oracle.com>,
-	Nicolin Chen <nicolinc@nvidia.com>,
-	Lu Baolu <baolu.lu@linux.intel.com>,
-	Steve Sistare <steven.sistare@oracle.com>,
-	Lukas Wunner <lukas@wunner.de>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Dionna Glaze <dionnaglaze@google.com>, Yi Liu <yi.l.liu@intel.com>,
-	iommu@lists.linux.dev, linux-coco@lists.linux.dev,
-	Zhi Wang <zhiw@nvidia.com>, AXu Yilun <yilun.xu@linux.intel.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@kernel.org>
-Subject: Re: [RFC PATCH v2 12/22] iommufd: Allow mapping from guest_memfd
-Message-ID: <20250319174058.GF10600@ziepe.ca>
-References: <20250218111017.491719-1-aik@amd.com>
- <20250218111017.491719-13-aik@amd.com>
- <20250218141634.GI3696814@ziepe.ca>
- <340d8dba-1b09-4875-8604-cd9f66ca1407@amd.com>
- <20250218235105.GK3696814@ziepe.ca>
- <06b850ab-5321-4134-9b24-a83aaab704bf@amd.com>
- <20250219133516.GL3696814@ziepe.ca>
- <20250219202324.uq2kq27kmpmptbwx@amd.com>
- <20250219203708.GO3696814@ziepe.ca>
- <604c0d0e-048f-402a-893a-62e1ce8d24ba@amd.com>
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="as0gSA2+"
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FE1AC4CEE4;
+	Wed, 19 Mar 2025 18:15:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1742408124;
+	bh=ZXilbN9jDvTOzafQDbp86jN9E8Evbp+LsnGKHYrnZYE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=as0gSA2+0o0P9fMeL2uL4nbe3iz+MsO67DrZk/MwOoJ8IU09bZD7eIwzHKGE0ZUCX
+	 L5Xe0RfH26Nk5+Gqxha9VgzavlSXw2w36U454VepwwmvI/wq1/r24JqF1X0MVe8t9r
+	 nwSCIx3IYWXhxKRH4FCKc5ZwI2RHrJz44I+PAGZz3INiwH+e8nEZGcx42VJZvCDZ2O
+	 peDnTaVDjkNWTQtRsyOCVEIiAk5tQeHtz3bNl0T+o1Dx5B48pXRj3UWBdui/cKNOA/
+	 +uSaBKKaGkY89MemEb1H+T37uGXDoW5FuBz7RHSheaQs1hBNmPwqjfPcBeAtxL5EVo
+	 43Wu928PbKgYQ==
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org,
+	x86@kernel.org,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H . Peter Anvin" <hpa@zytor.com>
+Subject: [PATCH] x86/crc: drop the avx10_256 functions and rename avx10_512 to avx512
+Date: Wed, 19 Mar 2025 11:13:16 -0700
+Message-ID: <20250319181316.91271-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <604c0d0e-048f-402a-893a-62e1ce8d24ba@amd.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Mar 13, 2025 at 03:51:13PM +1100, Alexey Kardashevskiy wrote:
+From: Eric Biggers <ebiggers@google.com>
 
-> About this atomical restructure - I looked at yours iommu-pt branch on
-> github but  __cut_mapping()->pt_table_install64() only atomically swaps the
-> PDE but it does not do IOMMU TLB invalidate, have I missed it? 
+Intel made a late change to the AVX10 specification that removes support
+for a 256-bit maximum vector length and enumeration of the maximum
+vector length.  AVX10 will imply a maximum vector length of 512 bits.
+I.e. there won't be any such thing as AVX10/256 or AVX10/512; there will
+just be AVX10, and it will essentially just consolidate AVX512 features.
 
-That branch doesn't have the invalidation wired in, there is another
-branch that has invalidation but not cut yet.. It is a journey
+As a result of this new development, my strategy of providing both
+*_avx10_256 and *_avx10_512 functions didn't turn out to be that useful.
+The only remaining motivation for the 256-bit AVX512 / AVX10 functions
+is to avoid downclocking on older Intel CPUs.  But I already wrote
+*_avx2 code too (primarily to support CPUs without AVX512), which
+performs almost as well as *_avx10_256.  So we should just use that.
 
-> And if it did so, that would not be atomic but it won't matter as
-> long as we do not destroy the old PDE before invalidating IOMMU TLB,
-> is this the idea? Thanks,
+Therefore, remove the *_avx10_256 functions, and rename the *_avx10_512
+functions to *_avx512.  Make Ice Lake and Tiger Lake use the *_avx2
+functions instead of *_avx10_256 which they previously used.
 
-When splitting the change in the PDE->PTE doesn't change the
-translation in effect.
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ arch/x86/lib/crc-pclmul-template.S | 23 ++++++++---------------
+ arch/x86/lib/crc-pclmul-template.h | 15 +++++----------
+ 2 files changed, 13 insertions(+), 25 deletions(-)
 
-So if the IOTLB has cached the PDE, the SW will update it to an array
-of PTEs of same address, any concurrent DMA will continue to hit the
-same address, then when we invalidate the IOTLB the PDE will get
-dropped from cache and the next DMA will load PTEs.
+diff --git a/arch/x86/lib/crc-pclmul-template.S b/arch/x86/lib/crc-pclmul-template.S
+index a19b730b642d3..ae0b6144c503c 100644
+--- a/arch/x86/lib/crc-pclmul-template.S
++++ b/arch/x86/lib/crc-pclmul-template.S
+@@ -136,11 +136,11 @@
+ // is a vector register containing the needed fold constants, and \tmp is a
+ // temporary vector register.  All arguments must be the same length.
+ .macro	_fold_vec	acc, data, consts, tmp
+ 	_pclmulqdq	\consts, HI64_TERMS, \acc, HI64_TERMS, \tmp
+ 	_pclmulqdq	\consts, LO64_TERMS, \acc, LO64_TERMS, \acc
+-.if AVX_LEVEL < 10
++.if AVX_LEVEL <= 2
+ 	_cond_vex pxor,	\data, \tmp, \tmp
+ 	_cond_vex pxor,	\tmp, \acc, \acc
+ .else
+ 	vpternlogq	$0x96, \data, \tmp, \acc
+ .endif
+@@ -199,23 +199,20 @@
+ // bit0 to x^0, bit1 to x^1, bit7 to x^7.
+ //
+ // \vl is the maximum length of vector register to use in bytes: 16, 32, or 64.
+ //
+ // \avx_level is the level of AVX support to use: 0 for SSE only, 2 for AVX2, or
+-// 10 for AVX10 or AVX512.
++// 512 for AVX512.
+ //
+ // If \vl == 16 && \avx_level == 0, the generated code requires:
+ // PCLMULQDQ && SSE4.1.  (Note: all known CPUs with PCLMULQDQ also have SSE4.1.)
+ //
+ // If \vl == 32 && \avx_level == 2, the generated code requires:
+ // VPCLMULQDQ && AVX2.
+ //
+-// If \vl == 32 && \avx_level == 10, the generated code requires:
+-// VPCLMULQDQ && (AVX10/256 || (AVX512BW && AVX512VL))
+-//
+-// If \vl == 64 && \avx_level == 10, the generated code requires:
+-// VPCLMULQDQ && (AVX10/512 || (AVX512BW && AVX512VL))
++// If \vl == 64 && \avx_level == 512, the generated code requires:
++// VPCLMULQDQ && AVX512BW && AVX512VL.
+ //
+ // Other \vl and \avx_level combinations are either not supported or not useful.
+ .macro	_crc_pclmul	n, lsb_crc, vl, avx_level
+ 	.set	LSB_CRC,	\lsb_crc
+ 	.set	VL,		\vl
+@@ -532,11 +529,11 @@
+ 	// floor(t0 / G).  The most efficient way to do that is to move it to
+ 	// the physically high qword and use a ternlog to combine the two XORs.
+ .if LSB_CRC && \n == 64
+ 	_cond_vex punpcklqdq,	%xmm1, %xmm2, %xmm2
+ 	_pclmulqdq		CONSTS_XMM, LO64_TERMS, %xmm1, HI64_TERMS, %xmm1
+-    .if AVX_LEVEL < 10
++    .if AVX_LEVEL <= 2
+ 	_cond_vex pxor,		%xmm2, %xmm0, %xmm0
+ 	_cond_vex pxor,		%xmm1, %xmm0, %xmm0
+     .else
+ 	vpternlogq		$0x96, %xmm2, %xmm1, %xmm0
+     .endif
+@@ -572,17 +569,13 @@ SYM_FUNC_END(prefix##_pclmul_sse);					\
+ 									\
+ SYM_FUNC_START(prefix##_vpclmul_avx2);					\
+ 	_crc_pclmul	n=bits, lsb_crc=lsb, vl=32, avx_level=2;	\
+ SYM_FUNC_END(prefix##_vpclmul_avx2);					\
+ 									\
+-SYM_FUNC_START(prefix##_vpclmul_avx10_256);				\
+-	_crc_pclmul	n=bits, lsb_crc=lsb, vl=32, avx_level=10;	\
+-SYM_FUNC_END(prefix##_vpclmul_avx10_256);				\
+-									\
+-SYM_FUNC_START(prefix##_vpclmul_avx10_512);				\
+-	_crc_pclmul	n=bits, lsb_crc=lsb, vl=64, avx_level=10;	\
+-SYM_FUNC_END(prefix##_vpclmul_avx10_512);
++SYM_FUNC_START(prefix##_vpclmul_avx512);				\
++	_crc_pclmul	n=bits, lsb_crc=lsb, vl=64, avx_level=512;	\
++SYM_FUNC_END(prefix##_vpclmul_avx512);
+ #else
+ #define DEFINE_CRC_PCLMUL_FUNCS(prefix, bits, lsb)			\
+ SYM_FUNC_START(prefix##_pclmul_sse);					\
+ 	_crc_pclmul	n=bits, lsb_crc=lsb, vl=16, avx_level=0;	\
+ SYM_FUNC_END(prefix##_pclmul_sse);
+diff --git a/arch/x86/lib/crc-pclmul-template.h b/arch/x86/lib/crc-pclmul-template.h
+index 7b89f0edbc179..c5b3bfe11d8da 100644
+--- a/arch/x86/lib/crc-pclmul-template.h
++++ b/arch/x86/lib/crc-pclmul-template.h
+@@ -19,31 +19,26 @@
+ #define DECLARE_CRC_PCLMUL_FUNCS(prefix, crc_t)				\
+ crc_t prefix##_pclmul_sse(crc_t crc, const u8 *p, size_t len,		\
+ 			  const void *consts_ptr);			\
+ crc_t prefix##_vpclmul_avx2(crc_t crc, const u8 *p, size_t len,		\
+ 			    const void *consts_ptr);			\
+-crc_t prefix##_vpclmul_avx10_256(crc_t crc, const u8 *p, size_t len,	\
+-				 const void *consts_ptr);		\
+-crc_t prefix##_vpclmul_avx10_512(crc_t crc, const u8 *p, size_t len,	\
+-				 const void *consts_ptr);		\
++crc_t prefix##_vpclmul_avx512(crc_t crc, const u8 *p, size_t len,	\
++			      const void *consts_ptr);			\
+ DEFINE_STATIC_CALL(prefix##_pclmul, prefix##_pclmul_sse)
+ 
+ #define INIT_CRC_PCLMUL(prefix)						\
+ do {									\
+ 	if (IS_ENABLED(CONFIG_AS_VPCLMULQDQ) &&				\
+ 	    boot_cpu_has(X86_FEATURE_VPCLMULQDQ) &&			\
+ 	    boot_cpu_has(X86_FEATURE_AVX2) &&				\
+ 	    cpu_has_xfeatures(XFEATURE_MASK_YMM, NULL)) {		\
+ 		if (boot_cpu_has(X86_FEATURE_AVX512BW) &&		\
+ 		    boot_cpu_has(X86_FEATURE_AVX512VL) &&		\
++		    !boot_cpu_has(X86_FEATURE_PREFER_YMM) &&		\
+ 		    cpu_has_xfeatures(XFEATURE_MASK_AVX512, NULL)) {	\
+-			if (boot_cpu_has(X86_FEATURE_PREFER_YMM))	\
+-				static_call_update(prefix##_pclmul,	\
+-						   prefix##_vpclmul_avx10_256); \
+-			else						\
+-				static_call_update(prefix##_pclmul,	\
+-						   prefix##_vpclmul_avx10_512); \
++			static_call_update(prefix##_pclmul,		\
++					   prefix##_vpclmul_avx512);	\
+ 		} else {						\
+ 			static_call_update(prefix##_pclmul,		\
+ 					   prefix##_vpclmul_avx2);	\
+ 		}							\
+ 	}								\
 
-When I say atomic I mean from the perspective of the DMA initator
-there is no visible alteration. Perhaps I should say hitless.
+base-commit: 981b39dc6da6dd11ec40824a224c1e0a7557b5ca
+-- 
+2.49.0
 
-Jason
