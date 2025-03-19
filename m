@@ -1,30 +1,30 @@
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 149F0253B65;
-	Wed, 19 Mar 2025 09:39:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33FB0256C92;
+	Wed, 19 Mar 2025 09:44:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742377169; cv=none; b=Yr/6OG+ezUy7ClP87EJLdKSu9SwY2QWCTKIe5rjRZFIh73E5Pg+Zjy3pWGqV6o3EvxebefmDYHD896GHsk6WSzdcQjIr7UIAumbLJCAoi+zdQAz2txDiQxacO63fBUW6gAikY7V1WweOgKKWvk5oVWZJ18OQss98N1fiwAE216g=
+	t=1742377464; cv=none; b=iD1Awj3Rj8T+6z3oYU8A3HhaxZS6pxdV/y1WdSVF5AhU052yHC1B4RJIETldnrPRwdI4WD7HC/0+r72E/CfsxZhefSdrLKJQTzfYT3x++uCZbxpZ1Yz/XGioEfEFXNu5DJ5J+c8PySfvEade7KdAmrDmD5AW2xM3n2FTJ+4i6dA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742377169; c=relaxed/simple;
-	bh=O5m4J2uazvVon6VrejWT7QbkzPd8R8Ka6P+/dKxYqY8=;
+	s=arc-20240116; t=1742377464; c=relaxed/simple;
+	bh=pID1YVqDrR/XGfOmfBf1DckSXCMMhnSS8zNIM2xIcXo=;
 	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=FPqyeSEO8sfPgmtpKi0Z1HFOIDT/BkEFIBNL5V1wBimfA2bWGVU2i7P0Rxzfe5Bxpk+qQR5Sny8UHBVtKs9UfKux/jS4MKXe8I6lzkcVcoX2xlE7hoJBjs3O6ekwNUfHtsH7Qamnb4bSVtRFSgeZAk3PBH8RzZQSt2yqKEZMF5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+	 In-Reply-To:Content-Type; b=YGu1TUHnDtxgHvNRVKGP4aIu85BNnPNiADIUlOH7yFFA1yAK6dDejUZDXv02emQ9LCFZTNC0LCSpJULMmLi4zDzZe1RFg9k6FwJocrbhtOpi66KsrllZ6Tl0C7+MlwK8Pv1IeUNDEH1dpD36kBIm+51Ig+4bTEsKrACcTMOeKGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4ZHk9H6zmDzpg72;
-	Wed, 19 Mar 2025 17:36:03 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4ZHkLY6m8Gz1d0DC;
+	Wed, 19 Mar 2025 17:44:05 +0800 (CST)
 Received: from kwepemk500005.china.huawei.com (unknown [7.202.194.90])
-	by mail.maildlp.com (Postfix) with ESMTPS id D8A7F14033A;
-	Wed, 19 Mar 2025 17:39:17 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 728FC1800C8;
+	Wed, 19 Mar 2025 17:44:19 +0800 (CST)
 Received: from [10.174.178.46] (10.174.178.46) by
  kwepemk500005.china.huawei.com (7.202.194.90) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 19 Mar 2025 17:39:16 +0800
-Subject: Re: [v5 PATCH 13/14] ubifs: Use crypto_acomp interface
+ 15.2.1544.11; Wed, 19 Mar 2025 17:44:18 +0800
+Subject: Re: [v5 PATCH 14/14] ubifs: Pass folios to acomp
 To: Herbert Xu <herbert@gondor.apana.org.au>, Linux Crypto Mailing List
 	<linux-crypto@vger.kernel.org>
 CC: Richard Weinberger <richard@nod.at>, <linux-mtd@lists.infradead.org>,
@@ -32,10 +32,10 @@ CC: Richard Weinberger <richard@nod.at>, <linux-mtd@lists.infradead.org>,
 	<linux-pm@vger.kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>,
 	<netdev@vger.kernel.org>
 References: <cover.1742034499.git.herbert@gondor.apana.org.au>
- <434ca0f270b1e76f2abb222ddb0d68d7f1e0831a.1742034499.git.herbert@gondor.apana.org.au>
+ <99ae6a15afc1478bab201949dc3dbb2c7634b687.1742034499.git.herbert@gondor.apana.org.au>
 From: Zhihao Cheng <chengzhihao1@huawei.com>
-Message-ID: <d81b956d-8d08-8ddd-9746-5b0262a4e68e@huawei.com>
-Date: Wed, 19 Mar 2025 17:39:16 +0800
+Message-ID: <9f77f2a4-e4ba-813e-f44d-3a42d9637d0f@huawei.com>
+Date: Wed, 19 Mar 2025 17:44:17 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 Precedence: bulk
@@ -44,285 +44,167 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <434ca0f270b1e76f2abb222ddb0d68d7f1e0831a.1742034499.git.herbert@gondor.apana.org.au>
+In-Reply-To: <99ae6a15afc1478bab201949dc3dbb2c7634b687.1742034499.git.herbert@gondor.apana.org.au>
 Content-Type: text/plain; charset="gbk"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
  kwepemk500005.china.huawei.com (7.202.194.90)
 
 ÔÚ 2025/3/15 18:30, Herbert Xu Ð´µÀ:
-> Replace the legacy crypto compression interface with the new acomp
-> interface.
-> 
-> Remove the compression mutexes and the overallocation for memory
-> (the offender LZO has been fixed).
-> 
-> Cap the output buffer length for compression to eliminate the
-> post-compression check for UBIFS_MIN_COMPRESS_DIFF.
+> As the acomp interface supports folios, use that instead of mapping
+> the data in ubifs.
 > 
 > Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 > ---
->   fs/ubifs/compress.c | 106 ++++++++++++++++++++++++++------------------
->   fs/ubifs/journal.c  |   2 +-
->   fs/ubifs/ubifs.h    |  15 +------
->   3 files changed, 67 insertions(+), 56 deletions(-)
-> 
+>   fs/ubifs/compress.c | 106 +++++++++++++++++++++++++++++++++++++++++++-
+>   fs/ubifs/file.c     |  74 +++++++++++--------------------
+>   fs/ubifs/journal.c  |   9 ++--
+>   fs/ubifs/ubifs.h    |  11 ++++-
+>   4 files changed, 145 insertions(+), 55 deletions(-)
+
 
 Tested-by: Zhihao Cheng <chengzhihao1@huawei.com> # For xfstests
-Reviewed-by: Zhihao Cheng <chengzhihao1@huawei.com>
+
+> 
 > diff --git a/fs/ubifs/compress.c b/fs/ubifs/compress.c
-> index 0b48cbab8a3d..a241ba01c9a8 100644
+> index a241ba01c9a8..ea6f06adcd43 100644
 > --- a/fs/ubifs/compress.c
 > +++ b/fs/ubifs/compress.c
-> @@ -15,7 +15,7 @@
->    * decompression.
+> @@ -16,6 +16,7 @@
 >    */
 >   
-> -#include <linux/crypto.h>
-> +#include <crypto/acompress.h>
+>   #include <crypto/acompress.h>
+> +#include <linux/highmem.h>
 >   #include "ubifs.h"
 >   
 >   /* Fake description object for the "none" compressor */
-> @@ -26,11 +26,8 @@ static struct ubifs_compressor none_compr = {
->   };
+> @@ -126,7 +127,7 @@ void ubifs_compress(const struct ubifs_info *c, const void *in_buf,
+>   	{
+>   		ACOMP_REQUEST_ALLOC(req, compr->cc, GFP_NOFS | __GFP_NOWARN);
 >   
->   #ifdef CONFIG_UBIFS_FS_LZO
-> -static DEFINE_MUTEX(lzo_mutex);
-> -
->   static struct ubifs_compressor lzo_compr = {
->   	.compr_type = UBIFS_COMPR_LZO,
-> -	.comp_mutex = &lzo_mutex,
->   	.name = "lzo",
->   	.capi_name = "lzo",
->   };
-> @@ -42,13 +39,8 @@ static struct ubifs_compressor lzo_compr = {
->   #endif
->   
->   #ifdef CONFIG_UBIFS_FS_ZLIB
-> -static DEFINE_MUTEX(deflate_mutex);
-> -static DEFINE_MUTEX(inflate_mutex);
-> -
->   static struct ubifs_compressor zlib_compr = {
->   	.compr_type = UBIFS_COMPR_ZLIB,
-> -	.comp_mutex = &deflate_mutex,
-> -	.decomp_mutex = &inflate_mutex,
->   	.name = "zlib",
->   	.capi_name = "deflate",
->   };
-> @@ -60,13 +52,8 @@ static struct ubifs_compressor zlib_compr = {
->   #endif
->   
->   #ifdef CONFIG_UBIFS_FS_ZSTD
-> -static DEFINE_MUTEX(zstd_enc_mutex);
-> -static DEFINE_MUTEX(zstd_dec_mutex);
-> -
->   static struct ubifs_compressor zstd_compr = {
->   	.compr_type = UBIFS_COMPR_ZSTD,
-> -	.comp_mutex = &zstd_enc_mutex,
-> -	.decomp_mutex = &zstd_dec_mutex,
->   	.name = "zstd",
->   	.capi_name = "zstd",
->   };
-> @@ -80,6 +67,30 @@ static struct ubifs_compressor zstd_compr = {
->   /* All UBIFS compressors */
->   struct ubifs_compressor *ubifs_compressors[UBIFS_COMPR_TYPES_CNT];
->   
-> +static int ubifs_compress_req(const struct ubifs_info *c,
-> +			      struct acomp_req *req,
-> +			      void *out_buf, int *out_len,
-> +			      const char *compr_name)
-> +{
-> +	struct crypto_wait wait;
-> +	int in_len = req->slen;
-> +	int dlen = *out_len;
-> +	int err;
-> +
-> +	dlen = min(dlen, in_len - UBIFS_MIN_COMPRESS_DIFF);
-> +
-> +	crypto_init_wait(&wait);
-> +	acomp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-> +				   crypto_req_done, &wait);
-> +	acomp_request_set_dst_dma(req, out_buf, dlen);
-> +	err = crypto_acomp_compress(req);
-> +	err = crypto_wait_req(err, &wait);
-> +	*out_len = req->dlen;
-> +	acomp_request_free(req);
-> +
-> +	return err;
-> +}
-> +
->   /**
->    * ubifs_compress - compress data.
->    * @c: UBIFS file-system description object
-> @@ -112,23 +123,14 @@ void ubifs_compress(const struct ubifs_info *c, const void *in_buf,
->   	if (in_len < UBIFS_MIN_COMPR_LEN)
->   		goto no_compr;
->   
-> -	if (compr->comp_mutex)
-> -		mutex_lock(compr->comp_mutex);
-> -	err = crypto_comp_compress(compr->cc, in_buf, in_len, out_buf,
-> -				   (unsigned int *)out_len);
-> -	if (compr->comp_mutex)
-> -		mutex_unlock(compr->comp_mutex);
-> -	if (unlikely(err)) {
-> -		ubifs_warn(c, "cannot compress %d bytes, compressor %s, error %d, leave data uncompressed",
-> -			   in_len, compr->name, err);
-> -		goto no_compr;
-> +	{
-> +		ACOMP_REQUEST_ALLOC(req, compr->cc, GFP_NOFS | __GFP_NOWARN);
-> +
-> +		acomp_request_set_src_nondma(req, in_buf, in_len);
-> +		err = ubifs_compress_req(c, req, out_buf, out_len, compr->name);
+> -		acomp_request_set_src_nondma(req, in_buf, in_len);
+> +		acomp_request_set_src_dma(req, in_buf, in_len);
+
+Why not merging it into patch 13?
+>   		err = ubifs_compress_req(c, req, out_buf, out_len, compr->name);
 >   	}
 >   
-> -	/*
-> -	 * If the data compressed only slightly, it is better to leave it
-> -	 * uncompressed to improve read speed.
-> -	 */
-> -	if (in_len - *out_len < UBIFS_MIN_COMPRESS_DIFF)
-> +	if (err)
->   		goto no_compr;
->   
->   	return;
-> @@ -139,6 +141,31 @@ void ubifs_compress(const struct ubifs_info *c, const void *in_buf,
+> @@ -141,6 +142,58 @@ void ubifs_compress(const struct ubifs_info *c, const void *in_buf,
 >   	*compr_type = UBIFS_COMPR_NONE;
 >   }
 >   
-> +static int ubifs_decompress_req(const struct ubifs_info *c,
-> +				struct acomp_req *req,
-> +				const void *in_buf, int in_len, int *out_len,
-> +				const char *compr_name)
+> +/**
+> + * ubifs_compress_folio - compress folio.
+> + * @c: UBIFS file-system description object
+> + * @in_folio: data to compress
+> + * @in_offset: offset into @in_folio
+> + * @in_len: length of the data to compress
+> + * @out_buf: output buffer where compressed data should be stored
+> + * @out_len: output buffer length is returned here
+> + * @compr_type: type of compression to use on enter, actually used compression
+> + *              type on exit
+> + *
+> + * This function compresses input folio @in_folio of length @in_len and
+> + * stores the result in the output buffer @out_buf and the resulting length
+> + * in @out_len. If the input buffer does not compress, it is just copied
+> + * to the @out_buf. The same happens if @compr_type is %UBIFS_COMPR_NONE
+> + * or if compression error occurred.
+> + *
+> + * Note, if the input buffer was not compressed, it is copied to the output
+> + * buffer and %UBIFS_COMPR_NONE is returned in @compr_type.
+> + */
+> +void ubifs_compress_folio(const struct ubifs_info *c, struct folio *in_folio,
+> +			  size_t in_offset, int in_len, void *out_buf,
+> +			  int *out_len, int *compr_type)
 > +{
-> +	struct crypto_wait wait;
 > +	int err;
+> +	struct ubifs_compressor *compr = ubifs_compressors[*compr_type];
 > +
-> +	crypto_init_wait(&wait);
-> +	acomp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
-> +				   crypto_req_done, &wait);
-> +	acomp_request_set_src_dma(req, in_buf, in_len);
-> +	err = crypto_acomp_decompress(req);
-> +	err = crypto_wait_req(err, &wait);
-> +	*out_len = req->dlen;
+> +	if (*compr_type == UBIFS_COMPR_NONE)
+> +		goto no_compr;
 > +
-> +	if (err)
-> +		ubifs_err(c, "cannot decompress %d bytes, compressor %s, error %d",
-> +			  in_len, compr_name, err);
+> +	/* If the input data is small, do not even try to compress it */
+> +	if (in_len < UBIFS_MIN_COMPR_LEN)
+> +		goto no_compr;
 > +
-> +	acomp_request_free(req);
-> +
-> +	return err;
-> +}
-> +
->   /**
->    * ubifs_decompress - decompress data.
->    * @c: UBIFS file-system description object
-> @@ -155,7 +182,6 @@ void ubifs_compress(const struct ubifs_info *c, const void *in_buf,
->   int ubifs_decompress(const struct ubifs_info *c, const void *in_buf,
->   		     int in_len, void *out_buf, int *out_len, int compr_type)
->   {
-> -	int err;
->   	struct ubifs_compressor *compr;
->   
->   	if (unlikely(compr_type < 0 || compr_type >= UBIFS_COMPR_TYPES_CNT)) {
-> @@ -176,17 +202,13 @@ int ubifs_decompress(const struct ubifs_info *c, const void *in_buf,
->   		return 0;
->   	}
->   
-> -	if (compr->decomp_mutex)
-> -		mutex_lock(compr->decomp_mutex);
-> -	err = crypto_comp_decompress(compr->cc, in_buf, in_len, out_buf,
-> -				     (unsigned int *)out_len);
-> -	if (compr->decomp_mutex)
-> -		mutex_unlock(compr->decomp_mutex);
-> -	if (err)
-> -		ubifs_err(c, "cannot decompress %d bytes, compressor %s, error %d",
-> -			  in_len, compr->name, err);
 > +	{
 > +		ACOMP_REQUEST_ALLOC(req, compr->cc, GFP_NOFS | __GFP_NOWARN);
+> +
+> +		acomp_request_set_src_folio(req, in_folio, in_offset, in_len);
+> +		err = ubifs_compress_req(c, req, out_buf, out_len, compr->name);
+> +	}
+> +
+> +	if (err)
+> +		goto no_compr;
+> +
+> +	return;
+> +
+> +no_compr:
+> +	memcpy_from_folio(out_buf, in_folio, in_offset, in_len);
+> +	*out_len = in_len;
+> +	*compr_type = UBIFS_COMPR_NONE;
+> +}
+> +
+>   static int ubifs_decompress_req(const struct ubifs_info *c,
+>   				struct acomp_req *req,
+>   				const void *in_buf, int in_len, int *out_len,
+> @@ -205,7 +258,56 @@ int ubifs_decompress(const struct ubifs_info *c, const void *in_buf,
+>   	{
+>   		ACOMP_REQUEST_ALLOC(req, compr->cc, GFP_NOFS | __GFP_NOWARN);
 >   
-> -	return err;
-> +		acomp_request_set_dst_nondma(req, out_buf, *out_len);
+> -		acomp_request_set_dst_nondma(req, out_buf, *out_len);
+> +		acomp_request_set_dst_dma(req, out_buf, *out_len);
+
+Same as the suggestion above.
 > +		return ubifs_decompress_req(c, req, in_buf, in_len, out_len,
 > +					    compr->name);
 > +	}
->   }
->   
->   /**
-> @@ -199,7 +221,7 @@ int ubifs_decompress(const struct ubifs_info *c, const void *in_buf,
->   static int __init compr_init(struct ubifs_compressor *compr)
->   {
->   	if (compr->capi_name) {
-> -		compr->cc = crypto_alloc_comp(compr->capi_name, 0, 0);
-> +		compr->cc = crypto_alloc_acomp(compr->capi_name, 0, 0);
->   		if (IS_ERR(compr->cc)) {
->   			pr_err("UBIFS error (pid %d): cannot initialize compressor %s, error %ld",
->   			       current->pid, compr->name, PTR_ERR(compr->cc));
-> @@ -218,7 +240,7 @@ static int __init compr_init(struct ubifs_compressor *compr)
->   static void compr_exit(struct ubifs_compressor *compr)
->   {
->   	if (compr->capi_name)
-> -		crypto_free_comp(compr->cc);
-> +		crypto_free_acomp(compr->cc);
->   }
->   
->   /**
-> diff --git a/fs/ubifs/journal.c b/fs/ubifs/journal.c
-> index 36ba79fbd2ff..7629ca9ecfe8 100644
-> --- a/fs/ubifs/journal.c
-> +++ b/fs/ubifs/journal.c
-> @@ -1625,7 +1625,7 @@ static int truncate_data_node(const struct ubifs_info *c, const struct inode *in
->   	int err, dlen, compr_type, out_len, data_size;
->   
->   	out_len = le32_to_cpu(dn->size);
-> -	buf = kmalloc_array(out_len, WORST_COMPR_FACTOR, GFP_NOFS);
-> +	buf = kmalloc(out_len, GFP_NOFS);
->   	if (!buf)
->   		return -ENOMEM;
->   
-> diff --git a/fs/ubifs/ubifs.h b/fs/ubifs/ubifs.h
-> index 3375bbe0508c..7d0aaf5d2e23 100644
-> --- a/fs/ubifs/ubifs.h
-> +++ b/fs/ubifs/ubifs.h
-> @@ -124,13 +124,6 @@
->   #define OLD_ZNODE_AGE 20
->   #define YOUNG_ZNODE_AGE 5
->   
-> -/*
-> - * Some compressors, like LZO, may end up with more data then the input buffer.
-> - * So UBIFS always allocates larger output buffer, to be sure the compressor
-> - * will not corrupt memory in case of worst case compression.
-> - */
-> -#define WORST_COMPR_FACTOR 2
-> -
->   #ifdef CONFIG_FS_ENCRYPTION
->   #define UBIFS_CIPHER_BLOCK_SIZE FSCRYPT_CONTENTS_ALIGNMENT
->   #else
-> @@ -141,7 +134,7 @@
->    * How much memory is needed for a buffer where we compress a data node.
->    */
->   #define COMPRESSED_DATA_NODE_BUF_SZ \
-> -	(UBIFS_DATA_NODE_SZ + UBIFS_BLOCK_SIZE * WORST_COMPR_FACTOR)
-> +	(UBIFS_DATA_NODE_SZ + UBIFS_BLOCK_SIZE)
->   
->   /* Maximum expected tree height for use by bottom_up_buf */
->   #define BOTTOM_UP_HEIGHT 64
-> @@ -835,16 +828,12 @@ struct ubifs_node_range {
->    * struct ubifs_compressor - UBIFS compressor description structure.
->    * @compr_type: compressor type (%UBIFS_COMPR_LZO, etc)
->    * @cc: cryptoapi compressor handle
-> - * @comp_mutex: mutex used during compression
-> - * @decomp_mutex: mutex used during decompression
->    * @name: compressor name
->    * @capi_name: cryptoapi compressor name
->    */
->   struct ubifs_compressor {
->   	int compr_type;
-> -	struct crypto_comp *cc;
-> -	struct mutex *comp_mutex;
-> -	struct mutex *decomp_mutex;
-> +	struct crypto_acomp *cc;
->   	const char *name;
->   	const char *capi_name;
->   };
-> 
-
+> +}
+> +
+> +/**
+> + * ubifs_decompress_folio - decompress folio.
+> + * @c: UBIFS file-system description object
+> + * @in_buf: data to decompress
+> + * @in_len: length of the data to decompress
+> + * @out_folio: output folio where decompressed data should
+> + * @out_offset: offset into @out_folio
+> + * @out_len: output length is returned here
+> + * @compr_type: type of compression
+> + *
+> + * This function decompresses data from buffer @in_buf into folio
+> + * @out_folio.  The length of the uncompressed data is returned in
+> + * @out_len.  This functions returns %0 on success or a negative error
+> + * code on failure.
+> + */
+> +int ubifs_decompress_folio(const struct ubifs_info *c, const void *in_buf,
+> +			   int in_len, struct folio *out_folio,
+> +			   size_t out_offset, int *out_len, int compr_type)
+> +{
+> +	struct ubifs_compressor *compr;
+> +
+> +	if (unlikely(compr_type < 0 || compr_type >= UBIFS_COMPR_TYPES_CNT)) {
+> +		ubifs_err(c, "invalid compression type %d", compr_type);
+> +		return -EINVAL;
+> +	}
+> +
+> +	compr = ubifs_compressors[compr_type];
+> +
+> +	if (unlikely(!compr->capi_name)) {
+> +		ubifs_err(c, "%s compression is not compiled in", compr->name);
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (compr_type == UBIFS_COMPR_NONE) {
+> +		memcpy_to_folio(out_folio, out_offset, in_buf, in_len);
+> +		*out_len = in_len;
+> +		return 0;
+> +	}
+> +
+> +	{
+> +		ACOMP_REQUEST_ALLOC(req, compr->cc, GFP_NOFS | __GFP_NOWARN);
+> +
+> +		acomp_request_set_dst_folio(req, out_folio, out_offset,
+> +					    *out_len);
+>   		return ubifs_decompress_req(c, req, in_buf, in_len, out_len,
+>   					    compr->name);
+>   	}
