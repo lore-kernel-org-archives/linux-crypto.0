@@ -1,81 +1,129 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1F4C1B3937
-	for <linux-crypto@vger.kernel.org>; Wed, 19 Mar 2025 08:47:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52A3A211486
+	for <linux-crypto@vger.kernel.org>; Wed, 19 Mar 2025 09:26:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742374073; cv=none; b=rxt3PFYrazh5oBkUtfh0cDdMola7PLbI6CgwmC9+1zjqYfPKd0RWVFLHDHYEayy+KsfG1NnnRfDCHIyb8dJ1/UqMH9FjHbkLvl4vXRi2mvYsSJ0e4hB2aDSORaiuP6PU+qnTGySJTjd5rzYVyKG9tHgO9arStBC0Z4rsWYG7IJw=
+	t=1742376410; cv=none; b=XelyU0MfecKVsmUsKqpl415r5d6Ty1sTIWCD2++CxWjrzSRihrYIOF79Bkz28LEo7q8rtmgcyS2v6h7VA0VJWmAsyB1lcvBJVmyP7R7FHxK8oDaVmI+cmccZUVUUdReEg3YL243qy3zqVTIFHZc71GlD83/gJTlSRulBF1vfO6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742374073; c=relaxed/simple;
-	bh=VB+XYfxjd2Vs43pm8vkr7uALamILl1BBGLgL5P79zyg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hJENSIbUqvK9CG/+YrvU0ni/swViweSlys3pNPn3Mne7SLwnqT8rNCzO+fGTZcmyOUXTWZ33LCVhUudJBw72S1cA2DGDVeoy7TXHv370dCLdWBqueglIA+XkesRO/863Kg6mIkFjEbmm3zvuzLmn0/9Db5OVTWtb5Yf2sjo4l94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TrYqE+GA; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1742376410; c=relaxed/simple;
+	bh=1bt1b4g8xalmkzFXWnnIrwLZxbpXfYqg1gFe5i2qRTk=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=Ibusc180/bD8A1oZoJK6bMLs1SHSiwXgchBfxTy29ExMfWOGCA0ETYvEYZm1s4V4ExZwbp4IWYVrEUmQWiO+aEczRNeI5HGsYEurxetCxwl8HPoJkvVAyY9cRAo6qLtAZIJQQgqsoPiCjcAh5be6tEguLbLwnYzpmKRO5zYc6f4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=dcygCB2r; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TrYqE+GA"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D82BC4CEF1
-	for <linux-crypto@vger.kernel.org>; Wed, 19 Mar 2025 08:47:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742374073;
-	bh=VB+XYfxjd2Vs43pm8vkr7uALamILl1BBGLgL5P79zyg=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=TrYqE+GAxVk5FJkvQWmXTGKV+5/CczhBwFuiR5DVFooDmFgfBILq1SCQRzKf3nhiA
-	 yZjetmszWcqSlYm62uhZRW7ZkKmW8Jl84ISkE4PJFExsIes8z7Fq/iJN8WRfTilHLH
-	 PifCubNmYW6W8h1LNgwxB5xemFDj9z29s8nIYhe8+3CPystHXQEYol73LVtMCukmZm
-	 u+wCqK23Ju+lqPFfYXV2JQf5m9R8pJcfWBfKHRZkiTme5hUq+RvJOKUoEcvtsaSLoj
-	 TAeLaZGQ88saobl8cnYHN7GNy1RWaKHApKErT+lsnbKD/LXL2sxH/5RWbZSnkBFxDP
-	 OrguOqBQ5XZwA==
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-30bf5d7d107so58220891fa.2
-        for <linux-crypto@vger.kernel.org>; Wed, 19 Mar 2025 01:47:53 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCW3z35n+gNetMfbzgjWRxSs5e8hPmAZuBQOE4ZTmfviP6h/yu2ev00p5rxo1EFJgtk27loog3fz1m2VASI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyGjQageM7miWf07s5eTTxC2BqhYuBqfJtOyyfQVBLZ7CHy7WHT
-	VJaetZeWaXJ1wanGXJJ07VMCd9I36P8wLf0K76uqJqIP2Tqc+XF30Zp+ctwzCi1laZRv0ZW7ZS6
-	DH+8tMfMeFCy9Sr+8cckNnMZYqM8=
-X-Google-Smtp-Source: AGHT+IE8Ahqnso4BQYlx/etNEC2vPQE0730DP4x7yDLiaYWGLwaJFeWjmWeVPFVhMOX/Tn2TsswRIFULwkGeg6w77+Q=
-X-Received: by 2002:a05:6512:3b06:b0:549:8963:eb04 with SMTP id
- 2adb3069b0e04-54acb1fe25amr383924e87.40.1742374071560; Wed, 19 Mar 2025
- 01:47:51 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="dcygCB2r"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=Content-Type:MIME-Version:Message-ID:Subject:To:From:Date:
+	Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=i5+NbJvZo3E4FbIqmU24z+YhtOUYOUhTDE49eFvixLo=; b=dcygCB2rkcI6wCogJwoDxq/kWJ
+	L3NKHTlnlHS6oRMV6HluDPs+Sa/LOF1clk15/KLfkrPXzFvEBAD3ljYIN/4FQwRHgtgl030+Rwneg
+	WC9IKwZL9dlj+J9BRwa318soTe181P6KE/gT52eb/4M8XsvwF9N/fMcEDFNQTuikMGEb6L+FiRVnz
+	GImWKGv6FvSZsHDk+O237NwFf99YV3ozmh504caBKfGesyXnySiOvVoTL0J0itIVSLbiK3pQqDksU
+	mtB1InYS5VHXz9hckbSoGW/HfoOmuJIMWQfRbHpbBx6d0TUpLezCJd7jVJqzAgBDCQRtxUxYf3Pnw
+	CNaobUzw==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tuphD-008M3h-1x;
+	Wed, 19 Mar 2025 17:26:44 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 19 Mar 2025 17:26:43 +0800
+Date: Wed, 19 Mar 2025 17:26:43 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [PATCH] crypto: crypto4xx - Fix gcc12 uninitialized warning in
+ crypto4xx_crypt
+Message-ID: <Z9qN05tYIrnh_L8I@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <Z9pfpHP783E3W6pz@gondor.apana.org.au> <CAMj1kXFxbUm1NUd2ogVAqOydPhcbU9GwnOhYnbuM9Tg8GNazwg@mail.gmail.com>
- <Z9p_0k7AsqZql-Ye@gondor.apana.org.au>
-In-Reply-To: <Z9p_0k7AsqZql-Ye@gondor.apana.org.au>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Wed, 19 Mar 2025 09:47:39 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXES_4oM2g9s8TfQaBSgx+whx4++mU2ZHX0B_rA1ipUOhQ@mail.gmail.com>
-X-Gm-Features: AQ5f1Jp5neAI1XoFucuKd05biuuMxtS3senYzrCR_0C8vJKJClCtAl4GuonwBOE
-Message-ID: <CAMj1kXES_4oM2g9s8TfQaBSgx+whx4++mU2ZHX0B_rA1ipUOhQ@mail.gmail.com>
-Subject: Re: Cavium and lzs
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Jan Glauber <jglauber@cavium.com>, 
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Wed, 19 Mar 2025 at 09:27, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> On Wed, Mar 19, 2025 at 09:18:42AM +0100, Ard Biesheuvel wrote:
-> >
-> > Not sure whether there are any other SoCs that incorporate the same
-> > IP, but the ThunderX SoC that it was added for is hopelessly obsolete.
-> >
-> > So depending on that, we might either drop just LZS support, or the
-> > whole driver.
->
-> Removing the driver works for me.  This is the last thing stopping us
-> from removing the scratch dst buffer in scomp.
->
+The compiler gcc 12 warns about the IV buffer being uninitialized
+in crypto4xx_crypt.  Silence the warning by using the new gcc 12
+access attribute to mark crypto4xx_build_pd.
 
-Excellent. I was hoping we'd be able to get rid of those at some point.
+Also fix the IV buffer length as it has been quadrupled (64 instead
+of 16).
 
-> Which is ironic because cavium allocates its own scratch buffers so
-> the scomp one is only used because the driver isn't acomp.
->
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-18 files changed, 3794 deletions(-)
-
-Nuff said
+diff --git a/drivers/crypto/amcc/crypto4xx_alg.c b/drivers/crypto/amcc/crypto4xx_alg.c
+index e0af611a95d8..289750f34ccf 100644
+--- a/drivers/crypto/amcc/crypto4xx_alg.c
++++ b/drivers/crypto/amcc/crypto4xx_alg.c
+@@ -72,7 +72,7 @@ static inline int crypto4xx_crypt(struct skcipher_request *req,
+ {
+ 	struct crypto_skcipher *cipher = crypto_skcipher_reqtfm(req);
+ 	struct crypto4xx_ctx *ctx = crypto_skcipher_ctx(cipher);
+-	__le32 iv[AES_IV_SIZE];
++	__le32 iv[AES_IV_SIZE / 4];
+ 
+ 	if (check_blocksize && !IS_ALIGNED(req->cryptlen, AES_BLOCK_SIZE))
+ 		return -EINVAL;
+@@ -429,7 +429,7 @@ static int crypto4xx_crypt_aes_ccm(struct aead_request *req, bool decrypt)
+ 	struct crypto4xx_ctx *ctx  = crypto_tfm_ctx(req->base.tfm);
+ 	struct crypto4xx_aead_reqctx *rctx = aead_request_ctx(req);
+ 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+-	__le32 iv[16];
++	__le32 iv[4];
+ 	u32 tmp_sa[SA_AES128_CCM_LEN + 4];
+ 	struct dynamic_sa_ctl *sa = (struct dynamic_sa_ctl *)tmp_sa;
+ 	unsigned int len = req->cryptlen;
+diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
+index d6b8d962d20a..f67c8f987e8b 100644
+--- a/drivers/crypto/amcc/crypto4xx_core.c
++++ b/drivers/crypto/amcc/crypto4xx_core.c
+@@ -677,7 +677,7 @@ int crypto4xx_build_pd(struct crypto_async_request *req,
+ 		       struct scatterlist *src,
+ 		       struct scatterlist *dst,
+ 		       const unsigned int datalen,
+-		       const __le32 *iv, const u32 iv_len,
++		       const void *iv, const u32 iv_len,
+ 		       const struct dynamic_sa_ctl *req_sa,
+ 		       const unsigned int sa_len,
+ 		       const unsigned int assoclen,
+diff --git a/drivers/crypto/amcc/crypto4xx_core.h b/drivers/crypto/amcc/crypto4xx_core.h
+index 3adcc5e65694..11a69ec60ab2 100644
+--- a/drivers/crypto/amcc/crypto4xx_core.h
++++ b/drivers/crypto/amcc/crypto4xx_core.h
+@@ -147,6 +147,12 @@ struct crypto4xx_alg {
+ 	struct crypto4xx_device *dev;
+ };
+ 
++#if IS_ENABLED(CONFIG_CC_IS_GCC) && CONFIG_GCC_VERSION >= 120000
++#define BUILD_PD_ACCESS __attribute__((access(read_only, 6, 7)))
++#else
++#define BUILD_PD_ACCESS
++#endif
++
+ int crypto4xx_alloc_sa(struct crypto4xx_ctx *ctx, u32 size);
+ void crypto4xx_free_sa(struct crypto4xx_ctx *ctx);
+ int crypto4xx_build_pd(struct crypto_async_request *req,
+@@ -154,11 +160,11 @@ int crypto4xx_build_pd(struct crypto_async_request *req,
+ 		       struct scatterlist *src,
+ 		       struct scatterlist *dst,
+ 		       const unsigned int datalen,
+-		       const __le32 *iv, const u32 iv_len,
++		       const void *iv, const u32 iv_len,
+ 		       const struct dynamic_sa_ctl *sa,
+ 		       const unsigned int sa_len,
+ 		       const unsigned int assoclen,
+-		       struct scatterlist *dst_tmp);
++		       struct scatterlist *dst_tmp) BUILD_PD_ACCESS;
+ int crypto4xx_setkey_aes_cbc(struct crypto_skcipher *cipher,
+ 			     const u8 *key, unsigned int keylen);
+ int crypto4xx_setkey_aes_ctr(struct crypto_skcipher *cipher,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
