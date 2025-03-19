@@ -1,43 +1,43 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13090253329
-	for <linux-crypto@vger.kernel.org>; Wed, 19 Mar 2025 12:31:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 109932566FB
+	for <linux-crypto@vger.kernel.org>; Wed, 19 Mar 2025 12:31:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742387515; cv=none; b=OryDR9lZ+yNr7rxHlpdlTaF71POPwU1IuFOmimWoBN8QTdowArd9kaQ8LVrTln7Fw4QEA6nTZXdUeFV+nyNgEjQxPJbThBCk9tFHqpIZ00+w7cWuIbu1BfhmCfxMe6t5AHwQn/0ooYkoM042yA6N8MYuI74jKYsu1oUI9ilsmPo=
+	t=1742387517; cv=none; b=rpOI/K6SMgr3W0DZYxq8MzKH3nCABMTNbq1AocGcPF+V5qI3nBweKxBxExTSzpIjnLFzDfZHrKvHz5iDgcbDv8vUcoQlO8ku5qBQAiYnxrS/Sm60zPN4qKJisfiZiAqTsIGmHgsyJQp8lNNm0a0rfT7ybEAH6BQQVQ9VPiWDvKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742387515; c=relaxed/simple;
-	bh=LsxevvB5nFM6xsefjkXDy+vlGYYgYLZ0JgqdGTyVfIk=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To:Cc; b=ICXWmuaRwloALy1UzTcCu07C08zaefLyGu2cQhiUz/SHvPBsqTMalCs4CMq8g3u7WBJh639D3f3BY32ok/Nr28xKZWQVRoQPor5beTfizzG6tagtSrm8ru2kL/fLSv9wvG9xxfOapS5t7pNhm8nSuxyqJgqQrX+8NHnGG+4Os4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=sTxy71FH; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1742387517; c=relaxed/simple;
+	bh=P5YQ2tkU5yomGenSWWBepe4ERDQ59/8bSqkDFLknwFo=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To:Cc; b=f0Ya7jYs42Xizz8MCXq8puJ7bzhjrqtTYZpSvooWRq4bbctIZGzjlgYDdpyy8oL9JggkMC+BIATGS/BK3cNlzbyOoeaMIvvFAMltlt3pyhmRq5tpkmmvpjV/gNY/qatJ1bNmce1OSlbmgidyBn4uq+qE5mGvWtyDwPVsTQmkcbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=YVs7cH1N; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="sTxy71FH"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="YVs7cH1N"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=Cc:To:Subject:From:References:In-Reply-To:Message-Id:Date:
 	Sender:Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
 	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
 	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=nVwUdE9HTC/8yO3XuoXy2CW+YxOqZB3IOsm+WSacGYE=; b=sTxy71FHiWwXeYVlEkyjIcIrIw
-	wZLKcWUdgbYqZVcOpUceDKy1iB749NqEyAor5AtUj9HaE9zFt+MMkpF+2ycCEr7osvqWNhI1MdvEt
-	iB08yVX+77JF66dNpwQBAKG7VLJ+d28Bk2X39OvGIElfdXaRX7gSf3r9GWqGj/XFU4CK9kFw576g1
-	VsgnCqK/r6B6DXyqubhIGRXKX83ZOBYfbA7BTocf/DKY8qgXGVKB5+8OfKzFmErI36GqRD3yca8jU
-	EAsSrNTlTBCrIKLA1GGJLy1OcETFxfjrIHsF7umQqYfcKKKoPtUZUUOcyF3NbM4AyNc5VtNJkkszZ
-	yzx857Lw==;
+	bh=C8PtQI73n+VviJs5ze/O0GwsIThsQsrgAOUaUikfCmc=; b=YVs7cH1NUIgDe4cFNcG59P5XRh
+	RuettO+CgyjKTpMnegg0GJPhzhB4M6GEbca4M7HvFw+wB8hZExggDWHUvip4aT9dVIOtffWaQlyBx
+	NFMB6scUlFuJgwdcw8RoScSnCfngvM5kQEyFa/EV/M/CY5XOewCAXnx2mq2SSt3Wgx9FLE4RXQ98E
+	a01E4QgYIlVr3Vnc8TDxUse4LRXldMPLOB1Xmb6ie7kVGY8ciE32nAsiblKIgEr71Jj88HQes3wRk
+	UxPVC6usPt9+C917vZJnsgELZY8UPuRsLj8OHWjhY6Ii3lKNnamQ02vwtqmU8pab83cSnwOWeBXhl
+	kHBJweMA==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tusaL-008Q12-1D;
-	Wed, 19 Mar 2025 20:31:50 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 19 Mar 2025 20:31:49 +0800
-Date: Wed, 19 Mar 2025 20:31:49 +0800
-Message-Id: <fdbda8c4d075545e424faf24a5f58f824b7186de.1742387288.git.herbert@gondor.apana.org.au>
+	id 1tusaJ-008Q0q-0B;
+	Wed, 19 Mar 2025 20:31:48 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Wed, 19 Mar 2025 20:31:47 +0800
+Date: Wed, 19 Mar 2025 20:31:47 +0800
+Message-Id: <09343a1a32ee73fc975bb5645c8c0182739df398.1742387288.git.herbert@gondor.apana.org.au>
 In-Reply-To: <cover.1742387288.git.herbert@gondor.apana.org.au>
 References: <cover.1742387288.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 3/3] crypto: scomp - Drop the dst scratch buffer
+Subject: [PATCH 2/3] crypto: cavium/zip - Remove driver
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Cc: Ard Biesheuvel <ardb@kernel.org>
 Precedence: bulk
@@ -46,199 +46,3845 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
-As deflate has been converted over to acomp, and cavium zip has been
-removed, there are no longer any scomp algorithms that can be used
-by IPsec.
-
-Since IPsec was the only user of the dst scratch buffer, remove it.
+Remove cavium/zip as it is obsolete and stands in the way of
+acomp API work.  If this is ever resurrected, please turn it
+into an acomp driver.
 
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- crypto/scompress.c | 98 +++++++++++++++++++++-------------------------
- 1 file changed, 44 insertions(+), 54 deletions(-)
+ drivers/crypto/Kconfig                  |    7 -
+ drivers/crypto/cavium/Makefile          |    1 -
+ drivers/crypto/cavium/zip/Makefile      |   12 -
+ drivers/crypto/cavium/zip/common.h      |  222 ----
+ drivers/crypto/cavium/zip/zip_crypto.c  |  261 -----
+ drivers/crypto/cavium/zip/zip_crypto.h  |   68 --
+ drivers/crypto/cavium/zip/zip_deflate.c |  200 ----
+ drivers/crypto/cavium/zip/zip_deflate.h |   62 --
+ drivers/crypto/cavium/zip/zip_device.c  |  202 ----
+ drivers/crypto/cavium/zip/zip_device.h  |  108 --
+ drivers/crypto/cavium/zip/zip_inflate.c |  223 ----
+ drivers/crypto/cavium/zip/zip_inflate.h |   62 --
+ drivers/crypto/cavium/zip/zip_main.c    |  603 ----------
+ drivers/crypto/cavium/zip/zip_main.h    |  120 --
+ drivers/crypto/cavium/zip/zip_mem.c     |  114 --
+ drivers/crypto/cavium/zip/zip_mem.h     |   78 --
+ drivers/crypto/cavium/zip/zip_regs.h    | 1347 -----------------------
+ 17 files changed, 3690 deletions(-)
+ delete mode 100644 drivers/crypto/cavium/zip/Makefile
+ delete mode 100644 drivers/crypto/cavium/zip/common.h
+ delete mode 100644 drivers/crypto/cavium/zip/zip_crypto.c
+ delete mode 100644 drivers/crypto/cavium/zip/zip_crypto.h
+ delete mode 100644 drivers/crypto/cavium/zip/zip_deflate.c
+ delete mode 100644 drivers/crypto/cavium/zip/zip_deflate.h
+ delete mode 100644 drivers/crypto/cavium/zip/zip_device.c
+ delete mode 100644 drivers/crypto/cavium/zip/zip_device.h
+ delete mode 100644 drivers/crypto/cavium/zip/zip_inflate.c
+ delete mode 100644 drivers/crypto/cavium/zip/zip_inflate.h
+ delete mode 100644 drivers/crypto/cavium/zip/zip_main.c
+ delete mode 100644 drivers/crypto/cavium/zip/zip_main.h
+ delete mode 100644 drivers/crypto/cavium/zip/zip_mem.c
+ delete mode 100644 drivers/crypto/cavium/zip/zip_mem.h
+ delete mode 100644 drivers/crypto/cavium/zip/zip_regs.h
 
-diff --git a/crypto/scompress.c b/crypto/scompress.c
-index 5a40605570f5..4a2b3933aa95 100644
---- a/crypto/scompress.c
-+++ b/crypto/scompress.c
-@@ -25,15 +25,12 @@
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index 47082782008a..5686369779be 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -530,13 +530,6 @@ source "drivers/crypto/cavium/nitrox/Kconfig"
+ source "drivers/crypto/marvell/Kconfig"
+ source "drivers/crypto/intel/Kconfig"
  
- #include "compress.h"
- 
--#define SCOMP_SCRATCH_SIZE 65400
+-config CRYPTO_DEV_CAVIUM_ZIP
+-	tristate "Cavium ZIP driver"
+-	depends on PCI && 64BIT && (ARM64 || COMPILE_TEST)
+-	help
+-	  Select this option if you want to enable compression/decompression
+-	  acceleration on Cavium's ARM based SoCs
 -
- struct scomp_scratch {
- 	spinlock_t	lock;
- 	union {
- 		void	*src;
- 		unsigned long saddr;
- 	};
--	void		*dst;
- };
- 
- static DEFINE_PER_CPU(struct scomp_scratch, scomp_scratch) = {
-@@ -78,9 +75,7 @@ static void crypto_scomp_free_scratches(void)
- 		scratch = per_cpu_ptr(&scomp_scratch, i);
- 
- 		free_page(scratch->saddr);
--		kvfree(scratch->dst);
- 		scratch->src = NULL;
--		scratch->dst = NULL;
- 	}
- }
- 
-@@ -88,19 +83,12 @@ static int scomp_alloc_scratch(struct scomp_scratch *scratch, int cpu)
- {
- 	int node = cpu_to_node(cpu);
- 	struct page *page;
--	void *mem;
- 
--	mem = kvmalloc_node(SCOMP_SCRATCH_SIZE, GFP_KERNEL, node);
--	if (!mem)
+ config CRYPTO_DEV_QCE
+ 	tristate "Qualcomm crypto engine accelerator"
+ 	depends on ARCH_QCOM || COMPILE_TEST
+diff --git a/drivers/crypto/cavium/Makefile b/drivers/crypto/cavium/Makefile
+index 6c1297426376..75227c587ed0 100644
+--- a/drivers/crypto/cavium/Makefile
++++ b/drivers/crypto/cavium/Makefile
+@@ -4,4 +4,3 @@
+ #
+ obj-$(CONFIG_CRYPTO_DEV_CPT) += cpt/
+ obj-$(CONFIG_CRYPTO_DEV_NITROX) += nitrox/
+-obj-$(CONFIG_CRYPTO_DEV_CAVIUM_ZIP) += zip/
+diff --git a/drivers/crypto/cavium/zip/Makefile b/drivers/crypto/cavium/zip/Makefile
+deleted file mode 100644
+index 020d189d793d..000000000000
+--- a/drivers/crypto/cavium/zip/Makefile
++++ /dev/null
+@@ -1,12 +0,0 @@
+-# SPDX-License-Identifier: GPL-2.0
+-#
+-# Makefile for Cavium's ZIP Driver.
+-#
+-
+-obj-$(CONFIG_CRYPTO_DEV_CAVIUM_ZIP) += thunderx_zip.o
+-thunderx_zip-y := zip_main.o    \
+-                  zip_device.o  \
+-                  zip_crypto.o  \
+-                  zip_mem.o     \
+-                  zip_deflate.o \
+-                  zip_inflate.o
+diff --git a/drivers/crypto/cavium/zip/common.h b/drivers/crypto/cavium/zip/common.h
+deleted file mode 100644
+index 54f6fb054119..000000000000
+--- a/drivers/crypto/cavium/zip/common.h
++++ /dev/null
+@@ -1,222 +0,0 @@
+-/***********************license start************************************
+- * Copyright (c) 2003-2017 Cavium, Inc.
+- * All rights reserved.
+- *
+- * License: one of 'Cavium License' or 'GNU General Public License Version 2'
+- *
+- * This file is provided under the terms of the Cavium License (see below)
+- * or under the terms of GNU General Public License, Version 2, as
+- * published by the Free Software Foundation. When using or redistributing
+- * this file, you may do so under either license.
+- *
+- * Cavium License:  Redistribution and use in source and binary forms, with
+- * or without modification, are permitted provided that the following
+- * conditions are met:
+- *
+- *  * Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- *
+- *  * Redistributions in binary form must reproduce the above
+- *    copyright notice, this list of conditions and the following
+- *    disclaimer in the documentation and/or other materials provided
+- *    with the distribution.
+- *
+- *  * Neither the name of Cavium Inc. nor the names of its contributors may be
+- *    used to endorse or promote products derived from this software without
+- *    specific prior written permission.
+- *
+- * This Software, including technical data, may be subject to U.S. export
+- * control laws, including the U.S. Export Administration Act and its
+- * associated regulations, and may be subject to export or import
+- * regulations in other countries.
+- *
+- * TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS PROVIDED "AS IS"
+- * AND WITH ALL FAULTS AND CAVIUM INC. MAKES NO PROMISES, REPRESENTATIONS
+- * OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, WITH
+- * RESPECT TO THE SOFTWARE, INCLUDING ITS CONDITION, ITS CONFORMITY TO ANY
+- * REPRESENTATION OR DESCRIPTION, OR THE EXISTENCE OF ANY LATENT OR PATENT
+- * DEFECTS, AND CAVIUM SPECIFICALLY DISCLAIMS ALL IMPLIED (IF ANY)
+- * WARRANTIES OF TITLE, MERCHANTABILITY, NONINFRINGEMENT, FITNESS FOR A
+- * PARTICULAR PURPOSE, LACK OF VIRUSES, ACCURACY OR COMPLETENESS, QUIET
+- * ENJOYMENT, QUIET POSSESSION OR CORRESPONDENCE TO DESCRIPTION. THE
+- * ENTIRE  RISK ARISING OUT OF USE OR PERFORMANCE OF THE SOFTWARE LIES
+- * WITH YOU.
+- ***********************license end**************************************/
+-
+-#ifndef __COMMON_H__
+-#define __COMMON_H__
+-
+-#include <linux/delay.h>
+-#include <linux/init.h>
+-#include <linux/interrupt.h>
+-#include <linux/io.h>
+-#include <linux/kernel.h>
+-#include <linux/module.h>
+-#include <linux/pci.h>
+-#include <linux/seq_file.h>
+-#include <linux/string.h>
+-#include <linux/types.h>
+-
+-/* Device specific zlib function definitions */
+-#include "zip_device.h"
+-
+-/* ZIP device definitions */
+-#include "zip_main.h"
+-
+-/* ZIP memory allocation/deallocation related definitions */
+-#include "zip_mem.h"
+-
+-/* Device specific structure definitions */
+-#include "zip_regs.h"
+-
+-#define ZIP_ERROR    -1
+-
+-#define ZIP_FLUSH_FINISH  4
+-
+-#define RAW_FORMAT		0  /* for rawpipe */
+-#define ZLIB_FORMAT		1  /* for zpipe */
+-#define GZIP_FORMAT		2  /* for gzpipe */
+-#define LZS_FORMAT		3  /* for lzspipe */
+-
+-/* Max number of ZIP devices supported */
+-#define MAX_ZIP_DEVICES		2
+-
+-/* Configures the number of zip queues to be used */
+-#define ZIP_NUM_QUEUES		2
+-
+-#define DYNAMIC_STOP_EXCESS	1024
+-
+-/* Maximum buffer sizes in direct mode */
+-#define MAX_INPUT_BUFFER_SIZE   (64 * 1024)
+-#define MAX_OUTPUT_BUFFER_SIZE  (64 * 1024)
+-
+-/**
+- * struct zip_operation - common data structure for comp and decomp operations
+- * @input:               Next input byte is read from here
+- * @output:              Next output byte written here
+- * @ctx_addr:            Inflate context buffer address
+- * @history:             Pointer to the history buffer
+- * @input_len:           Number of bytes available at next_in
+- * @input_total_len:     Total number of input bytes read
+- * @output_len:          Remaining free space at next_out
+- * @output_total_len:    Total number of bytes output so far
+- * @csum:                Checksum value of the uncompressed data
+- * @flush:               Flush flag
+- * @format:              Format (depends on stream's wrap)
+- * @speed:               Speed depends on stream's level
+- * @ccode:               Compression code ( stream's strategy)
+- * @lzs_flag:            Flag for LZS support
+- * @begin_file:          Beginning of file indication for inflate
+- * @history_len:         Size of the history data
+- * @end_file:            Ending of the file indication for inflate
+- * @compcode:            Completion status of the ZIP invocation
+- * @bytes_read:          Input bytes read in current instruction
+- * @bits_processed:      Total bits processed for entire file
+- * @sizeofptr:           To distinguish between ILP32 and LP64
+- * @sizeofzops:          Optional just for padding
+- *
+- * This structure is used to maintain the required meta data for the
+- * comp and decomp operations.
+- */
+-struct zip_operation {
+-	u8    *input;
+-	u8    *output;
+-	u64   ctx_addr;
+-	u64   history;
+-
+-	u32   input_len;
+-	u32   input_total_len;
+-
+-	u32   output_len;
+-	u32   output_total_len;
+-
+-	u32   csum;
+-	u32   flush;
+-
+-	u32   format;
+-	u32   speed;
+-	u32   ccode;
+-	u32   lzs_flag;
+-
+-	u32   begin_file;
+-	u32   history_len;
+-
+-	u32   end_file;
+-	u32   compcode;
+-	u32   bytes_read;
+-	u32   bits_processed;
+-
+-	u32   sizeofptr;
+-	u32   sizeofzops;
+-};
+-
+-static inline int zip_poll_result(union zip_zres_s *result)
+-{
+-	int retries = 1000;
+-
+-	while (!result->s.compcode) {
+-		if (!--retries) {
+-			pr_err("ZIP ERR: request timed out");
+-			return -ETIMEDOUT;
+-		}
+-		udelay(10);
+-		/*
+-		 * Force re-reading of compcode which is updated
+-		 * by the ZIP coprocessor.
+-		 */
+-		rmb();
+-	}
+-	return 0;
+-}
+-
+-/* error messages */
+-#define zip_err(fmt, args...) pr_err("ZIP ERR:%s():%d: " \
+-			      fmt "\n", __func__, __LINE__, ## args)
+-
+-#ifdef MSG_ENABLE
+-/* Enable all messages */
+-#define zip_msg(fmt, args...) pr_info("ZIP_MSG:" fmt "\n", ## args)
+-#else
+-#define zip_msg(fmt, args...)
+-#endif
+-
+-#if defined(ZIP_DEBUG_ENABLE) && defined(MSG_ENABLE)
+-
+-#ifdef DEBUG_LEVEL
+-
+-#define FILE_NAME (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : \
+-	strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)
+-
+-#if DEBUG_LEVEL >= 4
+-
+-#define zip_dbg(fmt, args...) pr_info("ZIP DBG: %s: %s() : %d: " \
+-			      fmt "\n", FILE_NAME, __func__, __LINE__, ## args)
+-
+-#elif DEBUG_LEVEL >= 3
+-
+-#define zip_dbg(fmt, args...) pr_info("ZIP DBG: %s: %s() : %d: " \
+-			      fmt "\n", FILE_NAME, __func__, __LINE__, ## args)
+-
+-#elif DEBUG_LEVEL >= 2
+-
+-#define zip_dbg(fmt, args...) pr_info("ZIP DBG: %s() : %d: " \
+-			      fmt "\n", __func__, __LINE__, ## args)
+-
+-#else
+-
+-#define zip_dbg(fmt, args...) pr_info("ZIP DBG:" fmt "\n", ## args)
+-
+-#endif /* DEBUG LEVEL >=4 */
+-
+-#else
+-
+-#define zip_dbg(fmt, args...) pr_info("ZIP DBG:" fmt "\n", ## args)
+-
+-#endif /* DEBUG_LEVEL */
+-#else
+-
+-#define zip_dbg(fmt, args...)
+-
+-#endif /* ZIP_DEBUG_ENABLE && MSG_ENABLE*/
+-
+-#endif
+diff --git a/drivers/crypto/cavium/zip/zip_crypto.c b/drivers/crypto/cavium/zip/zip_crypto.c
+deleted file mode 100644
+index 02e87f2d50db..000000000000
+--- a/drivers/crypto/cavium/zip/zip_crypto.c
++++ /dev/null
+@@ -1,261 +0,0 @@
+-/***********************license start************************************
+- * Copyright (c) 2003-2017 Cavium, Inc.
+- * All rights reserved.
+- *
+- * License: one of 'Cavium License' or 'GNU General Public License Version 2'
+- *
+- * This file is provided under the terms of the Cavium License (see below)
+- * or under the terms of GNU General Public License, Version 2, as
+- * published by the Free Software Foundation. When using or redistributing
+- * this file, you may do so under either license.
+- *
+- * Cavium License:  Redistribution and use in source and binary forms, with
+- * or without modification, are permitted provided that the following
+- * conditions are met:
+- *
+- *  * Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- *
+- *  * Redistributions in binary form must reproduce the above
+- *    copyright notice, this list of conditions and the following
+- *    disclaimer in the documentation and/or other materials provided
+- *    with the distribution.
+- *
+- *  * Neither the name of Cavium Inc. nor the names of its contributors may be
+- *    used to endorse or promote products derived from this software without
+- *    specific prior written permission.
+- *
+- * This Software, including technical data, may be subject to U.S. export
+- * control laws, including the U.S. Export Administration Act and its
+- * associated regulations, and may be subject to export or import
+- * regulations in other countries.
+- *
+- * TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS PROVIDED "AS IS"
+- * AND WITH ALL FAULTS AND CAVIUM INC. MAKES NO PROMISES, REPRESENTATIONS
+- * OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, WITH
+- * RESPECT TO THE SOFTWARE, INCLUDING ITS CONDITION, ITS CONFORMITY TO ANY
+- * REPRESENTATION OR DESCRIPTION, OR THE EXISTENCE OF ANY LATENT OR PATENT
+- * DEFECTS, AND CAVIUM SPECIFICALLY DISCLAIMS ALL IMPLIED (IF ANY)
+- * WARRANTIES OF TITLE, MERCHANTABILITY, NONINFRINGEMENT, FITNESS FOR A
+- * PARTICULAR PURPOSE, LACK OF VIRUSES, ACCURACY OR COMPLETENESS, QUIET
+- * ENJOYMENT, QUIET POSSESSION OR CORRESPONDENCE TO DESCRIPTION. THE
+- * ENTIRE  RISK ARISING OUT OF USE OR PERFORMANCE OF THE SOFTWARE LIES
+- * WITH YOU.
+- ***********************license end**************************************/
+-
+-#include "zip_crypto.h"
+-
+-static void zip_static_init_zip_ops(struct zip_operation *zip_ops,
+-				    int lzs_flag)
+-{
+-	zip_ops->flush        = ZIP_FLUSH_FINISH;
+-
+-	/* equivalent to level 6 of opensource zlib */
+-	zip_ops->speed          = 1;
+-
+-	if (!lzs_flag) {
+-		zip_ops->ccode		= 0; /* Auto Huffman */
+-		zip_ops->lzs_flag	= 0;
+-		zip_ops->format		= ZLIB_FORMAT;
+-	} else {
+-		zip_ops->ccode		= 3; /* LZS Encoding */
+-		zip_ops->lzs_flag	= 1;
+-		zip_ops->format		= LZS_FORMAT;
+-	}
+-	zip_ops->begin_file   = 1;
+-	zip_ops->history_len  = 0;
+-	zip_ops->end_file     = 1;
+-	zip_ops->compcode     = 0;
+-	zip_ops->csum	      = 1; /* Adler checksum desired */
+-}
+-
+-static int zip_ctx_init(struct zip_kernel_ctx *zip_ctx, int lzs_flag)
+-{
+-	struct zip_operation  *comp_ctx   = &zip_ctx->zip_comp;
+-	struct zip_operation  *decomp_ctx = &zip_ctx->zip_decomp;
+-
+-	zip_static_init_zip_ops(comp_ctx, lzs_flag);
+-	zip_static_init_zip_ops(decomp_ctx, lzs_flag);
+-
+-	comp_ctx->input  = zip_data_buf_alloc(MAX_INPUT_BUFFER_SIZE);
+-	if (!comp_ctx->input)
 -		return -ENOMEM;
- 	page = alloc_pages_node(node, GFP_KERNEL, 0);
--	if (!page) {
--		kvfree(mem);
-+	if (!page)
- 		return -ENOMEM;
--	}
- 	spin_lock_bh(&scratch->lock);
- 	scratch->src = page_address(page);
--	scratch->dst = mem;
- 	spin_unlock_bh(&scratch->lock);
- 	return 0;
- }
-@@ -181,6 +169,8 @@ static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
- {
- 	struct crypto_acomp *tfm = crypto_acomp_reqtfm(req);
- 	struct crypto_scomp **tfm_ctx = acomp_tfm_ctx(tfm);
-+	bool src_isvirt = acomp_request_src_isvirt(req);
-+	bool dst_isvirt = acomp_request_dst_isvirt(req);
- 	struct crypto_scomp *scomp = *tfm_ctx;
- 	struct crypto_acomp_stream *stream;
- 	struct scomp_scratch *scratch;
-@@ -200,13 +190,33 @@ static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
- 	if (!req->dst || !dlen)
- 		return -EINVAL;
- 
--	stream = crypto_acomp_lock_stream_bh(&crypto_scomp_alg(scomp)->streams);
--	scratch = scomp_lock_scratch();
-+	if (dst_isvirt)
-+		dst = req->dvirt;
-+	else {
-+		if (acomp_request_dst_isfolio(req)) {
-+			dpage = folio_page(req->dfolio, 0);
-+			doff = req->doff;
-+		} else if (dlen <= req->dst->length) {
-+			dpage = sg_page(req->dst);
-+			doff = req->dst->offset;
-+		} else
-+			return -ENOSYS;
- 
--	if (acomp_request_src_isvirt(req))
-+		dpage = nth_page(dpage, doff / PAGE_SIZE);
-+		doff = offset_in_page(doff);
-+
-+		n = dlen / PAGE_SIZE;
-+		n += (offset_in_page(dlen) + doff - 1) / PAGE_SIZE;
-+		if (PageHighMem(dpage + n) &&
-+		    size_add(doff, dlen) > PAGE_SIZE)
-+			return -ENOSYS;
-+		dst = kmap_local_page(dpage) + doff;
-+	}
-+
-+	if (src_isvirt)
- 		src = req->svirt;
- 	else {
--		src = scratch->src;
-+		src = NULL;
- 		do {
- 			if (acomp_request_src_isfolio(req)) {
- 				spage = folio_page(req->sfolio, 0);
-@@ -227,57 +237,39 @@ static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
- 				break;
- 			src = kmap_local_page(spage) + soff;
- 		} while (0);
 -
--		if (src == scratch->src)
--			memcpy_from_sglist(scratch->src, req->src, 0, slen);
- 	}
- 
--	if (acomp_request_dst_isvirt(req))
--		dst = req->dvirt;
--	else {
--		unsigned int max = SCOMP_SCRATCH_SIZE;
-+	stream = crypto_acomp_lock_stream_bh(&crypto_scomp_alg(scomp)->streams);
- 
--		dst = scratch->dst;
--		do {
--			if (acomp_request_dst_isfolio(req)) {
--				dpage = folio_page(req->dfolio, 0);
--				doff = req->doff;
--			} else if (dlen <= req->dst->length) {
--				dpage = sg_page(req->dst);
--				doff = req->dst->offset;
--			} else
--				break;
-+	if (!src_isvirt && !src) {
-+		const u8 *src;
- 
--			dpage = nth_page(dpage, doff / PAGE_SIZE);
--			doff = offset_in_page(doff);
-+		scratch = scomp_lock_scratch();
-+		src = scratch->src;
-+		memcpy_from_sglist(scratch->src, req->src, 0, slen);
- 
--			n = dlen / PAGE_SIZE;
--			n += (offset_in_page(dlen) + doff - 1) / PAGE_SIZE;
--			if (PageHighMem(dpage + n) &&
--			    size_add(doff, dlen) > PAGE_SIZE)
--				break;
--			dst = kmap_local_page(dpage) + doff;
--			max = dlen;
--		} while (0);
--		dlen = min(dlen, max);
--	}
-+		if (dir)
-+			ret = crypto_scomp_compress(scomp, src, slen,
-+						    dst, &dlen, stream->ctx);
-+		else
-+			ret = crypto_scomp_decompress(scomp, src, slen,
-+						      dst, &dlen, stream->ctx);
- 
--	if (dir)
-+		scomp_unlock_scratch(scratch);
-+	} else if (dir)
- 		ret = crypto_scomp_compress(scomp, src, slen,
- 					    dst, &dlen, stream->ctx);
- 	else
- 		ret = crypto_scomp_decompress(scomp, src, slen,
- 					      dst, &dlen, stream->ctx);
- 
--	if (dst == scratch->dst)
--		memcpy_to_sglist(req->dst, 0, dst, dlen);
+-	comp_ctx->output = zip_data_buf_alloc(MAX_OUTPUT_BUFFER_SIZE);
+-	if (!comp_ctx->output)
+-		goto err_comp_input;
 -
--	scomp_unlock_scratch(scratch);
- 	crypto_acomp_unlock_stream_bh(stream);
- 
- 	req->dlen = dlen;
- 
--	if (!acomp_request_dst_isvirt(req) && dst != scratch->dst) {
-+	if (!src_isvirt && src)
-+		kunmap_local(src);
-+	if (!dst_isvirt) {
- 		kunmap_local(dst);
- 		dlen += doff;
- 		for (;;) {
-@@ -288,8 +280,6 @@ static int scomp_acomp_comp_decomp(struct acomp_req *req, int dir)
- 			dpage = nth_page(dpage, 1);
- 		}
- 	}
--	if (!acomp_request_src_isvirt(req) && src != scratch->src)
--		kunmap_local(src);
- 
- 	return ret;
- }
+-	decomp_ctx->input  = zip_data_buf_alloc(MAX_INPUT_BUFFER_SIZE);
+-	if (!decomp_ctx->input)
+-		goto err_comp_output;
+-
+-	decomp_ctx->output = zip_data_buf_alloc(MAX_OUTPUT_BUFFER_SIZE);
+-	if (!decomp_ctx->output)
+-		goto err_decomp_input;
+-
+-	return 0;
+-
+-err_decomp_input:
+-	zip_data_buf_free(decomp_ctx->input, MAX_INPUT_BUFFER_SIZE);
+-
+-err_comp_output:
+-	zip_data_buf_free(comp_ctx->output, MAX_OUTPUT_BUFFER_SIZE);
+-
+-err_comp_input:
+-	zip_data_buf_free(comp_ctx->input, MAX_INPUT_BUFFER_SIZE);
+-
+-	return -ENOMEM;
+-}
+-
+-static void zip_ctx_exit(struct zip_kernel_ctx *zip_ctx)
+-{
+-	struct zip_operation  *comp_ctx   = &zip_ctx->zip_comp;
+-	struct zip_operation  *dec_ctx = &zip_ctx->zip_decomp;
+-
+-	zip_data_buf_free(comp_ctx->input, MAX_INPUT_BUFFER_SIZE);
+-	zip_data_buf_free(comp_ctx->output, MAX_OUTPUT_BUFFER_SIZE);
+-
+-	zip_data_buf_free(dec_ctx->input, MAX_INPUT_BUFFER_SIZE);
+-	zip_data_buf_free(dec_ctx->output, MAX_OUTPUT_BUFFER_SIZE);
+-}
+-
+-static int zip_compress(const u8 *src, unsigned int slen,
+-		 u8 *dst, unsigned int *dlen,
+-		 struct zip_kernel_ctx *zip_ctx)
+-{
+-	struct zip_operation  *zip_ops   = NULL;
+-	struct zip_state      *zip_state;
+-	struct zip_device     *zip = NULL;
+-	int ret;
+-
+-	if (!zip_ctx || !src || !dst || !dlen)
+-		return -ENOMEM;
+-
+-	zip = zip_get_device(zip_get_node_id());
+-	if (!zip)
+-		return -ENODEV;
+-
+-	zip_state = kzalloc(sizeof(*zip_state), GFP_ATOMIC);
+-	if (!zip_state)
+-		return -ENOMEM;
+-
+-	zip_ops = &zip_ctx->zip_comp;
+-
+-	zip_ops->input_len  = slen;
+-	zip_ops->output_len = *dlen;
+-	memcpy(zip_ops->input, src, slen);
+-
+-	ret = zip_deflate(zip_ops, zip_state, zip);
+-
+-	if (!ret) {
+-		*dlen = zip_ops->output_len;
+-		memcpy(dst, zip_ops->output, *dlen);
+-	}
+-	kfree(zip_state);
+-	return ret;
+-}
+-
+-static int zip_decompress(const u8 *src, unsigned int slen,
+-		   u8 *dst, unsigned int *dlen,
+-		   struct zip_kernel_ctx *zip_ctx)
+-{
+-	struct zip_operation  *zip_ops   = NULL;
+-	struct zip_state      *zip_state;
+-	struct zip_device     *zip = NULL;
+-	int ret;
+-
+-	if (!zip_ctx || !src || !dst || !dlen)
+-		return -ENOMEM;
+-
+-	zip = zip_get_device(zip_get_node_id());
+-	if (!zip)
+-		return -ENODEV;
+-
+-	zip_state = kzalloc(sizeof(*zip_state), GFP_ATOMIC);
+-	if (!zip_state)
+-		return -ENOMEM;
+-
+-	zip_ops = &zip_ctx->zip_decomp;
+-	memcpy(zip_ops->input, src, slen);
+-
+-	/* Work around for a bug in zlib which needs an extra bytes sometimes */
+-	if (zip_ops->ccode != 3) /* Not LZS Encoding */
+-		zip_ops->input[slen++] = 0;
+-
+-	zip_ops->input_len  = slen;
+-	zip_ops->output_len = *dlen;
+-
+-	ret = zip_inflate(zip_ops, zip_state, zip);
+-
+-	if (!ret) {
+-		*dlen = zip_ops->output_len;
+-		memcpy(dst, zip_ops->output, *dlen);
+-	}
+-	kfree(zip_state);
+-	return ret;
+-}
+-
+-/* SCOMP framework start */
+-void *zip_alloc_scomp_ctx_deflate(void)
+-{
+-	int ret;
+-	struct zip_kernel_ctx *zip_ctx;
+-
+-	zip_ctx = kzalloc(sizeof(*zip_ctx), GFP_KERNEL);
+-	if (!zip_ctx)
+-		return ERR_PTR(-ENOMEM);
+-
+-	ret = zip_ctx_init(zip_ctx, 0);
+-
+-	if (ret) {
+-		kfree_sensitive(zip_ctx);
+-		return ERR_PTR(ret);
+-	}
+-
+-	return zip_ctx;
+-}
+-
+-void *zip_alloc_scomp_ctx_lzs(void)
+-{
+-	int ret;
+-	struct zip_kernel_ctx *zip_ctx;
+-
+-	zip_ctx = kzalloc(sizeof(*zip_ctx), GFP_KERNEL);
+-	if (!zip_ctx)
+-		return ERR_PTR(-ENOMEM);
+-
+-	ret = zip_ctx_init(zip_ctx, 1);
+-
+-	if (ret) {
+-		kfree_sensitive(zip_ctx);
+-		return ERR_PTR(ret);
+-	}
+-
+-	return zip_ctx;
+-}
+-
+-void zip_free_scomp_ctx(void *ctx)
+-{
+-	struct zip_kernel_ctx *zip_ctx = ctx;
+-
+-	zip_ctx_exit(zip_ctx);
+-	kfree_sensitive(zip_ctx);
+-}
+-
+-int zip_scomp_compress(struct crypto_scomp *tfm,
+-		       const u8 *src, unsigned int slen,
+-		       u8 *dst, unsigned int *dlen, void *ctx)
+-{
+-	struct zip_kernel_ctx *zip_ctx  = ctx;
+-
+-	return zip_compress(src, slen, dst, dlen, zip_ctx);
+-}
+-
+-int zip_scomp_decompress(struct crypto_scomp *tfm,
+-			 const u8 *src, unsigned int slen,
+-			 u8 *dst, unsigned int *dlen, void *ctx)
+-{
+-	struct zip_kernel_ctx *zip_ctx = ctx;
+-
+-	return zip_decompress(src, slen, dst, dlen, zip_ctx);
+-} /* SCOMP framework end */
+diff --git a/drivers/crypto/cavium/zip/zip_crypto.h b/drivers/crypto/cavium/zip/zip_crypto.h
+deleted file mode 100644
+index 10899ece2d1f..000000000000
+--- a/drivers/crypto/cavium/zip/zip_crypto.h
++++ /dev/null
+@@ -1,68 +0,0 @@
+-/***********************license start************************************
+- * Copyright (c) 2003-2017 Cavium, Inc.
+- * All rights reserved.
+- *
+- * License: one of 'Cavium License' or 'GNU General Public License Version 2'
+- *
+- * This file is provided under the terms of the Cavium License (see below)
+- * or under the terms of GNU General Public License, Version 2, as
+- * published by the Free Software Foundation. When using or redistributing
+- * this file, you may do so under either license.
+- *
+- * Cavium License:  Redistribution and use in source and binary forms, with
+- * or without modification, are permitted provided that the following
+- * conditions are met:
+- *
+- *  * Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- *
+- *  * Redistributions in binary form must reproduce the above
+- *    copyright notice, this list of conditions and the following
+- *    disclaimer in the documentation and/or other materials provided
+- *    with the distribution.
+- *
+- *  * Neither the name of Cavium Inc. nor the names of its contributors may be
+- *    used to endorse or promote products derived from this software without
+- *    specific prior written permission.
+- *
+- * This Software, including technical data, may be subject to U.S. export
+- * control laws, including the U.S. Export Administration Act and its
+- * associated regulations, and may be subject to export or import
+- * regulations in other countries.
+- *
+- * TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS PROVIDED "AS IS"
+- * AND WITH ALL FAULTS AND CAVIUM INC. MAKES NO PROMISES, REPRESENTATIONS
+- * OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, WITH
+- * RESPECT TO THE SOFTWARE, INCLUDING ITS CONDITION, ITS CONFORMITY TO ANY
+- * REPRESENTATION OR DESCRIPTION, OR THE EXISTENCE OF ANY LATENT OR PATENT
+- * DEFECTS, AND CAVIUM SPECIFICALLY DISCLAIMS ALL IMPLIED (IF ANY)
+- * WARRANTIES OF TITLE, MERCHANTABILITY, NONINFRINGEMENT, FITNESS FOR A
+- * PARTICULAR PURPOSE, LACK OF VIRUSES, ACCURACY OR COMPLETENESS, QUIET
+- * ENJOYMENT, QUIET POSSESSION OR CORRESPONDENCE TO DESCRIPTION. THE
+- * ENTIRE  RISK ARISING OUT OF USE OR PERFORMANCE OF THE SOFTWARE LIES
+- * WITH YOU.
+- ***********************license end**************************************/
+-
+-#ifndef __ZIP_CRYPTO_H__
+-#define __ZIP_CRYPTO_H__
+-
+-#include <crypto/internal/scompress.h>
+-#include "common.h"
+-#include "zip_deflate.h"
+-#include "zip_inflate.h"
+-
+-struct zip_kernel_ctx {
+-	struct zip_operation zip_comp;
+-	struct zip_operation zip_decomp;
+-};
+-
+-void *zip_alloc_scomp_ctx_deflate(void);
+-void *zip_alloc_scomp_ctx_lzs(void);
+-void  zip_free_scomp_ctx(void *zip_ctx);
+-int   zip_scomp_compress(struct crypto_scomp *tfm,
+-			 const u8 *src, unsigned int slen,
+-			 u8 *dst, unsigned int *dlen, void *ctx);
+-int   zip_scomp_decompress(struct crypto_scomp *tfm,
+-			   const u8 *src, unsigned int slen,
+-			   u8 *dst, unsigned int *dlen, void *ctx);
+-#endif
+diff --git a/drivers/crypto/cavium/zip/zip_deflate.c b/drivers/crypto/cavium/zip/zip_deflate.c
+deleted file mode 100644
+index d7133f857d67..000000000000
+--- a/drivers/crypto/cavium/zip/zip_deflate.c
++++ /dev/null
+@@ -1,200 +0,0 @@
+-/***********************license start************************************
+- * Copyright (c) 2003-2017 Cavium, Inc.
+- * All rights reserved.
+- *
+- * License: one of 'Cavium License' or 'GNU General Public License Version 2'
+- *
+- * This file is provided under the terms of the Cavium License (see below)
+- * or under the terms of GNU General Public License, Version 2, as
+- * published by the Free Software Foundation. When using or redistributing
+- * this file, you may do so under either license.
+- *
+- * Cavium License:  Redistribution and use in source and binary forms, with
+- * or without modification, are permitted provided that the following
+- * conditions are met:
+- *
+- *  * Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- *
+- *  * Redistributions in binary form must reproduce the above
+- *    copyright notice, this list of conditions and the following
+- *    disclaimer in the documentation and/or other materials provided
+- *    with the distribution.
+- *
+- *  * Neither the name of Cavium Inc. nor the names of its contributors may be
+- *    used to endorse or promote products derived from this software without
+- *    specific prior written permission.
+- *
+- * This Software, including technical data, may be subject to U.S. export
+- * control laws, including the U.S. Export Administration Act and its
+- * associated regulations, and may be subject to export or import
+- * regulations in other countries.
+- *
+- * TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS PROVIDED "AS IS"
+- * AND WITH ALL FAULTS AND CAVIUM INC. MAKES NO PROMISES, REPRESENTATIONS
+- * OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, WITH
+- * RESPECT TO THE SOFTWARE, INCLUDING ITS CONDITION, ITS CONFORMITY TO ANY
+- * REPRESENTATION OR DESCRIPTION, OR THE EXISTENCE OF ANY LATENT OR PATENT
+- * DEFECTS, AND CAVIUM SPECIFICALLY DISCLAIMS ALL IMPLIED (IF ANY)
+- * WARRANTIES OF TITLE, MERCHANTABILITY, NONINFRINGEMENT, FITNESS FOR A
+- * PARTICULAR PURPOSE, LACK OF VIRUSES, ACCURACY OR COMPLETENESS, QUIET
+- * ENJOYMENT, QUIET POSSESSION OR CORRESPONDENCE TO DESCRIPTION. THE
+- * ENTIRE  RISK ARISING OUT OF USE OR PERFORMANCE OF THE SOFTWARE LIES
+- * WITH YOU.
+- ***********************license end**************************************/
+-
+-#include <linux/delay.h>
+-#include <linux/sched.h>
+-
+-#include "common.h"
+-#include "zip_deflate.h"
+-
+-/* Prepares the deflate zip command */
+-static int prepare_zip_command(struct zip_operation *zip_ops,
+-			       struct zip_state *s, union zip_inst_s *zip_cmd)
+-{
+-	union zip_zres_s *result_ptr = &s->result;
+-
+-	memset(zip_cmd, 0, sizeof(s->zip_cmd));
+-	memset(result_ptr, 0, sizeof(s->result));
+-
+-	/* IWORD #0 */
+-	/* History gather */
+-	zip_cmd->s.hg = 0;
+-	/* compression enable = 1 for deflate */
+-	zip_cmd->s.ce = 1;
+-	/* sf (sync flush) */
+-	zip_cmd->s.sf = 1;
+-	/* ef (end of file) */
+-	if (zip_ops->flush == ZIP_FLUSH_FINISH) {
+-		zip_cmd->s.ef = 1;
+-		zip_cmd->s.sf = 0;
+-	}
+-
+-	zip_cmd->s.cc = zip_ops->ccode;
+-	/* ss (compression speed/storage) */
+-	zip_cmd->s.ss = zip_ops->speed;
+-
+-	/* IWORD #1 */
+-	/* adler checksum */
+-	zip_cmd->s.adlercrc32 = zip_ops->csum;
+-	zip_cmd->s.historylength = zip_ops->history_len;
+-	zip_cmd->s.dg = 0;
+-
+-	/* IWORD # 6 and 7 - compression input/history pointer */
+-	zip_cmd->s.inp_ptr_addr.s.addr  = __pa(zip_ops->input);
+-	zip_cmd->s.inp_ptr_ctl.s.length = (zip_ops->input_len +
+-					   zip_ops->history_len);
+-	zip_cmd->s.ds = 0;
+-
+-	/* IWORD # 8 and 9 - Output pointer */
+-	zip_cmd->s.out_ptr_addr.s.addr  = __pa(zip_ops->output);
+-	zip_cmd->s.out_ptr_ctl.s.length = zip_ops->output_len;
+-	/* maximum number of output-stream bytes that can be written */
+-	zip_cmd->s.totaloutputlength    = zip_ops->output_len;
+-
+-	/* IWORD # 10 and 11 - Result pointer */
+-	zip_cmd->s.res_ptr_addr.s.addr = __pa(result_ptr);
+-	/* Clearing completion code */
+-	result_ptr->s.compcode = 0;
+-
+-	return 0;
+-}
+-
+-/**
+- * zip_deflate - API to offload deflate operation to hardware
+- * @zip_ops: Pointer to zip operation structure
+- * @s:       Pointer to the structure representing zip state
+- * @zip_dev: Pointer to zip device structure
+- *
+- * This function prepares the zip deflate command and submits it to the zip
+- * engine for processing.
+- *
+- * Return: 0 if successful or error code
+- */
+-int zip_deflate(struct zip_operation *zip_ops, struct zip_state *s,
+-		struct zip_device *zip_dev)
+-{
+-	union zip_inst_s *zip_cmd = &s->zip_cmd;
+-	union zip_zres_s *result_ptr = &s->result;
+-	u32 queue;
+-
+-	/* Prepares zip command based on the input parameters */
+-	prepare_zip_command(zip_ops, s, zip_cmd);
+-
+-	atomic64_add(zip_ops->input_len, &zip_dev->stats.comp_in_bytes);
+-	/* Loads zip command into command queues and rings door bell */
+-	queue = zip_load_instr(zip_cmd, zip_dev);
+-
+-	/* Stats update for compression requests submitted */
+-	atomic64_inc(&zip_dev->stats.comp_req_submit);
+-
+-	/* Wait for completion or error */
+-	zip_poll_result(result_ptr);
+-
+-	/* Stats update for compression requests completed */
+-	atomic64_inc(&zip_dev->stats.comp_req_complete);
+-
+-	zip_ops->compcode = result_ptr->s.compcode;
+-	switch (zip_ops->compcode) {
+-	case ZIP_CMD_NOTDONE:
+-		zip_dbg("Zip instruction not yet completed");
+-		return ZIP_ERROR;
+-
+-	case ZIP_CMD_SUCCESS:
+-		zip_dbg("Zip instruction completed successfully");
+-		zip_update_cmd_bufs(zip_dev, queue);
+-		break;
+-
+-	case ZIP_CMD_DTRUNC:
+-		zip_dbg("Output Truncate error");
+-		/* Returning ZIP_ERROR to avoid copy to user */
+-		return ZIP_ERROR;
+-
+-	default:
+-		zip_err("Zip instruction failed. Code:%d", zip_ops->compcode);
+-		return ZIP_ERROR;
+-	}
+-
+-	/* Update the CRC depending on the format */
+-	switch (zip_ops->format) {
+-	case RAW_FORMAT:
+-		zip_dbg("RAW Format: %d ", zip_ops->format);
+-		/* Get checksum from engine, need to feed it again */
+-		zip_ops->csum = result_ptr->s.adler32;
+-		break;
+-
+-	case ZLIB_FORMAT:
+-		zip_dbg("ZLIB Format: %d ", zip_ops->format);
+-		zip_ops->csum = result_ptr->s.adler32;
+-		break;
+-
+-	case GZIP_FORMAT:
+-		zip_dbg("GZIP Format: %d ", zip_ops->format);
+-		zip_ops->csum = result_ptr->s.crc32;
+-		break;
+-
+-	case LZS_FORMAT:
+-		zip_dbg("LZS Format: %d ", zip_ops->format);
+-		break;
+-
+-	default:
+-		zip_err("Unknown Format:%d\n", zip_ops->format);
+-	}
+-
+-	atomic64_add(result_ptr->s.totalbyteswritten,
+-		     &zip_dev->stats.comp_out_bytes);
+-
+-	/* Update output_len */
+-	if (zip_ops->output_len < result_ptr->s.totalbyteswritten) {
+-		/* Dynamic stop && strm->output_len < zipconstants[onfsize] */
+-		zip_err("output_len (%d) < total bytes written(%d)\n",
+-			zip_ops->output_len, result_ptr->s.totalbyteswritten);
+-		zip_ops->output_len = 0;
+-
+-	} else {
+-		zip_ops->output_len = result_ptr->s.totalbyteswritten;
+-	}
+-
+-	return 0;
+-}
+diff --git a/drivers/crypto/cavium/zip/zip_deflate.h b/drivers/crypto/cavium/zip/zip_deflate.h
+deleted file mode 100644
+index 1d32e76edc4d..000000000000
+--- a/drivers/crypto/cavium/zip/zip_deflate.h
++++ /dev/null
+@@ -1,62 +0,0 @@
+-/***********************license start************************************
+- * Copyright (c) 2003-2017 Cavium, Inc.
+- * All rights reserved.
+- *
+- * License: one of 'Cavium License' or 'GNU General Public License Version 2'
+- *
+- * This file is provided under the terms of the Cavium License (see below)
+- * or under the terms of GNU General Public License, Version 2, as
+- * published by the Free Software Foundation. When using or redistributing
+- * this file, you may do so under either license.
+- *
+- * Cavium License:  Redistribution and use in source and binary forms, with
+- * or without modification, are permitted provided that the following
+- * conditions are met:
+- *
+- *  * Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- *
+- *  * Redistributions in binary form must reproduce the above
+- *    copyright notice, this list of conditions and the following
+- *    disclaimer in the documentation and/or other materials provided
+- *    with the distribution.
+- *
+- *  * Neither the name of Cavium Inc. nor the names of its contributors may be
+- *    used to endorse or promote products derived from this software without
+- *    specific prior written permission.
+- *
+- * This Software, including technical data, may be subject to U.S. export
+- * control laws, including the U.S. Export Administration Act and its
+- * associated regulations, and may be subject to export or import
+- * regulations in other countries.
+- *
+- * TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS PROVIDED "AS IS"
+- * AND WITH ALL FAULTS AND CAVIUM INC. MAKES NO PROMISES, REPRESENTATIONS
+- * OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, WITH
+- * RESPECT TO THE SOFTWARE, INCLUDING ITS CONDITION, ITS CONFORMITY TO ANY
+- * REPRESENTATION OR DESCRIPTION, OR THE EXISTENCE OF ANY LATENT OR PATENT
+- * DEFECTS, AND CAVIUM SPECIFICALLY DISCLAIMS ALL IMPLIED (IF ANY)
+- * WARRANTIES OF TITLE, MERCHANTABILITY, NONINFRINGEMENT, FITNESS FOR A
+- * PARTICULAR PURPOSE, LACK OF VIRUSES, ACCURACY OR COMPLETENESS, QUIET
+- * ENJOYMENT, QUIET POSSESSION OR CORRESPONDENCE TO DESCRIPTION. THE
+- * ENTIRE  RISK ARISING OUT OF USE OR PERFORMANCE OF THE SOFTWARE LIES
+- * WITH YOU.
+- ***********************license end**************************************/
+-
+-#ifndef __ZIP_DEFLATE_H__
+-#define __ZIP_DEFLATE_H__
+-
+-/**
+- * zip_deflate - API to offload deflate operation to hardware
+- * @zip_ops: Pointer to zip operation structure
+- * @s:       Pointer to the structure representing zip state
+- * @zip_dev: Pointer to the structure representing zip device
+- *
+- * This function prepares the zip deflate command and submits it to the zip
+- * engine by ringing the doorbell.
+- *
+- * Return: 0 if successful or error code
+- */
+-int zip_deflate(struct zip_operation *zip_ops, struct zip_state *s,
+-		struct zip_device *zip_dev);
+-#endif
+diff --git a/drivers/crypto/cavium/zip/zip_device.c b/drivers/crypto/cavium/zip/zip_device.c
+deleted file mode 100644
+index f174ec29ed69..000000000000
+--- a/drivers/crypto/cavium/zip/zip_device.c
++++ /dev/null
+@@ -1,202 +0,0 @@
+-/***********************license start************************************
+- * Copyright (c) 2003-2017 Cavium, Inc.
+- * All rights reserved.
+- *
+- * License: one of 'Cavium License' or 'GNU General Public License Version 2'
+- *
+- * This file is provided under the terms of the Cavium License (see below)
+- * or under the terms of GNU General Public License, Version 2, as
+- * published by the Free Software Foundation. When using or redistributing
+- * this file, you may do so under either license.
+- *
+- * Cavium License:  Redistribution and use in source and binary forms, with
+- * or without modification, are permitted provided that the following
+- * conditions are met:
+- *
+- *  * Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- *
+- *  * Redistributions in binary form must reproduce the above
+- *    copyright notice, this list of conditions and the following
+- *    disclaimer in the documentation and/or other materials provided
+- *    with the distribution.
+- *
+- *  * Neither the name of Cavium Inc. nor the names of its contributors may be
+- *    used to endorse or promote products derived from this software without
+- *    specific prior written permission.
+- *
+- * This Software, including technical data, may be subject to U.S. export
+- * control laws, including the U.S. Export Administration Act and its
+- * associated regulations, and may be subject to export or import
+- * regulations in other countries.
+- *
+- * TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS PROVIDED "AS IS"
+- * AND WITH ALL FAULTS AND CAVIUM INC. MAKES NO PROMISES, REPRESENTATIONS
+- * OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, WITH
+- * RESPECT TO THE SOFTWARE, INCLUDING ITS CONDITION, ITS CONFORMITY TO ANY
+- * REPRESENTATION OR DESCRIPTION, OR THE EXISTENCE OF ANY LATENT OR PATENT
+- * DEFECTS, AND CAVIUM SPECIFICALLY DISCLAIMS ALL IMPLIED (IF ANY)
+- * WARRANTIES OF TITLE, MERCHANTABILITY, NONINFRINGEMENT, FITNESS FOR A
+- * PARTICULAR PURPOSE, LACK OF VIRUSES, ACCURACY OR COMPLETENESS, QUIET
+- * ENJOYMENT, QUIET POSSESSION OR CORRESPONDENCE TO DESCRIPTION. THE
+- * ENTIRE  RISK ARISING OUT OF USE OR PERFORMANCE OF THE SOFTWARE LIES
+- * WITH YOU.
+- ***********************license end**************************************/
+-
+-#include "common.h"
+-#include "zip_deflate.h"
+-
+-/**
+- * zip_cmd_queue_consumed - Calculates the space consumed in the command queue.
+- *
+- * @zip_dev: Pointer to zip device structure
+- * @queue:   Queue number
+- *
+- * Return: Bytes consumed in the command queue buffer.
+- */
+-static inline u32 zip_cmd_queue_consumed(struct zip_device *zip_dev, int queue)
+-{
+-	return ((zip_dev->iq[queue].sw_head - zip_dev->iq[queue].sw_tail) *
+-		sizeof(u64 *));
+-}
+-
+-/**
+- * zip_load_instr - Submits the instruction into the ZIP command queue
+- * @instr:      Pointer to the instruction to be submitted
+- * @zip_dev:    Pointer to ZIP device structure to which the instruction is to
+- *              be submitted
+- *
+- * This function copies the ZIP instruction to the command queue and rings the
+- * doorbell to notify the engine of the instruction submission. The command
+- * queue is maintained in a circular fashion. When there is space for exactly
+- * one instruction in the queue, next chunk pointer of the queue is made to
+- * point to the head of the queue, thus maintaining a circular queue.
+- *
+- * Return: Queue number to which the instruction was submitted
+- */
+-u32 zip_load_instr(union zip_inst_s *instr,
+-		   struct zip_device *zip_dev)
+-{
+-	union zip_quex_doorbell dbell;
+-	u32 queue = 0;
+-	u32 consumed = 0;
+-	u64 *ncb_ptr = NULL;
+-	union zip_nptr_s ncp;
+-
+-	/*
+-	 * Distribute the instructions between the enabled queues based on
+-	 * the CPU id.
+-	 */
+-	if (raw_smp_processor_id() % 2 == 0)
+-		queue = 0;
+-	else
+-		queue = 1;
+-
+-	zip_dbg("CPU Core: %d Queue number:%d", raw_smp_processor_id(), queue);
+-
+-	/* Take cmd buffer lock */
+-	spin_lock(&zip_dev->iq[queue].lock);
+-
+-	/*
+-	 * Command Queue implementation
+-	 * 1. If there is place for new instructions, push the cmd at sw_head.
+-	 * 2. If there is place for exactly one instruction, push the new cmd
+-	 *    at the sw_head. Make sw_head point to the sw_tail to make it
+-	 *    circular. Write sw_head's physical address to the "Next-Chunk
+-	 *    Buffer Ptr" to make it cmd_hw_tail.
+-	 * 3. Ring the door bell.
+-	 */
+-	zip_dbg("sw_head : %lx", zip_dev->iq[queue].sw_head);
+-	zip_dbg("sw_tail : %lx", zip_dev->iq[queue].sw_tail);
+-
+-	consumed = zip_cmd_queue_consumed(zip_dev, queue);
+-	/* Check if there is space to push just one cmd */
+-	if ((consumed + 128) == (ZIP_CMD_QBUF_SIZE - 8)) {
+-		zip_dbg("Cmd queue space available for single command");
+-		/* Space for one cmd, pust it and make it circular queue */
+-		memcpy((u8 *)zip_dev->iq[queue].sw_head, (u8 *)instr,
+-		       sizeof(union zip_inst_s));
+-		zip_dev->iq[queue].sw_head += 16; /* 16 64_bit words = 128B */
+-
+-		/* Now, point the "Next-Chunk Buffer Ptr" to sw_head */
+-		ncb_ptr = zip_dev->iq[queue].sw_head;
+-
+-		zip_dbg("ncb addr :0x%lx sw_head addr :0x%lx",
+-			ncb_ptr, zip_dev->iq[queue].sw_head - 16);
+-
+-		/* Using Circular command queue */
+-		zip_dev->iq[queue].sw_head = zip_dev->iq[queue].sw_tail;
+-		/* Mark this buffer for free */
+-		zip_dev->iq[queue].free_flag = 1;
+-
+-		/* Write new chunk buffer address at "Next-Chunk Buffer Ptr" */
+-		ncp.u_reg64 = 0ull;
+-		ncp.s.addr = __pa(zip_dev->iq[queue].sw_head);
+-		*ncb_ptr = ncp.u_reg64;
+-		zip_dbg("*ncb_ptr :0x%lx sw_head[phys] :0x%lx",
+-			*ncb_ptr, __pa(zip_dev->iq[queue].sw_head));
+-
+-		zip_dev->iq[queue].pend_cnt++;
+-
+-	} else {
+-		zip_dbg("Enough space is available for commands");
+-		/* Push this cmd to cmd queue buffer */
+-		memcpy((u8 *)zip_dev->iq[queue].sw_head, (u8 *)instr,
+-		       sizeof(union zip_inst_s));
+-		zip_dev->iq[queue].sw_head += 16; /* 16 64_bit words = 128B */
+-
+-		zip_dev->iq[queue].pend_cnt++;
+-	}
+-	zip_dbg("sw_head :0x%lx sw_tail :0x%lx hw_tail :0x%lx",
+-		zip_dev->iq[queue].sw_head, zip_dev->iq[queue].sw_tail,
+-		zip_dev->iq[queue].hw_tail);
+-
+-	zip_dbg(" Pushed the new cmd : pend_cnt : %d",
+-		zip_dev->iq[queue].pend_cnt);
+-
+-	/* Ring the doorbell */
+-	dbell.u_reg64     = 0ull;
+-	dbell.s.dbell_cnt = 1;
+-	zip_reg_write(dbell.u_reg64,
+-		      (zip_dev->reg_base + ZIP_QUEX_DOORBELL(queue)));
+-
+-	/* Unlock cmd buffer lock */
+-	spin_unlock(&zip_dev->iq[queue].lock);
+-
+-	return queue;
+-}
+-
+-/**
+- * zip_update_cmd_bufs - Updates the queue statistics after posting the
+- *                       instruction
+- * @zip_dev: Pointer to zip device structure
+- * @queue:   Queue number
+- */
+-void zip_update_cmd_bufs(struct zip_device *zip_dev, u32 queue)
+-{
+-	/* Take cmd buffer lock */
+-	spin_lock(&zip_dev->iq[queue].lock);
+-
+-	/* Check if the previous buffer can be freed */
+-	if (zip_dev->iq[queue].free_flag == 1) {
+-		zip_dbg("Free flag. Free cmd buffer, adjust sw head and tail");
+-		/* Reset the free flag */
+-		zip_dev->iq[queue].free_flag = 0;
+-
+-		/* Point the hw_tail to start of the new chunk buffer */
+-		zip_dev->iq[queue].hw_tail = zip_dev->iq[queue].sw_head;
+-	} else {
+-		zip_dbg("Free flag not set. increment hw tail");
+-		zip_dev->iq[queue].hw_tail += 16; /* 16 64_bit words = 128B */
+-	}
+-
+-	zip_dev->iq[queue].done_cnt++;
+-	zip_dev->iq[queue].pend_cnt--;
+-
+-	zip_dbg("sw_head :0x%lx sw_tail :0x%lx hw_tail :0x%lx",
+-		zip_dev->iq[queue].sw_head, zip_dev->iq[queue].sw_tail,
+-		zip_dev->iq[queue].hw_tail);
+-	zip_dbg(" Got CC : pend_cnt : %d\n", zip_dev->iq[queue].pend_cnt);
+-
+-	spin_unlock(&zip_dev->iq[queue].lock);
+-}
+diff --git a/drivers/crypto/cavium/zip/zip_device.h b/drivers/crypto/cavium/zip/zip_device.h
+deleted file mode 100644
+index 9e18b3b93d38..000000000000
+--- a/drivers/crypto/cavium/zip/zip_device.h
++++ /dev/null
+@@ -1,108 +0,0 @@
+-/***********************license start************************************
+- * Copyright (c) 2003-2017 Cavium, Inc.
+- * All rights reserved.
+- *
+- * License: one of 'Cavium License' or 'GNU General Public License Version 2'
+- *
+- * This file is provided under the terms of the Cavium License (see below)
+- * or under the terms of GNU General Public License, Version 2, as
+- * published by the Free Software Foundation. When using or redistributing
+- * this file, you may do so under either license.
+- *
+- * Cavium License:  Redistribution and use in source and binary forms, with
+- * or without modification, are permitted provided that the following
+- * conditions are met:
+- *
+- *  * Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- *
+- *  * Redistributions in binary form must reproduce the above
+- *    copyright notice, this list of conditions and the following
+- *    disclaimer in the documentation and/or other materials provided
+- *    with the distribution.
+- *
+- *  * Neither the name of Cavium Inc. nor the names of its contributors may be
+- *    used to endorse or promote products derived from this software without
+- *    specific prior written permission.
+- *
+- * This Software, including technical data, may be subject to U.S. export
+- * control laws, including the U.S. Export Administration Act and its
+- * associated regulations, and may be subject to export or import
+- * regulations in other countries.
+- *
+- * TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS PROVIDED "AS IS"
+- * AND WITH ALL FAULTS AND CAVIUM INC. MAKES NO PROMISES, REPRESENTATIONS
+- * OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, WITH
+- * RESPECT TO THE SOFTWARE, INCLUDING ITS CONDITION, ITS CONFORMITY TO ANY
+- * REPRESENTATION OR DESCRIPTION, OR THE EXISTENCE OF ANY LATENT OR PATENT
+- * DEFECTS, AND CAVIUM SPECIFICALLY DISCLAIMS ALL IMPLIED (IF ANY)
+- * WARRANTIES OF TITLE, MERCHANTABILITY, NONINFRINGEMENT, FITNESS FOR A
+- * PARTICULAR PURPOSE, LACK OF VIRUSES, ACCURACY OR COMPLETENESS, QUIET
+- * ENJOYMENT, QUIET POSSESSION OR CORRESPONDENCE TO DESCRIPTION. THE
+- * ENTIRE  RISK ARISING OUT OF USE OR PERFORMANCE OF THE SOFTWARE LIES
+- * WITH YOU.
+- ***********************license end**************************************/
+-
+-#ifndef __ZIP_DEVICE_H__
+-#define __ZIP_DEVICE_H__
+-
+-#include <linux/types.h>
+-#include "zip_main.h"
+-
+-struct sg_info {
+-	/*
+-	 * Pointer to the input data when scatter_gather == 0 and
+-	 * pointer to the input gather list buffer when scatter_gather == 1
+-	 */
+-	union zip_zptr_s *gather;
+-
+-	/*
+-	 * Pointer to the output data when scatter_gather == 0 and
+-	 * pointer to the output scatter list buffer when scatter_gather == 1
+-	 */
+-	union zip_zptr_s *scatter;
+-
+-	/*
+-	 * Holds size of the output buffer pointed by scatter list
+-	 * when scatter_gather == 1
+-	 */
+-	u64 scatter_buf_size;
+-
+-	/* for gather data */
+-	u64 gather_enable;
+-
+-	/* for scatter data */
+-	u64 scatter_enable;
+-
+-	/* Number of gather list pointers for gather data */
+-	u32 gbuf_cnt;
+-
+-	/* Number of scatter list pointers for scatter data */
+-	u32 sbuf_cnt;
+-
+-	/* Buffers allocation state */
+-	u8 alloc_state;
+-};
+-
+-/**
+- * struct zip_state - Structure representing the required information related
+- *                    to a command
+- * @zip_cmd: Pointer to zip instruction structure
+- * @result:  Pointer to zip result structure
+- * @ctx:     Context pointer for inflate
+- * @history: Decompression history pointer
+- * @sginfo:  Scatter-gather info structure
+- */
+-struct zip_state {
+-	union zip_inst_s zip_cmd;
+-	union zip_zres_s result;
+-	union zip_zptr_s *ctx;
+-	union zip_zptr_s *history;
+-	struct sg_info   sginfo;
+-};
+-
+-#define ZIP_CONTEXT_SIZE          2048
+-#define ZIP_INFLATE_HISTORY_SIZE  32768
+-#define ZIP_DEFLATE_HISTORY_SIZE  32768
+-
+-#endif
+diff --git a/drivers/crypto/cavium/zip/zip_inflate.c b/drivers/crypto/cavium/zip/zip_inflate.c
+deleted file mode 100644
+index 7e0d73e2f89e..000000000000
+--- a/drivers/crypto/cavium/zip/zip_inflate.c
++++ /dev/null
+@@ -1,223 +0,0 @@
+-/***********************license start************************************
+- * Copyright (c) 2003-2017 Cavium, Inc.
+- * All rights reserved.
+- *
+- * License: one of 'Cavium License' or 'GNU General Public License Version 2'
+- *
+- * This file is provided under the terms of the Cavium License (see below)
+- * or under the terms of GNU General Public License, Version 2, as
+- * published by the Free Software Foundation. When using or redistributing
+- * this file, you may do so under either license.
+- *
+- * Cavium License:  Redistribution and use in source and binary forms, with
+- * or without modification, are permitted provided that the following
+- * conditions are met:
+- *
+- *  * Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- *
+- *  * Redistributions in binary form must reproduce the above
+- *    copyright notice, this list of conditions and the following
+- *    disclaimer in the documentation and/or other materials provided
+- *    with the distribution.
+- *
+- *  * Neither the name of Cavium Inc. nor the names of its contributors may be
+- *    used to endorse or promote products derived from this software without
+- *    specific prior written permission.
+- *
+- * This Software, including technical data, may be subject to U.S. export
+- * control laws, including the U.S. Export Administration Act and its
+- * associated regulations, and may be subject to export or import
+- * regulations in other countries.
+- *
+- * TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS PROVIDED "AS IS"
+- * AND WITH ALL FAULTS AND CAVIUM INC. MAKES NO PROMISES, REPRESENTATIONS
+- * OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, WITH
+- * RESPECT TO THE SOFTWARE, INCLUDING ITS CONDITION, ITS CONFORMITY TO ANY
+- * REPRESENTATION OR DESCRIPTION, OR THE EXISTENCE OF ANY LATENT OR PATENT
+- * DEFECTS, AND CAVIUM SPECIFICALLY DISCLAIMS ALL IMPLIED (IF ANY)
+- * WARRANTIES OF TITLE, MERCHANTABILITY, NONINFRINGEMENT, FITNESS FOR A
+- * PARTICULAR PURPOSE, LACK OF VIRUSES, ACCURACY OR COMPLETENESS, QUIET
+- * ENJOYMENT, QUIET POSSESSION OR CORRESPONDENCE TO DESCRIPTION. THE
+- * ENTIRE  RISK ARISING OUT OF USE OR PERFORMANCE OF THE SOFTWARE LIES
+- * WITH YOU.
+- ***********************license end**************************************/
+-
+-#include <linux/delay.h>
+-#include <linux/sched.h>
+-
+-#include "common.h"
+-#include "zip_inflate.h"
+-
+-static int prepare_inflate_zcmd(struct zip_operation *zip_ops,
+-				struct zip_state *s, union zip_inst_s *zip_cmd)
+-{
+-	union zip_zres_s *result_ptr = &s->result;
+-
+-	memset(zip_cmd, 0, sizeof(s->zip_cmd));
+-	memset(result_ptr, 0, sizeof(s->result));
+-
+-	/* IWORD#0 */
+-
+-	/* Decompression History Gather list - no gather list */
+-	zip_cmd->s.hg = 0;
+-	/* For decompression, CE must be 0x0. */
+-	zip_cmd->s.ce = 0;
+-	/* For decompression, SS must be 0x0. */
+-	zip_cmd->s.ss = 0;
+-	/* For decompression, SF should always be set. */
+-	zip_cmd->s.sf = 1;
+-
+-	/* Begin File */
+-	if (zip_ops->begin_file == 0)
+-		zip_cmd->s.bf = 0;
+-	else
+-		zip_cmd->s.bf = 1;
+-
+-	zip_cmd->s.ef = 1;
+-	/* 0: for Deflate decompression, 3: for LZS decompression */
+-	zip_cmd->s.cc = zip_ops->ccode;
+-
+-	/* IWORD #1*/
+-
+-	/* adler checksum */
+-	zip_cmd->s.adlercrc32 = zip_ops->csum;
+-
+-	/*
+-	 * HISTORYLENGTH must be 0x0 for any ZIP decompress operation.
+-	 * History data is added to a decompression operation via IWORD3.
+-	 */
+-	zip_cmd->s.historylength = 0;
+-	zip_cmd->s.ds = 0;
+-
+-	/* IWORD # 8 and 9 - Output pointer */
+-	zip_cmd->s.out_ptr_addr.s.addr  = __pa(zip_ops->output);
+-	zip_cmd->s.out_ptr_ctl.s.length = zip_ops->output_len;
+-
+-	/* Maximum number of output-stream bytes that can be written */
+-	zip_cmd->s.totaloutputlength    = zip_ops->output_len;
+-
+-	zip_dbg("Data Direct Input case ");
+-
+-	/* IWORD # 6 and 7 - input pointer */
+-	zip_cmd->s.dg = 0;
+-	zip_cmd->s.inp_ptr_addr.s.addr  = __pa((u8 *)zip_ops->input);
+-	zip_cmd->s.inp_ptr_ctl.s.length = zip_ops->input_len;
+-
+-	/* IWORD # 10 and 11 - Result pointer */
+-	zip_cmd->s.res_ptr_addr.s.addr = __pa(result_ptr);
+-
+-	/* Clearing completion code */
+-	result_ptr->s.compcode = 0;
+-
+-	/* Returning 0 for time being.*/
+-	return 0;
+-}
+-
+-/**
+- * zip_inflate - API to offload inflate operation to hardware
+- * @zip_ops: Pointer to zip operation structure
+- * @s:       Pointer to the structure representing zip state
+- * @zip_dev: Pointer to zip device structure
+- *
+- * This function prepares the zip inflate command and submits it to the zip
+- * engine for processing.
+- *
+- * Return: 0 if successful or error code
+- */
+-int zip_inflate(struct zip_operation *zip_ops, struct zip_state *s,
+-		struct zip_device *zip_dev)
+-{
+-	union zip_inst_s *zip_cmd    = &s->zip_cmd;
+-	union zip_zres_s  *result_ptr = &s->result;
+-	u32 queue;
+-
+-	/* Prepare inflate zip command */
+-	prepare_inflate_zcmd(zip_ops, s, zip_cmd);
+-
+-	atomic64_add(zip_ops->input_len, &zip_dev->stats.decomp_in_bytes);
+-
+-	/* Load inflate command to zip queue and ring the doorbell */
+-	queue = zip_load_instr(zip_cmd, zip_dev);
+-
+-	/* Decompression requests submitted stats update */
+-	atomic64_inc(&zip_dev->stats.decomp_req_submit);
+-
+-	/* Wait for completion or error */
+-	zip_poll_result(result_ptr);
+-
+-	/* Decompression requests completed stats update */
+-	atomic64_inc(&zip_dev->stats.decomp_req_complete);
+-
+-	zip_ops->compcode = result_ptr->s.compcode;
+-	switch (zip_ops->compcode) {
+-	case ZIP_CMD_NOTDONE:
+-		zip_dbg("Zip Instruction not yet completed\n");
+-		return ZIP_ERROR;
+-
+-	case ZIP_CMD_SUCCESS:
+-		zip_dbg("Zip Instruction completed successfully\n");
+-		break;
+-
+-	case ZIP_CMD_DYNAMIC_STOP:
+-		zip_dbg(" Dynamic stop Initiated\n");
+-		break;
+-
+-	default:
+-		zip_dbg("Instruction failed. Code = %d\n", zip_ops->compcode);
+-		atomic64_inc(&zip_dev->stats.decomp_bad_reqs);
+-		zip_update_cmd_bufs(zip_dev, queue);
+-		return ZIP_ERROR;
+-	}
+-
+-	zip_update_cmd_bufs(zip_dev, queue);
+-
+-	if ((zip_ops->ccode == 3) && (zip_ops->flush == 4) &&
+-	    (zip_ops->compcode != ZIP_CMD_DYNAMIC_STOP))
+-		result_ptr->s.ef = 1;
+-
+-	zip_ops->csum = result_ptr->s.adler32;
+-
+-	atomic64_add(result_ptr->s.totalbyteswritten,
+-		     &zip_dev->stats.decomp_out_bytes);
+-
+-	if (zip_ops->output_len < result_ptr->s.totalbyteswritten) {
+-		zip_err("output_len (%d) < total bytes written (%d)\n",
+-			zip_ops->output_len, result_ptr->s.totalbyteswritten);
+-		zip_ops->output_len = 0;
+-	} else {
+-		zip_ops->output_len = result_ptr->s.totalbyteswritten;
+-	}
+-
+-	zip_ops->bytes_read = result_ptr->s.totalbytesread;
+-	zip_ops->bits_processed = result_ptr->s.totalbitsprocessed;
+-	zip_ops->end_file = result_ptr->s.ef;
+-	if (zip_ops->end_file) {
+-		switch (zip_ops->format) {
+-		case RAW_FORMAT:
+-			zip_dbg("RAW Format: %d ", zip_ops->format);
+-			/* Get checksum from engine */
+-			zip_ops->csum = result_ptr->s.adler32;
+-			break;
+-
+-		case ZLIB_FORMAT:
+-			zip_dbg("ZLIB Format: %d ", zip_ops->format);
+-			zip_ops->csum = result_ptr->s.adler32;
+-			break;
+-
+-		case GZIP_FORMAT:
+-			zip_dbg("GZIP Format: %d ", zip_ops->format);
+-			zip_ops->csum = result_ptr->s.crc32;
+-			break;
+-
+-		case LZS_FORMAT:
+-			zip_dbg("LZS Format: %d ", zip_ops->format);
+-			break;
+-
+-		default:
+-			zip_err("Format error:%d\n", zip_ops->format);
+-		}
+-	}
+-
+-	return 0;
+-}
+diff --git a/drivers/crypto/cavium/zip/zip_inflate.h b/drivers/crypto/cavium/zip/zip_inflate.h
+deleted file mode 100644
+index 6b20f179978e..000000000000
+--- a/drivers/crypto/cavium/zip/zip_inflate.h
++++ /dev/null
+@@ -1,62 +0,0 @@
+-/***********************license start************************************
+- * Copyright (c) 2003-2017 Cavium, Inc.
+- * All rights reserved.
+- *
+- * License: one of 'Cavium License' or 'GNU General Public License Version 2'
+- *
+- * This file is provided under the terms of the Cavium License (see below)
+- * or under the terms of GNU General Public License, Version 2, as
+- * published by the Free Software Foundation. When using or redistributing
+- * this file, you may do so under either license.
+- *
+- * Cavium License:  Redistribution and use in source and binary forms, with
+- * or without modification, are permitted provided that the following
+- * conditions are met:
+- *
+- *  * Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- *
+- *  * Redistributions in binary form must reproduce the above
+- *    copyright notice, this list of conditions and the following
+- *    disclaimer in the documentation and/or other materials provided
+- *    with the distribution.
+- *
+- *  * Neither the name of Cavium Inc. nor the names of its contributors may be
+- *    used to endorse or promote products derived from this software without
+- *    specific prior written permission.
+- *
+- * This Software, including technical data, may be subject to U.S. export
+- * control laws, including the U.S. Export Administration Act and its
+- * associated regulations, and may be subject to export or import
+- * regulations in other countries.
+- *
+- * TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS PROVIDED "AS IS"
+- * AND WITH ALL FAULTS AND CAVIUM INC. MAKES NO PROMISES, REPRESENTATIONS
+- * OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, WITH
+- * RESPECT TO THE SOFTWARE, INCLUDING ITS CONDITION, ITS CONFORMITY TO ANY
+- * REPRESENTATION OR DESCRIPTION, OR THE EXISTENCE OF ANY LATENT OR PATENT
+- * DEFECTS, AND CAVIUM SPECIFICALLY DISCLAIMS ALL IMPLIED (IF ANY)
+- * WARRANTIES OF TITLE, MERCHANTABILITY, NONINFRINGEMENT, FITNESS FOR A
+- * PARTICULAR PURPOSE, LACK OF VIRUSES, ACCURACY OR COMPLETENESS, QUIET
+- * ENJOYMENT, QUIET POSSESSION OR CORRESPONDENCE TO DESCRIPTION. THE
+- * ENTIRE  RISK ARISING OUT OF USE OR PERFORMANCE OF THE SOFTWARE LIES
+- * WITH YOU.
+- ***********************license end**************************************/
+-
+-#ifndef __ZIP_INFLATE_H__
+-#define __ZIP_INFLATE_H__
+-
+-/**
+- * zip_inflate - API to offload inflate operation to hardware
+- * @zip_ops: Pointer to zip operation structure
+- * @s:       Pointer to the structure representing zip state
+- * @zip_dev: Pointer to the structure representing zip device
+- *
+- * This function prepares the zip inflate command and submits it to the zip
+- * engine for processing.
+- *
+- * Return: 0 if successful or error code
+- */
+-int zip_inflate(struct zip_operation *zip_ops, struct zip_state *s,
+-		struct zip_device *zip_dev);
+-#endif
+diff --git a/drivers/crypto/cavium/zip/zip_main.c b/drivers/crypto/cavium/zip/zip_main.c
+deleted file mode 100644
+index abd58de4343d..000000000000
+--- a/drivers/crypto/cavium/zip/zip_main.c
++++ /dev/null
+@@ -1,603 +0,0 @@
+-/***********************license start************************************
+- * Copyright (c) 2003-2017 Cavium, Inc.
+- * All rights reserved.
+- *
+- * License: one of 'Cavium License' or 'GNU General Public License Version 2'
+- *
+- * This file is provided under the terms of the Cavium License (see below)
+- * or under the terms of GNU General Public License, Version 2, as
+- * published by the Free Software Foundation. When using or redistributing
+- * this file, you may do so under either license.
+- *
+- * Cavium License:  Redistribution and use in source and binary forms, with
+- * or without modification, are permitted provided that the following
+- * conditions are met:
+- *
+- *  * Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- *
+- *  * Redistributions in binary form must reproduce the above
+- *    copyright notice, this list of conditions and the following
+- *    disclaimer in the documentation and/or other materials provided
+- *    with the distribution.
+- *
+- *  * Neither the name of Cavium Inc. nor the names of its contributors may be
+- *    used to endorse or promote products derived from this software without
+- *    specific prior written permission.
+- *
+- * This Software, including technical data, may be subject to U.S. export
+- * control laws, including the U.S. Export Administration Act and its
+- * associated regulations, and may be subject to export or import
+- * regulations in other countries.
+- *
+- * TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS PROVIDED "AS IS"
+- * AND WITH ALL FAULTS AND CAVIUM INC. MAKES NO PROMISES, REPRESENTATIONS
+- * OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, WITH
+- * RESPECT TO THE SOFTWARE, INCLUDING ITS CONDITION, ITS CONFORMITY TO ANY
+- * REPRESENTATION OR DESCRIPTION, OR THE EXISTENCE OF ANY LATENT OR PATENT
+- * DEFECTS, AND CAVIUM SPECIFICALLY DISCLAIMS ALL IMPLIED (IF ANY)
+- * WARRANTIES OF TITLE, MERCHANTABILITY, NONINFRINGEMENT, FITNESS FOR A
+- * PARTICULAR PURPOSE, LACK OF VIRUSES, ACCURACY OR COMPLETENESS, QUIET
+- * ENJOYMENT, QUIET POSSESSION OR CORRESPONDENCE TO DESCRIPTION. THE
+- * ENTIRE  RISK ARISING OUT OF USE OR PERFORMANCE OF THE SOFTWARE LIES
+- * WITH YOU.
+- ***********************license end**************************************/
+-
+-#include "common.h"
+-#include "zip_crypto.h"
+-
+-#define DRV_NAME		"ThunderX-ZIP"
+-
+-static struct zip_device *zip_dev[MAX_ZIP_DEVICES];
+-
+-static const struct pci_device_id zip_id_table[] = {
+-	{ PCI_DEVICE(PCI_VENDOR_ID_CAVIUM, PCI_DEVICE_ID_THUNDERX_ZIP) },
+-	{ 0, }
+-};
+-
+-static void zip_debugfs_init(void);
+-static void zip_debugfs_exit(void);
+-static int zip_register_compression_device(void);
+-static void zip_unregister_compression_device(void);
+-
+-void zip_reg_write(u64 val, u64 __iomem *addr)
+-{
+-	writeq(val, addr);
+-}
+-
+-u64 zip_reg_read(u64 __iomem *addr)
+-{
+-	return readq(addr);
+-}
+-
+-/*
+- * Allocates new ZIP device structure
+- * Returns zip_device pointer or NULL if cannot allocate memory for zip_device
+- */
+-static struct zip_device *zip_alloc_device(struct pci_dev *pdev)
+-{
+-	struct zip_device *zip = NULL;
+-	int idx;
+-
+-	for (idx = 0; idx < MAX_ZIP_DEVICES; idx++) {
+-		if (!zip_dev[idx])
+-			break;
+-	}
+-
+-	/* To ensure that the index is within the limit */
+-	if (idx < MAX_ZIP_DEVICES)
+-		zip = devm_kzalloc(&pdev->dev, sizeof(*zip), GFP_KERNEL);
+-
+-	if (!zip)
+-		return NULL;
+-
+-	zip_dev[idx] = zip;
+-	zip->index = idx;
+-	return zip;
+-}
+-
+-/**
+- * zip_get_device - Get ZIP device based on node id of cpu
+- *
+- * @node: Node id of the current cpu
+- * Return: Pointer to Zip device structure
+- */
+-struct zip_device *zip_get_device(int node)
+-{
+-	if ((node < MAX_ZIP_DEVICES) && (node >= 0))
+-		return zip_dev[node];
+-
+-	zip_err("ZIP device not found for node id %d\n", node);
+-	return NULL;
+-}
+-
+-/**
+- * zip_get_node_id - Get the node id of the current cpu
+- *
+- * Return: Node id of the current cpu
+- */
+-int zip_get_node_id(void)
+-{
+-	return cpu_to_node(raw_smp_processor_id());
+-}
+-
+-/* Initializes the ZIP h/w sub-system */
+-static int zip_init_hw(struct zip_device *zip)
+-{
+-	union zip_cmd_ctl    cmd_ctl;
+-	union zip_constants  constants;
+-	union zip_que_ena    que_ena;
+-	union zip_quex_map   que_map;
+-	union zip_que_pri    que_pri;
+-
+-	union zip_quex_sbuf_addr que_sbuf_addr;
+-	union zip_quex_sbuf_ctl  que_sbuf_ctl;
+-
+-	int q = 0;
+-
+-	/* Enable the ZIP Engine(Core) Clock */
+-	cmd_ctl.u_reg64 = zip_reg_read(zip->reg_base + ZIP_CMD_CTL);
+-	cmd_ctl.s.forceclk = 1;
+-	zip_reg_write(cmd_ctl.u_reg64 & 0xFF, (zip->reg_base + ZIP_CMD_CTL));
+-
+-	zip_msg("ZIP_CMD_CTL  : 0x%016llx",
+-		zip_reg_read(zip->reg_base + ZIP_CMD_CTL));
+-
+-	constants.u_reg64 = zip_reg_read(zip->reg_base + ZIP_CONSTANTS);
+-	zip->depth    = constants.s.depth;
+-	zip->onfsize  = constants.s.onfsize;
+-	zip->ctxsize  = constants.s.ctxsize;
+-
+-	zip_msg("depth: 0x%016llx , onfsize : 0x%016llx , ctxsize : 0x%016llx",
+-		zip->depth, zip->onfsize, zip->ctxsize);
+-
+-	/*
+-	 * Program ZIP_QUE(0..7)_SBUF_ADDR and ZIP_QUE(0..7)_SBUF_CTL to
+-	 * have the correct buffer pointer and size configured for each
+-	 * instruction queue.
+-	 */
+-	for (q = 0; q < ZIP_NUM_QUEUES; q++) {
+-		que_sbuf_ctl.u_reg64 = 0ull;
+-		que_sbuf_ctl.s.size = (ZIP_CMD_QBUF_SIZE / sizeof(u64));
+-		que_sbuf_ctl.s.inst_be   = 0;
+-		que_sbuf_ctl.s.stream_id = 0;
+-		zip_reg_write(que_sbuf_ctl.u_reg64,
+-			      (zip->reg_base + ZIP_QUEX_SBUF_CTL(q)));
+-
+-		zip_msg("QUEX_SBUF_CTL[%d]: 0x%016llx", q,
+-			zip_reg_read(zip->reg_base + ZIP_QUEX_SBUF_CTL(q)));
+-	}
+-
+-	for (q = 0; q < ZIP_NUM_QUEUES; q++) {
+-		memset(&zip->iq[q], 0x0, sizeof(struct zip_iq));
+-
+-		spin_lock_init(&zip->iq[q].lock);
+-
+-		if (zip_cmd_qbuf_alloc(zip, q)) {
+-			while (q != 0) {
+-				q--;
+-				zip_cmd_qbuf_free(zip, q);
+-			}
+-			return -ENOMEM;
+-		}
+-
+-		/* Initialize tail ptr to head */
+-		zip->iq[q].sw_tail = zip->iq[q].sw_head;
+-		zip->iq[q].hw_tail = zip->iq[q].sw_head;
+-
+-		/* Write the physical addr to register */
+-		que_sbuf_addr.u_reg64   = 0ull;
+-		que_sbuf_addr.s.ptr = (__pa(zip->iq[q].sw_head) >>
+-				       ZIP_128B_ALIGN);
+-
+-		zip_msg("QUE[%d]_PTR(PHYS): 0x%016llx", q,
+-			(u64)que_sbuf_addr.s.ptr);
+-
+-		zip_reg_write(que_sbuf_addr.u_reg64,
+-			      (zip->reg_base + ZIP_QUEX_SBUF_ADDR(q)));
+-
+-		zip_msg("QUEX_SBUF_ADDR[%d]: 0x%016llx", q,
+-			zip_reg_read(zip->reg_base + ZIP_QUEX_SBUF_ADDR(q)));
+-
+-		zip_dbg("sw_head :0x%lx sw_tail :0x%lx hw_tail :0x%lx",
+-			zip->iq[q].sw_head, zip->iq[q].sw_tail,
+-			zip->iq[q].hw_tail);
+-		zip_dbg("sw_head phy addr : 0x%lx", que_sbuf_addr.s.ptr);
+-	}
+-
+-	/*
+-	 * Queue-to-ZIP core mapping
+-	 * If a queue is not mapped to a particular core, it is equivalent to
+-	 * the ZIP core being disabled.
+-	 */
+-	que_ena.u_reg64 = 0x0ull;
+-	/* Enabling queues based on ZIP_NUM_QUEUES */
+-	for (q = 0; q < ZIP_NUM_QUEUES; q++)
+-		que_ena.s.ena |= (0x1 << q);
+-	zip_reg_write(que_ena.u_reg64, (zip->reg_base + ZIP_QUE_ENA));
+-
+-	zip_msg("QUE_ENA      : 0x%016llx",
+-		zip_reg_read(zip->reg_base + ZIP_QUE_ENA));
+-
+-	for (q = 0; q < ZIP_NUM_QUEUES; q++) {
+-		que_map.u_reg64 = 0ull;
+-		/* Mapping each queue to two ZIP cores */
+-		que_map.s.zce = 0x3;
+-		zip_reg_write(que_map.u_reg64,
+-			      (zip->reg_base + ZIP_QUEX_MAP(q)));
+-
+-		zip_msg("QUE_MAP(%d)   : 0x%016llx", q,
+-			zip_reg_read(zip->reg_base + ZIP_QUEX_MAP(q)));
+-	}
+-
+-	que_pri.u_reg64 = 0ull;
+-	for (q = 0; q < ZIP_NUM_QUEUES; q++)
+-		que_pri.s.pri |= (0x1 << q); /* Higher Priority RR */
+-	zip_reg_write(que_pri.u_reg64, (zip->reg_base + ZIP_QUE_PRI));
+-
+-	zip_msg("QUE_PRI %016llx", zip_reg_read(zip->reg_base + ZIP_QUE_PRI));
+-
+-	return 0;
+-}
+-
+-static void zip_reset(struct zip_device *zip)
+-{
+-	union zip_cmd_ctl cmd_ctl;
+-
+-	cmd_ctl.u_reg64 = 0x0ull;
+-	cmd_ctl.s.reset = 1;  /* Forces ZIP cores to do reset */
+-	zip_reg_write(cmd_ctl.u_reg64, (zip->reg_base + ZIP_CMD_CTL));
+-}
+-
+-static int zip_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+-{
+-	struct device *dev = &pdev->dev;
+-	struct zip_device *zip = NULL;
+-	int    err;
+-
+-	zip = zip_alloc_device(pdev);
+-	if (!zip)
+-		return -ENOMEM;
+-
+-	dev_info(dev, "Found ZIP device %d %x:%x on Node %d\n", zip->index,
+-		 pdev->vendor, pdev->device, dev_to_node(dev));
+-
+-	pci_set_drvdata(pdev, zip);
+-	zip->pdev = pdev;
+-
+-	err = pci_enable_device(pdev);
+-	if (err) {
+-		dev_err(dev, "Failed to enable PCI device");
+-		goto err_free_device;
+-	}
+-
+-	err = pci_request_regions(pdev, DRV_NAME);
+-	if (err) {
+-		dev_err(dev, "PCI request regions failed 0x%x", err);
+-		goto err_disable_device;
+-	}
+-
+-	err = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(48));
+-	if (err) {
+-		dev_err(dev, "Unable to get usable 48-bit DMA configuration\n");
+-		goto err_release_regions;
+-	}
+-
+-	/* MAP configuration registers */
+-	zip->reg_base = pci_ioremap_bar(pdev, PCI_CFG_ZIP_PF_BAR0);
+-	if (!zip->reg_base) {
+-		dev_err(dev, "ZIP: Cannot map BAR0 CSR memory space, aborting");
+-		err = -ENOMEM;
+-		goto err_release_regions;
+-	}
+-
+-	/* Initialize ZIP Hardware */
+-	err = zip_init_hw(zip);
+-	if (err)
+-		goto err_release_regions;
+-
+-	/* Register with the Kernel Crypto Interface */
+-	err = zip_register_compression_device();
+-	if (err < 0) {
+-		zip_err("ZIP: Kernel Crypto Registration failed\n");
+-		goto err_register;
+-	}
+-
+-	/* comp-decomp statistics are handled with debugfs interface */
+-	zip_debugfs_init();
+-
+-	return 0;
+-
+-err_register:
+-	zip_reset(zip);
+-
+-err_release_regions:
+-	if (zip->reg_base)
+-		iounmap(zip->reg_base);
+-	pci_release_regions(pdev);
+-
+-err_disable_device:
+-	pci_disable_device(pdev);
+-
+-err_free_device:
+-	pci_set_drvdata(pdev, NULL);
+-
+-	/* Remove zip_dev from zip_device list, free the zip_device memory */
+-	zip_dev[zip->index] = NULL;
+-	devm_kfree(dev, zip);
+-
+-	return err;
+-}
+-
+-static void zip_remove(struct pci_dev *pdev)
+-{
+-	struct zip_device *zip = pci_get_drvdata(pdev);
+-	int q = 0;
+-
+-	if (!zip)
+-		return;
+-
+-	zip_debugfs_exit();
+-
+-	zip_unregister_compression_device();
+-
+-	if (zip->reg_base) {
+-		zip_reset(zip);
+-		iounmap(zip->reg_base);
+-	}
+-
+-	pci_release_regions(pdev);
+-	pci_disable_device(pdev);
+-
+-	/*
+-	 * Free Command Queue buffers. This free should be called for all
+-	 * the enabled Queues.
+-	 */
+-	for (q = 0; q < ZIP_NUM_QUEUES; q++)
+-		zip_cmd_qbuf_free(zip, q);
+-
+-	pci_set_drvdata(pdev, NULL);
+-	/* remove zip device from zip device list */
+-	zip_dev[zip->index] = NULL;
+-}
+-
+-/* PCI Sub-System Interface */
+-static struct pci_driver zip_driver = {
+-	.name	    =  DRV_NAME,
+-	.id_table   =  zip_id_table,
+-	.probe	    =  zip_probe,
+-	.remove     =  zip_remove,
+-};
+-
+-/* Kernel Crypto Subsystem Interface */
+-
+-static struct scomp_alg zip_scomp_deflate = {
+-	.alloc_ctx		= zip_alloc_scomp_ctx_deflate,
+-	.free_ctx		= zip_free_scomp_ctx,
+-	.compress		= zip_scomp_compress,
+-	.decompress		= zip_scomp_decompress,
+-	.base			= {
+-		.cra_name		= "deflate",
+-		.cra_driver_name	= "deflate-scomp-cavium",
+-		.cra_module		= THIS_MODULE,
+-		.cra_priority           = 300,
+-	}
+-};
+-
+-static struct scomp_alg zip_scomp_lzs = {
+-	.alloc_ctx		= zip_alloc_scomp_ctx_lzs,
+-	.free_ctx		= zip_free_scomp_ctx,
+-	.compress		= zip_scomp_compress,
+-	.decompress		= zip_scomp_decompress,
+-	.base			= {
+-		.cra_name		= "lzs",
+-		.cra_driver_name	= "lzs-scomp-cavium",
+-		.cra_module		= THIS_MODULE,
+-		.cra_priority           = 300,
+-	}
+-};
+-
+-static int zip_register_compression_device(void)
+-{
+-	int ret;
+-
+-	ret = crypto_register_scomp(&zip_scomp_deflate);
+-	if (ret < 0) {
+-		zip_err("Deflate scomp algorithm registration failed\n");
+-		return ret;
+-	}
+-
+-	ret = crypto_register_scomp(&zip_scomp_lzs);
+-	if (ret < 0) {
+-		zip_err("LZS scomp algorithm registration failed\n");
+-		goto err_unregister_scomp_deflate;
+-	}
+-
+-	return ret;
+-
+-err_unregister_scomp_deflate:
+-	crypto_unregister_scomp(&zip_scomp_deflate);
+-
+-	return ret;
+-}
+-
+-static void zip_unregister_compression_device(void)
+-{
+-	crypto_unregister_scomp(&zip_scomp_deflate);
+-	crypto_unregister_scomp(&zip_scomp_lzs);
+-}
+-
+-/*
+- * debugfs functions
+- */
+-#ifdef CONFIG_DEBUG_FS
+-#include <linux/debugfs.h>
+-
+-/* Displays ZIP device statistics */
+-static int zip_stats_show(struct seq_file *s, void *unused)
+-{
+-	u64 val = 0ull;
+-	u64 avg_chunk = 0ull, avg_cr = 0ull;
+-	u32 q = 0;
+-
+-	int index  = 0;
+-	struct zip_device *zip;
+-	struct zip_stats  *st;
+-
+-	for (index = 0; index < MAX_ZIP_DEVICES; index++) {
+-		u64 pending = 0;
+-
+-		if (zip_dev[index]) {
+-			zip = zip_dev[index];
+-			st  = &zip->stats;
+-
+-			/* Get all the pending requests */
+-			for (q = 0; q < ZIP_NUM_QUEUES; q++) {
+-				val = zip_reg_read((zip->reg_base +
+-						    ZIP_DBG_QUEX_STA(q)));
+-				pending += val >> 32 & 0xffffff;
+-			}
+-
+-			val = atomic64_read(&st->comp_req_complete);
+-			avg_chunk = (val) ? atomic64_read(&st->comp_in_bytes) / val : 0;
+-
+-			val = atomic64_read(&st->comp_out_bytes);
+-			avg_cr = (val) ? atomic64_read(&st->comp_in_bytes) / val : 0;
+-			seq_printf(s, "        ZIP Device %d Stats\n"
+-				      "-----------------------------------\n"
+-				      "Comp Req Submitted        : \t%lld\n"
+-				      "Comp Req Completed        : \t%lld\n"
+-				      "Compress In Bytes         : \t%lld\n"
+-				      "Compressed Out Bytes      : \t%lld\n"
+-				      "Average Chunk size        : \t%llu\n"
+-				      "Average Compression ratio : \t%llu\n"
+-				      "Decomp Req Submitted      : \t%lld\n"
+-				      "Decomp Req Completed      : \t%lld\n"
+-				      "Decompress In Bytes       : \t%lld\n"
+-				      "Decompressed Out Bytes    : \t%lld\n"
+-				      "Decompress Bad requests   : \t%lld\n"
+-				      "Pending Req               : \t%lld\n"
+-					"---------------------------------\n",
+-				       index,
+-				       (u64)atomic64_read(&st->comp_req_submit),
+-				       (u64)atomic64_read(&st->comp_req_complete),
+-				       (u64)atomic64_read(&st->comp_in_bytes),
+-				       (u64)atomic64_read(&st->comp_out_bytes),
+-				       avg_chunk,
+-				       avg_cr,
+-				       (u64)atomic64_read(&st->decomp_req_submit),
+-				       (u64)atomic64_read(&st->decomp_req_complete),
+-				       (u64)atomic64_read(&st->decomp_in_bytes),
+-				       (u64)atomic64_read(&st->decomp_out_bytes),
+-				       (u64)atomic64_read(&st->decomp_bad_reqs),
+-				       pending);
+-		}
+-	}
+-	return 0;
+-}
+-
+-/* Clears stats data */
+-static int zip_clear_show(struct seq_file *s, void *unused)
+-{
+-	int index = 0;
+-
+-	for (index = 0; index < MAX_ZIP_DEVICES; index++) {
+-		if (zip_dev[index]) {
+-			memset(&zip_dev[index]->stats, 0,
+-			       sizeof(struct zip_stats));
+-			seq_printf(s, "Cleared stats for zip %d\n", index);
+-		}
+-	}
+-
+-	return 0;
+-}
+-
+-static struct zip_registers zipregs[64] = {
+-	{"ZIP_CMD_CTL        ",  0x0000ull},
+-	{"ZIP_THROTTLE       ",  0x0010ull},
+-	{"ZIP_CONSTANTS      ",  0x00A0ull},
+-	{"ZIP_QUE0_MAP       ",  0x1400ull},
+-	{"ZIP_QUE1_MAP       ",  0x1408ull},
+-	{"ZIP_QUE_ENA        ",  0x0500ull},
+-	{"ZIP_QUE_PRI        ",  0x0508ull},
+-	{"ZIP_QUE0_DONE      ",  0x2000ull},
+-	{"ZIP_QUE1_DONE      ",  0x2008ull},
+-	{"ZIP_QUE0_DOORBELL  ",  0x4000ull},
+-	{"ZIP_QUE1_DOORBELL  ",  0x4008ull},
+-	{"ZIP_QUE0_SBUF_ADDR ",  0x1000ull},
+-	{"ZIP_QUE1_SBUF_ADDR ",  0x1008ull},
+-	{"ZIP_QUE0_SBUF_CTL  ",  0x1200ull},
+-	{"ZIP_QUE1_SBUF_CTL  ",  0x1208ull},
+-	{ NULL, 0}
+-};
+-
+-/* Prints registers' contents */
+-static int zip_regs_show(struct seq_file *s, void *unused)
+-{
+-	u64 val = 0;
+-	int i = 0, index = 0;
+-
+-	for (index = 0; index < MAX_ZIP_DEVICES; index++) {
+-		if (zip_dev[index]) {
+-			seq_printf(s, "--------------------------------\n"
+-				      "     ZIP Device %d Registers\n"
+-				      "--------------------------------\n",
+-				      index);
+-
+-			i = 0;
+-
+-			while (zipregs[i].reg_name) {
+-				val = zip_reg_read((zip_dev[index]->reg_base +
+-						    zipregs[i].reg_offset));
+-				seq_printf(s, "%s: 0x%016llx\n",
+-					   zipregs[i].reg_name, val);
+-				i++;
+-			}
+-		}
+-	}
+-	return 0;
+-}
+-
+-DEFINE_SHOW_ATTRIBUTE(zip_stats);
+-DEFINE_SHOW_ATTRIBUTE(zip_clear);
+-DEFINE_SHOW_ATTRIBUTE(zip_regs);
+-
+-/* Root directory for thunderx_zip debugfs entry */
+-static struct dentry *zip_debugfs_root;
+-
+-static void zip_debugfs_init(void)
+-{
+-	if (!debugfs_initialized())
+-		return;
+-
+-	zip_debugfs_root = debugfs_create_dir("thunderx_zip", NULL);
+-
+-	/* Creating files for entries inside thunderx_zip directory */
+-	debugfs_create_file("zip_stats", 0444, zip_debugfs_root, NULL,
+-			    &zip_stats_fops);
+-
+-	debugfs_create_file("zip_clear", 0444, zip_debugfs_root, NULL,
+-			    &zip_clear_fops);
+-
+-	debugfs_create_file("zip_regs", 0444, zip_debugfs_root, NULL,
+-			    &zip_regs_fops);
+-
+-}
+-
+-static void zip_debugfs_exit(void)
+-{
+-	debugfs_remove_recursive(zip_debugfs_root);
+-}
+-
+-#else
+-static void __init zip_debugfs_init(void) { }
+-static void __exit zip_debugfs_exit(void) { }
+-#endif
+-/* debugfs - end */
+-
+-module_pci_driver(zip_driver);
+-
+-MODULE_AUTHOR("Cavium Inc");
+-MODULE_DESCRIPTION("Cavium Inc ThunderX ZIP Driver");
+-MODULE_LICENSE("GPL v2");
+-MODULE_DEVICE_TABLE(pci, zip_id_table);
+diff --git a/drivers/crypto/cavium/zip/zip_main.h b/drivers/crypto/cavium/zip/zip_main.h
+deleted file mode 100644
+index e1e4fa92ce80..000000000000
+--- a/drivers/crypto/cavium/zip/zip_main.h
++++ /dev/null
+@@ -1,120 +0,0 @@
+-/***********************license start************************************
+- * Copyright (c) 2003-2017 Cavium, Inc.
+- * All rights reserved.
+- *
+- * License: one of 'Cavium License' or 'GNU General Public License Version 2'
+- *
+- * This file is provided under the terms of the Cavium License (see below)
+- * or under the terms of GNU General Public License, Version 2, as
+- * published by the Free Software Foundation. When using or redistributing
+- * this file, you may do so under either license.
+- *
+- * Cavium License:  Redistribution and use in source and binary forms, with
+- * or without modification, are permitted provided that the following
+- * conditions are met:
+- *
+- *  * Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- *
+- *  * Redistributions in binary form must reproduce the above
+- *    copyright notice, this list of conditions and the following
+- *    disclaimer in the documentation and/or other materials provided
+- *    with the distribution.
+- *
+- *  * Neither the name of Cavium Inc. nor the names of its contributors may be
+- *    used to endorse or promote products derived from this software without
+- *    specific prior written permission.
+- *
+- * This Software, including technical data, may be subject to U.S. export
+- * control laws, including the U.S. Export Administration Act and its
+- * associated regulations, and may be subject to export or import
+- * regulations in other countries.
+- *
+- * TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS PROVIDED "AS IS"
+- * AND WITH ALL FAULTS AND CAVIUM INC. MAKES NO PROMISES, REPRESENTATIONS
+- * OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, WITH
+- * RESPECT TO THE SOFTWARE, INCLUDING ITS CONDITION, ITS CONFORMITY TO ANY
+- * REPRESENTATION OR DESCRIPTION, OR THE EXISTENCE OF ANY LATENT OR PATENT
+- * DEFECTS, AND CAVIUM SPECIFICALLY DISCLAIMS ALL IMPLIED (IF ANY)
+- * WARRANTIES OF TITLE, MERCHANTABILITY, NONINFRINGEMENT, FITNESS FOR A
+- * PARTICULAR PURPOSE, LACK OF VIRUSES, ACCURACY OR COMPLETENESS, QUIET
+- * ENJOYMENT, QUIET POSSESSION OR CORRESPONDENCE TO DESCRIPTION. THE
+- * ENTIRE  RISK ARISING OUT OF USE OR PERFORMANCE OF THE SOFTWARE LIES
+- * WITH YOU.
+- ***********************license end**************************************/
+-
+-#ifndef __ZIP_MAIN_H__
+-#define __ZIP_MAIN_H__
+-
+-#include "zip_device.h"
+-#include "zip_regs.h"
+-
+-/* PCI device IDs */
+-#define PCI_DEVICE_ID_THUNDERX_ZIP   0xA01A
+-
+-/* ZIP device BARs */
+-#define PCI_CFG_ZIP_PF_BAR0   0  /* Base addr for normal regs */
+-
+-/* Maximum available zip queues */
+-#define ZIP_MAX_NUM_QUEUES    8
+-
+-#define ZIP_128B_ALIGN        7
+-
+-/* Command queue buffer size */
+-#define ZIP_CMD_QBUF_SIZE     (8064 + 8)
+-
+-struct zip_registers {
+-	char  *reg_name;
+-	u64   reg_offset;
+-};
+-
+-/* ZIP Compression - Decompression stats */
+-struct zip_stats {
+-	atomic64_t    comp_req_submit;
+-	atomic64_t    comp_req_complete;
+-	atomic64_t    decomp_req_submit;
+-	atomic64_t    decomp_req_complete;
+-	atomic64_t    comp_in_bytes;
+-	atomic64_t    comp_out_bytes;
+-	atomic64_t    decomp_in_bytes;
+-	atomic64_t    decomp_out_bytes;
+-	atomic64_t    decomp_bad_reqs;
+-};
+-
+-/* ZIP Instruction Queue */
+-struct zip_iq {
+-	u64        *sw_head;
+-	u64        *sw_tail;
+-	u64        *hw_tail;
+-	u64        done_cnt;
+-	u64        pend_cnt;
+-	u64        free_flag;
+-
+-	/* ZIP IQ lock */
+-	spinlock_t  lock;
+-};
+-
+-/* ZIP Device */
+-struct zip_device {
+-	u32               index;
+-	void __iomem      *reg_base;
+-	struct pci_dev    *pdev;
+-
+-	/* Different ZIP Constants */
+-	u64               depth;
+-	u64               onfsize;
+-	u64               ctxsize;
+-
+-	struct zip_iq     iq[ZIP_MAX_NUM_QUEUES];
+-	struct zip_stats  stats;
+-};
+-
+-/* Prototypes */
+-struct zip_device *zip_get_device(int node_id);
+-int zip_get_node_id(void);
+-void zip_reg_write(u64 val, u64 __iomem *addr);
+-u64 zip_reg_read(u64 __iomem *addr);
+-void zip_update_cmd_bufs(struct zip_device *zip_dev, u32 queue);
+-u32 zip_load_instr(union zip_inst_s *instr, struct zip_device *zip_dev);
+-
+-#endif /* ZIP_MAIN_H */
+diff --git a/drivers/crypto/cavium/zip/zip_mem.c b/drivers/crypto/cavium/zip/zip_mem.c
+deleted file mode 100644
+index b3e0843a9169..000000000000
+--- a/drivers/crypto/cavium/zip/zip_mem.c
++++ /dev/null
+@@ -1,114 +0,0 @@
+-/***********************license start************************************
+- * Copyright (c) 2003-2017 Cavium, Inc.
+- * All rights reserved.
+- *
+- * License: one of 'Cavium License' or 'GNU General Public License Version 2'
+- *
+- * This file is provided under the terms of the Cavium License (see below)
+- * or under the terms of GNU General Public License, Version 2, as
+- * published by the Free Software Foundation. When using or redistributing
+- * this file, you may do so under either license.
+- *
+- * Cavium License:  Redistribution and use in source and binary forms, with
+- * or without modification, are permitted provided that the following
+- * conditions are met:
+- *
+- *  * Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- *
+- *  * Redistributions in binary form must reproduce the above
+- *    copyright notice, this list of conditions and the following
+- *    disclaimer in the documentation and/or other materials provided
+- *    with the distribution.
+- *
+- *  * Neither the name of Cavium Inc. nor the names of its contributors may be
+- *    used to endorse or promote products derived from this software without
+- *    specific prior written permission.
+- *
+- * This Software, including technical data, may be subject to U.S. export
+- * control laws, including the U.S. Export Administration Act and its
+- * associated regulations, and may be subject to export or import
+- * regulations in other countries.
+- *
+- * TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS PROVIDED "AS IS"
+- * AND WITH ALL FAULTS AND CAVIUM INC. MAKES NO PROMISES, REPRESENTATIONS
+- * OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, WITH
+- * RESPECT TO THE SOFTWARE, INCLUDING ITS CONDITION, ITS CONFORMITY TO ANY
+- * REPRESENTATION OR DESCRIPTION, OR THE EXISTENCE OF ANY LATENT OR PATENT
+- * DEFECTS, AND CAVIUM SPECIFICALLY DISCLAIMS ALL IMPLIED (IF ANY)
+- * WARRANTIES OF TITLE, MERCHANTABILITY, NONINFRINGEMENT, FITNESS FOR A
+- * PARTICULAR PURPOSE, LACK OF VIRUSES, ACCURACY OR COMPLETENESS, QUIET
+- * ENJOYMENT, QUIET POSSESSION OR CORRESPONDENCE TO DESCRIPTION. THE
+- * ENTIRE  RISK ARISING OUT OF USE OR PERFORMANCE OF THE SOFTWARE LIES
+- * WITH YOU.
+- ***********************license end**************************************/
+-
+-#include <linux/types.h>
+-#include <linux/vmalloc.h>
+-
+-#include "common.h"
+-
+-/**
+- * zip_cmd_qbuf_alloc - Allocates a cmd buffer for ZIP Instruction Queue
+- * @zip: Pointer to zip device structure
+- * @q:   Queue number to allocate bufffer to
+- * Return: 0 if successful, -ENOMEM otherwise
+- */
+-int zip_cmd_qbuf_alloc(struct zip_device *zip, int q)
+-{
+-	zip->iq[q].sw_head = (u64 *)__get_free_pages((GFP_KERNEL | GFP_DMA),
+-						get_order(ZIP_CMD_QBUF_SIZE));
+-
+-	if (!zip->iq[q].sw_head)
+-		return -ENOMEM;
+-
+-	memset(zip->iq[q].sw_head, 0, ZIP_CMD_QBUF_SIZE);
+-
+-	zip_dbg("cmd_qbuf_alloc[%d] Success : %p\n", q, zip->iq[q].sw_head);
+-	return 0;
+-}
+-
+-/**
+- * zip_cmd_qbuf_free - Frees the cmd Queue buffer
+- * @zip: Pointer to zip device structure
+- * @q:   Queue number to free buffer of
+- */
+-void zip_cmd_qbuf_free(struct zip_device *zip, int q)
+-{
+-	zip_dbg("Freeing cmd_qbuf 0x%lx\n", zip->iq[q].sw_tail);
+-
+-	free_pages((u64)zip->iq[q].sw_tail, get_order(ZIP_CMD_QBUF_SIZE));
+-}
+-
+-/**
+- * zip_data_buf_alloc - Allocates memory for a data bufffer
+- * @size:   Size of the buffer to allocate
+- * Returns: Pointer to the buffer allocated
+- */
+-u8 *zip_data_buf_alloc(u64 size)
+-{
+-	u8 *ptr;
+-
+-	ptr = (u8 *)__get_free_pages((GFP_KERNEL | GFP_DMA),
+-					get_order(size));
+-
+-	if (!ptr)
+-		return NULL;
+-
+-	memset(ptr, 0, size);
+-
+-	zip_dbg("Data buffer allocation success\n");
+-	return ptr;
+-}
+-
+-/**
+- * zip_data_buf_free - Frees the memory of a data buffer
+- * @ptr:  Pointer to the buffer
+- * @size: Buffer size
+- */
+-void zip_data_buf_free(u8 *ptr, u64 size)
+-{
+-	zip_dbg("Freeing data buffer 0x%lx\n", ptr);
+-
+-	free_pages((u64)ptr, get_order(size));
+-}
+diff --git a/drivers/crypto/cavium/zip/zip_mem.h b/drivers/crypto/cavium/zip/zip_mem.h
+deleted file mode 100644
+index f8f2f08c4a5c..000000000000
+--- a/drivers/crypto/cavium/zip/zip_mem.h
++++ /dev/null
+@@ -1,78 +0,0 @@
+-/***********************license start************************************
+- * Copyright (c) 2003-2017 Cavium, Inc.
+- * All rights reserved.
+- *
+- * License: one of 'Cavium License' or 'GNU General Public License Version 2'
+- *
+- * This file is provided under the terms of the Cavium License (see below)
+- * or under the terms of GNU General Public License, Version 2, as
+- * published by the Free Software Foundation. When using or redistributing
+- * this file, you may do so under either license.
+- *
+- * Cavium License:  Redistribution and use in source and binary forms, with
+- * or without modification, are permitted provided that the following
+- * conditions are met:
+- *
+- *  * Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- *
+- *  * Redistributions in binary form must reproduce the above
+- *    copyright notice, this list of conditions and the following
+- *    disclaimer in the documentation and/or other materials provided
+- *    with the distribution.
+- *
+- *  * Neither the name of Cavium Inc. nor the names of its contributors may be
+- *    used to endorse or promote products derived from this software without
+- *    specific prior written permission.
+- *
+- * This Software, including technical data, may be subject to U.S. export
+- * control laws, including the U.S. Export Administration Act and its
+- * associated regulations, and may be subject to export or import
+- * regulations in other countries.
+- *
+- * TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS PROVIDED "AS IS"
+- * AND WITH ALL FAULTS AND CAVIUM INC. MAKES NO PROMISES, REPRESENTATIONS
+- * OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, WITH
+- * RESPECT TO THE SOFTWARE, INCLUDING ITS CONDITION, ITS CONFORMITY TO ANY
+- * REPRESENTATION OR DESCRIPTION, OR THE EXISTENCE OF ANY LATENT OR PATENT
+- * DEFECTS, AND CAVIUM SPECIFICALLY DISCLAIMS ALL IMPLIED (IF ANY)
+- * WARRANTIES OF TITLE, MERCHANTABILITY, NONINFRINGEMENT, FITNESS FOR A
+- * PARTICULAR PURPOSE, LACK OF VIRUSES, ACCURACY OR COMPLETENESS, QUIET
+- * ENJOYMENT, QUIET POSSESSION OR CORRESPONDENCE TO DESCRIPTION. THE
+- * ENTIRE  RISK ARISING OUT OF USE OR PERFORMANCE OF THE SOFTWARE LIES
+- * WITH YOU.
+- ***********************license end**************************************/
+-
+-#ifndef __ZIP_MEM_H__
+-#define __ZIP_MEM_H__
+-
+-/**
+- * zip_cmd_qbuf_free - Frees the cmd Queue buffer
+- * @zip: Pointer to zip device structure
+- * @q:   Queue nmber to free buffer of
+- */
+-void zip_cmd_qbuf_free(struct zip_device *zip, int q);
+-
+-/**
+- * zip_cmd_qbuf_alloc - Allocates a Chunk/cmd buffer for ZIP Inst(cmd) Queue
+- * @zip: Pointer to zip device structure
+- * @q:   Queue number to allocate bufffer to
+- * Return: 0 if successful, 1 otherwise
+- */
+-int zip_cmd_qbuf_alloc(struct zip_device *zip, int q);
+-
+-/**
+- * zip_data_buf_alloc - Allocates memory for a data bufffer
+- * @size:   Size of the buffer to allocate
+- * Returns: Pointer to the buffer allocated
+- */
+-u8 *zip_data_buf_alloc(u64 size);
+-
+-/**
+- * zip_data_buf_free - Frees the memory of a data buffer
+- * @ptr:  Pointer to the buffer
+- * @size: Buffer size
+- */
+-void zip_data_buf_free(u8 *ptr, u64 size);
+-
+-#endif
+diff --git a/drivers/crypto/cavium/zip/zip_regs.h b/drivers/crypto/cavium/zip/zip_regs.h
+deleted file mode 100644
+index 874e0236c87e..000000000000
+--- a/drivers/crypto/cavium/zip/zip_regs.h
++++ /dev/null
+@@ -1,1347 +0,0 @@
+-/***********************license start************************************
+- * Copyright (c) 2003-2017 Cavium, Inc.
+- * All rights reserved.
+- *
+- * License: one of 'Cavium License' or 'GNU General Public License Version 2'
+- *
+- * This file is provided under the terms of the Cavium License (see below)
+- * or under the terms of GNU General Public License, Version 2, as
+- * published by the Free Software Foundation. When using or redistributing
+- * this file, you may do so under either license.
+- *
+- * Cavium License:  Redistribution and use in source and binary forms, with
+- * or without modification, are permitted provided that the following
+- * conditions are met:
+- *
+- *  * Redistributions of source code must retain the above copyright
+- *    notice, this list of conditions and the following disclaimer.
+- *
+- *  * Redistributions in binary form must reproduce the above
+- *    copyright notice, this list of conditions and the following
+- *    disclaimer in the documentation and/or other materials provided
+- *    with the distribution.
+- *
+- *  * Neither the name of Cavium Inc. nor the names of its contributors may be
+- *    used to endorse or promote products derived from this software without
+- *    specific prior written permission.
+- *
+- * This Software, including technical data, may be subject to U.S. export
+- * control laws, including the U.S. Export Administration Act and its
+- * associated regulations, and may be subject to export or import
+- * regulations in other countries.
+- *
+- * TO THE MAXIMUM EXTENT PERMITTED BY LAW, THE SOFTWARE IS PROVIDED "AS IS"
+- * AND WITH ALL FAULTS AND CAVIUM INC. MAKES NO PROMISES, REPRESENTATIONS
+- * OR WARRANTIES, EITHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, WITH
+- * RESPECT TO THE SOFTWARE, INCLUDING ITS CONDITION, ITS CONFORMITY TO ANY
+- * REPRESENTATION OR DESCRIPTION, OR THE EXISTENCE OF ANY LATENT OR PATENT
+- * DEFECTS, AND CAVIUM SPECIFICALLY DISCLAIMS ALL IMPLIED (IF ANY)
+- * WARRANTIES OF TITLE, MERCHANTABILITY, NONINFRINGEMENT, FITNESS FOR A
+- * PARTICULAR PURPOSE, LACK OF VIRUSES, ACCURACY OR COMPLETENESS, QUIET
+- * ENJOYMENT, QUIET POSSESSION OR CORRESPONDENCE TO DESCRIPTION. THE
+- * ENTIRE  RISK ARISING OUT OF USE OR PERFORMANCE OF THE SOFTWARE LIES
+- * WITH YOU.
+- ***********************license end**************************************/
+-
+-#ifndef __ZIP_REGS_H__
+-#define __ZIP_REGS_H__
+-
+-/*
+- * Configuration and status register (CSR) address and type definitions for
+- * Cavium ZIP.
+- */
+-
+-#include <linux/kern_levels.h>
+-
+-/* ZIP invocation result completion status codes */
+-#define ZIP_CMD_NOTDONE        0x0
+-
+-/* Successful completion. */
+-#define ZIP_CMD_SUCCESS        0x1
+-
+-/* Output truncated */
+-#define ZIP_CMD_DTRUNC         0x2
+-
+-/* Dynamic Stop */
+-#define ZIP_CMD_DYNAMIC_STOP   0x3
+-
+-/* Uncompress ran out of input data when IWORD0[EF] was set */
+-#define ZIP_CMD_ITRUNC         0x4
+-
+-/* Uncompress found the reserved block type 3 */
+-#define ZIP_CMD_RBLOCK         0x5
+-
+-/*
+- * Uncompress found LEN != ZIP_CMD_NLEN in an uncompressed block in the input.
+- */
+-#define ZIP_CMD_NLEN           0x6
+-
+-/* Uncompress found a bad code in the main Huffman codes. */
+-#define ZIP_CMD_BADCODE        0x7
+-
+-/* Uncompress found a bad code in the 19 Huffman codes encoding lengths. */
+-#define ZIP_CMD_BADCODE2       0x8
+-
+-/* Compress found a zero-length input. */
+-#define ZIP_CMD_ZERO_LEN       0x9
+-
+-/* The compress or decompress encountered an internal parity error. */
+-#define ZIP_CMD_PARITY         0xA
+-
+-/*
+- * Uncompress found a string identifier that precedes the uncompressed data and
+- * decompression history.
+- */
+-#define ZIP_CMD_FATAL          0xB
+-
+-/**
+- * enum zip_int_vec_e - ZIP MSI-X Vector Enumeration, enumerates the MSI-X
+- * interrupt vectors.
+- */
+-enum zip_int_vec_e {
+-	ZIP_INT_VEC_E_ECCE = 0x10,
+-	ZIP_INT_VEC_E_FIFE = 0x11,
+-	ZIP_INT_VEC_E_QUE0_DONE = 0x0,
+-	ZIP_INT_VEC_E_QUE0_ERR = 0x8,
+-	ZIP_INT_VEC_E_QUE1_DONE = 0x1,
+-	ZIP_INT_VEC_E_QUE1_ERR = 0x9,
+-	ZIP_INT_VEC_E_QUE2_DONE = 0x2,
+-	ZIP_INT_VEC_E_QUE2_ERR = 0xa,
+-	ZIP_INT_VEC_E_QUE3_DONE = 0x3,
+-	ZIP_INT_VEC_E_QUE3_ERR = 0xb,
+-	ZIP_INT_VEC_E_QUE4_DONE = 0x4,
+-	ZIP_INT_VEC_E_QUE4_ERR = 0xc,
+-	ZIP_INT_VEC_E_QUE5_DONE = 0x5,
+-	ZIP_INT_VEC_E_QUE5_ERR = 0xd,
+-	ZIP_INT_VEC_E_QUE6_DONE = 0x6,
+-	ZIP_INT_VEC_E_QUE6_ERR = 0xe,
+-	ZIP_INT_VEC_E_QUE7_DONE = 0x7,
+-	ZIP_INT_VEC_E_QUE7_ERR = 0xf,
+-	ZIP_INT_VEC_E_ENUM_LAST = 0x12,
+-};
+-
+-/**
+- * union zip_zptr_addr_s - ZIP Generic Pointer Structure for ADDR.
+- *
+- * It is the generic format of pointers in ZIP_INST_S.
+- */
+-union zip_zptr_addr_s {
+-	u64 u_reg64;
+-	struct {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_49_63              : 15;
+-		u64 addr                        : 49;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 addr                        : 49;
+-		u64 reserved_49_63              : 15;
+-#endif
+-	} s;
+-
+-};
+-
+-/**
+- * union zip_zptr_ctl_s - ZIP Generic Pointer Structure for CTL.
+- *
+- * It is the generic format of pointers in ZIP_INST_S.
+- */
+-union zip_zptr_ctl_s {
+-	u64 u_reg64;
+-	struct {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_112_127            : 16;
+-		u64 length                      : 16;
+-		u64 reserved_67_95              : 29;
+-		u64 fw                          : 1;
+-		u64 nc                          : 1;
+-		u64 data_be                     : 1;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 data_be                     : 1;
+-		u64 nc                          : 1;
+-		u64 fw                          : 1;
+-		u64 reserved_67_95              : 29;
+-		u64 length                      : 16;
+-		u64 reserved_112_127            : 16;
+-#endif
+-	} s;
+-};
+-
+-/**
+- * union zip_inst_s - ZIP Instruction Structure.
+- * Each ZIP instruction has 16 words (they are called IWORD0 to IWORD15 within
+- * the structure).
+- */
+-union zip_inst_s {
+-	u64 u_reg64[16];
+-	struct {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 doneint                     : 1;
+-		u64 reserved_56_62              : 7;
+-		u64 totaloutputlength           : 24;
+-		u64 reserved_27_31              : 5;
+-		u64 exn                         : 3;
+-		u64 reserved_23_23              : 1;
+-		u64 exbits                      : 7;
+-		u64 reserved_12_15              : 4;
+-		u64 sf                          : 1;
+-		u64 ss                          : 2;
+-		u64 cc                          : 2;
+-		u64 ef                          : 1;
+-		u64 bf                          : 1;
+-		u64 ce                          : 1;
+-		u64 reserved_3_3                : 1;
+-		u64 ds                          : 1;
+-		u64 dg                          : 1;
+-		u64 hg                          : 1;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 hg                          : 1;
+-		u64 dg                          : 1;
+-		u64 ds                          : 1;
+-		u64 reserved_3_3                : 1;
+-		u64 ce                          : 1;
+-		u64 bf                          : 1;
+-		u64 ef                          : 1;
+-		u64 cc                          : 2;
+-		u64 ss                          : 2;
+-		u64 sf                          : 1;
+-		u64 reserved_12_15              : 4;
+-		u64 exbits                      : 7;
+-		u64 reserved_23_23              : 1;
+-		u64 exn                         : 3;
+-		u64 reserved_27_31              : 5;
+-		u64 totaloutputlength           : 24;
+-		u64 reserved_56_62              : 7;
+-		u64 doneint                     : 1;
+-#endif
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 historylength               : 16;
+-		u64 reserved_96_111             : 16;
+-		u64 adlercrc32                  : 32;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 adlercrc32                  : 32;
+-		u64 reserved_96_111             : 16;
+-		u64 historylength               : 16;
+-#endif
+-		union zip_zptr_addr_s ctx_ptr_addr;
+-		union zip_zptr_ctl_s ctx_ptr_ctl;
+-		union zip_zptr_addr_s his_ptr_addr;
+-		union zip_zptr_ctl_s his_ptr_ctl;
+-		union zip_zptr_addr_s inp_ptr_addr;
+-		union zip_zptr_ctl_s inp_ptr_ctl;
+-		union zip_zptr_addr_s out_ptr_addr;
+-		union zip_zptr_ctl_s out_ptr_ctl;
+-		union zip_zptr_addr_s res_ptr_addr;
+-		union zip_zptr_ctl_s res_ptr_ctl;
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_817_831            : 15;
+-		u64 wq_ptr                      : 49;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 wq_ptr                      : 49;
+-		u64 reserved_817_831            : 15;
+-#endif
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_882_895            : 14;
+-		u64 tt                          : 2;
+-		u64 reserved_874_879            : 6;
+-		u64 grp                         : 10;
+-		u64 tag                         : 32;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 tag                         : 32;
+-		u64 grp                         : 10;
+-		u64 reserved_874_879            : 6;
+-		u64 tt                          : 2;
+-		u64 reserved_882_895            : 14;
+-#endif
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_896_959            : 64;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 reserved_896_959            : 64;
+-#endif
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_960_1023           : 64;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 reserved_960_1023           : 64;
+-#endif
+-	} s;
+-};
+-
+-/**
+- * union zip_nptr_s - ZIP Instruction Next-Chunk-Buffer Pointer (NPTR)
+- * Structure
+- *
+- * ZIP_NPTR structure is used to chain all the zip instruction buffers
+- * together. ZIP instruction buffers are managed (allocated and released) by
+- * the software.
+- */
+-union zip_nptr_s {
+-	u64 u_reg64;
+-	struct {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_49_63              : 15;
+-		u64 addr                        : 49;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 addr                        : 49;
+-		u64 reserved_49_63              : 15;
+-#endif
+-	} s;
+-};
+-
+-/**
+- * union zip_zptr_s - ZIP Generic Pointer Structure.
+- *
+- * It is the generic format of pointers in ZIP_INST_S.
+- */
+-union zip_zptr_s {
+-	u64 u_reg64[2];
+-	struct {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_49_63              : 15;
+-		u64 addr                        : 49;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 addr                        : 49;
+-		u64 reserved_49_63              : 15;
+-#endif
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_112_127            : 16;
+-		u64 length                      : 16;
+-		u64 reserved_67_95              : 29;
+-		u64 fw                          : 1;
+-		u64 nc                          : 1;
+-		u64 data_be                     : 1;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 data_be                     : 1;
+-		u64 nc                          : 1;
+-		u64 fw                          : 1;
+-		u64 reserved_67_95              : 29;
+-		u64 length                      : 16;
+-		u64 reserved_112_127            : 16;
+-#endif
+-	} s;
+-};
+-
+-/**
+- * union zip_zres_s - ZIP Result Structure
+- *
+- * The ZIP coprocessor writes the result structure after it completes the
+- * invocation. The result structure is exactly 24 bytes, and each invocation of
+- * the ZIP coprocessor produces exactly one result structure.
+- */
+-union zip_zres_s {
+-	u64 u_reg64[3];
+-	struct {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 crc32                       : 32;
+-		u64 adler32                     : 32;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 adler32                     : 32;
+-		u64 crc32                       : 32;
+-#endif
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 totalbyteswritten           : 32;
+-		u64 totalbytesread              : 32;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 totalbytesread              : 32;
+-		u64 totalbyteswritten           : 32;
+-#endif
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 totalbitsprocessed          : 32;
+-		u64 doneint                     : 1;
+-		u64 reserved_155_158            : 4;
+-		u64 exn                         : 3;
+-		u64 reserved_151_151            : 1;
+-		u64 exbits                      : 7;
+-		u64 reserved_137_143            : 7;
+-		u64 ef                          : 1;
+-
+-		volatile u64 compcode           : 8;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-
+-		volatile u64 compcode           : 8;
+-		u64 ef                          : 1;
+-		u64 reserved_137_143            : 7;
+-		u64 exbits                      : 7;
+-		u64 reserved_151_151            : 1;
+-		u64 exn                         : 3;
+-		u64 reserved_155_158            : 4;
+-		u64 doneint                     : 1;
+-		u64 totalbitsprocessed          : 32;
+-#endif
+-	} s;
+-};
+-
+-/**
+- * union zip_cmd_ctl - Structure representing the register that controls
+- * clock and reset.
+- */
+-union zip_cmd_ctl {
+-	u64 u_reg64;
+-	struct zip_cmd_ctl_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_2_63               : 62;
+-		u64 forceclk                    : 1;
+-		u64 reset                       : 1;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 reset                       : 1;
+-		u64 forceclk                    : 1;
+-		u64 reserved_2_63               : 62;
+-#endif
+-	} s;
+-};
+-
+-#define ZIP_CMD_CTL 0x0ull
+-
+-/**
+- * union zip_constants - Data structure representing the register that contains
+- * all of the current implementation-related parameters of the zip core in this
+- * chip.
+- */
+-union zip_constants {
+-	u64 u_reg64;
+-	struct zip_constants_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 nexec                       : 8;
+-		u64 reserved_49_55              : 7;
+-		u64 syncflush_capable           : 1;
+-		u64 depth                       : 16;
+-		u64 onfsize                     : 12;
+-		u64 ctxsize                     : 12;
+-		u64 reserved_1_7                : 7;
+-		u64 disabled                    : 1;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 disabled                    : 1;
+-		u64 reserved_1_7                : 7;
+-		u64 ctxsize                     : 12;
+-		u64 onfsize                     : 12;
+-		u64 depth                       : 16;
+-		u64 syncflush_capable           : 1;
+-		u64 reserved_49_55              : 7;
+-		u64 nexec                       : 8;
+-#endif
+-	} s;
+-};
+-
+-#define ZIP_CONSTANTS 0x00A0ull
+-
+-/**
+- * union zip_corex_bist_status - Represents registers which have the BIST
+- * status of memories in zip cores.
+- *
+- * Each bit is the BIST result of an individual memory
+- * (per bit, 0 = pass and 1 = fail).
+- */
+-union zip_corex_bist_status {
+-	u64 u_reg64;
+-	struct zip_corex_bist_status_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_53_63              : 11;
+-		u64 bstatus                     : 53;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 bstatus                     : 53;
+-		u64 reserved_53_63              : 11;
+-#endif
+-	} s;
+-};
+-
+-static inline u64 ZIP_COREX_BIST_STATUS(u64 param1)
+-{
+-	if (param1 <= 1)
+-		return 0x0520ull + (param1 & 1) * 0x8ull;
+-	pr_err("ZIP_COREX_BIST_STATUS: %llu\n", param1);
+-	return 0;
+-}
+-
+-/**
+- * union zip_ctl_bist_status - Represents register that has the BIST status of
+- * memories in ZIP_CTL (instruction buffer, G/S pointer FIFO, input data
+- * buffer, output data buffers).
+- *
+- * Each bit is the BIST result of an individual memory
+- * (per bit, 0 = pass and 1 = fail).
+- */
+-union zip_ctl_bist_status {
+-	u64 u_reg64;
+-	struct zip_ctl_bist_status_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_9_63               : 55;
+-		u64 bstatus                     : 9;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 bstatus                     : 9;
+-		u64 reserved_9_63               : 55;
+-#endif
+-	} s;
+-};
+-
+-#define ZIP_CTL_BIST_STATUS 0x0510ull
+-
+-/**
+- * union zip_ctl_cfg - Represents the register that controls the behavior of
+- * the ZIP DMA engines.
+- *
+- * It is recommended to keep default values for normal operation. Changing the
+- * values of the fields may be useful for diagnostics.
+- */
+-union zip_ctl_cfg {
+-	u64 u_reg64;
+-	struct zip_ctl_cfg_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_52_63              : 12;
+-		u64 ildf                        : 4;
+-		u64 reserved_36_47              : 12;
+-		u64 drtf                        : 4;
+-		u64 reserved_27_31              : 5;
+-		u64 stcf                        : 3;
+-		u64 reserved_19_23              : 5;
+-		u64 ldf                         : 3;
+-		u64 reserved_2_15               : 14;
+-		u64 busy                        : 1;
+-		u64 reserved_0_0                : 1;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 reserved_0_0                : 1;
+-		u64 busy                        : 1;
+-		u64 reserved_2_15               : 14;
+-		u64 ldf                         : 3;
+-		u64 reserved_19_23              : 5;
+-		u64 stcf                        : 3;
+-		u64 reserved_27_31              : 5;
+-		u64 drtf                        : 4;
+-		u64 reserved_36_47              : 12;
+-		u64 ildf                        : 4;
+-		u64 reserved_52_63              : 12;
+-#endif
+-	} s;
+-};
+-
+-#define ZIP_CTL_CFG 0x0560ull
+-
+-/**
+- * union zip_dbg_corex_inst - Represents the registers that reflect the status
+- * of the current instruction that the ZIP core is executing or has executed.
+- *
+- * These registers are only for debug use.
+- */
+-union zip_dbg_corex_inst {
+-	u64 u_reg64;
+-	struct zip_dbg_corex_inst_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 busy                        : 1;
+-		u64 reserved_35_62              : 28;
+-		u64 qid                         : 3;
+-		u64 iid                         : 32;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 iid                         : 32;
+-		u64 qid                         : 3;
+-		u64 reserved_35_62              : 28;
+-		u64 busy                        : 1;
+-#endif
+-	} s;
+-};
+-
+-static inline u64 ZIP_DBG_COREX_INST(u64 param1)
+-{
+-	if (param1 <= 1)
+-		return 0x0640ull + (param1 & 1) * 0x8ull;
+-	pr_err("ZIP_DBG_COREX_INST: %llu\n", param1);
+-	return 0;
+-}
+-
+-/**
+- * union zip_dbg_corex_sta - Represents registers that reflect the status of
+- * the zip cores.
+- *
+- * They are for debug use only.
+- */
+-union zip_dbg_corex_sta {
+-	u64 u_reg64;
+-	struct zip_dbg_corex_sta_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 busy                        : 1;
+-		u64 reserved_37_62              : 26;
+-		u64 ist                         : 5;
+-		u64 nie                         : 32;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 nie                         : 32;
+-		u64 ist                         : 5;
+-		u64 reserved_37_62              : 26;
+-		u64 busy                        : 1;
+-#endif
+-	} s;
+-};
+-
+-static inline u64 ZIP_DBG_COREX_STA(u64 param1)
+-{
+-	if (param1 <= 1)
+-		return 0x0680ull + (param1 & 1) * 0x8ull;
+-	pr_err("ZIP_DBG_COREX_STA: %llu\n", param1);
+-	return 0;
+-}
+-
+-/**
+- * union zip_dbg_quex_sta - Represets registers that reflect status of the zip
+- * instruction queues.
+- *
+- * They are for debug use only.
+- */
+-union zip_dbg_quex_sta {
+-	u64 u_reg64;
+-	struct zip_dbg_quex_sta_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 busy                        : 1;
+-		u64 reserved_56_62              : 7;
+-		u64 rqwc                        : 24;
+-		u64 nii                         : 32;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 nii                         : 32;
+-		u64 rqwc                        : 24;
+-		u64 reserved_56_62              : 7;
+-		u64 busy                        : 1;
+-#endif
+-	} s;
+-};
+-
+-static inline u64 ZIP_DBG_QUEX_STA(u64 param1)
+-{
+-	if (param1 <= 7)
+-		return 0x1800ull + (param1 & 7) * 0x8ull;
+-	pr_err("ZIP_DBG_QUEX_STA: %llu\n", param1);
+-	return 0;
+-}
+-
+-/**
+- * union zip_ecc_ctl - Represents the register that enables ECC for each
+- * individual internal memory that requires ECC.
+- *
+- * For debug purpose, it can also flip one or two bits in the ECC data.
+- */
+-union zip_ecc_ctl {
+-	u64 u_reg64;
+-	struct zip_ecc_ctl_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_19_63              : 45;
+-		u64 vmem_cdis                   : 1;
+-		u64 vmem_fs                     : 2;
+-		u64 reserved_15_15              : 1;
+-		u64 idf1_cdis                   : 1;
+-		u64 idf1_fs                     : 2;
+-		u64 reserved_11_11              : 1;
+-		u64 idf0_cdis                   : 1;
+-		u64 idf0_fs                     : 2;
+-		u64 reserved_7_7                : 1;
+-		u64 gspf_cdis                   : 1;
+-		u64 gspf_fs                     : 2;
+-		u64 reserved_3_3                : 1;
+-		u64 iqf_cdis                    : 1;
+-		u64 iqf_fs                      : 2;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 iqf_fs                      : 2;
+-		u64 iqf_cdis                    : 1;
+-		u64 reserved_3_3                : 1;
+-		u64 gspf_fs                     : 2;
+-		u64 gspf_cdis                   : 1;
+-		u64 reserved_7_7                : 1;
+-		u64 idf0_fs                     : 2;
+-		u64 idf0_cdis                   : 1;
+-		u64 reserved_11_11              : 1;
+-		u64 idf1_fs                     : 2;
+-		u64 idf1_cdis                   : 1;
+-		u64 reserved_15_15              : 1;
+-		u64 vmem_fs                     : 2;
+-		u64 vmem_cdis                   : 1;
+-		u64 reserved_19_63              : 45;
+-#endif
+-	} s;
+-};
+-
+-#define ZIP_ECC_CTL 0x0568ull
+-
+-/* NCB - zip_ecce_ena_w1c */
+-union zip_ecce_ena_w1c {
+-	u64 u_reg64;
+-	struct zip_ecce_ena_w1c_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_37_63              : 27;
+-		u64 dbe                         : 5;
+-		u64 reserved_5_31               : 27;
+-		u64 sbe                         : 5;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 sbe                         : 5;
+-		u64 reserved_5_31               : 27;
+-		u64 dbe                         : 5;
+-		u64 reserved_37_63              : 27;
+-#endif
+-	} s;
+-};
+-
+-#define ZIP_ECCE_ENA_W1C 0x0598ull
+-
+-/* NCB - zip_ecce_ena_w1s */
+-union zip_ecce_ena_w1s {
+-	u64 u_reg64;
+-	struct zip_ecce_ena_w1s_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_37_63              : 27;
+-		u64 dbe                         : 5;
+-		u64 reserved_5_31               : 27;
+-		u64 sbe                         : 5;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 sbe                         : 5;
+-		u64 reserved_5_31               : 27;
+-		u64 dbe                         : 5;
+-		u64 reserved_37_63              : 27;
+-#endif
+-	} s;
+-};
+-
+-#define ZIP_ECCE_ENA_W1S 0x0590ull
+-
+-/**
+- * union zip_ecce_int - Represents the register that contains the status of the
+- * ECC interrupt sources.
+- */
+-union zip_ecce_int {
+-	u64 u_reg64;
+-	struct zip_ecce_int_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_37_63              : 27;
+-		u64 dbe                         : 5;
+-		u64 reserved_5_31               : 27;
+-		u64 sbe                         : 5;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 sbe                         : 5;
+-		u64 reserved_5_31               : 27;
+-		u64 dbe                         : 5;
+-		u64 reserved_37_63              : 27;
+-#endif
+-	} s;
+-};
+-
+-#define ZIP_ECCE_INT 0x0580ull
+-
+-/* NCB - zip_ecce_int_w1s */
+-union zip_ecce_int_w1s {
+-	u64 u_reg64;
+-	struct zip_ecce_int_w1s_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_37_63              : 27;
+-		u64 dbe                         : 5;
+-		u64 reserved_5_31               : 27;
+-		u64 sbe                         : 5;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 sbe                         : 5;
+-		u64 reserved_5_31               : 27;
+-		u64 dbe                         : 5;
+-		u64 reserved_37_63              : 27;
+-#endif
+-	} s;
+-};
+-
+-#define ZIP_ECCE_INT_W1S 0x0588ull
+-
+-/* NCB - zip_fife_ena_w1c */
+-union zip_fife_ena_w1c {
+-	u64 u_reg64;
+-	struct zip_fife_ena_w1c_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_42_63              : 22;
+-		u64 asserts                     : 42;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 asserts                     : 42;
+-		u64 reserved_42_63              : 22;
+-#endif
+-	} s;
+-};
+-
+-#define ZIP_FIFE_ENA_W1C 0x0090ull
+-
+-/* NCB - zip_fife_ena_w1s */
+-union zip_fife_ena_w1s {
+-	u64 u_reg64;
+-	struct zip_fife_ena_w1s_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_42_63              : 22;
+-		u64 asserts                     : 42;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 asserts                     : 42;
+-		u64 reserved_42_63              : 22;
+-#endif
+-	} s;
+-};
+-
+-#define ZIP_FIFE_ENA_W1S 0x0088ull
+-
+-/* NCB - zip_fife_int */
+-union zip_fife_int {
+-	u64 u_reg64;
+-	struct zip_fife_int_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_42_63              : 22;
+-		u64 asserts                     : 42;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 asserts                     : 42;
+-		u64 reserved_42_63              : 22;
+-#endif
+-	} s;
+-};
+-
+-#define ZIP_FIFE_INT 0x0078ull
+-
+-/* NCB - zip_fife_int_w1s */
+-union zip_fife_int_w1s {
+-	u64 u_reg64;
+-	struct zip_fife_int_w1s_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_42_63              : 22;
+-		u64 asserts                     : 42;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 asserts                     : 42;
+-		u64 reserved_42_63              : 22;
+-#endif
+-	} s;
+-};
+-
+-#define ZIP_FIFE_INT_W1S 0x0080ull
+-
+-/**
+- * union zip_msix_pbax - Represents the register that is the MSI-X PBA table
+- *
+- * The bit number is indexed by the ZIP_INT_VEC_E enumeration.
+- */
+-union zip_msix_pbax {
+-	u64 u_reg64;
+-	struct zip_msix_pbax_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 pend                        : 64;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 pend                        : 64;
+-#endif
+-	} s;
+-};
+-
+-static inline u64 ZIP_MSIX_PBAX(u64 param1)
+-{
+-	if (param1 == 0)
+-		return 0x0000838000FF0000ull;
+-	pr_err("ZIP_MSIX_PBAX: %llu\n", param1);
+-	return 0;
+-}
+-
+-/**
+- * union zip_msix_vecx_addr - Represents the register that is the MSI-X vector
+- * table, indexed by the ZIP_INT_VEC_E enumeration.
+- */
+-union zip_msix_vecx_addr {
+-	u64 u_reg64;
+-	struct zip_msix_vecx_addr_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_49_63              : 15;
+-		u64 addr                        : 47;
+-		u64 reserved_1_1                : 1;
+-		u64 secvec                      : 1;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 secvec                      : 1;
+-		u64 reserved_1_1                : 1;
+-		u64 addr                        : 47;
+-		u64 reserved_49_63              : 15;
+-#endif
+-	} s;
+-};
+-
+-static inline u64 ZIP_MSIX_VECX_ADDR(u64 param1)
+-{
+-	if (param1 <= 17)
+-		return 0x0000838000F00000ull + (param1 & 31) * 0x10ull;
+-	pr_err("ZIP_MSIX_VECX_ADDR: %llu\n", param1);
+-	return 0;
+-}
+-
+-/**
+- * union zip_msix_vecx_ctl - Represents the register that is the MSI-X vector
+- * table, indexed by the ZIP_INT_VEC_E enumeration.
+- */
+-union zip_msix_vecx_ctl {
+-	u64 u_reg64;
+-	struct zip_msix_vecx_ctl_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_33_63              : 31;
+-		u64 mask                        : 1;
+-		u64 reserved_20_31              : 12;
+-		u64 data                        : 20;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 data                        : 20;
+-		u64 reserved_20_31              : 12;
+-		u64 mask                        : 1;
+-		u64 reserved_33_63              : 31;
+-#endif
+-	} s;
+-};
+-
+-static inline u64 ZIP_MSIX_VECX_CTL(u64 param1)
+-{
+-	if (param1 <= 17)
+-		return 0x0000838000F00008ull + (param1 & 31) * 0x10ull;
+-	pr_err("ZIP_MSIX_VECX_CTL: %llu\n", param1);
+-	return 0;
+-}
+-
+-/**
+- * union zip_quex_done - Represents the registers that contain the per-queue
+- * instruction done count.
+- */
+-union zip_quex_done {
+-	u64 u_reg64;
+-	struct zip_quex_done_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_20_63              : 44;
+-		u64 done                        : 20;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 done                        : 20;
+-		u64 reserved_20_63              : 44;
+-#endif
+-	} s;
+-};
+-
+-static inline u64 ZIP_QUEX_DONE(u64 param1)
+-{
+-	if (param1 <= 7)
+-		return 0x2000ull + (param1 & 7) * 0x8ull;
+-	pr_err("ZIP_QUEX_DONE: %llu\n", param1);
+-	return 0;
+-}
+-
+-/**
+- * union zip_quex_done_ack - Represents the registers on write to which will
+- * decrement the per-queue instructiona done count.
+- */
+-union zip_quex_done_ack {
+-	u64 u_reg64;
+-	struct zip_quex_done_ack_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_20_63              : 44;
+-		u64 done_ack                    : 20;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 done_ack                    : 20;
+-		u64 reserved_20_63              : 44;
+-#endif
+-	} s;
+-};
+-
+-static inline u64 ZIP_QUEX_DONE_ACK(u64 param1)
+-{
+-	if (param1 <= 7)
+-		return 0x2200ull + (param1 & 7) * 0x8ull;
+-	pr_err("ZIP_QUEX_DONE_ACK: %llu\n", param1);
+-	return 0;
+-}
+-
+-/**
+- * union zip_quex_done_ena_w1c - Represents the register which when written
+- * 1 to will disable the DONEINT interrupt for the queue.
+- */
+-union zip_quex_done_ena_w1c {
+-	u64 u_reg64;
+-	struct zip_quex_done_ena_w1c_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_1_63               : 63;
+-		u64 done_ena                    : 1;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 done_ena                    : 1;
+-		u64 reserved_1_63               : 63;
+-#endif
+-	} s;
+-};
+-
+-static inline u64 ZIP_QUEX_DONE_ENA_W1C(u64 param1)
+-{
+-	if (param1 <= 7)
+-		return 0x2600ull + (param1 & 7) * 0x8ull;
+-	pr_err("ZIP_QUEX_DONE_ENA_W1C: %llu\n", param1);
+-	return 0;
+-}
+-
+-/**
+- * union zip_quex_done_ena_w1s - Represents the register that when written 1 to
+- * will enable the DONEINT interrupt for the queue.
+- */
+-union zip_quex_done_ena_w1s {
+-	u64 u_reg64;
+-	struct zip_quex_done_ena_w1s_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_1_63               : 63;
+-		u64 done_ena                    : 1;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 done_ena                    : 1;
+-		u64 reserved_1_63               : 63;
+-#endif
+-	} s;
+-};
+-
+-static inline u64 ZIP_QUEX_DONE_ENA_W1S(u64 param1)
+-{
+-	if (param1 <= 7)
+-		return 0x2400ull + (param1 & 7) * 0x8ull;
+-	pr_err("ZIP_QUEX_DONE_ENA_W1S: %llu\n", param1);
+-	return 0;
+-}
+-
+-/**
+- * union zip_quex_done_wait - Represents the register that specifies the per
+- * queue interrupt coalescing settings.
+- */
+-union zip_quex_done_wait {
+-	u64 u_reg64;
+-	struct zip_quex_done_wait_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_48_63              : 16;
+-		u64 time_wait                   : 16;
+-		u64 reserved_20_31              : 12;
+-		u64 num_wait                    : 20;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 num_wait                    : 20;
+-		u64 reserved_20_31              : 12;
+-		u64 time_wait                   : 16;
+-		u64 reserved_48_63              : 16;
+-#endif
+-	} s;
+-};
+-
+-static inline u64 ZIP_QUEX_DONE_WAIT(u64 param1)
+-{
+-	if (param1 <= 7)
+-		return 0x2800ull + (param1 & 7) * 0x8ull;
+-	pr_err("ZIP_QUEX_DONE_WAIT: %llu\n", param1);
+-	return 0;
+-}
+-
+-/**
+- * union zip_quex_doorbell - Represents doorbell registers for the ZIP
+- * instruction queues.
+- */
+-union zip_quex_doorbell {
+-	u64 u_reg64;
+-	struct zip_quex_doorbell_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_20_63              : 44;
+-		u64 dbell_cnt                   : 20;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 dbell_cnt                   : 20;
+-		u64 reserved_20_63              : 44;
+-#endif
+-	} s;
+-};
+-
+-static inline u64 ZIP_QUEX_DOORBELL(u64 param1)
+-{
+-	if (param1 <= 7)
+-		return 0x4000ull + (param1 & 7) * 0x8ull;
+-	pr_err("ZIP_QUEX_DOORBELL: %llu\n", param1);
+-	return 0;
+-}
+-
+-union zip_quex_err_ena_w1c {
+-	u64 u_reg64;
+-	struct zip_quex_err_ena_w1c_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_5_63               : 59;
+-		u64 mdbe                        : 1;
+-		u64 nwrp                        : 1;
+-		u64 nrrp                        : 1;
+-		u64 irde                        : 1;
+-		u64 dovf                        : 1;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 dovf                        : 1;
+-		u64 irde                        : 1;
+-		u64 nrrp                        : 1;
+-		u64 nwrp                        : 1;
+-		u64 mdbe                        : 1;
+-		u64 reserved_5_63               : 59;
+-#endif
+-	} s;
+-};
+-
+-static inline u64 ZIP_QUEX_ERR_ENA_W1C(u64 param1)
+-{
+-	if (param1 <= 7)
+-		return 0x3600ull + (param1 & 7) * 0x8ull;
+-	pr_err("ZIP_QUEX_ERR_ENA_W1C: %llu\n", param1);
+-	return 0;
+-}
+-
+-union zip_quex_err_ena_w1s {
+-	u64 u_reg64;
+-	struct zip_quex_err_ena_w1s_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_5_63               : 59;
+-		u64 mdbe                        : 1;
+-		u64 nwrp                        : 1;
+-		u64 nrrp                        : 1;
+-		u64 irde                        : 1;
+-		u64 dovf                        : 1;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 dovf                        : 1;
+-		u64 irde                        : 1;
+-		u64 nrrp                        : 1;
+-		u64 nwrp                        : 1;
+-		u64 mdbe                        : 1;
+-		u64 reserved_5_63               : 59;
+-#endif
+-	} s;
+-};
+-
+-static inline u64 ZIP_QUEX_ERR_ENA_W1S(u64 param1)
+-{
+-	if (param1 <= 7)
+-		return 0x3400ull + (param1 & 7) * 0x8ull;
+-	pr_err("ZIP_QUEX_ERR_ENA_W1S: %llu\n", param1);
+-	return 0;
+-}
+-
+-/**
+- * union zip_quex_err_int - Represents registers that contain the per-queue
+- * error interrupts.
+- */
+-union zip_quex_err_int {
+-	u64 u_reg64;
+-	struct zip_quex_err_int_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_5_63               : 59;
+-		u64 mdbe                        : 1;
+-		u64 nwrp                        : 1;
+-		u64 nrrp                        : 1;
+-		u64 irde                        : 1;
+-		u64 dovf                        : 1;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 dovf                        : 1;
+-		u64 irde                        : 1;
+-		u64 nrrp                        : 1;
+-		u64 nwrp                        : 1;
+-		u64 mdbe                        : 1;
+-		u64 reserved_5_63               : 59;
+-#endif
+-	} s;
+-};
+-
+-static inline u64 ZIP_QUEX_ERR_INT(u64 param1)
+-{
+-	if (param1 <= 7)
+-		return 0x3000ull + (param1 & 7) * 0x8ull;
+-	pr_err("ZIP_QUEX_ERR_INT: %llu\n", param1);
+-	return 0;
+-}
+-
+-/* NCB - zip_que#_err_int_w1s */
+-union zip_quex_err_int_w1s {
+-	u64 u_reg64;
+-	struct zip_quex_err_int_w1s_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_5_63               : 59;
+-		u64 mdbe                        : 1;
+-		u64 nwrp                        : 1;
+-		u64 nrrp                        : 1;
+-		u64 irde                        : 1;
+-		u64 dovf                        : 1;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 dovf                        : 1;
+-		u64 irde                        : 1;
+-		u64 nrrp                        : 1;
+-		u64 nwrp                        : 1;
+-		u64 mdbe                        : 1;
+-		u64 reserved_5_63               : 59;
+-#endif
+-	} s;
+-};
+-
+-static inline u64 ZIP_QUEX_ERR_INT_W1S(u64 param1)
+-{
+-	if (param1 <= 7)
+-		return 0x3200ull + (param1 & 7) * 0x8ull;
+-	pr_err("ZIP_QUEX_ERR_INT_W1S: %llu\n", param1);
+-	return 0;
+-}
+-
+-/**
+- * union zip_quex_gcfg - Represents the registers that reflect status of the
+- * zip instruction queues,debug use only.
+- */
+-union zip_quex_gcfg {
+-	u64 u_reg64;
+-	struct zip_quex_gcfg_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_4_63               : 60;
+-		u64 iqb_ldwb                    : 1;
+-		u64 cbw_sty                     : 1;
+-		u64 l2ld_cmd                    : 2;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 l2ld_cmd                    : 2;
+-		u64 cbw_sty                     : 1;
+-		u64 iqb_ldwb                    : 1;
+-		u64 reserved_4_63               : 60;
+-#endif
+-	} s;
+-};
+-
+-static inline u64 ZIP_QUEX_GCFG(u64 param1)
+-{
+-	if (param1 <= 7)
+-		return 0x1A00ull + (param1 & 7) * 0x8ull;
+-	pr_err("ZIP_QUEX_GCFG: %llu\n", param1);
+-	return 0;
+-}
+-
+-/**
+- * union zip_quex_map - Represents the registers that control how each
+- * instruction queue maps to zip cores.
+- */
+-union zip_quex_map {
+-	u64 u_reg64;
+-	struct zip_quex_map_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_2_63               : 62;
+-		u64 zce                         : 2;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 zce                         : 2;
+-		u64 reserved_2_63               : 62;
+-#endif
+-	} s;
+-};
+-
+-static inline u64 ZIP_QUEX_MAP(u64 param1)
+-{
+-	if (param1 <= 7)
+-		return 0x1400ull + (param1 & 7) * 0x8ull;
+-	pr_err("ZIP_QUEX_MAP: %llu\n", param1);
+-	return 0;
+-}
+-
+-/**
+- * union zip_quex_sbuf_addr - Represents the registers that set the buffer
+- * parameters for the instruction queues.
+- *
+- * When quiescent (i.e. outstanding doorbell count is 0), it is safe to rewrite
+- * this register to effectively reset the command buffer state machine.
+- * These registers must be programmed after SW programs the corresponding
+- * ZIP_QUE(0..7)_SBUF_CTL.
+- */
+-union zip_quex_sbuf_addr {
+-	u64 u_reg64;
+-	struct zip_quex_sbuf_addr_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_49_63              : 15;
+-		u64 ptr                         : 42;
+-		u64 off                         : 7;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 off                         : 7;
+-		u64 ptr                         : 42;
+-		u64 reserved_49_63              : 15;
+-#endif
+-	} s;
+-};
+-
+-static inline u64 ZIP_QUEX_SBUF_ADDR(u64 param1)
+-{
+-	if (param1 <= 7)
+-		return 0x1000ull + (param1 & 7) * 0x8ull;
+-	pr_err("ZIP_QUEX_SBUF_ADDR: %llu\n", param1);
+-	return 0;
+-}
+-
+-/**
+- * union zip_quex_sbuf_ctl - Represents the registers that set the buffer
+- * parameters for the instruction queues.
+- *
+- * When quiescent (i.e. outstanding doorbell count is 0), it is safe to rewrite
+- * this register to effectively reset the command buffer state machine.
+- * These registers must be programmed before SW programs the corresponding
+- * ZIP_QUE(0..7)_SBUF_ADDR.
+- */
+-union zip_quex_sbuf_ctl {
+-	u64 u_reg64;
+-	struct zip_quex_sbuf_ctl_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_45_63              : 19;
+-		u64 size                        : 13;
+-		u64 inst_be                     : 1;
+-		u64 reserved_24_30              : 7;
+-		u64 stream_id                   : 8;
+-		u64 reserved_12_15              : 4;
+-		u64 aura                        : 12;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 aura                        : 12;
+-		u64 reserved_12_15              : 4;
+-		u64 stream_id                   : 8;
+-		u64 reserved_24_30              : 7;
+-		u64 inst_be                     : 1;
+-		u64 size                        : 13;
+-		u64 reserved_45_63              : 19;
+-#endif
+-	} s;
+-};
+-
+-static inline u64 ZIP_QUEX_SBUF_CTL(u64 param1)
+-{
+-	if (param1 <= 7)
+-		return 0x1200ull + (param1 & 7) * 0x8ull;
+-	pr_err("ZIP_QUEX_SBUF_CTL: %llu\n", param1);
+-	return 0;
+-}
+-
+-/**
+- * union zip_que_ena - Represents queue enable register
+- *
+- * If a queue is disabled, ZIP_CTL stops fetching instructions from the queue.
+- */
+-union zip_que_ena {
+-	u64 u_reg64;
+-	struct zip_que_ena_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_8_63               : 56;
+-		u64 ena                         : 8;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 ena                         : 8;
+-		u64 reserved_8_63               : 56;
+-#endif
+-	} s;
+-};
+-
+-#define ZIP_QUE_ENA 0x0500ull
+-
+-/**
+- * union zip_que_pri - Represents the register that defines the priority
+- * between instruction queues.
+- */
+-union zip_que_pri {
+-	u64 u_reg64;
+-	struct zip_que_pri_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_8_63               : 56;
+-		u64 pri                         : 8;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 pri                         : 8;
+-		u64 reserved_8_63               : 56;
+-#endif
+-	} s;
+-};
+-
+-#define ZIP_QUE_PRI 0x0508ull
+-
+-/**
+- * union zip_throttle - Represents the register that controls the maximum
+- * number of in-flight X2I data fetch transactions.
+- *
+- * Writing 0 to this register causes the ZIP module to temporarily suspend NCB
+- * accesses; it is not recommended for normal operation, but may be useful for
+- * diagnostics.
+- */
+-union zip_throttle {
+-	u64 u_reg64;
+-	struct zip_throttle_s {
+-#if defined(__BIG_ENDIAN_BITFIELD)
+-		u64 reserved_6_63               : 58;
+-		u64 ld_infl                     : 6;
+-#elif defined(__LITTLE_ENDIAN_BITFIELD)
+-		u64 ld_infl                     : 6;
+-		u64 reserved_6_63               : 58;
+-#endif
+-	} s;
+-};
+-
+-#define ZIP_THROTTLE 0x0010ull
+-
+-#endif /* _CSRS_ZIP__ */
 -- 
 2.39.5
 
