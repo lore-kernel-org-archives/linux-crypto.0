@@ -1,106 +1,88 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0909211710
-	for <linux-crypto@vger.kernel.org>; Thu, 20 Mar 2025 08:55:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2594154C15;
+	Thu, 20 Mar 2025 09:34:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742460956; cv=none; b=rMEctgwabPyiC9avC5qIFhebAtO0l3o6jugShc+o58vSSexRRdmWhhlJU7Kw4H0P/uSugGhdKxmKaWhSbUQS3w5DRYMKusjIHJQf2L/Mpjz6wTJsFTwSr0PQR2hBSH3TRTyfpkmJtcj1clAF+CdqWZ1+MiHIBrzitA/heMBI6iU=
+	t=1742463271; cv=none; b=lLxDJvj/Qwx6vt/sSA+pd51AjBdX2/mC2tjoLjk+XgEeurOQAbBWZ+aSS9yEVSESnWc66xUw0qQO+KVg1Wnzh6wq8drVfnW34KMiokN+iKtatQY3YQjSxKC9rlWm3zdk9JGddptyiQR+GxqLoxk8c2DYd7VqIKZ3Bd0FFqTYYxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742460956; c=relaxed/simple;
-	bh=aPOqkd5z7dHA/YpbB4wJT4DNs/hTbzC5BMJUwFGcEoA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GqYVab4J2rQncP2rdsWGWf2b5NBarCi64UXBRX3fyz6aaOa0iZ5GaJlAZxupaR9RUtXUby2r5ZtxXAZJSaUSdd6KmyuoTuy7LDTMsLVnD8OL8lPUmv9cCrmsGQFbpZnh5kWQcqc6LRcD3fsY11oQ8maHskj9yX1kslz/q7mGyY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XdwmXqFL; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1742463271; c=relaxed/simple;
+	bh=bt+N5kQLJxvGgIO4NgUP/iL4oA4vaOGmqFvBCJSbhtE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EtlU3T8rimtORHwLkzSREdbLeknp16gOfga1IfJw4xGX7coH5EI0vDYQOm00Y0R7TeWCt+UMXspI6QpD6+SrL/FBfuHq2a4R6rak7iam+MSOQao3+ZoQeHsSrLrpKXVdk+iBSbb/6D9ApWelURBtFyzLdxI/hM5BqRnSDoL1lkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=AXLjn6h3; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XdwmXqFL"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72E8AC4CEEC
-	for <linux-crypto@vger.kernel.org>; Thu, 20 Mar 2025 08:55:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742460955;
-	bh=aPOqkd5z7dHA/YpbB4wJT4DNs/hTbzC5BMJUwFGcEoA=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=XdwmXqFLkZ64lnj4IK+B6VVNEnRVSsV63nrZQidN0l2mp1qTaZ45UA6VB9XnB3aHc
-	 BiH88EMqfnkGPIRhri1e3+/K1E1BpnHkoyJJ3olzBOk/3uSq6ok4EDBPi+PCCnujgv
-	 V6YEAM+dT8KG5zR+0FfC/8aKJGibHLT3VVz9bZZFPeSEsWm+I1bG+boW6J73XFrED3
-	 TVJF27kRuA0Q4Xeao3UaFLDQTUOlYURH4s16Buhf3s5d4MKHyv56zH9iqCVI7Qs/nv
-	 v7tpYr9n7FWJTwIRBadRWgXLiGUEyTIsBdG0Li45PMAbWnAoYPdoErn/Wnr98hwa6a
-	 baMzndh4HtAFA==
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-54ad1e75f49so337820e87.0
-        for <linux-crypto@vger.kernel.org>; Thu, 20 Mar 2025 01:55:55 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVuhTneHbpRu4CVY8jmYKvL5c2DZald2fupHc7tdQ8tv1JsHEMbqnW50hbsDu2+lqOCudOh7JmheUbbPeY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxpx+AQJpQah9CIfC2uETmMWFXS0dRN9JLOnQkeL2U0bwNDbAb9
-	gRif/ZMRXLB4hhoQgTFBP2NRwCwdFw5twUocvChDcqrFFxnfraPma2jiYdaJdoE9HXIkYvZxUnO
-	CtlQFt/EhBlSbLgFgGy1EP0tKSPk=
-X-Google-Smtp-Source: AGHT+IG7klNhhuyGCLLjrkmZBdftTlLeG5BjHjPtvWcIFLCQG9KUaAXrJiUbbSzodhNMAZsDF1GH6G6VHI2pBw9EcY0=
-X-Received: by 2002:a05:6512:3e1e:b0:548:91f6:4328 with SMTP id
- 2adb3069b0e04-54acb1be834mr2384163e87.15.1742460953776; Thu, 20 Mar 2025
- 01:55:53 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="AXLjn6h3"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=NgDHGEQEM91sirkF0AfoRwO3nj0yC7YqaxjyVS0vZ7A=; b=AXLjn6h3p+ptU90LFBXmrST3qQ
+	3Uh9x6yofzozBU9OGkrnqfJmYis+jGw+KswC8ZzAAS7BwOMjVlx1psug331Rpohj6oy1o42tV/k7X
+	hRTiPUowHypiiNaxT6mupCE7AJlGz4sgBjDhp8U5DMHRfTjzRW9oOMz+YJXIpKtRhC7gsUqwCO56v
+	q4sfFzB4wUNPx29wl+iBmiFnT5iCOvJF07avkO/faIN2OITJJdrJMfJo+Orkv6scMAV74iHmK+rUQ
+	4Iyy6kktqUsFMtK1yu8cg2vRcOlU3KGctyn53lnYWfJkYkJxyYORZHQU+14rNrXxfk07v/Kg7uKmo
+	+30tTLFA==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tvCHm-008fU1-0b;
+	Thu, 20 Mar 2025 17:33:59 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 20 Mar 2025 17:33:58 +0800
+Date: Thu, 20 Mar 2025 17:33:58 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Cc: Richard Weinberger <richard@nod.at>,
+	Zhihao Cheng <chengzhihao1@huawei.com>,
+	linux-mtd@lists.infradead.org,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Pavel Machek <pavel@ucw.cz>, linux-pm@vger.kernel.org,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	netdev@vger.kernel.org
+Subject: Re: [v5 PATCH 11/14] xfrm: ipcomp: Use crypto_acomp interface
+Message-ID: <Z9vhBv2Jp0ABpZas@gondor.apana.org.au>
+References: <cover.1742034499.git.herbert@gondor.apana.org.au>
+ <d7bccafdf38259c2b820be79763f66bfaad1497e.1742034499.git.herbert@gondor.apana.org.au>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1742364215.git.herbert@gondor.apana.org.au>
- <CAMj1kXGAokDnf_spFU85qCh+quU4eewgWwCO6-UpCWDdf5Q0Og@mail.gmail.com> <Z9vOUut7CWJK0kVJ@gondor.apana.org.au>
-In-Reply-To: <Z9vOUut7CWJK0kVJ@gondor.apana.org.au>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Thu, 20 Mar 2025 09:55:42 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXHXZoaf3H4brxm2O+mvw0iebEUkO2euNj4CeDVn4dz40w@mail.gmail.com>
-X-Gm-Features: AQ5f1JrTlvYoKh16WMg3zBNjdODun7NCtL7Z_EPTa99P7zYiEMs4aBwJ0Dmyds8
-Message-ID: <CAMj1kXHXZoaf3H4brxm2O+mvw0iebEUkO2euNj4CeDVn4dz40w@mail.gmail.com>
-Subject: Re: [PATCH 0/3] crypto: Add SG support to deflate
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Eric Biggers <ebiggers@kernel.org>, 
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	=?UTF-8?B?WU9TSElGVUpJIEhpZGVha2kv5ZCJ6Jek6Iux5piO?= <hideaki.yoshifuji@miraclelinux.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d7bccafdf38259c2b820be79763f66bfaad1497e.1742034499.git.herbert@gondor.apana.org.au>
 
-On Thu, 20 Mar 2025 at 09:14, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+On Sat, Mar 15, 2025 at 06:30:43PM +0800, Herbert Xu wrote:
 >
-> On Thu, Mar 20, 2025 at 08:51:40AM +0100, Ard Biesheuvel wrote:
-> >
-> > IIRC Eric had some feedback at the time regarding the exact behavior
-> > of the zlib API, and I notice that the code no longer deals with
-> > Z_SYNC_FLUSH at all, which I did handle in my version of patch #3.
->
-> I didn't see any feedback regarding this when looking at your patch:
->
-> https://lore.kernel.org/linux-crypto/20230718125847.3869700-21-ardb@kernel.org/
->
-> Do you have a link to that discussion?
->
+> +	sg_init_table(dsg, dnfrags);
+> +	total = 0;
+> +	for (i = 0; i < dnfrags && total < dlen; i++) {
+> +		struct page *page;
+> +
+> +		page = alloc_page(GFP_ATOMIC);
+> +		if (!page)
+> +			break;
+> +		sg_set_page(dsg + i, page, PAGE_SIZE, 0);
+> +		total += PAGE_SIZE;
+> +	}
+> +	if (!i)
+> +		return ERR_PTR(-ENOMEM);
+> +	sg_mark_end(dsg + i - 1);
 
-No. I did some digging but I could find anything. Eric might remember.
+This is missing a
 
-> I was going to add the original USAGI workaround but then I
-> thought perhaps it is no longer necessary as our zlib has
-> been updated since the workaround was added back in 2003.
->
-> My understanding is that the workaround is not about Z_SYNC_FLUSH
-> but feeding an extra byte to the decompressor.  The only difference
-> between Z_SYNC_FLUSH and Z_FLUSH on inflate is that one would return
-> Z_OK while the other returns Z_BUF_ERROR,  both are treated as an
-> error by crypto/deflate.c.
->
+	dlen = min(dlen, total);
 
-I'm fine with this, I just wanted to raise it because it jogged my
-memory but I can't quite remember the details. So if things are
-working as expected, it's all fine with me.
+> +
+> +	acomp_request_set_params(req, sg, dsg, plen, dlen);
 
-> > Do your tests have coverage for all the conditional cases there?
->
-> If you mean the scatterlists then yes I have coverage for that.
->
-> If you mean the USAGI workaround then no because I don't know what
-> triggered the original problem.
->
-> I do note however that zcomp which also contains deflate does not
-> have this workaround either.  If it was really necessary then zram
-> would have run into it and screamed loudly about not being able to
-> decompress a page.  Or perhaps nobody ever uses zram with deflate.
->
-
-Yeah I meant in general, not the workaround for the mythical USAGI issue :-)
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
