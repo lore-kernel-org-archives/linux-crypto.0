@@ -1,690 +1,112 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lamorak.hansenpartnership.com (lamorak.hansenpartnership.com [198.37.111.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45C621DC05F;
-	Thu, 20 Mar 2025 22:07:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF1A61EDA2F;
+	Thu, 20 Mar 2025 22:40:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.37.111.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742508439; cv=none; b=Qg8ZJVz9M3L52FNx251OdWPC1XBHeU9JZLnNAxIrNNI1ZzKqkS22r4yz4K1xhI218ZVeL+nZFujZp6bIuaUkzxvZc5ZHcvr0GwlDJ04XU+rnqGT9iNvfbhnMS6bEdKdFw2JDMJw2Z6R2I1oTYAxctInMFMErsBoC1b2Tk07k5nU=
+	t=1742510460; cv=none; b=CGS6bqPAVbaOxqbSPDH7vAVFr70OWqdTc2GKsJN6Jk/XKYp/Z/qDXo9O7pZI6HDCjqOi9e/U8z6onTA7CRmKC0vTriv7ygnuSQsnWTjQtZe0hwsOyTVqg8DmpSZbablHfBJw9uA6k6DtsbO9X5sVBeb0clezzzztcb2IiiGxK78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742508439; c=relaxed/simple;
-	bh=lcq25xdzbo8iCr++0K2n9nAlx/bSUCGY+l4wy2nx7ak=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=rLkAHLyheA7TMq8STIXr6+SHPLUtH5nNnzRVygyDmujB0C4f3GGoTpPGpWl/01ZT1KjH8MfrgCaq0A3T6akuPcs+CnsYWJXKtz/DTQb710YHE0M/goUmNYBd0VPzUTYZPm4Old7bGoPJRqA1j55QXBo9yj8d4F2FIu2vD4pYWbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BAsFJfTh; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1742510460; c=relaxed/simple;
+	bh=JKnvNlXwLqCU5iyEfTBNAPr85fP/oZ8D60vEMAgvaHs=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ny+6+T8AL+XzGVumZVjeR2uMLPUDnAnLkzXxpPFVaJB9GtWvudS8kdmjzq3OZnvhASXgfpkFPyjHsg3nLLiRsEFxaSa7GNJeIZyEARtCbnueJ0hYNblYnsS4E/DuP5kqCC4idDmS/lFwC4UOXrfKwbaOiXXtkKHoWgAmJGq8CBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com; spf=pass smtp.mailfrom=HansenPartnership.com; dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b=FCxQaWPO; arc=none smtp.client-ip=198.37.111.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=HansenPartnership.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=HansenPartnership.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BAsFJfTh"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B563C4CEE3;
-	Thu, 20 Mar 2025 22:07:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742508438;
-	bh=lcq25xdzbo8iCr++0K2n9nAlx/bSUCGY+l4wy2nx7ak=;
-	h=From:To:Cc:Subject:Date:From;
-	b=BAsFJfThmn/kXAlnqNf4MJnANioEwoaTtPm1sAjnN8HJiXxnDIDy0bbFGd5j30kE5
-	 voFA98q/J5XO2EGDf11Jg5rXdsLkAz1eKl9WEQT0VwntNk6NS+VsKyPVw2Iw7yWWSs
-	 rgWG0/FuHPbrENfb4tpwytuBqCUGD+VI0mqdSGnywiGuNNXoIE1m4ALfg4JE2F5bgk
-	 t4Xq0ppBKl/Xv4qbcr1pV6JFD4PnKVoznmcy35xH0cPS9pIPJxBCMCAaSgylJscTR7
-	 F9Gz9nRsrhhYgnlf12GTLiQ18/nItp6y9/PD+HpKpRpzlOecpgXxkGrbBVVjevxo+3
-	 IF7QsLyL6lncg==
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: x86@kernel.org,
-	linux-kernel@vger.kernel.org,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>
-Subject: [PATCH v2] crypto: x86/aes - drop the avx10_256 AES-XTS and AES-CTR code
-Date: Thu, 20 Mar 2025 15:06:48 -0700
-Message-ID: <20250320220648.121990-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.49.0
+	dkim=pass (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="FCxQaWPO"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=hansenpartnership.com; s=20151216; t=1742510457;
+	bh=JKnvNlXwLqCU5iyEfTBNAPr85fP/oZ8D60vEMAgvaHs=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+	b=FCxQaWPOLZDZHzES9KhJgGM5WofCEzg5i2ztHJe5nGFkB/lTxcpjFR5ZLC7UBfkaH
+	 e0fWepEUtYB7x2fEMG5BwQLO0Krn6joSS3hwI1Or4XXzS/o8CMs1oPeAaM1+DDS2kb
+	 9zv+uqeOix7JDyJ+674vBB6u+pW/riRkCSH3Z944=
+Received: from lingrow.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4302:c21::a774])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by lamorak.hansenpartnership.com (Postfix) with ESMTPSA id BF7C91C0061;
+	Thu, 20 Mar 2025 18:40:56 -0400 (EDT)
+Message-ID: <95e7a43a2dd675615a146c56a10abf6921f955f9.camel@HansenPartnership.com>
+Subject: Re: [RFC PATCH v3 00/13] Clavis LSM
+From: James Bottomley <James.Bottomley@HansenPartnership.com>
+To: Eric Snowberg <eric.snowberg@oracle.com>, Paul Moore
+ <paul@paul-moore.com>
+Cc: Mimi Zohar <zohar@linux.ibm.com>, David Howells <dhowells@redhat.com>, 
+ Jarkko Sakkinen <jarkko@kernel.org>, "open list:SECURITY SUBSYSTEM"
+ <linux-security-module@vger.kernel.org>,  David Woodhouse
+ <dwmw2@infradead.org>, "herbert@gondor.apana.org.au"
+ <herbert@gondor.apana.org.au>,  "davem@davemloft.net"
+ <davem@davemloft.net>, Ard Biesheuvel <ardb@kernel.org>, James Morris
+ <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, Roberto Sassu
+ <roberto.sassu@huawei.com>, Dmitry Kasatkin <dmitry.kasatkin@gmail.com>, 
+ =?ISO-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>,
+ "casey@schaufler-ca.com" <casey@schaufler-ca.com>, Stefan Berger
+ <stefanb@linux.ibm.com>, "ebiggers@kernel.org" <ebiggers@kernel.org>, Randy
+ Dunlap <rdunlap@infradead.org>, open list <linux-kernel@vger.kernel.org>, 
+ "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
+ "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+ "linux-efi@vger.kernel.org" <linux-efi@vger.kernel.org>,
+ "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>
+Date: Thu, 20 Mar 2025 18:40:55 -0400
+In-Reply-To: <A3A29FB9-E015-4C87-B5F0-190A4C779CB3@oracle.com>
+References: <20241017155516.2582369-1-eric.snowberg@oracle.com>
+	 <c490397315c2704e9ef65c8ad3fefedb239f1997.camel@linux.ibm.com>
+	 <72F52F71-C7F3-402D-8441-3D636A093FE8@oracle.com>
+	 <CAHC9VhRHEw5c+drC=aX4xTqWoQJJZ+qkJ7aHUT5dcu+Q5f7BqA@mail.gmail.com>
+	 <CAHC9VhSJpnaAK1efgs1Uk0Tr3CaDNR1LiDU-t_yDKDQG6J-74Q@mail.gmail.com>
+	 <E20C617B-EA01-4E69-B5E2-31E9AAD6F7A2@oracle.com>
+	 <506e8e58e5236a4525b18d84bafa9aae80b24452.camel@linux.ibm.com>
+	 <CAHC9VhTsZntLdGBV7=4suauS+rzSQv1O4UAoGcy2vEB02wRkoA@mail.gmail.com>
+	 <c580811716f550ed5d6777db5e143afe4ad06edc.camel@linux.ibm.com>
+	 <CAHC9VhTz6U5rRdbJBWq0_U4BSKTsiGCsaX=LTgisNNoZXZokOA@mail.gmail.com>
+	 <FD501FB8-72D2-4B10-A03A-F52FC5B67646@oracle.com>
+	 <CAHC9VhR961uTFueovLXXaOf-3ZAnvQCWOTfw-wCRuAKOKPAOKw@mail.gmail.com>
+	 <73B78CE7-1BB8-4065-9EBA-FB69E327725E@oracle.com>
+	 <CAHC9VhRMUkzLVT5GT5c5hgpfaaKubzcPOTWFDpOmhNne0sswPA@mail.gmail.com>
+	 <1A222B45-FCC4-4BBD-8E17-D92697FE467D@oracle.com>
+	 <CAHC9VhTObTee95SwZ+C4EwPotovE9R3vy0gVXf+kATtP3vfXrg@mail.gmail.com>
+	 <EB757F96-E152-4EAB-B3F7-75C1DBE3A03B@oracle.com>
+	 <1956e7f9d60.28a7.85c95baa4474aabc7814e68940a78392@paul-moore.com>
+	 <A3A29FB9-E015-4C87-B5F0-190A4C779CB3@oracle.com>
+Autocrypt: addr=James.Bottomley@HansenPartnership.com;
+ prefer-encrypt=mutual;
+ keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-From: Eric Biggers <ebiggers@google.com>
+On Thu, 2025-03-20 at 16:24 +0000, Eric Snowberg wrote:
+> Having lockdown enforcement has always been=20
+> a requirement to get a shim signed by Microsoft.
 
-Intel made a late change to the AVX10 specification that removes support
-for a 256-bit maximum vector length and enumeration of the maximum
-vector length.  AVX10 will imply a maximum vector length of 512 bits.
-I.e. there won't be any such thing as AVX10/256 or AVX10/512; there will
-just be AVX10, and it will essentially just consolidate AVX512 features.
+This is factually incorrect.  Microsoft transferred shim signing to an
+independent process run by a group of open source maintainers a while
+ago:
 
-As a result of this new development, my strategy of providing both
-*_avx10_256 and *_avx10_512 functions didn't turn out to be that useful.
-The only remaining motivation for the 256-bit AVX512 / AVX10 functions
-is to avoid downclocking on older Intel CPUs.  But in the case of
-AES-XTS and AES-CTR, I already wrote *_avx2 code too (primarily to
-support CPUs without AVX512), which performs almost as well as
-*_avx10_256.  So we should just use that.
+https://github.com/rhboot/shim-review/
 
-Therefore, remove the *_avx10_256 AES-XTS and AES-CTR functions and
-algorithms, and rename the *_avx10_512 AES-XTS and AES-CTR functions and
-algorithms to *_avx512.  Make Ice Lake and Tiger Lake use *_avx2 instead
-of *_avx10_256 which they previously used.
+If you actually look, you'll see even Microsoft has to obey this
+upstream process for their Linux distro:
 
-I've left AES-GCM unchanged for now.  There is no VAES+AVX2 optimized
-AES-GCM in the kernel yet, so the path forward for that is not as clear.
-However, I did write a VAES+AVX2 optimized AES-GCM for BoringSSL.  So
-one option is to port that to the kernel and then do the same cleanup.
+https://github.com/rhboot/shim-review/issues/427
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
+Regards,
 
-v2: fixed a comment in aes-xts-avx-x86_64.S, and
-    fixed a typo in the commit message.
-
- arch/x86/crypto/aes-ctr-avx-x86_64.S |  47 ++++-------
- arch/x86/crypto/aes-xts-avx-x86_64.S | 118 ++++++++++++---------------
- arch/x86/crypto/aesni-intel_glue.c   |  30 +++----
- 3 files changed, 74 insertions(+), 121 deletions(-)
-
-diff --git a/arch/x86/crypto/aes-ctr-avx-x86_64.S b/arch/x86/crypto/aes-ctr-avx-x86_64.S
-index 1685d8b24b2ca..bbbfd80f5a502 100644
---- a/arch/x86/crypto/aes-ctr-avx-x86_64.S
-+++ b/arch/x86/crypto/aes-ctr-avx-x86_64.S
-@@ -46,12 +46,11 @@
- //
- // This file contains x86_64 assembly implementations of AES-CTR and AES-XCTR
- // using the following sets of CPU features:
- //	- AES-NI && AVX
- //	- VAES && AVX2
--//	- VAES && (AVX10/256 || (AVX512BW && AVX512VL)) && BMI2
--//	- VAES && (AVX10/512 || (AVX512BW && AVX512VL)) && BMI2
-+//	- VAES && AVX512BW && AVX512VL && BMI2
- //
- // See the function definitions at the bottom of the file for more information.
- 
- #include <linux/linkage.h>
- #include <linux/cfi_types.h>
-@@ -74,31 +73,29 @@
- 	.quad	4, 0
- 
- .text
- 
- // Move a vector between memory and a register.
--// The register operand must be in the first 16 vector registers.
- .macro	_vmovdqu	src, dst
- .if VL < 64
- 	vmovdqu		\src, \dst
- .else
- 	vmovdqu8	\src, \dst
- .endif
- .endm
- 
- // Move a vector between registers.
--// The registers must be in the first 16 vector registers.
- .macro	_vmovdqa	src, dst
- .if VL < 64
- 	vmovdqa		\src, \dst
- .else
- 	vmovdqa64	\src, \dst
- .endif
- .endm
- 
- // Broadcast a 128-bit value from memory to all 128-bit lanes of a vector
--// register.  The register operand must be in the first 16 vector registers.
-+// register.
- .macro	_vbroadcast128	src, dst
- .if VL == 16
- 	vmovdqu		\src, \dst
- .elseif VL == 32
- 	vbroadcasti128	\src, \dst
-@@ -106,11 +103,10 @@
- 	vbroadcasti32x4	\src, \dst
- .endif
- .endm
- 
- // XOR two vectors together.
--// Any register operands must be in the first 16 vector registers.
- .macro	_vpxor	src1, src2, dst
- .if VL < 64
- 	vpxor		\src1, \src2, \dst
- .else
- 	vpxord		\src1, \src2, \dst
-@@ -197,20 +193,20 @@
- 
- // Prepare the next two vectors of AES inputs in AESDATA\i0 and AESDATA\i1, and
- // XOR each with the zero-th round key.  Also update LE_CTR if !\final.
- .macro	_prepare_2_ctr_vecs	is_xctr, i0, i1, final=0
- .if \is_xctr
--  .if USE_AVX10
--	_vmovdqa	LE_CTR, AESDATA\i0
-+  .if USE_AVX512
-+	vmovdqa64	LE_CTR, AESDATA\i0
- 	vpternlogd	$0x96, XCTR_IV, RNDKEY0, AESDATA\i0
-   .else
- 	vpxor		XCTR_IV, LE_CTR, AESDATA\i0
- 	vpxor		RNDKEY0, AESDATA\i0, AESDATA\i0
-   .endif
- 	vpaddq		LE_CTR_INC1, LE_CTR, AESDATA\i1
- 
--  .if USE_AVX10
-+  .if USE_AVX512
- 	vpternlogd	$0x96, XCTR_IV, RNDKEY0, AESDATA\i1
-   .else
- 	vpxor		XCTR_IV, AESDATA\i1, AESDATA\i1
- 	vpxor		RNDKEY0, AESDATA\i1, AESDATA\i1
-   .endif
-@@ -479,22 +475,16 @@
- 	_vmovdqa	AESDATA3, AESDATA0
- 
- .Lxor_tail_partial_vec_0\@:
- 	// XOR the remaining 1 <= LEN < VL bytes.  It's easy if masked
- 	// loads/stores are available; otherwise it's a bit harder...
--.if USE_AVX10
--  .if VL <= 32
--	mov		$-1, %eax
--	bzhi		LEN, %eax, %eax
--	kmovd		%eax, %k1
--  .else
-+.if USE_AVX512
- 	mov		$-1, %rax
- 	bzhi		LEN64, %rax, %rax
- 	kmovq		%rax, %k1
--  .endif
- 	vmovdqu8	(SRC), AESDATA1{%k1}{z}
--	_vpxor		AESDATA1, AESDATA0, AESDATA0
-+	vpxord		AESDATA1, AESDATA0, AESDATA0
- 	vmovdqu8	AESDATA0, (DST){%k1}
- .else
-   .if VL == 32
- 	cmp		$16, LEN
- 	jl		1f
-@@ -552,41 +542,32 @@
- // with HCTR2" (https://eprint.iacr.org/2021/1441.pdf).  XCTR is an
- // easier-to-implement variant of CTR that uses little endian byte order and
- // eliminates carries.  |ctr| is the per-message block counter starting at 1.
- 
- .set	VL, 16
--.set	USE_AVX10, 0
-+.set	USE_AVX512, 0
- SYM_TYPED_FUNC_START(aes_ctr64_crypt_aesni_avx)
- 	_aes_ctr_crypt	0
- SYM_FUNC_END(aes_ctr64_crypt_aesni_avx)
- SYM_TYPED_FUNC_START(aes_xctr_crypt_aesni_avx)
- 	_aes_ctr_crypt	1
- SYM_FUNC_END(aes_xctr_crypt_aesni_avx)
- 
- #if defined(CONFIG_AS_VAES) && defined(CONFIG_AS_VPCLMULQDQ)
- .set	VL, 32
--.set	USE_AVX10, 0
-+.set	USE_AVX512, 0
- SYM_TYPED_FUNC_START(aes_ctr64_crypt_vaes_avx2)
- 	_aes_ctr_crypt	0
- SYM_FUNC_END(aes_ctr64_crypt_vaes_avx2)
- SYM_TYPED_FUNC_START(aes_xctr_crypt_vaes_avx2)
- 	_aes_ctr_crypt	1
- SYM_FUNC_END(aes_xctr_crypt_vaes_avx2)
- 
--.set	VL, 32
--.set	USE_AVX10, 1
--SYM_TYPED_FUNC_START(aes_ctr64_crypt_vaes_avx10_256)
--	_aes_ctr_crypt	0
--SYM_FUNC_END(aes_ctr64_crypt_vaes_avx10_256)
--SYM_TYPED_FUNC_START(aes_xctr_crypt_vaes_avx10_256)
--	_aes_ctr_crypt	1
--SYM_FUNC_END(aes_xctr_crypt_vaes_avx10_256)
--
- .set	VL, 64
--.set	USE_AVX10, 1
--SYM_TYPED_FUNC_START(aes_ctr64_crypt_vaes_avx10_512)
-+.set	USE_AVX512, 1
-+SYM_TYPED_FUNC_START(aes_ctr64_crypt_vaes_avx512)
- 	_aes_ctr_crypt	0
--SYM_FUNC_END(aes_ctr64_crypt_vaes_avx10_512)
--SYM_TYPED_FUNC_START(aes_xctr_crypt_vaes_avx10_512)
-+SYM_FUNC_END(aes_ctr64_crypt_vaes_avx512)
-+SYM_TYPED_FUNC_START(aes_xctr_crypt_vaes_avx512)
- 	_aes_ctr_crypt	1
--SYM_FUNC_END(aes_xctr_crypt_vaes_avx10_512)
-+SYM_FUNC_END(aes_xctr_crypt_vaes_avx512)
- #endif // CONFIG_AS_VAES && CONFIG_AS_VPCLMULQDQ
-diff --git a/arch/x86/crypto/aes-xts-avx-x86_64.S b/arch/x86/crypto/aes-xts-avx-x86_64.S
-index 93ba0ddbe0092..bbeaccbd1c51f 100644
---- a/arch/x86/crypto/aes-xts-avx-x86_64.S
-+++ b/arch/x86/crypto/aes-xts-avx-x86_64.S
-@@ -50,36 +50,29 @@
-  * This file implements AES-XTS for modern x86_64 CPUs.  To handle the
-  * complexities of coding for x86 SIMD, e.g. where every vector length needs
-  * different code, it uses a macro to generate several implementations that
-  * share similar source code but are targeted at different CPUs, listed below:
-  *
-- * AES-NI + AVX
-+ * AES-NI && AVX
-  *    - 128-bit vectors (1 AES block per vector)
-  *    - VEX-coded instructions
-  *    - xmm0-xmm15
-  *    - This is for older CPUs that lack VAES but do have AVX.
-  *
-- * VAES + VPCLMULQDQ + AVX2
-+ * VAES && VPCLMULQDQ && AVX2
-  *    - 256-bit vectors (2 AES blocks per vector)
-  *    - VEX-coded instructions
-  *    - ymm0-ymm15
-- *    - This is for CPUs that have VAES but lack AVX512 or AVX10,
-- *      e.g. Intel's Alder Lake and AMD's Zen 3.
-+ *    - This is for CPUs that have VAES but either lack AVX512 (e.g. Intel's
-+ *      Alder Lake and AMD's Zen 3) or downclock too eagerly when using zmm
-+ *      registers (e.g. Intel's Ice Lake).
-  *
-- * VAES + VPCLMULQDQ + AVX10/256 + BMI2
-- *    - 256-bit vectors (2 AES blocks per vector)
-+ * VAES && VPCLMULQDQ && AVX512BW && AVX512VL && BMI2
-+ *    - 512-bit vectors (4 AES blocks per vector)
-  *    - EVEX-coded instructions
-- *    - ymm0-ymm31
-- *    - This is for CPUs that have AVX512 but where using zmm registers causes
-- *      downclocking, and for CPUs that have AVX10/256 but not AVX10/512.
-- *    - By "AVX10/256" we really mean (AVX512BW + AVX512VL) || AVX10/256.
-- *      To avoid confusion with 512-bit, we just write AVX10/256.
-- *
-- * VAES + VPCLMULQDQ + AVX10/512 + BMI2
-- *    - Same as the previous one, but upgrades to 512-bit vectors
-- *      (4 AES blocks per vector) in zmm0-zmm31.
-- *    - This is for CPUs that have good AVX512 or AVX10/512 support.
-+ *    - zmm0-zmm31
-+ *    - This is for CPUs that have good AVX512 support.
-  *
-  * This file doesn't have an implementation for AES-NI alone (without AVX), as
-  * the lack of VEX would make all the assembly code different.
-  *
-  * When we use VAES, we also use VPCLMULQDQ to parallelize the computation of
-@@ -107,11 +100,11 @@
- 	// exists when there's a carry out of the low 64 bits of the tweak.
- 	.quad	0x87, 1
- 
- 	// This table contains constants for vpshufb and vpblendvb, used to
- 	// handle variable byte shifts and blending during ciphertext stealing
--	// on CPUs that don't support AVX10-style masking.
-+	// on CPUs that don't support AVX512-style masking.
- .Lcts_permute_table:
- 	.byte	0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80
- 	.byte	0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80
- 	.byte	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07
- 	.byte	0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
-@@ -136,11 +129,11 @@
- 	// are available, that map to the xmm, ymm, or zmm registers according
- 	// to the selected Vector Length (VL).
- .irp i, 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
- 	_define_Vi	\i
- .endr
--.if USE_AVX10
-+.if USE_AVX512
- .irp i, 16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31
- 	_define_Vi	\i
- .endr
- .endif
- 
-@@ -191,11 +184,11 @@
- 	// AES-128, AES-192, and AES-256 use different numbers of round keys.
- 	// To allow handling all three variants efficiently, we align the round
- 	// keys to the *end* of this register range.  I.e., AES-128 uses
- 	// KEY5-KEY14, AES-192 uses KEY3-KEY14, and AES-256 uses KEY1-KEY14.
- 	// (All also use KEY0 for the XOR-only "round" at the beginning.)
--.if USE_AVX10
-+.if USE_AVX512
- 	.set	KEY1_XMM,	%xmm16
- 	.set	KEY1,		V16
- 	.set	KEY2_XMM,	%xmm17
- 	.set	KEY2,		V17
- 	.set	KEY3_XMM,	%xmm18
-@@ -225,43 +218,41 @@
- .endif
- 	// V30-V31 are currently unused.
- .endm
- 
- // Move a vector between memory and a register.
--// The register operand must be in the first 16 vector registers.
- .macro	_vmovdqu	src, dst
- .if VL < 64
- 	vmovdqu		\src, \dst
- .else
- 	vmovdqu8	\src, \dst
- .endif
- .endm
- 
- // Broadcast a 128-bit value into a vector.
- .macro	_vbroadcast128	src, dst
--.if VL == 16 && !USE_AVX10
-+.if VL == 16
- 	vmovdqu		\src, \dst
--.elseif VL == 32 && !USE_AVX10
-+.elseif VL == 32
- 	vbroadcasti128	\src, \dst
- .else
- 	vbroadcasti32x4	\src, \dst
- .endif
- .endm
- 
- // XOR two vectors together.
--// Any register operands must be in the first 16 vector registers.
- .macro	_vpxor	src1, src2, dst
- .if VL < 64
- 	vpxor		\src1, \src2, \dst
- .else
- 	vpxord		\src1, \src2, \dst
- .endif
- .endm
- 
- // XOR three vectors together.
- .macro	_xor3	src1, src2, src3_and_dst
--.if USE_AVX10
-+.if USE_AVX512
- 	// vpternlogd with immediate 0x96 is a three-argument XOR.
- 	vpternlogd	$0x96, \src1, \src2, \src3_and_dst
- .else
- 	vpxor		\src1, \src3_and_dst, \src3_and_dst
- 	vpxor		\src2, \src3_and_dst, \src3_and_dst
-@@ -272,11 +263,11 @@
- // (by multiplying by the polynomial 'x') and write it to \dst.
- .macro	_next_tweak	src, tmp, dst
- 	vpshufd		$0x13, \src, \tmp
- 	vpaddq		\src, \src, \dst
- 	vpsrad		$31, \tmp, \tmp
--.if USE_AVX10
-+.if USE_AVX512
- 	vpternlogd	$0x78, GF_POLY_XMM, \tmp, \dst
- .else
- 	vpand		GF_POLY_XMM, \tmp, \tmp
- 	vpxor		\tmp, \dst, \dst
- .endif
-@@ -335,11 +326,11 @@
- 	vpslldq		$8, V2, V2
- 	vpslldq		$8, V4, V4
- 	vpsllq		$1*VL/16, TWEAK0, TWEAK1
- 	vpsllq		$2*VL/16, TWEAK0, TWEAK2
- 	vpsllq		$3*VL/16, TWEAK0, TWEAK3
--.if USE_AVX10
-+.if USE_AVX512
- 	vpternlogd	$0x96, V0, V1, TWEAK1
- 	vpternlogd	$0x96, V2, V3, TWEAK2
- 	vpternlogd	$0x96, V4, V5, TWEAK3
- .else
- 	vpxor		V0, TWEAK1, TWEAK1
-@@ -472,30 +463,30 @@
- 	// interleave the AES rounds with the XTS tweak computation, and (c) it
- 	// seems unwise to rely *too* heavily on the CPU's branch predictor.
- 	lea		OFFS-16(KEY, KEYLEN64, 4), KEY
- 
- 	// If all 32 SIMD registers are available, cache all the round keys.
--.if USE_AVX10
-+.if USE_AVX512
- 	cmp		$24, KEYLEN
- 	jl		.Laes128\@
- 	je		.Laes192\@
--	_vbroadcast128	-6*16(KEY), KEY1
--	_vbroadcast128	-5*16(KEY), KEY2
-+	vbroadcasti32x4	-6*16(KEY), KEY1
-+	vbroadcasti32x4	-5*16(KEY), KEY2
- .Laes192\@:
--	_vbroadcast128	-4*16(KEY), KEY3
--	_vbroadcast128	-3*16(KEY), KEY4
-+	vbroadcasti32x4	-4*16(KEY), KEY3
-+	vbroadcasti32x4	-3*16(KEY), KEY4
- .Laes128\@:
--	_vbroadcast128	-2*16(KEY), KEY5
--	_vbroadcast128	-1*16(KEY), KEY6
--	_vbroadcast128	0*16(KEY), KEY7
--	_vbroadcast128	1*16(KEY), KEY8
--	_vbroadcast128	2*16(KEY), KEY9
--	_vbroadcast128	3*16(KEY), KEY10
--	_vbroadcast128	4*16(KEY), KEY11
--	_vbroadcast128	5*16(KEY), KEY12
--	_vbroadcast128	6*16(KEY), KEY13
--	_vbroadcast128	7*16(KEY), KEY14
-+	vbroadcasti32x4	-2*16(KEY), KEY5
-+	vbroadcasti32x4	-1*16(KEY), KEY6
-+	vbroadcasti32x4	0*16(KEY), KEY7
-+	vbroadcasti32x4	1*16(KEY), KEY8
-+	vbroadcasti32x4	2*16(KEY), KEY9
-+	vbroadcasti32x4	3*16(KEY), KEY10
-+	vbroadcasti32x4	4*16(KEY), KEY11
-+	vbroadcasti32x4	5*16(KEY), KEY12
-+	vbroadcasti32x4	6*16(KEY), KEY13
-+	vbroadcasti32x4	7*16(KEY), KEY14
- .endif
- .endm
- 
- // Do a single non-last round of AES encryption (if \enc==1) or decryption (if
- // \enc==0) on the block(s) in \data using the round key(s) in \key.  The
-@@ -519,11 +510,11 @@
- 
- // Do a single non-last round of AES en/decryption on the block(s) in \data,
- // using the same key for all block(s).  The round key is loaded from the
- // appropriate register or memory location for round \i.  May clobber \tmp.
- .macro _vaes_1x		enc, i, xmm_suffix, data, tmp
--.if USE_AVX10
-+.if USE_AVX512
- 	_vaes		\enc, KEY\i\xmm_suffix, \data
- .else
- .ifnb \xmm_suffix
- 	_vaes		\enc, (\i-7)*16(KEY), \data
- .else
-@@ -536,11 +527,11 @@
- // Do a single non-last round of AES en/decryption on the blocks in registers
- // V0-V3, using the same key for all blocks.  The round key is loaded from the
- // appropriate register or memory location for round \i.  In addition, does two
- // steps of the computation of the next set of tweaks.  May clobber V4 and V5.
- .macro	_vaes_4x	enc, i
--.if USE_AVX10
-+.if USE_AVX512
- 	_tweak_step	(2*(\i-5))
- 	_vaes		\enc, KEY\i, V0
- 	_vaes		\enc, KEY\i, V1
- 	_tweak_step	(2*(\i-5) + 1)
- 	_vaes		\enc, KEY\i, V2
-@@ -572,11 +563,11 @@
- 	_vaes_1x	\enc, 4, \xmm_suffix, \data, tmp=\tmp
- .Laes128\@:
- .irp i, 5,6,7,8,9,10,11,12,13
- 	_vaes_1x	\enc, \i, \xmm_suffix, \data, tmp=\tmp
- .endr
--.if USE_AVX10
-+.if USE_AVX512
- 	vpxord		KEY14\xmm_suffix, \tweak, \tmp
- .else
- .ifnb \xmm_suffix
- 	vpxor		7*16(KEY), \tweak, \tmp
- .else
-@@ -615,15 +606,15 @@
- 
- .Lmain_loop\@:
- 	// This is the main loop, en/decrypting 4*VL bytes per iteration.
- 
- 	// XOR each source block with its tweak and the zero-th round key.
--.if USE_AVX10
--	_vmovdqu	0*VL(SRC), V0
--	_vmovdqu	1*VL(SRC), V1
--	_vmovdqu	2*VL(SRC), V2
--	_vmovdqu	3*VL(SRC), V3
-+.if USE_AVX512
-+	vmovdqu8	0*VL(SRC), V0
-+	vmovdqu8	1*VL(SRC), V1
-+	vmovdqu8	2*VL(SRC), V2
-+	vmovdqu8	3*VL(SRC), V3
- 	vpternlogd	$0x96, TWEAK0, KEY0, V0
- 	vpternlogd	$0x96, TWEAK1, KEY0, V1
- 	vpternlogd	$0x96, TWEAK2, KEY0, V2
- 	vpternlogd	$0x96, TWEAK3, KEY0, V3
- .else
-@@ -652,11 +643,11 @@
- .endr
- 	// Do the last AES round, then XOR the results with the tweaks again.
- 	// Reduce latency by doing the XOR before the vaesenclast, utilizing the
- 	// property vaesenclast(key, a) ^ b == vaesenclast(key ^ b, a)
- 	// (and likewise for vaesdeclast).
--.if USE_AVX10
-+.if USE_AVX512
- 	_tweak_step	18
- 	_tweak_step	19
- 	vpxord		TWEAK0, KEY14, V4
- 	vpxord		TWEAK1, KEY14, V5
- 	_vaeslast	\enc, V4, V0
-@@ -760,11 +751,11 @@
- 	_next_tweak	TWEAK0_XMM, %xmm0, TWEAK1_XMM
- 	vmovdqu		(SRC), %xmm0
- 	_aes_crypt	\enc, _XMM, TWEAK1_XMM, %xmm0, tmp=%xmm1
- .endif
- 
--.if USE_AVX10
-+.if USE_AVX512
- 	// Create a mask that has the first LEN bits set.
- 	mov		$-1, %r9d
- 	bzhi		LEN, %r9d, %r9d
- 	kmovd		%r9d, %k1
- 
-@@ -809,11 +800,11 @@
- 
- // void aes_xts_encrypt_iv(const struct crypto_aes_ctx *tweak_key,
- //			   u8 iv[AES_BLOCK_SIZE]);
- //
- // Encrypt |iv| using the AES key |tweak_key| to get the first tweak.  Assumes
--// that the CPU supports AES-NI and AVX, but not necessarily VAES or AVX10.
-+// that the CPU supports AES-NI and AVX, but not necessarily VAES or AVX512.
- SYM_TYPED_FUNC_START(aes_xts_encrypt_iv)
- 	.set	TWEAK_KEY,	%rdi
- 	.set	IV,		%rsi
- 	.set	KEYLEN,		%eax
- 	.set	KEYLEN64,	%rax
-@@ -851,41 +842,32 @@ SYM_FUNC_END(aes_xts_encrypt_iv)
- // incremental computation, but |len| must always be >= 16 (AES_BLOCK_SIZE), and
- // |len| must be a multiple of 16 except on the last call.  If |len| is a
- // multiple of 16, then this function updates |tweak| to contain the next tweak.
- 
- .set	VL, 16
--.set	USE_AVX10, 0
-+.set	USE_AVX512, 0
- SYM_TYPED_FUNC_START(aes_xts_encrypt_aesni_avx)
- 	_aes_xts_crypt	1
- SYM_FUNC_END(aes_xts_encrypt_aesni_avx)
- SYM_TYPED_FUNC_START(aes_xts_decrypt_aesni_avx)
- 	_aes_xts_crypt	0
- SYM_FUNC_END(aes_xts_decrypt_aesni_avx)
- 
- #if defined(CONFIG_AS_VAES) && defined(CONFIG_AS_VPCLMULQDQ)
- .set	VL, 32
--.set	USE_AVX10, 0
-+.set	USE_AVX512, 0
- SYM_TYPED_FUNC_START(aes_xts_encrypt_vaes_avx2)
- 	_aes_xts_crypt	1
- SYM_FUNC_END(aes_xts_encrypt_vaes_avx2)
- SYM_TYPED_FUNC_START(aes_xts_decrypt_vaes_avx2)
- 	_aes_xts_crypt	0
- SYM_FUNC_END(aes_xts_decrypt_vaes_avx2)
- 
--.set	VL, 32
--.set	USE_AVX10, 1
--SYM_TYPED_FUNC_START(aes_xts_encrypt_vaes_avx10_256)
--	_aes_xts_crypt	1
--SYM_FUNC_END(aes_xts_encrypt_vaes_avx10_256)
--SYM_TYPED_FUNC_START(aes_xts_decrypt_vaes_avx10_256)
--	_aes_xts_crypt	0
--SYM_FUNC_END(aes_xts_decrypt_vaes_avx10_256)
--
- .set	VL, 64
--.set	USE_AVX10, 1
--SYM_TYPED_FUNC_START(aes_xts_encrypt_vaes_avx10_512)
-+.set	USE_AVX512, 1
-+SYM_TYPED_FUNC_START(aes_xts_encrypt_vaes_avx512)
- 	_aes_xts_crypt	1
--SYM_FUNC_END(aes_xts_encrypt_vaes_avx10_512)
--SYM_TYPED_FUNC_START(aes_xts_decrypt_vaes_avx10_512)
-+SYM_FUNC_END(aes_xts_encrypt_vaes_avx512)
-+SYM_TYPED_FUNC_START(aes_xts_decrypt_vaes_avx512)
- 	_aes_xts_crypt	0
--SYM_FUNC_END(aes_xts_decrypt_vaes_avx10_512)
-+SYM_FUNC_END(aes_xts_decrypt_vaes_avx512)
- #endif /* CONFIG_AS_VAES && CONFIG_AS_VPCLMULQDQ */
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index e141b7995304d..d9194863e412f 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -842,12 +842,11 @@ static struct simd_skcipher_alg *					       \
- simd_skcipher_algs_##suffix[ARRAY_SIZE(skcipher_algs_##suffix)]
- 
- DEFINE_AVX_SKCIPHER_ALGS(aesni_avx, "aesni-avx", 500);
- #if defined(CONFIG_AS_VAES) && defined(CONFIG_AS_VPCLMULQDQ)
- DEFINE_AVX_SKCIPHER_ALGS(vaes_avx2, "vaes-avx2", 600);
--DEFINE_AVX_SKCIPHER_ALGS(vaes_avx10_256, "vaes-avx10_256", 700);
--DEFINE_AVX_SKCIPHER_ALGS(vaes_avx10_512, "vaes-avx10_512", 800);
-+DEFINE_AVX_SKCIPHER_ALGS(vaes_avx512, "vaes-avx512", 800);
- #endif
- 
- /* The common part of the x86_64 AES-GCM key struct */
- struct aes_gcm_key {
- 	/* Expanded AES key and the AES key length in bytes */
-@@ -1610,33 +1609,28 @@ static int __init register_avx_algs(void)
- 	    !boot_cpu_has(X86_FEATURE_BMI2) ||
- 	    !cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM |
- 			       XFEATURE_MASK_AVX512, NULL))
- 		return 0;
- 
--	err = simd_register_skciphers_compat(skcipher_algs_vaes_avx10_256,
--					     ARRAY_SIZE(skcipher_algs_vaes_avx10_256),
--					     simd_skcipher_algs_vaes_avx10_256);
--	if (err)
--		return err;
- 	err = simd_register_aeads_compat(aes_gcm_algs_vaes_avx10_256,
- 					 ARRAY_SIZE(aes_gcm_algs_vaes_avx10_256),
- 					 aes_gcm_simdalgs_vaes_avx10_256);
- 	if (err)
- 		return err;
- 
- 	if (x86_match_cpu(zmm_exclusion_list)) {
- 		int i;
- 
--		for (i = 0; i < ARRAY_SIZE(skcipher_algs_vaes_avx10_512); i++)
--			skcipher_algs_vaes_avx10_512[i].base.cra_priority = 1;
-+		for (i = 0; i < ARRAY_SIZE(skcipher_algs_vaes_avx512); i++)
-+			skcipher_algs_vaes_avx512[i].base.cra_priority = 1;
- 		for (i = 0; i < ARRAY_SIZE(aes_gcm_algs_vaes_avx10_512); i++)
- 			aes_gcm_algs_vaes_avx10_512[i].base.cra_priority = 1;
- 	}
- 
--	err = simd_register_skciphers_compat(skcipher_algs_vaes_avx10_512,
--					     ARRAY_SIZE(skcipher_algs_vaes_avx10_512),
--					     simd_skcipher_algs_vaes_avx10_512);
-+	err = simd_register_skciphers_compat(skcipher_algs_vaes_avx512,
-+					     ARRAY_SIZE(skcipher_algs_vaes_avx512),
-+					     simd_skcipher_algs_vaes_avx512);
- 	if (err)
- 		return err;
- 	err = simd_register_aeads_compat(aes_gcm_algs_vaes_avx10_512,
- 					 ARRAY_SIZE(aes_gcm_algs_vaes_avx10_512),
- 					 aes_gcm_simdalgs_vaes_avx10_512);
-@@ -1659,22 +1653,18 @@ static void unregister_avx_algs(void)
- #if defined(CONFIG_AS_VAES) && defined(CONFIG_AS_VPCLMULQDQ)
- 	if (simd_skcipher_algs_vaes_avx2[0])
- 		simd_unregister_skciphers(skcipher_algs_vaes_avx2,
- 					  ARRAY_SIZE(skcipher_algs_vaes_avx2),
- 					  simd_skcipher_algs_vaes_avx2);
--	if (simd_skcipher_algs_vaes_avx10_256[0])
--		simd_unregister_skciphers(skcipher_algs_vaes_avx10_256,
--					  ARRAY_SIZE(skcipher_algs_vaes_avx10_256),
--					  simd_skcipher_algs_vaes_avx10_256);
- 	if (aes_gcm_simdalgs_vaes_avx10_256[0])
- 		simd_unregister_aeads(aes_gcm_algs_vaes_avx10_256,
- 				      ARRAY_SIZE(aes_gcm_algs_vaes_avx10_256),
- 				      aes_gcm_simdalgs_vaes_avx10_256);
--	if (simd_skcipher_algs_vaes_avx10_512[0])
--		simd_unregister_skciphers(skcipher_algs_vaes_avx10_512,
--					  ARRAY_SIZE(skcipher_algs_vaes_avx10_512),
--					  simd_skcipher_algs_vaes_avx10_512);
-+	if (simd_skcipher_algs_vaes_avx512[0])
-+		simd_unregister_skciphers(skcipher_algs_vaes_avx512,
-+					  ARRAY_SIZE(skcipher_algs_vaes_avx512),
-+					  simd_skcipher_algs_vaes_avx512);
- 	if (aes_gcm_simdalgs_vaes_avx10_512[0])
- 		simd_unregister_aeads(aes_gcm_algs_vaes_avx10_512,
- 				      ARRAY_SIZE(aes_gcm_algs_vaes_avx10_512),
- 				      aes_gcm_simdalgs_vaes_avx10_512);
- #endif
-
-base-commit: d2d072a313c1817a0d72d7b8301eaf29ce7f83fc
--- 
-2.49.0
+James
 
