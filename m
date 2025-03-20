@@ -1,71 +1,95 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A65411E2611
-	for <linux-crypto@vger.kernel.org>; Thu, 20 Mar 2025 07:51:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D2761CC8B0
+	for <linux-crypto@vger.kernel.org>; Thu, 20 Mar 2025 08:14:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742457113; cv=none; b=ImN5W/IV6AEazQ+q/Id044ZnKcN3DvFFqG2FMJ1W7ZwBwsKXeO0Cxh9mu3eDBu/btbjkaNX6f5zHs8J2nvCj5nM8xl+1uRQ3HShs0d3Wb17oUduN88sPJ+vNyiTvbplcFZ53YVjnYJCF+oEfMjz6TZdlmnNHfIJtS6tBjJrnk9A=
+	t=1742458464; cv=none; b=TPyz8mNT0ZUsqU3dbu1TtaA90EdSI/XGwGtBfzaO8+OvFM5jayWc/QkABvh6W3I43AGvxQTJk7gde0RrKSppnT8xUZYcoI6G/eFq+34rlWAN1X86J2QKDgBCkyBC99+mOCvXmIjbfhOLnS5U1fmlRMrXsh6xidtfoXJxctz4MNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742457113; c=relaxed/simple;
-	bh=9jCNV3AeFUBIDemlzi0f299DFlSTTmjNjUvi4tsDhF4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FV7AnL+N2jZTJKptwDHOtihIOKRF9tOtErLrWrb174tpFDAeUyrWybgMPw2+hOADo38otNWtK4FkDDW9K+L5vwQuKnksaA+Q1Ou0LOnCKyo/09Y13+dBXvRDbpGnzBy/dEoicsFTWaExQcLg8HupltikB85dP/e3dgodIWzGThg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wff7GKQ8; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1742458464; c=relaxed/simple;
+	bh=vEWwgINp3YIrOQZyUMn0yBTyJf9GdZsgswUbqjXXGiY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GWiI5ZQkns8hdctToKy5lAsM6C6TFiii7P9MKhggsuzniNCJwHV+IyJaEiqdoZJFJcNqImjOPF1iR3Q0Bb8TBKujfbl8KuNER6cyl45D4m3FKuZEWoduwHuBUGs8ugGbEhMT84ldQL0xS5OY7Q9Z841nirJgB9ZbRtwURFLXHZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=hKlrBJvT; arc=none smtp.client-ip=144.6.53.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wff7GKQ8"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 234A1C4CEDD
-	for <linux-crypto@vger.kernel.org>; Thu, 20 Mar 2025 07:51:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742457113;
-	bh=9jCNV3AeFUBIDemlzi0f299DFlSTTmjNjUvi4tsDhF4=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=Wff7GKQ8+kb5snJyUQNt10WJfH/lExaHZwjCfq1Qw+Xn28cemvl11fcUQ+/glvTPO
-	 pN/n/ZEwielMwj0RbTZD42cR6+HYK1kNvkhXPosFqWAUsUnF3lP8+qBwtv+b4vg/7w
-	 MTN8tUxESVa8EEzQkCJGAKUfveD17Lwci7Qqa0h2ex0kSki/e4GSvz1vumLwVy5F28
-	 e4KKcHbVXe5k9lFWQfy8aK/hHugrNe8UTVu7KYApTo+KbQI/EU3hc1d5b9o9hJZrbG
-	 muxEXg1DEI+3j8fGFLYyolEJPGVYF6pIjEiD0TF9KGnzY8KjkCsf50o2pCoFSW/OdQ
-	 Z05G1J38kHSvA==
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5495c1e1b63so677010e87.0
-        for <linux-crypto@vger.kernel.org>; Thu, 20 Mar 2025 00:51:53 -0700 (PDT)
-X-Gm-Message-State: AOJu0YyhQHdCtT8X9/+jviNqKcZYobZEcvjhZapwH/psSrZJZSHZ6ABj
-	NDa3uqUbfX4cq0fCVYovUYxMGf5y0iRMNbFvy81QkJO1kT8f1xl8eS7afu9E9WH6BcRqBVLMaoR
-	DHR3YvYpLJvBkS9n2o4z/M3l7x90=
-X-Google-Smtp-Source: AGHT+IHPbrq1o4lgNig1AkGzUuiaWj6ZQl6VPBLHq2SyYFVry4c05zwGISfmBQkqqdY78VBuYJnVvg1pzS+RLr2u8Ps=
-X-Received: by 2002:a05:6512:130c:b0:549:903a:1c2 with SMTP id
- 2adb3069b0e04-54acb22429fmr1950418e87.49.1742457111499; Thu, 20 Mar 2025
- 00:51:51 -0700 (PDT)
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="hKlrBJvT"
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
+	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=4LNoPnuv3CGDskaddoRLtwJmcTbgV6cdnTYyUrPknTo=; b=hKlrBJvTvnJcV22k2XR3DrPLfx
+	vgV4M0lyj0Oj+SUJzuiKdMDOf/aIoDdwSwLscpjRlWyl+9r70Y0dENFj0FW0MLRkaKdSWIVYK6KmA
+	rX7C6S946FJdOtjx/ikLERdBUwS6tTqQR8vPIfiIg8/Q0UriwrguLLTh6EcGJOjLh09uR4XjNVCDW
+	COS0Ww/LIaXO6ZPnmCFyz0GwT8txCSLptQLO73wwGATT+CvAUO1Yh1eDvMZKPU9iykeiMCRVr34xC
+	pSJcpCC5bm40N8ggpA9fBbr3WRjUjBrsM2ba5LyHqjz4J69y1wmI8CDzRfU0QVckvYCtldkkd9Li+
+	qHDJaIQQ==;
+Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
+	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
+	id 1tvB2Y-008eQx-1X;
+	Thu, 20 Mar 2025 16:14:11 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Thu, 20 Mar 2025 16:14:10 +0800
+Date: Thu, 20 Mar 2025 16:14:10 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Ard Biesheuvel <ardb@kernel.org>
+Cc: Eric Biggers <ebiggers@kernel.org>,
+	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	YOSHIFUJI =?utf-8?B?SGlkZWFraS/lkInol6Toi7HmmI4=?= <hideaki.yoshifuji@miraclelinux.com>
+Subject: Re: [PATCH 0/3] crypto: Add SG support to deflate
+Message-ID: <Z9vOUut7CWJK0kVJ@gondor.apana.org.au>
+References: <cover.1742364215.git.herbert@gondor.apana.org.au>
+ <CAMj1kXGAokDnf_spFU85qCh+quU4eewgWwCO6-UpCWDdf5Q0Og@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1742364215.git.herbert@gondor.apana.org.au>
-In-Reply-To: <cover.1742364215.git.herbert@gondor.apana.org.au>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Thu, 20 Mar 2025 08:51:40 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXGAokDnf_spFU85qCh+quU4eewgWwCO6-UpCWDdf5Q0Og@mail.gmail.com>
-X-Gm-Features: AQ5f1Jqm9KR6ZZPit6KXt6NaFhLUzU_9XBIAPprPzhpd3GnkW21QNLtu8xAOdfU
-Message-ID: <CAMj1kXGAokDnf_spFU85qCh+quU4eewgWwCO6-UpCWDdf5Q0Og@mail.gmail.com>
-Subject: Re: [PATCH 0/3] crypto: Add SG support to deflate
-To: Herbert Xu <herbert@gondor.apana.org.au>, Eric Biggers <ebiggers@kernel.org>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMj1kXGAokDnf_spFU85qCh+quU4eewgWwCO6-UpCWDdf5Q0Og@mail.gmail.com>
 
-On Wed, 19 Mar 2025 at 07:05, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+On Thu, Mar 20, 2025 at 08:51:40AM +0100, Ard Biesheuvel wrote:
 >
-> This patch-series adds SG support to deflate so that IPsec can
-> avoid linearising the data.
->
-> Herbert Xu (3):
->   crypto: acomp - Move scomp stream allocation code into acomp
->   crypto: acomp - Add acomp_walk
->   crypto: deflate - Convert to acomp
->
+> IIRC Eric had some feedback at the time regarding the exact behavior
+> of the zlib API, and I notice that the code no longer deals with
+> Z_SYNC_FLUSH at all, which I did handle in my version of patch #3.
 
-IIRC Eric had some feedback at the time regarding the exact behavior
-of the zlib API, and I notice that the code no longer deals with
-Z_SYNC_FLUSH at all, which I did handle in my version of patch #3.
+I didn't see any feedback regarding this when looking at your patch:
 
-Do your tests have coverage for all the conditional cases there?
+https://lore.kernel.org/linux-crypto/20230718125847.3869700-21-ardb@kernel.org/
+
+Do you have a link to that discussion?
+
+I was going to add the original USAGI workaround but then I
+thought perhaps it is no longer necessary as our zlib has
+been updated since the workaround was added back in 2003.
+
+My understanding is that the workaround is not about Z_SYNC_FLUSH
+but feeding an extra byte to the decompressor.  The only difference
+between Z_SYNC_FLUSH and Z_FLUSH on inflate is that one would return
+Z_OK while the other returns Z_BUF_ERROR,  both are treated as an
+error by crypto/deflate.c.
+
+> Do your tests have coverage for all the conditional cases there?
+
+If you mean the scatterlists then yes I have coverage for that.
+
+If you mean the USAGI workaround then no because I don't know what
+triggered the original problem.
+
+I do note however that zcomp which also contains deflate does not
+have this workaround either.  If it was really necessary then zram
+would have run into it and screamed loudly about not being able to
+decompress a page.  Or perhaps nobody ever uses zram with deflate.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
