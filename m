@@ -1,90 +1,172 @@
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0F88224B1B
-	for <linux-crypto@vger.kernel.org>; Thu, 20 Mar 2025 17:34:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 061B4221541
+	for <linux-crypto@vger.kernel.org>; Thu, 20 Mar 2025 21:36:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742492092; cv=none; b=HSdUAYR7HmtP9vkjrAYK0RA1ER0HjJ9HfltFlKeNNqu82kwUH9m4EHXunFNLOtFsamSUbpuLhpvdEu5ipxrNK/Ez3x3+exQhK/yb8/M7luXtAhUjRu3xtkMUL3ek1w85m2G5B8+tOu1OTtTyhohHfMNMKADSnm4ZqYf9LEx7lEA=
+	t=1742506614; cv=none; b=CQtR0tPshjmVtIoQZEjCj+Dp2i3o8LcRHhT+4A5i5VsaLBv9c6XffGz/zSiu3FxkflrSWzoSljfgFl4ziiQ1MuYKIgSq1STsJw6+1RER7JQudYz9vk+R9M8XlSEZPGuaWHjOLsMk0p5UKTORZKG4qa+EFipHpqCTF856K1gZ2bc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742492092; c=relaxed/simple;
-	bh=Yu5He2ygIik+idfAjHdNQOx+CbRP2Ueu+BM5nTiBt2w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tDYgJxbkuPSF2EXkCj251Be636dX8DwZbBHGW2U5y50ET+1hF8wgrQ+UNA7n//lRrS+pq4fd3MvaOeZBzN0+8xTdbO7W2ZwQSOIOUAJiSTfZC0oZqi4+7fOjlUuUT4E+3wXeXdeBmkXVtqnLpcIHtbabwLze0w/H6c3clJxKZz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u1dPE6fO; arc=none smtp.client-ip=10.30.226.201
+	s=arc-20240116; t=1742506614; c=relaxed/simple;
+	bh=7T7mCRUv80WJKGWdZte/WL6i1IdpqsfOrUhZIxZ6UZg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kUkm6EBELkniq4iGP5OqYb2Kpnd0zuMGFNPHBVChZVQmSdykF9ulHsGoxITwXU4xFLB891Gh6gA//gMBnrBPW+g7x9M7xUhsrH1JDGggjDtb9BeDnOPJLHwkCxHWhiXp6jU5Ln9DhGM58POhhGhIJhPLFJ1o2TnX2Z0r6JWpOhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=A8xoPFKR; arc=none smtp.client-ip=209.85.219.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u1dPE6fO"
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18E23C4CEDD;
-	Thu, 20 Mar 2025 17:34:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1742492092;
-	bh=Yu5He2ygIik+idfAjHdNQOx+CbRP2Ueu+BM5nTiBt2w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=u1dPE6fOAN6bn17U4CG0U66TvHGmkV3zp4Xp6HR2Y2cM8unF1Hw6eD3RJPQSfJE7r
-	 y3vDKFNApA6yDE/RY8L8c9C3TpTgmu0o9nXZ4VIQ9kFOXuAJ9CUu6BHA4VouUAzVsA
-	 1BzcWKnHFiCO4mjcWyq4BTxDfNxyMu20coxKqkkIpA3CtbDop59sTVx1zNQ8mwmfIN
-	 dx0t+y4lGK+3XePatZinxzn9C1D+OLqbKjP1NL9/GhGjNEJL2ECcaMjoT62ug/omBW
-	 3XgqCW+ZzsFgvWUvotTc9aAivRlOhC1zLONhUboIqWx38f8C2+yBGu9ZHO++hxzoyA
-	 cloaG+eHZRtgQ==
-Date: Thu, 20 Mar 2025 17:34:50 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: Ard Biesheuvel <ardb@kernel.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-	Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	YOSHIFUJI =?utf-8?B?SGlkZWFraS/lkInol6Toi7HmmI4=?= <hideaki.yoshifuji@miraclelinux.com>
-Subject: Re: [PATCH 0/3] crypto: Add SG support to deflate
-Message-ID: <20250320173450.GA697647@google.com>
-References: <cover.1742364215.git.herbert@gondor.apana.org.au>
- <CAMj1kXGAokDnf_spFU85qCh+quU4eewgWwCO6-UpCWDdf5Q0Og@mail.gmail.com>
- <Z9vOUut7CWJK0kVJ@gondor.apana.org.au>
- <CAMj1kXHXZoaf3H4brxm2O+mvw0iebEUkO2euNj4CeDVn4dz40w@mail.gmail.com>
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="A8xoPFKR"
+Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-e53ef7462b6so1209866276.3
+        for <linux-crypto@vger.kernel.org>; Thu, 20 Mar 2025 14:36:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1742506612; x=1743111412; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qyZVutv4Kbo86NuPvlmJO48TrYySdnlCPpx5adkmTKs=;
+        b=A8xoPFKRuuU0iDFj+64CmEKGuRy7UI+o8numXiGZBrB1qZaQig54zyNUWIs48zcaNW
+         qDzdwjiFBuFJ4w/m8HqkIC4DeyZFl+N9MGDI9mzLJo6/MfwFr0dJUBshs7SxZBa22ZUs
+         gnWjQMYbo8qV7Ob4Gy3b7oFEQNcDHw98qdAgHLgPlMANHfZti0uDEnVommBDn79yz6Dc
+         NNHl7zw6zX0RlLuDpBXzaYLXAiZIusFopRY8Up/GVj35kvkyFo3klhMawZqxBmjdrbM9
+         sUVNCcJH2BBRu5nNveg7N0wNarnO1zmSR34fe0yOMQlHlTFcgqlj8vB157tekDh7RRiP
+         a7kw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742506612; x=1743111412;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qyZVutv4Kbo86NuPvlmJO48TrYySdnlCPpx5adkmTKs=;
+        b=T1b6NUR0c6cC4jDbHwtrw50KYf96b1hrCY+gfNM1SZ/oDOwZR2c4W0f0Hqe21r91Cj
+         orIICfpMkQVsIUZkV+5JHi13TDICOHvrojjQ76maaz9wgCCz4ZtcxiL2GZtzK5p2I2pX
+         9D2FEHZmHGo3VN4SYiHFFeoil52RA+d5OjYT9TPwyuuI9duKbeL1UI5bXm6Qyc4wniEX
+         dHCMLmK8QcSYRMMf6cUTTOCHMFTxHs+DfN1ZJMOIUbKPy/99nCjFnOjJvaDabmPtaVqc
+         yCRrLCmpPdGpAI3aDW88M87a+rjmcnVnvt8PyL5M1WUJircEwBf9hhKXRCb3qsf459Rs
+         2D/w==
+X-Forwarded-Encrypted: i=1; AJvYcCXYkrI8MpmBmWj/FtN9a76fDS+oF0INn4cKwQQwgBIlz8Txcy9MptDTHFyHnLONaycoO4zYzLpSaa4jFZM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqnAidHFX02C140jTF+3SYKHBvLaFgR2fYTOMWFjBZuiE34lhh
+	5Wg1BXXgcf2+0PK+TqcDVbE/RdjvuYeZh19ISkoMXjcqxLz6hz0HCRbAYpt5HNNwc4yPmboXEQz
+	KvPlRrxzPepMwtESNGJituIsZ8UaKTq6cq2Ydk951bKSwtKk=
+X-Gm-Gg: ASbGncu7+aQzEM93q89vUGN9Aj4uT3YwV0EqAYOKIyIc6aTA8Eh652uptjhgLQbgxde
+	AiMwo3TP7mlqwVk8jtMLNes/l0XBWDtY39k/AmJC6OlqBB2qDDdcA9mTgNNlkrwrcQdPqstMSXD
+	1SKj+nr8uK7GOrzyPaSWtXUyKL4w==
+X-Google-Smtp-Source: AGHT+IFJ/8y4nRYG0B8A5J8ib2VPKClvoRy8JxYCkiIoEvg+R5jg8fqFBWw5SyaibbYjeIOB5RlLC8ykklezHgslACQ=
+X-Received: by 2002:a05:690c:296:b0:6fe:b88e:4d82 with SMTP id
+ 00721157ae682-700bacfbab5mr12941147b3.28.1742506611920; Thu, 20 Mar 2025
+ 14:36:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMj1kXHXZoaf3H4brxm2O+mvw0iebEUkO2euNj4CeDVn4dz40w@mail.gmail.com>
+References: <20241017155516.2582369-1-eric.snowberg@oracle.com>
+ <c490397315c2704e9ef65c8ad3fefedb239f1997.camel@linux.ibm.com>
+ <72F52F71-C7F3-402D-8441-3D636A093FE8@oracle.com> <CAHC9VhRHEw5c+drC=aX4xTqWoQJJZ+qkJ7aHUT5dcu+Q5f7BqA@mail.gmail.com>
+ <CAHC9VhSJpnaAK1efgs1Uk0Tr3CaDNR1LiDU-t_yDKDQG6J-74Q@mail.gmail.com>
+ <E20C617B-EA01-4E69-B5E2-31E9AAD6F7A2@oracle.com> <506e8e58e5236a4525b18d84bafa9aae80b24452.camel@linux.ibm.com>
+ <CAHC9VhTsZntLdGBV7=4suauS+rzSQv1O4UAoGcy2vEB02wRkoA@mail.gmail.com>
+ <c580811716f550ed5d6777db5e143afe4ad06edc.camel@linux.ibm.com>
+ <CAHC9VhTz6U5rRdbJBWq0_U4BSKTsiGCsaX=LTgisNNoZXZokOA@mail.gmail.com>
+ <FD501FB8-72D2-4B10-A03A-F52FC5B67646@oracle.com> <CAHC9VhR961uTFueovLXXaOf-3ZAnvQCWOTfw-wCRuAKOKPAOKw@mail.gmail.com>
+ <73B78CE7-1BB8-4065-9EBA-FB69E327725E@oracle.com> <CAHC9VhRMUkzLVT5GT5c5hgpfaaKubzcPOTWFDpOmhNne0sswPA@mail.gmail.com>
+ <1A222B45-FCC4-4BBD-8E17-D92697FE467D@oracle.com> <CAHC9VhTObTee95SwZ+C4EwPotovE9R3vy0gVXf+kATtP3vfXrg@mail.gmail.com>
+ <EB757F96-E152-4EAB-B3F7-75C1DBE3A03B@oracle.com> <1956e7f9d60.28a7.85c95baa4474aabc7814e68940a78392@paul-moore.com>
+ <A3A29FB9-E015-4C87-B5F0-190A4C779CB3@oracle.com>
+In-Reply-To: <A3A29FB9-E015-4C87-B5F0-190A4C779CB3@oracle.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Thu, 20 Mar 2025 17:36:41 -0400
+X-Gm-Features: AQ5f1JqQwO9cUQQ6QCKvqyhp93snLVhEFtem_HInBr_dfTdWSHM5DQ2eAF2fppc
+Message-ID: <CAHC9VhQMN6cgWbxdAgBNffpCAo=ogGdm4qBGS_kKdDmiT8b3cw@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 00/13] Clavis LSM
+To: Eric Snowberg <eric.snowberg@oracle.com>
+Cc: Mimi Zohar <zohar@linux.ibm.com>, David Howells <dhowells@redhat.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, 
+	"open list:SECURITY SUBSYSTEM" <linux-security-module@vger.kernel.org>, 
+	David Woodhouse <dwmw2@infradead.org>, 
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>, "davem@davemloft.net" <davem@davemloft.net>, 
+	Ard Biesheuvel <ardb@kernel.org>, James Morris <jmorris@namei.org>, 
+	"Serge E. Hallyn" <serge@hallyn.com>, Roberto Sassu <roberto.sassu@huawei.com>, 
+	Dmitry Kasatkin <dmitry.kasatkin@gmail.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	"casey@schaufler-ca.com" <casey@schaufler-ca.com>, Stefan Berger <stefanb@linux.ibm.com>, 
+	"ebiggers@kernel.org" <ebiggers@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, 
+	open list <linux-kernel@vger.kernel.org>, 
+	"keyrings@vger.kernel.org" <keyrings@vger.kernel.org>, 
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, 
+	"linux-efi@vger.kernel.org" <linux-efi@vger.kernel.org>, 
+	"linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 20, 2025 at 09:55:42AM +0100, Ard Biesheuvel wrote:
-> On Thu, 20 Mar 2025 at 09:14, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+On Thu, Mar 20, 2025 at 12:29=E2=80=AFPM Eric Snowberg <eric.snowberg@oracl=
+e.com> wrote:
+> > On Mar 6, 2025, at 7:46=E2=80=AFPM, Paul Moore <paul@paul-moore.com> wr=
+ote:
+> > On March 6, 2025 5:29:36 PM Eric Snowberg <eric.snowberg@oracle.com> wr=
+ote:
+
+...
+
+> >> Does this mean Microsoft will begin signing shims in the future withou=
+t
+> >> the lockdown requirement?
 > >
-> > On Thu, Mar 20, 2025 at 08:51:40AM +0100, Ard Biesheuvel wrote:
-> > >
-> > > IIRC Eric had some feedback at the time regarding the exact behavior
-> > > of the zlib API, and I notice that the code no longer deals with
-> > > Z_SYNC_FLUSH at all, which I did handle in my version of patch #3.
-> >
-> > I didn't see any feedback regarding this when looking at your patch:
-> >
-> > https://lore.kernel.org/linux-crypto/20230718125847.3869700-21-ardb@kernel.org/
-> >
-> > Do you have a link to that discussion?
-> >
-> 
-> No. I did some digging but I could find anything. Eric might remember.
+> > That's not a question I can answer, you'll need to discuss that with th=
+e UEFI SB people.
+>
+> Based on your previous lockdown comments, I thought you might have
+> some new information.  Having lockdown enforcement has always been
+> a requirement to get a shim signed by Microsoft.
 
-I'm not sure what this is referring to.
+I want to address two things, the first, and most important, is that
+while I am currently employed by Microsoft, I do not speak for
+Microsoft and the decisions and actions I take as an upstream Linux
+kernel maintainer are not vetted by Microsoft in any way.  I think you
+will find that many upstream kernel maintainers operate in a similar
+way for a variety of very good reasons.
 
-Then again this patchset doesn't apply, so it's unreviewable anyway.
+The second issue is that my main focus is on ensuring we have a
+secure, safe, and well maintained LSM subsystem within the upstream
+Linux kernel.  While I do care about downstream efforts, e.g. UEFI
+Secure Boot, those efforts are largely outside the scope of the
+upstream Linux kernel and not my first concern.  If the developer
+groups who are focused on things like UEFI SB want to rely on
+functionality within the upstream Linux kernel they should be prepared
+to stand up and contribute/maintain those features or else they may go
+away at some point in the future.  In very blunt terms, contribute
+upstream or Lockdown dies.
 
-Just a note, for compression and decompression it's often more efficient to
-linearize in the caller.  Otherwise the algorithm ends up having to copy the
-uncompressed data to an internal buffer anyway.  That's needed for the match
-finding (compression) and match copying (decompression) to work.
+However, let me be clear that I consider deprecation and removal of a
+LSM to be an option of last resort.  My preference would be to find a
+capable maintainer, or two, that would be willing to take on a
+maintenance role for the LSM in question.  Luckily I think we may have
+some people who are interested in doing so for the Lockdown LSM,
+hopefully you'll see something on-list in the near future.
 
-As I mentioned before, the "stream" terminology that Herbert is choosing for
-some reason also seems less than ideal.  "workspace" would be better.  Many of
-the compression algorithms don't even support streaming.
+> The alternative "usage-oriented keyring" approach you've suggested
+> wouldn't align with the threat model that lockdown aims to achieve.
 
-> > I was going to add the original USAGI workaround but then I
-> > thought perhaps it is no longer necessary as our zlib has
-> > been updated since the workaround was added back in 2003.
+That's a Lockdown problem, or more specifically a problem for the
+people who are freeloading on the Lockdown LSM and expecting it to be
+maintained without contributing anything meaningful.
 
-The kernel's zlib was forked from upstream zlib in the 90s and hasn't been
-re-synced since then.
+> For
+> a distro-based kernel, I don't see the value in pursuing such an approach=
+.
 
-- Eric
+So you've said.  I disagree, but we've already had that discussion,
+let's agree to not waste any more time repeating ourselves.
+
+> With Clavis, I attempted to develop
+> an approach that would meet the lockdown threat model requirements
+> while allowing the end user to control key usage as they deem fit.
+
+As mentioned previously, the design/implementation choices you made
+for Clavis means it is better suited for inclusion in the key
+subsystem and not as a standalone LSM.  If you wanted to
+redesign/rework Clavis to stick to the traditional LSM security blobs
+perhaps that is something we could consider as a LSM, but it's
+probably worth seeing if David and Jarkko have any interest in
+including Clavis functionality in the key subsystem first.
+
+--=20
+paul-moore.com
