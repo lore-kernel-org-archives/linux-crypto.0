@@ -1,48 +1,59 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7076F221578
-	for <linux-crypto@vger.kernel.org>; Fri, 21 Mar 2025 11:06:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37F071F09A8;
+	Fri, 21 Mar 2025 11:07:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742555178; cv=none; b=FbvKQPOvV6TJDWZJAAaX33TuKE5KceauX0NTaJ5UkN81/ZOwBwm4uRaiYMr7ZT8FL2/VJFTHzKxgyWx4ow84jny/bRfCu5mtr++cTAk+G6pyI7NP8Nnwx3W/IR2F/y7UrpPbMxPArugpTxUEmgMtlK+L5qLOsR2cdhoLWgvSUnw=
+	t=1742555228; cv=none; b=QhQV7OaslktZxOw7fyYnrldCnY6kwsbqWoUIE4QfanGpsIERBNV9eF2qo93NchQ95o5iNZwSc26he16IYqLd4dXxNyToS2Yh+2/mNuM3KeA7ibRzOw7/UXys8RY0v2YndNYCXssmUyqLMLlsFmbJ7xrSRUlIKcBQKOaMAd9d4TM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742555178; c=relaxed/simple;
-	bh=fRZjJmEsRJElSeTQGZf+lO0JoLPwQHDRfevJu+Jnrkk=;
+	s=arc-20240116; t=1742555228; c=relaxed/simple;
+	bh=Mhh/jGWYISEYVoqjjfMvQsP+f47HccIZcoa+4NXdSv4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Qi5RwVC5ZVLxUEJ9p8n4w+2LuTvBJUnmRJwepEUK/oBQR1IV/MrteLIBDfku/Rh/Zk+SNFvMbuYHZ7WRnmxTsp6ZN58n110b1CMOM+O2Pi5sKGIaXmSYYksb3CpxwASSHhR3RZPyLM9+3STKMixhpJuD8KHjZsQNNgTOgbKzKbo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=avGfc+gs; arc=none smtp.client-ip=144.6.53.87
+	 Content-Type:Content-Disposition:In-Reply-To; b=jgdaH1tr/SMUZDde9CpuoZIeRkF01O6MWYcrwjmIM2Tzo5CLZ2ZouxK3THWS6EtvwBXfIeNnOVsLjGTJiPuMkbk6f9ZB6IzZvSWA77v2Hn6sVgjjWqoztdLHJMLPq3XN5L4o9If1dv64vakFmQndpOTULzSOkLgb259m5iNcDWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=Q+l5nEw6; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="avGfc+gs"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="Q+l5nEw6"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
 	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=cjy6Cx1rnzfS9SjGHYqpp16aaP8kSdlTC125cU9ijX8=; b=avGfc+gskChuY5mMSSMoDSsalJ
-	GM8e8ZdEtuIEckJlkDhwlcJ6PbRlRbU8TEGVlT/tT78ao3YNiNr9g1gauEAis/XrHEIdd6OAqsix9
-	O6+jx05WNzpFLvzUWoKUis3c1cDzzQ6I3YeaSpBmuR7Ql2k1pNJ5S2OUt/0TFWH4LPjcyi0HqgJuB
-	+0h7bfFcI+wP7OSKTjb0wBeUqGjL3vtKshc1qmKjEyCP8xVaQDCFnOFtZCQj58Zk2ctcjH2eqrPpl
-	C84pchkv8hopInJutv70GxnH6z5qpap+v24mZV2JG3ZakD/ALblTcQyJuTFJlv/I7mrTXxm+ORm2s
-	ooNkiDVg==;
+	bh=QaVaGTW9001ipjEXlA8GyMzu/EmEw5sG37WJJlONmRY=; b=Q+l5nEw6J1yFdrA0OhHKhMVOvR
+	Gmm3ANZ6LAIFPJnjXRfP+URq4Pq6n7BA1UEYRClGMl+fTiDFu2JHjQyAl4FJPjUwvbDBJ6u9Ac/ZZ
+	4/DKfIkPM+ydObrWzuprHtlQxQnBjG0qDRKGUh9EsE/T0cgG3whsD4Dk2bEIH5vi2lseYiBbOYeUG
+	/ymaEm75aJ3JLTYXj3L2gHxZqNu2b12pinjSUrAQ0wrPmAKFLK/tOQ/OJFKDJpUhd8AuWhcwT+xgB
+	Vwp4dwFJSjfHAkjzeMpEUOuW44aw5XeB9Gg2cqESbze3bLE1/+Ps7AdutuIuiLQNm6Kehh4FWDrIa
+	fc1axgUg==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tvaCa-0090ET-2D;
-	Fri, 21 Mar 2025 19:06:13 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 21 Mar 2025 19:06:12 +0800
-Date: Fri, 21 Mar 2025 19:06:12 +0800
+	id 1tvaCp-0090Ez-16;
+	Fri, 21 Mar 2025 19:06:28 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 21 Mar 2025 19:06:27 +0800
+Date: Fri, 21 Mar 2025 19:06:27 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc: linux-crypto@vger.kernel.org, qat-linux@intel.com,
-	Bairavi Alagappan <bairavix.alagappan@intel.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: Re: [PATCH] crypto: qat - remove access to parity register for QAT
- GEN4
-Message-ID: <Z91IJG9Fz6JZD0I3@gondor.apana.org.au>
-References: <20250314150943.30404-1-giovanni.cabiddu@intel.com>
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: Boris Brezillon <bbrezillon@kernel.org>,
+	Arnaud Ebalard <arno@natisbad.org>,
+	Srujana Challa <schalla@marvell.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Howells <dhowells@redhat.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	"Justin M. Forbes" <jforbes@fedoraproject.org>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Arnd Bergmann <arnd@arndb.de>, Rosen Penev <rosenp@gmail.com>,
+	Ard Biesheuvel <ardb@kernel.org>,
+	James Bottomley <James.Bottomley@hansenpartnership.com>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	keyrings@vger.kernel.org, linux-security-module@vger.kernel.org
+Subject: Re: [PATCH] [v2] crypto: lib/Kconfig: hide library options
+Message-ID: <Z91IMz8bXE8_T-3r@gondor.apana.org.au>
+References: <20250314160543.605055-1-arnd@kernel.org>
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
@@ -51,28 +62,29 @@ List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250314150943.30404-1-giovanni.cabiddu@intel.com>
+In-Reply-To: <20250314160543.605055-1-arnd@kernel.org>
 
-On Fri, Mar 14, 2025 at 03:09:31PM +0000, Giovanni Cabiddu wrote:
-> From: Bairavi Alagappan <bairavix.alagappan@intel.com>
+On Fri, Mar 14, 2025 at 05:05:32PM +0100, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
 > 
-> The firmware already handles parity errors reported by the accelerators
-> by clearing them through the corresponding SSMSOFTERRORPARITY register.
-> To ensure consistent behavior and prevent race conditions between the
-> driver and firmware, remove the logic that checks the SSMSOFTERRORPARITY
-> registers.
+> Any driver that needs these library functions should already be selecting
+> the corresponding Kconfig symbols, so there is no real point in making
+> these visible.
 > 
-> Additionally, change the return type of the function
-> adf_handle_rf_parr_err() to void, as it consistently returns false.
-> Parity errors are recoverable and do not necessitate a device reset.
+> The original patch that made these user selectable described problems
+> with drivers failing to select the code they use, but for consistency
+> it's better to always use 'select' on a symbol than to mix it with
+> 'depends on'.
 > 
-> Fixes: 895f7d532c84 ("crypto: qat - add handling of errors from ERRSOU2 for QAT GEN4")
-> Signed-off-by: Bairavi Alagappan <bairavix.alagappan@intel.com>
-> Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> Signed-off-by: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> Fixes: e56e18985596 ("lib/crypto: add prompts back to crypto libraries")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 > ---
->  .../intel/qat/qat_common/adf_gen4_ras.c       | 57 ++-----------------
->  1 file changed, 5 insertions(+), 52 deletions(-)
+> v2: add the missing 'select' statements
+> ---
+>  drivers/crypto/marvell/Kconfig | 4 ++--
+>  lib/crypto/Kconfig             | 8 ++++----
+>  security/keys/Kconfig          | 2 +-
+>  3 files changed, 7 insertions(+), 7 deletions(-)
 
 Patch applied.  Thanks.
 -- 
