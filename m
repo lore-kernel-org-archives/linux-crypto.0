@@ -1,43 +1,43 @@
 Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54EFE1EFF9A
-	for <linux-crypto@vger.kernel.org>; Fri, 21 Mar 2025 08:43:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 284E21EFFA0
+	for <linux-crypto@vger.kernel.org>; Fri, 21 Mar 2025 08:43:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742546620; cv=none; b=tNbY6hOOd2kjQiPr2Dbrw41yWBkMqETpvhKUWrdHA2vU+7x489OYEj1zJMDDjTEJroBLrgGrG0wP+188C6aZAHb4koKWYAJ33sfgpzctblaNcj3Y5UuwTiPSKZpnm3T2vgvKep3GetN3wB2E9D2GWLbqJnoLfyHKs3tWL4LvIik=
+	t=1742546621; cv=none; b=tqOHokaua478zQQWqeqwwb6wcUgfDEILKkSKIQ5cZbfX1kpsS3tcvFEBWw20yhbxpY9phmWyJQmDC7qzaR6XYDvVqKZzDiVZjTg6tseaD5+4y9FDOdmYBnvGX3jVxHk0f+3JtxGkKAlWxnMNoVO53mFTUd5VuPVMVW8mbmfi/L4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742546620; c=relaxed/simple;
-	bh=rs1Et5T5uf8vgUN5PswoTpFqrjPvr6iJG8mCjQLyoao=;
-	h=Date:Message-Id:In-Reply-To:References:From:Subject:To:Cc; b=Z5/3HL190PfcqEfwVejbLeqHPYb1lUlXP5wla6Iuthoe/NIBkmExaWCtkROSI8OSs4abeOaFQJt2S2gFpCmi0XCVvdAAwJDGYi04fUl5HJY9jL/toIDDIbwCNpRUD2jfwYuEuqWBHt58PqMPds5kkDPu5S8ktq+GH0QAci/d6Jc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=snFg9Yuo; arc=none smtp.client-ip=144.6.53.87
+	s=arc-20240116; t=1742546621; c=relaxed/simple;
+	bh=jCyJDgo+g8dZGbTbAe1jAwrRdVAI3bRWc1ZAVdGX5Co=;
+	h=Date:Message-Id:In-Reply-To:References:From:Subject:To:Cc; b=XQb/5LYOWo4TosLCfWAZSiWO0HkOPfSwH7TTwJiKV1wt6moWpdU6e1A/tSYV4tZlpdCQdO2bCwU4FoipSJ3zjTu+RCWEwih/awW17afbQExLOFszPwA2y9Hq9oMyS44fzyt+ZuuXnbUHk/NfSk4m7SE1ziq7lOmDO+7VQ8DxuHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=d+WAHNxV; arc=none smtp.client-ip=144.6.53.87
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="snFg9Yuo"
+	dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="d+WAHNxV"
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
 	s=formenos; h=Cc:To:Subject:From:References:In-Reply-To:Message-Id:Date:
 	Sender:Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
 	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
 	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=UYefgwDir3W+0ZeY28DpkgEAml/Kpzx9qm5cIo22mCk=; b=snFg9YuomC0AJP3meSdkzpbjOm
-	4ZioOyZMxe1G7YGQBcO94z4qLIw9TGp9R8Nq3vVbpnrITD5fFqO5Q57/bKWdKOeHXO2rldL5ubGNq
-	0shKNBagq5OMOmOzbw07r8bNq2ysW8OawOm22sZ3wFk6Y6BQB5VZ0litAiPYlkx+6LUw2nK+/1gS9
-	wLMu3Si65AzgBQ7NA1jrqGvGOpaRggZx4T1hMIWeQjq7tnG7+iDspT+ddH2dgojPwxfpRI+u9FWa3
-	I7usO4atQZ7Xt8fzmMXGp9v5EtY4JJO2Nlpg4RPMdyBEAJYC//1A6O/LkU9Y4FzBWT0/C9vzQAJj5
-	6sYBhZKw==;
+	bh=o9NG1hls8IZWMonn8boTkJIhJqkFDavqPhGqIk8cN7Y=; b=d+WAHNxV4j9Os5bRwQebAE6BDq
+	G+XexQOgVmqrSr48qOlGLdttySnnw6B3VLmZTmSBdTNavH+aKQU11NhytoviZO5qtCRFZBjqxuCwY
+	GqHrMXMwfgq9yOKg5u950vtMcPeLWWPcE18dzBHkd207YcrAv1Ai/I+M8XPomZkaPXJsqurgBmHSe
+	hGaM0XDEV7Nm58pc+/moyp/0x11wDzTuRkeiF0aWzoSKwTmOhEnFZIVKVKaEdSyjP/TjX6b3COCi+
+	lcOIRewi0uQAfA6vxxPK/uGWIc6ua1SJXNt5npgRgrNjpm+RqZL8bEkETfQMz64tcy0AbPWQ7zvqt
+	FNJHpGhQ==;
 Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
 	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tvXyS-008xvU-10;
-	Fri, 21 Mar 2025 16:43:29 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 21 Mar 2025 16:43:28 +0800
-Date: Fri, 21 Mar 2025 16:43:28 +0800
-Message-Id: <9a84f666cc312786bb85def7d7f03b771a16d397.1742546178.git.herbert@gondor.apana.org.au>
+	id 1tvXyZ-008xw9-0h;
+	Fri, 21 Mar 2025 16:43:36 +0800
+Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 21 Mar 2025 16:43:35 +0800
+Date: Fri, 21 Mar 2025 16:43:35 +0800
+Message-Id: <342e2c0e357e71a03fa0641929069ae908b9ff28.1742546178.git.herbert@gondor.apana.org.au>
 In-Reply-To: <cover.1742546178.git.herbert@gondor.apana.org.au>
 References: <cover.1742546178.git.herbert@gondor.apana.org.au>
 From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 1/4] crypto: hash - Fix synchronous ahash chaining fallback
+Subject: [PATCH 4/4] crypto: testmgr - Add multibuffer acomp testing
 To: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Cc: "Cabiddu, Giovanni" <giovanni.cabiddu@intel.com>
 Precedence: bulk
@@ -46,224 +46,237 @@ List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 
-The synchronous ahash fallback code paths are broken because the
-ahash_restore_req assumes there is always a state object.  Fix this
-by removing the state from ahash_restore_req and localising it to
-the asynchronous completion callback.
+Add rudimentary multibuffer acomp testing.  Testing coverage is
+extended to compression vectors only.  However, as the compression
+vectors are compressed and then decompressed, this covers both
+compression and decompression.
 
-Also add a missing synchronous finish call in ahash_def_digest_finish.
-
-Fixes: f2ffe5a9183d ("crypto: hash - Add request chaining API")
-Fixes: 439963cdc3aa ("crypto: ahash - Add virtual address support")
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- crypto/ahash.c | 60 +++++++++++++++++++++++---------------------------
- 1 file changed, 28 insertions(+), 32 deletions(-)
+ crypto/testmgr.c | 142 ++++++++++++++++++++++++++---------------------
+ 1 file changed, 79 insertions(+), 63 deletions(-)
 
-diff --git a/crypto/ahash.c b/crypto/ahash.c
-index 9c26175c21a8..f0068c72a9e1 100644
---- a/crypto/ahash.c
-+++ b/crypto/ahash.c
-@@ -57,8 +57,9 @@ struct ahash_save_req_state {
- 
- static void ahash_reqchain_done(void *data, int err);
- static int ahash_save_req(struct ahash_request *req, crypto_completion_t cplt);
--static void ahash_restore_req(struct ahash_save_req_state *state);
-+static void ahash_restore_req(struct ahash_request *req);
- static void ahash_def_finup_done1(void *data, int err);
-+static int ahash_def_finup_finish1(struct ahash_request *req, int err);
- static int ahash_def_finup(struct ahash_request *req);
- 
- static int hash_walk_next(struct crypto_hash_walk *walk)
-@@ -357,14 +358,15 @@ static int ahash_reqchain_virt(struct ahash_save_req_state *state,
- 	return err;
- }
- 
--static int ahash_reqchain_finish(struct ahash_save_req_state *state,
-+static int ahash_reqchain_finish(struct ahash_request *req0,
-+				 struct ahash_save_req_state *state,
- 				 int err, u32 mask)
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 5694901e5242..02016ae7c7dd 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -3544,27 +3544,48 @@ static int test_acomp(struct crypto_acomp *tfm,
+ 		      int ctcount, int dtcount)
  {
--	struct ahash_request *req0 = state->req0;
- 	struct ahash_request *req = state->cur;
- 	struct crypto_ahash *tfm;
- 	struct ahash_request *n;
- 	bool update;
-+	u8 *page;
+ 	const char *algo = crypto_tfm_alg_driver_name(crypto_acomp_tfm(tfm));
+-	unsigned int i;
+-	char *output, *decomp_out;
+-	int ret;
+-	struct scatterlist src, dst;
+-	struct acomp_req *req;
++	struct scatterlist *src = NULL, *dst = NULL;
++	struct acomp_req *reqs[MAX_MB_MSGS] = {};
++	char *decomp_out[MAX_MB_MSGS] = {};
++	char *output[MAX_MB_MSGS] = {};
+ 	struct crypto_wait wait;
++	struct acomp_req *req;
++	int ret = -ENOMEM;
++	unsigned int i;
  
- 	err = ahash_reqchain_virt(state, err, mask);
- 	if (err == -EINPROGRESS || err == -EBUSY)
-@@ -418,7 +420,12 @@ static int ahash_reqchain_finish(struct ahash_save_req_state *state,
- 		list_add_tail(&req->base.list, &req0->base.list);
- 	}
+-	output = kmalloc(COMP_BUF_SIZE, GFP_KERNEL);
+-	if (!output)
+-		return -ENOMEM;
++	src = kmalloc_array(MAX_MB_MSGS, sizeof(*src), GFP_KERNEL);
++	if (!src)
++		goto out;
++	dst = kmalloc_array(MAX_MB_MSGS, sizeof(*dst), GFP_KERNEL);
++	if (!dst)
++		goto out;
  
--	ahash_restore_req(state);
-+	page = state->page;
-+	if (page) {
-+		memset(page, 0, PAGE_SIZE);
-+		free_page((unsigned long)page);
-+	}
-+	ahash_restore_req(req0);
- 
- out:
- 	return err;
-@@ -437,7 +444,8 @@ static void ahash_reqchain_done(void *data, int err)
- 		goto notify;
- 	}
- 
--	err = ahash_reqchain_finish(state, err, CRYPTO_TFM_REQ_MAY_BACKLOG);
-+	err = ahash_reqchain_finish(state->req0, state, err,
-+				    CRYPTO_TFM_REQ_MAY_BACKLOG);
- 	if (err == -EBUSY)
- 		return;
- 
-@@ -513,13 +521,10 @@ static int ahash_do_req_chain(struct ahash_request *req,
- 	if (err == -EBUSY || err == -EINPROGRESS)
- 		return -EBUSY;
- 
--	return ahash_reqchain_finish(state, err, ~0);
-+	return ahash_reqchain_finish(req, state, err, ~0);
- 
- out_free_page:
--	if (page) {
--		memset(page, 0, PAGE_SIZE);
--		free_page((unsigned long)page);
--	}
-+	free_page((unsigned long)page);
- 
- out_set_chain:
- 	req->base.err = err;
-@@ -578,18 +583,15 @@ static int ahash_save_req(struct ahash_request *req, crypto_completion_t cplt)
- 	req->base.complete = cplt;
- 	req->base.data = state;
- 	state->req0 = req;
--	state->page = NULL;
- 
- 	return 0;
- }
- 
--static void ahash_restore_req(struct ahash_save_req_state *state)
-+static void ahash_restore_req(struct ahash_request *req)
- {
--	struct ahash_request *req = state->req0;
-+	struct ahash_save_req_state *state;
- 	struct crypto_ahash *tfm;
- 
--	free_page((unsigned long)state->page);
--
- 	tfm = crypto_ahash_reqtfm(req);
- 	if (!ahash_is_async(tfm))
- 		return;
-@@ -680,9 +682,8 @@ int crypto_ahash_finup(struct ahash_request *req)
- }
- EXPORT_SYMBOL_GPL(crypto_ahash_finup);
- 
--static int ahash_def_digest_finish(struct ahash_save_req_state *state, int err)
-+static int ahash_def_digest_finish(struct ahash_request *req, int err)
- {
--	struct ahash_request *req = state->req0;
- 	struct crypto_ahash *tfm;
- 
- 	if (err)
-@@ -696,8 +697,10 @@ static int ahash_def_digest_finish(struct ahash_save_req_state *state, int err)
- 	if (err == -EINPROGRESS || err == -EBUSY)
- 		return err;
- 
-+	return ahash_def_finup_finish1(req, err);
+-	decomp_out = kmalloc(COMP_BUF_SIZE, GFP_KERNEL);
+-	if (!decomp_out) {
+-		kfree(output);
+-		return -ENOMEM;
++	for (i = 0; i < MAX_MB_MSGS; i++) {
++		reqs[i] = acomp_request_alloc(tfm);
++		if (!reqs[i])
++			goto out;
 +
- out:
--	ahash_restore_req(state);
-+	ahash_restore_req(req);
- 	return err;
- }
++		acomp_request_set_callback(reqs[i],
++					   CRYPTO_TFM_REQ_MAY_SLEEP |
++					   CRYPTO_TFM_REQ_MAY_BACKLOG,
++					   crypto_req_done, &wait);
++		if (i)
++			acomp_request_chain(reqs[i], reqs[0]);
++
++		output[i] = kmalloc(COMP_BUF_SIZE, GFP_KERNEL);
++		if (!output[i])
++			goto out;
++
++		decomp_out[i] = kmalloc(COMP_BUF_SIZE, GFP_KERNEL);
++		if (!decomp_out[i])
++			goto out;
+ 	}
  
-@@ -714,7 +717,7 @@ static void ahash_def_digest_done(void *data, int err)
+ 	for (i = 0; i < ctcount; i++) {
+ 		unsigned int dlen = COMP_BUF_SIZE;
+ 		int ilen = ctemplate[i].inlen;
+ 		void *input_vec;
++		int j;
  
- 	areq->base.flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
+ 		input_vec = kmemdup(ctemplate[i].input, ilen, GFP_KERNEL);
+ 		if (!input_vec) {
+@@ -3572,70 +3593,61 @@ static int test_acomp(struct crypto_acomp *tfm,
+ 			goto out;
+ 		}
  
--	err = ahash_def_digest_finish(state0, err);
-+	err = ahash_def_digest_finish(areq, err);
- 	if (err == -EINPROGRESS || err == -EBUSY)
- 		return;
+-		memset(output, 0, dlen);
+ 		crypto_init_wait(&wait);
+-		sg_init_one(&src, input_vec, ilen);
+-		sg_init_one(&dst, output, dlen);
++		sg_init_one(src, input_vec, ilen);
  
-@@ -724,20 +727,17 @@ static void ahash_def_digest_done(void *data, int err)
+-		req = acomp_request_alloc(tfm);
+-		if (!req) {
+-			pr_err("alg: acomp: request alloc failed for %s\n",
+-			       algo);
+-			kfree(input_vec);
+-			ret = -ENOMEM;
+-			goto out;
++		for (j = 0; j < MAX_MB_MSGS; j++) {
++			sg_init_one(dst + j, output[j], dlen);
++			acomp_request_set_params(reqs[j], src, dst + j, ilen, dlen);
+ 		}
  
- static int ahash_def_digest(struct ahash_request *req)
- {
--	struct ahash_save_req_state *state;
- 	int err;
- 
- 	err = ahash_save_req(req, ahash_def_digest_done);
- 	if (err)
- 		return err;
- 
--	state = req->base.data;
+-		acomp_request_set_params(req, &src, &dst, ilen, dlen);
+-		acomp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+-					   crypto_req_done, &wait);
 -
- 	err = crypto_ahash_init(req);
- 	if (err == -EINPROGRESS || err == -EBUSY)
- 		return err;
++		req = reqs[0];
+ 		ret = crypto_wait_req(crypto_acomp_compress(req), &wait);
+ 		if (ret) {
+ 			pr_err("alg: acomp: compression failed on test %d for %s: ret=%d\n",
+ 			       i + 1, algo, -ret);
+ 			kfree(input_vec);
+-			acomp_request_free(req);
+ 			goto out;
+ 		}
  
--	return ahash_def_digest_finish(state, err);
-+	return ahash_def_digest_finish(req, err);
- }
+ 		ilen = req->dlen;
+ 		dlen = COMP_BUF_SIZE;
+-		sg_init_one(&src, output, ilen);
+-		sg_init_one(&dst, decomp_out, dlen);
+ 		crypto_init_wait(&wait);
+-		acomp_request_set_params(req, &src, &dst, ilen, dlen);
+-
+-		ret = crypto_wait_req(crypto_acomp_decompress(req), &wait);
+-		if (ret) {
+-			pr_err("alg: acomp: compression failed on test %d for %s: ret=%d\n",
+-			       i + 1, algo, -ret);
+-			kfree(input_vec);
+-			acomp_request_free(req);
+-			goto out;
++		for (j = 0; j < MAX_MB_MSGS; j++) {
++			sg_init_one(src + j, output[j], ilen);
++			sg_init_one(dst + j, decomp_out[j], dlen);
++			acomp_request_set_params(reqs[j], src + j, dst + j, ilen, dlen);
+ 		}
  
- int crypto_ahash_digest(struct ahash_request *req)
-@@ -779,13 +779,12 @@ static void ahash_def_finup_done2(void *data, int err)
- 	if (err == -EINPROGRESS)
- 		return;
+-		if (req->dlen != ctemplate[i].inlen) {
+-			pr_err("alg: acomp: Compression test %d failed for %s: output len = %d\n",
+-			       i + 1, algo, req->dlen);
+-			ret = -EINVAL;
+-			kfree(input_vec);
+-			acomp_request_free(req);
+-			goto out;
+-		}
++		crypto_wait_req(crypto_acomp_decompress(req), &wait);
++		for (j = 0; j < MAX_MB_MSGS; j++) {
++			ret = reqs[j]->base.err;
++			if (ret) {
++				pr_err("alg: acomp: compression failed on test %d (%d) for %s: ret=%d\n",
++				       i + 1, j, algo, -ret);
++				kfree(input_vec);
++				goto out;
++			}
  
--	ahash_restore_req(state);
-+	ahash_restore_req(areq);
- 	ahash_request_complete(areq, err);
- }
+-		if (memcmp(input_vec, decomp_out, req->dlen)) {
+-			pr_err("alg: acomp: Compression test %d failed for %s\n",
+-			       i + 1, algo);
+-			hexdump(output, req->dlen);
+-			ret = -EINVAL;
+-			kfree(input_vec);
+-			acomp_request_free(req);
+-			goto out;
++			if (reqs[j]->dlen != ctemplate[i].inlen) {
++				pr_err("alg: acomp: Compression test %d (%d) failed for %s: output len = %d\n",
++				       i + 1, j, algo, reqs[j]->dlen);
++				ret = -EINVAL;
++				kfree(input_vec);
++				goto out;
++			}
++
++			if (memcmp(input_vec, decomp_out[j], reqs[j]->dlen)) {
++				pr_err("alg: acomp: Compression test %d (%d) failed for %s\n",
++				       i + 1, j, algo);
++				hexdump(output[j], reqs[j]->dlen);
++				ret = -EINVAL;
++				kfree(input_vec);
++				goto out;
++			}
+ 		}
  
--static int ahash_def_finup_finish1(struct ahash_save_req_state *state, int err)
-+static int ahash_def_finup_finish1(struct ahash_request *req, int err)
- {
--	struct ahash_request *req = state->req0;
- 	struct crypto_ahash *tfm;
+ 		kfree(input_vec);
+-		acomp_request_free(req);
+ 	}
  
- 	if (err)
-@@ -800,7 +799,7 @@ static int ahash_def_finup_finish1(struct ahash_save_req_state *state, int err)
- 		return err;
+ 	for (i = 0; i < dtcount; i++) {
+@@ -3649,10 +3661,9 @@ static int test_acomp(struct crypto_acomp *tfm,
+ 			goto out;
+ 		}
+ 
+-		memset(output, 0, dlen);
+ 		crypto_init_wait(&wait);
+-		sg_init_one(&src, input_vec, ilen);
+-		sg_init_one(&dst, output, dlen);
++		sg_init_one(src, input_vec, ilen);
++		sg_init_one(dst, output[0], dlen);
+ 
+ 		req = acomp_request_alloc(tfm);
+ 		if (!req) {
+@@ -3663,7 +3674,7 @@ static int test_acomp(struct crypto_acomp *tfm,
+ 			goto out;
+ 		}
+ 
+-		acomp_request_set_params(req, &src, &dst, ilen, dlen);
++		acomp_request_set_params(req, src, dst, ilen, dlen);
+ 		acomp_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+ 					   crypto_req_done, &wait);
+ 
+@@ -3685,10 +3696,10 @@ static int test_acomp(struct crypto_acomp *tfm,
+ 			goto out;
+ 		}
+ 
+-		if (memcmp(output, dtemplate[i].output, req->dlen)) {
++		if (memcmp(output[0], dtemplate[i].output, req->dlen)) {
+ 			pr_err("alg: acomp: Decompression test %d failed for %s\n",
+ 			       i + 1, algo);
+-			hexdump(output, req->dlen);
++			hexdump(output[0], req->dlen);
+ 			ret = -EINVAL;
+ 			kfree(input_vec);
+ 			acomp_request_free(req);
+@@ -3702,8 +3713,13 @@ static int test_acomp(struct crypto_acomp *tfm,
+ 	ret = 0;
  
  out:
--	ahash_restore_req(state);
-+	ahash_restore_req(req);
- 	return err;
+-	kfree(decomp_out);
+-	kfree(output);
++	acomp_request_free(reqs[0]);
++	for (i = 0; i < MAX_MB_MSGS; i++) {
++		kfree(output[i]);
++		kfree(decomp_out[i]);
++	}
++	kfree(dst);
++	kfree(src);
+ 	return ret;
  }
  
-@@ -817,7 +816,7 @@ static void ahash_def_finup_done1(void *data, int err)
- 
- 	areq->base.flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
- 
--	err = ahash_def_finup_finish1(state0, err);
-+	err = ahash_def_finup_finish1(areq, err);
- 	if (err == -EINPROGRESS || err == -EBUSY)
- 		return;
- 
-@@ -827,20 +826,17 @@ static void ahash_def_finup_done1(void *data, int err)
- 
- static int ahash_def_finup(struct ahash_request *req)
- {
--	struct ahash_save_req_state *state;
- 	int err;
- 
- 	err = ahash_save_req(req, ahash_def_finup_done1);
- 	if (err)
- 		return err;
- 
--	state = req->base.data;
--
- 	err = crypto_ahash_update(req);
- 	if (err == -EINPROGRESS || err == -EBUSY)
- 		return err;
- 
--	return ahash_def_finup_finish1(state, err);
-+	return ahash_def_finup_finish1(req, err);
- }
- 
- int crypto_ahash_export(struct ahash_request *req, void *out)
 -- 
 2.39.5
 
