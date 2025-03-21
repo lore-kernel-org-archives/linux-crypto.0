@@ -1,97 +1,184 @@
-Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f173.google.com (mail-yb1-f173.google.com [209.85.219.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CFB7150980;
-	Fri, 21 Mar 2025 17:32:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.79.88.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBE04B664
+	for <linux-crypto@vger.kernel.org>; Fri, 21 Mar 2025 18:57:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1742578369; cv=none; b=nLtDkIVWoupZBlene+yo425nuReD9Yfcf4BeOOyfc9YCii5l/bGQeDD4WMfmu4yIHX5hfGgMWfhiMu3FB1XZjHixAlN8ok7TGcEyqPmieLYLpM3HAzZXP4lSRxD7IxPue9W8tYtxJdVPNyThLJVm625PGOCZ1QJ8ZA0VOy3XPco=
+	t=1742583444; cv=none; b=BSeCLKE2S+3Vdmu+lSDGWATnWBYa5xsvQVOV/Clzp1UOIcNtcb3dZOr52RIRXYn2nat3iU9RhqsUQyXgrhGCEASXy8+1Li+c64r4iEgOJcNwe17oZSs17x1DVulWwirVEn5IBrleOoULkW+zemUNxdkB9+mAYR8K0MODls4xNc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1742578369; c=relaxed/simple;
-	bh=ylazAiId8B+tXX/5u3yopnZM1vrUb4IkzGMknQShfq8=;
-	h=From:To:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=jMwf3mcx37kodmm3gpQFbUNj7YwcOFF7LnpgCOnDYAbP4jHKdhxltd00ZSGKL521J0QOEoX8vRl3t1EV0+feRoFEn3MJeHmCJjVdvLm7vsj/aeSzbs7HO+aEbPikVqfGXJX30EnqEV7sGdueOtW03j38ob2uSZ5CaAStSbXZAJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net; spf=pass smtp.mailfrom=lwn.net; dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b=js9XcrS6; arc=none smtp.client-ip=45.79.88.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lwn.net
+	s=arc-20240116; t=1742583444; c=relaxed/simple;
+	bh=R9jLZ0JS/I/Nk0Iz0Fs5IHkSxU6QsL7aQ1XSqeyU8Gc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=U/he0+Ru7J72HVB2Kjuz1RgJ0r3AeeL37q4SitPPTz1Z+3LAoE7aAZARndArjlnud+RG/ZA/GVoko3EUz0Qzs7dnA+fx1q3blwn0irv4ZV6ZvEvpk22GOCWys2WHpdHgywHwa3yRmFBoBOuMzO4/Ka1MAqp3ErV6WAFmzjvG/2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=QC0JtafT; arc=none smtp.client-ip=209.85.219.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="js9XcrS6"
-DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net D0FF741061
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
-	t=1742578367; bh=e8LnavV6SlTbyQVO8z9IZ0GGY7kUoVlnZAAZGa1WgGY=;
-	h=From:To:Subject:In-Reply-To:References:Date:From;
-	b=js9XcrS6T1hU9105EYTWYu8QHp3SNxGbUpoLpab9Trijr4b0fesgpaniwQWJfswlh
-	 ATPI9S0oPNQlRiMt/7T6OWkafx8InYbdl0QfVKu54wTi7xwYHBClpJNe4IoP9ylwMP
-	 u3e1fJie/f4Az/VmsumaL5+OQ3pCvYh07XbrS3INkKg36etVNNpcqGwjUaEU/tE368
-	 psPv+vn1tLmkpGJwmZQt9u7FbgBq08sjXUGShJL+ykeWs4mCvk9U5qrPxmvQGpGYRd
-	 Faurwchzh6Jow6jkU10g6YSpsNJprVUCpYFanKdZXtGl9dnZaoFMjTFso0dT/pPV9b
-	 qDt4mgKUSeKuw==
-Received: from localhost (mdns.lwn.net [45.79.72.68])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by ms.lwn.net (Postfix) with ESMTPSA id D0FF741061;
-	Fri, 21 Mar 2025 17:32:46 +0000 (UTC)
-From: Jonathan Corbet <corbet@lwn.net>
-To: Blaise Boscaccy <bboscaccy@linux.microsoft.com>, David Howells
- <dhowells@redhat.com>, Herbert Xu <herbert@gondor.apana.org.au>, "David S.
- Miller" <davem@davemloft.net>, Paul Moore <paul@paul-moore.com>, James
- Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, Masahiro
- Yamada <masahiroy@kernel.org>, Nathan Chancellor <nathan@kernel.org>,
- Nicolas Schier <nicolas@fjasle.eu>, Shuah Khan <shuah@kernel.org>,
- =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>, =?utf-8?Q?G=C3=BC?=
- =?utf-8?Q?nther?= Noack <gnoack@google.com>, Nick
- Desaulniers <nick.desaulniers+lkml@gmail.com>, Bill Wendling
- <morbo@google.com>, Justin Stitt <justinstitt@google.com>, Blaise Boscaccy
- <bboscaccy@linux.microsoft.com>, Jarkko Sakkinen <jarkko@kernel.org>, Jan
- Stancek <jstancek@redhat.com>, Neal Gompa <neal@gompa.dev>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
- linux-security-module@vger.kernel.org, linux-kbuild@vger.kernel.org,
- linux-kselftest@vger.kernel.org, bpf@vger.kernel.org,
- llvm@lists.linux.dev, nkapron@google.com, teknoraver@meta.com,
- roberto.sassu@huawei.com, xiyou.wangcong@gmail.com
-Subject: Re: [RFC PATCH security-next 1/4] security: Hornet LSM
-In-Reply-To: <20250321164537.16719-2-bboscaccy@linux.microsoft.com>
-References: <20250321164537.16719-1-bboscaccy@linux.microsoft.com>
- <20250321164537.16719-2-bboscaccy@linux.microsoft.com>
-Date: Fri, 21 Mar 2025 11:32:45 -0600
-Message-ID: <87frj6l26a.fsf@trenco.lwn.net>
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="QC0JtafT"
+Received: by mail-yb1-f173.google.com with SMTP id 3f1490d57ef6-e5dc299deb4so2297629276.1
+        for <linux-crypto@vger.kernel.org>; Fri, 21 Mar 2025 11:57:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1742583442; x=1743188242; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PX53KeX8QdfdkHuGZL3pdegSXRrN5TG6dmB2yHiIl9U=;
+        b=QC0JtafTjLYnReunsyFX4LGaxjmtHg0EVVJEojotz08Zwhq5mKW92FvOugkwHGgZu5
+         0opXpQ0BpiZ7Hdtp3vRofn8pGNNdrAMPBX9dpi+Epn867rSu9t4Lo5J1C+p8LcKOO+GK
+         MSfIQ9YxN9Cp8f0EiiaxW7utlvt7B9mpLrmXAQU4IuzRVuLO6+ZWCGDwDc/fFT7Xh9cn
+         lz7NouYffWf7G2EhPJhOdBReWc+0wrNsGNp081zH1B0sgwSmm9GiKa5MTpA52Qq9//My
+         5MX5qRbeeAGQtu5BPtVZFOjPFXzhrpQKUQglS8/l06BOuPlr0pryogZbrXSOKrv7nbyF
+         AwKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1742583442; x=1743188242;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PX53KeX8QdfdkHuGZL3pdegSXRrN5TG6dmB2yHiIl9U=;
+        b=bqjnw+EAxFjgwaXUb3bVBxpzSww2aX51v5R+uvG57pp+b8lTGOb1X6Lt1m8VyenjAl
+         aBhBe9IYzjNvp95PDI5Pp7hGBzW9+1gxHYFmonfSIM6oTJ9THd0XRhM+xJdG30KOhiD5
+         OCzRFcjZmeGyJu4NLw0Nd/f7A8Tl7idha8JWMmWltf8y+pmCgEfGWdjh4uK8yp+kG4e5
+         jZkP3F9oKPcqAbxqyt6eSJa9EMBoZTUaGiKN0hyZn5Cjkzh1M6nqJeuFfNtNVDB9Xepf
+         z/Ouqefo4UjMhWPNewJWMYG4R4MRu3BbXKARWO4YAHMIX0IvkW6wlX9hGcx3L8LThdyw
+         1iWA==
+X-Forwarded-Encrypted: i=1; AJvYcCW4NZV/9g0HHJwsNOw1+qsT68yr5QryBODEqMSX/2QO8AE1o7SBlmtkwqEM8R86tB7vLfJAb1RwdmUWlU8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxqc/VEyvbBtvbO5BsB1AeL50BwkgHBHRUdIlTHpFnCXwdosF7+
+	+qxndLZtm5+YVxNhHbiuDAteJwlvNyOvNHihKBy9YUfEk3UwfdiQWZEGpUtkneK9C6FaC9ajCWI
+	oPQjiinrF7mHV6nFnMcBxdKKbo4QW4bMtsBxK
+X-Gm-Gg: ASbGncuezr85wcbuaCqmIt7bLpDJkXggDySDm9DFFo46FeAx+fSkqvcXamapoKz54E0
+	wMB3aPTa1el2NDwWI+iea9JafT0aPOfifeFh1oPwTKzFkFTYfT5mwuHyLVmHxKgG8wL7vhZtzJ7
+	KLx/VD9xb8aTUdYWfMgS4jyrkfiA==
+X-Google-Smtp-Source: AGHT+IHWOfZuod7gXcYVT7pQNeKd7Yx7NruRIAvwDJwwJA0Zn5j0qTeOw7UV9AmgyOEamkLXhmLVnNJPDbaPxH+JWSw=
+X-Received: by 2002:a05:6902:2709:b0:e63:6f6a:ab03 with SMTP id
+ 3f1490d57ef6-e66a4dbd62cmr6107284276.22.1742583441566; Fri, 21 Mar 2025
+ 11:57:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: linux-crypto@vger.kernel.org
 List-Id: <linux-crypto.vger.kernel.org>
 List-Subscribe: <mailto:linux-crypto+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:linux-crypto+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20241017155516.2582369-1-eric.snowberg@oracle.com>
+ <c490397315c2704e9ef65c8ad3fefedb239f1997.camel@linux.ibm.com>
+ <72F52F71-C7F3-402D-8441-3D636A093FE8@oracle.com> <CAHC9VhRHEw5c+drC=aX4xTqWoQJJZ+qkJ7aHUT5dcu+Q5f7BqA@mail.gmail.com>
+ <CAHC9VhSJpnaAK1efgs1Uk0Tr3CaDNR1LiDU-t_yDKDQG6J-74Q@mail.gmail.com>
+ <E20C617B-EA01-4E69-B5E2-31E9AAD6F7A2@oracle.com> <506e8e58e5236a4525b18d84bafa9aae80b24452.camel@linux.ibm.com>
+ <CAHC9VhTsZntLdGBV7=4suauS+rzSQv1O4UAoGcy2vEB02wRkoA@mail.gmail.com>
+ <c580811716f550ed5d6777db5e143afe4ad06edc.camel@linux.ibm.com>
+ <CAHC9VhTz6U5rRdbJBWq0_U4BSKTsiGCsaX=LTgisNNoZXZokOA@mail.gmail.com>
+ <FD501FB8-72D2-4B10-A03A-F52FC5B67646@oracle.com> <CAHC9VhR961uTFueovLXXaOf-3ZAnvQCWOTfw-wCRuAKOKPAOKw@mail.gmail.com>
+ <73B78CE7-1BB8-4065-9EBA-FB69E327725E@oracle.com> <CAHC9VhRMUkzLVT5GT5c5hgpfaaKubzcPOTWFDpOmhNne0sswPA@mail.gmail.com>
+ <1A222B45-FCC4-4BBD-8E17-D92697FE467D@oracle.com> <CAHC9VhTObTee95SwZ+C4EwPotovE9R3vy0gVXf+kATtP3vfXrg@mail.gmail.com>
+ <EB757F96-E152-4EAB-B3F7-75C1DBE3A03B@oracle.com> <1956e7f9d60.28a7.85c95baa4474aabc7814e68940a78392@paul-moore.com>
+ <A3A29FB9-E015-4C87-B5F0-190A4C779CB3@oracle.com> <CAHC9VhQMN6cgWbxdAgBNffpCAo=ogGdm4qBGS_kKdDmiT8b3cw@mail.gmail.com>
+ <B89ED288-1A01-41D2-8ECF-285669139553@oracle.com>
+In-Reply-To: <B89ED288-1A01-41D2-8ECF-285669139553@oracle.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Fri, 21 Mar 2025 14:57:10 -0400
+X-Gm-Features: AQ5f1JoZ0K8YLyq-d626n3YkVM423cC9evLtvBNR5_Xa6ss3FNArdL28zS4Umlo
+Message-ID: <CAHC9VhQb55+SmwmrsVpyw5X2Ys0oo6gJ_dbDf64mS5c008230A@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 00/13] Clavis LSM
+To: Eric Snowberg <eric.snowberg@oracle.com>
+Cc: Mimi Zohar <zohar@linux.ibm.com>, David Howells <dhowells@redhat.com>, 
+	Jarkko Sakkinen <jarkko@kernel.org>, 
+	"open list:SECURITY SUBSYSTEM" <linux-security-module@vger.kernel.org>, 
+	David Woodhouse <dwmw2@infradead.org>, 
+	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>, "davem@davemloft.net" <davem@davemloft.net>, 
+	Ard Biesheuvel <ardb@kernel.org>, James Morris <jmorris@namei.org>, 
+	"Serge E. Hallyn" <serge@hallyn.com>, Roberto Sassu <roberto.sassu@huawei.com>, 
+	Dmitry Kasatkin <dmitry.kasatkin@gmail.com>, =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, 
+	"casey@schaufler-ca.com" <casey@schaufler-ca.com>, Stefan Berger <stefanb@linux.ibm.com>, 
+	"ebiggers@kernel.org" <ebiggers@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, 
+	open list <linux-kernel@vger.kernel.org>, 
+	"keyrings@vger.kernel.org" <keyrings@vger.kernel.org>, 
+	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, 
+	"linux-efi@vger.kernel.org" <linux-efi@vger.kernel.org>, 
+	"linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Blaise Boscaccy <bboscaccy@linux.microsoft.com> writes:
-
-> This adds the Hornet Linux Security Module which provides signature
-> verification of eBPF programs.
+On Fri, Mar 21, 2025 at 12:37=E2=80=AFPM Eric Snowberg <eric.snowberg@oracl=
+e.com> wrote:
+> > On Mar 20, 2025, at 3:36=E2=80=AFPM, Paul Moore <paul@paul-moore.com> w=
+rote:
+> > On Thu, Mar 20, 2025 at 12:29=E2=80=AFPM Eric Snowberg <eric.snowberg@o=
+racle.com> wrote:
+> >>> On Mar 6, 2025, at 7:46=E2=80=AFPM, Paul Moore <paul@paul-moore.com> =
+wrote:
+> >>> On March 6, 2025 5:29:36 PM Eric Snowberg <eric.snowberg@oracle.com> =
+wrote:
+> >
+> > ...
+> >
+> >>>> Does this mean Microsoft will begin signing shims in the future with=
+out
+> >>>> the lockdown requirement?
+> >>>
+> >>> That's not a question I can answer, you'll need to discuss that with =
+the UEFI SB people.
+> >>
+> >> Based on your previous lockdown comments, I thought you might have
+> >> some new information.  Having lockdown enforcement has always been
+> >> a requirement to get a shim signed by Microsoft.
 >
-> Hornet uses a similar signature verification scheme similar to that of
-> kernel modules. A pkcs#7 signature is appended to the end of an
-> executable file. During an invocation of bpf_prog_load, the signature
-> is fetched from the current task's executable file. That signature is
-> used to verify the integrity of the bpf instructions and maps which
-> where passed into the kernel. Additionally, Hornet implicitly trusts any
-> programs which where loaded from inside kernel rather than userspace,
-> which allows BPF_PRELOAD programs along with outputs for BPF_SYSCALL
-> programs to run.
+> ...
 >
-> Hornet allows users to continue to maintain an invariant that all code
-> running inside of the kernel has been signed and works well with
-> light-skeleton based loaders, or any statically generated program that
-> doesn't require userspace instruction rewriting.
+> >> The alternative "usage-oriented keyring" approach you've suggested
+> >> wouldn't align with the threat model that lockdown aims to achieve.
+> >
+> > That's a Lockdown problem, or more specifically a problem for the
+> > people who are freeloading on the Lockdown LSM and expecting it to be
+> > maintained without contributing anything meaningful.
 >
-> Signed-off-by: Blaise Boscaccy <bboscaccy@linux.microsoft.com>
-> ---
->  Documentation/admin-guide/LSM/Hornet.rst |  51 +++++
+> There are past examples of previous contributions, but they don't seem to
+> go anywhere:
+>
+> https://lkml.org/lkml/2023/5/26/1057
 
-You will need to add that file to .../index.rst, or it won't be included
-in the docs build.
+Those patches proposed loosening Lockdown restrictions, which is
+particularly concerning given the intent behind Lockdown, and
+considering the author did not have any existing patches under
+security/ (they still do not, I just checked) there was room for
+concern.  If your first introduction to your neighbour includes
+proposing the removal of the locks on their front door, you have to
+understand that they might not consider this a valuable contribution
+and might bristle at the idea of handing over responsibility of their
+home's security to you.
 
-Thanks,
+You are welcome to continue to criticize me and my handling of things,
+that's the popular thing to do these days when you disagree with a
+maintainer, but I will note that I don't recall you offering to step
+up and maintain Lockdown anywhere in this thread.
 
-jon
+> Which causes us to carry patches like this downstream.
+
+Which is your choice, and I'm sure you have plenty more patches
+unrelated to Lockdown in your downstream repo.
+
+> >> With Clavis, I attempted to develop
+> >> an approach that would meet the lockdown threat model requirements
+> >> while allowing the end user to control key usage as they deem fit.
+> >
+> > As mentioned previously, the design/implementation choices you made
+> > for Clavis means it is better suited for inclusion in the key
+> > subsystem and not as a standalone LSM.  If you wanted to
+> > redesign/rework Clavis to stick to the traditional LSM security blobs
+> > perhaps that is something we could consider as a LSM, but it's
+> > probably worth seeing if David and Jarkko have any interest in
+> > including Clavis functionality in the key subsystem first.
+>
+> The direction of creating a new LSM was based on this discussion ...
+
+Oh so we are going to repeat ourselves, are we?
+
+> A lot of time could have been saved had your concerns been
+> voiced in either the first or second round ...
+
+I'm still waiting for someone to connect the dots between a lack of
+"timely" review (feel free to define that however you like) and these
+never ending threads where we keep rehashing arguments over and over
+and over ...
+
+--=20
+paul-moore.com
